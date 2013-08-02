@@ -18,8 +18,6 @@ typedef struct {
 //static int			botBeginDelay = 0;  // bk001206 - unused, init
 static botSpawnQueue_t	botSpawnQueue[BOT_SPAWN_QUEUE_DEPTH];
 
-vmCvar_t bot_minplayers;
-
 extern gentity_t	*podium1;
 extern gentity_t	*podium2;
 extern gentity_t	*podium3;
@@ -614,126 +612,46 @@ G_CheckMinimumPlayers
 ===============
 */
 void G_CheckMinimumPlayers( void ) {
-	int minplayers;
 	int humanplayers, botplayers;
 	static int checkminimumplayers_time;
 
-	if (level.gametype == GT_SIEGE)
-	{
+	if ( level.gametype == GT_SIEGE )
 		return;
-	}
 
-	if (level.intermissiontime) return;
+	if ( level.intermissiontime )
+		return;
+
 	//only check once each 10 seconds
-	if (checkminimumplayers_time > level.time - 10000) {
+	if ( checkminimumplayers_time > level.time - (bot_addDelay.integer*1000) )
 		return;
-	}
-	checkminimumplayers_time = level.time;
-	trap_Cvar_Update(&bot_minplayers);
-	minplayers = bot_minplayers.integer;
-	if (minplayers <= 0) return;
 
-	if (minplayers > sv_maxclients.integer)
-	{
-		minplayers = sv_maxclients.integer;
+	checkminimumplayers_time = level.time;
+
+	if ( bot_minplayers.integer <= 0 )
+		return;
+
+	if ( bot_minplayers.integer > sv_maxclients.integer ) {
+		trap_Cvar_Set( "bot_minplayers", sv_maxclients.string );
+		trap_Cvar_Update( &bot_minplayers );
 	}
 
 	humanplayers = G_CountHumanPlayers( -1 );
 	botplayers = G_CountBotPlayers(	-1 );
 
-	if ((humanplayers+botplayers) < minplayers)
+	// if numPlayers < minPlayers and (maxBots and numPlayers < maxBots)
+	//	then addbot
+	if ( (humanplayers+botplayers) < bot_minplayers.integer
+		&& (!bot_maxbots.integer || (humanplayers+botplayers) < bot_maxbots.integer) )
 	{
-		G_AddRandomBot(-1);
+		G_AddRandomBot( -1 );
 	}
-	else if ((humanplayers+botplayers) > minplayers && botplayers)
+	else if ( ((humanplayers+botplayers) > bot_minplayers.integer && botplayers)
+		|| (botplayers > bot_maxbots.integer && botplayers && bot_maxbots.integer) )
 	{
 		// try to remove spectators first
-		if (!G_RemoveRandomBot(TEAM_SPECTATOR))
-		{
-			// just remove the bot that is playing
-			G_RemoveRandomBot(-1);
-		}
+		if ( !G_RemoveRandomBot( TEAM_SPECTATOR ) )
+			G_RemoveRandomBot( -1 );
 	}
-
-	/*
-	if (level.gametype >= GT_TEAM) {
-		int humanplayers2, botplayers2;
-		if (minplayers >= sv_maxclients.integer / 2) {
-			minplayers = (sv_maxclients.integer / 2) -1;
-		}
-
-		humanplayers = G_CountHumanPlayers( TEAM_RED );
-		botplayers = G_CountBotPlayers(	TEAM_RED );
-		humanplayers2 = G_CountHumanPlayers( TEAM_BLUE );
-		botplayers2 = G_CountBotPlayers( TEAM_BLUE );
-		//
-		if ((humanplayers+botplayers+humanplayers2+botplayers) < minplayers)
-		{
-			if ((humanplayers+botplayers) < (humanplayers2+botplayers2))
-			{
-				G_AddRandomBot( TEAM_RED );
-			}
-			else
-			{
-				G_AddRandomBot( TEAM_BLUE );
-			}
-		}
-		else if ((humanplayers+botplayers+humanplayers2+botplayers) > minplayers && botplayers)
-		{
-			if ((humanplayers+botplayers) < (humanplayers2+botplayers2))
-			{
-				G_RemoveRandomBot( TEAM_BLUE );
-			}
-			else
-			{
-				G_RemoveRandomBot( TEAM_RED );
-			}
-		}
-	}
-	else if (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) {
-		if (minplayers >= sv_maxclients.integer) {
-			minplayers = sv_maxclients.integer-1;
-		}
-		humanplayers = G_CountHumanPlayers( -1 );
-		botplayers = G_CountBotPlayers( -1 );
-		//
-		if (humanplayers + botplayers < minplayers) {
-			G_AddRandomBot( TEAM_FREE );
-		} else if (humanplayers + botplayers > minplayers && botplayers) {
-			// try to remove spectators first
-			if (!G_RemoveRandomBot( TEAM_SPECTATOR )) {
-				// just remove the bot that is playing
-				G_RemoveRandomBot( -1 );
-			}
-		}
-	}
-	else if (level.gametype == GT_FFA) {
-		if (minplayers >= sv_maxclients.integer) {
-			minplayers = sv_maxclients.integer-1;
-		}
-		humanplayers = G_CountHumanPlayers( TEAM_FREE );
-		botplayers = G_CountBotPlayers( TEAM_FREE );
-		//
-		if (humanplayers + botplayers < minplayers) {
-			G_AddRandomBot( TEAM_FREE );
-		} else if (humanplayers + botplayers > minplayers && botplayers) {
-			G_RemoveRandomBot( TEAM_FREE );
-		}
-	}
-	else if (level.gametype == GT_HOLOCRON || level.gametype == GT_JEDIMASTER) {
-		if (minplayers >= sv_maxclients.integer) {
-			minplayers = sv_maxclients.integer-1;
-		}
-		humanplayers = G_CountHumanPlayers( TEAM_FREE );
-		botplayers = G_CountBotPlayers( TEAM_FREE );
-		//
-		if (humanplayers + botplayers < minplayers) {
-			G_AddRandomBot( TEAM_FREE );
-		} else if (humanplayers + botplayers > minplayers && botplayers) {
-			G_RemoveRandomBot( TEAM_FREE );
-		}
-	}
-	*/
 }
 
 /*
@@ -1223,8 +1141,6 @@ G_InitBots
 void G_InitBots( qboolean restart ) {
 	G_LoadBots();
 	G_LoadArenas();
-
-	trap_Cvar_Register( &bot_minplayers, "bot_minplayers", "0", CVAR_SERVERINFO );
 
 	//rww - new bot route stuff
 	LoadPath_ThisLevel();

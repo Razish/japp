@@ -12,6 +12,9 @@
 #endif
 
 XCVAR_DEF( bg_fighterAltControl,			"0",					NULL,			CVAR_SERVERINFO,								qtrue )
+XCVAR_DEF( bot_addDelay,					"3",					NULL,			CVAR_NONE,										qfalse )
+XCVAR_DEF( bot_maxbots,						"0",					NULL,			CVAR_NONE,										qtrue )
+XCVAR_DEF( bot_minplayers,					"0",					NULL,			CVAR_SERVERINFO,								qtrue )
 XCVAR_DEF( capturelimit,					"8",					NULL,			CVAR_SERVERINFO|CVAR_ARCHIVE|CVAR_NORESTART,	qtrue )
 XCVAR_DEF( com_optvehtrace,					"0",					NULL,			CVAR_NONE,										qtrue )
 XCVAR_DEF( d_altRoutes,						"0",					NULL,			CVAR_CHEAT,										qfalse )
