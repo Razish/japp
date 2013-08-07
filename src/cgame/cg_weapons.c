@@ -767,9 +767,9 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 		&& cg_trueFOV.value 
 		&& cg.predictedPlayerState.pm_type != PM_SPECTATOR
 		&& cg.predictedPlayerState.pm_type != PM_INTERMISSION )
-		cgFov = cg_trueFOV.value;
+		cgFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_trueFOV.value;
 	else
-		cgFov = cg_fov.value;
+		cgFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_fov.value;
 	//float	cgFov = cg_fov.value;
 	//[/TrueView]
 
@@ -810,6 +810,12 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	VectorMA( &hand.origin, cg.gunAlign.z, &refdef->viewaxis[2], &hand.origin );
 
 	AnglesToAxis( &angles, hand.axis );
+
+	if ( cg_fovViewmodel.integer ) {
+		float fracDistFOV = tanf( CG_GetRefdef()->fov_x * ( M_PI/180 ) * 0.5f );
+		float fracWeapFOV = ( 1.0f / fracDistFOV ) * tanf( cgFov * ( M_PI/180 ) * 0.5f );
+		VectorScale( &hand.axis[0], fracWeapFOV, &hand.axis[0] );
+	}
 
 	// map torso animations to weapon animations
 	if ( cg_debugGunFrame.integer ) {
