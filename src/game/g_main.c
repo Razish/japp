@@ -333,6 +333,7 @@ static void SetCInfo( int check, unsigned int bit ) {
 	else			cinfo &= ~bit;
 
 	trap_Cvar_Set( "jp_cinfo", va( "%i", cinfo ) );
+	trap_Cvar_Update( &jp_cinfo );
 }
 
 static void CVU_CInfo( void ) {
@@ -436,7 +437,7 @@ void G_UpdateCvars( void ) {
 		if ( cv->vmCvar ) {
 			int modCount = cv->vmCvar->modificationCount;
 			trap_Cvar_Update( cv->vmCvar );
-			if ( cv->vmCvar->modificationCount > modCount ) {
+			if ( cv->vmCvar->modificationCount != modCount ) {
 				if ( cv->update )
 					cv->update();
 
