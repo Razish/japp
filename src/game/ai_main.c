@@ -6268,6 +6268,9 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 		{
 			WPTouchRoutine(bs);
 
+			if ( !bs->wpCurrent )
+				return;
+
 			if (!bs->wpDirection)
 			{
 				desiredIndex = bs->wpCurrent->index+1;
