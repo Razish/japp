@@ -2230,21 +2230,31 @@ qboolean G_VoteGametype( gentity_t *ent, int numArgs, const char *arg1, const ch
 qboolean G_VotePromode( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
 	int n = Com_Clampi( 0, 1, atoi( arg2 ) );
 	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %i", arg1, n );
-	Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
+	Q_strncpyz( level.voteDisplayString, level.voteString, sizeof( level.voteDisplayString ) );
+	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
 	return qtrue;
 }
 
 qboolean G_VoteShootFromEye( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
 	int n = Com_Clampi( 0, 1, atoi( arg2 ) );
 	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %i", arg1, n );
-	Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
+	Q_strncpyz( level.voteDisplayString, level.voteString, sizeof( level.voteDisplayString ) );
+	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
 	return qtrue;
 }
 
 qboolean G_VoteSpeedcaps( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
 	int n = Com_Clampi( 0, 1, atoi( arg2 ) );
 	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %i", arg1, n );
-	Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
+	Q_strncpyz( level.voteDisplayString, level.voteString, sizeof( level.voteDisplayString ) );
+	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
+	return qtrue;
+}
+
+qboolean G_VoteSuicideDropFlag( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
+	int n = Com_Clampi( 0, 1, atoi( arg2 ) );
+	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %i", arg1, n );
+	Q_strncpyz( level.voteDisplayString, level.voteString, sizeof( level.voteDisplayString ) );
 	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
 	return qtrue;
 }
@@ -2391,24 +2401,25 @@ typedef struct voteString_s {
 } voteString_t;
 
 static voteString_t validVoteStrings[] = {
-	//	vote string				aliases									# args	valid gametypes							exec delay		short help	long help
-	{	"allready",				"ready",			G_VoteAllready,		2,		GTB_ALL,								qfalse,			NULL,		"" },
-	{	"capturelimit",			"caps",				G_VoteCapturelimit,	3,		GTB_CTF|GTB_CTY,						qtrue,			"<num>",	"" },
-	{	"clientkick",			NULL,				G_VoteClientkick,	3,		GTB_ALL,								qfalse,			"<num>",	"" },
-	{	"cointoss",				"coinflip",			G_VoteCointoss,		2,		GTB_ALL,								qfalse,			NULL,		"" },
-	{	"fraglimit",			"frags",			G_VoteFraglimit,	3,		GTB_ALL & ~(GTB_SIEGE|GTB_CTF|GTB_CTY),	qtrue,			"<num>",	"" },
-	{	"g_gametype",			"gametype gt mode",	G_VoteGametype,		3,		GTB_ALL,								qtrue,			"<name>",	"" },
-	{	"japp_promode",			"promode cpm",		G_VotePromode,		2,		GTB_ALL,								qtrue,			"<0-1>",	"" },
-	{	"japp_shootFromEye",	"shootfromeye",		G_VoteShootFromEye,	2,		GTB_ALL,								qfalse,			"<0-1>",	"" },
-	{	"japp_speedCaps",		"speedcaps",		G_VoteSpeedcaps,	3,		GTB_CTF|GTB_CTY,						qfalse,			"<0-1>",	"" },
-	{	"kick",					NULL,				G_VoteKick,			3,		GTB_ALL,								qfalse,			"<name>",	"" },
-	{	"map",					NULL,				G_VoteMap,			2,		GTB_ALL,								qtrue,			"<name>",	"" },
-	{	"map_restart",			"restart",			NULL,				2,		GTB_ALL,								qtrue,			NULL,		"Restarts the current map\nExample: callvote map_restart" },
-	{	"nextmap",				NULL,				G_VoteNextmap,		2,		GTB_ALL,								qtrue,			NULL,		"" },
-	{	"pause",				NULL,				G_VotePause,		2,		GTB_ALL,								qfalse,			NULL,		"" },
-	{	"shuffle",				NULL,				G_VoteShuffle,		2,		GTB_ALL & ~(GTB_NOTTEAM),				qtrue,			NULL,		"" },
-	{	"timelimit",			"time",				G_VoteTimelimit,	3,		GTB_ALL,								qtrue,			"<num>",	"" },
-	{	"warmup",				"dowarmup",			G_VoteWarmup,		3,		GTB_ALL,								qtrue,			"<0-1>",	"" },
+	//	vote string				aliases										# args	valid gametypes							exec delay		short help	long help
+	{	"allready",				"ready",			G_VoteAllready,			0,		GTB_ALL,								qfalse,			NULL,		"" },
+	{	"capturelimit",			"caps",				G_VoteCapturelimit,		1,		GTB_CTF|GTB_CTY,						qtrue,			"<num>",	"" },
+	{	"clientkick",			NULL,				G_VoteClientkick,		1,		GTB_ALL,								qfalse,			"<num>",	"" },
+	{	"cointoss",				"coinflip",			G_VoteCointoss,			0,		GTB_ALL,								qfalse,			NULL,		"" },
+	{	"fraglimit",			"frags",			G_VoteFraglimit,		1,		GTB_ALL & ~(GTB_SIEGE|GTB_CTF|GTB_CTY),	qtrue,			"<num>",	"" },
+	{	"g_gametype",			"gametype gt mode",	G_VoteGametype,			1,		GTB_ALL,								qtrue,			"<name>",	"" },
+	{	"japp_promode",			"promode cpm",		G_VotePromode,			1,		GTB_ALL,								qtrue,			"<0-1>",	"" },
+	{	"japp_shootFromEye",	"shootfromeye",		G_VoteShootFromEye,		1,		GTB_ALL,								qfalse,			"<0-1>",	"" },
+	{	"japp_speedCaps",		"speedcaps",		G_VoteSpeedcaps,		1,		GTB_CTF|GTB_CTY,						qfalse,			"<0-1>",	"" },
+	{	"japp_suicideDropFlag",	"killdropflag",		G_VoteSuicideDropFlag,	1,		GTB_CTF|GTB_CTY,						qfalse,			"<0-1>",	"Drop flag when you /kill yourself" },
+	{	"kick",					NULL,				G_VoteKick,				1,		GTB_ALL,								qfalse,			"<name>",	"" },
+	{	"map",					NULL,				G_VoteMap,				0,		GTB_ALL,								qtrue,			"<name>",	"" },
+	{	"map_restart",			"restart",			NULL,					0,		GTB_ALL,								qtrue,			NULL,		"Restarts the current map\nExample: callvote map_restart" },
+	{	"nextmap",				NULL,				G_VoteNextmap,			0,		GTB_ALL,								qtrue,			NULL,		"" },
+	{	"pause",				NULL,				G_VotePause,			0,		GTB_ALL,								qfalse,			NULL,		"" },
+	{	"shuffle",				NULL,				G_VoteShuffle,			0,		GTB_ALL & ~(GTB_NOTTEAM),				qtrue,			NULL,		"" },
+	{	"timelimit",			"time",				G_VoteTimelimit,		1,		GTB_ALL,								qtrue,			"<num>",	"" },
+	{	"warmup",				"dowarmup",			G_VoteWarmup,			1,		GTB_ALL,								qtrue,			"<0-1>",	"" },
 };
 static const int validVoteStringsSize = ARRAY_LEN( validVoteStrings );
 
@@ -2509,7 +2520,7 @@ validVote:
 		return;
 	}
 
-	if ( numArgs < vote->numArgs ) {
+	if ( numArgs < vote->numArgs+2 ) {
 		trap_SendServerCommand( ent-g_entities, va( "print \"%s requires more arguments: %s\n\"", arg1, vote->shortHelp ) );
 		return;
 	}
