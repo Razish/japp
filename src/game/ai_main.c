@@ -2685,8 +2685,10 @@ void GetNewFlagPoint(wpobject_t *wp, gentity_t *flagEnt, int team)
 		}
 	}
 
-	while (i < gWPNum)
-	{
+	for ( i=0; i<gWPNum; i++ ) {
+		if ( !gWPArray[i] )
+			continue;
+
 		VectorSubtract(&gWPArray[i]->origin, &flagEnt->s.pos.trBase, &a);
 		testdist = VectorLength(&a);
 
@@ -2701,8 +2703,6 @@ void GetNewFlagPoint(wpobject_t *wp, gentity_t *flagEnt, int team)
 				bestdist = testdist;
 			}
 		}
-
-		i++;
 	}
 
 	if (foundindex)
