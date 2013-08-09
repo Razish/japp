@@ -847,11 +847,17 @@ static int spawncmp( const void *a, const void *b ) {
 qboolean G_CallSpawn( gentity_t *ent ) {
 	spawn_t *s;
 	gitem_t *item;
+	char buf[MAX_STRING_CHARS] = {0};
 
 	if ( !ent->classname ) {
 		G_Printf( "G_CallSpawn: NULL classname\n" );
 		return qfalse;
 	}
+
+	// swap this entity out for something else
+	trap_Cvar_VariableStringBuffer( va( "replace_%s", ent->classname ), buf, sizeof( buf ) );
+	if ( buf[0] )
+		ent->classname = G_NewString( buf );
 
 	// check item spawn functions
 	//RAZTODO: cant reorder items because compat so....?
