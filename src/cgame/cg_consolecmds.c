@@ -421,6 +421,9 @@ static command_t commands[] = {
 	{ "engage_duel",				NULL },
 	{ "fakegun",					CG_FakeGun_f },
 	{ "follow",						NULL },
+	{ "forcechanged",				NULL },
+	{ "forcenext",					CG_NextForcePower_f },
+	{ "forceprev",					CG_PrevForcePower_f },
 	{ "force_absorb",				NULL },
 	{ "force_distract",				NULL },
 	{ "force_forcepowerother",		NULL },
@@ -432,9 +435,6 @@ static command_t commands[] = {
 	{ "force_seeing",				NULL },
 	{ "force_speed",				NULL },
 	{ "force_throw",				NULL },
-	{ "forcechanged",				NULL },
-	{ "forcenext",					CG_NextForcePower_f },
-	{ "forceprev",					CG_PrevForcePower_f },
 	{ "give",						NULL },
 	{ "god",						NULL },
 	{ "hud_reload",					CG_HudReload_f },
@@ -511,13 +511,11 @@ qboolean CG_ConsoleCommand( void ) {
 	if ( JPLua_Event_ConsoleCommand() )
 		return qtrue;
 
-	cmd = CG_Argv( 0);
+	cmd = CG_Argv(0);
 
 	command = (command_t *)bsearch( cmd, commands, numCommands, sizeof( commands[0] ), cmdcmp );
 	if ( !command )
 		return qfalse;
-
-//	Com_Printf( "Executing %s\n", command->name );
 
 	if ( !command->func )
 		return qfalse;
