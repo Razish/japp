@@ -72,7 +72,7 @@ static int G_FindConfigstringIndex( const char *name, int start, int max, qboole
 	}
 
 	for ( i=1 ; i<max ; i++ ) {
-		trap_GetConfigstring( start + i, s, sizeof( s ) );
+		trap->GetConfigstring( start + i, s, sizeof( s ) );
 		if ( !s[0] ) {
 			break;
 		}
@@ -86,10 +86,10 @@ static int G_FindConfigstringIndex( const char *name, int start, int max, qboole
 	}
 
 	if ( i == max ) {
-		G_Error( "G_FindConfigstringIndex: overflow" );
+		trap->Error( ERR_DROP, "G_FindConfigstringIndex: overflow" );
 	}
 
-	trap_SetConfigstring( start + i, name );
+	trap->SetConfigstring( start + i, name );
 
 	return i;
 }
@@ -111,10 +111,10 @@ int G_ModelIndex( const char *name ) {
 	//so, where we are doing it from -rww
 	fileHandle_t fh;
 
-	trap_FS_FOpenFile(name, &fh, FS_READ);
+	trap->FS_Open(name, &fh, FS_READ);
 	if (!fh)
 	{ //try models/ then, this is assumed for registering models
-		trap_FS_FOpenFile(va("models/%s", name), &fh, FS_READ);
+		trap->FS_Open(va("models/%s", name), &fh, FS_READ);
 		if (!fh)
 		{
 			Com_Printf("ERROR: Server tried to modelindex %s but it doesn't exist.\n", name);
@@ -123,7 +123,7 @@ int G_ModelIndex( const char *name ) {
 
 	if (fh)
 	{
-		trap_FS_FCloseFile(fh);
+		trap->FS_Close(fh);
 	}
 #endif
 	return G_FindConfigstringIndex (name, CS_MODELS, MAX_MODELS, qtrue);
@@ -200,7 +200,7 @@ void G_TeamCommand( team_t team, char *cmd ) {
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
 			if ( level.clients[i].sess.sessionTeam == team ) {
-				trap_SendServerCommand( i, va("%s", cmd ));
+				trap->SendServerCommand( i, va("%s", cmd ));
 			}
 		}
 	}
@@ -271,7 +271,7 @@ int G_RadiusList ( vector3 *origin, float radius, gentity_t *ignore, qboolean ta
 		maxs.data[i] = origin->data[i] + radius;
 	}
 
-	numListedEntities = trap_EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
+	numListedEntities = trap->EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
 
 	for ( e = 0 ; e < numListedEntities ; e++ ) 
 	{
@@ -366,7 +366,7 @@ void G_FreeFakeClient(gclient_t **cl)
 { //or not, the dynamic stuff is busted somehow at the moment. Yet it still works in the test.
   //I think something is messed up in being able to cast the memory to stuff to modify it,
   //while modifying it directly seems to work fine.
-	//trap_TrueFree((void **)cl);
+	//trap->TrueFree((void **)cl);
 }
 
 //allocate a veh object
@@ -418,7 +418,7 @@ gclient_t *gClPtrs[MAX_GENTITIES];
 
 void G_CreateFakeClient(int entNum, gclient_t **cl)
 {
-	//trap_TrueMalloc((void **)cl, sizeof(gclient_t));
+	//trap->TrueMalloc((void **)cl, sizeof(gclient_t));
 	if (!gClPtrs[entNum])
 	{
 		gClPtrs[entNum] = (gclient_t *) BG_Alloc(sizeof(gclient_t));
@@ -456,34 +456,8 @@ void BG_SetAnim(playerState_t *ps, animation_t *animations, int setAnimParts,int
 
 void G_SetAnim(gentity_t *ent, usercmd_t *ucmd, int setAnimParts, int anim, int setAnimFlags, int blendTime)
 {
-#if 0 //old hackish way
-	pmove_t pmv;
-
-	assert(ent && ent->inuse && ent->client);
-
-	memset (&pmv, 0, sizeof(pmv));
-	pmv.ps = &ent->client->ps;
-	pmv.animations = bgAllAnims[ent->localAnimIndex].anims;
-	if (!ucmd)
-	{
-		pmv.cmd = ent->client->pers.cmd;
-	}
-	else
-	{
-		pmv.cmd = *ucmd;
-	}
-	pmv.trace = trap_Trace;
-	pmv.pointcontents = trap_PointContents;
-	pmv.gametype = level.gametype;
-
-	//don't need to bother with ghoul2 stuff, it's not even used in PM_SetAnim.
-	pm = &pmv;
-	PM_SetAnim(setAnimParts, anim, setAnimFlags, blendTime);
-#else //new clean and shining way!
 	assert(ent->client);
-    BG_SetAnim(&ent->client->ps, bgAllAnims[ent->localAnimIndex].anims, setAnimParts,
-		anim, setAnimFlags, blendTime);
-#endif
+    BG_SetAnim(&ent->client->ps, bgAllAnims[ent->localAnimIndex].anims, setAnimParts, anim, setAnimFlags, blendTime);
 }
 
 
@@ -504,7 +478,7 @@ gentity_t *G_PickTarget (char *targetname)
 
 	if (!targetname)
 	{
-		G_Printf("G_PickTarget called with NULL targetname\n");
+		trap->Print("G_PickTarget called with NULL targetname\n");
 		return NULL;
 	}
 
@@ -520,7 +494,7 @@ gentity_t *G_PickTarget (char *targetname)
 
 	if (!num_choices)
 	{
-		G_Printf("G_PickTarget: target %s not found\n", targetname);
+		trap->Print("G_PickTarget: target %s not found\n", targetname);
 		return NULL;
 	}
 
@@ -551,7 +525,7 @@ void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *string ) {
 	if (ent->targetShaderName && ent->targetShaderNewName) {
 		float f = level.time * 0.001;
 		AddRemap(ent->targetShaderName, ent->targetShaderNewName, f);
-		trap_SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+		trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
 	}
 
 	if ( !string || !string[0] ) {
@@ -561,14 +535,14 @@ void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *string ) {
 	t = NULL;
 	while ( (t = G_Find (t, FOFS(targetname), string)) != NULL ) {
 		if ( t == ent ) {
-			G_Printf ("WARNING: Entity used itself.\n");
+			trap->Print ("WARNING: Entity used itself.\n");
 		} else {
 			if ( t->use ) {
 				GlobalUse(t, ent, activator);
 			}
 		}
 		if ( !ent->inuse ) {
-			G_Printf("entity was removed while using targets\n");
+			trap->Print("entity was removed while using targets\n");
 			return;
 		}
 	}
@@ -627,7 +601,7 @@ void G_InitGentity( gentity_t *e ) {
 	e->r.ownerNum = ENTITYNUM_NONE;
 	e->s.modelGhoul2 = 0; //assume not
 
-	trap_ICARUS_FreeEnt( e );	//ICARUS information must be added after this point
+	trap->ICARUS_FreeEnt( (sharedEntity_t *)e );	//ICARUS information must be added after this point
 }
 
 //give us some decent info on all the active ents -rww
@@ -650,11 +624,11 @@ static void G_SpewEntList(void)
 
 		time( &rawtime );
 		strftime( buf, sizeof( buf ), "%Y-%m-%d_%H-%M-%S", gmtime( &rawtime ) );
-		trap_FS_FOpenFile( va( "entspew_%s.txt", buf ), &fh, FS_WRITE );
-		trap_FS_Write( va( "================================\nEntspew triggered at: %s\n================================\n\n", buf ), sizeof( buf ), fh );
+		trap->FS_Open( va( "entspew_%s.txt", buf ), &fh, FS_WRITE );
+		trap->FS_Write( va( "================================\nEntspew triggered at: %s\n================================\n\n", buf ), sizeof( buf ), fh );
 	}
 	#else
-		trap_FS_FOpenFile( "entspew.txt", &fh, FS_WRITE );
+		trap->FS_Open( "entspew.txt", &fh, FS_WRITE );
 	#endif
 
 	while (i < ENTITYNUM_MAX_NORMAL)
@@ -681,7 +655,7 @@ static void G_SpewEntList(void)
 				str = va("TEMPENT %4i: EV %i\n", ent->s.number, ent->s.eType-ET_EVENTS);
 				Com_Printf(str);
 				if (fh)
-					trap_FS_Write(str, strlen(str), fh);
+					trap->FS_Write(str, strlen(str), fh);
 			}
 
 			if (ent->classname && ent->classname[0])
@@ -696,7 +670,7 @@ static void G_SpewEntList(void)
 			Com_Printf(str);
 			if (fh)
 			{
-				trap_FS_Write(str, strlen(str), fh);
+				trap->FS_Write(str, strlen(str), fh);
 			}
 		}
 
@@ -707,8 +681,8 @@ static void G_SpewEntList(void)
 	Com_Printf(str);
 	if (fh)
 	{
-		trap_FS_Write(str, strlen(str), fh);
-		trap_FS_FCloseFile(fh);
+		trap->FS_Write(str, strlen(str), fh);
+		trap->FS_Close(fh);
 	}
 }
 
@@ -760,19 +734,18 @@ gentity_t *G_Spawn( void ) {
 	if ( i == ENTITYNUM_MAX_NORMAL ) {
 		/*
 		for (i = 0; i < MAX_GENTITIES; i++) {
-			G_Printf("%4i: %s\n", i, g_entities[i].classname);
+			trap->Print("%4i: %s\n", i, g_entities[i].classname);
 		}
 		*/
 		G_SpewEntList();
-		G_Error( "G_Spawn: no free entities" );
+		trap->Error( ERR_DROP, "G_Spawn: no free entities" );
 	}
 	
 	// open up a new slot
 	level.num_entities++;
 
 	// let the server system know that there are more entities
-	trap_LocateGameData( level.gentities, level.num_entities, sizeof( gentity_t ), 
-		&level.clients[0].ps, sizeof( level.clients[0] ) );
+	trap->LocateGameData( (sharedEntity_t *)level.gentities, level.num_entities, sizeof( gentity_t ), &level.clients[0].ps, sizeof( level.clients[0] ) );
 
 	G_InitGentity( e );
 	return e;
@@ -821,7 +794,7 @@ void G_SendG2KillQueue(void)
 		i++;
 	}
 
-	trap_SendServerCommand(-1, g2KillString);
+	trap->SendServerCommand(-1, g2KillString);
 
 	//Clear the count because we just sent off the whole queue
 	gG2KillNum -= i;
@@ -840,7 +813,7 @@ void G_KillG2Queue(int entNum)
 		Com_Printf("WARNING: Exceeded the MAX_G2_KILL_QUEUE count for this frame!\n");
 #endif
 		//Since we're out of queue slots, just send it now as a seperate command (eats more bandwidth, but we have no choice)
-		trap_SendServerCommand(-1, va("kg2 %i", entNum));
+		trap->SendServerCommand(-1, va("kg2 %i", entNum));
 		return;
 	}
 
@@ -866,9 +839,9 @@ void G_FreeEntity( gentity_t *ed ) {
 		return;
 	}
 
-	trap_UnlinkEntity (ed);		// unlink from world
+	trap->UnlinkEntity ((sharedEntity_t *)ed);		// unlink from world
 
-	trap_ICARUS_FreeEnt( ed );	//ICARUS information must be added after this point
+	trap->ICARUS_FreeEnt( (sharedEntity_t *)ed );	//ICARUS information must be added after this point
 
 	if ( ed->neverFree ) {
 		return;
@@ -892,7 +865,7 @@ void G_FreeEntity( gentity_t *ed ) {
 	//And, free the server instance too, if there is one.
 	if (ed->ghoul2)
 	{
-		trap_G2API_CleanGhoul2Models(&(ed->ghoul2));
+		trap->G2API_CleanGhoul2Models(&(ed->ghoul2));
 	}
 
 	if (ed->s.eType == ET_NPC && ed->m_pVehicle)
@@ -921,9 +894,9 @@ void G_FreeEntity( gentity_t *ed ) {
 
 		while (i < MAX_SABERS)
 		{
-			if (ed->client->weaponGhoul2[i] && trap_G2_HaveWeGhoul2Models(ed->client->weaponGhoul2[i]))
+			if (ed->client->weaponGhoul2[i] && trap->G2API_HaveWeGhoul2Models(ed->client->weaponGhoul2[i]))
 			{
-				trap_G2API_CleanGhoul2Models(&ed->client->weaponGhoul2[i]);
+				trap->G2API_CleanGhoul2Models(&ed->client->weaponGhoul2[i]);
 			}
 			i++;
 		}
@@ -959,7 +932,7 @@ void G_FreeEntity( gentity_t *ed ) {
 		}
 
 		//make sure clientside loop sounds are killed on the tracker and client
-		trap_SendServerCommand(-1, va("kls %i %i", ed->s.trickedentindex, ed->s.number));
+		trap->SendServerCommand(-1, va("kls %i %i", ed->s.trickedentindex, ed->s.number));
 	}
 
 	memset (ed, 0, sizeof(*ed));
@@ -997,7 +970,7 @@ gentity_t *G_TempEntity( vector3 *origin, int event ) {
 	//VectorCopy( snapped, e->s.origin );
 
 	// find cluster for PVS
-	trap_LinkEntity( e );
+	trap->LinkEntity( (sharedEntity_t *)e );
 
 	return e;
 }
@@ -1028,7 +1001,7 @@ gentity_t *G_SoundTempEntity( vector3 *origin, int event, int channel ) {
 	G_SetOrigin( e, &snapped );
 
 	// find cluster for PVS
-	trap_LinkEntity( e );
+	trap->LinkEntity( (sharedEntity_t *)e );
 
 	return e;
 }
@@ -1093,7 +1066,7 @@ void G_KillBox (gentity_t *ent) {
 
 	VectorAdd( &ent->client->ps.origin, &ent->r.mins, &mins );
 	VectorAdd( &ent->client->ps.origin, &ent->r.maxs, &maxs );
-	num = trap_EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
+	num = trap->EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
 
 	for (i=0 ; i<num ; i++) {
 		hit = &g_entities[touch[i]];
@@ -1126,7 +1099,7 @@ void G_AvoidBox( gentity_t *ent )
 
 	VectorAdd( &ent->client->ps.origin, &ent->r.mins, &mins );
 	VectorAdd( &ent->client->ps.origin, &ent->r.maxs, &maxs );
-	num = trap_EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
+	num = trap->EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
 
 	for ( i=0; i < num; i++ )
 	{
@@ -1172,7 +1145,7 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm ) {
 	int		bits;
 
 	if ( !event ) {
-		G_Printf( "G_AddEvent: zero event added for entity %i\n", ent->s.number );
+		trap->Print( "G_AddEvent: zero event added for entity %i\n", ent->s.number );
 		return;
 	}
 
@@ -1606,7 +1579,7 @@ void TryUse( gentity_t *ent )
 	VectorMA( &src, USE_DISTANCE, &vf, &dest );
 
 	//Trace ahead to find a valid target
-	trap_Trace( &trace, &src, &vec3_origin, &vec3_origin, &dest, ent->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE );
+	trap->Trace( &trace, &src, &vec3_origin, &vec3_origin, &dest, ent->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, qfalse, 0, 0 );
 	
 	if ( trace.fraction == 1.0f || trace.entityNum == ENTITYNUM_NONE ) //Raz: slot 0 fix
 	{
@@ -1779,7 +1752,7 @@ tryJetPack:
 		AngleVectors(&fAng, &fwd, 0, 0);
 
         VectorMA(&ent->client->ps.origin, 64.0f, &fwd, &fwd);		
-		trap_Trace(&trToss, &ent->client->ps.origin, &playerMins, &playerMaxs, &fwd, ent->s.number, ent->clipmask);
+		trap->Trace(&trToss, &ent->client->ps.origin, &playerMins, &playerMaxs, &fwd, ent->s.number, ent->clipmask, qfalse, 0, 0);
 		if (trToss.fraction == 1.0f && !trToss.allsolid && !trToss.startsolid)
 		{
 			ItemUse_UseDisp(ent, HI_AMMODISP);
@@ -1834,7 +1807,7 @@ qboolean G_ClearTrace( vector3 *start, vector3 *mins, vector3 *maxs, vector3 *en
 {
 	static	trace_t	tr;
 
-	trap_Trace( &tr, start, mins, maxs, end, ignore, clipmask );
+	trap->Trace( &tr, start, mins, maxs, end, ignore, clipmask, qfalse, 0, 0 );
 
 	if ( tr.allsolid || tr.startsolid || tr.fraction < 1.0 )
 	{
@@ -1871,7 +1844,7 @@ qboolean G_CheckInSolid (gentity_t *self, qboolean fix)
 	VectorCopy(&self->r.mins, &mins);
 	mins.z = 0;
 
-	trap_Trace(&trace, &self->r.currentOrigin, &mins, &self->r.maxs, &end, self->s.number, self->clipmask);
+	trap->Trace(&trace, &self->r.currentOrigin, &mins, &self->r.maxs, &end, self->s.number, self->clipmask, qfalse, 0, 0);
 	if(trace.allsolid || trace.startsolid)
 	{
 		return qtrue;
@@ -1886,7 +1859,7 @@ qboolean G_CheckInSolid (gentity_t *self, qboolean fix)
 			VectorCopy(&trace.endpos, &neworg);
 			neworg.z -= self->r.mins.z;
 			G_SetOrigin(self, &neworg);
-			trap_LinkEntity(self);
+			trap->LinkEntity((sharedEntity_t *)self);
 
 			return G_CheckInSolid(self, qfalse);
 		}
@@ -1934,7 +1907,7 @@ int DebugLine(vector3 *start, vector3 *end, int color) {
 	VectorMA(&points[2], -2, &cross, &points[2]);
 	VectorMA(&points[3],  2, &cross, &points[3]);
 
-	return trap_DebugPolygonCreate(color, 4, points);
+	return trap->DebugPolygonCreate(color, 4, points);
 }
 
 void G_ROFF_NotetrackCallback( gentity_t *cent, const char *notetrack)
@@ -1976,7 +1949,7 @@ void G_ROFF_NotetrackCallback( gentity_t *cent, const char *notetrack)
 			VectorCopy(&cent->s.angles2, &cent->r.currentAngles);
 		}
 
-		trap_ROFF_Play(cent->s.number, cent->roffid, qfalse);
+		trap->ROFF_Play(cent->s.number, cent->roffid, qfalse);
 	}
 }
 
@@ -1997,7 +1970,7 @@ qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3
 	{
 		VectorCopy( &start, &end );
 		end.data[i] += mins->data[i];
-		trap_Trace( &tr, &start, &vec3_origin, &vec3_origin, &end, ignore, clipmask );
+		trap->Trace( &tr, &start, &vec3_origin, &vec3_origin, &end, ignore, clipmask, qfalse, 0, 0 );
 		if ( tr.allsolid || tr.startsolid )
 		{
 			return qfalse;
@@ -2006,7 +1979,7 @@ qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3
 		{
 			VectorCopy( &start, &end );
 			end.data[i] += maxs->data[i]-(mins->data[i]*tr.fraction);
-			trap_Trace( &tr, &start, &vec3_origin, &vec3_origin, &end, ignore, clipmask );
+			trap->Trace( &tr, &start, &vec3_origin, &vec3_origin, &end, ignore, clipmask, qfalse, 0, 0 );
 			if ( tr.allsolid || tr.startsolid )
 			{
 				return qfalse;
@@ -2019,7 +1992,7 @@ qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3
 		}
 	}
 	//expanded it, now see if it's all clear
-	trap_Trace( &tr, &start, mins, maxs, &start, ignore, clipmask );
+	trap->Trace( &tr, &start, mins, maxs, &start, ignore, clipmask, qfalse, 0, 0 );
 	if ( tr.allsolid || tr.startsolid )
 	{
 		return qfalse;

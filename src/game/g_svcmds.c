@@ -33,7 +33,7 @@ gclient_t *ClientForString( const char *s ) {
 		}
 	}
 
-	G_Printf( "User %s is not on the server\n", s );
+	trap->Print( "User %s is not on the server\n", s );
 	return NULL;
 }
 
@@ -93,7 +93,7 @@ void G_ShuffleTeams(void)
 		}
 	}
 
-	trap_SendServerCommand( -1, "cp \"^1Teams have been shuffled!\n\"");
+	trap->SendServerCommand( -1, "cp \"^1Teams have been shuffled!\n\"");
 }
 
 char *ConcatArgs( int start );
@@ -112,42 +112,42 @@ static void SV_AddBot_f( void ) {
 	char name[MAX_TOKEN_CHARS], altname[MAX_TOKEN_CHARS], string[MAX_TOKEN_CHARS], team[MAX_TOKEN_CHARS];
 
 	// are bots enabled?
-	if ( !trap_Cvar_VariableIntegerValue( "bot_enable" ) )
+	if ( !trap->Cvar_VariableIntegerValue( "bot_enable" ) )
 		return;
 
 	// name
-	trap_Argv( 1, name, sizeof( name ) );
+	trap->Argv( 1, name, sizeof( name ) );
 	if ( !name[0] ) {
-		trap_Printf( "Syntax: addbot <botname> [skill 1-5] [team] [msec delay] [altname]\n" );
+		trap->Print( "Syntax: addbot <botname> [skill 1-5] [team] [msec delay] [altname]\n" );
 		return;
 	}
 
 	// skill
-	trap_Argv( 2, string, sizeof( string ) );
+	trap->Argv( 2, string, sizeof( string ) );
 	if ( !string[0] )
 		skill = 4;
 	else
 		skill = atof( string );
 
 	// team
-	trap_Argv( 3, team, sizeof( team ) );
+	trap->Argv( 3, team, sizeof( team ) );
 
 	// delay
-	trap_Argv( 4, string, sizeof( string ) );
+	trap->Argv( 4, string, sizeof( string ) );
 	if ( !string[0] )
 		delay = 0;
 	else
 		delay = atoi( string );
 
 	// alternative name
-	trap_Argv( 5, altname, sizeof( altname ) );
+	trap->Argv( 5, altname, sizeof( altname ) );
 
 	G_AddBot( name, skill, team, delay, altname );
 
 	// if this was issued during gameplay and we are playing locally,
 	// go ahead and load the bot's media immediately
-	if ( level.time - level.startTime > 1000 && trap_Cvar_VariableIntegerValue( "cl_running" ) )
-		trap_SendServerCommand( -1, "loaddefered\n" );	// FIXME: spelled wrong, but not changing for demo
+	if ( level.time - level.startTime > 1000 && trap->Cvar_VariableIntegerValue( "cl_running" ) )
+		trap->SendServerCommand( -1, "loaddefered\n" );	// FIXME: spelled wrong, but not changing for demo
 }
 
 static void SV_AdminAdd_f( void ) {
@@ -156,14 +156,14 @@ static void SV_AdminAdd_f( void ) {
 			argPrivs[MAX_TOKEN_CHARS] = {0},
 			*argMsg = NULL;
 
-	if ( trap_Argc() < 5 ) {
-		G_Printf( "Syntax: adminadd <user> <pass> <privileges> <login message>\n" );
+	if ( trap->Argc() < 5 ) {
+		trap->Print( "Syntax: adminadd <user> <pass> <privileges> <login message>\n" );
 		return;
 	}
 
-	trap_Argv( 1,	argUser,	sizeof( argUser ) );
-	trap_Argv( 2,	argPass,	sizeof( argPass ) );
-	trap_Argv( 3,	argPrivs,	sizeof( argPrivs ) );
+	trap->Argv( 1,	argUser,	sizeof( argUser ) );
+	trap->Argv( 2,	argPass,	sizeof( argPass ) );
+	trap->Argv( 3,	argPrivs,	sizeof( argPrivs ) );
 	argMsg = ConcatArgs( 4 );
 	
 	AM_AddAdmin( argUser, argPass, atoi( argPrivs ), argMsg );
@@ -173,12 +173,12 @@ static void SV_AdminAdd_f( void ) {
 static void SV_AdminDel_f( void ) {
 	char argUser[MAX_TOKEN_CHARS] = {0};
 
-	if ( trap_Argc() < 2 ) {
-		G_Printf( "Syntax: admindel <user>\n" );
+	if ( trap->Argc() < 2 ) {
+		trap->Print( "Syntax: admindel <user>\n" );
 		return;
 	}
 
-	trap_Argv( 1, argUser, sizeof( argUser ) );
+	trap->Argv( 1, argUser, sizeof( argUser ) );
 
 	AM_DeleteAdmin( argUser );
 	AM_SaveAdmins();
@@ -194,7 +194,7 @@ static void SV_AdminReload_f( void ) {
 
 static void SV_AllReady_f( void ) {
 	if ( !level.warmupTime ) {
-		G_Printf( "allready is only available during warmup\n" );
+		trap->Print( "allready is only available during warmup\n" );
 		return;
 	}
 
@@ -204,14 +204,14 @@ static void SV_AllReady_f( void ) {
 static void SV_BanAdd_f( void ) {
 	char ip[NET_ADDRSTRMAXLEN] = {0}, duration[32] = {0}, *reason = NULL;
 
-	if ( trap_Argc() < 2 ) {
-		G_Printf( "Syntax: banadd <ip> <duration> <reason>\n" );
+	if ( trap->Argc() < 2 ) {
+		trap->Print( "Syntax: banadd <ip> <duration> <reason>\n" );
 		return;
 	}
 
-	trap_Argv( 1, ip, sizeof( ip ) );
-	trap_Argv( 2, duration, sizeof( duration ) );
-	if ( trap_Argc() >= 4 )
+	trap->Argv( 1, ip, sizeof( ip ) );
+	trap->Argv( 2, duration, sizeof( duration ) );
+	if ( trap->Argc() >= 4 )
 		reason = ConcatArgs( 3 );
 	JKG_Bans_AddBanString( ip, duration, reason );
 }
@@ -220,26 +220,26 @@ static void SV_BanDel_f( void ) {
 	char ip[NET_ADDRSTRMAXLEN] = {0};
 	byte *bIP = NULL;
 	
-	if ( trap_Argc() < 2 ) {
-		G_Printf( "Syntax: bandel <ip>\n" );
+	if ( trap->Argc() < 2 ) {
+		trap->Print( "Syntax: bandel <ip>\n" );
 		return;
 	}
 
-	trap_Argv( 1, ip, sizeof( ip ) );
+	trap->Argv( 1, ip, sizeof( ip ) );
 	bIP = BuildByteFromIP( ip );
 	if ( JKG_Bans_Remove( bIP ) )
-		G_Printf( "Removing ban on %s\n", ip );
+		trap->Print( "Removing ban on %s\n", ip );
 	else
-		G_Printf( "No ban found for %s\n", ip );
+		trap->Print( "No ban found for %s\n", ip );
 }
 
 static void SV_BanList_f( void ) {
-	G_Printf( "Listing bans\n" );
+	trap->Print( "Listing bans\n" );
 	JKG_Bans_List();
 }
 
 static void SV_BanReload_f( void ) {
-	G_Printf( "Reloading bans\n" );
+	trap->Print( "Reloading bans\n" );
 	JKG_Bans_LoadBans();
 }
 
@@ -247,7 +247,7 @@ static void SV_BotList_f( void ) {
 	int i;
 	char name[MAX_TOKEN_CHARS], funname[MAX_TOKEN_CHARS], model[MAX_TOKEN_CHARS], personality[MAX_TOKEN_CHARS];
 
-	trap_Printf( "name             model            personality              funname\n" );
+	trap->Print( "name             model            personality              funname\n" );
 	for ( i=0; i<level.bots.num; i++ )
 	{
 		Q_strncpyz( name, Info_ValueForKey( level.bots.infos[i], "name" ), sizeof( name ) );
@@ -262,13 +262,13 @@ static void SV_BotList_f( void ) {
 		Q_strncpyz( personality, Info_ValueForKey( level.bots.infos[i], "personality" ), sizeof( personality ) );
 		Q_CleanColorStr( personality );
 
-		trap_Printf( va( "%-16s %-16s %-20s %-20s\n", name, model, personality, funname ) );
+		trap->Print( "%-16s %-16s %-20s %-20s\n", name, model, personality, funname );
 	}
 }
 
 static void SV_Cointoss_f( void ) {
 	qboolean heads = !!(Q_irand( 0, QRAND_MAX-1 )&1);
-	trap_SendServerCommand( -1, va( "cp \"Cointoss result: %s\n\"", heads ? "^2HEADS" : "^3TAILS" ) );
+	trap->SendServerCommand( -1, va( "cp \"Cointoss result: %s\n\"", heads ? "^2HEADS" : "^3TAILS" ) );
 	G_LogPrintf( "Cointoss result: %s\n", heads ? "^2HEADS" : "^3TAILS" );
 }
 
@@ -293,7 +293,7 @@ static void SV_EntityList_f( void ) {
 		if ( check->classname )
 			Q_strcat( buf, sizeof( buf ), va( "[%s]", check->classname ) );
 
-		G_Printf( "%s\n", buf );
+		trap->Print( "%s\n", buf );
 	}
 }
 
@@ -302,13 +302,13 @@ static void SV_ForceTeam_f( void ) {
 	char		str[MAX_TOKEN_CHARS];
 
 	// find the player
-	trap_Argv( 1, str, sizeof( str ) );
+	trap->Argv( 1, str, sizeof( str ) );
 	cl = ClientForString( str );
 	if ( !cl )
 		return;
 
 	// set the team
-	trap_Argv( 2, str, sizeof( str ) );
+	trap->Argv( 2, str, sizeof( str ) );
 	SetTeam( &g_entities[cl - level.clients], str );
 }
 
@@ -317,15 +317,15 @@ static void SV_GameMemory_f( void ) {
 }
 
 static void SV_Gametype_f( void ) {
-	G_Printf( "Gametype is currently: %s\n", BG_GetGametypeString( level.gametype ) );
+	trap->Print( "Gametype is currently: %s\n", BG_GetGametypeString( level.gametype ) );
 }
 
 static void SV_ListMaps_f( void ) {
 	int i;
 	char map[24] = "--", longname[32] = "--", type[64] = "--";
 
-	trap_Printf( "  map                     longname                        types\n" );
-	trap_Printf( "  --------                --------                        --------\n" );
+	trap->Print( "  map                     longname                        types\n" );
+	trap->Print( "  --------                --------                        --------\n" );
 
 	for ( i=0; i<level.arenas.num; i++ )
 	{
@@ -338,7 +338,7 @@ static void SV_ListMaps_f( void ) {
 		Q_strncpyz( type, Info_ValueForKey( level.arenas.infos[i], "type" ), sizeof( type ) );
 		Q_CleanColorStr( type );
 
-		trap_Printf( va( "  %-24s%-32s%-64s\n", map, longname, type ) );
+		trap->Print( "  %-24s%-32s%-64s\n", map, longname, type );
 	}
 }
 
@@ -356,7 +356,7 @@ static void SV_Pause_f( void ) {
 
 static void SV_Say_f( void ) {
 	if ( dedicated.integer )
-		trap_SendServerCommand( -1, va( "print \"server: %s\n\"", ConcatArgs( 1 ) ) );
+		trap->SendServerCommand( -1, va( "print \"server: %s\n\"", ConcatArgs( 1 ) ) );
 }
 
 static void SV_ShuffleTeams_f( void ) {
@@ -404,7 +404,7 @@ qboolean ConsoleCommand( void ) {
 	svCommand_t *command = NULL;
 	char cmd[MAX_TOKEN_CHARS] = {0};
 
-	trap_Argv( 0, cmd, sizeof( cmd ) );
+	trap->Argv( 0, cmd, sizeof( cmd ) );
 
 	#ifdef JPLUA
 		if ( !Q_stricmp( cmd, "lua_reload" ) )

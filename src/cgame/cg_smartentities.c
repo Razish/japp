@@ -42,7 +42,7 @@ void MakeVector(const vector3 *ain, vector3 *vout)
 
 void SE_PerformTrace(trace_t *results, vector3 *start, vector3 *end, int mask)
 {
-	trap_CM_BoxTrace(results, start, end, NULL, NULL, 0, mask);
+	trap->CM_Trace(results, start, end, NULL, NULL, 0, mask, qfalse);
 }
 
 // ==============================
@@ -151,7 +151,7 @@ qboolean SE_RenderIsVisible( vector3 *startPos, vector3 *testOrigin, qboolean re
     trace_t results;
 
 	//SE_PerformTrace(&results, startPos, testOrigin, MASK_SOLID);
-	trap_CM_BoxTrace(&results, startPos, testOrigin, NULL, NULL, 0, MASK_SOLID);
+	trap->CM_Trace(&results, startPos, testOrigin, NULL, NULL, 0, MASK_SOLID, qfalse);
 
 	if ( results.fraction < 1.0f )
 	{
@@ -221,10 +221,10 @@ qboolean SE_RenderPlayerChecks( vector3 *playerOrigin, vector3 playerPoints[9] )
 
 	for (i=0; i<9; i++)
 	{
-		if (trap_CM_PointContents(&playerPoints[i], 0 ) == CONTENTS_SOLID)
+		if (trap->CM_PointContents(&playerPoints[i], 0 ) == CONTENTS_SOLID)
 		{
 			//SE_PerformTrace(&results, playerOrigin, playerPoints[i], MASK_SOLID);
-			trap_CM_BoxTrace(&results, playerOrigin, &playerPoints[i], NULL, NULL, 0, MASK_SOLID);
+			trap->CM_Trace(&results, playerOrigin, &playerPoints[i], NULL, NULL, 0, MASK_SOLID, qfalse);
 			VectorCopy(&results.endpos, &playerPoints[i]);
 		}
 	}
@@ -250,16 +250,16 @@ qboolean SE_RenderPlayer( int targIndex )
 	VectorCopy( (cg_entities[selfIndex].playerState->zoomMode ? &cg_entities[selfIndex].lerpOrigin : &refdef->vieworg), &startPos );
 
 	//Raz: Added 'fix' so people are visible if you're in water.
-	if (( trap_CM_PointContents(&startPos, 0) & CONTENTS_WATER ) ||
-		( trap_CM_PointContents(&startPos, 0) & CONTENTS_LAVA ) ||
-		( trap_CM_PointContents(&startPos, 0) & CONTENTS_SLIME ) )
+	if (( trap->CM_PointContents(&startPos, 0) & CONTENTS_WATER ) ||
+		( trap->CM_PointContents(&startPos, 0) & CONTENTS_LAVA ) ||
+		( trap->CM_PointContents(&startPos, 0) & CONTENTS_SLIME ) )
 		return qtrue;
 //	if ( refdef->viewContents&CONTENTS_WATER )
 //		return true;
 
-	if (( trap_CM_PointContents(&startPos, 0) & CONTENTS_SOLID ) ||
-		( trap_CM_PointContents(&startPos, 0) & CONTENTS_TERRAIN ) ||
-		( trap_CM_PointContents(&startPos, 0) & CONTENTS_OPAQUE ))
+	if (( trap->CM_PointContents(&startPos, 0) & CONTENTS_SOLID ) ||
+		( trap->CM_PointContents(&startPos, 0) & CONTENTS_TERRAIN ) ||
+		( trap->CM_PointContents(&startPos, 0) & CONTENTS_OPAQUE ))
 		return qfalse;
 
 	SE_RenderPlayerPoints( SE_IsPlayerCrouching( targIndex ), &targ->lerpAngles, &targ->lerpOrigin, targPos );

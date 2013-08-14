@@ -25,15 +25,15 @@ static void R_EXT_GLSL_OutputInfoLog ( int objectID )
     
     if ( logLength > 0 )
     {
-        trap_TrueMalloc ((void**)&logText, logLength);
+        trap->TrueMalloc ((void**)&logText, logLength);
         glGetInfoLogARB (objectID, logLength, NULL, logText);
         
 		if ( strlen( logText ) > 1020 )
 			logText[1020] = '\0';
 
-        CG_Printf ("%s\n", logText);
+        trap->Print ("%s\n", logText);
         
-        trap_TrueFree ((void**)&logText);
+        trap->TrueFree ((void**)&logText);
     }
 }
 
@@ -49,44 +49,44 @@ static glslShader_t* R_EXT_GLSL_CreateShader ( const char* shaderPath, int shade
 
     if ( numShaders >= MAX_GLSL_SHADERS )
     {
-        CG_Printf ("Maximum number of GLSL shaders exceeded.\n");
+        trap->Print ("Maximum number of GLSL shaders exceeded.\n");
 		tr.postprocessing.loaded = qfalse;
         return NULL;
     }
     
 #ifdef FILE_BASED_SHADERS
-    fileLength = trap_FS_FOpenFile (shaderPath, &fileHandle, FS_READ);
+    fileLength = trap->FS_Open (shaderPath, &fileHandle, FS_READ);
     if ( !fileHandle )
     {
-        CG_Printf ("Unable to open shader file %s.\n", shaderPath);
+        trap->Print ("Unable to open shader file %s.\n", shaderPath);
 		tr.postProcessing.loaded = qfalse;
         return NULL;
     }
     
     if ( !fileLength )
     {
-        CG_Printf( "Shader file %s is empty.\n", shaderPath );
+        trap->Print( "Shader file %s is empty.\n", shaderPath );
 		tr.postProcessing.loaded = qfalse;
-		trap_FS_FCloseFile( fileHandle );
+		trap->FS_Close( fileHandle );
         return NULL;
     }
     
-    trap_TrueMalloc( (void**)&shaderCode, fileLength + 1 );
+    trap->TrueMalloc( (void**)&shaderCode, fileLength + 1 );
     if ( shaderCode == NULL )
     {
-        CG_Printf ("Unable to allocate memory for shader code for shader file %s.\n", shaderPath);
+        trap->Print ("Unable to allocate memory for shader code for shader file %s.\n", shaderPath);
         return NULL;
     }
     
-    trap_FS_Read (shaderCode, fileLength, fileHandle);
+    trap->FS_Read (shaderCode, fileLength, fileHandle);
     shaderCode[fileLength] = 0;
     
-    trap_FS_FCloseFile( fileHandle );
+    trap->FS_Close( fileHandle );
 #else
-	trap_TrueMalloc( (void **)&shaderCode, 16384 );
+	trap->TrueMalloc( (void **)&shaderCode, 16384 );
     if ( shaderCode == NULL )
     {
-        CG_Printf ("Unable to allocate memory for shader code for shader file %s.\n", shaderPath);
+        trap->Print ("Unable to allocate memory for shader code for shader file %s.\n", shaderPath);
         return NULL;
     }
 	Q_strncpyz( shaderCode, shaderPath, 16384 );
@@ -99,9 +99,9 @@ static glslShader_t* R_EXT_GLSL_CreateShader ( const char* shaderPath, int shade
 
 	if ( !shader->id )
 	{
-		CG_Printf( "Failed to create vertex shader object for shader %s.\n", shaderPath );
+		trap->Print( "Failed to create vertex shader object for shader %s.\n", shaderPath );
 
-		trap_TrueFree( (void**)&shaderCode );
+		trap->TrueFree( (void**)&shaderCode );
 
 		return NULL;
 	}
@@ -109,28 +109,28 @@ static glslShader_t* R_EXT_GLSL_CreateShader ( const char* shaderPath, int shade
 	glShaderSourceARB (shader->id, 1, (GLcharARB**)&shaderCode, NULL);
 	if ( glGetError() == GL_INVALID_OPERATION )
 	{
-		CG_Printf ("Invalid source code in shader\n");
+		trap->Print ("Invalid source code in shader\n");
 		R_EXT_GLSL_OutputInfoLog (shader->id);
 
 		glDeleteObjectARB (shader->id);
-		trap_TrueFree ((void**)&shaderCode);
-		trap_Cvar_Set( "r_postprocess_enable", "0" );
+		trap->TrueFree ((void**)&shaderCode);
+		trap->Cvar_Set( "r_postprocess_enable", "0" );
 
 		return NULL;
 	}
 
-	trap_TrueFree ((void**)&shaderCode);
+	trap->TrueFree ((void**)&shaderCode);
 
 	glCompileShaderARB (shader->id);
 	glGetObjectParameterivARB (shader->id, GL_OBJECT_COMPILE_STATUS_ARB, &statusCode);
 
 	if ( statusCode == GL_FALSE )
 	{
-		CG_Printf ("Failed to compile shader source\n");
+		trap->Print ("Failed to compile shader source\n");
 		R_EXT_GLSL_OutputInfoLog (shader->id);
 
 		glDeleteObjectARB (shader->id);
-		trap_Cvar_Set( "r_postprocess_enable", "0" );
+		trap->Cvar_Set( "r_postprocess_enable", "0" );
 
 		return NULL;
 	}
@@ -146,14 +146,14 @@ qboolean R_EXT_GLSL_Init ( void )
 {
 	if ( !strstr (cgs.glconfig.extensions_string, "GL_ARB_shader_objects") )
 	{
-		CG_Printf (S_COLOR_RED "...GLSL extension NOT loaded. Required OpenGL extensions not available.\n");
+		trap->Print (S_COLOR_RED "...GLSL extension NOT loaded. Required OpenGL extensions not available.\n");
 		return qfalse;
 	}
 
     memset (glslPrograms, 0, sizeof (glslPrograms));
     memset (glslShaders, 0, sizeof (glslShaders));
     
-    CG_Printf ("GLSL extension loaded\n");
+    trap->Print ("GLSL extension loaded\n");
 
 	return qtrue;
 }
@@ -163,7 +163,7 @@ static void R_EXT_GLSL_CleanupVariable ( glslProgramVariable_t* variable )
     if ( variable && variable->next )
         R_EXT_GLSL_CleanupVariable (variable->next);
     else
-        trap_TrueFree ((void**)&variable);
+        trap->TrueFree ((void**)&variable);
 }
 
 static glslProgramVariable_t* R_EXT_GLSL_GetUniformLocation ( glslProgram_t* program, const char* name )
@@ -179,12 +179,12 @@ static glslProgramVariable_t* R_EXT_GLSL_GetUniformLocation ( glslProgram_t* pro
 	{
 		if ( prev == NULL )
 		{
-			trap_TrueMalloc ((void**)&program->uniforms, sizeof (glslProgramVariable_t));
+			trap->TrueMalloc ((void**)&program->uniforms, sizeof (glslProgramVariable_t));
 			variable = program->uniforms;
 		}
 		else
 		{
-			trap_TrueMalloc ((void**)&prev->next, sizeof (glslProgramVariable_t));
+			trap->TrueMalloc ((void**)&prev->next, sizeof (glslProgramVariable_t));
 			variable = prev->next;
 		}
 
@@ -207,7 +207,7 @@ static glslProgramVariable_t* R_EXT_GLSL_GetAttributeLocation ( glslProgram_t* p
 
     if ( variable == NULL )
     {
-        trap_TrueMalloc ((void**)&variable, sizeof (glslProgramVariable_t));
+        trap->TrueMalloc ((void**)&variable, sizeof (glslProgramVariable_t));
         
         variable->name = name;
         variable->next = NULL;
@@ -269,7 +269,7 @@ glslProgram_t* R_EXT_GLSL_CreateProgram ( void )
     glslProgram_t* program = NULL;
     if ( numPrograms >= MAX_GLSL_PROGRAMS )
     {
-        CG_Printf ("Maximum number of GLSL programs exceeded.\n");
+        trap->Print ("Maximum number of GLSL programs exceeded.\n");
 		tr.postprocessing.loaded = qfalse;
         return NULL;
     }
@@ -279,7 +279,7 @@ glslProgram_t* R_EXT_GLSL_CreateProgram ( void )
     program->id = glCreateProgramObjectARB();
     if ( program->id == 0 )
     {
-        CG_Printf ("Failed to create program with internal ID %d\n", numPrograms);
+        trap->Print ("Failed to create program with internal ID %d\n", numPrograms);
  		tr.postprocessing.loaded = qfalse;
    }
     
@@ -337,7 +337,7 @@ void R_EXT_GLSL_LinkProgram ( const glslProgram_t* program )
     
     if ( statusCode == GL_FALSE )
     {
-        CG_Printf (S_COLOR_RED "Failed to link program %d\n", program->id);
+        trap->Print (S_COLOR_RED "Failed to link program %d\n", program->id);
         R_EXT_GLSL_OutputInfoLog (program->id);
     }
 }

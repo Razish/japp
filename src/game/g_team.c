@@ -84,7 +84,7 @@ void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) {
 	
 	va_start (argptr,fmt);
 	if (vsprintf (msg, fmt, argptr) > sizeof(msg)) {
-		G_Error ( "PrintMsg overrun" );
+		trap->Error( ERR_DROP, "PrintMsg overrun" );
 	}
 	va_end (argptr);
 
@@ -92,7 +92,7 @@ void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) {
 	while ((p = strchr(msg, '"')) != NULL)
 		*p = '\'';
 
-	trap_SendServerCommand ( ( (ent == NULL) ? -1 : ent-g_entities ), va("print \"%s\"", msg ));
+	trap->SendServerCommand ( ( (ent == NULL) ? -1 : ent-g_entities ), va("print \"%s\"", msg ));
 }
 */
 //Printing messages to players via this method is no longer done, StringEd stuff is client only.
@@ -307,7 +307,7 @@ void Team_SetFlagStatus( int team, flagStatus_t status ) {
 			st[2] = 0;
 		}
 
-		trap_SetConfigstring( CS_FLAGSTATUS, st );
+		trap->SetConfigstring( CS_FLAGSTATUS, st );
 	}
 }
 
@@ -492,9 +492,9 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 	VectorSubtract(&attacker->r.currentOrigin, &flag->r.currentOrigin, &v2);
 
 	if ( ( ( VectorLength(&v1) < CTF_TARGET_PROTECT_RADIUS &&
-		trap_InPVS(&flag->r.currentOrigin, &targ->r.currentOrigin ) ) ||
+		trap->InPVS(&flag->r.currentOrigin, &targ->r.currentOrigin ) ) ||
 		( VectorLength(&v2) < CTF_TARGET_PROTECT_RADIUS &&
-		trap_InPVS(&flag->r.currentOrigin, &attacker->r.currentOrigin ) ) ) &&
+		trap->InPVS(&flag->r.currentOrigin, &attacker->r.currentOrigin ) ) ) &&
 		attacker->client->sess.sessionTeam != targ->client->sess.sessionTeam) {
 
 		// we defended the base flag
@@ -512,9 +512,9 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		VectorSubtract(&attacker->r.currentOrigin, &carrier->r.currentOrigin, &v1);
 
 		if ( ( ( VectorLength(&v1) < CTF_ATTACKER_PROTECT_RADIUS &&
-			trap_InPVS(&carrier->r.currentOrigin, &targ->r.currentOrigin ) ) ||
+			trap->InPVS(&carrier->r.currentOrigin, &targ->r.currentOrigin ) ) ||
 			( VectorLength(&v2) < CTF_ATTACKER_PROTECT_RADIUS &&
-				trap_InPVS(&carrier->r.currentOrigin, &attacker->r.currentOrigin ) ) ) &&
+				trap->InPVS(&carrier->r.currentOrigin, &attacker->r.currentOrigin ) ) ) &&
 			attacker->client->sess.sessionTeam != targ->client->sess.sessionTeam) {
 			AddScore(attacker, &targ->r.currentOrigin, CTF_CARRIER_PROTECT_BONUS);
 			attacker->client->pers.teamState.carrierdefense++;
@@ -603,7 +603,7 @@ void Team_ReturnFlagSound( gentity_t *ent, int team ) {
 	gentity_t	*te;
 
 	if (ent == NULL) {
-		G_Printf ("Warning:  NULL passed to Team_ReturnFlagSound\n");
+		trap->Print ("Warning:  NULL passed to Team_ReturnFlagSound\n");
 		return;
 	}
 
@@ -621,7 +621,7 @@ void Team_TakeFlagSound( gentity_t *ent, int team ) {
 	gentity_t	*te;
 
 	if (ent == NULL) {
-		G_Printf ("Warning:  NULL passed to Team_TakeFlagSound\n");
+		trap->Print ("Warning:  NULL passed to Team_TakeFlagSound\n");
 		return;
 	}
 
@@ -659,7 +659,7 @@ void Team_CaptureFlagSound( gentity_t *ent, int team ) {
 	gentity_t	*te;
 
 	if (ent == NULL) {
-		G_Printf ("Warning:  NULL passed to Team_CaptureFlagSound\n");
+		trap->Print ("Warning:  NULL passed to Team_CaptureFlagSound\n");
 		return;
 	}
 
@@ -780,7 +780,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 	VectorSubtract( &ent->s.pos.trBase, &minFlagRange, &mins );
 	VectorAdd( &ent->s.pos.trBase, &maxFlagRange, &maxs );
 
-	num = trap_EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
+	num = trap->EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
 
 	dist = Distance(&ent->s.pos.trBase, &other->client->ps.origin);
 
@@ -823,28 +823,28 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 
 	if ( japp_speedCaps.integer )
 	{//Raz: speed caps
-		capTime = trap_Milliseconds() - cl->pers.teamState.flagsince;
+		capTime = trap->Milliseconds() - cl->pers.teamState.flagsince;
 		if ( teamgame.bestCapTime == -1 )
 		{
-			trap_SendServerCommand( -1, va( "print \"%s ^2captured the %s flag in ^5%.3f ^2seconds, setting the record\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime/1000.0f ) );
+			trap->SendServerCommand( -1, va( "print \"%s ^2captured the %s flag in ^5%.3f ^2seconds, setting the record\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime/1000.0f ) );
 			teamgame.bestCapTime = capTime;
 			Q_strncpyz( teamgame.bestCapName, cl->pers.netname, sizeof( teamgame.bestCapName ) );
 		}
 		else if ( capTime < teamgame.bestCapTime )
 		{
 			if ( !Q_stricmp( teamgame.bestCapName, cl->pers.netname ) )
-				trap_SendServerCommand( -1, va( "print \"%s ^2captured the %s flag in ^5%.3f ^2seconds, breaking their record of ^5%.3f ^2seconds (^3+%.3f^2)\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime/1000.0f, teamgame.bestCapTime/1000.0f, (teamgame.bestCapTime-capTime)/1000.0f ) );
+				trap->SendServerCommand( -1, va( "print \"%s ^2captured the %s flag in ^5%.3f ^2seconds, breaking their record of ^5%.3f ^2seconds (^3+%.3f^2)\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime/1000.0f, teamgame.bestCapTime/1000.0f, (teamgame.bestCapTime-capTime)/1000.0f ) );
 			else
-				trap_SendServerCommand( -1, va( "print \"%s ^2captured the %s flag in ^5%.3f ^2seconds, breaking %s^2's record of ^5%.3f ^2seconds (^3+%.3f^2)\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime/1000.0f, teamgame.bestCapName, teamgame.bestCapTime/1000.0f, (teamgame.bestCapTime-capTime)/1000.0f ) );
+				trap->SendServerCommand( -1, va( "print \"%s ^2captured the %s flag in ^5%.3f ^2seconds, breaking %s^2's record of ^5%.3f ^2seconds (^3+%.3f^2)\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime/1000.0f, teamgame.bestCapName, teamgame.bestCapTime/1000.0f, (teamgame.bestCapTime-capTime)/1000.0f ) );
 			teamgame.bestCapTime = capTime;
 			Q_strncpyz( teamgame.bestCapName, cl->pers.netname, sizeof( teamgame.bestCapName ) );
 		}
 		else
 		{
 			if ( !Q_stricmp( teamgame.bestCapName, cl->pers.netname ) )
-				trap_SendServerCommand( -1, va( "print \"%s ^2captured the %s flag in ^5%.3f ^2seconds, failing to break their record of ^5%.3f ^2seconds (^1%.3f^2)\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime/1000.0f, teamgame.bestCapTime/1000.0f, (teamgame.bestCapTime-capTime)/1000.0f ) );
+				trap->SendServerCommand( -1, va( "print \"%s ^2captured the %s flag in ^5%.3f ^2seconds, failing to break their record of ^5%.3f ^2seconds (^1%.3f^2)\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime/1000.0f, teamgame.bestCapTime/1000.0f, (teamgame.bestCapTime-capTime)/1000.0f ) );
 			else
-				trap_SendServerCommand( -1, va( "print \"%s ^2captured the %s flag in ^5%.3f ^2seconds, failing to break %s^2's record of ^5%.3f ^2seconds (^1%.3f^2)\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime/1000.0f, teamgame.bestCapName, teamgame.bestCapTime/1000.0f, (teamgame.bestCapTime-capTime)/1000.0f ) );
+				trap->SendServerCommand( -1, va( "print \"%s ^2captured the %s flag in ^5%.3f ^2seconds, failing to break %s^2's record of ^5%.3f ^2seconds (^1%.3f^2)\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime/1000.0f, teamgame.bestCapName, teamgame.bestCapTime/1000.0f, (teamgame.bestCapTime-capTime)/1000.0f ) );
 		}
 	}
 	else
@@ -931,7 +931,7 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 	VectorSubtract( &ent->s.pos.trBase, &minFlagRange, &mins );
 	VectorAdd( &ent->s.pos.trBase, &maxFlagRange, &maxs );
 
-	num = trap_EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
+	num = trap->EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
 
 	dist = Distance(&ent->s.pos.trBase, &other->client->ps.origin);
 
@@ -982,7 +982,7 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 	Team_SetFlagStatus( team, FLAG_TAKEN );
 
 	AddScore(other, &ent->r.currentOrigin, CTF_FLAG_BONUS);
-	cl->pers.teamState.flagsince = trap_Milliseconds() - ent->genericValue1; //Raz: speed caps
+	cl->pers.teamState.flagsince = trap->Milliseconds() - ent->genericValue1; //Raz: speed caps
 	Team_TakeFlagSound( ent, team );
 
 	return -1; // Do not respawn this automatically, but do delete it if it was FL_DROPPED
@@ -1040,7 +1040,7 @@ gentity_t *Team_GetLocation(gentity_t *ent)
 			continue;
 		}
 
-		if ( !trap_InPVS( &origin, &eloc->r.currentOrigin ) ) {
+		if ( !trap->InPVS( &origin, &eloc->r.currentOrigin ) ) {
 			continue;
 		}
 
@@ -1312,7 +1312,7 @@ void TeamplayInfoMessageFixed( gentity_t *ent ) {
 		}
 	}
 
-	trap_SendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
+	trap->SendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
 }
 
 void TeamplayInfoMessageOriginal( gentity_t *ent ) {
@@ -1370,7 +1370,7 @@ void TeamplayInfoMessageOriginal( gentity_t *ent ) {
 		}
 	}
 
-	trap_SendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
+	trap->SendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
 }
 
 void CheckTeamStatus(void) {

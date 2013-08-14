@@ -97,9 +97,9 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 		VectorCopy(&ent->r.maxs, &vMax);
 		if (vMax.z < 1)
 			vMax.z = 1;
-		trap_Trace( &tr, &ent->client->ps.origin, &ent->r.mins, &vMax, &ent->client->ps.origin, ent->s.number, mask );
+		trap->Trace( &tr, &ent->client->ps.origin, &ent->r.mins, &vMax, &ent->client->ps.origin, ent->s.number, mask, qfalse, 0, 0 );
 	} else {
-		trap_Trace( &tr, &ent->s.pos.trBase, &ent->r.mins, &ent->r.maxs, &ent->s.pos.trBase, ent->s.number, mask );
+		trap->Trace( &tr, &ent->s.pos.trBase, &ent->r.mins, &ent->r.maxs, &ent->s.pos.trBase, ent->s.number, mask, qfalse, 0, 0 );
 	}
 	
 	if (tr.startsolid)
@@ -177,7 +177,7 @@ qboolean	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vector3 *move,
 
 	// save off the old position
 	if (pushed_p > &pushed[MAX_GENTITIES]) {
-		G_Error( "pushed_p > &pushed[MAX_GENTITIES]" );
+		trap->Error( ERR_DROP, "pushed_p > &pushed[MAX_GENTITIES]" );
 	}
 	pushed_p->ent = check;
 	VectorCopy (&check->s.pos.trBase, &pushed_p->origin);
@@ -224,7 +224,7 @@ qboolean	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vector3 *move,
 		} else {
 			VectorCopy( &check->s.pos.trBase, &check->r.currentOrigin );
 		}
-		trap_LinkEntity (check);
+		trap->LinkEntity ((sharedEntity_t *)check);
 		return qtrue;
 	}
 
@@ -316,14 +316,14 @@ qboolean G_MoverPush( gentity_t *pusher, vector3 *move, vector3 *amove, gentity_
 	}
 
 	// unlink the pusher so we don't get it in the entityList
-	trap_UnlinkEntity( pusher );
+	trap->UnlinkEntity( (sharedEntity_t *)pusher );
 
-	listedEntities = trap_EntitiesInBox( &totalMins, &totalMaxs, entityList, MAX_GENTITIES );
+	listedEntities = trap->EntitiesInBox( &totalMins, &totalMaxs, entityList, MAX_GENTITIES );
 
 	// move the pusher to it's final position
 	VectorAdd( &pusher->r.currentOrigin, move, &pusher->r.currentOrigin );
 	VectorAdd( &pusher->r.currentAngles, amove, &pusher->r.currentAngles );
-	trap_LinkEntity( pusher );
+	trap->LinkEntity( (sharedEntity_t *)pusher );
 
 	// see if any solid entities are inside the final position
 	for ( e = 0 ; e < listedEntities ; e++ ) {
@@ -414,7 +414,7 @@ qboolean G_MoverPush( gentity_t *pusher, vector3 *move, vector3 *amove, gentity_
 				p->ent->client->ps.delta_angles.yaw = p->deltayaw;
 				VectorCopy (&p->origin, &p->ent->client->ps.origin);
 			}
-			trap_LinkEntity (p->ent);
+			trap->LinkEntity ((sharedEntity_t *)p->ent);
 		}
 		return qfalse;
 	}
@@ -461,7 +461,7 @@ void G_MoverTeam( gentity_t *ent ) {
 			part->s.apos.trTime += level.time - level.previousTime;
 			BG_EvaluateTrajectory( &part->s.pos, level.time, &part->r.currentOrigin );
 			BG_EvaluateTrajectory( &part->s.apos, level.time, &part->r.currentAngles );
-			trap_LinkEntity( part );
+			trap->LinkEntity( (sharedEntity_t *)part );
 		}
 
 		// if the pusher has a "blocked" function, call it
@@ -605,7 +605,7 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 		break;
 	}
 	BG_EvaluateTrajectory( &ent->s.pos, level.time, &ent->r.currentOrigin );	
-	trap_LinkEntity( ent );
+	trap->LinkEntity( (sharedEntity_t *)ent );
 }
 
 /*
@@ -710,13 +710,13 @@ void Reached_BinaryMover( gentity_t *ent )
 		// close areaportals
 		if ( ent->teammaster == ent || !ent->teammaster ) 
 		{
-			trap_AdjustAreaPortalState( ent, qfalse );
+			trap->AdjustAreaPortalState( (sharedEntity_t *)ent, qfalse );
 		}
 		G_UseTargets2( ent, ent->activator, ent->closetarget );
 	} 
 	else 
 	{
-		G_Error( "Reached_BinaryMover: bad moverState" );
+		trap->Error( ERR_DROP, "Reached_BinaryMover: bad moverState" );
 	}
 }
 
@@ -752,7 +752,7 @@ void Use_BinaryMover_Go( gentity_t *ent )
 
 		// open areaportal
 		if ( ent->teammaster == ent || !ent->teammaster ) {
-			trap_AdjustAreaPortalState( ent, qtrue );
+			trap->AdjustAreaPortalState( (sharedEntity_t *)ent, qtrue );
 		}
 		G_UseTargets( ent, ent->activator );
 		return;
@@ -1012,7 +1012,7 @@ void InitMover( gentity_t *ent )
 	}
 	ent->s.eType = ET_MOVER;
 	VectorCopy( &ent->pos1, &ent->r.currentOrigin );
-	trap_LinkEntity( ent );
+	trap->LinkEntity( (sharedEntity_t *)ent );
 
 	InitMoverTrData( ent );
 }
@@ -1090,7 +1090,7 @@ static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other, trace_
 
 	VectorSet(&pMins, -15.0f, -15.0f, DEFAULT_MINS_2);
 	VectorSet(&pMaxs,  15.0f,  15.0f, DEFAULT_MAXS_2);
-	trap_Trace(&tr, &origin, &pMins, &pMaxs, &origin, other->s.number, other->clipmask);
+	trap->Trace(&tr, &origin, &pMins, &pMaxs, &origin, other->s.number, other->clipmask, qfalse, 0, 0);
 	if (!tr.startsolid &&
 		!tr.allsolid &&
 		tr.fraction == 1.0f &&
@@ -1236,7 +1236,7 @@ void Think_SpawnNewDoorTrigger( gentity_t *ent )
 	other->parent = ent;
 	other->r.contents = CONTENTS_TRIGGER;
 	other->touch = Touch_DoorTrigger;
-	trap_LinkEntity (other);
+	trap->LinkEntity ((sharedEntity_t *)other);
 	other->classname = "trigger_door";
 	// remember the thinnest axis
 	other->count = best;
@@ -1445,7 +1445,7 @@ void SP_func_door (gentity_t *ent)
 	VectorCopy( &ent->s.origin, &ent->pos1 );
 
 	// calculate second position
-	trap_SetBrushModel( ent, ent->model );
+	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 	G_SetMovedir( &ent->s.angles, &ent->movedir );
 	abs_movedir.x = fabs( ent->movedir.x );
 	abs_movedir.y = fabs( ent->movedir.y );
@@ -1585,7 +1585,7 @@ void SpawnPlatTrigger( gentity_t *ent ) {
 	VectorCopy (&tmin, &trigger->r.mins);
 	VectorCopy (&tmax, &trigger->r.maxs);
 
-	trap_LinkEntity (trigger);
+	trap->LinkEntity ((sharedEntity_t *)trigger);
 }
 
 
@@ -1619,7 +1619,7 @@ void SP_func_plat (gentity_t *ent) {
 	ent->wait = 1000;
 
 	// create second position
-	trap_SetBrushModel( ent, ent->model );
+	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 
 	if ( !G_SpawnFloat( "height", "0", &height ) ) {
 		height = (ent->r.maxs.z - ent->r.mins.z) - lip;
@@ -1708,7 +1708,7 @@ void SP_func_button( gentity_t *ent ) {
 	VectorCopy( &ent->s.origin, &ent->pos1 );
 
 	// calculate second position
-	trap_SetBrushModel( ent, ent->model );
+	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 
 	G_SpawnFloat( "lip", "4", &lip );
 
@@ -1902,7 +1902,7 @@ Target: next path corner and other targets to fire
 */
 void SP_path_corner( gentity_t *self ) {
 	if ( !self->targetname ) {
-		G_Printf ("path_corner with no targetname at %s\n", vtos(&self->s.origin));
+		trap->Print ("path_corner with no targetname at %s\n", vtos(&self->s.origin));
 		G_FreeEntity( self );
 		return;
 	}
@@ -1940,12 +1940,12 @@ void SP_func_train (gentity_t *self) {
 	}
 
 	if ( !self->target ) {
-		G_Printf ("func_train without a target at %s\n", vtos(&self->r.absmin));
+		trap->Print ("func_train without a target at %s\n", vtos(&self->r.absmin));
 		G_FreeEntity( self );
 		return;
 	}
 
-	trap_SetBrushModel( self, self->model );
+	trap->SetBrushModel( (sharedEntity_t *)self, self->model );
 	InitMover( self );
 
 	self->reached = Reached_Train;
@@ -1986,7 +1986,7 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 void SP_func_static( gentity_t *ent ) 
 {
 	int		test;
-	trap_SetBrushModel( ent, ent->model );
+	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 
 	VectorCopy( &ent->s.origin, &ent->pos1 );
 	VectorCopy( &ent->s.origin, &ent->pos2 );
@@ -2028,7 +2028,7 @@ void SP_func_static( gentity_t *ent )
 		ent->s.eFlags2 |= EF2_HYPERSPACE;
 	}
 
-	trap_LinkEntity( ent );
+	trap->LinkEntity( (sharedEntity_t *)ent );
 
 	if (level.mBSPInstanceDepth)
 	{	// this means that this guy will never be updated, moved, changed, etc.
@@ -2157,14 +2157,14 @@ void SP_func_rotating (gentity_t *ent) {
 	}
 	else
 	{
-		trap_SetBrushModel( ent, ent->model );
+		trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 		InitMover( ent );
 
 		VectorCopy( &ent->s.origin, &ent->s.pos.trBase );
 		VectorCopy( &ent->s.pos.trBase, &ent->r.currentOrigin );
 		VectorCopy( &ent->s.apos.trBase, &ent->r.currentAngles );
 
-		trap_LinkEntity( ent );
+		trap->LinkEntity( (sharedEntity_t *)ent );
 	}
 
 	G_SpawnInt("model2scale", "0", &ent->s.iModelScale);
@@ -2234,7 +2234,7 @@ void SP_func_bobbing (gentity_t *ent) {
 	G_SpawnInt( "dmg", "2", &ent->damage );
 	G_SpawnFloat( "phase", "0", &phase );
 
-	trap_SetBrushModel( ent, ent->model );
+	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 	InitMover( ent );
 
 	VectorCopy( &ent->s.origin, &ent->s.pos.trBase );
@@ -2280,7 +2280,7 @@ void SP_func_pendulum(gentity_t *ent) {
 	G_SpawnInt( "dmg", "2", &ent->damage );
 	G_SpawnFloat( "phase", "0", &phase );
 
-	trap_SetBrushModel( ent, ent->model );
+	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 
 	// find pendulum length
 	length = fabs( ent->r.mins.z );
@@ -2409,7 +2409,7 @@ void funcBBrushDieGo (gentity_t *self)
 	self->s.solid = 0;
 	self->r.contents = 0;
 	self->clipmask = 0;
-	trap_LinkEntity(self); 
+	trap->LinkEntity((sharedEntity_t *)self); 
 
 	VectorSet(&up, 0, 0, 1);
 
@@ -2484,7 +2484,7 @@ void funcBBrushDieGo (gentity_t *self)
 	//FIXME: base numChunks off size?
 	G_Chunks( self->s.number, &org, &dir, &self->r.absmin, &self->r.absmax, 300, numChunks, chunkType, 0, (scale*self->mass) );
 
-	trap_AdjustAreaPortalState( self, qtrue );
+	trap->AdjustAreaPortalState( (sharedEntity_t *)self, qtrue );
 	self->think = G_FreeEntity;
 	self->nextthink = level.time + 50;
 	//G_FreeEntity( self );
@@ -2597,7 +2597,7 @@ static void InitBBrush ( gentity_t *ent )
 
 	VectorCopy( &ent->s.origin, &ent->pos1 );
 	
-	trap_SetBrushModel( ent, ent->model );
+	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 
 	ent->die = funcBBrushDie;
 	
@@ -2647,7 +2647,7 @@ static void InitBBrush ( gentity_t *ent )
 	}
 
 	ent->s.eType = ET_MOVER;
-	trap_LinkEntity(ent);
+	trap->LinkEntity((sharedEntity_t *)ent);
 
 	ent->s.pos.trType = TR_STATIONARY;
 	VectorCopy( &ent->pos1, &ent->s.pos.trBase );
@@ -2795,7 +2795,7 @@ void SP_func_breakable( gentity_t *self )
 		self->alliedTeam = TranslateTeamName( self->team );
 		if(self->alliedTeam == TEAM_FREE)
 		{
-			G_Error("team name %s not recognized\n", self->team);
+			trap->Error( ERR_DROP, "team name %s not recognized\n", self->team);
 		}
 	}
 	*/
@@ -2806,7 +2806,7 @@ void SP_func_breakable( gentity_t *self )
 	}
 	self->team = NULL;
 	if (!self->model) {
-		G_Error("func_breakable with NULL model\n");
+		trap->Error( ERR_DROP, "func_breakable with NULL model\n");
 	}
 	InitBBrush( self );
 
@@ -2916,7 +2916,7 @@ void GlassDie_Old(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, in
 
 void GlassPain(gentity_t *self, gentity_t *attacker, int damage)
 {
-	//G_Printf("Mr. Glass says: PLZ NO IT HURTS\n");
+	//trap->Print("Mr. Glass says: PLZ NO IT HURTS\n");
 	//Make "cracking" sound?
 }
 
@@ -2948,7 +2948,7 @@ Breakable glass
 "maxshards"	Max number of shards to spawn on glass break
 */
 void SP_func_glass( gentity_t *ent ) {
-	trap_SetBrushModel( ent, ent->model );
+	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 	InitMover( ent );
 
 	ent->r.svFlags = SVF_GLASS_BRUSH;
@@ -2991,7 +2991,7 @@ void func_wait_return_solid( gentity_t *self )
 	self->clipmask = CONTENTS_BODY;
 	if ( !(self->spawnflags&16) || G_TestEntityPosition( self ) == NULL )
 	{
-		trap_SetBrushModel( self, self->model );
+		trap->SetBrushModel( (sharedEntity_t *)self, self->model );
 		InitMover( self );
 		VectorCopy( &self->s.origin, &self->s.pos.trBase );
 		VectorCopy( &self->s.origin, &self->r.currentOrigin );
@@ -3132,7 +3132,7 @@ teamuser - if 1, team 2 can't use this. If 2, team 1 can't use this.
 
 void SP_func_usable( gentity_t *self ) 
 {
-	trap_SetBrushModel( self, self->model );
+	trap->SetBrushModel( (sharedEntity_t *)self, self->model );
 	InitMover( self );
 	VectorCopy( &self->s.origin, &self->s.pos.trBase );
 	VectorCopy( &self->s.origin, &self->r.currentOrigin );
@@ -3192,7 +3192,7 @@ void SP_func_usable( gentity_t *self )
 		self->s.time = self->genericValue5 + 1;
 	}
 
-	trap_LinkEntity (self);
+	trap->LinkEntity ((sharedEntity_t *)self);
 }
 
 
@@ -3217,7 +3217,7 @@ void use_wall( gentity_t *ent, gentity_t *other, gentity_t *activator )
 		ent->r.contents = CONTENTS_SOLID;
 		if ( !(ent->spawnflags&1) )
 		{//START_OFF doesn't effect area portals
-			trap_AdjustAreaPortalState( ent, qfalse );
+			trap->AdjustAreaPortalState( (sharedEntity_t *)ent, qfalse );
 		}
 	}
 	// Make it go away
@@ -3228,7 +3228,7 @@ void use_wall( gentity_t *ent, gentity_t *other, gentity_t *activator )
 		ent->s.eFlags |= EF_NODRAW;
 		if ( !(ent->spawnflags&1) )
 		{//START_OFF doesn't effect area portals
-			trap_AdjustAreaPortalState( ent, qtrue );
+			trap->AdjustAreaPortalState( (sharedEntity_t *)ent, qtrue );
 		}
 	}
 }
@@ -3248,7 +3248,7 @@ START_OFF - the wall will not be there
 */
 void SP_func_wall( gentity_t *ent ) 
 {
-	trap_SetBrushModel( ent, ent->model );
+	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 
 	VectorCopy( &ent->s.origin, &ent->pos1 );
 	VectorCopy( &ent->s.origin, &ent->pos2 );
@@ -3267,6 +3267,6 @@ void SP_func_wall( gentity_t *ent )
 
 	ent->use = use_wall;
 
-	trap_LinkEntity (ent);
+	trap->LinkEntity ((sharedEntity_t *)ent);
 
 }

@@ -249,7 +249,7 @@ void Interrogator_Strafe( void )
 	dir = ( rand() & 1 ) ? -1 : 1;
 	VectorMA( &NPC->r.currentOrigin, HUNTER_STRAFE_DIS * dir, &right, &end );
 
-	trap_Trace( &tr, &NPC->r.currentOrigin, NULL, NULL, &end, NPC->s.number, MASK_SOLID );
+	trap->Trace( &tr, &NPC->r.currentOrigin, NULL, NULL, &end, NPC->s.number, MASK_SOLID, qfalse, 0, 0 );
 
 	// Close enough
 	if ( tr.fraction > 0.9f )

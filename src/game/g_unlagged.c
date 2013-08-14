@@ -59,7 +59,7 @@ void G_StoreTrail( gentity_t *ent ) {
 	} else {
 		// calculate the actual server time
 		// (we set level.frameStartTime every G_RunFrame)
-		newtime = level.previousTime + trap_Milliseconds() - level.frameStartTime;
+		newtime = level.previousTime + trap->Milliseconds() - level.frameStartTime;
 		if ( newtime > level.time ) {
 			newtime = level.time;
 		} else if ( newtime <= level.previousTime ) {
@@ -156,7 +156,7 @@ void G_TimeShiftClient( gentity_t *ent, int time ) {
 			TimeShiftLerp( frac, &ent->client->trail[k].maxs, &ent->client->trail[j].maxs, &ent->r.maxs );
 
 			// this will recalculate absmin and absmax
-			trap_LinkEntity( ent );
+			trap->LinkEntity( (sharedEntity_t *)ent );
 		} else {
 			// we wrapped, so grab the earliest
 			VectorCopy( &ent->client->trail[k].currentAngles, &ent->r.currentAngles );
@@ -165,7 +165,7 @@ void G_TimeShiftClient( gentity_t *ent, int time ) {
 			VectorCopy( &ent->client->trail[k].maxs, &ent->r.maxs );
 
 			// this will recalculate absmin and absmax
-			trap_LinkEntity( ent );
+			trap->LinkEntity( (sharedEntity_t *)ent );
 		}
 	}
 }
@@ -184,7 +184,7 @@ void G_TimeShiftAllClients( int time, gentity_t *skip ) {
 	gentity_t *ent=NULL;
 
 	if ( shifted ) {
-		G_Printf( "WARNING: Tried to shift all clients when they were already shifted!\n" );
+		trap->Print( "WARNING: Tried to shift all clients when they were already shifted!\n" );
 		return;
 	}
 
@@ -223,7 +223,7 @@ void G_UnTimeShiftClient( gentity_t *ent ) {
 		ent->client->saved.leveltime = 0;
 
 		// this will recalculate absmin and absmax
-		trap_LinkEntity( ent );
+		trap->LinkEntity( (sharedEntity_t *)ent );
 	}
 }
 
@@ -240,7 +240,7 @@ void G_UnTimeShiftAllClients( gentity_t *skip ) {
 	gentity_t *ent=NULL;
 
 	if ( !shifted ) {
-		G_Printf( "WARNING: Tried to unshift all clients when they weren't shifted!\n" );
+		trap->Print( "WARNING: Tried to unshift all clients when they weren't shifted!\n" );
 		return;
 	}
 

@@ -159,22 +159,22 @@ void BotSelectWeapon(int client, int weapon)
 //		assert(0);
 		return;
 	}
-	trap_EA_SelectWeapon(client, weapon);
+	trap->EA_SelectWeapon(client, weapon);
 }
 
 void BotReportStatus(bot_state_t *bs)
 {
 	if (level.gametype == GT_TEAM)
 	{
-		trap_EA_SayTeam(bs->client, teamplayStateDescriptions[bs->teamplayState]);
+		trap->EA_SayTeam(bs->client, teamplayStateDescriptions[bs->teamplayState]);
 	}
 	else if (level.gametype == GT_SIEGE)
 	{
-		trap_EA_SayTeam(bs->client, siegeStateDescriptions[bs->siegeState]);
+		trap->EA_SayTeam(bs->client, siegeStateDescriptions[bs->siegeState]);
 	}
 	else if (level.gametype == GT_CTF || level.gametype == GT_CTY)
 	{
-		trap_EA_SayTeam(bs->client, ctfStateDescriptions[bs->ctfState]);
+		trap->EA_SayTeam(bs->client, ctfStateDescriptions[bs->ctfState]);
 	}
 }
 
@@ -388,7 +388,7 @@ BotAI_GetSnapshotEntity
 int BotAI_GetSnapshotEntity( int clientNum, int sequence, entityState_t *state ) {
 	int		entNum;
 
-	entNum = trap_BotGetSnapshotEntity( clientNum, sequence );
+	entNum = trap->BotGetSnapshotEntity( clientNum, sequence );
 	if ( entNum == -1 ) {
 		memset(state, 0, sizeof(entityState_t));
 		return -1;
@@ -405,7 +405,7 @@ BotEntityInfo
 ==============
 */
 void BotEntityInfo(int entnum, aas_entityinfo_t *info) {
-	trap_AAS_EntityInfo(entnum, info);
+	trap->AAS_EntityInfo(entnum, info);
 }
 
 /*
@@ -508,7 +508,7 @@ void BotChangeViewAngles(bot_state_t *bs, float thinktime) {
 		bs->viewanglespeed.data[i] *= 0.45 * (1 - factor);
 	}
 	if (bs->viewangles.pitch > 180) bs->viewangles.pitch -= 360;
-	trap_EA_View(bs->client, &bs->viewangles);
+	trap->EA_View(bs->client, &bs->viewangles);
 }
 
 /*
@@ -623,7 +623,7 @@ void BotUpdateInput(bot_state_t *bs, int time, int elapsed_time) {
 	//change the bot view angles
 	BotChangeViewAngles(bs, (float) elapsed_time / 1000);
 	//retrieve the bot input
-	trap_EA_GetInput(bs->client, (float) time / 1000, &bi);
+	trap->EA_GetInput(bs->client, (float) time / 1000, &bi);
 	//respawn hack
 	if (bi.actionflags & ACTION_RESPAWN) {
 		if (bs->lastucmd.buttons & BUTTON_ATTACK) bi.actionflags &= ~(ACTION_RESPAWN|ACTION_ATTACK);
@@ -643,7 +643,7 @@ BotAIRegularUpdate
 */
 void BotAIRegularUpdate(void) {
 	if (regularupdate_time < FloatTime()) {
-		trap_BotUpdateEntityItems();
+		trap->BotUpdateEntityItems();
 		regularupdate_time = FloatTime() + 0.3;
 	}
 }
@@ -684,7 +684,7 @@ int BotAI(int client, float thinktime) {
 	int end = 0;
 #endif
 
-	trap_EA_ResetInput(client);
+	trap->EA_ResetInput(client);
 	//
 	bs = botstates[client];
 	if (!bs || !bs->inuse) {
@@ -696,7 +696,7 @@ int BotAI(int client, float thinktime) {
 	BotAI_GetClientState( client, &bs->cur_ps );
 
 	//retrieve any waiting server commands
-	while( trap_BotGetServerCommand(client, buf, sizeof(buf)) ) {
+	while( trap->BotGetServerCommand(client, buf, sizeof(buf)) ) {
 		//have buf point to the command and args to the command arguments
 		args = strchr( buf, ' ');
 		if (!args) continue;
@@ -730,13 +730,13 @@ int BotAI(int client, float thinktime) {
 	//get the area the bot is in
 
 #ifdef _DEBUG
-	start = trap_Milliseconds();
+	start = trap->Milliseconds();
 #endif
 	StandardBotAI(bs, thinktime);
 #ifdef _DEBUG
-	end = trap_Milliseconds();
+	end = trap->Milliseconds();
 
-	trap_Cvar_Update(&bot_debugmessages);
+	trap->Cvar_Update(&bot_debugmessages);
 
 	if (bot_debugmessages.integer)
 	{
@@ -842,16 +842,16 @@ int BotAISetupClient(int client, struct bot_settings_s *settings, qboolean resta
 	}
 
 	//allocate a goal state
-	bs->gs = trap_BotAllocGoalState(client);
+	bs->gs = trap->BotAllocGoalState(client);
 
 	//allocate a weapon state
-	bs->ws = trap_BotAllocWeaponState();
+	bs->ws = trap->BotAllocWeaponState();
 
 	bs->inuse = qtrue;
 	bs->entitynum = client;
 	bs->setupcount = 4;
 	bs->entergame_time = FloatTime();
-	bs->ms = trap_BotAllocMoveState();
+	bs->ms = trap->BotAllocMoveState();
 	numbots++;
 
 	//NOTE: reschedule the bot thinking
@@ -879,11 +879,11 @@ int BotAIShutdownClient(int client, qboolean restart) {
 		return qfalse;
 	}
 
-	trap_BotFreeMoveState(bs->ms);
+	trap->BotFreeMoveState(bs->ms);
 	//free the goal state`			
-	trap_BotFreeGoalState(bs->gs);
+	trap->BotFreeGoalState(bs->gs);
 	//free the weapon weights
-	trap_BotFreeWeaponState(bs->ws);
+	trap->BotFreeWeaponState(bs->ws);
 	//
 	//clear the bot state
 	memset(bs, 0, sizeof(bot_state_t));
@@ -933,11 +933,11 @@ void BotResetState(bot_state_t *bs) {
 	bs->entitynum = entitynum;
 	bs->entergame_time = entergame_time;
 	//reset several states
-	if (bs->ms) trap_BotResetMoveState(bs->ms);
-	if (bs->gs) trap_BotResetGoalState(bs->gs);
-	if (bs->ws) trap_BotResetWeaponState(bs->ws);
-	if (bs->gs) trap_BotResetAvoidGoals(bs->gs);
-	if (bs->ms) trap_BotResetAvoidReach(bs->ms);
+	if (bs->ms) trap->BotResetMoveState(bs->ms);
+	if (bs->gs) trap->BotResetGoalState(bs->gs);
+	if (bs->ws) trap->BotResetWeaponState(bs->ws);
+	if (bs->gs) trap->BotResetAvoidGoals(bs->gs);
+	if (bs->ms) trap->BotResetAvoidReach(bs->ms);
 }
 
 /*
@@ -965,7 +965,7 @@ int OrgVisible(vector3 *org1, vector3 *org2, int ignore)
 {
 	trace_t tr;
 
-	trap_Trace(&tr, org1, NULL, NULL, org2, ignore, MASK_SOLID);
+	trap->Trace(&tr, org1, NULL, NULL, org2, ignore, MASK_SOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1)
 	{
@@ -981,11 +981,11 @@ int WPOrgVisible(gentity_t *bot, vector3 *org1, vector3 *org2, int ignore)
 	trace_t tr;
 	gentity_t *ownent;
 
-	trap_Trace(&tr, org1, NULL, NULL, org2, ignore, MASK_SOLID);
+	trap->Trace(&tr, org1, NULL, NULL, org2, ignore, MASK_SOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1)
 	{
-		trap_Trace(&tr, org1, NULL, NULL, org2, ignore, MASK_PLAYERSOLID);
+		trap->Trace(&tr, org1, NULL, NULL, org2, ignore, MASK_PLAYERSOLID, qfalse, 0, 0);
 
 		if (tr.fraction != 1 && tr.entityNum != ENTITYNUM_NONE && g_entities[tr.entityNum].s.eType == ET_SPECIAL)
 		{
@@ -1014,11 +1014,11 @@ int OrgVisibleBox(vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2, in
 
 	if (RMG.integer)
 	{
-		trap_Trace(&tr, org1, NULL, NULL, org2, ignore, MASK_SOLID);
+		trap->Trace(&tr, org1, NULL, NULL, org2, ignore, MASK_SOLID, qfalse, 0, 0);
 	}
 	else
 	{
-		trap_Trace(&tr, org1, mins, maxs, org2, ignore, MASK_SOLID);
+		trap->Trace(&tr, org1, mins, maxs, org2, ignore, MASK_SOLID, qfalse, 0, 0);
 	}
 
 	if (tr.fraction == 1 && !tr.startsolid && !tr.allsolid)
@@ -1042,7 +1042,7 @@ int CheckForFunc(vector3 *org, int ignore)
 
 	under.z -= 64;
 
-	trap_Trace(&tr, org, NULL, NULL, &under, ignore, MASK_SOLID);
+	trap->Trace(&tr, org, NULL, NULL, &under, ignore, MASK_SOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1)
 		return 0;
@@ -1071,7 +1071,7 @@ qboolean BotPVSCheck( const vector3 *p1, const vector3 *p2 )
 		return qtrue;
 	}
 
-	return trap_InPVS(p1, p2);
+	return trap->InPVS(p1, p2);
 }
 
 //get the index to the nearest visible waypoint in the global trail
@@ -1558,7 +1558,7 @@ int BotTrace_Strafe(bot_state_t *bs, vector3 *traceto)
 	to.y = from.y + forward.y*32;
 	to.z = from.z + forward.z*32;
 
-	trap_Trace(&tr, &from, &playerMins, &playerMaxs, &to, bs->client, MASK_PLAYERSOLID);
+	trap->Trace(&tr, &from, &playerMins, &playerMaxs, &to, bs->client, MASK_PLAYERSOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1)
 		return 0;
@@ -1573,7 +1573,7 @@ int BotTrace_Strafe(bot_state_t *bs, vector3 *traceto)
 	to.y += right.y*32;
 	to.z += right.z*32;
 
-	trap_Trace(&tr, &from, &playerMins, &playerMaxs, &to, bs->client, MASK_PLAYERSOLID);
+	trap->Trace(&tr, &from, &playerMins, &playerMaxs, &to, bs->client, MASK_PLAYERSOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1)
 		return STRAFEAROUND_RIGHT;
@@ -1586,7 +1586,7 @@ int BotTrace_Strafe(bot_state_t *bs, vector3 *traceto)
 	to.y -= right.y*64;
 	to.z -= right.z*64;
 
-	trap_Trace(&tr, &from, &playerMins, &playerMaxs, &to, bs->client, MASK_PLAYERSOLID);
+	trap->Trace(&tr, &from, &playerMins, &playerMaxs, &to, bs->client, MASK_PLAYERSOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1)
 		return STRAFEAROUND_LEFT;
@@ -1615,7 +1615,7 @@ int BotTrace_Jump(bot_state_t *bs, vector3 *traceto)
 	VectorSet( &mins, -15, -15, -18 );
 	VectorSet( &maxs,  15,  15,  32 );
 
-	trap_Trace(&tr, &bs->origin, &mins, &maxs, &traceto_mod, bs->client, MASK_PLAYERSOLID);
+	trap->Trace(&tr, &bs->origin, &mins, &maxs, &traceto_mod, bs->client, MASK_PLAYERSOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1)
 		return 0;
@@ -1630,7 +1630,7 @@ int BotTrace_Jump(bot_state_t *bs, vector3 *traceto)
 	VectorSet( &mins, -15, -15, 0 );
 	VectorSet( &maxs,  15,  15, 8 );
 
-	trap_Trace(&tr, &tracefrom_mod, &mins, &maxs, &traceto_mod, bs->client, MASK_PLAYERSOLID);
+	trap->Trace(&tr, &tracefrom_mod, &mins, &maxs, &traceto_mod, bs->client, MASK_PLAYERSOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1)
 	{
@@ -1664,7 +1664,7 @@ int BotTrace_Duck(bot_state_t *bs, vector3 *traceto)
 	VectorSet( &mins, -15, -15, -23 );
 	VectorSet( &maxs,  15,  15,   8 );
 
-	trap_Trace(&tr, &bs->origin, &mins, &maxs, &traceto_mod, bs->client, MASK_PLAYERSOLID);
+	trap->Trace(&tr, &bs->origin, &mins, &maxs, &traceto_mod, bs->client, MASK_PLAYERSOLID, qfalse, 0, 0);
 
 	if (tr.fraction != 1)
 		return 0;
@@ -1677,7 +1677,7 @@ int BotTrace_Duck(bot_state_t *bs, vector3 *traceto)
 	VectorSet( &mins, -15, -15,  0 );
 	VectorSet( &maxs,  15,  15, 32 );
 
-	trap_Trace(&tr, &tracefrom_mod, &mins, &maxs, &traceto_mod, bs->client, MASK_PLAYERSOLID);
+	trap->Trace(&tr, &tracefrom_mod, &mins, &maxs, &traceto_mod, bs->client, MASK_PLAYERSOLID, qfalse, 0, 0);
 
 	if (tr.fraction != 1)
 		return 1;
@@ -2356,7 +2356,7 @@ gentity_t *GetNearestBadThing(bot_state_t *bs)
 				if (ent->s.weapon && glen <= 256 && bs->settings.skill > 2)
 				{ //it's a projectile so push it away
 					bs->doForcePush = level.time + 700;
-					//G_Printf("PUSH PROJECTILE\n");
+					//trap->Print("PUSH PROJECTILE\n");
 				}
 			}
 			else
@@ -2374,7 +2374,7 @@ gentity_t *GetNearestBadThing(bot_state_t *bs)
 
 			if (glen < bestdist*factor && BotPVSCheck(&bs->origin, &ent->s.pos.trBase))
 			{
-				trap_Trace(&tr, &bs->origin, NULL, NULL, &ent->s.pos.trBase, bs->client, MASK_SOLID);
+				trap->Trace(&tr, &bs->origin, NULL, NULL, &ent->s.pos.trBase, bs->client, MASK_SOLID, qfalse, 0, 0);
 
 				if (tr.fraction == 1 || tr.entityNum == ent->s.number)
 				{
@@ -2677,7 +2677,7 @@ void GetNewFlagPoint(wpobject_t *wp, gentity_t *flagEnt, int team)
 
 	if (bestdist <= WP_KEEP_FLAG_DIST)
 	{
-		trap_Trace(&tr, &wp->origin, &mins, &maxs, &flagEnt->s.pos.trBase, flagEnt->s.number, MASK_SOLID);
+		trap->Trace(&tr, &wp->origin, &mins, &maxs, &flagEnt->s.pos.trBase, flagEnt->s.number, MASK_SOLID, qfalse, 0, 0);
 
 		if (tr.fraction == 1)
 		{ //this point is good
@@ -2694,7 +2694,7 @@ void GetNewFlagPoint(wpobject_t *wp, gentity_t *flagEnt, int team)
 
 		if (testdist < bestdist)
 		{
-			trap_Trace(&tr, &gWPArray[i]->origin, &mins, &maxs, &flagEnt->s.pos.trBase, flagEnt->s.number, MASK_SOLID);
+			trap->Trace(&tr, &gWPArray[i]->origin, &mins, &maxs, &flagEnt->s.pos.trBase, flagEnt->s.number, MASK_SOLID, qfalse, 0, 0);
 
 			if (tr.fraction == 1)
 			{
@@ -2737,7 +2737,7 @@ int CTFTakesPriority(bot_state_t *bs)
 #ifdef BOT_CTF_DEBUG
 	vector3 t;
 
-	G_Printf("CTFSTATE: %s\n", ctfStateNames[bs->ctfState]);
+	trap->Print("CTFSTATE: %s\n", ctfStateNames[bs->ctfState]);
 #endif
 
 	if (level.gametype != GT_CTF && level.gametype != GT_CTY)
@@ -2899,7 +2899,7 @@ int EntityVisibleBox(vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2,
 {
 	trace_t tr;
 
-	trap_Trace(&tr, org1, mins, maxs, org2, ignore, MASK_SOLID);
+	trap->Trace(&tr, org1, mins, maxs, org2, ignore, MASK_SOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1 && !tr.startsolid && !tr.allsolid)
 		return 1;
@@ -2997,7 +2997,7 @@ hasPoint:
 
 	if (bs->touchGoal)
 	{
-		//G_Printf("Please, master, let me touch it!\n");
+		//trap->Print("Please, master, let me touch it!\n");
 		VectorCopy(&dif, &bs->goalPosition);
 	}
 
@@ -3205,7 +3205,7 @@ int SiegeTakesPriority(bot_state_t *bs)
 				}
 				else
 				{
-					trap_Trace(&tr, &bs->origin, NULL, NULL, &dif, bs->client, MASK_SOLID);
+					trap->Trace(&tr, &bs->origin, NULL, NULL, &dif, bs->client, MASK_SOLID, qfalse, 0, 0);
 
 					if (tr.fraction != 1 && tr.entityNum != bs->shootGoal->s.number)
 					{
@@ -3228,7 +3228,7 @@ int SiegeTakesPriority(bot_state_t *bs)
 				bs->shootGoal = NULL;
 			else
 			{
-				trap_Trace(&tr, &bs->origin, NULL, NULL, &dif, bs->client, MASK_SOLID);
+				trap->Trace(&tr, &bs->origin, NULL, NULL, &dif, bs->client, MASK_SOLID, qfalse, 0, 0);
 
 				if (tr.fraction != 1 && tr.entityNum != bs->shootGoal->s.number)
 					bs->shootGoal = NULL;
@@ -3250,7 +3250,7 @@ int SiegeTakesPriority(bot_state_t *bs)
 			}
 			else
 			{
-				trap_Trace(&tr, &bs->origin, NULL, NULL, &dif, bs->client, MASK_SOLID);
+				trap->Trace(&tr, &bs->origin, NULL, NULL, &dif, bs->client, MASK_SOLID, qfalse, 0, 0);
 
 				if (tr.fraction != 1 && tr.entityNum != bs->shootGoal->s.number)
 				{
@@ -3465,7 +3465,7 @@ void GetIdealDestination(bot_state_t *bs)
 	gentity_t *badthing;
 
 #ifdef _DEBUG
-	trap_Cvar_Update(&bot_nogoals);
+	trap->Cvar_Update(&bot_nogoals);
 
 	if (bot_nogoals.integer)
 		return;
@@ -3555,10 +3555,10 @@ void GetIdealDestination(bot_state_t *bs)
 
 				bs->escapeDirTime = level.time + Q_irand(500, 1000);//Q_irand(1000, 1400);
 
-				//G_Printf("Escaping from scary bad thing [%s]\n", badthing->classname);
+				//trap->Print("Escaping from scary bad thing [%s]\n", badthing->classname);
 			}
 		}
-		//G_Printf("Run away run away run away!\n");
+		//trap->Print("Run away run away run away!\n");
 		return;
 	}
 
@@ -3664,7 +3664,7 @@ void GetIdealDestination(bot_state_t *bs)
 
 	if (!bs->wpDestination && bs->wpDestSwitchTime < level.time)
 	{
-		//G_Printf("I need something to do\n");
+		//trap->Print("I need something to do\n");
 		idleWP = GetBestIdleGoal(bs);
 
 		if (idleWP != -1 && gWPArray[idleWP] && gWPArray[idleWP]->inuse)
@@ -4033,14 +4033,14 @@ void MeleeCombatHandling(bot_state_t *bs)
 	VectorCopy(&usethisvec, &downvec);
 	downvec.z -= 4096;
 
-	trap_Trace(&tr, &usethisvec, &mins, &maxs, &downvec, -1, MASK_SOLID);
+	trap->Trace(&tr, &usethisvec, &mins, &maxs, &downvec, -1, MASK_SOLID, qfalse, 0, 0);
 
 	en_down = (int)tr.endpos.z;
 
 	VectorCopy(&bs->origin, &downvec);
 	downvec.z -= 4096;
 
-	trap_Trace(&tr, &bs->origin, &mins, &maxs, &downvec, -1, MASK_SOLID);
+	trap->Trace(&tr, &bs->origin, &mins, &maxs, &downvec, -1, MASK_SOLID, qfalse, 0, 0);
 
 	me_down = (int)tr.endpos.z;
 
@@ -4055,7 +4055,7 @@ void MeleeCombatHandling(bot_state_t *bs)
 	VectorCopy(&midorg, &downvec);
 	downvec.z -= 4096;
 
-	trap_Trace(&tr, &midorg, &mins, &maxs, &downvec, -1, MASK_SOLID);
+	trap->Trace(&tr, &midorg, &mins, &maxs, &downvec, -1, MASK_SOLID, qfalse, 0, 0);
 
 	mid_down = (int)tr.endpos.z;
 
@@ -4101,7 +4101,7 @@ void SaberCombatHandling(bot_state_t *bs)
 	VectorCopy(&usethisvec, &downvec);
 	downvec.z -= 4096;
 
-	trap_Trace(&tr, &usethisvec, &mins, &maxs, &downvec, -1, MASK_SOLID);
+	trap->Trace(&tr, &usethisvec, &mins, &maxs, &downvec, -1, MASK_SOLID, qfalse, 0, 0);
 
 	en_down = (int)tr.endpos.z;
 
@@ -4115,7 +4115,7 @@ void SaberCombatHandling(bot_state_t *bs)
 		VectorCopy(&bs->origin, &downvec);
 		downvec.z -= 4096;
 
-		trap_Trace(&tr, &bs->origin, &mins, &maxs, &downvec, -1, MASK_SOLID);
+		trap->Trace(&tr, &bs->origin, &mins, &maxs, &downvec, -1, MASK_SOLID, qfalse, 0, 0);
 
 		me_down = (int)tr.endpos.z;
 
@@ -4137,7 +4137,7 @@ void SaberCombatHandling(bot_state_t *bs)
 	VectorCopy(&midorg, &downvec);
 	downvec.z -= 4096;
 
-	trap_Trace(&tr, &midorg, &mins, &maxs, &downvec, -1, MASK_SOLID);
+	trap->Trace(&tr, &midorg, &mins, &maxs, &downvec, -1, MASK_SOLID, qfalse, 0, 0);
 
 	mid_down = (int)tr.endpos.z;
 
@@ -4217,7 +4217,7 @@ void SaberCombatHandling(bot_state_t *bs)
 
 					groundcheck.z -= 64;
 
-					trap_Trace(&tr, &bs->goalPosition, NULL, NULL, &groundcheck, bs->client, MASK_SOLID);
+					trap->Trace(&tr, &bs->goalPosition, NULL, NULL, &groundcheck, bs->client, MASK_SOLID, qfalse, 0, 0);
 					
 					if (tr.fraction == 1.0f)
 					{ //don't back off of a ledge
@@ -4317,7 +4317,7 @@ void BotAimLeading(bot_state_t *bs, vector3 *headlevel, float leadAmount)
 	else
 		vtotal += bs->currentEnemy->client->ps.velocity.z;
 
-	//G_Printf("Leadin target with a velocity total of %f\n", vtotal);
+	//trap->Print("Leadin target with a velocity total of %f\n", vtotal);
 
 	VectorCopy(&bs->currentEnemy->client->ps.velocity, &movementVector);
 
@@ -4679,7 +4679,7 @@ int BotFallbackNavigation(bot_state_t *bs)
 	trto.y = bs->origin.y + fwd.y*16;
 	trto.z = bs->origin.z + fwd.z*16;
 
-	trap_Trace(&tr, &bs->origin, &mins, &maxs, &trto, ENTITYNUM_NONE, MASK_SOLID);
+	trap->Trace(&tr, &bs->origin, &mins, &maxs, &trto, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1)
 	{
@@ -5061,7 +5061,7 @@ void StrafeTracing(bot_state_t *bs)
 		rorg.z = bs->origin.z + right.z*32;
 	}
 
-	trap_Trace(&tr, &bs->origin, &mins, &maxs, &rorg, bs->client, MASK_SOLID);
+	trap->Trace(&tr, &bs->origin, &mins, &maxs, &rorg, bs->client, MASK_SOLID, qfalse, 0, 0);
 
 	if (tr.fraction != 1)
 	{
@@ -5072,7 +5072,7 @@ void StrafeTracing(bot_state_t *bs)
 
 	drorg.z -= 32;
 
-	trap_Trace(&tr, &rorg, NULL, NULL, &drorg, bs->client, MASK_SOLID);
+	trap->Trace(&tr, &rorg, NULL, NULL, &drorg, bs->client, MASK_SOLID, qfalse, 0, 0);
 
 	if (tr.fraction == 1)
 	{ //this may be a dangerous ledge, so don't strafe over it just in case
@@ -5172,7 +5172,7 @@ gentity_t *CheckForFriendInLOF(bot_state_t *bs)
 	trto.y = trfrom.y + fwd.y*2048;
 	trto.z = trfrom.z + fwd.z*2048;
 
-	trap_Trace(&tr, &trfrom, &mins, &maxs, &trto, bs->client, MASK_PLAYERSOLID);
+	trap->Trace(&tr, &trfrom, &mins, &maxs, &trto, bs->client, MASK_PLAYERSOLID, qfalse, 0, 0);
 
 	if (tr.fraction != 1 && tr.entityNum <= MAX_CLIENTS)
 	{
@@ -5307,7 +5307,7 @@ void CTFFlagMovement(bot_state_t *bs)
 
 				if (VectorLength(&a) <= BOT_FLAG_GET_DISTANCE)
 				{
-					trap_Trace(&tr, &bs->origin, &mins, &maxs, &desiredDrop->s.pos.trBase, bs->client, MASK_SOLID);
+					trap->Trace(&tr, &bs->origin, &mins, &maxs, &desiredDrop->s.pos.trBase, bs->client, MASK_SOLID, qfalse, 0, 0);
 
 					if (tr.fraction == 1 || tr.entityNum == desiredDrop->s.number)
 					{
@@ -5440,7 +5440,7 @@ int BotSurfaceNear(bot_state_t *bs)
 	fwd.y = bs->origin.y+(fwd.y*64);
 	fwd.z = bs->origin.z+(fwd.z*64);
 
-	trap_Trace(&tr, &bs->origin, NULL, NULL, &fwd, bs->client, MASK_SOLID);
+	trap->Trace(&tr, &bs->origin, NULL, NULL, &fwd, bs->client, MASK_SOLID, qfalse, 0, 0);
 
 	if (tr.fraction != 1)
 	{
@@ -5570,11 +5570,11 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 
 			if (bot_getinthecarrr.integer != 2)
 			{
-				trap_EA_MoveForward(bs->client);
+				trap->EA_MoveForward(bs->client);
 
 				if (bot_getinthecarrr.integer == 3)
 				{ //use alt fire
-					trap_EA_Alt_Attack(bs->client);
+					trap->EA_Alt_Attack(bs->client);
 				}
 			}
 		}
@@ -5603,7 +5603,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 				VectorNormalize(&v);
 				vectoangles(&v, &bs->goalAngles);
 				MoveTowardIdealAngles(bs);
-				trap_EA_Move(bs->client, &v, 5000.0f);
+				trap->EA_Move(bs->client, &v, 5000.0f);
 
 				if (bs->noUseTime < (level.time-400))
 				{
@@ -5625,7 +5625,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 
 		if (bot_forgimmick.integer == 2)
 		{ //for debugging saber stuff, this is handy
-			trap_EA_Attack(bs->client);
+			trap->EA_Attack(bs->client);
 		}
 
 		if (bot_forgimmick.integer == 3)
@@ -5634,8 +5634,8 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 
 			VectorSubtract(&bs->origin, &vec3_origin, &mdir);
 			VectorNormalize(&mdir);
-			trap_EA_Attack(bs->client);
-			trap_EA_Move(bs->client, &mdir, 5000);
+			trap->EA_Attack(bs->client);
+			trap->EA_Move(bs->client, &mdir, 5000);
 		}
 
 		if (bot_forgimmick.integer == 4)
@@ -5646,7 +5646,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 
 				VectorSubtract(&g_entities[0].client->ps.origin, &bs->origin, &mdir);
 				VectorNormalize(&mdir);
-				trap_EA_Move(bs->client, &mdir, 5000);
+				trap->EA_Move(bs->client, &mdir, 5000);
 			}
 		}
 
@@ -5654,27 +5654,27 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 		{
 			if (bs->forceMove_Forward > 0)
 			{
-				trap_EA_MoveForward(bs->client);
+				trap->EA_MoveForward(bs->client);
 			}
 			else
 			{
-				trap_EA_MoveBack(bs->client);
+				trap->EA_MoveBack(bs->client);
 			}
 		}
 		if (bs->forceMove_Right)
 		{
 			if (bs->forceMove_Right > 0)
 			{
-				trap_EA_MoveRight(bs->client);
+				trap->EA_MoveRight(bs->client);
 			}
 			else
 			{
-				trap_EA_MoveLeft(bs->client);
+				trap->EA_MoveLeft(bs->client);
 			}
 		}
 		if (bs->forceMove_Up)
 		{
-			trap_EA_Jump(bs->client);
+			trap->EA_Jump(bs->client);
 		}
 		return;
 	}
@@ -5724,7 +5724,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 		if (rand()%10 < 5 &&
 			(!bs->doChat || bs->chatTime < level.time))
 		{
-			trap_EA_Attack(bs->client);
+			trap->EA_Attack(bs->client);
 		}
 
 		return;
@@ -5919,7 +5919,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 	if (BotUseInventoryItem(bs))
 	{
 		if (rand()%10 < 5)
-			trap_EA_Use(bs->client);
+			trap->EA_Use(bs->client);
 	}
 
 	if (bs->cur_ps.ammo[weaponData[bs->cur_ps.weapon].ammoIndex] < weaponData[bs->cur_ps.weapon].energyPerShot)
@@ -6314,7 +6314,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 			/*if ((level.time - bs->forceJumpChargeTime) > 3500)
 			{
 				bs->forceJumpChargeTime = level.time + 2000;
-				trap_EA_MoveForward(bs->client);
+				trap->EA_MoveForward(bs->client);
 			}
 			*/
 			bs->jumpTime = level.time + 1500;
@@ -6610,12 +6610,12 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 	{
 		if (bs->chatTeam)
 		{
-			trap_EA_SayTeam(bs->client, bs->currentChat);
+			trap->EA_SayTeam(bs->client, bs->currentChat);
 			bs->chatTeam = 0;
 		}
 		else
 		{
-			trap_EA_Say(bs->client, bs->currentChat);
+			trap->EA_Say(bs->client, bs->currentChat);
 		}
 		if (bs->doChat == 2)
 		{
@@ -6735,12 +6735,12 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 		if (bs->jumpTime > level.time && bs->jDelay < level.time &&
 			level.clients[bs->client].pers.cmd.upmove > 0)
 		{
-		//	trap_EA_Move(bs->client, bs->origin, 5000);
+		//	trap->EA_Move(bs->client, bs->origin, 5000);
 			bs->beStill = level.time + 200;
 		}
 		else
 		{
-			trap_EA_Move(bs->client, &bs->goalMovedir, 5000);
+			trap->EA_Move(bs->client, &bs->goalMovedir, 5000);
 		}
 
 		if (meleestrafe)
@@ -6750,11 +6750,11 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 
 		if (bs->meleeStrafeDir && meleestrafe && bs->meleeStrafeDisable < level.time)
 		{
-			trap_EA_MoveRight(bs->client);
+			trap->EA_MoveRight(bs->client);
 		}
 		else if (meleestrafe && bs->meleeStrafeDisable < level.time)
 		{
-			trap_EA_MoveLeft(bs->client);
+			trap->EA_MoveLeft(bs->client);
 		}
 
 		if (BotTrace_Jump(bs, &bs->goalPosition))
@@ -6772,11 +6772,11 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 
 			if (strafeAround == STRAFEAROUND_RIGHT)
 			{
-				trap_EA_MoveRight(bs->client);
+				trap->EA_MoveRight(bs->client);
 			}
 			else if (strafeAround == STRAFEAROUND_LEFT)
 			{
-				trap_EA_MoveLeft(bs->client);
+				trap->EA_MoveLeft(bs->client);
 			}
 		}
 #endif
@@ -6809,17 +6809,17 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 	{
 		if (bs->jumpHoldTime > level.time)
 		{
-			trap_EA_Jump(bs->client);
+			trap->EA_Jump(bs->client);
 			if (bs->wpCurrent)
 			{
 				if ((bs->wpCurrent->origin.z - bs->origin.z) < 64)
 				{
-					trap_EA_MoveForward(bs->client);
+					trap->EA_MoveForward(bs->client);
 				}
 			}
 			else
 			{
-				trap_EA_MoveForward(bs->client);
+				trap->EA_MoveForward(bs->client);
 			}
 			if (g_entities[bs->client].client->ps.groundEntityNum == ENTITYNUM_NONE)
 			{
@@ -6828,13 +6828,13 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 		}
 		else if (!(bs->cur_ps.pm_flags & PMF_JUMP_HELD))
 		{
-			trap_EA_Jump(bs->client);
+			trap->EA_Jump(bs->client);
 		}
 	}
 
 	if (bs->duckTime > level.time)
 	{
-		trap_EA_Crouch(bs->client);
+		trap->EA_Crouch(bs->client);
 	}
 
 	if ( bs->dangerousObject && bs->dangerousObject->inuse && bs->dangerousObject->health > 0 &&
@@ -6972,11 +6972,11 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 
 	if (bs->doAttack)
 	{
-		trap_EA_Attack(bs->client);
+		trap->EA_Attack(bs->client);
 	}
 	else if (bs->doAltAttack)
 	{
-		trap_EA_Alt_Attack(bs->client);
+		trap->EA_Alt_Attack(bs->client);
 	}
 
 	if (useTheForce && forceHostile && bs->botChallengingTime > level.time)
@@ -6990,14 +6990,14 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 		if (bs->forceJumpChargeTime > level.time)
 		{
 			level.clients[bs->client].ps.fd.forcePowerSelected = FP_LEVITATION;
-			trap_EA_ForcePower(bs->client);
+			trap->EA_ForcePower(bs->client);
 		}
 		else
 		{
 #endif
 			if (bot_forcepowers.integer && !g_forcePowerDisable.integer)
 			{
-				trap_EA_ForcePower(bs->client);
+				trap->EA_ForcePower(bs->client);
 			}
 #ifndef FORCEJUMP_INSTANTMETHOD
 		}
@@ -7023,13 +7023,13 @@ int BotAIStartFrame(int time) {
 
 	if (gUpdateVars < level.time)
 	{
-		trap_Cvar_Update(&bot_pvstype);
-		trap_Cvar_Update(&bot_camp);
-		trap_Cvar_Update(&bot_attachments);
-		trap_Cvar_Update(&bot_forgimmick);
-		trap_Cvar_Update(&bot_honorableduelacceptance);
+		trap->Cvar_Update(&bot_pvstype);
+		trap->Cvar_Update(&bot_camp);
+		trap->Cvar_Update(&bot_attachments);
+		trap->Cvar_Update(&bot_forgimmick);
+		trap->Cvar_Update(&bot_honorableduelacceptance);
 #ifndef FINAL_BUILD
-		trap_Cvar_Update(&bot_getinthecarrr);
+		trap->Cvar_Update(&bot_getinthecarrr);
 #endif
 		gUpdateVars = level.time + 1000;
 	}
@@ -7039,7 +7039,7 @@ int BotAIStartFrame(int time) {
 	//rww - addl bot frame functions
 	if (gBotEdit)
 	{
-		trap_Cvar_Update(&bot_wp_info);
+		trap->Cvar_Update(&bot_wp_info);
 		BotWaypointRender();
 	}
 
@@ -7086,7 +7086,7 @@ int BotAIStartFrame(int time) {
 		}
 
 		BotUpdateInput(botstates[i], time, elapsed_time);
-		trap_BotUserCommand(botstates[i]->client, &botstates[i]->lastucmd);
+		trap->BotUserCommand(botstates[i]->client, &botstates[i]->lastucmd);
 	}
 
 	return qtrue;
@@ -7099,29 +7099,29 @@ BotAISetup
 */
 int BotAISetup( int restart ) {
 	//rww - new bot cvars..
-	trap_Cvar_Register(&bot_forcepowers, "bot_forcepowers", "1", 0);
-	trap_Cvar_Register(&bot_forgimmick, "bot_forgimmick", "0", CVAR_CHEAT);
-	trap_Cvar_Register(&bot_honorableduelacceptance, "bot_honorableduelacceptance", "0", 0);
-	trap_Cvar_Register(&bot_pvstype, "bot_pvstype", "1", CVAR_CHEAT);
+	trap->Cvar_Register(&bot_forcepowers, "bot_forcepowers", "1", 0);
+	trap->Cvar_Register(&bot_forgimmick, "bot_forgimmick", "0", CVAR_CHEAT);
+	trap->Cvar_Register(&bot_honorableduelacceptance, "bot_honorableduelacceptance", "0", 0);
+	trap->Cvar_Register(&bot_pvstype, "bot_pvstype", "1", CVAR_CHEAT);
 #ifndef FINAL_BUILD
-	trap_Cvar_Register(&bot_getinthecarrr, "bot_getinthecarrr", "0", 0);
+	trap->Cvar_Register(&bot_getinthecarrr, "bot_getinthecarrr", "0", 0);
 #endif
 
 #ifdef _DEBUG
-	trap_Cvar_Register(&bot_nogoals, "bot_nogoals", "0", CVAR_CHEAT);
-	trap_Cvar_Register(&bot_debugmessages, "bot_debugmessages", "0", CVAR_CHEAT);
+	trap->Cvar_Register(&bot_nogoals, "bot_nogoals", "0", CVAR_CHEAT);
+	trap->Cvar_Register(&bot_debugmessages, "bot_debugmessages", "0", CVAR_CHEAT);
 #endif
 
-	trap_Cvar_Register(&bot_attachments, "bot_attachments", "1", 0);
-	trap_Cvar_Register(&bot_camp, "bot_camp", "1", 0);
+	trap->Cvar_Register(&bot_attachments, "bot_attachments", "1", 0);
+	trap->Cvar_Register(&bot_camp, "bot_camp", "1", 0);
 
-	trap_Cvar_Register(&bot_wp_info, "bot_wp_info", "1", 0);
-	trap_Cvar_Register(&bot_wp_edit, "bot_wp_edit", "0", CVAR_CHEAT);
-	trap_Cvar_Register(&bot_wp_clearweight, "bot_wp_clearweight", "1", 0);
-	trap_Cvar_Register(&bot_wp_distconnect, "bot_wp_distconnect", "1", 0);
-	trap_Cvar_Register(&bot_wp_visconnect, "bot_wp_visconnect", "1", 0);
+	trap->Cvar_Register(&bot_wp_info, "bot_wp_info", "1", 0);
+	trap->Cvar_Register(&bot_wp_edit, "bot_wp_edit", "0", CVAR_CHEAT);
+	trap->Cvar_Register(&bot_wp_clearweight, "bot_wp_clearweight", "1", 0);
+	trap->Cvar_Register(&bot_wp_distconnect, "bot_wp_distconnect", "1", 0);
+	trap->Cvar_Register(&bot_wp_visconnect, "bot_wp_visconnect", "1", 0);
 
-	trap_Cvar_Update(&bot_forcepowers);
+	trap->Cvar_Update(&bot_forcepowers);
 	//end rww
 
 	//if the game is restarted for a tournament
@@ -7132,7 +7132,7 @@ int BotAISetup( int restart ) {
 	//initialize the bot states
 	memset( botstates, 0, sizeof(botstates) );
 
-	if (!trap_BotLibSetup())
+	if (!trap->BotLibSetup())
 	{
 		return qfalse; //wts?!
 	}
@@ -7160,7 +7160,7 @@ int BotAIShutdown( int restart ) {
 		//don't shutdown the bot library
 	}
 	else {
-		trap_BotLibShutdown();
+		trap->BotLibShutdown();
 	}
 	return qtrue;
 }

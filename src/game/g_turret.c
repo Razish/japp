@@ -132,7 +132,7 @@ static void turret_fire ( gentity_t *ent, vector3 *start, vector3 *dir )
 	vector3		org;
 	gentity_t	*bolt;
 
-	if ( (trap_PointContents( start, ent->s.number )&MASK_SHOT) )
+	if ( (trap->PointContents( start, ent->s.number )&MASK_SHOT) )
 	{
 		return;
 	}
@@ -431,7 +431,7 @@ static qboolean turret_find_enemies( gentity_t *self )
 				continue;
 			}
 		}
-		if ( !trap_InPVS( &org2, &target->r.currentOrigin ))
+		if ( !trap->InPVS( &org2, &target->r.currentOrigin ))
 		{
 			continue;
 		}
@@ -439,7 +439,7 @@ static qboolean turret_find_enemies( gentity_t *self )
 		VectorCopy( &target->r.currentOrigin, &org );
 		org.z += target->r.maxs.z*0.5f;
 
-		trap_Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT );
+		trap->Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT, qfalse, 0, 0 );
 
 		if ( !tr.allsolid && !tr.startsolid && ( tr.fraction == 1.0 || tr.entityNum == target->s.number ))
 		{
@@ -526,7 +526,7 @@ void turret_base_think( gentity_t *self )
 			if ( enemyDist < (self->radius * self->radius) )
 			{
 				// was in valid radius
-				if ( trap_InPVS( &self->r.currentOrigin, &self->enemy->r.currentOrigin ) )
+				if ( trap->InPVS( &self->r.currentOrigin, &self->enemy->r.currentOrigin ) )
 				{
 					// Every now and again, check to see if we can even trace to the enemy
 					trace_t tr;
@@ -544,7 +544,7 @@ void turret_base_think( gentity_t *self )
 						org2.z += 10;
 					else
 						org2.z -= 10;
-					trap_Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT );
+					trap->Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT, qfalse, 0, 0 );
 
 					if ( !tr.allsolid && !tr.startsolid && tr.entityNum == self->enemy->s.number )
 					{
@@ -667,7 +667,7 @@ void SP_misc_turret( gentity_t *base )
 	// don't start working right away
 	base->nextthink = level.time + FRAMETIME * 5;
 
-	trap_LinkEntity( base );
+	trap->LinkEntity( (sharedEntity_t *)base );
 
 	if ( !turret_base_spawn_top( base ) )
 	{
@@ -829,6 +829,6 @@ qboolean turret_base_spawn_top( gentity_t *base )
 	// But set us as a turret so that we can be identified as a turret
 	top->s.weapon = WP_EMPLACED_GUN;
 
-	trap_LinkEntity( top );
+	trap->LinkEntity( (sharedEntity_t *)top );
 	return qtrue;
 }

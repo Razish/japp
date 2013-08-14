@@ -160,7 +160,7 @@ void Seeker_Strafe( void )
 		side = ( rand() & 1 ) ? -1 : 1;
 		VectorMA( &NPC->r.currentOrigin, SEEKER_STRAFE_DIS * side, &right, &end );
 
-		trap_Trace( &tr, &NPC->r.currentOrigin, NULL, NULL, &end, NPC->s.number, MASK_SOLID );
+		trap->Trace( &tr, &NPC->r.currentOrigin, NULL, NULL, &end, NPC->s.number, MASK_SOLID, qfalse, 0, 0 );
 
 		// Close enough
 		if ( tr.fraction > 0.9f )
@@ -202,7 +202,7 @@ void Seeker_Strafe( void )
 		// then add a very small bit of random in front of/behind the player action
 		VectorMA( &end, crandom() * 25, &dir, &end );
 
-		trap_Trace( &tr, &NPC->r.currentOrigin, NULL, NULL, &end, NPC->s.number, MASK_SOLID );
+		trap->Trace( &tr, &NPC->r.currentOrigin, NULL, NULL, &end, NPC->s.number, MASK_SOLID, qfalse, 0, 0 );
 
 		// Close enough
 		if ( tr.fraction > 0.9f )
@@ -388,7 +388,7 @@ void Seeker_FindEnemy( void )
 	VectorSet( &maxs, SEEKER_SEEK_RADIUS, SEEKER_SEEK_RADIUS, SEEKER_SEEK_RADIUS );
 	VectorScale( &maxs, -1, &mins );
 
-	numFound = trap_EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
+	numFound = trap->EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
 
 	for ( i = 0 ; i < numFound ; i++ ) 
 	{

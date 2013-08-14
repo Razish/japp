@@ -29,25 +29,25 @@ void CheckGLErrors( const char* filename, int line )
 		switch ( error )
 		{
 		case GL_INVALID_ENUM:
-			CG_Printf (S_COLOR_RED "GL_INVALID_ENUM in file %s:%d.\n", filename, line);
+			trap->Print (S_COLOR_RED "GL_INVALID_ENUM in file %s:%d.\n", filename, line);
 			break;
 		case GL_INVALID_VALUE:
-			CG_Printf (S_COLOR_RED "GL_INVALID_VALUE in file %s:%d.\n", filename, line);
+			trap->Print (S_COLOR_RED "GL_INVALID_VALUE in file %s:%d.\n", filename, line);
 			break;
 		case GL_INVALID_OPERATION:
-			CG_Printf (S_COLOR_RED "GL_INVALID_OPERATION in file %s:%d.\n", filename, line);
+			trap->Print (S_COLOR_RED "GL_INVALID_OPERATION in file %s:%d.\n", filename, line);
 			break;
 		case GL_STACK_OVERFLOW:
-			CG_Printf (S_COLOR_RED "GL_STACK_OVERFLOW in file %s:%d.\n", filename, line);
+			trap->Print (S_COLOR_RED "GL_STACK_OVERFLOW in file %s:%d.\n", filename, line);
 			break;
 		case GL_STACK_UNDERFLOW:
-			CG_Printf (S_COLOR_RED "GL_STACK_UNDERFLOW in file %s:%d.\n", filename, line);
+			trap->Print (S_COLOR_RED "GL_STACK_UNDERFLOW in file %s:%d.\n", filename, line);
 			break;
 		case GL_OUT_OF_MEMORY:
-			CG_Printf (S_COLOR_RED "GL_OUT_OF_MEMORY in file %s:%d.\n", filename, line);
+			trap->Print (S_COLOR_RED "GL_OUT_OF_MEMORY in file %s:%d.\n", filename, line);
 			break;
 		default:
-			CG_Printf (S_COLOR_RED "Error code 0x%X on line %d.\n", error, line);
+			trap->Print (S_COLOR_RED "Error code 0x%X on line %d.\n", error, line);
 			break;
 		}
 		tr.postprocessing.loaded = qfalse;
@@ -148,7 +148,7 @@ qboolean R_EXT_FramebufferInit( void )
 	if ( !strstr( cgs.glconfig.extensions_string, "GL_EXT_framebuffer_object" ) ||
 		 !strstr( cgs.glconfig.extensions_string, "GL_EXT_framebuffer_blit" ) )
 	{
-		CG_Printf( S_COLOR_RED "Framebuffer extension NOT loaded.\nRequired OpenGL extensions not available.\n" );
+		trap->Print( S_COLOR_RED "Framebuffer extension NOT loaded.\nRequired OpenGL extensions not available.\n" );
 		tr.postprocessing.loaded = qfalse;
 		return qfalse;
 	}
@@ -157,7 +157,7 @@ qboolean R_EXT_FramebufferInit( void )
 //  memset( textures,		0,	sizeof( textures )		);
 //  memset( renderbuffers,	0,	sizeof( renderbuffers )	);
 
-	CG_Printf( "Framebuffer extension loaded\n" );
+	trap->Print( "Framebuffer extension loaded\n" );
 
 	CheckGLErrors( __FILE__, __LINE__ );
 
@@ -226,7 +226,7 @@ void R_EXT_AttachColorTextureToFramebuffer( framebuffer_t *framebuffer, const te
 {
 	if ( slot >= MAX_FBO_COLOR_TEXTURES )
 	{
-		CG_Printf( "Invalid slot number given (%d), valid range is 0 - %d.\n", slot, MAX_FBO_COLOR_TEXTURES - 1 );
+		trap->Print( "Invalid slot number given (%d), valid range is 0 - %d.\n", slot, MAX_FBO_COLOR_TEXTURES - 1 );
 		return;
 	}
 
@@ -276,27 +276,27 @@ void R_EXT_CheckFramebuffer( const framebuffer_t *framebuffer )
 	switch ( status )
 	{
 	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-		CG_Printf( "One or more framebuffer attachment points are not complete.\n" );
+		trap->Print( "One or more framebuffer attachment points are not complete.\n" );
 		break;
 
 	case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-		CG_Printf( "One or more attached images have different dimensions.\n" );
+		trap->Print( "One or more attached images have different dimensions.\n" );
 		break;
 
 	case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-		CG_Printf( "Invalid framebuffer attachment object type used.\n" );
+		trap->Print( "Invalid framebuffer attachment object type used.\n" );
 		break;
 
 	case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-		CG_Printf( "More than one internal format was used in the color attachments.\n" );
+		trap->Print( "More than one internal format was used in the color attachments.\n" );
 		break;
 
 	case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-		CG_Printf( "Missing a read buffer.\n" );
+		trap->Print( "Missing a read buffer.\n" );
 		break;
 
 	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-		CG_Printf( "No images were attached to the framebuffer.\n" );
+		trap->Print( "No images were attached to the framebuffer.\n" );
 		break;
 
 	case GL_FRAMEBUFFER_COMPLETE_EXT:
@@ -305,7 +305,7 @@ void R_EXT_CheckFramebuffer( const framebuffer_t *framebuffer )
 
 	//Raz: Maybe Com_Error from here to unload cgame before crashing
 	if ( status != GL_FRAMEBUFFER_COMPLETE_EXT )
-		CG_Printf( "Creation of framebuffer %d could not be completed.\n", framebuffer->id );
+		trap->Print( "Creation of framebuffer %d could not be completed.\n", framebuffer->id );
 
 	CheckGLErrors( __FILE__, __LINE__ );
 }
@@ -382,14 +382,14 @@ texture_t *R_EXT_CreateTexture( unsigned int width, unsigned int height, interna
 
     if ( numTextures >= MAX_TEXTURES )
     {
-        CG_Printf ("Exceeded maximum number of textures.\n");
+        trap->Print ("Exceeded maximum number of textures.\n");
         return NULL;
     }
 
     glGenTextures (1, &textureId);
     if ( textureId == 0 )
     {
-        CG_Printf ("Failed to create texture with internal ID %d.\n", numTextures);
+        trap->Print ("Failed to create texture with internal ID %d.\n", numTextures);
         return NULL;
     }
     

@@ -216,7 +216,7 @@ void Droid_Spin( void )
 		|| NPC->client->NPC_class == CLASS_R2D2 )
 	{
 		// No head?
-		if (trap_G2API_GetSurfaceRenderStatus( NPC->ghoul2, 0, "head" )>0)
+		if (trap->G2API_GetSurfaceRenderStatus( NPC->ghoul2, 0, "head" )>0)
 		{
 			if (TIMER_Done(NPC,"smoke") && !TIMER_Done(NPC,"droidsmoketotal"))
 			{
@@ -293,7 +293,7 @@ void NPC_Droid_Pain(gentity_t *self, gentity_t *attacker, int damage)
 				if (!(self->spawnflags & 2))	// Doesn't have to ALWAYSDIE
 				{
 					if ((self->NPC->localState != LSTATE_SPINNING) && 
-						(!trap_G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "head" )))
+						(!trap->G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "head" )))
 					{
 						NPC_SetSurfaceOnOff( self, "head", TURN_OFF );
 
@@ -371,7 +371,7 @@ void NPC_Droid_Pain(gentity_t *self, gentity_t *attacker, int damage)
 				if (!(self->spawnflags & 2))	// Doesn't have to ALWAYSDIE
 				{
 					if ((self->NPC->localState != LSTATE_SPINNING) && 
-						(!trap_G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "head" )))
+						(!trap->G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "head" )))
 					{
 						NPC_SetSurfaceOnOff( self, "head", TURN_OFF );
 

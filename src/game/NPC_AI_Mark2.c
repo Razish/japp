@@ -52,7 +52,7 @@ void NPC_Mark2_Part_Explode( gentity_t *self, int bolt )
 		mdxaBone_t	boltMatrix;
 		vector3		org, dir;
 
-		trap_G2API_GetBoltMatrix( self->ghoul2, 0, 
+		trap->G2API_GetBoltMatrix( self->ghoul2, 0, 
 					bolt,
 					&boltMatrix, &self->r.currentAngles, &self->r.currentOrigin, level.time,
 					NULL, &self->modelScale );
@@ -88,7 +88,7 @@ void NPC_Mark2_Pain(gentity_t *self, gentity_t *attacker, int damage)
 		{
 			if (self->locationDamage[hitLoc] >= AMMO_POD_HEALTH)
 			{			
-				newBolt = trap_G2API_AddBolt( self->ghoul2, 0, va("torso_canister%d",(i+1)) );
+				newBolt = trap->G2API_AddBolt( self->ghoul2, 0, va("torso_canister%d",(i+1)) );
 				if ( newBolt != -1 )
 				{
 					NPC_Mark2_Part_Explode(self,newBolt);
@@ -139,9 +139,9 @@ void Mark2_FireBlaster(qboolean advance)
 //	static	vector3	muzzle;
 	gentity_t	*missile;
 	mdxaBone_t	boltMatrix;
-	int bolt = trap_G2API_AddBolt(NPC->ghoul2, 0, "*flash");
+	int bolt = trap->G2API_AddBolt(NPC->ghoul2, 0, "*flash");
 
-	trap_G2API_GetBoltMatrix( NPC->ghoul2, 0, 
+	trap->G2API_GetBoltMatrix( NPC->ghoul2, 0, 
 				bolt,
 				&boltMatrix, &NPC->r.currentAngles, &NPC->r.currentOrigin, level.time,
 				NULL, &NPC->modelScale );

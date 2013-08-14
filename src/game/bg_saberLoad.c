@@ -6,30 +6,19 @@
 
 extern stringID_table_t animTable [MAX_ANIMATIONS+1];
 
-//Could use strap stuff but I don't particularly care at the moment anyway.
-extern int	trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
-extern void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
-extern void	trap_FS_Write( const void *buffer, int len, fileHandle_t f );
-extern void	trap_FS_FCloseFile( fileHandle_t f );
-extern int	trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
-extern qhandle_t trap_R_RegisterSkin( const char *name );
-
-
-#ifdef QAGAME
-extern int G_SoundIndex( const char *name );
-#elif defined CGAME
-sfxHandle_t trap_S_RegisterSound( const char *sample);
-qhandle_t	trap_R_RegisterShader( const char *name );			// returns all white if not found
-int	trap_FX_RegisterEffect(const char *file);
+#if defined( _GAME )
+	#include "g_local.h"
+#elif defined( _CGAME )
+	#include "cgame/cg_local.h"
 #endif
 
 
 int BG_SoundIndex(char *sound)
 {
-#ifdef QAGAME
+#if defined( _GAME )
 	return G_SoundIndex(sound);
-#elif defined CGAME
-	return trap_S_RegisterSound(sound);
+#elif defined( _CGAME )
+	return trap->S_RegisterSound( sound );
 #endif
 }
 
@@ -690,7 +679,7 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 			{
 				continue;
 			}
-			saber->skin = trap_R_RegisterSkin(value);
+			saber->skin = trap->R_RegisterSkin(value);
 			continue;
 		}
 
@@ -1744,10 +1733,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 				SkipRestOfLine( &p );
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->g2MarksShader = trap_R_RegisterShader( value );
+#elif defined _CGAME
+			saber->g2MarksShader = trap->R_RegisterShader( value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -1762,10 +1751,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 				SkipRestOfLine( &p );
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->g2WeaponMarkShader = trap_R_RegisterShader( value );
+#elif defined _CGAME
+			saber->g2WeaponMarkShader = trap->R_RegisterShader( value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2013,10 +2002,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 			{
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->blockEffect = trap_FX_RegisterEffect( (char *)value );
+#elif defined _CGAME
+			saber->blockEffect = trap->FX_RegisterEffect( (char *)value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2030,10 +2019,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 			{
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->hitPersonEffect = trap_FX_RegisterEffect( (char *)value );
+#elif defined _CGAME
+			saber->hitPersonEffect = trap->FX_RegisterEffect( (char *)value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2047,10 +2036,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 			{
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->hitOtherEffect = trap_FX_RegisterEffect( (char *)value );
+#elif defined _CGAME
+			saber->hitOtherEffect = trap->FX_RegisterEffect( (char *)value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2064,10 +2053,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 			{
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->bladeEffect = trap_FX_RegisterEffect( (char *)value );
+#elif defined _CGAME
+			saber->bladeEffect = trap->FX_RegisterEffect( (char *)value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2155,10 +2144,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 				SkipRestOfLine( &p );
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->g2MarksShader2 = trap_R_RegisterShader( value );
+#elif defined _CGAME
+			saber->g2MarksShader2 = trap->R_RegisterShader( value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2173,10 +2162,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 				SkipRestOfLine( &p );
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->g2WeaponMarkShader2 = trap_R_RegisterShader( value );
+#elif defined _CGAME
+			saber->g2WeaponMarkShader2 = trap->R_RegisterShader( value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2424,10 +2413,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 			{
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->blockEffect2 = trap_FX_RegisterEffect( (char *)value );
+#elif defined _CGAME
+			saber->blockEffect2 = trap->FX_RegisterEffect( (char *)value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2441,10 +2430,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 			{
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->hitPersonEffect2 = trap_FX_RegisterEffect( (char *)value );
+#elif defined _CGAME
+			saber->hitPersonEffect2 = trap->FX_RegisterEffect( (char *)value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2458,10 +2447,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 			{
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->hitOtherEffect2 = trap_FX_RegisterEffect( (char *)value );
+#elif defined _CGAME
+			saber->hitOtherEffect2 = trap->FX_RegisterEffect( (char *)value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2475,10 +2464,10 @@ qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber )
 			{
 				continue;
 			}
-#ifdef QAGAME//cgame-only cares about this
+#ifdef _GAME//cgame-only cares about this
 			SkipRestOfLine(&p);
-#elif defined CGAME
-			saber->bladeEffect2 = trap_FX_RegisterEffect( (char *)value );
+#elif defined _CGAME
+			saber->bladeEffect2 = trap->FX_RegisterEffect( (char *)value );
 #else
 			SkipRestOfLine(&p);
 #endif
@@ -2600,7 +2589,7 @@ qboolean WP_SaberValidForPlayerInMP( const char *saberName )
 	}
 	else
 	{//return value
-		#ifndef QAGAME
+		#ifndef _GAME
 			return qtrue;
 		#else
 			return ((qboolean)(atoi(allowed)==0));
@@ -2698,14 +2687,14 @@ void WP_SaberLoadParms( void )
 	*marker = 0;
 
 	//now load in the extra .sab extensions
-	fileCnt = trap_FS_GetFileList("ext_data/sabers", ".sab", saberExtensionListBuf, sizeof(saberExtensionListBuf) );
+	fileCnt = trap->FS_GetFileList("ext_data/sabers", ".sab", saberExtensionListBuf, sizeof(saberExtensionListBuf) );
 
 	holdChar = saberExtensionListBuf;
 	for ( i = 0; i < fileCnt; i++, holdChar += saberExtFNLen + 1 ) 
 	{
 		saberExtFNLen = strlen( holdChar );
 
-		len = trap_FS_FOpenFile(va( "ext_data/sabers/%s", holdChar), &f, FS_READ);
+		len = trap->FS_Open(va( "ext_data/sabers/%s", holdChar), &f, FS_READ);
 
 		if ( len == -1 ) 
 		{
@@ -2717,14 +2706,14 @@ void WP_SaberLoadParms( void )
 				Com_Error(ERR_DROP, "Saber extensions (*.sab) are too large" );
 			}
 
-			trap_FS_Read(bgSaberParseTBuffer, len, f);
+			trap->FS_Read(bgSaberParseTBuffer, len, f);
 			bgSaberParseTBuffer[len] = 0;
 
 			//Raz: HAX
 		//	len = COM_Compress( bgSaberParseTBuffer );
 
 			Q_strcat( marker, MAX_SABER_DATA_SIZE-totallen, bgSaberParseTBuffer );
-			trap_FS_FCloseFile(f);
+			trap->FS_Close(f);
 
 			//get around the stupid problem of not having an endline at the bottom
 			//of a sab file -rww

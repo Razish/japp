@@ -204,8 +204,8 @@ int JPLua_Serialiser_Close( lua_State *L )
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
 	const char *buffer = cJSON_Serialize( serialiser->outRoot, 1 );
 
-	trap_FS_Write( buffer, strlen( buffer ), serialiser->fileHandle );
-	trap_FS_FCloseFile( serialiser->fileHandle );
+	trap->FS_Write( buffer, strlen( buffer ), serialiser->fileHandle );
+	trap->FS_Close( serialiser->fileHandle );
 	serialiser->fileHandle = 0;
 
 	free( (void *)buffer );
@@ -223,12 +223,12 @@ void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode )
 
 	serialiser = (jplua_serialiser_t *)lua_newuserdata( L, sizeof( jplua_serialiser_t ) );
 	Q_strncpyz( serialiser->fileName, path, sizeof( serialiser->fileName ) );
-	len = trap_FS_FOpenFile( path, &serialiser->fileHandle, mode );
+	len = trap->FS_Open( path, &serialiser->fileHandle, mode );
 	if ( len > 0 )
 	{
 		char *contents = (char*)malloc( len );
 
-		trap_FS_Read( contents, len, serialiser->fileHandle );
+		trap->FS_Read( contents, len, serialiser->fileHandle );
 		serialiser->outRoot = cJSON_CreateObject();
 		serialiser->inRoot = cJSON_Parse( contents );
 		if ( !serialiser->inRoot )

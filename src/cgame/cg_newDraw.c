@@ -249,7 +249,7 @@ const char *CG_GetGameStatusText(void) {
 		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) 
 		{
 			char sPlaceWith[256];
-			trap_SP_GetStringTextString("MP_INGAME_PLACE_WITH", sPlaceWith, sizeof(sPlaceWith));
+			trap->SE_GetStringTextString("MP_INGAME_PLACE_WITH", sPlaceWith, sizeof(sPlaceWith));
 
 			s = va("%s %s %i",CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ), sPlaceWith, cg.snap->ps.persistant[PERS_SCORE] );
 		}
@@ -280,7 +280,7 @@ void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vector4 *co
 	int iFontIndex = MenuFontToHandle(iMenuFont);
 	
 	//float fMax = *maxX;
-	float iPixelLen = trap_R_Font_StrLenPixels(text, iFontIndex, scale);
+	float iPixelLen = trap->R_Font_StrLenPixels(text, iFontIndex, scale);
 	if (x + iPixelLen > *maxX)
 	{
 		// whole text won't fit, so we need to print just the amount that does...
@@ -292,14 +292,14 @@ void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vector4 *co
 		char *psOutLastGood = psOut;
 		unsigned int uiLetter;
 
-		while (*psText && (x + trap_R_Font_StrLenPixels(sTemp, iFontIndex, scale)<=*maxX) 
+		while (*psText && (x + trap->R_Font_StrLenPixels(sTemp, iFontIndex, scale)<=*maxX) 
 			   && psOut < &sTemp[sizeof(sTemp)-1]	// sanity
 				)
 		{
 			int iAdvanceCount;
 			psOutLastGood = psOut;			
 
-			uiLetter = trap_AnyLanguage_ReadCharFromString(psText, &iAdvanceCount, &bIsTrailingPunctuation);
+			uiLetter = trap->R_AnyLanguage_ReadCharFromString(psText, &iAdvanceCount, &bIsTrailingPunctuation);
 			psText += iAdvanceCount;
 
 			if (uiLetter > 255)
@@ -378,7 +378,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 					item = BG_FindItemForPowerup( j );
 
 					if (item) {
-						CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, trap_R_RegisterShader( item->icon ) );
+						CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, trap->R_RegisterShader( item->icon ) );
 						xx += PIC_WIDTH;
 					}
 				}
@@ -388,7 +388,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 			xx = rect->x + (PIC_WIDTH * 3) + 2;
 
 			CG_GetColorForHealth( ci->health, ci->armor, &hcolor );
-			trap_R_SetColor(&hcolor);
+			trap->R_SetColor(&hcolor);
 			CG_DrawPic( xx, y + 1, PIC_WIDTH - 2, PIC_WIDTH - 2, cgs.media.heartShader );
 
 			//Com_sprintf (st, sizeof(st), "%3i %3i", ci->health,	ci->armor);
@@ -406,7 +406,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 			}
 #endif
 
-			trap_R_SetColor(NULL);
+			trap->R_SetColor(NULL);
 			h = CG_StatusHandle(ci->teamTask);
 
 			if (h) {
@@ -552,7 +552,7 @@ void CG_DrawMedal(int ownerDraw, rectDef_t *rect, float scale, vector4 *color, q
 		}
 	}
 
-	trap_R_SetColor(color);
+	trap->R_SetColor(color);
 	CG_DrawPic( rect->x, rect->y, rect->w, rect->h, shader );
 
 	if (text) {
@@ -560,7 +560,7 @@ void CG_DrawMedal(int ownerDraw, rectDef_t *rect, float scale, vector4 *color, q
 		value = CG_Text_Width(text, scale, 0);
 		CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h + 10 , scale, color, text, 0, 0, 0, FONT_MEDIUM); 
 	}
-	trap_R_SetColor(NULL);
+	trap->R_SetColor(NULL);
 
 }
 
@@ -755,7 +755,7 @@ void CG_MouseEvent(int x, int y) {
 	int n;
 
 	if ( (cg.predictedPlayerState.pm_type == PM_NORMAL || cg.predictedPlayerState.pm_type == PM_JETPACK || cg.predictedPlayerState.pm_type == PM_FLOAT || cg.predictedPlayerState.pm_type == PM_SPECTATOR) && cg.showScores == qfalse) {
- //   trap_Key_SetCatcher(0);
+ //   trap->Key_SetCatcher(0);
 //		return;
 	}
 
@@ -841,14 +841,14 @@ void CG_KeyEvent(int key, qboolean down) {
 
 	if ( cg.predictedPlayerState.pm_type == PM_NORMAL || cg.predictedPlayerState.pm_type == PM_JETPACK || cg.predictedPlayerState.pm_type == PM_NORMAL || (cg.predictedPlayerState.pm_type == PM_SPECTATOR && cg.showScores == qfalse)) {
 		CG_EventHandling(CGAME_EVENT_NONE);
-    trap_Key_SetCatcher(0);
+    trap->Key_SetCatcher(0);
 		return;
 	}
 
-  //if (key == trap_Key_GetKey("teamMenu") || !Display_CaptureItem(cgs.cursorX, cgs.cursorY)) {
+  //if (key == trap->Key_GetKey("teamMenu") || !Display_CaptureItem(cgs.cursorX, cgs.cursorY)) {
     // if we see this then we should always be visible
   //  CG_EventHandling(CGAME_EVENT_NONE);
-  //  trap_Key_SetCatcher(0);
+  //  trap->Key_SetCatcher(0);
   //}
 
 
@@ -876,7 +876,7 @@ int CG_ClientNumFromName(const char *p) {
 
 void CG_ShowResponseHead(void) {
   Menus_OpenByName("voiceMenu");
-	trap_Cvar_Set("cl_conXOffset", "72");
+	trap->Cvar_Set("cl_conXOffset", "72");
 	cg.voiceTime = cg.time;
 }
 

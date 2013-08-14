@@ -559,7 +559,7 @@ void Sniper_FaceEnemy( void )
 								VectorMA( &target, NPC->enemy->r.mins.z*flrand(1.5, 4), &up, &target );
 							}
 						}
-						trap_Trace( &trace, &muzzle, &vec3_origin, &vec3_origin, &target, NPC->s.number, MASK_SHOT );
+						trap->Trace( &trace, &muzzle, &vec3_origin, &vec3_origin, &target, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 						hit = Sniper_EvaluateShot( trace.entityNum );
 					}
 					NPC->count++;
@@ -679,7 +679,7 @@ void NPC_BSSniper_Attack( void )
 			if ( NPCInfo->scriptFlags & SCF_ALT_FIRE )
 			{//use primary fire
 				trace_t	trace;
-				trap_Trace ( &trace, &NPC->enemy->r.currentOrigin, &NPC->enemy->r.mins, &NPC->enemy->r.maxs, &NPC->r.currentOrigin, NPC->enemy->s.number, NPC->enemy->clipmask );
+				trap->Trace ( &trace, &NPC->enemy->r.currentOrigin, &NPC->enemy->r.mins, &NPC->enemy->r.maxs, &NPC->r.currentOrigin, NPC->enemy->s.number, NPC->enemy->clipmask, qfalse, 0, 0 );
 				if ( !trace.allsolid && !trace.startsolid && (trace.fraction == 1.0 || trace.entityNum == NPC->s.number ) )
 				{//he can get right to me
 					NPCInfo->scriptFlags &= ~SCF_ALT_FIRE;
@@ -726,7 +726,7 @@ void NPC_BSSniper_Attack( void )
 			AngleVectors( &NPC->client->ps.viewangles, &fwd, &right, &up );
 			CalcMuzzlePoint( NPC, &fwd, &right, &up, &muzzle );
 			VectorMA( &muzzle, 8192, &fwd, &end );
-			trap_Trace ( &tr, &muzzle, NULL, NULL, &end, NPC->s.number, MASK_SHOT );
+			trap->Trace ( &tr, &muzzle, NULL, NULL, &end, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 
 			hit = tr.entityNum;
 			//can we shoot our target?

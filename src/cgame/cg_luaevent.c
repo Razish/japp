@@ -27,7 +27,7 @@ int JPLua_Event_AddListener( lua_State *L )
 
 	if ( lua_type( L, -1 ) != LUA_TFUNCTION || lua_type( L, -2 ) != LUA_TSTRING )
 	{
-		CG_Printf( "JPLua: AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+		trap->Print( "JPLua: AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 		return 0;
 	}
 
@@ -40,7 +40,7 @@ int JPLua_Event_AddListener( lua_State *L )
 		}
 	}
 
-	CG_Printf( "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+	trap->Print( "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 	
 	return 0;
 }
@@ -52,7 +52,7 @@ int JPLua_Event_RemoveListener( lua_State *L )
 
 	if ( lua_type( L, -1 ) != LUA_TSTRING )
 	{
-		CG_Printf( "JPLua: RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+		trap->Print( "JPLua: RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 		return 0;
 	}
 
@@ -66,7 +66,7 @@ int JPLua_Event_RemoveListener( lua_State *L )
 		}
 	}
 
-	CG_Printf( "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+	trap->Print( "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 	
 	return 0;
 }
@@ -314,7 +314,7 @@ qboolean JPLua_Event_ConsoleCommand( void )
 				//Push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
-				for ( i=1; i<trap_Argc(); i++ )
+				for ( i=1; i<trap->Cmd_Argc(); i++ )
 				{
 					lua_pushnumber( JPLua.state, i );
 					lua_pushstring( JPLua.state, CG_Argv( i ) );
@@ -356,7 +356,7 @@ qboolean JPLua_Event_ServerCommand( void )
 				//Push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
-				for ( i=1; i<trap_Argc(); i++ )
+				for ( i=1; i<trap->Cmd_Argc(); i++ )
 				{
 					lua_pushnumber( JPLua.state, i );
 					lua_pushstring( JPLua.state, CG_Argv( i ) );

@@ -19,7 +19,7 @@
 #define JAPLUS_CLIENT_FLAGS (CSF_GRAPPLE_SWING|CSF_SCOREBOARD_KD)
 #define JAPLUS_SERVER_FLAGS (SSF_GRAPPLE_SWING|SSF_SCOREBOARD_KD|SSF_MERC_FLAMETHOWER)
 
-#ifdef QAGAME
+#ifdef _GAME
 
 	// server-side conditional compiling
 	#define OPENJK // ensure OpenJK compatibility (disables engine modifications, new vmMain/trap functionality for jappeng, etc)
@@ -38,7 +38,6 @@
 //	#define JPLUA_DEBUG
 	#define RAZTEST //Vehicles? First person stuff?
 	#define IMPROVED_RAGDOLL
-	#define JK2AWARDS
 
 	#ifndef OPENJK
 		#define FAV_SERVERS // jappeng adds this to engine
@@ -174,14 +173,14 @@ float FloatSwap( const float *f );
 		#endif
 	#endif
 
-	#define ID_INLINE __inline
+	#define QINLINE __inline
 //	#define USE_SSE
 
-	static ID_INLINE short BigShort( short l) { return ShortSwap(l); }
+	static QINLINE short BigShort( short l) { return ShortSwap(l); }
 	#define LittleShort
-	static ID_INLINE int BigLong(int l) { return LongSwap(l); }
+	static QINLINE int BigLong(int l) { return LongSwap(l); }
 	#define LittleLong
-	static ID_INLINE float BigFloat(const float *l) { return FloatSwap(l); } //JAC: Actually return something =]
+	static QINLINE float BigFloat(const float *l) { return FloatSwap(l); } //JAC: Actually return something =]
 	#define LittleFloat
 
 	#define	PATH_SEP '\\'
@@ -203,7 +202,7 @@ float FloatSwap( const float *f );
 	#define __cdecl
 	#define __declspec(x)
 	#define stricmp strcasecmp
-	#define ID_INLINE inline 
+	#define QINLINE inline 
 
 	#ifdef __ppc__
 		#define CPUSTRING "MacOSX-ppc"
@@ -258,7 +257,7 @@ float FloatSwap( const float *f );
 #ifdef __MACOS__
 
 	#include <MacTypes.h>
-	#define ID_INLINE inline 
+	#define QINLINE inline 
 
 	#define	CPUSTRING "MacOS-PPC"
 
@@ -290,7 +289,7 @@ float FloatSwap( const float *f );
 	// bk001205 - from Makefile
 	#define stricmp strcasecmp
 
-	#define ID_INLINE inline 
+	#define QINLINE inline 
 
 	#ifdef __i386__
 		#define	CPUSTRING "linux-i386"
@@ -302,14 +301,6 @@ float FloatSwap( const float *f );
 
 	#define	PATH_SEP '/'
 	#define RAND_MAX 2147483647
-
-	// bk001205 - try
-	#ifdef Q3_STATIC
-		#define	GAME_HARD_LINKED
-		#define	CGAME_HARD_LINKED
-		#define	UI_HARD_LINKED
-		#define	BOTLIB_HARD_LINKED
-	#endif
 
 	#if !idppc
 		inline static short BigShort( short l ) { return ShortSwap( l ); }
@@ -341,7 +332,7 @@ float FloatSwap( const float *f );
 	#define stricmp strcasecmp
 
 	#define MAC_STATIC
-	#define ID_INLINE inline 
+	#define QINLINE inline 
 
 	#ifdef __i386__
 		#define CPUSTRING "freebsd-i386"
@@ -385,6 +376,12 @@ typedef unsigned short		word;
 typedef unsigned long		ulong;
 
 typedef enum qboolean_e { qfalse=0, qtrue } qboolean;
+
+typedef union {
+	float f;
+	int i;
+	unsigned int ui;
+} floatint_t;
 
 typedef int		qhandle_t;
 typedef int		thandle_t; //rwwRMG - inserted
@@ -1354,38 +1351,38 @@ void ByteToDir( int b, vector3 *dir );
 #define DEG2RAD( a ) ( ( (a) * M_PI ) / 180.0F )
 #define RAD2DEG( a ) ( ( (a) * 180.0f ) / M_PI )
 
-extern ID_INLINE void		VectorAdd( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
-extern ID_INLINE void		VectorSubtract( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
-extern ID_INLINE void		VectorNegate( const vector3 *vecIn, vector3 *vecOut );
-extern ID_INLINE void		VectorScale( const vector3 *vecIn, number scale, vector3 *vecOut );
-extern ID_INLINE void		VectorScale4( const vector4 *vecIn, number scale, vector4 *vecOut );
-extern ID_INLINE void		VectorScaleVector( const vector3 *vecIn, const vector3 *vecScale, vector3 *vecOut );
-extern ID_INLINE void		VectorMA( const vector3 *vec1, number scale, const vector3 *vec2, vector3 *vecOut );
-extern ID_INLINE void		VectorLerp( const vector3 *vec1, number frac, const vector3 *vec2, vector3 *vecOut );
-extern ID_INLINE void		VectorLerp4( const vector4 *vec1, number frac, const vector4 *vec2, vector4 *vecOut );
-extern ID_INLINE number		VectorLength( const vector3 *vec );
-extern ID_INLINE number		VectorLengthSquared( const vector3 *vec );
-extern ID_INLINE number		Distance( const vector3 *p1, const vector3 *p2 );
-extern ID_INLINE number		DistanceSquared( const vector3 *p1, const vector3 *p2 );
-extern ID_INLINE void		VectorNormalizeFast( vector3 *vec );
-extern ID_INLINE number		VectorNormalize( vector3 *vec );
-extern ID_INLINE number		VectorNormalize2( const vector3 *vec, vector3 *vecOut );
-extern ID_INLINE void		VectorCopy( const vector3 *vecIn, vector3 *vecOut );
-extern ID_INLINE void		IVectorCopy( const ivector3 *vecIn, ivector3 *vecOut );
-extern ID_INLINE void		VectorCopy4( const vector4 *vecIn, vector4 *vecOut );
-extern ID_INLINE void		VectorSet( vector3 *vec, number x, number y, number z );
-extern ID_INLINE void		VectorSet4( vector4 *vec, number x, number y, number z, number w );
-extern ID_INLINE void		VectorClear( vector3 *vec );
-extern ID_INLINE void		VectorClear4( vector4 *vec );
-extern ID_INLINE void		VectorInc( vector3 *vec );
-extern ID_INLINE void		VectorDec( vector3 *vec );
-extern ID_INLINE void		VectorRotate( vector3 *in, vector3 matrix[3], vector3 *out );
-extern ID_INLINE void		VectorInverse( vector3 *vec );
-extern ID_INLINE void		CrossProduct( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
-extern ID_INLINE number		DotProduct( const vector3 *vec1, const vector3 *vec2 );
-extern ID_INLINE qboolean	VectorCompare( const vector3 *vec1, const vector3 *vec2 );
-extern ID_INLINE void		VectorSnap( vector3 *v );
-extern ID_INLINE void		VectorSnapTowards( vector3 *v, vector3 *to );
+extern QINLINE void		VectorAdd( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
+extern QINLINE void		VectorSubtract( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
+extern QINLINE void		VectorNegate( const vector3 *vecIn, vector3 *vecOut );
+extern QINLINE void		VectorScale( const vector3 *vecIn, number scale, vector3 *vecOut );
+extern QINLINE void		VectorScale4( const vector4 *vecIn, number scale, vector4 *vecOut );
+extern QINLINE void		VectorScaleVector( const vector3 *vecIn, const vector3 *vecScale, vector3 *vecOut );
+extern QINLINE void		VectorMA( const vector3 *vec1, number scale, const vector3 *vec2, vector3 *vecOut );
+extern QINLINE void		VectorLerp( const vector3 *vec1, number frac, const vector3 *vec2, vector3 *vecOut );
+extern QINLINE void		VectorLerp4( const vector4 *vec1, number frac, const vector4 *vec2, vector4 *vecOut );
+extern QINLINE number		VectorLength( const vector3 *vec );
+extern QINLINE number		VectorLengthSquared( const vector3 *vec );
+extern QINLINE number		Distance( const vector3 *p1, const vector3 *p2 );
+extern QINLINE number		DistanceSquared( const vector3 *p1, const vector3 *p2 );
+extern QINLINE void		VectorNormalizeFast( vector3 *vec );
+extern QINLINE number		VectorNormalize( vector3 *vec );
+extern QINLINE number		VectorNormalize2( const vector3 *vec, vector3 *vecOut );
+extern QINLINE void		VectorCopy( const vector3 *vecIn, vector3 *vecOut );
+extern QINLINE void		IVectorCopy( const ivector3 *vecIn, ivector3 *vecOut );
+extern QINLINE void		VectorCopy4( const vector4 *vecIn, vector4 *vecOut );
+extern QINLINE void		VectorSet( vector3 *vec, number x, number y, number z );
+extern QINLINE void		VectorSet4( vector4 *vec, number x, number y, number z, number w );
+extern QINLINE void		VectorClear( vector3 *vec );
+extern QINLINE void		VectorClear4( vector4 *vec );
+extern QINLINE void		VectorInc( vector3 *vec );
+extern QINLINE void		VectorDec( vector3 *vec );
+extern QINLINE void		VectorRotate( vector3 *in, vector3 matrix[3], vector3 *out );
+extern QINLINE void		VectorInverse( vector3 *vec );
+extern QINLINE void		CrossProduct( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
+extern QINLINE number		DotProduct( const vector3 *vec1, const vector3 *vec2 );
+extern QINLINE qboolean	VectorCompare( const vector3 *vec1, const vector3 *vec2 );
+extern QINLINE void		VectorSnap( vector3 *v );
+extern QINLINE void		VectorSnapTowards( vector3 *v, vector3 *to );
 
 // TODO
 #define VectorInverseScaleVector(a,b,c)	((c)[0]=(a)[0]/(b)[0],(c)[1]=(a)[1]/(b)[1],(c)[2]=(a)[2]/(b)[2])
@@ -1506,7 +1503,7 @@ void Parse3DMatrix (const char **buf_p, int z, int y, int x, float *m);
 void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
 
 
-// mode parm for FS_FOpenFile
+// mode parm for FS_Open
 typedef enum fsMode_e {
 	FS_READ,
 	FS_WRITE,
@@ -1592,8 +1589,13 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
-void	QDECL Com_Error( int level, const char *error, ... );
-void	QDECL Com_Printf( const char *msg, ... );
+#if defined( _GAME ) || defined( _CGAME ) || defined( _UI )
+	void (*Com_Error)( int level, const char *error, ... );
+	void (*Com_Printf)( const char *msg, ... );
+#else
+	void QDECL Com_Error( int level, const char *error, ... );
+	void QDECL Com_Printf( const char *msg, ... );
+#endif
 
 
 /*
@@ -2555,7 +2557,7 @@ typedef struct entityState_s {
 
 	qboolean	isPortalEnt; //this needs to be seperate for all entities I guess, which is why I couldn't reuse another value.
 
-	int		solid;			// for client side prediction, trap_linkentity sets this properly
+	int		solid;			// for client side prediction, trap->linkentity sets this properly
 
 	int		event;			// impulse events -- muzzle flashes, footsteps, etc
 	int		eventParm;

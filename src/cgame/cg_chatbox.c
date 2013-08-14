@@ -58,7 +58,7 @@ static chatHistory_t *currentHistory = NULL;
 	static int*		const keys_shift	= (int *)0x97ae8c;//not sure about these atm
 #endif
 
-static __inline int JP_GetChatboxFont( void ) {
+static QINLINE int JP_GetChatboxFont( void ) {
 	return Com_Clampi( FONT_SMALL, FONT_NUM_FONTS, cg_chatboxFont.integer );
 }
 
@@ -390,7 +390,7 @@ void JP_ChatboxDraw( void )
 
 #if defined(_WIN32) && !defined(OPENJK)
 #if 0
-	if ( (trap_Key_GetCatcher() & KEYCATCH_MESSAGE) )
+	if ( (trap->Key_GetCatcher() & KEYCATCH_MESSAGE) )
 	{
 		int overStrike = *(int *)0x8859E0;
 		int cls_realtime = *(int *)0x8AF224;
@@ -442,7 +442,7 @@ void JP_ChatboxDraw( void )
 	for ( done = 0; done<cg_chatboxLineCount.integer && i<MAX_CHATBOX_ENTRIES; i++, done++ )
 	{//Check to see if background should be drawn
 		chatEntry_t *chat = &currentChatbox->chatBuffer[i];
-		if ( chat->isUsed && (chat->time >= cg.time-cg_chatbox.integer || currentChatbox->scrollAmount || cg_chatbox.integer == 1 || (trap_Key_GetCatcher() & KEYCATCH_MESSAGE)) )
+		if ( chat->isUsed && (chat->time >= cg.time-cg_chatbox.integer || currentChatbox->scrollAmount || cg_chatbox.integer == 1 || (trap->Key_GetCatcher() & KEYCATCH_MESSAGE)) )
 		{
 			CG_FillRect( cg.chatbox.pos.x, cg.chatbox.pos.y+1.75f, max( cg.chatbox.size.width, 192.0f ), cg_chatboxLineHeight.value*cg_chatboxLineCount.integer, &cg.chatbox.background );
 			break;
@@ -455,7 +455,7 @@ void JP_ChatboxDraw( void )
 		if ( chat->isUsed )
 		{
 			last = chat;
-			if ( chat->time >= cg.time-cg_chatbox.integer || currentChatbox->scrollAmount || cg_chatbox.integer == 1 || (trap_Key_GetCatcher() & KEYCATCH_MESSAGE) )
+			if ( chat->time >= cg.time-cg_chatbox.integer || currentChatbox->scrollAmount || cg_chatbox.integer == 1 || (trap->Key_GetCatcher() & KEYCATCH_MESSAGE) )
 			{
 				CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.value * numLines), cg.chatbox.size.scale, &colorWhite, va( "%s%s", (cg_chatboxTimeShow.integer ? chat->timeStamp : ""), chat->message ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, JP_GetChatboxFont() );
 				numLines++;
@@ -558,7 +558,7 @@ static void keyConcatArgs( void ) {
 	int		i;
 	char	*arg;
 
-	for ( i = 1 ; i < trap_Argc() ; i++ ) {
+	for ( i = 1 ; i < trap->Cmd_Argc() ; i++ ) {
 		Q_strcat( completionField->buffer, sizeof( completionField->buffer ), " " );
 		arg = cmd_argv[i];
 		while (*arg) {
@@ -616,7 +616,7 @@ void JP_Field_CompleteCommand( field_t *field ) {
 
 	if ( matchCount == 1 ) {
 		Com_sprintf( completionField->buffer, sizeof( completionField->buffer ), "/%s", shortestMatch );
-		if ( trap_Argc() == 1 )
+		if ( trap->Cmd_Argc() == 1 )
 			Q_strcat( completionField->buffer, sizeof( completionField->buffer ), " " );
 		else
 			ConcatRemaining( temp.buffer, completionString );
@@ -725,7 +725,7 @@ void JP_ChatboxSelectTabNext( void )
 				JP_ChatboxAdd( va( "^2- ^7%s", matches[i] ), qfalse, currentChatbox->shortname );
 		//	if ( numMatches > 3 )
 		//		JP_ChatboxAdd( "^2- ^7[...] truncated", qfalse, "normal" );
-			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+			trap->S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		}
 		else if ( (cg_chatboxCompletion.integer & 2) && chatField->buffer[0] )
 			JP_Field_CompleteCommand( chatField );

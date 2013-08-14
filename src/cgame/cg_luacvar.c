@@ -12,7 +12,7 @@ int JPLua_CreateCvar( lua_State *L )
 {
 	const char *name = lua_tostring( L, 1 );
 	
-	trap_Cvar_Register( NULL, name, lua_tostring( L, 2 ), lua_tointeger( L, 3 ) );
+	trap->Cvar_Register( NULL, name, lua_tostring( L, 2 ), lua_tointeger( L, 3 ) );
 
 	JPLua_Cvar_CreateRef( L, name );
 
@@ -101,7 +101,7 @@ static int JPLua_Cvar_GetInteger( lua_State *L )
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 	#ifdef OPENJK
 		char buf[MAX_CVAR_VALUE_STRING] = {0};
-		trap_Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
+		trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
 		if ( buf[0] )
 			lua_pushinteger( L, atoi( buf ) );
 		else
@@ -124,7 +124,7 @@ static int JPLua_Cvar_GetString( lua_State *L )
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 	#ifdef OPENJK
 		char buf[MAX_CVAR_VALUE_STRING] = {0};
-		trap_Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
+		trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
 		if ( buf[0] )
 			lua_pushstring( L, buf );
 		else
@@ -147,7 +147,7 @@ static int JPLua_Cvar_GetFloat( lua_State *L )
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 	#ifdef OPENJK
 		char buf[MAX_CVAR_VALUE_STRING] = {0};
-		trap_Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
+		trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
 		if ( buf[0] )
 			lua_pushnumber( L, (lua_Number)atof( buf ) );
 		else
@@ -175,7 +175,7 @@ static int JPLua_Cvar_Reset( lua_State *L )
 	
 		//Kind of hacky, but whatever..
 		if ( cvar )
-			trap_Cvar_Set( cvar->name, cvar->resetString );
+			trap->Cvar_Set( cvar->name, cvar->resetString );
 	#endif // OPENJK
 
 	return 0;
@@ -188,7 +188,7 @@ static int JPLua_Cvar_Set( lua_State *L )
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 
 	if ( luaCvar )
-		trap_Cvar_Set( luaCvar->name, lua_tostring( L, 2 ) );
+		trap->Cvar_Set( luaCvar->name, lua_tostring( L, 2 ) );
 
 	return 0;
 }
@@ -200,7 +200,7 @@ void JPLua_Cvar_CreateRef( lua_State *L, const char *name )
 
 #ifdef OPENJK
 	char buf[MAX_CVAR_VALUE_STRING] = {0};
-	trap_Cvar_VariableStringBuffer( name, buf, sizeof( buf ) );
+	trap->Cvar_VariableStringBuffer( name, buf, sizeof( buf ) );
 	if ( !buf[0] ) //RAZFIXME: This isn't exactly reliable. Could be an empty cvar.
 #else
 	if ( !ENG_Cvar_FindVar( name ) )

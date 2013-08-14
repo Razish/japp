@@ -15,10 +15,10 @@ void FX_DisruptorMainShot( vector3 *start, vector3 *end )
 //	vector3	dir;
 //	float	len;
 
-	trap_FX_AddLine( start, end, 0.1f, 6.0f, 0.0f, 
+	trap->FX_AddLine( start, end, 0.1f, 6.0f, 0.0f, 
 							1.0f, 0.0f, 0.0f,
 							&WHITE, &WHITE, 0.0f,
-							150, trap_R_RegisterShader( "gfx/effects/redLine" ), 
+							150, trap->R_RegisterShader( "gfx/effects/redLine" ), 
 							FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 //	VectorSubtract( end, start, dir );
@@ -76,7 +76,7 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end )
 	reGlow->shaderTime = cg.time / 1600.0f;
 	reGlow->reType = RT_LINE;
 	reGlow->radius = 3.0f;
-	reGlow->customShader = trap_R_RegisterShader( "gfx/misc/whiteline2" );
+	reGlow->customShader = trap->R_RegisterShader( "gfx/misc/whiteline2" );
 	VectorCopy(start, &reGlow->origin);
 	VectorCopy(end, &reGlow->oldorigin);
 	reGlow->shaderRGBA[0] = color1.r * 255;
@@ -96,7 +96,7 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end )
 	reCore->shaderTime = cg.time / 1600.0f;
 	reCore->reType = RT_LINE;
 	reCore->radius = 1.0f;
-	reCore->customShader = trap_R_RegisterShader( "gfx/misc/whiteline2" );
+	reCore->customShader = trap->R_RegisterShader( "gfx/misc/whiteline2" );
 	VectorCopy(start, &reCore->origin);
 	VectorCopy(end, &reCore->oldorigin);
 	reCore->shaderRGBA[0] = color1.r * 255;
@@ -118,10 +118,10 @@ FX_DisruptorAltShot
 */
 void FX_DisruptorAltShot( vector3 *start, vector3 *end, qboolean fullCharge )
 {
-	trap_FX_AddLine( start, end, 0.1f, 10.0f, 0.0f, 
+	trap->FX_AddLine( start, end, 0.1f, 10.0f, 0.0f, 
 							1.0f, 0.0f, 0.0f,
 							&WHITE, &WHITE, 0.0f,
-							175, trap_R_RegisterShader( "gfx/effects/redLine" ), 
+							175, trap->R_RegisterShader( "gfx/effects/redLine" ), 
 							FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 	if ( fullCharge )
@@ -129,10 +129,10 @@ void FX_DisruptorAltShot( vector3 *start, vector3 *end, qboolean fullCharge )
 		vector3	YELLER={0.8f,0.7f,0.0f};
 
 		// add some beef
-		trap_FX_AddLine( start, end, 0.1f, 7.0f, 0.0f, 
+		trap->FX_AddLine( start, end, 0.1f, 7.0f, 0.0f, 
 							1.0f, 0.0f, 0.0f,
 							&YELLER, &YELLER, 0.0f,
-							150, trap_R_RegisterShader( "gfx/misc/whiteline2" ), 
+							150, trap->R_RegisterShader( "gfx/misc/whiteline2" ), 
 							FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 	}
 }
@@ -160,7 +160,7 @@ void FX_DisruptorAltMiss( vector3 *origin, vector3 *normal )
 
 	/*
 	FX_AddBezier( origin, pos, c1, vec3_origin, c2, vec3_origin, 6.0f, 6.0f, 0.0f, 0.0f, 0.2f, 0.5f,
-	WHITE, WHITE, 0.0f, 4000, trap_R_RegisterShader( "gfx/effects/smokeTrail" ), FX_ALPHA_WAVE );
+	WHITE, WHITE, 0.0f, 4000, trap->R_RegisterShader( "gfx/effects/smokeTrail" ), FX_ALPHA_WAVE );
 	*/
 
 	VectorCopy(origin, &b.start);
@@ -182,12 +182,12 @@ void FX_DisruptorAltMiss( vector3 *origin, vector3 *normal )
 
 	b.rgbParm = 0.0f;
 	b.killTime = 4000;
-	b.shader = trap_R_RegisterShader( "gfx/effects/smokeTrail" );
+	b.shader = trap->R_RegisterShader( "gfx/effects/smokeTrail" );
 	b.flags = FX_ALPHA_WAVE;
 
-	trap_FX_AddBezier(&b);
+	trap->FX_AddBezier(&b);
 
-	trap_FX_PlayEffectID( cgs.effects.disruptorAltMissEffect, origin, normal, -1, -1 );
+	trap->FX_PlayEffectID( cgs.effects.disruptorAltMissEffect, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -197,7 +197,7 @@ FX_DisruptorAltHit
 */
 
 void FX_DisruptorAltHit( vector3 *origin, vector3 *normal ) {
-	trap_FX_PlayEffectID( cgs.effects.disruptorAltHitEffect, origin, normal, -1, -1 );
+	trap->FX_PlayEffectID( cgs.effects.disruptorAltHitEffect, origin, normal, -1, -1, qfalse );
 }
 
 
@@ -209,7 +209,7 @@ FX_DisruptorHitWall
 */
 
 void FX_DisruptorHitWall( vector3 *origin, vector3 *normal ) {
-	trap_FX_PlayEffectID( cgs.effects.disruptorWallImpactEffect, origin, normal, -1, -1 );
+	trap->FX_PlayEffectID( cgs.effects.disruptorWallImpactEffect, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -219,5 +219,5 @@ FX_DisruptorHitPlayer
 */
 
 void FX_DisruptorHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
-	trap_FX_PlayEffectID( cgs.effects.disruptorFleshImpactEffect, origin, normal, -1, -1 );
+	trap->FX_PlayEffectID( cgs.effects.disruptorFleshImpactEffect, origin, normal, -1, -1, qfalse );
 }

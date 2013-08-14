@@ -64,9 +64,9 @@ static const char *ShaderSource( const char *path )
 	memset( buf, 0, sizeof( buf ) );
 
 	Com_Printf( "Loading GLSL shader %s\n", path );
-	trap_FS_FOpenFile( path, &f, FS_READ );
-	trap_FS_Read( buf, sizeof( buf ), f );
-	trap_FS_FCloseFile( f );
+	trap->FS_Open( path, &f, FS_READ );
+	trap->FS_Read( buf, sizeof( buf ), f );
+	trap->FS_Close( f );
 
 //	COM_Compress( buf );
 	return &buf[0];
@@ -200,15 +200,15 @@ static __inline void LoadShaders( void )
 
 void R_EXT_Init( void )
 {
-	CG_Printf( "----------------------------\n" );
-	CG_Printf( "Loading visual extensions...\n" );
+	trap->Print( "----------------------------\n" );
+	trap->Print( "Loading visual extensions...\n" );
 
 	tr.postprocessing.loaded = qfalse;
 	if ( !R_EXT_GLSL_Init() || !R_EXT_FramebufferInit() )
 		return;
 
 	tr.postprocessing.loaded = qtrue;
-	CG_Printf( "----------------------------\n" );
+	trap->Print( "----------------------------\n" );
 
 	CreateFramebuffers();
 	LoadShaders();
@@ -233,7 +233,7 @@ void R_EXT_Cleanup( void )
 	tr.postprocessing.loaded = qfalse;
 }
 
-static ID_INLINE void DrawQuad( float x, float y, float width, float height ) {
+static QINLINE void DrawQuad( float x, float y, float width, float height ) {
 	glBegin( GL_QUADS );
 		glTexCoord2f (0.0f, 0.0f);
 		glVertex2f (x, y + height);
@@ -266,7 +266,7 @@ const float *tr_viewParms_zFar = (float *)0xFE3988;
 	static float lastFrameTime			= 0.0f;
 	static void CalculateLightAdaptation ( void )
 	{
-		float	time = trap_Milliseconds() / 1000.0f;
+		float	time = trap->Milliseconds() / 1000.0f;
 		float	dt;
 		vector4	currentFrameLuminance = { 0.0f };
 		float tau = 1.0f;
@@ -286,7 +286,7 @@ const float *tr_viewParms_zFar = (float *)0xFE3988;
 	}
 #endif
 
-static ID_INLINE void ResizeTarget( float w, float h ) {
+static QINLINE void ResizeTarget( float w, float h ) {
 	glViewport( 0, 0, w, h );
 	glScissor( 0, 0, w, h );
 }
@@ -315,7 +315,7 @@ static void _R_EXT_PostProcess( void )
 //	ENG_GL_State( 0x00000100 );
 	glColor4fv( (float *)&colorTable[CT_WHITE] ); //HACK: Sometimes scopes change the colour.
 	if ( r_postprocess_enable.integer == 2 ) {
-		trap_R_DrawStretchPic( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, cgs.media.whiteShader );
+		trap->R_DrawStretchPic( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, cgs.media.whiteShader );
 		ENG_R_SyncRenderThread();
 	}
 //	RB_EndSurface();

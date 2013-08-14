@@ -68,13 +68,13 @@ void JKG_Bans_LoadBans( void )
 	cJSON			*ip;
 	banentry_t		*entry;
 
-	len = trap_FS_FOpenFile( "bans.dat", &f, FS_READ );
+	len = trap->FS_Open( "bans.dat", &f, FS_READ );
 	if ( !len || len == -1 )
 		return;
 
 	buffer = malloc( len+1 );
-	trap_FS_Read( buffer, len, f );
-	trap_FS_FCloseFile( f );
+	trap->FS_Read( buffer, len, f );
+	trap->FS_Close( f );
 
 	buffer[len] = 0;
 
@@ -83,7 +83,7 @@ void JKG_Bans_LoadBans( void )
 
 	if ( !root )
 	{
-		G_Printf( "Error: Could not parse banlist\n" );
+		trap->Print( "Error: Could not parse banlist\n" );
 		return;
 	}
 	
@@ -161,9 +161,9 @@ void JKG_Bans_SaveBans()
 
 	buffer = cJSON_Serialize( root, 1 );
 
-	trap_FS_FOpenFile( "bans.dat", &f, FS_WRITE );
-	trap_FS_Write( buffer, strlen( buffer ), f );
-	trap_FS_FCloseFile( f );
+	trap->FS_Open( "bans.dat", &f, FS_WRITE );
+	trap->FS_Write( buffer, strlen( buffer ), f );
+	trap->FS_Close( f );
 
 	free( (void *)buffer );
 	cJSON_Delete( root );
@@ -435,7 +435,7 @@ byte *BuildByteFromIP( const char *ip )
 	return &m[0];
 
 Faulty:
-	G_Printf( "Faulty IP\n" );
+	trap->Print( "Faulty IP\n" );
 	*(unsigned int *)&m = 0;
 
 	return &m[0];
@@ -467,7 +467,7 @@ void JKG_Bans_List( void ) {
 		// reason
 		Q_strcat( buf, sizeof( buf ), entry->banreason );
 
-		G_Printf( "%s\n", buf );
+		trap->Print( "%s\n", buf );
 	}
 }
 

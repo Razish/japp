@@ -46,7 +46,7 @@ CG_FreeMarkPoly
 */
 void CG_FreeMarkPoly( markPoly_t *le ) {
 	if ( !le->prevMark ) {
-		CG_Error( "CG_FreeLocalEntity: not active" );
+		trap->Error( ERR_DROP, "CG_FreeLocalEntity: not active" );
 	}
 
 	// remove from the doubly linked active list
@@ -127,13 +127,13 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 	}
 	else if (cg_marks.integer == 2)
 	{
-		trap_R_AddDecalToScene(markShader, origin, dir, orientation, red, green, blue, alpha,
+		trap->R_AddDecalToScene(markShader, origin, dir, orientation, red, green, blue, alpha,
 			alphaFade, radius, temporary);
 		return;
 	}
 
 	if ( radius <= 0 ) {
-		CG_Error( "CG_ImpactMark called with <= 0 radius" );
+		trap->Error( ERR_DROP, "CG_ImpactMark called with <= 0 radius" );
 	}
 
 	//if ( markTotal >= MAX_MARK_POLYS ) {
@@ -158,7 +158,7 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 
 	// get the fragments
 	VectorScale( dir, -20, &projection );
-	numFragments = trap_CM_MarkFragments( 4, originalPoints,
+	numFragments = trap->R_MarkFragments( 4, originalPoints,
 					&projection, MAX_MARK_POINTS, &markPoints[0],
 					MAX_MARK_FRAGMENTS, markFragments );
 
@@ -190,7 +190,7 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 
 		// if it is a temporary (shadow) mark, add it immediately and forget about it
 		if ( temporary ) {
-			trap_R_AddPolyToScene( markShader, mf->numPoints, verts );
+			trap->R_AddPolysToScene( markShader, mf->numPoints, verts, 1 );
 			continue;
 		}
 
@@ -287,7 +287,7 @@ void CG_AddMarks( void ) {
 			}
 		}
 
-		trap_R_AddPolyToScene( mp->markShader, mp->poly.numVerts, mp->verts );
+		trap->R_AddPolysToScene( mp->markShader, mp->poly.numVerts, mp->verts, 1 );
 	}
 }
 
@@ -416,7 +416,7 @@ void CG_ClearParticles (void)
 		int j;
 
 		for (j=0; j<shaderAnimCounts[i]; j++) {
-			shaderAnims[i][j] = trap_R_RegisterShader( va("%s%i", shaderAnimNames[i], j+1) );
+			shaderAnims[i][j] = trap->R_RegisterShader( va("%s%i", shaderAnimNames[i], j+1) );
 		}
 	}
 	numShaderAnims = i;
@@ -1051,14 +1051,14 @@ void CG_AddParticleToScene (cparticle_t *p, vector3 *org, float alpha)
 	
 	if (!p->pshader) {
 // (SA) temp commented out for DM
-//		CG_Printf ("CG_AddParticleToScene type %d p->pshader == ZERO\n", p->type);
+//		trap->Print ("CG_AddParticleToScene type %d p->pshader == ZERO\n", p->type);
 		return;
 	}
 
 	if (p->type == P_WEATHER || p->type == P_WEATHER_TURBULENT || p->type == P_WEATHER_FLURRY)
-		trap_R_AddPolyToScene( p->pshader, 3, TRIverts );
+		trap->R_AddPolysToScene( p->pshader, 3, TRIverts, 1 );
 	else
-		trap_R_AddPolyToScene( p->pshader, 4, verts );
+		trap->R_AddPolysToScene( p->pshader, 4, verts, 1 );
 
 }
 
@@ -1211,7 +1211,7 @@ void CG_ParticleSnowFlurry (qhandle_t pshader, centity_t *cent)
 	qboolean turb = qtrue;
 
 	if (!pshader)
-		CG_Printf ("CG_ParticleSnowFlurry pshader == ZERO!\n");
+		trap->Print ("CG_ParticleSnowFlurry pshader == ZERO!\n");
 
 	if (!free_particles)
 		return;
@@ -1278,7 +1278,7 @@ void CG_ParticleSnow (qhandle_t pshader, vector3 *origin, vector3 *origin2, int 
 	cparticle_t	*p;
 
 	if (!pshader)
-		CG_Printf ("CG_ParticleSnow pshader == ZERO!\n");
+		trap->Print ("CG_ParticleSnow pshader == ZERO!\n");
 
 	if (!free_particles)
 		return;
@@ -1336,7 +1336,7 @@ void CG_ParticleBubble (qhandle_t pshader, vector3 *origin, vector3 *origin2, in
 	float		randsize;
 
 	if (!pshader)
-		CG_Printf ("CG_ParticleSnow pshader == ZERO!\n");
+		trap->Print ("CG_ParticleSnow pshader == ZERO!\n");
 
 	if (!free_particles)
 		return;
@@ -1399,7 +1399,7 @@ void CG_ParticleSmoke (qhandle_t pshader, centity_t *cent)
 	cparticle_t	*p;
 
 	if (!pshader)
-		CG_Printf ("CG_ParticleSmoke == ZERO!\n");
+		trap->Print ("CG_ParticleSmoke == ZERO!\n");
 
 	if (!free_particles)
 		return;
@@ -1492,7 +1492,7 @@ void CG_ParticleExplosion (char *animStr, vector3 *origin, vector3 *vel, int dur
 	int anim;
 
 	if (animStr < (char *)10)
-		CG_Error( "CG_ParticleExplosion: animStr is probably an index rather than a string" );
+		trap->Error( ERR_DROP, "CG_ParticleExplosion: animStr is probably an index rather than a string" );
 
 	// find the animation string
 	for (anim=0; shaderAnimNames[anim]; anim++) {
@@ -1500,7 +1500,7 @@ void CG_ParticleExplosion (char *animStr, vector3 *origin, vector3 *vel, int dur
 			break;
 	}
 	if (!shaderAnimNames[anim]) {
-		CG_Error("CG_ParticleExplosion: unknown animation string: %s\n", animStr);
+		trap->Error(ERR_DROP, "CG_ParticleExplosion: unknown animation string: %s\n", animStr);
 		return;
 	}
 
@@ -1642,7 +1642,7 @@ void CG_ParticleImpactSmokePuff (qhandle_t pshader, vector3 *origin)
 	cparticle_t	*p;
 
 	if (!pshader)
-		CG_Printf ("CG_ParticleImpactSmokePuff pshader == ZERO!\n");
+		trap->Print ("CG_ParticleImpactSmokePuff pshader == ZERO!\n");
 
 	if (!free_particles)
 		return;
@@ -1682,7 +1682,7 @@ void CG_Particle_Bleed (qhandle_t pshader, vector3 *start, vector3 *dir, int fle
 	cparticle_t	*p;
 
 	if (!pshader)
-		CG_Printf ("CG_Particle_Bleed pshader == ZERO!\n");
+		trap->Print ("CG_Particle_Bleed pshader == ZERO!\n");
 
 	if (!free_particles)
 		return;
@@ -1743,7 +1743,7 @@ void CG_Particle_OilParticle (qhandle_t pshader, centity_t *cent)
 	ratio =(float)1 - ((float)time / (float)time2);
 
 	if (!pshader)
-		CG_Printf ("CG_Particle_OilParticle == ZERO!\n");
+		trap->Print ("CG_Particle_OilParticle == ZERO!\n");
 
 	if (!free_particles)
 		return;
@@ -1796,7 +1796,7 @@ void CG_Particle_OilSlick (qhandle_t pshader, centity_t *cent)
 	cparticle_t	*p;
 	
   	if (!pshader)
-		CG_Printf ("CG_Particle_OilSlick == ZERO!\n");
+		trap->Print ("CG_Particle_OilSlick == ZERO!\n");
 
 	if (!free_particles)
 		return;
@@ -1865,7 +1865,7 @@ void CG_OilSlickRemove (centity_t *cent)
 	id = 1.0f;
 
 	if (!id)
-		CG_Printf ("CG_OilSlickRevove NULL id\n");
+		trap->Print ("CG_OilSlickRevove NULL id\n");
 
 	for (p=active_particles ; p ; p=next)
 	{
@@ -1938,7 +1938,7 @@ void CG_BloodPool (localEntity_t *le, qhandle_t pshader, trace_t *tr)
 	float		rndSize;
 	
 	if (!pshader)
-		CG_Printf ("CG_BloodPool pshader == ZERO!\n");
+		trap->Print ("CG_BloodPool pshader == ZERO!\n");
 
 	if (!free_particles)
 		return;
@@ -2217,7 +2217,7 @@ void CG_ParticleMisc (qhandle_t pshader, vector3 *origin, int size, int duration
 	cparticle_t	*p;
 
 	if (!pshader)
-		CG_Printf ("CG_ParticleImpactSmokePuff pshader == ZERO!\n");
+		trap->Print ("CG_ParticleImpactSmokePuff pshader == ZERO!\n");
 
 	if (!free_particles)
 		return;

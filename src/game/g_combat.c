@@ -409,7 +409,7 @@ void TossClientItems( gentity_t *self ) {
 
 				//Raz: speed caps
 				if ((level.gametype == GT_CTF || level.gametype == GT_CTY) && item->giType == IT_TEAM) { // Special case for CTF flags
-					drop->genericValue1 = trap_Milliseconds() - self->client->pers.teamState.flagsince;
+					drop->genericValue1 = trap->Milliseconds() - self->client->pers.teamState.flagsince;
 				}
 
 				angle += 45;
@@ -458,7 +458,7 @@ void GibEntity( gentity_t *self, int killer ) {
 
 void BodyRid(gentity_t *ent)
 {
-	trap_UnlinkEntity( ent );
+	trap->UnlinkEntity( (sharedEntity_t *)ent );
 	ent->physicsObject = qfalse;
 }
 
@@ -1571,7 +1571,7 @@ void G_AlertTeam( gentity_t *victim, gentity_t *attacker, float radius, float so
 	}
 
 	//Get the number of entities in a given space
-	numEnts = trap_EntitiesInBox( &mins, &maxs, radiusEnts, 128 );
+	numEnts = trap->EntitiesInBox( &mins, &maxs, radiusEnts, 128 );
 
 	//Cull this list
 	for ( i = 0; i < numEnts; i++ )
@@ -1621,7 +1621,7 @@ void G_AlertTeam( gentity_t *victim, gentity_t *attacker, float radius, float so
 		if ( check->enemy == NULL )
 		{//only do this if they're not already mad at someone
 			distSq = DistanceSquared( &check->r.currentOrigin, &victim->r.currentOrigin );
-			if ( distSq > 16384 /*128 squared*/ && !trap_InPVS( &victim->r.currentOrigin, &check->r.currentOrigin ) )
+			if ( distSq > 16384 /*128 squared*/ && !trap->InPVS( &victim->r.currentOrigin, &check->r.currentOrigin ) )
 			{//not even potentially visible/hearable
 				continue;
 			}
@@ -2008,7 +2008,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (self->client->ps.weapon == WP_SABER && self->client->saberKnockedTime)
 	{
 		gentity_t *saberEnt = &g_entities[self->client->ps.saberEntityNum];
-		//G_Printf("DEBUG: Running saber cleanup for %s\n", self->client->pers.netname);
+		//trap->Print("DEBUG: Running saber cleanup for %s\n", self->client->pers.netname);
 		self->client->saberKnockedTime = 0;
 		saberReactivate(saberEnt, self);
 		saberEnt->r.contents = CONTENTS_LIGHTSABER;
@@ -2059,7 +2059,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		//droids throw heads if they haven't yet
 		if ( self->client->NPC_class == CLASS_R2D2 )
 		{
-			if ( !trap_G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "head" ) )
+			if ( !trap->G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "head" ) )
 			{
 				vector3	up;
 				AngleVectors( &self->r.currentAngles, NULL, NULL, &up );
@@ -2068,7 +2068,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		}
 		else if ( self->client->NPC_class == CLASS_R5D2 )
 		{
-			if ( !trap_G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "head" ) )
+			if ( !trap->G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "head" ) )
 			{
 				vector3	up;
 				AngleVectors( &self->r.currentAngles, NULL, NULL, &up );
@@ -2456,7 +2456,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	}
 
 	// if client is in a nodrop area, don't drop anything (but return CTF flags!)
-	contents = trap_PointContents( &self->r.currentOrigin, -1 );
+	contents = trap->PointContents( &self->r.currentOrigin, -1 );
 	if ( !( contents & CONTENTS_NODROP ) && !self->client->ps.fallingToDeath) {
 		if (self->s.eType != ET_NPC)
 		{
@@ -2658,7 +2658,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	// Free up any timers we may have on us.
 	TIMER_Clear2( self );
 
-	trap_LinkEntity (self);
+	trap->LinkEntity ((sharedEntity_t *)self);
 
 	if ( self->NPC )
 	{
@@ -3008,7 +3008,7 @@ void G_GetDismemberBolt(gentity_t *self, vector3 *boltPoint, int limbType)
 		break;
 	}
 
-	useBolt = trap_G2API_AddBolt(self->ghoul2, 0, rotateBone);
+	useBolt = trap->G2API_AddBolt(self->ghoul2, 0, rotateBone);
 
 	VectorCopy(&self->client->ps.origin, &properOrigin);
 	VectorCopy(&self->client->ps.viewangles, &properAngles);
@@ -3034,13 +3034,13 @@ void G_GetDismemberBolt(gentity_t *self, vector3 *boltPoint, int limbType)
 	properAngles.y = self->client->ps.viewangles.yaw;
 	properAngles.z = 0;
 
-	trap_G2API_GetBoltMatrix(self->ghoul2, 0, useBolt, &boltMatrix, &properAngles, &properOrigin, level.time, NULL, &self->modelScale);
+	trap->G2API_GetBoltMatrix(self->ghoul2, 0, useBolt, &boltMatrix, &properAngles, &properOrigin, level.time, NULL, &self->modelScale);
 
 	boltPoint->x = boltMatrix.matrix[0][3];
 	boltPoint->y = boltMatrix.matrix[1][3];
 	boltPoint->z = boltMatrix.matrix[2][3];
 
-	trap_G2API_GetBoltMatrix(self->ghoul2, 1, 0, &boltMatrix, &properAngles, &properOrigin, level.time, NULL, &self->modelScale);
+	trap->G2API_GetBoltMatrix(self->ghoul2, 1, 0, &boltMatrix, &properAngles, &properOrigin, level.time, NULL, &self->modelScale);
 
 	if (self->client && limbType == G2_MODELPART_RHAND)
 	{ //Make some saber hit sparks over the severed wrist area
@@ -3171,7 +3171,7 @@ void G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType
 		Com_sprintf( stubCapName, sizeof( stubCapName), "%s_cap_r_leg", stubName );
 	}
 
-	if (ent->ghoul2 && limbName[0] && trap_G2API_GetSurfaceRenderStatus(ent->ghoul2, 0, limbName))
+	if (ent->ghoul2 && limbName[0] && trap->G2API_GetSurfaceRenderStatus(ent->ghoul2, 0, limbName))
 	{ //is it already off? If so there's no reason to be doing it again, so get out of here.
 		return;
 	}
@@ -3290,8 +3290,8 @@ void G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType
 
 	if (ent->s.eType == ET_NPC && ent->ghoul2 && limbName[0] && stubCapName[0])
 	{ //if it's an npc remove these surfs on the server too. For players we don't even care cause there's no further dismemberment after death.
-		trap_G2API_SetSurfaceOnOff(ent->ghoul2, limbName, 0x00000100);
-		trap_G2API_SetSurfaceOnOff(ent->ghoul2, stubCapName, 0);
+		trap->G2API_SetSurfaceOnOff(ent->ghoul2, limbName, 0x00000100);
+		trap->G2API_SetSurfaceOnOff(ent->ghoul2, stubCapName, 0);
 	}
 
 	//Raz: Limbs now have team colours.
@@ -3327,7 +3327,7 @@ void G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType
 		limb->s.customRGBA[3] = ent->s.customRGBA[3];
 	}
 
-	trap_LinkEntity( limb );
+	trap->LinkEntity( (sharedEntity_t *)limb );
 }
 
 void DismembermentTest(gentity_t *self)
@@ -3475,12 +3475,12 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 
 	if (ent->localAnimIndex <= 1)
 	{ //humanoid
-		handLBolt = trap_G2API_AddBolt(ent->ghoul2, 0, "*l_hand");
-		handRBolt = trap_G2API_AddBolt(ent->ghoul2, 0, "*r_hand");
-		kneeLBolt = trap_G2API_AddBolt(ent->ghoul2, 0, "*hips_l_knee");
-		kneeRBolt = trap_G2API_AddBolt(ent->ghoul2, 0, "*hips_r_knee");
-		footLBolt = trap_G2API_AddBolt(ent->ghoul2, 0, "*l_leg_foot");
-		footRBolt = trap_G2API_AddBolt(ent->ghoul2, 0, "*r_leg_foot");
+		handLBolt = trap->G2API_AddBolt(ent->ghoul2, 0, "*l_hand");
+		handRBolt = trap->G2API_AddBolt(ent->ghoul2, 0, "*r_hand");
+		kneeLBolt = trap->G2API_AddBolt(ent->ghoul2, 0, "*hips_l_knee");
+		kneeRBolt = trap->G2API_AddBolt(ent->ghoul2, 0, "*hips_r_knee");
+		footLBolt = trap->G2API_AddBolt(ent->ghoul2, 0, "*l_leg_foot");
+		footRBolt = trap->G2API_AddBolt(ent->ghoul2, 0, "*r_leg_foot");
 	}
 
 	if ( ent->client && (ent->client->NPC_class == CLASS_ATST) )
@@ -3587,7 +3587,7 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 			VectorSet( &angles, 0, ent->r.currentAngles.yaw, 0 );
 			if (kneeLBolt>=0)
 			{
-				trap_G2API_GetBoltMatrix( ent->ghoul2, 0, kneeLBolt, 
+				trap->G2API_GetBoltMatrix( ent->ghoul2, 0, kneeLBolt, 
 								&boltMatrix, &angles, &ent->r.currentOrigin,
 								actualTime, NULL, &ent->modelScale );
 				BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, &tagOrg );
@@ -3600,7 +3600,7 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 			{
 				if (kneeRBolt>=0)
 				{
-					trap_G2API_GetBoltMatrix( ent->ghoul2, 0, kneeRBolt, 
+					trap->G2API_GetBoltMatrix( ent->ghoul2, 0, kneeRBolt, 
 									&boltMatrix, &angles, &ent->r.currentOrigin,
 									actualTime, NULL, &ent->modelScale );
 					BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, &tagOrg );
@@ -3679,7 +3679,7 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 			VectorSet( &angles, 0, ent->r.currentAngles.yaw, 0 );
 			if (handRBolt>=0)
 			{
-				trap_G2API_GetBoltMatrix( ent->ghoul2, 0, handRBolt, 
+				trap->G2API_GetBoltMatrix( ent->ghoul2, 0, handRBolt, 
 								&boltMatrix, &angles, &ent->r.currentOrigin,
 								actualTime, NULL, &ent->modelScale );
 				BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, &tagOrg );
@@ -3701,7 +3701,7 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 			VectorSet( &angles, 0, ent->r.currentAngles.yaw, 0 );
 			if (handLBolt>=0)
 			{
-				trap_G2API_GetBoltMatrix( ent->ghoul2, 0, handLBolt, 
+				trap->G2API_GetBoltMatrix( ent->ghoul2, 0, handLBolt, 
 								&boltMatrix, &angles, &ent->r.currentOrigin,
 								actualTime, NULL, &ent->modelScale );
 				BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, &tagOrg );
@@ -3723,7 +3723,7 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 			VectorSet( &angles, 0, ent->r.currentAngles.yaw, 0 );
 			if (footRBolt>=0)
 			{
-				trap_G2API_GetBoltMatrix( ent->ghoul2, 0, footRBolt, 
+				trap->G2API_GetBoltMatrix( ent->ghoul2, 0, footRBolt, 
 								&boltMatrix, &angles, &ent->r.currentOrigin,
 								actualTime, NULL, &ent->modelScale );
 				BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, &tagOrg );
@@ -3745,7 +3745,7 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 			VectorSet( &angles, 0, ent->r.currentAngles.yaw, 0 );
 			if (footLBolt>=0)
 			{
-				trap_G2API_GetBoltMatrix( ent->ghoul2, 0, footLBolt, 
+				trap->G2API_GetBoltMatrix( ent->ghoul2, 0, footLBolt, 
 								&boltMatrix, &angles, &ent->r.currentOrigin,
 								actualTime, NULL, &ent->modelScale );
 				BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, &tagOrg );
@@ -3831,14 +3831,14 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 				}
 				if ( tagName )
 				{
-					int tagBolt = trap_G2API_AddBolt( ent->ghoul2, 0, tagName );
+					int tagBolt = trap->G2API_AddBolt( ent->ghoul2, 0, tagName );
 					if ( tagBolt != -1 )
 					{
 						mdxaBone_t	boltMatrix;
 						vector3	tagOrg, tagDir, angles;
 
 						VectorSet( &angles, 0, ent->r.currentAngles.yaw, 0 );
-						trap_G2API_GetBoltMatrix( ent->ghoul2, 0, tagBolt, 
+						trap->G2API_GetBoltMatrix( ent->ghoul2, 0, tagBolt, 
 										&boltMatrix, &angles, &ent->r.currentOrigin,
 										actualTime, NULL, &ent->modelScale );
 						BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, &tagOrg );
@@ -3919,7 +3919,7 @@ void G_CheckForDismemberment(gentity_t *ent, gentity_t *enemy, vector3 *point, i
 		{
 			char hitSurface[MAX_QPATH];
 
-			trap_G2API_GetSurfaceName(ent->ghoul2, ent->client->g2LastSurfaceHit, 0, hitSurface);
+			trap->G2API_GetSurfaceName(ent->ghoul2, ent->client->g2LastSurfaceHit, 0, hitSurface);
 
 			if (hitSurface[0])
 			{
@@ -4029,7 +4029,7 @@ void G_LocationBasedDamageModifier(gentity_t *ent, vector3 *point, int mod, int 
 	{
 		char hitSurface[MAX_QPATH];
 
-		trap_G2API_GetSurfaceName(ent->ghoul2, ent->client->g2LastSurfaceHit, 0, hitSurface);
+		trap->G2API_GetSurfaceName(ent->ghoul2, ent->client->g2LastSurfaceHit, 0, hitSurface);
 
 		if (hitSurface[0])
 		{
@@ -4704,7 +4704,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	//Raz: Added
 	if ( japp_damageNotifications.integer )
 	{
-		trap_SendServerCommand( attacker-g_entities, va( "chat \"^7* Damage given: ^2%i\"", take ) );
+		trap->SendServerCommand( attacker-g_entities, va( "chat \"^7* Damage given: ^2%i\"", take ) );
 	}
 	
 	if ( targ->client )
@@ -4738,7 +4738,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 				{
 					char hitSurface[MAX_QPATH];
 
-					trap_G2API_GetSurfaceName(targ->ghoul2, targ->client->g2LastSurfaceHit, 0, hitSurface);
+					trap->G2API_GetSurfaceName(targ->ghoul2, targ->client->g2LastSurfaceHit, 0, hitSurface);
 
 					if (hitSurface[0])
 					{
@@ -4914,7 +4914,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	}
 
 	if ( g_debugDamage.integer ) {
-		G_Printf( "%i: client:%i health:%i damage:%i armor:%i\n", level.time, targ->s.number,
+		trap->Print( "%i: client:%i health:%i damage:%i armor:%i\n", level.time, targ->s.number,
 			targ->health, take, asave );
 	}
 
@@ -5137,7 +5137,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		{ //We updated the hit surface this frame, so it's valid.
 			char hitSurface[MAX_QPATH];
 
-			trap_G2API_GetSurfaceName(targ->ghoul2, targ->client->g2LastSurfaceHit, 0, hitSurface);
+			trap->G2API_GetSurfaceName(targ->ghoul2, targ->client->g2LastSurfaceHit, 0, hitSurface);
 
 			if (hitSurface[0])
 			{
@@ -5283,7 +5283,7 @@ qboolean CanDamage (gentity_t *targ, vector3 *origin) {
 	VectorScale (&midpoint, 0.5, &midpoint);
 
 	VectorCopy (&midpoint, &dest);
-	trap_Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID);
+	trap->Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
 	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
 		return qtrue;
 
@@ -5292,28 +5292,28 @@ qboolean CanDamage (gentity_t *targ, vector3 *origin) {
 	VectorCopy (&midpoint, &dest);
 	dest.x += 15.0;
 	dest.y += 15.0;
-	trap_Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID);
+	trap->Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
 	if (tr.fraction == 1.0)
 		return qtrue;
 
 	VectorCopy (&midpoint, &dest);
 	dest.x += 15.0;
 	dest.y -= 15.0;
-	trap_Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID);
+	trap->Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
 	if (tr.fraction == 1.0)
 		return qtrue;
 
 	VectorCopy (&midpoint, &dest);
 	dest.x -= 15.0;
 	dest.y += 15.0;
-	trap_Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID);
+	trap->Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
 	if (tr.fraction == 1.0)
 		return qtrue;
 
 	VectorCopy (&midpoint, &dest);
 	dest.x -= 15.0;
 	dest.y -= 15.0;
-	trap_Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID);
+	trap->Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
 	if (tr.fraction == 1.0)
 		return qtrue;
 
@@ -5370,7 +5370,7 @@ qboolean G_RadiusDamage ( vector3 *origin, gentity_t *attacker, float damage, fl
 		maxs.data[i] = origin->data[i] + radius;
 	}
 
-	numListedEntities = trap_EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
+	numListedEntities = trap->EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
 
 	for ( e = 0 ; e < numListedEntities ; e++ ) {
 		ent = &g_entities[entityList[ e ]];

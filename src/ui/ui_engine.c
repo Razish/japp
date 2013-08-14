@@ -746,12 +746,12 @@ void CL_GlobalServers_f ( void )
 	int *masterNum = (int*)(0x913844);
 	char buf[MAX_TOKEN_CHARS] = {0};
 
-	if ( trap_Argc() < 3 ) {
+	if ( trap->Cmd_Argc() < 3 ) {
 		Com_Printf( "usage: globalservers <master# 0-1> <protocol> [keywords]\n");
 		return;
 	}
 
-	trap_Argv( 1, buf, sizeof( buf ) );
+	trap->Cmd_Argv( 1, buf, sizeof( buf ) );
 	*masterNum = atoi( buf );
 
 	Com_Printf( "Requesting servers from the master...\n");
@@ -763,7 +763,7 @@ void CL_GlobalServers_f ( void )
 	{
 		const int bufSize = 64;
 		char *cvarBuffer = (char *)malloc(bufSize);
-		trap_Cvar_VariableStringBuffer( va( "sv_master%i", (*masterNum > 0) ? *masterNum : 1), cvarBuffer, bufSize );
+		trap->Cvar_VariableStringBuffer( va( "sv_master%i", (*masterNum > 0) ? *masterNum : 1), cvarBuffer, bufSize );
 		qasm1( pushad )
 		qasm1( pushfd )
 		qasm1( push cvarBuffer )
@@ -782,17 +782,17 @@ void CL_GlobalServers_f ( void )
 	to.port = BigShort( 29060 );
 
 	// Construct the command
-	trap_Argv( 2, buf, sizeof( buf ) );
+	trap->Cmd_Argv( 2, buf, sizeof( buf ) );
 	Com_sprintf( command, sizeof( command ), "getservers %s", buf );
 
 	// tack on keywords
 	buffptr = command + strlen( command );
-	count = trap_Argc();
+	count = trap->Cmd_Argc();
 
 	//Raz: plz fix
 	for (i=3; i<count; i++)
 	{
-		trap_Argv( i, buf, sizeof( buf ) );
+		trap->Cmd_Argv( i, buf, sizeof( buf ) );
 		buffptr += sprintf( buffptr, " %s", buf );
 	}
 
@@ -965,31 +965,31 @@ void CL_GlobalServers_f ( void )
 
 		if ( uiLocal.updateStatus == JAPP_UPDATE_OUTDATED )
 		{
-			trap_R_SetColor( &ce_colourOutdated );
+			trap->R_SetColor( &ce_colourOutdated );
 			for ( ce_x=0; ce_x<ce_lenOutdated; ce_x++ )
 				ENG_SCR_DrawSmallChar( ce_cls_glconfig_vidWidth - ( ce_lenOutdated - ce_x ) * SMALLCHAR_WIDTH, (ce_lines-(SMALLCHAR_HEIGHT+SMALLCHAR_HEIGHT/2))-(SMALLCHAR_HEIGHT*2), ce_japp_outdated[ce_x] );
 		}
 		else if ( uiLocal.updateStatus == JAPP_UPDATE_UPDATED )
 		{
-			trap_R_SetColor( &ce_colourUpdated );
+			trap->R_SetColor( &ce_colourUpdated );
 			for ( ce_x=0; ce_x<ce_lenUpdated; ce_x++ )
 				ENG_SCR_DrawSmallChar( ce_cls_glconfig_vidWidth - ( ce_lenUpdated - ce_x ) * SMALLCHAR_WIDTH, (ce_lines-(SMALLCHAR_HEIGHT+SMALLCHAR_HEIGHT/2))-(SMALLCHAR_HEIGHT*2), ce_japp_updated[ce_x] );
 		}
 
-		trap_R_SetColor( &ce_colourJapp );
+		trap->R_SetColor( &ce_colourJapp );
 		for ( ce_x=0; ce_x<ce_lenJapp; ce_x++ )
 			ENG_SCR_DrawSmallChar( ce_cls_glconfig_vidWidth - ( ce_lenJapp - ce_x ) * SMALLCHAR_WIDTH, (ce_lines-(SMALLCHAR_HEIGHT+SMALLCHAR_HEIGHT/2))-SMALLCHAR_HEIGHT, ce_japp_version[ce_x] );
 
-		trap_R_SetColor( &ce_colourJamp );
+		trap->R_SetColor( &ce_colourJamp );
 		time( &ce_tm );
 		ce_timeinfo = localtime ( &ce_tm );
 		if ( !timestamp24Hour && ce_timeinfo->tm_hour > 12 )
 			ce_timeinfo->tm_hour -= 12;
 		ce_jampString = va( "[%02i:%02i:%02i] JAmp: v1.0.1.0", ce_timeinfo->tm_hour, ce_timeinfo->tm_min, ce_timeinfo->tm_sec );
-		trap_R_SetColor( &colorTable[CT_WHITE] );
+		trap->R_SetColor( &colorTable[CT_WHITE] );
 		for ( ce_x=0; ce_x<11; ce_x++ )
 			ENG_SCR_DrawSmallChar( ce_cls_glconfig_vidWidth - ( ce_lenJamp - ce_x ) * SMALLCHAR_WIDTH, (ce_lines-(SMALLCHAR_HEIGHT+SMALLCHAR_HEIGHT/2)), ce_jampString[ce_x] );
-		trap_R_SetColor( &ce_colourJamp );
+		trap->R_SetColor( &ce_colourJamp );
 		for ( ce_x=11; ce_x<ce_lenJamp; ce_x++ )
 			ENG_SCR_DrawSmallChar( ce_cls_glconfig_vidWidth - ( ce_lenJamp - ce_x ) * SMALLCHAR_WIDTH, (ce_lines-(SMALLCHAR_HEIGHT+SMALLCHAR_HEIGHT/2)), ce_jampString[ce_x] );
 

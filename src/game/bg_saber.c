@@ -3,7 +3,7 @@
 #include "bg_local.h"
 #include "w_saber.h"
 
-#ifdef QAGAME
+#ifdef _GAME
 #include "g_local.h"
 #endif
 
@@ -32,7 +32,7 @@ void BG_ForcePowerDrain( playerState_t *ps, forcePowers_t forcePower, int overri
 	//take away the power
 	int	drain = overrideAmt;
 
-#ifdef QAGAME
+#ifdef _GAME
 	if ( g_entities[ps->clientNum].client->pers.adminData.empowered )
 		return;
 #endif
@@ -878,13 +878,13 @@ int PM_SaberLockWinAnim( qboolean victory, qboolean superBreak )
 }
 
 // Need to avoid nesting namespaces!
-#ifdef QAGAME //including game headers on cgame is FORBIDDEN ^_^
+#ifdef _GAME //including game headers on cgame is FORBIDDEN ^_^
 
 #include "g_local.h"
 extern void NPC_SetAnim(gentity_t *ent, int setAnimParts, int anim, int setAnimFlags);
 extern gentity_t g_entities[];
 
-#elif defined CGAME
+#elif defined _CGAME
 
 #include "cg_local.h" //ahahahahhahahaha@$!$!
 
@@ -1008,7 +1008,7 @@ int PM_SaberLockLoseAnim( playerState_t *genemy, qboolean victory, qboolean supe
 	}
 	if ( loseAnim != -1 )
 	{
-#ifdef QAGAME
+#ifdef _GAME
 		NPC_SetAnim( &g_entities[genemy->clientNum], SETANIM_BOTH, loseAnim, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 		genemy->weaponTime = genemy->torsoTimer;// + 250;
 #endif
@@ -1062,7 +1062,7 @@ int PM_SaberLockResultAnim( playerState_t *duelist, qboolean superBreak, qboolea
 	}
 
 	//play the anim and hold it
-#ifdef QAGAME
+#ifdef _GAME
 	//server-side: set it on the other guy, too
 	if ( duelist->clientNum == pm->ps->clientNum )
 	{//me
@@ -1090,7 +1090,7 @@ int PM_SaberLockResultAnim( playerState_t *duelist, qboolean superBreak, qboolea
 			G_SetOrigin(saberent, duelist->currentOrigin);
 		}
 		*/
-#ifdef QAGAME
+#ifdef _GAME
 		if ( 1 )
 #else
 		if ( duelist->clientNum == pm->ps->clientNum )
@@ -1103,7 +1103,7 @@ int PM_SaberLockResultAnim( playerState_t *duelist, qboolean superBreak, qboolea
 		}
 	}
 
-#ifdef QAGAME
+#ifdef _GAME
 	if ( 1 )
 #else
 	if ( duelist->clientNum == pm->ps->clientNum )
@@ -3851,7 +3851,7 @@ void PM_SetSaberMove(short newMove)
 saberInfo_t *BG_MySaber( int clientNum, int saberNum )
 {
 	//returns a pointer to the requested saberNum
-#ifdef QAGAME
+#ifdef _GAME
 	gentity_t *ent = &g_entities[clientNum];
 	if ( ent->inuse && ent->client )
 	{
@@ -3862,7 +3862,7 @@ saberInfo_t *BG_MySaber( int clientNum, int saberNum )
 		}
 		return &ent->client->saber[saberNum];
 	}
-#elif defined CGAME
+#elif defined _CGAME
 	clientInfo_t *ci = NULL;
 	if (clientNum < MAX_CLIENTS)
 	{

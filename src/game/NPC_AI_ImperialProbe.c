@@ -116,7 +116,7 @@ void ImperialProbe_MaintainHeight( void )
 
 		// Stay at a given height until we take on an enemy
 /*		VectorSet( endPos, NPC->r.currentorigin.x, NPC->r.currentorigin.y, NPC->r.currentorigin.z - 512 );
-		trap_Trace( &trace, NPC->r.currentOrigin, NULL, NULL, endPos, NPC->s.number, MASK_SOLID );
+		trap->Trace( &trace, NPC->r.currentOrigin, NULL, NULL, endPos, NPC->s.number, MASK_SOLID, qfalse, 0, 0 );
 
 		if ( trace.fraction != 1.0f )
 		{
@@ -190,7 +190,7 @@ void ImperialProbe_Strafe( void )
 	dir = ( rand() & 1 ) ? -1 : 1;
 	VectorMA( &NPC->r.currentOrigin, HUNTER_STRAFE_DIS * dir, &right, &end );
 
-	trap_Trace( &tr, &NPC->r.currentOrigin, NULL, NULL, &end, NPC->s.number, MASK_SOLID );
+	trap->Trace( &tr, &NPC->r.currentOrigin, NULL, NULL, &end, NPC->s.number, MASK_SOLID, qfalse, 0, 0 );
 
 	// Close enough
 	if ( tr.fraction > 0.9f )
@@ -272,10 +272,10 @@ void ImperialProbe_FireBlaster(void)
 	gentity_t	*missile;
 	mdxaBone_t	boltMatrix;
 
-	genBolt1 = trap_G2API_AddBolt(NPC->ghoul2, 0, "*flash");
+	genBolt1 = trap->G2API_AddBolt(NPC->ghoul2, 0, "*flash");
 
 	//FIXME: use {0, NPC->client->ps.legsYaw, 0}
-	trap_G2API_GetBoltMatrix( NPC->ghoul2, 0, 
+	trap->G2API_GetBoltMatrix( NPC->ghoul2, 0, 
 				genBolt1,
 				&boltMatrix, &NPC->r.currentAngles, &NPC->r.currentOrigin, level.time,
 				NULL, &NPC->modelScale );
@@ -442,7 +442,7 @@ void NPC_Probe_Pain(gentity_t *self, gentity_t *attacker, int damage)
 		trace_t	trace;
 
 		VectorSet( &endPos, self->r.currentOrigin.x, self->r.currentOrigin.y, self->r.currentOrigin.z - 128 );
-		trap_Trace( &trace, &self->r.currentOrigin, NULL, NULL, &endPos, self->s.number, MASK_SOLID );
+		trap->Trace( &trace, &self->r.currentOrigin, NULL, NULL, &endPos, self->s.number, MASK_SOLID, qfalse, 0, 0 );
 
 		if ( trace.fraction == 1.0f || mod == MOD_DEMP2 ) // demp2 always does this
 		{
@@ -568,7 +568,7 @@ void ImperialProbe_Wait(void)
 		NPCInfo->desiredYaw = AngleNormalize360( NPCInfo->desiredYaw + 25 );
 
 		VectorSet( &endPos, NPC->r.currentOrigin.x, NPC->r.currentOrigin.y, NPC->r.currentOrigin.z - 32 );
-		trap_Trace( &trace, &NPC->r.currentOrigin, NULL, NULL, &endPos, NPC->s.number, MASK_SOLID );
+		trap->Trace( &trace, &NPC->r.currentOrigin, NULL, NULL, &endPos, NPC->s.number, MASK_SOLID, qfalse, 0, 0 );
 
 		if ( trace.fraction != 1.0f )
 		{

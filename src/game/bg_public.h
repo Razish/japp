@@ -362,7 +362,7 @@ extern bgLoadedAnim_t bgAllAnims[MAX_ANIM_FILES];
 //cut memory cost.
 //On the bright side this also means we're cutting a rather large size out of
 //required game-side memory.
-#ifndef QAGAME
+#ifndef _GAME
 extern bgLoadedEvents_t bgAllEvents[MAX_ANIM_FILES];
 extern int bgNumAnimEvents;
 #endif
@@ -1250,7 +1250,7 @@ stringID_table_t eTypes[ET_MAX];
 //
 //I moved these from g_spawn.c because the entity parsing stuff is semi-shared now -rww
 
-#if defined(QAGAME) || defined(CGAME)
+#if defined(_GAME) || defined(_CGAME)
 
 typedef enum {
 	F_INT, 
@@ -1540,7 +1540,7 @@ qboolean BG_LegalizedForcePowers(char *powerOut, int maxRank, qboolean freeSaber
 void BG_GiveMeVectorFromMatrix(mdxaBone_t *boltMatrix, int flags, vector3 *vec);
 #else
 // given a boltmatrix, return in vec a normalised vector for the axis requested in flags
-static ID_INLINE void BG_GiveMeVectorFromMatrix(mdxaBone_t *boltMatrix, int flags, vector3 *vec)
+static QINLINE void BG_GiveMeVectorFromMatrix(mdxaBone_t *boltMatrix, int flags, vector3 *vec)
 {
 	switch (flags)
 	{
@@ -1644,7 +1644,7 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 void	BG_InitAnimsets(void);
 void	BG_ClearAnimsets(void);
 int		BG_ParseAnimationFile(const char *filename, animation_t *animSet, qboolean isHumanoid);
-#ifndef QAGAME
+#ifndef _GAME
 int		BG_ParseAnimationEvtFile( const char *as_filename, int animFileIndex, int eventFileIndex );
 #endif
 

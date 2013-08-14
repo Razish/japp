@@ -4,20 +4,13 @@
 
 #include "q_shared.h"
 #include "bg_public.h"
-#include "bg_strap.h"
 
-#ifdef QAGAME
-#include "g_local.h"
-#endif
-
-#ifdef UI_EXPORTS
-#include "../ui/ui_local.h"
-#endif
-
-#ifndef UI_EXPORTS
-#ifndef QAGAME
-#include "../cgame/cg_local.h"
-#endif
+#if defined(_GAME)
+	#include "g_local.h"
+#elif defined(_UI)
+	#include "../ui/ui_local.h"
+#elif defined(_CGAME)
+	#include "../cgame/cg_local.h"
 #endif
 
 
@@ -39,14 +32,14 @@ void BG_AttachToRancor( void *ghoul2,
 	// Getting the bolt here
 	if ( inMouth )
 	{//in mouth
-		boltIndex = trap_G2API_AddBolt(ghoul2, 0, "jaw_bone");
+		boltIndex = trap->G2API_AddBolt(ghoul2, 0, "jaw_bone");
 	}
 	else
 	{//in right hand
-		boltIndex = trap_G2API_AddBolt(ghoul2, 0, "*r_hand");
+		boltIndex = trap->G2API_AddBolt(ghoul2, 0, "*r_hand");
 	}
 	VectorSet( &rancAngles, 0, rancYaw, 0 );
-	trap_G2API_GetBoltMatrix( ghoul2, 0, boltIndex, 
+	trap->G2API_GetBoltMatrix( ghoul2, 0, boltIndex, 
 			&boltMatrix, &rancAngles, rancOrigin, time,
 			modelList, modelScale );
 	// Storing ent position, bolt position, and bolt axis
@@ -99,7 +92,7 @@ void BG_AttachToRancor( void *ghoul2,
 #define	MAX_VARIANTS 8
 qboolean BG_GetRootSurfNameWithVariant( void *ghoul2, const char *rootSurfName, char *returnSurfName, int returnSize )
 {
-	if ( !ghoul2 || !trap_G2API_GetSurfaceRenderStatus( ghoul2, 0, rootSurfName ) )
+	if ( !ghoul2 || !trap->G2API_GetSurfaceRenderStatus( ghoul2, 0, rootSurfName ) )
 	{//see if the basic name without variants is on
 		Q_strncpyz( returnSurfName, rootSurfName, returnSize );
 		return qtrue;
@@ -110,7 +103,7 @@ qboolean BG_GetRootSurfNameWithVariant( void *ghoul2, const char *rootSurfName, 
 		for ( i = 0; i < MAX_VARIANTS; i++ )
 		{
 			Com_sprintf( returnSurfName, returnSize, "%s%c", rootSurfName, 'a'+i );
-			if ( !trap_G2API_GetSurfaceRenderStatus( ghoul2, 0, returnSurfName ) )
+			if ( !trap->G2API_GetSurfaceRenderStatus( ghoul2, 0, returnSurfName ) )
 			{
 				return qtrue;
 			}

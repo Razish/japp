@@ -15,7 +15,7 @@ void FX_RepeaterProjectileThink( centity_t *cent, const struct weaponInfo_s *wea
 	if ( VectorNormalize2( &cent->currentState.pos.trDelta, &forward ) == 0.0f )
 		forward.z = 1.0f;
 
-	trap_FX_PlayEffectID( cgs.effects.repeaterProjectileEffect, &cent->lerpOrigin, &forward, -1, -1 );
+	trap->FX_PlayEffectID( cgs.effects.repeaterProjectileEffect, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 }
 
 /*
@@ -25,7 +25,7 @@ FX_RepeaterHitWall
 */
 
 void FX_RepeaterHitWall( vector3 *origin, vector3 *normal ) {
-	trap_FX_PlayEffectID( cgs.effects.repeaterWallImpactEffect, origin, normal, -1, -1 );
+	trap->FX_PlayEffectID( cgs.effects.repeaterWallImpactEffect, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -35,7 +35,7 @@ FX_RepeaterHitPlayer
 */
 
 void FX_RepeaterHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
-	trap_FX_PlayEffectID( cgs.effects.repeaterFleshImpactEffect, origin, normal, -1, -1 );
+	trap->FX_PlayEffectID( cgs.effects.repeaterFleshImpactEffect, origin, normal, -1, -1, qfalse );
 }
 
 //q3pro/QtZ code
@@ -77,25 +77,25 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon )
 	ent.hModel = cgs.media.halfShieldModel;
 
 	ent.shaderRGBA[0] = 128;	ent.shaderRGBA[1] = 43;		ent.shaderRGBA[2] = 255;	ent.shaderRGBA[3] = 48;
-	ent.customShader = trap_R_RegisterShaderNoMip( "gfx/effects/shock_ripple" );
+	ent.customShader = trap->R_RegisterShaderNoMip( "gfx/effects/shock_ripple" );
 	ent.renderfx = (RF_RGB_TINT|RF_FORCE_ENT_ALPHA);
-	trap_R_AddRefEntityToScene( &ent, cent->currentState.number );
+	SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 
 	ent.shaderRGBA[0] = 255;	ent.shaderRGBA[1] = 255;	ent.shaderRGBA[2] = 255;	ent.shaderRGBA[3] = 255;
-	ent.customShader	= trap_R_RegisterShaderNoMip( "gfx/effects/caustic1" );
+	ent.customShader	= trap->R_RegisterShaderNoMip( "gfx/effects/caustic1" );
 	ent.renderfx		= (RF_RGB_TINT|RF_MINLIGHT);
-	trap_R_AddRefEntityToScene( &ent, cent->currentState.number );
+	SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 
 	scale = (1.15 + Q_fabs( sinf( cg.time / 80.0f ) )*0.65f);
 	VectorScale( &ent.axis[0], scale, &ent.axis[0] );
 	VectorScale( &ent.axis[1], scale, &ent.axis[1] );
 	VectorScale( &ent.axis[2], scale, &ent.axis[2] );
 	ent.shaderRGBA[0] = 51;		ent.shaderRGBA[1] = 119;	ent.shaderRGBA[2] = 255;	ent.shaderRGBA[3] = 255;
-	ent.customShader = trap_R_RegisterShaderNoMip( "gfx/effects/eplosion_wave" );
+	ent.customShader = trap->R_RegisterShaderNoMip( "gfx/effects/eplosion_wave" );
 	ent.renderfx = (RF_RGB_TINT|RF_ALPHA_DEPTH);
-	trap_R_AddRefEntityToScene( &ent, cent->currentState.number );
+	SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 
-	trap_R_AddLightToScene( &cent->lerpOrigin, 400, 0.13f, 0.43f, 0.87f );
+	trap->R_AddLightToScene( &cent->lerpOrigin, 400, 0.13f, 0.43f, 0.87f );
 }
 
 static void CG_DistortionOrb( centity_t *cent )
@@ -152,7 +152,7 @@ static void CG_DistortionOrb( centity_t *cent )
 	ent.renderfx = RF_DISTORTION;
 #endif
 
-	trap_R_AddRefEntityToScene( &ent, cent->currentState.number );
+	SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 }
 
 /*
@@ -177,7 +177,7 @@ void FX_RepeaterAltProjectileThink( centity_t *cent, const struct weaponInfo_s *
 	if (cg_repeaterOrb.integer)
 		CG_DistortionOrb(cent);
 
-	trap_FX_PlayEffectID( cgs.effects.repeaterAltProjectileEffect, &cent->lerpOrigin, &forward, -1, -1 );
+	trap->FX_PlayEffectID( cgs.effects.repeaterAltProjectileEffect, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 }
 
 /*
@@ -187,7 +187,7 @@ FX_RepeaterAltHitWall
 */
 
 void FX_RepeaterAltHitWall( vector3 *origin, vector3 *normal ) {
-	trap_FX_PlayEffectID( cgs.effects.repeaterAltWallImpactEffect, origin, normal, -1, -1 );
+	trap->FX_PlayEffectID( cgs.effects.repeaterAltWallImpactEffect, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -197,5 +197,5 @@ FX_RepeaterAltHitPlayer
 */
 
 void FX_RepeaterAltHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
-	trap_FX_PlayEffectID( cgs.effects.repeaterAltWallImpactEffect, origin, normal, -1, -1 );
+	trap->FX_PlayEffectID( cgs.effects.repeaterAltWallImpactEffect, origin, normal, -1, -1, qfalse );
 }

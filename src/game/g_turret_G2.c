@@ -104,7 +104,7 @@ void G2Tur_SetBoneAngles(gentity_t *ent, char *bone, vector3 *angles)
 	//first 3 bits is forward, second 3 bits is right, third 3 bits is up
 	ent->s.boneOrient = ((forward)|(right<<3)|(up<<6));
 
-	trap_G2API_SetBoneAngles( ent->ghoul2,
+	trap->G2API_SetBoneAngles( ent->ghoul2,
 					0,
 					bone,
 					angles, 
@@ -127,11 +127,11 @@ void turretG2_set_models( gentity_t *self, qboolean dying )
 			self->s.modelindex2 = G_ModelIndex( name );
 		}
 		
-		trap_G2API_RemoveGhoul2Model( &self->ghoul2, 0 );
+		trap->G2API_RemoveGhoul2Model( &self->ghoul2, 0 );
 		G_KillG2Queue( self->s.number );
 		self->s.modelGhoul2 = 0;
 		/*
-		trap_G2API_InitGhoul2Model( &self->ghoul2,
+		trap->G2API_InitGhoul2Model( &self->ghoul2,
 									name2,
 									0, //base->s.modelindex,
 									//note, this is not the same kind of index - this one's referring to the actual
@@ -150,7 +150,7 @@ void turretG2_set_models( gentity_t *self, qboolean dying )
 			self->s.modelindex = G_ModelIndex( name );
 			self->s.modelindex2 = G_ModelIndex( name2 );
 			//set the new onw
-			trap_G2API_InitGhoul2Model( &self->ghoul2,
+			trap->G2API_InitGhoul2Model( &self->ghoul2,
 										name,
 										0, //base->s.modelindex,
 										//note, this is not the same kind of index - this one's referring to the actual
@@ -165,7 +165,7 @@ void turretG2_set_models( gentity_t *self, qboolean dying )
 		{
 			self->s.modelindex = G_ModelIndex( name3 );
 			//set the new onw
-			trap_G2API_InitGhoul2Model( &self->ghoul2,
+			trap->G2API_InitGhoul2Model( &self->ghoul2,
 										name3,
 										0, //base->s.modelindex,
 										//note, this is not the same kind of index - this one's referring to the actual
@@ -190,13 +190,13 @@ void turretG2_set_models( gentity_t *self, qboolean dying )
 		if ( (self->spawnflags&SPF_TURRETG2_TURBO) )
 		{//different pitch bone and muzzle flash points
 			G2Tur_SetBoneAngles(self, "pitch", &vec3_origin);
-			self->genericValue11 = trap_G2API_AddBolt( self->ghoul2, 0, "*muzzle1" );
-			self->genericValue12 = trap_G2API_AddBolt( self->ghoul2, 0, "*muzzle2" );
+			self->genericValue11 = trap->G2API_AddBolt( self->ghoul2, 0, "*muzzle1" );
+			self->genericValue12 = trap->G2API_AddBolt( self->ghoul2, 0, "*muzzle2" );
 		}
 		else
 		{
 			G2Tur_SetBoneAngles(self, "Bone_body", &vec3_origin);
-			self->genericValue11 = trap_G2API_AddBolt( self->ghoul2, 0, "*flash03" );
+			self->genericValue11 = trap->G2API_AddBolt( self->ghoul2, 0, "*flash03" );
 		}
 	}
 }
@@ -322,7 +322,7 @@ void TurboLaser_SetBoneAnim(gentity_t *eweb, int startFrame, int endFrame)
 
 	//now set the animation on the server ghoul2 instance.
 	assert(eweb->ghoul2);
-	trap_G2API_SetBoneAnim(eweb->ghoul2, 0, "model_root", startFrame, endFrame,
+	trap->G2API_SetBoneAnim(eweb->ghoul2, 0, "model_root", startFrame, endFrame,
 		(BONE_ANIM_OVERRIDE_FREEZE|BONE_ANIM_BLEND), 1.0f, level.time, -1, 100);
 }
 
@@ -334,7 +334,7 @@ static void turretG2_fire ( gentity_t *ent, vector3 *start, vector3 *dir )
 	vector3		org, ang;
 	gentity_t	*bolt;
 
-	if ( (trap_PointContents( start, ent->s.number )&MASK_SHOT) )
+	if ( (trap->PointContents( start, ent->s.number )&MASK_SHOT) )
 	{
 		return;
 	}
@@ -436,7 +436,7 @@ void turretG2_head_think( gentity_t *self )
 		self->setTime = level.time + self->wait;
 
 		// Getting the flash bolt here
-		trap_G2API_GetBoltMatrix( self->ghoul2,
+		trap->G2API_GetBoltMatrix( self->ghoul2,
 					0, 
 					(self->alt_fire?self->genericValue12:self->genericValue11),
 					&boltMatrix, 
@@ -515,7 +515,7 @@ static void turretG2_aim( gentity_t *self )
 		}
 
 		// Getting the "eye" here
-		trap_G2API_GetBoltMatrix( self->ghoul2,
+		trap->G2API_GetBoltMatrix( self->ghoul2,
 					0, 
 					(self->alt_fire?self->genericValue12:self->genericValue11),
 					&boltMatrix,
@@ -694,7 +694,7 @@ static qboolean turretG2_find_enemies( gentity_t *self )
 				continue;
 			}
 		}
-		if ( !trap_InPVS( &org2, &target->r.currentOrigin ))
+		if ( !trap->InPVS( &org2, &target->r.currentOrigin ))
 		{
 			continue;
 		}
@@ -713,7 +713,7 @@ static qboolean turretG2_find_enemies( gentity_t *self )
 		else
 			org.z += 5;
 
-		trap_Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT );
+		trap->Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT, qfalse, 0, 0 );
 
 		if ( !tr.allsolid && !tr.startsolid && ( tr.fraction == 1.0 || tr.entityNum == target->s.number ))
 		{
@@ -841,7 +841,7 @@ void turretG2_base_think( gentity_t *self )
 			if ( enemyDist < self->radius * self->radius )
 			{
 				// was in valid radius
-				if ( trap_InPVS( &self->r.currentOrigin, &self->enemy->r.currentOrigin ) )
+				if ( trap->InPVS( &self->r.currentOrigin, &self->enemy->r.currentOrigin ) )
 				{
 					// Every now and again, check to see if we can even trace to the enemy
 					trace_t tr;
@@ -859,7 +859,7 @@ void turretG2_base_think( gentity_t *self )
 						org2.z += 10;
 					else
 						org2.z -= 10;
-					trap_Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT );
+					trap->Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT, qfalse, 0, 0 );
 
 					if ( !tr.allsolid && !tr.startsolid && tr.entityNum == self->enemy->s.number )
 					{
@@ -1229,5 +1229,5 @@ void finish_spawning_turretG2( gentity_t *base )
 	// But set us as a turret so that we can be identified as a turret
 	base->s.weapon = WP_TURRET;
 
-	trap_LinkEntity( base );
+	trap->LinkEntity( (sharedEntity_t *)base );
 }

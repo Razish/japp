@@ -117,103 +117,103 @@ static qhandle_t purpleSaberCoreShader;
 
 void UI_CacheSaberGlowGraphics( void )
 {//FIXME: these get fucked by vid_restarts
-	redSaberGlowShader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/red_glow" );
-	redSaberCoreShader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/red_line" );
-	orangeSaberGlowShader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/orange_glow" );
-	orangeSaberCoreShader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/orange_line" );
-	yellowSaberGlowShader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/yellow_glow" );
-	yellowSaberCoreShader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/yellow_line" );
-	greenSaberGlowShader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/green_glow" );
-	greenSaberCoreShader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/green_line" );
-	blueSaberGlowShader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/blue_glow" );
-	blueSaberCoreShader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/blue_line" );
-	purpleSaberGlowShader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/purple_glow" );
-	purpleSaberCoreShader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/purple_line" );
+	redSaberGlowShader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/red_glow" );
+	redSaberCoreShader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/red_line" );
+	orangeSaberGlowShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/orange_glow" );
+	orangeSaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/orange_line" );
+	yellowSaberGlowShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/yellow_glow" );
+	yellowSaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/yellow_line" );
+	greenSaberGlowShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/green_glow" );
+	greenSaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/green_line" );
+	blueSaberGlowShader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/blue_glow" );
+	blueSaberCoreShader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/blue_line" );
+	purpleSaberGlowShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/purple_glow" );
+	purpleSaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/purple_line" );
 	//[RGBSabers]
-	rgbSaberGlowShader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow1" );
-	rgbSaberCoreShader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore1" );
+	rgbSaberGlowShader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow1" );
+	rgbSaberCoreShader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore1" );
 
 	//Flame 1
-	rgbSaberGlow2Shader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow2" );
-	rgbSaberCore2Shader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore2" );
-	rgbSaberTrail2Shader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBtrail2" );
+	rgbSaberGlow2Shader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow2" );
+	rgbSaberCore2Shader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore2" );
+	rgbSaberTrail2Shader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBtrail2" );
 
 	//Electric 1
-	rgbSaberGlow3Shader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow3" );
-	rgbSaberCore3Shader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore3" );
-	rgbSaberTrail3Shader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBtrail3" );
+	rgbSaberGlow3Shader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow3" );
+	rgbSaberCore3Shader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore3" );
+	rgbSaberTrail3Shader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBtrail3" );
 
 	//Flame 2
-	rgbSaberGlow4Shader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow4" );
-	rgbSaberCore4Shader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore4" );
-	rgbSaberTrail4Shader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBtrail4" );
+	rgbSaberGlow4Shader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow4" );
+	rgbSaberCore4Shader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore4" );
+	rgbSaberTrail4Shader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBtrail4" );
 
 	//Electric 2
-	rgbSaberGlow5Shader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow5" );
-	rgbSaberCore5Shader			= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore5" );
-	rgbSaberTrail5Shader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/RGBtrail5" );
+	rgbSaberGlow5Shader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow5" );
+	rgbSaberCore5Shader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore5" );
+	rgbSaberTrail5Shader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBtrail5" );
 
 	//Black
-	blackSaberGlowShader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/blackglow" );
-	blackSaberCoreShader		= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/blackcore" );
-	blackBlurShader				= trap_R_RegisterShaderNoMip( "gfx/effects/sabers/blacktrail" );
+	blackSaberGlowShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/blackglow" );
+	blackSaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/blackcore" );
+	blackBlurShader				= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/blacktrail" );
 	//[/RGBSabers]
 
 	//[SFXSabers]
-    sfxSaberTrailShader			= trap_R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_trail" );
-    sfxSaberBladeShader			= trap_R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_blade" );
-    sfxSaberBlade2Shader		= trap_R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_blade_rgb" );
-    sfxSaberEndShader			= trap_R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_end" );
-    sfxSaberEnd2Shader			= trap_R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_end_rgb" );
+    sfxSaberTrailShader			= trap->R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_trail" );
+    sfxSaberBladeShader			= trap->R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_blade" );
+    sfxSaberBlade2Shader		= trap->R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_blade_rgb" );
+    sfxSaberEndShader			= trap->R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_end" );
+    sfxSaberEnd2Shader			= trap->R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_end_rgb" );
     //[/SFXSabers]
 
 	//[Movie Sabers]
 #if 0
 	//Original Trilogy Sabers
-	otSaberCoreShader			= trap_R_RegisterShaderNoMip( "gfx/OTsabers/ot_saberCore" );
-	redOTGlowShader				= trap_R_RegisterShaderNoMip( "gfx/OTsabers/ot_redGlow" );
-	orangeOTGlowShader			= trap_R_RegisterShaderNoMip( "gfx/OTsabers/ot_orangeGlow" );
-	yellowOTGlowShader			= trap_R_RegisterShaderNoMip( "gfx/OTsabers/ot_yellowGlow" );
-	greenOTGlowShader			= trap_R_RegisterShaderNoMip( "gfx/OTsabers/ot_greenGlow" );
-	blueOTGlowShader			= trap_R_RegisterShaderNoMip( "gfx/OTsabers/ot_blueGlow" );
-	purpleOTGlowShader			= trap_R_RegisterShaderNoMip( "gfx/OTsabers/ot_purpleGlow" );
+	otSaberCoreShader			= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_saberCore" );
+	redOTGlowShader				= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_redGlow" );
+	orangeOTGlowShader			= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_orangeGlow" );
+	yellowOTGlowShader			= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_yellowGlow" );
+	greenOTGlowShader			= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_greenGlow" );
+	blueOTGlowShader			= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_blueGlow" );
+	purpleOTGlowShader			= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_purpleGlow" );
 
 	//Episode I Sabers
-	ep1SaberCoreShader			= trap_R_RegisterShaderNoMip( "gfx/Ep1Sabers/saber_core" );
-	redEp1GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep1Sabers/red_glowa" );
-	orangeEp1GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep1Sabers/orange_glowa" );
-	yellowEp1GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep1Sabers/yellow_glowa" );
-	greenEp1GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep1Sabers/green_glowa" );
-	blueEp1GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep1Sabers/blue_glowa" );
-	purpleEp1GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep1Sabers/purple_glowa" );
+	ep1SaberCoreShader			= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/saber_core" );
+	redEp1GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/red_glowa" );
+	orangeEp1GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/orange_glowa" );
+	yellowEp1GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/yellow_glowa" );
+	greenEp1GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/green_glowa" );
+	blueEp1GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/blue_glowa" );
+	purpleEp1GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/purple_glowa" );
 
 	//Episode II Sabers
-	ep2SaberCoreShader			= trap_R_RegisterShaderNoMip( "gfx/Ep2Sabers/saber_core" );
-	whiteIgniteFlare			= trap_R_RegisterShaderNoMip( "gfx/Ep2Sabers/white_ignite_flare" );
-	blackIgniteFlare			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/black_ignite_flare" );
-	redEp2GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep2Sabers/red_glowa" );
-	orangeEp2GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep2Sabers/orange_glowa" );
-	yellowEp2GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep2Sabers/yellow_glowa" );
-	greenEp2GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep2Sabers/green_glowa" );
-	blueEp2GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep2Sabers/blue_glowa" );
-	purpleEp2GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep2Sabers/purple_glowa" );
+	ep2SaberCoreShader			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/saber_core" );
+	whiteIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/white_ignite_flare" );
+	blackIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/black_ignite_flare" );
+	redEp2GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/red_glowa" );
+	orangeEp2GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/orange_glowa" );
+	yellowEp2GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/yellow_glowa" );
+	greenEp2GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/green_glowa" );
+	blueEp2GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/blue_glowa" );
+	purpleEp2GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/purple_glowa" );
 
 	//Episode III Sabers
-	ep3SaberCoreShader			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/saber_core" );
-	whiteIgniteFlare02			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/white_ignite_flare" );
-	blackIgniteFlare02			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/black_ignite_flare" );
-	redIgniteFlare				= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/red_ignite_flare" );
-	greenIgniteFlare			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/green_ignite_flare" );
-	purpleIgniteFlare			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/purple_ignite_flare" );
-	blueIgniteFlare				= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/blue_ignite_flare" );
-	orangeIgniteFlare			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/orange_ignite_flare" );
-	yellowIgniteFlare			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/yellow_ignite_flare" );
-	redEp3GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/red_glowa" );
-	orangeEp3GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/orange_glowa" );
-	yellowEp3GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/yellow_glowa" );
-	greenEp3GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/green_glowa" );
-	blueEp3GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/blue_glowa" );
-	purpleEp3GlowShader			= trap_R_RegisterShaderNoMip( "gfx/Ep3Sabers/purple_glowa" );
+	ep3SaberCoreShader			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/saber_core" );
+	whiteIgniteFlare02			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/white_ignite_flare" );
+	blackIgniteFlare02			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/black_ignite_flare" );
+	redIgniteFlare				= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/red_ignite_flare" );
+	greenIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/green_ignite_flare" );
+	purpleIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/purple_ignite_flare" );
+	blueIgniteFlare				= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/blue_ignite_flare" );
+	orangeIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/orange_ignite_flare" );
+	yellowIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/yellow_ignite_flare" );
+	redEp3GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/red_glowa" );
+	orangeEp3GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/orange_glowa" );
+	yellowEp3GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/yellow_glowa" );
+	greenEp3GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/green_glowa" );
+	blueEp3GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/blue_glowa" );
+	purpleEp3GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/purple_glowa" );
 #endif
 	//[/Movie Sabers]
 }
@@ -468,7 +468,7 @@ qboolean UI_SaberProperNameForSaber( const char *saberName, char *saberProperNam
 
 	// if it's a stringed reference translate it
 	if ( ret && stringedSaberName[0] == '@')
-		trap_SP_GetStringTextString( &stringedSaberName[1], saberProperName, destsize );
+		trap->SE_GetStringTextString( &stringedSaberName[1], saberProperName, destsize );
 	else if ( !stringedSaberName[0] )
 		Q_strncpyz( saberProperName, va( "^1<%s^1>", saberName ), destsize );
 	else // no stringed so just use it as it
@@ -490,7 +490,7 @@ qboolean UI_SaberValidForPlayerInMP( const char *saberName )
 	}
 	else
 	{//return value
-		#ifndef QAGAME
+		#ifndef _GAME
 			return qtrue;
 		#else
 			return ((qboolean)(atoi(allowed)==0));
@@ -517,14 +517,14 @@ void UI_SaberLoadParms( void )
 	marker[0] = '\0';
 
 	//now load in the extra .npc extensions
-	fileCnt = trap_FS_GetFileList("ext_data/sabers", ".sab", saberExtensionListBuf, sizeof(saberExtensionListBuf) );
+	fileCnt = trap->FS_GetFileList("ext_data/sabers", ".sab", saberExtensionListBuf, sizeof(saberExtensionListBuf) );
 
 	holdChar = saberExtensionListBuf;
 	for ( i = 0; i < fileCnt; i++, holdChar += saberExtFNLen + 1 ) 
 	{
 		saberExtFNLen = strlen( holdChar );
 
-		len = trap_FS_FOpenFile( va( "ext_data/sabers/%s", holdChar), &f, FS_READ );
+		len = trap->FS_Open( va( "ext_data/sabers/%s", holdChar), &f, FS_READ );
 
 		if (!f)
 		{
@@ -541,8 +541,8 @@ void UI_SaberLoadParms( void )
 			{
 				Com_Error( ERR_FATAL, "UI_SaberLoadParms: file %s too large to read (max=%d)", holdChar, sizeof(buffer) );
 			}
-			trap_FS_Read( buffer, len, f );
-			trap_FS_FCloseFile( f );
+			trap->FS_Read( buffer, len, f );
+			trap->FS_Close( f );
 			buffer[len] = 0;
 
 			if ( totallen && *(marker-1) == '}' )
@@ -722,7 +722,7 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	//[/RGBSabers]
 	//saber.renderfx = rfx;
 
-	trap_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
+	SE_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
 
 	// Do the hot core
 	VectorMA( origin, length, dir, saber.origin );
@@ -733,7 +733,7 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	saber.radius = (radiusStart + crandom() * radiusRange)*radiusmult;
 //	saber.radius = (1.0 + crandom() * 0.2f)*radiusmult;
 
-	trap_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
+	SE_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
 
 	//[RGBSabers]
 	if(color < SABER_RGB)
@@ -744,7 +744,7 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	saber.shaderTexCoord[0] = saber.shaderTexCoord[1] = 1.0f;
 	saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 	saber.radius = (radiusStart + crandom() * radiusRange)*radiusmult;
-	trap_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
+	SE_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
 	//[/RGBSabers]
 }
 #endif
@@ -918,7 +918,7 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	//RAZTODO: Pass in cent info so we can cull!!!
 	//Raz: Glow
 	//	saber.renderfx = RF_DEPTHHACK;
-	trap_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
+	SE_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
 	saber.renderfx = 0;
 
 	// Do the hot core
@@ -947,7 +947,7 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	}
 
 
-	//	trap_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
+	//	SE_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
 
 	if(color < SABER_RGB)
 		return;
@@ -983,11 +983,11 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 
 	sbak.shaderRGBA[0] = sbak.shaderRGBA[1] = sbak.shaderRGBA[2] = sbak.shaderRGBA[3] = 0xff;
 
-	lol = Q_fabs((sinf((float)trap_Milliseconds() / 400.0f)));
+	lol = Q_fabs((sinf((float)trap->Milliseconds() / 400.0f)));
 	lol = (lol * 0.1f) + 1.0;
 	sbak.radius = lol;
 
-	trap_R_AddRefEntityToScene( &sbak, MAX_CLIENTS );
+	SE_R_AddRefEntityToScene( &sbak, MAX_CLIENTS );
 	//[/RGBSabers]
 }
 
@@ -1104,7 +1104,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			}
 			//[/RGBSabers]
 
-			trap_R_AddRefEntityToScene( &saber, cnum );
+			SE_R_AddRefEntityToScene( &saber, cnum );
 		}
 
 		// Do the hot core
@@ -1126,7 +1126,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 				saber.shaderRGBA[i] = rgb.data[i];
 		}
 		sbak = saber;
-		trap_R_AddRefEntityToScene( &saber, cnum );
+		SE_R_AddRefEntityToScene( &saber, cnum );
 
 		if(color >= SABER_RGB /*|| color == SABER_WHITE*/)
 		{// Add the saber surface that provides color.
@@ -1136,7 +1136,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			sbak.shaderTexCoord.x = sbak.shaderTexCoord.y = 1.0f;
 			sbak.shaderRGBA[0] = sbak.shaderRGBA[1] = sbak.shaderRGBA[2] = sbak.shaderRGBA[3] = 0xff;
 			sbak.radius = coreradius;
-			trap_R_AddRefEntityToScene( &sbak, cnum );
+			SE_R_AddRefEntityToScene( &sbak, cnum );
 		}
 		//[/RGBSabers]
 	}
@@ -1162,7 +1162,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			}
 			//[/RGBSabers]
 
-			trap_R_AddRefEntityToScene( &saber, cnum );
+			SE_R_AddRefEntityToScene( &saber, cnum );
 		}
 
 		// Do the hot core
@@ -1185,7 +1185,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.shaderRGBA[3] = 255;
 		}
 		sbak = saber;
-		trap_R_AddRefEntityToScene( &saber, cnum );
+		SE_R_AddRefEntityToScene( &saber, cnum );
 
 		if(color >= SABER_RGB /*|| color == SABER_WHITE*/)
 		{// Add the saber surface that provides color.
@@ -1195,7 +1195,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			sbak.shaderTexCoord.x = sbak.shaderTexCoord.y = 1.0f;
 			sbak.shaderRGBA[0] = sbak.shaderRGBA[1] = sbak.shaderRGBA[2] = sbak.shaderRGBA[3] = 0xff;
 			sbak.radius = coreradius;
-			trap_R_AddRefEntityToScene( &sbak, cnum );
+			SE_R_AddRefEntityToScene( &sbak, cnum );
 		}
 		//[/RGBSabers]
 
@@ -1225,7 +1225,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 				saber.shaderRGBA[3] = 255 * effectalpha;
 			}
 			//[/RGBSabers]
-			trap_R_AddRefEntityToScene( &saber, cnum );
+			SE_R_AddRefEntityToScene( &saber, cnum );
 		}
 
 		// Do the hot core
@@ -1249,7 +1249,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.shaderRGBA[3] = 255;
 		}
 		sbak = saber;
-		trap_R_AddRefEntityToScene( &saber, cnum );
+		SE_R_AddRefEntityToScene( &saber, cnum );
 
 		if(color >= SABER_RGB /*|| color == SABER_WHITE*/)
 		{// Add the saber surface that provides color.
@@ -1260,7 +1260,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 			saber.radius = coreradius;
 			saber.saberLength = base_len;
-			trap_R_AddRefEntityToScene( &sbak, cnum );
+			SE_R_AddRefEntityToScene( &sbak, cnum );
 		}
 		//[/RGBSabers]
 	}
@@ -1346,16 +1346,16 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 	{
 		//[RGBSabers]
 		snum = 0;
-		trap_Cvar_VariableStringBuffer("ui_saber_color", bladeColorString, sizeof(bladeColorString) );
+		trap->Cvar_VariableStringBuffer("ui_saber_color", bladeColorString, sizeof(bladeColorString) );
 	}
 	else//if ( item->flags&ITF_ISSABER2 ) - presumed
 	{
 		snum = 1;
 		//[/RGBSabers]
-		trap_Cvar_VariableStringBuffer("ui_saber2_color", bladeColorString, sizeof(bladeColorString) );
+		trap->Cvar_VariableStringBuffer("ui_saber2_color", bladeColorString, sizeof(bladeColorString) );
 	}
 
-	if ( !trap_G2API_HasGhoul2ModelOnIndex(&(item->ghoul2),saberModel) )
+	if ( !trap->G2API_HasGhoul2ModelOnIndex(&(item->ghoul2),saberModel) )
 	{//invalid index!
 		return;
 	}
@@ -1366,23 +1366,23 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 	bladeRadius = UI_SaberBladeRadiusForSaber( saberName, bladeNum );
 
 	tagName = va( "*blade%d", bladeNum+1 );
-	bolt = trap_G2API_AddBolt( item->ghoul2,saberModel, tagName );
+	bolt = trap->G2API_AddBolt( item->ghoul2,saberModel, tagName );
 	
 	if ( bolt == -1 )
 	{
 		tagHack = qtrue;
 		//hmm, just fall back to the most basic tag (this will also make it work with pre-JKA saber models
-		bolt = trap_G2API_AddBolt( item->ghoul2,saberModel, "*flash" );
+		bolt = trap->G2API_AddBolt( item->ghoul2,saberModel, "*flash" );
 		if ( bolt == -1 )
 		{//no tag_flash either?!!
 			bolt = 0;
 		}
 	}
 	
-//	angles[PITCH] = curYaw;
-//	angles[ROLL] = 0;
+//	angles.pitch = curYaw;
+//	angles.roll = 0;
 
-	trap_G2API_GetBoltMatrix( item->ghoul2, saberModel, bolt, &boltMatrix, angles, origin, uiInfo.uiDC.realTime, NULL, vec3_origin );//NULL was cgs.model_draw
+	trap->G2API_GetBoltMatrix( item->ghoul2, saberModel, bolt, &boltMatrix, angles, origin, uiInfo.uiDC.realTime, NULL, vec3_origin );//NULL was cgs.model_draw
 
 	// work the matrix axis stuff into the original axis and origins used.
 	BG_GiveMeVectorFromMatrix(&boltMatrix, ORIGIN, bladeOrigin);
@@ -1592,16 +1592,16 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 	{
 		//[RGBSabers]
 		snum = 0;
-		trap_Cvar_VariableStringBuffer("ui_saber_color", bladeColorString, sizeof(bladeColorString) );
+		trap->Cvar_VariableStringBuffer("ui_saber_color", bladeColorString, sizeof(bladeColorString) );
 	}
 	else//if ( item->flags&ITF_ISSABER2 ) - presumed
 	{
 		snum = 1;
 		//[/RGBSabers]
-		trap_Cvar_VariableStringBuffer("ui_saber2_color", bladeColorString, sizeof(bladeColorString) );
+		trap->Cvar_VariableStringBuffer("ui_saber2_color", bladeColorString, sizeof(bladeColorString) );
 	}
 
-	if ( !trap_G2API_HasGhoul2ModelOnIndex(&(item->ghoul2),saberModel) )
+	if ( !trap->G2API_HasGhoul2ModelOnIndex(&(item->ghoul2),saberModel) )
 	{//invalid index!
 		return;
 	}
@@ -1618,23 +1618,23 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 	useModelIndex = 0;
 
 	tagName = va( "*blade%d", bladeNum+1 );
-	bolt = trap_G2API_AddBolt( item->ghoul2,saberModel, tagName );
+	bolt = trap->G2API_AddBolt( item->ghoul2,saberModel, tagName );
 	
 	if ( bolt == -1 )
 	{
 		tagHack = qtrue;
 		//hmm, just fall back to the most basic tag (this will also make it work with pre-JKA saber models
-		bolt = trap_G2API_AddBolt( item->ghoul2,saberModel, "*flash" );
+		bolt = trap->G2API_AddBolt( item->ghoul2,saberModel, "*flash" );
 		if ( bolt == -1 )
 		{//no tag_flash either?!!
 			bolt = 0;
 		}
 	}
 	
-//	angles[PITCH] = curYaw;
-//	angles[ROLL] = 0;
+//	angles.pitch = curYaw;
+//	angles.roll = 0;
 
-	trap_G2API_GetBoltMatrix( item->ghoul2, saberModel, bolt, &boltMatrix, angles, origin, uiInfo.uiDC.realTime, NULL, &vec3_origin );//NULL was cgs.model_draw
+	trap->G2API_GetBoltMatrix( item->ghoul2, saberModel, bolt, &boltMatrix, angles, origin, uiInfo.uiDC.realTime, NULL, &vec3_origin );//NULL was cgs.model_draw
 
 	// work the matrix axis stuff into the original axis and origins used.
 	BG_GiveMeVectorFromMatrix(&boltMatrix, ORIGIN, &org_);
@@ -1847,20 +1847,20 @@ void UI_SaberDrawBlades( itemDef_t *item, vector3 *origin, vector3 *angles )
 	char saber[MAX_QPATH];
 	if ( item->flags&ITF_ISSABER )
 	{
-		trap_Cvar_VariableStringBuffer("ui_saber", saber, sizeof(saber) );
+		trap->Cvar_VariableStringBuffer("ui_saber", saber, sizeof(saber) );
 		if ( !UI_SaberValidForPlayerInMP( saber ) )
 		{
-			trap_Cvar_Set( "ui_saber", "kyle" );
-			trap_Cvar_VariableStringBuffer("ui_saber", saber, sizeof(saber) );
+			trap->Cvar_Set( "ui_saber", "kyle" );
+			trap->Cvar_VariableStringBuffer("ui_saber", saber, sizeof(saber) );
 		}
 	}
 	else if ( item->flags&ITF_ISSABER2 )
 	{
-		trap_Cvar_VariableStringBuffer("ui_saber2", saber, sizeof(saber) );
+		trap->Cvar_VariableStringBuffer("ui_saber2", saber, sizeof(saber) );
 		if ( !UI_SaberValidForPlayerInMP( saber ) )
 		{
-			trap_Cvar_Set( "ui_saber2", "kyle" );
-			trap_Cvar_VariableStringBuffer("ui_saber2", saber, sizeof(saber) );
+			trap->Cvar_Set( "ui_saber2", "kyle" );
+			trap->Cvar_VariableStringBuffer("ui_saber2", saber, sizeof(saber) );
 		}
 	}
 	else
@@ -1893,20 +1893,20 @@ void UI_GetSaberForMenu( char *saber, int saberNum )
 
 	if ( saberNum == 0 )
 	{
-		trap_Cvar_VariableStringBuffer("ui_saber", saber, MAX_QPATH );
+		trap->Cvar_VariableStringBuffer("ui_saber", saber, MAX_QPATH );
 		if ( !UI_SaberValidForPlayerInMP( saber ) )
 		{
-			trap_Cvar_Set( "ui_saber", "kyle" );
-			trap_Cvar_VariableStringBuffer("ui_saber", saber, MAX_QPATH );
+			trap->Cvar_Set( "ui_saber", "kyle" );
+			trap->Cvar_VariableStringBuffer("ui_saber", saber, MAX_QPATH );
 		}
 	}
 	else
 	{
-		trap_Cvar_VariableStringBuffer("ui_saber2", saber, MAX_QPATH );
+		trap->Cvar_VariableStringBuffer("ui_saber2", saber, MAX_QPATH );
 		if ( !UI_SaberValidForPlayerInMP( saber ) )
 		{
-			trap_Cvar_Set( "ui_saber2", "kyle" );
-			trap_Cvar_VariableStringBuffer("ui_saber2", saber, MAX_QPATH );
+			trap->Cvar_Set( "ui_saber2", "kyle" );
+			trap->Cvar_VariableStringBuffer("ui_saber2", saber, MAX_QPATH );
 		}
 	}
 	//read this from the sabers.cfg
@@ -1967,21 +1967,21 @@ void UI_SaberDrawBlades( itemDef_t *item, vector3 *origin, vector3 *angles )
 		}
 		else if ( (item->flags&ITF_ISSABER) )
 		{
-			trap_Cvar_VariableStringBuffer("ui_saber", saber, sizeof(saber) );
+			trap->Cvar_VariableStringBuffer("ui_saber", saber, sizeof(saber) );
 			if ( !UI_SaberValidForPlayerInMP( saber ) )
 			{
-				trap_Cvar_Set( "ui_saber", "kyle" );
-				trap_Cvar_VariableStringBuffer("ui_saber", saber, sizeof(saber) );
+				trap->Cvar_Set( "ui_saber", "kyle" );
+				trap->Cvar_VariableStringBuffer("ui_saber", saber, sizeof(saber) );
 			}
 			saberModel = 0;
 		}
 		else if ( (item->flags&ITF_ISSABER2) )
 		{
-			trap_Cvar_VariableStringBuffer("ui_saber2", saber, sizeof(saber) );
+			trap->Cvar_VariableStringBuffer("ui_saber2", saber, sizeof(saber) );
 			if ( !UI_SaberValidForPlayerInMP( saber ) )
 			{
-				trap_Cvar_Set( "ui_saber2", "kyle" );
-				trap_Cvar_VariableStringBuffer("ui_saber2", saber, sizeof(saber) );
+				trap->Cvar_Set( "ui_saber2", "kyle" );
+				trap->Cvar_VariableStringBuffer("ui_saber2", saber, sizeof(saber) );
 			}
 			saberModel = 0;
 		}
@@ -2016,13 +2016,13 @@ void UI_SaberAttachToChar( itemDef_t *item )
 	int	numSabers = 1;
  	int	saberNum = 0;
 
-	if ( trap_G2API_HasGhoul2ModelOnIndex(&(item->ghoul2),2) )
+	if ( trap->G2API_HasGhoul2ModelOnIndex(&(item->ghoul2),2) )
 	{//remove any extra models
-		trap_G2API_RemoveGhoul2Model(&(item->ghoul2), 2);
+		trap->G2API_RemoveGhoul2Model(&(item->ghoul2), 2);
 	}
-	if ( trap_G2API_HasGhoul2ModelOnIndex(&(item->ghoul2),1) )
+	if ( trap->G2API_HasGhoul2ModelOnIndex(&(item->ghoul2),1) )
 	{//remove any extra models
-		trap_G2API_RemoveGhoul2Model(&(item->ghoul2), 1);
+		trap->G2API_RemoveGhoul2Model(&(item->ghoul2), 1);
 	}
 
 	if ( uiInfo.movesTitleIndex == 4 /*MD_DUAL_SABERS*/ )
@@ -2042,29 +2042,29 @@ void UI_SaberAttachToChar( itemDef_t *item )
 		//RAZTODO: UI_SaberAttachToChar is different in JA+
 		if ( UI_SaberModelForSaber( saber, modelPath ) )
 		{//successfully found a model
-			int g2Saber = trap_G2API_InitGhoul2Model( &(item->ghoul2), modelPath, 0, 0, 0, 0, 0 ); //add the model
+			int g2Saber = trap->G2API_InitGhoul2Model( &(item->ghoul2), modelPath, 0, 0, 0, 0, 0 ); //add the model
 			if ( g2Saber )
 			{
 				int boltNum;
 				//get the customSkin, if any
 				if ( UI_SaberSkinForSaber( saber, skinPath ) )
 				{
-					int g2skin = trap_R_RegisterSkin(skinPath);
-					trap_G2API_SetSkin( item->ghoul2, g2Saber, 0, g2skin );//this is going to set the surfs on/off matching the skin file
+					int g2skin = trap->R_RegisterSkin(skinPath);
+					trap->G2API_SetSkin( item->ghoul2, g2Saber, 0, g2skin );//this is going to set the surfs on/off matching the skin file
 				}
 				else
 				{
-					trap_G2API_SetSkin( item->ghoul2, g2Saber, 0, 0 );//turn off custom skin
+					trap->G2API_SetSkin( item->ghoul2, g2Saber, 0, 0 );//turn off custom skin
 				}
 				if ( saberNum == 0 )
 				{
-					boltNum = trap_G2API_AddBolt( item->ghoul2, 0, "*r_hand");
+					boltNum = trap->G2API_AddBolt( item->ghoul2, 0, "*r_hand");
 				}
 				else
 				{
-					boltNum = trap_G2API_AddBolt( item->ghoul2, 0, "*l_hand");
+					boltNum = trap->G2API_AddBolt( item->ghoul2, 0, "*l_hand");
 				}
-				trap_G2API_AttachG2Model( item->ghoul2, g2Saber, item->ghoul2, boltNum, 0);
+				trap->G2API_AttachG2Model( item->ghoul2, g2Saber, item->ghoul2, boltNum, 0);
 			}
 		}
 	}

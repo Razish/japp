@@ -20,22 +20,22 @@ void CG_TargetCommand_f( void ) {
 		return;
 	}
 
-	trap_Argv( 1, test, 4 );
-	trap_SendConsoleCommand( va( "gc %i %i", targetNum, atoi( test ) ) );
+	trap->Cmd_Argv( 1, test, 4 );
+	trap->SendConsoleCommand( va( "gc %i %i", targetNum, atoi( test ) ) );
 
 }
 
 static void CG_SizeUp_f (void) {
-	trap_Cvar_Set("cg_viewSize", va("%i",(int)(cg_viewSize.integer+10)));
+	trap->Cvar_Set("cg_viewSize", va("%i",(int)(cg_viewSize.integer+10)));
 }
 
 static void CG_SizeDown_f (void) {
-	trap_Cvar_Set("cg_viewSize", va("%i",(int)(cg_viewSize.integer-10)));
+	trap->Cvar_Set("cg_viewSize", va("%i",(int)(cg_viewSize.integer-10)));
 }
 
 static void CG_Viewpos_f (void) {
 	refdef_t *refdef = CG_GetRefdef();
-	CG_Printf( "%s (%i %i %i) : %i\n", cgs.mapname, (int)refdef->vieworg.x, (int)refdef->vieworg.y, (int)refdef->vieworg.z, (int)refdef->viewangles.yaw );
+	trap->Print( "%s (%i %i %i) : %i\n", cgs.mapname, (int)refdef->vieworg.x, (int)refdef->vieworg.y, (int)refdef->vieworg.z, (int)refdef->viewangles.yaw );
 }
 
 void CG_ScoresDown_f( void ) {
@@ -45,7 +45,7 @@ void CG_ScoresDown_f( void ) {
 		// the scores are more than two seconds out of data,
 		// so request new ones
 		cg.scoresRequestTime = cg.time;
-		trap_SendClientCommand( "score" );
+		trap->SendClientCommand( "score" );
 
 		// leave the current scores up if they were already
 		// displayed, but if this is the first hit, clear them out
@@ -68,24 +68,24 @@ static void CG_ScoresUp_f( void ) {
 }
 
 static void CG_spWin_f( void) {
-	trap_Cvar_Set("cg_cameraOrbit", "2");
-	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
-	trap_Cvar_Set("cg_thirdPerson", "1");
-	trap_Cvar_Set("cg_thirdPersonAngle", "0");
-	trap_Cvar_Set("cg_thirdPersonRange", "100");
+	trap->Cvar_Set("cg_cameraOrbit", "2");
+	trap->Cvar_Set("cg_cameraOrbitDelay", "35");
+	trap->Cvar_Set("cg_thirdPerson", "1");
+	trap->Cvar_Set("cg_thirdPersonAngle", "0");
+	trap->Cvar_Set("cg_thirdPersonRange", "100");
 	CG_AddBufferedSound(cgs.media.winnerSound);
-	//trap_S_StartLocalSound(cgs.media.winnerSound, CHAN_ANNOUNCER);
+	//trap->S_StartLocalSound(cgs.media.winnerSound, CHAN_ANNOUNCER);
 	CG_CenterPrint(CG_GetStringEdString("MP_INGAME", "YOU_WIN"), SCREEN_HEIGHT * .30, 0);
 }
 
 static void CG_spLose_f( void) {
-	trap_Cvar_Set("cg_cameraOrbit", "2");
-	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
-	trap_Cvar_Set("cg_thirdPerson", "1");
-	trap_Cvar_Set("cg_thirdPersonAngle", "0");
-	trap_Cvar_Set("cg_thirdPersonRange", "100");
+	trap->Cvar_Set("cg_cameraOrbit", "2");
+	trap->Cvar_Set("cg_cameraOrbitDelay", "35");
+	trap->Cvar_Set("cg_thirdPerson", "1");
+	trap->Cvar_Set("cg_thirdPersonAngle", "0");
+	trap->Cvar_Set("cg_thirdPersonRange", "100");
 	CG_AddBufferedSound(cgs.media.loserSound);
-	//trap_S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
+	//trap->S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
 	CG_CenterPrint(CG_GetStringEdString("MP_INGAME", "YOU_LOSE"), SCREEN_HEIGHT * .30, 0);
 }
 
@@ -98,9 +98,9 @@ static void CG_TellTarget_f( void ) {
 	if ( clientNum == -1 )
 		return;
 
-	trap_Args( message, 128 );
-	Com_sprintf( command, 128, "tell %i %s", clientNum, message );
-	trap_SendClientCommand( command );
+	trap->Cmd_Args( message, sizeof( message ) );
+	Com_sprintf( command, sizeof( command ), "tell %i %s", clientNum, message );
+	trap->SendClientCommand( command );
 }
 
 static void CG_TellAttacker_f( void ) {
@@ -113,26 +113,26 @@ static void CG_TellAttacker_f( void ) {
 		return;
 	}
 
-	trap_Args( message, 128 );
-	Com_sprintf( command, 128, "tell %i %s", clientNum, message );
-	trap_SendClientCommand( command );
+	trap->Cmd_Args( message, sizeof( message ) );
+	Com_sprintf( command, sizeof( command ), "tell %i %s", clientNum, message );
+	trap->SendClientCommand( command );
 }
 
 static void CG_StartOrbit_f( void ) {
 	char var[MAX_TOKEN_CHARS];
 
-	trap_Cvar_VariableStringBuffer( "developer", var, sizeof( var ) );
+	trap->Cvar_VariableStringBuffer( "developer", var, sizeof( var ) );
 	if ( !atoi(var) )
 		return;
 
 	if (cg_cameraOrbit.value != 0) {
-		trap_Cvar_Set ("cg_cameraOrbit", "0");
-		trap_Cvar_Set("cg_thirdPerson", "0");
+		trap->Cvar_Set ("cg_cameraOrbit", "0");
+		trap->Cvar_Set("cg_thirdPerson", "0");
 	} else {
-		trap_Cvar_Set("cg_cameraOrbit", "5");
-		trap_Cvar_Set("cg_thirdPerson", "1");
-		trap_Cvar_Set("cg_thirdPersonAngle", "0");
-		trap_Cvar_Set("cg_thirdPersonRange", "100");
+		trap->Cvar_Set("cg_cameraOrbit", "5");
+		trap->Cvar_Set("cg_thirdPerson", "1");
+		trap->Cvar_Set("cg_thirdPersonAngle", "0");
+		trap->Cvar_Set("cg_thirdPersonRange", "100");
 	}
 }
 
@@ -181,7 +181,7 @@ static void CG_CopyNames_f( void ) {
 	int			bytes = 0;
 	HGLOBAL		clipbuffer;
 	int			i;
-	char		buf[1216] = {0};	//(32*36) = 1152
+	char		buf[1216] = {0};	//(32*36) = 1152 + 64 scrap
 
 	memset( buf, 0, sizeof( buf ) );
 	buf[0] = '\0';
@@ -212,7 +212,7 @@ static void CG_CopyNames_f( void ) {
 	SetClipboardData( CF_TEXT, clipbuffer );
 	CloseClipboard();
 #else //WIN32
-	CG_Printf( "Feature not yet implemented for your operating system (copynames)\n" );
+	trap->Print( "Feature not yet implemented for your operating system (copynames)\n" );
 #endif //WIN32
 }
 
@@ -246,28 +246,28 @@ static const int numPluginDisableOpts = ARRAY_LEN( pluginDisableStrings );
 // 0x30025430 JA+ cgame 1.4 beta3
 static void CG_PluginDisable_f( void ) {
 	int i;
-	if ( trap_Argc() > 1 )
+	if ( trap->Cmd_Argc() > 1 )
 	{
 		char arg[8]={0}, buf[16]={0};
 		int current, toggle, index;
-		trap_Argv( 1, arg, sizeof( arg ) );
+		trap->Cmd_Argv( 1, arg, sizeof( arg ) );
 		index = toggle = atoi( arg );
 		if ( toggle < 0 || toggle > numPluginDisableOpts-1 ) {
 			Com_Printf( "Invalid pluginDisable value: %i\n", toggle );
 			return;
 		}
 
-		trap_Cvar_VariableStringBuffer( "cp_pluginDisable", buf, sizeof( buf ) );
+		trap->Cvar_VariableStringBuffer( "cp_pluginDisable", buf, sizeof( buf ) );
 		current = atoi( buf );
 		toggle = (1<<index);
-		trap_Cvar_Set( "cp_pluginDisable", va( "%i", toggle ^ current ) );
+		trap->Cvar_Set( "cp_pluginDisable", va( "%i", toggle ^ current ) );
 
 		Com_Printf( "%s %s\n", pluginDisableStrings[index], ((current&toggle)?"^2Allowed":"^1Disallowed") );
 	}
 	else
 	{
 		char buf[16]={0};
-		trap_Cvar_VariableStringBuffer( "cp_pluginDisable", buf, sizeof( buf ) );
+		trap->Cvar_VariableStringBuffer( "cp_pluginDisable", buf, sizeof( buf ) );
 
 		Com_Printf( "Usage: /pluginDisable <ID>\n" );
 		for ( i=0; i<numPluginDisableOpts; i++ ) {
@@ -279,7 +279,7 @@ static void CG_PluginDisable_f( void ) {
 
 static void CG_ScrollChat_f( void ) {
 	char args[8]={0};
-	trap_Args( args, sizeof( args ) );
+	trap->Cmd_Args( args, sizeof( args ) );
 	JP_ChatboxScroll( atoi( args ) );
 }
 
@@ -299,7 +299,7 @@ static void CG_Clear_f( void ) {
 }
 
 static void CG_Menu_f( void ) {
-	trap_Key_SetCatcher( trap_Key_GetCatcher() ^ KEYCATCH_CGAME );
+	trap->Key_SetCatcher( trap->Key_GetCatcher() ^ KEYCATCH_CGAME );
 }
 
 static void Cmd_ChatboxSelectTabNextNoKeys( void ) {
@@ -311,7 +311,7 @@ static void Cmd_ChatboxSelectTabPrevNoKeys( void ) {
 
 static void CG_ChatboxFindTab_f( void ) {
 	char args[128];
-	trap_Args( args, sizeof( args ) );
+	trap->Cmd_Args( args, sizeof( args ) );
 	JP_ChatboxSelect( args );
 }
 
@@ -322,24 +322,24 @@ void CG_LuaDoString_f( void )
 	char arg[MAX_TOKEN_CHARS];
 	char buf[4096]={0};
 	int i=0;
-	int argc = trap_Argc();
+	int argc = trap->Cmd_Argc();
 
 	if ( argc < 2 || !JPLua.state )
 		return;
 
 	for ( i=1; i<argc; i++ ) {
-		trap_Argv( i, arg, sizeof( arg ) );
+		trap->Cmd_Argv( i, arg, sizeof( arg ) );
 		Q_strcat( buf, sizeof(buf), va( "%s ", arg ) );
 	}
 
-	if ( trap_Key_GetCatcher() & KEYCATCH_CONSOLE )
-		CG_Printf( "^5Executing Lua code...\n" );
+	if ( trap->Key_GetCatcher() & KEYCATCH_CONSOLE )
+		trap->Print( "^5Executing Lua code...\n" );
 	if ( luaL_dostring( JPLua.state, buf ) != 0 )
-		CG_Printf( "^1Lua Error: %s\n", lua_tostring( JPLua.state, -1 ) );
+		trap->Print( "^1Lua Error: %s\n", lua_tostring( JPLua.state, -1 ) );
 }
 
 void CG_LuaReload_f( void ) {
-	CG_Printf( "^5Reloading JPLua...\n" );
+	trap->Print( "^5Reloading JPLua...\n" );
 	JPLua_Shutdown();
 	JPLua_Init();
 }
@@ -358,11 +358,11 @@ void CG_LuaReload_f( void ) {
 void CG_FixDirection(void){
 	if (cg.japp.isfixedVector){
 		cg.japp.isfixedVector = qfalse;
-		CG_Printf("Direction unset.\n");
+		trap->Print("Direction unset.\n");
 		return;
 	}
 
-	if (trap_Argc() == 3){
+	if (trap->Cmd_Argc() == 3){
 		cg.japp.fixedVector.x = atof( CG_Argv( 1 ) );
 		cg.japp.fixedVector.y = atof( CG_Argv( 2 ) );
 	} else {
@@ -371,7 +371,7 @@ void CG_FixDirection(void){
 
 	cg.japp.fixedVector.z = 0;
 	cg.japp.isfixedVector = qtrue;
-	CG_Printf( "Direction set (%.3f,%.3f).\n", cg.japp.fixedVector.x, cg.japp.fixedVector.y );
+	trap->Print( "Direction set (%.3f,%.3f).\n", cg.japp.fixedVector.x, cg.japp.fixedVector.y );
 }
 
 void CG_FakeGun_f( void ) {
@@ -380,9 +380,9 @@ void CG_FakeGun_f( void ) {
 
 void CG_SayTeam_f( void ) {
 	char buf[MAX_TOKEN_CHARS] = {0};
-	trap_Args( buf, sizeof( buf ) );
+	trap->Cmd_Args( buf, sizeof( buf ) );
 	HandleTeamBinds( buf, sizeof( buf ) );
-	trap_SendClientCommand( va( "say_team %s", buf ) );
+	trap->SendClientCommand( va( "say_team %s", buf ) );
 }
 
 #include "ui/ui_shared.h"
@@ -529,5 +529,5 @@ void CG_InitConsoleCommands( void ) {
 	size_t i;
 
 	for ( i=0; i<numCommands; i++, cmd++ )
-		trap_AddCommand( cmd->name );
+		trap->AddCommand( cmd->name );
 }

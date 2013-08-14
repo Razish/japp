@@ -160,10 +160,10 @@ qboolean JPLua_Event_ClientCommand( void )
 
 		while ( cmd )
 		{
-			int top = 0, i = 0, numArgs = trap_Argc();
+			int top = 0, i = 0, numArgs = trap->Argc();
 			char arg1[MAX_TOKEN_CHARS] = {0};
 
-			trap_Argv( 0, arg1, sizeof( arg1 ) );
+			trap->Argv( 0, arg1, sizeof( arg1 ) );
 
 			if ( !Q_stricmp( arg1, cmd->command ) )
 			{
@@ -175,7 +175,7 @@ qboolean JPLua_Event_ClientCommand( void )
 				for ( i=1; i<numArgs; i++ )
 				{
 					char argN[MAX_TOKEN_CHARS] = {0};
-					trap_Argv( i, argN, sizeof( argN ) );
+					trap->Argv( i, argN, sizeof( argN ) );
 					lua_pushnumber( JPLua.state, i );
 					lua_pushstring( JPLua.state, argN );
 					lua_settable( JPLua.state, top );
@@ -205,10 +205,10 @@ qboolean JPLua_Event_ServerCommand( void )
 
 		while ( cmd )
 		{
-			int top = 0, i = 0, numArgs = trap_Argc();
+			int top = 0, i = 0, numArgs = trap->Argc();
 			char arg1[MAX_TOKEN_CHARS] = {0};
 
-			trap_Argv( 0, arg1, sizeof( arg1 ) );
+			trap->Argv( 0, arg1, sizeof( arg1 ) );
 
 			if ( !Q_stricmp( arg1, cmd->command ) )
 			{
@@ -220,7 +220,7 @@ qboolean JPLua_Event_ServerCommand( void )
 				for ( i=1; i<numArgs; i++ )
 				{
 					char argN[MAX_TOKEN_CHARS] = {0};
-					trap_Argv( i, argN, sizeof( argN ) );
+					trap->Argv( i, argN, sizeof( argN ) );
 					lua_pushnumber( JPLua.state, i );
 					lua_pushstring( JPLua.state, argN );
 					lua_settable( JPLua.state, top );

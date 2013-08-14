@@ -41,7 +41,7 @@ static size_t JAPP_CURL_WriteMemoryCallback(void *contents, size_t size, size_t 
 
 	mem->memory = realloc(mem->memory, mem->size + realsize + 1);
 	if ( !mem->memory )
-		trap_Error("JA++ autoupdate failed: not enough memory (realloc:NULL)\n");
+		trap->Error("JA++ autoupdate failed: not enough memory (realloc:NULL)\n");
 
 	memcpy( &(mem->memory[mem->size]), contents, realsize );
 	mem->size += realsize;
@@ -362,7 +362,7 @@ void UpdateJAPP( void )
 	CURLcode ret = CURLE_OK;
 	MemoryStruct_t chunk = { 0 };
 	char buf[MAX_TOKEN_CHARS] = {0};
-	trap_Argv( 0, buf, sizeof( buf ) );
+	trap->Cmd_Argv( 0, buf, sizeof( buf ) );
 	
 	#if UPDATER_TYPE == 1
 		if ( Q_stricmp( buf, "update" ) && !japp_update->integer )

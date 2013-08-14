@@ -46,7 +46,7 @@ int	bCrashing = 0;
 #endif
 
 static void JKG_FS_WriteString(const char *msg, fileHandle_t f) {
-	trap_FS_Write( msg, strlen(msg), f );
+	trap->FS_Write( msg, strlen(msg), f );
 }
 
 int StrToDword(const char *str) {
@@ -89,11 +89,11 @@ void Cmd_DisAsmDirect_f() {
 	char Addrbuf[32];
 	ud_t disasm;
 	int Addr;
-	if (trap_Argc() < 2) {
-		G_Printf("Usage: /disasm <address>\n");
+	if (trap->Argc() < 2) {
+		trap->Print("Usage: /disasm <address>\n");
 		return;
 	}
-	trap_Argv(1,Addrbuf,32);
+	trap->Argv(1,Addrbuf,32);
 	// Look for 0x notation
 	if (Addrbuf[0] == '0' && Addrbuf[1] == 'x') {
 		Addr = StrToDword(Addrbuf);
@@ -101,7 +101,7 @@ void Cmd_DisAsmDirect_f() {
 		Addr = atoi(Addrbuf);
 	}
 	if (!Addr) {
-		G_Printf("Bad pointer provided, aborting\n");
+		trap->Print("Bad pointer provided, aborting\n");
 		return;
 	}
 
@@ -113,7 +113,7 @@ void Cmd_DisAsmDirect_f() {
 
 	ud_disassemble(&disasm);
 
-	G_Printf("%08X: %s (%s)\n", Addr, ud_insn_asm(&disasm), ud_insn_hex(&disasm));
+	trap->Print("%08X: %s (%s)\n", Addr, ud_insn_asm(&disasm), ud_insn_hex(&disasm));
 }
 
 void JKG_ExtCrashInfo(int fileHandle) {
@@ -127,7 +127,7 @@ void JKG_ExtCrashInfo(int fileHandle) {
 	JKG_FS_WriteString("----------------------------------------\n"
 					   "          Server info / players\n"
 					   "----------------------------------------\n", f);
-	trap_GetServerinfo( cs, sizeof( cs ) );
+	trap->GetServerinfo( cs, sizeof( cs ) );
 	JKG_FS_WriteString(va("Map: %s\n\n", Info_ValueForKey( cs, "mapname" )), f);
 	JKG_FS_WriteString(va("Players: %i/%i:\n\n", level.numConnectedClients, level.maxclients), f);
 	if (level.numConnectedClients != 0) {
@@ -917,7 +917,7 @@ void G_ShutdownGame( int restart );
 static void (*Sys_Quit)(void) = NULL;
 
 static void G_ForceQuit( void ) {
-	trap_Error( "Server crash\n" );
+	trap->Error( ERR_DROP, "Server crash\n" );
 }
 
 static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*ExceptionInfo*/) {
@@ -945,7 +945,7 @@ static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*E
 	Com_Printf("------------------------------------------------------------\n");
 	Com_Printf("Server crashed. Creating crash log %s...\n", filename);
 
-	trap_FS_FOpenFile( filename, &f, FS_WRITE );
+	trap->FS_Open( filename, &f, FS_WRITE );
 
 	JKG_FS_WriteString("========================================\n"
 		               "             JA++ Crash Log\n"
@@ -994,7 +994,7 @@ static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*E
 	JKG_FS_WriteString("========================================\n"
 					   "             End of crash log\n"
 					   "========================================\n", f);
-	trap_FS_FCloseFile( f );
+	trap->FS_Close( f );
 	SymCleanup( GetCurrentProcess() );
 	Com_Printf("Crash report finished, attempting to shut down...\n");
 	Sys_Quit();	// This will call G_ShutdownGame and then shutdown the engine as well

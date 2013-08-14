@@ -13,12 +13,6 @@
 // If you absolutely need something stored, it can either be kept
 // by the server in the server stored userinfos, or stashed in a cvar.
 
-#ifndef __LCC__
-#define CGAME_INLINE ID_INLINE
-#else
-#define CGAME_INLINE //none
-#endif
-
 #define NULL_HANDLE			((qhandle_t) 0)
 #define NULL_SOUND			((sfxHandle_t) 0)
 #define NULL_FX				((fxHandle_t) 0)
@@ -1861,9 +1855,6 @@ const char *CG_ConfigString( int index );
 const char *CG_Argv( int arg );
 const char *CG_Cvar_VariableString( const char *var_name );
 
-void QDECL CG_Printf( const char *msg, ... );
-void QDECL CG_Error( const char *msg, ... );
-
 void CG_StartMusic( qboolean bForceStart );
 
 void CG_UpdateCvars( void );
@@ -1986,7 +1977,7 @@ int MenuFontToHandle(int iMenuFont);
 // cg_player.c
 //
 qboolean CG_RagDoll(centity_t *cent, vector3 *forcedAngles);
-qboolean CG_G2TraceCollide(trace_t *tr, vector3* const mins, vector3* const maxs, const vector3 *lastValidStart, const vector3 *lastValidEnd);
+qboolean CG_G2TraceCollide(trace_t *tr, vector3* const mins, vector3* const maxs, vector3 *lastValidStart, vector3 *lastValidEnd);
 void CG_AddGhoul2Mark(int shader, float size, vector3 *start, vector3 *end, int entnum,
 					  vector3 *entposition, float entangle, void *ghoul2, vector3 *scale, int lifeTime);
 
@@ -2183,240 +2174,9 @@ void CG_SiegeRoundOver(centity_t *ent, int won);
 void CG_SiegeObjectiveCompleted(centity_t *ent, int won, int objectivenum);
 
 
-
-//===============================================
-
-//
-// system traps
-// These functions are how the cgame communicates with the main game system
-//
-
-
-// print message on the local console
-void		trap_Print( const char *fmt );
-
-// abort the game
-void		trap_Error( const char *fmt );
-
-// milliseconds should only be used for performance tuning, never
-// for anything game related.  Get time from the CG_DrawActiveFrame parameter
-int			trap_Milliseconds( void );
-
-//rww - precision timer funcs... -ALWAYS- call end after start with supplied ptr, or you'll get a nasty memory leak.
-//not that you should be using these outside of debug anyway.. because you shouldn't be. So don't.
-void		trap_PrecisionTimer_Start(void **theNewTimer);
-int			trap_PrecisionTimer_End(void *theTimer);
-
-// console variable interaction
-void		trap_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
-void		trap_Cvar_Update( vmCvar_t *vmCvar );
-void		trap_Cvar_Set( const char *var_name, const char *value );
-void		trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
-int			trap_Cvar_GetHiddenVarValue(const char *name);
-
-// ServerCommand and ConsoleCommand parameter access
-int			trap_Argc( void );
-void		trap_Argv( int n, char *buffer, int bufferLength );
-void		trap_Args( char *buffer, int bufferLength );
-
-// filesystem access
-// returns length of file
-int			trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void		trap_FS_Read( void *buffer, int len, fileHandle_t f );
-void		trap_FS_Write( const void *buffer, int len, fileHandle_t f );
-void		trap_FS_FCloseFile( fileHandle_t f );
-int			trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
-
-// add commands to the local console as if they were typed in
-// for map changing, etc.  The command is not executed immediately,
-// but will be executed in order the next time console commands
-// are processed
-void		trap_SendConsoleCommand( const char *text );
-
-// register a command name so the console can perform command completion.
-// FIXME: replace this with a normal console command "defineCommand"?
-void		trap_AddCommand( const char *cmdName );
-
-// send a string to the server over the network
-void		trap_SendClientCommand( const char *s );
-
-// force a screen update, only used during gamestate load
-void		trap_UpdateScreen( void );
-
-// model collision
-void		trap_CM_LoadMap( const char *mapname, qboolean SubBSP );
-int			trap_CM_NumInlineModels( void );
-clipHandle_t trap_CM_InlineModel( int index );		// 0 = world, 1+ = bmodels
-clipHandle_t trap_CM_TempBoxModel( const vector3 *mins, const vector3 *maxs );
-int			trap_CM_PointContents( const vector3 *p, clipHandle_t model );
-int			trap_CM_TransformedPointContents( const vector3 *p, clipHandle_t model, const vector3 *origin, const vector3 *angles );
-void		trap_CM_BoxTrace( trace_t *results, const vector3 *start, const vector3 *end,
-					  const vector3 *mins, const vector3 *maxs,
-					  clipHandle_t model, int brushmask );
-void		trap_CM_TransformedBoxTrace( trace_t *results, const vector3 *start, const vector3 *end,
-					  const vector3 *mins, const vector3 *maxs,
-					  clipHandle_t model, int brushmask,
-					  const vector3 *origin, const vector3 *angles );
-
-// Returns the projection of a polygon onto the solid brushes in the world
-int			trap_CM_MarkFragments( int numPoints, const vector3 points[4], 
-			const vector3 *projection,
-			int maxPoints, vector3 *pointBuffer,
-			int maxFragments, markFragment_t *fragmentBuffer );
-
-// normal sounds will have their volume dynamically changed as their entity
-// moves and the listener moves
-int			trap_S_GetVoiceVolume( int entityNum );
-void		trap_S_MuteSound( int entityNum, int entchannel );
-void		trap_S_StartSound( vector3 *origin, int entityNum, int entchannel, sfxHandle_t sfx );
-void		trap_S_StopLoopingSound(int entnum);
-
-// a local sound is always played full volume
-void		trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum );
-void		trap_S_ClearLoopingSounds( void );
-void		trap_S_AddLoopingSound( int entityNum, const vector3 *origin, const vector3 *velocity, sfxHandle_t sfx );
-void		trap_S_AddRealLoopingSound( int entityNum, const vector3 *origin, const vector3 *velocity, sfxHandle_t sfx );
-void		trap_S_UpdateEntityPosition( int entityNum, const vector3 *origin );
-
-// repatialize recalculates the volumes of sound as they should be heard by the
-// given entityNum and position
-void		trap_S_Respatialize( int entityNum, const vector3 *origin, vector3 axis[3], int inwater );
-void		trap_S_ShutUp(qboolean shutUpFactor);
-sfxHandle_t	trap_S_RegisterSound( const char *sample);		// returns buzz if not found
-void		trap_S_StartBackgroundTrack( const char *intro, const char *loop, qboolean bReturnWithoutStarting);	// empty name stops music
-void	trap_S_StopBackgroundTrack( void );
-
-void		trap_S_UpdateAmbientSet( const char *name, vector3 *origin );
-void		trap_AS_ParseSets( void );
-void		trap_AS_AddPrecacheEntry( const char *name );
-int			trap_S_AddLocalSet( const char *name, vector3 *listener_origin, vector3 *origin, int entID, int time );
-sfxHandle_t	trap_AS_GetBModelSound( const char *name, int stage );
-
-void		trap_R_LoadWorldMap( const char *mapname );
-
-// all media should be registered during level startup to prevent
-// hitches during gameplay
-qhandle_t	trap_R_RegisterModel( const char *name );			// returns rgb axis if not found
-qhandle_t	trap_R_RegisterSkin( const char *name );			// returns all white if not found
-qhandle_t	trap_R_RegisterShader( const char *name );			// returns all white if not found
-qhandle_t	trap_R_RegisterShaderNoMip( const char *name );			// returns all white if not found
-qhandle_t	trap_R_RegisterFont( const char *name );
-float			trap_R_Font_StrLenPixels(const char *text, const int iFontIndex, const float scale);
-int			trap_R_Font_StrLenChars(const char *text);
-float		trap_R_Font_HeightPixels(const int iFontIndex, const float scale);
-void		trap_R_Font_DrawString(int ox, int oy, const char *text, const vector4 *rgba, const int setIndex, int iCharLimit, const float scale);
-qboolean	trap_Language_IsAsian(void);
-qboolean	trap_Language_UsesSpaces(void);
-unsigned	trap_AnyLanguage_ReadCharFromString( const char *psText, int *piAdvanceCount, qboolean *pbIsTrailingPunctuation/* = NULL*/ );
-
-
-// a scene is built up by calls to R_ClearScene and the various R_Add functions.
-// Nothing is drawn until R_RenderScene is called.
-void		trap_R_ClearScene( void );
-void		trap_R_ClearDecals ( void );
-void		trap_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity );
-
-// polys are intended for simple wall marks, not really for doing
-// significant construction
-void		trap_R_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts );
-void		trap_R_AddPolysToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int numPolys );
-void		trap_R_AddDecalToScene ( qhandle_t shader, const vector3 *origin, const vector3 *dir, float orientation, float r, float g, float b, float a, qboolean alphaFade, float radius, qboolean temporary );
-void		trap_R_AddLightToScene( const vector3 *org, float intensity, float r, float g, float b );
-int			trap_R_LightForPoint( vector3 *point, vector3 *ambientLight, vector3 *directedLight, vector3 *lightDir );
-void		trap_R_RenderScene( const refdef_t *fd );
-void		trap_R_SetColor( const vector4 *rgba );	// NULL = 1,1,1,1
-void		trap_R_DrawStretchPic( float x, float y, float w, float h, 
-			float s1, float t1, float s2, float t2, qhandle_t hShader );
-void		trap_R_ModelBounds( clipHandle_t model, vector3 *mins, vector3 *maxs );
-int			trap_R_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, 
-					   float frac, const char *tagName );
-// Does weird, barely controllable rotation behaviour
-void	trap_R_DrawRotatePic( float x, float y, float w, float h, 
-			float s1, float t1, float s2, float t2,float a, qhandle_t hShader );
-// rotates image around exact center point of passed in coords
-void	trap_R_DrawRotatePic2( float x, float y, float w, float h, 
-			float s1, float t1, float s2, float t2,float a, qhandle_t hShader );
-
-void		trap_R_SetRangeFog(float range);
-
-void		trap_R_SetRefractProp(float alpha, float stretch, qboolean prepost, qboolean negate);
-
-void		trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset );
-
-void		trap_R_GetLightStyle(int style, color4ub_t color);
-void		trap_R_SetLightStyle(int style, int color);
-
-void		trap_R_GetBModelVerts(int bmodelIndex, vector3 verts[4], vector3 *normal );
-
-void		trap_R_GetDistanceCull(float *f);
-
-void		trap_R_GetRealRes(int *w, int *h); //get screen resolution -rww
-void		trap_R_AutomapElevAdj(float newHeight); //automap elevation setting -rww
-qboolean	trap_R_InitWireframeAutomap(void); //initialize automap -rww
-
-
-void	trap_FX_AddLine( const vector3 *start, const vector3 *end, float size1, float size2, float sizeParm,
-									float alpha1, float alpha2, float alphaParm,
-									const vector3 *sRGB, const vector3 *eRGB, float rgbParm,
-									int killTime, qhandle_t shader, int flags);
-
-// The glconfig_t will not change during the life of a cgame.
-// If it needs to change, the entire cgame will be restarted, because
-// all the qhandle_t are then invalid.
-void		trap_GetGlconfig( glconfig_t *glconfig );
-
-// the gamestate should be grabbed at startup, and whenever a
-// configstring changes
-void		trap_GetGameState( gameState_t *gamestate );
-
-// cgame will poll each frame to see if a newer snapshot has arrived
-// that it is interested in.  The time is returned seperately so that
-// snapshot latency can be calculated.
-void		trap_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime );
-
-// a snapshot get can fail if the snapshot (or the entties it holds) is so
-// old that it has fallen out of the client system queue
-qboolean	trap_GetSnapshot( int snapshotNumber, snapshot_t *snapshot );
-
-
-qboolean	trap_GetDefaultState(int entityIndex, entityState_t *state );
-
-// retrieve a text command from the server stream
-// the current snapshot will hold the number of the most recent command
-// qfalse can be returned if the client system handled the command
-// argc() / argv() can be used to examine the parameters of the command
-qboolean	trap_GetServerCommand( int serverCommandNumber );
-
-// returns the most recent command number that can be passed to GetUserCmd
-// this will always be at least one higher than the number in the current
-// snapshot, and it may be quite a few higher if it is a fast computer on
-// a lagged connection
-int			trap_GetCurrentCmdNumber( void );	
-
-qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
-
-// used for the weapon select and zoom
-void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, float mPitchOverride, float mYawOverride, float mSensitivityOverride, int fpSel, int invenSel, qboolean fighterControls );
-
-void		trap_SetClientForceAngle(int time, vector3 *angle);
-void		trap_SetClientTurnExtent(float turnAdd, float turnSub, int turnTime);
-
-void trap_OpenUIMenu(int menuID);
-
-// aids for VM testing
-void		testPrintInt( char *string, int i );
-void		testPrintFloat( char *string, float f );
-
-int			trap_MemoryRemaining( void );
-qboolean	trap_Key_IsDown( int keynum );
-int			trap_Key_GetCatcher( void );
-void		trap_Key_SetCatcher( int catcher );
-int			trap_Key_GetKey( const char *binding );
-
 void		BG_CycleInven(playerState_t *ps, int direction);
 int			BG_ProperForceIndex(int power);
 void		BG_CycleForce(playerState_t *ps, int direction);
-
 
 
 typedef enum q3print_e {
@@ -2424,67 +2184,6 @@ typedef enum q3print_e {
   CHAT_PRINT,
   TEAMCHAT_PRINT
 } q3print_t; // bk001201 - warning: useless keyword or type name in empty declaration
-
-
-int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits);
-e_status trap_CIN_StopCinematic(int handle);
-e_status trap_CIN_RunCinematic (int handle);
-void trap_CIN_DrawCinematic (int handle);
-void trap_CIN_SetExtents (int handle, int x, int y, int w, int h);
-
-void trap_SnapVector( vector3 *v );
-
-qboolean	trap_loadCamera(const char *name);
-void		trap_startCamera(int time);
-qboolean	trap_getCameraInfo(int time, vector3 **origin, vector3 **angles);
-
-qboolean	trap_GetEntityToken( char *buffer, int bufferSize );
-qboolean	trap_R_inPVS( const vector3 *p1, const vector3 *p2, byte *mask );
-
-int			trap_FX_InitSystem			( refdef_t* );
-void		trap_FX_SetRefDef			( refdef_t* refdef );
-int			trap_FX_RegisterEffect		( const char *file);
-void		trap_FX_PlayEffect			( const char *file, vector3 *org, vector3 *fwd, int vol, int rad );		// builds arbitrary perp. right vector, does a cross product to define up
-void		trap_FX_PlayEntityEffect	( const char *file, vector3 *org, vector3 axis[3], const int boltInfo, const int entNum, int vol, int rad );
-void		trap_FX_PlayEffectID		( int id, vector3 *org, vector3 *fwd, int vol, int rad );		// builds arbitrary perp. right vector, does a cross product to define up
-void		trap_FX_PlayPortalEffectID	( int id, vector3 *org, vector3 *fwd, int vol, int rad );		// builds arbitrary perp. right vector, does a cross product to define up
-void		trap_FX_PlayEntityEffectID	( int id, vector3 *org, vector3 axis[3], const int boltInfo, const int pGhoul2, int vol, int rad );
-void		trap_FX_PlayBoltedEffectID	( int id, vector3 *org, void *pGhoul2, const int boltNum, const int entNum, const int modelNum, int iLooptime, qboolean isRelative );
-void		trap_FX_AddScheduledEffects	( qboolean skyPortal );
-void		trap_FX_Draw2DEffects		( float screenXScale, float screenYScale );
-qboolean	trap_FX_FreeSystem			( void );
-void		trap_FX_AdjustTime			( int time );
-void		trap_FX_Reset				( void );
-
-//rww - additional funcs for adding custom incode stuff
-void trap_FX_AddPoly( addpolyArgStruct_t *p );
-void trap_FX_AddBezier( addbezierArgStruct_t *p );
-void trap_FX_AddPrimitive( effectTrailArgStruct_t *p );
-void trap_FX_AddSprite( addspriteArgStruct_t *p );
-void trap_FX_AddElectricity( addElectricityArgStruct_t *p );
-
-//void trap_SP_Print(const unsigned ID, byte *Data);
-int trap_SP_GetStringTextString(const char *text, char *buffer, int bufferLength);
-
-void		trap_CG_RegisterSharedMemory(char *memory);
-
-int			trap_CM_RegisterTerrain(const char *config);
-void		trap_RMG_Init(int terrainID, const char *terrainInfo);
-void		trap_RE_InitRendererTerrain( const char *info );
-void		trap_R_WeatherContentsOverride( int contents );
-void		trap_R_WorldEffectCommand(const char *cmd);
-void		trap_WE_AddWeatherZone( const vector3 *mins, const vector3 *maxs );
-
-qboolean	trap_ROFF_Clean( void );
-void		trap_ROFF_UpdateEntities( void );
-	int			trap_ROFF_Cache( char *file );
-qboolean	trap_ROFF_Play( int entID, int roffID, qboolean doTranslation );
-qboolean	trap_ROFF_Purge_Ent( int entID );
-
-//rww - dynamic vm memory allocation!
-void	trap_TrueMalloc(void **ptr, int size);
-void	trap_TrueFree(void **ptr);
-
 
 void	CG_ClearParticles (void);
 void	CG_AddParticles (void);
@@ -2550,94 +2249,6 @@ void FX_BlasterAltFireThink( centity_t *cent, const struct weaponInfo_s *weapon 
 void FX_BlasterWeaponHitWall( vector3 *origin, vector3 *normal );
 void FX_BlasterWeaponHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid );
 
-
-void		trap_G2API_CollisionDetect			( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position,int frameNumber, int entNum, const vector3 *rayStart, const vector3 *rayEnd, const vector3 *scale, int traceFlags, int useLod, float fRadius );
-void		trap_G2API_CollisionDetectCache		( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position,int frameNumber, int entNum, const vector3 *rayStart, const vector3 *rayEnd, const vector3 *scale, int traceFlags, int useLod, float fRadius );
-
-/*
-Ghoul2 Insert Start
-*/
-// CG specific API access
-void		trap_G2_ListModelSurfaces(void *ghlInfo);
-void		trap_G2_ListModelBones(void *ghlInfo, int frame);
-void		trap_G2_SetGhoul2ModelIndexes(void *ghoul2, qhandle_t *modelList, qhandle_t *skinList);
-qboolean	trap_G2_HaveWeGhoul2Models(void *ghoul2);
-qboolean	trap_G2API_GetBoltMatrix(void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix,
-								const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale);
-qboolean	trap_G2API_GetBoltMatrix_NoReconstruct(void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix,
-								const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale);
-qboolean	trap_G2API_GetBoltMatrix_NoRecNoRot(void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix,
-								const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale);
-int			trap_G2API_InitGhoul2Model(void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin,
-						  qhandle_t customShader, int modelFlags, int lodBias);
-qboolean	trap_G2API_SetSkin(void *ghoul2, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin);
-
-int			trap_G2API_CopyGhoul2Instance(void *g2From, void *g2To, int modelIndex);
-void		trap_G2API_CopySpecificGhoul2Model(void *g2From, int modelFrom, void *g2To, int modelTo);
-void		trap_G2API_DuplicateGhoul2Instance(void *g2From, void **g2To);
-qboolean	trap_G2API_HasGhoul2ModelOnIndex(void *ghlInfo, int modelIndex);
-qboolean	trap_G2API_RemoveGhoul2Model(void *ghlInfo, int modelIndex);
-
-qboolean	trap_G2API_SkinlessModel(void *ghlInfo, int modelIndex);
-
-//rww - for adding gore (or whatever) shaders to the g2 model
-int			trap_G2API_GetNumGoreMarks(void *ghlInfo, int modelIndex);
-void		trap_G2API_AddSkinGore(void *ghlInfo,SSkinGoreData *gore);
-void		trap_G2API_ClearSkinGore ( void* ghlInfo );
-
-int			trap_G2API_Ghoul2Size ( void* ghlInfo );
-
-int			trap_G2API_AddBolt(void *ghoul2, int modelIndex, const char *boneName);
-void		trap_G2API_SetBoltInfo(void *ghoul2, int modelIndex, int boltInfo);
-qboolean	trap_G2API_AttachEnt(int *boltInfo, void *ghlInfoTo, int toBoltIndex, int entNum, int toModelNum);
-
-void		trap_G2API_CleanGhoul2Models(void **ghoul2Ptr);
-qboolean	trap_G2API_SetBoneAngles(void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const int flags,
-								const int up, const int right, const int forward, qhandle_t *modelList,
-								int blendTime , int currentTime );
-void		trap_G2API_GetGLAName(void *ghoul2, int modelIndex, char *fillBuf);
-qboolean	trap_G2API_SetBoneAnim(void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame,
-							  const int flags, const float animSpeed, const int currentTime, const float setFrame , const int blendTime );
-qboolean	trap_G2API_GetBoneAnim(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame,
-								int *endFrame, int *flags, float *animSpeed, int *modelList, const int modelIndex);
-qboolean	trap_G2API_GetBoneFrame(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *modelList, const int modelIndex);
-
-qboolean	trap_G2API_SetRootSurface(void *ghoul2, const int modelIndex, const char *surfaceName);
-qboolean	trap_G2API_SetSurfaceOnOff(void *ghoul2, const char *surfaceName, const int flags);
-qboolean	trap_G2API_SetNewOrigin(void *ghoul2, const int boltIndex);
-qboolean	trap_G2API_DoesBoneExist(void *ghoul2, int modelIndex, const char *boneName);
-int			trap_G2API_GetSurfaceRenderStatus(void *ghoul2, const int modelIndex, const char *surfaceName);
-
-int			trap_G2API_GetTime(void);
-void		trap_G2API_SetTime(int time, int clock);
-
-void		trap_G2API_AbsurdSmoothing(void *ghoul2, qboolean status);
-
-void		trap_G2API_SetRagDoll(void *ghoul2, sharedRagDollParams_t *params);
-void		trap_G2API_AnimateG2Models(void *ghoul2, int time, sharedRagDollUpdateParams_t *params);
-
-//additional ragdoll options -rww
-qboolean	trap_G2API_RagPCJConstraint(void *ghoul2, const char *boneName, vector3 *min, vector3 *max); //override default pcj bonee constraints
-qboolean	trap_G2API_RagPCJGradientSpeed(void *ghoul2, const char *boneName, const float speed); //override the default gradient movespeed for a pcj bone
-qboolean	trap_G2API_RagEffectorGoal(void *ghoul2, const char *boneName, vector3 *pos); //override an effector bone's goal position (world coordinates)
-qboolean	trap_G2API_GetRagBonePos(void *ghoul2, const char *boneName, vector3 *pos, vector3 *entAngles, vector3 *entPos, vector3 *entScale); //current position of said bone is put into pos (world coordinates)
-qboolean	trap_G2API_RagEffectorKick(void *ghoul2, const char *boneName, vector3 *velocity); //add velocity to a rag bone
-qboolean	trap_G2API_RagForceSolve(void *ghoul2, qboolean force); //make sure we are actively performing solve/settle routines, if desired
-
-qboolean	trap_G2API_SetBoneIKState(void *ghoul2, int time, const char *boneName, int ikState, sharedSetBoneIKStateParams_t *params);
-qboolean	trap_G2API_IKMove(void *ghoul2, int time, sharedIKMoveParams_t *params);
-
-//for removing bones so they no longer have their own seperate animation hierarchy. Or whatever reason you may have. -rww
-qboolean	trap_G2API_RemoveBone(void *ghoul2, const char *boneName, int modelIndex);
-
-void		trap_G2API_AttachInstanceToEntNum(void *ghoul2, int entityNum, qboolean server);
-void		trap_G2API_ClearAttachedInstance(int entityNum);
-void		trap_G2API_CleanEntAttachments(void);
-qboolean	trap_G2API_OverrideServer(void *serverInstance);
-
-void		trap_G2API_GetSurfaceName(void *ghoul2, int surfNumber, int modelIndex, char *fillBuf);
-
-
 void		CG_Init_CG(void);
 void		CG_Init_CGents(void);
 
@@ -2661,8 +2272,8 @@ Ghoul2 Insert End
 void CG_LoadHudMenu( void );
 
 //[SmartEntities]
-//void	trap_R_AddRefEntityToScene2( const refEntity_t *re, int gameEntity );
 qboolean SE_RenderThisEntity( vector3 *testOrigin, int gameEntity );
+void SE_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity );
 //[/SmartEntities]
 void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... );
 void QDECL CG_SecurityLogPrintf( const char *fmt, ... );
@@ -2706,3 +2317,5 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end );
 #define DRAWTIMER_ENABLE	0x0001
 #define DRAWTIMER_COUNTDOWN	0x0002
 #define DRAWTIMER_COLOUR	0x0004
+
+extern cgameImport_t *trap;

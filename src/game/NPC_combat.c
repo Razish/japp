@@ -785,7 +785,7 @@ void NPC_ChangeWeapon( int newWeapon )
 	}
 	if ( changing && NPC->weaponModel[0] > 9 )
 	{
-		trap_G2API_RemoveGhoul2Model( NPC->ghoul2, NPC->weaponModel[0] );
+		trap->G2API_RemoveGhoul2Model( NPC->ghoul2, NPC->weaponModel[0] );
 	}
 	ChangeWeapon( NPC, newWeapon );
 	if ( changing && NPC->client->ps.weapon != WP_NONE )
@@ -1068,7 +1068,7 @@ qboolean ShotThroughGlass (trace_t *tr, gentity_t *target, vector3 *spot, int ma
 		vector3		muzzle;
 
 		VectorCopy(&tr->endpos, &muzzle);
-		trap_Trace (tr, &muzzle, NULL, NULL, spot, skip, mask );
+		trap->Trace (tr, &muzzle, NULL, NULL, spot, skip, mask, qfalse, 0, 0 );
 		return qtrue;
 	}
 
@@ -1093,7 +1093,7 @@ qboolean CanShoot ( gentity_t *ent, gentity_t *shooter )
 	CalcEntitySpot( shooter, SPOT_WEAPON, &muzzle );
 	CalcEntitySpot( ent, SPOT_ORIGIN, &spot );		//FIXME preferred target locations for some weapons (feet for R/L)
 
-	trap_Trace ( &tr, &muzzle, NULL, NULL, &spot, shooter->s.number, MASK_SHOT );
+	trap->Trace ( &tr, &muzzle, NULL, NULL, &spot, shooter->s.number, MASK_SHOT, qfalse, 0, 0 );
 	traceEnt = &g_entities[ tr.entityNum ];
 
 	// point blank, baby!
@@ -1116,7 +1116,7 @@ qboolean CanShoot ( gentity_t *ent, gentity_t *shooter )
 	else
 	{//ok, can't hit them in center, try their head
 		CalcEntitySpot( ent, SPOT_HEAD, &spot );
-		trap_Trace ( &tr, &muzzle, NULL, NULL, &spot, shooter->s.number, MASK_SHOT );
+		trap->Trace ( &tr, &muzzle, NULL, NULL, &spot, shooter->s.number, MASK_SHOT, qfalse, 0, 0 );
 		traceEnt = &g_entities[ tr.entityNum ];
 		if ( traceEnt == ent) 
 		{
@@ -1481,7 +1481,7 @@ gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis
 				{//FIXME:  check for range and FOV or vis?
 					if( newenemy != NPC->lastEnemy )
 					{//Make sure we're not just going back and forth here
-						if ( trap_InPVS(&newenemy->r.currentOrigin, &NPC->r.currentOrigin) )
+						if ( trap->InPVS(&newenemy->r.currentOrigin, &NPC->r.currentOrigin) )
 						{
 							if(NPCInfo->behaviorState == BS_INVESTIGATE ||	NPCInfo->behaviorState == BS_PATROL)
 							{
@@ -1622,7 +1622,7 @@ gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis
 
 					if ( newenemy != NPC->lastEnemy )
 					{//Make sure we're not just going back and forth here
-						if(!trap_InPVS(&newenemy->r.currentOrigin, &NPC->r.currentOrigin))
+						if(!trap->InPVS(&newenemy->r.currentOrigin, &NPC->r.currentOrigin))
 						{
 							continue;
 						}
@@ -1775,7 +1775,7 @@ gentity_t *NPC_PickAlly ( qboolean facingEachOther, float range, qboolean ignore
 						}
 					}
 
-					if(!trap_InPVS(&ally->r.currentOrigin, &NPC->r.currentOrigin))
+					if(!trap->InPVS(&ally->r.currentOrigin, &NPC->r.currentOrigin))
 					{
 						continue;
 					}
@@ -1900,7 +1900,7 @@ gentity_t *NPC_CheckEnemy( qboolean findNew, qboolean tooFarOk, qboolean setEnem
 				}
 			}
 		}
-		else if ( !trap_InPVS(&NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin ) )
+		else if ( !trap->InPVS(&NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin ) )
 		{//FIXME: should this be a line-of site check?
 			//FIXME: a lot of things check PVS AGAIN when deciding whether 
 			//or not to shoot, redundant!
@@ -2065,11 +2065,11 @@ qboolean NPC_ClearShot( gentity_t *ent )
 		vector3	mins = { -2, -2, -2 };
 		vector3	maxs = {  2,  2,  2 };
 
-		trap_Trace ( &tr, &muzzle, &mins, &maxs, &ent->r.currentOrigin, NPC->s.number, MASK_SHOT );
+		trap->Trace ( &tr, &muzzle, &mins, &maxs, &ent->r.currentOrigin, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 	}
 	else
 	{
-		trap_Trace ( &tr, &muzzle, NULL, NULL, &ent->r.currentOrigin, NPC->s.number, MASK_SHOT );
+		trap->Trace ( &tr, &muzzle, NULL, NULL, &ent->r.currentOrigin, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 	}
 	
 	if ( tr.startsolid || tr.allsolid )
@@ -2108,7 +2108,7 @@ int NPC_ShotEntity( gentity_t *ent, vector3 *impactPos )
 		AngleVectors( &angles, &forward, NULL, NULL );
 		VectorMA( &muzzle, 8, &forward, &end );
 		end.z += 24;
-		trap_Trace ( &tr, &muzzle, &vec3_origin, &vec3_origin, &end, NPC->s.number, MASK_SHOT );
+		trap->Trace ( &tr, &muzzle, &vec3_origin, &vec3_origin, &end, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 		VectorCopy( &tr.endpos, &muzzle );
 	}
 	else
@@ -2125,11 +2125,11 @@ int NPC_ShotEntity( gentity_t *ent, vector3 *impactPos )
 		vector3	mins = { -2, -2, -2 };
 		vector3	maxs = {  2,  2,  2 };
 
-		trap_Trace ( &tr, &muzzle, &mins, &maxs, &targ, NPC->s.number, MASK_SHOT );
+		trap->Trace ( &tr, &muzzle, &mins, &maxs, &targ, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 	}
 	else
 	{
-		trap_Trace ( &tr, &muzzle, NULL, NULL, &targ, NPC->s.number, MASK_SHOT );
+		trap->Trace ( &tr, &muzzle, NULL, NULL, &targ, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 	}
 	//FIXME: if using a bouncing weapon like the bowcaster, should we check the reflection of the wall, too?
 	if ( impactPos )
@@ -2287,11 +2287,11 @@ qboolean NPC_CheckCanAttack (float attack_scale, qboolean stationary)
 			//NEW: use actual forward facing
 			AngleVectors( &client->ps.viewangles, &forward, NULL, NULL );
 			VectorMA( &muzzle, distanceToEnemy, &forward, &hitspot );
-			trap_Trace( &tr, &muzzle, NULL, NULL, &hitspot, NPC->s.number, MASK_SHOT );
+			trap->Trace( &tr, &muzzle, NULL, NULL, &hitspot, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 			ShotThroughGlass( &tr, NPC->enemy, &hitspot, MASK_SHOT );
 			/*
 			//OLD: trace regardless of facing
-			trap_Trace ( &tr, muzzle, NULL, NULL, enemy_org, NPC->s.number, MASK_SHOT );
+			trap->Trace ( &tr, muzzle, NULL, NULL, enemy_org, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 			ShotThroughGlass(&tr, NPC->enemy, enemy_org, MASK_SHOT);
 			*/
 
@@ -2307,7 +2307,7 @@ qboolean NPC_CheckCanAttack (float attack_scale, qboolean stationary)
 				enemy_org[2] -= NPC->enemy->r.maxs[2]*Q_flrand(0.0f, 1.0f);
 
 				attack_scale *= 0.75;
-				trap_Trace ( &tr, muzzle, NULL, NULL, enemy_org, NPC->s.number, MASK_SHOT );
+				trap->Trace ( &tr, muzzle, NULL, NULL, enemy_org, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 				ShotThroughGlass(&tr, NPC->enemy, enemy_org, MASK_SHOT);
 				traceEnt = &g_entities[tr.entityNum];
 			}
@@ -2466,7 +2466,7 @@ void SP_point_combat( gentity_t *self )
 
 	self->s.origin.z += 0.125;
 	G_SetOrigin(self, &self->s.origin);
-	trap_LinkEntity(self);
+	trap->LinkEntity((sharedEntity_t *)self);
 
 	if ( G_CheckInSolid( self, qtrue ) )
 	{
@@ -2551,7 +2551,7 @@ static int NPC_CollectCombatPoints( const vector3 *origin, const float radius, c
 
 		if ( flags&CP_NO_PVS )
 		{//must not be within PVS of mu current origin
-			if ( trap_InPVS( origin, &level.combatPoints[i].origin ) )
+			if ( trap->InPVS( origin, &level.combatPoints[i].origin ) )
 			{
 				continue;
 			}
@@ -2745,7 +2745,7 @@ int NPC_FindCombatPoint( const vector3 *position, const vector3 *avoidPosition, 
 			NAV_FindClosestWaypointForEnt( NPC, level.combatPoints[i].waypoint );
 			if ( NPC->waypoint != WAYPOINT_NONE && NPC->waypoint != level.combatPoints[i].waypoint )
 			{
-				trap_Nav_GetNodePosition( NPC->waypoint, wpOrg );
+				trap->Nav_GetNodePosition( NPC->waypoint, wpOrg );
 			}
 			else
 			*/
@@ -2767,7 +2767,7 @@ int NPC_FindCombatPoint( const vector3 *position, const vector3 *avoidPosition, 
 		}
 		
 		//Okay, now make sure it's not blocked
-		trap_Trace( &tr, &level.combatPoints[i].origin, &NPC->r.mins, &NPC->r.maxs, &level.combatPoints[i].origin, NPC->s.number, NPC->clipmask );
+		trap->Trace( &tr, &level.combatPoints[i].origin, &NPC->r.mins, &NPC->r.maxs, &level.combatPoints[i].origin, NPC->s.number, NPC->clipmask, qfalse, 0, 0 );
 		if ( tr.allsolid || tr.startsolid )
 		{
 			continue;
@@ -2783,7 +2783,7 @@ int NPC_FindCombatPoint( const vector3 *position, const vector3 *avoidPosition, 
 			}
 			*/
 
-			if ( waypoint == WAYPOINT_NONE || level.combatPoints[i].waypoint == WAYPOINT_NONE || trap_Nav_GetBestNodeAltRoute2( waypoint, level.combatPoints[i].waypoint, NODE_NONE ) == WAYPOINT_NONE )
+			if ( waypoint == WAYPOINT_NONE || level.combatPoints[i].waypoint == WAYPOINT_NONE || trap->Nav_GetBestNodeAltRoute2( waypoint, level.combatPoints[i].waypoint, NODE_NONE ) == WAYPOINT_NONE )
 			{//can't possibly have a route to any OR can't possibly have a route to this one OR don't have a route to this one
 				if ( !NAV_ClearPathToPoint( NPC, &NPC->r.mins, &NPC->r.maxs, &level.combatPoints[i].origin, NPC->clipmask, ENTITYNUM_NONE ) )
 				{//don't even have a clear straight path to this one
@@ -2795,7 +2795,7 @@ int NPC_FindCombatPoint( const vector3 *position, const vector3 *avoidPosition, 
 		//We want the one with the shortest path from current pos
 		if ( flags & CP_NEAREST && waypoint != WAYPOINT_NONE && level.combatPoints[i].waypoint != WAYPOINT_NONE )
 		{
-			cost = trap_Nav_GetPathCost( waypoint, level.combatPoints[i].waypoint );
+			cost = trap->Nav_GetPathCost( waypoint, level.combatPoints[i].waypoint );
 			if ( cost < bestCost )
 			{
 				bestCost = cost;
@@ -2957,13 +2957,13 @@ gentity_t *NPC_SearchForWeapons( void )
 		}
 		if ( CheckItemCanBePickedUpByNPC( found, NPC ) )
 		{
-			if ( trap_InPVS( &found->r.currentOrigin, &NPC->r.currentOrigin ) )
+			if ( trap->InPVS( &found->r.currentOrigin, &NPC->r.currentOrigin ) )
 			{
 				dist = DistanceSquared( &found->r.currentOrigin, &NPC->r.currentOrigin );
 				if ( dist < bestDist )
 				{
-					if ( !trap_Nav_GetBestPathBetweenEnts( NPC, found, NF_CLEAR_PATH ) 
-						|| trap_Nav_GetBestNodeAltRoute2( NPC->waypoint, found->waypoint, NODE_NONE ) == WAYPOINT_NONE )
+					if ( !trap->Nav_GetBestPathBetweenEnts( (sharedEntity_t *)NPC, (sharedEntity_t *)found, NF_CLEAR_PATH ) 
+						|| trap->Nav_GetBestNodeAltRoute2( NPC->waypoint, found->waypoint, NODE_NONE ) == WAYPOINT_NONE )
 					{//can't possibly have a route to any OR can't possibly have a route to this one OR don't have a route to this one
 						if ( NAV_ClearPathToPoint( NPC, &NPC->r.mins, &NPC->r.maxs, &found->r.currentOrigin, NPC->clipmask, ENTITYNUM_NONE ) )
 						{//have a clear straight path to this one
@@ -3014,8 +3014,8 @@ void NPC_CheckGetNewWeapon( void )
 			if ( foundWeap )
 			{//try to nav to it
 				/*
-				if ( !trap_Nav_GetBestPathBetweenEnts( NPC, foundWeap, NF_CLEAR_PATH ) 
-					|| trap_Nav_GetBestNodeAltRoute( NPC->waypoint, foundWeap->waypoint ) == WAYPOINT_NONE )
+				if ( !trap->Nav_GetBestPathBetweenEnts( NPC, foundWeap, NF_CLEAR_PATH ) 
+					|| trap->Nav_GetBestNodeAltRoute( NPC->waypoint, foundWeap->waypoint ) == WAYPOINT_NONE )
 				{//can't possibly have a route to any OR can't possibly have a route to this one OR don't have a route to this one
 					if ( !NAV_ClearPathToPoint( NPC, NPC->r.mins, NPC->r.maxs, foundWeap->r.currentOrigin, NPC->clipmask, ENTITYNUM_NONE ) )
 					{//don't even have a clear straight path to this one

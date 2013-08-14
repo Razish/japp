@@ -21,10 +21,10 @@ void Rancor_SetBolts( gentity_t *self )
 	if ( self && self->client )
 	{
 		renderInfo_t *ri = &self->client->renderInfo;
-		ri->handRBolt = trap_G2API_AddBolt( self->ghoul2, 0, "*r_hand" );
-		ri->handLBolt = trap_G2API_AddBolt( self->ghoul2, 0, "*l_hand" );
-		ri->headBolt = trap_G2API_AddBolt( self->ghoul2, 0, "*head_eyes" );
-		ri->torsoBolt = trap_G2API_AddBolt( self->ghoul2, 0, "jaw_bone" );
+		ri->handRBolt = trap->G2API_AddBolt( self->ghoul2, 0, "*r_hand" );
+		ri->handLBolt = trap->G2API_AddBolt( self->ghoul2, 0, "*l_hand" );
+		ri->headBolt = trap->G2API_AddBolt( self->ghoul2, 0, "*head_eyes" );
+		ri->torsoBolt = trap->G2API_AddBolt( self->ghoul2, 0, "jaw_bone" );
 	}
 }
 
@@ -794,7 +794,7 @@ void Rancor_CheckDropVictim( void )
 	VectorSet( &start, NPC->activator->r.currentOrigin.x, NPC->activator->r.currentOrigin.y, NPC->activator->r.absmin.z ); 
 	VectorSet( &end, NPC->activator->r.currentOrigin.x, NPC->activator->r.currentOrigin.y, NPC->activator->r.absmax.z-1 ); 
 
-	trap_Trace( &trace, &start, &mins, &maxs, &end, NPC->activator->s.number, NPC->activator->clipmask );
+	trap->Trace( &trace, &start, &mins, &maxs, &end, NPC->activator->s.number, NPC->activator->clipmask, qfalse, 0, 0 );
 	if ( !trace.allsolid && !trace.startsolid && trace.fraction >= 1.0f )
 	{
 		Rancor_DropVictim( NPC );

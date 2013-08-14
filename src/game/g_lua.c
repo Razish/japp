@@ -45,14 +45,14 @@ static const char *JPLua_LoadFile_Reader( lua_State *L, void *ud, size_t *sz )
 
 	if ( gfd->dataRemaining >= JPLUA_LOAD_CHUNKSIZE )
 	{
-		trap_FS_Read( gfd->buff, JPLUA_LOAD_CHUNKSIZE, gfd->f );
+		trap->FS_Read( gfd->buff, JPLUA_LOAD_CHUNKSIZE, gfd->f );
 		gfd->dataRemaining -= JPLUA_LOAD_CHUNKSIZE;
 		*sz = JPLUA_LOAD_CHUNKSIZE;
 		return gfd->buff;
 	}
 	else
 	{
-		trap_FS_Read( gfd->buff, gfd->dataRemaining, gfd->f );
+		trap->FS_Read( gfd->buff, gfd->dataRemaining, gfd->f );
 		*sz = gfd->dataRemaining;
 		gfd->dataRemaining = 0;
 		return gfd->buff;
@@ -62,7 +62,7 @@ static const char *JPLua_LoadFile_Reader( lua_State *L, void *ud, size_t *sz )
 int JPLua_LoadFile( lua_State *L, const char *file )
 {// Loads a file using JA's FS functions, only use THIS to load files into lua!
 	fileHandle_t	f		= 0;
-	int				len		= trap_FS_FOpenFile( file, &f, FS_READ );
+	int				len		= trap->FS_Open( file, &f, FS_READ );
 	gfd_t			gfd;
 	int				status;
 	
@@ -83,7 +83,7 @@ int JPLua_LoadFile( lua_State *L, const char *file )
 		lua_pop( L, 1 );
 	}
 	
-	trap_FS_FCloseFile( f );
+	trap->FS_Close( f );
 	return status;
 }
 
@@ -301,7 +301,7 @@ static int JPLua_Export_GetMapTime( lua_State *L )
 
 static int JPLua_Export_GetRealTime( lua_State *L )
 {
-	lua_pushinteger( L, trap_Milliseconds() );
+	lua_pushinteger( L, trap->Milliseconds() );
 	return 1;
 }
 
@@ -331,7 +331,7 @@ int JPLua_Export_Trace( lua_State *L )
 	skipNumber = lua_tointeger( L, 4 );
 	mask = lua_tointeger( L, 5 );
 
-	trap_Trace( &tr, &start, &mins, &maxs, &end, skipNumber, mask );
+	trap->Trace( &tr, &start, &mins, &maxs, &end, skipNumber, mask, qfalse, 0, 0 );
 
 	lua_newtable( L );
 	top = lua_gettop( L );
@@ -394,19 +394,19 @@ static int JPLua_RegisterPlugin( lua_State *L )
 
 static int JPLua_Export_PrintToChat( lua_State *L )
 {
-	trap_SendServerCommand( lua_tointeger(L, 1), va("chat \"%s\"", lua_tostring(L, 2) ) );
+	trap->SendServerCommand( lua_tointeger(L, 1), va("chat \"%s\"", lua_tostring(L, 2) ) );
 	return 0;
 }
 
 static int JPLua_Export_PrintToCenter( lua_State *L )
 {
-	trap_SendServerCommand( lua_tointeger(L, 1), va("cp \"%s\"", lua_tostring(L, 2) ) );
+	trap->SendServerCommand( lua_tointeger(L, 1), va("cp \"%s\"", lua_tostring(L, 2) ) );
 	return 0;
 }
 
 static int JPLua_Export_PrintToConsole( lua_State *L )
 {
-	trap_SendServerCommand( lua_tointeger(L, 1), va("print \"%s\n\"", lua_tostring(L, 2) ) );
+	trap->SendServerCommand( lua_tointeger(L, 1), va("print \"%s\n\"", lua_tostring(L, 2) ) );
 	return 0;
 }
 
@@ -485,7 +485,7 @@ static void JPLua_PostInit( lua_State *L )
 	char folderList[16384] = {0}, *folderName = NULL;
 	int i=0, numFolders=0, folderLen=0;
 
-	G_Printf( "^5**************** ^3JA++ Lua (SV) is initialising ^5****************\n" );
+	trap->Print( "^5**************** ^3JA++ Lua (SV) is initialising ^5****************\n" );
 	
 	JPLua_LoadFile( L, JPLUA_DIRECTORY"init"JPLUA_EXTENSION );
 	lua_getfield( L, LUA_GLOBALSINDEX, "JPLua" );
@@ -493,9 +493,9 @@ static void JPLua_PostInit( lua_State *L )
 	JPLua.version = lua_tointeger( L, -1 );
 	lua_pop( L, 1 );
 
-	G_Printf( "%-15s%-32s%-8s%s\n", "               ", "Name", "Version", "Unique ID" );
+	trap->Print( "%-15s%-32s%-8s%s\n", "               ", "Name", "Version", "Unique ID" );
 
-	numFolders = trap_FS_GetFileList( JPLUA_DIRECTORY, "/", folderList, sizeof( folderList ) );
+	numFolders = trap->FS_GetFileList( JPLUA_DIRECTORY, "/", folderList, sizeof( folderList ) );
 	folderName = folderList;
 	for ( i=0; i<numFolders; i++ )
 	{
@@ -507,7 +507,7 @@ static void JPLua_PostInit( lua_State *L )
 			char fileList[16384] = {0}, *fileName = NULL;
 			int j=0, numFiles=0, fileLen=0;
 			
-			numFiles = trap_FS_GetFileList( va( JPLUA_DIRECTORY"%s", folderName ), JPLUA_EXTENSION, fileList, sizeof( fileList ) );
+			numFiles = trap->FS_GetFileList( va( JPLUA_DIRECTORY"%s", folderName ), JPLUA_EXTENSION, fileList, sizeof( fileList ) );
 			fileName = fileList;
 
 			for ( j=0; j<numFiles; j++ )
@@ -526,7 +526,7 @@ static void JPLua_PostInit( lua_State *L )
 		folderName += folderLen+1;
 	}
 
-	G_Printf( "^5**************** ^2JA++ Lua (SV) is initialised ^5****************\n" );
+	trap->Print( "^5**************** ^2JA++ Lua (SV) is initialised ^5****************\n" );
 
 	return;
 }

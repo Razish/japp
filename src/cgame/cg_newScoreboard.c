@@ -19,14 +19,14 @@ void DrawServerInformation( float fade )
 	const char *tmp = NULL;
 	vector4 colour = { 1.0f, 1.0f, 1.0f, fade };
 
-	trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( cgs.japp.serverName, fontHandle, fontScale )/2.0, y, cgs.japp.serverName, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( cgs.japp.serverName, fontHandle, fontScale )/2.0, y, cgs.japp.serverName, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 	y += lineHeight;
 
 	tmp = va( "%s (%s)", (char *)CG_ConfigString( CS_MESSAGE ), cgs.mapname );
-	trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 	y += lineHeight;
 	tmp = BG_GetGametypeString( cgs.gametype );
-	trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 	y += lineHeight;
 
 	switch ( cgs.gametype )
@@ -36,7 +36,7 @@ void DrawServerInformation( float fade )
 		else if ( cgs.timelimit )				tmp = va( "Until ^3%i^7/^3%i ^7minutes", (cg.time-cgs.levelStartTime)/60000, cgs.timelimit );
 		else if ( cgs.fraglimit )				tmp = va( "Until ^3%i ^7frags", cgs.fraglimit );
 		else									tmp = "Playing forever!";
-		trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+		trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 		y += lineHeight*2;
 		break;
 	case GT_CTF:
@@ -45,35 +45,35 @@ void DrawServerInformation( float fade )
 		else if ( cgs.timelimit )					tmp = va( "Until ^3%i^7/^3%i ^7minutes", (cg.time-cgs.levelStartTime)/60000, cgs.timelimit );
 		else if ( cgs.capturelimit )				tmp = va( "Until ^3%i^7/^3%i ^7captures", max(cgs.scores1, cgs.scores2), cgs.capturelimit );
 		else										tmp = "Playing forever!";
-		trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+		trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 		y += lineHeight*2;
 		//FALL THROUGH TO GENERIC TEAM GAME INFO!
 	case GT_TEAM:
 		if ( cgs.scores1 == cgs.scores2 )
 		{
 			tmp = "^3Teams are tied";
-			trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
 			tmp = va( "^1%i ^7/ ^5%i", cgs.scores1, cgs.scores2 );
-			trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
 		}
 		else if ( cgs.scores1 > cgs.scores2 )
 		{
 			tmp = "^1Red ^7leads";
-			trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
 			tmp = va( "^1%i ^7/ ^5%i", cgs.scores1, cgs.scores2 );
-			trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
 		}
 		else
 		{
 			tmp = "^5Blue ^7leads";
-			trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
 			tmp = va( "^5%i ^7/ ^1%i", cgs.scores2, cgs.scores1 );
-			trap_R_Font_DrawString( SCREEN_WIDTH/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
 		}
 		break;
@@ -110,9 +110,9 @@ void DrawPlayerCount_Free( float fade )
 		tmp = va( "%i players / %i bots", freeCount-botCount, botCount );
 	else
 		tmp = va( "%i players", freeCount );
-	trap_R_Font_DrawString( width/*/2.0*/ - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
+	trap->R_Font_DrawString( width/*/2.0*/ - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
 	tmp = va( "%2i spectators", specCount );
-	trap_R_Font_DrawString( width/* + width/2.0*/ - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + lineHeight*20, tmp, &colour, fontHandle, -1, fontScale );
+	trap->R_Font_DrawString( width/* + width/2.0*/ - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + lineHeight*20, tmp, &colour, fontHandle, -1, fontScale );
 }
 
 void DrawPlayerCount_Team( float fade )
@@ -156,20 +156,20 @@ void DrawPlayerCount_Team( float fade )
 	if ( cgs.scores1 >= cgs.scores2 )
 	{
 		tmp = va( "^1%i players ^7(%3i avg ping)", redCount, pingAvgRed );
-		trap_R_Font_DrawString( width/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
+		trap->R_Font_DrawString( width/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
 		tmp = va( "^5%i players ^7(%3i avg ping)", blueCount, pingAvgBlue );
-		trap_R_Font_DrawString( width + width/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
+		trap->R_Font_DrawString( width + width/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
 	}
 	else
 	{
 		tmp = va( "^5%i players ^7(%i avg ping)", blueCount, pingAvgBlue );
-		trap_R_Font_DrawString( width/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
+		trap->R_Font_DrawString( width/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
 		tmp = va( "^1%i players ^7(%i avg ping)", redCount, pingAvgRed );
-		trap_R_Font_DrawString( width + width/2.0 - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
+		trap->R_Font_DrawString( width + width/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
 	}
 
 	tmp = va( "%2i spectators", specCount );
-	trap_R_Font_DrawString( width/* + width/2.0*/ - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + lineHeight*20, tmp, &colour, fontHandle, -1, fontScale );
+	trap->R_Font_DrawString( width/* + width/2.0*/ - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + lineHeight*20, tmp, &colour, fontHandle, -1, fontScale );
 }
 
 void DrawPlayerCount( float fade )
@@ -225,21 +225,21 @@ int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHand
 	if ( !count )
 		return 0;
 
-	trap_R_SetColor( &background );
+	trap->R_SetColor( &background );
 		CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight*1.5, cgs.media.japp.scoreboardLine );
-	trap_R_SetColor( NULL );
+	trap->R_SetColor( NULL );
 
 	tmp = "Name";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Score";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Ping";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Time";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 	y += lineHeight*1.5f;
 
 	savedY = y;
@@ -255,12 +255,12 @@ int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHand
 
 			// background
 			if ( ci-cgs.clientinfo == cg.snap->ps.clientNum )
-				trap_R_SetColor( &blue );
+				trap->R_SetColor( &blue );
 			else
-				trap_R_SetColor( &background );
+				trap->R_SetColor( &background );
 
 			CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight, cgs.media.japp.scoreboardLine );
-			trap_R_SetColor( NULL );
+			trap->R_SetColor( NULL );
 
 			y += lineHeight;
 		}
@@ -283,33 +283,33 @@ int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHand
 
 			if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags&EF_CONNECTION) )
 			{
-				trap_R_SetColor( &white );
+				trap->R_SetColor( &white );
 					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, cgs.media.connectionShader );
-				trap_R_SetColor( NULL );
+				trap->R_SetColor( NULL );
 			}
 
 			else if ( cg.snap->ps.duelInProgress && (ci-cgs.clientinfo == cg.snap->ps.duelIndex || ci-cgs.clientinfo == cg.snap->ps.clientNum) )
 			{
-				trap_R_SetColor( &white );
+				trap->R_SetColor( &white );
 					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, cgs.media.powerDuelAllyShader );
-				trap_R_SetColor( NULL );
+				trap->R_SetColor( NULL );
 			}
 
 			else if ( ci->botSkill != -1 )
 			{
 				tmp = "BOT";
-				trap_R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
 			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1<<score->client) ) 
 			{
 				tmp = "READY";
-				trap_R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
 			//Name
 			tmp = ci->name;
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			//Score
 			if ( score->ping == -1 )
@@ -319,24 +319,24 @@ int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHand
 			else
 				tmp = va( "%02i/%02i", score->score, score->deaths );
 
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			if ( score->ping != -1 )
 			{
 				if ( ci->botSkill != -1 )
 				{
 					tmp = "--";
-					trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+					trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 				}
 				else
 				{//Ping
 					tmp = va( "%i", score->ping );
-					trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &pingColour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+					trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &pingColour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 				}
 
 				//Time
 				tmp = va( "%i", score->time );
-				trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+				trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
 			y += lineHeight;
@@ -383,30 +383,30 @@ int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHand
 	if ( !count )
 		return 0;
 
-	trap_R_SetColor( teamBackground );
+	trap->R_SetColor( teamBackground );
 		CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight*1.5, cgs.media.japp.scoreboardLine );
-	trap_R_SetColor( NULL );
+	trap->R_SetColor( NULL );
 
 	tmp = "Name";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Score";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Cap";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Def";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Asst";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Ping";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Time";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 	y += lineHeight*1.5f;
 
 	savedY = y;
@@ -422,12 +422,12 @@ int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHand
 
 			// background
 			if ( ci-cgs.clientinfo == cg.snap->ps.clientNum )
-				trap_R_SetColor( &blue );
+				trap->R_SetColor( &blue );
 			else
-				trap_R_SetColor( teamBackground );
+				trap->R_SetColor( teamBackground );
 
 			CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight, cgs.media.japp.scoreboardLine );
-			trap_R_SetColor( NULL );
+			trap->R_SetColor( NULL );
 
 			y += lineHeight;
 		}
@@ -450,59 +450,59 @@ int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHand
 
 			if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags&EF_CONNECTION) )
 			{
-				trap_R_SetColor( &white );
+				trap->R_SetColor( &white );
 					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, cgs.media.connectionShader );
-				trap_R_SetColor( NULL );
+				trap->R_SetColor( NULL );
 			}
 
 			else if ( ci->botSkill != -1 )
 			{
 				tmp = "BOT";
-				trap_R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
 			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1<<score->client) ) 
 			{
 				tmp = "READY";
-				trap_R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
 			//Name
 			tmp = ci->name;
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			//Score
 			tmp = va( "%4i", score->score );
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			//Capture
 			tmp = va( "%2i", score->captures );
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			//Defend
 			tmp = va( "%2i", score->defendCount );
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			//Assist
 			tmp = va( "%2i", score->assistCount );
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			if ( score->ping != -1 )
 			{
 				if ( ci->botSkill != -1 )
 				{
 					tmp = "--";
-					trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+					trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 				}
 				else
 				{//Ping
 					tmp = va( "%i", score->ping );
-					trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &pingColour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+					trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &pingColour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 				}
 
 				//Time
 				tmp = va( "%i", score->time );
-				trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+				trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
 			y += lineHeight;
@@ -549,30 +549,30 @@ int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHand
 	if ( !count )
 		return 0;
 
-	trap_R_SetColor( teamBackground );
+	trap->R_SetColor( teamBackground );
 		CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight*1.5, cgs.media.japp.scoreboardLine );
-	trap_R_SetColor( NULL );
+	trap->R_SetColor( NULL );
 
 	tmp = "Name";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Score";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Cap";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Def";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Asst";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Ping";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 	tmp = "Time";
-	trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 	y += lineHeight*1.5f;
 
 	savedY = y;
@@ -588,12 +588,12 @@ int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHand
 
 			// background
 			if ( ci-cgs.clientinfo == cg.snap->ps.clientNum )
-				trap_R_SetColor( &blue );
+				trap->R_SetColor( &blue );
 			else
-				trap_R_SetColor( teamBackground );
+				trap->R_SetColor( teamBackground );
 
 			CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight, cgs.media.japp.scoreboardLine );
-			trap_R_SetColor( NULL );
+			trap->R_SetColor( NULL );
 
 			y += lineHeight;
 		}
@@ -616,66 +616,66 @@ int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHand
 
 			if ( ci->powerups & ((1<<PW_BLUEFLAG)|(1<<PW_REDFLAG)) )
 			{
-				trap_R_SetColor( &white );
+				trap->R_SetColor( &white );
 					CG_DrawPic( x+5.0f, y, lineHeight, lineHeight, cgs.media.flagShaders[FLAG_TAKEN] );
-				trap_R_SetColor( NULL );
+				trap->R_SetColor( NULL );
 			}
 
 			else if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags&EF_CONNECTION) )
 			{
-				trap_R_SetColor( &white );
+				trap->R_SetColor( &white );
 					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, cgs.media.connectionShader );
-				trap_R_SetColor( NULL );
+				trap->R_SetColor( NULL );
 			}
 
 			else if ( ci->botSkill != -1 )
 			{
 				tmp = "BOT";
-				trap_R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
 			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1<<score->client) ) 
 			{
 				tmp = "READY";
-				trap_R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
 			//Name
 			tmp = ci->name;
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			//Score
 			tmp = va( "%4i", score->score );
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			//Capture
 			tmp = va( "%2i", score->captures );
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			//Defend
 			tmp = va( "%2i", score->defendCount );
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			//Assist
 			tmp = va( "%2i", score->assistCount );
-			trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 
 			if ( score->ping != -1 )
 			{
 				if ( ci->botSkill != -1 )
 				{
 					tmp = "--";
-					trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+					trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 				}
 				else
 				{//Ping
 					tmp = va( "%i", score->ping );
-					trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &pingColour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+					trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &pingColour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 				}
 
 				//Time
 				tmp = va( "%i", score->time );
-				trap_R_Font_DrawString( x + columnOffset[column++] - trap_R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap_R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+				trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
 			y += lineHeight;
@@ -705,7 +705,7 @@ int ListPlayers_Free( float fade, float x, float y, float fontScale, int fontHan
 		break;
 	case GT_CTF:
 	case GT_CTY:
-		CG_Error( "Tried to use non-team scoreboard on team gametype" );
+		trap->Error( ERR_DROP, "Tried to use non-team scoreboard on team gametype" );
 		break;
 	}
 
@@ -724,7 +724,7 @@ int ListPlayers_Team( float fade, float x, float y, float fontScale, int fontHan
 	case GT_DUEL:
 	case GT_POWERDUEL:
 	case GT_SINGLE_PLAYER:
-		CG_Error( "Tried to use team scoreboard on non-team gametype" );
+		trap->Error( ERR_DROP, "Tried to use team scoreboard on non-team gametype" );
 		break;
 
 	case GT_TEAM:

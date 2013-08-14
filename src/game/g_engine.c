@@ -180,7 +180,7 @@
 	{
 		if ( !level.security.clientConnectionActive[clientNum] )
 		{
-			G_Printf( "Client %i (%s) has an active connection\n", clientNum, level.clients[clientNum].pers.netname );
+			trap->Print( "Client %i (%s) has an active connection\n", clientNum, level.clients[clientNum].pers.netname );
 			level.clients[clientNum].sess.validated |= (1<<CV_ACTIVECON);
 			level.security.clientConnectionActive[clientNum] = qtrue;
 		}
@@ -306,7 +306,7 @@
 #endif //_WIN32
 
 	static void USED SvSay_Handler( char *msg ) {
-		trap_SendServerCommand( -1, va( "chat \"Server^7\x19: ^7%s\"", msg+8 ) );
+		trap->SendServerCommand( -1, va( "chat \"Server^7\x19: ^7%s\"", msg+8 ) );
 	}
 
 	HOOK( SvSay ) {
