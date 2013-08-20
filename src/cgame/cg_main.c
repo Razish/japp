@@ -1219,6 +1219,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.deniedSound = trap->S_RegisterSound( "sound/chars/protocol/misc/40MOM017" );
 	cgs.media.humiliationSound = trap->S_RegisterSound( "sound/chars/protocol/misc/40MOM019" );
 	cgs.media.defendSound = trap->S_RegisterSound( "sound/chars/protocol/misc/40MOM024" );
+	cgs.media.holyShitSound = trap->S_RegisterSound( "sound/chars/protocol/misc/holyshit" );
 #endif
 
 	/*

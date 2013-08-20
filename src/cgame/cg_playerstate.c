@@ -404,13 +404,17 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		//Com_Printf("assist\n");
 	}
 	// if any of the player event bits changed
-	if (ps->persistant[PERS_PLAYEREVENTS] != ops->persistant[PERS_PLAYEREVENTS]) {
-		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) != (ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD)) {
+	if ( ps->persistant[PERS_PLAYEREVENTS] != ops->persistant[PERS_PLAYEREVENTS] ) {
+
+			 if ( (ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) != (ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) )
 			trap->S_StartLocalSound( cgs.media.deniedSound, CHAN_ANNOUNCER );
-		}
-		else if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) != (ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD)) {
+
+		else if ( (ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) != (ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) )
 			trap->S_StartLocalSound( cgs.media.humiliationSound, CHAN_ANNOUNCER );
-		}
+
+		else if ( (ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_HOLYSHIT) != (ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_HOLYSHIT) )
+			trap_S_StartLocalSound( cgs.media.holyShitSound, CHAN_ANNOUNCER );
+
 		reward = qtrue;
 	}
 #else

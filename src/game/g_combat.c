@@ -588,7 +588,7 @@ CheckAlmostCapture
 ==================
 */
 void CheckAlmostCapture( gentity_t *self, gentity_t *attacker ) {
-#if 0
+#if 1
 	gentity_t	*ent;
 	vector3		dir;
 	char		*classname;
@@ -622,8 +622,8 @@ void CheckAlmostCapture( gentity_t *self, gentity_t *attacker ) {
 		// if we found the destination flag and it's not picked up
 		if (ent && !(ent->r.svFlags & SVF_NOCLIENT) ) {
 			// if the player was *very* close
-			VectorSubtract( self->client->ps.origin, ent->s.origin, dir );
-			if ( VectorLength(dir) < 200 ) {
+			VectorSubtract( &self->client->ps.origin, &ent->s.origin, &dir );
+			if ( VectorLength(&dir) < 200 ) {
 				self->client->ps.persistant[PERS_PLAYEREVENTS] ^= PLAYEREVENT_HOLYSHIT;
 				if ( attacker->client ) {
 					attacker->client->ps.persistant[PERS_PLAYEREVENTS] ^= PLAYEREVENT_HOLYSHIT;
