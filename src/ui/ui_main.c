@@ -11839,6 +11839,7 @@ Q_EXPORT uiExport_t* QDECL GetModuleAPI( int apiVersion, uiImport_t *import )
 	uie.SetActiveMenu		= _UI_SetActiveMenu;
 	uie.ConsoleCommand		= UI_ConsoleCommand;
 	uie.DrawConnectScreen	= UI_DrawConnectScreen;
+	uie.MenuReset			= Menu_Reset;
 
 	return &uie;
 }
