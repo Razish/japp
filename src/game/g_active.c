@@ -3744,8 +3744,24 @@ void ClientThink( int clientNum,usercmd_t *ucmd ) {
 
 
 void G_RunClient( gentity_t *ent ) {
+	// force client updates if they're not sending packets at roughly 4hz
+	if ( !(ent->r.svFlags & SVF_BOT) && g_forceClientUpdateRate.integer && ent->client->lastCmdTime < level.time - g_forceClientUpdateRate.integer ) {
+		trap->GetUsercmd( ent-g_entities, &ent->client->pers.cmd );
+
+		ent->client->lastCmdTime = level.time;
+
+		// fill with seemingly valid data
+		ent->client->pers.cmd.serverTime = level.time;
+		ent->client->pers.cmd.buttons = 0;
+		ent->client->pers.cmd.forwardmove = ent->client->pers.cmd.rightmove = ent->client->pers.cmd.upmove = 0;
+
+		ClientThink_real( ent );
+		return;
+	}
+
 	if ( !(ent->r.svFlags & SVF_BOT) && !g_synchronousClients.integer )
 		return;
+
 	ent->client->pers.cmd.serverTime = level.time;
 	ClientThink_real( ent );
 }
