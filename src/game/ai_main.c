@@ -2686,9 +2686,6 @@ void GetNewFlagPoint(wpobject_t *wp, gentity_t *flagEnt, int team)
 	}
 
 	for ( i=0; i<gWPNum; i++ ) {
-		if ( !gWPArray[i] )
-			continue;
-
 		VectorSubtract(&gWPArray[i]->origin, &flagEnt->s.pos.trBase, &a);
 		testdist = VectorLength(&a);
 
@@ -6267,9 +6264,6 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 		if (bs->frame_Waypoint_Len < wpTouchDist || (RMG.integer && bs->frame_Waypoint_Len < wpTouchDist*2))
 		{
 			WPTouchRoutine(bs);
-
-			if ( !bs->wpCurrent )
-				return;
 
 			if (!bs->wpDirection)
 			{
