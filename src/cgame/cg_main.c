@@ -2926,7 +2926,7 @@ typedef struct cgSpawnEnt_s
 	float		zoffset;
 } cgSpawnEnt_t;
 
-#define	CGFOFS(x) ((int)&(((cgSpawnEnt_t *)0)->x))
+#define	CGFOFS(x) offsetof(cgSpawnEnt_t, x)
 
 //spawn fields for our cgame "entity"
 BG_field_t cg_spawnFields[] =

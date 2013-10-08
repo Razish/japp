@@ -358,11 +358,6 @@ void trap_OpenUIMenu(int menuID) {
 	Q_syscall( CG_OPENUIMENU, menuID );
 }
 
-void trap_OpenUIMenu(int menuID)
-{
-	syscall( CG_OPENUIMENU, menuID );
-}
-
 void		testPrintInt( char *string, int i ) {
 	Q_syscall( CG_TESTPRINTINT, string, i );
 }

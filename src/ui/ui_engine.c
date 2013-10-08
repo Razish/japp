@@ -1469,7 +1469,7 @@ static const int numCmds = ARRAY_LEN( cmdTable );
 	}
 #endif
 
-#if !MAC_PORT
+#ifdef _WIN32
 static void Minimize( void ) {
 	ShowWindow( FindWindowA( "Jedi Knight®: Jedi Academy (MP)", NULL ), SW_MINIMIZE );
 }

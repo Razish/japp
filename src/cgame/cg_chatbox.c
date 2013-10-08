@@ -49,13 +49,15 @@ typedef struct chatHistory_s {
 static chatHistory_t *chatHistory = NULL;
 static chatHistory_t *currentHistory = NULL;
 
-#ifdef _WIN32
-	static field_t*	const chatField		= (field_t *)0x8868F0;
-	static int*		const keys_ctrl		= (int *)0x885A00;
-	static int*		const keys_shift	= (int *)0x8859F8;
-#elif defined( MAC_PORT )
-	static int*		const keys_ctrl		= (int *)0x97ae98;
-	static int*		const keys_shift	= (int *)0x97ae8c;//not sure about these atm
+#ifndef OPENJK
+	#ifdef _WIN32
+		static field_t*	const chatField		= (field_t *)0x8868F0;
+		static int*		const keys_ctrl		= (int *)0x885A00;
+		static int*		const keys_shift	= (int *)0x8859F8;
+	#elif defined( MAC_PORT )
+		static int*		const keys_ctrl		= (int *)0x97ae98;
+		static int*		const keys_shift	= (int *)0x97ae8c;//not sure about these atm
+	#endif
 #endif
 
 static QINLINE int JP_GetChatboxFont( void ) {
@@ -474,6 +476,7 @@ void JP_ChatboxScroll( int direction )
 
 	if ( direction == 0 )
 	{//down
+#ifndef OPENJK
 		if ( *keys_ctrl )
 		{
 			if ( currentChatbox->next )
@@ -482,10 +485,12 @@ void JP_ChatboxScroll( int direction )
 				currentChatbox = chatboxList;
 		}
 		else
+#endif
 			currentChatbox->scrollAmount = min( scrollAmount + 1, 0 );
 	}
 	else
 	{//up
+#ifndef OPENJK
 		if ( *keys_ctrl )
 		{
 			if ( currentChatbox->prev )
@@ -499,6 +504,7 @@ void JP_ChatboxScroll( int direction )
 			}
 		}
 		else
+#endif
 			currentChatbox->scrollAmount = max( scrollAmount - 1, numActiveLines >= cg_chatboxLineCount.integer ? ((min(numActiveLines,MAX_CHATBOX_ENTRIES)-cg_chatboxLineCount.integer)*-1) : 0 );
 	}
 }

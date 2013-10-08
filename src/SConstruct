@@ -75,7 +75,6 @@ files['game'] = [
 	'game/g_saga.c',
 	'game/g_session.c',
 	'game/g_spawn.c',
-	'game/g_strap.c',
 	'game/g_svcmds.c',
 	'game/g_syscalls.c',
 	'game/g_target.c',
@@ -181,7 +180,6 @@ files['cgame'] = [
 	'cgame/cg_serverModification.c',
 	'cgame/cg_smartentities.c',
 	'cgame/cg_snapshot.c',
-	'cgame/cg_strap.c',
 	'cgame/cg_syscalls.c',
 	'cgame/cg_teambinds.c',
 	'cgame/cg_turret.c',
@@ -226,7 +224,7 @@ files['ui'] = [
 if plat == 'Linux':
     libs['game']        = [ 'm', 'lua5.1' ]
     libs['cgame']       = [ 'm', 'lua5.1', 'GL' ]
-    libs['ui']          = [ 'm' ]
+    libs['ui']          = [ 'm', 'curl' ]
 else:
     libs['game']        = []
     libs['cgame']       = []
@@ -246,7 +244,7 @@ else:
 # Game
 if int(ARGUMENTS.get( 'game', 0 )):
 	env['CPPPATH'] = [ '.', './game', './shared' ]
-	env['CPPDEFINES'] = [ 'QAGAME', '_JK2', 'JK2AWARDS', 'MISSIONPACK' ]
+	env['CPPDEFINES'] = [ '_GAME', '_JK2', 'JK2AWARDS', 'MISSIONPACK' ]
 	if env['PLATFORM'] == 'posix':
 		env['CPPDEFINES'] += [ '__GCC__' ]
 	env['LIBS'] = libs['game']
@@ -256,7 +254,7 @@ if int(ARGUMENTS.get( 'game', 0 )):
 # Client Game
 if int(ARGUMENTS.get( 'cgame', 0 )):
 	env['CPPPATH'] = [ '.', './cgame', './shared', './game' ]
-	env['CPPDEFINES'] = [ 'CGAME', '_JK2', 'MISSIONPACK' ]
+	env['CPPDEFINES'] = [ '_CGAME', '_JK2', 'MISSIONPACK' ]
 	if env['PLATFORM'] == 'posix':
 		env['CPPDEFINES'] += [ '__GCC__' ]
 	env['LIBS'] = libs['cgame']
@@ -265,8 +263,8 @@ if int(ARGUMENTS.get( 'cgame', 0 )):
 
 # UI
 if int(ARGUMENTS.get( 'ui', 0 )):
-	env['CPPPATH'] = [ '.', './shared', './game' ]
-	env['CPPDEFINES'] = [ 'UI_EXPORTS', 'PROJECT_UI' ]
+	env['CPPPATH'] = [ '.', './shared', './game', './curl' ]
+	env['CPPDEFINES'] = [ '_UI', 'PROJECT_UI' ]
 	if env['PLATFORM'] == 'posix':
 		env['CPPDEFINES'] += [ '__GCC__' ]
 	env['LIBS'] = libs['ui']

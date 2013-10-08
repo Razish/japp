@@ -457,7 +457,7 @@ typedef struct cgameImport_s {
 	// common
 	void			(*Print)								( const char *msg, ... );
 	void			(*Error)								( int level, const char *error, ... );
-	void			(*SnapVector)							( float *v );
+	void			(*SnapVector)							( vector3 *v );
 	int				(*MemoryRemaining)						( void );
 	void			(*RegisterSharedMemory)					( char *memory );
 	void			(*TrueMalloc)							( void **ptr, int size );
@@ -542,9 +542,9 @@ typedef struct cgameImport_s {
 	void			(*R_DrawRotatePic)						( float x, float y, float w, float h, float s1, float t1, float s2, float t2, float a1, qhandle_t hShader );	// 0 = white
 	void			(*R_DrawRotatePic2)						( float x, float y, float w, float h, float s1, float t1, float s2, float t2, float a1, qhandle_t hShader );	// 0 = white
 	void			(*R_Font_DrawString)					( int ox, int oy, const char *text, const vector4 *rgba, const int setIndex, int iCharLimit, const float scale );
-	int				(*R_Font_HeightPixels)					( const int iFontIndex, const float scale );
+	float			(*R_Font_HeightPixels)					( const int iFontIndex, const float scale );
 	int				(*R_Font_StrLenChars)					( const char *text );
-	int				(*R_Font_StrLenPixels)					( const char *text, const int iFontIndex, const float scale );
+	float			(*R_Font_StrLenPixels)					( const char *text, const int iFontIndex, const float scale );
 	void			(*R_GetBModelVerts)						( int bmodelIndex, vector3 *vec, vector3 *normal );
 	float			(*R_GetDistanceCull)					( void );
 	qboolean		(*R_GetEntityToken)						( char *buffer, int size );

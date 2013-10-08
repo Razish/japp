@@ -117,6 +117,7 @@ extern int g_G2AllocServer;
 #include <time.h>
 #include <ctype.h>
 #include <limits.h>
+#include <stddef.h>
 
 // this is the define for determining if we have an asm version of a C function
 #if (defined(_M_IX86) || defined(__i386__)) && !defined(__sun__) && !defined(__LCC__)

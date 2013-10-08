@@ -148,7 +148,7 @@ typedef struct  itemFlagsDef_s {
 
 itemFlagsDef_t itemFlags [] = {
 	{"WINDOW_INACTIVE",		WINDOW_INACTIVE},
-	{NULL,					(int) NULL}
+	{NULL,					0}
 };
 
 char *styles [] = {
@@ -9014,7 +9014,7 @@ qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 		}
 
 		//a normal StringAlloc ptr
-		if ((int)psString > 0)	
+		if (psString > 0)	
 		{
 			if (*psString == '}') {
 				return qtrue;
@@ -9077,7 +9077,7 @@ qboolean ItemParse_cvarFloatList( itemDef_t *item, int handle )
 		}
 			
 		//a normal StringAlloc ptr
-		if ((int)string > 0)	
+		if (string > 0)	
 		{
 			if (*string == '}') 
 			{

@@ -2,7 +2,6 @@
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
-#ifndef G_PUBLIC_H
 
 // g_public.h -- game module information visible to server
 
@@ -255,8 +254,6 @@ typedef struct T_G_ICARUS_PLAYSOUND_s {
 	char channel[2048];
 } T_G_ICARUS_PLAYSOUND;
 
-	G_SET_USERINFO,		// ( int num, const char *buffer );
-
 typedef struct T_G_ICARUS_SET_s {
 	int taskID;
 	int entID;
@@ -352,6 +349,7 @@ typedef struct T_G_ICARUS_GETSTRING_s {
 typedef struct T_G_ICARUS_SOUNDINDEX_s {
 	char filename[2048];
 } T_G_ICARUS_SOUNDINDEX;
+
 typedef struct T_G_ICARUS_GETSETIDFORSTRING_s {
 	char string[2048];
 } T_G_ICARUS_GETSETIDFORSTRING;
@@ -1169,12 +1167,6 @@ typedef struct gameExport_s {
 	void		(*NAV_FindCombatPointWaypoints)		( void );
 	int			(*BG_GetItemIndexByTag)				( int tag, int type );
 } gameExport_t;
-
-typedef struct
-{
-	int entID;
-	char name[2048];
-} T_G_ICARUS_REMOVE;
 
 //linking of game library
 typedef gameExport_t* (QDECL *GetGameAPI_t)( int apiVersion, gameImport_t *import );
