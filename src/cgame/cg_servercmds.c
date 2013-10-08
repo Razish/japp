@@ -156,11 +156,7 @@ void CG_ParseServerinfo( void ) {
 	if ( !Q_stricmpn( Info_ValueForKey( info, "gamename" ), "JA+ Mod", 7 ) )
 		cg.japp.SSF = JAPLUS_SERVER_FLAGS;
 
-#if MAC_PORT
 	if ( tinfo[0] && sscanf( tinfo, "%X", &cg.japp.SSF ) != 1 )
-#else
-	if ( tinfo[0] && sscanf_s( tinfo, "%X", &cg.japp.SSF ) != 1 )
-#endif
 		CG_SecurityLogPrintf( "CG_ParseServerinfo: serverinfo 'ssf' was found, but invalid.\n"  );
 	Com_Printf( "Server support hints: 0x%X\n", cg.japp.SSF );
 

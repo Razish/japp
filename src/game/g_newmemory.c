@@ -26,7 +26,7 @@ void JP_Free( void *data )
 	jpMalloc_t *ptr = root;
 	while ( ptr )
 	{
-		if ( (unsigned int)data == (unsigned int)ptr->data )
+		if ( data == ptr->data )
 		{//Found it, remove the entry
 			free( ptr->data );
 			if ( ptr->next )

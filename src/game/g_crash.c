@@ -9,6 +9,10 @@
 
 #include "qcommon/game_version.h"
 
+#if QARCH == 64
+
+#elif QARCH == 32
+
 int	bCrashing = 0;
 
 //#include <disasm/disasm.h>
@@ -1532,3 +1536,5 @@ void DeactivateCrashHandler() {
 }
 
 #endif
+
+#endif //QARCH == 32

@@ -20,8 +20,6 @@ gclient_t		g_clients[MAX_CLIENTS];	//Raz: Not directly accessed. level.clients[]
 
 qboolean gDuelExit = qfalse;
 
-
-
 void G_InitGame					( int levelTime, int randomSeed, int restart );
 void G_RunFrame					( int levelTime );
 void G_ShutdownGame				( int restart );

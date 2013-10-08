@@ -390,7 +390,7 @@ void JP_ChatboxDraw( void )
 
 #if defined(_WIN32) && !defined(OPENJK)
 #if 0
-	if ( (trap->Key_GetCatcher() & KEYCATCH_MESSAGE) )
+	if ( (trap_Key_GetCatcher() & KEYCATCH_MESSAGE) )
 	{
 		int overStrike = *(int *)0x8859E0;
 		int cls_realtime = *(int *)0x8AF224;

@@ -2,8 +2,11 @@
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
+#ifndef G_PUBLIC_H
 
 // g_public.h -- game module information visible to server
+
+#define G_PUBLIC_H
 
 #define Q3_INFINITE			16777216 
 
@@ -56,7 +59,7 @@ typedef struct failedEdge_e
 	int	entID;
 } failedEdge_t;
 
-typedef struct {
+typedef struct entityShared_s {
 	qboolean	linked;				// qfalse if not in any good cluster
 	int			linkcount;
 
@@ -75,8 +78,7 @@ typedef struct {
 	// it will not necessarily be the same as the trajectory evaluation for the current
 	// time, because each entity must be moved one at a time after time is advanced
 	// to avoid simultanious collision issues
-	vector3		currentOrigin;
-	vector3		currentAngles;
+	vector3		currentOrigin, currentAngles;
 	qboolean	mIsRoffing;			// set to qtrue when the entity is being roffed
 
 	// when a trace call is made and passEntityNum != ENTITYNUM_NONE,
@@ -178,8 +180,7 @@ typedef enum //# bSet_e
 
 #define	MAX_PARMS	16
 #define	MAX_PARM_STRING_LENGTH	MAX_QPATH//was 16, had to lengthen it so they could take a valid file path
-typedef struct
-{	
+typedef struct parms_s {	
 	char	parm[MAX_PARMS][MAX_PARM_STRING_LENGTH];
 } parms_t;
 
@@ -191,7 +192,7 @@ typedef struct Vehicle_s Vehicle_t;
 
 // the server looks at a sharedEntity, which is the start of the game's gentity_t structure
 //mod authors should not touch this struct
-typedef struct {
+typedef struct sharedEntity_s {
 	entityState_t	s;				// communicated by server to clients
 	playerState_t	*playerState;	//needs to be in the gentity for bg entity access
 									//if you want to actually see the contents I guess
@@ -247,25 +248,23 @@ extern CTaskManager	*gTaskManagers[MAX_GENTITIES];
 #include "icarus/taskmanager.h"
 #endif
 
-typedef struct
-{
+typedef struct T_G_ICARUS_PLAYSOUND_s {
 	int taskID;
 	int entID;
 	char name[2048];
 	char channel[2048];
 } T_G_ICARUS_PLAYSOUND;
 
+	G_SET_USERINFO,		// ( int num, const char *buffer );
 
-typedef struct
-{
+typedef struct T_G_ICARUS_SET_s {
 	int taskID;
 	int entID;
 	char type_name[2048];
 	char data[2048];
 } T_G_ICARUS_SET;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_LERP2POS_s {
 	int taskID;
 	int entID; 
 	vector3 origin;
@@ -274,100 +273,86 @@ typedef struct
 	qboolean nullAngles; //special case
 } T_G_ICARUS_LERP2POS;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_LERP2ORIGIN_s {
 	int taskID;
 	int entID;
 	vector3 origin;
 	float duration;
 } T_G_ICARUS_LERP2ORIGIN;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_LERP2ANGLES_s {
 	int taskID;
 	int entID;
 	vector3 angles;
 	float duration;
 } T_G_ICARUS_LERP2ANGLES;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_GETTAG_s {
 	int entID;
 	char name[2048];
 	int lookup;
 	vector3 info;
 } T_G_ICARUS_GETTAG;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_LERP2START_s {
 	int entID;
 	int taskID;
 	float duration;
 } T_G_ICARUS_LERP2START;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_LERP2END_s {
 	int entID;
 	int taskID;
 	float duration;
 } T_G_ICARUS_LERP2END;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_USE_s {
 	int entID;
 	char target[2048];
 } T_G_ICARUS_USE;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_KILL_s {
 	int entID;
 	char name[2048];
 } T_G_ICARUS_KILL;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_REMOVE_s {
 	int entID;
 	char name[2048];
 } T_G_ICARUS_REMOVE;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_PLAY_s {
 	int taskID;
 	int entID;
 	char type[2048];
 	char name[2048];
 } T_G_ICARUS_PLAY;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_GETFLOAT_s {
 	int entID;
 	int type;
 	char name[2048];
 	float value;
 } T_G_ICARUS_GETFLOAT;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_GETVECTOR_s {
 	int entID;
 	int type;
 	char name[2048];
 	vector3 value;
 } T_G_ICARUS_GETVECTOR;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_GETSTRING_s {
 	int entID;
 	int type;
 	char name[2048];
 	char value[2048];
 } T_G_ICARUS_GETSTRING;
 
-typedef struct
-{
+typedef struct T_G_ICARUS_SOUNDINDEX_s {
 	char filename[2048];
 } T_G_ICARUS_SOUNDINDEX;
-typedef struct
-{
+typedef struct T_G_ICARUS_GETSETIDFORSTRING_s {
 	char string[2048];
 } T_G_ICARUS_GETSETIDFORSTRING;
 
@@ -416,6 +401,7 @@ typedef enum gameImportLegacy_e {
 	G_GET_ENTITY_TOKEN,
 	G_SIEGEPERSSET,
 	G_SIEGEPERSGET,
+
 	G_FS_GETFILELIST,
 	G_DEBUG_POLYGON_CREATE,
 	G_DEBUG_POLYGON_DELETE,
@@ -431,8 +417,11 @@ typedef enum gameImportLegacy_e {
 	G_ROFF_PURGE_ENT,
 	G_TRUEMALLOC,
 	G_TRUEFREE,
+
+	//rww - icarus traps
 	G_ICARUS_RUNSCRIPT,
 	G_ICARUS_REGISTERSCRIPT,
+
 	G_ICARUS_INIT,
 	G_ICARUS_VALIDENT,
 	G_ICARUS_ISINITIALIZED,
@@ -450,8 +439,10 @@ typedef enum gameImportLegacy_e {
 	G_ICARUS_GETFLOATVARIABLE,
 	G_ICARUS_GETSTRINGVARIABLE,
 	G_ICARUS_GETVECTORVARIABLE,
+
 	G_SET_SHARED_BUFFER,
 
+	//BEGIN VM STUFF
 	G_MEMSET = 100,
 	G_MEMCPY,
 	G_STRNCPY,
@@ -464,11 +455,16 @@ typedef enum gameImportLegacy_e {
 	G_PERPENDICULARVECTOR,
 	G_FLOOR,
 	G_CEIL,
+
 	G_TESTPRINTINT,
 	G_TESTPRINTFLOAT,
+
 	G_ACOS,
 	G_ASIN,
 
+	//END VM STUFF
+
+	//rww - BEGIN NPC NAV TRAPS
 	G_NAV_INIT = 200,
 	G_NAV_FREE,
 	G_NAV_LOAD,
@@ -511,6 +507,7 @@ typedef enum gameImportLegacy_e {
 	G_NAV_FLAGALLNODES,
 	G_NAV_GETPATHSCALCULATED,
 	G_NAV_SETPATHSCALCULATED,
+	//rww - END NPC NAV TRAPS
 
 	BOTLIB_SETUP = 250,
 	BOTLIB_SHUTDOWN,
@@ -529,25 +526,32 @@ typedef enum gameImportLegacy_e {
 	BOTLIB_AAS_BBOX_AREAS,
 	BOTLIB_AAS_AREA_INFO,
 	BOTLIB_AAS_ENTITY_INFO,
+
 	BOTLIB_AAS_INITIALIZED,
 	BOTLIB_AAS_PRESENCE_TYPE_BOUNDING_BOX,
 	BOTLIB_AAS_TIME,
+
 	BOTLIB_AAS_POINT_AREA_NUM,
 	BOTLIB_AAS_TRACE_AREAS,
+
 	BOTLIB_AAS_POINT_CONTENTS,
 	BOTLIB_AAS_NEXT_BSP_ENTITY,
 	BOTLIB_AAS_VALUE_FOR_BSP_EPAIR_KEY,
 	BOTLIB_AAS_VECTOR_FOR_BSP_EPAIR_KEY,
 	BOTLIB_AAS_FLOAT_FOR_BSP_EPAIR_KEY,
 	BOTLIB_AAS_INT_FOR_BSP_EPAIR_KEY,
+
 	BOTLIB_AAS_AREA_REACHABILITY,
+
 	BOTLIB_AAS_AREA_TRAVEL_TIME_TO_GOAL_AREA,
+
 	BOTLIB_AAS_SWIMMING,
 	BOTLIB_AAS_PREDICT_CLIENT_MOVEMENT,
 
 	BOTLIB_EA_SAY = 400,
 	BOTLIB_EA_SAY_TEAM,
 	BOTLIB_EA_COMMAND,
+
 	BOTLIB_EA_ACTION,
 	BOTLIB_EA_GESTURE,
 	BOTLIB_EA_TALK,
@@ -563,14 +567,17 @@ typedef enum gameImportLegacy_e {
 	BOTLIB_EA_MOVE_BACK,
 	BOTLIB_EA_MOVE_LEFT,
 	BOTLIB_EA_MOVE_RIGHT,
+
 	BOTLIB_EA_SELECT_WEAPON,
 	BOTLIB_EA_JUMP,
 	BOTLIB_EA_DELAYED_JUMP,
 	BOTLIB_EA_MOVE,
 	BOTLIB_EA_VIEW,
+
 	BOTLIB_EA_END_REGULAR,
 	BOTLIB_EA_GET_INPUT,
 	BOTLIB_EA_RESET_INPUT,
+
 
 	BOTLIB_AI_LOAD_CHARACTER = 500,
 	BOTLIB_AI_FREE_CHARACTER,
@@ -579,6 +586,7 @@ typedef enum gameImportLegacy_e {
 	BOTLIB_AI_CHARACTERISTIC_INTEGER,
 	BOTLIB_AI_CHARACTERISTIC_BINTEGER,
 	BOTLIB_AI_CHARACTERISTIC_STRING,
+
 	BOTLIB_AI_ALLOC_CHAT_STATE,
 	BOTLIB_AI_FREE_CHAT_STATE,
 	BOTLIB_AI_QUEUE_CONSOLE_MESSAGE,
@@ -597,6 +605,7 @@ typedef enum gameImportLegacy_e {
 	BOTLIB_AI_LOAD_CHAT_FILE,
 	BOTLIB_AI_SET_CHAT_GENDER,
 	BOTLIB_AI_SET_CHAT_NAME,
+
 	BOTLIB_AI_RESET_GOAL_STATE,
 	BOTLIB_AI_RESET_AVOID_GOALS,
 	BOTLIB_AI_PUSH_GOAL,
@@ -620,6 +629,7 @@ typedef enum gameImportLegacy_e {
 	BOTLIB_AI_SAVE_GOAL_FUZZY_LOGIC,
 	BOTLIB_AI_ALLOC_GOAL_STATE,
 	BOTLIB_AI_FREE_GOAL_STATE,
+
 	BOTLIB_AI_RESET_MOVE_STATE,
 	BOTLIB_AI_MOVE_TO_GOAL,
 	BOTLIB_AI_MOVE_IN_DIRECTION,
@@ -630,12 +640,14 @@ typedef enum gameImportLegacy_e {
 	BOTLIB_AI_ALLOC_MOVE_STATE,
 	BOTLIB_AI_FREE_MOVE_STATE,
 	BOTLIB_AI_INIT_MOVE_STATE,
+
 	BOTLIB_AI_CHOOSE_BEST_FIGHT_WEAPON,
 	BOTLIB_AI_GET_WEAPON_INFO,
 	BOTLIB_AI_LOAD_WEAPON_WEIGHTS,
 	BOTLIB_AI_ALLOC_WEAPON_STATE,
 	BOTLIB_AI_FREE_WEAPON_STATE,
 	BOTLIB_AI_RESET_WEAPON_STATE,
+
 	BOTLIB_AI_GENETIC_PARENTS_AND_CHILD_SELECTION,
 	BOTLIB_AI_INTERBREED_GOAL_FUZZY_LOGIC,
 	BOTLIB_AI_MUTATE_GOAL_FUZZY_LOGIC,
@@ -645,16 +657,21 @@ typedef enum gameImportLegacy_e {
 	BOTLIB_AI_GET_CHAT_MESSAGE,
 	BOTLIB_AI_REMOVE_FROM_AVOID_GOALS,
 	BOTLIB_AI_PREDICT_VISIBLE_POSITION,
+
 	BOTLIB_AI_SET_AVOID_GOAL_TIME,
 	BOTLIB_AI_ADD_AVOID_SPOT,
 	BOTLIB_AAS_ALTERNATIVE_ROUTE_GOAL,
 	BOTLIB_AAS_PREDICT_ROUTE,
 	BOTLIB_AAS_POINT_REACHABILITY_AREA_INDEX,
+
 	BOTLIB_PC_LOAD_SOURCE,
 	BOTLIB_PC_FREE_SOURCE,
 	BOTLIB_PC_READ_TOKEN,
 	BOTLIB_PC_SOURCE_FILE_AND_LINE,
 
+	/*
+Ghoul2 Insert Start
+*/
 	G_R_REGISTERSKIN,
 	G_G2_LISTBONES,
 	G_G2_LISTSURFACES,
@@ -681,31 +698,49 @@ typedef enum gameImportLegacy_e {
 	G_G2_CLEANMODELS,
 	G_G2_COLLISIONDETECT,
 	G_G2_COLLISIONDETECTCACHE,
+
 	G_G2_SETROOTSURFACE,
 	G_G2_SETSURFACEONOFF,
 	G_G2_SETNEWORIGIN,
 	G_G2_DOESBONEEXIST,
 	G_G2_GETSURFACERENDERSTATUS,
+
 	G_G2_ABSURDSMOOTHING,
+
+/*
+	//rww - RAGDOLL_BEGIN
+*/
 	G_G2_SETRAGDOLL,
 	G_G2_ANIMATEG2MODELS,
+/*
+	//rww - RAGDOLL_END
+*/
+	//additional ragdoll options -rww
 	G_G2_RAGPCJCONSTRAINT,
 	G_G2_RAGPCJGRADIENTSPEED,
 	G_G2_RAGEFFECTORGOAL,
 	G_G2_GETRAGBONEPOS,
 	G_G2_RAGEFFECTORKICK,
 	G_G2_RAGFORCESOLVE,
+
+	//rww - ik move method, allows you to specify a bone and move it to a world point (within joint constraints)
+	//by using the majority of gil's existing bone angling stuff from the ragdoll code.
 	G_G2_SETBONEIKSTATE,
 	G_G2_IKMOVE,
+
 	G_G2_REMOVEBONE,
+
 	G_G2_ATTACHINSTANCETOENTNUM,
 	G_G2_CLEARATTACHEDINSTANCE,
 	G_G2_CLEANENTATTACHMENTS,
 	G_G2_OVERRIDESERVER,
+
 	G_G2_GETSURFACENAME,
+
 	G_SET_ACTIVE_SUBBSP,
 	G_CM_REGISTER_TERRAIN,
 	G_RMG_INIT,
+
 	G_BOT_UPDATEWAYPOINTS,
 	G_BOT_CALCULATEPATHS
 } gameImportLegacy_t;
@@ -750,6 +785,7 @@ typedef enum gameExportLegacy_e {
 	GAME_NAV_ENTISBREAKABLE,
 	GAME_NAV_ENTISREMOVABLEUSABLE,
 	GAME_NAV_FINDCOMBATPOINTWAYPOINTS,
+	
 	GAME_GETITEMINDEXBYTAG
 } gameExportLegacy_t;
 
@@ -1134,6 +1170,11 @@ typedef struct gameExport_s {
 	int			(*BG_GetItemIndexByTag)				( int tag, int type );
 } gameExport_t;
 
+typedef struct
+{
+	int entID;
+	char name[2048];
+} T_G_ICARUS_REMOVE;
 
 //linking of game library
 typedef gameExport_t* (QDECL *GetGameAPI_t)( int apiVersion, gameImport_t *import );

@@ -14,6 +14,7 @@ Q_EXPORT void dllEntry( intptr_t (QDECL *syscallptr)( intptr_t arg,... ) ) {
 	TranslateSyscalls();
 }
 
+
 int PASSFLOAT( float x ) {
 	floatint_t fi;
 	fi.f = x;
@@ -45,6 +46,7 @@ void trap_Cvar_Update( vmCvar_t *vmCvar ) {
 void trap_Cvar_Set( const char *var_name, const char *value ) {
 	Q_syscall( CG_CVAR_SET, var_name, value );
 }
+
 void trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
 	Q_syscall( CG_CVAR_VARIABLESTRINGBUFFER, var_name, buffer, bufsize );
 }
@@ -72,6 +74,7 @@ void trap_FS_Write( const void *buffer, int len, fileHandle_t f ) {
 void trap_FS_FCloseFile( fileHandle_t f ) {
 	Q_syscall( CG_FS_FCLOSEFILE, f );
 }
+
 int trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize ) {
 	return Q_syscall( CG_FS_GETFILELIST, path, extension, listbuf, bufsize );
 }
@@ -96,12 +99,15 @@ void trap_CM_LoadMap( const char *mapname, qboolean SubBSP ) {
 int trap_CM_NumInlineModels( void ) {
 	return Q_syscall( CG_CM_NUMINLINEMODELS );
 }
+
 clipHandle_t trap_CM_InlineModel( int index ) {
 	return Q_syscall( CG_CM_INLINEMODEL, index );
 }
+
 clipHandle_t trap_CM_TempBoxModel( const vector3 *mins, const vector3 *maxs ) {
 	return Q_syscall( CG_CM_TEMPBOXMODEL, mins, maxs );
 }
+
 clipHandle_t trap_CM_TempCapsuleModel( const vector3 *mins, const vector3 *maxs ) {
 	return Q_syscall( CG_CM_TEMPCAPSULEMODEL, mins, maxs );
 }
@@ -126,6 +132,7 @@ void trap_CM_TransformedCapsuleTrace( trace_t *results, const vector3 *start, co
 int trap_CM_MarkFragments( int numPoints, const vector3 *points, const vector3 *projection, int maxPoints, vector3 *pointBuffer, int maxFragments, markFragment_t *fragmentBuffer ) {
 	return Q_syscall( CG_CM_MARKFRAGMENTS, numPoints, points, projection, maxPoints, pointBuffer, maxFragments, fragmentBuffer );
 }
+
 int trap_S_GetVoiceVolume( int entityNum ) {
 	return Q_syscall( CG_S_GETVOICEVOLUME, entityNum );
 }
@@ -159,6 +166,7 @@ void trap_S_Respatialize( int entityNum, const vector3 *origin, vector3 axis[3],
 void trap_S_ShutUp(qboolean shutUpFactor) {
 	Q_syscall(CG_S_SHUTUP, shutUpFactor);
 }
+
 sfxHandle_t	trap_S_RegisterSound( const char *sample ) {
 	return Q_syscall( CG_S_REGISTERSOUND, sample );
 }
@@ -180,35 +188,45 @@ int trap_S_AddLocalSet( const char *name, vector3 *listener_origin, vector3 *ori
 sfxHandle_t trap_AS_GetBModelSound( const char *name, int stage ) {
 	return Q_syscall(CG_AS_GETBMODELSOUND, name, stage);
 }
+
 void	trap_R_LoadWorldMap( const char *mapname ) {
 	Q_syscall( CG_R_LOADWORLDMAP, mapname );
 }
+
 qhandle_t trap_R_RegisterModel( const char *name ) {
 	return Q_syscall( CG_R_REGISTERMODEL, name );
 }
+
 qhandle_t trap_R_RegisterSkin( const char *name ) {
 	return Q_syscall( CG_R_REGISTERSKIN, name );
 }
+
 qhandle_t trap_R_RegisterShader( const char *name ) {
 	return Q_syscall( CG_R_REGISTERSHADER, name );
 }
+
 qhandle_t trap_R_RegisterShaderNoMip( const char *name ) {
 	return Q_syscall( CG_R_REGISTERSHADERNOMIP, name );
 }
 qhandle_t trap_R_RegisterFont( const char *fontName ) {
 	return Q_syscall( CG_R_REGISTERFONT, fontName);
 }
-int trap_R_Font_StrLenPixels(const char *text, const int iFontIndex, const float scale) {
-	//Raz: HACK! RE_Font_StrLenPixels only works correctly with 1.0f scale
-	float width = (float)Q_syscall( CG_R_FONT_STRLENPIXELS, text, iFontIndex, PASSFLOAT(1.0f));
-	return width * scale;
+
+float	trap_R_Font_StrLenPixels(const char *text, const int iFontIndex, const float scale)
+{
+	//Raz: HACK! RE_Font_StrLenPixels only works semi-correctly with 1.0f scale
+	float width = (float)Q_syscall( CG_R_FONT_STRLENPIXELS, text, iFontIndex, PASSFLOAT(8.0f));
+	return (width/8.0f) * scale;
 }
 int trap_R_Font_StrLenChars(const char *text) {
 	return Q_syscall( CG_R_FONT_STRLENCHARS, text);
 }
-int trap_R_Font_HeightPixels(const int iFontIndex, const float scale) {
-	float height = (float)Q_syscall( CG_R_FONT_STRHEIGHTPIXELS, iFontIndex, PASSFLOAT(1.0f));
-	return height * scale;
+
+float trap_R_Font_HeightPixels(const int iFontIndex, const float scale)
+{
+	//Raz: HACK! RE_Font_HeightPixels only works semi-correctly with 1.0f scale
+	float height = (float)Q_syscall( CG_R_FONT_STRHEIGHTPIXELS, iFontIndex, PASSFLOAT(8.0f));
+	return (height/8.0f) * scale;
 }
 void trap_R_Font_DrawString(int ox, int oy, const char *text, const vector4 *rgba, const int setIndex, int iCharLimit, const float scale) {
 	Q_syscall( CG_R_FONT_DRAWSTRING, ox, oy, text, rgba, setIndex, iCharLimit, PASSFLOAT(scale));
@@ -339,39 +357,56 @@ void trap_SetClientTurnExtent(float turnAdd, float turnSub, int turnTime) {
 void trap_OpenUIMenu(int menuID) {
 	Q_syscall( CG_OPENUIMENU, menuID );
 }
+
+void trap_OpenUIMenu(int menuID)
+{
+	syscall( CG_OPENUIMENU, menuID );
+}
+
 void		testPrintInt( char *string, int i ) {
 	Q_syscall( CG_TESTPRINTINT, string, i );
 }
+
 void		testPrintFloat( char *string, float f ) {
 	Q_syscall( CG_TESTPRINTFLOAT, string, PASSFLOAT(f) );
 }
+
 int trap_MemoryRemaining( void ) {
 	return Q_syscall( CG_MEMORY_REMAINING );
 }
+
 qboolean trap_Key_IsDown( int keynum ) {
 	return Q_syscall( CG_KEY_ISDOWN, keynum );
 }
+
 int trap_Key_GetCatcher( void ) {
 	return Q_syscall( CG_KEY_GETCATCHER );
 }
+
 void trap_Key_SetCatcher( int catcher ) {
 	Q_syscall( CG_KEY_SETCATCHER, catcher );
 }
+
 int trap_Key_GetKey( const char *binding ) {
 	return Q_syscall( CG_KEY_GETKEY, binding );
 }
+
 int trap_PC_AddGlobalDefine( char *define ) {
 	return Q_syscall( CG_PC_ADD_GLOBAL_DEFINE, define );
 }
+
 int trap_PC_LoadSource( const char *filename ) {
 	return Q_syscall( CG_PC_LOAD_SOURCE, filename );
 }
+
 int trap_PC_FreeSource( int handle ) {
 	return Q_syscall( CG_PC_FREE_SOURCE, handle );
 }
+
 int trap_PC_ReadToken( int handle, pc_token_t *pc_token ) {
 	return Q_syscall( CG_PC_READ_TOKEN, handle, pc_token );
 }
+
 int trap_PC_SourceFileAndLine( int handle, char *filename, int *line ) {
 	return Q_syscall( CG_PC_SOURCE_FILE_AND_LINE, handle, filename, line );
 }
@@ -381,33 +416,52 @@ int trap_PC_LoadGlobalDefines ( const char* filename ) {
 void trap_PC_RemoveAllGlobalDefines ( void ) {
 	Q_syscall ( CG_PC_REMOVE_ALL_GLOBAL_DEFINES );
 }
+
 void	trap_S_StopBackgroundTrack( void ) {
 	Q_syscall( CG_S_STOPBACKGROUNDTRACK );
 }
+
 int trap_RealTime(qtime_t *qtime) {
 	return Q_syscall( CG_REAL_TIME, qtime );
 }
-void trap_SnapVector( float *v ) {
+
+void trap_SnapVector( vector3 *v ) {
 	Q_syscall( CG_SNAPVECTOR, v );
 }
+
+// this returns a handle.  arg0 is the name in the format "idlogo.roq", set arg1 to NULL, alteredstates to qfalse (do not alter gamestate)
 int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits) {
   return Q_syscall(CG_CIN_PLAYCINEMATIC, arg0, xpos, ypos, width, height, bits);
 }
+ 
+// stops playing the cinematic and ends it.  should always return FMV_EOF
+// cinematics must be stopped in reverse order of when they are started
 e_status trap_CIN_StopCinematic(int handle) {
   return Q_syscall(CG_CIN_STOPCINEMATIC, handle);
 }
+
+
+// will run a frame of the cinematic but will not draw it.  Will return FMV_EOF if the end of the cinematic has been reached.
 e_status trap_CIN_RunCinematic (int handle) {
   return Q_syscall(CG_CIN_RUNCINEMATIC, handle);
 }
+ 
+
+// draws the current frame
 void trap_CIN_DrawCinematic (int handle) {
   Q_syscall(CG_CIN_DRAWCINEMATIC, handle);
 }
+ 
+
+// allows you to resize the animation dynamically
 void trap_CIN_SetExtents (int handle, int x, int y, int w, int h) {
   Q_syscall(CG_CIN_SETEXTENTS, handle, x, y, w, h);
 }
+
 qboolean trap_GetEntityToken( char *buffer, int bufferSize ) {
 	return Q_syscall( CG_GET_ENTITY_TOKEN, buffer, bufferSize );
 }
+
 qboolean trap_R_inPVS( const vector3 *p1, const vector3 *p2, byte *mask ) {
 	return Q_syscall( CG_R_INPVS, p1, p2, mask );
 }

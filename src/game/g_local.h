@@ -1546,7 +1546,7 @@ int BotAIStartFrame( int time );
 extern	level_locals_t	level;
 extern	gentity_t		g_entities[MAX_GENTITIES];
 
-#define	FOFS(x) ((int)&(((gentity_t *)0)->x))
+#define	FOFS(x) offsetof(gentity_t, x)
 
 #define XCVAR_PROTO
 	#include "g_xcvar.h"

@@ -11,7 +11,7 @@ TARGET = ../../japlus/jampgamei386.so
 FLAGS += -g3 -D_DEBUG
 FLAGS += -I../ -I./ -I../shared/
 FLAGS += -DMISSION_PACK -DQAGAME -D_JK2 -D__GCC__
-FLAGS += -Wall -masm=intel -fno-strict-aliasing
+FLAGS += -masm=intel -m32 -fno-strict-aliasing -march=k8
 
 # Files
 FILES += ai_main.o ai_util.o ai_wpnav.o
@@ -24,14 +24,14 @@ FILES += NPC.o NPC_AI_Atst.o NPC_AI_Default.o NPC_AI_Droid.o NPC_AI_GalakMech.o 
 			NPC_AI_Sniper.o NPC_AI_Stormtrooper.o NPC_AI_Utils.o NPC_AI_Wampa.o NPC_behavior.o NPC_combat.o NPC_goal.o NPC_misc.o NPC_move.o NPC_reactions.o \
 			NPC_senses.o NPC_sounds.o NPC_spawn.o NPC_stats.o NPC_utils.o AnimalNPC.o FighterNPC.o SpeederNPC.o WalkerNPC.o
 FILES += q_math.o q_shared.o tri_coll_test.o w_force.o w_saber.o
-FILES += g_engine.o g_admin.o g_playerbans.o g_unlagged.o g_clientModification.o g_lua.o g_luaevent.o g_crash.o
+FILES += g_engine.o g_admin.o g_playerbans.o g_unlagged.o g_clientModification.o g_lua.o g_luaevent.o #g_crash.o
 FILES += ../shared/qcommon/q_engine.o ../shared/JAPP/jp_tokenparser.o ../shared/json/cJSON.o ../shared/JAPP/jp_promode.o
 FILES += ../shared/libudis86/decode.o ../shared/libudis86/input.o ../shared/libudis86/itab.o ../shared/libudis86/syn.o \
 		../shared/libudis86/syn-att.o ../shared/libudis86/syn-intel.o ../shared/libudis86/udis86.o
 
 # "make"
 $(TARGET):  $(FILES)
-	$(CC) -shared -o $(TARGET) $(FILES)
+	$(CC) $(FLAGS) -shared -o $(TARGET) $(FILES)
 	chmod +x $(TARGET)
 
 # "make .c.o"

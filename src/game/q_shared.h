@@ -38,6 +38,7 @@
 //	#define JPLUA_DEBUG
 	#define RAZTEST //Vehicles? First person stuff?
 	#define IMPROVED_RAGDOLL
+	#define JK2AWARDS
 
 	#ifndef OPENJK
 		#define FAV_SERVERS // jappeng adds this to engine
@@ -301,6 +302,14 @@ float FloatSwap( const float *f );
 
 	#define	PATH_SEP '/'
 	#define RAND_MAX 2147483647
+
+	// bk001205 - try
+	#ifdef Q3_STATIC
+		#define	GAME_HARD_LINKED
+		#define	CGAME_HARD_LINKED
+		#define	UI_HARD_LINKED
+		#define	BOTLIB_HARD_LINKED
+	#endif
 
 	#if !idppc
 		inline static short BigShort( short l ) { return ShortSwap( l ); }
@@ -1503,7 +1512,7 @@ void Parse3DMatrix (const char **buf_p, int z, int y, int x, float *m);
 void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
 
 
-// mode parm for FS_Open
+// mode parm for FS_FOpenFile
 typedef enum fsMode_e {
 	FS_READ,
 	FS_WRITE,
@@ -2557,7 +2566,7 @@ typedef struct entityState_s {
 
 	qboolean	isPortalEnt; //this needs to be seperate for all entities I guess, which is why I couldn't reuse another value.
 
-	int		solid;			// for client side prediction, trap->linkentity sets this properly
+	int		solid;			// for client side prediction, trap_linkentity sets this properly
 
 	int		event;			// impulse events -- muzzle flashes, footsteps, etc
 	int		eventParm;

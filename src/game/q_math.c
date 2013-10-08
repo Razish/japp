@@ -749,9 +749,9 @@ int BoxOnPlaneSide (vector3 *emins, vector3 *emaxs, struct cplane_s *p)
 // fast axial cases
 	if (p->type < 3)
 	{
-		if (p->dist <= emins[p->type])
+		if (p->dist <= emins->data[p->type])
 			return 1;
-		if (p->dist >= emaxs[p->type])
+		if (p->dist >= emaxs->data[p->type])
 			return 2;
 		return 3;
 	}
@@ -760,36 +760,36 @@ int BoxOnPlaneSide (vector3 *emins, vector3 *emaxs, struct cplane_s *p)
 	switch (p->signbits)
 	{
 	case 0:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+		dist1 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
+		dist2 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emins->z;
 		break;
 	case 1:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
+		dist1 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
+		dist2 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emins->z;
 		break;
 	case 2:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+		dist1 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
+		dist2 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
 		break;
 	case 3:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
+		dist1 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
+		dist2 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
 		break;
 	case 4:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+		dist1 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
+		dist2 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
 		break;
 	case 5:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emaxs[2];
+		dist1 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
+		dist2 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
 		break;
 	case 6:
-		dist1 = p->normal[0]*emaxs[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emins[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+		dist1 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emins->z;
+		dist2 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
 		break;
 	case 7:
-		dist1 = p->normal[0]*emins[0] + p->normal[1]*emins[1] + p->normal[2]*emins[2];
-		dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
+		dist1 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emins->z;
+		dist2 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
 		break;
 	default:
 		dist1 = dist2 = 0;		// shut up compiler
@@ -1682,6 +1682,7 @@ int Q_irand(int value1, int value2)
 
 float Q_powf( float x, int y )
 {
+#if 0 //no need for another temporary value, we already have a stack variable to work with
 	float r = x;
 
 	do {
@@ -1690,6 +1691,11 @@ float Q_powf( float x, int y )
 	} while ( y > 0 );
 
 	return r;
+#else
+	for ( y--; y>0; y-- )
+		x *= x;
+	return x;
+#endif
 }
 
 /*
