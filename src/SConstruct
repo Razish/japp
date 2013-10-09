@@ -249,7 +249,7 @@ if int(ARGUMENTS.get( 'game', 0 )):
 		env['CPPDEFINES'] += [ '__GCC__' ]
 	env['LIBS'] = libs['game']
 	env['LIBPREFIX'] = ''
-	env.SharedLibrary( 'game'+arch, files['game'] )
+	env.SharedLibrary( 'jampgame'+arch, files['game'] )
 
 # Client Game
 if int(ARGUMENTS.get( 'cgame', 0 )):

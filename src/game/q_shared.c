@@ -1058,6 +1058,21 @@ char *Q_strrep( const char *string, const char *substr, const char *replacement 
 	return newstr;
 }
 
+char *Q_strrev( char *str ) {
+	char *p1, *p2;
+
+	if ( !VALIDSTRING( str ) )
+		return str; // could be NULL, or empty string
+
+	for ( p1=str, p2=str+strlen(str)-1; p2 > p1; ++p1, --p2 ) {
+		*p1 ^= *p2;
+		*p2 ^= *p1;
+		*p1 ^= *p2;
+	}
+
+	return str;
+}
+
 char *Q_CleanColorStr( char *string ) {
 	char *d;
 	char *s;

@@ -3698,7 +3698,6 @@ GetModuleAPI
 */
 
 gameImport_t *trap = NULL;
-
 Q_EXPORT gameExport_t* QDECL GetModuleAPI( int apiVersion, gameImport_t *import )
 {
 	static gameExport_t ge = {0};

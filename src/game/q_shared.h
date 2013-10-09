@@ -118,6 +118,15 @@ extern int g_G2AllocServer;
 #include <ctype.h>
 #include <limits.h>
 #include <stddef.h>
+#include <stdint.h>
+
+#if UINTPTR_MAX == 0xffffffff
+	#define QARCH 32
+#elif UINTPTR_MAX == 0xffffffffffffffff
+	#define QARCH 64
+#else
+	#error "Could not determine architecture"
+#endif
 
 // this is the define for determining if we have an asm version of a C function
 #if (defined(_M_IX86) || defined(__i386__)) && !defined(__sun__) && !defined(__LCC__)
@@ -1553,6 +1562,7 @@ char *Q_CleanStr( char *string );
 void Q_strstrip( char *string, const char *strip, const char *repl );
 const char *Q_strchrs( const char *string, const char *search );
 char *Q_strrep( const char *string, const char *substr, const char *replacement );
+char *Q_strrev( char *str );
 char *Q_CleanColorStr( char *string );
 
 //=============================================

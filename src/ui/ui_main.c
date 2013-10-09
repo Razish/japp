@@ -7347,14 +7347,14 @@ static int UI_HeadCountByColor() {
 	for (i=0; i<uiInfo.q3HeadCount; i++)
 	{
 		Q_strncpyz( saved, uiInfo.q3HeadNames[i], sizeof( saved ) );
-		strrev( uiInfo.q3HeadNames[i] );
+		Q_strrev( uiInfo.q3HeadNames[i] );
 		if (uiInfo.q3HeadNames[i] && (!Q_stricmpn(uiInfo.q3HeadNames[i], teamname, strlen(teamname)) || (uiSkinColor == TEAM_FREE && Q_stricmpn(uiInfo.q3HeadNames[i], "der", 3 ) && Q_stricmpn(uiInfo.q3HeadNames[i], "eulb", 4 ))) )
 		{
-			strrev( uiInfo.q3HeadNames[i] );
+			Q_strrev( uiInfo.q3HeadNames[i] );
 			c++;
 			continue;
 		}
-		strrev( uiInfo.q3HeadNames[i] );
+		Q_strrev( uiInfo.q3HeadNames[i] );
 	}
 	return c;
 }
@@ -8415,10 +8415,10 @@ static const char *UI_SelectedTeamHead(int index, int *actual) {
 	for (i=0; i<uiInfo.q3HeadCount; i++)
 	{
 		Q_strncpyz( saved, uiInfo.q3HeadNames[i], sizeof( saved ) );
-		strrev( uiInfo.q3HeadNames[i] );
+		Q_strrev( uiInfo.q3HeadNames[i] );
 		if (uiInfo.q3HeadNames[i] && (!Q_stricmpn(uiInfo.q3HeadNames[i], teamname, strlen(teamname)) || (uiSkinColor == TEAM_FREE && Q_stricmpn(uiInfo.q3HeadNames[i], "der", 3 ) && Q_stricmpn(uiInfo.q3HeadNames[i], "eulb", 4 ))) )
 		{
-			strrev( uiInfo.q3HeadNames[i] );
+			Q_strrev( uiInfo.q3HeadNames[i] );
 			if (c==index)
 			{
 				*actual = i;
@@ -8430,7 +8430,7 @@ static const char *UI_SelectedTeamHead(int index, int *actual) {
 			}
 			continue;
 		}
-		strrev( uiInfo.q3HeadNames[i] );
+		Q_strrev( uiInfo.q3HeadNames[i] );
 	}
 	return "";
 }
@@ -10432,7 +10432,7 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad )
 
 				if (bIsImageFile(dirptr, skinname))
 				{ //if it exists
-					if (strnicmp(skinname,"head_",5) == 0)
+					if (Q_stricmpn(skinname,"head_",5) == 0)
 					{
 						if (uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinHeadCount < MAX_PLAYERMODELS) 
 						{
@@ -10444,7 +10444,7 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad )
 							iSkinParts |= 1<<0;
 						}
 					} else
-					if (strnicmp(skinname,"torso_",6) == 0)
+					if (Q_stricmpn(skinname,"torso_",6) == 0)
 					{
 						if (uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinTorsoCount < MAX_PLAYERMODELS) 
 						{
@@ -10455,7 +10455,7 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad )
 							iSkinParts |= 1<<1;
 						}
 					} else
-					if (strnicmp(skinname,"lower_",6) == 0)
+					if (Q_stricmpn(skinname,"lower_",6) == 0)
 					{
 						if (uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinLegCount < MAX_PLAYERMODELS) 
 						{
