@@ -300,9 +300,9 @@ typedef struct uiImport_s {
 	void			(*R_AddRefEntityToScene)				( const refEntity_t *re );
 	void			(*R_ClearScene)							( void );
 	void			(*R_DrawStretchPic)						( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader );
-	int				(*R_Font_StrLenPixels)					( const char *text, const int iFontIndex, const float scale );
+	float			(*R_Font_StrLenPixels)					( const char *text, const int iFontIndex, const float scale );
 	int				(*R_Font_StrLenChars)					( const char *text );
-	int				(*R_Font_HeightPixels)					( const int iFontIndex, const float scale );
+	float			(*R_Font_HeightPixels)					( const int iFontIndex, const float scale );
 	void			(*R_Font_DrawString)					( int ox, int oy, const char *text, const vector4 *rgba, const int setIndex, int iCharLimit, const float scale );
 	int				(*R_LerpTag)							( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, float frac, const char *tagName );
 	void			(*R_ModelBounds)						( clipHandle_t model, vector3 *mins, vector3 *maxs );

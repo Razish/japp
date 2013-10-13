@@ -91,14 +91,14 @@ qhandle_t trap_R_RegisterSkin( const char *name ) {
 qhandle_t trap_R_RegisterFont( const char *fontName ) {
 	return Q_syscall( UI_R_REGISTERFONT, fontName);
 }
-int trap_R_Font_StrLenPixels(const char *text, const int iFontIndex, const float scale) {
+float trap_R_Font_StrLenPixels(const char *text, const int iFontIndex, const float scale) {
 	float width = (float)Q_syscall( UI_R_FONT_STRLENPIXELS, text, iFontIndex, PASSFLOAT(1.0f));
 	return width * scale;
 }
 int trap_R_Font_StrLenChars(const char *text) {
 	return Q_syscall( UI_R_FONT_STRLENCHARS, text);
 }
-int trap_R_Font_HeightPixels(const int iFontIndex, const float scale) {
+float trap_R_Font_HeightPixels(const int iFontIndex, const float scale) {
 	float height = (float)Q_syscall( UI_R_FONT_STRHEIGHTPIXELS, iFontIndex, PASSFLOAT(1.0f));
 	return height * scale;
 }

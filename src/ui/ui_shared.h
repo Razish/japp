@@ -440,9 +440,9 @@ typedef struct {
 	void (*renderScene) ( const refdef_t *fd );
 
 	qhandle_t (*RegisterFont)( const char *fontName );
-	int		(*Font_StrLenPixels) (const char *text, const int iFontIndex, const float scale);
+	float		(*Font_StrLenPixels) (const char *text, const int iFontIndex, const float scale);
 	int		(*Font_StrLenChars) (const char *text);
-	int		(*Font_HeightPixels)(const int iFontIndex, const float scale);
+	float		(*Font_HeightPixels)(const int iFontIndex, const float scale);
 	void	(*Font_DrawString)(int ox, int oy, const char *text, const vector4 *rgba, const int setIndex, int iCharLimit, const float scale);
 	qboolean (*Language_IsAsian)(void);
 	qboolean (*Language_UsesSpaces)(void);

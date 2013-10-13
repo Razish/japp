@@ -11814,6 +11814,20 @@ GetModuleAPI
 
 uiImport_t *trap = NULL;
 
+typedef int (*R_Font_StrLenPixels_t)( const char *text, const int iFontIndex, const float scale );
+int (*R_Font_StrLenPixels)( const char *text, const int iFontIndex, const float scale );
+float UI_Font_StrLenPixels( const char *text, const int iFontIndex, const float scale ) {
+	float width = (float)R_Font_StrLenPixels( text, iFontIndex, 4.0f );
+	return (width/4.0f) * scale;
+}
+
+int (*R_Font_HeightPixels)( const int iFontIndex, const float scale );
+typedef int (*R_Font_HeightPixels_t)( const int iFontIndex, const float scale );
+float UI_Font_HeightPixels( const int iFontIndex, const float scale ) {
+	float height = (float)R_Font_HeightPixels( iFontIndex, 4.0f );
+	return (height/4.0f) * scale;
+}
+
 Q_EXPORT uiExport_t* QDECL GetModuleAPI( int apiVersion, uiImport_t *import )
 {
 	static uiExport_t uie = {0};
@@ -11822,6 +11836,12 @@ Q_EXPORT uiExport_t* QDECL GetModuleAPI( int apiVersion, uiImport_t *import )
 	trap = import;
 	Com_Printf	= trap->Print;
 	Com_Error	= trap->Error;
+
+	//HACK: work-around for JA's crappy width calculation
+	R_Font_StrLenPixels = (R_Font_StrLenPixels_t)trap->R_Font_StrLenPixels;
+	R_Font_HeightPixels = (R_Font_HeightPixels_t)trap->R_Font_HeightPixels;
+	trap->R_Font_StrLenPixels = UI_Font_StrLenPixels;
+	trap->R_Font_HeightPixels = UI_Font_HeightPixels;
 
 	memset( &uie, 0, sizeof( uie ) );
 

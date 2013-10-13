@@ -413,7 +413,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 			trap->S_StartLocalSound( cgs.media.humiliationSound, CHAN_ANNOUNCER );
 
 		else if ( (ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_HOLYSHIT) != (ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_HOLYSHIT) )
-			trap_S_StartLocalSound( cgs.media.holyShitSound, CHAN_ANNOUNCER );
+			trap->S_StartLocalSound( cgs.media.holyShitSound, CHAN_ANNOUNCER );
 
 		reward = qtrue;
 	}
