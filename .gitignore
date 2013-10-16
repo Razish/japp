@@ -171,3 +171,7 @@ pip-log.txt
 #############
 *.o
 *.so
+*.os
+
+# SCons
+.sconsign.dblite
