@@ -7,7 +7,7 @@
 // Makes the memory at address writable for at least size bytes.
 // Returns 1 if successful, returns 0 on failure.
 // ==================================================
-qboolean UnlockMemory( int address, int size )
+qboolean UnlockMemory( intptr_t address, int size )
 {
 	#ifdef _WIN32
 
@@ -16,7 +16,9 @@ qboolean UnlockMemory( int address, int size )
 
 	#else // Linux is a bit more tricky
 
-		int ret, page1, page2;
+		int ret;
+		intptr_t page1, page2;
+
 		page1 = address & ~( getpagesize() - 1);
 		page2 = (address+size) & ~( getpagesize() - 1);
 
@@ -38,7 +40,7 @@ qboolean UnlockMemory( int address, int size )
 // Makes the memory at address read-only for at least size bytes.
 // Returns 1 if successful, returns 0 on failure.
 // ==================================================
-qboolean LockMemory( int address, int size )
+qboolean LockMemory( intptr_t address, int size )
 {
 	#ifdef _WIN32
 
@@ -47,7 +49,9 @@ qboolean LockMemory( int address, int size )
 
 	#else // Linux is a bit more tricky
 
-		int ret, page1, page2;
+		int ret;
+		intptr_t page1, page2;
+
 		page1 = address & ~( getpagesize() - 1);
 		page2 = (address+size) & ~( getpagesize() - 1);
 
@@ -70,12 +74,12 @@ void PlaceHook( hookEntry_t *hook )
 
 	if ( hook && (success = UnlockMemory( hook->hookPosition, 5 )) )
 	{
-		unsigned int forward = (unsigned int)((void*(*)())hook->hookForward)(); //i never want to see this line again
+		uintptr_t forward = (uintptr_t)((void*(*)())hook->hookForward)(); //i never want to see this line again
 		if ( !memcmp( (const void *)&hook->origBytes[0], (const void *)hook->hookPosition, sizeof( hook->origBytes ) ) )
 		{
 			//	memcpy( &hook->origBytes[0], (void *)hook->hookPosition, 5 );
 			*(unsigned char *)(hook->hookPosition) = hook->hookOpcode;
-			*(unsigned int *)(hook->hookPosition+1) = (forward) - ((unsigned int)(hook->hookPosition)+5);
+			*(uintptr_t *)(hook->hookPosition+1) = (forward) - ((uintptr_t)(hook->hookPosition)+5);
 			success = LockMemory( hook->hookPosition, 5 );
 		}
 		else

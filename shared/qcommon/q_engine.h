@@ -10,16 +10,16 @@ typedef struct netadr_s {
 // Common engine modification data and functions
 
 typedef struct hookEntry_s {
-	const unsigned int	hookPosition;	//	The code we're patching
+	const uintptr_t		hookPosition;	//	The code we're patching
 	unsigned char		origBytes[5];	//	What it originally was
 	unsigned char		hookOpcode;		//	CALL or JMP
-	const unsigned int	hookForward;	//	Function to direct the control flow into
+	const uintptr_t		hookForward;	//	Function to direct the control flow into
 	const char			*name;			//	Long name of the hook
 } hookEntry_t;
 
 typedef struct cvarEntry_s {
-	const char		*cvarname;
-	unsigned int	flags;
+	const char	*cvarname;
+	uint32_t	flags;
 } cvarEntry_t;
 
 typedef enum engineDisable_e {
@@ -65,8 +65,8 @@ typedef enum engineDisable_e {
 }
 
 // Helper functions
-qboolean UnlockMemory( int address, int size );
-qboolean LockMemory( int address, int size );
+qboolean UnlockMemory( intptr_t address, int size );
+qboolean LockMemory( intptr_t address, int size );
 #ifndef OPENJK
 	void PlaceHook( hookEntry_t *hook );
 	void RemoveHook( const hookEntry_t *hook );
