@@ -221,7 +221,7 @@ files['ui'] = [
 	'ui/ui_syscalls.c' ]
 
 # set up libraries to link with
-if plat == 'Linux':
+if env['PLATFORM'] == 'posix':
     libs['game']        = [ 'm', 'lua5.1' ]
     libs['cgame']       = [ 'm', 'lua5.1', 'GL' ]
     libs['ui']          = [ 'm', 'curl' ]
@@ -231,10 +231,21 @@ else:
     libs['ui']          = []
 
 # compiler options
-if plat == 'Linux':
-	env['CCFLAGS'] = [ '-g3', '-march=k8', '-fno-strict-aliasing' ]
+if env['PLATFORM'] == 'posix':
+	env['CPPDEFINES'] = [ '__GCC__' ]
+	env['CCFLAGS'] = [ '-march=k8', '-fno-strict-aliasing' ]
 else:
+	env['CPPDEFINES'] = []
 	env['CCFLAGS'] = []
+# debug / release
+if int( ARGUMENTS.get( 'debug', 0 ) ):
+	if env['PLATFORM'] == 'posix':
+		env['CCFLAGS'] += [ '-g3' ]
+	env['CPPDEFINES'] += [ '_DEBUG' ]
+else:
+	if env['PLATFORM'] == 'posix':
+		env['CCFLAGS'] += [ '-O2' ]
+	env['CPPDEFINES'] += [ 'NDEBUG' ]
 
 
 #################
@@ -244,9 +255,7 @@ else:
 # Game
 if int(ARGUMENTS.get( 'game', 0 )):
 	env['CPPPATH'] = [ '.', './game', './shared' ]
-	env['CPPDEFINES'] = [ '_GAME', '_JK2', 'JK2AWARDS', 'MISSIONPACK' ]
-	if env['PLATFORM'] == 'posix':
-		env['CPPDEFINES'] += [ '__GCC__' ]
+	env['CPPDEFINES'] += [ '_GAME', '_JK2', 'JK2AWARDS', 'MISSIONPACK' ]
 	env['LIBS'] = libs['game']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'jampgame'+arch, files['game'] )
@@ -254,9 +263,7 @@ if int(ARGUMENTS.get( 'game', 0 )):
 # Client Game
 if int(ARGUMENTS.get( 'cgame', 0 )):
 	env['CPPPATH'] = [ '.', './cgame', './shared', './game' ]
-	env['CPPDEFINES'] = [ '_CGAME', '_JK2', 'MISSIONPACK' ]
-	if env['PLATFORM'] == 'posix':
-		env['CPPDEFINES'] += [ '__GCC__' ]
+	env['CPPDEFINES'] += [ '_CGAME', '_JK2', 'MISSIONPACK' ]
 	env['LIBS'] = libs['cgame']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'cgame'+arch, files['cgame'] )
@@ -264,9 +271,7 @@ if int(ARGUMENTS.get( 'cgame', 0 )):
 # UI
 if int(ARGUMENTS.get( 'ui', 0 )):
 	env['CPPPATH'] = [ '.', './shared', './game', './curl' ]
-	env['CPPDEFINES'] = [ '_UI', 'PROJECT_UI' ]
-	if env['PLATFORM'] == 'posix':
-		env['CPPDEFINES'] += [ '__GCC__' ]
+	env['CPPDEFINES'] += [ '_UI', 'PROJECT_UI' ]
 	env['LIBS'] = libs['ui']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'ui'+arch, files['ui'] )
