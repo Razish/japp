@@ -81,18 +81,19 @@ void G_ReadSessionData( gclient_t *client )
 	char		s[MAX_CVAR_VALUE_STRING] = {0};
 	const char	*var;
 	int			i = 0;
+	int			tmp1, tmp2, tmp3;
 
 	var = va( "session%i", client - level.clients );
 	trap->Cvar_VariableStringBuffer( var, s, sizeof(s) );
 
 	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %i %s %s",
-		&client->sess.sessionTeam,
+		&tmp1,
 		&client->sess.spectatorTime,
-		&client->sess.spectatorState,
+		&tmp2,
 		&client->sess.spectatorClient,
 		&client->sess.wins,
 		&client->sess.losses,
-		&client->sess.teamLeader,
+		&tmp3,
 		&client->sess.setForce,
 		&client->sess.saberLevel,
 		&client->sess.selectedFP,
@@ -102,6 +103,10 @@ void G_ReadSessionData( gclient_t *client )
 		client->sess.siegeClass,
 		client->sess.IP
 		);
+
+	client->sess.sessionTeam = tmp1;
+	client->sess.spectatorState = tmp2;
+	client->sess.teamLeader = tmp3;
 
 	// convert back to spaces from unused chars, as session data is written that way.
 	for ( i=0; client->sess.siegeClass[i]; i++ )

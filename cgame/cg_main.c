@@ -531,13 +531,16 @@ static void CVU_ChatboxBG( void ) {
 
 static void CVU_DuelColour( void ) {
 	ivector4 *v = &cg.duelColour.rgba;
-	if ( sscanf( cg_duelColour.string, "%i %i %i %i %i", &v->r, &v->g, &v->b, &v->a, &cg.duelColour.forceAlpha ) != 5 ) {
+	int tmp;
+	if ( sscanf( cg_duelColour.string, "%i %i %i %i %i", &v->r, &v->g, &v->b, &v->a, &tmp ) != 5 ) {
 		v->r = 75;
 		v->g = 75;
 		v->b = 224;
 		v->a = 128;
-		cg.duelColour.forceAlpha = 0;
+		cg.duelColour.forceAlpha = qfalse;
 	}
+	else
+		cg.duelColour.forceAlpha = tmp;
 }
 
 static void CVU_GunAlign( void ) {
@@ -594,13 +597,16 @@ static void CVU_StatsPos( void ) {
 
 static void CVU_ShieldColour( void ) {
 	ivector4 *v = &cg.shieldColour.rgba;
-	if ( sscanf( cg_shieldColour.string, "%i %i %i %i %i", &v->r, &v->g, &v->b, &v->a, &cg.shieldColour.forceAlpha ) != 5 ) {
+	int tmp;
+	if ( sscanf( cg_shieldColour.string, "%i %i %i %i %i", &v->r, &v->g, &v->b, &v->a, &tmp ) != 5 ) {
 		v->r = 75;
 		v->g = 128;
 		v->b = 224;
 		v->a = 255;
-		cg.shieldColour.forceAlpha = 0;
+		cg.shieldColour.forceAlpha = qfalse;
 	}
+	else
+		cg.shieldColour.forceAlpha = tmp;
 }
 
 static void CVU_StrafeHelpColour( void ) {
@@ -622,12 +628,15 @@ static void CVU_StrafeTrailWeights( void ) {
 }
 
 static void CVU_ViewBob( void ) {
-	if ( sscanf( cg_viewBob.string, "%f %f %f %i", &cg.viewBob.pitch, &cg.viewBob.roll, &cg.viewBob.up, &cg.viewBob.fall ) != 4 ) {
+	int tmp;
+	if ( sscanf( cg_viewBob.string, "%f %f %f %i", &cg.viewBob.pitch, &cg.viewBob.roll, &cg.viewBob.up, &tmp ) != 4 ) {
 		cg.viewBob.pitch	= 0.002f;
 		cg.viewBob.roll		= 0.002f;
 		cg.viewBob.up		= 0.005f;
-		cg.viewBob.fall		= 1;
+		cg.viewBob.fall		= qtrue;
 	}
+	else
+		cg.viewBob.fall = tmp;
 }
 
 static void CVU_AutomapAngle( void ) {
