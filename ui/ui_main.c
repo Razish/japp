@@ -8598,7 +8598,6 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 						}
 						//check for saberonly and restricted force powers
 						gametype = atoi(Info_ValueForKey(info, "gametype"));
-#if 0
 						if ( gametype != GT_JEDIMASTER )
 						{
 							
@@ -8646,7 +8645,6 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 								}
 							}
 						}
-#endif
 						if ( ui_netSource.integer == AS_LOCAL ) {
 							Com_sprintf( hostname, sizeof(hostname), "%s [%s]",
 											Info_ValueForKey(info, "hostname"),
