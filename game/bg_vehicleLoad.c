@@ -1402,7 +1402,7 @@ int BG_VehicleGetIndex( const char *vehicleName )
 //with a $ in front of it.
 //we are expected to then get the model for the
 //vehicle and stomp over modelname with it.
-void BG_GetVehicleModelName(char *modelname, int len)
+void BG_GetVehicleModelName( char *modelname, int len )
 {
 	char *vehName = &modelname[1];
 	int vIndex = BG_VehicleGetIndex(vehName);
