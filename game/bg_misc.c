@@ -1437,8 +1437,8 @@ NOTENOTE This weapon is not yet complete.  Don't place it.
 	{
 		"ammo_tripmine", 
 		"sound/weapons/w_pkup.wav",
-        { "models/weapons2/laser_trap/laser_trap->pu.md3", 
-		"models/weapons2/laser_trap/laser_trap->w.glm", 0, 0},
+        { "models/weapons2/laser_trap/laser_trap_pu.md3", 
+		"models/weapons2/laser_trap/laser_trap_w.glm", 0, 0},
 /* view */		"models/weapons2/laser_trap/laser_trap.md3", 
 /* icon */		"gfx/hud/w_icon_tripmine",
 /* pickup *///	"Trip Mines",
@@ -1490,7 +1490,7 @@ NOTENOTE This weapon is not yet complete.  Don't place it.
 	{
 		"weapon_trip_mine", 
 		"sound/weapons/w_pkup.wav",
-        { "models/weapons2/laser_trap/laser_trap->w.glm", "models/weapons2/laser_trap/laser_trap->pu.md3",
+        { "models/weapons2/laser_trap/laser_trap_w.glm", "models/weapons2/laser_trap/laser_trap_pu.md3",
 		0, 0},
 /* view */		"models/weapons2/laser_trap/laser_trap.md3", 
 /* icon */		"gfx/hud/w_icon_tripmine",
