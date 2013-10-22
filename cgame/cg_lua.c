@@ -547,7 +547,7 @@ static int JPLua_RegisterPlugin( lua_State *L )
 	Q_strncpyz( JPLua.currentPlugin->version, lua_tostring( L, 2 ), sizeof( JPLua.currentPlugin->version ) );
 	Q_CleanColorStr( JPLua.currentPlugin->version );
 	JPLua.currentPlugin->requiredJPLuaVersion = lua_isnumber( L, 3 ) ? lua_tointeger( L, 3 ) : JPLua.version;
-	JPLua.currentPlugin->UID = (unsigned int)JPLua.currentPlugin;
+	JPLua.currentPlugin->UID = (intptr_t)JPLua.currentPlugin;
 
 	//lua_newtable( L );
 	lua_newtable( L );
