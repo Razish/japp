@@ -6048,6 +6048,7 @@ void Item_Model_Paint(itemDef_t *item)
 		VectorCopy(&modelPtr->g2scale, &ent.modelScale);
 		UI_ScaleModelAxis(&ent);
 #ifndef _CGAME
+		if ( item->flags & ITF_ISCHARACTER )
 		{
 			char modelPath[MAX_QPATH] = {0}, skinpath[MAX_QPATH] = {0};
 			char *skinPtr = NULL, *finalSkin = NULL;
