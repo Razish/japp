@@ -18,6 +18,40 @@ print( '\n********************************\n' )
 files = {}
 libs = {}
 
+files['lua'] = [
+	'lua/bit.c',
+	'lua/lapi.c',
+	'lua/lauxlib.c',
+	'lua/lbaselib.c',
+	'lua/lcode.c',
+	'lua/ldblib.c',
+	'lua/ldebug.c',
+	'lua/ldo.c',
+	'lua/ldump.c',
+	'lua/lfunc.c',
+	'lua/lgc.c',
+	'lua/linit.c',
+	'lua/liolib.c',
+	'lua/llex.c',
+	'lua/lmathlib.c',
+	'lua/lmem.c',
+	'lua/loadlib.c',
+	'lua/lobject.c',
+	'lua/lopcodes.c',
+	'lua/loslib.c',
+	'lua/lparser.c',
+	'lua/lstate.c',
+	'lua/lstring.c',
+	'lua/lstrlib.c',
+	'lua/ltable.c',
+	'lua/ltablib.c',
+	'lua/ltm.c',
+	'lua/lua.c',
+	'lua/lundump.c',
+	'lua/lvm.c',
+	'lua/lzio.c',
+	'lua/print.c' ]
+
 files['game'] = [
 	'shared/JAPP/jp_promode.c',
 	'shared/JAPP/jp_tokenparser.c',
@@ -126,7 +160,7 @@ files['game'] = [
 	'game/tri_coll_test.c',
 	'game/w_force.c',
 	'game/w_saber.c',
-	'game/WalkerNPC.c' ]
+	'game/WalkerNPC.c' ] + files['lua']
 
 files['cgame'] = [
 	'game/AnimalNPC.c',
@@ -198,7 +232,7 @@ files['cgame'] = [
 	'cgame/GLee.c',
 	'cgame/tr_ext_extras.c',
 	'cgame/tr_ext_framebuffer.c',
-	'cgame/tr_ext_glsl_program.c' ]
+	'cgame/tr_ext_glsl_program.c' ] + files['lua']
 
 files['ui'] = [
 	'game/bg_misc.c',
@@ -222,9 +256,9 @@ files['ui'] = [
 
 # set up libraries to link with
 if env['PLATFORM'] == 'posix':
-    libs['game']        = [ 'm', 'lua5.1' ]
-    libs['cgame']       = [ 'm', 'lua5.1', 'GL' ]
-    libs['ui']          = [ 'm', 'curl' ]
+    libs['game']        = [ 'm' ]
+    libs['cgame']       = [ 'm', 'GL' ]
+    libs['ui']          = [ 'm' ]
 else:
     libs['game']        = []
     libs['cgame']       = []
@@ -271,7 +305,7 @@ if int(ARGUMENTS.get( 'cgame', 0 )):
 # UI
 if int(ARGUMENTS.get( 'ui', 0 )):
 	env['CPPPATH'] = [ '.', './shared', './game', './curl' ]
-	env['CPPDEFINES'] += [ '_UI', 'PROJECT_UI' ]
+	env['CPPDEFINES'] += [ '_UI' ]
 	env['LIBS'] = libs['ui']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'ui'+arch, files['ui'] )
