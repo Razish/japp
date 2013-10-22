@@ -1606,40 +1606,6 @@ static void UI_SetCapFragLimits(qboolean uiVars) {
 	}
 }
 
-#if 0
-static const char* UI_GetGameTypeName(int gtEnum)
-{
-	switch ( gtEnum ) 
-	{
-	case GT_FFA:
-		return UI_GetStringEdString("MENUS", "FREE_FOR_ALL");//"Free For All";
-	case GT_HOLOCRON:
-		return UI_GetStringEdString("MENUS", "HOLOCRON_FFA");//"Holocron FFA";
-	case GT_JEDIMASTER:
-		//Raz: JK2 gametypes
-		//	return UI_GetStringEdString("MENUS", "SAGA");//"Jedi Master";??
-		return "Jedi Master";
-	case GT_SINGLE_PLAYER:
-		//	return UI_GetStringEdString("MENUS", "SAGA");//"Team FFA";
-		return "Cooperative";
-	case GT_DUEL:
-		return UI_GetStringEdString("MENUS", "DUEL");//"Team FFA";
-	case GT_POWERDUEL:
-		return UI_GetStringEdString("MENUS", "POWERDUEL");//"Team FFA";
-	case GT_TEAM:
-		return UI_GetStringEdString("MENUS", "TEAM_FFA");//"Team FFA";
-	case GT_SIEGE:
-		return UI_GetStringEdString("MENUS", "SIEGE");//"Siege";
-	case GT_CTF:
-		return UI_GetStringEdString("MENUS", "CAPTURE_THE_FLAG");//"Capture the Flag";
-	case GT_CTY:
-		return UI_GetStringEdString("MENUS", "CAPTURE_THE_YSALIMARI");//"Capture the Ysalamiri";
-	}
-	return UI_GetStringEdString("MENUS", "SAGA");//"Team FFA";
-}
-#endif
-
-
 // ui_gameType assumes gametype 0 is -1 ALL and will not show
 static void UI_DrawGameType(rectDef_t *rect, float scale, vector4 *color, int textStyle, int iMenuFont) 
 {
@@ -7273,7 +7239,7 @@ static int UI_MapCountByGameType(qboolean singlePlayer) {
 	if ( game == GT_TEAM )
 		game = GT_FFA;
 
-	//Raz: JK2 gametypes~
+	//Raz: JK2 gametypes
 	//Since GT_CTY uses the same entities as CTF, use the same map sets
 	if ( game == GT_CTY )
 		game = GT_CTF;
