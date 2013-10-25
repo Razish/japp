@@ -22,7 +22,7 @@ vector4		colorDkGrey	= {0.25, 0.25, 0.25, 1};
 vector4		colorLtBlue	= {0.367f, 0.261f, 0.722f, 1};
 vector4		colorDkBlue	= {0.199f, 0.0f,   0.398f, 1};
 
-vector4	g_color_table[10] =
+vector4	g_color_table[Q_COLOR_BITS+1] =
 {
 	{ 0.0f, 0.0f, 0.0f, 1.0f }, // black
 	{ 1.0f, 0.0f, 0.0f, 1.0f }, // red
@@ -32,8 +32,8 @@ vector4	g_color_table[10] =
 	{ 0.0f, 1.0f, 1.0f, 1.0f }, // cyan
 	{ 1.0f, 0.0f, 1.0f, 1.0f }, // magenta
 	{ 1.0f, 1.0f, 1.0f, 1.0f }, // white
-	{ 0.5f, 0.5f, 0.5f, 1.0f }, // grey
 	{ 1.0f, 0.5f, 0.0f, 1.0f }, // orange
+	{ 0.5f, 0.5f, 0.5f, 1.0f },	// md.grey
 };
 
 

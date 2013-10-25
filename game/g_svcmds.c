@@ -251,16 +251,16 @@ static void SV_BotList_f( void ) {
 	for ( i=0; i<level.bots.num; i++ )
 	{
 		Q_strncpyz( name, Info_ValueForKey( level.bots.infos[i], "name" ), sizeof( name ) );
-		Q_CleanColorStr( name );
+		Q_StripColor( name );
 
 		Q_strncpyz( funname, Info_ValueForKey( level.bots.infos[i], "funname" ), sizeof( funname ) );
-		Q_CleanColorStr( funname );
+		Q_StripColor( funname );
 
 		Q_strncpyz( model, Info_ValueForKey( level.bots.infos[i], "model" ), sizeof( model ) );
-		Q_CleanColorStr( model );
+		Q_StripColor( model );
 
 		Q_strncpyz( personality, Info_ValueForKey( level.bots.infos[i], "personality" ), sizeof( personality ) );
-		Q_CleanColorStr( personality );
+		Q_StripColor( personality );
 
 		trap->Print( "%-16s %-16s %-20s %-20s\n", name, model, personality, funname );
 	}
@@ -330,13 +330,13 @@ static void SV_ListMaps_f( void ) {
 	for ( i=0; i<level.arenas.num; i++ )
 	{
 		Q_strncpyz( map, Info_ValueForKey( level.arenas.infos[i], "map" ), sizeof( map ) );
-		Q_CleanColorStr( map );
+		Q_StripColor( map );
 
 		Q_strncpyz( longname, Info_ValueForKey( level.arenas.infos[i], "longname" ), sizeof( longname ) );
-		Q_CleanColorStr( longname );
+		Q_StripColor( longname );
 
 		Q_strncpyz( type, Info_ValueForKey( level.arenas.infos[i], "type" ), sizeof( type ) );
-		Q_CleanColorStr( type );
+		Q_StripColor( type );
 
 		trap->Print( "  %-24s%-32s%-64s\n", map, longname, type );
 	}

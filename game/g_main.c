@@ -2626,7 +2626,7 @@ void CheckVote( void ) {
 	if ( level.voteExecuteTime && level.voteExecuteTime < level.time ) {
 		level.voteExecuteTime = 0;
 		if ( !level.votePoll )
-			trap->SendConsoleCommand( EXEC_APPEND, va("%s\n", level.voteString ) );
+			trap->SendConsoleCommand( EXEC_APPEND, va( "%s\n", level.voteString ) );
 
 		if (level.votingGametype)
 		{

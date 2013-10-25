@@ -684,7 +684,7 @@ void JP_ChatboxSelectTabNext( void )
 			return;
 
 		Q_strncpyz( currWord, p, sizeof( currWord ) );
-		Q_CleanColorStr( currWord );
+		Q_StripColor( currWord );
 		Q_strlwr( currWord );
 
 		for ( i=0; i<cgs.maxclients; i++ )
@@ -694,7 +694,7 @@ void JP_ChatboxSelectTabNext( void )
 				char name[MAX_QPATH/*MAX_NETNAME*/] = { 0 }; // because cgs.clientinfo[i].name uses MAX_QPATH...wtf...
 
 				Q_strncpyz( name, cgs.clientinfo[i].name, sizeof( name ) );
-				Q_CleanColorStr( name );
+				Q_StripColor( name );
 				Q_strlwr( name );
 				if ( strstr( name, currWord ) )
 				{

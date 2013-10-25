@@ -1275,11 +1275,12 @@ extern vector4 colorDkGrey;
 extern vector4 colorLtBlue;
 extern vector4 colorDkBlue;
 
-#define Q_COLOR_ESCAPE	'^'
+#define Q_COLOR_ESCAPE		'^'
+#define Q_COLOR_BITS 0xF // was 7
 // you MUST have the last bit on here about colour strings being less than 7 or taiwanese strings register as colour!!!!
 //#define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= '7' && *((p)+1) >= '0' )
 #define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= '9' && *((p)+1) >= '0' )
-
+#define Q_IsColorStringExt(p)	((p) && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) >= '0' && *((p)+1) <= '9') // ^[0-9]
 
 #define COLOR_BLACK		'0'
 #define COLOR_RED		'1'
@@ -1289,7 +1290,9 @@ extern vector4 colorDkBlue;
 #define COLOR_CYAN		'5'
 #define COLOR_MAGENTA	'6'
 #define COLOR_WHITE		'7'
-#define ColorIndex(c)	( ( (c) - '0' ) & 0xF )
+#define COLOR_ORANGE	'8'
+#define COLOR_GREY		'9'
+#define ColorIndex(c)	( ( (c) - '0' ) & Q_COLOR_BITS )
 
 #define S_COLOR_BLACK	"^0"
 #define S_COLOR_RED		"^1"
@@ -1299,8 +1302,10 @@ extern vector4 colorDkBlue;
 #define S_COLOR_CYAN	"^5"
 #define S_COLOR_MAGENTA	"^6"
 #define S_COLOR_WHITE	"^7"
+#define S_COLOR_ORANGE	"^8"
+#define S_COLOR_GREY	"^9"
 
-extern vector4	g_color_table[10];
+extern vector4	g_color_table[Q_COLOR_BITS+1];
 
 #define	MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
 #define	MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
@@ -1542,6 +1547,8 @@ int Q_isprint( int c );
 int Q_islower( int c );
 int Q_isupper( int c );
 int Q_isalpha( int c );
+qboolean Q_isanumber( const char *s );
+qboolean Q_isintegral( float f );
 
 // portable case insensitive compare
 int		Q_stricmp (const char *s1, const char *s2);
@@ -1563,7 +1570,7 @@ void Q_strstrip( char *string, const char *strip, const char *repl );
 const char *Q_strchrs( const char *string, const char *search );
 char *Q_strrep( const char *string, const char *substr, const char *replacement );
 char *Q_strrev( char *str );
-char *Q_CleanColorStr( char *string );
+void Q_StripColor( char *string );
 
 //=============================================
 

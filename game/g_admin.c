@@ -478,9 +478,9 @@ static void AM_WhoIs( gentity_t *ent )
 			char strAdmin[32] = { 0 };
 
 			Q_strncpyz( strName, cl->pers.netname, sizeof( strName ) );
-			Q_CleanColorStr( strName );
+			Q_StripColor( strName );
 			Q_strncpyz( strAdmin, (cl->pers.adminUser) ? cl->pers.adminUser->user : "", sizeof( strAdmin ) );
-			Q_CleanColorStr( strAdmin );
+			Q_StripColor( strAdmin );
 
 			Q_strcat( msg, sizeof( msg ), va( "%-36s%-32s\n", strName, strAdmin ) );
 		}
@@ -521,9 +521,9 @@ static void AM_Status( gentity_t *ent )
 			char strAdmin[32] = {0};
 
 			Q_strncpyz( strNum, va( "(%i)", i ), sizeof( strNum ) );
-			Q_CleanColorStr( strNum );
+			Q_StripColor( strNum );
 			Q_strncpyz( strName, cl->pers.netname, sizeof( strName ) );
-			Q_CleanColorStr( strName );
+			Q_StripColor( strName );
 			#ifndef OPENJK
 			if ( svs->clients[i].netchan.remoteAddress.type == NA_BOT )
 				Q_strncpyz( strIP, "BOT", sizeof( strIP ) );
@@ -533,7 +533,7 @@ static void AM_Status( gentity_t *ent )
 				Q_strncpyz( strIP, cl->sess.IP, sizeof( strIP ) );
 			#endif // !OPENJK
 			Q_strncpyz( strAdmin, (cl->pers.adminUser) ? cl->pers.adminUser->user : "", sizeof( strAdmin ) );
-			Q_CleanColorStr( strAdmin );
+			Q_StripColor( strAdmin );
 
 			tmpMsg = va( "%-12s%-36s%-24s%-32s\n", strNum, strName, strIP, strAdmin );
 
@@ -989,7 +989,7 @@ static void AM_Poll( gentity_t *ent )
 	trap->Argv( 0, arg1, sizeof( arg1 ) );
 	//Q_strncpyz( arg2, ConcatArgs( 2 ), sizeof( arg2 ) );
 	Q_strncpyz( arg2, ent->client->pers.netname, sizeof( arg2 ) );
-	Q_CleanColorStr( arg2 );
+	Q_StripColor( arg2 );
 	Q_CleanStr( arg2 );
 	Q_strstrip( arg2, "\n\r;\"", NULL );
 

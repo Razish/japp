@@ -780,6 +780,25 @@ int Q_isalpha( int c )
 	return ( 0 );
 }
 
+qboolean Q_isanumber( const char *s ) {
+	char *p;
+	double ret;
+
+	if ( *s == '\0' )
+		return qfalse;
+
+	ret = strtod( s, &p );
+	
+	if ( ret == HUGE_VAL || errno == ERANGE )
+		return qfalse;
+
+	return (qboolean)(*p == '\0');
+}
+
+qboolean Q_isintegral( float f ) {
+	return (qboolean)( (int)f == f );
+}
+
 char* Q_strrchr( const char* string, int c )
 {
 	char cc = c;
@@ -1073,32 +1092,29 @@ char *Q_strrev( char *str ) {
 	return str;
 }
 
-char *Q_CleanColorStr( char *string ) {
-	char *d;
-	char *s;
-	int c;
-	long len = strlen( string );
+void Q_StripColor( char *string ) {
+	qboolean doPass = qtrue;
+	char *read, *write;
 
-	s = string;
-	d = string;
-	while ( len > s-string && (c = *s) != 0 )
-	{
-		if ( Q_IsColorString( s ) )
-			s+=2;
-		
-		//Oops, went over the end of the string
-	//	if ( s-string > len)
-	//		break;
-		
-		*d = *s;
-
-		d++;
-		s++;
+	while ( doPass ) {
+		doPass = qfalse;
+		read = write = string;
+		while ( *read ) {
+			if ( Q_IsColorStringExt( read ) ) {
+				doPass = qtrue;
+				read += 2;
+			}
+			else {
+				// Avoid writing the same data over itself
+				if ( write != read )
+					*write = *read;
+				write++, read++;
+			}
+		}
+		// Add trailing NUL byte if string has shortened
+		if ( write < read )
+			*write = '\0';
 	}
-
-	*d = '\0';
-
-	return string;
 }
 
 /*

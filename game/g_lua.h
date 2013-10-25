@@ -45,7 +45,7 @@ typedef struct jplua_plugin_s
 	char name[32];
 	char version[8];
 	unsigned int requiredJPLuaVersion;
-	unsigned int UID;
+	intptr_t UID;
 	int handle;
 
 	int eventListeners[JPLUA_EVENT_MAX];

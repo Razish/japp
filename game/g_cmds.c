@@ -2141,8 +2141,7 @@ Cmd_CallVote_f
 */
 extern void SiegeClearSwitchData(void); //g_saga.c
 qboolean G_VoteAllready( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	if ( !level.warmupTime )
-	{
+	if ( !level.warmupTime ) {
 		trap->SendServerCommand( ent-g_entities, "print \"allready is only available during warmup.\n\"" );
 		return qfalse;
 	}
@@ -2163,14 +2162,12 @@ qboolean G_VoteCapturelimit( gentity_t *ent, int numArgs, const char *arg1, cons
 qboolean G_VoteClientkick( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
 	int n = atoi ( arg2 );
 
-	if ( n < 0 || n >= MAX_CLIENTS )
-	{
+	if ( n < 0 || n >= MAX_CLIENTS ) {
 		trap->SendServerCommand( ent-g_entities, va("print \"invalid client number %d.\n\"", n ) );
 		return qfalse;
 	}
 
-	if ( g_entities[n].client->pers.connected == CON_DISCONNECTED )
-	{
+	if ( g_entities[n].client->pers.connected == CON_DISCONNECTED ) {
 		trap->SendServerCommand( ent-g_entities, va("print \"there is no client with the client number %d.\n\"", n ) );
 		return qfalse;
 	}
@@ -2199,8 +2196,8 @@ qboolean G_VoteFraglimit( gentity_t *ent, int numArgs, const char *arg1, const c
 qboolean G_VoteGametype( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
 	int gt = atoi( arg2 );
 
-	if ( arg2[0] && isalpha( arg2[0] ) )
-	{// ffa, ctf, tdm, etc
+	// ffa, ctf, tdm, etc
+	if ( arg2[0] && isalpha( arg2[0] ) ) {
 		gt = BG_GetGametypeForString( arg2 );
 		if ( gt == -1 )
 		{
@@ -2208,15 +2205,15 @@ qboolean G_VoteGametype( gentity_t *ent, int numArgs, const char *arg1, const ch
 			gt = GT_FFA;
 		}
 	}
-	else if ( gt < 0 || gt >= GT_MAX_GAME_TYPE )
-	{// numeric but out of range
+	// numeric but out of range
+	else if ( gt < 0 || gt >= GT_MAX_GAME_TYPE ) {
 		trap->SendServerCommand( ent-g_entities, va( "print \"Gametype (%i) is out of range, defaulting to FFA/Deathmatch\n\"", gt ) );
 		gt = GT_FFA;
 	}
 
-	if ( gt == GT_SINGLE_PLAYER )
-	{// logically invalid gametypes, or gametypes not fully implemented in MP
-		trap->SendServerCommand( ent-g_entities, "print \"This gametype is not supported (%s).\n\"" );
+	// logically invalid gametypes, or gametypes not fully implemented in MP
+	if ( gt == GT_SINGLE_PLAYER ) {
+		trap->SendServerCommand( ent-g_entities, va( "print \"This gametype is not supported (%s).\n\"", arg2 ) );
 		return qfalse;
 	}
 
@@ -2286,16 +2283,13 @@ void Cmd_MapList_f( gentity_t *ent ) {
 
 	Q_strcat( buf, sizeof( buf ), "Map list:" );
 
-	for ( i=0; i<level.arenas.num; i++ )
-	{
+	for ( i=0; i<level.arenas.num; i++ ) {
 		Q_strncpyz( map, Info_ValueForKey( level.arenas.infos[i], "map" ), sizeof( map ) );
-		Q_CleanColorStr( map );
+		Q_StripColor( map );
 
-		if ( G_DoesMapSupportGametype( map, level.gametype ) )
-		{
-			char *tmpMsg = va( " ^%c%s", (++toggle&1) ? '2' : '3', map );
-			if ( strlen( buf ) + strlen( tmpMsg ) >= sizeof( buf ) )
-			{
+		if ( G_DoesMapSupportGametype( map, level.gametype ) ) {
+			char *tmpMsg = va( " ^%c%s", (++toggle&1) ? COLOR_GREEN : COLOR_YELLOW, map );
+			if ( strlen( buf ) + strlen( tmpMsg ) >= sizeof( buf ) ) {
 				trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", buf ) );
 				buf[0] = '\0';
 			}
@@ -2307,22 +2301,21 @@ void Cmd_MapList_f( gentity_t *ent ) {
 }
 
 qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	char s[MAX_STRING_CHARS] = {0}, *mapName = NULL, *mapName2 = NULL;
+	char s[MAX_CVAR_VALUE_STRING] = {0}, *mapName = NULL, *mapName2 = NULL;
 	const char *arenaInfo;
 
-	if ( numArgs < 3 )
-	{// didn't specify a map, show available maps
+	// didn't specify a map, show available maps
+	if ( numArgs < 3 ) {
 		Cmd_MapList_f( ent );
 		return qfalse;
 	}
 
-	if ( !G_DoesMapSupportGametype( arg2, level.gametype ) )
-	{
+	if ( !G_DoesMapSupportGametype( arg2, level.gametype ) ) {
 		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NOVOTE_MAPNOTSUPPORTEDBYGAME" ) ) );
 		return qfalse;
 	}
 
-	//preserve the map rotation
+	// preserve the map rotation
 	trap->Cvar_VariableStringBuffer( "nextmap", s, sizeof( s ) );
 	if ( *s )
 		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %s; set nextmap \"%s\"", arg1, arg2, s );
@@ -2330,10 +2323,9 @@ qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const char *a
 		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %s", arg1, arg2 );
 
 	arenaInfo = G_GetArenaInfoByMap(arg2);
-	if ( arenaInfo )
-	{
-		mapName = Info_ValueForKey(arenaInfo, "longname");
-		mapName2 = Info_ValueForKey(arenaInfo, "map");
+	if ( arenaInfo ) {
+		mapName = Info_ValueForKey( arenaInfo, "longname" );
+		mapName2 = Info_ValueForKey( arenaInfo, "map" );
 	}
 
 	if ( !mapName || !mapName[0] )
@@ -2347,10 +2339,20 @@ qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const char *a
 	return qtrue;
 }
 
-qboolean G_VoteNextmap( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	char	s[MAX_STRING_CHARS];
+qboolean G_VoteMapRestart( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
+	int n = Com_Clampi( 0, 60, atoi( arg2 ) );
+	if ( numArgs < 3 )
+		n = 5;
+	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %i", arg1, n );
+	Q_strncpyz( level.voteDisplayString, level.voteString, sizeof( level.voteDisplayString ) );
+	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
+	return qtrue;
+}
 
-	trap->Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
+qboolean G_VoteNextmap( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
+	char s[MAX_CVAR_VALUE_STRING];
+
+	trap->Cvar_VariableStringBuffer( "nextmap", s, sizeof( s ) );
 	if ( !*s ) {
 		trap->SendServerCommand( ent-g_entities, "print \"nextmap not set.\n\"" );
 		return qfalse;
@@ -2378,7 +2380,10 @@ qboolean G_VoteShuffle( gentity_t *ent, int numArgs, const char *arg1, const cha
 
 qboolean G_VoteTimelimit( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
 	float tl = Com_Clamp( 0.0f, 35790.0f, atof( arg2 ) );
-	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %.3f", arg1, tl );
+	if ( Q_isintegral( tl ) )
+		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %i", arg1, (int)tl );
+	else
+		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %.3f", arg1, tl );
 	Q_strncpyz( level.voteDisplayString, level.voteString, sizeof( level.voteDisplayString ) );
 	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
 	return qtrue;
@@ -2387,19 +2392,20 @@ qboolean G_VoteTimelimit( gentity_t *ent, int numArgs, const char *arg1, const c
 qboolean G_VoteWarmup( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
 	int n = Com_Clampi( 0, 1, atoi( arg2 ) );
 	Com_sprintf( level.voteString, sizeof( level.voteString ), "g_doWarmup %i", arg1, n );
-	Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
+	Q_strncpyz( level.voteDisplayString, level.voteString, sizeof( level.voteDisplayString ) );
+	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
 	return qtrue;
 }
 
 typedef struct voteString_s {
-	const char		*string;
-	const char		*aliases;	// space delimited list of aliases, will always show the real vote string
-	qboolean		(*func)(gentity_t *ent, int numArgs, const char *arg1, const char *arg2);
-	int				numArgs;	// number of REQUIRED arguments, not total/optional arguments
-	unsigned int	validGT;	// bit-flag of valid gametypes
-	qboolean		voteDelay;	// if true, will delay executing the vote string after it's accepted by japp_voteDelay
-	const char		*shortHelp;	// NULL if no arguments needed
-	const char		*longHelp;		// long help text, accessible with /vhelp and maybe /callvote help
+	const char	*string;
+	const char	*aliases;	// space delimited list of aliases, will always show the real vote string
+	qboolean	(*func)(gentity_t *ent, int numArgs, const char *arg1, const char *arg2);
+	int			numArgs;	// number of REQUIRED arguments, not total/optional arguments
+	uint32_t	validGT;	// bit-flag of valid gametypes
+	qboolean	voteDelay;	// if true, will delay executing the vote string after it's accepted by japp_voteDelay
+	const char	*shortHelp;	// NULL if no arguments needed
+	const char	*longHelp;	// long help text, accessible with /vhelp and maybe /callvote help
 } voteString_t;
 
 static voteString_t validVoteStrings[] = {
@@ -2416,7 +2422,7 @@ static voteString_t validVoteStrings[] = {
 	{	"japp_suicideDropFlag",	"killdropflag",		G_VoteSuicideDropFlag,	1,		GTB_CTF|GTB_CTY,						qfalse,			"<0-1>",	"Drop flag when you /kill yourself" },
 	{	"kick",					NULL,				G_VoteKick,				1,		GTB_ALL,								qfalse,			"<name>",	"" },
 	{	"map",					NULL,				G_VoteMap,				0,		GTB_ALL,								qtrue,			"<name>",	"" },
-	{	"map_restart",			"restart",			NULL,					0,		GTB_ALL,								qtrue,			NULL,		"Restarts the current map\nExample: callvote map_restart" },
+	{	"map_restart",			"restart",			G_VoteMapRestart,		0,		GTB_ALL,								qtrue,			NULL,		"Restarts the current map\nExample: callvote map_restart" },
 	{	"nextmap",				NULL,				G_VoteNextmap,			0,		GTB_ALL,								qtrue,			NULL,		"" },
 	{	"pause",				NULL,				G_VotePause,			0,		GTB_ALL,								qfalse,			NULL,		"" },
 	{	"shuffle",				NULL,				G_VoteShuffle,			0,		GTB_ALL & ~(GTB_NOTTEAM),				qtrue,			NULL,		"" },
@@ -2426,24 +2432,25 @@ static voteString_t validVoteStrings[] = {
 static const int validVoteStringsSize = ARRAY_LEN( validVoteStrings );
 
 void Cmd_CallVote_f( gentity_t *ent ) {
-	int			i=0, numArgs=trap->Argc();
-	char		arg1[MAX_CVAR_VALUE_STRING] = {0}, arg2[MAX_CVAR_VALUE_STRING] = {0};
-	voteString_t *vote = NULL;
+	int				i=0, numArgs=0;
+	char			arg1[MAX_CVAR_VALUE_STRING] = {0};
+	char			arg2[MAX_CVAR_VALUE_STRING] = {0};
+	voteString_t	*vote = NULL;
 
-	if ( !g_allowVote.integer )
-	{// not allowed to vote at all
-		trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "NOVOTE")) );
+	// not allowed to vote at all
+	if ( !g_allowVote.integer ) {
+		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NOVOTE" ) ) );
 		return;
 	}
 
-	else if ( level.voteTime || level.voteExecuteTime >= level.time )
-	{// vote in progress
-		trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "VOTEINPROGRESS")) );
+	// vote in progress
+	else if ( level.voteTime || level.voteExecuteTime >= level.time ) {
+		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "VOTEINPROGRESS" ) ) );
 		return;
 	}
 
-	else if ( level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL && ent->client->sess.sessionTeam == TEAM_SPECTATOR )
-	{// can't vote as a spectator, except in (power)duel
+	// can't vote as a spectator, except in (power)duel
+	else if ( level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL && ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NOSPECVOTE" ) ) );
 		return;
 	}
@@ -2452,32 +2459,30 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	numArgs = trap->Argc();
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	if ( numArgs > 1 )
-		Q_strncpyz( arg2, ConcatArgs( 2 ), sizeof( arg2 ) ); //trap->Argv( 2, arg2, sizeof( arg2 ) );
+		Q_strncpyz( arg2, ConcatArgs( 2 ), sizeof( arg2 ) );
 
 	//Raz: callvote exploit, filter \n and \r ==> in both args
-	if ( Q_strchrs( arg1, ";\r\n" ) || Q_strchrs( arg2, ";\r\n" ) )
-	{
+	if ( Q_strchrs( arg1, ";\r\n" ) || Q_strchrs( arg2, ";\r\n" ) ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
 		return;
 	}
 
-	for ( i=0; i<validVoteStringsSize; i++ )
-	{// check for invalid votes
-		if ( (japp_voteDisable.integer & (1<<i)) )
+	// check for invalid votes
+	for ( i=0; i<validVoteStringsSize; i++ ) {
+		if ( !(g_allowVote.integer & (1<<i)) )
 			continue;
 
 		if ( !Q_stricmp( arg1, validVoteStrings[i].string ) )
 			break;
 
-		if ( validVoteStrings[i].aliases )
-		{// see if they're using an alias, and set arg1 to the actual vote string
-			char tmp[MAX_TOKEN_CHARS] = {0}, *p = NULL, *delim = " ";
+		// see if they're using an alias, and set arg1 to the actual vote string
+		if ( validVoteStrings[i].aliases ) {
+			char tmp[MAX_TOKEN_CHARS] = {0}, *p = NULL;
+			const char *delim = " ";
 			Q_strncpyz( tmp, validVoteStrings[i].aliases, sizeof( tmp ) );
 			p = strtok( tmp, delim );
-			while ( p != NULL )
-			{
-				if ( !Q_stricmp( arg1, p ) )
-				{
+			while ( p != NULL ) {
+				if ( !Q_stricmp( arg1, p ) ) {
 					Q_strncpyz( arg1, validVoteStrings[i].string, sizeof( arg1 ) );
 					goto validVote;
 				}
@@ -2485,28 +2490,27 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 			}
 		}
 	}
-	if ( i == validVoteStringsSize )
-	{// invalid vote string, abandon ship
+	// invalid vote string, abandon ship
+	if ( i == validVoteStringsSize ) {
 		char buf[1024] = {0};
 		int toggle = 0;
 		trap->SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
 		trap->SendServerCommand( ent-g_entities, "print \"Allowed vote strings are: \"" );
-		for ( i=0; i<validVoteStringsSize; i++ )
-		{
-			if ( (japp_voteDisable.integer & (1<<i)) )
+		for ( i=0; i<validVoteStringsSize; i++ ) {
+			if ( !(g_allowVote.integer & (1<<i)) )
 				continue;
 
 			toggle = !toggle;
 			if ( validVoteStrings[i].shortHelp ) {
 				Q_strcat( buf, sizeof( buf ), va( "^%c%s %s ",
-													toggle?'2':'3',
-													validVoteStrings[i].string,
-													validVoteStrings[i].shortHelp ) );
+					toggle ? COLOR_GREEN : COLOR_YELLOW,
+					validVoteStrings[i].string,
+					validVoteStrings[i].shortHelp ) );
 			}
 			else {
 				Q_strcat( buf, sizeof( buf ), va( "^%c%s ",
-													toggle?'2':'3',
-													validVoteStrings[i].string ) );
+					toggle ? COLOR_GREEN : COLOR_YELLOW,
+					validVoteStrings[i].string ) );
 			}
 		}
 
@@ -2531,22 +2535,22 @@ validVote:
 
 	level.voteExecuteDelay = vote->voteDelay ? japp_voteDelay.integer : 0;
 
-	if ( level.voteExecuteTime )
-	{// there is still a vote to be executed, execute it and store the new vote
+	// there is still a vote to be executed, execute it and store the new vote
+	if ( level.voteExecuteTime ) {
 		level.voteExecuteTime = 0;
-		if ( level.votePoll )
+		if ( !level.votePoll )
 			trap->SendConsoleCommand( EXEC_APPEND, va( "%s\n", level.voteString ) );
 	}
 
-	if ( vote->func )
-	{
+	// pass the args onto vote-specific handlers for parsing/filtering
+	if ( vote->func ) {
 		if ( !vote->func( ent, numArgs, arg1, arg2 ) )
 			return;
 	}
-	else
-	{
+	// otherwise assume it's a command
+	else {
 		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s \"%s\"", arg1, arg2 );
-		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
+		Q_strncpyz( level.voteDisplayString, level.voteString, sizeof( level.voteDisplayString ) );
 		Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
 	}
 	Q_strstrip( level.voteStringClean, "\"\n\r", NULL );
@@ -2567,7 +2571,7 @@ validVote:
 	ent->client->mGameFlags |= PSG_VOTED;
 	ent->client->pers.vote = 1;
 
-	trap->SetConfigstring( CS_VOTE_TIME,		va( "%i", level.voteTime ) );
+	trap->SetConfigstring( CS_VOTE_TIME,	va( "%i", level.voteTime ) );
 	trap->SetConfigstring( CS_VOTE_STRING,	level.voteDisplayString );	
 	trap->SetConfigstring( CS_VOTE_YES,		va( "%i", level.voteYes ) );
 	trap->SetConfigstring( CS_VOTE_NO,		va( "%i", level.voteNo ) );	
