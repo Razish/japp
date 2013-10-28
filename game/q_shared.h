@@ -118,6 +118,7 @@ extern int g_G2AllocServer;
 #include <ctype.h>
 #include <limits.h>
 #include <stddef.h>
+#include <errno.h>
 #include <stdint.h>
 
 #if UINTPTR_MAX == 0xffffffff
