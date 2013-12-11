@@ -4004,6 +4004,8 @@ void ClientSpawn(gentity_t *ent) {
 	*/
 	//Disabled. At least for now. Not sure if I'll want to do it or not eventually.
 
+	JPLua_Event_ClientSpawn( ent->s.number );
+
 	// run a client frame to drop exactly to the floor,
 	// initialize animations and other things
 	client->ps.commandTime = level.time - 100;

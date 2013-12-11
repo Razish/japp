@@ -12,6 +12,7 @@ stringID_table_t jplua_events[JPLUA_EVENT_MAX] =
 	ENUM2STRING(JPLUA_EVENT_UNLOAD),
 	ENUM2STRING(JPLUA_EVENT_RUNFRAME),
 //	ENUM2STRING(JPLUA_EVENT_CLIENTCONNECT),
+	ENUM2STRING(JPLUA_EVENT_CLIENTSPAWN),
 };
 
 int JPLua_Event_AddListener( lua_State *L )
@@ -124,6 +125,28 @@ void JPLua_Event_RunFrame( void )
 		}
 	}
 #endif // JPLUA
+}
+
+void JPLua_Event_ClientSpawn( int clientNum )
+{
+	for ( JPLua.currentPlugin = JPLua.plugins;
+			JPLua.currentPlugin;
+			JPLua.currentPlugin = JPLua.currentPlugin->next
+		)
+	{
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTSPAWN] )
+		{
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTSPAWN] );
+#if 0
+			// Create a player instance for this client number and push on stack
+			JPLua_Player_CreateRef( JPLua.state, clientNum );
+
+			JPLUACALL( JPLua.state, 1, 0 );
+#else
+			JPLUACALL( JPLua.state, 0, 0 );
+#endif
+		}
+	}
 }
 
 /*
