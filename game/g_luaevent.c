@@ -129,6 +129,7 @@ void JPLua_Event_RunFrame( void )
 
 void JPLua_Event_ClientSpawn( int clientNum )
 {
+#ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
 			JPLua.currentPlugin;
 			JPLua.currentPlugin = JPLua.currentPlugin->next
@@ -147,11 +148,13 @@ void JPLua_Event_ClientSpawn( int clientNum )
 #endif
 		}
 	}
+#endif
 }
 
 /*
 void JPLua_Event_ClientConnect( int clientNum )
 {
+#ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
 			JPLua.currentPlugin;
 			JPLua.currentPlugin = JPLua.currentPlugin->next
@@ -167,6 +170,7 @@ void JPLua_Event_ClientConnect( int clientNum )
 			JPLUACALL( JPLua.state, 1, 0 );
 		}
 	}
+#endif
 }
 */
 
