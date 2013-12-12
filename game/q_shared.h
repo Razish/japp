@@ -23,9 +23,6 @@
 
 	// server-side conditional compiling
 	#define OPENJK // ensure OpenJK compatibility (disables engine modifications, new vmMain/trap functionality for jappeng, etc)
-	#ifndef __linux__
-		#define JPLUA
-	#endif
 
 	#define JAPP_SERVER_VERSION "JA++ revision 2 (DEV)"
 	#define JAPP_SERVER_FLAGS (SSF_GRAPPLE_SWING|SSF_SCOREBOARD_LARGE|SSF_SCOREBOARD_KD|SSF_CHAT_FILTERS|SSF_FIXED_WEAP_ANIMS|SSF_SPECTINFO)
@@ -34,11 +31,9 @@
 
 	// client-side conditional compiling
 	#define OPENJK // ensure OpenJK compatibility (disables engine modifications, new vmMain/trap functionality for jappeng, etc)
-	#define JPLUA
 //	#define JPLUA_DEBUG
 	#define RAZTEST //Vehicles? First person stuff?
 	#define IMPROVED_RAGDOLL
-	#define JK2AWARDS
 
 	#ifndef OPENJK
 		#define FAV_SERVERS // jappeng adds this to engine

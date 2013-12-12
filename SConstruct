@@ -289,7 +289,7 @@ else:
 # Game
 if int(ARGUMENTS.get( 'game', 0 )):
 	env['CPPPATH'] = [ '.', './game', './shared' ]
-	env['CPPDEFINES'] += [ '_GAME', '_JK2', 'JK2AWARDS', 'MISSIONPACK' ]
+	env['CPPDEFINES'] += [ '_GAME', '_JK2', 'JK2AWARDS', 'JPLUA' ]
 	env['LIBS'] = libs['game']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'jampgame'+arch, files['game'] )
@@ -297,7 +297,7 @@ if int(ARGUMENTS.get( 'game', 0 )):
 # Client Game
 if int(ARGUMENTS.get( 'cgame', 0 )):
 	env['CPPPATH'] = [ '.', './cgame', './shared', './game' ]
-	env['CPPDEFINES'] += [ '_CGAME', '_JK2', 'MISSIONPACK' ]
+	env['CPPDEFINES'] += [ '_CGAME', '_JK2', 'JK2AWARDS', 'JPLUA' ]
 	env['LIBS'] = libs['cgame']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'cgame'+arch, files['cgame'] )
@@ -305,7 +305,7 @@ if int(ARGUMENTS.get( 'cgame', 0 )):
 # UI
 if int(ARGUMENTS.get( 'ui', 0 )):
 	env['CPPPATH'] = [ '.', './shared', './game', './curl' ]
-	env['CPPDEFINES'] += [ '_UI' ]
+	env['CPPDEFINES'] += [ '_UI', 'JK2AWARDS', 'JPLUA' ]
 	env['LIBS'] = libs['ui']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'ui'+arch, files['ui'] )
