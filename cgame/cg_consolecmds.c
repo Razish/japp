@@ -5,7 +5,6 @@
 
 #include "cg_local.h"
 #include "bg_saga.h"
-#include "cg_engine.h"
 #if MAC_PORT
 	#include "macosx/jp_mac.h"
 #endif
@@ -283,19 +282,8 @@ static void CG_ScrollChat_f( void ) {
 	JP_ChatboxScroll( atoi( args ) );
 }
 
-#ifndef OPENJK
-	#ifdef _WIN32
-		static void (*Con_Clear_f)( void ) = (void (*)( void ))0x4171A0;
-	#elif defined(MAC_PORT)
-	#endif
-#else
-	static void (*Con_Clear_f)( void ) = (void (*)( void ))0x00000000;
-#endif // !OPENJK
-
-static void CG_Clear_f( void ) {
+static void CG_ClearChat_f( void ) {
 	JP_ChatboxClear();
-	if ( Con_Clear_f )
-		Con_Clear_f();
 }
 
 static void CG_Menu_f( void ) {
@@ -416,7 +404,7 @@ static command_t commands[] = {
 	{ "chattabfind",				CG_ChatboxFindTab_f },
 	{ "chattabnext",				Cmd_ChatboxSelectTabNextNoKeys },
 	{ "chattabprev",				Cmd_ChatboxSelectTabPrevNoKeys },
-	{ "clear",						CG_Clear_f },
+	{ "clearchat",					CG_ClearChat_f },
 	{ "copynames",					CG_CopyNames_f },
 	{ "engage_duel",				NULL },
 	{ "fakegun",					CG_FakeGun_f },

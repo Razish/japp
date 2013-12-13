@@ -3,7 +3,6 @@
 #include "g_local.h"
 #include "bg_saga.h"
 #include "g_admin.h"
-#include "g_engine.h"
 
 #include "ui/menudef.h"			// for the voice chats
 
@@ -4211,23 +4210,11 @@ void ClientCommand( int clientNum ) {
 
 	ent = g_entities + clientNum;
 	if ( !ent->client || ent->client->pers.connected != CON_CONNECTED ) {
-		#ifndef OPENJK
-			char tmpIP[NET_ADDRSTRMAXLEN] = {0};
-			NET_AddrToString( tmpIP, sizeof( tmpIP ), &svs->clients[clientNum].netchan.remoteAddress );
-		#else
-			char *tmpIP = "Unknown";
-		#endif // !OPENJK
-		G_SecurityLogPrintf( "ClientCommand(%d) without an active connection [IP: %s]\n", clientNum, tmpIP );
+		G_SecurityLogPrintf( "ClientCommand(%d) without an active connection\n", clientNum );
 		return;		// not fully in game yet
 	}
 
 	trap->Argv( 0, cmd, sizeof( cmd ) );
-
-	//Raz: Bypass sv_floodProtect for admins o_o
-	#ifndef OPENJK
-		if ( ent->client->pers.adminUser && (ent->client->pers.adminUser->privs & PRIV_BYPASSFLOOD) )
-			svs->clients[clientNum].nextReliableTime = svs->time;
-	#endif // OPENJK
 
 	//rww - redirect bot commands
 	if ( strstr( cmd, "bot_" ) && AcceptBotCommand( cmd, ent ) )

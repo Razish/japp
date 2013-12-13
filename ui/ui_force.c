@@ -11,7 +11,6 @@ FORCE INTERFACE
 #include "ui_local.h"
 #include "../shared/qcommon/qfiles.h"
 #include "ui_force.h"
-#include "ui_engine.h"
 
 int uiForceSide = FORCE_LIGHTSIDE;
 int uiJediNonJedi = -1;

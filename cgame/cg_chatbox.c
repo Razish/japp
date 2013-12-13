@@ -2,7 +2,6 @@
 #include "cg_local.h"
 #include "ui/menudef.h"
 #include "ui/keycodes.h"
-#include "cg_engine.h"
 #include "cg_luaevent.h"
 
 #define MAX_CHATBOX_ENTRIES (512)
@@ -40,26 +39,6 @@ typedef struct chatBox_s {
 static chatBox_t *chatboxList = NULL;
 static chatBox_t *currentChatbox = NULL;
 
-typedef struct chatHistory_s {
-	struct chatHistory_s *next;
-	struct chatHistory_s *prev;
-
-	char message[MAX_EDIT_LINE];
-} chatHistory_t;
-static chatHistory_t *chatHistory = NULL;
-static chatHistory_t *currentHistory = NULL;
-
-#ifndef OPENJK
-	#ifdef _WIN32
-		static field_t*	const chatField		= (field_t *)0x8868F0;
-		static int*		const keys_ctrl		= (int *)0x885A00;
-		static int*		const keys_shift	= (int *)0x8859F8;
-	#elif defined( MAC_PORT )
-		static int*		const keys_ctrl		= (int *)0x97ae98;
-		static int*		const keys_shift	= (int *)0x97ae8c;//not sure about these atm
-	#endif
-#endif
-
 static QINLINE int JP_GetChatboxFont( void ) {
 	return Com_Clampi( FONT_SMALL, FONT_NUM_FONTS, cg_chatboxFont.integer );
 }
@@ -73,15 +52,6 @@ static chatBox_t *CreateChatboxObject( const char *cbName )
 	Q_strncpyz( cb->shortname, cbName, sizeof( cb->shortname ) );
 	return cb;
 }
-
-static chatHistory_t *CreateChatHistoryObject( const char *message )
-{
-	chatHistory_t *ch = (chatHistory_t *)malloc( sizeof( chatHistory_t ) );
-	memset( ch, 0, sizeof( chatHistory_t ) );
-	Q_strncpyz( ch->message, message, sizeof( ch->message ) );
-	return ch;
-}
-
 
 static chatBox_t *GetChatboxByName( const char *cbName )
 {
@@ -113,20 +83,6 @@ static chatBox_t *GetChatboxByName( const char *cbName )
 	cb->prev = prev;
 
 	return cb;
-}
-
-static chatHistory_t *GetNewChatHistory( const char *message )
-{
-	chatHistory_t *ch = NULL, *prev = chatHistory;
-
-	ch = CreateChatHistoryObject( message );
-	if ( prev )
-		chatHistory = prev->prev = ch; // Attach it to the start of the list
-	else
-		chatHistory = ch;
-
-	ch->next = prev;
-	return ch;
 }
 
 // these match g_cmds.c
@@ -176,40 +132,6 @@ char *CG_RemoveChannelEscapeChar( char *text )
 	return buf;
 #endif
 }
-
-#ifndef OPENJK
-	int JP_ChatboxOutgoing( void )
-	{
-		char *msg = NULL;
-		if ( currentChatbox && currentChatbox->identifier[0] )
-		{
-			ENG_CBuf_AddText( va( "msgchan %s %s", currentChatbox->identifier, chatField->buffer ) );
-			return 1;
-		}
-		else if ( currentChatbox && !Q_stricmp( currentChatbox->shortname, "team" ) )
-		{
-			ENG_CBuf_AddText( va( "say_team %s", chatField->buffer ) );
-			return 1;
-		}
-		if ( chatField->buffer[0] == '/' && (cg_chatboxCompletion.integer & 2) )
-		{
-			ENG_CBuf_AddText( chatField->buffer+1 );
-			return 1;
-		}
-
-		//RAZTODO: Handle say/say_team manually for a larger message?
-		msg = JPLua_Event_ChatMessageSent( chatField->buffer );
-		if ( !msg )
-			return 1;
-		Q_strncpyz( chatField->buffer, msg, sizeof( chatField->buffer ) );
-
-		GetNewChatHistory( chatField->buffer );
-
-	//	HandleTeamBinds( chatField->buffer, sizeof( chatField->buffer ) );
-
-		return 0;
-	}
-#endif
 
 void JP_ChatboxInit( void )
 {
@@ -390,44 +312,6 @@ void JP_ChatboxDraw( void )
 	//i is the ideal index. Now offset for scrolling
 	i += currentChatbox->scrollAmount;
 
-#if defined(_WIN32) && !defined(OPENJK)
-#if 0
-	if ( (trap_Key_GetCatcher() & KEYCATCH_MESSAGE) )
-	{
-		int overStrike = *(int *)0x8859E0;
-		int cls_realtime = *(int *)0x8AF224;
-		int chatTeam = *(int *)0x8868EC;
-		int chatClient = *(int *)0x8868E8;
-		char cursorChar = overStrike ? '|' : '_';
-		char message[256] = { 0 };
-		char name[36] = { 0 };
-		char tmp[256] = { 0 };
-		int cursorOffset = 0;
-
-		if ( chatTeam )
-		{
-			Q_strncpyz( message, "^5Say team", sizeof( message ) );
-		}
-		else
-		{
-			if ( chatClient == -1 )
-				Q_strncpyz( message, "^2Say", sizeof( message ) );
-			else
-			{
-				Q_strncpyz( name, cgs.clientinfo[chatClient].name, sizeof( name ) );
-				Q_CleanStr( name );
-				Com_sprintf( message, sizeof( message ), "^6Tell (%s)", name );
-			}
-		}
-		cursorOffset = CG_Text_Width( va( "%s: ^7", message ), 64.0, JP_GetChatboxFont() );
-
-		CG_Text_Paint( cg_hudChatX.value, cg_hudChatY.value + (cg_chatLH.value*cg_chatLines.integer), cg_hudChatS.value, colorWhite, va( "%s: ^7%s", message, chatField->buffer ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, JP_GetChatboxFont() );
-		Q_strncpyz( tmp, chatField->buffer, min( sizeof( tmp ), chatField->cursor )+1 );
-		CG_Text_Paint( cg_hudChatX.value + (CG_Text_Width( tmp, 64.0, JP_GetChatboxFont() )*cg_hudChatS.value*0.015625) + (cursorOffset*cg_hudChatS.value*0.015625), cg_hudChatY.value + (cg_chatLH.value*cg_chatLines.integer), cg_hudChatS.value, colorWhite, va( "%c", ( (int)( cls_realtime >> 8 ) & 1 ) ? '\n' : cursorChar ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, JP_GetChatboxFont() );
-	}
-#endif
-#endif
-
 //	CG_FillRect( cg_hudChatX.value, cg_hudChatY.value+1.75f, max( cg_hudChatW.value, 192.0f ), cg_chatLH.value*cg_chatLines.integer, backgroundColour );
 
 	currentChatbox->notification = qfalse;
@@ -476,268 +360,13 @@ void JP_ChatboxScroll( int direction )
 
 	if ( direction == 0 )
 	{//down
-#ifndef OPENJK
-		if ( *keys_ctrl )
-		{
-			if ( currentChatbox->next )
-				currentChatbox = currentChatbox->next;
-			else
-				currentChatbox = chatboxList;
-		}
-		else
-#endif
-			currentChatbox->scrollAmount = min( scrollAmount + 1, 0 );
+		currentChatbox->scrollAmount = min( scrollAmount + 1, 0 );
 	}
 	else
 	{//up
-#ifndef OPENJK
-		if ( *keys_ctrl )
-		{
-			if ( currentChatbox->prev )
-				currentChatbox = currentChatbox->prev;
-			else
-			{
-				chatBox_t *cb = chatboxList;
-				while ( cb->next )
-					cb = cb->next;
-				currentChatbox = cb;
-			}
-		}
-		else
-#endif
-			currentChatbox->scrollAmount = max( scrollAmount - 1, numActiveLines >= cg_chatboxLineCount.integer ? ((min(numActiveLines,MAX_CHATBOX_ENTRIES)-cg_chatboxLineCount.integer)*-1) : 0 );
+		currentChatbox->scrollAmount = max( scrollAmount - 1, numActiveLines >= cg_chatboxLineCount.integer ? ((min(numActiveLines,MAX_CHATBOX_ENTRIES)-cg_chatboxLineCount.integer)*-1) : 0 );
 	}
 }
-
-#ifndef OPENJK
-static const char *completionString = NULL;
-static char shortestMatch[MAX_TOKEN_CHARS] = {0};
-static int	matchCount = 0;
-// field we are working on, passed to Field_CompleteCommand (&g_consoleCommand for instance)
-field_t *completionField = NULL;
-
-static void FindMatches( const char *s ) {
-	int		i;
-
-	if ( Q_stricmpn( s, completionString, strlen( completionString ) ) ) {
-		return;
-	}
-	matchCount++;
-	if ( matchCount == 1 ) {
-		Q_strncpyz( shortestMatch, s, sizeof( shortestMatch ) );
-		return;
-	}
-
-	// cut shortestMatch to the amount common with s
-	for ( i = 0 ; s[i] ; i++ ) {
-		if ( tolower(shortestMatch[i]) != tolower(s[i]) ) {
-			shortestMatch[i] = 0;
-		}
-	}
-}
-
-static void FindMatchesCvar( const cvar_t *cvar ) {
-	FindMatches( cvar->name );
-}
-
-static void PrintMatches( const char *s ) {
-	if ( !Q_stricmpn( s, shortestMatch, strlen( shortestMatch ) ) ) {
-		JP_ChatboxAdd( va( "    %s", s ), qfalse, currentChatbox->shortname );
-	}
-}
-
-static void PrintMatchesCvar( const cvar_t *cvar ) {
-	if ( !Q_stricmpn( cvar->name, shortestMatch, strlen( shortestMatch ) ) )
-	{
-		char msg[MAX_STRING_CHARS] = {0};
-		if ( !strcmp( cvar->string, cvar->resetString ) )
-			Com_sprintf( msg, sizeof( msg ), " %s^7 = \"%s^7\", the default", cvar->name, cvar->string );
-		else
-			Com_sprintf( msg, sizeof( msg ), " %s^7 = \"%s^7\"", cvar->name, cvar->string );
-		if ( cvar->latchedString )
-			Q_strcat( msg, sizeof( msg ), va( " (latched: \"%s^7\")", cvar->latchedString ) );
-		JP_ChatboxAdd( msg, qfalse, currentChatbox->shortname );
-	}
-}
-
-static void keyConcatArgs( void ) {
-	int		i;
-	char	*arg;
-
-	for ( i = 1 ; i < trap->Cmd_Argc() ; i++ ) {
-		Q_strcat( completionField->buffer, sizeof( completionField->buffer ), " " );
-		arg = cmd_argv[i];
-		while (*arg) {
-			if (*arg == ' ') {
-				Q_strcat( completionField->buffer, sizeof( completionField->buffer ),  "\"");
-				break;
-			}
-			arg++;
-		}
-		Q_strcat( completionField->buffer, sizeof( completionField->buffer ), cmd_argv[i] );
-		if (*arg == ' ') {
-			Q_strcat( completionField->buffer, sizeof( completionField->buffer ),  "\"");
-		}
-	}
-}
-
-static void ConcatRemaining( const char *src, const char *start ) {
-	const char *str;
-
-	str = strstr(src, start);
-	if (!str) {
-		keyConcatArgs();
-		return;
-	}
-
-	str += strlen(start);
-	Q_strcat( completionField->buffer, sizeof( completionField->buffer ), str);
-}
-
-void JP_Field_CompleteCommand( field_t *field ) {
-	field_t		temp;
-
-	completionField = field;
-
-	// only look at the first token for completion purposes
-	ENG_Cmd_TokenizeString( completionField->buffer );
-
-	completionString = cmd_argv[0];
-	if ( completionString[0] == '\\' || completionString[0] == '/' )
-		completionString++;
-
-	matchCount = 0;
-	shortestMatch[0] = 0;
-
-	if ( strlen( completionString ) == 0 )
-		return;
-
-	Cmd_CommandCompletion( FindMatches );
-	Cvar_CommandCompletion( FindMatchesCvar );
-
-	if ( matchCount == 0 )
-		return;	// no matches
-
-	memcpy( &temp, completionField, sizeof(field_t) );
-
-	if ( matchCount == 1 ) {
-		Com_sprintf( completionField->buffer, sizeof( completionField->buffer ), "/%s", shortestMatch );
-		if ( trap->Cmd_Argc() == 1 )
-			Q_strcat( completionField->buffer, sizeof( completionField->buffer ), " " );
-		else
-			ConcatRemaining( temp.buffer, completionString );
-		completionField->cursor = strlen( completionField->buffer );
-		return;
-	}
-
-	// multiple matches, complete to shortest
-	Com_sprintf( completionField->buffer, sizeof( completionField->buffer ), "/%s", shortestMatch );
-	completionField->cursor = strlen( completionField->buffer );
-	ConcatRemaining( temp.buffer, completionString );
-
-	JP_ChatboxAdd( va( "> %s\n", completionField->buffer ), qfalse, currentChatbox->shortname );
-
-	// run through again, printing matches
-	Cmd_CommandCompletion( PrintMatches );
-	Cvar_CommandCompletion( PrintMatchesCvar );
-}
-
-void JP_ChatboxSelectTabNext( void )
-{
-	if ( *keys_ctrl )
-	{
-		if ( *keys_shift )
-		{//left
-			if ( currentChatbox->prev )
-				currentChatbox = currentChatbox->prev;
-			else
-			{
-				chatBox_t *cb = chatboxList;
-				while ( cb->next )
-					cb = cb->next;
-				currentChatbox = cb;
-			}
-		}
-		else
-		{//right
-			if ( currentChatbox->next )
-				currentChatbox = currentChatbox->next;
-			else
-				currentChatbox = chatboxList;
-		}
-	}
-	else if ( (cg_chatboxCompletion.integer & (1|2)) )
-	{
-		int i=0;
-		int match = -1;
-		char currWord[MAX_INFO_STRING] = { 0 };
-		char *p = &chatField->buffer[0];//[chatField->cursor];
-		char matches[MAX_CLIENTS][MAX_QPATH/*MAX_NETNAME*/] = { {0} }; // because cgs.clientinfo[i].name uses MAX_QPATH...wtf...
-		int numMatches = 0;
-
-		p = &chatField->buffer[chatField->cursor];
-		//find current word
-		while ( p > &chatField->buffer[0] && *(p-1) != ' ' )
-			p--;
-
-		if ( !*p )
-			return;
-
-		Q_strncpyz( currWord, p, sizeof( currWord ) );
-		Q_StripColor( currWord );
-		Q_strlwr( currWord );
-
-		for ( i=0; i<cgs.maxclients; i++ )
-		{
-			if ( cgs.clientinfo[i].infoValid )
-			{
-				char name[MAX_QPATH/*MAX_NETNAME*/] = { 0 }; // because cgs.clientinfo[i].name uses MAX_QPATH...wtf...
-
-				Q_strncpyz( name, cgs.clientinfo[i].name, sizeof( name ) );
-				Q_StripColor( name );
-				Q_strlwr( name );
-				if ( strstr( name, currWord ) )
-				{
-					match = i;
-					Q_strncpyz( matches[numMatches++], cgs.clientinfo[i].name, sizeof( matches[0] ) );
-				}
-			}
-		}
-
-		if ( numMatches == 1 )
-		{
-			int oldCursor = chatField->cursor;
-			int delta = &chatField->buffer[oldCursor] - p;
-			char *str = va( "%s ^2", cgs.clientinfo[match].name );
-			int drawLen, len;
-
-			Q_strncpyz( p, str, sizeof( chatField->buffer ) - (p - &chatField->buffer[0]) );
-			chatField->cursor = oldCursor - delta + strlen( str );
-
-			//make sure cursor is visible
-			drawLen = chatField->widthInChars - 1;
-			len = strlen( chatField->buffer );
-			if ( chatField->scroll + drawLen > len )
-			{
-				chatField->scroll = len - drawLen;
-				if ( chatField->scroll < 0 )
-					chatField->scroll = 0;
-			}
-		}
-		else if ( numMatches > 1 )
-		{
-			JP_ChatboxAdd( va( "Several matches found for '%s':", currWord ), qfalse, currentChatbox->shortname );
-			for ( i=0; i</*min( 3, numMatches )*/numMatches; i++ )
-				JP_ChatboxAdd( va( "^2- ^7%s", matches[i] ), qfalse, currentChatbox->shortname );
-		//	if ( numMatches > 3 )
-		//		JP_ChatboxAdd( "^2- ^7[...] truncated", qfalse, "normal" );
-			trap->S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-		}
-		else if ( (cg_chatboxCompletion.integer & 2) && chatField->buffer[0] )
-			JP_Field_CompleteCommand( chatField );
-	}
-}
-#endif // !OPENJK
 
 void JP_ChatboxSelectTabNextNoKeys( void )
 {
@@ -760,45 +389,11 @@ void JP_ChatboxSelectTabPrevNoKeys( void )
 	}
 }
 
-#ifndef OPENJK
-void JP_ChatboxHistoryUp( void )
-{
-//	Com_Printf( "History up\n" );
-	if ( currentHistory )
-	{
-		if ( currentHistory->next )
-			currentHistory = currentHistory->next;
-	}
-	else if ( chatHistory )
-		currentHistory = chatHistory;
-	else
-		return;
-
-	Q_strncpyz( chatField->buffer, currentHistory->message, sizeof( chatField->buffer ) );
-	chatField->cursor = strlen( chatField->buffer );
-}
-
-void JP_ChatboxHistoryDn( void )
-{
-//	Com_Printf( "History down\n" );
-	if ( currentHistory )
-		currentHistory = currentHistory->prev;
-	if ( currentHistory )
-	{
-		Q_strncpyz( chatField->buffer, currentHistory->message, sizeof( chatField->buffer ) );
-		chatField->cursor = strlen( chatField->buffer );
-	}
-	else
-		Field_Clear( chatField );
-}
-#endif // !OPENJK
-
 void JP_ChatboxClear( void )
 {
 	currentChatbox->numActiveLines = 0;
 	memset( currentChatbox->chatBuffer, 0, sizeof( currentChatbox->chatBuffer ) );
 	currentChatbox->scrollAmount = 0;
-	//TODO: Clear chat history?
 }
 
 void JP_ChatboxSelect( char *cbName )

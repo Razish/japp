@@ -1,6 +1,5 @@
 #include "cg_local.h"
 #include "cg_lua.h"
-#include "cg_engine.h"
 
 #ifdef JPLUA
 
@@ -94,9 +93,6 @@ void JPLua_Event_Shutdown( void )
 		while ( nextConsoleCmd )
 		{//Remove all console commands
 			lua_unref( JPLua.state, consoleCmd->handle );
-			#ifndef OPENJK
-				ENG_Cmd_RemoveCommand( consoleCmd->command );
-			#endif // !OPENJK
 			nextConsoleCmd = consoleCmd->next;
 
 			free( consoleCmd );

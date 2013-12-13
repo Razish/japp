@@ -1096,11 +1096,4 @@ typedef struct uiLocal_s
 
 extern uiLocal_t uiLocal;
 
-// JA++ updater
-#ifndef OPENJK
-	void JAPP_CURL_Init( void );
-	void JAPP_CURL_Shutdown( void );
-	void UpdateJAPP( void );
-#endif
-
 extern uiImport_t *trap;

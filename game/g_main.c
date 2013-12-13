@@ -5,7 +5,6 @@
 #include "g_ICARUScb.h"
 #include "g_nav.h"
 #include "bg_saga.h"
-#include "g_engine.h"
 
 level_locals_t	level;
 
@@ -493,8 +492,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	AM_TM_ParseTelemarks();
 	JKG_Bans_Init();
 
-	PatchEngine();
-
 	#ifdef JPLUA
 		//As: BEGIN THE LUAS
 		JPLua_Init();
@@ -515,7 +512,6 @@ void G_ShutdownGame( int restart ) {
 	JKG_Bans_SaveBans();
 	JKG_Bans_Clear();
 	AM_TM_SaveTelemarks();
-	UnpatchEngine();
 
 	G_CleanAllFakeClients(); //get rid of dynamically allocated fake client structs.
 
@@ -2998,37 +2994,6 @@ void G_RunFrame( int levelTime ) {
 
 		g_siegeRespawnCheck = level.time + g_siegeRespawn.integer * 1000;
 	}
-
-	#ifndef OPENJK
-		//Raz: fake client detected, client didn't validate themselves
-		if ( japp_antiFakePlayer.integer && level.security.isPatched )
-		{//Patched, check for q3fill (Connection activity check)
-			gclient_t	*cl;
-			for (i=0; i<MAX_CLIENTS; i++)
-			{
-				cl = &level.clients[i];
-				if ( cl->pers.connected != CON_DISCONNECTED )
-				{
-					if ( !level.security.clientConnectionActive[i] && level.time > (cl->pers.connectTime + 5000) )
-					{
-						char buf[MAX_TOKEN_CHARS] = {0};
-
-						if ( svs->clients[i].netchan.remoteAddress.type == NA_LOOPBACK ||
-							 svs->clients[i].netchan.remoteAddress.type == NA_BOT )
-						{//localhost. don't kick. ever.
-							level.security.clientConnectionActive[i] = qtrue;
-							continue;
-						}
-
-						NET_AddrToString( buf, sizeof( buf ), &svs->clients[i].netchan.remoteAddress );
-						G_SecurityLogPrintf( "Client %i (%s) kicked for q3fill [IP: %s]\n", i, cl->pers.netname, buf );
-						trap->DropClient( i, "Fake client detected" );
-						cl->pers.connected = CON_DISCONNECTED;
-					}
-				}
-			}
-		}
-	#endif
 	
 	if (gDoSlowMoDuel)
 	{

@@ -7,7 +7,6 @@
 #include "tr_ext_public.h"
 //[/PostProcess]
 
-#include "cg_engine.h"
 #include "cg_lua.h"
 
 #include "../ui/ui_shared.h"
@@ -31,11 +30,7 @@ void CG_CleanJetpackGhoul2(void);
 
 #include "holocronicons.h"
 
-#ifdef OPENJK
-	void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback );
-#else
-	void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
-#endif
+void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback );
 void CG_Shutdown( void );
 
 void CG_CalcEntityLerpPositions( centity_t *cent );
@@ -480,18 +475,6 @@ static void CVU_TeamOverlay( void ) {
 		trap->Cvar_Set( "teamoverlay", "1" );
 	else
 		trap->Cvar_Set( "teamoverlay", "0" );
-}
-
-static void CVU_ConsoleChar( void ) {
-#ifndef OPENJK
-	#ifdef _WIN32
-		PATCH( 0x41784B, byte, cg_consolePromptChar.string[0] ); // Draw '>' instead of ']' in the console
-		PATCH( 0x5643C4, byte, cg_consolePromptChar.string[0] ); // Draw '>' instead of ']' in the console
-	#elif MAC_PORT
-		PATCH( 0x00a187, byte, cg_consolePromptChar.string[0] );
-		PATCH( 0x1268e4, byte, cg_consolePromptChar.string[0] );
-	#endif
-#endif
 }
 
 static void CVU_BubbleColour( void ) {
@@ -3245,20 +3228,12 @@ Will perform callbacks to make the loading info screen update.
 =================
 */
 
-#ifdef OPENJK
-	void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback )
-#else
-	void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum )
-#endif
+void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback )
 {
 	static gitem_t *item;
 	char buf[64];
 	const char	*s;
 	int i = 0;
-
-	#if !MAC_PORT //for now this doesn't work on macs
-		PatchEngine();
-	#endif
 
 	BG_InitAnimsets(); //clear it out
 
@@ -3439,9 +3414,7 @@ Ghoul2 Insert End
 
 	String_Init();
 
-	#ifdef OPENJK
-		cg.demoPlayback = demoPlayback;
-	#endif
+	cg.demoPlayback = demoPlayback;
 
 	cg.loading = qtrue;		// force players to load instead of defer
 
@@ -3670,10 +3643,6 @@ void CG_Shutdown( void )
 	trap->FS_Close( cg.log.console );
 	trap->FS_Close( cg.log.chat );
 	trap->FS_Close( cg.log.security );
-
-#if !MAC_PORT
-	UnpatchEngine();
-#endif
 }
 
 /*

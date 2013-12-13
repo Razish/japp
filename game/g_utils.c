@@ -2187,14 +2187,3 @@ void GetAnglesForDirection( const vector3 *p1, const vector3 *p2, vector3 *out )
 	VectorSubtract( p2, p1, &v );
 	vectoangles( &v, out );
 }
-
-//Raz: Added
-
-#include "g_engine.h"
-
-void NET_AddrToString( char *out, size_t size, void *addr )
-{
-	netadr_t *a = (netadr_t *)addr;
-	unsigned char *IP = (unsigned char *)&a->ip;
-	Com_sprintf( out, size, "%i.%i.%i.%i:%i", IP[0], IP[1], IP[2], IP[3], BigShort( a->port ) );
-}

@@ -6,7 +6,6 @@
 	User interface building blocks and support functions.
 **********************************************************************/
 #include "ui_local.h"
-#include "ui_engine.h"
 
 qboolean		m_entersound;		// after a frame, so caching won't disrupt the sound
 
@@ -446,46 +445,6 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		return qtrue;
 	}
 #endif //FAV_SERVERS
-
-	#if !defined(OPENJK) && defined(_WIN32)
-		#define dwExStyleFullscreenAddress 0x4C5794
-		#define dwStyleFullscreenAddress 0x4C579C
-		#define dwStyleWindowedAddress 0x4C57B5
-		#define g_wv_hwndAddress 0xB8F038
-		#define r_modeAddress 0xFE3000
-	
-		if ( !Q_stricmp( cmd, "jappvideomode" ) )
-		{
-			if ( !atoi( UI_Argv( 1 ) ) )
-			{//Fullscreen or regular windowed
-				PATCH( dwExStyleFullscreenAddress, unsigned int, 0x00000008 );
-				PATCH( dwStyleFullscreenAddress, unsigned int, 0x90080000 );
-				PATCH( dwStyleWindowedAddress, unsigned int, 0x10CA0000 );
-				PATCH( 0X4549A1, byte, 0x74 ); //Disable alt-tab for r_fullscreen 1
-			}
-			else
-			{//Fullscreen + minimise or borderless windowed
-				RECT desktop;
-				int gameW = uiInfo.uiDC.glconfig.vidWidth, gameH = uiInfo.uiDC.glconfig.vidHeight;
-			//	int desktopW = GetSystemMetrics( SM_CXSCREEN ), desktopH = GetSystemMetrics( SM_CYSCREEN );
-	
-				PATCH( dwExStyleFullscreenAddress, unsigned int, 0x00000000 );
-				PATCH( dwStyleFullscreenAddress, unsigned int, (WS_VISIBLE | WS_POPUP | WS_MAXIMIZE) );
-				PATCH( dwStyleWindowedAddress, unsigned int, (WS_VISIBLE | WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN) );
-				PATCH( 0X4549A1, byte, 0xEB ); //Always enable alt-tab
-	
-				//Now to correct vid_xpos/vid_ypos to center the borderless window
-				GetWindowRect( GetDesktopWindow(), &desktop );
-	
-				trap->Cvar_SetValue( "vid_xpos", (desktop.right/2.0f)-(gameW/2.0f) );
-				trap->Cvar_SetValue( "vid_ypos", (desktop.bottom/2.0f)-(gameH/2.0f) );
-			}
-	
-			trap->Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
-			return qtrue;
-		}
-	
-	#endif // !OPENJK && _WIN32
 
 	return qfalse;
 }

@@ -29,8 +29,6 @@ USER INTERFACE MAIN
 	#include "macosx/jp_mac.h"
 #endif
 
-#include "ui_engine.h"
-
 extern void UI_SaberAttachToChar( itemDef_t *item );
 
 char *forcepowerDesc[NUM_FORCE_POWERS] =
@@ -1099,12 +1097,6 @@ void _UI_Shutdown( void ) {
 #ifdef FAV_SERVERS
 	JP_SaveFavServers();
 #endif
-
-#ifndef OPENJK
-	JAPP_CURL_Shutdown();
-#endif // !OPENJK
-
-	UnpatchEngine();
 }
 
 char *defaultMenu = NULL;
@@ -10498,14 +10490,9 @@ void _UI_Init( qboolean inGameLoad ) {
 	// Register identifier and support flags this way to ensure validity
 	
 	//ENG_Cvar_Set2( "cjp_client", JAPLUS_CLIENT_VERSION, true );
-#ifdef OPENJK
 	trap->Cvar_Register( &cjp_client, "cjp_client", JAPLUS_CLIENT_VERSION, CVAR_USERINFO|CVAR_ROM );
 	trap->Cvar_Register( &japp_version, "japp_version", JAPP_CLIENT_VERSION, CVAR_ROM );
 	trap->Cvar_Reset( "cjp_client" ); trap->Cvar_Reset( "japp_version" );	
-#else
-	ENG_Cvar_Get( "cjp_client", JAPLUS_CLIENT_VERSION, CVAR_USERINFO|CVAR_ROM );
-	ENG_Cvar_Get( "japp_version", JAPP_CLIENT_VERSION, CVAR_ROM );
-#endif // OPENJK
 
 	trap->Cvar_Register( &csf, "csf", va( "%X", JAPP_CLIENT_FLAGS ), CVAR_USERINFO|CVAR_ROM );
 	trap->Cvar_Reset( "csf" );
@@ -10514,15 +10501,6 @@ void _UI_Init( qboolean inGameLoad ) {
 	trap->Cvar_Register( NULL,	"cp_clanpwd",		"", CVAR_USERINFO | CVAR_ARCHIVE );
 	trap->Cvar_Register( NULL,	"cp_login",			"", CVAR_USERINFO );
 	trap->Cvar_Register( NULL,	"cp_pluginDisable",	"", CVAR_USERINFO | CVAR_ARCHIVE );
-
-
-	//Raz: Patch engine!
-	PatchEngine();
-
-	#ifndef OPENJK
-		JAPP_CURL_Init();
-		UpdateJAPP();
-	#endif // !OPENJK
 
 	#ifdef FAV_SERVERS
 		JP_ParseFavServers();

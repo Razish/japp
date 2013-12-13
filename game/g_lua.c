@@ -1,6 +1,5 @@
 #include "g_local.h"
 #include "q_shared.h"
-#include "g_engine.h"
 #include "json/cJSON.h"
 
 #include "g_lua.h"

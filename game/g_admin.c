@@ -22,7 +22,6 @@
 #include "g_admin.h"
 #include "JAPP/jp_tokenparser.h"
 #include <json/cJSON.h>
-#include "g_engine.h"
 
 static adminUser_t *adminUsers = NULL;
 
@@ -524,14 +523,7 @@ static void AM_Status( gentity_t *ent )
 			Q_StripColor( strNum );
 			Q_strncpyz( strName, cl->pers.netname, sizeof( strName ) );
 			Q_StripColor( strName );
-			#ifndef OPENJK
-			if ( svs->clients[i].netchan.remoteAddress.type == NA_BOT )
-				Q_strncpyz( strIP, "BOT", sizeof( strIP ) );
-			else
-				NET_AddrToString( strIP, sizeof( strIP ), &svs->clients[i].netchan.remoteAddress );
-			#else
-				Q_strncpyz( strIP, cl->sess.IP, sizeof( strIP ) );
-			#endif // !OPENJK
+			Q_strncpyz( strIP, cl->sess.IP, sizeof( strIP ) );
 			Q_strncpyz( strAdmin, (cl->pers.adminUser) ? cl->pers.adminUser->user : "", sizeof( strAdmin ) );
 			Q_StripColor( strAdmin );
 
@@ -1456,11 +1448,7 @@ static void AM_Ban( gentity_t *ent )
 			trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
 			return;
 		}
-		#ifndef OPENJK
-			NET_AddrToString( arg1, sizeof( arg1 ), &svs->clients[targetClient].netchan.remoteAddress );
-		#else
-			Q_strncpyz( arg1, g_entities[targetClient].client->sess.IP, sizeof( arg1 ) );
-		#endif // !OPENJK
+		Q_strncpyz( arg1, g_entities[targetClient].client->sess.IP, sizeof( arg1 ) );
 
 		trap->Argv( 2, arg2, sizeof( arg2 ) );	//	Duration
 		if ( trap->Argc() >= 4 )

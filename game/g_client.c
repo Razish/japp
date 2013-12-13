@@ -1854,8 +1854,6 @@ if desired.
 ============
 */
 
-#include "g_engine.h"
-
 qboolean G_SetSaber(gentity_t *ent, int saberNum, char *saberName, qboolean siegeOverride);
 void G_ValidateSiegeClassForTeam(gentity_t *ent, int team);
 
@@ -2034,15 +2032,9 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	// check for malformed or illegal info strings
 	s = G_ValidateUserinfo( userinfo );
-	if ( s && *s )
-	{
-		#ifndef OPENJK
-			char strIP[NET_ADDRSTRMAXLEN] = { 0 };
-			NET_AddrToString( strIP, sizeof( strIP ), &svs->clients[clientNum].netchan.remoteAddress );
-		#else
-			char *strIP = client->sess.IP;
-		#endif // !OPENJK
-		G_SecurityLogPrintf( "Client %d (%s) failed userinfo validation: %s [IP: %s]\n", clientNum, Info_ValueForKey( userinfo, "name" ), s, strIP );
+	if ( s && *s ) {
+		G_SecurityLogPrintf( "Client %d (%s) failed userinfo validation: %s [IP: %s]\n", clientNum,
+			Info_ValueForKey( userinfo, "name" ), s, client->sess.IP );
 		trap->DropClient( clientNum, va( "Failed userinfo validation: %s", s ) );
 		return qfalse;
 	}
@@ -2055,15 +2047,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	//Raz: cp_pluginDisable
 	s = Info_ValueForKey( userinfo, "cp_pluginDisable" );
 	if ( s[0] && sscanf( s, "%u", &client->pers.CPD ) != 1 )
-	{
-		#ifndef OPENJK
-			char strIP[NET_ADDRSTRMAXLEN] = { 0 };
-			NET_AddrToString( strIP, sizeof( strIP ), &svs->clients[clientNum].netchan.remoteAddress );
-		#else
-			char *strIP = client->sess.IP;
-		#endif // !OPENJK
-		G_SecurityLogPrintf( "ClientUserinfoChanged(): Client %i (%s) userinfo 'cp_pluginDisable' was found, but invalid. [IP: %s]\n", clientNum, client->pers.netname, strIP );
-	}
+		G_SecurityLogPrintf( "ClientUserinfoChanged(): Client %i (%s) userinfo 'cp_pluginDisable' was found, but invalid. [IP: %s]\n", clientNum, client->pers.netname, client->sess.IP );
 
 	s = Info_ValueForKey( userinfo, "cjp_client" );
 	if ( s[0] ) {
@@ -2363,8 +2347,6 @@ restarts.
 ============
 */
 
-#include "g_engine.h"
-
 static qboolean CompareIPString( const char *ip1, const char *ip2 )
 {
 	while ( 1 ) {
@@ -2381,35 +2363,27 @@ static qboolean CompareIPString( const char *ip1, const char *ip2 )
 
 static qboolean CompareIPNum( int clientnum1, int clientnum2 )
 {
-	#ifndef OPENJK
-	if ( svs->clients[clientnum1].netchan.remoteAddress.type == NA_IP && svs->clients[clientnum2].netchan.remoteAddress.type == NA_IP
-		&& *(unsigned int *)&svs->clients[clientnum1].netchan.remoteAddress.ip == *(unsigned int *)&svs->clients[clientnum2].netchan.remoteAddress.ip )
-			 return qtrue;
+	const char *ip1 = NULL, *ip2 = NULL;
 
+	if ( clientnum1 < 0 || clientnum1 >= MAX_CLIENTS )
 		return qfalse;
-	#else
-		const char *ip1 = NULL, *ip2 = NULL;
+	if ( clientnum2 < 0 || clientnum2 >= MAX_CLIENTS )
+		return qfalse;
 
-		if ( clientnum1 < 0 || clientnum1 >= MAX_CLIENTS )
+	ip1 = level.clients[clientnum1].sess.IP;
+	ip2 = level.clients[clientnum2].sess.IP;
+
+	while ( 1 )
+	{
+		if ( *ip1 != *ip2 )
 			return qfalse;
-		if ( clientnum2 < 0 || clientnum2 >= MAX_CLIENTS )
-			return qfalse;
+		if ( !*ip1 || *ip1 == ':' )
+			break;
+		ip1++;
+		ip2++;
+	}
 
-		ip1 = level.clients[clientnum1].sess.IP;
-		ip2 = level.clients[clientnum2].sess.IP;
-
-		while ( 1 )
-		{
-			if ( *ip1 != *ip2 )
-				return qfalse;
-			if ( !*ip1 || *ip1 == ':' )
-				break;
-			ip1++;
-			ip2++;
-		}
-
-		return qtrue;
-	#endif // !OPENJK
+	return qtrue;
 }
 
 char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
@@ -2419,14 +2393,6 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	int			finalCSF = 0;
 	char		userinfo[MAX_INFO_STRING] = {0},
 				tmpIP[NET_ADDRSTRMAXLEN] = {0};
-#ifndef OPENJK
-	char		realIP[NET_ADDRSTRMAXLEN] = {0};
-
-	if ( svs->clients[clientNum].netchan.remoteAddress.type == NA_BOT )
-		Q_strncpyz( realIP, "localhost", sizeof( realIP ) );
-	else
-		NET_AddrToString( realIP, sizeof( realIP ), &svs->clients[clientNum].netchan.remoteAddress );
-#endif // !OPENJK
 
 	ent = &g_entities[ clientNum ];
 
@@ -2443,12 +2409,8 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	if ( !isBot && firstTime )
 	{
 		//Raz: Check if they're really banned
-		#ifndef OPENJK
-			byte *bIP = svs->clients[clientNum].netchan.remoteAddress.ip;
-		#else
-			byte bIP[4];
-			*(unsigned int *)&bIP[0] = *(unsigned int *)BuildByteFromIP( value );
-		#endif // !OPENJK
+		byte bIP[4];
+		*(unsigned int *)&bIP[0] = *(unsigned int *)BuildByteFromIP( value );
 		value = (char *)JKG_Bans_IsBanned( bIP );
 		if ( value )
 			return value;
@@ -2467,38 +2429,12 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	if ( !isBot && firstTime )
 	{
-		#ifndef OPENJK
-			if ( Q_stricmp( tmpIP, realIP ) )
-				G_SecurityLogPrintf( "Client %i mismatching IP. %s / %s\n", clientNum, tmpIP, realIP );
-		#endif // !OPENJK
-			
-		#ifndef OPENJK
-		if ( level.security.isPatched && japp_antiFakePlayer.integer
-			&& svs->clients[clientNum].netchan.remoteAddress.type != NA_LOOPBACK
-			&& svs->clients[clientNum].netchan.remoteAddress.type != NA_BOT )
-		#else
 		if ( japp_antiFakePlayer.integer )
-		#endif // !OPENJK
-		{// patched, check for > g_maxConnPerIP connections from same IP
+		{// check for > g_maxConnPerIP connections from same IP
 			int count=0, i=0;
-			for ( i=0; i<sv_maxclients.integer; i++ )
-			{
-				#if 0
-					if ( level.clients[i].pers.connected != CON_DISCONNECTED && i != clientNum )
-					{
-						if ( CompareIPNum( clientNum, i ) )
-						{
-							if ( !level.security.clientConnectionActive[i] )
-							{//This IP has a dead connection pending, wait for it to time out
-							//	client->pers.connected = CON_DISCONNECTED;
-								return "Please wait, another connection from this IP is still pending...";
-							}
-						}
-					}
-				#else
-					if ( CompareIPString( tmpIP, level.clients[i].sess.IP ) )
-						count++;
-				#endif
+			for ( i=0; i<sv_maxclients.integer; i++ ) {
+				if ( CompareIPString( tmpIP, level.clients[i].sess.IP ) )
+					count++;
 			}
 			if ( count > japp_maxConnPerIP.integer )
 			{
@@ -2522,11 +2458,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		value = Info_ValueForKey( userinfo, "cjp_client" );
 		if ( Q_strchrs( value, "\n\r;\"" ) )
 		{//Spoofed userinfo
-			#ifdef OPENJK
-				G_SecurityLogPrintf( "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum, tmpIP );
-			#else
-				G_SecurityLogPrintf( "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum, realIP );
-			#endif // OPENJK
+			G_SecurityLogPrintf( "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 		Q_strcat( msg, sizeof( msg ), va( "cjp_client: %s...", value[0] ? value : "basejka" ) );
@@ -2543,21 +2475,13 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		value = Info_ValueForKey( userinfo, "csf" );
 		if ( Q_strchrs( value, "\n\r;\"" ) )
 		{
-			#ifdef OPENJK
-				G_SecurityLogPrintf( "ClientConnect(%d): Spoofed userinfo 'csf'. [IP: %s]\n", clientNum, tmpIP );
-			#else
-				G_SecurityLogPrintf( "ClientConnect(%d): Spoofed userinfo 'csf'. [IP: %s]\n", clientNum, realIP );
-			#endif // OPENJK
+			G_SecurityLogPrintf( "ClientConnect(%d): Spoofed userinfo 'csf'. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 
 		if ( value[0] && sscanf( value, "%X", &finalCSF ) != 1 )
 		{
-			#ifdef OPENJK
-				G_LogPrintf( "ClientConnect(%d): userinfo 'csf' was found, but empty. [IP: %s]\n", clientNum, tmpIP );
-			#else
-				G_LogPrintf( "ClientConnect(%d): userinfo 'csf' was found, but empty. [IP: %s]\n", clientNum, realIP );
-			#endif // OPENJK
+			G_LogPrintf( "ClientConnect(%d): userinfo 'csf' was found, but empty. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 		Q_strcat( msg, sizeof( msg ), va( " final csf 0x%X\n", finalCSF ) );
@@ -2629,21 +2553,13 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		if ( !tmpIP[0] )
 		{//No IP sent when connecting, probably an unban hack attempt
 			client->pers.connected = CON_DISCONNECTED;
-			#ifdef OPENJK
-				G_SecurityLogPrintf( "Client %i (%s) sent no IP when connecting.\n", clientNum, client->pers.netname );
-			#else
-				G_SecurityLogPrintf( "Client %i (%s) sent no IP when connecting. Real IP is: %s\n", clientNum, client->pers.netname, realIP );
-			#endif // OPENJK
+			G_SecurityLogPrintf( "Client %i (%s) sent no IP when connecting.\n", clientNum, client->pers.netname );
 			return "Invalid userinfo detected";
 		}
 		Q_strncpyz( client->sess.IP, tmpIP, sizeof( client->sess.IP ) );
 	}
 
-	#ifdef OPENJK
-		G_LogPrintf( "ClientConnect: %i (%s) [IP: %s]\n", clientNum, client->pers.netname, tmpIP  );
-	#else
-		G_LogPrintf( "ClientConnect: %i (%s) [IP: %s]\n", clientNum, client->pers.netname, realIP);
-	#endif // OPENJK
+	G_LogPrintf( "ClientConnect: %i (%s) [IP: %s]\n", clientNum, client->pers.netname, tmpIP);
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
 	if ( firstTime ) {

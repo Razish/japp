@@ -1,7 +1,6 @@
 
 #include "cg_local.h"
 #include "q_shared.h"
-#include "cg_engine.h"
 #include "json/cJSON.h"
 
 #include "cg_lua.h"
@@ -327,30 +326,13 @@ static int JPLua_Export_RemapShader( lua_State *L )
 
 static int JPLua_Export_ResolveHostname( lua_State *L )
 {
-#ifndef OPENJK
-	netadr_t netAddr = { 0 };
-#endif
 	char buf[1024] = { 0 };
 
 	JPLua_Util_ArgAsString( L, &buf[0], sizeof( buf ) );
 
-	#ifdef OPENJK
-		lua_pushnil( L );
-		lua_pushstring( L, "^1ResolveHostname is not supported by this version of JA++" );
-		return 2;
-	#else
-		if ( ENG_NET_StringToAddr( buf, &netAddr ) )
-		{
-			lua_pushfstring( L, "%i.%i.%i.%i (nettype: %i)", netAddr.ip[0], netAddr.ip[1], netAddr.ip[2], netAddr.ip[3], BigShort( netAddr.port ), netAddr.type );
-			return 1;
-		}
-		else
-		{
-			lua_pushnil( L );
-			lua_pushstring( L, "^1Could not resolve address" );
-			return 2;
-		}
-	#endif
+	lua_pushnil( L );
+	lua_pushstring( L, "^1ResolveHostname is not supported by this version of JA++" );
+	return 2;
 }
 
 static int JPLua_Export_AddConsoleCommand( lua_State *L )

@@ -22,7 +22,6 @@ int	bCrashing = 0;
 #include "qcommon/disablewarnings.h"
 #include "g_crash.h"
 #include "g_local.h"
-#include "g_engine.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -139,15 +138,9 @@ void JKG_ExtCrashInfo(int fileHandle) {
 		JKG_FS_WriteString("|ID|Name                                |Ping|IP                    |\n",f);
 		JKG_FS_WriteString("+--+------------------------------------+----+----------------------+\n",f);
 		for (i=0; i < level.maxclients; i++) {
-			if (level.clients[i].pers.connected != CON_DISCONNECTED) {
-				#ifdef OPENJK
-					char *strIP = level.clients[i].sess.IP;
-				#else
-					char strIP[NET_ADDRSTRMAXLEN] = {0};
-					NET_AddrToString( strIP, sizeof( strIP ), &svs->clients[i].netchan.remoteAddress );
-				#endif // OPENJK
-				JKG_FS_WriteString(va("|%-2i|%-36s|%-4i|%-24s|\n",i,level.clients[i].pers.netname,level.clients[i].ps.ping, strIP), f); 
-			}
+			if ( level.clients[i].pers.connected != CON_DISCONNECTED )
+				JKG_FS_WriteString( va( "|%-2i|%-36s|%-4i|%-24s|\n", i, level.clients[i].pers.netname,
+					level.clients[i].ps.ping, level.clients[i].sess.IP ), f );
 		}
 		JKG_FS_WriteString("+--+------------------------------------+----+----------------------+\n",f);
 	}
@@ -918,7 +911,6 @@ static void InitSymbolPath( char * SymbolPath, const char* ModPath )
 		}
 }
 void G_ShutdownGame( int restart );
-static void (*Sys_Quit)(void) = NULL;
 
 static void G_ForceQuit( void ) {
 	trap->Error( ERR_DROP, "Server crash\n" );
@@ -931,13 +923,6 @@ static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*E
 	static char fspath[260];
 	const char *filename = JKG_Crash_GetCrashlogName();
 	fileHandle_t f;
-
-#ifndef OPENJK
-	if ( level.security.isPatched )
-		Sys_Quit = (void (*) (void))0x410CB0;
-	else
-#endif
-		Sys_Quit = G_ForceQuit;
 
 	SymPath[0] = 0;
 	basepath[0] = 0;
@@ -1001,8 +986,8 @@ static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*E
 	trap->FS_Close( f );
 	SymCleanup( GetCurrentProcess() );
 	Com_Printf("Crash report finished, attempting to shut down...\n");
-	Sys_Quit();	// This will call G_ShutdownGame and then shutdown the engine as well
-	// Generally speaking, we'll never get here, as Sys_Quit will terminate the process
+	G_ForceQuit();	// This will call G_ShutdownGame and then shutdown the engine as well
+	// Generally speaking, we'll never get here, as G_ForceQuit will terminate the process
 	return 1;
 }
 
@@ -1050,7 +1035,6 @@ extern char *strsignal(int __sig) __THROW;
 void (*OldHandler)(int signal, siginfo_t *siginfo, ucontext_t *ctx);
 
 static int m_crashloop=0;
-static void (* Sys_Quit)(void) = (void (*) (void))0x8073214;
 
 // Defined a linked
 #define PERM_READ 1
@@ -1494,7 +1478,7 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 	JKG_Free_MemoryMap();
 	Com_Printf("Crash report finished, attempting to shut down...\n");
 	if (m_crashloop < 2) {	// If we crashed here before, skip the quit call
-		Sys_Quit();	// This will call G_ShutdownGame and then shutdown the engine as well
+		G_ForceQuit();	// This will call G_ShutdownGame and then shutdown the engine as well
 	}
 	// We'll never get here, but just in case, forward the call to the old crash handler if we DO get here
 	OldHandler = (void *)oldact[signal].sa_sigaction;

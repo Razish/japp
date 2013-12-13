@@ -184,11 +184,7 @@ XCVAR_DEF( pmove_msec,						"8",					NULL,			CVAR_SYSTEMINFO,								qtrue )
 XCVAR_DEF( pmove_overbounce,				"1",					NULL,			CVAR_SERVERINFO,								qtrue )
 XCVAR_DEF( RMG,								"0",					NULL,			CVAR_NONE,										qfalse )
 XCVAR_DEF( sv_cheats,						"",						NULL,			CVAR_LATCH,										qtrue )
-#ifdef OPENJK
-XCVAR_DEF( sv_fps,							"40",					NULL,			CVAR_ARCHIVE|CVAR_SERVERINFO,					qtrue )
-#else
-XCVAR_DEF( sv_fps,							"20",					NULL,			CVAR_ARCHIVE,									qtrue )
-#endif
+XCVAR_DEF( sv_fps,							"40",					NULL,			CVAR_NONE,										qtrue )
 XCVAR_DEF( sv_maxclients,					"24",					NULL,			CVAR_SERVERINFO|CVAR_LATCH|CVAR_ARCHIVE,		qfalse )
 XCVAR_DEF( timelimit,						"0",					NULL,			CVAR_SERVERINFO|CVAR_ARCHIVE|CVAR_NORESTART,	qtrue )
 XCVAR_DEF( v,								"2.6B1",				NULL,			CVAR_SERVERINFO|CVAR_ROM,						qfalse )

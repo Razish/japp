@@ -63,7 +63,6 @@ files['game'] = [
 	'shared/libudis86/syn-intel.c',
 	'shared/libudis86/syn.c',
 	'shared/libudis86/udis86.c',
-	'shared/qcommon/q_engine.c',
 	'game/ai_main.c',
 	'game/ai_util.c',
 	'game/ai_wpnav.c',
@@ -89,7 +88,6 @@ files['game'] = [
 	'game/g_cmds.c',
 	'game/g_combat.c',
 	'game/g_crash.c',
-	'game/g_engine.c',
 	'game/g_exphysics.c',
 	'game/g_ICARUScb.c',
 	'game/g_items.c',
@@ -182,14 +180,12 @@ files['cgame'] = [
 	'shared/JAPP/jp_promode.c',
 	'shared/JAPP/jp_tokenparser.c',
 	'shared/json/cJSON.c',
-	'shared/qcommon/q_engine.c',
 	'ui/ui_shared.c',
 	'cgame/cg_chatbox.c',
 	'cgame/cg_consolecmds.c',
 	'cgame/cg_draw.c',
 	'cgame/cg_drawtools.c',
 	'cgame/cg_effects.c',
-	'cgame/cg_engine.c',
 	'cgame/cg_ents.c',
 	'cgame/cg_event.c',
 	'cgame/cg_info.c',
@@ -228,11 +224,7 @@ files['cgame'] = [
 	'cgame/fx_flechette.c',
 	'cgame/fx_force.c',
 	'cgame/fx_heavyrepeater.c',
-	'cgame/fx_rocketlauncher.c',
-	'cgame/GLee.c',
-	'cgame/tr_ext_extras.c',
-	'cgame/tr_ext_framebuffer.c',
-	'cgame/tr_ext_glsl_program.c' ] + files['lua']
+	'cgame/fx_rocketlauncher.c' ] + files['lua']
 
 files['ui'] = [
 	'game/bg_misc.c',
@@ -243,10 +235,7 @@ files['ui'] = [
 	'game/q_shared.c',
 	'shared/JAPP/jp_tokenparser.c',
 	'shared/json/cJSON.c',
-	'shared/qcommon/q_engine.c',
-	'ui/jp_update.c',
 	'ui/ui_atoms.c',
-	'ui/ui_engine.c',
 	'ui/ui_force.c',
 	'ui/ui_gameinfo.c',
 	'ui/ui_main.c',
@@ -257,7 +246,7 @@ files['ui'] = [
 # set up libraries to link with
 if env['PLATFORM'] == 'posix':
     libs['game']        = [ 'm' ]
-    libs['cgame']       = [ 'm', 'GL' ]
+    libs['cgame']       = [ 'm' ]
     libs['ui']          = [ 'm' ]
 else:
     libs['game']        = []
@@ -304,7 +293,7 @@ if int(ARGUMENTS.get( 'cgame', 0 )):
 
 # UI
 if int(ARGUMENTS.get( 'ui', 0 )):
-	env['CPPPATH'] = [ '.', './shared', './game', './curl' ]
+	env['CPPPATH'] = [ '.', './ui', './shared', './game' ]
 	env['CPPDEFINES'] += [ '_UI', 'JK2AWARDS', 'JPLUA' ]
 	env['LIBS'] = libs['ui']
 	env['LIBPREFIX'] = ''

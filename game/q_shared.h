@@ -22,7 +22,7 @@
 #ifdef _GAME
 
 	// server-side conditional compiling
-	#define OPENJK // ensure OpenJK compatibility (disables engine modifications, new vmMain/trap functionality for jappeng, etc)
+//	#define DERP
 
 	#define JAPP_SERVER_VERSION "JA++ revision 2 (DEV)"
 	#define JAPP_SERVER_FLAGS (SSF_GRAPPLE_SWING|SSF_SCOREBOARD_LARGE|SSF_SCOREBOARD_KD|SSF_CHAT_FILTERS|SSF_FIXED_WEAP_ANIMS|SSF_SPECTINFO)
@@ -30,16 +30,11 @@
 #else //Client-side
 
 	// client-side conditional compiling
-	#define OPENJK // ensure OpenJK compatibility (disables engine modifications, new vmMain/trap functionality for jappeng, etc)
 //	#define JPLUA_DEBUG
 	#define RAZTEST //Vehicles? First person stuff?
 	#define IMPROVED_RAGDOLL
+//	#define FAV_SERVERS // jappeng adds this to engine
 
-	#ifndef OPENJK
-		#define FAV_SERVERS // jappeng adds this to engine
-		#define R_POSTPROCESSING
-		#define R_TONEMAPPING
-	#endif
 
 	#define JAPLUS_CLIENT_VERSION		"1.4B4"
 	#define JAPP_CLIENT_VERSION			"^2JA++ 0.3 ^3build 3"

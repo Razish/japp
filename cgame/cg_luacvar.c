@@ -1,6 +1,5 @@
 #include "cg_local.h"
 #include "cg_lua.h"
-#include "cg_engine.h"
 
 #ifdef JPLUA
 
@@ -59,18 +58,11 @@ static int JPLua_Cvar_GetName( lua_State *L )
 static int JPLua_Cvar_GetDefault( lua_State *L )
 {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
-	#ifdef OPENJK
-		//No way to get the cvar's default value without engine funcs
-		//RAZTODO: search the local vmCvar table anyway?
-		lua_pushnil( L );
-	#else
-		cvar_t *cvar = ENG_Cvar_FindVar( luaCvar->name );
-	
-		if ( cvar )
-			lua_pushstring( L, cvar->resetString );
-		else
-			lua_pushnil( L );
-	#endif // OPENJK
+
+	//No way to get the cvar's default value without engine funcs
+	//RAZTODO: search the local vmCvar table anyway?
+	lua_pushnil( L );
+
 	return 1;
 }
 
@@ -79,18 +71,11 @@ static int JPLua_Cvar_GetDefault( lua_State *L )
 static int JPLua_Cvar_GetFlags( lua_State *L )
 {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
-	#ifdef OPENJK
-		// No way to get the cvar's flags without engine funcs
-		//RAZTODO: search the local vmCvar table anyway?
-		lua_pushnil( L );
-	#else
-		cvar_t *cvar = ENG_Cvar_FindVar( luaCvar->name );
-	
-		if ( cvar )
-			lua_pushinteger( L, cvar->flags );
-		else
-			lua_pushnil( L );
-	#endif // OPENJK
+
+	// No way to get the cvar's flags without engine funcs
+	//RAZTODO: search the local vmCvar table anyway?
+	lua_pushnil( L );
+
 	return 1;
 }
 
@@ -99,21 +84,14 @@ static int JPLua_Cvar_GetFlags( lua_State *L )
 static int JPLua_Cvar_GetInteger( lua_State *L )
 {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
-	#ifdef OPENJK
-		char buf[MAX_CVAR_VALUE_STRING] = {0};
-		trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
-		if ( buf[0] )
-			lua_pushinteger( L, atoi( buf ) );
-		else
-			lua_pushnil( L );
-	#else
-		cvar_t *cvar = ENG_Cvar_FindVar( luaCvar->name );
-	
-		if ( cvar )
-			lua_pushinteger( L, cvar->integer );
-		else
-			lua_pushnil( L );
-	#endif // OPENJK
+	char buf[MAX_CVAR_VALUE_STRING] = {0};
+
+	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
+	if ( buf[0] )
+		lua_pushinteger( L, atoi( buf ) );
+	else
+		lua_pushnil( L );
+
 	return 1;
 }
 
@@ -122,21 +100,14 @@ static int JPLua_Cvar_GetInteger( lua_State *L )
 static int JPLua_Cvar_GetString( lua_State *L )
 {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
-	#ifdef OPENJK
-		char buf[MAX_CVAR_VALUE_STRING] = {0};
-		trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
-		if ( buf[0] )
-			lua_pushstring( L, buf );
-		else
-			lua_pushnil( L );
-	#else
-		cvar_t *cvar = ENG_Cvar_FindVar( luaCvar->name );
-	
-		if ( cvar )
-			lua_pushstring( L, cvar->string );
-		else
-			lua_pushnil( L );
-	#endif // OPENJK
+	char buf[MAX_CVAR_VALUE_STRING] = {0};
+
+	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
+	if ( buf[0] )
+		lua_pushstring( L, buf );
+	else
+		lua_pushnil( L );
+
 	return 1;
 }
 
@@ -145,21 +116,14 @@ static int JPLua_Cvar_GetString( lua_State *L )
 static int JPLua_Cvar_GetFloat( lua_State *L )
 {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
-	#ifdef OPENJK
-		char buf[MAX_CVAR_VALUE_STRING] = {0};
-		trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
-		if ( buf[0] )
-			lua_pushnumber( L, (lua_Number)atof( buf ) );
-		else
-			lua_pushnil( L );
-	#else
-		cvar_t *cvar = ENG_Cvar_FindVar( luaCvar->name );
-	
-		if ( cvar )
-			lua_pushnumber( L, cvar->value );
-		else
-			lua_pushnil( L );
-	#endif // OPENJK
+	char buf[MAX_CVAR_VALUE_STRING] = {0};
+
+	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
+	if ( buf[0] )
+		lua_pushnumber( L, (lua_Number)atof( buf ) );
+	else
+		lua_pushnil( L );
+
 	return 1;
 }
 
@@ -167,16 +131,8 @@ static int JPLua_Cvar_GetFloat( lua_State *L )
 //Retn: --
 static int JPLua_Cvar_Reset( lua_State *L )
 {
-	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
-	#ifdef OPENJK
-		//RAZTODO: Search the local vmCvar table anyway?
-	#else
-		cvar_t *cvar = ENG_Cvar_FindVar( luaCvar->name );
-	
-		//Kind of hacky, but whatever..
-		if ( cvar )
-			trap->Cvar_Set( cvar->name, cvar->resetString );
-	#endif // OPENJK
+//	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
+	//RAZTODO: Search the local vmCvar table anyway?
 
 	return 0;
 }
@@ -198,13 +154,9 @@ void JPLua_Cvar_CreateRef( lua_State *L, const char *name )
 {
 	jplua_cvar_t *luaCvar = NULL;
 
-#ifdef OPENJK
 	char buf[MAX_CVAR_VALUE_STRING] = {0};
 	trap->Cvar_VariableStringBuffer( name, buf, sizeof( buf ) );
 	if ( !buf[0] ) //RAZFIXME: This isn't exactly reliable. Could be an empty cvar.
-#else
-	if ( !ENG_Cvar_FindVar( name ) )
-#endif // OPENJK
 	{
 		lua_pushnil( L );
 		return;
