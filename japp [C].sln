@@ -1,24 +1,15 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client Game", "cgame\cgame.vcxproj", "{4DC69D68-9DB8-4DEB-AC63-481153B1F41D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0AF93E5E-5CB4-4EC8-8B72-7F449DC48296} = {0AF93E5E-5CB4-4EC8-8B72-7F449DC48296}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "User Interface", "ui\ui.vcxproj", "{2DDA2041-6A68-4754-B342-14039CC91695}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D912B68D-9FFA-478D-ADB4-C36B89EB6242} = {D912B68D-9FFA-478D-ADB4-C36B89EB6242}
-		{664D9FB3-ACE7-43CC-94ED-527F9E3627B8} = {664D9FB3-ACE7-43CC-94ED-527F9E3627B8}
-		{0B6D35E5-150F-4F7C-8554-80A4477A09D7} = {0B6D35E5-150F-4F7C-8554-80A4477A09D7}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua", "lua\lua.vcxproj", "{0AF93E5E-5CB4-4EC8-8B72-7F449DC48296}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "zlib\zlib.vcxproj", "{D912B68D-9FFA-478D-ADB4-C36B89EB6242}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cURL", "curl\cURL.vcxproj", "{664D9FB3-ACE7-43CC-94ED-527F9E3627B8}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "minizip", "minizip\minizip.vcxproj", "{0B6D35E5-150F-4F7C-8554-80A4477A09D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,18 +29,6 @@ Global
 		{0AF93E5E-5CB4-4EC8-8B72-7F449DC48296}.Debug|Win32.Build.0 = Debug|Win32
 		{0AF93E5E-5CB4-4EC8-8B72-7F449DC48296}.Release|Win32.ActiveCfg = Release|Win32
 		{0AF93E5E-5CB4-4EC8-8B72-7F449DC48296}.Release|Win32.Build.0 = Release|Win32
-		{D912B68D-9FFA-478D-ADB4-C36B89EB6242}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D912B68D-9FFA-478D-ADB4-C36B89EB6242}.Debug|Win32.Build.0 = Debug|Win32
-		{D912B68D-9FFA-478D-ADB4-C36B89EB6242}.Release|Win32.ActiveCfg = Release|Win32
-		{D912B68D-9FFA-478D-ADB4-C36B89EB6242}.Release|Win32.Build.0 = Release|Win32
-		{664D9FB3-ACE7-43CC-94ED-527F9E3627B8}.Debug|Win32.ActiveCfg = Debug|Win32
-		{664D9FB3-ACE7-43CC-94ED-527F9E3627B8}.Debug|Win32.Build.0 = Debug|Win32
-		{664D9FB3-ACE7-43CC-94ED-527F9E3627B8}.Release|Win32.ActiveCfg = Release|Win32
-		{664D9FB3-ACE7-43CC-94ED-527F9E3627B8}.Release|Win32.Build.0 = Release|Win32
-		{0B6D35E5-150F-4F7C-8554-80A4477A09D7}.Debug|Win32.ActiveCfg = Debug|Win32
-		{0B6D35E5-150F-4F7C-8554-80A4477A09D7}.Debug|Win32.Build.0 = Debug|Win32
-		{0B6D35E5-150F-4F7C-8554-80A4477A09D7}.Release|Win32.ActiveCfg = Release|Win32
-		{0B6D35E5-150F-4F7C-8554-80A4477A09D7}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

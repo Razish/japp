@@ -169,7 +169,6 @@
     <ClCompile Include="..\shared\libudis86\syn-intel.c" />
     <ClCompile Include="..\shared\libudis86\syn.c" />
     <ClCompile Include="..\shared\libudis86\udis86.c" />
-    <ClCompile Include="..\shared\qcommon\q_engine.c" />
     <ClCompile Include="ai_main.c" />
     <ClCompile Include="ai_util.c" />
     <ClCompile Include="ai_wpnav.c" />
@@ -195,7 +194,6 @@
     <ClCompile Include="g_cmds.c" />
     <ClCompile Include="g_combat.c" />
     <ClCompile Include="g_crash.c" />
-    <ClCompile Include="g_engine.c" />
     <ClCompile Include="g_exphysics.c" />
     <ClCompile Include="g_ICARUScb.c" />
     <ClCompile Include="g_items.c" />
@@ -306,7 +304,6 @@
     <ClInclude Include="g_admin.h" />
     <ClInclude Include="g_chatFilters.h" />
     <ClInclude Include="g_crash.h" />
-    <ClInclude Include="g_engine.h" />
     <ClInclude Include="g_headers.h" />
     <ClInclude Include="g_ICARUScb.h" />
     <ClInclude Include="g_local.h" />
@@ -331,9 +328,6 @@
     <ClInclude Include="..\shared\qcommon\tags.h" />
     <ClInclude Include="teams.h" />
     <ClInclude Include="w_saber.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="game.def" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\win32\game.rc" />

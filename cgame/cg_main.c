@@ -3,10 +3,6 @@
 // cg_main.c -- initialization and primary entry point for cgame
 #include "cg_local.h"
 
-//[PostProcess]
-#include "tr_ext_public.h"
-//[/PostProcess]
-
 #include "cg_lua.h"
 
 #include "../ui/ui_shared.h"
@@ -3472,12 +3468,6 @@ Ghoul2 Insert End
 	//now get all the cgame only cents
 	CG_SpawnCGameOnlyEnts();
 
-	//[PostProcess]
-	#ifdef R_POSTPROCESSING
-		R_EXT_Init();
-	#endif
-	//[/PostProcess]
-
 	// console logging
 	if ( cg_logConsole.string[0] ) {
 		trap->FS_Open( cg_logConsole.string, &cg.log.console, FS_APPEND );
@@ -3608,12 +3598,6 @@ Called before every level change or subsystem restart
 */
 void CG_Shutdown( void ) 
 {
-	//[PostProcess]
-#ifdef R_POSTPROCESSING
-	R_EXT_Cleanup();
-#endif
-	//[/PostProcess]
-
 	BG_ClearAnimsets(); //free all dynamic allocations made through the engine
 
 	CG_DestroyAllGhoul2();

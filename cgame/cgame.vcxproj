@@ -179,13 +179,11 @@
     <ClCompile Include="..\game\bg_weapons.c" />
     <ClCompile Include="..\shared\JAPP\jp_promode.c" />
     <ClCompile Include="..\shared\json\cJSON.c" />
-    <ClCompile Include="..\shared\qcommon\q_engine.c" />
     <ClCompile Include="cg_chatbox.c" />
     <ClCompile Include="cg_consolecmds.c" />
     <ClCompile Include="cg_draw.c" />
     <ClCompile Include="cg_drawtools.c" />
     <ClCompile Include="cg_effects.c" />
-    <ClCompile Include="cg_engine.c" />
     <ClCompile Include="cg_ents.c" />
     <ClCompile Include="cg_event.c" />
     <ClCompile Include="cg_info.c" />
@@ -226,14 +224,10 @@
     <ClCompile Include="fx_force.c" />
     <ClCompile Include="fx_heavyrepeater.c" />
     <ClCompile Include="fx_rocketlauncher.c" />
-    <ClCompile Include="GLee.c" />
     <ClCompile Include="..\shared\JAPP\jp_tokenparser.c" />
     <ClCompile Include="..\game\q_math.c" />
     <ClCompile Include="..\game\q_shared.c" />
     <ClCompile Include="..\game\SpeederNPC.c" />
-    <ClCompile Include="tr_ext_extras.c" />
-    <ClCompile Include="tr_ext_framebuffer.c" />
-    <ClCompile Include="tr_ext_glsl_program.c" />
     <ClCompile Include="..\ui\ui_shared.c" />
     <ClCompile Include="..\game\WalkerNPC.c" />
   </ItemGroup>
@@ -247,7 +241,6 @@
     <ClInclude Include="..\game\bg_public.h" />
     <ClInclude Include="..\game\bg_saga.h" />
     <ClInclude Include="..\game\bg_weapons.h" />
-    <ClInclude Include="cg_engine.h" />
     <ClInclude Include="cg_lights.h" />
     <ClInclude Include="cg_local.h" />
     <ClInclude Include="cg_lua.h" />
@@ -261,7 +254,6 @@
     <ClInclude Include="..\shared\qcommon\disablewarnings.h" />
     <ClInclude Include="fx_local.h" />
     <ClInclude Include="..\shared\Ghoul2\G2.h" />
-    <ClInclude Include="GLee.h" />
     <ClInclude Include="holocronicons.h" />
     <ClInclude Include="..\shared\JAPP\jp_tokenparser.h" />
     <ClInclude Include="..\ui\keycodes.h" />
@@ -270,14 +262,8 @@
     <ClInclude Include="..\shared\qcommon\qfiles.h" />
     <ClInclude Include="..\game\surfaceflags.h" />
     <ClInclude Include="..\shared\qcommon\tags.h" />
-    <ClInclude Include="tr_ext_framebuffer.h" />
-    <ClInclude Include="tr_ext_glsl_program.h" />
-    <ClInclude Include="tr_ext_public.h" />
     <ClInclude Include="tr_types.h" />
     <ClInclude Include="..\ui\ui_shared.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cgame.def" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\win32\cgame.rc" />

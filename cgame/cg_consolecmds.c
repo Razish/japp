@@ -333,14 +333,6 @@ void CG_LuaReload_f( void ) {
 }
 #endif // JPLUA
 
-#ifdef R_POSTPROCESSING
-	#include "tr_ext_public.h"
-	void CG_PostProcess_Reload_f( void ) {
-		R_EXT_Cleanup();
-		R_EXT_Init();
-	}
-#endif // R_POSTPROCESSING
-
 //cg_consolecmds.c
 
 void CG_FixDirection(void){
@@ -442,9 +434,6 @@ static command_t commands[] = {
 	{ "notarget",					NULL },
 	{ "npc",						NULL },
 	{ "pluginDisable",				CG_PluginDisable_f },
-#ifdef R_POSTPROCESSING
-	{ "postprocess_reload",			CG_PostProcess_Reload_f },
-#endif // R_POSTPROCESSING
 	{ "prevframe",					CG_TestModelPrevFrame_f },
 	{ "prevskin",					CG_TestModelPrevSkin_f },
 	{ "saberAttackCycle",			NULL },

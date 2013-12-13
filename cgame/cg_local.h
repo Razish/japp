@@ -1101,10 +1101,6 @@ Ghoul2 Insert End
 	} viewBob;
 
 	struct {
-		vector4		UserVec1;
-	} postProcessing;
-
-	struct {
 		ivector2 position, size;
 	} accelerometer;
 

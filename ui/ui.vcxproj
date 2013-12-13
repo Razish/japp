@@ -173,10 +173,7 @@
     <ClCompile Include="..\game\q_math.c" />
     <ClCompile Include="..\game\q_shared.c" />
     <ClCompile Include="..\shared\json\cJSON.c" />
-    <ClCompile Include="..\shared\qcommon\q_engine.c" />
-    <ClCompile Include="jp_update.c" />
     <ClCompile Include="ui_atoms.c" />
-    <ClCompile Include="ui_engine.c" />
     <ClCompile Include="ui_force.c" />
     <ClCompile Include="ui_gameinfo.c" />
     <ClCompile Include="ui_main.c" />
@@ -202,14 +199,10 @@
     <ClInclude Include="..\game\surfaceflags.h" />
     <ClInclude Include="..\shared\qcommon\tags.h" />
     <ClInclude Include="..\cgame\tr_types.h" />
-    <ClInclude Include="ui_engine.h" />
     <ClInclude Include="ui_force.h" />
     <ClInclude Include="ui_local.h" />
     <ClInclude Include="ui_public.h" />
     <ClInclude Include="ui_shared.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ui.def" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\win32\ui.rc" />

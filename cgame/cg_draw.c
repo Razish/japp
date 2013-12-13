@@ -10,10 +10,6 @@
 #include "../ui/ui_shared.h"
 #include "../ui/ui_public.h"
 
-//[PostProcess]
-#include "tr_ext_public.h"
-//[/PostProcess]
-
 #include "cg_luaevent.h"
 
 extern float CG_RadiusForCent( centity_t *cent );
@@ -8983,12 +8979,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// draw 3D view
 	trap->R_RenderScene( refdef );
-
-	//[PostProcess]
-#ifdef R_POSTPROCESSING
-	R_EXT_PostProcess();
-#endif
-	//[/PostProcess]
 
 	// restore original viewpoint if running stereo
 	if ( separation != 0 ) {
