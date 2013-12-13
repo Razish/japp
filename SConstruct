@@ -268,7 +268,7 @@ if int( ARGUMENTS.get( 'debug', 0 ) ):
 else:
 	if env['PLATFORM'] == 'posix':
 		env['CCFLAGS'] += [ '-O2' ]
-	env['CPPDEFINES'] += [ 'NDEBUG' ]
+	env['CPPDEFINES'] += [ 'NDEBUG', 'FINAL_BUILD' ]
 
 
 #################
