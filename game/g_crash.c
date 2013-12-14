@@ -7,16 +7,19 @@
 //
 ////////////////////////////////
 
+#include "q_shared.h"
 #include "qcommon/game_version.h"
 
 #if QARCH == 64
 
 #elif QARCH == 32
 
+#pragma comment( lib, "DbgHelp" )
+
 int	bCrashing = 0;
 
 //#include <disasm/disasm.h>
-#include <libudis86/udis86.h>
+#include "shared/libudis86/udis86.h"
 
 #include <time.h>
 #include "qcommon/disablewarnings.h"
