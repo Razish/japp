@@ -243,10 +243,6 @@ typedef struct {
 
 //=============================================================================
 
-#ifdef _XBOX
-removed
-#else // _XBOX
-
 typedef struct {
 	int		fileofs, filelen;
 } lump_t;
@@ -397,8 +393,6 @@ typedef struct {
 	int			patchWidth;
 	int			patchHeight;
 } dsurface_t;
-
-#endif // _XBOX
 
 /////////////////////////////////////////////////////////////
 //

@@ -302,10 +302,6 @@ typedef struct clientInfo_s {
 
 	int			superSmoothTime; //do crazy amount of smoothing
 
-#ifdef _XBOX
-	int			friendshipStatus;
-#endif
-
 	//[RGBSabers]
 	vector3		rgb1;
 	vector3		rgb2;
@@ -314,11 +310,7 @@ typedef struct clientInfo_s {
 } clientInfo_t;
 
 //rww - cheap looping sound struct
-#ifdef _XBOX
-#define MAX_CG_LOOPSOUNDS 2
-#else
 #define MAX_CG_LOOPSOUNDS 8
-#endif
 
 typedef struct cgLoopSound_s {
 	int entityNum;
