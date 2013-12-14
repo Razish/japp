@@ -4,7 +4,7 @@
 #include "b_local.h"
 #include "anims.h"
 #include "say.h"
-#include "ICARUS/Q3_Interface.h"
+#include "shared/ICARUS/Q3_Interface.h"
 
 extern vector3 playerMins;
 extern vector3 playerMaxs;

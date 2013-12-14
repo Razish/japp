@@ -47,7 +47,6 @@ local.properties
 [Rr]elease/
 [Ff]inal/
 [Ff]inal[Bb]uild/
-.build/
 *_i.c
 *_p.c
 *.ilk
@@ -64,7 +63,6 @@ local.properties
 *.tlh
 *.tmp
 *.vspscc
-.builds
 *.dotCover
 
 ## TODO: If you have NuGet Package Restore enabled, uncomment this

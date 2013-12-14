@@ -7,8 +7,8 @@
 #include "q_shared.h"
 #include "bg_public.h"
 #include "b_local.h"
-#include "ICARUS/Q3_Interface.h"
-#include "ICARUS/Q3_Registers.h"
+#include "shared/ICARUS/Q3_Interface.h"
+#include "shared/ICARUS/Q3_Registers.h"
 #include "g_nav.h"
 
 qboolean BG_SabersOff( playerState_t *ps );
@@ -42,7 +42,7 @@ enum
 };
 #endif
 
-#include "ICARUS/interpreter.h"
+#include "shared/ICARUS/interpreter.h"
 
 extern stringID_table_t animTable [MAX_ANIMATIONS+1];
 

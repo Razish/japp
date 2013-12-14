@@ -11,7 +11,7 @@
 //
 // cg_drawtools.c -- helper functions called by cg_draw, cg_scoreboard, cg_info, etc
 #include "cg_local.h"
-#include "../game/q_shared.h"
+#include "q_shared.h"
 
 
 /*
@@ -202,7 +202,7 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-#include "../ui/menudef.h"	// for "ITEM_TEXTSTYLE_SHADOWED"
+#include "ui/menudef.h"	// for "ITEM_TEXTSTYLE_SHADOWED"
 void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor, 
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars )
 {
@@ -600,7 +600,7 @@ void CG_DrawNumField( int x, int y, int width, int value, int charWidth, int cha
 
 }
 
-#include "../ui/ui_shared.h"	// for some text style junk
+#include "ui/ui_shared.h"	// for some text style junk
 void UI_DrawProportionalString( int x, int y, const char* str, int style, vector4 *color ) 
 {
 	// having all these different style defines (1 for UI, one for CG, and now one for the re->font stuff) 

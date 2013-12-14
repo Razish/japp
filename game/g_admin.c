@@ -20,8 +20,8 @@
 
 #include "g_local.h"
 #include "g_admin.h"
-#include "JAPP/jp_tokenparser.h"
-#include <json/cJSON.h>
+#include "shared/JAPP/jp_tokenparser.h"
+#include "shared/json/cJSON.h"
 
 static adminUser_t *adminUsers = NULL;
 

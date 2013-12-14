@@ -2,7 +2,7 @@
 //
 // cg_players.c -- handle the media and animation for player entities
 #include "cg_local.h"
-#include "Ghoul2/G2.h"
+#include "shared/Ghoul2/G2.h"
 #include "bg_saga.h"
 #include "fx_local.h"
 
@@ -9343,7 +9343,7 @@ float CG_RadiusForCent( centity_t *cent )
 
 static float cg_vehThirdPersonAlpha = 1.0f;
 extern vector3	cg_crosshairPos;
-extern vector3	cameraCurLoc;
+extern vector3	cameraCurLoc[MAX_CLIENTS];
 void CG_CheckThirdPersonAlpha( centity_t *cent, refEntity_t *legs )
 {
 	float alpha = 1.0f;		
@@ -9378,10 +9378,10 @@ void CG_CheckThirdPersonAlpha( centity_t *cent, refEntity_t *legs )
 			{//vehicle has auto third-person alpha on
 				trace_t trace;
 				vector3	dir2Crosshair, end;
-				VectorSubtract( &cg_crosshairPos, &cameraCurLoc, &dir2Crosshair );
+				VectorSubtract( &cg_crosshairPos, &cameraCurLoc[cent->currentState.clientNum], &dir2Crosshair );
 				VectorNormalize( &dir2Crosshair );
-				VectorMA( &cameraCurLoc, cent->m_pVehicle->m_pVehicleInfo->cameraRange*2.0f, &dir2Crosshair, &end );
-				CG_G2Trace( &trace, &cameraCurLoc, &vec3_origin, &vec3_origin, &end, ENTITYNUM_NONE, CONTENTS_BODY );
+				VectorMA( &cameraCurLoc[cent->currentState.clientNum], cent->m_pVehicle->m_pVehicleInfo->cameraRange*2.0f, &dir2Crosshair, &end );
+				CG_G2Trace( &trace, &cameraCurLoc[cent->currentState.clientNum], &vec3_origin, &vec3_origin, &end, ENTITYNUM_NONE, CONTENTS_BODY );
 				if ( trace.entityNum == cent->currentState.clientNum 
 					|| trace.entityNum == cg.predictedPlayerState.clientNum)
 				{//hit me or the vehicle I'm in

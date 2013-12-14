@@ -1,6 +1,6 @@
 #include "cg_local.h"
-#include "../ui/ui_public.h"
-#include "../ui/ui_shared.h"
+#include "ui/ui_public.h"
+#include "ui/ui_shared.h"
 #include "qcommon/qfiles.h"	// for STYLE_BLINK etc
 
 int JP_GetScoreboardFont( void )

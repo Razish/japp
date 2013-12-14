@@ -8,7 +8,7 @@
 #if defined( _GAME )
 	#include "g_local.h"
 #elif defined( _UI )
-	#include "../ui/ui_local.h"
+	#include "ui_local.h"
 #elif defined( _CGAME )
 	#include "cg_local.h"
 #endif

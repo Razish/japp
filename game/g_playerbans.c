@@ -26,7 +26,7 @@
 \*/
 
 #include "g_local.h"
-#include "json/cJSON.h"
+#include "shared/json/cJSON.h"
 
 typedef struct banentry_s {
 	unsigned int	id;

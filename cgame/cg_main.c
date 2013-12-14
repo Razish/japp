@@ -5,7 +5,7 @@
 
 #include "cg_lua.h"
 
-#include "../ui/ui_shared.h"
+#include "ui/ui_shared.h"
 // display context for new ui stuff
 displayContextDef_t cgDC;
 
@@ -44,11 +44,7 @@ static int	CG_RagCallback(int callType);
 static void C_GetBoltPos(void);
 static void C_ImpactMark(void);
 
-#ifdef _XBOX
-#define MAX_MISC_ENTS	500
-#else
 #define MAX_MISC_ENTS	4000
-#endif
 
 //static refEntity_t	*MiscEnts = 0;
 //static float		*Radius = 0;
@@ -2074,7 +2070,6 @@ void CG_StartMusic( qboolean bForceStart ) {
 	trap->S_StartBackgroundTrack( parm1, parm2, !bForceStart );
 }
 
-#ifndef _XBOX
 char *CG_GetMenuBuffer(const char *filename) {
 	int	len;
 	fileHandle_t	f;
@@ -2097,7 +2092,6 @@ char *CG_GetMenuBuffer(const char *filename) {
 
 	return buf;
 }
-#endif
 
 //
 // ==============================
@@ -3453,9 +3447,7 @@ Ghoul2 Insert End
 
 //	CG_LoadingString( "Creating automap data" );
 	//init automap
-#ifndef _XBOX
 	trap->R_InitializeWireframeAutomap();
-#endif
 
 	CG_LoadingString( "" );
 

@@ -11,8 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{0AF93E5E-5CB4-4EC8-8B72-7F449DC48296}</ProjectGuid>
+    <ProjectGuid>{7697D754-1C48-485F-AD68-DAD8BB45BD78}</ProjectGuid>
     <RootNamespace>lua</RootNamespace>
+    <ProjectName>lua</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -37,17 +38,18 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IntDir>.\../.build/$(CONFIGURATION)/$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>.\../.build/$(CONFIGURATION)/$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)</OutDir>
+    <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -55,80 +57,49 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
-    <Lib>
-      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include=".\bit.c" />
-    <ClCompile Include=".\lapi.c" />
-    <ClCompile Include=".\lauxlib.c" />
-    <ClCompile Include=".\lbaselib.c" />
-    <ClCompile Include=".\lcode.c" />
-    <ClCompile Include=".\ldblib.c" />
-    <ClCompile Include=".\ldebug.c" />
-    <ClCompile Include=".\ldo.c" />
-    <ClCompile Include=".\ldump.c" />
-    <ClCompile Include=".\lfunc.c" />
-    <ClCompile Include=".\lgc.c" />
-    <ClCompile Include=".\linit.c" />
-    <ClCompile Include=".\liolib.c" />
-    <ClCompile Include=".\llex.c" />
-    <ClCompile Include=".\lmathlib.c" />
-    <ClCompile Include=".\lmem.c" />
-    <ClCompile Include=".\loadlib.c" />
-    <ClCompile Include=".\lobject.c" />
-    <ClCompile Include=".\lopcodes.c" />
-    <ClCompile Include=".\loslib.c" />
-    <ClCompile Include=".\lparser.c" />
-    <ClCompile Include=".\lstate.c" />
-    <ClCompile Include=".\lstring.c" />
-    <ClCompile Include=".\lstrlib.c" />
-    <ClCompile Include=".\ltable.c" />
-    <ClCompile Include=".\ltablib.c" />
-    <ClCompile Include=".\ltm.c" />
-    <ClCompile Include=".\lua.c" />
-    <ClCompile Include=".\lundump.c" />
-    <ClCompile Include=".\lvm.c" />
-    <ClCompile Include=".\lzio.c" />
-    <ClCompile Include=".\print.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include=".\lapi.h" />
-    <ClInclude Include=".\lauxlib.h" />
-    <ClInclude Include=".\lcode.h" />
-    <ClInclude Include=".\ldebug.h" />
-    <ClInclude Include=".\ldo.h" />
-    <ClInclude Include=".\lfunc.h" />
-    <ClInclude Include=".\lgc.h" />
-    <ClInclude Include=".\llex.h" />
-    <ClInclude Include=".\llimits.h" />
-    <ClInclude Include=".\lmem.h" />
-    <ClInclude Include=".\lobject.h" />
-    <ClInclude Include=".\lopcodes.h" />
-    <ClInclude Include=".\lparser.h" />
-    <ClInclude Include=".\lstate.h" />
-    <ClInclude Include=".\lstring.h" />
-    <ClInclude Include=".\ltable.h" />
-    <ClInclude Include=".\ltm.h" />
-    <ClInclude Include=".\lua.h" />
-    <ClInclude Include=".\luaconf.h" />
-    <ClInclude Include=".\lualib.h" />
-    <ClInclude Include=".\lundump.h" />
-    <ClInclude Include=".\lvm.h" />
-    <ClInclude Include=".\lzio.h" />
+    <ClCompile Include="..\lua\bit.c" />
+    <ClCompile Include="..\lua\lapi.c" />
+    <ClCompile Include="..\lua\lauxlib.c" />
+    <ClCompile Include="..\lua\lbaselib.c" />
+    <ClCompile Include="..\lua\lcode.c" />
+    <ClCompile Include="..\lua\ldblib.c" />
+    <ClCompile Include="..\lua\ldebug.c" />
+    <ClCompile Include="..\lua\ldo.c" />
+    <ClCompile Include="..\lua\ldump.c" />
+    <ClCompile Include="..\lua\lfunc.c" />
+    <ClCompile Include="..\lua\lgc.c" />
+    <ClCompile Include="..\lua\linit.c" />
+    <ClCompile Include="..\lua\liolib.c" />
+    <ClCompile Include="..\lua\llex.c" />
+    <ClCompile Include="..\lua\lmathlib.c" />
+    <ClCompile Include="..\lua\lmem.c" />
+    <ClCompile Include="..\lua\loadlib.c" />
+    <ClCompile Include="..\lua\lobject.c" />
+    <ClCompile Include="..\lua\lopcodes.c" />
+    <ClCompile Include="..\lua\loslib.c" />
+    <ClCompile Include="..\lua\lparser.c" />
+    <ClCompile Include="..\lua\lstate.c" />
+    <ClCompile Include="..\lua\lstring.c" />
+    <ClCompile Include="..\lua\lstrlib.c" />
+    <ClCompile Include="..\lua\ltable.c" />
+    <ClCompile Include="..\lua\ltablib.c" />
+    <ClCompile Include="..\lua\ltm.c" />
+    <ClCompile Include="..\lua\lua.c" />
+    <ClCompile Include="..\lua\lundump.c" />
+    <ClCompile Include="..\lua\lvm.c" />
+    <ClCompile Include="..\lua\lzio.c" />
+    <ClCompile Include="..\lua\print.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

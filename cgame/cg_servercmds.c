@@ -5,10 +5,10 @@
 // be a valid snapshot this frame
 
 #include "cg_local.h"
-#include "../ui/menudef.h"
+#include "ui/menudef.h"
 #include "cg_lights.h"
-#include "Ghoul2/G2.h"
-#include "../ui/ui_public.h"
+#include "shared/Ghoul2/G2.h"
+#include "ui/ui_public.h"
 
 #include "cg_luaevent.h"
 
@@ -105,7 +105,7 @@ and whenever the server updates any serverinfo flagged cvars
 ================
 */
 
-#include "JAPP/jp_promode.h"
+#include "shared/JAPP/jp_promode.h"
 void CG_ParseServerinfo( void ) {
 	const char *info = NULL, *tinfo = NULL;
 	char *mapname;

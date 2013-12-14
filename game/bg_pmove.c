@@ -6,7 +6,7 @@
 #include "q_shared.h"
 #include "bg_public.h"
 #include "bg_local.h"
-#include "Ghoul2/G2.h"
+#include "shared/Ghoul2/G2.h"
 
 #ifdef _GAME
 	#include "g_local.h" //ahahahahhahahaha@$!$!
@@ -16,7 +16,7 @@
 	#include "cg_local.h"
 #endif
 
-#include "JAPP/jp_promode.h"
+#include "shared/JAPP/jp_promode.h"
 
 #define MAX_WEAPON_CHARGE_TIME 5000
 

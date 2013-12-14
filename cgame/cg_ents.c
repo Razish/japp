@@ -7,7 +7,7 @@
 Ghoul2 Insert Start
 */
 #include "q_shared.h"
-#include "Ghoul2/G2.h"
+#include "shared/Ghoul2/G2.h"
 /*
 Ghoul2 Insert end
 */
@@ -142,9 +142,6 @@ void CG_S_AddLoopingSound(int entityNum, const vector3 *origin, const vector3 *v
 	}
 	else if (cent->numLoopingSounds >= MAX_CG_LOOPSOUNDS)
 	{ //Just don't add it then I suppose.
-#ifdef _XBOX	// We decreased this number, so I'd like to know if it gets overflowed
-		Com_Printf( S_COLOR_YELLOW "Warning: MAX_CG_LOOPSOUNDS exceeded!!\n" );
-#endif
 		return;
 	}
 

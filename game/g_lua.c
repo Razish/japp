@@ -1,6 +1,6 @@
 #include "g_local.h"
 #include "q_shared.h"
-#include "json/cJSON.h"
+#include "shared/json/cJSON.h"
 
 #include "g_lua.h"
 //#include "cg_luaserialiser.h" 

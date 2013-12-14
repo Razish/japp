@@ -2182,13 +2182,6 @@ void CGCam_Shake( float intensity, int duration )
 	
 
 	cgScreenEffects.shake_start = cg.time;
-//JLFRUMBLE
-#ifdef _XBOX
-extern void FF_XboxShake(float intensity, int duration);
-
-FF_XboxShake(intensity, duration);
-
-#endif
 }
 
 void CG_DoCameraShake( vector3 *origin, float intensity, int radius, int time )

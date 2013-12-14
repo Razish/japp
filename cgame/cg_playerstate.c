@@ -173,18 +173,6 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 	cg.damageValue = kick;
 	cg.v_dmg_time = cg.time + DAMAGE_TIME;
 	cg.damageTime = cg.snap->serverTime;
-
-//JLFRUMBLE
-#ifdef _XBOX
-extern void FF_XboxShake(float intensity, int duration);
-extern void FF_XboxDamage(int damage, float xpos);
-
-//FF_XboxShake(kick, 500);
-FF_XboxDamage(damage, -left);
-
-
-#endif
-
 }
 
 
@@ -239,7 +227,6 @@ void CG_CheckPlayerstateEvents( playerState_t *ps, playerState_t *ops ) {
 			event = ps->events[ i & (MAX_PS_EVENTS-1) ];
 			cent->currentState.event = event;
 			cent->currentState.eventParm = ps->eventParms[ i & (MAX_PS_EVENTS-1) ];
-//JLF ADDED to hopefully mark events as player event
 			//Raz: Swoop camera fix
 		//	cent->playerState = ps;
 			CG_EntityEvent( cent, &cent->lerpOrigin );

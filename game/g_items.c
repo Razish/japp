@@ -1,7 +1,7 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 #include "g_local.h"
-#include "Ghoul2/G2.h"
+#include "shared/Ghoul2/G2.h"
 #include "q_shared.h"
 
 /*

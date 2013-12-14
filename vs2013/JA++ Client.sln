@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgame", "cgame.vcxproj", "{6245E8FD-5C7D-44D0-8811-EEB704A253D5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7697D754-1C48-485F-AD68-DAD8BB45BD78} = {7697D754-1C48-485F-AD68-DAD8BB45BD78}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua", "lua.vcxproj", "{7697D754-1C48-485F-AD68-DAD8BB45BD78}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ui", "ui.vcxproj", "{B55AFD1E-232E-4CF9-AD6F-283941A185DE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6245E8FD-5C7D-44D0-8811-EEB704A253D5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6245E8FD-5C7D-44D0-8811-EEB704A253D5}.Debug|Win32.Build.0 = Debug|Win32
+		{6245E8FD-5C7D-44D0-8811-EEB704A253D5}.Release|Win32.ActiveCfg = Release|Win32
+		{6245E8FD-5C7D-44D0-8811-EEB704A253D5}.Release|Win32.Build.0 = Release|Win32
+		{7697D754-1C48-485F-AD68-DAD8BB45BD78}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7697D754-1C48-485F-AD68-DAD8BB45BD78}.Debug|Win32.Build.0 = Debug|Win32
+		{7697D754-1C48-485F-AD68-DAD8BB45BD78}.Release|Win32.ActiveCfg = Release|Win32
+		{7697D754-1C48-485F-AD68-DAD8BB45BD78}.Release|Win32.Build.0 = Release|Win32
+		{B55AFD1E-232E-4CF9-AD6F-283941A185DE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B55AFD1E-232E-4CF9-AD6F-283941A185DE}.Debug|Win32.Build.0 = Debug|Win32
+		{B55AFD1E-232E-4CF9-AD6F-283941A185DE}.Release|Win32.ActiveCfg = Release|Win32
+		{B55AFD1E-232E-4CF9-AD6F-283941A185DE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,6 +1,6 @@
 //b_goal.cpp
 #include "b_local.h"
-#include "ICARUS/Q3_Interface.h"
+#include "shared/ICARUS/Q3_Interface.h"
 
 extern qboolean FlyingCreature( gentity_t *ent );
 /*

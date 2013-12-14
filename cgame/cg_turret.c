@@ -1,6 +1,6 @@
 #include "cg_local.h"
 #include "q_shared.h"
-#include "Ghoul2/G2.h"
+#include "shared/Ghoul2/G2.h"
 
 //rww - The turret is heavily dependant on bone angles. We can't happily set that on the server, so it is done client-only.
 

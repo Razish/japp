@@ -12,9 +12,9 @@
 
 #define MAX_TEAMNAME 32
 
-#include "JAPP/jp_csflags.h"
-#include "JAPP/jp_ssflags.h"
-#include "JAPP/jp_cinfo.h"
+#include "shared/JAPP/jp_csflags.h"
+#include "shared/JAPP/jp_ssflags.h"
+#include "shared/JAPP/jp_cinfo.h"
 
 #define JAPLUS_CLIENT_FLAGS (CSF_GRAPPLE_SWING|CSF_SCOREBOARD_KD)
 #define JAPLUS_SERVER_FLAGS (SSF_GRAPPLE_SWING|SSF_SCOREBOARD_KD|SSF_MERC_FLAMETHOWER)
@@ -150,7 +150,7 @@ float FloatSwap( const float *f );
 //
 // ================================================================
 
-#ifdef WIN32
+#ifdef _WIN32
 
 	//Raz: added
 	#define WIN32_LEAN_AND_MEAN
@@ -187,7 +187,7 @@ float FloatSwap( const float *f );
 
 	#define	PATH_SEP '\\'
 
-#endif // WIN32
+#endif // _WIN32
 
 
 // ================================================================

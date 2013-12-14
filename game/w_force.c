@@ -2,7 +2,7 @@
 #include "b_local.h"
 #include "w_saber.h"
 #include "ai_main.h"
-#include "Ghoul2/G2.h"
+#include "shared/Ghoul2/G2.h"
 
 #define METROID_JUMP 1
 

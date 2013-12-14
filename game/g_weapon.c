@@ -6,7 +6,7 @@
 #include "g_local.h"
 #include "be_aas.h"
 #include "bg_saga.h"
-#include "Ghoul2/G2.h"
+#include "shared/Ghoul2/G2.h"
 #include "q_shared.h"
 
 static	vector3	forward, vright, up;

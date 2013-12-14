@@ -1,6 +1,6 @@
 #include "cg_local.h"
 #include "cg_lua.h"
-#include "json/cJSON.h"
+#include "shared/json/cJSON.h"
 #include "cg_luaserialiser.h"
 
 #ifdef JPLUA

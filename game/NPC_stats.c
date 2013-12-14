@@ -2,7 +2,7 @@
 #include "b_local.h"
 #include "b_public.h"
 #include "anims.h"
-#include "Ghoul2/G2.h"
+#include "shared/Ghoul2/G2.h"
 
 extern qboolean NPCsPrecached;
 

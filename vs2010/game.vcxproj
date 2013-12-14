@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6245E8FD-5C7D-44D0-8811-EEB704A253D5}</ProjectGuid>
+    <RootNamespace>game</RootNamespace>
+    <ProjectName>game</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(ProjectName)x86</TargetName>
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)</OutDir>
+    <TargetName>$(ProjectName)x86</TargetName>
+    <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <AdditionalIncludeDirectories>../;../game/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDLL;_GAME;JK2AWARDS;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link />
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)\</AdditionalLibraryDirectories>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <AdditionalIncludeDirectories>../;../game/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDLL;FINAL_BUILD;_GAME;JK2AWARDS;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\shared\JAPP\jp_promode.c" />
+    <ClCompile Include="..\shared\JAPP\jp_tokenparser.c" />
+    <ClCompile Include="..\shared\json\cJSON.c" />
+    <ClCompile Include="..\shared\libudis86\decode.c" />
+    <ClCompile Include="..\shared\libudis86\input.c" />
+    <ClCompile Include="..\shared\libudis86\itab.c" />
+    <ClCompile Include="..\shared\libudis86\syn-att.c" />
+    <ClCompile Include="..\shared\libudis86\syn-intel.c" />
+    <ClCompile Include="..\shared\libudis86\syn.c" />
+    <ClCompile Include="..\shared\libudis86\udis86.c" />
+    <ClCompile Include="..\game\ai_main.c" />
+    <ClCompile Include="..\game\ai_util.c" />
+    <ClCompile Include="..\game\ai_wpnav.c" />
+    <ClCompile Include="..\game\AnimalNPC.c" />
+    <ClCompile Include="..\game\bg_g2_utils.c" />
+    <ClCompile Include="..\game\bg_misc.c" />
+    <ClCompile Include="..\game\bg_panimate.c" />
+    <ClCompile Include="..\game\bg_pmove.c" />
+    <ClCompile Include="..\game\bg_saber.c" />
+    <ClCompile Include="..\game\bg_saberLoad.c" />
+    <ClCompile Include="..\game\bg_saga.c" />
+    <ClCompile Include="..\game\bg_slidemove.c" />
+    <ClCompile Include="..\game\bg_vehicleLoad.c" />
+    <ClCompile Include="..\game\bg_weapons.c" />
+    <ClCompile Include="..\game\FighterNPC.c" />
+    <ClCompile Include="..\game\g_active.c" />
+    <ClCompile Include="..\game\g_admin.c" />
+    <ClCompile Include="..\game\g_arenas.c" />
+    <ClCompile Include="..\game\g_bot.c" />
+    <ClCompile Include="..\game\g_chatFilters.c" />
+    <ClCompile Include="..\game\g_client.c" />
+    <ClCompile Include="..\game\g_cmds.c" />
+    <ClCompile Include="..\game\g_combat.c" />
+    <ClCompile Include="..\game\g_crash.c" />
+    <ClCompile Include="..\game\g_exphysics.c" />
+    <ClCompile Include="..\game\g_ICARUScb.c" />
+    <ClCompile Include="..\game\g_items.c" />
+    <ClCompile Include="..\game\g_log.c" />
+    <ClCompile Include="..\game\g_lua.c" />
+    <ClCompile Include="..\game\g_luaevent.c" />
+    <ClCompile Include="..\game\g_main.c" />
+    <ClCompile Include="..\game\g_mem.c" />
+    <ClCompile Include="..\game\g_misc.c" />
+    <ClCompile Include="..\game\g_missile.c" />
+    <ClCompile Include="..\game\g_mover.c" />
+    <ClCompile Include="..\game\g_nav.c" />
+    <ClCompile Include="..\game\g_navnew.c" />
+    <ClCompile Include="..\game\g_newmemory.c" />
+    <ClCompile Include="..\game\g_object.c" />
+    <ClCompile Include="..\game\g_playerbans.c" />
+    <ClCompile Include="..\game\g_clientModification.c" />
+    <ClCompile Include="..\game\g_saga.c" />
+    <ClCompile Include="..\game\g_session.c" />
+    <ClCompile Include="..\game\g_spawn.c" />
+    <ClCompile Include="..\game\g_svcmds.c" />
+    <ClCompile Include="..\game\g_syscalls.c" />
+    <ClCompile Include="..\game\g_target.c" />
+    <ClCompile Include="..\game\g_team.c" />
+    <ClCompile Include="..\game\g_timer.c" />
+    <ClCompile Include="..\game\g_trigger.c" />
+    <ClCompile Include="..\game\g_turret.c" />
+    <ClCompile Include="..\game\g_turret_G2.c" />
+    <ClCompile Include="..\game\g_unlagged.c" />
+    <ClCompile Include="..\game\g_utils.c" />
+    <ClCompile Include="..\game\g_vehicles.c" />
+    <ClCompile Include="..\game\g_vehicleTurret.c" />
+    <ClCompile Include="..\game\g_weapon.c" />
+    <ClCompile Include="..\game\NPC.c" />
+    <ClCompile Include="..\game\NPC_AI_Atst.c" />
+    <ClCompile Include="..\game\NPC_AI_Default.c" />
+    <ClCompile Include="..\game\NPC_AI_Droid.c" />
+    <ClCompile Include="..\game\NPC_AI_GalakMech.c" />
+    <ClCompile Include="..\game\NPC_AI_Grenadier.c" />
+    <ClCompile Include="..\game\NPC_AI_Howler.c" />
+    <ClCompile Include="..\game\NPC_AI_ImperialProbe.c" />
+    <ClCompile Include="..\game\NPC_AI_Interrogator.c" />
+    <ClCompile Include="..\game\NPC_AI_Jedi.c" />
+    <ClCompile Include="..\game\NPC_AI_Mark1.c" />
+    <ClCompile Include="..\game\NPC_AI_Mark2.c" />
+    <ClCompile Include="..\game\NPC_AI_MineMonster.c" />
+    <ClCompile Include="..\game\NPC_AI_Rancor.c" />
+    <ClCompile Include="..\game\NPC_AI_Remote.c" />
+    <ClCompile Include="..\game\NPC_AI_Seeker.c" />
+    <ClCompile Include="..\game\NPC_AI_Sentry.c" />
+    <ClCompile Include="..\game\NPC_AI_Sniper.c" />
+    <ClCompile Include="..\game\NPC_AI_Stormtrooper.c" />
+    <ClCompile Include="..\game\NPC_AI_Utils.c" />
+    <ClCompile Include="..\game\NPC_AI_Wampa.c" />
+    <ClCompile Include="..\game\NPC_behavior.c" />
+    <ClCompile Include="..\game\NPC_combat.c" />
+    <ClCompile Include="..\game\NPC_goal.c" />
+    <ClCompile Include="..\game\NPC_misc.c" />
+    <ClCompile Include="..\game\NPC_move.c" />
+    <ClCompile Include="..\game\NPC_reactions.c" />
+    <ClCompile Include="..\game\NPC_senses.c" />
+    <ClCompile Include="..\game\NPC_sounds.c" />
+    <ClCompile Include="..\game\NPC_spawn.c" />
+    <ClCompile Include="..\game\NPC_stats.c" />
+    <ClCompile Include="..\game\NPC_utils.c" />
+    <ClCompile Include="..\game\q_math.c" />
+    <ClCompile Include="..\game\q_shared.c" />
+    <ClCompile Include="..\game\SpeederNPC.c" />
+    <ClCompile Include="..\game\tri_coll_test.c" />
+    <ClCompile Include="..\game\w_force.c" />
+    <ClCompile Include="..\game\w_saber.c" />
+    <ClCompile Include="..\game\WalkerNPC.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
