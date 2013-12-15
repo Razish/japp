@@ -4104,6 +4104,14 @@ static void Cmd_Ready_f( gentity_t *ent ) {
 	}
 }
 
+static void Cmd_Origin_f( gentity_t *ent ) {
+	if ( trap->Argc() == 1 ) {
+		trap->SendServerCommand( ent-g_entities, va( "print \"Origin: %s\nAngles: %s\"", vtos( &ent->client->ps.origin ),
+			vtos( &ent->client->ps.viewangles ) ) );
+		return;
+	}
+}
+
 #define CMDFLAG_NOINTERMISSION	0x0001
 #define CMDFLAG_CHEAT			0x0002
 #define CMDFLAG_ALIVE			0x0004
@@ -4153,6 +4161,7 @@ command_t commands[] = {
 	{ "noclip",				Cmd_Noclip_f,				GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
 	{ "notarget",			Cmd_Notarget_f,				GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
 	{ "npc",				Cmd_NPC_f,					GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE },
+	{ "origin",				Cmd_Origin_f,				GTB_ALL,					0 }, // Raz: added
 	{ "ready",				Cmd_Ready_f	,				GTB_ALL,					CMDFLAG_NOINTERMISSION }, //Raz: added
 	{ "sabercolor",			Cmd_Sabercolor_f,			GTB_ALL,					0 }, //Raz: added
 	{ "say",				Cmd_Say_f,					GTB_ALL,					0 },
