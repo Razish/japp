@@ -1225,9 +1225,17 @@ static void AM_Freeze( gentity_t *ent )
 	}
 	else if ( clientNum != -1 )
 	{//Freeze specified clientNum
-		Freeze( &level.clients[clientNum] );
-		trap->SendServerCommand( -1, va( "cp \"%s\n^7has been ^5frozen\n\"", level.clients[clientNum].pers.netname ) );
-		trap->SendServerCommand( clientNum, "cp \"You have been ^5frozen\n\"" );
+		gclient_t *cl = &level.clients[clientNum];
+		if ( cl->pers.adminData.isFrozen ) {
+			Unfreeze( cl );
+			trap->SendServerCommand( -1, va( "cp \"%s\n^7has been ^5unfrozen\n\"", cl->pers.netname ) );
+			trap->SendServerCommand( clientNum, "cp \"You have been ^5unfrozen\n\"" );
+		}
+		else {
+			Freeze( cl );
+			trap->SendServerCommand( -1, va( "cp \"%s\n^7has been ^5frozen\n\"", cl->pers.netname ) );
+			trap->SendServerCommand( clientNum, "cp \"You have been ^5frozen\n\"" );
+		}
 	}
 }
 
@@ -1255,40 +1263,6 @@ static void AM_GunFreeze( gentity_t *ent )
 	else
 		trap->SendServerCommand( ent-g_entities, "print \"Gunfreeze missed!\n\"" );
 #endif
-}
-
-static void AM_Unfreeze( gentity_t *ent )
-{//Unfreeze specified client	RAZFIXME: Maybe not? Just let amfreeze toggle them?
-	char	arg1[48] = { 0 };
-	int		clientNum;
-
-	if ( trap->Argc() < 2 )
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Please specify a player to be frozen (Or -1 for all)\n\"" );
-		return;
-	}
-
-	//Grab the clientNum
-	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	clientNum = G_ClientNumberFromStrippedName2( arg1 );
-
-	//Check for purposely freezing all. HACKHACKHACK
-	if ( arg1[0] == '-' && arg1[1] == '1' )
-		clientNum = -2;
-
-	if ( clientNum == -2 )
-	{//Freeze everyone
-		int i;
-		for ( i=0; i<MAX_CLIENTS; i++ )
-			Unfreeze( &level.clients[i] );
-		trap->SendServerCommand( -1, "cp \"You have all been ^5unfrozen\n\"" );
-	}
-	else
-	{//Freeze specified clientNum
-		Unfreeze( &level.clients[clientNum] );
-		trap->SendServerCommand( -1, va( "cp \"%s\n^7has been ^5unfrozen\n\"", level.clients[clientNum].pers.netname ) );
-		trap->SendServerCommand( clientNum, "cp \"You have been ^5unfrozen\n\"" );
-	}
 }
 
 static void AM_Silence( gentity_t *ent )
@@ -1740,7 +1714,6 @@ static const adminCommand_t adminCommands[] = {
 #ifdef _DEBUG
 	{	"amtest",		-1,				AM_Test				},	//	Test :D
 #endif
-/**/{	"amunfreeze",	PRIV_FREEZE,	AM_Unfreeze			},	//	Unfreeze specified client	RAZFIXME: Maybe not? Just let amfreeze toggle them?
 /**/{	"amunsilence",	PRIV_SILENCE,	AM_Unsilence		},	//	Unsilence specified client
 /**/{	"amunspawn",	PRIV_ENTSPAWN,	AM_EntRemove		},	//	Remove an entity
 /**/{	"amvstr",		PRIV_VSTR,		AM_Vstr				},	//	Execute a variable string
