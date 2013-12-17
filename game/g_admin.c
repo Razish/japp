@@ -41,7 +41,7 @@ static adminUser_t *adminUsers = NULL;
 }
 */
 
-void AM_AddAdmin( const char *user, const char *pass, const uint32_t privileges, const char *loginMsg ) {
+void AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const char *loginMsg ) {
 	adminUser_t	*admin = NULL;
 
 	for ( admin=adminUsers; admin; admin=admin->next ) {
