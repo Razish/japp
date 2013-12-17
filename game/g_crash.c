@@ -15,6 +15,7 @@
 #elif QARCH == 32
 
 #pragma comment( lib, "DbgHelp" )
+#pragma comment( lib, "Psapi" )
 
 int	bCrashing = 0;
 

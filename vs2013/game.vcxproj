@@ -41,13 +41,13 @@
     <OutDir>$(SolutionDir)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>$(ProjectName)x86</TargetName>
+    <TargetName>jamp$(ProjectName)x86</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)</OutDir>
-    <TargetName>$(ProjectName)x86</TargetName>
+    <TargetName>jamp$(ProjectName)x86</TargetName>
     <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
