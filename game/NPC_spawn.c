@@ -4146,7 +4146,7 @@ void NPC_Kill_f( void )
 }
 
 void NPC_PrintScore( gentity_t *ent, gentity_t *npc ) {
-	trap_SendServerCommand( ent-g_entities, va( "print \"%s: %d\n\"", npc->targetname,
+	trap->SendServerCommand( ent-g_entities, va( "print \"%s: %d\n\"", npc->targetname,
 		npc->client->ps.persistant[PERS_SCORE] ) );
 }
 
