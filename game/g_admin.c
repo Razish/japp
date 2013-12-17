@@ -1694,8 +1694,8 @@ static const adminCommand_t adminCommands[] = {
 /**/{	"amban",		PRIV_BAN,		AM_Ban				},	//	Ban specified client (Client + duration + reason)
 /**/{	"ambanip",		PRIV_BAN,		AM_BanIP			},	//	Ban specified IP (IP/range-ban + duration + reason)
 /**/{	"amclip",		PRIV_CLIP,		AM_Clip				},	//	Toggle noclip mode
-/**/{	"amforceteam",	PRIV_FORCETEAM,	AM_ForceTeam		},	//	Force the specified client to a specific team
 /**/{	"amempower",	PRIV_EMPOWER,	AM_Empower			},	//	Empower the specified client
+/**/{	"amforceteam",	PRIV_FORCETEAM,	AM_ForceTeam		},	//	Force the specified client to a specific team
 /**/{	"amfreeze",		PRIV_FREEZE,	AM_Freeze			},	//	Freeze specified client on the spot
 /**/{	"amghost",		PRIV_GHOST,		AM_Ghost			},	//	Ghost specified client (or self)
 /**/{	"amkick",		PRIV_KICK,		AM_Kick				},	//	Kick specified client
@@ -1713,8 +1713,8 @@ static const adminCommand_t adminCommands[] = {
 /**/{	"amremovetele",	PRIV_TELEPORT,	AM_RemoveTelemark	},	//	Remove a telemark from the list
 /**/{	"amsavetele",	PRIV_TELEPORT,	AM_SaveTelemarks	},	//	Save marked positions RAZFIXME: Temporary?
 /**/{	"amseetele",	PRIV_TELEPORT,	AM_SeeTelemarks		},	//	Visualise all telemarks
-/**/{	"amslap",		PRIV_SLAP,		AM_Slap				},	//	Slap the specified client
 /**/{	"amsilence",	PRIV_SILENCE,	AM_Silence			},	//	Silence specified client
+/**/{	"amslap",		PRIV_SLAP,		AM_Slap				},	//	Slap the specified client
 /**/{	"amslay",		PRIV_SLAY,		AM_Slay				},	//	Slay the specified client
 	{	"amspawn",		PRIV_ENTSPAWN,	AM_EntSpawn			},	//	Spawn an entity
 /**/{	"amstatus",		PRIV_STATUS,	AM_Status			},	//	Display list of players + clientNum + IP + admin
