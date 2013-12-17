@@ -49,7 +49,7 @@ extern void NPC_GalakMech_Init( gentity_t *ent );
 extern void NPC_Protocol_Precache( void );
 extern void Boba_Precache( void );
 extern void NPC_Wampa_Precache( void );
-gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle );
+gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle, vector3 *origin );
 
 extern void Rancor_SetBolts( gentity_t *self );
 extern void Wampa_SetBolts( gentity_t *self );
@@ -1230,7 +1230,7 @@ void NPC_Begin (gentity_t *ent)
 						droidNPCType = "r5d2";
 					}
 				}
-				droidEnt = NPC_SpawnType( ent, droidNPCType, NULL, qfalse );
+				droidEnt = NPC_SpawnType( ent, droidNPCType, NULL, qfalse, NULL );
 				if ( droidEnt != NULL )
 				{
 					if ( droidEnt->client )
@@ -3856,11 +3856,10 @@ void SP_NPC_Droid_Protocol( gentity_t *self)
 NPC_Spawn_f
 */
 
-gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle ) 
-{
-	gentity_t		*NPCspawner = G_Spawn();
-	vector3			forward, end;
-	trace_t			trace;
+gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle, vector3 *origin ) {
+	gentity_t *NPCspawner = G_Spawn();
+	vector3 forward, end;
+	trace_t trace;
 
 	if(!NPCspawner)
 	{
@@ -3887,24 +3886,28 @@ gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboo
 		return NULL;
 	}
 
-	//rwwFIXMEFIXME: Care about who is issuing this command/other clients besides 0?
-	//Spawn it at spot of first player
-	//FIXME: will gib them!
-	AngleVectors(&ent->client->ps.viewangles, &forward, NULL, NULL);
-	VectorNormalize(&forward);
-	VectorMA(&ent->r.currentOrigin, 64, &forward, &end);
-	trap->Trace(&trace, &ent->r.currentOrigin, NULL, NULL, &end, 0, MASK_SOLID, qfalse, 0, 0);
-	VectorCopy(&trace.endpos, &end);
-	end.z -= 24;
-	trap->Trace(&trace, &trace.endpos, NULL, NULL, &end, 0, MASK_SOLID, qfalse, 0, 0);
-	VectorCopy(&trace.endpos, &end);
-	end.z += 24;
-	G_SetOrigin(NPCspawner, &end);
-	VectorCopy(&NPCspawner->r.currentOrigin, &NPCspawner->s.origin);
-	//set the yaw so that they face away from player
-	NPCspawner->s.angles.y = ent->client->ps.viewangles.y;
+	if ( origin ) {
+		G_SetOrigin( NPCspawner, origin );
+		VectorCopy( &NPCspawner->r.currentOrigin, &NPCspawner->s.origin );
+		NPCspawner->s.angles.y = 0;
+	}
+	else {
+		AngleVectors( &ent->client->ps.viewangles, &forward, NULL, NULL );
+		VectorNormalize( &forward );
+		VectorMA( &ent->r.currentOrigin, 64, &forward, &end );
+		trap->Trace( &trace, &ent->r.currentOrigin, NULL, NULL, &end, 0, MASK_SOLID, qfalse, 0, 0 );
+		VectorCopy( &trace.endpos, &end );
+		end.z -= 24;
+		trap->Trace( &trace, &trace.endpos, NULL, NULL, &end, 0, MASK_SOLID, qfalse, 0, 0 );
+		VectorCopy( &trace.endpos, &end );
+		end.z += 24;
+		G_SetOrigin( NPCspawner, &end );
+		VectorCopy( &NPCspawner->r.currentOrigin, &NPCspawner->s.origin );
+		//set the yaw so that they face away from player
+		NPCspawner->s.angles.y = ent->client->ps.viewangles.y;
+	}
 
-	trap->LinkEntity((sharedEntity_t *)NPCspawner);
+	trap->LinkEntity( (sharedEntity_t *)NPCspawner );
 
 	NPCspawner->NPC_type = G_NewString( npc_type );
 
@@ -3928,65 +3931,87 @@ gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboo
 	}
 
 	//call precache funcs for James' builds
-		 if ( !Q_stricmp( "gonk", NPCspawner->NPC_type))
+		 if ( !Q_stricmp( "gonk", NPCspawner->NPC_type ) )
 		NPC_Gonk_Precache();
-	else if ( !Q_stricmp( "mouse", NPCspawner->NPC_type))
+	else if ( !Q_stricmp( "mouse", NPCspawner->NPC_type ) )
 		NPC_Mouse_Precache();
-	else if ( !Q_strncmp( "r2d2", NPCspawner->NPC_type, 4))
+	else if ( !Q_strncmp( "r2d2", NPCspawner->NPC_type, 4 ) )
 		NPC_R2D2_Precache();
-	else if ( !Q_stricmp( "atst", NPCspawner->NPC_type))
+	else if ( !Q_stricmp( "atst", NPCspawner->NPC_type ) )
 		NPC_ATST_Precache();
-	else if ( !Q_strncmp( "r5d2", NPCspawner->NPC_type, 4))
+	else if ( !Q_strncmp( "r5d2", NPCspawner->NPC_type, 4 ) )
 		NPC_R5D2_Precache();
-	else if ( !Q_stricmp( "mark1", NPCspawner->NPC_type))
+	else if ( !Q_stricmp( "mark1", NPCspawner->NPC_type ) )
 		NPC_Mark1_Precache();
-	else if ( !Q_stricmp( "mark2", NPCspawner->NPC_type))
+	else if ( !Q_stricmp( "mark2", NPCspawner->NPC_type ) )
 		NPC_Mark2_Precache();
-	else if ( !Q_stricmp( "interrogator", NPCspawner->NPC_type))
-		NPC_Interrogator_Precache(NULL);
-	else if ( !Q_stricmp( "probe", NPCspawner->NPC_type))
+	else if ( !Q_stricmp( "interrogator", NPCspawner->NPC_type ) )
+		NPC_Interrogator_Precache( NULL );
+	else if ( !Q_stricmp( "probe", NPCspawner->NPC_type ) )
 		NPC_Probe_Precache();
-	else if ( !Q_stricmp( "seeker", NPCspawner->NPC_type))
+	else if ( !Q_stricmp( "seeker", NPCspawner->NPC_type ) )
 		NPC_Seeker_Precache();
-	else if ( !Q_stricmp( "remote", NPCspawner->NPC_type))
+	else if ( !Q_stricmp( "remote", NPCspawner->NPC_type ) )
 		NPC_Remote_Precache();
 	else if ( !Q_strncmp( "shadowtrooper", NPCspawner->NPC_type, 13 ) )
 		NPC_ShadowTrooper_Precache();
-	else if ( !Q_stricmp( "minemonster", NPCspawner->NPC_type ))
+	else if ( !Q_stricmp( "minemonster", NPCspawner->NPC_type ) )
 		NPC_MineMonster_Precache();
-	else if ( !Q_stricmp( "howler", NPCspawner->NPC_type ))
+	else if ( !Q_stricmp( "howler", NPCspawner->NPC_type ) )
 		NPC_Howler_Precache();
-	else if ( !Q_stricmp( "sentry", NPCspawner->NPC_type ))
+	else if ( !Q_stricmp( "sentry", NPCspawner->NPC_type ) )
 		NPC_Sentry_Precache();
-	else if ( !Q_stricmp( "protocol", NPCspawner->NPC_type ))
+	else if ( !Q_stricmp( "protocol", NPCspawner->NPC_type ) )
 		NPC_Protocol_Precache();
-	else if ( !Q_stricmp( "galak_mech", NPCspawner->NPC_type ))
+	else if ( !Q_stricmp( "galak_mech", NPCspawner->NPC_type ) )
 		NPC_GalakMech_Precache();
-	else if ( !Q_stricmp( "wampa", NPCspawner->NPC_type ))
+	else if ( !Q_stricmp( "wampa", NPCspawner->NPC_type ) )
 		NPC_Wampa_Precache();
 
-	return (NPC_Spawn_Do( NPCspawner ));
+	return NPC_Spawn_Do( NPCspawner );
 }
 
-void NPC_Spawn_f( gentity_t *ent ) 
-{
-	char	npc_type[1024];
-	char	targetname[1024];
-	qboolean	isVehicle = qfalse;
+void NPC_Spawn_f( gentity_t *ent ) {
+	char npc_type[1024], targetname[1024];
+	qboolean isVehicle = qfalse;
+	int positionArg = 0;
 
-	trap->Argv(2, npc_type, 1024);
-	if ( Q_stricmp( "vehicle", npc_type ) == 0 )
-	{
+	trap->Argv( 2, npc_type, sizeof( npc_type ) );
+	if ( !Q_stricmp( "vehicle", npc_type ) ) {
 		isVehicle = qtrue;
-		trap->Argv(3, npc_type, 1024);
-		trap->Argv(4, targetname, 1024);
+		trap->Argv( 3, npc_type, sizeof( npc_type ) );
+		if ( trap->Argc() == 8 ) {
+			// npc spawn vehicle npcname x y z targetname
+			positionArg = 4;
+			trap->Argv( 7, targetname, sizeof( targetname ) );
+		}
+		else {
+			// npc spawn vehicle npcname targetname
+			trap->Argv( 4, targetname, sizeof( targetname ) );
+		}
+	}
+	else {
+		if ( trap->Argc() == 6 ) {
+			// npc spawn npcname
+			positionArg = 3;
+			trap->Argv( 6, targetname, sizeof( targetname ) );
+		}
+	}
+
+	if ( positionArg ) {
+		vector3	origin;
+		char argX[16]={0}, argY[16]={0}, argZ[16]={0};
+
+		trap->Argv( positionArg+0, argX, sizeof( argX ) );
+		trap->Argv( positionArg+1, argY, sizeof( argY ) );
+		trap->Argv( positionArg+2, argZ, sizeof( argZ ) );
+
+		VectorCopy( tv( atoi(argX), atoi(argY), atoi(argZ) ), &origin );
+
+		NPC_SpawnType( ent, npc_type, targetname, isVehicle, &origin );
 	}
 	else
-	{
-		trap->Argv(3, targetname, 1024);
-	}
-
-	NPC_SpawnType( ent, npc_type, targetname, isVehicle );
+		NPC_SpawnType( ent, npc_type, targetname, isVehicle, NULL );
 }
 
 /*
@@ -4120,9 +4145,9 @@ void NPC_Kill_f( void )
 	}
 }
 
-void NPC_PrintScore( gentity_t *ent )
-{
-	Com_Printf( "%s: %d\n", ent->targetname, ent->client->ps.persistant[PERS_SCORE] );
+void NPC_PrintScore( gentity_t *ent, gentity_t *npc ) {
+	trap_SendServerCommand( ent-g_entities, va( "print \"%s: %d\n\"", npc->targetname,
+		npc->client->ps.persistant[PERS_SCORE] ) );
 }
 
 /*
@@ -4131,64 +4156,46 @@ Svcmd_NPC_f
 parse and dispatch bot commands
 */
 qboolean	showBBoxes = qfalse;
-void Cmd_NPC_f( gentity_t *ent ) 
-{
-	char	cmd[1024];
+void Cmd_NPC_f( gentity_t *ent ) {
+	char cmd[1024];
 
-	trap->Argv( 1, cmd, 1024 );
+	trap->Argv( 1, cmd, sizeof( cmd ) );
 
-	if ( !cmd[0] ) 
-	{
-		Com_Printf( "Valid NPC commands are:\n" );
-		Com_Printf( " spawn [NPC type (from NCPCs.cfg)]\n" );
-		Com_Printf( " kill [NPC targetname] or [all(kills all NPCs)] or 'team [teamname]'\n" );
-		Com_Printf( " showbounds (draws exact bounding boxes of NPCs)\n" );
-		Com_Printf( " score [NPC targetname] (prints number of kills per NPC)\n" );
+	if ( !cmd[0] ) {
+		static const char *msg = "Valid NPC commands are:\n"
+" spawn [NPC type (from NPCs.cfg)]\n"
+" kill [NPC targetname] or [all (kills all NPCs)] or [team teamname]\n"
+" showbounds (draws exact bounding boxes of NPCs)\n"
+" score [NPC targetname] (prints number of kills per NPC)\n";
 	}
-	else if ( Q_stricmp( cmd, "spawn" ) == 0 )
-	{
+	else if ( !Q_stricmp( cmd, "spawn" ) )
 		NPC_Spawn_f( ent );
-	}
-	else if ( Q_stricmp( cmd, "kill" ) == 0 ) 
-	{
+	else if ( !Q_stricmp( cmd, "kill" ) ) 
 		NPC_Kill_f();
-	}
-	else if ( Q_stricmp( cmd, "showbounds" ) == 0 )
-	{//Toggle on and off
-		showBBoxes = showBBoxes ? qfalse : qtrue;
-	}
-	else if ( Q_stricmp ( cmd, "score" ) == 0 )
-	{
-		char		cmd2[1024];
-		gentity_t *ent = NULL;
+	else if ( !Q_stricmp( cmd, "showbounds" ) )
+		showBBoxes = !showBBoxes;
+	else if ( !Q_stricmp( cmd, "score" ) ) {
+		char cmd2[1024];
+		gentity_t *e = NULL;
 
-		trap->Argv(2, cmd2, 1024);
+		trap->Argv( 2, cmd2, sizeof( cmd2 ) );
 
-		if ( !cmd2[0] )
-		{//Show the score for all NPCs
+		if ( !cmd2[0] ) {
 			int i;
 
+			//Show the score for all NPCs
 			Com_Printf( "SCORE LIST:\n" );
-			for ( i = 0; i < ENTITYNUM_WORLD; i++ )
-			{
-				ent = &g_entities[i];
-				if ( !ent || !ent->client )
-				{
+			for ( i=0, e=g_entities; i<ENTITYNUM_WORLD; i++, e++ ) {
+				if ( !e || !e->client )
 					continue;
-				}
-				NPC_PrintScore( ent );
+				NPC_PrintScore( ent, e );
 			}
 		}
-		else
-		{
-			if ( (ent = G_Find( NULL, FOFS(targetname), cmd2 )) != NULL && ent->client )
-			{
-				NPC_PrintScore( ent );
-			}
+		else {
+			if ( (e = G_Find( NULL, FOFS(targetname), cmd2 )) != NULL && e->client )
+				NPC_PrintScore( ent, e );
 			else
-			{
 				Com_Printf( "ERROR: NPC score - no such NPC %s\n", cmd2 );
-			}
 		}
 	}
 }
