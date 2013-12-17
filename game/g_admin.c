@@ -41,12 +41,13 @@ static adminUser_t *adminUsers = NULL;
 }
 */
 
-void AM_AddAdmin( const char *user, const char *pass, const int privs, const char *loginMsg ) {
+void AM_AddAdmin( const char *user, const char *pass, const uint32_t privileges, const char *loginMsg ) {
 	adminUser_t	*admin = NULL;
 
 	for ( admin=adminUsers; admin; admin=admin->next ) {
 		if ( !strcmp( user, admin->user ) ) {
-			trap->Print( "Overwriting existing admin: %s/%s (%d) %s\n", admin->user, admin->password, admin->privs, admin->loginMsg );
+			trap->Print( "Overwriting existing admin: %s/%s (%d) %s\n", admin->user, admin->password, admin->privileges,
+				admin->loginMsg );
 			break;
 		}
 	}
@@ -62,7 +63,7 @@ void AM_AddAdmin( const char *user, const char *pass, const int privs, const cha
 	// we're either overwriting an admin, or adding a new one
 	Q_strncpyz( admin->user, user, sizeof( admin->user ) );
 	Q_strncpyz( admin->password, pass, sizeof( admin->password ) );
-	admin->privs = privs;
+	admin->privileges = privileges;
 	Q_strncpyz( admin->loginMsg, loginMsg, sizeof( admin->loginMsg ) );
 }
 
@@ -109,7 +110,7 @@ void AM_ListAdmins( void ) {
 	for ( admin=adminUsers; admin; admin=admin->next ) {
 		gentity_t *ent = NULL;
 
-		trap->Print( " %3d: %s/%s (%d) %s\n", ++count, admin->user, admin->password, admin->privs, admin->loginMsg );
+		trap->Print( " %3d: %s/%s (%d) %s\n", ++count, admin->user, admin->password, admin->privileges, admin->loginMsg );
 
 		for ( ent=g_entities; ent-g_entities<level.maxclients; ent++ ) {
 			if ( ent->client->pers.adminUser && ent->client->pers.adminUser == admin )
@@ -155,7 +156,7 @@ static void AM_ProcessUsers( const char *jsonText )
 			Q_strncpyz( user->password, tmp, sizeof( user->password ) );
 
 		// privs
-		user->privs = cJSON_ToInteger( cJSON_GetObjectItem( item, "privs" ) );
+		user->privileges = cJSON_ToInteger( cJSON_GetObjectItem( item, "privs" ) );
 
 		// login message
 		if ( (tmp=cJSON_ToString( cJSON_GetObjectItem( item, "message" ) )) )
@@ -256,7 +257,7 @@ void AM_SaveAdmins( void ) {
 		cJSON *item = cJSON_CreateObject();
 		cJSON_AddStringToObject( item, "user", admin->user );
 		cJSON_AddStringToObject( item, "pass", admin->password );
-		cJSON_AddIntegerToObject( item, "privs", admin->privs );
+		cJSON_AddIntegerToObject( item, "privs", admin->privileges );
 		cJSON_AddStringToObject( item, "message", admin->loginMsg );
 
 		cJSON_AddItemToArray( admins, item );
@@ -1679,6 +1680,12 @@ static void AM_Merc( gentity_t *ent ) {
 //Walk around no weapon no melee
 //admin chat logs
 
+typedef struct adminCommand_s {
+	const char	*cmd;
+	uint32_t	privilege;
+	void		(*func)(gentity_t *ent);
+} adminCommand_t;
+
 static const adminCommand_t adminCommands[] = {
 	// these must be in alphabetical order for the binary search to work
 //	{	"amlogin",		-1,				AM_Login			},	//	Log in using user + pass (Handled explicitly!!!)
@@ -1734,16 +1741,22 @@ static int cmdcmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((adminCommand_t*)b)->cmd );
 }
 
+qboolean AM_HasPrivilege( const gentity_t *ent, uint32_t privilege ) {
+	adminUser_t *user = ent->client->pers.adminUser;
+
+	if ( user && (user->privileges & privilege) )
+		return qtrue;
+
+	return qfalse;
+}
+
 //	Handle admin related commands.
 //	Return true if the command exists and/or everything was handled fine.
 //	Return false if command didn't exist, so we can tell them.
-qboolean AM_HandleCommands( gentity_t *ent, const char *cmd )
-{
+qboolean AM_HandleCommands( gentity_t *ent, const char *cmd ) {
 	adminCommand_t *command = NULL;
-	adminUser_t *user = ent->client->pers.adminUser;
 
-	if ( !Q_stricmp( cmd, "amlogin" ) )
-	{
+	if ( !Q_stricmp( cmd, "amlogin" ) ) {
 		AM_Login( ent );
 		return qtrue;
 	}
@@ -1752,8 +1765,7 @@ qboolean AM_HandleCommands( gentity_t *ent, const char *cmd )
 	if ( !command )
 		return qfalse;
 
-	else if ( !user || !(user->privs & command->privs) )
-	{
+	else if ( !AM_HasPrivilege( ent, command->privilege ) ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Insufficient privileges\n\"" );
 		return qtrue;
 	}
@@ -1764,8 +1776,7 @@ qboolean AM_HandleCommands( gentity_t *ent, const char *cmd )
 	return qtrue;
 }
 
-void AM_PrintCommands( gentity_t *ent )
-{
+void AM_PrintCommands( gentity_t *ent ) {
 	const adminCommand_t *command = NULL;
 	adminUser_t *user = ent->client->pers.adminUser;
 	char buf[256] = {0};
@@ -1775,17 +1786,14 @@ void AM_PrintCommands( gentity_t *ent )
 
 	Q_strcat( buf, sizeof( buf ), "Admin commands:\n   " );
 
-	if ( !user )
-	{
+	if ( !user ) {
 		Q_strcat( buf, sizeof( buf ), " ^1Unavailable" );
 		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", buf ) );
 		return;
 	}
 
-	for ( command=adminCommands; command && command->cmd; command++ )
-	{
-		if ( (user->privs & command->privs) )
-		{
+	for ( command=adminCommands; command && command->cmd; command++ ) {
+		if ( AM_HasPrivilege( ent, command->privilege ) ) {
 			char *tmpMsg = va( " ^%c%s", (++toggle&1?'2':'3'), command->cmd );
 
 			//newline if we reach limit

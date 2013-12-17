@@ -4105,11 +4105,27 @@ static void Cmd_Ready_f( gentity_t *ent ) {
 }
 
 static void Cmd_Origin_f( gentity_t *ent ) {
-	if ( trap->Argc() == 1 ) {
-		trap->SendServerCommand( ent-g_entities, va( "print \"Origin: %s\nAngles: %s\n\"", vtos( &ent->client->ps.origin ),
-			vtos( &ent->client->ps.viewangles ) ) );
+	char		arg1[64];
+	int			targetClient;
+	gentity_t	*targ;
+	
+	//Self, partial name, clientNum
+	trap->Argv( 1, arg1, sizeof( arg1 ) );
+	targetClient = (trap->Argc()>1) ? G_ClientNumberFromStrippedName2( arg1 ) : ent-g_entities;
+
+	if ( targetClient == -1 ) {
+		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
 		return;
 	}
+
+	targ = &g_entities[targetClient];
+
+	// can't see ghosted clients, let's just send their own coords =]
+	if ( targ->client->pers.adminData.isGhost && !AM_HasPrivilege( ent, PRIV_GHOST ) )
+		targ = ent;
+
+	trap->SendServerCommand( ent-g_entities, va( "print \"Origin: %s\nAngles: %s\n\"", vtos( &targ->client->ps.origin ),
+		vtos( &targ->client->ps.viewangles ) ) );
 }
 
 #define CMDFLAG_NOINTERMISSION	0x0001
