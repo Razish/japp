@@ -4106,7 +4106,7 @@ static void Cmd_Ready_f( gentity_t *ent ) {
 
 static void Cmd_Origin_f( gentity_t *ent ) {
 	if ( trap->Argc() == 1 ) {
-		trap->SendServerCommand( ent-g_entities, va( "print \"Origin: %s\nAngles: %s\"", vtos( &ent->client->ps.origin ),
+		trap->SendServerCommand( ent-g_entities, va( "print \"Origin: %s\nAngles: %s\n\"", vtos( &ent->client->ps.origin ),
 			vtos( &ent->client->ps.viewangles ) ) );
 		return;
 	}
