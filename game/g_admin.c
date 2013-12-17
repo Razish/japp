@@ -861,6 +861,7 @@ static void AM_Telemark( gentity_t *ent )
 			if ( !Q_stricmp( args, teleMarks[i].name ) )
 			{//Update it
 				SpawnTelemark( &teleMarks[i], &ent->client->ps.origin, args );
+				VectorCopy( &ent->client->ps.origin, &ent->client->pers.adminData.teleMark );
 				return;
 			}
 		}
@@ -869,6 +870,7 @@ static void AM_Telemark( gentity_t *ent )
 		if ( level.adminData.teleMarksIndex < 32 )
 		{
 			SpawnTelemark( GetTelemark(), &ent->client->ps.origin, args );
+			VectorCopy( &ent->client->ps.origin, &ent->client->pers.adminData.teleMark );
 			level.adminData.teleMarksIndex++;
 		}
 
