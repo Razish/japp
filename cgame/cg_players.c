@@ -11336,9 +11336,8 @@ skipTrail:
 		cent->bodyFadeTime = 0;
 	}
 
-	if (cent->currentState.weapon == WP_STUN_BATON && cent->currentState.number == cg.snap->ps.clientNum)
-	{
-		trap->S_AddLoopingSound( cent->currentState.number, &refdef->vieworg, &vec3_origin, 
+	if ( cent->currentState.weapon == WP_STUN_BATON ) {
+		trap->S_AddLoopingSound( cent->currentState.number, &cent->lerpOrigin, &vec3_origin, 
 			trap->S_RegisterSound( "sound/weapons/baton/idle.wav" ) );
 	}
 
