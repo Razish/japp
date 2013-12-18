@@ -67,6 +67,7 @@ typedef struct adminUser_s {
 #define PRIV_LUA			(0x00400000u)
 #define PRIV_VSTR			(0x00800000u)
 #define PRIV_MERC			(0x01000000u)
+#define PRIV_MAP			(0x02000000u)
 
 qboolean	AM_HasPrivilege			( const gentity_t *ent, uint32_t privilege );
 

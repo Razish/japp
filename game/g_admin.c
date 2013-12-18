@@ -1599,6 +1599,65 @@ static void AM_ReloadLua( gentity_t *ent ) {
 #endif
 }
 
+
+static void AM_Map( gentity_t *ent )
+{//Change map and gamemode
+	char gametypeStr[12];
+	char map[MAX_QPATH];
+	char *filter = NULL, *args = ConcatArgs( 1 );
+	int gametype = 0;
+	int i = 0;
+	
+	
+
+	if(trap->Argc() < 2)
+	{
+		trap->SendServerCommand( ent-g_entities, "print \"AM_Map: syntax is 'ammap gamemode map'\n\"" );
+		return;
+	}
+
+	trap->Argv(1, gametypeStr, 12); //Random size for now
+	gametype = BG_GetGametypeForString( gametypeStr );
+	
+	if(gametype == -1) //So it didn't find a gamemode that matches the arg provided, it could be numeric.
+	{
+		i = atoi(gametypeStr);
+		if(i >= 0 && i < GT_MAX_GAME_TYPE)
+			gametype = i;
+		else
+		{
+			trap->SendServerCommand( ent-g_entities, va( "print \"AM_Map: argument 1 must be a valid gametype or gametype number identifier\n\"", map, BG_GetGametypeString(gametype)) );
+			return;
+		}
+	}
+
+	trap->Argv(2, map, MAX_QPATH);
+
+	if( !!japp_allowAnyGametype.integer == 0 )
+	{
+		if( G_DoesMapSupportGametype( map, gametype ) == qfalse )
+		{
+			trap->SendServerCommand( ent-g_entities, va( "print \"Map: %s does not support gametype: %s, or the map doesn't exist.\n\"", map, BG_GetGametypeString(gametype)) );
+			return;
+		}
+	}
+	//Such copypaste
+	if ( (filter = strchr( args, ';' )) != NULL ) {
+		*filter = '\0';
+		Com_Printf( "AM_Map: %s passed suspicious arguments that contained ; or \\n!\n", ent->client->pers.netname );
+	}
+	if ( (filter = strchr( args, '\n' )) != NULL ) { //so multi-use
+		*filter = '\0';
+		Com_Printf( "AM_Map: %s passed suspicious arguments that contained ; or \\n!\n", ent->client->pers.netname );
+	} //wow
+	
+	trap->SendConsoleCommand(EXEC_APPEND, va("g_gametype %d\n", gametype) );
+	trap->SendConsoleCommand(EXEC_APPEND, va("map %s\n", map) );
+
+
+	return;
+}
+
 static void AM_Vstr( gentity_t *ent ) {
 	char *filter = NULL, *args = ConcatArgs( 1 );
 
@@ -1702,6 +1761,7 @@ static const adminCommand_t adminCommands[] = {
 /**/{	"amlogout",		-1,				AM_Logout			},	//	Logout
 /**/{	"amluaexec",	PRIV_LUA,		AM_Lua				},	//	Execute Lua code
 /**/{	"amluareload",	PRIV_LUA,		AM_ReloadLua		},	//	Reload JPLua system
+/**/{	"ammap",		PRIV_MAP,		AM_Map				},	//	Change map and gamemode
 /**/{	"ammerc",		PRIV_MERC,		AM_Merc				},	//	Give all weapons
 /**/{	"amnpc",		PRIV_NPCSPAWN,	AM_NPCSpawn			},	//	Spawn an NPC (Including vehicles)
 /**/{	"ampoll",		PRIV_POLL,		AM_Poll				},	//	Call an arbitrary vote
