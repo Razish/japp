@@ -503,7 +503,6 @@ CG_UseItem
 static void CG_UseItem( centity_t *cent ) {
 	clientInfo_t *ci;
 	int			itemNum, clientNum;
-	gitem_t		*item;
 	entityState_t *es;
 
 	es = &cent->currentState;
@@ -513,18 +512,10 @@ static void CG_UseItem( centity_t *cent ) {
 		itemNum = 0;
 	}
 
-	// print a message if the local player
-	if ( es->number == cg.snap->ps.clientNum ) {
-		if ( !itemNum ) {
-			//CG_CenterPrint( "No item to use", SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
-		} else {
-			item = BG_FindItemForHoldable( itemNum );
-		}
-	}
-
 	switch ( itemNum ) {
 	default:
 	case HI_NONE:
+		//RAZTODO: missing item sound, useful for teamplay
 		//trap->S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.useNothingSound );
 		break;
 

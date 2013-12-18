@@ -1340,14 +1340,11 @@ void JP_DrawMovementKeys( void )
 	else
 	{
 		float xyspeed = sqrtf( cg.snap->ps.velocity.x*cg.snap->ps.velocity.x + cg.snap->ps.velocity.y*cg.snap->ps.velocity.y );
-		float zspeed = cg.snap->ps.velocity.z;
-		static float lastZSpeed = 0.0f;
 
 		if ( (cg.snap->ps.pm_flags & PMF_JUMP_HELD) )//zspeed > lastZSpeed || zspeed > 10 )
 			cmd.upmove = 1;
 		else if ( (cg.snap->ps.pm_flags & PMF_DUCKED) )
 			cmd.upmove = -1;
-		lastZSpeed = zspeed;
 
 		if ( xyspeed < 10 )
 			moveDir = -1;
@@ -1775,14 +1772,10 @@ void CG_DrawForceSelect( void )
 	int		i;
 	int		count;
 	int		smallIconSize,bigIconSize;
-	int		holdX,x,y,x2,y2,pad,length;
+	int		holdX,x,y,pad;
 	int		sideLeftIconCnt,sideRightIconCnt;
 	int		sideMax,holdCount,iconCnt;
 	int		yOffset = 0;
-
-
-	x2 = 0;
-	y2 = 0;
 
 	// don't display if dead
 	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 ) 
@@ -1845,9 +1838,6 @@ void CG_DrawForceSelect( void )
 	y = 425;
 
 	// Background
-	length = (sideLeftIconCnt * smallIconSize) + (sideLeftIconCnt*pad) +
-			bigIconSize + (sideRightIconCnt * smallIconSize) + (sideRightIconCnt*pad) + 12;
-	
 	i = BG_ProperForceIndex(cg.forceSelect) - 1;
 	if (i < 0)
 	{
@@ -1936,8 +1926,6 @@ void CG_DrawInvenSelect( void )
 	int				sideLeftIconCnt,sideRightIconCnt;
 	int				count;
 	int				holdX,x,y,y2,pad;
-	int				height;
-	float			addX;
 
 	// don't display if dead
 	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 ) 
@@ -2016,8 +2004,6 @@ void CG_DrawInvenSelect( void )
 	// Left side ICONS
 	// Work backwards from current icon
 	holdX = x - ((bigIconSize/2) + pad + smallIconSize);
-	height = smallIconSize * cg.iconHUDPercent;
-	addX = (float) smallIconSize * .75;
 
 	for (iconCnt=0;iconCnt<sideLeftIconCnt;i--)
 	{
@@ -2053,13 +2039,11 @@ void CG_DrawInvenSelect( void )
 	}
 
 	// Current Center Icon
-	height = bigIconSize * cg.iconHUDPercent;
 	if (cgs.media.invenIcons[cg.itemSelect] && BG_IsItemSelectable(&cg.predictedPlayerState, cg.itemSelect))
 	{
 		int itemNdex;
 		trap->R_SetColor(NULL);
 		CG_DrawPic( x-(bigIconSize/2), (y-((bigIconSize-smallIconSize)/2))+10, bigIconSize, bigIconSize, cgs.media.invenIcons[cg.itemSelect] );
-		addX = (float) bigIconSize * .75;
 		trap->R_SetColor(&colorTable[CT_ICON_BLUE]);
 		/*CG_DrawNumField ((x-(bigIconSize/2)) + addX, y, 2, cg.snap->ps.inventory[cg.inventorySelect], 6, 12, 
 			NUM_FONT_SMALL,qfalse);*/
@@ -2093,8 +2077,6 @@ void CG_DrawInvenSelect( void )
 	// Right side ICONS
 	// Work forwards from current icon
 	holdX = x + (bigIconSize/2) + pad;
-	height = smallIconSize * cg.iconHUDPercent;
-	addX = (float) smallIconSize * .75;
 	for (iconCnt=0;iconCnt<sideRightIconCnt;i++)
 	{
 		if (i> HI_NUM_HOLDABLE-1)
@@ -4078,7 +4060,7 @@ static float CG_DrawTimer( float y ) {
 	s = va( "%i:%i%i", mins, tens, seconds );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 #else
-	vector4 *timeColour = NULL;
+//	vector4 *timeColour = NULL;
 	int msec=0, secs=0, mins=0, limitSec=cgs.timelimit*60;
 	char *s = NULL;
 	float w;
@@ -4090,6 +4072,7 @@ static float CG_DrawTimer( float y ) {
 	secs = msec/1000;
 	mins = secs/60;
 
+/*
 	timeColour = &colorTable[CT_WHITE];
 	if ( cgs.timelimit && (cg_drawTimer.integer & DRAWTIMER_COLOUR) ) {
 		// final minute
@@ -4102,6 +4085,7 @@ static float CG_DrawTimer( float y ) {
 		else if ( secs >= limitSec/2 )
 			timeColour = &colorTable[CT_YELLOW];
 	}
+*/
 
 	if ( cgs.timelimit && (cg_drawTimer.integer & DRAWTIMER_COUNTDOWN) )
 	{// count down
@@ -4879,7 +4863,7 @@ void CG_DrawSiegeInfo(centity_t *cent, float chX, float chY, float chW, float ch
 	clientInfo_t *ci;
 	const char *configstring, *v;
 	siegeClass_t *siegeClass;
-	vector4 aColor, bColor, cColor;
+	vector4 aColor, cColor;
 	float x;
 	float y;
 	float percent;
@@ -4943,12 +4927,6 @@ void CG_DrawSiegeInfo(centity_t *cent, float chX, float chY, float chW, float ch
 	aColor.b = 0.0f;
 	aColor.a = 0.4f;
 
-	//color of the border
-	bColor.r = 0.0f;
-	bColor.g = 0.0f;
-	bColor.b = 0.0f;
-	bColor.a = 0.3f;
-
 	//color of greyed out "missing health"
 	cColor.r = 0.5f;
 	cColor.g = 0.5f;
@@ -4991,12 +4969,6 @@ void CG_DrawSiegeInfo(centity_t *cent, float chX, float chY, float chW, float ch
 	aColor.b = 0.0f;
 	aColor.a = 0.4f;
 
-	//color of the border
-	bColor.r = 0.0f;
-	bColor.g = 0.0f;
-	bColor.b = 0.0f;
-	bColor.a = 0.3f;
-
 	//color of greyed out "missing health"
 	cColor.r = 0.5f;
 	cColor.g = 0.5f;
@@ -5016,7 +4988,7 @@ void CG_DrawSiegeInfo(centity_t *cent, float chX, float chY, float chW, float ch
 //draw the health bar based on current "health" and maxhealth
 void CG_DrawHealthBar(centity_t *cent, float chX, float chY, float chW, float chH)
 {
-	vector4 aColor, bColor, cColor;
+	vector4 aColor, cColor;
 	float x = chX+((chW/2)-(HEALTH_WIDTH/2));
 	float y = (chY+chH) + 8.0f;
 	float percent = ((float)cent->currentState.health/(float)cent->currentState.maxhealth)*HEALTH_WIDTH;
@@ -5048,12 +5020,6 @@ void CG_DrawHealthBar(centity_t *cent, float chX, float chY, float chW, float ch
 		aColor.a = 0.4f;
 	}
 
-	//color of the border
-	bColor.r = 0.0f;
-	bColor.g = 0.0f;
-	bColor.b = 0.0f;
-	bColor.a = 0.3f;
-
 	//color of greyed out "missing health"
 	cColor.r = 0.5f;
 	cColor.g = 0.5f;
@@ -5073,7 +5039,7 @@ void CG_DrawHealthBar(centity_t *cent, float chX, float chY, float chW, float ch
 //same routine (at least for now), draw progress of a "hack" or whatever
 void CG_DrawHaqrBar(float chX, float chY, float chW, float chH)
 {
-	vector4 aColor, bColor, cColor;
+	vector4 aColor, cColor;
 	float x = chX+((chW/2)-(HEALTH_WIDTH/2));
 	float y = (chY+chH) + 8.0f;
 	float percent = (((float)cg.predictedPlayerState.hackingTime-(float)cg.time)/(float)cg.predictedPlayerState.hackingBaseTime)*HEALTH_WIDTH;
@@ -5089,12 +5055,6 @@ void CG_DrawHaqrBar(float chX, float chY, float chW, float chH)
 	aColor.g = 1.0f;
 	aColor.b = 0.0f;
 	aColor.a = 0.4f;
-
-	//color of the border
-	bColor.r = 0.0f;
-	bColor.g = 0.0f;
-	bColor.b = 0.0f;
-	bColor.a = 0.3f;
 
 	//color of greyed out done area
 	cColor.r = 0.5f;
@@ -5125,7 +5085,7 @@ vector4 cg_genericTimerColor;
 #define CGTIMERBAR_Y			(SCREEN_HEIGHT-CGTIMERBAR_H-20.0f)
 void CG_DrawGenericTimerBar(void)
 {
-	vector4 aColor, bColor, cColor;
+	vector4 aColor, cColor;
 	float x = CGTIMERBAR_X;
 	float y = CGTIMERBAR_Y;
 	float percent = ((float)(cg_genericTimerBar-cg.time)/(float)cg_genericTimerDur)*CGTIMERBAR_H;
@@ -5141,12 +5101,6 @@ void CG_DrawGenericTimerBar(void)
 	aColor.g = cg_genericTimerColor.g;
 	aColor.b = cg_genericTimerColor.b;
 	aColor.a = cg_genericTimerColor.a;
-
-	//color of the border
-	bColor.r = 0.0f;
-	bColor.g = 0.0f;
-	bColor.b = 0.0f;
-	bColor.a = 0.3f;
 
 	//color of greyed out "missing fuel"
 	cColor.r = 0.5f;
@@ -6687,7 +6641,6 @@ static void CG_DrawCrosshairNames( void ) {
 	vector4		tcolor;
 	char		*name;
 //	char		sanitized[1024];
-	int			baseColor;
 	qboolean	isVeh = qfalse;
 
 	if ( !cg_drawCrosshair.integer ) {
@@ -6744,77 +6697,18 @@ static void CG_DrawCrosshairNames( void ) {
 
 	name = cgs.clientinfo[ cg.crosshairClientNum ].name;
 
-	if (cgs.gametype >= GT_TEAM)
-	{
-		//if (cgs.gametype == GT_SIEGE)
-		if (1)
-		{ //instead of team-based we'll make it oriented based on which team we're on
-			if (cgs.clientinfo[cg.crosshairClientNum].team == cg.predictedPlayerState.persistant[PERS_TEAM])
-			{
-				baseColor = CT_GREEN;
-			}
-			else
-			{
-				baseColor = CT_RED;
-			}
-		}
-		else
-		{
-			if (cgs.clientinfo[cg.crosshairClientNum].team == TEAM_RED)
-			{
-				baseColor = CT_RED;
-			}
-			else
-			{
-				baseColor = CT_BLUE;
-			}
-		}
-	}
-	else
-	{
-		//baseColor = CT_WHITE;
-		if (cgs.gametype == GT_POWERDUEL &&
-			cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR &&
-			cgs.clientinfo[cg.crosshairClientNum].duelTeam == cgs.clientinfo[cg.predictedPlayerState.clientNum].duelTeam)
-		{ //on the same duel team in powerduel, so he's a friend
-			baseColor = CT_GREEN;
-		}
-		else
-		{
-			baseColor = CT_WHITE; //just make it red in nonteam modes since everyone is hostile and crosshair will be red on them too
-		}
-	}
+	VectorSet4( &tcolor, 1.0f, 1.0f, 1.0f, 1.0f );
 
-	if (cg.snap->ps.duelInProgress)
-	{
-		if (cg.crosshairClientNum != cg.snap->ps.duelIndex)
-		{ //grey out crosshair for everyone but your foe if you're in a duel
-			baseColor = CT_BLACK;
-		}
-	}
-	else if (cg_entities[cg.crosshairClientNum].currentState.bolt1)
-	{ //this fellow is in a duel. We just checked if we were in a duel above, so
-	  //this means we aren't and he is. Which of course means our crosshair greys out over him.
-		baseColor = CT_BLACK;
-	}
+//	CG_SanitizeString( name, sanitized );
 
-	tcolor.r = 1.0f;//colorTable[baseColor][0];
-	tcolor.g = 1.0f;//colorTable[baseColor][1];
-	tcolor.b = 1.0f;//colorTable[baseColor][2];
-	tcolor.a = 1.0f;//color[3]*0.5f;
-
-//	CG_SanitizeString(name, sanitized);
-
-	if (isVeh)
-	{
+	if ( isVeh ) {
 		char str[MAX_STRING_CHARS];
-		Com_sprintf(str, MAX_STRING_CHARS, "%s (pilot)", name);
-		UI_DrawProportionalString(320, 170, str, UI_CENTER, &tcolor);
+		Com_sprintf( str, MAX_STRING_CHARS, "%s (pilot)", name );
+		UI_DrawProportionalString( 320, 170, str, UI_CENTER, &tcolor );
 	}
 	else if ( cg_drawCrosshairNames.integer == 1 )
-		UI_DrawProportionalString(320, 170, name, UI_CENTER, &tcolor);
-	else if ( cg_drawCrosshairNames.integer >= 2 && !CG_FadeColor2( &tcolor, cg.crosshairClientTime, 250.0f ) )
-	{
+		UI_DrawProportionalString( 320, 170, name, UI_CENTER, &tcolor );
+	else if ( cg_drawCrosshairNames.integer >= 2 && !CG_FadeColor2( &tcolor, cg.crosshairClientTime, 250.0f ) ) {
 		int fontHandle = MenuFontToHandle( FONT_JAPPSMALL );
 		float fontScale = 0.875f;
 		if ( cg_drawCrosshairNames.integer == 3 )
@@ -7208,7 +7102,6 @@ static void CG_DrawWarmup( void ) {
 	int			sec;
 	int			i;
 	float scale;
-	int			cw;
 	const char	*s;
 
 	sec = cg.warmup;
@@ -7275,6 +7168,7 @@ static void CG_DrawWarmup( void ) {
 			CG_Text_Paint(320 - w / 2, 60, 0.6f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE,FONT_MEDIUM);
 		}
 	} else {
+		//RAZFIXME: global gametype names
 		if ( cgs.gametype == GT_FFA ) {
 			s = CG_GetStringEdString("MENUS", "FREE_FOR_ALL");//"Free For All";
 		} else if ( cgs.gametype == GT_HOLOCRON ) {
@@ -7330,19 +7224,15 @@ static void CG_DrawWarmup( void ) {
 	scale = 0.45f;
 	switch ( cg.warmupCount ) {
 	case 0:
-		cw = 28;
 		scale = 1.25f;
 		break;
 	case 1:
-		cw = 24;
 		scale = 1.15f;
 		break;
 	case 2:
-		cw = 20;
 		scale = 1.05f;
 		break;
 	default:
-		cw = 16;
 		scale = 0.9f;
 		break;
 	}
@@ -7519,7 +7409,7 @@ void CG_DrawFlagStatus()
 #define JPFUELBAR_Y			260.0f
 void CG_DrawJetpackFuel(void)
 {
-	vector4 aColor, bColor, cColor;
+	vector4 aColor, cColor;
 	float x = JPFUELBAR_X;
 	float y = JPFUELBAR_Y;
 	float percent = ((float)cg.snap->ps.jetpackFuel/100.0f)*JPFUELBAR_H;
@@ -7539,12 +7429,6 @@ void CG_DrawJetpackFuel(void)
 	aColor.g = 0.0f;
 	aColor.b = 0.0f;
 	aColor.a = 0.8f;
-
-	//color of the border
-	bColor.r = 0.0f;
-	bColor.g = 0.0f;
-	bColor.b = 0.0f;
-	bColor.a = 0.3f;
 
 	//color of greyed out "missing fuel"
 	cColor.r = 0.5f;
@@ -7569,7 +7453,7 @@ void CG_DrawJetpackFuel(void)
 #define EWEBHEALTH_Y			290.0f
 void CG_DrawEWebHealth(void)
 {
-	vector4 aColor, bColor, cColor;
+	vector4 aColor, cColor;
 	float x = EWEBHEALTH_X;
 	float y = EWEBHEALTH_Y;
 	centity_t *eweb = &cg_entities[cg.predictedPlayerState.emplacedIndex];
@@ -7601,12 +7485,6 @@ void CG_DrawEWebHealth(void)
 	aColor.b = 0.0f;
 	aColor.a = 0.8f;
 
-	//color of the border
-	bColor.r = 0.0f;
-	bColor.g = 0.0f;
-	bColor.b = 0.0f;
-	bColor.a = 0.3f;
-
 	//color of greyed out "missing fuel"
 	cColor.r = 0.5f;
 	cColor.g = 0.5f;
@@ -7630,7 +7508,7 @@ void CG_DrawEWebHealth(void)
 #define CLFUELBAR_Y			260.0f
 void CG_DrawCloakFuel(void)
 {
-	vector4 aColor, bColor, cColor;
+	vector4 aColor, cColor;
 	float x = CLFUELBAR_X;
 	float y = CLFUELBAR_Y;
 	float percent = ((float)cg.snap->ps.cloakFuel/100.0f)*CLFUELBAR_H;
@@ -7651,7 +7529,6 @@ void CG_DrawCloakFuel(void)
 	}
 
 	VectorSet4( &aColor, 0.0f, 0.0f, 0.6f, 0.8f ); // color of the bar
-	VectorSet4( &bColor, 0.0f, 0.0f, 0.0f, 0.3f ); // color of the border
 	VectorSet4( &cColor, 0.1f, 0.1f, 0.3f, 0.1f ); // color of greyed out "missing fuel"
 
 	//draw the background (black)

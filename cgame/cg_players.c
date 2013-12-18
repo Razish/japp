@@ -349,8 +349,7 @@ qboolean CG_ParseSurfsFile( const char *modelName, const char *skinName, char *s
 	// parse the text
 	text_p = text;
 
-	memset( (char *)surfOff, 0, sizeof(surfOff) );
-	memset( (char *)surfOn, 0, sizeof(surfOn) );
+	surfOff[0] = surfOn[0] = '\0';
 
 	// read information for surfOff and surfOn
 	while ( 1 ) 
@@ -4543,28 +4542,18 @@ CG_PlayerPowerups
 ===============
 */
 static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
-	int		powerups;
-	clientInfo_t	*ci;
+	int powerups = cent->currentState.powerups;
 
-	powerups = cent->currentState.powerups;
-	if ( !powerups ) {
+	if ( !powerups )
 		return;
-	}
 
 	// quad gives a dlight
-	if ( powerups & ( 1 << PW_QUAD ) ) {
+	if ( powerups & ( 1 << PW_QUAD ) )
 		trap->R_AddLightToScene( &cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1 );
-	}
 
-	if (cent->currentState.eType == ET_NPC)
-	{
-		ci = cent->npcClient;
-		assert(ci);
-	}
-	else
-	{
-		ci = &cgs.clientinfo[ cent->currentState.clientNum ];
-	}
+	if ( cent->currentState.eType == ET_NPC )
+		assert( cent->npcClient );
+
 	// redflag
 	if ( powerups & ( 1 << PW_REDFLAG ) ) {
 		CG_PlayerFlag( cent, cgs.media.redFlagModel );
@@ -4578,16 +4567,8 @@ static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 	}
 
 	// neutralflag
-	if ( powerups & ( 1 << PW_NEUTRALFLAG ) ) {
+	if ( powerups & ( 1 << PW_NEUTRALFLAG ) )
 		trap->R_AddLightToScene( &cent->lerpOrigin, 200 + (rand()&31), 1.0, 1.0, 1.0 );
-	}
-
-	// haste leaves smoke trails
-	/*
-	if ( powerups & ( 1 << PW_HASTE ) ) {
-	CG_HasteTrail( cent );
-	}
-	*/
 }
 
 
@@ -6713,7 +6694,6 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 	//[/SFXSabers]
 	//[Movie Sabers]
 	vector3 draw_dir;
-	float  draw_len;
 	//[/Movie Sabers]
 	int styleToUse = cg_saberBladeStyle.integer;
 
@@ -7453,7 +7433,7 @@ JustDoIt:
 		//[Movie Sabers]
 		//GR - Just tweaking this a little, cuz it looks funny when you turn around slowly
 		VectorSubtract( &fx.mVerts[2].origin, &fx.mVerts[1].origin, &draw_dir );
-		draw_len = VectorNormalize( &draw_dir );
+		/*draw_len = */VectorNormalize( &draw_dir );
 
 		//if( draw_len > 2 )
 		{
@@ -8734,13 +8714,10 @@ static void CG_ForceElectrocution( centity_t *cent, const vector3 *origin, vecto
 	int bolt=-1;
 	int iter=0;
 	int torsoBolt = -1;
-	int crotchBolt = -1;
 	int elbowLBolt = -1;
 	int elbowRBolt = -1;
 	int handLBolt = -1;
 	int handRBolt = -1;
-	int kneeLBolt = -1;
-	int kneeRBolt = -1;
 	int footLBolt = -1;
 	int footRBolt = -1;
 
@@ -8749,26 +8726,20 @@ static void CG_ForceElectrocution( centity_t *cent, const vector3 *origin, vecto
 	if (cent->localAnimIndex <= 1)
 	{ //humanoid
 		torsoBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "lower_lumbar");
-		crotchBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "pelvis");
 		elbowLBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*l_arm_elbow");
 		elbowRBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*r_arm_elbow");
 		handLBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*l_hand");
 		handRBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*r_hand");
-		kneeLBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*hips_l_knee");
-		kneeRBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*hips_r_knee");
 		footLBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*l_leg_foot");
 		footRBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*r_leg_foot");
 	}
 	else if (cent->currentState.NPC_class == CLASS_PROTOCOL)
 	{ //any others that can use these bolts too?
 		torsoBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "lower_lumbar");
-		crotchBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "pelvis");
 		elbowLBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*bicep_lg");
 		elbowRBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*bicep_rg");
 		handLBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*hand_l");
 		handRBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*weapon");
-		kneeLBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*thigh_lg");
-		kneeRBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*thigh_rg");
 		footLBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*foot_lg");
 		footRBolt = trap->G2API_AddBolt(cent->ghoul2, 0, "*foot_rg");
 	}
@@ -9829,7 +9800,6 @@ void CG_Player( centity_t *cent ) {
 	int				renderfx;
 	qboolean		shadow = qfalse;
 	float			shadowPlane = 0;
-	qboolean		dead = qfalse;
 	vector3			rootAngles;
 	float			angle;
 	vector3			angles, dir, elevated, enang, seekorg;
@@ -10857,14 +10827,6 @@ SkipTrueView:
 		}
 	}
 #endif
-
-	if (cent->currentState.eFlags & EF_DEAD)
-	{
-		dead = qtrue;
-		//rww - since our angles are fixed when we're dead this shouldn't be an issue anyway
-		//we need to render the dying/dead player because we are now spawning the body on respawn instead of death
-		//return;
-	}
 
 	ScaleModelAxis(&legs);
 

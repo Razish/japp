@@ -1339,58 +1339,17 @@ void CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float 
 	vector3			direction, new_org;
 	vector3			velocity		= { 0, 0, 0 };
 	vector3			temp_org, temp_vel;
-	float			scale, dscale;
-	int				i, numSparks;
+	int				i;
 	refdef_t *refdef = CG_GetRefdef();
-
-	//Sparks
-	numSparks = 16 + (random() * 16.0f);
-	
-	for ( i = 0; i < numSparks; i++ )
-	{	
-		scale = 0.25f + (random() * 2.0f);
-		dscale = -scale*0.5;
-
-/*		particle = FX_AddTrail( origin,
-								NULL,
-								NULL,
-								32.0f,
-								-64.0f,
-								scale,
-								-scale,
-								1.0f,
-								0.0f,
-								0.25f,
-								4000.0f,
-								cgs.media.sparkShader,
-								rand() & FXF_BOUNCE);
-		if ( particle == NULL )
-			return;
-
-		FXE_Spray( normal, 500, 150, 1.0f, 768 + (rand() & 255), (FXPrimitive *) particle );*/
-	}
 
 	//Smoke
 	//Move this out a little from the impact surface
 	VectorMA( origin, 4, normal, &new_org );
 	VectorSet( &velocity, 0.0f, 0.0f, 16.0f );
 
-	for ( i = 0; i < 4; i++ )
-	{
+	for ( i = 0; i < 4; i++ ) {
 		VectorSet( &temp_org, new_org.x + (crandom() * 16.0f), new_org.y + (crandom() * 16.0f), new_org.z + (random() * 4.0f) );
 		VectorSet( &temp_vel, velocity.x + (crandom() * 8.0f), velocity.y + (crandom() * 8.0f), velocity.z + (crandom() * 8.0f) );
-
-/*		FX_AddSprite(	temp_org,
-						temp_vel, 
-						NULL, 
-						64.0f + (random() * 32.0f), 
-						16.0f, 
-						1.0f, 
-						0.0f,
-						20.0f + (crandom() * 90.0f),
-						0.5f,
-						1500.0f, 
-						cgs.media.smokeShader, FXF_USE_ALPHA_CHAN );*/
 	}
 
 	//Core of the explosion
@@ -1400,7 +1359,8 @@ void CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float 
 	VectorNormalize( &direction );
 
 	//Tag the last one with a light
-	le = CG_MakeExplosion( origin, &direction, cgs.media.explosionModel, 6, cgs.media.surfaceExplosionShader, 500, qfalse, radius * 0.02f + (random() * 0.3f), 0);
+	le = CG_MakeExplosion( origin, &direction, cgs.media.explosionModel, 6, cgs.media.surfaceExplosionShader, 500,
+		qfalse, radius * 0.02f + (random() * 0.3f), 0);
 	le->light = 150;
 	VectorSet( &le->lightColor, 0.9f, 0.8f, 0.5f );
 
@@ -1410,7 +1370,8 @@ void CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float 
 			(origin->x + (16 + (crandom() * 8))*crandom()),
 			(origin->y + (16 + (crandom() * 8))*crandom()),
 			(origin->z + (16 + (crandom() * 8))*crandom()) );
-		le = CG_MakeExplosion( &new_org, &direction, cgs.media.explosionModel, 6, cgs.media.surfaceExplosionShader, 300 + (rand() & 99), qfalse, radius * 0.05f + (crandom() *0.3f), 0);
+		le = CG_MakeExplosion( &new_org, &direction, cgs.media.explosionModel, 6, cgs.media.surfaceExplosionShader,
+			300 + (rand() & 99), qfalse, radius * 0.05f + (crandom() *0.3f), 0);
 	}
 
 	//Shake the camera
@@ -1422,8 +1383,6 @@ void CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float 
 	if ( smoke )
 	{
 		VectorMA( origin, -8, normal, &temp_org );
-//		FX_AddSpawner( temp_org, normal, NULL, NULL, 100, random()*25.0f, 5000.0f, (void *) CG_SmokeSpawn );
-
 		//Impact mark
 		//FIXME: Replace mark
 		//CG_ImpactMark( cgs.media.burnMarkShader, origin, normal, random()*360, 1,1,1,1, qfalse, 8, qfalse );

@@ -890,127 +890,58 @@ WEAPON SELECTION
 
 void CG_DrawIconBackground(void)
 {
-	int				height,xAdd,x2,y2,t;
-//	int				prongLeftX,prongRightX;
+	int				t;
 	float			inTime = cg.invenSelectTime+WEAPON_SELECT_TIME;
 	float			wpTime = cg.weaponSelectTime+WEAPON_SELECT_TIME;
 	float			fpTime = cg.forceSelectTime+WEAPON_SELECT_TIME;
-//	int				drawType = cgs.media.weaponIconBackground;
-//	int				yOffset = 0;
 
 	// don't display if dead
 	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 ) 
-	{
 		return;
-	}
 
+	// simple hud
 	if (cg_hudFiles.integer)
-	{ //simple hud
 		return;
-	}
-
-	x2 = 30;
-	y2 = SCREEN_HEIGHT-70;
-
-	//prongLeftX =x2+37; 
-	//prongRightX =x2+544; 
 
 	if (inTime > wpTime)
-	{
-//		drawType = cgs.media.inventoryIconBackground;
 		cg.iconSelectTime = cg.invenSelectTime;
-	}
 	else
-	{
-//		drawType = cgs.media.weaponIconBackground;
 		cg.iconSelectTime = cg.weaponSelectTime;
-	}
 
 	if (fpTime > inTime && fpTime > wpTime)
-	{
-//		drawType = cgs.media.forceIconBackground;
 		cg.iconSelectTime = cg.forceSelectTime;
-	}
 
-	if ((cg.iconSelectTime+WEAPON_SELECT_TIME)<cg.time)	// Time is up for the HUD to display
-	{
-		if (cg.iconHUDActive)		// The time is up, but we still need to move the prongs back to their original position
-		{
+	if ((cg.iconSelectTime+WEAPON_SELECT_TIME)<cg.time) {
+		// Time is up for the HUD to display
+		if (cg.iconHUDActive) {
+			// The time is up, but we still need to move the prongs back to their original position
 			t =  cg.time - (cg.iconSelectTime+WEAPON_SELECT_TIME);
 			cg.iconHUDPercent = t/ 130.0f;
 			cg.iconHUDPercent = 1 - cg.iconHUDPercent;
 
-			if (cg.iconHUDPercent<0)
-			{
+			if (cg.iconHUDPercent<0) {
 				cg.iconHUDActive = qfalse;
 				cg.iconHUDPercent=0;
 			}
-
-			xAdd = (int) 8*cg.iconHUDPercent;
-
-			height = (int) (60.0f*cg.iconHUDPercent);
-			//CG_DrawPic( x2+60, y2+30+yOffset, 460, -height, drawType);	// Top half
-			//CG_DrawPic( x2+60, y2+30-2+yOffset, 460, height, drawType);	// Bottom half
-
-		}
-		else
-		{
-			xAdd = 0;
 		}
 
 		return;
 	}
-	//prongLeftX =x2+37; 
-	//prongRightX =x2+544; 
 
-	if (!cg.iconHUDActive)
-	{
+	if (!cg.iconHUDActive) {
 		t = cg.time - cg.iconSelectTime;
 		cg.iconHUDPercent = t/ 130.0f;
 
 		// Calc how far into opening sequence we are
-		if (cg.iconHUDPercent>1)
-		{
+		if (cg.iconHUDPercent>1) {
 			cg.iconHUDActive = qtrue;
 			cg.iconHUDPercent=1;
 		}
 		else if (cg.iconHUDPercent<0)
-		{
 			cg.iconHUDPercent=0;
-		}
 	}
 	else
-	{
 		cg.iconHUDPercent=1;
-	}
-
-	//trap->R_SetColor( colorTable[CT_WHITE] );					
-	//height = (int) (60.0f*cg.iconHUDPercent);
-	//CG_DrawPic( x2+60, y2+30+yOffset, 460, -height, drawType);	// Top half
-	//CG_DrawPic( x2+60, y2+30-2+yOffset, 460, height, drawType);	// Bottom half
-
-	// And now for the prongs
-/*	if ((cg.inventorySelectTime+WEAPON_SELECT_TIME)>cg.time)	
-	{
-		cgs.media.currentBackground = ICON_INVENTORY;
-		background = &cgs.media.inventoryProngsOn;
-	}
-	else if ((cg.weaponSelectTime+WEAPON_SELECT_TIME)>cg.time)	
-	{
-		cgs.media.currentBackground = ICON_WEAPONS;
-	}
-	else 
-	{
-		cgs.media.currentBackground = ICON_FORCE;
-		background = &cgs.media.forceProngsOn;
-	}
-*/
-	// Side Prongs
-//	trap->R_SetColor( colorTable[CT_WHITE]);					
-//	xAdd = (int) 8*cg.iconHUDPercent;
-//	CG_DrawPic( prongLeftX+xAdd, y2-10, 40, 80, background);
-//	CG_DrawPic( prongRightX-xAdd, y2-10, -40, 80, background);
-
 }
 
 qboolean CG_WeaponCheck(int weap)
@@ -1070,7 +1001,6 @@ void CG_DrawWeaponSelect( void ) {
 	int				holdX,x,y,pad;
 	int				sideLeftIconCnt,sideRightIconCnt;
 	int				sideMax,holdCount,iconCnt;
-	int				height;
 	int		yOffset = 0;
 	qboolean drewConc = qfalse;
 
@@ -1171,7 +1101,6 @@ void CG_DrawWeaponSelect( void ) {
 	trap->R_SetColor(&colorTable[CT_WHITE]);
 	// Work backwards from current icon
 	holdX = x - ((bigIconSize/2) + pad + smallIconSize);
-	height = smallIconSize * 1;//cg.iconHUDPercent;
 	drewConc = qfalse;
 
 	for (iconCnt=1;iconCnt<(sideLeftIconCnt+1);i--)
@@ -1211,15 +1140,13 @@ void CG_DrawWeaponSelect( void ) {
 
 		if (cgs.media.weaponIcons[i])
 		{
-			weaponInfo_t	*weaponInfo;
 			CG_RegisterWeapon( i );	
-			weaponInfo = &cg_weapons[i];
 
 			trap->R_SetColor(&colorTable[CT_WHITE]);
 			if (!CG_WeaponCheck(i))
-				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, /*weaponInfo->weaponIconNoAmmo*/cgs.media.weaponIcons_NA[i] );
+				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, cgs.media.weaponIcons_NA[i] );
 			else
-				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, /*weaponInfo->weaponIcon*/cgs.media.weaponIcons[i] );
+				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, cgs.media.weaponIcons[i] );
 
 			holdX -= (smallIconSize+pad);
 		}
@@ -1231,12 +1158,9 @@ void CG_DrawWeaponSelect( void ) {
 	}
 
 	// Current Center Icon
-	height = bigIconSize * cg.iconHUDPercent;
 	if (cgs.media.weaponIcons[cg.weaponSelect])
 	{
-		weaponInfo_t	*weaponInfo;
 		CG_RegisterWeapon( cg.weaponSelect );	
-		weaponInfo = &cg_weapons[cg.weaponSelect];
 
 		trap->R_SetColor( &colorTable[CT_WHITE]);
 		if (!CG_WeaponCheck(cg.weaponSelect))
@@ -1261,7 +1185,6 @@ void CG_DrawWeaponSelect( void ) {
 	// Right side ICONS
 	// Work forwards from current icon
 	holdX = x + (bigIconSize/2) + pad;
-	height = smallIconSize * cg.iconHUDPercent;
 	for (iconCnt=1;iconCnt<(sideRightIconCnt+1);i++)
 	{
 		if ( i == WP_CONCUSSION )
@@ -1297,9 +1220,7 @@ void CG_DrawWeaponSelect( void ) {
 
 		if (/*weaponData[i].weaponIcon[0]*/cgs.media.weaponIcons[i])
 		{
-			weaponInfo_t	*weaponInfo;
 			CG_RegisterWeapon( i );	
-			weaponInfo = &cg_weapons[i];
 			// No ammo for this weapon?
 			trap->R_SetColor( &colorTable[CT_WHITE]);
 			if (!CG_WeaponCheck(i))

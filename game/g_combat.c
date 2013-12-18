@@ -44,7 +44,7 @@ qboolean G_HeavyMelee( gentity_t *attacker )
 
 hitLocation_t G_GetHitLocation( gentity_t *target, vector3 *ppoint ) {
 	vector3 point, point_dir, fwd, rt, up, tangles, tcenter;
-	float tradius, udot, fdot, rdot;
+	float udot, fdot, rdot;
 	int vertical, forward, lateral, hitLoc;
 
 	// Get target forward, right and up.
@@ -57,10 +57,6 @@ hitLocation_t G_GetHitLocation( gentity_t *target, vector3 *ppoint ) {
 	// Get center of target.
 	VectorAdd( &target->r.absmin, &target->r.absmax, &tcenter );
 	VectorScale( &tcenter, 0.5f, &tcenter );
-
-	// Get radius width of target.
-	tradius = (fabs(target->r.maxs.x) + fabs(target->r.maxs.y)
-			 + fabs(target->r.mins.x) + fabs(target->r.mins.y))/4;
 
 	// Get impact point.
 	if ( ppoint && !VectorCompare( ppoint, &vec3_origin ) )
@@ -426,22 +422,17 @@ LookAtKiller
 */
 void LookAtKiller( gentity_t *self, gentity_t *inflictor, gentity_t *attacker ) {
 	vector3		dir;
-	vector3		angles;
 
-	if ( attacker && attacker != self ) {
-		VectorSubtract (&attacker->s.pos.trBase, &self->s.pos.trBase, &dir);
-	} else if ( inflictor && inflictor != self ) {
-		VectorSubtract (&inflictor->s.pos.trBase, &self->s.pos.trBase, &dir);
-	} else {
+	if ( attacker && attacker != self )
+		VectorSubtract( &attacker->s.pos.trBase, &self->s.pos.trBase, &dir );
+	else if ( inflictor && inflictor != self )
+		VectorSubtract( &inflictor->s.pos.trBase, &self->s.pos.trBase, &dir );
+	else {
 		self->client->ps.stats[STAT_DEAD_YAW] = self->s.angles.yaw;
 		return;
 	}
 
-	self->client->ps.stats[STAT_DEAD_YAW] = vectoyaw ( &dir );
-
-	angles.yaw = vectoyaw ( &dir );
-	angles.pitch = 0; 
-	angles.roll = 0;
+	self->client->ps.stats[STAT_DEAD_YAW] = vectoyaw( &dir );
 }
 
 /*
@@ -4143,18 +4134,10 @@ int gPainMOD = 0;
 int gPainHitLoc = -1;
 vector3 gPainPoint;
 
-void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
-			   vector3 *dir, vector3 *point, int damage, int dflags, int mod ) {
+void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vector3 *dir, vector3 *point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
-	int			take;
-	int			save;
-	int			asave;
-	int			knockback;
-	int			max;
-	int			subamt = 0;
-	float		famt = 0;
-	float		hamt = 0;
-	float		shieldAbsorbed = 0;
+	int			take, asave, knockback, max, subamt = 0;
+	float		famt = 0, hamt = 0, shieldAbsorbed = 0;
 
 	if (targ && targ->damageRedirect)
 	{
@@ -4651,7 +4634,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	// battlesuit protects from all radius damage (but takes knockback)
 	// and protects 50% against all damage
-	if ( client && client->ps.powerups[PW_BATTLESUIT] ) {
+	if ( client && client->ps.powerups[PW_BATTLESUIT] >= level.time ) {
 		G_AddEvent( targ, EV_POWERUP_BATTLESUIT, 0 );
 		if ( ( dflags & DAMAGE_RADIUS ) || ( mod == MOD_FALLING ) ) {
 			return;
@@ -4689,7 +4672,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		damage = 1;
 	}
 	take = damage;
-	save = 0;
 
 	// save some from armor
 	asave = CheckArmor (targ, take, dflags);

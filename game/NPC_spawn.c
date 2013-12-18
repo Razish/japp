@@ -4023,7 +4023,7 @@ void NPC_Kill_f( void )
 	int			n;
 	gentity_t	*player;
 	char		name[1024];
-	team_t		killTeam = TEAM_FREE;
+	npcteam_t	killTeam = NPCTEAM_FREE;
 	qboolean	killNonSF = qfalse;
 
 	trap->Argv(2, name, 1024);
@@ -4063,7 +4063,7 @@ void NPC_Kill_f( void )
 		{
 			killTeam = (team_t)GetIDForString( TeamTable, name );
 
-			if ( killTeam == TEAM_FREE )
+			if ( killTeam == NPCTEAM_FREE )
 			{
 				Com_Printf( S_COLOR_RED"NPC_Kill Error: team '%s' not recognized\n", name );
 				Com_Printf( S_COLOR_RED"Valid team names are:\n");
@@ -4110,7 +4110,7 @@ void NPC_Kill_f( void )
 		}
 		else if ( player && player->NPC && player->client )
 		{
-			if ( killTeam != TEAM_FREE )
+			if ( killTeam != NPCTEAM_FREE )
 			{
 				if ( player->client->playerTeam == killTeam )
 				{
@@ -4162,11 +4162,11 @@ void Cmd_NPC_f( gentity_t *ent ) {
 	trap->Argv( 1, cmd, sizeof( cmd ) );
 
 	if ( !cmd[0] ) {
-		static const char *msg = "Valid NPC commands are:\n"
+		trap->SendServerCommand( ent-g_entities, "print \"Valid NPC commands are:\n"
 " spawn [NPC type (from NPCs.cfg)]\n"
 " kill [NPC targetname] or [all (kills all NPCs)] or [team teamname]\n"
 " showbounds (draws exact bounding boxes of NPCs)\n"
-" score [NPC targetname] (prints number of kills per NPC)\n";
+" score [NPC targetname] (prints number of kills per NPC)\n\"" );
 	}
 	else if ( !Q_stricmp( cmd, "spawn" ) )
 		NPC_Spawn_f( ent );

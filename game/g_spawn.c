@@ -466,7 +466,6 @@ void jp_portal_touch( gentity_t *self, gentity_t *other, trace_t *trace )
 		vector3 tpPos;
 		vector3 sourceVelocity, destVelocity;
 		vector3 sourceNormal, destNormal;
-		float speed;
 
 		//Fetch normals
 		VectorCopy( &self->s.boneAngles1, &sourceNormal );
@@ -531,7 +530,6 @@ void jp_portal_touch( gentity_t *self, gentity_t *other, trace_t *trace )
 			float velocity = *(float*)&other->genericValue1; //stored during missile creation
 		//	VectorScale( destNormal, velocity, other->s.pos.trDelta );
 			VectorMA( &other->s.pos.trBase, velocity, &destNormal, &other->s.pos.trDelta );
-			speed = velocity;
 			other->s.pos.trTime = level.time;
 			other->nextthink = level.time + other->genericValue2;
 		}

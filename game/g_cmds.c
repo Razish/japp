@@ -1385,7 +1385,7 @@ qboolean G_SetSaber(gentity_t *ent, int saberNum, char *saberName, qboolean sieg
 
 	Q_strncpyz( truncSaberName, saberName, sizeof( truncSaberName ) );
 
-	if ( saberNum == 0 && !Q_stricmp( "none", truncSaberName ) || !Q_stricmp( "remove", truncSaberName ) )
+	if ( saberNum == 0 && (!Q_stricmp( "none", truncSaberName ) || !Q_stricmp( "remove", truncSaberName )) )
 	{ //can't remove saber 0 like this
 		Q_strncpyz( truncSaberName, DEFAULT_SABER, sizeof( truncSaberName ) );
 	}

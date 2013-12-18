@@ -2187,7 +2187,6 @@ void	CG_ParticleMisc (qhandle_t pshader, vector3 *origin, int size, int duration
 void	CG_ParticleExplosion (char *animStr, vector3 *origin, vector3 *vel, int duration, int sizeStart, int sizeEnd);
 const char *CG_GetStringEdString(char *refSection, char *refName);
 extern qboolean		initparticles;
-int CG_NewParticleArea ( int num );
 
 void FX_TurretProjectileThink(  centity_t *cent, const struct weaponInfo_s *weapon );
 void FX_TurretHitWall( vector3 *origin, vector3 *normal );

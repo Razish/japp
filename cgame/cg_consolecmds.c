@@ -66,28 +66,6 @@ static void CG_ScoresUp_f( void ) {
 	}
 }
 
-static void CG_spWin_f( void) {
-	trap->Cvar_Set("cg_cameraOrbit", "2");
-	trap->Cvar_Set("cg_cameraOrbitDelay", "35");
-	trap->Cvar_Set("cg_thirdPerson", "1");
-	trap->Cvar_Set("cg_thirdPersonAngle", "0");
-	trap->Cvar_Set("cg_thirdPersonRange", "100");
-	CG_AddBufferedSound(cgs.media.winnerSound);
-	//trap->S_StartLocalSound(cgs.media.winnerSound, CHAN_ANNOUNCER);
-	CG_CenterPrint(CG_GetStringEdString("MP_INGAME", "YOU_WIN"), SCREEN_HEIGHT * .30, 0);
-}
-
-static void CG_spLose_f( void) {
-	trap->Cvar_Set("cg_cameraOrbit", "2");
-	trap->Cvar_Set("cg_cameraOrbitDelay", "35");
-	trap->Cvar_Set("cg_thirdPerson", "1");
-	trap->Cvar_Set("cg_thirdPersonAngle", "0");
-	trap->Cvar_Set("cg_thirdPersonRange", "100");
-	CG_AddBufferedSound(cgs.media.loserSound);
-	//trap->S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
-	CG_CenterPrint(CG_GetStringEdString("MP_INGAME", "YOU_LOSE"), SCREEN_HEIGHT * .30, 0);
-}
-
 static void CG_TellTarget_f( void ) {
 	int		clientNum;
 	char	command[128];
@@ -115,24 +93,6 @@ static void CG_TellAttacker_f( void ) {
 	trap->Cmd_Args( message, sizeof( message ) );
 	Com_sprintf( command, sizeof( command ), "tell %i %s", clientNum, message );
 	trap->SendClientCommand( command );
-}
-
-static void CG_StartOrbit_f( void ) {
-	char var[MAX_TOKEN_CHARS];
-
-	trap->Cvar_VariableStringBuffer( "developer", var, sizeof( var ) );
-	if ( !atoi(var) )
-		return;
-
-	if (cg_cameraOrbit.value != 0) {
-		trap->Cvar_Set ("cg_cameraOrbit", "0");
-		trap->Cvar_Set("cg_thirdPerson", "0");
-	} else {
-		trap->Cvar_Set("cg_cameraOrbit", "5");
-		trap->Cvar_Set("cg_thirdPerson", "1");
-		trap->Cvar_Set("cg_thirdPersonAngle", "0");
-		trap->Cvar_Set("cg_thirdPersonRange", "100");
-	}
 }
 
 void CG_SiegeBriefingDisplay( int team, int dontshow );

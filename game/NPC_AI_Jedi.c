@@ -469,7 +469,6 @@ void Boba_FireDecide( void )
 	qboolean enemyCS = qfalse;
 	qboolean enemyInFOV = qfalse;
 	//qboolean move = qtrue;
-	qboolean faceEnemy = qfalse;
 	qboolean shoot = qfalse;
 	qboolean hitAlly = qfalse;
 	vector3	impactPos;
@@ -537,7 +536,6 @@ void Boba_FireDecide( void )
 		enemyCS = qfalse;
 		shoot = qfalse;
 		NPCInfo->enemyLastSeenTime = level.time;
-		faceEnemy = qtrue;
 		ucmd.buttons &= ~(BUTTON_ATTACK|BUTTON_ALT_ATTACK);
 	}
 	else if ( enemyDist < MIN_ROCKET_DIST_SQUARED )//128
@@ -618,26 +616,15 @@ void Boba_FireDecide( void )
 		else if ( trap->InPVS( &NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin ) )
 		{
 			NPCInfo->enemyLastSeenTime = level.time;
-			faceEnemy = qtrue;
 			//NPC_AimAdjust( -1 );//adjust aim worse longer we cannot see enemy
 		}
 
 		if ( NPC->client->ps.weapon == WP_NONE )
 		{
-			faceEnemy = qfalse;
 			shoot = qfalse;
 		}
-		else
-		{
-			if ( enemyLOS )
-			{//FIXME: no need to face enemy if we're moving to some other goal and he's too far away to shoot?
-				faceEnemy = qtrue;
-			}
-			if ( enemyCS )
-			{
-				shoot = qtrue;
-			}
-		}
+		else if ( enemyCS )
+			shoot = qtrue;
 
 		if ( !enemyCS )
 		{//if have a clear shot, always try
@@ -737,7 +724,6 @@ void Boba_FireDecide( void )
 							NPCInfo->desiredPitch	= angles.pitch;
 
 							shoot = qtrue;
-							faceEnemy = qfalse;
 						}
 					}
 				}
@@ -2449,7 +2435,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 	float zdiff;
 	int	  duckChance = 0;
 	int	  dodgeAnim = -1;
-	qboolean	saberBusy = qfalse, evaded = qfalse, doDodge = qfalse;
+	qboolean	saberBusy = qfalse, doDodge = qfalse;
 	evasionType_t	evasionType = EVASION_NONE;
 
 	//FIXME: if we don't have our saber in hand, pick the force throw option or a jump or strafe!
@@ -2549,7 +2535,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						TIMER_Start( self, "strafeLeft", Q_irand( 500, 1500 ) );
 						TIMER_Set( self, "strafeRight", 0 );
 						evasionType = EVASION_DUCK;
-						evaded = qtrue;
 					}
 					else if ( Q_irand( 0, 1 ) )
 					{
@@ -2570,7 +2555,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						{
 							TIMER_Start( self, "duck", Q_irand( 500, 1500 ) );
 							evasionType = EVASION_DUCK_PARRY;
-							evaded = qtrue;
 							if ( d_JediAI.integer )
 							{
 								Com_Printf( "duck " );
@@ -2599,7 +2583,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						TIMER_Start( self, "strafeRight", Q_irand( 500, 1500 ) );
 						TIMER_Set( self, "strafeLeft", 0 );
 						evasionType = EVASION_DUCK;
-						evaded = qtrue;
 					}
 					else if ( Q_irand( 0, 1 ) )
 					{
@@ -2620,7 +2603,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						{
 							TIMER_Start( self, "duck", Q_irand( 500, 1500 ) );
 							evasionType = EVASION_DUCK_PARRY;
-							evaded = qtrue;
 							if ( d_JediAI.integer )
 							{
 								Com_Printf( "duck " );
@@ -2650,7 +2632,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 					Com_Printf( "TOP block\n" );
 				}
 			}
-			evaded = qtrue;
 		}
 		else
 		{
@@ -2659,7 +2640,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 				//duckChance = 2;
 				TIMER_Start( self, "duck", Q_irand( 500, 1500 ) );
 				evasionType = EVASION_DUCK;
-				evaded = qtrue;
 				if ( d_JediAI.integer )
 				{
 					Com_Printf( "duck " );
@@ -2678,7 +2658,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 				//duckChance = 2;
 				TIMER_Start( self, "duck", Q_irand( 500, 1500 ) );
 				evasionType = EVASION_DUCK;
-				evaded = qtrue;
 				if ( d_JediAI.integer )
 				{
 					Com_Printf( "duck " );
@@ -2768,7 +2747,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 					Com_Printf( "mid-TOP block\n" );
 				}
 			}
-			evaded = qtrue;
 		}
 	}
 	else if ( saberBusy || (zdiff < -36 && ( zdiff < -44 || !Q_irand( 0, 2 ) ) ) )//was -30 and -40//2nd one was -46
@@ -2777,7 +2755,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 		{//already in air, duck to pull up legs
 			TIMER_Start( self, "duck", Q_irand( 500, 1500 ) );
 			evasionType = EVASION_DUCK;
-			evaded = qtrue;
 			if ( d_JediAI.integer )
 			{
 				Com_Printf( "legs up\n" );
@@ -2803,7 +2780,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						Com_Printf( "LL block\n" );
 					}
 				}
-				evaded = qtrue;
 			}
 		}
 		else 
@@ -2820,7 +2796,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 				{
 					self->client->ps.fd.forceJumpCharge = 320;//FIXME: calc this intelligently
 					evasionType = EVASION_FJUMP;
-					evaded = qtrue;
 					if ( d_JediAI.integer )
 					{
 						Com_Printf( "force jump + " );
@@ -2862,7 +2837,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						}
 					}
 					evasionType = EVASION_JUMP;
-					evaded = qtrue;
 					if ( d_JediAI.integer )
 					{
 						Com_Printf( "jump + " );
@@ -2906,7 +2880,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 							}
 							cmd->upmove = 0;
 							saberBusy = qtrue;
-							evaded = qtrue;
 						}
 					}
 				}
@@ -2914,7 +2887,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 			if ( ((evasionType = Jedi_CheckFlipEvasions( self, rightdot, zdiff ))!=EVASION_NONE) )
 			{
 				saberBusy = qtrue;
-				evaded = qtrue;
 			}
 			else if ( incoming || !saberBusy )
 			{
@@ -2951,7 +2923,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						Com_Printf( "LL block\n" );
 					}
 				}
-				evaded = qtrue;
 			}
 		}
 	}
@@ -3021,7 +2992,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 					}
 				}
 			}
-			evaded = qtrue;
 		}
 	}
 
@@ -5095,7 +5065,6 @@ static void Jedi_Combat( void )
 {
 	vector3	enemy_dir, enemy_movedir, enemy_dest;
 	float	enemy_dist, enemy_movespeed;
-	qboolean	enemy_lost = qfalse;
 
 	//See where enemy will be 300 ms from now
 	Jedi_SetEnemyInfo( &enemy_dest, &enemy_dir, &enemy_dist, &enemy_movedir, &enemy_movespeed, 300 );
@@ -5189,8 +5158,6 @@ static void Jedi_Combat( void )
 					}
 					G_FreeEntity( tempGoal );
 				}
-
-				enemy_lost = qtrue;
 			}
 		}
 	}

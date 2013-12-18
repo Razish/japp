@@ -1379,8 +1379,6 @@ extern void Boba_FlyStop( gentity_t *self );
 extern void NPC_BSWampa_Default( void );
 void NPC_RunBehavior( int team, int bState )
 {
-	qboolean dontSetAim = qfalse;
-
 	if (NPC->s.NPC_class == CLASS_VEHICLE &&
 		NPC->m_pVehicle)
 	{ //vehicles don't do AI!
@@ -1388,78 +1386,47 @@ void NPC_RunBehavior( int team, int bState )
 	}
 
 	if ( bState == BS_CINEMATIC )
-	{
 		NPC_BSCinematic();
-	}
-	else if ( NPC->client->ps.weapon == WP_EMPLACED_GUN )
-	{
+	else if ( NPC->client->ps.weapon == WP_EMPLACED_GUN ) {
 		NPC_BSEmplaced();
 		NPC_CheckCharmed();
 		return;
 	}
 	else if ( NPC->client->ps.weapon == WP_SABER )
-	{//jedi
 		NPC_BehaviorSet_Jedi( bState );
-		dontSetAim = qtrue;
-	}
 	else if ( NPC->client->NPC_class == CLASS_WAMPA )
-	{//wampa
 		NPC_BSWampa_Default();
-	}
 	else if ( NPC->client->NPC_class == CLASS_RANCOR )
-	{//rancor
 		NPC_BehaviorSet_Rancor( bState );
-	}
 	else if ( NPC->client->NPC_class == CLASS_REMOTE )
-	{
 		NPC_BehaviorSet_Remote( bState );
-	}
 	else if ( NPC->client->NPC_class == CLASS_SEEKER )
-	{
 		NPC_BehaviorSet_Seeker( bState );
-	}
-	else if ( NPC->client->NPC_class == CLASS_BOBAFETT )
-	{//bounty hunter
+	else if ( NPC->client->NPC_class == CLASS_BOBAFETT ) {
 		if ( Boba_Flying( NPC ) )
-		{
-			NPC_BehaviorSet_Seeker(bState);
-		}
+			NPC_BehaviorSet_Seeker( bState );
 		else
-		{
 			NPC_BehaviorSet_Jedi( bState );
-		}
-		dontSetAim = qtrue;
 	}
 	else if ( NPCInfo->scriptFlags & SCF_FORCED_MARCH )
-	{//being forced to march
 		NPC_BSDefault();
-	}
-	else
-	{
-		switch( team )
-		{
-		
-	//	case NPCTEAM_SCAVENGERS:
-	//	case NPCTEAM_IMPERIAL:
-	//	case NPCTEAM_KLINGON:
-	//	case NPCTEAM_HIROGEN:
-	//	case NPCTEAM_MALON:
+	else {
+		switch ( team ) {
 		// not sure if TEAM_ENEMY is appropriate here, I think I should be using NPC_class to check for behavior - dmv
 		case NPCTEAM_ENEMY:
 			// special cases for enemy droids
-			switch( NPC->client->NPC_class)
-			{
+			switch ( NPC->client->NPC_class) {
 			case CLASS_ATST:
 				NPC_BehaviorSet_ATST( bState );
 				return;
 			case CLASS_PROBE:
-				NPC_BehaviorSet_ImperialProbe(bState);
+				NPC_BehaviorSet_ImperialProbe( bState );
 				return;
 			case CLASS_REMOTE:
 				NPC_BehaviorSet_Remote( bState );
 				return;
 			case CLASS_SENTRY:
-				NPC_BehaviorSet_Sentry(bState);
+				NPC_BehaviorSet_Sentry( bState );
 				return;
 			case CLASS_INTERROGATOR:
 				NPC_BehaviorSet_Interrogator( bState );
@@ -1481,80 +1448,59 @@ void NPC_RunBehavior( int team, int bState )
 				return;
 			default:
 				break;
-
 			}
 
-			if ( NPC->enemy && NPC->s.weapon == WP_NONE && bState != BS_HUNT_AND_KILL && !trap->ICARUS_TaskIDPending( (sharedEntity_t *)NPC, TID_MOVE_NAV ) )
-			{//if in battle and have no weapon, run away, fixme: when in BS_HUNT_AND_KILL, they just stand there
+			//if in battle and have no weapon, run away, fixme: when in BS_HUNT_AND_KILL, they just stand there
+			if ( NPC->enemy && NPC->s.weapon == WP_NONE && bState != BS_HUNT_AND_KILL
+				&& !trap->ICARUS_TaskIDPending( (sharedEntity_t *)NPC, TID_MOVE_NAV ) ) {
 				if ( bState != BS_FLEE )
-				{
 					NPC_StartFlee( NPC->enemy, &NPC->enemy->r.currentOrigin, AEL_DANGER_GREAT, 5000, 10000 );
-				}
 				else
-				{
 					NPC_BSFlee();
-				}
 				return;
 			}
-			if ( NPC->client->ps.weapon == WP_SABER )
-			{//special melee exception
+			//special melee exception
+			if ( NPC->client->ps.weapon == WP_SABER ) {
 				NPC_BehaviorSet_Default( bState );
 				return;
 			}
-			if ( NPC->client->ps.weapon == WP_DISRUPTOR && (NPCInfo->scriptFlags & SCF_ALT_FIRE) )
-			{//a sniper
+			//a sniper
+			if ( NPC->client->ps.weapon == WP_DISRUPTOR && (NPCInfo->scriptFlags & SCF_ALT_FIRE) ) {
 				NPC_BehaviorSet_Sniper( bState );
 				return;
 			}
-			if ( NPC->client->ps.weapon == WP_THERMAL || NPC->client->ps.weapon == WP_STUN_BATON )//FIXME: separate AI for melee fighters
-			{//a grenadier
+			//a grenadier
+			//FIXME: separate AI for melee fighters
+			if ( NPC->client->ps.weapon == WP_THERMAL || NPC->client->ps.weapon == WP_STUN_BATON ) {
 				NPC_BehaviorSet_Grenadier( bState );
 				return;
 			}
 			if ( NPC_CheckSurrender() )
-			{
 				return;
-			}
 			NPC_BehaviorSet_Stormtrooper( bState );
 			break;
 
 		case NPCTEAM_NEUTRAL: 
-
 			// special cases for enemy droids
-			if ( NPC->client->NPC_class == CLASS_PROTOCOL || NPC->client->NPC_class == CLASS_UGNAUGHT ||
-				NPC->client->NPC_class == CLASS_JAWA)
-			{
+			if ( NPC->client->NPC_class == CLASS_PROTOCOL || NPC->client->NPC_class == CLASS_UGNAUGHT || NPC->client->NPC_class == CLASS_JAWA )
 				NPC_BehaviorSet_Default(bState);
-			}
 			else if ( NPC->client->NPC_class == CLASS_VEHICLE )
-			{
 				// TODO: Add vehicle behaviors here.
 				NPC_UpdateAngles( qtrue, qtrue );//just face our spawn angles for now
-			}
 			else
-			{
 				// Just one of the average droids
 				NPC_BehaviorSet_Droid( bState );
-			}
 			break;
 
 		default:
 			if ( NPC->client->NPC_class == CLASS_SEEKER )
-			{
 				NPC_BehaviorSet_Seeker(bState);
-			}
-			else
-			{
+			else {
 				if ( NPCInfo->charmedTime > level.time )
-				{
 					NPC_BehaviorSet_Charmed( bState );
-				}
 				else
-				{
 					NPC_BehaviorSet_Default( bState );
-				}
 				NPC_CheckCharmed();
-				dontSetAim = qtrue;
 			}
 			break;
 		}

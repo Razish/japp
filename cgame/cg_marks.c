@@ -1076,9 +1076,7 @@ void CG_AddParticles (void)
 	float			alpha;
 	float			time, time2;
 	vector3			org;
-	int				color;
 	cparticle_t		*active, *tail;
-	int				type;
 	vector3			rotate_ang;
 	refdef_t *refdef = CG_GetRefdef();
 
@@ -1184,15 +1182,11 @@ void CG_AddParticles (void)
 		if (alpha > 1.0)
 			alpha = 1;
 
-		color = p->color;
-
 		time2 = time*time;
 
 		org.x = p->org.x + p->vel.x*time + p->accel.x*time2;
 		org.y = p->org.y + p->vel.y*time + p->accel.y*time2;
 		org.z = p->org.z + p->vel.z*time + p->accel.z*time2;
-
-		type = p->type;
 
 		CG_AddParticleToScene (p, &org, alpha);
 	}
@@ -1314,9 +1308,9 @@ void CG_ParticleSnow (qhandle_t pshader, vector3 *origin, vector3 *origin2, int 
 	p->org.y = p->org.y + ( crandom() * range);
 	p->org.z = p->org.z + ( crandom() * (p->start - p->end)); 
 
-	p->vel.z = p->vel.y = 0;
+	p->vel.x = p->vel.y = 0;
 	
-	p->accel.z = p->accel.y = p->accel.z = 0;
+	p->accel.x = p->accel.y = p->accel.z = 0;
 
 	if (turb)
 	{
@@ -1537,79 +1531,6 @@ void CG_ParticleExplosion (char *animStr, vector3 *origin, vector3 *vel, int dur
 	VectorCopy( vel, &p->vel );
 	VectorClear( &p->accel );
 
-}
-
-// Rafael Shrapnel
-void CG_AddParticleShrapnel (localEntity_t *le)
-{
-	return;
-}
-// done.
-
-int CG_NewParticleArea (int num)
-{
-	// const char *str;
-	char *str;
-	char *token;
-	int type;
-	vector3 origin, origin2;
-	int		i;
-	float range = 0;
-	int turb;
-	int	numparticles;
-	int	snum;
-	
-	str = (char *) CG_ConfigString (num);
-	if (!str[0])
-		return (0);
-	
-	// returns type 128 64 or 32
-	token = COM_Parse ((const char **)&str);
-	type = atoi (token);
-	
-		 if ( type == 1 )	range = 128;
-	else if ( type == 2 )	range = 64;
-	else if ( type == 3 )	range = 32;
-	else if ( type == 0 )	range = 256;
-	else if ( type == 4 )	range = 8;
-	else if ( type == 5 )	range = 16;
-	else if ( type == 6 )	range = 32;
-	else if ( type == 7 )	range = 64;
-	else					range = 0;
-
-
-	for (i=0; i<3; i++)
-	{
-		token = COM_Parse ((const char **)&str);
-		origin.data[i] = atof (token);
-	}
-
-	for (i=0; i<3; i++)
-	{
-		token = COM_Parse ((const char **)&str);
-		origin2.data[i] = atof (token);
-	}
-		
-	token = COM_Parse ((const char **)&str);
-	numparticles = atoi (token);
-	
-	token = COM_Parse ((const char **)&str);
-	turb = atoi (token);
-
-	token = COM_Parse ((const char **)&str);
-	snum = atoi (token);
-	
-	/*
-	for (i=0; i<numparticles; i++)
-	{
-		if (type >= 4)
-			CG_ParticleBubble (cgs.media.waterBubbleShader, origin, origin2, turb, range, snum);
-		else
-			CG_ParticleSnow (cgs.media.waterBubbleShader, origin, origin2, turb, range, snum);
-	}
-	*/
-
-	return (1);
 }
 
 void	CG_SnowLink (centity_t *cent, qboolean particleOn)

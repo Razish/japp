@@ -8,7 +8,9 @@
 
 #ifdef JPLUA
 
-#pragma comment( lib, "lua" )
+#ifdef _MSC_VER
+	#pragma comment( lib, "lua" )
+#endif
 
 jplua_t JPLua = { 0 };
 
@@ -143,8 +145,6 @@ int JPLua_Push_Pairs( lua_State *L )
 
 void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize )
 {
-	char *msg;
-//	char *nl;
 	int args = lua_gettop(L);
 	const char *res;
 	int i;
@@ -163,37 +163,8 @@ void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize )
 		lua_pop( L, 1 );
 	}
 	lua_pop( L, 1 );
-	msg = out;
 
 	return;
-	// It's messy but it works :P
-	/*
-	nl = msg;
-	while ( 1 )
-	{
-		if ( !(*nl) )
-		{
-			if ( *msg )
-			{
-				assert( strlen( msg ) < 4096 ); // Failsafe, this should never happen (4096 is engine Com_Printf buffer)
-				return;//Com_Printf( va( "%s\n", msg ) );
-			}
-			break;
-		}
-		if ( *nl == '\n' )
-		{
-		//	*nl = '\0';
-			assert( strlen( msg ) < 4096 ); // Failsafe, this should never happen
-			return;
-			/*
-			Com_Printf( va( "%s\n", msg ) );
-			msg = nl + 1;
-			*nl = '\n';
-			*//*
-		}
-		nl++;
-	}
-	*/
 }
 
 void JPLua_TableToColour( vector4 *out, lua_State *L, int idx )

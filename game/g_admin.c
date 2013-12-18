@@ -242,14 +242,13 @@ void AM_ParseAdmins( void )
 void AM_SaveAdmins( void ) {
 	char			loadPath[MAX_QPATH] = {0};
 	const char		*buf = NULL;
-	long			len;
 	fileHandle_t	f;
 	cJSON			*root = NULL, *admins = NULL;
 	adminUser_t		*admin = NULL;
 
 	Com_Printf( "Saving admins\n" );
 	Com_sprintf( loadPath, sizeof( loadPath ), "admins.dat" );
-	len = trap->FS_Open( loadPath, &f, FS_WRITE );
+	trap->FS_Open( loadPath, &f, FS_WRITE );
 
 	root = cJSON_CreateObject();
 	admins = cJSON_CreateArray();
@@ -357,13 +356,12 @@ void AM_TM_SaveTelemarks( void )
 {//Save telemarks file
 	char			buf[16384] = { 0 };// 16k file size
 	char			loadPath[MAX_QPATH];
-	long			len;
 	fileHandle_t	f;
 	teleMark_t		*current = NULL;
 
 	Com_Printf( "^5Saving telemark Data...\n" );
 	Com_sprintf( loadPath, sizeof(loadPath), "maps\\%s.tele", level.rawmapname );
-	len = trap->FS_Open( loadPath, &f, FS_WRITE );
+	trap->FS_Open( loadPath, &f, FS_WRITE );
 
 	for ( current=level.adminData.teleMarks; current-level.adminData.teleMarks<level.adminData.teleMarksIndex; current++ )
 		Q_strcat( buf, sizeof( buf ), va( "{ \"%s\" %i %i %i }\n", current->name, (int)current->position.x, (int)current->position.y, (int)current->position.z ) );
@@ -1461,7 +1459,7 @@ static void AM_BanIP( gentity_t *ent )
 	return;
 }
 
-qboolean G_CallSpawn( gentity_t *ent );
+#ifdef _DEBUG
 static void AM_Test( gentity_t *ent )
 {
 #if 0
@@ -1516,12 +1514,13 @@ static void AM_Test( gentity_t *ent )
 	G_CallSpawn( obj );
 	return;
 #endif
-#if 1
+#if 0
 	int x=0;
 	int y=1;
 	y /= x;
 #endif
 }
+#endif
 
 static void AM_Remap( gentity_t *ent )
 {//Shader remapping
@@ -1633,11 +1632,10 @@ static void AM_Merc( gentity_t *ent ) {
 	targ = &g_entities[targetClient];
 
 	targ->client->pers.adminData.merc = !targ->client->pers.adminData.merc;
-	targ->client->ps.fd.forcePowerSelected = 0; // HACK: What the actual fuck
 	if ( targ->client->pers.adminData.merc )
 	{// give everything between WP_NONE and LAST_USEABLE_WEAPON
 		int i=0;
-		targ->client->ps.stats[STAT_WEAPONS] = (1<<LAST_USEABLE_WEAPON)-1 & ~1;
+		targ->client->ps.stats[STAT_WEAPONS] = ((1<<LAST_USEABLE_WEAPON)-1) & ~1;
 		for ( i=0; i<AMMO_MAX; i++ ) {
 			targ->client->ps.ammo[i] = ammoData[i].max;
 		}

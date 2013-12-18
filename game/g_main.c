@@ -1111,11 +1111,8 @@ void CalculateRanks( void ) {
 	int		rank;
 	int		score;
 	int		newScore;
-	int		preNumSpec = 0;
 	//int		nonSpecIndex = -1;
 	gclient_t	*cl;
-
-	preNumSpec = level.numNonSpectatorClients;
 
 	level.follow1 = -1;
 	level.follow2 = -1;

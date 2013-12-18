@@ -304,7 +304,7 @@ void JP_ChatboxDraw( void )
 	int i = MAX_CHATBOX_ENTRIES-min( cg_chatboxLineCount.integer, currentChatbox->numActiveLines );
 	int numLines = 0;
 	int done = 0;
-	chatEntry_t *last = NULL;
+//	chatEntry_t *last = NULL;
 
 	if ( cg.scoreBoardShowing && !(cg.snap && cg.snap->ps.pm_type == PM_INTERMISSION) )
 		return;
@@ -340,7 +340,7 @@ void JP_ChatboxDraw( void )
 		chatEntry_t *chat = &currentChatbox->chatBuffer[i];
 		if ( chat->isUsed )
 		{
-			last = chat;
+		//	last = chat;
 			if ( chat->time >= cg.time-cg_chatbox.integer || currentChatbox->scrollAmount || cg_chatbox.integer == 1 || (trap->Key_GetCatcher() & KEYCATCH_MESSAGE) )
 			{
 				CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.value * numLines), cg.chatbox.size.scale, &colorWhite, va( "%s%s", (cg_chatboxTimeShow.integer ? chat->timeStamp : ""), chat->message ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, JP_GetChatboxFont() );

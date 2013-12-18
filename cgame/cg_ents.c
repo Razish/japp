@@ -396,7 +396,6 @@ void FX_DrawPortableShield(centity_t *cent)
 
 	int				xaxis, height, posWidth, negWidth, team;
 	vector3			start, end, normal;
-	localEntity_t	*le;
 	qhandle_t		shader;
 	char			buf[1024];
 
@@ -447,7 +446,7 @@ void FX_DrawPortableShield(centity_t *cent)
 	else
 		shader = trap->R_RegisterShader( (team == TEAM_RED) ? "gfx/misc/red_portashield" : "gfx/misc/blue_portashield" );
 
-	le = FX_AddOrientedLine(&start, &end, &normal, 1.0f, height, 0.0f, 1.0f, 1.0f, 50.0, shader);
+	FX_AddOrientedLine(&start, &end, &normal, 1.0f, height, 0.0f, 1.0f, 1.0f, 50.0, shader);
 }
 
 /*
@@ -1040,7 +1039,6 @@ static void CG_General( centity_t *cent ) {
 
 		if (!cent->ghoul2)
 		{
-			const char *limbBone;
 			const char *rotateBone;
 			char	limbName[MAX_QPATH];
 			char	stubName[MAX_QPATH];
@@ -1048,7 +1046,6 @@ static void CG_General( centity_t *cent ) {
 			char	stubCapName[MAX_QPATH];
 			char *limbTagName;
 			char *stubTagName;
-			int limb_anim;
 			int newBolt;
 			int limbBit = (1 << (cent->currentState.modelGhoul2-10));
 
@@ -1076,19 +1073,15 @@ static void CG_General( centity_t *cent ) {
 
 			if (cent->currentState.modelGhoul2 == G2_MODELPART_HEAD)
 			{
-				limbBone = "cervical";
 				rotateBone = "cranium";
 				Q_strncpyz( limbName , "head", sizeof( limbName  ) );
 				Q_strncpyz( limbCapName, "head_cap_torso", sizeof( limbCapName ) );
 				Q_strncpyz( stubCapName, "torso_cap_head", sizeof( stubCapName ) );
 				limbTagName = "*head_cap_torso";
 				stubTagName = "*torso_cap_head";
-				limb_anim = BOTH_DISMEMBER_HEAD1;
 			}
 			else if (cent->currentState.modelGhoul2 == G2_MODELPART_WAIST)
 			{
-				limbBone = "pelvis";
-
 				if (clEnt->localAnimIndex <= 1)
 				{ //humanoid/rtrooper
 					rotateBone = "thoracic";
@@ -1102,11 +1095,9 @@ static void CG_General( centity_t *cent ) {
 				Q_strncpyz( stubCapName, "hips_cap_torso", sizeof( stubCapName ) );
 				limbTagName = "*torso_cap_hips";
 				stubTagName = "*hips_cap_torso";
-				limb_anim = BOTH_DISMEMBER_TORSO1;
 			}
 			else if (cent->currentState.modelGhoul2 == G2_MODELPART_LARM)
 			{
-				limbBone = "lhumerus";
 				rotateBone = "lradius";
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "l_arm", limbName, sizeof(limbName) );
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "torso", stubName, sizeof(stubName) );
@@ -1114,11 +1105,9 @@ static void CG_General( centity_t *cent ) {
 				Com_sprintf( stubCapName, sizeof( stubCapName), "%s_cap_l_arm", stubName );
 				limbTagName = "*l_arm_cap_torso";
 				stubTagName = "*torso_cap_l_arm";
-				limb_anim = BOTH_DISMEMBER_LARM;
 			}
 			else if (cent->currentState.modelGhoul2 == G2_MODELPART_RARM)
 			{
-				limbBone = "rhumerus";
 				rotateBone = "rradius";
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "r_arm", limbName, sizeof(limbName) );
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "torso", stubName, sizeof(stubName) );
@@ -1126,11 +1115,9 @@ static void CG_General( centity_t *cent ) {
 				Com_sprintf( stubCapName, sizeof( stubCapName), "%s_cap_r_arm", stubName );
 				limbTagName = "*r_arm_cap_torso";
 				stubTagName = "*torso_cap_r_arm";
-				limb_anim = BOTH_DISMEMBER_RARM;
 			}
 			else if (cent->currentState.modelGhoul2 == G2_MODELPART_RHAND)
 			{
-				limbBone = "rradiusX";
 				rotateBone = "rhand";
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "r_hand", limbName, sizeof(limbName) );
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "r_arm", stubName, sizeof(stubName) );
@@ -1138,11 +1125,9 @@ static void CG_General( centity_t *cent ) {
 				Com_sprintf( stubCapName, sizeof( stubCapName), "%s_cap_r_hand", stubName );
 				limbTagName = "*r_hand_cap_r_arm";
 				stubTagName = "*r_arm_cap_r_hand";
-				limb_anim = BOTH_DISMEMBER_RARM;
 			}
 			else if (cent->currentState.modelGhoul2 == G2_MODELPART_LLEG)
 			{
-				limbBone = "lfemurYZ";
 				rotateBone = "ltibia";
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "l_leg", limbName, sizeof(limbName) );
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "hips", stubName, sizeof(stubName) );
@@ -1150,11 +1135,9 @@ static void CG_General( centity_t *cent ) {
 				Com_sprintf( stubCapName, sizeof( stubCapName), "%s_cap_l_leg", stubName );
 				limbTagName = "*l_leg_cap_hips";
 				stubTagName = "*hips_cap_l_leg";
-				limb_anim = BOTH_DISMEMBER_LLEG;
 			}
 			else if (cent->currentState.modelGhoul2 == G2_MODELPART_RLEG)
 			{
-				limbBone = "rfemurYZ";
 				rotateBone = "rtibia";
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "r_leg", limbName, sizeof(limbName) );
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "hips", stubName, sizeof(stubName) );
@@ -1162,11 +1145,9 @@ static void CG_General( centity_t *cent ) {
 				Com_sprintf( stubCapName, sizeof( stubCapName), "%s_cap_r_leg", stubName );
 				limbTagName = "*r_leg_cap_hips";
 				stubTagName = "*hips_cap_r_leg";
-				limb_anim = BOTH_DISMEMBER_RLEG;
 			}
 			else
 			{//umm... just default to the right leg, I guess (same as on server)
-				limbBone = "rfemurYZ";
 				rotateBone = "rtibia";
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "r_leg", limbName, sizeof(limbName) );
 				BG_GetRootSurfNameWithVariant( clEnt->ghoul2, "hips", stubName, sizeof(stubName) );
@@ -1174,7 +1155,6 @@ static void CG_General( centity_t *cent ) {
 				Com_sprintf( stubCapName, sizeof( stubCapName), "%s_cap_r_leg", stubName );
 				limbTagName = "*r_leg_cap_hips";
 				stubTagName = "*hips_cap_r_leg";
-				limb_anim = BOTH_DISMEMBER_RLEG;
 			}
 
 			if (clEnt && clEnt->ghoul2)

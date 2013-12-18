@@ -995,7 +995,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 {
 	vector3	mid, blade_dir, end_dir, trail_dir, base_dir;
 	float	radiusmult, effectradius, coreradius, effectalpha=1.0f, AngleScale=1.0f;
-	float	blade_len, end_len, trail_len, base_len;
+	float	blade_len, trail_len, base_len;
 	//[RGBSabers]
 	vector3 rgb={1,1,1};
 	int i;
@@ -1018,7 +1018,6 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 
 	VectorSubtract( trail_tip, blade_tip, &end_dir );
 	VectorSubtract( trail_muz, blade_muz, &base_dir );
-	end_len = VectorLength(&end_dir);
 	base_len = VectorLength(&base_dir);
 	VectorNormalize(&end_dir);
 	VectorNormalize(&base_dir);
@@ -1572,9 +1571,7 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 	vector3	org_, end,
 	axis_[3] = {{0.0f}};	// shut the compiler up
 	mdxaBone_t	boltMatrix;
-	vector3 futureAngles;
 	effectTrailArgStruct_t fx;
-	int	useModelIndex = 0;
 	saber_colors_t bladeColor;
 	float bladeLength,bladeRadius;
 	char bladeColorString[MAX_QPATH];
@@ -1609,12 +1606,6 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 
 	bladeLength = UI_SaberBladeLengthForSaber( saberName, bladeNum );
 	bladeRadius = UI_SaberBladeRadiusForSaber( saberName, bladeNum );
-
-	futureAngles.pitch	= angles->pitch;
-	futureAngles.yaw	= angles->yaw;
-	futureAngles.roll	= angles->roll;
-
-	useModelIndex = 0;
 
 	tagName = va( "*blade%d", bladeNum+1 );
 	bolt = trap->G2API_AddBolt( item->ghoul2,saberModel, tagName );

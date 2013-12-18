@@ -43,7 +43,6 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon )
 {
 	refEntity_t ent;
 	vector3 ang;
-	float vLen;
 	float scale = 1.0f;
 	refdef_t *refdef = CG_GetRefdef();
 
@@ -52,7 +51,6 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon )
 	VectorCopy( &cent->lerpOrigin, &ent.origin );
 
 	VectorSubtract( &ent.origin, &refdef->vieworg, &ent.axis[0] );
-	vLen = VectorLength( &ent.axis[0] );
 	if ( VectorNormalize( &ent.axis[0] ) <= 0.1f )
 		return;
 
@@ -64,10 +62,6 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon )
 	AnglesToAxis( &ang, ent.axis );
 
 	//radius must be a power of 2, and is the actual captured texture size
-//	if (vLen < 128)			ent.radius = 256;
-//	else if (vLen < 256)	ent.radius = 128;
-//	else if (vLen < 512)	ent.radius = 64;
-//	else					ent.radius = 32;
 	scale = 0.37f;
 	VectorScale( &ent.axis[0],  scale, &ent.axis[0] );
 	VectorScale( &ent.axis[1],  scale, &ent.axis[1] );

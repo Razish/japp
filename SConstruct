@@ -256,7 +256,7 @@ else:
 # compiler options
 if env['PLATFORM'] == 'posix':
 	env['CPPDEFINES'] = [ '__GCC__' ]
-	env['CCFLAGS'] = [ '-march=k8', '-fno-strict-aliasing' ]
+	env['CCFLAGS'] = [ '-march=k8', '-fno-strict-aliasing', '-Wall', '-Wno-missing-braces' ]
 else:
 	env['CPPDEFINES'] = []
 	env['CCFLAGS'] = []

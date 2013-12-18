@@ -2507,12 +2507,7 @@ int Item_TextScroll_ThumbDrawPosition ( itemDef_t *item )
 int Item_TextScroll_OverLB ( itemDef_t *item, float x, float y ) 
 {
 	rectDef_t		r;
-	textScrollDef_t *scrollPtr;
 	int				thumbstart;
-	int				count;
-
-	scrollPtr = (textScrollDef_t*)item->typeData;
-	count     = scrollPtr->iLineCount;
 
 	r.x = item->window.rect.x + item->window.rect.w - SCROLLBAR_SIZE;
 	r.y = item->window.rect.y;
@@ -2867,9 +2862,7 @@ int Item_ListBox_OverLB(itemDef_t *item, float x, float y)
 	rectDef_t r;
 	listBoxDef_t *listPtr;
 	int thumbstart;
-	int count;
 
-	count = DC->feederCount(item->special);
 	listPtr = (listBoxDef_t*)item->typeData;
 	if (item->window.flags & WINDOW_HORIZONTAL) 
 	{
@@ -4063,7 +4056,7 @@ void Item_StopCapture(itemDef_t *item) {
 
 qboolean Item_Slider_HandleKey(itemDef_t *item, int key, qboolean down) {
 	float x, value, work;
-	float sliderWidth, sliderHeight, thumbWidth, thumbHeight;
+	float sliderWidth, thumbWidth;
 
 	//DC->Print("slider handle key\n");
 	if (item->window.flags & WINDOW_HASFOCUS && item->cvar && Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory)) {
@@ -4076,16 +4069,12 @@ qboolean Item_Slider_HandleKey(itemDef_t *item, int key, qboolean down) {
 				if ( item->slider.x == 0 && item->slider.y == 0 && item->slider.w == 0 && item->slider.h == 0 )
 				{
 					sliderWidth = SLIDER_WIDTH;
-					sliderHeight = SLIDER_HEIGHT;
 					thumbWidth = SLIDER_THUMB_WIDTH;
-					thumbHeight = SLIDER_THUMB_HEIGHT;
 				}
 				else
 				{
 					sliderWidth = item->slider.x;
-					sliderHeight = item->slider.y;
 					thumbWidth = item->slider.w;
-					thumbHeight = item->slider.h;
 				}
 
 				if (item->text) {
@@ -4098,9 +4087,7 @@ qboolean Item_Slider_HandleKey(itemDef_t *item, int key, qboolean down) {
 				testRect.x = x;
 				value = (float)thumbWidth / 2;
 				testRect.x -= value;
-				//DC->Print("slider x: %f\n", testRect.x);
 				testRect.w = (sliderWidth + (float)thumbWidth / 2);
-				//DC->Print("slider w: %f\n", testRect.w);
 				if (Rect_ContainsPoint(&testRect, DC->cursorx, DC->cursory)) {
 					work = DC->cursorx - x;
 					value = work / sliderWidth;
@@ -5278,10 +5265,8 @@ void BindingFromName(const char *cvar) {
 
 void Item_Slider_Paint(itemDef_t *item) {
 	vector4 newColor, lowLight;
-	float x, y, value, sliderWidth, sliderHeight, thumbWidth, thumbHeight, thumbOffset = 2;
+	float x, y, sliderWidth, sliderHeight, thumbWidth, thumbHeight, thumbOffset = 2;
 	menuDef_t *parent = (menuDef_t*)item->parent;
-
-	value = (item->cvar) ? DC->getCVarValue(item->cvar) : 0;
 
 	if (item->window.flags & WINDOW_HASFOCUS) {
 		lowLight.r = 0.8 * parent->focusColor.r; 
@@ -5861,8 +5846,6 @@ void Item_ListBox_Paint(itemDef_t *item) {
 	qhandle_t image;
 	qhandle_t optionalImage1, optionalImage2, optionalImage3;
 	listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
-	int numlines;
-
 
 	// the listbox is horizontal or vertical and has a fixed size scroll bar going either direction
 	// elements are enumerated from the DC and either text or image handles are acquired from the DC as well
@@ -5982,7 +5965,6 @@ void Item_ListBox_Paint(itemDef_t *item) {
 	// A vertical list box
 	else 
 	{
-		numlines = item->window.rect.h / listPtr->elementHeight;
 		if (!listPtr->scrollhidden)
 		{
 
@@ -7499,12 +7481,10 @@ qboolean ItemParse_asset_model_go( itemDef_t *item, const char *name,int *runTim
 
 qboolean ItemParse_asset_model( itemDef_t *item, int handle ) {
 	const char *temp;
-	modelDef_t *modelPtr;
 	int animRunLength;
 	pc_token_t token;
 
 	Item_ValidateTypeData(item);
-	modelPtr = (modelDef_t*)item->typeData;
 
 	if (!trap->PC_ReadToken(handle, &token)) {
 		return qfalse;

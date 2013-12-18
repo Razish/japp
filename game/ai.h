@@ -97,7 +97,7 @@ typedef struct AIGroupInfo_s
 {
 	int			numGroup;
 	qboolean	processed;
-	team_t		team;
+	npcteam_t	team;
 	gentity_t	*enemy;
 	int			enemyWP;
 	int			speechDebounceTime;

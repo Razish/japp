@@ -191,6 +191,8 @@ void DrawPlayerCount( float fade )
 	case GT_CTY:
 		DrawPlayerCount_Team( fade );
 		break;
+	default:
+		break;
 	}
 }
 
@@ -244,7 +246,7 @@ int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHand
 
 	savedY = y;
 
-	// First pass, background + borders
+	// First pass, background
 	for ( i=startIndex; i<startIndex+playerCount; i++ )
 	{
 		score_t *score = &cg.scores[i];
@@ -351,28 +353,18 @@ int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHand
 {
 	const char *tmp = NULL;
 	vector4	white		= { 1.0f, 1.0f, 1.0f, fade },
-			border		= { 0.6f, 0.6f, 0.6f, fade },
-			borderRed	= { 1.0f, 0.8f, 0.8f, fade },
-			borderBlue	= { 1.0f, 0.8f, 0.8f, fade },
 			blue		= { 0.6f, 0.6f, 1.0f, fade },
 			background	= { 0.75f, 0.75f, 0.75f, 0.6f*fade },
 			teamRed		= { 0.7f, 0.4f, 0.4f, 0.6f*fade },
 			teamBlue	= { 0.4f, 0.4f, 0.7f, 0.6f*fade };
-	vector4	*teamBackground	= &background,
-			*teamBorder		= &border;
+	vector4	*teamBackground	= &background;
 	int i = 0, count = 0, column = 0;
 	float endX = SCREEN_WIDTH/2.0, columnOffset[] = { /*name*/80.0f, /*score*/170.0f, /*capture*/195.0f, /*defend*/220.f, /*assist*/245.f, /*ping*/270.0f, /*time*/295.0f }, savedY=0.0f;
 
 	if ( team == TEAM_RED )
-	{
 		teamBackground = &teamRed;
-		teamBorder = &borderRed;
-	}
 	else if ( team == TEAM_BLUE )
-	{
 		teamBackground = &teamBlue;
-		teamBorder = &borderBlue;
-	}
 
 	for ( i=0; i<cg.numScores; i++ )
 	{
@@ -411,7 +403,7 @@ int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHand
 
 	savedY = y;
 
-	// First pass, background + borders
+	// First pass, background
 	for ( i=0; i<cg.numScores; i++ )
 	{
 		score_t *score = &cg.scores[i];
@@ -517,28 +509,18 @@ int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHand
 {
 	const char *tmp = NULL;
 	vector4	white		= { 1.0f, 1.0f, 1.0f, fade },
-			border		= { 0.6f, 0.6f, 0.6f, fade },
-			borderRed	= { 1.0f, 0.8f, 0.8f, fade },
-			borderBlue	= { 1.0f, 0.8f, 0.8f, fade },
 			blue		= { 0.6f, 0.6f, 1.0f, fade },
 			background	= { 0.75f, 0.75f, 0.75f, 0.6f*fade },
 			teamRed		= { 0.7f, 0.4f, 0.4f, 0.6f*fade },
 			teamBlue	= { 0.4f, 0.4f, 0.7f, 0.6f*fade };
-	vector4	*teamBackground	= &background,
-			*teamBorder		= &border;
+	vector4	*teamBackground	= &background;
 	int i = 0, count = 0, column = 0;
 	float endX = SCREEN_WIDTH/2.0, columnOffset[] = { /*name*/80.0f, /*score*/170.0f, /*capture*/195.0f, /*defend*/220.f, /*assist*/245.f, /*ping*/270.0f, /*time*/295.0f }, savedY=0.0f;
 
 	if ( team == TEAM_RED )
-	{
 		teamBackground = &teamRed;
-		teamBorder = &borderRed;
-	}
 	else if ( team == TEAM_BLUE )
-	{
 		teamBackground = &teamBlue;
-		teamBorder = &borderBlue;
-	}
 
 	for ( i=0; i<cg.numScores; i++ )
 	{
@@ -577,7 +559,7 @@ int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHand
 
 	savedY = y;
 
-	// First pass, background + borders
+	// First pass, background
 	for ( i=0; i<cg.numScores; i++ )
 	{
 		score_t *score = &cg.scores[i];
@@ -707,6 +689,8 @@ int ListPlayers_Free( float fade, float x, float y, float fontScale, int fontHan
 	case GT_CTY:
 		trap->Error( ERR_DROP, "Tried to use non-team scoreboard on team gametype" );
 		break;
+	default:
+		break;
 	}
 
 	return -1;
@@ -735,6 +719,8 @@ int ListPlayers_Team( float fade, float x, float y, float fontScale, int fontHan
 	case GT_CTF:
 	case GT_CTY:
 		return ListPlayers_CTF( fade, x, y, fontScale, fontHandle, lineHeight, team );
+		break;
+	default:
 		break;
 	}
 
@@ -816,6 +802,8 @@ void DrawPlayers( float fade )
 	case GT_CTF:
 	case GT_CTY:
 		DrawPlayers_Team( fade );
+		break;
+	default:
 		break;
 	}
 }

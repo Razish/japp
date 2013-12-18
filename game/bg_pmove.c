@@ -3458,6 +3458,7 @@ static void PM_AirMove( void ) {
 	float		accelerate;
 	usercmd_t	cmd;
 	Vehicle_t	*pVeh = NULL;
+	qboolean	promode = GetCInfo( CINFO_CPMPHYSICS );
 
 	if (pm->ps->clientNum >= MAX_CLIENTS)
 	{
@@ -3541,7 +3542,7 @@ static void PM_AirMove( void ) {
 	wishspeed = VectorNormalize(&wishdir);
 	wishspeed *= scale;
 
-	if ( GetCInfo( CINFO_CPMPHYSICS ) )
+	if ( promode )
 	{//Raz: CPM Physics
 		wishspeed2 = wishspeed;
 		if (DotProduct(&pm->ps->velocity, &wishdir) < 0)
@@ -3572,7 +3573,7 @@ static void PM_AirMove( void ) {
 	PM_Accelerate (&wishdir, wishspeed, accelerate);
 
 	//Raz: CPM Physics
-	if ( GetCInfo( CINFO_CPMPHYSICS ) && cpm_pm_aircontrol )
+	if ( promode && cpm_pm_aircontrol )
 		CPM_PM_Aircontrol( pm, &wishdir, wishspeed2 );
 
 	// we may have a ground plane that is very steep, even
@@ -5622,7 +5623,6 @@ PM_Footsteps
 static void PM_Footsteps( void ) {
 	float		bobmove;
 	int			old;
-	qboolean	footstep;
 	int			setAnimFlags = 0;
 
 	if ( (PM_InSaberAnim( (pm->ps->legsAnim) ) && !BG_SpinningSaberAnim( (pm->ps->legsAnim) )) 
@@ -5752,8 +5752,6 @@ static void PM_Footsteps( void ) {
 		return;
 	}
 	
-
-	footstep = qfalse;
 
 	if (pm->ps->saberMove == LS_SPINATTACK)
 	{
@@ -5984,7 +5982,6 @@ static void PM_Footsteps( void ) {
 					break;
 				}
 			}
-			footstep = qtrue;
 		}
 		else
 		{
@@ -8829,7 +8826,7 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 	{ //can't roll unless you're able to move normally
 		if ((ps->legsAnim) == BOTH_ROLL_B)
 		{ //backwards roll is pretty fast, should also be slower
-			if (ps->legsTimer > 800 || JP_GetJPFixRoll() == 3 && ps->legsTimer > 100)
+			if ( ps->legsTimer > 800 || (JP_GetJPFixRoll() == 3 && ps->legsTimer > 100) )
 				ps->speed = ps->legsTimer/2.5f;
 			else
 				ps->speed = ps->legsTimer/6.0f;//450;
@@ -10066,9 +10063,11 @@ void PM_VehicleViewAngles(playerState_t *ps, bgEntity_t *veh, usercmd_t *ucmd)
 {
 	Vehicle_t *pVeh = veh->m_pVehicle;
 	qboolean setAngles = qtrue;
-	vector3 clampMin;
-	vector3 clampMax;
+	vector3 clampMin, clampMax;
 	int i;
+
+	VectorClear( &clampMin );
+	VectorClear( &clampMax );
 
 	if ( veh->m_pVehicle->m_pPilot 
 		&& veh->m_pVehicle->m_pPilot->s.number == ps->clientNum )
@@ -10081,7 +10080,7 @@ void PM_VehicleViewAngles(playerState_t *ps, bgEntity_t *veh, usercmd_t *ucmd)
 		{//only if not if doing special free-roll/pitch control
 			setAngles = qtrue;
 			clampMin.pitch	= -pVeh->m_pVehicleInfo->lookPitch;
-			clampMax.pitch	= pVeh->m_pVehicleInfo->lookPitch;
+			clampMax.pitch	=  pVeh->m_pVehicleInfo->lookPitch;
 			clampMin.yaw	= clampMax.yaw = 0;
 			clampMin.roll	= clampMax.roll = -1;
 		}

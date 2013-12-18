@@ -3831,7 +3831,6 @@ while a slow client may have multiple ClientEndFrame between ClientThink.
 */
 void ClientEndFrame( gentity_t *ent ) {
 	int			i;
-	clientPersistant_t	*pers;
 	qboolean isNPC = qfalse;
 
 	if (ent->s.eType == ET_NPC)
@@ -3843,8 +3842,6 @@ void ClientEndFrame( gentity_t *ent ) {
 		SpectatorClientEndFrame( ent );
 		return;
 	}
-
-	pers = &ent->client->pers;
 
 	for ( i=0; i<MAX_POWERUPS; i++ )
 	{// turn off any expired powerups

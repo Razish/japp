@@ -308,7 +308,6 @@ int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 	int			i;
 	char		*token;
 	float		fps;
-	int			skip;
 	int			usedIndex = -1;
 	int			nextIndex = uiNumAllAnims;
 
@@ -380,7 +379,6 @@ int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 
 	// parse the text
 	text_p = UIPAFtext;
-	skip = 0;	// quiet the compiler warning
 
 	//FIXME: have some way of playing anims backwards... negative numFrames?
 
@@ -1480,9 +1478,7 @@ qboolean Load_Menu(int handle) {
 void UI_LoadMenus(const char *menuFile, qboolean reset) {
 	pc_token_t token;
 	int handle;
-	int start;
-
-	start = trap->Milliseconds();
+//	int start = trap->Milliseconds();
 
 	trap->PC_LoadGlobalDefines ( "ui/jamp/menudef.h" );
 
@@ -1519,7 +1515,7 @@ void UI_LoadMenus(const char *menuFile, qboolean reset) {
 		}
 	}
 
-	//	Com_Printf("UI menu load time = %d milli seconds\n", trap->Milliseconds() - start);
+//	Com_Printf("UI menu load time = %d milli seconds\n", trap->Milliseconds() - start);
 
 	trap->PC_FreeSource( handle );
 
@@ -10336,7 +10332,7 @@ extern int whichVersionDigDl( char *version );
 #endif
 void _UI_Init( qboolean inGameLoad ) {
 	const char	*menuSet;
-	int			start, value=0;
+	int			value=0;
 	
 #if MAC_PORT
 	int			isDigitalDownloadMac;
@@ -10511,7 +10507,7 @@ void _UI_Init( qboolean inGameLoad ) {
 
 	AssetCache();
 
-	start = trap->Milliseconds();
+//	start = trap->Milliseconds();
 
 	uiInfo.teamCount = 0;
 	uiInfo.characterCount = 0;
@@ -10653,8 +10649,6 @@ void _UI_SetActiveMenu( uiMenuCommand_t menu ) {
 			return;
 		case UIMENU_MAIN:
 			{
-				qboolean active = qfalse;
-
 				//trap->Cvar_Set( "sv_killserver", "1" );
 				trap->Key_SetCatcher( KEYCATCH_UI );
 				//trap->S_StartLocalSound( trap->S_RegisterSound("sound/misc/menu_background.wav", qfalse) , CHAN_LOCAL_SOUND );
@@ -10671,14 +10665,9 @@ void _UI_SetActiveMenu( uiMenuCommand_t menu ) {
 				if (buf[0]) 
 				{
 					if (!ui_singlePlayerActive.integer) 
-					{
 						Menus_ActivateByName("error_popmenu");
-						active = qtrue;
-					} 
 					else 
-					{
 						trap->Cvar_Set("com_errorMessage", "");
-					}
 				}
 				return;
 			}

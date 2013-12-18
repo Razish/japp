@@ -1746,7 +1746,6 @@ void ST_Commander( void )
 	qboolean	runner = qfalse;
 	qboolean	enemyLost = qfalse;
 	qboolean	enemyProtected = qfalse;
-	qboolean	scouting = qfalse;
 	int			squadState;
 	int			curMemberNum, lastMemberNum;
 	float		avoidDist;
@@ -1885,7 +1884,6 @@ void ST_Commander( void )
 		cpFlags = 0;
 		squadState = SQUAD_IDLE;
 		avoidDist = 0;
-		scouting = qfalse;
 
 		//get the next guy
 		member = &g_entities[group->member[i].number];
@@ -2084,7 +2082,6 @@ void ST_Commander( void )
 					//ask where he went
 					if ( group->numState[SQUAD_SCOUT] <= 0 )
 					{
-						scouting = qtrue;
 						NPC_ST_StoreMovementSpeech( SPEECH_CHASE, 0.0f );
 					}
 					//Since no-one else has done this, I should be the closest one, so go after him...

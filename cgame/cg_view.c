@@ -1,4 +1,4 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
+;// Copyright (C) 1999-2000 Id Software, Inc.
 //
 // cg_view.c -- setup all the parameters (position, angle, etc)
 // for a 3D rendering
@@ -1029,6 +1029,8 @@ static void CG_OffsetFirstPersonView( void ) {
 #endif
 }
 
+//RAZTODO: implement CG_OffsetFighterView?
+#if 0
 static void CG_OffsetFighterView( void )
 {
 	vector3 vehFwd, vehRight, vehUp, backDir;
@@ -1088,7 +1090,7 @@ static void CG_OffsetFighterView( void )
 	// ...and of course we should copy the new view location to the proper spot too.
 	VectorCopy(&camOrg, &refdef->vieworg);
 }
-//======================================================================
+#endif
 
 void CG_ZoomDown_f( void ) { 
 	if ( cg.zoomed ) {
@@ -1779,7 +1781,6 @@ extern float cg_skyOriScale;
 extern qboolean cg_noFogOutsidePortal;
 void CG_DrawSkyBoxPortal(const char *cstr)
 {
-	static float lastfov;
 	refdef_t backuprefdef;
 	float fov_x;
 	float fov_y;
@@ -1787,8 +1788,6 @@ void CG_DrawSkyBoxPortal(const char *cstr)
 	char *token;
 	float f = 0;
 	refdef_t *refdef = CG_GetRefdef();
-
-	lastfov = zoomFov;	// for transitions back from zoomed in modes
 
 	//backuprefdef = cg.refdef;
 	memcpy( &backuprefdef, refdef, sizeof( backuprefdef ) );
@@ -1847,42 +1846,26 @@ void CG_DrawSkyBoxPortal(const char *cstr)
 	token = COM_ParseExt(&cstr, qfalse);
 	if (!token || !token[0])
 	{
-		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog state\n");
+		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog state\n" );
 	}
 	else 
 	{
-		vector4	fogColor;
-		int		fogStart, fogEnd;
-
 		if(atoi(token))
 		{	// this camera has fog
-			token = COM_ParseExt(&cstr, qfalse);
-
+			token = COM_ParseExt( &cstr, qfalse );
 			if ( !VALIDSTRING( token ) )
-				trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog[0]\n");
-			fogColor.r = atof(token);
+				trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog[0]\n" );
 
-			token = COM_ParseExt(&cstr, qfalse);
+			token = COM_ParseExt( &cstr, qfalse );
 			if ( !VALIDSTRING( token ) )
-				trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog[1]\n");
-			fogColor.g = atof(token);
+				trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog[1]\n" );
 
-			token = COM_ParseExt(&cstr, qfalse);
+			token = COM_ParseExt( &cstr, qfalse );
 			if ( !VALIDSTRING( token ) )
-				trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog[2]\n");
-			fogColor.b = atof(token);
+				trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog[2]\n" );
 
-			token = COM_ParseExt(&cstr, qfalse);
-			if ( !VALIDSTRING( token ) )
-				fogStart = 0;
-			else
-				fogStart = atoi(token);
-
-			token = COM_ParseExt(&cstr, qfalse);
-			if ( !VALIDSTRING( token ) )
-				fogEnd = 0;
-			else
-				fogEnd = atoi(token);
+			token = COM_ParseExt( &cstr, qfalse );
+			token = COM_ParseExt( &cstr, qfalse );
 		}
 	}
 
@@ -1941,7 +1924,6 @@ void CG_DrawSkyBoxPortal(const char *cstr)
 			} else {
 				fov_x = fov_x + f * ( zoomFov - fov_x );
 			}
-			lastfov = fov_x;
 		}
 		else
 		{ //zooming out
@@ -1954,6 +1936,7 @@ void CG_DrawSkyBoxPortal(const char *cstr)
 		}
 	}
 
+	//RAZFIXME: skyportal FOV
 	x = refdef->width / tan( fov_x / 360 * M_PI );
 	fov_y = atan2( refdef->height, x );
 	fov_y = fov_y * 360 / M_PI;

@@ -24,13 +24,7 @@ void G_ReflectMissile( gentity_t *ent, gentity_t *missile, vector3 *forward )
 	vector3	bounce_dir;
 	int		i;
 	float	speed;
-	gentity_t	*owner = ent;
 	int		isowner = 0;
-
-	if ( ent->r.ownerNum )
-	{
-		owner = &g_entities[ent->r.ownerNum];
-	}
 
 	if (missile->r.ownerNum == ent->s.number)
 	{ //the original owner is bouncing the missile, so don't try to bounce it back at him
@@ -91,13 +85,7 @@ void G_DeflectMissile( gentity_t *ent, gentity_t *missile, vector3 *forward )
 	vector3	bounce_dir;
 	int		i;
 	float	speed;
-	int		isowner = 0;
 	vector3 missile_dir;
-
-	if (missile->r.ownerNum == ent->s.number)
-	{ //the original owner is bouncing the missile, so don't try to bounce it back at him
-		isowner = 1;
-	}
 
 	//save the original speed
 	speed = VectorNormalize( &missile->s.pos.trDelta );

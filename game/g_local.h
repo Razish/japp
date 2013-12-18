@@ -1345,16 +1345,11 @@ void BlowDetpacks(gentity_t *ent);
 void RemoveDetpacks(gentity_t *ent);
 
 //
-// p_hud.c
+// ???
 //
 void MoveClientToIntermission (gentity_t *client);
 void G_SetStats (gentity_t *ent);
 void DeathmatchScoreboardMessage (gentity_t *client);
-
-//
-// g_pweapon.c
-//
-
 
 //
 // g_main.c
@@ -1552,24 +1547,6 @@ extern	gentity_t		g_entities[MAX_GENTITIES];
 	#include "g_xcvar.h"
 #undef XCVAR_PROTO
 
-//Raz: Added
-
-void	SanitizeString3( char *in, char *out );
-int		G_ClientNumberFromStrippedName2( const char *name );
-//void	WP_AddAsMindtricked( forcedata_t *fd, int entNum );
-void	G_AvoidBox( gentity_t *ent );
-char	*ConcatArgs( int start );
-void G_TestLine(vector3 *start, vector3 *end, int color, int time);
-trace_t	*RealTrace( gentity_t *ent, float dist );
-
-// g_clientModification.c
-qboolean Client_Supports( gentity_t *ent, unsigned int supportFlag );
-extern const char *supportFlagNames[];
-
-// g_client.c
-void G_ClearVote( gentity_t *ent );
-
-
 typedef enum saberSystems_e {//japp_saberSystem
 	SABERSYSTEM_BASE = 0,
 	SABERSYSTEM_JAPP,
@@ -1594,8 +1571,6 @@ typedef enum userinfoValidationBits_e {
 	USERINFO_VALIDATION_MAX
 } userinfoValidationBits_t;
 
-void SV_ToggleUserinfoValidation_f( void );
-
 #define PRIVDUEL_ALLOW		(0x0001)
 #define PRIVDUEL_MULTI		(0x0002)
 #define PRIVDUEL_RESPAWN	(0x0004)
@@ -1609,4 +1584,17 @@ typedef enum matchPause_e {
 	PAUSE_UNPAUSING,
 } matchPause_t;
 
+extern const char *supportFlagNames[];
 extern gameImport_t *trap;
+
+void		SanitizeString3					( char *in, char *out );
+int			G_ClientNumberFromStrippedName2	( const char *name );
+//void		WP_AddAsMindtricked				( forcedata_t *fd, int entNum );
+void		G_AvoidBox						( gentity_t *ent );
+char		*ConcatArgs						( int start );
+void		G_TestLine						( vector3 *start, vector3 *end, int color, int time );
+trace_t		*RealTrace						( gentity_t *ent, float dist );
+qboolean	Client_Supports					( gentity_t *ent, unsigned int supportFlag );
+void		G_ClearVote						( gentity_t *ent );
+void		SV_ToggleUserinfoValidation_f	( void );
+qboolean	G_CallSpawn						( gentity_t *ent );

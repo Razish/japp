@@ -1725,7 +1725,6 @@ ammo_power_converter_use
 void ammo_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *activator)
 {
 	int			add = 0.0f;//,highest;
-	qboolean	overcharge;
 //	int			difBlaster,difPowerCell,difMetalBolts;
 	int			stop = 1;
 
@@ -1736,8 +1735,6 @@ void ammo_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *act
 
 	if (self->setTime < level.time)
 	{
-		overcharge = qfalse;
-
 		if (!self->s.loopSound)
 		{
 			self->s.loopSound = G_SoundIndex("sound/player/pickupshield.wav");
@@ -3020,8 +3017,6 @@ target		- use to point the tag at something for angles
 
 void ref_link ( gentity_t *ent )
 {
-	reference_tag_t	*tag;
-
 	if ( ent->target )
 	{
 		//TODO: Find the target and set our angles to that direction
@@ -3044,7 +3039,7 @@ void ref_link ( gentity_t *ent )
 	}
 	
 	//Add the tag
-	tag = TAG_Add( ent->targetname, ent->ownername, &ent->s.origin, &ent->s.angles, 16, 0 );
+	TAG_Add( ent->targetname, ent->ownername, &ent->s.origin, &ent->s.angles, 16, 0 );
 
 	//Delete immediately, cannot be refered to as an entity again
 	//NOTE: this means if you wanted to link them in a chain for, say, a path, you can't

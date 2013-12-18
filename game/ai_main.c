@@ -1383,13 +1383,6 @@ void WPConstantRoutine(bot_state_t *bs)
 			bs->jumpTime = level.time + 100;
 		}
 #else
-		float heightDif = (bs->wpCurrent->origin.z - bs->origin.z+16);
-
-		if (bs->origin.z+16 >= bs->wpCurrent->origin.z)
-		{ //then why exactly would we be force jumping?
-			heightDif = 0;
-		}
-
 		if (bs->cur_ps.fd.forceJumpCharge < (forceJumpStrength[bs->cur_ps.fd.forcePowerLevel[FP_LEVITATION]]-100))
 		{
 			bs->forceJumpChargeTime = level.time + 200;
@@ -2722,7 +2715,6 @@ int CTFTakesPriority(bot_state_t *bs)
 	int enemyFlag = 0;
 	int myFlag = 0;
 	int enemyHasOurFlag = 0;
-	int weHaveEnemyFlag = 0;
 	int numOnMyTeam = 0;
 	int numOnEnemyTeam = 0;
 	int numAttackers = 0;
@@ -2808,9 +2800,7 @@ int CTFTakesPriority(bot_state_t *bs)
 
 		if (ent && ent->client)
 		{
-			if (ent->client->ps.powerups[enemyFlag] && OnSameTeam(&g_entities[bs->client], ent))
-				weHaveEnemyFlag = 1;
-			else if (ent->client->ps.powerups[myFlag] && !OnSameTeam(&g_entities[bs->client], ent))
+			if (ent->client->ps.powerups[myFlag] && !OnSameTeam(&g_entities[bs->client], ent))
 				enemyHasOurFlag = 1;
 
 			if (OnSameTeam(&g_entities[bs->client], ent))
@@ -3106,7 +3096,6 @@ int Siege_CountTeammates(bot_state_t *bs)
 int SiegeTakesPriority(bot_state_t *bs)
 {
 	int attacker;
-	int flagForDefendableObjective;
 	int flagForAttackableObjective;
 	int defenders, teammates;
 	int idleWP;
@@ -3153,13 +3142,11 @@ int SiegeTakesPriority(bot_state_t *bs)
 	if (bcl->sess.sessionTeam == SIEGETEAM_TEAM1)
 	{
 		attacker = imperial_attackers;
-		flagForDefendableObjective = WPFLAG_SIEGE_REBELOBJ;
 		flagForAttackableObjective = WPFLAG_SIEGE_IMPERIALOBJ;
 	}
 	else
 	{
 		attacker = rebel_attackers;
-		flagForDefendableObjective = WPFLAG_SIEGE_IMPERIALOBJ;
 		flagForAttackableObjective = WPFLAG_SIEGE_REBELOBJ;
 	}
 
@@ -3569,7 +3556,7 @@ void GetIdealDestination(bot_state_t *bs)
 	else if (tempInt == BWEAPONRANGE_LONG)		distChange = 300;
 
 	if (bs->revengeEnemy && bs->revengeEnemy->health > 0 &&
-		bs->revengeEnemy->client && (bs->revengeEnemy->client->pers.connected == CA_ACTIVE || bs->revengeEnemy->client->pers.connected == CA_AUTHORIZING))
+		bs->revengeEnemy->client && (bs->revengeEnemy->client->pers.connected == CON_CONNECTED || bs->revengeEnemy->client->pers.connected == CON_CONNECTING))
 	{ //if we hate someone, always try to get to them
 		if (bs->wpDestSwitchTime < level.time)
 		{
@@ -3588,7 +3575,7 @@ void GetIdealDestination(bot_state_t *bs)
 		}
 	}
 	else if (bs->squadLeader && bs->squadLeader->health > 0 &&
-		bs->squadLeader->client && (bs->squadLeader->client->pers.connected == CA_ACTIVE || bs->squadLeader->client->pers.connected == CA_AUTHORIZING))
+		bs->squadLeader->client && (bs->squadLeader->client->pers.connected == CON_CONNECTED || bs->squadLeader->client->pers.connected == CON_CONNECTING))
 	{
 		if (bs->wpDestSwitchTime < level.time)
 		{
@@ -5532,7 +5519,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 	int visResult=0,
 		selResult=0,
 		mineSelect=0, detSelect=0;
-	int wp, enemy, desiredIndex, goalWPIndex, fjHalt, meleestrafe=0, useTheForce=0, forceHostile=0, cBAI=0;
+	int wp, enemy, desiredIndex, goalWPIndex, fjHalt, meleestrafe=0, useTheForce=0, forceHostile=0;
 	qboolean doingFallback = qfalse;
 
 	if (gDeactivated)
@@ -5748,14 +5735,14 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 	}
 
 	if (bs->revengeEnemy && bs->revengeEnemy->client &&
-		bs->revengeEnemy->client->pers.connected != CA_ACTIVE && bs->revengeEnemy->client->pers.connected != CA_AUTHORIZING)
+		bs->revengeEnemy->client->pers.connected != CON_CONNECTED && bs->revengeEnemy->client->pers.connected != CON_CONNECTING)
 	{
 		bs->revengeEnemy = NULL;
 		bs->revengeHateLevel = 0;
 	}
 
 	if (bs->currentEnemy && bs->currentEnemy->client &&
-		bs->currentEnemy->client->pers.connected != CA_ACTIVE && bs->currentEnemy->client->pers.connected != CA_AUTHORIZING)
+		bs->currentEnemy->client->pers.connected != CON_CONNECTED && bs->currentEnemy->client->pers.connected != CON_CONNECTING)
 	{
 		bs->currentEnemy = NULL;
 	}
@@ -6400,9 +6387,8 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 
 	if (bs->timeToReact < level.time && bs->currentEnemy && bs->enemySeenTime > level.time + (ENEMY_FORGET_MS - (ENEMY_FORGET_MS*0.2)))
 	{
-		if (bs->frame_Enemy_Vis)
-		{
-			cBAI = CombatBotAI(bs, thinktime);
+		if ( bs->frame_Enemy_Vis ) {
+			// ...
 		}
 		else if (bs->cur_ps.weaponstate == WEAPON_CHARGING_ALT)
 		{ //keep charging in case we see him again before we lose track of him

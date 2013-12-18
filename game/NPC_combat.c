@@ -69,7 +69,7 @@ qboolean G_TeamEnemy( gentity_t *self )
 	int	i;
 	gentity_t	*ent;
 
-	if ( !self->client || self->client->playerTeam == TEAM_FREE )
+	if ( !self->client || self->client->playerTeam == NPCTEAM_FREE )
 	{
 		return qfalse;
 	}
@@ -2507,8 +2507,7 @@ void CP_FindCombatPointWaypoints( void )
 NPC_CollectCombatPoints
 -------------------------
 */
-typedef struct
-{
+typedef struct combatPt_s {
 	float dist;
 	int index;
 } combatPt_t;
@@ -2517,7 +2516,6 @@ static int NPC_CollectCombatPoints( const vector3 *origin, const float radius, c
 	float	radiusSqr = (radius*radius);
 	float	distance;
 	float	bestDistance = Q3_INFINITE;
-	int		bestPoint = 0;
 	int		numPoints = 0;
 	int		i;
 
@@ -2571,7 +2569,6 @@ static int NPC_CollectCombatPoints( const vector3 *origin, const float radius, c
 			if (distance < bestDistance)
 			{
 				bestDistance = distance;
-				bestPoint = numPoints;
 			}
 
 			points[numPoints].dist = distance;

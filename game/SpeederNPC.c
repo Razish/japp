@@ -65,16 +65,11 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 	/*	BEGIN	Here is where we move the vehicle (forward or back or whatever). BEGIN	*/
 	/************************************************************************************/
 	//Client sets ucmds and such for speed alterations
-	float speedInc, speedIdleDec, speedIdle, speedIdleAccel, speedMin, speedMax;
+	float speedInc, speedIdleDec, speedIdle, speedMin, speedMax;
 	playerState_t *parentPS;
-	playerState_t *pilotPS = NULL;
 	int	curTime;
 
 	parentPS = pVeh->m_pParentEntity->playerState;
-	if (pVeh->m_pPilot)
-	{
-		pilotPS = pVeh->m_pPilot->playerState;
-	}
 
 	// If we're flying, make us accelerate at 40% (about half) acceleration rate, and restore the pitch
 	// to origin (straight) position (at 5% increments). 
@@ -182,7 +177,6 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 
 
 	speedIdle = pVeh->m_pVehicleInfo->speedIdle;
-	speedIdleAccel = pVeh->m_pVehicleInfo->accelIdle * pVeh->m_fTimeModifier;
 	speedMin = pVeh->m_pVehicleInfo->speedMin;
 
 	if ( parentPS->speed || parentPS->groundEntityNum == ENTITYNUM_NONE  ||
@@ -333,10 +327,8 @@ void AnimateVehicle( Vehicle_t *pVeh )
 void AnimateRiders( Vehicle_t *pVeh )
 {
 	animNumber_t Anim = BOTH_VS_IDLE;
-	float fSpeedPercToMax;
 	int iFlags = SETANIM_FLAG_NORMAL, iBlend = 300;
 	playerState_t *pilotPS;
-	playerState_t *parentPS;
 	int curTime;
 
 
@@ -391,7 +383,6 @@ void AnimateRiders( Vehicle_t *pVeh )
 		return;
 
 	pilotPS = pVeh->m_pPilot->playerState;
-	parentPS = pVeh->m_pPilot->playerState;
 
 #ifdef _GAME
 	curTime = level.time;
@@ -399,9 +390,6 @@ void AnimateRiders( Vehicle_t *pVeh )
 	//FIXME: pass in ucmd?  Not sure if this is reliable...
 	curTime = pm->cmd.serverTime;
 #endif
-
-	// Percentage of maximum speed relative to current speed.
-	fSpeedPercToMax = parentPS->speed / pVeh->m_pVehicleInfo->speedMax;
 
 	// Going in reverse...
 	if ( pVeh->m_ucmd.forwardmove < 0 && !(pVeh->m_ulFlags & VEH_SLIDEBREAKING))

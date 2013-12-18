@@ -57,7 +57,7 @@ static int JPLua_Cvar_GetName( lua_State *L )
 //Retn: string of the Cvar's default value
 static int JPLua_Cvar_GetDefault( lua_State *L )
 {
-	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
+//	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 
 	//No way to get the cvar's default value without engine funcs
 	//RAZTODO: search the local vmCvar table anyway?
@@ -70,7 +70,7 @@ static int JPLua_Cvar_GetDefault( lua_State *L )
 //Retn: bit-mask of the Cvar's behaviour flags
 static int JPLua_Cvar_GetFlags( lua_State *L )
 {
-	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
+//	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 
 	// No way to get the cvar's flags without engine funcs
 	//RAZTODO: search the local vmCvar table anyway?

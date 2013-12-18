@@ -2361,6 +2361,7 @@ static qboolean CompareIPString( const char *ip1, const char *ip2 )
 	return qtrue;
 }
 
+#if 0
 static qboolean CompareIPNum( int clientnum1, int clientnum2 )
 {
 	const char *ip1 = NULL, *ip2 = NULL;
@@ -2385,6 +2386,7 @@ static qboolean CompareIPNum( int clientnum1, int clientnum2 )
 
 	return qtrue;
 }
+#endif
 
 char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	char		*value;
@@ -3589,7 +3591,7 @@ void ClientSpawn(gentity_t *ent) {
 	{
 		if ( ent->client->pers.adminData.merc ) {
 			int i=0;
-			client->ps.stats[STAT_WEAPONS] = (1<<LAST_USEABLE_WEAPON)-1 & ~1;
+			client->ps.stats[STAT_WEAPONS] = ((1<<LAST_USEABLE_WEAPON)-1) & ~1;
 			for ( i=0; i<AMMO_MAX; i++ ) {
 				client->ps.ammo[i] = ammoData[i].max;
 			}

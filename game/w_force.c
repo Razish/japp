@@ -2490,7 +2490,7 @@ void WP_AddAsMindtricked(forcedata_t *fd, int entNum)
 qboolean ForceTelepathyCheckDirectNPCTarget( gentity_t *self, trace_t *tr, qboolean *tookPower )
 {
 	gentity_t	*traceEnt;
-	qboolean	targetLive = qfalse, mindTrickDone = qfalse;
+	qboolean	targetLive = qfalse;
 	vector3		tfrom, tto, fwd;
 	float		radius = MAX_TRICK_DISTANCE;
 
@@ -2560,7 +2560,9 @@ qboolean ForceTelepathyCheckDirectNPCTarget( gentity_t *self, trace_t *tr, qbool
 			WP_ForcePowerStart( self, FP_TELEPATHY, 0 );
 		}
 		else if ( (self->NPC && traceEnt->client->playerTeam != self->client->playerTeam)
-			|| (!self->NPC && traceEnt->client->playerTeam != self->client->sess.sessionTeam) )
+		//RAZFIXME: NPC vs player team..
+		//	|| (!self->NPC && traceEnt->client->playerTeam != self->client->sess.sessionTeam) )
+		|| ( !self->NPC && !OnSameTeam( traceEnt, self ) ) )
 		{//an enemy
 			int override = 0;
 			if ( (traceEnt->NPC->scriptFlags&SCF_NO_MIND_TRICK) )
@@ -2655,7 +2657,6 @@ qboolean ForceTelepathyCheckDirectNPCTarget( gentity_t *self, trace_t *tr, qbool
 		//FIXME: BOTH_FORCEMINDTRICK or BOTH_FORCEDISTRACT
 		//NPC_SetAnim( self, SETANIM_TORSO, BOTH_MINDTRICK1, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_RESTART|SETANIM_FLAG_HOLD );
 		//FIXME: build-up or delay this until in proper part of anim
-		mindTrickDone = qtrue;
 	}
 	else 
 	{
@@ -3026,7 +3027,6 @@ void ForceThrow( gentity_t *self, qboolean pull )
 	vector3		pushDir;
 	vector3		thispush_org;
 	vector3		tfrom, tto, fwd, a;
-	float		knockback = pull?0:200;
 	int			powerUse = 0;
 
 	visionArc = 0;
@@ -3449,8 +3449,6 @@ void ForceThrow( gentity_t *self, qboolean pull )
 						G_LetGoOfWall( push_list[x] );
 					}
 				}
-
-				knockback = pull?0:200;
 
 				pushPowerMod = pushPower;
 
@@ -5003,7 +5001,6 @@ qboolean G_SpecialRollGetup(gentity_t *self)
 
 void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 {
-	qboolean	usingForce = qfalse;
 	int			i, holo, holoregen;
 	int			prepower = 0;
 	//see if any force powers are running
@@ -5317,17 +5314,13 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 		if (!(ucmd->buttons & BUTTON_FORCEPOWER) ||
 			self->client->ps.fd.forcePowerSelected != FP_LEVITATION)
 		{
-			if (WP_DoSpecificPower( self, ucmd, FP_LEVITATION ))
-				usingForce = qtrue;
+			WP_DoSpecificPower( self, ucmd, FP_LEVITATION );
 		}
 	}
 
 	if ( ucmd->buttons & BUTTON_FORCEGRIP )
 	{ //grip is one of the powers with its own button.. if it's held, call the specific grip power function.
-		if (WP_DoSpecificPower( self, ucmd, FP_GRIP ))
-			usingForce = qtrue;
-		else //don't let recharge even if the grip misses if the player still has the button down
-			usingForce = qtrue;
+		WP_DoSpecificPower( self, ucmd, FP_GRIP );
 	}
 	else
 	{ //see if we're using it generically.. if not, stop.
@@ -5341,7 +5334,6 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 	if ( ucmd->buttons & BUTTON_FORCE_LIGHTNING )
 	{ //lightning
 		WP_DoSpecificPower(self, ucmd, FP_LIGHTNING);
-		usingForce = qtrue;
 	}
 	else
 	{ //see if we're using it generically.. if not, stop.
@@ -5355,7 +5347,6 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 	if ( ucmd->buttons & BUTTON_FORCE_DRAIN )
 	{ //drain
 		WP_DoSpecificPower(self, ucmd, FP_DRAIN);
-		usingForce = qtrue;
 	}
 	else
 	{ //see if we're using it generically.. if not, stop.
@@ -5370,14 +5361,9 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 		BG_CanUseFPNow(level.gametype, &self->client->ps, level.time, self->client->ps.fd.forcePowerSelected))
 	{
 		if (self->client->ps.fd.forcePowerSelected == FP_LEVITATION)
-		{
 			ForceJumpCharge( self, ucmd );
-			usingForce = qtrue;
-		}
-		else if (WP_DoSpecificPower( self, ucmd, self->client->ps.fd.forcePowerSelected ))
-			usingForce = qtrue;
-		else if (self->client->ps.fd.forcePowerSelected == FP_GRIP)
-			usingForce = qtrue;
+		else
+			WP_DoSpecificPower( self, ucmd, self->client->ps.fd.forcePowerSelected );
 	}
 	else
 		self->client->ps.fd.forceButtonNeedRelease = 0;
@@ -5395,7 +5381,6 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 		}
 		if ( (self->client->ps.fd.forcePowersActive&( 1 << i )) )
 		{
-			usingForce = qtrue;
 			WP_ForcePowerRun( self, (forcePowers_t)i, ucmd );
 		}
 	}
@@ -5405,16 +5390,6 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 	if ( !(self->client->ps.fd.forcePowersActive & (1<<FP_LIGHTNING)) )
 		self->client->force.lightningDebounce = level.time;
 
-	if ( self->client->ps.saberInFlight && self->client->ps.saberEntityNum )
-	{//don't regen force power while throwing saber
-		if ( self->client->ps.saberEntityNum < ENTITYNUM_NONE && self->client->ps.saberEntityNum > 0 )//player is 0
-		{//
-			if ( &g_entities[self->client->ps.saberEntityNum] != NULL && g_entities[self->client->ps.saberEntityNum].s.pos.trType == TR_LINEAR )
-			{//fell to the ground and we're trying to pull it back
-				usingForce = qtrue;
-			}
-		}
-	}
 	if ( !self->client->ps.fd.forcePowersActive || self->client->ps.fd.forcePowersActive == (1 << FP_DRAIN) )
 	{//when not using the force, regenerate at 1 point per half second
 		if ( !self->client->ps.saberInFlight && (self->client->ps.weapon != WP_SABER || !BG_SaberInSpecial(self->client->ps.saberMove)) )

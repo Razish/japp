@@ -2365,11 +2365,9 @@ int BG_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 	int			i;
 	char		*token;
 	float		fps;
-	int			skip;
 	int			usedIndex = -1;
 	int			nextIndex = bgNumAllAnims;
 	qboolean	dynAlloc = qfalse;
-	qboolean	wasLoaded = qfalse;
 	static char BGPAFtext[60000] = {0};
 
 	fileHandle_t	f;
@@ -2464,7 +2462,6 @@ int BG_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 
 	// parse the text
 	text_p = BGPAFtext;
-	skip = 0;	// quiet the compiler warning
 
 	//FIXME: have some way of playing anims backwards... negative numFrames?
 
@@ -2559,8 +2556,6 @@ int BG_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 #ifdef CONVENIENT_ANIMATION_FILE_DEBUG_THING
 	SpewDebugStuffToFile();
 #endif
-
-	wasLoaded = BGPAFtextLoaded;
 
 	if (isHumanoid)
 	{

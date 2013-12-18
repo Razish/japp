@@ -34,16 +34,6 @@ void CG_ROFF_NotetrackCallback( centity_t *cent, const char *notetrack);
 
 void UI_CleanupGhoul2(void);
 
-static int	C_PointContents(void);
-static void C_GetLerpOrigin(void);
-static void C_GetLerpData(void);
-static void C_Trace(void);
-static void C_G2Trace(void);
-static void C_G2Mark(void);
-static int	CG_RagCallback(int callType);
-static void C_GetBoltPos(void);
-static void C_ImpactMark(void);
-
 #define MAX_MISC_ENTS	4000
 
 //static refEntity_t	*MiscEnts = 0;
@@ -449,13 +439,11 @@ static void CVU_ForceModel( void ) {
 
 	for ( i=0; i<MAX_CLIENTS; i++ ) {
 		const char *clientInfo;
-		void *oldGhoul2;
 
 		clientInfo = CG_ConfigString( CS_PLAYERS+i );
 		if ( !VALIDSTRING( clientInfo ) )
 			continue;
 
-		oldGhoul2 = cgs.clientinfo[i].ghoul2Model;
 		CG_NewClientInfo( i, qtrue );
 	}
 }
@@ -1900,18 +1888,6 @@ Ghoul2 Insert End
 	trap->FX_RegisterEffect("force/force_touch");
 
 	CG_ClearParticles ();
-/*
-	for (i=1; i<MAX_PARTICLES_AREAS; i++)
-	{
-		{
-			int rval;
-
-			rval = CG_NewParticleArea ( CS_PARTICLES + i);
-			if (!rval)
-				break;
-		}
-	}
-*/
 }
 
 
@@ -3820,11 +3796,10 @@ void QDECL CG_SecurityLogPrintf( const char *fmt, ... ) {
 	va_list		argptr;
 	char		string[1024] = {0};
 	time_t		rawtime;
-	struct tm	*timeinfo;
 	int			timeLen=0;
 
 	time( &rawtime );
-	timeinfo = localtime( &rawtime );
+	localtime( &rawtime );
 	strftime( string, sizeof( string ), "[%Y-%m-%d] [%H:%M:%S] ", gmtime( &rawtime ) );
 	timeLen = strlen( string );
 
