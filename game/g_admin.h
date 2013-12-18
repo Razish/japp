@@ -90,4 +90,4 @@ void		JKG_Bans_List			( void );
 qboolean	JKG_Bans_Remove			( byte *ip );
 int			JKG_Bans_AddBanString	( const char *ip, const char *duration, const char *reason );
 const char	*JKG_Bans_IsBanned		( byte *ip );
-byte		*BuildByteFromIP		( const char *ip );
+byteAlias_t *BuildByteFromIP		( const char *ip );

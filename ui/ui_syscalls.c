@@ -15,9 +15,9 @@ Q_EXPORT void dllEntry( intptr_t (QDECL *syscallptr)( intptr_t arg,... ) ) {
 }
 
 int PASSFLOAT( float x ) {
-	floatint_t fi;
-	fi.f = x;
-	return fi.i;
+	byteAlias_t ba;
+	ba.f = x;
+	return ba.i;
 }
 void trap_Print( const char *string ) {
 	Q_syscall( UI_PRINT, string );
@@ -39,9 +39,9 @@ void trap_Cvar_Set( const char *var_name, const char *value ) {
 	Q_syscall( UI_CVAR_SET, var_name, value );
 }
 float trap_Cvar_VariableValue( const char *var_name ) {
-	floatint_t fi;
-	fi.i = Q_syscall( UI_CVAR_VARIABLEVALUE, var_name );
-	return fi.f;
+	byteAlias_t ba;
+	ba.i = Q_syscall( UI_CVAR_VARIABLEVALUE, var_name );
+	return ba.f;
 }
 void trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
 	Q_syscall( UI_CVAR_VARIABLESTRINGBUFFER, var_name, buffer, bufsize );

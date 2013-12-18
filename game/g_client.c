@@ -2411,9 +2411,9 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	if ( !isBot && firstTime )
 	{
 		//Raz: Check if they're really banned
-		byte bIP[4];
-		*(unsigned int *)&bIP[0] = *(unsigned int *)BuildByteFromIP( value );
-		value = (char *)JKG_Bans_IsBanned( bIP );
+		byteAlias_t *ba;
+		ba = BuildByteFromIP( value );
+		value = (char *)JKG_Bans_IsBanned( ba->b );
 		if ( value )
 			return value;
 	}

@@ -14,9 +14,9 @@ Q_EXPORT void dllEntry( intptr_t (QDECL *syscallptr)( intptr_t arg,... ) ) {
 }
 
 int PASSFLOAT( float x ) {
-	floatint_t fi;
-	fi.f = x;
-	return fi.i;
+	byteAlias_t ba;
+	ba.f = x;
+	return ba.i;
 }
 
 void trap_Print( const char *fmt ) {
@@ -434,9 +434,9 @@ void trap_AAS_PresenceTypeBoundingBox(int presencetype, vector3 *mins, vector3 *
 	Q_syscall( BOTLIB_AAS_PRESENCE_TYPE_BOUNDING_BOX, presencetype, mins, maxs );
 }
 float trap_AAS_Time(void) {
-	floatint_t fi;
-	fi.i = Q_syscall( BOTLIB_AAS_TIME );
-	return fi.f;
+	byteAlias_t ba;
+	ba.i = Q_syscall( BOTLIB_AAS_TIME );
+	return ba.f;
 }
 int trap_AAS_PointAreaNum(vector3 *point) {
 	return Q_syscall( BOTLIB_AAS_POINT_AREA_NUM, point );
@@ -577,14 +577,14 @@ void trap_BotFreeCharacter(int character) {
 	Q_syscall( BOTLIB_AI_FREE_CHARACTER, character );
 }
 float trap_Characteristic_Float(int character, int index) {
-	floatint_t fi;
-	fi.i = Q_syscall( BOTLIB_AI_CHARACTERISTIC_FLOAT, character, index );
-	return fi.f;
+	byteAlias_t ba;
+	ba.i = Q_syscall( BOTLIB_AI_CHARACTERISTIC_FLOAT, character, index );
+	return ba.f;
 }
 float trap_Characteristic_BFloat(int character, int index, float min, float max) {
-	floatint_t fi;
-	fi.i = Q_syscall( BOTLIB_AI_CHARACTERISTIC_BFLOAT, character, index, PASSFLOAT(min), PASSFLOAT(max) );
-	return fi.f;
+	byteAlias_t ba;
+	ba.i = Q_syscall( BOTLIB_AI_CHARACTERISTIC_BFLOAT, character, index, PASSFLOAT(min), PASSFLOAT(max) );
+	return ba.f;
 }
 int trap_Characteristic_Integer(int character, int index) {
 	return Q_syscall( BOTLIB_AI_CHARACTERISTIC_INTEGER, character, index );
@@ -710,9 +710,9 @@ int trap_BotGetMapLocationGoal(char *name, void *goal) {
 	return Q_syscall( BOTLIB_AI_GET_MAP_LOCATION_GOAL, name, goal );
 }
 float trap_BotAvoidGoalTime(int goalstate, int number) {
-	floatint_t fi;
-	fi.i = Q_syscall( BOTLIB_AI_AVOID_GOAL_TIME, goalstate, number );
-	return fi.f;
+	byteAlias_t ba;
+	ba.i = Q_syscall( BOTLIB_AI_AVOID_GOAL_TIME, goalstate, number );
+	return ba.f;
 }
 void trap_BotSetAvoidGoalTime(int goalstate, int number, float avoidtime) {
 	Q_syscall( BOTLIB_AI_SET_AVOID_GOAL_TIME, goalstate, number, PASSFLOAT(avoidtime));

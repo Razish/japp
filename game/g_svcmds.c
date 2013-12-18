@@ -218,7 +218,7 @@ static void SV_BanAdd_f( void ) {
 
 static void SV_BanDel_f( void ) {
 	char ip[NET_ADDRSTRMAXLEN] = {0};
-	byte *bIP = NULL;
+	byteAlias_t *bIP = NULL;
 	
 	if ( trap->Argc() < 2 ) {
 		trap->Print( "Syntax: bandel <ip>\n" );
@@ -227,7 +227,7 @@ static void SV_BanDel_f( void ) {
 
 	trap->Argv( 1, ip, sizeof( ip ) );
 	bIP = BuildByteFromIP( ip );
-	if ( JKG_Bans_Remove( bIP ) )
+	if ( JKG_Bans_Remove( bIP->b ) )
 		trap->Print( "Removing ban on %s\n", ip );
 	else
 		trap->Print( "No ban found for %s\n", ip );

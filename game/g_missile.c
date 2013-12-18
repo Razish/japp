@@ -305,7 +305,11 @@ gentity_t *CreateMissile( vector3 *org, vector3 *dir, float vel, int life,
 	VectorSnap(&missile->s.pos.trDelta);
 
 	//Raz: Save the velocity for portals reorienting projectiles
-	missile->genericValue1 = *(int*)&vel;
+	{
+		byteAlias_t ba;
+		ba.f = vel;
+		missile->genericValue1 = ba.i;
+	}
 	missile->genericValue2 = life;
 
 	return missile;

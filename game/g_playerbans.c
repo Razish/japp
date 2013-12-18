@@ -4,11 +4,8 @@
 |*
 |* This module manages IP bans
 |*
-|* There is support for subnet bans (using * as wildcard)
-|*  and temporary bans (with reason)
-|*
-|* The bans are stored in a file specified by g_banfile (bans.dat by default)
-|* in json format
+|* There is support for subnet bans (using * as wildcard) and temporary bans (with reason)
+|* The bans are stored in a file specified by g_banfile (bans.dat by default) in json format
 |*
 |* Structure sample:
 |*
@@ -23,14 +20,14 @@
 			"ip" : [10, 0, 0, 0]
 		}]
 }
-\*/
+*/
 
 #include "g_local.h"
 #include "shared/json/cJSON.h"
 
 typedef struct banentry_s {
 	unsigned int	id;
-	unsigned char	ip[4];
+	byteAlias_t		ip;
 	unsigned char	mask;
 	unsigned int	expireTime;
 	char			banreason[64];
@@ -103,10 +100,10 @@ void JKG_Bans_LoadBans( void )
 		entry->mask			= cJSON_ToInteger( cJSON_GetObjectItem( item, "mask" ) );
 		entry->expireTime	= cJSON_ToInteger( cJSON_GetObjectItem( item, "expire" ) );
 		Q_strncpyz( entry->banreason, cJSON_ToString( cJSON_GetObjectItem( item, "reason" ) ), sizeof( entry->banreason ) );
-		entry->ip[0]		= cJSON_ToInteger( cJSON_GetArrayItem( ip, 0 ) );
-		entry->ip[1]		= cJSON_ToInteger( cJSON_GetArrayItem( ip, 1 ) );
-		entry->ip[2]		= cJSON_ToInteger( cJSON_GetArrayItem( ip, 2 ) );
-		entry->ip[3]		= cJSON_ToInteger( cJSON_GetArrayItem( ip, 3 ) );
+		entry->ip.b[0]		= cJSON_ToInteger( cJSON_GetArrayItem( ip, 0 ) );
+		entry->ip.b[1]		= cJSON_ToInteger( cJSON_GetArrayItem( ip, 1 ) );
+		entry->ip.b[2]		= cJSON_ToInteger( cJSON_GetArrayItem( ip, 2 ) );
+		entry->ip.b[3]		= cJSON_ToInteger( cJSON_GetArrayItem( ip, 3 ) );
 
 		entry->next = banlist;
 		banlist = entry;
@@ -126,7 +123,7 @@ void JKG_Bans_SaveBans()
 	cJSON			*ip;
 	const char		*buffer;
 	fileHandle_t	f;
-	banentry_t *entry;
+	banentry_t		*entry;
 	unsigned int	curr = time( NULL );
 	
 	root = cJSON_CreateObject();
@@ -147,10 +144,10 @@ void JKG_Bans_SaveBans()
 		cJSON_AddIntegerToObject( item, "mask", entry->mask );
 		cJSON_AddIntegerToObject( item, "expire", entry->expireTime );
 		cJSON_AddStringToObject( item, "reason", entry->banreason );
-		cJSON_AddIntegerToArray( ip, entry->ip[0] );
-		cJSON_AddIntegerToArray( ip, entry->ip[1] );
-		cJSON_AddIntegerToArray( ip, entry->ip[2] );
-		cJSON_AddIntegerToArray( ip, entry->ip[3] );
+		cJSON_AddIntegerToArray( ip, entry->ip.b[0] );
+		cJSON_AddIntegerToArray( ip, entry->ip.b[1] );
+		cJSON_AddIntegerToArray( ip, entry->ip.b[2] );
+		cJSON_AddIntegerToArray( ip, entry->ip.b[3] );
 		cJSON_AddItemToObject( item, "ip", ip );
 
 		cJSON_AddItemToArray( bans, item );
@@ -191,17 +188,16 @@ void JKG_Bans_SaveBans()
 
 int JKG_Bans_AddBanString( const char *ip, const char *duration, const char *reason )
 {
-	unsigned char	m[4];
+	byteAlias_t		m;
 	unsigned char	mask = 15;
-	int				i;
-	int				c;
+	int				i, c;
 	const char		*p;
 	unsigned int	expire;
 	char			type;
 	banentry_t		*entry;
 
 	for ( i=0; i<4; i++ )
-		m[i] = 0;
+		m.b[i] = 0;
 
 	i = 0;
 	p = ip;
@@ -218,7 +214,7 @@ int JKG_Bans_AddBanString( const char *ip, const char *duration, const char *rea
 		{
 			while ( *p >= '0' && *p <= '9' )
 			{
-				m[i] = m[i]*10 + (*p - '0');
+				m.b[i] = m.b[i]*10 + (*p - '0');
 				c++;
 				p++;
 			}
@@ -288,7 +284,7 @@ int JKG_Bans_AddBanString( const char *ip, const char *duration, const char *rea
 	// Check if this ban already exists
 	for ( entry = banlist; entry; entry = entry->next )
 	{
-		if ( entry->mask == mask && *(unsigned int *)&entry->ip == *(unsigned int *)&m )
+		if ( entry->mask == mask && entry->ip.ui == m.ui )
 		{
 			entry->expireTime = expire;
 			if ( reason )
@@ -301,7 +297,7 @@ int JKG_Bans_AddBanString( const char *ip, const char *duration, const char *rea
 	//When in rome...
 	entry = (banentry_t *)malloc( sizeof( banentry_t ) );
 	entry->id = nextBanId++;
-	*(unsigned int *)&entry->ip = *(unsigned int *)&m;
+	entry->ip.ui = m.ui;
 	entry->expireTime = expire;
 	entry->mask = mask;
 	if ( reason )
@@ -347,10 +343,10 @@ const char *JKG_Bans_IsBanned( byte *ip )
 	for ( entry=banlist; entry; prev = entry, entry = entry?entry->next:NULL )
 	{// Find the ban entry
 
-		if ( entry->mask & 1 && entry->ip[0] != ip[0] ) continue;	//	*.0.0.0
-		if ( entry->mask & 2 && entry->ip[1] != ip[1] ) continue;	//	0.*.0.0
-		if ( entry->mask & 4 && entry->ip[2] != ip[2] ) continue;	//	0.0.*.0
-		if ( entry->mask & 8 && entry->ip[3] != ip[3] ) continue;	//	0.0.0.*
+		if ( entry->mask & 1 && entry->ip.b[0] != ip[0] ) continue;	//	*.0.0.0
+		if ( entry->mask & 2 && entry->ip.b[1] != ip[1] ) continue;	//	0.*.0.0
+		if ( entry->mask & 4 && entry->ip.b[2] != ip[2] ) continue;	//	0.0.*.0
+		if ( entry->mask & 8 && entry->ip.b[3] != ip[3] ) continue;	//	0.0.0.*
 
 		// If we get here, we got a match
 		if ( entry->expireTime )
@@ -378,16 +374,16 @@ const char *JKG_Bans_IsBanned( byte *ip )
 	return NULL;
 }
 
-byte *BuildByteFromIP( const char *ip )
+byteAlias_t *BuildByteFromIP( const char *ip )
 {
-	static unsigned char	m[4];
-	unsigned char			mask = 15;
-	int						i;
-	int						c;
-	const char				*p;
+	static byteAlias_t	m;
+	unsigned char		mask = 15;
+	int					i;
+	int					c;
+	const char			*p;
 
 	for ( i=0; i<4; i++ )
-		m[i] = 0;
+		m.b[i] = 0;
 
 	i = 0;
 	p = ip;
@@ -405,7 +401,7 @@ byte *BuildByteFromIP( const char *ip )
 		{
 			while ( *p >= '0' && *p <= '9' )
 			{
-				m[i] = m[i]*10 + (*p - '0');
+				m.b[i] = m.b[i]*10 + (*p - '0');
 				c++;
 				p++;
 			}
@@ -431,13 +427,13 @@ byte *BuildByteFromIP( const char *ip )
 	if (i < 3)
 		goto Faulty;
 
-	return &m[0];
+	return &m;
 
 Faulty:
 	trap->Print( "Faulty IP\n" );
-	*(unsigned int *)&m = 0;
+	m.ui = 0u;
 
-	return &m[0];
+	return &m;
 }
 
 void JKG_Bans_List( void ) {
@@ -452,10 +448,10 @@ void JKG_Bans_List( void ) {
 
 		// build IP
 		if ( entry->mask & 1 )	Q_strcat( tmp, sizeof( tmp ), "*" );
-		else					Q_strcat( tmp, sizeof( tmp ), va( "%i", entry->ip[0] ) );
+		else					Q_strcat( tmp, sizeof( tmp ), va( "%i", entry->ip.b[0] ) );
 		for ( i=1; i<4; i++ ) {
 			if ( entry->mask & (1<<i) )		Q_strcat( tmp, sizeof( tmp ), ".*" );
-			else							Q_strcat( tmp, sizeof( tmp ), va( ".%i", entry->ip[i] ) );
+			else							Q_strcat( tmp, sizeof( tmp ), va( ".%i", entry->ip.b[i] ) );
 		}
 		Q_strcat( buf, sizeof( buf ), va( "%-20s ", tmp ) );
 		tmp[0] = '\0';
@@ -477,10 +473,10 @@ qboolean JKG_Bans_Remove( byte *ip )
 
 	for ( entry=banlist; entry; prev = entry, entry = entry?entry->next:NULL )
 	{// Find the ban entry
-		if ( entry->mask & 1 && entry->ip[0] != ip[0] ) continue;	//	*.0.0.0
-		if ( entry->mask & 2 && entry->ip[1] != ip[1] ) continue;	//	0.*.0.0
-		if ( entry->mask & 4 && entry->ip[2] != ip[2] ) continue;	//	0.0.*.0
-		if ( entry->mask & 8 && entry->ip[3] != ip[3] ) continue;	//	0.0.0.*
+		if ( entry->mask & 1 && entry->ip.b[0] != ip[0] ) continue;	//	*.0.0.0
+		if ( entry->mask & 2 && entry->ip.b[1] != ip[1] ) continue;	//	0.*.0.0
+		if ( entry->mask & 4 && entry->ip.b[2] != ip[2] ) continue;	//	0.0.*.0
+		if ( entry->mask & 8 && entry->ip.b[3] != ip[3] ) continue;	//	0.0.0.*
 
 		// If we get here, we got a match
 		if ( !prev )	banlist = entry->next;		//	root item

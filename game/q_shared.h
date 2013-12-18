@@ -391,7 +391,8 @@ typedef union {
 	float f;
 	int i;
 	unsigned int ui;
-} floatint_t;
+	byte b[4];
+} byteAlias_t;
 
 typedef int		qhandle_t;
 typedef int		thandle_t; //rwwRMG - inserted

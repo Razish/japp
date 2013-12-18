@@ -527,7 +527,10 @@ void jp_portal_touch( gentity_t *self, gentity_t *other, trace_t *trace )
 		}
 		else
 		{//Projectiles
-			float velocity = *(float*)&other->genericValue1; //stored during missile creation
+			byteAlias_t ba;
+			float velocity;
+			ba.i = other->genericValue1; // stored during missile creation
+			velocity = ba.f;
 		//	VectorScale( destNormal, velocity, other->s.pos.trDelta );
 			VectorMA( &other->s.pos.trBase, velocity, &destNormal, &other->s.pos.trDelta );
 			other->s.pos.trTime = level.time;
