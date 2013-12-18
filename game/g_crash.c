@@ -14,8 +14,10 @@
 
 #elif QARCH == 32
 
-#pragma comment( lib, "DbgHelp" )
-#pragma comment( lib, "Psapi" )
+#ifdef _MSC_VER
+	#pragma comment( lib, "DbgHelp" )
+	#pragma comment( lib, "Psapi" )
+#endif
 
 int	bCrashing = 0;
 
@@ -33,10 +35,10 @@ int	bCrashing = 0;
 #ifdef _WIN32
 	#include <windows.h>
 #else
+	#define __USE_GNU
 	#include <signal.h>
 	#include <unistd.h>
 	#include <execinfo.h>
-	#define __USE_GNU
 	// disasm.h defines REG_xxx constants which will conflict, so undefine them now
 	#undef REG_EAX
 	#undef REG_EBX
@@ -48,6 +50,7 @@ int	bCrashing = 0;
 	#undef REG_EBP
 	#include <sys/utsname.h>
 	#include <link.h>
+	#define __USE_GNU
 	#include <sys/ucontext.h>
 	#include <features.h>
 #endif
@@ -247,6 +250,10 @@ static const char *JKG_Crash_GetCrashlogName() {
 	strftime( buf, sizeof( buf ), "JAPP-SVCrashlog_%Y-%m-%d_%H-%M-%S.log", gmtime( &rawtime ) );
 
 	return buf;
+}
+
+static void G_ForceQuit( void ) {
+	trap->Error( ERR_DROP, "Server crash\n" );
 }
 
 #ifdef _WIN32
@@ -916,10 +923,6 @@ static void InitSymbolPath( char * SymbolPath, const char* ModPath )
 }
 void G_ShutdownGame( int restart );
 
-static void G_ForceQuit( void ) {
-	trap->Error( ERR_DROP, "Server crash\n" );
-}
-
 static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*ExceptionInfo*/) {
 	// Alright, we got an exception here, create a crash log and let the program grind to a halt :P
 	static char SymPath[4096];
@@ -1234,7 +1237,7 @@ static void JKG_Crash_ListModules(fileHandle_t f) {
 	struct r_debug *rdebug = NULL;
 	phdr = (ElfW(Phdr) *)((char *)ehdr + ehdr->e_phoff);
 
-	while(phdr++ < (ElfW(Phdr) *)((char *)phdr + (ehdr->e_phnum * sizeof(ElfW(Phdr))))) {
+	for ( ; phdr < (ElfW(Phdr) *)((char *)phdr + (ehdr->e_phnum * sizeof(ElfW(Phdr)))); phdr++ ) {
 		if (phdr->p_type == PT_DYNAMIC)
 			break;
 	}
@@ -1284,7 +1287,7 @@ static void JKG_Crash_DisAsm(ucontext_t *ctx, fileHandle_t f) {
 		JKG_FS_WriteString("ERROR: Exception address invalid, cannot create assembly dump\n\n", f);
 		return;
 	}
-	dladdrok = dladdr(eaddr, &info);
+	dladdrok = dladdr((void *)eaddr, &info);
 	if (dladdrok && info.dli_saddr) {
 		disp = eaddr - (unsigned int)info.dli_saddr;
 		JKG_FS_WriteString(va("Crash location located at 0x%08X: %s::%s(+0x%X) [Func at 0x%08X]\n", eaddr, info.dli_fname, info.dli_sname, disp, info.dli_saddr), f);
@@ -1354,7 +1357,7 @@ static void JKG_Crash_DisAsm(ucontext_t *ctx, fileHandle_t f) {
 							}
 						}
 						// Its a call table
-						dladdrok = dladdr(addy, &info);
+						dladdrok = dladdr((void *)addy, &info);
 						if (dladdrok && info.dli_saddr) {
 							// We got a symbol for it!
 							disp = addy - (unsigned int)info.dli_saddr;
@@ -1369,7 +1372,7 @@ static void JKG_Crash_DisAsm(ucontext_t *ctx, fileHandle_t f) {
 						}
 					} else {
 						// Its not a call table
-						dladdrok = dladdr(addr2, &info);
+						dladdrok = dladdr((void*)addr2, &info);
 						if (dladdrok && info.dli_saddr) {
 							// We got a symbol for it!
 							disp = GetJumpTarget(&dasym, 0) - (unsigned int)info.dli_saddr;
@@ -1401,7 +1404,7 @@ static void JKG_Crash_BackTrace(ucontext_t *ctx, fileHandle_t f) {
 
 	size = backtrace(array,1024);
 	JKG_FS_WriteString(va("Stack frames found: %i\n", size), f);
-	array[1] = ctx->uc_mcontext.gregs[REG_EIP];
+	array[1] = (void*)ctx->uc_mcontext.gregs[REG_EIP];
 	strings = (char **)backtrace_symbols(array, size);
 	for (i=1; i<size; i++) {
 		JKG_FS_WriteString(va("%i) %s\n", i, strings[i]), f);
@@ -1412,13 +1415,8 @@ static void JKG_Crash_BackTrace(ucontext_t *ctx, fileHandle_t f) {
 
 static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 	// Very basic atm, will be expanded soon
-	static char basepath[260];
-	static char fspath[260];
 	const char *filename = JKG_Crash_GetCrashlogName();
 	fileHandle_t f;
-
-	basepath[0] = 0;
-	fspath[0] = 0;
 
 	m_crashloop++;
 	if (m_crashloop>2) {
@@ -1429,7 +1427,7 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 	bCrashing = 1;
 	Com_Printf("------------------------------------------------------------\n");
 	Com_Printf("Server crashed. Creating crash log %s...\n", filename);
-	ENG_FS_FOpenFileByMode(filename, &f, FS_WRITE);
+	trap->FS_Open( filename, &f, FS_WRITE );
 	JKG_FS_WriteString("========================================\n"
 		               "             JA++ Crash Log\n"
 					   "========================================\n", f);
@@ -1478,7 +1476,7 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 					   "             End of crash log\n"
 					   "========================================\n", f);
 
-	ENG_FS_FCloseFile(f);
+	trap->FS_Close( f );
 	JKG_Free_MemoryMap();
 	Com_Printf("Crash report finished, attempting to shut down...\n");
 	if (m_crashloop < 2) {	// If we crashed here before, skip the quit call

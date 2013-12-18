@@ -1,18 +1,34 @@
 import platform
 
-plat = platform.system()
+plat = platform.system() # Windows or Linux
+try:
+	bits = int( platform.architecture()[0][:2] ) # 32 or 64
+except (ValueError, TypeError ):
+	bits = None
+arch = None # platform-specific, set manually
 
 print( '\n********************************\n' )
 print( 'Configuring build environment...' )
 env = Environment()
+
+if bits == 32:
+	if plat == 'Windows':
+		arch = 'x86'
+	elif plat == 'Linux':
+		arch = 'i386'
+elif bits == 64:
+	if plat == 'Windows':
+		arch = 'x64'
+	elif plat == 'Linux':
+		arch = 'x86_64'
+
 if env['PLATFORM'] == 'posix':
 	arch = platform.machine()
 	if ( arch != 'x86_64' ):
 		#HACK: pretend we're i386 for consistent naming schemes
 		arch = 'i386'
-#TODO: make sure windows is fine for x86/x64
 
-print( 'Building for ' + plat + '/' + platform.machine() )
+print( 'Building for ' + plat + ' (' + str(bits) + ' bits, treated as \'' + arch + '\')' )
 print( '\n********************************\n' )
 
 files = {}
@@ -244,30 +260,39 @@ files['ui'] = [
 	'ui/ui_syscalls.c' ]
 
 # set up libraries to link with
-if env['PLATFORM'] == 'posix':
+if plat == 'Linux':
     libs['game']        = [ 'm' ]
     libs['cgame']       = [ 'm' ]
     libs['ui']          = [ 'm' ]
-else:
+elif plat == 'Windows':
     libs['game']        = []
     libs['cgame']       = []
     libs['ui']          = []
 
 # compiler options
-if env['PLATFORM'] == 'posix':
+if plat == 'Linux':
 	env['CPPDEFINES'] = [ '__GCC__' ]
 	env['CCFLAGS'] = [ '-Wall', '-Wno-missing-braces' ]
-else:
-	env['CPPDEFINES'] = []
-	env['CCFLAGS'] = []
+	# this may not be necessary
+	#if bits == 32:
+	#	env['CCFLAGS'] += [ '-m32' ]
+elif plat == 'Windows':
+	env['CCFLAGS'] = [ '/Gm', '/GS', '/Zc:wchar_t', '/WX-', '/RTC1', '/MDd', '/EHsc', '/nologo', '/W4', '/wd"4100"', '/wd"4127"', '/wd"4996"' ]
+	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS','/MACHINE:'+arch ]
+	env['CPPDEFINES'] = [ '_CRT_SECURE_NO_WARNINGS', 'WIN32', '_WINDOWS' ]
+
 # debug / release
 if int( ARGUMENTS.get( 'debug', 0 ) ):
-	if env['PLATFORM'] == 'posix':
+	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-g3' ]
+	elif plat == 'Windows':
+		env['CCFLAGS'] += [ '/Zi', '/Od' ]
 	env['CPPDEFINES'] += [ '_DEBUG' ]
 else:
-	if env['PLATFORM'] == 'posix':
+	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-O2' ]
+	elif plat == 'Windows':
+		env['CCFLAGS'] += [ '/O2' ]
 	env['CPPDEFINES'] += [ 'NDEBUG', 'FINAL_BUILD' ]
 
 

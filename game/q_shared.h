@@ -284,7 +284,6 @@ float FloatSwap( const float *f );
 // ================================================================
 
 #ifdef __linux__
-
 	#include <sys/mman.h>
 	#include <unistd.h>
 
