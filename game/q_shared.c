@@ -1215,7 +1215,7 @@ FIXME: overflow check?
 */
 char *Info_ValueForKey( const char *s, const char *key ) {
 	char	pkey[BIG_INFO_KEY];
-	static	char value[4][BIG_INFO_VALUE];	// use two buffers so compares
+	static	char value[2][BIG_INFO_VALUE];	// use two buffers so compares
 											// work without stomping on each other
 	static	int	valueindex = 0;
 	char	*o;
@@ -1310,10 +1310,9 @@ Info_RemoveKey
 ===================
 */
 void Info_RemoveKey( char *s, const char *key ) {
-	char	*start;
+	char	*start = NULL, *o = NULL;
 	char	pkey[MAX_INFO_KEY] = {0};
 	char	value[MAX_INFO_VALUE] = {0};
-	char	*o;
 
 	if ( strlen( s ) >= MAX_INFO_STRING ) {
 		Com_Error( ERR_DROP, "Info_RemoveKey: oversize infostring" );
@@ -1348,16 +1347,16 @@ void Info_RemoveKey( char *s, const char *key ) {
 		}
 		*o = 0;
 
+		//OJKNOTE: static analysis pointed out pkey may not be null-terminated
 		if (!strcmp (key, pkey) )
 		{
-			strcpy (start, s);	// remove this part
+			memmove(start, s, strlen(s) + 1);	// remove this part
 			return;
 		}
 
 		if (!*s)
 			return;
 	}
-
 }
 
 /*
@@ -1367,13 +1366,10 @@ Info_RemoveKey_Big
 */
 void Info_RemoveKey_Big( char *s, const char *key ) {
 	char	*start;
-	static char pkey[BIG_INFO_KEY] = {0};
-	static char value[BIG_INFO_VALUE] = {0};
+	static char pkey[BIG_INFO_KEY], value[BIG_INFO_VALUE];
 	char	*o;
 
-	//Raz: moved to heap
-	pkey[0] = '\0';
-	value[0] = '\0';
+	pkey[0] = value[0] = '\0';
 
 	if ( strlen( s ) >= BIG_INFO_STRING ) {
 		Com_Error( ERR_DROP, "Info_RemoveKey_Big: oversize infostring" );
@@ -1408,9 +1404,10 @@ void Info_RemoveKey_Big( char *s, const char *key ) {
 		}
 		*o = 0;
 
+		//OJKNOTE: static analysis pointed out pkey may not be null-terminated
 		if (!strcmp (key, pkey) )
 		{
-			strcpy (start, s);	// remove this part
+			memmove(start, s, strlen(s) + 1);	// remove this part
 			return;
 		}
 
@@ -1460,43 +1457,35 @@ Changes or adds a key/value pair
 */
 void Info_SetValueForKey( char *s, const char *key, const char *value ) {
 	char	newi[MAX_INFO_STRING];
+	const char* blacklist = "\\;\"";
 
 	if ( strlen( s ) >= MAX_INFO_STRING ) {
 		Com_Error( ERR_DROP, "Info_SetValueForKey: oversize infostring" );
 	}
 
-	if (strchr (key, '\\') || strchr (value, '\\'))
+	for(; *blacklist; ++blacklist)
 	{
-		Com_Printf( "Info_SetValueForKey: Can't use keys or values with a \\\n" );
+		if (strchr (key, *blacklist) || strchr (value, *blacklist))
+		{
+			Com_Printf (S_COLOR_YELLOW "Can't use keys or values with a '%c': %s = %s\n", *blacklist, key, value);
+			return;
+		}
+	}
+
+	Info_RemoveKey (s, key);
+	if (!value || !strlen(value))
+		return;
+
+	Com_sprintf (newi, sizeof(newi), "\\%s\\%s", key, value);
+
+	if (strlen(newi) + strlen(s) >= MAX_INFO_STRING)
+	{
+		Com_Printf ("Info string length exceeded\n");
 		return;
 	}
 
-	if (strchr (key, ';') || strchr (value, ';'))
-	{
-		Com_Printf( "Info_SetValueForKey: Can't use keys or values with a semicolon\n" );
-		return;
-	}
-
-	if (strchr (key, '\"') || strchr (value, '\"'))
-	{
-		Com_Printf( "Info_SetValueForKey: Can't use keys or values with a \"\n" );
-		return;
-	}
-
-	Info_RemoveKey( s, key );
-	if ( !value || !strlen( value ) )
-		return;
-
-	Com_sprintf( newi, sizeof( newi ), "\\%s\\%s", key, value );
-
-	if ( strlen( newi ) + strlen( s ) >= MAX_INFO_STRING )
-	{
-		Com_Printf( "Info_SetValueForKey: Info string length exceeded\n" );
-		return;
-	}
-
-	strcat( newi, s );
-	strcpy( s, newi );
+	strcat (newi, s);
+	strcpy (s, newi);
 }
 
 /*
@@ -1504,35 +1493,28 @@ void Info_SetValueForKey( char *s, const char *key, const char *value ) {
 Info_SetValueForKey_Big
 
 Changes or adds a key/value pair
+Includes and retains zero-length values
 ==================
 */
 void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 	char	newi[BIG_INFO_STRING];
+	const char* blacklist = "\\;\"";
 
 	if ( strlen( s ) >= BIG_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info_SetValueForKey: oversize infostring" );
+		Com_Error( ERR_DROP, "Info_SetValueForKey_Big: oversize infostring" );
 	}
 
-	if (strchr (key, '\\') || strchr (value, '\\'))
+	for(; *blacklist; ++blacklist)
 	{
-		Com_Printf ("Can't use keys or values with a \\\n");
-		return;
-	}
-
-	if (strchr (key, ';') || strchr (value, ';'))
-	{
-		Com_Printf ("Can't use keys or values with a semicolon\n");
-		return;
-	}
-
-	if (strchr (key, '\"') || strchr (value, '\"'))
-	{
-		Com_Printf ("Can't use keys or values with a \"\n");
-		return;
+		if (strchr (key, *blacklist) || strchr (value, *blacklist))
+		{
+			Com_Printf (S_COLOR_YELLOW "Can't use keys or values with a '%c': %s = %s\n", *blacklist, key, value);
+			return;
+		}
 	}
 
 	Info_RemoveKey_Big (s, key);
-	if (!value || !strlen(value))
+	if (!value)
 		return;
 
 	Com_sprintf (newi, sizeof(newi), "\\%s\\%s", key, value);
