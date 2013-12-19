@@ -174,7 +174,7 @@ static int JPLua_Export_Print( lua_State *L )
 	char buf[16384] = { 0 };
 
 	JPLua_Util_ArgAsString( L, &buf[0], sizeof( buf ) );
-	Com_Printf( buf );
+	trap->Print( "%s\n", buf );
 
 	return 0;
 }

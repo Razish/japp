@@ -783,7 +783,7 @@ static void AM_Teleport( gentity_t *ent )
 		else
 		{
 			vector3	telePos;
-			char argX[16]={0}, argY[16]={0}, argZ[16]={0}, argR[8]={0};
+			char argX[16]={0}, argY[16]={0}, argZ[16]={0};
 
 			trap->Argv( 2, argX, sizeof( argX ) );
 			trap->Argv( 3, argY, sizeof( argY ) );
@@ -793,6 +793,7 @@ static void AM_Teleport( gentity_t *ent )
 			if ( trap->Argc() == 6 )
 			{// amtele c x y z r
 				vector3 angles = { 0.0f };
+				char argR[8]={0};
 	
 				trap->Argv( 5, argR, sizeof( argR ) );
 				angles.yaw = atoi( argR );
@@ -849,34 +850,37 @@ static void SpawnTelemark( teleMark_t *tm, vector3 *origin, const char *args )
 }
 static void AM_Telemark( gentity_t *ent )
 {//Mark current location
+	char name[32];
+	int i;
+
 	if ( trap->Argc() > 1 )
-	{//They provided a name
-		char	*args	= ConcatArgs( 1 );
-		int		i;
-
-		for ( i=0; i<level.adminData.teleMarksIndex; i++ )
-		{//Check for an existing telemark
-			if ( !Q_stricmp( args, teleMarks[i].name ) )
-			{//Update it
-				SpawnTelemark( &teleMarks[i], &ent->client->ps.origin, args );
-				VectorCopy( &ent->client->ps.origin, &ent->client->pers.adminData.teleMark );
-				return;
-			}
-		}
-
-		//It doesn't exist yet, check if we have room to add it
-		if ( level.adminData.teleMarksIndex < 32 )
-		{
-			SpawnTelemark( GetTelemark(), &ent->client->ps.origin, args );
-			VectorCopy( &ent->client->ps.origin, &ent->client->pers.adminData.teleMark );
-			level.adminData.teleMarksIndex++;
-		}
-
-		else
-			trap->SendServerCommand( ent-g_entities, "print \"Maximum number of telemarks for this map exceeded! (Remove some first)\n\"" );
+		Q_strncpyz( name, ConcatArgs( 1 ), sizeof( name ) );
+	else {
+		char cleanName[MAX_NETNAME];
+		Q_strncpyz( cleanName, ent->client->pers.netname, sizeof( cleanName ) );
+		Q_StripColor( cleanName );
+		Com_sprintf( name, sizeof( name ), "default_%s", cleanName );
 	}
-	else
-		trap->SendServerCommand( ent-g_entities, "print \"Please name the telemark\n\"" );
+
+	for ( i=0; i<level.adminData.teleMarksIndex; i++ )
+	{//Check for an existing telemark
+		if ( !Q_stricmp( name, teleMarks[i].name ) )
+		{//Update it
+			SpawnTelemark( &teleMarks[i], &ent->client->ps.origin, name );
+			VectorCopy( &ent->client->ps.origin, &ent->client->pers.adminData.teleMark );
+			return;
+		}
+	}
+
+	//It doesn't exist yet, check if we have room to add it
+	if ( level.adminData.teleMarksIndex >= 32 ) {
+		trap->SendServerCommand( ent-g_entities, "print \"Maximum number of telemarks for this map exceeded! (Remove some first)\n\"" );
+		return;
+	}
+
+	SpawnTelemark( GetTelemark(), &ent->client->ps.origin, name );
+	VectorCopy( &ent->client->ps.origin, &ent->client->pers.adminData.teleMark );
+	level.adminData.teleMarksIndex++;
 }
 
 static void AM_GunTeleportMark( gentity_t *ent )
@@ -903,6 +907,11 @@ static void AM_RemoveTelemark( gentity_t *ent )
 	if ( arg1[0] >= '0' && arg1[0] <= '9' )
 	{//If they enter invalid input past this, fuck 'em.
 		int index = atoi( arg1 );
+
+		if ( index < 0 || index >= level.adminData.teleMarksIndex ) {
+			trap->SendServerCommand( ent-g_entities, va( "print \"Index %i out of range [0, %i]\n\"", index, level.adminData.teleMarksIndex ) );
+			return;
+		}
 
 		//First, free the ent if needed
 		if ( level.adminData.teleMarksVisual )
@@ -1031,6 +1040,11 @@ static void AM_ForceTeam( gentity_t *ent )
 	char		arg1[64]={0}, arg2[64]={0};
 	int			targetClient;
 	gentity_t	*targ;
+
+	if ( trap->Argc() != 3 ) {
+		trap->SendServerCommand( ent-g_entities, "print \"Syntax: \\amforceteam <clientnum or partial name> <team>\n\"" );
+		return;
+	}
 
 	//amforceteam <partial name|clientNum> <team>
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
@@ -1553,7 +1567,6 @@ static void AM_EntSpawn( gentity_t *ent )
 	return;
 }
 
-#define NUM_REMOVE_ENTS (4)
 static void AM_EntRemove( gentity_t *ent )
 {//Remove an entity
 	trace_t *tr = RealTrace( ent, 0.0f );

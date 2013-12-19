@@ -342,6 +342,26 @@ static void SV_ListMaps_f( void ) {
 	}
 }
 
+#ifdef JPLUA
+static void SV_Lua_f( void ) {
+	char *args = NULL;
+
+	if ( trap->Argc() < 2 || !JPLua.state )
+		return;
+
+	args = ConcatArgs( 1 );
+
+	trap->Print( S_COLOR_CYAN"Executing Lua code: %s\n", args );
+	if ( luaL_dostring( JPLua.state, args ) != 0 )
+		trap->Print( S_COLOR_RED"Lua Error: %s\n", lua_tostring( JPLua.state, -1 ) );
+}
+
+static void SV_LuaReload_f( void ) {
+	JPLua_Shutdown();
+	JPLua_Init();
+}
+#endif
+
 static void SV_Pause_f( void ) {
 	//OSP: pause
 	if ( level.pause.state == PAUSE_NONE ) {
@@ -389,6 +409,8 @@ static const svCommand_t svCommands[] = {
 	{ "gametype",					SV_Gametype_f },
 	{ "game_memory",				SV_GameMemory_f },
 	{ "lsmaps",						SV_ListMaps_f },
+	{ "lua",						SV_Lua_f },
+	{ "lua_reload",					SV_LuaReload_f },
 	{ "pause",						SV_Pause_f },
 	{ "say",						SV_Say_f },
 	{ "shuffle",					SV_ShuffleTeams_f },
@@ -405,15 +427,6 @@ qboolean ConsoleCommand( void ) {
 	char cmd[MAX_TOKEN_CHARS] = {0};
 
 	trap->Argv( 0, cmd, sizeof( cmd ) );
-
-	#ifdef JPLUA
-		if ( !Q_stricmp( cmd, "lua_reload" ) )
-		{
-			JPLua_Shutdown();
-			JPLua_Init();
-			return qtrue;
-		}
-	#endif
 
 	if ( JPLua_Event_ServerCommand() )
 		return qtrue;
