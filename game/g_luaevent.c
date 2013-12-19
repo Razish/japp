@@ -174,8 +174,7 @@ void JPLua_Event_ClientConnect( int clientNum )
 }
 */
 
-qboolean JPLua_Event_ClientCommand( void )
-{
+qboolean JPLua_Event_ClientCommand( int clientNum ) {
 	qboolean ret = qfalse;
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
@@ -196,6 +195,8 @@ qboolean JPLua_Event_ClientCommand( void )
 			{
 				lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, cmd->handle );
 
+				lua_pushnumber( JPLua.state, clientNum );
+
 				//Push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
@@ -208,7 +209,7 @@ qboolean JPLua_Event_ClientCommand( void )
 					lua_settable( JPLua.state, top );
 				}
 
-				JPLUACALL( JPLua.state, 1, 0 );
+				JPLUACALL( JPLua.state, 2, 0 );
 				if ( !ret )
 					ret = qtrue;
 			}

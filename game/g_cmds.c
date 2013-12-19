@@ -4255,7 +4255,7 @@ void ClientCommand( int clientNum ) {
 	//[/Admin]
 
 	//Raz: JPLua
-	if ( JPLua_Event_ClientCommand() )
+	if ( JPLua_Event_ClientCommand( clientNum ) )
 		return;
 
 	command = (command_t *)bsearch( cmd, commands, numCommands, sizeof( commands[0] ), cmdcmp );

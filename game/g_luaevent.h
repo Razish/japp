@@ -21,5 +21,5 @@ void JPLua_Event_Shutdown( void );
 void JPLua_Event_RunFrame( void );
 //void JPLua_Event_ClientConnect( int clientNum );
 void JPLua_Event_ClientSpawn( int clientNum );
-qboolean JPLua_Event_ClientCommand( void );
+qboolean JPLua_Event_ClientCommand( int clientNum );
 qboolean JPLua_Event_ServerCommand( void );
