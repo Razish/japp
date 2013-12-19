@@ -1233,7 +1233,7 @@ void JP_DrawMiniScoreboard( void )
 			if ( i == cg.numScores)
 				break;
 			rank++;
-			Com_sprintf( scoreName[i], sizeof( scoreName[i] ), "%2i (^5%2i^7) - %s", rank, cg.scores[i].client, cgs.clientinfo[cg.scores[i].client].name );
+			Com_sprintf( scoreName[i], sizeof( scoreName[i] ), "%2i ("S_COLOR_CYAN"%2i"S_COLOR_WHITE") - %s", rank, cg.scores[i].client, cgs.clientinfo[cg.scores[i].client].name );
 			scoreKills[i]	= cg.scores[i].score;
 			scoreDeaths[i]	= cg.scores[i].deaths;
 		}
@@ -1306,7 +1306,7 @@ void JP_DrawStats( void )
 	}
 
 	//Speedometer
-	Com_sprintf( speedStr, sizeof( speedStr ), "%s%04.01f ups", ( speed >= 800.0f ? "^1" : ( speed >= 550.0f ? "^3" : "^7" ) ), speed );
+	Com_sprintf( speedStr, sizeof( speedStr ), "%s%04.01f ups", ( speed >= 800.0f ? S_COLOR_RED : ( speed >= 550.0f ? S_COLOR_YELLOW : S_COLOR_WHITE ) ), speed );
 
 	{
 		char *statStr = va( "%-12s%i\n%-12s%i\n%-12s%.2f\n\n%-12s%i\n%-12s%i\n\n%-12s%s\n%-12s%s\n\n%-12s%s",
@@ -1388,8 +1388,10 @@ void JP_DrawMovementKeys( void )
 	w2 = CG_Text_Width( "A S D", cg_hudMovementKeysScale.value, fontIndex );
 	height = CG_Text_Height( "A S D v W ^", cg_hudMovementKeysScale.value, fontIndex );
 
-	Com_sprintf( str1, sizeof( str1 ), va( "^%cv ^%cW ^%c^", (cmd.upmove < 0) ? '1' : '7',		(cmd.forwardmove > 0) ? '1' : '7',	(cmd.upmove > 0) ? '1' : '7' ) );
-	Com_sprintf( str2, sizeof( str2 ), va( "^%cA ^%cS ^%cD", (cmd.rightmove < 0) ? '1' : '7',	(cmd.forwardmove < 0) ? '1' : '7',	(cmd.rightmove > 0) ? '1' : '7' ) );
+	Com_sprintf( str1, sizeof( str1 ), va( "^%cv ^%cW ^%c^", (cmd.upmove < 0) ? COLOR_RED : COLOR_WHITE,
+		(cmd.forwardmove > 0) ? COLOR_RED : COLOR_WHITE, (cmd.upmove > 0) ? COLOR_RED : COLOR_WHITE ) );
+	Com_sprintf( str2, sizeof( str2 ), va( "^%cA ^%cS ^%cD", (cmd.rightmove < 0) ? COLOR_RED : COLOR_WHITE,
+		(cmd.forwardmove < 0) ? COLOR_RED : COLOR_WHITE, (cmd.rightmove > 0) ? COLOR_RED : COLOR_WHITE ) );
 
 	CG_Text_Paint( cg.moveKeysPos.x - max(w1,w2)/2.0, cg.moveKeysPos.y,				cg_hudMovementKeysScale.value, &colorWhite, str1, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex );
 	CG_Text_Paint( cg.moveKeysPos.x - max(w1,w2)/2.0, cg.moveKeysPos.y + height,	cg_hudMovementKeysScale.value, &colorWhite, str2, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex );
@@ -1482,21 +1484,44 @@ void CG_DrawHUD( centity_t *cent )
 
 		if ( cg_smartEntities.integer )
 		{//Smart entities
-			str = "^1Smart entities ON";
+			str = S_COLOR_RED"Smart entities ON";
 			x = ( 36 - (trap->R_Font_StrLenPixels( str, 1, 0.8f ) / 2) );
 			trap->R_Font_DrawString( x+16, y-180, str, &colorTable[CT_VLTBLUE1], 1, -1, 0.8f );
 		}
 
 		if ( cg.snap->ps.eFlags & EF_ALT_DIM )
 		{//alt-dim
-			str = "^1Alternate dimension!";
+			str = S_COLOR_RED"Alternate dimension!";
 			x = ( 48 - (trap->R_Font_StrLenPixels( str, 1, 0.8f ) / 2) );
 			trap->R_Font_DrawString( x+16, y-140, str, &colorTable[CT_VLTBLUE1], 1, -1, 0.8f );
 		}
 
 		//(eFlags2 & 512) == grapple is out
 		//(eFlags & 65536) == grapple controls movement
-		str = va( "^5legsAnim: %i\n^5torsoAnim: %i\n^5duelIndex: %i\n^5duelInProgress: %i\n^5eFlags: %i\n^5eFlags2: %i\n^5activeForcePass: %i\n^5generic1: %i\n^5genericEnemyIndex: %i\n^5pm_flags: %i\n^5pm_type: %i\n^5ragAttach: %i\n^3bolt1: ^7%i\n^3bolt2: %i\n^3generic1: %i\n^3genericenemyindex: %i\n^5forcePowerSelected: %i\n^5forcePowersKnown: %i\n^2cg.forceSelect: %i\n^2cg.time: %i\nspeed: %f\n^5legsTimer: %i\n^5groundEntityNum: %i",
+		str = va(
+S_COLOR_CYAN"legsAnim: %i\n"
+S_COLOR_CYAN"torsoAnim: %i\n"
+S_COLOR_CYAN"duelIndex: %i\n"
+S_COLOR_CYAN"duelInProgress: %i\n"
+S_COLOR_CYAN"eFlags: %i\n"
+S_COLOR_CYAN"eFlags2: %i\n"
+S_COLOR_CYAN"activeForcePass: %i\n"
+S_COLOR_CYAN"generic1: %i\n"
+S_COLOR_CYAN"genericEnemyIndex: %i\n"
+S_COLOR_CYAN"pm_flags: %i\n"
+S_COLOR_CYAN"pm_type: %i\n"
+S_COLOR_CYAN"ragAttach: %i\n"
+S_COLOR_YELLOW"bolt1: %i\n"
+S_COLOR_YELLOW"bolt2: %i\n"
+S_COLOR_YELLOW"generic1: %i\n"
+S_COLOR_YELLOW"genericenemyindex: %i\n"
+S_COLOR_CYAN"forcePowerSelected: %i\n"
+S_COLOR_CYAN"forcePowersKnown: %i\n"
+S_COLOR_GREEN"cg.forceSelect: %i\n"
+S_COLOR_GREEN"cg.time: %i\n"
+S_COLOR_GREEN"speed: %f\n"
+S_COLOR_CYAN"legsTimer: %i\n"
+S_COLOR_CYAN"groundEntityNum: %i",
 			ps->legsAnim,
 			ps->torsoAnim,
 			ps->duelIndex,
@@ -6750,11 +6775,11 @@ static void CG_DrawSpectator(void)
 
 		if (cgs.gametype == GT_POWERDUEL && cgs.duelist3 != -1)
 		{
-			Com_sprintf(text, sizeof(text), "%s^7 %s %s^7 %s %s", cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString("MP_INGAME", "SPECHUD_VERSUS"), cgs.clientinfo[cgs.duelist2].name, CG_GetStringEdString("MP_INGAME", "AND"), cgs.clientinfo[cgs.duelist3].name);
+			Com_sprintf(text, sizeof(text), "%s"S_COLOR_WHITE" %s %s"S_COLOR_WHITE" %s %s", cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString("MP_INGAME", "SPECHUD_VERSUS"), cgs.clientinfo[cgs.duelist2].name, CG_GetStringEdString("MP_INGAME", "AND"), cgs.clientinfo[cgs.duelist3].name);
 		}
 		else
 		{
-			Com_sprintf(text, sizeof(text), "%s^7 %s %s", cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString("MP_INGAME", "SPECHUD_VERSUS"), cgs.clientinfo[cgs.duelist2].name);
+			Com_sprintf(text, sizeof(text), "%s"S_COLOR_WHITE" %s %s", cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString("MP_INGAME", "SPECHUD_VERSUS"), cgs.clientinfo[cgs.duelist2].name);
 		}
 		CG_Text_Paint ( 320 - CG_Text_Width ( text, 1.0f, 3 ) / 2, 420, 1.0f, &colorWhite, text, 0, 0, 0, 3 );
 

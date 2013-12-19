@@ -821,7 +821,7 @@ void CG_PrintCTFMessage(clientInfo_t *ci, const char *teamName, int ctfMessage)
 			if (ci)
 			{
 				//Raz: Fix colour bleeding in CTF messages
-				Com_sprintf(printMsg, sizeof(printMsg), "%s^7 ", ci->name);
+				Com_sprintf(printMsg, sizeof(printMsg), "%s"S_COLOR_WHITE" ", ci->name);
 				strLen = strlen(printMsg);
 			}
 
@@ -854,7 +854,7 @@ void CG_PrintCTFMessage(clientInfo_t *ci, const char *teamName, int ctfMessage)
 	if (ci)
 	{
 		//Raz: Fix colour bleeding in CTF messages
-		Com_sprintf(printMsg, sizeof(printMsg), "%s^7 %s", ci->name, psStringEDString);
+		Com_sprintf(printMsg, sizeof(printMsg), "%s"S_COLOR_WHITE" %s", ci->name, psStringEDString);
 	}
 	else
 	{
@@ -3230,7 +3230,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 				{ //add to the chat box
 					//hear it in the world spot.
 					char vchatstr[1024] = {0};
-					Q_strncpyz( vchatstr, va( "<%s^7> %s\n", ci->name, descr ), sizeof( vchatstr ) );
+					Q_strncpyz( vchatstr, va( "<%s"S_COLOR_WHITE"> %s\n", ci->name, descr ), sizeof( vchatstr ) );
 					trap->Print(vchatstr);
 					if ( !cg_newChatbox.integer )
 						CG_ChatBox_AddString( vchatstr );

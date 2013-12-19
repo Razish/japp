@@ -176,9 +176,6 @@ void JP_ChatboxAdd( const char *message, qboolean multiLine, char *cbName )
 		Com_sprintf( buf, sizeof( buf ), "%c", *p );
 		if ( !Q_IsColorString( p ) && (i > 0 && !Q_IsColorString( p-1 )) )
 			accumLength += CG_Text_Width( buf, cg.chatbox.size.scale, JP_GetChatboxFont() );
-		//HACK: Compensate for ^x effectively being 0
-	//	if ( Q_IsColorString( p ) )
-	//		accumLength -= CG_Text_Width( "^0",  chatVars.scale, JP_GetChatboxFont() );
 
 		if ( accumLength > max( cg.chatbox.size.width, 192.0f ) && (i>0 && !Q_IsColorString( p-1 )) )
 		{
@@ -215,7 +212,7 @@ void JP_ChatboxAdd( const char *message, qboolean multiLine, char *cbName )
 					if ( !cg.japp.timestamp24Hour && timeinfo->tm_hour > 12 )
 						timeinfo->tm_hour -= 12;
 
-					Com_sprintf( chat->timeStamp, sizeof( chat->timeStamp ), "[^%c%02i:%02i:%02i^7] ", *(char *)cg_chatboxTimeColour.string, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+					Com_sprintf( chat->timeStamp, sizeof( chat->timeStamp ), "[^%c%02i:%02i:%02i"S_COLOR_WHITE"] ", *(char *)cg_chatboxTimeColour.string, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
 				}
 				else if ( cg_chatboxTimeShow.integer == 2 )
 				{
@@ -225,7 +222,7 @@ void JP_ChatboxAdd( const char *message, qboolean multiLine, char *cbName )
 					mins	= seconds / 60;					seconds	-= mins * 60;
 					hours	= mins / 60;					mins -= hours * 60;
 
-					Com_sprintf( chat->timeStamp, sizeof( chat->timeStamp ), "[^%c%02i:%02i:%02i^7] ", *(char *)cg_chatboxTimeColour.string, hours, mins, seconds );
+					Com_sprintf( chat->timeStamp, sizeof( chat->timeStamp ), "[^%c%02i:%02i:%02i"S_COLOR_WHITE"] ", *(char *)cg_chatboxTimeColour.string, hours, mins, seconds );
 				}
 			}
 
@@ -262,7 +259,7 @@ void JP_ChatboxAdd( const char *message, qboolean multiLine, char *cbName )
 			if ( !cg.japp.timestamp24Hour && timeinfo->tm_hour > 12 )
 				timeinfo->tm_hour -= 12;
 
-			Com_sprintf( chat->timeStamp, sizeof( chat->timeStamp ), "[^%c%02i:%02i:%02i^7] ", *(char *)cg_chatboxTimeColour.string, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+			Com_sprintf( chat->timeStamp, sizeof( chat->timeStamp ), "[^%c%02i:%02i:%02i"S_COLOR_WHITE"] ", *(char *)cg_chatboxTimeColour.string, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
 		}
 		else if ( cg_chatboxTimeShow.integer == 2 )
 		{
@@ -272,7 +269,7 @@ void JP_ChatboxAdd( const char *message, qboolean multiLine, char *cbName )
 			mins	= seconds / 60;					seconds	-= mins * 60;
 			hours	= mins / 60;					mins -= hours * 60;
 
-			Com_sprintf( chat->timeStamp, sizeof( chat->timeStamp ), "[^%c%02i:%02i:%02i^7] ", *(char *)cg_chatboxTimeColour.string, hours, mins, seconds );
+			Com_sprintf( chat->timeStamp, sizeof( chat->timeStamp ), "[^%c%02i:%02i:%02i"S_COLOR_WHITE"] ", *(char *)cg_chatboxTimeColour.string, hours, mins, seconds );
 		}
 	}
 
@@ -323,7 +320,7 @@ void JP_ChatboxDraw( void )
 		return;
 
 	if ( currentChatbox->scrollAmount < 0 )
-		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y - (cg_chatboxLineHeight.value*1), cg.chatbox.size.scale, &colorWhite, va( "^3Scrolled lines: ^5%i\n", currentChatbox->scrollAmount*-1 ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, JP_GetChatboxFont() );
+		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y - (cg_chatboxLineHeight.value*1), cg.chatbox.size.scale, &colorWhite, va( S_COLOR_YELLOW"Scrolled lines: "S_COLOR_CYAN"%i\n", currentChatbox->scrollAmount*-1 ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, JP_GetChatboxFont() );
 
 	for ( done = 0; done<cg_chatboxLineCount.integer && i<MAX_CHATBOX_ENTRIES; i++, done++ )
 	{//Check to see if background should be drawn

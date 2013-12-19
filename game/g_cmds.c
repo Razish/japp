@@ -1651,7 +1651,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	default:
 	case SAY_ADMIN:
 		G_LogPrintf( "amsay: %s: %s\n", ent->client->pers.netname, chatText );
-		Com_sprintf (name, sizeof(name), "^3<Admin	>^7%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+		Com_sprintf (name, sizeof(name), S_COLOR_YELLOW"<Admin	>"S_COLOR_WHITE"%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_YELLOW;
 		break;
 	case SAY_ALL:
@@ -1663,12 +1663,12 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, chatText );
 		if ( isMeCmd )
 		{
-			Com_sprintf( name, sizeof( name ), "^7* %s^7"EC" ", ent->client->pers.netname );
+			Com_sprintf( name, sizeof( name ), S_COLOR_WHITE"* %s"S_COLOR_WHITE""EC" ", ent->client->pers.netname );
 			color = COLOR_WHITE;
 		}
 		else
 		{
-			Com_sprintf( name, sizeof( name ), "%s^7"EC": ", ent->client->pers.netname );
+			Com_sprintf( name, sizeof( name ), "%s"S_COLOR_WHITE EC": ", ent->client->pers.netname );
 			color = COLOR_GREEN;
 		}
 		break;
@@ -2554,7 +2554,7 @@ validVote:
 	}
 	Q_strstrip( level.voteStringClean, "\"\n\r", NULL );
 
-	trap->SendServerCommand( -1, va( "print \"%s^7 %s (%s)\n\"", ent->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLCALLEDVOTE" ), level.voteStringClean ) );
+	trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s (%s)\n\"", ent->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLCALLEDVOTE" ), level.voteStringClean ) );
 
 	// start the voting, the caller automatically votes yes
 	level.voteTime = level.time;
@@ -3471,7 +3471,7 @@ void Cmd_Sabercolor_f( gentity_t *ent )
 
 	if ( trap->Argc() < 5 )
 	{
-		trap->SendServerCommand( ent-g_entities, va( "print \"^3Usage: /sabercolor ^7<^31-2^7> ^7<^10-255^7> <^20-255^7> <^50-255^7>\n\"" ) );
+		trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_YELLOW"Usage: /sabercolor "S_COLOR_WHITE"<"S_COLOR_YELLOW"1-2"S_COLOR_WHITE"> <"S_COLOR_RED"0-255"S_COLOR_WHITE"> <"S_COLOR_GREEN"0-255"S_COLOR_WHITE"> <"S_COLOR_CYAN"0-255"S_COLOR_WHITE">\n\"" ) );
 		return;
 	}
 
@@ -3555,7 +3555,10 @@ static void JP_ListChannels( gentity_t *ent )
 
 	while ( channel )
 	{
-		Q_strcat( msg, sizeof( msg ), (legacyClient && channel == ent->client->pers.japp.activeChannel) ? va( "^7- ^3%s ^7[^2%s^7]\n", channel->identifier, channel->shortname ) : !!(legacyClient) ? va( "^7- %s ^7[^2%s^7]\n", channel->identifier, channel->shortname ) : va( "^7- %s\n", channel->identifier ) );
+		Q_strcat( msg, sizeof( msg ), (legacyClient && channel == ent->client->pers.japp.activeChannel)
+			? va( S_COLOR_WHITE"- "S_COLOR_YELLOW"%s "S_COLOR_WHITE"["S_COLOR_GREEN"%s"S_COLOR_WHITE"]\n", channel->identifier,
+			channel->shortname ) : !!(legacyClient) ? va( S_COLOR_WHITE"- %s "S_COLOR_WHITE"["S_COLOR_GREEN"%s"S_COLOR_WHITE"]\n",
+			channel->identifier, channel->shortname ) : va( S_COLOR_WHITE"- %s\n", channel->identifier ) );
 		channel = channel->next;
 	}
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
@@ -3571,7 +3574,7 @@ void Cmd_JoinChannel_f( gentity_t *ent )
 
 	if ( trap->Argc() < 2 )
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"^3Usage: /joinchan <identifier/password> <short-name (optional)>\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: /joinchan <identifier/password> <short-name (optional)>\n\"" );
 		return;
 	}
 
@@ -3586,7 +3589,7 @@ void Cmd_JoinChannel_f( gentity_t *ent )
 	{//Try to find an existing channel
 		if ( !strcmp( arg1_ident, channel->identifier ) )
 		{//Already joined, return
-			trap->SendServerCommand( ent-g_entities, va( "print \"^3You are already in channel '%s'\n\"", arg1_ident ) );
+			trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_YELLOW"You are already in channel '%s'\n\"", arg1_ident ) );
 			//TODO: update short-name?
 			//		for legacy clients
 			return;
@@ -3655,7 +3658,7 @@ void Cmd_WhoisChannel_f( gentity_t *ent )
 				{
 					if ( !strcmp( chan->identifier, arg1_ident ) )
 					{
-						Q_strcat( msg, sizeof( msg ), va( "^7- %s\n", other->client->pers.netname ) );
+						Q_strcat( msg, sizeof( msg ), va( S_COLOR_WHITE"- %s\n", other->client->pers.netname ) );
 					}
 					chan = chan->next;
 				}
@@ -3686,7 +3689,7 @@ void Cmd_WhoisChannel_f( gentity_t *ent )
 				{
 					if ( chan == ent->client->pers.japp.activeChannel )
 					{
-						Q_strcat( msg, sizeof( msg ), va( "^7- %s\n", other->client->pers.netname ) );
+						Q_strcat( msg, sizeof( msg ), va( S_COLOR_WHITE"- %s\n", other->client->pers.netname ) );
 					}
 					chan = chan->next;
 				}
@@ -3695,7 +3698,7 @@ void Cmd_WhoisChannel_f( gentity_t *ent )
 		trap->SendServerCommand( ent-g_entities, va( "print \"Players in channel '%s':\n%s\"", arg1_ident, msg ) );
 	}
 	else
-		trap->SendServerCommand( ent-g_entities, "print \"^3Usage: /whoischan <identifier>\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: /whoischan <identifier>\n\"" );
 
 	return;
 }
@@ -3734,7 +3737,7 @@ void Cmd_LeaveChannel_f( gentity_t *ent )
 			prev = channel;
 			channel = channel->next;
 		}
-		trap->SendServerCommand( ent-g_entities, va( "print \"^3Error leaving channel '%s'. You were not in the channel.\n\"", arg1_ident ) );
+		trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_YELLOW"Error leaving channel '%s'. You were not in the channel.\n\"", arg1_ident ) );
 		if ( ent->client->pers.japp.channels )
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"You are currently in these channels:\n\"" );
@@ -3790,7 +3793,7 @@ void Cmd_MessageChannel_f( gentity_t *ent )
 			return;
 		}
 
-		Com_sprintf( name, sizeof( name ), "%s^7"CHANNEL_EC"%s"CHANNEL_EC": ", ent->client->pers.netname, chan->identifier );
+		Com_sprintf( name, sizeof( name ), "%s"S_COLOR_WHITE CHANNEL_EC"%s"CHANNEL_EC": ", ent->client->pers.netname, chan->identifier );
 
 		for ( other = g_entities; other-g_entities < MAX_CLIENTS; other++ )
 		{
@@ -3822,7 +3825,7 @@ void Cmd_MessageChannel_f( gentity_t *ent )
 			return;
 		}
 
-		Com_sprintf( name, sizeof( name ), "%s^7"CHANNEL_EC"%s"CHANNEL_EC": ", ent->client->pers.netname, ent->client->pers.japp.activeChannel->identifier );
+		Com_sprintf( name, sizeof( name ), "%s"S_COLOR_WHITE CHANNEL_EC"%s"CHANNEL_EC": ", ent->client->pers.netname, ent->client->pers.japp.activeChannel->identifier );
 
 		for ( other = g_entities; other-g_entities < MAX_CLIENTS; other++ )
 		{
@@ -3841,7 +3844,7 @@ void Cmd_MessageChannel_f( gentity_t *ent )
 		}
 	}
 	else
-		trap->SendServerCommand( ent-g_entities, "print \"^3Usage: /msgchan <identifier> <message>\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: /msgchan <identifier> <message>\n\"" );
 
 	return;
 }
@@ -3851,7 +3854,7 @@ void Cmd_Drop_f( gentity_t *ent ) {
 
 	if ( ent->client->ps.pm_type == PM_DEAD || ent->client->ps.pm_type == PM_SPECTATOR )
 	{
-		trap->SendServerCommand( ent-g_entities, "print \"^3You must be alive to drop items\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"You must be alive to drop items\n\"" );
 		return;
 	}
 
@@ -3863,13 +3866,13 @@ void Cmd_Drop_f( gentity_t *ent ) {
 
 		if ( !japp_allowFlagDrop.integer )
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"^3Not allowed to drop the flag\n\"" );
+			trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Not allowed to drop the flag\n\"" );
 			return;
 		}
 
 		if ( level.gametype != GT_CTF || (ent->client->ps.powerups[powerup] <= level.time) )
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"^3No flag to drop\n\"" );
+			trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"No flag to drop\n\"" );
 			return;
 		}
 
@@ -3901,7 +3904,7 @@ void Cmd_Drop_f( gentity_t *ent ) {
 
 		if ( !japp_allowWeaponDrop.integer )
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"^3Not allowed to drop weapons\n\"" );
+			trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Not allowed to drop weapons\n\"" );
 			return;
 		}
 
@@ -3909,7 +3912,7 @@ void Cmd_Drop_f( gentity_t *ent ) {
 		|| wp == WP_SABER || wp == WP_MELEE || wp == WP_EMPLACED_GUN || wp == WP_TURRET
 			|| wp <= WP_NONE || wp > WP_NUM_WEAPONS )
 		{// We don't have this weapon or ammo for it, or it's a 'weapon' that can't be dropped
-			trap->SendServerCommand( ent-g_entities, "print \"^3Can't drop this weapon\n\"" );
+			trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Can't drop this weapon\n\"" );
 			return;
 		}
 
@@ -3917,7 +3920,7 @@ void Cmd_Drop_f( gentity_t *ent ) {
 
 		if ( !ent->client->ps.ammo[weaponData[wp].ammoIndex] )
 		{
-			trap->SendServerCommand( ent-g_entities, "print \"^3No ammo for this weapon\n\"" );
+			trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"No ammo for this weapon\n\"" );
 			return;
 		}
 		else if ( ent->client->ps.ammo[weaponData[wp].ammoIndex] > item->quantity )//bg_itemlist[BG_GetItemIndexByTag( wp, IT_WEAPON )].quantity )
@@ -4088,12 +4091,12 @@ static void Cmd_Ready_f( gentity_t *ent ) {
 	ent->client->pers.ready = !ent->client->pers.ready;
 
 	if ( ent->client->pers.ready ) {
-		publicMsg = va( "cp \"%s\n^7is ready\"", ent->client->pers.netname );
-		trap->SendServerCommand( ent-g_entities, va( "cp \"^2You are ready\"" ) );
+		publicMsg = va( "cp \"%s\n"S_COLOR_WHITE"is ready\"", ent->client->pers.netname );
+		trap->SendServerCommand( ent-g_entities, va( "cp \""S_COLOR_GREEN"You are ready\"" ) );
 	}
 	else {
-		publicMsg = va( "cp \"%s\n^3is NOT ready\"", ent->client->pers.netname );
-		trap->SendServerCommand( ent-g_entities, va( "cp \"^3You are NOT ready\"" ) );
+		publicMsg = va( "cp \"%s\n"S_COLOR_YELLOW"is NOT ready\"", ent->client->pers.netname );
+		trap->SendServerCommand( ent-g_entities, va( "cp \""S_COLOR_YELLOW"You are NOT ready\"" ) );
 	}
 
 	// send public message to everyone BUT this client, so they see their own message
@@ -4302,7 +4305,7 @@ void G_PrintCommands( gentity_t *ent )
 		if ( G_CmdValid( ent, command ) )
 			continue;
 
-		tmpMsg = va( " ^%c%s", (++toggle&1?'2':'3'), command->name );
+		tmpMsg = va( " ^%c%s", (++toggle&1?COLOR_GREEN:COLOR_YELLOW), command->name );
 
 		//newline if we reach limit
 		if ( count >= limit ) {

@@ -179,7 +179,7 @@ static void CG_ShowPlayerID_f( void ) {
 	int i;
 	for ( i=0; i<MAX_CLIENTS; i++ ) {
 		if ( cgs.clientinfo[i].infoValid )
-			Com_Printf( "^7(^5%i^7) %s\n", i, cgs.clientinfo[i].name );
+			Com_Printf( S_COLOR_WHITE"("S_COLOR_CYAN"%i"S_COLOR_WHITE") %s\n", i, cgs.clientinfo[i].name );
 	}
 }
 
@@ -221,7 +221,7 @@ static void CG_PluginDisable_f( void ) {
 		toggle = (1<<index);
 		trap->Cvar_Set( "cp_pluginDisable", va( "%i", toggle ^ current ) );
 
-		Com_Printf( "%s %s\n", pluginDisableStrings[index], ((current&toggle)?"^2Allowed":"^1Disallowed") );
+		Com_Printf( "%s %s\n", pluginDisableStrings[index], ((current&toggle)?S_COLOR_GREEN"Allowed":S_COLOR_RED"Disallowed") );
 	}
 	else
 	{
@@ -231,7 +231,7 @@ static void CG_PluginDisable_f( void ) {
 		Com_Printf( "Usage: /pluginDisable <ID>\n" );
 		for ( i=0; i<numPluginDisableOpts; i++ ) {
 			qboolean allowed = !(atoi( buf ) & (1<<i));
-			Com_Printf( "^7(^5%i^7) ^%c%s\n", i, (allowed?'2':'1'), pluginDisableStrings[i] );
+			Com_Printf( S_COLOR_WHITE"("S_COLOR_CYAN"%i"S_COLOR_WHITE") ^%c%s\n", i, (allowed?COLOR_GREEN:COLOR_RED), pluginDisableStrings[i] );
 		}
 	}
 }
@@ -281,13 +281,13 @@ void CG_LuaDoString_f( void )
 	}
 
 	if ( trap->Key_GetCatcher() & KEYCATCH_CONSOLE )
-		trap->Print( "^5Executing Lua code...\n" );
+		trap->Print( S_COLOR_CYAN"Executing Lua code...\n" );
 	if ( luaL_dostring( JPLua.state, buf ) != 0 )
-		trap->Print( "^1Lua Error: %s\n", lua_tostring( JPLua.state, -1 ) );
+		trap->Print( S_COLOR_RED"Lua Error: %s\n", lua_tostring( JPLua.state, -1 ) );
 }
 
 void CG_LuaReload_f( void ) {
-	trap->Print( "^5Reloading JPLua...\n" );
+	trap->Print( S_COLOR_CYAN"Reloading JPLua...\n" );
 	JPLua_Shutdown();
 	JPLua_Init();
 }

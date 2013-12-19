@@ -4686,7 +4686,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 	//Raz: Added
 	if ( japp_damageNotifications.integer )
 	{
-		trap->SendServerCommand( attacker-g_entities, va( "chat \"^7* Damage given: ^2%i\"", take ) );
+		trap->SendServerCommand( attacker-g_entities, va( "chat \""S_COLOR_WHITE"* Damage given: "S_COLOR_GREEN"%i\"", take ) );
 	}
 	
 	if ( targ->client )

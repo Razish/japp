@@ -354,7 +354,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 	if ((cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL) && cgs.duelWinner != -1 &&
 		cg.predictedPlayerState.pm_type == PM_INTERMISSION)
 	{
-		s = va("%s^7 %s", cgs.clientinfo[cgs.duelWinner].name, CG_GetStringEdString("MP_INGAME", "DUEL_WINS") );
+		s = va("%s"S_COLOR_WHITE" %s", cgs.clientinfo[cgs.duelWinner].name, CG_GetStringEdString("MP_INGAME", "DUEL_WINS") );
 		/*w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 		x = ( SCREEN_WIDTH - w ) / 2;
 		y = 40;
@@ -369,11 +369,11 @@ qboolean CG_DrawOldScoreboard( void ) {
 	{
 		if (cgs.gametype == GT_POWERDUEL && cgs.duelist3 != -1)
 		{
-			s = va("%s^7 %s %s^7 %s %s", cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString("MP_INGAME", "SPECHUD_VERSUS"), cgs.clientinfo[cgs.duelist2].name, CG_GetStringEdString("MP_INGAME", "AND"), cgs.clientinfo[cgs.duelist3].name );
+			s = va("%s"S_COLOR_WHITE" %s %s"S_COLOR_WHITE" %s %s", cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString("MP_INGAME", "SPECHUD_VERSUS"), cgs.clientinfo[cgs.duelist2].name, CG_GetStringEdString("MP_INGAME", "AND"), cgs.clientinfo[cgs.duelist3].name );
 		}
 		else
 		{
-			s = va("%s^7 %s %s", cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString("MP_INGAME", "SPECHUD_VERSUS"), cgs.clientinfo[cgs.duelist2].name );
+			s = va("%s"S_COLOR_WHITE" %s %s", cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString("MP_INGAME", "SPECHUD_VERSUS"), cgs.clientinfo[cgs.duelist2].name );
 		}
 		/*w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 		x = ( SCREEN_WIDTH - w ) / 2;
@@ -415,7 +415,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 				else if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_SPECTATOR )
 					specCount++;
 			}
-			s = va( "Players: ^2%i^7/^2%i ^7(^1%i^7/^5%i^7) - %i spectators", cg.numScores, cgs.maxclients, redCount, blueCount, specCount );
+			s = va( "Players: "S_COLOR_GREEN"%i"S_COLOR_WHITE"/"S_COLOR_GREEN"%i "S_COLOR_WHITE"("S_COLOR_RED"%i"S_COLOR_WHITE"/"S_COLOR_CYAN"%i"S_COLOR_WHITE") - %i spectators", cg.numScores, cgs.maxclients, redCount, blueCount, specCount );
 		}
 		else
 		{

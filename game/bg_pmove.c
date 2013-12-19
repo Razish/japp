@@ -3838,9 +3838,9 @@ static void PM_WalkMove( void ) {
 	if (pm->ps->clientNum >= MAX_CLIENTS)
 	{
 #ifdef _GAME
-		Com_Printf("^1S: %f, %f\n", wishspeed, pm->ps->speed);
+		Com_Printf(S_COLOR_RED"S: %f, %f\n", wishspeed, pm->ps->speed);
 #else
-		Com_Printf("^2C: %f, %f\n", wishspeed, pm->ps->speed);
+		Com_Printf(S_COLOR_GREEN"C: %f, %f\n", wishspeed, pm->ps->speed);
 #endif
 	}
 	*/
@@ -10934,9 +10934,9 @@ void PmoveSingle (pmove_t *pmove) {
 	if (pm->ps->clientNum >= MAX_CLIENTS)
 	{
 #ifdef _GAME
-		Com_Printf( "^1 SERVER N%i msec %d\n", pm->ps->clientNum, pml.msec );
+		Com_Printf( S_C0LOR_RED" SERVER N%i msec %d\n", pm->ps->clientNum, pml.msec );
 #else
-		Com_Printf( "^2 CLIENT N%i msec %d\n", pm->ps->clientNum, pml.msec );
+		Com_Printf( S_COLOR_GREEN" CLIENT N%i msec %d\n", pm->ps->clientNum, pml.msec );
 #endif
 	}
 	*/

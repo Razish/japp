@@ -824,7 +824,7 @@ void CG_AddRadarEnt(centity_t *cent)
 	if (cg.radarEntityCount == ARRAY_LEN( cg.radarEntities ) )
 	{	
 #ifdef _DEBUG
-		Com_Printf( "^3Warning: CG_AddRadarEnt full. (%d max)\n", ARRAY_LEN( cg.radarEntities ) );
+		Com_Printf( S_COLOR_YELLOW"Warning: CG_AddRadarEnt full. (%d max)\n", ARRAY_LEN( cg.radarEntities ) );
 #endif
 		return;
 	}
@@ -836,7 +836,7 @@ void CG_AddBracketedEnt(centity_t *cent)
 	if (cg.bracketedEntityCount == ARRAY_LEN( cg.bracketedEntities ) )
 	{	
 #ifdef _DEBUG
-		Com_Printf( "^3Warning: CG_AddBracketedEnt full. (%d max)\n", ARRAY_LEN( cg.bracketedEntities ) );
+		Com_Printf( S_COLOR_YELLOW"Warning: CG_AddBracketedEnt full. (%d max)\n", ARRAY_LEN( cg.bracketedEntities ) );
 #endif
 		return;
 	}
@@ -3718,15 +3718,15 @@ defaultoffsetposition:
 	else
 	{
 		if (type[0])
-			Com_Printf("^3Warning: \"%s\" is an invalid ROFF notetrack function\n", type);
+			Com_Printf(S_COLOR_YELLOW"Warning: \"%s\" is an invalid ROFF notetrack function\n", type);
 		else
-			Com_Printf("^3Warning: Notetrack is missing function and/or arguments\n");
+			Com_Printf(S_COLOR_YELLOW"Warning: Notetrack is missing function and/or arguments\n");
 	}
 
 	return;
 
 functionend:
-	Com_Printf("^3Type-specific notetrack error: %s\n", errMsg);
+	Com_Printf(S_COLOR_YELLOW"Type-specific notetrack error: %s\n", errMsg);
 	return;
 }
 

@@ -302,7 +302,7 @@ static int JPLua_Export_ResolveHostname( lua_State *L )
 	JPLua_Util_ArgAsString( L, &buf[0], sizeof( buf ) );
 
 	lua_pushnil( L );
-	lua_pushstring( L, "^1ResolveHostname is not supported by this version of JA++" );
+	lua_pushstring( L, S_COLOR_RED"ResolveHostname is not supported by this version of JA++" );
 	return 2;
 }
 
@@ -597,8 +597,8 @@ static const int cimportsSize = ARRAY_LEN( JPLua_CImports );
 // This error should never happen in a clean release version of JA++!
 static int CGLuaI_Error( lua_State *L )
 {
-	trap->Print( "^1*************** JA++ LUA ERROR ***************" );
-	trap->Print( "^1unprotected error in call to Lua API (%s)\n", lua_tostring(L,-1) );
+	trap->Print( S_COLOR_RED"*************** JA++ LUA ERROR ***************" );
+	trap->Print( S_COLOR_RED"unprotected error in call to Lua API (%s)\n", lua_tostring(L,-1) );
 	return 0;
 }
 
@@ -641,7 +641,7 @@ static void JPLua_PostInit( lua_State *L )
 	char folderList[16384] = {0}, *folderName = NULL;
 	int i=0, numFolders=0, folderLen=0;
 
-	trap->Print( "^5**************** ^3JA++ Lua (CL) is initialising ^5****************\n" );
+	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_YELLOW"JA++ Lua (CL) is initialising "S_COLOR_CYAN"****************\n" );
 	
 	JPLua_LoadFile( L, JPLUA_DIRECTORY"init"JPLUA_EXTENSION );
 	lua_getfield( L, LUA_GLOBALSINDEX, "JPLua" );
@@ -682,7 +682,7 @@ static void JPLua_PostInit( lua_State *L )
 		folderName += folderLen+1;
 	}
 
-	trap->Print( "^5**************** ^2JA++ Lua (CL) is initialised ^5****************\n" );
+	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_GREEN"JA++ Lua (CL) is initialised "S_COLOR_GREEN"****************\n" );
 
 	return;
 }

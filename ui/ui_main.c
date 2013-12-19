@@ -11468,20 +11468,20 @@ void JP_ParseFavServers( void )
 
 	if ( !f )
 	{//no file
-		Com_Printf( "^1failed! ^7(Can't find %s)\n", loadPath );
+		Com_Printf( S_COLOR_RED"failed! "S_COLOR_WHITE"(Can't find %s)\n", loadPath );
 		return;
 	}
 
 	if ( !len || len == -1 )
 	{//empty file
-		Com_Printf( "^1failed! ^7(%s is empty)\n", loadPath );
+		Com_Printf( S_COLOR_RED"failed! "S_COLOR_WHITE"(%s is empty)\n", loadPath );
 		trap->FS_Close( f );
 		return;
 	}
 
 	if ( (buf = (char*)malloc(len+1)) == 0 )
 	{
-		Com_Printf( "^1failed! ^7(Failed to allocate buffer)\n" );
+		Com_Printf( S_COLOR_RED"failed! "S_COLOR_WHITE"(Failed to allocate buffer)\n" );
 		return;
 	}
 
@@ -11502,7 +11502,7 @@ void JP_ParseFavServers( void )
 				break;
 		}
 		else
-			Com_Printf( "^1failed! ^7MAX_SERVERS reached!" );
+			Com_Printf( S_COLOR_RED"failed! "S_COLOR_WHITE"MAX_SERVERS reached!" );
 	}
 	free( buf );
 
@@ -11518,7 +11518,7 @@ void JP_SaveFavServers( void )
 	fileHandle_t	f;
 	unsigned int	i;
 
-	Com_Printf( "^5JA++ Saving favourite servers...\n" );
+	Com_Printf( S_COLOR_CYAN"JA++ Saving favourite servers...\n" );
 	Com_sprintf( loadPath, sizeof( loadPath ), "favourites.dat" );
 	len = trap->FS_Open( loadPath, &f, FS_WRITE );
 

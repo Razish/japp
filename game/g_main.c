@@ -2726,7 +2726,7 @@ void CheckReady( void ) {
 		static int lastPrint = 0;
 		if ( lastPrint < level.time-g_warmupPrintDelay.integer ) {
 			char msg[MAX_STRING_CHARS/2] = {0};
-			Com_sprintf( msg, sizeof( msg ), "^2Waiting for players to ready up!\n%i more needed\n\nType /ready", ((level.numConnectedClients+1)/2)-readyCount, level.numConnectedClients );
+			Com_sprintf( msg, sizeof( msg ), S_COLOR_GREEN"Waiting for players to ready up!\n%i more needed\n\nType /ready", ((level.numConnectedClients+1)/2)-readyCount, level.numConnectedClients );
 			trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
 			Com_Printf( "%s\n", msg );
 			lastPrint = level.time;

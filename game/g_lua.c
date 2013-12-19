@@ -411,8 +411,8 @@ static const int cimportsSize = ARRAY_LEN( JPLua_CImports );
 // This error should never happen in a clean release version of JA++!
 static int JPLuaI_Error( lua_State *L )
 {
-	Com_Printf( "^1*************** JA++ LUA ERROR ***************" );
-	Com_Printf( "^1unprotected error in call to Lua API (%s)\n", lua_tostring(L,-1) );
+	Com_Printf( S_COLOR_RED"*************** JA++ LUA ERROR ***************" );
+	Com_Printf( S_COLOR_RED"unprotected error in call to Lua API (%s)\n", lua_tostring(L,-1) );
 	return 0;
 }
 
@@ -455,7 +455,7 @@ static void JPLua_PostInit( lua_State *L )
 	char folderList[16384] = {0}, *folderName = NULL;
 	int i=0, numFolders=0, folderLen=0;
 
-	trap->Print( "^5**************** ^3JA++ Lua (SV) is initialising ^5****************\n" );
+	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_YELLOW"JA++ Lua (SV) is initialising "S_COLOR_CYAN"****************\n" );
 	
 	JPLua_LoadFile( L, JPLUA_DIRECTORY"init"JPLUA_EXTENSION );
 	lua_getfield( L, LUA_GLOBALSINDEX, "JPLua" );
@@ -496,7 +496,7 @@ static void JPLua_PostInit( lua_State *L )
 		folderName += folderLen+1;
 	}
 
-	trap->Print( "^5**************** ^2JA++ Lua (SV) is initialised ^5****************\n" );
+	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_GREEN"JA++ Lua (SV) is initialised "S_COLOR_CYAN"****************\n" );
 
 	return;
 }

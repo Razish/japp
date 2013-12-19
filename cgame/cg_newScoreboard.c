@@ -32,18 +32,18 @@ void DrawServerInformation( float fade )
 	switch ( cgs.gametype )
 	{
 	case GT_FFA:
-		if ( cgs.timelimit && cgs.fraglimit )	tmp = va( "Until ^3%i ^7frags or ^3%i^7/^3%i minutes", cgs.fraglimit, (cg.time-cgs.levelStartTime)/60000, cgs.timelimit );
-		else if ( cgs.timelimit )				tmp = va( "Until ^3%i^7/^3%i ^7minutes", (cg.time-cgs.levelStartTime)/60000, cgs.timelimit );
-		else if ( cgs.fraglimit )				tmp = va( "Until ^3%i ^7frags", cgs.fraglimit );
+		if ( cgs.timelimit && cgs.fraglimit )	tmp = va( "Until "S_COLOR_YELLOW"%i "S_COLOR_WHITE"frags or "S_COLOR_YELLOW"%i"S_COLOR_WHITE"/"S_COLOR_YELLOW"%i minutes", cgs.fraglimit, (cg.time-cgs.levelStartTime)/60000, cgs.timelimit );
+		else if ( cgs.timelimit )				tmp = va( "Until "S_COLOR_YELLOW"%i"S_COLOR_WHITE"/"S_COLOR_YELLOW"%i "S_COLOR_WHITE"minutes", (cg.time-cgs.levelStartTime)/60000, cgs.timelimit );
+		else if ( cgs.fraglimit )				tmp = va( "Until "S_COLOR_YELLOW"%i "S_COLOR_WHITE"frags", cgs.fraglimit );
 		else									tmp = "Playing forever!";
 		trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 		y += lineHeight*2;
 		break;
 	case GT_CTF:
 	case GT_CTY:
-		if ( cgs.timelimit && cgs.capturelimit )	tmp = va( "Until ^3%i^7/^3%i ^7captures or ^3%i^7/^3%i minutes", max(cgs.scores1, cgs.scores2), cgs.capturelimit, (cg.time-cgs.levelStartTime)/60000, cgs.timelimit );
-		else if ( cgs.timelimit )					tmp = va( "Until ^3%i^7/^3%i ^7minutes", (cg.time-cgs.levelStartTime)/60000, cgs.timelimit );
-		else if ( cgs.capturelimit )				tmp = va( "Until ^3%i^7/^3%i ^7captures", max(cgs.scores1, cgs.scores2), cgs.capturelimit );
+		if ( cgs.timelimit && cgs.capturelimit )	tmp = va( "Until "S_COLOR_YELLOW"%i"S_COLOR_WHITE"/"S_COLOR_YELLOW"%i "S_COLOR_WHITE"captures or "S_COLOR_YELLOW"%i"S_COLOR_WHITE"/"S_COLOR_YELLOW"%i minutes", max(cgs.scores1, cgs.scores2), cgs.capturelimit, (cg.time-cgs.levelStartTime)/60000, cgs.timelimit );
+		else if ( cgs.timelimit )					tmp = va( "Until "S_COLOR_YELLOW"%i"S_COLOR_WHITE"/"S_COLOR_YELLOW"%i "S_COLOR_WHITE"minutes", (cg.time-cgs.levelStartTime)/60000, cgs.timelimit );
+		else if ( cgs.capturelimit )				tmp = va( "Until "S_COLOR_YELLOW"%i"S_COLOR_WHITE"/"S_COLOR_YELLOW"%i "S_COLOR_WHITE"captures", max(cgs.scores1, cgs.scores2), cgs.capturelimit );
 		else										tmp = "Playing forever!";
 		trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 		y += lineHeight*2;
@@ -51,28 +51,28 @@ void DrawServerInformation( float fade )
 	case GT_TEAM:
 		if ( cgs.scores1 == cgs.scores2 )
 		{
-			tmp = "^3Teams are tied";
+			tmp = S_COLOR_YELLOW"Teams are tied";
 			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
-			tmp = va( "^1%i ^7/ ^5%i", cgs.scores1, cgs.scores2 );
+			tmp = va( S_COLOR_RED"%i "S_COLOR_WHITE"/ "S_COLOR_CYAN"%i", cgs.scores1, cgs.scores2 );
 			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
 		}
 		else if ( cgs.scores1 > cgs.scores2 )
 		{
-			tmp = "^1Red ^7leads";
+			tmp = S_COLOR_RED"Red "S_COLOR_WHITE"leads";
 			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
-			tmp = va( "^1%i ^7/ ^5%i", cgs.scores1, cgs.scores2 );
+			tmp = va( S_COLOR_RED"%i "S_COLOR_WHITE"/ "S_COLOR_CYAN"%i", cgs.scores1, cgs.scores2 );
 			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
 		}
 		else
 		{
-			tmp = "^5Blue ^7leads";
+			tmp = S_COLOR_CYAN"Blue "S_COLOR_WHITE"leads";
 			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
-			tmp = va( "^5%i ^7/ ^1%i", cgs.scores2, cgs.scores1 );
+			tmp = va( S_COLOR_CYAN"%i "S_COLOR_WHITE"/ "S_COLOR_RED"%i", cgs.scores2, cgs.scores1 );
 			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeight;
 		}
@@ -155,16 +155,16 @@ void DrawPlayerCount_Team( float fade )
 
 	if ( cgs.scores1 >= cgs.scores2 )
 	{
-		tmp = va( "^1%i players ^7(%3i avg ping)", redCount, pingAvgRed );
+		tmp = va( S_COLOR_RED"%i players "S_COLOR_WHITE"(%3i avg ping)", redCount, pingAvgRed );
 		trap->R_Font_DrawString( width/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
-		tmp = va( "^5%i players ^7(%3i avg ping)", blueCount, pingAvgBlue );
+		tmp = va( S_COLOR_CYAN"%i players "S_COLOR_WHITE"(%3i avg ping)", blueCount, pingAvgBlue );
 		trap->R_Font_DrawString( width + width/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
 	}
 	else
 	{
-		tmp = va( "^5%i players ^7(%i avg ping)", blueCount, pingAvgBlue );
+		tmp = va( S_COLOR_CYAN"%i players "S_COLOR_WHITE"(%i avg ping)", blueCount, pingAvgBlue );
 		trap->R_Font_DrawString( width/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
-		tmp = va( "^1%i players ^7(%i avg ping)", redCount, pingAvgRed );
+		tmp = va( S_COLOR_RED"%i players "S_COLOR_WHITE"(%i avg ping)", redCount, pingAvgRed );
 		trap->R_Font_DrawString( width + width/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle, -1, fontScale );
 	}
 

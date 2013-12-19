@@ -2980,7 +2980,6 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 //			cg_entities[i].currentState.solid = savedSolid[i];
 
 	// decide on third person view
-//	Com_Printf( "^3JA++: Setting cg.renderingThirdPerson from %i to %i\n", cg.renderingThirdPerson, cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0) );
 	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
 
 	if (cg.snap->ps.stats[STAT_HEALTH] > 0)

@@ -1969,7 +1969,7 @@ void CG_BuildSpectatorString(void) {
 	for ( i=0; i<cg.numScores; i++ )
 	{
 		if ( cg.scores[i].team == TEAM_SPECTATOR )
-			Q_strcat( cg.scoreboard.spectatorList, sizeof( cg.scoreboard.spectatorList ), va( "^7%s  ", cgs.clientinfo[cg.scores[i].client].name ) );
+			Q_strcat( cg.scoreboard.spectatorList, sizeof( cg.scoreboard.spectatorList ), va( S_COLOR_WHITE"%s  ", cgs.clientinfo[cg.scores[i].client].name ) );
 	}
 
 	i = strlen( cg.scoreboard.spectatorList );
@@ -3494,16 +3494,16 @@ Ghoul2 Insert End
 					RegCloseKey( hkey );
 				}
 				else
-					Com_Printf( "^1Error, couldn't query registry string %s, error code %i\n", "sTimeFormat", error );
+					Com_Printf( S_COLOR_RED"Error, couldn't query registry string %s, error code %i\n", "sTimeFormat", error );
 			}
 			else
-				Com_Printf( "^1Error, couldn't open registry key %s, error code %i\n", JP_TIMESTAMP_REGISTRY_KEY, error );
+				Com_Printf( S_COLOR_RED"Error, couldn't open registry key %s, error code %i\n", JP_TIMESTAMP_REGISTRY_KEY, error );
 		}
 	#endif
 
 	trap->Cvar_VariableStringBuffer( "rate", buf, sizeof( buf ) );
 	if ( atoi( buf ) == 4000 )
-		trap->Print( "^3WARNING: Default /rate value detected. Suggest typing /rate 25000 for a smoother connection!\n" );
+		trap->Print( S_COLOR_YELLOW"WARNING: Default /rate value detected. Suggest typing /rate 25000 for a smoother connection!\n" );
 }
 
 //makes sure returned string is in localized format

@@ -372,13 +372,13 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		unsigned int i = 0;
 		netadr_t netAddr = { 0 };
 
-		Com_Printf( "^3%-32s%-32sIP\n", "Name", "Address" );
+		Com_Printf( S_COLOR_YELLOW"%-32s%-32sIP\n", "Name", "Address" );
 		for ( i=0; i<uiLocal.serversCount; i++ )
 		{
 			if ( ENG_NET_StringToAddr( uiLocal.servers[i].ip, &netAddr ) )
-				Com_Printf( "^7%-32s%-32s%i.%i.%i.%i:%i\n", uiLocal.servers[i].name, uiLocal.servers[i].ip, netAddr.ip[0], netAddr.ip[1], netAddr.ip[2], netAddr.ip[3], BigShort( netAddr.port ) );
+				Com_Printf( S_COLOR_WHITE"%-32s%-32s%i.%i.%i.%i:%i\n", uiLocal.servers[i].name, uiLocal.servers[i].ip, netAddr.ip[0], netAddr.ip[1], netAddr.ip[2], netAddr.ip[3], BigShort( netAddr.port ) );
 			else
-				Com_Printf( "^7%-32s%-32s^1Could not resolve address\n", uiLocal.servers[i].name, uiLocal.servers[i].ip );
+				Com_Printf( S_COLOR_WHITE"%-32s%-32s"S_COLOR_RED"Could not resolve address\n", uiLocal.servers[i].name, uiLocal.servers[i].ip );
 		}
 		Com_Printf( "\n" );
 		return qtrue;
@@ -395,7 +395,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		Q_strncpyz( serverAddrBuf, UI_Argv( 2 ), sizeof( serverAddrBuf ) );
 
 		if ( trap->Cmd_Argc() < 3 ) {
-			Com_Printf( "^3Usage: japp_favsrv_add [name] [ip or hostname or ! for current server] [optional admin password]\n" );
+			Com_Printf( S_COLOR_YELLOW"Usage: japp_favsrv_add [name] [ip or hostname or ! for current server] [optional admin password]\n" );
 		}
 		else
 		{
@@ -425,7 +425,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 				{
 					if ( ENG_NET_StringToAddr( uiLocal.servers[i].ip, &netAddr ) && targetIP == *(unsigned int*)&netAddr.ip[0] && targetPort == BigShort( netAddr.port ) )
 					{//Same IP and port
-						Com_Printf( "Favourite server IP already found (name: ^5%s^7, addr: ^5%s^7, ip: ^5%i.%i.%i.%i:%i^7)\n", uiLocal.servers[i].name, uiLocal.servers[i].ip, netAddr.ip[0], netAddr.ip[1], netAddr.ip[2], netAddr.ip[3], BigShort( netAddr.port ) );
+						Com_Printf( "Favourite server IP already found (name: "S_COLOR_CYAN"%s"S_COLOR_WHITE", addr: "S_COLOR_CYAN"%s"S_COLOR_WHITE", ip: "S_COLOR_CYAN"%i.%i.%i.%i:%i"S_COLOR_WHITE")\n", uiLocal.servers[i].name, uiLocal.servers[i].ip, netAddr.ip[0], netAddr.ip[1], netAddr.ip[2], netAddr.ip[3], BigShort( netAddr.port ) );
 						return qtrue;
 					}
 					if ( !Q_stricmp( serverName, uiLocal.servers[i].name ) || !Q_stricmp( serverAddress, uiLocal.servers[i].ip ) )

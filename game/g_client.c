@@ -2024,7 +2024,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		ent->userinfoChanged = level.time;
 
 		if ( ent->userinfoSpam > 12 ) {
-			trap->SendServerCommand( ent-g_entities, va( "print \"^3Userinfo changing too fast. Ignored.\n\"" ) );
+			trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_YELLOW"Userinfo changing too fast. Ignored.\n\"" ) );
 			return qfalse;
 		}
 		ent->userinfoSpam++;
@@ -2262,7 +2262,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	s = Info_ValueForKey( userinfo, "snaps" );
 	if ( atoi( s ) < sv_fps.integer )
-		trap->SendServerCommand( clientNum, va( "print \"^3Recommend setting /snaps %d or higher to match this server's sv_fps\n\"", sv_fps.integer ) );
+		trap->SendServerCommand( clientNum, va( "print \""S_COLOR_YELLOW"Recommend setting /snaps %d or higher to match this server's sv_fps\n\"", sv_fps.integer ) );
 
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds

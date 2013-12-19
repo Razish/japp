@@ -93,7 +93,7 @@ void G_ShuffleTeams(void)
 		}
 	}
 
-	trap->SendServerCommand( -1, "cp \"^1Teams have been shuffled!\n\"");
+	trap->SendServerCommand( -1, "cp \""S_COLOR_RED"Teams have been shuffled!\n\"");
 }
 
 char *ConcatArgs( int start );
@@ -268,8 +268,8 @@ static void SV_BotList_f( void ) {
 
 static void SV_Cointoss_f( void ) {
 	qboolean heads = !!(Q_irand( 0, QRAND_MAX-1 )&1);
-	trap->SendServerCommand( -1, va( "cp \"Cointoss result: %s\n\"", heads ? "^2HEADS" : "^3TAILS" ) );
-	G_LogPrintf( "Cointoss result: %s\n", heads ? "^2HEADS" : "^3TAILS" );
+	trap->SendServerCommand( -1, va( "cp \"Cointoss result: %s\n\"", heads ? S_COLOR_GREEN"HEADS" : S_COLOR_YELLOW"TAILS" ) );
+	G_LogPrintf( "Cointoss result: %s\n", heads ? S_COLOR_GREEN"HEADS" : S_COLOR_YELLOW"TAILS" );
 }
 
 static void SV_EntityList_f( void ) {
