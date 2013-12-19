@@ -2036,6 +2036,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		G_SecurityLogPrintf( "Client %d (%s) failed userinfo validation: %s [IP: %s]\n", clientNum,
 			Info_ValueForKey( userinfo, "name" ), s, client->sess.IP );
 		trap->DropClient( clientNum, va( "Failed userinfo validation: %s", s ) );
+		G_LogPrintf( "Userinfo: %s\n", userinfo );
 		return qfalse;
 	}
 
