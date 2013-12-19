@@ -4131,6 +4131,86 @@ static void Cmd_Origin_f( gentity_t *ent ) {
 		vtos( &targ->client->ps.viewangles ) ) );
 }
 
+static void Cmd_Saber_f( gentity_t *ent ) {
+	int argc = trap->Argc();
+	int numSabers = 1;
+
+	if ( Q_stricmp( ent->client->pers.saber2, "none" ) )
+		numSabers++;
+
+	if ( argc == 1 ) {
+		if ( numSabers == 1 )
+			trap->SendServerCommand( ent-g_entities, va( "print \"Saber is %s\n\"", ent->client->pers.saber1 ) );
+		else
+			trap->SendServerCommand( ent-g_entities, va( "print \"Sabers are %s and %s\n\"", ent->client->pers.saber1, ent->client->pers.saber2 ) );
+	}
+	else if ( !(japp_allowSaberSwitch.integer & (1<<level.gametype)) ) {
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Not allowed to change saber\n\"" );
+		return;
+	}
+	else {
+		char saber1[MAX_TOKEN_CHARS], saber2[MAX_TOKEN_CHARS];
+		char *saber, *key, *value, userinfo[MAX_INFO_STRING];
+		int i;
+
+		// first saber
+		trap->Argv( 1, saber1, sizeof( saber1 ) );
+		trap->SendServerCommand( ent-g_entities, va( "print \"Setting first saber to %s\n\"", saber1 ) );
+
+		// second saber if specified
+		if ( argc == 3 ) {
+			trap->Argv( 2, saber2, sizeof( saber2 ) );
+			trap->SendServerCommand( ent-g_entities, va( "print \"Setting second saber to %s\n\"", saber2 ) );
+		}
+		else
+			Q_strncpyz( saber2, "none", sizeof( saber2 ) );
+
+		trap->GetUserinfo( ent-g_entities, userinfo, sizeof( userinfo ) );
+
+		G_SetSaber( ent, 0, saber1, qfalse );
+		G_SetSaber( ent, 1, saber2, qfalse );
+
+		if ( !ClientUserinfoChanged( ent-g_entities ) )
+			return;
+
+		// make sure the saber models are updated
+		G_SaberModelSetup( ent );
+
+		for ( i=0; i<MAX_SABERS; i++ ) {
+			saber = (i&1) ? ent->client->pers.saber2 : ent->client->pers.saber1;
+			key = va( "saber%d", i+1 );
+			value = Info_ValueForKey( userinfo, key );
+			if ( Q_stricmp( value, saber ) )
+			{// they don't match up, force the user info
+				Info_SetValueForKey( userinfo, key, saber );
+				trap->SetUserinfo( ent-g_entities, userinfo );
+			}
+		}
+
+		// dual
+		if ( ent->client->saber[0].model[0] && ent->client->saber[1].model[0] )
+			ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_DUAL;
+		// staff
+		else if ( (ent->client->saber[0].saberFlags&SFL_TWO_HANDED) )
+			ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_STAFF;
+		else {
+			ent->client->sess.saberLevel = Com_Clampi( SS_FAST, SS_STRONG, ent->client->sess.saberLevel );
+			ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel;
+
+			// limit our saber style to our force points allocated to saber offense
+			if ( level.gametype != GT_SIEGE && ent->client->ps.fd.saberAnimLevel > ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] )
+				ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel = ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE];
+		}
+		// let's just make sure the styles we chose are cool
+		if ( level.gametype != GT_SIEGE ) {
+			if ( !WP_SaberStyleValidForSaber( &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, ent->client->ps.fd.saberAnimLevel ) ) {
+				WP_UseFirstValidSaberStyle( &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, &ent->client->ps.fd.saberAnimLevel );
+				ent->client->ps.fd.saberAnimLevelBase = ent->client->saberCycleQueue = ent->client->ps.fd.saberAnimLevel;
+			}
+		}
+	}
+}
+
 #define CMDFLAG_NOINTERMISSION	0x0001
 #define CMDFLAG_CHEAT			0x0002
 #define CMDFLAG_ALIVE			0x0004
@@ -4182,6 +4262,7 @@ command_t commands[] = {
 	{ "npc",				Cmd_NPC_f,					GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE },
 	{ "origin",				Cmd_Origin_f,				GTB_ALL,					0 }, // Raz: added
 	{ "ready",				Cmd_Ready_f	,				GTB_ALL,					CMDFLAG_NOINTERMISSION }, //Raz: added
+	{ "saber",				Cmd_Saber_f,				GTB_ALL,					0 }, //Raz: added
 	{ "sabercolor",			Cmd_Sabercolor_f,			GTB_ALL,					0 }, //Raz: added
 	{ "say",				Cmd_Say_f,					GTB_ALL,					0 },
 	{ "say_team",			Cmd_SayTeam_f,				GTB_ALL,					0 },

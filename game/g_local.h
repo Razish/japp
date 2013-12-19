@@ -1598,3 +1598,4 @@ qboolean	Client_Supports					( gentity_t *ent, unsigned int supportFlag );
 void		G_ClearVote						( gentity_t *ent );
 void		SV_ToggleUserinfoValidation_f	( void );
 qboolean	G_CallSpawn						( gentity_t *ent );
+qboolean	G_SaberModelSetup				( gentity_t *ent );
