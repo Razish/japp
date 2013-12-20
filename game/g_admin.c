@@ -667,7 +667,6 @@ static void AM_Teleport( gentity_t *ent )
 		}
 	}
 
-	//RAZTODO:
 	else if ( trap->Argc() == 3 )
 	{//2 args mean we're teleporting x to y (client -> client, client -> telemark)
 		char	arg1[64];
@@ -772,8 +771,6 @@ static void AM_Teleport( gentity_t *ent )
 		}
 
 	}
-
-	//RAZTODO: Coords
 }
 
 static void AM_GunTeleport( gentity_t *ent )
@@ -934,8 +931,8 @@ static void AM_SeeTelemarks( gentity_t *ent )
 	level.adminData.teleMarksVisual = !level.adminData.teleMarksVisual;
 }
 
-static void AM_SaveTelemarks( gentity_t *ent )
-{//Save marked positions RAZFIXME: Temporary?
+static void AM_SaveTelemarks( gentity_t *ent ) {
+	//Save marked positions
 	AM_TM_SaveTelemarks();
 }
 

@@ -859,25 +859,48 @@ PM_AddTouchEnt
 ===============
 */
 void PM_AddTouchEnt( int entityNum ) {
-	int		i;
+	int i;
 
-	if ( entityNum == ENTITYNUM_WORLD ) {
+	if ( entityNum == ENTITYNUM_WORLD )
 		return;
-	}
-	if ( pm->numtouch == MAXTOUCH ) {
+
+	if ( pm->numtouch == MAXTOUCH )
 		return;
-	}
 
 #ifdef _GAME
 	if ( ((gentity_t *)pm_entSelf)->client->pers.adminData.isGhost )
 		return;
 #endif
 
-	// see if it is already added
-	for ( i = 0 ; i < pm->numtouch ; i++ ) {
-		if ( pm->touchents[ i ] == entityNum ) {
+	// duel isolation
+#if 0 // redundant, handled in g_active and cg_predict before Pmove
+	if ( entityNum <= MAX_CLIENTS ) {
+		qboolean selfDueling = pm->ps->duelInProgress;
+		int selfDuelist = pm->ps->duelIndex;
+		int selfNum = pm_entSelf->s.number;
+#ifdef _GAME
+		gentity_t *other = &g_entities[entityNum];
+		qboolean themDueling = other->client->ps.duelInProgress;
+		int themDuelist = other->client->ps.duelIndex;
+#else // _CGAME
+		qboolean themDueling = cg_entities[entityNum].currentState.bolt1;
+		int themDuelist = 9001; // pretend they're never dueling with us
+#endif
+
+		// we're dueling, but not with them
+		if ( selfDueling && entityNum != selfDuelist )
 			return;
-		}
+
+		// they're dueling, but not with us
+		if ( themDueling && themDuelist != selfNum )
+			return;
+	}
+#endif
+
+	// see if it is already added
+	for ( i=0; i<pm->numtouch; i++ ) {
+		if ( pm->touchents[i] == entityNum )
+			return;
 	}
 
 	// add it

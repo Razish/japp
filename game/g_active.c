@@ -3103,13 +3103,46 @@ void ClientThink_real( gentity_t *ent ) {
 
 	{
 		int savedMask = pm.tracemask;
+		int i;
+		gentity_t *other = NULL;
 		if ( ent->client->pers.adminData.isGhost )
 		{
 			pm.tracemask = CONTENTS_SOLID;
 			ent->r.contents = 0;
 		}
 
-		Pmove (&pm);
+		for ( i=0, other=g_entities; i<level.numConnectedClients; i++, other++ ) {
+			if ( i != ent-g_entities ) {
+				qboolean selfDueling = ent->client->ps.duelInProgress;
+				int selfDuelist = ent->client->ps.duelIndex;
+				int selfNum = ent->s.number;
+				qboolean themDueling = other->client->ps.duelInProgress;
+				int themDuelist = other->client->ps.duelIndex;
+
+				if ( (selfDueling && i != selfDuelist) || (themDueling && themDuelist != selfNum) ) {
+					other->savedContents = other->r.contents;
+					other->r.contents = 0;
+					trap->LinkEntity( (sharedEntity_t *)other );
+				}
+			}
+		}
+
+		Pmove( &pm );
+
+		for ( i=0, other=g_entities; i<level.numConnectedClients; i++, other++ ) {
+			if ( i != ent-g_entities ) {
+				qboolean selfDueling = ent->client->ps.duelInProgress;
+				int selfDuelist = ent->client->ps.duelIndex;
+				int selfNum = ent->s.number;
+				qboolean themDueling = other->client->ps.duelInProgress;
+				int themDuelist = other->client->ps.duelIndex;
+
+				if ( (selfDueling && i != selfDuelist) || (themDueling && themDuelist != selfNum) ) {
+					other->r.contents = other->savedContents;
+					trap->LinkEntity( (sharedEntity_t *)other );
+				}
+			}
+		}
 
 		pm.tracemask = savedMask;
 	}

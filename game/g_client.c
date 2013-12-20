@@ -2203,6 +2203,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	//Raz: only set the saber name on the first connect.
 	//		it will be read from userinfo on ClientSpawn and stored in client->pers.saber1/2
+	//RAZTODO: instantly switch optionally?
 	if ( !VALIDSTRING( client->pers.saber1 ) || !VALIDSTRING( client->pers.saber2 ) )
 	{
 		G_SetSaber( ent, 0, Info_ValueForKey( userinfo, "saber1" ), qfalse );

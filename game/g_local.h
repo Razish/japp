@@ -386,6 +386,8 @@ struct gentity_s {
 	int jpModelScaleTimeEnd;
 
 	qboolean jpSpawned;
+
+	int savedContents;
 };
 
 #define DAMAGEREDIRECT_HEAD		1
