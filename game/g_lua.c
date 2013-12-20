@@ -360,23 +360,8 @@ static int JPLua_RegisterPlugin( lua_State *L )
 	return 1;
 }
 
-//I'm just going to put my funcs here, kay? kay. Move them if you don't want them there. -Not AstralSerpent
-
-static int JPLua_Export_PrintToChat( lua_State *L )
-{
-	trap->SendServerCommand( lua_tointeger(L, 1), va("chat \"%s\"", lua_tostring(L, 2) ) );
-	return 0;
-}
-
-static int JPLua_Export_PrintToCenter( lua_State *L )
-{
-	trap->SendServerCommand( lua_tointeger(L, 1), va("cp \"%s\"", lua_tostring(L, 2) ) );
-	return 0;
-}
-
-static int JPLua_Export_PrintToConsole( lua_State *L )
-{
-	trap->SendServerCommand( lua_tointeger(L, 1), va("print \"%s\n\"", lua_tostring(L, 2) ) );
+static int JPLua_Export_SendReliableCommand( lua_State *L ) {
+	trap->SendServerCommand( lua_tointeger( L, 1 ), lua_tostring( L, 2 ) );
 	return 0;
 }
 
@@ -399,9 +384,7 @@ static const jplua_cimport_table_t JPLua_CImports[] =
 	{ "RayTrace", JPLua_Export_Trace }, // traceResult Trace( stuff )
 
 	//Communication
-	{ "PrintToChat", JPLua_Export_PrintToChat }, 
-	{ "PrintToCenter", JPLua_Export_PrintToCenter }, //'MERRICA! FUCK NO~! 
-	{ "PrintToConsole", JPLua_Export_PrintToConsole }
+	{ "SendReliableCommand", JPLua_Export_SendReliableCommand } // SendReliableCommand( integer clientNum, string cmd )
 };
 
 static const int cimportsSize = ARRAY_LEN( JPLua_CImports );
