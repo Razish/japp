@@ -153,6 +153,7 @@ XCVAR_DEF( japp_antiUserinfoFlood,			"1",					NULL,			CVAR_NONE,										qfalse
 XCVAR_DEF( japp_charRestrictRGB,			"0",					NULL,			CVAR_NONE,										qfalse )
 XCVAR_DEF( japp_chatProtection,				"0",					NULL,			CVAR_NONE,										qtrue )
 XCVAR_DEF( japp_damageNotifications,		"0",					NULL,			CVAR_NONE,										qfalse )
+XCVAR_DEF( japp_empowerDrain,				"1",					NULL,			CVAR_NONE,										qfalse )
 XCVAR_DEF( japp_fallToDeathInstant,			"0",					NULL,			CVAR_NONE,										qfalse )
 XCVAR_DEF( japp_hookSpeed,					"800",					NULL,			CVAR_NONE,										qfalse )
 XCVAR_DEF( japp_itemDropStyle,				"1",					NULL,			CVAR_NONE,										qfalse )
