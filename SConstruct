@@ -69,6 +69,7 @@ files['lua'] = [
 	'lua/print.c' ]
 
 files['game'] = [
+	'shared/JAPP/jp_crash.c',
 	'shared/JAPP/jp_promode.c',
 	'shared/JAPP/jp_tokenparser.c',
 	'shared/json/cJSON.c',
@@ -103,7 +104,6 @@ files['game'] = [
 	'game/g_clientModification.c',
 	'game/g_cmds.c',
 	'game/g_combat.c',
-	'game/g_crash.c',
 	'game/g_exphysics.c',
 	'game/g_ICARUScb.c',
 	'game/g_items.c',
@@ -243,6 +243,7 @@ files['cgame'] = [
 	'cgame/fx_rocketlauncher.c' ] + files['lua']
 
 files['ui'] = [
+	'shared/JAPP/jp_crash.c',
 	'game/bg_misc.c',
 	'game/bg_saga.c',
 	'game/bg_vehicleLoad.c',

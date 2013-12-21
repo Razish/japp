@@ -12,6 +12,14 @@
 
 #if QARCH == 64
 
+// wat do?
+
+void ActivateCrashHandler( void ) {
+}
+
+void DeactivateCrashHandler( void ) {
+}
+
 #elif QARCH == 32
 
 #ifdef _MSC_VER
@@ -26,7 +34,7 @@ int	bCrashing = 0;
 
 #include <time.h>
 #include "qcommon/disablewarnings.h"
-#include "g_crash.h"
+#include "shared/JAPP/jp_crash.h"
 #include "g_local.h"
 
 #include <string.h>
@@ -977,16 +985,7 @@ static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*E
 	JKG_FS_WriteString("----------------------------------------\n"
 					   "            Extra Information\n"
 					   "----------------------------------------\n", f);
-#if 0
-	if (GLS_JampGameAvailable()) {
-		JKG_FS_WriteString(" - JampGame is loaded, obtaining extra information...\n\n", f);
-		GLS_ExtCrashInfo((int)f);
-	} else {
-		JKG_FS_WriteString(" - JampGame is NOT loaded, no further info available.\n\n", f);
-	}
-#else
 	JKG_ExtCrashInfo( (int)f );
-#endif
 	JKG_FS_WriteString("========================================\n"
 					   "             End of crash log\n"
 					   "========================================\n", f);
@@ -1024,11 +1023,11 @@ skip:
 }
 
 
-void ActivateCrashHandler() {
+void ActivateCrashHandler( void ) {
 	oldHandler = SetUnhandledExceptionFilter(UnhandledExceptionHandler_Failsafe);
 }
 
-void DeactivateCrashHandler() {
+void DeactivateCrashHandler( void ) {
 	if (!oldHandler) return;
 	SetUnhandledExceptionFilter(oldHandler);
 }
@@ -1462,16 +1461,7 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 	JKG_FS_WriteString("----------------------------------------\n"
 					   "            Extra Information\n"
 					   "----------------------------------------\n", f);
-#if 0
-	if (GLS_JampGameAvailable()) {
-		JKG_FS_WriteString(" - JampGame is loaded, obtaining extra information...\n\n", f);
-		GLS_ExtCrashInfo((int)f);
-	} else {
-		JKG_FS_WriteString(" - JampGame is NOT loaded, no further info available.\n\n", f);
-	}
-#else
 	JKG_ExtCrashInfo( (int)f );
-#endif
 	JKG_FS_WriteString("========================================\n"
 					   "             End of crash log\n"
 					   "========================================\n", f);
@@ -1494,7 +1484,7 @@ static __sighandler_t CTRLCHandler(int signal, struct sigcontext ctx) {
 	return 0;
 }
 
-void ActivateCrashHandler() {
+void ActivateCrashHandler( void ) {
 	struct sigaction act;
 	memset(&act, 0, sizeof(act));
 	memset(&oldact, 0, sizeof(oldact));
@@ -1511,7 +1501,7 @@ void ActivateCrashHandler() {
 	signal(SIGINT, (void *)CTRLCHandler);
 }
 
-void DeactivateCrashHandler() {
+void DeactivateCrashHandler( void ) {
 	if (!oldactsset) {
 		return;
 	}

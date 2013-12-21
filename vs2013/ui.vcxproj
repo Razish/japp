@@ -82,6 +82,7 @@
     <ClCompile Include="..\game\bg_weapons.c" />
     <ClCompile Include="..\game\q_math.c" />
     <ClCompile Include="..\game\q_shared.c" />
+    <ClCompile Include="..\shared\JAPP\jp_crash.c" />
     <ClCompile Include="..\shared\JAPP\jp_tokenparser.c" />
     <ClCompile Include="..\shared\json\cJSON.c" />
     <ClCompile Include="..\ui\ui_atoms.c" />

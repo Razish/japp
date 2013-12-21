@@ -77,6 +77,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\shared\JAPP\jp_crash.c" />
     <ClCompile Include="..\shared\JAPP\jp_promode.c" />
     <ClCompile Include="..\shared\JAPP\jp_tokenparser.c" />
     <ClCompile Include="..\shared\json\cJSON.c" />
@@ -110,7 +111,6 @@
     <ClCompile Include="..\game\g_client.c" />
     <ClCompile Include="..\game\g_cmds.c" />
     <ClCompile Include="..\game\g_combat.c" />
-    <ClCompile Include="..\game\g_crash.c" />
     <ClCompile Include="..\game\g_exphysics.c" />
     <ClCompile Include="..\game\g_ICARUScb.c" />
     <ClCompile Include="..\game\g_items.c" />

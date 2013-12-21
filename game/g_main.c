@@ -5,6 +5,7 @@
 #include "g_ICARUScb.h"
 #include "g_nav.h"
 #include "bg_saga.h"
+#include "shared/JAPP/jp_crash.h"
 
 level_locals_t	level;
 
@@ -249,6 +250,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	char		cs[MAX_INFO_STRING] = {0};
 	//[/RawMapName]
 
+	ActivateCrashHandler();
 
 	//Init RMG to 0, it will be autoset to 1 if there is terrain on the level.
 	trap->Cvar_Set("RMG", "0");
@@ -585,6 +587,8 @@ void G_ShutdownGame( int restart ) {
 	}
 
 	B_CleanupAlloc(); //clean up all allocations made with B_Alloc
+
+	DeactivateCrashHandler();
 }
 
 /*

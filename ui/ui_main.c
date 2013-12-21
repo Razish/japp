@@ -18,16 +18,15 @@ USER INTERFACE MAIN
 #include "ui_force.h"
 #include "cgame/animtable.h" //we want this to be compiled into the module because we access it in the shared module.
 #include "game/bg_saga.h"
-
 #include "cgame/holocronicons.h"
-
 #ifdef FAV_SERVERS
 	#include "JAPP/jp_tokenparser.h"
 #endif
-
 #if MAC_PORT
 	#include "macosx/jp_mac.h"
 #endif
+#include "shared/JAPP/jp_crash.h"
+
 
 extern void UI_SaberAttachToChar( itemDef_t *item );
 
@@ -1093,6 +1092,8 @@ void _UI_Shutdown( void ) {
 #ifdef FAV_SERVERS
 	JP_SaveFavServers();
 #endif
+
+	DeactivateCrashHandler();
 }
 
 char *defaultMenu = NULL;
@@ -10352,6 +10353,7 @@ void _UI_Init( qboolean inGameLoad ) {
 	}
 #endif
 
+	ActivateCrashHandler();
 
 	//register this freakin thing now
 //	vmCvar_t siegeTeamSwitch;
