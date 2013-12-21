@@ -135,6 +135,7 @@ void Cmd_DisAsmDirect_f() {
 }
 
 void JKG_ExtCrashInfo(int fileHandle) {
+#ifdef _GAME
 	char cs[1024];
 	// In case of a crash, the auxiliary library will write a report
 	// If jampgame is still loaded when the crash occours (and this is usually the case)
@@ -159,6 +160,9 @@ void JKG_ExtCrashInfo(int fileHandle) {
 		}
 		JKG_FS_WriteString("+--+------------------------------------+----+----------------------+\n",f);
 	}
+#else
+	// TODO: communicate with cgame for server info?
+#endif
 }
 
 static unsigned long DisasmBacktrace(unsigned char *block, unsigned long base, unsigned long size, unsigned long ip, int n) {
@@ -255,12 +259,12 @@ static const char *JKG_Crash_GetCrashlogName() {
 	time_t rawtime;
 
 	time( &rawtime );
-	strftime( buf, sizeof( buf ), "JAPP-SVCrashlog_%Y-%m-%d_%H-%M-%S.log", gmtime( &rawtime ) );
+	strftime( buf, sizeof( buf ), "JAPP-Crashlog_%Y-%m-%d_%H-%M-%S.log", gmtime( &rawtime ) );
 
 	return buf;
 }
 
-static void G_ForceQuit( void ) {
+static void JP_ForceQuit( void ) {
 	trap->Error( ERR_DROP, "Server crash\n" );
 }
 
@@ -954,8 +958,13 @@ static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*E
 	JKG_FS_WriteString("========================================\n"
 		               "             JA++ Crash Log\n"
 					   "========================================\n", f);
+#ifdef _GAME
 	JKG_FS_WriteString(va("Version: %s (Windows)\n", JAPP_SERVER_VERSION), f);
 	JKG_FS_WriteString(va("Side: Server-side\n"), f);
+#else
+	JKG_FS_WriteString(va("Version: %s (Windows)\n", JAPP_CLIENT_VERSION_CLEAN), f);
+	JKG_FS_WriteString(va("Side: Client-side\n"), f);
+#endif
 	JKG_FS_WriteString(va("Build Date/Time: %s %s\n", __DATE__, __TIME__), f);
 	
 	JKG_Crash_AddOSData(f);
@@ -992,8 +1001,8 @@ static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*E
 	trap->FS_Close( f );
 	SymCleanup( GetCurrentProcess() );
 	Com_Printf("Crash report finished, attempting to shut down...\n");
-	G_ForceQuit();	// This will call G_ShutdownGame and then shutdown the engine as well
-	// Generally speaking, we'll never get here, as G_ForceQuit will terminate the process
+	JP_ForceQuit();	// This will shutdown the engine as well
+	// Generally speaking, we'll never get here, as JP_ForceQuit will terminate the process
 	return 1;
 }
 
@@ -1425,13 +1434,22 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 
 	bCrashing = 1;
 	Com_Printf("------------------------------------------------------------\n");
+#ifdef _GAME
 	Com_Printf("Server crashed. Creating crash log %s...\n", filename);
+#else
+	Com_Printf("Client crashed. Creating crash log %s...\n", filename);
+#endif
 	trap->FS_Open( filename, &f, FS_WRITE );
 	JKG_FS_WriteString("========================================\n"
 		               "             JA++ Crash Log\n"
 					   "========================================\n", f);
+#ifdef _GAME
 	JKG_FS_WriteString(va("Version: %s (Linux)\n", JAPP_SERVER_VERSION), f);
 	JKG_FS_WriteString(va("Side: Server-side\n"), f);
+#else
+	JKG_FS_WriteString(va("Version: %s (Linux)\n", JAPP_CLIENT_VERSION_CLEAN), f);
+	JKG_FS_WriteString(va("Side: Client-side\n"), f);
+#endif
 	JKG_FS_WriteString(va("Build Date/Time: %s %s\n", __DATE__, __TIME__), f);
 	JKG_Crash_AddOSData(f);
 	JKG_Enum_MemoryMap();
@@ -1470,7 +1488,7 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 	JKG_Free_MemoryMap();
 	Com_Printf("Crash report finished, attempting to shut down...\n");
 	if (m_crashloop < 2) {	// If we crashed here before, skip the quit call
-		G_ForceQuit();	// This will call G_ShutdownGame and then shutdown the engine as well
+		JP_ForceQuit();	// This will shutdown the engine as well
 	}
 	// We'll never get here, but just in case, forward the call to the old crash handler if we DO get here
 	OldHandler = (void *)oldact[signal].sa_sigaction;
