@@ -2410,9 +2410,8 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	value = Info_ValueForKey( userinfo, "ip" );
 	Q_strncpyz( tmpIP, isBot ? "Bot" : value, sizeof( tmpIP ) );
 
-	if ( !isBot && firstTime )
-	{
-		//Raz: Check if they're really banned
+	if ( !isBot && firstTime && Q_stricmp( value, "localhost" ) ) {
+		//Raz: Check if they're banned
 		byteAlias_t *ba;
 		ba = BuildByteFromIP( value );
 		value = (char *)JKG_Bans_IsBanned( ba->b );

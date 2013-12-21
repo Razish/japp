@@ -430,7 +430,7 @@ byteAlias_t *BuildByteFromIP( const char *ip )
 	return &m;
 
 Faulty:
-	trap->Print( "Faulty IP\n" );
+	trap->Print( "Faulty IP: %s\n", ip );
 	m.ui = 0u;
 
 	return &m;
