@@ -94,29 +94,9 @@ qboolean NPC_StandTrackAndShoot (gentity_t *NPC, qboolean canDuck)
 	//First see if we're hurt bad- if so, duck
 	//FIXME: if even when ducked, we can shoot someone, we should.
 	//Maybe is can be shot even when ducked, we should run away to the nearest cover?
-	if ( canDuck )
-	{
-		if ( NPC->health < 20 )
-		{
-		//	if( NPC->svFlags&SVF_HEALING || random() )
-			if( random() )
-			{
-				duck_ok = qtrue;
-			}
-		}
-		else if ( NPC->health < 40 )
-		{
-//			if ( NPC->svFlags&SVF_HEALING )
-//			{//Medic is on the way, get down!
-//				duck_ok = qtrue;
-//			}
-			// no more borg
-///			if ( NPC->client->playerTeam!= TEAM_BORG )
-//			{//Borg don't care if they're about to die
-				//attack_scale will be a max of .66
-//				attack_scale = NPC->health/60;
-//			}
-		}
+	if ( canDuck ) {
+		if ( NPC->health < 20 && random() )
+			duck_ok = qtrue;
 	}
 
 	//NPC_CheckEnemy( qtrue, qfalse, qtrue );
@@ -148,7 +128,6 @@ qboolean NPC_StandTrackAndShoot (gentity_t *NPC, qboolean canDuck)
 
 		if ( duck_ok )
 		{//duck and don't shoot
-			attack_ok = qfalse;
 			ucmd.upmove = -127;
 			NPCInfo->duckDebounceTime = level.time + 1000;//duck for a full second
 		}
@@ -506,7 +485,6 @@ void NPC_BSPointShoot (qboolean shoot)
 	{//FIXME: should still keep shooting for a second or two after they actually die...
 		trap->ICARUS_TaskIDComplete( (sharedEntity_t *)NPC, TID_BSTATE );
 		goto finished;
-		return;
 	}
 
 	CalcEntitySpot(NPC, SPOT_WEAPON, &muzzle);

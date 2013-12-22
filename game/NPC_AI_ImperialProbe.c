@@ -251,7 +251,7 @@ void ImperialProbe_Hunt( qboolean visible, qboolean advance )
 	else
 	{
 		VectorSubtract( &NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin, &forward );
-		distance = VectorNormalize( &forward );
+		VectorNormalize( &forward );
 	}
 
 	speed = HUNTER_FORWARD_BASE_SPEED + HUNTER_FORWARD_MULTIPLIER * g_spSkill.integer;

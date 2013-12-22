@@ -275,7 +275,7 @@ void Seeker_Hunt( qboolean visible, qboolean advance )
 	else
 	{
 		VectorSubtract( &NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin, &forward );
-		distance = VectorNormalize( &forward );
+		VectorNormalize( &forward );
 	}
 
 	speed = SEEKER_FORWARD_BASE_SPEED + SEEKER_FORWARD_MULTIPLIER * g_spSkill.integer;

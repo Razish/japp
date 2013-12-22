@@ -1222,15 +1222,15 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 	case BOTH_DEADBACKWARD2:		//# Second thrown backward death finished pose
 		deathAnim = -2;
 		/*
+		// done with the anim
 		if ( PM_FinishedCurrentLegsAnim( self ) )
-		{//done with the anim
 			deathAnim = BOTH_DEADFLOP2;
-		}
 		else
-		{
 			deathAnim = -2;
-		}
+		*/
 		break;
+
+		/*
 	case BOTH_DEADFLOP2:
 		deathAnim = BOTH_DEADFLOP2;
 		break;
@@ -1243,20 +1243,19 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 	case BOTH_DEADFORWARD2:		//# Second thrown forward death finished pose
 		deathAnim = -2;
 		/*
+		// done with the anim
 		if ( PM_FinishedCurrentLegsAnim( self ) )
-		{//done with the anim
 			deathAnim = BOTH_DEADFLOP1;
-		}
 		else
-		{
 			deathAnim = -2;
-		}
-		break;
 		*/
+		break;
+
 	case BOTH_DEADFLOP1:
 		deathAnim = -2;
 		//deathAnim = BOTH_DEADFLOP1;
 		break;
+
 	case BOTH_DEAD3:				//# Third Death finished pose
 	case BOTH_DEAD4:				//# Fourth Death finished pose
 	case BOTH_DEAD5:				//# Fifth Death finished pose
@@ -2247,7 +2246,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	else
 		Q_strcat( buf, sizeof( buf ), va( "%s by %s\n", self->client->pers.netname, obit ) );
 	G_LogPrintf( "%s", buf );
-	buf[0] = '\0';
 
 	if ( g_austrian.integer 
 		&& (level.gametype == GT_DUEL) 
@@ -3453,12 +3451,10 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 
 	if ( ent->client 
 		&& ( ent->client->NPC_class == CLASS_R2D2 
-			|| ent->client->NPC_class == CLASS_R2D2 
 			|| ent->client->NPC_class == CLASS_GONK
 			|| ent->client->NPC_class == CLASS_MOUSE
 			|| ent->client->NPC_class == CLASS_SENTRY
 			|| ent->client->NPC_class == CLASS_INTERROGATOR
-			|| ent->client->NPC_class == CLASS_SENTRY
 			|| ent->client->NPC_class == CLASS_PROBE ) )
 	{//we don't care about per-surface hit-locations or dismemberment for these guys 
 		return qfalse;

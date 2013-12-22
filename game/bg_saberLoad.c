@@ -2673,7 +2673,7 @@ static char bgSaberParseTBuffer[MAX_SABER_DATA_SIZE];
 
 void WP_SaberLoadParms( void ) 
 {
-	int			len, totallen, saberExtFNLen, mainBlockLen, fileCnt, i;
+	int			len, totallen, saberExtFNLen, fileCnt, i;
 	//const char	*filename = "ext_data/sabers.cfg";
 	char		*holdChar, *marker;
 	char		saberExtensionListBuf[2048];			//	The list of file names read in
@@ -2682,7 +2682,7 @@ void WP_SaberLoadParms( void )
 	len = 0;
 
 	//remember where to store the next one
-	totallen = mainBlockLen = len;
+	totallen = len;
 	marker = SaberParms+totallen;
 	*marker = 0;
 

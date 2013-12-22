@@ -2526,53 +2526,31 @@ NOTSOLID - Starts not solid
 STARTINSOLID - Don't try to fix if spawn in solid
 SHY - Spawner is shy
 */
-void SP_NPC_Cultist_Saber( gentity_t *self)
-{
-	if ( !self->NPC_type )
-	{
-		if ( (self->spawnflags&1) )
-		{
-			if ( (self->spawnflags&8) )
-			{
+void SP_NPC_Cultist_Saber( gentity_t *self ) {
+	if ( !self->NPC_type ) {
+		if ( (self->spawnflags & 1) ) {
+			if ( (self->spawnflags & 8) )
 				self->NPC_type = "cultist_saber_med_throw";
-			}
 			else
-			{
 				self->NPC_type = "cultist_saber_med";
-			}
 		}
-		else if ( (self->spawnflags&2) )
-		{
-			if ( (self->spawnflags&8) )
-			{
+		else if ( (self->spawnflags & 2) ) {
+			if ( (self->spawnflags & 8) )
 				self->NPC_type = "cultist_saber_strong_throw";
-			}
 			else
-			{
 				self->NPC_type = "cultist_saber_strong";
-			}
 		}
-		else if ( (self->spawnflags&2) )
-		{
-			if ( (self->spawnflags&8) )
-			{
+		else if ( (self->spawnflags & 4) ) {
+			if ( (self->spawnflags & 8) )
 				self->NPC_type = "cultist_saber_all_throw";
-			}
 			else
-			{
 				self->NPC_type = "cultist_saber_all";
-			}
 		}
-		else
-		{
-			if ( (self->spawnflags&8) )
-			{
+		else {
+			if ( (self->spawnflags & 8) )
 				self->NPC_type = "cultist_saber_throw";
-			}
 			else
-			{
 				self->NPC_type = "cultist_saber";
-			}
 		}
 	}
 	
@@ -2595,53 +2573,31 @@ NOTSOLID - Starts not solid
 STARTINSOLID - Don't try to fix if spawn in solid
 SHY - Spawner is shy
 */
-void SP_NPC_Cultist_Saber_Powers( gentity_t *self)
-{
-	if ( !self->NPC_type )
-	{
-		if ( (self->spawnflags&1) )
-		{
-			if ( (self->spawnflags&8) )
-			{
+void SP_NPC_Cultist_Saber_Powers( gentity_t *self ) {
+	if ( !self->NPC_type ) {
+		if ( (self->spawnflags & 1) ) {
+			if ( (self->spawnflags & 8) )
 				self->NPC_type = "cultist_saber_med_throw2";
-			}
 			else
-			{
 				self->NPC_type = "cultist_saber_med2";
-			}
 		}
-		else if ( (self->spawnflags&2) )
-		{
-			if ( (self->spawnflags&8) )
-			{
+		else if ( (self->spawnflags & 2) ) {
+			if ( (self->spawnflags & 8) )
 				self->NPC_type = "cultist_saber_strong_throw2";
-			}
 			else
-			{
 				self->NPC_type = "cultist_saber_strong2";
-			}
 		}
-		else if ( (self->spawnflags&2) )
-		{
-			if ( (self->spawnflags&8) )
-			{
+		else if ( (self->spawnflags & 4) ) {
+			if ( (self->spawnflags & 8) )
 				self->NPC_type = "cultist_saber_all_throw2";
-			}
 			else
-			{
 				self->NPC_type = "cultist_saber_all2";
-			}
 		}
-		else
-		{
-			if ( (self->spawnflags&8) )
-			{
-				self->NPC_type = "cultist_saber_throw";
-			}
+		else {
+			if ( (self->spawnflags & 8) )
+				self->NPC_type = "cultist_saber_throw2";
 			else
-			{
 				self->NPC_type = "cultist_saber2";
-			}
 		}
 	}
 	

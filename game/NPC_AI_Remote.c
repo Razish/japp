@@ -209,7 +209,7 @@ void Remote_Hunt( qboolean visible, qboolean advance, qboolean retreat )
 	else
 	{
 		VectorSubtract( &NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin, &forward );
-		distance = VectorNormalize( &forward );
+		VectorNormalize( &forward );
 	}
 
 	speed = REMOTE_FORWARD_BASE_SPEED + REMOTE_FORWARD_MULTIPLIER * g_spSkill.integer;

@@ -565,8 +565,6 @@ qboolean BG_LegalizedForcePowers(char *powerOut, int maxRank, qboolean freeSaber
 	i = 0;
 	while (i < NUM_FORCE_POWERS)
 	{
-		countDown = 0;
-
 		countDown = final_Powers[i];
 
 		while (countDown > 0)
@@ -811,7 +809,7 @@ gitem_t	bg_itemlist[] =
 /* icon */		NULL,		// icon
 /* pickup */	//NULL,		// pickup_name
 		0,					// quantity
-		0,					// giType (IT_*)
+		IT_BAD,					// giType (IT_*)
 		0,					// giTag
 /* precache */ "",			// precaches
 /* sounds */ "",			// sounds

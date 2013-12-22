@@ -5012,14 +5012,12 @@ static void Jedi_CheckJumps( void )
 		{//WTF?
 			//FIXME: what do we do when we start INSIDE the CONTENTS_BOTCLIP?  Do the trace again without that clipmask?
 			goto jump_unsafe;
-			return;
 		}
 		if ( trace.fraction < 1.0f )
 		{//hit something
 			if ( trace.contents & CONTENTS_BOTCLIP )
 			{//hit a do-not-enter brush
 				goto jump_unsafe;
-				return;
 			}
 			//FIXME: trace through func_glass?
 			break;
@@ -5036,7 +5034,6 @@ static void Jedi_CheckJumps( void )
 	{//whoa, long drop, don't do it!
 		//probably no floor at end of jump, so don't jump
 		goto jump_unsafe;
-		return;
 	}
 	bottom.z -= 128;
 	trap->Trace( &trace, &trace.endpos, &NPC->r.mins, &NPC->r.maxs, &bottom, NPC->s.number, NPC->clipmask, qfalse, 0, 0 );
@@ -5048,7 +5045,6 @@ static void Jedi_CheckJumps( void )
 			if ( groundEnt->r.svFlags&SVF_GLASS_BRUSH )
 			{//don't land on breakable glass!
 				goto jump_unsafe;
-				return;
 			}
 		}
 		//Com_Printf( "(%d) jump is safe\n", level.time );
@@ -6050,8 +6046,10 @@ static void Jedi_Attack( void )
 				{
 				case 0:
 					chance = 9;
+					break;
 				case 1:
 					chance = 3;
+					break;
 				case 2:
 					chance = 1;
 					break;
