@@ -1177,13 +1177,6 @@ typedef struct {
 	qhandle_t	redFlagModel;
 	qhandle_t	blueFlagModel;
 
-	qhandle_t	flagPoleModel;
-	qhandle_t	flagFlapModel;
-
-	qhandle_t	redFlagBaseModel;
-	qhandle_t	blueFlagBaseModel;
-	qhandle_t	neutralFlagBaseModel;
-
 	qhandle_t	teamStatusBar;
 
 	qhandle_t	deferShader;
