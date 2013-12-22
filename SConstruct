@@ -68,18 +68,20 @@ files['lua'] = [
 	'lua/lzio.c',
 	'lua/print.c' ]
 
-files['game'] = [
-	'shared/JAPP/jp_crash.c',
-	'shared/JAPP/jp_promode.c',
-	'shared/JAPP/jp_tokenparser.c',
-	'shared/json/cJSON.c',
+files['udis86'] = [
 	'shared/libudis86/decode.c',
 	'shared/libudis86/input.c',
 	'shared/libudis86/itab.c',
 	'shared/libudis86/syn-att.c',
 	'shared/libudis86/syn-intel.c',
 	'shared/libudis86/syn.c',
-	'shared/libudis86/udis86.c',
+	'shared/libudis86/udis86.c' ]
+
+files['game'] = [
+	'shared/JAPP/jp_crash.c',
+	'shared/JAPP/jp_promode.c',
+	'shared/JAPP/jp_tokenparser.c',
+	'shared/json/cJSON.c',
 	'game/ai_main.c',
 	'game/ai_util.c',
 	'game/ai_wpnav.c',
@@ -174,7 +176,7 @@ files['game'] = [
 	'game/tri_coll_test.c',
 	'game/w_force.c',
 	'game/w_saber.c',
-	'game/WalkerNPC.c' ] + files['lua']
+	'game/WalkerNPC.c' ] + files['lua'] + files['udis86']
 
 files['cgame'] = [
 	'game/AnimalNPC.c',
@@ -258,7 +260,7 @@ files['ui'] = [
 	'ui/ui_main.c',
 	'ui/ui_saber.c',
 	'ui/ui_shared.c',
-	'ui/ui_syscalls.c' ]
+	'ui/ui_syscalls.c' ] + files['udis86']
 
 # set up libraries to link with
 if plat == 'Linux':

@@ -85,6 +85,13 @@
     <ClCompile Include="..\shared\JAPP\jp_crash.c" />
     <ClCompile Include="..\shared\JAPP\jp_tokenparser.c" />
     <ClCompile Include="..\shared\json\cJSON.c" />
+    <ClCompile Include="..\shared\libudis86\decode.c" />
+    <ClCompile Include="..\shared\libudis86\input.c" />
+    <ClCompile Include="..\shared\libudis86\itab.c" />
+    <ClCompile Include="..\shared\libudis86\syn-att.c" />
+    <ClCompile Include="..\shared\libudis86\syn-intel.c" />
+    <ClCompile Include="..\shared\libudis86\syn.c" />
+    <ClCompile Include="..\shared\libudis86\udis86.c" />
     <ClCompile Include="..\ui\ui_atoms.c" />
     <ClCompile Include="..\ui\ui_force.c" />
     <ClCompile Include="..\ui\ui_gameinfo.c" />
