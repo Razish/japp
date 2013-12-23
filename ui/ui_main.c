@@ -10334,7 +10334,7 @@ extern int whichVersionDigDl( char *version );
 void _UI_Init( qboolean inGameLoad ) {
 	const char	*menuSet;
 	int			value=0;
-	
+	vmCvar_t	japp_crashHandler;
 #if MAC_PORT
 	int			isDigitalDownloadMac;
 	char		macVersion[8];
@@ -10353,7 +10353,10 @@ void _UI_Init( qboolean inGameLoad ) {
 	}
 #endif
 
-	ActivateCrashHandler();
+	trap->Cvar_Register( &japp_crashHandler, "japp_crashHandler", "1", CVAR_ARCHIVE );
+
+	if ( japp_crashHandler.integer )
+		ActivateCrashHandler();
 
 	//register this freakin thing now
 //	vmCvar_t siegeTeamSwitch;
