@@ -1943,19 +1943,6 @@ void Cmd_Where_f( gentity_t *ent ) {
 	//[/BugFix31]
 }
 
-static const char *gameNames[] = {
-	"Free For All",
-	"Holocron FFA",
-	"Jedi Master",
-	"Duel",
-	"Power Duel",
-	"Single Player",
-	"Team FFA",
-	"Siege",
-	"Capture the Flag",
-	"Capture the Ysalamiri"
-};
-
 /*
 ==================
 G_ClientNumberFromName
@@ -2220,7 +2207,7 @@ qboolean G_VoteGametype( gentity_t *ent, int numArgs, const char *arg1, const ch
 	level.votingGametypeTo = gt;
 
 	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d", arg1, gt );
-	Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s %s", arg1, gameNames[gt] );
+	Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s %s", arg1, BG_GetGametypeString( gt ) );
 	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
 	return qtrue;
 }
