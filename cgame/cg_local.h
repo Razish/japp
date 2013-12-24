@@ -2160,26 +2160,7 @@ void		BG_CycleInven(playerState_t *ps, int direction);
 int			BG_ProperForceIndex(int power);
 void		BG_CycleForce(playerState_t *ps, int direction);
 
-
-typedef enum q3print_e {
-  SYSTEM_PRINT,
-  CHAT_PRINT,
-  TEAMCHAT_PRINT
-} q3print_t; // bk001201 - warning: useless keyword or type name in empty declaration
-
-void	CG_ClearParticles (void);
-void	CG_AddParticles (void);
-void	CG_ParticleSnow (qhandle_t pshader, vector3 *origin, vector3 *origin2, int turb, float range, int snum);
-void	CG_ParticleSmoke (qhandle_t pshader, centity_t *cent);
-void	CG_AddParticleShrapnel (localEntity_t *le);
-void	CG_ParticleSnowFlurry (qhandle_t pshader, centity_t *cent);
-void	CG_ParticleBulletDebris (vector3 *org, vector3 *vel, int duration);
-void	CG_ParticleSparks (vector3 *org, vector3 *vel, int duration, float x, float y, float speed);
-void	CG_ParticleDust (centity_t *cent, vector3 *origin, vector3 *dir);
-void	CG_ParticleMisc (qhandle_t pshader, vector3 *origin, int size, int duration, float alpha);
-void	CG_ParticleExplosion (char *animStr, vector3 *origin, vector3 *vel, int duration, int sizeStart, int sizeEnd);
 const char *CG_GetStringEdString(char *refSection, char *refName);
-extern qboolean		initparticles;
 
 void FX_TurretProjectileThink(  centity_t *cent, const struct weaponInfo_s *weapon );
 void FX_TurretHitWall( vector3 *origin, vector3 *normal );

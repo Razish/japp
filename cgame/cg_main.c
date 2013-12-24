@@ -1879,8 +1879,6 @@ Ghoul2 Insert End
 	cgs.media.halfShieldShader	= trap->R_RegisterShader( "halfShieldShell" );
 
 	trap->FX_RegisterEffect("force/force_touch");
-
-	CG_ClearParticles ();
 }
 
 

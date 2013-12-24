@@ -59,8 +59,8 @@
 #define	VALIDATEB( a )	if ( a == NULL ) {	assert(0);	return qfalse;	}
 #define VALIDATEP( a )	if ( a == NULL ) {	assert(0);	return NULL;	}
 
-#define VALIDSTRING( a )	( ( a != 0 ) && ( a[0] != 0 ) )
-#define VALIDENT( e )		( ( e != 0 ) && ( (e)->inuse ) )
+#define VALIDSTRING( a )	( ( a != NULL ) && ( a[0] != '\0' ) )
+#define VALIDENT( e )		( ( e != NULL ) && ( (e)->inuse ) )
 
 #define ARRAY_LEN( x ) ( sizeof( x ) / sizeof( *(x) ) )
 #define STRING( a ) #a
@@ -1306,10 +1306,6 @@ struct cplane_s;
 extern	vector3	vec3_origin;
 extern	vector3	axisDefault[3];
 
-#define	nanmask (255<<23)
-#define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
-
-
 #if idppc
 
 static inline float Q_rsqrt( float number ) {
@@ -2550,7 +2546,7 @@ typedef struct entityState_s {
 	int		otherEntityNum;	// shotgun sources, etc
 	int		otherEntityNum2;
 
-	int		groundEntityNum;	// -1 = in air
+	int		groundEntityNum;	// ENTITYNUM_NONE = in air
 
 	int		constantLight;	// r + (g<<8) + (b<<16) + (intensity<<24)
 	int		loopSound;		// constantly loop this sound

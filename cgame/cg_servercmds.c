@@ -1067,7 +1067,6 @@ static void CG_MapRestart( void ) {
 
 	CG_InitLocalEntities();
 	CG_InitMarkPolys();
-	CG_ClearParticles ();
 	CG_KillCEntityInstances();
 
 	// make sure the "3 frags left" warnings play again
