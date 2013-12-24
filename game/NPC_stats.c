@@ -231,7 +231,6 @@ extern qboolean BG_ParseLiteral( const char **data, const char *string );
 //
 #define MAX_NPC_DATA_SIZE 0x20000
 char	NPCParms[MAX_NPC_DATA_SIZE];
-char	NPCFile[MAX_QPATH];
 
 /*
 team_t TranslateTeamName( const char *name ) 
@@ -601,6 +600,7 @@ void NPC_Precache ( gentity_t *spawner )
 	qboolean	md3Model = qfalse;
 	char	playerModel[MAX_QPATH];
 	char	customSkin[MAX_QPATH];
+	char	sessionName[MAX_QPATH+15];
 
 	if ( !Q_stricmp( "random", spawner->NPC_type ) )
 	{//sorry, can't precache a random just yet
@@ -609,7 +609,8 @@ void NPC_Precache ( gentity_t *spawner )
 	Q_strncpyz( customSkin, "default", sizeof( customSkin ) );
 
 	p = NPCParms;
-	COM_BeginParseSession(NPCFile);
+	Com_sprintf( sessionName, sizeof( sessionName ), "NPC_Precache(%s)", spawner->NPC_type );
+	COM_BeginParseSession( sessionName );
 
 	// look for the right NPC
 	while ( p ) 
@@ -976,6 +977,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 	char	sound[MAX_QPATH];
 	char	playerModel[MAX_QPATH];
 	char	customSkin[MAX_QPATH];
+	char	sessionName[MAX_QPATH+17];
 	renderInfo_t	*ri = &NPC->client->renderInfo;
 	gNPCstats_t		*stats = NULL;
 	qboolean	md3Model = qtrue;
@@ -1103,7 +1105,8 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 		int fp;
 
 		p = NPCParms;
-		COM_BeginParseSession(NPCFile);
+		Com_sprintf( sessionName, sizeof( sessionName ), "NPC_ParseParms(%s)", NPCName );
+		COM_BeginParseSession( sessionName );
 
 		// look for the right NPC
 		while ( p ) 
