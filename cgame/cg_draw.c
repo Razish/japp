@@ -6577,21 +6577,17 @@ traceAgain:
 	{
 		if (trace.entityNum < /*MAX_CLIENTS*/ENTITYNUM_WORLD)
 		{
+			centity_t *veh = &cg_entities[trace.entityNum];
 			cg.crosshairClientNum = trace.entityNum;
 			cg.crosshairClientTime = cg.time;
 
-			if (cg.crosshairClientNum < ENTITYNUM_WORLD)
-			{
-				centity_t *veh = &cg_entities[cg.crosshairClientNum];
-
-				if (veh->currentState.eType == ET_NPC &&
-					veh->currentState.NPC_class == CLASS_VEHICLE &&
-					veh->currentState.owner < MAX_CLIENTS)
-				{ //draw the name of the pilot then
-					cg.crosshairClientNum = veh->currentState.owner;
-					cg.crosshairVehNum = veh->currentState.number;
-					cg.crosshairVehTime = cg.time;
-				}
+			if ( veh->currentState.eType == ET_NPC &&
+				veh->currentState.NPC_class == CLASS_VEHICLE &&
+				veh->currentState.owner < MAX_CLIENTS )
+			{ //draw the name of the pilot then
+				cg.crosshairClientNum = veh->currentState.owner;
+				cg.crosshairVehNum = veh->currentState.number;
+				cg.crosshairVehTime = cg.time;
 			}
 
 			CG_DrawCrosshair(&trace.endpos, 1);
@@ -6854,8 +6850,11 @@ static void CG_DrawVote(void) {
 	else							s = va( "%s(%i):<%s> %s:%i %s:%i",    sVote, sec, sCmd,        sYes, cgs.voteYes, sNo, cgs.voteNo );
 
 	CG_DrawSmallString( 4, 58, s, 1.0F );
-	s = CG_GetStringEdString( "MP_INGAME", "OR_PRESS_ESC_THEN_CLICK_VOTE" ); // s = "or press ESC then click Vote";
-	CG_DrawSmallString( 4, 58 + SMALLCHAR_HEIGHT + 2, s, 1.0f );
+
+	if ( cgs.clientinfo[cg.clientNum].team != TEAM_SPECTATOR ) {
+		s = CG_GetStringEdString( "MP_INGAME", "OR_PRESS_ESC_THEN_CLICK_VOTE" ); // s = "or press ESC then click Vote";
+		CG_DrawSmallString( 4, 58 + SMALLCHAR_HEIGHT + 2, s, 1.0f );
+	}
 }
 
 /*

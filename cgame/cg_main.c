@@ -24,8 +24,6 @@ Ghoul2 Insert End
 void CG_InitJetpackGhoul2(void);
 void CG_CleanJetpackGhoul2(void);
 
-#include "holocronicons.h"
-
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback );
 void CG_Shutdown( void );
 

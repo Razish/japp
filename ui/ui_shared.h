@@ -1,6 +1,4 @@
-#ifndef __UI_SHARED_H
-#define __UI_SHARED_H
-
+#pragma once
 
 #include "../game/q_shared.h"
 #include "../cgame/tr_types.h"
@@ -546,4 +544,4 @@ qboolean UI_OutOfMemory();
 void Controls_GetConfig( void );
 void Controls_SetConfig(qboolean restart);
 
-#endif
+extern const char *HolocronIcons[NUM_FORCE_POWERS];

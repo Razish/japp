@@ -2117,7 +2117,7 @@ qboolean G_VoteTimelimit( gentity_t *ent, int numArgs, const char *arg1, const c
 
 qboolean G_VoteWarmup( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
 	int n = Com_Clampi( 0, 1, atoi( arg2 ) );
-	Com_sprintf( level.voteString, sizeof( level.voteString ), "g_doWarmup %i", arg1, n );
+	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %i", arg1, n );
 	Q_strncpyz( level.voteDisplayString, level.voteString, sizeof( level.voteDisplayString ) );
 	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
 	return qtrue;

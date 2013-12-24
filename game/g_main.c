@@ -290,6 +290,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.time = levelTime;
 	level.startTime = levelTime;
 
+	level.follow1 = level.follow2 = -1;
+
 	if ( g_log.string[0] )
 	{
 		trap->FS_Open( g_log.string, &level.logFile, g_logSync.integer ? FS_APPEND_SYNC : FS_APPEND );
@@ -1347,7 +1349,7 @@ This is also used for spectator spawns
 */
 extern qboolean	gSiegeRoundBegun;
 extern qboolean	gSiegeRoundEnded;
-extern qboolean	gSiegeRoundWinningTeam;
+extern int		gSiegeRoundWinningTeam;
 void FindIntermissionPoint( void ) {
 	gentity_t	*ent = NULL;
 	gentity_t	*target;
