@@ -5348,7 +5348,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 
 		attackStr = self->client->ps.fd.saberAnimLevel;
 	}
-	else if (self->client->ps.saberIdleWound < level.time)
+	else if ( japp_saberIdleDamage.integer && self->client->ps.saberIdleWound < level.time)
 	{ //just touching, do minimal damage and only check for it every 200ms (mainly to cut down on network traffic for hit events)
 		dmg = SABER_NONATTACK_DAMAGE;
 		idleDamage = qtrue;

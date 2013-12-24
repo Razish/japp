@@ -3779,8 +3779,10 @@ static void Cmd_AMInfo_f( gentity_t *ent )
 		else														Q_strcat( buf, sizeof( buf ), " with no tweaks (default)\n" );
 
 		// damage scale
-		Q_strcat( buf, sizeof( buf ), va( "    %.05f damage scale", g_saberDamageScale.value ) );
-		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", buf ) );
+		Q_strcat( buf, sizeof( buf ), va( "    %.03f damage scale\n", g_saberDamageScale.value ) );
+		Q_strcat( buf, sizeof( buf ), va( "    Idle damage %s\n", (japp_saberIdleDamage.integer || japp_saberSystem.integer == SABERSYSTEM_JK2)
+		? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
+		trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", buf ) );
 		buf[0] = '\0';
 	}
 
