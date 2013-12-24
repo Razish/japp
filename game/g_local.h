@@ -1056,7 +1056,6 @@ char *G_NewString( const char *string );
 //
 // g_cmds.c
 //
-qboolean StringIsInteger( const char *s );
 void Cmd_Score_f (gentity_t *ent);
 void StopFollowing( gentity_t *ent );
 void BroadcastTeamChange( gclient_t *client, int oldTeam );
@@ -1589,8 +1588,6 @@ typedef enum matchPause_e {
 extern const char *supportFlagNames[];
 extern gameImport_t *trap;
 
-void		SanitizeString3					( char *in, char *out );
-int			G_ClientNumberFromStrippedName2	( const char *name );
 //void		WP_AddAsMindtricked				( forcedata_t *fd, int entNum );
 void		G_AvoidBox						( gentity_t *ent );
 char		*ConcatArgs						( int start );
@@ -1601,3 +1598,4 @@ void		G_ClearVote						( gentity_t *ent );
 void		SV_ToggleUserinfoValidation_f	( void );
 qboolean	G_CallSpawn						( gentity_t *ent );
 qboolean	G_SaberModelSetup				( gentity_t *ent );
+int			G_ClientFromString				( const gentity_t *ent, const char *match, qboolean substr, qboolean firstMatch, qboolean clean );

@@ -444,9 +444,9 @@ static void AM_WhoIs( gentity_t *ent )
 			char strAdmin[32] = { 0 };
 
 			Q_strncpyz( strName, cl->pers.netname, sizeof( strName ) );
-			Q_StripColor( strName );
+			Q_CleanString( strName, qtrue );
 			Q_strncpyz( strAdmin, (cl->pers.adminUser) ? cl->pers.adminUser->user : "", sizeof( strAdmin ) );
-			Q_StripColor( strAdmin );
+			Q_CleanString( strAdmin, qtrue );
 
 			Q_strcat( msg, sizeof( msg ), va( "%-36s%-32s\n", strName, strAdmin ) );
 		}
@@ -487,12 +487,12 @@ static void AM_Status( gentity_t *ent )
 			char strAdmin[32] = {0};
 
 			Q_strncpyz( strNum, va( "(%i)", i ), sizeof( strNum ) );
-			Q_StripColor( strNum );
+			Q_CleanString( strNum, qtrue );
 			Q_strncpyz( strName, cl->pers.netname, sizeof( strName ) );
-			Q_StripColor( strName );
+			Q_CleanString( strName, qtrue );
 			Q_strncpyz( strIP, cl->sess.IP, sizeof( strIP ) );
 			Q_strncpyz( strAdmin, (cl->pers.adminUser) ? cl->pers.adminUser->user : "", sizeof( strAdmin ) );
-			Q_StripColor( strAdmin );
+			Q_CleanString( strAdmin, qtrue );
 
 			tmpMsg = va( "%-12s%-36s%-24s%-32s\n", strNum, strName, strIP, strAdmin );
 
@@ -539,25 +539,24 @@ static void AM_Announce( gentity_t *ent )
 
 	//Grab the clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = G_ClientNumberFromStrippedName2( arg1 );
+	targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
 
 	//Check for purposely announcing to all. HACKHACKHACK
 	if ( arg1[0] == '-' && arg1[1] == '1' )
 		targetClient = -2;
 
-	if ( targetClient == -1 )
-	{//Invalid player
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player.\n\"" );
+	// Invalid player
+	if ( targetClient == -1 ) {
 		free( p );
 		return;
 	}
 
-	//Print to everyone
+	// print to everyone
 	else if ( targetClient == -2 )
 		trap->SendServerCommand( -1, va( "cp \"%s\"", p ) );
 
-	else
-	{//Should be a valid client..
+	// valid client
+	else {
 		trap->SendServerCommand( targetClient, va( "cp \"%s\"", p ) );
 		trap->SendServerCommand( ent-g_entities, va( "cp \"Relay:\n%s\"", p ) );	//Helena wanted me to relay it back to the sender
 	}
@@ -577,13 +576,10 @@ static void AM_Ghost( gentity_t *ent )
 
 	//Self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientNumberFromStrippedName2( arg1 ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
 
 	if ( targetClient == -1 )
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
 		return;
-	}
 
 	targ = &g_entities[targetClient];
 
@@ -626,18 +622,20 @@ static void AM_Teleport( gentity_t *ent )
 		int		targetClient;
 
 		trap->Argv( 1, arg1, sizeof( arg1 ) );
-		targetClient = G_ClientNumberFromStrippedName2( arg1 );
+		targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
 		if ( targetClient == -1 )
 		{//No client with this name, check for named teleport
 			int i;
 			char cleanedInput[64];
 			char cleanedTelemark[64];
 
-			SanitizeString3( arg1, cleanedInput );
+			Q_strncpyz( cleanedInput, arg1, sizeof( cleanedInput ) );
+			Q_CleanString( cleanedInput, qtrue );
 
 			for ( i=0; i<level.adminData.teleMarksIndex; i++ )
 			{//Check all telemarks
-				SanitizeString3( level.adminData.teleMarks[i].name, cleanedTelemark );
+				Q_strncpyz( cleanedTelemark, level.adminData.teleMarks[i].name, sizeof( cleanedTelemark ) );
+				Q_CleanString( cleanedTelemark, qtrue );
 				if ( !Q_stricmp( cleanedTelemark, cleanedInput ) )
 				{//We found one that contains our string
 					TeleportPlayer( ent, &level.adminData.teleMarks[i].position, &ent->client->ps.viewangles );
@@ -674,12 +672,11 @@ static void AM_Teleport( gentity_t *ent )
 		int		targetClient1;
 		int		targetClient2;
 
-		trap->Argv( 1, arg1, sizeof( arg1 ) );	targetClient1 = G_ClientNumberFromStrippedName2( arg1 );
-		trap->Argv( 2, arg2, sizeof( arg2 ) );	targetClient2 = G_ClientNumberFromStrippedName2( arg2 );
+		trap->Argv( 1, arg1, sizeof( arg1 ) );	targetClient1 = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+		trap->Argv( 2, arg2, sizeof( arg2 ) );	targetClient2 = G_ClientFromString( ent, arg2, qtrue, qfalse, qtrue );
 		
 		if ( targetClient1 == -1 )
 		{//No client with this name - abort!
-			trap->SendServerCommand( ent-g_entities, "print \"Invalid player (First argument)\n\"" );
 			return;
 		}
 		else
@@ -690,11 +687,13 @@ static void AM_Teleport( gentity_t *ent )
 				char cleanedInput[64];
 				char cleanedTelemark[64];
 
-				SanitizeString3( arg2, cleanedInput );
+				Q_strncpyz( cleanedInput, arg2, sizeof( cleanedInput ) );
+				Q_CleanString( cleanedInput, qtrue );
 
 				for ( i=0; i<level.adminData.teleMarksIndex; i++ )
 				{//Check all telemarks
-					SanitizeString3( level.adminData.teleMarks[i].name, cleanedTelemark );
+					Q_strncpyz( cleanedTelemark, level.adminData.teleMarks[i].name, sizeof( cleanedTelemark ) );
+					Q_CleanString( cleanedTelemark, qtrue );
 					if ( !Q_stricmp( cleanedTelemark, cleanedInput ) )
 					{//We found one that contains our string
 						TeleportPlayer( &g_entities[targetClient1], &level.adminData.teleMarks[i].position, &ent->client->ps.viewangles );
@@ -743,12 +742,11 @@ static void AM_Teleport( gentity_t *ent )
 		int		targetClient;
 
 		trap->Argv( 1, argC, sizeof( argC ) );
-		targetClient = G_ClientNumberFromStrippedName2( argC );
+		targetClient = G_ClientFromString( ent, argC, qtrue, qfalse, qtrue );
 
 		if ( targetClient == -1 )
-			trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
-		else
-		{
+			return;
+		else {
 			vector3	telePos;
 			char argX[16]={0}, argY[16]={0}, argZ[16]={0};
 
@@ -823,7 +821,7 @@ static void AM_Telemark( gentity_t *ent )
 	else {
 		char cleanName[MAX_NETNAME];
 		Q_strncpyz( cleanName, ent->client->pers.netname, sizeof( cleanName ) );
-		Q_StripColor( cleanName );
+		Q_CleanString( cleanName, qtrue );
 		Com_sprintf( name, sizeof( name ), "default_%s", cleanName );
 	}
 
@@ -956,8 +954,7 @@ static void AM_Poll( gentity_t *ent )
 	trap->Argv( 0, arg1, sizeof( arg1 ) );
 	//Q_strncpyz( arg2, ConcatArgs( 2 ), sizeof( arg2 ) );
 	Q_strncpyz( arg2, ent->client->pers.netname, sizeof( arg2 ) );
-	Q_StripColor( arg2 );
-	Q_CleanStr( arg2 );
+	Q_CleanString( arg2, qtrue );
 	Q_strstrip( arg2, "\n\r;\"", NULL );
 
 	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s \"%s\"", arg1, arg2 );
@@ -1014,13 +1011,10 @@ static void AM_ForceTeam( gentity_t *ent )
 	//amforceteam <partial name|clientNum> <team>
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	trap->Argv( 2, arg2, sizeof( arg2 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientNumberFromStrippedName2( arg1 ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
 
 	if ( targetClient == -1 )
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
 		return;
-	}
 
 	targ = &g_entities[targetClient];
 
@@ -1044,13 +1038,10 @@ static void AM_Protect( gentity_t *ent )
 
 	//Can protect: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientNumberFromStrippedName2( arg1 ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
 
-	if ( targetClient == -1 || !g_entities[targetClient].inuse || g_entities[targetClient].s.number > level.maxclients )
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
+	if ( targetClient == -1 )
 		return;
-	}
 
 	targ = &g_entities[targetClient];
 
@@ -1080,13 +1071,10 @@ static void AM_Empower( gentity_t *ent )
 
 	//Can empower: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientNumberFromStrippedName2( arg1 ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
 
-	if ( targetClient == -1 || !g_entities[targetClient].inuse || g_entities[targetClient].s.number > level.maxclients )
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
+	if ( targetClient == -1 )
 		return;
-	}
 
 	targ = &g_entities[targetClient];
 
@@ -1149,13 +1137,10 @@ static void AM_Slap( gentity_t *ent )
 
 	//Can slap: partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = G_ClientNumberFromStrippedName2( arg1 );
+	targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
 
-	if ( targetClient == -1 || !g_entities[targetClient].inuse || g_entities[targetClient].s.number > level.maxclients )
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
+	if ( targetClient == -1 )
 		return;
-	}
 
 	Slap( &g_entities[targetClient] );
 }
@@ -1190,7 +1175,7 @@ static void AM_Freeze( gentity_t *ent )
 
 	//Grab the clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	clientNum = G_ClientNumberFromStrippedName2( arg1 );
+	clientNum = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
 
 	//Check for purposely freezing all. HACKHACKHACK
 	if ( arg1[0] == '-' && arg1[1] == '1' )
@@ -1267,15 +1252,13 @@ static void AM_Silence( gentity_t *ent )
 		return;
 	}
 
-	targetClient = G_ClientNumberFromStrippedName2( arg1 );
+	targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
 	if ( targetClient == -1 )
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
-	else
-	{
-		level.clients[targetClient].pers.adminData.canTalk = qfalse;
-		trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"silenced\n\"", level.clients[targetClient].pers.netname ) );
-		trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_CYAN"silenced\n\"" );
-	}
+		return;
+
+	level.clients[targetClient].pers.adminData.canTalk = qfalse;
+	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"silenced\n\"", level.clients[targetClient].pers.netname ) );
+	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_CYAN"silenced\n\"" );
 }
 
 static void AM_Unsilence( gentity_t *ent )
@@ -1300,15 +1283,13 @@ static void AM_Unsilence( gentity_t *ent )
 		return;
 	}
 
-	targetClient = G_ClientNumberFromStrippedName2( arg1 );
+	targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
 	if ( targetClient == -1 )
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
-	else
-	{
-		level.clients[targetClient].pers.adminData.canTalk = qtrue;
-		trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"un-silenced\n\"", level.clients[targetClient].pers.netname ) );
-		trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_CYAN"un-silenced\n\"" );
-	}
+		return;
+
+	level.clients[targetClient].pers.adminData.canTalk = qtrue;
+	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"un-silenced\n\"", level.clients[targetClient].pers.netname ) );
+	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_CYAN"un-silenced\n\"" );
 }
 
 extern void Cmd_Kill_f( gentity_t *ent );
@@ -1325,15 +1306,13 @@ static void AM_Slay( gentity_t *ent )
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 
-	targetClient = G_ClientNumberFromStrippedName2( arg1 );
-	if ( targetClient == -1 || !g_entities[targetClient].inuse )
-		trap->SendServerCommand( ent-g_entities, va( "print \"Player is not on the server (%s)\n\"", arg1 ) );
-	else
-	{
-		Cmd_Kill_f( &g_entities[targetClient] );
-		trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_RED"slain\n\"", level.clients[targetClient].pers.netname ) );
-		trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_RED"slain\n\"" );
-	}
+	targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+	if ( targetClient == -1 )
+		return;
+
+	Cmd_Kill_f( &g_entities[targetClient] );
+	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_RED"slain\n\"", level.clients[targetClient].pers.netname ) );
+	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_RED"slain\n\"" );
 }
 
 //================================
@@ -1357,25 +1336,14 @@ static void AM_Kick( gentity_t *ent )
 	if ( trap->Argc() > 2 )
 		reason = ConcatArgs( 2 );
 
-	clientNum = G_ClientNumberFromStrippedName2( arg1 );
+	clientNum = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
 
-	if ( clientNum == -1 || !g_entities[clientNum].inuse || g_entities[clientNum].s.number > level.maxclients )
-	{//No name match, or not an active client
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
-	}
-	else
-	{
-		if ( g_entities[clientNum].inuse )
-		{
-			strcpy( string, va( "Kicked!\nReason: %s", reason?reason:"Not specified" ) );
-			trap->DropClient( clientNum, string );
-			//ClientDisconnect( clientNum );
-		}
-		else
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
-		}
-	}
+	if ( clientNum == -1 )
+		return;
+
+	Q_strncpyz( string, va( "Kicked!\nReason: %s", reason ? reason : "Not specified" ), sizeof( string ) );
+	trap->DropClient( clientNum, string );
+//	ClientDisconnect( clientNum );
 }
 
 static void AM_Ban( gentity_t *ent )
@@ -1396,12 +1364,10 @@ static void AM_Ban( gentity_t *ent )
 	{
 		//	clientNum / Partial name
 		trap->Argv( 1, arg1, sizeof( arg1 ) );
-		targetClient = G_ClientNumberFromStrippedName2( arg1 );
-		if ( targetClient == -1 || !g_entities[targetClient].inuse || g_entities[targetClient].s.number > level.maxclients )
-		{
-			trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
+		targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+		if ( targetClient == -1 )
 			return;
-		}
+
 		Q_strncpyz( arg1, g_entities[targetClient].client->sess.IP, sizeof( arg1 ) );
 
 		trap->Argv( 2, arg2, sizeof( arg2 ) );	//	Duration
@@ -1647,13 +1613,10 @@ static void AM_Merc( gentity_t *ent ) {
 
 	//Can merc: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientNumberFromStrippedName2( arg1 ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
 
-	if ( targetClient == -1 || !g_entities[targetClient].inuse || g_entities[targetClient].s.number > level.maxclients )
-	{
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
+	if ( targetClient == -1 )
 		return;
-	}
 
 	targ = &g_entities[targetClient];
 

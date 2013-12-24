@@ -117,8 +117,7 @@ void Cmd_Score_f( gentity_t *ent ) {
 	DeathmatchScoreboardMessage( ent );
 }
 
-
-
+//RAZTODO: Move ConcatArgs to g_utils.c
 /*
 ==================
 ConcatArgs
@@ -149,88 +148,6 @@ char	*ConcatArgs( int start ) {
 	line[len] = 0;
 
 	return line;
-}
-
-/*
-==================
-SanitizeString
-
-Remove case and control characters
-==================
-*/
-void SanitizeString( char *in, char *out ) {
-	while ( *in ) {
-		if ( *in == 27 ) {
-			in += 2;		// skip color code
-			continue;
-		}
-		if ( *in < 32 ) {
-			in++;
-			continue;
-		}
-		*out++ = tolower( (unsigned char) *in++ );
-	}
-
-	*out = 0;
-}
-
-/*
-==================
-StringIsInteger
-==================
-*/
-qboolean StringIsInteger( const char *s ) {
-	int			i=0, len=0;
-	qboolean	foundDigit=qfalse;
-
-	for ( i=0, len=strlen( s ); i<len; i++ )
-	{
-		if ( !isdigit( s[i] ) )
-			return qfalse;
-
-		foundDigit = qtrue;
-	}
-
-	return foundDigit;
-}
-
-/*
-==================
-ClientNumberFromString
-
-Returns a player number for either a number or name string
-Returns -1 if invalid
-==================
-*/
-int ClientNumberFromString( gentity_t *to, const char *s ) {
-	gclient_t	*cl;
-	int			idnum;
-	char		cleanName[MAX_NETNAME];
-
-	if ( StringIsInteger( s ) )
-	{// numeric values could be slot numbers
-		idnum = atoi( s );
-		if ( idnum >= 0 && idnum < level.maxclients )
-		{
-			cl = &level.clients[idnum];
-			if ( cl->pers.connected == CON_CONNECTED )
-				return idnum;
-		}
-	}
-
-	for ( idnum=0,cl=level.clients; idnum < level.maxclients; idnum++,cl++ )
-	{// check for a name match
-		if ( cl->pers.connected != CON_CONNECTED )
-			continue;
-
-		Q_strncpyz( cleanName, cl->pers.netname, sizeof( cleanName ) );
-		Q_CleanStr( cleanName );
-		if ( !Q_stricmp( cleanName, s ) )
-			return idnum;
-	}
-
-	trap->SendServerCommand( to-g_entities, va( "print \"User %s is not on the server\n\"", s ) );
-	return -1;
 }
 
 /*
@@ -1433,7 +1350,7 @@ void Cmd_Follow_f( gentity_t *ent ) {
 	}
 
 	trap->Argv( 1, arg, sizeof( arg ) );
-	i = ClientNumberFromString( ent, arg );
+	i = G_ClientFromString( ent, arg, qtrue, qfalse, qtrue );
 	if ( i == -1 ) {
 		return;
 	}
@@ -1792,7 +1709,7 @@ void Cmd_Tell_f( gentity_t *ent ) {
 	}
 
 	trap->Argv( 1, arg, sizeof( arg ) );
-	targetNum = ClientNumberFromString( ent, arg );
+	targetNum = G_ClientFromString( ent, arg, qtrue, qfalse, qtrue );
 	if ( targetNum == -1 ) {
 		return;
 	}
@@ -1907,7 +1824,7 @@ void Cmd_GameCommand_f( gentity_t *ent ) {
 	}
 
 	trap->Argv( 1, arg, sizeof( arg ) );
-	targetNum = ClientNumberFromString( ent, arg );
+	targetNum = G_ClientFromString( ent, arg, qtrue, qfalse, qtrue );
 	if ( targetNum == -1 )
 		return;
 
@@ -1942,183 +1859,6 @@ void Cmd_Where_f( gentity_t *ent ) {
 	//trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", vtos( ent->s.origin ) ) );
 	//[/BugFix31]
 }
-
-/*
-==================
-G_ClientNumberFromName
-
-Finds the client number of the client with the given name
-==================
-*/
-int G_ClientNumberFromName ( const char* name )
-{
-	char		s2[MAX_STRING_CHARS];
-	char		n2[MAX_STRING_CHARS];
-	int			i;
-	gclient_t*	cl;
-
-	// check for a name match
-	SanitizeString( (char*)name, s2 );
-	for ( i=0, cl=level.clients ; i < level.numConnectedClients ; i++, cl++ ) 
-	{
-		SanitizeString( cl->pers.netname, n2 );
-		if ( !strcmp( n2, s2 ) ) 
-		{
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-/*
-==================
-SanitizeString2
-
-Rich's revised version of SanitizeString
-==================
-*/
-void SanitizeString2( char *in, char *out )
-{
-	int i = 0;
-	int r = 0;
-
-	while (in[i])
-	{
-		if (i >= MAX_NAME_LENGTH-1)
-		{ //the ui truncates the name here..
-			break;
-		}
-
-		if (in[i] == '^')
-		{
-			if (in[i+1] >= 48 && //'0'
-				in[i+1] <= 57) //'9'
-			{ //only skip it if there's a number after it for the color
-				i += 2;
-				continue;
-			}
-			else
-			{ //just skip the ^
-				i++;
-				continue;
-			}
-		}
-
-		if (in[i] < 32)
-		{
-			i++;
-			continue;
-		}
-
-		out[r] = in[i];
-		r++;
-		i++;
-	}
-	out[r] = 0;
-}
-
-void SanitizeString3( char *in, char *out )
-{
-	int i = 0;
-	int r = 0;
-
-	while (in[i])
-	{
-		if (i >= MAX_NAME_LENGTH-1)
-		{ //the ui truncates the name here..
-			break;
-		}
-
-		if (in[i] == '^')
-		{
-			if (in[i+1] >= 48 && //'0'
-				in[i+1] <= 57) //'9'
-			{ //only skip it if there's a number after it for the color
-				i += 2;
-				continue;
-			}
-			else
-			{ //just skip the ^
-				i++;
-				continue;
-			}
-		}
-
-		if (in[i] < 32)
-		{
-			i++;
-			continue;
-		}
-
-		out[r] = tolower(in[i]);
-		r++;
-		i++;
-	}
-	out[r] = 0;
-}
-
-/*
-==================
-G_ClientNumberFromStrippedName
-
-Same as above, but strips special characters out of the names before comparing.
-==================
-*/
-int G_ClientNumberFromStrippedName ( const char* name )
-{
-	char		s2[MAX_STRING_CHARS];
-	char		n2[MAX_STRING_CHARS];
-	int			i;
-	gclient_t*	cl;
-
-	// check for a name match
-	SanitizeString2( (char*)name, s2 );
-	for ( i=0, cl=level.clients ; i < level.numConnectedClients ; i++, cl++ ) 
-	{
-		SanitizeString2( cl->pers.netname, n2 );
-		if ( !strcmp( n2, s2 ) ) 
-		{
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-int G_ClientNumberFromStrippedName2( const char *name )
-{
-	char		s2[MAX_STRING_CHARS];
-	char		n2[MAX_STRING_CHARS];
-	int			i;
-	int			num;
-	gclient_t*	cl;
-
-	//	First check for clientNum match
-	if ( name[0] >= '0' && name[0] <= '9' )
-	{
-		num = atoi( name );
-		if ( num >=0 && num < MAX_CLIENTS )
-			return num;
-		else
-			return -1;
-	}
-
-	//	Failed, check for a name match
-	SanitizeString3( (char *)name, s2 );
-
-	for ( i=0, cl=level.clients; i<level.numConnectedClients; i++, cl++ ) 
-	{
-		SanitizeString3( cl->pers.netname, n2 );
-
-		if ( strstr( n2, s2 ) )
-			return i;
-	}
-
-	//Failed, target client does not exist
-	return -1;
-}
-
 
 /*
 ==================
@@ -2245,7 +1985,7 @@ qboolean G_VoteSuicideDropFlag( gentity_t *ent, int numArgs, const char *arg1, c
 }
 
 qboolean G_VoteKick( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	int clientid = ClientNumberFromString( ent, arg2 );
+	int clientid = G_ClientFromString( ent, arg2, qtrue, qfalse, qtrue );
 	gentity_t *target = NULL;
 
 	if ( clientid == -1 )
@@ -2271,7 +2011,7 @@ void Cmd_MapList_f( gentity_t *ent ) {
 
 	for ( i=0; i<level.arenas.num; i++ ) {
 		Q_strncpyz( map, Info_ValueForKey( level.arenas.infos[i], "map" ), sizeof( map ) );
-		Q_StripColor( map );
+		Q_CleanString( map, qtrue );
 
 		if ( G_DoesMapSupportGametype( map, level.gametype ) ) {
 			char *tmpMsg = va( " ^%c%s", (++toggle&1) ? COLOR_GREEN : COLOR_YELLOW, map );
@@ -4101,12 +3841,10 @@ static void Cmd_Origin_f( gentity_t *ent ) {
 	
 	//Self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientNumberFromStrippedName2( arg1 ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
 
-	if ( targetClient == -1 ) {
-		trap->SendServerCommand( ent-g_entities, "print \"Invalid player\n\"" );
+	if ( targetClient == -1 )
 		return;
-	}
 
 	targ = &g_entities[targetClient];
 

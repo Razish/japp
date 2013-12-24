@@ -42,7 +42,8 @@ void CG_LoadingItem( int itemNum ) {
 	}
 
 	strcpy(upperKey, item->classname);
-	CG_LoadingString( CG_GetStringEdString("SP_INGAME",Q_strupr(upperKey)) );
+	Q_strupr( upperKey );
+	CG_LoadingString( CG_GetStringEdString("SP_INGAME", upperKey) );
 }
 
 /*
@@ -86,6 +87,7 @@ void CG_LoadingClient( int clientNum ) {
 	}
 */
 	Q_strncpyz( personality, Info_ValueForKey( info, "n" ), sizeof(personality) );
+	// allow colours and extended ASCII in names on loading screen
 //	Q_CleanStr( personality );
 
 	/*
@@ -147,7 +149,8 @@ void CG_DrawInformation( void ) {
 	if ( !atoi( buf ) ) {
 		// server hostname
 		Q_strncpyz(buf, Info_ValueForKey( info, "sv_hostname" ), sizeof( buf ) );
-		Q_CleanStr(buf);
+		// allow colours, don't allow extended ASCII
+		Q_CleanString( buf, qfalse );
 		UI_DrawProportionalString( 320, y, buf, UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 

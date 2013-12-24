@@ -467,7 +467,7 @@ void G_AddRandomBot( int team ) {
 				else if (team == TEAM_BLUE) teamstr = "blue";
 				else teamstr = "";
 				Q_strncpyz( netname, value, sizeof( netname ) );
-				Q_CleanStr(netname);
+				Q_CleanString(netname, qfalse);
 				trap->SendConsoleCommand( EXEC_INSERT, va("addbot \"%s\" %f %s %i\n", netname, skill, teamstr, 0) );
 				return;
 			}
@@ -482,7 +482,6 @@ G_RemoveRandomBot
 */
 int G_RemoveRandomBot( int team ) {
 	int i;
-	char netname[36];
 	gclient_t	*cl;
 
 	for ( i=0 ; i< sv_maxclients.integer ; i++ ) {
@@ -518,8 +517,7 @@ int G_RemoveRandomBot( int team ) {
 				continue;
 			}
 		}
-		strcpy(netname, cl->pers.netname);
-		Q_CleanStr(netname);
+		//RAZFIXME: is clientkick id correct?
 		trap->SendConsoleCommand( EXEC_INSERT, va("clientkick \"%d\"\n", i) );
 		return qtrue;
 	}

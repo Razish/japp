@@ -5,13 +5,14 @@
 
 #include "g_local.h"
 
+//RAZFIXME: Use G_ClientFromString
 gclient_t *ClientForString( const char *s ) {
 	gclient_t	*cl;
 	int			idnum;
 	char		cleanName[MAX_STRING_CHARS];
 
 	// numeric values could be slot numbers
-	if ( StringIsInteger( s ) ) {
+	if ( Q_StringIsInteger( s ) ) {
 		idnum = atoi( s );
 		if ( idnum >= 0 && idnum < level.maxclients ) {
 			cl = &level.clients[idnum];
@@ -27,7 +28,7 @@ gclient_t *ClientForString( const char *s ) {
 			continue;
 		}
 		Q_strncpyz(cleanName, cl->pers.netname, sizeof(cleanName));
-		Q_CleanStr(cleanName);
+		Q_CleanString( cleanName, qtrue );
 		if ( !Q_stricmp( cleanName, s ) ) {
 			return cl;
 		}
@@ -251,16 +252,16 @@ static void SV_BotList_f( void ) {
 	for ( i=0; i<level.bots.num; i++ )
 	{
 		Q_strncpyz( name, Info_ValueForKey( level.bots.infos[i], "name" ), sizeof( name ) );
-		Q_StripColor( name );
+		Q_CleanString( name, qtrue );
 
 		Q_strncpyz( funname, Info_ValueForKey( level.bots.infos[i], "funname" ), sizeof( funname ) );
-		Q_StripColor( funname );
+		Q_CleanString( funname, qtrue );
 
 		Q_strncpyz( model, Info_ValueForKey( level.bots.infos[i], "model" ), sizeof( model ) );
-		Q_StripColor( model );
+		Q_CleanString( model, qtrue );
 
 		Q_strncpyz( personality, Info_ValueForKey( level.bots.infos[i], "personality" ), sizeof( personality ) );
-		Q_StripColor( personality );
+		Q_CleanString( personality, qtrue );
 
 		trap->Print( "%-16s %-16s %-20s %-20s\n", name, model, personality, funname );
 	}
@@ -330,13 +331,13 @@ static void SV_ListMaps_f( void ) {
 	for ( i=0; i<level.arenas.num; i++ )
 	{
 		Q_strncpyz( map, Info_ValueForKey( level.arenas.infos[i], "map" ), sizeof( map ) );
-		Q_StripColor( map );
+		Q_CleanString( map, qtrue );
 
 		Q_strncpyz( longname, Info_ValueForKey( level.arenas.infos[i], "longname" ), sizeof( longname ) );
-		Q_StripColor( longname );
+		Q_CleanString( longname, qtrue );
 
 		Q_strncpyz( type, Info_ValueForKey( level.arenas.infos[i], "type" ), sizeof( type ) );
-		Q_StripColor( type );
+		Q_CleanString( type, qtrue );
 
 		trap->Print( "  %-24s%-32s%-64s\n", map, longname, type );
 	}

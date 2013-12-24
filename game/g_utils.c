@@ -2187,3 +2187,86 @@ void GetAnglesForDirection( const vector3 *p1, const vector3 *p2, vector3 *out )
 	VectorSubtract( p2, p1, &v );
 	vectoangles( &v, out );
 }
+
+static qboolean G_ValidClient( const gclient_t *cl ) {
+	if ( cl->pers.connected == CON_DISCONNECTED )
+		return qfalse;
+
+	return qtrue;
+}
+
+static qboolean compareSubstring( const char *s1, const char *s2 ) {
+	return (strstr( s1, s2 ) != NULL) ? qtrue : qfalse;
+}
+
+static qboolean compareWhole( const char *s1, const char *s2 ) {
+	return (!Q_stricmp( s1, s2 )) ? qtrue : qfalse;
+}
+
+int G_ClientFromString( const gentity_t *ent, const char *match, qboolean substr, qboolean firstMatch, qboolean clean ) {
+	char cleanedMatch[MAX_STRING_CHARS], cleanedName[MAX_STRING_CHARS];
+	int i;
+	gclient_t *cl = NULL;
+	qboolean (*compareFunc)(const char *s1, const char *s2) = substr ? compareSubstring : compareWhole;
+
+	// First check for clientNum match
+	if ( Q_StringIsInteger( match ) ) {
+		i = atoi( match );
+		if ( i >=0 && i < level.numConnectedClients ) {
+			if ( G_ValidClient( &level.clients[i] ) )
+				return i;
+			trap->SendServerCommand( ent-g_entities, va( "print \"Client %d is not on the server\n\"", i ) );
+			return -1;
+		}
+		else {
+			trap->SendServerCommand( ent-g_entities, va( "print \"Client %d is out of range [0, %d]\n\"", i, level.numConnectedClients-1 ) );
+			return -1;
+		}
+	}
+
+	// Failed, check for a name match
+	Q_strncpyz( cleanedMatch, match, sizeof( cleanedMatch ) );
+	Q_CleanString( cleanedMatch, qtrue );
+
+	if ( firstMatch ) {
+		for ( i=0, cl=level.clients; i<level.numConnectedClients; i++, cl++ ) {
+			Q_strncpyz( cleanedName, cl->pers.netname, sizeof( cleanedName ) );
+			Q_CleanString( cleanedName, qtrue );
+
+			if ( compareFunc( cleanedName, cleanedMatch ) && G_ValidClient( cl ) )
+				return i;
+		}
+	}
+	else {
+		int numMatches, matches[MAX_CLIENTS];
+
+		// find all matching names
+		for ( i=0, numMatches=0, cl=level.clients; i<level.numConnectedClients; i++, cl++ ) {
+			Q_strncpyz( cleanedName, cl->pers.netname, sizeof( cleanedName ) );
+			Q_CleanString( cleanedName, qtrue );
+
+			if ( compareFunc( cleanedName, cleanedMatch ) && G_ValidClient( cl ) )
+				matches[numMatches++] = i;
+		}
+
+		// success
+		if ( numMatches == 1 )
+			return matches[0];
+
+		// multiple matches, can occur on substrings and if duplicate names are allowed
+		else if ( numMatches ) {
+			char msg[MAX_TOKEN_CHARS];
+			Com_sprintf( msg, sizeof( msg ), "Found %d matches:\n", numMatches );
+			for ( i=0; i<numMatches; i++ ) {
+				Q_strcat( msg, sizeof( msg ), va( "  "S_COLOR_WHITE"("S_COLOR_CYAN"%02i"S_COLOR_WHITE") %s\n", matches[i],
+					level.clients[matches[i]].pers.netname ) );
+			}
+			trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
+			return -1;
+		}
+	}
+
+	//Failed, target client does not exist
+	trap->SendServerCommand( ent-g_entities, va( "print \"Client %s does not exist\n\"", cleanedMatch ) );
+	return -1;
+}

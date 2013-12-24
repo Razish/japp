@@ -1250,8 +1250,9 @@ void CG_DrawWeaponSelect( void ) {
 		char	upperKey[1024];
 
 		strcpy(upperKey, cg_weapons[ cg.weaponSelect ].item->classname);
+		Q_strupr( upperKey );
 
-		if ( trap->SE_GetStringTextString( va("SP_INGAME_%s",Q_strupr(upperKey)), text, sizeof( text )))
+		if ( trap->SE_GetStringTextString( va("SP_INGAME_%s", upperKey), text, sizeof( text )))
 		{
 			UI_DrawProportionalString(320, y+45+yOffset, text, UI_CENTER|UI_SMALLFONT, &textColor);
 		}

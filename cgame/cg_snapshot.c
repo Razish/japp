@@ -133,7 +133,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 		Com_sprintf( buf, sizeof( buf ), "%s_%s_%s_%s", timeStr, gametypeStringShort[cgs.gametype], mapName, cgs.clientinfo[cg.clientNum].name );
 		Q_strstrip( buf, "\n\r;?*<>|\\/\"", NULL );
 		Q_strstrip( buf, " ", "_" );
-		Q_StripColor( buf );
+		Q_CleanString( buf, qtrue );
 		trap->SendConsoleCommand( va( "stoprecord; record %s\n", buf ) );
 	}
 

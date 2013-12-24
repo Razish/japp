@@ -1457,7 +1457,8 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 	}
 	else
 	{
-		ent->NPC_type = Q_strlwr( G_NewString( ent->NPC_type ) );
+		ent->NPC_type = G_NewString( ent->NPC_type );
+		Q_strlwr( ent->NPC_type );
 	}
 
 	if ( ent->r.svFlags & SVF_NO_BASIC_SOUNDS )

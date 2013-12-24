@@ -173,9 +173,9 @@ int	LongNoSwap (int l)
 	return l;
 }
 
-qint64 Long64Swap (qint64 ll)
+qint64_t Long64Swap (qint64_t ll)
 {
-	qint64	result;
+	qint64_t	result;
 
 	result.b0 = ll.b7;
 	result.b1 = ll.b6;
@@ -189,7 +189,7 @@ qint64 Long64Swap (qint64 ll)
 	return result;
 }
 
-qint64 Long64NoSwap (qint64 ll)
+qint64_t Long64NoSwap (qint64_t ll)
 {
 	return ll;
 }
@@ -752,35 +752,24 @@ void Parse3DMatrix (const char **buf_p, int z, int y, int x, float *m) {
 ============================================================================
 */
 
-int Q_isprint( int c )
-{
-	if ( c >= 0x20 && c <= 0x7E )
-		return ( 1 );
-	return ( 0 );
+qboolean Q_isprint( int c ) {
+	return (c >= 0x20 && c <= 0x7E) ? qtrue : qfalse;
 }
 
-int Q_islower( int c )
-{
-	if (c >= 'a' && c <= 'z')
-		return ( 1 );
-	return ( 0 );
+qboolean Q_islower( int c ) {
+	return (c >= 'a' && c <= 'z') ? qtrue : qfalse;
 }
 
-int Q_isupper( int c )
-{
-	if (c >= 'A' && c <= 'Z')
-		return ( 1 );
-	return ( 0 );
+qboolean Q_isupper( int c ) {
+	return (c >= 'A' && c <= 'Z') ? qtrue : qfalse;
 }
 
-int Q_isalpha( int c )
-{
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-		return ( 1 );
-	return ( 0 );
+qboolean Q_isalpha( int c ) {
+	return (Q_islower( c ) || Q_isupper( c )) ? qtrue : qfalse;
 }
 
-qboolean Q_isanumber( const char *s ) {
+// true if s is a number (real or integer)
+qboolean Q_StringIsNumber( const char *s ) {
 	char *p;
 	double ret;
 
@@ -792,172 +781,146 @@ qboolean Q_isanumber( const char *s ) {
 	if ( ret == HUGE_VAL || errno == ERANGE )
 		return qfalse;
 
-	return (qboolean)(*p == '\0');
+	return (*p == '\0') ? qtrue : qfalse;
 }
 
+// true if s is an integer
+qboolean Q_StringIsInteger( const char *s ) {
+	int i, len;
+	qboolean foundDigit = qfalse;
+
+	for ( i=0, len=strlen( s ); i<len; i++ ) {
+		if ( !isdigit( s[i] ) )
+			return qfalse;
+
+		foundDigit = qtrue;
+	}
+
+	return foundDigit;
+}
+
+// returns true if f is an integer
 qboolean Q_isintegral( float f ) {
-	return (qboolean)( (int)f == f );
+	return ((int)f == f) ? qtrue : qfalse;
 }
 
-char* Q_strrchr( const char* string, int c )
-{
-	char cc = c;
-	char *s;
-	char *sp=(char *)0;
-
-	s = (char*)string;
-
-	while (*s)
-	{
-		if (*s == cc)
-			sp = s;
-		s++;
+// returns last instance of a character in a string
+char *Q_strrchr( const char *string, char c ) {
+	size_t len = strlen( string );
+	char *p = (char *)string+len;
+	while ( p >= string ) {
+		if ( *p == c )
+			return p;
+		p--;
 	}
-	if (cc == 0)
-		sp = s;
 
-	return sp;
+	return NULL;
 }
 
-/*
-=============
-Q_strncpyz
- 
-Safe strncpy that ensures a trailing zero
-=============
-*/
+// copy string and ensure a trailing null terminator
 void Q_strncpyz( char *dest, const char *src, int destsize ) {
-	// bk001129 - also NULL dest
 	if ( !dest )
-	{
 		Com_Error( ERR_FATAL, "Q_strncpyz: NULL dest" );
-		return;
-	}
 	if ( !src )
-	{
 		Com_Error( ERR_FATAL, "Q_strncpyz: NULL src" );
-		return;
-	}
-
 	if ( destsize < 1 )
-	{
-		Com_Error(ERR_FATAL,"Q_strncpyz: destsize < 1" ); 
-		return;
-	}
+		Com_Error( ERR_FATAL,"Q_strncpyz: destsize < 1" ); 
 
 	strncpy( dest, src, destsize-1 );
 	dest[destsize-1] = 0;
 }
-                 
-int Q_stricmpn( const char *s1, const char *s2, int n )
-{
+
+// case insensitive length compare
+int Q_stricmpn( const char *s1, const char *s2, int n ) {
 	int c1, c2;
 
-	// bk001129 - moved in 1.17 fix not in id codebase
-	if ( s1 == NULL ) {
-		if ( s2 == NULL )
+	if ( !s1 ) {
+		if ( !s2 )
 			return 0;
 		else
 			return -1;
 	}
-	else if ( s2==NULL )
+	else if ( !s2 )
 		return 1;
 
 	do {
 		c1 = *s1++;
 		c2 = *s2++;
 
-		if (!n--) {
-			return 0;		// strings are equal until end point
-		}
+		if ( !n-- )
+			return 0; // strings are equal until end point
 
-		if (c1 != c2) {
-			if (c1 >= 'a' && c1 <= 'z') {
-				c1 -= ('a' - 'A');
-			}
-			if (c2 >= 'a' && c2 <= 'z') {
-				c2 -= ('a' - 'A');
-			}
-			if (c1 != c2) {
+		if ( c1 != c2 ) {
+			if ( Q_islower( c1 ) ) c1 -= ('a' - 'A');
+			if ( Q_islower( c2 ) ) c2 -= ('a' - 'A');
+
+			if ( c1 != c2 )
 				return c1 < c2 ? -1 : 1;
-			}
 		}
-	} while (c1);
+	} while ( c1 );
 
 	return 0; // strings are equal
 }
 
-int Q_strncmp (const char *s1, const char *s2, int n) {
-	int		c1, c2;
+// case sensitive length compare
+int Q_strncmp( const char *s1, const char *s2, int n ) {
+	int c1, c2;
 	
 	do {
 		c1 = *s1++;
 		c2 = *s2++;
 
-		if (!n--) {
-			return 0;		// strings are equal until end point
-		}
+		if ( !n-- )
+			return 0; // strings are equal until end point
 		
-		if (c1 != c2) {
+		if ( c1 != c2 )
 			return c1 < c2 ? -1 : 1;
-		}
-	} while (c1);
+	} while ( c1 );
 	
-	return 0;		// strings are equal
+	return 0; // strings are equal
 }
 
-int Q_stricmp (const char *s1, const char *s2) {
+// case insensitive compare
+int Q_stricmp( const char *s1, const char *s2 ) {
 	return (s1 && s2) ? Q_stricmpn( s1, s2, 99999 ) : -1;
 }
 
+// convert string to lower-case
+void Q_strlwr( char *s1 ) {
+	char *s;
 
-char *Q_strlwr( char *s1 ) {
-    char	*s;
-
-    s = s1;
-	while ( *s ) {
-		*s = tolower(*s);
-		s++;
-	}
-    return s1;
+	for ( s=s1; *s; s++ )
+		*s = tolower( *s );
 }
 
-char *Q_strupr( char *s1 ) {
-    char	*s;
+// convert string to upper-case
+void Q_strupr( char *s1 ) {
+	char *s;
 
-    s = s1;
-	while ( *s ) {
-		*s = toupper(*s);
-		s++;
-	}
-    return s1;
+	for ( s=s1; *s; s++ )
+		*s = toupper( *s );
 }
 
-
-// never goes past bounds or leaves without a terminating 0
+// concatenate string (size safe, ensures trailing null terminator)
 void Q_strcat( char *dest, int size, const char *src ) {
-	int		l1;
+	int len;
 
-	l1 = strlen( dest );
-	if ( l1 >= size ) {
+	len = strlen( dest );
+	if ( len >= size )
 		Com_Error( ERR_FATAL, "Q_strcat: already overflowed" );
-	}
-	Q_strncpyz( dest + l1, src, size - l1 );
+	Q_strncpyz( dest+len, src, size-len );
 }
 
-
+// string length not counting colour codes
 int Q_PrintStrlen( const char *string ) {
-	int			len;
-	const char	*p;
+	int len;
+	const char *p;
 
-	if( !string ) {
+	if ( !string )
 		return 0;
-	}
 
-	len = 0;
-	p = string;
-	while( *p ) {
-		if( Q_IsColorString( p ) ) {
+	for ( p=string, len=0; *p; /**/ ) {
+		if ( Q_IsColorString( p ) ) {
 			p += 2;
 			continue;
 		}
@@ -968,54 +931,22 @@ int Q_PrintStrlen( const char *string ) {
 	return len;
 }
 
-
-char *Q_CleanStr( char *string ) {
-	char*	d;
-	char*	s;
-	int		c;
-
-	s = string;
-	d = string;
-	while ((c = *s) != 0 ) {
-		if ( Q_IsColorString( s ) ) {
-			s++;
-		}		
-		else if ( c >= 0x20 && c <= 0x7E ) {
-			*d++ = c;
-		}
-		s++;
-	}
-	*d = '\0';
-
-	return string;
-}
-
-/*
-Q_strstrip
-
-	Description:	Replace strip[x] in string with repl[x] or remove characters entirely
-					Does not strip colours or any characters not specified. See Q_CleanStr
-	Mutates:		string
-	Return:			--
-
-	Examples:		Q_strstrip( "Bo\nb is h\rairy!!", "\n\r!", "123" );	// "Bo1b is h2airy33"
-					Q_strstrip( "Bo\nb is h\rairy!!", "\n\r!", "12" );	// "Bo1b is h2airy"
-					Q_strstrip( "Bo\nb is h\rairy!!", "\n\r!", NULL );	// "Bob is hairy"
-*/
-
-void Q_strstrip( char *string, const char *strip, const char *repl )
-{
+// replace or strip characters in a string
+// replace strip[x] in string with repl[x] or remove characters entirely
+// does not strip colours or any characters not specified. See Q_CleanString
+// mutates string
+// Examples:	Q_strstrip( "Bo\nb is h\rairy!!", "\n\r!", "123" );	// "Bo1b is h2airy33"
+//				Q_strstrip( "Bo\nb is h\rairy!!", "\n\r!", "12" );	// "Bo1b is h2airy"
+//				Q_strstrip( "Bo\nb is h\rairy!!", "\n\r!", NULL );	// "Bob is hairy"
+void Q_strstrip( char *string, const char *strip, const char *repl ) {
 	char		*out=string, *p=string, c;
 	const char	*s=strip;
 	int			replaceLen = repl?strlen( repl ):0, offset=0;
 
-	while ( (c = *p++) != '\0' )
-	{
-		for ( s=strip; *s; s++ )
-		{
+	while ( (c = *p++) != '\0' ) {
+		for ( s=strip; *s; s++ ) {
 			offset = s-strip;
-			if ( c == *s )
-			{
+			if ( c == *s ) {
 				if ( !repl || offset >= replaceLen )
 					c = *p++;
 				else
@@ -1028,24 +959,14 @@ void Q_strstrip( char *string, const char *strip, const char *repl )
 	*out = '\0';
 }
 
-/*
-Q_strchrs
-
-	Description:	Find any characters in a string. Think of it as a shorthand strchr loop.
-	Mutates:		--
-	Return:			first instance of any characters found
-					 otherwise NULL
-*/
-
-const char *Q_strchrs( const char *string, const char *search )
-{
+// find first instance of specified characters, or NULL if none are found
+const char *Q_strchrs( const char *string, const char *search ) {
 	const char *p = string, *s = search;
 
 	while ( *p != '\0' ) {
 		for ( s=search; *s != '\0'; s++ ) {
-			if ( *p == *s ) {
+			if ( *p == *s )
 				return p;
-			}
 		}
 		p++;
 	}
@@ -1053,46 +974,46 @@ const char *Q_strchrs( const char *string, const char *search )
 	return NULL;
 }
 
-/*
-Q_strrep
+// replace strings in a string
+// caller must free the return value
+char *Q_strrep( const char *subject, const char *search, const char *replace ) {
+	char *tok = NULL, *newstr = NULL;
+	size_t searchLen, replaceLen;
 
-	Description:	Replace instances of 'old' in 's' with 'new'
-	Mutates:		--
-	Return:			malloced string containing the replacements
-*/
+	if ( !(tok=(char *)strstr( subject, search )) )
+		return strdup( subject );
 
-char *Q_strrep( const char *string, const char *substr, const char *replacement ) {
-	char *tok = NULL;
-	char *newstr = NULL;
+	searchLen = strlen( search );
+	replaceLen = strlen( replace );
 
-	tok = (char *)strstr( string, substr );
-	if( tok == NULL ) return strdup( string );
-	newstr = (char *)malloc( strlen( string ) - strlen( substr ) + strlen( replacement ) + 1 );
-	if( newstr == NULL ) return NULL;
-	memcpy( newstr, string, tok - string );
-	memcpy( newstr + (tok - string), replacement, strlen( replacement ) );
-	memcpy( newstr + (tok - string) + strlen( replacement ), tok + strlen( substr ), strlen( string ) - strlen( substr ) - ( tok - string ) );
-	memset( newstr + strlen( string ) - strlen( substr ) + strlen( replacement ), 0, 1 );
+	newstr = (char *)malloc( strlen( subject ) - searchLen + replaceLen + 1 );
+	if ( !newstr )
+		return NULL;
+
+	memcpy( newstr, subject, tok - subject );
+	memcpy( newstr + (tok - subject), replace, replaceLen );
+	memcpy( newstr + (tok - subject) + replaceLen, tok + searchLen, strlen( subject ) - searchLen - ( tok - subject ) );
+	memset( newstr + strlen( subject ) - searchLen + replaceLen, 0, 1 );
 
 	return newstr;
 }
 
-char *Q_strrev( char *str ) {
+// reverse a string in place
+void Q_strrev( char *str ) {
 	char *p1, *p2;
 
 	if ( !VALIDSTRING( str ) )
-		return str; // could be NULL, or empty string
+		return;
 
 	for ( p1=str, p2=str+strlen(str)-1; p2 > p1; ++p1, --p2 ) {
 		*p1 ^= *p2;
 		*p2 ^= *p1;
 		*p1 ^= *p2;
 	}
-
-	return str;
 }
 
-void Q_StripColor( char *string ) {
+// removes extended ASCII and Q3 colour codes
+void Q_CleanString( char *string, qboolean stripColour ) {
 	qboolean doPass = qtrue;
 	char *read, *write;
 
@@ -1100,11 +1021,11 @@ void Q_StripColor( char *string ) {
 		doPass = qfalse;
 		read = write = string;
 		while ( *read ) {
-			if ( Q_IsColorStringExt( read ) ) {
+			if ( stripColour && Q_IsColorStringExt( read ) ) {
 				doPass = qtrue;
 				read += 2;
 			}
-			else {
+			else if ( *read >= 0x20 && *read <= 0x7E ) {
 				// Avoid writing the same data over itself
 				if ( write != read )
 					*write = *read;
@@ -1116,6 +1037,7 @@ void Q_StripColor( char *string ) {
 			*write = '\0';
 	}
 }
+
 
 /*
 ============
@@ -1135,8 +1057,7 @@ Q_vsnprintf: always appends a trailing '\0', returns number of characters writte
 or returns -1 on failure or if the buffer would be overflowed.
 ============
 */
-int Q_vsnprintf( char *str, size_t size, const char *format, va_list args )
-{
+int Q_vsnprintf( char *str, size_t size, const char *format, va_list args ) {
 	int ret;
 
 #ifdef _WIN32
@@ -1153,9 +1074,8 @@ int Q_vsnprintf( char *str, size_t size, const char *format, va_list args )
 	return ret;
 }
 
-//Raz: Patched version of Com_sprintf
-void QDECL Com_sprintf( char *dest, int size, const char *fmt, ...)
-{
+// format a string into a buffer
+void Com_sprintf( char *dest, int size, const char *fmt, ... ) {
 	int			ret;
 	va_list		argptr;
 
@@ -1167,20 +1087,12 @@ void QDECL Com_sprintf( char *dest, int size, const char *fmt, ...)
 		Com_Printf( "Com_sprintf: overflow of %i bytes buffer\n", size );
 }
 
-
-/*
-============
-va
-
-does a varargs printf into a temp buffer, so I don't need to have
-varargs versions of all text functions.
-FIXME: make this buffer size safe someday
-============
-*/
 #define	MAX_VA_STRING 32000
 #define MAX_VA_BUFFERS 4
 #define VA_MASK (MAX_VA_BUFFERS-1)
 
+// varargs format buffer
+// uses a circular buffer, copy after use
 char *va( const char *format, ... ) {
 	va_list		argptr;
 	static char	string[MAX_VA_BUFFERS][MAX_VA_STRING];	// in case va is called by nested functions

@@ -23,6 +23,7 @@ int JPLua_GetPlayer( lua_State *L )
 		const char *name = lua_tostring( L, 1 );
 		int numFound = 0;
 		int i=0;
+		//RAZTODO: copy G_ClientFromString
 		for ( i=0; i<cgs.maxclients; i++ )
 		{
 			char nameClean[36] = {0};
@@ -31,8 +32,8 @@ int JPLua_GetPlayer( lua_State *L )
 				continue;
 			Q_strncpyz( nameClean, cgs.clientinfo[i].name, sizeof( nameClean ) );
 			Q_strncpyz( nameClean2, name, sizeof( nameClean2 ) );
-			Q_StripColor( nameClean );
-			Q_StripColor( nameClean2 );
+			Q_CleanString( nameClean, qtrue );
+			Q_CleanString( nameClean2, qtrue );
 			if ( !Q_stricmp( nameClean, nameClean2 ) )
 			{
 				num = i;

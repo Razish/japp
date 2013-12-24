@@ -8562,7 +8562,9 @@ qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 #ifndef _CGAME
 		for (; multiPtr->count < uiInfo.playerSpeciesCount; multiPtr->count++)
 		{
-			multiPtr->cvarList[multiPtr->count] = String_Alloc(Q_strupr(va("@MENUS_%s",uiInfo.playerSpecies[multiPtr->count].Name )));	//look up translation
+			const char *p = String_Alloc( va( "@MENUS_%s", uiInfo.playerSpecies[multiPtr->count].Name ) ); // look up translation
+			Q_strupr( (char *)p );
+			multiPtr->cvarList[multiPtr->count] = p;
 			multiPtr->cvarStr[multiPtr->count] = uiInfo.playerSpecies[multiPtr->count].Name;	//value
 		}
 #endif

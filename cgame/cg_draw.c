@@ -2082,7 +2082,7 @@ void CG_DrawInvenSelect( void )
 
 			strcpy(upperKey, bg_itemlist[itemNdex].classname);
 			
-			if ( trap->SE_GetStringTextString( va("SP_INGAME_%s",Q_strupr(upperKey)), text, sizeof( text )))
+			if ( trap->SE_GetStringTextString( va("SP_INGAME_%s", upperKey), text, sizeof( text )))
 			{
 				UI_DrawProportionalString(320, y+45, text, UI_CENTER | UI_SMALLFONT, &textColor);
 			}
@@ -6616,46 +6616,6 @@ traceAgain:
 	cg.crosshairClientTime = cg.time;
 }
 
-void CG_SanitizeString( char *in, char *out )
-{
-	int i = 0;
-	int r = 0;
-
-	while (in[i])
-	{
-		if (i >= 128-1)
-		{ //the ui truncates the name here..
-			break;
-		}
-
-		if (in[i] == '^')
-		{
-			if (in[i+1] >= 48 && //'0'
-				in[i+1] <= 57) //'9'
-			{ //only skip it if there's a number after it for the color
-				i += 2;
-				continue;
-			}
-			else
-			{ //just skip the ^
-				i++;
-				continue;
-			}
-		}
-
-		if (in[i] < 32)
-		{
-			i++;
-			continue;
-		}
-
-		out[r] = in[i];
-		r++;
-		i++;
-	}
-	out[r] = 0;
-}
-
 /*
 =====================
 CG_DrawCrosshairNames
@@ -6665,7 +6625,6 @@ static void CG_DrawCrosshairNames( void ) {
 	vector4		*color;
 	vector4		tcolor;
 	char		*name;
-//	char		sanitized[1024];
 	qboolean	isVeh = qfalse;
 
 	if ( !cg_drawCrosshair.integer ) {
@@ -6723,8 +6682,6 @@ static void CG_DrawCrosshairNames( void ) {
 	name = cgs.clientinfo[ cg.crosshairClientNum ].name;
 
 	VectorSet4( &tcolor, 1.0f, 1.0f, 1.0f, 1.0f );
-
-//	CG_SanitizeString( name, sanitized );
 
 	if ( isVeh ) {
 		char str[MAX_STRING_CHARS];

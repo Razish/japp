@@ -1530,65 +1530,39 @@ typedef enum fsOrigin_e {
 
 //=============================================
 
-int Q_isprint( int c );
-int Q_islower( int c );
-int Q_isupper( int c );
-int Q_isalpha( int c );
-qboolean Q_isanumber( const char *s );
+// string library
+qboolean Q_isprint( int c );
+qboolean Q_islower( int c );
+qboolean Q_isupper( int c );
+qboolean Q_isalpha( int c );
+qboolean Q_StringIsNumber( const char *s );
+qboolean Q_StringIsInteger( const char *s );
 qboolean Q_isintegral( float f );
-
-// portable case insensitive compare
-int		Q_stricmp (const char *s1, const char *s2);
-int		Q_strncmp (const char *s1, const char *s2, int n);
-int		Q_stricmpn (const char *s1, const char *s2, int n);
-char	*Q_strlwr( char *s1 );
-char	*Q_strupr( char *s1 );
-char	*Q_strrchr( const char* string, int c );
-
-// buffer size safe library replacements
-void	Q_strncpyz( char *dest, const char *src, int destsize );
-void	Q_strcat( char *dest, int size, const char *src );
-
-// strlen that discounts Quake color sequences
+char *Q_strrchr( const char *string, char c );
+void Q_strncpyz( char *dest, const char *src, int destsize );
+int Q_stricmpn( const char *s1, const char *s2, int n );
+int Q_strncmp( const char *s1, const char *s2, int n );
+int Q_stricmp( const char *s1, const char *s2 );
+void Q_strlwr( char *s1 );
+void Q_strupr( char *s1 );
+void Q_strcat( char *dest, int size, const char *src );
 int Q_PrintStrlen( const char *string );
-// removes color sequences from string
-char *Q_CleanStr( char *string );
 void Q_strstrip( char *string, const char *strip, const char *repl );
 const char *Q_strchrs( const char *string, const char *search );
-char *Q_strrep( const char *string, const char *substr, const char *replacement );
-char *Q_strrev( char *str );
-void Q_StripColor( char *string );
+char *Q_strrep( const char *subject, const char *search, const char *replace );
+void Q_strrev( char *str );
+void Q_CleanString( char *string, qboolean stripColour );
+int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
+void Com_sprintf( char *dest, int size, const char *fmt, ... );
+char *va( const char *format, ... );
 
 //=============================================
 
 // 64-bit integers for global rankings interface
 // implemented as a struct for qvm compatibility
-typedef struct
-{
-	byte	b0;
-	byte	b1;
-	byte	b2;
-	byte	b3;
-	byte	b4;
-	byte	b5;
-	byte	b6;
-	byte	b7;
-} qint64;
-
-//=============================================
-/*
-short	BigShort(short l);
-short	LittleShort(short l);
-int		BigLong (int l);
-int		LittleLong (int l);
-qint64  BigLong64 (qint64 l);
-qint64  LittleLong64 (qint64 l);
-float	BigFloat (const float *l);
-float	LittleFloat (const float *l);
-
-void	Swap_Init (void);
-*/
-char	* QDECL va(const char *format, ...);
+typedef struct qint64_s {
+	byte	b0, b1, b2, b3, b4, b5, b6, b7;
+} qint64_t;
 
 //=============================================
 
