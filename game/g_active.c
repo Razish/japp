@@ -3437,6 +3437,8 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( ent->s.eType != ET_NPC &&
 		 ent->client &&
 		 ent->client->pers.connected == CON_CONNECTED &&
+		 !ent->client->ps.duelInProgress &&
+		 !BG_SaberInAttack( ent->client->ps.saberMove ) &&
 		 !!(japp_allowHook.integer & (1<<level.gametype)))
 	{
 		if ( !ent->client->hook && (pm.cmd.buttons & BUTTON_GRAPPLE) && ent->client->ps.pm_type != PM_DEAD /*&& !ent->client->hookHasBeenFired*/ )

@@ -949,6 +949,16 @@ void G_RunMissile( gentity_t *ent ) {
 		}
 	}
 
+	if ( ent->parent &&
+		 ent->parent->client &&
+		 ent->parent->client->hook == ent &&
+ 		 (ent->parent->client->ps.duelInProgress ||
+		 BG_SaberInAttack( ent->parent->client->ps.saberMove ) ||
+		 !(japp_allowHook.integer & (1<<level.gametype))) )
+	{// not allowed to have hook out
+		Weapon_HookFree( ent->parent->client->hook );
+	}
+
 	if ( tr.fraction != 1) {
 		// never explode or bounce on sky
 		if ( tr.surfaceFlags & SURF_NOIMPACT )
@@ -958,11 +968,7 @@ void G_RunMissile( gentity_t *ent ) {
 		//	if ( ent->parent && ent->parent->client && ent->parent->client->hook == ent )
 		//		ent->parent->client->hook = NULL;
 			if ( ent->parent && ent->parent->client && ent->parent->client->hook == ent )
-			{
-				ent->parent->client->hook				= NULL;
-				ent->parent->client->hookHasBeenFired	= qfalse;
-				ent->parent->client->fireHeld			= qfalse;
-			}
+				Weapon_HookFree( ent->parent->client->hook );
 			//[/Grapple]
 
 			if ((ent->s.weapon == WP_SABER && ent->isSaberEntity) || isKnockedSaber)
