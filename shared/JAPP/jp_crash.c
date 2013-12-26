@@ -10,7 +10,7 @@
 #include "q_shared.h"
 #include "qcommon/game_version.h"
 
-#if QARCH == 64
+#if QARCH == 64 || defined(MACOS_X)
 
 // wat do?
 

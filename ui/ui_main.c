@@ -22,9 +22,6 @@ USER INTERFACE MAIN
 #ifdef FAV_SERVERS
 	#include "JAPP/jp_tokenparser.h"
 #endif
-#if MAC_PORT
-	#include "macosx/jp_mac.h"
-#endif
 #include "shared/JAPP/jp_crash.h"
 
 
@@ -10328,30 +10325,10 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad )
 UI_Init
 =================
 */
-#if MAC_PORT
-extern int whichVersionDigDl( char *version );
-#endif
 void _UI_Init( qboolean inGameLoad ) {
 	const char	*menuSet;
 	int			value=0;
 	vmCvar_t	japp_crashHandler;
-#if MAC_PORT
-	int			isDigitalDownloadMac;
-	char		macVersion[8];
-	//first let's check which version it is
-	
-	isDigitalDownloadMac = whichVersionDigDl(macVersion);
-	Com_Printf("Mac Patch Version: %s\n", macVersion);
-	Com_Printf("Mac Digital Download: %d\n", isDigitalDownloadMac);
-	if (!isDigitalDownloadMac)
-	{
-		Com_Error(ERR_FATAL, "This version of JA++ does not support Jedi Academy version %s", macVersion);
-	}
-	else if (isDigitalDownloadMac == 1)
-	{
-		Com_Error(ERR_FATAL, "This version of JA++ does not support Jedi Academy digital download");
-	}
-#endif
 
 	trap->Cvar_Register( &japp_crashHandler, "japp_crashHandler", "1", CVAR_ARCHIVE );
 

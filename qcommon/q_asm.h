@@ -9,7 +9,7 @@
 	#define qasm3( a, b, c )	__asm a, b, c
 	#define qasmL( a )			__asm a
 
-#elif MAC_PORT
+#elif defined(MACOS_X)
 
 	//In order to use intel syntax need "Codewarrior-style inline assembly" enabled
 

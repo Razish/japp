@@ -645,7 +645,7 @@ void BG_VehicleTurnRateForSpeed( Vehicle_t *pVeh, float speed, float *mPitchOver
 
 // Following couple things don't belong in the DLL namespace!
 #ifdef _GAME
-	#if !MAC_PORT && !defined(__GCC__)
+	#if !defined(MACOS_X) && !defined(__GCC__)
 		typedef struct gentity_s gentity_t;
 	#endif
 	gentity_t *G_PlayEffectID( const int fxID, vector3 *org, vector3 *ang );

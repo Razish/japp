@@ -1059,6 +1059,7 @@ Q_vsnprintf: always appends a trailing '\0', returns number of characters writte
 or returns -1 on failure or if the buffer would be overflowed.
 ============
 */
+#ifdef _MSC_VER
 int Q_vsnprintf( char *str, size_t size, const char *format, va_list args ) {
 	int ret;
 
@@ -1075,6 +1076,7 @@ int Q_vsnprintf( char *str, size_t size, const char *format, va_list args ) {
 
 	return ret;
 }
+#endif
 
 // format a string into a buffer
 void Com_sprintf( char *dest, int size, const char *fmt, ... ) {
