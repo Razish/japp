@@ -204,7 +204,7 @@ float FloatSwap( const float *f );
 	#define __cdecl
 	#define __declspec(x)
 	#define stricmp strcasecmp
-	#define QINLINE inline 
+	#define QINLINE /*inline*/ 
 
 	#ifdef __ppc__
 		#define CPUSTRING "MacOSX-ppc"
@@ -1552,7 +1552,6 @@ const char *Q_strchrs( const char *string, const char *search );
 char *Q_strrep( const char *subject, const char *search, const char *replace );
 void Q_strrev( char *str );
 void Q_CleanString( char *string, qboolean stripColour );
-int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
 void Com_sprintf( char *dest, int size, const char *fmt, ... );
 char *va( const char *format, ... );
 

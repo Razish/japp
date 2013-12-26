@@ -738,7 +738,7 @@ int BoxOnPlaneSide2 (vector3 *emins, vector3 *emaxs, struct cplane_s *p)
 
 ==================
 */
-#if !( (MAC_PORT || defined __linux__ || __FreeBSD__) && (defined __i386__) && (!defined C_ONLY)) // rb010123
+#if !( (defined MACOS_X || defined __linux__ || __FreeBSD__) && (defined __i386__) && (!defined C_ONLY)) // rb010123
 
 #if defined __LCC__ || defined C_ONLY || !id386 || defined(MINGW32)
 

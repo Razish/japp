@@ -442,7 +442,7 @@ typedef struct bgEntity_s
 	vector3			modelScale; //needed for g2 collision
 
 	//Data type(s) must directly correspond to the head of the gentity and centity structures
-#if defined(__GCC__) || defined(MINGW32) || MAC_PORT
+#if defined(__GCC__) || defined(MINGW32) || defined(MACOS_X)
 	} _bgEntity_t;
 #else
 	} bgEntity_t;
