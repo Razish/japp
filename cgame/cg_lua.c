@@ -256,7 +256,7 @@ static int JPLua_Export_SendChatText( lua_State *L )
 		lua_pop( L, 1 );
 		CG_LogPrintf( cg.log.console, va( "%s\n", text ) );
 		if ( cg_newChatbox.integer )
-			JP_ChatboxAdd( text, qfalse, "normal" );
+			CG_ChatboxAddMessage( text, qfalse, "normal" );
 		else
 			CG_ChatBox_AddString( text );
 	}

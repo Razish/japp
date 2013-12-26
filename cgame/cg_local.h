@@ -1774,9 +1774,6 @@ typedef struct {
 
 	int cursorX;
 	int cursorY;
-	qboolean eventHandling;
-	qboolean mouseCaptured;
-	qboolean sizingHud;
 	void *capturedItem;
 	qhandle_t activeCursor;
 
@@ -2245,25 +2242,40 @@ void CG_TrueViewInit( void );
 void CG_AdjustEyePos( const char *modelName );
 //[/TrueView]
 
+qboolean Server_Supports( unsigned int supportFlag );
+void HandleTeamBinds( char *buf, int bufsize );
+
 // chatbox stuff
 #define MAX_CHATBOX_IDENTIFIER_SIZE (32)
 qboolean CG_ContainsChannelEscapeChar( char *text );
 char *CG_RemoveChannelEscapeChar( char *text );
 
-void JP_ChatboxInit( void );
-void JP_ChatboxAdd( const char *message, qboolean multiLine, char *cbName );
-void JP_ChatboxDraw( void );
-void JP_ChatboxClear( void );
-void JP_ChatboxScroll( int direction );
-void JP_ChatboxSelectTabNext( void );
-void JP_ChatboxSelectTabNextNoKeys( void );
-void JP_ChatboxSelectTabPrevNoKeys( void );
-void JP_ChatboxSelect( char *cbName );
-int JP_ChatboxOutgoing( void );
-void JP_ChatboxHistoryUp( void );
-void JP_ChatboxHistoryDn( void );
-qboolean Server_Supports( unsigned int supportFlag );
-void HandleTeamBinds( char *buf, int bufsize );
+// chatbox tabs
+void CG_ChatboxSelectTabNext( void );
+void CG_ChatboxSelectTabNextNoKeys( void );
+void CG_ChatboxSelectTabPrevNoKeys( void );
+void CG_ChatboxSelect( char *cbName );
+
+// chatbox history
+void CG_ChatboxHistoryUp( void );
+void CG_ChatboxHistoryDn( void );
+
+// chatbox events
+void CG_MessageModeAll_f( void );
+void CG_MessageModeTeam_f( void );
+void CG_ChatboxTabComplete( void );
+void CG_ChatboxScroll( int direction );
+void CG_ChatboxChar( int key );
+void CG_ChatboxOutgoing( void );
+void CG_ChatboxClear( void );
+
+// chatbox management
+void CG_ChatboxInit( void );
+qboolean CG_ChatboxActive( void );
+void CG_ChatboxDraw( void );
+void CG_ChatboxEscape( void );
+void CG_ChatboxAddMessage( const char *message, qboolean multiLine, char *cbName );
+
 
 refdef_t *CG_GetRefdef( void );
 qboolean CG_WorldCoordToScreenCoordFloat( vector3 *worldCoord, float *x, float *y );

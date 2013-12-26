@@ -1636,7 +1636,7 @@ static void CG_ServerCommand( void ) {
 			CG_RemoveChatEscapeChar( text );
 			CG_LogPrintf( cg.log.console, va( "%s\n", text ) );
 			if ( cg_newChatbox.integer )
-				JP_ChatboxAdd( text, qfalse, cbName );
+				CG_ChatboxAddMessage( text, qfalse, cbName );
 			else
 				CG_ChatBox_AddString( text );
 			trap->Print( "*%s\n", text );
@@ -1653,7 +1653,7 @@ static void CG_ServerCommand( void ) {
 		CG_RemoveChatEscapeChar( text );
 		CG_LogPrintf( cg.log.console, va( "%s\n", text ) );
 		if ( cg_newChatbox.integer )
-			JP_ChatboxAdd( text, qfalse, "team" );
+			CG_ChatboxAddMessage( text, qfalse, "team" );
 		else
 			CG_ChatBox_AddString( text );
 		trap->Print( "*%s\n", text );
@@ -1692,7 +1692,7 @@ static void CG_ServerCommand( void ) {
 			CG_RemoveChatEscapeChar( text );
 			//Raz: Siege chat now uses the fancy new chatbox
 			if ( cg_newChatbox.integer )
-				JP_ChatboxAdd( text, qfalse, "normal" );
+				CG_ChatboxAddMessage( text, qfalse, "normal" );
 			else
 				CG_ChatBox_AddString( text );
 			trap->Print( "*%s\n", text );
@@ -1727,7 +1727,7 @@ static void CG_ServerCommand( void ) {
 		Com_sprintf(text, sizeof( text ), "%s"S_COLOR_WHITE"<%s> ^%s%s", name, loc, color, message);
 		CG_RemoveChatEscapeChar( text );
 			if ( cg_newChatbox.integer )
-				JP_ChatboxAdd( text, qfalse, "team" );
+				CG_ChatboxAddMessage( text, qfalse, "team" );
 			else
 				CG_ChatBox_AddString( text );
 		trap->Print( "*%s\n", text );

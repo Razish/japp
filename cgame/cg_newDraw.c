@@ -787,81 +787,31 @@ void CG_MouseEvent(int x, int y) {
 
 }
 
-/*
-==================
-CG_HideTeamMenus
-==================
-
-*/
-void CG_HideTeamMenu() {
-  Menus_CloseByName("teamMenu");
-  Menus_CloseByName("getMenu");
+void CG_EventHandling( int type ) {
+	// ...
 }
 
-/*
-==================
-CG_ShowTeamMenus
-==================
+void CG_KeyEvent( int key, qboolean down ) {
+	if ( !down )
+		return;
 
-*/
-void CG_ShowTeamMenu() {
-  Menus_OpenByName("teamMenu");
-}
-
-
-
-
-/*
-==================
-CG_EventHandling
-==================
- type 0 - no event handling
-      1 - team menu
-      2 - hud editor
-
-*/
-void CG_EventHandling(int type) {
-	cgs.eventHandling = type;
-  if (type == CGAME_EVENT_NONE) {
-    CG_HideTeamMenu();
-  } else if (type == CGAME_EVENT_TEAMMENU) {
-    //CG_ShowTeamMenu();
-  } else if (type == CGAME_EVENT_SCOREBOARD) {
-  }
-
-}
-
-
-
-void CG_KeyEvent(int key, qboolean down) {
-
-	if (!down) {
+	if ( CG_ChatboxActive() ) {
+		CG_ChatboxChar( key );
 		return;
 	}
 
 	if ( cg.predictedPlayerState.pm_type == PM_NORMAL || cg.predictedPlayerState.pm_type == PM_JETPACK || cg.predictedPlayerState.pm_type == PM_NORMAL || (cg.predictedPlayerState.pm_type == PM_SPECTATOR && cg.showScores == qfalse)) {
-		CG_EventHandling(CGAME_EVENT_NONE);
-    trap->Key_SetCatcher(0);
+		CG_EventHandling( CGAME_EVENT_NONE );
+		trap->Key_SetCatcher( 0 );
 		return;
 	}
 
-  //if (key == trap->Key_GetKey("teamMenu") || !Display_CaptureItem(cgs.cursorX, cgs.cursorY)) {
-    // if we see this then we should always be visible
-  //  CG_EventHandling(CGAME_EVENT_NONE);
-  //  trap->Key_SetCatcher(0);
-  //}
+	Display_HandleKey( key, down, cgs.cursorX, cgs.cursorY );
 
-
-
-  Display_HandleKey(key, down, cgs.cursorX, cgs.cursorY);
-
-	if (cgs.capturedItem) {
+	if ( cgs.capturedItem )
 		cgs.capturedItem = NULL;
-	}	else {
-		if (key == A_MOUSE2 && down) {
-			cgs.capturedItem = Display_CaptureItem(cgs.cursorX, cgs.cursorY);
-		}
-	}
+	else if ( key == A_MOUSE2 && down )
+		cgs.capturedItem = Display_CaptureItem( cgs.cursorX, cgs.cursorY );
 }
 
 int CG_ClientNumFromName(const char *p) {

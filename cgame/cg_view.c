@@ -3189,8 +3189,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	//Reset the refdef for future frames
 	cg.currentRefdef = REFDEF_DEFAULT;
 
-	if ( trap->Key_GetCatcher() & KEYCATCH_CGAME )
-	{
+	if ( trap->Key_GetCatcher() & KEYCATCH_CGAME && !CG_ChatboxActive() ) {
 		displayContextDef_t *dc = Display_GetContext();
 		CG_DrawPic( (float)dc->cursorx, (float)dc->cursory, 40.0f, 40.0f, cgs.media.cursor);
 	}

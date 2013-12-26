@@ -8324,7 +8324,7 @@ void CG_Draw2D( void ) {
 		if ( !cg_newChatbox.integer )
 			CG_ChatBox_DrawStrings();
 		else
-			JP_ChatboxDraw();
+			CG_ChatboxDraw();
 
 		CG_DrawMapChange();
 		return;
@@ -8690,7 +8690,7 @@ void CG_Draw2D( void ) {
 	if ( !cg_newChatbox.integer )
 		CG_ChatBox_DrawStrings();
 	else
-		JP_ChatboxDraw();
+		CG_ChatboxDraw();
 }
 
 

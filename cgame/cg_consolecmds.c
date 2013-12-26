@@ -239,11 +239,11 @@ static void CG_PluginDisable_f( void ) {
 static void CG_ScrollChat_f( void ) {
 	char args[8]={0};
 	trap->Cmd_Args( args, sizeof( args ) );
-	JP_ChatboxScroll( atoi( args ) );
+	CG_ChatboxScroll( atoi( args ) );
 }
 
 static void CG_ClearChat_f( void ) {
-	JP_ChatboxClear();
+	CG_ChatboxClear();
 }
 
 static void CG_Menu_f( void ) {
@@ -251,16 +251,16 @@ static void CG_Menu_f( void ) {
 }
 
 static void Cmd_ChatboxSelectTabNextNoKeys( void ) {
-	JP_ChatboxSelectTabNextNoKeys();
+	CG_ChatboxSelectTabNextNoKeys();
 }
 static void Cmd_ChatboxSelectTabPrevNoKeys( void ) {
-	JP_ChatboxSelectTabPrevNoKeys();
+	CG_ChatboxSelectTabPrevNoKeys();
 }
 
 static void CG_ChatboxFindTab_f( void ) {
 	char args[128];
 	trap->Cmd_Args( args, sizeof( args ) );
-	JP_ChatboxSelect( args );
+	CG_ChatboxSelect( args );
 }
 
 #ifdef JPLUA
@@ -388,6 +388,9 @@ static command_t commands[] = {
 	{ "lua",						CG_LuaDoString_f },
 	{ "lua_reload",					CG_LuaReload_f },
 #endif // JPLUA
+	{ "messagemodeAll",				CG_MessageModeAll_f },
+	{ "messagemodeTeam",			CG_MessageModeTeam_f },
+	//RAZTODO: messagemode3 whisper?
 	{ "nextframe",					CG_TestModelNextFrame_f },
 	{ "nextskin",					CG_TestModelNextSkin_f },
 	{ "noclip",						NULL },

@@ -3463,7 +3463,7 @@ Ghoul2 Insert End
 		JPLua_Init();
 	#endif // JPLUA
 
-	JP_ChatboxInit();
+	CG_ChatboxInit();
 
 	#ifdef _WIN32
 		{//Detect the timestamp format via the registry

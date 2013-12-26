@@ -3236,7 +3236,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 					if ( !cg_newChatbox.integer )
 						CG_ChatBox_AddString( vchatstr );
 					else
-						JP_ChatboxAdd( vchatstr, qfalse, "team" );
+						CG_ChatboxAddMessage( vchatstr, qfalse, "team" );
 				}
 
 				//and play in world for everyone
