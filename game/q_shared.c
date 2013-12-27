@@ -1018,7 +1018,7 @@ void Q_strrev( char *str ) {
 void Q_CleanString( char *string, qboolean stripColour ) {
 	qboolean doPass = qtrue;
 	char *read, *write;
-
+	
 	while ( doPass ) {
 		doPass = qfalse;
 		read = write = string;
@@ -1027,7 +1027,10 @@ void Q_CleanString( char *string, qboolean stripColour ) {
 				doPass = qtrue;
 				read += 2;
 			}
-			else if ( *read >= 0x20 && *read <= 0x7E ) {
+			else if ( *read < 0x20 || *read > 0x7E ) {
+				read++;
+			}
+			else {
 				// Avoid writing the same data over itself
 				if ( write != read )
 					*write = *read;
@@ -1040,7 +1043,6 @@ void Q_CleanString( char *string, qboolean stripColour ) {
 	}
 }
 
-
 /*
 ============
 Q_vsnprintf
@@ -1052,7 +1054,7 @@ C99 standard: vsnprintf returns the number of characters (excluding the trailing
 snprintf and vsnprintf do not write more than size bytes (including the trailing '\0')
 
 win32: _vsnprintf returns the number of characters written, not including the terminating null character,
-or a negative value if an output error occurs. If the number of characters to write exceeds count, then count 
+or a negative value if an output error occurs. If the number of characters to write exceeds count, then count
 characters are written and -1 is returned and no trailing '\0' is added.
 
 Q_vsnprintf: always appends a trailing '\0', returns number of characters written (not including terminal \0)
