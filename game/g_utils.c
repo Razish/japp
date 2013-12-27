@@ -2204,7 +2204,7 @@ static qboolean compareWhole( const char *s1, const char *s2 ) {
 }
 
 int G_ClientFromString( const gentity_t *ent, const char *match, qboolean substr, qboolean firstMatch, qboolean clean ) {
-	char cleanedMatch[MAX_STRING_CHARS], cleanedName[MAX_STRING_CHARS];
+	char cleanedMatch[MAX_STRING_CHARS];
 	int i;
 	gclient_t *cl = NULL;
 	qboolean (*compareFunc)(const char *s1, const char *s2) = substr ? compareSubstring : compareWhole;
@@ -2230,10 +2230,7 @@ int G_ClientFromString( const gentity_t *ent, const char *match, qboolean substr
 
 	if ( firstMatch ) {
 		for ( i=0, cl=level.clients; i<level.numConnectedClients; i++, cl++ ) {
-			Q_strncpyz( cleanedName, cl->pers.netname, sizeof( cleanedName ) );
-			Q_CleanString( cleanedName, STRIP_COLOUR );
-
-			if ( compareFunc( cleanedName, cleanedMatch ) && G_ValidClient( cl ) )
+			if ( compareFunc( cl->pers.netnameClean, cleanedMatch ) && G_ValidClient( cl ) )
 				return i;
 		}
 	}
@@ -2242,10 +2239,7 @@ int G_ClientFromString( const gentity_t *ent, const char *match, qboolean substr
 
 		// find all matching names
 		for ( i=0, numMatches=0, cl=level.clients; i<level.numConnectedClients; i++, cl++ ) {
-			Q_strncpyz( cleanedName, cl->pers.netname, sizeof( cleanedName ) );
-			Q_CleanString( cleanedName, STRIP_COLOUR );
-
-			if ( compareFunc( cleanedName, cleanedMatch ) && G_ValidClient( cl ) )
+			if ( compareFunc( cl->pers.netnameClean, cleanedMatch ) && G_ValidClient( cl ) )
 				matches[numMatches++] = i;
 		}
 
