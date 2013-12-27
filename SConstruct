@@ -111,6 +111,7 @@ files['game'] = [
 	'game/g_items.c',
 	'game/g_log.c',
 	'game/g_lua.c',
+	'game/g_luacvar.c',
 	'game/g_luaevent.c',
 	'game/g_main.c',
 	'game/g_mem.c',

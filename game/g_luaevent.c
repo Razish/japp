@@ -127,7 +127,7 @@ void JPLua_Event_RunFrame( void )
 #endif // JPLUA
 }
 
-void JPLua_Event_ClientSpawn( int clientNum )
+void JPLua_Event_ClientSpawn( int clientNum, qboolean firstSpawn )
 {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
@@ -141,11 +141,10 @@ void JPLua_Event_ClientSpawn( int clientNum )
 #if 0
 			// Create a player instance for this client number and push on stack
 			JPLua_Player_CreateRef( JPLua.state, clientNum );
-
-			JPLUACALL( JPLua.state, 1, 0 );
-#else
-			JPLUACALL( JPLua.state, 0, 0 );
 #endif
+			lua_pushinteger( JPLua.state, clientNum );
+			lua_pushboolean( JPLua.state, firstSpawn );
+			JPLUACALL( JPLua.state, 2, 0 );
 		}
 	}
 #endif

@@ -20,6 +20,6 @@ int JPLua_Event_RemoveListener( lua_State *L );
 void JPLua_Event_Shutdown( void );
 void JPLua_Event_RunFrame( void );
 //void JPLua_Event_ClientConnect( int clientNum );
-void JPLua_Event_ClientSpawn( int clientNum );
+void JPLua_Event_ClientSpawn( int clientNum, qboolean firstSpawn );
 qboolean JPLua_Event_ClientCommand( int clientNum );
 qboolean JPLua_Event_ServerCommand( void );

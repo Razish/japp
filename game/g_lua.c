@@ -376,6 +376,9 @@ static const jplua_cimport_table_t JPLua_CImports[] =
 	{ "AddClientCommand", JPLua_Export_AddClientCommand }, // AddClientCommand( string cmd )
 	{ "AddServerCommand", JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
 
+	{ "CreateCvar", JPLua_CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
+	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
+
 	//Misc
 	{ "GetTime", JPLua_Export_GetTime }, // integer GetTime()
 	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
@@ -534,9 +537,10 @@ void JPLua_Init( void )
 	// Register our classes
 	/*JPLua_Register_Player( JPLua.state );
 	JPLua_Register_Server( JPLua.state );
-	JPLua_Register_Cvar( JPLua.state );
 	JPLua_Register_Serialiser( JPLua.state );
 	*/
+	JPLua_Register_Cvar( JPLua.state );
+
 	// -- FRAMEWORK INITIALISATION begin
 	lua_getglobal( JPLua.state, "tostring" );	JPLua_Framework[JPLUA_FRAMEWORK_TOSTRING]	= luaL_ref( JPLua.state, LUA_REGISTRYINDEX );
 	lua_getglobal( JPLua.state, "pairs" );		JPLua_Framework[JPLUA_FRAMEWORK_PAIRS]		= luaL_ref( JPLua.state, LUA_REGISTRYINDEX );

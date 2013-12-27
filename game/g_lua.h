@@ -4,6 +4,7 @@
 #include "../lua/lualib.h"
 #include "../lua/lauxlib.h"
 
+#include "g_luacvar.h"
 #include "g_luaevent.h"
 
 #ifdef JPLUA
