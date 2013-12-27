@@ -2027,7 +2027,8 @@ void Cmd_MapList_f( gentity_t *ent ) {
 }
 
 qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	char s[MAX_CVAR_VALUE_STRING] = {0}, *mapName = NULL, *mapName2 = NULL;
+	char s[MAX_CVAR_VALUE_STRING] = {0}, bspName[MAX_QPATH] = {0}, *mapName = NULL, *mapName2 = NULL;
+	fileHandle_t fp = NULL_FILE;
 	const char *arenaInfo;
 
 	// didn't specify a map, show available maps
@@ -2035,6 +2036,20 @@ qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const char *a
 		Cmd_MapList_f( ent );
 		return qfalse;
 	}
+
+	if ( strchr( arg2, '\\' ) ) {
+		trap->SendServerCommand( ent-g_entities, "print \"Can't have mapnames with a \\\n\"" );
+		return qfalse;
+	}
+
+	Com_sprintf( bspName, sizeof( bspName ), "maps/%s.bsp", arg2 );
+	if ( trap->FS_Open( bspName, &fp, FS_READ ) <= 0 ) {
+		trap->SendServerCommand( ent-g_entities, va( "print \"Can't find map %s on server\n\"", bspName ) );
+		if ( fp != NULL_FILE )
+			trap->FS_Close( fp );
+		return qfalse;
+	}
+	trap->FS_Close( fp );
 
 	if ( !G_DoesMapSupportGametype( arg2, level.gametype ) ) {
 		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NOVOTE_MAPNOTSUPPORTEDBYGAME" ) ) );

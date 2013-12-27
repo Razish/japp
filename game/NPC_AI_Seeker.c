@@ -34,9 +34,7 @@ void NPC_Seeker_Precache(void)
 void NPC_Seeker_Pain(gentity_t *self, gentity_t *attacker, int damage)
 {
 	if ( !(self->NPC->aiFlags&NPCAI_CUSTOM_GRAVITY ))
-	{//void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vector3 *dir, vector3 *point, int damage, int dflags, int mod, int hitLoc=HL_NONE );
 		G_Damage( self, NULL, NULL, &vec3_origin, &vec3_origin, 999, 0, MOD_FALLING );
-	}
 
 	SaveNPCGlobals();
 	SetNPCGlobals( self );

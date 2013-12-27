@@ -1890,7 +1890,7 @@ static userinfoValidate_t userinfoFields[] = {
 	UIF( password,			0, 1 ), // optional
 	UIF( cjp_client,		0, 1 ), // JA+
 	UIF( csf,				0, 1 ), // JA++
-	UIF( teamoverlay,		0, 1 ), // only registered in game, not sent when connecting
+	UIF( teamoverlay,		0, 1 ), // only registered in cgame, not sent when connecting
 };
 static size_t numUserinfoFields = ARRAY_LEN( userinfoFields );
 
@@ -4074,9 +4074,7 @@ void ClientDisconnect( int clientNum ) {
 	G_LogPrintf( "ClientDisconnect: %i\n", clientNum );
 
 	// if we are playing in tourney mode, give a win to the other player and clear his frags for this round
-	if ( (level.gametype == GT_DUEL )
-		&& !level.intermissiontime
-		&& !level.warmupTime ) {
+	if ( level.gametype == GT_DUEL && !level.intermissiontime && !level.warmupTime ) {
 		if ( level.sortedClients[1] == clientNum ) {
 			level.clients[ level.sortedClients[0] ].ps.persistant[PERS_SCORE] = 0;
 			level.clients[ level.sortedClients[0] ].sess.wins++;
@@ -4087,6 +4085,13 @@ void ClientDisconnect( int clientNum ) {
 			level.clients[ level.sortedClients[1] ].sess.wins++;
 			ClientUserinfoChanged( level.sortedClients[1] );
 		}
+	}
+
+	if ( level.gametype == GT_DUEL && ent->client->sess.sessionTeam == TEAM_FREE && level.intermissiontime ) {
+		trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+		level.restarted = qtrue;
+		level.changemap = NULL;
+		level.intermissiontime = 0;
 	}
 
 	if (ent->ghoul2 && trap->G2API_HaveWeGhoul2Models(ent->ghoul2))

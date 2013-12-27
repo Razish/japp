@@ -14,15 +14,9 @@ extern qboolean ClientUserinfoChanged( int clientNum );
 extern qboolean SpotWouldTelefrag2( gentity_t *mover, vector3 *dest );
 extern void Jedi_Cloak( gentity_t *self );
 
-//extern void FX_BorgTeleport( vector3 *org );
-
 extern void Q3_SetParm (int entID, int parmNum, const char *parmValue);
 extern team_t TranslateTeamName( const char *name );
 extern char	*TeamNames[TEAM_NUM_TEAMS];
-
-//extern void CG_ShimmeryThing_Spawner( vector3 *start, vector3 *end, float radius, qboolean taper, int duration );
-
-//extern void NPC_StasisSpawnEffect( gentity_t *ent );
 
 extern void PM_SetTorsoAnimTimer( gentity_t *ent, int *torsoAnimTimer, int time );
 extern void PM_SetLegsAnimTimer( gentity_t *ent, int *legsAnimTimer, int time );
@@ -83,9 +77,6 @@ extern void CrystalCratePain			(gentity_t *self, gentity_t *attacker, int damage
 extern void TurretPain					(gentity_t *self, gentity_t *attacker, int damage);
 extern void NPC_Wampa_Pain				(gentity_t *self, gentity_t *attacker, int damage);
 extern void NPC_Rancor_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-
-
-//void HirogenAlpha_Precache( void );
 
 int WP_SetSaberModel( gclient_t *client, class_t npcClass )
 {
@@ -1943,7 +1934,6 @@ teamnodmg - team that NPC does not take damage from (turrets and other auto-defe
 "noCombatSounds" - set to 1 to prevent loading and usage of combat sounds (anger, victory, etc.)
 "noExtraSounds" - set to 1 to prevent loading and usage of "extra" sounds (chasing the enemy - detecting them, flanking them... also jedi combat sounds)
 */
-//void NPC_PrecacheModels ( char *NPCName );
 extern void NPC_PrecacheAnimationCFG( const char *NPC_type );
 void NPC_Precache ( gentity_t *spawner );
 void NPC_PrecacheType( char *NPC_type )

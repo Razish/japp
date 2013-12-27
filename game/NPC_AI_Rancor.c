@@ -130,10 +130,8 @@ void Rancor_Move( qboolean visible )
 }
 
 //---------------------------------------------------------
-//extern void G_Knockdown( gentity_t *self, gentity_t *attacker, const vector3 *pushDir, float strength, qboolean breakSaberLock );
 extern void G_Knockdown( gentity_t *victim );
 extern void G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType, float limbRollBase, float limbPitchBase, int deathAnim, qboolean postDeath );
-//extern qboolean G_DoDismemberment( gentity_t *self, vector3 *point, int mod, int damage, int hitLoc, qboolean force );
 extern float NPC_EntRangeFromBolt( gentity_t *targEnt, int boltIndex );
 extern int NPC_GetEntsNearBolt( int *radiusEnts, float radius, int boltIndex, vector3 *boltOrg );
 
@@ -699,7 +697,6 @@ void Rancor_Combat( void )
 NPC_Rancor_Pain
 -------------------------
 */
-//void NPC_Rancor_Pain( gentity_t *self, gentity_t *inflictor, gentity_t *other, const vector3 *point, int damage, int mod,int hitLoc ) 
 void NPC_Rancor_Pain( gentity_t *self, gentity_t *attacker, int damage ) 
 {
 	qboolean hitByRancor = qfalse;

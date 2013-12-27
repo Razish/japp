@@ -2,11 +2,6 @@
 #include "g_nav.h"
 #include "shared/ICARUS/Q3_Interface.h"
 
-//#include "anims.h"
-//extern int PM_AnimLength( int index, animNumber_t anim );
-//extern int PM_AnimLength( int index, animNumber_t anim );
-//#define	MAX_IDLE_ANIMS	8
-
 extern qboolean NPC_SomeoneLookingAtMe(gentity_t *ent);
 
 /*

@@ -400,6 +400,13 @@ typedef int		sfxHandle_t;
 typedef int		fileHandle_t;
 typedef int		clipHandle_t;
 
+#define NULL_HANDLE		((qhandle_t) 0)
+#define NULL_SOUND		((sfxHandle_t) 0)
+#define NULL_FX				((fxHandle_t) 0)
+#define NULL_SFX			((sfxHandle_t) 0)
+#define NULL_FILE			((fileHandle_t) 0)
+#define NULL_CLIP			((clipHandle_t) 0)
+
 //Raz: can't think of a better place to put this atm,
 //		should probably be in the platform specific definitions
 #if defined (_MSC_VER) && (_MSC_VER >= 1600)
@@ -536,13 +543,7 @@ typedef enum {
 
 // font rendering values used by ui and cgame
 
-/*#define PROP_GAP_WIDTH			3
-#define PROP_SPACE_WIDTH		8
-#define PROP_HEIGHT				27
-#define PROP_SMALL_SIZE_SCALE	0.75*/
-
-#define PROP_GAP_WIDTH			2
-//#define PROP_GAP_WIDTH			3
+#define PROP_GAP_WIDTH			2 // 3
 #define PROP_SPACE_WIDTH		4
 #define PROP_HEIGHT				16
 
@@ -568,7 +569,7 @@ typedef enum {
 #define UI_FORMATMASK	0x00000007
 #define UI_SMALLFONT	0x00000010
 #define UI_BIGFONT		0x00000020	// default
-//#define UI_GIANTFONT	0x00000040
+
 #define UI_DROPSHADOW	0x00000800
 #define UI_BLINK		0x00001000
 #define UI_INVERSE		0x00002000
