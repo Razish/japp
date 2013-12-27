@@ -2011,7 +2011,7 @@ void Cmd_MapList_f( gentity_t *ent ) {
 
 	for ( i=0; i<level.arenas.num; i++ ) {
 		Q_strncpyz( map, Info_ValueForKey( level.arenas.infos[i], "map" ), sizeof( map ) );
-		Q_CleanString( map, qtrue );
+		Q_CleanString( map, STRIP_COLOUR );
 
 		if ( G_DoesMapSupportGametype( map, level.gametype ) ) {
 			char *tmpMsg = va( " ^%c%s", (++toggle&1) ? COLOR_GREEN : COLOR_YELLOW, map );

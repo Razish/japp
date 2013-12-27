@@ -28,7 +28,7 @@ gclient_t *ClientForString( const char *s ) {
 			continue;
 		}
 		Q_strncpyz(cleanName, cl->pers.netname, sizeof(cleanName));
-		Q_CleanString( cleanName, qtrue );
+		Q_CleanString( cleanName, STRIP_COLOUR );
 		if ( !Q_stricmp( cleanName, s ) ) {
 			return cl;
 		}
@@ -252,16 +252,16 @@ static void SV_BotList_f( void ) {
 	for ( i=0; i<level.bots.num; i++ )
 	{
 		Q_strncpyz( name, Info_ValueForKey( level.bots.infos[i], "name" ), sizeof( name ) );
-		Q_CleanString( name, qtrue );
+		Q_CleanString( name, STRIP_COLOUR );
 
 		Q_strncpyz( funname, Info_ValueForKey( level.bots.infos[i], "funname" ), sizeof( funname ) );
-		Q_CleanString( funname, qtrue );
+		Q_CleanString( funname, STRIP_COLOUR );
 
 		Q_strncpyz( model, Info_ValueForKey( level.bots.infos[i], "model" ), sizeof( model ) );
-		Q_CleanString( model, qtrue );
+		Q_CleanString( model, STRIP_COLOUR );
 
 		Q_strncpyz( personality, Info_ValueForKey( level.bots.infos[i], "personality" ), sizeof( personality ) );
-		Q_CleanString( personality, qtrue );
+		Q_CleanString( personality, STRIP_COLOUR );
 
 		trap->Print( "%-16s %-16s %-20s %-20s\n", name, model, personality, funname );
 	}
@@ -331,13 +331,13 @@ static void SV_ListMaps_f( void ) {
 	for ( i=0; i<level.arenas.num; i++ )
 	{
 		Q_strncpyz( map, Info_ValueForKey( level.arenas.infos[i], "map" ), sizeof( map ) );
-		Q_CleanString( map, qtrue );
+		Q_CleanString( map, STRIP_COLOUR );
 
 		Q_strncpyz( longname, Info_ValueForKey( level.arenas.infos[i], "longname" ), sizeof( longname ) );
-		Q_CleanString( longname, qtrue );
+		Q_CleanString( longname, STRIP_COLOUR );
 
 		Q_strncpyz( type, Info_ValueForKey( level.arenas.infos[i], "type" ), sizeof( type ) );
-		Q_CleanString( type, qtrue );
+		Q_CleanString( type, STRIP_COLOUR );
 
 		trap->Print( "  %-24s%-32s%-64s\n", map, longname, type );
 	}

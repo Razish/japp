@@ -2468,7 +2468,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		Q_strcat( msg, sizeof( msg ), va( "cjp_client: %s...", value[0] ? value : "basejka" ) );
 		if ( value[0] )
 		{
-			Q_CleanString( value, qfalse );
+			Q_CleanString( value, STRIP_COLOUR|STRIP_EXTASCII );
 			Q_strcat( msg, sizeof( msg ), va( " assumed JA+ csf 0x%X...", JAPLUS_CLIENT_FLAGS ) );
 			finalCSF = JAPLUS_CLIENT_FLAGS;
 		}

@@ -1015,31 +1015,31 @@ void Q_strrev( char *str ) {
 }
 
 // removes extended ASCII and Q3 colour codes
-void Q_CleanString( char *string, qboolean stripColour ) {
+// use STRIP_*** for flags
+void Q_CleanString( char *string, uint32_t flags ) {
 	qboolean doPass = qtrue;
-	char *read, *write;
-	
+	char *r, *w; // read, write
+
 	while ( doPass ) {
 		doPass = qfalse;
-		read = write = string;
-		while ( *read ) {
-			if ( stripColour && Q_IsColorStringExt( read ) ) {
+		r = w = string;
+		while ( *r ) {
+			if ( (flags & STRIP_COLOUR) && Q_IsColorStringExt( r ) ) {
 				doPass = qtrue;
-				read += 2;
+				r += 2;
 			}
-			else if ( *read < 0x20 || *read > 0x7E ) {
-				read++;
-			}
+			else if ( (flags & STRIP_EXTASCII) && (*r < 0x20 || *r > 0x7E) )
+				r++;
 			else {
 				// Avoid writing the same data over itself
-				if ( write != read )
-					*write = *read;
-				write++, read++;
+				if ( w != r )
+					*w = *r;
+				w++, r++;
 			}
 		}
 		// Add trailing NUL byte if string has shortened
-		if ( write < read )
-			*write = '\0';
+		if ( w < r )
+			*w = '\0';
 	}
 }
 

@@ -367,7 +367,7 @@ void CG_ChatboxDraw( void ) {
 		if ( ((trap->Milliseconds() >> 8) & 1) ) {
 			float cursorOffset = 0.0f, cursorPre = CG_Text_Width( cleanPre, cg.chatbox.size.scale, CG_GetChatboxFont() );
 			int j;
-			Q_CleanString( msg, qtrue );
+			Q_CleanString( msg, STRIP_COLOUR );
 			for ( j=0; j<chatField.cursor; j++ )
 				cursorOffset += CG_Text_Width( va( "%c", msg[j] ), cg.chatbox.size.scale, CG_GetChatboxFont() );
 			CG_Text_Paint( cg.chatbox.pos.x + cursorPre + cursorOffset, cg.chatbox.pos.y + (cg_chatboxLineHeight.value*cg_chatboxLineCount.integer),
@@ -453,7 +453,7 @@ void CG_ChatboxTabComplete( void ) {
 			return;
 
 		Q_strncpyz( currWord, p, sizeof( currWord ) );
-		Q_CleanString( currWord, qtrue );
+		Q_CleanString( currWord, STRIP_COLOUR );
 		Q_strlwr( currWord );
 
 		for ( i=0; i<cgs.maxclients; i++ ) {
@@ -461,7 +461,7 @@ void CG_ChatboxTabComplete( void ) {
 				char name[MAX_QPATH/*MAX_NETNAME*/] = { 0 }; // because cgs.clientinfo[i].name uses MAX_QPATH...wtf...
 
 				Q_strncpyz( name, cgs.clientinfo[i].name, sizeof( name ) );
-				Q_CleanString( name, qtrue );
+				Q_CleanString( name, STRIP_COLOUR );
 				Q_strlwr( name );
 				if ( strstr( name, currWord ) ) {
 					match = i;

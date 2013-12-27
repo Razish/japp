@@ -2226,12 +2226,12 @@ int G_ClientFromString( const gentity_t *ent, const char *match, qboolean substr
 
 	// Failed, check for a name match
 	Q_strncpyz( cleanedMatch, match, sizeof( cleanedMatch ) );
-	Q_CleanString( cleanedMatch, qtrue );
+	Q_CleanString( cleanedMatch, STRIP_COLOUR );
 
 	if ( firstMatch ) {
 		for ( i=0, cl=level.clients; i<level.numConnectedClients; i++, cl++ ) {
 			Q_strncpyz( cleanedName, cl->pers.netname, sizeof( cleanedName ) );
-			Q_CleanString( cleanedName, qtrue );
+			Q_CleanString( cleanedName, STRIP_COLOUR );
 
 			if ( compareFunc( cleanedName, cleanedMatch ) && G_ValidClient( cl ) )
 				return i;
@@ -2243,7 +2243,7 @@ int G_ClientFromString( const gentity_t *ent, const char *match, qboolean substr
 		// find all matching names
 		for ( i=0, numMatches=0, cl=level.clients; i<level.numConnectedClients; i++, cl++ ) {
 			Q_strncpyz( cleanedName, cl->pers.netname, sizeof( cleanedName ) );
-			Q_CleanString( cleanedName, qtrue );
+			Q_CleanString( cleanedName, STRIP_COLOUR );
 
 			if ( compareFunc( cleanedName, cleanedMatch ) && G_ValidClient( cl ) )
 				matches[numMatches++] = i;

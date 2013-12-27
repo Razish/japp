@@ -467,7 +467,7 @@ void G_AddRandomBot( int team ) {
 				else if (team == TEAM_BLUE) teamstr = "blue";
 				else teamstr = "";
 				Q_strncpyz( netname, value, sizeof( netname ) );
-				Q_CleanString(netname, qfalse);
+				Q_CleanString( netname, STRIP_EXTASCII );
 				trap->SendConsoleCommand( EXEC_INSERT, va("addbot \"%s\" %f %s %i\n", netname, skill, teamstr, 0) );
 				return;
 			}

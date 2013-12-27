@@ -496,9 +496,9 @@ static int JPLua_RegisterPlugin( lua_State *L )
 	int top = 0;
 
 	Q_strncpyz( JPLua.currentPlugin->name, lua_tostring( L, 1 ), sizeof( JPLua.currentPlugin->name ) );
-	Q_CleanString( JPLua.currentPlugin->name, qtrue );
+	Q_CleanString( JPLua.currentPlugin->name, STRIP_COLOUR );
 	Q_strncpyz( JPLua.currentPlugin->version, lua_tostring( L, 2 ), sizeof( JPLua.currentPlugin->version ) );
-	Q_CleanString( JPLua.currentPlugin->version, qtrue );
+	Q_CleanString( JPLua.currentPlugin->version, STRIP_COLOUR );
 	JPLua.currentPlugin->requiredJPLuaVersion = lua_isnumber( L, 3 ) ? lua_tointeger( L, 3 ) : JPLua.version;
 	JPLua.currentPlugin->UID = (intptr_t)JPLua.currentPlugin;
 

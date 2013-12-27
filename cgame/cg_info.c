@@ -150,7 +150,7 @@ void CG_DrawInformation( void ) {
 		// server hostname
 		Q_strncpyz(buf, Info_ValueForKey( info, "sv_hostname" ), sizeof( buf ) );
 		// allow colours, don't allow extended ASCII
-		Q_CleanString( buf, qfalse );
+		Q_CleanString( buf, STRIP_EXTASCII );
 		UI_DrawProportionalString( 320, y, buf, UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 

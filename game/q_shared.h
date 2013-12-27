@@ -1552,7 +1552,9 @@ void Q_strstrip( char *string, const char *strip, const char *repl );
 const char *Q_strchrs( const char *string, const char *search );
 char *Q_strrep( const char *subject, const char *search, const char *replace );
 void Q_strrev( char *str );
-void Q_CleanString( char *string, qboolean stripColour );
+#define STRIP_COLOUR	(0x00000001u)
+#define STRIP_EXTASCII	(0x00000002u)
+void Q_CleanString( char *string, uint32_t flags );
 void Com_sprintf( char *dest, int size, const char *fmt, ... );
 char *va( const char *format, ... );
 

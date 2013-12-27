@@ -32,8 +32,8 @@ int JPLua_GetPlayer( lua_State *L )
 				continue;
 			Q_strncpyz( nameClean, cgs.clientinfo[i].name, sizeof( nameClean ) );
 			Q_strncpyz( nameClean2, name, sizeof( nameClean2 ) );
-			Q_CleanString( nameClean, qtrue );
-			Q_CleanString( nameClean2, qtrue );
+			Q_CleanString( nameClean, STRIP_COLOUR );
+			Q_CleanString( nameClean2, STRIP_COLOUR );
 			if ( !Q_stricmp( nameClean, nameClean2 ) )
 			{
 				num = i;

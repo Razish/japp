@@ -1640,7 +1640,7 @@ static void CG_ServerCommand( void ) {
 			else
 				CG_ChatBox_AddString( text );
 			trap->Print( "*%s\n", text );
-			Q_CleanString( text, qtrue );
+			Q_CleanString( text, STRIP_COLOUR );
 			CG_LogPrintf( cg.log.chat, va( "%s\n", text ) );
 		}
 
@@ -1657,7 +1657,7 @@ static void CG_ServerCommand( void ) {
 		else
 			CG_ChatBox_AddString( text );
 		trap->Print( "*%s\n", text );
-		Q_CleanString( text, qtrue );
+		Q_CleanString( text, STRIP_COLOUR );
 		CG_LogPrintf( cg.log.chat, va( "%s\n", text ) );
 
 		return;
@@ -1696,7 +1696,7 @@ static void CG_ServerCommand( void ) {
 			else
 				CG_ChatBox_AddString( text );
 			trap->Print( "*%s\n", text );
-			Q_CleanString( text, qtrue );
+			Q_CleanString( text, STRIP_COLOUR );
 			CG_LogPrintf( cg.log.chat, va( "%s\n", text ) );
 		}
 		return;
@@ -1731,7 +1731,7 @@ static void CG_ServerCommand( void ) {
 			else
 				CG_ChatBox_AddString( text );
 		trap->Print( "*%s\n", text );
-		Q_CleanString( text, qtrue );
+		Q_CleanString( text, STRIP_COLOUR );
 		CG_LogPrintf( cg.log.chat, va( "%s\n", text ) );
 
 		return;

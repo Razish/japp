@@ -443,9 +443,9 @@ static void AM_WhoIs( gentity_t *ent )
 			char strAdmin[32] = { 0 };
 
 			Q_strncpyz( strName, cl->pers.netname, sizeof( strName ) );
-			Q_CleanString( strName, qtrue );
+			Q_CleanString( strName, STRIP_COLOUR );
 			Q_strncpyz( strAdmin, (cl->pers.adminUser) ? cl->pers.adminUser->user : "", sizeof( strAdmin ) );
-			Q_CleanString( strAdmin, qtrue );
+			Q_CleanString( strAdmin, STRIP_COLOUR );
 
 			Q_strcat( msg, sizeof( msg ), va( "%-36s%-32s\n", strName, strAdmin ) );
 		}
@@ -477,12 +477,11 @@ static void AM_Status( gentity_t *ent )
 			char strAdmin[32] = {0};
 
 			Q_strncpyz( strNum, va( "(%i)", i ), sizeof( strNum ) );
-			Q_CleanString( strNum, qtrue );
 			Q_strncpyz( strName, cl->pers.netname, sizeof( strName ) );
-			Q_CleanString( strName, qtrue );
+			Q_CleanString( strName, STRIP_COLOUR );
 			Q_strncpyz( strIP, cl->sess.IP, sizeof( strIP ) );
 			Q_strncpyz( strAdmin, (cl->pers.adminUser) ? cl->pers.adminUser->user : "", sizeof( strAdmin ) );
-			Q_CleanString( strAdmin, qtrue );
+			Q_CleanString( strAdmin, STRIP_COLOUR );
 
 			tmpMsg = va( "%-12s%-36s%-24s%-32s\n", strNum, strName, strIP, strAdmin );
 
@@ -611,12 +610,12 @@ static void AM_Teleport( gentity_t *ent )
 			char cleanedTelemark[64];
 
 			Q_strncpyz( cleanedInput, arg1, sizeof( cleanedInput ) );
-			Q_CleanString( cleanedInput, qtrue );
+			Q_CleanString( cleanedInput, STRIP_COLOUR );
 
 			for ( i=0; i<level.adminData.teleMarksIndex; i++ )
 			{//Check all telemarks
 				Q_strncpyz( cleanedTelemark, level.adminData.teleMarks[i].name, sizeof( cleanedTelemark ) );
-				Q_CleanString( cleanedTelemark, qtrue );
+				Q_CleanString( cleanedTelemark, STRIP_COLOUR );
 				if ( !Q_stricmp( cleanedTelemark, cleanedInput ) )
 				{//We found one that contains our string
 					TeleportPlayer( ent, &level.adminData.teleMarks[i].position, &ent->client->ps.viewangles );
@@ -669,12 +668,12 @@ static void AM_Teleport( gentity_t *ent )
 				char cleanedTelemark[64];
 
 				Q_strncpyz( cleanedInput, arg2, sizeof( cleanedInput ) );
-				Q_CleanString( cleanedInput, qtrue );
+				Q_CleanString( cleanedInput, STRIP_COLOUR );
 
 				for ( i=0; i<level.adminData.teleMarksIndex; i++ )
 				{//Check all telemarks
 					Q_strncpyz( cleanedTelemark, level.adminData.teleMarks[i].name, sizeof( cleanedTelemark ) );
-					Q_CleanString( cleanedTelemark, qtrue );
+					Q_CleanString( cleanedTelemark, STRIP_COLOUR );
 					if ( !Q_stricmp( cleanedTelemark, cleanedInput ) )
 					{//We found one that contains our string
 						TeleportPlayer( &g_entities[targetClient1], &level.adminData.teleMarks[i].position, &ent->client->ps.viewangles );
@@ -802,7 +801,7 @@ static void AM_Telemark( gentity_t *ent )
 	else {
 		char cleanName[MAX_NETNAME];
 		Q_strncpyz( cleanName, ent->client->pers.netname, sizeof( cleanName ) );
-		Q_CleanString( cleanName, qtrue );
+		Q_CleanString( cleanName, STRIP_COLOUR );
 		Com_sprintf( name, sizeof( name ), "default_%s", cleanName );
 	}
 
@@ -935,7 +934,7 @@ static void AM_Poll( gentity_t *ent )
 	trap->Argv( 0, arg1, sizeof( arg1 ) );
 	//Q_strncpyz( arg2, ConcatArgs( 2 ), sizeof( arg2 ) );
 	Q_strncpyz( arg2, ent->client->pers.netname, sizeof( arg2 ) );
-	Q_CleanString( arg2, qtrue );
+	Q_CleanString( arg2, STRIP_COLOUR );
 	Q_strstrip( arg2, "\n\r;\"", NULL );
 
 	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s \"%s\"", arg1, arg2 );
