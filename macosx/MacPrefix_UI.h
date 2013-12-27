@@ -1,7 +1,7 @@
 #ifndef MacPrefix_UI_h
 #define MacPrefix_UI_h
 
-#define UI_EXPORTS	1
+#define _UI	1
 
 #include "MacPrefixCommon.h"
 

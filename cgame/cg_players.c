@@ -288,7 +288,7 @@ sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
 	}
 
 	//trap->Error( "Unknown custom sound: %s", lSoundName );
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 	Com_Printf( "Unknown custom sound: %s\n", lSoundName );
 #endif
 	return 0;
@@ -10257,7 +10257,6 @@ void CG_Player( centity_t *cent ) {
 			cent->trickAlphaTime = cg.time;
 		}
 	}
-//#endif
 
 	// get the player model information
 	renderfx = 0;

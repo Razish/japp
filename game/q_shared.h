@@ -79,13 +79,13 @@
 #endif
 */
 
-#ifndef FINAL_BUILD
-#define G2_PERFORMANCE_ANALYSIS
-#define _FULL_G2_LEAK_CHECKING
-extern int g_Ghoul2Allocations;
-extern int g_G2ServerAlloc;
-extern int g_G2ClientAlloc;
-extern int g_G2AllocServer;
+#ifdef _DEBUG
+	#define G2_PERFORMANCE_ANALYSIS
+	#define _FULL_G2_LEAK_CHECKING
+	extern int g_Ghoul2Allocations;
+	extern int g_G2ServerAlloc;
+	extern int g_G2ClientAlloc;
+	extern int g_G2AllocServer;
 #endif
 
 #if (defined _MSC_VER)

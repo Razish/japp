@@ -1,7 +1,6 @@
 #include "b_local.h"
 #include "g_nav.h"
 #include "anims.h"
-//#include "g_navigator.h"
 
 extern qboolean BG_SabersOff( playerState_t *ps );
 

@@ -68,7 +68,7 @@ int UI_ParseInfos( char *buf, int max, char *infos[] ) {
 		infos[count] = (char *) UI_Alloc(strlen(info) + strlen("\\num\\") + strlen(va("%d", MAX_ARENAS)) + 1);
 		if (infos[count]) {
 			strcpy(infos[count], info);
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			if (trap->Cvar_VariableValue("com_buildScript"))
 			{
 				char *botFile = Info_ValueForKey(info, "personality");

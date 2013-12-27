@@ -1,8 +1,6 @@
 #ifndef MacPrefixCommon_h
 #define MacPrefixCommon_h
 
-#define _JK2			1
-
 // gcc-only
 #define MACOS_X			1
 

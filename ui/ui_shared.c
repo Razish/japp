@@ -109,12 +109,11 @@ extern qboolean ItemParse_model_g2anim_go( itemDef_t *item, const char *animName
 
 
 #ifdef _CGAME
-#define MEM_POOL_SIZE  128 * 1024
-#define UI_ALLOCATION_TAG	TAG_CG_UI_ALLOC
+	#define MEM_POOL_SIZE 128 * 1024 // 128kb
+	#define UI_ALLOCATION_TAG TAG_CG_UI_ALLOC
 #else
-//#define MEM_POOL_SIZE  1024 * 1024
-#define MEM_POOL_SIZE  2048 * 1024
-#define	UI_ALLOCATION_TAG	TAG_UI_ALLOC
+	#define MEM_POOL_SIZE 2*1024*1024 // 2mb
+	#define	UI_ALLOCATION_TAG TAG_UI_ALLOC
 #endif
 
 static char		memoryPool[MEM_POOL_SIZE];
@@ -7718,11 +7717,9 @@ extern displayContextDef_t cgDC;
 qboolean ItemParse_model_g2skin( itemDef_t *item, int handle ) {
 	modelDef_t *modelPtr;
 	pc_token_t token;
-//#ifndef _CGAME
 	char modelPath[MAX_QPATH] = { 0 };
 	char skinpath[MAX_QPATH] = { 0 };
 	char *skinPtr = NULL;
-//#endif
 	char *finalSkin = &token.string[0];
 
 	Item_ValidateTypeData(item);
@@ -7738,7 +7735,6 @@ qboolean ItemParse_model_g2skin( itemDef_t *item, int handle ) {
 	}
 
 	//Raz: Added
-//#ifndef _CGAME
 	if ( !Q_stricmp( token.string, "model" ) )
 	{
 #ifdef _CGAME
@@ -7765,7 +7761,6 @@ qboolean ItemParse_model_g2skin( itemDef_t *item, int handle ) {
 		}
 		finalSkin = &modelPath[0];
 	}
-//#endif
 
 	modelPtr->g2skin = trap->R_RegisterSkin( finalSkin );
 

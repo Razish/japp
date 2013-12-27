@@ -2927,7 +2927,7 @@ void NAV_CheckCalcPaths( void )
 		
 		trap->Nav_CalculatePaths(qfalse);
 
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 		if ( fatalErrors )
 			Com_Printf( S_COLOR_RED"Not saving .nav file due to fatal nav errors\n" );
 		else 

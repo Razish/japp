@@ -296,7 +296,7 @@ else:
 		env['CCFLAGS'] += [ '-O2' ]
 	elif plat == 'Windows':
 		env['CCFLAGS'] += [ '/O2' ]
-	env['CPPDEFINES'] += [ 'NDEBUG', 'FINAL_BUILD' ]
+	env['CPPDEFINES'] += [ 'NDEBUG' ]
 
 
 #################

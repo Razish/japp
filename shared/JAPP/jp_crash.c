@@ -29,7 +29,6 @@ void DeactivateCrashHandler( void ) {
 
 int	bCrashing = 0;
 
-//#include <disasm/disasm.h>
 #include "shared/libudis86/udis86.h"
 
 #include <time.h>

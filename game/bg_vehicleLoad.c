@@ -1012,7 +1012,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 		{
 			if ( !BG_ParseVehicleParm( vehicle, parmName, value ) )
 			{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 				Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair '%s', '%s'!\n", parmName, value );
 #endif
 			}
@@ -1023,7 +1023,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weap1", weap1 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weap1', '%s'!\n", weap1 );
 #endif
 		}
@@ -1032,7 +1032,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weap2", weap2 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weap2', '%s'!\n", weap2 );
 #endif
 		}
@@ -1041,7 +1041,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weapMuzzle1", weapMuzzle1 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weapMuzzle1', '%s'!\n", weapMuzzle1 );
 #endif
 		}
@@ -1050,7 +1050,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weapMuzzle2", weapMuzzle2 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weapMuzzle2', '%s'!\n", weapMuzzle2 );
 #endif
 		}
@@ -1059,7 +1059,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weapMuzzle3", weapMuzzle3 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weapMuzzle3', '%s'!\n", weapMuzzle3 );
 #endif
 		}
@@ -1068,7 +1068,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weapMuzzle4", weapMuzzle4 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weapMuzzle4', '%s'!\n", weapMuzzle4 );
 #endif
 		}
@@ -1077,7 +1077,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weapMuzzle5", weapMuzzle5 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weapMuzzle5', '%s'!\n", weapMuzzle5 );
 #endif
 		}
@@ -1086,7 +1086,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weapMuzzle6", weapMuzzle6 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weapMuzzle6', '%s'!\n", weapMuzzle6 );
 #endif
 		}
@@ -1095,7 +1095,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weapMuzzle7", weapMuzzle7 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weapMuzzle7', '%s'!\n", weapMuzzle7 );
 #endif
 		}
@@ -1104,7 +1104,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weapMuzzle8", weapMuzzle8 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weapMuzzle8', '%s'!\n", weapMuzzle8 );
 #endif
 		}
@@ -1113,7 +1113,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weapMuzzle9", weapMuzzle9 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weapMuzzle9', '%s'!\n", weapMuzzle9 );
 #endif
 		}
@@ -1122,7 +1122,7 @@ int VEH_LoadVehicle( const char *vehicleName )
 	{
 		if ( !BG_ParseVehicleParm( vehicle, "weapMuzzle10", weapMuzzle10 ) )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 			Com_Printf( S_COLOR_RED"ERROR: Unknown Vehicle key/value pair 'weapMuzzle10', '%s'!\n", weapMuzzle10 );
 #endif
 		}

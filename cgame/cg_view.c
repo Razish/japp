@@ -7,7 +7,6 @@
 #include "cg_lights.h"
 #include "cg_luaevent.h"
 
-//#define MASK_CAMERACLIP (MASK_SOLID|CONTENTS_PLAYERCLIP)
 #define CAMERA_SIZE	4
 
 static int GetCameraClip( void ) {

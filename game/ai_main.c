@@ -60,11 +60,9 @@ vmCvar_t bot_forgimmick;
 vmCvar_t bot_honorableduelacceptance;
 vmCvar_t bot_pvstype;
 vmCvar_t bot_normgpath;
-#ifndef FINAL_BUILD
-vmCvar_t bot_getinthecarrr;
-#endif
 
 #ifdef _DEBUG
+vmCvar_t bot_getinthecarrr;
 vmCvar_t bot_nogoals;
 vmCvar_t bot_debugmessages;
 #endif
@@ -5541,7 +5539,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 	}
 
 
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 	if (bot_getinthecarrr.integer)
 	{ //stupid vehicle debug, I tire of having to connect another client to test passengers.
 		gentity_t *botEnt = &g_entities[bs->client];
@@ -7006,7 +7004,7 @@ int BotAIStartFrame(int time) {
 		trap->Cvar_Update(&bot_attachments);
 		trap->Cvar_Update(&bot_forgimmick);
 		trap->Cvar_Update(&bot_honorableduelacceptance);
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 		trap->Cvar_Update(&bot_getinthecarrr);
 #endif
 		gUpdateVars = level.time + 1000;
@@ -7081,11 +7079,9 @@ int BotAISetup( int restart ) {
 	trap->Cvar_Register(&bot_forgimmick, "bot_forgimmick", "0", CVAR_CHEAT);
 	trap->Cvar_Register(&bot_honorableduelacceptance, "bot_honorableduelacceptance", "0", 0);
 	trap->Cvar_Register(&bot_pvstype, "bot_pvstype", "1", CVAR_CHEAT);
-#ifndef FINAL_BUILD
-	trap->Cvar_Register(&bot_getinthecarrr, "bot_getinthecarrr", "0", 0);
-#endif
 
 #ifdef _DEBUG
+	trap->Cvar_Register(&bot_getinthecarrr, "bot_getinthecarrr", "0", 0);
 	trap->Cvar_Register(&bot_nogoals, "bot_nogoals", "0", CVAR_CHEAT);
 	trap->Cvar_Register(&bot_debugmessages, "bot_debugmessages", "0", CVAR_CHEAT);
 #endif

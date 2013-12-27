@@ -1592,7 +1592,7 @@ int		NAVDEBUG_curGoal			= 0;
 NAV_CalculatePaths
 -------------------------
 */
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 int fatalErrors = 0;
 char *fatalErrorPointer = NULL;
 char	fatalErrorString[4096];
@@ -1710,7 +1710,7 @@ void NAV_CalculatePaths( const char *filename, int checksum )
 	}
 #endif
 
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 	fatalErrors = 0;
 	memset( fatalErrorString, 0, sizeof( fatalErrorString ) );
 	fatalErrorPointer = &fatalErrorString[0];
@@ -1725,7 +1725,7 @@ void NAV_CalculatePaths( const char *filename, int checksum )
 
 		if ( target != -1 )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 //			if ( !NAV_WaypointsTooFar( ent, target ) )
 #endif
 			{
@@ -1738,7 +1738,7 @@ void NAV_CalculatePaths( const char *filename, int checksum )
 
 		if ( target != -1 )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 //			if ( !NAV_WaypointsTooFar( ent, target ) )
 #endif
 			{
@@ -1751,7 +1751,7 @@ void NAV_CalculatePaths( const char *filename, int checksum )
 
 		if ( target != -1 )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 //			if ( !NAV_WaypointsTooFar( ent, target ) )
 #endif
 			{
@@ -1764,7 +1764,7 @@ void NAV_CalculatePaths( const char *filename, int checksum )
 
 		if ( target != -1 )
 		{
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 //			if ( !NAV_WaypointsTooFar( ent, target ) )
 #endif
 			{
@@ -1798,7 +1798,7 @@ void NAV_CalculatePaths( const char *filename, int checksum )
 		Com_Printf("Unable to save navigations data for map \"%s\" (checksum:%d)\n", filename, checksum );
 	}
 	*/
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 	if ( fatalErrors )
 	{
 		//Com_Error( ERR_DROP, "%s%d FATAL NAV ERRORS\n", fatalErrorString, fatalErrors );

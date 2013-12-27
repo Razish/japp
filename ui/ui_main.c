@@ -8,9 +8,6 @@ USER INTERFACE MAIN
 =======================================================================
 */
 
-// use this to get a demo build without an explicit demo build, i.e. to get the demo ui files to build
-//#define PRE_RELEASE_TADEMO
-
 #include "shared/Ghoul2/G2.h"
 #include "ui_local.h"
 #include "qcommon/qfiles.h"
@@ -401,7 +398,6 @@ int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 		animNum = GetIDForString(animTable, token);
 		if(animNum == -1)
 		{
-//#ifndef FINAL_BUILD
 #ifdef _DEBUG
 			//Com_Printf(S_COLOR_RED"WARNING: Unknown token %s in %s\n", token, filename);
 #endif

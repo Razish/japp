@@ -204,7 +204,6 @@ static QINLINE qboolean CG_VehicleClipCheck(centity_t *ignored, trace_t *trace)
 
 //rww - I'm disabling this warning for this function. It complains about oldTrace but as you can see it
 //always gets set before use, and I am not wasting CPU memsetting it to shut the compiler up.
-//#pragma warning(disable : 4701) //local variable may be used without having been initialized
 /*
 ====================
 CG_ClipMoveToEntities
@@ -350,7 +349,6 @@ static void CG_ClipMoveToEntities ( const vector3 *start, const vector3 *mins, c
 		}
 	}
 }
-//#pragma warning(default : 4701) //local variable may be used without having been initialized
 
 /*
 ================
@@ -918,7 +916,6 @@ extern	vmCvar_t		cg_showVehBounds;
 pmove_t cg_vehPmove;
 qboolean cg_vehPmoveSet = qfalse;
 
-//#pragma warning(disable : 4701) //local variable may be used without having been initialized
 void CG_PredictPlayerState( void ) {
 	int			cmdNum, current, i;
 	playerState_t	oldPlayerState;
@@ -1533,5 +1530,3 @@ revertES:
 		}
 	}
 }
-//#pragma warning(default : 4701) //local variable may be used without having been initialized
-

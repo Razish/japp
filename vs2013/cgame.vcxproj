@@ -68,7 +68,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>../;../cgame/;../game/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDLL;FINAL_BUILD;_CGAME;JK2AWARDS;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;_CGAME;JK2AWARDS;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

@@ -3,7 +3,6 @@
 #include "shared/json/cJSON.h"
 
 #include "g_lua.h"
-//#include "cg_luaserialiser.h" 
 
 #ifdef JPLUA
 

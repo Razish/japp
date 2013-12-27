@@ -4149,21 +4149,6 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 	int ret_y, count;
 	int xOffset = 0;
 
-#if 0
-	float		outX = 0.0f, outY = 0.0f,
-				scale = 1.0f;
-	int			font = FONT_JAPPSMALL;
-	char		*str = NULL;//cgs.clientinfo[i].name;
-
-	for ( i=0; i<cgs.maxclients; i++ )
-	{
-		str = cgs.clientinfo[i].name;
-
-		if ( CG_WorldCoordToScreenCoordFloat( cg_entities[i].lerpOrigin, &outX, &outY ) )
-			CG_Text_Paint( outX - CG_Text_Width( str, scale, font )/2.0, outY, scale, colorTable[CT_WHITE], str, 0, 0, 6, font );
-	}
-#endif
-
 	if ( !cg_drawTeamOverlay.integer ) {
 		return y;
 	}
@@ -4319,7 +4304,6 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 	}
 
 	return ret_y;
-//#endif
 }
 
 

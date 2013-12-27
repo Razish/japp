@@ -790,7 +790,7 @@ int PM_SaberLockWinAnim( qboolean victory, qboolean superBreak )
 	{
 /*
 	default:
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 		Com_Printf( S_COLOR_RED"ERROR-PM_SaberLockBreak: %s not in saberlock anim, anim = (%d)%s\n", pm->gent->NPC_type, pm->ps->torsoAnim, animTable[pm->ps->torsoAnim].name );
 #endif
 */
@@ -897,7 +897,7 @@ int PM_SaberLockLoseAnim( playerState_t *genemy, qboolean victory, qboolean supe
 	{
 /*
 	default:
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 		Com_Printf( S_COLOR_RED"ERROR-PM_SaberLockBreak: %s not in saberlock anim, anim = (%d)%s\n", genemy->NPC_type, genemy->client->ps.torsoAnim, animTable[genemy->client->ps.torsoAnim].name );
 #endif
 */

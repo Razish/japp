@@ -426,7 +426,6 @@ static void AM_Logout( gentity_t *ent )
 	trap->SendServerCommand( ent-g_entities, "print \"You have logged out\n\"" );
 }
 
-//#define SENDTOALL
 static void AM_WhoIs( gentity_t *ent )
 {//Display list of admins
 	int			i;
@@ -452,16 +451,7 @@ static void AM_WhoIs( gentity_t *ent )
 		}
 	}
 
-#ifdef SENDTOALL
-	for ( i=0; i<MAX_CLIENTS; i++ )
-	{//Now that we've contructed our list, send it to the admins
-		cl = &level.clients[i];
-		if ( cl->pers.adminUser )
-			trap->SendServerCommand( i, va( "print \"%s\"", msg ) );
-	}
-#else
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
-#endif
 }
 
 static void AM_Status( gentity_t *ent )
@@ -505,16 +495,7 @@ static void AM_Status( gentity_t *ent )
 		}
 	}
 
-#ifdef SENDTOALL
-	for ( i=0; i<MAX_CLIENTS; i++ )
-	{//Now that we've contructed our list, send it to the admins
-		cl = &level.clients[i];
-		if ( cl->pers.adminUser )
-			trap->SendServerCommand( i, va( "print \"%s\n\"", msg ) );
-	}
-#else
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
-#endif
 }
 
 

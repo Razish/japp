@@ -12,8 +12,7 @@ USER INTERFACE SABER LOADING & DISPLAY CODE
 #include "ui_local.h"
 #include "ui_shared.h"
 
-//#define MAX_SABER_DATA_SIZE 0x8000
-#define MAX_SABER_DATA_SIZE 0x80000
+#define MAX_SABER_DATA_SIZE (1000 * 1024) // 1mb (was 32kb)
 
 // On Xbox, static linking lets us steal the buffer from wp_saberLoad
 // Just make sure that the saber data size is the same

@@ -2791,7 +2791,7 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent)
 		}
 	}
 /*
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 	switch ( selectLevel )
 	{
 	case FORCE_LEVEL_1:
@@ -2980,7 +2980,7 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 	}
 }
 
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 extern stringID_table_t animTable[MAX_ANIMATIONS+1];
 
 void Cmd_DebugSetSaberMove_f(gentity_t *self)
@@ -3059,7 +3059,7 @@ void DismembermentTest(gentity_t *self);
 
 void Bot_SetForcedMovement(int bot, int forward, int right, int up);
 
-#ifndef FINAL_BUILD
+#ifdef _DEBUG
 extern void DismembermentByNum(gentity_t *self, int num);
 extern void G_SetVehDamageFlags( gentity_t *veh, int shipSurf, int damageLevel );
 #endif
