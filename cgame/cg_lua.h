@@ -29,21 +29,18 @@ void JPLua_DPrintf( const char *msg, ... );
 		lua_pop( lua, 1 ); \
 	}
 
-typedef struct jplua_cimport_table_s
-{
+typedef struct jplua_cimport_table_s {
 	char *name;
 	lua_CFunction function;
 } jplua_cimport_table_t;
 
-typedef struct jplua_plugin_command_s
-{
+typedef struct jplua_plugin_command_s {
 	char command[64];
 	int handle;
 	struct jplua_plugin_command_s *next;
 } jplua_plugin_command_t;
 
-typedef struct jplua_plugin_s
-{
+typedef struct jplua_plugin_s {
 	char name[32];
 	char version[8];
 	unsigned int requiredJPLuaVersion;
@@ -58,15 +55,13 @@ typedef struct jplua_plugin_s
 	struct jplua_plugin_s *next;
 } jplua_plugin_t;
 
-typedef struct jplua_s
-{
+typedef struct jplua_s {
 	lua_State *state;
 	jplua_plugin_t *plugins;
 	jplua_plugin_t *currentPlugin;
 	unsigned int version;
 } jplua_t;
 extern jplua_t JPLua;
-
 
 extern stringID_table_t jplua_events[JPLUA_EVENT_MAX];
 

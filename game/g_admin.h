@@ -3,33 +3,29 @@
 #include "q_shared.h"
 
 // named telemark
-typedef struct teleMark_s {
-	char		name[32];		//	Name
-	vector3		position;		//	Position
-	gentity_t	*ent;			//	Tempent
-} teleMark_t;
+#define MAX_TELEMARK_NAME_LEN (32)
+typedef struct telemark_s {
+	char name[MAX_TELEMARK_NAME_LEN];
+	vector3 position;
+	gentity_t *ent; // tempent
 
-// server admin data
-typedef struct serverAdminData_s {
-	teleMark_t		teleMarks[32];	//	Named telemarks for this map
-	int				teleMarksIndex;	//	Index of next telemark
-	qboolean		teleMarksVisual;//	Are they being viewed by someone?
-} serverAdminData_t;
+	struct telemark_s *next;
+} telemark_t;
 
 // client admin data
 typedef struct adminData_s {
-	qboolean		canTalk;		//	Have they been silenced?
-	qboolean		isGhost;		//	Are they a ghost?
-	qboolean		isGhost2;		//	Are they a ghost? RAZTEST
-	qboolean		isFrozen;		//	Are they frozen?
-	vector3			teleMark;		//	Last marked location
-	qboolean		empowered;		//	Are they empowered?
-	qboolean		merc;			//	Are they merced?
+	qboolean canTalk; // have they been silenced?
+	qboolean isGhost; // are they a ghost?
+	qboolean isGhost2; // are they a ghost? RAZTEST
+	qboolean isFrozen; // are they frozen?
+	telemark_t *telemark; // last marked location
+	qboolean empowered; // are they empowered?
+	qboolean merc; // are they merced?
 
 	// saving these for amempower
-	int				forcePowersKnown;
-	int				forcePowerBaseLevel[NUM_FORCE_POWERS];
-	int				forcePowerLevel[NUM_FORCE_POWERS];
+	int forcePowersKnown;
+	int forcePowerBaseLevel[NUM_FORCE_POWERS];
+	int forcePowerLevel[NUM_FORCE_POWERS];
 } adminData_t;
 
 // admin users
@@ -68,18 +64,17 @@ typedef struct adminUser_s {
 #define PRIV_MERC			(0x00800000u)
 #define PRIV_MAP			(0x01000000u)
 
-qboolean	AM_HasPrivilege			( const gentity_t *ent, uint32_t privilege );
-
-// command handling
 void		AM_AddAdmin				( const char *user, const char *pass, uint32_t privileges, const char *loginMsg );
 void		AM_DeleteAdmin			( const char *user );
 void		AM_ListAdmins			( void );
-void		AM_ParseAdmins			( void );
+void		AM_LoadAdmins			( void );
 void		AM_SaveAdmins			( void );
-void		AM_TM_ParseTelemarks	( void );
+void		AM_LoadTelemarks		( void );
+void		AM_SaveTelemarks		( void );
+
+qboolean	AM_HasPrivilege			( const gentity_t *ent, uint32_t privilege );
 void		AM_PrintCommands		( gentity_t *ent );
 qboolean	AM_HandleCommands		( gentity_t *ent, const char *cmd );
-void		AM_TM_SaveTelemarks		( void );
 
 // bans
 void		JKG_Bans_Clear			( void );

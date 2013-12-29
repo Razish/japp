@@ -7,25 +7,19 @@ static const char PLAYER_META[] = "Player.meta";
 
 //Func: GetPlayer(clientNum)
 //Retn: Player object if their clientinfo is valid, and clientNum is between [0, MAX_CLIENTS-1]
-int JPLua_GetPlayer( lua_State *L )
-{
+int JPLua_GetPlayer( lua_State *L ) {
 	int num = -1;
 	unsigned int clientsFound = 0;
 
-	if ( lua_type( L, 1 ) == LUA_TNIL )
-		num = cg.clientNum;
-
-	else if ( lua_type( L, 1 ) == LUA_TNUMBER )
+	if ( lua_type( L, 1 ) == LUA_TNUMBER )
 		num = lua_tointeger( L, 1 );
 
-	if ( lua_type( L, 1 ) == LUA_TSTRING )
-	{
+	else if ( lua_type( L, 1 ) == LUA_TSTRING ) {
 		const char *name = lua_tostring( L, 1 );
 		int numFound = 0;
 		int i=0;
 		//RAZTODO: copy G_ClientFromString
-		for ( i=0; i<cgs.maxclients; i++ )
-		{
+		for ( i=0; i<cgs.maxclients; i++ ) {
 			char nameClean[36] = {0};
 			char nameClean2[36] = {0};
 			if ( !cgs.clientinfo[i].infoValid )
@@ -34,26 +28,22 @@ int JPLua_GetPlayer( lua_State *L )
 			Q_strncpyz( nameClean2, name, sizeof( nameClean2 ) );
 			Q_CleanString( nameClean, STRIP_COLOUR );
 			Q_CleanString( nameClean2, STRIP_COLOUR );
-			if ( !Q_stricmp( nameClean, nameClean2 ) )
-			{
+			if ( !Q_stricmp( nameClean, nameClean2 ) ) {
 				num = i;
 				clientsFound |= (1<<i);
 				numFound++;
 			}
 		}
 
-		if ( numFound > 1 )
-		{
+		if ( numFound > 1 ) {
 			int top=0;
 			lua_pushnil( L );
 			lua_pushstring( L, "Multiple matches" );
 			
 			lua_newtable( L );
 			top = lua_gettop( L );
-			for ( i=0; i<cgs.maxclients; i++ )
-			{
-				if ( clientsFound & (1<<i) )
-				{
+			for ( i=0; i<cgs.maxclients; i++ ) {
+				if ( clientsFound & (1<<i) ) {
 					lua_pushnumber( L, i );
 					JPLua_Player_CreateRef( L, i );
 					lua_settable( L, top );
@@ -61,12 +51,14 @@ int JPLua_GetPlayer( lua_State *L )
 			}
 			return 3;
 		}
-		else if ( !numFound )
-		{
+		else if ( !numFound ) {
 			lua_pushnil( L );
 			return 1;
 		}
 	}
+
+	else //if ( lua_type( L, 1 ) == LUA_TNIL )
+		num = cg.clientNum;
 
 	JPLua_Player_CreateRef( L, num );
 	return 1;
@@ -74,8 +66,7 @@ int JPLua_GetPlayer( lua_State *L )
 
 //Func: tostring(Player)
 //Retn: string representing the Player instance (for debug/error messages)
-static int JPLua_Player_ToString( lua_State *L )
-{
+static int JPLua_Player_ToString( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	lua_pushfstring( L, "Player(%d)", player->clientNum );
 	return 1;
@@ -83,8 +74,7 @@ static int JPLua_Player_ToString( lua_State *L )
 
 //Func: Player:GetID()
 //Retn: integer of the client's ID
-static int JPLua_Player_GetID( lua_State *L )
-{
+static int JPLua_Player_GetID( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	lua_pushinteger( L, player->clientNum );
 	return 1;
@@ -92,8 +82,7 @@ static int JPLua_Player_GetID( lua_State *L )
 
 //Func: Player:GetName()
 //Retn: string of the Player's name
-static int JPLua_Player_GetName( lua_State *L )
-{
+static int JPLua_Player_GetName( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	lua_pushstring( L, cgs.clientinfo[player->clientNum].name );
 	return 1;
@@ -102,8 +91,7 @@ static int JPLua_Player_GetName( lua_State *L )
 //Func: Player:GetHealth()
 //Retn: nil if Player:GetID() != self:GetID() due to lack of reliable information
 //		integer amount of the Player's health
-static int JPLua_Player_GetHealth( lua_State *L )
-{
+static int JPLua_Player_GetHealth( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	if ( player->clientNum == cg.clientNum )
 		lua_pushinteger( L, cg.predictedPlayerState.stats[STAT_HEALTH] );
@@ -115,8 +103,7 @@ static int JPLua_Player_GetHealth( lua_State *L )
 //Func: Player:GetLastPickup()
 //Retn: nil if Player:GetID() != self:GetID() due to lack of reliable information
 //		string of the most recent pickup's name
-static int JPLua_Player_GetLastPickup( lua_State *L )
-{
+static int JPLua_Player_GetLastPickup( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	if ( player->clientNum == cg.clientNum )
 		lua_pushstring( L, CG_GetStringEdString( "SP_INGAME", bg_itemlist[cg.itemPickup].classname ) );
@@ -128,8 +115,7 @@ static int JPLua_Player_GetLastPickup( lua_State *L )
 //Func: Player:GetArmor()
 //Retn: nil if Player:GetID() != self:GetID() due to lack of reliable information
 //		integer amount of the Player's armor
-static int JPLua_Player_GetArmor( lua_State *L )
-{
+static int JPLua_Player_GetArmor( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	if ( player->clientNum == cg.clientNum )
 		lua_pushinteger( L, cg.predictedPlayerState.stats[STAT_ARMOR] );
@@ -141,8 +127,7 @@ static int JPLua_Player_GetArmor( lua_State *L )
 //Func: Player:GetForce()
 //Retn: nil if Player:GetID() != self:GetID() due to lack of reliable information
 //		integer amount of Player's force mana points
-static int JPLua_Player_GetForce( lua_State *L )
-{
+static int JPLua_Player_GetForce( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	if ( player->clientNum == cg.clientNum )
 		lua_pushinteger( L, cg.predictedPlayerState.fd.forcePower );
@@ -153,8 +138,7 @@ static int JPLua_Player_GetForce( lua_State *L )
 
 //Func: Player:GetWeapon()
 //Retn: integer index of the weapon the Player has selected (See: 'Weapons' table)
-static int JPLua_Player_GetWeapon( lua_State *L )
-{
+static int JPLua_Player_GetWeapon( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	lua_pushinteger( L, cg_entities[player->clientNum].currentState.weapon );
 	return 1;
@@ -163,8 +147,7 @@ static int JPLua_Player_GetWeapon( lua_State *L )
 //Func: Player:GetAmmo([weapon])
 //Retn: nil if Player:GetID() != self:GetID() due to lack of reliable information
 //		integer amount of the ammo for either the specified weapon, or the weapon the player has selected
-static int JPLua_Player_GetAmmo( lua_State *L )
-{
+static int JPLua_Player_GetAmmo( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	int weapon = cg.predictedPlayerState.weapon;
 
@@ -179,8 +162,7 @@ static int JPLua_Player_GetAmmo( lua_State *L )
 //Func: Player:GetMaxAmmo([weapon])
 //Retn: nil if Player:GetID() != self:GetID() due to lack of reliable information
 //		integer amount of the max ammo for either the specified weapon, or the weapon the player has selected
-static int JPLua_Player_GetMaxAmmo( lua_State *L )
-{
+static int JPLua_Player_GetMaxAmmo( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	int weapon = cg.predictedPlayerState.weapon;
 
@@ -195,8 +177,7 @@ static int JPLua_Player_GetMaxAmmo( lua_State *L )
 //Func: Player:GetSaberStyle()
 //Retn: nil if Player:GetID() != self:GetID() due to lack of reliable information
 //		integer index of the saber style the Player is using (See: 'SaberStyle' table)
-static int JPLua_Player_GetSaberStyle( lua_State *L )
-{
+static int JPLua_Player_GetSaberStyle( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	if ( player->clientNum == cg.clientNum )
 		lua_pushinteger( L, cg.predictedPlayerState.fd.saberDrawAnimLevel );
@@ -207,8 +188,7 @@ static int JPLua_Player_GetSaberStyle( lua_State *L )
 
 //Func: Player:GetEFlags()
 //Retn: bit-mask of various entity flags (See: 'EFlags' table)
-static int JPLua_Player_GetEFlags( lua_State *L )
-{
+static int JPLua_Player_GetEFlags( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	lua_pushinteger( L, cg_entities[player->clientNum].currentState.eFlags );
 	return 1;
@@ -216,8 +196,7 @@ static int JPLua_Player_GetEFlags( lua_State *L )
 
 //Func: Player:GetEFlags2()
 //Retn: bit-mask of various entity flags (See: 'EFlags2' table)
-static int JPLua_Player_GetEFlags2( lua_State *L )
-{
+static int JPLua_Player_GetEFlags2( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	lua_pushinteger( L, cg_entities[player->clientNum].currentState.eFlags2 );
 	return 1;
@@ -239,9 +218,8 @@ static int JPLua_Player_GetDuelingPartner( lua_State *L )
 
 //Func: Player:GetLocation()
 //Retn: string of the nearest target_location
-extern const char *CG_GetLocationString(const char *loc); //cg_main.c
-static int JPLua_Player_GetLocation( lua_State *L )
-{
+extern const char *CG_GetLocationString( const char *loc ); // cg_main.c
+static int JPLua_Player_GetLocation( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	lua_pushstring( L, CG_GetLocationString( CG_ConfigString( CS_LOCATIONS+cgs.clientinfo[player->clientNum].location ) ) );
 
@@ -250,18 +228,15 @@ static int JPLua_Player_GetLocation( lua_State *L )
 
 //Func: Player:GetClientInfo()
 //Retn: key/value table of the player's Clientinfo
-static int JPLua_Player_GetClientInfo( lua_State *L )
-{
+static int JPLua_Player_GetClientInfo( lua_State *L ) {
 	int top=0, top2=0, i=0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	clientInfo_t *ci = &cgs.clientinfo[player->clientNum];
 	entityState_t *es = &cg_entities[player->clientNum].currentState;
 	score_t	*score = NULL; // for ping and other scoreboard information
 
-	for ( i=0; i<cg.numScores; i++ )
-	{
-		if ( cg.scores[i].client == player->clientNum )
-		{
+	for ( i=0; i<cg.numScores; i++ ) {
+		if ( cg.scores[i].client == player->clientNum ) {
 			score = &cg.scores[i];
 			break;
 		}
@@ -283,14 +258,12 @@ static int JPLua_Player_GetClientInfo( lua_State *L )
 	lua_pushstring( L, "skinName" ); lua_pushstring( L, ci->skinName ); lua_settable( L, top );
 	lua_pushstring( L, "deferred" ); lua_pushboolean( L, !!ci->deferred ); lua_settable( L, top );
 	lua_pushstring( L, "gender" ); lua_pushinteger( L, ci->gender ); lua_settable( L, top );
-	if ( score )
-	{
+	if ( score ) {
 		lua_pushstring( L, "ping" ); lua_pushinteger( L, (player->clientNum==cg.clientNum) ? cg.snap->ping : score->ping ); lua_settable( L, top );
 		lua_pushstring( L, "time" ); lua_pushinteger( L, score->time ); lua_settable( L, top );
 		lua_pushstring( L, "deaths" ); lua_pushinteger( L, score->deaths ); lua_settable( L, top );
 	}
-	else
-	{
+	else {
 		lua_pushstring( L, "ping" );
 		if ( player->clientNum == cg.clientNum )
 			lua_pushinteger( L, cg.snap->ping );
@@ -327,8 +300,7 @@ static int JPLua_Player_GetClientInfo( lua_State *L )
 //[ASTRAL-START]
 //Func: Player:GetAnimations()
 //Retn: Table of Legs/Torso anims and Legs/Torso timers
-static int JPLua_Player_GetAnimations( lua_State *L )
-{
+static int JPLua_Player_GetAnimations( lua_State *L ) {
 	int top = 0;
 	int torsoAnim = 0;
 	int torsoTimer = 0;
@@ -337,15 +309,13 @@ static int JPLua_Player_GetAnimations( lua_State *L )
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 
 	
-	if ( player->clientNum == cg.clientNum )
-	{
+	if ( player->clientNum == cg.clientNum ) {
 		torsoAnim = cg.predictedPlayerState.torsoAnim;
 		torsoTimer = cg.predictedPlayerState.torsoTimer;
 		legsAnim = cg.predictedPlayerState.legsAnim;
 		legsTimer = cg.predictedPlayerState.legsTimer;
 	}
-	else 
-	{
+	else {
 		torsoAnim = cg_entities[player->clientNum].currentState.torsoAnim;
 		legsAnim = cg_entities[player->clientNum].currentState.legsAnim;
 	}
@@ -362,8 +332,7 @@ static int JPLua_Player_GetAnimations( lua_State *L )
 //[ASTRAL-END]
 //Func: Player:GetPosition()
 //Retn: Table of x/y/z position
-static int JPLua_Player_GetPosition( lua_State *L )
-{
+static int JPLua_Player_GetPosition( lua_State *L ) {
 	int top = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	vector3 position = { 0.0f };
@@ -384,8 +353,7 @@ static int JPLua_Player_GetPosition( lua_State *L )
 
 //Func: Player:GetAngles()
 //Retn: Table of pitch/yaw/roll view angles
-static int JPLua_Player_GetAngles( lua_State *L )
-{
+static int JPLua_Player_GetAngles( lua_State *L ) {
 	int top = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	vector3 angles = { 0.0f };
@@ -406,8 +374,7 @@ static int JPLua_Player_GetAngles( lua_State *L )
 
 //Func: Player:GetVelocity()
 //Retn: Table of x/y/z velocity
-static int JPLua_Player_GetVelocity( lua_State *L )
-{
+static int JPLua_Player_GetVelocity( lua_State *L ) {
 	int top = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	vector3 velocity = { 0.0f };
@@ -431,8 +398,7 @@ static int JPLua_Player_GetVelocity( lua_State *L )
 //		0 - all applicable sabers are activated
 //		1 - using dual/staff and only one blade is activated
 //		2 - both blades are off
-static int JPLua_Player_IsWeaponHolstered( lua_State *L )
-{
+static int JPLua_Player_IsWeaponHolstered( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	lua_pushinteger( L, cg_entities[player->clientNum].currentState.saberHolstered );
 	return 1;
@@ -440,22 +406,17 @@ static int JPLua_Player_IsWeaponHolstered( lua_State *L )
 
 //Func: Player:IsAlive()
 //Retn: boolean expressing whether the Player is alive
-static int JPLua_Player_IsAlive( lua_State *L )
-{
+static int JPLua_Player_IsAlive( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	//RAZFIXME: Check clientNum bounds
-	if ( player->clientNum == cg.clientNum )
-	{
-		if ( cg.predictedPlayerState.stats[STAT_HEALTH] > 0 && !(cg.predictedPlayerState.eFlags & EF_DEAD) && cg.predictedPlayerState.persistant[PERS_TEAM] != TEAM_SPECTATOR )
-		{
+	if ( player->clientNum == cg.clientNum ) {
+		if ( cg.predictedPlayerState.stats[STAT_HEALTH] > 0 && !(cg.predictedPlayerState.eFlags & EF_DEAD) && cg.predictedPlayerState.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 			lua_pushboolean( L, 1 );
 			return 1;
 		}
 	}
-	else
-	{
-		if ( !(cg_entities[player->clientNum].currentState.eFlags & EF_DEAD) && cgs.clientinfo[player->clientNum].team != TEAM_SPECTATOR )
-		{
+	else {
+		if ( !(cg_entities[player->clientNum].currentState.eFlags & EF_DEAD) && cgs.clientinfo[player->clientNum].team != TEAM_SPECTATOR ) {
 			lua_pushboolean( L, 1 );
 			return 1;
 		}
@@ -467,20 +428,17 @@ static int JPLua_Player_IsAlive( lua_State *L )
 
 //Func: Player:IsBot()
 //Retn: boolean expressing whether the Player is a bot
-static int JPLua_Player_IsBot( lua_State *L )
-{
+static int JPLua_Player_IsBot( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	lua_pushboolean( L, !!(cgs.clientinfo[player->clientNum].botSkill != -1) );
 	return 1;
 }
 
 // Push a Player instance for a client number onto the stack
-void JPLua_Player_CreateRef( lua_State *L, int num )
-{
+void JPLua_Player_CreateRef( lua_State *L, int num ) {
 	jplua_player_t *player = NULL;
 
-	if ( num < 0 || num >= MAX_CLIENTS || !cgs.clientinfo[num].infoValid )
-	{
+	if ( num < 0 || num >= MAX_CLIENTS || !cgs.clientinfo[num].infoValid ) {
 		lua_pushnil( L );
 		return;
 	}
@@ -494,8 +452,7 @@ void JPLua_Player_CreateRef( lua_State *L, int num )
 
 // Ensure the value at the specified index is a valid Player instance,
 // Return the instance if it is, otherwise return NULL.
-jplua_player_t *JPLua_CheckPlayer( lua_State *L, int idx )
-{
+jplua_player_t *JPLua_CheckPlayer( lua_State *L, int idx ) {
 	void *ud = luaL_checkudata( L, idx, PLAYER_META );
 	luaL_argcheck( L, ud != NULL, 1, "'Player' expected" );
 	return (jplua_player_t *)ud;
@@ -530,8 +487,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 };
 
 // Register the Player class for Lua
-void JPLua_Register_Player( lua_State *L )
-{
+void JPLua_Register_Player( lua_State *L ) {
 	luaL_newmetatable( L, PLAYER_META ); // Create metatable for Player class, push on stack
 
 	// Lua won't attempt to directly index userdata, only via metatables

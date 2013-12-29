@@ -2892,7 +2892,7 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 	}
 
 	// unlagged!
-	tr = RealTrace( ent, 256.0f );
+	tr = G_RealTrace( ent, 256.0f );
 	
 	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS )
 	{

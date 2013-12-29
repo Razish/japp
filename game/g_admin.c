@@ -1,30 +1,48 @@
-//================================
-//================================
-//	
-//	-	jp_admin.c
-//		In-game Administration system
-//	
-//	Author: Raz0r
-//	
-//	Desc:	This administration system is developed to be flexible,
-//			easy to maintain, secure and simple.
-//			
-//			There is a list of user/pass combinations to be defined by
-//			the server owner, with each user having their own permission mask.
-//			
-//			All checking of permissions is done before the associated function
-//			is called, so you don't have to worry about complex control paths
-//			
-//================================
-//================================
+// JA++ administration system
+//
+// This administration system is developed to be flexible, easy to maintain, secure and simple.
+//
+// There is a list of user/pass combinations to be defined by the server owner, with each user having their own
+// permission mask.
+//
+// All checking of permissions is done before the associated function is called, so you don't have to worry about
+// complex control paths
+//
+// Admin data is saved in JSON format in <fs_homepath>/<fs_game>/admins.json
+//
 
 #include "g_local.h"
 #include "g_admin.h"
-#include "shared/JAPP/jp_tokenparser.h"
 #include "shared/json/cJSON.h"
 
 static adminUser_t *adminUsers = NULL;
+static telemark_t *telemarks = NULL;
+static qboolean telemarksVisible = qfalse;
 
+// clear all admin accounts and logout all users
+static void AM_ClearAccounts( void ) {
+	adminUser_t *user = adminUsers;
+
+	while ( user ) {
+		adminUser_t *next = user->next;
+		gentity_t *ent = NULL;
+		int i = 0;
+
+		for ( i=0, ent=g_entities; i<level.maxclients; i++, ent++ ) {
+			if ( ent->client->pers.adminUser && ent->client->pers.adminUser == user ) {
+				trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"You have been forcefully logged out of admin.\n\"" );
+				ent->client->pers.adminUser = NULL;
+			}
+		}
+
+		free( user );
+		user = next;
+	}
+
+	adminUsers = NULL;
+}
+
+// add or update an existing admin account (user, pass, privileges, login mesage)
 void AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const char *loginMsg ) {
 	adminUser_t	*admin = NULL;
 
@@ -36,8 +54,8 @@ void AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const
 		}
 	}
 
-	if ( !admin )
-	{// a new admin, insert it to the start of the linked list, user->next will be the old root
+	if ( !admin ) {
+		// a new admin, insert it to the start of the linked list, user->next will be the old root
 		admin = malloc( sizeof( adminUser_t ) );
 		memset( admin, 0, sizeof( adminUser_t ) );
 		admin->next = adminUsers;
@@ -51,16 +69,17 @@ void AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const
 	Q_strncpyz( admin->loginMsg, loginMsg, sizeof( admin->loginMsg ) );
 }
 
+// delete an admin account and forcefully log out any users
 void AM_DeleteAdmin( const char *user ) {
 	adminUser_t	*admin = NULL, *prev=NULL, *next=NULL;
 
 	for ( admin=adminUsers; admin; admin=admin->next ) {
 		next = admin->next;
 
-		if ( !strcmp( user, admin->user ) )
-		{// remove it
+		if ( !strcmp( user, admin->user ) ) {
 			gentity_t *ent = NULL;
-			for ( ent=g_entities; ent-g_entities<level.maxclients; ent++ ) {
+			int i = 0;
+			for ( i=0, ent=g_entities; i<level.maxclients; i++, ent++ ) {
 				if ( ent->client->pers.adminUser && ent->client->pers.adminUser == admin ) {
 					trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_RED"Your admin account has been deleted.\n\"" );
 					ent->client->pers.adminUser = NULL;
@@ -85,6 +104,7 @@ void AM_DeleteAdmin( const char *user ) {
 	trap->Print( "No such admin found (%s)\n", user );
 }
 
+// list all admin accounts and users logged into them
 void AM_ListAdmins( void ) {
 	adminUser_t	*admin = NULL;
 	int count = 0;
@@ -97,31 +117,30 @@ void AM_ListAdmins( void ) {
 		trap->Print( " %3d: %s/%s (%d) %s\n", ++count, admin->user, admin->password, admin->privileges, admin->loginMsg );
 
 		for ( ent=g_entities; ent-g_entities<level.maxclients; ent++ ) {
+			//TODO: build string like "user1, user2"
 			if ( ent->client->pers.adminUser && ent->client->pers.adminUser == admin )
 				trap->Print( "      Logged in: %s\n", ent->client->pers.netname );
 		}
 	}
 }
 
-static void AM_ProcessUsers( const char *jsonText )
-{
+// parse json object for admin accounts
+static void AM_ReadAccounts( const char *jsonText ) {
 	cJSON *root = NULL, *admins = NULL;
 	int adminsCount = 0, i = 0;
 	const char *tmp = NULL;
 	adminUser_t	*user = adminUsers;
 
 	root = cJSON_Parse( jsonText );
-	if ( !root )
-	{
-		Com_Printf( "- ERROR: Could not parse admin info\n" );
+	if ( !root ) {
+		Com_Printf( "ERROR: Could not parse admin info\n" );
 		return;
 	}
 
 	admins = cJSON_GetObjectItem( root, "admins" );
 	adminsCount = cJSON_GetArraySize( admins );
 
-	for ( i=0; i<adminsCount; i++ )
-	{
+	for ( i=0; i<adminsCount; i++ ) {
 		cJSON *item = cJSON_GetArrayItem( admins, i );
 
 		// first, allocate the admin user
@@ -148,75 +167,10 @@ static void AM_ProcessUsers( const char *jsonText )
 	}
 }
 
-void AM_ParseAdmins( void )
-{
-	char			*buf = NULL, loadPath[MAX_QPATH] = {0};
-	unsigned int	len = 0;
-	fileHandle_t	f = 0;
-	adminUser_t *user = adminUsers;
-
-	// clear the admins table
-	while ( user ) {
-		adminUser_t *next = user->next;
-
-		gentity_t *ent = NULL;
-		for ( ent=g_entities; ent-g_entities<level.maxclients; ent++ ) {
-			if ( ent->client->pers.adminUser && ent->client->pers.adminUser == user ) {
-				trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"You have been forcefully logged out of admin.\n\"" );
-				ent->client->pers.adminUser = NULL;
-			}
-		}
-
-		free( user );
-		user = next;
-	}
-	adminUsers = NULL;
-
-	Com_Printf( "Loading Admins\n" );
-	Com_sprintf( loadPath, sizeof( loadPath ), "admins.dat" );
-	len = trap->FS_Open( loadPath, &f, FS_READ );
-
-	if ( !f )
-	{//no file
-		Com_Printf( "- ERROR: File not found (%s)\n", loadPath );
-		return;
-	}
-
-	if ( !len || len == -1 )
-	{//empty file
-		Com_Printf( "- ERROR: File is empty (%s)\n", loadPath );
-		trap->FS_Close( f );
-		return;
-	}
-
-	if ( !(buf = (char*)malloc(len+1)) )
-	{//alloc memory for buffer
-		Com_Printf( "- ERROR: Ran out of memory\n", loadPath );
-		return;
-	}
-
-	trap->FS_Read( buf, len, f );
-	trap->FS_Close( f );
-	buf[len] = 0;
-
-	// pass it off to the json reader
-	AM_ProcessUsers( buf );
-
-	free( buf );
-
-	return;
-}
-
-void AM_SaveAdmins( void ) {
-	char			loadPath[MAX_QPATH] = {0};
-	const char		*buf = NULL;
-	fileHandle_t	f;
-	cJSON			*root = NULL, *admins = NULL;
-	adminUser_t		*admin = NULL;
-
-	Com_Printf( "Saving admins\n" );
-	Com_sprintf( loadPath, sizeof( loadPath ), "admins.dat" );
-	trap->FS_Open( loadPath, &f, FS_WRITE );
+// create json object for admin accounts and write to file
+static void AM_WriteAccounts( fileHandle_t f ) {
+	cJSON *root = NULL, *admins = NULL;
+	adminUser_t *admin = NULL;
 
 	root = cJSON_CreateObject();
 	admins = cJSON_CreateArray();
@@ -231,149 +185,263 @@ void AM_SaveAdmins( void ) {
 	}
 	cJSON_AddItemToObject( root, "admins", admins );
 
-	buf = cJSON_Serialize( root, 1 );
-	trap->FS_Write( buf, strlen( buf ), f );
-	trap->FS_Close( f );
-
-	free( (void *)buf );
-	cJSON_Delete( root );
+	Q_WriteJSONToFile( root, f );
 }
 
-static qboolean AM_TM_ProcessTelemark( const char *token )
-{//Okay, so we're looping through and setting all the info for each class per team
-	const char	*tmp = NULL;
-	teleMark_t	*current = &level.adminData.teleMarks[level.adminData.teleMarksIndex];
+// load admin accounts from disk after logging everyone out
+void AM_LoadAdmins( void ) {
+	char *buf = NULL, loadPath[MAX_QPATH] = {0};
+	unsigned int len = 0;
+	fileHandle_t f = 0;
 
-	//If we're still at the end of the previous telemark, there's no more :o
-	if ( !Q_stricmp( token, "}" ) )
-		return qfalse;
+	AM_ClearAccounts();
 
-	//Name
-	if ( TP_ParseString( &tmp ) )
-		Com_Printf( "Unexpected EOL line %i (Expected 'name')\n", TP_CurrentLine() );
-	else
-		Q_strncpyz( current->name, tmp, sizeof( current->name ) );
-
-	//Position
-	if ( TP_ParseVec3( &current->position ) )
-		Com_Printf( "Unexpected EOL line %i (Expected 'position')\n", TP_CurrentLine() );
-
-	//Successful write, fix index
-	level.adminData.teleMarksIndex++;
-
-	token = TP_ParseToken();
-	return qtrue;
-}
-
-void AM_TM_ParseTelemarks( void )
-{//Parse telemarks file
-	char			*buf = NULL;
-	char			loadPath[MAX_QPATH] = { 0 };
-	unsigned int	len = 0;
-	const char		*token = NULL;
-	fileHandle_t	f = 0;
-
-	//Clear the admins table
-	memset( &level.adminData.teleMarks, 0, sizeof( teleMark_t ) * 32 );
-	level.adminData.teleMarksIndex = 0;
-
-	Com_Printf( S_COLOR_CYAN"JA++: Loading telemark Data...\n" );
-	Com_sprintf( loadPath, sizeof(loadPath), "maps\\%s.tele", level.rawmapname );
+	Q_strncpyz( loadPath, "admins.json", sizeof( loadPath ) );
 	len = trap->FS_Open( loadPath, &f, FS_READ );
+	Com_Printf( "Loading admin accounts (%s)\n", loadPath );
 
+	// no file
 	if ( !f )
-	{//no file
-		Com_Printf( S_COLOR_RED"Telemark loading failed! (Can't find %s)\n", loadPath );
 		return;
-	}
 
-	if ( !len || len == -1 )
-	{//empty file
-		Com_Printf( S_COLOR_RED"Telemark loading failed! (%s is empty)\n", loadPath );
+	// empty file
+	if ( !len || len == -1 ) {
 		trap->FS_Close( f );
 		return;
 	}
 
-	if ( !(buf = (char*)malloc( len+1 )) )
-	{//alloc memory for buffer
-		Com_Printf( S_COLOR_RED"Telemark loading failed! (Failed to allocate buffer)\n" );
+	// alloc memory for buffer
+	if ( !(buf = (char*)malloc(len+1)) )
 		return;
-	}
 
 	trap->FS_Read( buf, len, f );
 	trap->FS_Close( f );
 	buf[len] = 0;
-	TP_NewParseSession( buf );
 
-	while ( 1 )
-	{//the file is there, and it's not empty
-		token = TP_ParseToken();
-		if ( !token[0] )
-			break;
-		
-		if ( level.adminData.teleMarksIndex < 32 && !AM_TM_ProcessTelemark( token ) )
-			break;
-	}
+	// pass it off to the json reader
+	AM_ReadAccounts( buf );
 
 	free( buf );
-
-	return;
 }
 
-void AM_TM_SaveTelemarks( void )
-{//Save telemarks file
-	char			buf[16384] = { 0 };// 16k file size
-	char			loadPath[MAX_QPATH];
-	fileHandle_t	f;
-	teleMark_t		*current = NULL;
+// save admin accounts to disk
+void AM_SaveAdmins( void ) {
+	char loadPath[MAX_QPATH] = {0};
+	fileHandle_t f;
 
-	Com_Printf( S_COLOR_CYAN"Saving telemark Data...\n" );
-	Com_sprintf( loadPath, sizeof(loadPath), "maps\\%s.tele", level.rawmapname );
+	Q_strncpyz( loadPath, "admins.json", sizeof( loadPath ) );
 	trap->FS_Open( loadPath, &f, FS_WRITE );
+	Com_Printf( "Saving admins (%s)\n", loadPath );
 
-	for ( current=level.adminData.teleMarks; current-level.adminData.teleMarks<level.adminData.teleMarksIndex; current++ )
-		Q_strcat( buf, sizeof( buf ), va( "{ \"%s\" %i %i %i }\n", current->name, (int)current->position.x, (int)current->position.y, (int)current->position.z ) );
+	AM_WriteAccounts( f );
+}
 
-	trap->FS_Write( buf, strlen( buf ), f );
+static telemark_t *FindTelemark( const char *name ) {
+	telemark_t *tm = NULL;
+	for ( tm=telemarks; tm; tm=tm->next ) {
+		char cleanedName[MAX_TELEMARK_NAME_LEN];
+
+		Q_strncpyz( cleanedName, tm->name, sizeof( cleanedName ) );
+		Q_CleanString( cleanedName, STRIP_COLOUR );
+
+		if ( !Q_stricmp( cleanedName, name ) )
+			return tm;
+	}
+
+	return NULL;
+}
+
+// clear all telemarks
+static void AM_ClearTelemarks( void ) {
+	telemark_t *tm = telemarks;
+
+	while ( tm ) {
+		telemark_t *next = tm->next;
+		free( tm );
+		tm = next;
+	}
+
+	telemarks = NULL;
+}
+
+void SP_fx_runner( gentity_t *ent );
+static void SpawnTelemark( telemark_t *tm, vector3 *position ) {
+	if ( telemarksVisible ) {
+		tm->ent = G_Spawn();
+		tm->ent->fullName = "env/fire_wall";
+		VectorCopy( position, &tm->ent->s.origin );
+		SP_fx_runner( tm->ent );
+	}
+}
+
+// add or update an existing admin account (user, pass, privileges, login mesage)
+static telemark_t *AM_AddTelemark( const char *name, vector3 *position ) {
+	telemark_t *tm = NULL;
+
+	for ( tm=telemarks; tm; tm=tm->next ) {
+		if ( !Q_stricmp( name, tm->name ) ) {
+			trap->Print( "Overwriting existing telemark: %s %s\n", tm->name, vtos( position ) );
+			break;
+		}
+	}
+
+	if ( !tm ) {
+		// a new telemark, insert it to the start of the linked list, tm->next will be the old root
+		tm = malloc( sizeof( telemark_t ) );
+		memset( tm, 0, sizeof( telemark_t ) );
+		tm->next = telemarks;
+		telemarks = tm;
+	}
+
+	// we're either overwriting a telemark, or adding a new one
+	Q_strncpyz( tm->name, name, sizeof( tm->name ) );
+	VectorCopy( position, &tm->position );
+	SpawnTelemark( tm, position );
+
+	return tm;
+}
+
+// delete a telemark
+static void AM_DeleteTelemark( gentity_t *ent, const char *name ) {
+	telemark_t *tm = NULL, *prev=NULL, *next=NULL;
+
+	for ( tm=telemarks; tm; tm=tm->next ) {
+		next = tm->next;
+
+		if ( !Q_stricmp( name, tm->name ) ) {
+			trap->SendServerCommand( ent-g_entities, va( "print \"Deleting telemark '%s'\n\"", name ) );
+
+			if ( telemarksVisible )
+				G_FreeEntity( tm->ent );
+
+			free( tm );
+			if ( prev )
+				prev->next = next;
+
+			// root node
+			if ( tm == telemarks )
+				telemarks = next;
+
+			return;
+		}
+
+		prev = tm;
+	}
+
+	trap->SendServerCommand( ent-g_entities, va( "print \"No such telemark found (%s)\n\"", name ) );
+}
+
+// parse json object for telemarks
+static void AM_ReadTelemarks( const char *jsonText ) {
+	cJSON *root = NULL, *tms = NULL;
+	int tmCount = 0, i = 0, tmpInt = 0;
+	const char *tmp = NULL;
+	telemark_t *tm = telemarks;
+
+	root = cJSON_Parse( jsonText );
+	if ( !root ) {
+		Com_Printf( "ERROR: Could not parse telemarks\n" );
+		return;
+	}
+
+	tms = cJSON_GetObjectItem( root, "telemarks" );
+	tmCount = cJSON_GetArraySize( tms );
+
+	for ( i=0; i<tmCount; i++ ) {
+		cJSON *item = cJSON_GetArrayItem( tms, i );
+
+		// first, allocate the telemark
+		// insert it to the start of the linked list, tm->next will be the old root
+		tm = (telemark_t *)malloc( sizeof( telemark_t ) );
+		memset( tm, 0, sizeof( telemark_t ) );
+		tm->next = telemarks;
+		telemarks = tm;
+
+		// name
+		if ( (tmp=cJSON_ToString( cJSON_GetObjectItem( item, "name" ) )) )
+			Q_strncpyz( tm->name, tmp, sizeof( tm->name ) );
+
+		// position
+		tmpInt = cJSON_ToInteger( cJSON_GetObjectItem( item, "x" ) );
+		tm->position.x = tmpInt;
+		tmpInt = cJSON_ToInteger( cJSON_GetObjectItem( item, "y" ) );
+		tm->position.y = tmpInt;
+		tmpInt = cJSON_ToInteger( cJSON_GetObjectItem( item, "z" ) );
+		tm->position.z = tmpInt;
+	}
+}
+
+// create json object for telemarks and write to file
+static void AM_WriteTelemarks( fileHandle_t f ) {
+	cJSON *root = NULL, *tms = NULL;
+	telemark_t *tm = NULL;
+
+	root = cJSON_CreateObject();
+	tms = cJSON_CreateArray();
+	for ( tm=telemarks; tm; tm=tm->next ) {
+		cJSON *item = cJSON_CreateObject();
+		cJSON_AddStringToObject( item, "name", tm->name );
+		cJSON_AddIntegerToObject( item, "x", tm->position.x );
+		cJSON_AddIntegerToObject( item, "y", tm->position.y );
+		cJSON_AddIntegerToObject( item, "z", tm->position.z );
+
+		cJSON_AddItemToArray( tms, item );
+	}
+	cJSON_AddItemToObject( root, "telemarks", tms );
+
+	Q_WriteJSONToFile( root, f );
+}
+
+// load telemarks from disk
+void AM_LoadTelemarks( void ) {
+	char *buf = NULL, loadPath[MAX_QPATH] = {0};
+	unsigned int len = 0;
+	fileHandle_t f = 0;
+
+	AM_ClearTelemarks();
+
+	Com_sprintf( loadPath, sizeof( loadPath ), "telemarks\\%s.json", level.rawmapname );
+	len = trap->FS_Open( loadPath, &f, FS_READ );
+	Com_Printf( "Loading telemarks (%s)\n", loadPath );
+
+	// no file
+	if ( !f )
+		return;
+
+	// empty file
+	if ( !len || len == -1 ) {
+		trap->FS_Close( f );
+		return;
+	}
+
+	// alloc memory for buffer
+	if ( !(buf = (char*)malloc(len+1)) )
+		return;
+
+	trap->FS_Read( buf, len, f );
 	trap->FS_Close( f );
+	buf[len] = 0;
 
-	return;
+	// pass it off to the json reader
+	AM_ReadTelemarks( buf );
+
+	free( buf );
 }
 
-trace_t *RealTrace( gentity_t *ent, float dist )
-{
-	static trace_t tr;
-	vector3	start, end;
+// save telemarks to disk
+void AM_SaveTelemarks( void ) {
+	char loadPath[MAX_QPATH] = {0};
+	fileHandle_t f;
 
-	if ( japp_unlagged.integer )
-		G_TimeShiftAllClients( ent->client->pers.cmd.serverTime, ent );
+	Com_sprintf( loadPath, sizeof( loadPath ), "telemarks\\%s.json", level.rawmapname );
+	trap->FS_Open( loadPath, &f, FS_WRITE );
+	Com_Printf( "Saving telemarks (%s)\n", loadPath );
 
-	//Get start
-	VectorCopy( &ent->client->ps.origin, &start );
-	start.z += ent->client->ps.viewheight; //36.0f;
-
-	//Get end
-	AngleVectors( &ent->client->ps.viewangles, &end, NULL, NULL );
-	VectorMA( &start, dist ? dist : 16384.0f, &end, &end );
-
-	trap->Trace( &tr, &start, NULL, NULL, &end, ent->s.number, MASK_OPAQUE|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, qfalse, 0, 0 );
-
-	#ifdef _DEBUG
-		G_TestLine( &start, &tr.endpos, 0xFF, 7500 );
-	#endif
-
-	if ( japp_unlagged.integer )
-		G_UnTimeShiftAllClients( ent );
-
-	return &tr;
+	AM_WriteTelemarks( f );
 }
 
-//================================
-//================================
-
-//** HANDLED EXPLICITLY
-static void AM_Login( gentity_t *ent )
-{//Log in using user + pass
+// log in using user + pass
+static void AM_Login( gentity_t *ent ) {
 	char argUser[64] = {0}, argPass[64] = {0};
 	adminUser_t *user = NULL, *current = adminUsers;
 
@@ -386,12 +454,11 @@ static void AM_Login( gentity_t *ent )
 	trap->Argv( 1, argUser, sizeof( argUser ) );
 	trap->Argv( 2, argPass, sizeof( argPass ) );
 
-	for ( current=adminUsers; current; current=current->next )
-	{//find valid user
-		if ( !strcmp( current->user, argUser ) )
-		{
-			if ( !strcmp( current->password, argPass ) )
-			{//case sensitive password
+	// find valid user
+	for ( current=adminUsers; current; current=current->next ) {
+		if ( !strcmp( current->user, argUser ) ) {
+			// case sensitive password
+			if ( !strcmp( current->password, argPass ) ) {
 				ent->client->pers.adminUser = user = current;
 				break;
 			}
@@ -420,27 +487,25 @@ static void AM_Login( gentity_t *ent )
 		trap->SendServerCommand( ent-g_entities, "print \"Invalid login\n\"" );
 }
 
-static void AM_Logout( gentity_t *ent )
-{//Logout
+// logout
+static void AM_Logout( gentity_t *ent ) {
 	ent->client->pers.adminUser = NULL;
 	trap->SendServerCommand( ent-g_entities, "print \"You have logged out\n\"" );
 }
 
-static void AM_WhoIs( gentity_t *ent )
-{//Display list of admins
-	int			i;
-	char		msg[960] = { 0 };
-	gclient_t	*cl;
+// display list of admins
+static void AM_WhoIs( gentity_t *ent ) {
+	int i;
+	char msg[1024-128] = { 0 };
+	gclient_t *cl;
 
 	Q_strcat( msg, sizeof( msg ), S_COLOR_WHITE"Name                                Admin User\n" );
 
-	for ( i=0; i<MAX_CLIENTS; i++ )
-	{//If the client is an admin, append their name and 'user' to the string
+	// if the client is an admin, append their name and 'user' to the string
+	for ( i=0; i<MAX_CLIENTS; i++ ) {
 		cl = &level.clients[i];
-		if ( cl->pers.adminUser )
-		{
-			char strName[MAX_NETNAME] = { 0 };
-			char strAdmin[32] = { 0 };
+		if ( cl->pers.adminUser ) {
+			char strName[MAX_NETNAME] = {0}, strAdmin[32] = {0};
 
 			Q_strncpyz( strName, cl->pers.netname, sizeof( strName ) );
 			Q_CleanString( strName, STRIP_COLOUR );
@@ -454,23 +519,22 @@ static void AM_WhoIs( gentity_t *ent )
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
 }
 
-static void AM_Status( gentity_t *ent )
-{//Display list of players + clientNum + IP + admin
-	int			i;
-	char		msg[1024-128] = {0};
-	gclient_t	*cl;
+// display list of players + clientNum + IP + admin
+static void AM_Status( gentity_t *ent ) {
+	int i;
+	char msg[1024-128] = {0};
+	gclient_t *cl;
 
 	Q_strcat( msg, sizeof( msg ), S_COLOR_WHITE"clientNum   Name                                IP                      Admin User\n" );
 
-	for ( i=0; i<MAX_CLIENTS; i++ )
-	{//Build a list of clients
+	// build a list of clients
+	for ( i=0; i<MAX_CLIENTS; i++ ) {
 		char *tmpMsg = NULL;
 		if ( !g_entities[i].inuse )
 			continue;
 
 		cl = &level.clients[i];
-		if ( cl->pers.netname[0] )
-		{
+		if ( cl->pers.netname[0] ) {
 			char strNum[12] = {0};
 			char strName[MAX_NETNAME] = {0};
 			char strIP[NET_ADDRSTRMAXLEN] = {0};
@@ -485,8 +549,7 @@ static void AM_Status( gentity_t *ent )
 
 			tmpMsg = va( "%-12s%-36s%-24s%-32s\n", strNum, strName, strIP, strAdmin );
 
-			if ( strlen( msg ) + strlen( tmpMsg ) >= sizeof( msg ) )
-			{
+			if ( strlen( msg ) + strlen( tmpMsg ) >= sizeof( msg ) ) {
 				trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
 				msg[0] = '\0';
 			}
@@ -497,25 +560,18 @@ static void AM_Status( gentity_t *ent )
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
 }
 
+// announce a message to all clients
+static void AM_Announce( gentity_t *ent ) {
+	char *p, arg1[48];
+	int targetClient;
 
-//================================
-//	Utilities
-//================================
-
-static void AM_Announce( gentity_t *ent )
-{//Announce a message to all clients
-	char	*p;
-	char	arg1[48];
-	int		targetClient;
-
-	if ( trap->Argc() < 3 )
-	{//Not enough args
+	if ( trap->Argc() < 3 ) {
 		trap->SendServerCommand( ent-g_entities, va( "print \"Usage: \\ampsay <client> <message>\n\"" ) );
 		return;
 	}
 
 	p = ConcatArgs( 2 );
-	p = G_NewString( p );
+	p = G_NewString( p ); // convert line-feeds
 
 	//Grab the clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
@@ -547,12 +603,12 @@ static void AM_Announce( gentity_t *ent )
 	return;
 }
 
-extern void WP_AddToClientBitflags(gentity_t *ent, int entNum);
-static void AM_Ghost( gentity_t *ent )
-{//Ghost specified client (or self)
-	char		arg1[64];
-	int			targetClient;
-	gentity_t	*targ;
+extern void WP_AddToClientBitflags( gentity_t *ent, int entNum );
+// ghost specified client (or self)
+static void AM_Ghost( gentity_t *ent ) {
+	char arg1[64];
+	int targetClient;
+	gentity_t *targ;
 
 	//Self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
@@ -563,69 +619,64 @@ static void AM_Ghost( gentity_t *ent )
 
 	targ = &g_entities[targetClient];
 
-	if ( targ->client->pers.adminData.isGhost )
-	{
+	if ( targ->client->pers.adminData.isGhost ) {
 		targ->client->pers.adminData.isGhost = qfalse;
 		targ->r.contents = CONTENTS_SOLID;
 		targ->clipmask = CONTENTS_SOLID|CONTENTS_BODY;
 		targ->s.trickedentindex = 0; targ->s.trickedentindex2 = 0; //This is entirely for client-side prediction. Please fix me.
 		trap->SendServerCommand( targetClient, "cp \""S_COLOR_CYAN"Unghosted\n\"" );
 	}
-	else
-	{
+	else {
 		targ->client->pers.adminData.isGhost = qtrue;
 		targ->r.contents = CONTENTS_BODY;
 		targ->clipmask = 267009/*CONTENTS_SOLID*/;
-		{//This is *entirely* for client-side prediction. Do not rely on it. Please fix me.
-			targ->client->ps.fd.forceMindtrickTargetIndex = ~(1<<targetClient);
-			targ->client->ps.fd.forceMindtrickTargetIndex2 = ~(1<<targetClient);
-		}
+
+		//This is *entirely* for client-side prediction. Do not rely on it. Please fix me.
+		targ->client->ps.fd.forceMindtrickTargetIndex = ~(1<<targetClient);
+		targ->client->ps.fd.forceMindtrickTargetIndex2 = ~(1<<targetClient);
+
 		trap->SendServerCommand( targetClient, "cp \"You are now a "S_COLOR_CYAN"ghost\n\"" );
 	}
 }
 
-static void AM_Clip( gentity_t *ent )
-{//Toggle noclip mode
+// toggle noclip mode
+static void AM_Clip( gentity_t *ent ) {
 	ent->client->noclip = !ent->client->noclip;
 	trap->SendServerCommand( ent-g_entities, va( "print \"Noclip %s\n\"", ent->client->noclip?S_COLOR_GREEN"on":S_COLOR_RED"off" ) );
 }
 
-static void AM_Teleport( gentity_t *ent )
-{//Teleport (All variations of x to y)
+// teleport (all variations of x to y)
+static void AM_Teleport( gentity_t *ent ) {
 	//No args means we teleport ourself to our last marked coordinates
-	if ( trap->Argc() == 1 && (ent->client->pers.adminData.teleMark.x || ent->client->pers.adminData.teleMark.y || ent->client->pers.adminData.teleMark.z) )
-		TeleportPlayer( ent, &ent->client->pers.adminData.teleMark, &ent->client->ps.viewangles );
+	if ( trap->Argc() == 1 && ent->client->pers.adminData.telemark )
+		TeleportPlayer( ent, &ent->client->pers.adminData.telemark->position, &ent->client->ps.viewangles );
 
-	else if ( trap->Argc() == 2 )
-	{//1 arg means we're teleporting ourself to x (self -> client, self -> namedTelePos)
-		char	arg1[64];
-		int		targetClient;
+	// 1 arg means we're teleporting ourself to x (self -> client, self -> namedTelePos)
+	else if ( trap->Argc() == 2 ) {
+		char arg1[64];
+		int targetClient;
 
 		trap->Argv( 1, arg1, sizeof( arg1 ) );
 		targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
-		if ( targetClient == -1 )
-		{//No client with this name, check for named teleport
-			int i;
-			char cleanedInput[64];
-			char cleanedTelemark[64];
+
+		// no client with this name, check for named teleport
+		if ( targetClient == -1 ) {
+			char cleanedInput[MAX_TELEMARK_NAME_LEN];
+			telemark_t *tm = NULL;
 
 			Q_strncpyz( cleanedInput, arg1, sizeof( cleanedInput ) );
 			Q_CleanString( cleanedInput, STRIP_COLOUR );
 
-			for ( i=0; i<level.adminData.teleMarksIndex; i++ )
-			{//Check all telemarks
-				Q_strncpyz( cleanedTelemark, level.adminData.teleMarks[i].name, sizeof( cleanedTelemark ) );
-				Q_CleanString( cleanedTelemark, STRIP_COLOUR );
-				if ( !Q_stricmp( cleanedTelemark, cleanedInput ) )
-				{//We found one that contains our string
-					TeleportPlayer( ent, &level.adminData.teleMarks[i].position, &ent->client->ps.viewangles );
-					return;
-				}
+			tm = FindTelemark( cleanedInput );
+			if ( tm ) {
+				TeleportPlayer( ent, &tm->position, &ent->client->ps.viewangles );
+				return;
 			}
+
 			trap->SendServerCommand( ent-g_entities, "print \"AM_Teleport: Assumed telemark but found no matching telemark\n\"" );
 		}
-		else if ( g_entities[targetClient].inuse )
-		{//Must be teleporting self -> client
+		// must be teleporting self -> client
+		else if ( g_entities[targetClient].inuse ) {
 			vector3 targetPos, telePos, angles;
 			trace_t tr;
 
@@ -645,45 +696,35 @@ static void AM_Teleport( gentity_t *ent )
 		}
 	}
 
-	else if ( trap->Argc() == 3 )
-	{//2 args mean we're teleporting x to y (client -> client, client -> telemark)
-		char	arg1[64];
-		char	arg2[64];
-		int		targetClient1;
-		int		targetClient2;
+	// 2 args mean we're teleporting x to y (client -> client, client -> telemark)
+	else if ( trap->Argc() == 3 ) {
+		char arg1[64], arg2[64];
+		int targetClient1, targetClient2;
 
 		trap->Argv( 1, arg1, sizeof( arg1 ) );	targetClient1 = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
 		trap->Argv( 2, arg2, sizeof( arg2 ) );	targetClient2 = G_ClientFromString( ent, arg2, qtrue, qfalse, qtrue );
-		
-		if ( targetClient1 == -1 )
-		{//No client with this name - abort!
-			return;
-		}
-		else
-		{//First arg is a valid client, attempt to find destination
-			if ( targetClient2 == -1 )
-			{//No client with this name - check for telemark
-				int i;
-				char cleanedInput[64];
-				char cleanedTelemark[64];
+
+		// first arg is a valid client, attempt to find destination
+		if ( targetClient1 != -1 ) {
+			// no client with this name - check for telemark
+			if ( targetClient2 == -1 ) {
+				char cleanedInput[MAX_TELEMARK_NAME_LEN];
+				telemark_t *tm = NULL;
 
 				Q_strncpyz( cleanedInput, arg2, sizeof( cleanedInput ) );
 				Q_CleanString( cleanedInput, STRIP_COLOUR );
 
-				for ( i=0; i<level.adminData.teleMarksIndex; i++ )
-				{//Check all telemarks
-					Q_strncpyz( cleanedTelemark, level.adminData.teleMarks[i].name, sizeof( cleanedTelemark ) );
-					Q_CleanString( cleanedTelemark, STRIP_COLOUR );
-					if ( !Q_stricmp( cleanedTelemark, cleanedInput ) )
-					{//We found one that contains our string
-						TeleportPlayer( &g_entities[targetClient1], &level.adminData.teleMarks[i].position, &ent->client->ps.viewangles );
-						return;
-					}
+				tm = FindTelemark( cleanedInput );
+				if ( tm ) {
+					TeleportPlayer( &g_entities[targetClient1], &tm->position, &ent->client->ps.viewangles );
+					return;
 				}
+
 				trap->SendServerCommand( ent-g_entities, "print \"AM_Teleport: Assumed telemark but found no matching telemark\n\"" );
 			}
-			else
-			{//Must be teleporting client -> client
+
+			// must be teleporting client -> client
+			else {
 				vector3 targetPos, telePos, angles;
 				trace_t tr;
 
@@ -704,10 +745,10 @@ static void AM_Teleport( gentity_t *ent )
 		}
 	}
 
-	else if ( trap->Argc() == 4 )
-	{//amtele x y z - tele ourself to x y z
-		char	argX[8], argY[8], argZ[8];
-		vector3	telePos;
+	// amtele x y z - tele ourself to x y z
+	else if ( trap->Argc() == 4 ) {
+		char argX[8], argY[8], argZ[8];
+		vector3 telePos;
 
 		trap->Argv( 1, argX, sizeof( argX ) );	trap->Argv( 2, argY, sizeof( argX ) );	trap->Argv( 3, argZ, sizeof( argX ) );
 
@@ -715,11 +756,11 @@ static void AM_Teleport( gentity_t *ent )
 		TeleportPlayer( ent, &telePos, &ent->client->ps.viewangles );
 	}
 
-	else if ( trap->Argc() > 4 )
-	{//amtele c x y z - tele c to x y z
-	 //amtele c x y z r - tele c to x y z with r
-		char	argC[64];
-		int		targetClient;
+	// amtele c x y z - tele c to x y z
+	// amtele c x y z r - tele c to x y z with r
+	else if ( trap->Argc() > 4 ) {
+		char argC[64];
+		int targetClient;
 
 		trap->Argv( 1, argC, sizeof( argC ) );
 		targetClient = G_ClientFromString( ent, argC, qtrue, qfalse, qtrue );
@@ -735,8 +776,8 @@ static void AM_Teleport( gentity_t *ent )
 			trap->Argv( 4, argZ, sizeof( argZ ) );
 
 			VectorCopy( tv( atoi(argX), atoi(argY), atoi(argZ) ), &telePos );
-			if ( trap->Argc() == 6 )
-			{// amtele c x y z r
+			// amtele c x y z r
+			if ( trap->Argc() == 6 ) {
 				vector3 angles = { 0.0f };
 				char argR[8]={0};
 	
@@ -744,189 +785,130 @@ static void AM_Teleport( gentity_t *ent )
 				angles.yaw = atoi( argR );
 				TeleportPlayer( &g_entities[targetClient], &telePos, &angles );
 			}
-			else // amtele c x y z
+			// amtele c x y z
+			else
 				TeleportPlayer( &g_entities[targetClient], &telePos, &g_entities[targetClient].client->ps.viewangles );
 		}
 
 	}
 }
 
-static void AM_GunTeleport( gentity_t *ent )
-{//Teleport self to targeted position
-	trace_t	*tr = RealTrace( ent, 0.0f );
-	vector3	telepos;
+// teleport self to targeted position
+static void AM_GunTeleport( gentity_t *ent ) {
+	trace_t *tr = G_RealTrace( ent, 0.0f );
+	vector3 telepos;
 
 	VectorMA( &tr->endpos, 48.0f, &tr->plane.normal, &telepos );
 	TeleportPlayer( ent, &telepos, &ent->client->ps.viewangles );
 }
 
-static void AM_GunTeleportRev( gentity_t *ent )
-{//Teleport targeted client to self
-	trace_t	*tr = RealTrace( ent, 0.0f );
+// teleport targeted client to self
+static void AM_GunTeleportRev( gentity_t *ent ) {
+	trace_t	*tr = G_RealTrace( ent, 0.0f );
 	vector3	angles, telepos;
 
-	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS )
-	{//Success, teleport them to us
+	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
 		AngleVectors( &ent->client->ps.viewangles, &angles, NULL, NULL );
 		VectorMA( &ent->client->ps.origin, 48.0f, &angles, &telepos );
 		TeleportPlayer( &g_entities[tr->entityNum], &telepos, &level.clients[tr->entityNum].ps.viewangles );
 	}
 }
 
-static teleMark_t *teleMarks = level.adminData.teleMarks;
-static teleMark_t *GetTelemark( void )
-{
-	return &teleMarks[level.adminData.teleMarksIndex];
-}
-void SP_fx_runner( gentity_t *ent );
-static void SpawnTelemark( teleMark_t *tm, vector3 *origin, const char *args )
-{
-	if ( level.adminData.teleMarksVisual )
-	{
-		tm->ent = G_Spawn();
-		tm->ent->fullName = "env/fire_wall";
-		SP_fx_runner( tm->ent );
-	}
-
-	Q_strncpyz( tm->name, args, 32 );
-	VectorCopy( origin, &tm->position );
-}
-static void AM_Telemark( gentity_t *ent )
-{//Mark current location
-	char name[32];
-	int i;
+// mark current location
+static void AM_Telemark( gentity_t *ent ) {
+	char name[MAX_TELEMARK_NAME_LEN];
 
 	if ( trap->Argc() > 1 )
 		Q_strncpyz( name, ConcatArgs( 1 ), sizeof( name ) );
-	else {
-		char cleanName[MAX_NETNAME];
-		Q_strncpyz( cleanName, ent->client->pers.netname, sizeof( cleanName ) );
-		Q_CleanString( cleanName, STRIP_COLOUR );
-		Com_sprintf( name, sizeof( name ), "default_%s", cleanName );
-	}
+	else
+		Com_sprintf( name, sizeof( name ), "default_%s", ent->client->pers.netnameClean );
 
-	for ( i=0; i<level.adminData.teleMarksIndex; i++ )
-	{//Check for an existing telemark
-		if ( !Q_stricmp( name, teleMarks[i].name ) )
-		{//Update it
-			SpawnTelemark( &teleMarks[i], &ent->client->ps.origin, name );
-			VectorCopy( &ent->client->ps.origin, &ent->client->pers.adminData.teleMark );
-			return;
-		}
-	}
-
-	//It doesn't exist yet, check if we have room to add it
-	if ( level.adminData.teleMarksIndex >= 32 ) {
-		trap->SendServerCommand( ent-g_entities, "print \"Maximum number of telemarks for this map exceeded! (Remove some first)\n\"" );
-		return;
-	}
-
-	SpawnTelemark( GetTelemark(), &ent->client->ps.origin, name );
-	VectorCopy( &ent->client->ps.origin, &ent->client->pers.adminData.teleMark );
-	level.adminData.teleMarksIndex++;
+	AM_AddTelemark( name, &ent->client->ps.origin );
 }
 
-static void AM_GunTeleportMark( gentity_t *ent )
-{//Mark targeted location
-	trace_t		*tr = RealTrace( ent, 0.0f );
-	vector3		telePos;
-	gentity_t	*tent;
+// mark targeted location
+static void AM_GunTeleportMark( gentity_t *ent ) {
+	trace_t *tr = G_RealTrace( ent, 0.0f );
+	vector3 telePos;
+	gentity_t *tent;
 
 	VectorMA( &tr->endpos, 48.0f, &tr->plane.normal, &telePos );
 
-	VectorCopy( &telePos, &ent->client->pers.adminData.teleMark );
+	ent->client->pers.adminData.telemark = AM_AddTelemark( va( "default_%s", ent->client->pers.netnameClean ), &telePos );
 	tent = G_PlayEffect( EFFECT_EXPLOSION, &tr->endpos, &tr->plane.normal );
 	tent->r.svFlags |= SVF_SINGLECLIENT;
 	tent->r.singleClient = ent->s.number;
 	trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_CYAN"Teleport mark created at "S_COLOR_YELLOW"%s\n\"", vtos( &telePos ) ) );
 }
 
-static void AM_RemoveTelemark( gentity_t *ent )
-{//Remove a telemark from the list
-	char arg1[8];
+// remove a telemark from the list
+static void AM_RemoveTelemark( gentity_t *ent ) {
+	char arg1[MAX_TELEMARK_NAME_LEN];
 
-	trap->Argv( 1, arg1, sizeof( arg1 ) );
-
-	if ( arg1[0] >= '0' && arg1[0] <= '9' )
-	{//If they enter invalid input past this, fuck 'em.
-		int index = atoi( arg1 );
-
-		if ( index < 0 || index >= level.adminData.teleMarksIndex ) {
-			trap->SendServerCommand( ent-g_entities, va( "print \"Index %i out of range [0, %i]\n\"", index, level.adminData.teleMarksIndex ) );
-			return;
-		}
-
-		//First, free the ent if needed
-		if ( level.adminData.teleMarksVisual )
-			G_FreeEntity( teleMarks[atoi( arg1 )].ent );
-
-		//Time to remove it from the list. I hope the ptrs work as expected
-		for ( index = atoi( arg1 ); index<level.adminData.teleMarksIndex; index++ )
-			memcpy( &teleMarks[index], &teleMarks[index+1], sizeof( teleMark_t ) );
-		memset( &level.adminData.teleMarks[index], 0, sizeof( teleMark_t ) );
-
-		//Correct the index
-		level.adminData.teleMarksIndex--;
+	if ( trap->Argc() == 1 ) {
+		trap->SendServerCommand( ent-g_entities, "print \"Usage: \\amremovetele <name>\n\"" );
+		return;
 	}
 
-	//RAZTODO: Remove telemarks by name
+	trap->Argv( 1, arg1, sizeof( arg1 ) );
+	Q_CleanString( arg1, STRIP_COLOUR );
+
+	AM_DeleteTelemark( ent, arg1 );
 }
 
-static void AM_ListTelemarks( gentity_t *ent )
-{//List all marked positions
-	int i;
-	char msg[3096] = { 0 };
+// list all marked positions
+static void AM_ListTelemarks( gentity_t *ent ) {
+	char msg[3096] = {0};
+	telemark_t *tm = NULL;
+	int i = 0;
 	
-	//Append each mark to the end of the string
+	// append each mark to the end of the string
 	Q_strcat( msg, sizeof( msg ), "- Named telemarks\n" );
 	Q_strcat( msg, sizeof( msg ), va( "ID %-32s Location\n", "Name" ) );
-	for ( i=0; i<level.adminData.teleMarksIndex; i++ )
-		Q_strcat( msg, sizeof( msg ), va( "%2i %-32s %s\n", i, level.adminData.teleMarks[i].name, vtos( &level.adminData.teleMarks[i].position ) ) );
+	for ( tm=telemarks, i=0; tm; tm=tm->next, i++ )
+		Q_strcat( msg, sizeof( msg ), va( "%2i %-32s %s\n", i, tm->name, vtos( &tm->position ) ) );
 	
-	//Send in one big chunk
+	// send in one big chunk
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
 }
 
-static void AM_SeeTelemarks( gentity_t *ent )
-{//Visualise all telemarks
-	int i;
+// visualise all telemarks
+static void AM_SeeTelemarks( gentity_t *ent ) {
+	telemark_t *tm = NULL;
 
-	if ( level.adminData.teleMarksVisual )
-	{//Assume all telemarks have valid ent ptr's
-		for ( i=0; i<level.adminData.teleMarksIndex; i++ )
-			G_FreeEntity( teleMarks[i].ent );
-	}
-	else
-	{
-		for ( i=0; i<level.adminData.teleMarksIndex; i++ )
-		{
-			teleMarks[i].ent = G_Spawn();
-			teleMarks[i].ent->fullName = "env/btend";
-			VectorCopy( &teleMarks[i].position, &teleMarks[i].ent->s.origin );
-			SP_fx_runner( teleMarks[i].ent );
+	// assume all telemarks have valid ent ptr's
+	if ( telemarksVisible ) {
+		for ( tm=telemarks; tm; tm=tm->next ) {
+			G_FreeEntity( tm->ent );
+			tm->ent = NULL;
 		}
 	}
-	level.adminData.teleMarksVisual = !level.adminData.teleMarksVisual;
+	else {
+		for ( tm=telemarks; tm; tm=tm->next ) {
+			tm->ent = G_Spawn();
+			tm->ent->fullName = "env/btend";
+			VectorCopy( &tm->position, &tm->ent->s.origin );
+			SP_fx_runner( tm->ent );
+		}
+	}
+	telemarksVisible = !telemarksVisible;
 }
 
-static void AM_SaveTelemarks( gentity_t *ent ) {
-	//Save marked positions
-	AM_TM_SaveTelemarks();
+static void AM_SaveTelemarksCmd( gentity_t *ent ) {
+	AM_SaveTelemarks();
 }
 
-static void AM_Poll( gentity_t *ent )
-{//Call an arbitrary vote
+// call an arbitrary vote
+static void AM_Poll( gentity_t *ent ) {
 	int i=0;
 	char arg1[MAX_TOKEN_CHARS] = {0}, arg2[MAX_TOKEN_CHARS] = {0};
 
-	if ( level.voteExecuteTime )
-	{
+	if ( level.voteExecuteTime ) {
 		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Vote already in progress.\n\"" );
 		return;
 	}
 
-	if ( trap->Argc() < 2 )
-	{
+	if ( trap->Argc() < 2 ) {
 		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Please specify a poll.\n\"" );
 		return;
 	}
@@ -958,16 +940,16 @@ static void AM_Poll( gentity_t *ent )
 	trap->SetConfigstring( CS_VOTE_NO,		va( "%i", level.voteNo ) );	
 }
 
-static void AM_KillVote( gentity_t *ent )
-{//Kill the current vote
+// kill the current vote
+static void AM_KillVote( gentity_t *ent ) {
 	//Overkill, but it's a surefire way to kill the vote =]
 	level.voteExecuteTime	= 0;
 	level.votingGametype	= qfalse;
 	level.votingGametypeTo	= level.gametype;
 	level.voteTime			= 0;
 
-	memset( level.voteDisplayString,	0,	sizeof( level.voteDisplayString ) );
-	memset( level.voteString,			0,	sizeof( level.voteString ) );
+	level.voteDisplayString[0] = '\0';
+	level.voteString[0] = '\0';
 
 	trap->SetConfigstring( CS_VOTE_TIME, "" );
 	trap->SetConfigstring( CS_VOTE_STRING, "" );
@@ -977,11 +959,11 @@ static void AM_KillVote( gentity_t *ent )
 	trap->SendServerCommand( -1, "print \""S_COLOR_RED"Vote has been killed!\n\"" );
 }
 
-static void AM_ForceTeam( gentity_t *ent )
-{//Force the specified client to a specific team
-	char		arg1[64]={0}, arg2[64]={0};
-	int			targetClient;
-	gentity_t	*targ;
+// force the specified client to a specific team
+static void AM_ForceTeam( gentity_t *ent ) {
+	char arg1[64]={0}, arg2[64]={0};
+	int targetClient;
+	gentity_t *targ;
 
 	if ( trap->Argc() != 3 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Syntax: \\amforceteam <clientnum or partial name> <team>\n\"" );
@@ -1002,21 +984,21 @@ static void AM_ForceTeam( gentity_t *ent )
 		SetTeam( targ, arg2 );
 }
 
-static void AM_GunSpectate( gentity_t *ent )
-{//Force the targeted client to spectator team
-	trace_t *tr = RealTrace( ent, 0.0f );
+// force the targeted client to spectator team
+static void AM_GunSpectate( gentity_t *ent ) {
+	trace_t *tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum < MAX_CLIENTS )
 		SetTeam( &g_entities[tr->entityNum], "s" );
 }
 
-static void AM_Protect( gentity_t *ent )
-{//Protect/unprotect the specified client
-	char		arg1[64] = { 0 };
-	int			targetClient;
-	gentity_t	*targ;
+// protect/unprotect the specified client
+static void AM_Protect( gentity_t *ent ) {
+	char arg1[64] = { 0 };
+	int targetClient;
+	gentity_t *targ;
 
-	//Can protect: self, partial name, clientNum
+	// can protect: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
 
@@ -1031,25 +1013,23 @@ static void AM_Protect( gentity_t *ent )
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s "S_COLOR_WHITE"has been %s\n\"", targ->client->pers.netname, !!(targ->client->ps.eFlags&EF_INVULNERABLE)?S_COLOR_GREEN"protected":S_COLOR_RED"unprotected" ) );
 }
 
-static void AM_GunProtect( gentity_t *ent )
-{//Protect/unprotect the targeted client
-	trace_t *tr = RealTrace( ent, 0.0f );
+// protect/unprotect the targeted client
+static void AM_GunProtect( gentity_t *ent ) {
+	trace_t *tr = G_RealTrace( ent, 0.0f );
 
-	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS )
-	{
+	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
 		gclient_t *cl = &level.clients[tr->entityNum];
 		cl->ps.eFlags			^= EF_INVULNERABLE;
 		cl->invulnerableTimer	= !!(cl->ps.eFlags & EF_INVULNERABLE) ? level.time : 0x7FFFFFFF;
 	}
 }
 
-static void AM_Empower( gentity_t *ent )
-{
-	char		arg1[64] = { 0 };
-	int			targetClient;
-	gentity_t	*targ;
+static void AM_Empower( gentity_t *ent ) {
+	char arg1[64] = {0};
+	int targetClient;
+	gentity_t *targ;
 
-	//Can empower: self, partial name, clientNum
+	// can empower: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
 
@@ -1060,35 +1040,30 @@ static void AM_Empower( gentity_t *ent )
 
 	targ->client->pers.adminData.empowered = !targ->client->pers.adminData.empowered;
 	targ->client->ps.fd.forcePowerSelected = 0; // HACK: What the actual fuck
-	if ( targ->client->pers.adminData.empowered )
-	{
+	if ( targ->client->pers.adminData.empowered ) {
 		int i = 0;
 		targ->client->ps.eFlags |= EF_BODYPUSH;
 
 		targ->client->pers.adminData.forcePowersKnown = targ->client->ps.fd.forcePowersKnown;
 
-		for ( i=0; i<NUM_FORCE_POWERS; i++ )
-		{
+		for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
 			targ->client->pers.adminData.forcePowerBaseLevel[i] = targ->client->ps.fd.forcePowerBaseLevel[i];		targ->client->ps.fd.forcePowerBaseLevel[i] = 3;
 			targ->client->pers.adminData.forcePowerLevel[i] = targ->client->ps.fd.forcePowerLevel[i];				targ->client->ps.fd.forcePowerLevel[i] = 3;
 			targ->client->ps.fd.forcePowersKnown |= (1<<i);
 		}
 	}
-	else
-	{
+	else {
 		int i = 0;
 		targ->client->ps.eFlags &= ~EF_BODYPUSH;
 
 		targ->client->ps.fd.forcePowersKnown = targ->client->pers.adminData.forcePowersKnown;
-		for ( i=0; i<NUM_FORCE_POWERS; i++ )
-		{
+		for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
 			targ->client->ps.fd.forcePowerBaseLevel[i] = targ->client->pers.adminData.forcePowerBaseLevel[i];
 			targ->client->ps.fd.forcePowerLevel[i] = targ->client->pers.adminData.forcePowerLevel[i];
 		}
 	}
 }
 
-float RandFloat( float min, float max );
 extern void G_Knockdown( gentity_t *self, gentity_t *attacker, const vector3 *pushDir, float strength, qboolean breakSaberLock );
 static void Slap( gentity_t *targ ) {
 	vector3 newDir = { 0.0f, 0.0f, 0.0f };
@@ -1101,14 +1076,15 @@ static void Slap( gentity_t *targ ) {
 	}
 	newDir.z = 1.0f;
 
+	//RAZTODO: japp_slapDistance
 	G_Knockdown( targ, NULL, &newDir, 50.0f, qtrue );
 	G_Throw( targ, &newDir, 50.0f );
 }
 
-static void AM_Slap( gentity_t *ent )
-{//Slap the specified client
-	char		arg1[64] = { 0 };
-	int			targetClient;
+// slap the specified client
+static void AM_Slap( gentity_t *ent ) {
+	char arg1[64] = { 0 };
+	int targetClient;
 
 	if ( trap->Argc() != 2 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"usage: amslap <clientnum or partial name>\n\"" );
@@ -1125,9 +1101,9 @@ static void AM_Slap( gentity_t *ent )
 	Slap( &g_entities[targetClient] );
 }
 
-static void AM_GunSlap( gentity_t *ent )
-{//Slap the targeted client
-	trace_t *tr = RealTrace( ent, 0.0f );
+// slap the targeted client
+static void AM_GunSlap( gentity_t *ent ) {
+	trace_t *tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum < MAX_CLIENTS )
 		Slap( &g_entities[tr->entityNum] );
@@ -1137,39 +1113,38 @@ static void Freeze( gclient_t *cl ) {
 	cl->pers.adminData.isFrozen = qtrue;
 	VectorClear( &cl->ps.velocity );
 }
+
 static void Unfreeze( gclient_t *cl ) {
 	cl->pers.adminData.isFrozen = qfalse;
 }
-static void AM_Freeze( gentity_t *ent )
-{//Freeze specified client on the spot
-	char	arg1[64] = { 0 };
-	int		clientNum;
 
-	//RAZFIXME: 'amfreeze den' froze me :<
+// freeze specified client on the spot
+static void AM_Freeze( gentity_t *ent ) {
+	char arg1[64] = { 0 };
+	int clientNum;
 
-	if ( trap->Argc() < 2 )
-	{
+	if ( trap->Argc() < 2 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Please specify a player to be frozen (Or -1 for all)\n\"" );
 		return;
 	}
 
-	//Grab the clientNum
+	// grab the clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	clientNum = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
 
-	//Check for purposely freezing all. HACKHACKHACK
+	// check for purposely freezing all. HACKHACKHACK
 	if ( arg1[0] == '-' && arg1[1] == '1' )
 		clientNum = -2;
 
-	if ( clientNum == -2 )
-	{//Freeze everyone
+	// freeze everyone
+	if ( clientNum == -2 ) {
 		int i;
 		for ( i=0; i<MAX_CLIENTS; i++ )
 			Freeze( &level.clients[i] );
 		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_CYAN"frozen\n\"" );
 	}
-	else if ( clientNum != -1 )
-	{//Freeze specified clientNum
+	// freeze specified clientNum
+	else if ( clientNum != -1 ) {
 		gclient_t *cl = &level.clients[clientNum];
 		if ( cl->pers.adminData.isFrozen ) {
 			Unfreeze( cl );
@@ -1184,21 +1159,18 @@ static void AM_Freeze( gentity_t *ent )
 	}
 }
 
-static void AM_GunFreeze( gentity_t *ent )
-{//Toggle the 'frozen' state of targeted client
-	trace_t	*tr = RealTrace( ent, 0.0f );
+// toggle the 'frozen' state of targeted client
+static void AM_GunFreeze( gentity_t *ent ) {
+	trace_t	*tr = G_RealTrace( ent, 0.0f );
 
-	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS )
-	{
+	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
 		gclient_t *cl = &level.clients[tr->entityNum];
-		if ( cl->pers.adminData.isFrozen )
-		{
+		if ( cl->pers.adminData.isFrozen ) {
 			Unfreeze( cl );
 			trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"unfrozen\n\"", cl->pers.netname ) );
 			trap->SendServerCommand( tr->entityNum, "cp \"You have been "S_COLOR_CYAN"unfrozen\n\"" );
 		}
-		else
-		{
+		else {
 			Freeze( cl );
 			trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"frozen\n\"", cl->pers.netname ) );
 			trap->SendServerCommand( tr->entityNum, "cp \"You have been "S_COLOR_CYAN"frozen\n\"" );
@@ -1210,21 +1182,20 @@ static void AM_GunFreeze( gentity_t *ent )
 #endif
 }
 
-static void AM_Silence( gentity_t *ent )
-{//Silence specified client
-	char	arg1[64] = { 0 };
-	int		targetClient;
+// silence specified client
+static void AM_Silence( gentity_t *ent ) {
+	char arg1[64] = { 0 };
+	int targetClient;
 
-	if ( trap->Argc() < 2 )
-	{
+	if ( trap->Argc() < 2 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Please specify a player to be silenced\n\"" );
 		return;
 	}
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 
-	if ( atoi( arg1 ) == -1 )
-	{//Silence everyone
+	// silence everyone
+	if ( atoi( arg1 ) == -1 ) {
 		int i;
 		for ( i=0; i<MAX_CLIENTS; i++ )
 			level.clients[i].pers.adminData.canTalk = qfalse;
@@ -1241,21 +1212,20 @@ static void AM_Silence( gentity_t *ent )
 	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_CYAN"silenced\n\"" );
 }
 
-static void AM_Unsilence( gentity_t *ent )
-{//Unsilence specified client
-	char	arg1[64] = { 0 };
-	int		targetClient;
+// unsilence specified client
+static void AM_Unsilence( gentity_t *ent ) {
+	char arg1[64] = { 0 };
+	int targetClient;
 
-	if ( trap->Argc() < 2 )
-	{
+	if ( trap->Argc() < 2 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Please specify a player to be un-silenced\n\"" );
 		return;
 	}
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 
-	if ( atoi( arg1 ) == -1 )
-	{//Unsilence everyone
+	// unsilence everyone
+	if ( atoi( arg1 ) == -1 ) {
 		int i;
 		for ( i=0; i<MAX_CLIENTS; i++ )
 			level.clients[i].pers.adminData.canTalk = qtrue;
@@ -1273,13 +1243,12 @@ static void AM_Unsilence( gentity_t *ent )
 }
 
 extern void Cmd_Kill_f( gentity_t *ent );
-static void AM_Slay( gentity_t *ent )
-{//Slay the specified client
-	char	arg1[64] = { 0 };
-	int		targetClient;
+// slay the specified client
+static void AM_Slay( gentity_t *ent ) {
+	char arg1[64] = { 0 };
+	int targetClient;
 
-	if ( trap->Argc() < 2 )
-	{
+	if ( trap->Argc() < 2 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Please specify a player to be slain\n\"" );
 		return;
 	}
@@ -1295,19 +1264,14 @@ static void AM_Slay( gentity_t *ent )
 	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_RED"slain\n\"" );
 }
 
-//================================
-//	Kick / Ban
-//================================
+// kick specified client
+static void AM_Kick( gentity_t *ent ) {
+	char arg1[64] = {0};
+	char *reason = NULL;
+	char string[960] = {0};
+	int clientNum;
 
-static void AM_Kick( gentity_t *ent )
-{//Kick specified client
-	char	arg1[64] = { 0 };
-	char	*reason = NULL;
-	char	string[960] = { 0 };
-	int		clientNum;
-
-	if ( trap->Argc() == 1 )
-	{
+	if ( trap->Argc() == 1 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Syntax: \\amkick <client> <reason>\n\"" );
 		return;
 	}
@@ -1326,22 +1290,17 @@ static void AM_Kick( gentity_t *ent )
 //	ClientDisconnect( clientNum );
 }
 
-static void AM_Ban( gentity_t *ent )
-{
-	char	arg1[32] = { 0 };
-	char	arg2[8] = { 0 };
-	char	*arg3 = NULL;
-	char	string[960] = { 0 };
-	int		targetClient;
+static void AM_Ban( gentity_t *ent ) {
+	char arg1[32] = {0}, arg2[8] = {0}, *arg3 = NULL;
+	char string[960] = { 0 };
+	int targetClient;
 
-	if ( trap->Argc() < 2 )
-	{
+	if ( trap->Argc() < 2 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Syntax: \\amban <client> <duration> <reason>\n\"" );
 		return;
 	}
 
-	else
-	{
+	else {
 		//	clientNum / Partial name
 		trap->Argv( 1, arg1, sizeof( arg1 ) );
 		targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
@@ -1357,26 +1316,22 @@ static void AM_Ban( gentity_t *ent )
 		JKG_Bans_AddBanString( arg1, arg2, arg3 );
 		Com_sprintf( string, sizeof( string ), "Banned!\nReason: %s", arg3 ? arg3 : "Not specified" );
 		trap->DropClient( targetClient, string );
-		//ClientDisconnect( targetClient );
+	//	ClientDisconnect( targetClient );
 	}
 
 	return;
 }
 
-static void AM_BanIP( gentity_t *ent )
-{
-	char	arg1[32] = { 0 };
-	char	arg2[8] = { 0 };
-	char	*arg3 = NULL;
+static void AM_BanIP( gentity_t *ent ) {
+	char arg1[32] = {0}, arg2[8] = {0}, *arg3 = NULL;
 
 	if ( trap->Argc() < 2 )
 		trap->SendServerCommand( ent-g_entities, "print \"Syntax: \\ambanip <ip> <duration> <reason>\n\"" );
-	else
-	{
-		trap->Argv( 1, arg1, sizeof( arg1 ) );	//	IP
-		trap->Argv( 2, arg2, sizeof( arg2 ) );	//	Duration
+	else {
+		trap->Argv( 1, arg1, sizeof( arg1 ) ); // IP
+		trap->Argv( 2, arg2, sizeof( arg2 ) ); // Duration
 		if ( trap->Argc() >= 4 )
-			arg3 = ConcatArgs( 3 );				//	Reason
+			arg3 = ConcatArgs( 3 ); // Reason
 
 		JKG_Bans_AddBanString( arg1, arg2, arg3 );
 	}
@@ -1385,10 +1340,9 @@ static void AM_BanIP( gentity_t *ent )
 }
 
 #ifdef _DEBUG
-static void AM_Test( gentity_t *ent )
-{
+static void AM_Test( gentity_t *ent ) {
 #if 0
-	gentity_t	*ghost = &g_entities[RealTrace( ent, 0.0f )->entityNum];
+	gentity_t	*ghost = &g_entities[G_RealTrace( ent, 0.0f )->entityNum];
 
 	if ( ghost->s.number > MAX_CLIENTS )
 		return;
@@ -1405,7 +1359,7 @@ static void AM_Test( gentity_t *ent )
 #endif
 #if 0
 	gentity_t       *obj = G_Spawn();
-	trace_t         *tr = RealTrace( ent, 0.0f );
+	trace_t         *tr = G_RealTrace( ent, 0.0f );
 	vector3          forward, up = { 0, 0, 1 };
 
 	obj->classname = "jp_portal";
@@ -1439,31 +1393,26 @@ static void AM_Test( gentity_t *ent )
 	G_CallSpawn( obj );
 	return;
 #endif
-#if 0
-	int x=0;
-	int y=1;
-	y /= x;
-#endif
 }
 #endif
 
-static void AM_Remap( gentity_t *ent )
-{//Shader remapping
+// shader remapping
+static void AM_Remap( gentity_t *ent ) {
 	//RAZTODO: amremap
 	trap->SendServerCommand( ent-g_entities, "print \"AM_Remap: not yet implemented\n\"" );
 }
 
-static void AM_Weather( gentity_t *ent )
-{//Shader remapping
+// weather manipulation
+static void AM_Weather( gentity_t *ent ) {
 	//RAZTODO: amweather
 	trap->SendServerCommand( ent-g_entities, "print \"AM_Weather: not yet implemented\n\"" );
 }
 
-static void AM_EntSpawn( gentity_t *ent )
-{//Spawn an entity
+// spawn an entity
+static void AM_EntSpawn( gentity_t *ent ) {
 	gentity_t	*obj = G_Spawn();
 	char		buf[32] = { 0 };
-	trace_t		*tr = RealTrace( ent, 0.0f );
+	trace_t		*tr = G_RealTrace( ent, 0.0f );
 
 	if ( trap->Argc() < 2 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"AM_EntSpawn: syntax is 'amspawn entity' where 'entity' is misc_model, info_player_start, etc\n\"" );
@@ -1478,9 +1427,9 @@ static void AM_EntSpawn( gentity_t *ent )
 	return;
 }
 
-static void AM_EntRemove( gentity_t *ent )
-{//Remove an entity
-	trace_t *tr = RealTrace( ent, 0.0f );
+// remove an entity
+static void AM_EntRemove( gentity_t *ent ) {
+	trace_t *tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum >= MAX_CLIENTS && tr->entityNum < ENTITYNUM_WORLD ) {
 		if ( g_entities[tr->entityNum].jpSpawned )
@@ -1491,8 +1440,8 @@ static void AM_EntRemove( gentity_t *ent )
 }
 
 void Cmd_NPC_f( gentity_t *ent );
-static void AM_NPCSpawn( gentity_t *ent )
-{//Spawn an NPC
+// spawn an NPC
+static void AM_NPCSpawn( gentity_t *ent ) {
 	Cmd_NPC_f( ent );
 }
 
@@ -1523,8 +1472,8 @@ static void AM_ReloadLua( gentity_t *ent ) {
 #endif
 }
 
-static void AM_Map( gentity_t *ent )
-{//Change map and gamemode
+// change map and gamemode
+static void AM_Map( gentity_t *ent ) {
 	char gametypeStr[32], map[MAX_QPATH];
 	char *filter = NULL, *args = ConcatArgs( 1 );
 	int gametype = 0, i = 0;
@@ -1549,7 +1498,7 @@ static void AM_Map( gentity_t *ent )
 
 	trap->Argv( 2, map, sizeof( map ) );
 
-	if( !japp_allowAnyGametype.integer ) {
+	if ( !japp_allowAnyGametype.integer ) {
 		if ( !G_DoesMapSupportGametype( map, gametype ) ) {
 			trap->SendServerCommand( ent-g_entities, va( "print \"Map: %s does not support gametype: %s, or the map doesn't exist.\n\"", map, BG_GetGametypeString( gametype ) ) );
 			return;
@@ -1601,35 +1550,30 @@ static void AM_Merc( gentity_t *ent ) {
 	targ = &g_entities[targetClient];
 
 	targ->client->pers.adminData.merc = !targ->client->pers.adminData.merc;
-	if ( targ->client->pers.adminData.merc )
-	{// give everything between WP_NONE and LAST_USEABLE_WEAPON
+	// give everything between WP_NONE and LAST_USEABLE_WEAPON
+	if ( targ->client->pers.adminData.merc ) {
 		int i=0;
 		targ->client->ps.stats[STAT_WEAPONS] = ((1<<LAST_USEABLE_WEAPON)-1) & ~1;
 		for ( i=0; i<AMMO_MAX; i++ ) {
 			targ->client->ps.ammo[i] = ammoData[i].max;
 		}
 	}
-	else
-	{// back to spawn weapons, select first usable weapon
+	// back to spawn weapons, select first usable weapon
+	else {
 		int i=0, newWeap=-1, wp=targ->client->ps.weapon;
 
 		targ->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
 
-		for ( i=WP_SABER; i<WP_NUM_WEAPONS; i++ )
-		{
-			if ( (targ->client->ps.stats[STAT_WEAPONS] & (1 << i)) )
-			{
+		for ( i=WP_SABER; i<WP_NUM_WEAPONS; i++ ) {
+			if ( (targ->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
 				newWeap = i;
 				break;
 			}
 		}
 
-		if ( newWeap == WP_NUM_WEAPONS )
-		{
-			for ( i=WP_STUN_BATON; i<WP_SABER; i++ )
-			{
-				if ( (targ->client->ps.stats[STAT_WEAPONS] & (1 << i)) )
-				{
+		if ( newWeap == WP_NUM_WEAPONS ) {
+			for ( i=WP_STUN_BATON; i<WP_SABER; i++ ) {
+				if ( (targ->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
 					newWeap = i;
 					break;
 				}
@@ -1657,53 +1601,52 @@ typedef struct adminCommand_s {
 
 static const adminCommand_t adminCommands[] = {
 	// these must be in alphabetical order for the binary search to work
-//	{	"amlogin",		-1,				AM_Login			},	//	Log in using user + pass (Handled explicitly!!!)
-/**/{	"amban",		PRIV_BAN,		AM_Ban				},	//	Ban specified client (Client + duration + reason)
-/**/{	"ambanip",		PRIV_BAN,		AM_BanIP			},	//	Ban specified IP (IP/range-ban + duration + reason)
-/**/{	"amclip",		PRIV_CLIP,		AM_Clip				},	//	Toggle noclip mode
-/**/{	"amempower",	PRIV_EMPOWER,	AM_Empower			},	//	Empower the specified client
-/**/{	"amforceteam",	PRIV_FORCETEAM,	AM_ForceTeam		},	//	Force the specified client to a specific team
-/**/{	"amfreeze",		PRIV_FREEZE,	AM_Freeze			},	//	Freeze specified client on the spot
-/**/{	"amghost",		PRIV_GHOST,		AM_Ghost			},	//	Ghost specified client (or self)
-/**/{	"amkick",		PRIV_KICK,		AM_Kick				},	//	Kick specified client
-/**/{	"amkillvote",	PRIV_KILLVOTE,	AM_KillVote			},	//	Kill the current vote
-/**/{	"amlisttele",	PRIV_TELEPORT,	AM_ListTelemarks	},	//	List all marked positions
-/**/{	"amlogout",		-1,				AM_Logout			},	//	Logout
-/**/{	"amluaexec",	PRIV_LUA,		AM_Lua				},	//	Execute Lua code
-/**/{	"amluareload",	PRIV_LUA,		AM_ReloadLua		},	//	Reload JPLua system
-/**/{	"ammap",		PRIV_MAP,		AM_Map				},	//	Change map and gamemode
-/**/{	"ammerc",		PRIV_MERC,		AM_Merc				},	//	Give all weapons
-/**/{	"amnpc",		PRIV_NPCSPAWN,	AM_NPCSpawn			},	//	Spawn an NPC (Including vehicles)
-/**/{	"ampoll",		PRIV_POLL,		AM_Poll				},	//	Call an arbitrary vote
-/**/{	"amprotect",	PRIV_PROTECT,	AM_Protect			},	//	Protect the specified client
-/**/{	"ampsay",		PRIV_ANNOUNCE,	AM_Announce			},	//	Announce a message to the specified client (Or all)
-	{	"amremap",		PRIV_REMAP,		AM_Remap			},	//	Shader remapping
-/**/{	"amremovetele",	PRIV_TELEPORT,	AM_RemoveTelemark	},	//	Remove a telemark from the list
-/**/{	"amsavetele",	PRIV_TELEPORT,	AM_SaveTelemarks	},	//	Save marked positions RAZFIXME: Temporary?
-/**/{	"amseetele",	PRIV_TELEPORT,	AM_SeeTelemarks		},	//	Visualise all telemarks
-/**/{	"amsilence",	PRIV_SILENCE,	AM_Silence			},	//	Silence specified client
-/**/{	"amslap",		PRIV_SLAP,		AM_Slap				},	//	Slap the specified client
-/**/{	"amslay",		PRIV_SLAY,		AM_Slay				},	//	Slay the specified client
-	{	"amspawn",		PRIV_ENTSPAWN,	AM_EntSpawn			},	//	Spawn an entity
-/**/{	"amstatus",		PRIV_STATUS,	AM_Status			},	//	Display list of players + clientNum + IP + admin
-/**/{	"amtele",		PRIV_TELEPORT,	AM_Teleport			},	//	Teleport (All variations of x to y)
-/**/{	"amtelemark",	PRIV_TELEPORT,	AM_Telemark			},	//	Mark current location
+//	{ "amlogin",		-1,				AM_Login			}, // log in using user + pass (Handled explicitly!!!)
+	{ "amban",			PRIV_BAN,		AM_Ban				}, // ban specified client (Client + duration + reason)
+	{ "ambanip",		PRIV_BAN,		AM_BanIP			}, // ban specified IP (IP/range-ban + duration + reason)
+	{ "amclip",			PRIV_CLIP,		AM_Clip				}, // toggle noclip mode
+	{ "amempower",		PRIV_EMPOWER,	AM_Empower			}, // empower the specified client
+	{ "amforceteam",	PRIV_FORCETEAM,	AM_ForceTeam		}, // force the specified client to a specific team
+	{ "amfreeze",		PRIV_FREEZE,	AM_Freeze			}, // freeze specified client on the spot
+	{ "amghost",		PRIV_GHOST,		AM_Ghost			}, // ghost specified client (or self)
+	{ "amkick",			PRIV_KICK,		AM_Kick				}, // kick specified client
+	{ "amkillvote",		PRIV_KILLVOTE,	AM_KillVote			}, // kill the current vote
+	{ "amlisttele",		PRIV_TELEPORT,	AM_ListTelemarks	}, // list all marked positions
+	{ "amlogout",		-1,				AM_Logout			}, // logout
+	{ "amluaexec",		PRIV_LUA,		AM_Lua				}, // execute Lua code
+	{ "amluareload",	PRIV_LUA,		AM_ReloadLua		}, // reload JPLua system
+	{ "ammap",			PRIV_MAP,		AM_Map				}, // change map and gamemode
+	{ "ammerc",			PRIV_MERC,		AM_Merc				}, // give all weapons
+	{ "amnpc",			PRIV_NPCSPAWN,	AM_NPCSpawn			}, // spawn an NPC (Including vehicles)
+	{ "ampoll",			PRIV_POLL,		AM_Poll				}, // call an arbitrary vote
+	{ "amprotect",		PRIV_PROTECT,	AM_Protect			}, // protect the specified client
+	{ "ampsay",			PRIV_ANNOUNCE,	AM_Announce			}, // announce a message to the specified client (Or all)
+	{ "amremap",		PRIV_REMAP,		AM_Remap			}, // shader remapping
+	{ "amremovetele",	PRIV_TELEPORT,	AM_RemoveTelemark	}, // remove a telemark from the list
+	{ "amsavetele",		PRIV_TELEPORT,	AM_SaveTelemarksCmd	}, // save marked positions RAZFIXME: Temporary?
+	{ "amseetele",		PRIV_TELEPORT,	AM_SeeTelemarks		}, // visualise all telemarks
+	{ "amsilence",		PRIV_SILENCE,	AM_Silence			}, // silence specified client
+	{ "amslap",			PRIV_SLAP,		AM_Slap				}, // slap the specified client
+	{ "amslay",			PRIV_SLAY,		AM_Slay				}, // slay the specified client
+	{ "amspawn",		PRIV_ENTSPAWN,	AM_EntSpawn			}, // spawn an entity
+	{ "amstatus",		PRIV_STATUS,	AM_Status			}, // display list of players + clientNum + IP + admin
+	{ "amtele",			PRIV_TELEPORT,	AM_Teleport			}, // teleport (All variations of x to y)
+	{ "amtelemark",		PRIV_TELEPORT,	AM_Telemark			}, // mark current location
 #ifdef _DEBUG
-	{	"amtest",		-1,				AM_Test				},	//	Test :D
+	{ "amtest",			-1,				AM_Test				}, // test :D
 #endif
-/**/{	"amunsilence",	PRIV_SILENCE,	AM_Unsilence		},	//	Unsilence specified client
-/**/{	"amunspawn",	PRIV_ENTSPAWN,	AM_EntRemove		},	//	Remove an entity
-/**/{	"amvstr",		PRIV_VSTR,		AM_Vstr				},	//	Execute a variable string
-	{	"amweather",	PRIV_WEATHER,	AM_Weather			},	//	Weather effects
-/**/{	"amwhois",		PRIV_WHOIS,		AM_WhoIs			},	//	Display list of admins
-/**/{	"gunfreeze",	PRIV_FREEZE,	AM_GunFreeze		},	//	Toggle the 'frozen' state of targeted client
-/**/{	"gunprotect",	PRIV_PROTECT,	AM_GunProtect		},	//	Protect the targeted client
-/**/{	"gunslap",		PRIV_SLAP,		AM_GunSlap			},	//	Slap the targeted client
-/**/{	"gunspectate",	PRIV_FORCETEAM,	AM_GunSpectate		},	//	Force the targeted client to spectator team
-/**/{	"guntele",		PRIV_TELEPORT,	AM_GunTeleport		},	//	Teleport self to targeted position
-/**/{	"guntelemark",	PRIV_TELEPORT,	AM_GunTeleportMark	},	//	Mark targeted location
-/**/{	"guntelerev",	PRIV_TELEPORT,	AM_GunTeleportRev	},	//	Teleport targeted client to self
-	{	NULL,			0,				NULL				},
+	{ "amunsilence",	PRIV_SILENCE,	AM_Unsilence		}, // unsilence specified client
+	{ "amunspawn",		PRIV_ENTSPAWN,	AM_EntRemove		}, // remove an entity
+	{ "amvstr",			PRIV_VSTR,		AM_Vstr				}, // execute a variable string
+	{ "amweather",		PRIV_WEATHER,	AM_Weather			}, // weather effects
+	{ "amwhois",		PRIV_WHOIS,		AM_WhoIs			}, // display list of admins
+	{ "gunfreeze",		PRIV_FREEZE,	AM_GunFreeze		}, // toggle the 'frozen' state of targeted client
+	{ "gunprotect",		PRIV_PROTECT,	AM_GunProtect		}, // protect the targeted client
+	{ "gunslap",		PRIV_SLAP,		AM_GunSlap			}, // slap the targeted client
+	{ "gunspectate",	PRIV_FORCETEAM,	AM_GunSpectate		}, // force the targeted client to spectator team
+	{ "guntele",		PRIV_TELEPORT,	AM_GunTeleport		}, // teleport self to targeted position
+	{ "guntelemark",	PRIV_TELEPORT,	AM_GunTeleportMark	}, // mark targeted location
+	{ "guntelerev",		PRIV_TELEPORT,	AM_GunTeleportRev	}, // teleport targeted client to self
 };
 static const int numAdminCommands = ARRAY_LEN( adminCommands );
 

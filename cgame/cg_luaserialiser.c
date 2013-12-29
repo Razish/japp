@@ -9,8 +9,7 @@ static const char SERIALISER_META[] = "Serialiser.meta";
 
 //Func: GetSerialiser(fileName)
 //Retn: Serialiser object
-int JPLua_GetSerialiser( lua_State *L )
-{
+int JPLua_GetSerialiser( lua_State *L ) {
 	const char *path = NULL;
 	fsMode_t mode = FS_READ;
 
@@ -26,8 +25,7 @@ int JPLua_GetSerialiser( lua_State *L )
 
 //Func: tostring(Serialiser)
 //Retn: string representing the Player instance (for debug/error messages)
-static int JPLua_Serialiser_ToString( lua_State *L )
-{
+static int JPLua_Serialiser_ToString( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
 	lua_pushfstring( L, "Serialiser(%s)", serialiser->fileName );
 	return 1;
@@ -68,14 +66,13 @@ static int JPLua_Serialiser_ToString( lua_State *L )
 }
 */
 
-void JPLua_Serialiser_IterateTableWrite( cJSON *parent, const char *name, lua_State *L )
-{
+void JPLua_Serialiser_IterateTableWrite( cJSON *parent, const char *name, lua_State *L ) {
 	cJSON *table = cJSON_CreateArray();
 	int tableIndex = lua_gettop( L );
 
 	lua_pushnil( L );
-	while ( lua_next( L, -2 ) != 0 )
-	{//for each element
+	// for each element
+	while ( lua_next( L, -2 ) != 0 ) {
 		cJSON *item = cJSON_CreateObject();
 		int keyType = lua_type(L, -2);
 		int valueType = lua_type(L, -1);
@@ -87,10 +84,8 @@ void JPLua_Serialiser_IterateTableWrite( cJSON *parent, const char *name, lua_St
 			cJSON_AddIntegerToObject( item, "key", lua_tointeger( L, -2 ) );
 
 		cJSON_AddIntegerToObject( item, "value_type", valueType );
-		if ( valueType == LUA_TTABLE )
-		{
-			if ( lua_rawequal( L, -1, tableIndex ) )
-			{
+		if ( valueType == LUA_TTABLE ) {
+			if ( lua_rawequal( L, -1, tableIndex ) ) {
 				Com_Printf( "Can not serialise key <FIXME> in table %s: self-references are fatal!\n", name );
 				cJSON_Delete( item );
 				lua_pop( L, 1 );
@@ -103,8 +98,7 @@ void JPLua_Serialiser_IterateTableWrite( cJSON *parent, const char *name, lua_St
 			cJSON_AddNumberToObject( item, "value", lua_tonumber( L, -1 ) );
 		else if ( valueType == LUA_TSTRING )
 			cJSON_AddStringToObject( item, "value", lua_tostring( L, -1 ) );
-		else
-		{
+		else {
 			Com_Printf( "Can not serialise key <FIXME> in table %s: invalid value type\n", name );
 			cJSON_Delete( item );
 			lua_pop( L, 1 );
@@ -118,14 +112,13 @@ void JPLua_Serialiser_IterateTableWrite( cJSON *parent, const char *name, lua_St
 	cJSON_AddItemToObject( parent, name, table );
 }
 
-void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_State *L )
-{
+void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_State *L ) {
 	cJSON *table = cJSON_CreateArray();
 	int tableIndex = lua_gettop( L );
 
 	lua_pushnil( L );
-	while ( lua_next( L, -2 ) != 0 )
-	{//for each element
+	// for each element
+	while ( lua_next( L, -2 ) != 0 ) {
 		cJSON *item = cJSON_CreateObject();
 		int keyType = lua_type(L, -2);
 		int valueType = lua_type(L, -1);
@@ -137,10 +130,8 @@ void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_Sta
 			cJSON_AddIntegerToObject( item, "key", lua_tointeger( L, -2 ) );
 
 		cJSON_AddIntegerToObject( item, "value_type", valueType );
-		if ( valueType == LUA_TTABLE )
-		{
-			if ( lua_rawequal( L, -1, tableIndex ) )
-			{
+		if ( valueType == LUA_TTABLE ) {
+			if ( lua_rawequal( L, -1, tableIndex ) ) {
 				Com_Printf( "Can not serialise key <FIXME> in table %s: self-references are fatal!\n", name );
 				cJSON_Delete( item );
 				lua_pop( L, 1 );
@@ -153,8 +144,7 @@ void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_Sta
 			cJSON_AddNumberToObject( item, "value", lua_tonumber( L, -1 ) );
 		else if ( valueType == LUA_TSTRING )
 			cJSON_AddStringToObject( item, "value", lua_tostring( L, -1 ) );
-		else
-		{
+		else {
 			Com_Printf( "Can not serialise key <FIXME> in table %s: invalid value type\n", name );
 			cJSON_Delete( item );
 			lua_pop( L, 1 );
@@ -170,8 +160,7 @@ void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_Sta
 
 //Func: AddTable( string, table )
 //Retn: --
-int JPLua_Serialiser_AddTable( lua_State *L )
-{
+int JPLua_Serialiser_AddTable( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
 	const char *tableName = NULL;
 	luaL_argcheck( L, lua_type( L, 2 ) == LUA_TSTRING, 2, "'string' expected" );
@@ -185,8 +174,7 @@ int JPLua_Serialiser_AddTable( lua_State *L )
 
 //Func: GetTable('string')
 //Retn: table
-int JPLua_Serialiser_GetTable( lua_State *L )
-{
+int JPLua_Serialiser_GetTable( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
 	const char *tableName = NULL;
 	luaL_argcheck( L, lua_type( L, 2 ) == LUA_TSTRING, 2, "'string' expected" );
@@ -199,8 +187,7 @@ int JPLua_Serialiser_GetTable( lua_State *L )
 
 //Func: Serialiser:Close()
 //Retn: --
-int JPLua_Serialiser_Close( lua_State *L )
-{
+int JPLua_Serialiser_Close( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
 	const char *buffer = cJSON_Serialize( serialiser->outRoot, 1 );
 
@@ -216,25 +203,21 @@ int JPLua_Serialiser_Close( lua_State *L )
 }
 
 // Push a Serialiser instance for a client number onto the stack
-void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode )
-{
+void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode ) {
 	jplua_serialiser_t *serialiser = NULL;
 	int len = 0;
 
 	serialiser = (jplua_serialiser_t *)lua_newuserdata( L, sizeof( jplua_serialiser_t ) );
 	Q_strncpyz( serialiser->fileName, path, sizeof( serialiser->fileName ) );
 	len = trap->FS_Open( path, &serialiser->fileHandle, mode );
-	if ( len > 0 )
-	{
+	if ( len > 0 ) {
 		char *contents = (char*)malloc( len );
 
 		trap->FS_Read( contents, len, serialiser->fileHandle );
 		serialiser->outRoot = cJSON_CreateObject();
 		serialiser->inRoot = cJSON_Parse( contents );
 		if ( !serialiser->inRoot )
-		{
 			Com_Printf( "Couldn't parse serialised JSON data %s\n", path );
-		}
 
 		free( contents );
 		contents = NULL;
@@ -246,8 +229,7 @@ void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode )
 
 // Ensure the value at the specified index is a valid Serialiser instance,
 // Return the instance if it is, otherwise return NULL.
-jplua_serialiser_t *JPLua_CheckSerialiser( lua_State *L, int idx )
-{
+jplua_serialiser_t *JPLua_CheckSerialiser( lua_State *L, int idx ) {
 	void *ud = luaL_checkudata( L, idx, SERIALISER_META );
 	luaL_argcheck( L, ud != NULL, 1, "'Serialiser' expected" );
 	return (jplua_serialiser_t *)ud;
@@ -262,8 +244,7 @@ static const struct luaL_Reg jplua_serialiser_meta[] = {
 };
 
 // Register the Serialiser class for Lua
-void JPLua_Register_Serialiser( lua_State *L )
-{
+void JPLua_Register_Serialiser( lua_State *L ) {
 	luaL_newmetatable( L, SERIALISER_META ); // Create metatable for Serialiser class, push on stack
 
 	// Lua won't attempt to directly index userdata, only via metatables

@@ -2264,3 +2264,31 @@ int G_ClientFromString( const gentity_t *ent, const char *match, qboolean substr
 	trap->SendServerCommand( ent-g_entities, va( "print \"Client %s does not exist\n\"", cleanedMatch ) );
 	return -1;
 }
+
+// trace from eyes using unlagged
+trace_t *G_RealTrace( gentity_t *ent, float dist ) {
+	static trace_t tr;
+	vector3	start, end;
+
+	if ( japp_unlagged.integer )
+		G_TimeShiftAllClients( ent->client->pers.cmd.serverTime, ent );
+
+	//Get start
+	VectorCopy( &ent->client->ps.origin, &start );
+	start.z += ent->client->ps.viewheight; //36.0f;
+
+	//Get end
+	AngleVectors( &ent->client->ps.viewangles, &end, NULL, NULL );
+	VectorMA( &start, dist ? dist : 16384.0f, &end, &end );
+
+	trap->Trace( &tr, &start, NULL, NULL, &end, ent->s.number, MASK_OPAQUE|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, qfalse, 0, 0 );
+
+	#ifdef _DEBUG
+		G_TestLine( &start, &tr.endpos, 0xFF, 7500 );
+	#endif
+
+	if ( japp_unlagged.integer )
+		G_UnTimeShiftAllClients( ent );
+
+	return &tr;
+}

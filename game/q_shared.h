@@ -2845,3 +2845,4 @@ enum {
 
 vector3 *tv( float x, float y, float z );
 char *vtos( const vector3 *v );
+void Q_WriteJSONToFile( void *root, fileHandle_t f );

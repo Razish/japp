@@ -27,7 +27,7 @@ qboolean JPLua_Event_HUD( void );
 char *JPLua_Event_ChatMessageRecieved( const char *msg );
 char *JPLua_Event_ChatMessageSent( const char *msg );
 void JPLua_Event_ClientConnect( int clientNum );
-void JPLua_Event_Pain( int clientNum, int damage );
+void JPLua_Event_Pain( int clientNum, int health );
 void JPLua_Event_SaberTouch( int victim, int attacker );
 
 qboolean JPLua_Event_ServerCommand( void );

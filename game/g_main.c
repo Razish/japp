@@ -496,8 +496,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	}
 
 	//Raz: Load admins + telemarks
-	AM_ParseAdmins();
-	AM_TM_ParseTelemarks();
+	AM_LoadAdmins();
+	AM_LoadTelemarks();
 	JKG_Bans_Init();
 
 	#ifdef JPLUA
@@ -519,7 +519,7 @@ void G_ShutdownGame( int restart ) {
 //	trap->Print ("==== ShutdownGame ====\n");
 	JKG_Bans_SaveBans();
 	JKG_Bans_Clear();
-	AM_TM_SaveTelemarks();
+	AM_SaveTelemarks();
 
 	G_CleanAllFakeClients(); //get rid of dynamically allocated fake client structs.
 

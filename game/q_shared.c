@@ -2,6 +2,15 @@
 //
 // q_shared.c -- stateless support routines that are included in each code dll
 #include "q_shared.h"
+#include "shared/json/cJSON.h"
+
+#ifdef _GAME
+	#include "g_local.h"
+#elif defined(_CGAME)
+	#include "cg_local.h"
+#elif defined(_UI)
+	#include "ui_local.h"
+#endif
 
 /*
 -------------------------
@@ -1521,17 +1530,8 @@ vector4 colorTable[CT_MAX] =
 	{ 1.0f,		0.658f,	0.062f,	1.0f },		// CT_HUD_ORANGE
 };
 
-
-/*
-=============
-TempVector
-
-This is just a convenience function for making temporary vectors
-=============
-*/
 #define NUM_TEMPVECS 8
 static vector3 tempVecs[NUM_TEMPVECS];
-
 vector3 *tv( float x, float y, float z ) {
 	static int index;
 	vector3 *v = &tempVecs[index++];
@@ -1542,15 +1542,7 @@ vector3 *tv( float x, float y, float z ) {
 	return v;
 }
 
-/*
-=============
-VectorToString
-
-This is just a convenience function for printing vectors
-=============
-*/
 static char tempStrs[NUM_TEMPVECS][32];
-
 char *vtos( const vector3 *v ) {
 	static int index;
 	char *s = tempStrs[index++];
@@ -1559,4 +1551,16 @@ char *vtos( const vector3 *v ) {
 	Com_sprintf( s, 32, "(%i %i %i)", (int)v->x, (int)v->y, (int)v->z );
 
 	return s;
+}
+
+// serialise a JSON object and write it to the specified file
+void Q_WriteJSONToFile( void *root, fileHandle_t f ) {
+	const char *serialised = NULL;
+
+	serialised = cJSON_Serialize( (cJSON *)root, 1 );
+	trap->FS_Write( serialised, strlen( serialised ), f );
+	trap->FS_Close( f );
+
+	free( (void *)serialised );
+	cJSON_Delete( (cJSON *)root );
 }

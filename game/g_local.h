@@ -1009,8 +1009,6 @@ typedef struct {
 		fileHandle_t	log;
 	} security;
 
-	serverAdminData_t	adminData;
-
 	//[RawMapName]
 	char				rawmapname[MAX_QPATH];
 	//[/RawMapName]
@@ -1592,7 +1590,7 @@ extern gameImport_t *trap;
 void		G_AvoidBox						( gentity_t *ent );
 char		*ConcatArgs						( int start );
 void		G_TestLine						( vector3 *start, vector3 *end, int color, int time );
-trace_t		*RealTrace						( gentity_t *ent, float dist );
+trace_t		*G_RealTrace					( gentity_t *ent, float dist );
 qboolean	Client_Supports					( gentity_t *ent, unsigned int supportFlag );
 void		G_ClearVote						( gentity_t *ent );
 void		SV_ToggleUserinfoValidation_f	( void );
