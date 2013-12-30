@@ -3534,7 +3534,7 @@ void ClientThink_real( gentity_t *ent ) {
 //	G_VehicleAttachDroidUnit( ent );
 
 	// Did we kick someone in our pmove sequence?
-	if (client->ps.forceKickFlip)
+	if ( japp_flipKick.integer && client->ps.forceKickFlip )
 	{
 		gentity_t *faceKicked = &g_entities[client->ps.forceKickFlip-1];
 
@@ -3551,7 +3551,8 @@ void ClientThink_real( gentity_t *ent ) {
 
 				VectorScale( &oppDir, -1, &oppDir );
 
-				G_Damage( faceKicked, ent, ent, &oppDir, &client->ps.origin, strength, DAMAGE_NO_ARMOR, MOD_MELEE );
+				if ( japp_flipKickDamage.value > 0.0f )
+					G_Damage( faceKicked, ent, ent, &oppDir, &client->ps.origin, strength*japp_flipKickDamage.value, DAMAGE_NO_ARMOR, MOD_MELEE );
 
 				if ( faceKicked->client->ps.weapon != WP_SABER ||
 					 faceKicked->client->ps.fd.saberAnimLevel != FORCE_LEVEL_3 ||
@@ -3561,7 +3562,7 @@ void ClientThink_real( gentity_t *ent ) {
 						faceKicked->client->ps.stats[STAT_HEALTH] > 0 &&
 						faceKicked->client->ps.forceHandExtend != HANDEXTEND_KNOCKDOWN)
 					{
-						if (BG_KnockDownable(&faceKicked->client->ps) && Q_irand(1, 10) <= 3)
+						if (japp_flipKickKnockdown.integer && BG_KnockDownable(&faceKicked->client->ps) && Q_irand(1, 10) <= 3)
 						{ //only actually knock over sometimes, but always do velocity hit
 							faceKicked->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
 							faceKicked->client->ps.forceHandExtendTime = level.time + 1100;

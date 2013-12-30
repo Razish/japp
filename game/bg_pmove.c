@@ -18,6 +18,8 @@
 
 #include "shared/JAPP/jp_promode.h"
 
+#define KICKFLIP
+
 #define MAX_WEAPON_CHARGE_TIME 5000
 
 #ifdef _GAME
@@ -2496,7 +2498,6 @@ static qboolean PM_CheckJump( void )
 	{
 		qboolean allowWallRuns = qtrue;
 		qboolean allowWallFlips = qtrue;
-		//Raz: static code analysis picked up this duplicate variable
 	//	qboolean allowFlips = qtrue;
 		qboolean allowWallGrabs = qtrue;
 		if ( pm->ps->weapon == WP_SABER )
@@ -2605,7 +2606,7 @@ static qboolean PM_CheckJump( void )
 				vector3	idealNormal={0}, wallNormal={0};
 				trace_t	trace;
 				qboolean doTrace = qfalse;
-				int contents = MASK_SOLID;//MASK_PLAYERSOLID;
+				int contents = MASK_PLAYERSOLID;
 
 				VectorSet(&mins, pm->mins.x, pm->mins.y, 0);
 				VectorSet(&maxs, pm->maxs.x, pm->maxs.y, 24);
@@ -2675,14 +2676,13 @@ static qboolean PM_CheckJump( void )
 							VectorMA( &pm->ps->velocity, -150, &fwd, &pm->ps->velocity );
 						}
 
-						//RAZTEST: kick flip
-						if ( doTrace && anim != BOTH_WALL_RUN_LEFT && anim != BOTH_WALL_RUN_RIGHT )
-						{
-							if (trace.entityNum < MAX_CLIENTS)
-							{
+#ifdef KICKFLIP
+						if ( doTrace && anim != BOTH_WALL_RUN_LEFT && anim != BOTH_WALL_RUN_RIGHT ) {
+							bgEntity_t *kickedEnt = PM_BGEntForNum( trace.entityNum );
+							if ( trace.entityNum < MAX_CLIENTS || kickedEnt->s.eType == ET_NPC )
 								pm->ps->forceKickFlip = trace.entityNum+1; //let the server know that this person gets kicked by this client
-							}
 						}
+#endif
 
 						//up
 						if ( vertPush )
@@ -2788,6 +2788,55 @@ static qboolean PM_CheckJump( void )
 					return qfalse;
 				}
 			}
+#ifdef KICKFLIP
+			else if ( pm->cmd.forwardmove > 0 //pushing forward
+				&& pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_1
+				&& pm->ps->velocity.z > 200
+				&& PM_GroundDistance() <= 80 //unfortunately we do not have a happy ground timer like SP (this would use up more bandwidth if we wanted prediction workign right), so we'll just use the actual ground distance.
+				&& !BG_InSpecialJump(pm->ps->legsAnim))
+			{//run up wall, flip backwards
+				vector3 fwd, traceto, mins, maxs, fwdAngles;
+				trace_t	trace;
+				vector3	idealNormal;
+				bgEntity_t *kickedEnt = NULL;
+
+				VectorSet( &mins, pm->mins.x, pm->mins.y, pm->mins.z );
+				VectorSet( &maxs, pm->maxs.x, pm->maxs.y, pm->maxs.z );
+				VectorSet( &fwdAngles, 0, pm->ps->viewangles.yaw, 0 );
+
+				AngleVectors( &fwdAngles, &fwd, NULL, NULL );
+				VectorMA( &pm->ps->origin, 32, &fwd, &traceto );
+
+				pm->trace( &trace, &pm->ps->origin, &mins, &maxs, &traceto, pm->ps->clientNum, MASK_PLAYERSOLID );//FIXME: clip brushes too?
+				VectorSubtract( &pm->ps->origin, &traceto, &idealNormal );
+				VectorNormalize( &idealNormal );
+
+				kickedEnt = PM_BGEntForNum( trace.entityNum );
+				
+				if ( trace.fraction < 1.0f && (trace.entityNum < MAX_CLIENTS || kickedEnt->s.eType == ET_NPC) )
+				{//there is a wall there
+					int parts = SETANIM_LEGS;
+
+					pm->ps->velocity.x = pm->ps->velocity.y = 0;
+					VectorMA( &pm->ps->velocity, -150, &fwd, &pm->ps->velocity );
+					pm->ps->velocity.z += 128;
+
+					if ( !pm->ps->weaponTime )
+						parts = SETANIM_BOTH;
+					PM_SetAnim( parts, BOTH_WALL_FLIP_BACK1, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD, 0 );
+
+					pm->ps->legsTimer -= 600; //I force this anim to play to the end to prevent landing on your head and suddenly flipping over.
+											  //It is a bit too long at the end though, so I'll just shorten it.
+
+					PM_SetForceJumpZStart( pm->ps->origin.z );//so we don't take damage if we land at same height
+					pm->cmd.upmove = 0;
+					pm->ps->fd.forceJumpSound = 1;
+					BG_ForcePowerDrain( pm->ps, FP_LEVITATION, 5 );
+
+					pm->ps->forceKickFlip = trace.entityNum+1; //let the server know that this person gets kicked by this client
+				}
+			}
+#endif
 			//NEW JKA
 			else if ( pm->ps->legsAnim == BOTH_FORCEWALLRUNFLIP_START )
 			{
@@ -2837,62 +2886,8 @@ static qboolean PM_CheckJump( void )
 					return qfalse;
 				}
 			}
-
-			//RAZTEST: kick flip
-			/*
 			else if ( pm->cmd.forwardmove > 0 //pushing forward
-				&& pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_1 //Raz: was 1
-				&& pm->ps->velocity[2] > 200
-				&& PM_GroundDistance() <= 80 //unfortunately we do not have a happy ground timer like SP (this would use up more bandwidth if we wanted prediction workign right), so we'll just use the actual ground distance.
-				&& !BG_InSpecialJump(pm->ps->legsAnim))
-			{//run up wall, flip backwards
-				vector3 fwd, traceto, mins, maxs, fwdAngles;
-				trace_t	trace;
-				vector3	idealNormal;
-
-				VectorSet(mins, pm->mins[0],pm->mins[1],pm->mins[2]);
-				VectorSet(maxs, pm->maxs[0],pm->maxs[1],pm->maxs[2]);
-				VectorSet(fwdAngles, 0, pm->ps->viewangles.yaw, 0);
-
-				AngleVectors( fwdAngles, fwd, NULL, NULL );
-				VectorMA( pm->ps->origin, 32, fwd, traceto );
-
-				pm->trace( &trace, pm->ps->origin, mins, maxs, traceto, pm->ps->clientNum, MASK_PLAYERSOLID );//FIXME: clip brushes too?
-				VectorSubtract( pm->ps->origin, traceto, idealNormal );
-				VectorNormalize( idealNormal );
-				
-				if ( trace.fraction < 1.0f )
-				{//there is a wall there
-					int parts = SETANIM_LEGS;
-
-					pm->ps->velocity.x = pm->ps->velocity.y = 0;
-					VectorMA( pm->ps->velocity, -150, fwd, pm->ps->velocity );
-					pm->ps->velocity[2] += 128;
-
-					if ( !pm->ps->weaponTime )
-					{
-						parts = SETANIM_BOTH;
-					}
-					PM_SetAnim( parts, BOTH_WALL_FLIP_BACK1, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD, 0 );
-
-					pm->ps->legsTimer -= 600; //I force this anim to play to the end to prevent landing on your head and suddenly flipping over.
-											  //It is a bit too long at the end though, so I'll just shorten it.
-
-					PM_SetForceJumpZStart(pm->ps->origin.z);//so we don't take damage if we land at same height
-					pm->cmd.upmove = 0;
-					pm->ps->fd.forceJumpSound = 1;
-					BG_ForcePowerDrain( pm->ps, FP_LEVITATION, 5 );
-
-					if (trace.entityNum < MAX_CLIENTS)
-					{
-						pm->ps->forceKickFlip = trace.entityNum+1; //let the server know that this person gets kicked by this client
-					}
-				}
-			}
-			*/
-
-			else if ( pm->cmd.forwardmove > 0 //pushing forward
-				&& pm->ps->fd.forceRageRecoveryTime < pm->cmd.serverTime	//not in a force Rage recovery period
+			//	&& pm->ps->fd.forceRageRecoveryTime < pm->cmd.serverTime	//not in a force Rage recovery period
 				&& pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_1 
 				&& PM_WalkableGroundDistance() <= 80 //unfortunately we do not have a happy ground timer like SP (this would use up more bandwidth if we wanted prediction workign right), so we'll just use the actual ground distance.
 				&& (pm->ps->legsAnim == BOTH_JUMP1 || pm->ps->legsAnim == BOTH_INAIR1 ) )//not in a flip or spin or anything
@@ -2902,13 +2897,13 @@ static qboolean PM_CheckJump( void )
 					//FIXME: have to be moving... make sure it's opposite the wall... or at least forward?
 					int wallWalkAnim = BOTH_WALL_FLIP_BACK1;
 					int parts = SETANIM_LEGS;
-					int contents = MASK_SOLID;//MASK_PLAYERSOLID;//CONTENTS_SOLID;
-					//qboolean kick = qtrue;
+					int contents = MASK_PLAYERSOLID;
+					qboolean kick = qtrue;
 					if ( pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_2 )
 					{
 						wallWalkAnim = BOTH_FORCEWALLRUNFLIP_START;
 						parts = SETANIM_BOTH;
-						//kick = qfalse;
+						kick = qfalse;
 					}
 					else
 					{
@@ -2936,10 +2931,9 @@ static qboolean PM_CheckJump( void )
 						VectorSubtract( &pm->ps->origin, &traceto, &idealNormal );
 						VectorNormalize( &idealNormal );
 						traceEnt = PM_BGEntForNum(trace.entityNum);
-						
+
 						if ( trace.fraction < 1.0f
-							&&( ( trace.entityNum < ENTITYNUM_WORLD && traceEnt && traceEnt->s.solid != SOLID_BMODEL )
-								|| DotProduct( &trace.plane.normal, &idealNormal ) > 0.7f ) )
+							&&((trace.entityNum<ENTITYNUM_WORLD&&traceEnt&&traceEnt->s.solid!=SOLID_BMODEL)||DotProduct(&trace.plane.normal,&idealNormal)>0.7f) )
 						{//there is a wall there
 							pm->ps->velocity.x = pm->ps->velocity.y = 0;
 							if ( wallWalkAnim == BOTH_FORCEWALLRUNFLIP_START )
@@ -2962,13 +2956,14 @@ static qboolean PM_CheckJump( void )
 							pm->ps->fd.forceJumpSound = 1;
 							BG_ForcePowerDrain( pm->ps, FP_LEVITATION, 5 );
 
-							//RAZTEST: kick flip
 							//kick if jumping off an ent
-							if ( /*kick &&*/ traceEnt && (traceEnt->s.eType == ET_PLAYER || traceEnt->s.eType == ET_NPC) )
+#ifdef KICKFLIP
+							if ( kick && traceEnt && (traceEnt->s.eType == ET_PLAYER || traceEnt->s.eType == ET_NPC) )
 							{ //kick that thang!
+								Com_Printf( "kicking\n\n" );
 								pm->ps->forceKickFlip = traceEnt->s.number+1;
 							}
-
+#endif
 							pm->cmd.rightmove = pm->cmd.forwardmove= 0;
 						}
 					}
