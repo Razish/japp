@@ -1555,6 +1555,7 @@ void Q_strrev( char *str );
 #define STRIP_COLOUR	(0x00000001u)
 #define STRIP_EXTASCII	(0x00000002u)
 void Q_CleanString( char *string, uint32_t flags );
+void Q_ConvertLinefeeds( char *string );
 void Com_sprintf( char *dest, int size, const char *fmt, ... );
 char *va( const char *format, ... );
 

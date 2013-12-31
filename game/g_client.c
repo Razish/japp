@@ -1507,9 +1507,8 @@ void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
 
 	if (precachedKyle && trap->G2API_HaveWeGhoul2Models(precachedKyle))
 	{
-		if (d_perPlayerGhoul2.integer || ent->s.number >= MAX_CLIENTS ||
-			G_PlayerHasCustomSkeleton(ent))
-		{ //rww - allow option for perplayer models on server for collision and bolt stuff.
+		//rww - allow option for perplayer models on server for collision and bolt stuff.
+		if ( d_perPlayerGhoul2.integer || ent->s.number >= MAX_CLIENTS ) {
 			char modelFullPath[MAX_QPATH];
 			char truncModelName[MAX_QPATH];
 			char skin[MAX_QPATH];
@@ -1641,8 +1640,8 @@ void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
 				GLAName[0] = 0;
 				trap->G2API_GetGLAName( ent->ghoul2, 0, GLAName);
 
-				if (!GLAName[0] || (!strstr(GLAName, "players/_humanoid/") && ent->s.number < MAX_CLIENTS && !G_PlayerHasCustomSkeleton(ent)))
-				{ //a bad model
+				if ( !GLAName[0] || (!strstr( GLAName, "players/_humanoid/" ) && ent->s.number < MAX_CLIENTS) ) {
+					// a bad model
 					trap->G2API_CleanGhoul2Models(&(ent->ghoul2));
 					ent->ghoul2 = NULL;
 					trap->G2API_DuplicateGhoul2Instance(precachedKyle, &ent->ghoul2);
@@ -1695,8 +1694,7 @@ void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
 		}
 	}
 
-	if (ent->s.number >= MAX_CLIENTS || G_PlayerHasCustomSkeleton(ent))
-	{
+	if ( ent->s.number >= MAX_CLIENTS ) {
 		ent->localAnimIndex = -1;
 
 		GLAName[0] = 0;
@@ -2192,15 +2190,6 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 						Q_strncpyz( client->modelname, model, sizeof( client->modelname ) );
 						modelChanged = qtrue;
 					}
-				}
-			}
-
-			if ( G_PlayerHasCustomSkeleton( ent ) )
-			{//force them to use their class model on the server, if the class dictates
-				if ( Q_stricmp( model, client->modelname ) || ent->localAnimIndex == 0 )
-				{
-					Q_strncpyz( client->modelname, model, sizeof( client->modelname ) );
-					modelChanged = qtrue;
 				}
 			}
 		}

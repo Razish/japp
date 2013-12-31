@@ -562,7 +562,7 @@ static void AM_Status( gentity_t *ent ) {
 
 // announce a message to all clients
 static void AM_Announce( gentity_t *ent ) {
-	char *p, arg1[48];
+	char *msg, arg1[48];
 	int targetClient;
 
 	if ( trap->Argc() < 3 ) {
@@ -570,8 +570,8 @@ static void AM_Announce( gentity_t *ent ) {
 		return;
 	}
 
-	p = ConcatArgs( 2 );
-	p = G_NewString( p ); // convert line-feeds
+	msg = ConcatArgs( 2 );
+	Q_ConvertLinefeeds( msg );
 
 	//Grab the clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
@@ -583,23 +583,21 @@ static void AM_Announce( gentity_t *ent ) {
 
 	// Invalid player
 	if ( targetClient == -1 ) {
-		free( p );
 		return;
 	}
 
 	// print to everyone
 	else if ( targetClient == -2 )
-		trap->SendServerCommand( -1, va( "cp \"%s\"", p ) );
+		trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
 
 	// valid client
 	else {
-		trap->SendServerCommand( targetClient, va( "cp \"%s\"", p ) );
-		trap->SendServerCommand( ent-g_entities, va( "cp \"Relay:\n%s\"", p ) );	//Helena wanted me to relay it back to the sender
+		trap->SendServerCommand( targetClient, va( "cp \"%s\"", msg ) );
+		trap->SendServerCommand( ent-g_entities, va( "cp \"Relay:\n%s\"", msg ) ); //Helena wanted me to relay it back to the sender
 	}
 
-	G_LogPrintf( "AM_Announce: Start\nSender: %s\nMessage: %s\nAM_Announce: End\n", ent->client->pers.netname, p );
+	G_LogPrintf( "AM_Announce: Start\nSender: %s\nMessage: %s\nAM_Announce: End\n", ent->client->pers.netname, msg );
 
-	free( p );
 	return;
 }
 

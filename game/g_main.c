@@ -521,8 +521,6 @@ void G_ShutdownGame( int restart ) {
 	JKG_Bans_Clear();
 	AM_SaveTelemarks();
 
-	G_CleanAllFakeClients(); //get rid of dynamically allocated fake client structs.
-
 	BG_ClearAnimsets(); //free all dynamic allocations made through the engine
 
 //	Com_Printf("... Gameside GHOUL2 Cleanup\n");
