@@ -600,6 +600,7 @@ static void Field_CharEvent( field_t *edit, int key ) {
 			edit->scroll = 0;
 			break;
 
+		case A_BACKSPACE: // clear
 		case 'c': // clear
 			Field_Clear( edit );
 			break;
@@ -616,10 +617,6 @@ static void Field_CharEvent( field_t *edit, int key ) {
 				if ( edit->cursor < edit->scroll )
 					edit->scroll--;
 			}
-			break;
-
-		case A_BACKSPACE: // clear
-			CG_ChatboxClear();
 			break;
 
 		case 'v': // paste
@@ -645,10 +642,12 @@ static void Field_CharEvent( field_t *edit, int key ) {
 			break;
 
 		case A_PAGE_DOWN:
+		case A_MWHEELDOWN:
 			CG_ChatboxScroll( 0 );
 			break;
 
 		case A_PAGE_UP:
+		case A_MWHEELUP:
 			CG_ChatboxScroll( 1 );
 			break;
 
