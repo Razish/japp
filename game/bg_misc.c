@@ -565,7 +565,7 @@ qboolean BG_LegalizedForcePowers(char *powerOut, int maxRank, qboolean freeSaber
 	i = 0;
 	while (i < NUM_FORCE_POWERS)
 	{
-		countDown = final_Powers[i];
+		countDown = Com_Clampi( 0, NUM_FORCE_POWER_LEVELS, final_Powers[i] );
 
 		while (countDown > 0)
 		{
@@ -735,51 +735,6 @@ qboolean BG_LegalizedForcePowers(char *powerOut, int maxRank, qboolean freeSaber
 
 	return maintainsValidity;
 }
-
-#ifdef __LCC__
-// given a boltmatrix, return in vec a normalised vector for the axis requested in flags
-void BG_GiveMeVectorFromMatrix(mdxaBone_t *boltMatrix, int flags, vector3 *vec)
-{
-	switch (flags)
-	{
-	case ORIGIN:
-		vec[0] = boltMatrix->matrix[0][3];
-		vec[1] = boltMatrix->matrix[1][3];
-		vec[2] = boltMatrix->matrix[2][3];
-		break;
-	case POSITIVE_Y:
-		vec[0] = boltMatrix->matrix[0][1];
-		vec[1] = boltMatrix->matrix[1][1];
-		vec[2] = boltMatrix->matrix[2][1];
- 		break;
-	case POSITIVE_X:
-		vec[0] = boltMatrix->matrix[0][0];
-		vec[1] = boltMatrix->matrix[1][0];
-		vec[2] = boltMatrix->matrix[2][0];
-		break;
-	case POSITIVE_Z:
-		vec[0] = boltMatrix->matrix[0][2];
-		vec[1] = boltMatrix->matrix[1][2];
-		vec[2] = boltMatrix->matrix[2][2];
-		break;
-	case NEGATIVE_Y:
-		vec[0] = -boltMatrix->matrix[0][1];
-		vec[1] = -boltMatrix->matrix[1][1];
-		vec[2] = -boltMatrix->matrix[2][1];
-		break;
-	case NEGATIVE_X:
-		vec[0] = -boltMatrix->matrix[0][0];
-		vec[1] = -boltMatrix->matrix[1][0];
-		vec[2] = -boltMatrix->matrix[2][0];
-		break;
-	case NEGATIVE_Z:
-		vec[0] = -boltMatrix->matrix[0][2];
-		vec[1] = -boltMatrix->matrix[1][2];
-		vec[2] = -boltMatrix->matrix[2][2];
-		break;
-	}
-}
-#endif
 
 /*QUAKED item_***** ( 0 0 0 ) (-16 -16 -16) (16 16 16) suspended
 DO NOT USE THIS CLASS, IT JUST HOLDS GENERAL INFORMATION.

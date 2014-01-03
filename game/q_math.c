@@ -1306,10 +1306,9 @@ number VectorNormalize( vector3 *vec ) {
 }
 
 number VectorNormalize2( const vector3 *vec, vector3 *vecOut ) {
-	float	length, ilength;
+	float length, ilength;
 
-	length = vec->x*vec->x + vec->y*vec->y + vec->z*vec->z;
-	length = sqrtf( length );
+	length = sqrtf( vec->x*vec->x + vec->y*vec->y + vec->z*vec->z );
 
 	if ( length ) {
 		ilength = 1/length;

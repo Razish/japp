@@ -1,11 +1,11 @@
+#pragma once
+
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 // bg_public.h -- definitions shared by both the server game and client game modules
 
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
-
-#pragma once
 
 #include "bg_weapons.h"
 #include "anims.h"
@@ -23,6 +23,7 @@
 #define	STEPSIZE		18
 
 #define DEFAULT_FORCEPOWERS	"5-1-000000000000000000"
+#define DEFAULT_FORCEPOWERS_LEN (22) // numPowers + rank + side + separators
 //"rank-side-heal.lev.speed.push.pull.tele.grip.lightning.rage.protect.absorb.teamheal.teamforce.drain.see"
 
 #define	DEFAULT_GRAVITY		800

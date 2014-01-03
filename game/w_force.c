@@ -135,140 +135,78 @@ const int mindTrickTime[NUM_FORCE_POWER_LEVELS] =
 	15000
 };
 
-void WP_InitForcePowers( gentity_t *ent )
-{
-	int i;
-	int i_r;
-	int maxRank = g_maxForceRank.integer;
-	qboolean warnClient = qfalse;
-	qboolean warnClientLimit = qfalse;
-	char userinfo[MAX_INFO_STRING];
-	char forcePowers[256];
-	char readBuf[256];
-	int lastFPKnown = -1;
-	qboolean didEvent = qfalse;
+void WP_InitForcePowers( gentity_t *ent ) {
+	int i, i_r, lastFPKnown = -1;
+	qboolean warnClient = qfalse, warnClientLimit = qfalse, didEvent = qfalse;
+	char userinfo[MAX_INFO_STRING], forcePowers[DEFAULT_FORCEPOWERS_LEN+1], readBuf[DEFAULT_FORCEPOWERS_LEN+1];
 
-	if (!maxRank)
-	{ //if server has no max rank, default to max (50)
-		maxRank = FORCE_MASTERY_JEDI_MASTER;
+	// if server has no max rank, default to max (50)
+	if ( g_maxForceRank.integer <= 0 || g_maxForceRank.integer >= NUM_FORCE_MASTERY_LEVELS ) {
+		// ack, prevent user from being dumb
+		trap->Cvar_Set( "g_maxForceRank", va( "%i", FORCE_MASTERY_JEDI_MASTER ) );
+		trap->Cvar_Update( &g_maxForceRank );
 	}
-	else if (maxRank >= NUM_FORCE_MASTERY_LEVELS)
-	{//ack, prevent user from being dumb
-		maxRank = FORCE_MASTERY_JEDI_MASTER;
-		trap->Cvar_Set( "g_maxForceRank", va("%i", maxRank) );
-	}
-
-	/*
-	if (g_forcePowerDisable.integer)
-	{
-		maxRank = FORCE_MASTERY_UNINITIATED;
-	}
-	*/
-	//rww - don't do this
 
 	if ( !ent || !ent->client )
-	{
 		return;
-	}
 
 	ent->client->ps.fd.saberAnimLevel = ent->client->sess.saberLevel;
 
-	if (ent->client->ps.fd.saberAnimLevel < FORCE_LEVEL_1 ||
-		ent->client->ps.fd.saberAnimLevel > FORCE_LEVEL_3)
-	{
+	if ( ent->client->ps.fd.saberAnimLevel < FORCE_LEVEL_1 || ent->client->ps.fd.saberAnimLevel > FORCE_LEVEL_3 )
 		ent->client->ps.fd.saberAnimLevel = FORCE_LEVEL_1;
-	}
 
-	if (!speedLoopSound)
-	{ //so that the client configstring is already modified with this when we need it
-		speedLoopSound = G_SoundIndex("sound/weapons/force/speedloop.wav");
-	}
+	// so that the client configstring is already modified with this when we need it
+	if ( !speedLoopSound )
+		speedLoopSound = G_SoundIndex( "sound/weapons/force/speedloop.wav" );
+	if ( !rageLoopSound )
+		rageLoopSound = G_SoundIndex( "sound/weapons/force/rageloop.wav" );
+	if ( !absorbLoopSound )
+		absorbLoopSound = G_SoundIndex( "sound/weapons/force/absorbloop.wav" );
+	if ( !protectLoopSound )
+		protectLoopSound = G_SoundIndex( "sound/weapons/force/protectloop.wav" );
+	if ( !seeLoopSound )
+		seeLoopSound = G_SoundIndex( "sound/weapons/force/seeloop.wav" );
+	if ( !ysalamiriLoopSound )
+		ysalamiriLoopSound = G_SoundIndex( "sound/player/nullifyloop.wav" );
 
-	if (!rageLoopSound)
-	{
-		rageLoopSound = G_SoundIndex("sound/weapons/force/rageloop.wav");
-	}
-
-	if (!absorbLoopSound)
-	{
-		absorbLoopSound = G_SoundIndex("sound/weapons/force/absorbloop.wav");
-	}
-
-	if (!protectLoopSound)
-	{
-		protectLoopSound = G_SoundIndex("sound/weapons/force/protectloop.wav");
-	}
-
-	if (!seeLoopSound)
-	{
-		seeLoopSound = G_SoundIndex("sound/weapons/force/seeloop.wav");
-	}
-
-	if (!ysalamiriLoopSound)
-	{
-		ysalamiriLoopSound = G_SoundIndex("sound/player/nullifyloop.wav");
-	}
-
-	if (ent->s.eType == ET_NPC)
-	{ //just stop here then.
+	if ( ent->s.eType == ET_NPC )
 		return;
-	}
 
-	i = 0;
-	while (i < NUM_FORCE_POWERS)
-	{
+	for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
 		ent->client->ps.fd.forcePowerLevel[i] = 0;
-		ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
-		i++;
+		ent->client->ps.fd.forcePowersKnown &= ~(1<<i);
 	}
 
 	ent->client->ps.fd.forcePowerSelected = -1;
-
 	ent->client->ps.fd.forceSide = 0;
 
-	if (level.gametype == GT_SIEGE &&
-		ent->client->siegeClass != -1)
-	{ //Then use the powers for this class, and skip all this nonsense.
-		i = 0;
-
-		while (i < NUM_FORCE_POWERS)
-		{
+	// if in siege, then use the powers for this class, and skip all this nonsense.
+	if ( level.gametype == GT_SIEGE && ent->client->siegeClass != -1 ) { 
+		for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
 			ent->client->ps.fd.forcePowerLevel[i] = bgSiegeClasses[ent->client->siegeClass].forcePowerLevels[i];
-
-			if (!ent->client->ps.fd.forcePowerLevel[i])
-			{
+			if ( !ent->client->ps.fd.forcePowerLevel[i] )
 				ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
-			}
 			else
-			{
 				ent->client->ps.fd.forcePowersKnown |= (1 << i);
-			}
-			i++;
 		}
 
-		if (!ent->client->sess.setForce)
-		{
-			//bring up the class selection menu
-			trap->SendServerCommand(ent-g_entities, "scl");
-		}
+		// bring up the class selection menu
+		if ( !ent->client->sess.setForce )
+			trap->SendServerCommand( ent-g_entities, "scl" );
 		ent->client->sess.setForce = qtrue;
 
 		return;
 	}
 
-	if (ent->s.eType == ET_NPC && ent->s.number >= MAX_CLIENTS)
-	{ //rwwFIXMEFIXME: Temp
+	//rwwFIXMEFIXME: Temp
+	if ( ent->s.eType == ET_NPC && ent->s.number >= MAX_CLIENTS )
 		Q_strncpyz( userinfo, "forcepowers\\7-1-333003000313003120", sizeof( userinfo ) );
-	}
 	else
-	{
 		trap->GetUserinfo( ent->s.number, userinfo, sizeof( userinfo ) );
-	}
 
 	Q_strncpyz( forcePowers, Info_ValueForKey( userinfo, "forcepowers" ), sizeof( forcePowers ) );
 
-	if ( strlen( forcePowers ) < strlen( DEFAULT_FORCEPOWERS ) )
-	{
+	if ( strlen( forcePowers ) != DEFAULT_FORCEPOWERS_LEN ) {
 		Q_strncpyz( forcePowers, DEFAULT_FORCEPOWERS, sizeof( forcePowers ) );
 		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_RED"Invalid forcepowers string, setting default\n\"" );
 	}
@@ -277,110 +215,74 @@ void WP_InitForcePowers( gentity_t *ent )
 	if ( (ent->r.svFlags & SVF_BOT) && botstates[ent->s.number] )
 		Q_strncpyz( forcePowers, botstates[ent->s.number]->forceinfo, sizeof( forcePowers ) );
 
-	//rww - parse through the string manually and eat out all the appropriate data
-	i = 0;
-
-	if (g_forceBasedTeams.integer)
-	{
-		if (ent->client->sess.sessionTeam == TEAM_RED)
-		{
-			warnClient = !(BG_LegalizedForcePowers(forcePowers, maxRank, HasSetSaberOnly(), FORCE_DARKSIDE, level.gametype, g_forcePowerDisable.integer));
-		}
-		else if (ent->client->sess.sessionTeam == TEAM_BLUE)
-		{
-			warnClient = !(BG_LegalizedForcePowers(forcePowers, maxRank, HasSetSaberOnly(), FORCE_LIGHTSIDE, level.gametype, g_forcePowerDisable.integer));
-		}
+	if ( g_forceBasedTeams.integer ) {
+		if ( ent->client->sess.sessionTeam == TEAM_RED )
+			warnClient = !(BG_LegalizedForcePowers( forcePowers, g_maxForceRank.integer, HasSetSaberOnly(), FORCE_DARKSIDE, level.gametype, g_forcePowerDisable.integer ));
+		else if ( ent->client->sess.sessionTeam == TEAM_BLUE )
+			warnClient = !(BG_LegalizedForcePowers( forcePowers, g_maxForceRank.integer, HasSetSaberOnly(), FORCE_LIGHTSIDE, level.gametype, g_forcePowerDisable.integer ));
 		else
-		{
-			warnClient = !(BG_LegalizedForcePowers(forcePowers, maxRank, HasSetSaberOnly(), 0, level.gametype, g_forcePowerDisable.integer));
-		}
+			warnClient = !(BG_LegalizedForcePowers( forcePowers, g_maxForceRank.integer, HasSetSaberOnly(), 0, level.gametype, g_forcePowerDisable.integer ));
 	}
 	else
-	{
-		warnClient = !(BG_LegalizedForcePowers(forcePowers, maxRank, HasSetSaberOnly(), 0, level.gametype, g_forcePowerDisable.integer));
-	}
+		warnClient = !(BG_LegalizedForcePowers( forcePowers, g_maxForceRank.integer, HasSetSaberOnly(), 0, level.gametype, g_forcePowerDisable.integer ));
 
+	//rww - parse through the string manually and eat out all the appropriate data
+	i = 0;
 	i_r = 0;
-	while (forcePowers[i] && forcePowers[i] != '-')
-	{
+	while ( forcePowers[i] && forcePowers[i] != '-' ) {
 		readBuf[i_r] = forcePowers[i];
 		i_r++;
 		i++;
 	}
 	readBuf[i_r] = 0;
 	//THE RANK
-	ent->client->ps.fd.forceRank = atoi(readBuf);
+	ent->client->ps.fd.forceRank = atoi( readBuf );
 	i++;
 
 	i_r = 0;
-	while (forcePowers[i] && forcePowers[i] != '-')
-	{
+	while ( forcePowers[i] && forcePowers[i] != '-' ) {
 		readBuf[i_r] = forcePowers[i];
 		i_r++;
 		i++;
 	}
 	readBuf[i_r] = 0;
 	//THE SIDE
-	ent->client->ps.fd.forceSide = atoi(readBuf);
+	ent->client->ps.fd.forceSide = atoi( readBuf );
 	i++;
 
-
-	if ( level.gametype != GT_SIEGE && (ent->r.svFlags & SVF_BOT) && botstates[ent->s.number] )
-	{ //hmm..I'm going to cheat here.
+	if ( level.gametype != GT_SIEGE && (ent->r.svFlags & SVF_BOT) && botstates[ent->s.number] ) {
+		// hmm..I'm going to cheat here.
 		int oldI = i;
 		i_r = 0;
-		while (forcePowers[i] && forcePowers[i] != '\n' &&
-			i_r < NUM_FORCE_POWERS)
-		{
-			if (ent->client->ps.fd.forceSide == FORCE_LIGHTSIDE)
-			{
-				if (i_r == FP_ABSORB)
-				{
+		while ( forcePowers[i] && forcePowers[i] != '\n' && i_r < NUM_FORCE_POWERS ) {
+			if ( ent->client->ps.fd.forceSide == FORCE_LIGHTSIDE ) {
+				if ( i_r == FP_ABSORB )
 					forcePowers[i] = '3';
-				}
-				if (botstates[ent->s.number]->settings.skill >= 4)
-				{ //cheat and give them more stuff
-					if (i_r == FP_HEAL)
-					{
+				if ( botstates[ent->s.number]->settings.skill >= 4 ) {
+					// cheat and give them more stuff
+					if ( i_r == FP_HEAL )
 						forcePowers[i] = '3';
-					}
-					else if (i_r == FP_PROTECT)
-					{
+					else if ( i_r == FP_PROTECT )
 						forcePowers[i] = '3';
-					}
 				}
 			}
-			else if (ent->client->ps.fd.forceSide == FORCE_DARKSIDE)
-			{
-				if (botstates[ent->s.number]->settings.skill >= 4)
-				{
-					if (i_r == FP_GRIP)
-					{
+			else if ( ent->client->ps.fd.forceSide == FORCE_DARKSIDE ) {
+				if ( botstates[ent->s.number]->settings.skill >= 4 ) {
+					if ( i_r == FP_GRIP )
 						forcePowers[i] = '3';
-					}
-					else if (i_r == FP_LIGHTNING)
-					{
+					else if ( i_r == FP_LIGHTNING )
 						forcePowers[i] = '3';
-					}
-					else if (i_r == FP_RAGE)
-					{
+					else if ( i_r == FP_RAGE )
 						forcePowers[i] = '3';
-					}
-					else if (i_r == FP_DRAIN)
-					{
+					else if ( i_r == FP_DRAIN )
 						forcePowers[i] = '3';
-					}
 				}
 			}
 
-			if (i_r == FP_PUSH)
-			{
+			if ( i_r == FP_PUSH )
 				forcePowers[i] = '3';
-			}
-			else if (i_r == FP_PULL)
-			{
+			else if ( i_r == FP_PULL )
 				forcePowers[i] = '3';
-			}
 
 			i++;
 			i_r++;
@@ -409,172 +311,101 @@ void WP_InitForcePowers( gentity_t *ent )
 	}
 	//THE POWERS
 
-	if (ent->s.eType != ET_NPC)
-	{
-		if (HasSetSaberOnly())
-		{
+	if ( ent->s.eType != ET_NPC ) {
+		if ( HasSetSaberOnly() ) {
 			gentity_t *te = G_TempEntity( &vec3_origin, EV_SET_FREE_SABER );
 			te->r.svFlags |= SVF_BROADCAST;
 			te->s.eventParm = 1;
 		}
-		else
-		{
+		else {
 			gentity_t *te = G_TempEntity( &vec3_origin, EV_SET_FREE_SABER );
 			te->r.svFlags |= SVF_BROADCAST;
 			te->s.eventParm = 0;
 		}
 
-		if (g_forcePowerDisable.integer)
-		{
+		if ( g_forcePowerDisable.integer ) {
 			gentity_t *te = G_TempEntity( &vec3_origin, EV_SET_FORCE_DISABLE );
 			te->r.svFlags |= SVF_BROADCAST;
 			te->s.eventParm = 1;
 		}
-		else
-		{
+		else {
 			gentity_t *te = G_TempEntity( &vec3_origin, EV_SET_FORCE_DISABLE );
 			te->r.svFlags |= SVF_BROADCAST;
 			te->s.eventParm = 0;
 		}
 	}
 
-	//rww - It seems we currently want to always do this, even if the player isn't exceeding the max
-	//rank, so..
-//	if (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL)
-//	{ //totally messes duel up to force someone into spec mode, and besides, each "round" is
-	  //counted as a full restart
-//		ent->client->sess.setForce = qtrue;
-//	}
-
-	if (ent->s.eType == ET_NPC)
-	{
+	if ( ent->s.eType == ET_NPC )
 		ent->client->sess.setForce = qtrue;
-	}
-	else if (level.gametype == GT_SIEGE)
-	{
-		if (!ent->client->sess.setForce)
-		{
+	else if ( level.gametype == GT_SIEGE ) {
+		if ( !ent->client->sess.setForce ) {
 			ent->client->sess.setForce = qtrue;
-			//bring up the class selection menu
-			trap->SendServerCommand(ent-g_entities, "scl");
+			// bring up the class selection menu
+			trap->SendServerCommand( ent-g_entities, "scl" );
 		}
 	}
-	else
-	{
-		if (warnClient || !ent->client->sess.setForce)
-		{ //the client's rank is too high for the server and has been autocapped, so tell them
-			if (level.gametype != GT_HOLOCRON && level.gametype != GT_JEDIMASTER )
-			{
-#ifdef EVENT_FORCE_RANK
-				gentity_t *te = G_TempEntity( vec3_origin, EV_GIVE_NEW_RANK );
-
-				te->r.svFlags |= SVF_BROADCAST;
-				te->s.trickedentindex = ent->s.number;
-				te->s.eventParm = maxRank;
-				te->s.bolt1 = 0;
-#endif
+	else {
+		if ( warnClient || !ent->client->sess.setForce ) {
+			// the client's rank is too high for the server and has been autocapped, so tell them
+			if ( level.gametype != GT_HOLOCRON && level.gametype != GT_JEDIMASTER ) {
 				didEvent = qtrue;
 
-//				if (!(ent->r.svFlags & SVF_BOT) && level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL && ent->s.eType != ET_NPC)
-				if (!(ent->r.svFlags & SVF_BOT) && ent->s.eType != ET_NPC)
-				{
-					if (!g_teamAutoJoin.integer)
-					{
-						//Make them a spectator so they can set their powerups up without being bothered.
+				if ( !(ent->r.svFlags & SVF_BOT) && ent->s.eType != ET_NPC ) {
+					if ( !g_teamAutoJoin.integer ) {
+						// make them a spectator so they can set their powerups up without being bothered.
 						ent->client->sess.sessionTeam = TEAM_SPECTATOR;
 						ent->client->sess.spectatorState = SPECTATOR_FREE;
 						ent->client->sess.spectatorClient = 0;
 
 						ent->client->pers.teamState.state = TEAM_BEGIN;
-						trap->SendServerCommand(ent-g_entities, "spc");	// Fire up the profile menu
+						trap->SendServerCommand( ent-g_entities, "spc" ); // Fire up the profile menu
 					}
 				}
 
-#ifdef EVENT_FORCE_RANK
-				te->s.bolt2 = ent->client->sess.sessionTeam;
-#else
-				//Event isn't very reliable, I made it a string. This way I can send it to just one
-				//client also, as opposed to making a broadcast event.
-				trap->SendServerCommand(ent->s.number, va("nfr %i %i %i", maxRank, 1, ent->client->sess.sessionTeam));
-				//Arg1 is new max rank, arg2 is non-0 if force menu should be shown, arg3 is the current team
-#endif
+				// event isn't very reliable, I made it a string. This way I can send it to just one client also,
+				//	as opposed to making a broadcast event.
+				trap->SendServerCommand( ent->s.number, va( "nfr %i %i %i", g_maxForceRank.integer, 1, ent->client->sess.sessionTeam ) );
+				// arg1 is new max rank, arg2 is non-0 if force menu should be shown, arg3 is the current team
 			}
 			ent->client->sess.setForce = qtrue;
 		}
 
-		if (!didEvent )
-		{
-#ifdef EVENT_FORCE_RANK
-			gentity_t *te = G_TempEntity( vec3_origin, EV_GIVE_NEW_RANK );
+		if ( !didEvent )
+			trap->SendServerCommand( ent->s.number, va( "nfr %i %i %i", g_maxForceRank.integer, 0, ent->client->sess.sessionTeam ) );
 
-			te->r.svFlags |= SVF_BROADCAST;
-			te->s.trickedentindex = ent->s.number;
-			te->s.eventParm = maxRank;
-			te->s.bolt1 = 1;
-			te->s.bolt2 = ent->client->sess.sessionTeam;
-#else
-			trap->SendServerCommand(ent->s.number, va("nfr %i %i %i", maxRank, 0, ent->client->sess.sessionTeam));
-#endif
-		}
-
-		if (warnClientLimit)
-		{ //the server has one or more force powers disabled and the client is using them in his config
-			//trap->SendServerCommand(ent-g_entities, va("print \"The server has one or more force powers that you have chosen disabled.\nYou will not be able to use the disable force power(s) while playing on this server.\n\""));
-		}
+		// the server has one or more force powers disabled and the client is using them in his config
+		if ( warnClientLimit )
+			trap->SendServerCommand( ent-g_entities, va( "print \"The server has one or more force powers that you have chosen disabled.\nYou will not be able to use the disable force power(s) while playing on this server.\n\"" ) );
 	}
 
-	i = 0;
-	while (i < NUM_FORCE_POWERS)
-	{
-		if ((ent->client->ps.fd.forcePowersKnown & (1 << i)) &&
-			!ent->client->ps.fd.forcePowerLevel[i])
-		{ //err..
+	for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
+		if ( (ent->client->ps.fd.forcePowersKnown & (1 << i)) && !ent->client->ps.fd.forcePowerLevel[i] )
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
-		}
-		else
-		{
-			if (i != FP_LEVITATION && i != FP_SABER_OFFENSE && i != FP_SABER_DEFENSE && i != FP_SABERTHROW)
-			{
-				lastFPKnown = i;
-			}
-		}
-
-		i++;
+		else if ( i != FP_LEVITATION && i != FP_SABER_OFFENSE && i != FP_SABER_DEFENSE && i != FP_SABERTHROW )
+			lastFPKnown = i;
 	}
 
-	if (ent->client->ps.fd.forcePowersKnown & ent->client->sess.selectedFP)
-	{
+	if ( ent->client->ps.fd.forcePowersKnown & ent->client->sess.selectedFP )
 		ent->client->ps.fd.forcePowerSelected = ent->client->sess.selectedFP;
-	}
 
-	if (!(ent->client->ps.fd.forcePowersKnown & (1 << ent->client->ps.fd.forcePowerSelected)))
-	{
-		if (lastFPKnown != -1)
-		{
+	if ( !(ent->client->ps.fd.forcePowersKnown & (1 << ent->client->ps.fd.forcePowerSelected)) ) {
+		if ( lastFPKnown != -1 )
 			ent->client->ps.fd.forcePowerSelected = lastFPKnown;
-		}
 		else
-		{
 			ent->client->ps.fd.forcePowerSelected = 0;
-		}
 	}
 
-	while (i < NUM_FORCE_POWERS)
-	{
+	for ( i=0; i<NUM_FORCE_POWERS; i++ )
 		ent->client->ps.fd.forcePowerBaseLevel[i] = ent->client->ps.fd.forcePowerLevel[i];
-		i++;
-	}
 	ent->client->ps.fd.forceUsingAdded = 0;
 
 	//Raz: ...And if we're empowered, just overwrite the whole lot ='D
-	if ( ent->client->pers.adminData.empowered )
-	{
+	if ( ent->client->pers.adminData.empowered ) {
 		ent->client->ps.eFlags |= EF_BODYPUSH;
 
 		ent->client->pers.adminData.forcePowersKnown = ent->client->ps.fd.forcePowersKnown;
 
-		for ( i=0; i<NUM_FORCE_POWERS; i++ )
-		{
+		for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
 			ent->client->pers.adminData.forcePowerBaseLevel[i] = ent->client->ps.fd.forcePowerBaseLevel[i];		ent->client->ps.fd.forcePowerBaseLevel[i] = 3;
 			ent->client->pers.adminData.forcePowerLevel[i] = ent->client->ps.fd.forcePowerLevel[i];				ent->client->ps.fd.forcePowerLevel[i] = 3;
 			ent->client->ps.fd.forcePowersKnown |= (1<<i);
@@ -582,22 +413,14 @@ void WP_InitForcePowers( gentity_t *ent )
 	}
 }
 
-void WP_SpawnInitForcePowers( gentity_t *ent )
-{
-	int i = 0;
+void WP_SpawnInitForcePowers( gentity_t *ent ) {
+	int i=0;
 
 	ent->client->ps.saberAttackChainCount = 0;
 
-	i = 0;
-
-	while (i < NUM_FORCE_POWERS)
-	{
-		if (ent->client->ps.fd.forcePowersActive & (1 << i))
-		{
-			WP_ForcePowerStop(ent, i);
-		}
-
-		i++;
+	for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
+		if ( ent->client->ps.fd.forcePowersActive & (1 << i) )
+			WP_ForcePowerStop( ent, i );
 	}
 
 	ent->client->ps.fd.forceDeactivateAll = 0;
@@ -612,43 +435,24 @@ void WP_SpawnInitForcePowers( gentity_t *ent )
 
 	ent->client->ps.holocronBits = 0;
 
-	i = 0;
-	while (i < NUM_FORCE_POWERS)
-	{
+	for ( i=0; i<NUM_FORCE_POWERS; i++ )
 		ent->client->ps.holocronsCarried[i] = 0;
-		i++;
-	}
 
-	if (level.gametype == GT_HOLOCRON)
-	{
-		i = 0;
-		while (i < NUM_FORCE_POWERS)
-		{
+	if ( level.gametype == GT_HOLOCRON ) {
+		for ( i=0; i<NUM_FORCE_POWERS; i++ )
 			ent->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_0;
-			i++;
-		}
 
-		if (HasSetSaberOnly())
-		{
+		if ( HasSetSaberOnly() ) {
 			if (ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] < FORCE_LEVEL_1)
-			{
 				ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] = FORCE_LEVEL_1;
-			}
 			if (ent->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] < FORCE_LEVEL_1)
-			{
 				ent->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] = FORCE_LEVEL_1;
-			}
 		}
 	}
 
-	i = 0;
-
-	while (i < NUM_FORCE_POWERS)
-	{
+	for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
 		ent->client->ps.fd.forcePowerDebounce[i] = 0;
 		ent->client->ps.fd.forcePowerDuration[i] = 0;
-
-		i++;
 	}
 
 	ent->client->ps.fd.forceJumpZStart = 0;
@@ -666,36 +470,21 @@ void WP_SpawnInitForcePowers( gentity_t *ent )
 	ent->client->ps.fd.forceDrainEntNum = ENTITYNUM_NONE;
 	ent->client->ps.fd.forceDrainTime = 0;
 
-	i = 0;
-	while (i < NUM_FORCE_POWERS)
-	{
-		if ((ent->client->ps.fd.forcePowersKnown & (1 << i)) &&
-			!ent->client->ps.fd.forcePowerLevel[i])
-		{ //make sure all known powers are cleared if we have level 0 in them
+	for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
+		// make sure all known powers are cleared if we have level 0 in them
+		if ( (ent->client->ps.fd.forcePowersKnown & (1 << i)) && !ent->client->ps.fd.forcePowerLevel[i] )
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
-		}
-
-		i++;
 	}
 
-	if (level.gametype == GT_SIEGE &&
-		ent->client->siegeClass != -1)
-	{ //Then use the powers for this class.
-		i = 0;
-
-		while (i < NUM_FORCE_POWERS)
-		{
+	if ( level.gametype == GT_SIEGE && ent->client->siegeClass != -1 ) {
+		// then use the powers for this class.
+		for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
 			ent->client->ps.fd.forcePowerLevel[i] = bgSiegeClasses[ent->client->siegeClass].forcePowerLevels[i];
 
-			if (!ent->client->ps.fd.forcePowerLevel[i])
-			{
+			if ( !ent->client->ps.fd.forcePowerLevel[i] )
 				ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
-			}
 			else
-			{
 				ent->client->ps.fd.forcePowersKnown |= (1 << i);
-			}
-			i++;
 		}
 	}
 }

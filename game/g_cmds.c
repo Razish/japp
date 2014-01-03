@@ -1249,42 +1249,32 @@ void Cmd_SiegeClass_f( gentity_t *ent )
 Cmd_ForceChanged_f
 =================
 */
-void Cmd_ForceChanged_f( gentity_t *ent )
-{
-	char fpChStr[1024];
-	const char *buf;
-//	Cmd_Kill_f(ent);
-	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR)
-	{ //if it's a spec, just make the changes now
-		//trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "FORCEAPPLIED")) );
-		//No longer print it, as the UI calls this a lot.
+void Cmd_ForceChanged_f( gentity_t *ent ) {
+	// if it's a spec, just make the changes now
+	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+	//	trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "FORCEAPPLIED" ) ) );
+		// No longer print it, as the UI calls this a lot.
 		WP_InitForcePowers( ent );
 		goto argCheck;
 	}
 
-	buf = G_GetStringEdString("MP_SVGAME", "FORCEPOWERCHANGED");
-
-	strcpy(fpChStr, buf);
-
-	trap->SendServerCommand( ent-g_entities, va("print \"%s%s\n\n\"", S_COLOR_GREEN, fpChStr) );
+	trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_GREEN"%s\n\"", G_GetStringEdString( "MP_SVGAME", "FORCEPOWERCHANGED" ) ) );
 
 	ent->client->ps.fd.forceDoInit = 1;
-argCheck:
-	if (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL)
-	{ //If this is duel, don't even bother changing team in relation to this.
-		return;
-	}
 
-	if (trap->Argc() > 1)
-	{
-		char	arg[MAX_TOKEN_CHARS];
+argCheck:
+	// if this is duel, don't even bother changing team in relation to this.
+	if ( level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL )
+		return;
+
+	if ( trap->Argc() > 1 ) {
+		char arg[MAX_TOKEN_CHARS];
 
 		trap->Argv( 1, arg, sizeof( arg ) );
 
-		if (arg[0])
-		{ //if there's an arg, assume it's a combo team command from the UI.
-			Cmd_Team_f(ent);
-		}
+		// if there's an arg, assume it's a combo team command from the UI.
+		if ( arg[0] )
+			Cmd_Team_f( ent );
 	}
 }
 
