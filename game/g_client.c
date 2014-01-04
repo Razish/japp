@@ -1312,7 +1312,7 @@ ClientCheckName
 */
 static void ClientCleanName( const char *in, char *out, int outSize )
 {
-	int outpos = 0, colorlessLen = 0, spaces = 0;
+	int outpos = 0, colorlessLen = 0, spaces = 0, ats = 0;
 
 	// discard leading spaces
 	for ( ; *in == ' '; in++);
@@ -1332,7 +1332,15 @@ static void ClientCleanName( const char *in, char *out, int outSize )
 
 			spaces++;
 		}
-		else if ( *in == 0xb || *in == '\n' || *in == '\r' ) {
+		else if ( *in == '@' )
+		{// don't allow too many consecutive at signs
+			if ( ++ats > 2 ) {
+				outpos -= 2;
+				ats = 0;
+				continue;
+			}
+		}
+		else if ( *in < 0x20 ) {
 			outpos--;
 			continue;
 		}
@@ -1352,13 +1360,13 @@ static void ClientCleanName( const char *in, char *out, int outSize )
 			}
 			else
 			{
-				spaces = 0;
+				spaces = ats = 0;
 				colorlessLen++;
 			}
 		}
 		else
 		{
-			spaces = 0;
+			spaces = ats = 0;
 			colorlessLen++;
 		}
 		
