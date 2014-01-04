@@ -675,7 +675,7 @@ void PM_HoverTrace( void )
 
 	pml.groundPlane = qfalse;
 
-	//relativeWaterLevel = (pm->ps->waterheight - (pm->ps->origin.z+pm->mins[2]));
+	//relativeWaterLevel = (pm->ps->waterheight - (pm->ps->origin.z+pm->mins.z));
 	relativeWaterLevel = pm->waterlevel; //I.. guess this works
 	if ( pm->waterlevel && relativeWaterLevel >= 0 )
 	{//in water
@@ -684,10 +684,10 @@ void PM_HoverTrace( void )
 		}
 		else
 		{//rise up
-			float floatHeight = (pVeh->m_pVehicleInfo->bouyancy * ((pm->maxs.data[2]-pm->mins.data[2])*0.5f)) - (hoverHeight*0.5f);//1.0f should make you float half-in, half-out of water
+			float floatHeight = (pVeh->m_pVehicleInfo->bouyancy * ((pm->maxs.z-pm->mins.z)*0.5f)) - (hoverHeight*0.5f);//1.0f should make you float half-in, half-out of water
 			if ( relativeWaterLevel > floatHeight )
 			{//too low, should rise up
-				pm->ps->velocity.data[2] += (relativeWaterLevel - floatHeight) * pVeh->m_fTimeModifier;
+				pm->ps->velocity.z += (relativeWaterLevel - floatHeight) * pVeh->m_fTimeModifier;
 			}
 		}
 		//if ( pm->ps->waterheight < pm->ps->origin.z+pm->maxs[2] )
@@ -865,7 +865,7 @@ void PM_AddTouchEnt( int entityNum ) {
 	if ( entityNum == ENTITYNUM_WORLD )
 		return;
 
-	if ( pm->numtouch == MAXTOUCH )
+	if ( pm->numtouch >= MAXTOUCH )
 		return;
 
 #ifdef _GAME
@@ -1256,7 +1256,6 @@ qboolean PM_ForceJumpingUp(void)
 	}
 
 	if (!BG_CanUseFPNow(pm->gametype, pm->ps, pm->cmd.serverTime, FP_LEVITATION))
-
 	{
 		return qfalse;
 	}
@@ -1588,8 +1587,8 @@ qboolean PM_AdjustAngleForWallJump( playerState_t *ps, usercmd_t *ucmd, qboolean
 		trace_t	trace;
 		float	dist = 128.0f, yawAdjust;
 
-		VectorSet(&mins, pm->mins.x, pm->mins.z, 0);
-		VectorSet(&maxs, pm->maxs.x, pm->maxs.z, 24);
+		VectorSet(&mins, pm->mins.x, pm->mins.y, 0);
+		VectorSet(&maxs, pm->maxs.x, pm->maxs.y, 24);
 		VectorSet(&fwdAngles, 0, pm->ps->viewangles.yaw, 0);
 
 		switch ( ps->legsAnim )
@@ -1690,7 +1689,7 @@ qboolean PM_AdjustAngleForWallJump( playerState_t *ps, usercmd_t *ucmd, qboolean
 		{//jump off
 			//push off of it!
 			ps->pm_flags &= ~PMF_STUCK_TO_WALL;
-			ps->velocity.z = ps->velocity.y = 0;
+			ps->velocity.x = ps->velocity.y = 0;
 			VectorScale( &checkDir, -JUMP_OFF_WALL_SPEED, &ps->velocity );
 			ps->velocity.z = BG_ForceWallJumpStrength();
 			ps->pm_flags |= PMF_JUMP_HELD;//PMF_JUMPING|PMF_JUMP_HELD;
@@ -2764,7 +2763,7 @@ static qboolean PM_CheckJump( void )
 
 						if ( anim == BOTH_WALL_RUN_LEFT_FLIP )
 						{
-							pm->ps->velocity.z *= 0.5f;
+							pm->ps->velocity.x *= 0.5f;
 							pm->ps->velocity.y *= 0.5f;
 							VectorMA( &pm->ps->velocity, 150, &right, &pm->ps->velocity );
 						}
@@ -2960,7 +2959,6 @@ static qboolean PM_CheckJump( void )
 #ifdef KICKFLIP
 							if ( kick && traceEnt && (traceEnt->s.eType == ET_PLAYER || traceEnt->s.eType == ET_NPC) )
 							{ //kick that thang!
-								Com_Printf( "kicking\n\n" );
 								pm->ps->forceKickFlip = traceEnt->s.number+1;
 							}
 #endif
@@ -4049,7 +4047,7 @@ static int PM_TryRoll( void )
 		}
 	}
 
-	VectorSet(&mins, pm->mins.x, pm->mins.y, pm->mins.x+STEPSIZE);
+	VectorSet(&mins, pm->mins.x, pm->mins.y, pm->mins.z+STEPSIZE);
 	VectorSet(&maxs, pm->maxs.x, pm->maxs.y, pm->ps->crouchheight);
 
 	VectorSet(&fwdAngles, 0, pm->ps->viewangles.yaw, 0);
@@ -4712,8 +4710,8 @@ static void PM_SetWaterLevel( void ) {
 	point.x = pm->ps->origin.x;
 	point.y = pm->ps->origin.y;
 	point.z = pm->ps->origin.z + MINS_Z + 1;
-
 	cont = pm->pointcontents( &point, pm->ps->clientNum );
+
 	if ( cont & MASK_WATER ) {
 		sample2 = pm->ps->viewheight - MINS_Z;
 		sample1 = sample2 / 2;
@@ -4721,12 +4719,12 @@ static void PM_SetWaterLevel( void ) {
 		pm->watertype = cont;
 		pm->waterlevel = 1;
 		point.z = pm->ps->origin.z + MINS_Z + sample1;
-
-		if ( pm->pointcontents( &point, pm->ps->clientNum ) & MASK_WATER ) {
+		cont = pm->pointcontents( &point, pm->ps->clientNum );
+		if ( cont & MASK_WATER ) {
 			pm->waterlevel = 2;
 			point.z = pm->ps->origin.z + MINS_Z + sample2;
-
-			if ( pm->pointcontents( &point, pm->ps->clientNum ) & MASK_WATER )
+			cont = pm->pointcontents( &point, pm->ps->clientNum );
+			if ( cont & MASK_WATER )
 				pm->waterlevel = 3;
 		}
 	}
@@ -5136,16 +5134,12 @@ void PM_FootSlopeTrace( float *pDiff, float *pInterval )
 
 	interval = 4;//?
 
-	trap->G2API_GetBoltMatrix( pm->ghoul2, 0, pm->g2Bolts_LFoot, 
-			&boltMatrix, &G2Angles, &pm->ps->origin, pm->cmd.serverTime, 
-					NULL, &pm->modelScale );
+	trap->G2API_GetBoltMatrix( pm->ghoul2, 0, pm->g2Bolts_LFoot, &boltMatrix, &G2Angles, &pm->ps->origin, pm->cmd.serverTime, NULL, &pm->modelScale );
 	footLPoint.x = boltMatrix.matrix[0][3];
 	footLPoint.y = boltMatrix.matrix[1][3];
 	footLPoint.z = boltMatrix.matrix[2][3];
 	
-	trap->G2API_GetBoltMatrix( pm->ghoul2, 0, pm->g2Bolts_RFoot, 
-					&boltMatrix, &G2Angles, &pm->ps->origin, pm->cmd.serverTime, 
-					NULL, &pm->modelScale );
+	trap->G2API_GetBoltMatrix( pm->ghoul2, 0, pm->g2Bolts_RFoot, &boltMatrix, &G2Angles, &pm->ps->origin, pm->cmd.serverTime, NULL, &pm->modelScale );
 	footRPoint.x = boltMatrix.matrix[0][3];
 	footRPoint.y = boltMatrix.matrix[1][3];
 	footRPoint.z = boltMatrix.matrix[2][3];
@@ -5157,13 +5151,12 @@ void PM_FootSlopeTrace( float *pDiff, float *pInterval )
 	//step 2: adjust foot tag z height to bottom of bbox+1
 	footLOrg.z = pm->ps->origin.z + pm->mins.z + 1;
 	footROrg.z = pm->ps->origin.z + pm->mins.z + 1;
-	VectorSet( &footLBot, footLOrg.z, footLOrg.y, footLOrg.z - interval*10 );
-	VectorSet( &footRBot, footROrg.z, footROrg.y, footROrg.z - interval*10 );
+	VectorSet( &footLBot, footLOrg.x, footLOrg.y, footLOrg.z - interval*10 );
+	VectorSet( &footRBot, footROrg.x, footROrg.y, footROrg.z - interval*10 );
 
 	//step 3: trace down from each, find difference
 	VectorSet( &footMins, -3, -3, 0 );
 	VectorSet( &footMaxs, 3, 3, 1 );
-
 
 	pm->trace( &trace, &footLOrg, &footMins, &footMaxs, &footLBot, pm->ps->clientNum, pm->tracemask );
 	VectorCopy( &trace.endpos, &footLBot );
@@ -6123,7 +6116,7 @@ static void PM_Footsteps( void ) {
 	old = pm->ps->bobCycle;
 	pm->ps->bobCycle = (int)( old + bobmove * pml.msec ) & 255;
 
-	// if we just crossed a cycle boundary, play an apropriate footstep event
+	// if we just crossed a cycle boundary, play an appropriate footstep event
 	if ( ( ( old + 64 ) ^ ( pm->ps->bobCycle + 64 ) ) & 128 )
 	{
 		pm->ps->footstepTime = pm->cmd.serverTime + 300;
@@ -8728,7 +8721,7 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 	}
 	else if (ps->fd.forceRageRecoveryTime > svTime)
 	{
-		ps->speed *= 0.75;
+		ps->speed *= 0.75f;
 	}
 
 	if (pm->ps->weapon == WP_DISRUPTOR &&
@@ -8737,21 +8730,13 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 		ps->speed *= 0.5f;
 	}
 
-	//Raz: [SS/C] fd.forceGripCripple after spectating someone who's being gripped
-	if (ps->fd.forceGripCripple && pm->ps->persistant[PERS_TEAM] != TEAM_SPECTATOR)
-	{
-		if (ps->fd.forcePowersActive & (1 << FP_RAGE))
-		{
+	if ( ps->fd.forceGripCripple && pm->ps->persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
+		if ( ps->fd.forcePowersActive & (1 << FP_RAGE) )
 			ps->speed *= 0.9f;
-		}
-		else if (ps->fd.forcePowersActive & (1 << FP_SPEED))
-		{ //force speed will help us escape
+		else if ( ps->fd.forcePowersActive & (1 << FP_SPEED) )
 			ps->speed *= 0.8f;
-		}
 		else
-		{
 			ps->speed *= 0.2f;
-		}
 	}
 
 	if ( BG_SaberInAttack( ps->saberMove ) && cmd->forwardmove < 0 )
@@ -9802,16 +9787,16 @@ void BG_G2PlayerAngles(void *ghoul2, int motionBolt, entityState_t *cent, int ti
 		}
 		else
 		{ //misc emplaced
-			float dif = AngleSubtract(cent_lerpAngles->yaw, facingAngles.yaw);
+			float emplacedDif = AngleSubtract(cent_lerpAngles->yaw, facingAngles.yaw);
 
 			/*
 			if (emplaced->weapon == WP_NONE)
 			{ //offset is a little bit different for the e-web
-				dif -= 16.0f;
+				emplacedDif -= 16.0f;
 			}
 			*/
 
-			VectorSet(&facingAngles, -16.0f, -dif, 0.0f);
+			VectorSet(&facingAngles, -16.0f, -emplacedDif, 0.0f);
 
 			if (cent->legsAnim == BOTH_STRAFE_LEFT1 || cent->legsAnim == BOTH_STRAFE_RIGHT1)
 			{ //try to adjust so it doesn't look wrong
@@ -9820,9 +9805,7 @@ void BG_G2PlayerAngles(void *ghoul2, int motionBolt, entityState_t *cent, int ti
 					*crazySmoothFactor = time + 1000;
 				}
 
-				BG_G2ClientSpineAngles(ghoul2, motionBolt, cent_lerpOrigin, cent_lerpAngles, cent, time,
-					&viewAngles, ciLegs, ciTorso, &angles, &thoracicAngles, &ulAngles, &llAngles, modelScale,
-					tPitchAngle, tYawAngle, corrTime);
+				BG_G2ClientSpineAngles(ghoul2, motionBolt, cent_lerpOrigin, cent_lerpAngles, cent, time, &viewAngles, ciLegs, ciTorso, &angles, &thoracicAngles, &ulAngles, &llAngles, modelScale, tPitchAngle, tYawAngle, corrTime);
 				trap->G2API_SetBoneAngles( ghoul2, 0, "lower_lumbar",	&llAngles, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time );
 				trap->G2API_SetBoneAngles( ghoul2, 0, "upper_lumbar",	&ulAngles, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time );
 				trap->G2API_SetBoneAngles( ghoul2, 0, "cranium",		&vec3_origin, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time );
@@ -9841,15 +9824,12 @@ void BG_G2PlayerAngles(void *ghoul2, int motionBolt, entityState_t *cent, int ti
 				trap->G2API_SetBoneAngles(ghoul2, 0, "cranium", &vec3_origin, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time);
 			}
 
-			VectorScale( &facingAngles, 0.6f, &facingAngles );
-			trap->G2API_SetBoneAngles( ghoul2, 0, "lower_lumbar",	&vec3_origin, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time ); 
-			VectorScale( &facingAngles, 0.8f, &facingAngles );
-			trap->G2API_SetBoneAngles( ghoul2, 0, "upper_lumbar",	&facingAngles, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time ); 
-			VectorScale( &facingAngles, 0.8f, &facingAngles );
-			trap->G2API_SetBoneAngles( ghoul2, 0, "thoracic",		&facingAngles, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time ); 
+			VectorScale( &facingAngles, 0.6f, &facingAngles );	trap->G2API_SetBoneAngles( ghoul2, 0, "lower_lumbar",	&vec3_origin, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time ); 
+			VectorScale( &facingAngles, 0.8f, &facingAngles );	trap->G2API_SetBoneAngles( ghoul2, 0, "upper_lumbar",	&facingAngles, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time ); 
+			VectorScale( &facingAngles, 0.8f, &facingAngles );	trap->G2API_SetBoneAngles( ghoul2, 0, "thoracic",		&facingAngles, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time ); 
 
 			//Now we want the head angled toward where we are facing
-			VectorSet( &facingAngles, 0.0f, dif, 0.0f );
+			VectorSet( &facingAngles, 0.0f, emplacedDif, 0.0f );
 			VectorScale( &facingAngles, 0.6f, &facingAngles );
 			trap->G2API_SetBoneAngles( ghoul2, 0, "cervical", &facingAngles, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, 0, 0, time );
 
@@ -9912,16 +9892,11 @@ static qboolean PM_AdjustAnglesForDualJumpAttack( playerState_t *ps, usercmd_t *
 static QINLINE void PM_CmdForSaberMoves(usercmd_t *ucmd)
 {
 	//DUAL FORWARD+JUMP+ATTACK
-	if ( ( pm->ps->legsAnim == BOTH_JUMPATTACK6
-			&& pm->ps->saberMove == LS_JUMPATTACK_DUAL )
-		|| ( pm->ps->legsAnim == BOTH_BUTTERFLY_FL1 
-			&& pm->ps->saberMove == LS_JUMPATTACK_STAFF_LEFT ) 
-		|| ( pm->ps->legsAnim == BOTH_BUTTERFLY_FR1 
-			&& pm->ps->saberMove == LS_JUMPATTACK_STAFF_RIGHT )
-		|| ( pm->ps->legsAnim == BOTH_BUTTERFLY_RIGHT
-			&& pm->ps->saberMove == LS_BUTTERFLY_RIGHT ) 
-		|| ( pm->ps->legsAnim == BOTH_BUTTERFLY_LEFT 
-			&& pm->ps->saberMove == LS_BUTTERFLY_LEFT ) )
+	if ( (pm->ps->legsAnim == BOTH_JUMPATTACK6		&& pm->ps->saberMove == LS_JUMPATTACK_DUAL) ||
+		 (pm->ps->legsAnim == BOTH_BUTTERFLY_FL1	&& pm->ps->saberMove == LS_JUMPATTACK_STAFF_LEFT) ||
+		 (pm->ps->legsAnim == BOTH_BUTTERFLY_FR1	&& pm->ps->saberMove == LS_JUMPATTACK_STAFF_RIGHT) ||
+		 (pm->ps->legsAnim == BOTH_BUTTERFLY_RIGHT	&& pm->ps->saberMove == LS_BUTTERFLY_RIGHT) ||
+		 (pm->ps->legsAnim == BOTH_BUTTERFLY_LEFT	&& pm->ps->saberMove == LS_BUTTERFLY_LEFT) )
 	{
 		int aLen = PM_AnimLength(0, BOTH_JUMPATTACK6);
 
@@ -10558,6 +10533,21 @@ void PmoveSingle (pmove_t *pmove) {
 
 	pm = pmove;
 
+#ifdef _GAME
+	if ( japp_fixWeaponCharge.integer ) {
+		if (pm->cmd.buttons & BUTTON_ATTACK && pm->cmd.buttons & BUTTON_USE_HOLDABLE)
+		{
+			pm->cmd.buttons &= ~BUTTON_ATTACK;
+			pm->cmd.buttons &= ~BUTTON_USE_HOLDABLE;
+		}
+		if (pm->cmd.buttons & BUTTON_ALT_ATTACK && pm->cmd.buttons & BUTTON_USE_HOLDABLE)
+		{
+			pm->cmd.buttons &= ~BUTTON_ALT_ATTACK;
+			pm->cmd.buttons &= ~BUTTON_USE_HOLDABLE;
+		}
+	}
+#endif
+
 	if (pm->ps->emplacedIndex)
 	{
 		if (pm->cmd.buttons & BUTTON_ALT_ATTACK)
@@ -10626,7 +10616,6 @@ void PmoveSingle (pmove_t *pmove) {
 		pm->ps->saberMove == LS_A_FLIP_SLASH ||*/ pm->ps->saberMove == LS_A_JUMP_T__B_ ||
 		pm->ps->saberMove == LS_DUAL_LR || pm->ps->saberMove == LS_DUAL_FB)
 	{
-#if 1
 		if (pm->ps->legsAnim == BOTH_JUMPFLIPSTABDOWN ||
 			pm->ps->legsAnim == BOTH_JUMPFLIPSLASHDOWN1)
 		{ //flipover medium stance attack
@@ -10636,7 +10625,6 @@ void PmoveSingle (pmove_t *pmove) {
 				PM_SetPMViewAngle(pm->ps, &pm->ps->viewangles, &pm->cmd);
 			}
 		}
-#endif
 		stiffenedUp = qtrue;
 	}
 	else if (
@@ -10884,6 +10872,7 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	PM_CmdForSaberMoves(&pm->cmd);
+
 	BG_AdjustClientSpeed(pm->ps, &pm->cmd, pm->cmd.serverTime);
 
 	if ( pm->ps->stats[STAT_HEALTH] <= 0 ) {
@@ -11486,11 +11475,11 @@ void PmoveSingle (pmove_t *pmove) {
 		PM_HoverTrace();
 	}
 	PM_SetWaterLevel();
-	if (pm->cmd.forcesel != -1 && (pm->ps->fd.forcePowersKnown & (1 << pm->cmd.forcesel)))
+	if (pm->cmd.forcesel != (byte)-1 && (pm->ps->fd.forcePowersKnown & (1 << pm->cmd.forcesel)))
 	{
 		pm->ps->fd.forcePowerSelected = pm->cmd.forcesel;
 	}
-	if (pm->cmd.invensel != -1 && (pm->ps->stats[STAT_HOLDABLE_ITEMS] & (1 << pm->cmd.invensel)))
+	if (pm->cmd.invensel != (byte)-1 && (pm->ps->stats[STAT_HOLDABLE_ITEMS] & (1 << pm->cmd.invensel)))
 	{
 		pm->ps->stats[STAT_HOLDABLE_ITEM] = BG_GetItemIndexByTag(pm->cmd.invensel, IT_HOLDABLE);
 	}
