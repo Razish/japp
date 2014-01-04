@@ -1551,14 +1551,14 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		return;
 	//[/Admin]
 
-	if ( strstr( ent->client->pers.netname, "<Admin>" ) || Q_strchrs( chatText, "\n\r" ) )
+	if ( strstr( ent->client->pers.netname, "<Admin>" ) || Q_strchrs( chatText, "\n\r\x0b" ) )
 		returnToSender = qtrue;
 
 	switch ( mode ) {
 	default:
 	case SAY_ADMIN:
 		G_LogPrintf( "amsay: %s: %s\n", ent->client->pers.netname, chatText );
-		Com_sprintf (name, sizeof(name), S_COLOR_YELLOW"<Admin	>"S_COLOR_WHITE"%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+		Com_sprintf (name, sizeof(name), S_COLOR_YELLOW"<Admin>"S_COLOR_WHITE"%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_YELLOW;
 		break;
 	case SAY_ALL:
@@ -1610,16 +1610,17 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		break;
 	}
 
-	Q_strncpyz( text, chatText, sizeof(text) );
+	Q_strncpyz( text, chatText, sizeof( text ) );
 
-	if ( target ) {
-		G_SayTo( ent, target, mode, color, name, text, locMsg );
+	if ( returnToSender ) {
+		//Raz: Silly kids, make it look like they said something
+		G_SecurityLogPrintf( "%s attempted to send a bogus message: %s\n", ent->client->pers.netnameClean, text );
+		G_SayTo( ent, ent, mode, color, name, text, locMsg );
 		return;
 	}
 
-	if ( returnToSender )
-	{//Raz: Silly kids, make it look like they said something
-		G_SayTo( ent, ent, mode, color, name, text, locMsg );
+	if ( target ) {
+		G_SayTo( ent, target, mode, color, name, text, locMsg );
 		return;
 	}
 
