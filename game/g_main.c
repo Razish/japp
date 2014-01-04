@@ -108,7 +108,7 @@ static void SetCInfo( int check, unsigned int bit ) {
 	if ( check )	cinfo |=  bit;
 	else			cinfo &= ~bit;
 
-	trap->Cvar_Set( "jp_cinfo", va( "%i", cinfo ) );
+	trap->Cvar_Set( "jp_cinfo", va( "%u", cinfo ) );
 	trap->Cvar_Update( &jp_cinfo );
 }
 
@@ -130,6 +130,10 @@ static void CVU_WeaponPU( void ) {
 
 static void CVU_Duel( void ) {
 	SetCInfo( (g_privateDuel.integer & PRIVDUEL_WEAP), CINFO_PRIVDUELWEAP );
+}
+
+static void CVU_BusyAttack( void ) {
+	SetCInfo( !japp_allowBusyAttack.integer, CINFO_NOBUSYATK );
 }
 
 static void CVU_Ledge( void ) {

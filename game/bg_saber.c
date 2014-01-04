@@ -2103,7 +2103,7 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 				VectorSet(&fwdAngles, 0.0f, pm->ps->viewangles.yaw, 0.0f);
 
 				AngleVectors( &fwdAngles, NULL, &right, NULL );
-				pm->ps->velocity.z = pm->ps->velocity.y = 0.0f; 
+				pm->ps->velocity.x = pm->ps->velocity.y = 0.0f; 
 				VectorMA( &pm->ps->velocity, 190.0f, &right, &pm->ps->velocity );
 				if ( pm->ps->fd.saberAnimLevel == SS_STAFF )
 				{
@@ -2889,6 +2889,14 @@ void PM_WeaponLightsaber(void)
 
 	// check for dead player
 	if ( pm->ps->stats[STAT_HEALTH] <= 0 ) {
+		return;
+	}
+
+	if ( GetCInfo( CINFO_NOBUSYATK ) && pm->ps->weaponstate == WEAPON_RAISING && pm->ps->saberMove != LS_READY ) {
+		pm->ps->weaponTime -= pml.msec;
+		if ( pm->ps->weaponTime <= 0 ) {
+			PM_SetSaberMove( LS_READY );
+		}
 		return;
 	}
 
@@ -3851,7 +3859,7 @@ saberInfo_t *BG_MySaber( int clientNum, int saberNum )
 		}
 		return &ent->client->saber[saberNum];
 	}
-#elif defined _CGAME
+#elif defined(_CGAME)
 	clientInfo_t *ci = NULL;
 	if (clientNum < MAX_CLIENTS)
 	{

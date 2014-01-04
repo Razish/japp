@@ -173,15 +173,6 @@ float forceJumpStrength[NUM_FORCE_POWER_LEVELS] =
 	840
 };
 
-static qboolean GetCInfo( int bit ) {
-#ifdef _GAME
-	unsigned int cinfo = jp_cinfo.integer;
-#else
-	unsigned int cinfo = cgs.japp.jp_cinfo;
-#endif
-	return !!(cinfo & bit );
-}
-
 //rww - Get a pointer to the bgEntity by the index
 bgEntity_t *PM_BGEntForNum( int num )
 {

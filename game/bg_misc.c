@@ -3342,3 +3342,14 @@ int BG_GetGametypeForString( const char *gametype )
 	else if ( !Q_stricmp( gametype, "cty" ) )			return GT_CTY;
 	else												return -1;
 }
+
+qboolean GetCInfo( int bit ) {
+#if defined(_GAME)
+	uint32_t cinfo = jp_cinfo.integer;
+#elif defined(_CGAME)
+	uint32_t cinfo = cgs.japp.jp_cinfo;
+#else
+	uint32_t cinfo = 0u;
+#endif
+	return !!(cinfo & bit);
+}

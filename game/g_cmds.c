@@ -3788,7 +3788,7 @@ static void Cmd_AMInfo_f( gentity_t *ent )
 		Q_strcat( buf, sizeof( buf ), va( "    %.03f damage scale\n", g_saberDamageScale.value ) );
 		Q_strcat( buf, sizeof( buf ), va( "    Idle damage %s\n", (japp_saberIdleDamage.integer || japp_saberSystem.integer == SABERSYSTEM_JK2)
 		? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
-		trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", buf ) );
+		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", buf ) );
 		buf[0] = '\0';
 	}
 

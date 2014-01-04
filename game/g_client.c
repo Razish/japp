@@ -2054,10 +2054,8 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		G_SecurityLogPrintf( "ClientUserinfoChanged(): Client %i (%s) userinfo 'cp_pluginDisable' was found, but invalid. [IP: %s]\n", clientNum, client->pers.netname, client->sess.IP );
 
 	s = Info_ValueForKey( userinfo, "cjp_client" );
-	if ( s[0] ) {
-		Com_Printf( "Setting CSF for client %d late\n", clientNum );
+	if ( s[0] )
 		client->pers.CSF |= JAPLUS_CLIENT_FLAGS;
-	}
 
 	// check the item prediction
 	s = Info_ValueForKey( userinfo, "cg_predictItems" );
