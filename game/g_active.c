@@ -3545,14 +3545,12 @@ void ClientThink_real( gentity_t *ent ) {
 			if ( faceKicked && faceKicked->client && faceKicked->health && faceKicked->takedamage )
 			{//push them away and do pain
 				vector3 oppDir;
-				int strength = (int)VectorNormalize2( &client->ps.velocity, &oppDir );
 
-				strength *= 0.05;
-
+				VectorNormalize2( &client->ps.velocity, &oppDir );
 				VectorScale( &oppDir, -1, &oppDir );
 
-				if ( japp_flipKickDamage.value > 0.0f )
-					G_Damage( faceKicked, ent, ent, &oppDir, &client->ps.origin, strength*japp_flipKickDamage.value, DAMAGE_NO_ARMOR, MOD_MELEE );
+				if ( japp_flipKickDamage.integer )
+					G_Damage( faceKicked, ent, ent, &oppDir, &client->ps.origin, japp_flipKickDamage.integer, DAMAGE_NO_ARMOR, MOD_MELEE );
 
 				if ( faceKicked->client->ps.weapon != WP_SABER ||
 					 faceKicked->client->ps.fd.saberAnimLevel != FORCE_LEVEL_3 ||
