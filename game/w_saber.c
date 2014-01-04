@@ -4156,16 +4156,26 @@ static QINLINE qboolean CheckSaberDamageOriginal(gentity_t *self, int rSaberNum,
 			attackStr = self->client->ps.fd.saberAnimLevel;
 		}
 	}
-	else if ( japp_saberIdleDamage.integer &&
-		self->client->ps.saberAttackWound < level.time &&
-		self->client->ps.saberIdleWound < level.time )
-	{ //just touching, do minimal damage and only check for it every 200ms (mainly to cut down on network traffic for hit events)
-		if ( (self->client->saber[0].saberFlags2&SFL2_NO_IDLE_EFFECT) )
-		{//no idle damage or effects
-			return qtrue;//true cause even though we didn't get a hit, we don't want to do those extra traces because the debounce time says not to.
-		}
+	else if ( self->client->ps.saberAttackWound < level.time && self->client->ps.saberIdleWound < level.time ) {
+		// just touching, do minimal damage and only check for it every 200ms (mainly to cut down on network traffic for hit events)
+		// no idle damage or effects
+		if ( (self->client->saber[0].saberFlags2 & SFL2_NO_IDLE_EFFECT) )
+			return qtrue; // true cause even though we didn't get a hit, we don't want to do those extra traces because the debounce time says not to.
+
 		trMask &= ~CONTENTS_LIGHTSABER;
-		dmg = SABER_NONATTACK_DAMAGE;
+
+		if ( d_saberSPStyleDamage.integer ) {
+			if ( BG_SaberInReturn( self->client->ps.saberMove ) || japp_saberIdleDamage.integer )
+				dmg = SABER_NONATTACK_DAMAGE;
+			else
+				dmg = 0;
+		}
+		else if ( japp_saberSystem.integer == SABERSYSTEM_JAPP && BG_SaberInReturn( self->client->ps.saberMove) )
+			dmg = 10 * g_saberDamageScale.value;
+		else if ( japp_saberIdleDamage.integer )
+			dmg = SABER_NONATTACK_DAMAGE;
+		else 
+			dmg = 0;
 		idleDamage = qtrue;
 	}
 	else

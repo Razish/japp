@@ -3545,8 +3545,8 @@ void ClientThink_real( gentity_t *ent ) {
 			if ( faceKicked && faceKicked->client && faceKicked->health && faceKicked->takedamage )
 			{//push them away and do pain
 				vector3 oppDir;
+				float strength = VectorNormalize2( &client->ps.velocity, &oppDir );
 
-				VectorNormalize2( &client->ps.velocity, &oppDir );
 				VectorScale( &oppDir, -1, &oppDir );
 
 				if ( japp_flipKickDamage.integer )
@@ -3571,8 +3571,8 @@ void ClientThink_real( gentity_t *ent ) {
 						faceKicked->client->ps.otherKillerTime = level.time + 5000;
 						faceKicked->client->ps.otherKillerDebounceTime = level.time + 100;
 
-						faceKicked->client->ps.velocity.x = oppDir.x*(strength*40);
-						faceKicked->client->ps.velocity.y = oppDir.y*(strength*40);
+						faceKicked->client->ps.velocity.x = oppDir.x*(strength*2);
+						faceKicked->client->ps.velocity.y = oppDir.y*(strength*2);
 						faceKicked->client->ps.velocity.z = 200;
 					}
 				}

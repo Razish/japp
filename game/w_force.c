@@ -1643,7 +1643,7 @@ void ForceLightningDamage( gentity_t *self, gentity_t *traceEnt, vector3 *dir, v
 			}
 			if (ForcePowerUsableOn(self, traceEnt, FP_LIGHTNING))
 			{
-				int	dmg = Q_irand(1,2); //Q_irand( 1, 3 );
+				int	dmg = japp_forceLightningDamage.integer;
 				
 				int modPowerLevel = -1;
 				

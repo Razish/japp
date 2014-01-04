@@ -2365,7 +2365,7 @@ void CheckTournament( void ) {
 		if (level.numPlayingClients >= 2)
 		{
 // nmckenzie: DUEL_HEALTH
-			if ( g_showDuelHealths.integer >= 1 )
+			if ( g_showDuelHealths.integer )
 			{
 				playerState_t *ps1, *ps2;
 				ps1 = &level.clients[level.sortedClients[0]].ps;
