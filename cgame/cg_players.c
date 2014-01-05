@@ -1476,71 +1476,54 @@ void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *sab
 void ParseRGBSaber(char *str, vector3 *c);
 //[/RGBSabers]
 void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
-	clientInfo_t *ci;
-	clientInfo_t newInfo;
-	const char	*configstring;
-	const char	*v;
-	char		*slash;
+	clientInfo_t *ci, newInfo;
+	const char  *configstring, *v;
 	//[RGBSabers]
-	char		*yo;
+	char *slash, *yo;
 	//[/RGBSabers]
-	void *oldGhoul2;
-	void *oldG2Weapons[MAX_SABERS];
-	int i = 0;
-	int k = 0;
+	void *oldGhoul2, *oldG2Weapons[MAX_SABERS];
+	int i, k, r, g, b, full;
 	qboolean saberUpdate[MAX_SABERS];
 
 	ci = &cgs.clientinfo[clientNum];
 
 	oldGhoul2 = ci->ghoul2Model;
 
-	while (k < MAX_SABERS)
-	{
+	for ( k=0; k<MAX_SABERS; k++ )
 		oldG2Weapons[k] = ci->ghoul2Weapons[k];
-		k++;
-	}
 
 	configstring = CG_ConfigString( clientNum + CS_PLAYERS );
 	if ( !configstring[0] ) {
-		if (ci->ghoul2Model && trap->G2_HaveWeGhoul2Models(ci->ghoul2Model))
-		{ //clean this stuff up first
-			trap->G2API_CleanGhoul2Models(&ci->ghoul2Model);
-		}
-		k = 0;
-		while (k < MAX_SABERS)
-		{
-			if (ci->ghoul2Weapons[k] && trap->G2_HaveWeGhoul2Models(ci->ghoul2Weapons[k]))
-			{
-				trap->G2API_CleanGhoul2Models(&ci->ghoul2Weapons[k]);
-			}
-			k++;
+		// clean this stuff up first
+		if ( ci->ghoul2Model && trap->G2_HaveWeGhoul2Models( ci->ghoul2Model ) )
+			trap->G2API_CleanGhoul2Models( &ci->ghoul2Model );
+
+		for ( k=0; k<MAX_SABERS; k++ ) {
+			if ( ci->ghoul2Weapons[k] && trap->G2_HaveWeGhoul2Models( ci->ghoul2Weapons[k] ) )
+				trap->G2API_CleanGhoul2Models( &ci->ghoul2Weapons[k] );
 		}
 
+		// player just left
 		memset( ci, 0, sizeof( *ci ) );
-		return;		// player just left
+		return;
 	}
 
-	// build into a temp buffer so the defer checks can use
-	// the old value
+	// build into a temp buffer so the defer checks can use the old value
 	memset( &newInfo, 0, sizeof( newInfo ) );
 
 	// isolate the player's name
-	v = Info_ValueForKey(configstring, "n");
-	Q_strncpyz( newInfo.name, v, sizeof( newInfo.name ) );
+	Q_strncpyz( newInfo.name, Info_ValueForKey( configstring, "n" ), sizeof( newInfo.name ) );
 
 	// colors
 	v = Info_ValueForKey( configstring, "c1" );
 	CG_ColorFromString( v, &newInfo.color1 );
-
-	newInfo.icolor1 = atoi(v);
+	newInfo.icolor1 = atoi( v );
 
 	v = Info_ValueForKey( configstring, "c2" );
 	CG_ColorFromString( v, &newInfo.color2 );
-
 	newInfo.icolor2 = atoi(v);
 
 	// bot skill
-	//Raz: Mark those without this key/value as a regular player! bots can have 0 skill
 	v = Info_ValueForKey( configstring, "skill" );
 	if ( v && v[0] )
 		newInfo.botSkill = atoi( v );
@@ -1563,113 +1546,61 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	v = Info_ValueForKey( configstring, "t" );
 	newInfo.team = atoi( v );
 
-//copy team info out to menu
-	if ( clientNum == cg.clientNum)	//this is me
-	{
-		trap->Cvar_Set("ui_team", v);
-	}
+	// copy team info out to menu
+	if ( clientNum == cg.clientNum )
+		trap->Cvar_Set( "ui_team", v );
 
 	//[RGBSabers]
-	//va( "%i", red | ((green | (blue << 8)) << 8));
-	yo = Info_ValueForKey(configstring, "c3");
-	{
-		int red		= atoi(yo) & 255;
-		int green	= (atoi(yo) >> 8) & 255;
-		int blue	= atoi(yo) >> 16;
-		if ( cg.clientNum == clientNum && newInfo.icolor1 == SABER_RGB )
-		{
-			trap->Cvar_Set( "color1", va( "%i", SABER_RGB ) );
-			trap->Cvar_Set( "cp_sbRGB1", yo );
-		}
-
-		ParseRGBSaber( va( "%i,%i,%i", red, green, blue ), &newInfo.rgb1 );
+	yo = Info_ValueForKey( configstring, "c3" );
+	full = atoi( yo );
+	r = full & 255;
+	g = (full >> 8) & 255;
+	b = full >> 16;
+	if ( cg.clientNum == clientNum && newInfo.icolor1 == SABER_RGB ) {
+		trap->Cvar_Set( "color1", va( "%i", SABER_RGB ) );
+		trap->Cvar_Set( "cp_sbRGB1", yo );
 	}
 
-	yo = Info_ValueForKey(configstring, "c4");
-	{
-		int red		= atoi(yo) & 255;
-		int green	= (atoi(yo) >> 8) & 255;
-		int blue	= atoi(yo) >> 16;
-		if ( cg.clientNum == clientNum && newInfo.icolor2 == SABER_RGB )
-		{
-			trap->Cvar_Set( "color2", va( "%i", SABER_RGB ) );
-			trap->Cvar_Set( "cp_sbRGB2", yo );
-		}
+	ParseRGBSaber( va( "%i,%i,%i", r, g, b ), &newInfo.rgb1 );
 
-		ParseRGBSaber( va( "%i,%i,%i", red, green, blue ), &newInfo.rgb2 );
+	yo = Info_ValueForKey( configstring, "c4" );
+	full = atoi( yo );
+	full = atoi( yo );
+	r = full & 255;
+	g = (full >> 8) & 255;
+	b = full >> 16;
+	if ( cg.clientNum == clientNum && newInfo.icolor2 == SABER_RGB ) {
+		trap->Cvar_Set( "color2", va( "%i", SABER_RGB ) );
+		trap->Cvar_Set( "cp_sbRGB2", yo );
 	}
-//	Com_Printf("saber1 : %s\n",yo);
+
+	ParseRGBSaber( va( "%i,%i,%i", r, g, b ), &newInfo.rgb2 );
 	//[/RGBSabers]
 
 	//Raz: Gender hints
-	if ( (v = Info_ValueForKey( configstring, "ds" )) )
-	{
+	if ( (v = Info_ValueForKey( configstring, "ds" )) ) {
 		if ( *v == 'm' )
 			newInfo.gender = GENDER_MALE;
 		else if ( *v == 'f' )
 			newInfo.gender = GENDER_FEMALE;
 		else
 			newInfo.gender = GENDER_NEUTER;
-	}	
+	}
 
 	// team task
 	v = Info_ValueForKey( configstring, "tt" );
-	newInfo.teamTask = atoi(v);
+	newInfo.teamTask = atoi( v );
 
 	// team leader
 	v = Info_ValueForKey( configstring, "tl" );
-	newInfo.teamLeader = atoi(v);
-
-//	v = Info_ValueForKey( configstring, "g_redteam" );
-//	Q_strncpyz(newInfo.redTeam, v, MAX_TEAMNAME);
-
-//	v = Info_ValueForKey( configstring, "g_blueteam" );
-//	Q_strncpyz(newInfo.blueTeam, v, MAX_TEAMNAME);
+	newInfo.teamLeader = atoi( v );
 
 	// model
 	v = Info_ValueForKey( configstring, "model" );
-#if 0
-	if ( cg_forceModel.integer ) {
-		// forcemodel makes everyone use a single model
-		// to prevent load hitches
-		char modelStr[MAX_QPATH];
-		char *skin;
-
-		trap->Cvar_VariableStringBuffer( "model", modelStr, sizeof( modelStr ) );
-		if ( ( skin = strchr( modelStr, '/' ) ) == NULL) {
-			skin = "default";
-		} else {
-			*skin++ = 0;
-		}
-		Q_strncpyz( newInfo.skinName, skin, sizeof( newInfo.skinName ) );
-		Q_strncpyz( newInfo.modelName, modelStr, sizeof( newInfo.modelName ) );
-
-		if ( cgs.gametype >= GT_TEAM ) {
-			// keep skin name
-			slash = strchr( v, '/' );
-			if ( slash ) {
-				Q_strncpyz( newInfo.skinName, slash + 1, sizeof( newInfo.skinName ) );
-			}
-		}
-	} else {
-		Q_strncpyz( newInfo.modelName, v, sizeof( newInfo.modelName ) );
-
-		slash = strchr( newInfo.modelName, '/' );
-		if ( !slash ) {
-			// modelName didn not include a skin name
-			Q_strncpyz( newInfo.skinName, "default", sizeof( newInfo.skinName ) );
-		} else {
-			Q_strncpyz( newInfo.skinName, slash + 1, sizeof( newInfo.skinName ) );
-			// truncate modelName
-			*slash = 0;
-		}
-	}
-#else
 	if ( cg_forceModel.integer && clientNum != cg.clientNum ) {
-		char modelStr[MAX_QPATH] = {0};
-		char *skin = NULL;
+		char modelStr[MAX_QPATH], *skin = NULL;
 
-		//Ally model for teammates unless we're in a non-team game, i.e. FFA where everyone is on TEAM_FREE
+		// ally model for teammates unless we're in a non-team game, i.e. FFA where everyone is on TEAM_FREE
 		if ( cgs.gametype < GT_TEAM || newInfo.team != cgs.clientinfo[cg.snap ? cg.snap->ps.clientNum : cg.clientNum].team )
 			Q_strncpyz( modelStr, cg_forceEnemyModel.string, sizeof( modelStr ) );
 		else
@@ -1683,133 +1614,108 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 		Q_strncpyz( newInfo.skinName, skin, sizeof( newInfo.skinName ) );
 		Q_strncpyz( newInfo.modelName, modelStr, sizeof( newInfo.modelName ) );
 
-	} else {
+	}
+	else {
 		Q_strncpyz( newInfo.modelName, v, sizeof( newInfo.modelName ) );
 
-		slash = strchr( newInfo.modelName, '/' );
-		if ( !slash ) {
-			// modelName didn not include a skin name
+		// modelName didn not include a skin name
+		if ( !(slash=strchr( newInfo.modelName, '/' )) )
 			Q_strncpyz( newInfo.skinName, "default", sizeof( newInfo.skinName ) );
-		} else {
+		else {
 			Q_strncpyz( newInfo.skinName, slash + 1, sizeof( newInfo.skinName ) );
 			// truncate modelName
 			*slash = 0;
 		}
 	}
-#endif
 
-	if (cgs.gametype == GT_SIEGE)
-	{ //entries only sent in siege mode
-		//siege desired team
+	if ( cgs.gametype == GT_SIEGE ) {
+		// entries only sent in siege mode
+		// siege desired team
 		v = Info_ValueForKey( configstring, "sdt" );
-		if (v && v[0])
-		{
-            newInfo.siegeDesiredTeam = atoi(v);
-		}
+		if ( v && v[0] )
+            newInfo.siegeDesiredTeam = atoi( v );
 		else
-		{
 			newInfo.siegeDesiredTeam = 0;
-		}
 
-		//siege classname
+		// siege classname
 		v = Info_ValueForKey( configstring, "siegeclass" );
 		newInfo.siegeIndex = -1;
 
-		if (v)
-		{
-			siegeClass_t *siegeClass = BG_SiegeFindClassByName(v);
+		if ( v ) {
+			siegeClass_t *siegeClass = BG_SiegeFindClassByName( v );
 
-			if (siegeClass)
-			{ //See if this class forces a model, if so, then use it. Same for skin.
-				newInfo.siegeIndex = BG_SiegeFindClassIndexByName(v);
+			if ( siegeClass ) {
+				// see if this class forces a model, if so, then use it. Same for skin.
+				newInfo.siegeIndex = BG_SiegeFindClassIndexByName( v );
 
-				if (siegeClass->forcedModel[0])
-				{
+				if ( siegeClass->forcedModel[0] )
 					Q_strncpyz( newInfo.modelName, siegeClass->forcedModel, sizeof( newInfo.modelName ) );
-				}
 
-				if (siegeClass->forcedSkin[0])
-				{
+				if ( siegeClass->forcedSkin[0] )
 					Q_strncpyz( newInfo.skinName, siegeClass->forcedSkin, sizeof( newInfo.skinName ) );
-				}
 
-				if (siegeClass->hasForcedSaberColor)
-				{
+				if ( siegeClass->hasForcedSaberColor ) {
 					newInfo.icolor1 = siegeClass->forcedSaberColor;
-
 					CG_ColorFromInt( newInfo.icolor1, &newInfo.color1 );
 				}
-				if (siegeClass->hasForcedSaber2Color)
-				{
+				if ( siegeClass->hasForcedSaber2Color ) {
 					newInfo.icolor2 = siegeClass->forcedSaber2Color;
-
 					CG_ColorFromInt( newInfo.icolor2, &newInfo.color2 );
 				}
 			}
 		}
 	}
 
-	saberUpdate[0] = qfalse;
-	saberUpdate[1] = qfalse;
+	saberUpdate[0] = saberUpdate[1] = qfalse;
 
 	//saber being used
 	v = Info_ValueForKey( configstring, "st" );
 	yo = (clientNum == cg.clientNum) ? cg_forceOwnSaber.string : cg_forceEnemySaber.string;
-	if ( v && Q_stricmp( v, ci->saberName ) )
-	{
+	if ( v && Q_stricmp( v, ci->saberName ) ) {
 		if ( yo[0] )
 			Q_strncpyz( newInfo.saberName, yo, sizeof( newInfo.saberName ) );
 		else
 			Q_strncpyz( newInfo.saberName, v, sizeof( newInfo.saberName ) );
 
-		WP_SetSaber(clientNum, newInfo.saber, 0, newInfo.saberName);
+		WP_SetSaber( clientNum, newInfo.saber, 0, newInfo.saberName );
 		saberUpdate[0] = qtrue;
 	}
-	else
-	{
+	else {
 		Q_strncpyz( newInfo.saberName, ci->saberName, sizeof( newInfo.saberName ) );
 		memcpy( &newInfo.saber[0], &ci->saber[0], sizeof( newInfo.saber[0] ) );
 		newInfo.ghoul2Weapons[0] = ci->ghoul2Weapons[0];
 	}
 
 	v = Info_ValueForKey( configstring, "st2" );
-
-	if (v && Q_stricmp(v, ci->saber2Name))
-	{
-		Q_strncpyz( newInfo.saber2Name, v, 64 );
-		WP_SetSaber(clientNum, newInfo.saber, 1, newInfo.saber2Name);
+	if ( v && Q_stricmp( v, ci->saber2Name ) ) {
+		Q_strncpyz( newInfo.saber2Name, v, sizeof( newInfo.saber2Name ) );
+		WP_SetSaber( clientNum, newInfo.saber, 1, newInfo.saber2Name );
 		saberUpdate[1] = qtrue;
 	}
-	else
-	{
-		Q_strncpyz( newInfo.saber2Name, ci->saber2Name, 64 );
-		memcpy(&newInfo.saber[1], &ci->saber[1], sizeof(newInfo.saber[1]));
+	else {
+		Q_strncpyz( newInfo.saber2Name, ci->saber2Name, sizeof( newInfo.saber2Name ) );
+		memcpy( &newInfo.saber[1], &ci->saber[1], sizeof( newInfo.saber[1] ) );
 		newInfo.ghoul2Weapons[1] = ci->ghoul2Weapons[1];
 	}
 
-	if (saberUpdate[0] || saberUpdate[1])
-	{
-		int j = 0;
+	if ( saberUpdate[0] || saberUpdate[1] ) {
+		int j;
 
-		while (j < MAX_SABERS)
-		{
-			if (saberUpdate[j])
-			{
-				if (newInfo.saber[j].model[0])
-				{
-					if (oldG2Weapons[j])
-					{ //free the old instance(s)
-						trap->G2API_CleanGhoul2Models(&oldG2Weapons[j]);
+		for ( j=0; j<MAX_SABERS; j++ ) {
+			if ( saberUpdate[j] ) {
+				if ( newInfo.saber[j].model[0] ) {
+					if ( oldG2Weapons[j] ) {
+						// free the old instance(s)
+						trap->G2API_CleanGhoul2Models( &oldG2Weapons[j] );
 						oldG2Weapons[j] = 0;
 					}
 
-					CG_InitG2SaberData(j, &newInfo);
+					CG_InitG2SaberData( j, &newInfo );
 				}
-				else
-				{
-					if (oldG2Weapons[j])
-					{ //free the old instance(s)
-						trap->G2API_CleanGhoul2Models(&oldG2Weapons[j]);
+				else {
+					if ( oldG2Weapons[j] ) {
+						// free the old instance(s)
+						trap->G2API_CleanGhoul2Models( &oldG2Weapons[j] );
 						oldG2Weapons[j] = 0;
 					}
 				}
@@ -1817,32 +1723,21 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 				cg_entities[clientNum].weapon = 0;
 				cg_entities[clientNum].ghoul2weapon = NULL; //force a refresh
 			}
-			j++;
 		}
 	}
 
-	//Check for any sabers that didn't get set again, if they didn't, then reassign the pointers for the new ci
-	k = 0;
-	while (k < MAX_SABERS)
-	{
-		if (oldG2Weapons[k])
-		{
+	// check for any sabers that didn't get set again, if they didn't, then reassign the pointers for the new ci
+	for ( k=0; k<MAX_SABERS; k++ ) {
+		if ( oldG2Weapons[k] )
 			newInfo.ghoul2Weapons[k] = oldG2Weapons[k];
-		}
-		k++;
 	}
 
 	//duel team
 	v = Info_ValueForKey( configstring, "dt" );
-
-	if (v)
-	{
-		newInfo.duelTeam = atoi(v);
-	}
+	if ( v )
+		newInfo.duelTeam = atoi( v );
 	else
-	{
 		newInfo.duelTeam = 0;
-	}
 
 	// force powers
 	v = Info_ValueForKey( configstring, "forcepowers" );
@@ -1850,156 +1745,118 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 
 	//RAZTODO: Lua event handler for new clientinfo
 
-	if (cgs.gametype >= GT_TEAM	&& !cgs.jediVmerc && cgs.gametype != GT_SIEGE && !cg_forceModel.integer )
-	{ //We won't force colors for siege.
+	// we won't force colors for siege.
+	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE && !cg_forceModel.integer )
 		BG_ValidateSkinForTeam( newInfo.modelName, newInfo.skinName, newInfo.team, &newInfo.colorOverride );
-	}
 	else
-	{
 		newInfo.colorOverride.r = newInfo.colorOverride.g = newInfo.colorOverride.b = 0.0f;
-	}
 
-	// scan for an existing clientinfo that matches this modelname
-	// so we can avoid loading checks if possible
+	// scan for an existing clientinfo that matches this modelname so we can avoid loading checks if possible
 	if ( !CG_ScanForExistingClientInfo( &newInfo, clientNum ) ) {
 		// if we are defering loads, just have it pick the first valid
-		if (cg.snap && cg.snap->ps.clientNum == clientNum)
-		{ //rww - don't defer your own client info ever
+		if ( cg.snap && cg.snap->ps.clientNum == clientNum )
 			CG_LoadClientInfo( &newInfo );
-		}
-		else if ( cg_deferPlayers.integer && cgs.gametype != GT_SIEGE && !cg.loading ) {
-			// keep whatever they had if it won't violate team skins
+		else if ( cg_deferPlayers.integer && cgs.gametype != GT_SIEGE && !cg.loading )
 			CG_SetDeferredClientInfo( &newInfo );
-		} else {
+		else
 			CG_LoadClientInfo( &newInfo );
-		}
 	}
 
 	// replace whatever was there with the new one
 	newInfo.infoValid = qtrue;
-	if (ci->ghoul2Model &&
-		ci->ghoul2Model != newInfo.ghoul2Model &&
-		trap->G2_HaveWeGhoul2Models(ci->ghoul2Model))
-	{ //We must kill this instance before we remove our only pointer to it from the cgame.
-	  //Otherwise we will end up with extra instances all over the place, I think.
-		trap->G2API_CleanGhoul2Models(&ci->ghoul2Model);
+	if ( ci->ghoul2Model && ci->ghoul2Model != newInfo.ghoul2Model && trap->G2_HaveWeGhoul2Models( ci->ghoul2Model ) ) {
+		// we must kill this instance before we remove our only pointer to it from the cgame.
+		//	otherwise we will end up with extra instances all over the place, I think.
+		trap->G2API_CleanGhoul2Models( &ci->ghoul2Model );
 	}
 	*ci = newInfo;
 
-	//force a weapon change anyway, for all clients being rendered to the current client
-	while (i < MAX_CLIENTS)
-	{
+	// force a weapon change anyway, for all clients being rendered to the current client
+	for ( i=0; i<MAX_CLIENTS; i++ )
 		cg_entities[i].ghoul2weapon = NULL;
-		i++;
-	}
 
-	if (clientNum != -1)
-	{ //don't want it using an invalid pointer to share
-		trap->G2API_ClearAttachedInstance(clientNum);
-	}
+	// don't want it using an invalid pointer to share
+	if ( clientNum != -1 )
+		trap->G2API_ClearAttachedInstance( clientNum );
 
 	// Check if the ghoul2 model changed in any way.  This is safer than assuming we have a legal cent shile loading info.
-	if (entitiesInitialized && ci->ghoul2Model && (oldGhoul2 != ci->ghoul2Model))
-	{	// Copy the new ghoul2 model to the centity.
+	if ( entitiesInitialized && ci->ghoul2Model && oldGhoul2 != ci->ghoul2Model ) {
+		// copy the new ghoul2 model to the centity.
 		animation_t *anim;
 		centity_t *cent = &cg_entities[clientNum];
 		
 		anim = &bgHumanoidAnimations[ (cg_entities[clientNum].currentState.legsAnim) ];
 
-		if (anim)
-		{
+		if ( anim ) {
 			int flags = BONE_ANIM_OVERRIDE_FREEZE;
 			int firstFrame = anim->firstFrame;
 			int setFrame = -1;
 			float animSpeed = 50.0f / anim->frameLerp;
 
-			if (anim->loopFrames != -1)
-			{
+			if ( anim->loopFrames != -1 )
 				flags = BONE_ANIM_OVERRIDE_LOOP;
-			}
 
-			if (cent->pe.legs.frame >= anim->firstFrame && cent->pe.legs.frame <= (anim->firstFrame + anim->numFrames))
-			{
+			if ( cent->pe.legs.frame >= anim->firstFrame && cent->pe.legs.frame <= anim->firstFrame+anim->numFrames )
 				setFrame = cent->pe.legs.frame;
-			}
 
 			//rww - Set the animation again because it just got reset due to the model change
-			trap->G2API_SetBoneAnim(ci->ghoul2Model, 0, "model_root", firstFrame, anim->firstFrame + anim->numFrames, flags, animSpeed, cg.time, setFrame, 150);
+			trap->G2API_SetBoneAnim( ci->ghoul2Model, 0, "model_root", firstFrame, anim->firstFrame + anim->numFrames, flags, animSpeed, cg.time, setFrame, 150 );
 
 			cg_entities[clientNum].currentState.legsAnim = 0;
 		}
 
-		anim = &bgHumanoidAnimations[ (cg_entities[clientNum].currentState.torsoAnim) ];
+		anim = &bgHumanoidAnimations[cg_entities[clientNum].currentState.torsoAnim];
 
-		if (anim)
-		{
+		if ( anim ) {
 			int flags = BONE_ANIM_OVERRIDE_FREEZE;
 			int firstFrame = anim->firstFrame;
 			int setFrame = -1;
 			float animSpeed = 50.0f / anim->frameLerp;
 
-			if (anim->loopFrames != -1)
-			{
+			if ( anim->loopFrames != -1 )
 				flags = BONE_ANIM_OVERRIDE_LOOP;
-			}
 
-			if (cent->pe.torso.frame >= anim->firstFrame && cent->pe.torso.frame <= (anim->firstFrame + anim->numFrames))
-			{
+			if ( cent->pe.torso.frame >= anim->firstFrame && cent->pe.torso.frame <= anim->firstFrame+anim->numFrames )
 				setFrame = cent->pe.torso.frame;
-			}
 
 			//rww - Set the animation again because it just got reset due to the model change
-			trap->G2API_SetBoneAnim(ci->ghoul2Model, 0, "lower_lumbar", firstFrame, anim->firstFrame + anim->numFrames, flags, animSpeed, cg.time, setFrame, 150);
+			trap->G2API_SetBoneAnim( ci->ghoul2Model, 0, "lower_lumbar", firstFrame, anim->firstFrame + anim->numFrames, flags, animSpeed, cg.time, setFrame, 150 );
 
 			cg_entities[clientNum].currentState.torsoAnim = 0;
 		}
 
-		if (cg_entities[clientNum].ghoul2 && trap->G2_HaveWeGhoul2Models(cg_entities[clientNum].ghoul2))
-		{
-			trap->G2API_CleanGhoul2Models(&cg_entities[clientNum].ghoul2);
-		}
-		trap->G2API_DuplicateGhoul2Instance(ci->ghoul2Model, &cg_entities[clientNum].ghoul2);
+		if ( cg_entities[clientNum].ghoul2 && trap->G2_HaveWeGhoul2Models( cg_entities[clientNum].ghoul2 ) )
+			trap->G2API_CleanGhoul2Models( &cg_entities[clientNum].ghoul2 );
+		trap->G2API_DuplicateGhoul2Instance( ci->ghoul2Model, &cg_entities[clientNum].ghoul2 );
 
-		if (clientNum != -1)
-		{
-			//Attach the instance to this entity num so we can make use of client-server
-			//shared operations if possible.
-			trap->G2API_AttachInstanceToEntNum(cg_entities[clientNum].ghoul2, clientNum, qfalse);
-		}
+		// attach the instance to this entity num so we can make use of client-server shared operations if possible.
+		if ( clientNum != -1 )
+			trap->G2API_AttachInstanceToEntNum( cg_entities[clientNum].ghoul2, clientNum, qfalse );
 
-		if (trap->G2API_AddBolt(cg_entities[clientNum].ghoul2, 0, "face") == -1)
-		{ //check now to see if we have this bone for setting anims and such
+		// check now to see if we have this bone for setting anims and such
+		if ( trap->G2API_AddBolt( cg_entities[clientNum].ghoul2, 0, "face" ) == -1 )
 			cg_entities[clientNum].noFace = qtrue;
-		}
 
-		cg_entities[clientNum].localAnimIndex = CG_G2SkelForModel(cg_entities[clientNum].ghoul2);
-		cg_entities[clientNum].eventAnimIndex = CG_G2EvIndexForModel(cg_entities[clientNum].ghoul2, cg_entities[clientNum].localAnimIndex);
+		cg_entities[clientNum].localAnimIndex = CG_G2SkelForModel( cg_entities[clientNum].ghoul2 );
+		cg_entities[clientNum].eventAnimIndex = CG_G2EvIndexForModel( cg_entities[clientNum].ghoul2, cg_entities[clientNum].localAnimIndex );
 
-		if (cg_entities[clientNum].currentState.number != cg.predictedPlayerState.clientNum &&
-			cg_entities[clientNum].currentState.weapon == WP_SABER)
+		if ( cg_entities[clientNum].currentState.number != cg.predictedPlayerState.clientNum
+			&& cg_entities[clientNum].currentState.weapon == WP_SABER )
 		{
 			cg_entities[clientNum].weapon = cg_entities[clientNum].currentState.weapon;
-			if (cg_entities[clientNum].ghoul2 && ci->ghoul2Model)
-			{
-				CG_CopyG2WeaponInstance(&cg_entities[clientNum], cg_entities[clientNum].currentState.weapon, cg_entities[clientNum].ghoul2);
-				cg_entities[clientNum].ghoul2weapon = CG_G2WeaponInstance(&cg_entities[clientNum], cg_entities[clientNum].currentState.weapon);
+			if ( cg_entities[clientNum].ghoul2 && ci->ghoul2Model ) {
+				CG_CopyG2WeaponInstance( &cg_entities[clientNum], cg_entities[clientNum].currentState.weapon, cg_entities[clientNum].ghoul2 );
+				cg_entities[clientNum].ghoul2weapon = CG_G2WeaponInstance( &cg_entities[clientNum], cg_entities[clientNum].currentState.weapon );
 			}
-			if (!cg_entities[clientNum].currentState.saberHolstered)
-			{ //if not holstered set length and desired length for both blades to full right now.
+			// if not holstered set length and desired length for both blades to full right now.
+			if ( !cg_entities[clientNum].currentState.saberHolstered ) {
 				int j;
-				BG_SI_SetDesiredLength(&ci->saber[0], 0, -1);
-				BG_SI_SetDesiredLength(&ci->saber[1], 0, -1);
+				BG_SI_SetDesiredLength( &ci->saber[0], 0, -1 );
+				BG_SI_SetDesiredLength( &ci->saber[1], 0, -1 );
 
-				i = 0;
-				while (i < MAX_SABERS)
-				{
-					j = 0;
-					while (j < ci->saber[i].numBlades)
-					{
+				for ( i=0; i<MAX_SABERS; i++ ) {
+					for ( j=0; j<ci->saber[i].numBlades; j++ )
 						ci->saber[i].blade[j].length = ci->saber[i].blade[j].lengthMax;
-						j++;
-					}
-					i++;
 				}
 			}
 		}
