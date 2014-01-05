@@ -1951,7 +1951,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 
 			index = es->eventParm;		// player predicted
 
-			if ( index < 1 || index >= bg_numItems ) {
+			if ( index < 1 || index >= (int)bg_numItems ) {
 				break;
 			}
 			item = &bg_itemlist[ index ];

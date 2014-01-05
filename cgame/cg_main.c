@@ -1401,8 +1401,7 @@ This function may execute for a couple of minutes with a slow disk.
 =================
 */
 static void CG_RegisterGraphics( void ) {
-	int			i;
-	int			breakPoint;
+	size_t		i, breakPoint;
 	char		items[MAX_ITEMS+1];
 	const char	*terrainInfo;
 	int			terrainID;
@@ -1716,7 +1715,7 @@ Ghoul2 Insert End
 	cgs.media.viewPainShader_ShieldsAndHealth	= trap->R_RegisterShader( "gfx/mp/dmgshader_shieldsandhealth" );
 
 	// register the inline models
-	breakPoint = cgs.numInlineModels = trap->CM_NumInlineModels();
+	breakPoint = cgs.numInlineModels = (size_t)trap->CM_NumInlineModels();
 	for ( i = 1 ; i < cgs.numInlineModels ; i++ ) {
 		char	name[10];
 		vector3			mins, maxs;

@@ -1766,7 +1766,7 @@ typedef struct {
 	fxHandle_t		gameEffects[MAX_FX];
 	qhandle_t		gameIcons[MAX_ICONS];
 
-	int				numInlineModels;
+	size_t			numInlineModels;
 	qhandle_t		inlineDrawModel[MAX_MODELS];
 	vector3			inlineModelMidpoints[MAX_MODELS];
 
