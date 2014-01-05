@@ -10312,6 +10312,19 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad )
 
 }
 
+static qhandle_t UI_RegisterShaderNoMip( const char *name ) {
+	if ( *name == '*' ) {
+		char buf[MAX_CVAR_VALUE_STRING];
+
+		trap->Cvar_VariableStringBuffer( name+1, buf, sizeof( buf ) );
+
+		if ( buf[0] )
+			return trap->R_RegisterShaderNoMip( buf );
+	}
+
+	return trap->R_RegisterShaderNoMip( name );
+}
+
 /*
 =================
 UI_Init
@@ -10380,7 +10393,7 @@ void _UI_Init( qboolean inGameLoad ) {
 
 
   //UI_Load();
-	uiInfo.uiDC.registerShaderNoMip				= trap->R_RegisterShaderNoMip;
+	uiInfo.uiDC.registerShaderNoMip				= &UI_RegisterShaderNoMip;
 	uiInfo.uiDC.setColor						= &UI_SetColor;
 	uiInfo.uiDC.drawHandlePic					= &UI_DrawHandlePic;
 	uiInfo.uiDC.drawStretchPic					= trap->R_DrawStretchPic;
