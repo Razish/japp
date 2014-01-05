@@ -22,12 +22,6 @@ elif bits == 64:
 	elif plat == 'Linux':
 		arch = 'x86_64'
 
-if env['PLATFORM'] == 'posix':
-	arch = platform.machine()
-	if ( arch != 'x86_64' ):
-		#HACK: pretend we're i386 for consistent naming schemes
-		arch = 'i386'
-
 print( 'Building for ' + plat + ' (' + str(bits) + ' bits, treated as \'' + arch + '\')' )
 print( '\n********************************\n' )
 
