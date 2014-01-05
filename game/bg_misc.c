@@ -1789,13 +1789,12 @@ qboolean BG_IsValidCharacterModel( const char *modelName, const char *skinName )
 #endif
 }
 
-qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team, vector3 *colors )
-{
-	if (!Q_stricmpn(modelName, "jedi_",5))
-	{ //argh, it's a custom player skin!
-		if (team == TEAM_RED && colors)
+qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team, vector3 *colors ) {
+	if ( strlen( modelName ) > 5 && !Q_stricmpn( modelName, "jedi_", 5 ) ) {
+		//argh, it's a custom player skin!
+		if ( team == TEAM_RED && colors )
 			VectorSet( colors, 1.0f, 0.0f, 0.0f );
-		else if (team == TEAM_BLUE && colors)
+		else if ( team == TEAM_BLUE && colors )
 			VectorSet( colors, 0.0f, 0.0f, 1.0f );
 		return qtrue;
 	}
