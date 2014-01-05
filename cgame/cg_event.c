@@ -1866,7 +1866,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 	case EV_ITEM_PICKUP:
 		DEBUGNAME("EV_ITEM_PICKUP");
 		{
-			gitem_t	*item;
+			const gitem_t *item;
 			int		index;
 			qboolean	newindex = qfalse;
 
@@ -1924,7 +1924,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			//solution then please do use it.
 			cg_entities[es->eventParm].weapon = cg.time+500;
 
-			if ( index < 1 || index >= bg_numItems ) {
+			if ( index < 1 || index >= (int)bg_numItems ) {
 				break;
 			}
 			item = &bg_itemlist[ index ];
@@ -1946,7 +1946,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 	case EV_GLOBAL_ITEM_PICKUP:
 		DEBUGNAME("EV_GLOBAL_ITEM_PICKUP");
 		{
-			gitem_t	*item;
+			const gitem_t	*item;
 			int		index;
 
 			index = es->eventParm;		// player predicted

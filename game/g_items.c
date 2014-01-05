@@ -426,7 +426,7 @@ qboolean PlaceShield(gentity_t *playerent)
 
 			shield->s.eType = ET_SPECIAL;
 			shield->s.modelindex =  HI_SHIELD;	// this'll be used in CG_Useable() for rendering.
-			shield->classname = shieldItem->classname;
+			shield->classname = (char *)shieldItem->classname;
 
 			shield->r.contents = CONTENTS_TRIGGER;
 
@@ -1250,7 +1250,7 @@ void SpecialItemThink(gentity_t *ent)
 	ent->nextthink = level.time + 50;
 }
 
-void G_SpecialSpawnItem(gentity_t *ent, gitem_t *item)
+void G_SpecialSpawnItem(gentity_t *ent, const gitem_t *item)
 {
 	RegisterItem( item );
 	ent->item = item;
@@ -1293,7 +1293,7 @@ void G_SpecialSpawnItem(gentity_t *ent, gitem_t *item)
 
 void G_PrecacheDispensers(void)
 {
-	gitem_t *item;
+	const gitem_t *item;
 		
 	item = BG_FindItem(DISP_HEALTH_ITEM);
 	if (item)
@@ -1310,7 +1310,7 @@ void G_PrecacheDispensers(void)
 
 void ItemUse_UseDisp(gentity_t *ent, int type)
 {
-	gitem_t *item = NULL;
+	const gitem_t *item = NULL;
 	gentity_t *eItem;
 
 	if (!ent->client ||
@@ -1343,7 +1343,7 @@ void ItemUse_UseDisp(gentity_t *ent, int type)
 
 		eItem = G_Spawn();
 		eItem->r.ownerNum = ent->s.number;
-		eItem->classname = item->classname;
+		eItem->classname = (char *)item->classname;
 
 		VectorCopy(&ent->client->ps.origin, &pos);
 		pos.z += ent->client->ps.viewheight;
@@ -2604,7 +2604,7 @@ LaunchItem_Throw
 Spawns an item and tosses it forward
 ================
 */
-gentity_t *LaunchItem_Throw( gitem_t *item, vector3 *origin, vector3 *velocity ) {
+gentity_t *LaunchItem_Throw( const gitem_t *item, vector3 *origin, vector3 *velocity ) {
 	gentity_t	*dropped;
 
 	dropped = G_Spawn();
@@ -2617,7 +2617,7 @@ gentity_t *LaunchItem_Throw( gitem_t *item, vector3 *origin, vector3 *velocity )
 	}
 	dropped->s.modelindex2 = 1; // This is non-zero is it's a dropped item
 
-	dropped->classname = item->classname;
+	dropped->classname = (char *)item->classname;
 	dropped->item = item;
 	VectorSet (&dropped->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, -ITEM_RADIUS);
 	VectorSet (&dropped->r.maxs, ITEM_RADIUS, ITEM_RADIUS, ITEM_RADIUS);
@@ -2681,7 +2681,7 @@ gentity_t *LaunchItem_Throw( gitem_t *item, vector3 *origin, vector3 *velocity )
 	return dropped;
 }
 
-gentity_t *LaunchItem_Drop( gitem_t *item, vector3 *origin, vector3 *dir ) {
+gentity_t *LaunchItem_Drop( const gitem_t *item, vector3 *origin, vector3 *dir ) {
 	gentity_t	*dropped;
 
 	dropped = G_Spawn();
@@ -2692,7 +2692,7 @@ gentity_t *LaunchItem_Drop( gitem_t *item, vector3 *origin, vector3 *dir ) {
 		dropped->s.modelindex = 0;
 	dropped->s.modelindex2 = 1; // This is non-zero if it's a dropped item
 
-	dropped->classname = item->classname;
+	dropped->classname = (char *)item->classname;
 	dropped->item = item;
 	VectorSet( &dropped->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, -ITEM_RADIUS );
 	VectorSet( &dropped->r.maxs, ITEM_RADIUS, ITEM_RADIUS, ITEM_RADIUS );
@@ -2753,7 +2753,7 @@ Drop_Item
 Spawns an item and tosses it forward
 ================
 */
-gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle ) {
+gentity_t *Drop_Item( gentity_t *ent, const  gitem_t *item, float angle ) {
 	vector3	velocity;
 	vector3	angles;
 	vector3	newOrigin;
@@ -3006,7 +3006,7 @@ void G_CheckTeamItems( void ) {
 	Team_InitGame();
 
 	if( level.gametype == GT_CTF || level.gametype == GT_CTY ) {
-		gitem_t	*item;
+		const gitem_t	*item;
 
 		// check for the two flags
 		item = BG_FindItem( "team_CTF_redflag" );
@@ -3047,7 +3047,7 @@ RegisterItem
 The item will be added to the precache list
 ===============
 */
-void RegisterItem( gitem_t *item ) {
+void RegisterItem( const gitem_t *item ) {
 	if ( !item ) {
 		trap->Error( ERR_DROP, "RegisterItem: NULL" );
 	}
@@ -3065,7 +3065,7 @@ so the client will know which ones to precache
 */
 void SaveRegisteredItems( void ) {
 	char	string[MAX_ITEMS+1];
-	int		i;
+	size_t		i;
 	int		count;
 
 	count = 0;
@@ -3088,7 +3088,7 @@ void SaveRegisteredItems( void ) {
 G_ItemDisabled
 ============
 */
-int G_ItemDisabled( gitem_t *item ) {
+int G_ItemDisabled( const gitem_t *item ) {
 
 	char name[128];
 
@@ -3106,7 +3106,7 @@ Items can't be immediately dropped to floor, because they might
 be on an entity that hasn't spawned yet.
 ============
 */
-void G_SpawnItem (gentity_t *ent, gitem_t *item) {
+void G_SpawnItem (gentity_t *ent, const gitem_t *item) {
 	int wDisable = 0;
 
 	G_SpawnFloat( "random", "0", &ent->random );

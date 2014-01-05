@@ -33,10 +33,10 @@ The server says this item is used on this level
 */
 void CG_RegisterItemVisuals( int itemNum ) {
 	itemInfo_t		*itemInfo;
-	gitem_t			*item;
+	const gitem_t	*item;
 	int				handle;
 
-	if ( itemNum < 0 || itemNum >= bg_numItems ) {
+	if ( itemNum < 0 || itemNum >= (int)bg_numItems ) {
 		trap->Error( ERR_DROP, "CG_RegisterItemVisuals: itemNum %d out of range [0-%d]", itemNum, bg_numItems-1 );
 	}
 
@@ -2216,7 +2216,7 @@ static void *g2WeaponInstances[MAX_WEAPONS];
 void CG_InitG2Weapons(void)
 {
 	int i = 0;
-	gitem_t		*item;
+	const gitem_t *item;
 	memset(g2WeaponInstances, 0, sizeof(g2WeaponInstances));
 	for ( item = bg_itemlist + 1 ; item->classname ; item++ ) 
 	{

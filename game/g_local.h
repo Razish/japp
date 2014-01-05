@@ -370,7 +370,7 @@ struct gentity_s {
 	vector3		epVelocity;
 	float		epGravFactor;
 
-	gitem_t		*item;			// for bonus items
+	const gitem_t *item;			// for bonus items
 
 	//Raz: Scooper's userinfo spam code
 	int userinfoChanged;
@@ -864,6 +864,7 @@ typedef enum
 
 typedef enum
 {
+	AEL_NONE=0,
 	AEL_MINOR,			//Enemy responds to the sound, but only by looking
 	AEL_SUSPICIOUS,		//Enemy looks at the sound, and will also investigate it
 	AEL_DISCOVERED,		//Enemy knows the player is around, and will actively hunt
@@ -1090,11 +1091,11 @@ void G_RunItem( gentity_t *ent );
 void RespawnItem( gentity_t *ent );
 
 void UseHoldableItem( gentity_t *ent );
-void PrecacheItem (gitem_t *it);
-gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle );
-gentity_t *LaunchItem_Throw( gitem_t *item, vector3 *origin, vector3 *velocity );
+void PrecacheItem (const gitem_t *it);
+gentity_t *Drop_Item( gentity_t *ent, const gitem_t *item, float angle );
+gentity_t *LaunchItem_Throw( const gitem_t *item, vector3 *origin, vector3 *velocity );
 void SetRespawn (gentity_t *ent, float delay);
-void G_SpawnItem (gentity_t *ent, gitem_t *item);
+void G_SpawnItem (gentity_t *ent, const gitem_t *item);
 void FinishSpawningItem( gentity_t *ent );
 void Think_Weapon (gentity_t *ent);
 int ArmorIndex (gentity_t *ent);
@@ -1102,7 +1103,7 @@ void	Add_Ammo (gentity_t *ent, int weapon, int count);
 void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace);
 
 void ClearRegisteredItems( void );
-void RegisterItem( gitem_t *item );
+void RegisterItem( const gitem_t *item );
 void SaveRegisteredItems( void );
 
 //

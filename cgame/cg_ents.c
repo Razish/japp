@@ -1871,13 +1871,13 @@ CG_Item
 static void CG_Item( centity_t *cent ) {
 	refEntity_t		ent;
 	entityState_t	*es;
-	gitem_t			*item;
+	const gitem_t	*item;
 	int				msec;
 	float			scale;
 	weaponInfo_t	*wi;
 
 	es = &cent->currentState;
-	if ( es->modelindex >= bg_numItems ) {
+	if ( es->modelindex >= (int)bg_numItems ) {
 		trap->Error( ERR_DROP, "Bad item index %i on entity", es->modelindex );
 	}
 

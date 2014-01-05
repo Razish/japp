@@ -339,7 +339,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 	vector4		hcolor;
 	float pwidth, lwidth, maxx, leftOver;
 	clientInfo_t *ci;
-	gitem_t	*item;
+	const gitem_t	*item;
 	qhandle_t h;
 
 	// max player name width

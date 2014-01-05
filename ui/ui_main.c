@@ -352,7 +352,7 @@ int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 	if (!UIPAFtextLoaded || !isHumanoid)
 	{ //rww - We are always using the same animation config now. So only load it once.
 		len = trap->FS_Open( filename, &f, FS_READ );
-		if ( (len <= 0) || (len >= sizeof( UIPAFtext ) - 1) ) 
+		if ( (len <= 0) || (len >= (signed)sizeof( UIPAFtext ) - 1) ) 
 		{
 			if (len > 0)
 			{
@@ -9053,7 +9053,7 @@ void UI_SiegeSetCvarsForClass(siegeClass_t *scl)
 			}
 			else
 			{
-				gitem_t *item = BG_FindItemForWeapon( i );
+				const gitem_t *item = BG_FindItemForWeapon( i );
 				trap->Cvar_Set(va("ui_class_weapon%i", count), item->icon);
 				trap->Cvar_Set(va("ui_class_weapondesc%i", count), item->description);
 				count++;
@@ -9072,7 +9072,7 @@ void UI_SiegeSetCvarsForClass(siegeClass_t *scl)
 	{
 		if (scl->invenItems & (1<<i))
 		{
-			gitem_t *item = BG_FindItemForHoldable(i);
+			const gitem_t *item = BG_FindItemForHoldable(i);
 			trap->Cvar_Set(va("ui_class_item%i", count), item->icon);
 			trap->Cvar_Set(va("ui_class_itemdesc%i", count), item->description);
 			count++;

@@ -1146,37 +1146,31 @@ typedef enum itemType_e {
 	IT_TEAM
 } itemType_t;
 
-#define MAX_ITEM_MODELS 4
+#define MAX_ITEM_MODELS 3
 
 typedef struct gitem_s {
-	char		*classname;	// spawning name
-	char		*pickup_sound;
-	char		*world_model[MAX_ITEM_MODELS];
-	char		*view_model;
-	char		*icon;
-//	char		*pickup_name;	// for printing on pickup
-
-	int			quantity;		// for ammo how much, or duration of powerup
-	itemType_t  giType;			// IT_* flags
-
-	int			giTag;
-
-	char		*precaches;		// string of all models and images this item will use
-	char		*sounds;		// string of all sounds this item will use
-	char		*description;
+	const char		*classname;		// spawning name
+	const char		*pickup_sound;
+	const char		*icon;
+	int				quantity;		// for ammo how much, or duration of powerup
+	itemType_t  	giType;			// IT_* flags
+	int				giTag;
+	const char		*view_model, *world_model[MAX_ITEM_MODELS];
+	const char		*precaches, *sounds;
+	const char 		*description;
 } gitem_t;
 
 // included in both the game dll and the client
 
-extern	gitem_t	bg_itemlist[];
-extern	int		bg_numItems;
+extern const gitem_t bg_itemlist[];
+extern const size_t bg_numItems;
 
 float vectoyaw( const vector3 *vec );
 
-gitem_t	*BG_FindItem( const char *classname );
-gitem_t	*BG_FindItemForWeapon( weapon_t weapon );
-gitem_t	*BG_FindItemForPowerup( powerup_t pw );
-gitem_t	*BG_FindItemForHoldable( holdable_t pw );
+const gitem_t *BG_FindItem( const char *classname );
+const gitem_t *BG_FindItemForWeapon( weapon_t wp );
+const gitem_t *BG_FindItemForPowerup( powerup_t pw );
+const gitem_t *BG_FindItemForHoldable( holdable_t hi );
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
 
 qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps );
@@ -1653,7 +1647,7 @@ int		BG_ParseAnimationEvtFile( const char *as_filename, int animFileIndex, int e
 qboolean BG_HasAnimation(int animIndex, int animation);
 int		BG_PickAnim( int animIndex, int minAnim, int maxAnim );
 
-int BG_GetItemIndexByTag(int tag, int type);
+int BG_GetItemIndexByTag( int tag, itemType_t type );
 
 qboolean BG_IsItemSelectable(playerState_t *ps, int item);
 

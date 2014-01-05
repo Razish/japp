@@ -159,11 +159,11 @@ Give items to a client
 */
 void G_Give( gentity_t *ent, const char *name, const char *args, int argc )
 {
-	gitem_t		*it;
-	int			i;
-	qboolean	give_all = qfalse;
-	gentity_t	*it_ent;
-	trace_t		trace;
+	const gitem_t	*it;
+	int				i;
+	qboolean		give_all = qfalse;
+	gentity_t		*it_ent;
+	trace_t			trace;
 
 	if ( !Q_stricmp( name, "all" ) )
 		give_all = qtrue;
@@ -269,7 +269,7 @@ void G_Give( gentity_t *ent, const char *name, const char *args, int argc )
 
 		it_ent = G_Spawn();
 		VectorCopy( &ent->r.currentOrigin, &it_ent->s.origin );
-		it_ent->classname = it->classname;
+		it_ent->classname = (char *)it->classname;
 		G_SpawnItem( it_ent, it );
 		FinishSpawningItem( it_ent );
 		memset( &trace, 0, sizeof( trace ) );
@@ -1796,8 +1796,8 @@ static char	*gc_orders[] = {
 static size_t numgc_orders = ARRAY_LEN( gc_orders );
 
 void Cmd_GameCommand_f( gentity_t *ent ) {
-	int				targetNum;
-	unsigned int	order;
+	int			targetNum;
+	uint32_t	order;
 	gentity_t	*target;
 	char		arg[MAX_TOKEN_CHARS] = {0};
 
@@ -1809,7 +1809,7 @@ void Cmd_GameCommand_f( gentity_t *ent ) {
 	trap->Argv( 2, arg, sizeof( arg ) );
 	order = atoi( arg );
 
-	if ( order < 0 || order >= numgc_orders ) {
+	if ( order >= numgc_orders ) {
 		trap->SendServerCommand( ent-g_entities, va("print \"Bad order: %i\n\"", order));
 		return;
 	}
@@ -3611,7 +3611,7 @@ void Cmd_Drop_f( gentity_t *ent ) {
 
 		if ( ent->client->ps.powerups[ powerup ] > level.time )
 		{
-			gitem_t *item = BG_FindItemForPowerup( powerup );
+			const gitem_t *item = BG_FindItemForPowerup( powerup );
 			gentity_t *drop = NULL;
 			vector3 angs = { 0.0f, 0.0f, 0.0f };
 
@@ -3629,8 +3629,8 @@ void Cmd_Drop_f( gentity_t *ent ) {
 	}
 	else if ( !Q_stricmp( arg, "weapon" ) )
 	{
-		weapon_t wp = (weapon_t)ent->client->ps.weapon, newWeap = -1;
-		gitem_t *item = NULL;
+		weapon_t wp = (weapon_t)ent->client->ps.weapon, newWeap = WP_NONE;
+		const gitem_t *item = NULL;
 		gentity_t *drop = NULL;
 		vector3 angs = { 0.0f, 0.0f, 0.0f };
 		int ammo, i=0;
@@ -3678,7 +3678,7 @@ void Cmd_Drop_f( gentity_t *ent ) {
 			}
 		}
 
-		if (newWeap != -1)
+		if (newWeap != WP_NONE)
 		{
 			ent->s.weapon = newWeap;
 			ent->client->ps.weapon = newWeap;

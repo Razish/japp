@@ -5010,157 +5010,142 @@ void Item_Multi_Paint(itemDef_t *item) {
 }
 
 
-typedef struct {
-	char	*command;
-	int		id;
-	int		defaultbind1;
-	int		defaultbind2;
-	int		bind1;
-	int		bind2;
+typedef struct bind_s {
+	const char *command;
+	int defaultbind1, defaultbind2;
+	int bind1, bind2;
 } bind_t;
 
-typedef struct
-{
-	char*	name;
-	float	defaultvalue;
-	float	value;	
+typedef struct configcvar_s {
+	const char *name;
+	float defaultvalue, value;	
 } configcvar_t;
 
-
-static bind_t g_bindings[] = 
-{
-	{"+scores",			 A_TAB,				-1,		-1, -1},
-	{"+button2",		 A_ENTER,			-1,		-1, -1},
-	{"+speed", 			 A_SHIFT,			-1,		-1,	-1},
-	{"+forward", 		 A_CURSOR_UP,		-1,		-1, -1},
-	{"+back", 			 A_CURSOR_DOWN,		-1,		-1, -1},
-	{"+moveleft",		 ',',				-1,		-1, -1},
-	{"+moveright", 		 '.',				-1,		-1, -1},
-	{"+moveup",			 A_SPACE,			-1,		-1, -1},
-	{"+movedown",		 'c',				-1,		-1, -1},
-	{"+left", 			 A_CURSOR_LEFT,		-1,		-1, -1},
-	{"+right", 			 A_CURSOR_RIGHT,	-1,		-1, -1},
-	{"+strafe", 		 A_ALT,				-1,		-1, -1},
-	{"+lookup", 		 A_PAGE_DOWN,		-1,		-1, -1},
-	{"+lookdown",	 	 A_DELETE,			-1,		-1, -1},
-	{"+mlook", 			 '/',				-1,		-1, -1},
-	{"centerview",		 A_END,				-1,		-1, -1},
-//	{"+zoom", 			 -1,				-1,		-1, -1},
-	{"weapon 1",		 '1',				-1,		-1, -1},
-	{"weapon 2",		 '2',				-1,		-1, -1},
-	{"weapon 3",		 '3',				-1,		-1, -1},
-	{"weapon 4",		 '4',				-1,		-1, -1},
-	{"weapon 5",		 '5',				-1,		-1, -1},
-	{"weapon 6",		 '6',				-1,		-1, -1},
-	{"weapon 7",		 '7',				-1,		-1, -1},
-	{"weapon 8",		 '8',				-1,		-1, -1},
-	{"weapon 9",		 '9',				-1,		-1, -1},
-	{"weapon 10",		 '0',				-1,		-1, -1},
-	{"saberAttackCycle", 'l',				-1,		-1, -1},
-	{"weapon 11",		 -1,				-1,		-1, -1},
-	{"weapon 12",		 -1,				-1,		-1, -1},
-	{"weapon 13",		 -1,				-1,		-1, -1},
-	{"+attack", 		 A_CTRL,			-1,		-1, -1},
-	{"+altattack", 		-1,					-1,		-1,	-1},
-	{"+use",			-1,					-1,		-1, -1},
-	{"engage_duel",		'h',				-1,		-1, -1},
-	{"taunt",			'u',				-1,		-1, -1},
-	{"bow",				-1,					-1,		-1, -1},
-	{"meditate",		-1,					-1,		-1, -1},
-	{"flourish",		-1,					-1,		-1, -1},
-	{"gloat",			-1,					-1,		-1, -1},
-	{"weapprev",		 '[',				-1,		-1, -1},
-	{"weapnext", 		 ']',				-1,		-1, -1},
-	{"prevTeamMember",	'w',				-1,		-1, -1},
-	{"nextTeamMember",	'r',				-1,		-1, -1},
-	{"nextOrder",		't',				-1,		-1, -1},
-	{"confirmOrder",	'y',				-1,		-1, -1},
-	{"denyOrder",		'n',				-1,		-1, -1},
-	{"taskOffense",		'o',				-1,		-1, -1},
-	{"taskDefense",		'd',				-1,		-1, -1},
-	{"taskPatrol",		'p',				-1,		-1, -1},
-	{"taskCamp",		'c',				-1,		-1, -1},
-	{"taskFollow",		'f',				-1,		-1, -1},
-	{"taskRetrieve",	'v',				-1,		-1, -1},
-	{"taskEscort",		'e',				-1,		-1, -1},
-	{"taskOwnFlag",		'i',				-1,		-1, -1},
-	{"taskSuicide",		'k',				-1,		-1, -1},
-	{"tauntKillInsult", -1,					-1,		-1, -1},
-	{"tauntPraise",		-1,					-1,		-1, -1},
-	{"tauntTaunt",		-1,					-1,		-1, -1},
-	{"tauntDeathInsult",-1,					-1,		-1, -1},
-	{"tauntGauntlet",	-1,					-1,		-1, -1},
-	{"scoresUp",		A_INSERT,			-1,		-1, -1},
-	{"scoresDown",		A_DELETE,			-1,		-1, -1},
-	{"messagemode",		-1,					-1,		-1, -1},
-	{"messagemode2",	-1,					-1,		-1, -1},
-	{"messagemode3",	-1,					-1,		-1, -1},
-	{"messagemode4",	-1,					-1,		-1, -1},
-	{"+use",			-1,					-1,		-1,	-1},
-	{"+force_jump",		-1,					-1,		-1,	-1},
-	{"force_throw",		A_F1,				-1,		-1,	-1},
-	{"force_pull",		A_F2,				-1,		-1,	-1},
-	{"force_speed",		A_F3,				-1,		-1,	-1},
-	{"force_distract",	A_F4,				-1,		-1,	-1},
-	{"force_heal",		A_F5,				-1,		-1,	-1},
-	{"+force_grip",		A_F6,				-1,		-1,	-1},
-	{"+force_lightning",A_F7,				-1,		-1,	-1},
+static bind_t g_bindings[] = {
+	{ "+scores",				A_TAB,				-1,		-1,		-1 },
+	{ "+button2",				A_ENTER,			-1,		-1,		-1 },
+	{ "+speed", 				A_SHIFT,			-1,		-1,		-1 },
+	{ "+forward", 				A_CURSOR_UP,		-1,		-1,		-1 },
+	{ "+back", 					A_CURSOR_DOWN,		-1,		-1,		-1 },
+	{ "+moveleft",				',',				-1,		-1,		-1 },
+	{ "+moveright", 			'.',				-1,		-1,		-1 },
+	{ "+moveup",				A_SPACE,			-1,		-1,		-1 },
+	{ "+movedown",				'c',				-1,		-1,		-1 },
+	{ "+left", 					A_CURSOR_LEFT,		-1,		-1,		-1 },
+	{ "+right", 				A_CURSOR_RIGHT,		-1,		-1,		-1 },
+	{ "+strafe", 				A_ALT,				-1,		-1,		-1 },
+	{ "+lookup", 				A_PAGE_DOWN,		-1,		-1,		-1 },
+	{ "+lookdown",	 			A_DELETE,			-1,		-1,		-1 },
+	{ "+mlook", 				'/',				-1,		-1,		-1 },
+	{ "centerview",				A_END,				-1,		-1,		-1 },
+	{ "weapon 1",				'1',				-1,		-1,		-1 },
+	{ "weapon 2",				'2',				-1,		-1,		-1 },
+	{ "weapon 3",				'3',				-1,		-1,		-1 },
+	{ "weapon 4",				'4',				-1,		-1,		-1 },
+	{ "weapon 5",				'5',				-1,		-1,		-1 },
+	{ "weapon 6",				'6',				-1,		-1,		-1 },
+	{ "weapon 7",				'7',				-1,		-1,		-1 },
+	{ "weapon 8",				'8',				-1,		-1,		-1 },
+	{ "weapon 9",				'9',				-1,		-1,		-1 },
+	{ "weapon 10",				'0',				-1,		-1,		-1 },
+	{ "saberAttackCycle",		'l',				-1,		-1,		-1 },
+	{ "weapon 11",				-1,					-1,		-1,		-1 },
+	{ "weapon 12",				-1,					-1,		-1,		-1 },
+	{ "weapon 13",				-1,					-1,		-1,		-1 },
+	{ "+attack", 				A_CTRL,				-1,		-1,		-1 },
+	{ "+altattack", 			-1,					-1,		-1,		-1 },
+	{ "+use",					-1,					-1,		-1,		-1 },
+	{ "engage_duel",			'h',				-1,		-1,		-1 },
+	{ "taunt",					'u',				-1,		-1,		-1 },
+	{ "bow",					-1,					-1,		-1,		-1 },
+	{ "meditate",				-1,					-1,		-1,		-1 },
+	{ "flourish",				-1,					-1,		-1,		-1 },
+	{ "gloat",					-1,					-1,		-1,		-1 },
+	{ "weapprev",				'[',				-1,		-1,		-1 },
+	{ "weapnext", 				']',				-1,		-1,		-1 },
+	{ "prevTeamMember",			'w',				-1,		-1,		-1 },
+	{ "nextTeamMember",			'r',				-1,		-1,		-1 },
+	{ "nextOrder",				't',				-1,		-1,		-1 },
+	{ "confirmOrder",			'y',				-1,		-1,		-1 },
+	{ "denyOrder",				'n',				-1,		-1,		-1 },
+	{ "taskOffense",			'o',				-1,		-1,		-1 },
+	{ "taskDefense",			'd',				-1,		-1,		-1 },
+	{ "taskPatrol",				'p',				-1,		-1,		-1 },
+	{ "taskCamp",				'c',				-1,		-1,		-1 },
+	{ "taskFollow",				'f',				-1,		-1,		-1 },
+	{ "taskRetrieve",			'v',				-1,		-1,		-1 },
+	{ "taskEscort",				'e',				-1,		-1,		-1 },
+	{ "taskOwnFlag",			'i',				-1,		-1,		-1 },
+	{ "taskSuicide",			'k',				-1,		-1,		-1 },
+	{ "tauntKillInsult",		-1,					-1,		-1,		-1 },
+	{ "tauntPraise",			-1,					-1,		-1,		-1 },
+	{ "tauntTaunt",				-1,					-1,		-1,		-1 },
+	{ "tauntDeathInsult",		-1,					-1,		-1,		-1 },
+	{ "tauntGauntlet",			-1,					-1,		-1,		-1 },
+	{ "scoresUp",				A_INSERT,			-1,		-1,		-1 },
+	{ "scoresDown",				A_DELETE,			-1,		-1,		-1 },
+	{ "messagemode",			-1,					-1,		-1,		-1 },
+	{ "messagemode2",			-1,					-1,		-1,		-1 },
+	{ "messagemode3",			-1,					-1,		-1,		-1 },
+	{ "messagemode4",			-1,					-1,		-1,		-1 },
+	{ "+use",					-1,					-1,		-1,		-1 },
+	{ "+force_jump",			-1,					-1,		-1,		-1 },
+	{ "force_throw",			A_F1,				-1,		-1,		-1 },
+	{ "force_pull",				A_F2,				-1,		-1,		-1 },
+	{ "force_speed",			A_F3,				-1,		-1,		-1 },
+	{ "force_distract",			A_F4,				-1,		-1,		-1 },
+	{ "force_heal",				A_F5,				-1,		-1,		-1 },
+	{ "+force_grip",			A_F6,				-1,		-1,		-1 },
+	{ "+force_lightning",		A_F7,				-1,		-1,		-1 },
 //mp only
-	{"+force_drain",	-1,					-1,		-1,	-1},
-	{"force_rage",		-1,					-1,		-1,	-1},
-	{"force_protect",	-1,					-1,		-1,	-1},
-	{"force_absorb",	-1,					-1,		-1,	-1},
-	{"force_healother",	-1,					-1,		-1,	-1},
-	{"force_forcepowerother",	-1,			-1,		-1,	-1},
-	{"force_seeing",	-1,					-1,		-1,	-1},
+	{ "+force_drain",			-1,					-1,		-1,		-1 },
+	{ "force_rage",				-1,					-1,		-1,		-1 },
+	{ "force_protect",			-1,					-1,		-1,		-1 },
+	{ "force_absorb",			-1,					-1,		-1,		-1 },
+	{ "force_healother",		-1,					-1,		-1,		-1 },
+	{ "force_forcepowerother",	-1,					-1,		-1	,	-1 },
+	{ "force_seeing",			-1,					-1,		-1,		-1 },
 
-	{"+useforce",		-1,					-1,		-1,	-1},
-	{"forcenext",		-1,					-1,		-1,	-1},
-	{"forceprev",		-1,					-1,		-1,	-1},
-	{"invnext",			-1,					-1,		-1,	-1},
-	{"invprev",			-1,					-1,		-1,	-1},
-	{"use_seeker",		-1,					-1,		-1,	-1},
-	{"use_field",		-1,					-1,		-1,	-1},
-	{"use_bacta",		-1,					-1,		-1,	-1},
-	{"use_electrobinoculars",	-1,			-1,		-1,	-1},
-	{"use_sentry",		-1,					-1,		-1,	-1},
-	{"cg_thirdperson !",-1,					-1,		-1,	-1},
-	{"automap_button",	-1,					-1,		-1,	-1},
-	{"automap_toggle",	-1,					-1,		-1,	-1},
-	{"voicechat",		-1,					-1,		-1,	-1},
-
+	{ "+useforce",				-1,					-1,		-1,		-1 },
+	{ "forcenext",				-1,					-1,		-1,		-1 },
+	{ "forceprev",				-1,					-1,		-1,		-1 },
+	{ "invnext",				-1,					-1,		-1,		-1 },
+	{ "invprev",				-1,					-1,		-1,		-1 },
+	{ "use_seeker",				-1,					-1,		-1,		-1 },
+	{ "use_field",				-1,					-1,		-1,		-1 },
+	{ "use_bacta",				-1,					-1,		-1,		-1 },
+	{ "use_electrobinoculars",	-1,					-1,		-1,		-1 },
+	{ "use_sentry",				-1,					-1,		-1,		-1 },
+	{ "cg_thirdperson !",		-1,					-1,		-1,		-1 },
+	{ "automap_button",			-1,					-1,		-1,		-1 },
+	{ "automap_toggle",			-1,					-1,		-1,		-1 },
+	{ "voicechat",				-1,					-1,		-1,		-1 },
 };
-
-
-static const int g_bindCount = sizeof(g_bindings) / sizeof(bind_t);
+static const size_t g_bindCount = ARRAY_LEN( g_bindings );
 
 /*
 =================
 Controls_GetKeyAssignment
 =================
 */
-static void Controls_GetKeyAssignment (char *command, int *twokeys)
-{
-
-	int		count;
-	int		j;
-	char	b[256];
+static void Controls_GetKeyAssignment( const char *command, int *twokeys ) {
+	int count, j;
+	char b[256];
 
 	twokeys[0] = twokeys[1] = -1;
 	count = 0;
 
-	for ( j = 0; j < MAX_KEYS; j++ )
-	{
-		DC->getBindingBuf( j, b, 256 );
-		if ( *b == 0 ) {
+	for ( j=0; j<MAX_KEYS; j++ ) {
+		DC->getBindingBuf( j, b, sizeof( b ) );
+
+		if ( *b == '\0' )
 			continue;
-		}
+
 		if ( !Q_stricmp( b, command ) ) {
 			twokeys[count] = j;
 			count++;
-			if (count == 2) {
+			if ( count == 2 )
 				break;
-			}
 		}
 	}
 }
@@ -5170,29 +5155,16 @@ static void Controls_GetKeyAssignment (char *command, int *twokeys)
 Controls_GetConfig
 =================
 */
-void Controls_GetConfig( void )
-{
-	int		i;
-	int		twokeys[2];
+void Controls_GetConfig( void ) {
+	size_t i;
+	int twokeys[2];
 
 	// iterate each command, get its numeric binding
-	for (i=0; i < g_bindCount; i++)
-	{
-
-		Controls_GetKeyAssignment(g_bindings[i].command, twokeys);
-
+	for ( i=0; i<g_bindCount; i++ ) {
+		Controls_GetKeyAssignment( g_bindings[i].command, twokeys );
 		g_bindings[i].bind1 = twokeys[0];
 		g_bindings[i].bind2 = twokeys[1];
 	}
-
-	//s_controls.invertmouse.curvalue  = DC->getCVarValue( "m_pitch" ) < 0;
-	//s_controls.smoothmouse.curvalue  = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "m_filter" ) );
-	//s_controls.alwaysrun.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_run" ) );
-	//s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cg_autoswitch" ) );
-	//s_controls.sensitivity.curvalue  = UI_ClampCvar( 2, 30, Controls_GetCvarValue( "sensitivity" ) );
-	//s_controls.joyenable.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "in_joystick" ) );
-	//s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05, 0.75, Controls_GetCvarValue( "joy_threshold" ) );
-	//s_controls.freelook.curvalue     = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_freelook" ) );
 }
 
 /*
@@ -5200,85 +5172,63 @@ void Controls_GetConfig( void )
 Controls_SetConfig
 =================
 */
-void Controls_SetConfig(qboolean restart)
-{
-	int		i;
+void Controls_SetConfig( qboolean restart ) {
+	size_t i;
 
 	// iterate each command, get its numeric binding
-	for (i=0; i < g_bindCount; i++)
-	{
-		if (g_bindings[i].bind1 != -1)
-		{	
+	for ( i=0; i<g_bindCount; i++ ) {
+		if ( g_bindings[i].bind1 != -1 ) {	
 			DC->setBinding( g_bindings[i].bind1, g_bindings[i].command );
 
-			if (g_bindings[i].bind2 != -1)
+			if ( g_bindings[i].bind2 != -1 )
 				DC->setBinding( g_bindings[i].bind2, g_bindings[i].command );
 		}
 	}
-
-	//if ( s_controls.invertmouse.curvalue )
-	//	DC->setCVar("m_pitch", va("%f),-fabs( DC->getCVarValue( "m_pitch" ) ) );
-	//else
-	//	trap->Cvar_SetValue( "m_pitch", fabs( trap->Cvar_VariableValue( "m_pitch" ) ) );
-
-	//trap->Cvar_SetValue( "m_filter", s_controls.smoothmouse.curvalue );
-	//trap->Cvar_SetValue( "cl_run", s_controls.alwaysrun.curvalue );
-	//trap->Cvar_SetValue( "cg_autoswitch", s_controls.autoswitch.curvalue );
-	//trap->Cvar_SetValue( "sensitivity", s_controls.sensitivity.curvalue );
-	//trap->Cvar_SetValue( "in_joystick", s_controls.joyenable.curvalue );
-	//trap->Cvar_SetValue( "joy_threshold", s_controls.joythreshold.curvalue );
-	//trap->Cvar_SetValue( "cl_freelook", s_controls.freelook.curvalue );
-//
-//	DC->executeText(EXEC_APPEND, "in_restart\n");
-// ^--this is bad, it shows the cursor during map load, if you need to, add it as an exec cmd to use_joy or something.
 }
 
-
-int BindingIDFromName(const char *name) {
-	int i;
-  for (i=0; i < g_bindCount; i++)
-	{
-		if (Q_stricmp(name, g_bindings[i].command) == 0) {
-			return i;
-		}
+int BindingIDFromName( const char *name ) {
+	size_t i;
+	for ( i=0; i<g_bindCount; i++ ) {
+		if ( !Q_stricmp( name, g_bindings[i].command ) )
+			return (int)i;
 	}
+
 	return -1;
 }
 
 char g_nameBind1[32];
 char g_nameBind2[32];
 
-void BindingFromName(const char *cvar) {
-	int		i, b1, b2;
-	char	sOR[32];
-
+void BindingFromName( const char *cvar ) {
+	size_t i;
+	int b1, b2;
+	char sOR[32];
 
 	// iterate each command, set its default binding
-	for (i=0; i < g_bindCount; i++)
-	{
-		if (Q_stricmp(cvar, g_bindings[i].command) == 0) {
+	for ( i=0; i<g_bindCount; i++ ) {
+		if ( !Q_stricmp( cvar, g_bindings[i].command ) ) {
 			b1 = g_bindings[i].bind1;
-			if (b1 == -1) {
+			if ( b1 == -1 )
 				break;
+			DC->keynumToStringBuf( b1, g_nameBind1, sizeof( g_nameBind1 ) );
+			// do NOT do this or it corrupts asian text!!!
+			Q_strupr( g_nameBind1 );
+
+			b2 = g_bindings[i].bind2;
+			if ( b2 != -1 ) {
+				DC->keynumToStringBuf( b2, g_nameBind2, sizeof( g_nameBind2 ) );
+				// do NOT do this or it corrupts asian text!!!
+				Q_strupr( g_nameBind2 );
+
+				trap->SE_GetStringTextString( "MENUS_KEYBIND_OR", sOR, sizeof( sOR ) );
+
+				strcat( g_nameBind1, va( " %s ", sOR ) );
+				strcat( g_nameBind1, g_nameBind2 );
 			}
-				DC->keynumToStringBuf( b1, g_nameBind1, 32 );
-// do NOT do this or it corrupts asian text!!!					Q_strupr(g_nameBind1);
-
-				b2 = g_bindings[i].bind2;
-				if (b2 != -1)
-				{
-					DC->keynumToStringBuf( b2, g_nameBind2, 32 );
-// do NOT do this or it corrupts asian text!!!					Q_strupr(g_nameBind2);
-
-					trap->SE_GetStringTextString("MENUS_KEYBIND_OR",sOR, sizeof(sOR));
-
-					strcat( g_nameBind1, va(" %s ",sOR));
-					strcat( g_nameBind1, g_nameBind2 );
-				}
 			return;
 		}
 	}
-	strcpy(g_nameBind1, "???");
+	strcpy( g_nameBind1, "???" );
 }
 
 void Item_Slider_Paint(itemDef_t *item) {
@@ -5409,8 +5359,8 @@ qboolean Display_KeyBindPending() {
 }
 
 qboolean Item_Bind_HandleKey(itemDef_t *item, int key, qboolean down) {
-	int			id;
-	int			i;
+	int id;
+	size_t i;
 
 	if (key == A_MOUSE1 && Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory) && !g_waitingForKey)
 	{
@@ -7176,7 +7126,7 @@ typedef struct keywordHash_s
 } keywordHash_t;
 
 int KeywordHash_Key(char *keyword) {
-	int register hash, i;
+	register int hash, i;
 
 	hash = 0;
 	for (i = 0; keyword[i] != '\0'; i++) {

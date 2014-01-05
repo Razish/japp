@@ -1888,7 +1888,7 @@ void ParseAnimationEvtBlock(const char *aeb_filename, animevent_t *animEvents, a
 
 		token = COM_Parse( text_p );
 		eventType = (animEventType_t)GetIDForString(animEventTypeTable, token);
-		if ( eventType == AEV_NONE || eventType == -1 )
+		if ( eventType == AEV_NONE || (signed)eventType == -1 )
 		{//Unrecognized ANIM EVENT TYOE, or we're skipping this line, keep going till you get a good one
 			//Com_Printf(S_COLOR_YELLOW"WARNING: Unknown token %s in animEvent file %s\n", token, aeb_filename );
 			continue;
@@ -2829,9 +2829,6 @@ void BG_SetAnimFinal(playerState_t *ps, animation_t *animations,
 
 	assert(anim > -1);
 	assert(animations[anim].firstFrame > 0 || animations[anim].numFrames > 0);
-
-	//NOTE: Setting blendTime here breaks actual blending..
-	blendTime = 0;
 
 	BG_SaberStartTransAnim(ps->clientNum, ps->fd.saberAnimLevel, ps->weapon, anim, &editAnimSpeed, ps->brokenLimbs);
 

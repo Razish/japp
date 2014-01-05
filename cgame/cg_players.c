@@ -4497,7 +4497,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hModel ) {
 
 	if ( cg_newFX.integer & NEWFX_SIMPLEFLAG )
 	{
-		gitem_t *item = NULL;
+		const gitem_t *item = NULL;
 
 			 if ( cent->currentState.powerups & (1<<PW_REDFLAG) )	item = BG_FindItemForPowerup( PW_REDFLAG );
 		else if ( cent->currentState.powerups & (1<<PW_BLUEFLAG) )	item = BG_FindItemForPowerup( PW_BLUEFLAG );

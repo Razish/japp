@@ -277,10 +277,10 @@ void CG_SetConfigValues( void )
 		redflagId = s[0] - '0';
 		blueflagId = s[1] - '0';
 
-		if ( redflagId >= 0 && redflagId < ARRAY_LEN( ctfFlagStatusRemap ) ) 
+		if ( redflagId >= 0 && redflagId < (signed)ARRAY_LEN( ctfFlagStatusRemap ) ) 
 			cgs.redflag = ctfFlagStatusRemap[redflagId];
 
-		if ( blueflagId >= 0 && blueflagId < ARRAY_LEN( ctfFlagStatusRemap ) ) 
+		if ( blueflagId >= 0 && blueflagId < (signed)ARRAY_LEN( ctfFlagStatusRemap ) ) 
 			cgs.blueflag = ctfFlagStatusRemap[blueflagId];
 	}
 	cg.warmup = atoi( CG_ConfigString( CS_WARMUP ) );

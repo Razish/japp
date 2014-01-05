@@ -376,7 +376,7 @@ void SP_item_botroam( gentity_t *ent )
 
 void SP_gametype_item ( gentity_t* ent )
 {
-	gitem_t *item = NULL;
+	const gitem_t *item = NULL;
 	char *value;
 	int team = -1;
 
@@ -429,7 +429,7 @@ void SP_gametype_item ( gentity_t* ent )
 		if (item)
 		{
 			ent->targetname = NULL;
-			ent->classname = item->classname;
+			ent->classname = (char *)item->classname;
 			G_SpawnItem( ent, item );
 		}
 	}
@@ -847,7 +847,7 @@ static int spawncmp( const void *a, const void *b ) {
 
 qboolean G_CallSpawn( gentity_t *ent ) {
 	spawn_t *s;
-	gitem_t *item;
+	const gitem_t *item;
 	char buf[MAX_STRING_CHARS] = {0};
 
 	if ( !ent->classname ) {

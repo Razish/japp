@@ -1444,17 +1444,17 @@ FIXME: this should go through the snapshot and find the closest enemy
 */
 gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis, qboolean findPlayersFirst, qboolean findClosest )
 {
-	int			num_choices = 0;
-	int			choice[128];//FIXME: need a different way to determine how many choices?
-	gentity_t	*newenemy = NULL;
-	gentity_t	*closestEnemy = NULL;
-	int			entNum;
-	vector3		diff;
-	float		relDist;
-	float		bestDist = Q3_INFINITE;
-	qboolean	failed = qfalse;
-	int			visChecks = (CHECK_360|CHECK_FOV|CHECK_VISRANGE);
-	int			minVis = VIS_FOV;
+	int				num_choices = 0;
+	int				choice[128];//FIXME: need a different way to determine how many choices?
+	gentity_t		*newenemy = NULL;
+	gentity_t		*closestEnemy = NULL;
+	int				entNum;
+	vector3			diff;
+	float			relDist;
+	float			bestDist = Q3_INFINITE;
+	qboolean		failed = qfalse;
+	int				visChecks = (CHECK_360|CHECK_FOV|CHECK_VISRANGE);
+	visibility_t	minVis = VIS_FOV;
 
 	if ( enemyTeam == NPCTEAM_NEUTRAL )
 	{

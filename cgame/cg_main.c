@@ -740,9 +740,9 @@ The server says this item is used on this level
 =================
 */
 static void CG_RegisterItemSounds( int itemNum ) {
-	gitem_t			*item;
+	const gitem_t	*item;
 	char			data[MAX_QPATH];
-	char			*s, *start;
+	const char		*s, *start;
 	int				len;
 
 	item = &bg_itemlist[ itemNum ];
@@ -764,8 +764,7 @@ static void CG_RegisterItemSounds( int itemNum ) {
 
 		len = s-start;
 		if (len >= MAX_QPATH || len < 5) {
-			trap->Error( ERR_DROP, "PrecacheItem: %s has bad precache string", 
-				item->classname);
+			trap->Error( ERR_DROP, "PrecacheItem: %s has bad precache string", item->classname );
 			return;
 		}
 		memcpy (data, start, len);
@@ -907,13 +906,13 @@ void CG_ParseSiegeObjectiveStatus(const char *str);
 extern int cg_beatingSiegeTime;
 extern int cg_siegeWinTeam;
 static void CG_RegisterSounds( void ) {
-	int		i;
-	char	items[MAX_ITEMS+1];
-	const char	*soundName;
+	size_t i;
+	char items[MAX_ITEMS+1];
+	const char *soundName;
 
 	CG_AS_Register();
 
-//	CG_LoadingString( "sounds" );
+	CG_LoadingString( "sounds" );
 
 	trap->S_RegisterSound( "sound/weapons/melee/punch1.mp3" );
 	trap->S_RegisterSound( "sound/weapons/melee/punch2.mp3" );
@@ -1880,13 +1879,13 @@ Ghoul2 Insert End
 }
 
 
-const char *CG_GetStringEdString(char *refSection, char *refName)
+const char *CG_GetStringEdString(const char *refSection, const char *refName)
 {
 	static char text[2][1024]={{0}};	//just incase it's nested
 	static int		index = 0;
 
 	index ^= 1;
-	trap->SE_GetStringTextString(va("%s_%s", refSection, refName), text[index], sizeof(text[0]));
+	trap->SE_GetStringTextString( va( "%s_%s", refSection, refName ), text[index], sizeof( text[0] ) );
 	return text[index];
 }
 
@@ -2395,7 +2394,7 @@ static clientInfo_t * CG_InfoFromScoreIndex(int index, int team, int *scoreIndex
 
 static const char *CG_FeederItemText(float feederID, int index, int column,
 									 qhandle_t *handle1, qhandle_t *handle2, qhandle_t *handle3) {
-	gitem_t *item;
+	const gitem_t *item;
 	int scoreIndex = 0;
 	clientInfo_t *info = NULL;
 	int team = -1;
@@ -2560,67 +2559,56 @@ CG_LoadMenus();
 
 =================
 */
-void CG_LoadMenus(const char *menuFile) 
-{
-	const char	*token;
-	const char	*p;
-	int	len;
-	fileHandle_t	f;
+void CG_LoadMenus( const char *menuFile ) {
+	const char *token, *p;
+	int len;
+	fileHandle_t f;
 	static char buf[MAX_MENUDEFFILE];
 
 	len = trap->FS_Open( menuFile, &f, FS_READ );
 
-	if ( !f ) 
-	{
-		trap->Print( va( S_COLOR_RED "menu file not found: %s, using default\n", menuFile ) );
+	if ( !f ) {
+		if ( Q_StringIsInteger( menuFile ) )
+			trap->Print( S_COLOR_GREEN "hud menu file skipped, using default\n" );
+		else
+			trap->Print( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
 
 		len = trap->FS_Open( "ui/jahud.txt", &f, FS_READ );
-		if (!f) 
-		{
-			trap->Print( va( S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n", menuFile ) );
+		if ( !f ) {
+			trap->Error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n", menuFile );
+			return;
 		}
 	}
 
-	if ( len >= MAX_MENUDEFFILE ) 
-	{
-		trap->Print( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE ) );
+	if ( len >= MAX_MENUDEFFILE ) {
+		trap->Error( ERR_DROP, S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE );
 		trap->FS_Close( f );
 		return;
 	}
 
 	trap->FS_Read( buf, len, f );
-	buf[len] = 0;
+	buf[len] = '\0';
 	trap->FS_Close( f );
-	
+
 	p = buf;
 
-	while ( 1 ) 
-	{
+	while ( 1 ) {
 		token = COM_ParseExt( &p, qtrue );
-		if( !token || token[0] == 0 || token[0] == '}') 
-		{
+		if ( !token || token[0] == '\0' || token[0] == '}' )
 			break;
-		}
 
-		if ( Q_stricmp( token, "}" ) == 0 ) 
-		{
+		if ( Q_stricmp( token, "}" ) == 0 )
 			break;
-		}
 
-		if (Q_stricmp(token, "loadmenu") == 0) 
-		{
-			if (CG_Load_Menu(&p)) 
-			{
+		if ( !Q_stricmp( token, "loadmenu" ) ) {
+			if ( CG_Load_Menu( &p ) )
 				continue;
-			} 
-			else 
-			{
+			else
 				break;
-			}
 		}
 	}
 
-	//Com_Printf("UI menu load time = %d milli seconds\n", cgi_Milliseconds() - start);
+//	trap->Print( "UI menu load time = %d milli seconds\n", trap->Milliseconds() - start );
 }
 
 /*
@@ -3185,10 +3173,10 @@ Will perform callbacks to make the loading info screen update.
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback )
 {
-	static gitem_t *item;
+	static const gitem_t *item;
 	char buf[64];
 	const char	*s;
-	int i = 0;
+	size_t i = 0;
 
 	BG_InitAnimsets(); //clear it out
 

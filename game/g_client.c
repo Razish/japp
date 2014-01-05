@@ -1926,12 +1926,12 @@ void SV_ToggleUserinfoValidation_f( void ) {
 	}
 	else {
 		char arg[8]={0};
-		unsigned int index;
+		uint32_t index;
 
 		trap->Argv( 1, arg, sizeof( arg ) );
 		index = atoi( arg );
 
-		if ( index < 0 || index > numUserinfoFields+USERINFO_VALIDATION_MAX-1 ) {
+		if ( index > numUserinfoFields+USERINFO_VALIDATION_MAX-1 ) {
 			Com_Printf( "ToggleUserinfoValidation: Invalid range: %i [0, %i]\n", index, numUserinfoFields+USERINFO_VALIDATION_MAX-1 );
 			return;
 		}

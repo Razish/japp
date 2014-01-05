@@ -1165,7 +1165,7 @@ typedef struct gameExport_s {
 	qboolean	(*NAV_EntIsBreakable)				( int entityNum );
 	qboolean	(*NAV_EntIsRemovableUsable)			( int entNum );
 	void		(*NAV_FindCombatPointWaypoints)		( void );
-	int			(*BG_GetItemIndexByTag)				( int tag, int type );
+	int			(*BG_GetItemIndexByTag)				( int tag, itemType_t type );
 } gameExport_t;
 
 //linking of game library

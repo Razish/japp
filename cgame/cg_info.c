@@ -30,20 +30,19 @@ CG_LoadingItem
 ===================
 */
 void CG_LoadingItem( int itemNum ) {
-	gitem_t		*item;
-	char	upperKey[1024];
+	const gitem_t *item;
+	char upperKey[1024];
 
 	item = &bg_itemlist[itemNum];
 
-	if (!item->classname || !item->classname[0])
-	{
-	//	CG_LoadingString( "Unknown item" );
+	if ( !item->classname || !item->classname[0] ) {
+		CG_LoadingString( "Unknown item" );
 		return;
 	}
 
-	strcpy(upperKey, item->classname);
+	strcpy( upperKey, item->classname );
 	Q_strupr( upperKey );
-	CG_LoadingString( CG_GetStringEdString("SP_INGAME", upperKey) );
+	CG_LoadingString( CG_GetStringEdString( "SP_INGAME", upperKey ) );
 }
 
 /*

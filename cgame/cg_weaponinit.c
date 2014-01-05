@@ -13,7 +13,7 @@ The server says this item is used on this level
 */
 void CG_RegisterWeapon( int weaponNum) {
 	weaponInfo_t	*weaponInfo;
-	gitem_t			*item, *ammo;
+	const gitem_t	*item, *ammo;
 	char			path[MAX_QPATH];
 	vector3			mins, maxs;
 	int				i;

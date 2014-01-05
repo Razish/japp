@@ -276,7 +276,7 @@ elif plat == 'Windows':
 # compiler options
 if plat == 'Linux':
 	env['CPPDEFINES'] = [ '__GCC__' ]
-	env['CCFLAGS'] = [ '-Wall', '-Wno-missing-braces' ]
+	env['CCFLAGS'] = [ '-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-missing-field-initializers', '-Wno-sign-compare', '-Wno-unused-parameter' ]
 	# this may not be necessary
 	#if bits == 32:
 	#	env['CCFLAGS'] += [ '-m32' ]

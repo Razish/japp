@@ -241,7 +241,7 @@ rww - Toss the weapon away from the player in the specified direction
 void TossClientWeapon(gentity_t *self, vector3 *direction, float speed)
 {
 	vector3 vel;
-	gitem_t *item;
+	const gitem_t *item;
 	gentity_t *launched;
 	int weapon = self->s.weapon;
 	int ammoSub;
@@ -338,11 +338,11 @@ Toss the weapon and powerups for the killed player
 =================
 */
 void TossClientItems( gentity_t *self ) {
-	gitem_t		*item;
-	int			weapon;
-	float		angle;
-	int			i;
-	gentity_t	*drop;
+	const gitem_t	*item;
+	int				weapon;
+	float			angle;
+	int				i;
+	gentity_t		*drop;
 
 	if (level.gametype == GT_SIEGE)
 	{ //just don't drop anything then
@@ -2227,7 +2227,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 		killerName = "<world>";
 	}
 
-	if ( meansOfDeath < 0 || meansOfDeath >= sizeof( modNames ) / sizeof( modNames[0] ) ) {
+	if ( meansOfDeath < 0 || meansOfDeath >= (int)ARRAY_LEN( modNames ) ) {
 		obit = "<bad obituary>";
 	} else {
 		obit = modNames[ meansOfDeath ];

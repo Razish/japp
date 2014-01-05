@@ -1,4 +1,4 @@
 #!/bin/sh
-scons game=1
-scons cgame=1
-scons ui=1
+scons game=1 > /dev/null
+scons cgame=1 > /dev/null
+scons ui=1 > /dev/null

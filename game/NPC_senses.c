@@ -317,10 +317,10 @@ visibility_t NPC_CheckVisibility ( gentity_t *ent, int flags )
 NPC_CheckSoundEvents
 -------------------------
 */
-static int G_CheckSoundEvents( gentity_t *self, float maxHearDist, int ignoreAlert, qboolean mustHaveOwner, int minAlertLevel )
+static int G_CheckSoundEvents( gentity_t *self, float maxHearDist, int ignoreAlert, qboolean mustHaveOwner, alertEventLevel_e minAlertLevel )
 {
 	int	bestEvent = -1;
-	int bestAlert = -1;
+	alertEventLevel_e bestAlert = AEL_NONE;
 	int	bestTime = -1;
 	int i;
 	float dist, radius;
@@ -393,7 +393,7 @@ float G_GetLightLevel( vector3 *pos, vector3 *fromDir )
 NPC_CheckSightEvents
 -------------------------
 */
-static int G_CheckSightEvents( gentity_t *self, int hFOV, int vFOV, float maxSeeDist, int ignoreAlert, qboolean mustHaveOwner, int minAlertLevel )
+static int G_CheckSightEvents( gentity_t *self, int hFOV, int vFOV, float maxSeeDist, int ignoreAlert, qboolean mustHaveOwner, alertEventLevel_e minAlertLevel )
 {
 	int	bestEvent = -1;
 	int bestAlert = -1;

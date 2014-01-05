@@ -536,7 +536,7 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean fo
 		}
 		CG_Draw3DModel( x, y, w, h, handle, NULL, 0, 0, &origin, &angles );
 	} else if ( cg_drawIcons.integer ) {
-		gitem_t *item = NULL;
+		const gitem_t *item = NULL;
 
 			 if ( team == TEAM_RED )	item = BG_FindItemForPowerup( PW_REDFLAG );
 		else if ( team == TEAM_BLUE )	item = BG_FindItemForPowerup( PW_BLUEFLAG );
@@ -4145,7 +4145,7 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 	int plyrs;
 	char st[16];
 	clientInfo_t *ci;
-	gitem_t	*item;
+	const gitem_t *item;
 	int ret_y, count;
 	int xOffset = 0;
 
@@ -4313,7 +4313,7 @@ static void CG_DrawPowerupIcons(int y)
 	int ico_size = 64;
 	//int y = ico_size/2;
 	int xOffset = 0;
-	gitem_t	*item;
+	const gitem_t	*item;
 
 	trap->R_SetColor( NULL );
 

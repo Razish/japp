@@ -656,7 +656,7 @@ typedef struct {
 // weapon and its effects
 typedef struct weaponInfo_s {
 	qboolean		registered;
-	gitem_t			*item;
+	const gitem_t	*item;
 
 	qhandle_t		handsModel;			// the hands don't actually draw, they just position the weapon
 	qhandle_t		weaponModel;		// this is the pickup model
@@ -2157,7 +2157,7 @@ void		BG_CycleInven(playerState_t *ps, int direction);
 int			BG_ProperForceIndex(int power);
 void		BG_CycleForce(playerState_t *ps, int direction);
 
-const char *CG_GetStringEdString(char *refSection, char *refName);
+const char *CG_GetStringEdString( const char *refSection, const char *refName );
 
 void FX_TurretProjectileThink(  centity_t *cent, const struct weaponInfo_s *weapon );
 void FX_TurretHitWall( vector3 *origin, vector3 *normal );
