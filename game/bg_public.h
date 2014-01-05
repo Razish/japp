@@ -1529,7 +1529,7 @@ extern saberMoveData_t	saberMoveData[LS_MOVE_MAX];
 
 bgEntity_t *PM_BGEntForNum( int num );
 qboolean BG_KnockDownable(playerState_t *ps);
-qboolean BG_LegalizedForcePowers(char *powerOut, int maxRank, qboolean freeSaber, int teamForce, int gametype, int fpDisabled);
+qboolean BG_LegalizedForcePowers(char *powerOut, size_t powerOutSize, int maxRank, qboolean freeSaber, int teamForce, int gametype, int fpDisabled);
 
 
 #ifdef __LCC__ //can't inline it then, it is declared over in bg_misc in this case
