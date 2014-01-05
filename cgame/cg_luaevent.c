@@ -14,6 +14,7 @@ stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 	ENUM2STRING(JPLUA_EVENT_CHATMSGRECV),
 	ENUM2STRING(JPLUA_EVENT_CHATMSGSEND),
 	ENUM2STRING(JPLUA_EVENT_CLIENTCONNECT),
+	ENUM2STRING(JPLUA_EVENT_CLIENTINFO),
 	ENUM2STRING(JPLUA_EVENT_PAIN),
 	ENUM2STRING(JPLUA_EVENT_SABERTOUCH),
 };
@@ -199,6 +200,93 @@ void JPLua_Event_ClientConnect( int clientNum ) {
 		}
 	}
 #endif // JPLUA
+}
+
+void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientInfo_t *newInfo ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTINFO] ) {
+			int top1, top2, i;
+
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTINFO] );
+
+			// Create a player instance for this client number and push on stack
+			JPLua_Player_CreateRef( JPLua.state, clientNum );
+
+			for ( i=0; i<2; i++ ) {
+				clientInfo_t *ci = i ? newInfo : oldInfo;
+				lua_newtable( JPLua.state );
+				top1 = lua_gettop( JPLua.state );
+
+				lua_pushstring( JPLua.state, "colorOverride" );
+				lua_newtable( JPLua.state ); top2 = lua_gettop( JPLua.state );
+				lua_pushstring( JPLua.state, "r" );				lua_pushnumber( JPLua.state, ci->colorOverride.r );	lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "g" );				lua_pushnumber( JPLua.state, ci->colorOverride.g );	lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "b" );				lua_pushnumber( JPLua.state, ci->colorOverride.b );	lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "a" );				lua_pushnumber( JPLua.state, ci->colorOverride.a );	lua_settable( JPLua.state, top2 );
+				lua_settable( JPLua.state, top1 );
+
+				lua_pushstring( JPLua.state, "saberName" );		lua_pushstring( JPLua.state, ci->saberName );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "saber2Name" );	lua_pushstring( JPLua.state, ci->saber2Name );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "name" );			lua_pushstring( JPLua.state, ci->name );			lua_settable( JPLua.state, top1 );
+
+				lua_pushstring( JPLua.state, "team" );			lua_pushnumber( JPLua.state, ci->team );			lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "duelTeam" );		lua_pushnumber( JPLua.state, ci->duelTeam );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "botSkill" );		lua_pushnumber( JPLua.state, ci->botSkill );		lua_settable( JPLua.state, top1 );
+
+				lua_pushstring( JPLua.state, "color1" );
+				lua_newtable( JPLua.state ); top2 = lua_gettop( JPLua.state );
+				lua_pushstring( JPLua.state, "r" );				lua_pushnumber( JPLua.state, ci->color1.r );		lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "g" );				lua_pushnumber( JPLua.state, ci->color1.g );		lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "b" );				lua_pushnumber( JPLua.state, ci->color1.b );		lua_settable( JPLua.state, top2 );
+				lua_settable( JPLua.state, top1 );
+
+				lua_pushstring( JPLua.state, "color2" );
+				lua_newtable( JPLua.state ); top2 = lua_gettop( JPLua.state );
+				lua_pushstring( JPLua.state, "r" );				lua_pushnumber( JPLua.state, ci->color2.r );		lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "g" );				lua_pushnumber( JPLua.state, ci->color2.g );		lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "b" );				lua_pushnumber( JPLua.state, ci->color2.b );		lua_settable( JPLua.state, top2 );
+				lua_settable( JPLua.state, top1 );
+
+				lua_pushstring( JPLua.state, "rgb1" );
+				lua_newtable( JPLua.state ); top2 = lua_gettop( JPLua.state );
+				lua_pushstring( JPLua.state, "r" );				lua_pushnumber( JPLua.state, ci->rgb1.r );			lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "g" );				lua_pushnumber( JPLua.state, ci->rgb1.g );			lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "b" );				lua_pushnumber( JPLua.state, ci->rgb1.b );			lua_settable( JPLua.state, top2 );
+				lua_settable( JPLua.state, top1 );
+
+				lua_pushstring( JPLua.state, "rgb2" );
+				lua_newtable( JPLua.state ); top2 = lua_gettop( JPLua.state );
+				lua_pushstring( JPLua.state, "r" );				lua_pushnumber( JPLua.state, ci->rgb2.r );			lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "g" );				lua_pushnumber( JPLua.state, ci->rgb2.g );			lua_settable( JPLua.state, top2 );
+				lua_pushstring( JPLua.state, "b" );				lua_pushnumber( JPLua.state, ci->rgb2.b );			lua_settable( JPLua.state, top2 );
+				lua_settable( JPLua.state, top1 );
+
+				lua_pushstring( JPLua.state, "icolor1" );		lua_pushnumber( JPLua.state, ci->icolor1 );			lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "icolor2" );		lua_pushnumber( JPLua.state, ci->icolor2 );			lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "score" );			lua_pushnumber( JPLua.state, ci->score );			lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "location" );		lua_pushnumber( JPLua.state, ci->location );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "health" );		lua_pushnumber( JPLua.state, ci->health );			lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "armor" );			lua_pushnumber( JPLua.state, ci->armor );			lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "curWeapon" );		lua_pushnumber( JPLua.state, ci->curWeapon );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "handicap" );		lua_pushnumber( JPLua.state, ci->handicap );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "wins" );			lua_pushnumber( JPLua.state, ci->wins );			lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "losses" );		lua_pushnumber( JPLua.state, ci->losses );			lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "teamTask" );		lua_pushnumber( JPLua.state, ci->teamTask );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "teamLeader" );	lua_pushboolean( JPLua.state, ci->teamLeader );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "powerups" );		lua_pushnumber( JPLua.state, ci->powerups );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "modelName" );		lua_pushstring( JPLua.state, ci->saberName );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "skinName" );		lua_pushstring( JPLua.state, ci->saberName );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "forcePowers" );	lua_pushstring( JPLua.state, ci->forcePowers );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "teamName" );		lua_pushstring( JPLua.state, ci->teamName );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "deferred" );		lua_pushboolean( JPLua.state, ci->deferred );		lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "gender" );		lua_pushnumber( JPLua.state, ci->gender );			lua_settable( JPLua.state, top1 );
+			}
+
+			JPLUACALL( JPLua.state, 3, 0 );
+		}
+	}
+#endif
 }
 
 void JPLua_Event_Pain( int clientNum, int health ) {

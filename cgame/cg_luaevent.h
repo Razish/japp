@@ -11,6 +11,7 @@ typedef enum jplua_event_e {
 	JPLUA_EVENT_CHATMSGRECV,
 	JPLUA_EVENT_CHATMSGSEND,
 	JPLUA_EVENT_CLIENTCONNECT,
+	JPLUA_EVENT_CLIENTINFO,
 	JPLUA_EVENT_PAIN,
 	JPLUA_EVENT_SABERTOUCH,
 	JPLUA_EVENT_MAX
@@ -27,6 +28,7 @@ qboolean JPLua_Event_HUD( void );
 char *JPLua_Event_ChatMessageRecieved( const char *msg );
 char *JPLua_Event_ChatMessageSent( const char *msg );
 void JPLua_Event_ClientConnect( int clientNum );
+void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientInfo_t *newInfo );
 void JPLua_Event_Pain( int clientNum, int health );
 void JPLua_Event_SaberTouch( int victim, int attacker );
 

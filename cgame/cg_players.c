@@ -5,6 +5,7 @@
 #include "shared/Ghoul2/G2.h"
 #include "bg_saga.h"
 #include "fx_local.h"
+#include "cg_luaevent.h"
 
 //[TrueView]
 extern void CheckCameraLocation( vector3 *OldeyeOrigin );
@@ -1743,7 +1744,7 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	v = Info_ValueForKey( configstring, "forcepowers" );
 	Q_strncpyz( newInfo.forcePowers, v, sizeof( newInfo.forcePowers ) );
 
-	//RAZTODO: Lua event handler for new clientinfo
+	JPLua_Event_ClientInfoUpdate( clientNum, ci, &newInfo );
 
 	// we won't force colors for siege.
 	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE && !cg_forceModel.integer )
