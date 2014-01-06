@@ -692,26 +692,20 @@ typedef enum saberBlockedType_e {
 	BLOCKED_TOP_PROJ
 } saberBlockedType_t;
 
-
-
-typedef enum saber_colors_e
-{
+typedef enum saber_colors_e {
 	SABER_RED,
 	SABER_ORANGE,
 	SABER_YELLOW,
 	SABER_GREEN,
 	SABER_BLUE,
 	SABER_PURPLE,
-	//[RGBSaber]
 	SABER_RGB,
 	SABER_FLAME1,
 	SABER_ELEC1,
 	SABER_FLAME2,
 	SABER_ELEC2,
 	SABER_BLACK,
-	//[/RGBSaber]
 	NUM_SABER_COLORS
-
 } saber_colors_t;
 
 typedef enum forcePowers_e

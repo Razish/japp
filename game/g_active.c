@@ -813,9 +813,7 @@ void G_VehicleAttachDroidUnit( gentity_t *vehEnt )
 }
 
 //called gameside only from pmove code (convenience)
-//[BugFix42]
 extern qboolean BG_SabersOff( playerState_t *ps );
-//[/BugFix42]
 void G_CheapWeaponFire(int entNum, int ev)
 {
 	gentity_t *ent = &g_entities[entNum];
@@ -835,9 +833,7 @@ void G_CheapWeaponFire(int entNum, int ev)
 				if (rider->inuse && rider->client)
 				{ //pilot is valid...
                     if (rider->client->ps.weapon != WP_MELEE &&
-						//[BugFix42]
 						(rider->client->ps.weapon != WP_SABER || !BG_SabersOff(&rider->client->ps)))
-						//[/BugFix42]
 					{ //can only attack on speeder when using melee or when saber is holstered
 						break;
 					}
@@ -2055,7 +2051,7 @@ void ClientThink_real( gentity_t *ent ) {
 		trap->Cvar_Set("pmove_msec", "33");
 	}
 
-	if ( pmove_fixed.integer || client->pers.pmoveFixed ) {
+	if ( pmove_fixed.integer ) {
 		ucmd->serverTime = ((ucmd->serverTime + pmove_msec.integer-1) / pmove_msec.integer) * pmove_msec.integer;
 		//if (ucmd->serverTime - client->ps.commandTime <= 0)
 		//	return;
@@ -2511,7 +2507,7 @@ void ClientThink_real( gentity_t *ent ) {
 			if ( g_privateDuel.integer & PRIVDUEL_RESPAWN )
 			{
 				// winner
-				if ( SpotWouldTelefrag3( &ent->client->pers.duel.startPos ) ) {
+				if ( SpotWouldTelefrag3( &ent->client->pers.duelStartPos ) ) {
 					respawn( ent );
 				}
 				else {
@@ -2524,7 +2520,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 					// teleport them
 					trap->UnlinkEntity( (sharedEntity_t *)ent );
-					VectorCopy ( &ent->client->pers.duel.startPos, &ent->client->ps.origin );
+					VectorCopy ( &ent->client->pers.duelStartPos, &ent->client->ps.origin );
 					ent->client->ps.origin.z += 1;
 					ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
 					BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue );
@@ -2533,7 +2529,7 @@ void ClientThink_real( gentity_t *ent ) {
 				}
 
 				// loser
-				if ( SpotWouldTelefrag3( &duelAgainst->client->pers.duel.startPos ) ) {
+				if ( SpotWouldTelefrag3( &duelAgainst->client->pers.duelStartPos ) ) {
 					respawn( duelAgainst );
 				}
 				else {
@@ -2546,7 +2542,7 @@ void ClientThink_real( gentity_t *ent ) {
 					
 					// teleport them
 					trap->UnlinkEntity( (sharedEntity_t *)duelAgainst );
-					VectorCopy ( &duelAgainst->client->pers.duel.startPos, &duelAgainst->client->ps.origin );
+					VectorCopy ( &duelAgainst->client->pers.duelStartPos, &duelAgainst->client->ps.origin );
 					duelAgainst->client->ps.origin.z += 1;
 					duelAgainst->client->ps.eFlags ^= EF_TELEPORT_BIT;
 					BG_PlayerStateToEntityState( &duelAgainst->client->ps, &duelAgainst->s, qtrue );
@@ -2883,7 +2879,7 @@ void ClientThink_real( gentity_t *ent ) {
 	pm.debugLevel = g_debugMove.integer;
 	pm.noFootsteps = ( dmflags.integer & DF_NO_FOOTSTEPS ) > 0;
 
-	pm.pmove_fixed = pmove_fixed.integer | client->pers.pmoveFixed;
+	pm.pmove_fixed = pmove_fixed.integer;
 	pm.pmove_msec = pmove_msec.integer;
 	pm.pmove_float = pmove_float.integer;
 
@@ -3429,7 +3425,6 @@ void ClientThink_real( gentity_t *ent ) {
 
 	SendPendingPredictableEvents( &ent->client->ps );
 
-	//[Grapple]
 //	if ( !( ent->client->ps.eFlags & EF_FIRING ) ) {
 //		client->fireHeld = qfalse;		// for grapple
 //	}
@@ -3467,7 +3462,6 @@ void ClientThink_real( gentity_t *ent ) {
 			}
 		}
 	}
-	//[/Grapple]
 
 	// use the snapped origin for linking so it matches client predicted versions
 	VectorCopy( &ent->s.pos.trBase, &ent->r.currentOrigin );
@@ -3510,10 +3504,8 @@ void ClientThink_real( gentity_t *ent ) {
 	// NOTE: now copy the exact origin over otherwise clients can be snapped into solid
 	VectorCopy( &ent->client->ps.origin, &ent->r.currentOrigin );
 
-	//[Unlagged]
 	//NT - store the client's new position
     G_StoreTrail( ent );
-	//[/Unlagged]
 
 	//test for solid areas in the AAS file
 //	BotTestAAS(ent->r.currentOrigin);

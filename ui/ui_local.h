@@ -80,7 +80,6 @@ extern vmCvar_t ui_bypassMainMenuLoad;
 extern vmCvar_t cjp_client;
 extern vmCvar_t japp_version;
 extern vmCvar_t csf;
-//[RGBSabers]
 extern vmCvar_t	ui_sab1_r;
 extern vmCvar_t	ui_sab1_g;
 extern vmCvar_t	ui_sab1_b;
@@ -88,7 +87,6 @@ extern vmCvar_t	ui_sab1_b;
 extern vmCvar_t	ui_sab2_r;
 extern vmCvar_t	ui_sab2_g;
 extern vmCvar_t	ui_sab2_b;
-//[/RGBSabers]
 
 //
 // ui_qmenu.c

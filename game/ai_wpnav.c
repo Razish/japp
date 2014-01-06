@@ -3129,20 +3129,14 @@ void LoadPath_ThisLevel(void)
 		}
 		else
 		{ //try loading standard nav data
-			//[RawMapName]
 			LoadPathData(level.rawmapname);
-			//LoadPathData(mapname.string);
-			//[/RawMapName]
 		}
 
 		gLevelFlags |= LEVELFLAG_NOPOINTPREDICTION;
 	}
 	else
 	{
-		//[RawMapName]
 		if (LoadPathData(level.rawmapname) == 2)
-		//if (LoadPathData(mapname.string) == 2)
-		//[/RawMapName]
 		{
 			//enter "edit" mode if cheats enabled?
 		}
@@ -3563,11 +3557,7 @@ int AcceptBotCommand(char *cmd, gentity_t *pl)
 	if ( !Q_stricmp( cmd, "bot_wp_save" ) )
 	{
 		gDeactivated = 0;
-		//[RawMapName]
-		//trap->Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
-		//SavePathData(mapname.string);
 		SavePathData(level.rawmapname);
-		//[/RawMapName]
 		return 1;
 	}
 

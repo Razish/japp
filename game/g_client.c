@@ -1587,7 +1587,6 @@ void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
 
 					if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer )
 					{
-						//[BugFix32]
 						//Also adjust customRGBA for team colors.
 						vector3 colorOverride;
 
@@ -1602,7 +1601,6 @@ void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
 						}
 
 						//BG_ValidateSkinForTeam( truncModelName, skin, ent->client->sess.sessionTeam, NULL );
-						//[/BugFix32]
 					}
 					else if (level.gametype == GT_SIEGE)
 					{ //force skin for class if appropriate
@@ -2620,9 +2618,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	gentity_t	*tent;
 	int			flags, i;
 	char		userinfo[MAX_INFO_VALUE], *modelname;
-	//[BugFix48]
 	int			spawnCount;
-	//[/BugFix48]
 
 	ent = g_entities + clientNum;
 
@@ -2704,9 +2700,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	// so the viewpoint doesn't interpolate through the
 	// world to the new position
 	flags = client->ps.eFlags;
-	//[BugFix48]
 	spawnCount = client->ps.persistant[PERS_SPAWN_COUNT];
-	//[/BugFix48]
 
 	i = 0;
 
@@ -2733,9 +2727,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 
 	memset( &client->ps, 0, sizeof( client->ps ) );
 	client->ps.eFlags = flags;
-	//[BugFix48]
 	client->ps.persistant[PERS_SPAWN_COUNT] = spawnCount;
-	//[/BugFix48]
 
 	client->ps.hasDetPackPlanted = qfalse;
 
@@ -2763,11 +2755,9 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 		// locate ent at a spawn point
 		ClientSpawn( ent );
 
-		//[Unlagged]
 		//NT - reset the origin trails
 		G_ResetTrail( ent );
 		ent->client->saved.leveltime = 0;
-		//[/Unlagged]
 	}
 
 	if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
@@ -3977,9 +3967,7 @@ call trap->DropClient(), which will call this and do
 server system housekeeping.
 ============
 */
-//[BugFix38]
 extern void G_LeaveVehicle( gentity_t* ent, qboolean ConCheck );
-//[/BugFix38]
 
 void G_ClearVote( gentity_t *ent ) {
 	if ( !level.voteTime )
@@ -4036,23 +4024,7 @@ void ClientDisconnect( int clientNum ) {
 	}
 	i = 0;
 
-	//[BugFix38]
 	G_LeaveVehicle( ent, qtrue );
-
-	/*if (ent->client->ps.m_iVehicleNum)
-	{ //tell it I'm getting off
-		gentity_t *veh = &g_entities[ent->client->ps.m_iVehicleNum];
-
-		if (veh->inuse && veh->client && veh->m_pVehicle)
-		{
-			int pCon = ent->client->pers.connected;
-
-			ent->client->pers.connected = 0;
-			veh->m_pVehicle->m_pVehicleInfo->Eject(veh->m_pVehicle, (bgEntity_t *)ent, qtrue);
-			ent->client->pers.connected = pCon;
-		}
-	}*/
-	//[/BugFix38]
 
 	// stop any following clients
 	for ( i = 0 ; i < level.maxclients ; i++ ) {

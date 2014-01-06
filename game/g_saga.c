@@ -1438,7 +1438,6 @@ void SiegeItemThink(gentity_t *ent)
 			}
 			else
 			{
-				//[BugFix7]
 				//perform a startsolid check to make sure the seige item doesn't get stuck
 				//in a wall or something
 				trace_t tr;
@@ -1476,7 +1475,6 @@ void SiegeItemThink(gentity_t *ent)
 				
 
 				//G_SetOrigin(ent, carrier->client->ps.origin);
-				//[/BugFix7]
 				ent->epVelocity.x = Q_irand(-80, 80);
 				ent->epVelocity.y = Q_irand(-80, 80);
 				ent->epVelocity.z = Q_irand( 40, 80);
@@ -1645,7 +1643,6 @@ void SiegeItemUse(gentity_t *ent, gentity_t *other, gentity_t *activator)
 		
 		if (targ && targ->inuse)
 		{
-			//[BugFix7]
 			//perform a startsolid check to make sure the seige item doesn't get stuck
 			//in a wall or something
 			trace_t tr;
@@ -1682,7 +1679,6 @@ void SiegeItemUse(gentity_t *ent, gentity_t *other, gentity_t *activator)
 			}
 			G_SetOrigin(ent, &TracePoint);
 			//G_SetOrigin(ent, targ->r.currentOrigin);
-			//[/BugFix7]
 			trap->LinkEntity((sharedEntity_t *)ent);
 		}
 	}

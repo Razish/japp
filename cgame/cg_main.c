@@ -952,7 +952,6 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.blueSaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/blue_line" );
 	cgs.media.purpleSaberGlowShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/purple_glow" );
 	cgs.media.purpleSaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/purple_line" );
-	//[RGBSabers]
 	cgs.media.rgbSaberGlowShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBglow1" );
 	cgs.media.rgbSaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/RGBcore1" );
 
@@ -980,66 +979,12 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.blackSaberGlowShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/blackglow" );
 	cgs.media.blackSaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/blackcore" );
 	cgs.media.blackBlurShader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/blacktrail" );
-	//[/RGBSabers]
 
-	//[SFXSabers]
 	cgs.media.sfxSaberTrailShader		= trap->R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_trail" );
 	cgs.media.sfxSaberBladeShader		= trap->R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_blade" );
 	cgs.media.sfxSaberBlade2Shader		= trap->R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_blade_rgb" );
 	cgs.media.sfxSaberEndShader			= trap->R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_end" );
 	cgs.media.sfxSaberEnd2Shader		= trap->R_RegisterShaderNoMip( "gfx/SFX_Sabers/saber_end_rgb" );
-	//[/SFXSabers]
-
-	//[Movie Sabers]
-#if 0
-	//Original Trilogy Sabers
-	cgs.media.otSaberCoreShader			= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_saberCore" );
-	cgs.media.redOTGlowShader			= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_redGlow" );
-	cgs.media.orangeOTGlowShader		= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_orangeGlow" );
-	cgs.media.yellowOTGlowShader		= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_yellowGlow" );
-	cgs.media.greenOTGlowShader			= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_greenGlow" );
-	cgs.media.blueOTGlowShader			= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_blueGlow" );
-	cgs.media.purpleOTGlowShader		= trap->R_RegisterShaderNoMip( "gfx/OTsabers/ot_purpleGlow" );
-
-	//Episode I Sabers
-	cgs.media.ep1SaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/saber_core" );
-	cgs.media.redEp1GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/red_glowa" );
-	cgs.media.orangeEp1GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/orange_glowa" );
-	cgs.media.yellowEp1GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/yellow_glowa" );
-	cgs.media.greenEp1GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/green_glowa" );
-	cgs.media.blueEp1GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/blue_glowa" );
-	cgs.media.purpleEp1GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep1Sabers/purple_glowa" );
-
-	//Episode II Sabers
-	cgs.media.ep2SaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/saber_core" );
-	cgs.media.whiteIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/white_ignite_flare" );
-	cgs.media.blackIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/black_ignite_flare" );
-	cgs.media.redEp2GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/red_glowa" );
-	cgs.media.orangeEp2GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/orange_glowa" );
-	cgs.media.yellowEp2GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/yellow_glowa" );
-	cgs.media.greenEp2GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/green_glowa" );
-	cgs.media.blueEp2GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/blue_glowa" );
-	cgs.media.purpleEp2GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep2Sabers/purple_glowa" );
-
-	//Episode III Sabers
-	cgs.media.ep3SaberCoreShader		= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/saber_core" );
-	cgs.media.whiteIgniteFlare02		= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/white_ignite_flare" );
-	cgs.media.blackIgniteFlare02		= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/black_ignite_flare" );
-	cgs.media.redIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/red_ignite_flare" );
-	cgs.media.greenIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/green_ignite_flare" );
-	cgs.media.purpleIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/purple_ignite_flare" );
-	cgs.media.blueIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/blue_ignite_flare" );
-	cgs.media.orangeIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/orange_ignite_flare" );
-	cgs.media.yellowIgniteFlare			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/yellow_ignite_flare" );
-	cgs.media.redEp3GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/red_glowa" );
-	cgs.media.orangeEp3GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/orange_glowa" );
-	cgs.media.yellowEp3GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/yellow_glowa" );
-	cgs.media.greenEp3GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/green_glowa" );
-	cgs.media.blueEp3GlowShader			= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/blue_glowa" );
-	cgs.media.purpleEp3GlowShader		= trap->R_RegisterShaderNoMip( "gfx/Ep3Sabers/purple_glowa" );
-#endif
-	//[/Movie Sabers]
-
 
 	cgs.media.saberBlurShader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/saberBlur" );
 	cgs.media.swordTrailShader			= trap->R_RegisterShaderNoMip( "gfx/effects/sabers/swordTrail" );
@@ -3363,9 +3308,7 @@ Ghoul2 Insert End
 	//make sure saber data is loaded before this! (so we can precache the appropriate hilts)
 	CG_InitSiegeMode();
 
-	//[TrueView]
 	CG_TrueViewInit();
-	//[/TrueView]
 
 	CG_RegisterSounds();
 

@@ -24,11 +24,9 @@ int			team2Timed = 0;
 int			cgSiegeTeam1PlShader = 0;
 int			cgSiegeTeam2PlShader = 0;
 
-//[TrueView]
 #define		MAX_TRUEVIEW_INFO_SIZE		4096
 char		true_view_info[MAX_TRUEVIEW_INFO_SIZE];
 int			true_view_valid;
-//[/TrueView]
 
 static char cgParseObjectives[MAX_SIEGE_INFO_SIZE];
 
@@ -1110,7 +1108,6 @@ void CG_SetSiegeTimerCvar ( int msec )
 	trap->Cvar_Set("ui_siegeTimer", va( "%i:%i%i", mins, tens, seconds ) );
 }
 
-//[TrueView]
 void CG_TrueViewInit( void )
 {
 	int				len = 0;
@@ -1171,4 +1168,3 @@ void CG_AdjustEyePos (const char *modelName)
 	}
 
 }
-//[/TrueView]

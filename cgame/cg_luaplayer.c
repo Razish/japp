@@ -297,7 +297,7 @@ static int JPLua_Player_GetClientInfo( lua_State *L ) {
 	
 	return 1;
 }
-//[ASTRAL-START]
+
 //Func: Player:GetAnimations()
 //Retn: Table of Legs/Torso anims and Legs/Torso timers
 static int JPLua_Player_GetAnimations( lua_State *L ) {
@@ -329,7 +329,7 @@ static int JPLua_Player_GetAnimations( lua_State *L ) {
 	lua_pushstring( L, "legsTimer" ); lua_pushnumber( L, legsTimer ); lua_settable( L, top );
 	return 1;
 }
-//[ASTRAL-END]
+
 //Func: Player:GetPosition()
 //Retn: Table of x/y/z position
 static int JPLua_Player_GetPosition( lua_State *L ) {

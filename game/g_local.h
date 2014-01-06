@@ -34,7 +34,7 @@ extern vector3 gPainPoint;
 #define BODY_QUEUE_SIZE		8
 
 #ifndef INFINITE
-#define INFINITE			1000000
+	#define INFINITE		1000000
 #endif
 
 #define	FRAMETIME			100					// msec
@@ -47,49 +47,42 @@ extern vector3 gPainPoint;
 //primarily used by NPCs
 #define	START_TIME_LINK_ENTS		FRAMETIME*1 // time-delay after map start at which all ents have been spawned, so can link them
 #define	START_TIME_FIND_LINKS		FRAMETIME*2 // time-delay after map start at which you can find linked entities
-#define	START_TIME_MOVERS_SPAWNED	FRAMETIME*2 // time-delay after map start at which all movers should be spawned
-#define	START_TIME_REMOVE_ENTS		FRAMETIME*3 // time-delay after map start to remove temporary ents
-#define	START_TIME_NAV_CALC			FRAMETIME*4 // time-delay after map start to connect waypoints and calc routes
-#define	START_TIME_FIND_WAYPOINT	FRAMETIME*5 // time-delay after map start after which it's okay to try to find your best waypoint
+#define	START_TIME_MOVERS_SPAWNED	FRAMETIME*3 // time-delay after map start at which all movers should be spawned
+#define	START_TIME_REMOVE_ENTS		FRAMETIME*4 // time-delay after map start to remove temporary ents
+#define	START_TIME_NAV_CALC			FRAMETIME*5 // time-delay after map start to connect waypoints and calc routes
+#define	START_TIME_FIND_WAYPOINT	FRAMETIME*6 // time-delay after map start after which it's okay to try to find your best waypoint
 
 // gentity->flags
-#define	FL_GODMODE				0x00000010
-#define	FL_NOTARGET				0x00000020
-#define	FL_TEAMSLAVE			0x00000400	// not the first on the team
-#define FL_NO_KNOCKBACK			0x00000800
-#define FL_DROPPED_ITEM			0x00001000
-#define FL_NO_BOTS				0x00002000	// spawn point not for bot use
-#define FL_NO_HUMANS			0x00004000	// spawn point just for bots
-#define FL_FORCE_GESTURE		0x00008000	// force gesture on client
-#define FL_INACTIVE				0x00010000	// inactive
-#define FL_NAVGOAL				0x00020000	// for npc nav stuff
-#define	FL_DONT_SHOOT			0x00040000
-#define FL_SHIELDED				0x00080000
-#define FL_UNDYING				0x00100000	// takes damage down to 1, but never dies
-
-//ex-eFlags -rww
-#define	FL_BOUNCE				0x00100000		// for missiles
-#define	FL_BOUNCE_HALF			0x00200000		// for missiles
-#define	FL_BOUNCE_SHRAPNEL		0x00400000		// special shrapnel flag
-
-//vehicle game-local stuff -rww
-#define	FL_VEH_BOARDING			0x00800000		// special shrapnel flag
-
-//breakable flags -rww
-#define FL_DMG_BY_SABER_ONLY		0x01000000 //only take dmg from saber
-#define FL_DMG_BY_HEAVY_WEAP_ONLY	0x02000000 //only take dmg from explosives
-
-#define FL_BBRUSH					0x04000000 //I am a breakable brush
+#define	FL_GODMODE					(0x00000001u) //
+#define	FL_NOTARGET					(0x00000002u) //
+#define	FL_TEAMSLAVE				(0x00000004u) // not the first on the team
+#define FL_NO_KNOCKBACK				(0x00000008u) //
+#define FL_DROPPED_ITEM				(0x00000010u) //
+#define FL_NO_BOTS					(0x00000020u) // spawn point not for bot use
+#define FL_NO_HUMANS				(0x00000040u) // spawn point just for bots
+#define FL_FORCE_GESTURE			(0x00000080u) // force gesture on client
+#define FL_INACTIVE					(0x00000100u) // inactive
+#define FL_NAVGOAL					(0x00000200u) // for npc nav stuff
+#define	FL_DONT_SHOOT				(0x00000400u) //
+#define FL_SHIELDED					(0x00000800u) //
+#define FL_UNDYING					(0x00001000u) // takes damage down to 1, but never dies
+#define	FL_BOUNCE					(0x00002000u) // for missiles
+#define	FL_BOUNCE_HALF				(0x00004000u) // for missiles
+#define	FL_BOUNCE_SHRAPNEL			(0x00008000u) // special shrapnel flag
+#define	FL_VEH_BOARDING				(0x00010000u) // special shrapnel flag
+#define FL_DMG_BY_SABER_ONLY		(0x00020000u) // only take dmg from saber
+#define FL_DMG_BY_HEAVY_WEAP_ONLY	(0x00040000u) // only take dmg from explosives
+#define FL_BBRUSH					(0x00080000u) // i am a breakable brush
 
 #ifdef _DEBUG
-#define DEBUG_SABER_BOX
+	#define DEBUG_SABER_BOX
 #endif
 
 #define	MAX_G_SHARED_BUFFER_SIZE		8192
 extern char gSharedBuffer[MAX_G_SHARED_BUFFER_SIZE];
 
 // movers are things like doors, plats, buttons, etc
-typedef enum {
+typedef enum moverState_e {
 	MOVER_POS1,
 	MOVER_POS2,
 	MOVER_1TO2,
@@ -98,8 +91,7 @@ typedef enum {
 
 #define SP_PODIUM_MODEL		"models/mapobjects/podium/podium4.md3"
 
-typedef enum hitLocation_e
-{
+typedef enum hitLocation_e {
 	HL_NONE = 0,
 	HL_FOOT_RT,
 	HL_FOOT_LT,
@@ -133,8 +125,7 @@ extern void *g2SaberInstance;
 extern qboolean gEscaping;
 extern int gEscapeTime;
 
-typedef struct channel_s
-{
+typedef struct channel_s {
 	char identifier[32];
 	char shortname[32]; //only legacy clients need this
 
@@ -225,20 +216,17 @@ struct gentity_s {
 
 	int			flags;				// FL_* variables
 
-	char		*model;
-	char		*model2;
+	char		*model, *model2;
 	int			freetime;			// level.time when the object was freed
 	
 	int			eventTime;			// events will be cleared EVENT_VALID_MSEC after set
 	qboolean	freeAfterEvent;
 	qboolean	unlinkAfterEvent;
 
-	qboolean	physicsObject;		// if true, it can be pushed by movers and fall off edges
-									// all game items are physicsObjects, 
+	qboolean	physicsObject;		// if true, it can be pushed by movers and fall off edges. all game items are physicsObjects
 	float		physicsBounce;		// 1.0 = continuous bounce, 0.0 = no bounce
-	int			clipmask;			// brushes with this content value will be collided against
-									// when moving.  items and corpses do not collide against
-									// players, for instance
+	int			clipmask;			// brushes with this content value will be collided against when moving. items and
+									//	corpses do not collide against players, for instance
 
 //Only used by NPC_spawners
 	char		*NPC_type;
@@ -247,14 +235,9 @@ struct gentity_s {
 
 	// movers
 	moverState_t moverState;
-	int			soundPos1;
-	int			sound1to2;
-	int			sound2to1;
-	int			soundPos2;
-	int			soundLoop;
+	int			soundPos1, sound1to2, sound2to1, soundPos2, soundLoop;
 	gentity_t	*parent;
-	gentity_t	*nextTrain;
-	gentity_t	*prevTrain;
+	gentity_t	*nextTrain, *prevTrain;
 	vector3		pos1, pos2;
 
 	//for npc's
@@ -312,12 +295,10 @@ struct gentity_s {
 	qboolean	takedamage;
 	material_t	material;
 
-	int			damage;
 	int			dflags;
-	int			splashDamage;	// quad will increase this without increasing radius
+	int			damage, splashDamage;
 	int			splashRadius;
-	int			methodOfDeath;
-	int			splashMethodOfDeath;
+	int			methodOfDeath, splashMethodOfDeath;
 
 	int			locationDamage[HL_MAX];		// Damage accumulated on different body locations
 
@@ -400,26 +381,26 @@ typedef enum clientConnected_e {
 	CON_CONNECTED
 } clientConnected_t;
 
-typedef enum clientValidation_e
-{						//	Bit values :: (1<<CV_XXX)
-	CV_UINFO = 0,		//	1
-	CV_ACTIVECON,		//	2
-	CV_MAX				//	--
+//RAZTODO: Remove clientValidation_t?
+typedef enum clientValidation_e {
+	CV_UINFO = 0,
+	CV_ACTIVECON,
+	CV_MAX
 } clientValidation_t;
 
-typedef enum {
+typedef enum spectatorState_e {
 	SPECTATOR_NOT,
 	SPECTATOR_FREE,
 	SPECTATOR_FOLLOW,
 	SPECTATOR_SCOREBOARD
 } spectatorState_t;
 
-typedef enum {
+typedef enum playerTeamStateState_e {
 	TEAM_BEGIN,		// Beginning a team game, spawn at base
 	TEAM_ACTIVE		// Now actively playing
 } playerTeamStateState_t;
 
-typedef struct {
+typedef struct playerTeamState_s {
 	playerTeamStateState_t	state;
 
 	int			location;
@@ -448,104 +429,66 @@ typedef struct {
 // MUST be dealt with in G_InitSessionData() / G_ReadSessionData() / G_WriteSessionData()
 typedef struct clientSession_s {
 	team_t				sessionTeam;
-	int					spectatorTime;		// for determining next-in-line to play
+	int					spectatorTime; // for determining next-in-line to play
 	spectatorState_t	spectatorState;
-	int					spectatorClient;	// for chasecam and follow mode
-	int					wins, losses;		// tournament stats
-	int					selectedFP;			// check against this, if doesn't match value in playerstate then update userinfo
-	int					saberLevel;			// similar to above method, but for current saber attack level
-	int					setForce;			// set to true once player is given the chance to set force powers
-	int					updateUITime;		// only update userinfo for FP/SL if < level.time
-	qboolean			teamLeader;			// true when this client is a team leader
+	int					spectatorClient; // for chasecam and follow mode
+	int					wins, losses; // tournament stats
+	int					selectedFP; // check against this, if doesn't match value in playerstate then update userinfo
+	int					saberLevel; // similar to above method, but for current saber attack level
+	int					setForce; // set to true once player is given the chance to set force powers
+	int					updateUITime; // only update userinfo for FP/SL if < level.time
+	qboolean			teamLeader; // true when this client is a team leader
 	char				siegeClass[64];
 	int					duelTeam;
 	int					siegeDesiredTeam;
-
-	//Raz: validation
-	char				IP[NET_ADDRSTRMAXLEN]; //DEPRECATED: use svs->clients[num].netchan.remoteAddress
+	char				IP[NET_ADDRSTRMAXLEN];
 	int					validated;
 } clientSession_t;
 
 // playerstate mGameFlags
-#define	PSG_VOTED				(1<<0)		// already cast a vote
+#define	PSG_VOTED		(0x0001u) // already cast a vote
 
-//
-#define	MAX_VOTE_COUNT		3
+#define	MAX_VOTE_COUNT (3)
 
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
 typedef struct clientPersistant_s {
 	clientConnected_t	connected;	
-	usercmd_t	cmd;				// we would lose angles if not persistant
-	qboolean	localClient;		// true if "ip" info key is "localhost"
-	qboolean	initialSpawn;		// the first spawn should be at a cool location
-	qboolean	predictItemPickup;	// based on cg_predictItems userinfo
-	qboolean	pmoveFixed;			//
-	char		netname[MAX_NETNAME], netnameClean[MAX_NETNAME];
-	int			netnameTime;				// Last time the name was changed
-	int			maxHealth;			// for handicapping
-	int			enterTime;			// level.time the client entered the game
-	playerTeamState_t teamState;	// status in teamplay games
-	qboolean	teamInfo;			// send team overlay updates?
-
-	//[Admin]
-	adminUser_t	*adminUser;
-	adminData_t	adminData;
-	//[/Admin]
-
-	struct japp
-	{
-		channel_t *channels; //linked list of channels
-		channel_t *activeChannel; //only used for legacy clients that don't support inline chat filters/tabs
-	} japp;
-
-	int				connectTime;
-	unsigned int	CSF;			//	CSF_XXX bit-flags
-	unsigned int	CPD;			//	CPD_XXX bit-flags
-
-	//Raz: Moved this out of session data.
-	//		userinfo -> pers in ClientUserinfoChanged
-	char		saber1[MAX_QPATH];
-	char		saber2[MAX_QPATH];
-
-	struct {
-		int weapon; // for weapon-specific duels - pistols etc
-		vector3 startPos;
-	} duel;
-
-	qboolean ready;
-	int vote; // 0 = none, 1 = yes, 2 = no
+	usercmd_t			cmd; // we would lose angles if not persistant
+	qboolean			localClient; // true if "ip" info key is "localhost"
+	qboolean			initialSpawn; // the first spawn should be at a cool location
+	qboolean			predictItemPickup; // based on cg_predictItems userinfo
+	char				netname[MAX_NETNAME], netnameClean[MAX_NETNAME];
+	int					netnameTime; // Last time the name was changed
+	int					maxHealth; // for handicapping
+	int					enterTime; // level.time the client entered the game
+	playerTeamState_t	teamState; // status in teamplay games
+	qboolean			teamInfo; // send team overlay updates?
+	adminUser_t			*adminUser;
+	adminData_t			adminData;
+	qboolean			ready;
+	int					vote; // 0 = none, 1 = yes, 2 = no
+	int					connectTime;
+	uint32_t			CSF, CPD; // CSF_***/CPD_*** bit-flags
+	char				saber1[MAX_QPATH], saber2[MAX_QPATH];
+	channel_t			*channels, *activeChannel; // linked list of channels. activeChannel only used for legacy clients that don't support inline chat filters/tabs
+	int					duelWeapon; // for weapon-specific duels - pistols etc
+	vector3				duelStartPos; // respawn client to this position when duel ends
 } clientPersistant_t;
 
-//[Unlagged]
-//NT - client origin trails
-#define NUM_CLIENT_TRAILS 10
-typedef struct {
-	vector3 mins, maxs;
-	vector3 currentOrigin;
-	vector3 currentAngles;
-	int time, leveltime;
+#define NUM_CLIENT_TRAILS (10)
+typedef struct clientTrail_s {
+	vector3		mins, maxs;
+	vector3		currentOrigin, currentAngles;
+	int			time, leveltime;
 } clientTrail_t;
-//[/Unlagged]
 
-typedef struct renderInfo_s
-{
+typedef struct renderInfo_s {
 	//In whole degrees, How far to let the different model parts yaw and pitch
-	int		headYawRangeLeft;
-	int		headYawRangeRight;
-	int		headPitchRangeUp;
-	int		headPitchRangeDown;
-
-	int		torsoYawRangeLeft;
-	int		torsoYawRangeRight;
-	int		torsoPitchRangeUp;
-	int		torsoPitchRangeDown;
-
-	int		legsFrame;
-	int		torsoFrame;
-
-	float	legsFpsMod;
-	float	torsoFpsMod;
+	int		headYawRangeLeft, headYawRangeRight, headPitchRangeUp, headPitchRangeDown;
+	int		torsoYawRangeLeft, torsoYawRangeRight, torsoPitchRangeUp, torsoPitchRangeDown;
+	int		legsFrame, torsoFrame;
+	float	legsFpsMod, torsoFpsMod;
 
 	//Fields to apply to entire model set, individual model's equivalents will modify this value
 	vector3	customRGB;//Red Green Blue, 0 = don't apply
@@ -554,17 +497,12 @@ typedef struct renderInfo_s
 	//RF?
 	int			renderFlags;
 
-	//
-	vector3		muzzlePoint;
-	vector3		muzzleDir;
-	vector3		muzzlePointOld;
-	vector3		muzzleDirOld;
+	vector3		muzzlePoint, muzzlePointOld;
+	vector3		muzzleDir, muzzleDirOld;
 	int			mPCalcTime;//Last time muzzle point was calced
 
-	//
-	float		lockYaw;//
+	float		lockYaw;
 
-	//
 	vector3		headPoint;//Where your tag_head is
 	vector3		headAngles;//where the tag_head in the torso is pointing
 	vector3		handRPoint;//where your right hand is
@@ -588,14 +526,7 @@ typedef struct renderInfo_s
 
 	//for tracking legitimate bolt indecies
 	void		*lastG2; //if it doesn't match ent->ghoul2, the bolts are considered invalid.
-	int			headBolt;
-	int			handRBolt;
-	int			handLBolt;
-	int			torsoBolt;
-	int			crotchBolt;
-	int			footRBolt;
-	int			footLBolt;
-	int			motionBolt;
+	int			headBolt, handRBolt, handLBolt, torsoBolt, crotchBolt, footRBolt, footLBolt, motionBolt;
 
 	int			boltValidityTime;
 } renderInfo_t;
@@ -636,9 +567,7 @@ typedef struct gclient_s {
 	int			lastCmdTime;		// level.time of last usercmd_t, for EF_CONNECTION
 									// we can't just use pers.lastCommand.time, because
 									// of the g_sycronousclients case
-	int			buttons;
-	int			oldbuttons;
-	int			latched_buttons;
+	int			buttons, oldbuttons, latched_buttons;
 
 	vector3		oldOrigin;
 
@@ -656,8 +585,7 @@ typedef struct gclient_s {
 
 	int			accurateCount;		// for "impressive" reward sound
 
-	int			accuracy_shots;		// total number of shots
-	int			accuracy_hits;		// total number of hits
+	int			accuracy_shots, accuracy_hits; // total number of shots/hits
 
 	//
 	int			lastkilled_client;	// last client that this client killed
@@ -678,9 +606,7 @@ typedef struct gclient_s {
 	gentity_t	*hook;				// grapple hook if out
 
 	int			switchTeamTime;		// time the player switched teams
-
-	int			switchDuelTeamTime;		// time the player switched duel teams
-
+	int			switchDuelTeamTime;	// time the player switched duel teams
 	int			switchClassTime;	// class changed debounce timer
 
 	// timeResidual is used to handle events that happen every second
@@ -810,18 +736,14 @@ typedef struct gclient_s {
 	int			lastGenCmd;
 	int			lastGenCmdTime;
 
-	//[Grapple]
-	qboolean		hookHasBeenFired;
-	//[/Grapple]
+	qboolean	hookHasBeenFired;
 
-	//[Unlagged]
 	//NT - client origin trails
-    int              trailHead;
-    clientTrail_t    trail[NUM_CLIENT_TRAILS];
-    clientTrail_t    saved;    // used to restore after time shift
-	//[/Unlagged]
+    int				trailHead;
+    clientTrail_t	trail[NUM_CLIENT_TRAILS];
+    clientTrail_t	saved; // used to restore after time shift
 
-	struct force {
+	struct {
 		int		drainDebounce;
 		int		lightningDebounce;
 	} force;
@@ -831,8 +753,7 @@ typedef struct gclient_s {
 
 #define MAX_INTEREST_POINTS		64
 
-typedef struct 
-{
+typedef struct interestPoint_s {
 	vector3		origin;
 	char		*target;
 } interestPoint_t;
@@ -841,12 +762,9 @@ typedef struct
 
 #define MAX_COMBAT_POINTS		512
 
-typedef struct 
-{
+typedef struct combatPoint_s {
 	vector3		origin;
 	int			flags;
-//	char		*NPC_targetname;
-//	team_t		team;
 	qboolean	occupied;
 	int			waypoint;
 	int			dangerTime;
@@ -856,28 +774,25 @@ typedef struct
 
 #define	MAX_ALERT_EVENTS	32
 
-typedef enum
-{
+typedef enum alertEventType_e {
 	AET_SIGHT,
 	AET_SOUND,
-} alertEventType_e;
+} alertEventType_t;
 
-typedef enum
-{
+typedef enum alertEventLevel_e {
 	AEL_NONE=0,
 	AEL_MINOR,			//Enemy responds to the sound, but only by looking
 	AEL_SUSPICIOUS,		//Enemy looks at the sound, and will also investigate it
 	AEL_DISCOVERED,		//Enemy knows the player is around, and will actively hunt
 	AEL_DANGER,			//Enemy should try to find cover
 	AEL_DANGER_GREAT,	//Enemy should run like hell!
-} alertEventLevel_e;
+} alertEventLevel_t;
 
-typedef struct alertEvent_s
-{
+typedef struct alertEvent_s {
 	vector3				position;	//Where the event is located
 	float				radius;		//Consideration radius
-	alertEventLevel_e	level;		//Priority level of the event
-	alertEventType_e	type;		//Event type (sound,sight)
+	alertEventLevel_t	level;		//Priority level of the event
+	alertEventType_t	type;		//Event type (sound,sight)
 	gentity_t			*owner;		//Who made the sound
 	float				light;		//ambient light level at point
 	float				addLight;	//additional light- makes it more noticable, even in darkness
@@ -888,8 +803,7 @@ typedef struct alertEvent_s
 //
 // this structure is cleared as each map is entered
 //
-typedef struct
-{
+typedef struct waypointData_s {
 	char	targetname[MAX_QPATH];
 	char	target[MAX_QPATH];
 	char	target2[MAX_QPATH];
@@ -947,8 +861,7 @@ typedef struct {
 	int			voteTime;				// level.time vote was called
 	int			voteExecuteTime;		// time the vote is executed
 	int			voteExecuteDelay;		// set per-vote
-	int			voteYes;
-	int			voteNo;
+	int			voteYes, voteNo;
 	qboolean	votePoll;
 	int			numVotingClients;		// set by CalculateRanks
 
@@ -972,8 +885,7 @@ typedef struct {
 	char		*changemap;
 	qboolean	readyToExit;			// at least one client wants to exit
 	int			exitTime;
-	vector3		intermission_origin;	// also used for spectator spawns
-	vector3		intermission_angle;
+	vector3		intermission_origin, intermission_angle;
 
 	qboolean	locationLinked;			// target_locations get linked
 	gentity_t	*locationHead;			// head of the location list
@@ -1010,20 +922,16 @@ typedef struct {
 		fileHandle_t	log;
 	} security;
 
-	//[RawMapName]
 	char				rawmapname[MAX_QPATH];
-	//[/RawMapName]
 
-	//[Unlagged]
-	int         frameStartTime;         //NT - actual time frame started
-	//[/Unlagged]
+	int			frameStartTime;         //NT - actual time frame started
 
 	int			gametype;
 
 	qboolean allReady;
 
 	struct {
-		int state;		//OSP: paused state of the match
+		int state; //OSP: paused state of the match
 		int time;
 	} pause;
 
@@ -1036,7 +944,6 @@ typedef struct {
 		int num;
 		char *infos[MAX_ARENAS];
 	} arenas;
-
 } level_locals_t;
 
 
@@ -1235,9 +1142,7 @@ void G_ExplodeMissile( gentity_t *ent );
 
 void WP_FireBlasterMissile( gentity_t *ent, vector3 *start, vector3 *dir, qboolean altFire );
 
-//[Grapple]
 gentity_t *fire_grapple( gentity_t *self, vector3 *start, vector3 *dir );
-//[/Grapple]
 
 //
 // g_mover.c
@@ -1299,11 +1204,9 @@ void CalcMuzzlePoint ( gentity_t *ent, vector3 *forward, vector3 *right, vector3
 void SnapVectorTowards( vector3 *v, const vector3 *to );
 qboolean CheckGauntletAttack( gentity_t *ent );
 
-//[Grapple]
 void Weapon_GrapplingHook_Fire( gentity_t *ent );
 void Weapon_HookThink( gentity_t *ent );
 void Weapon_HookFree( gentity_t *ent );
-//[/Grapple]
 
 //
 // g_client.c
@@ -1407,8 +1310,8 @@ void G_WriteSessionData( void );
 //
 // NPC_senses.cpp
 //
-extern void AddSightEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_e alertLevel, float addLight ); //addLight = 0.0f
-extern void AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_e alertLevel, qboolean needLOS ); //needLOS = qfalse
+extern void AddSightEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, float addLight ); //addLight = 0.0f
+extern void AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, qboolean needLOS ); //needLOS = qfalse
 extern qboolean G_CheckForDanger( gentity_t *self, int alertEvent );
 extern int G_CheckAlertEvents( gentity_t *self, qboolean checkSight, qboolean checkSound, float maxSeeDist, float maxHearDist, int ignoreAlert, qboolean mustHaveOwner, int minAlertLevel ); //ignoreAlert = -1, mustHaveOwner = qfalse, minAlertLevel = AEL_MINOR
 extern qboolean G_CheckForDanger( gentity_t *self, int alertEvent );

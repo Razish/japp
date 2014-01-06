@@ -743,7 +743,6 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	}
 killProj:
 
-	//[Grapple]
 	if ( !strcmp( ent->classname, "hook" ) )
 	{
 	//	gentity_t	*nent = G_Spawn();
@@ -793,7 +792,6 @@ killProj:
 
 		return;
 	}
-	//[/Grapple]
 
 	// is it cheaper in bandwidth to just remove this ent and create a new
 	// one, rather than changing the missile into the explosion?
@@ -963,13 +961,11 @@ void G_RunMissile( gentity_t *ent ) {
 		// never explode or bounce on sky
 		if ( tr.surfaceFlags & SURF_NOIMPACT )
 		{
-			//[Grapple]
 			// If grapple, reset owner
 		//	if ( ent->parent && ent->parent->client && ent->parent->client->hook == ent )
 		//		ent->parent->client->hook = NULL;
 			if ( ent->parent && ent->parent->client && ent->parent->client->hook == ent )
 				Weapon_HookFree( ent->parent->client->hook );
-			//[/Grapple]
 
 			if ((ent->s.weapon == WP_SABER && ent->isSaberEntity) || isKnockedSaber)
 			{
@@ -1045,7 +1041,6 @@ passthrough:
 
 //=============================================================================
 
-//[Grapple]
 gentity_t *fire_grapple( gentity_t *self, vector3 *start, vector3 *dir )
 {
 	gentity_t	*hook;
@@ -1084,4 +1079,3 @@ gentity_t *fire_grapple( gentity_t *self, vector3 *start, vector3 *dir )
 
 	return hook;
 }
-//[/Grapple]

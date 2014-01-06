@@ -669,10 +669,8 @@ void SetTeam( gentity_t *ent, char *s ) {
 		if ( g_teamForceBalance.integer && !g_jediVmerc.integer ) {
 			int		counts[TEAM_NUM_TEAMS];
 
-			//[ClientNumFix]
 			counts[TEAM_BLUE] = TeamCount( ent-g_entities, TEAM_BLUE );
 			counts[TEAM_RED] = TeamCount( ent-g_entities, TEAM_RED );
-			//[/ClientNumFix]
 
 			// We allow a spread of two
 			if ( team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] > 1 ) {
@@ -686,10 +684,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 				else
 				*/
 				{
-				//[ClientNumFix]
-				trap->SendServerCommand( ent-g_entities, 
-				//[/ClientNumFix]
-						va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "TOOMANYRED")) );
+				trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "TOOMANYRED" ) ) );
 				}
 				return; // ignore the request
 			}
@@ -704,10 +699,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 				else
 				*/
 				{
-				//[ClientNumFix]
-				trap->SendServerCommand( ent-g_entities, 
-				//[/ClientNumFix]
-						va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "TOOMANYBLUE")) );
+					trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "TOOMANYBLUE" ) ) );
 				}
 				return; // ignore the request
 			}
@@ -737,9 +729,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 		team = TEAM_FREE;
 	}
 
-	//[BugFix41]
 	oldTeam = client->sess.sessionTeam;
-	//[/BugFix41]
 
 	if (level.gametype == GT_SIEGE)
 	{
@@ -749,11 +739,9 @@ void SetTeam( gentity_t *ent, char *s ) {
 			return;
 		}
 
-		//[BugFix41]
 		if ( team == oldTeam && team != TEAM_SPECTATOR ) {
 			return;
 		}
-		//[/BugFix41]
 
 		client->sess.siegeDesiredTeam = team;
 		//oh well, just let them go.
@@ -820,10 +808,6 @@ void SetTeam( gentity_t *ent, char *s ) {
 	//
 	// decide if we will allow the change
 	//
-	//[BugFix41]
-	// moved this up above the siege check
-	//oldTeam = client->sess.sessionTeam;
-	//[/BugFix41]
 	if ( team == oldTeam && team != TEAM_SPECTATOR ) {
 		return;
 	}
@@ -1355,12 +1339,10 @@ void Cmd_Follow_f( gentity_t *ent ) {
 		return;
 	}
 
-	//[BugFix38]
 	// can't follow another spectator
 	if ( level.clients[ i ].tempSpectate >= level.time ) {
 		return;
 	}
-	//[/BugFix38]
 
 	// if they are playing a tournement game, count as a loss
 	if ( (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL)
@@ -1546,10 +1528,8 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		mode = SAY_ALL;
 	}
 
-	//[Admin]
 	if ( !ent->client->pers.adminData.canTalk )
 		return;
-	//[/Admin]
 
 	if ( strstr( ent->client->pers.netname, "<Admin>" ) || Q_strchrs( chatText, "\n\r\x0b" ) )
 		returnToSender = qtrue;
@@ -1837,7 +1817,6 @@ Cmd_Where_f
 ==================
 */
 void Cmd_Where_f( gentity_t *ent ) {
-	//[BugFix31]
 	//This wasn't working for non-spectators since s.origin doesn't update for active players.
 	if(ent->client && ent->client->sess.sessionTeam != TEAM_SPECTATOR )
 	{//active players use currentOrigin
@@ -1848,7 +1827,6 @@ void Cmd_Where_f( gentity_t *ent ) {
 		trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", vtos( &ent->s.origin ) ) );
 	}
 	//trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", vtos( ent->s.origin ) ) );
-	//[/BugFix31]
 }
 
 /*
@@ -2381,7 +2359,6 @@ void Cmd_SetViewpos_f( gentity_t *ent ) {
 	TeleportPlayer( ent, &origin, &angles );
 }
 
-//[BugFix38]
 void G_LeaveVehicle( gentity_t* ent, qboolean ConCheck ) {
 
 	if (ent->client->ps.m_iVehicleNum)
@@ -2403,7 +2380,6 @@ void G_LeaveVehicle( gentity_t* ent, qboolean ConCheck ) {
 
 	ent->client->ps.m_iVehicleNum = 0;
 }
-//[/BugFix38]
 
 int G_ItemUsable(playerState_t *ps, int forcedUse)
 {
@@ -2904,14 +2880,15 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 		if ( challenged->client->ps.duelIndex == ent->s.number
 			&& challenged->client->ps.duelTime >= level.time )
 		{
-			trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"%s %s "S_COLOR_WHITE"(%s)!\n\"", challenged->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELACCEPT" ), ent->client->pers.netname, weaponData[challenged->client->pers.duel.weapon].longName ) );
+			trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"%s %s "S_COLOR_WHITE"(%s)!\n\"", challenged->client->pers.netname,
+				G_GetStringEdString( "MP_SVGAME", "PLDUELACCEPT" ), ent->client->pers.netname, weaponData[challenged->client->pers.duelWeapon].longName ) );
 
 			ent->client->ps.duelInProgress			= qtrue;
 			challenged->client->ps.duelInProgress	= qtrue;
 
 			// copy the start pos
-			VectorCopy( &ent->client->ps.origin, &ent->client->pers.duel.startPos );
-			VectorCopy( &challenged->client->ps.origin, &challenged->client->pers.duel.startPos );
+			VectorCopy( &ent->client->ps.origin, &ent->client->pers.duelStartPos );
+			VectorCopy( &challenged->client->ps.origin, &challenged->client->pers.duelStartPos );
 
 			ent->client->ps.duelTime		= level.time + 2000;
 			challenged->client->ps.duelTime	= level.time + 2000;
@@ -2919,7 +2896,7 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 			G_AddEvent( ent, EV_PRIVATE_DUEL, 1 );
 			G_AddEvent( challenged, EV_PRIVATE_DUEL, 1 );
 
-			if ( challenged->client->pers.duel.weapon == WP_SABER ) {
+			if ( challenged->client->pers.duelWeapon == WP_SABER ) {
 				// Holster their sabers now, until the duel starts (then they'll get auto-turned on to look cool)
 				if ( !ent->client->ps.saberHolstered )
 				{
@@ -2946,7 +2923,7 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 			else // reset their weapon times
 				ent->client->ps.weaponTime = challenged->client->ps.weaponTime = 1000;
 
-			ent->client->ps.weapon = challenged->client->ps.weapon = challenged->client->pers.duel.weapon;
+			ent->client->ps.weapon = challenged->client->ps.weapon = challenged->client->pers.duelWeapon;
 
 			// set health etc
 			ent->health = challenged->health = ent->client->ps.stats[STAT_HEALTH] = challenged->client->ps.stats[STAT_HEALTH] = g_privateDuelHealth.integer;
@@ -2955,10 +2932,13 @@ void Cmd_EngageDuel_f(gentity_t *ent)
 		else
 		{// Print the message that a player has been challenged in private, only announce the actual duel initiation in private
 			// set their desired dueling weapon.
-			ent->client->pers.duel.weapon = weapon;
+			ent->client->pers.duelWeapon = weapon;
 
-			trap->SendServerCommand( challenged-g_entities, va( "cp \"%s "S_COLOR_WHITE"%s\n"S_COLOR_YELLOW"Weapon: "S_COLOR_WHITE"%s\n\"", ent->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELCHALLENGE" ), weaponData[weapon].longName ) );
-			trap->SendServerCommand( ent-g_entities, va( "cp \"%s %s\n"S_COLOR_YELLOW"Weapon: "S_COLOR_WHITE"%s\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELCHALLENGED" ), challenged->client->pers.netname, weaponData[weapon].longName ) );
+			trap->SendServerCommand( challenged-g_entities, va( "cp \"%s "S_COLOR_WHITE"%s\n"S_COLOR_YELLOW"Weapon: "
+				S_COLOR_WHITE"%s\n\"", ent->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELCHALLENGE" ),
+				weaponData[weapon].longName ) );
+			trap->SendServerCommand( ent-g_entities, va( "cp \"%s %s\n"S_COLOR_YELLOW"Weapon: "S_COLOR_WHITE"%s\n\"",
+				G_GetStringEdString( "MP_SVGAME", "PLDUELCHALLENGED" ), challenged->client->pers.netname, weaponData[weapon].longName ) );
 		}
 
 		challenged->client->ps.fd.privateDuelTime = 0; //reset the timer in case this player just got out of a duel. He should still be able to accept the challenge.
@@ -3283,12 +3263,12 @@ static void JP_FilterIdentifier( char *ident )
 static void JP_ListChannels( gentity_t *ent )
 {
 	qboolean legacyClient = !(ent->client->pers.CSF & CSF_CHAT_FILTERS);
-	channel_t *channel = ent->client->pers.japp.channels;
+	channel_t *channel = ent->client->pers.channels;
 	char msg[960] = { 0 };
 
 	while ( channel )
 	{
-		Q_strcat( msg, sizeof( msg ), (legacyClient && channel == ent->client->pers.japp.activeChannel)
+		Q_strcat( msg, sizeof( msg ), (legacyClient && channel == ent->client->pers.activeChannel)
 			? va( S_COLOR_WHITE"- "S_COLOR_YELLOW"%s "S_COLOR_WHITE"["S_COLOR_GREEN"%s"S_COLOR_WHITE"]\n", channel->identifier,
 			channel->shortname ) : !!(legacyClient) ? va( S_COLOR_WHITE"- %s "S_COLOR_WHITE"["S_COLOR_GREEN"%s"S_COLOR_WHITE"]\n",
 			channel->identifier, channel->shortname ) : va( S_COLOR_WHITE"- %s\n", channel->identifier ) );
@@ -3317,7 +3297,7 @@ void Cmd_JoinChannel_f( gentity_t *ent )
 
 	JP_FilterIdentifier( arg1_ident );
 
-	channel = ent->client->pers.japp.channels;
+	channel = ent->client->pers.channels;
 	while ( channel )
 	{//Try to find an existing channel
 		if ( !strcmp( arg1_ident, channel->identifier ) )
@@ -3339,7 +3319,7 @@ void Cmd_JoinChannel_f( gentity_t *ent )
 	if ( prev )
 		prev->next = channel;
 	else
-		ent->client->pers.japp.channels = channel;
+		ent->client->pers.channels = channel;
 
 	Q_strncpyz( channel->identifier, arg1_ident, sizeof( channel->identifier ) );
 	if ( legacyClient )
@@ -3368,7 +3348,7 @@ void Cmd_WhoisChannel_f( gentity_t *ent )
 		JP_FilterIdentifier( arg1_ident );
 
 		//Check if they're even in the channel
-		for ( chan = ent->client->pers.japp.channels; chan; chan = chan->next )
+		for ( chan = ent->client->pers.channels; chan; chan = chan->next )
 		{
 			if ( !strcmp( arg1_ident, chan->identifier) )
 			{
@@ -3386,7 +3366,7 @@ void Cmd_WhoisChannel_f( gentity_t *ent )
 		{
 			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED )
 			{
-				chan = other->client->pers.japp.channels;
+				chan = other->client->pers.channels;
 				while ( chan )
 				{
 					if ( !strcmp( chan->identifier, arg1_ident ) )
@@ -3407,7 +3387,7 @@ void Cmd_WhoisChannel_f( gentity_t *ent )
 		trap->Argv( 1, arg1_ident, sizeof( arg1_ident ) );
 		JP_FilterIdentifier( arg1_ident );
 
-		if ( !ent->client->pers.japp.activeChannel )
+		if ( !ent->client->pers.activeChannel )
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"You are not in any channels\n\"" );
 			return;
@@ -3417,10 +3397,10 @@ void Cmd_WhoisChannel_f( gentity_t *ent )
 		{
 			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED )
 			{
-				channel_t *chan = other->client->pers.japp.channels;
+				channel_t *chan = other->client->pers.channels;
 				while ( chan )
 				{
-					if ( chan == ent->client->pers.japp.activeChannel )
+					if ( chan == ent->client->pers.activeChannel )
 					{
 						Q_strcat( msg, sizeof( msg ), va( S_COLOR_WHITE"- %s\n", other->client->pers.netname ) );
 					}
@@ -3442,7 +3422,7 @@ void Cmd_LeaveChannel_f( gentity_t *ent )
 
 	if ( trap->Argc() == 2 && !legacyClient )
 	{
-		channel_t *channel = ent->client->pers.japp.channels;
+		channel_t *channel = ent->client->pers.channels;
 		channel_t *prev = NULL;
 		char arg1_ident[32] = { 0 };
 
@@ -3456,11 +3436,11 @@ void Cmd_LeaveChannel_f( gentity_t *ent )
 				if ( prev )
 					prev->next = channel->next;
 				else
-					ent->client->pers.japp.channels = channel->next;
+					ent->client->pers.channels = channel->next;
 				free( channel );
 
 				trap->SendServerCommand( ent-g_entities, va( "print \"Successfully left channel '%s'\n\"", arg1_ident ) );
-				if ( ent->client->pers.japp.channels )
+				if ( ent->client->pers.channels )
 				{
 					trap->SendServerCommand( ent-g_entities, "print \"You are currently in these channels:\n\"" );
 					JP_ListChannels( ent );
@@ -3471,7 +3451,7 @@ void Cmd_LeaveChannel_f( gentity_t *ent )
 			channel = channel->next;
 		}
 		trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_YELLOW"Error leaving channel '%s'. You were not in the channel.\n\"", arg1_ident ) );
-		if ( ent->client->pers.japp.channels )
+		if ( ent->client->pers.channels )
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"You are currently in these channels:\n\"" );
 			JP_ListChannels( ent );
@@ -3512,7 +3492,7 @@ void Cmd_MessageChannel_f( gentity_t *ent )
 		JP_FilterIdentifier( arg1_ident );
 
 		//Check if they're even in the channel
-		for ( chan = ent->client->pers.japp.channels; chan; chan = chan->next )
+		for ( chan = ent->client->pers.channels; chan; chan = chan->next )
 		{
 			if ( !strcmp( arg1_ident, chan->identifier) )
 			{
@@ -3532,7 +3512,7 @@ void Cmd_MessageChannel_f( gentity_t *ent )
 		{
 			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED )
 			{
-				chan = other->client->pers.japp.channels;
+				chan = other->client->pers.channels;
 				while ( chan )
 				{
 					if ( !strcmp( chan->identifier, arg1_ident ) )
@@ -3552,22 +3532,22 @@ void Cmd_MessageChannel_f( gentity_t *ent )
 		trap->Argv( 1, arg1_ident, sizeof( arg1_ident ) );
 		JP_FilterIdentifier( arg1_ident );
 
-		if ( !ent->client->pers.japp.activeChannel )
+		if ( !ent->client->pers.activeChannel )
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"You are not in any channels\n\"" );
 			return;
 		}
 
-		Com_sprintf( name, sizeof( name ), "%s"S_COLOR_WHITE CHANNEL_EC"%s"CHANNEL_EC": ", ent->client->pers.netname, ent->client->pers.japp.activeChannel->identifier );
+		Com_sprintf( name, sizeof( name ), "%s"S_COLOR_WHITE CHANNEL_EC"%s"CHANNEL_EC": ", ent->client->pers.netname, ent->client->pers.activeChannel->identifier );
 
 		for ( other = g_entities; other-g_entities < MAX_CLIENTS; other++ )
 		{
 			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED )
 			{
-				channel_t *chan = other->client->pers.japp.channels;
+				channel_t *chan = other->client->pers.channels;
 				while ( chan )
 				{
-					if ( chan == ent->client->pers.japp.activeChannel )
+					if ( chan == ent->client->pers.activeChannel )
 					{
 						G_SayTo( ent, other, SAY_ALL, COLOR_RED, name, msg, NULL );
 					}
@@ -4063,10 +4043,8 @@ void ClientCommand( int clientNum ) {
 		return;
 	//end rww
 
-	//[Admin]
 	else if ( AM_HandleCommands( ent, cmd ) )
 		return;
-	//[/Admin]
 
 	//Raz: JPLua
 	if ( JPLua_Event_ClientCommand( clientNum ) )

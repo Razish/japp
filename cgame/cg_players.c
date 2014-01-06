@@ -7,9 +7,7 @@
 #include "fx_local.h"
 #include "cg_luaevent.h"
 
-//[TrueView]
 extern void CheckCameraLocation( vector3 *OldeyeOrigin );
-//[/TrueView]
 
 extern vmCvar_t	cg_thirdPersonAlpha;
 
@@ -402,10 +400,8 @@ qboolean CG_ParseSurfsFile( const char *modelName, const char *skinName, char *s
 	return qtrue;
 }
 
-//[TrueView]
 //Warning flag for models that are incompatible with True View
-qboolean	trueviewwarning = qfalse;
-//[/TrueView]
+static qboolean trueviewwarning = qfalse;
 
 /*
 ==========================
@@ -427,10 +423,8 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	int		checkSkin;
 	char	*useSkinName;
 
-	//[TrueView]
 	//Warning flag for models that are incompatible with True View
 	trueviewwarning = qfalse;
-	//[/TrueView]
 
 retryModel:
 	if (badModel)
@@ -1473,15 +1467,11 @@ CG_NewClientInfo
 ======================
 */
 void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *saberName );
-//[RGBSabers]
 void ParseRGBSaber(char *str, vector3 *c);
-//[/RGBSabers]
 void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	clientInfo_t *ci, newInfo;
 	const char  *configstring, *v;
-	//[RGBSabers]
 	char *slash, *yo;
-	//[/RGBSabers]
 	void *oldGhoul2, *oldG2Weapons[MAX_SABERS];
 	int i, k, r, g, b, full;
 	qboolean saberUpdate[MAX_SABERS];
@@ -1551,7 +1541,6 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	if ( clientNum == cg.clientNum )
 		trap->Cvar_Set( "ui_team", v );
 
-	//[RGBSabers]
 	yo = Info_ValueForKey( configstring, "c3" );
 	full = atoi( yo );
 	r = full & 255;
@@ -1576,7 +1565,6 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	}
 
 	ParseRGBSaber( va( "%i,%i,%i", r, g, b ), &newInfo.rgb2 );
-	//[/RGBSabers]
 
 	//Raz: Gender hints
 	if ( (v = Info_ValueForKey( configstring, "ds" )) ) {
@@ -4303,7 +4291,6 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hModel ) {
 	mdxaBone_t		boltMatrix;
 	clientInfo_t	*ci;
 
-	//[TrueView]
 	if (cent->currentState.number == cg.snap->ps.clientNum 
 		&& !cg.renderingThirdPerson && !cg_trueGuns.integer 
 		&& cg.snap->ps.weapon != WP_SABER)
@@ -4311,7 +4298,6 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hModel ) {
 		if (cent->currentState.number == cg.snap->ps.clientNum &&
 		!cg.renderingThirdPerson)
 		*/
-		//[/TrueView]
 		return;
 
 	if (!cent->ghoul2)
@@ -5116,7 +5102,6 @@ int CG_LightVerts( vector3 *normal, int numVerts, polyVert_t *verts )
 	return qtrue;
 }
 
-//[RGBSabers]
 void RGB_LerpColor(vector3 *from, vector3 *to, float frac, vector3 *out)
 {
 	vector3 diff;
@@ -5197,9 +5182,7 @@ static void CG_RGBForSaberColor( saber_colors_t color, vector3 *rgb, int cnum, i
 	}
 }
 
-static void CG_DoSaberLight( saberInfo_t *saber , int cnum, int bnum)
-	//[/RGBSabers]
-{
+static void CG_DoSaberLight( saberInfo_t *saber , int cnum, int bnum ) {
 	vector3		positions[MAX_BLADES*2], mid={0}, rgbs[MAX_BLADES*2], rgb={0};
 	float		lengths[MAX_BLADES*2]={0}, totallength = 0, numpositions = 0, dist, diameter = 0;
 	int			i, j;
@@ -5219,10 +5202,7 @@ static void CG_DoSaberLight( saberInfo_t *saber , int cnum, int bnum)
 	{
 		if ( saber->blade[i].length >= 0.5f )
 		{
-			//FIXME: make RGB sabers
-			//[RGBSabers]
 			CG_RGBForSaberColor( saber->blade[i].color, &rgbs[i] , cnum, bnum);
-			//[/RGBSabers]
 			lengths[i] = saber->blade[i].length;
 			if ( saber->blade[i].length*2.0f > diameter )
 			{
@@ -5286,22 +5266,17 @@ static void CG_DoSaberLight( saberInfo_t *saber , int cnum, int bnum)
 	}
 }
 
-//[RGBSabers]
-void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, float radius, saber_colors_t color, int rfx, qboolean doLight, int cnum, int bnum )
-	//void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, float radius, saber_colors_t color, int rfx, qboolean doLight )
-{
+void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, float radius, saber_colors_t color, int rfx, qboolean doLight, int cnum, int bnum ) {
 	vector3		mid;
 	qhandle_t	blade = 0, glow = 0;
 	refEntity_t saber;
 	float radiusmult;
 	float radiusRange;
 	float radiusStart;
-	//[RGBSabers]
 	refEntity_t sbak;
 	vector3 rgb={1,1,1};
 	int i;
-	float lol;
-	//[/RGBSabers]
+	float pulse;
 
 	// if the thing is so short, just forget even adding me.
 	if ( length < 0.5f )
@@ -5339,7 +5314,6 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 		glow = cgs.media.purpleSaberGlowShader;
 		blade = cgs.media.purpleSaberCoreShader;
 		break;
-		//[RGBSabers]
 	default:
 	case SABER_RGB:
 		glow = cgs.media.rgbSaberGlowShader;
@@ -5365,16 +5339,13 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 		glow = cgs.media.blackSaberGlowShader;
 		blade = cgs.media.blackSaberCoreShader;
 		doLight = qfalse;
-		//[/RGBSabers]
 	}
 
 	if (doLight)
 	{	// always add a light because sabers cast a nice glow before they slice you in half!!  or something...
-		//[RGBSabers]
 		float light = length*1.4f + random()*3.0f;
 		CG_RGBForSaberColor( color, &rgb , cnum, bnum);
 		trap->R_AddLightToScene( &mid, light, rgb.r, rgb.g, rgb.b );
-		//[/RGBSabers]
 	}
 
 	memset( &saber, 0, sizeof( refEntity_t ));
@@ -5395,10 +5366,9 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 		rfx |= RF_FORCEPOST;
 	}
 
-	//[RGBSabers]
 	for ( i=0; i<3; i++ )
 		rgb.data[i] *= 255;
-	//[/RGBSabers]
+
 	radiusRange = radius * 0.075f;
 	radiusStart = radius-radiusRange;
 
@@ -5410,7 +5380,6 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	saber.reType = RT_SABER_GLOW;
 	saber.customShader = glow;
 
-	//[RGBSabers]
 	if ( color < SABER_RGB )
 		saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 	else
@@ -5419,8 +5388,7 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 			saber.shaderRGBA[i] = rgb.data[i];
 		saber.shaderRGBA[3] = 0xff;
 	}
-	//[/RGBSabers]
-	//	saber.renderfx = rfx;
+//	saber.renderfx = rfx;
 
 	//RAZTODO: Pass in cent info so we can cull!!!
 	//Raz: Glow
@@ -5441,24 +5409,6 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	//	saber.radius = (1.0 + crandom() * 0.2f)*radiusmult;
 
 	saber.shaderTexCoord.x = saber.shaderTexCoord.y = 1.0f;
-
-	//[RGBSabers]
-#if 0
-	if(color < SABER_RGB)
-		saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
-	else
-	{
-		for(i=0;i<3;i++)
-			saber.shaderRGBA[i] = rgb[i];
-		saber.shaderRGBA[3] = 255;
-	}
-
-
-	//	SE_R_AddRefEntityToScene( &saber, MAX_CLIENTS );
-
-	if(color < SABER_RGB)
-		return;
-#endif
 
 	memcpy( &sbak, &saber, sizeof( sbak ) );
 
@@ -5489,15 +5439,12 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 
 	sbak.shaderRGBA[0] = sbak.shaderRGBA[1] = sbak.shaderRGBA[2] = sbak.shaderRGBA[3] = 0xff;
 
-	lol = Q_fabs((sinf((float)cg.time / 400.0f)));
-	lol = (lol * 0.1f) + cg_saberWidth.value;
-	sbak.radius = lol;
+	pulse = Q_fabs((sinf((float)cg.time / 400.0f)));
+	sbak.radius = (pulse * 0.1f) + cg_saberWidth.value;
 
 	SE_R_AddRefEntityToScene( &sbak, MAX_CLIENTS );
-	//[/RGBSabers]
 }
 
-//[SFXSabers]
 void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, vector3 *trail_muz, float lengthMax, float radius, saber_colors_t color, int rfx, qboolean doLight, qboolean doTrail, int cnum, int bnum )
 {
 	vector3	dif, mid, blade_dir, end_dir, trail_dir, base_dir;
@@ -5505,10 +5452,8 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 	float	blade_len, end_len, trail_len, base_len, DisTip, DisMuz, DisDif;
 	float	glowscale = 0.5;
 	float 	v1, v2, len;
-	//[RGBSabers]
 	vector3 rgb={1,1,1};
 	int i;
-	//[/RGBSabers]
 	refdef_t *refdef = CG_GetRefdef();
 
 	qhandle_t	glow = 0;
@@ -5553,8 +5498,7 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 	case SABER_PURPLE:
 		glow = cgs.media.purpleSaberGlowShader;
 		break;
-		//[RGBSabers]
-		//	case SABER_WHITE:
+//	case SABER_WHITE:
 	case SABER_RGB:
 	case SABER_FLAME1:
 	case SABER_ELEC1:
@@ -5566,7 +5510,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 		glow = cgs.media.blackSaberGlowShader;
 		doLight = qfalse;
 		break;
-		//[/RGBSabers]
 	default:
 		glow = cgs.media.blueSaberGlowShader;
 		break;
@@ -5670,10 +5613,8 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 		rfx |= RF_FORCEPOST;
 	}
 
-	//[RGBSabers]
 	for(i=0;i<3;i++)
 		rgb.data[i] *= 255;
-	//[/RGBSabers]
 
 	{
 		saber.renderfx = rfx;
@@ -5685,7 +5626,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			VectorCopy( &blade_dir, &saber.axis[0] );
 			saber.reType = RT_SABER_GLOW;
 			saber.customShader = glow;
-			//[RGBSabers]
 			if(color < SABER_RGB /*&& color != SABER_WHITE*/)
 				saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * effectalpha;
 			else
@@ -5694,7 +5634,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 					saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
 				saber.shaderRGBA[3] = 255 * effectalpha;
 			}
-			//[/RGBSabers]
 
 			SE_R_AddRefEntityToScene( &saber, cnum );
 		}
@@ -5709,7 +5648,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 		saber.radius = coreradius;
 
 		saber.shaderTexCoord.x = saber.shaderTexCoord.y = 1.0f;
-		//[RGBSabers]
 		if(color < SABER_RGB /*&& color != SABER_WHITE*/)
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 		else
@@ -5730,7 +5668,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			sbak.radius = coreradius;
 			SE_R_AddRefEntityToScene( &sbak, cnum );
 		}
-		//[/RGBSabers]
 	}
 
 	{
@@ -5743,7 +5680,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			VectorCopy( &trail_dir, &saber.axis[0] );
 			saber.reType = RT_SABER_GLOW;
 			saber.customShader = glow;
-			//[RGBSabers]
 			if(color < SABER_RGB /*&& color != SABER_WHITE*/)
 				saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * effectalpha;
 			else
@@ -5752,7 +5688,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 					saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
 				saber.shaderRGBA[3] = 255 * effectalpha;
 			}
-			//[/RGBSabers]
 
 			SE_R_AddRefEntityToScene( &saber, cnum );
 		}
@@ -5767,7 +5702,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 		saber.radius = coreradius;
 
 		saber.shaderTexCoord.x = saber.shaderTexCoord.y = 1.0f;
-		//[RGBSabers]
 		if(color < SABER_RGB /*&& color != SABER_WHITE*/)
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 		else
@@ -5789,7 +5723,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			sbak.radius = coreradius;
 			SE_R_AddRefEntityToScene( &sbak, cnum );
 		}
-		//[/RGBSabers]
 
 	}
 
@@ -5807,7 +5740,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			VectorCopy( &base_dir, &saber.axis[0] );
 			saber.reType = RT_SABER_GLOW;
 			saber.customShader = glow;
-			//[RGBSabers]
 			if(color < SABER_RGB /*&& color != SABER_WHITE*/)
 				saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * effectalpha;
 			else
@@ -5816,7 +5748,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 					saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
 				saber.shaderRGBA[3] = 255 * effectalpha;
 			}
-			//[/RGBSabers]
 			SE_R_AddRefEntityToScene( &saber, cnum );
 		}
 
@@ -5831,7 +5762,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 		saber.saberLength = base_len;
 
 		saber.shaderTexCoord.x = saber.shaderTexCoord.y = 1.0f;
-		//[RGBSabers]
 		if(color < SABER_RGB /*&& color != SABER_WHITE*/)
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 		else
@@ -5854,7 +5784,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.saberLength = base_len;
 			SE_R_AddRefEntityToScene( &sbak, cnum );
 		}
-		//[/RGBSabers]
 	}
 
 	//	if(end_len > 1)
@@ -5903,7 +5832,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			VectorCopy( &end_dir, &saber.axis[0] );
 			saber.reType = RT_SABER_GLOW;
 			saber.customShader = glow;
-			//[RGBSabers]
 			if(color < SABER_RGB /*&& color != SABER_WHITE*/)
 				saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * effectalpha;
 			else
@@ -5912,7 +5840,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 					saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
 				saber.shaderRGBA[3] = 255 * effectalpha;
 			}
-			//[/RGBSabers]
 			SE_R_AddRefEntityToScene( &saber, cnum );
 		}
 
@@ -5947,7 +5874,6 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 		saber.saberLength = end_len;
 
 		saber.shaderTexCoord.x = saber.shaderTexCoord.y = 1.0f;
-		//[RGBSabers]
 		if(color < SABER_RGB /*&& color != SABER_WHITE*/)
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 		else
@@ -5969,10 +5895,8 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.saberLength = end_len;
 			SE_R_AddRefEntityToScene( &sbak, cnum );
 		}
-		//[/RGBSabers]
 	}
 }
-//[/SFXSabers]
 
 //--------------------------------------------------------------
 // CG_GetTagWorldPosition
@@ -6432,7 +6356,6 @@ void CG_SaberCompWork(vector3 *start, vector3 *end, centity_t *owner, int saberN
 										}
 									}
 								}
-								//[RGBSabers]
 								CG_AddGhoul2Mark(markShader, flrand(3.0f, 4.0f),
 									&trace.endpos, &ePos, trace.entityNum, &trEnt->lerpOrigin, trEnt->lerpAngles.yaw,
 									trEnt->ghoul2, &trEnt->modelScale, Q_irand(5000, 10000));
@@ -6444,7 +6367,6 @@ void CG_SaberCompWork(vector3 *start, vector3 *end, centity_t *owner, int saberN
 										&trace.endpos, &splashBackDir, owner->currentState.clientNum, &owner->lerpOrigin, owner->lerpAngles.yaw,
 										owner->ghoul2, &owner->modelScale, Q_irand(5000, 10000));
 								}
-								//[/RGBSabers]
 							}
 						}
 					}
@@ -6547,12 +6469,8 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 	effectTrailArgStruct_t fx;
 	int scolor = 0;
 	int	useModelIndex = 0;
-	//[SFXSabers]
 	vector3	rgb1={255.0f,255.0f,255.0f};
-	//[/SFXSabers]
-	//[Movie Sabers]
 	vector3 draw_dir;
-	//[/Movie Sabers]
 	int styleToUse = cg_saberBladeStyle.integer;
 
 	if (cent->currentState.eType == ET_NPC)
@@ -6650,20 +6568,12 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 		}
 	}
 
-	//[RGBSabers]
 	if(((cg_teamSabersRGB.integer < 1) 
 		|| (cg_teamSabersRGB.integer == 1 && cg.snap && cg.snap->ps.clientNum != cent->currentState.number)) &&
 		cgs.gametype >= GT_TEAM &&
 		cgs.gametype != GT_SIEGE &&
 		!cgs.jediVmerc &&
 		cent->currentState.eType != ET_NPC)
-	/*
-	if (cgs.gametype >= GT_TEAM &&
-		cgs.gametype != GT_SIEGE &&
-		!cgs.jediVmerc &&
-		cent->currentState.eType != ET_NPC)
-	*/
-	//[/RGBSabers]
 	{
 		if (client->team == TEAM_RED)
 		{
@@ -6932,7 +6842,6 @@ CheckTrail:
 						case SABER_PURPLE:
 							VectorSet( &rgb1, 220.0f, 0.0f, 255.0f );
 							break;
-							//[RGBSabers]
 					//	case SABER_WHITE:
 						case SABER_BLACK:
 							VectorSet( &rgb1, 255.0f, 255.0f, 255.0f );
@@ -6958,12 +6867,6 @@ CheckTrail:
 									VectorSet( &rgb1, 0.0f, 64.0f, 255.0f );
 							}
 							break;
-							//[/RGBSabers]
-#ifdef _DISABLED
-						default:
-							VectorSet( rgb1, 0.0f, 64.0f, 255.0f );
-							break;
-#endif
 						}
 
 						switch ( scolor )
@@ -7108,7 +7011,6 @@ CheckTrail:
 			VectorMA( &end, 3.0f, &axis_[0], &saberTrail->tip );
 			saberTrail->lastTime = cg.time;
 		}
-		//[SFXSabers]
 	}
 	else
 	{// Use the supremely hacky SFX Sabers.
@@ -7195,7 +7097,6 @@ CheckTrail:
 			case SABER_PURPLE:
 				VectorSet( &rgb1, 220.0f, 0.0f, 255.0f );
 				break;
-				//[RGBSabers]
 			case SABER_RGB:
 				{
 					int cnum = cent->currentState.clientNum;
@@ -7218,7 +7119,6 @@ CheckTrail:
 				//	case SABER_WHITE:
 				//			VectorSet( rgb1, 1.0f, 1.0f, 1.0f );
 				//			break;
-				//[/RGBSabers]
 			default:
 				VectorSet( &rgb1, 0.0f, 64.0f, 255.0f );
 				break;
@@ -7230,7 +7130,6 @@ CheckTrail:
 			VectorCopy( &saberTrail->dualbase, &fx.mVerts[3].origin );
 		}
 	}
-	//[/SFXSabers]
 
 JustDoIt:
 
@@ -7244,9 +7143,7 @@ JustDoIt:
 		if ( client->saber[saberNum].numBlades < 3
 			&& !(client->saber[saberNum].saberFlags2&SFL2_NO_DLIGHT) )
 		{//hmm, but still add the dlight
-			//[RGBSabers]
 			CG_DoSaberLight( &client->saber[saberNum], cent->currentState.clientNum, saberNum);
-			//[/RGBSabers]
 		}
 		return;
 	}
@@ -7288,14 +7185,12 @@ JustDoIt:
 	{
 		saberTrail->inAction = cg.time;
 
-		//[Movie Sabers]
 		//GR - Just tweaking this a little, cuz it looks funny when you turn around slowly
 		VectorSubtract( &fx.mVerts[2].origin, &fx.mVerts[1].origin, &draw_dir );
 		/*draw_len = */VectorNormalize( &draw_dir );
 
 		//if( draw_len > 2 )
 		{
-			//[/Movie Sabers]
 			fx.mShader = cgs.media.sfxSaberTrailShader;
 			fx.mKillTime = 0;
 			fx.mSetFlags = FX_USE_ALPHA;
@@ -9255,7 +9150,6 @@ void CG_CheckThirdPersonAlpha( centity_t *cent, refEntity_t *legs )
 	}
 }
 
-//[TrueView]
 /*
 ================
 GetSelfLegAnimPoint
@@ -9266,26 +9160,7 @@ GetSelfLegAnimPoint
 //Get the point in the leg animation and return a percentage of the current point in the anim between 0 and the total anim length (0.0f - 1.0f)
 float GetSelfLegAnimPoint(void)
 {
-	//[Animation]
 	return BG_GetLegsAnimPoint(&cg.predictedPlayerState, cg_entities[cg.predictedPlayerState.clientNum].localAnimIndex);
-	
-	/*
-	int animindex = cg_entities[cg.predictedPlayerState.clientNum].localAnimIndex;
-	float attackAnimLength = bgAllAnims[animindex].anims[cg.predictedPlayerState.legsAnim].numFrames * fabs(bgAllAnims[animindex].anims[cg.predictedPlayerState.legsAnim].frameLerp);
-	float currentPoint = 0;
-	//float animSpeedFactor = 1.0f;
-	float animPercentage = 0;
-
-	//currentPoint = cg.snap->ps.legsTimer;
-	currentPoint = cg.predictedPlayerState.legsTimer;
-
-	animPercentage = currentPoint/attackAnimLength;
-
-	//Com_Printf("Leg Animation Float Percentage: %f\n", animPercentage);
-
-	return animPercentage;
-	*/
-	//[/Animation]
 }
 
 
@@ -9299,32 +9174,7 @@ GetSelfTorsoAnimPoint
 //Get the point in the torso animation and return a percentage of the current point in the anim between 0 and the total anim length (0.0f - 1.0f)
 float GetSelfTorsoAnimPoint(void)
 {
-	//[Animation]
 	return BG_GetTorsoAnimPoint(&cg.predictedPlayerState, cg_entities[cg.predictedPlayerState.clientNum].localAnimIndex);
-	
-	/*
-	int animindex = cg_entities[cg.predictedPlayerState.clientNum].localAnimIndex;
-	int speedDif = 0;
-	float attackAnimLength = bgAllAnims[animindex].anims[cg.predictedPlayerState.torsoAnim].numFrames * fabs(bgAllAnims[animindex].anims[cg.predictedPlayerState.torsoAnim].frameLerp);
-	float currentPoint = 0;
-	float animSpeedFactor = 1.0f;
-	float animPercentage = 0;
-
-	//Be sure to scale by the proper anim speed just as if we were going to play the animation
-
-	BG_SaberStartTransAnim(cg.predictedPlayerState.clientNum, cg.predictedPlayerState.fd.saberAnimLevel, cg.predictedPlayerState.weapon, cg.predictedPlayerState.torsoAnim, &animSpeedFactor, cg.predictedPlayerState.brokenLimbs);
-	speedDif = attackAnimLength - (attackAnimLength * animSpeedFactor);
-	attackAnimLength += speedDif;
-
-	currentPoint = cg.predictedPlayerState.torsoTimer;
-
-	animPercentage = currentPoint/attackAnimLength;
-
-	//Com_Printf("Torso Animation Float Percentage: %f\n", animPercentage);
-
-	return animPercentage;
-	*/
-	//[/Animation]
 }
 
 
@@ -9647,7 +9497,6 @@ void SmoothTrueView(vector3 *eyeAngles)
 		}
 	}
 }
-//[/TrueView]
 
 void CG_AddMovementVectors();
 void CG_Player( centity_t *cent ) {
@@ -10120,18 +9969,11 @@ void CG_Player( centity_t *cent ) {
 	renderfx = 0;
 	if ( cent->currentState.number == cg.snap->ps.clientNum) {
 		if (!cg.renderingThirdPerson) {
-#if 0
-			if (!cg_fpls.integer || cent->currentState.weapon != WP_SABER)
-#else
-			//[TrueView]
 			if ( ( !cg_trueGuns.integer && cg.predictedPlayerState.weapon != WP_SABER 
 				&& cg.predictedPlayerState.weapon != WP_MELEE) 
 				|| ( cg.predictedPlayerState.weapon == WP_SABER && cg_trueSaberOnly.integer )
 				|| cg.predictedPlayerState.zoomMode
 				|| cg.japp.fakeGun )
-			//if (cent->currentState.weapon != WP_SABER)
-			//[/TrueView]
-#endif
 			{
 				renderfx = RF_THIRD_PERSON;			// only draw in mirrors
 			}
@@ -10478,7 +10320,6 @@ void CG_Player( centity_t *cent ) {
 	trap->G2API_GetBoltMatrix(cent->ghoul2, 0, ci->bolt_lhand, &lHandMatrix, &cent->turAngles, &cent->lerpOrigin, cg.time, cgs.gameModels, &cent->modelScale);
 	gotLHandMatrix = qtrue;
 
-	//[TrueView]
 	//Restrict True View Model changes to the player and do the True View camera view work.
 	if (cg.snap && cent->currentState.number == cg.snap->ps.clientNum)
 	{
@@ -10626,7 +10467,6 @@ void CG_Player( centity_t *cent ) {
 		trap->G2API_SetSurfaceOnOff( cent->ghoul2, "headb_eyes_mouth", TURN_ON );
 	}
 SkipTrueView:
-	//[/TrueView]
 
 #if 0
 	if (cg.renderingThirdPerson)
@@ -11078,17 +10918,11 @@ skipTrail:
 		efOrg.y = lHandMatrix.matrix[1][3];
 		efOrg.z = lHandMatrix.matrix[2][3];
 
-		//[TrueView]
 		//Do the Grip visual when you're using true view.
 		if ( (cent->currentState.forcePowersActive & (1 << FP_GRIP)) &&
 			(cg.renderingThirdPerson || cent->currentState.number != cg.snap->ps.clientNum 
 			|| cg_trueGuns.integer  || cg.predictedPlayerState.weapon == WP_SABER
 			|| cg.predictedPlayerState.weapon == WP_MELEE) )
-		/*
-		if ( (cent->currentState.forcePowersActive & (1 << FP_GRIP)) &&
-			(cg.renderingThirdPerson || cent->currentState.number != cg.snap->ps.clientNum) )
-		*/
-		//[/TrueView]
 		{
 			vector3 boltDir;
 			vector3 origBolt;
@@ -11306,7 +11140,6 @@ skipTrail:
 		}
 	}
 
-	//[TrueView]
 	if (cgs.gametype == GT_HOLOCRON &&
 		cent->currentState.time2
 		&& ((cg.renderingThirdPerson
@@ -11314,8 +11147,6 @@ skipTrail:
 			|| cg.predictedPlayerState.weapon == WP_SABER
 			|| cg.predictedPlayerState.weapon == WP_MELEE)
 		|| cg.snap->ps.clientNum != cent->currentState.number))
-	//if (cgs.gametype == GT_HOLOCRON && cent->currentState.time2 && (cg.renderingThirdPerson || cg.snap->ps.clientNum != cent->currentState.number))
-	//[/TrueView]
 	{
 		int i = 0;
 		int renderedHolos = 0;
@@ -11846,9 +11677,7 @@ stillDoSaber:
 					}
 					if ( ci->saber[l].numBlades > 2 )
 					{//add a single glow for the saber based on all the blade colors combined
-						//[RGBSabers]
 						CG_DoSaberLight( &ci->saber[l], cent->currentState.clientNum, l );
-						//[/RGBSabers]
 					}
 
 					l++;
@@ -12059,9 +11888,7 @@ stillDoSaber:
 			}
 			if ( ci->saber[l].numBlades > 2 )
 			{//add a single glow for the saber based on all the blade colors combined
-				//[RGBSabers]
 				CG_DoSaberLight( &ci->saber[l], cent->currentState.clientNum, l );
-				//[/RGBSabers]
 			}
 
 			l++;
@@ -12105,7 +11932,6 @@ stillDoSaber:
 		legs.renderfx |= RF_MINLIGHT;
 	}
 
-	//[ShieldEffects]
 	if ( ((cent->shieldHit || (cg_shieldTest.integer && cent->currentState.number == cg.clientNum)) && cg_shieldStyle.integer != -1 && !(cent->playerState->eFlags & EF_DEAD) && (cent->currentState.number != cg.clientNum || cg.predictedPlayerState.zoomMode == 0) ) )
 	{
 		int rfx = legs.renderfx;
@@ -12153,7 +11979,6 @@ stillDoSaber:
 		legs.shaderRGBA[2] = savedRGBA[2];
 		legs.shaderRGBA[3] = savedRGBA[3];
 	}
-	//[/ShieldEffects]
 
 	if (cg.snap->ps.duelInProgress && cent->currentState.number != cg.snap->ps.clientNum)
 	{ //I guess go ahead and glow your own client too in a duel
@@ -12521,14 +12346,10 @@ stillDoSaber:
 	// add powerups floating behind the player
 	CG_PlayerPowerups( cent, &legs );
 
-	//[TrueView]
 	if ((cent->currentState.forcePowersActive & (1 << FP_RAGE)) &&
 		(cg.renderingThirdPerson || cent->currentState.number != cg.snap->ps.clientNum
 		|| cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER
 		|| cg.predictedPlayerState.weapon == WP_MELEE))
-	//if ((cent->currentState.forcePowersActive & (1 << FP_RAGE)) &&
-	//	(cg.renderingThirdPerson || cent->currentState.number != cg.snap->ps.clientNum))
-	//[/TrueView]
 	{
 		//legs.customShader = cgs.media.rageShader;
 		legs.renderfx &= ~RF_FORCE_ENT_ALPHA;

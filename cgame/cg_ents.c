@@ -2396,7 +2396,6 @@ static void CG_Missile( centity_t *cent ) {
 			trap->FX_PlayEffectID( (cent->currentState.eFlags & EF_ALT_FIRING) ? cgs.effects.mBobaJet : cgs.effects.itemCone, &pos, &s1->angles, -1, -1, qfalse );
 			return;
 		}
-		//[Grapple]
 		else
 		{//Raz: Grapple
 			int			clientNum	= (cent->currentState.otherEntityNum == cg.snap->ps.clientNum) ? cg.predictedPlayerState.clientNum : cent->currentState.otherEntityNum;
@@ -2421,7 +2420,6 @@ static void CG_Missile( centity_t *cent ) {
 			CG_TestLine( &rHandPos, &pos, 1, 6, 1 );
 			return;
 		}
-		//[/Grapple]
 	}
 
 	if ( s1->weapon > WP_NUM_WEAPONS && s1->weapon != G2_MODEL_PART )

@@ -116,8 +116,16 @@ static void CVU_CInfo( void ) {
 	CPM_UpdateSettings( !!(jp_cinfo.integer & CINFO_CPMPHYSICS) );
 }
 
+static void CVU_Flipkick( void ) {
+	SetCInfo( japp_flipKick.integer, CINFO_FLIPKICK );
+}
+
 static void CVU_Promode( void ) {
 	SetCInfo( japp_promode.integer, CINFO_CPMPHYSICS );
+}
+
+static void CVU_HeadSlide( void ) {
+	SetCInfo( japp_slideOnHead.integer, CINFO_HEADSLIDE );
 }
 
 static void CVU_WeaponRoll( void ) {
@@ -250,9 +258,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int			i;
 	vmCvar_t	mapname;
 	vmCvar_t	ckSum;
-	//[RawMapName]
 	char		cs[MAX_INFO_STRING] = {0};
-	//[/RawMapName]
 	vmCvar_t	japp_crashHandler;
 
 	trap->Cvar_Register( &japp_crashHandler, "japp_crashHandler", "1", CVAR_ARCHIVE );
@@ -340,9 +346,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	//trap->SP_RegisterServer("mp_svgame");
 
-	//[RawMapName]
 	Q_strncpyz( level.rawmapname, Info_ValueForKey( cs, "mapname" ), sizeof(level.rawmapname) );
-	//[/RawMapName]
 
 	G_InitWorldSession();
 
@@ -429,15 +433,12 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		BotAISetup( restart );
 		BotAILoadMap( restart );
 		G_InitBots( restart );
-	//[BugFix44]
-	//}
 	} else {
 		// We still want to load arenas even if bot_enable is off so that 
 		// g_autoMapCycle can work let alone any other code that relies on 
 		// using arena information that normally wouldn't be loaded :Nervous
 		G_LoadArenas();
 	}
-	//[/BugFix44]
 
 	if ( level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL )
 		G_LogPrintf("Duel Tournament Begun: kill limit %d, win limit: %d\n", fraglimit.integer, duel_fraglimit.integer );
@@ -1298,9 +1299,7 @@ When the intermission starts, this will be called for all players.
 If a new client connects, this will be called after the spawn function.
 ========================
 */
-//[BugFix38]
 extern void G_LeaveVehicle( gentity_t *ent, qboolean ConCheck );
-//[/BugFix38]
 void MoveClientToIntermission( gentity_t *ent ) {
 	// take out of follow mode if needed
 	if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
@@ -1317,19 +1316,15 @@ void MoveClientToIntermission( gentity_t *ent ) {
 	// clean up powerup info
 	memset( ent->client->ps.powerups, 0, sizeof(ent->client->ps.powerups) );
 
-	//[BugFix38]
 	G_LeaveVehicle( ent, qfalse );
 	
 	ent->client->ps.rocketLockIndex = ENTITYNUM_NONE;
 	ent->client->ps.rocketLockTime = 0;
-	//[/BugFix38]
 
 	ent->client->ps.eFlags = 0;
 	ent->s.eFlags = 0;
-	//[BugFix38]
 	ent->client->ps.eFlags2 = 0;
 	ent->s.eFlags2 = 0;
-	//[/BugFix38]
 	ent->s.eType = ET_GENERAL;
 	ent->s.modelindex = 0;
 	ent->s.loopSound = 0;

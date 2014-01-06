@@ -6901,10 +6901,8 @@ void DeadSaberThink(gentity_t *saberent)
 void MakeDeadSaber(gentity_t *ent)
 {	//spawn a "dead" saber entity here so it looks like the saber fell out of the air.
 	//This entity will remove itself after a very short time period.
-	//[BugFix23]
 	//trace stuct used for determining if it's safe to spawn at current location
 	trace_t		tr;  
-	//[/BugFix23]
 	vector3 startorg;
 	vector3 startang;
 	gentity_t *saberent;
@@ -6937,7 +6935,6 @@ void MakeDeadSaber(gentity_t *ent)
 	saberent->think = DeadSaberThink;
 	saberent->nextthink = level.time;
 
-	//[BugFix23]
 	//perform a trace before attempting to spawn at currently location.
 	//unfortunately, it's a fairly regular occurance that current saber location
 	//(normally at the player's right hand) could result in the saber being stuck 
@@ -6958,7 +6955,6 @@ void MakeDeadSaber(gentity_t *ent)
 			//since this is our last chance, we don't care if this works or not.
 		}
 	}
-	//[/BugFix23]
 
 	VectorCopy(&startorg, &saberent->s.pos.trBase);
 	VectorCopy(&startang, &saberent->s.apos.trBase);
@@ -7192,10 +7188,8 @@ void saberReactivate(gentity_t *saberent, gentity_t *saberOwner)
 
 void saberKnockDown(gentity_t *saberent, gentity_t *saberOwner, gentity_t *other)
 {
-	//[BugFix23]
 	//trace stuct used for determining if it's safe to spawn at current location
 	trace_t		tr;  
-	//[/BugFix23]
 	saberOwner->client->ps.saberEntityNum = 0; //still stored in client->saberStoredIndex
 	saberOwner->client->saberKnockedTime = level.time + SABER_RETRIEVE_DELAY;
 
@@ -7205,7 +7199,6 @@ void saberKnockDown(gentity_t *saberent, gentity_t *saberOwner, gentity_t *other
 	VectorSet( &saberent->r.mins, -3.0f, -3.0f, -1.5f );
 	VectorSet( &saberent->r.maxs,  3.0f,  3.0f,  1.5f );
 
-	//[BugFix23]
 	//perform a trace before attempting to spawn at currently location.
 	//unfortunately, it's a fairly regular occurance that current saber location
 	//(normally at the player's right hand) could result in the saber being stuck 
@@ -7223,7 +7216,6 @@ void saberKnockDown(gentity_t *saberent, gentity_t *saberOwner, gentity_t *other
 			//since this is our last chance, we don't care if this works or not.
 		}
 	}
-	//[/BugFix23]
 
 	saberent->s.apos.trType = TR_GRAVITY;
 	saberent->s.apos.trDelta.x = Q_irand(200, 800);

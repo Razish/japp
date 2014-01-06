@@ -465,10 +465,8 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 	float		shotRange = 8192;
 	int			ignore, traces;
 
-	//[Unlagged]
 	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) )
 		G_TimeShiftAllClients( ent->client->pers.cmd.serverTime, ent );
-	//[/Unlagged]
 
 	if ( level.gametype == GT_SIEGE )
 	{
@@ -547,19 +545,15 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 				te->s.weapon = 0;//saberNum
 				te->s.legsAnim = 0;//bladeNum
 
-				//[Unlagged]
 				if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) )
 					G_UnTimeShiftAllClients( ent );
-				//[/Unlagged]
 				return;
 			}
 		}
 		else if ( (traceEnt->flags&FL_SHIELDED) )
 		{//stopped cold
-			//[Unlagged]
 			if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) )
 				G_UnTimeShiftAllClients( ent );
-			//[/Unlagged]
 			return;
 		}
 		//a Jedi is not dodging this shot
@@ -604,11 +598,9 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 			tent->s.weapon = 1;
 		}
 	}
-	
-	//[Unlagged]
+
 	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) )
 		G_UnTimeShiftAllClients( ent );
-	//[/Unlagged]
 }
 
 
@@ -645,10 +637,8 @@ void WP_DisruptorAltFire( gentity_t *ent )
 	int			traces = DISRUPTOR_ALT_TRACES;
 	qboolean	fullCharge = qfalse;
 
-	//[Unlagged]
 	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) )
 		G_TimeShiftAllClients( ent->client->pers.cmd.serverTime, ent );
-	//[/Unlagged]
 
 	damage = DISRUPTOR_ALT_DAMAGE-30;
 
@@ -759,10 +749,8 @@ void WP_DisruptorAltFire( gentity_t *ent )
 				te->s.weapon = 0;//saberNum
 				te->s.legsAnim = 0;//bladeNum
 
-				//[Unlagged]
 				if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) )
 					G_UnTimeShiftAllClients( ent );
-				//[/Unlagged]
 
 				return;
 			}
@@ -874,10 +862,8 @@ void WP_DisruptorAltFire( gentity_t *ent )
 		skip = tr.entityNum;
 	}
 
-	//[Unlagged]
 	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) )
 		G_UnTimeShiftAllClients( ent );
-	//[/Unlagged]
 }
 
 
@@ -2895,10 +2881,8 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 	vector3 shot_mins, shot_maxs;
 	int			i;
 
-	//[Unlagged]
 	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) )
 		G_TimeShiftAllClients( ent->client->pers.cmd.serverTime, ent );
-	//[/Unlagged]
 
 	//Shove us backwards for half a second
 	VectorMA( &ent->client->ps.velocity, -200, &forward, &ent->client->ps.velocity );
@@ -3131,26 +3115,8 @@ static void WP_FireConcussionAlt( gentity_t *ent )
 	VectorCopy(&muzzle, &tent->s.origin2);
 	VectorCopy(&forward, &tent->s.angles2);
 
-#if 0 //yuck
-	//FIXME: if shoot *really* close to someone, the alert could be way out of their FOV
-	for ( dist = 0; dist < shotDist; dist += 64 )
-	{
-		//FIXME: on a really long shot, this could make a LOT of alerts in one frame...
-		VectorMA( muzzle, dist, dir, spot );
-		AddSightEvent( ent, spot, 256, AEL_DISCOVERED, 50 );
-		//FIXME: creates *way* too many effects, make it one effect somehow?
-		G_PlayEffectID( G_EffectIndex( "concussion/alt_ring" ), spot, actualAngles );
-	}
-	//FIXME: spawn a temp ent that continuously spawns sight alerts here?  And 1 sound alert to draw their attention?
-	VectorMA( start, shotDist-4, forward, spot );
-	AddSightEvent( ent, spot, 256, AEL_DISCOVERED, 50 );
-
-	G_PlayEffectID( G_EffectIndex( "concussion/altmuzzle_flash" ), muzzle, forward );
-#endif
-	//[Unlagged]
 	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) )
 		G_UnTimeShiftAllClients( ent );
-	//[/Unlagged]
 }
 
 static void WP_FireConcussion( gentity_t *ent )
@@ -3380,7 +3346,6 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire )
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
-//[Grapple]
 void Weapon_GrapplingHook_Fire( gentity_t *ent )
 {
 	AngleVectors( &ent->client->ps.viewangles, &forward, &vright, &up );
@@ -3421,7 +3386,6 @@ void Weapon_HookThink( gentity_t *ent )
 
 	VectorCopy( &ent->r.currentOrigin, &ent->parent->client->ps.lastHitLoc );
 }
-//[/Grapple]
 
 /*
 ======================

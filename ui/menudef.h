@@ -21,9 +21,7 @@
 #define ITEM_TYPE_MULTI			12		// multiple list setting, enumerated
 #define ITEM_TYPE_BIND			13		// multiple list setting, enumerated
 #define ITEM_TYPE_TEXTSCROLL	14		// scrolls text
-//[INTSLIDER]
 #define ITEM_TYPE_INTSLIDER		15		// mouse speed, volume, etc.
-//[/INTSLIDER]
     
 #define ITEM_ALIGN_LEFT 0                 // left alignment
 #define ITEM_ALIGN_CENTER 1               // center alignment

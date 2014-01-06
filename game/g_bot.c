@@ -205,17 +205,11 @@ const char *G_RefreshNextMap(int gametype, qboolean forced)
 		return NULL;
 	}
 
-	//[RawMapName]
-	//trap->Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
-	//[/RawMapName]
 	for( n = 0; n < level.arenas.num; n++ )
 	{
 		type = Info_ValueForKey( level.arenas.infos[n], "map" );
 
-		//[RawMapName]
 		if (Q_stricmp(level.rawmapname, type) == 0)
-		//if (Q_stricmp(mapname.string, type) == 0)
-		//[/RawMapName]
 		{
 			thisLevel = n;
 			break;
@@ -402,10 +396,7 @@ void G_AddRandomBot( int team ) {
 			if ( cl->pers.connected != CON_CONNECTED ) {
 				continue;
 			}
-			//[ClientNumFix]
 			if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
-			//if ( !(g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) ) {
-			//[/ClientNumFix]
 				continue;
 			}
 			if (level.gametype == GT_SIEGE)
@@ -437,10 +428,7 @@ void G_AddRandomBot( int team ) {
 			if ( cl->pers.connected != CON_CONNECTED ) {
 				continue;
 			}
-			//[ClientNumFix]
 			if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
-			//if ( !(g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) ) {
-			//[/ClientNumFix]
 				continue;
 			}
 			if (level.gametype == GT_SIEGE)
@@ -489,21 +477,16 @@ int G_RemoveRandomBot( int team ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		//[ClientNumFix]
 		if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
-		//if ( !(g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) ) {
-		//[/ClientNumFix]
 			continue;
 		}
 
-		//[BugFix9]
 		if ( cl->sess.sessionTeam == TEAM_SPECTATOR 
 			&& cl->sess.spectatorState == SPECTATOR_FOLLOW )
 		{//this entity is actually following another entity so the ps data is for a
 			//different entity.  Bots never spectate like this so, skip this player.
 			continue;
 		}
-		//[/BugFix9]
 
 		if (level.gametype == GT_SIEGE)
 		{
@@ -539,11 +522,8 @@ int G_CountHumanPlayers( int team ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		//[BugFix17]
 		//can't use cl->ps.clientNum since the ps.clientNum might be for the clientNum of the player that this client is specing.
 		if ( g_entities[i].r.svFlags & SVF_BOT ) {
-		//if ( g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT ) {
-		//[/BugFix17]
 			continue;
 		}
 		if ( team >= 0 && cl->sess.sessionTeam != team ) {
@@ -570,13 +550,11 @@ int G_CountBotPlayers( int team ) {
 			continue;
 		}
 
-		//[BugFix17]
 		//can't use cl->ps.clientNum since the ps.clientNum might be for the clientNum of the player that this client is specing.
 		if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
 		//if ( !(g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) ) {
 			continue;
 		}
-		//[/BugFix17]
 
 		if (level.gametype == GT_SIEGE)
 		{

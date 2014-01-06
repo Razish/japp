@@ -2512,11 +2512,8 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 	case EV_DISRUPTOR_MAIN_SHOT:
 		DEBUGNAME("EV_DISRUPTOR_MAIN_SHOT");
 		if (cent->currentState.eventParm != cg.snap->ps.clientNum ||
-			//[TrueView]
 			cg.renderingThirdPerson || cg_trueGuns.integer 
 			|| cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
-			//cg.renderingThirdPerson)
-			//[/TrueView]
 		{ //h4q3ry
 			CG_GetClientWeaponMuzzleBoltPoint(cent->currentState.eventParm, &cent->currentState.origin2);
 		}

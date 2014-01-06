@@ -128,7 +128,7 @@ typedef enum impactSound_e {
 
 // when changing animation, set animationTime to frameTime + lerping time
 // The current lerp will finish out, then it will lerp to the new animation
-typedef struct {
+typedef struct lerpFrame_s {
 	int			oldFrame;
 	int			oldFrameTime;		// time when ->oldFrame was exactly on
 
@@ -159,154 +159,84 @@ typedef struct {
 } lerpFrame_t;
 
 
-typedef struct {
-	lerpFrame_t		legs, torso, flag;
-	int				painTime;
-	int				painDirection;	// flip from 0 to 1
-	int				lightningFiring;
+typedef struct playerEntity_s {
+	lerpFrame_t	legs, torso, flag;
+	int			painTime;
+	int			painDirection;	// flip from 0 to 1
+	int			lightningFiring;
 
 	// machinegun spinning
-	float			barrelAngle;
-	int				barrelTime;
-	qboolean		barrelSpinning;
+	float		barrelAngle;
+	int			barrelTime;
+	qboolean	barrelSpinning;
 } playerEntity_t;
 
 //=================================================
 
-// each client has an associated clientInfo_t
-// that contains media references necessary to present the
-// client model and other color coded effects
-// this is regenerated each time a client's configstring changes,
-// usually as a result of a userinfo (name, model, etc) change
-#define	MAX_CUSTOM_COMBAT_SOUNDS	40
-#define	MAX_CUSTOM_EXTRA_SOUNDS	40
-#define	MAX_CUSTOM_JEDI_SOUNDS	40
+// each client has an associated clientInfo_t that contains media references necessary to present the client model and
+//	other color coded effects
+// this is regenerated each time a client's configstring changes, usually as a result of a userinfo (name, model, etc) change
+#define	MAX_CUSTOM_COMBAT_SOUNDS 40
+#define	MAX_CUSTOM_EXTRA_SOUNDS 40
+#define	MAX_CUSTOM_JEDI_SOUNDS 40
 // MAX_CUSTOM_SIEGE_SOUNDS defined in bg_public.h
-#define MAX_CUSTOM_DUEL_SOUNDS	40
+#define MAX_CUSTOM_DUEL_SOUNDS 40
 
-#define	MAX_CUSTOM_SOUNDS	40 //rww - Note that for now these must all be the same, because of the way I am
-							   //cycling through them and comparing for custom sounds.
+#define	MAX_CUSTOM_SOUNDS 40	//rww - Note that for now these must all be the same, because of the way I am cycling
+								//	through them and comparing for custom sounds.
 
 typedef struct clientInfo_s {
-	qboolean		infoValid;
-
-	vector4			colorOverride;
-
-	saberInfo_t		saber[MAX_SABERS];
-	void			*ghoul2Weapons[MAX_SABERS];
-
-	char			saberName[64];
-	char			saber2Name[64];
-
-	char			name[MAX_QPATH];
-	team_t			team;
-
-	int				duelTeam;
-
-	int				botSkill;		// 0 = not bot, 1-5 = bot
-
-	int				frame;
-
-	vector3			color1;
-	vector3			color2;
-
-	int				icolor1;
-	int				icolor2;
-
-	int				score;			// updated by score servercmds
-	int				location;		// location index for team mode
-	int				health;			// you only get this info about your teammates
-	int				armor;
-	int				curWeapon;
-
-	int				handicap;
-	int				wins, losses;	// in tourney mode
-
-	int				teamTask;		// task in teamplay (offence/defence)
-	qboolean		teamLeader;		// true when this is a team leader
-
-	int				powerups;		// so can display quad/flag status
-
-	int				medkitUsageTime;
-
-	int				breathPuffTime;
-
-	// when clientinfo is changed, the loading of models/skins/sounds
-	// can be deferred until you are dead, to prevent hitches in
-	// gameplay
-	char			modelName[MAX_QPATH];
-	char			skinName[MAX_QPATH];
-//	char			headModelName[MAX_QPATH];
-//	char			headSkinName[MAX_QPATH];
-	char			forcePowers[MAX_QPATH];
-//	char			redTeam[MAX_TEAMNAME];
-//	char			blueTeam[MAX_TEAMNAME];
-
-	char			teamName[MAX_TEAMNAME];
-
-	int				corrTime;
-
-	vector3			lastHeadAngles;
-	int				lookTime;
-
-	int				brokenLimbs;
-
-	qboolean		deferred;
-
-	qboolean		newAnims;		// true if using the new mission pack animations
-	qboolean		fixedlegs;		// true if legs yaw is always the same as torso yaw
-	qboolean		fixedtorso;		// true if torso never changes yaw
-
-	vector3			headOffset;		// move head in icon views
-	//footstep_t		footsteps;
-	gender_t		gender;			// from model
-
-	qhandle_t		legsModel;
-	qhandle_t		legsSkin;
-
-	qhandle_t		torsoModel;
-	qhandle_t		torsoSkin;
-
-	//qhandle_t		headModel;
-	//qhandle_t		headSkin;
-
-	void			*ghoul2Model;
-	
-	qhandle_t		modelIcon;
-
-	qhandle_t		bolt_rhand;
-	qhandle_t		bolt_lhand;
-
-	qhandle_t		bolt_head;
-
-	qhandle_t		bolt_motion;
-
-	qhandle_t		bolt_llumbar;
-
-	int				siegeIndex;
-	int				siegeDesiredTeam;
-
-	sfxHandle_t		sounds[MAX_CUSTOM_SOUNDS];
-	sfxHandle_t		combatSounds[MAX_CUSTOM_COMBAT_SOUNDS];
-	sfxHandle_t		extraSounds[MAX_CUSTOM_EXTRA_SOUNDS];
-	sfxHandle_t		jediSounds[MAX_CUSTOM_JEDI_SOUNDS];
-	sfxHandle_t		siegeSounds[MAX_CUSTOM_SIEGE_SOUNDS];
-	sfxHandle_t		duelSounds[MAX_CUSTOM_DUEL_SOUNDS];
-
-	int				legsAnim;
-	int				torsoAnim;
-
-	float		facial_blink;		// time before next blink. If a minus value, we are in blink mode
-	float		facial_frown;		// time before next frown. If a minus value, we are in frown mode
-	float		facial_aux;			// time before next aux. If a minus value, we are in aux mode
-
+	qboolean	infoValid;
+	vector4		colorOverride;
+	saberInfo_t	saber[MAX_SABERS];
+	void		*ghoul2Weapons[MAX_SABERS];
+	char		saberName[64], saber2Name[64];
+	char		name[MAX_QPATH];
+	team_t		team;
+	int			duelTeam;
+	int			botSkill; // 0 = not bot, 1-5 = bot
+	int			frame;
+	vector3		color1, color2;
+	int			icolor1, icolor2;
+	int			score; // updated by score servercmds
+	int			location; // location index for team mode
+	int			health, armor, curWeapon; // you only get this info about your teammates
+	int			handicap;
+	int			wins, losses; // in tourney mode
+	int			teamTask; // task in teamplay (offence/defence)
+	qboolean	teamLeader; // true when this is a team leader
+	int			powerups; // so can display quad/flag status
+	int			medkitUsageTime;
+	int			breathPuffTime;
+	char		modelName[MAX_QPATH], skinName[MAX_QPATH];
+	char		forcePowers[MAX_QPATH];
+	char		teamName[MAX_TEAMNAME];
+	int			corrTime;
+	vector3		lastHeadAngles;
+	int			lookTime;
+	int			brokenLimbs;
+	qboolean	deferred;
+	qboolean	newAnims; // true if using the new mission pack animations
+	qboolean	fixedlegs, fixedtorso; // true if legs yaw is always the same as torso yaw, true if torso never changes yaw
+	vector3		headOffset; // move head in icon views
+	gender_t	gender; // from model
+	qhandle_t	legsModel, legsSkin;
+	qhandle_t	torsoModel, torsoSkin;
+	void		*ghoul2Model;
+	qhandle_t	modelIcon;
+	qhandle_t	bolt_rhand, bolt_lhand, bolt_head, bolt_motion, bolt_llumbar;
+	int			siegeIndex;
+	int			siegeDesiredTeam;
+	sfxHandle_t	sounds[MAX_CUSTOM_SOUNDS];
+	sfxHandle_t	combatSounds[MAX_CUSTOM_COMBAT_SOUNDS];
+	sfxHandle_t	extraSounds[MAX_CUSTOM_EXTRA_SOUNDS];
+	sfxHandle_t	jediSounds[MAX_CUSTOM_JEDI_SOUNDS];
+	sfxHandle_t	siegeSounds[MAX_CUSTOM_SIEGE_SOUNDS];
+	sfxHandle_t	duelSounds[MAX_CUSTOM_DUEL_SOUNDS];
+	int			legsAnim, torsoAnim;
+	float		facial_blink, facial_frown, facial_aux;
 	int			superSmoothTime; //do crazy amount of smoothing
-
-	//[RGBSabers]
-	vector3		rgb1;
-	vector3		rgb2;
-	//[/RGBSabers]
-
+	vector3		rgb1, rgb2;
 } clientInfo_t;
 
 //rww - cheap looping sound struct
@@ -1219,7 +1149,6 @@ typedef struct {
 	qhandle_t	blueSaberCoreShader;
 	qhandle_t	purpleSaberGlowShader;
 	qhandle_t	purpleSaberCoreShader;
-	//[RGBSabers]
 	qhandle_t	rgbSaberGlowShader;
 	qhandle_t	rgbSaberCoreShader;
 
@@ -1242,63 +1171,12 @@ typedef struct {
 	qhandle_t	blackSaberGlowShader;
 	qhandle_t	blackSaberCoreShader;
 	qhandle_t	blackBlurShader;
-	//[/RGBSabers]
-	//[Movie Sabers]
-#if 0
-	//Original Trilogy Sabers
-	qhandle_t otSaberCoreShader;			
-	qhandle_t redOTGlowShader;				
-	qhandle_t orangeOTGlowShader;			
-	qhandle_t yellowOTGlowShader;			
-	qhandle_t greenOTGlowShader;			
-	qhandle_t blueOTGlowShader;			
-	qhandle_t purpleOTGlowShader;			
 
-	//Episode I Sabers
-	qhandle_t ep1SaberCoreShader;
-	qhandle_t redEp1GlowShader;			
-	qhandle_t orangeEp1GlowShader;			
-	qhandle_t yellowEp1GlowShader;			
-	qhandle_t greenEp1GlowShader;			
-	qhandle_t blueEp1GlowShader;			
-	qhandle_t purpleEp1GlowShader;
-
-	//Episode II Sabers
-	qhandle_t ep2SaberCoreShader;
-	qhandle_t whiteIgniteFlare;
-	qhandle_t blackIgniteFlare;
-	qhandle_t redEp2GlowShader;			
-	qhandle_t orangeEp2GlowShader;			
-	qhandle_t yellowEp2GlowShader;			
-	qhandle_t greenEp2GlowShader;			
-	qhandle_t blueEp2GlowShader;			
-	qhandle_t purpleEp2GlowShader;
-
-	//Episode III Sabers
-	qhandle_t ep3SaberCoreShader;
-	qhandle_t whiteIgniteFlare02;
-	qhandle_t blackIgniteFlare02;
-	qhandle_t redIgniteFlare;
-	qhandle_t greenIgniteFlare;
-	qhandle_t purpleIgniteFlare;
-	qhandle_t blueIgniteFlare;
-	qhandle_t orangeIgniteFlare;
-	qhandle_t yellowIgniteFlare;
-	qhandle_t redEp3GlowShader;			
-	qhandle_t orangeEp3GlowShader;			
-	qhandle_t yellowEp3GlowShader;			
-	qhandle_t greenEp3GlowShader;			
-	qhandle_t blueEp3GlowShader;			
-	qhandle_t purpleEp3GlowShader;			
-#endif
-	//[Movie Sabers]
-	//[SFXSabers]
-	qhandle_t sfxSaberTrailShader;
-	qhandle_t sfxSaberBladeShader;
-	qhandle_t sfxSaberBlade2Shader;
-	qhandle_t sfxSaberEndShader;
-	qhandle_t sfxSaberEnd2Shader;
-	//[/SFXSabers]
+	qhandle_t	sfxSaberTrailShader;
+	qhandle_t	sfxSaberBladeShader;
+	qhandle_t	sfxSaberBlade2Shader;
+	qhandle_t	sfxSaberEndShader;
+	qhandle_t	sfxSaberEnd2Shader;
 
 	qhandle_t	saberBlurShader;
 	qhandle_t	swordTrailShader;
@@ -2230,17 +2108,13 @@ Ghoul2 Insert End
 
 void CG_LoadHudMenu( void );
 
-//[SmartEntities]
 qboolean SE_RenderThisEntity( vector3 *testOrigin, int gameEntity );
 void SE_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity );
-//[/SmartEntities]
 void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... );
 void QDECL CG_SecurityLogPrintf( const char *fmt, ... );
 void CG_ScoresDown_f( void );
-//[TrueView]
 void CG_TrueViewInit( void );
 void CG_AdjustEyePos( const char *modelName );
-//[/TrueView]
 
 qboolean Server_Supports( unsigned int supportFlag );
 void HandleTeamBinds( char *buf, int bufsize );

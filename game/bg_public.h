@@ -410,26 +410,24 @@ extern int forceMasteryPoints[NUM_FORCE_MASTERY_LEVELS];
 extern int bgForcePowerCost[NUM_FORCE_POWERS][NUM_FORCE_POWER_LEVELS];
 
 // pmove->pm_flags
-#define	PMF_DUCKED			1
-#define	PMF_JUMP_HELD		2
-#define PMF_ROLLING			4
-#define	PMF_BACKWARDS_JUMP	8		// go into backwards land
-#define	PMF_BACKWARDS_RUN	16		// coast down to backwards run
-#define	PMF_TIME_LAND		32		// pm_time is time before rejump
-#define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time
-#define	PMF_FIX_MINS		128		// mins have been brought up, keep tracing down to fix them
-#define	PMF_TIME_WATERJUMP	256		// pm_time is waterjump
-#define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
-#define	PMF_USE_ITEM_HELD	1024
-#define PMF_UPDATE_ANIM		2048	// The server updated the animation, the pmove should set the ghoul2 anim to match.
-#define PMF_FOLLOW			4096	// spectate following another player
-#define PMF_SCOREBOARD		8192	// spectate as a scoreboard
-#define PMF_STUCK_TO_WALL	16384	// grabbing a wall
-//[Grapple]
-#define PMF_GRAPPLE_PULL	32768
-//[/Grapple]
+#define	PMF_DUCKED			(0x00000001u)
+#define	PMF_JUMP_HELD		(0x00000002u)
+#define PMF_ROLLING			(0x00000004u)
+#define	PMF_BACKWARDS_JUMP	(0x00000008u) // go into backwards land
+#define	PMF_BACKWARDS_RUN	(0x00000010u) // coast down to backwards run
+#define	PMF_TIME_LAND		(0x00000020u) // pm_time is time before rejump
+#define	PMF_TIME_KNOCKBACK	(0x00000040u) // pm_time is an air-accelerate only time
+#define	PMF_FIX_MINS		(0x00000080u) // mins have been brought up, keep tracing down to fix them
+#define	PMF_TIME_WATERJUMP	(0x00000100u) // pm_time is waterjump
+#define	PMF_RESPAWNED		(0x00000200u) // clear after attack and jump buttons come up
+#define	PMF_USE_ITEM_HELD	(0x00000400u)
+#define PMF_UPDATE_ANIM		(0x00000800u) // The server updated the animation, the pmove should set the ghoul2 anim to match.
+#define PMF_FOLLOW			(0x00001000u) // spectate following another player
+#define PMF_SCOREBOARD		(0x00002000u) // spectate as a scoreboard
+#define PMF_STUCK_TO_WALL	(0x00004000u) // grabbing a wall
+#define PMF_GRAPPLE_PULL	(0x00008000u)
 
-#define	PMF_ALL_TIMES	(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
+#define	PMF_ALL_TIMES		(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
 
 #define	MAXTOUCH	32
 
@@ -523,12 +521,10 @@ extern	pmove_t		*pm;
 #define SETANIM_FLAG_HOLD		2//Set the new timer
 #define SETANIM_FLAG_RESTART	4//Allow restarting the anim if playing the same one (weapon fires)
 #define SETANIM_FLAG_HOLDLESS	8//Set the new timer
-//[AnimationSys]
 //new flag to be able to restart and override without overriding the same animation.
 //this is useful for situations where you want to have the animation timer pace
 //a repeating animation
 #define SETANIM_FLAG_PACE		16//acts like a SETANIM_FLAG_RESTART but only restarts if the animation is over.
-//[/AnimationSys]
 
 
 // if a full pmove isn't done on the client, you can just update the angles
@@ -1695,15 +1691,11 @@ extern int forcePowerDarkLight[NUM_FORCE_POWERS];
 #define	HYPERSPACE_SPEED			10000.0f//was 30000
 #define	HYPERSPACE_TURN_RATE		45.0f
 
-//[LedgeGrab]
 qboolean BG_InLedgeMove( int anim );
 qboolean In_LedgeIdle( int anim );
-//[/LedgeGrab]
 
-//[AnimationSys]
 float BG_GetTorsoAnimPoint( playerState_t *ps, int AnimIndex );
 float BG_GetLegsAnimPoint( playerState_t *ps, int AnimIndex );
-//[/AnimationSys]
 
 extern const char *gametypeStringShort[GT_MAX_GAME_TYPE];
 const char *BG_GetGametypeString( int gametype );

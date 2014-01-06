@@ -5657,61 +5657,13 @@ static void UI_UpdateSaberColor( qboolean secondSaber )
 		trap->Cvar_Set( "cp_sbRGB2", va( "%i", ui_sab2_r.integer | ((ui_sab2_g.integer | (ui_sab2_b.integer << 8)) << 8)) );
 	else
 		trap->Cvar_Set( "cp_sbRGB2", "0" );
-	//[RGBSabers]
-//	char str[32];
-//	str[0] = '\0';
-
-//	strncat(str,va("%i,%i,%i",ui_sab1_r.integer,ui_sab1_g.integer,ui_sab1_b.integer),sizeof(str));
-//	trap->Cvar_Set("cp_sbRGB1", str);
-//	str[0] = '\0';
-
-//	strncat(str,va("%i,%i,%i",ui_sab2_r.integer,ui_sab2_g.integer,ui_sab2_b.integer),sizeof(str));
-//	trap->Cvar_Set("cp_sbRGB2", str);
-
-	//	Com_Printf("update saber : %i\n",secondSaber);
-	//[/RGBSabers]
-
 }
 
 extern char * SaberColorToString(saber_colors_t color);
 
-//[RGBSabers]
 void ParseRGBSaber(char * str, vector3 *c);
-//[/RGBSabers]
 static void UI_GetSaberCvars ( void )
 {
-	//[RGBSabers]
-//	char strgb1[64],strgb2[64];
-//	vector3 c1,c2;
-	//[/RGBSabers]
-//	trap->Cvar_Set ( "ui_saber_type", UI_Cvar_VariableString ( "g_saber_type" ) );
-//	trap->Cvar_Set ( "ui_saber", UI_Cvar_VariableString ( "saber1" ) );
-//	trap->Cvar_Set ( "ui_saber2", UI_Cvar_VariableString ( "saber2" ));
-
-	//[RGBSabers]
-	/*
-	trap->Cvar_Set("g_saber_color", SaberColorToString((saber_colors_t)trap->Cvar_VariableValue("color1")));
-	trap->Cvar_Set("g_saber2_color", SaberColorToString((saber_colors_t)trap->Cvar_VariableValue("color2")));
-
-	trap->Cvar_Set ( "ui_saber_color", UI_Cvar_VariableString ( "g_saber_color" ) );
-	trap->Cvar_Set ( "ui_saber2_color", UI_Cvar_VariableString ( "g_saber2_color" ) );
-	*/
-
-//	strncpy(strgb1, UI_Cvar_VariableString("c3"),sizeof(strgb1));
-//	strncpy(strgb2, UI_Cvar_VariableString("c4"),sizeof(strgb2));
-
-//	ParseRGBSaber(strgb1,c1);
-//	ParseRGBSaber(strgb2,c2);
-
-//	trap->Cvar_Set("ui_sab1_r", va("%f",c1[0]));
-//	trap->Cvar_Set("ui_sab1_g", va("%f",c1[1]));
-//	trap->Cvar_Set("ui_sab1_b", va("%f",c1[2]));
-
-//	trap->Cvar_Set("ui_sab2_r", va("%f",c2[0]));
-//	trap->Cvar_Set("ui_sab2_g", va("%f",c2[1]));
-//	trap->Cvar_Set("ui_sab2_b", va("%f",c2[2]));
-
-
 	trap->Cvar_Set( "ui_saber", UI_Cvar_VariableString( "saber1" ) );
 	trap->Cvar_Set( "ui_saber2", UI_Cvar_VariableString( "saber2" ) );
 
@@ -5722,9 +5674,6 @@ static void UI_GetSaberCvars ( void )
 	trap->Cvar_Set( "ui_saber2_color", UI_Cvar_VariableString( "g_saber2_color" ) );
 	
 	return;
-
-//[/RGBSabers]
-
 }
 
 extern qboolean ItemParse_model_g2anim_go( itemDef_t *item, const char *animName );
@@ -9125,10 +9074,7 @@ void UI_SiegeSetCvarsForClass(siegeClass_t *scl)
 
 int g_siegedFeederForcedSet = 0;
 
-//[Compiler]
 void UI_UpdateCvarsForClass(const int team,const int baseClass,const int index)
-//void UI_UpdateCvarsForClass(const int team,const baseClass,const int index)
-//[/Compiler]
 {
 	siegeClass_t *holdClass=0;
 	char *holdBuf;
@@ -11096,7 +11042,6 @@ vmCvar_t	ui_bypassMainMenuLoad;
 vmCvar_t	cjp_client;
 vmCvar_t	japp_version;
 vmCvar_t	csf;
-//[RGBSabers]
 vmCvar_t	ui_sab1_r;
 vmCvar_t	ui_sab1_g;
 vmCvar_t	ui_sab1_b;
@@ -11107,7 +11052,6 @@ vmCvar_t	ui_sab2_b;
 
 vmCvar_t	cp_sbRGB1;
 vmCvar_t	cp_sbRGB2;
-//[/RGBSabers]
 
 // bk001129 - made static to avoid aliasing
 static cvarTable_t		cvarTable[] = {
@@ -11228,8 +11172,7 @@ static cvarTable_t		cvarTable[] = {
 //	{ &cjp_client, "cjp_client", "", CVAR_USERINFO|CVAR_ROM },
 //	{ &japp_version, "japp_version", "", CVAR_ROM },
 
-	//[RGBSabers]
-	//RAZFIXME: random
+	//RAZFIXME: random rgb sabers?
 	{ &ui_sab1_r,			"ui_sab1_r", "255", CVAR_INTERNAL|CVAR_ARCHIVE},
 	{ &ui_sab1_g,			"ui_sab1_g", "255", CVAR_INTERNAL|CVAR_ARCHIVE},
 	{ &ui_sab1_b,			"ui_sab1_b", "255", CVAR_INTERNAL|CVAR_ARCHIVE},
@@ -11239,8 +11182,6 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_sab2_b,			"ui_sab2_b", "255", CVAR_INTERNAL|CVAR_ARCHIVE},
 	{ &cp_sbRGB1,			"cp_sbRGB1", "0", CVAR_ARCHIVE|CVAR_USERINFO },
 	{ &cp_sbRGB2,			"cp_sbRGB2", "0", CVAR_ARCHIVE|CVAR_USERINFO },
-	//[/RGBSabers]
-
 };
 
 // bk001129 - made static to avoid aliasing

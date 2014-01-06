@@ -160,9 +160,7 @@ static void turret_fire ( gentity_t *ent, vector3 *start, vector3 *dir )
 	bolt->splashDamage = ent->damage;
 	bolt->splashRadius = 100;
 	bolt->methodOfDeath = MOD_TARGET_LASER;
-	//[BugFix16]
 	bolt->splashMethodOfDeath = MOD_TARGET_LASER;
-	//[/BugFix16]
 	bolt->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 	//bolt->trigger_formation = qfalse;		// don't draw tail on first frame	
 
