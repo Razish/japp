@@ -599,7 +599,7 @@ typedef struct {
 #define MAX_Q3PLAYERMODELS 1024 //256
 #define MAX_PLAYERMODELS 256 //32
 
-#define DEMO_DIRECTORY "demos/"
+#define DEMO_DIRECTORY "demos"
 #define DEMO_EXTENSION "dm_"
 #define MAX_DEMOLIST (MAX_DEMOS * MAX_QPATH)
 

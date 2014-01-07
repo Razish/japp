@@ -13,10 +13,6 @@
 // If you absolutely need something stored, it can either be kept
 // by the server in the server stored userinfos, or stashed in a cvar.
 
-#define NULL_HANDLE			((qhandle_t) 0)
-#define NULL_SOUND			((sfxHandle_t) 0)
-#define NULL_FX				((fxHandle_t) 0)
-
 #define	POWERUP_BLINKS		5
 
 #define	POWERUP_BLINK_TIME	1000

@@ -1483,7 +1483,7 @@ This prevents it from truncating into a wall.
 void VectorSnapTowards( vector3 *v, vector3 *to ) {
 	int i;
 
-	LOOPVEC3( i ) {
+	for ( i=0; i<3; i++ ) {
 		if ( to->data[i] <= v->data[i] )
 			v->data[i] = floorf( v->data[i] );
 		else
@@ -1506,7 +1506,7 @@ int Q_log2( int val ) {
 MatrixMultiply
 ================
 */
-void MatrixMultiply( vector3 in1[3], vector3 in2[3], vector3 out[3] ) {
+void MatrixMultiply( const vector3 in1[3], const vector3 in2[3], vector3 out[3] ) {
 	out[0].x = in1[0].x*in2[0].x + in1[0].y*in2[1].x + in1[0].z*in2[2].x;
 	out[0].y = in1[0].x*in2[0].y + in1[0].y*in2[1].y + in1[0].z*in2[2].y;
 	out[0].z = in1[0].x*in2[0].z + in1[0].y*in2[1].z + in1[0].z*in2[2].z;

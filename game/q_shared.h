@@ -380,38 +380,33 @@ float FloatSwap( const float *f );
 // TYPE DEFINITIONS
 // ================================================================
 
-typedef unsigned char 		byte;
-typedef unsigned short		word;
-typedef unsigned long		ulong;
+typedef unsigned char byte;
+typedef unsigned short word;
+typedef unsigned long ulong;
 
 typedef enum qboolean_e { qfalse=0, qtrue } qboolean;
 
-typedef union {
+// 32 bit field aliasing
+typedef union byteAlias_u {
 	float f;
-	int i;
-	unsigned int ui;
+	int32_t i;
+	uint32_t ui;
 	byte b[4];
+	char c[4];
 } byteAlias_t;
 
-typedef int		qhandle_t;
-typedef int		thandle_t; //rwwRMG - inserted
-typedef int		fxHandle_t;
-typedef int		sfxHandle_t;
-typedef int		fileHandle_t;
-typedef int		clipHandle_t;
+typedef int32_t qhandle_t, thandle_t, fxHandle_t, sfxHandle_t, fileHandle_t, clipHandle_t;
 
-#define NULL_HANDLE		((qhandle_t) 0)
-#define NULL_SOUND		((sfxHandle_t) 0)
-#define NULL_FX				((fxHandle_t) 0)
-#define NULL_SFX			((sfxHandle_t) 0)
-#define NULL_FILE			((fileHandle_t) 0)
-#define NULL_CLIP			((clipHandle_t) 0)
+#define NULL_HANDLE ((qhandle_t)0)
+#define NULL_SOUND ((sfxHandle_t)0)
+#define NULL_FX ((fxHandle_t)0)
+#define NULL_SFX ((sfxHandle_t)0)
+#define NULL_FILE ((fileHandle_t)0)
+#define NULL_CLIP ((clipHandle_t)0)
 
 //Raz: can't think of a better place to put this atm,
 //		should probably be in the platform specific definitions
 #if defined (_MSC_VER) && (_MSC_VER >= 1600)
-
-	#include <stdint.h>
 
 	// vsnprintf is ISO/IEC 9899:1999
 	// abstracting this to make it portable
@@ -435,14 +430,12 @@ typedef int		clipHandle_t;
 	int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
 #else // not using MSVC
 
-	#include <stdint.h>
-
 	#define Q_vsnprintf vsnprintf
 
 #endif
 
 #ifndef NULL
-#define NULL ((void *)0)
+	#define NULL ((void *)0)
 #endif
 
 #define	MAX_QINT			0x7fffffff
@@ -475,9 +468,9 @@ typedef int		clipHandle_t;
 
 #define	MAX_QPATH			64		// max length of a quake game pathname
 #ifdef PATH_MAX
-#define MAX_OSPATH			PATH_MAX
+	#define MAX_OSPATH			PATH_MAX
 #else
-#define	MAX_OSPATH			256		// max length of a filesystem pathname
+	#define	MAX_OSPATH			256		// max length of a filesystem pathname
 #endif
 
 #define	MAX_NAME_LENGTH		32		// max length of a client name
@@ -486,9 +479,8 @@ typedef int		clipHandle_t;
 #define	MAX_SAY_TEXT	150
 
 // paramters for command buffer stuffing
-typedef enum {
-	EXEC_NOW,			// don't return until completed, a VM should NEVER use this,
-						// because some commands might cause the VM to be unloaded...
+typedef enum cbufExec_t {
+	EXEC_NOW,			// don't return until completed, a VM should NEVER use this, because some commands might cause the VM to be unloaded...
 	EXEC_INSERT,		// insert at current position, but don't run yet
 	EXEC_APPEND			// add to end of the command buffer (normal case)
 } cbufExec_t;
@@ -509,17 +501,17 @@ typedef enum {
 #endif
 
 //For system-wide prints
-enum WL_e {
+typedef enum warningLevel_e {
 	WL_ERROR=1,
 	WL_WARNING,
 	WL_VERBOSE,
 	WL_DEBUG
-};
+} warningLevel_t;
 
 extern float forceSpeedLevels[4];
 
 // print levels from renderer (FIXME: set up for game / cgame?)
-typedef enum {
+typedef enum printParm_e {
 	PRINT_ALL,
 	PRINT_DEVELOPER,		// only print when "developer 1"
 	PRINT_WARNING,
@@ -532,7 +524,7 @@ typedef enum {
 #endif
 
 // parameters to the main Error routine
-typedef enum {
+typedef enum errorParm_e {
 	ERR_FATAL,					// exit the entire game with a popup window
 	ERR_DROP,					// print to console and disconnect from game
 	ERR_SERVERDISCONNECT,		// don't kill server
@@ -579,7 +571,7 @@ typedef enum {
 	#define HUNK_DEBUG
 #endif
 
-typedef enum {
+typedef enum ha_pref_e {
 	h_high,
 	h_low,
 	h_dontcare
@@ -607,62 +599,57 @@ MATHLIB
 #define atoff (float)atof
 
 typedef float number;
-typedef int integer;
+typedef signed int integer;
 
 #ifdef _MSC_VER
 	#pragma warning( push )
 	#pragma warning( disable : 4201 )
 #endif
 
-typedef union {
+typedef union vector2_u {
 	struct { number x, y; };
 	struct { number w, h; };
 	// s, t?
 	number data[2];
 } vector2;
-typedef union {
+typedef union ivector2_u {
 	struct { integer x, y; };
 	struct { integer w, h; };
 	// s, t?
 	integer data[2];
 } ivector2;
-#define LOOPVEC2( ct ) for ( ct=0; ct<2; ct++ )
 
-typedef union {
+typedef union vector3_u {
 	struct { number x, y, z; };
 	struct { number r, g, b; }; // red, green, blue?
 	struct { number pitch, yaw, roll; };
 	number data[3];
 } vector3;
-typedef union {
+typedef union ivector3_u {
 	struct { integer x, y, z; };
 	struct { integer r, g, b; }; // red, green, blue?
 	struct { integer pitch, yaw, roll; };
 	integer data[3];
 } ivector3;
-#define LOOPVEC3( ct ) for ( ct=0; ct<3; ct++ )
 
-typedef union {
+typedef union vector4_u {
 	struct { number x, y, z, w; };
 	struct { number r, g, b, a; };
 	// red, green, blue, alpha?
 	number data[4];
 } vector4;
-typedef union {
+typedef union ivector4_u {
 	struct { integer x, y, z, w; };
 	struct { integer r, g, b, a; };
 	// red, green, blue, alpha?
 	integer data[4];
 } ivector4;
-#define LOOPVEC4( ct ) for ( ct=0; ct<4; ct++ )
 
 #ifdef _MSC_VER
 	#pragma warning( pop )
 #endif
 
-typedef	int	fixed4_t;
-typedef	int	fixed8_t;
-typedef	int	fixed16_t;
+typedef	signed int fixed4_t, fixed8_t, fixed16_t;
 
 #ifndef M_PI
 	#define M_PI 3.14159265358979323846f // matches value in gcc v2 math.h
@@ -1447,7 +1434,7 @@ void MakeNormalVectors( const vector3 *forward, vector3 *right, vector3 *up );
 
 //int	PlaneTypeForNormal (vector3 *normal);
 
-void MatrixMultiply( vector3 in1[3], vector3 in2[3], vector3 out[3] );
+void MatrixMultiply( const vector3 in1[3], const vector3 in2[3], vector3 out[3] );
 void AngleVectors( const vector3 *angles, vector3 *forward, vector3 *right, vector3 *up);
 void PerpendicularVector( vector3 *dst, const vector3 *src );
 void NormalToLatLong( const vector3 *normal, byte bytes[2] ); //rwwRMG - added
