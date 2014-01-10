@@ -92,7 +92,7 @@ void NAVNEW_PushBlocker( gentity_t *self, gentity_t *blocker, vector3 *right, qb
 		return;
 	}
 
-	if ( !blocker->s.number )
+	if ( blocker->s.number >= 0 && blocker->s.number < MAX_CLIENTS )
 	{//never push the player
 		return;
 	}

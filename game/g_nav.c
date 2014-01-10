@@ -71,7 +71,7 @@ void NPC_Blocked( gentity_t *self, gentity_t *blocker )
 	//Debug_Printf( d_npcai, DEBUG_LEVEL_WARNING, "%s: Excuse me, %s %s!\n", self->targetname, blocker->classname, blocker->targetname );
 	
 	//If we're being blocked by the player, say something to them
-	if ( ( blocker->s.number == 0 ) && ( ( blocker->client->playerTeam == self->client->playerTeam ) ) )
+	if ( ( blocker->s.number >= 0 && blocker->s.number < MAX_CLIENTS ) && ( ( blocker->client->playerTeam == self->client->playerTeam ) ) )
 	{
 		//guys in formation are not trying to get to a critical point, 
 		//don't make them yell at the player (unless they have an enemy and
@@ -823,7 +823,7 @@ qboolean NAV_ResolveEntityCollision( gentity_t *self, gentity_t *blocker, vector
 //		return qtrue;
 	
 	//See if we can get around the blocker at all (only for player!)
-	if ( blocker->s.number == 0 )
+	if ( blocker->s.number >= 0 && blocker->s.number < MAX_CLIENTS )
 	{
 		if ( NAV_StackedCanyon( self, blocker, pathDir ) )
 		{
@@ -1101,7 +1101,7 @@ int	NAV_MoveToGoal( gentity_t *self, navInfo_t *info )
 		return WAYPOINT_NONE;
 
 	//Check special player optimizations
-	if ( self->NPC->goalEntity->s.number == 0 )
+	if ( self->NPC->goalEntity->s.number >= 0 && self->NPC->goalEntity->s.number < MAX_CLIENTS )
 	{
 		//If we couldn't find the point, then we won't be able to this turn
 		if ( self->NPC->goalEntity->waypoint == WAYPOINT_NONE )

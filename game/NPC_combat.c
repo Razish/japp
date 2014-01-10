@@ -305,7 +305,7 @@ void G_SetEnemy( gentity_t *self, gentity_t *enemy )
 	}
 
 #ifdef _DEBUG
-	if ( self->s.number )
+	if ( self->s.number >= MAX_CLIENTS )
 	{
 		assert( enemy != self );
 	}
@@ -346,7 +346,7 @@ void G_SetEnemy( gentity_t *self, gentity_t *enemy )
 		self->enemy = enemy;
 
 		//Special case- if player is being hunted by his own people, set their enemy team correctly
-		if ( self->client->playerTeam == NPCTEAM_PLAYER && enemy->s.number == 0 )
+		if ( self->client->playerTeam == NPCTEAM_PLAYER && enemy->s.number >= 0 && enemy->s.number < MAX_CLIENTS )
 		{
 			self->client->enemyTeam = NPCTEAM_PLAYER;
 		}
@@ -1614,7 +1614,7 @@ gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis
 				{//FIXME:  check for range and FOV or vis?
 					if ( NPC->client->playerTeam == NPCTEAM_PLAYER && enemyTeam == NPCTEAM_PLAYER )
 					{//player allies turning on ourselves?  How?
-						if ( newenemy->s.number )
+						if ( newenemy->s.number >= MAX_CLIENTS )
 						{//only turn on the player, not other player allies
 							continue;
 						}

@@ -954,7 +954,7 @@ void NPC_UseResponse( gentity_t *self, gentity_t *user, qboolean useWhenDone )
 		return;
 	}
 
-	if ( user->s.number != 0 )
+	if ( user->s.number >= MAX_CLIENTS )
 	{//not used by the player
 		if ( useWhenDone )
 		{
@@ -1046,7 +1046,7 @@ void NPC_Use( gentity_t *self, gentity_t *other, gentity_t *activator )
 			Jedi_Ambush( NPC );
 		}
 		//Run any use instructions
-		if ( activator && activator->s.number == 0 && self->client->NPC_class == CLASS_GONK )
+		if ( activator && activator->s.number >= MAX_CLIENTS && self->client->NPC_class == CLASS_GONK )
 		{
 			// must be using the gonk, so attempt to give battery power.
 			// NOTE: this will steal up to MAX_BATTERIES for the activator, leaving the residual on the gonk for potential later use.
@@ -1080,8 +1080,8 @@ void NPC_Use( gentity_t *self, gentity_t *other, gentity_t *activator )
 //		{//Heal me NOW, dammit!
 //			NPC_TakePatient( activator );
 //		}
-		else if ( !self->enemy 
-			&& activator->s.number == 0 
+		else if ( activator && !self->enemy 
+			&& activator->s.number >= 0 && activator->s.number < MAX_CLIENTS
 			&& /*!gi.VoiceVolume[self->s.number] &&*/ !(self->NPC->scriptFlags&SCF_NO_RESPONSE) )
 			//rwwFIXMEFIXME: voice volume support?
 		{//I don't have an enemy and I'm not talking and I was used by the player
