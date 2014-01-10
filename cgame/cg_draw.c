@@ -24,10 +24,6 @@ void CG_DrawDuelistHealth ( float x, float y, float w, float h, int duelist );
 extern displayContextDef_t cgDC;
 menuDef_t *menuScoreboard = NULL;
 
-vector4 	bluehudtint	= { 0.5f, 0.5f, 1.0f, 1.0f };
-vector4 	redhudtint	= { 1.0f, 0.5f, 0.5f, 1.0f };
-vector4		*hudTintColor = NULL;
-
 int sortedTeamPlayers[TEAM_MAXOVERLAY];
 int	numSortedTeamPlayers;
 
@@ -591,7 +587,7 @@ void CG_DrawHealth( menuDef_t *menuHUD )
 			continue;
 		}
 
-		memcpy(&calcColor, hudTintColor, sizeof(vector4));
+		memcpy( &calcColor, &colorTable[CT_WHITE], sizeof(calcColor) );
 
 		if (currValue <= 0)	// don't show tic
 		{
@@ -664,7 +660,7 @@ void CG_DrawArmor( menuDef_t *menuHUD )
 	currValue = ps->stats[STAT_ARMOR];
 	inc = (float) maxArmor / MAX_HUD_TICS;
 
-	memcpy(&calcColor, hudTintColor, sizeof(vector4));
+	memcpy( &calcColor, &colorTable[CT_WHITE], sizeof( calcColor ) );
 	for (i=(MAX_HUD_TICS-1);i>=0;i--)
 	{
 		focusItem = Menu_FindItemByName(menuHUD, armorTicName[i]);
@@ -674,7 +670,7 @@ void CG_DrawArmor( menuDef_t *menuHUD )
 			continue;
 		}
 
-		memcpy(&calcColor, hudTintColor, sizeof(vector4));
+		memcpy( &calcColor, &colorTable[CT_WHITE], sizeof( calcColor ) );
 
 		if (currValue <= 0)	// don't show tic
 		{
@@ -805,7 +801,7 @@ static void CG_DrawSaberStyle( centity_t *cent, menuDef_t *menuHUD)
 
 		if (focusItem)
 		{
-			trap->R_SetColor( hudTintColor );
+			trap->R_SetColor( &colorTable[CT_WHITE] );
 
 			CG_DrawPic( 
 				focusItem->window.rect.x,
@@ -824,7 +820,7 @@ static void CG_DrawSaberStyle( centity_t *cent, menuDef_t *menuHUD)
 
 		if (focusItem)
 		{
-			trap->R_SetColor( hudTintColor );
+			trap->R_SetColor( &colorTable[CT_WHITE] );
 
 			CG_DrawPic( 
 				focusItem->window.rect.x,
@@ -841,7 +837,7 @@ static void CG_DrawSaberStyle( centity_t *cent, menuDef_t *menuHUD)
 
 		if (focusItem)
 		{
-			trap->R_SetColor( hudTintColor );
+			trap->R_SetColor( &colorTable[CT_WHITE] );
 
 			CG_DrawPic( 
 				focusItem->window.rect.x,
@@ -889,7 +885,7 @@ static void CG_DrawAmmo( centity_t	*cent,menuDef_t *menuHUD)
 	}
 
 	focusItem = Menu_FindItemByName(menuHUD, "ammoamount");
-	trap->R_SetColor( hudTintColor );
+	trap->R_SetColor( &colorTable[CT_WHITE] );
 
 	if (weaponData[cent->currentState.weapon].energyPerShot == 0 &&
 		weaponData[cent->currentState.weapon].altEnergyPerShot == 0)
@@ -898,7 +894,7 @@ static void CG_DrawAmmo( centity_t	*cent,menuDef_t *menuHUD)
 		value = 8;
 
 		focusItem = Menu_FindItemByName(menuHUD, "ammoinfinite");
-		trap->R_SetColor( hudTintColor );
+		trap->R_SetColor( &colorTable[CT_WHITE] );
 		if (focusItem)
 		{
 			UI_DrawProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "--", NUM_FONT_SMALL, &focusItem->window.foreColor);
@@ -907,7 +903,7 @@ static void CG_DrawAmmo( centity_t	*cent,menuDef_t *menuHUD)
 	else
 	{
 		focusItem = Menu_FindItemByName(menuHUD, "ammoamount");
-		trap->R_SetColor( hudTintColor );
+		trap->R_SetColor( &colorTable[CT_WHITE] );
 		if (focusItem)
 		{
 
@@ -943,7 +939,7 @@ static void CG_DrawAmmo( centity_t	*cent,menuDef_t *menuHUD)
 			continue;
 		}
 
-		memcpy(&calcColor, hudTintColor, sizeof(vector4));
+		memcpy( &calcColor, &colorTable[CT_WHITE], sizeof( calcColor ) );
 
 		if ( value <= 0 )	// done
 		{
@@ -1033,7 +1029,7 @@ void CG_DrawForcePower( menuDef_t *menuHUD )
 			continue;
 		}
 
-//		memcpy(calcColor, hudTintColor, sizeof(vector4));
+//		memcpy( calcColor, &colorTable[CT_WHITE], sizeof( calcColor ) );
 
 		if ( value <= 0 )	// done
 		{
@@ -1602,20 +1598,6 @@ S_COLOR_CYAN"groundEntityNum: %i",
 		return;
 	}
 	
-	if (cgs.gametype >= GT_TEAM && cgs.gametype != GT_SIEGE)
-	{	// tint the hud items based on team
-		if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED )
-			hudTintColor = &redhudtint;
-		else if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE )
-			hudTintColor = &bluehudtint;
-		else // If we're not on a team for whatever reason, leave things as they are.
-			hudTintColor = &colorTable[CT_WHITE];
-	}
-	else
-	{	// tint the hud items white (dont' tint)
-		hudTintColor = &colorTable[CT_WHITE];
-	}
-
 	// Draw the left HUD 
 	menuHUD = Menus_FindByName("lefthud");
 	Menu_Paint( menuHUD, qtrue );
@@ -1628,7 +1610,7 @@ S_COLOR_CYAN"groundEntityNum: %i",
 		focusItem = Menu_FindItemByName(menuHUD, "scanline");
 		if (focusItem)
 		{
-			trap->R_SetColor( hudTintColor );	
+			trap->R_SetColor( &colorTable[CT_WHITE] );
 			CG_DrawPic( 
 				focusItem->window.rect.x, 
 				focusItem->window.rect.y, 
@@ -1642,7 +1624,7 @@ S_COLOR_CYAN"groundEntityNum: %i",
 		focusItem = Menu_FindItemByName(menuHUD, "frame");
 		if (focusItem)
 		{
-			trap->R_SetColor( hudTintColor );	
+			trap->R_SetColor( &colorTable[CT_WHITE] );	
 			CG_DrawPic( 
 				focusItem->window.rect.x, 
 				focusItem->window.rect.y, 
@@ -1726,7 +1708,7 @@ S_COLOR_CYAN"groundEntityNum: %i",
 		focusItem = Menu_FindItemByName(menuHUD, "scanline");
 		if (focusItem)
 		{
-			trap->R_SetColor( hudTintColor );	
+			trap->R_SetColor( &colorTable[CT_WHITE] );	
 			CG_DrawPic( 
 				focusItem->window.rect.x, 
 				focusItem->window.rect.y, 
@@ -1739,7 +1721,7 @@ S_COLOR_CYAN"groundEntityNum: %i",
 		focusItem = Menu_FindItemByName(menuHUD, "frame");
 		if (focusItem)
 		{
-			trap->R_SetColor( hudTintColor );	
+			trap->R_SetColor( &colorTable[CT_WHITE] );	
 			CG_DrawPic( 
 				focusItem->window.rect.x, 
 				focusItem->window.rect.y, 

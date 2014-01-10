@@ -12055,7 +12055,8 @@ stillDoSaber:
 			if ( cg.duelColour.forceAlpha == 1 )
 				legs.renderfx |= RF_FORCE_ENT_ALPHA;
 
-				 if ( cg_duelShaderStyle.integer == 0 )		legs.customShader = cgs.media.forceSightBubble;
+			if ( !Q_stricmp( cg_duelShaderStyle.string, "none" ) )
+				legs.customShader = 0;
 			else if ( cg_duelShaderStyle.integer == 1 )		legs.customShader = cgs.media.protectShader;
 			else if ( cg_duelShaderStyle.integer == 2 )		legs.customShader = cgs.media.playerShieldDamage;
 			else if ( cg_duelShaderStyle.integer == 3 )		legs.customShader = cgs.media.forceShell;
@@ -12064,17 +12065,13 @@ stillDoSaber:
 			else if ( cg_duelShaderStyle.integer == 6 )		legs.customShader = cgs.media.cloakedShader;
 			else											legs.customShader = cgs.media.forceSightBubble;
 
-			if ( !Q_stricmp( cg_duelShaderStyle.string, "none" ) )
-				legs.customShader = 0;
-
 			SE_R_AddRefEntityToScene( &legs, cent->currentState.number );
 			return;
 		}
 	}
 
 	//Raz: JA+ alt-dim
-	if ( cent->currentState.eType == ET_PLAYER && (cent->currentState.eFlags & EF_ALT_DIM) != (cg.predictedPlayerState.eFlags & EF_ALT_DIM) )
-	{
+	if ( cent->currentState.eType == ET_PLAYER && (cent->currentState.eFlags & EF_ALT_DIM) != (cg.predictedPlayerState.eFlags & EF_ALT_DIM) ) {
 		legs.shaderRGBA[0] = cg_altDimA.value;
 		legs.shaderRGBA[1] = cg_altDimA.value;
 		legs.shaderRGBA[2] = cg_altDimA.value;

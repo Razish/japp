@@ -259,13 +259,13 @@ files['ui'] = [
 
 # set up libraries to link with
 if plat == 'Linux':
-    libs['game']        = [ 'm' ]
-    libs['cgame']       = [ 'm' ]
-    libs['ui']          = [ 'm' ]
+	libs['game'] = [ 'm' ]
+	libs['cgame'] = [ 'm' ]
+	libs['ui'] = [ 'm' ]
 elif plat == 'Windows':
-    libs['game']        = []
-    libs['cgame']       = []
-    libs['ui']          = []
+	libs['game'] = []
+	libs['cgame'] = []
+	libs['ui'] = []
 
 # compiler options
 if plat == 'Linux':
@@ -275,6 +275,7 @@ if plat == 'Linux':
 	#if bits == 32:
 	#	env['CCFLAGS'] += [ '-m32' ]
 elif plat == 'Windows':
+	# assume msvc
 	env['CCFLAGS'] = [ '/Gm', '/GS', '/Zc:wchar_t', '/WX-', '/RTC1', '/MDd', '/EHsc', '/nologo', '/W4', '/wd"4100"', '/wd"4127"', '/wd"4996"' ]
 	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS','/MACHINE:'+arch ]
 	env['CPPDEFINES'] = [ '_CRT_SECURE_NO_WARNINGS', 'WIN32', '_WINDOWS' ]
