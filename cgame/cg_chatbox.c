@@ -59,8 +59,13 @@ static chatHistory_t *currentHistory = NULL;
 
 // chatbox input
 field_t chatField;
-qboolean chatTeam; //RAZTODO: messagemode3 whisper
-qboolean chatActive;
+static enum messageMode_e {
+	CHAT_ALL=0,
+	CHAT_TEAM,
+	CHAT_WHISPER,
+} chatMode;
+static int chatTargetClient = -1;
+static qboolean chatActive;
 
 static QINLINE int CG_GetChatboxFont( void ) {
 	return Com_Clampi( FONT_SMALL, FONT_NUM_FONTS, cg_chatboxFont.integer );
@@ -189,15 +194,19 @@ void CG_ChatboxOutgoing( void ) {
 	// commit the current line to history
 	CG_GetNewChatHistory( chatField.buffer );
 
-	// intercept team messages, replace teambinds like #h
-	if ( chatTeam ) {
+	switch ( chatMode ) {
+	default:
+	case CHAT_ALL:
+		trap->SendClientCommand( va( "say %s", chatField.buffer ) );
+		break;
+	case CHAT_TEAM:
 	//	CG_HandleTeamBinds( chatField.buffer, sizeof( chatField.buffer ) );
 		trap->SendClientCommand( va( "say_team %s", chatField.buffer ) );
-		return;
+		break;
+	case CHAT_WHISPER:
+		trap->SendClientCommand( va( "tell %i %s", chatTargetClient, chatField.buffer ) );
+		break;
 	}
-
-	// send as regular message
-	trap->SendClientCommand( va( "say %s", chatField.buffer ) );
 }
 
 // This function is called recursively when a logical message has to be split into multiple lines
@@ -231,7 +240,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, char *cbName
 			accumLength += CG_Text_Width( buf, cg.chatbox.size.scale, CG_GetChatboxFont() );
 
 		if ( accumLength > max( cg.chatbox.size.width, 192.0f ) && (i>0 && !Q_IsColorString( p-1 )) ) {
-			char lastColor = '2';
+			char lastColor = COLOR_GREEN;
 			int j = i;
 			int savedOffset = i;
 			char tempMessage[CHAT_MESSAGE_LENGTH];
@@ -281,8 +290,8 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, char *cbName
 			chat->isUsed = qtrue;
 			for ( j=i; j>=0; j-- )
 			{
-				if ( message[j] == '^' && message[j+1] >= '0' && message[j+1] <= '9' )
-				{
+				const char *tmp = &message[i];
+				if ( Q_IsColorString( tmp ) ) {// == '^' && message[j+1] >= '0' && message[j+1] <= '9' )
 					lastColor = message[j+1];
 					break;
 				}
@@ -343,33 +352,53 @@ static void CG_ChatboxDrawTabs( void ) {
 			+ (textHeight*0.25f), textWidth+16.0f, cg_chatboxLineHeight.value, (cb==currentChatbox) ? &colorTable[CT_DKGREY] : &colorTable[CT_BLACK] );
 
 		CG_Text_Paint( cg.chatbox.pos.x + xOffset+8.0f, cg.chatbox.pos.y + (cg_chatboxLineHeight.value*cg_chatboxLineCount.integer),
-			cg.chatbox.size.scale, &colorWhite, va( "^%c%s", (cb==currentChatbox) ? '2' : (cb->notification && ( (int)( trap->Milliseconds() >> 8 ) & 1 ) )
-			? '1' : '7', cb->shortname ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
+			cg.chatbox.size.scale, &colorWhite, va( "^%c%s", (cb==currentChatbox) ? COLOR_GREEN : (cb->notification && ( (int)( trap->Milliseconds() >> 8 ) & 1 ) )
+			? COLOR_RED : COLOR_WHITE, cb->shortname ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
 
 		xOffset += textWidth + 16.0f;
 		cb = cb->next;
 	}
 }
 
+static const char *GetPreText( qboolean clean ) {
+	switch ( chatMode ) {
+	default:
+	case CHAT_ALL:
+		return clean ? "Say: " : "Say: %s";
+
+	case CHAT_TEAM:
+		return clean ? "Team: " : "Team: %s";
+
+	case CHAT_WHISPER:
+		if ( clean ) {
+			char name[MAX_NETNAME];
+			Q_strncpyz( name, cgs.clientinfo[chatTargetClient].name, sizeof( name ) );
+			Q_CleanString( name, STRIP_COLOUR );
+			return va( "Tell %s: ", name );
+		}
+		return va( "Tell %s: %%s", cgs.clientinfo[chatTargetClient].name );
+	}
+}
+
 void CG_ChatboxDraw( void ) {
 	int i = MAX_CHATBOX_ENTRIES-min( cg_chatboxLineCount.integer, currentChatbox->numActiveLines );
-	int numLines = 0;
-	int done = 0;
+	int numLines = 0, done = 0, j = 0;
 //	chatEntry_t *last = NULL;
 
 	if ( CG_ChatboxActive() ) {
-		const char *pre = chatTeam ? "Team: %s" : "Say: %s";
-		const char *cleanPre = chatTeam ? "Team: " : "Say: ";
+		const char *pre = GetPreText( qfalse );
+		const char *cleanPre = GetPreText( qtrue );
 		char msg[MAX_EDIT_LINE];
 		Com_sprintf( msg, sizeof( msg ), pre, chatField.buffer );
 		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.value*cg_chatboxLineCount.integer),
 			cg.chatbox.size.scale, &g_color_table[ColorIndex(COLOR_WHITE)], msg, 0, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
 		if ( ((trap->Milliseconds() >> 8) & 1) ) {
 			float cursorOffset = 0.0f, cursorPre = CG_Text_Width( cleanPre, cg.chatbox.size.scale, CG_GetChatboxFont() );
-			int j;
+
 			Q_CleanString( msg, STRIP_COLOUR );
 			for ( j=0; j<chatField.cursor; j++ )
 				cursorOffset += CG_Text_Width( va( "%c", msg[j] ), cg.chatbox.size.scale, CG_GetChatboxFont() );
+
 			CG_Text_Paint( cg.chatbox.pos.x + cursorPre + cursorOffset, cg.chatbox.pos.y + (cg_chatboxLineHeight.value*cg_chatboxLineCount.integer),
 				cg.chatbox.size.scale, &g_color_table[ColorIndex(COLOR_WHITE)], "_", 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
 		}
@@ -473,7 +502,7 @@ void CG_ChatboxTabComplete( void ) {
 		if ( numMatches == 1 ) {
 			size_t oldCursor = chatField.cursor;
 			ptrdiff_t delta = &chatField.buffer[oldCursor] - p;
-			const char *str = va( "%s ^2", cgs.clientinfo[match].name );
+			const char *str = va( "%s "S_COLOR_GREEN, cgs.clientinfo[match].name );
 			size_t drawLen, len;
 
 			Q_strncpyz( p, str, sizeof( chatField.buffer ) - (p - &chatField.buffer[0]) );
@@ -493,9 +522,9 @@ void CG_ChatboxTabComplete( void ) {
 		{
 			CG_ChatboxAddMessage( va( "Several matches found for '%s':", currWord ), qfalse, "normal" );
 			for ( i=0; i</*min( 3, numMatches )*/numMatches; i++ )
-				CG_ChatboxAddMessage( va( "^2- ^7%s", matches[i] ), qfalse, "normal" );
+				CG_ChatboxAddMessage( va( S_COLOR_GREEN"- "S_COLOR_WHITE"%s", matches[i] ), qfalse, "normal" );
 		//	if ( numMatches > 3 )
-		//		CG_ChatboxAddMessage( "^2- ^7[...] truncated", qfalse, "normal" );
+		//		CG_ChatboxAddMessage( S_COLOR_GREEN"- "S_COLOR_WHITE"[...] truncated", qfalse, "normal" );
 			trap->S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		}
 	}
@@ -572,18 +601,38 @@ void CG_ChatboxEscape( void ) {
 }
 
 void CG_MessageModeAll_f( void ) {
+	if ( chatActive )
+		return;
 	chatActive = qtrue;
-	chatTeam = qfalse;
+	chatMode = CHAT_ALL;
+	chatTargetClient = -1;
 	Field_Clear( &chatField );
-	chatField.widthInChars = 30;
+//	chatField.widthInChars = 30;
 	trap->Key_SetCatcher( trap->Key_GetCatcher() ^ KEYCATCH_CGAME );
 }
 
 void CG_MessageModeTeam_f( void ) {
+	if ( chatActive )
+		return;
 	chatActive = qtrue;
-	chatTeam = qtrue;
+	chatMode = CHAT_TEAM;
+	chatTargetClient = -1;
 	Field_Clear( &chatField );
-	chatField.widthInChars = 25;
+//	chatField.widthInChars = 25;
+	trap->Key_SetCatcher( trap->Key_GetCatcher() ^ KEYCATCH_CGAME );
+}
+
+void CG_MessageModeTell_f( void ) {
+	if ( chatActive )
+		return;
+
+	if ( (chatTargetClient = CG_CrosshairPlayer()) == -1 )
+		return;
+
+	chatActive = qtrue;
+	chatMode = CHAT_WHISPER;
+	Field_Clear( &chatField );
+//	chatField.widthInChars = 25;
 	trap->Key_SetCatcher( trap->Key_GetCatcher() ^ KEYCATCH_CGAME );
 }
 

@@ -2133,6 +2133,7 @@ void CG_ChatboxHistoryDn( void );
 // chatbox events
 void CG_MessageModeAll_f( void );
 void CG_MessageModeTeam_f( void );
+void CG_MessageModeTell_f( void );
 void CG_ChatboxTabComplete( void );
 void CG_ChatboxScroll( int direction );
 void CG_ChatboxChar( int key );

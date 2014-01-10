@@ -387,7 +387,7 @@ static command_t commands[] = {
 #endif // JPLUA
 	{ "messagemodeAll",				CG_MessageModeAll_f },
 	{ "messagemodeTeam",			CG_MessageModeTeam_f },
-	//RAZTODO: messagemode3 whisper?
+	{ "messageModeTell",			CG_MessageModeTell_f },
 	{ "nextframe",					CG_TestModelNextFrame_f },
 	{ "nextskin",					CG_TestModelNextSkin_f },
 	{ "noclip",						NULL },
