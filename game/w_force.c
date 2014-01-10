@@ -4823,10 +4823,9 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 			self->client->ps.fd.forcePowerLevel[FP_LEVITATION] = FORCE_LEVEL_1;
 	}
 
-	if (self->client->ps.fd.forcePowerSelected < 0)
-	{ //bad
+	// bad
+	if ( self->client->ps.fd.forcePowerSelected < 0 || self->client->ps.fd.forcePowerSelected >= NUM_FORCE_POWERS )
 		self->client->ps.fd.forcePowerSelected = 0;
-	}
 
 	if ( ((self->client->sess.selectedFP != self->client->ps.fd.forcePowerSelected) ||
 		(self->client->sess.saberLevel != self->client->ps.fd.saberAnimLevel)) &&
