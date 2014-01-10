@@ -1075,8 +1075,8 @@ static void Slap( gentity_t *targ ) {
 	newDir.z = 1.0f;
 
 	//RAZTODO: japp_slapDistance
-	G_Knockdown( targ, NULL, &newDir, 50.0f, qtrue );
-	G_Throw( targ, &newDir, 50.0f );
+	G_Knockdown( targ, NULL, &newDir, japp_slapDistance.value, qtrue );
+	G_Throw( targ, &newDir, japp_slapDistance.value );
 }
 
 // slap the specified client
