@@ -93,6 +93,7 @@
     <ClCompile Include="..\shared\libudis86\syn.c" />
     <ClCompile Include="..\shared\libudis86\udis86.c" />
     <ClCompile Include="..\ui\ui_atoms.c" />
+    <ClCompile Include="..\ui\ui_cvar.c" />
     <ClCompile Include="..\ui\ui_force.c" />
     <ClCompile Include="..\ui\ui_gameinfo.c" />
     <ClCompile Include="..\ui\ui_main.c" />
