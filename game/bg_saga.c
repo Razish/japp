@@ -10,9 +10,9 @@
  *
  *****************************************************************************/
 #include "q_shared.h"
+#include "bg_public.h"
 #include "bg_saga.h"
 #include "bg_weapons.h"
-#include "bg_public.h"
 
 #if defined( _GAME )
 	#include "g_local.h"

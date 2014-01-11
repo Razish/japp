@@ -557,23 +557,18 @@ typedef struct localEntity_s {
 //======================================================================
 
 
-typedef struct {
-	int				client;
-	int				score;
-	int				deaths;
-	int				ping;
-	int				time;
-	int				scoreFlags;
-	int				powerUps;
-	int				accuracy;
-	int				impressiveCount;
-	int				excellentCount;
-	int				guantletCount;
-	int				defendCount;
-	int				assistCount;
-	int				captures;
-	qboolean	perfect;
-	int				team;
+typedef struct score_s {
+	int client;
+	int score, deaths;
+	int ping;
+	int time;
+	int scoreFlags;
+	int powerUps;
+	int accuracy;
+	int impressiveCount, excellentCount, gauntletCount, defendCount, assistCount;
+	int captures;
+	qboolean perfect;
+	int team;
 } score_t;
 
 
@@ -636,7 +631,7 @@ typedef struct weaponInfo_s {
 // each IT_* item has an associated itemInfo_t
 // that constains media references necessary to present the
 // item and its effects
-typedef struct {
+typedef struct itemInfo_s {
 	qboolean		registered;
 	qhandle_t		models[MAX_ITEM_MODELS];
 	qhandle_t		icon;
@@ -651,17 +646,9 @@ Ghoul2 Insert End
 } itemInfo_t;
 
 
-typedef struct {
-	int				itemNum;
+typedef struct powerupInfo_s {
+	int itemNum;
 } powerupInfo_t;
-
-
-#define MAX_SKULLTRAIL		10
-
-typedef struct {
-	vector3 positions[MAX_SKULLTRAIL];
-	int numpositions;
-} skulltrail_t;
 
 
 #define MAX_REWARDSTACK		10
@@ -702,7 +689,7 @@ typedef enum refdefView_e {
 	REFDEF_MAX
 } refdefViews_t;
 
-typedef struct {
+typedef struct cg_s {
 	int			clientFrame;		// incremented each frame
 
 	int			clientNum;
@@ -812,9 +799,6 @@ typedef struct {
 	int			spectatorPaintX2;					// current paint x
 	int			spectatorOffset;					// current offset from start
 	int			spectatorPaintLen; 					// current offset from start
-
-	// skull trails
-	skulltrail_t	skulltrails[MAX_CLIENTS];
 
 	// centerprinting
 	int			centerPrintTime;
@@ -1087,7 +1071,7 @@ typedef enum
 // loaded at gamestate time are stored in cgMedia_t
 // Other media that can be tied to clients, weapons, or items are
 // stored in the clientInfo_t, itemInfo_t, weaponInfo_t, and powerupInfo_t
-typedef struct {
+typedef struct cgMedia_s {
 	qhandle_t	charsetShader;
 	qhandle_t	whiteShader;
 
@@ -1568,7 +1552,7 @@ typedef struct
 // loaded or calculated from the gamestate.  It will NOT
 // be cleared when a tournement restart is done, allowing
 // all clients to begin playing instantly
-typedef struct {
+typedef struct cgs_s {
 	gameState_t		gameState;			// gamestate from server
 	glconfig_t		glconfig;			// rendering configuration
 	float			screenXScale;		// derived from glconfig

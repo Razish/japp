@@ -3,7 +3,6 @@
 //now). Basically it's slower and takes more memory.
 
 #include "g_local.h"
-//typedef map		< string, int >	timer_m;
 
 #define MAX_GTIMERS	16384
 

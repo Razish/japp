@@ -673,7 +673,7 @@ Initializes a window structure ( windowDef_t ) with defaults
  
 ==================
 */
-void Window_Init(Window *w) {
+void Window_Init(windowDef_t *w) {
 	memset(w, 0, sizeof(windowDef_t));
 	w->borderSize = 1;
 	w->foreColor.r = w->foreColor.g = w->foreColor.b = w->foreColor.a = 1.0;
@@ -704,7 +704,7 @@ void Fade(int *flags, float *f, float clamp, int *nextTime, int offsetTime, qboo
 
 
 
-void Window_Paint(Window *w, float fadeAmount, float fadeClamp, float fadeCycle) 
+void Window_Paint(windowDef_t *w, float fadeAmount, float fadeClamp, float fadeCycle) 
 {
 	//float bordersize = 0;
 	vector4 color;

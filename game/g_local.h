@@ -11,10 +11,8 @@
 #include "g_lua.h"
 
 typedef struct gentity_s gentity_t;
-//typedef struct gclient_s gclient_t;
 
 #include "g_admin.h"
-//#include "jp_asmdefines.h"
 
 //npc stuff
 #include "b_public.h"
@@ -812,9 +810,7 @@ typedef struct waypointData_s {
 	int		nodeID;
 } waypointData_t;
 
-//#include "..\shared\server.h"
-
-typedef struct {
+typedef struct level_locals_s {
 	struct gclient_s	*clients;		// [maxclients]
 
 	struct gentity_s	*gentities;

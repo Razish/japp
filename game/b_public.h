@@ -289,7 +289,7 @@ void Nav_ItemSpawn( gentity_t *ent, int remaining );
 #define NAVFILE_ID			(('I')+('N'<<8)+('A'<<16)+('V'<<24))
 #define NAVFILE_VERSION		6
 
-typedef struct {
+typedef struct navHeader_s {
 	unsigned	id;
 	unsigned	version;
 	unsigned	checksum;
@@ -314,7 +314,7 @@ typedef struct {
 #define NSF_DOOR_BUTTON		0x00000800
 #define NSF_BUTTON			0x00001000
 
-typedef struct {
+typedef struct nsurface_s {
 	vector3		origin;
 	vector2		absmin;
 	vector2		absmax;
@@ -339,7 +339,7 @@ typedef struct {
 #define NEF_DOOR_BUTTON		0x00000800
 #define NEF_BUTTON			0x00001000
 
-typedef struct {
+typedef struct nedge_s {
 	vector3		origin;
 	vector2		absmin;		// region within this surface that is the portal to the other surface
 	vector2		absmax;

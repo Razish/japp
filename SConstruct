@@ -250,6 +250,7 @@ files['ui'] = [
 	'shared/JAPP/jp_tokenparser.c',
 	'shared/json/cJSON.c',
 	'ui/ui_atoms.c',
+	'ui/ui_cvar.c',
 	'ui/ui_force.c',
 	'ui/ui_gameinfo.c',
 	'ui/ui_main.c',

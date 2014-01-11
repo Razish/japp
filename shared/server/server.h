@@ -36,7 +36,7 @@ typedef enum {
 	SS_GAME				// actively running
 } serverState_t;
 
-typedef struct {
+typedef struct server_s {
 	serverState_t	state;
 	qboolean		restarting;			// if true, send configstring changes during SS_LOADING
 	int				serverId;			// changes each server start
@@ -73,7 +73,7 @@ typedef struct {
 
 
 
-typedef struct {
+typedef struct clientState_s {
 	int				areabytes;
 	byte			areabits[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
 	playerState_t	ps;
@@ -166,7 +166,7 @@ typedef struct client_s {
 
 #define	AUTHORIZE_TIMEOUT	5000
 
-typedef struct {
+typedef struct challenge_s {
 	netadr_t	adr;
 	int			challenge;
 	int			time;				// time the last packet was sent to the autherize server
@@ -180,7 +180,7 @@ typedef struct {
 
 
 // this structure will be cleared only when the game dll changes
-typedef struct {
+typedef struct serverStatic_s {
 	qboolean	initialized;				// sv_init has completed
 
 	int			time;						// will be strictly increasing across level changes

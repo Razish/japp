@@ -64,6 +64,7 @@
 
 #define ARRAY_LEN( x ) ( sizeof( x ) / sizeof( *(x) ) )
 #define STRING( a ) #a
+#define XSTRING( a ) STRING( a )
 
 
 /*
@@ -1533,6 +1534,7 @@ void Q_strstrip( char *string, const char *strip, const char *repl );
 const char *Q_strchrs( const char *string, const char *search );
 char *Q_strrep( const char *subject, const char *search, const char *replace );
 void Q_strrev( char *str );
+const char *Q_stristr( const char *s, const char *find );
 #define STRIP_COLOUR	(0x00000001u)
 #define STRIP_EXTASCII	(0x00000002u)
 void Q_CleanString( char *string, uint32_t flags );
@@ -2663,11 +2665,6 @@ typedef struct qtime_s {
 #define AS_LOCAL			0
 #define AS_GLOBAL			1
 #define AS_FAVORITES		2
-//Raz: Added
-#define AS_GLOBAL2			3
-#define AS_GLOBAL3			4
-#define AS_GLOBAL4			5
-#define AS_GLOBAL5			6
 
 #define AS_MPLAYER			3 // (Obsolete)
 

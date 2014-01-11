@@ -10,13 +10,10 @@
 
 #define BOT_SPAWN_QUEUE_DEPTH	16
 
-typedef struct {
+static struct botSpawnQueue_s {
 	int		clientNum;
 	int		spawnTime;
-} botSpawnQueue_t;
-
-//static int			botBeginDelay = 0;  // bk001206 - unused, init
-static botSpawnQueue_t	botSpawnQueue[BOT_SPAWN_QUEUE_DEPTH];
+} botSpawnQueue[BOT_SPAWN_QUEUE_DEPTH];
 
 extern gentity_t	*podium1;
 extern gentity_t	*podium2;

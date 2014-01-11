@@ -15,7 +15,7 @@ PUSHMOVE
 
 void MatchTeam( gentity_t *teamLeader, int moverState, int time );
 
-typedef struct {
+typedef struct pushed_s {
 	gentity_t	*ent;
 	vector3	origin;
 	vector3	angles;

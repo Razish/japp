@@ -50,7 +50,7 @@ static void CG_ParseScores( void )
 		cg.scores[scoreIndex].accuracy			= atoi( CG_Argv( i * scoreOffset + 10 ) );
 		cg.scores[scoreIndex].impressiveCount	= atoi( CG_Argv( i * scoreOffset + 11 ) );
 		cg.scores[scoreIndex].excellentCount	= atoi( CG_Argv( i * scoreOffset + 12 ) );
-		cg.scores[scoreIndex].guantletCount		= atoi( CG_Argv( i * scoreOffset + 13 ) );
+		cg.scores[scoreIndex].gauntletCount		= atoi( CG_Argv( i * scoreOffset + 13 ) );
 		cg.scores[scoreIndex].defendCount		= atoi( CG_Argv( i * scoreOffset + 14 ) );
 		cg.scores[scoreIndex].assistCount		= atoi( CG_Argv( i * scoreOffset + 15 ) );
 		cg.scores[scoreIndex].perfect			= atoi( CG_Argv( i * scoreOffset + 16 ) );

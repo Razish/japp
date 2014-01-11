@@ -625,7 +625,7 @@ static void CVU_AccelSize( void ) {
 	}
 }
 
-typedef struct {
+typedef struct cvarTable_s {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
 	char		*defaultString;

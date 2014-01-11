@@ -3700,7 +3700,10 @@ void Cmd_Drop_f( gentity_t *ent ) {
 #define EXTINFO_CLIENT	(0x0004)
 #define EXTINFO_ALL		(0x0007)
 
-struct { char *str; int bit; } aminfoSettings[] = {
+static struct amInfoSetting_s {
+	char *str;
+	int bit;
+} aminfoSettings[] = {
 	{ "all", EXTINFO_ALL },
 	{ "saber", EXTINFO_SABER },
 	{ "cmds", EXTINFO_CMDS },
