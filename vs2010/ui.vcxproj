@@ -75,6 +75,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\game\bg_misc.c" />
+    <ClCompile Include="..\game\bg_saberLoad.c" />
     <ClCompile Include="..\game\bg_saga.c" />
     <ClCompile Include="..\game\bg_vehicleLoad.c" />
     <ClCompile Include="..\game\bg_weapons.c" />

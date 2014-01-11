@@ -242,6 +242,7 @@ files['cgame'] = [
 files['ui'] = [
 	'shared/JAPP/jp_crash.c',
 	'game/bg_misc.c',
+	'game/bg_saberLoad.c',
 	'game/bg_saga.c',
 	'game/bg_vehicleLoad.c',
 	'game/bg_weapons.c',
