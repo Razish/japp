@@ -9022,8 +9022,8 @@ static void UI_BuildQ3Model_List( void )
 			if (f)
 			*/
 			check = &skinname[1];
-		//	if ( bIsImageFile(dirptr, check) )
-			if ( bIsSkinFile(dirptr, check) && !bIsAnimFile(dirptr) && Q_stricmp( check, "menu" ) )
+			if ( (ui_showMissingSkins.integer && bIsSkinFile( dirptr, check ) && !bIsAnimFile( dirptr ) && Q_stricmp( check, "menu" ))
+				|| bIsImageFile( dirptr, check ))
 		//	if ( *dirptr )
 			{ //if it exists
 				qboolean iconExists = qfalse;
@@ -9095,7 +9095,7 @@ static void UI_BuildQ3Model_List( void )
 
 					//and now we are ready to register (thankfully this will only happen once)
 					uiInfo.q3HeadIcons[uiInfo.q3HeadCount] = trap->R_RegisterShaderNoMip(iconNameFromSkinName);
-					if ( ui_showMissingSkins.integer && !uiInfo.q3HeadIcons[uiInfo.q3HeadCount] )
+					if ( !uiInfo.q3HeadIcons[uiInfo.q3HeadCount] )
 						uiInfo.q3HeadIcons[uiInfo.q3HeadCount] = trap->R_RegisterShaderNoMip( "gfx/2d/defer.tga" );
 				}
 				uiInfo.q3HeadCount++;
