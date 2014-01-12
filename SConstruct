@@ -1,3 +1,20 @@
+#
+# JA++ SCons project file
+# written by Raz0r
+#
+# targets:
+#	game
+#	cgame
+#	ui
+#
+# options:
+#	debug		generate debug information
+#	force32		force 32 bit target when on 64 bit machine
+#
+# example:
+#	scons game=1 debug=1 force32=1
+#
+
 import platform
 
 plat = platform.system() # Windows or Linux
@@ -10,6 +27,10 @@ arch = None # platform-specific, set manually
 print( '\n********************************\n' )
 print( 'Configuring build environment...' )
 env = Environment()
+
+force32 = bool( ARGUMENTS.get( 'force32', 0 ) )
+if force32:
+	bits = 32
 
 if bits == 32:
 	if plat == 'Windows':
@@ -274,8 +295,9 @@ if plat == 'Linux':
 	env['CPPDEFINES'] = [ '__GCC__' ]
 	env['CCFLAGS'] = [ '-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-missing-field-initializers', '-Wno-sign-compare', '-Wno-unused-parameter' ]
 	# this may not be necessary
-	#if bits == 32:
-	#	env['CCFLAGS'] += [ '-m32' ]
+	if force32 == True:
+		env['CCFLAGS'] += [ '-m32' ]
+		env['LINKFLAGS'] += [ '-m32' ]
 elif plat == 'Windows':
 	# assume msvc
 	env['CCFLAGS'] = [ '/Gm', '/GS', '/Zc:wchar_t', '/WX-', '/RTC1', '/MDd', '/EHsc', '/nologo', '/W4', '/wd"4100"', '/wd"4127"', '/wd"4996"' ]
