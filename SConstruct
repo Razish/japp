@@ -28,7 +28,7 @@ print( '\n********************************\n' )
 print( 'Configuring build environment...' )
 env = Environment()
 
-force32 = bool( ARGUMENTS.get( 'force32', 0 ) )
+force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 if force32:
 	bits = 32
 
@@ -295,7 +295,7 @@ if plat == 'Linux':
 	env['CPPDEFINES'] = [ '__GCC__' ]
 	env['CCFLAGS'] = [ '-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-missing-field-initializers', '-Wno-sign-compare', '-Wno-unused-parameter' ]
 	# this may not be necessary
-	if force32 == True:
+	if force32:
 		env['CCFLAGS'] += [ '-m32' ]
 		env['LINKFLAGS'] += [ '-m32' ]
 elif plat == 'Windows':
