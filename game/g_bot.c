@@ -4,7 +4,6 @@
 
 #include "g_local.h"
 
-
 #define BOT_BEGIN_DELAY_BASE		2000
 #define BOT_BEGIN_DELAY_INCREMENT	1500
 
@@ -14,10 +13,6 @@ static struct botSpawnQueue_s {
 	int		clientNum;
 	int		spawnTime;
 } botSpawnQueue[BOT_SPAWN_QUEUE_DEPTH];
-
-extern gentity_t	*podium1;
-extern gentity_t	*podium2;
-extern gentity_t	*podium3;
 
 float G_Cvar_VariableValue( const char *var_name ) {
 	char buf[MAX_CVAR_VALUE_STRING];
@@ -40,6 +35,7 @@ int G_ParseInfos( char *buf, int max, char *infos[] ) {
 
 	count = 0;
 
+	COM_BeginParseSession ("G_ParseInfos");
 	while ( 1 ) {
 		token = COM_Parse( (const char **)(&buf) );
 		if ( !token[0] ) {
@@ -99,7 +95,7 @@ void G_LoadArenasFromFile( char *filename ) {
 		return;
 	}
 	if ( len >= MAX_ARENAS_TEXT ) {
-		trap->Print( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_ARENAS_TEXT );
+		trap->Print( S_COLOR_RED "file too large: %s is %i, max allowed is %i\n", filename, len, MAX_ARENAS_TEXT );
 		trap->FS_Close( f );
 		return;
 	}
@@ -284,7 +280,7 @@ void G_LoadArenas( void ) {
 		strcat(filename, dirptr);
 		G_LoadArenasFromFile(filename);
 	}
-	trap->Print( "%i arenas parsed\n", level.arenas.num );
+//	trap->Print( "%i arenas parsed\n", level.arenas.num );
 	
 	for( n = 0; n < level.arenas.num; n++ ) {
 		Info_SetValueForKey( level.arenas.infos[n], "num", va( "%i", n ) );
@@ -453,7 +449,7 @@ void G_AddRandomBot( int team ) {
 				else teamstr = "";
 				Q_strncpyz( netname, value, sizeof( netname ) );
 				Q_CleanString( netname, STRIP_EXTASCII );
-				trap->SendConsoleCommand( EXEC_INSERT, va("addbot \"%s\" %f %s %i\n", netname, skill, teamstr, 0) );
+				trap->SendConsoleCommand( EXEC_INSERT, va("addbot \"%s\" %.2f %s %i\n", netname, skill, teamstr, 0) );
 				return;
 			}
 		}
@@ -474,31 +470,18 @@ int G_RemoveRandomBot( int team ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
+		if ( !(g_entities[i].r.svFlags & SVF_BOT) )
 			continue;
-		}
 
-		if ( cl->sess.sessionTeam == TEAM_SPECTATOR 
-			&& cl->sess.spectatorState == SPECTATOR_FOLLOW )
-		{//this entity is actually following another entity so the ps data is for a
-			//different entity.  Bots never spectate like this so, skip this player.
+		if ( cl->sess.sessionTeam == TEAM_SPECTATOR && cl->sess.spectatorState == SPECTATOR_FOLLOW )
 			continue;
-		}
 
-		if (level.gametype == GT_SIEGE)
-		{
-			if ( team >= 0 && cl->sess.siegeDesiredTeam != team ) {
-				continue;
-			}
-		}
-		else
-		{
-			if ( team >= 0 && cl->sess.sessionTeam != team ) {
-				continue;
-			}
-		}
-		//RAZFIXME: is clientkick id correct?
-		trap->SendConsoleCommand( EXEC_INSERT, va("clientkick \"%d\"\n", i) );
+		if ( level.gametype == GT_SIEGE && team >= 0 && cl->sess.siegeDesiredTeam != team )
+			continue;
+		else if ( team >= 0 && cl->sess.sessionTeam != team )
+			continue;
+
+		trap->SendConsoleCommand( EXEC_INSERT, va("clientkick %d\n", i) );
 		return qtrue;
 	}
 	return qfalse;
@@ -519,7 +502,6 @@ int G_CountHumanPlayers( int team ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		//can't use cl->ps.clientNum since the ps.clientNum might be for the clientNum of the player that this client is specing.
 		if ( g_entities[i].r.svFlags & SVF_BOT ) {
 			continue;
 		}
@@ -546,13 +528,9 @@ int G_CountBotPlayers( int team ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-
-		//can't use cl->ps.clientNum since the ps.clientNum might be for the clientNum of the player that this client is specing.
 		if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
-		//if ( !(g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) ) {
 			continue;
 		}
-
 		if (level.gametype == GT_SIEGE)
 		{
 			if ( team >= 0 && cl->sess.siegeDesiredTeam != team ) {
@@ -720,7 +698,6 @@ qboolean G_BotConnect( int clientNum, qboolean restart ) {
 
 	return qtrue;
 }
-
 
 /*
 ===============

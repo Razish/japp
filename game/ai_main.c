@@ -196,10 +196,7 @@ void BotOrder(gentity_t *ent, int clientnum, int ordernum)
 		return;
 	}
 
-	if (level.gametype != GT_CTF &&
-		level.gametype != GT_CTY &&
-		level.gametype != GT_SIEGE &&
-		level.gametype != GT_TEAM)
+	if (level.gametype != GT_CTF && level.gametype != GT_CTY && level.gametype != GT_SIEGE && level.gametype != GT_TEAM)
 	{
 		return;
 	}
@@ -6384,7 +6381,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 	if (bs->timeToReact < level.time && bs->currentEnemy && bs->enemySeenTime > level.time + (ENEMY_FORGET_MS - (ENEMY_FORGET_MS*0.2)))
 	{
 		if ( bs->frame_Enemy_Vis ) {
-			// ...
+			CombatBotAI( bs, thinktime );
 		}
 		else if (bs->cur_ps.weaponstate == WEAPON_CHARGING_ALT)
 		{ //keep charging in case we see him again before we lose track of him
