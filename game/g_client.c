@@ -1944,22 +1944,26 @@ void SV_ToggleUserinfoValidation_f( void ) {
 	}
 }
 
-char *G_ValidateUserinfo( const char *userinfo )
-{
-	unsigned int		i=0, count=0, currentInfo=0;
-	size_t				length = strlen( userinfo ), fieldLen = 0;
+static const char *G_ValidateUserinfo( const char *userinfo ) {
+	unsigned int		i=0, count=0;
+	size_t				length = strlen( userinfo );
 	userinfoValidate_t	*info = NULL;
+	char				key[BIG_INFO_KEY], value[BIG_INFO_VALUE];
+	const char			*s;
+	int					fieldCount[numUserinfoFields];
 
-	if ( japp_userinfoValidate.integer & (1<<(numUserinfoFields+USERINFO_VALIDATION_SIZE)) )
-	{// size checks
+	memset( fieldCount, 0, sizeof( fieldCount ) );
+
+	// size checks
+	if ( japp_userinfoValidate.integer & (1<<(numUserinfoFields+USERINFO_VALIDATION_SIZE)) ) {
 		if ( length < 1 )
 			return "Userinfo too short";
 		else if ( length >= MAX_INFO_STRING )
 			return "Userinfo too long";
 	}
 
-	if ( japp_userinfoValidate.integer & (1<<(numUserinfoFields+USERINFO_VALIDATION_SLASH)) )
-	{// slash checks
+	// slash checks
+	if ( japp_userinfoValidate.integer & (1<<(numUserinfoFields+USERINFO_VALIDATION_SLASH)) ) {
 		// there must be a leading slash
 		if ( userinfo[0] != '\\' )
 			return "Missing leading slash";
@@ -1978,8 +1982,8 @@ char *G_ValidateUserinfo( const char *userinfo )
 			return "Bad number of slashes";
 	}
 
-	if ( japp_userinfoValidate.integer & (1<<(numUserinfoFields+USERINFO_VALIDATION_EXTASCII)) )
-	{// extended characters are impossible to type, may want to disable
+	// extended characters are impossible to type, may want to disable
+	if ( japp_userinfoValidate.integer & (1<<(numUserinfoFields+USERINFO_VALIDATION_EXTASCII)) ) {
 		for ( i=0, count=0; i<length; i++ ) {
 			if ( userinfo[i] < 0 )
 				count++;
@@ -1988,28 +1992,32 @@ char *G_ValidateUserinfo( const char *userinfo )
 			return "Extended ASCII characters found";
 	}
 
-	if ( japp_userinfoValidate.integer & (1<<(numUserinfoFields+USERINFO_VALIDATION_CONTROLCHARS)) )
-	{// disallow \n \r ; and \"
+	// disallow \n \r ; and \"
+	if ( japp_userinfoValidate.integer & (1<<(numUserinfoFields+USERINFO_VALIDATION_CONTROLCHARS)) ) {
 		if ( Q_strchrs( userinfo, "\n\r;\"" ) )
 			return "Invalid characters found";
 	}
 
-	for ( currentInfo=0; currentInfo<numUserinfoFields; currentInfo++ )
-	{
-		info = &userinfoFields[currentInfo];
-		if ( japp_userinfoValidate.integer & (1<<currentInfo) )
-		{
-			fieldLen = strlen( info->field );
-			for ( i=0, count=0; i<length; i++ ) {
-				if ( !Q_stricmpn( &userinfo[i], info->field, fieldLen ) ) {
-					count++;
-					i += fieldLen-1;
-				}
-			}
-			if ( info->minCount && !count )
+	s = userinfo;
+	while ( s ) {
+		Info_NextPair( &s, key, value );
+
+		if ( !key[0] )
+			break;
+
+		for ( i=0; i<numUserinfoFields; i++ ) {
+			if ( !Q_stricmp( key, userinfoFields[i].fieldClean ) )
+				fieldCount[i]++;
+		}
+	}
+
+	// count the number of fields
+	for ( i=0, info=userinfoFields; i<numUserinfoFields; i++, info++ ) {
+		if ( japp_userinfoValidate.integer & (1<<i) ) {
+			if ( info->minCount && !fieldCount[i] )
 				return va( "%s field not found", info->fieldClean );
-			else if ( count > info->maxCount )
-				return va( "Too many %s fields (%i)", info->fieldClean, info->maxCount );
+			else if ( fieldCount[i] > info->maxCount )
+				return va( "Too many %s fields (%i/%i)", info->fieldClean, fieldCount[i], info->maxCount );
 		}
 	}
 
@@ -2020,11 +2028,10 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	gentity_t	*ent = g_entities + clientNum;
 	gclient_t	*client = ent->client;
 	int			teamLeader, team=TEAM_FREE, health=100, maxHealth=100;
-	char		*s=NULL,						*value=NULL,
-				userinfo[MAX_INFO_STRING]={0},	buf[MAX_INFO_STRING]={0},		oldClientinfo[MAX_INFO_STRING]={0},
-				model[MAX_QPATH]={0},			forcePowers[MAX_QPATH]={0},		oldname[MAX_NETNAME]={0},
-				className[MAX_QPATH]={0},		color1[MAX_INFO_STRING]={0},	color2[MAX_INFO_STRING]={0},
-				cp_sbRGB1[MAX_INFO_STRING]={0}, cp_sbRGB2[MAX_INFO_STRING]={0};
+	const char	*s=NULL;
+	char		*value=NULL, userinfo[MAX_INFO_STRING],	buf[MAX_INFO_STRING], oldClientinfo[MAX_INFO_STRING], model[MAX_QPATH],
+				forcePowers[MAX_QPATH], oldname[MAX_NETNAME], className[MAX_QPATH], color1[16], color2[16],
+				cp_sbRGB1[MAX_INFO_STRING], cp_sbRGB2[MAX_INFO_STRING];
 	qboolean	modelChanged = qfalse;
 	gender_t	gender = GENDER_MALE;
 
