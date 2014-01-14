@@ -3247,12 +3247,11 @@ Client info:
 */
 
 //Filters bad characters out of the channel identifier
-static void JP_FilterIdentifier( char *ident )
-{
+static void JP_FilterIdentifier( char *ident ) {
 	char *s=ident, *out=ident, c=0;
 
-	while ( (c = *s++) != '\0' )
-	{
+	Q_CleanString( ident, STRIP_COLOUR );
+	while ( (c = *s++) != '\0' ) {
 		if ( c < '$' || c > '}' || c == ';' )
 			 continue;
 		*out++ = c;
@@ -3260,33 +3259,28 @@ static void JP_FilterIdentifier( char *ident )
 	*out = '\0';
 }
 
-static void JP_ListChannels( gentity_t *ent )
-{
+static void JP_ListChannels( gentity_t *ent ) {
 	qboolean legacyClient = !(ent->client->pers.CSF & CSF_CHAT_FILTERS);
 	channel_t *channel = ent->client->pers.channels;
 	char msg[960] = { 0 };
 
-	while ( channel )
-	{
+	while ( channel ) {
 		Q_strcat( msg, sizeof( msg ), (legacyClient && channel == ent->client->pers.activeChannel)
 			? va( S_COLOR_WHITE"- "S_COLOR_YELLOW"%s "S_COLOR_WHITE"["S_COLOR_GREEN"%s"S_COLOR_WHITE"]\n", channel->identifier,
-			channel->shortname ) : !!(legacyClient) ? va( S_COLOR_WHITE"- %s "S_COLOR_WHITE"["S_COLOR_GREEN"%s"S_COLOR_WHITE"]\n",
+			channel->shortname ) : legacyClient ? va( S_COLOR_WHITE"- %s "S_COLOR_WHITE"["S_COLOR_GREEN"%s"S_COLOR_WHITE"]\n",
 			channel->identifier, channel->shortname ) : va( S_COLOR_WHITE"- %s\n", channel->identifier ) );
 		channel = channel->next;
 	}
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
 }
 
-void Cmd_JoinChannel_f( gentity_t *ent )
-{
+void Cmd_JoinChannel_f( gentity_t *ent ) {
 	qboolean legacyClient = !(ent->client->pers.CSF & CSF_CHAT_FILTERS);
 	char arg1_ident[32] = { 0 };
 	char arg2_shortname[32] = { 0 };
-	channel_t *channel = NULL;
-	channel_t *prev = NULL;
+	channel_t *channel = NULL, *prev = NULL;
 
-	if ( trap->Argc() < 2 )
-	{
+	if ( trap->Argc() < 2 ) {
 		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: /joinchan <identifier/password> <short-name (optional)>\n\"" );
 		return;
 	}
@@ -3297,11 +3291,11 @@ void Cmd_JoinChannel_f( gentity_t *ent )
 
 	JP_FilterIdentifier( arg1_ident );
 
+	// Try to find an existing channel
 	channel = ent->client->pers.channels;
-	while ( channel )
-	{//Try to find an existing channel
-		if ( !strcmp( arg1_ident, channel->identifier ) )
-		{//Already joined, return
+	while ( channel ) {
+		if ( !strcmp( arg1_ident, channel->identifier ) ) {
+			// Already joined, return
 			trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_YELLOW"You are already in channel '%s'\n\"", arg1_ident ) );
 			//TODO: update short-name?
 			//		for legacy clients
@@ -3332,78 +3326,64 @@ void Cmd_JoinChannel_f( gentity_t *ent )
 	return;
 }
 
-void Cmd_WhoisChannel_f( gentity_t *ent )
-{
+void Cmd_WhoisChannel_f( gentity_t *ent ) {
 	qboolean legacyClient = !(ent->client->pers.CSF & CSF_CHAT_FILTERS);
 	char msg[960] = { 0 };
 
-	if ( trap->Argc() == 2 && !legacyClient )
-	{//Supported client
+	// Supported client
+	if ( trap->Argc() == 2 && !legacyClient ) {
 		char arg1_ident[32] = { 0 };
 		gentity_t *other = NULL;
 		channel_t *chan = NULL;
 		qboolean in = qfalse;
+		int i;
 
 		trap->Argv( 1, arg1_ident, sizeof( arg1_ident ) );
 		JP_FilterIdentifier( arg1_ident );
 
 		//Check if they're even in the channel
-		for ( chan = ent->client->pers.channels; chan; chan = chan->next )
-		{
-			if ( !strcmp( arg1_ident, chan->identifier) )
-			{
+		for ( chan = ent->client->pers.channels; chan; chan = chan->next ) {
+			if ( !strcmp( arg1_ident, chan->identifier) ) {
 				in = qtrue;
 				break;
 			}
 		}
-		if ( !in )
-		{
+		if ( !in ) {
 			trap->SendServerCommand( ent-g_entities, va( "print \"You are not in channel '%s'\n\"", arg1_ident, msg ) );
 			return;
 		}
 
-		for ( other = g_entities; other-g_entities < MAX_CLIENTS; other++ )
-		{
-			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED )
-			{
+		for ( i=0, other=g_entities; i<MAX_CLIENTS; i++, other++ ) {
+			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED ) {
 				chan = other->client->pers.channels;
-				while ( chan )
-				{
+				while ( chan ) {
 					if ( !strcmp( chan->identifier, arg1_ident ) )
-					{
 						Q_strcat( msg, sizeof( msg ), va( S_COLOR_WHITE"- %s\n", other->client->pers.netname ) );
-					}
 					chan = chan->next;
 				}
 			}
 		}
 		trap->SendServerCommand( ent-g_entities, va( "print \"Players in channel '%s':\n%s\"", arg1_ident, msg ) );
 	}
-	else if ( legacyClient )
-	{
+	else if ( legacyClient ) {
 		char arg1_ident[32] = { 0 };
 		gentity_t *other = NULL;
+		int i;
 
 		trap->Argv( 1, arg1_ident, sizeof( arg1_ident ) );
 		JP_FilterIdentifier( arg1_ident );
 
-		if ( !ent->client->pers.activeChannel )
-		{
+		if ( !ent->client->pers.activeChannel ) {
 			trap->SendServerCommand( ent-g_entities, "print \"You are not in any channels\n\"" );
 			return;
 		}
 
-		for ( other = g_entities; other-g_entities < MAX_CLIENTS; other++ )
-		{
-			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED )
-			{
+		for ( i=0, other=g_entities; i<MAX_CLIENTS; i++, other++ ) {
+			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED ) {
 				channel_t *chan = other->client->pers.channels;
-				while ( chan )
-				{
+				while ( chan ) {
 					if ( chan == ent->client->pers.activeChannel )
-					{
 						Q_strcat( msg, sizeof( msg ), va( S_COLOR_WHITE"- %s\n", other->client->pers.netname ) );
-					}
 					chan = chan->next;
 				}
 			}
@@ -3416,12 +3396,10 @@ void Cmd_WhoisChannel_f( gentity_t *ent )
 	return;
 }
 
-void Cmd_LeaveChannel_f( gentity_t *ent )
-{
+void Cmd_LeaveChannel_f( gentity_t *ent ) {
 	qboolean legacyClient = !(ent->client->pers.CSF & CSF_CHAT_FILTERS);
 
-	if ( trap->Argc() == 2 && !legacyClient )
-	{
+	if ( trap->Argc() == 2 && !legacyClient ) {
 		channel_t *channel = ent->client->pers.channels;
 		channel_t *prev = NULL;
 		char arg1_ident[32] = { 0 };
@@ -3429,10 +3407,8 @@ void Cmd_LeaveChannel_f( gentity_t *ent )
 		trap->Argv( 1, arg1_ident, sizeof( arg1_ident ) );
 		JP_FilterIdentifier( arg1_ident );
 
-		while ( channel )
-		{
-			if ( !strcmp( arg1_ident, channel->identifier ) )
-			{
+		while ( channel ) {
+			if ( !strcmp( arg1_ident, channel->identifier ) ) {
 				if ( prev )
 					prev->next = channel->next;
 				else
@@ -3440,8 +3416,7 @@ void Cmd_LeaveChannel_f( gentity_t *ent )
 				free( channel );
 
 				trap->SendServerCommand( ent-g_entities, va( "print \"Successfully left channel '%s'\n\"", arg1_ident ) );
-				if ( ent->client->pers.channels )
-				{
+				if ( ent->client->pers.channels ) {
 					trap->SendServerCommand( ent-g_entities, "print \"You are currently in these channels:\n\"" );
 					JP_ListChannels( ent );
 				}
@@ -3451,14 +3426,12 @@ void Cmd_LeaveChannel_f( gentity_t *ent )
 			channel = channel->next;
 		}
 		trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_YELLOW"Error leaving channel '%s'. You were not in the channel.\n\"", arg1_ident ) );
-		if ( ent->client->pers.channels )
-		{
+		if ( ent->client->pers.channels ) {
 			trap->SendServerCommand( ent-g_entities, "print \"You are currently in these channels:\n\"" );
 			JP_ListChannels( ent );
 		}
 	}
-	else if ( legacyClient )
-	{
+	else if ( legacyClient ) {
 		//if activeChannel
 			//if activeChannel->next
 				//set activeChannel to activeChannel->next
@@ -3475,82 +3448,68 @@ void Cmd_LeaveChannel_f( gentity_t *ent )
 
 	return;
 }
-void Cmd_MessageChannel_f( gentity_t *ent )
-{
+void Cmd_MessageChannel_f( gentity_t *ent ) {
 	qboolean legacyClient = !(ent->client->pers.CSF & CSF_CHAT_FILTERS);
 	char *msg = ConcatArgs( 2 );
 	char name[MAX_STRING_CHARS] = {0};
 
-	if ( trap->Argc() >= 3 && !legacyClient )
-	{//Supported client
+	// Supported client
+	if ( trap->Argc() >= 3 && !legacyClient ) {
 		char arg1_ident[32] = { 0 };
 		gentity_t *other = NULL;
 		channel_t *chan = NULL;
 		qboolean in = qfalse;
+		int i;
 
 		trap->Argv( 1, arg1_ident, sizeof( arg1_ident ) );
 		JP_FilterIdentifier( arg1_ident );
 
 		//Check if they're even in the channel
-		for ( chan = ent->client->pers.channels; chan; chan = chan->next )
-		{
-			if ( !strcmp( arg1_ident, chan->identifier) )
-			{
+		for ( chan=ent->client->pers.channels; chan; chan=chan->next ) {
+			if ( !strcmp( arg1_ident, chan->identifier) ) {
 				in = qtrue;
 				break;
 			}
 		}
-		if ( !in )
-		{
+		if ( !in ) {
 			trap->SendServerCommand( ent-g_entities, va( "print \"You are not in channel '%s'\n\"", arg1_ident, msg ) );
 			return;
 		}
 
 		Com_sprintf( name, sizeof( name ), "%s"S_COLOR_WHITE CHANNEL_EC"%s"CHANNEL_EC": ", ent->client->pers.netname, chan->identifier );
 
-		for ( other = g_entities; other-g_entities < MAX_CLIENTS; other++ )
-		{
-			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED )
-			{
+		for ( i=0, other=g_entities; i<MAX_CLIENTS; i++, other++ ) {
+			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED ) {
 				chan = other->client->pers.channels;
-				while ( chan )
-				{
+				while ( chan ) {
 					if ( !strcmp( chan->identifier, arg1_ident ) )
-					{
 						G_SayTo( ent, other, SAY_ALL, COLOR_RED, name, msg, NULL );
-					}
 					chan = chan->next;
 				}
 			}
 		}
 	}
-	else if ( legacyClient )
-	{
+	else if ( legacyClient ) {
 		char arg1_ident[32] = { 0 };
 		gentity_t *other = NULL;
+		int i;
 
 		trap->Argv( 1, arg1_ident, sizeof( arg1_ident ) );
 		JP_FilterIdentifier( arg1_ident );
 
-		if ( !ent->client->pers.activeChannel )
-		{
+		if ( !ent->client->pers.activeChannel ) {
 			trap->SendServerCommand( ent-g_entities, "print \"You are not in any channels\n\"" );
 			return;
 		}
 
 		Com_sprintf( name, sizeof( name ), "%s"S_COLOR_WHITE CHANNEL_EC"%s"CHANNEL_EC": ", ent->client->pers.netname, ent->client->pers.activeChannel->identifier );
 
-		for ( other = g_entities; other-g_entities < MAX_CLIENTS; other++ )
-		{
-			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED )
-			{
+		for ( i=0, other=g_entities; i<MAX_CLIENTS; i++, other++ ) {
+			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED ) {
 				channel_t *chan = other->client->pers.channels;
-				while ( chan )
-				{
+				while ( chan ) {
 					if ( chan == ent->client->pers.activeChannel )
-					{
 						G_SayTo( ent, other, SAY_ALL, COLOR_RED, name, msg, NULL );
-					}
 					chan = chan->next;
 				}
 			}
@@ -3994,6 +3953,7 @@ command_t commands[] = {
 	{ "vote",				Cmd_Vote_f,					GTB_ALL,					CMDFLAG_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				GTB_ALL,					CMDFLAG_NOINTERMISSION },
 	{ "whoischan",			Cmd_WhoisChannel_f,			GTB_ALL,					0 }, //Raz: added
+	{ "wrists",				Cmd_Kill_f,					GTB_ALL,					CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
 	{ NULL,					NULL,						GTB_ALL,					0 },
 };
 static size_t numCommands = ARRAY_LEN( commands );
