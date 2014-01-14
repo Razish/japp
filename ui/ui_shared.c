@@ -8571,7 +8571,7 @@ qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 		}
 
 		//a normal StringAlloc ptr
-		if (psString > 0)	
+		if (psString)
 		{
 			if (*psString == '}') {
 				return qtrue;
@@ -8634,7 +8634,7 @@ qboolean ItemParse_cvarFloatList( itemDef_t *item, int handle )
 		}
 			
 		//a normal StringAlloc ptr
-		if (string > 0)	
+		if (string)
 		{
 			if (*string == '}') 
 			{
