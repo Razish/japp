@@ -565,7 +565,7 @@ qboolean BG_LegalizedForcePowers(char *powerOut, size_t powerOutSize, int maxRan
 	i = 0;
 	while (i < NUM_FORCE_POWERS)
 	{
-		countDown = Com_Clampi( 0, NUM_FORCE_POWER_LEVELS, final_Powers[i] );
+		countDown = Q_clampi( 0, final_Powers[i], NUM_FORCE_POWER_LEVELS );
 
 		while (countDown > 0)
 		{

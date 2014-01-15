@@ -1581,8 +1581,8 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	newInfo.teamTask = atoi( v );
 
 	// team leader
-	v = Info_ValueForKey( configstring, "tl" );
-	newInfo.teamLeader = atoi( v );
+//	v = Info_ValueForKey( configstring, "tl" );
+//	newInfo.teamLeader = atoi( v );
 
 	// model
 	v = Info_ValueForKey( configstring, "model" );

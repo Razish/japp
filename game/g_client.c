@@ -651,7 +651,8 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vector3 *avoidPoint, vector3 *origin
 					list_dist[i] = dist;
 					list_spot[i] = spot;
 					numSpots++;
-					CAP( numSpots, 64 );
+					if ( numSpots > 64 )
+						numSpots = 64;
 					break;
 				}
 			}
@@ -691,7 +692,8 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vector3 *avoidPoint, vector3 *origin
 					list_spot[i] = spot;
 					numSpots++;
 
-					CAP( numSpots, 64 );
+					if ( numSpots > 64 )
+						numSpots = 64;
 					break;
 				}
 			}
@@ -1235,30 +1237,6 @@ int TeamCount( int ignoreClientNum, team_t team ) {
 
 	return count;
 }
-
-/*
-================
-TeamLeader
-
-Returns the client number of the team leader
-================
-*/
-int TeamLeader( int team ) {
-	int		i;
-
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if ( level.clients[i].pers.connected == CON_DISCONNECTED ) {
-			continue;
-		}
-		if ( level.clients[i].sess.sessionTeam == team ) {
-			if ( level.clients[i].sess.teamLeader )
-				return i;
-		}
-	}
-
-	return -1;
-}
-
 
 /*
 ================
@@ -2027,7 +2005,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 qboolean ClientUserinfoChanged( int clientNum ) {
 	gentity_t	*ent = g_entities + clientNum;
 	gclient_t	*client = ent->client;
-	int			teamLeader, team=TEAM_FREE, health=100, maxHealth=100;
+	int			team=TEAM_FREE, health=100, maxHealth=100;
 	const char	*s=NULL;
 	char		*value=NULL, userinfo[MAX_INFO_STRING],	buf[MAX_INFO_STRING], oldClientinfo[MAX_INFO_STRING], model[MAX_QPATH],
 				forcePowers[MAX_QPATH], oldname[MAX_NETNAME], className[MAX_QPATH], color1[16], color2[16],
@@ -2123,9 +2101,9 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		}
 	}
 
-	client->ps.customRGBA[0] = (value=Info_ValueForKey( userinfo, "char_color_red" ))	? Com_Clampi( 0, 255, atoi( value ) ) : 255;
-	client->ps.customRGBA[1] = (value=Info_ValueForKey( userinfo, "char_color_green" ))	? Com_Clampi( 0, 255, atoi( value ) ) : 255;
-	client->ps.customRGBA[2] = (value=Info_ValueForKey( userinfo, "char_color_blue" ))	? Com_Clampi( 0, 255, atoi( value ) ) : 255;
+	client->ps.customRGBA[0] = (value=Info_ValueForKey( userinfo, "char_color_red" ))	? Q_clampi( 0, atoi( value ), 255 ) : 255;
+	client->ps.customRGBA[1] = (value=Info_ValueForKey( userinfo, "char_color_green" ))	? Q_clampi( 0, atoi( value ), 255 ) : 255;
+	client->ps.customRGBA[2] = (value=Info_ValueForKey( userinfo, "char_color_blue" ))	? Q_clampi( 0, atoi( value ), 255 ) : 255;
 
 	//Prevent skins being too dark
 	if ( japp_charRestrictRGB.integer && ((client->ps.customRGBA[0]+client->ps.customRGBA[1]+client->ps.customRGBA[2]) < 100) )
@@ -2237,7 +2215,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	else
 	{
 		maxHealth = 100;
-		health = Com_Clampi( 1, 100, atoi( Info_ValueForKey( userinfo, "handicap" ) ) );
+		health = Q_clampi( 1, atoi( Info_ValueForKey( userinfo, "handicap" ) ), 100 );
 	}
 	client->pers.maxHealth = health;
 	if ( client->pers.maxHealth < 1 || client->pers.maxHealth > maxHealth )
@@ -2257,8 +2235,6 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	// team task (0 = none, 1 = offence, 2 = defence)
 //	teamTask = atoi( Info_ValueForKey( userinfo, "teamtask" ) );
-	// team Leader (1 = leader, 0 is normal player)
-	teamLeader = client->sess.teamLeader;
 
 	// colors
 	Q_strncpyz( color1, Info_ValueForKey( userinfo, "color1" ), sizeof( color1 ) );
@@ -2307,7 +2283,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		Q_strcat( buf, sizeof( buf ), va( "dt\\%i\\", client->sess.duelTeam ) );
 	if ( level.gametype >= GT_TEAM ) {
 	//	Q_strcat( buf, sizeof( buf ), va( "tt\\%d\\", teamTask ) );
-		Q_strcat( buf, sizeof( buf ), va( "tl\\%d\\", teamLeader ) );
+	//	Q_strcat( buf, sizeof( buf ), va( "tl\\%d\\", teamLeader ) );
 	}
 	if ( level.gametype == GT_SIEGE ) {
 		Q_strcat( buf, sizeof( buf ), va( "siegeclass\\%s\\", className ) );
@@ -3199,7 +3175,7 @@ void ClientSpawn(gentity_t *ent) {
 		}
 		else
 		{
-			ent->client->sess.saberLevel = Com_Clampi( SS_FAST, SS_STRONG, ent->client->sess.saberLevel );
+			ent->client->sess.saberLevel = Q_clampi( SS_FAST, ent->client->sess.saberLevel, SS_STRONG );
 			ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel;
 
 			// limit our saber style to our force points allocated to saber offense
@@ -3226,7 +3202,7 @@ void ClientSpawn(gentity_t *ent) {
 		ent->client->ps.fd.saberAnimLevel == ent->client->ps.fd.saberDrawAnimLevel &&
 		ent->client->ps.fd.saberAnimLevel == ent->client->sess.saberLevel)
 	{
-		ent->client->sess.saberLevel = Com_Clampi( SS_FAST, SS_STRONG, ent->client->sess.saberLevel );
+		ent->client->sess.saberLevel = Q_clampi( SS_FAST, ent->client->sess.saberLevel, SS_STRONG );
 		ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel;
 
 		// limit our saber style to our force points allocated to saber offense
@@ -3333,9 +3309,9 @@ void ClientSpawn(gentity_t *ent) {
 	client->bodyGrabIndex = ENTITYNUM_NONE;
 
 	//Get the skin RGB based on his userinfo
-	client->ps.customRGBA[0] = (value=Info_ValueForKey( userinfo, "char_color_red" ))	? Com_Clampi( 0, 255, atoi( value ) ) : 255;
-	client->ps.customRGBA[1] = (value=Info_ValueForKey( userinfo, "char_color_green" ))	? Com_Clampi( 0, 255, atoi( value ) ) : 255;
-	client->ps.customRGBA[2] = (value=Info_ValueForKey( userinfo, "char_color_blue" ))	? Com_Clampi( 0, 255, atoi( value ) ) : 255;
+	client->ps.customRGBA[0] = (value=Info_ValueForKey( userinfo, "char_color_red" ))	? Q_clampi( 0, atoi( value ), 255 ) : 255;
+	client->ps.customRGBA[1] = (value=Info_ValueForKey( userinfo, "char_color_green" ))	? Q_clampi( 0, atoi( value ), 255 ) : 255;
+	client->ps.customRGBA[2] = (value=Info_ValueForKey( userinfo, "char_color_blue" ))	? Q_clampi( 0, atoi( value ), 255 ) : 255;
 
 	//Prevent skins being too dark
 	if ( japp_charRestrictRGB.integer && ((client->ps.customRGBA[0]+client->ps.customRGBA[1]+client->ps.customRGBA[2]) < 100) )
@@ -3411,7 +3387,7 @@ void ClientSpawn(gentity_t *ent) {
 	}
 	else
 	{
-		maxHealth = Com_Clampi( 1, 100, atoi( Info_ValueForKey( userinfo, "handicap" ) ) );
+		maxHealth = Q_clampi( 1, atoi( Info_ValueForKey( userinfo, "handicap" ) ), 100 );
 	}
 	client->pers.maxHealth = maxHealth;//atoi( Info_ValueForKey( userinfo, "handicap" ) );
 	if ( client->pers.maxHealth < 1 || client->pers.maxHealth > maxHealth ) {

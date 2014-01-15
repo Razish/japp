@@ -68,7 +68,7 @@ static int chatTargetClient = -1;
 static qboolean chatActive;
 
 static QINLINE int CG_GetChatboxFont( void ) {
-	return Com_Clampi( FONT_SMALL, FONT_NUM_FONTS, cg_chatboxFont.integer );
+	return Q_clampi( FONT_SMALL, cg_chatboxFont.integer, FONT_NUM_FONTS );
 }
 
 //CHATBOX OBJECT API

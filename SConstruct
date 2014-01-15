@@ -16,6 +16,7 @@
 #
 
 import platform
+import os
 
 plat = platform.system() # Windows or Linux
 try:
@@ -28,6 +29,9 @@ print( '\n********************************\n' )
 print( 'Configuring build environment...' )
 env = Environment()
 
+env['ENV']['TERM'] = os.environ['TERM']
+
+analyse = int( ARGUMENTS.get( 'analyse', 0 ) )
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 if force32:
 	bits = 32
@@ -294,6 +298,9 @@ elif plat == 'Windows':
 if plat == 'Linux':
 	env['CPPDEFINES'] = [ '__GCC__' ]
 	env['CCFLAGS'] = [ '-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-missing-field-initializers', '-Wno-sign-compare', '-Wno-unused-parameter' ]
+	if analyse:
+		env['CC'] = 'clang'
+		env['CCFLAGS'] += [ '--analyze' ]
 	# this may not be necessary
 	if force32:
 		env['CCFLAGS'] += [ '-m32' ]

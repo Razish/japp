@@ -28,9 +28,9 @@ static void CG_ParseScores( void )
 	int		scoreOffset = GetScoreOffset();
 
 	if ( Server_Supports( SSF_SCOREBOARD_LARGE ) )
-		readScores = Com_Clampi( 0, MAX_CLIENTS, atoi( CG_Argv( 1 ) ) );
+		readScores = Q_clampi( 0, atoi( CG_Argv( 1 ) ), MAX_CLIENTS );
 	else
-		readScores = Com_Clampi( 0, MAX_CLIENT_SCORE_SEND, atoi( CG_Argv( 1 ) ) );
+		readScores = Q_clampi( 0, atoi( CG_Argv( 1 ) ), MAX_CLIENT_SCORE_SEND );
 	cg.numScores = readScores;
 
 	cg.teamScores[0] = atoi( CG_Argv( 2 ) );
@@ -81,11 +81,10 @@ static void CG_ParseTeamInfo( void )
 	int i=0, client=0;
 
 	//Raz: avoid crash if server sends invalid range
-	numSortedTeamPlayers = Com_Clampi( 0, TEAM_MAXOVERLAY, atoi( CG_Argv( 1 ) ) );
+	numSortedTeamPlayers = Q_clampi( 0, atoi( CG_Argv( 1 ) ), TEAM_MAXOVERLAY );
 
-	for ( i=0; i<numSortedTeamPlayers; i++ )
-	{
-		client								= Com_Clampi( 0, MAX_CLIENTS, atoi( CG_Argv( i * 6 + 2 ) ) );
+	for ( i=0; i<numSortedTeamPlayers; i++ ) {
+		client								= Q_clampi( 0, atoi( CG_Argv( i * 6 + 2 ) ), MAX_CLIENTS );
 		sortedTeamPlayers[i]				= client;
 		cgs.clientinfo[ client ].location	= atoi( CG_Argv( i * 6 + 3 ) );
 		cgs.clientinfo[ client ].health		= atoi( CG_Argv( i * 6 + 4 ) );
@@ -146,7 +145,7 @@ void CG_ParseServerinfo( void ) {
 		cg.timelimitWarnings &= ~(1|2);
 	cgs.timelimit = i;
 
-	cgs.maxclients = Com_Clampi( 0, MAX_CLIENTS, atoi( Info_ValueForKey( info, "sv_maxclients" ) ) );
+	cgs.maxclients = Q_clampi( 0, atoi( Info_ValueForKey( info, "sv_maxclients" ) ), MAX_CLIENTS );
 
 	cgs.japp.jp_cinfo = atoi( Info_ValueForKey( info, "jp_cinfo" ) );
 	cgs.japp.overbounce = atoi( Info_ValueForKey( info, "pmove_overbounce" ) );

@@ -56,7 +56,6 @@ void G_WriteClientSessionData( gclient_t *client )
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.spectatorClient ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.wins ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.losses ) );
-	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.teamLeader ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.setForce ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.saberLevel ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.selectedFP ) );
@@ -83,19 +82,19 @@ void G_ReadSessionData( gclient_t *client )
 	char		s[MAX_CVAR_VALUE_STRING] = {0};
 	const char	*var;
 	int			i = 0;
-	int			tmp1, tmp2, tmp3;
+	int			tmp1, tmp2;
 
 	var = va( "session%i", client - level.clients );
 	trap->Cvar_VariableStringBuffer( var, s, sizeof(s) );
 
-	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %i %s %s",
+	//RAZTODO: sscanf validation
+	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %s %s",
 		&tmp1,
 		&client->sess.spectatorTime,
 		&tmp2,
 		&client->sess.spectatorClient,
 		&client->sess.wins,
 		&client->sess.losses,
-		&tmp3,
 		&client->sess.setForce,
 		&client->sess.saberLevel,
 		&client->sess.selectedFP,
@@ -108,7 +107,6 @@ void G_ReadSessionData( gclient_t *client )
 
 	client->sess.sessionTeam = tmp1;
 	client->sess.spectatorState = tmp2;
-	client->sess.teamLeader = tmp3;
 
 	// convert back to spaces from unused chars, as session data is written that way.
 	for ( i=0; client->sess.siegeClass[i]; i++ )

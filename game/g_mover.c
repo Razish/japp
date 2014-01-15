@@ -2158,7 +2158,7 @@ void SP_func_rotating (gentity_t *ent) {
 	}
 
 	G_SpawnInt("model2scale", "0", &ent->s.iModelScale);
-	ent->s.iModelScale = Com_Clampi( 0, 1023, ent->s.iModelScale );
+	ent->s.iModelScale = Q_clampi( 0, ent->s.iModelScale, 1023 );
 
 	if ( G_SpawnVector( "spinangles", "0 0 0", &spinangles ) )
 	{

@@ -3,13 +3,8 @@
 #include "ui/ui_shared.h"
 #include "qcommon/qfiles.h"	// for STYLE_BLINK etc
 
-int JP_GetScoreboardFont( void )
-{
-	int font = cg_newScoreboardFont.integer;
-	BUMP( font, FONT_SMALL );
-	CAP( font, FONT_NUM_FONTS );
-
-	return font;
+static int JP_GetScoreboardFont( void ) {
+	return Q_clampi( FONT_SMALL, cg_newScoreboardFont.integer, FONT_NUM_FONTS );
 }
 
 void DrawServerInformation( float fade )

@@ -435,7 +435,6 @@ typedef struct clientSession_s {
 	int					saberLevel; // similar to above method, but for current saber attack level
 	int					setForce; // set to true once player is given the chance to set force powers
 	int					updateUITime; // only update userinfo for FP/SL if < level.time
-	qboolean			teamLeader; // true when this client is a team leader
 	char				siegeClass[64];
 	int					duelTeam;
 	int					siegeDesiredTeam;
@@ -1208,7 +1207,6 @@ void Weapon_HookFree( gentity_t *ent );
 // g_client.c
 //
 int TeamCount( int ignoreClientNum, team_t team );
-int TeamLeader( int team );
 team_t PickTeam( int ignoreClientNum );
 void SetClientViewAngle( gentity_t *ent, vector3 *angle );
 gentity_t *SelectSpawnPoint ( vector3 *avoidPoint, vector3 *origin, vector3 *angles, team_t team );
@@ -1255,7 +1253,6 @@ void G_PowerDuelCount(int *loners, int *doubles, qboolean countSpec);
 
 void FindIntermissionPoint( void );
 void SetLeader(int team, int client);
-void CheckTeamLeader( int team );
 void G_RunThink (gentity_t *ent);
 void QDECL G_LogPrintf( const char *fmt, ... );
 void QDECL G_SecurityLogPrintf( const char *fmt, ... );

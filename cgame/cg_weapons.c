@@ -752,7 +752,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	else
 		cgFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_fov.value;
 
-	cgFov = Com_Clampi( 1, 180, cgFov );
+	cgFov = Q_clampi( 1, cgFov, 180 );
 
 	// allow the gun to be completely removed
 	if ( !cg.japp.fakeGun && (!cg_drawGun.integer || cg.predictedPlayerState.zoomMode || cg_trueGuns.integer

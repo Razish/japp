@@ -1806,7 +1806,6 @@ Ghoul2 Insert End
 	cgs.media.campShader = trap->R_RegisterShaderNoMip("ui/assets/statusbar/camp.tga");
 	cgs.media.followShader = trap->R_RegisterShaderNoMip("ui/assets/statusbar/follow.tga");
 	cgs.media.defendShader = trap->R_RegisterShaderNoMip("ui/assets/statusbar/defend.tga");
-	cgs.media.teamLeaderShader = trap->R_RegisterShaderNoMip("ui/assets/statusbar/team_leader.tga");
 	cgs.media.retrieveShader = trap->R_RegisterShaderNoMip("ui/assets/statusbar/retrieve.tga");
 	cgs.media.escortShader = trap->R_RegisterShaderNoMip("ui/assets/statusbar/escort.tga");
 	cgs.media.cursor = trap->R_RegisterShaderNoMip( "menu/art/3_cursor2" );
@@ -2395,10 +2394,6 @@ static const char *CG_FeederItemText(float feederID, int index, int column,
 						return "Spectator";
 					} else {
 						return "";
-					}
-				} else {
-					if (info->teamLeader) {
-						return "Leader";
 					}
 				}
 			break;

@@ -785,19 +785,17 @@ UI_BuildPlayerList
 */
 static void UI_BuildPlayerList() {
 	uiClientState_t	cs;
-	int		n, count, team, team2, playerTeamNumber;
+	int		n, count, team, team2;
 	char	info[MAX_INFO_STRING];
 
 	trap->GetClientState( &cs );
 	trap->GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
 	uiInfo.playerNumber = cs.clientNum;
-	uiInfo.teamLeader = atoi(Info_ValueForKey(info, "tl"));
 	team = atoi(Info_ValueForKey(info, "t"));
 	trap->GetConfigString( CS_SERVERINFO, info, sizeof(info) );
 	count = atoi( Info_ValueForKey( info, "sv_maxclients" ) );
 	uiInfo.playerCount = 0;
 	uiInfo.myTeamCount = 0;
-	playerTeamNumber = 0;
 	for( n = 0; n < count; n++ ) {
 		trap->GetConfigString( CS_PLAYERS + n, info, MAX_INFO_STRING );
 
@@ -811,16 +809,9 @@ static void UI_BuildPlayerList() {
 				Q_strncpyz( uiInfo.teamNames[uiInfo.myTeamCount], Info_ValueForKey( info, "n" ), MAX_NETNAME );
 				Q_CleanString( uiInfo.teamNames[uiInfo.myTeamCount], STRIP_COLOUR );
 				uiInfo.teamClientNums[uiInfo.myTeamCount] = n;
-				if (uiInfo.playerNumber == n) {
-					playerTeamNumber = uiInfo.myTeamCount;
-				}
 				uiInfo.myTeamCount++;
 			}
 		}
-	}
-
-	if (!uiInfo.teamLeader) {
-		trap->Cvar_Set("cg_selectedPlayer", va("%d", playerTeamNumber));
 	}
 
 	n = trap->Cvar_VariableValue("cg_selectedPlayer");
@@ -837,8 +828,7 @@ static void UI_BuildPlayerList() {
 		trap->Cvar_Set("cg_selectedPlayerName", "Everyone");
 	}
 
-	if (!team || team == TEAM_SPECTATOR || !uiInfo.teamLeader)
-	{
+	if ( !team || team == TEAM_SPECTATOR ) {
 		n = uiInfo.myTeamCount;
 		trap->Cvar_Set("cg_selectedPlayer", va("%d", n));
 		trap->Cvar_Set("cg_selectedPlayerName", "N/A");
@@ -1492,7 +1482,7 @@ static const char *handicapValues[] = {"None","95","90","85","80","75","70","65"
 static void UI_DrawHandicap(rectDef_t *rect, float scale, vector4 *color, int textStyle, int iMenuFont) {
 	int i, h;
 
-	h = Com_Clamp( 5, 100, trap->Cvar_VariableValue("handicap") );
+	h = Q_clampi( 5, trap->Cvar_VariableValue( "handicap" ), 100 );
 	i = 20 - h / 5;
 
 	Text_Paint(rect->x, rect->y, scale, color, handicapValues[i], 0, 0, textStyle, iMenuFont);
@@ -2283,7 +2273,7 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
 
 	switch (ownerDraw) {
 	case UI_HANDICAP:
-		h = Com_Clamp( 5, 100, trap->Cvar_VariableValue("handicap") );
+		h = Q_clampi( 5, trap->Cvar_VariableValue( "handicap" ), 100 );
 		i = 20 - h / 5;
 		s = handicapValues[i];
 		break;
@@ -2947,8 +2937,7 @@ static qboolean UI_OwnerDrawVisible(int flags) {
 
 static qboolean UI_Handicap_HandleKey(int flags, float *special, int key) {
 	if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER) {
-		int h;
-		h = Com_Clamp( 5, 100, trap->Cvar_VariableValue("handicap") );
+		int h = Q_clampi( 5, trap->Cvar_VariableValue( "handicap" ), 100 );
 		if (key == A_MOUSE2) {
 			h -= 5;
 		} else {
@@ -3991,7 +3980,7 @@ static void UI_LoadDemos( void )
 	int		i, len, extLen;
 
 	Com_sprintf( demoExt, sizeof( demoExt ), "dm_%d", (int)trap->Cvar_VariableValue( "protocol" ) );
-	uiInfo.demoCount = Com_Clampi( 0, MAX_DEMOS, trap->FS_GetFileList( DEMOS_DIRECTORY, demoExt, demolist, sizeof( demolist ) ) );
+	uiInfo.demoCount = Q_clampi( 0, trap->FS_GetFileList( DEMOS_DIRECTORY, demoExt, demolist, sizeof( demolist ) ), MAX_DEMOS );
 	Com_sprintf( demoExt, sizeof( demoExt ), ".dm_%d", (int)trap->Cvar_VariableValue( "protocol" ) );
 	extLen = strlen( demoExt );
 
@@ -5454,12 +5443,11 @@ static void UI_RunMenuScript(char **args)
 			}
 			else
 			{
-				trap->Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, ui_dedicated.integer ) );
+				trap->Cvar_SetValue( "dedicated", Q_clamp( 0, ui_dedicated.integer, 2 ) );
 			}
 
 			//Raz: JK2 gametypes
-			trap->Cvar_SetValue( "g_gametype", Com_Clamp( GT_FFA, GT_CTY, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
-			//trap->Cvar_SetValue( "g_gametype", Com_Clamp( 0, 8, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
+			trap->Cvar_SetValue( "g_gametype", Q_clamp( GT_FFA, uiInfo.gameTypes[ui_netGameType.integer].gtEnum, GT_CTY ) );
 
 			//trap->Cvar_Set("g_redTeam", UI_Cvar_VariableString("ui_teamName"));
 			//trap->Cvar_Set("g_blueTeam", UI_Cvar_VariableString("ui_opponentName"));
@@ -7015,7 +7003,7 @@ static void UI_SortServerStatusInfo( serverStatusInfo_t *info ) {
 	// replace the gametype number by FFA, CTF etc.
 	//
 	index = 0;
-	numLines = Com_Clampi( 0, MAX_SERVERSTATUS_LINES, info->numLines );
+	numLines = Q_clampi( 0, info->numLines, MAX_SERVERSTATUS_LINES );
 	for (i = 0; serverStatusCvars[i].name; i++) {
 		for (j = 0; j < numLines; j++) {
 			if ( !info->lines[j][1] || info->lines[j][1][0] ) {
@@ -7408,7 +7396,7 @@ static int UI_FeederCount(float feederID)
 			return uiInfo.serverStatus.numDisplayServers;
 	
 		case FEEDER_SERVERSTATUS:
-			return Com_Clampi( 0, MAX_SERVERSTATUS_LINES, uiInfo.serverStatusInfo.numLines );
+			return Q_clampi( 0, uiInfo.serverStatusInfo.numLines, MAX_SERVERSTATUS_LINES );
 	
 		case FEEDER_FINDPLAYER:
 			return uiInfo.numFoundPlayerServers;

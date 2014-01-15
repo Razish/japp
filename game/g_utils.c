@@ -203,7 +203,7 @@ void G_Throw( gentity_t *targ, vector3 *newDir, float push ) {
 
 	// set the timer so that the other client can't cancel out the movement immediately
 	if ( targ->client && !targ->client->ps.pm_time ) {
-		targ->client->ps.pm_time = Com_Clampi( 50, 200, push*2 );
+		targ->client->ps.pm_time = Q_clampi( 50, push*2, 200 );
 		targ->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 	}
 }

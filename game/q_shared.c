@@ -57,17 +57,34 @@ const char *GetStringForID( stringID_table_t *table, int id )
 	return NULL;
 }
 
-int Com_Clampi( int min, int max, int value ) 
-{
-	if ( value < min )	return min;
-	if ( value > max )	return max;
+float Q_clamp( float min, float value, float max ) {
+	if ( value < min ) return min;
+	if ( value > max ) return max;
 	return value;
 }
 
-float Com_Clamp( float min, float max, float value ) {
-	if ( value < min )	return min;
-	if ( value > max )	return max;
+int Q_clampi( int min, int value, int max ) {
+	if ( value < min ) return min;
+	if ( value > max ) return max;
 	return value;
+}
+
+// min
+float Q_cap( float value, float max ) {
+	return (value > max) ? max : value;
+}
+
+int Q_capi( int value, int max ) {
+	return (value > max) ? max : value;
+}
+
+// max
+float Q_bump( float min, float value ) {
+	return (value < min) ? min : value;
+}
+
+int Q_bumpi( int min, int value ) {
+	return (value < min) ? min : value;
 }
 
 

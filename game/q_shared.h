@@ -1214,8 +1214,12 @@ void NormalToLatLong( const vector3 *normal, byte bytes[2] ); //rwwRMG - added
 
 //=============================================
 
-int Com_Clampi( int min, int max, int value ); //rwwRMG - added
-float Com_Clamp( float min, float max, float value );
+float Q_clamp( float min, float value, float max );
+int Q_clampi( int min, int value, int max );
+float Q_cap( float value, float max );
+int Q_capi( int value, int max );
+float Q_bump( float min, float value );
+int Q_bumpi( int min, int value );
 
 char	*COM_SkipPath( char *pathname );
 void	COM_StripExtension( const char *in, char *out, int destsize );
@@ -2590,9 +2594,6 @@ enum {
 	FONT_JAPPMONO,
 	FONT_NUM_FONTS
 };
-
-#define BUMP(x, y)	if (x < y) { x = y; }
-#define  CAP(x, y)	if (x > y) { x = y; }
 
 vector3 *tv( float x, float y, float z );
 char *vtos( const vector3 *v );

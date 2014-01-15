@@ -314,7 +314,7 @@ static void CG_DrawZoomMask( void )
 		level = (float)(50.0f - zoomFov) / 50.0f;//(float)(80.0f - zoomFov) / 80.0f;
 
 		// ...so we'll clamp it
-		level = Com_Clamp( 0.0f, 1.0f, level );
+		level = Q_clamp( 0.0f, level, 1.0f );
 
 		// Using a magic number to convert the zoom level to a rotation amount that correlates more or less with the zoom artwork. 
 		level *= 103.0f;
@@ -1203,28 +1203,26 @@ static QINLINE void _DRAW_PIC( float x, float y, float w, float h, qhandle_t sha
 void JP_DrawMiniScoreboard( void )
 {
 #ifdef JAPP_MINISCOREBOARD
-	int		i;
-	int		rank	= 0;
-	int		scoreX1	= cg_hudMiniScoreboardX1.integer;
-	int		scoreX2	= cg_hudMiniScoreboardX2.integer;
-	float	scoreY	= cg_hudMiniScoreboardY.value;//cg_stats.integer ? cg_hudMiniScoreboardY.value : cg_hudMiniScoreboardY.value + 30;
-	float	scoreS	= cg_hudMiniScoreboardS.value;
-	char	scoreName[MAX_CLIENTS][64];
-	int		scoreKills[MAX_CLIENTS];
-	int		scoreDeaths[MAX_CLIENTS];
-	vector4	clrBlack = { 0.0f, 0.0f, 0.0f, cg_hudMiniScoreboardA.value };
-	int		cap		= Server_Supports( SSF_SCOREBOARD_LARGE ) ? MAX_CLIENTS : 20;
+	int i, rank=0;
+	int scoreX1 = cg_hudMiniScoreboardX1.integer, scoreX2 = cg_hudMiniScoreboardX2.integer;
+	float scoreY = cg_hudMiniScoreboardY.value, scoreS = cg_hudMiniScoreboardS.value;
+	char scoreName[MAX_CLIENTS][64];
+	int scoreKills[MAX_CLIENTS], scoreDeaths[MAX_CLIENTS];
+	vector4 clrBlack = { 0.0f, 0.0f, 0.0f, cg_hudMiniScoreboardA.value };
+	int cap = Server_Supports( SSF_SCOREBOARD_LARGE ) ? MAX_CLIENTS : 20;
+	int count = cg_miniScoreboard.integer;
 
 	if ( !cg_miniScoreboard.integer || cgs.gametype != GT_FFA || cg.showScores )
 		return;
 
-	CAP( cg_miniScoreboard.integer, cap );
+	if ( count > cap )
+		count = cap;
 
 	if ( Server_Supports( SSF_SCOREBOARD_KD ) )
 	{
-		CG_FillRect( scoreX1-8, scoreY-8, cg_hudMiniScoreboardW.value, scoreY-8 + (cg_hudMiniScoreboardLH.value*((cg_miniScoreboard.integer > cg.numScores ? cg.numScores : cg_miniScoreboard.integer)+1)), clrBlack );
+		CG_FillRect( scoreX1-8, scoreY-8, cg_hudMiniScoreboardW.value, scoreY-8 + (cg_hudMiniScoreboardLH.value*((count > cg.numScores ? cg.numScores : count)+1)), clrBlack );
 
-		for ( i=0; i<cg_miniScoreboard.integer; i++ )
+		for ( i=0; i<count; i++ )
 		{
 			if ( i == cg.numScores)
 				break;
@@ -1236,7 +1234,7 @@ void JP_DrawMiniScoreboard( void )
 		CG_Text_Paint( scoreX1, scoreY, scoreS, colorWhite, va( "%-5s%-4s%-36s%s", "Rank", "ID", "Name", "Score" ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_JAPPMONO );
 	//	CG_Text_Paint( scoreX2, scoreY, scoreS, colorWhite, "K/D", 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
 
-		for ( i=0; i<cg_miniScoreboard.integer; i++ )
+		for ( i=0; i<count; i++ )
 		{
 			if ( i == cg.numScores)
 				break;
@@ -1435,7 +1433,7 @@ void JP_DrawAccel( void )
 			avgAccel += accelSamples[i];
 		avgAccel /= (float)NUM_ACCEL_SAMPLES;
 
-		percent = Com_Clamp( -1.0f, 1.0f, avgAccel/maxAccel );
+		percent = Q_clamp( -1.0f, avgAccel/maxAccel, 1.0f );
 		/*
 		UI_DrawProportionalString(	cg.accelerometer.position.x + (cg.accelerometer.size.w/2),
 									cg.accelerometer.position.y +  cg.accelerometer.size.h,

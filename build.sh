@@ -7,6 +7,7 @@ ARGSLEN=${#ARGS[@]}
 # options
 BUILD_ALL=1
 DEBUG=0
+ANALYSE=0
 FORCE32=0
 
 # targets
@@ -19,6 +20,9 @@ do
 	case ${ARGS[$i]} in
 	"debug")
 		DEBUG=1
+		;;
+	"analyse")
+		ANALYSE=1
 		;;
 	"force32")
 		FORCE32=1
@@ -49,15 +53,15 @@ fi
 
 if [ $GAME -eq 1 ]
 then
-	scons game=1 debug=$DEBUG force32=$FORCE32 > /dev/null
+	scons game=1 debug=$DEBUG analyse=$ANALYSE force32=$FORCE32 > /dev/null
 fi
 
 if [ $CGAME -eq 1 ]
 then
-	scons cgame=1 debug=$DEBUG force32=$FORCE32 > /dev/null
+	scons cgame=1 debug=$DEBUG analyse=$ANALYSE force32=$FORCE32 > /dev/null
 fi
 
 if [ $UI -eq 1 ]
 then
-	scons ui=1 debug=$DEBUG force32=$FORCE32 > /dev/null
+	scons ui=1 debug=$DEBUG analyse=$ANALYSE force32=$FORCE32 > /dev/null
 fi

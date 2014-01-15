@@ -181,7 +181,7 @@ void BotOrder(gentity_t *ent, int clientnum, int ordernum)
 	int stateMax = 0;
 	int i = 0;
 
-	if (!ent || !ent->client || !ent->client->sess.teamLeader)
+	if (!ent || !ent->client)
 	{
 		return;
 	}
@@ -5937,7 +5937,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 		return;
 	}*/
 
-	reaction = Com_Clampi( 0, 2000, (int)((float)bs->skills.reflex/bs->settings.skill) );
+	reaction = Q_clampi( 0, (int)((float)bs->skills.reflex/bs->settings.skill), 2000 );
 
 	if (!bs->currentEnemy)
 		bs->timeToReact = level.time + reaction;

@@ -2195,8 +2195,7 @@ static QINLINE int G_GetAttackDamage( gentity_t *self, int minDmg, int maxDmg, f
 		damageFactor = (2.0f - damageFactor);
 
 	totalDamage *= damageFactor;
-	BUMP( totalDamage, minDmg );
-	 CAP( totalDamage, maxDmg );
+	totalDamage = Q_clamp( minDmg, totalDamage, maxDmg );
 
 	//Com_Printf("%i\n", totalDamage);
 

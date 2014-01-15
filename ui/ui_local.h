@@ -275,7 +275,6 @@ typedef struct uiInfo_s {
 	int						playerRefresh;
 	int						playerIndex;
 	int						playerNumber; 
-	qboolean				teamLeader;
 	char					playerNames[MAX_CLIENTS][MAX_NETNAME];
 	char					teamNames[MAX_CLIENTS][MAX_TEAMNAME];
 	int						teamClientNums[MAX_CLIENTS];

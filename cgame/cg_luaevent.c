@@ -273,7 +273,6 @@ void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientI
 				lua_pushstring( JPLua.state, "wins" );			lua_pushnumber( JPLua.state, ci->wins );			lua_settable( JPLua.state, top1 );
 				lua_pushstring( JPLua.state, "losses" );		lua_pushnumber( JPLua.state, ci->losses );			lua_settable( JPLua.state, top1 );
 				lua_pushstring( JPLua.state, "teamTask" );		lua_pushnumber( JPLua.state, ci->teamTask );		lua_settable( JPLua.state, top1 );
-				lua_pushstring( JPLua.state, "teamLeader" );	lua_pushboolean( JPLua.state, ci->teamLeader );		lua_settable( JPLua.state, top1 );
 				lua_pushstring( JPLua.state, "powerups" );		lua_pushnumber( JPLua.state, ci->powerups );		lua_settable( JPLua.state, top1 );
 				lua_pushstring( JPLua.state, "modelName" );		lua_pushstring( JPLua.state, ci->saberName );		lua_settable( JPLua.state, top1 );
 				lua_pushstring( JPLua.state, "skinName" );		lua_pushstring( JPLua.state, ci->saberName );		lua_settable( JPLua.state, top1 );

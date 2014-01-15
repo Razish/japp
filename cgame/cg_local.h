@@ -200,7 +200,6 @@ typedef struct clientInfo_s {
 	int			handicap;
 	int			wins, losses; // in tourney mode
 	int			teamTask; // task in teamplay (offence/defence)
-	qboolean	teamLeader; // true when this is a team leader
 	int			powerups; // so can display quad/flag status
 	int			medkitUsageTime;
 	int			breathPuffTime;
@@ -1358,7 +1357,6 @@ typedef struct cgMedia_s {
 	qhandle_t campShader;
 	qhandle_t followShader;
 	qhandle_t defendShader;
-	qhandle_t teamLeaderShader;
 	qhandle_t retrieveShader;
 	qhandle_t escortShader;
 	qhandle_t flagShaders[3];
