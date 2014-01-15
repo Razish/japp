@@ -507,7 +507,7 @@ void Menu_New(int handle);
 void Menu_PaintAll();
 menuDef_t *Menus_ActivateByName(const char *p);
 void Menu_Reset( void );
-qboolean Menus_AnyFullScreenVisible();
+qboolean Menus_AnyFullScreenVisible( void );
 void  Menus_Activate(menuDef_t *menu);
 itemDef_t *Menu_FindItemByName(menuDef_t *menu, const char *p);
 void Menu_ShowGroup (menuDef_t *menu, char *itemName, qboolean showFlag);

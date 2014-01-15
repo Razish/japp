@@ -6880,7 +6880,7 @@ void Menu_SetFeederSelection(menuDef_t *menu, int feeder, int index, const char 
 	}
 }
 
-qboolean Menus_AnyFullScreenVisible() {
+qboolean Menus_AnyFullScreenVisible( void ) {
 	int i;
 	for (i = 0; i < menuCount; i++) {
 		if (Menus[i].window.flags & WINDOW_VISIBLE && Menus[i].fullScreen) {

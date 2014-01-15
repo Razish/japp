@@ -289,7 +289,7 @@ typedef struct uiInfo_s {
 	int						tierCount;
 	tierInfo_t				tierList[MAX_TIERS];
 
-	int						skillIndex;
+	size_t					skillIndex;
 
 	modInfo_t				modList[MAX_MODS];
 	int						modCount;

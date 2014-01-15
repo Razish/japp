@@ -1585,7 +1585,7 @@ static int UI_TeamIndexFromName(const char *name) {
 static void UI_DrawSkill(rectDef_t *rect, float scale, vector4 *color, int textStyle, int iMenuFont) {
 	int i;
 	i = trap->Cvar_VariableValue( "g_spSkill" );
-	if (i < 1 || i > numSkillLevels) {
+	if (i < 1 || i > (signed)numSkillLevels) {
 		i = 1;
 	}
 	Text_Paint(rect->x, rect->y, scale, color, (char *)UI_GetStringEdString("MP_INGAME", (char *)skillLevels[i-1]),0, 0, textStyle, iMenuFont);
@@ -2381,7 +2381,7 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
 		break;
 	case UI_SKILL:
 		i = trap->Cvar_VariableValue( "g_spSkill" );
-		if (i < 1 || i > numSkillLevels) {
+		if (i < 1 || i > (signed)numSkillLevels) {
 			i = 1;
 		}
 		s = (char *)UI_GetStringEdString("MP_INGAME", (char *)skillLevels[i-1]);
@@ -2496,7 +2496,7 @@ static void UI_DrawBotName(rectDef_t *rect, float scale, vector4 *color, int tex
 
 static void UI_DrawBotSkill(rectDef_t *rect, float scale, vector4 *color, int textStyle,int iMenuFont) 
 {
-	if (uiInfo.skillIndex >= 0 && uiInfo.skillIndex < numSkillLevels) 
+	if (uiInfo.skillIndex < numSkillLevels) 
 	{
 		Text_Paint(rect->x, rect->y, scale, color, (char *)UI_GetStringEdString("MP_INGAME", (char *)skillLevels[uiInfo.skillIndex]), 0, 0, textStyle,iMenuFont);
 	}
@@ -3455,7 +3455,7 @@ static qboolean UI_Skill_HandleKey(int flags, float *special, int key) {
 
 		if (i < 1) {
 			i = numSkillLevels;
-		} else if (i > numSkillLevels) {
+		} else if (i > (signed)numSkillLevels) {
 			i = 1;
 		}
 
@@ -3630,16 +3630,13 @@ static qboolean UI_BotName_HandleKey(int flags, float *special, int key) {
 
 static qboolean UI_BotSkill_HandleKey(int flags, float *special, int key) {
 	if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER) {
-		if (key == A_MOUSE2) {
+		if (key == A_MOUSE2)
 			uiInfo.skillIndex--;
-		} else {
+		else
 			uiInfo.skillIndex++;
-		}
-		if (uiInfo.skillIndex >= numSkillLevels) {
+		// handle overflow
+		if (uiInfo.skillIndex >= numSkillLevels)
 			uiInfo.skillIndex = 0;
-		} else if (uiInfo.skillIndex < 0) {
-			uiInfo.skillIndex = numSkillLevels-1;
-		}
 		return qtrue;
 	}
 	return qfalse;
@@ -7825,7 +7822,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 					return clientBuff;
 				case SORT_GAME : 
 					game = atoi(Info_ValueForKey(info, "gametype"));
-					if (game >= 0 && game < numGameTypes) {
+					if (game >= 0 && game < (signed)numGameTypes) {
 						strcpy(needPass,gameTypes[game]);
 					} else {
 						if (ping <= 0)
