@@ -749,9 +749,8 @@ int	NAVNEW_MoveToGoal( gentity_t *self, navInfo_t *info )
 					trap->Nav_AddFailedNode( (sharedEntity_t *)self, self->waypoint );
 					goto failed;
 				}
-				else
-				{//try going for our waypoint this time
-					inGoalWP = qfalse;
+				else {
+					// try going for our waypoint this time
 				}
 			}
 			else if ( bestNode != self->waypoint )

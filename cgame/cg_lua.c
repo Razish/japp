@@ -387,8 +387,6 @@ int JPLua_Export_Trace( lua_State *L ) {
 	int skipNumber=0,mask=0;
 	int top=0, top2=0, top3=0;
 
-	top = lua_gettop( L );
-
 	lua_getfield( L, 1, "x" ); start.x = lua_tonumber( L, -1 );
 	lua_getfield( L, 1, "y" ); start.y = lua_tonumber( L, -1 );
 	lua_getfield( L, 1, "z" ); start.z = lua_tonumber( L, -1 );

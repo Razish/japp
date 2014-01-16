@@ -1999,10 +1999,6 @@ qboolean WP_LobFire( gentity_t *self, vector3 *start, vector3 *target, vector3 *
 		idealSpeed = speedInc;
 	shotSpeed = idealSpeed;
 	skipNum = (idealSpeed-speedInc)/speedInc;
-	if ( !minSpeed )
-		minSpeed = 100;
-	if ( !maxSpeed )
-		maxSpeed = 900;
 	while ( hitCount < maxHits )
 	{
 		VectorSubtract( target, start, &targetDir );

@@ -870,7 +870,6 @@ qboolean CalculateSharpshooter(gentity_t *ent, int *frags)
 
 	for (i = 0; i < sv_maxclients.integer; i++)
 	{
-		nKills = 0;
 		player = g_entities + i;
 		if (!player->inuse)
 			continue;
@@ -1085,7 +1084,6 @@ qboolean CalculateDemolitionist(gentity_t *ent, int *kills)
 
 	for (i = 0; i < sv_maxclients.integer; i++)
 	{
-		nKills = 0;
 		player = g_entities + i;
 		if (!player->inuse)
 			continue;
@@ -1157,7 +1155,6 @@ qboolean CalculateTeamMVP(gentity_t *ent)
 
 	for (i = 0; i < sv_maxclients.integer; i++)
 	{
-		nScore = 0;
 		player = g_entities + i;
 		if (!player->inuse || (player->client->ps.persistant[PERS_TEAM] != team))
 			continue;
@@ -1202,7 +1199,6 @@ qboolean CalculateTeamMVPByRank(gentity_t *ent)
 
 	for (i = 0; i < sv_maxclients.integer; i++)
 	{
-		nScore = 0;
 		player = g_entities + i;
 		if (!player->inuse)
 			continue;
@@ -1245,7 +1241,6 @@ qboolean CalculateTeamDefender(gentity_t *ent)
 	*/
 	for (i = 0; i < sv_maxclients.integer; i++)
 	{
-		nScore = 0;
 		player = g_entities + i;
 		if (!player->inuse || (player->client->ps.persistant[PERS_TEAM] != team))
 			continue;
@@ -1281,7 +1276,6 @@ qboolean CalculateTeamWarrior(gentity_t *ent)
 	*/
 	for (i = 0; i < sv_maxclients.integer; i++)
 	{
-		nScore = 0;
 		player = g_entities + i;
 		if (!player->inuse || (player->client->ps.persistant[PERS_TEAM] != team))
 			continue;
@@ -1317,7 +1311,6 @@ qboolean CalculateTeamCarrier(gentity_t *ent)
 	*/
 	for (i = 0; i < sv_maxclients.integer; i++)
 	{
-		nScore = 0;
 		player = g_entities + i;
 		if (!player->inuse || (player->client->ps.persistant[PERS_TEAM] != team))
 			continue;
@@ -1354,7 +1347,6 @@ qboolean CalculateTeamInterceptor(gentity_t *ent)
 	*/
 	for (i = 0; i < sv_maxclients.integer; i++)
 	{
-		nScore = 0;
 		player = g_entities + i;
 		if (!player->inuse || (player->client->ps.persistant[PERS_TEAM] != team))
 			continue;
@@ -1392,7 +1384,6 @@ qboolean CalculateTeamRedShirt(gentity_t *ent)
 	*/
 	for (i = 0; i < sv_maxclients.integer; i++)
 	{
-		nScore = 0;
 		player = g_entities + i;
 		if (!player->inuse || (player->client->ps.persistant[PERS_TEAM] != team))
 			continue;

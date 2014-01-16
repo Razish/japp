@@ -129,7 +129,7 @@ static void AM_ReadAccounts( const char *jsonText ) {
 	cJSON *root = NULL, *admins = NULL;
 	int adminsCount = 0, i = 0;
 	const char *tmp = NULL;
-	adminUser_t	*user = adminUsers;
+	adminUser_t	*user = NULL;
 
 	root = cJSON_Parse( jsonText );
 	if ( !root ) {
@@ -336,7 +336,7 @@ static void AM_ReadTelemarks( const char *jsonText ) {
 	cJSON *root = NULL, *tms = NULL;
 	int tmCount = 0, i = 0, tmpInt = 0;
 	const char *tmp = NULL;
-	telemark_t *tm = telemarks;
+	telemark_t *tm = NULL;
 
 	root = cJSON_Parse( jsonText );
 	if ( !root ) {
@@ -443,7 +443,7 @@ void AM_SaveTelemarks( void ) {
 // log in using user + pass
 static void AM_Login( gentity_t *ent ) {
 	char argUser[64] = {0}, argPass[64] = {0};
-	adminUser_t *user = NULL, *current = adminUsers;
+	adminUser_t *user = NULL, *current = NULL;
 
 	if ( trap->Argc() < 3 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Please enter a name and password to login\n\"" );

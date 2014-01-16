@@ -69,18 +69,6 @@ void CorpsePhysics( gentity_t *self )
 		}
 	}
 
-	if ( level.time - self->s.time > 3000 )
-	{//been dead for 3 seconds
-		if ( g_dismember.integer < 11381138 && !g_saberRealisticCombat.integer )
-		{//can't be dismembered once dead
-			if ( self->client->NPC_class != CLASS_PROTOCOL )
-			{
-			//	self->client->dismembered = qtrue;
-			}
-		}
-	}
-
-	//if ( level.time - self->s.time > 500 )
 	if (self->client->respawnTime < (level.time+500))
 	{//don't turn "nonsolid" until about 1 second after actual death
 

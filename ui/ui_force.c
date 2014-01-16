@@ -12,7 +12,7 @@ FORCE INTERFACE
 #include "qcommon/qfiles.h"
 #include "ui_force.h"
 
-int uiForceSide = FORCE_LIGHTSIDE;
+int uiForceSide = FORCESIDE_LIGHT;
 int uiJediNonJedi = -1;
 int uiForceRank = FORCE_MASTERY_JEDI_KNIGHT;
 int uiMaxRank = MAX_FORCE_RANK;
@@ -69,27 +69,25 @@ int uiForcePowersRank[NUM_FORCE_POWERS] = {
 	0//FP_SABERTHROW,
 };
 
-int uiForcePowerDarkLight[NUM_FORCE_POWERS] = //0 == neutral
-{ //nothing should be usable at rank 0..
-	FORCE_LIGHTSIDE,//FP_HEAL,//instant
-	0,//FP_LEVITATION,//hold/duration
-	0,//FP_SPEED,//duration
-	0,//FP_PUSH,//hold/duration
-	0,//FP_PULL,//hold/duration
-	FORCE_LIGHTSIDE,//FP_TELEPATHY,//instant
-	FORCE_DARKSIDE,//FP_GRIP,//hold/duration
-	FORCE_DARKSIDE,//FP_LIGHTNING,//hold/duration
-	FORCE_DARKSIDE,//FP_RAGE,//duration
-	FORCE_LIGHTSIDE,//FP_PROTECT,//duration
-	FORCE_LIGHTSIDE,//FP_ABSORB,//duration
-	FORCE_LIGHTSIDE,//FP_TEAM_HEAL,//instant
-	FORCE_DARKSIDE,//FP_TEAM_FORCE,//instant
-	FORCE_DARKSIDE,//FP_DRAIN,//hold/duration
-	0,//FP_SEE,//duration
-	0,//FP_SABER_OFFENSE,
-	0,//FP_SABER_DEFENSE,
-	0//FP_SABERTHROW,
-		//NUM_FORCE_POWERS
+const forceSide_t uiForcePowerDarkLight[NUM_FORCE_POWERS] = {
+	FORCESIDE_LIGHT,//FP_HEAL,//instant
+	FORCESIDE_NEUTRAL,//FP_LEVITATION,//hold/duration
+	FORCESIDE_NEUTRAL,//FP_SPEED,//duration
+	FORCESIDE_NEUTRAL,//FP_PUSH,//hold/duration
+	FORCESIDE_NEUTRAL,//FP_PULL,//hold/duration
+	FORCESIDE_LIGHT,//FP_TELEPATHY,//instant
+	FORCESIDE_DARK,//FP_GRIP,//hold/duration
+	FORCESIDE_DARK,//FP_LIGHTNING,//hold/duration
+	FORCESIDE_DARK,//FP_RAGE,//duration
+	FORCESIDE_LIGHT,//FP_PROTECT,//duration
+	FORCESIDE_LIGHT,//FP_ABSORB,//duration
+	FORCESIDE_LIGHT,//FP_TEAM_HEAL,//instant
+	FORCESIDE_DARK,//FP_TEAM_FORCE,//instant
+	FORCESIDE_DARK,//FP_DRAIN,//hold/duration
+	FORCESIDE_NEUTRAL,//FP_SEE,//duration
+	FORCESIDE_NEUTRAL,//FP_SABER_OFFENSE,
+	FORCESIDE_NEUTRAL,//FP_SABER_DEFENSE,
+	FORCESIDE_NEUTRAL//FP_SABERTHROW,
 };
 
 int uiForceStarShaders[NUM_FORCE_STAR_IMAGES][2];
@@ -197,7 +195,7 @@ void UI_UpdateClientForcePowers(const char *teamArg)
 
 int UI_TranslateFCFIndex(int index)
 {
-	if (uiForceSide == FORCE_LIGHTSIDE)
+	if (uiForceSide == FORCESIDE_LIGHT)
 	{
 		return index-uiInfo.forceConfigLightIndexBegin;
 	}
@@ -222,7 +220,7 @@ void UI_SaveForceTemplate()
 		return;
 	}
 
-	if (uiForceSide == FORCE_LIGHTSIDE)
+	if (uiForceSide == FORCESIDE_LIGHT)
 	{ //write it into the light side folder
 		trap->FS_Open(va("forcecfg/light/%s.fcf", selectedName), &f, FS_WRITE);
 	}
@@ -276,8 +274,8 @@ void UI_SaveForceTemplate()
 	{
 		if (!Q_stricmp(uiInfo.forceConfigNames[i], selectedName))
 		{
-			if ((uiForceSide == FORCE_LIGHTSIDE && uiInfo.forceConfigSide[i]) ||
-				(uiForceSide == FORCE_DARKSIDE && !uiInfo.forceConfigSide[i]))
+			if ((uiForceSide == FORCESIDE_LIGHT && uiInfo.forceConfigSide[i]) ||
+				(uiForceSide == FORCESIDE_DARK && !uiInfo.forceConfigSide[i]))
 			{
 				Menu_SetFeederSelection(NULL, FEEDER_FORCECFG, UI_TranslateFCFIndex(i), NULL);
 				foundFeederItem = qtrue;
@@ -511,10 +509,10 @@ void UI_ReadLegalForce(void)
 		switch((int)(trap->Cvar_VariableValue("ui_myteam")))
 		{
 		case TEAM_RED:
-			forceTeam = FORCE_DARKSIDE;
+			forceTeam = FORCESIDE_DARK;
 			break;
 		case TEAM_BLUE:
-			forceTeam = FORCE_LIGHTSIDE;
+			forceTeam = FORCESIDE_LIGHT;
 			break;
 		default:
 			break;
@@ -561,10 +559,10 @@ void UI_ReadLegalForce(void)
 
 	uiForceSide = atoi(singleBuf);
 
-	if (uiForceSide != FORCE_LIGHTSIDE &&
-		uiForceSide != FORCE_DARKSIDE)
+	if (uiForceSide != FORCESIDE_LIGHT &&
+		uiForceSide != FORCESIDE_DARK)
 	{
-		uiForceSide = FORCE_LIGHTSIDE;
+		uiForceSide = FORCESIDE_LIGHT;
 		return;
 	}
 
@@ -687,7 +685,6 @@ void UI_UpdateForcePowers()
 				goto validitycheck;
 			}
 			uiForceSide = atoi(readBuf);
-			i_r = 0;
 
 			i++;
 
@@ -1162,7 +1159,7 @@ void UI_ForceConfigHandle( int oldindex, int newindex )
 	}
 
 	//If we made it here, we want to load in a new config
-	if (uiForceSide == FORCE_LIGHTSIDE)
+	if (uiForceSide == FORCESIDE_LIGHT)
 	{ //we should only be displaying lightside configs, so.. look in the light folder
 		newindex += uiInfo.forceConfigLightIndexBegin;
 		if (newindex >= uiInfo.forceConfigCount)
@@ -1183,7 +1180,7 @@ void UI_ForceConfigHandle( int oldindex, int newindex )
 
 	if (len <= 0)
 	{ //This should not have happened. But, before we quit out, attempt searching the other light/dark folder for the file.
-		if (uiForceSide == FORCE_LIGHTSIDE)
+		if (uiForceSide == FORCESIDE_LIGHT)
 		{
 			len = trap->FS_Open(va("forcecfg/dark/%s.fcf", uiInfo.forceConfigNames[newindex]), &f, FS_READ);
 		}
@@ -1217,10 +1214,10 @@ void UI_ForceConfigHandle( int oldindex, int newindex )
 		switch((int)(trap->Cvar_VariableValue("ui_myteam")))
 		{
 		case TEAM_RED:
-			forceTeam = FORCE_DARKSIDE;
+			forceTeam = FORCESIDE_DARK;
 			break;
 		case TEAM_BLUE:
-			forceTeam = FORCE_LIGHTSIDE;
+			forceTeam = FORCESIDE_LIGHT;
 			break;
 		default:
 			break;
@@ -1264,10 +1261,10 @@ void UI_ForceConfigHandle( int oldindex, int newindex )
 
 	uiForceSide = atoi(singleBuf);
 
-	if (uiForceSide != FORCE_LIGHTSIDE &&
-		uiForceSide != FORCE_DARKSIDE)
+	if (uiForceSide != FORCESIDE_LIGHT &&
+		uiForceSide != FORCESIDE_DARK)
 	{
-		uiForceSide = FORCE_LIGHTSIDE;
+		uiForceSide = FORCESIDE_LIGHT;
 		return;
 	}
 

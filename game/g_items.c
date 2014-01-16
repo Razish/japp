@@ -2343,14 +2343,14 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	{
 		if (ent->item->giTag == PW_FORCE_ENLIGHTENED_LIGHT)
 		{
-			if (other->client->ps.fd.forceSide != FORCE_LIGHTSIDE)
+			if (other->client->ps.fd.forceSide != FORCESIDE_LIGHT)
 			{
 				return;
 			}
 		}
 		else
 		{
-			if (other->client->ps.fd.forceSide != FORCE_DARKSIDE)
+			if (other->client->ps.fd.forceSide != FORCESIDE_DARK)
 			{
 				return;
 			}

@@ -1038,7 +1038,7 @@ static qboolean CopyToBodyQue( gentity_t *ent ) {
 
 	//G_AddEvent(body, EV_BODY_QUEUE_COPY, ent->s.clientNum);
 	//Now doing this through a modified version of the rcg reliable command.
-	if (ent->client && ent->client->ps.fd.forceSide == FORCE_LIGHTSIDE)
+	if (ent->client && ent->client->ps.fd.forceSide == FORCESIDE_LIGHT)
 	{
 		islight = 1;
 	}
@@ -1417,7 +1417,7 @@ qboolean G_SaberModelSetup(gentity_t *ent)
 					{
 						if (j == 0)
 						{ //guess this is an 0ldsk3wl saber
-							tagBolt = trap->G2API_AddBolt(ent->client->weaponGhoul2[i], 0, "*flash");
+							trap->G2API_AddBolt(ent->client->weaponGhoul2[i], 0, "*flash");
 							fallbackForSaber = qfalse;
 							break;
 						}
@@ -1554,7 +1554,6 @@ void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
 							p++;
 						}
 						skin[i] = 0;
-						i = 0;
 					}
 
 					if (!BG_IsValidCharacterModel(truncModelName, skin))
@@ -1742,7 +1741,7 @@ void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
 		int i;
 
 		// Setup the default first bolt
-		i = trap->G2API_AddBolt( ent->ghoul2, 0, "model_root" );
+		trap->G2API_AddBolt( ent->ghoul2, 0, "model_root" );
 
 		// Setup the droid unit.
 		ent->m_pVehicle->m_iDroidUnitTag = trap->G2API_AddBolt( ent->ghoul2, 0, "*droidunit" );
@@ -2129,6 +2128,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		}
 	}
 
+#if 0
 	// bots set their team a few frames later
 	if ( level.gametype >= GT_TEAM && g_entities[clientNum].r.svFlags & SVF_BOT )
 	{
@@ -2142,9 +2142,10 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	}
 	else
 		team = client->sess.sessionTeam;
-
+#else
 	//Testing to see if this fixes the problem with a bot's team getting set incorrectly.
 	team = client->sess.sessionTeam;
+#endif
 
 	//Set the siege class
 	if ( level.gametype == GT_SIEGE )
@@ -2706,7 +2707,6 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 		}
 		i++;
 	}
-	i = 0;
 
 	memset( &client->ps, 0, sizeof( client->ps ) );
 	client->ps.eFlags = flags;
@@ -3113,10 +3113,10 @@ void ClientSpawn(gentity_t *ent) {
 	vector3				spawn_origin, spawn_angles;
 	gentity_t			*spawnPoint = NULL;
 	gclient_t			*client = NULL;
-	clientPersistant_t	saved = {0};
-	clientSession_t		savedSess = {0};
-	forcedata_t			savedForce = {0};
-	saberInfo_t			saberSaved[MAX_SABERS] = {0};
+	clientPersistant_t	saved;
+	clientSession_t		savedSess;
+	forcedata_t			savedForce;
+	saberInfo_t			saberSaved[MAX_SABERS];
 	int					persistant[MAX_PERSISTANT] = {0};
 	int					flags, gameFlags, savedPing, accuracy_hits, accuracy_shots, eventSequence;
 	void				*g2WeaponPtrs[MAX_SABERS];
@@ -4005,7 +4005,6 @@ void ClientDisconnect( int clientNum ) {
 		}
 		i++;
 	}
-	i = 0;
 
 	G_LeaveVehicle( ent, qtrue );
 

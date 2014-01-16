@@ -262,7 +262,6 @@ int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 		{ //see if it's been loaded already
 			if (!Q_stricmp(bgAllAnims[i].filename, filename))
 			{
-				animset = bgAllAnims[i].anims;
 				return i; //alright, we already have it.
 			}
 			i++;
@@ -1653,11 +1652,11 @@ static void UI_DrawForceSide(rectDef_t *rect, float scale, vector4 *color, int t
 		switch((int)(trap->Cvar_VariableValue("ui_myteam")))
 		{
 		case TEAM_RED:
-			uiForceSide = FORCE_DARKSIDE;
+			uiForceSide = FORCESIDE_DARK;
 			VectorSet( (vector3 *)color, 0.2f, 0.2f, 0.2f );
 			break;
 		case TEAM_BLUE:
-			uiForceSide = FORCE_LIGHTSIDE;
+			uiForceSide = FORCESIDE_LIGHT;
 			VectorSet( (vector3 *)color, 0.2f, 0.2f, 0.2f );
 			break;
 		default:
@@ -1665,7 +1664,7 @@ static void UI_DrawForceSide(rectDef_t *rect, float scale, vector4 *color, int t
 		}
 	}
 
-	if (val == FORCE_LIGHTSIDE)
+	if (val == FORCESIDE_LIGHT)
 	{
 		trap->SE_GetStringTextString("MENUS_FORCEDESC_LIGHT",s, sizeof(s));
 		menu = Menus_FindByName("forcealloc");
@@ -2108,12 +2107,12 @@ void UpdateForceStatus()
 				// This is disabled, always show both sides from spectator.
 				if ( 0 && atoi(Info_ValueForKey(info, "g_forceBasedTeams")))
 				{	// Show red or blue based on what side is chosen.
-					if (uiForceSide==FORCE_LIGHTSIDE)
+					if (uiForceSide==FORCESIDE_LIGHT)
 					{
 						Menu_ShowItemByName(menu, "playerforcered", qfalse);
 						Menu_ShowItemByName(menu, "playerforceblue", qtrue);
 					}
-					else if (uiForceSide==FORCE_DARKSIDE)
+					else if (uiForceSide==FORCESIDE_DARK)
 					{
 						Menu_ShowItemByName(menu, "playerforcered", qtrue);
 						Menu_ShowItemByName(menu, "playerforceblue", qfalse);
@@ -2300,7 +2299,7 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
 			i = 1;
 		}
 
-		if (i == FORCE_LIGHTSIDE)
+		if (i == FORCESIDE_LIGHT)
 		{
 			//			s = "Light";
 			s = (char *)UI_GetStringEdString("MENUS", "FORCEDESC_LIGHT");
@@ -4889,6 +4888,7 @@ static void UI_UpdateSaberHilt( qboolean secondSaber )
 	if(!item)
 	{
 		Com_Error( ERR_FATAL, "UI_UpdateSaberHilt: Could not find item (%s) in menu (%s)", itemName, menu->window.name);
+		return;
 	}
 
 	trap->Cvar_VariableStringBuffer( saberCvarName, model, sizeof(model) );
@@ -5405,7 +5405,7 @@ void UI_ClampMaxPlayers( void ) {
 }
 
 void UI_UpdateSiegeStatusIcons( void ) {
-    menuDef_t *menu = Menu_GetFocused();
+    menuDef_t *menu;
 
 	if ( (menu=Menu_GetFocused()) ) {
 		int i=0;
@@ -7375,7 +7375,7 @@ static int UI_FeederCount(float feederID)
 			return siegeTeam2->numClasses;
 
 		case FEEDER_FORCECFG:
-			if (uiForceSide == FORCE_LIGHTSIDE)
+			if (uiForceSide == FORCESIDE_LIGHT)
 			{
 				return uiInfo.forceConfigCount-uiInfo.forceConfigLightIndexBegin;
 			}
@@ -7670,7 +7670,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 			}
 			else
 			{
-				if (uiForceSide == FORCE_LIGHTSIDE)
+				if (uiForceSide == FORCESIDE_LIGHT)
 				{
 					index += uiInfo.forceConfigLightIndexBegin;
 					if (index < 0)
@@ -7683,7 +7683,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 					}
 					return uiInfo.forceConfigNames[index];
 				}
-				else if (uiForceSide == FORCE_DARKSIDE)
+				else if (uiForceSide == FORCESIDE_DARK)
 				{
 					index += uiInfo.forceConfigDarkIndexBegin;
 					if (index < 0)
@@ -7936,7 +7936,7 @@ static qhandle_t UI_FeederItemImage(float feederID, int index) {
 	}
 	else if (feederID == FEEDER_Q3HEADS) 
 	{
-		int actual;
+		int actual = -1;
 		UI_SelectedTeamHead(index, &actual);
 		index = actual;
 
@@ -8248,7 +8248,7 @@ qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 
 	if (feederID == FEEDER_Q3HEADS) 
 	{
-		int actual;
+		int actual = -1;
 		UI_SelectedTeamHead(index, &actual);
 		uiInfo.q3SelectedHead = index;
 		trap->Cvar_Set("ui_selectedModelIndex", va("%i", index));
@@ -8412,7 +8412,7 @@ qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 	{
 		int newindex = index;
 
-		if (uiForceSide == FORCE_LIGHTSIDE)
+		if (uiForceSide == FORCESIDE_LIGHT)
 		{
 			newindex += uiInfo.forceConfigLightIndexBegin;
 			if (newindex >= uiInfo.forceConfigCount)
@@ -8980,7 +8980,6 @@ static void UI_BuildQ3Model_List( void )
 				k++;
 			}
 			*/
-			k = 0;
 			k = strchr( skinname, '/' ) ? (strchr( skinname, '/' )-skinname) : 0;
 			while ( k<skinLen && skinname[k] && skinname[k] != '_' )
 				k++;
@@ -9823,6 +9822,7 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 		centerPoint = 320;
 		yStart = 32;
 		scale = 1.0f;	// -ste
+		//RAZTODO: see results without returning
 		return;
 	}
 

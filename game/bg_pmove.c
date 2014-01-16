@@ -3348,7 +3348,6 @@ static void PM_FlyVehicleMove( void )
 	// Handle negative speed.
 	if ( wishspeed < 0 )
 	{
-		wishspeed = wishspeed * -1.0f;
 		VectorScale( &wishvel, -1.0f, &wishvel );
 		VectorScale( &wishdir, -1.0f, &wishdir );
 	}
@@ -3471,7 +3470,6 @@ static void PM_AirMove( void ) {
 	{//in a hovering vehicle, have air control
 		if ( 1 )
 		{
-			wishspeed = pm->ps->speed;
 			VectorScale( &pm->ps->moveDir, pm->ps->speed, &wishvel );
 			VectorCopy( &pm->ps->moveDir, &wishdir );
 			scale = 1.0f;
@@ -3607,24 +3605,17 @@ static void PM_GrappleSwing( void )
 
 }
 #else
-void PM_GrappleSwing( void )
-{
-	float	height = pm->ps->lastHitLoc.z - pm->ps->origin.z;
-	vector3	dist;
-	float 	length;
-	float	length2;
-
-	if ( height < 0.0f )
-		height *= -1.0f;
+void PM_GrappleSwing( void ) {
+	vector3 dist;
+	float length, length2;
 
 	VectorSubtract( &pm->ps->lastHitLoc, &pml.previous_origin, &dist );
 
 	length = VectorLength( &dist );
 
-	if ( length > 0.0f )
-	{
-		float	Unknown1 = 0.0f;
-		vector3	UnknownVec = { 0.0f };
+	if ( length > 0.0f ) {
+		float	Unknown1, Unknown2;
+		vector3	UnknownVec;
 
 		VectorSubtract( &pm->ps->lastHitLoc, &pm->ps->origin, &dist );
 		length2 = VectorLength( &dist );
@@ -3635,9 +3626,10 @@ void PM_GrappleSwing( void )
 		VectorScale( &dist, Unknown1, &UnknownVec );
 		VectorAdd( &UnknownVec, &pm->ps->velocity, &UnknownVec );
 
-		pm->ps->velocity.x = -(UnknownVec.z*dist.z + UnknownVec.y*dist.y + UnknownVec.x*dist.x) * dist.x + UnknownVec.x;
-		pm->ps->velocity.y = -(UnknownVec.z*dist.z + UnknownVec.y*dist.y + UnknownVec.x*dist.x) * dist.y + UnknownVec.y;
-		pm->ps->velocity.z = -(UnknownVec.z*dist.z + UnknownVec.y*dist.y + UnknownVec.x*dist.x) * dist.z + UnknownVec.z;	
+		Unknown2 = UnknownVec.z*dist.z + UnknownVec.y*dist.y + UnknownVec.x*dist.x;
+		pm->ps->velocity.x = -Unknown2 * dist.x + UnknownVec.x;
+		pm->ps->velocity.y = -Unknown2 * dist.y + UnknownVec.y;
+		pm->ps->velocity.z = -Unknown2 * dist.z + UnknownVec.z;	
 	}
 
 	pml.groundPlane = qfalse;
@@ -7560,8 +7552,6 @@ static void PM_Weapon( void )
 		}
 	}
 
-	amount = weaponData[pm->ps->weapon].energyPerShot;
-
 	// take an ammo away if not infinite
 	if ( pm->ps->weapon != WP_NONE &&
 		pm->ps->weapon == pm->cmd.weapon &&
@@ -9988,7 +9978,6 @@ void PM_VehicleViewAngles(playerState_t *ps, bgEntity_t *veh, usercmd_t *ucmd)
 #endif //VEH_CONTROL_SCHEME_4
 		{//only if not if doing special free-roll/pitch control
 			setAngles = qtrue;
-			clampMin.pitch	= -pVeh->m_pVehicleInfo->lookPitch;
 			clampMax.pitch	=  pVeh->m_pVehicleInfo->lookPitch;
 			clampMin.yaw	= clampMax.yaw = 0;
 			clampMin.roll	= clampMax.roll = -1;

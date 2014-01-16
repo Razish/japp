@@ -230,7 +230,7 @@ static int JPLua_Export_GetMapTime( lua_State *L ) {
 	int seconds = msec / 1000;
 	int mins = seconds / 60;
 	seconds %= 60;
-	msec %= 1000;
+//	msec %= 1000;
 	lua_pushstring( L, va( "%02i:%02i", mins, seconds ) );
 	return 1;
 }
@@ -247,8 +247,6 @@ int JPLua_Export_Trace( lua_State *L ) {
 	vector3 mins={0},maxs={0};
 	int skipNumber=0,mask=0;
 	int top=0, top2=0, top3=0;
-
-	top = lua_gettop( L );
 
 	lua_getfield( L, 1, "x" ); start.x = lua_tonumber( L, -1 );
 	lua_getfield( L, 1, "y" ); start.y = lua_tonumber( L, -1 );

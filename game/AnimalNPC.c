@@ -107,7 +107,6 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 #endif
 
 	speedIdleDec = pVeh->m_pVehicleInfo->decelIdle * pVeh->m_fTimeModifier;
-	speedMax = pVeh->m_pVehicleInfo->speedMax;
 
 	speedIdle = pVeh->m_pVehicleInfo->speedIdle;
 	speedMin = pVeh->m_pVehicleInfo->speedMin;
@@ -365,12 +364,8 @@ static void AnimateVehicle( Vehicle_t *pVeh )
 			return;
 		}
 	}
-	else if ( pVeh->m_ulFlags & VEH_BUCKING )
-	{
-		iFlags = SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD;
-		Anim = BOTH_VT_BUCK;
-		iBlend = 500;
-		Vehicle_SetAnim( parent, SETANIM_LEGS, BOTH_VT_BUCK, iFlags, iBlend );
+	else if ( pVeh->m_ulFlags & VEH_BUCKING ) {
+		Vehicle_SetAnim( parent, SETANIM_LEGS, BOTH_VT_BUCK, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD, 500 );
 		return;
 	}
 

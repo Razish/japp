@@ -2381,7 +2381,6 @@ int BG_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 		{ //see if it's been loaded already
 			if (!Q_stricmp(bgAllAnims[i].filename, filename))
 			{
-				animset = bgAllAnims[i].anims;
 				return i; //alright, we already have it.
 			}
 			i++;

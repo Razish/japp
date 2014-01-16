@@ -125,7 +125,6 @@
     <ClCompile Include="..\game\g_mover.c" />
     <ClCompile Include="..\game\g_nav.c" />
     <ClCompile Include="..\game\g_navnew.c" />
-    <ClCompile Include="..\game\g_newmemory.c" />
     <ClCompile Include="..\game\g_object.c" />
     <ClCompile Include="..\game\g_playerbans.c" />
     <ClCompile Include="..\game\g_clientModification.c" />

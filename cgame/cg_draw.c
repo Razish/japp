@@ -884,7 +884,6 @@ static void CG_DrawAmmo( centity_t	*cent,menuDef_t *menuHUD)
 		return;
 	}
 
-	focusItem = Menu_FindItemByName(menuHUD, "ammoamount");
 	trap->R_SetColor( &colorTable[CT_WHITE] );
 
 	if (weaponData[cent->currentState.weapon].energyPerShot == 0 &&
@@ -2176,10 +2175,7 @@ qboolean CG_CheckTargetVehicle( centity_t **pTargetVeh, float *alpha )
 		return qtrue;
 	}
 
-	if ( cg_targVehLastTime && cg.time-cg_targVehLastTime < 3000 )
-	{
-		targetVeh = &cg_entities[cg_targVeh];
-
+	if ( cg_targVehLastTime && cg.time-cg_targVehLastTime < 3000 ) {
 		//stay at full alpha for 1 sec after lose them from crosshair
 		if ( cg.time-cg_targVehLastTime < 1000 )
 			*alpha = 1.0f;
@@ -4098,7 +4094,7 @@ static float CG_DrawTimer( float y ) {
 	}
 
 	secs %= 60;
-	msec %= 1000;
+//	msec %= 1000;
 
 	s = va( "%i:%02i", mins, secs );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
@@ -4222,9 +4218,6 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 				p = CG_GetLocationString(CG_ConfigString(CS_LOCATIONS+ci->location));
 				if (!p || !*p)
 					p = "unknown";
-				len = CG_DrawStrlen(p);
-				if (len > lwidth)
-					len = lwidth;
 
 //				xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth + 
 //					((lwidth/2 - len/2) * TINYCHAR_WIDTH);
@@ -5599,13 +5592,14 @@ qboolean CG_WorldCoordToScreenCoordFloat( vector3 *point, float *x, float *y )
 }
 #endif
 
-qboolean CG_WorldCoordToScreenCoord( vector3 *worldCoord, int *x, int *y )
-{
-	float	xF, yF;
-	qboolean retVal = CG_WorldCoordToScreenCoordFloat( worldCoord, &xF, &yF );
-	*x = (int)xF;
-	*y = (int)yF;
-	return retVal;
+qboolean CG_WorldCoordToScreenCoord( vector3 *worldCoord, int *x, int *y ) {
+	float xF, yF;
+	if ( CG_WorldCoordToScreenCoordFloat( worldCoord, &xF, &yF ) ) {
+		*x = (int)xF;
+		*y = (int)yF;
+		return qtrue;
+	}
+	return qfalse;
 }
 
 /*
@@ -5878,7 +5872,7 @@ void CG_BracketEntity( centity_t *cent, float radius )
 								if ( !CG_WorldCoordToScreenCoordFloat(&vehLeadPos, &leadX, &leadY) )
 								{//off-screen, don't draw it
 									//just draw the line
-									CG_DottedLine( x, y, leadX, leadY, 1, 10, &g_color_table[ColorIndex(COLOR_RED)], 0.5f );
+									CG_DottedLine( x, y, x, y, 1, 10, &g_color_table[ColorIndex(COLOR_RED)], 0.5f );
 									return;
 								}
 								//draw a line from the ship's cur pos to the lead pos
@@ -7161,7 +7155,6 @@ static void CG_DrawWarmup( void ) {
 			}
 		}
 	}
-	scale = 0.45f;
 	switch ( cg.warmupCount ) {
 	case 0:
 		scale = 1.25f;

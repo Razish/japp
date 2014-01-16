@@ -217,9 +217,9 @@ void WP_InitForcePowers( gentity_t *ent ) {
 
 	if ( g_forceBasedTeams.integer ) {
 		if ( ent->client->sess.sessionTeam == TEAM_RED )
-			warnClient = !(BG_LegalizedForcePowers( forcePowers, sizeof( forcePowers ), g_maxForceRank.integer, HasSetSaberOnly(), FORCE_DARKSIDE, level.gametype, g_forcePowerDisable.integer ));
+			warnClient = !(BG_LegalizedForcePowers( forcePowers, sizeof( forcePowers ), g_maxForceRank.integer, HasSetSaberOnly(), FORCESIDE_DARK, level.gametype, g_forcePowerDisable.integer ));
 		else if ( ent->client->sess.sessionTeam == TEAM_BLUE )
-			warnClient = !(BG_LegalizedForcePowers( forcePowers, sizeof( forcePowers ), g_maxForceRank.integer, HasSetSaberOnly(), FORCE_LIGHTSIDE, level.gametype, g_forcePowerDisable.integer ));
+			warnClient = !(BG_LegalizedForcePowers( forcePowers, sizeof( forcePowers ), g_maxForceRank.integer, HasSetSaberOnly(), FORCESIDE_LIGHT, level.gametype, g_forcePowerDisable.integer ));
 		else
 			warnClient = !(BG_LegalizedForcePowers( forcePowers, sizeof( forcePowers ), g_maxForceRank.integer, HasSetSaberOnly(), 0, level.gametype, g_forcePowerDisable.integer ));
 	}
@@ -255,7 +255,7 @@ void WP_InitForcePowers( gentity_t *ent ) {
 		int oldI = i;
 		i_r = 0;
 		while ( forcePowers[i] && forcePowers[i] != '\n' && i_r < NUM_FORCE_POWERS ) {
-			if ( ent->client->ps.fd.forceSide == FORCE_LIGHTSIDE ) {
+			if ( ent->client->ps.fd.forceSide == FORCESIDE_LIGHT ) {
 				if ( i_r == FP_ABSORB )
 					forcePowers[i] = '3';
 				if ( botstates[ent->s.number]->settings.skill >= 4 ) {
@@ -266,7 +266,7 @@ void WP_InitForcePowers( gentity_t *ent ) {
 						forcePowers[i] = '3';
 				}
 			}
-			else if ( ent->client->ps.fd.forceSide == FORCE_DARKSIDE ) {
+			else if ( ent->client->ps.fd.forceSide == FORCESIDE_DARK ) {
 				if ( botstates[ent->s.number]->settings.skill >= 4 ) {
 					if ( i_r == FP_GRIP )
 						forcePowers[i] = '3';
@@ -2924,12 +2924,10 @@ void ForceThrow( gentity_t *self, qboolean pull )
 	if (pull)
 	{
 		powerLevel = self->client->ps.fd.forcePowerLevel[FP_PULL];
-		pushPower = 256*self->client->ps.fd.forcePowerLevel[FP_PULL];
 	}
 	else
 	{
 		powerLevel = self->client->ps.fd.forcePowerLevel[FP_PUSH];
-		pushPower = 256*self->client->ps.fd.forcePowerLevel[FP_PUSH];
 	}
 
 	if (!powerLevel)
@@ -4970,8 +4968,6 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 		}
 	}
 
-	i = 0;
-
 	if (self->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] || self->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK])
 	{ //enlightenment
 		if (!self->client->ps.fd.forceUsingAdded)
@@ -5014,8 +5010,6 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 
 		self->client->ps.fd.forceUsingAdded = 0;
 	}
-
-	i = 0;
 
 	//Raz: Don't unset the tricked ents if they're a ghost, they're used for prediction in the JA++ client
 	if (!self->client->pers.adminData.isGhost && !(self->client->ps.fd.forcePowersActive & (1 << FP_TELEPATHY)))

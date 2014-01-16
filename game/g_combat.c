@@ -2946,9 +2946,8 @@ void G_GetDismemberLoc(gentity_t *self, vector3 *boltPoint, int limbType)
 	return;
 }
 
-void G_GetDismemberBolt(gentity_t *self, vector3 *boltPoint, int limbType)
-{
-	int useBolt = self->genericValue5;
+void G_GetDismemberBolt( gentity_t *self, vector3 *boltPoint, int limbType ) {
+	int useBolt;
 	vector3 properOrigin, properAngles, addVel;
 	//vector3 legAxis[3];
 	mdxaBone_t	boltMatrix;
@@ -3361,22 +3360,17 @@ void DismembermentByNum(gentity_t *self, int num)
 	G_Dismember( self, self, &boltPoint, sect, 90, 0, BOTH_DEATH1, qfalse );
 }
 
-int G_GetHitQuad( gentity_t *self, vector3 *hitloc )
-{
-	vector3 diff, fwdangles={0,0,0}, right;
-	vector3 clEye;
-	float rightdot;
-	float zdiff;
-	int hitLoc = gPainHitLoc;
+int G_GetHitQuad( gentity_t *self, vector3 *hitloc ) {
+	vector3 diff, fwdangles={0,0,0}, right, clEye;
+	float rightdot, zdiff;
+	int hitLoc;
 
-	if (self->client)
-	{
-		VectorCopy(&self->client->ps.origin, &clEye);
+	if ( self->client ) {
+		VectorCopy( &self->client->ps.origin, &clEye );
 		clEye.z += self->client->ps.viewheight;
 	}
-	else
-	{
-		VectorCopy(&self->s.pos.trBase, &clEye);
+	else {
+		VectorCopy( &self->s.pos.trBase, &clEye );
 		clEye.z += 16;
 	}
 
@@ -3384,33 +3378,30 @@ int G_GetHitQuad( gentity_t *self, vector3 *hitloc )
 	diff.z = 0;
 	VectorNormalize( &diff );
 
-	if (self->client)
-	{
+	if ( self->client )
 		fwdangles.y = self->client->ps.viewangles.y;
-	}
 	else
-	{
 		fwdangles.y = self->s.apos.trBase.y;
-	}
+
 	// Ultimately we might care if the shot was ahead or behind, but for now, just quadrant is fine.
 	AngleVectors( &fwdangles, NULL, &right, NULL );
 
-	rightdot = DotProduct(&right, &diff);
+	rightdot = DotProduct( &right, &diff );
 	zdiff = hitloc->z - clEye.z;
 	
 	if ( zdiff > 0 ) {
-			 if ( rightdot >  0.3 )		hitLoc = G2_MODELPART_RARM;
-		else if ( rightdot < -0.3 )		hitLoc = G2_MODELPART_LARM;
+			 if ( rightdot >  0.3f )	hitLoc = G2_MODELPART_RARM;
+		else if ( rightdot < -0.3f )	hitLoc = G2_MODELPART_LARM;
 		else							hitLoc = G2_MODELPART_HEAD;
 	}
 	else if ( zdiff > -20 ) {
-			 if ( rightdot >  0.1 )		hitLoc = G2_MODELPART_RARM;
-		else if ( rightdot < -0.1 )		hitLoc = G2_MODELPART_LARM;
+			 if ( rightdot >  0.1f )	hitLoc = G2_MODELPART_RARM;
+		else if ( rightdot < -0.1f )	hitLoc = G2_MODELPART_LARM;
 		else							hitLoc = G2_MODELPART_HEAD;
 	}
 	else {
-		if ( rightdot >= 0 )	hitLoc = G2_MODELPART_RLEG;
-		else					hitLoc = G2_MODELPART_LLEG;
+		if ( rightdot >= 0 )			hitLoc = G2_MODELPART_RLEG;
+		else							hitLoc = G2_MODELPART_LLEG;
 	}
 
 	return hitLoc;

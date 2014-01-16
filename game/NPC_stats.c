@@ -1036,9 +1036,9 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 		stats->runSpeed		= 300;
 		stats->acceleration	= 15;//Increase/descrease speed this much per frame (20fps)
 	}
-	else
-	{
-		stats = NULL;
+	else {
+		trap->Error( ERR_DROP, "NPC_ParseParms: %s not an NPC", NPCName );
+		return qfalse;
 	}
 
 	//Set defaults

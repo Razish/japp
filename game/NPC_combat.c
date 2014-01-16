@@ -137,6 +137,7 @@ void G_AttackDelay( gentity_t *self, gentity_t *enemy )
 
 		//Now modify the delay based on NPC_class, weapon, and team
 		//NOTE: attDelay should be somewhere between 1000 to 6000 milliseconds
+#if 0
 		switch ( self->client->NPC_class )
 		{
 		case CLASS_IMPERIAL://they give orders and hang back
@@ -206,6 +207,7 @@ void G_AttackDelay( gentity_t *self, gentity_t *enemy )
 			break;
 		*/
 		}
+#endif
 
 		//RAZTODO: Lol..fix plz
 		attDelay = weaponData[self->s.weapon].fireTime*2.0f;
@@ -1544,13 +1546,13 @@ gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis
 												{
 													if( NPC_CheckVisibility ( newenemy, visChecks ) == minVis )
 													{
-														bestDist = relDist;
+													//	bestDist = relDist;
 														closestEnemy = newenemy;
 													}
 												}
 												else
 												{
-													bestDist = relDist;
+												//	bestDist = relDist;
 													closestEnemy = newenemy;
 												}
 											}

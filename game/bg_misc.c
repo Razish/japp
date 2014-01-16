@@ -205,20 +205,20 @@ int forcePowerSorted[NUM_FORCE_POWERS] =
 
 int forcePowerDarkLight[NUM_FORCE_POWERS] = //0 == neutral
 { //nothing should be usable at rank 0..
-	FORCE_LIGHTSIDE,//FP_HEAL,//instant
+	FORCESIDE_LIGHT,//FP_HEAL,//instant
 	0,//FP_LEVITATION,//hold/duration
 	0,//FP_SPEED,//duration
 	0,//FP_PUSH,//hold/duration
 	0,//FP_PULL,//hold/duration
-	FORCE_LIGHTSIDE,//FP_TELEPATHY,//instant
-	FORCE_DARKSIDE,//FP_GRIP,//hold/duration
-	FORCE_DARKSIDE,//FP_LIGHTNING,//hold/duration
-	FORCE_DARKSIDE,//FP_RAGE,//duration
-	FORCE_LIGHTSIDE,//FP_PROTECT,//duration
-	FORCE_LIGHTSIDE,//FP_ABSORB,//duration
-	FORCE_LIGHTSIDE,//FP_TEAM_HEAL,//instant
-	FORCE_DARKSIDE,//FP_TEAM_FORCE,//instant
-	FORCE_DARKSIDE,//FP_DRAIN,//hold/duration
+	FORCESIDE_LIGHT,//FP_TELEPATHY,//instant
+	FORCESIDE_DARK,//FP_GRIP,//hold/duration
+	FORCESIDE_DARK,//FP_LIGHTNING,//hold/duration
+	FORCESIDE_DARK,//FP_RAGE,//duration
+	FORCESIDE_LIGHT,//FP_PROTECT,//duration
+	FORCESIDE_LIGHT,//FP_ABSORB,//duration
+	FORCESIDE_LIGHT,//FP_TEAM_HEAL,//instant
+	FORCESIDE_DARK,//FP_TEAM_FORCE,//instant
+	FORCESIDE_DARK,//FP_DRAIN,//hold/duration
 	0,//FP_SEE,//duration
 	0,//FP_SABER_OFFENSE,
 	0,//FP_SABER_DEFENSE,
@@ -501,10 +501,10 @@ qboolean BG_LegalizedForcePowers(char *powerOut, size_t powerOutSize, int maxRan
 	//at this point, readBuf contains the intended side
 	final_Side = atoi(readBuf);
 
-	if (final_Side != FORCE_LIGHTSIDE &&
-		final_Side != FORCE_DARKSIDE)
+	if (final_Side != FORCESIDE_LIGHT &&
+		final_Side != FORCESIDE_DARK)
 	{ //Not a valid side. You will be dark. Because I said so. (this is something that should never actually happen unless you purposely feed in an invalid config)
-		final_Side = FORCE_DARKSIDE;
+		final_Side = FORCESIDE_DARK;
 		maintainsValidity = qfalse;
 	}
 
@@ -677,7 +677,6 @@ qboolean BG_LegalizedForcePowers(char *powerOut, size_t powerOutSize, int maxRan
 				}
 				i++;
 			}
-			usedPoints = 0;
 		}
 	}
 
@@ -1026,7 +1025,7 @@ void BG_CycleForce( playerState_t *ps, int direction ) {
 	int i, x, presel;
 	int foundnext = -1;
 
-	presel = x = i = ps->fd.forcePowerSelected;
+	x = i = ps->fd.forcePowerSelected;
 
 	// no valid force powers
 	if ( x >= NUM_FORCE_POWERS || x == -1 )

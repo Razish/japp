@@ -972,20 +972,16 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 	do {
 		clientnum += dir;
 		if ( clientnum >= level.maxclients ) {
-			if ( looped ) {
-				clientnum = original;
+			if ( looped )
 				break;
-			}
 			else {
 				clientnum = 0;
 				looped = qtrue;
 			}
 		}
 		if ( clientnum < 0 ) {
-			if ( looped ) {
-				clientnum = original;
+			if ( looped )
 				break;
-			}
 			else {
 				clientnum = level.maxclients - 1;
 				looped = qtrue;

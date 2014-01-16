@@ -1049,9 +1049,9 @@ void SP_misc_holocron(gentity_t *ent)
 
 	ent->s.trickedentindex4 = ent->count;
 
-	if (forcePowerDarkLight[ent->count] == FORCE_DARKSIDE)
+	if (forcePowerDarkLight[ent->count] == FORCESIDE_DARK)
 		ent->s.trickedentindex3 = 1;
-	else if (forcePowerDarkLight[ent->count] == FORCE_LIGHTSIDE)
+	else if (forcePowerDarkLight[ent->count] == FORCESIDE_LIGHT)
 		ent->s.trickedentindex3 = 2;
 	else
 		ent->s.trickedentindex3 = 3;

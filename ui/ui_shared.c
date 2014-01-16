@@ -2005,7 +2005,7 @@ transition3		lfvscr		(min extent) (max extent) (fovx,y)  20 25
 */
 qboolean Script_Transition3(itemDef_t *item, char **args) 
 {
-	const char *name;
+	const char *name = "unknown";
 	const char *value;
 	float minx, miny, minz, maxx, maxy, maxz, fovtx, fovty;
 	int time;
@@ -2778,9 +2778,8 @@ float Item_Slider_ThumbPosition(itemDef_t *item) {
 		x = item->window.rect.x;
 	}
 
-	if (editDef == NULL && item->cvar) {
+	if ( !editDef )
 		return x;
-	}
 
 	value = DC->getCVarValue(item->cvar);
 
@@ -2824,12 +2823,11 @@ float Item_Slider_ThumbDefaultPosition(itemDef_t *item) {
 
 	value = DC->getCVarValue(item->cvar);
 
-	if (value < editDef->minVal) {
-		value = editDef->minVal;
-	} else if (value > editDef->maxVal) {
-		value = editDef->maxVal;
-	}
 	value = editDef->defVal;
+	if ( value < editDef->minVal )
+		value = editDef->minVal;
+	else if ( value > editDef->maxVal )
+		value = editDef->maxVal;
 
 	range = editDef->maxVal - editDef->minVal;
 	value -= editDef->minVal;
@@ -4383,10 +4381,8 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 		return;
 	}
 
-	inHandler = qtrue;
 	if (g_waitingForKey && down) {
 		Item_Bind_HandleKey(g_bindItem, key, down);
-		inHandler = qfalse;
 		return;
 	}
 
@@ -4396,7 +4392,6 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 		{
 			g_editingField = qfalse;
 			g_editItem = NULL;
-			inHandler = qfalse;
 			return;
 		} 
 		else if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_MOUSE3) 
@@ -4414,7 +4409,6 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 	}
 
 	if (menu == NULL) {
-		inHandler = qfalse;
 		return;
 	}
 		// see if the mouse is within the window bounds and if so is this a mouse click
@@ -4426,7 +4420,6 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 			inHandleKey = qtrue;
 			Menus_HandleOOBClick(menu, key, down);
 			inHandleKey = qfalse;
-			inHandler = qfalse;
 			return;
 		}
 	}
@@ -4452,13 +4445,11 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 			{
 				Item_Action(item);
 			}
-			inHandler = qfalse;
 			return;
 		}
 	}
 
 	if (!down) {
-		inHandler = qfalse;
 		return;
 	}
 
@@ -4583,7 +4574,6 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 			}
 			break;
 	}
-	inHandler = qfalse;
 }
 
 void ToWindowCoords(float *x, float *y, windowDef_t *window) {
@@ -4909,8 +4899,6 @@ void Item_TextField_Paint(itemDef_t *item) {
 			trap->SE_GetStringTextString( &buff[1], buff, sizeof(buff));
 		}
 	} 
-
-	parent = (menuDef_t*)item->parent;
 
 	if (item->window.flags & WINDOW_HASFOCUS) {
 		lowLight.r = 0.8 * parent->focusColor.r; 
@@ -5358,61 +5346,49 @@ qboolean Display_KeyBindPending() {
 	return g_waitingForKey;
 }
 
-qboolean Item_Bind_HandleKey(itemDef_t *item, int key, qboolean down) {
+qboolean Item_Bind_HandleKey( itemDef_t *item, int key, qboolean down ) {
 	int id;
 	size_t i;
 
-	if (key == A_MOUSE1 && Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory) && !g_waitingForKey)
-	{
-		if (down) {
+	if ( key == A_MOUSE1 && Rect_ContainsPoint( &item->window.rect, DC->cursorx, DC->cursory ) && !g_waitingForKey ) {
+		if ( down ) {
 			g_waitingForKey = qtrue;
 			g_bindItem = item;
 		}
 		return qtrue;
 	}
-	else if (key == A_ENTER && !g_waitingForKey)
-	{
-		if (down) 
-		{
+	else if ( key == A_ENTER && !g_waitingForKey ) {
+		if ( down ) {
 			g_waitingForKey = qtrue;
 			g_bindItem = item;
 		}
 		return qtrue;
 	}
-	else
-	{
-		if (!g_waitingForKey || g_bindItem == NULL) {
+	else {
+		if ( !g_waitingForKey || !g_bindItem )
 			return qfalse;
-		}
 
-		if (key & K_CHAR_FLAG) {
+		if ( key & K_CHAR_FLAG )
 			return qtrue;
-		}
 
-		switch (key)
-		{
+		switch ( key ) {
 			case A_ESCAPE:
 				g_waitingForKey = qfalse;
 				return qtrue;
-	
+
 			case A_BACKSPACE:
-				id = BindingIDFromName(item->cvar);
-				if (id != -1) 
-				{
+				id = BindingIDFromName( item->cvar );
+				if ( id != -1 ) {
 					if ( g_bindings[id].bind1 != -1 )
-					{
-						DC->setBinding ( g_bindings[id].bind1, "" );
-					}
-					
+						DC->setBinding( g_bindings[id].bind1, "" );
+
 					if ( g_bindings[id].bind2 != -1 )
-					{
-						DC->setBinding ( g_bindings[id].bind2, "" );
-					}
-								
+						DC->setBinding( g_bindings[id].bind2, "" );
+
 					g_bindings[id].bind1 = -1;
 					g_bindings[id].bind2 = -1;
 				}
-				Controls_SetConfig(qtrue);
+				Controls_SetConfig( qtrue );
 				g_waitingForKey = qfalse;
 				g_bindItem = NULL;
 				return qtrue;
@@ -5422,29 +5398,25 @@ qboolean Item_Bind_HandleKey(itemDef_t *item, int key, qboolean down) {
 		}
 	}
 
-	if (key != -1)
-	{
+	if ( key != -1 ) {
 
-		for (i=0; i < g_bindCount; i++)
-		{
+		for ( i=0; i<g_bindCount; i++ ) {
 
-			if (g_bindings[i].bind2 == key) {
+			if ( g_bindings[i].bind2 == key )
 				g_bindings[i].bind2 = -1;
-			}
 
-			if (g_bindings[i].bind1 == key)
-			{
+			if ( g_bindings[i].bind1 == key ) {
 				g_bindings[i].bind1 = g_bindings[i].bind2;
 				g_bindings[i].bind2 = -1;
 			}
 		}
 	}
 
+	assert( item );
+	id = BindingIDFromName( item->cvar );
 
-	id = BindingIDFromName(item->cvar);
-
-	if (id != -1) {
-		if (key == -1) {
+	if ( id != -1 ) {
+		if ( key == -1 ) {
 			if( g_bindings[id].bind1 != -1 ) {
 				DC->setBinding( g_bindings[id].bind1, "" );
 				g_bindings[id].bind1 = -1;
@@ -5454,21 +5426,19 @@ qboolean Item_Bind_HandleKey(itemDef_t *item, int key, qboolean down) {
 				g_bindings[id].bind2 = -1;
 			}
 		}
-		else if (g_bindings[id].bind1 == -1) {
+		else if ( g_bindings[id].bind1 == -1 )
 			g_bindings[id].bind1 = key;
-		}
-		else if (g_bindings[id].bind1 != key && g_bindings[id].bind2 == -1) {
+		else if ( g_bindings[id].bind1 != key && g_bindings[id].bind2 == -1 )
 			g_bindings[id].bind2 = key;
-		}
 		else {
 			DC->setBinding( g_bindings[id].bind1, "" );
 			DC->setBinding( g_bindings[id].bind2, "" );
 			g_bindings[id].bind1 = key;
 			g_bindings[id].bind2 = -1;
-		}						
+		}
 	}
 
-	Controls_SetConfig(qtrue);	
+	Controls_SetConfig( qtrue );
 	g_waitingForKey = qfalse;
 
 	return qtrue;
@@ -5960,7 +5930,6 @@ void Item_ListBox_Paint(itemDef_t *item) {
 		}
 
 		// adjust size for item painting
-		sizeWidth = item->window.rect.w - 2;
 		sizeHeight = item->window.rect.h - 2;
 
 		if (listPtr->elementStyle == LISTBOX_IMAGE) 
@@ -5969,7 +5938,6 @@ void Item_ListBox_Paint(itemDef_t *item) {
 			if ( item->window.rect.w > (listPtr->elementWidth*2) )
 			{
 				startPos = listPtr->startPos;
-				x = item->window.rect.x + 1;
 				y = item->window.rect.y + 1;
 				// Next row
 				for (i2 = startPos; i2 < count; i2++) 
@@ -6063,7 +6031,6 @@ void Item_ListBox_Paint(itemDef_t *item) {
 		else 
 		{
 			x = item->window.rect.x + 1;
-			y = item->window.rect.y + 1;
 			y = item->window.rect.y + 1 - listPtr->elementHeight;
 			i = listPtr->startPos;
 
@@ -6915,6 +6882,7 @@ menuDef_t *Menus_ActivateByName(const char *p) {
 
 
 void Item_Init(itemDef_t *item) {
+	assert( item );
 	memset(item, 0, sizeof(itemDef_t));
 	item->textscale = 0.55f;
 	Window_Init(&item->window);
@@ -7726,6 +7694,8 @@ qboolean ItemParse_model_g2anim( itemDef_t *item, int handle ) {
 	Item_ValidateTypeData(item);
 	modelPtr = (modelDef_t*)item->typeData;
 
+	assert( modelPtr );
+
 	if (!trap->PC_ReadToken(handle, &token)) {
 		return qfalse;
 	}
@@ -7752,13 +7722,14 @@ qboolean ItemParse_model_g2anim( itemDef_t *item, int handle ) {
 // model_g2skin <string>
 qboolean ItemParse_model_g2skin_go( itemDef_t *item, const char *skinName ) 
 {
-
 	modelDef_t *modelPtr;
 	int defSkin;
 
 
 	Item_ValidateTypeData(item);
 	modelPtr = (modelDef_t*)item->typeData;
+
+	assert( modelPtr );
 
 	if (!skinName || !skinName[0])
 	{ //it was parsed correctly so still return true.
@@ -7786,6 +7757,8 @@ qboolean ItemParse_model_g2anim_go( itemDef_t *item, const char *animName )
 
 	Item_ValidateTypeData(item);
 	modelPtr = (modelDef_t*)item->typeData;
+
+	assert( modelPtr );
 
 	if (!animName || !animName[0])
 	{ //it was parsed correctly so still return true.
@@ -8985,6 +8958,8 @@ static void Item_TextScroll_BuildLines ( itemDef_t* item )
 	psCurrentTextReadPos = psText;
 	psReadPosAtLineStart = psCurrentTextReadPos;
 	psBestLineBreakSrcPos = psCurrentTextReadPos;
+
+	assert( scrollPtr );
 
 	scrollPtr->iLineCount = 0;
 	memset((char*)scrollPtr->pLines,0,sizeof(scrollPtr->pLines));

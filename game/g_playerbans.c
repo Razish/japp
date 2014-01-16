@@ -483,7 +483,6 @@ qboolean JKG_Bans_Remove( byte *ip )
 		else			prev->next = entry->next;	//	other-wise, fix the link
 
 		free( (void *)entry );
-		entry = prev;
 
 		return qtrue;
 	}

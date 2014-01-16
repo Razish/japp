@@ -357,6 +357,8 @@ void TransferWPData(int from, int to)
 		trap->Print(S_COLOR_RED "FATAL ERROR: Could not allocated memory for waypoint\n");
 	}
 
+	assert( gWPArray[from] );
+
 	gWPArray[to]->flags = gWPArray[from]->flags;
 	gWPArray[to]->weight = gWPArray[from]->weight;
 	gWPArray[to]->associated_entity = gWPArray[from]->associated_entity;
@@ -1005,8 +1007,6 @@ int ConnectTrail(int startindex, int endindex, qboolean behindTheScenes)
 
 		i++;
 	}
-
-	i = 0;
 
 	if (!behindTheScenes)
 	{
@@ -1870,7 +1870,6 @@ int LoadPathData(const char *filename)
 	int nei_num;
 
 	i = 0;
-	i_cv = 0;
 
 	routePath = (char *)B_TempAlloc(1024);
 

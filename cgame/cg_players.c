@@ -1555,7 +1555,6 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 
 	yo = Info_ValueForKey( configstring, "c4" );
 	full = atoi( yo );
-	full = atoi( yo );
 	r = full & 255;
 	g = (full >> 8) & 255;
 	b = full >> 16;
@@ -3740,7 +3739,6 @@ qboolean CG_RagDoll(centity_t *cent, vector3 *forcedAngles)
 						if (difLen < 12.0f)
 						{
 							VectorScale(&pDif, 12.0f/difLen, &pDif);
-							difLen = 12.0f;
 						}
 
 						while (cg_effectorStringTable[i])
@@ -5361,11 +5359,6 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	else
 		radiusmult = 1.0;
 
-	if (cg_saberTrail.integer == 2 && cg_shadows.integer != 2 && cgs.glconfig.stencilBits >= 4)
-	{ //draw the blade as a post-render so it doesn't get in the cap...
-		rfx |= RF_FORCEPOST;
-	}
-
 	for ( i=0; i<3; i++ )
 		rgb.data[i] *= 255;
 
@@ -6744,21 +6737,6 @@ CheckTrail:
 
 		trailDur = (int)stDur;
 
-		if (!trailDur)
-		{ //hmm.. ok, default
-			stDur = trailDur = SABER_TRAIL_TIME*cg_saberTrailLength.value;//50.0f;
-#if 0
-			if ( BG_SuperBreakWinAnim(cent->currentState.torsoAnim) )
-			{
-				trailDur = 150;
-			}
-			else
-			{
-				trailDur = SABER_TRAIL_TIME;
-			}
-#endif
-		}
-
 		// if we happen to be timescaled or running in a high framerate situation, we don't want to flood
 		//	the system with very small trail slices...but perhaps doing it by distance would yield better results?
 		if ( cg.time > saberTrail->lastTime + 2 || cg_saberTrail.integer == 2 ) // 2ms
@@ -6817,7 +6795,7 @@ CheckTrail:
 #endif
 					{
 						vector3	rgb1={255.0f,255.0f,255.0f};
-						qhandle_t trailShader = cgs.media.saberBlurShader;
+						qhandle_t trailShader;
 
 						if ( scolor == SABER_BLACK && (cp_pluginDisable.integer & CPD_BLACKSABERSDISABLE) )
 							scolor = SABER_ORANGE;
@@ -7852,7 +7830,7 @@ void CG_G2AnimEntModelLoad(centity_t *cent)
 				int i;
 
 				// Setup the default first bolt
-				i = trap->G2API_AddBolt( cent->ghoul2, 0, "model_root" );
+				trap->G2API_AddBolt( cent->ghoul2, 0, "model_root" );
 
 				// Setup the droid unit.
 				cent->m_pVehicle->m_iDroidUnitTag = trap->G2API_AddBolt( cent->ghoul2, 0, "*droidunit" );
@@ -9977,17 +9955,10 @@ void CG_Player( centity_t *cent ) {
 			{
 				renderfx = RF_THIRD_PERSON;			// only draw in mirrors
 			}
-		} else {
-			if (com_cameraMode.integer) {
-				iwantout = 1;
-
-				
-				// goto minimal_add;
-				
-				// NOTENOTE Temporary
-				return;
-			}
 		}
+		// NOTENOTE Temporary
+		else if ( com_cameraMode.integer )
+			return;
 	}
 
 	// Update the player's client entity information regarding weapons.
@@ -10911,7 +10882,6 @@ skipTrail:
 		if (!gotLHandMatrix)
 		{
 			trap->G2API_GetBoltMatrix(cent->ghoul2, 0, ci->bolt_lhand, &lHandMatrix, &cent->turAngles, &cent->lerpOrigin, cg.time, cgs.gameModels, &cent->modelScale);
-			gotLHandMatrix = qtrue;
 		}
 
 		efOrg.x = lHandMatrix.matrix[0][3];
@@ -11242,14 +11212,14 @@ skipTrail:
 
 					fxSArgs.flags = 0x08000000|0x00000001;
 
-					if (forcePowerDarkLight[i] == FORCE_DARKSIDE)
+					if (forcePowerDarkLight[i] == FORCESIDE_DARK)
 					{ //dark
 						fxSArgs.sAlpha *= 3;
 						fxSArgs.eAlpha *= 3;
 						fxSArgs.shader = cgs.media.redSaberGlowShader;
 						trap->FX_AddSprite(&fxSArgs);
 					}
-					else if (forcePowerDarkLight[i] == FORCE_LIGHTSIDE)
+					else if (forcePowerDarkLight[i] == FORCESIDE_LIGHT)
 					{ //light
 						fxSArgs.sAlpha *= 1.5;
 						fxSArgs.eAlpha *= 1.5;
@@ -11407,7 +11377,6 @@ stillDoSaber:
 					&& g2HasWeapon)
 				{ //special case, kill the saber on a freshly dead player if another source says to.
 					trap->G2API_RemoveGhoul2Model(&(cent->ghoul2), 1);
-					g2HasWeapon = qfalse;
 				}
 			}
 			return;
@@ -11914,7 +11883,6 @@ stillDoSaber:
 		if (cent->ghoul2 && cent->currentState.saberInFlight && g2HasWeapon)
 		{ //special case, kill the saber on a freshly dead player if another source says to.
 			trap->G2API_RemoveGhoul2Model(&(cent->ghoul2), 1);
-			g2HasWeapon = qfalse;
 		}
 	}
 

@@ -437,6 +437,7 @@ static void CG_RegisterCustomSounds(clientInfo_t *ci, int setType, const char *p
 		break;
 	case 5:
 		iTableEntries = MAX_CUSTOM_SIEGE_SOUNDS;
+		break;
 	default:
 		assert(0);
 		return;

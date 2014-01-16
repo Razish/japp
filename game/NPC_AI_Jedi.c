@@ -2288,8 +2288,6 @@ int Jedi_ReCalcParryTime( gentity_t *self, evasionType_t evasionType )
 			{
 				if ( g_saberRealisticCombat.integer )
 				{
-					baseTime = 500;
-
 					switch ( g_spSkill.integer )
 					{
 					case 0:
@@ -2306,8 +2304,6 @@ int Jedi_ReCalcParryTime( gentity_t *self, evasionType_t evasionType )
 				}
 				else
 				{
-					baseTime = 150;//500;
-
 					switch ( g_spSkill.integer )
 					{
 					case 0:
@@ -2792,7 +2788,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 					&& !PM_InKnockDown( &self->client->ps ) )
 				{
 					self->client->ps.fd.forceJumpCharge = 320;//FIXME: calc this intelligently
-					evasionType = EVASION_FJUMP;
 					if ( d_JediAI.integer )
 					{
 						Com_Printf( "force jump + " );
@@ -2833,7 +2828,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 							self->client->ps.velocity.z = JUMP_VELOCITY;
 						}
 					}
-					evasionType = EVASION_JUMP;
 					if ( d_JediAI.integer )
 					{
 						Com_Printf( "jump + " );
@@ -2860,7 +2854,6 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 							{
 								butterflyAnim = BOTH_BUTTERFLY_RIGHT;
 							}
-							evasionType = EVASION_CARTWHEEL;
 							NPC_SetAnim( self, SETANIM_BOTH, butterflyAnim, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 							self->client->ps.velocity.z = 225;
 							self->client->ps.fd.forceJumpZStart = self->r.currentOrigin.z;//so we don't take damage if we land at same height
@@ -2881,9 +2874,8 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 					}
 				}
 			}
-			if ( ((evasionType = Jedi_CheckFlipEvasions( self, rightdot, zdiff ))!=EVASION_NONE) )
-			{
-				saberBusy = qtrue;
+			if ( ((evasionType = Jedi_CheckFlipEvasions( self, rightdot, zdiff ))!=EVASION_NONE) ) {
+				// ...
 			}
 			else if ( incoming || !saberBusy )
 			{
@@ -3671,7 +3663,7 @@ gentity_t *Jedi_FindEnemyInCone( gentity_t *self, gentity_t *fallback, float min
 
 		if ( dist < bestDist )
 		{//closer than our last best one
-			dist = bestDist;
+			bestDist = dist;
 			enemy = check;
 		}
 	}

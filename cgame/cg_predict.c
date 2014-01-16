@@ -619,14 +619,14 @@ static void CG_TouchItem( centity_t *cent ) {
 	{
 		if (item->giTag == PW_FORCE_ENLIGHTENED_LIGHT)
 		{
-			if (cg.predictedPlayerState.fd.forceSide != FORCE_LIGHTSIDE)
+			if (cg.predictedPlayerState.fd.forceSide != FORCESIDE_LIGHT)
 			{
 				return;
 			}
 		}
 		else
 		{
-			if (cg.predictedPlayerState.fd.forceSide != FORCE_DARKSIDE)
+			if (cg.predictedPlayerState.fd.forceSide != FORCESIDE_DARK)
 			{
 				return;
 			}

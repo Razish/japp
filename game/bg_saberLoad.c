@@ -210,6 +210,8 @@ qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum ) {
 	return qfalse;
 }
 qboolean WP_SaberBladeDoTransitionDamage( saberInfo_t *saber, int bladeNum ) {
+	assert( saber );
+
 	//use first blade style for this blade
 	if ( !WP_SaberBladeUseSecondBladeStyle( saber, bladeNum ) && (saber->saberFlags2 & SFL2_TRANSITION_DAMAGE) )
 		return qtrue;
@@ -348,7 +350,7 @@ qboolean WP_SaberStyleValidForSaber( saberInfo_t *saber1, saberInfo_t *saber2, i
 		if ( saberAnimLevel != SS_DUAL ) {
 			if ( saberAnimLevel != SS_TAVION )
 				return qfalse;
-			else {
+			else if ( saber1 ) {
 				//see if "tavion" style is okay
 				if ( !(saber1Active && (saber1->stylesLearned & (1<<SS_TAVION)))
 					|| !(saber2->stylesLearned & (1<<SS_TAVION)) )

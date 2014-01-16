@@ -847,12 +847,18 @@ char *Q_strrchr( const char *string, char c ) {
 
 // copy string and ensure a trailing null terminator
 void Q_strncpyz( char *dest, const char *src, int destsize ) {
-	if ( !dest )
+	if ( !dest ) {
 		Com_Error( ERR_FATAL, "Q_strncpyz: NULL dest" );
-	if ( !src )
+		return;
+	}
+	if ( !src ) {
 		Com_Error( ERR_FATAL, "Q_strncpyz: NULL src" );
-	if ( destsize < 1 )
+		return;
+	}
+	if ( destsize < 1 ) {
 		Com_Error( ERR_FATAL,"Q_strncpyz: destsize < 1" ); 
+		return;
+	}
 
 	strncpy( dest, src, destsize-1 );
 	dest[destsize-1] = 0;
@@ -1138,18 +1144,12 @@ or returns -1 on failure or if the buffer would be overflowed.
 */
 #ifdef _MSC_VER
 int Q_vsnprintf( char *str, size_t size, const char *format, va_list args ) {
-	int ret;
+	int ret = _vsnprintf( str, size, format, args );
 
-#ifdef _WIN32
-	ret = _vsnprintf( str, size-1, format, args );
-#else
-	ret = vsnprintf( str, size, format, args );
-#endif
-
-	str[size-1] = '\0';
-
-	if ( ret < 0 || ret >= (signed)size )
-		return -1;
+	if ( ret < 0 || ret == (int)size ) {
+		str[size-1] = '\0';
+		return (int)size;
+	}
 
 	return ret;
 }
@@ -1168,7 +1168,7 @@ void Com_sprintf( char *dest, int size, const char *fmt, ... ) {
 		Com_Printf( "Com_sprintf: overflow of %i bytes buffer\n", size );
 }
 
-#define	MAX_VA_STRING 32000
+#define	MAX_VA_STRING (1024*32)
 #define MAX_VA_BUFFERS 4
 #define VA_MASK (MAX_VA_BUFFERS-1)
 

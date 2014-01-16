@@ -1124,17 +1124,14 @@ int PM_SaberLockResultAnim( playerState_t *duelist, qboolean superBreak, qboolea
 	return baseAnim;
 }
 
-void PM_SaberLockBreak( playerState_t *genemy, qboolean victory, int strength )
-{
-	int	winAnim = BOTH_STAND1;
+void PM_SaberLockBreak( playerState_t *genemy, qboolean victory, int strength ) {
 	//qboolean punishLoser = qfalse;
 	qboolean noKnockdown = qfalse;
 	qboolean superBreak = (strength+pm->ps->saberLockHits > Q_irand(2,4));
 
-	winAnim = PM_SaberLockWinAnim( victory, superBreak );
-	if ( winAnim == -1 )
-	{//must be a saberlock that's not between single and single...
-		winAnim = PM_SaberLockResultAnim( pm->ps, superBreak, qtrue );
+	if ( PM_SaberLockWinAnim( victory, superBreak ) == -1 ) {
+		// must be a saberlock that's not between single and single...
+		PM_SaberLockResultAnim( pm->ps, superBreak, qtrue );
 		pm->ps->weaponstate = WEAPON_FIRING;
 		genemy->weaponstate = WEAPON_READY;
 	}

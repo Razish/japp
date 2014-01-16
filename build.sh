@@ -53,15 +53,30 @@ fi
 
 if [ $GAME -eq 1 ]
 then
-	scons game=1 debug=$DEBUG analyse=$ANALYSE force32=$FORCE32 > /dev/null
+	if [ $ANALYSE -eq 1 ]
+	then
+		scons game=1 debug=$DEBUG analyse=1 force32=$FORCE32 >/dev/null 2>>analyse.log
+	else
+		scons game=1 debug=$DEBUG analyse=0 force32=$FORCE32 >/dev/null
+	fi
 fi
 
 if [ $CGAME -eq 1 ]
 then
-	scons cgame=1 debug=$DEBUG analyse=$ANALYSE force32=$FORCE32 > /dev/null
+	if [ $ANALYSE -eq 1 ]
+	then
+		scons cgame=1 debug=$DEBUG analyse=1 force32=$FORCE32 >/dev/null 2>>analyse.log
+	else
+		scons cgame=1 debug=$DEBUG analyse=0 force32=$FORCE32 >/dev/null
+	fi
 fi
 
 if [ $UI -eq 1 ]
 then
-	scons ui=1 debug=$DEBUG analyse=$ANALYSE force32=$FORCE32 > /dev/null
+	if [ $ANALYSE -eq 1 ]
+	then
+		scons ui=1 debug=$DEBUG analyse=1 force32=$FORCE32 >/dev/null 2>>analyse.log
+	else
+		scons ui=1 debug=$DEBUG analyse=0 force32=$FORCE32 >/dev/null
+	fi
 fi

@@ -147,7 +147,7 @@ void GM_Dying( gentity_t *self )
 				}
 				else if (!trap->G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "r_arm_middle" ))
 				{//r_arm_middle still there
-					newBolt = trap->G2API_AddBolt( self->ghoul2, 0, "*r_arm_elbow" );
+					trap->G2API_AddBolt( self->ghoul2, 0, "*r_arm_elbow" );
 					NPC_SetSurfaceOnOff( self, "r_arm_middle", TURN_OFF );
 				}
 				break;
@@ -160,17 +160,17 @@ void GM_Dying( gentity_t *self )
 				}
 				else if (!trap->G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "l_arm_wrist" ))
 				{//l_arm_wrist still there
-					newBolt = trap->G2API_AddBolt( self->ghoul2, 0, "*l_arm_cap_l_hand" );
+					trap->G2API_AddBolt( self->ghoul2, 0, "*l_arm_cap_l_hand" );
 					NPC_SetSurfaceOnOff( self, "l_arm_wrist", TURN_OFF );
 				}
 				else if (!trap->G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "l_arm_middle" ))
 				{//l_arm_middle still there
-					newBolt = trap->G2API_AddBolt( self->ghoul2, 0, "*l_arm_cap_l_hand" );
+					trap->G2API_AddBolt( self->ghoul2, 0, "*l_arm_cap_l_hand" );
 					NPC_SetSurfaceOnOff( self, "l_arm_middle", TURN_OFF );
 				}
 				else if (!trap->G2API_GetSurfaceRenderStatus( self->ghoul2, 0, "l_arm_augment" ))
 				{//l_arm_augment still there
-					newBolt = trap->G2API_AddBolt( self->ghoul2, 0, "*l_arm_elbow" );
+					trap->G2API_AddBolt( self->ghoul2, 0, "*l_arm_elbow" );
 					NPC_SetSurfaceOnOff( self, "l_arm_augment", TURN_OFF );
 				}
 				break;
@@ -1152,7 +1152,7 @@ void NPC_BSGM_Attack( void )
 	}
 
 	//also:
-	if ( NPC->enemy->s.weapon == WP_TURRET && !Q_stricmp( "PAS", NPC->enemy->classname ) )
+	if ( NPC->enemy && NPC->enemy->s.weapon == WP_TURRET && !Q_stricmp( "PAS", NPC->enemy->classname ) )
 	{//crush turrets
 		if ( G_BoundsOverlap( &NPC->r.absmin, &NPC->r.absmax, &NPC->enemy->r.absmin, &NPC->enemy->r.absmax ) )
 		{//have to do this test because placed turrets are not solid to NPCs (so they don't obstruct navigation)

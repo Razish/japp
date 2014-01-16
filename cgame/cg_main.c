@@ -3684,7 +3684,7 @@ void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	seconds = msec / 1000;
 	mins = seconds / 60;
 	seconds %= 60;
-	msec %= 1000;
+//	msec %= 1000;
 
 	Com_sprintf( string, sizeof( string ), "%i:%02i ", mins, seconds );
 	l = strlen( string );

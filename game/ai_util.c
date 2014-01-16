@@ -608,6 +608,10 @@ int ReadChatGroups(bot_state_t *bs, char *buf)
 	return 1;
 }
 
+#define BUFSIZE (1024*128) // 128kb
+#define READBUFSIZE (1024*1) // 1kb
+#define GROUPBUFSIZE (1024*64) // 64kb
+
 void BotUtilizePersonality(bot_state_t *bs)
 {
 	fileHandle_t f;
@@ -615,7 +619,7 @@ void BotUtilizePersonality(bot_state_t *bs)
 	int failed;
 	int i;
 	//char buf[131072];
-	char *buf = (char *)B_TempAlloc(131072);
+	char *buf = (char *)B_TempAlloc(BUFSIZE);
 	char *readbuf, *group;
 
 	len = trap->FS_Open(bs->settings.personalityfile, &f, FS_READ);
@@ -625,14 +629,14 @@ void BotUtilizePersonality(bot_state_t *bs)
 	if (!f)
 	{
 		trap->Print(S_COLOR_RED "Error: Specified personality not found\n");
-		B_TempFree(131072); //buf
+		B_TempFree(BUFSIZE); //buf
 		return;
 	}
 
-	if (len >= 131072)
+	if (len >= BUFSIZE)
 	{
 		trap->Print(S_COLOR_RED "Personality file exceeds maximum length\n");
-		B_TempFree(131072); //buf
+		B_TempFree(BUFSIZE); //buf
 		return;
 	}
 
@@ -640,16 +644,29 @@ void BotUtilizePersonality(bot_state_t *bs)
 
 	rlen = len;
 
-	while (len < 131072)
+	while (len < BUFSIZE)
 	{ //kill all characters after the file length, since sometimes FS_Read doesn't do that entirely (or so it seems)
-		buf[len] = '\0';
-		len++;
+		buf[len++] = '\0';
 	}
 
 	len = rlen;
 
-	readbuf = (char *)B_TempAlloc(1024);
-	group = (char *)B_TempAlloc(65536);
+	readbuf = (char *)B_TempAlloc( READBUFSIZE );
+	if ( !readbuf ) {
+		trap->Print( S_COLOR_RED"BotUtilizePersonality: could not allocate enough memory for reading\n" );
+		B_TempFree( BUFSIZE ); //buf
+		trap->FS_Close( f );
+		return;
+	}
+
+	group = (char *)B_TempAlloc( GROUPBUFSIZE );
+	if ( !group ) {
+		trap->Print( S_COLOR_RED"BotUtilizePersonality: could not allocate enough memory for group\n" );
+		B_TempFree( READBUFSIZE ); //buf
+		B_TempFree( BUFSIZE ); //buf
+		trap->FS_Close( f );
+		return;
+	}
 
 	if (!GetValueGroup(buf, "GeneralBotInfo", group))
 	{
@@ -857,8 +874,8 @@ void BotUtilizePersonality(bot_state_t *bs)
 		ParseEmotionalAttachments(bs, group);
 	}
 
-	B_TempFree(131072); //buf
-	B_TempFree(1024); //readbuf
-	B_TempFree(65536); //group
+	B_TempFree(BUFSIZE); //buf
+	B_TempFree(READBUFSIZE); //readbuf
+	B_TempFree(GROUPBUFSIZE); //group
 	trap->FS_Close(f);
 }

@@ -1370,7 +1370,7 @@ void CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float 
 			(origin->x + (16 + (crandom() * 8))*crandom()),
 			(origin->y + (16 + (crandom() * 8))*crandom()),
 			(origin->z + (16 + (crandom() * 8))*crandom()) );
-		le = CG_MakeExplosion( &new_org, &direction, cgs.media.explosionModel, 6, cgs.media.surfaceExplosionShader,
+		CG_MakeExplosion( &new_org, &direction, cgs.media.explosionModel, 6, cgs.media.surfaceExplosionShader,
 			300 + (rand() & 99), qfalse, radius * 0.05f + (crandom() *0.3f), 0);
 	}
 

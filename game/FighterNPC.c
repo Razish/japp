@@ -861,7 +861,7 @@ static void FighterDamageRoutine( Vehicle_t *pVeh, bgEntity_t *parent, playerSta
 	//FIXME: not in space!
 	if ( pVeh->m_LandTrace.fraction >= 0.1f )
 	{
-		if ( !FighterSuspended( pVeh, parentPS ) )
+		if ( !FighterSuspended( pVeh, parentPS ) && pVeh->m_pParentEntity )
 		{
 			//pVeh->m_ucmd.forwardmove = 0;
 			//FIXME: don't bias towards pitching down when in space...

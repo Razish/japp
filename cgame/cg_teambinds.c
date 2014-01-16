@@ -77,7 +77,7 @@ static char *TB_Time( void ) {
 	mins = secs/60;
 
 	secs %= 60;
-	msec %= 1000;
+//	msec %= 1000;
 
 	return va( "%i:%02i", mins, secs );
 }

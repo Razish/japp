@@ -162,7 +162,6 @@ void CG_ChatboxInit( void ) {
 	if ( cgs.gametype >= GT_TEAM ) {
 		cb->next = CG_CreateChatboxObject( "team" );
 		cb->next->prev = cb;
-		cb = cb->next;
 	}
 	memset( &chatField, 0, sizeof( chatField ) );
 }

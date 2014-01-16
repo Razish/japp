@@ -550,14 +550,12 @@ void VectorRotate( vector3 *in, vector3 matrix[3], vector3 *out )
 /*
 ** float q_rsqrt( float number )
 */
-float Q_rsqrt( float number )
-{
+float Q_rsqrt( float number ) {
 	byteAlias_t ba;
 	float x2, y;
 	const float threehalfs = 1.5F;
 
 	x2 = number * 0.5F;
-	y  = number;
 	ba.f  = number;
 	ba.i  = 0x5f3759df - ( ba.i >> 1 );               // what the fuck?
 	y  = ba.f;

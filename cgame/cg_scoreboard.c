@@ -588,7 +588,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 			//maxClients -= n2;
 
-			maxClients -= (team1MaxCl+team2MaxCl);
+		//	maxClients -= (team1MaxCl+team2MaxCl);
 		} else {
 			int team1MaxCl = CG_GetTeamCount(TEAM_BLUE, maxClients);
 			int team2MaxCl = CG_GetTeamCount(TEAM_RED, maxClients);
@@ -621,7 +621,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 			//maxClients -= n2;
 
-			maxClients -= (team1MaxCl+team2MaxCl);
+		//	maxClients -= (team1MaxCl+team2MaxCl);
 		}
 		maxClients = realMaxClients;
 		n1 = CG_TeamScoreboard( y, TEAM_SPECTATOR, fade, maxClients, lineHeight, qfalse );

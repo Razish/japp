@@ -139,7 +139,6 @@ files['game'] = [
 	'game/g_mover.c',
 	'game/g_nav.c',
 	'game/g_navnew.c',
-	'game/g_newmemory.c',
 	'game/g_object.c',
 	'game/g_playerbans.c',
 	'game/g_saga.c',

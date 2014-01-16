@@ -414,7 +414,6 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		targ->client->pers.teamState.lasthurtcarrier = 0;
 
 		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
-		team = attacker->client->sess.sessionTeam;
 		attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
 
 		return;
@@ -428,7 +427,6 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		targ->client->pers.teamState.lasthurtcarrier = 0;
 
 		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
-		team = attacker->client->sess.sessionTeam;
 		attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
 
 		return;

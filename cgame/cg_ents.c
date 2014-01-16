@@ -1844,14 +1844,14 @@ qboolean CG_GreyItem(int type, int tag, int plSide)
 	if (type == IT_POWERUP &&
 		(tag == PW_FORCE_ENLIGHTENED_LIGHT || tag == PW_FORCE_ENLIGHTENED_DARK))
 	{
-		if (plSide == FORCE_LIGHTSIDE)
+		if (plSide == FORCESIDE_LIGHT)
 		{
 			if (tag == PW_FORCE_ENLIGHTENED_DARK)
 			{
 				return qtrue;
 			}
 		}
-		else if (plSide == FORCE_DARKSIDE)
+		else if (plSide == FORCESIDE_DARK)
 		{
 			if (tag == PW_FORCE_ENLIGHTENED_LIGHT)
 			{
@@ -2086,8 +2086,6 @@ Ghoul2 Insert End
 	}
 	else
 	{
-		wi = &cg_weapons[item->giTag];
-
 			 if ( item->giTag == WP_BLASTER )			cent->lerpOrigin.z -= 12;
 		else if ( item->giTag == WP_DISRUPTOR )			cent->lerpOrigin.z -= 13;
 		else if ( item->giTag == WP_BOWCASTER )			cent->lerpOrigin.z -= 16;
@@ -2181,19 +2179,6 @@ Ghoul2 Insert End
 		SE_R_AddRefEntityToScene(&ent, cent->currentState.number);
 		
 		ent.renderfx &= ~RF_FORCE_ENT_ALPHA;
-	
-		// Now draw the static shader over it.
-		// Alpha in over half the time, out over half.
-		
-		//alpha = sin(M_PI*alpha);
-		a = alpha * 255.0;
-
-		a = 255 - a;
-
-		if (a <= 0)
-			a=1;
-		if (a > 255)
-			a=255;
 
 		ent.customShader = cgs.media.itemRespawningRezOut;
 

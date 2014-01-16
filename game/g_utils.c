@@ -462,7 +462,6 @@ qboolean G_EntitiesFree( void ) {
 	int i;
 	gentity_t *e;
 
-	e = &g_entities[MAX_CLIENTS];
 	for ( i=MAX_CLIENTS, e=&g_entities[MAX_CLIENTS]; i<level.num_entities; i++, e++ ) {
 		if ( !e->inuse )
 			return qtrue;

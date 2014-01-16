@@ -282,21 +282,18 @@ void CG_DrawInformation( void ) {
 	switch ( cgs.gametype ) {
 	case GT_FFA:					
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_FFA_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
-		y += iPropHeight;
 		break;
 
 	case GT_HOLOCRON:
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_HOLO_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_HOLO_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
-		y += iPropHeight;
 		break;
 
 	case GT_JEDIMASTER:
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_JEDI_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_JEDI_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
-		y += iPropHeight;
 		break;
 
 	case GT_SINGLE_PLAYER:
@@ -306,21 +303,18 @@ void CG_DrawInformation( void ) {
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_DUEL_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_DUEL_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
-		y += iPropHeight;
 		break;
 
 	case GT_POWERDUEL:
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_POWERDUEL_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_POWERDUEL_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
-		y += iPropHeight;
 		break;
 
 	case GT_TEAM:
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_TEAM_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_TEAM_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
-		y += iPropHeight;
 		break;
 
 	case GT_SIEGE:
@@ -330,14 +324,12 @@ void CG_DrawInformation( void ) {
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTF_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTF_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
-		y += iPropHeight;
 		break;
 
 	case GT_CTY:
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTY_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 		UI_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTY_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
-		y += iPropHeight;
 		break;
 	default:
 		break;

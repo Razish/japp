@@ -801,6 +801,11 @@ int BotAISetupClient(int client, struct bot_settings_s *settings, qboolean resta
 
 	bs = botstates[client];
 
+	if ( !bs ) {
+		BotAI_Print( PRT_FATAL, "BotAISetupClient: NULL botstate for client %d\n", client );
+		return qfalse;
+	}
+
 	if (bs && bs->inuse) {
 		BotAI_Print(PRT_FATAL, "BotAISetupClient: client %d already setup\n", client);
 		return qfalse;
@@ -4300,8 +4305,6 @@ void BotAimLeading(bot_state_t *bs, vector3 *headlevel, float leadAmount)
 
 	VectorNormalize(&movementVector);
 
-	x = bs->frame_Enemy_Len*leadAmount; //hardly calculated with an exact science, but it works
-
 	if (vtotal > 400)
 		vtotal = 400;
 
@@ -5764,7 +5767,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 			useTheForce = 1;
 			forceHostile = 1;
 		}
-		else if (bs->cur_ps.fd.forceSide == FORCE_DARKSIDE)
+		else if (bs->cur_ps.fd.forceSide == FORCESIDE_DARK)
 		{ //try dark side powers
 		  //in order of priority top to bottom
 			if ((bs->cur_ps.fd.forcePowersKnown & (1 << FP_GRIP)) && (bs->cur_ps.fd.forcePowersActive & (1 << FP_GRIP)) && InFieldOfVision(&bs->viewangles, 50, &a_fo))
@@ -5791,14 +5794,14 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 				useTheForce = 1;
 				forceHostile = 0;
 			}
-			else if ((bs->cur_ps.fd.forcePowersKnown & (1 << FP_DRAIN)) && bs->frame_Enemy_Len < MAX_DRAIN_DISTANCE && level.clients[bs->client].ps.fd.forcePower > 50 && InFieldOfVision(&bs->viewangles, 50, &a_fo) && bs->currentEnemy->client->ps.fd.forcePower > 10 && bs->currentEnemy->client->ps.fd.forceSide == FORCE_LIGHTSIDE)
+			else if ((bs->cur_ps.fd.forcePowersKnown & (1 << FP_DRAIN)) && bs->frame_Enemy_Len < MAX_DRAIN_DISTANCE && level.clients[bs->client].ps.fd.forcePower > 50 && InFieldOfVision(&bs->viewangles, 50, &a_fo) && bs->currentEnemy->client->ps.fd.forcePower > 10 && bs->currentEnemy->client->ps.fd.forceSide == FORCESIDE_LIGHT)
 			{
 				level.clients[bs->client].ps.fd.forcePowerSelected = FP_DRAIN;
 				useTheForce = 1;
 				forceHostile = 1;
 			}
 		}
-		else if (bs->cur_ps.fd.forceSide == FORCE_LIGHTSIDE)
+		else if (bs->cur_ps.fd.forceSide == FORCESIDE_LIGHT)
 		{ //try light side powers
 			if ((bs->cur_ps.fd.forcePowersKnown & (1 << FP_ABSORB)) && bs->cur_ps.fd.forceGripCripple &&
 				 level.clients[bs->client].ps.fd.forcePower > forcePowerNeeded[level.clients[bs->client].ps.fd.forcePowerLevel[FP_ABSORB]][FP_ABSORB])
@@ -5820,7 +5823,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 				useTheForce = 1;
 				forceHostile = 1;
 			}
-			else if ((bs->cur_ps.fd.forcePowersKnown & (1 << FP_ABSORB)) && g_entities[bs->client].health < 75 && bs->currentEnemy->client->ps.fd.forceSide == FORCE_DARKSIDE && level.clients[bs->client].ps.fd.forcePower > forcePowerNeeded[level.clients[bs->client].ps.fd.forcePowerLevel[FP_ABSORB]][FP_ABSORB])
+			else if ((bs->cur_ps.fd.forcePowersKnown & (1 << FP_ABSORB)) && g_entities[bs->client].health < 75 && bs->currentEnemy->client->ps.fd.forceSide == FORCESIDE_DARK && level.clients[bs->client].ps.fd.forcePower > forcePowerNeeded[level.clients[bs->client].ps.fd.forcePowerLevel[FP_ABSORB]][FP_ABSORB])
 			{
 				level.clients[bs->client].ps.fd.forcePowerSelected = FP_ABSORB;
 				useTheForce = 1;

@@ -32,7 +32,6 @@ void DrawServerInformation( float fade )
 		else if ( cgs.fraglimit )				tmp = va( "Until "S_COLOR_YELLOW"%i "S_COLOR_WHITE"frags", cgs.fraglimit );
 		else									tmp = "Playing forever!";
 		trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
-		y += lineHeight*2;
 		break;
 	case GT_CTF:
 	case GT_CTY:
@@ -51,7 +50,6 @@ void DrawServerInformation( float fade )
 			y += lineHeight;
 			tmp = va( S_COLOR_RED"%i "S_COLOR_WHITE"/ "S_COLOR_CYAN"%i", cgs.scores1, cgs.scores2 );
 			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
-			y += lineHeight;
 		}
 		else if ( cgs.scores1 > cgs.scores2 )
 		{
@@ -60,7 +58,6 @@ void DrawServerInformation( float fade )
 			y += lineHeight;
 			tmp = va( S_COLOR_RED"%i "S_COLOR_WHITE"/ "S_COLOR_CYAN"%i", cgs.scores1, cgs.scores2 );
 			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
-			y += lineHeight;
 		}
 		else
 		{
@@ -69,7 +66,6 @@ void DrawServerInformation( float fade )
 			y += lineHeight;
 			tmp = va( S_COLOR_CYAN"%i "S_COLOR_WHITE"/ "S_COLOR_RED"%i", cgs.scores2, cgs.scores1 );
 			trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0, y, tmp, &colour, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
-			y += lineHeight;
 		}
 		break;
 	default:
@@ -248,8 +244,6 @@ int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHand
 		clientInfo_t *ci = &cgs.clientinfo[score->client];
 		if ( ci->team == TEAM_FREE )
 		{
-			column = 0;
-
 			// background
 			if ( ci-cgs.clientinfo == cg.snap->ps.clientNum )
 				trap->R_SetColor( &blue );
@@ -405,8 +399,6 @@ int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHand
 		clientInfo_t *ci = &cgs.clientinfo[score->client];
 		if ( ci->team == team )
 		{
-			column = 0;
-
 			// background
 			if ( ci-cgs.clientinfo == cg.snap->ps.clientNum )
 				trap->R_SetColor( &blue );
@@ -561,8 +553,6 @@ int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHand
 		clientInfo_t *ci = &cgs.clientinfo[score->client];
 		if ( ci->team == team )
 		{
-			column = 0;
-
 			// background
 			if ( ci-cgs.clientinfo == cg.snap->ps.clientNum )
 				trap->R_SetColor( &blue );

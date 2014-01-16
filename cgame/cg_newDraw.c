@@ -11,35 +11,32 @@ int CG_GetSelectedPlayer() {
 	return cg_currentSelectedPlayer.integer;
 }
 
-qhandle_t CG_StatusHandle(int task) {
-	qhandle_t h = cgs.media.assaultShader;
-	switch (task) {
+qhandle_t CG_StatusHandle( int task ) {
+	switch ( task ) {
 		case TEAMTASK_OFFENSE :
-			h = cgs.media.assaultShader;
-			break;
+			return cgs.media.assaultShader;
+
 		case TEAMTASK_DEFENSE :
-			h = cgs.media.defendShader;
-			break;
+			return cgs.media.defendShader;
+
 		case TEAMTASK_PATROL :
-			h = cgs.media.patrolShader;
-			break;
+			return cgs.media.patrolShader;
+
 		case TEAMTASK_FOLLOW :
-			h = cgs.media.followShader;
-			break;
+			return cgs.media.followShader;
+
 		case TEAMTASK_CAMP :
-			h = cgs.media.campShader;
-			break;
+			return cgs.media.campShader;
+
 		case TEAMTASK_RETRIEVE :
-			h = cgs.media.retrieveShader; 
-			break;
+			return cgs.media.retrieveShader; 
+
 		case TEAMTASK_ESCORT :
-			h = cgs.media.escortShader; 
-			break;
+			return cgs.media.escortShader; 
+
 		default : 
-			h = cgs.media.assaultShader;
-			break;
+			return cgs.media.assaultShader;
 	}
-	return h;
 }
 
 

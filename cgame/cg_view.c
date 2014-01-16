@@ -1809,22 +1809,7 @@ void CG_DrawSkyBoxPortal(const char *cstr)
 		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring\n");
 		return;
 	}
-	fov_x = atoi(token);
-
-	if (!fov_x)
-	{
-		if(!cg.renderingThirdPerson && (cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
-			&& cg_trueFOV.value
-			&& (cg.predictedPlayerState.pm_type != PM_SPECTATOR)
-			&& (cg.predictedPlayerState.pm_type != PM_INTERMISSION))
-		{
-			fov_x = cg_trueFOV.value;
-		}
-		else
-		{
-			fov_x = cg_fov.value;
-		}
-	}
+//	fov_x = atoi(token);
 
 	// setup fog the first time, ignore this part of the configstring after that
 	token = COM_ParseExt(&cstr, qfalse);
@@ -1848,8 +1833,8 @@ void CG_DrawSkyBoxPortal(const char *cstr)
 			if ( !VALIDSTRING( token ) )
 				trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog[2]\n" );
 
-			token = COM_ParseExt( &cstr, qfalse );
-			token = COM_ParseExt( &cstr, qfalse );
+			COM_ParseExt( &cstr, qfalse );
+			COM_ParseExt( &cstr, qfalse );
 		}
 	}
 

@@ -675,10 +675,8 @@ void NPC_SetBoneAngles(gentity_t *ent, char *bone, vector3 *angles)
 
 	//Now set the angles on our server instance if we have one.
 
-	if (!ent->ghoul2)
-	{
+	if ( !ent || !ent->ghoul2 )
 		return;
-	}
 
 	flags = BONE_ANGLES_POSTMULT;
 	up = POSITIVE_X;

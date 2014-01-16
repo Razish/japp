@@ -1712,8 +1712,11 @@ typedef enum itemUseFail_e {
 
 #define PS_PMOVEFRAMECOUNTBITS	6
 
-#define FORCE_LIGHTSIDE			1
-#define FORCE_DARKSIDE			2
+typedef enum forceSide_e {
+	FORCESIDE_NEUTRAL,
+	FORCESIDE_LIGHT,
+	FORCESIDE_DARK
+} forceSide_t;
 
 #define MAX_FORCE_RANK			7
 
