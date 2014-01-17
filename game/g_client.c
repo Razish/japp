@@ -1879,7 +1879,7 @@ static userinfoValidate_t userinfoFields[] = {
 	UIF( csf,				0, 1 ), // JA++
 	UIF( teamoverlay,		0, 1 ), // only registered in cgame, not sent when connecting
 };
-static size_t numUserinfoFields = ARRAY_LEN( userinfoFields );
+static const size_t numUserinfoFields = ARRAY_LEN( userinfoFields );
 
 static const char *userinfoValidateExtra[USERINFO_VALIDATION_MAX] = {
 	"Size",					// USERINFO_VALIDATION_SIZE
@@ -1927,7 +1927,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	userinfoValidate_t	*info = NULL;
 	char				key[BIG_INFO_KEY], value[BIG_INFO_VALUE];
 	const char			*s;
-	int					fieldCount[numUserinfoFields];
+	unsigned int		fieldCount[ARRAY_LEN( userinfoFields )];
 
 	memset( fieldCount, 0, sizeof( fieldCount ) );
 

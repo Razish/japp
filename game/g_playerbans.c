@@ -196,8 +196,7 @@ int JKG_Bans_AddBanString( const char *ip, const char *duration, const char *rea
 	char			type;
 	banentry_t		*entry;
 
-	for ( i=0; i<4; i++ )
-		m.b[i] = 0;
+	m.ui = 0u;
 
 	i = 0;
 	p = ip;
