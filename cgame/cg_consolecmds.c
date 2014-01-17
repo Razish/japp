@@ -213,7 +213,7 @@ static void CG_PluginDisable_f( void ) {
 		uint32_t toggle;
 		trap->Cmd_Argv( 1, arg, sizeof( arg ) );
 		index = toggle = atoi( arg );
-		if ( toggle < 0 || toggle > numPluginDisableOpts-1 ) {
+		if ( toggle >= numPluginDisableOpts ) {
 			Com_Printf( "Invalid pluginDisable value: %u\n", toggle );
 			return;
 		}
