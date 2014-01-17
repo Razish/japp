@@ -34,8 +34,10 @@ int	bCrashing = 0;
 #include <time.h>
 #include "qcommon/disablewarnings.h"
 #include "JAPP/jp_crash.h"
-#ifdef _GAME
+#if defined(_GAME)
 	#include "g_local.h"
+#elif defined(_UI)
+	#include "ui_local.h"
 #endif
 
 #include <string.h>
@@ -102,37 +104,6 @@ int StrToDword(const char *str) {
 		result |= ((val & 15 ) << (hb*4));
 	}
 	return result;
-}
-
-void Cmd_DisAsmDirect_f() {
-	char Addrbuf[32];
-	ud_t disasm;
-	int Addr;
-	if (trap->Argc() < 2) {
-		trap->Print("Usage: /disasm <address>\n");
-		return;
-	}
-	trap->Argv(1,Addrbuf,32);
-	// Look for 0x notation
-	if (Addrbuf[0] == '0' && Addrbuf[1] == 'x') {
-		Addr = StrToDword(Addrbuf);
-	} else {
-		Addr = atoi(Addrbuf);
-	}
-	if (!Addr) {
-		trap->Print("Bad pointer provided, aborting\n");
-		return;
-	}
-
-	ud_init(&disasm);
-	ud_set_input_buffer(&disasm, (uint8_t *)Addr, 16);
-	ud_set_mode(&disasm, 32);
-	ud_set_pc(&disasm, Addr);
-	ud_set_syntax(&disasm, UD_SYN_INTEL);
-
-	ud_disassemble(&disasm);
-
-	trap->Print("%08X: %s (%s)\n", Addr, ud_insn_asm(&disasm), ud_insn_hex(&disasm));
 }
 
 void JKG_ExtCrashInfo(int fileHandle) {

@@ -209,11 +209,12 @@ static void CG_PluginDisable_f( void ) {
 	if ( trap->Cmd_Argc() > 1 )
 	{
 		char arg[8]={0}, buf[16]={0};
-		int current, toggle, index;
+		int current, index;
+		uint32_t toggle;
 		trap->Cmd_Argv( 1, arg, sizeof( arg ) );
 		index = toggle = atoi( arg );
 		if ( toggle < 0 || toggle > numPluginDisableOpts-1 ) {
-			Com_Printf( "Invalid pluginDisable value: %i\n", toggle );
+			Com_Printf( "Invalid pluginDisable value: %u\n", toggle );
 			return;
 		}
 
