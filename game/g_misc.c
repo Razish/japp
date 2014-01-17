@@ -3,7 +3,7 @@
 // g_misc.c
 
 #include "g_local.h"
-#include "shared/Ghoul2/G2.h"
+#include "Ghoul2/G2.h"
 
 #include "ai_main.h" //for the g2animents
 

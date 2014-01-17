@@ -3,10 +3,10 @@
 // bg_pmove.c -- both games player movement code
 // takes a playerstate and a usercmd as input and returns a modifed playerstate
 
-#include "q_shared.h"
+#include "qcommon/q_shared.h"
 #include "bg_public.h"
 #include "bg_local.h"
-#include "shared/Ghoul2/G2.h"
+#include "Ghoul2/G2.h"
 
 #ifdef _GAME
 	#include "g_local.h" //ahahahahhahahaha@$!$!
@@ -16,7 +16,7 @@
 	#include "cg_local.h"
 #endif
 
-#include "shared/JAPP/jp_promode.h"
+#include "JAPP/jp_promode.h"
 
 #define MAX_WEAPON_CHARGE_TIME 5000
 

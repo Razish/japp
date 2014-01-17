@@ -77,17 +77,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\shared\JAPP\jp_crash.c" />
-    <ClCompile Include="..\shared\JAPP\jp_promode.c" />
-    <ClCompile Include="..\shared\JAPP\jp_tokenparser.c" />
-    <ClCompile Include="..\shared\json\cJSON.c" />
-    <ClCompile Include="..\shared\libudis86\decode.c" />
-    <ClCompile Include="..\shared\libudis86\input.c" />
-    <ClCompile Include="..\shared\libudis86\itab.c" />
-    <ClCompile Include="..\shared\libudis86\syn-att.c" />
-    <ClCompile Include="..\shared\libudis86\syn-intel.c" />
-    <ClCompile Include="..\shared\libudis86\syn.c" />
-    <ClCompile Include="..\shared\libudis86\udis86.c" />
+    <ClCompile Include="..\qcommon\q_math.c" />
+    <ClCompile Include="..\qcommon\q_shared.c" />
+    <ClCompile Include="..\JAPP\jp_crash.c" />
+    <ClCompile Include="..\JAPP\jp_promode.c" />
+    <ClCompile Include="..\JAPP\jp_tokenparser.c" />
+    <ClCompile Include="..\json\cJSON.c" />
+    <ClCompile Include="..\libudis86\decode.c" />
+    <ClCompile Include="..\libudis86\input.c" />
+    <ClCompile Include="..\libudis86\itab.c" />
+    <ClCompile Include="..\libudis86\syn-att.c" />
+    <ClCompile Include="..\libudis86\syn-intel.c" />
+    <ClCompile Include="..\libudis86\syn.c" />
+    <ClCompile Include="..\libudis86\udis86.c" />
     <ClCompile Include="..\game\ai_main.c" />
     <ClCompile Include="..\game\ai_util.c" />
     <ClCompile Include="..\game\ai_wpnav.c" />
@@ -176,8 +178,6 @@
     <ClCompile Include="..\game\NPC_spawn.c" />
     <ClCompile Include="..\game\NPC_stats.c" />
     <ClCompile Include="..\game\NPC_utils.c" />
-    <ClCompile Include="..\game\q_math.c" />
-    <ClCompile Include="..\game\q_shared.c" />
     <ClCompile Include="..\game\SpeederNPC.c" />
     <ClCompile Include="..\game\tri_coll_test.c" />
     <ClCompile Include="..\game\w_force.c" />

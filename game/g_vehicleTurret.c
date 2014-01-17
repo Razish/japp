@@ -1,7 +1,7 @@
 #include "g_headers.h"
 #include "bg_vehicles.h"
 #include "b_local.h"
-#include "shared/Ghoul2/G2.h"
+#include "Ghoul2/G2.h"
 
 extern void G_SetEnemy( gentity_t *self, gentity_t *enemy );
 extern void WP_CalcVehMuzzle(gentity_t *ent, int muzzleNum);

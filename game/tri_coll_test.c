@@ -13,7 +13,7 @@
  */
 
 #include <math.h>
-#include "q_shared.h"
+#include "qcommon/q_shared.h"
 #include "g_local.h"
 
 /* if USE_EPSILON_TEST is true then we do a check: 

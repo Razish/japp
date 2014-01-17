@@ -1,3 +1,5 @@
+#pragma once
+
 #define CSF_GRAPPLE_SWING		0x00000001 // Can correctly predict movement when using the grapple hook
 #define CSF_SCOREBOARD_LARGE	0x00000002 // Can correctly parse scoreboard messages with information for 32 clients
 #define CSF_SCOREBOARD_KD		0x00000004 // Can correctly parse scoreboard messages with extra K/D information

@@ -10,7 +10,7 @@
 #include "ui_shared.h"
 #include "bg_public.h"
 #include "anims.h"
-#include "shared/Ghoul2/G2.h"
+#include "Ghoul2/G2.h"
 extern stringID_table_t animTable [MAX_ANIMATIONS+1];
 extern void UI_UpdateCharacterSkin( void );
 

@@ -12,7 +12,7 @@
 // for the voice chats
 #include "ui/menudef.h"
 
-#include "shared/Ghoul2/G2.h"
+#include "Ghoul2/G2.h"
 //==========================================================================
 
 extern qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum );

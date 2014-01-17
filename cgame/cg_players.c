@@ -2,7 +2,7 @@
 //
 // cg_players.c -- handle the media and animation for player entities
 #include "cg_local.h"
-#include "shared/Ghoul2/G2.h"
+#include "Ghoul2/G2.h"
 #include "bg_saga.h"
 #include "fx_local.h"
 #include "cg_luaevent.h"
@@ -26,7 +26,7 @@ extern qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeN
 
 extern stringID_table_t animTable [MAX_ANIMATIONS+1];
 
-char	*cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
+const char *cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
 	"*death1",
 	"*death2",
 	"*death3",

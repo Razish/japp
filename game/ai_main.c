@@ -16,7 +16,7 @@
 
 
 #include "g_local.h"
-#include "q_shared.h"
+#include "qcommon/q_shared.h"
 #include "botlib.h"		//bot lib interface
 #include "be_aas.h"
 #include "be_ea.h"

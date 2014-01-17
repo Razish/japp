@@ -2,7 +2,7 @@
 //
 // bg_g2_utils.c -- both games misc functions, all completely stateless
 
-#include "q_shared.h"
+#include "qcommon/q_shared.h"
 #include "bg_public.h"
 
 #if defined(_GAME)

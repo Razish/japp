@@ -1,6 +1,6 @@
 //NPC_sounds.cpp
 #include "b_local.h"
-#include "shared/ICARUS/Q3_Interface.h"
+#include "ICARUS/Q3_Interface.h"
 
 /*
 void NPC_AngerSound (void)

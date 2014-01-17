@@ -13,7 +13,7 @@
 
 #include "g_local.h"
 #include "g_admin.h"
-#include "shared/json/cJSON.h"
+#include "json/cJSON.h"
 
 static adminUser_t *adminUsers = NULL;
 static telemark_t *telemarks = NULL;

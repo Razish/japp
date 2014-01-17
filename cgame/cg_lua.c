@@ -1,7 +1,7 @@
 
 #include "cg_local.h"
-#include "q_shared.h"
-#include "shared/json/cJSON.h"
+#include "qcommon/q_shared.h"
+#include "json/cJSON.h"
 
 #include "cg_lua.h"
 #include "cg_luaserialiser.h"

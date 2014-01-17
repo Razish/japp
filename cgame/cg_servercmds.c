@@ -7,7 +7,7 @@
 #include "cg_local.h"
 #include "ui/menudef.h"
 #include "cg_lights.h"
-#include "shared/Ghoul2/G2.h"
+#include "Ghoul2/G2.h"
 #include "ui/ui_public.h"
 
 #include "cg_luaevent.h"
@@ -104,7 +104,7 @@ and whenever the server updates any serverinfo flagged cvars
 ================
 */
 
-#include "shared/JAPP/jp_promode.h"
+#include "JAPP/jp_promode.h"
 void CG_ParseServerinfo( void ) {
 	const char *info = NULL, *tinfo = NULL;
 	char *mapname;
@@ -360,7 +360,7 @@ void CG_ShaderStateChanged(void) {
 	}
 }
 
-extern char *cg_customSoundNames[MAX_CUSTOM_SOUNDS];
+extern const char *cg_customSoundNames[MAX_CUSTOM_SOUNDS];
 extern const char *cg_customCombatSoundNames[MAX_CUSTOM_COMBAT_SOUNDS];
 extern const char *cg_customExtraSoundNames[MAX_CUSTOM_EXTRA_SOUNDS];
 extern const char *cg_customJediSoundNames[MAX_CUSTOM_JEDI_SOUNDS];

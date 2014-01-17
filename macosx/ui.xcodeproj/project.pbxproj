@@ -99,9 +99,9 @@
 		014CEA3E0018CDD111CA2923 /* ui.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = ui.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
-		56056E2E186C876200CC97EA /* jp_crash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_crash.c; path = ../shared/JAPP/jp_crash.c; sourceTree = "<group>"; };
-		5658334515EFEBB90079C919 /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = ../shared/json/cJSON.c; sourceTree = SOURCE_ROOT; };
-		5658337815EFED0C0079C919 /* jp_tokenparser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_tokenparser.c; path = ../shared/JAPP/jp_tokenparser.c; sourceTree = SOURCE_ROOT; };
+		56056E2E186C876200CC97EA /* jp_crash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_crash.c; path = ../JAPP/jp_crash.c; sourceTree = "<group>"; };
+		5658334515EFEBB90079C919 /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = ../json/cJSON.c; sourceTree = SOURCE_ROOT; };
+		5658337815EFED0C0079C919 /* jp_tokenparser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_tokenparser.c; path = ../JAPP/jp_tokenparser.c; sourceTree = SOURCE_ROOT; };
 		565833FB15EFF0F00079C919 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = usr/lib/libssl.dylib; sourceTree = SDKROOT; };
 		565833FF15EFF10F0079C919 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		565DADB30C4FF701008167FA /* Info-ui__Upgraded_.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-ui__Upgraded_.plist"; sourceTree = "<group>"; };
@@ -526,7 +526,7 @@
 				GCC_VERSION = "";
 				OTHER_CFLAGS = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "../ ../shared//**";
+				USER_HEADER_SEARCH_PATHS = "../ ..//**";
 			};
 			name = Development;
 		};
@@ -539,7 +539,7 @@
 				GCC_VERSION = "";
 				OTHER_CFLAGS = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "../ ../shared//**";
+				USER_HEADER_SEARCH_PATHS = "../ ..//**";
 			};
 			name = "Deployment - Native";
 		};
@@ -551,7 +551,7 @@
 				GCC_VERSION = "";
 				OTHER_CFLAGS = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "../ ../shared//**";
+				USER_HEADER_SEARCH_PATHS = "../ ..//**";
 			};
 			name = Default;
 		};
@@ -615,7 +615,7 @@
 				GCC_VERSION = "";
 				OTHER_CFLAGS = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "../ ../shared//**";
+				USER_HEADER_SEARCH_PATHS = "../ ..//**";
 			};
 			name = "Deployment - Universal";
 		};

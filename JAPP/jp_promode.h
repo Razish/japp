@@ -1,3 +1,4 @@
+#pragma once
 
 void CPM_UpdateSettings(int num);
 

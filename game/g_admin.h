@@ -1,6 +1,6 @@
 #pragma once
 
-#include "q_shared.h"
+#include "qcommon/q_shared.h"
 
 // named telemark
 #define MAX_TELEMARK_NAME_LEN (32)

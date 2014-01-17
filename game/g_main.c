@@ -5,7 +5,7 @@
 #include "g_ICARUScb.h"
 #include "g_nav.h"
 #include "bg_saga.h"
-#include "shared/JAPP/jp_crash.h"
+#include "JAPP/jp_crash.h"
 
 level_locals_t	level;
 
@@ -100,7 +100,7 @@ void G_FindTeams( void ) {
 //	trap->Print ("%i teams with %i entities\n", c, c2);
 }
 
-#include "shared/JAPP/jp_promode.h"
+#include "JAPP/jp_promode.h"
 
 static void SetCInfo( int check, unsigned int bit ) {
 	int cinfo = jp_cinfo.integer;

@@ -1,4 +1,4 @@
-#include "q_shared.h"
+#include "qcommon/q_shared.h"
 #include "g_local.h"
 
 #include "bg_vehicles.h"

@@ -1,8 +1,8 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 // q_shared.c -- stateless support routines that are included in each code dll
-#include "q_shared.h"
-#include "shared/json/cJSON.h"
+#include "qcommon/q_shared.h"
+#include "json/cJSON.h"
 
 #ifdef _GAME
 	#include "g_local.h"

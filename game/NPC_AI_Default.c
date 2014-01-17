@@ -1,6 +1,6 @@
 #include "b_local.h"
 #include "g_nav.h"
-#include "shared/ICARUS/Q3_Interface.h"
+#include "ICARUS/Q3_Interface.h"
 
 extern qboolean NPC_SomeoneLookingAtMe(gentity_t *ent);
 

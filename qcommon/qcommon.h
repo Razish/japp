@@ -3,7 +3,7 @@
 #define _QCOMMON_H_
 
 #include "../qcommon/cm_public.h"
-#include "../game/q_shared.h"
+#include "../qcommon/q_shared.h"
 
 //#define	PRE_RELEASE_DEMO
 

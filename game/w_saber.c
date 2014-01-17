@@ -2,7 +2,7 @@
 #include "bg_local.h"
 #include "w_saber.h"
 #include "ai_main.h"
-#include "shared/Ghoul2/G2.h"
+#include "Ghoul2/G2.h"
 
 #define SABER_BOX_SIZE 16.0f
 extern bot_state_t *botstates[MAX_CLIENTS];

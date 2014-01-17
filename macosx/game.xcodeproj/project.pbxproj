@@ -216,7 +216,7 @@
 		56056E30186C883500CC97EA /* g_lua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = g_lua.c; path = ../game/g_lua.c; sourceTree = "<group>"; };
 		56056E31186C883500CC97EA /* g_luaevent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = g_luaevent.c; path = ../game/g_luaevent.c; sourceTree = "<group>"; };
 		56056E32186C883500CC97EA /* g_unlagged.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = g_unlagged.c; path = ../game/g_unlagged.c; sourceTree = "<group>"; };
-		56056E37186C88A700CC97EA /* jp_crash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_crash.c; path = ../shared/JAPP/jp_crash.c; sourceTree = "<group>"; };
+		56056E37186C88A700CC97EA /* jp_crash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_crash.c; path = ../JAPP/jp_crash.c; sourceTree = "<group>"; };
 		56056E3A186C88D200CC97EA /* bit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bit.c; path = ../lua/bit.c; sourceTree = "<group>"; };
 		56056E3B186C88D200CC97EA /* lapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lapi.c; path = ../lua/lapi.c; sourceTree = "<group>"; };
 		56056E3C186C88D200CC97EA /* lauxlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lauxlib.c; path = ../lua/lauxlib.c; sourceTree = "<group>"; };
@@ -249,9 +249,9 @@
 		56056E57186C88D200CC97EA /* lvm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lvm.c; path = ../lua/lvm.c; sourceTree = "<group>"; };
 		56056E58186C88D200CC97EA /* lzio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lzio.c; path = ../lua/lzio.c; sourceTree = "<group>"; };
 		56056E59186C88D200CC97EA /* print.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = print.c; path = ../lua/print.c; sourceTree = "<group>"; };
-		56056E7A186C88ED00CC97EA /* jp_promode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_promode.c; path = ../shared/JAPP/jp_promode.c; sourceTree = "<group>"; };
-		56056E7D186C890400CC97EA /* jp_tokenparser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_tokenparser.c; path = ../shared/JAPP/jp_tokenparser.c; sourceTree = "<group>"; };
-		56056E7F186C891200CC97EA /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = ../shared/json/cJSON.c; sourceTree = "<group>"; };
+		56056E7A186C88ED00CC97EA /* jp_promode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_promode.c; path = ../JAPP/jp_promode.c; sourceTree = "<group>"; };
+		56056E7D186C890400CC97EA /* jp_tokenparser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_tokenparser.c; path = ../JAPP/jp_tokenparser.c; sourceTree = "<group>"; };
+		56056E7F186C891200CC97EA /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = ../json/cJSON.c; sourceTree = "<group>"; };
 		565DAD760C4FF414008167FA /* Info-game__Upgraded_.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-game__Upgraded_.plist"; sourceTree = "<group>"; };
 		565DAD770C4FF414008167FA /* jampgame.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = jampgame.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5694CCA315E4123E00F4A3E0 /* g_admin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = g_admin.c; path = ../game/g_admin.c; sourceTree = SOURCE_ROOT; };
@@ -980,7 +980,7 @@
 				);
 				GCC_VERSION = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "..//** ../shared/**";
+				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
 			name = Development;
 		};
@@ -994,7 +994,7 @@
 				);
 				GCC_VERSION = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "..//** ../shared/**";
+				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
 			name = "Deployment - Native";
 		};
@@ -1007,7 +1007,7 @@
 				);
 				GCC_VERSION = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "..//** ../shared/**";
+				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
 			name = Default;
 		};
@@ -1073,7 +1073,7 @@
 				);
 				GCC_VERSION = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "..//** ../shared/**";
+				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
 			name = "Deployment - Universal";
 		};

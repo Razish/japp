@@ -7,7 +7,7 @@
 //
 ////////////////////////////////
 
-#include "q_shared.h"
+#include "qcommon/q_shared.h"
 #include "qcommon/game_version.h"
 
 #if QARCH == 64 || defined(MACOS_X)
@@ -29,12 +29,14 @@ void DeactivateCrashHandler( void ) {
 
 int	bCrashing = 0;
 
-#include "shared/libudis86/udis86.h"
+#include "libudis86/udis86.h"
 
 #include <time.h>
 #include "qcommon/disablewarnings.h"
-#include "shared/JAPP/jp_crash.h"
-#include "g_local.h"
+#include "JAPP/jp_crash.h"
+#ifdef _GAME
+	#include "g_local.h"
+#endif
 
 #include <string.h>
 #include <stdio.h>

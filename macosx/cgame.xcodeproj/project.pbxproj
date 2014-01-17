@@ -179,8 +179,8 @@
 		014CEA3E0018CDD111CA2923 /* cgame.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = cgame.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
-		561B1B4715E422F500903484 /* jp_promode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_promode.c; path = ../shared/JAPP/jp_promode.c; sourceTree = SOURCE_ROOT; };
-		561B1B4815E422F500903484 /* jp_tokenparser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_tokenparser.c; path = ../shared/JAPP/jp_tokenparser.c; sourceTree = SOURCE_ROOT; };
+		561B1B4715E422F500903484 /* jp_promode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_promode.c; path = ../JAPP/jp_promode.c; sourceTree = SOURCE_ROOT; };
+		561B1B4815E422F500903484 /* jp_tokenparser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_tokenparser.c; path = ../JAPP/jp_tokenparser.c; sourceTree = SOURCE_ROOT; };
 		5638835D186C84A70085216A /* bit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bit.c; path = ../lua/bit.c; sourceTree = "<group>"; };
 		5638835E186C84A70085216A /* lapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lapi.c; path = ../lua/lapi.c; sourceTree = "<group>"; };
 		5638835F186C84A70085216A /* lauxlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lauxlib.c; path = ../lua/lauxlib.c; sourceTree = "<group>"; };
@@ -215,7 +215,7 @@
 		5638837C186C84A70085216A /* print.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = print.c; path = ../lua/print.c; sourceTree = "<group>"; };
 		5638839D186C84C40085216A /* cg_newScoreboard.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_newScoreboard.c; path = ../cgame/cg_newScoreboard.c; sourceTree = "<group>"; };
 		5638839F186C84DF0085216A /* cg_teambinds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_teambinds.c; path = ../cgame/cg_teambinds.c; sourceTree = "<group>"; };
-		5658315E15EFC22E0079C919 /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = ../shared/json/cJSON.c; sourceTree = SOURCE_ROOT; };
+		5658315E15EFC22E0079C919 /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = ../json/cJSON.c; sourceTree = SOURCE_ROOT; };
 		565832D515EFE5650079C919 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		565DAE130C4FF78D008167FA /* cgame.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cgame.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		5694CB8615E4084800F4A3E0 /* cg_chatbox.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 2; name = cg_chatbox.c; path = ../cgame/cg_chatbox.c; sourceTree = SOURCE_ROOT; };
@@ -856,7 +856,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
 				GCC_VERSION = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "..//** ../shared/**";
+				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
 			name = Development;
 		};
@@ -868,7 +868,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
 				GCC_VERSION = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "..//** ../shared/**";
+				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
 			name = "Deployment - Native";
 		};
@@ -879,7 +879,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
 				GCC_VERSION = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "..//** ../shared/**";
+				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
 			name = Default;
 		};
@@ -943,7 +943,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
 				GCC_VERSION = "";
 				SDKROOT = "";
-				USER_HEADER_SEARCH_PATHS = "..//** ../shared/**";
+				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
 			name = "Deployment - Universal";
 		};

@@ -4,7 +4,7 @@
 
 #include "g_local.h"
 #include "bg_saga.h"
-#include "q_shared.h"
+#include "qcommon/q_shared.h"
 
 typedef struct shaderRemap_s {
   char oldShader[MAX_QPATH], newShader[MAX_QPATH];

@@ -1,3 +1,5 @@
+#pragma once
+
 #define CINFO_FLIPKICK			(0x00000001u) // TODO: allow player flip-kicking
 #define CINFO_JK2ROLL1			(0x00000002u) // Grip whilst rolling
 #define CINFO_JK2ROLL2			(0x00000004u) // Grip whilst rolling + chainable rolls

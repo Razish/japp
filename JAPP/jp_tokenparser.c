@@ -9,7 +9,7 @@
 //		Modified by Raz0r
 //	--------------------------------------------
 
-#include "q_shared.h"
+#include "qcommon/q_shared.h"
 
 #define MAX_TOKEN_LENGTH 16384
 

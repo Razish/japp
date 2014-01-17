@@ -88,19 +88,21 @@ files['lua'] = [
 	'lua/print.c' ]
 
 files['udis86'] = [
-	'shared/libudis86/decode.c',
-	'shared/libudis86/input.c',
-	'shared/libudis86/itab.c',
-	'shared/libudis86/syn-att.c',
-	'shared/libudis86/syn-intel.c',
-	'shared/libudis86/syn.c',
-	'shared/libudis86/udis86.c' ]
+	'libudis86/decode.c',
+	'libudis86/input.c',
+	'libudis86/itab.c',
+	'libudis86/syn-att.c',
+	'libudis86/syn-intel.c',
+	'libudis86/syn.c',
+	'libudis86/udis86.c' ]
 
 files['game'] = [
-	'shared/JAPP/jp_crash.c',
-	'shared/JAPP/jp_promode.c',
-	'shared/JAPP/jp_tokenparser.c',
-	'shared/json/cJSON.c',
+	'qcommon/q_math.c',
+	'qcommon/q_shared.c',
+	'JAPP/jp_crash.c',
+	'JAPP/jp_promode.c',
+	'JAPP/jp_tokenparser.c',
+	'json/cJSON.c',
 	'game/ai_main.c',
 	'game/ai_util.c',
 	'game/ai_wpnav.c',
@@ -189,8 +191,6 @@ files['game'] = [
 	'game/NPC_spawn.c',
 	'game/NPC_stats.c',
 	'game/NPC_utils.c',
-	'game/q_math.c',
-	'game/q_shared.c',
 	'game/SpeederNPC.c',
 	'game/tri_coll_test.c',
 	'game/w_force.c',
@@ -198,6 +198,8 @@ files['game'] = [
 	'game/WalkerNPC.c' ] + files['lua'] + files['udis86']
 
 files['cgame'] = [
+	'qcommon/q_math.c',
+	'qcommon/q_shared.c',
 	'game/AnimalNPC.c',
 	'game/bg_g2_utils.c',
 	'game/bg_misc.c',
@@ -211,12 +213,10 @@ files['cgame'] = [
 	'game/bg_weapons.c',
 	'game/FighterNPC.c',
 	'game/SpeederNPC.c',
-	'game/q_math.c',
-	'game/q_shared.c',
 	'game/WalkerNPC.c',
-	'shared/JAPP/jp_promode.c',
-	'shared/JAPP/jp_tokenparser.c',
-	'shared/json/cJSON.c',
+	'JAPP/jp_promode.c',
+	'JAPP/jp_tokenparser.c',
+	'json/cJSON.c',
 	'ui/ui_shared.c',
 	'cgame/cg_chatbox.c',
 	'cgame/cg_consolecmds.c',
@@ -264,16 +264,16 @@ files['cgame'] = [
 	'cgame/fx_rocketlauncher.c' ] + files['lua']
 
 files['ui'] = [
-	'shared/JAPP/jp_crash.c',
+	'qcommon/q_math.c',
+	'qcommon/q_shared.c',
+	'JAPP/jp_crash.c',
+	'JAPP/jp_tokenparser.c',
+	'json/cJSON.c',
 	'game/bg_misc.c',
 	'game/bg_saberLoad.c',
 	'game/bg_saga.c',
 	'game/bg_vehicleLoad.c',
 	'game/bg_weapons.c',
-	'game/q_math.c',
-	'game/q_shared.c',
-	'shared/JAPP/jp_tokenparser.c',
-	'shared/json/cJSON.c',
 	'ui/ui_atoms.c',
 	'ui/ui_cvar.c',
 	'ui/ui_force.c',

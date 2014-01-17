@@ -8,7 +8,7 @@ USER INTERFACE MAIN
 =======================================================================
 */
 
-#include "shared/Ghoul2/G2.h"
+#include "Ghoul2/G2.h"
 #include "ui_local.h"
 #include "qcommon/qfiles.h"
 #include "qcommon/game_version.h"
@@ -19,7 +19,7 @@ USER INTERFACE MAIN
 #ifdef FAV_SERVERS
 	#include "JAPP/jp_tokenparser.h"
 #endif
-#include "shared/JAPP/jp_crash.h"
+#include "JAPP/jp_crash.h"
 
 
 extern void UI_SaberAttachToChar( itemDef_t *item );

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "q_shared.h"
+#include "qcommon/q_shared.h"
 #include "bg_public.h"
 #include "bg_vehicles.h"
 #include "g_public.h"
