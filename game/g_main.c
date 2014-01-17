@@ -112,12 +112,24 @@ static void SetCInfo( int check, unsigned int bit ) {
 	trap->Cvar_Update( &jp_cinfo );
 }
 
-static void CVU_CInfo( void ) {
-	CPM_UpdateSettings( !!(jp_cinfo.integer & CINFO_CPMPHYSICS) );
+static void CVU_Duel( void ) {
+	SetCInfo( (g_privateDuel.integer & PRIVDUEL_WEAP), CINFO_PRIVDUELWEAP );
+}
+
+static void CVU_BusyAttack( void ) {
+	SetCInfo( !japp_allowBusyAttack.integer, CINFO_NOBUSYATK );
+}
+
+static void CVU_Ledge( void ) {
+	SetCInfo( japp_allowLedgeGrab.integer, CINFO_LEDGEGRAB );
 }
 
 static void CVU_Flipkick( void ) {
 	SetCInfo( japp_flipKick.integer, CINFO_FLIPKICK );
+}
+
+static void CVU_YellowDFA( void ) {
+	SetCInfo( japp_improveYellowDFA.integer, CINFO_YELLOWDFA );
 }
 
 static void CVU_Promode( void ) {
@@ -136,17 +148,10 @@ static void CVU_WeaponPU( void ) {
 	SetCInfo( japp_weaponPickupAlways.integer, CINFO_ALWAYSPICKUPWEAP );
 }
 
-static void CVU_Duel( void ) {
-	SetCInfo( (g_privateDuel.integer & PRIVDUEL_WEAP), CINFO_PRIVDUELWEAP );
+static void CVU_CInfo( void ) {
+	CPM_UpdateSettings( !!(jp_cinfo.integer & CINFO_CPMPHYSICS) );
 }
 
-static void CVU_BusyAttack( void ) {
-	SetCInfo( !japp_allowBusyAttack.integer, CINFO_NOBUSYATK );
-}
-
-static void CVU_Ledge( void ) {
-	SetCInfo( japp_allowLedgeGrab.integer, CINFO_LEDGEGRAB );
-}
 
 typedef struct cvarTable_s {
 	vmCvar_t	*vmCvar;

@@ -98,3 +98,4 @@ void PM_SetForceJumpZStart(float value);
 void BG_CycleInven(playerState_t *ps, int direction);
 
 qboolean GetCInfo( int bit );
+qboolean GetCPD( bgEntity_t *self, int bit );

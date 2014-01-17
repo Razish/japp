@@ -1917,13 +1917,8 @@ void PM_GrabWallForJump( int anim ) {
 // scan for for a ledge in the given direction
 static qboolean LedgeTrace( trace_t *trace, vector3 *dir, float *lerpup, float *lerpfwd, float *lerpyaw ) {
 	vector3 traceTo, traceFrom, wallangles;
-#ifdef _GAME
-	unsigned int clientDisable = ((gentity_t *)pm_entSelf)->client->pers.CPD;
-#else
-	unsigned int clientDisable = cp_pluginDisable.integer;
-#endif
 
-	if ( (clientDisable & CPD_LEDGEGRAB) || !GetCInfo( CINFO_LEDGEGRAB ) )
+	if ( GetCPD( pm_entSelf, CPD_LEDGEGRAB ) || !GetCInfo( CINFO_LEDGEGRAB ) )
 		return qfalse;
 
 	VectorMA( &pm->ps->origin, LEDGEGRABDISTANCE, dir, &traceTo );
@@ -2001,11 +1996,6 @@ qboolean PM_CheckGrab(void)
 	float lerpfwd = 0;
 	float lerpyaw = 0;
 	qboolean skipcmdtrace = qfalse;
-#ifdef _GAME
-	unsigned int clientDisable = ((gentity_t *)pm_entSelf)->client->pers.CPD;
-#else
-	unsigned int clientDisable = cp_pluginDisable.integer;
-#endif
 
 	if(pm->ps->groundEntityNum != ENTITYNUM_NONE)
 	{//not in the air don't attempt a ledge grab
@@ -2017,7 +2007,7 @@ qboolean PM_CheckGrab(void)
 		return qfalse;
 	}
 
-	if ( (clientDisable & CPD_LEDGEGRAB) )
+	if ( GetCPD( pm_entSelf, CPD_LEDGEGRAB ) )
 		return qfalse;
 
 	if(BG_InLedgeMove(pm->ps->legsAnim) ||	//already on a ledge
@@ -10518,17 +10508,17 @@ void PmoveSingle (pmove_t *pmove) {
 	//Raz: DFA
 	//RAZTODO: JK2 YDFA JA+ setting
 	else if ( pm->ps->saberMove == LS_A_BACK || pm->ps->saberMove == LS_A_BACK_CR ||
-		pm->ps->saberMove == LS_A_BACKSTAB || /*pm->ps->saberMove == LS_A_FLIP_STAB ||
-		pm->ps->saberMove == LS_A_FLIP_SLASH ||*/ pm->ps->saberMove == LS_A_JUMP_T__B_ ||
+		pm->ps->saberMove == LS_A_BACKSTAB || pm->ps->saberMove == LS_A_FLIP_STAB ||
+		pm->ps->saberMove == LS_A_FLIP_SLASH || pm->ps->saberMove == LS_A_JUMP_T__B_ ||
 		pm->ps->saberMove == LS_DUAL_LR || pm->ps->saberMove == LS_DUAL_FB)
 	{
-		if (pm->ps->legsAnim == BOTH_JUMPFLIPSTABDOWN ||
-			pm->ps->legsAnim == BOTH_JUMPFLIPSLASHDOWN1)
-		{ //flipover medium stance attack
-			if (pm->ps->legsTimer < 1600 && pm->ps->legsTimer > 900)
-			{
+		if ( !GetCInfo( CINFO_YELLOWDFA )
+			&& (pm->ps->legsAnim == BOTH_JUMPFLIPSTABDOWN || pm->ps->legsAnim == BOTH_JUMPFLIPSLASHDOWN1) )
+		{
+			// flipover medium stance attack
+			if ( pm->ps->legsTimer < 1600 && pm->ps->legsTimer > 900 ) {
 				pm->ps->viewangles.yaw += pml.frametime*240.0f;
-				PM_SetPMViewAngle(pm->ps, &pm->ps->viewangles, &pm->cmd);
+				PM_SetPMViewAngle( pm->ps, &pm->ps->viewangles, &pm->cmd );
 			}
 		}
 		stiffenedUp = qtrue;

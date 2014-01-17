@@ -1535,6 +1535,7 @@ qboolean PM_CanBackstab(void)
 saberMoveName_t PM_SaberFlipOverAttackMove(void)
 { 
 	vector3 fwdAngles, jumpFwd;
+	float jumpDistance = GetCInfo( CINFO_YELLOWDFA ) ? 50.0f : 150.0f;
 //	float zDiff = 0;
 //	playerState_t *psData;
 //	bgEntity_t *bgEnt;
@@ -1573,7 +1574,7 @@ saberMoveName_t PM_SaberFlipOverAttackMove(void)
 	VectorCopy( &pm->ps->viewangles, &fwdAngles );
 	fwdAngles.pitch = fwdAngles.roll = 0;
 	AngleVectors( &fwdAngles, &jumpFwd, NULL, NULL );
-	VectorScale( &jumpFwd, 150, &pm->ps->velocity );//was 50
+	VectorScale( &jumpFwd, jumpDistance, &pm->ps->velocity );
 	pm->ps->velocity.z = 400;
 
 	/*

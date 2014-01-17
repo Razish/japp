@@ -2364,3 +2364,14 @@ qboolean GetCInfo( int bit ) {
 #endif
 	return !!(cinfo & bit);
 }
+
+qboolean GetCPD( bgEntity_t *self, int bit ) {
+#if defined(_GAME)
+	uint32_t cpd = ((gentity_t *)self)->client->pers.CPD;
+#elif defined(_CGAME)
+	uint32_t cpd = cp_pluginDisable.integer;
+#else
+	uint32_t cpd = 0u;
+#endif
+	return !!(cpd & bit);
+}
