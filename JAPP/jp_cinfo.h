@@ -22,11 +22,11 @@
 #define CINFO_CPMPHYSICS		(0x00080000u) // CPM style player physics
 #define CINFO_WEAPONROLL		(0x00100000u) // allow rolling with weapons
 #define CINFO_PRIVDUELWEAP		(0x00200000u) // allow other weapons in duels
-#define CINFO_NOBUSYATK			(0x00400000u) // don't allow saber attacks when "busy"
-#define CINFO_UNUSED09			(0x00800000u)
-#define CINFO_UNUSED08			(0x01000000u)
-#define CINFO_UNUSED07			(0x02000000u)
-#define CINFO_UNUSED06			(0x04000000u)
+#define CINFO_NOBUSYATK			(0x00400000u) // /--don't allow saber attacks when "busy"
+#define CINFO_NOBUTTERFLY		(0x00800000u) // |--don't allow butterflies
+#define CINFO_NOSTAB			(0x01000000u) // |--don't allow backstab/rollstab
+#define CINFO_NODFA				(0x02000000u) // |--don't allow DFAs
+#define CINFO_TOGGLESPECIALATK	(0x04000000u) // ^ allow toggling of these
 #define CINFO_UNUSED05			(0x08000000u)
 #define CINFO_UNUSED04			(0x10000000u)
 #define CINFO_UNUSED03			(0x20000000u)

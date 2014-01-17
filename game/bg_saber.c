@@ -2008,6 +2008,24 @@ qboolean PM_InSecondaryStyle( void )
 	return qfalse;
 }
 
+extern bgEntity_t *pm_entSelf;
+
+static qboolean PM_ButterflyDisabled( void ) {
+	return GetCInfo( CINFO_NOBUTTERFLY ) || (GetCPD( pm_entSelf, CPD_NOBUTTERFLY ) && GetCInfo( CINFO_TOGGLESPECIALATK ));
+}
+
+static qboolean PM_DFADisabled( void ) {
+	return GetCInfo( CINFO_NODFA ) || (GetCPD( pm_entSelf, CPD_NODFA ) && GetCInfo( CINFO_TOGGLESPECIALATK ));
+}
+
+static qboolean PM_KataDisabled( void ) {
+	return GetCInfo( CINFO_NOKATA ) || (GetCPD( pm_entSelf, CPD_NOKATA ) && GetCInfo( CINFO_TOGGLESPECIALATK ));
+}
+
+static qboolean PM_StabDisabled( void ) {
+	return GetCInfo( CINFO_NOSTAB ) || (GetCPD( pm_entSelf, CPD_NOSTAB ) && GetCInfo( CINFO_NOSTAB ));
+}
+
 saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 {
 	saberMoveName_t newmove = LS_NONE;
@@ -2103,7 +2121,7 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 				AngleVectors( &fwdAngles, NULL, &right, NULL );
 				pm->ps->velocity.x = pm->ps->velocity.y = 0.0f; 
 				VectorMA( &pm->ps->velocity, 190.0f, &right, &pm->ps->velocity );
-				if ( pm->ps->fd.saberAnimLevel == SS_STAFF )
+				if ( !PM_ButterflyDisabled() && pm->ps->fd.saberAnimLevel == SS_STAFF )
 				{
 					newmove = LS_BUTTERFLY_RIGHT;
 					pm->ps->velocity.z = 350.0f;
@@ -2165,7 +2183,7 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 				AngleVectors( &fwdAngles, NULL, &right, NULL );
 				pm->ps->velocity.x = pm->ps->velocity.y = 0.0f; 
 				VectorMA( &pm->ps->velocity, -190.0f, &right, &pm->ps->velocity );
-				if ( pm->ps->fd.saberAnimLevel == SS_STAFF )
+				if ( !PM_ButterflyDisabled() && pm->ps->fd.saberAnimLevel == SS_STAFF )
 				{
 					newmove = LS_BUTTERFLY_LEFT;
 					pm->ps->velocity.z = 250.0f;
@@ -2206,7 +2224,9 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 	{//not moving left or right
 		if ( pm->cmd.forwardmove > 0 )
 		{//forward= T2B slash
-			if (!noSpecials&&
+			// staff/dual butterfly
+			if ( !PM_ButterflyDisabled() &&
+				!noSpecials &&
 				(pm->ps->fd.saberAnimLevel == SS_DUAL || pm->ps->fd.saberAnimLevel == SS_STAFF) &&
 				pm->ps->fd.forceRageRecoveryTime < pm->cmd.serverTime &&
 				//pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_1 &&
@@ -2227,7 +2247,10 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 					BG_ForcePowerDrain(pm->ps, FP_GRIP, SABER_ALT_ATTACK_POWER_FB);
 				}
 			}
-			else if (!noSpecials&&
+
+			// yellow DFA
+			else if ( !PM_DFADisabled() &&
+				!noSpecials &&
 				pm->ps->fd.saberAnimLevel == SS_MEDIUM &&
 				pm->ps->velocity.z > 100 &&
 				PM_GroundDistance() < 32 &&
@@ -2247,7 +2270,10 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 					}
 				}
 			}
-			else if (!noSpecials&&
+
+			// red DFA
+			else if ( !PM_DFADisabled() &&
+				!noSpecials &&
 				pm->ps->fd.saberAnimLevel == SS_STRONG &&
 				pm->ps->velocity.z > 100 &&
 				PM_GroundDistance() < 32 &&
@@ -2267,6 +2293,8 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 					}
 				}
 			}
+
+			// blue lunge
 			else if ((pm->ps->fd.saberAnimLevel == SS_FAST || pm->ps->fd.saberAnimLevel == SS_DUAL || pm->ps->fd.saberAnimLevel == SS_STAFF) &&
 				pm->ps->groundEntityNum != ENTITYNUM_NONE &&
 				(pm->ps->pm_flags & PMF_DUCKED) &&
@@ -2296,9 +2324,11 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 				}
 			}
 		}
+
 		else if ( pm->cmd.forwardmove < 0 )
 		{//backward= T2B slash//B2T uppercut?
-			if (!noSpecials&&
+			// staff backflip attack
+			if ( !noSpecials &&
 				pm->ps->fd.saberAnimLevel == SS_STAFF &&
 				pm->ps->fd.forceRageRecoveryTime < pm->cmd.serverTime &&
 				pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_1 &&
@@ -2313,7 +2343,8 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 			{ //BACKFLIP ATTACK
 				newmove = PM_SaberBackflipAttackMove();
 			}
-			else if (PM_CanBackstab() && !BG_SaberInSpecialAttack(pm->ps->torsoAnim))
+			// backstab
+			else if ( !PM_StabDisabled() && PM_CanBackstab() && !BG_SaberInSpecialAttack( pm->ps->torsoAnim ) )
 			{ //BACKSTAB (attack varies by level)
 				if (pm->ps->fd.saberAnimLevel >= FORCE_LEVEL_2 && pm->ps->fd.saberAnimLevel != SS_STAFF)
 				{//medium and higher attacks
@@ -2361,6 +2392,7 @@ saberMoveName_t PM_SaberAttackForMovement(saberMoveName_t curmove)
 		}
 	}
 
+	// dual stab to sides or front+back
 	if (pm->ps->fd.saberAnimLevel == SS_DUAL)
 	{
 		if ( ( newmove == LS_A_R2L || newmove == LS_S_R2L
@@ -2479,6 +2511,9 @@ qboolean PM_SaberMoveOkayForKata( void )
 
 qboolean PM_CanDoKata( void )
 {
+	if ( PM_KataDisabled() )
+		return qfalse;
+
 	if ( PM_InSecondaryStyle() )
 	{
 		return qfalse;
@@ -2622,25 +2657,22 @@ void PM_WeaponLightsaber(void)
 				pm->ps->weaponTime = 0;
 			}
 		}
-		if ( pm->ps->legsAnim == BOTH_ROLL_F 
-			&& pm->ps->legsTimer <= 250 )
+		if ( !PM_StabDisabled()
+			&& pm->ps->legsAnim == BOTH_ROLL_F
+			&& pm->ps->legsTimer <= 250
+			&& (pm->cmd.buttons & BUTTON_ATTACK)
+			&& BG_EnoughForcePowerForMove( SABER_ALT_ATTACK_POWER_FB )
+			&& !pm->ps->saberInFlight )
 		{
-			if ( (pm->cmd.buttons&BUTTON_ATTACK) )
-			{
-				if ( BG_EnoughForcePowerForMove(SABER_ALT_ATTACK_POWER_FB) && !pm->ps->saberInFlight )
-				{
-					if ( PM_CanDoRollStab() )
-					{
-						//make sure the saber is on for this move!
-						if ( pm->ps->saberHolstered == 2 )
-						{//all the way off
-							pm->ps->saberHolstered = 0;
-							PM_AddEvent(EV_SABER_UNHOLSTER);
-						}
-						PM_SetSaberMove( LS_ROLL_STAB );
-						BG_ForcePowerDrain(pm->ps, FP_GRIP, SABER_ALT_ATTACK_POWER_FB);
-					}
+			if ( PM_CanDoRollStab() ) {
+				// make sure the saber is on for this move!
+				if ( pm->ps->saberHolstered == 2 ) {
+					// all the way off
+					pm->ps->saberHolstered = 0;
+					PM_AddEvent( EV_SABER_UNHOLSTER );
 				}
+				PM_SetSaberMove( LS_ROLL_STAB );
+				BG_ForcePowerDrain( pm->ps, FP_GRIP, SABER_ALT_ATTACK_POWER_FB );
 			}
 		}
 		return;

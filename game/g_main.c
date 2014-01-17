@@ -120,8 +120,28 @@ static void CVU_BusyAttack( void ) {
 	SetCInfo( !japp_allowBusyAttack.integer, CINFO_NOBUSYATK );
 }
 
+static void CVU_Butterfly( void ) {
+	SetCInfo( !japp_allowButterfly.integer, CINFO_NOBUTTERFLY );
+}
+
+static void CVU_DFA( void ) {
+	SetCInfo( !japp_allowDFA.integer, CINFO_NODFA );
+}
+
+static void CVU_Kata( void ) {
+	SetCInfo( !japp_allowKata.integer, CINFO_NOKATA );
+}
+
 static void CVU_Ledge( void ) {
 	SetCInfo( japp_allowLedgeGrab.integer, CINFO_LEDGEGRAB );
+}
+
+static void CVU_Stab( void ) {
+	SetCInfo( !japp_allowStab.integer, CINFO_NOSTAB );
+}
+
+static void CVU_ToggleAtk( void ) {
+	SetCInfo( japp_allowToggleSpecialAttacks.integer, CINFO_TOGGLESPECIALATK );
 }
 
 static void CVU_Flipkick( void ) {

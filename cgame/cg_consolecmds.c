@@ -195,13 +195,17 @@ static const char *pluginDisableStrings[] = {
 	"Plugin_NewDFA_PrimAttack",
 	"Plugin_NewDFA_AltAttack",
 	"Plugin_No_SP_Cartwheel",
-	"Plugin_AllowDownloadURL_Redirect"
+	"Plugin_AllowDownloadURL_Redirect",
+	"japp_NoKata",
+	"japp_NoButterfly",
+	"japp_NoStab",
+	"japp_NoDFA"
 };
-static const int numPluginDisableOpts = ARRAY_LEN( pluginDisableStrings );
+static const size_t numPluginDisableOpts = ARRAY_LEN( pluginDisableStrings );
 
 // 0x30025430 JA+ cgame 1.4 beta3
 static void CG_PluginDisable_f( void ) {
-	int i;
+	uint32_t i;
 	if ( trap->Cmd_Argc() > 1 )
 	{
 		char arg[8]={0}, buf[16]={0};
