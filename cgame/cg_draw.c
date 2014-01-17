@@ -13,7 +13,6 @@
 #include "cg_luaevent.h"
 
 extern float CG_RadiusForCent( centity_t *cent );
-qboolean CG_WorldCoordToScreenCoordFloat( vector3 *point, float *x, float *y );
 qboolean CG_CalcMuzzlePoint( int entityNum, vector3 *muzzle );
 static void CG_DrawSiegeTimer(int timeRemaining, qboolean isMyTeam);
 static void CG_DrawSiegeDeathTimer( int timeRemaining );
@@ -151,56 +150,6 @@ void CG_Text_Paint(float x, float y, float scale, vector4 *color, const char *te
 							scale	// const float scale = 1.0f
 							);
 }
-
-/*
-qboolean CG_WorldCoordToScreenCoord(vector3 *worldCoord, int *x, int *y)
-
-  Take any world coord and convert it to a 2D virtual 640x480 screen coord
-*/
-/*
-qboolean CG_WorldCoordToScreenCoordFloat(vector3 *worldCoord, float *x, float *y)
-{
-	int	xcenter, ycenter;
-	vector3	local, transformed;
-
-//	xcenter = refdef->width / 2;//gives screen coords adjusted for resolution
-//	ycenter = refdef->height / 2;//gives screen coords adjusted for resolution
-	
-	//NOTE: did it this way because most draw functions expect virtual 640x480 coords
-	//	and adjust them for current resolution
-	xcenter = 640 / 2;//gives screen coords in virtual 640x480, to be adjusted when drawn
-	ycenter = 480 / 2;//gives screen coords in virtual 640x480, to be adjusted when drawn
-
-	VectorSubtract (worldCoord, refdef->vieworg, local);
-
-	transformed[0] = DotProduct(local,vright);
-	transformed[1] = DotProduct(local,vup);
-	transformed[2] = DotProduct(local,vfwd);		
-
-	// Make sure Z is not negative.
-	if(transformed[2] < 0.01)
-	{
-		return qfalse;
-	}
-	// Simple convert to screen coords.
-	float xzi = xcenter / transformed[2] * (90.0/refdef->fov_x);
-	float yzi = ycenter / transformed[2] * (90.0/refdef->fov_y);
-
-	*x = xcenter + xzi * transformed[0];
-	*y = ycenter - yzi * transformed[1];
-
-	return qtrue;
-}
-
-qboolean CG_WorldCoordToScreenCoord( vector3 *worldCoord, int *x, int *y )
-{
-	float	xF, yF;
-	qboolean retVal = CG_WorldCoordToScreenCoordFloat( worldCoord, &xF, &yF );
-	*x = (int)xF;
-	*y = (int)yF;
-	return retVal;
-}
-*/
 
 /*
 ================
@@ -5519,59 +5468,16 @@ CG_WorldToScreen
 ================
 */
 
-#if 0
-qboolean CG_WorldCoordToScreenCoordFloat(vector3 *worldCoord, float *x, float *y)
-{
-	float	xcenter, ycenter;
-	vector3	local, transformed;
-	vector3	vfwd;
-	vector3	vright;
-	vector3	vup;
-	float xzi;
-	float yzi;
+qboolean CG_WorldCoordToScreenCoordFloat( const vector3 *point, float *x, float *y ) {
+	vector3 trans;
+	float xc, yc;
+	float px, py;
+	float z;
 	refdef_t *refdef = CG_GetRefdef();
+	const float epsilon = 0.001f;
 
-//	xcenter = refdef->width / 2;//gives screen coords adjusted for resolution
-//	ycenter = refdef->height / 2;//gives screen coords adjusted for resolution
-	
-	//NOTE: did it this way because most draw functions expect virtual 640x480 coords
-	//	and adjust them for current resolution
-	xcenter = 640.0f / 2.0f;//gives screen coords in virtual 640x480, to be adjusted when drawn
-	ycenter = 480.0f / 2.0f;//gives screen coords in virtual 640x480, to be adjusted when drawn
-
-	AngleVectors (refdef->viewangles, vfwd, vright, vup);
-
-	VectorSubtract (worldCoord, refdef->vieworg, local);
-
-	transformed[0] = DotProduct(local,vright);
-	transformed[1] = DotProduct(local,vup);
-	transformed[2] = DotProduct(local,vfwd);		
-
-	// Make sure Z is not negative.
-	if(transformed[2] < 0.01f)
-	{
-		return qfalse;
-	}
-
-	xzi = xcenter / transformed[2] * (96.0f/refdef->fov_x);
-	yzi = ycenter / transformed[2] * (102.0f/refdef->fov_y);
-
-	*x = xcenter + xzi * transformed[0];
-	*y = ycenter - yzi * transformed[1];
-
-	return qtrue;
-}
-#else
-qboolean CG_WorldCoordToScreenCoordFloat( vector3 *point, float *x, float *y )
-{
-	vector3  trans;
-	float   xc, yc;
-	float   px, py;
-	float   z;
-	refdef_t *refdef = CG_GetRefdef();
-
-	px = tan( refdef->fov_x * M_PI / 360.0f );
-	py = tan( refdef->fov_y * M_PI / 360.0f );
+	px = tanf( refdef->fov_x * M_PI / 360.0f );
+	py = tanf( refdef->fov_y * M_PI / 360.0f );
 
 	VectorSubtract( point, &refdef->vieworg, &trans );
 
@@ -5579,18 +5485,17 @@ qboolean CG_WorldCoordToScreenCoordFloat( vector3 *point, float *x, float *y )
 	yc = ( SCREEN_HEIGHT * cg_viewSize.integer ) / 200.0f;
 
 	z = DotProduct( &trans, &refdef->viewaxis[0] );
-	if ( z <= 0.001f )
+	if ( z <= epsilon )
 		return qfalse;
 
 	if ( x )
-		*x = 320.0f - DotProduct( &trans, &refdef->viewaxis[1] ) * xc / (z * px);
+		*x = (SCREEN_WIDTH/2.0f) - DotProduct( &trans, &refdef->viewaxis[1] ) * xc / (z * px);
 
 	if ( y )
-		*y = 240.0f - DotProduct( &trans, &refdef->viewaxis[2] ) * yc / (z * py);
+		*y = (SCREEN_HEIGHT/2.0f) - DotProduct( &trans, &refdef->viewaxis[2] ) * yc / (z * py);
 
 	return qtrue;
 }
-#endif
 
 qboolean CG_WorldCoordToScreenCoord( vector3 *worldCoord, int *x, int *y ) {
 	float xF, yF;
@@ -6644,11 +6549,40 @@ static void CG_DrawCrosshairNames( void ) {
 		float fontScale = 0.875f;
 		if ( cg_drawCrosshairNames.integer == 3 )
 			fontScale *= tcolor.a;
-		CG_Text_Paint( 320 - CG_Text_Width( name, fontScale, FONT_JAPPSMALL )/2.0, 170, fontScale, &tcolor, name, 0, 0, ITEM_TEXTSTYLE_SHADOWED, FONT_JAPPSMALL );
 		trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( name, fontHandle, fontScale )/2.0, SCREEN_HEIGHT/2.0 - 70.0, name, &tcolor, fontHandle, -1, fontScale );
 	}
 
 	trap->R_SetColor( NULL );
+}
+
+static void CG_DrawClientNames( void ) {
+	const char *name = NULL;
+	unsigned int i;
+	const centity_t *cent = NULL;
+	const int fontHandle = MenuFontToHandle( FONT_JAPPSMALL );
+	const float fontScale = 0.75f, fontHeight = trap->R_Font_HeightPixels( fontHandle, fontScale );
+	const vector4 *colour = &g_color_table[ColorIndex(COLOR_WHITE)];
+	float x, y;
+
+	if ( !cg_drawSpectatorNames.integer )
+		return;
+
+	for ( i=0, cent=cg_entities; i<cgs.maxclients; i++, cent++ ) {
+		vector3 point;
+
+		if ( !cgs.clientinfo[i].infoValid || cgs.clientinfo[i].team == TEAM_SPECTATOR )
+			continue;
+
+		name = cgs.clientinfo[i].name;
+		VectorCopy( &cent->lerpOrigin, &point );
+		point.z += DEFAULT_VIEWHEIGHT; // player height
+
+		if ( CG_WorldCoordToScreenCoordFloat( &point, &x, &y ) ) {
+			if ( cgs.gametype >= GT_TEAM )
+				colour = &g_color_table[ColorIndex((cgs.clientinfo[i].team == TEAM_RED) ? COLOR_RED : COLOR_CYAN)];
+			trap->R_Font_DrawString( x - trap->R_Font_StrLenPixels( name, fontHandle, fontScale )/2.0f, y-(fontHeight/2.0f), name, colour, fontHandle, -1, fontScale );
+		}
+	}
 }
 
 
@@ -8326,8 +8260,8 @@ void CG_Draw2D( void ) {
 */
 	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
 		CG_DrawSpectator();
-		CG_DrawCrosshair(NULL, 0);
-		CG_DrawCrosshairNames();
+		CG_DrawCrosshair( NULL, 0 );
+		CG_DrawClientNames();
 		CG_SaberClashFlare();
 	} else {
 		// don't draw any status if dead or the scoreboard is being explicitly shown

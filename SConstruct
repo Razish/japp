@@ -10,6 +10,7 @@
 # options:
 #	debug		generate debug information
 #	force32		force 32 bit target when on 64 bit machine
+#	analyse		run static analysis
 #
 # example:
 #	scons game=1 debug=1 force32=1
@@ -21,7 +22,7 @@ import os
 plat = platform.system() # Windows or Linux
 try:
 	bits = int( platform.architecture()[0][:2] ) # 32 or 64
-except (ValueError, TypeError ):
+except (ValueError, TypeError):
 	bits = None
 arch = None # platform-specific, set manually
 
@@ -41,11 +42,14 @@ if bits == 32:
 		arch = 'x86'
 	elif plat == 'Linux':
 		arch = 'i386'
+	#TODO: Mac
+
 elif bits == 64:
 	if plat == 'Windows':
 		arch = 'x64'
 	elif plat == 'Linux':
 		arch = 'x86_64'
+	#TODO: Mac
 
 print( 'Building for ' + plat + ' (' + str(bits) + ' bits, treated as \'' + arch + '\')' )
 print( '\n********************************\n' )
@@ -300,7 +304,6 @@ if plat == 'Linux':
 	if analyse:
 		env['CC'] = 'clang'
 		env['CCFLAGS'] += [ '--analyze' ]
-	# this may not be necessary
 	if force32:
 		env['CCFLAGS'] += [ '-m32' ]
 		env['LINKFLAGS'] += [ '-m32' ]

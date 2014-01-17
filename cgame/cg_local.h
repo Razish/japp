@@ -2131,8 +2131,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, char *cbName
 
 
 refdef_t *CG_GetRefdef( void );
-qboolean CG_WorldCoordToScreenCoordFloat( vector3 *worldCoord, float *x, float *y );
-qboolean CG_WorldCoordToScreenCoordFloat_Fixed( vector3 *point, float *x, float *y );
+qboolean CG_WorldCoordToScreenCoordFloat( const vector3 *point, float *x, float *y );
 
 void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end );
 #define NEWFX_DISINT		0x0001
