@@ -2007,7 +2007,7 @@ qboolean PM_CheckGrab(void)
 		return qfalse;
 	}
 
-	if ( GetCPD( pm_entSelf, CPD_LEDGEGRAB ) )
+	if ( GetCPD( pm_entSelf, CPD_LEDGEGRAB ) || !GetCInfo( CINFO_LEDGEGRAB ) )
 		return qfalse;
 
 	if(BG_InLedgeMove(pm->ps->legsAnim) ||	//already on a ledge
