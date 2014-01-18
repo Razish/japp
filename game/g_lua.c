@@ -235,6 +235,13 @@ static int JPLua_Export_GetMapTime( lua_State *L ) {
 	return 1;
 }
 
+static int JPLua_Export_GetMap( lua_State *L ) {
+	char mapname[MAX_CVAR_VALUE_STRING];
+	COM_StripExtension( level.rawmapname, mapname, sizeof( mapname ) );
+	lua_pushstring( L, mapname );
+	return 1;
+}
+
 static int JPLua_Export_GetRealTime( lua_State *L ) {
 	lua_pushinteger( L, trap->Milliseconds() );
 	return 1;
@@ -343,6 +350,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	//Misc
 	{ "GetTime", JPLua_Export_GetTime }, // integer GetTime()
 	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
+	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
 	{ "GetRealTime", JPLua_Export_GetRealTime }, // integer GetRealTime()
 	{ "RayTrace", JPLua_Export_Trace }, // traceResult Trace( stuff )
 
