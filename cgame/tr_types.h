@@ -11,53 +11,36 @@
 #define	TR_WORLDENT		(MAX_ENTITIES-1)
 
 // renderfx flags
-#define	RF_MINLIGHT			0x00001	// allways have some light (viewmodel, some items)
-#define	RF_THIRD_PERSON		0x00002	// don't draw through eyes, only mirrors (player bodies, chat sprites)
-#define	RF_FIRST_PERSON		0x00004	// only draw through eyes (view weapon, damage blood blob)
-#define	RF_DEPTHHACK		0x00008	// for view weapon Z crunching
-#define RF_NODEPTH			0x00010	// No depth at all (seeing through walls)
-
-#define RF_VOLUMETRIC		0x00020	// fake volumetric shading
-
-#define	RF_NOSHADOW			0x00040	// don't add stencil shadows
-
-#define RF_LIGHTING_ORIGIN	0x00080	// use refEntity->lightingOrigin instead of refEntity->origin
-									// for lighting.  This allows entities to sink into the floor
-									// with their origin going solid, and allows all parts of a
-									// player to get the same lighting
-#define	RF_SHADOW_PLANE		0x00100	// use refEntity->shadowPlane
-#define	RF_WRAP_FRAMES		0x00200	// mod the model frames by the maxframes to allow continuous
-										// animation without needing to know the frame count
-
-#define RF_FORCE_ENT_ALPHA	0x00400 // override shader alpha settings
-#define RF_RGB_TINT			0x00800 // override shader rgb settings
-
-#define	RF_SHADOW_ONLY		0x01000	//add surfs for shadowing but don't draw them -rww
-
-#define	RF_DISTORTION		0x02000	//area distortion effect -rww
-
-#define RF_FORKED			0x04000	// override lightning to have forks
-#define RF_TAPERED			0x08000	// lightning tapers
-#define RF_GROW				0x10000	// lightning grows from start to end during its life
-
-#define RF_DISINTEGRATE1	0x20000	// does a procedural hole-ripping thing.
-#define RF_DISINTEGRATE2	0x40000	// does a procedural hole-ripping thing with scaling at the ripping point
-
-#define RF_SETANIMINDEX		0x80000	//use backEnd.currentEntity->e.skinNum for R_BindAnimatedImage
-
-#define RF_ALPHA_DEPTH		0x100000 //depth write on alpha model
-
-#define RF_FORCEPOST		0x200000 //force it to post-render -rww
+#define	RF_MINLIGHT			(0x00000001u) // allways have some light (viewmodel, some items)
+#define	RF_THIRD_PERSON		(0x00000002u) // don't draw through eyes, only mirrors (player bodies, chat sprites)
+#define	RF_FIRST_PERSON		(0x00000004u) // only draw through eyes (view weapon, damage blood blob)
+#define	RF_DEPTHHACK		(0x00000008u) // for view weapon Z crunching
+#define RF_NODEPTH			(0x00000010u) // No depth at all (seeing through walls)
+#define RF_VOLUMETRIC		(0x00000020u) // fake volumetric shading
+#define	RF_NOSHADOW			(0x00000040u) // don't add stencil shadows
+#define RF_LIGHTING_ORIGIN	(0x00000080u) // use refEntity->lightingOrigin instead of refEntity->origin for lighting. This allows entities to sink into the floor with their origin going solid, and allows all parts of a player to get the same lighting
+#define	RF_SHADOW_PLANE		(0x00000100u) // use refEntity->shadowPlane
+#define	RF_WRAP_FRAMES		(0x00000200u) // mod the model frames by the maxframes to allow continuous animation without needing to know the frame count
+#define RF_FORCE_ENT_ALPHA	(0x00000400u) // override shader alpha settings
+#define RF_RGB_TINT			(0x00000800u) // override shader rgb settings
+#define	RF_SHADOW_ONLY		(0x00001000u) // add surfs for shadowing but don't draw them -rww
+#define	RF_DISTORTION		(0x00002000u) // area distortion effect -rww
+#define RF_FORKED			(0x00004000u) // override lightning to have forks
+#define RF_TAPERED			(0x00008000u) // lightning tapers
+#define RF_GROW				(0x00010000u) // lightning grows from start to end during its life
+#define RF_DISINTEGRATE1	(0x00020000u) // does a procedural hole-ripping thing.
+#define RF_DISINTEGRATE2	(0x00040000u) // does a procedural hole-ripping thing with scaling at the ripping point
+#define RF_SETANIMINDEX		(0x00080000u) // use backEnd.currentEntity->e.skinNum for R_BindAnimatedImage
+#define RF_ALPHA_DEPTH		(0x00100000u) // depth write on alpha model
+#define RF_FORCEPOST		(0x00200000u) // force it to post-render -rww
 
 // refdef flags
-#define RDF_NOWORLDMODEL	1		// used for player configuration screen
-#define RDF_HYPERSPACE		4		// teleportation effect
-
-#define RDF_SKYBOXPORTAL	8
-#define RDF_DRAWSKYBOX		16		// the above marks a scene as being a 'portal sky'.  this flag says to draw it or not
-
-#define RDF_AUTOMAP			32		//means this scene is to draw the automap -rww
-#define	RDF_NOFOG			64		//no global fog in this scene (but still brush fog) -rww
+#define RDF_NOWORLDMODEL	(0x0001u) // used for player configuration screen
+#define RDF_HYPERSPACE		(0x0004u) // teleportation effect
+#define RDF_SKYBOXPORTAL	(0x0008u) 
+#define RDF_DRAWSKYBOX		(0x0010u) // the above marks a scene as being a 'portal sky'.  this flag says to draw it or not
+#define RDF_AUTOMAP			(0x0020u) // means this scene is to draw the automap -rww
+#define	RDF_NOFOG			(0x0040u) // no global fog in this scene (but still brush fog) -rww
 
 extern int	skyboxportal;
 extern int	drawskyboxportal;
@@ -261,7 +244,7 @@ typedef struct refdef_s {
 	// time in milliseconds for shader effects and other time dependent rendering issues
 	int			time;
 
-	int			rdflags;			// RDF_NOWORLDMODEL, etc
+	uint32_t	rdflags;			// RDF_NOWORLDMODEL, etc
 
 	// 1 bits will prevent the associated area from rendering at all
 	byte		areamask[MAX_MAP_AREA_BYTES];

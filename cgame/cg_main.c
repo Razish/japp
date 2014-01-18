@@ -630,7 +630,7 @@ typedef struct cvarTable_s {
 	char		*cvarName;
 	char		*defaultString;
 	void		(*update)( void );
-	int			cvarFlags;
+	uint32_t	cvarFlags;
 } cvarTable_t;
 
 #define XCVAR_DECL
@@ -2255,7 +2255,7 @@ qboolean CG_Load_Menu(const char **p)
 }
 
 
-static qboolean CG_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, int key) {
+static qboolean CG_OwnerDrawHandleKey(int ownerDraw, uint32_t flags, float *special, int key) {
 	return qfalse;
 }
 

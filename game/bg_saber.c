@@ -3579,7 +3579,7 @@ weapChecks:
 
 void PM_SetSaberMove(short newMove)
 {
-	unsigned int setflags = saberMoveData[newMove].animSetFlags;
+	uint32_t setflags = saberMoveData[newMove].animSetFlags;
 	int	anim = saberMoveData[newMove].animToUse;
 	int parts = SETANIM_TORSO;
 

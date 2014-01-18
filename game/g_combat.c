@@ -2696,7 +2696,7 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 CheckArmor
 ================
 */
-int CheckArmor (gentity_t *ent, int damage, int dflags)
+int CheckArmor (gentity_t *ent, int damage, uint32_t dflags)
 {
 	gclient_t	*client;
 	int			save;
@@ -3966,7 +3966,7 @@ void G_CheckForDismemberment(gentity_t *ent, gentity_t *enemy, vector3 *point, i
 	G_Dismember(ent, enemy, &boltPoint, hitLocUse, 90, 0, deathAnim, postDeath);
 }
 
-void G_LocationBasedDamageModifier(gentity_t *ent, vector3 *point, int mod, int dflags, int *damage)
+void G_LocationBasedDamageModifier(gentity_t *ent, vector3 *point, int mod, uint32_t dflags, int *damage)
 {
 	int hitLoc = -1;
 
@@ -4114,7 +4114,7 @@ int gPainMOD = 0;
 int gPainHitLoc = -1;
 vector3 gPainPoint;
 
-void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vector3 *dir, vector3 *point, int damage, int dflags, int mod ) {
+void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vector3 *dir, vector3 *point, int damage, uint32_t dflags, int mod ) {
 	gclient_t	*client;
 	int			take, asave, knockback, max, subamt = 0;
 	float		famt = 0, hamt = 0, shieldAbsorbed = 0;

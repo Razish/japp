@@ -132,7 +132,7 @@ typedef struct md3Surface_s {
 
 	char	name[MAX_QPATH];	// polyset name
 
-	int		flags;
+	uint32_t flags;
 	int		numFrames;			// all surfaces in a model should have the same
 
 	int		numShaders;			// all surfaces in a model should have the same
@@ -172,7 +172,7 @@ typedef struct md3Header_s {
 
 	char		name[MAX_QPATH];	// model name
 
-	int			flags;
+	uint32_t	flags;
 
 	int			numFrames;
 	int			numTags;			
@@ -282,8 +282,8 @@ typedef struct dmodel_s {
 
 typedef struct dshader_s {
 	char		shader[MAX_QPATH];
-	int			surfaceFlags;
-	int			contentFlags;
+	uint32_t	surfaceFlags;
+	uint32_t	contentFlags;
 } dshader_t;
 
 // planes x^1 is allways the opposite of plane x

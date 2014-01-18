@@ -890,7 +890,7 @@ typedef struct wpobject_s
 	int index;
 	float weight;
 	float disttonext;
-	int flags;
+	uint32_t flags;
 	int associated_entity;
 
 	int forceJumpTo;
@@ -1387,7 +1387,7 @@ typedef struct cvar_s {
 	char		*string;
 	char		*resetString;		// cvar_restart will reset to this value
 	char		*latchedString;		// for CVAR_LATCH vars
-	int			flags;
+	uint32_t	flags;
 	qboolean	modified;			// set each time the cvar is changed
 	int			modificationCount;	// incremented each time the cvar is changed
 	float		value;				// atof( string )
@@ -1457,7 +1457,7 @@ typedef struct CollisionRecord_s
 	int			mSurfaceIndex;
 	vector3		mCollisionPosition;
 	vector3		mCollisionNormal;
-	int			mFlags;
+	uint32_t	mFlags;
 	int			mMaterial;
 	int			mLocation;
 	float		mBarycentricI; // two barycentic coodinates for the hit point
@@ -1480,8 +1480,8 @@ typedef struct trace_s {
 	float		fraction;	// time completed, 1.0 = didn't hit anything
 	vector3		endpos;		// final position
 	cplane_t	plane;		// surface normal at impact, transformed to world space
-	int			surfaceFlags;	// surface hit
-	int			contents;	// contents on other side of surface hit
+	uint32_t	surfaceFlags;	// surface hit
+	uint32_t	contents;	// contents on other side of surface hit
 /*
 Ghoul2 Insert Start
 */
@@ -1745,7 +1745,7 @@ typedef struct playerState_s {
 	int			commandTime;	// cmd->serverTime of last executed command
 	int			pm_type;
 	int			bobCycle;		// for view bobbing and footstep generation
-	int			pm_flags;		// ducked, jump_held, etc
+	uint32_t	pm_flags;		// ducked, jump_held, etc
 	int			pm_time;
 
 	vector3		origin;
@@ -1782,8 +1782,7 @@ typedef struct playerState_s {
 								// when at rest, the value will remain unchanged
 								// used to twist the legs during strafing
 
-	int			eFlags;			// copied to entityState_t->eFlags
-	int			eFlags2;		// copied to entityState_t->eFlags2, EF2_??? used much less frequently
+	uint32_t	eFlags, eFlags2;	// copied to entityState_t->eFlags(2), EF(2)_???
 
 	int			eventSequence;	// pmove generated events
 	int			events[MAX_PS_EVENTS];
@@ -1853,7 +1852,7 @@ typedef struct playerState_s {
 	int			saberDidThrowTime;
 	int			saberDamageDebounceTime;
 	int			saberHitWallSoundDebounceTime;
-	int			saberEventFlags;
+	uint32_t	saberEventFlags;
 
 	int			rocketLockIndex;
 	float		rocketLastValidTime;
@@ -2129,7 +2128,7 @@ typedef struct addpolyArgStruct_s {
 	int					motionDelay;
 	int					killTime;
 	qhandle_t			shader;
-	int					flags;
+	uint32_t			flags;
 } addpolyArgStruct_t;
 
 typedef struct addbezierArgStruct_s {
@@ -2150,7 +2149,7 @@ typedef struct addbezierArgStruct_s {
 	float rgbParm;
 	int killTime;
 	qhandle_t shader;
-	int flags;
+	uint32_t flags;
 } addbezierArgStruct_t;
 
 typedef struct addspriteArgStruct_s
@@ -2166,7 +2165,7 @@ typedef struct addspriteArgStruct_s
 	float bounce;
 	int life;
 	qhandle_t shader;
-	int flags;
+	uint32_t flags;
 } addspriteArgStruct_t;
 
 typedef struct effectTrailVertStruct_s
@@ -2192,7 +2191,7 @@ typedef struct effectTrailVertStruct_s
 typedef struct effectTrailArgStruct_s {
 	effectTrailVertStruct_t		mVerts[4];
 	qhandle_t					mShader;
-	int							mSetFlags;
+	uint32_t					mSetFlags;
 	int							mKillTime;
 } effectTrailArgStruct_t;
 
@@ -2212,7 +2211,7 @@ typedef struct addElectricityArgStruct_s
 	float chaos;
 	int killTime;
 	qhandle_t shader;
-	int flags;
+	uint32_t flags;
 } addElectricityArgStruct_t;
 
 // if entityState->solid == SOLID_BMODEL, modelindex is an inline model number
@@ -2246,8 +2245,7 @@ typedef struct trajectory_s {
 typedef struct entityState_s {
 	int		number;			// entity index
 	int		eType;			// entityType_t
-	int		eFlags;
-	int		eFlags2;		// EF2_??? used much less frequently
+	uint32_t eFlags, eFlags2; // EF(2)_???
 
 	trajectory_t	pos;	// for calculating position
 	trajectory_t	apos;	// for calculating angles
@@ -2321,10 +2319,10 @@ typedef struct entityState_s {
 	qboolean	shouldtarget;
 
 	// for players
-	int		powerups;		// bit flags
-	int		weapon;			// determines weapon and flash model, etc
-	int		legsAnim;
-	int		torsoAnim;
+	uint32_t	powerups;		// bit flags
+	int			weapon;			// determines weapon and flash model, etc
+	int			legsAnim;
+	int			torsoAnim;
 
 	qboolean	legsFlip; //set to opposite when the same anim needs restarting, sent over in only 1 bit. Cleaner and makes porting easier than having that god forsaken ANIM_TOGGLEBIT.
 	qboolean	torsoFlip;

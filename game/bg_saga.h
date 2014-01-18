@@ -56,7 +56,7 @@ typedef struct siegeClass_s {
 	int			saberStance;
 	int			weapons;
 	int			forcePowerLevels[NUM_FORCE_POWERS];
-	int			classflags;
+	uint32_t	classflags;
 	int			maxhealth;
 	int			starthealth;
 	int			maxarmor;

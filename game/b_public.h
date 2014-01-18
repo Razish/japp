@@ -2,63 +2,66 @@
 
 #include "ai.h"
 
-#define NPCAI_CHECK_WEAPON		0x00000001
-#define NPCAI_BURST_WEAPON		0x00000002
-#define NPCAI_MOVING			0x00000004
-#define NPCAI_TOUCHED_GOAL		0x00000008
-#define NPCAI_PUSHED			0x00000010
-#define NPCAI_NO_COLL_AVOID		0x00000020
-#define NPCAI_BLOCKED			0x00000040
-#define NPCAI_OFF_PATH			0x00000100
-#define NPCAI_IN_SQUADPOINT		0x00000200
-#define NPCAI_STRAIGHT_TO_DESTPOS	0x00000400
-#define NPCAI_NO_SLOWDOWN		0x00001000
-#define NPCAI_LOST				0x00002000	//Can't nav to his goal
-#define NPCAI_SHIELDS			0x00004000	//Has shields, borg can adapt
-#define NPCAI_GREET_ALLIES		0x00008000	//Say hi to nearby allies
-#define NPCAI_FORM_TELE_NAV		0x00010000	//Tells formation people to use nav info to get to 
-#define NPCAI_ENROUTE_TO_HOMEWP 0x00020000	//Lets us know to run our lostenemyscript when we get to homeWp
-#define NPCAI_MATCHPLAYERWEAPON 0x00040000	//Match the player's weapon except when it changes during cinematics
-#define NPCAI_DIE_ON_IMPACT		0x00100000	//Next time you crashland, die!
-#define NPCAI_CUSTOM_GRAVITY	0x00200000	//Don't use g_gravity, I fly!
+#define NPCAI_CHECK_WEAPON			(0x00000001u) // 
+#define NPCAI_BURST_WEAPON			(0x00000002u) // 
+#define NPCAI_MOVING				(0x00000004u) // 
+#define NPCAI_TOUCHED_GOAL			(0x00000008u) // 
+#define NPCAI_PUSHED				(0x00000010u) // 
+#define NPCAI_NO_COLL_AVOID			(0x00000020u) // 
+#define NPCAI_BLOCKED				(0x00000040u) // 
+#define NPCAI_UNUSED00000080		(0x00000080u) // 
+#define NPCAI_OFF_PATH				(0x00000100u) // 
+#define NPCAI_IN_SQUADPOINT			(0x00000200u) // 
+#define NPCAI_STRAIGHT_TO_DESTPOS	(0x00000400u) // 
+#define NPCAI_UNUSED00000800		(0x00000800u) // 
+#define NPCAI_NO_SLOWDOWN			(0x00001000u) // 
+#define NPCAI_LOST					(0x00002000u) // Can't nav to his goal
+#define NPCAI_SHIELDS				(0x00004000u) // Has shields, borg can adapt
+#define NPCAI_GREET_ALLIES			(0x00008000u) // Say hi to nearby allies
+#define NPCAI_FORM_TELE_NAV			(0x00010000u) // Tells formation people to use nav info to get to 
+#define NPCAI_ENROUTE_TO_HOMEWP 	(0x00020000u) // Lets us know to run our lostenemyscript when we get to homeWp
+#define NPCAI_MATCHPLAYERWEAPON 	(0x00040000u) // Match the player's weapon except when it changes during cinematics
+#define NPCAI_UNUSED00080000		(0x00080000u) // 
+#define NPCAI_DIE_ON_IMPACT			(0x00100000u) // Next time you crashland, die!
+#define NPCAI_CUSTOM_GRAVITY		(0x00200000u) // Don't use g_gravity, I fly!
 
 //Script flags
-#define	SCF_CROUCHED		0x00000001	//Force ucmd.upmove to be -127
-#define	SCF_WALKING			0x00000002	//Force BUTTON_WALKING to be pressed
-#define	SCF_MORELIGHT		0x00000004	//NPC will have a minlight of 96
-#define	SCF_LEAN_RIGHT		0x00000008	//Force rightmove+BUTTON_USE
-#define	SCF_LEAN_LEFT		0x00000010	//Force leftmove+BUTTON_USE
-#define	SCF_RUNNING			0x00000020	//Takes off walking button, overrides SCF_WALKING
-#define	SCF_ALT_FIRE		0x00000040	//Force to use alt-fire when firing
-#define	SCF_NO_RESPONSE		0x00000080	//NPC will not do generic responses to being used
-#define	SCF_FFDEATH			0x00000100	//Just tells player_die to run the friendly fire deathscript
-#define	SCF_NO_COMBAT_TALK	0x00000200	//NPC will not use their generic combat chatter stuff
-#define	SCF_CHASE_ENEMIES	0x00000400	//NPC chase enemies - FIXME: right now this is synonymous with using combat points... should it be?
-#define	SCF_LOOK_FOR_ENEMIES	0x00000800	//NPC be on the lookout for enemies
-#define	SCF_FACE_MOVE_DIR	0x00001000	//NPC face direction it's moving - FIXME: not really implemented right now
-#define	SCF_IGNORE_ALERTS	0x00002000	//NPC ignore alert events
-#define SCF_DONT_FIRE		0x00004000	//NPC won't shoot
-#define	SCF_DONT_FLEE		0x00008000	//NPC never flees
-#define	SCF_FORCED_MARCH	0x00010000	//NPC that the player must aim at to make him walk
-#define	SCF_NO_GROUPS		0x00020000	//NPC cannot alert groups or be part of a group
-#define	SCF_FIRE_WEAPON		0x00040000	//NPC will fire his (her) weapon
-#define	SCF_NO_MIND_TRICK	0x00080000	//Not succeptible to mind tricks
-#define	SCF_USE_CP_NEAREST	0x00100000	//Will use combat point close to it, not next to player or try and flank player
-#define	SCF_NO_FORCE		0x00200000	//Not succeptible to force powers
-#define	SCF_NO_FALLTODEATH	0x00400000	//NPC will not scream and tumble and fall to hit death over large drops
-#define	SCF_NO_ACROBATICS	0x00800000	//Jedi won't jump, roll or cartwheel
-#define	SCF_USE_SUBTITLES	0x01000000	//Regardless of subtitle setting, this NPC will display subtitles when it speaks lines
-#define	SCF_NO_ALERT_TALK	0x02000000	//Will not say alert sounds, but still can be woken up by alerts
+#define	SCF_CROUCHED			(0x00000001u) // Force ucmd.upmove to be -127
+#define	SCF_WALKING				(0x00000002u) // Force BUTTON_WALKING to be pressed
+#define	SCF_MORELIGHT			(0x00000004u) // NPC will have a minlight of 96
+#define	SCF_LEAN_RIGHT			(0x00000008u) // Force rightmove+BUTTON_USE
+#define	SCF_LEAN_LEFT			(0x00000010u) // Force leftmove+BUTTON_USE
+#define	SCF_RUNNING				(0x00000020u) // Takes off walking button, overrides SCF_WALKING
+#define	SCF_ALT_FIRE			(0x00000040u) // Force to use alt-fire when firing
+#define	SCF_NO_RESPONSE			(0x00000080u) // NPC will not do generic responses to being used
+#define	SCF_FFDEATH				(0x00000100u) // Just tells player_die to run the friendly fire deathscript
+#define	SCF_NO_COMBAT_TALK		(0x00000200u) // NPC will not use their generic combat chatter stuff
+#define	SCF_CHASE_ENEMIES		(0x00000400u) // NPC chase enemies - FIXME: right now this is synonymous with using combat points... should it be?
+#define	SCF_LOOK_FOR_ENEMIES	(0x00000800u) // NPC be on the lookout for enemies
+#define	SCF_FACE_MOVE_DIR		(0x00001000u) // NPC face direction it's moving - FIXME: not really implemented right now
+#define	SCF_IGNORE_ALERTS		(0x00002000u) // NPC ignore alert events
+#define SCF_DONT_FIRE			(0x00004000u) // NPC won't shoot
+#define	SCF_DONT_FLEE			(0x00008000u) // NPC never flees
+#define	SCF_FORCED_MARCH		(0x00010000u) // NPC that the player must aim at to make him walk
+#define	SCF_NO_GROUPS			(0x00020000u) // NPC cannot alert groups or be part of a group
+#define	SCF_FIRE_WEAPON			(0x00040000u) // NPC will fire his (her) weapon
+#define	SCF_NO_MIND_TRICK		(0x00080000u) // Not succeptible to mind tricks
+#define	SCF_USE_CP_NEAREST		(0x00100000u) // Will use combat point close to it, not next to player or try and flank player
+#define	SCF_NO_FORCE			(0x00200000u) // Not succeptible to force powers
+#define	SCF_NO_FALLTODEATH		(0x00400000u) // NPC will not scream and tumble and fall to hit death over large drops
+#define	SCF_NO_ACROBATICS		(0x00800000u) // Jedi won't jump, roll or cartwheel
+#define	SCF_USE_SUBTITLES		(0x01000000u) // Regardless of subtitle setting, this NPC will display subtitles when it speaks lines
+#define	SCF_NO_ALERT_TALK		(0x02000000u) // Will not say alert sounds, but still can be woken up by alerts
 
 //#ifdef __DEBUG
 
 //Debug flag definitions
 
-#define	AID_IDLE		0x00000000	//Nothing is happening
-#define AID_ACQUIRED	0x00000001	//A target has been found
-#define AID_LOST		0x00000002	//Alert, but no target is in sight
-#define AID_CONFUSED	0x00000004	//Is unable to come up with a course of action
-#define AID_LOSTPATH	0x00000008	//Cannot make a valid movement due to lack of connections
+#define	AID_IDLE		(0x00000000u) // Nothing is happening
+#define AID_ACQUIRED	(0x00000001u) // A target has been found
+#define AID_LOST		(0x00000002u) // Alert, but no target is in sight
+#define AID_CONFUSED	(0x00000004u) // Is unable to come up with a course of action
+#define AID_LOSTPATH	(0x00000008u) // Cannot make a valid movement due to lack of connections
 
 //#endif //__DEBUG
 
@@ -133,8 +136,8 @@ typedef struct
 	int			enemyLastHeardTime;
 	int			lastAlertID;		//unique ID
 
-	int			eFlags;
-	int			aiFlags;
+	uint32_t	eFlags;
+	uint32_t	aiFlags;
 
 	int			currentAmmo;		// this sucks, need to find a better way
 	int			shotTime;
@@ -203,7 +206,7 @@ typedef struct
 	int			currentAggression;
 
 	//scriptflags
-	int			scriptFlags;//in b_local.h
+	uint32_t	scriptFlags;//in b_local.h
 
 	//moveInfo
 	int			desiredSpeed;
@@ -269,85 +272,3 @@ void Svcmd_NPC_f( void );
 void NAV_DebugShowWaypoints (void);
 void NAV_DebugShowBoxes (void);
 void NAV_DebugShowSquadPaths (void);
-/*
-void Bot_InitGame( void );
-void Bot_InitPreSpawn( void );
-void Bot_InitPostSpawn( void );
-void Bot_Shutdown( void );
-void Bot_Think( gentity_t *ent, int msec );
-void Bot_Connect( gentity_t *bot, char *botName );
-void Bot_Begin( gentity_t *bot );
-void Bot_Disconnect( gentity_t *bot );
-void Svcmd_Bot_f( void );
-void Nav_ItemSpawn( gentity_t *ent, int remaining );
-*/
-
-//
-// This section should be moved to QFILES.H
-//
-/*
-#define NAVFILE_ID			(('I')+('N'<<8)+('A'<<16)+('V'<<24))
-#define NAVFILE_VERSION		6
-
-typedef struct navHeader_s {
-	unsigned	id;
-	unsigned	version;
-	unsigned	checksum;
-	unsigned	surfaceCount;
-	unsigned	edgeCount;
-} navheader_t;
-
-
-#define MAX_SURFACES	4096
-
-#define NSF_PUSH			0x00000001
-#define NSF_WATERLEVEL1		0x00000002
-#define NSF_WATERLEVEL2		0x00000004
-#define NSF_WATER_NOAIR		0x00000008
-#define NSF_DUCK			0x00000010
-#define NSF_PAIN			0x00000020
-#define NSF_TELEPORTER		0x00000040
-#define NSF_PLATHIGH		0x00000080
-#define NSF_PLATLOW			0x00000100
-#define NSF_DOOR_FLOOR		0x00000200
-#define NSF_DOOR_SHOOT		0x00000400
-#define NSF_DOOR_BUTTON		0x00000800
-#define NSF_BUTTON			0x00001000
-
-typedef struct nsurface_s {
-	vector3		origin;
-	vector2		absmin;
-	vector2		absmax;
-	int			parm;
-	unsigned	flags;
-	unsigned	edgeCount;
-	unsigned	edgeIndex;
-} nsurface_t;
-
-
-#define NEF_DUCK			0x00000001
-#define NEF_JUMP			0x00000002
-#define NEF_HOLD			0x00000004
-#define NEF_WALK			0x00000008
-#define NEF_RUN				0x00000010
-#define NEF_NOAIRMOVE		0x00000020
-#define NEF_LEFTGROUND		0x00000040
-#define NEF_PLAT			0x00000080
-#define NEF_FALL1			0x00000100
-#define NEF_FALL2			0x00000200
-#define NEF_DOOR_SHOOT		0x00000400
-#define NEF_DOOR_BUTTON		0x00000800
-#define NEF_BUTTON			0x00001000
-
-typedef struct nedge_s {
-	vector3		origin;
-	vector2		absmin;		// region within this surface that is the portal to the other surface
-	vector2		absmax;
-	int			surfaceNum;
-	unsigned	flags;		// jump, prerequisite button, will take falling damage, etc...
-	float		cost;
-	int			dirIndex;
-	vector3		endSpot;
-	int			parm;
-} nedge_t;
-*/

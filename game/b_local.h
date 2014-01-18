@@ -14,10 +14,10 @@
 // Navigation susbsystem
 //
 
-#define NAVF_DUCK			0x00000001
-#define NAVF_JUMP			0x00000002
-#define NAVF_HOLD			0x00000004
-#define NAVF_SLOW			0x00000008
+#define NAVF_DUCK			(0x0001u)
+#define NAVF_JUMP			(0x0002u)
+#define NAVF_HOLD			(0x0004u)
+#define NAVF_SLOW			(0x0008u)
 
 #define DEBUG_LEVEL_DETAIL	4
 #define DEBUG_LEVEL_INFO	3
@@ -155,16 +155,16 @@ extern qboolean NPC_MoveToGoal( qboolean tryStraight );
 
 //NPC_senses
 #define	ALERT_CLEAR_TIME	200
-#define CHECK_PVS		1
-#define CHECK_360		2
-#define CHECK_FOV		4
-#define CHECK_SHOOT		8
-#define CHECK_VISRANGE	16
+#define CHECK_PVS		(0x0001u)
+#define CHECK_360		(0x0002u)
+#define CHECK_FOV		(0x0004u)
+#define CHECK_SHOOT		(0x0008u)
+#define CHECK_VISRANGE	(0x0010u)
 extern qboolean CanSee ( gentity_t *ent );
 extern qboolean InFOV ( gentity_t *ent, gentity_t *from, int hFOV, int vFOV );
 extern qboolean InFOV2( vector3 *origin, gentity_t *from, int hFOV, int vFOV );
 extern qboolean InFOV3( vector3 *spot, vector3 *from, vector3 *fromAngles, int hFOV, int vFOV );
-extern visibility_t NPC_CheckVisibility ( gentity_t *ent, int flags );
+extern visibility_t NPC_CheckVisibility ( gentity_t *ent, uint32_t flags );
 extern qboolean InVisrange ( gentity_t *ent );
 
 //NPC_spawn
@@ -213,7 +213,7 @@ extern qboolean NPC_EnemyTooFar(gentity_t *enemy, float dist, qboolean toShoot);
 void NPC_SetBoneAngles(gentity_t *ent, char *bone, vector3 *angles);
 
 //rww - and another method of automatically managing surface status for the client and server at once
-void NPC_SetSurfaceOnOff(gentity_t *ent, const char *surfaceName, int surfaceFlags);
+void NPC_SetSurfaceOnOff(gentity_t *ent, const char *surfaceName, uint32_t surfaceFlags);
 
 extern qboolean NPC_ClearLOS( const vector3 *start, const vector3 *end );
 extern qboolean NPC_ClearLOS5( const vector3 *end );
@@ -223,40 +223,40 @@ extern qboolean NPC_ClearLOS2( gentity_t *ent, const vector3 *end );
 
 extern qboolean NPC_ClearShot( gentity_t *ent );
 
-extern int NPC_FindCombatPoint( const vector3 *position, const vector3 *avoidPosition, vector3 *enemyPosition, const int flags, const float avoidDist, const int ignorePoint ); //ignorePoint = -1
+extern int NPC_FindCombatPoint( const vector3 *position, const vector3 *avoidPosition, vector3 *enemyPosition, const uint32_t flags, const float avoidDist, const int ignorePoint ); //ignorePoint = -1
 
 
 extern qboolean NPC_ReserveCombatPoint( int combatPointID );
 extern qboolean NPC_FreeCombatPoint( int combatPointID, qboolean failed ); //failed = qfalse
 extern qboolean NPC_SetCombatPoint( int combatPointID );
 
-#define	CP_ANY			0			//No flags
-#define	CP_COVER		0x00000001	//The enemy cannot currently shoot this position
-#define CP_CLEAR		0x00000002	//This cover point has a clear shot to the enemy
-#define CP_FLEE			0x00000004	//This cover point is marked as a flee point
-#define CP_DUCK			0x00000008	//This cover point is marked as a duck point
-#define CP_NEAREST		0x00000010	//Find the nearest combat point
-#define CP_AVOID_ENEMY	0x00000020	//Avoid our enemy
-#define CP_INVESTIGATE	0x00000040	//A special point worth enemy investigation if searching
-#define	CP_SQUAD		0x00000080	//Squad path
-#define	CP_AVOID		0x00000100	//Avoid supplied position
-#define	CP_APPROACH_ENEMY 0x00000200	//Try to get closer to enemy
-#define	CP_CLOSEST		0x00000400	//Take the closest combatPoint to the enemy that's available
-#define	CP_FLANK		0x00000800	//Pick a combatPoint behind the enemy
-#define	CP_HAS_ROUTE	0x00001000	//Pick a combatPoint that we have a route to
-#define	CP_SNIPE		0x00002000	//Pick a combatPoint that is marked as a sniper spot
-#define	CP_SAFE			0x00004000	//Pick a combatPoint that is not have dangerTime
-#define	CP_HORZ_DIST_COLL 0x00008000	//Collect combat points within *horizontal* dist
-#define	CP_NO_PVS		0x00010000	//A combat point out of the PVS of enemy pos
-#define	CP_RETREAT		0x00020000	//Try to get farther from enemy
+#define	CP_ANY				(0x00000000u) // No flags
+#define	CP_COVER			(0x00000001u) // The enemy cannot currently shoot this position
+#define CP_CLEAR			(0x00000002u) // This cover point has a clear shot to the enemy
+#define CP_FLEE				(0x00000004u) // This cover point is marked as a flee point
+#define CP_DUCK				(0x00000008u) // This cover point is marked as a duck point
+#define CP_NEAREST			(0x00000010u) // Find the nearest combat point
+#define CP_AVOID_ENEMY		(0x00000020u) // Avoid our enemy
+#define CP_INVESTIGATE		(0x00000040u) // A special point worth enemy investigation if searching
+#define	CP_SQUAD			(0x00000080u) // Squad path
+#define	CP_AVOID			(0x00000100u) // Avoid supplied position
+#define	CP_APPROACH_ENEMY	(0x00000200u) // Try to get closer to enemy
+#define	CP_CLOSEST			(0x00000400u) // Take the closest combatPoint to the enemy that's available
+#define	CP_FLANK			(0x00000800u) // Pick a combatPoint behind the enemy
+#define	CP_HAS_ROUTE		(0x00001000u) // Pick a combatPoint that we have a route to
+#define	CP_SNIPE			(0x00002000u) // Pick a combatPoint that is marked as a sniper spot
+#define	CP_SAFE				(0x00004000u) // Pick a combatPoint that is not have dangerTime
+#define	CP_HORZ_DIST_COLL	(0x00008000u) // Collect combat points within *horizontal* dist
+#define	CP_NO_PVS			(0x00010000u) // A combat point out of the PVS of enemy pos
+#define	CP_RETREAT			(0x00020000u) // Try to get farther from enemy
 
-#define CPF_NONE		0
-#define	CPF_DUCK		0x00000001
-#define	CPF_FLEE		0x00000002
-#define	CPF_INVESTIGATE	0x00000004
-#define	CPF_SQUAD		0x00000008
-#define	CPF_LEAN		0x00000010
-#define	CPF_SNIPE		0x00000020
+#define CPF_NONE		(0x0000u)
+#define	CPF_DUCK		(0x0001u)
+#define	CPF_FLEE		(0x0002u)
+#define	CPF_INVESTIGATE	(0x0004u)
+#define	CPF_SQUAD		(0x0008u)
+#define	CPF_LEAN		(0x0010u)
+#define	CPF_SNIPE		(0x0020u)
 
 #define	MAX_COMBAT_POINT_CHECK	32
 
@@ -286,11 +286,11 @@ extern qboolean NPC_FacePosition( vector3 *position, qboolean doPitch ); //doPit
 extern qboolean NPC_FaceEntity( gentity_t *ent, qboolean doPitch ); //doPitch = qtrue
 extern qboolean NPC_FaceEnemy( qboolean doPitch ); //doPitch = qtrue
 
-#define	NIF_NONE		0x00000000
-#define	NIF_FAILED		0x00000001	//failed to find a way to the goal
-#define	NIF_MACRO_NAV	0x00000002	//using macro navigation
-#define	NIF_COLLISION	0x00000004	//resolving collision with an entity
-#define NIF_BLOCKED		0x00000008	//blocked from moving
+#define	NIF_NONE		(0x0000u)
+#define	NIF_FAILED		(0x0001u)	//failed to find a way to the goal
+#define	NIF_MACRO_NAV	(0x0002u)	//using macro navigation
+#define	NIF_COLLISION	(0x0004u)	//resolving collision with an entity
+#define NIF_BLOCKED		(0x0008u)	//blocked from moving
 
 /*
 -------------------------
@@ -305,7 +305,7 @@ typedef struct navInfo_s
 	vector3		pathDirection;
 	float		distance;
 	trace_t		trace;
-	int			flags;
+	uint32_t	flags;
 } navInfo_t;
 
 extern int	NAV_MoveToGoal( gentity_t *self, navInfo_t *info );

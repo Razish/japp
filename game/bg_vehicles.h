@@ -432,13 +432,13 @@ typedef enum
 #define	SHIPSURF_DAMAGE_LEFT_HEAVY		7
 
 //generic part bits
-#define SHIPSURF_BROKEN_A	(1<<0) //gear 1
-#define SHIPSURF_BROKEN_B	(1<<1) //gear 1
-#define SHIPSURF_BROKEN_C	(1<<2) //wing 1
-#define SHIPSURF_BROKEN_D	(1<<3) //wing 2
-#define SHIPSURF_BROKEN_E	(1<<4) //wing 3
-#define SHIPSURF_BROKEN_F	(1<<5) //wing 4
-#define SHIPSURF_BROKEN_G	(1<<6) //front
+#define SHIPSURF_BROKEN_A	(0x0001u) // gear 1
+#define SHIPSURF_BROKEN_B	(0x0002u) // gear 1
+#define SHIPSURF_BROKEN_C	(0x0004u) // wing 1
+#define SHIPSURF_BROKEN_D	(0x0008u) // wing 2
+#define SHIPSURF_BROKEN_E	(0x0010u) // wing 3
+#define SHIPSURF_BROKEN_F	(0x0020u) // wing 4
+#define SHIPSURF_BROKEN_G	(0x0040u) // front
 
 typedef struct
 {
@@ -533,7 +533,7 @@ typedef struct Vehicle_s
 	int m_EjectDir;
 
 	// Flags that describe the vehicles behavior.
-	unsigned long m_ulFlags;
+	uint32_t m_ulFlags;
 
 	// NOTE: Vehicle Type ID, Orientation, and Armor MUST be transmitted over the net.
 

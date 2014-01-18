@@ -611,7 +611,7 @@ void NPC_SetBoneAngles(gentity_t *ent, char *bone, vector3 *angles)
 	int *firstFree = NULL;
 	int i = 0;
 	int boneIndex = G_BoneIndex(bone);
-	int flags, up, right, forward;
+	uint32_t flags, up, right, forward;
 	vector3 *boneVector = &ent->s.boneAngles1;
 	vector3 *freeBoneVec = NULL;
 
@@ -693,7 +693,7 @@ void NPC_SetBoneAngles(gentity_t *ent, char *bone, vector3 *angles)
 #define TURN_ON				0x00000000
 #define TURN_OFF			0x00000100
 
-void NPC_SetSurfaceOnOff(gentity_t *ent, const char *surfaceName, int surfaceFlags)
+void NPC_SetSurfaceOnOff(gentity_t *ent, const char *surfaceName, uint32_t surfaceFlags)
 {
 	int i = 0;
 	qboolean foundIt = qfalse;

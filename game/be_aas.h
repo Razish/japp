@@ -19,35 +19,35 @@
 #endif
 
 //travel flags
-#define TFL_INVALID				0x00000001	//traveling temporary not possible
-#define TFL_WALK				0x00000002	//walking
-#define TFL_CROUCH				0x00000004	//crouching
-#define TFL_BARRIERJUMP			0x00000008	//jumping onto a barrier
-#define TFL_JUMP				0x00000010	//jumping
-#define TFL_LADDER				0x00000020	//climbing a ladder
-#define TFL_WALKOFFLEDGE		0x00000080	//walking of a ledge
-#define TFL_SWIM				0x00000100	//swimming
-#define TFL_WATERJUMP			0x00000200	//jumping out of the water
-#define TFL_TELEPORT			0x00000400	//teleporting
-#define TFL_ELEVATOR			0x00000800	//elevator
-#define TFL_ROCKETJUMP			0x00001000	//rocket jumping
-#define TFL_BFGJUMP				0x00002000	//bfg jumping
-#define TFL_GRAPPLEHOOK			0x00004000	//grappling hook
-#define TFL_DOUBLEJUMP			0x00008000	//double jump
-#define TFL_RAMPJUMP			0x00010000	//ramp jump
-#define TFL_STRAFEJUMP			0x00020000	//strafe jump
-#define TFL_JUMPPAD				0x00040000	//jump pad
-#define TFL_AIR					0x00080000	//travel through air
-#define TFL_WATER				0x00100000	//travel through water
-#define TFL_SLIME				0x00200000	//travel through slime
-#define TFL_LAVA				0x00400000	//travel through lava
-#define TFL_DONOTENTER			0x00800000	//travel through donotenter area
-#define TFL_FUNCBOB				0x01000000	//func bobbing
-#define TFL_FLIGHT				0x02000000	//flight
-#define TFL_BRIDGE				0x04000000	//move over a bridge
-//
-#define TFL_NOTTEAM1			0x08000000	//not team 1
-#define TFL_NOTTEAM2			0x10000000	//not team 2
+#define TFL_INVALID				(0x00000001u) // traveling temporary not possible
+#define TFL_WALK				(0x00000002u) // walking
+#define TFL_CROUCH				(0x00000004u) // crouching
+#define TFL_BARRIERJUMP			(0x00000008u) // jumping onto a barrier
+#define TFL_JUMP				(0x00000010u) // jumping
+#define TFL_LADDER				(0x00000020u) // climbing a ladder
+#define TFL_UNUSED00000040		(0x00000040u) // 
+#define TFL_WALKOFFLEDGE		(0x00000080u) // walking of a ledge
+#define TFL_SWIM				(0x00000100u) // swimming
+#define TFL_WATERJUMP			(0x00000200u) // jumping out of the water
+#define TFL_TELEPORT			(0x00000400u) // teleporting
+#define TFL_ELEVATOR			(0x00000800u) // elevator
+#define TFL_ROCKETJUMP			(0x00001000u) // rocket jumping
+#define TFL_BFGJUMP				(0x00002000u) // bfg jumping
+#define TFL_GRAPPLEHOOK			(0x00004000u) // grappling hook
+#define TFL_DOUBLEJUMP			(0x00008000u) // double jump
+#define TFL_RAMPJUMP			(0x00010000u) // ramp jump
+#define TFL_STRAFEJUMP			(0x00020000u) // strafe jump
+#define TFL_JUMPPAD				(0x00040000u) // jump pad
+#define TFL_AIR					(0x00080000u) // travel through air
+#define TFL_WATER				(0x00100000u) // travel through water
+#define TFL_SLIME				(0x00200000u) // travel through slime
+#define TFL_LAVA				(0x00400000u) // travel through lava
+#define TFL_DONOTENTER			(0x00800000u) // travel through donotenter area
+#define TFL_FUNCBOB				(0x01000000u) // func bobbing
+#define TFL_FLIGHT				(0x02000000u) // flight
+#define TFL_BRIDGE				(0x04000000u) // move over a bridge
+#define TFL_NOTTEAM1			(0x08000000u) // not team 1
+#define TFL_NOTTEAM2			(0x10000000u) // not team 2
 
 //default travel flags
 #define TFL_DEFAULT	TFL_WALK|TFL_CROUCH|TFL_BARRIERJUMP|\
@@ -82,7 +82,7 @@ typedef struct aas_trace_s
 typedef struct bsp_surface_s
 {
 	char name[16];
-	int flags;
+	uint32_t flags;
 	int value;
 } bsp_surface_t;
 
@@ -108,7 +108,7 @@ typedef struct aas_entityinfo_s
 {
 	int		valid;			// true if updated this frame
 	int		type;			// entity type
-	int		flags;			// entity flags
+	uint32_t flags;			// entity flags
 	float	ltime;			// local time
 	float	update_time;	// time between last and current update
 	int		number;			// number of the entity
@@ -125,7 +125,7 @@ typedef struct aas_entityinfo_s
 	int		frame;			// model frame number
 	int		event;			// impulse events -- muzzle flashes, footsteps, etc
 	int		eventParm;		// even parameter
-	int		powerups;		// bit flags
+	uint32_t powerups;		// bit flags
 	int		weapon;			// determines weapon and flash model, etc
 	int		legsAnim;		// current legs anim
 	int		torsoAnim;		// current torso anim
@@ -135,7 +135,7 @@ typedef struct aas_entityinfo_s
 typedef struct aas_areainfo_s
 {
 	int contents;
-	int flags;
+	uint32_t flags;
 	int presencetype;
 	int cluster;
 	vector3 mins;
@@ -144,20 +144,20 @@ typedef struct aas_areainfo_s
 } aas_areainfo_t;
 
 // client movement prediction stop events, stop as soon as:
-#define SE_NONE					0
-#define SE_HITGROUND			1		// the ground is hit
-#define SE_LEAVEGROUND			2		// there's no ground
-#define SE_ENTERWATER			4		// water is entered
-#define SE_ENTERSLIME			8		// slime is entered
-#define SE_ENTERLAVA			16		// lava is entered
-#define SE_HITGROUNDDAMAGE		32		// the ground is hit with damage
-#define SE_GAP					64		// there's a gap
-#define SE_TOUCHJUMPPAD			128		// touching a jump pad area
-#define SE_TOUCHTELEPORTER		256		// touching teleporter
-#define SE_ENTERAREA			512		// the given stoparea is entered
-#define SE_HITGROUNDAREA		1024	// a ground face in the area is hit
-#define SE_HITBOUNDINGBOX		2048	// hit the specified bounding box
-#define SE_TOUCHCLUSTERPORTAL	4096	// touching a cluster portal
+#define SE_NONE					(0x0000u) // 
+#define SE_HITGROUND			(0x0001u) // the ground is hit
+#define SE_LEAVEGROUND			(0x0002u) // there's no ground
+#define SE_ENTERWATER			(0x0004u) // water is entered
+#define SE_ENTERSLIME			(0x0008u) // slime is entered
+#define SE_ENTERLAVA			(0x0010u) // lava is entered
+#define SE_HITGROUNDDAMAGE		(0x0020u) // the ground is hit with damage
+#define SE_GAP					(0x0040u) // there's a gap
+#define SE_TOUCHJUMPPAD			(0x0080u) // touching a jump pad area
+#define SE_TOUCHTELEPORTER		(0x0100u) // touching teleporter
+#define SE_ENTERAREA			(0x0200u) // the given stoparea is entered
+#define SE_HITGROUNDAREA		(0x0400u) // a ground face in the area is hit
+#define SE_HITBOUNDINGBOX		(0x0800u) // hit the specified bounding box
+#define SE_TOUCHCLUSTERPORTAL	(0x1000u) // touching a cluster portal
 
 typedef struct aas_clientmove_s
 {
@@ -173,9 +173,9 @@ typedef struct aas_clientmove_s
 } aas_clientmove_t;
 
 // alternate route goals
-#define ALTROUTEGOAL_ALL				1
-#define ALTROUTEGOAL_CLUSTERPORTALS		2
-#define ALTROUTEGOAL_VIEWPORTALS		4
+#define ALTROUTEGOAL_ALL				(0x0001u)
+#define ALTROUTEGOAL_CLUSTERPORTALS		(0x0002u)
+#define ALTROUTEGOAL_VIEWPORTALS		(0x0004u)
 
 typedef struct aas_altroutegoal_s
 {
@@ -187,11 +187,11 @@ typedef struct aas_altroutegoal_s
 } aas_altroutegoal_t;
 
 // route prediction stop events
-#define RSE_NONE				0
-#define RSE_NOROUTE				1	//no route to goal
-#define RSE_USETRAVELTYPE		2	//stop as soon as on of the given travel types is used
-#define RSE_ENTERCONTENTS		4	//stop when entering the given contents
-#define RSE_ENTERAREA			8	//stop when entering the given area
+#define RSE_NONE				(0x0000u)
+#define RSE_NOROUTE				(0x0001u) // no route to goal
+#define RSE_USETRAVELTYPE		(0x0002u) // stop as soon as on of the given travel types is used
+#define RSE_ENTERCONTENTS		(0x0004u) // stop when entering the given contents
+#define RSE_ENTERAREA			(0x0008u) // stop when entering the given area
 
 typedef struct aas_predictroute_s
 {
@@ -199,7 +199,7 @@ typedef struct aas_predictroute_s
 	int endarea;			//area at end of movement prediction
 	int stopevent;			//event that made the prediction stop
 	int endcontents;		//contents at the end of movement prediction
-	int endtravelflags;		//end travel flags
+	uint32_t endtravelflags;		//end travel flags
 	int numareas;			//number of areas predicted ahead
 	int time;				//time predicted ahead (in hundreth of a sec)
 } aas_predictroute_t;

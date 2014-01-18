@@ -1,7 +1,6 @@
 #include "g_local.h"
 
-qboolean Client_Supports( gentity_t *ent, unsigned int supportFlag )
-{
+qboolean Client_Supports( const gentity_t *ent, uint32_t supportFlag ) {
 	return !!(ent->client->pers.CSF & supportFlag );
 }
 

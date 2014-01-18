@@ -680,7 +680,7 @@ void Window_Init(windowDef_t *w) {
 	w->cinematic = -1;
 }
 
-void Fade(int *flags, float *f, float clamp, int *nextTime, int offsetTime, qboolean bFlags, float fadeAmount) {
+void Fade(uint32_t *flags, float *f, float clamp, int *nextTime, int offsetTime, qboolean bFlags, float fadeAmount) {
 	if (*flags & (WINDOW_FADINGOUT | WINDOW_FADINGIN)) {
 		if (DC->realTime > *nextTime) {
 			*nextTime = DC->realTime + offsetTime;
@@ -969,7 +969,7 @@ itemDef_t *Menu_ClearFocus(menuDef_t *menu) {
 	return ret;
 }
 
-qboolean IsVisible(int flags) {
+qboolean IsVisible(uint32_t flags) {
 	return (flags & WINDOW_VISIBLE && !(flags & WINDOW_FADINGOUT));
 }
 
@@ -3997,7 +3997,7 @@ static void Scroll_Slider_ThumbFunc(void *p) {
 
 void Item_StartCapture(itemDef_t *item, int key) 
 {
-	int flags;
+	uint32_t flags;
 	switch (item->type) 
 	{
 	case ITEM_TYPE_EDITFIELD:
@@ -7374,7 +7374,7 @@ qboolean ItemParse_asset_model_go( itemDef_t *item, const char *name,int *runTim
 
 							int sFrame = anim->firstFrame;
 							int eFrame = anim->firstFrame + anim->numFrames;
-							int flags = BONE_ANIM_OVERRIDE_FREEZE;
+							uint32_t flags = BONE_ANIM_OVERRIDE_FREEZE;
 							int time = DC->realTime;
 							float animSpeed = 50.0f / anim->frameLerp;
 							int blendTime = 150;

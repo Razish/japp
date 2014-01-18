@@ -17,13 +17,13 @@
 #define MAX_CHATTYPE_NAME		32
 #define MAX_MATCHVARIABLES		8
 
-#define CHAT_GENDERLESS			0
-#define CHAT_GENDERFEMALE		1
-#define CHAT_GENDERMALE			2
+#define CHAT_GENDERLESS		(0x0000u)
+#define CHAT_GENDERFEMALE	(0x0001u)
+#define CHAT_GENDERMALE		(0x0002u)
 
-#define CHAT_ALL					0
-#define CHAT_TEAM					1
-#define CHAT_TELL					2
+#define CHAT_ALL	(0x0000u)
+#define CHAT_TEAM	(0x0001u)
+#define CHAT_TELL	(0x0002u)
 
 //a console message
 typedef struct bot_consolemessage_s

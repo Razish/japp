@@ -63,31 +63,28 @@ struct weaponinfo_s;
 #define BLERR_CANNOTLOADWEAPONCONFIG	12	//cannot load weapon config
 
 //action flags
-#define ACTION_ATTACK			0x0000001
-#define ACTION_USE				0x0000002
-#define ACTION_RESPAWN			0x0000008
-#define ACTION_JUMP				0x0000010
-#define ACTION_MOVEUP			0x0000020
-#define ACTION_CROUCH			0x0000080
-#define ACTION_MOVEDOWN			0x0000100
-#define ACTION_MOVEFORWARD		0x0000200
-#define ACTION_MOVEBACK			0x0000800
-#define ACTION_MOVELEFT			0x0001000
-#define ACTION_MOVERIGHT		0x0002000
-#define ACTION_DELAYEDJUMP		0x0008000
-#define ACTION_TALK				0x0010000
-#define ACTION_GESTURE			0x0020000
-#define ACTION_WALK				0x0080000
-#define ACTION_FORCEPOWER		0x0100000
-#define ACTION_ALT_ATTACK		0x0200000
-/*
-#define ACTION_AFFIRMATIVE		0x0100000
-#define ACTION_NEGATIVE			0x0200000
-#define ACTION_GETFLAG			0x0800000
-#define ACTION_GUARDBASE		0x1000000
-#define ACTION_PATROL			0x2000000
-#define ACTION_FOLLOWME			0x8000000
-*/
+#define ACTION_ATTACK			(0x00000001u)
+#define ACTION_USE				(0x00000002u)
+#define ACTION_UNUSED00000004	(0x00000004u)
+#define ACTION_RESPAWN			(0x00000008u)
+#define ACTION_JUMP				(0x00000010u)
+#define ACTION_MOVEUP			(0x00000020u)
+#define ACTION_UNUSED00000040	(0x00000040u)
+#define ACTION_CROUCH			(0x00000080u)
+#define ACTION_MOVEDOWN			(0x00000100u)
+#define ACTION_MOVEFORWARD		(0x00000200u)
+#define ACTION_UNUSED00000400	(0x00000400u)
+#define ACTION_MOVEBACK			(0x00000800u)
+#define ACTION_MOVELEFT			(0x00001000u)
+#define ACTION_MOVERIGHT		(0x00002000u)
+#define ACTION_UNUSED00004000	(0x00004000u)
+#define ACTION_DELAYEDJUMP		(0x00008000u)
+#define ACTION_TALK				(0x00010000u)
+#define ACTION_GESTURE			(0x00020000u)
+#define ACTION_UNUSED00040000	(0x00040000u)
+#define ACTION_WALK				(0x00080000u)
+#define ACTION_FORCEPOWER		(0x00100000u)
+#define ACTION_ALT_ATTACK		(0x00200000u)
 
 //the bot input, will be converted to an usercmd_t
 typedef struct bot_input_s
@@ -96,7 +93,7 @@ typedef struct bot_input_s
 	vector3 dir;				//movement direction
 	float speed;			//speed in the range [0, 400]
 	vector3 viewangles;		//the view angles
-	int actionflags;		//one of the ACTION_? flags
+	uint32_t actionflags;		//one of the ACTION_? flags
 	int weapon;				//weapon to use
 } bot_input_t;
 
@@ -108,7 +105,7 @@ typedef struct bot_input_s
 typedef struct bsp_surface_s
 {
 	char name[16];
-	int flags;
+	uint32_t flags;
 	int value;
 } bsp_surface_t;
 
@@ -134,7 +131,7 @@ typedef struct bsp_trace_s
 typedef struct bot_entitystate_s
 {
 	int		type;			// entity type
-	int		flags;			// entity flags
+	uint32_t flags;			// entity flags
 	vector3	origin;			// origin of the entity
 	vector3	angles;			// angles of the model
 	vector3	old_origin;		// for lerping
@@ -147,7 +144,7 @@ typedef struct bot_entitystate_s
 	int		frame;			// model frame number
 	int		event;			// impulse events -- muzzle flashes, footsteps, etc
 	int		eventParm;		// even parameter
-	int		powerups;		// bit flags
+	uint32_t powerups;		// bit flags
 	int		weapon;			// determines weapon and flash model, etc
 	int		legsAnim;
 	int		torsoAnim;
@@ -228,15 +225,15 @@ typedef struct aas_export_s
 	//--------------------------------------------
 	// be_aas_route.c
 	//--------------------------------------------
-	int			(*AAS_AreaTravelTimeToGoalArea)(int areanum, vector3 *origin, int goalareanum, int travelflags);
+	int			(*AAS_AreaTravelTimeToGoalArea)(int areanum, vector3 *origin, int goalareanum, uint32_t travelflags);
 	int			(*AAS_EnableRoutingArea)(int areanum, int enable);
 	int			(*AAS_PredictRoute)(struct aas_predictroute_s *route, int areanum, vector3 *origin,
-							int goalareanum, int travelflags, int maxareas, int maxtime,
+							int goalareanum, uint32_t travelflags, int maxareas, int maxtime,
 							int stopevent, int stopcontents, int stoptfl, int stopareanum);
 	//--------------------------------------------
 	// be_aas_altroute.c
 	//--------------------------------------------
-	int			(*AAS_AlternativeRouteGoals)(vector3 *start, int startareanum, vector3 *goal, int goalareanum, int travelflags,
+	int			(*AAS_AlternativeRouteGoals)(vector3 *start, int startareanum, vector3 *goal, int goalareanum, uint32_t travelflags,
 										struct aas_altroutegoal_s *altroutegoals, int maxaltroutegoals,
 										int type);
 	//--------------------------------------------
@@ -335,8 +332,8 @@ typedef struct ai_export_s
 	void	(*BotGoalName)(int number, char *name, int size);
 	int		(*BotGetTopGoal)(int goalstate, struct bot_goal_s *goal);
 	int		(*BotGetSecondGoal)(int goalstate, struct bot_goal_s *goal);
-	int		(*BotChooseLTGItem)(int goalstate, vector3 *origin, int *inventory, int travelflags);
-	int		(*BotChooseNBGItem)(int goalstate, vector3 *origin, int *inventory, int travelflags,
+	int		(*BotChooseLTGItem)(int goalstate, vector3 *origin, int *inventory, uint32_t travelflags);
+	int		(*BotChooseNBGItem)(int goalstate, vector3 *origin, int *inventory, uint32_t travelflags,
 								struct bot_goal_s *ltg, float maxtime);
 	int		(*BotTouchingGoal)(vector3 *origin, struct bot_goal_s *goal);
 	int		(*BotItemGoalInVisButNotVisible)(int viewer, vector3 *eye, vector3 *viewangles, struct bot_goal_s *goal);
@@ -358,13 +355,13 @@ typedef struct ai_export_s
 	// be_ai_move.h
 	//-----------------------------------
 	void	(*BotResetMoveState)(int movestate);
-	void	(*BotMoveToGoal)(struct bot_moveresult_s *result, int movestate, struct bot_goal_s *goal, int travelflags);
+	void	(*BotMoveToGoal)(struct bot_moveresult_s *result, int movestate, struct bot_goal_s *goal, uint32_t travelflags);
 	int		(*BotMoveInDirection)(int movestate, vector3 *dir, float speed, int type);
 	void	(*BotResetAvoidReach)(int movestate);
 	void	(*BotResetLastAvoidReach)(int movestate);
 	int		(*BotReachabilityArea)(vector3 *origin, int testground);
-	int		(*BotMovementViewTarget)(int movestate, struct bot_goal_s *goal, int travelflags, float lookahead, vector3 *target);
-	int		(*BotPredictVisiblePosition)(vector3 *origin, int areanum, struct bot_goal_s *goal, int travelflags, vector3 *target);
+	int		(*BotMovementViewTarget)(int movestate, struct bot_goal_s *goal, uint32_t travelflags, float lookahead, vector3 *target);
+	int		(*BotPredictVisiblePosition)(vector3 *origin, int areanum, struct bot_goal_s *goal, uint32_t travelflags, vector3 *target);
 	int		(*BotAllocMoveState)(void);
 	void	(*BotFreeMoveState)(int handle);
 	void	(*BotInitMoveState)(int handle, struct bot_initmove_s *initmove);

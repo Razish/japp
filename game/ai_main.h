@@ -13,27 +13,34 @@
 
 #define MAX_FORCE_INFO_SIZE 2048
 
-#define WPFLAG_JUMP				0x00000010 //jump when we hit this
-#define WPFLAG_DUCK				0x00000020 //duck while moving around here
-#define WPFLAG_NOVIS			0x00000400 //go here for a bit even with no visibility
-#define WPFLAG_SNIPEORCAMPSTAND	0x00000800 //a good position to snipe or camp - stand
-#define WPFLAG_WAITFORFUNC		0x00001000 //wait for a func brushent under this point before moving here
-#define WPFLAG_SNIPEORCAMP		0x00002000 //a good position to snipe or camp - crouch
-#define WPFLAG_ONEWAY_FWD		0x00004000 //can only go forward on the trial from here (e.g. went over a ledge)
-#define WPFLAG_ONEWAY_BACK		0x00008000 //can only go backward on the trail from here
-#define WPFLAG_GOALPOINT		0x00010000 //make it a goal to get here.. goal points will be decided by setting "weight" values
-#define WPFLAG_RED_FLAG			0x00020000 //red flag
-#define WPFLAG_BLUE_FLAG		0x00040000 //blue flag
-#define WPFLAG_SIEGE_REBELOBJ	0x00080000 //rebel siege objective
-#define WPFLAG_SIEGE_IMPERIALOBJ	0x00100000 //imperial siege objective
-#define WPFLAG_NOMOVEFUNC		0x00200000 //don't move over if a func is under
+#define WPFLAG_UNUSED00000001		(0x00000001u)
+#define WPFLAG_UNUSED00000002		(0x00000002u)
+#define WPFLAG_UNUSED00000004		(0x00000004u)
+#define WPFLAG_UNUSED00000008		(0x00000008u)
+#define WPFLAG_JUMP					(0x00000010u) // jump when we hit this
+#define WPFLAG_DUCK					(0x00000020u) // duck while moving around here
+#define WPFLAG_UNUSED00000040		(0x00000040u)
+#define WPFLAG_UNUSED00000080		(0x00000080u)
+#define WPFLAG_UNUSED00000100		(0x00000100u)
+#define WPFLAG_UNUSED00000200		(0x00000200u)
+#define WPFLAG_NOVIS				(0x00000400u) // go here for a bit even with no visibility
+#define WPFLAG_SNIPEORCAMPSTAND		(0x00000800u) // a good position to snipe or camp - stand
+#define WPFLAG_WAITFORFUNC			(0x00001000u) // wait for a func brushent under this point before moving here
+#define WPFLAG_SNIPEORCAMP			(0x00002000u) // a good position to snipe or camp - crouch
+#define WPFLAG_ONEWAY_FWD			(0x00004000u) // can only go forward on the trial from here (e.g. went over a ledge)
+#define WPFLAG_ONEWAY_BACK			(0x00008000u) // can only go backward on the trail from here
+#define WPFLAG_GOALPOINT			(0x00010000u) // make it a goal to get here.. goal points will be decided by setting "weight" values
+#define WPFLAG_RED_FLAG				(0x00020000u) // red flag
+#define WPFLAG_BLUE_FLAG			(0x00040000u) // blue flag
+#define WPFLAG_SIEGE_REBELOBJ		(0x00080000u) // rebel siege objective
+#define WPFLAG_SIEGE_IMPERIALOBJ	(0x00100000u) // imperial siege objective
+#define WPFLAG_NOMOVEFUNC			(0x00200000u) // don't move over if a func is under
+#define WPFLAG_CALCULATED			(0x00400000u) // don't calculate it again
+#define WPFLAG_NEVERONEWAY			(0x00800000u) // never flag it as one-way
 
-#define WPFLAG_CALCULATED		0x00400000 //don't calculate it again
-#define WPFLAG_NEVERONEWAY		0x00800000 //never flag it as one-way
-
-#define LEVELFLAG_NOPOINTPREDICTION			1 //don't take waypoint beyond current into account when adjusting path view angles
-#define LEVELFLAG_IGNOREINFALLBACK			2 //ignore enemies when in a fallback navigation routine
-#define LEVELFLAG_IMUSTNTRUNAWAY			4 //don't be scared
+#define LEVELFLAG_NOPOINTPREDICTION	(0x0001u) //don't take waypoint beyond current into account when adjusting path view angles
+#define LEVELFLAG_IGNOREINFALLBACK	(0x0002u) //ignore enemies when in a fallback navigation routine
+#define LEVELFLAG_IMUSTNTRUNAWAY	(0x0004u) //don't be scared
 
 #define WP_KEEP_FLAG_DIST			128
 
@@ -111,7 +118,7 @@ typedef struct nodeobject_s
 	vector3 origin;
 //	int index;
 	float weight;
-	int flags;
+	uint32_t flags;
 	int neighbornum;
 	int inuse;
 } nodeobject_t;
@@ -390,7 +397,7 @@ extern int gLastPrintedIndex;
 extern nodeobject_t nodetable[MAX_NODETABLE_SIZE];
 extern int nodenum;
 
-extern int gLevelFlags;
+extern uint32_t gLevelFlags;
 
 extern float floattime;
 #define FloatTime() floattime

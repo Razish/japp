@@ -20,7 +20,7 @@
 // but they may not be sent if a client's rate level is exceeded, or
 // they may be dropped by the network.
 typedef struct snapshot_s {
-	int				snapFlags;			// SNAPFLAG_RATE_DELAYED, etc
+	uint32_t		snapFlags;			// SNAPFLAG_RATE_DELAYED, etc
 	int				ping;
 
 	int				serverTime;		// server time the message is valid for (in msec)
@@ -470,7 +470,7 @@ typedef struct cgameImport_s {
 	int				(*PrecisionTimerEnd)					( void *timer );
 
 	// cvar
-	void			(*Cvar_Register)						( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
+	void			(*Cvar_Register)						( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, uint32_t flags );
 	void			(*Cvar_Set)								( const char *var_name, const char *value );
 	void			(*Cvar_Update)							( vmCvar_t *vmCvar );
 	void			(*Cvar_VariableStringBuffer)			( const char *var_name, char *buffer, int bufsize );
@@ -610,7 +610,7 @@ typedef struct cgameImport_s {
 	e_status		(*CIN_StopCinematic)					( int handle );
 
 	// FX
-	void			(*FX_AddLine)							( vector3 *start, vector3 *end, float size1, float size2, float sizeParm, float alpha1, float alpha2, float alphaParm, vector3 *sRGB, vector3 *eRGB, float rgbParm, int killTime, qhandle_t shader, int flags );
+	void			(*FX_AddLine)							( vector3 *start, vector3 *end, float size1, float size2, float sizeParm, float alpha1, float alpha2, float alphaParm, vector3 *sRGB, vector3 *eRGB, float rgbParm, int killTime, qhandle_t shader, uint32_t flags );
 	int				(*FX_RegisterEffect)					( const char *file );
 	void			(*FX_PlayEffect)						( const char *file, vector3 *org, vector3 *fwd, int vol, int rad );
 	void			(*FX_PlayEffectID)						( int id, vector3 *org, vector3 *fwd, int vol, int rad, qboolean isPortal );
@@ -646,14 +646,14 @@ typedef struct cgameImport_s {
 	qboolean		(*G2API_GetBoltMatrix)					( void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale );
 	qboolean		(*G2API_GetBoltMatrix_NoReconstruct)	( void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale );
 	qboolean		(*G2API_GetBoltMatrix_NoRecNoRot)		( void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale );
-	int				(*G2API_InitGhoul2Model)				( void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, int modelFlags, int lodBias );
+	int				(*G2API_InitGhoul2Model)				( void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, uint32_t modelFlags, int lodBias );
 	qboolean		(*G2API_SetSkin)						( void *ghoul2, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin );
-	void			(*G2API_CollisionDetect)				( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, int traceFlags, int useLod, float fRadius );
-	void			(*G2API_CollisionDetectCache)			( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position,int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, int traceFlags, int useLod, float fRadius );
+	void			(*G2API_CollisionDetect)				( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius );
+	void			(*G2API_CollisionDetectCache)			( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position,int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius );
 	void			(*G2API_CleanGhoul2Models)				( void **ghoul2Ptr );
-	qboolean		(*G2API_SetBoneAngles)					( void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const int flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime , int currentTime );
-	qboolean		(*G2API_SetBoneAnim)					( void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const int flags, const float animSpeed, const int currentTime, const float setFrame, const int blendTime );
-	qboolean		(*G2API_GetBoneAnim)					( void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, int *flags, float *animSpeed, int *modelList, const int modelIndex );
+	qboolean		(*G2API_SetBoneAngles)					( void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const uint32_t flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime , int currentTime );
+	qboolean		(*G2API_SetBoneAnim)					( void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const uint32_t flags, const float animSpeed, const int currentTime, const float setFrame, const int blendTime );
+	qboolean		(*G2API_GetBoneAnim)					( void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, uint32_t *flags, float *animSpeed, int *modelList, const int modelIndex );
 	qboolean		(*G2API_GetBoneFrame)					( void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *modelList, const int modelIndex );
 	void			(*G2API_GetGLAName)						( void *ghoul2, int modelIndex, char *fillBuf );
 	int				(*G2API_CopyGhoul2Instance)				( void *g2From, void *g2To, int modelIndex );
@@ -670,7 +670,7 @@ typedef struct cgameImport_s {
 	qboolean		(*G2API_AttachEnt)						( int *boltInfo, void *ghlInfoTo, int toBoltIndex, int entNum, int toModelNum );
 	void			(*G2API_SetBoltInfo)					( void *ghoul2, int modelIndex, int boltInfo );
 	qboolean		(*G2API_SetRootSurface)					( void *ghoul2, const int modelIndex, const char *surfaceName );
-	qboolean		(*G2API_SetSurfaceOnOff)				( void *ghoul2, const char *surfaceName, const int flags );
+	qboolean		(*G2API_SetSurfaceOnOff)				( void *ghoul2, const char *surfaceName, const uint32_t flags );
 	qboolean		(*G2API_SetNewOrigin)					( void *ghoul2, const int boltIndex );
 	qboolean		(*G2API_DoesBoneExist)					( void *ghoul2, int modelIndex, const char *boneName );
 	int				(*G2API_GetSurfaceRenderStatus)			( void *ghoul2, const int modelIndex, const char *surfaceName );

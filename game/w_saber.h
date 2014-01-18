@@ -1,16 +1,17 @@
 #define ARMOR_EFFECT_TIME	500
 
 //saberEventFlags
-#define	SEF_HITENEMY	0x1		//Hit the enemy
-#define	SEF_HITOBJECT	0x2		//Hit some other object
-#define	SEF_HITWALL		0x4		//Hit a wall
-#define	SEF_PARRIED		0x8		//Parried a saber swipe
-#define	SEF_DEFLECTED	0x10	//Deflected a missile or saberInFlight
-#define	SEF_BLOCKED		0x20	//Was blocked by a parry
+#define	SEF_HITENEMY	(0x0001u)		//Hit the enemy
+#define	SEF_HITOBJECT	(0x0002u)		//Hit some other object
+#define	SEF_HITWALL		(0x0004u)		//Hit a wall
+#define	SEF_PARRIED		(0x0008u)		//Parried a saber swipe
+#define	SEF_DEFLECTED	(0x0010u)	//Deflected a missile or saberInFlight
+#define	SEF_BLOCKED		(0x0020u)	//Was blocked by a parry
 #define	SEF_EVENTS		(SEF_HITENEMY|SEF_HITOBJECT|SEF_HITWALL|SEF_PARRIED|SEF_DEFLECTED|SEF_BLOCKED)
-#define	SEF_LOCKED		0x40	//Sabers locked with someone else
-#define	SEF_INWATER		0x80	//Saber is in water
-#define	SEF_LOCK_WON	0x100	//Won a saberLock
+#define	SEF_LOCKED		(0x0040u)	//Sabers locked with someone else
+#define	SEF_INWATER		(0x0080u)	//Saber is in water
+#define	SEF_LOCK_WON	(0x0100u)	//Won a saberLock
+
 //saberEntityState
 #define SES_LEAVING		1
 #define SES_HOVERING	1//2

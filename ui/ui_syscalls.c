@@ -29,7 +29,7 @@ void trap_Error( const char *string ) {
 int trap_Milliseconds( void ) {
 	return Q_syscall( UI_MILLISECONDS ); 
 }
-void trap_Cvar_Register( vmCvar_t *cvar, const char *var_name, const char *value, int flags ) {
+void trap_Cvar_Register( vmCvar_t *cvar, const char *var_name, const char *value, uint32_t flags ) {
 	Q_syscall( UI_CVAR_REGISTER, cvar, var_name, value, flags );
 }
 void trap_Cvar_Update( vmCvar_t *cvar ) {
@@ -52,7 +52,7 @@ void trap_Cvar_SetValue( const char *var_name, float value ) {
 void trap_Cvar_Reset( const char *name ) {
 	Q_syscall( UI_CVAR_RESET, name ); 
 }
-void trap_Cvar_Create( const char *var_name, const char *var_value, int flags ) {
+void trap_Cvar_Create( const char *var_name, const char *var_value, uint32_t flags ) {
 	Q_syscall( UI_CVAR_CREATE, var_name, var_value, flags );
 }
 void trap_Cvar_InfoStringBuffer( int bit, char *buffer, int bufsize ) {
@@ -337,28 +337,28 @@ qboolean trap_G2API_GetBoltMatrix_NoReconstruct( void *ghoul2, const int modelIn
 qboolean trap_G2API_GetBoltMatrix_NoRecNoRot(void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale) {
 	return (qboolean)(Q_syscall(UI_G2_GETBOLT_NOREC_NOROT, ghoul2, modelIndex, boltIndex, matrix, angles, position, frameNum, modelList, scale));
 }
-int trap_G2API_InitGhoul2Model(void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, int modelFlags, int lodBias) {
+int trap_G2API_InitGhoul2Model(void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, uint32_t modelFlags, int lodBias) {
 	return Q_syscall(UI_G2_INITGHOUL2MODEL, ghoul2Ptr, fileName, modelIndex, customSkin, customShader, modelFlags, lodBias);
 }
 qboolean trap_G2API_SetSkin(void *ghoul2, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin) {
 	return Q_syscall(UI_G2_SETSKIN, ghoul2, modelIndex, customSkin, renderSkin);
 }
-void trap_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, const vector3 *rayStart, const vector3 *rayEnd, const vector3 *scale, int traceFlags, int useLod, float fRadius ) {
+void trap_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, const vector3 *rayStart, const vector3 *rayEnd, const vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) {
 	Q_syscall ( UI_G2_COLLISIONDETECT, collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, PASSFLOAT(fRadius) );
 }
-void trap_G2API_CollisionDetectCache( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, const vector3 *rayStart, const vector3 *rayEnd, const vector3 *scale, int traceFlags, int useLod, float fRadius ) {
+void trap_G2API_CollisionDetectCache( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, const vector3 *rayStart, const vector3 *rayEnd, const vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) {
 	Q_syscall ( UI_G2_COLLISIONDETECTCACHE, collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, PASSFLOAT(fRadius) );
 }
 void trap_G2API_CleanGhoul2Models(void **ghoul2Ptr) {
 	Q_syscall(UI_G2_CLEANMODELS, ghoul2Ptr);
 }
-qboolean trap_G2API_SetBoneAngles(void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const int flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime, int currentTime ) {
+qboolean trap_G2API_SetBoneAngles(void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const uint32_t flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime, int currentTime ) {
 	return (Q_syscall(UI_G2_ANGLEOVERRIDE, ghoul2, modelIndex, boneName, angles, flags, up, right, forward, modelList, blendTime, currentTime));
 }
-qboolean trap_G2API_SetBoneAnim(void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const int flags, const float animSpeed, const int currentTime, const float setFrame, const int blendTime ) {
+qboolean trap_G2API_SetBoneAnim(void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const uint32_t flags, const float animSpeed, const int currentTime, const float setFrame, const int blendTime ) {
 	return Q_syscall(UI_G2_PLAYANIM, ghoul2, modelIndex, boneName, startFrame, endFrame, flags, PASSFLOAT(animSpeed), currentTime, PASSFLOAT(setFrame), blendTime);
 }
-qboolean trap_G2API_GetBoneAnim(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, int *flags, float *animSpeed, int *modelList, const int modelIndex) {
+qboolean trap_G2API_GetBoneAnim(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, uint32_t *flags, float *animSpeed, int *modelList, const int modelIndex) {
 	return Q_syscall(UI_G2_GETBONEANIM, ghoul2, boneName, currentTime, currentFrame, startFrame, endFrame, flags, animSpeed, modelList, modelIndex);
 }
 qboolean trap_G2API_GetBoneFrame(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *modelList, const int modelIndex) {
@@ -391,7 +391,7 @@ void trap_G2API_SetBoltInfo(void *ghoul2, int modelIndex, int boltInfo) {
 qboolean trap_G2API_SetRootSurface(void *ghoul2, const int modelIndex, const char *surfaceName) {
 	return Q_syscall(UI_G2_SETROOTSURFACE, ghoul2, modelIndex, surfaceName);
 }
-qboolean trap_G2API_SetSurfaceOnOff(void *ghoul2, const char *surfaceName, const int flags) {
+qboolean trap_G2API_SetSurfaceOnOff(void *ghoul2, const char *surfaceName, const uint32_t flags) {
 	return Q_syscall(UI_G2_SETSURFACEONOFF, ghoul2, surfaceName, flags);
 }
 qboolean trap_G2API_SetNewOrigin(void *ghoul2, const int boltIndex) {
@@ -428,7 +428,7 @@ qboolean trap_G2API_AttachG2Model(void *ghoul2From, int modelIndexFrom, void *gh
 int UISyscall_FS_Read( void *buffer, int len, fileHandle_t f ) { trap_FS_Read( buffer, len, f ); return 0; }
 int UISyscall_FS_Write( const void *buffer, int len, fileHandle_t f ) { trap_FS_Write( buffer, len, f ); return 0; }
 void UISyscall_R_AddPolysToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int num ) { trap_R_AddPolyToScene( hShader, numVerts, verts ); }
-void UISyscall_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, int traceFlags, int useLod, float fRadius ) { trap_G2API_CollisionDetect( collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, fRadius ); }
+void UISyscall_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) { trap_G2API_CollisionDetect( collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, fRadius ); }
 
 void QDECL UI_Error( int level, const char *error, ... ) {
 	va_list argptr;

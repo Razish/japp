@@ -28,7 +28,7 @@ typedef struct projectileinfo_s
 {
 	char name[MAX_STRINGFIELD];
 	char model[MAX_STRINGFIELD];
-	int flags;
+	uint32_t flags;
 	float gravity;
 	int damage;
 	float radius;
@@ -50,7 +50,7 @@ typedef struct weaponinfo_s
 	char model[MAX_STRINGFIELD];
 	int level;
 	int weaponindex;
-	int flags;
+	uint32_t flags;
 	char projectile[MAX_STRINGFIELD];
 	int numprojectiles;
 	float hspread;

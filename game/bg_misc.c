@@ -18,8 +18,7 @@ extern void Q3_SetParm (int entID, int parmNum, const char *parmValue);
 #endif
 
 
-const char *bgToggleableSurfaces[BG_NUM_TOGGLEABLE_SURFACES] = 
-{
+const char *bgToggleableSurfaces[BG_NUM_TOGGLEABLE_SURFACES] = {
 	"l_arm_key",					//0
 	"torso_canister1",
 	"torso_canister2",
@@ -1448,7 +1447,48 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vector3 *re
 	}
 }
 
-char *eventnames[] = {
+// given a boltmatrix, return in vec a normalised vector for the axis requested in flags
+void BG_GiveMeVectorFromMatrix( mdxaBone_t *boltMatrix, uint32_t flags, vector3 *vec ) {
+	switch ( flags ) {
+	case ORIGIN:
+		vec->x = boltMatrix->matrix[0][3];
+		vec->y = boltMatrix->matrix[1][3];
+		vec->z = boltMatrix->matrix[2][3];
+		break;
+	case POSITIVE_Y:
+		vec->x = boltMatrix->matrix[0][1];
+		vec->y = boltMatrix->matrix[1][1];
+		vec->z = boltMatrix->matrix[2][1];
+ 		break;
+	case POSITIVE_X:
+		vec->x = boltMatrix->matrix[0][0];
+		vec->y = boltMatrix->matrix[1][0];
+		vec->z = boltMatrix->matrix[2][0];
+		break;
+	case POSITIVE_Z:
+		vec->x = boltMatrix->matrix[0][2];
+		vec->y = boltMatrix->matrix[1][2];
+		vec->z = boltMatrix->matrix[2][2];
+		break;
+	case NEGATIVE_Y:
+		vec->x = -boltMatrix->matrix[0][1];
+		vec->y = -boltMatrix->matrix[1][1];
+		vec->z = -boltMatrix->matrix[2][1];
+		break;
+	case NEGATIVE_X:
+		vec->x = -boltMatrix->matrix[0][0];
+		vec->y = -boltMatrix->matrix[1][0];
+		vec->z = -boltMatrix->matrix[2][0];
+		break;
+	case NEGATIVE_Z:
+		vec->x = -boltMatrix->matrix[0][2];
+		vec->y = -boltMatrix->matrix[1][2];
+		vec->z = -boltMatrix->matrix[2][2];
+		break;
+	}
+}
+
+const char *eventnames[] = {
 	"EV_NONE",
 
 	"EV_CLIENTJOIN",

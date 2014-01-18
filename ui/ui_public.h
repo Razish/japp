@@ -213,9 +213,9 @@ typedef struct uiImport_s {
 	int				(*RealTime)								( qtime_t *qtime );
 	int				(*MemoryRemaining)						( void );
 
-	void			(*Cvar_Create)							( const char *var_name, const char *var_value, int flags );
+	void			(*Cvar_Create)							( const char *var_name, const char *var_value, uint32_t flags );
 	void			(*Cvar_InfoStringBuffer)				( int bit, char *buffer, int bufsize );
-	void			(*Cvar_Register)						( vmCvar_t *cvar, const char *var_name, const char *value, int flags );
+	void			(*Cvar_Register)						( vmCvar_t *cvar, const char *var_name, const char *value, uint32_t flags );
 	void			(*Cvar_Reset)							( const char *name );
 	void			(*Cvar_Set)								( const char *var_name, const char *value );
 	void			(*Cvar_SetValue)						( const char *var_name, float value );
@@ -322,13 +322,13 @@ typedef struct uiImport_s {
 	qboolean		(*G2API_GetBoltMatrix)					( void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale );
 	qboolean		(*G2API_GetBoltMatrix_NoReconstruct)	( void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale );
 	qboolean		(*G2API_GetBoltMatrix_NoRecNoRot)		( void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale );
-	int				(*G2API_InitGhoul2Model)				( void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, int modelFlags, int lodBias );
-	void			(*G2API_CollisionDetect)				( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, int traceFlags, int useLod, float fRadius );
-	void			(*G2API_CollisionDetectCache)			( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, int traceFlags, int useLod, float fRadius );
+	int				(*G2API_InitGhoul2Model)				( void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, uint32_t modelFlags, int lodBias );
+	void			(*G2API_CollisionDetect)				( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius );
+	void			(*G2API_CollisionDetectCache)			( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius );
 	void			(*G2API_CleanGhoul2Models)				( void **ghoul2Ptr );
-	qboolean		(*G2API_SetBoneAngles)					( void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const int flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime , int currentTime );
-	qboolean		(*G2API_SetBoneAnim)					( void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const int flags, const float animSpeed, const int currentTime, const float setFrame, const int blendTime );
-	qboolean		(*G2API_GetBoneAnim)					( void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, int *flags, float *animSpeed, int *modelList, const int modelIndex );
+	qboolean		(*G2API_SetBoneAngles)					( void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const uint32_t flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime , int currentTime );
+	qboolean		(*G2API_SetBoneAnim)					( void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const uint32_t flags, const float animSpeed, const int currentTime, const float setFrame, const int blendTime );
+	qboolean		(*G2API_GetBoneAnim)					( void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, uint32_t *flags, float *animSpeed, int *modelList, const int modelIndex );
 	qboolean		(*G2API_GetBoneFrame)					( void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *modelList, const int modelIndex );
 	void			(*G2API_GetGLAName)						( void *ghoul2, int modelIndex, char *fillBuf );
 	int				(*G2API_CopyGhoul2Instance)				( void *g2From, void *g2To, int modelIndex );
@@ -339,7 +339,7 @@ typedef struct uiImport_s {
 	int				(*G2API_AddBolt)						( void *ghoul2, int modelIndex, const char *boneName );
 	void			(*G2API_SetBoltInfo)					( void *ghoul2, int modelIndex, int boltInfo );
 	qboolean		(*G2API_SetRootSurface)					( void *ghoul2, const int modelIndex, const char *surfaceName );
-	qboolean		(*G2API_SetSurfaceOnOff)				( void *ghoul2, const char *surfaceName, const int flags );
+	qboolean		(*G2API_SetSurfaceOnOff)				( void *ghoul2, const char *surfaceName, const uint32_t flags );
 	qboolean		(*G2API_SetNewOrigin)					( void *ghoul2, const int boltIndex );
 	int				(*G2API_GetTime)						( void );
 	void			(*G2API_SetTime)						( int time, int clock );

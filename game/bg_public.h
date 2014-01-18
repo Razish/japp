@@ -209,19 +209,19 @@ typedef enum gametype_e {
 } gametype_t;
 
 // gametype bits
-#define GTB_NONE			0x000 // invalid
-#define GTB_FFA				0x001 // free for all
-#define GTB_HOLOCRON		0x002 // holocron ffa
-#define GTB_JEDIMASTER		0x004 // jedi master
-#define GTB_DUEL			0x008 // one on one tournament
-#define GTB_POWERDUEL		0x010 // two on one tournament
-#define GTB_SINGLE_PLAYER	0x020 // single player ffa
-#define GTB_NOTTEAM			0x03F // **SPECIAL: All of the above gametypes, i.e. not team-based
-#define GTB_TEAM			0x040 // team deathmatch
-#define GTB_SIEGE			0x080 // siege
-#define GTB_CTF				0x100 // capture the flag
-#define GTB_CTY				0x200 // capture the ysalimiri
-#define GTB_ALL				0x1FF // all
+#define GTB_NONE			(0x0000u) // invalid
+#define GTB_FFA				(0x0001u) // free for all
+#define GTB_HOLOCRON		(0x0002u) // holocron ffa
+#define GTB_JEDIMASTER		(0x0004u) // jedi master
+#define GTB_DUEL			(0x0008u) // one on one tournament
+#define GTB_POWERDUEL		(0x0010u) // two on one tournament
+#define GTB_SINGLE_PLAYER	(0x0020u) // single player ffa
+#define GTB_NOTTEAM			(0x003Fu) // **SPECIAL: All of the above gametypes, i.e. not team-based
+#define GTB_TEAM			(0x0040u) // team deathmatch
+#define GTB_SIEGE			(0x0080u) // siege
+#define GTB_CTF				(0x0100u) // capture the flag
+#define GTB_CTY				(0x0200u) // capture the ysalimiri
+#define GTB_ALL				(0x01FFu) // all
 
 typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
@@ -585,81 +585,51 @@ typedef enum {
 
 
 // entityState_t->eFlags
-#define EF_G2ANIMATING			(1<<0)		//perform g2 bone anims based on torsoAnim and legsAnim, works for ET_GENERAL -rww
-#define EF_DEAD					(1<<1)		// don't draw a foe marker over players with EF_DEAD
-//#define EF_BOUNCE_SHRAPNEL		(1<<2)		// special shrapnel flag
-//do not use eflags for server-only things, it wastes bandwidth -rww
-#define EF_RADAROBJECT			(1<<2)		// display on team radar
-
-#define EF_TELEPORT_BIT			(1<<3)		// toggled every time the origin abruptly changes
-
-#define EF_SHADER_ANIM			(1<<4)		// Animating shader (by s.frame)
-
-#define EF_PLAYER_EVENT			(1<<5)
-//#define EF_BOUNCE				(1<<5)		// for missiles
-//#define EF_BOUNCE_HALF			(1<<6)		// for missiles
-//these aren't even referenced in bg or client code and do not need to be eFlags, so I
-//am using these flags for rag stuff -rww
-
-#define EF_RAG					(1<<6)		//ragdoll him even if he's alive
-
-
-#define EF_PERMANENT			(1<<7)		// rww - I am claiming this. (for permanent entities)
-
-#define EF_NODRAW				(1<<8)		// may have an event, but no model (unspawned items)
-#define EF_FIRING				(1<<9)		// for lightning gun
-#define EF_ALT_FIRING			(1<<10)		// for alt-fires, mostly for lightning guns though
-#define EF_JETPACK_ACTIVE		(1<<11)		//jetpack is activated
-
-#define EF_NOT_USED_1			(1<<12)		// not used
-
-#define EF_TALK					(1<<13)		// draw a talk balloon
-#define EF_CONNECTION			(1<<14)		// draw a connection trouble sprite
-//Raz: EF_ALT_DIM
-//#define EF_NOT_USED_6			(1<<15)		// not used
-#define EF_ALT_DIM				(1<<15)		// Player is in the alternate dimension
-
-//Raz: EF_GRAPPLE_SWING
-//#define EF_NOT_USED_2			(1<<16)		// not used
-#define EF_GRAPPLE_SWING		(1<<16)		// not used
-
-#define EF_NOT_USED_2			(1<<17)		// not used
-#define EF_NOT_USED_3			(1<<18)		// not used
-
-#define EF_BODYPUSH				(1<<19)		//rww - claiming this for fullbody push effect
-
-#define EF_DOUBLE_AMMO			(1<<20)		// Hacky way to get around ammo max
-#define EF_SEEKERDRONE			(1<<21)		// show seeker drone floating around head
-#define EF_MISSILE_STICK		(1<<22)		// missiles that stick to the wall.
-#define EF_ITEMPLACEHOLDER		(1<<23)		// item effect
-#define EF_SOUNDTRACKER			(1<<24)		// sound position needs to be updated in relation to another entity
-#define EF_DROPPEDWEAPON		(1<<25)		// it's a dropped weapon
-#define EF_DISINTEGRATION		(1<<26)		// being disintegrated by the disruptor
-#define EF_INVULNERABLE			(1<<27)		// just spawned in or whatever, so is protected
-
-#define EF_CLIENTSMOOTH			(1<<28)		// standard lerporigin smooth override on client
-
-#define EF_JETPACK				(1<<29)		//rww - wearing a jetpack
-#define EF_JETPACK_FLAMING		(1<<30)		//rww - jetpack fire effect
-
-#define EF_NOT_USED_4			(1<<31)		// not used
-
+#define EF_G2ANIMATING		(0x00000001u) // perform g2 bone anims based on torsoAnim and legsAnim, works for ET_GENERAL -rww
+#define EF_DEAD				(0x00000002u) // don't draw a foe marker over players with EF_DEAD
+#define EF_RADAROBJECT		(0x00000004u) // display on team radar
+#define EF_TELEPORT_BIT		(0x00000008u) // toggled every time the origin abruptly changes
+#define EF_SHADER_ANIM		(0x00000010u) // Animating shader (by s.frame)
+#define EF_PLAYER_EVENT		(0x00000020u) // 
+#define EF_RAG				(0x00000040u) // ragdoll him even if he's alive
+#define EF_PERMANENT		(0x00000080u) // rww - I am claiming this. (for permanent entities)
+#define EF_NODRAW			(0x00000100u) // may have an event, but no model (unspawned items)
+#define EF_FIRING			(0x00000200u) // for lightning gun
+#define EF_ALT_FIRING		(0x00000400u) // for alt-fires, mostly for lightning guns though
+#define EF_JETPACK_ACTIVE	(0x00000800u) // jetpack is activated
+#define EF_NOT_USED_1		(0x00001000u) // 
+#define EF_TALK				(0x00002000u) // draw a talk balloon
+#define EF_CONNECTION		(0x00004000u) // draw a connection trouble sprite
+#define EF_ALT_DIM			(0x00008000u) // Player is in the alternate dimension
+#define EF_GRAPPLE_SWING	(0x00010000u) // swinging on grapple hook
+#define EF_NOT_USED_2		(0x00020000u) // 
+#define EF_NOT_USED_3		(0x00040000u) // 
+#define EF_BODYPUSH			(0x00080000u) // rww - claiming this for fullbody push effect
+#define EF_DOUBLE_AMMO		(0x00100000u) // Hacky way to get around ammo max
+#define EF_SEEKERDRONE		(0x00200000u) // show seeker drone floating around head
+#define EF_MISSILE_STICK	(0x00400000u) // missiles that stick to the wall.
+#define EF_ITEMPLACEHOLDER	(0x00800000u) // item effect
+#define EF_SOUNDTRACKER		(0x01000000u) // sound position needs to be updated in relation to another entity
+#define EF_DROPPEDWEAPON	(0x02000000u) // it's a dropped weapon
+#define EF_DISINTEGRATION	(0x04000000u) // being disintegrated by the disruptor
+#define EF_INVULNERABLE		(0x08000000u) // just spawned in or whatever, so is protected
+#define EF_CLIENTSMOOTH		(0x10000000u) // standard lerporigin smooth override on client
+#define EF_JETPACK			(0x20000000u) // rww - wearing a jetpack
+#define EF_JETPACK_FLAMING	(0x40000000u) // rww - jetpack fire effect
+#define EF_NOT_USED_4		(0x80000000u) // 
 
 //These new EF2_??? flags were added for NPCs, they really should not be used often.
 //NOTE: we only allow 10 of these!
-#define EF2_HELD_BY_MONSTER		(1<<0)		// Being held by something, like a Rancor or a Wampa
-#define EF2_USE_ALT_ANIM		(1<<1)		// For certain special runs/stands for creatures like the Rancor and Wampa whose runs/stands are conditional
-#define EF2_ALERTED				(1<<2)		// For certain special anims, for Rancor: means you've had an enemy, so use the more alert stand
-#define EF2_GENERIC_NPC_FLAG	(1<<3)		// So far, used for Rancor...
-#define EF2_FLYING				(1<<4)		// Flying FIXME: only used on NPCs doesn't *really* have to be passed over, does it?
-#define EF2_HYPERSPACE			(1<<5)		// Used to both start the hyperspace effect on the predicted client and to let the vehicle know it can now jump into hyperspace (after turning to face the proper angle)
-#define EF2_BRACKET_ENTITY		(1<<6)		// Draw as bracketed
-#define EF2_SHIP_DEATH			(1<<7)		// "died in ship" mode
-#define EF2_NOT_USED_1			(1<<8)		// not used
-//Raz: EF2_GRAPPLE_OUT
-#define EF2_GRAPPLE_OUT			(1<<9)
-
-
+#define EF2_HELD_BY_MONSTER		(0x0001u) // Being held by something, like a Rancor or a Wampa
+#define EF2_USE_ALT_ANIM		(0x0002u) // For certain special runs/stands for creatures like the Rancor and Wampa whose runs/stands are conditional
+#define EF2_ALERTED				(0x0004u) // For certain special anims, for Rancor: means you've had an enemy, so use the more alert stand
+#define EF2_GENERIC_NPC_FLAG	(0x0008u) // So far, used for Rancor...
+#define EF2_FLYING				(0x0010u) // Flying FIXME: only used on NPCs doesn't *really* have to be passed over, does it?
+#define EF2_HYPERSPACE			(0x0020u) // Used to both start the hyperspace effect on the predicted client and to let the vehicle know it can now jump into hyperspace (after turning to face the proper angle)
+#define EF2_BRACKET_ENTITY		(0x0040u) // Draw as bracketed
+#define EF2_SHIP_DEATH			(0x0080u) // "died in ship" mode
+#define EF2_NOT_USED_1			(0x0100u) //
+#define EF2_GRAPPLE_OUT			(0x0200u) // grapple hook is out
 
 typedef enum {
 	EFFECT_NONE = 0,
@@ -748,9 +718,9 @@ typedef enum ctfMsg_e {
 } ctfMsg_t;
 
 // reward sounds (stored in ps->persistant[PERS_PLAYEREVENTS])
-#define	PLAYEREVENT_DENIEDREWARD		0x0001
-#define	PLAYEREVENT_GAUNTLETREWARD		0x0002
-#define PLAYEREVENT_HOLYSHIT			0x0004
+#define	PLAYEREVENT_DENIEDREWARD		(0x0001u)
+#define	PLAYEREVENT_GAUNTLETREWARD		(0x0002u)
+#define PLAYEREVENT_HOLYSHIT			(0x0004u)
 
 // entityState_t->event values
 // entity events are for effects that take place reletive
@@ -761,8 +731,8 @@ typedef enum ctfMsg_e {
 // that an identical event started twice in a row can
 // be distinguished.  And off the value with ~EV_EVENT_BITS
 // to retrieve the actual event number
-#define	EV_EVENT_BIT1		0x00000100
-#define	EV_EVENT_BIT2		0x00000200
+#define	EV_EVENT_BIT1		(0x00000100u)
+#define	EV_EVENT_BIT2		(0x00000200u)
 #define	EV_EVENT_BITS		(EV_EVENT_BIT1|EV_EVENT_BIT2)
 
 #define	EVENT_VALID_MSEC	300
@@ -1185,13 +1155,16 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 
 // dmflags->integer flags
-#define	DF_NO_FALLING			8
-#define DF_FIXED_FOV			16
-#define	DF_NO_FOOTSTEPS			32
-#define DF_NO_DROWN				64	//RAZTODO
-#define DF_FIXED_YAW			128 //RAZTODO: Er, what do..
-#define DF_NO_FIXED_ANIMS		256 //RAZTODO: Whut?
-#define DF_NO_REALISTIC_HOOK	512 //RAZTODO: Whut?
+#define DF_UNUSED0001			(0x0001u)
+#define DF_UNUSED0002			(0x0002u)
+#define DF_UNUSED0004			(0x0004u)
+#define	DF_NO_FALLING			(0x0008u)
+#define DF_FIXED_FOV			(0x0010u)
+#define	DF_NO_FOOTSTEPS			(0x0020u)
+#define DF_NO_DROWN				(0x0040u) //RAZTODO
+#define DF_FIXED_YAW			(0x0080u) //RAZTODO: Er, what do..
+#define DF_NO_FIXED_ANIMS		(0x0100u) //RAZTODO: Whut?
+#define DF_NO_REALISTIC_HOOK	(0x0200u) //RAZTODO: Whut?
 
 //rwwRMG - added in CONTENTS_TERRAIN
 // content masks
@@ -1501,7 +1474,7 @@ typedef enum saberMoveName_e {
 	LS_MOVE_MAX//
 } saberMoveName_t;
 
-typedef enum {
+typedef enum saberQuadrant_e {
 	Q_BR,
 	Q_R,
 	Q_TR,
@@ -1513,13 +1486,12 @@ typedef enum {
 	Q_NUM_QUADS
 } saberQuadrant_t;
 
-typedef struct
-{
-	char *name;
+typedef struct saberMoveData_s {
+	const char *name;
 	int animToUse;
 	int	startQuad;
 	int	endQuad;
-	unsigned animSetFlags;
+	uint32_t animSetFlags;
 	int blendTime;
 	int blocking;
 	saberMoveName_t chain_idle;			// What move to call if the attack button is not pressed at the end of this anim
@@ -1588,54 +1560,47 @@ typedef enum saber_styles_e {
 } saber_styles_t;
 
 //SABER FLAGS
-//Old bools converted to a flag now
-#define SFL_NOT_LOCKABLE			(1<<0)//can't get into a saberlock
-#define SFL_NOT_THROWABLE			(1<<1)//can't be thrown - FIXME: maybe make this a max level of force saber throw that can be used with this saber?
-#define SFL_NOT_DISARMABLE			(1<<2)//can't be dropped
-#define SFL_NOT_ACTIVE_BLOCKING		(1<<3)//don't to try to block incoming shots with this saber
-#define SFL_TWO_HANDED				(1<<4)//uses both hands
-#define SFL_SINGLE_BLADE_THROWABLE	(1<<5)//can throw this saber if only the first blade is on
-#define SFL_RETURN_DAMAGE			(1<<6)//when returning from a saber throw, it keeps spinning and doing damage
-//NEW FLAGS
-#define SFL_ON_IN_WATER				(1<<7)//if set, weapon stays active even in water
-#define SFL_BOUNCE_ON_WALLS			(1<<8)//if set, the saber will bounce back when it hits solid architecture (good for real-sword type mods)
-#define SFL_BOLT_TO_WRIST			(1<<9)//if set, saber model is bolted to wrist, not in hand... useful for things like claws & shields, etc.
-//#define SFL_STICK_ON_IMPACT		(1<<?)//if set, the saber will stick in the wall when thrown and hits solid architecture (good for sabers that are meant to be thrown).
-//#define SFL_NO_ATTACK				(1<<?)//if set, you cannot attack with the saber (for sabers/weapons that are meant to be thrown only, not used as melee weapons).
-//Move Restrictions
-#define SFL_NO_PULL_ATTACK			(1<<10)//if set, cannot do pull+attack move (move not available in MP anyway)
-#define SFL_NO_BACK_ATTACK			(1<<11)//if set, cannot do back-stab moves
-#define SFL_NO_STABDOWN				(1<<12)//if set, cannot do stabdown move (when enemy is on ground)
-#define SFL_NO_WALL_RUNS			(1<<13)//if set, cannot side-run or forward-run on walls
-#define SFL_NO_WALL_FLIPS			(1<<14)//if set, cannot do backflip off wall or side-flips off walls
-#define SFL_NO_WALL_GRAB			(1<<15)//if set, cannot grab wall & jump off
-#define SFL_NO_ROLLS				(1<<16)//if set, cannot roll
-#define SFL_NO_FLIPS				(1<<17)//if set, cannot do flips
-#define SFL_NO_CARTWHEELS			(1<<18)//if set, cannot do cartwheels
-#define SFL_NO_KICKS				(1<<19)//if set, cannot do kicks (can't do kicks anyway if using a throwable saber/sword)
-#define SFL_NO_MIRROR_ATTACKS		(1<<20)//if set, cannot do the simultaneous attack left/right moves (only available in Dual Lightsaber Combat Style)
-#define SFL_NO_ROLL_STAB			(1<<21)//if set, cannot do roll-stab move at end of roll
-//SABER FLAGS2
-//Primary Blade Style
-#define SFL2_NO_WALL_MARKS			(1<<0)//if set, stops the saber from drawing marks on the world (good for real-sword type mods)
-#define SFL2_NO_DLIGHT				(1<<1)//if set, stops the saber from drawing a dynamic light (good for real-sword type mods)
-#define SFL2_NO_BLADE				(1<<2)//if set, stops the saber from drawing a blade (good for real-sword type mods)
-#define SFL2_NO_CLASH_FLARE			(1<<3)//if set, the saber will not do the big, white clash flare with other sabers
-#define SFL2_NO_DISMEMBERMENT		(1<<4)//if set, the saber never does dismemberment (good for pointed/blunt melee weapons)
-#define SFL2_NO_IDLE_EFFECT			(1<<5)//if set, the saber will not do damage or any effects when it is idle (not in an attack anim).  (good for real-sword type mods)
-#define SFL2_ALWAYS_BLOCK			(1<<6)//if set, the blades will always be blocking (good for things like shields that should always block)
-#define SFL2_NO_MANUAL_DEACTIVATE	(1<<7)//if set, the blades cannot manually be toggled on and off
-#define SFL2_TRANSITION_DAMAGE		(1<<8)//if set, the blade does damage in start, transition and return anims (like strong style does)
-//Secondary Blade Style
-#define SFL2_NO_WALL_MARKS2			(1<<9)//if set, stops the saber from drawing marks on the world (good for real-sword type mods)
-#define SFL2_NO_DLIGHT2				(1<<10)//if set, stops the saber from drawing a dynamic light (good for real-sword type mods)
-#define SFL2_NO_BLADE2				(1<<11)//if set, stops the saber from drawing a blade (good for real-sword type mods)
-#define SFL2_NO_CLASH_FLARE2		(1<<12)//if set, the saber will not do the big, white clash flare with other sabers
-#define SFL2_NO_DISMEMBERMENT2		(1<<13)//if set, the saber never does dismemberment (good for pointed/blunt melee weapons)
-#define SFL2_NO_IDLE_EFFECT2		(1<<14)//if set, the saber will not do damage or any effects when it is idle (not in an attack anim).  (good for real-sword type mods)
-#define SFL2_ALWAYS_BLOCK2			(1<<15)//if set, the blades will always be blocking (good for things like shields that should always block)
-#define SFL2_NO_MANUAL_DEACTIVATE2	(1<<16)//if set, the blades cannot manually be toggled on and off
-#define SFL2_TRANSITION_DAMAGE2		(1<<17)//if set, the blade does damage in start, transition and return anims (like strong style does)
+#define SFL_NOT_LOCKABLE			(0x00000001u) // can't get into a saberlock
+#define SFL_NOT_THROWABLE			(0x00000002u) // can't be thrown - FIXME: maybe make this a max level of force saber throw that can be used with this saber?
+#define SFL_NOT_DISARMABLE			(0x00000004u) // can't be dropped
+#define SFL_NOT_ACTIVE_BLOCKING		(0x00000008u) // don't to try to block incoming shots with this saber
+#define SFL_TWO_HANDED				(0x00000010u) // uses both hands
+#define SFL_SINGLE_BLADE_THROWABLE	(0x00000020u) // can throw this saber if only the first blade is on
+#define SFL_RETURN_DAMAGE			(0x00000040u) // when returning from a saber throw, it keeps spinning and doing damage
+#define SFL_ON_IN_WATER				(0x00000080u) // weapon stays active even in water
+#define SFL_BOUNCE_ON_WALLS			(0x00000100u) // the saber will bounce back when it hits solid architecture (good for real-sword type mods)
+#define SFL_BOLT_TO_WRIST			(0x00000200u) // saber model is bolted to wrist, not in hand... useful for things like claws & shields, etc.
+#define SFL_NO_PULL_ATTACK			(0x00000400u) // cannot do pull+attack move (move not available in MP anyway)
+#define SFL_NO_BACK_ATTACK			(0x00000800u) // cannot do back-stab moves
+#define SFL_NO_STABDOWN				(0x00001000u) // cannot do stabdown move (when enemy is on ground)
+#define SFL_NO_WALL_RUNS			(0x00002000u) // cannot side-run or forward-run on walls
+#define SFL_NO_WALL_FLIPS			(0x00004000u) // cannot do backflip off wall or side-flips off walls
+#define SFL_NO_WALL_GRAB			(0x00008000u) // cannot grab wall & jump off
+#define SFL_NO_ROLLS				(0x00010000u) // cannot roll
+#define SFL_NO_FLIPS				(0x00020000u) // cannot do flips
+#define SFL_NO_CARTWHEELS			(0x00040000u) // cannot do cartwheels
+#define SFL_NO_KICKS				(0x00080000u) // cannot do kicks (can't do kicks anyway if using a throwable saber/sword)
+#define SFL_NO_MIRROR_ATTACKS		(0x00100000u) // cannot do the simultaneous attack left/right moves (only available in Dual Lightsaber Combat Style)
+#define SFL_NO_ROLL_STAB			(0x00200000u) // cannot do roll-stab move at end of roll
+
+#define SFL2_NO_WALL_MARKS			(0x00000001u) // stops the saber from drawing marks on the world (good for real-sword type mods)
+#define SFL2_NO_DLIGHT				(0x00000002u) // stops the saber from drawing a dynamic light (good for real-sword type mods)
+#define SFL2_NO_BLADE				(0x00000004u) // stops the saber from drawing a blade (good for real-sword type mods)
+#define SFL2_NO_CLASH_FLARE			(0x00000008u) // the saber will not do the big, white clash flare with other sabers
+#define SFL2_NO_DISMEMBERMENT		(0x00000010u) // the saber never does dismemberment (good for pointed/blunt melee weapons)
+#define SFL2_NO_IDLE_EFFECT			(0x00000020u) // the saber will not do damage or any effects when it is idle (not in an attack anim).  (good for real-sword type mods)
+#define SFL2_ALWAYS_BLOCK			(0x00000040u) // the blades will always be blocking (good for things like shields that should always block)
+#define SFL2_NO_MANUAL_DEACTIVATE	(0x00000080u) // the blades cannot manually be toggled on and off
+#define SFL2_TRANSITION_DAMAGE		(0x00000100u) // the blade does damage in start, transition and return anims (like strong style does)
+#define SFL2_NO_WALL_MARKS2			(0x00000200u) // stops the saber from drawing marks on the world (good for real-sword type mods)
+#define SFL2_NO_DLIGHT2				(0x00000400u) // stops the saber from drawing a dynamic light (good for real-sword type mods)
+#define SFL2_NO_BLADE2				(0x00000800u) // stops the saber from drawing a blade (good for real-sword type mods)
+#define SFL2_NO_CLASH_FLARE2		(0x00001000u) // the saber will not do the big, white clash flare with other sabers
+#define SFL2_NO_DISMEMBERMENT2		(0x00002000u) // the saber never does dismemberment (good for pointed/blunt melee weapons)
+#define SFL2_NO_IDLE_EFFECT2		(0x00004000u) // the saber will not do damage or any effects when it is idle (not in an attack anim).  (good for real-sword type mods)
+#define SFL2_ALWAYS_BLOCK2			(0x00008000u) // the blades will always be blocking (good for things like shields that should always block)
+#define SFL2_NO_MANUAL_DEACTIVATE2	(0x00010000u) // the blades cannot manually be toggled on and off
+#define SFL2_TRANSITION_DAMAGE2		(0x00020000u) // the blade does damage in start, transition and return anims (like strong style does)
 
 #define SABER_NAME_LENGTH (64)
 typedef struct saberInfo_s {
@@ -1660,7 +1625,7 @@ typedef struct saberInfo_s {
 	saber_styles_t	singleBladeStyle;						// makes it so that you use a different style if you only have the first blade active
 
 	//these values are global to the saber, like all of the ones above
-	int				saberFlags, saberFlags2;				// from SFL(2)_ list above
+	uint32_t		saberFlags, saberFlags2;				// from SFL(2)_ list above
 
 	//done in cgame (client-side code)
 	qhandle_t		spinSound;								// none - if set, plays this sound as it spins when thrown
@@ -1718,53 +1683,7 @@ qboolean BG_KnockDownable(playerState_t *ps);
 qboolean BG_LegalizedForcePowers(char *powerOut, size_t powerOutSize, int maxRank, qboolean freeSaber, int teamForce, int gametype, int fpDisabled);
 
 
-#ifdef __LCC__ //can't inline it then, it is declared over in bg_misc in this case
-void BG_GiveMeVectorFromMatrix(mdxaBone_t *boltMatrix, int flags, vector3 *vec);
-#else
-// given a boltmatrix, return in vec a normalised vector for the axis requested in flags
-static QINLINE void BG_GiveMeVectorFromMatrix(mdxaBone_t *boltMatrix, int flags, vector3 *vec)
-{
-	switch (flags)
-	{
-	case ORIGIN:
-		vec->data[0] = boltMatrix->matrix[0][3];
-		vec->data[1] = boltMatrix->matrix[1][3];
-		vec->data[2] = boltMatrix->matrix[2][3];
-		break;
-	case POSITIVE_Y:
-		vec->data[0] = boltMatrix->matrix[0][1];
-		vec->data[1] = boltMatrix->matrix[1][1];
-		vec->data[2] = boltMatrix->matrix[2][1];
- 		break;
-	case POSITIVE_X:
-		vec->data[0] = boltMatrix->matrix[0][0];
-		vec->data[1] = boltMatrix->matrix[1][0];
-		vec->data[2] = boltMatrix->matrix[2][0];
-		break;
-	case POSITIVE_Z:
-		vec->data[0] = boltMatrix->matrix[0][2];
-		vec->data[1] = boltMatrix->matrix[1][2];
-		vec->data[2] = boltMatrix->matrix[2][2];
-		break;
-	case NEGATIVE_Y:
-		vec->data[0] = -boltMatrix->matrix[0][1];
-		vec->data[1] = -boltMatrix->matrix[1][1];
-		vec->data[2] = -boltMatrix->matrix[2][1];
-		break;
-	case NEGATIVE_X:
-		vec->data[0] = -boltMatrix->matrix[0][0];
-		vec->data[1] = -boltMatrix->matrix[1][0];
-		vec->data[2] = -boltMatrix->matrix[2][0];
-		break;
-	case NEGATIVE_Z:
-		vec->data[0] = -boltMatrix->matrix[0][2];
-		vec->data[1] = -boltMatrix->matrix[1][2];
-		vec->data[2] = -boltMatrix->matrix[2][2];
-		break;
-	}
-}
-#endif
-
+void BG_GiveMeVectorFromMatrix( mdxaBone_t *boltMatrix, uint32_t flags, vector3 *vec );
 
 void BG_IK_MoveArm(void *ghoul2, int lHandBolt, int time, entityState_t *ent, int basePose, vector3 *desiredPos, qboolean *ikInProgress,
 					 vector3 *origin, vector3 *angles, vector3 *scale, int blendTime, qboolean forceHalt);

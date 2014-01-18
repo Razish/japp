@@ -2593,7 +2593,7 @@ NPC_FindCombatPoint
 #define MIN_AVOID_DISTANCE_SQUARED	( MIN_AVOID_DISTANCE * MIN_AVOID_DISTANCE )
 #define	CP_COLLECT_RADIUS			512.0f
 
-int NPC_FindCombatPoint( const vector3 *position, const vector3 *avoidPosition, vector3 *enemyPosition, const int flags, const float avoidDist, const int ignorePoint )
+int NPC_FindCombatPoint( const vector3 *position, const vector3 *avoidPosition, vector3 *enemyPosition, const uint32_t flags, const float avoidDist, const int ignorePoint )
 {
 	combatPt_t		points[MAX_COMBAT_POINTS];
 	int				best = -1, cost, bestCost = Q3_INFINITE, waypoint = WAYPOINT_NONE;

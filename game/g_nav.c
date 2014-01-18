@@ -8,20 +8,10 @@ extern qboolean G_EntIsRemovableUsable( int entNum );
 extern qboolean G_FindClosestPointOnLineSegment( const vector3 *start, const vector3 *end, const vector3 *from, vector3 *result );
 
 void G_TestLine( vector3 *start, vector3 *end, int color, int time );
-void G_DrawNode( vector3 *origin, int type )
-{
-#if 0
-	//Raz: Added
-	vector3 tempOrg = { 0.0f };
-	VectorCopy( origin, tempOrg );
-	tempOrg[2] += 64.0f;
-	G_TestLine( origin, tempOrg, 3, 100 );
-#endif
+void G_DrawNode( vector3 *origin, int type ) {
 }
 
-void TAG_ShowTags( int flags )
-{
-
+void TAG_ShowTags( uint32_t flags ) {
 }
 
 qboolean FlyingCreature( gentity_t *ent )
@@ -851,7 +841,7 @@ NAV_TestForBlocked
 -------------------------
 */
 
-qboolean NAV_TestForBlocked( gentity_t *self, gentity_t *goal, gentity_t *blocker, float distance, int *flags )
+qboolean NAV_TestForBlocked( gentity_t *self, gentity_t *goal, gentity_t *blocker, float distance, uint32_t *flags )
 {
 	if ( goal == NULL )
 		return qfalse;

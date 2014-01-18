@@ -424,12 +424,10 @@ typedef enum {
 	LE_LINE
 } leType_t;
 
-typedef enum {
-	LEF_PUFF_DONT_SCALE = 0x0001,			// do not scale size over time
-	LEF_TUMBLE			= 0x0002,			// tumble over time, used for ejecting shells
-	LEF_FADE_RGB		= 0x0004,			// explicitly fade
-	LEF_NO_RANDOM_ROTATE= 0x0008			// MakeExplosion adds random rotate which could be bad in some cases
-} leFlag_t;
+#define LEF_PUFF_DONT_SCALE		(0x0001u) // do not scale size over time
+#define LEF_TUMBLE				(0x0002u) // tumble over time, used for ejecting shells
+#define LEF_FADE_RGB			(0x0004u) // explicitly fade
+#define LEF_NO_RANDOM_ROTATE	(0x0008u) // MakeExplosion adds random rotate which could be bad in some cases
 
 typedef enum {
 	LEMT_NONE,
@@ -448,7 +446,7 @@ typedef enum {
 typedef struct localEntity_s {
 	struct localEntity_s	*prev, *next;
 	leType_t		leType;
-	int				leFlags;
+	uint32_t		leFlags;
 
 	int				startTime;
 	int				endTime;
@@ -561,7 +559,7 @@ typedef struct score_s {
 	int score, deaths;
 	int ping;
 	int time;
-	int scoreFlags;
+	uint32_t scoreFlags;
 	int powerUps;
 	int accuracy;
 	int impressiveCount, excellentCount, gauntletCount, defendCount, assistCount;
@@ -659,16 +657,6 @@ typedef struct powerupInfo_s {
 // occurs, and they will have visible effects for #define STEP_TIME or whatever msec after
 
 #define MAX_PREDICTED_EVENTS	16
-
-#if 0 //this feels sooooo good
-typedef enum jappMods_e
-{
-	SMOD_BASE = 0,	//	Base
-	SMOD_JAP,		//	JA+
-	SMOD_JAPP,		//	JA++
-	SMOD_UNKNOWN,	//	Something else, somehow.
-} jappMods_t;
-#endif
 
 extern const char *modNames[];
 
@@ -937,25 +925,20 @@ Ghoul2 Insert End
 	chatBoxItem_t		chatItems[MAX_CHATBOX_ITEMS];
 	int					chatItemActive;
 
-	//Raz: Added
-	struct japp
-	{
-		unsigned int		SSF;
-
-		int					fps;		//	FPS for stats HUD
-
-		qboolean			timestamp24Hour;
-
-		qboolean			isGhosted; //amghost
+	struct japp {
+		uint32_t		SSF;
+		int				fps;		//	FPS for stats HUD
+		qboolean		timestamp24Hour;
+		qboolean		isGhosted; //amghost
 
 		//Smod: strafe helper
-		refEntity_t			velocityVect;
-		refEntity_t			leftIdeal;
-		refEntity_t			rightIdeal;
-		qboolean			isfixedVector;
-		vector3				fixedVector;
+		refEntity_t		velocityVect;
+		refEntity_t		leftIdeal;
+		refEntity_t		rightIdeal;
+		qboolean		isfixedVector;
+		vector3			fixedVector;
 
-		qboolean			fakeGun;
+		qboolean		fakeGun;
 	} japp;
 
 	struct log {
@@ -1569,7 +1552,7 @@ typedef struct cgs_s {
 	int				debugMelee;
 	int				stepSlideFix;
 	int				noSpecMove;
-	int				dmflags;
+	uint32_t		dmflags;
 	int				fraglimit;
 	int				duel_fraglimit;
 	int				capturelimit;
@@ -1641,14 +1624,13 @@ typedef struct cgs_s {
 
 	//Raz: serverinfo vars
 	struct {
-		unsigned int	jp_cinfo;
-		char			serverName[MAX_HOSTNAMELENGTH];
-		int				overbounce;
+		uint32_t	jp_cinfo;
+		char		serverName[MAX_HOSTNAMELENGTH];
+		int			overbounce;
 	} japp;
 } cgs_t;
 
-typedef struct siegeExtended_s
-{
+typedef struct siegeExtended_s {
 	int			health;
 	int			maxhealth;
 	int			ammo;
@@ -1786,12 +1768,12 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vector3 *he
 void CG_DrawActive( stereoFrame_t stereoView );
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D );
 void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team );
-void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vector4 *color, qhandle_t shader, int textStyle,int font);
+void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, vector4 *color, qhandle_t shader, int textStyle,int font);
 void CG_Text_Paint(float x, float y, float scale, vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont);
 float CG_Text_Width(const char *text, float scale, int iMenuFont);
 float CG_Text_Height(const char *text, float scale, int iMenuFont);
 float CG_GetValue(int ownerDraw);
-qboolean CG_OwnerDrawVisible(int flags);
+qboolean CG_OwnerDrawVisible(uint32_t flags);
 void CG_RunMenuScript(char **args);
 qboolean CG_DeferMenuScript(char **args);
 void CG_ShowResponseHead(void);
@@ -1930,33 +1912,19 @@ void	CG_AddLocalEntities( void );
 //
 // cg_effects.c
 //
-localEntity_t *CG_SmokePuff( const vector3 *p, 
-				   const vector3 *vel, 
-				   float radius,
-				   float r, float g, float b, float a,
-				   float duration,
-				   int startTime,
-				   int fadeInTime,
-				   int leFlags,
-				   qhandle_t hShader );
+localEntity_t *CG_SmokePuff( const vector3 *p, const vector3 *vel, float radius, float r, float g, float b, float a,
+	float duration, int startTime, int fadeInTime, uint32_t leFlags, qhandle_t hShader );
 void CG_BubbleTrail( vector3 *start, vector3 *end, float spacing );
 void CG_GlassShatter(int entnum, vector3 *dmgPt, vector3 *dmgDir, float dmgRadius, int maxShards);
 void CG_ScorePlum( int client, vector3 *org, int score );
-
-void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3 *mins, const vector3 *maxs, 
-						float speed, int numChunks, material_t chunkType, int customChunk, float baseScale );
+void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3 *mins, const vector3 *maxs, float speed,
+	int numChunks, material_t chunkType, int customChunk, float baseScale );
 void CG_MiscModelExplosion( vector3 *mins, vector3 *maxs, int size, material_t chunkType );
-
 void CG_Bleed( vector3 *origin, int entityNum );
-
-localEntity_t *CG_MakeExplosion( vector3 *origin, vector3 *dir, 
-								qhandle_t hModel, int numframes, qhandle_t shader, int msec,
-								qboolean isSprite, float scale, int flags );// Overloaded in single player
-
+localEntity_t *CG_MakeExplosion( vector3 *origin, vector3 *dir, qhandle_t hModel, int numframes, qhandle_t shader,
+	int msec, qboolean isSprite, float scale, uint32_t flags );
 void CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float shake_speed, qboolean smoke );
-
 void CG_TestLine( vector3 *start, vector3 *end, int time, unsigned int color, int radius);
-
 void CG_InitGlass( void );
 
 //
@@ -2094,7 +2062,7 @@ void CG_ScoresDown_f( void );
 void CG_TrueViewInit( void );
 void CG_AdjustEyePos( const char *modelName );
 
-qboolean Server_Supports( unsigned int supportFlag );
+qboolean Server_Supports( uint32_t supportFlag );
 void HandleTeamBinds( char *buf, int bufsize );
 
 // chatbox stuff
@@ -2134,14 +2102,14 @@ refdef_t *CG_GetRefdef( void );
 qboolean CG_WorldCoordToScreenCoordFloat( const vector3 *point, float *x, float *y );
 
 void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end );
-#define NEWFX_DISINT		0x0001
-#define NEWFX_RUPTOR		0x0002
-#define NEWFX_REPEATER_ALT	0x0004
-#define NEWFX_SIMPLEFLAG	0x0008
-#define NEWFX_TRANSFLAG		0x0010
+#define NEWFX_DISINT		(0x0001u)
+#define NEWFX_RUPTOR		(0x0002u)
+#define NEWFX_REPEATER_ALT	(0x0004u)
+#define NEWFX_SIMPLEFLAG	(0x0008u)
+#define NEWFX_TRANSFLAG		(0x0010u)
 
-#define DRAWTIMER_ENABLE	0x0001
-#define DRAWTIMER_COUNTDOWN	0x0002
-#define DRAWTIMER_COLOUR	0x0004
+#define DRAWTIMER_ENABLE	(0x0001u)
+#define DRAWTIMER_COUNTDOWN	(0x0002u)
+#define DRAWTIMER_COLOUR	(0x0004u)
 
 extern cgameImport_t *trap;

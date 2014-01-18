@@ -2,7 +2,7 @@
 #include "g_nav.h"
 
 qboolean NAV_CheckAhead( gentity_t *self, vector3 *end, trace_t *trace, int clipmask );
-qboolean NAV_TestForBlocked( gentity_t *self, gentity_t *goal, gentity_t *blocker, float distance, int *flags );
+qboolean NAV_TestForBlocked( gentity_t *self, gentity_t *goal, gentity_t *blocker, float distance, uint32_t *flags );
 
 void G_Line( vector3 *start, vector3 *end, vector3 *color, float alpha );
 void G_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha );
@@ -10,7 +10,7 @@ void G_CubeOutline( vector3 *mins, vector3 *maxs, int time, unsigned int color, 
 void G_DrawEdge( vector3 *start, vector3 *end, int type );
 void G_DrawNode( vector3 *origin, int type );
 void G_DrawCombatPoint( vector3 *origin, int type );
-void TAG_ShowTags( int flags );
+void TAG_ShowTags( uint32_t flags );
 
 qboolean NAV_CheckNodeFailedForEnt( gentity_t *ent, int nodeNum )
 {

@@ -3,12 +3,11 @@
 //
 
 // NOTENOTE This is not the best, DO NOT CHANGE THESE!
-#define	FX_ALPHA_LINEAR		0x00000001
-#define	FX_SIZE_LINEAR		0x00000100
-//STC: Added from EffectsEd code
-#define FX_TAPER			0x01000000
-#define FX_BRANCH			0x02000000
-#define FX_GROW				0x04000000
+#define	FX_ALPHA_LINEAR		(0x00000001u)
+#define	FX_SIZE_LINEAR		(0x00000100u)
+#define FX_TAPER			(0x01000000u)
+#define FX_BRANCH			(0x02000000u)
+#define FX_GROW				(0x04000000u)
 
 
 // Bryar

@@ -177,7 +177,7 @@ typedef struct cvarTable_s {
 	vmCvar_t	*vmCvar;
 	char		*cvarName, *defaultString;
 	void		(*update)( void );
-	int			cvarFlags;
+	uint32_t	cvarFlags;
 	qboolean	trackChange; // track this variable, and announce if changed
 } cvarTable_t;
 

@@ -12,14 +12,15 @@
 #define EC	"\x19"
 
 //match template contexts
-#define MTCONTEXT_MISC					2
-#define MTCONTEXT_INITIALTEAMCHAT		4
-#define MTCONTEXT_TIME					8
-#define MTCONTEXT_TEAMMATE				16
-#define MTCONTEXT_ADDRESSEE				32
-#define MTCONTEXT_PATROLKEYAREA			64
-#define MTCONTEXT_REPLYCHAT				128
-#define MTCONTEXT_CTF					256
+#define MTCONTEXT_UNUSED0001			(0x0001u)
+#define MTCONTEXT_MISC					(0x0002u)
+#define MTCONTEXT_INITIALTEAMCHAT		(0x0004u)
+#define MTCONTEXT_TIME					(0x0008u)
+#define MTCONTEXT_TEAMMATE				(0x0010u)
+#define MTCONTEXT_ADDRESSEE				(0x0020u)
+#define MTCONTEXT_PATROLKEYAREA			(0x0040u)
+#define MTCONTEXT_REPLYCHAT				(0x0080u)
+#define MTCONTEXT_CTF					(0x0100u)
 
 //message types
 #define MSG_NEWLEADER					1		//new leader
@@ -74,24 +75,25 @@
 #define MSG_CTF							300		//ctf message
 
 //command sub types
-#define ST_SOMEWHERE					0
-#define ST_NEARITEM						1
-#define ST_ADDRESSED					2
-#define ST_METER						4
-#define ST_FEET							8
-#define ST_TIME							16
-#define ST_HERE							32
-#define ST_THERE						64
-#define ST_I							128
-#define ST_MORE							256
-#define ST_BACK							512
-#define ST_REVERSE						1024
-#define ST_SOMEONE						2048
-#define ST_GOTFLAG						4096
-#define ST_CAPTUREDFLAG					8192
-#define ST_RETURNEDFLAG					16384
-#define ST_TEAM							32768
-#define ST_1FCTFGOTFLAG					65535
+#define ST_SOMEWHERE		(0x00000000u)
+#define ST_NEARITEM			(0x00000001u)
+#define ST_ADDRESSED		(0x00000002u)
+#define ST_METER			(0x00000004u)
+#define ST_FEET				(0x00000008u)
+#define ST_TIME				(0x00000010u)
+#define ST_HERE				(0x00000020u)
+#define ST_THERE			(0x00000040u)
+#define ST_I				(0x00000080u)
+#define ST_MORE				(0x00000100u)
+#define ST_BACK				(0x00000200u)
+#define ST_REVERSE			(0x00000400u)
+#define ST_SOMEONE			(0x00000800u)
+#define ST_GOTFLAG			(0x00001000u)
+#define ST_CAPTUREDFLAG		(0x00002000u)
+#define ST_RETURNEDFLAG		(0x00004000u)
+#define ST_TEAM				(0x00008000u)
+#define ST_1FCTFGOTFLAG		(0x00010000u)
+
 //ctf task preferences
 #define ST_DEFENDER						1
 #define ST_ATTACKER						2

@@ -25,9 +25,9 @@ void UI_DrawForceStars( rectDef_t *rect, float scale, vector4 *color, int textSt
 void UI_UpdateClientForcePowers( const char *teamArg );
 void UI_SaveForceTemplate( void );
 void UI_UpdateForcePowers( void );
-qboolean UI_SkinColor_HandleKey( int flags, float *special, int key, int num, int min, int max, int type );
-qboolean UI_ForceSide_HandleKey( int flags, float *special, int key, int num, int min, int max, int type );
-qboolean UI_JediNonJedi_HandleKey( int flags, float *special, int key, int num, int min, int max, int type );
-qboolean UI_ForceMaxRank_HandleKey( int flags, float *special, int key, int num, int min, int max, int type );
-qboolean UI_ForcePowerRank_HandleKey( int flags, float *special, int key, int num, int min, int max, int type );
+qboolean UI_SkinColor_HandleKey( uint32_t flags, float *special, int key, int num, int min, int max, int type );
+qboolean UI_ForceSide_HandleKey( uint32_t flags, float *special, int key, int num, int min, int max, int type );
+qboolean UI_JediNonJedi_HandleKey( uint32_t flags, float *special, int key, int num, int min, int max, int type );
+qboolean UI_ForceMaxRank_HandleKey( uint32_t flags, float *special, int key, int num, int min, int max, int type );
+qboolean UI_ForcePowerRank_HandleKey( uint32_t flags, float *special, int key, int num, int min, int max, int type );
 void UI_ForceConfigHandle( int oldindex, int newindex );

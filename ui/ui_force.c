@@ -766,7 +766,7 @@ validitycheck:
 extern int	uiSkinColor;
 extern int	uiHoldSkinColor;
 
-qboolean UI_SkinColor_HandleKey(int flags, float *special, int key, int num, int min, int max, int type) 
+qboolean UI_SkinColor_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type) 
 {
   if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER) 
   {
@@ -806,7 +806,7 @@ qboolean UI_SkinColor_HandleKey(int flags, float *special, int key, int num, int
 
 
 
-qboolean UI_ForceSide_HandleKey(int flags, float *special, int key, int num, int min, int max, int type) 
+qboolean UI_ForceSide_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type) 
 {
 	char info[MAX_INFO_VALUE];
 
@@ -874,7 +874,7 @@ qboolean UI_ForceSide_HandleKey(int flags, float *special, int key, int num, int
 	return qfalse;
 }
 
-qboolean UI_JediNonJedi_HandleKey(int flags, float *special, int key, int num, int min, int max, int type) 
+qboolean UI_JediNonJedi_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type) 
 {
 	char info[MAX_INFO_VALUE];
 
@@ -951,7 +951,7 @@ qboolean UI_JediNonJedi_HandleKey(int flags, float *special, int key, int num, i
 	return qfalse;
 }
 
-qboolean UI_ForceMaxRank_HandleKey(int flags, float *special, int key, int num, int min, int max, int type) 
+qboolean UI_ForceMaxRank_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type) 
 {
   if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER) 
   {
@@ -993,7 +993,7 @@ qboolean UI_ForceMaxRank_HandleKey(int flags, float *special, int key, int num, 
 
 
 // This function will either raise or lower a power by one rank.
-qboolean UI_ForcePowerRank_HandleKey(int flags, float *special, int key, int num, int min, int max, int type) 
+qboolean UI_ForcePowerRank_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type) 
 {
 	qboolean raising;
 

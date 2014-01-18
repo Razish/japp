@@ -2784,7 +2784,7 @@ TAG_Add
 -------------------------
 */
 
-reference_tag_t	*TAG_Add( const char *name, const char *owner, vector3 *origin, vector3 *angles, int radius, int flags )
+reference_tag_t	*TAG_Add( const char *name, const char *owner, vector3 *origin, vector3 *angles, int radius, uint32_t flags )
 {
 	reference_tag_t	*tag = NULL;
 	tagOwner_t	*tagOwner = NULL;
@@ -2941,7 +2941,7 @@ TAG_GetFlags
 -------------------------
 */
 
-int TAG_GetFlags( const char *owner, const char *name )
+uint32_t TAG_GetFlags( const char *owner, const char *name )
 {
 	reference_tag_t	*tag = TAG_Find( owner, name );
 

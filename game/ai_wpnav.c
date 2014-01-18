@@ -16,9 +16,9 @@ int gLastPrintedIndex = -1;
 nodeobject_t nodetable[MAX_NODETABLE_SIZE];
 int nodenum; //so we can connect broken trails
 
-int gLevelFlags = 0;
+uint32_t gLevelFlags = 0;
 
-char *GetFlagStr( int flags )
+char *GetFlagStr( uint32_t flags )
 {
 	char *flagstr;
 	int i;

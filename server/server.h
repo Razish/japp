@@ -377,7 +377,7 @@ int SV_PointContents( const vector3 *p, int passEntityNum );
 // returns the CONTENTS_* value from the world and all entities at the given point.
 
 
-void SV_Trace( trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentmask, int capsule, int traceFlags, int useLod );
+void SV_Trace( trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentmask, int capsule, uint32_t traceFlags, int useLod );
 // mins and maxs are relative
 
 // if the entire move stays in a solid volume, trace.allsolid will be set,

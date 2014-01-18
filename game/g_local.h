@@ -183,7 +183,7 @@ struct gentity_s {
 
 	int			lockCount; //used by NPCs
 
-	int			spawnflags;			// set in QuakeEd
+	uint32_t	spawnflags;			// set in QuakeEd
 
 	int			teamnodmg;			// damage will be ignored if it comes from this team
 
@@ -212,7 +212,7 @@ struct gentity_s {
 	qboolean	neverFree;			// if true, FreeEntity will only unlink
 									// bodyque uses this
 
-	int			flags;				// FL_* variables
+	uint32_t	flags;				// FL_* variables
 
 	char		*model, *model2;
 	int			freetime;			// level.time when the object was freed
@@ -293,7 +293,7 @@ struct gentity_s {
 	qboolean	takedamage;
 	material_t	material;
 
-	int			dflags;
+	uint32_t	dflags;
 	int			damage, splashDamage;
 	int			splashRadius;
 	int			methodOfDeath, splashMethodOfDeath;
@@ -492,7 +492,7 @@ typedef struct renderInfo_s {
 	int		customAlpha;//Alpha to apply, 0 = none?
 
 	//RF?
-	int			renderFlags;
+	uint32_t	renderFlags;
 
 	vector3		muzzlePoint, muzzlePointOld;
 	vector3		muzzleDir, muzzleDirOld;
@@ -725,7 +725,7 @@ typedef struct gclient_s {
 
 	int			noLightningTime;
 
-	unsigned int mGameFlags;
+	uint32_t	 mGameFlags;
 
 	//fallen duelist
 	qboolean	iAmALoser;
@@ -761,7 +761,7 @@ typedef struct interestPoint_s {
 
 typedef struct combatPoint_s {
 	vector3		origin;
-	int			flags;
+	uint32_t	flags;
 	qboolean	occupied;
 	int			waypoint;
 	int			dangerTime;
@@ -1028,7 +1028,7 @@ void	G_Throw( gentity_t *targ, vector3 *newDir, float push );
 
 void	G_CreateFakeClient(int entNum, gclient_t **cl);
 
-void	G_SetAnim(gentity_t *ent, usercmd_t *ucmd, int setAnimParts, int anim, int setAnimFlags, int blendTime);
+void	G_SetAnim(gentity_t *ent, usercmd_t *ucmd, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime);
 gentity_t *G_PickTarget (char *targetname);
 void	GlobalUse(gentity_t *self, gentity_t *other, gentity_t *activator);
 void	G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *string );
@@ -1085,7 +1085,7 @@ Ghoul2 Insert End
 // g_combat.c
 //
 qboolean CanDamage (gentity_t *targ, vector3 *origin);
-void G_Damage (gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vector3 *dir, vector3 *point, int damage, int dflags, int mod);
+void G_Damage (gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vector3 *dir, vector3 *point, int damage, uint32_t dflags, int mod);
 qboolean G_RadiusDamage (vector3 *origin, gentity_t *attacker, float damage, float radius, gentity_t *ignore, gentity_t *missile, int mod);
 void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath );
 void TossClientWeapon(gentity_t *self, vector3 *direction, float speed);
@@ -1097,27 +1097,27 @@ extern int gGAvoidDismember;
 
 
 // damage flags
-#define DAMAGE_NORMAL				0x00000000	// No flags set.
-#define DAMAGE_RADIUS				0x00000001	// damage was indirect
-#define DAMAGE_NO_ARMOR				0x00000002	// armour does not protect from this damage
-#define DAMAGE_NO_KNOCKBACK			0x00000004	// do not affect velocity, just view angles
-#define DAMAGE_NO_PROTECTION		0x00000008  // armor, shields, invulnerability, and godmode have no effect
-#define DAMAGE_NO_TEAM_PROTECTION	0x00000010  // armor, shields, invulnerability, and godmode have no effect
-//JK2 flags
-#define DAMAGE_EXTRA_KNOCKBACK		0x00000040	// add extra knockback to this damage
-#define DAMAGE_DEATH_KNOCKBACK		0x00000080	// only does knockback on death of target
-#define DAMAGE_IGNORE_TEAM			0x00000100	// damage is always done, regardless of teams
-#define DAMAGE_NO_DAMAGE			0x00000200	// do no actual damage but react as if damage was taken
-#define DAMAGE_HALF_ABSORB			0x00000400	// half shields, half health
-#define DAMAGE_HALF_ARMOR_REDUCTION	0x00000800	// This damage doesn't whittle down armor as efficiently.
-#define DAMAGE_HEAVY_WEAP_CLASS		0x00001000	// Heavy damage
-#define DAMAGE_NO_HIT_LOC			0x00002000	// No hit location
-#define DAMAGE_NO_SELF_PROTECTION	0x00004000	// Dont apply half damage to self attacks
-#define DAMAGE_NO_DISMEMBER			0x00008000	// Dont do dismemberment
-#define DAMAGE_SABER_KNOCKBACK1		0x00010000	// Check the attacker's first saber for a knockbackScale
-#define DAMAGE_SABER_KNOCKBACK2		0x00020000	// Check the attacker's second saber for a knockbackScale
-#define DAMAGE_SABER_KNOCKBACK1_B2	0x00040000	// Check the attacker's first saber for a knockbackScale2
-#define DAMAGE_SABER_KNOCKBACK2_B2	0x00080000	// Check the attacker's second saber for a knockbackScale2
+#define DAMAGE_NORMAL				(0x00000000u) // No flags set.
+#define DAMAGE_RADIUS				(0x00000001u) // damage was indirect
+#define DAMAGE_NO_ARMOR				(0x00000002u) // armour does not protect from this damage
+#define DAMAGE_NO_KNOCKBACK			(0x00000004u) // do not affect velocity, just view angles
+#define DAMAGE_NO_PROTECTION		(0x00000008u) // armor, shields, invulnerability, and godmode have no effect
+#define DAMAGE_NO_TEAM_PROTECTION	(0x00000010u) // armor, shields, invulnerability, and godmode have no effect
+#define DAMAGE_UNUSED00000020		(0x00000020u) // 
+#define DAMAGE_EXTRA_KNOCKBACK		(0x00000040u) // add extra knockback to this damage
+#define DAMAGE_DEATH_KNOCKBACK		(0x00000080u) // only does knockback on death of target
+#define DAMAGE_IGNORE_TEAM			(0x00000100u) // damage is always done, regardless of teams
+#define DAMAGE_NO_DAMAGE			(0x00000200u) // do no actual damage but react as if damage was taken
+#define DAMAGE_HALF_ABSORB			(0x00000400u) // half shields, half health
+#define DAMAGE_HALF_ARMOR_REDUCTION	(0x00000800u) // This damage doesn't whittle down armor as efficiently.
+#define DAMAGE_HEAVY_WEAP_CLASS		(0x00001000u) // Heavy damage
+#define DAMAGE_NO_HIT_LOC			(0x00002000u) // No hit location
+#define DAMAGE_NO_SELF_PROTECTION	(0x00004000u) // Dont apply half damage to self attacks
+#define DAMAGE_NO_DISMEMBER			(0x00008000u) // Dont do dismemberment
+#define DAMAGE_SABER_KNOCKBACK1		(0x00010000u) // Check the attacker's first saber for a knockbackScale
+#define DAMAGE_SABER_KNOCKBACK2		(0x00020000u) // Check the attacker's second saber for a knockbackScale
+#define DAMAGE_SABER_KNOCKBACK1_B2	(0x00040000u) // Check the attacker's first saber for a knockbackScale2
+#define DAMAGE_SABER_KNOCKBACK2_B2	(0x00080000u) // Check the attacker's second saber for a knockbackScale2
 //
 // g_exphysics.c
 //
@@ -1146,8 +1146,9 @@ extern int	BMS_START;
 extern int	BMS_MID;
 extern int	BMS_END;
 
-#define SPF_BUTTON_USABLE		1
-#define SPF_BUTTON_FPUSHABLE	2
+#define SPF_BUTTON_USABLE		(0x0001u)
+#define SPF_BUTTON_FPUSHABLE	(0x0002u)
+
 void G_PlayDoorLoopSound( gentity_t *ent );
 void G_PlayDoorSound( gentity_t *ent, int type );
 void G_RunMover( gentity_t *ent );
@@ -1173,19 +1174,19 @@ typedef struct reference_tag_s
 	char		name[MAX_REFNAME];
 	vector3		origin;
 	vector3		angles;
-	int			flags;	//Just in case
+	uint32_t	flags;	//Just in case
 	int			radius;	//For nav goals
 	qboolean	inuse;
 } reference_tag_t;
 
 void TAG_Init( void );
 reference_tag_t	*TAG_Find( const char *owner, const char *name );
-reference_tag_t	*TAG_Add( const char *name, const char *owner, vector3 *origin, vector3 *angles, int radius, int flags );
+reference_tag_t	*TAG_Add( const char *name, const char *owner, vector3 *origin, vector3 *angles, int radius, uint32_t flags );
 int	TAG_GetOrigin( const char *owner, const char *name, vector3 *origin );
 int	TAG_GetOrigin2( const char *owner, const char *name, vector3 *origin );
 int	TAG_GetAngles( const char *owner, const char *name, vector3 *angles );
 int TAG_GetRadius( const char *owner, const char *name );
-int TAG_GetFlags( const char *owner, const char *name );
+uint32_t TAG_GetFlags( const char *owner, const char *name );
 
 void TeleportPlayer( gentity_t *player, vector3 *origin, vector3 *angles );
 
@@ -1344,7 +1345,7 @@ gentity_t *G_PreDefSound(vector3 *org, int pdSound);
 qboolean HasSetSaberOnly(void);
 void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower );
 void WP_SaberPositionUpdate( gentity_t *self, usercmd_t *ucmd );
-int WP_SaberCanBlock(gentity_t *self, vector3 *point, int dflags, int mod, qboolean projectile, int attackStr);
+int WP_SaberCanBlock(gentity_t *self, vector3 *point, uint32_t dflags, int mod, qboolean projectile, int attackStr);
 void WP_SaberInitBladeData( gentity_t *ent );
 void WP_InitForcePowers( gentity_t *ent );
 void WP_SpawnInitForcePowers( gentity_t *ent );
@@ -1462,12 +1463,12 @@ typedef enum userinfoValidationBits_e {
 	USERINFO_VALIDATION_MAX
 } userinfoValidationBits_t;
 
-#define PRIVDUEL_ALLOW		(0x0001)
-#define PRIVDUEL_MULTI		(0x0002)
-#define PRIVDUEL_RESPAWN	(0x0004)
-#define PRIVDUEL_NOSEVER	(0x0008)
-#define PRIVDUEL_TEAM		(0x0010)
-#define PRIVDUEL_WEAP		(0x0020)
+#define PRIVDUEL_ALLOW		(0x0001u)
+#define PRIVDUEL_MULTI		(0x0002u)
+#define PRIVDUEL_RESPAWN	(0x0004u)
+#define PRIVDUEL_NOSEVER	(0x0008u)
+#define PRIVDUEL_TEAM		(0x0010u)
+#define PRIVDUEL_WEAP		(0x0020u)
 
 typedef enum matchPause_e {
 	PAUSE_NONE=0,
@@ -1483,7 +1484,7 @@ void		G_AvoidBox						( gentity_t *ent );
 char		*ConcatArgs						( int start );
 void		G_TestLine						( vector3 *start, vector3 *end, int color, int time );
 trace_t		*G_RealTrace					( gentity_t *ent, float dist );
-qboolean	Client_Supports					( gentity_t *ent, unsigned int supportFlag );
+qboolean	Client_Supports					( const gentity_t *ent, uint32_t supportFlag );
 void		G_ClearVote						( gentity_t *ent );
 void		SV_ToggleUserinfoValidation_f	( void );
 qboolean	G_CallSpawn						( gentity_t *ent );

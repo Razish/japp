@@ -3932,12 +3932,7 @@ static int PM_TryRoll( void )
 	trace_t	trace;
 	int		anim = -1;
 	vector3 fwd, right, traceto, mins, maxs, fwdAngles;
-#ifdef _CGAME
-	unsigned int cinfo = cgs.japp.jp_cinfo;
-#elif defined( _GAME )
-	unsigned int cinfo = jp_cinfo.integer;
-#endif
-	qboolean jpRollAllowed = !!(cinfo & CINFO_WEAPONROLL) ? qtrue : !!(pm->ps->weapon == WP_SABER || pm->ps->weapon == WP_MELEE);
+	qboolean jpRollAllowed = GetCInfo( CINFO_WEAPONROLL ) ? qtrue : !!(pm->ps->weapon == WP_SABER || pm->ps->weapon == WP_MELEE);
 
 	if ( BG_SaberInAttack( pm->ps->saberMove ) || BG_SaberInSpecialAttack( pm->ps->torsoAnim ) 
 		|| BG_SpinningSaberAnim( pm->ps->legsAnim ) 
@@ -5535,17 +5530,16 @@ int PM_LegsSlopeBackTransition(int desiredAnim)
 	return resultingAnim;
 }
 
-static int JP_GetJPFixRoll( void )
-{
+static int JP_GetJPFixRoll( void ) {
 	int level = 0;
 #ifdef _GAME
-	unsigned int cinfo = jp_cinfo.integer;
+	uint32_t cinfo = jp_cinfo.integer;
 #else
-	unsigned int cinfo = cgs.japp.jp_cinfo;
+	uint32_t cinfo = cgs.japp.jp_cinfo;
 #endif
 
 	if ( cinfo & CINFO_JK2ROLL1 )
-		level = 1;
+		level++;
 	if ( cinfo & CINFO_JK2ROLL2 )
 		level++;
 	if ( cinfo & CINFO_JK2ROLL3 )
@@ -5562,7 +5556,7 @@ PM_Footsteps
 static void PM_Footsteps( void ) {
 	float		bobmove;
 	int			old;
-	int			setAnimFlags = 0;
+	uint32_t			setAnimFlags = 0;
 
 	if ( (PM_InSaberAnim( (pm->ps->legsAnim) ) && !BG_SpinningSaberAnim( (pm->ps->legsAnim) )) 
 		|| (pm->ps->legsAnim) == BOTH_STAND1 
@@ -9008,7 +9002,8 @@ void BG_IK_MoveArm(void *ghoul2, int lHandBolt, int time, entityState_t *ent, in
 	else if (*ikInProgress)
 	{ //kill it
 		float cFrame, animSpeed;
-		int sFrame, eFrame, flags;
+		int sFrame, eFrame;
+		uint32_t flags;
 
 		trap->G2API_SetBoneIKState(ghoul2, time, "lhumerus", IKS_NONE, NULL);
 		trap->G2API_SetBoneIKState(ghoul2, time, "lradius", IKS_NONE, NULL);

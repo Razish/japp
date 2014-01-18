@@ -35,7 +35,7 @@ void trap_PrecisionTimer_Start(void **theNewTimer) {
 int trap_PrecisionTimer_End(void *theTimer) {
 	return Q_syscall(G_PRECISIONTIMER_END, theTimer);
 }
-void trap_Cvar_Register( vmCvar_t *cvar, const char *var_name, const char *value, int flags ) {
+void trap_Cvar_Register( vmCvar_t *cvar, const char *var_name, const char *value, uint32_t flags ) {
 	Q_syscall( G_CVAR_REGISTER, cvar, var_name, value, flags );
 }
 void trap_Cvar_Update( vmCvar_t *cvar ) {
@@ -271,7 +271,7 @@ qboolean trap_Nav_Load( const char *filename, int checksum ) {
 qboolean trap_Nav_Save( const char *filename, int checksum ) {
 	return Q_syscall(G_NAV_SAVE, filename, checksum);
 }
-int trap_Nav_AddRawPoint( vector3 *point, int flags, int radius ) {
+int trap_Nav_AddRawPoint( vector3 *point, uint32_t flags, int radius ) {
 	return Q_syscall(G_NAV_ADDRAWPOINT, point, flags, radius);
 }
 void trap_Nav_CalculatePaths( qboolean recalc ) {
@@ -289,7 +289,7 @@ void trap_Nav_ShowEdges( void ) {
 void trap_Nav_ShowPath( int start, int end ) {
 	Q_syscall(G_NAV_SHOWPATH, start, end);
 }
-int trap_Nav_GetNearestNode( sharedEntity_t *ent, int lastID, int flags, int targetID ) {
+int trap_Nav_GetNearestNode( sharedEntity_t *ent, int lastID, uint32_t flags, int targetID ) {
 	return Q_syscall(G_NAV_GETNEARESTNODE, ent, lastID, flags, targetID);
 }
 int trap_Nav_GetBestNode( int startID, int endID, int rejectID ) {
@@ -358,7 +358,7 @@ int trap_Nav_GetBestNodeAltRoute( int startID, int endID, int *pathCost, int rej
 int trap_Nav_GetBestNodeAltRoute2( int startID, int endID, int rejectID ) {
 	return Q_syscall(G_NAV_GETBESTNODEALT2, startID, endID, rejectID);
 }
-int trap_Nav_GetBestPathBetweenEnts( sharedEntity_t *ent, sharedEntity_t *goal, int flags ) {
+int trap_Nav_GetBestPathBetweenEnts( sharedEntity_t *ent, sharedEntity_t *goal, uint32_t flags ) {
 	return Q_syscall(G_NAV_GETBESTPATHBETWEENENTS, ent, goal, flags);
 }
 int	trap_Nav_GetNodeRadius( int nodeID ) {
@@ -474,16 +474,16 @@ int trap_AAS_IntForBSPEpairKey(int ent, char *key, int *value) {
 int trap_AAS_AreaReachability(int areanum) {
 	return Q_syscall( BOTLIB_AAS_AREA_REACHABILITY, areanum );
 }
-int trap_AAS_AreaTravelTimeToGoalArea(int areanum, vector3 *origin, int goalareanum, int travelflags) {
+int trap_AAS_AreaTravelTimeToGoalArea(int areanum, vector3 *origin, int goalareanum, uint32_t travelflags) {
 	return Q_syscall( BOTLIB_AAS_AREA_TRAVEL_TIME_TO_GOAL_AREA, areanum, origin, goalareanum, travelflags );
 }
 int trap_AAS_EnableRoutingArea( int areanum, int enable ) {
 	return Q_syscall( BOTLIB_AAS_ENABLE_ROUTING_AREA, areanum, enable );
 }
-int trap_AAS_PredictRoute(void *route, int areanum, vector3 *origin, int goalareanum, int travelflags, int maxareas, int maxtime, int stopevent, int stopcontents, int stoptfl, int stopareanum) {
+int trap_AAS_PredictRoute(void *route, int areanum, vector3 *origin, int goalareanum, uint32_t travelflags, int maxareas, int maxtime, int stopevent, int stopcontents, int stoptfl, int stopareanum) {
 	return Q_syscall( BOTLIB_AAS_PREDICT_ROUTE, route, areanum, origin, goalareanum, travelflags, maxareas, maxtime, stopevent, stopcontents, stoptfl, stopareanum );
 }
-int trap_AAS_AlternativeRouteGoals(vector3 *start, int startareanum, vector3 *goal, int goalareanum, int travelflags, void *altroutegoals, int maxaltroutegoals, int type) {
+int trap_AAS_AlternativeRouteGoals(vector3 *start, int startareanum, vector3 *goal, int goalareanum, uint32_t travelflags, void *altroutegoals, int maxaltroutegoals, int type) {
 	return Q_syscall( BOTLIB_AAS_ALTERNATIVE_ROUTE_GOAL, start, startareanum, goal, goalareanum, travelflags, altroutegoals, maxaltroutegoals, type );
 }
 int trap_AAS_Swimming(vector3 *origin) {
@@ -688,10 +688,10 @@ int trap_BotGetTopGoal(int goalstate, void *goal) {
 int trap_BotGetSecondGoal(int goalstate, void *goal) {
 	return Q_syscall( BOTLIB_AI_GET_SECOND_GOAL, goalstate, goal );
 }
-int trap_BotChooseLTGItem(int goalstate, vector3 *origin, int *inventory, int travelflags) {
+int trap_BotChooseLTGItem(int goalstate, vector3 *origin, int *inventory, uint32_t travelflags) {
 	return Q_syscall( BOTLIB_AI_CHOOSE_LTG_ITEM, goalstate, origin, inventory, travelflags );
 }
-int trap_BotChooseNBGItem(int goalstate, vector3 *origin, int *inventory, int travelflags, void *ltg, float maxtime) {
+int trap_BotChooseNBGItem(int goalstate, vector3 *origin, int *inventory, uint32_t travelflags, void *ltg, float maxtime) {
 	return Q_syscall( BOTLIB_AI_CHOOSE_NBG_ITEM, goalstate, origin, inventory, travelflags, ltg, PASSFLOAT(maxtime) );
 }
 int trap_BotTouchingGoal(vector3 *origin, void *goal) {
@@ -750,7 +750,7 @@ void trap_BotResetMoveState(int movestate) {
 void trap_BotAddAvoidSpot(int movestate, vector3 *origin, float radius, int type) {
 	Q_syscall( BOTLIB_AI_ADD_AVOID_SPOT, movestate, origin, PASSFLOAT(radius), type);
 }
-void trap_BotMoveToGoal(void *result, int movestate, void *goal, int travelflags) {
+void trap_BotMoveToGoal(void *result, int movestate, void *goal, uint32_t travelflags) {
 	Q_syscall( BOTLIB_AI_MOVE_TO_GOAL, result, movestate, goal, travelflags );
 }
 int trap_BotMoveInDirection(int movestate, vector3 *dir, float speed, int type) {
@@ -765,10 +765,10 @@ void trap_BotResetLastAvoidReach(int movestate) {
 int trap_BotReachabilityArea(vector3 *origin, int testground) {
 	return Q_syscall( BOTLIB_AI_REACHABILITY_AREA, origin, testground );
 }
-int trap_BotMovementViewTarget(int movestate, void *goal, int travelflags, float lookahead, vector3 *target) {
+int trap_BotMovementViewTarget(int movestate, void *goal, uint32_t travelflags, float lookahead, vector3 *target) {
 	return Q_syscall( BOTLIB_AI_MOVEMENT_VIEW_TARGET, movestate, goal, travelflags, PASSFLOAT(lookahead), target );
 }
-int trap_BotPredictVisiblePosition(vector3 *origin, int areanum, void *goal, int travelflags, vector3 *target) {
+int trap_BotPredictVisiblePosition(vector3 *origin, int areanum, void *goal, uint32_t travelflags, vector3 *target) {
 	return Q_syscall( BOTLIB_AI_PREDICT_VISIBLE_POSITION, origin, areanum, goal, travelflags, target );
 }
 int trap_BotAllocMoveState(void) {
@@ -837,7 +837,7 @@ qboolean trap_G2API_GetBoltMatrix_NoReconstruct(void *ghoul2, const int modelInd
 qboolean trap_G2API_GetBoltMatrix_NoRecNoRot(void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale) {
 	return (qboolean)(Q_syscall(G_G2_GETBOLT_NOREC_NOROT, ghoul2, modelIndex, boltIndex, matrix, angles, position, frameNum, modelList, scale));
 }
-int trap_G2API_InitGhoul2Model(void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, int modelFlags, int lodBias) {
+int trap_G2API_InitGhoul2Model(void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, uint32_t modelFlags, int lodBias) {
 	return Q_syscall(G_G2_INITGHOUL2MODEL, ghoul2Ptr, fileName, modelIndex, customSkin, customShader, modelFlags, lodBias);
 }
 qboolean trap_G2API_SetSkin(void *ghoul2, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin) {
@@ -852,13 +852,13 @@ int trap_G2API_AddBolt(void *ghoul2, int modelIndex, const char *boneName) {
 void trap_G2API_SetBoltInfo(void *ghoul2, int modelIndex, int boltInfo) {
 	Q_syscall(G_G2_SETBOLTINFO, ghoul2, modelIndex, boltInfo);
 }
-qboolean trap_G2API_SetBoneAngles(void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const int flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime , int currentTime ) {
+qboolean trap_G2API_SetBoneAngles(void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const uint32_t flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime , int currentTime ) {
 	return (Q_syscall(G_G2_ANGLEOVERRIDE, ghoul2, modelIndex, boneName, angles, flags, up, right, forward, modelList, blendTime, currentTime));
 }
-qboolean trap_G2API_SetBoneAnim(void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const int flags, const float animSpeed, const int currentTime, const float setFrame , const int blendTime ) {
+qboolean trap_G2API_SetBoneAnim(void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const uint32_t flags, const float animSpeed, const int currentTime, const float setFrame , const int blendTime ) {
 	return Q_syscall(G_G2_PLAYANIM, ghoul2, modelIndex, boneName, startFrame, endFrame, flags, PASSFLOAT(animSpeed), currentTime, PASSFLOAT(setFrame), blendTime);
 }
-qboolean trap_G2API_GetBoneAnim(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, int *flags, float *animSpeed, int *modelList, const int modelIndex) {
+qboolean trap_G2API_GetBoneAnim(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, uint32_t *flags, float *animSpeed, int *modelList, const int modelIndex) {
 	return Q_syscall(G_G2_GETBONEANIM, ghoul2, boneName, currentTime, currentFrame, startFrame, endFrame, flags, animSpeed, modelList, modelIndex);
 }
 void trap_G2API_GetGLAName(void *ghoul2, int modelIndex, char *fillBuf) {
@@ -885,10 +885,10 @@ qboolean trap_G2API_RemoveGhoul2Models(void *ghlInfo) {
 void trap_G2API_CleanGhoul2Models(void **ghoul2Ptr) {
 	Q_syscall(G_G2_CLEANMODELS, ghoul2Ptr);
 }
-void trap_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void *ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, int traceFlags, int useLod, float fRadius ) {
+void trap_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void *ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) {
 	Q_syscall ( G_G2_COLLISIONDETECT, collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, PASSFLOAT(fRadius) );
 }
-void trap_G2API_CollisionDetectCache( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, int traceFlags, int useLod, float fRadius ) {
+void trap_G2API_CollisionDetectCache( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) {
 	Q_syscall ( G_G2_COLLISIONDETECTCACHE, collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, PASSFLOAT(fRadius) );
 }
 void trap_G2API_GetSurfaceName(void *ghoul2, int surfNumber, int modelIndex, char *fillBuf) {
@@ -897,7 +897,7 @@ void trap_G2API_GetSurfaceName(void *ghoul2, int surfNumber, int modelIndex, cha
 qboolean trap_G2API_SetRootSurface(void *ghoul2, const int modelIndex, const char *surfaceName) {
 	return Q_syscall(G_G2_SETROOTSURFACE, ghoul2, modelIndex, surfaceName);
 }
-qboolean trap_G2API_SetSurfaceOnOff(void *ghoul2, const char *surfaceName, const int flags) {
+qboolean trap_G2API_SetSurfaceOnOff(void *ghoul2, const char *surfaceName, const uint32_t flags) {
 	return Q_syscall(G_G2_SETSURFACEONOFF, ghoul2, surfaceName, flags);
 }
 qboolean trap_G2API_SetNewOrigin(void *ghoul2, const int boltIndex) {
@@ -979,7 +979,7 @@ void trap_Bot_CalculatePaths(int rmg) {
 int SVSyscall_FS_Read( void *buffer, int len, fileHandle_t f ) { trap_FS_Read( buffer, len, f ); return 0; }
 int SVSyscall_FS_Write( const void *buffer, int len, fileHandle_t f ) { trap_FS_Write( buffer, len, f ); return 0; }
 qboolean SVSyscall_EntityContact( const vector3 *mins, const vector3 *maxs, const sharedEntity_t *ent, int capsule ) { if ( capsule ) return trap_EntityContactCapsule( mins, maxs, ent ); else return trap_EntityContact( mins, maxs, ent ); }
-void SVSyscall_Trace( trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentmask, int capsule, int traceFlags, int useLod ) {
+void SVSyscall_Trace( trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentmask, int capsule, uint32_t traceFlags, int useLod ) {
 	if ( capsule )
 		trap_TraceCapsule( results, start, mins, maxs, end, passEntityNum, contentmask );
 	else if ( traceFlags )

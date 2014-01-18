@@ -242,7 +242,7 @@ qboolean InVisrange ( gentity_t *ent )
 NPC_CheckVisibility
 */
 
-visibility_t NPC_CheckVisibility ( gentity_t *ent, int flags ) 
+visibility_t NPC_CheckVisibility ( gentity_t *ent, uint32_t flags ) 
 {
 	// flags should never be 0
 	if ( !flags ) 

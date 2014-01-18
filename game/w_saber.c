@@ -3412,7 +3412,7 @@ static float	totalDmg[MAX_SABER_VICTIMS];
 static vector3	dmgDir[MAX_SABER_VICTIMS];
 static vector3	dmgSpot[MAX_SABER_VICTIMS];
 static qboolean dismemberDmg[MAX_SABER_VICTIMS];
-static int saberKnockbackFlags[MAX_SABER_VICTIMS];
+static uint32_t saberKnockbackFlags[MAX_SABER_VICTIMS];
 static int numVictims = 0;
 void WP_SaberClearDamage( void )
 {
@@ -3431,7 +3431,7 @@ void WP_SaberClearDamage( void )
 }
 
 void WP_SaberDamageAdd( int trVictimEntityNum, vector3 *trDmgDir, vector3 *trDmgSpot, 
-					   int trDmg, qboolean doDismemberment, int knockBackFlags )
+					   int trDmg, qboolean doDismemberment, uint32_t knockBackFlags )
 {
 	if ( trVictimEntityNum < 0 || trVictimEntityNum >= ENTITYNUM_WORLD )
 	{
@@ -3489,7 +3489,7 @@ void WP_SaberApplyDamage( gentity_t *self )
 	for ( i = 0; i < numVictims; i++ )
 	{
 		gentity_t *victim = NULL;
-		int dflags = 0;
+		uint32_t dflags = 0;
 
 		victim = &g_entities[victimEntityNum[i]];
 
@@ -6617,7 +6617,7 @@ static QINLINE qboolean CheckThrownSaberDamaged(gentity_t *saberent, gentity_t *
 				else
 				{ //a good hit
 					vector3 dir;
-					int dflags = 0;
+					uint32_t dflags = 0;
 
 					VectorSubtract(&tr.endpos, &saberent->r.currentOrigin, &dir);
 					VectorNormalize(&dir);
@@ -6706,7 +6706,7 @@ static QINLINE qboolean CheckThrownSaberDamaged(gentity_t *saberent, gentity_t *
 			if (tr.fraction == 1 || tr.entityNum == ent->s.number)
 			{
 				vector3 dir;
-				int dflags = 0;
+				uint32_t dflags = 0;
 
 				VectorSubtract(&tr.endpos, &entOrigin, &dir);
 				VectorNormalize(&dir);
@@ -9941,7 +9941,7 @@ void WP_SaberBlock( gentity_t *playerent, vector3 *hitloc, qboolean missileBlock
 		playerent->client->ps.saberBlocked = WP_MissileBlockForBlock( playerent->client->ps.saberBlocked );
 }
 
-int WP_SaberCanBlock(gentity_t *self, vector3 *point, int dflags, int mod, qboolean projectile, int attackStr)
+int WP_SaberCanBlock(gentity_t *self, vector3 *point, uint32_t dflags, int mod, qboolean projectile, int attackStr)
 {
 	qboolean thrownSaber = qfalse;
 	float blockFactor = 0;

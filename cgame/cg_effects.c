@@ -83,7 +83,7 @@ localEntity_t *CG_SmokePuff( const vector3 *p, const vector3 *vel,
 				   float duration,
 				   int startTime,
 				   int fadeInTime,
-				   int leFlags,
+				   uint32_t leFlags,
 				   qhandle_t hShader ) {
 	static int	seed = 0x92;
 	localEntity_t	*le;
@@ -1252,7 +1252,7 @@ CG_MakeExplosion
 */
 localEntity_t *CG_MakeExplosion( vector3 *origin, vector3 *dir, 
 								qhandle_t hModel, int numFrames, qhandle_t shader,
-								int msec, qboolean isSprite, float scale, int flags )
+								int msec, qboolean isSprite, float scale, uint32_t flags )
 {
 	float			ang = 0;
 	localEntity_t	*ex;

@@ -75,32 +75,26 @@
 #define FEEDER_SERVERSTATUS					0x0d			// server status
 #define FEEDER_FINDPLAYER					0x0e			// find player
 #define FEEDER_CINEMATICS					0x0f			// cinematics
-
 #define FEEDER_FORCECFG						0x10			// force config list
-
 #define FEEDER_SIEGE_TEAM1					0x11			// siege class list for team1
 #define FEEDER_SIEGE_TEAM2					0x12			// siege class list for team2
-
 #define FEEDER_PLAYER_SPECIES				0x13			// models/player/*
 #define FEEDER_PLAYER_SKIN_HEAD				0x14			// head*.skin files in species folder
 #define FEEDER_PLAYER_SKIN_TORSO			0x15			// torso*.skin files in species folder
 #define FEEDER_PLAYER_SKIN_LEGS				0x16			// lower*.skin files in species folder
 #define FEEDER_COLORCHOICES					0x17			// special hack to feed text/actions from playerchoice.txt in species folder
-
 #define FEEDER_TEAM1_INFANTRY				0x18			// for siege team choice
 #define FEEDER_TEAM1_VANGUARD				0x19			// for siege team choice
 #define FEEDER_TEAM1_SUPPORT				0x1a			// for siege team choice
 #define FEEDER_TEAM1_JEDI					0x1b			// for siege team choice
 #define FEEDER_TEAM1_DEMO					0x1c			// for siege team choice
 #define FEEDER_TEAM1_HEAVY					0x1d			// for siege team choice
-
 #define FEEDER_TEAM2_INFANTRY				0x1e			// for siege team choice
 #define FEEDER_TEAM2_VANGUARD				0x1f			// for siege team choice
 #define FEEDER_TEAM2_SUPPORT				0x20			// for siege team choice
 #define FEEDER_TEAM2_JEDI					0x21			// for siege team choice
 #define FEEDER_TEAM2_DEMO					0x22			// for siege team choice
 #define FEEDER_TEAM2_HEAVY					0x23			// for siege team choice
-
 #define FEEDER_SIEGE_BASE_CLASS				0x24			// for siege team choice
 #define FEEDER_SIEGE_CLASS_WEAPONS			0x25			// for siege team choice
 #define FEEDER_SIEGE_CLASS_INVENTORY		0x26			// for siege team choice
@@ -112,6 +106,7 @@
 #define FEEDER_SABER_STAFF_INFO				0x2c			// saber staff
 
 
+
 // Xbox specific, hope no one minds
 #define FEEDER_XBL_ACCOUNTS					0xA0			// list of available XBL accounts
 #define FEEDER_XBL_PLAYERS					0xA1			// players (current and recent)
@@ -119,42 +114,41 @@
 #define FEEDER_XBL_SERVERS					0xA3			// results of an optimatch query
 
 // display flags
-#define CG_SHOW_BLUE_TEAM_HAS_REDFLAG     0x00000001
-#define CG_SHOW_RED_TEAM_HAS_BLUEFLAG     0x00000002
-#define CG_SHOW_ANYTEAMGAME               0x00000004
-#define CG_SHOW_HARVESTER                 0x00000008
-#define CG_SHOW_ONEFLAG                   0x00000010
-#define CG_SHOW_CTF                       0x00000020
-#define CG_SHOW_OBELISK                   0x00000040
-#define CG_SHOW_HEALTHCRITICAL            0x00000080
-#define CG_SHOW_SINGLEPLAYER              0x00000100
-#define CG_SHOW_TOURNAMENT                0x00000200
-#define CG_SHOW_DURINGINCOMINGVOICE       0x00000400
-#define CG_SHOW_IF_PLAYER_HAS_FLAG				0x00000800
-#define CG_SHOW_LANPLAYONLY								0x00001000
-#define CG_SHOW_MINED											0x00002000
-#define CG_SHOW_HEALTHOK			            0x00004000
-#define CG_SHOW_TEAMINFO			            0x00008000
-#define CG_SHOW_NOTEAMINFO		            0x00010000
-#define CG_SHOW_OTHERTEAMHASFLAG          0x00020000
-#define CG_SHOW_YOURTEAMHASENEMYFLAG      0x00040000
-#define CG_SHOW_ANYNONTEAMGAME            0x00080000
-#define CG_SHOW_2DONLY										0x10000000
+#define CG_SHOW_BLUE_TEAM_HAS_REDFLAG	0x00000001
+#define CG_SHOW_RED_TEAM_HAS_BLUEFLAG	0x00000002
+#define CG_SHOW_ANYTEAMGAME				0x00000004
+#define CG_SHOW_HARVESTER				0x00000008
+#define CG_SHOW_ONEFLAG					0x00000010
+#define CG_SHOW_CTF						0x00000020
+#define CG_SHOW_OBELISK					0x00000040
+#define CG_SHOW_HEALTHCRITICAL			0x00000080
+#define CG_SHOW_SINGLEPLAYER			0x00000100
+#define CG_SHOW_TOURNAMENT				0x00000200
+#define CG_SHOW_DURINGINCOMINGVOICE		0x00000400
+#define CG_SHOW_IF_PLAYER_HAS_FLAG		0x00000800
+#define CG_SHOW_LANPLAYONLY				0x00001000
+#define CG_SHOW_MINED					0x00002000
+#define CG_SHOW_HEALTHOK				0x00004000
+#define CG_SHOW_TEAMINFO				0x00008000
+#define CG_SHOW_NOTEAMINFO				0x00010000
+#define CG_SHOW_OTHERTEAMHASFLAG		0x00020000
+#define CG_SHOW_YOURTEAMHASENEMYFLAG	0x00040000
+#define CG_SHOW_ANYNONTEAMGAME			0x00080000
+#define CG_SHOW_2DONLY					0x10000000
 
-
-#define UI_SHOW_LEADER				            0x00000001
-#define UI_SHOW_NOTLEADER			            0x00000002
-#define UI_SHOW_FAVORITESERVERS						0x00000004
-#define UI_SHOW_ANYNONTEAMGAME						0x00000008
-#define UI_SHOW_ANYTEAMGAME								0x00000010
-#define UI_SHOW_NEWHIGHSCORE							0x00000020
-#define UI_SHOW_DEMOAVAILABLE							0x00000040
-#define UI_SHOW_NEWBESTTIME								0x00000080
-#define UI_SHOW_FFA												0x00000100
-#define UI_SHOW_NOTFFA										0x00000200
-#define UI_SHOW_NETANYNONTEAMGAME	 				0x00000400
-#define UI_SHOW_NETANYTEAMGAME		 				0x00000800
-#define UI_SHOW_NOTFAVORITESERVERS				0x00001000
+#define UI_SHOW_LEADER				0x00000001
+#define UI_SHOW_NOTLEADER			0x00000002
+#define UI_SHOW_FAVORITESERVERS		0x00000004
+#define UI_SHOW_ANYNONTEAMGAME		0x00000008
+#define UI_SHOW_ANYTEAMGAME			0x00000010
+#define UI_SHOW_NEWHIGHSCORE		0x00000020
+#define UI_SHOW_DEMOAVAILABLE		0x00000040
+#define UI_SHOW_NEWBESTTIME			0x00000080
+#define UI_SHOW_FFA					0x00000100
+#define UI_SHOW_NOTFFA				0x00000200
+#define UI_SHOW_NETANYNONTEAMGAME	0x00000400
+#define UI_SHOW_NETANYTEAMGAME		0x00000800
+#define UI_SHOW_NOTFAVORITESERVERS	0x00001000
 
 
 

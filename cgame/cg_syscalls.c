@@ -37,7 +37,7 @@ void trap_PrecisionTimer_Start( void **theNewTimer ) {
 int trap_PrecisionTimer_End( void *theTimer ) {
 	return Q_syscall(CG_PRECISIONTIMER_END, theTimer);
 }
-void trap_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags ) {
+void trap_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, uint32_t flags ) {
 	Q_syscall( CG_CVAR_REGISTER, vmCvar, varName, defaultValue, flags );
 }
 void trap_Cvar_Update( vmCvar_t *vmCvar ) {
@@ -318,7 +318,7 @@ void trap_R_AutomapElevAdj(float newHeight) {
 qboolean trap_R_InitWireframeAutomap(void) {
 	return Q_syscall( CG_R_INITWIREFRAMEAUTO );
 }
-void trap_FX_AddLine( vector3 *start, vector3 *end, float size1, float size2, float sizeParm, float alpha1, float alpha2, float alphaParm, vector3 *sRGB, vector3 *eRGB, float rgbParm, int killTime, qhandle_t shader, int flags) {
+void trap_FX_AddLine( vector3 *start, vector3 *end, float size1, float size2, float sizeParm, float alpha1, float alpha2, float alphaParm, vector3 *sRGB, vector3 *eRGB, float rgbParm, int killTime, qhandle_t shader, uint32_t flags) {
 	Q_syscall( CG_FX_ADDLINE, start, end, PASSFLOAT(size1), PASSFLOAT(size2), PASSFLOAT(sizeParm), PASSFLOAT(alpha1), PASSFLOAT(alpha2), PASSFLOAT(alphaParm), sRGB, eRGB, PASSFLOAT(rgbParm), killTime, shader, flags);
 }
 void trap_GetGlconfig( glconfig_t *glconfig ) {
@@ -562,28 +562,28 @@ qboolean trap_G2API_GetBoltMatrix_NoReconstruct(void *ghoul2, const int modelInd
 qboolean trap_G2API_GetBoltMatrix_NoRecNoRot(void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale) {
 	return (qboolean)(Q_syscall(CG_G2_GETBOLT_NOREC_NOROT, ghoul2, modelIndex, boltIndex, matrix, angles, position, frameNum, modelList, scale));
 }
-int trap_G2API_InitGhoul2Model(void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, int modelFlags, int lodBias) {
+int trap_G2API_InitGhoul2Model(void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, uint32_t modelFlags, int lodBias) {
 	return Q_syscall(CG_G2_INITGHOUL2MODEL, ghoul2Ptr, fileName, modelIndex, customSkin, customShader, modelFlags, lodBias);
 }
 qboolean trap_G2API_SetSkin(void *ghoul2, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin) {
 	return Q_syscall(CG_G2_SETSKIN, ghoul2, modelIndex, customSkin, renderSkin);
 }
-void trap_G2API_CollisionDetect ( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, const vector3 *rayStart, const vector3 *rayEnd, const vector3 *scale, int traceFlags, int useLod, float fRadius ) {
+void trap_G2API_CollisionDetect ( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, const vector3 *rayStart, const vector3 *rayEnd, const vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) {
 	Q_syscall ( CG_G2_COLLISIONDETECT, collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, PASSFLOAT(fRadius) );
 }
-void trap_G2API_CollisionDetectCache ( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position,int frameNumber, int entNum, const vector3 *rayStart, const vector3 *rayEnd, const vector3 *scale, int traceFlags, int useLod, float fRadius ) {
+void trap_G2API_CollisionDetectCache ( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position,int frameNumber, int entNum, const vector3 *rayStart, const vector3 *rayEnd, const vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) {
 	Q_syscall ( CG_G2_COLLISIONDETECTCACHE, collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, PASSFLOAT(fRadius) );
 }
 void trap_G2API_CleanGhoul2Models(void **ghoul2Ptr) {
 	Q_syscall(CG_G2_CLEANMODELS, ghoul2Ptr);
 }
-qboolean trap_G2API_SetBoneAngles(void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const int flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime , int currentTime ) {
+qboolean trap_G2API_SetBoneAngles(void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const uint32_t flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime , int currentTime ) {
 	return (Q_syscall(CG_G2_ANGLEOVERRIDE, ghoul2, modelIndex, boneName, angles, flags, up, right, forward, modelList, blendTime, currentTime));
 }
-qboolean trap_G2API_SetBoneAnim(void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const int flags, const float animSpeed, const int currentTime, const float setFrame , const int blendTime ) {
+qboolean trap_G2API_SetBoneAnim(void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const uint32_t flags, const float animSpeed, const int currentTime, const float setFrame , const int blendTime ) {
 	return Q_syscall(CG_G2_PLAYANIM, ghoul2, modelIndex, boneName, startFrame, endFrame, flags, PASSFLOAT(animSpeed), currentTime, PASSFLOAT(setFrame), blendTime);
 }
-qboolean trap_G2API_GetBoneAnim(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, int *flags, float *animSpeed, int *modelList, const int modelIndex) {
+qboolean trap_G2API_GetBoneAnim(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, uint32_t *flags, float *animSpeed, int *modelList, const int modelIndex) {
 	return Q_syscall(CG_G2_GETBONEANIM, ghoul2, boneName, currentTime, currentFrame, startFrame, endFrame, flags, animSpeed, modelList, modelIndex);
 }
 qboolean trap_G2API_GetBoneFrame(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *modelList, const int modelIndex) {
@@ -634,7 +634,7 @@ void trap_G2API_SetBoltInfo(void *ghoul2, int modelIndex, int boltInfo) {
 qboolean trap_G2API_SetRootSurface(void *ghoul2, const int modelIndex, const char *surfaceName) {
 	return Q_syscall(CG_G2_SETROOTSURFACE, ghoul2, modelIndex, surfaceName);
 }
-qboolean trap_G2API_SetSurfaceOnOff(void *ghoul2, const char *surfaceName, const int flags) {
+qboolean trap_G2API_SetSurfaceOnOff(void *ghoul2, const char *surfaceName, const uint32_t flags) {
 	return Q_syscall(CG_G2_SETSURFACEONOFF, ghoul2, surfaceName, flags);
 }
 qboolean trap_G2API_SetNewOrigin(void *ghoul2, const int boltIndex) {
@@ -736,7 +736,7 @@ void CGSyscall_CM_TransformedTrace( trace_t *results, const vector3 *start, cons
 void CGSyscall_R_AddPolysToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int num ) { trap_R_AddPolyToScene( hShader, numVerts, verts ); }
 float CGSyscall_R_GetDistanceCull( void ) { float tmp; trap_R_GetDistanceCull( &tmp ); return tmp; }
 void CGSyscall_FX_PlayEffectID( int id, vector3 *org, vector3 *fwd, int vol, int rad, qboolean isPortal ) { if ( isPortal ) trap_FX_PlayPortalEffectID( id, org, fwd, vol, rad ); else trap_FX_PlayEffectID( id, org, fwd, vol, rad ); }
-void CGSyscall_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, int traceFlags, int useLod, float fRadius ) { trap_G2API_CollisionDetect( collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, fRadius ); }
+void CGSyscall_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) { trap_G2API_CollisionDetect( collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, fRadius ); }
 
 void QDECL CG_Error( int level, const char *error, ... ) {
 	va_list argptr;

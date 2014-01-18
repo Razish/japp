@@ -17,40 +17,39 @@
 #define MAX_OPEN_MENUS				64//16
 #define	MAX_TEXTSCROLL_LINES		256
 
-#define WINDOW_MOUSEOVER			0x00000001	// mouse is over it, non exclusive
-#define WINDOW_HASFOCUS				0x00000002	// has cursor focus, exclusive
-#define WINDOW_VISIBLE				0x00000004	// is visible
-#define WINDOW_INACTIVE				0x00000008	// is visible but grey ( non-active )
-#define WINDOW_DECORATION			0x00000010	// for decoration only, no mouse, keyboard, etc.. 
-#define WINDOW_FADINGOUT			0x00000020	// fading out, non-active
-#define WINDOW_FADINGIN				0x00000040	// fading in
-#define WINDOW_MOUSEOVERTEXT		0x00000080	// mouse is over it, non exclusive
-#define WINDOW_INTRANSITION			0x00000100	// window is in transition
-#define WINDOW_FORECOLORSET			0x00000200	// forecolor was explicitly set ( used to color alpha images or not )
-#define WINDOW_HORIZONTAL			0x00000400	// for list boxes and sliders, vertical is default this is set of horizontal
-#define WINDOW_LB_LEFTARROW			0x00000800	// mouse is over left/up arrow
-#define WINDOW_LB_RIGHTARROW		0x00001000	// mouse is over right/down arrow
-#define WINDOW_LB_THUMB				0x00002000	// mouse is over thumb
-#define WINDOW_LB_PGUP				0x00004000	// mouse is over page up
-#define WINDOW_LB_PGDN				0x00008000	// mouse is over page down
-#define WINDOW_ORBITING				0x00010000	// item is in orbit
-#define WINDOW_OOB_CLICK			0x00020000	// close on out of bounds click
-#define WINDOW_WRAPPED				0x00040000	// manually wrap text
-#define WINDOW_AUTOWRAPPED			0x00080000	// auto wrap text
-#define WINDOW_FORCED				0x00100000	// forced open
-#define WINDOW_POPUP				0x00200000	// popup
-#define WINDOW_BACKCOLORSET			0x00400000	// backcolor was explicitly set 
-#define WINDOW_TIMEDVISIBLE			0x00800000	// visibility timing ( NOT implemented )
-#define WINDOW_PLAYERCOLOR			0x01000000	// hack the forecolor to match ui_char_color_*
-
-//JLF
-#define WINDOW_INTRANSITIONMODEL	0x04000000	// delayed script waiting to run
+#define WINDOW_MOUSEOVER			(0x00000001u) // mouse is over it, non exclusive
+#define WINDOW_HASFOCUS				(0x00000002u) // has cursor focus, exclusive
+#define WINDOW_VISIBLE				(0x00000004u) // is visible
+#define WINDOW_INACTIVE				(0x00000008u) // is visible but grey ( non-active )
+#define WINDOW_DECORATION			(0x00000010u) // for decoration only, no mouse, keyboard, etc.. 
+#define WINDOW_FADINGOUT			(0x00000020u) // fading out, non-active
+#define WINDOW_FADINGIN				(0x00000040u) // fading in
+#define WINDOW_MOUSEOVERTEXT		(0x00000080u) // mouse is over it, non exclusive
+#define WINDOW_INTRANSITION			(0x00000100u) // window is in transition
+#define WINDOW_FORECOLORSET			(0x00000200u) // forecolor was explicitly set ( used to color alpha images or not )
+#define WINDOW_HORIZONTAL			(0x00000400u) // for list boxes and sliders, vertical is default this is set of horizontal
+#define WINDOW_LB_LEFTARROW			(0x00000800u) // mouse is over left/up arrow
+#define WINDOW_LB_RIGHTARROW		(0x00001000u) // mouse is over right/down arrow
+#define WINDOW_LB_THUMB				(0x00002000u) // mouse is over thumb
+#define WINDOW_LB_PGUP				(0x00004000u) // mouse is over page up
+#define WINDOW_LB_PGDN				(0x00008000u) // mouse is over page down
+#define WINDOW_ORBITING				(0x00010000u) // item is in orbit
+#define WINDOW_OOB_CLICK			(0x00020000u) // close on out of bounds click
+#define WINDOW_WRAPPED				(0x00040000u) // manually wrap text
+#define WINDOW_AUTOWRAPPED			(0x00080000u) // auto wrap text
+#define WINDOW_FORCED				(0x00100000u) // forced open
+#define WINDOW_POPUP				(0x00200000u) // popup
+#define WINDOW_BACKCOLORSET			(0x00400000u) // backcolor was explicitly set 
+#define WINDOW_TIMEDVISIBLE			(0x00800000u) // visibility timing ( NOT implemented )
+#define WINDOW_PLAYERCOLOR			(0x01000000u) // hack the forecolor to match ui_char_color_*
+#define WINDOW_UNUSED02000000		(0x02000000u) // 
+#define WINDOW_INTRANSITIONMODEL	(0x04000000u) // delayed script waiting to run
 
 
 // CGAME cursor type bits
-#define CURSOR_NONE					0x00000001
-#define CURSOR_ARROW				0x00000002
-#define CURSOR_SIZER				0x00000004
+#define CURSOR_NONE					(0x0001u)
+#define CURSOR_ARROW				(0x0002u)
+#define CURSOR_SIZER				(0x0004u)
 
 #ifdef _CGAME
 	#define STRING_POOL_SIZE 128*1024
@@ -111,9 +110,9 @@ typedef struct windowDef_s {
 	int style;                      //
 	int border;                     //
 	int ownerDraw;									// ownerDraw style
-	int ownerDrawFlags;							// show flags for ownerdraw items
+	uint32_t ownerDrawFlags;							// show flags for ownerdraw items
 	float borderSize;               // 
-	int flags;                      // visible, focus, mouseover, cursor
+	uint32_t flags;                      // visible, focus, mouseover, cursor
 	rectDef_t rectEffects;          // for various effects
 	rectDef_t rectEffects2;         // for various effects
 	int offsetTime;                 // time based value for various effects
@@ -227,20 +226,19 @@ typedef struct textScrollDef_s
 #define ITEM_ALIGN_CENTER	1		// center alignment
 #define ITEM_ALIGN_RIGHT	2		// right alignment
 
-#define CVAR_ENABLE			0x00000001
-#define CVAR_DISABLE		0x00000002
-#define CVAR_SHOW			0x00000004
-#define CVAR_HIDE			0x00000008
+#define CVAR_ENABLE			(0x0001u)
+#define CVAR_DISABLE		(0x0002u)
+#define CVAR_SHOW			(0x0004u)
+#define CVAR_HIDE			(0x0008u)
+#define CVAR_ENABLE2		(0x0010u)
+#define CVAR_DISABLE2		(0x0020u)
+#define CVAR_SHOW2			(0x0040u)
+#define CVAR_HIDE2			(0x0080u)
 
-#define CVAR_ENABLE2		0x00000010
-#define CVAR_DISABLE2		0x00000020
-#define CVAR_SHOW2			0x00000040
-#define CVAR_HIDE2			0x00000080
-
-#define ITF_G2VALID			0x0001					// indicates whether or not g2 instance is valid.
-#define ITF_ISCHARACTER		0x0002					// a character item, uses customRGBA
-#define ITF_ISSABER			0x0004					// first saber item, draws blade
-#define ITF_ISSABER2		0x0008					// second saber item, draws blade
+#define ITF_G2VALID			(0x0001u) // whether or not g2 instance is valid.
+#define ITF_ISCHARACTER		(0x0002u) // character item, uses customRGBA
+#define ITF_ISSABER			(0x0004u) // saber item, draws blade
+#define ITF_ISSABER2		(0x0008u) // saber item, draws blade
 
 #define ITF_ISANYSABER		(ITF_ISSABER|ITF_ISSABER2)	//either saber
 
@@ -261,7 +259,7 @@ typedef struct itemDef_s {
 	void		*parent;					// menu owner
 	qhandle_t	asset;						// handle to asset
 	void		*ghoul2;					// ghoul2 instance if available instead of a model.
-	int			flags;						// flags like g2valid, character, saber, saber2, etc.
+	uint32_t	flags;						// flags like g2valid, character, saber, saber2, etc.
 	const char	*mouseEnterText;			// mouse enter script
 	const char	*mouseExitText;				// mouse exit script
 	const char	*mouseEnter;				// mouse enter script
@@ -282,7 +280,7 @@ typedef struct itemDef_s {
 	const char	*cvarTest2;					// Raz: Added
 	const char	*enableCvar2;				// Raz: Added
 
-	int			cvarFlags;					//	what type of action to take on cvarenables
+	uint32_t	cvarFlags;					//	what type of action to take on cvarenables
 	sfxHandle_t focusSound;
 	int			numColors;					// number of color ranges
 	colorRangeDef_t colorRanges[MAX_COLOR_RANGES];
@@ -425,9 +423,9 @@ typedef struct displayContextDef_s {
 	qboolean		(*Language_IsAsian)					( void );
 	qboolean		(*Language_UsesSpaces)				( void );
 	unsigned int	(*AnyLanguage_ReadCharFromString)	( const char *psText, int *piAdvanceCount, qboolean *pbIsTrailingPunctuation );
-	void			(*ownerDrawItem)					( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vector4 *color, qhandle_t shader, int textStyle, int iMenuFont );
+	void			(*ownerDrawItem)					( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, vector4 *color, qhandle_t shader, int textStyle, int iMenuFont );
 	float			(*getValue)							( int ownerDraw );
-	qboolean		(*ownerDrawVisible)					( int flags );
+	qboolean		(*ownerDrawVisible)					( uint32_t flags );
 	void			(*runScript)						( char **p );
 	qboolean		(*deferScript)						( char **p );
 	void			(*getTeamColor)						( vector4 *color );
@@ -438,7 +436,7 @@ typedef struct displayContextDef_s {
 	void			(*setOverstrikeMode)				( qboolean b );
 	qboolean		(*getOverstrikeMode)				( void );
 	void			(*startLocalSound)					( sfxHandle_t sfx, int channelNum );
-	qboolean		(*ownerDrawHandleKey)				( int ownerDraw, int flags, float *special, int key );
+	qboolean		(*ownerDrawHandleKey)				( int ownerDraw, uint32_t flags, float *special, int key );
 	int				(*feederCount)						( float feederID );
 	const char *	(*feederItemText)					( float feederID, int index, int column, qhandle_t *handle1, qhandle_t *handle2, qhandle_t *handle3 );
 	qhandle_t		(*feederItemImage)					( float feederID, int index );

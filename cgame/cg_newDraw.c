@@ -145,7 +145,7 @@ qboolean CG_YourTeamDroppedFlag( void ) {
 
 // THINKABOUTME: should these be exclusive or inclusive.. 
 // 
-qboolean CG_OwnerDrawVisible(int flags) {
+qboolean CG_OwnerDrawVisible(uint32_t flags) {
 
 	if (flags & CG_SHOW_TEAMINFO) {
 		return (cg_currentSelectedPlayer.integer == numSortedTeamPlayers);
@@ -563,7 +563,7 @@ void CG_DrawMedal(int ownerDraw, rectDef_t *rect, float scale, vector4 *color, q
 
 	
 //
-void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vector4 *color, qhandle_t shader, int textStyle,int font) {
+void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, vector4 *color, qhandle_t shader, int textStyle,int font) {
 
 //Ignore all this, at least for now. May put some stat stuff back in menu files later.
 #if 0

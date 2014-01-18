@@ -479,7 +479,7 @@ void jp_portal_touch( gentity_t *self, gentity_t *other, trace_t *trace )
 		if ( other->client )
 		{
 			qboolean isNPC = (other->s.eType == ET_NPC);
-			unsigned int eFlags = other->client->ps.eFlags ^ EF_TELEPORT_BIT;
+			uint32_t eFlags = other->client->ps.eFlags ^ EF_TELEPORT_BIT;
 			VectorCopy( &tpPos, &other->client->ps.origin );
 			other->client->ps.origin.z += 1.0f;
 			SetClientViewAngle( other, &other->client->ps.viewangles );

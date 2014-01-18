@@ -2814,7 +2814,7 @@ qboolean PM_RunningAnim( int anim );
 qboolean PM_WalkingAnim( int anim );
 
 void BG_SetAnimFinal(playerState_t *ps, animation_t *animations,
-					 int setAnimParts,int anim,int setAnimFlags,
+					 int setAnimParts,int anim,uint32_t setAnimFlags,
 					 int blendTime)		// default blendTime=350
 {
 	float editAnimSpeed = 1;
@@ -2941,7 +2941,7 @@ setAnimDone:
 	return;
 }
 
-void PM_SetAnimFinal(int setAnimParts,int anim,int setAnimFlags,
+void PM_SetAnimFinal(int setAnimParts,int anim,uint32_t setAnimFlags,
 					 int blendTime)		// default blendTime=350
 {
 	BG_SetAnimFinal(pm->ps, pm->animations, setAnimParts, anim, setAnimFlags, blendTime);
@@ -2996,7 +2996,7 @@ int BG_PickAnim( int animIndex, int minAnim, int maxAnim )
 //of a pmove too so I have ported it to true BGishness.
 //Please do not reference pm in this function or any functions that it calls,
 //or I will cry. -rww
-void BG_SetAnim(playerState_t *ps, animation_t *animations, int setAnimParts,int anim,int setAnimFlags, int blendTime)
+void BG_SetAnim(playerState_t *ps, animation_t *animations, int setAnimParts,int anim,uint32_t setAnimFlags, int blendTime)
 {
 	if (!animations)
 	{
@@ -3055,7 +3055,7 @@ void BG_SetAnim(playerState_t *ps, animation_t *animations, int setAnimParts,int
 	BG_SetAnimFinal(ps, animations, setAnimParts, anim, setAnimFlags, blendTime);
 }
 
-void PM_SetAnim(int setAnimParts,int anim,int setAnimFlags, int blendTime)
+void PM_SetAnim(int setAnimParts,int anim,uint32_t setAnimFlags, int blendTime)
 {	
 	BG_SetAnim(pm->ps, pm->animations, setAnimParts, anim, setAnimFlags, blendTime);
 }

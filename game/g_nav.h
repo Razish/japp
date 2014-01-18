@@ -29,15 +29,15 @@
 	#define _HARD_CONNECT	1
 
 	//Node flags
-	#define	NF_ANY			0
-	//#define	NF_CLEAR_LOS	0x00000001
-	#define NF_CLEAR_PATH	0x00000002
-	#define NF_RECALC		0x00000004
+	#define	NF_ANY			(0x0000u)
+//	#define	NF_CLEAR_LOS	(0x0001u)
+	#define NF_CLEAR_PATH	(0x0002u)
+	#define NF_RECALC		(0x0004u)
 
 	//Edge flags
-	#define	EFLAG_NONE		0
-	#define EFLAG_BLOCKED	0x00000001
-	#define EFLAG_FAILED	0x00000002
+	#define	EFLAG_NONE		(0x0000u)
+	#define EFLAG_BLOCKED	(0x0001u)
+	#define EFLAG_FAILED	(0x0002u)
 
 	//Miscellaneous defines
 	#define	NODE_NONE		-1

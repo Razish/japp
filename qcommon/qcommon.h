@@ -407,13 +407,13 @@ modules of the program.
 
 */
 
-cvar_t *Cvar_Get( const char *var_name, const char *value, int flags );
+cvar_t *Cvar_Get( const char *var_name, const char *value, uint32_t flags );
 // creates the variable if it doesn't exist, or returns the existing one
 // if it exists, the value will not be changed, but flags will be ORed in
 // that allows variables to be unarchived without needing bitflags
 // if value is "", the value will not override a previously set value.
 
-void	Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
+void	Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, uint32_t flags );
 // basically a slightly modified Cvar_Get for the interpreted modules
 
 void	Cvar_Update( vmCvar_t *vmCvar );
@@ -463,7 +463,7 @@ void	Cvar_InfoStringBuffer( int bit, char *buff, int buffsize );
 
 void	Cvar_Restart_f( void );
 
-extern	int			cvar_modifiedFlags;
+extern uint32_t cvar_modifiedFlags;
 // whenever a cvar is modifed, its flags will be OR'd into this, so
 // a single check can determine if any CVAR_USERINFO, CVAR_SERVERINFO,
 // etc, variables have been modified since the last check.  The bit
@@ -593,7 +593,7 @@ const char *FS_ReferencedPakPureChecksums( void );
 // AND referenced pk3 files. Servers with sv_pure set will get this string 
 // back from clients for pure validation 
 
-void FS_ClearPakReferences( int flags );
+void FS_ClearPakReferences( uint32_t flags );
 // clears referenced booleans on loaded pk3s
 
 void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames );
