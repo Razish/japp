@@ -1288,7 +1288,7 @@ static void ForceClientSkin( gclient_t *client, char *model, const char *skin ) 
 ClientCheckName
 ============
 */
-static void ClientCleanName( const char *in, char *out, int outSize )
+void ClientCleanName( const char *in, char *out, int outSize )
 {
 	int outpos = 0, colorlessLen = 0, spaces = 0, ats = 0;
 
@@ -4052,5 +4052,3 @@ void ClientDisconnect( int clientNum ) {
 
 	G_ClearClientLog( clientNum );
 }
-
-

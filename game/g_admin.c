@@ -1586,7 +1586,47 @@ static void AM_Merc( gentity_t *ent ) {
 	}
 }
 
-//spawn weapons/holocrons
+static void AM_Rename( gentity_t *ent ) {
+	char arg1[MAX_NETNAME], arg2[MAX_NETNAME], oldName[MAX_NETNAME];
+	char info[MAX_INFO_STRING];
+	int targetClient;
+	gclient_t *cl;
+
+	if ( trap->Argc() != 3 ) {
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\amrename <client> <name>\n\"" );
+		return;
+	}
+
+	trap->Argv( 1, arg1, sizeof( arg1 ) );
+	trap->Argv( 2, arg2, sizeof( arg2 ) );
+
+	targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT );
+	if ( targetClient == -1 )
+		return;
+
+	cl = &level.clients[targetClient];
+	Q_strncpyz( oldName, cl->pers.netname, sizeof( oldName ) );
+	ClientCleanName( arg2, cl->pers.netname, sizeof( cl->pers.netname ) );
+
+	if ( !strcmp( oldName, cl->pers.netname ) )
+		return;
+
+	Q_strncpyz( cl->pers.netnameClean, cl->pers.netname, sizeof( cl->pers.netnameClean ) );
+	Q_CleanString( cl->pers.netnameClean, STRIP_COLOUR );
+
+	// update clientinfo
+	trap->GetConfigstring( CS_PLAYERS+targetClient, info, sizeof( info ) );
+	Info_SetValueForKey( info, "n", cl->pers.netname );
+	trap->SetConfigstring( CS_PLAYERS+targetClient, info );
+
+	// update userinfo (in engine)
+	trap->GetUserinfo( targetClient, info, sizeof( info ) );
+	Info_SetValueForKey( info, "name", cl->pers.netname );
+	trap->SetUserinfo( targetClient, info );
+	trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldName, G_GetStringEdString( "MP_SVGAME",
+		"PLRENAME" ), cl->pers.netname ) );
+}
+
 //Walk around no weapon no melee
 //admin chat logs
 
@@ -1620,6 +1660,7 @@ static const adminCommand_t adminCommands[] = {
 	{ "ampsay",			PRIV_ANNOUNCE,	AM_Announce			}, // announce a message to the specified client (Or all)
 	{ "amremap",		PRIV_REMAP,		AM_Remap			}, // shader remapping
 	{ "amremovetele",	PRIV_TELEPORT,	AM_RemoveTelemark	}, // remove a telemark from the list
+	{ "amrename",		PRIV_RENAME,	AM_Rename			}, // rename a c;ient
 	{ "amsavetele",		PRIV_TELEPORT,	AM_SaveTelemarksCmd	}, // save marked positions RAZFIXME: Temporary?
 	{ "amseetele",		PRIV_TELEPORT,	AM_SeeTelemarks		}, // visualise all telemarks
 	{ "amsilence",		PRIV_SILENCE,	AM_Silence			}, // silence specified client

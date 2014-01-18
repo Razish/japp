@@ -1214,6 +1214,7 @@ void CalculateRanks( void );
 qboolean SpotWouldTelefrag( gentity_t *spot );
 qboolean SpotWouldTelefrag2( gentity_t *mover, vector3 *dest );
 qboolean SpotWouldTelefrag3( vector3 *spot );
+void ClientCleanName( const char *in, char *out, int outSize );
 
 extern gentity_t *gJMSaberEnt;
 
