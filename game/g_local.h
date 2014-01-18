@@ -463,6 +463,7 @@ typedef struct clientPersistant_s {
 	channel_t			*channels, *activeChannel; // linked list of channels. activeChannel only used for legacy clients that don't support inline chat filters/tabs
 	int					duelWeapon; // for weapon-specific duels - pistols etc
 	vector3				duelStartPos; // respawn client to this position when duel ends
+	qboolean			ignore[MAX_CLIENTS];
 } clientPersistant_t;
 
 #define NUM_CLIENT_TRAILS (10)
@@ -1479,4 +1480,9 @@ void		G_ClearVote						( gentity_t *ent );
 void		SV_ToggleUserinfoValidation_f	( void );
 qboolean	G_CallSpawn						( gentity_t *ent );
 qboolean	G_SaberModelSetup				( gentity_t *ent );
-int			G_ClientFromString				( const gentity_t *ent, const char *match, qboolean substr, qboolean firstMatch, qboolean clean );
+
+#define FINDCL_SUBSTR		(0x0001u)
+#define FINDCL_FIRSTMATCH	(0x0002u)
+#define FINDCL_PRINT		(0x0004u)
+
+int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags );

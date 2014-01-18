@@ -196,6 +196,24 @@ static void Cmd_God_f( gentity_t *ent ) {
 	trap->SendServerCommand( ent-g_entities, va( "print \"godmode %s\n\"", (ent->flags & FL_GODMODE) ? "ON" : "OFF" ) );
 }
 
+static void Cmd_Ignore_f( gentity_t *ent ) {
+	char name[MAX_NETNAME];
+	int clientNum;
+	if ( trap->Argc() != 2 ) {
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\ignore <client>\n\"" );
+		return;
+	}
+
+	trap->Argv( 1, name, sizeof( name ) );
+	clientNum = G_ClientFromString( ent, name, FINDCL_SUBSTR|FINDCL_PRINT );
+	if ( clientNum == -1 )
+		return;
+
+	ent->client->pers.ignore[clientNum] = !ent->client->pers.ignore[clientNum];
+	trap->SendServerCommand( ent-g_entities, va( "print \"%s "S_COLOR_WHITE"%s\n\"", ent->client->pers.ignore[clientNum]
+		? S_COLOR_YELLOW"Ignoring" : S_COLOR_GREEN"Unignoring", g_entities[clientNum].client->pers.netname ) );
+}
+
 // Sets client to notarget
 static void Cmd_Notarget_f( gentity_t *ent ) {
 	ent->flags ^= FL_NOTARGET;
@@ -837,7 +855,7 @@ static void Cmd_Follow_f( gentity_t *ent ) {
 	}
 
 	trap->Argv( 1, arg, sizeof( arg ) );
-	i = G_ClientFromString( ent, arg, qtrue, qfalse, qtrue );
+	i = G_ClientFromString( ent, arg, FINDCL_SUBSTR|FINDCL_PRINT );
 	if ( i == -1 )
 		return;
 
@@ -942,6 +960,10 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
 
 	// only send admin messages to other admins
 	if ( mode == SAY_ADMIN && !other->client->pers.adminUser )
+		return;
+
+	// this client is ignoring us
+	if ( other->client->pers.ignore[ent-g_entities] )
 		return;
 
 	if ( level.gametype == GT_SIEGE && ent->client
@@ -1101,7 +1123,7 @@ static void Cmd_Tell_f( gentity_t *ent ) {
 		return;
 
 	trap->Argv( 1, arg, sizeof( arg ) );
-	targetNum = G_ClientFromString( ent, arg, qtrue, qfalse, qtrue );
+	targetNum = G_ClientFromString( ent, arg, FINDCL_SUBSTR|FINDCL_PRINT );
 	if ( targetNum == -1 )
 		return;
 
@@ -1184,7 +1206,7 @@ static void Cmd_GameCommand_f( gentity_t *ent ) {
 	char		arg[MAX_TOKEN_CHARS] = {0};
 
 	if ( trap->Argc() != 3 ) {
-		trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_YELLOW"Usage: gc <player id> <order 0-%d>\n\"", numgc_orders - 1 ) );
+		trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_YELLOW"Usage: \\gc <player id> <order 0-%d>\n\"", numgc_orders - 1 ) );
 		return;
 	}
 
@@ -1197,7 +1219,7 @@ static void Cmd_GameCommand_f( gentity_t *ent ) {
 	}
 
 	trap->Argv( 1, arg, sizeof( arg ) );
-	targetNum = G_ClientFromString( ent, arg, qtrue, qfalse, qtrue );
+	targetNum = G_ClientFromString( ent, arg, FINDCL_SUBSTR|FINDCL_PRINT );
 	if ( targetNum == -1 )
 		return;
 
@@ -1340,7 +1362,7 @@ static qboolean G_VoteSuicideDropFlag( gentity_t *ent, int numArgs, const char *
 }
 
 static qboolean G_VoteKick( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	int clientid = G_ClientFromString( ent, arg2, qtrue, qfalse, qtrue );
+	int clientid = G_ClientFromString( ent, arg2, FINDCL_SUBSTR|FINDCL_PRINT );
 	gentity_t *target = NULL;
 
 	if ( clientid == -1 )
@@ -1712,7 +1734,7 @@ static void Cmd_SetViewpos_f( gentity_t *ent ) {
 	int			i;
 
 	if ( trap->Argc() != 5 ) {
-		trap->SendServerCommand( ent-g_entities, va("print \""S_COLOR_YELLOW"Usage: setviewpos x y z yaw\n\""));
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\setviewpos x y z yaw\n\"" );
 		return;
 	}
 
@@ -2301,7 +2323,7 @@ static void Cmd_Sabercolor_f( gentity_t *ent ) {
 	char userinfo[MAX_INFO_STRING];
 
 	if ( trap->Argc() < 5 ) {
-		trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_YELLOW"Usage: /sabercolor "S_COLOR_WHITE"<"S_COLOR_YELLOW"1-2"S_COLOR_WHITE"> <"S_COLOR_RED"0-255"S_COLOR_WHITE"> <"S_COLOR_GREEN"0-255"S_COLOR_WHITE"> <"S_COLOR_CYAN"0-255"S_COLOR_WHITE">\n\"" ) );
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\sabercolor "S_COLOR_WHITE"<"S_COLOR_YELLOW"1-2"S_COLOR_WHITE"> <"S_COLOR_RED"0-255"S_COLOR_WHITE"> <"S_COLOR_GREEN"0-255"S_COLOR_WHITE"> <"S_COLOR_CYAN"0-255"S_COLOR_WHITE">\n\"" );
 		return;
 	}
 
@@ -2397,9 +2419,9 @@ static void Cmd_JoinChannel_f( gentity_t *ent ) {
 
 	if ( trap->Argc() < 2 ) {
 		if ( legacyClient )
-			trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: /joinchan <identifier/password> [short-name]>\n\"" );
+			trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\joinchan <identifier/password> [short-name]>\n\"" );
 		else
-			trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: /joinchan <identifier/password>\n\"" );
+			trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\joinchan <identifier/password>\n\"" );
 		return;
 	}
 
@@ -2509,7 +2531,7 @@ static void Cmd_WhoisChannel_f( gentity_t *ent ) {
 		trap->SendServerCommand( ent-g_entities, va( "print \"Players in channel '%s':\n%s\"", arg1_ident, msg ) );
 	}
 	else
-		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: /whoischan <identifier/password>\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\whoischan <identifier/password>\n\"" );
 
 	return;
 }
@@ -2635,7 +2657,7 @@ static void Cmd_MessageChannel_f( gentity_t *ent ) {
 		}
 	}
 	else
-		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: /msgchan <identifier/password> <message>\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\msgchan <identifier/password> <message>\n\"" );
 
 	return;
 }
@@ -2884,7 +2906,7 @@ static void Cmd_Origin_f( gentity_t *ent ) {
 	
 	//Self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT ) : ent-g_entities;
 
 	if ( targetClient == -1 )
 		return;
@@ -3007,7 +3029,7 @@ static const command_t commands[] = {
 	{ "debugBMove_Left",	Cmd_BotMoveLeft_f,			GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE },
 	{ "debugBMove_Right",	Cmd_BotMoveRight_f,			GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE },
 	{ "debugBMove_Up",		Cmd_BotMoveUp_f,			GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE },
-	{ "drop",				Cmd_Drop_f,					GTB_ALL,					CMDFLAG_NOINTERMISSION }, //Raz: added
+	{ "drop",				Cmd_Drop_f,					GTB_ALL,					CMDFLAG_NOINTERMISSION },
 	{ "duelteam",			Cmd_DuelTeam_f,				GTB_DUEL|GTB_POWERDUEL,		CMDFLAG_NOINTERMISSION },
 	{ "follow",				Cmd_Follow_f,				GTB_ALL,					CMDFLAG_NOINTERMISSION },
 	{ "follownext",			Cmd_FollowNext_f,			GTB_ALL,					CMDFLAG_NOINTERMISSION },
@@ -3017,19 +3039,20 @@ static const command_t commands[] = {
 	{ "give",				Cmd_Give_f,					GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
 	{ "giveother",			Cmd_GiveOther_f,			GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
 	{ "god",				Cmd_God_f,					GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
-	{ "joinchan",			Cmd_JoinChannel_f,			GTB_ALL,					0 }, //Raz: added
+	{ "ignore",				Cmd_Ignore_f,				GTB_ALL,					0 },
+	{ "joinchan",			Cmd_JoinChannel_f,			GTB_ALL,					0 },
 	{ "kill",				Cmd_Kill_f,					GTB_ALL,					CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
 	{ "killother",			Cmd_KillOther_f,			GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE },
-	{ "leavechan",			Cmd_LeaveChannel_f,			GTB_ALL,					0 }, //Raz: added
+	{ "leavechan",			Cmd_LeaveChannel_f,			GTB_ALL,					0 },
 	{ "levelshot",			Cmd_LevelShot_f,			GTB_ALL,					CMDFLAG_NOINTERMISSION },
-	{ "msgchan",			Cmd_MessageChannel_f,		GTB_ALL,					0 }, //Raz: added
+	{ "msgchan",			Cmd_MessageChannel_f,		GTB_ALL,					0 },
 	{ "noclip",				Cmd_Noclip_f,				GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
 	{ "notarget",			Cmd_Notarget_f,				GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
 	{ "npc",				Cmd_NPC_f,					GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE },
-	{ "origin",				Cmd_Origin_f,				GTB_ALL,					CMDFLAG_NOINTERMISSION }, // Raz: added
-	{ "ready",				Cmd_Ready_f	,				GTB_ALL,					CMDFLAG_NOINTERMISSION }, //Raz: added
-	{ "saber",				Cmd_Saber_f,				GTB_ALL,					0 }, //Raz: added
-	{ "sabercolor",			Cmd_Sabercolor_f,			GTB_ALL,					0 }, //Raz: added
+	{ "origin",				Cmd_Origin_f,				GTB_ALL,					CMDFLAG_NOINTERMISSION },
+	{ "ready",				Cmd_Ready_f	,				GTB_ALL,					CMDFLAG_NOINTERMISSION },
+	{ "saber",				Cmd_Saber_f,				GTB_ALL,					0 },
+	{ "sabercolor",			Cmd_Sabercolor_f,			GTB_ALL,					0 },
 	{ "say",				Cmd_Say_f,					GTB_ALL,					0 },
 	{ "say_team",			Cmd_SayTeam_f,				GTB_ALL,					0 },
 	{ "score",				Cmd_Score_f,				GTB_ALL,					0 },
@@ -3041,7 +3064,7 @@ static const command_t commands[] = {
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			GTB_ALL & ~(GTB_NOTTEAM),	0 },
 	{ "vote",				Cmd_Vote_f,					GTB_ALL,					CMDFLAG_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				GTB_ALL,					CMDFLAG_NOINTERMISSION },
-	{ "whoischan",			Cmd_WhoisChannel_f,			GTB_ALL,					0 }, //Raz: added
+	{ "whoischan",			Cmd_WhoisChannel_f,			GTB_ALL,					0 },
 	{ "wrists",				Cmd_Kill_f,					GTB_ALL,					CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
 	{ NULL,					NULL,						GTB_ALL,					0 },
 };

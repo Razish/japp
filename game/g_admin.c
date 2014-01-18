@@ -575,16 +575,15 @@ static void AM_Announce( gentity_t *ent ) {
 
 	//Grab the clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+	targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT );
 
 	//Check for purposely announcing to all. HACKHACKHACK
 	if ( arg1[0] == '-' && arg1[1] == '1' )
 		targetClient = -2;
 
 	// Invalid player
-	if ( targetClient == -1 ) {
+	if ( targetClient == -1 )
 		return;
-	}
 
 	// print to everyone
 	else if ( targetClient == -2 )
@@ -610,7 +609,7 @@ static void AM_Ghost( gentity_t *ent ) {
 
 	//Self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT ) : ent-g_entities;
 
 	if ( targetClient == -1 )
 		return;
@@ -655,7 +654,7 @@ static void AM_Teleport( gentity_t *ent ) {
 		int targetClient;
 
 		trap->Argv( 1, arg1, sizeof( arg1 ) );
-		targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+		targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR );
 
 		// no client with this name, check for named teleport
 		if ( targetClient == -1 ) {
@@ -699,8 +698,8 @@ static void AM_Teleport( gentity_t *ent ) {
 		char arg1[64], arg2[64];
 		int targetClient1, targetClient2;
 
-		trap->Argv( 1, arg1, sizeof( arg1 ) );	targetClient1 = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
-		trap->Argv( 2, arg2, sizeof( arg2 ) );	targetClient2 = G_ClientFromString( ent, arg2, qtrue, qfalse, qtrue );
+		trap->Argv( 1, arg1, sizeof( arg1 ) );	targetClient1 = G_ClientFromString( ent, arg1, FINDCL_SUBSTR );
+		trap->Argv( 2, arg2, sizeof( arg2 ) );	targetClient2 = G_ClientFromString( ent, arg2, FINDCL_SUBSTR );
 
 		// first arg is a valid client, attempt to find destination
 		if ( targetClient1 != -1 ) {
@@ -761,7 +760,7 @@ static void AM_Teleport( gentity_t *ent ) {
 		int targetClient;
 
 		trap->Argv( 1, argC, sizeof( argC ) );
-		targetClient = G_ClientFromString( ent, argC, qtrue, qfalse, qtrue );
+		targetClient = G_ClientFromString( ent, argC, FINDCL_SUBSTR|FINDCL_PRINT );
 
 		if ( targetClient == -1 )
 			return;
@@ -964,14 +963,14 @@ static void AM_ForceTeam( gentity_t *ent ) {
 	gentity_t *targ;
 
 	if ( trap->Argc() != 3 ) {
-		trap->SendServerCommand( ent-g_entities, "print \"Syntax: \\amforceteam <clientnum or partial name> <team>\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \"Syntax: \\amforceteam <client> <team>\n\"" );
 		return;
 	}
 
 	//amforceteam <partial name|clientNum> <team>
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	trap->Argv( 2, arg2, sizeof( arg2 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT ) : ent-g_entities;
 
 	if ( targetClient == -1 )
 		return;
@@ -998,7 +997,7 @@ static void AM_Protect( gentity_t *ent ) {
 
 	// can protect: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT ) : ent-g_entities;
 
 	if ( targetClient == -1 )
 		return;
@@ -1029,7 +1028,7 @@ static void AM_Empower( gentity_t *ent ) {
 
 	// can empower: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT ) : ent-g_entities;
 
 	if ( targetClient == -1 )
 		return;
@@ -1085,13 +1084,13 @@ static void AM_Slap( gentity_t *ent ) {
 	int targetClient;
 
 	if ( trap->Argc() != 2 ) {
-		trap->SendServerCommand( ent-g_entities, "print \"usage: amslap <clientnum or partial name>\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \"usage: amslap <client>\n\"" );
 		return;
 	}
 
 	//Can slap: partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+	targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT );
 
 	if ( targetClient == -1 )
 		return;
@@ -1128,7 +1127,7 @@ static void AM_Freeze( gentity_t *ent ) {
 
 	// grab the clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	clientNum = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+	clientNum = G_ClientFromString( ent, arg1, FINDCL_SUBSTR );
 
 	// check for purposely freezing all. HACKHACKHACK
 	if ( arg1[0] == '-' && arg1[1] == '1' )
@@ -1201,7 +1200,7 @@ static void AM_Silence( gentity_t *ent ) {
 		return;
 	}
 
-	targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+	targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT );
 	if ( targetClient == -1 )
 		return;
 
@@ -1231,7 +1230,7 @@ static void AM_Unsilence( gentity_t *ent ) {
 		return;
 	}
 
-	targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+	targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT );
 	if ( targetClient == -1 )
 		return;
 
@@ -1253,7 +1252,7 @@ static void AM_Slay( gentity_t *ent ) {
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 
-	targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+	targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT );
 	if ( targetClient == -1 )
 		return;
 
@@ -1278,7 +1277,7 @@ static void AM_Kick( gentity_t *ent ) {
 	if ( trap->Argc() > 2 )
 		reason = ConcatArgs( 2 );
 
-	clientNum = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+	clientNum = G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT );
 
 	if ( clientNum == -1 )
 		return;
@@ -1301,7 +1300,7 @@ static void AM_Ban( gentity_t *ent ) {
 	else {
 		//	clientNum / Partial name
 		trap->Argv( 1, arg1, sizeof( arg1 ) );
-		targetClient = G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue );
+		targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT );
 		if ( targetClient == -1 )
 			return;
 
@@ -1540,7 +1539,7 @@ static void AM_Merc( gentity_t *ent ) {
 
 	//Can merc: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, qtrue, qfalse, qtrue ) : ent-g_entities;
+	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT ) : ent-g_entities;
 
 	if ( targetClient == -1 )
 		return;

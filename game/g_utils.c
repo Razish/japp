@@ -1487,10 +1487,13 @@ static qboolean compareWhole( const char *s1, const char *s2 ) {
 	return (!Q_stricmp( s1, s2 )) ? qtrue : qfalse;
 }
 
-int G_ClientFromString( const gentity_t *ent, const char *match, qboolean substr, qboolean firstMatch, qboolean clean ) {
-	char cleanedMatch[MAX_STRING_CHARS];
+int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags ) {
+	char cleanedMatch[MAX_NETNAME];
 	int i;
-	gclient_t *cl = NULL;
+	gclient_t *cl;
+	qboolean substr = !!(flags & FINDCL_SUBSTR);
+	qboolean firstMatch = !!(flags & FINDCL_FIRSTMATCH);
+	qboolean print = !!(flags & FINDCL_PRINT);
 	qboolean (*compareFunc)(const char *s1, const char *s2) = substr ? compareSubstring : compareWhole;
 
 	// First check for clientNum match
@@ -1499,11 +1502,13 @@ int G_ClientFromString( const gentity_t *ent, const char *match, qboolean substr
 		if ( i >=0 && i < level.numConnectedClients ) {
 			if ( G_ValidClient( &level.clients[i] ) )
 				return i;
-			trap->SendServerCommand( ent-g_entities, va( "print \"Client %d is not on the server\n\"", i ) );
+			if ( print )
+				trap->SendServerCommand( ent-g_entities, va( "print \"Client %d is not on the server\n\"", i ) );
 			return -1;
 		}
 		else {
-			trap->SendServerCommand( ent-g_entities, va( "print \"Client %d is out of range [0, %d]\n\"", i, level.numConnectedClients-1 ) );
+			if ( print )
+				trap->SendServerCommand( ent-g_entities, va( "print \"Client %d is out of range [0, %d]\n\"", i, level.numConnectedClients-1 ) );
 			return -1;
 		}
 	}
@@ -1545,7 +1550,8 @@ int G_ClientFromString( const gentity_t *ent, const char *match, qboolean substr
 	}
 
 	//Failed, target client does not exist
-	trap->SendServerCommand( ent-g_entities, va( "print \"Client %s does not exist\n\"", cleanedMatch ) );
+	if ( print )
+		trap->SendServerCommand( ent-g_entities, va( "print \"Client %s does not exist\n\"", cleanedMatch ) );
 	return -1;
 }
 

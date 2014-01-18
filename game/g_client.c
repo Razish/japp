@@ -3937,55 +3937,47 @@ void G_ClearVote( gentity_t *ent ) {
 }
 
 void ClientDisconnect( int clientNum ) {
-	gentity_t	*ent;
-	gentity_t	*tent;
-	int			i;
+	gentity_t *ent, *tent, *other;
+	int i;
 
 	// cleanup if we are kicking a bot that
 	// hasn't spawned yet
 	G_RemoveQueuedBotBegin( clientNum );
 
 	ent = g_entities + clientNum;
-	if ( !ent->client || ent->client->pers.connected == CON_DISCONNECTED ) {
+	if ( !ent->client || ent->client->pers.connected == CON_DISCONNECTED )
 		return;
+
+	for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
+		if ( ent->client->ps.fd.forcePowersActive & (1 << i) )
+			WP_ForcePowerStop( ent, i );
 	}
 
-	i = 0;
-
-	while (i < NUM_FORCE_POWERS)
-	{
-		if (ent->client->ps.fd.forcePowersActive & (1 << i))
-		{
-			WP_ForcePowerStop(ent, i);
-		}
-		i++;
-	}
-
-	i = TRACK_CHANNEL_1;
-
-	while (i < NUM_TRACK_CHANNELS)
-	{
-		if (ent->client->ps.fd.killSoundEntIndex[i-50] && ent->client->ps.fd.killSoundEntIndex[i-50] < MAX_GENTITIES && ent->client->ps.fd.killSoundEntIndex[i-50] > 0)
-		{
-			G_MuteSound(ent->client->ps.fd.killSoundEntIndex[i-50], CHAN_VOICE);
-		}
-		i++;
+	for ( i=TRACK_CHANNEL_1; i<NUM_TRACK_CHANNELS; i++ ) {
+		if ( ent->client->ps.fd.killSoundEntIndex[i-50] && ent->client->ps.fd.killSoundEntIndex[i-50] < MAX_GENTITIES && ent->client->ps.fd.killSoundEntIndex[i-50] > 0 )
+			G_MuteSound( ent->client->ps.fd.killSoundEntIndex[i-50], CHAN_VOICE );
 	}
 
 	G_LeaveVehicle( ent, qtrue );
 
+	// make sure this client slot is unignored
+	for ( i=0, other=g_entities; i<MAX_CLIENTS; i++, other++ ) {
+		other->client->pers.ignore[clientNum] = qfalse;
+		ent->client->pers.ignore[i] = qfalse;
+	}
+
 	// stop any following clients
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
+	for ( i=0; i<level.maxclients; i++ ) {
 		if ( level.clients[i].sess.sessionTeam == TEAM_SPECTATOR
 			&& level.clients[i].sess.spectatorState == SPECTATOR_FOLLOW
-			&& level.clients[i].sess.spectatorClient == clientNum ) {
+			&& level.clients[i].sess.spectatorClient == clientNum )
+		{
 			StopFollowing( &g_entities[i] );
 		}
 	}
 
 	// send effect if they were completely connected
-	if ( ent->client->pers.connected == CON_CONNECTED 
-		&& ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+	if ( ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		tent = G_TempEntity( &ent->client->ps.origin, EV_PLAYER_TELEPORT_OUT );
 		tent->s.clientNum = ent->s.clientNum;
 
@@ -4025,17 +4017,13 @@ void ClientDisconnect( int clientNum ) {
 	{
 		trap->G2API_CleanGhoul2Models(&ent->ghoul2);
 	}
-	i = 0;
-	while (i < MAX_SABERS)
-	{
-		if (ent->client->weaponGhoul2[i] && trap->G2API_HaveWeGhoul2Models(ent->client->weaponGhoul2[i]))
-		{
-			trap->G2API_CleanGhoul2Models(&ent->client->weaponGhoul2[i]);
-		}
-		i++;
+
+	for ( i=0; i<MAX_SABERS; i++ ) {
+		if ( ent->client->weaponGhoul2[i] && trap->G2API_HaveWeGhoul2Models( ent->client->weaponGhoul2[i] ) )
+			trap->G2API_CleanGhoul2Models( &ent->client->weaponGhoul2[i] );
 	}
 
-	trap->UnlinkEntity ((sharedEntity_t *)ent);
+	trap->UnlinkEntity( (sharedEntity_t *)ent );
 	ent->s.modelindex = 0;
 	ent->inuse = qfalse;
 	ent->classname = "disconnected";
@@ -4047,25 +4035,22 @@ void ClientDisconnect( int clientNum ) {
 	G_ClearVote( ent );
 
 	//Raz: Siege item/ATST/reconnect fix http://www.lucasforums.com/showpost.php?p=2143165&postcount=92
-	if (ent->client->holdingObjectiveItem > 0)
-	{ //carrying a siege objective item - make sure it updates and removes itself from us now in case this is an instant death-respawn situation
+	if ( ent->client->holdingObjectiveItem > 0 ) {
+		// carrying a siege objective item - make sure it updates and removes itself from us now in case this is an instant death-respawn situation
 		gentity_t *objectiveItem = &g_entities[ent->client->holdingObjectiveItem];
 
-		if (objectiveItem->inuse && objectiveItem->think)
-		{
-            objectiveItem->think(objectiveItem);
-		}
+		if ( objectiveItem->inuse && objectiveItem->think )
+			objectiveItem->think( objectiveItem );
 	}
 
 	trap->SetConfigstring( CS_PLAYERS + clientNum, "");
 
 	CalculateRanks();
 
-	if ( ent->r.svFlags & SVF_BOT ) {
+	if ( ent->r.svFlags & SVF_BOT )
 		BotAIShutdownClient( clientNum, qfalse );
-	}
 
-	G_ClearClientLog(clientNum);
+	G_ClearClientLog( clientNum );
 }
 
 
