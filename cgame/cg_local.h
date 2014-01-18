@@ -1563,9 +1563,7 @@ typedef struct cgs_s {
 	int				wDisable;
 	int				fDisable;
 
-	char			mapname[MAX_QPATH];
-//	char			redTeam[MAX_QPATH];
-//	char			blueTeam[MAX_QPATH];
+	char			mapname[MAX_QPATH], mapnameClean[MAX_QPATH];
 
 	int				voteTime;
 	int				voteYes;

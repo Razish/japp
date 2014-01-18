@@ -160,6 +160,7 @@ void CG_ParseServerinfo( void ) {
 	Com_Printf( "Server support hints: 0x%X\n", cg.japp.SSF );
 
 	mapname = Info_ValueForKey( info, "mapname" );
+	Q_strncpyz( cgs.mapnameClean, mapname, sizeof( cgs.mapnameClean ) );
 
 	//rww - You must do this one here, Info_ValueForKey always uses the same memory pointer.
 	trap->Cvar_Set ( "ui_about_mapname", mapname );

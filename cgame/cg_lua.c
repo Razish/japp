@@ -369,6 +369,11 @@ static int JPLua_Export_GetMapTime( lua_State *L ) {
 	return 3;
 }
 
+static int JPLua_Export_GetMap( lua_State *L ) {
+	lua_pushstring( L, cgs.mapnameClean );
+	return 1;
+}
+
 static int JPLua_Export_GetRealTime( lua_State *L ) {
 	lua_pushinteger( L, trap->Milliseconds() );
 	return 1;
@@ -525,6 +530,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "ResolveHostname", JPLua_Export_ResolveHostname }, // string ResolveHostname( string hostname )
 	{ "GetTime", JPLua_Export_GetTime }, // integer GetTime()
 	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
+	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
 	{ "GetRealTime", JPLua_Export_GetRealTime }, // integer GetRealTime()
 	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
 	{ "RayTrace", JPLua_Export_Trace }, // traceResult Trace( stuff )
