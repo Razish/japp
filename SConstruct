@@ -138,6 +138,7 @@ files['game'] = [
 	'game/g_lua.c',
 	'game/g_luacvar.c',
 	'game/g_luaevent.c',
+	'game/g_luaplayer.c',
 	'game/g_main.c',
 	'game/g_mem.c',
 	'game/g_misc.c',

@@ -344,6 +344,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "AddClientCommand", JPLua_Export_AddClientCommand }, // AddClientCommand( string cmd )
 	{ "AddServerCommand", JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
 
+	{ "GetPlayer", JPLua_GetPlayer }, // Player GetPlayer( integer clientNum )
 	{ "CreateCvar", JPLua_CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
 
@@ -492,10 +493,11 @@ void JPLua_Init( void ) {
 		lua_register( JPLua.state, JPLua_CImports[i].name, JPLua_CImports[i].function );
 
 	// Register our classes
-	/*JPLua_Register_Player( JPLua.state );
+	/*
 	JPLua_Register_Server( JPLua.state );
 	JPLua_Register_Serialiser( JPLua.state );
 	*/
+	JPLua_Register_Player( JPLua.state );
 	JPLua_Register_Cvar( JPLua.state );
 
 	// -- FRAMEWORK INITIALISATION begin

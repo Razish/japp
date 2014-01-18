@@ -6,6 +6,7 @@
 
 #include "g_luacvar.h"
 #include "g_luaevent.h"
+#include "g_luaplayer.h"
 
 #ifdef JPLUA
 
