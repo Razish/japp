@@ -61,7 +61,6 @@ void G_WriteClientSessionData( gclient_t *client )
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.selectedFP ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.duelTeam ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.siegeDesiredTeam ) );
-	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.validated ) );
 	Q_strcat( s, sizeof( s ), va( "%s ", siegeClass ) );
 	Q_strcat( s, sizeof( s ), va( "%s", IP ) );
 
@@ -88,7 +87,7 @@ void G_ReadSessionData( gclient_t *client )
 	trap->Cvar_VariableStringBuffer( var, s, sizeof(s) );
 
 	//RAZTODO: sscanf validation
-	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %s %s",
+	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %s %s",
 		&tmp1,
 		&client->sess.spectatorTime,
 		&tmp2,
@@ -100,7 +99,6 @@ void G_ReadSessionData( gclient_t *client )
 		&client->sess.selectedFP,
 		&client->sess.duelTeam,
 		&client->sess.siegeDesiredTeam,
-		&client->sess.validated,
 		client->sess.siegeClass,
 		client->sess.IP
 		);

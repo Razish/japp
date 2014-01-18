@@ -2381,16 +2381,13 @@ static qboolean CompareIPNum( int clientnum1, int clientnum2 )
 #endif
 
 char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
-	char		*value;
-	gentity_t	*ent = NULL, *te = NULL;
-	gclient_t	*client;
-	int			finalCSF = 0;
-	char		userinfo[MAX_INFO_STRING] = {0},
-				tmpIP[NET_ADDRSTRMAXLEN] = {0};
+	gentity_t *ent = NULL, *te = NULL;
+	gclient_t *client;
+	uint32_t finalCSF = 0;
+	char *value, userinfo[MAX_INFO_STRING], tmpIP[NET_ADDRSTRMAXLEN];
 
 	ent = &g_entities[ clientNum ];
 
-	level.security.clientConnectionActive[clientNum] = qfalse;
 	ent->s.number = clientNum;
 	ent->classname = "connecting";
 
@@ -2420,43 +2417,39 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		}
 	}
 
-	if ( !isBot && firstTime )
-	{
-		if ( japp_antiFakePlayer.integer )
-		{// check for > g_maxConnPerIP connections from same IP
+	if ( !isBot && firstTime ) {
+		if ( japp_antiFakePlayer.integer ) {
+			// check for > g_maxConnPerIP connections from same IP
 			int count=0, i=0;
 			for ( i=0; i<sv_maxclients.integer; i++ ) {
 				if ( CompareIPString( tmpIP, level.clients[i].sess.IP ) )
 					count++;
 			}
-			if ( count > japp_maxConnPerIP.integer )
-			{
+			if ( count > japp_maxConnPerIP.integer ) {
 			//	client->pers.connected = CON_DISCONNECTED;
 				return "Too many connections from the same IP";
 			}
 		}
 	}
 
-	if ( ent->inuse )
-	{// if a player reconnects quickly after a disconnect, the client disconnect may never be called, thus flag can get lost in the ether
+	if ( ent->inuse ) {
+		// if a player reconnects quickly after a disconnect, the client disconnect may never be called, thus flag can get lost in the ether
 		G_LogPrintf( "Forcing disconnect on active client: %i\n", clientNum );
 		// so lets just fix up anything that should happen on a disconnect
 		ClientDisconnect( clientNum );
 	}
 
 	//Raz: userinfo check
-	if ( !isBot )
-	{//Check their userinfo for the right modification (WEAK!)
+	if ( !isBot ) {
 		char msg[2048] = { 0 };
 		value = Info_ValueForKey( userinfo, "cjp_client" );
-		if ( Q_strchrs( value, "\n\r;\"" ) )
-		{//Spoofed userinfo
+		if ( Q_strchrs( value, "\n\r;\"" ) ) {
+			// Spoofed userinfo
 			G_SecurityLogPrintf( "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 		Q_strcat( msg, sizeof( msg ), va( "cjp_client: %s...", value[0] ? value : "basejka" ) );
-		if ( value[0] )
-		{
+		if ( value[0] ) {
 			Q_CleanString( value, STRIP_COLOUR|STRIP_EXTASCII );
 			Q_strcat( msg, sizeof( msg ), va( " assumed JA+ csf 0x%X...", JAPLUS_CLIENT_FLAGS ) );
 			finalCSF = JAPLUS_CLIENT_FLAGS;
@@ -2466,14 +2459,12 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 		//Raz: CLIENT SUPPORT HINTING
 		value = Info_ValueForKey( userinfo, "csf" );
-		if ( Q_strchrs( value, "\n\r;\"" ) )
-		{
+		if ( Q_strchrs( value, "\n\r;\"" ) ) {
 			G_SecurityLogPrintf( "ClientConnect(%d): Spoofed userinfo 'csf'. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 
-		if ( value[0] && sscanf( value, "%X", &finalCSF ) != 1 )
-		{
+		if ( value[0] && sscanf( value, "%X", &finalCSF ) != 1 ) {
 			G_LogPrintf( "ClientConnect(%d): userinfo 'csf' was found, but empty. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
@@ -2486,10 +2477,8 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	ent->client = level.clients + clientNum;
 	client = ent->client;
 
-	//assign the pointer for bg entity access
+	// assign the pointer for bg entity access
 	ent->playerState = &ent->client->ps;
-
-//	areabits = client->areabits;
 
 	memset( client, 0, sizeof(*client) );
 
@@ -2498,39 +2487,25 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->pers.CSF = finalCSF;
 
 	// read or initialize the session data
-	if ( firstTime || level.newSession ) {
+	if ( firstTime || level.newSession )
 		G_InitSessionData( client, userinfo, isBot );
-	}
 	G_ReadSessionData( client );
 
-	if (level.gametype == GT_SIEGE &&
-		(firstTime || level.newSession))
-	{ //if this is the first time then auto-assign a desired siege team and show briefing for that team
-		client->sess.siegeDesiredTeam = 0;//PickTeam(ent->s.number);
-		/*
-		trap->SendServerCommand(ent->s.number, va("sb %i", client->sess.siegeDesiredTeam));
-		*/
-		//don't just show it - they'll see it if they switch to a team on purpose.
-	}
+	// if this is the first time then auto-assign a desired siege team and show briefing for that team
+	if ( level.gametype == GT_SIEGE && (firstTime || level.newSession) )
+		client->sess.siegeDesiredTeam = 0;
 
-
-	if (level.gametype == GT_SIEGE && client->sess.sessionTeam != TEAM_SPECTATOR)
-	{
-		if (firstTime || level.newSession)
-		{ //start as spec
+	if ( level.gametype == GT_SIEGE && client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		if ( firstTime || level.newSession ) {
+			// start as spec
 			client->sess.siegeDesiredTeam = client->sess.sessionTeam;
 			client->sess.sessionTeam = TEAM_SPECTATOR;
 		}
 	}
-	else if (level.gametype == GT_POWERDUEL && client->sess.sessionTeam != TEAM_SPECTATOR)
+	else if ( level.gametype == GT_POWERDUEL && client->sess.sessionTeam != TEAM_SPECTATOR )
 		client->sess.sessionTeam = TEAM_SPECTATOR;
 
-	if ( isBot )
-	{//bots are assumed to be valid ;o
-		int i;
-		for (i=0; i<CV_MAX; i++)
-			client->sess.validated |= (1<<i);
-
+	if ( isBot ) {
 		ent->r.svFlags |= SVF_BOT;
 		ent->inuse = qtrue;
 		if ( !G_BotConnect( clientNum, !firstTime ) )
@@ -2541,10 +2516,9 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	if ( !ClientUserinfoChanged( clientNum ) )
 		return "Failed userinfo validation";
 
-	if ( !isBot && firstTime )
-	{
-		if ( !tmpIP[0] )
-		{//No IP sent when connecting, probably an unban hack attempt
+	if ( !isBot && firstTime ) {
+		if ( !tmpIP[0] ) {
+			// No IP sent when connecting, probably an unban hack attempt
 			client->pers.connected = CON_DISCONNECTED;
 			G_SecurityLogPrintf( "Client %i (%s) sent no IP when connecting.\n", clientNum, client->pers.netname );
 			return "Invalid userinfo detected";
@@ -2555,14 +2529,11 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	G_LogPrintf( "ClientConnect: %i (%s) [IP: %s]\n", clientNum, client->pers.netname, tmpIP);
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
-	if ( firstTime ) {
+	if ( firstTime )
 		trap->SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " %s\n\"", client->pers.netname, G_GetStringEdString("MP_SVGAME", "PLCONNECT")) );
-	}
 
-	if ( level.gametype >= GT_TEAM &&
-		client->sess.sessionTeam != TEAM_SPECTATOR ) {
+	if ( level.gametype >= GT_TEAM && client->sess.sessionTeam != TEAM_SPECTATOR )
 		BroadcastTeamChange( client, -1 );
-	}
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();
@@ -2570,11 +2541,6 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	te = G_TempEntity( &vec3_origin, EV_CLIENTJOIN );
 	te->r.svFlags |= SVF_BROADCAST;
 	te->s.eventParm = clientNum;
-
-	// for statistics
-//	client->areabits = areabits;
-//	if ( !client->areabits )
-//		client->areabits = G_Alloc( (trap->AAS_PointReachabilityAreaIndex( NULL ) + 7) / 8 );
 
 	return NULL;
 }
@@ -4077,9 +4043,6 @@ void ClientDisconnect( int clientNum ) {
 	ent->client->ps.persistant[PERS_TEAM] = TEAM_FREE;
 	ent->client->sess.sessionTeam = TEAM_FREE;
 	ent->r.contents = 0;
-
-	ent->client->sess.validated  &= ~(1<<CV_ACTIVECON);
-	level.security.clientConnectionActive[clientNum] = qfalse;
 
 	G_ClearVote( ent );
 

@@ -3808,6 +3808,8 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 		return;
 	}
 
+	ent->client->scoresWaiting = qtrue;
+
 	// if we are doing a chase cam or a remote view, grab the latest info
 	if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
 		int		clientNum;//, flags;
@@ -3846,6 +3848,91 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 	}
 }
 
+static void G_SendScoreboardUpdate( gentity_t *ent ) {
+	char		entry[MAX_STRING_CHARS], string[MAX_STRING_CHARS-32];
+	int			i, j;
+	int			stringlength=0, numSorted, scoreFlags=0, accuracy, perfect;
+	gclient_t	*cl = NULL;
+
+	// only send updates every japp_scoreUpdateRate msec
+	if ( !ent->client->scoresWaiting || ent->client->lastScoresTime > level.time - japp_scoreUpdateRate.integer )
+		return;
+	ent->client->lastScoresTime = level.time;
+	ent->client->scoresWaiting = qfalse;
+
+	// send the latest information on all clients
+	numSorted = level.numConnectedClients;
+	
+	if ( !Client_Supports( ent, CSF_SCOREBOARD_LARGE ) )
+		Q_capi( numSorted, MAX_CLIENT_SCORE_SEND );
+
+	for ( i=0; i<numSorted; i++ ) {
+		int ping;
+
+		cl = &level.clients[level.sortedClients[i]];
+
+		ping		= (cl->pers.connected == CON_CONNECTING) ? -1 : Q_clampi( 0, cl->ps.ping, 999 );
+		accuracy	= (cl->accuracy_shots) ? cl->accuracy_hits * 100 / cl->accuracy_shots : 0;
+		perfect		= (cl->ps.persistant[PERS_RANK] == 0 && cl->ps.persistant[PERS_KILLED] == 0);
+
+		// base, no K/D
+		if ( !Client_Supports( ent, CSF_SCOREBOARD_KD ) ) {
+			Com_sprintf( entry,
+				sizeof( entry ),
+				" %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+				level.sortedClients[i],
+				cl->ps.persistant[PERS_SCORE],
+				ping,
+				(level.time - cl->pers.enterTime)/60000,
+				scoreFlags,
+				g_entities[level.sortedClients[i]].s.powerups,
+				accuracy, 
+				cl->ps.persistant[PERS_IMPRESSIVE_COUNT],
+				cl->ps.persistant[PERS_EXCELLENT_COUNT],
+				cl->ps.persistant[PERS_GAUNTLET_FRAG_COUNT], 
+				cl->ps.persistant[PERS_DEFEND_COUNT], 
+				cl->ps.persistant[PERS_ASSIST_COUNT], 
+				perfect,
+				cl->ps.persistant[PERS_CAPTURES] );
+		}
+		// client mod hints K/D
+		else {
+			Com_sprintf( entry,
+				sizeof( entry ),
+				" %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+				level.sortedClients[i],
+				cl->ps.persistant[PERS_SCORE],
+				ping,
+				(level.time - cl->pers.enterTime)/60000,
+				scoreFlags,
+				g_entities[level.sortedClients[i]].s.powerups,
+				accuracy, 
+				cl->ps.persistant[PERS_IMPRESSIVE_COUNT],
+				cl->ps.persistant[PERS_EXCELLENT_COUNT],
+				cl->ps.persistant[PERS_GAUNTLET_FRAG_COUNT], 
+				cl->ps.persistant[PERS_DEFEND_COUNT], 
+				cl->ps.persistant[PERS_ASSIST_COUNT], 
+				perfect,
+				cl->ps.persistant[PERS_CAPTURES],
+				cl->ps.persistant[PERS_KILLED] );
+		}
+
+		//Protect against client overflow
+		j = strlen( entry );
+		if ( stringlength + j >= 1022 )
+			break;
+
+		strcpy( string + stringlength, entry );
+		stringlength += j;
+	}
+
+	trap->SendServerCommand( ent-g_entities, va( "scores %i %i %i%s",
+											level.numConnectedClients,
+											level.teamScores[TEAM_RED],
+											level.teamScores[TEAM_BLUE],
+											string ) );
+}
+
 /*
 ==============
 ClientEndFrame
@@ -3863,6 +3950,9 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		isNPC = qtrue;
 	}
+
+	// see if there is a scoreboard message pending
+	G_SendScoreboardUpdate( ent );
 
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		SpectatorClientEndFrame( ent );

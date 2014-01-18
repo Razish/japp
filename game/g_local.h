@@ -379,13 +379,6 @@ typedef enum clientConnected_e {
 	CON_CONNECTED
 } clientConnected_t;
 
-//RAZTODO: Remove clientValidation_t?
-typedef enum clientValidation_e {
-	CV_UINFO = 0,
-	CV_ACTIVECON,
-	CV_MAX
-} clientValidation_t;
-
 typedef enum spectatorState_e {
 	SPECTATOR_NOT,
 	SPECTATOR_FREE,
@@ -439,7 +432,6 @@ typedef struct clientSession_s {
 	int					duelTeam;
 	int					siegeDesiredTeam;
 	char				IP[NET_ADDRSTRMAXLEN];
-	int					validated;
 } clientSession_t;
 
 // playerstate mGameFlags
@@ -744,6 +736,9 @@ typedef struct gclient_s {
 		int		drainDebounce;
 		int		lightningDebounce;
 	} force;
+
+	int			lastScoresTime; // level.time the last scoreboard message was went
+	qboolean	scoresWaiting;
 } gclient_t;
 
 //Interest points
@@ -911,13 +906,9 @@ typedef struct level_locals_s {
 
 	char		mTeamFilter[MAX_QPATH];
 
-	struct {
-		qboolean		isPatched;
-		qboolean		clientConnectionActive[MAX_CLIENTS];
-		fileHandle_t	log;
-	} security;
+	fileHandle_t securityLog;
 
-	char				rawmapname[MAX_QPATH];
+	char		rawmapname[MAX_QPATH];
 
 	int			frameStartTime;         //NT - actual time frame started
 
@@ -1242,7 +1233,6 @@ void RemoveDetpacks(gentity_t *ent);
 //
 void MoveClientToIntermission (gentity_t *client);
 void G_SetStats (gentity_t *ent);
-void DeathmatchScoreboardMessage (gentity_t *client);
 
 //
 // g_main.c

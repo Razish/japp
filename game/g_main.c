@@ -346,11 +346,11 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	if ( japp_securityLog.integer )
 	{
 		if ( japp_securityLog.integer == 1 )
-			trap->FS_Open( SECURITY_LOG, &level.security.log, FS_APPEND );
+			trap->FS_Open( SECURITY_LOG, &level.securityLog, FS_APPEND );
 		else if ( japp_securityLog.integer == 2 )
-			trap->FS_Open( SECURITY_LOG, &level.security.log, FS_APPEND_SYNC );
+			trap->FS_Open( SECURITY_LOG, &level.securityLog, FS_APPEND_SYNC );
 
-		if ( level.security.log )
+		if ( level.securityLog )
 			trap->Print( "Logging to "SECURITY_LOG"\n" );
 		else
 			trap->Print( "WARNING: Couldn't open logfile: "SECURITY_LOG"\n" );
@@ -608,8 +608,8 @@ void G_ShutdownGame( int restart ) {
 		trap->FS_Close( level.logFile );
 	}
 
-	if ( level.security.log )
-		trap->FS_Close( level.security.log );
+	if ( level.securityLog )
+		trap->FS_Close( level.securityLog );
 
 	// write all the client session data so we can get it back
 	G_WriteSessionData();
@@ -1307,12 +1307,12 @@ due to enters/exits/forced team changes
 ========================
 */
 void SendScoreboardMessageToAllClients( void ) {
-	int		i;
+	int i;
+	gclient_t *cl;
 
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if ( level.clients[ i ].pers.connected == CON_CONNECTED ) {
-			DeathmatchScoreboardMessage( g_entities + i );
-		}
+	for ( i=0, cl=level.clients; i<level.maxclients; i++, cl++ ) {
+		if ( cl->pers.connected == CON_CONNECTED )
+			cl->scoresWaiting = qtrue;
 	}
 }
 
@@ -1640,10 +1640,10 @@ void QDECL G_SecurityLogPrintf( const char *fmt, ... ) {
 	if ( dedicated.integer )
 		trap->Print( "%s", string + timeLen );
 
-	if ( !level.security.log )
+	if ( !level.securityLog )
 		return;
 
-	trap->FS_Write( string, strlen( string ), level.security.log );
+	trap->FS_Write( string, strlen( string ), level.securityLog );
 }
 
 /*
