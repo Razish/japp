@@ -22,6 +22,11 @@ int JPLua_GetPlayer( lua_State *L ) {
 		}
 	}
 
+	else {
+		lua_pushnil( L );
+		return 1;
+	}
+
 	JPLua_Player_CreateRef( L, clientNum );
 	return 1;
 }
