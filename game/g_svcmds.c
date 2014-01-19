@@ -88,9 +88,9 @@ void G_ShuffleTeams(void)
 		if ( cTeam != cl_ent->client->sess.sessionTeam )
 		{
 			if ( cTeam == TEAM_RED )
-				SetTeam( cl_ent, "r" );
+				SetTeam( cl_ent, "r", qtrue );
 			else if ( cTeam == TEAM_BLUE )
-				SetTeam( cl_ent, "b" );
+				SetTeam( cl_ent, "b", qtrue );
 		}
 	}
 
@@ -310,7 +310,7 @@ static void SV_ForceTeam_f( void ) {
 
 	// set the team
 	trap->Argv( 2, str, sizeof( str ) );
-	SetTeam( &g_entities[cl - level.clients], str );
+	SetTeam( &g_entities[cl - level.clients], str, qtrue );
 }
 
 static void SV_GameMemory_f( void ) {

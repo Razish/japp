@@ -357,14 +357,14 @@ static qboolean G_PowerDuelCheckFail( gentity_t *ent ) {
 
 qboolean g_dontPenalizeTeam = qfalse;
 qboolean g_preventTeamBegin = qfalse;
-void SetTeam( gentity_t *ent, char *s ) {
+qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 	int					team, oldTeam, clientNum, specClient;
 	gclient_t			*client;
 	spectatorState_t	specState;
 
 	//Raz: this prevents rare creation of invalid players
 	if ( !ent->inuse )
-		return;
+		return qfalse;
 
 	//
 	// see what change is requested
@@ -411,11 +411,11 @@ void SetTeam( gentity_t *ent, char *s ) {
 			// We allow a spread of two
 			if ( team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] > 1 ) {
 				trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "TOOMANYRED" ) ) );
-				return; // ignore the request
+				return qfalse; // ignore the request
 			}
 			if ( team == TEAM_BLUE && counts[TEAM_BLUE] - counts[TEAM_RED] > 1 ) {
 				trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "TOOMANYBLUE" ) ) );
-				return; // ignore the request
+				return qfalse; // ignore the request
 			}
 			// It's ok, the team we are switching to has less or same number of players
 		}
@@ -429,10 +429,10 @@ void SetTeam( gentity_t *ent, char *s ) {
 	if ( level.gametype == GT_SIEGE ) {
 		// sorry, can't do that.
 		if ( client->tempSpectate >= level.time && team == TEAM_SPECTATOR )
-			return;
+			return qfalse;
 
 		if ( team == oldTeam && team != TEAM_SPECTATOR )
-			return;
+			return qfalse;
 
 		client->sess.siegeDesiredTeam = team;
 		if ( client->sess.sessionTeam != TEAM_SPECTATOR && team != TEAM_SPECTATOR ) {
@@ -450,7 +450,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 			if ( ent->client->sess.sessionTeam != ent->client->sess.siegeDesiredTeam )
 				SetTeamQuick( ent, ent->client->sess.siegeDesiredTeam, qfalse );
 
-			return;
+			return qtrue;
 		}
 	}
 
@@ -464,7 +464,13 @@ void SetTeam( gentity_t *ent, char *s ) {
 
 	// decide if we will allow the change
 	if ( team == oldTeam && team != TEAM_SPECTATOR )
-		return;
+		return qfalse;
+
+	// check if the team is locked
+	if ( !forced && team != oldTeam && level.lockedTeams[team] ) {
+		trap->SendServerCommand( clientNum, "print \""S_COLOR_YELLOW"This team is locked\n\"" );
+		return qfalse;
+	}
 
 	// execute the team change
 
@@ -506,10 +512,12 @@ void SetTeam( gentity_t *ent, char *s ) {
 
 	// get and distribute relevent paramters
 	if ( !ClientUserinfoChanged( clientNum ) )
-		return;
+		return qfalse;
 
 	if ( !g_preventTeamBegin )
 		ClientBegin( clientNum, qfalse );
+
+	return qtrue;
 }
 
 // If the client being followed leaves the game, or you just want to drop to free floating spectator mode
@@ -595,7 +603,7 @@ static void Cmd_Team_f( gentity_t *ent ) {
 
 	trap->Argv( 1, s, sizeof( s ) );
 
-	SetTeam( ent, s );
+	SetTeam( ent, s, qfalse );
 
 	//Raz: update team switch time only if team change really happened
 	if ( oldTeam != ent->client->sess.sessionTeam )
@@ -731,9 +739,9 @@ static void Cmd_SiegeClass_f( gentity_t *ent ) {
 		// try changing it then
 		g_preventTeamBegin = qtrue;
 		if ( team == TEAM_RED )
-			SetTeam( ent, "red" );
+			SetTeam( ent, "red", qfalse );
 		else if ( team == TEAM_BLUE )
-			SetTeam( ent, "blue" );
+			SetTeam( ent, "blue", qfalse );
 		g_preventTeamBegin = qfalse;
 
 		if ( ent->client->sess.sessionTeam != team ) {
@@ -876,8 +884,10 @@ static void Cmd_Follow_f( gentity_t *ent ) {
 		ent->client->sess.losses++; //WTF???
 
 	// first set them to spectator
-	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR )
-		SetTeam( ent, "spectator" );
+	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		if ( !SetTeam( ent, "spectator", qfalse ) )
+			return;
+	}
 
 	ent->client->sess.spectatorState = SPECTATOR_FOLLOW;
 	ent->client->sess.spectatorClient = i;
@@ -892,8 +902,10 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 		ent->client->sess.losses++; //WTF???
 
 	// first set them to spectator
-	if ( ent->client->sess.spectatorState == SPECTATOR_NOT )
-		SetTeam( ent, "spectator" );
+	if ( ent->client->sess.spectatorState == SPECTATOR_NOT ) {
+		if ( !SetTeam( ent, "spectator", qfalse ) )
+			return;
+	}
 
 	if ( dir != 1 && dir != -1 )
 		trap->Error( ERR_DROP, "Cmd_FollowCycle_f: bad dir %i", dir );

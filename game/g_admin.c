@@ -978,7 +978,7 @@ static void AM_ForceTeam( gentity_t *ent ) {
 	targ = &g_entities[targetClient];
 
 	if ( targ->inuse && targ->client && targ->client->pers.connected )
-		SetTeam( targ, arg2 );
+		SetTeam( targ, arg2, qtrue );
 }
 
 // force the targeted client to spectator team
@@ -986,7 +986,7 @@ static void AM_GunSpectate( gentity_t *ent ) {
 	trace_t *tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum < MAX_CLIENTS )
-		SetTeam( &g_entities[tr->entityNum], "s" );
+		SetTeam( &g_entities[tr->entityNum], "s", qtrue );
 }
 
 // protect/unprotect the specified client
@@ -1336,25 +1336,8 @@ static void AM_BanIP( gentity_t *ent ) {
 	return;
 }
 
-#ifdef _DEBUG
-static void AM_Test( gentity_t *ent ) {
 #if 0
-	gentity_t	*ghost = &g_entities[G_RealTrace( ent, 0.0f )->entityNum];
-
-	if ( ghost->s.number > MAX_CLIENTS )
-		return;
-
-	if ( ghost->client->pers.adminData.isGhost2 )
-		ghost->r.broadcastClients[0] &= ~(1 << ent->s.number);
-	else
-		ghost->r.broadcastClients[0] |= (1 << ent->s.number);
-
-//	ghost->r.broadcastClients[0] ^= (1 << ent->s.number);
-	ent->r.broadcastClients[0] ^= (1 << ghost->s.number);
-
-	ghost->client->pers.adminData.isGhost2 ^= 1;
-#endif
-#if 0
+static void AM_Portal( gentity_t *ent ) {
 	gentity_t       *obj = G_Spawn();
 	trace_t         *tr = G_RealTrace( ent, 0.0f );
 	vector3          forward, up = { 0, 0, 1 };
@@ -1389,7 +1372,6 @@ static void AM_Test( gentity_t *ent ) {
 
 	G_CallSpawn( obj );
 	return;
-#endif
 }
 #endif
 
@@ -1627,6 +1609,93 @@ static void AM_Rename( gentity_t *ent ) {
 		"PLRENAME" ), cl->pers.netname ) );
 }
 
+static void AM_LockTeam( gentity_t *ent ) {
+	char arg1[16];
+	team_t team;
+
+	if ( trap->Argc() != 2 ) {
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\amlockteam <team, -1>\n\"" );
+		return;
+	}
+
+	trap->Argv( 1, arg1, sizeof( arg1 ) );
+
+	if ( atoi( arg1 ) == -1 ) {
+		int i;
+		qboolean lockedAny = qfalse;
+		for ( i=0; i<TEAM_NUM_TEAMS; i++ ) {
+			if ( !level.lockedTeams[i] )
+				lockedAny = qtrue;
+			level.lockedTeams[i] = qtrue;
+		}
+		// force all to spectator? unlock spectator?
+		if ( lockedAny )
+			trap->SendServerCommand( -1, "print \""S_COLOR_YELLOW"All teams are locked\n\"" );
+		return;
+	}
+
+	if ( !Q_stricmp( arg1, "red" ) || !Q_stricmp( arg1, "r" ) )
+		team = TEAM_RED;
+	else if ( !Q_stricmp( arg1, "blue" ) || !Q_stricmp( arg1, "b" ) )
+		team = TEAM_BLUE;
+	else if ( !Q_stricmp( arg1, "spectator" ) || !Q_stricmp( arg1, "s" ) )
+		team = TEAM_SPECTATOR;
+	else {
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Invalid team\n\"" );
+		return;
+	}
+
+	// check if it's already locked
+	if ( level.lockedTeams[team] )
+		return;
+
+	level.lockedTeams[team] = qtrue;
+	trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"team has been locked\n\"", TeamName( team ) ) );
+}
+
+static void AM_UnlockTeam( gentity_t *ent ) {
+	char arg1[16];
+	team_t team;
+
+	if ( trap->Argc() != 2 ) {
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\amunlockteam <team, -1>\n\"" );
+		return;
+	}
+
+	trap->Argv( 1, arg1, sizeof( arg1 ) );
+
+	if ( atoi( arg1 ) == -1 ) {
+		int i;
+		qboolean unlockedAny = qfalse;
+		for ( i=0; i<TEAM_NUM_TEAMS; i++ ) {
+			if ( level.lockedTeams[i] )
+				unlockedAny = qtrue;
+			level.lockedTeams[i] = qfalse;
+		}
+		if ( unlockedAny )
+			trap->SendServerCommand( -1, "print \""S_COLOR_CYAN"All teams are unlocked\n\"" );
+		return;
+	}
+
+	if ( !Q_stricmp( arg1, "red" ) || !Q_stricmp( arg1, "r" ) )
+		team = TEAM_RED;
+	else if ( !Q_stricmp( arg1, "blue" ) || !Q_stricmp( arg1, "b" ) )
+		team = TEAM_BLUE;
+	else if ( !Q_stricmp( arg1, "spectator" ) || !Q_stricmp( arg1, "s" ) )
+		team = TEAM_SPECTATOR;
+	else {
+		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Invalid team\n\"" );
+		return;
+	}
+
+	// check if it's already unlocked
+	if ( !level.lockedTeams[team] )
+		return;
+
+	level.lockedTeams[team] = qfalse;
+	trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"team has been unlocked\n\"", TeamName( team ) ) );
+}
+
 //Walk around no weapon no melee
 //admin chat logs
 
@@ -1649,6 +1718,7 @@ static const adminCommand_t adminCommands[] = {
 	{ "amkick",			PRIV_KICK,		AM_Kick				}, // kick specified client
 	{ "amkillvote",		PRIV_KILLVOTE,	AM_KillVote			}, // kill the current vote
 	{ "amlisttele",		PRIV_TELEPORT,	AM_ListTelemarks	}, // list all marked positions
+	{ "amlockteam",		PRIV_LOCKTEAM,	AM_LockTeam			}, // prevent clients from joining a team
 	{ "amlogout",		-1,				AM_Logout			}, // logout
 	{ "amluaexec",		PRIV_LUA,		AM_Lua				}, // execute Lua code
 	{ "amluareload",	PRIV_LUA,		AM_ReloadLua		}, // reload JPLua system
@@ -1670,9 +1740,7 @@ static const adminCommand_t adminCommands[] = {
 	{ "amstatus",		PRIV_STATUS,	AM_Status			}, // display list of players + clientNum + IP + admin
 	{ "amtele",			PRIV_TELEPORT,	AM_Teleport			}, // teleport (All variations of x to y)
 	{ "amtelemark",		PRIV_TELEPORT,	AM_Telemark			}, // mark current location
-#ifdef _DEBUG
-	{ "amtest",			-1,				AM_Test				}, // test :D
-#endif
+	{ "amunlockteam",	PRIV_LOCKTEAM,	AM_UnlockTeam		}, // allow clients to join a team
 	{ "amunsilence",	PRIV_SILENCE,	AM_Unsilence		}, // unsilence specified client
 	{ "amunspawn",		PRIV_ENTSPAWN,	AM_EntRemove		}, // remove an entity
 	{ "amvstr",			PRIV_VSTR,		AM_Vstr				}, // execute a variable string

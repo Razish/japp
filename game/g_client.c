@@ -2579,7 +2579,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 			const char *team = "Red";
 			int preSess;
 
-			//SetTeam(ent, "");
+			//SetTeam(ent, "", qfalse);
 			ent->client->sess.sessionTeam = PickTeam(-1);
 			trap->GetUserinfo(clientNum, userinfo, MAX_INFO_STRING);
 
@@ -2695,7 +2695,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 		ent->client->renderInfo.lastG2 = NULL; //update the renderinfo bolts next update.
 
 	if ( level.gametype == GT_POWERDUEL && client->sess.sessionTeam != TEAM_SPECTATOR && client->sess.duelTeam == DUELTEAM_FREE )
-		SetTeam( ent, "s" );
+		SetTeam( ent, "s", qfalse );
 	else
 	{
 		if ( level.gametype == GT_SIEGE && (!gSiegeRoundBegun || gSiegeRoundEnded) )
@@ -3440,7 +3440,7 @@ void ClientSpawn(gentity_t *ent) {
 				{//using force but not on right team, switch him over
 					const char *teamName = TeamName( forceTeam );
 					//client->sess.sessionTeam = forceTeam;
-					SetTeam( ent, (char *)teamName );
+					SetTeam( ent, teamName, qfalse );
 					return;
 				}
 			}

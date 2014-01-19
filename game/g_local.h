@@ -916,6 +916,7 @@ typedef struct level_locals_s {
 	int			gametype;
 
 	qboolean allReady;
+	qboolean lockedTeams[TEAM_NUM_TEAMS];
 
 	struct {
 		int state; //OSP: paused state of the match
@@ -952,7 +953,7 @@ char *G_NewString( const char *string );
 void Cmd_Score_f (gentity_t *ent);
 void StopFollowing( gentity_t *ent );
 void BroadcastTeamChange( gclient_t *client, int oldTeam );
-void SetTeam( gentity_t *ent, char *s );
+qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced );
 void Cmd_FollowCycle_f( gentity_t *ent, int dir );
 void Cmd_SaberAttackCycle_f(gentity_t *ent);
 int G_ItemUsable(playerState_t *ps, int forcedUse);
