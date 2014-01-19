@@ -2064,6 +2064,11 @@ qboolean Server_Supports( uint32_t supportFlag );
 void HandleTeamBinds( char *buf, int bufsize );
 
 // chatbox stuff
+typedef enum messageMode_e {
+	CHAT_ALL=0,
+	CHAT_TEAM,
+	CHAT_WHISPER,
+} messageMode_t;
 #define MAX_CHATBOX_IDENTIFIER_SIZE (32)
 qboolean CG_ContainsChannelEscapeChar( char *text );
 char *CG_RemoveChannelEscapeChar( char *text );

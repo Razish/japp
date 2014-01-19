@@ -26,7 +26,7 @@ void JPLua_Event_Shutdown( void );
 void JPLua_Event_RunFrame( void );
 qboolean JPLua_Event_HUD( void );
 char *JPLua_Event_ChatMessageRecieved( const char *msg );
-char *JPLua_Event_ChatMessageSent( const char *msg );
+char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targetClient );
 void JPLua_Event_ClientConnect( int clientNum );
 void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientInfo_t *newInfo );
 void JPLua_Event_Pain( int clientNum, int health );

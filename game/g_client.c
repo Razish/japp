@@ -2112,7 +2112,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	Q_strncpyz( forcePowers, Info_ValueForKey( userinfo, "forcepowers" ), sizeof( forcePowers ) );
 
-	//JAC: update our customRGBA for team colors. 
+	// update our customRGBA for team colors. 
 	if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer )
 	{
 		char skin[MAX_QPATH] = {0};
@@ -3285,7 +3285,7 @@ void ClientSpawn(gentity_t *ent) {
 
 	client->ps.customRGBA[3]=255;
 
-	//JAC: update our customRGBA for team colors. 
+	// update our customRGBA for team colors. 
 	if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer )
 	{
 		char skin[MAX_QPATH] = {0}, model[MAX_QPATH] = {0};

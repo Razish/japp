@@ -10500,8 +10500,8 @@ void PmoveSingle (pmove_t *pmove) {
 		stiffenedUp = qtrue;
 		PM_SetPMViewAngle(pm->ps, &pm->ps->viewangles, &pm->cmd);
 	}
-	//Raz: DFA
-	//RAZTODO: JK2 YDFA JA+ setting
+
+	// DFA
 	else if ( pm->ps->saberMove == LS_A_BACK || pm->ps->saberMove == LS_A_BACK_CR ||
 		pm->ps->saberMove == LS_A_BACKSTAB || pm->ps->saberMove == LS_A_FLIP_STAB ||
 		pm->ps->saberMove == LS_A_FLIP_SLASH || pm->ps->saberMove == LS_A_JUMP_T__B_ ||

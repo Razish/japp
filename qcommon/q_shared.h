@@ -136,10 +136,6 @@
 // for windows fastcall option
 #define	QDECL
 
-// the mac compiler can't handle >32k of locals, so we
-// just waste space and make big arrays static...
-#define MAC_STATIC //RAZFIXME
-
 short ShortSwap( short l );
 int LongSwap( int l );
 float FloatSwap( const float *f );
@@ -183,7 +179,7 @@ float FloatSwap( const float *f );
 	#define LittleShort
 	static QINLINE int BigLong(int l) { return LongSwap(l); }
 	#define LittleLong
-	static QINLINE float BigFloat(const float *l) { return FloatSwap(l); } //JAC: Actually return something =]
+	static QINLINE float BigFloat(const float *l) { return FloatSwap(l); }
 	#define LittleFloat
 
 	#define	PATH_SEP '\\'
@@ -341,7 +337,6 @@ float FloatSwap( const float *f );
 
 	#define stricmp strcasecmp
 
-	#define MAC_STATIC
 	#define QINLINE inline 
 
 	#ifdef __i386__

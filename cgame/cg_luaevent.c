@@ -160,8 +160,8 @@ char *JPLua_Event_ChatMessageRecieved( const char *msg ) {
 	return tmpMsg;
 }
 
-char *JPLua_Event_ChatMessageSent( const char *msg ) {
-	static char tmpMsg[MAX_TOKEN_CHARS] = {0}; // although a chat message can only be MAX_SAY_TEXT long..-name?
+char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targetClient ) {
+	static char tmpMsg[MAX_STRING_CHARS] = {0}; // although a chat message can only be MAX_SAY_TEXT long..-name?
 
 	Q_strncpyz( tmpMsg, msg, sizeof( tmpMsg ) );
 
@@ -171,7 +171,9 @@ char *JPLua_Event_ChatMessageSent( const char *msg ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CHATMSGSEND] );
 
 			lua_pushstring( JPLua.state, tmpMsg );
-			JPLUACALL( JPLua.state, 1, 1 );
+			lua_pushinteger( JPLua.state, mode );
+			lua_pushinteger( JPLua.state, targetClient );
+			JPLUACALL( JPLua.state, 3, 1 );
 
 			// returned nil, no use passing it to other plugins
 			if ( lua_type( JPLua.state, -1 ) == LUA_TNIL )

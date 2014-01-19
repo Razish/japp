@@ -59,11 +59,7 @@ static chatHistory_t *currentHistory = NULL;
 
 // chatbox input
 field_t chatField;
-static enum messageMode_e {
-	CHAT_ALL=0,
-	CHAT_TEAM,
-	CHAT_WHISPER,
-} chatMode;
+messageMode_t chatMode;
 static int chatTargetClient = -1;
 static qboolean chatActive;
 
@@ -187,23 +183,31 @@ static chatHistory_t *CG_GetNewChatHistory( const char *message ) {
 }
 
 void CG_ChatboxOutgoing( void ) {
+	char *msg = chatField.buffer;
+
 	// remove the key catcher
 	CG_ChatboxEscape();
 
 	// commit the current line to history
 	CG_GetNewChatHistory( chatField.buffer );
 
+	msg = JPLua_Event_ChatMessageSent( msg, chatMode, chatTargetClient );
+
+	// lua event ate it
+	if ( !msg )
+		return;
+
 	switch ( chatMode ) {
 	default:
 	case CHAT_ALL:
-		trap->SendClientCommand( va( "say %s", chatField.buffer ) );
+		trap->SendClientCommand( va( "say %s", msg ) );
 		break;
 	case CHAT_TEAM:
 	//	CG_HandleTeamBinds( chatField.buffer, sizeof( chatField.buffer ) );
-		trap->SendClientCommand( va( "say_team %s", chatField.buffer ) );
+		trap->SendClientCommand( va( "say_team %s", msg ) );
 		break;
 	case CHAT_WHISPER:
-		trap->SendClientCommand( va( "tell %i %s", chatTargetClient, chatField.buffer ) );
+		trap->SendClientCommand( va( "tell %i %s", chatTargetClient, msg ) );
 		break;
 	}
 }
