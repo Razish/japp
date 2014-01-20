@@ -44,8 +44,8 @@ const char *forceTicName[MAX_HUD_TICS]		=	{	"force_tic1",	"force_tic2",	"force_t
 const char *ammoTicName[MAX_HUD_TICS]		=	{	"ammo_tic1",	"ammo_tic2",	"ammo_tic3",	"ammo_tic4",	};
 
 typedef struct saberStyleItem_s {
-	char	*name;
-	vector4	*colour;
+	const char *name;
+	const vector4 *colour;
 } saberStyleItem_t;
 
 saberStyleItem_t saberStyleItems[] = {
@@ -125,7 +125,7 @@ float CG_Text_Height(const char *text, float scale, int iMenuFont)
 }
 
 #include "qcommon/qfiles.h"	// for STYLE_BLINK etc
-void CG_Text_Paint(float x, float y, float scale, vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont) 
+void CG_Text_Paint(float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont) 
 {
 	int iStyleOR = 0;
 	int iFontIndex = MenuFontToHandle(iMenuFont);
@@ -1031,121 +1031,6 @@ void CG_DrawForcePower( menuDef_t *menuHUD )
 			NUM_FONT_SMALL,
 			qfalse);
 	}
-}
-
-/*
-================
-CG_DrawHUD
-================
-*/
-#if 0
-//Vertical meter
-#define RenderMeterVert(x, y, w, h, min, max, meterColor)											\
-{																									\
-	float	percent = ( (float)min/(float)max ) * h;												\
-	if ( min > 0 )																					\
-		CG_FillRect(x+1, y+(h-percent)+1, w-2, h-(h-((percent>max)?max:percent))-2, meterColor);	\
-}
-#endif
-
-void RenderMeterVert( float x, float y, float w, float h, int min, int max, vector4 *meterColor )
-{
-	float percent = ( (float)min/(float)max ) * h;
-	if ( min > max )
-		percent = h;
-	if ( min > 0 )
-		CG_FillRect( x+1, y+(h-percent)+1, w-2, h-(h-((percent>max)?max:percent))-1, meterColor );
-	return;
-}
-
-//Horizontal meter
-#define RenderMeterHorz(x,y,w,h,texty,info,max,meterColor,borderColor,invert,string)									\
-{																														\
-	float	percent			=	((float)info/(float)max) * w;															\
-	if (string == true)																									\
-		UI_DrawProportionalString(x+(w/2), texty, va("%i", info), UI_SMALLFONT|UI_DROPSHADOW|UI_CENTER, meterColor);	\
-	if (info > 0 && info <= max)																						\
-		CG_FillRect( (invert == true) ? (x+(w-percent)+1) : (x+1), y+1, w-(w-percent)-2, h-2, meterColor );				\
-	CG_DrawRect(x, y, w, h, 0.5f, borderColor);																			\
-}
-
-//Full-screen image
-#define DRAW_MASK( shader, colour )							\
-{															\
-	trap->R_SetColor( colour );								\
-		CG_DrawPic( 0.0f, 0.0f, 640.0f, 480.0f, shader );	\
-	trap->R_SetColor( NULL );								\
-}
-#define DRAW_MASK2( shader )							\
-{														\
-	CG_DrawPic( 0.0f, 0.0f, 640.0f, 480.0f, shader );	\
-}
-
-//Arbitrary image
-#define DRAW_PIC( x, y, w, h, shader, colour )	\
-{												\
-	trap->R_SetColor( colour );					\
-		CG_DrawPic( x, y, w, h, shader );		\
-	trap->R_SetColor( NULL );					\
-}
-
-//	--------------
-//	--	Funcs	--
-//	--------------
-
-//Vertical meter
-static QINLINE void _RenderMeterVert( float x, float y, float w, float h, float texty, int info, int max, vector4 *meterColor, vector4 *borderColor, qboolean string )
-{
-	float	percent			=	((float)info/(float)max) * h;
-		//	meterColor[3]	*=	cg.stc_HUDOpacity;
-		//	borderColor[3]	*=	cg.stc_HUDOpacity;
-
-	if ( string )
-		UI_DrawProportionalString( x+(w/2), texty, va("%i", info), UI_SMALLFONT|UI_DROPSHADOW|UI_CENTER, meterColor );
-
-	if ( info > 0 && info <= max )
-		CG_FillRect( x+1, y+(h-percent)+1, w-2, h-(h-percent)-2, meterColor );
-	//TODO: invert (see below)
-
-	CG_DrawRect( x, y, w, h, 0.5f, borderColor );
-}
-
-//Horizontal meter
-static QINLINE void _RenderMeterHorz( float x, float y, float w, float h, float texty, float info, float max, vector4 *meterColor, vector4 *borderColor, qboolean invert, qboolean string )
-{
-	float	percent			=	(info/max) * w;
-		//	meterColor[3]	*=	cg.stc_HUDOpacity;
-		//	borderColor[3]	*=	cg.stc_HUDOpacity;
-
-	if ( string )
-		UI_DrawProportionalString( x+(w/2), texty, va("%.3f", info), UI_SMALLFONT|UI_DROPSHADOW|UI_CENTER, meterColor );
-
-//	if ( info > 0.0f && info <= max )
-		CG_FillRect( (invert) ? (x+(w-percent)+1) : (x+1), y+1, w-(w-percent)-2, h-2, meterColor );
-
-	CG_DrawRect( x, y, w, h, 0.5f, borderColor );
-}
-
-//Full-screen image
-static QINLINE void _DRAW_MASK( qhandle_t shader, vector4 *colour )
-{
-	trap->R_SetColor( colour );
-		CG_DrawPic( 0.0f, 0.0f, 640.0f, 480.0f, shader );
-	trap->R_SetColor( NULL );
-}
-
-//Full-screen image
-static QINLINE void _DRAW_MASK2( qhandle_t shader )
-{
-	CG_DrawPic( 0.0f, 0.0f, 640.0f, 480.0f, shader );
-}
-
-//Arbitrary image
-static QINLINE void _DRAW_PIC( float x, float y, float w, float h, qhandle_t shader, vector4 *colour )
-{
-	trap->R_SetColor( colour );
-		CG_DrawPic( x, y, w, h, shader );
-	trap->R_SetColor( NULL );
 }
 
 void JP_DrawMiniScoreboard( void )
@@ -5579,7 +5464,7 @@ void CG_SaberClashFlare( void )
 				trap->R_RegisterShader( "gfx/effects/saberFlare" ));
 }
 
-void CG_DottedLine( float x1, float y1, float x2, float y2, float dotSize, int numDots, vector4 *color, float alpha )
+void CG_DottedLine( float x1, float y1, float x2, float y2, float dotSize, int numDots, const vector4 *color, float alpha )
 {
 	float x, y, xDiff, yDiff, xStep, yStep;
 	vector4 colorRGBA;

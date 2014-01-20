@@ -1133,7 +1133,7 @@ typedef struct gameImport_s {
 typedef struct gameExport_s {
 	void		(*InitGame)							( int levelTime, int randomSeed, int restart );
 	void		(*ShutdownGame)						( int restart );
-	char *		(*ClientConnect)					( int clientNum, qboolean firstTime, qboolean isBot );
+	const char *(*ClientConnect)					( int clientNum, qboolean firstTime, qboolean isBot );
 	void		(*ClientBegin)						( int clientNum, qboolean allowTeamReset );
 	qboolean	(*ClientUserinfoChanged)			( int clientNum );
 	void		(*ClientDisconnect)					( int clientNum );

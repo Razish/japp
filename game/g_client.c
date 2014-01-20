@@ -2002,15 +2002,15 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 }
 
 qboolean ClientUserinfoChanged( int clientNum ) {
-	gentity_t	*ent = g_entities + clientNum;
-	gclient_t	*client = ent->client;
-	int			team=TEAM_FREE, health=100, maxHealth=100;
-	const char	*s=NULL;
-	char		*value=NULL, userinfo[MAX_INFO_STRING],	buf[MAX_INFO_STRING], oldClientinfo[MAX_INFO_STRING], model[MAX_QPATH],
-				forcePowers[MAX_QPATH], oldname[MAX_NETNAME], className[MAX_QPATH], color1[16], color2[16],
-				cp_sbRGB1[MAX_INFO_STRING], cp_sbRGB2[MAX_INFO_STRING];
-	qboolean	modelChanged = qfalse;
-	gender_t	gender = GENDER_MALE;
+	gentity_t *ent = g_entities + clientNum;
+	gclient_t *client = ent->client;
+	int team=TEAM_FREE, health=100, maxHealth=100;
+	const char *s=NULL;
+	char *value=NULL, userinfo[MAX_INFO_STRING], buf[MAX_INFO_STRING], oldClientinfo[MAX_INFO_STRING], model[MAX_QPATH],
+		forcePowers[MAX_QPATH], oldname[MAX_NETNAME], className[MAX_QPATH], color1[16], color2[16],
+		cp_sbRGB1[MAX_INFO_STRING], cp_sbRGB2[MAX_INFO_STRING];
+	qboolean modelChanged = qfalse;
+	gender_t gender = GENDER_MALE;
 
 	trap->GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
@@ -2066,38 +2066,28 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		Q_strncpyz( client->pers.netnameClean, "scoreboard", sizeof( client->pers.netnameClean ) );
 	}
 
-	if ( client->pers.connected == CON_CONNECTED )
-	{
-		if ( strcmp( oldname, client->pers.netname ) ) 
-		{
-			if ( client->pers.netnameTime > level.time  )
-			{
-				trap->SendServerCommand( clientNum, va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "NONAMECHANGE")) );
+	if ( client->pers.connected == CON_CONNECTED && strcmp( oldname, client->pers.netname ) ) {
+		if ( client->pers.netnameTime > level.time ) {
+			trap->SendServerCommand( clientNum, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NONAMECHANGE" ) ) );
 
-				Info_SetValueForKey( userinfo, "name", oldname );
-				trap->SetUserinfo( clientNum, userinfo );			
-				Q_strncpyz( client->pers.netname, oldname, sizeof( client->pers.netname ) );
-				Q_strncpyz( client->pers.netnameClean, oldname, sizeof( client->pers.netnameClean ) );
-				Q_CleanString( client->pers.netnameClean, STRIP_COLOUR );
-			}
-			else
-			{				
-				trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldname, G_GetStringEdString( "MP_SVGAME", "PLRENAME" ), client->pers.netname ) );
-				client->pers.netnameTime = level.time + 5000;
-			}
+			Info_SetValueForKey( userinfo, "name", oldname );
+			trap->SetUserinfo( clientNum, userinfo );			
+			Q_strncpyz( client->pers.netname, oldname, sizeof( client->pers.netname ) );
+			Q_strncpyz( client->pers.netnameClean, oldname, sizeof( client->pers.netnameClean ) );
+			Q_CleanString( client->pers.netnameClean, STRIP_COLOUR );
+		}
+		else {
+			trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldname, G_GetStringEdString( "MP_SVGAME", "PLRENAME" ), client->pers.netname ) );
+			client->pers.netnameTime = level.time + 5000;
 		}
 	}
 
 	// set model
 	Q_strncpyz( model, Info_ValueForKey( userinfo, "model" ), sizeof( model ) );
 
-	if ( d_perPlayerGhoul2.integer )
-	{
-		if ( Q_stricmp( model, client->modelname ) )
-		{
-			Q_strncpyz( client->modelname, model, sizeof( client->modelname ) );
-			modelChanged = qtrue;
-		}
+	if ( d_perPlayerGhoul2.integer && Q_stricmp( model, client->modelname ) ) {
+		Q_strncpyz( client->modelname, model, sizeof( client->modelname ) );
+		modelChanged = qtrue;
 	}
 
 	client->ps.customRGBA[0] = (value=Info_ValueForKey( userinfo, "char_color_red" ))	? Q_clampi( 0, atoi( value ), 255 ) : 255;
@@ -2113,8 +2103,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	Q_strncpyz( forcePowers, Info_ValueForKey( userinfo, "forcepowers" ), sizeof( forcePowers ) );
 
 	// update our customRGBA for team colors. 
-	if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer )
-	{
+	if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer ) {
 		char skin[MAX_QPATH] = {0};
 		vector3 colorOverride = {0.0f};
 
@@ -2148,26 +2137,25 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 #endif
 
 	//Set the siege class
-	if ( level.gametype == GT_SIEGE )
-	{
+	if ( level.gametype == GT_SIEGE ) {
 		Q_strncpyz( className, client->sess.siegeClass, sizeof( className ) );
 
 		//Now that the team is legal for sure, we'll go ahead and get an index for it.
 		client->siegeClass = BG_SiegeFindClassIndexByName( className );
-		if ( client->siegeClass == -1 )
-		{ //ok, get the first valid class for the team you're on then, I guess.
+		if ( client->siegeClass == -1 ) {
+			// ok, get the first valid class for the team you're on then, I guess.
 			BG_SiegeCheckClassLegality( team, className );
 			Q_strncpyz( client->sess.siegeClass, className, sizeof( client->sess.siegeClass ) );
 			client->siegeClass = BG_SiegeFindClassIndexByName( className );
 		}
-		else
-		{ //otherwise, make sure the class we are using is legal.
+		else {
+			// otherwise, make sure the class we are using is legal.
 			G_ValidateSiegeClassForTeam( ent, team );
 			Q_strncpyz( className, client->sess.siegeClass, sizeof( className ) );
 		}
 
-		if ( client->siegeClass != -1 )
-		{// Set the sabers if the class dictates
+		if ( client->siegeClass != -1 ) {
+			// Set the sabers if the class dictates
 			siegeClass_t *scl = &bgSiegeClasses[client->siegeClass];
 
 			G_SetSaber( ent, 0, scl->saber1[0] ? scl->saber1 : DEFAULT_SABER, qtrue );
@@ -2176,16 +2164,12 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 			//make sure the saber models are updated
 			G_SaberModelSetup( ent );
 
-			if ( scl->forcedModel[0] )
-			{ //be sure to override the model we actually use
+			if ( scl->forcedModel[0] ) {
+				// be sure to override the model we actually use
 				Q_strncpyz( model, scl->forcedModel, sizeof( model ) );
-				if ( d_perPlayerGhoul2.integer )
-				{
-					if ( Q_stricmp( model, client->modelname ) )
-					{
-						Q_strncpyz( client->modelname, model, sizeof( client->modelname ) );
-						modelChanged = qtrue;
-					}
+				if ( d_perPlayerGhoul2.integer && Q_stricmp( model, client->modelname ) ) {
+					Q_strncpyz( client->modelname, model, sizeof( client->modelname ) );
+					modelChanged = qtrue;
 				}
 			}
 		}
@@ -2196,17 +2180,14 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	//Raz: only set the saber name on the first connect.
 	//		it will be read from userinfo on ClientSpawn and stored in client->pers.saber1/2
 	//RAZTODO: instantly switch optionally?
-	if ( !VALIDSTRING( client->pers.saber1 ) || !VALIDSTRING( client->pers.saber2 ) )
-	{
+	if ( !VALIDSTRING( client->pers.saber1 ) || !VALIDSTRING( client->pers.saber2 ) ) {
 		G_SetSaber( ent, 0, Info_ValueForKey( userinfo, "saber1" ), qfalse );
 		G_SetSaber( ent, 1, Info_ValueForKey( userinfo, "saber2" ), qfalse );
 	}
 
 	// set max health
-	if ( level.gametype == GT_SIEGE && client->siegeClass != -1 )
-	{
+	if ( level.gametype == GT_SIEGE && client->siegeClass != -1 ) {
 		siegeClass_t *scl = &bgSiegeClasses[client->siegeClass];
-		maxHealth = 100;
 
 		if ( scl->maxhealth )
 			maxHealth = scl->maxhealth;
@@ -2214,10 +2195,8 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		health = maxHealth;
 	}
 	else
-	{
-		maxHealth = 100;
 		health = Q_clampi( 1, atoi( Info_ValueForKey( userinfo, "handicap" ) ), 100 );
-	}
+
 	client->pers.maxHealth = health;
 	if ( client->pers.maxHealth < 1 || client->pers.maxHealth > maxHealth )
 		client->pers.maxHealth = 100;
@@ -2225,8 +2204,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	if ( level.gametype >= GT_TEAM )
 		client->pers.teamInfo = qtrue;
-	else
-	{
+	else {
 		s = Info_ValueForKey( userinfo, "teamoverlay" );
 		if ( !*s || atoi( s ) != 0 )
 			client->pers.teamInfo = qtrue;
@@ -2294,8 +2272,9 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	trap->GetConfigstring( CS_PLAYERS+clientNum, oldClientinfo, sizeof( oldClientinfo ) );
 	trap->SetConfigstring( CS_PLAYERS+clientNum, buf );
 
-	if ( modelChanged ) //only going to be true for allowable server-side custom skeleton cases
-	{ //update the server g2 instance if appropriate
+	// only going to be true for allowable server-side custom skeleton cases
+	if ( modelChanged ) {
+		// update the server g2 instance if appropriate
 		char *modelname = Info_ValueForKey( userinfo, "model" );
 		SetupGameGhoul2Model( ent, modelname, NULL );
 
@@ -2306,8 +2285,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		client->torsoLastFlip = client->legsLastFlip = qfalse;
 	}
 
-	if ( g_logClientInfo.integer )
-	{
+	if ( g_logClientInfo.integer ) {
 		if ( strcmp( oldClientinfo, buf ) )
 			G_LogPrintf( "ClientUserinfoChanged: %i %s\n", clientNum, buf );
 		else
@@ -2339,8 +2317,7 @@ restarts.
 ============
 */
 
-static qboolean CompareIPString( const char *ip1, const char *ip2 )
-{
+static qboolean CompareIPString( const char *ip1, const char *ip2 ) {
 	while ( 1 ) {
 		if ( *ip1 != *ip2 )
 			return qfalse;
@@ -2353,40 +2330,11 @@ static qboolean CompareIPString( const char *ip1, const char *ip2 )
 	return qtrue;
 }
 
-#if 0
-static qboolean CompareIPNum( int clientnum1, int clientnum2 )
-{
-	const char *ip1 = NULL, *ip2 = NULL;
-
-	if ( clientnum1 < 0 || clientnum1 >= MAX_CLIENTS )
-		return qfalse;
-	if ( clientnum2 < 0 || clientnum2 >= MAX_CLIENTS )
-		return qfalse;
-
-	ip1 = level.clients[clientnum1].sess.IP;
-	ip2 = level.clients[clientnum2].sess.IP;
-
-	while ( 1 )
-	{
-		if ( *ip1 != *ip2 )
-			return qfalse;
-		if ( !*ip1 || *ip1 == ':' )
-			break;
-		ip1++;
-		ip2++;
-	}
-
-	return qtrue;
-}
-#endif
-
-char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
-	gentity_t *ent = NULL, *te = NULL;
+const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
+	gentity_t *ent = g_entities+clientNum, *te = NULL;
 	gclient_t *client;
 	uint32_t finalCSF = 0;
 	char *value, userinfo[MAX_INFO_STRING], tmpIP[NET_ADDRSTRMAXLEN];
-
-	ent = &g_entities[ clientNum ];
 
 	ent->s.number = clientNum;
 	ent->classname = "connecting";
@@ -2408,13 +2356,9 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	if ( !isBot && g_needpass.integer ) {
 		// check for a password
-		value = Info_ValueForKey (userinfo, "password");
-		if ( g_password.string[0] && Q_stricmp( g_password.string, "none" ) &&
-			strcmp( g_password.string, value) != 0) {
-			static char sTemp[1024];
-			Q_strncpyz(sTemp, G_GetStringEdString("MP_SVGAME","INVALID_ESCAPE_TO_MAIN"), sizeof (sTemp) );
-			return sTemp;// return "Invalid password";
-		}
+		value = Info_ValueForKey( userinfo, "password" );
+		if ( g_password.string[0] && Q_stricmp( g_password.string, "none" ) && strcmp( g_password.string, value ) )
+			return G_GetStringEdString( "MP_SVGAME", "INVALID_ESCAPE_TO_MAIN" );
 	}
 
 	if ( !isBot && firstTime ) {
@@ -2474,13 +2418,13 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	}
 
 	// they can connect
-	ent->client = level.clients + clientNum;
+	ent->client = level.clients+clientNum;
 	client = ent->client;
 
 	// assign the pointer for bg entity access
 	ent->playerState = &ent->client->ps;
 
-	memset( client, 0, sizeof(*client) );
+	memset( client, 0, sizeof( *client ) );
 
 	client->pers.connected = CON_CONNECTING;
 	client->pers.connectTime = level.time;
@@ -2545,10 +2489,6 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	return NULL;
 }
 
-void G_WriteClientSessionData( gclient_t *client );
-
-void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *saberName );
-
 /*
 ===========
 ClientBegin
@@ -2562,6 +2502,8 @@ extern qboolean	gSiegeRoundBegun;
 extern qboolean	gSiegeRoundEnded;
 extern qboolean g_dontPenalizeTeam; //g_cmds.c
 void SetTeamQuick(gentity_t *ent, int team, qboolean doBegin);
+void G_WriteClientSessionData( gclient_t *client );
+void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *saberName );
 void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	gentity_t	*ent;
 	gclient_t	*client;

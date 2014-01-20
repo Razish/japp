@@ -265,7 +265,7 @@ void CG_DrawBigString( int x, int y, const char *s, float alpha ) {
 	CG_DrawStringExt( x, y, s, &color, qfalse, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
 }
 
-void CG_DrawBigStringColor( int x, int y, const char *s, vector4 *color ) {
+void CG_DrawBigStringColor( int x, int y, const char *s, const vector4 *color ) {
 	CG_DrawStringExt( x, y, s, color, qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
 }
 
@@ -276,7 +276,7 @@ void CG_DrawSmallString( int x, int y, const char *s, float alpha ) {
 	CG_DrawStringExt( x, y, s, &color, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 }
 
-void CG_DrawSmallStringColor( int x, int y, const char *s, vector4 *color ) {
+void CG_DrawSmallStringColor( int x, int y, const char *s, const vector4 *color ) {
 	CG_DrawStringExt( x, y, s, color, qtrue, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 }
 
@@ -592,7 +592,7 @@ void CG_DrawNumField( int x, int y, int width, int value, int charWidth, int cha
 }
 
 #include "ui/ui_shared.h"	// for some text style junk
-void UI_DrawProportionalString( int x, int y, const char* str, int style, vector4 *color ) 
+void UI_DrawProportionalString( int x, int y, const char* str, int style, const vector4 *color ) 
 {
 	// having all these different style defines (1 for UI, one for CG, and now one for the re->font stuff) 
 	//	is dumb, but for now...
@@ -624,7 +624,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vector
 	CG_Text_Paint( x, y, 1.0, color, str, 0, 0, iStyle, iMenuFont );
 }
 
-void UI_DrawScaledProportionalString( int x, int y, const char* str, int style, vector4 *color, float scale ) 
+void UI_DrawScaledProportionalString( int x, int y, const char* str, int style, const vector4 *color, float scale ) 
 {
 	// having all these different style defines (1 for UI, one for CG, and now one for the re->font stuff) 
 	//	is dumb, but for now...

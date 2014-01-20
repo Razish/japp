@@ -63,7 +63,7 @@ static qboolean localClient; // true if local client has been displayed
 CG_DrawScoreboard
 =================
 */
-static void CG_DrawClientScore( int y, score_t *score, vector4 *color, float fade, qboolean largeFormat ) 
+static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, float fade, qboolean largeFormat ) 
 {
 	//vector3	headAngles;
 	clientInfo_t	*ci;
@@ -314,7 +314,7 @@ int cg_siegeWinTeam = 0;
 qboolean CG_DrawOldScoreboard( void ) {
 	int		x, y, i, n1, n2;
 	float	fade;
-	vector4 *fadeColor;
+	const vector4 *fadeColor;
 	char	*s;
 	int maxClients, realMaxClients;
 	int lineHeight;

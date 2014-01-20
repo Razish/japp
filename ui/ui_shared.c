@@ -380,18 +380,11 @@ void PC_SourceError(int handle, char *format, ...) {
 	Com_Printf(S_COLOR_RED "ERROR: %s, line %d: %s\n", filename, line, string);
 }
 
-/*
-=================
-LerpColor
-=================
-*/
-void LerpColor(vector4 *a, vector4 *b, vector4 *c, float t)
-{
+void LerpColor( const vector4 *a, vector4 *b, vector4 *c, float t ) {
 	int i;
 
 	// lerp and clamp each component
-	for ( i=0; i<4; i++ )
-	{
+	for ( i=0; i<4; i++ ) {
 		c->data[i] = a->data[i] + t*(b->data[i] - a->data[i]);
 		if ( c->data[i] < 0 )
 			c->data[i] = 0;

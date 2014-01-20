@@ -194,7 +194,7 @@ void CG_ChatboxOutgoing( void ) {
 	msg = JPLua_Event_ChatMessageSent( msg, chatMode, chatTargetClient );
 
 	// lua event ate it
-	if ( !msg )
+	if ( !msg || !msg[0] )
 		return;
 
 	switch ( chatMode ) {

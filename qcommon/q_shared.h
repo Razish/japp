@@ -896,7 +896,7 @@ typedef struct wpobject_s
 
 
 #define NUMVERTEXNORMALS	162
-extern	vector3	bytedirs[NUMVERTEXNORMALS];
+extern const vector3 bytedirs[NUMVERTEXNORMALS];
 
 // all drawing is done to a 640*480 virtual screen size
 // and will be automatically scaled to the real resolution
@@ -1000,21 +1000,21 @@ typedef enum ct_table_e
 	CT_MAX
 } ct_table_t;
 
-extern vector4 colorTable[CT_MAX];
+extern const vector4 colorTable[CT_MAX];
 
-extern vector4 colorBlack;
-extern vector4 colorRed;
-extern vector4 colorGreen;
-extern vector4 colorBlue;
-extern vector4 colorYellow;
-extern vector4 colorMagenta;
-extern vector4 colorCyan;
-extern vector4 colorWhite;
-extern vector4 colorLtGrey;
-extern vector4 colorMdGrey;
-extern vector4 colorDkGrey;
-extern vector4 colorLtBlue;
-extern vector4 colorDkBlue;
+extern const vector4 colorBlack;
+extern const vector4 colorRed;
+extern const vector4 colorGreen;
+extern const vector4 colorBlue;
+extern const vector4 colorYellow;
+extern const vector4 colorMagenta;
+extern const vector4 colorCyan;
+extern const vector4 colorWhite;
+extern const vector4 colorLtGrey;
+extern const vector4 colorMdGrey;
+extern const vector4 colorDkGrey;
+extern const vector4 colorLtBlue;
+extern const vector4 colorDkBlue;
 
 #define Q_COLOR_ESCAPE		'^'
 #define Q_COLOR_BITS 0xF // was 7
@@ -1046,7 +1046,7 @@ extern vector4 colorDkBlue;
 #define S_COLOR_ORANGE	"^8"
 #define S_COLOR_GREY	"^9"
 
-extern vector4	g_color_table[Q_COLOR_BITS+1];
+extern const vector4 g_color_table[Q_COLOR_BITS+1];
 
 #define	MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
 #define	MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
@@ -2562,8 +2562,8 @@ typedef struct stringID_table_s
 	int		id;
 } stringID_table_t;
 
-int GetIDForString ( stringID_table_t *table, const char *string );
-const char *GetStringForID( stringID_table_t *table, int id );
+int GetIDForString ( const stringID_table_t *table, const char *string );
+const char *GetStringForID( const stringID_table_t *table, int id );
 
 
 // stuff to help out during development process, force reloading/uncacheing of certain filetypes...

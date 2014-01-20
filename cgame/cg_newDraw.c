@@ -268,7 +268,7 @@ extern int MenuFontToHandle(int iMenuFont);
 
 // maxX param is initially an X limit, but is also used as feedback. 0 = text was clipped to fit within, else maxX = next pos
 //
-void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vector4 *color, const char* text, float adjust, int limit, int iMenuFont) 
+void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, const vector4 *color, const char* text, float adjust, int limit, int iMenuFont) 
 {
 	qboolean bIsTrailingPunctuation;
 
@@ -328,7 +328,7 @@ void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vector4 *co
 #define PIC_WIDTH 12
 
 extern const char *CG_GetLocationString(const char *loc); //cg_main.c
-void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale, vector4 *color, qhandle_t shader) {
+void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale, const vector4 *color, qhandle_t shader) {
 	int xx;
 	float y;
 	int i, j, len, count;
@@ -438,7 +438,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 }
 
 
-void CG_DrawTeamSpectators(rectDef_t *rect, float scale, vector4 *color, qhandle_t shader) {
+void CG_DrawTeamSpectators(rectDef_t *rect, float scale, const vector4 *color, qhandle_t shader) {
 	if (cg.spectatorLen) {
 		float maxX;
 
@@ -497,11 +497,14 @@ void CG_DrawTeamSpectators(rectDef_t *rect, float scale, vector4 *color, qhandle
 
 
 
-void CG_DrawMedal(int ownerDraw, rectDef_t *rect, float scale, vector4 *color, qhandle_t shader) {
+void CG_DrawMedal(int ownerDraw, rectDef_t *rect, float scale, const vector4 *color, qhandle_t shader) {
 	score_t *score = &cg.scores[cg.selectedScore];
 	float value = 0;
 	char *text = NULL;
-	color->a = 0.25;
+	vector4 newColour;
+
+	VectorCopy4( color, &newColour );
+	newColour.a = 0.25;
 
 	switch (ownerDraw) {
 		case CG_ACCURACY:
@@ -535,27 +538,27 @@ void CG_DrawMedal(int ownerDraw, rectDef_t *rect, float scale, vector4 *color, q
 			if (ownerDraw == CG_ACCURACY) {
 				text = va("%i%%", (int)value);
 				if (value > 50) {
-					color->a = 1.0;
+					newColour.a = 1.0;
 				}
 			} else {
 				text = va("%i", (int)value);
-				color->a = 1.0;
+				newColour.a = 1.0;
 			}
 		} else {
 			if (value) {
-				color->a = 1.0;
+				newColour.a = 1.0;
 			}
 			text = "Wow";
 		}
 	}
 
-	trap->R_SetColor(color);
+	trap->R_SetColor(&newColour);
 	CG_DrawPic( rect->x, rect->y, rect->w, rect->h, shader );
 
 	if (text) {
-		color->a = 1.0;
+		newColour.a = 1.0;
 		value = CG_Text_Width(text, scale, 0);
-		CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h + 10 , scale, color, text, 0, 0, 0, FONT_MEDIUM); 
+		CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h + 10 , scale, &newColour, text, 0, 0, 0, FONT_MEDIUM); 
 	}
 	trap->R_SetColor(NULL);
 
@@ -563,7 +566,7 @@ void CG_DrawMedal(int ownerDraw, rectDef_t *rect, float scale, vector4 *color, q
 
 	
 //
-void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, vector4 *color, qhandle_t shader, int textStyle,int font) {
+void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle,int font) {
 
 //Ignore all this, at least for now. May put some stat stuff back in menu files later.
 #if 0

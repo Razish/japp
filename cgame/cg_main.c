@@ -2449,7 +2449,7 @@ static float CG_Cvar_Get(const char *cvar) {
 	return atof(buff);
 }
 
-void CG_Text_PaintWithCursor(float x, float y, float scale, vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont) {
+void CG_Text_PaintWithCursor(float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont) {
 	CG_Text_Paint(x, y, scale, color, text, 0, limit, style, iMenuFont);
 }
 

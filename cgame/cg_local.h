@@ -1732,9 +1732,9 @@ void CG_DrawNumField (int x, int y, int width, int value,int charWidth,int charH
 void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor, 
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars );
 void CG_DrawBigString( int x, int y, const char *s, float alpha );
-void CG_DrawBigStringColor( int x, int y, const char *s, vector4 *color );
+void CG_DrawBigStringColor( int x, int y, const char *s, const vector4 *color );
 void CG_DrawSmallString( int x, int y, const char *s, float alpha );
-void CG_DrawSmallStringColor( int x, int y, const char *s, vector4 *color );
+void CG_DrawSmallStringColor( int x, int y, const char *s, const vector4 *color );
 
 int CG_DrawStrlen( const char *str );
 
@@ -1746,8 +1746,8 @@ void CG_TileClear( void );
 void CG_ColorForHealth( vector4 *hcolor );
 void CG_GetColorForHealth( int health, int armor, vector4 *hcolor );
 
-void UI_DrawProportionalString( int x, int y, const char* str, int style, vector4 *color );
-void UI_DrawScaledProportionalString( int x, int y, const char* str, int style, vector4 *color, float scale);
+void UI_DrawProportionalString( int x, int y, const char* str, int style, const vector4 *color );
+void UI_DrawScaledProportionalString( int x, int y, const char* str, int style, const vector4 *color, float scale);
 void CG_DrawRect( float x, float y, float width, float height, float size, const vector4 *color );
 void CG_DrawSides(float x, float y, float w, float h, float size);
 void CG_DrawTopBottom(float x, float y, float w, float h, float size);
@@ -1766,8 +1766,8 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vector3 *he
 void CG_DrawActive( stereoFrame_t stereoView );
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D );
 void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team );
-void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, vector4 *color, qhandle_t shader, int textStyle,int font);
-void CG_Text_Paint(float x, float y, float scale, vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont);
+void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle,int font);
+void CG_Text_Paint(float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont);
 float CG_Text_Width(const char *text, float scale, int iMenuFont);
 float CG_Text_Height(const char *text, float scale, int iMenuFont);
 float CG_GetValue(int ownerDraw);

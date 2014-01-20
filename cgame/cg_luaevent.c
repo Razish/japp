@@ -180,8 +180,10 @@ char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targ
 				return NULL;
 			else if ( lua_type( JPLua.state, -1 ) == LUA_TSTRING )
 				Q_strncpyz( tmpMsg, lua_tostring( JPLua.state, -1 ), MAX_SAY_TEXT );
-			else
-				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CHATMSGSEND), expected string or nil but got %s", JPLua.currentPlugin->name, lua_typename( JPLua.state, -1 ) );
+			else {
+				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CHATMSGSEND), expected string or nil but got %s\n", JPLua.currentPlugin->name, lua_typename( JPLua.state, -1 ) );
+				return NULL;
+			}
 		}
 	}
 #endif // JPLUA
