@@ -31,6 +31,14 @@ int JPLua_GetPlayer( lua_State *L ) {
 	return 1;
 }
 
+//Func: Player1 == Player2
+//Retn: boolean value of whether Player1 is the same client as Player2
+static int JPLua_Player_Equals( lua_State *L ) {
+	jplua_player_t *p1 = JPLua_CheckPlayer( L, 1 ), *p2 = JPLua_CheckPlayer( L, 2 );
+	lua_pushboolean( L, (p1->clientNum == p2->clientNum) ? 1 : 0 );
+	return 1;
+}
+
 //Func: tostring( Player )
 //Retn: string representing the Player instance (for debug/error messages)
 static int JPLua_Player_ToString( lua_State *L ) {
@@ -48,9 +56,10 @@ static int JPLua_Player_GetAngles( lua_State *L ) {
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	lua_pushstring( L, "x" ); lua_pushnumber( L, level.clients[player->clientNum].ps.viewangles.pitch ); lua_settable( L, top );
-	lua_pushstring( L, "y" ); lua_pushnumber( L, level.clients[player->clientNum].ps.viewangles.yaw); lua_settable( L, top );
-	lua_pushstring( L, "z" ); lua_pushnumber( L, level.clients[player->clientNum].ps.viewangles.roll ); lua_settable( L, top );
+	lua_pushstring( L, "pitch" );	lua_pushnumber( L, level.clients[player->clientNum].ps.viewangles.pitch );	lua_settable( L, top );
+	lua_pushstring( L, "yaw" );		lua_pushnumber( L, level.clients[player->clientNum].ps.viewangles.yaw);		lua_settable( L, top );
+	lua_pushstring( L, "roll" );	lua_pushnumber( L, level.clients[player->clientNum].ps.viewangles.roll );	lua_settable( L, top );
+
 	return 1;
 }
 
@@ -146,7 +155,6 @@ static int JPLua_Player_GetID( lua_State *L ) {
 
 //Func: Player:GetLocation()
 //Retn: string of the nearest target_location
-extern const char *CG_GetLocationString( const char *loc ); // cg_main.c
 static int JPLua_Player_GetLocation( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	char location[64];
@@ -251,6 +259,20 @@ static int JPLua_Player_GetWeapon( lua_State *L ) {
 	return 1;
 }
 
+//Func: Player:GiveWeapon( integer weaponID )
+//Retn: N/A
+static int JPLua_Player_GiveWeapon( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	int wp = luaL_checkinteger( L, 2 );
+
+	if ( wp <= WP_NONE || wp >= WP_NUM_WEAPONS )
+		return 0;
+
+	level.clients[player->clientNum].ps.stats[STAT_WEAPONS] |= (1<<wp);
+
+	return 0;
+}
+
 //Func: Player:IsAlive()
 //Retn: boolean expressing whether the Player is alive
 static int JPLua_Player_IsAlive( lua_State *L ) {
@@ -285,6 +307,90 @@ static int JPLua_Player_IsWeaponHolstered( lua_State *L ) {
 	return 1;
 }
 
+//Func: Player:Kick( [string reason] )
+//Retn: N/A
+static int JPLua_Player_Kick( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	const char *reason = lua_tostring( L, 2 );
+
+	trap->DropClient( player->clientNum, reason ? reason : "was kicked" );
+
+	return 0;
+}
+
+//Func: Player:Kill()
+//Retn: N/A
+static int JPLua_Player_Kill( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+
+	ent->flags &= ~FL_GODMODE;
+	ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;
+	player_die( ent, ent, ent, 100000, MOD_SUICIDE );
+
+	return 0;
+}
+
+//Func: Player:TakeWeapon( integer weaponID )
+//Retn: N/A
+static int JPLua_Player_TakeWeapon( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	int wp = luaL_checkinteger( L, 2 );
+	int i, newWeapon = -1, selectedWeapon = ent->client->ps.weapon;
+
+	if ( wp <= WP_NONE || wp >= WP_NUM_WEAPONS )
+		return 0;
+
+	ent->client->ps.stats[STAT_WEAPONS] &= ~(1<<wp);
+
+	for ( i=WP_SABER; i<WP_NUM_WEAPONS; i++ ) {
+		if ( ent->client->ps.stats[STAT_WEAPONS] & (1<<i) ) {
+			newWeapon = i;
+			break;
+		}
+	}
+
+	if ( newWeapon == WP_NUM_WEAPONS ) {
+		for ( i=WP_STUN_BATON; i<WP_SABER; i++ ) {
+			if ( ent->client->ps.stats[STAT_WEAPONS] & (1<<i) ) {
+				newWeapon = i;
+				break;
+			}
+		}
+		if ( newWeapon == WP_SABER )
+			newWeapon = WP_NONE;
+	}
+
+	ent->client->ps.weapon = (newWeapon == -1) ? 0 : newWeapon;
+
+	G_AddEvent( ent, EV_NOAMMO, selectedWeapon );
+
+	return 0;
+}
+
+//Func: Player:Teleport( table position{x, y, z}, table angles{pitch, yaw, roll} )
+//Retn: N/A
+static int JPLua_Player_Teleport( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	vector3 pos, angles;
+
+	// get position
+	lua_getfield( L, 2, "x" );	pos.x = lua_tonumber( L, -1 );
+	lua_getfield( L, 2, "y" );	pos.y = lua_tonumber( L, -1 );
+	lua_getfield( L, 2, "z" );	pos.z = lua_tonumber( L, -1 );
+
+	// get angles
+	lua_getfield( L, 3, "pitch" );	angles.pitch = lua_tonumber( L, -1 );
+	lua_getfield( L, 3, "yaw" );	angles.yaw = lua_tonumber( L, -1 );
+	lua_getfield( L, 3, "roll" );	angles.roll = lua_tonumber( L, -1 );
+
+	TeleportPlayer( ent, &pos, &angles );
+
+	return 0;
+}
+
 // Push a Player instance for a client number onto the stack
 void JPLua_Player_CreateRef( lua_State *L, int num ) {
 	jplua_player_t *player = NULL;
@@ -310,6 +416,7 @@ jplua_player_t *JPLua_CheckPlayer( lua_State *L, int idx ) {
 }
 
 static const struct luaL_Reg jplua_player_meta[] = {
+	{ "__eq",				JPLua_Player_Equals },
 	{ "__tostring",			JPLua_Player_ToString },
 	{ "GetAmmo",			JPLua_Player_GetAmmo },
 	{ "GetAngles",			JPLua_Player_GetAngles },
@@ -329,9 +436,14 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "GetUserinfo",		JPLua_Player_GetUserinfo },
 	{ "GetVelocity",		JPLua_Player_GetVelocity },
 	{ "GetWeapon",			JPLua_Player_GetWeapon },
+	{ "GiveWeapon",			JPLua_Player_GiveWeapon },
 	{ "IsAlive",			JPLua_Player_IsAlive },
 	{ "IsBot",				JPLua_Player_IsBot },
 	{ "IsWeaponHolstered",	JPLua_Player_IsWeaponHolstered },
+	{ "Kick",				JPLua_Player_Kick },
+	{ "Kill",				JPLua_Player_Kill },
+	{ "TakeWeapon",			JPLua_Player_TakeWeapon },
+	{ "Teleport",			JPLua_Player_Teleport },
 
 	{ NULL, NULL }
 };

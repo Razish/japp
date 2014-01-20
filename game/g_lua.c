@@ -10,6 +10,10 @@
 	#pragma comment( lib, "lua" )
 #endif
 
+static const char *baseDir = "lua/";
+static const char *pluginDir = "lua/sv/";
+#define JPLUA_EXTENSION ".lua"
+
 jplua_t JPLua = { 0 };
 
 #define JPLUA_LOAD_CHUNKSIZE 1024
@@ -159,7 +163,7 @@ static int JPLua_Export_Print( lua_State *L ) {
 }
 
 static int JPLua_Export_Require( lua_State *L ) {
-	const char *path = va( "lua/sv/%s", lua_tostring( L, 1 ) );
+	const char *path = va( "%s%s", JPLua.initialised ? pluginDir : baseDir, lua_tostring( L, 1 ) );
 	JPLua_LoadFile( L, path );
 	return 0;
 }
@@ -364,13 +368,10 @@ static const int cimportsSize = ARRAY_LEN( JPLua_CImports );
 // Lua calls this if it panics, it'll then terminate the server with exit(EXIT_FAILURE)
 // This error should never happen in a clean release version of JA++!
 static int JPLuaI_Error( lua_State *L ) {
-	Com_Printf( S_COLOR_RED"*************** JA++ LUA ERROR ***************" );
-	Com_Printf( S_COLOR_RED"unprotected error in call to Lua API (%s)\n", lua_tostring(L,-1) );
+	trap->Print( S_COLOR_RED"*************** JA++ LUA ERROR ***************" );
+	trap->Print( S_COLOR_RED"unprotected error in call to Lua API (%s)\n", lua_tostring(L,-1) );
 	return 0;
 }
-
-#define JPLUA_DIRECTORY "lua/sv/"
-#define JPLUA_EXTENSION ".lua"
 
 static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 	if ( !JPLua.plugins ) {
@@ -385,7 +386,7 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 
 	memset( JPLua.currentPlugin, 0, sizeof( jplua_plugin_t ) );
 	Q_strncpyz( JPLua.currentPlugin->name, "<null>", sizeof( JPLua.currentPlugin->name ) );
-	JPLua_LoadFile( JPLua.state, va( JPLUA_DIRECTORY"%s/%s", pluginName, fileName ) );
+	JPLua_LoadFile( JPLua.state, va( "%s%s/%s", pluginDir, pluginName, fileName ) );
 
 	if ( JPLua.currentPlugin->requiredJPLuaVersion > JPLua.version ) {
 		jplua_plugin_t *nextPlugin = JPLua.currentPlugin->next;
@@ -406,15 +407,16 @@ static void JPLua_PostInit( lua_State *L ) {
 
 	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_YELLOW"JA++ Lua (SV) is initialising "S_COLOR_CYAN"****************\n" );
 	
-	JPLua_LoadFile( L, JPLUA_DIRECTORY"init"JPLUA_EXTENSION );
+	JPLua_LoadFile( L, va( "%sinit"JPLUA_EXTENSION, baseDir ) );
 	lua_getfield( L, LUA_GLOBALSINDEX, "JPLua" );
 	lua_getfield( L, -1, "version" );
 	JPLua.version = lua_tointeger( L, -1 );
 	lua_pop( L, 1 );
+	JPLua.initialised = qtrue;
 
 	trap->Print( "%-15s%-32s%-8s%s\n", "               ", "Name", "Version", "Unique ID" );
 
-	numFolders = trap->FS_GetFileList( JPLUA_DIRECTORY, "/", folderList, sizeof( folderList ) );
+	numFolders = trap->FS_GetFileList( pluginDir, "/", folderList, sizeof( folderList ) );
 	folderName = folderList;
 	for ( i=0; i<numFolders; i++ ) {
 		Q_strstrip( folderName, "/\\", NULL );
@@ -424,7 +426,7 @@ static void JPLua_PostInit( lua_State *L ) {
 			char fileList[16384] = {0}, *fileName = NULL;
 			int j=0, numFiles=0, fileLen=0;
 			
-			numFiles = trap->FS_GetFileList( va( JPLUA_DIRECTORY"%s", folderName ), JPLUA_EXTENSION, fileList, sizeof( fileList ) );
+			numFiles = trap->FS_GetFileList( va( "%s%s", pluginDir, folderName ), JPLUA_EXTENSION, fileList, sizeof( fileList ) );
 			fileName = fileList;
 
 			for ( j=0; j<numFiles; j++ ) {

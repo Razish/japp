@@ -59,6 +59,7 @@ typedef struct jplua_s {
 	jplua_plugin_t *plugins;
 	jplua_plugin_t *currentPlugin;
 	unsigned int version;
+	qboolean initialised;
 } jplua_t;
 extern jplua_t JPLua;
 
