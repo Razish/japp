@@ -2327,7 +2327,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	//Raz: Added a check for
 	if (ent->item && ent->item->giType == IT_WEAPON &&
 		ent->s.powerups &&
-		ent->s.powerups < level.time)
+		(int)ent->s.powerups < level.time)
 	{
 		ent->s.generic1 = 0;
 		ent->s.powerups = 0;
