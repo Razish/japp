@@ -273,6 +273,26 @@ static int JPLua_Player_GiveWeapon( lua_State *L ) {
 	return 0;
 }
 
+//Func: Player:IsAdmin()
+//Retn: boolean loggedIn, string adminUser, integer adminPermissions
+static int JPLua_Player_IsAdmin( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gclient_t *cl = &level.clients[player->clientNum];
+
+	if ( cl->pers.adminUser ) {
+		lua_pushboolean( L, 1 );
+		lua_pushstring( L, cl->pers.adminUser->user );
+		lua_pushinteger( L, cl->pers.adminUser->privileges );
+	}
+	else {
+		lua_pushboolean( L, 0 );
+		lua_pushnil( L );
+		lua_pushnil( L );
+	}
+
+	return 3;
+}
+
 //Func: Player:IsAlive()
 //Retn: boolean expressing whether the Player is alive
 static int JPLua_Player_IsAlive( lua_State *L ) {
@@ -437,6 +457,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "GetVelocity",		JPLua_Player_GetVelocity },
 	{ "GetWeapon",			JPLua_Player_GetWeapon },
 	{ "GiveWeapon",			JPLua_Player_GiveWeapon },
+	{ "IsAdmin",			JPLua_Player_IsAdmin },
 	{ "IsAlive",			JPLua_Player_IsAlive },
 	{ "IsBot",				JPLua_Player_IsBot },
 	{ "IsWeaponHolstered",	JPLua_Player_IsWeaponHolstered },

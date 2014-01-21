@@ -712,6 +712,7 @@ void JPLua_Shutdown( void ) {
 
 		lua_close( JPLua.state );
 		JPLua.state = NULL;
+		JPLua.initialised = qfalse;
 	}
 }
 
