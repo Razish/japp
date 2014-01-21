@@ -930,14 +930,13 @@ static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*E
 	JKG_FS_WriteString("========================================\n"
 		               "             JA++ Crash Log\n"
 					   "========================================\n", f);
+	JKG_FS_WriteString( "Version: "JAPP_VERSION" (Windows)\n", f);
 #ifdef _GAME
-	JKG_FS_WriteString(va("Version: %s (Windows)\n", JAPP_SERVER_VERSION), f);
-	JKG_FS_WriteString(va("Side: Server-side\n"), f);
+	JKG_FS_WriteString("Side: Server-side\n", f);
 #else
-	JKG_FS_WriteString(va("Version: %s (Windows)\n", JAPP_CLIENT_VERSION_CLEAN), f);
-	JKG_FS_WriteString(va("Side: Client-side\n"), f);
+	JKG_FS_WriteString("Side: Client-side\n", f);
 #endif
-	JKG_FS_WriteString(va("Build Date/Time: %s %s\n", __DATE__, __TIME__), f);
+	JKG_FS_WriteString("Build Date/Time: "__DATE__" "__TIME__"\n", f);
 	
 	JKG_Crash_AddOSData(f);
 	JKG_FS_WriteString("Crash type: Exception\n\n"
@@ -1415,14 +1414,13 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 	JKG_FS_WriteString("========================================\n"
 		               "             JA++ Crash Log\n"
 					   "========================================\n", f);
+	JKG_FS_WriteString("Version: "JAPP_VERSION" (Linux)\n", f);
 #ifdef _GAME
-	JKG_FS_WriteString(va("Version: %s (Linux)\n", JAPP_SERVER_VERSION), f);
-	JKG_FS_WriteString(va("Side: Server-side\n"), f);
+	JKG_FS_WriteString("Side: Server-side\n", f);
 #else
-	JKG_FS_WriteString(va("Version: %s (Linux)\n", JAPP_CLIENT_VERSION_CLEAN), f);
-	JKG_FS_WriteString(va("Side: Client-side\n"), f);
+	JKG_FS_WriteString("Side: Client-side\n", f);
 #endif
-	JKG_FS_WriteString(va("Build Date/Time: %s %s\n", __DATE__, __TIME__), f);
+	JKG_FS_WriteString("Build Date/Time: "__DATE__" "__TIME__"\n", f);
 	JKG_Crash_AddOSData(f);
 	JKG_Enum_MemoryMap();
 	JKG_FS_WriteString("Crash type: Exception\n\n"
