@@ -42,7 +42,9 @@ qboolean pm_cancelOutZoom = qfalse;
 
 // movement parameters
 float	pm_stopspeed = 100.0f;
-float	pm_duckScale = 0.50f;
+static float PM_DuckScale( void ) {
+	return GetCInfo( CINFO_VQ3PHYS ) ? 0.25f : 0.50f;
+}
 float	pm_swimScale = 0.50f;
 float	pm_wadeScale = 0.70f;
 
@@ -1098,18 +1100,21 @@ static void PM_Accelerate( vector3 *wishdir, float wishspeed, float accel )
 			return;
 		}
 
-		if (addspeed < 0)
-		{
-			accelspeed = (-accel)*pml.frametime*wishspeed;
-			if (accelspeed < addspeed) {
-				accelspeed = addspeed;
-			}
-		}
-		else
-		{
+		if ( GetCInfo( CINFO_VQ3PHYS ) ) {
 			accelspeed = accel*pml.frametime*wishspeed;
-			if (accelspeed > addspeed) {
+			if ( accelspeed > addspeed )
 				accelspeed = addspeed;
+		}
+		else {
+			if ( addspeed < 0 ) {
+				accelspeed = (-accel)*pml.frametime*wishspeed;
+				if ( accelspeed < addspeed )
+					accelspeed = addspeed;
+			}
+			else {
+				accelspeed = accel*pml.frametime*wishspeed;
+				if ( accelspeed > addspeed )
+					accelspeed = addspeed;
 			}
 		}
 
@@ -1150,24 +1155,20 @@ without getting a sqrt(2) distortion in speed.
 */
 static float PM_CmdScale( usercmd_t *cmd ) {
 	int		max;
-	float	total;
-	float	scale;
-	int		umove = 0; //cmd->upmove;
-			//don't factor upmove into scaling speed
+	float	total, scale;
+	int		umove = GetCInfo( CINFO_VQ3PHYS ) ? cmd->upmove : 0;
 
-	max = abs( cmd->forwardmove );
-	if ( abs( cmd->rightmove ) > max ) {
-		max = abs( cmd->rightmove );
-	}
-	if ( abs( umove ) > max ) {
-		max = abs( umove );
-	}
-	if ( !max ) {
+										max = abs( cmd->forwardmove );
+	if ( abs( cmd->rightmove ) > max )	max = abs( cmd->rightmove );
+	if ( abs( umove ) > max )			max = abs( umove );
+
+	if ( !max )
 		return 0;
-	}
 
-	total = sqrt( (float)(cmd->forwardmove * cmd->forwardmove
-		+ cmd->rightmove * cmd->rightmove + umove * umove) );
+	if ( GetCInfo( CINFO_VQ3PHYS ) )
+		total = sqrt( cmd->forwardmove*cmd->forwardmove + cmd->rightmove*cmd->rightmove + umove*umove );
+	else
+		total = sqrt( (float)(cmd->forwardmove*cmd->forwardmove + cmd->rightmove*cmd->rightmove + umove*umove) );
 	scale = (float)pm->ps->speed * max / ( 127.0 * total );
 
 	return scale;
@@ -2440,10 +2441,10 @@ static qboolean PM_CheckJump( void )
 		!BG_HasYsalamiri(pm->gametype, pm->ps) &&
 		BG_CanUseFPNow(pm->gametype, pm->ps, pm->cmd.serverTime, FP_LEVITATION) )
 	{
-		qboolean allowWallRuns = qtrue;
-		qboolean allowWallFlips = qtrue;
+		qboolean allowWallRuns = GetCInfo( CINFO_VQ3PHYS ) ? qfalse : qtrue;
+		qboolean allowWallFlips = GetCInfo( CINFO_VQ3PHYS ) ? qfalse : qtrue;
 	//	qboolean allowFlips = qtrue;
-		qboolean allowWallGrabs = qtrue;
+		qboolean allowWallGrabs = GetCInfo( CINFO_VQ3PHYS ) ? qfalse : qtrue;
 		if ( pm->ps->weapon == WP_SABER )
 		{
 			saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
@@ -3062,14 +3063,15 @@ static qboolean PM_CheckJump( void )
 	}
 	if ( pm->cmd.upmove > 0 )
 	{//no special jumps
-		pm->ps->velocity.z = JUMP_VELOCITY;
+		const float jumpVelocity = GetCInfo( CINFO_VQ3PHYS ) ? 270.0f : JUMP_VELOCITY;
+		pm->ps->velocity.z = jumpVelocity;
 
 		PM_SetForceJumpZStart(pm->ps->origin.z);//so we don't take damage if we land at same height
 		pm->ps->pm_flags |= PMF_JUMP_HELD;
 
 		if ( GetCInfo( CINFO_CPMPHYSICS ) ) {
 			float dot = 0.0f, speed = 0.0f;
-			const float jumpVel = JUMP_VELOCITY;//270.0f;
+			const float jumpVel = jumpVelocity;//270.0f;
 			vector3 dir;
 
 			// first the double jump
@@ -3426,8 +3428,7 @@ static void PM_AirMove( void ) {
 		}
 	}
 
-	if (pm->ps->pm_type != PM_SPECTATOR)
-	{
+	if ( pm->ps->pm_type != PM_SPECTATOR && !GetCInfo( CINFO_VQ3PHYS ) ) {
 #if METROID_JUMP
 		PM_CheckJump();
 #else
@@ -3739,15 +3740,15 @@ static void PM_WalkMove( void ) {
 
 	// clamp the speed lower if ducking
 	if ( pm->ps->pm_flags & PMF_DUCKED ) {
-		if ( wishspeed > pm->ps->speed * pm_duckScale ) {
-			wishspeed = pm->ps->speed * pm_duckScale;
+		if ( wishspeed > pm->ps->speed * PM_DuckScale() ) {
+			wishspeed = pm->ps->speed * PM_DuckScale();
 		}
 	}
 	else if ( (pm->ps->pm_flags & PMF_ROLLING) && !BG_InRoll(pm->ps, pm->ps->legsAnim) &&
 		!PM_InRollComplete(pm->ps, pm->ps->legsAnim))
 	{
-		if ( wishspeed > pm->ps->speed * pm_duckScale ) {
-			wishspeed = pm->ps->speed * pm_duckScale;
+		if ( wishspeed > pm->ps->speed * PM_DuckScale() ) {
+			wishspeed = pm->ps->speed * PM_DuckScale();
 		}
 	}
 

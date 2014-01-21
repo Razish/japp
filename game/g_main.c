@@ -160,6 +160,10 @@ static void CVU_HeadSlide( void ) {
 	SetCInfo( japp_slideOnHead.integer, CINFO_HEADSLIDE );
 }
 
+static void CVU_VQ3Physics( void ) {
+	SetCInfo( japp_vq3physics.integer, CINFO_VQ3PHYS );
+}
+
 static void CVU_WeaponRoll( void ) {
 	SetCInfo( japp_weaponRoll.integer, CINFO_WEAPONROLL );
 }
