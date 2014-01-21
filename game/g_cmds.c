@@ -2836,7 +2836,7 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 	if ( !extendedInfo || extendedInfo == EXTINFO_ALL ) {
 		char version[256] = {0};
 		trap->Cvar_VariableStringBuffer( "version", version, sizeof( version ) );
-		trap->SendServerCommand( ent-g_entities, va( "print \"Version:\n    Gamecode: "JAPP_SERVER_VERSION" ("__DATE__")\n    Engine: %s\n\n\"", version ) );
+		trap->SendServerCommand( ent-g_entities, va( "print \"Version:\n    Gamecode: "JAPP_VERSION"\n    Engine: %s\n\n\"", version ) );
 	}
 
 	if ( extendedInfo & EXTINFO_SABER ) {

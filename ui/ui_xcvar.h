@@ -109,7 +109,7 @@ XCVAR_DEF( ui_team_friendly,				"1",					NULL,				CVAR_ARCHIVE|CVAR_INTERNAL )
 XCVAR_DEF( ui_team_timelimit,				"20",					NULL,				CVAR_ARCHIVE|CVAR_INTERNAL )
 
 XCVAR_DEF( cjp_client,						JAPLUS_CLIENT_VERSION,	NULL,				CVAR_USERINFO|CVAR_ROM )
-XCVAR_DEF( japp_version,					JAPP_CLIENT_VERSION,	NULL,				CVAR_ROM )
+XCVAR_DEF( japp_version,					JAPP_VERSION,			NULL,				CVAR_ROM )
 XCVAR_DEF( japp_crashHandler,				"1",					NULL,				CVAR_ARCHIVE )
 
 XCVAR_DEF( cp_clanpwd,						"",						NULL,				CVAR_USERINFO|CVAR_ARCHIVE )

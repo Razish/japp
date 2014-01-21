@@ -18,6 +18,7 @@
 
 import platform
 import os
+import commands
 
 plat = platform.system() # Windows or Linux
 try:
@@ -328,6 +329,9 @@ else:
 		env['CCFLAGS'] += [ '/O2' ]
 	env['CPPDEFINES'] += [ 'NDEBUG' ]
 
+status, rev = commands.getstatusoutput( 'git rev-parse HEAD' )
+if status == 0:
+	env['CPPDEFINES'] += [ 'REVISION=\\"'+rev+'\\"' ]
 
 #################
 #    TARGETS    #

@@ -16,31 +16,19 @@
 #include "JAPP/jp_ssflags.h"
 #include "JAPP/jp_cinfo.h"
 
-#define JAPLUS_CLIENT_FLAGS (CSF_GRAPPLE_SWING|CSF_SCOREBOARD_KD)
-#define JAPLUS_SERVER_FLAGS (SSF_GRAPPLE_SWING|SSF_SCOREBOARD_KD|SSF_MERC_FLAMETHOWER)
+#define JAPP_CLIENT_FLAGS		(CSF_GRAPPLE_SWING|CSF_SCOREBOARD_LARGE|CSF_SCOREBOARD_KD|CSF_CHAT_FILTERS|CSF_FIXED_WEAPON_ANIMS)
+#define JAPLUS_CLIENT_FLAGS 	(CSF_GRAPPLE_SWING|CSF_SCOREBOARD_KD)
+#define JAPP_SERVER_FLAGS		(SSF_GRAPPLE_SWING|SSF_SCOREBOARD_LARGE|SSF_SCOREBOARD_KD|SSF_CHAT_FILTERS|SSF_FIXED_WEAP_ANIMS|SSF_SPECTINFO)
+#define JAPLUS_SERVER_FLAGS		(SSF_GRAPPLE_SWING|SSF_SCOREBOARD_KD|SSF_MERC_FLAMETHOWER)
+#define JAPLUS_CLIENT_VERSION	"1.4B4"
 
-#ifdef _GAME
-
-	// server-side conditional compiling
-//	#define DERP
-
-	#define JAPP_SERVER_VERSION "JA++ revision 2 (DEV)"
-	#define JAPP_SERVER_FLAGS (SSF_GRAPPLE_SWING|SSF_SCOREBOARD_LARGE|SSF_SCOREBOARD_KD|SSF_CHAT_FILTERS|SSF_FIXED_WEAP_ANIMS|SSF_SPECTINFO)
-
-#else //Client-side
-
-	// client-side conditional compiling
+#if defined(_GAME)
+	// ...
+#elif defined(_CGAME) || defined(_UI)
 //	#define JPLUA_DEBUG
 	#define RAZTEST //Vehicles? First person stuff?
 	#define IMPROVED_RAGDOLL
 //	#define FAV_SERVERS // jappeng adds this to engine
-
-
-	#define JAPLUS_CLIENT_VERSION		"1.4B4"
-	#define JAPP_CLIENT_VERSION			S_COLOR_GREEN"JA++ 0.3 "S_COLOR_YELLOW"build 3"
-	#define JAPP_CLIENT_VERSION_CLEAN	"JA++ 0.3 build 3"
-	#define JAPP_CLIENT_FLAGS			(CSF_GRAPPLE_SWING|CSF_SCOREBOARD_LARGE|CSF_SCOREBOARD_KD|CSF_CHAT_FILTERS|CSF_FIXED_WEAPON_ANIMS)
-
 #endif
 
 #include "qcommon/disablewarnings.h"
@@ -118,6 +106,12 @@
 	#define QARCH 64
 #else
 	#error "Could not determine architecture"
+#endif
+
+#ifdef REVISION
+	#define JAPP_VERSION "JA++, "XSTRING(QARCH)" bits, "__DATE__", "REVISION
+#else
+	#define JAPP_VERSION "JA++, "XSTRING(QARCH)" bits, "__DATE__
 #endif
 
 // this is the define for determining if we have an asm version of a C function

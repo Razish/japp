@@ -191,7 +191,7 @@ XCVAR_DEF( japp_userinfoValidate,			"805306367",			NULL,			CVAR_NONE,										q
 XCVAR_DEF( japp_voteDelay,					"3000",					NULL,			CVAR_NONE,										qfalse )
 XCVAR_DEF( japp_pauseTime,					"120",					NULL,			CVAR_NONE,										qfalse )
 XCVAR_DEF( japp_unpauseTime,				"5",					NULL,			CVAR_NONE,										qfalse )
-XCVAR_DEF( japp_version,					JAPP_SERVER_VERSION,	NULL,			CVAR_SERVERINFO,								qfalse )
+XCVAR_DEF( japp_version,					JAPP_VERSION,			NULL,			CVAR_ROM|CVAR_SERVERINFO,						qfalse )
 XCVAR_DEF( japp_weaponRoll,					"0",					CVU_WeaponRoll,	CVAR_NONE,										qtrue )
 XCVAR_DEF( japp_weaponPickupAlways,			"0",					CVU_WeaponPU,	CVAR_NONE,										qtrue )
 XCVAR_DEF( jp_cinfo,						"0",					CVU_CInfo,		CVAR_ROM|CVAR_SERVERINFO,						qfalse )
