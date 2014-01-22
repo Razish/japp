@@ -73,7 +73,7 @@ int adjustRespawnTime(float preRespawnTime, int itemType, int itemTag)
 		{	// From 12-32, scale from 0.5 to 0.25;
 			respawnTime *= 20.0 / (float)(level.numPlayingClients + 8);
 		}
-		else 
+		else
 		{	// From 4-12, scale from 1.0 to 0.5;
 			respawnTime *= 8.0 / (float)(level.numPlayingClients + 4);
 		}
@@ -89,7 +89,7 @@ int adjustRespawnTime(float preRespawnTime, int itemType, int itemTag)
 
 
 #define SHIELD_HEALTH				250
-#define SHIELD_HEALTH_DEC			10		// 25 seconds	
+#define SHIELD_HEALTH_DEC			10		// 25 seconds
 #define MAX_SHIELD_HEIGHT			254
 #define MAX_SHIELD_HALFWIDTH		255
 #define SHIELD_HALFTHICKNESS		4
@@ -179,7 +179,7 @@ void ShieldGoSolid(gentity_t *self)
 		ShieldRemove(self);
 		return;
 	}
-	
+
 	trap->Trace (&tr, &self->r.currentOrigin, &self->r.mins, &self->r.maxs, &self->r.currentOrigin, self->s.number, CONTENTS_BODY, qfalse, 0, 0 );
 	if(tr.startsolid)
 	{	// gah, we can't activate yet
@@ -341,7 +341,7 @@ void CreateShield(gentity_t *ent)
 	ent->touch = ShieldTouch;
 
 	// see if we're valid
-	trap->Trace (&tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &ent->r.currentOrigin, ent->s.number, CONTENTS_BODY, qfalse, 0, 0 ); 
+	trap->Trace (&tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &ent->r.currentOrigin, ent->s.number, CONTENTS_BODY, qfalse, 0, 0 );
 
 	if (tr.startsolid)
 	{	// Something in the way!
@@ -523,7 +523,7 @@ void pas_fire( gentity_t *ent )
 
 	VectorSubtract(&enOrg, &myOrg, &fwd);
 	VectorNormalize(&fwd);
-	
+
 	myOrg.x += fwd.x*16;
 	myOrg.y += fwd.y*16;
 	myOrg.z += fwd.z*16;
@@ -574,7 +574,7 @@ static qboolean pas_find_enemies( gentity_t *self )
 			continue;
 		}
 		if ( self->alliedTeam && target->client->sess.sessionTeam == self->alliedTeam )
-		{ 
+		{
 			continue;
 		}
 		if (self->genericValue3 == target->s.number)
@@ -678,7 +678,7 @@ void pas_adjust_enemy( gentity_t *ent )
 		ent->enemy = NULL;
 		// shut-down sound
 		G_Sound( ent, CHAN_BODY, G_SoundIndex( "sound/chars/turret/shutdown.wav" ));
-	
+
 		ent->bounceCount = level.time + 500 + random() * 150;
 
 		// make turret play ping sound for 5 seconds
@@ -693,7 +693,7 @@ void turret_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
 
 void sentryExpire(gentity_t *self)
 {
-	turret_die(self, self, self, 1000, MOD_UNKNOWN);	
+	turret_die(self, self, self, 1000, MOD_UNKNOWN);
 }
 
 //---------------------------------
@@ -1080,7 +1080,7 @@ void ItemUse_Seeker(gentity_t *ent)
 				remote->client->playerTeam = NPCTEAM_ENEMY;
 			else
 				remote->client->playerTeam = NPCTEAM_NEUTRAL;
-		}	
+		}
 	}
 	else
 	{
@@ -1294,7 +1294,7 @@ void G_SpecialSpawnItem(gentity_t *ent, const gitem_t *item)
 void G_PrecacheDispensers(void)
 {
 	const gitem_t *item;
-		
+
 	item = BG_FindItem(DISP_HEALTH_ITEM);
 	if (item)
 	{
@@ -1324,9 +1324,9 @@ void ItemUse_UseDisp(gentity_t *ent, int type)
 	{ //busy doing something else
 		return;
 	}
-	
+
 	ent->client->tossableItemDebounce = level.time + TOSS_DEBOUNCE_TIME;
-	
+
 	if (type == HI_HEALTHDISP)
 	{
 		item = BG_FindItem(DISP_HEALTH_ITEM);
@@ -1538,14 +1538,14 @@ void EWeb_SetBoneAngles(gentity_t *ent, char *bone, vector3 *angles)
 	trap->G2API_SetBoneAngles( ent->ghoul2,
 					0,
 					bone,
-					angles, 
+					angles,
 					flags,
 					up,
 					right,
 					forward,
 					NULL,
 					100,
-					level.time ); 
+					level.time );
 }
 
 //start an animation on model_root both server side and client side
@@ -1689,7 +1689,7 @@ void EWebUpdateBoneAngles(gentity_t *owner, gentity_t *eweb)
 	float ideal;
 	float incr;
 	const float turnCap = 4.0f; //max degrees we can turn per update
-	
+
 	VectorClear(&yAng);
 	ideal = AngleSubtract(owner->client->ps.viewangles.yaw, eweb->s.angles.yaw);
 	incr = AngleSubtract(ideal, eweb->angle);
@@ -1972,7 +1972,7 @@ int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 	if ( !other->client->ps.powerups[ent->item->giTag] ) {
 		// round timing to seconds to make multiple powerup timers
 		// count in sync
-		other->client->ps.powerups[ent->item->giTag] = 
+		other->client->ps.powerups[ent->item->giTag] =
 			level.time - ( level.time % 1000 );
 
 		G_LogWeaponPowerup(other->s.number, ent->item->giTag);
@@ -2062,7 +2062,7 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 {
 	int max = ammoData[weapon].max;
 
-	if (ent->client->ps.eFlags & EF_DOUBLE_AMMO) 
+	if (ent->client->ps.eFlags & EF_DOUBLE_AMMO)
 	{//Raz fix: double ammo for siege
 		max *= 2;
 	}
@@ -2171,7 +2171,7 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 	Add_Ammo( other, weaponData[ent->item->giTag].ammoIndex, quantity );
 
 	G_LogWeaponPickup(other->s.number, ent->item->giTag);
-	
+
 	return adjustRespawnTime(g_weaponRespawn.integer, ent->item->giType, ent->item->giTag);
 }
 
@@ -2211,10 +2211,10 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 
 //======================================================================
 
-int Pickup_Armor( gentity_t *ent, gentity_t *other ) 
+int Pickup_Armor( gentity_t *ent, gentity_t *other )
 {
 	other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
-	if ( other->client->ps.stats[STAT_ARMOR] > other->client->ps.stats[STAT_MAX_HEALTH] * ent->item->giTag ) 
+	if ( other->client->ps.stats[STAT_ARMOR] > other->client->ps.stats[STAT_MAX_HEALTH] * ent->item->giTag )
 	{
 		other->client->ps.stats[STAT_ARMOR] = other->client->ps.stats[STAT_MAX_HEALTH] * ent->item->giTag;
 	}
@@ -2279,11 +2279,11 @@ void RespawnItem( gentity_t *ent ) {
 
 qboolean CheckItemCanBePickedUpByNPC( gentity_t *item, gentity_t *pickerupper )
 {
-	if ( (item->flags&FL_DROPPED_ITEM) 
+	if ( (item->flags&FL_DROPPED_ITEM)
 		&& (item->activator && item->activator->s.number >= MAX_CLIENTS)
-		&& pickerupper->s.number 
-		&& pickerupper->s.weapon == WP_NONE 
-		&& pickerupper->enemy 
+		&& pickerupper->s.number
+		&& pickerupper->s.weapon == WP_NONE
+		&& pickerupper->enemy
 		&& pickerupper->painDebounceTime < level.time
 		&& pickerupper->NPC && pickerupper->NPC->surrenderTime < level.time //not surrendering
 		&& !(pickerupper->NPC->scriptFlags&SCF_FORCED_MARCH) //not being forced to march
@@ -2324,7 +2324,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		return;
 	}
 
-	//Raz: Added a check for 
+	//Raz: Added a check for
 	if (ent->item && ent->item->giType == IT_WEAPON &&
 		ent->s.powerups &&
 		ent->s.powerups < level.time)
@@ -2362,20 +2362,20 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		return;
 	}
 
-	
-	if ( other->client->NPC_class == CLASS_ATST || 
-		other->client->NPC_class == CLASS_GONK || 
-		other->client->NPC_class == CLASS_MARK1 || 
-		other->client->NPC_class == CLASS_MARK2 || 
-		other->client->NPC_class == CLASS_MOUSE || 
-		other->client->NPC_class == CLASS_PROBE || 
-		other->client->NPC_class == CLASS_PROTOCOL || 
-		other->client->NPC_class == CLASS_R2D2 || 
-		other->client->NPC_class == CLASS_R5D2 || 
-		other->client->NPC_class == CLASS_SEEKER || 
-		other->client->NPC_class == CLASS_REMOTE || 
-		other->client->NPC_class == CLASS_RANCOR || 
-		other->client->NPC_class == CLASS_WAMPA || 
+
+	if ( other->client->NPC_class == CLASS_ATST ||
+		other->client->NPC_class == CLASS_GONK ||
+		other->client->NPC_class == CLASS_MARK1 ||
+		other->client->NPC_class == CLASS_MARK2 ||
+		other->client->NPC_class == CLASS_MOUSE ||
+		other->client->NPC_class == CLASS_PROBE ||
+		other->client->NPC_class == CLASS_PROTOCOL ||
+		other->client->NPC_class == CLASS_R2D2 ||
+		other->client->NPC_class == CLASS_R5D2 ||
+		other->client->NPC_class == CLASS_SEEKER ||
+		other->client->NPC_class == CLASS_REMOTE ||
+		other->client->NPC_class == CLASS_RANCOR ||
+		other->client->NPC_class == CLASS_WAMPA ||
 		//other->client->NPC_class == CLASS_JAWA || //FIXME: in some cases it's okay?
 		other->client->NPC_class == CLASS_UGNAUGHT || //FIXME: in some cases it's okay?
 		other->client->NPC_class == CLASS_SENTRY )
@@ -2493,7 +2493,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	}
 
 	G_LogPrintf( "Item: %i %s %s\n", other->s.number, other->client?other->client->pers.netname:"<null>", ent->item->classname );
-	
+
 	// play the normal pickup sound
 	if (predict) {
 		if (other->client)
@@ -2581,8 +2581,8 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	}
 
 	// ZOID
-	// A negative respawn times means to never respawn this item (but don't 
-	// delete it).  This is used by items that are respawned by third party 
+	// A negative respawn times means to never respawn this item (but don't
+	// delete it).  This is used by items that are respawned by third party
 	// events such as ctf flags
 	if ( respawn <= 0 ) {
 		ent->nextthink = 0;
@@ -3011,11 +3011,11 @@ void G_CheckTeamItems( void ) {
 		// check for the two flags
 		item = BG_FindItem( "team_CTF_redflag" );
 		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
-			trap->Print( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map" );
+			trap->Print( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map\n" );
 		}
 		item = BG_FindItem( "team_CTF_blueflag" );
 		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
-			trap->Print( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map" );
+			trap->Print( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map\n" );
 		}
 	}
 }
