@@ -10,10 +10,11 @@
 # options:
 #	debug		generate debug information
 #	force32		force 32 bit target when on 64 bit machine
+#	compiler=?	use an alternate compiler
 #	analyse		run static analysis
 #
 # example:
-#	scons game=1 debug=1 force32=1
+#	scons game=1 debug=1 force32=1 compiler=clang
 #
 
 import platform
@@ -33,7 +34,6 @@ env = Environment()
 
 env['ENV']['TERM'] = os.environ['TERM']
 
-analyse = int( ARGUMENTS.get( 'analyse', 0 ) )
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 if force32:
 	bits = 32
@@ -303,7 +303,8 @@ elif plat == 'Windows':
 if plat == 'Linux':
 	env['CPPDEFINES'] = [ '__GCC__' ]
 	env['CCFLAGS'] = [ '-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-missing-field-initializers', '-Wno-sign-compare', '-Wno-unused-parameter' ]
-	if analyse:
+	env['CC'] = ARGUMENTS.get( 'compiler', 'gcc' )
+	if int( ARGUMENTS.get( 'analyse', 0 ) ):
 		env['CC'] = 'clang'
 		env['CCFLAGS'] += [ '--analyze' ]
 	if force32:
@@ -329,34 +330,33 @@ else:
 		env['CCFLAGS'] += [ '/O2' ]
 	env['CPPDEFINES'] += [ 'NDEBUG' ]
 
+# get git revision
 status, rev = commands.getstatusoutput( 'git rev-parse HEAD' )
 if status == 0:
 	env['CPPDEFINES'] += [ 'REVISION=\\"'+rev+'\\"' ]
 
-#################
-#    TARGETS    #
-#################
-
-# Game
-if int(ARGUMENTS.get( 'game', 0 )):
+# targets
+project = ARGUMENTS.get( 'project', '' )
+if project == 'game':
 	env['CPPPATH'] = [ '.', './game' ]
 	env['CPPDEFINES'] += [ '_GAME', 'JK2AWARDS', 'JPLUA' ]
 	env['LIBS'] = libs['game']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'jampgame'+arch, files['game'] )
 
-# Client Game
-if int(ARGUMENTS.get( 'cgame', 0 )):
+elif project == 'cgame':
 	env['CPPPATH'] = [ '.', './cgame', './game' ]
 	env['CPPDEFINES'] += [ '_CGAME', 'JK2AWARDS', 'JPLUA' ]
 	env['LIBS'] = libs['cgame']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'cgame'+arch, files['cgame'] )
 
-# UI
-if int(ARGUMENTS.get( 'ui', 0 )):
+elif project == 'ui':
 	env['CPPPATH'] = [ '.', './ui', './game' ]
 	env['CPPDEFINES'] += [ '_UI' ]
 	env['LIBS'] = libs['ui']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'ui'+arch, files['ui'] )
+
+else:
+	print( 'no project specified' )

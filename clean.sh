@@ -1,4 +1,4 @@
 #!/bin/sh
-scons game=1 -c > /dev/null
-scons cgame=1 -c > /dev/null
-scons ui=1 -c > /dev/null
+scons project=game -c > /dev/null
+scons project=cgame -c > /dev/null
+scons project=ui -c > /dev/null

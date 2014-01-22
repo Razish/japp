@@ -21,7 +21,7 @@
 #define WINDOW_HASFOCUS				(0x00000002u) // has cursor focus, exclusive
 #define WINDOW_VISIBLE				(0x00000004u) // is visible
 #define WINDOW_INACTIVE				(0x00000008u) // is visible but grey ( non-active )
-#define WINDOW_DECORATION			(0x00000010u) // for decoration only, no mouse, keyboard, etc.. 
+#define WINDOW_DECORATION			(0x00000010u) // for decoration only, no mouse, keyboard, etc..
 #define WINDOW_FADINGOUT			(0x00000020u) // fading out, non-active
 #define WINDOW_FADINGIN				(0x00000040u) // fading in
 #define WINDOW_MOUSEOVERTEXT		(0x00000080u) // mouse is over it, non exclusive
@@ -39,10 +39,10 @@
 #define WINDOW_AUTOWRAPPED			(0x00080000u) // auto wrap text
 #define WINDOW_FORCED				(0x00100000u) // forced open
 #define WINDOW_POPUP				(0x00200000u) // popup
-#define WINDOW_BACKCOLORSET			(0x00400000u) // backcolor was explicitly set 
+#define WINDOW_BACKCOLORSET			(0x00400000u) // backcolor was explicitly set
 #define WINDOW_TIMEDVISIBLE			(0x00800000u) // visibility timing ( NOT implemented )
 #define WINDOW_PLAYERCOLOR			(0x01000000u) // hack the forecolor to match ui_char_color_*
-#define WINDOW_UNUSED02000000		(0x02000000u) // 
+#define WINDOW_UNUSED02000000		(0x02000000u) //
 #define WINDOW_INTRANSITIONMODEL	(0x04000000u) // delayed script waiting to run
 
 
@@ -111,7 +111,7 @@ typedef struct windowDef_s {
 	int border;                     //
 	int ownerDraw;									// ownerDraw style
 	uint32_t ownerDrawFlags;							// show flags for ownerdraw items
-	float borderSize;               // 
+	float borderSize;               //
 	uint32_t flags;                      // visible, focus, mouseover, cursor
 	rectDef_t rectEffects;          // for various effects
 	rectDef_t rectEffects2;         // for various effects
@@ -121,7 +121,7 @@ typedef struct windowDef_s {
 	vector4 backColor;               // border color
 	vector4 borderColor;             // border color
 	vector4 outlineColor;            // border color
-	qhandle_t background;           // background asset  
+	qhandle_t background;           // background asset
 } windowDef_t;
 
 typedef struct colorRangeDef_s {
@@ -133,13 +133,13 @@ typedef struct colorRangeDef_s {
 // FIXME: combine flags into bitfields to save space
 // FIXME: consolidate all of the common stuff in one structure for menus and items
 // THINKABOUTME: is there any compelling reason not to have items contain items
-// and do away with a menu per say.. major issue is not being able to dynamically allocate 
-// and destroy stuff.. Another point to consider is adding an alloc free call for vm's and have 
+// and do away with a menu per say.. major issue is not being able to dynamically allocate
+// and destroy stuff.. Another point to consider is adding an alloc free call for vm's and have
 // the engine just allocate the pool for it based on a cvar
 // many of the vars are re-used for different item types, as such they are not always named appropriately
 // the benefits of c++ in DOOM will greatly help crap like this
 // FIXME: need to put a type ptr that points to specific type info per type
-// 
+//
 #define MAX_LB_COLUMNS 16
 
 typedef struct columnInfo_s {
@@ -168,10 +168,10 @@ typedef struct editFieldDef_s {
 	float minVal;                  //	edit field limits
 	float maxVal;                  //
 	float defVal;                  //
-	float range;									 // 
+	float range;									 //
 	int maxChars;                  // for edit fields
 	int maxPaintChars;             // for edit fields
-	int paintOffset;							 // 
+	int paintOffset;							 //
 } editFieldDef_t;
 
 #define MAX_MULTI_CVARS 32
@@ -206,7 +206,7 @@ typedef struct modelDef_s {
 	float fov_x2, fov_y2, fov_Effectx, fov_Effecty;
 } modelDef_t;
 
-typedef struct textScrollDef_s 
+typedef struct textScrollDef_s
 {
 	int				startPos;
 	int				endPos;
@@ -244,7 +244,7 @@ typedef struct textScrollDef_s
 
 typedef struct itemDef_s {
 	windowDef_t	window;						// common positional, border, style, layout info
-	rectDef_t	textRect;					// rectangle the text ( if any ) consumes     
+	rectDef_t	textRect;					// rectangle the text ( if any ) consumes
 	int			type;						// text, button, radiobutton, checkbox, textfield, listbox, combo
 	int			alignment;					// left center right
 	int			textalignment;				// ( optional ) alignment for text within rect based on text width
@@ -263,7 +263,7 @@ typedef struct itemDef_s {
 	const char	*mouseEnterText;			// mouse enter script
 	const char	*mouseExitText;				// mouse exit script
 	const char	*mouseEnter;				// mouse enter script
-	const char	*mouseExit;					// mouse exit script 
+	const char	*mouseExit;					// mouse exit script
 	const char	*action;					// select script
 //JLFACCEPT MPMOVED
 	const char  *accept;
@@ -273,10 +273,10 @@ typedef struct itemDef_s {
 
 	const char	*onFocus;					// select script
 	const char	*leaveFocus;				// select script
-	const char	*cvar;						// associated cvar 
+	const char	*cvar;						// associated cvar
 	const char	*cvarTest;					// associated cvar for enable actions
 	const char	*enableCvar;				// enable, disable, show, or hide based on value, this can contain a list
-	
+
 	const char	*cvarTest2;					// Raz: Added
 	const char	*enableCvar2;				// Raz: Added
 
@@ -286,7 +286,7 @@ typedef struct itemDef_s {
 	colorRangeDef_t colorRanges[MAX_COLOR_RANGES];
 	float		special;					// used for feeder id's etc.. diff per type
 	int			cursorPos;					// cursor position in characters
-	void		*typeData;					// type specific data ptr's	
+	void		*typeData;					// type specific data ptr's
 	const char	*descText;					//	Description text
 	int			appearanceSlot;				// order of appearance
 	int			iMenuFont;					// FONT_SMALL,FONT_MEDIUM,FONT_LARGE	// changed from 'font' so I could see what didn't compile, and differentiate between font handles returned from RegisterFont -ste
@@ -301,9 +301,9 @@ typedef struct itemDef_s {
 typedef struct menuDef_s {
 	windowDef_t window;
 	const char  *font;						// font
-	qboolean fullScreen;					// covers entire screen 
+	qboolean fullScreen;					// covers entire screen
 	int itemCount;							// number of items;
-	int fontIndex;							// 
+	int fontIndex;							//
 	int cursorItem;							// which item as the cursor
 	int fadeCycle;							//
 	float fadeClamp;						//
@@ -318,7 +318,7 @@ typedef struct menuDef_s {
 
 	vector4 focusColor;						// focus color for items
 	vector4 disableColor;					// focus color for items
-	itemDef_t *items[MAX_MENUITEMS];		// items this menu contains   
+	itemDef_t *items[MAX_MENUITEMS];		// items this menu contains
 	int			descX;						// X position of description
 	int			descY;						// X position of description
 	vector4		descColor;					// description text color for items
@@ -392,7 +392,7 @@ typedef struct cachedAssets_s {
 
 } cachedAssets_t;
 
-typedef struct 
+typedef struct
 {
 	const char *name;
 	qboolean (*handler) (itemDef_t *item, char** args);
@@ -404,11 +404,11 @@ typedef struct displayContextDef_s {
 	void			(*drawHandlePic)					( float x, float y, float w, float h, qhandle_t asset );
 	void			(*drawStretchPic)					( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader );
 	void			(*drawText)							( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont );
-	float			(*textWidth)						( const char *text, float scale, int iMenuFont );  
+	float			(*textWidth)						( const char *text, float scale, int iMenuFont );
 	float			(*textHeight)						( const char *text, float scale, int iMenuFont );
 	qhandle_t		(*registerModel)					( const char *p );
 	void			(*modelBounds)						( qhandle_t model, vector3 *min, vector3 *max );
-	void			(*fillRect)							( float x, float y, float w, float h, const const vector4 *color );
+	void			(*fillRect)							( float x, float y, float w, float h, const vector4 *color );
 	void			(*drawRect)							( float x, float y, float w, float h, float size, const vector4 *color );
 	void			(*drawSides)						( float x, float y, float w, float h, float size );
 	void			(*drawTopBottom)					( float x, float y, float w, float h, float size );
@@ -444,7 +444,7 @@ typedef struct displayContextDef_s {
 	void			(*keynumToStringBuf)				( int keynum, char *buf, int buflen );
 	void			(*getBindingBuf)					( int keynum, char *buf, int buflen );
 	void			(*setBinding)						( int keynum, const char *binding );
-	void			(*executeText)						( int exec_when, const char *text );	
+	void			(*executeText)						( int exec_when, const char *text );
 	void			(*Error)							( int level, const char *error, ... );
 	void			(*Print)							( const char *msg, ... );
 	void			(*Pause)							( qboolean b );

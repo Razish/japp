@@ -5,10 +5,10 @@ ARGS=($@)
 ARGSLEN=${#ARGS[@]}
 
 # options
-BUILD_ALL=1
 DEBUG=0
 ANALYSE=0
 FORCE32=0
+COMPILER='gcc'
 
 # targets
 GAME=0
@@ -21,62 +21,51 @@ do
 	"debug")
 		DEBUG=1
 		;;
+	"clang")
+		COMPILER='clang'
+		;;
 	"analyse")
 		ANALYSE=1
 		;;
 	"force32")
 		FORCE32=1
 		;;
+	"all")
+		GAME=1
+		CGAME=1
+		UI=1
+		;;
 	"game")
 		GAME=1
-		BUILD_ALL=0
 		;;
 	"cgame")
 		CGAME=1
-		BUILD_ALL=0
 		;;
 	"ui")
 		UI=1
-		BUILD_ALL=0
 		;;
 	*)
 		;;
 	esac
 done
 
-if [ $BUILD_ALL -eq 1 ]
+if [ $GAME -eq 0 ] && [ $CGAME -eq 0 ] &&  [ $UI -eq 0 ]
 then
-	GAME=1
-	CGAME=1
-	UI=1
+	echo 'please specify a project to build: game, cgame, ui (or "all")'
+	exit
 fi
 
 if [ $GAME -eq 1 ]
 then
-	if [ $ANALYSE -eq 1 ]
-	then
-		scons game=1 debug=$DEBUG analyse=1 force32=$FORCE32 >/dev/null 2>>analyse.log
-	else
-		scons game=1 debug=$DEBUG analyse=0 force32=$FORCE32 >/dev/null
-	fi
+	scons project=game debug=$DEBUG compiler=$COMPILER analyse=$ANALYSE force32=$FORCE32 >/dev/null
 fi
 
 if [ $CGAME -eq 1 ]
 then
-	if [ $ANALYSE -eq 1 ]
-	then
-		scons cgame=1 debug=$DEBUG analyse=1 force32=$FORCE32 >/dev/null 2>>analyse.log
-	else
-		scons cgame=1 debug=$DEBUG analyse=0 force32=$FORCE32 >/dev/null
-	fi
+	scons project=cgame debug=$DEBUG compiler=$COMPILER analyse=$ANALYSE force32=$FORCE32 >/dev/null
 fi
 
 if [ $UI -eq 1 ]
 then
-	if [ $ANALYSE -eq 1 ]
-	then
-		scons ui=1 debug=$DEBUG analyse=1 force32=$FORCE32 >/dev/null 2>>analyse.log
-	else
-		scons ui=1 debug=$DEBUG analyse=0 force32=$FORCE32 >/dev/null
-	fi
+	scons project=ui debug=$DEBUG compiler=$COMPILER analyse=$ANALYSE force32=$FORCE32 >/dev/null
 fi

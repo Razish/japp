@@ -195,7 +195,7 @@ float FloatSwap( const float *f );
 	#define __cdecl
 	#define __declspec(x)
 	#define stricmp strcasecmp
-	#define QINLINE /*inline*/ 
+	#define QINLINE /*inline*/
 
 	#ifdef __ppc__
 		#define CPUSTRING "MacOSX-ppc"
@@ -250,7 +250,7 @@ float FloatSwap( const float *f );
 #ifdef __MACOS__
 
 	#include <MacTypes.h>
-	#define QINLINE inline 
+	#define QINLINE inline
 
 	#define	CPUSTRING "MacOS-PPC"
 
@@ -281,7 +281,7 @@ float FloatSwap( const float *f );
 	// bk001205 - from Makefile
 	#define stricmp strcasecmp
 
-	#define QINLINE inline 
+	#define QINLINE inline
 
 	#ifdef __i386__
 		#define	CPUSTRING "linux-i386"
@@ -331,7 +331,7 @@ float FloatSwap( const float *f );
 
 	#define stricmp strcasecmp
 
-	#define QINLINE inline 
+	#define QINLINE inline
 
 	#ifdef __i386__
 		#define CPUSTRING "freebsd-i386"
@@ -778,7 +778,7 @@ typedef struct sharedRagDollParams_s
 	int startFrame;
 	int endFrame;
 
-	int collisionType; // 1 = from a fall, 0 from effectors, this will be going away soon, hence no enum 
+	int collisionType; // 1 = from a fall, 0 from effectors, this will be going away soon, hence no enum
 
 	qboolean CallRagDollBegin; // a return value, means that we are now begininng ragdoll and the NPC stuff needs to happen
 
@@ -1055,7 +1055,7 @@ extern	vector3	axisDefault[3];
 static inline float Q_rsqrt( float number ) {
 		float x = 0.5f * number;
                 float y;
-#ifdef __GNUC__            
+#ifdef __GNUC__
                 asm("frsqrte %0,%1" : "=f" (y) : "f" (number));
 #else
 		y = __frsqrte( number );
@@ -1063,10 +1063,10 @@ static inline float Q_rsqrt( float number ) {
 		return y * (1.5f - (x * y * y));
 	}
 
-#ifdef __GNUC__            
+#ifdef __GNUC__
 static inline float Q_fabs(float x) {
     float abs_x;
-    
+
     asm("fabs %0,%1" : "=f" (abs_x) : "f" (x));
     return abs_x;
 }
@@ -1515,9 +1515,9 @@ typedef struct orientation_s {
 typedef enum soundChannel_e {
 	CHAN_AUTO,	//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # Auto-picks an empty channel to play sound on
 	CHAN_LOCAL,	//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # menu sounds, etc
-	CHAN_WEAPON,//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" 
+	CHAN_WEAPON,//## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
 	CHAN_VOICE, //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Voice sounds cause mouth animation
-	CHAN_VOICE_ATTEN, //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Causes mouth animation but still use normal sound falloff 
+	CHAN_VOICE_ATTEN, //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Causes mouth animation but still use normal sound falloff
 	CHAN_ITEM,  //## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
 	CHAN_BODY,	//## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
 	CHAN_AMBIENT,//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # added for ambient sounds
@@ -1580,7 +1580,7 @@ typedef enum soundChannel_e {
 // these are also in be_aas_def.h - argh (rjr)
 #define	MAX_MODELS			512		// these are sent over the net as -12 bits
 #define	MAX_SOUNDS			256		// so they cannot be blindly increased
-#define MAX_ICONS			64		// max registered icons you can have per map 
+#define MAX_ICONS			64		// max registered icons you can have per map
 #define MAX_FX				64		// max effects strings, I'm hoping that 64 will be plenty
 
 #define MAX_SUB_BSP			32 //rwwRMG - added
@@ -1628,9 +1628,9 @@ typedef enum {
 
 typedef struct forcedata_s {
 	int				forcePowerDebounce[NUM_FORCE_POWERS];	//for effects that must have an interval
-	int				forcePowersKnown;
+	uint32_t		forcePowersKnown;
 	int				forcePowersActive;
-	forcePowers_t	forcePowerSelected;
+	unsigned int	forcePowerSelected;
 	int				forceButtonNeedRelease;
 	int				forcePowerDuration[NUM_FORCE_POWERS];
 	int				forcePower;
@@ -1654,10 +1654,10 @@ typedef struct forcedata_s {
 	int				forceHealAmount;
 
 	//This hurts me somewhat to do, but there's no other real way to allow completely "dynamic" mindtricking.
-	int				forceMindtrickTargetIndex; //0-15
-	int				forceMindtrickTargetIndex2; //16-32
-	int				forceMindtrickTargetIndex3; //33-48
-	int				forceMindtrickTargetIndex4; //49-64
+	uint32_t		forceMindtrickTargetIndex; //0-15
+	uint32_t		forceMindtrickTargetIndex2; //16-32
+	uint32_t		forceMindtrickTargetIndex3; //33-48
+	uint32_t		forceMindtrickTargetIndex4; //49-64
 
 	int				forceRageRecoveryTime;
 	int				forceDrainEntNum;
@@ -1695,7 +1695,7 @@ typedef enum itemUseFail_e {
 #define	MAX_STATS				16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16
-#define	MAX_WEAPONS				19		
+#define	MAX_WEAPONS				19
 
 #define	MAX_PS_EVENTS			2
 
@@ -1758,10 +1758,10 @@ typedef struct playerState_s {
 	int			groundEntityNum;// ENTITYNUM_NONE = in air
 
 	int			legsTimer;		// don't change low priority animations until this runs out
-	int			legsAnim;
+	unsigned int legsAnim;
 
 	int			torsoTimer;		// don't change low priority animations until this runs out
-	int			torsoAnim;
+	unsigned int torsoAnim;
 
 	qboolean	legsFlip; //set to opposite when the same anim needs restarting, sent over in only 1 bit. Cleaner and makes porting easier than having that god forsaken ANIM_TOGGLEBIT.
 	qboolean	torsoFlip;
@@ -2019,7 +2019,7 @@ typedef struct siegePers_s
 										// walking will use different animations and
 										// won't generate footsteps
 #define	BUTTON_USE				32			// the ol' use key returns!
-#define BUTTON_FORCEGRIP		64			// 
+#define BUTTON_FORCEGRIP		64			//
 #define BUTTON_ALT_ATTACK		128
 
 #define	BUTTON_ANY				256			// any key whatsoever
@@ -2090,7 +2090,7 @@ typedef struct usercmd_s {
 	int				serverTime;
 	ivector3		angles;
 	int 			buttons;	//Raz: networked as 16 bits
-	byte			weapon;           // weapon 
+	byte			weapon;           // weapon
 	byte			forcesel;
 	byte			invensel;
 	byte			generic_cmd;
@@ -2397,7 +2397,7 @@ typedef struct entityState_s {
 typedef enum connstate_e {
 	CA_UNINITIALIZED,
 	CA_DISCONNECTED, 	// not talking to a server
-	CA_AUTHORIZING,		// not used any more, was checking cd key 
+	CA_AUTHORIZING,		// not used any more, was checking cd key
 	CA_CONNECTING,		// sending request packets to the server
 	CA_CHALLENGING,		// sending challenge packets to the server
 	CA_CONNECTED,		// netchan_t established, getting gamestate
@@ -2484,7 +2484,7 @@ typedef struct mdxaBone_s { float matrix[3][4]; } mdxaBone_t;
 
 typedef enum Eorientations
 {
-	ORIGIN = 0, 
+	ORIGIN = 0,
 	POSITIVE_X,
 	POSITIVE_Z,
 	POSITIVE_Y,
@@ -2535,7 +2535,7 @@ typedef struct SSkinGoreData_s
 	vector3			tint;					// unimplemented
 	float			impactStrength;			// unimplemented
 
-	int				shader; // shader handle 
+	int				shader; // shader handle
 
 	int				myIndex; // used internally
 
