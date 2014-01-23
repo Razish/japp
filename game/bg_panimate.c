@@ -1689,7 +1689,7 @@ animation_t	bgHumanoidAnimations[MAX_TOTALANIMATIONS]; //humanoid animations are
 //#define CONVENIENT_ANIMATION_FILE_DEBUG_THING
 
 #ifdef CONVENIENT_ANIMATION_FILE_DEBUG_THING
-void SpewDebugStuffToFile()
+void SpewDebugStuffToFile( void )
 {
 	fileHandle_t f;
 	int i = 0;

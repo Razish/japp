@@ -259,7 +259,7 @@ void BotWaypointRender(void)
 			plum = G_TempEntity( &gWPArray[i]->origin, EV_SCOREPLUM );
 			plum->r.svFlags |= SVF_BROADCAST;
 			plum->s.time = i;
-			
+
 			n = 0;
 
 			while (n < gWPArray[i]->neighbornum)
@@ -872,7 +872,7 @@ int CanGetToVectorTravel(vector3 *org1, vector3 *moveTo, vector3 *mins, vector3 
 				didMove = 1;
 			}
 		}
-		
+
 		if (didMove != 1)
 		{ //stair check
 			vector3 trFrom;
@@ -1946,7 +1946,7 @@ int LoadPathData(const char *filename)
 
 			nei_num++;
 		}
-		
+
 		while (fileString[i] != ' ')
 		{
 			currentVar[i_cv] = fileString[i];
@@ -2524,7 +2524,7 @@ int G_RecursiveConnection(int start, int end, int weight, qboolean traceCheck, f
 }
 
 #ifdef DEBUG_NODE_FILE
-void G_DebugNodeFile()
+void G_DebugNodeFile( void )
 {
 	fileHandle_t f;
 	int i = 0;
@@ -2562,7 +2562,7 @@ void G_DebugNodeFile()
 
 #define ALLOWABLE_DEBUG_FILE_SIZE 1048576
 
-void CreateAsciiTableRepresentation()
+void CreateAsciiTableRepresentation( void )
 { //Draw a text grid of the entire waypoint array (useful for debugging final waypoint placement)
 	fileHandle_t f;
 	int i = 0;
@@ -3086,7 +3086,7 @@ void BeginAutoPathRoutine(void)
 	}
 
 	G_RMGPathing();
-	
+
 	//rww - Using a faster in-engine version because we're having to wait for this stuff to get done as opposed to just saving it once.
 	trap->BotUpdateWaypoints(gWPNum, gWPArray);
 	trap->BotCalculatePaths(RMG.integer);

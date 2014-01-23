@@ -120,7 +120,7 @@ static char		memoryPool[MEM_POOL_SIZE];
 static int		allocPoint, outOfMemory;
 
 typedef struct  itemFlagsDef_s {
-	char *string;
+	const char *string;
 	int value;
 }	itemFlagsDef_t;
 
@@ -129,7 +129,7 @@ itemFlagsDef_t itemFlags [] = {
 	{NULL,					0}
 };
 
-char *styles [] = {
+const char *styles [] = {
 	"WINDOW_STYLE_EMPTY",
 	"WINDOW_STYLE_FILLED",
 	"WINDOW_STYLE_GRADIENT",
@@ -139,14 +139,14 @@ char *styles [] = {
 	NULL
 };
 
-char *alignment [] = {
+const char *alignment [] = {
 	"ITEM_ALIGN_LEFT",
 	"ITEM_ALIGN_CENTER",
 	"ITEM_ALIGN_RIGHT",
 	NULL
 };
 
-char *types [] = {
+const char *types [] = {
 	"ITEM_TYPE_TEXT",
 	"ITEM_TYPE_BUTTON",
 	"ITEM_TYPE_RADIOBUTTON",
@@ -205,7 +205,7 @@ void UI_InitMemory( void ) {
 	outOfMemory = qfalse;
 }
 
-qboolean UI_OutOfMemory() {
+qboolean UI_OutOfMemory( void ) {
 	return outOfMemory;
 }
 
@@ -300,7 +300,7 @@ const char *String_Alloc(const char *p) {
 	return NULL;
 }
 
-void String_Report() {
+void String_Report( void ) {
 	float f;
 	Com_Printf("Memory/String Pool Info\n");
 	Com_Printf("----------------\n");
@@ -319,7 +319,7 @@ void String_Report() {
 String_Init
 =================
 */
-void String_Init() {
+void String_Init( void ) {
 	int i;
 	for (i = 0; i < HASH_TABLE_SIZE; i++) {
 		strHandle[i] = 0;
@@ -1515,7 +1515,7 @@ void Menus_CloseByName ( const char *p )
 
 int FPMessageTime = 0;
 
-void Menus_CloseAll()
+void Menus_CloseAll( void )
 {
 	int i;
 
@@ -4298,7 +4298,7 @@ static void Menu_CloseCinematics(menuDef_t *menu) {
 	}
 }
 
-static void Display_CloseCinematics() {
+static void Display_CloseCinematics( void ) {
 	int i;
 	for (i = 0; i < menuCount; i++) {
 		Menu_CloseCinematics(&Menus[i]);
@@ -4323,7 +4323,7 @@ void  Menus_Activate(menuDef_t *menu) {
 
 }
 
-int Display_VisibleMenuCount() {
+int Display_VisibleMenuCount( void ) {
 	int i, count;
 	count = 0;
 	for (i = 0; i < menuCount; i++) {
@@ -5335,7 +5335,7 @@ void Item_Bind_Paint(itemDef_t *item)
 	}
 }
 
-qboolean Display_KeyBindPending() {
+qboolean Display_KeyBindPending( void ) {
 	return g_waitingForKey;
 }
 
@@ -6790,7 +6790,7 @@ itemDef_t *Menu_GetFocusedItem(menuDef_t *menu) {
 	return NULL;
 }
 
-menuDef_t *Menu_GetFocused() {
+menuDef_t *Menu_GetFocused( void ) {
 	int i;
 	for (i = 0; i < menuCount; i++) {
 		if (Menus[i].window.flags & WINDOW_HASFOCUS && Menus[i].window.flags & WINDOW_VISIBLE) {
@@ -7079,14 +7079,13 @@ Keyword Hash
 
 #define KEYWORDHASH_SIZE	512
 
-typedef struct keywordHash_s
-{
-	char *keyword;
+typedef struct keywordHash_s {
+	const char *keyword;
 	qboolean (*func)(itemDef_t *item, int handle);
 	struct keywordHash_s *next;
 } keywordHash_t;
 
-static int KeywordHash_Key(char *keyword) {
+static int KeywordHash_Key(const char *keyword) {
 	register int hash, i;
 
 	hash = 0;
@@ -8765,7 +8764,7 @@ qboolean ItemParse_isSaber2( itemDef_t *item, int handle  )
 	return qfalse;
 }
 
-keywordHash_t itemParseKeywords[] = {
+static keywordHash_t itemParseKeywords[] = {
 	{"action",			ItemParse_action,			NULL	},
 	{"addColorRange",	ItemParse_addColorRange,	NULL	},
 	{"align",			ItemParse_align,			NULL	},
@@ -9706,11 +9705,11 @@ void Menu_New(int handle) {
 	}
 }
 
-int Menu_Count() {
+int Menu_Count( void ) {
 	return menuCount;
 }
 
-void Menu_PaintAll() {
+void Menu_PaintAll( void ) {
 	int i;
 	if (captureFunc) {
 		captureFunc(captureData);
@@ -9731,7 +9730,7 @@ void Menu_Reset( void ) {
 	menuCount = 0;
 }
 
-displayContextDef_t *Display_GetContext() {
+displayContextDef_t *Display_GetContext( void ) {
 	return DC;
 }
 
@@ -9831,7 +9830,7 @@ static void Menu_CacheContents(menuDef_t *menu) {
 
 }
 
-void Display_CacheAll() {
+void Display_CacheAll( void ) {
 	int i;
 	for (i = 0; i < menuCount; i++) {
 		Menu_CacheContents(&Menus[i]);

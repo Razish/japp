@@ -1627,7 +1627,7 @@ Q3_GetString
   Argument		: char **value
 ============
 */
-int Q3_GetString( int entID, int type, const char *name, char **value )
+int Q3_GetString( int entID, int type, const char *name, const char **value )
 {
 	gentity_t	*ent = &g_entities[entID];
 	int toGet = 0;

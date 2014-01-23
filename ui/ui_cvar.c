@@ -17,8 +17,7 @@ static void CVU_Derpity( void ) {
 
 typedef struct cvarTable_s {
 	vmCvar_t	*vmCvar;
-	char		*cvarName;
-	char		*defaultString;
+	const char	*cvarName, *defaultString;
 	void		(*update)( void );
 	int			cvarFlags;
 } cvarTable_t;

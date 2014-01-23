@@ -75,7 +75,7 @@ extern cJSON *cJSON_GetObjectItem(cJSON *object, const char *string);
 
 // Extended GetItem.
 // Allows complex nested lookups
-// 
+//
 // Format example:
 // sub[5].myvar
 // [2]
@@ -87,15 +87,15 @@ extern cJSON *cJSON_GetItemExt(cJSON *item, const char *extitem);
 extern cJSON *cJSON_DuplicateItem(cJSON *item);
 
 // These calls create a cJSON item of the appropriate type.
-extern cJSON *cJSON_CreateNull();
-extern cJSON *cJSON_CreateTrue();
-extern cJSON *cJSON_CreateFalse();
+extern cJSON *cJSON_CreateNull( void );
+extern cJSON *cJSON_CreateTrue( void );
+extern cJSON *cJSON_CreateFalse( void );
 extern cJSON *cJSON_CreateBoolean(int boolean);
 extern cJSON *cJSON_CreateNumber(double num);
 extern cJSON *cJSON_CreateInteger(int num);
 extern cJSON *cJSON_CreateString(const char *string);
-extern cJSON *cJSON_CreateArray();
-extern cJSON *cJSON_CreateObject();
+extern cJSON *cJSON_CreateArray( void );
+extern cJSON *cJSON_CreateObject( void );
 
 // These utilities create an array of count items.
 extern cJSON *cJSON_CreateIntArray(int *numbers, int count);
@@ -117,7 +117,7 @@ extern void   cJSON_DeleteItemFromObject(cJSON *object, const char *string);
 // Clear all items from Arrays/Objects
 extern void cJSON_ClearItemsFromObject(cJSON *object);
 extern void cJSON_ClearItemsFromArray(cJSON *arry);
-	
+
 // Update array items.
 extern void cJSON_ReplaceItemInArray(cJSON *arry, int which, cJSON *newitem);
 extern void cJSON_SwapItemsInArray(cJSON *arry, int item1, int item2);

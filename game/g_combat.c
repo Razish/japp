@@ -526,7 +526,7 @@ void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 
 
 // these are just for logging, the client prints its own messages
-char	*modNames[MOD_MAX] = {
+const char *modNames[MOD_MAX] = {
 	"MOD_UNKNOWN",
 	"MOD_STUN_BATON",
 	"MOD_MELEE",
@@ -1848,11 +1848,9 @@ extern void saberBackToOwner(gentity_t *saberent);
 extern qboolean g_noPDuelCheck;
 void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
 	gentity_t	*ent;
-	int			anim;
-	int			contents;
-	int			killer;
-	int			i;
-	char		*killerName, *obit;
+	int			i, anim, contents, killer;
+	char		*killerName;
+	const char	*obit;
 	qboolean	wasJediMaster = qfalse;
 	int			sPMType = 0;
 	char		buf[512] = {0};
@@ -2952,7 +2950,7 @@ void G_GetDismemberBolt( gentity_t *self, vector3 *boltPoint, int limbType ) {
 	//vector3 legAxis[3];
 	mdxaBone_t	boltMatrix;
 	float fVSpeed = 0;
-	char *rotateBone = NULL;
+	const char *rotateBone = NULL;
 
 	switch (limbType)
 	{

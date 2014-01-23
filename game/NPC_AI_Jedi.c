@@ -474,7 +474,7 @@ void Boba_FireDecide( void )
 	vector3	enemyDir, shootDir;
 
 	if ( NPC->client->ps.groundEntityNum == ENTITYNUM_NONE
-		&& NPC->client->ps.fd.forceJumpZStart
+		&& (int)NPC->client->ps.fd.forceJumpZStart
 		&& !BG_FlippingAnim( NPC->client->ps.legsAnim )
 		&& !Q_irand( 0, 10 ) )
 	{//take off
@@ -1057,7 +1057,7 @@ qboolean NPC_MoveDirClear( int forwardmove, int rightmove, qboolean reset )
 		return qtrue;
 	}
 
-	if ( ucmd.upmove > 0 || NPC->client->ps.fd.forceJumpCharge )
+	if ( ucmd.upmove > 0 || (int)NPC->client->ps.fd.forceJumpCharge )
 	{//Going to jump
 		//Com_Printf( "%d skipping walk-cliff check (going to jump)\n", level.time );
 		return qtrue;
@@ -1356,6 +1356,8 @@ static void Jedi_AdjustSaberAnimLevel( gentity_t *self, int newLevel )
 			break;
 		case FORCE_LEVEL_3:
 			Com_Printf( S_COLOR_RED"%s Saber Attack Set: strong\n", self->NPC_type );
+			break;
+		default:
 			break;
 		}
 	}
@@ -2068,14 +2070,14 @@ evasionType_t Jedi_CheckFlipEvasions( gentity_t *self, float rightdot, float zdi
 		if ( trace.fraction >= 1.0f && allowCartWheels )
 		{//it's clear, let's do it
 			//FIXME: check for drops?
-			vector3 fwdAngles, jumpRt;
+			vector3 fwdAngles2, jumpRt;
 
 			NPC_SetAnim( self, parts, anim, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 			self->client->ps.weaponTime = self->client->ps.legsTimer;//don't attack again until this anim is done
-			VectorCopy( &self->client->ps.viewangles, &fwdAngles );
-			fwdAngles.pitch = fwdAngles.roll = 0;
+			VectorCopy( &self->client->ps.viewangles, &fwdAngles2 );
+			fwdAngles2.pitch = fwdAngles2.roll = 0;
 			//do the flip
-			AngleVectors( &fwdAngles, NULL, &jumpRt, NULL );
+			AngleVectors( &fwdAngles2, NULL, &jumpRt, NULL );
 			VectorScale( &jumpRt, speed, &self->client->ps.velocity );
 			self->client->ps.fd.forceJumpCharge = 0;//so we don't play the force flip anim
 			self->client->ps.velocity.z = 200;
@@ -2120,8 +2122,6 @@ evasionType_t Jedi_CheckFlipEvasions( gentity_t *self, float rightdot, float zdi
 						{//it's clear, let's do it
 							if ( allowWallFlips )
 							{//okay to do wall-flips with this saber
-								int parts;
-
 								//FIXME: check for drops?
 								//turn the cartwheel into a wallflip in the other dir
 								if ( rightdot > 0 )
@@ -2140,22 +2140,16 @@ evasionType_t Jedi_CheckFlipEvasions( gentity_t *self, float rightdot, float zdi
 								//animate me
 								parts = SETANIM_LEGS;
 								if ( !self->client->ps.weaponTime )
-								{
 									parts = SETANIM_BOTH;
-								}
 								NPC_SetAnim( self, parts, anim, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 								self->client->ps.fd.forceJumpZStart = self->r.currentOrigin.z;//so we don't take damage if we land at same height
 								//self->client->ps.pm_flags |= (PMF_JUMPING|PMF_SLOW_MO_FALL);
 								if ( self->client->NPC_class == CLASS_BOBAFETT )
-								{
 									G_AddEvent( self, EV_JUMP, 0 );
-								}
 								else
-								{
 									G_SoundOnEnt( self, CHAN_BODY, "sound/weapons/force/jump.wav" );
-								}
 								return EVASION_OTHER;
-								}
+							}
 						}
 						else
 						{//boxed in on both sides
@@ -2186,7 +2180,7 @@ evasionType_t Jedi_CheckFlipEvasions( gentity_t *self, float rightdot, float zdi
 					}
 				}
 				//Try wall run?
-				if ( bestCheckDist )
+				if ( (int)bestCheckDist )
 				{//one of the walls was close enough to wall-run on
 					qboolean allowWallRuns = qtrue;
 					if ( self->client->ps.weapon == WP_SABER )
@@ -2206,8 +2200,6 @@ evasionType_t Jedi_CheckFlipEvasions( gentity_t *self, float rightdot, float zdi
 					}
 					if ( allowWallRuns )
 					{//okay to do wallruns with this saber
-						int parts;
-
 						//FIXME: check for long enough wall and a drop at the end?
 						if ( bestCheckDist > 0 )
 						{//it was to the right
@@ -2221,20 +2213,14 @@ evasionType_t Jedi_CheckFlipEvasions( gentity_t *self, float rightdot, float zdi
 						//animate me
 						parts = SETANIM_LEGS;
 						if ( !self->client->ps.weaponTime )
-						{
 							parts = SETANIM_BOTH;
-						}
 						NPC_SetAnim( self, parts, anim, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 						self->client->ps.fd.forceJumpZStart = self->r.currentOrigin.z;//so we don't take damage if we land at same height
 						//self->client->ps.pm_flags |= (PMF_JUMPING|PMF_SLOW_MO_FALL);
 						if ( self->client->NPC_class == CLASS_BOBAFETT )
-						{
 							G_AddEvent( self, EV_JUMP, 0 );
-						}
 						else
-						{
 							G_SoundOnEnt( self, CHAN_BODY, "sound/weapons/force/jump.wav" );
-						}
 						return EVASION_OTHER;
 					}
 				}
@@ -3737,7 +3723,7 @@ static void Jedi_FaceEnemy( qboolean doPitch )
 		if ( NPC->health < NPC->client->pers.maxHealth*0.5f )
 		{//lead
 			float missileSpeed = WP_SpeedOfMissileForWeapon( NPC->s.weapon, ((qboolean)(NPCInfo->scriptFlags&SCF_ALT_FIRE)) );
-			if ( missileSpeed )
+			if ( missileSpeed > 0.0f )
 			{
 				float eDist = Distance( &eyes, &enemy_eyes );
 				eDist /= missileSpeed;//How many seconds it will take to get to the enemy
@@ -4488,7 +4474,7 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum )
 							}
 						}
 					}
-					if ( elapsedTime == floor( travelTime ) )
+					if ( elapsedTime == (int)floor( travelTime ) )
 					{//reached end, all clear
 						if ( trace.fraction >= 1.0f )
 						{//hmm, make sure we'll land on the ground...
@@ -4601,7 +4587,7 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum )
 		//Now we have the apex, aim for it
 		height = apex.z - NPC->r.currentOrigin.z;
 		time = sqrt( height / ( .5 * NPC->client->ps.gravity ) );//was 0.5, but didn't work well for very long jumps
-		if ( !time )
+		if ( !(int)time )
 		{
 			//Com_Printf( S_COLOR_RED"ERROR: no time in jump\n" );
 			return qfalse;
@@ -4947,7 +4933,7 @@ static void Jedi_CheckJumps( void )
 	//FIXME: all this work and he still jumps off ledges... *sigh*... need CONTENTS_BOTCLIP do-not-enter brushes...?
 	VectorClear(&jumpVel);
 
-	if ( NPC->client->ps.fd.forceJumpCharge )
+	if ( (int)NPC->client->ps.fd.forceJumpCharge )
 	{
 		//Com_Printf( "(%d) force jump\n", level.time );
 		WP_GetVelocityForForceJump( NPC, &jumpVel, &ucmd );
@@ -4964,7 +4950,7 @@ static void Jedi_CheckJumps( void )
 	}
 
 	//NOTE: for now, we clear ucmd.forwardmove & ucmd.rightmove while in air to avoid jumps going awry...
-	if ( !jumpVel.x && !jumpVel.y )//FIXME: && !ucmd.forwardmove && !ucmd.rightmove?
+	if ( !(int)jumpVel.x && !(int)jumpVel.y )//FIXME: && !ucmd.forwardmove && !ucmd.rightmove?
 	{//we assume a jump straight up is safe
 		//Com_Printf( "(%d) jump straight up is safe\n", level.time );
 		return;
@@ -5768,7 +5754,7 @@ static void Jedi_Attack( void )
 			else
 			{//the escalation in difficulty is nice, here, but cap it so it doesn't get *impossible* on hard
 				float maxChance	= (float)(RANK_LT)/2.0f+3.0f;//5?
-				if ( !g_spSkill.value )
+				if ( !g_spSkill.integer )
 				{
 					chance = (float)(NPCInfo->rank)/2.0f;
 				}
@@ -6037,6 +6023,8 @@ static void Jedi_Attack( void )
 					break;
 				case 2:
 					chance = 1;
+					break;
+				default:
 					break;
 				}
 				if ( !Q_irand( 0, chance ) )

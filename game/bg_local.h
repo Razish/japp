@@ -12,7 +12,7 @@
 // all of the locals will be zeroed before each
 // pmove, just to make damn sure we don't have
 // any differences when running on client or server
-typedef struct 
+typedef struct
 {
 	vector3		forward, right, up;
 	float		frametime;
@@ -97,5 +97,5 @@ void PM_SetForceJumpZStart(float value);
 
 void BG_CycleInven(playerState_t *ps, int direction);
 
-qboolean GetCInfo( int bit );
-qboolean GetCPD( bgEntity_t *self, int bit );
+qboolean GetCInfo( uint32_t bit );
+qboolean GetCPD( bgEntity_t *self, uint32_t bit );

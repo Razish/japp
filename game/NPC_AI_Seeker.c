@@ -45,7 +45,7 @@ void NPC_Seeker_Pain(gentity_t *self, gentity_t *attacker, int damage)
 
 //------------------------------------
 void Seeker_MaintainHeight( void )
-{	
+{
 	float	dif;
 
 	// Update our angles regardless
@@ -110,7 +110,7 @@ void Seeker_MaintainHeight( void )
 			}
 			else
 			{
-				if ( NPC->client->ps.velocity.z )
+				if ( NPC->client->ps.velocity.z > 0.0f )
 				{
 					NPC->client->ps.velocity.z *= VELOCITY_DECAY;
 
@@ -124,7 +124,7 @@ void Seeker_MaintainHeight( void )
 	}
 
 	// Apply friction
-	if ( NPC->client->ps.velocity.x )
+	if ( NPC->client->ps.velocity.x > 0.0f )
 	{
 		NPC->client->ps.velocity.x *= VELOCITY_DECAY;
 
@@ -132,7 +132,7 @@ void Seeker_MaintainHeight( void )
 			NPC->client->ps.velocity.x = 0;
 	}
 
-	if ( NPC->client->ps.velocity.y )
+	if ( NPC->client->ps.velocity.y > 0.0f )
 	{
 		NPC->client->ps.velocity.y *= VELOCITY_DECAY;
 
@@ -338,7 +338,7 @@ void Seeker_Ranged( qboolean visible, qboolean advance )
 	{
 		Seeker_Hunt( visible, advance );
 	}
-} 
+}
 
 //------------------------------------
 void Seeker_Attack( void )
@@ -351,7 +351,7 @@ void Seeker_Attack( void )
 	Seeker_MaintainHeight();
 
 	// Rate our distance to the target, and our visibilty
-	distance	= DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );	
+	distance	= DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
 	visible		= NPC_ClearLOS4( NPC->enemy );
 	advance		= (qboolean)(distance > MIN_DISTANCE_SQR);
 
@@ -388,13 +388,13 @@ void Seeker_FindEnemy( void )
 
 	numFound = trap->EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
 
-	for ( i = 0 ; i < numFound ; i++ ) 
+	for ( i = 0 ; i < numFound ; i++ )
 	{
 		ent = &g_entities[entityList[i]];
 
-		if ( ent->s.number == NPC->s.number 
-			|| !ent->client //&& || !ent->NPC 
-			|| ent->health <= 0 
+		if ( ent->s.number == NPC->s.number
+			|| !ent->client //&& || !ent->NPC
+			|| ent->health <= 0
 			|| !ent->inuse )
 		{
 			continue;
@@ -448,7 +448,7 @@ void Seeker_FollowOwner( void )
 	}
 	//rwwFIXMEFIXME: Care about all clients not just 0
 	dis	= DistanceHorizontalSquared( &NPC->r.currentOrigin, &owner->r.currentOrigin );
-	
+
 	minDistSqr = MIN_DISTANCE_SQR;
 
 	if ( NPC->client->NPC_class == CLASS_BOBAFETT )
@@ -530,7 +530,7 @@ void NPC_BSSeeker_Default( void )
 	if ( NPC->r.ownerNum < ENTITYNUM_NONE )
 	{
 		gentity_t *owner = &g_entities[0];
-		if ( owner->health <= 0 
+		if ( owner->health <= 0
 			|| (owner->client && owner->client->pers.connected == CON_DISCONNECTED) )
 		{//owner is dead or gone
 			//remove me
@@ -539,7 +539,7 @@ void NPC_BSSeeker_Default( void )
 		}
 	}
 
-	if ( NPC->random == 0.0f )
+	if ( !(int)NPC->random )
 	{
 		// used to offset seekers around a circle so they don't occupy the same spot.  This is not a fool-proof method.
 		NPC->random = random() * 6.3f; // roughly 2pi

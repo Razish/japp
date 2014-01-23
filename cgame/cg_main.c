@@ -304,7 +304,7 @@ void CG_MiscEnt(void)
 	{
 		return;
 	}
-	
+
 	radius = &Radius[NumMiscEnts];
 	zOff = &zOffset[NumMiscEnts];
 	RefEnt = &MiscEnts[NumMiscEnts++];
@@ -627,8 +627,7 @@ static void CVU_AccelSize( void ) {
 
 typedef struct cvarTable_s {
 	vmCvar_t	*vmCvar;
-	char		*cvarName;
-	char		*defaultString;
+	const char	*cvarName, *defaultString;
 	void		(*update)( void );
 	uint32_t	cvarFlags;
 } cvarTable_t;
@@ -789,7 +788,7 @@ static void CG_RegisterItemSounds( int itemNum ) {
 
 		len = s-start;
 		if (len >= MAX_QPATH || len < 5) {
-			trap->Error( ERR_DROP, "PrecacheItem: %s has bad precache string", 
+			trap->Error( ERR_DROP, "PrecacheItem: %s has bad precache string",
 				item->classname);
 			return;
 		}
@@ -998,7 +997,7 @@ static void CG_RegisterSounds( void ) {
 	trap->R_RegisterShader( "gfx/effects/saberFlare" );
 
 	trap->R_RegisterShader( "powerups/ysalimarishell" );
-	
+
 	trap->R_RegisterShaderNoMip( "gfx/effects/forcePush" );
 
 	trap->R_RegisterShader( "gfx/misc/red_dmgshield" );
@@ -1273,7 +1272,7 @@ static void CG_RegisterSounds( void ) {
 	// FIXME: only needed with item
 	cgs.media.deploySeeker = trap->S_RegisterSound ("sound/chars/seeker/misc/hiss");
 	cgs.media.medkitSound = trap->S_RegisterSound ("sound/items/use_bacta.wav");
-	
+
 	cgs.media.winnerSound = trap->S_RegisterSound( "sound/chars/protocol/misc/40MOM006" );
 	cgs.media.loserSound = trap->S_RegisterSound( "sound/chars/protocol/misc/40MOM010" );
 }
@@ -1281,7 +1280,7 @@ static void CG_RegisterSounds( void ) {
 
 //-------------------------------------
 // CG_RegisterEffects
-// 
+//
 // Handles precaching all effect files
 //	and any shader, model, or sound
 //	files an effect may use.
@@ -1292,11 +1291,11 @@ static void CG_RegisterEffects( void )
 	const char	*effectName;
 	int			i;
 
-	for ( i = 1 ; i < MAX_FX ; i++ ) 
+	for ( i = 1 ; i < MAX_FX ; i++ )
 	{
 		effectName = CG_ConfigString( CS_EFFECTS + i );
 
-		if ( !effectName[0] ) 
+		if ( !effectName[0] )
 		{
 			break;
 		}
@@ -1352,7 +1351,7 @@ static void CG_RegisterGraphics( void ) {
 	int			terrainID;
 	refdef_t *refdef = CG_GetRefdef();
 
-	static char		*sb_nums[11] = {
+	static const char *sb_nums[11] = {
 		"gfx/2d/numbers/zero",
 		"gfx/2d/numbers/one",
 		"gfx/2d/numbers/two",
@@ -1366,7 +1365,7 @@ static void CG_RegisterGraphics( void ) {
 		"gfx/2d/numbers/minus",
 	};
 
-	static char		*sb_t_nums[11] = {
+	static const char *sb_t_nums[11] = {
 		"gfx/2d/numbers/t_zero",
 		"gfx/2d/numbers/t_one",
 		"gfx/2d/numbers/t_two",
@@ -1380,7 +1379,7 @@ static void CG_RegisterGraphics( void ) {
 		"gfx/2d/numbers/t_minus",
 	};
 
-	static char		*sb_c_nums[11] = {
+	static const char *sb_c_nums[11] = {
 		"gfx/2d/numbers/c_zero",
 		"gfx/2d/numbers/c_one",
 		"gfx/2d/numbers/c_two",
@@ -1398,7 +1397,7 @@ static void CG_RegisterGraphics( void ) {
 	memset( &cg.refdef[0], 0, sizeof( cg.refdef ) );
 	trap->R_ClearScene();
 
-	CG_LoadingString( cgs.mapname );        
+	CG_LoadingString( cgs.mapname );
 
 	trap->R_LoadWorld( cgs.mapname );
 
@@ -1725,7 +1724,7 @@ Ghoul2 Insert Start
 		char			temp[MAX_QPATH];
 
 		bspName = CG_ConfigString( CS_BSP_MODELS+i );
-		if ( !bspName[0] ) 
+		if ( !bspName[0] )
 		{
 			break;
 		}
@@ -1733,7 +1732,7 @@ Ghoul2 Insert Start
 		trap->CM_LoadMap( bspName, qtrue );
 		cgs.inlineDrawModel[breakPoint] = trap->R_RegisterModel( bspName );
 		trap->R_ModelBounds( cgs.inlineDrawModel[breakPoint], &mins, &maxs );
-		for ( j = 0 ; j < 3 ; j++ ) 
+		for ( j = 0 ; j < 3 ; j++ )
 		{
 			cgs.inlineModelMidpoints[breakPoint].data[j] = mins.data[j] + 0.5 * ( maxs.data[j] - mins.data[j] );
 		}
@@ -1747,7 +1746,7 @@ Ghoul2 Insert Start
 				break;
 			}
 			trap->R_ModelBounds( cgs.inlineDrawModel[breakPoint], &mins, &maxs );
-			for ( j = 0 ; j < 3 ; j++ ) 
+			for ( j = 0 ; j < 3 ; j++ )
 			{
 				cgs.inlineModelMidpoints[breakPoint].data[j] = mins.data[j] + 0.5 * ( maxs.data[j] - mins.data[j] );
 			}
@@ -1842,8 +1841,8 @@ void CG_SiegeCountCvars( void )
 	trap->Cvar_Set( "ui_tm1_cnt", va( "%d", CG_GetTeamNonScoreCount( TEAM_RED ) ) );
 	trap->Cvar_Set( "ui_tm2_cnt", va( "%d", CG_GetTeamNonScoreCount( TEAM_BLUE ) ) );
 	trap->Cvar_Set( "ui_tm3_cnt", va( "%d", CG_GetTeamNonScoreCount( TEAM_SPECTATOR ) ) );
-	
-	// This is because the only way we can match up classes is by the gfx handle. 
+
+	// This is because the only way we can match up classes is by the gfx handle.
 	classGfx[0] = trap->R_RegisterShaderNoMip( "gfx/mp/c_icon_infantry" );
 	classGfx[1] = trap->R_RegisterShaderNoMip( "gfx/mp/c_icon_heavy_weapons" );
 	classGfx[2] = trap->R_RegisterShaderNoMip( "gfx/mp/c_icon_demolitionist" );
@@ -1867,7 +1866,7 @@ void CG_SiegeCountCvars( void )
 
 }
 
-/*																																			
+/*
 =======================
 CG_BuildSpectatorString
 
@@ -1914,7 +1913,7 @@ void CG_BuildSpectatorString(void) {
 }
 
 
-/*																																			
+/*
 ===================
 CG_RegisterClients
 ===================
@@ -2013,7 +2012,7 @@ qboolean CG_Asset_Parse(int handle) {
 	if (Q_stricmp(token.string, "{") != 0) {
 		return qfalse;
 	}
-	
+
 	while ( 1 ) {
 		if (!trap->PC_ReadToken(handle, &token))
 			return qfalse;
@@ -2226,7 +2225,7 @@ void CG_ParseMenu(const char *menuFile) {
 }
 
 
-qboolean CG_Load_Menu(const char **p) 
+qboolean CG_Load_Menu(const char **p)
 {
 
 	char *token;
@@ -2240,7 +2239,7 @@ qboolean CG_Load_Menu(const char **p)
 	while ( 1 ) {
 
 		token = COM_ParseExt((const char **)p, qtrue);
-	
+
 		if (Q_stricmp(token, "}") == 0) {
 			return qtrue;
 		}
@@ -2249,7 +2248,7 @@ qboolean CG_Load_Menu(const char **p)
 			return qfalse;
 		}
 
-		CG_ParseMenu(token); 
+		CG_ParseMenu(token);
 	}
 	return qfalse;
 }
@@ -2367,7 +2366,7 @@ static const char *CG_FeederItemText(float feederID, int index, int column,
 					item = BG_FindItemForPowerup( PW_BLUEFLAG );
 					*handle1 = cg_items[ ITEM_INDEX(item) ].icon;
 				} else {
-					/*	
+					/*
 					if ( info->botSkill > 0 && info->botSkill <= 5 ) {
 						*handle1 = cgs.media.botSkillShaders[ info->botSkill - 1 ];
 					} else if ( info->handicap < 100 ) {
@@ -2409,9 +2408,10 @@ static const char *CG_FeederItemText(float feederID, int index, int column,
 			case 6:
 				if ( sp->ping == -1 ) {
 					return "connecting";
-				} 
+				}
 				return va("%4i", sp->ping);
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -2453,24 +2453,20 @@ void CG_Text_PaintWithCursor(float x, float y, float scale, const vector4 *color
 	CG_Text_Paint(x, y, scale, color, text, 0, limit, style, iMenuFont);
 }
 
-static int CG_OwnerDrawWidth(int ownerDraw, float scale) {
-	switch (ownerDraw) {
-	  case CG_GAME_TYPE:
-			return CG_Text_Width( BG_GetGametypeString( cgs.gametype ), scale, FONT_MEDIUM );
-	  case CG_GAME_STATUS:
-			return CG_Text_Width(CG_GetGameStatusText(), scale, FONT_MEDIUM);
-			break;
-	  case CG_KILLER:
-			return CG_Text_Width(CG_GetKillerText(), scale, FONT_MEDIUM);
-			break;
-	  case CG_RED_NAME:
-			return CG_Text_Width(DEFAULT_REDTEAM_NAME/*cg_redTeamName.string*/, scale, FONT_MEDIUM);
-			break;
-	  case CG_BLUE_NAME:
-			return CG_Text_Width(DEFAULT_BLUETEAM_NAME/*cg_blueTeamName.string*/, scale, FONT_MEDIUM);
-			break;
-
-
+static int CG_OwnerDrawWidth( int ownerDraw, float scale ) {
+	switch ( ownerDraw ) {
+	case CG_GAME_TYPE:
+		return CG_Text_Width( BG_GetGametypeString( cgs.gametype ), scale, FONT_MEDIUM );
+	case CG_GAME_STATUS:
+		return CG_Text_Width( CG_GetGameStatusText(), scale, FONT_MEDIUM );
+	case CG_KILLER:
+		return CG_Text_Width( CG_GetKillerText(), scale, FONT_MEDIUM );
+	case CG_RED_NAME:
+		return CG_Text_Width( DEFAULT_REDTEAM_NAME/*cg_redTeamName.string*/, scale, FONT_MEDIUM );
+	case CG_BLUE_NAME:
+		return CG_Text_Width( DEFAULT_BLUETEAM_NAME/*cg_blueTeamName.string*/, scale, FONT_MEDIUM );
+	default:
+		break;
 	}
 	return 0;
 }
@@ -2550,13 +2546,7 @@ void CG_LoadMenus( const char *menuFile ) {
 //	trap->Print( "UI menu load time = %d milli seconds\n", trap->Milliseconds() - start );
 }
 
-/*
-=================
-CG_LoadHudMenu();
-
-=================
-*/
-void CG_LoadHudMenu() 
+void CG_LoadHudMenu( void )
 {
 	const char *hudSet;
 
@@ -2570,7 +2560,7 @@ void CG_LoadHudMenu()
 	cgDC.registerModel					= trap->R_RegisterModel;
 	cgDC.modelBounds					= trap->R_ModelBounds;
 	cgDC.fillRect						= &CG_FillRect;
-	cgDC.drawRect						= &CG_DrawRect;   
+	cgDC.drawRect						= &CG_DrawRect;
 	cgDC.drawSides						= &CG_DrawSides;
 	cgDC.drawTopBottom					= &CG_DrawTopBottom;
 	cgDC.clearScene						= trap->R_ClearScene;
@@ -2606,8 +2596,8 @@ void CG_LoadHudMenu()
 	//cgDC.getBindingBuf				= trap->Key_GetBindingBuf;
 	//cgDC.keynumToStringBuf			= trap->Key_KeynumToStringBuf;
 	//cgDC.executeText					= trap->Cmd_ExecuteText;
-	cgDC.Error							= trap->Error; 
-	cgDC.Print							= trap->Print; 
+	cgDC.Error							= trap->Error;
+	cgDC.Print							= trap->Print;
 	cgDC.ownerDrawWidth					= &CG_OwnerDrawWidth;
 	//cgDC.Pause						= &CG_Pause;
 	cgDC.registerSound					= trap->S_RegisterSound;
@@ -2617,13 +2607,13 @@ void CG_LoadHudMenu()
 	cgDC.stopCinematic					= &CG_StopCinematic;
 	cgDC.drawCinematic					= &CG_DrawCinematic;
 	cgDC.runCinematicFrame				= &CG_RunCinematicFrame;
-	
+
 	Init_Display(&cgDC);
 
 	Menu_Reset();
 
 	hudSet = cg_hudFiles.string;
-	if (hudSet[0] == '\0') 
+	if (hudSet[0] == '\0')
 	{
 		hudSet = "ui/jahud.txt";
 	}
@@ -2632,7 +2622,7 @@ void CG_LoadHudMenu()
 
 }
 
-void CG_AssetCache() {
+void CG_AssetCache( void ) {
 	//if (Assets.textFont == NULL) {
 	//  trap->R_RegisterFont("fonts/arial.ttf", 72, &Assets.textFont);
 	//}
@@ -2745,7 +2735,7 @@ char *CG_NewString( const char *string )
 {
 	char	*newb, *new_p;
 	int		i,l;
-	
+
 	l = strlen(string) + 1;
 
 //	newb = CG_StrPool_Alloc( l );
@@ -2778,7 +2768,7 @@ char *CG_NewString( const char *string )
 			*new_p++ = string[i];
 		}
 	}
-	
+
 	return newb;
 }
 
@@ -2803,7 +2793,7 @@ typedef struct cgSpawnEnt_s
 #define	CGFOFS(x) offsetof(cgSpawnEnt_t, x)
 
 //spawn fields for our cgame "entity"
-BG_field_t cg_spawnFields[] =
+static const BG_field_t cg_spawnFields[] =
 {
 	{ "angle",			CGFOFS( angle ),		F_FLOAT },
 	{ "angles",			CGFOFS( angles ),		F_VECTOR },
@@ -2874,7 +2864,7 @@ void CG_CreateModelFromSpawnEnt(cgSpawnEnt_t *ent)
 		Com_Error(ERR_DROP, "Too many misc_model_static's on level, ask a programmer to raise the limit (currently %i), or take some out.", MAX_MISC_ENTS);
 		return;
 	}
-	
+
 	if (!ent || !ent->model || !ent->model[0])
 	{
 		Com_Error(ERR_DROP, "misc_model_static with no model.");
@@ -2969,7 +2959,7 @@ qboolean CG_ParseSpawnVars( void )
 
 	// go through all the key / value pairs
 	while ( 1 )
-	{	
+	{
 		// parse key
 		if ( !trap->R_GetEntityToken( keyname, sizeof( keyname ) ) )
 		{
@@ -2980,8 +2970,8 @@ qboolean CG_ParseSpawnVars( void )
 		{
 			break;
 		}
-		
-		// parse value	
+
+		// parse value
 		if ( !trap->R_GetEntityToken( com_token, sizeof( com_token ) ) )
 		{ //this happens on mike's test level, I don't know why. Fixme?
 			//trap->Error( ERR_DROP, "CG_ParseSpawnVars: EOF without closing brace" );
@@ -3011,7 +3001,7 @@ CG_SpawnCGameEntFromVars
 See if we should do something for this ent cgame-side -rww
 ==============
 */
-void BG_ParseField( BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent );
+void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent );
 
 extern float cg_linearFogOverride; //cg_view.c
 extern float cg_radarRange;//cg_draw.c
@@ -3020,7 +3010,7 @@ void CG_SpawnCGameEntFromVars(void)
 	int i;
 	cgSpawnEnt_t ent;
 
-	memset(&ent, 0, sizeof(cgSpawnEnt_t));
+	memset(&ent, 0, sizeof(ent));
 
 	for (i = 0; i < cg_numSpawnVars; i++)
 	{ //shove all this stuff into our data structure used specifically for getting spawn info
@@ -3043,15 +3033,15 @@ void CG_SpawnCGameEntFromVars(void)
 		}
 		else if (!Q_stricmp(ent.classname, "misc_model_static"))
 		{ //we've got us a static model
-			CG_CreateModelFromSpawnEnt(&ent);			
+			CG_CreateModelFromSpawnEnt(&ent);
 		}
 		else if (!Q_stricmp(ent.classname, "misc_skyportal_orient"))
 		{ //a sky portal orientation point
-			CG_CreateSkyOriFromSpawnEnt(&ent);            
+			CG_CreateSkyOriFromSpawnEnt(&ent);
 		}
 		else if (!Q_stricmp(ent.classname, "misc_skyportal"))
 		{ //might as well parse this thing cgame side for the extra info I want out of it
-			CG_CreateSkyPortalFromSpawnEnt(&ent);            
+			CG_CreateSkyPortalFromSpawnEnt(&ent);
 		}
 		else if (!Q_stricmp(ent.classname, "misc_weather_zone"))
 		{ //might as well parse this thing cgame side for the extra info I want out of it
@@ -3088,7 +3078,7 @@ void CG_SpawnCGameOnlyEnts(void)
 	while(CG_ParseSpawnVars())
 	{ //now run through the whole list, and look for things we care about cgame-side
 		CG_SpawnCGameEntFromVars();
-	}		
+	}
 }
 
 /*
@@ -3096,7 +3086,7 @@ Ghoul2 Insert End
 */
 
 extern playerState_t *cgSendPS[MAX_GENTITIES]; //is not MAX_CLIENTS because NPCs exceed MAX_CLIENTS
-void CG_PmoveClientPointerUpdate();
+void CG_PmoveClientPointerUpdate( void );
 
 void WP_SaberLoadParms( void );
 void BG_VehicleLoadParms( void );
@@ -3175,7 +3165,7 @@ Ghoul2 Insert End
 
 	cg.itemSelect = -1;
 	cg.forceSelect = -1;
-	
+
 	// load a few needed things before we do any screen updates
 	cgs.media.charsetShader		= trap->R_RegisterShaderNoMip( "gfx/2d/charsgrid_med" );
 	cgs.media.whiteShader		= trap->R_RegisterShader( "white" );
@@ -3214,7 +3204,7 @@ Ghoul2 Insert End
 	}
 	i = 0;
 
-	// HUD artwork for cycling inventory,weapons and force powers 
+	// HUD artwork for cycling inventory,weapons and force powers
 	cgs.media.weaponIconBackground		= trap->R_RegisterShaderNoMip( "gfx/hud/background");
 	cgs.media.forceIconBackground		= trap->R_RegisterShaderNoMip( "gfx/hud/background_f");
 	cgs.media.inventoryIconBackground	= trap->R_RegisterShaderNoMip( "gfx/hud/background_i");
@@ -3396,7 +3386,7 @@ Ghoul2 Insert End
 			#define JP_TIMESTAMP_REGISTRY_NAME "sTimeFormat"
 			char registryValue[256] = { 0 };
 			HKEY hkey;
-			unsigned long datalen = sizeof( registryValue );  // data field length(in), data returned length(out) 
+			unsigned long datalen = sizeof( registryValue );  // data field length(in), data returned length(out)
 			unsigned long datatype; // #defined in winnt.h (predefined types 0-11)
 			LSTATUS error;
 			if ( (error = RegOpenKeyExA( (HKEY)HKEY_CURRENT_USER, (LPCSTR)JP_TIMESTAMP_REGISTRY_KEY, (DWORD)0, (REGSAM)KEY_QUERY_VALUE, &hkey )) == ERROR_SUCCESS )
@@ -3444,10 +3434,10 @@ void CG_DestroyAllGhoul2(void)
 //	Com_Printf("... CGameside GHOUL2 Cleanup\n");
 	while (i < MAX_GENTITIES)
 	{ //free all dynamically allocated npc client info structs and ghoul2 instances
-		CG_KillCEntityG2(i);	
+		CG_KillCEntityG2(i);
 		i++;
 	}
-	
+
 	//Clean the weapon instances
 	CG_ShutDownG2Weapons();
 
@@ -3478,7 +3468,7 @@ CG_Shutdown
 Called before every level change or subsystem restart
 =================
 */
-void CG_Shutdown( void ) 
+void CG_Shutdown( void )
 {
 	BG_ClearAnimsets(); //free all dynamic allocations made through the engine
 
@@ -3516,7 +3506,7 @@ void CG_Shutdown( void )
 CG_NextForcePower_f
 ===============
 */
-void CG_NextForcePower_f( void ) 
+void CG_NextForcePower_f( void )
 {
 	int current;
 	usercmd_t cmd;
@@ -3563,7 +3553,7 @@ void CG_NextForcePower_f( void )
 CG_PrevForcePower_f
 ===============
 */
-void CG_PrevForcePower_f( void ) 
+void CG_PrevForcePower_f( void )
 {
 	int current;
 	usercmd_t cmd;
@@ -3831,7 +3821,7 @@ float CG_Font_HeightPixels( const int iFontIndex, const float scale ) {
 Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *import )
 {
 	static cgameExport_t cge = {0};
-	
+
 	assert( import );
 	trap = import;
 	Com_Printf	= trap->Print;

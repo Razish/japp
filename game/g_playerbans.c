@@ -1,26 +1,24 @@
-/************************************************
-|*
-|* JKG Ban system
-|*
-|* This module manages IP bans
-|*
-|* There is support for subnet bans (using * as wildcard) and temporary bans (with reason)
-|* The bans are stored in a file specified by g_banfile (bans.dat by default) in json format
-|*
-|* Structure sample:
-|*
-
-{
-	"nextid" : 1,
-	"bans" : [{
-			"id" : 0,
-			"mask" : 7,
-			"expire" : 1270666947,
-			"reason" : "OMGWUT",
-			"ip" : [10, 0, 0, 0]
-		}]
-}
-*/
+//
+//
+//	JKG Ban system
+//
+// This module manages IP bans
+//
+// There is support for subnet bans (using * as wildcard) and temporary bans (with reason)
+// The bans are stored in a file specified by g_banfile (bans.dat by default) in json format
+//
+// Structure sample:
+//	{
+//		"nextid" : 1,
+//		"bans" : [{
+//				"id" : 0,
+//				"mask" : 7,
+//				"expire" : 1270666947,
+//				"reason" : "OMGWUT",
+//				"ip" : [10, 0, 0, 0]
+//			}]
+//	}
+//
 
 #include "g_local.h"
 #include "json/cJSON.h"
@@ -37,7 +35,7 @@ typedef struct banentry_s {
 static banentry_t *banlist = 0;
 static unsigned int nextBanId = 0;
 
-void JKG_Bans_Clear()
+void JKG_Bans_Clear( void )
 {
 	banentry_t	*entry;
 	banentry_t	*next = 0;
@@ -82,7 +80,7 @@ void JKG_Bans_LoadBans( void )
 		trap->Print( "Error: Could not parse banlist\n" );
 		return;
 	}
-	
+
 	JKG_Bans_Clear();
 
 	nextBanId = cJSON_ToInteger( cJSON_GetObjectItem( root, "nextid" ) );
@@ -95,7 +93,7 @@ void JKG_Bans_LoadBans( void )
 		ip		= cJSON_GetObjectItem( item, "ip" );
 
 		entry = (banentry_t *)malloc( sizeof( banentry_t ) );
-		
+
 		entry->id			= cJSON_ToInteger( cJSON_GetObjectItem( item, "id" ) );
 		entry->mask			= cJSON_ToInteger( cJSON_GetObjectItem( item, "mask" ) );
 		entry->expireTime	= cJSON_ToInteger( cJSON_GetObjectItem( item, "expire" ) );
@@ -111,26 +109,23 @@ void JKG_Bans_LoadBans( void )
 	cJSON_Delete( root );
 }
 
-void JKG_Bans_Init() {
+void JKG_Bans_Init( void ) {
 	JKG_Bans_LoadBans();
 }
 
-void JKG_Bans_SaveBans()
+void JKG_Bans_SaveBans( void )
 {
-	cJSON			*root;
-	cJSON			*bans;
-	cJSON			*item;
-	cJSON			*ip;
+	cJSON			*root, *bans, *item, *ip;
 	const char		*buffer;
 	fileHandle_t	f;
 	banentry_t		*entry;
 	unsigned int	curr = time( NULL );
-	
+
 	root = cJSON_CreateObject();
 	cJSON_AddIntegerToObject( root, "nextid", nextBanId );
 
 	bans = cJSON_CreateArray();
-	
+
 	for ( entry = banlist; entry; entry = entry->next )
 	{
 		// Don't save expired bans
@@ -165,7 +160,7 @@ void JKG_Bans_SaveBans()
 	cJSON_Delete( root );
 }
 
-/* Adds a ban to the banlist 
+/* Adds a ban to the banlist
 |* Duration format:
 |*
 |* <count><specifier> (eg. '12h' for a 12 hour ban)
@@ -238,7 +233,7 @@ int JKG_Bans_AddBanString( const char *ip, const char *duration, const char *rea
 	{// If i < 3, the parser ended prematurely, so abort
 		return -1;
 	}
-	
+
 	// Parse expire date
 	if (!duration || *duration == '0') {
 		expire = 0;
@@ -322,7 +317,7 @@ static const char *GetRemainingTime( unsigned int expireTime )
 
 	if ( curr >= expireTime )
 		return "Ban expired";
-	
+
 	diff = expireTime - curr;
 
 	days	= diff / 86400;	diff -= (days * 86400);

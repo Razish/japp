@@ -6,7 +6,7 @@
  * desc:		bot AI library
  *
  * $Archive: /source/code/game/botai.h $
- * $Author: osman $ 
+ * $Author: osman $
  * $Revision: 1.4 $
  * $Modtime: 03/01/00 3:32p $
  * $Date: 2003/03/15 23:44:00 $
@@ -254,7 +254,7 @@ typedef struct ea_export_s
 	//ClientCommand elementary actions
 	void	(*EA_Command)(int client, char *command );
 	void	(*EA_Say)(int client, char *str);
-	void	(*EA_SayTeam)(int client, char *str);
+	void	(*EA_SayTeam)(int client, const char *str);
 	//
 	void	(*EA_Action)(int client, int action);
 	void	(*EA_Gesture)(int client);

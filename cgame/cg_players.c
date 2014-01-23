@@ -2651,9 +2651,9 @@ qboolean CG_InRoll( centity_t *cent )
 	case BOTH_ROLL_R:
 	case BOTH_ROLL_L:
 		if ( cent->pe.legs.animationTime > cg.time )
-		{
 			return qtrue;
-		}
+		break;
+	default:
 		break;
 	}
 	return qfalse;
@@ -2668,6 +2668,8 @@ qboolean CG_InRollAnim( centity_t *cent )
 	case BOTH_ROLL_R:
 	case BOTH_ROLL_L:
 		return qtrue;
+	default:
+		break;
 	}
 	return qfalse;
 }
@@ -5915,7 +5917,7 @@ void CG_GetTagWorldPosition( refEntity_t *model, char *tag, vector3 *pos, vector
 
 #define	MAX_MARK_FRAGMENTS	128
 #define	MAX_MARK_POINTS		384
-extern markPoly_t *CG_AllocMark();
+extern markPoly_t *CG_AllocMark( void );
 
 void CG_CreateSaberMarks( vector3 *start, vector3 *end, vector3 *normal )
 {
@@ -9476,7 +9478,7 @@ void SmoothTrueView(vector3 *eyeAngles)
 	}
 }
 
-void CG_AddMovementVectors();
+void CG_AddMovementVectors( void );
 void CG_Player( centity_t *cent ) {
 	clientInfo_t	*ci;
 	refEntity_t		legs;

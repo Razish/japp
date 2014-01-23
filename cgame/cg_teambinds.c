@@ -1,6 +1,6 @@
 #include "cg_local.h"
 
-static char *TB_NearestPickup( void ) {
+static const char *TB_NearestPickup( void ) {
 	float bestDist = 999999999.9f;
 	int i = 0;
 	centity_t *cent=NULL, *bestEnt=NULL;
@@ -20,11 +20,11 @@ static char *TB_NearestPickup( void ) {
 
 	if ( !bestEnt || (bestEnt->currentState.eFlags & (EF_NODRAW|EF_ITEMPLACEHOLDER)) )
 		return "";
-	
-	return (char *)CG_GetStringEdString( "SP_INGAME", bg_itemlist[bestEnt->currentState.modelindex].classname );
+
+	return CG_GetStringEdString( "SP_INGAME", bg_itemlist[bestEnt->currentState.modelindex].classname );
 }
 
-static char *TB_NearestAlly( void ) {
+static const char *TB_NearestAlly( void ) {
 	float bestDist = 999999999.9f;
 	int bestClient = -1;
 	int i = 0;
@@ -41,35 +41,35 @@ static char *TB_NearestAlly( void ) {
 
 	if ( bestClient == -1 )
 		return "";
-	
+
 	return cgs.clientinfo[bestClient].name;
 }
 
-static char *TB_LastPickup( void ) {
+static const char *TB_LastPickup( void ) {
 	if ( cg.itemPickup )
-		return (char *)CG_GetStringEdString( "SP_INGAME", bg_itemlist[cg.itemPickup].classname );
+		return CG_GetStringEdString( "SP_INGAME", bg_itemlist[cg.itemPickup].classname );
 	else
 		return "";
 }
 
 extern const char *CG_GetLocationString( const char *loc );
-static char *TB_Location( void ) {
-	return (char *)CG_GetLocationString( CG_ConfigString( CS_LOCATIONS + cgs.clientinfo[cg.clientNum].location ) );
+static const char *TB_Location( void ) {
+	return CG_GetLocationString( CG_ConfigString( CS_LOCATIONS + cgs.clientinfo[cg.clientNum].location ) );
 }
 
-static char *TB_Health( void ) {
+static const char *TB_Health( void ) {
 	return va( "%i", cg.snap->ps.stats[STAT_HEALTH] );
 }
 
-static char *TB_Armor( void ) {
+static const char *TB_Armor( void ) {
 	return va( "%i", cg.snap->ps.stats[STAT_ARMOR] );
 }
 
-static char *TB_Weapon( void ) {
+static const char *TB_Weapon( void ) {
 	return weaponData[cg.weaponSelect].longName;
 }
 
-static char *TB_Time( void ) {
+static const char *TB_Time( void ) {
 	int msec=0, secs=0, mins=0;
 
 	msec = cg.time-cgs.levelStartTime;
@@ -83,8 +83,8 @@ static char *TB_Time( void ) {
 }
 
 typedef struct teamBind_s {
-	char *key;
-	char *(*GetValue)( void );
+	const char *key;
+	const char *(*GetValue)( void );
 } teamBind_t;
 
 teamBind_t teamBinds[] = {

@@ -302,7 +302,19 @@ elif plat == 'Windows':
 # compiler options
 if plat == 'Linux':
 	env['CPPDEFINES'] = [ '__GCC__' ]
-	env['CCFLAGS'] = [ '-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-missing-field-initializers', '-Wno-sign-compare', '-Wno-unused-parameter' ]
+	env['CCFLAGS'] = [
+		'-Wall', '-Wextra',
+		'-Wno-missing-braces', '-Wno-missing-field-initializers', '-Wno-sign-compare', '-Wno-unused-parameter',
+		'-Waggregate-return',
+	#	'-Wfloat-equal',
+		'-Winit-self',
+	#	'-Wshadow',
+		'-Wstrict-prototypes',
+	#	'-Wswitch-default',
+		'-Wuninitialized',
+		'-Wunreachable-code',
+	#	'-Wwrite-strings',
+		]
 	env['CC'] = ARGUMENTS.get( 'compiler', 'gcc' )
 	if int( ARGUMENTS.get( 'analyse', 0 ) ):
 		env['CC'] = 'clang'
@@ -325,7 +337,7 @@ if int( ARGUMENTS.get( 'debug', 0 ) ):
 	env['CPPDEFINES'] += [ '_DEBUG' ]
 else:
 	if plat == 'Linux':
-		env['CCFLAGS'] += [ '-O2' ]
+		env['CCFLAGS'] += [ '-O3' ]
 	elif plat == 'Windows':
 		env['CCFLAGS'] += [ '/O2' ]
 	env['CPPDEFINES'] += [ 'NDEBUG' ]

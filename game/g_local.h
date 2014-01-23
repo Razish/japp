@@ -153,8 +153,8 @@ struct gentity_s {
 //	bool			dynalloc_fullname;
 
 	//rww - targetname and classname are now shared as well. ICARUS needs access to them.
-	char			*targetname;
-	char			*classname;			// set in QuakeEd
+	const char		*targetname;
+	const char		*classname; // set in QuakeEd
 //	bool			dynalloc_classname;
 
 	//rww - and yet more things to share. This is because the nav code is in the exe because it's all C++.
@@ -216,7 +216,7 @@ struct gentity_s {
 
 	char		*model, *model2;
 	int			freetime;			// level.time when the object was freed
-	
+
 	int			eventTime;			// events will be cleared EVENT_VALID_MSEC after set
 	qboolean	freeAfterEvent;
 	qboolean	unlinkAfterEvent;
@@ -227,7 +227,7 @@ struct gentity_s {
 									//	corpses do not collide against players, for instance
 
 //Only used by NPC_spawners
-	char		*NPC_type;
+	const char	*NPC_type;
 	char		*NPC_targetname;
 	char		*NPC_target;
 
@@ -442,7 +442,7 @@ typedef struct clientSession_s {
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
 typedef struct clientPersistant_s {
-	clientConnected_t	connected;	
+	clientConnected_t	connected;
 	usercmd_t			cmd; // we would lose angles if not persistant
 	qboolean			localClient; // true if "ip" info key is "localhost"
 	qboolean			initialSpawn; // the first spawn should be at a cool location
@@ -1096,7 +1096,7 @@ extern int gGAvoidDismember;
 #define DAMAGE_NO_KNOCKBACK			(0x00000004u) // do not affect velocity, just view angles
 #define DAMAGE_NO_PROTECTION		(0x00000008u) // armor, shields, invulnerability, and godmode have no effect
 #define DAMAGE_NO_TEAM_PROTECTION	(0x00000010u) // armor, shields, invulnerability, and godmode have no effect
-#define DAMAGE_UNUSED00000020		(0x00000020u) // 
+#define DAMAGE_UNUSED00000020		(0x00000020u) //
 #define DAMAGE_EXTRA_KNOCKBACK		(0x00000040u) // add extra knockback to this damage
 #define DAMAGE_DEATH_KNOCKBACK		(0x00000080u) // only does knockback on death of target
 #define DAMAGE_IGNORE_TEAM			(0x00000100u) // damage is always done, regardless of teams
@@ -1123,7 +1123,7 @@ void G_ReflectMissile( gentity_t *ent, gentity_t *missile, vector3 *forward );
 
 void G_RunMissile( gentity_t *ent );
 
-gentity_t *CreateMissile( vector3 *org, vector3 *dir, float vel, int life, 
+gentity_t *CreateMissile( vector3 *org, vector3 *dir, float vel, int life,
 							gentity_t *owner, qboolean altFire);
 void G_BounceProjectile( vector3 *start, vector3 *impact, vector3 *dir, vector3 *endout );
 void G_ExplodeMissile( gentity_t *ent );

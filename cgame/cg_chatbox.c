@@ -213,7 +213,7 @@ void CG_ChatboxOutgoing( void ) {
 }
 
 // This function is called recursively when a logical message has to be split into multiple lines
-void CG_ChatboxAddMessage( const char *message, qboolean multiLine, char *cbName ) {
+void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *cbName ) {
 	chatBox_t *cb = CG_GetChatboxByName( cbName );
 	chatEntry_t *chat = &cb->chatBuffer[MAX_CHATBOX_ENTRIES-1];
 	int strLength = 0;

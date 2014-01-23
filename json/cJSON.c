@@ -59,7 +59,7 @@
 #define cJSON_String 4
 #define cJSON_Array 5
 #define cJSON_Object 6
-	
+
 #define cJSON_HashTableSize 32		// An object's hashtable has cJSON_HashTableSize slots
 #define cJSON_ArrayBlockSize 16		// Arrays are alloced with cJSON_ArrayBlockSize slots at a time
 
@@ -257,7 +257,7 @@ static const char *cJSON_SB_Finalize(cJSON_StringBuilder *sb)
 
 
 // Internal constructor.
-static cJSON *cJSON_New_Item()
+static cJSON *cJSON_New_Item( void )
 {
 	cJSON* node = (cJSON*)cJSON_malloc( sizeof(cJSON) );
 	if (node) {
@@ -320,7 +320,7 @@ static const char *parse_number(cJSON *item,const char *num)
 	// Could use sscanf for this?
 	if (*num == '-') { // Has sign?
 		sign = -1;
-		num++;	
+		num++;
 	}
 	if (*num == '0') { // is zero
 		num++;
@@ -337,9 +337,9 @@ static const char *parse_number(cJSON *item,const char *num)
 			n = ( n * 10.0 ) + ( *num++ - '0' );
 			scale--;
 		} while (*num >= '0' && *num <= '9');
-	}	
+	}
 	if (*num == 'e' || *num == 'E')		// Exponent?
-	{	
+	{
 		num++;
 		if (*num == '+')				// With sign?
 		{
@@ -357,7 +357,7 @@ static const char *parse_number(cJSON *item,const char *num)
 	}
 
 	n = sign * n * pow(10.0, (scale + subscale * signsubscale ));	// number = +/- number.fraction * 10^+/- exponent
-	
+
 	item->valuedouble = n;
 	item->valueint = (int)n;
 	item->type = cJSON_Number;
@@ -400,18 +400,18 @@ static const char *parse_string(cJSON *item, const char *str)
 	if (*str != '\"') {
 		return 0;	// not a string!
 	}
-	
+
 	while (*ptr != '\"' && (unsigned char)*ptr>31 && ++len) {
 		if (*ptr++ == '\\') {
 			ptr++;	// Skip escaped quotes.
 		}
 	}
-	
+
 	out = (char*)cJSON_malloc(len+1);	// This is how long we need for the string, roughly.
 	if (!out) {
 		return 0;	// malloc failed
 	}
-	
+
 	ptr = str + 1;
 	ptr2 = out;
 
@@ -423,7 +423,7 @@ static const char *parse_string(cJSON *item, const char *str)
 			ptr++;
 			switch (*ptr)
 			{
-				case 'b': 
+				case 'b':
 					*ptr2++ = '\b';
 					break;
 				case 'f':
@@ -440,7 +440,7 @@ static const char *parse_string(cJSON *item, const char *str)
 					break;
 				case 'u':	 // transcode utf16 to utf8. DOES NOT SUPPORT SURROGATE PAIRS CORRECTLY.
 					sscanf( ptr + 1, "%4x", &uc);	// get the unicode char.
-					
+
 					if (uc < 0x80) {
 						len=1;
 					} else if (uc < 0x800) {
@@ -450,7 +450,7 @@ static const char *parse_string(cJSON *item, const char *str)
 					}
 
 					ptr2 += len;
-					
+
 					switch (len) {
 						case 3: *--ptr2 = ((uc | 0x80) & 0xBF); uc >>= 6;
 						case 2: *--ptr2 = ((uc | 0x80) & 0xBF); uc >>= 6;
@@ -459,7 +459,7 @@ static const char *parse_string(cJSON *item, const char *str)
 					ptr2 += len;
 					ptr += 4;
 					break;
-				default:  
+				default:
 					*ptr2++ = *ptr;
 				break;
 			}
@@ -480,7 +480,7 @@ static void serialize_string_ptr(const char *str, cJSON_StringBuilder *sb)
 {
 	const char *ptr;
 	char ubuff[5];
-	
+
 	if (!str)
 	{
 		cJSON_SB_AddStringN(sb, "\"\"", 2);	// Add "" and bail
@@ -488,7 +488,7 @@ static void serialize_string_ptr(const char *str, cJSON_StringBuilder *sb)
 	}
 
 	ptr = str;
-	
+
 
 	ptr = str;
 	cJSON_SB_AddChar(sb, '\"');
@@ -635,10 +635,10 @@ static void serialize_value(cJSON *item, int depth, int fmt, cJSON_StringBuilder
 		case cJSON_True:
 			cJSON_SB_AddStringN(sb, "true", 4);
 			break;
-		case cJSON_Number:	
+		case cJSON_Number:
 			serialize_number(item, sb);
 			break;
-		case cJSON_String:	
+		case cJSON_String:
 			serialize_string(item, sb);
 			break;
 		case cJSON_Array:
@@ -678,7 +678,7 @@ static const char *parse_array(cJSON *item, const char *value)
 	if (!value) {
 		return 0;
 	}
-	
+
 	cJSON_AddItemToArray(item, child);
 
 	while (*value == ',')
@@ -702,7 +702,7 @@ static const char *parse_array(cJSON *item, const char *value)
 static void serialize_array(cJSON *item, int depth, int fmt, cJSON_StringBuilder *sb)
 {
 	cJSON *child = item->child;
-	
+
 	cJSON_SB_AddChar(sb, '[');
 	while (child)
 	{
@@ -726,7 +726,7 @@ static const char *parse_object(cJSON *item, const char *value)
 	if (*value != '{') {
 		return 0;	// not an object!
 	}
-	
+
 	// Create object
 	item->type = cJSON_Object;
 
@@ -738,7 +738,7 @@ static const char *parse_object(cJSON *item, const char *value)
 	if (*value == '}') {
 		return value + 1;	// empty arry.
 	}
-	
+
 	child = cJSON_New_Item();
 	if (!child) {
 		return 0;
@@ -763,7 +763,7 @@ static const char *parse_object(cJSON *item, const char *value)
 
 	cJSON_AddItemToObject(item, name, child);
 	free((void *)name);
-	
+
 	while (*value == ',')
 	{
 		if ( !(child = cJSON_New_Item()) ) {
@@ -780,7 +780,7 @@ static const char *parse_object(cJSON *item, const char *value)
 		if (*value != ':') {
 			return 0;	// fail!
 		}
-		value = skip( parse_value( child, skip( value + 1)) );	// skip any spacing, get the value.		
+		value = skip( parse_value( child, skip( value + 1)) );	// skip any spacing, get the value.
 		if (!value) {
 			return 0;
 		}
@@ -788,11 +788,11 @@ static const char *parse_object(cJSON *item, const char *value)
 		cJSON_AddItemToObject(item, name, child);
 		free((void *)name);
 	}
-	
+
 	if (*value == '}') {
 		return value + 1;	// end of arry
 	}
-	return 0;	// malformed.	
+	return 0;	// malformed.
 }
 
 // Render an object to text.
@@ -801,7 +801,7 @@ static void serialize_object(cJSON *item, int depth, int fmt, cJSON_StringBuilde
 	cJSON *child = item->child;
 
 	depth++;
-	
+
 	cJSON_SB_AddChar(sb, '{');
 	if (fmt) {
 		cJSON_SB_AddChar(sb, '\n');
@@ -868,7 +868,7 @@ cJSON *cJSON_GetObjectItem(cJSON *object, const char *string)
 
 // Extended GetItem.
 // Allows complex nested lookups
-// 
+//
 // Format example:
 // sub[5].myvar
 // [2]
@@ -971,7 +971,7 @@ cJSON *cJSON_GetItemExt(cJSON *item, const char *extitem)
 // Add item to arry/object.
 void cJSON_AddItemToArray(cJSON *arry, cJSON *item)
 {
-	
+
 	cJSON *c;
 	if (arry->type != cJSON_Array) {
 		return;
@@ -1000,7 +1000,7 @@ void cJSON_AddItemToArray(cJSON *arry, cJSON *item)
 
 		c->next = item;
 		item->prev = c;
-		
+
 		arry->table[arry->arraysize] = item;	// Add it to the array
 		arry->arraysize++;
 	}
@@ -1017,7 +1017,7 @@ void cJSON_InsertItemInArray(cJSON *arry, cJSON *item, int before)
 	if (item->linked) {
 		return;	// Item is already linked, dont allow a re-link
 	}
-	
+
 	if (before < 0) {	// Clamp insertion point
 		before = 0;
 	} else if ((size_t)before >= arry->arraysize) {
@@ -1051,7 +1051,7 @@ void cJSON_InsertItemInArray(cJSON *arry, cJSON *item, int before)
 			item->next = c->next;
 			item->next->prev = item;
 			item->prev = c;
-			c->next = item;	
+			c->next = item;
 		}
 		// Shift the array
 		memmove(&arry->table[before+1], &arry->table[before], (arry->arraysize - before) * sizeof(cJSON *));
@@ -1077,7 +1077,7 @@ void cJSON_AddItemToObject(cJSON *object, const char *string, cJSON *item)
 	item->string = cJSON_strdup(string);
 
 	cJSON_DeleteItemFromObject(object, string);		// If the item already exists, delete it
-	
+
 	hash = cJSON_GenerateHashValue(string, cJSON_HashTableSize);	// Get the hash
 	item->hashnext = object->table[hash];							// Link it to the hashtable
 	object->table[hash] = item;
@@ -1103,7 +1103,7 @@ cJSON *cJSON_DetachItemFromArray(cJSON *arry, int which)
 	}
 
 	c = arry->table[which];
-	
+
 	if (!c) {
 		return 0;
 	}
@@ -1114,7 +1114,7 @@ cJSON *cJSON_DetachItemFromArray(cJSON *arry, int which)
 	if (c->next) {
 		c->next->prev = c->prev;
 	}
-	
+
 	if (c == arry->child) {
 		arry->child = c->next;
 	}
@@ -1124,7 +1124,7 @@ cJSON *cJSON_DetachItemFromArray(cJSON *arry, int which)
 		// Shift it out of the dynamic array
 		memmove(&arry->table[which], &arry->table[which+1], (arry->arraysize - (which+1)) * sizeof(cJSON *));
 	}
-	
+
 	arry->arraysize--;
 	if (arry->tablesize - arry->arraysize > 31) {
 		// Got enough slack, lets shrink the array
@@ -1142,7 +1142,7 @@ cJSON *cJSON_DetachItemFromArray(cJSON *arry, int which)
 
 void cJSON_DeleteItemFromArray(cJSON *arry, int which)
 {
-	cJSON_Delete( cJSON_DetachItemFromArray(arry, which) ); 
+	cJSON_Delete( cJSON_DetachItemFromArray(arry, which) );
 }
 
 cJSON *cJSON_DetachItemFromObject(cJSON *object, const char *string)
@@ -1161,7 +1161,7 @@ cJSON *cJSON_DetachItemFromObject(cJSON *object, const char *string)
 			if (c->next) {
 				c->next->prev = c->prev;
 			}
-			
+
 			if (c == object->child) {
 				object->child = c->next;
 			}
@@ -1169,7 +1169,7 @@ cJSON *cJSON_DetachItemFromObject(cJSON *object, const char *string)
 				object->lastentry = c->prev;
 			}
 			c->prev = c->next = 0;
-			
+
 			if (p) {	// Unlink it from the hashtable
 				p->hashnext = c->hashnext;
 			} else {
@@ -1236,27 +1236,27 @@ void cJSON_ReplaceItemInArray(cJSON *arry, int which, cJSON *newitem)
 	}
 
 	c = arry->table[which];
-	
+
 	if (!c) {
 		return;
 	}
 
 	newitem->next = c->next;
 	newitem->prev = c->prev;
-	
+
 	if (newitem->next) {
 		newitem->next->prev = newitem;
 	}
 
 	if (c == arry->child) {
 		arry->child = newitem;
-	} else { 
+	} else {
 		newitem->prev->next = newitem;
 	}
 	c->next = c->prev = 0;
 
 	arry->table[which] = newitem;
-	
+
 	cJSON_Delete(c);
 }
 
@@ -1277,7 +1277,7 @@ void cJSON_SwapItemsInArray(cJSON *arry, int item1, int item2)
 
 	i1 = arry->table[item1];
 	i2 = arry->table[item2];
-	
+
 	if (!i1 || !i2) {
 		return;
 	}
@@ -1313,7 +1313,7 @@ void cJSON_SwapItemsInArray(cJSON *arry, int item1, int item2)
 	}
 	if (i2->next) {
 		i2->next->prev = i2;
-	}	
+	}
 }
 
 // Duplicate items
@@ -1322,7 +1322,7 @@ cJSON *cJSON_DuplicateItem(cJSON *item)
 {
 	cJSON *c = 0, *n = 0;	// Current, New Used for copying child items
 	cJSON *newitem = cJSON_New_Item();
-	
+
 	newitem->type = item->type;
 	newitem->valuedouble = item->valuedouble;
 	newitem->valueint = item->valueint;
@@ -1342,7 +1342,7 @@ cJSON *cJSON_DuplicateItem(cJSON *item)
 	if (item->child) {
 		for (c = item->child; c; c = c->next) {
 			n = cJSON_DuplicateItem(c);
-			
+
 			if (item->type == cJSON_Object) {
 				cJSON_AddItemToObject(newitem, c->string, n);
 			} else {
@@ -1354,21 +1354,21 @@ cJSON *cJSON_DuplicateItem(cJSON *item)
 }
 
 // Create basic types:
-cJSON *cJSON_CreateNull()
+cJSON *cJSON_CreateNull( void )
 {
 	cJSON *item = cJSON_New_Item();
 	item->type = cJSON_NULL;
 	return item;
 }
 
-cJSON *cJSON_CreateTrue()
+cJSON *cJSON_CreateTrue( void )
 {
 	cJSON *item = cJSON_New_Item();
 	item->type = cJSON_True;
 	return item;
 }
 
-cJSON *cJSON_CreateFalse()
+cJSON *cJSON_CreateFalse( void )
 {
 	cJSON *item = cJSON_New_Item();
 	item->type = cJSON_False;
@@ -1408,17 +1408,17 @@ cJSON *cJSON_CreateString(const char *string)
 	return item;
 }
 
-cJSON *cJSON_CreateArray()
+cJSON *cJSON_CreateArray( void )
 {
 	cJSON *item = cJSON_New_Item();
 	item->type = cJSON_Array;
-	
+
 	item->table = cJSON_malloc(cJSON_ArrayBlockSize * sizeof(cJSON *));
 	item->tablesize = cJSON_ArrayBlockSize;
 	return item;
 }
 
-cJSON *cJSON_CreateObject()
+cJSON *cJSON_CreateObject( void )
 {
 	cJSON *item = cJSON_New_Item();
 	item->type = cJSON_Object;
@@ -1434,7 +1434,7 @@ cJSON *cJSON_CreateIntArray(int *numbers, int count)
 {
 	int i;
 	cJSON *n = 0, *a = cJSON_CreateArray();
-	
+
 	for(i = 0; i < count; i++) {
 		n = cJSON_CreateNumber(numbers[i]);
 		cJSON_AddItemToArray(a, n);
@@ -1446,7 +1446,7 @@ cJSON *cJSON_CreateFloatArray(float *numbers, int count)
 {
 	int i;
 	cJSON *n = 0, *a = cJSON_CreateArray();
-	
+
 	for( i = 0; i < count; i++) {
 		n = cJSON_CreateNumber(numbers[i]);
 		cJSON_AddItemToArray(a, n);
@@ -1458,7 +1458,7 @@ cJSON *cJSON_CreateDoubleArray(double *numbers, int count)
 {
 	int i;
 	cJSON *n = 0, *a = cJSON_CreateArray();
-	
+
 	for( i = 0; i < count; i++) {
 		n = cJSON_CreateNumber(numbers[i]);
 		cJSON_AddItemToArray(a, n);
@@ -1470,7 +1470,7 @@ cJSON *cJSON_CreateStringArray(const char **strings, int count)
 {
 	int i;
 	cJSON *n = 0, *a = cJSON_CreateArray();
-	
+
 	for( i = 0; i < count; i++) {
 		if (!strings[i]) {
 			n = cJSON_CreateNull();
@@ -1675,7 +1675,7 @@ void cJSON_SetNumberValue(cJSON *item, double number)
 		free(item->valuestring);
 		item->valuestring = 0;
 	}
-	
+
 	item->valueint = (int)number;
 	item->valuedouble = number;
 }
@@ -1691,7 +1691,7 @@ void cJSON_SetIntegerValue(cJSON *item, int integer)
 		free(item->valuestring);
 		item->valuestring = 0;
 	}
-	
+
 	item->valueint = integer;
 	item->valuedouble = (double)integer;
 }
@@ -1708,7 +1708,7 @@ void cJSON_SetBooleanValue(cJSON *item, int boolean)
 		free(item->valuestring);
 		item->valuestring = 0;
 	}
-	
+
 	item->valueint = 0;
 	item->valuedouble = 0;
 }
@@ -1725,7 +1725,7 @@ void cJSON_SetNULLValue(cJSON *item)
 		free(item->valuestring);
 		item->valuestring = 0;
 	}
-	
+
 	item->valueint = 0;
 	item->valuedouble = 0;
 }

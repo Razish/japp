@@ -2550,10 +2550,9 @@ String ID Tables
 ========================================================================
 */
 #define ENUM2STRING(arg)   {#arg,arg}
-typedef struct stringID_table_s
-{
-	char	*name;
-	int		id;
+typedef struct stringID_table_s {
+	const char *name;
+	int id;
 } stringID_table_t;
 
 int GetIDForString ( const stringID_table_t *table, const char *string );
@@ -2588,3 +2587,4 @@ enum {
 vector3 *tv( float x, float y, float z );
 char *vtos( const vector3 *v );
 void Q_WriteJSONToFile( void *root, fileHandle_t f );
+qboolean FloatCompare( float f1, float f2, float epsilon );

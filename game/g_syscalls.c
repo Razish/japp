@@ -27,7 +27,7 @@ void trap_Error( const char *fmt ) {
 	exit(1);
 }
 int trap_Milliseconds( void ) {
-	return Q_syscall( G_MILLISECONDS ); 
+	return Q_syscall( G_MILLISECONDS );
 }
 void trap_PrecisionTimer_Start(void **theNewTimer) {
 	Q_syscall(G_PRECISIONTIMER_START, theNewTimer);
@@ -495,7 +495,7 @@ int trap_AAS_PredictClientMovement(void *move, int entnum, vector3 *origin, int 
 void trap_EA_Say(int client, char *str) {
 	Q_syscall( BOTLIB_EA_SAY, client, str );
 }
-void trap_EA_SayTeam(int client, char *str) {
+void trap_EA_SayTeam(int client, const char *str) {
 	Q_syscall( BOTLIB_EA_SAY_TEAM, client, str );
 }
 void trap_EA_Command(int client, char *command) {

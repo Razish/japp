@@ -96,7 +96,7 @@ const int bgToggleableSurfaceDebris[BG_NUM_TOGGLEABLE_SURFACES] =
 	-1
 };
 
-const char	*bg_customSiegeSoundNames[MAX_CUSTOM_SIEGE_SOUNDS] = 
+const char	*bg_customSiegeSoundNames[MAX_CUSTOM_SIEGE_SOUNDS] =
 {
 	"*att_attack",
 	"*att_primary",
@@ -133,7 +133,7 @@ const char	*bg_customSiegeSoundNames[MAX_CUSTOM_SIEGE_SOUNDS] =
 //rww - not putting @ in front of these because
 //we don't need them in a cgame StringEd lookup.
 //Let me know if this causes problems, pat.
-char *forceMasteryLevels[NUM_FORCE_MASTERY_LEVELS] = 
+const char *forceMasteryLevels[NUM_FORCE_MASTERY_LEVELS] =
 {
 	"MASTERY0",	//"Uninitiated",	// FORCE_MASTERY_UNINITIATED,
 	"MASTERY1",	//"Initiate",		// FORCE_MASTERY_INITIATE,
@@ -145,7 +145,7 @@ char *forceMasteryLevels[NUM_FORCE_MASTERY_LEVELS] =
 	"MASTERY7",	//"Jedi Master"		// FORCE_MASTERY_JEDI_MASTER,
 };
 
-int forceMasteryPoints[NUM_FORCE_MASTERY_LEVELS] =
+const int forceMasteryPoints[NUM_FORCE_MASTERY_LEVELS] =
 {
 	0,		// FORCE_MASTERY_UNINITIATED,
 	5,		// FORCE_MASTERY_INITIATE,
@@ -180,8 +180,7 @@ int bgForcePowerCost[NUM_FORCE_POWERS][NUM_FORCE_POWER_LEVELS] = //0 == neutral
 	//NUM_FORCE_POWERS
 };
 
-int forcePowerSorted[NUM_FORCE_POWERS] = 
-{ //rww - always use this order when drawing force powers for any reason
+const int forcePowerSorted[NUM_FORCE_POWERS] = { //rww - always use this order when drawing force powers for any reason
 	FP_TELEPATHY,
 	FP_HEAL,
 	FP_ABSORB,
@@ -202,7 +201,7 @@ int forcePowerSorted[NUM_FORCE_POWERS] =
 	FP_SABERTHROW
 };
 
-int forcePowerDarkLight[NUM_FORCE_POWERS] = //0 == neutral
+const int forcePowerDarkLight[NUM_FORCE_POWERS] = //0 == neutral
 { //nothing should be usable at rank 0..
 	FORCESIDE_LIGHT,//FP_HEAL,//instant
 	0,//FP_LEVITATION,//hold/duration
@@ -225,7 +224,7 @@ int forcePowerDarkLight[NUM_FORCE_POWERS] = //0 == neutral
 		//NUM_FORCE_POWERS
 };
 
-int WeaponReadyAnim[WP_NUM_WEAPONS] =
+const int WeaponReadyAnim[WP_NUM_WEAPONS] =
 {
 	TORSO_DROPWEAP1,//WP_NONE,
 
@@ -251,7 +250,7 @@ int WeaponReadyAnim[WP_NUM_WEAPONS] =
 	TORSO_WEAPONREADY1//WP_TURRET,
 };
 
-int WeaponReadyLegsAnim[WP_NUM_WEAPONS] =
+const int WeaponReadyLegsAnim[WP_NUM_WEAPONS] =
 {
 	BOTH_STAND1,//WP_NONE,
 
@@ -277,7 +276,7 @@ int WeaponReadyLegsAnim[WP_NUM_WEAPONS] =
 	BOTH_STAND1//WP_TURRET,
 };
 
-int WeaponAttackAnim[WP_NUM_WEAPONS] =
+const int WeaponAttackAnim[WP_NUM_WEAPONS] =
 {
 	BOTH_ATTACK1,//WP_NONE, //(shouldn't happen)
 
@@ -305,7 +304,7 @@ int WeaponAttackAnim[WP_NUM_WEAPONS] =
 	BOTH_ATTACK1//WP_TURRET,
 };
 
-stringID_table_t eTypes[ET_MAX] = {
+const stringID_table_t eTypes[ET_MAX] = {
 	ENUM2STRING(ET_GENERAL),
 	ENUM2STRING(ET_PLAYER),
 	ENUM2STRING(ET_ITEM),
@@ -363,9 +362,9 @@ static int spawncmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((BG_field_t*)b)->name );
 }
 
-void BG_ParseField( BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent )
+void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent )
 {
-	BG_field_t *f;
+	const BG_field_t *f;
 	byte *b;
 	float v;
 	vector3 vec;
@@ -468,7 +467,7 @@ qboolean BG_LegalizedForcePowers(char *powerOut, size_t powerOutSize, int maxRan
 	int allowedPoints = 0;
 	int usedPoints = 0;
 	int countDown = 0;
-	
+
 	int final_Side;
 	int final_Powers[NUM_FORCE_POWERS] = {0};
 
@@ -588,7 +587,7 @@ qboolean BG_LegalizedForcePowers(char *powerOut, size_t powerOutSize, int maxRan
 		int attemptedCycles = 0;
 		int powerCycle = 2;
 		int minPow = 0;
-		
+
 		if (freeSaber)
 		{
 			minPow = 1;
@@ -794,7 +793,7 @@ const size_t bg_numItems = ARRAY_LEN( bg_itemlist )-1;
 
 float vectoyaw( const vector3 *vec ) {
 	float	yaw;
-	
+
 	if (vec->yaw == 0 && vec->pitch == 0) {
 		yaw = 0;
 	} else {
@@ -1186,7 +1185,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		{//force powers and saber only
 			if ( item->giType != IT_TEAM //not a flag
 				&& item->giType != IT_ARMOR//not shields
-				&& (item->giType != IT_WEAPON 
+				&& (item->giType != IT_WEAPON
 									|| item->giTag != WP_SABER)//not a saber
 				&& (item->giType != IT_HOLDABLE || item->giTag != HI_SEEKER)//not a seeker
 				&& (item->giType != IT_POWERUP || item->giTag == PW_YSALAMIRI) )//not a force pick-up
@@ -1197,7 +1196,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		else if ( ps->trueNonJedi )
 		{//can't pick up force powerups
 			if ( (item->giType == IT_POWERUP && item->giTag != PW_YSALAMIRI) //if a powerup, can only can pick up ysalamiri
-				|| (item->giType == IT_HOLDABLE && item->giTag == HI_SEEKER)//if holdable, cannot pick up seeker 
+				|| (item->giType == IT_HOLDABLE && item->giTag == HI_SEEKER)//if holdable, cannot pick up seeker
 				|| (item->giType == IT_WEAPON && item->giTag == WP_SABER ) )//or if it's a saber
 			{
 				return qfalse;
@@ -1361,7 +1360,7 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vector3 *result 
 		VectorMA( &tr->trBase, deltaTime, &tr->trDelta, result );
 		break;
 	case TR_NONLINEAR_STOP:
-		if ( atTime > tr->trTime + tr->trDuration ) 
+		if ( atTime > tr->trTime + tr->trDuration )
 		{
 			atTime = tr->trTime + tr->trDuration;
 		}
@@ -1485,6 +1484,8 @@ void BG_GiveMeVectorFromMatrix( mdxaBone_t *boltMatrix, uint32_t flags, vector3 
 		vec->y = -boltMatrix->matrix[1][2];
 		vec->z = -boltMatrix->matrix[2][2];
 		break;
+	default:
+		break;
 	}
 }
 
@@ -1546,7 +1547,7 @@ const char *eventnames[] = {
 	"EV_TEAM_POWER",
 
 	"EV_SCREENSHAKE",
-	
+
 	"EV_LOCALTIMER",
 
 	"EV_USE",			// +Use key
@@ -1863,7 +1864,7 @@ qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team
 				{//too short to be "blue"
 					Q_strcat(skinName, MAX_QPATH, "_blue");
 				}
-				else 
+				else
 				{
 					char	*start = &skinName[len-4];
 					if ( Q_strncmp( "blue", start, 4 ) != 0 )
@@ -2394,9 +2395,9 @@ int BG_GetGametypeForString( const char *gametype )
 	else												return -1;
 }
 
-qboolean GetCInfo( int bit ) {
+qboolean GetCInfo( uint32_t bit ) {
 #if defined(_GAME)
-	uint32_t cinfo = jp_cinfo.integer;
+	uint32_t cinfo = (unsigned)jp_cinfo.integer;
 #elif defined(_CGAME)
 	uint32_t cinfo = cgs.japp.jp_cinfo;
 #else
@@ -2405,7 +2406,7 @@ qboolean GetCInfo( int bit ) {
 	return !!(cinfo & bit);
 }
 
-qboolean GetCPD( bgEntity_t *self, int bit ) {
+qboolean GetCPD( bgEntity_t *self, uint32_t bit ) {
 #if defined(_GAME)
 	uint32_t cpd = ((gentity_t *)self)->client->pers.CPD;
 #elif defined(_CGAME)

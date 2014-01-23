@@ -42,13 +42,13 @@ Remote_MaintainHeight
 -------------------------
 */
 void Remote_MaintainHeight( void )
-{	
+{
 	float	dif;
 
 	// Update our angles regardless
 	NPC_UpdateAngles( qtrue, qtrue );
 
-	if ( NPC->client->ps.velocity.z )
+	if ( NPC->client->ps.velocity.z > 0.0f )
 	{
 		NPC->client->ps.velocity.z *= VELOCITY_DECAY;
 
@@ -65,7 +65,7 @@ void Remote_MaintainHeight( void )
 			TIMER_Set( NPC,"heightChange",Q_irand( 1000, 3000 ));
 
 			// Find the height difference
-			dif = (NPC->enemy->r.currentOrigin.z +  Q_irand( 0, NPC->enemy->r.maxs.z+8 )) - NPC->r.currentOrigin.z; 
+			dif = (NPC->enemy->r.currentOrigin.z +  Q_irand( 0, NPC->enemy->r.maxs.z+8 )) - NPC->r.currentOrigin.z;
 
 			// cap to prevent dramatic height shifts
 			if ( fabs( dif ) > 2 )
@@ -106,7 +106,7 @@ void Remote_MaintainHeight( void )
 	}
 
 	// Apply friction
-	if ( NPC->client->ps.velocity.x )
+	if ( NPC->client->ps.velocity.x > 0.0f )
 	{
 		NPC->client->ps.velocity.x *= VELOCITY_DECAY;
 
@@ -116,7 +116,7 @@ void Remote_MaintainHeight( void )
 		}
 	}
 
-	if ( NPC->client->ps.velocity.y )
+	if ( NPC->client->ps.velocity.y > 0.0f )
 	{
 		NPC->client->ps.velocity.y *= VELOCITY_DECAY;
 
@@ -236,7 +236,7 @@ void Remote_Fire (void)
 
 	CalcEntitySpot( NPC->enemy, SPOT_HEAD, &enemy_org1 );
 	VectorCopy( &NPC->r.currentOrigin, &muzzle1 );
-	
+
 	VectorSubtract (&enemy_org1, &muzzle1, &delta1);
 
 	vectoangles ( &delta1, &angleToEnemy1 );
@@ -298,7 +298,7 @@ void Remote_Attack( void )
 	if ( TIMER_Done(NPC,"spin") )
 	{
 		TIMER_Set( NPC, "spin", Q_irand( 250, 1500 ) );
-		NPCInfo->desiredYaw += Q_irand( -200, 200 ); 
+		NPCInfo->desiredYaw += Q_irand( -200, 200 );
 	}
 	// Always keep a good height off the ground
 	Remote_MaintainHeight();
@@ -311,7 +311,7 @@ void Remote_Attack( void )
 	}
 
 	// Rate our distance to the target, and our visibilty
-	distance	= (int) DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );	
+	distance	= (int) DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
 	visible		= NPC_ClearLOS4( NPC->enemy );
 	idealDist	= MIN_DISTANCE_SQR+(MIN_DISTANCE_SQR*flrand( 0, 1 ));
 	advance		= (qboolean)(distance > idealDist*1.25);

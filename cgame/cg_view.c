@@ -1964,7 +1964,7 @@ static void CG_PlayBufferedSounds( void ) {
 	}
 }
 
-void CG_UpdateSoundTrackers()
+void CG_UpdateSoundTrackers( void )
 {
 	int num;
 	centity_t *cent;
@@ -2564,7 +2564,7 @@ static QINLINE float angleBetween(vector3 *vec1, vector3 *vec2){
 	return angle;
 }
 
-static void addVelocityVector(){
+static void addVelocityVector( void ){
 	refEntity_t*	ref;
 	vector3	velocity;
 
@@ -2587,7 +2587,7 @@ static void addVelocityVector(){
 	SE_R_AddRefEntityToScene( ref, MAX_CLIENTS );
 }
 
-static qboolean addIdealVectors(){
+static qboolean addIdealVectors( void ){
 	refEntity_t	*left, *right;
 	float  idealAngle, /*cosAngle, sinAngle,*/ delta;
 	float  cosLeftAngle, sinLeftAngle, cosRightAngle, sinRightAngle;
@@ -2742,7 +2742,7 @@ static qboolean addIdealVectors(){
 
 
 
-void CG_AddMovementVectors(){
+void CG_AddMovementVectors( void ){
 	static int modCount = 0;
 	if (modCount != cg_strafeHelperRadius.modificationCount){
 		cg.japp.leftIdeal.radius = cg.japp.rightIdeal.radius = cg.japp.velocityVect.radius = cg_strafeHelperRadius.value;

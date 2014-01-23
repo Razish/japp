@@ -75,7 +75,7 @@ NPC_Sentry_Pain
 -------------------------
 */
 void NPC_Sentry_Pain(gentity_t *self, gentity_t *attacker, int damage)
-{		
+{
 	int mod = gPainMOD;
 
 	NPC_Pain( self, attacker, damage );
@@ -86,7 +86,7 @@ void NPC_Sentry_Pain(gentity_t *self, gentity_t *attacker, int damage)
 		TIMER_Set( self, "attackDelay", Q_irand( 9000, 12000) );
 		self->flags |= FL_SHIELDED;
 		NPC_SetAnim( self, SETANIM_BOTH, BOTH_FLY_SHIELDED, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
-		G_Sound( self, CHAN_AUTO, G_SoundIndex("sound/chars/sentry/misc/sentry_pain") );		
+		G_Sound( self, CHAN_AUTO, G_SoundIndex("sound/chars/sentry/misc/sentry_pain") );
 
 		self->NPC->localState = LSTATE_ACTIVE;
 	}
@@ -135,7 +135,7 @@ void Sentry_Fire (void)
 	{
 		NPCInfo->localState = LSTATE_POWERING_UP;
 
-		G_Sound( NPC, CHAN_AUTO, G_SoundIndex("sound/chars/sentry/misc/sentry_shield_open") );		
+		G_Sound( NPC, CHAN_AUTO, G_SoundIndex("sound/chars/sentry/misc/sentry_shield_open") );
 		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_POWERUP1, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 		TIMER_Set( NPC, "powerup", 250 );
 		return;
@@ -162,7 +162,7 @@ void Sentry_Fire (void)
 		bolt = trap->G2API_AddBolt(NPC->ghoul2, 0, "*flash03");
 	}
 
-	trap->G2API_GetBoltMatrix( NPC->ghoul2, 0, 
+	trap->G2API_GetBoltMatrix( NPC->ghoul2, 0,
 				bolt,
 				&boltMatrix, &NPC->r.currentAngles, &NPC->r.currentOrigin, level.time,
 				NULL, &NPC->modelScale );
@@ -206,7 +206,7 @@ Sentry_MaintainHeight
 -------------------------
 */
 void Sentry_MaintainHeight( void )
-{	
+{
 	float	dif;
 
 	NPC->s.loopSound = G_SoundIndex( "sound/chars/sentry/misc/sentry_hover_1_lp" );
@@ -218,7 +218,7 @@ void Sentry_MaintainHeight( void )
 	if ( NPC->enemy )
 	{
 		// Find the height difference
-		dif = (NPC->enemy->r.currentOrigin.z+NPC->enemy->r.maxs.z) - NPC->r.currentOrigin.z; 
+		dif = (NPC->enemy->r.currentOrigin.z+NPC->enemy->r.maxs.z) - NPC->r.currentOrigin.z;
 
 		// cap to prevent dramatic height shifts
 		if ( fabs( dif ) > 8 )
@@ -254,7 +254,7 @@ void Sentry_MaintainHeight( void )
 			}
 			else
 			{
-				if ( NPC->client->ps.velocity.z )
+				if ( NPC->client->ps.velocity.z > 0.0f )
 				{
 					NPC->client->ps.velocity.z *= SENTRY_VELOCITY_DECAY;
 
@@ -266,7 +266,7 @@ void Sentry_MaintainHeight( void )
 			}
 		}
 		// Apply friction to Z
-		else if ( NPC->client->ps.velocity.z )
+		else if ( NPC->client->ps.velocity.z > 0.0f )
 		{
 			NPC->client->ps.velocity.z *= SENTRY_VELOCITY_DECAY;
 
@@ -278,7 +278,7 @@ void Sentry_MaintainHeight( void )
 	}
 
 	// Apply friction
-	if ( NPC->client->ps.velocity.x )
+	if ( NPC->client->ps.velocity.x > 0.0f )
 	{
 		NPC->client->ps.velocity.x *= SENTRY_VELOCITY_DECAY;
 
@@ -288,7 +288,7 @@ void Sentry_MaintainHeight( void )
 		}
 	}
 
-	if ( NPC->client->ps.velocity.y )
+	if ( NPC->client->ps.velocity.y > 0.0f )
 	{
 		NPC->client->ps.velocity.y *= SENTRY_VELOCITY_DECAY;
 
@@ -452,7 +452,7 @@ Sentry_AttackDecision
 */
 void Sentry_AttackDecision( void )
 {
-	float		distance;	
+	float		distance;
 	qboolean	visible;
 	qboolean	advance;
 
@@ -488,7 +488,7 @@ void Sentry_AttackDecision( void )
 	}
 
 	// Rate our distance to the target and visibilty
-	distance	= (int) DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );	
+	distance	= (int) DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
 	visible		= NPC_ClearLOS4( NPC->enemy );
 	advance		= (qboolean)(distance > MIN_DISTANCE_SQR);
 

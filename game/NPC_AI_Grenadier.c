@@ -70,7 +70,7 @@ void NPC_Grenadier_PlayConfusionSound( gentity_t *self )
 	TIMER_Set( self, "flee", 0 );
 	self->NPC->squadState = SQUAD_IDLE;
 	self->NPC->tempBehavior = BS_DEFAULT;
-	
+
 	//self->NPC->behaviorState = BS_PATROL;
 	G_ClearEnemy( self );//FIXME: or just self->enemy = NULL;?
 
@@ -84,7 +84,7 @@ NPC_ST_Pain
 -------------------------
 */
 
-void NPC_Grenadier_Pain(gentity_t *self, gentity_t *attacker, int damage) 
+void NPC_Grenadier_Pain(gentity_t *self, gentity_t *attacker, int damage)
 {
 	self->NPC->localState = LSTATE_UNDERFIRE;
 
@@ -109,7 +109,7 @@ static void Grenadier_HoldPosition( void )
 {
 	NPC_FreeCombatPoint( NPCInfo->combatPoint, qtrue );
 	NPCInfo->goalEntity = NULL;
-	
+
 	/*if ( TIMER_Done( NPC, "stand" ) )
 	{//FIXME: what if can't shoot from this pos?
 		TIMER_Set( NPC, "duck", Q_irand( 2000, 4000 ) );
@@ -130,13 +130,13 @@ static qboolean Grenadier_Move( void )
 
 	NPCInfo->combatMove = qtrue;//always move straight toward our goal
 	moved = NPC_MoveToGoal( qtrue );
-	
+
 	//Get the move info
 	NAV_GetLastMove( &info );
 
 	//FIXME: if we bump into another one of our guys and can't get around him, just stop!
 	//If we hit our target, then stop and fire!
-	if ( info.flags & NIF_COLLISION ) 
+	if ( info.flags & NIF_COLLISION )
 	{
 		if ( info.blocker == NPC->enemy )
 		{
@@ -217,8 +217,8 @@ void NPC_BSGrenadier_Patrol( void )
 					NPCInfo->lastAlertID = level.alertEvents[alertEvent].ID;
 					if ( level.alertEvents[alertEvent].level == AEL_DISCOVERED )
 					{
-						if ( level.alertEvents[alertEvent].owner && 
-							level.alertEvents[alertEvent].owner->client && 
+						if ( level.alertEvents[alertEvent].owner &&
+							level.alertEvents[alertEvent].owner->client &&
 							level.alertEvents[alertEvent].owner->health >= 0 &&
 							level.alertEvents[alertEvent].owner->client->playerTeam == NPC->client->enemyTeam )
 						{//an enemy
@@ -245,15 +245,15 @@ void NPC_BSGrenadier_Patrol( void )
 				//NOTE: stops walking or doing anything else below
 				vector3	dir, angles;
 				float	o_yaw, o_pitch;
-				
+
 				VectorSubtract( &NPCInfo->investigateGoal, &NPC->client->renderInfo.eyePoint, &dir );
 				vectoangles( &dir, &angles );
-				
+
 				o_yaw = NPCInfo->desiredYaw;
 				o_pitch = NPCInfo->desiredPitch;
 				NPCInfo->desiredYaw = angles.yaw;
 				NPCInfo->desiredPitch = angles.pitch;
-				
+
 				NPC_UpdateAngles( qtrue, qtrue );
 
 				NPCInfo->desiredYaw = o_yaw;
@@ -340,7 +340,7 @@ static void Grenadier_CheckMoveState( void )
 	if ( ( NPCInfo->goalEntity != NPC->enemy ) && ( NPCInfo->goalEntity != NULL ) )
 	{
 		//Did we make it?
-		if ( NAV_HitNavGoal( &NPC->r.currentOrigin, &NPC->r.mins, &NPC->r.maxs, &NPCInfo->goalEntity->r.currentOrigin, 16, FlyingCreature( NPC ) ) || 
+		if ( NAV_HitNavGoal( &NPC->r.currentOrigin, &NPC->r.mins, &NPC->r.maxs, &NPCInfo->goalEntity->r.currentOrigin, 16, FlyingCreature( NPC ) ) ||
 			( NPCInfo->squadState == SQUAD_SCOUT && enemyLOS3 && enemyDist3 <= 10000 ) )
 		{
 			//we got where we wanted to go, set timers based on why we were running
@@ -492,15 +492,15 @@ void NPC_BSGrenadier_Attack( void )
 	if ( enemyDist3 < 16384 //128
 		&& (!NPC->enemy->client
 			|| NPC->enemy->client->ps.weapon != WP_SABER
-			|| BG_SabersOff( &NPC->enemy->client->ps ) 
-			) 
+			|| BG_SabersOff( &NPC->enemy->client->ps )
+			)
 		)
 	{//enemy is close and not using saber
 		if ( NPC->client->ps.weapon == WP_THERMAL )
 		{//grenadier
 			trace_t	trace;
 			trap->Trace ( &trace, &NPC->r.currentOrigin, &NPC->enemy->r.mins, &NPC->enemy->r.maxs, &NPC->enemy->r.currentOrigin, NPC->s.number, NPC->enemy->clipmask, qfalse, 0, 0 );
-			if ( !trace.allsolid && !trace.startsolid && (trace.fraction == 1.0 || trace.entityNum == NPC->enemy->s.number ) )
+			if ( !trace.allsolid && !trace.startsolid && (FloatCompare( trace.fraction, 1.0f, 0.001f ) || trace.entityNum == NPC->enemy->s.number ) )
 			{//I can get right to him
 				//reset fire-timing variables
 				NPC_ChangeWeapon( WP_STUN_BATON );
@@ -535,12 +535,12 @@ void NPC_BSGrenadier_Attack( void )
 			}
 		}
 		else if ( InFOV3( &NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin, &NPC->client->ps.viewangles, 45, 90 ) )
-		{//in front of me 
+		{//in front of me
 			//can we shoot our target?
 			//FIXME: how accurate/necessary is this check?
 			int hit = NPC_ShotEntity( NPC->enemy, NULL );
 			gentity_t *hitEnt = &g_entities[hit];
-			if ( hit == NPC->enemy->s.number 
+			if ( hit == NPC->enemy->s.number
 				|| ( hitEnt && hitEnt->client && hitEnt->client->playerTeam == NPC->client->enemyTeam ) )
 			{
 				float enemyHorzDist;
@@ -644,13 +644,13 @@ void NPC_BSGrenadier_Attack( void )
 	if ( shoot3 )
 	{//try to shoot if it's time
 		if ( TIMER_Done( NPC, "attackDelay" ) )
-		{	
+		{
 			if( !(NPCInfo->scriptFlags & SCF_FIRE_WEAPON) ) // we've already fired, no need to do it again here
 			{
 				WeaponThink( qtrue );
 				TIMER_Set( NPC, "attackDelay", NPCInfo->shotTime-level.time );
 			}
-			
+
 		}
 	}
 }

@@ -102,8 +102,8 @@ void G_FindTeams( void ) {
 
 #include "JAPP/jp_promode.h"
 
-static void SetCInfo( int check, unsigned int bit ) {
-	int cinfo = jp_cinfo.integer;
+static void SetCInfo( int check, uint32_t bit ) {
+	uint32_t cinfo = (unsigned)jp_cinfo.integer;
 
 	if ( check )	cinfo |=  bit;
 	else			cinfo &= ~bit;
@@ -154,6 +154,7 @@ static void CVU_YellowDFA( void ) {
 
 static void CVU_Promode( void ) {
 	SetCInfo( japp_promode.integer, CINFO_CPMPHYSICS );
+	CPM_UpdateSettings( !!(jp_cinfo.integer & CINFO_CPMPHYSICS) );
 }
 
 static void CVU_HeadSlide( void ) {
@@ -179,7 +180,7 @@ static void CVU_CInfo( void ) {
 
 typedef struct cvarTable_s {
 	vmCvar_t	*vmCvar;
-	char		*cvarName, *defaultString;
+	const char	*cvarName, *defaultString;
 	void		(*update)( void );
 	uint32_t	cvarFlags;
 	qboolean	trackChange; // track this variable, and announce if changed

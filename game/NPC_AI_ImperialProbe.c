@@ -45,7 +45,7 @@ Hunter_MaintainHeight
 #define VELOCITY_DECAY	0.85f
 
 void ImperialProbe_MaintainHeight( void )
-{	
+{
 	float	dif;
 //	vector3	endPos;
 //	trace_t	trace;
@@ -57,7 +57,7 @@ void ImperialProbe_MaintainHeight( void )
 	if ( NPC->enemy )
 	{
 		// Find the height difference
-		dif = NPC->enemy->r.currentOrigin.z - NPC->r.currentOrigin.z; 
+		dif = NPC->enemy->r.currentOrigin.z - NPC->r.currentOrigin.z;
 
 		// cap to prevent dramatic height shifts
 		if ( fabs( dif ) > 8 )
@@ -92,7 +92,7 @@ void ImperialProbe_MaintainHeight( void )
 			}
 			else
 			{
-				if ( NPC->client->ps.velocity.z )
+				if ( (int)NPC->client->ps.velocity.z )
 				{
 					NPC->client->ps.velocity.z *= VELOCITY_DECAY;
 
@@ -104,7 +104,7 @@ void ImperialProbe_MaintainHeight( void )
 			}
 		}
 		// Apply friction
-		else if ( NPC->client->ps.velocity.z )
+		else if ( (int)NPC->client->ps.velocity.z )
 		{
 			NPC->client->ps.velocity.z *= VELOCITY_DECAY;
 
@@ -131,7 +131,7 @@ void ImperialProbe_MaintainHeight( void )
 				ucmd.upmove = -32;
 			}
 			else
-			{ 
+			{
 				if ( NPC->client->ps.velocity[2] )
 				{
 					NPC->client->ps.velocity[2] *= VELOCITY_DECAY;
@@ -146,7 +146,7 @@ void ImperialProbe_MaintainHeight( void )
 	}
 
 	// Apply friction
-	if ( NPC->client->ps.velocity.x )
+	if ( (int)NPC->client->ps.velocity.x )
 	{
 		NPC->client->ps.velocity.x *= VELOCITY_DECAY;
 
@@ -275,7 +275,7 @@ void ImperialProbe_FireBlaster(void)
 	genBolt1 = trap->G2API_AddBolt(NPC->ghoul2, 0, "*flash");
 
 	//FIXME: use {0, NPC->client->ps.legsYaw, 0}
-	trap->G2API_GetBoltMatrix( NPC->ghoul2, 0, 
+	trap->G2API_GetBoltMatrix( NPC->ghoul2, 0,
 				genBolt1,
 				&boltMatrix, &NPC->r.currentAngles, &NPC->r.currentOrigin, level.time,
 				NULL, &NPC->modelScale );
@@ -309,7 +309,7 @@ void ImperialProbe_FireBlaster(void)
 	{
 		missile->damage = 5;
 	}
-	else 
+	else
 	{
 		missile->damage = 10;
 	}
@@ -374,7 +374,7 @@ ImperialProbe_AttackDecision
 
 void ImperialProbe_AttackDecision( void )
 {
-	float		distance;	
+	float		distance;
 	qboolean	visible;
 	qboolean	advance;
 
@@ -402,7 +402,7 @@ void ImperialProbe_AttackDecision( void )
 	NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_RUN1, SETANIM_FLAG_NORMAL);
 
 	// Rate our distance to the target, and our visibilty
-	distance	= (int) DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );	
+	distance	= (int) DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
 	visible		= NPC_ClearLOS4( NPC->enemy );
 	advance		= (qboolean)(distance > MIN_DISTANCE_SQR);
 
@@ -433,7 +433,7 @@ void NPC_Probe_Pain(gentity_t *self, gentity_t *attacker, int damage)
 	float	pain_chance;
 	gentity_t *other = attacker;
 	int mod = gPainMOD;
-	
+
 	VectorCopy( &self->NPC->lastPathAngles, &self->s.angles );
 
 	if ( self->health < 30 || mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT ) // demp2 always messes them up real good
@@ -444,7 +444,7 @@ void NPC_Probe_Pain(gentity_t *self, gentity_t *attacker, int damage)
 		VectorSet( &endPos, self->r.currentOrigin.x, self->r.currentOrigin.y, self->r.currentOrigin.z - 128 );
 		trap->Trace( &trace, &self->r.currentOrigin, NULL, NULL, &endPos, self->s.number, MASK_SOLID, qfalse, 0, 0 );
 
-		if ( trace.fraction == 1.0f || mod == MOD_DEMP2 ) // demp2 always does this
+		if ( FloatCompare( trace.fraction, 1.0f, 0.001f ) || mod == MOD_DEMP2 ) // demp2 always does this
 		{
 			/*
 			if (self->client->clientInfo.headModel != 0)
@@ -461,7 +461,7 @@ void NPC_Probe_Pain(gentity_t *self, gentity_t *attacker, int damage)
 				self->client->ps.gravity = g_gravity->value*.1;
 			}
 			*/
-			
+
 			if ( (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT) && other )
 			{
 				vector3 dir;
@@ -480,7 +480,7 @@ void NPC_Probe_Pain(gentity_t *self, gentity_t *attacker, int damage)
 			self->client->ps.electrifyTime = level.time + 3000;
 
 			self->NPC->localState = LSTATE_DROP;
-		} 
+		}
 	}
 	else
 	{
@@ -489,7 +489,7 @@ void NPC_Probe_Pain(gentity_t *self, gentity_t *attacker, int damage)
 		if ( random() < pain_chance )	// Spin around in pain?
 		{
 			NPC_SetAnim( self, SETANIM_BOTH, BOTH_PAIN1, SETANIM_FLAG_OVERRIDE);
-		}	
+		}
 	}
 
 	NPC_Pain( self, attacker, damage );
@@ -570,10 +570,10 @@ void ImperialProbe_Wait(void)
 		VectorSet( &endPos, NPC->r.currentOrigin.x, NPC->r.currentOrigin.y, NPC->r.currentOrigin.z - 32 );
 		trap->Trace( &trace, &NPC->r.currentOrigin, NULL, NULL, &endPos, NPC->s.number, MASK_SOLID, qfalse, 0, 0 );
 
-		if ( trace.fraction != 1.0f )
+		if ( trace.fraction < 1.0f )
 		{
-			G_Damage(NPC, NPC->enemy, NPC->enemy, NULL, NULL, 2000, 0,MOD_UNKNOWN); 
-		} 
+			G_Damage(NPC, NPC->enemy, NPC->enemy, NULL, NULL, 2000, 0,MOD_UNKNOWN);
+		}
 	}
 
 	NPC_UpdateAngles( qtrue, qtrue );

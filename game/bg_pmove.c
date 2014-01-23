@@ -3407,36 +3407,25 @@ PM_AirMove
 */
 
 static void PM_AirMove( void ) {
-	int			i;
-	vector3		wishvel;
-	float		fmove, smove;
-	vector3		wishdir;
-	float		wishspeed, wishspeed2;
-	float		scale;
-	float		accelerate;
+	vector3		wishVel, wishDir;
+	float		fmove, smove, wishSpeed, wishSpeed2;
+	float		scale, accelerate;
 	usercmd_t	cmd;
 	Vehicle_t	*pVeh = NULL;
 	qboolean	promode = GetCInfo( CINFO_CPMPHYSICS );
 
-	if (pm->ps->clientNum >= MAX_CLIENTS)
-	{
+	if ( pm->ps->clientNum >= MAX_CLIENTS ) {
 		bgEntity_t	*pEnt = pm_entSelf;
-
 		if ( pEnt && pEnt->s.NPC_class == CLASS_VEHICLE )
-		{
 			pVeh = pEnt->m_pVehicle;
-		}
 	}
 
 	if ( pm->ps->pm_type != PM_SPECTATOR && !GetCInfo( CINFO_VQ3PHYS ) ) {
 #if METROID_JUMP
 		PM_CheckJump();
 #else
-		if (pm->ps->fd.forceJumpZStart &&
-			pm->ps->forceJumpFlip)
-		{
+		if ( pm->ps->fd.forceJumpZStart && pm->ps->forceJumpFlip )
 			PM_CheckJump();
-		}
 #endif
 	//	PM_CheckGrab();
 	}
@@ -3454,104 +3443,84 @@ static void PM_AirMove( void ) {
 	// project moves down to flat plane
 	pml.forward.z = 0;
 	pml.right.z = 0;
-	VectorNormalize (&pml.forward);
-	VectorNormalize (&pml.right);
+	VectorNormalize( &pml.forward );
+	VectorNormalize( &pml.right );
 
-	if ( pVeh && pVeh->m_pVehicleInfo->hoverHeight > 0 )
-	{//in a hovering vehicle, have air control
-		if ( 1 )
-		{
-			VectorScale( &pm->ps->moveDir, pm->ps->speed, &wishvel );
-			VectorCopy( &pm->ps->moveDir, &wishdir );
+	if ( pVeh && pVeh->m_pVehicleInfo->hoverHeight > 0 ) {
+		// in a hovering vehicle, have air control
+		if ( 1 ) {
+			VectorScale( &pm->ps->moveDir, pm->ps->speed, &wishVel );
+			VectorCopy( &pm->ps->moveDir, &wishDir );
 			scale = 1.0f;
 		}
 	}
-	else if ( gPMDoSlowFall )
-	{//no air-control
-		VectorClear( &wishvel );
+	else if ( gPMDoSlowFall ) {
+		// no air-control
+		VectorClear( &wishVel );
 	}
-	else if (pm->ps->pm_type == PM_JETPACK)
-	{ //reduced air control while not jetting
-		for ( i=0; i<2; i++ )
-			wishvel.data[i] = pml.forward.data[i]*fmove + pml.right.data[i]*smove;
-		wishvel.z = 0;
+	else {
+		// reduced air control while not jetting
+		wishVel.x = pml.forward.x*fmove + pml.right.x*smove;
+		wishVel.y = pml.forward.y*fmove + pml.right.y*smove;
+		wishVel.z = 0;
 
-		if (pm->cmd.upmove <= 0)
-		{
-            VectorScale(&wishvel, 0.8f, &wishvel);
+		if ( pm->ps->pm_type == PM_JETPACK ) {
+			// if we are jetting then we have more control than usual
+			if ( pm->cmd.upmove <= 0 )
+				VectorScale( &wishVel, 0.8f, &wishVel );
+			else
+				VectorScale( &wishVel, 2.0f, &wishVel );
 		}
-		else
-		{ //if we are jetting then we have more control than usual
-            VectorScale(&wishvel, 2.0f, &wishvel);
-		}
-	}
-	else
-	{
-		for ( i=0; i<2; i++ )
-			wishvel.data[i] = pml.forward.data[i]*fmove + pml.right.data[i]*smove;
-		wishvel.z = 0;
 	}
 
-	VectorCopy (&wishvel, &wishdir);
-	wishspeed = VectorNormalize(&wishdir);
-	wishspeed *= scale;
+	VectorCopy( &wishVel, &wishDir );
+	wishSpeed = VectorNormalize( &wishDir );
+	wishSpeed *= scale;
+	wishSpeed2 = wishSpeed;
 
-	if ( promode )
-	{//Raz: CPM Physics
-		wishspeed2 = wishspeed;
-		if (DotProduct(&pm->ps->velocity, &wishdir) < 0)
+	if ( promode ) {
+		if ( DotProduct( &pm->ps->velocity, &wishDir ) < 0.0f )
 			accelerate = cpm_pm_airstopaccelerate;
 		else
 			accelerate = pm_airaccelerate;
-		if (pm->ps->movementDir == 2 || pm->ps->movementDir == 6)
-		{
-			if (wishspeed > cpm_pm_wishspeed)
-				wishspeed = cpm_pm_wishspeed;
+		if ( pm->ps->movementDir == 2 || pm->ps->movementDir == 6 ) {
+			if ( wishSpeed > cpm_pm_wishspeed )
+				wishSpeed = cpm_pm_wishspeed;
 			accelerate = cpm_pm_strafeaccelerate;
 		}
 	}
 	else
 		accelerate = pm_airaccelerate;
 
-	if ( pVeh && pVeh->m_pVehicleInfo->type == VH_SPEEDER )
-	{//speeders have more control in air
-
+	// speeders have more control in air
+	if ( pVeh && pVeh->m_pVehicleInfo->type == VH_SPEEDER ) {
 		//in mid-air
 		accelerate = pVeh->m_pVehicleInfo->traction;
+		// on a slope of some kind, shouldn't have much control and should slide a lot
 		if ( pml.groundPlane )
-		{//on a slope of some kind, shouldn't have much control and should slide a lot
 			accelerate *= 0.5f;
-		}
 	}
 	// not on ground, so little effect on velocity
-	PM_Accelerate (&wishdir, wishspeed, accelerate);
+	PM_Accelerate( &wishDir, wishSpeed, accelerate );
 
 	//Raz: CPM Physics
-	if ( promode && cpm_pm_aircontrol )
-		CPM_PM_Aircontrol( pm, &wishdir, wishspeed2 );
+	if ( promode )
+		CPM_PM_Aircontrol( pm, &wishDir, wishSpeed2 );
 
-	// we may have a ground plane that is very steep, even
-	// though we don't have a groundentity
-	// slide along the steep plane
-	if ( pml.groundPlane )
-	{
-		if ( !(pm->ps->pm_flags&PMF_STUCK_TO_WALL) )
-		{//don't slide when stuck to a wall
+	// we may have a ground plane that is very steep, even though we don't have a groundentity slide along the steep plane
+	if ( pml.groundPlane ) {
+		if ( !(pm->ps->pm_flags & PMF_STUCK_TO_WALL) ) {
+			// don't slide when stuck to a wall
 			if ( PM_GroundSlideOkay( pml.groundTrace.plane.normal.z ) )
-			{
-				PM_ClipVelocity (&pm->ps->velocity, &pml.groundTrace.plane.normal, &pm->ps->velocity, OVERCLIP );
-			}
+				PM_ClipVelocity( &pm->ps->velocity, &pml.groundTrace.plane.normal, &pm->ps->velocity, OVERCLIP );
 		}
 	}
 
-	if ( (pm->ps->pm_flags&PMF_STUCK_TO_WALL) )
-	{//no grav when stuck to wall
+	// no grav when stuck to wall
+	if ( (pm->ps->pm_flags & PMF_STUCK_TO_WALL) )
 		PM_StepSlideMove( qfalse );
-	}
 	else
-	{
 		PM_StepSlideMove( qtrue );
-	}
 }
 
 static void PM_GrappleMove( void )

@@ -477,14 +477,14 @@ typedef struct displayContextDef_s {
 
 
 const char *String_Alloc(const char *p);
-void String_Init();
-void String_Report();
+void String_Init( void );
+void String_Report( void );
 void Init_Display(displayContextDef_t *dc);
 void Display_ExpandMacros(char * buff);
 void Menu_Init(menuDef_t *menu);
 void Item_Init(itemDef_t *item);
 void Menu_PostParse(menuDef_t *menu);
-menuDef_t *Menu_GetFocused();
+menuDef_t *Menu_GetFocused( void );
 void Menu_HandleKey(menuDef_t *menu, int key, qboolean down);
 void Menu_HandleMouseMove(menuDef_t *menu, float x, float y);
 void Menu_ScrollFeeder(menuDef_t *menu, int feeder, qboolean down);
@@ -500,9 +500,9 @@ qboolean PC_Int_Parse(int handle, int *i);
 qboolean PC_Rect_Parse(int handle, rectDef_t *r);
 qboolean PC_String_Parse(int handle, const char **out);
 qboolean PC_Script_Parse(int handle, const char **out);
-int Menu_Count();
+int Menu_Count( void );
 void Menu_New(int handle);
-void Menu_PaintAll();
+void Menu_PaintAll( void );
 menuDef_t *Menus_ActivateByName(const char *p);
 void Menu_Reset( void );
 qboolean Menus_AnyFullScreenVisible( void );
@@ -513,26 +513,26 @@ void Menu_ItemDisable(menuDef_t *menu, char *name,int disableFlag);
 int Menu_ItemsMatchingGroup(menuDef_t *menu, const char *name);
 itemDef_t *Menu_GetMatchingItemByNumber(menuDef_t *menu, int index, const char *name);
 
-displayContextDef_t *Display_GetContext();
+displayContextDef_t *Display_GetContext( void );
 void *Display_CaptureItem(int x, int y);
 qboolean Display_MouseMove(void *p, int x, int y);
 int Display_CursorType(int x, int y);
-qboolean Display_KeyBindPending();
+qboolean Display_KeyBindPending( void );
 void Menus_OpenByName(const char *p);
 menuDef_t *Menus_FindByName(const char *p);
 void Menus_ShowByName(const char *p);
 void Menus_CloseByName(const char *p);
 void Display_HandleKey(int key, qboolean down, int x, int y);
 void LerpColor( const vector4 *a, vector4 *b, vector4 *c, float t );
-void Menus_CloseAll();
+void Menus_CloseAll( void );
 void Menu_Paint(menuDef_t *menu, qboolean forcePaint);
 void Menu_SetFeederSelection(menuDef_t *menu, int feeder, int index, const char *name);
-void Display_CacheAll();
+void Display_CacheAll( void );
 void Menu_SetItemBackground(const menuDef_t *menu,const char *itemName, const char *background);
 
 void *UI_Alloc( int size );
 void UI_InitMemory( void );
-qboolean UI_OutOfMemory();
+qboolean UI_OutOfMemory( void );
 
 void Controls_GetConfig( void );
 void Controls_SetConfig(qboolean restart);

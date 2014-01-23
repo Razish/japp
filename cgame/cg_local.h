@@ -2098,7 +2098,7 @@ void CG_ChatboxInit( void );
 qboolean CG_ChatboxActive( void );
 void CG_ChatboxDraw( void );
 void CG_ChatboxEscape( void );
-void CG_ChatboxAddMessage( const char *message, qboolean multiLine, char *cbName );
+void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *cbName );
 
 
 refdef_t *CG_GetRefdef( void );
