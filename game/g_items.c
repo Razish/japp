@@ -3213,7 +3213,7 @@ G_RunItem
 void G_RunItem( gentity_t *ent ) {
 	vector3		origin;
 	trace_t		tr;
-	int			contents;
+	uint32_t	contents;
 	int			mask;
 
 	// if groundentity has been set to -1, it may have been pushed off an edge

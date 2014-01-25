@@ -73,7 +73,7 @@ typedef struct entityShared_s {
 	qboolean	bmodel;				// if false, assume an explicit mins / maxs bounding box
 									// only set by trap_SetBrushModel
 	vector3		mins, maxs;
-	int			contents;			// CONTENTS_TRIGGER, CONTENTS_SOLID, CONTENTS_BODY, etc
+	uint32_t	contents;			// CONTENTS_TRIGGER, CONTENTS_SOLID, CONTENTS_BODY, etc
 									// a non-solid entity should set to 0
 
 	vector3		absmin, absmax;		// derived from mins/maxs and origin + rotation
@@ -95,8 +95,7 @@ typedef struct entityShared_s {
 	// mask of clients that this entity should be broadcast too.  The first 32 clients
 	// are represented by the first array index and the latter 32 clients are represented
 	// by the second array index.
-	int			broadcastClients[2];
-
+	uint32_t	broadcastClients[2];
 } entityShared_t;
 
 //bstate.h
@@ -840,7 +839,7 @@ typedef struct gameImport_s {
 	qboolean	(*InPVSIgnorePortals)					( const vector3 *p1, const vector3 *p2 );
 	void		(*LinkEntity)							( sharedEntity_t *ent );
 	void		(*LocateGameData)						( sharedEntity_t *gEnts, int numGEntities, int sizeofGEntity_t, playerState_t *clients, int sizeofGClient );
-	int			(*PointContents)						( const vector3 *point, int passEntityNum );
+	uint32_t	(*PointContents)						( const vector3 *point, int passEntityNum );
 	void		(*SendConsoleCommand)					( int exec_when, const char *text );
 	void		(*SendServerCommand)					( int clientNum, const char *text );
 	void		(*SetBrushModel)						( sharedEntity_t *ent, const char *name );
@@ -1027,7 +1026,7 @@ typedef struct gameImport_s {
 	float		(*AAS_Time)								( void );
 	int			(*AAS_PointAreaNum)						( vector3 *point );
 	int			(*AAS_TraceAreas)						( vector3 *start, vector3 *end, int *areas, vector3 *points, int maxareas );
-	int			(*AAS_PointContents)					( vector3 *point );
+	uint32_t	(*AAS_PointContents)					( vector3 *point );
 	int			(*AAS_NextBSPEntity)					( int ent );
 	int			(*AAS_ValueForBSPEpairKey)				( int ent, char *key, char *value, int size );
 	int			(*AAS_VectorForBSPEpairKey)				( int ent, char *key, vector3 *v );

@@ -21,7 +21,7 @@
 typedef struct svEntity_s {
 	struct worldSector_s *worldSector;
 	struct svEntity_s *nextEntityInWorldSector;
-	
+
 	entityState_t	baseline;		// for delta compression of initial sighting
 	int			numClusters;		// if -1, use headnode instead
 	int			clusternums[MAX_ENT_CLUSTERS];
@@ -373,7 +373,7 @@ int SV_AreaEntities( const vector3 *mins, const vector3 *maxs, int *entityList, 
 // The world entity is never returned in this list.
 
 
-int SV_PointContents( const vector3 *p, int passEntityNum );
+uint32_t SV_PointContents( const vector3 *p, int passEntityNum );
 // returns the CONTENTS_* value from the world and all entities at the given point.
 
 

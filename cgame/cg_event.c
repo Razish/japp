@@ -2589,8 +2589,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 				break;
 			case PDSOUND_ABSORBHIT:
 				sID = trap->S_RegisterSound("sound/weapons/force/absorbhit.mp3");
-				if (es->trickedentindex >= 0 && es->trickedentindex < MAX_CLIENTS)
-				{
+				if ( es->trickedentindex < MAX_CLIENTS ) {
 					int clnum = es->trickedentindex;
 
 					cg_entities[clnum].teamPowerEffectTime = cg.time + 1000;

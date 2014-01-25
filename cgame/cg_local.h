@@ -1812,7 +1812,7 @@ void CG_TriggerAnimSounds( centity_t *cent );
 // cg_predict.c
 //
 void CG_BuildSolidList( void );
-int	CG_PointContents( const vector3 *point, int passEntityNum );
+uint32_t CG_PointContents( const vector3 *point, int passEntityNum );
 void CG_Trace( trace_t *result, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end,
 					 int skipNumber, int mask );
 void CG_G2Trace( trace_t *result, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end,

@@ -36,7 +36,7 @@ gclient_t		*client;
 usercmd_t		ucmd;
 visibility_t	enemyVisibility;
 
-void NPC_SetAnim(gentity_t	*ent,int type,int anim,int priority);
+void NPC_SetAnim( gentity_t *ent, int type, int anim, uint32_t setAnimFlags );
 void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope );
 extern void GM_Dying( gentity_t *self );
 
@@ -581,7 +581,8 @@ static void DeadThink ( void )
 	if ( NPC->bounceCount < 0 && NPC->s.groundEntityNum >= 0 )
 	{
 		// if client is in a nodrop area, make him/her nodraw
-		int contents = NPC->bounceCount = trap->PointContents( &NPC->r.currentOrigin, -1 );
+		uint32_t contents = trap->PointContents( &NPC->r.currentOrigin, -1 );
+		NPC->bounceCount = (int32_t)contents;
 
 		if ( ( contents & CONTENTS_NODROP ) )
 		{
@@ -1961,7 +1962,7 @@ void NPC_InitGame( void )
 	*/
 }
 
-void NPC_SetAnim(gentity_t *ent, int setAnimParts, int anim, int setAnimFlags)
+void NPC_SetAnim(gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags)
 {	// FIXME : once torsoAnim and legsAnim are in the same structure for NCP and Players
 	// rename PM_SETAnimFinal to PM_SetAnim and have both NCP and Players call PM_SetAnim
 	G_SetAnim(ent, NULL, setAnimParts, anim, setAnimFlags, 0);

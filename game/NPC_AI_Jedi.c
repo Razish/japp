@@ -4036,7 +4036,7 @@ static void Jedi_CombatTimersUpdate( int enemy_dist )
 
 	if ( NPC->client->ps.saberEventFlags )
 	{//some kind of saber combat event is still pending
-		int newFlags = NPC->client->ps.saberEventFlags;
+		uint32_t newFlags = NPC->client->ps.saberEventFlags;
 		if ( NPC->client->ps.saberEventFlags&SEF_PARRIED )
 		{//parried
 			TIMER_Set( NPC, "parryTime", -1 );

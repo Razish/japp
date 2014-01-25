@@ -7,7 +7,7 @@
  * desc:		Area Awareness System, stuff exported to the AI
  *
  * $Archive: /source/code/botlib/be_aas.h $
- * $Author: osman $ 
+ * $Author: osman $
  * $Revision: 1.4 $
  * $Modtime: 10/05/99 3:32p $
  * $Date: 2003/03/15 23:43:59 $
@@ -25,7 +25,7 @@
 #define TFL_BARRIERJUMP			(0x00000008u) // jumping onto a barrier
 #define TFL_JUMP				(0x00000010u) // jumping
 #define TFL_LADDER				(0x00000020u) // climbing a ladder
-#define TFL_UNUSED00000040		(0x00000040u) // 
+#define TFL_UNUSED00000040		(0x00000040u) //
 #define TFL_WALKOFFLEDGE		(0x00000080u) // walking of a ledge
 #define TFL_SWIM				(0x00000100u) // swimming
 #define TFL_WATERJUMP			(0x00000200u) // jumping out of the water
@@ -97,7 +97,7 @@ typedef struct bsp_trace_s
 	float			exp_dist;	// expanded plane distance
 	int				sidenum;	// number of the brush side hit
 	bsp_surface_t	surface;	// hit surface
-	int				contents;	// contents on other side of surface hit
+	uint32_t		contents;	// contents on other side of surface hit
 	int				ent;		// number of entity hit
 } bsp_trace_t;
 //
@@ -132,19 +132,17 @@ typedef struct aas_entityinfo_s
 } aas_entityinfo_t;
 
 // area info
-typedef struct aas_areainfo_s
-{
-	int contents;
+typedef struct aas_areainfo_s {
+	uint32_t contents;
 	uint32_t flags;
 	int presencetype;
 	int cluster;
-	vector3 mins;
-	vector3 maxs;
+	vector3 mins, maxs;
 	vector3 center;
 } aas_areainfo_t;
 
 // client movement prediction stop events, stop as soon as:
-#define SE_NONE					(0x0000u) // 
+#define SE_NONE					(0x0000u) //
 #define SE_HITGROUND			(0x0001u) // the ground is hit
 #define SE_LEAVEGROUND			(0x0002u) // there's no ground
 #define SE_ENTERWATER			(0x0004u) // water is entered
@@ -159,15 +157,14 @@ typedef struct aas_areainfo_s
 #define SE_HITBOUNDINGBOX		(0x0800u) // hit the specified bounding box
 #define SE_TOUCHCLUSTERPORTAL	(0x1000u) // touching a cluster portal
 
-typedef struct aas_clientmove_s
-{
+typedef struct aas_clientmove_s {
 	vector3 endpos;			//position at the end of movement prediction
 	int endarea;			//area at end of movement prediction
 	vector3 velocity;		//velocity at the end of movement prediction
 	aas_trace_t trace;		//last trace
 	int presencetype;		//presence type at end of movement prediction
 	int stopevent;			//event that made the prediction stop
-	int endcontents;		//contents at the end of movement prediction
+	uint32_t endcontents;		//contents at the end of movement prediction
 	float time;				//time predicted ahead
 	int frames;				//number of frames predicted ahead
 } aas_clientmove_t;
@@ -193,12 +190,11 @@ typedef struct aas_altroutegoal_s
 #define RSE_ENTERCONTENTS		(0x0004u) // stop when entering the given contents
 #define RSE_ENTERAREA			(0x0008u) // stop when entering the given area
 
-typedef struct aas_predictroute_s
-{
+typedef struct aas_predictroute_s {
 	vector3 endpos;			//position at the end of movement prediction
 	int endarea;			//area at end of movement prediction
 	int stopevent;			//event that made the prediction stop
-	int endcontents;		//contents at the end of movement prediction
+	uint32_t endcontents;		//contents at the end of movement prediction
 	uint32_t endtravelflags;		//end travel flags
 	int numareas;			//number of areas predicted ahead
 	int time;				//time predicted ahead (in hundreth of a sec)

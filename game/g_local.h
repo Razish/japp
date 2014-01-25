@@ -223,7 +223,7 @@ struct gentity_s {
 
 	qboolean	physicsObject;		// if true, it can be pushed by movers and fall off edges. all game items are physicsObjects
 	float		physicsBounce;		// 1.0 = continuous bounce, 0.0 = no bounce
-	int			clipmask;			// brushes with this content value will be collided against when moving. items and
+	uint32_t	clipmask;			// brushes with this content value will be collided against when moving. items and
 									//	corpses do not collide against players, for instance
 
 //Only used by NPC_spawners
@@ -366,7 +366,7 @@ struct gentity_s {
 
 	qboolean jpSpawned;
 
-	int savedContents;
+	uint32_t savedContents;
 };
 
 #define DAMAGEREDIRECT_HEAD		1

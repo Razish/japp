@@ -121,7 +121,7 @@ typedef struct bsp_trace_s
 	float			exp_dist;	// expanded plane distance
 	int				sidenum;	// number of the brush side hit
 	bsp_surface_t	surface;	// the hit point surface
-	int				contents;	// contents on other side of surface hit
+	uint32_t		contents;	// contents on other side of surface hit
 	int				ent;		// number of entity hit
 } bsp_trace_t;
 
@@ -160,7 +160,7 @@ typedef struct botlib_import_s
 	//trace a bbox against a specific entity
 	void		(*EntityTrace)(bsp_trace_t *trace, vector3 *start, vector3 *mins, vector3 *maxs, vector3 *end, int entnum, int contentmask);
 	//retrieve the contents at the given point
-	int			(*PointContents)(vector3 *point);
+	uint32_t	(*PointContents)(vector3 *point);
 	//check if the point is in potential visible sight
 	int			(*inPVS)(vector3 *p1, vector3 *p2);
 	//retrieve the BSP entity data lump
@@ -212,7 +212,7 @@ typedef struct aas_export_s
 	//--------------------------------------------
 	// be_aas_bspq3.c
 	//--------------------------------------------
-	int			(*AAS_PointContents)(vector3 *point);
+	uint32_t	(*AAS_PointContents)(vector3 *point);
 	int			(*AAS_NextBSPEntity)(int ent);
 	int			(*AAS_ValueForBSPEpairKey)(int ent, char *key, char *value, int size);
 	int			(*AAS_VectorForBSPEpairKey)(int ent, char *key, vector3 *v);

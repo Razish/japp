@@ -563,7 +563,7 @@ qboolean NPC_CheckEnemyStealth( gentity_t *target )
 		float	dist_influence, fov_influence, light_influence;
 		float	target_speed;
 		float	light_level;
-		int		contents;
+		uint32_t contents;
 		float	realize, cautious;
 		qboolean target_crouching;
 
@@ -1642,9 +1642,9 @@ void ST_TransferMoveGoal( gentity_t *self, gentity_t *other )
 	TIMER_Set( self, "stand", Q_irand( 1000, 3000 ) );
 }
 
-int ST_GetCPFlags( void )
+uint32_t ST_GetCPFlags( void )
 {
-	int cpFlags = 0;
+	uint32_t cpFlags = 0;
 	if ( NPC && NPCInfo->group )
 	{
 		if ( NPC == NPCInfo->group->commander && NPC->client->NPC_class == CLASS_IMPERIAL )

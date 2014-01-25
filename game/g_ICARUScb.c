@@ -4249,7 +4249,7 @@ SolidifyOwner
 */
 void SolidifyOwner( gentity_t *self )
 {
-	int oldContents;
+	uint32_t oldContents;
 	gentity_t *owner = &g_entities[self->r.ownerNum];
 
 	self->nextthink = level.time + FRAMETIME;

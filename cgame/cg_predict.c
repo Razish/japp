@@ -389,32 +389,29 @@ void	CG_G2Trace( trace_t *result, const vector3 *start, const vector3 *mins, con
 CG_PointContents
 ================
 */
-int		CG_PointContents( const vector3 *point, int passEntityNum ) {
-	int			i;
+uint32_t CG_PointContents( const vector3 *point, int passEntityNum ) {
+	int				i;
 	entityState_t	*ent;
-	centity_t	*cent;
-	clipHandle_t cmodel;
-	int			contents;
+	centity_t		*cent;
+	clipHandle_t	cmodel;
+	uint32_t		contents;
 
-	contents = trap->CM_PointContents (point, 0);
+	contents = trap->CM_PointContents( point, 0 );
 
-	for ( i = 0 ; i < cg_numSolidEntities ; i++ ) {
-		cent = cg_solidEntities[ i ];
-
+	for ( i=0; i<cg_numSolidEntities; i++ ) {
+		cent = cg_solidEntities[i];
 		ent = &cent->currentState;
 
-		if ( ent->number == passEntityNum ) {
+		if ( ent->number == passEntityNum )
 			continue;
-		}
 
-		if (ent->solid != SOLID_BMODEL) { // special value for bmodel
+		// special value for bmodel
+		if ( ent->solid != SOLID_BMODEL )
 			continue;
-		}
 
 		cmodel = trap->CM_InlineModel( ent->modelindex );
-		if ( !cmodel ) {
+		if ( !cmodel )
 			continue;
-		}
 
 		contents |= trap->CM_TransformedPointContents( point, cmodel, &ent->origin, &ent->angles );
 	}

@@ -1614,8 +1614,8 @@ int PM_AnimLength( int index, animNumber_t anim ) {
 
 void PM_DebugLegsAnim(int anim)
 {
-	int oldAnim = (pm->ps->legsAnim);
-	int newAnim = (anim);
+	unsigned int oldAnim = (pm->ps->legsAnim);
+	unsigned int newAnim = (anim);
 
 	if (oldAnim < MAX_TOTALANIMATIONS && oldAnim >= BOTH_DEATH1 &&
 		newAnim < MAX_TOTALANIMATIONS && newAnim >= BOTH_DEATH1)

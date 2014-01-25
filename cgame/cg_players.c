@@ -4630,7 +4630,7 @@ Draw a mark at the water surface
 static void CG_PlayerSplash( centity_t *cent ) {
 	vector3		start, end;
 	trace_t		trace;
-	int			contents;
+	uint32_t	contents;
 	polyVert_t	verts[4];
 
 	if ( !cg_shadows.integer ) {

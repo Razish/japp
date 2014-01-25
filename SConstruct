@@ -301,21 +301,25 @@ elif plat == 'Windows':
 
 # compiler options
 if plat == 'Linux':
+	env['CC'] = ARGUMENTS.get( 'compiler', 'gcc' )
 	env['CPPDEFINES'] = [ '__GCC__' ]
 	env['CCFLAGS'] = [
 		'-Wall', '-Wextra',
-		'-Wno-missing-braces', '-Wno-missing-field-initializers', '-Wno-sign-compare', '-Wno-unused-parameter',
+		'-Wno-missing-braces',
+		'-Wno-missing-field-initializers',
+		'-Wno-sign-compare',
+		'-Wno-unused-parameter',
 		'-Waggregate-return',
 	#	'-Wfloat-equal',
 		'-Winit-self',
 	#	'-Wshadow',
+	#	'-Wsign-conversion',
 		'-Wstrict-prototypes',
 	#	'-Wswitch-default',
 		'-Wuninitialized',
 		'-Wunreachable-code',
 	#	'-Wwrite-strings',
 		]
-	env['CC'] = ARGUMENTS.get( 'compiler', 'gcc' )
 	if int( ARGUMENTS.get( 'analyse', 0 ) ):
 		env['CC'] = 'clang'
 		env['CCFLAGS'] += [ '--analyze' ]

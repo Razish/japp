@@ -72,7 +72,7 @@ qboolean CG_NoUseableForce(void)
 	return qtrue;
 }
 
-static int C_PointContents(void)
+static uint32_t C_PointContents(void)
 {
 	TCGPointContents	*data = (TCGPointContents *)cg.sharedBuffer;
 

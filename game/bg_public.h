@@ -505,7 +505,7 @@ typedef struct pmove_s {
 	// callbacks to test the world
 	// these will be different functions during game and cgame
 	void		(*trace)( trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentMask );
-	int			(*pointcontents)( const vector3 *point, int passEntityNum );
+	uint32_t	(*pointcontents)( const vector3 *point, int passEntityNum );
 
 	int			checkDuelLoss;
 
@@ -1168,7 +1168,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 //rwwRMG - added in CONTENTS_TERRAIN
 // content masks
-#define	MASK_ALL				(-1)
+#define	MASK_ALL				(0xFFFFFFFFu)
 #define	MASK_SOLID				(CONTENTS_SOLID|CONTENTS_TERRAIN)
 #define	MASK_PLAYERSOLID		(CONTENTS_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_BODY|CONTENTS_TERRAIN)
 #define	MASK_NPCSOLID			(CONTENTS_SOLID|CONTENTS_MONSTERCLIP|CONTENTS_BODY|CONTENTS_TERRAIN)

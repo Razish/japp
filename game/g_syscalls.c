@@ -112,7 +112,7 @@ void trap_Trace( trace_t *results, const vector3 *start, const vector3 *mins, co
 void trap_G2Trace( trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentmask, int g2TraceType, int traceLod ) {
 	Q_syscall( G_G2TRACE, results, start, mins, maxs, end, passEntityNum, contentmask, g2TraceType, traceLod );
 }
-int trap_PointContents( const vector3 *point, int passEntityNum ) {
+uint32_t trap_PointContents( const vector3 *point, int passEntityNum ) {
 	return Q_syscall( G_POINT_CONTENTS, point, passEntityNum );
 }
 qboolean trap_InPVS( const vector3 *p1, const vector3 *p2 ) {
@@ -453,7 +453,7 @@ int trap_AAS_BBoxAreas(vector3 *absmins, vector3 *absmaxs, int *areas, int maxar
 int trap_AAS_AreaInfo( int areanum, void *info ) {
 	return Q_syscall( BOTLIB_AAS_AREA_INFO, areanum, info );
 }
-int trap_AAS_PointContents(vector3 *point) {
+uint32_t trap_AAS_PointContents(vector3 *point) {
 	return Q_syscall( BOTLIB_AAS_POINT_CONTENTS, point );
 }
 int trap_AAS_NextBSPEntity(int ent) {

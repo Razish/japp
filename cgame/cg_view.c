@@ -1121,7 +1121,7 @@ qboolean CG_CalcFOVFromX( float fov_x )
 	float	x;
 //	float	phase;
 //	float	v;
-//	int		contents;
+//	uint32_t contents;
 	float	fov_y;
 	qboolean	inwater;
 	refdef_t *refdef = CG_GetRefdef();

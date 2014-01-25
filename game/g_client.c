@@ -971,8 +971,8 @@ just like the existing corpse to leave behind.
 =============
 */
 static qboolean CopyToBodyQue( gentity_t *ent ) {
-	gentity_t		*body;
-	int			contents;
+	gentity_t	*body;
+	uint32_t	contents;
 	int			islight = 0;
 
 	if (level.intermissiontime)

@@ -1061,7 +1061,7 @@ void BG_CycleForce( playerState_t *ps, int direction ) {
 
 	// if we found one, select it
 	if ( foundnext != -1 )
-		ps->fd.forcePowerSelected = foundnext;
+		ps->fd.forcePowerSelected = (unsigned)foundnext;
 }
 
 // Get the itemlist index from the tag and type
@@ -2231,17 +2231,13 @@ int BG_ModelCache(const char *modelName, const char *skinName)
 }
 
 #ifdef _GAME
-//Raz: 3mb? nah, 12mb!
-//	#define MAX_POOL_SIZE	3000000 //1024000
-	#define MAX_POOL_SIZE	12288000 //1024000
+	#define MAX_POOL_SIZE	(12*1024*1024) // 12mB, was 3mB
 	#define BGALLOCSTR "S"
-#elif defined _CGAME //don't need as much for cgame stuff. 2mb will be fine.
-//Raz: 8mb is fine, no?
-//	#define MAX_POOL_SIZE	2048000
-	#define MAX_POOL_SIZE	8192000
+#elif defined _CGAME
+	#define MAX_POOL_SIZE	(8*1024*1024) // 8mB, was 2mB
 	#define BGALLOCSTR "CG"
-#else //And for the ui the only thing we'll be using this for anyway is allocating anim data for g2 menu models
-	#define MAX_POOL_SIZE	512000
+#else
+	#define MAX_POOL_SIZE	(512*1024) // 512kB
 	#define BGALLOCSTR "UI"
 #endif
 
@@ -2250,13 +2246,13 @@ int BG_ModelCache(const char *modelName, const char *skinName)
 //with casted datatypes, which is why it is so large.
 
 
-static char		bg_pool[MAX_POOL_SIZE];
-static int		bg_poolSize = 0;
-static int		bg_poolTail = MAX_POOL_SIZE;
+static char			bg_pool[MAX_POOL_SIZE];
+static unsigned int	bg_poolSize = 0u;
+static unsigned int	bg_poolTail = MAX_POOL_SIZE;
 
 void *BG_Alloc ( int size )
 {
-	bg_poolSize = ((bg_poolSize + 0x00000003) & 0xfffffffc);
+	bg_poolSize = ((bg_poolSize + 0x00000003u) & 0xfffffffcu);
 
 	#ifdef _DEBUG
 	//	Com_Printf( "BG_Alloc: %i bytes from "BGALLOCSTR"\n", size );
@@ -2410,7 +2406,7 @@ qboolean GetCPD( bgEntity_t *self, uint32_t bit ) {
 #if defined(_GAME)
 	uint32_t cpd = ((gentity_t *)self)->client->pers.CPD;
 #elif defined(_CGAME)
-	uint32_t cpd = cp_pluginDisable.integer;
+	uint32_t cpd = (unsigned)cp_pluginDisable.integer;
 #else
 	uint32_t cpd = 0u;
 #endif

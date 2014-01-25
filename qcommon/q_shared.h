@@ -1758,10 +1758,10 @@ typedef struct playerState_s {
 	int			groundEntityNum;// ENTITYNUM_NONE = in air
 
 	int			legsTimer;		// don't change low priority animations until this runs out
-	unsigned int legsAnim;
+	int			legsAnim;
 
 	int			torsoTimer;		// don't change low priority animations until this runs out
-	unsigned int torsoAnim;
+	int			torsoAnim;
 
 	qboolean	legsFlip; //set to opposite when the same anim needs restarting, sent over in only 1 bit. Cleaner and makes porting easier than having that god forsaken ANIM_TOGGLEBIT.
 	qboolean	torsoFlip;
@@ -2254,10 +2254,10 @@ typedef struct entityState_s {
 	int		bolt2;
 
 	//rww - this is necessary for determining player visibility during a jedi mindtrick
-	int		trickedentindex; //0-15
-	int		trickedentindex2; //16-32
-	int		trickedentindex3; //33-48
-	int		trickedentindex4; //49-64
+	uint32_t	trickedentindex; //0-15
+	uint32_t	trickedentindex2; //16-32
+	uint32_t	trickedentindex3; //33-48
+	uint32_t	trickedentindex4; //49-64
 
 	float	speed;
 

@@ -150,7 +150,7 @@ static qboolean Grenadier_Move( void )
 		if ( (NPCInfo->scriptFlags&SCF_CHASE_ENEMIES) && NPC->client->ps.weapon == WP_THERMAL && NPCInfo->goalEntity && NPCInfo->goalEntity == NPC->enemy )
 		{//we were running after enemy
 			//Try to find a combat point that can hit the enemy
-			int cpFlags = (CP_CLEAR|CP_HAS_ROUTE);
+			uint32_t cpFlags = (CP_CLEAR|CP_HAS_ROUTE);
 			int cp;
 
 			if ( NPCInfo->scriptFlags&SCF_USE_CP_NEAREST )
