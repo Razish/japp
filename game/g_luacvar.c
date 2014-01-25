@@ -9,7 +9,7 @@ static const char CVAR_META[] = "Cvar.meta";
 //Retn: An Cvar object, creating one if necessary
 int JPLua_CreateCvar( lua_State *L ) {
 	const char *name = lua_tostring( L, 1 );
-	
+
 	trap->Cvar_Register( NULL, name, lua_tostring( L, 2 ), lua_tointeger( L, 3 ) );
 
 	JPLua_Cvar_CreateRef( L, name );
@@ -190,7 +190,19 @@ void JPLua_Register_Cvar( lua_State *L ) {
 	lua_pushvalue( L, -2 ); // Re-push metatable to top of stack
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
-	luaL_register( L, NULL, jplua_cvar_meta ); // Fill metatable with fields
+	// fill metatable with fields
+#if LUA_VERSION_NUM > 501
+	{
+		const luaL_Reg *r;
+		for ( r=jplua_cvar_meta; r->name; r++ ) {
+			lua_pushcfunction( L, r->func );
+			lua_setfield( L, -2, r->name );
+		}
+	}
+#else
+	luaL_register( L, NULL, jplua_cvar_meta );
+#endif
+
 	lua_pop( L, -1 ); // Pop the Cvar class metatable from the stack
 }
 

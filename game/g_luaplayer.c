@@ -479,7 +479,19 @@ void JPLua_Register_Player( lua_State *L ) {
 	lua_pushvalue( L, -2 ); // Re-push metatable to top of stack
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
-	luaL_register( L, NULL, jplua_player_meta ); // Fill metatable with fields
+	// fill metatable with fields
+#if LUA_VERSION_NUM > 501
+	{
+		const luaL_Reg *r;
+		for ( r=jplua_player_meta; r->name; r++ ) {
+			lua_pushcfunction( L, r->func );
+			lua_setfield( L, -2, r->name );
+		}
+	}
+#else
+	luaL_register( L, NULL, jplua_player_meta );
+#endif
+
 	lua_pop( L, -1 ); // Pop the Player class metatable from the stack
 }
 

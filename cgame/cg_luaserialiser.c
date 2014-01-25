@@ -76,7 +76,7 @@ void JPLua_Serialiser_IterateTableWrite( cJSON *parent, const char *name, lua_St
 		cJSON *item = cJSON_CreateObject();
 		int keyType = lua_type(L, -2);
 		int valueType = lua_type(L, -1);
-		
+
 		cJSON_AddIntegerToObject( item, "key_type", keyType );
 		if ( keyType == LUA_TSTRING )
 			cJSON_AddStringToObject( item, "key", lua_tostring( L, -2 ) );
@@ -122,7 +122,7 @@ void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_Sta
 		cJSON *item = cJSON_CreateObject();
 		int keyType = lua_type(L, -2);
 		int valueType = lua_type(L, -1);
-		
+
 		cJSON_AddIntegerToObject( item, "key_type", keyType );
 		if ( keyType == LUA_TSTRING )
 			cJSON_AddStringToObject( item, "key", lua_tostring( L, -2 ) );
@@ -165,7 +165,7 @@ int JPLua_Serialiser_AddTable( lua_State *L ) {
 	const char *tableName = NULL;
 	luaL_argcheck( L, lua_type( L, 2 ) == LUA_TSTRING, 2, "'string' expected" );
 	luaL_argcheck( L, lua_type( L, 3 ) == LUA_TTABLE, 3, "'table' expected" );
-	
+
 	tableName = lua_tostring( L, 2 );
 	JPLua_Serialiser_IterateTableWrite( serialiser->outRoot, tableName, L );
 
@@ -178,7 +178,7 @@ int JPLua_Serialiser_GetTable( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
 	const char *tableName = NULL;
 	luaL_argcheck( L, lua_type( L, 2 ) == LUA_TSTRING, 2, "'string' expected" );
-	
+
 	tableName = lua_tostring( L, 2 );
 	JPLua_Serialiser_IterateTableRead( serialiser->inRoot, tableName, L );
 
@@ -253,7 +253,19 @@ void JPLua_Register_Serialiser( lua_State *L ) {
 	lua_pushvalue( L, -2 ); // Re-push metatable to top of stack
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
-	luaL_register( L, NULL, jplua_serialiser_meta ); // Fill metatable with fields
+	// fill metatable with fields
+#if LUA_VERSION_NUM > 501
+	{
+		const luaL_Reg *r;
+		for ( r=jplua_serialiser_meta; r->name; r++ ) {
+			lua_pushcfunction( L, r->func );
+			lua_setfield( L, -2, r->name );
+		}
+	}
+#else
+	luaL_register( L, NULL, jplua_serialiser_meta );
+#endif
+
 	lua_pop( L, -1 ); // Pop the Serialiser class metatable from the stack
 }
 

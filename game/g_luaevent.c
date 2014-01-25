@@ -7,7 +7,7 @@
 //		EVENT HANDLERS
 //================================
 
-stringID_table_t jplua_events[JPLUA_EVENT_MAX] = 
+stringID_table_t jplua_events[JPLUA_EVENT_MAX] =
 {
 	ENUM2STRING(JPLUA_EVENT_UNLOAD),
 	ENUM2STRING(JPLUA_EVENT_RUNFRAME),
@@ -36,7 +36,7 @@ int JPLua_Event_AddListener( lua_State *L )
 	}
 
 	G_LogPrintf( "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
-	
+
 	return 0;
 }
 
@@ -62,7 +62,7 @@ int JPLua_Event_RemoveListener( lua_State *L )
 	}
 
 	G_LogPrintf( "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
-	
+
 	return 0;
 }
 
@@ -88,7 +88,7 @@ void JPLua_Event_Shutdown( void )
 		//RAZTODO: Refcount because multiple plugins can register the same command
 		while ( nextClientCmd )
 		{//Remove all console commands
-			lua_unref( JPLua.state, clientCmd->handle );
+			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, clientCmd->handle );
 			nextClientCmd = clientCmd->next;
 
 			free( clientCmd );
@@ -97,7 +97,7 @@ void JPLua_Event_Shutdown( void )
 
 		while ( nextServerCmd )
 		{//Remove all server commands
-			lua_unref( JPLua.state, serverCmd->handle );
+			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, serverCmd->handle );
 			nextServerCmd = serverCmd->next;
 
 			free( serverCmd );

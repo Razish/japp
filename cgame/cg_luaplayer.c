@@ -39,7 +39,7 @@ int JPLua_GetPlayer( lua_State *L ) {
 			int top=0;
 			lua_pushnil( L );
 			lua_pushstring( L, "Multiple matches" );
-			
+
 			lua_newtable( L );
 			top = lua_gettop( L );
 			for ( i=0; i<cgs.maxclients; i++ ) {
@@ -101,7 +101,7 @@ static int JPLua_Player_GetAngles( lua_State *L ) {
 	int top = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	vector3 angles = { 0.0f };
-	
+
 	if ( player->clientNum == cg.clientNum )
 		VectorCopy( &cg.predictedPlayerState.viewangles, &angles );
 	else
@@ -127,7 +127,7 @@ static int JPLua_Player_GetAnimations( lua_State *L ) {
 	int legsTimer = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 
-	
+
 	if ( player->clientNum == cg.clientNum ) {
 		torsoAnim = cg.predictedPlayerState.torsoAnim;
 		torsoTimer = cg.predictedPlayerState.torsoTimer;
@@ -138,7 +138,7 @@ static int JPLua_Player_GetAnimations( lua_State *L ) {
 		torsoAnim = cg_entities[player->clientNum].currentState.torsoAnim;
 		legsAnim = cg_entities[player->clientNum].currentState.legsAnim;
 	}
-		
+
 	lua_newtable( L );
 	top = lua_gettop( L );
 
@@ -176,7 +176,7 @@ static int JPLua_Player_GetClientInfo( lua_State *L ) {
 			break;
 		}
 	}
-	
+
 	lua_newtable( L );
 	top = lua_gettop( L );
 
@@ -229,7 +229,7 @@ static int JPLua_Player_GetClientInfo( lua_State *L ) {
 		lua_pushstring( L, "g" ); lua_pushnumber( L, es->customRGBA[1] ); lua_settable( L, top2 );
 		lua_pushstring( L, "b" ); lua_pushnumber( L, es->customRGBA[2] ); lua_settable( L, top2 );
 	lua_settable( L, top );
-	
+
 	return 1;
 }
 
@@ -346,7 +346,7 @@ static int JPLua_Player_GetPosition( lua_State *L ) {
 	int top = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	vector3 position = { 0.0f };
-	
+
 	if ( player->clientNum == cg.clientNum )
 		VectorCopy( &cg.predictedPlayerState.origin, &position );
 	else
@@ -379,7 +379,7 @@ static int JPLua_Player_GetVelocity( lua_State *L ) {
 	int top = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	vector3 velocity = { 0.0f };
-	
+
 	if ( player->clientNum == cg.clientNum )
 		VectorCopy( &cg.predictedPlayerState.velocity, &velocity );
 	else
@@ -506,7 +506,19 @@ void JPLua_Register_Player( lua_State *L ) {
 	lua_pushvalue( L, -2 ); // Re-push metatable to top of stack
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
-	luaL_register( L, NULL, jplua_player_meta ); // Fill metatable with fields
+	// fill metatable with fields
+#if LUA_VERSION_NUM > 501
+	{
+		const luaL_Reg *r;
+		for ( r=jplua_player_meta; r->name; r++ ) {
+			lua_pushcfunction( L, r->func );
+			lua_setfield( L, -2, r->name );
+		}
+	}
+#else
+	luaL_register( L, NULL, jplua_player_meta );
+#endif
+
 	lua_pop( L, -1 ); // Pop the Player class metatable from the stack
 }
 

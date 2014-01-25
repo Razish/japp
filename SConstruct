@@ -59,11 +59,13 @@ files = {}
 libs = {}
 
 files['lua'] = [
-	'lua/bit.c',
 	'lua/lapi.c',
 	'lua/lauxlib.c',
 	'lua/lbaselib.c',
+	'lua/lbitlib.c',
 	'lua/lcode.c',
+	'lua/lcorolib.c',
+	'lua/lctype.c',
 	'lua/ldblib.c',
 	'lua/ldebug.c',
 	'lua/ldo.c',
@@ -89,8 +91,7 @@ files['lua'] = [
 	'lua/lua.c',
 	'lua/lundump.c',
 	'lua/lvm.c',
-	'lua/lzio.c',
-	'lua/print.c' ]
+	'lua/lzio.c' ]
 
 files['udis86'] = [
 	'libudis86/decode.c',
