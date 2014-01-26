@@ -210,6 +210,17 @@ static int JPLua_Player_GetSaberStyle( lua_State *L ) {
 	return 1;
 }
 
+//Func: Player:GetScore()
+//Retn: wot score the playah got rite now m8
+static int JPLua_Player_GetScore( lua_State *L )
+{
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	lua_pushinteger( L, level.clients[player->clientNum].ps.persistant[PERS_SCORE] );
+
+	return 1;
+}
+
+
 //Func: Player:GetUserinfo()
 //Retn: Table of userinfo keys/values
 static int JPLua_Player_GetUserinfo( lua_State *L ) {
@@ -351,7 +362,42 @@ static int JPLua_Player_Kill( lua_State *L ) {
 	return 0;
 }
 
+//Func: Player:SetArmor()
+//Retn: N/A
+static int JPLua_Player_SetArmor( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+
+	level.clients[player->clientNum].ps.stats[STAT_ARMOR] = lua_tointeger(L, 2);
+
+	return 0;
+}
+
+//Func: Player:SetHealth()
+//Retn: N/A
+static int JPLua_Player_SetHealth( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+
+	ent->health = lua_tointeger(L, 2);
+
+	return 0;
+}
+
+//Func: Player:SetScore()
+//Retn: N/A
+static int JPLua_Player_SetScore( lua_State *L )
+{
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+
+	g_entities[player->clientNum].client->ps.persistant[PERS_SCORE] = lua_tointeger(L, 2);
+	
+	return 0;
+}
+
+
+
 //Func: Player:SetVelocity( x, y, z )
+//Retn: N/A
 static int JPLua_Player_SetVelocity( lua_State *L ) 
 {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
@@ -470,6 +516,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "GetName",			JPLua_Player_GetName },
 	{ "GetPosition",		JPLua_Player_GetPosition },
 	{ "GetSaberStyle",		JPLua_Player_GetSaberStyle },
+	{ "GetScore",			JPLua_Player_GetScore },
 	{ "GetUserinfo",		JPLua_Player_GetUserinfo },
 	{ "GetVelocity",		JPLua_Player_GetVelocity },
 	{ "GetWeapon",			JPLua_Player_GetWeapon },
@@ -480,6 +527,9 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "IsWeaponHolstered",	JPLua_Player_IsWeaponHolstered },
 	{ "Kick",				JPLua_Player_Kick },
 	{ "Kill",				JPLua_Player_Kill },
+	{ "SetArmor",			JPLua_Player_SetArmor },
+	{ "SetHealth",			JPLua_Player_SetHealth },
+	{ "SetScore",			JPLua_Player_SetScore },
 	{ "SetVelocity",		JPLua_Player_SetVelocity },
 	{ "TakeWeapon",			JPLua_Player_TakeWeapon },
 	{ "Teleport",			JPLua_Player_Teleport },
