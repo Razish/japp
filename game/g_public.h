@@ -5,7 +5,7 @@
 
 // g_public.h -- game module information visible to server
 
-#define Q3_INFINITE			16777216 
+#define Q3_INFINITE			16777216
 
 #define	GAME_API_VERSION	1
 
@@ -14,8 +14,8 @@
 // in entityStates (level eType), so the game must explicitly flag
 // special server behaviors
 #define	SVF_NOCLIENT			(0x00000001u) // don't send entity to clients, even if it has effects
-#define SVF_UNUSED00000002		(0x00000002u) // 
-#define SVF_UNUSED00000004		(0x00000004u) // 
+#define SVF_UNUSED00000002		(0x00000002u) //
+#define SVF_UNUSED00000004		(0x00000004u) //
 #define SVF_BOT					(0x00000008u) // set if the entity is a bot
 #define SVF_PLAYER_USABLE		(0x00000010u) // player can use this with the use button
 #define	SVF_BROADCAST			(0x00000020u) // send to all connected clients
@@ -26,25 +26,25 @@
 #define SVF_CAPSULE				(0x00000400u) // use capsule for collision detection instead of bbox
 #define SVF_NOTSINGLECLIENT		(0x00000800u) // send entity to everyone but one client (entityShared_t->singleClient)
 #define SVF_OWNERNOTSHARED		(0x00001000u) // If it's owned by something and another thing owned by that something hits it, it will still touch
-#define SVF_UNUSED00002000		(0x00002000u) // 
-#define SVF_UNUSED00004000		(0x00004000u) // 
+#define SVF_UNUSED00002000		(0x00002000u) //
+#define SVF_UNUSED00004000		(0x00004000u) //
 #define	SVF_ICARUS_FREEZE		(0x00008000u) // NPCs are frozen, ents don't execute ICARUS commands
-#define SVF_UNUSED00010000		(0x00010000u) // 
-#define SVF_UNUSED00020000		(0x00020000u) // 
-#define SVF_UNUSED00040000		(0x00040000u) // 
-#define SVF_UNUSED00080000		(0x00000000u) // 
-#define SVF_UNUSED00100000		(0x00100000u) // 
-#define SVF_UNUSED00200000		(0x00200000u) // 
-#define SVF_UNUSED00400000		(0x00400000u) // 
-#define SVF_UNUSED00800000		(0x00800000u) // 
-#define SVF_UNUSED01000000		(0x01000000u) // 
-#define SVF_UNUSED02000000		(0x02000000u) // 
-#define SVF_UNUSED04000000		(0x04000000u) // 
+#define SVF_UNUSED00010000		(0x00010000u) //
+#define SVF_UNUSED00020000		(0x00020000u) //
+#define SVF_UNUSED00040000		(0x00040000u) //
+#define SVF_UNUSED00080000		(0x00000000u) //
+#define SVF_UNUSED00100000		(0x00100000u) //
+#define SVF_UNUSED00200000		(0x00200000u) //
+#define SVF_UNUSED00400000		(0x00400000u) //
+#define SVF_UNUSED00800000		(0x00800000u) //
+#define SVF_UNUSED01000000		(0x01000000u) //
+#define SVF_UNUSED02000000		(0x02000000u) //
+#define SVF_UNUSED04000000		(0x04000000u) //
 #define SVF_GLASS_BRUSH			(0x08000000u) // Ent is a glass brush
 #define SVF_NO_BASIC_SOUNDS		(0x10000000u) // No basic sounds
 #define SVF_NO_COMBAT_SOUNDS	(0x20000000u) // No combat sounds
 #define SVF_NO_EXTRA_SOUNDS		(0x40000000u) // No extra or jedi sounds
-#define SVF_UNUSED80000000		(0x80000000u) // 
+#define SVF_UNUSED80000000		(0x80000000u) //
 
 //rww - ghoul2 trace flags
 #define G2TRFLAG_DOGHOULTRACE	(0x00000001u) //do the ghoul2 trace
@@ -73,7 +73,7 @@ typedef struct entityShared_s {
 	qboolean	bmodel;				// if false, assume an explicit mins / maxs bounding box
 									// only set by trap_SetBrushModel
 	vector3		mins, maxs;
-	int			contents;			// CONTENTS_TRIGGER, CONTENTS_SOLID, CONTENTS_BODY, etc
+	uint32_t	contents;			// CONTENTS_TRIGGER, CONTENTS_SOLID, CONTENTS_BODY, etc
 									// a non-solid entity should set to 0
 
 	vector3		absmin, absmax;		// derived from mins/maxs and origin + rotation
@@ -95,8 +95,7 @@ typedef struct entityShared_s {
 	// mask of clients that this entity should be broadcast too.  The first 32 clients
 	// are represented by the first array index and the latter 32 clients are represented
 	// by the second array index.
-	int			broadcastClients[2];
-
+	uint32_t	broadcastClients[2];
 } entityShared_t;
 
 //bstate.h
@@ -184,7 +183,7 @@ typedef enum //# bSet_e
 
 #define	MAX_PARMS	16
 #define	MAX_PARM_STRING_LENGTH	MAX_QPATH//was 16, had to lengthen it so they could take a valid file path
-typedef struct parms_s {	
+typedef struct parms_s {
 	char	parm[MAX_PARMS][MAX_PARM_STRING_LENGTH];
 } parms_t;
 
@@ -268,7 +267,7 @@ typedef struct T_G_ICARUS_SET_s {
 
 typedef struct T_G_ICARUS_LERP2POS_s {
 	int taskID;
-	int entID; 
+	int entID;
 	vector3 origin;
 	vector3 angles;
 	float duration;
@@ -788,7 +787,7 @@ typedef enum gameExportLegacy_e {
 	GAME_NAV_ENTISBREAKABLE,
 	GAME_NAV_ENTISREMOVABLEUSABLE,
 	GAME_NAV_FINDCOMBATPOINTWAYPOINTS,
-	
+
 	GAME_GETITEMINDEXBYTAG
 } gameExportLegacy_t;
 
@@ -840,7 +839,7 @@ typedef struct gameImport_s {
 	qboolean	(*InPVSIgnorePortals)					( const vector3 *p1, const vector3 *p2 );
 	void		(*LinkEntity)							( sharedEntity_t *ent );
 	void		(*LocateGameData)						( sharedEntity_t *gEnts, int numGEntities, int sizeofGEntity_t, playerState_t *clients, int sizeofGClient );
-	int			(*PointContents)						( const vector3 *point, int passEntityNum );
+	uint32_t	(*PointContents)						( const vector3 *point, int passEntityNum );
 	void		(*SendConsoleCommand)					( int exec_when, const char *text );
 	void		(*SendServerCommand)					( int clientNum, const char *text );
 	void		(*SetBrushModel)						( sharedEntity_t *ent, const char *name );
@@ -923,7 +922,7 @@ typedef struct gameImport_s {
 	void		(*Nav_FlagAllNodes)						( int newFlag );
 	qboolean	(*Nav_GetPathsCalculated)				( void );
 	void		(*Nav_SetPathsCalculated)				( qboolean newVal );
-	
+
 	// botlib
 	int			(*BotAllocateClient)					( void );
 	void		(*BotFreeClient)						( int clientNum );
@@ -1016,7 +1015,7 @@ typedef struct gameImport_s {
 	void		(*BotUserCommand)						( int clientNum, usercmd_t *ucmd );
 	void		(*BotUpdateWaypoints)					( int wpnum, wpobject_t **wps );
 	void		(*BotCalculatePaths)					( int rmg );
-	
+
 	// area awareness system
 	int			(*AAS_EnableRoutingArea)				( int areanum, int enable );
 	int			(*AAS_BBoxAreas)						( vector3 *absmins, vector3 *absmaxs, int *areas, int maxareas );
@@ -1027,7 +1026,7 @@ typedef struct gameImport_s {
 	float		(*AAS_Time)								( void );
 	int			(*AAS_PointAreaNum)						( vector3 *point );
 	int			(*AAS_TraceAreas)						( vector3 *start, vector3 *end, int *areas, vector3 *points, int maxareas );
-	int			(*AAS_PointContents)					( vector3 *point );
+	uint32_t	(*AAS_PointContents)					( vector3 *point );
 	int			(*AAS_NextBSPEntity)					( int ent );
 	int			(*AAS_ValueForBSPEpairKey)				( int ent, char *key, char *value, int size );
 	int			(*AAS_VectorForBSPEpairKey)				( int ent, char *key, vector3 *v );
@@ -1040,10 +1039,10 @@ typedef struct gameImport_s {
 	int			(*AAS_AlternativeRouteGoals)			( vector3 *start, int startareanum, vector3 *goal, int goalareanum, uint32_t travelflags, void *altroutegoals, int maxaltroutegoals, int type );
 	int			(*AAS_PredictRoute)						( void *route, int areanum, vector3 *origin, int goalareanum, uint32_t travelflags, int maxareas, int maxtime, int stopevent, int stopcontents, int stoptfl, int stopareanum );
 	int			(*AAS_PointReachabilityAreaIndex)		( vector3 *point );
-	
+
 	// elementary action
 	void		(*EA_Say)								( int client, char *str );
-	void		(*EA_SayTeam)							( int client, char *str );
+	void		(*EA_SayTeam)							( int client, const char *str );
 	void		(*EA_Command)							( int client, char *command );
 	void		(*EA_Action)							( int client, int action );
 	void		(*EA_Gesture)							( int client );
@@ -1068,7 +1067,7 @@ typedef struct gameImport_s {
 	void		(*EA_EndRegular)						( int client, float thinktime );
 	void		(*EA_GetInput)							( int client, float thinktime, void *input );
 	void		(*EA_ResetInput)						( int client );
-	
+
 	// botlib preprocessor
 	int			(*PC_LoadSource)						( const char *filename );
 	int			(*PC_FreeSource)						( int handle );

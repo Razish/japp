@@ -16,7 +16,7 @@ typedef enum vehicleType_e
 	VH_NUM_VEHICLES
 } vehicleType_t;
 
-typedef enum	
+typedef enum
 {
 	WPOSE_NONE	= 0,
 	WPOSE_BLASTER,
@@ -230,7 +230,7 @@ typedef struct vehicleInfo_s
 	// Which weapon a muzzle fires (has to match one of the weapons this vehicle has). So 1 would be weapon 1,
 	// 2 would be weapon 2 and so on.
 	int			weapMuzzle[MAX_VEHICLE_MUZZLES];
-	
+
 	//turrets (if any) on the vehicle
 	turretStats_t	turret[MAX_VEHICLE_TURRETS];
 
@@ -310,17 +310,17 @@ typedef struct vehicleInfo_s
 	qboolean (*Eject)( Vehicle_t *pVeh, bgEntity_t *pEnt, qboolean forceEject );
 
 	// Eject all the inhabitants of this vehicle.
-	qboolean (*EjectAll)( Vehicle_t *pVeh );	
+	qboolean (*EjectAll)( Vehicle_t *pVeh );
 
 	// Start a delay until the vehicle dies.
 	void (*StartDeathDelay)( Vehicle_t *pVeh, int iDelayTime );
 
 	// Update death sequence.
 	void (*DeathUpdate)( Vehicle_t *pVeh );
-	
+
 	// Register all the assets used by this vehicle.
 	void (*RegisterAssets)( Vehicle_t *pVeh );
-	
+
 	// Initialize the vehicle (should be called by Spawn?).
 	qboolean (*Initialize)( Vehicle_t *pVeh );
 
@@ -337,7 +337,7 @@ typedef struct vehicleInfo_s
 
 	// ProcessOrientCommands the Vehicle.
 	void (*ProcessOrientCommands)( Vehicle_t *pVeh );
-	
+
 	// Attachs all the riders of this vehicle to their appropriate position/tag (*driver, *pass1, *pass2, whatever...).
 	void (*AttachRiders)( Vehicle_t *pVeh );
 
@@ -398,23 +398,27 @@ extern int	numVehicles;
 
 typedef enum
 {
-	VEH_EJECT_LEFT, 
-	VEH_EJECT_RIGHT, 
-	VEH_EJECT_FRONT, 
-	VEH_EJECT_REAR, 
-	VEH_EJECT_TOP, 
+	VEH_EJECT_LEFT,
+	VEH_EJECT_RIGHT,
+	VEH_EJECT_FRONT,
+	VEH_EJECT_REAR,
+	VEH_EJECT_TOP,
 	VEH_EJECT_BOTTOM
 } vehEject_t;
 
 // Vehicle flags.
-typedef enum
-{
-	VEH_NONE = 0, VEH_FLYING = 0x00000001, VEH_CRASHING = 0x00000002,
-	VEH_LANDING = 0x00000004, VEH_BUCKING = 0x00000010, VEH_WINGSOPEN = 0x00000020,
-	VEH_GEARSOPEN = 0x00000040, VEH_SLIDEBREAKING = 0x00000080, VEH_SPINNING = 0x00000100,
-	VEH_OUTOFCONTROL = 0x00000200,
-	VEH_SABERINLEFTHAND = 0x00000400
-} vehFlags_t;
+#define VEH_NONE			(0x0000u)
+#define VEH_FLYING			(0x0001u)
+#define VEH_CRASHING		(0x0002u)
+#define VEH_LANDING			(0x0004u)
+#define VEH_UNUSED0008		(0x0008u)
+#define VEH_BUCKING			(0x0010u)
+#define VEH_WINGSOPEN		(0x0020u)
+#define VEH_GEARSOPEN		(0x0040u)
+#define VEH_SLIDEBREAKING	(0x0080u)
+#define VEH_SPINNING		(0x0100u)
+#define VEH_OUTOFCONTROL	(0x0200u)
+#define VEH_SABERINLEFTHAND	(0x0400u)
 
 //defines for impact damage surface stuff
 #define	SHIPSURF_FRONT		0
@@ -523,7 +527,7 @@ typedef struct Vehicle_s
 	vector3 m_vMuzzlePos[MAX_VEHICLE_MUZZLES], m_vMuzzleDir[MAX_VEHICLE_MUZZLES];
 
 	// This is how long to wait before being able to fire a specific muzzle again. This is based on the firing rate
-	// so that a firing rate of 10 rounds/sec would make this value initially 100 miliseconds. 
+	// so that a firing rate of 10 rounds/sec would make this value initially 100 miliseconds.
 	int m_iMuzzleWait[MAX_VEHICLE_MUZZLES];
 
 	// The user commands structure.
@@ -547,7 +551,7 @@ typedef struct Vehicle_s
 	//to make it a pointer to a vector3 in the playerstate for prediction's sake. -rww
 
 	// How long you have strafed left or right (increments every frame that you strafe to right, decrements every frame you strafe left)
-	int			m_fStrafeTime;	
+	int			m_fStrafeTime;
 
 	// Previous angles of this vehicle.
 	vector3		m_vPrevOrientation;
@@ -568,7 +572,7 @@ typedef struct Vehicle_s
 	int			m_iHitDebounce;
 
 	// Timer for all cgame-FX...? ex: exhaust?
-	int			m_iLastFXTime; 
+	int			m_iLastFXTime;
 
 	// When to die.
 	int			m_iDieTime;
@@ -588,8 +592,8 @@ typedef struct Vehicle_s
 	int			m_iLastImpactDmg;
 
 	//bitflag of surfaces that have broken off
-	int			m_iRemovedSurfaces;
-	
+	uint32_t	m_iRemovedSurfaces;
+
 	int			m_iDmgEffectTime;
 
 	// the last time this vehicle fired a turbo burst

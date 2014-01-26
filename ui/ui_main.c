@@ -93,8 +93,8 @@ const char *datapadMoveTitleBaseAnims[MD_MOVE_TITLE_MAX] =
 
 typedef struct datpadmovedata_s
 {
-	const char	*title;	
-	const char	*desc;	
+	const char	*title;
+	const char	*desc;
 	const char	*anim;
 	short	sound;
 } datpadmovedata_t;
@@ -242,7 +242,7 @@ models/players/visor/animation.cfg, etc
 ======================
 */
 static char UIPAFtext[60000];
-int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean isHumanoid) 
+int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean isHumanoid)
 {
 	char		*text_p;
 	int			len;
@@ -299,7 +299,7 @@ int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 	if (!UIPAFtextLoaded || !isHumanoid)
 	{ //rww - We are always using the same animation config now. So only load it once.
 		len = trap->FS_Open( filename, &f, FS_READ );
-		if ( (len <= 0) || (len >= (signed)sizeof( UIPAFtext ) - 1) ) 
+		if ( (len <= 0) || (len >= (signed)sizeof( UIPAFtext ) - 1) )
 		{
 			if (len > 0)
 			{
@@ -335,11 +335,11 @@ int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 	COM_BeginParseSession ("UI_ParseAnimationFile");
 
 	// read information for each frame
-	while(1) 
+	while(1)
 	{
 		token = COM_Parse( (const char **)(&text_p) );
 
-		if ( !token || !token[0]) 
+		if ( !token || !token[0])
 		{
 			break;
 		}
@@ -354,33 +354,33 @@ int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 		}
 
 		token = COM_Parse( (const char **)(&text_p) );
-		if ( !token ) 
+		if ( !token )
 		{
 			break;
 		}
 		animset[animNum].firstFrame = atoi( token );
 
 		token = COM_Parse( (const char **)(&text_p) );
-		if ( !token ) 
+		if ( !token )
 		{
 			break;
 		}
 		animset[animNum].numFrames = atoi( token );
 
 		token = COM_Parse( (const char **)(&text_p) );
-		if ( !token ) 
+		if ( !token )
 		{
 			break;
 		}
 		animset[animNum].loopFrames = atoi( token );
 
 		token = COM_Parse( (const char **)(&text_p) );
-		if ( !token ) 
+		if ( !token )
 		{
 			break;
 		}
 		fps = atof( token );
-		if ( fps == 0 ) 
+		if ( fps == 0 )
 		{
 			fps = 1;//Don't allow divide by zero error
 		}
@@ -400,7 +400,7 @@ int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 	//Check the array, and print the ones that have nothing in them.
 	/*
 	for(i = 0; i < MAX_ANIMATIONS; i++)
-	{	
+	{
 		if (animTable[i].name != NULL)		// This animation reference exists.
 		{
 			if (animset[i].firstFrame <= 0 && animset[i].numFrames <=0)
@@ -445,7 +445,7 @@ int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean i
 void Menu_ShowItemByName(menuDef_t *menu, const char *p, qboolean bShow);
 
 
-void UpdateForceUsed();
+void UpdateForceUsed( void );
 
 char holdSPString[MAX_STRING_CHARS]={0};
 
@@ -541,7 +541,7 @@ static const char *GetCRDelineatedString( const char *psStripFileRef, const char
 static const char *GetMonthAbbrevString( int iMonth )
 {
 	const char *p = GetCRDelineatedString("MP_INGAME","MONTHS", iMonth);
-	
+
 	return p ? p : "Jan";	// sanity
 }
 
@@ -592,7 +592,7 @@ void AssetCache( void ) {
 	uiInfo.uiDC.Assets.forceRestrict	= trap->R_RegisterShaderNoMip( "gfx/menus/forcerestrict" );
 	uiInfo.uiDC.Assets.saberOnly		= trap->R_RegisterShaderNoMip( "gfx/menus/saberonly" );
 	uiInfo.uiDC.Assets.trueJedi			= trap->R_RegisterShaderNoMip( "gfx/menus/truejedi" );
-							
+
 	for( n = 0; n < NUM_CROSSHAIRS; n++ ) {
 		uiInfo.uiDC.Assets.crosshairShader[n] = trap->R_RegisterShaderNoMip( va("gfx/2d/crosshair%c", 'a' + n ) );
 	}
@@ -642,14 +642,14 @@ int MenuFontToHandle(int iMenuFont)
 	return uiInfo.uiDC.Assets.qhMediumFont;	// 0;
 }
 
-float Text_Width(const char *text, float scale, int iMenuFont) 
-{	
+float Text_Width(const char *text, float scale, int iMenuFont)
+{
 	int iFontIndex = MenuFontToHandle(iMenuFont);
 
 	return trap->R_Font_StrLenPixels(text, iFontIndex, scale);
 }
 
-float Text_Height(const char *text, float scale, int iMenuFont) 
+float Text_Height(const char *text, float scale, int iMenuFont)
 {
 	int iFontIndex = MenuFontToHandle(iMenuFont);
 
@@ -663,7 +663,7 @@ void Text_Paint(float x, float y, float scale, const vector4 *color, const char 
 	int iFontIndex = MenuFontToHandle(iMenuFont);
 	//
 	// kludge.. convert JK2 menu styles to SOF2 printstring ctrl codes...
-	//	
+	//
 	switch (style)
 	{
 	case  ITEM_TEXTSTYLE_NORMAL:			iStyleOR = 0;break;					// JK2 normal text
@@ -686,7 +686,7 @@ void Text_Paint(float x, float y, float scale, const vector4 *color, const char 
 }
 
 
-void Text_PaintWithCursor(float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont) 
+void Text_PaintWithCursor(float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont)
 {
 	Text_Paint(x, y, scale, color, text, 0, limit, style, iMenuFont);
 
@@ -699,12 +699,12 @@ void Text_PaintWithCursor(float x, float y, float scale, const vector4 *color, c
 		iCopyCount = min( iCopyCount, sizeof( sTemp ) );
 
 		// copy text into temp buffer for pixel measure...
-		//			
+		//
 		strncpy(sTemp,text,iCopyCount);
 		sTemp[iCopyCount] = '\0';
 
 		{
-			int iFontIndex = MenuFontToHandle( iMenuFont );	
+			int iFontIndex = MenuFontToHandle( iMenuFont );
 			float iNextXpos  = trap->R_Font_StrLenPixels(sTemp, iFontIndex, scale );
 
 			Text_Paint(x+iNextXpos, y, scale, color, va("%c",cursor), 0, limit, style|ITEM_TEXTSTYLE_BLINK, iMenuFont);
@@ -715,7 +715,7 @@ void Text_PaintWithCursor(float x, float y, float scale, const vector4 *color, c
 
 // maxX param is initially an X limit, but is also used as feedback. 0 = text was clipped to fit within, else maxX = next pos
 //
-static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const vector4 *color, const char* text, float adjust, int limit, int iMenuFont) 
+static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const vector4 *color, const char* text, float adjust, int limit, int iMenuFont)
 {
 	// this is kinda dirty, but...
 	//
@@ -734,7 +734,7 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const v
 		char *psOutLastGood = psOut;
 		unsigned int uiLetter;
 
-		while (*psText && (x + trap->R_Font_StrLenPixels(sTemp, iFontIndex, scale)<=*maxX) 
+		while (*psText && (x + trap->R_Font_StrLenPixels(sTemp, iFontIndex, scale)<=*maxX)
 			&& psOut < &sTemp[sizeof(sTemp)-1]	// sanity
 		)
 		{
@@ -763,12 +763,12 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const v
 	{
 		// whole text fits fine, so print it all...
 		//
-		*maxX = x + iPixelLen;	// feedback the next position, as the caller expects		
+		*maxX = x + iPixelLen;	// feedback the next position, as the caller expects
 		Text_Paint(x, y, scale, color, text, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont);
 	}
 }
 
-void UI_LoadNonIngame() {
+void UI_LoadNonIngame( void ) {
 	const char *menuSet = UI_Cvar_VariableString("ui_menuFilesMP");
 	if (menuSet == NULL || menuSet[0] == '\0') {
 		menuSet = "ui/jampmenus.txt";
@@ -782,7 +782,7 @@ void UI_LoadNonIngame() {
 UI_BuildPlayerList
 ===============
 */
-static void UI_BuildPlayerList() {
+static void UI_BuildPlayerList( void ) {
 	uiClientState_t	cs;
 	int		n, count, team, team2;
 	char	info[MAX_INFO_STRING];
@@ -863,13 +863,13 @@ void UI_SetActiveMenu( uiMenuCommand_t menu ) {
 				Menus_ActivateByName("main");
 				trap->Cvar_VariableStringBuffer("com_errorMessage", buf, sizeof(buf));
 
-				if (buf[0]) 
+				if (buf[0])
 				{
-					if (!ui_singlePlayerActive.integer) 
+					if (!ui_singlePlayerActive.integer)
 					{
 						Menus_ActivateByName("error_popmenu");
-					} 
-					else 
+					}
+					else
 					{
 						trap->Cvar_Set("com_errorMessage", "");
 					}
@@ -959,7 +959,6 @@ void UI_DrawCenteredPic(qhandle_t image, int w, int h) {
 int frameCount = 0;
 int startTime;
 
-static void UI_BuildPlayerList();
 char parsedFPMessage[1024];
 
 extern int FPMessageTime;
@@ -1046,7 +1045,7 @@ qboolean Asset_Parse(int handle) {
 			int pointSize;
 			if (!trap->PC_ReadToken(handle, &token) || !PC_Int_Parse(handle,&pointSize)) {
 				return qfalse;
-			}			
+			}
 			//trap->R_RegisterFont(tempStr, pointSize, &uiInfo.uiDC.Assets.textFont);
 			uiInfo.uiDC.Assets.qhMediumFont = trap->R_RegisterFont(token.string);
 			uiInfo.uiDC.Assets.fontRegistered = qtrue;
@@ -1094,7 +1093,7 @@ qboolean Asset_Parse(int handle) {
 		}
 #endif
 
-		if (Q_stricmp(token.string, "cursor") == 0) 
+		if (Q_stricmp(token.string, "cursor") == 0)
 		{
 			if (!PC_String_Parse(handle, &uiInfo.uiDC.Assets.cursorStr))
 			{
@@ -1193,7 +1192,7 @@ qboolean Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "moveRollSound") == 0) 
+		if (Q_stricmp(token.string, "moveRollSound") == 0)
 		{
 			if (trap->PC_ReadToken(handle,&token))
 			{
@@ -1202,7 +1201,7 @@ qboolean Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "moveJumpSound") == 0) 
+		if (Q_stricmp(token.string, "moveJumpSound") == 0)
 		{
 			if (trap->PC_ReadToken(handle,&token))
 			{
@@ -1211,7 +1210,7 @@ qboolean Asset_Parse(int handle) {
 
 			continue;
 		}
-		if (Q_stricmp(token.string, "datapadmoveSaberSound1") == 0) 
+		if (Q_stricmp(token.string, "datapadmoveSaberSound1") == 0)
 		{
 			if (trap->PC_ReadToken(handle,&token))
 			{
@@ -1221,7 +1220,7 @@ qboolean Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "datapadmoveSaberSound2") == 0) 
+		if (Q_stricmp(token.string, "datapadmoveSaberSound2") == 0)
 		{
 			if (trap->PC_ReadToken(handle,&token))
 			{
@@ -1231,7 +1230,7 @@ qboolean Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "datapadmoveSaberSound3") == 0) 
+		if (Q_stricmp(token.string, "datapadmoveSaberSound3") == 0)
 		{
 			if (trap->PC_ReadToken(handle,&token))
 			{
@@ -1241,7 +1240,7 @@ qboolean Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "datapadmoveSaberSound4") == 0) 
+		if (Q_stricmp(token.string, "datapadmoveSaberSound4") == 0)
 		{
 			if (trap->PC_ReadToken(handle,&token))
 			{
@@ -1251,7 +1250,7 @@ qboolean Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "datapadmoveSaberSound5") == 0) 
+		if (Q_stricmp(token.string, "datapadmoveSaberSound5") == 0)
 		{
 			if (trap->PC_ReadToken(handle,&token))
 			{
@@ -1261,7 +1260,7 @@ qboolean Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "datapadmoveSaberSound6") == 0) 
+		if (Q_stricmp(token.string, "datapadmoveSaberSound6") == 0)
 		{
 			if (trap->PC_ReadToken(handle,&token))
 			{
@@ -1275,12 +1274,12 @@ qboolean Asset_Parse(int handle) {
 		if (Q_stricmp(token.string, "precacheSound") == 0)
 		{
 			const char *tempStr;
-			if (PC_Script_Parse(handle, &tempStr)) 
+			if (PC_Script_Parse(handle, &tempStr))
 			{
 				char *soundFile;
 				do
 				{
-					soundFile = COM_ParseExt(&tempStr, qfalse);	
+					soundFile = COM_ParseExt(&tempStr, qfalse);
 					if (soundFile[0] != 0 && soundFile[0] != ';') {
 						trap->S_RegisterSound( soundFile);
 					}
@@ -1357,7 +1356,7 @@ qboolean Load_Menu(int handle) {
 
 		if (!trap->PC_ReadToken(handle, &token))
 			return qfalse;
-	
+
 		if ( token.string[0] == 0 ) {
 			return qfalse;
 		}
@@ -1366,7 +1365,7 @@ qboolean Load_Menu(int handle) {
 			return qtrue;
 		}
 
-		UI_ParseMenu(token.string); 
+		UI_ParseMenu(token.string);
 	}
 	return qfalse;
 }
@@ -1501,14 +1500,14 @@ static void UI_SetCapFragLimits(qboolean uiVars) {
 }
 
 // ui_gameType assumes gametype 0 is -1 ALL and will not show
-static void UI_DrawGameType(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont) 
+static void UI_DrawGameType(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont)
 {
 	Text_Paint(rect->x, rect->y, scale, color, BG_GetGametypeString(uiInfo.gameTypes[ui_gameType.integer].gtEnum), 0, 0, textStyle, iMenuFont);
 }
 
-static void UI_DrawNetGameType(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont) 
+static void UI_DrawNetGameType(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont)
 {
-	if (ui_netGameType.integer < 0 || ui_netGameType.integer >= uiInfo.numGameTypes) 
+	if (ui_netGameType.integer < 0 || ui_netGameType.integer >= uiInfo.numGameTypes)
 	{
 		trap->Cvar_Set("ui_netGameType", "0");
 		trap->Cvar_Update(&ui_netGameType);
@@ -1546,9 +1545,9 @@ static void UI_DrawAutoSwitch(rectDef_t *rect, float scale, const vector4 *color
 	}
 }
 
-static void UI_DrawJoinGameType(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont) 
+static void UI_DrawJoinGameType(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont)
 {
-	if (ui_joinGameType.integer < 0 || ui_joinGameType.integer > uiInfo.numJoinGameTypes) 
+	if (ui_joinGameType.integer < 0 || ui_joinGameType.integer > uiInfo.numJoinGameTypes)
 	{
 		trap->Cvar_Set("ui_joinGameType", "0");
 		trap->Cvar_Update(&ui_joinGameType);
@@ -1580,13 +1579,13 @@ static void UI_DrawSkill(rectDef_t *rect, float scale, const vector4 *color, int
 	Text_Paint(rect->x, rect->y, scale, color, (char *)UI_GetStringEdString("MP_INGAME", (char *)skillLevels[i-1]),0, 0, textStyle, iMenuFont);
 }
 
-static void UI_DrawGenericNum(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min, int max, int type,int iMenuFont) 
+static void UI_DrawGenericNum(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min, int max, int type,int iMenuFont)
 {
 	int i;
 	char s[256];
 
 	i = val;
-	if (i < min || i > max) 
+	if (i < min || i > max)
 	{
 		i = min;
 	}
@@ -1719,7 +1718,7 @@ qboolean UI_HasSetSaberOnly( const char *info, const int gametype )
 	int wDisable = 0;
 
 	if ( gametype == GT_JEDIMASTER )
-	{ //set to 0 
+	{ //set to 0
 		return qfalse;
 	}
 
@@ -1782,9 +1781,9 @@ qboolean UI_TrueJediEnabled( void )
 	gametype = atoi(Info_ValueForKey(info, "g_gametype"));
 	saberOnly = UI_HasSetSaberOnly(info, gametype);
 
-	if ( gametype == GT_HOLOCRON 
-		|| gametype == GT_JEDIMASTER 
-		|| saberOnly 
+	if ( gametype == GT_HOLOCRON
+		|| gametype == GT_JEDIMASTER
+		|| saberOnly
 		|| allForceDisabled )
 	{
 		trueJedi = 0;
@@ -1801,11 +1800,11 @@ static void UI_DrawJediNonJedi(rectDef_t *rect, float scale, const vector4 *colo
 	int i;
 	char s[256];
 	//menuDef_t *menu;
-	
+
 	char info[MAX_INFO_VALUE];
 
 	i = val;
-	if (i < min || i > max) 
+	if (i < min || i > max)
 	{
 		i = min;
 	}
@@ -1834,7 +1833,7 @@ static void UI_DrawTeamName(rectDef_t *rect, float scale, const vector4 *color, 
 	}
 }
 
-static void UI_DrawTeamMember(rectDef_t *rect, float scale, const vector4 *color, qboolean blue, int num, int textStyle, int iMenuFont) 
+static void UI_DrawTeamMember(rectDef_t *rect, float scale, const vector4 *color, qboolean blue, int num, int textStyle, int iMenuFont)
 {
 	// 0 - None
 	// 1 - Human
@@ -1921,7 +1920,7 @@ static void UI_DrawMapPreview(rectDef_t *rect, float scale, const vector4 *color
 }
 
 static void UI_DrawMapCinematic(rectDef_t *rect, float scale, const vector4 *color, qboolean net) {
-	int map = (net) ? ui_currentNetMap.integer : ui_currentMap.integer; 
+	int map = (net) ? ui_currentNetMap.integer : ui_currentMap.integer;
 	if (map < 0 || map > uiInfo.mapCount) {
 		if (net) {
 			trap->Cvar_Set("ui_currentNetMap", "0");
@@ -1995,12 +1994,12 @@ static void UI_SetForceDisabled(int force)
 		}
 	}
 }
-// The game type on create server has changed - make the HUMAN/BOTS fields active 
+// The game type on create server has changed - make the HUMAN/BOTS fields active
 void UpdateBotButtons(void)
 {
 	menuDef_t *menu;
 
-	menu = Menu_GetFocused();	
+	menu = Menu_GetFocused();
 
 	if (!menu)
 	{
@@ -2020,7 +2019,7 @@ void UpdateBotButtons(void)
 
 }
 
-void UpdateForceStatus()
+void UpdateForceStatus( void )
 {
 	menuDef_t *menu;
 
@@ -2103,7 +2102,7 @@ void UpdateForceStatus()
 			if (atoi(Info_ValueForKey(info, "g_gametype")) >= GT_TEAM)
 			{	// This is a team-based game.
 				Menu_ShowItemByName(menu, "playerforcespectate", qtrue);
-				
+
 				// This is disabled, always show both sides from spectator.
 				if ( 0 && atoi(Info_ValueForKey(info, "g_forceBasedTeams")))
 				{	// Show red or blue based on what side is chosen.
@@ -2204,7 +2203,7 @@ static void UI_DrawNetMapCinematic(rectDef_t *rect, float scale, const vector4 *
 	}
 }
 
-static void UI_DrawNetFilter(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont) 
+static void UI_DrawNetFilter(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont)
 {
 	trap->SE_GetStringTextString("MENUS_GAME", holdSPString, sizeof(holdSPString));
 
@@ -2230,9 +2229,9 @@ static void UI_DrawOpponent(rectDef_t *rect) {
   char team[256];
 	vector3	viewangles;
 	vector3	moveangles;
-  
+
 	if (updateOpponentModel) {
-		
+
 		strcpy(model, UI_Cvar_VariableString("ui_opponentModel"));
 	  strcpy(headmodel, UI_Cvar_VariableString("ui_opponentModel"));
 		team[0] = '\0';
@@ -2472,7 +2471,7 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
   return 0;
 }
 
-static void UI_DrawBotName(rectDef_t *rect, float scale, const vector4 *color, int textStyle,int iMenuFont) 
+static void UI_DrawBotName(rectDef_t *rect, float scale, const vector4 *color, int textStyle,int iMenuFont)
 {
 	int value = uiInfo.botIndex;
 	const char *text = "";
@@ -2483,15 +2482,15 @@ static void UI_DrawBotName(rectDef_t *rect, float scale, const vector4 *color, i
 	Text_Paint(rect->x, rect->y, scale, color, text, 0, 0, textStyle,iMenuFont);
 }
 
-static void UI_DrawBotSkill(rectDef_t *rect, float scale, const vector4 *color, int textStyle,int iMenuFont) 
+static void UI_DrawBotSkill(rectDef_t *rect, float scale, const vector4 *color, int textStyle,int iMenuFont)
 {
-	if (uiInfo.skillIndex < numSkillLevels) 
+	if (uiInfo.skillIndex < numSkillLevels)
 	{
 		Text_Paint(rect->x, rect->y, scale, color, (char *)UI_GetStringEdString("MP_INGAME", (char *)skillLevels[uiInfo.skillIndex]), 0, 0, textStyle,iMenuFont);
 	}
 }
 
-static void UI_DrawRedBlue(rectDef_t *rect, float scale, const vector4 *color, int textStyle,int iMenuFont) 
+static void UI_DrawRedBlue(rectDef_t *rect, float scale, const vector4 *color, int textStyle,int iMenuFont)
 {
 	Text_Paint(rect->x, rect->y, scale, color, (uiInfo.redBlue == 0) ? UI_GetStringEdString("MP_INGAME","RED") : UI_GetStringEdString("MP_INGAME","BLUE"), 0, 0, textStyle,iMenuFont);
 }
@@ -2517,21 +2516,21 @@ static void UI_DrawSelectedPlayer(rectDef_t *rect, float scale, const vector4 *c
 	Text_Paint(rect->x, rect->y, scale, color, UI_Cvar_VariableString("cg_selectedPlayerName"), 0, 0, textStyle, iMenuFont);
 }
 
-static void UI_DrawServerRefreshDate(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont) 
+static void UI_DrawServerRefreshDate(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont)
 {
-	if (uiInfo.serverStatus.refreshActive) 
+	if (uiInfo.serverStatus.refreshActive)
 	{
 		vector4 lowLight, newColor;
-		lowLight.r = 0.8 * color->r; 
-		lowLight.g = 0.8 * color->g; 
-		lowLight.b = 0.8 * color->b; 
-		lowLight.a = 0.8 * color->a; 
+		lowLight.r = 0.8 * color->r;
+		lowLight.g = 0.8 * color->g;
+		lowLight.b = 0.8 * color->b;
+		lowLight.a = 0.8 * color->a;
 		LerpColor(color,&lowLight,&newColor,0.5+0.5*sin((float)(uiInfo.uiDC.realTime / PULSE_DIVISOR)));
 
 		trap->SE_GetStringTextString("MP_INGAME_GETTINGINFOFORSERVERS", holdSPString, sizeof(holdSPString));
 		Text_Paint(rect->x, rect->y, scale, &newColor, va((char *) holdSPString, trap->LAN_GetServerCount(ui_netSource.integer)), 0, 0, textStyle, iMenuFont);
-	} 
-	else 
+	}
+	else
 	{
 		char buff[64];
 		Q_strncpyz(buff, UI_Cvar_VariableString(va("ui_lastServerRefresh_%i", ui_netSource.integer)), 64);
@@ -2583,10 +2582,10 @@ static void UI_DrawServerMOTD(rectDef_t *rect, float scale, const vector4 *color
 		}
 
 		maxX = rect->x + rect->w - 2;
-		Text_Paint_Limit(&maxX, uiInfo.serverStatus.motdPaintX, rect->y + rect->h - 3, scale, color, &uiInfo.serverStatus.motd[uiInfo.serverStatus.motdOffset], 0, 0, iMenuFont); 
+		Text_Paint_Limit(&maxX, uiInfo.serverStatus.motdPaintX, rect->y + rect->h - 3, scale, color, &uiInfo.serverStatus.motd[uiInfo.serverStatus.motdOffset], 0, 0, iMenuFont);
 		if (uiInfo.serverStatus.motdPaintX2 >= 0) {
 			float maxX2 = rect->x + rect->w - 2;
-			Text_Paint_Limit(&maxX2, uiInfo.serverStatus.motdPaintX2, rect->y + rect->h - 3, scale, color, uiInfo.serverStatus.motd, 0, uiInfo.serverStatus.motdOffset, iMenuFont); 
+			Text_Paint_Limit(&maxX2, uiInfo.serverStatus.motdPaintX2, rect->y + rect->h - 3, scale, color, uiInfo.serverStatus.motd, 0, uiInfo.serverStatus.motdOffset, iMenuFont);
 		}
 		if (uiInfo.serverStatus.motdOffset && maxX > 0) {
 			// if we have an offset ( we are skipping the first part of the string ) and we fit the string
@@ -2608,7 +2607,7 @@ static void UI_DrawKeyBindStatus(rectDef_t *rect, float scale, const vector4 *co
 	}
 }
 
-static void UI_DrawGLInfo(rectDef_t *rect, float scale, const vector4 *color, int textStyle,int iMenuFont) 
+static void UI_DrawGLInfo(rectDef_t *rect, float scale, const vector4 *color, int textStyle,int iMenuFont)
 {
 	char * eptr;
 	char buff[4096];
@@ -2630,7 +2629,7 @@ static void UI_DrawGLInfo(rectDef_t *rect, float scale, const vector4 *color, in
 			*eptr++ = '\0';
 
 		// track start of valid string
-		if (*eptr && *eptr != ' ') 
+		if (*eptr && *eptr != ' ')
 		{
 			lines[numLines++] = eptr;
 		}
@@ -2640,15 +2639,15 @@ static void UI_DrawGLInfo(rectDef_t *rect, float scale, const vector4 *color, in
 	}
 
 	i = 0;
-	while (i < numLines) 
+	while (i < numLines)
 	{
 		Text_Paint(rect->x + 2, y, scale, color, lines[i++], 0, (rect->w/2), textStyle,iMenuFont);
-		if (i < numLines) 
+		if (i < numLines)
 		{
 			Text_Paint(rect->x + rect->w / 2, y, scale, color, lines[i++], 0, (rect->w/2), textStyle,iMenuFont);
 		}
 		y += 10;
-		if (y > rect->y + rect->h - 11) 
+		if (y > rect->y + rect->h - 11)
 		{
 			break;
 		}
@@ -2660,7 +2659,7 @@ static void UI_DrawGLInfo(rectDef_t *rect, float scale, const vector4 *color, in
 UI_Version
 =================
 */
-static void UI_Version(rectDef_t *rect, float scale, const vector4 *color, int iMenuFont) 
+static void UI_Version(rectDef_t *rect, float scale, const vector4 *color, int iMenuFont)
 {
 	int width;
 
@@ -2676,7 +2675,7 @@ UI_OwnerDraw
 */
 // FIXME: table drive
 //
-static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle,int iMenuFont) 
+static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle,int iMenuFont)
 {
 	rectDef_t rect;
 	int findex;
@@ -2687,7 +2686,7 @@ static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float
 	rect.w = w;
 	rect.h = h;
 
-	switch (ownerDraw) 
+	switch (ownerDraw)
 	{
 	case UI_HANDICAP:
 		UI_DrawHandicap(&rect, scale, color, textStyle, iMenuFont);
@@ -2896,32 +2895,32 @@ static qboolean UI_OwnerDrawVisible(uint32_t flags) {
 				vis = qfalse;
 			}
 			flags &= ~UI_SHOW_FAVORITESERVERS;
-		} 
+		}
 		if (flags & UI_SHOW_NOTFAVORITESERVERS) {
 			// this assumes you only put this type of display flag on something showing in the proper context
 			if (ui_netSource.integer == AS_FAVORITES) {
 				vis = qfalse;
 			}
 			flags &= ~UI_SHOW_NOTFAVORITESERVERS;
-		} 
+		}
 		if (flags & UI_SHOW_ANYTEAMGAME) {
 			if (uiInfo.gameTypes[ui_gameType.integer].gtEnum <= GT_TEAM ) {
 				vis = qfalse;
 			}
 			flags &= ~UI_SHOW_ANYTEAMGAME;
-		} 
+		}
 		if (flags & UI_SHOW_ANYNONTEAMGAME) {
 			if (uiInfo.gameTypes[ui_gameType.integer].gtEnum > GT_TEAM ) {
 				vis = qfalse;
 			}
 			flags &= ~UI_SHOW_ANYNONTEAMGAME;
-		} 
+		}
 		if (flags & UI_SHOW_NETANYTEAMGAME) {
 			if (uiInfo.gameTypes[ui_netGameType.integer].gtEnum <= GT_TEAM ) {
 				vis = qfalse;
 			}
 			flags &= ~UI_SHOW_NETANYTEAMGAME;
-		} 
+		}
 		if (flags & UI_SHOW_NETANYNONTEAMGAME) {
 			if (uiInfo.gameTypes[ui_netGameType.integer].gtEnum > GT_TEAM ) {
 				vis = qfalse;
@@ -2956,12 +2955,12 @@ static qboolean UI_Handicap_HandleKey(uint32_t flags, float *special, int key) {
 extern void	Item_RunScript(itemDef_t *item, const char *s);		//from ui_shared;
 
 // For hot keys on the chat main menu.
-static qboolean UI_Chat_Main_HandleKey(int key) 
+static qboolean UI_Chat_Main_HandleKey(int key)
 {
 	menuDef_t *menu;
 	itemDef_t *item;
 
-	menu = Menu_GetFocused();	
+	menu = Menu_GetFocused();
 
 	if (!menu)
 	{
@@ -3006,12 +3005,12 @@ static qboolean UI_Chat_Main_HandleKey(int key)
 }
 
 // For hot keys on the chat main menu.
-static qboolean UI_Chat_Attack_HandleKey(int key) 
+static qboolean UI_Chat_Attack_HandleKey(int key)
 {
 	menuDef_t *menu;
 	itemDef_t *item;
 
-	menu = Menu_GetFocused();	
+	menu = Menu_GetFocused();
 
 	if (!menu)
 	{
@@ -3044,12 +3043,12 @@ static qboolean UI_Chat_Attack_HandleKey(int key)
 }
 
 // For hot keys on the chat main menu.
-static qboolean UI_Chat_Defend_HandleKey(int key) 
+static qboolean UI_Chat_Defend_HandleKey(int key)
 {
 	menuDef_t *menu;
 	itemDef_t *item;
 
-	menu = Menu_GetFocused();	
+	menu = Menu_GetFocused();
 
 	if (!menu)
 	{
@@ -3086,12 +3085,12 @@ static qboolean UI_Chat_Defend_HandleKey(int key)
 }
 
 // For hot keys on the chat main menu.
-static qboolean UI_Chat_Request_HandleKey(int key) 
+static qboolean UI_Chat_Request_HandleKey(int key)
 {
 	menuDef_t *menu;
 	itemDef_t *item;
 
-	menu = Menu_GetFocused();	
+	menu = Menu_GetFocused();
 
 	if (!menu)
 	{
@@ -3136,12 +3135,12 @@ static qboolean UI_Chat_Request_HandleKey(int key)
 }
 
 // For hot keys on the chat main menu.
-static qboolean UI_Chat_Reply_HandleKey(int key) 
+static qboolean UI_Chat_Reply_HandleKey(int key)
 {
 	menuDef_t *menu;
 	itemDef_t *item;
 
-	menu = Menu_GetFocused();	
+	menu = Menu_GetFocused();
 
 	if (!menu)
 	{
@@ -3182,12 +3181,12 @@ static qboolean UI_Chat_Reply_HandleKey(int key)
 }
 
 // For hot keys on the chat main menu.
-static qboolean UI_Chat_Spot_HandleKey(int key) 
+static qboolean UI_Chat_Spot_HandleKey(int key)
 {
 	menuDef_t *menu;
 	itemDef_t *item;
 
-	menu = Menu_GetFocused();	
+	menu = Menu_GetFocused();
 
 	if (!menu)
 	{
@@ -3224,12 +3223,12 @@ static qboolean UI_Chat_Spot_HandleKey(int key)
 }
 
 // For hot keys on the chat main menu.
-static qboolean UI_Chat_Tactical_HandleKey(int key) 
+static qboolean UI_Chat_Tactical_HandleKey(int key)
 {
 	menuDef_t *menu;
 	itemDef_t *item;
 
-	menu = Menu_GetFocused();	
+	menu = Menu_GetFocused();
 
 	if (!menu)
 	{
@@ -3294,7 +3293,7 @@ static qboolean UI_GameType_HandleKey(uint32_t flags, float *special, int key, q
 				value = 3;
 			}
 		}
-    
+
 		trap->Cvar_Set("ui_gameType", va("%d", value));
 		trap->Cvar_Update(&ui_gameType);
 		UI_SetCapFragLimits(qtrue);
@@ -3331,13 +3330,13 @@ static qboolean UI_InSoloMenu( void )
 	return (qfalse);
 }
 
-static qboolean UI_NetGameType_HandleKey(uint32_t flags, float *special, int key) 
+static qboolean UI_NetGameType_HandleKey(uint32_t flags, float *special, int key)
 {
-	if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER) 
+	if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER)
 	{
 		int value = ui_netGameType.integer;
 
-		if (key == A_MOUSE2) 
+		if (key == A_MOUSE2)
 		{
 			value--;
 			if (UI_InSoloMenu())
@@ -3347,8 +3346,8 @@ static qboolean UI_NetGameType_HandleKey(uint32_t flags, float *special, int key
 					value--;
 				}
 			}
-		} 
-		else 
+		}
+		else
 		{
 			value++;
 			if (UI_InSoloMenu())
@@ -3360,14 +3359,14 @@ static qboolean UI_NetGameType_HandleKey(uint32_t flags, float *special, int key
 			}
 		}
 
-		if (value < 0) 
+		if (value < 0)
 		{
 			value = uiInfo.numGameTypes - 1;
-		} 
-		else if (value >= uiInfo.numGameTypes) 
+		}
+		else if (value >= uiInfo.numGameTypes)
 		{
 			value = 0;
-		} 
+		}
 
 		trap->Cvar_Set( "ui_netGameType", va("%d", value));
 		trap->Cvar_Update(&ui_netGameType);
@@ -3399,7 +3398,7 @@ static qboolean UI_AutoSwitch_HandleKey(uint32_t flags, float *special, int key)
 		else if (switchVal >= 3)
 		{
 			switchVal = 0;
-		} 
+		}
 
 		trap->Cvar_Set( "cg_autoswitch", va("%i", switchVal));
 		return qtrue;
@@ -3540,7 +3539,7 @@ static qboolean UI_NetSource_HandleKey(uint32_t flags, float *special, int key) 
 		} else {
 			value++;
 		}
-    
+
 		if (value >= numNetSources) {
 			value = 0;
 		} else if (value < 0) {
@@ -3647,7 +3646,7 @@ static qboolean UI_Crosshair_HandleKey(uint32_t flags, float *special, int key) 
 		if ( uiInfo.currentCrosshair >= NUM_CROSSHAIRS )	uiInfo.currentCrosshair = 0;
 		else if ( uiInfo.currentCrosshair < 0 )				uiInfo.currentCrosshair = NUM_CROSSHAIRS-1;
 
-		trap->Cvar_Set( "cg_drawCrosshair", va( "%d", uiInfo.currentCrosshair ) ); 
+		trap->Cvar_Set( "cg_drawCrosshair", va( "%d", uiInfo.currentCrosshair ) );
 		return qtrue;
 	}
 	return qfalse;
@@ -3697,7 +3696,7 @@ static qboolean UI_OwnerDrawHandleKey(int ownerDraw, uint32_t flags, float *spec
 		return UI_ForceMaxRank_HandleKey(flags, special, key, uiForceRank, 1, MAX_FORCE_RANK, ownerDraw);
 		break;
 	case UI_FORCE_RANK:
-		break;		
+		break;
 	case UI_CHAT_MAIN:
 		return UI_Chat_Main_HandleKey(key);
 		break;
@@ -3858,7 +3857,7 @@ void UI_ServersSort(int column, qboolean force) {
 UI_LoadMods
 ===============
 */
-static void UI_LoadMods() {
+static void UI_LoadMods( void ) {
 	int		numdirs;
 	char	dirlist[MODSBUFSIZE];
 	char	*dirptr;
@@ -4124,7 +4123,7 @@ static void UI_StartSkirmish(qboolean next) {
 static void UI_Update(const char *name) {
 	int	val = trap->Cvar_VariableValue(name);
 
-	if (Q_stricmp(name, "s_khz") == 0) 
+	if (Q_stricmp(name, "s_khz") == 0)
 	{
 		trap->Cmd_ExecuteText( EXEC_APPEND, "snd_restart\n" );
 		return;
@@ -4150,8 +4149,8 @@ static void UI_Update(const char *name) {
 			trap->Cvar_Set("cl_maxpackets", "15");
 			trap->Cvar_Set("cl_packetdup", "1");		// favor lower bandwidth
 		}
-	} 
-	else if ( !Q_stricmp( name, "ui_GetName" ) ) 
+	}
+	else if ( !Q_stricmp( name, "ui_GetName" ) )
 	{
 		//Raz: Truncate the name, try and avoid overflow glitches for long names and menu feeders
 	//	trap->Cvar_Set( "ui_Name", UI_Cvar_VariableString( "name" ) );
@@ -4159,9 +4158,9 @@ static void UI_Update(const char *name) {
 		Q_strncpyz( buf, UI_Cvar_VariableString( "name" ), sizeof( buf ) );
 		trap->Cvar_Set( "ui_Name", buf );
 	}
-	else if (Q_stricmp(name, "ui_r_colorbits") == 0) 
+	else if (Q_stricmp(name, "ui_r_colorbits") == 0)
 	{
-		switch (val) 
+		switch (val)
 		{
 			case 0:
 				trap->Cvar_SetValue( "ui_r_depthbits", 0 );
@@ -4177,9 +4176,9 @@ static void UI_Update(const char *name) {
 		}
 	}
 #if 0
-	else if (Q_stricmp(name, "ui_r_lodbias") == 0) 
+	else if (Q_stricmp(name, "ui_r_lodbias") == 0)
 	{
-		switch (val) 
+		switch (val)
 		{
 			case 0:
 				trap->Cvar_SetValue( "ui_r_subdivisions", 4 );
@@ -4192,11 +4191,11 @@ static void UI_Update(const char *name) {
 				trap->Cvar_SetValue( "ui_r_subdivisions", 20 );
 				break;
 		}
-	} 
+	}
 #endif
-	else if (Q_stricmp(name, "ui_r_glCustom") == 0) 
+	else if (Q_stricmp(name, "ui_r_glCustom") == 0)
 	{
-		switch (val) 
+		switch (val)
 		{
 			case 0:	// high quality
 
@@ -4214,7 +4213,7 @@ static void UI_Update(const char *name) {
 				trap->Cvar_Set( "ui_r_texturemode", "GL_LINEAR_MIPMAP_LINEAR" );
 				break;
 
-			case 1: // normal 
+			case 1: // normal
 				trap->Cvar_SetValue( "ui_r_fullScreen", 1 );
 				trap->Cvar_SetValue( "ui_r_subdivisions", 4 );
 				trap->Cvar_SetValue( "ui_r_lodbias", 0 );
@@ -4261,25 +4260,25 @@ static void UI_Update(const char *name) {
 				trap->Cvar_Set( "ui_r_texturemode", "GL_LINEAR_MIPMAP_NEAREST" );
 			break;
 		}
-	} 
-	else if (Q_stricmp(name, "ui_mousePitch") == 0) 
+	}
+	else if (Q_stricmp(name, "ui_mousePitch") == 0)
 	{
-		if (val == 0) 
+		if (val == 0)
 		{
 			trap->Cvar_SetValue( "m_pitch", 0.022f );
-		} 
-		else 
+		}
+		else
 		{
 			trap->Cvar_SetValue( "m_pitch", -0.022f );
 		}
 	}
-	else if (Q_stricmp(name, "ui_mousePitchVeh") == 0) 
+	else if (Q_stricmp(name, "ui_mousePitchVeh") == 0)
 	{
-		if (val == 0) 
+		if (val == 0)
 		{
 			trap->Cvar_SetValue( "m_pitchVeh", 0.022f );
-		} 
-		else 
+		}
+		else
 		{
 			trap->Cvar_SetValue( "m_pitchVeh", -0.022f );
 		}
@@ -4300,7 +4299,7 @@ static qboolean UI_DeferMenuScript ( char **args )
 	const char* name;
 
 	// Whats the reason for being deferred?
-	if (!String_Parse( (char**)args, &name)) 
+	if (!String_Parse( (char**)args, &name))
 	{
 		return qfalse;
 	}
@@ -4331,7 +4330,7 @@ static qboolean UI_DeferMenuScript ( char **args )
 	else if ( !Q_stricmp ( name, "RulesBackout" ) )
 	{
 		qboolean deferred;
-		
+
 		deferred = trap->Cvar_VariableValue ( "ui_rules_backout" ) ? qtrue : qfalse ;
 
 		trap->Cvar_Set ( "ui_rules_backout", "0" );
@@ -4347,7 +4346,7 @@ static qboolean UI_DeferMenuScript ( char **args )
 UI_UpdateVideoSetup
 
 Copies the temporary user interface version of the video cvars into
-their real counterparts.  This is to create a interface which allows 
+their real counterparts.  This is to create a interface which allows
 you to discard your changes if you did something you didnt want
 =================
 */
@@ -4406,7 +4405,7 @@ void UI_GetVideoSetup ( void )
 	trap->Cvar_Register( NULL, "ui_r_allowExtensions",		"0", CVAR_ROM|CVAR_INTERNAL );
 	trap->Cvar_Register( NULL, "ui_cg_shadows",				"0", CVAR_ROM|CVAR_INTERNAL );
 	trap->Cvar_Register( NULL, "ui_r_modified",				"0", CVAR_ROM|CVAR_INTERNAL );
-	
+
 	// Copy over the real video cvars into their temporary counterparts
 	trap->Cvar_Set( "ui_r_mode",						UI_Cvar_VariableString( "r_mode" ) );
 	trap->Cvar_Set( "ui_r_colorbits",				UI_Cvar_VariableString( "r_colorbits" ) );
@@ -4472,11 +4471,11 @@ static void UI_UpdateCharacterCvars ( void )
 	trap->Cvar_VariableStringBuffer("ui_char_skin_torso", torso, sizeof(torso));
 	trap->Cvar_VariableStringBuffer("ui_char_skin_legs", legs, sizeof(legs));
 
-	Com_sprintf( skin, sizeof( skin ), "%s/%s|%s|%s", 
-										model, 
-										head, 
-										torso, 
-										legs 
+	Com_sprintf( skin, sizeof( skin ), "%s/%s|%s|%s",
+										model,
+										head,
+										torso,
+										legs
 				);
 
 	trap->Cvar_Set ( "model", skin );
@@ -4512,7 +4511,7 @@ static void UI_GetCharacterCvars ( void )
 		//now get the the individual files
 
 		//advance to second
-		p2 = strchr(skin, '|'); 
+		p2 = strchr(skin, '|');
 		assert(p2);
 		*p2=0;
 		p2++;
@@ -4577,7 +4576,7 @@ void UI_SetSiegeObjectiveGraphicPos(menuDef_t *menu,const char *itemName,const c
 	{
 		// get cvar data
 		trap->Cvar_VariableStringBuffer(cvarName, cvarBuf, sizeof(cvarBuf));
-		
+
 		holdBuf = cvarBuf;
 		if (String_Parse(&holdBuf,&holdVal))
 		{
@@ -4624,9 +4623,9 @@ void UI_FindCurrentSiegeTeamClass( void )
 		return;
 	}
 
-	// If the player is on a team, 
+	// If the player is on a team,
 	if ( myTeam == TEAM_RED )
-	{			
+	{
 		itemDef_t *item;
 		item = (itemDef_t *) Menu_FindItemByName(menu, "onteam1" );
 		if (item)
@@ -4635,14 +4634,14 @@ void UI_FindCurrentSiegeTeamClass( void )
 		}
 	}
 	else if ( myTeam == TEAM_BLUE )
-	{			
+	{
 		itemDef_t *item;
 		item = (itemDef_t *) Menu_FindItemByName(menu, "onteam2" );
 		if (item)
 		{
 			Item_RunScript(item, item->action);
 		}
-	}	
+	}
 
 
 	baseClass = (int)trap->Cvar_VariableValue("ui_siege_class");
@@ -4676,7 +4675,7 @@ void UI_FindCurrentSiegeTeamClass( void )
 	{
 		itemname = "class6_button";
 	}
-	else 
+	else
 	{
 		return;
 	}
@@ -4940,7 +4939,7 @@ static void UI_GetSaberCvars ( void )
 
 	trap->Cvar_Set( "ui_saber_color", UI_Cvar_VariableString( "g_saber_color" ) );
 	trap->Cvar_Set( "ui_saber2_color", UI_Cvar_VariableString( "g_saber2_color" ) );
-	
+
 	return;
 }
 
@@ -4974,11 +4973,11 @@ void UI_UpdateCharacterSkin( void )
 	trap->Cvar_VariableStringBuffer("ui_char_skin_torso", torso, sizeof(torso));
 	trap->Cvar_VariableStringBuffer("ui_char_skin_legs", legs, sizeof(legs));
 
-	Com_sprintf( skin, sizeof( skin ), "models/players/%s/|%s|%s|%s", 
-										model, 
-										head, 
-										torso, 
-										legs 
+	Com_sprintf( skin, sizeof( skin ), "models/players/%s/|%s|%s|%s",
+										model,
+										head,
+										torso,
+										legs
 				);
 
 	ItemParse_model_g2skin_go( item, skin );
@@ -5092,12 +5091,12 @@ UI_CheckServerName
 static void UI_CheckServerName( void )
 {
 	qboolean	changed = qfalse;
-	
+
 	char hostname[MAX_HOSTNAMELENGTH] = {0};
 	char *c = hostname;
-			
+
 	trap->Cvar_VariableStringBuffer( "sv_hostname", hostname, sizeof( hostname ) );
-	
+
 	while( *c )
 	{
 		if ( (*c == '\\') || (*c == ';') || (*c == '"'))
@@ -5111,7 +5110,7 @@ static void UI_CheckServerName( void )
 	{
 		trap->Cvar_Set("sv_hostname", hostname );
 	}
-	
+
 }
 
 /*
@@ -5122,13 +5121,13 @@ UI_CheckPassword
 static qboolean UI_CheckPassword( void )
 {
 	static char info[MAX_STRING_CHARS];
-	
+
 	int index = uiInfo.serverStatus.currentServer;
 	if( (index < 0) || (index >= uiInfo.serverStatus.numDisplayServers) )
 	{	// warning?
 		return qfalse;
 	}
-	
+
 	trap->LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS);
 
 	if ( atoi(Info_ValueForKey(info, "needpass")) )
@@ -5136,7 +5135,7 @@ static qboolean UI_CheckPassword( void )
 
 		Menus_OpenByName("password_request");
 		return qfalse;
-		
+
 	}
 
 	// This isn't going to make it (too late in dev), like James said I should check to see when we receive
@@ -5174,7 +5173,7 @@ static void UI_JoinServer( void )
 		trap->LAN_GetServerAddressString(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, sizeof( buff ) );
 		trap->Cmd_ExecuteText( EXEC_APPEND, va( "connect %s\n", buff ) );
 	}
-	
+
 }
 
 int UI_SiegeClassNum( siegeClass_t *scl ) {
@@ -5346,8 +5345,8 @@ void UI_UpdateCvarsForClass(const int team,const int baseClass,const int index)
 	char *holdBuf;
 
 	// Is it a valid team
-	if ((team == SIEGETEAM_TEAM1) || 
-		(team == SIEGETEAM_TEAM2)) 
+	if ((team == SIEGETEAM_TEAM1) ||
+		(team == SIEGETEAM_TEAM2))
 	{
 
 		// Is it a valid base class?
@@ -5358,7 +5357,7 @@ void UI_UpdateCvarsForClass(const int team,const int baseClass,const int index)
 			{
 				if (!g_siegedFeederForcedSet)
 				{
-					holdClass = BG_GetClassOnBaseClass( team, baseClass, index);					
+					holdClass = BG_GetClassOnBaseClass( team, baseClass, index);
 					if (holdClass)	//clicked a valid item
 					{
 						g_UIGloballySelectedSiegeClass = UI_SiegeClassNum(holdClass);
@@ -5416,20 +5415,20 @@ void UI_UpdateSiegeStatusIcons( void ) {
 	}
 }
 
-static void UI_RunMenuScript(char **args) 
+static void UI_RunMenuScript(char **args)
 {
 	const char *name, *name2;
 	char buff[1024];
 
-	if (String_Parse(args, &name)) 
+	if (String_Parse(args, &name))
 	{
-		if (Q_stricmp(name, "StartServer") == 0) 
+		if (Q_stricmp(name, "StartServer") == 0)
 		{
 			int i, added = 0;
 			float skill;
 			int warmupTime = 0;
 			int doWarmup = 0;
-			
+
 		//	trap->Cvar_Set("cg_thirdPerson", "0");
 			trap->Cvar_Set("cg_cameraOrbit", "0");
 			// for Solo games I set this to 1 in the menu and don't want it stomped here,
@@ -5478,12 +5477,12 @@ static void UI_RunMenuScript(char **args)
 				trap->Cvar_Set("timelimit", "0");
 			}
 
-			for (i = 0; i < PLAYERS_PER_TEAM; i++) 
+			for (i = 0; i < PLAYERS_PER_TEAM; i++)
 			{
 				int bot = trap->Cvar_VariableValue( va("ui_blueteam%i", i+1));
 				int maxcl = trap->Cvar_VariableValue( "sv_maxClients" );
 
-				if (bot > 1) 
+				if (bot > 1)
 				{
 					int numval = i+1;
 
@@ -5635,24 +5634,24 @@ static void UI_RunMenuScript(char **args)
 			trap->Key_SetCatcher( KEYCATCH_UI );
 			Menus_CloseAll();
 			Menus_ActivateByName("setup_menu2");
-		} 
-		else if (Q_stricmp(name, "Leave") == 0) 
+		}
+		else if (Q_stricmp(name, "Leave") == 0)
 		{
 			trap->Cmd_ExecuteText( EXEC_APPEND, "disconnect\n" );
 			trap->Key_SetCatcher( KEYCATCH_UI );
 			Menus_CloseAll();
 			Menus_ActivateByName("main");
-		} 
-		else if (Q_stricmp(name, "getvideosetup") == 0) 
+		}
+		else if (Q_stricmp(name, "getvideosetup") == 0)
 		{
 			UI_GetVideoSetup ( );
 		}
-		else if (Q_stricmp(name, "getsaberhiltinfo") == 0) 
+		else if (Q_stricmp(name, "getsaberhiltinfo") == 0)
 		{
 			WP_SaberGetHiltInfo(saberSingleHiltInfo,saberStaffHiltInfo);
 		}
 		// On the solo game creation screen, we can't see siege maps
-		else if (Q_stricmp(name, "checkforsiege") == 0) 
+		else if (Q_stricmp(name, "checkforsiege") == 0)
 		{
 			if (uiInfo.gameTypes[ui_netGameType.integer].gtEnum == GT_SIEGE)
 			{
@@ -5664,7 +5663,7 @@ static void UI_RunMenuScript(char **args)
 		{
 			UI_UpdateVideoSetup ( );
 		}
-		else if (Q_stricmp(name, "ServerSort") == 0) 
+		else if (Q_stricmp(name, "ServerSort") == 0)
 		{
 			int sortColumn;
 			if (Int_Parse(args, &sortColumn)) {
@@ -5703,9 +5702,9 @@ static void UI_RunMenuScript(char **args)
 			} else {
 				trap->Cmd_ExecuteText( EXEC_APPEND, va("addbot \"%s\" %i %s\n", UI_GetBotNameByNumber(uiInfo.botIndex), uiInfo.skillIndex+1, (uiInfo.redBlue == 0) ? "Red" : "Blue") );
 			}
-		} else if (Q_stricmp(name, "addFavorite") == 0) 
+		} else if (Q_stricmp(name, "addFavorite") == 0)
 		{
-			if (ui_netSource.integer != AS_FAVORITES) 
+			if (ui_netSource.integer != AS_FAVORITES)
 			{
 				char name[MAX_HOSTNAMELENGTH];
 				char addr[MAX_ADDRESSLENGTH];
@@ -5715,20 +5714,20 @@ static void UI_RunMenuScript(char **args)
 				name[0] = addr[0] = '\0';
 				Q_strncpyz( name, Info_ValueForKey( buff, "hostname" ), sizeof( name ) );
 				Q_strncpyz( addr, Info_ValueForKey( buff, "addr" ), sizeof( addr ) );
-				if (strlen(name) > 0 && strlen(addr) > 0) 
+				if (strlen(name) > 0 && strlen(addr) > 0)
 				{
 					res = trap->LAN_AddServer(AS_FAVORITES, name, addr);
-					if (res == 0) 
+					if (res == 0)
 					{
 						// server already in the list
 						Com_Printf("Favorite already in list\n");
 					}
-					else if (res == -1) 
+					else if (res == -1)
 					{
 						// list full
 						Com_Printf("Favorite list full\n");
 					}
-					else 
+					else
 					{
 						// successfully added
 						Com_Printf("Added favorite server %s\n", addr);
@@ -5740,24 +5739,24 @@ static void UI_RunMenuScript(char **args)
 					}
 				}
 			}
-		} 
-		else if (Q_stricmp(name, "deleteFavorite") == 0) 
+		}
+		else if (Q_stricmp(name, "deleteFavorite") == 0)
 		{
-			if (ui_netSource.integer == AS_FAVORITES) 
+			if (ui_netSource.integer == AS_FAVORITES)
 			{
 				char addr[MAX_ADDRESSLENGTH];
 				trap->LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, MAX_STRING_CHARS);
 				addr[0] = '\0';
 				Q_strncpyz(addr, Info_ValueForKey(buff, "addr"), sizeof(addr));
-				if (strlen(addr) > 0) 
+				if (strlen(addr) > 0)
 				{
 					trap->LAN_RemoveServer(AS_FAVORITES, addr);
 				}
 			}
-		} 
-		else if (Q_stricmp(name, "createFavorite") == 0) 
+		}
+		else if (Q_stricmp(name, "createFavorite") == 0)
 		{
-		//	if (ui_netSource.integer == AS_FAVORITES) 
+		//	if (ui_netSource.integer == AS_FAVORITES)
 		//rww - don't know why this check was here.. why would you want to only add new favorites when the filter was favorites?
 			{
 				char name[MAX_HOSTNAMELENGTH];
@@ -5836,7 +5835,7 @@ static void UI_RunMenuScript(char **args)
 			else if (oldteam == team)
 			{	// Classes match?
 				if (g_UIGloballySelectedSiegeClass != -1)
-				{	
+				{
 					if (!strcmp(startclassString,bgSiegeClasses[g_UIGloballySelectedSiegeClass].name))
 					{
 						goTeam = qfalse;
@@ -5865,7 +5864,7 @@ static void UI_RunMenuScript(char **args)
 				}
 			}
 		}
-		else if (Q_stricmp(name, "setBotButton") == 0) 
+		else if (Q_stricmp(name, "setBotButton") == 0)
 		{
 			UI_SetBotButton();
 		}
@@ -5875,12 +5874,12 @@ static void UI_RunMenuScript(char **args)
 			UI_UpdateForcePowers();
 		} else if (Q_stricmp(name, "glCustom") == 0) {
 			trap->Cvar_Set("ui_r_glCustom", "4");
-		} 
-		else if (Q_stricmp(name, "setMovesListDefault") == 0) 
+		}
+		else if (Q_stricmp(name, "setMovesListDefault") == 0)
 		{
 			uiInfo.movesTitleIndex = 2;
 		}
-		else if (Q_stricmp(name, "resetMovesList") == 0) 
+		else if (Q_stricmp(name, "resetMovesList") == 0)
 		{
 			menuDef_t *menu;
 			menu = Menus_FindByName("rulesMenu_moves");
@@ -5898,11 +5897,11 @@ static void UI_RunMenuScript(char **args)
 
 			trap->Cvar_Set( "ui_move_desc", " " );
 		}
-		else if (Q_stricmp(name, "resetcharacterlistboxes") == 0) 
+		else if (Q_stricmp(name, "resetcharacterlistboxes") == 0)
 		{
 			UI_ResetCharacterListBoxes();
 		}
-		else if (Q_stricmp(name, "setMoveCharacter") == 0) 
+		else if (Q_stricmp(name, "setMoveCharacter") == 0)
 		{
 			itemDef_t *item;
 			menuDef_t *menu;
@@ -5936,13 +5935,13 @@ static void UI_RunMenuScript(char **args)
 						UI_SaberAttachToChar( item );
 					}
 				}
-			} 
+			}
 		}
-		else if (Q_stricmp(name, "character") == 0) 
+		else if (Q_stricmp(name, "character") == 0)
 		{
 			UI_UpdateCharacter( qfalse );
 		}
-		else if (Q_stricmp(name, "characterchanged") == 0) 
+		else if (Q_stricmp(name, "characterchanged") == 0)
 		{
 			UI_UpdateCharacter( qtrue );
 		}
@@ -5951,16 +5950,16 @@ static void UI_RunMenuScript(char **args)
 		{
 			UI_UpdateCharacterCvars();
 		}
-		else if (Q_stricmp(name, "getcharcvars") == 0) 
+		else if (Q_stricmp(name, "getcharcvars") == 0)
 		{
 			UI_GetCharacterCvars();
 		}
-		else if (Q_stricmp(name, "char_skin") == 0) 
+		else if (Q_stricmp(name, "char_skin") == 0)
 		{
 			UI_UpdateCharacterSkin();
 		}
 #if 0
-		else if (Q_stricmp(name, "setui_dualforcepower") == 0) 
+		else if (Q_stricmp(name, "setui_dualforcepower") == 0)
 		{
 			int forcePowerDisable = trap->Cvar_VariableValue("g_forcePowerDisable");
 			int	i, forceBitFlag=0;
@@ -5987,12 +5986,12 @@ static void UI_RunMenuScript(char **args)
 			{
 				trap->Cvar_Set("ui_dualforcepower", "2");
 			}
-			else 
+			else
 			{
 				trap->Cvar_Set("ui_dualforcepower", "1");
 			}
 		}
-		else if (Q_stricmp(name, "dualForcePowers") == 0) 
+		else if (Q_stricmp(name, "dualForcePowers") == 0)
 		{
 			int	dualforcePower,i, forcePowerDisable;
 			dualforcePower = trap->Cvar_VariableValue("ui_dualforcepower");
@@ -6011,8 +6010,8 @@ static void UI_RunMenuScript(char **args)
 			}
 			else if (dualforcePower==2)	// Limited force powers
 			{
-				forcePowerDisable = 0;						
-				
+				forcePowerDisable = 0;
+
 				// Turn off all powers but a few
 				for (i=0;i<NUM_FORCE_POWERS;i++)
 				{
@@ -6030,7 +6029,7 @@ static void UI_RunMenuScript(char **args)
 
 			trap->Cvar_Set("g_forcePowerDisable", va("%i",forcePowerDisable));
 		}
-		else if (Q_stricmp(name, "forcePowersDisable") == 0) 
+		else if (Q_stricmp(name, "forcePowersDisable") == 0)
 		{
 			int	forcePowerDisable,i;
 
@@ -6046,8 +6045,8 @@ static void UI_RunMenuScript(char **args)
 
 				trap->Cvar_Set("g_forcePowerDisable", va("%i",forcePowerDisable));
 			}
-		} 
-		else if (Q_stricmp(name, "weaponDisable") == 0) 
+		}
+		else if (Q_stricmp(name, "weaponDisable") == 0)
 		{
 			int	weaponDisable,i;
 			const char *cvarString;
@@ -6077,11 +6076,11 @@ static void UI_RunMenuScript(char **args)
 
 				trap->Cvar_Set(cvarString, va("%i",weaponDisable));
 			}
-		} 
+		}
 #endif
-		// If this is siege, change all the bots to humans, because we faked it earlier 
+		// If this is siege, change all the bots to humans, because we faked it earlier
 		//  swapping humans for bots on the menu
-		else if (Q_stricmp(name, "setSiegeNoBots") == 0) 
+		else if (Q_stricmp(name, "setSiegeNoBots") == 0)
 		{
 			int blueValue,redValue,i;
 
@@ -6107,12 +6106,12 @@ static void UI_RunMenuScript(char **args)
 				}
 			}
 		}
-		else if (Q_stricmp(name, "clearmouseover") == 0) 
+		else if (Q_stricmp(name, "clearmouseover") == 0)
 		{
 			itemDef_t *item;
 			menuDef_t *menu = Menu_GetFocused();
 
-			if (menu) 
+			if (menu)
 			{
 				int count,j;
 				const char *itemName;
@@ -6120,10 +6119,10 @@ static void UI_RunMenuScript(char **args)
 
 				count = Menu_ItemsMatchingGroup(menu, itemName);
 
-				for (j = 0; j < count; j++) 
+				for (j = 0; j < count; j++)
 				{
 					item = Menu_GetMatchingItemByNumber( menu, j, itemName);
-					if (item != NULL) 
+					if (item != NULL)
 					{
 						item->window.flags &= ~WINDOW_MOUSEOVER;
 					}
@@ -6134,9 +6133,9 @@ static void UI_RunMenuScript(char **args)
 		{
 			UpdateForceStatus();
 		}
-		else if (Q_stricmp(name, "update") == 0) 
+		else if (Q_stricmp(name, "update") == 0)
 		{
-			if (String_Parse(args, &name2)) 
+			if (String_Parse(args, &name2))
 			{
 				UI_Update(name2);
 			}
@@ -6145,27 +6144,27 @@ static void UI_RunMenuScript(char **args)
 		{
 			UpdateBotButtons();
 		}
-		else if (Q_stricmp(name, "getsabercvars") == 0) 
+		else if (Q_stricmp(name, "getsabercvars") == 0)
 		{
 			UI_GetSaberCvars();
 		}
-		else if (Q_stricmp(name, "setsaberboxesandhilts") == 0) 
+		else if (Q_stricmp(name, "setsaberboxesandhilts") == 0)
 		{
 			UI_SetSaberBoxesandHilts();
 		}
-		else if (Q_stricmp(name, "saber_type") == 0) 
+		else if (Q_stricmp(name, "saber_type") == 0)
 		{
 			UI_UpdateSaberType();
 		}
-		else if (Q_stricmp(name, "saber_hilt") == 0) 
+		else if (Q_stricmp(name, "saber_hilt") == 0)
 		{
 			UI_UpdateSaberHilt( qfalse );
 		}
-		else if (Q_stricmp(name, "saber_color") == 0) 
+		else if (Q_stricmp(name, "saber_color") == 0)
 		{
 			UI_UpdateSaberColor( qfalse );
 		}
-		else if (Q_stricmp(name, "setscreensaberhilt") == 0) 
+		else if (Q_stricmp(name, "setscreensaberhilt") == 0)
 		{
 			menuDef_t *menu;
 			itemDef_t *item;
@@ -6183,7 +6182,7 @@ static void UI_RunMenuScript(char **args)
 				}
 			}
 		}
-		else if (Q_stricmp(name, "setscreensaberhilt1") == 0) 
+		else if (Q_stricmp(name, "setscreensaberhilt1") == 0)
 		{
 			menuDef_t *menu;
 			itemDef_t *item;
@@ -6201,7 +6200,7 @@ static void UI_RunMenuScript(char **args)
 				}
 			}
 		}
-		else if (Q_stricmp(name, "setscreensaberhilt2") == 0) 
+		else if (Q_stricmp(name, "setscreensaberhilt2") == 0)
 		{
 			menuDef_t *menu;
 			itemDef_t *item;
@@ -6219,7 +6218,7 @@ static void UI_RunMenuScript(char **args)
 				}
 			}
 		}
-		else if (Q_stricmp(name, "setscreensaberstaff") == 0) 
+		else if (Q_stricmp(name, "setscreensaberstaff") == 0)
 		{
 			menuDef_t *menu;
 			itemDef_t *item;
@@ -6237,26 +6236,26 @@ static void UI_RunMenuScript(char **args)
 				}
 			}
 		}
-		else if (Q_stricmp(name, "saber2_hilt") == 0) 
+		else if (Q_stricmp(name, "saber2_hilt") == 0)
 		{
 			UI_UpdateSaberHilt( qtrue );
 		}
-		else if (Q_stricmp(name, "saber2_color") == 0) 
+		else if (Q_stricmp(name, "saber2_color") == 0)
 		{
 			UI_UpdateSaberColor( qtrue );
 		}
-		else if (Q_stricmp(name, "updatesabercvars") == 0) 
+		else if (Q_stricmp(name, "updatesabercvars") == 0)
 		{
 			UI_UpdateSaberCvars();
 		}
-		else if (Q_stricmp(name, "updatesiegeobjgraphics") == 0) 
+		else if (Q_stricmp(name, "updatesiegeobjgraphics") == 0)
 		{
 			int team = (int)trap->Cvar_VariableValue("ui_team");
 			trap->Cvar_Set("ui_holdteam", va("%d", team));
 
 			UI_UpdateSiegeObjectiveGraphics();
 		}
-		else if (Q_stricmp(name, "setsiegeobjbuttons") == 0) 
+		else if (Q_stricmp(name, "setsiegeobjbuttons") == 0)
 		{
 			const char *itemArg;
 			const char *cvarLitArg;
@@ -6269,7 +6268,7 @@ static void UI_RunMenuScript(char **args)
 			menu = Menu_GetFocused();	// Get current menu
 			if (menu)
 			{
-				// Set the new item to the background 
+				// Set the new item to the background
 				if (String_Parse(args, &itemArg))
 				{
 
@@ -6308,7 +6307,7 @@ static void UI_RunMenuScript(char **args)
 				}
 			}
 		}
-		else if (Q_stricmp(name, "updatesiegeclasscnt") == 0) 
+		else if (Q_stricmp(name, "updatesiegeclasscnt") == 0)
 		{
 			const char *teamArg;
 
@@ -6317,10 +6316,10 @@ static void UI_RunMenuScript(char **args)
 				UI_SiegeClassCnt(atoi(teamArg));
 			}
 		}
-		else if (Q_stricmp(name, "updatesiegecvars") == 0) 
+		else if (Q_stricmp(name, "updatesiegecvars") == 0)
 		{
-			int team,baseClass; 
-	
+			int team,baseClass;
+
 			team = (int)trap->Cvar_VariableValue("ui_holdteam");
 			baseClass = (int)trap->Cvar_VariableValue("ui_siege_class");
 
@@ -6476,14 +6475,14 @@ static void UI_RunMenuScript(char **args)
 						listPtr->startPos = 0;
 					}
 					item->cursorPos = 0;
-				}	
+				}
 			}
 		}
-		else if (Q_stricmp(name, "updatesiegestatusicons") == 0) 
+		else if (Q_stricmp(name, "updatesiegestatusicons") == 0)
 		{
 			UI_UpdateSiegeStatusIcons();
 		}
-		else if (Q_stricmp(name, "setcurrentNetMap") == 0) 
+		else if (Q_stricmp(name, "setcurrentNetMap") == 0)
 		{
 			menuDef_t *menu;
 			itemDef_t *item;
@@ -6502,11 +6501,11 @@ static void UI_RunMenuScript(char **args)
 				}
 			}
 		}
-		else if (Q_stricmp(name, "resetmaplist") == 0) 
+		else if (Q_stricmp(name, "resetmaplist") == 0)
 		{
 			menuDef_t *menu;
 			itemDef_t *item;
-		
+
 			menu = Menu_GetFocused();	// Get current menu
 			if (menu)
 			{
@@ -6525,7 +6524,7 @@ static void UI_RunMenuScript(char **args)
 		{
 			UI_ClampMaxPlayers();
 		}
-		else 
+		else
 		{
 			Com_Printf("unknown UI script %s\n", name);
 		}
@@ -6703,7 +6702,7 @@ static int UI_MapCountByGameType(qboolean singlePlayer) {
 qboolean UI_hasSkinForBase(const char *base, const char *team) {
 	char	test[1024];
 	fileHandle_t	f;
-	
+
 	Com_sprintf( test, sizeof( test ), "models/players/%s/%s/lower_default.skin", base, team );
 	trap->FS_Open(test, &f, FS_READ);
 	if (f != 0) {
@@ -6724,7 +6723,7 @@ qboolean UI_hasSkinForBase(const char *base, const char *team) {
 UI_HeadCountByColor
 ==================
 */
-static int UI_HeadCountByColor() {
+static int UI_HeadCountByColor( void ) {
 	int i, c;
 	char *teamname;
 	char saved[MAX_QPATH];
@@ -6864,11 +6863,11 @@ static void UI_BuildServerDisplayList(int force) {
 	if (len == 0) {
 		strcpy(uiInfo.serverStatus.motd, "Welcome to Jedi Academy MP!");
 		len = strlen(uiInfo.serverStatus.motd);
-	} 
+	}
 	if (len != uiInfo.serverStatus.motdLen) {
 		uiInfo.serverStatus.motdLen = len;
 		uiInfo.serverStatus.motdWidth = -1;
-	} 
+	}
 
 	if (force) {
 		numinvisible = 0;
@@ -7239,7 +7238,7 @@ static void UI_BuildFindPlayerList(qboolean force) {
 
 				trap->SE_GetStringTextString("MENUS_SEARCHING", holdSPString, sizeof(holdSPString));
 				trap->Cvar_Set( "ui_playerServersFound", va(	holdSPString,uiInfo.pendingServerStatus.num, numFound));
-														
+
 			//	Com_sprintf(uiInfo.foundPlayerServerNames[uiInfo.numFoundPlayerServers-1],
 			//					sizeof(uiInfo.foundPlayerServerNames[uiInfo.numFoundPlayerServers-1]),
 			//						"searching %d/%d...", uiInfo.pendingServerStatus.num, numFound);
@@ -7257,11 +7256,11 @@ static void UI_BuildFindPlayerList(qboolean force) {
 	}
 	else {
 		// add a line that shows the number of servers found
-		if (!uiInfo.numFoundPlayerServers) 
+		if (!uiInfo.numFoundPlayerServers)
 		{
 			Com_sprintf(uiInfo.foundPlayerServerNames[uiInfo.numFoundPlayerServers-1], sizeof(uiInfo.foundPlayerServerAddresses[0]), "no servers found");
 		}
-		else 
+		else
 		{
 			trap->SE_GetStringTextString("MENUS_SERVERS_FOUNDWITH", holdSPString, sizeof(holdSPString));
 			trap->Cvar_Set( "ui_playerServersFound", va(	holdSPString,
@@ -7313,11 +7312,11 @@ static void UI_BuildServerStatus(qboolean force) {
 UI_FeederCount
 ==================
 */
-static int UI_FeederCount(float feederID) 
+static int UI_FeederCount(float feederID)
 {
-	int team,baseClass,count=0,i; 
+	int team,baseClass,count=0,i;
 	static char info[MAX_STRING_CHARS];
-	
+
 	switch ( (int)feederID )
 	{
 		case FEEDER_SABER_SINGLE_INFO:
@@ -7391,18 +7390,18 @@ static int UI_FeederCount(float feederID)
 		case FEEDER_MAPS:
 		case FEEDER_ALLMAPS:
 			return UI_MapCountByGameType(feederID == FEEDER_MAPS ? qtrue : qfalse);
-	
+
 		case FEEDER_SERVERS:
 			return uiInfo.serverStatus.numDisplayServers;
-	
+
 		case FEEDER_SERVERSTATUS:
 			return Q_clampi( 0, uiInfo.serverStatusInfo.numLines, MAX_SERVERSTATUS_LINES );
-	
+
 		case FEEDER_FINDPLAYER:
 			return uiInfo.numFoundPlayerServers;
 
 		case FEEDER_PLAYER_LIST:
-			if (uiInfo.uiDC.realTime > uiInfo.playerRefresh) 
+			if (uiInfo.uiDC.realTime > uiInfo.playerRefresh)
 			{
 				uiInfo.playerRefresh = uiInfo.uiDC.realTime + 3000;
 				UI_BuildPlayerList();
@@ -7411,7 +7410,7 @@ static int UI_FeederCount(float feederID)
 
 		case FEEDER_MODS:
 			return uiInfo.modCount;
-	
+
 		case FEEDER_DEMOS:
 			return uiInfo.demoCount;
 
@@ -7445,12 +7444,12 @@ static int UI_FeederCount(float feederID)
 		case FEEDER_COLORCHOICES:
 			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount;
 
-		case FEEDER_SIEGE_BASE_CLASS:		
+		case FEEDER_SIEGE_BASE_CLASS:
 			team = (int)trap->Cvar_VariableValue("ui_team");
 			baseClass = (int)trap->Cvar_VariableValue("ui_siege_class");
 
-			if ((team == SIEGETEAM_TEAM1) || 
-				(team == SIEGETEAM_TEAM2)) 
+			if ((team == SIEGETEAM_TEAM1) ||
+				(team == SIEGETEAM_TEAM2))
 			{
 				// Is it a valid base class?
 				if ((baseClass >= SPC_INFANTRY) && (baseClass < SPC_MAX))
@@ -7461,7 +7460,7 @@ static int UI_FeederCount(float feederID)
 			return 0;
 
 		// Get the count of weapons
-		case FEEDER_SIEGE_CLASS_WEAPONS:	
+		case FEEDER_SIEGE_CLASS_WEAPONS:
 			//count them up
 			for (i=0;i< WP_NUM_WEAPONS;i++)
 			{
@@ -7475,7 +7474,7 @@ static int UI_FeederCount(float feederID)
 			return count;
 
 		// Get the count of inventory
-		case FEEDER_SIEGE_CLASS_INVENTORY:	
+		case FEEDER_SIEGE_CLASS_INVENTORY:
 			//count them up
 			for (i=0;i< HI_NUM_HOLDABLE;i++)
 			{
@@ -7491,7 +7490,7 @@ static int UI_FeederCount(float feederID)
 			return count;
 
 		// Get the count of force powers
-		case FEEDER_SIEGE_CLASS_FORCE:	
+		case FEEDER_SIEGE_CLASS_FORCE:
 			//count them up
 			for (i=0;i< NUM_FORCE_POWERS;i++)
 			{
@@ -7590,13 +7589,13 @@ static int UI_GetIndexFromSelection(int actual) {
 	return 0;
 }
 
-static void UI_UpdatePendingPings() { 
+static void UI_UpdatePendingPings( void ) {
 	trap->LAN_ResetPings(ui_netSource.integer);
 	uiInfo.serverStatus.refreshActive = qtrue;
 	uiInfo.serverStatus.refreshtime = uiInfo.uiDC.realTime + 1000;
 }
 
-static const char *UI_FeederItemText(float feederID, int index, int column, 
+static const char *UI_FeederItemText(float feederID, int index, int column,
 									 qhandle_t *handle1, qhandle_t *handle2, qhandle_t *handle3) {
 	static char info[MAX_STRING_CHARS]; // don't change this size without changing the sizes inside the SaberProperName calls
 	static char hostname[MAX_HOSTNAMELENGTH];
@@ -7621,7 +7620,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 	else if (feederID == FEEDER_Q3HEADS) {
 		int actual;
 		return UI_SelectedTeamHead(index, &actual);
-	} 
+	}
 	else if (feederID == FEEDER_SIEGE_TEAM1)
 	{
 		return ""; //nothing I guess, the description part can cover this
@@ -7723,7 +7722,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 				// UI_UpdatePendingPings();
 			}
 			switch (column) {
-				case SORT_HOST : 
+				case SORT_HOST :
 					if (ping <= 0) {
 						return Info_ValueForKey(info, "addr");
 					} else {
@@ -7752,7 +7751,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 							{//at least one force power is disabled
 								*handle2 = uiInfo.uiDC.Assets.forceRestrict;
 							}
-							
+
 							//check weaps
 							wDisable = atoi(Info_ValueForKey(info, "wdisable"));
 
@@ -7771,9 +7770,9 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 							}
 							else if ( atoi(Info_ValueForKey(info, "truejedi")) != 0 )
 							{
-								if ( gametype != GT_HOLOCRON 
-									&& gametype != GT_JEDIMASTER 
-									&& !saberOnly 
+								if ( gametype != GT_HOLOCRON
+									&& gametype != GT_JEDIMASTER
+									&& !saberOnly
 									&& !allForceDisabled )
 								{//truejedi is on and allowed in this mode
 									*handle1 = uiInfo.uiDC.Assets.trueJedi;
@@ -7803,12 +7802,12 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 							return hostname;
 						}
 					}
-				case SORT_MAP : 
+				case SORT_MAP :
 					return Info_ValueForKey(info, "mapname");
-				case SORT_CLIENTS : 
+				case SORT_CLIENTS :
 					Com_sprintf( clientBuff, sizeof(clientBuff), "%s (%s)", Info_ValueForKey(info, "clients"), Info_ValueForKey(info, "sv_maxclients"));
 					return clientBuff;
-				case SORT_GAME : 
+				case SORT_GAME :
 					game = atoi(Info_ValueForKey(info, "gametype"));
 					if (game >= 0 && game < (signed)numGameTypes) {
 						strcpy(needPass,gameTypes[game]);
@@ -7821,7 +7820,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 					}
 
 					return needPass;
-				case SORT_PING : 
+				case SORT_PING :
 					if (ping <= 0) {
 						return "...";
 					} else {
@@ -7862,26 +7861,26 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 		if (index >= 0 && index < uiInfo.demoCount) {
 			return uiInfo.demoList[index];
 		}
-	} 
-	else if (feederID == FEEDER_MOVES) 
+	}
+	else if (feederID == FEEDER_MOVES)
 	{
 		return datapadMoveData[uiInfo.movesTitleIndex][index].title;
 	}
-	else if (feederID == FEEDER_MOVES_TITLES) 
+	else if (feederID == FEEDER_MOVES_TITLES)
 	{
 		return datapadMoveTitleData[index];
 	}
-	else if (feederID == FEEDER_PLAYER_SPECIES) 
+	else if (feederID == FEEDER_PLAYER_SPECIES)
 	{
 		return uiInfo.playerSpecies[index].Name;
-	} 
-	else if (feederID == FEEDER_LANGUAGES) 
+	}
+	else if (feederID == FEEDER_LANGUAGES)
 	{
 		return 0;
-	} 
+	}
 	else if (feederID == FEEDER_COLORCHOICES)
 	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount) 
+		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount)
 		{
 			*handle1 = trap->R_RegisterShaderNoMip( uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorShader[index]);
 			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorShader[index];
@@ -7889,7 +7888,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 	}
 	else if (feederID == FEEDER_PLAYER_SKIN_HEAD)
 	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount) 
+		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount)
 		{
 			*handle1 = trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadNames[index]));
 			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadNames[index];
@@ -7897,7 +7896,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 	}
 	else if (feederID == FEEDER_PLAYER_SKIN_TORSO)
 	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount) 
+		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount)
 		{
 			*handle1 = trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoNames[index]));
 			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoNames[index];
@@ -7905,7 +7904,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 	}
 	else if (feederID == FEEDER_PLAYER_SKIN_LEGS)
 	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount) 
+		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount)
 		{
 			*handle1 = trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegNames[index]));
 			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegNames[index];
@@ -7913,11 +7912,11 @@ static const char *UI_FeederItemText(float feederID, int index, int column,
 	}
 	else if (feederID == FEEDER_SIEGE_BASE_CLASS)
 	{
-		return ""; 
+		return "";
 	}
 	else if (feederID == FEEDER_SIEGE_CLASS_WEAPONS)
 	{
-		return ""; 
+		return "";
 	}
 	return "";
 }
@@ -7926,7 +7925,7 @@ static qhandle_t UI_FeederItemImage(float feederID, int index) {
 	int	validCnt,i;
 	static char info[MAX_STRING_CHARS];
 
-	if (feederID == FEEDER_SABER_SINGLE_INFO) 
+	if (feederID == FEEDER_SABER_SINGLE_INFO)
 	{
 		return 0;
 	}
@@ -7934,7 +7933,7 @@ static qhandle_t UI_FeederItemImage(float feederID, int index) {
 	{
 		return 0;
 	}
-	else if (feederID == FEEDER_Q3HEADS) 
+	else if (feederID == FEEDER_Q3HEADS)
 	{
 		int actual = -1;
 		UI_SelectedTeamHead(index, &actual);
@@ -7983,7 +7982,7 @@ static qhandle_t UI_FeederItemImage(float feederID, int index) {
 				{
 					i--;
 				}
-				
+
 				i++;
 				iconNameFromSkinName[i] = 0; //terminate, and append..
 				Q_strcat(iconNameFromSkinName, 256, "icon_");
@@ -8008,7 +8007,7 @@ static qhandle_t UI_FeederItemImage(float feederID, int index) {
 			return uiInfo.q3HeadIcons[index];
 		}
 	}
-	else if (feederID == FEEDER_SIEGE_TEAM1) 
+	else if (feederID == FEEDER_SIEGE_TEAM1)
 	{
 		if (!siegeTeam1)
 		{
@@ -8025,7 +8024,7 @@ static qhandle_t UI_FeederItemImage(float feederID, int index) {
 		}
 		return 0;
 	}
-	else if (feederID == FEEDER_SIEGE_TEAM2) 
+	else if (feederID == FEEDER_SIEGE_TEAM2)
 	{
 		if (!siegeTeam2)
 		{
@@ -8042,7 +8041,7 @@ static qhandle_t UI_FeederItemImage(float feederID, int index) {
 		}
 		return 0;
 	}
-	else if (feederID == FEEDER_ALLMAPS || feederID == FEEDER_MAPS) 
+	else if (feederID == FEEDER_ALLMAPS || feederID == FEEDER_MAPS)
 	{
 		int actual;
 		UI_SelectedMap(index, &actual);
@@ -8054,33 +8053,33 @@ static qhandle_t UI_FeederItemImage(float feederID, int index) {
 			return uiInfo.mapList[index].levelShot;
 		}
 	}
-	else if (feederID == FEEDER_PLAYER_SKIN_HEAD) 
+	else if (feederID == FEEDER_PLAYER_SKIN_HEAD)
 	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount) 
+		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount)
 		{
 			//return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadIcons[index];
 			return trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadNames[index]));
 		}
-	} 
-	else if (feederID == FEEDER_PLAYER_SKIN_TORSO) 
+	}
+	else if (feederID == FEEDER_PLAYER_SKIN_TORSO)
 	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount) 
+		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount)
 		{
 			//return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoIcons[index];
 			return trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoNames[index]));
 		}
-	} 
-	else if (feederID == FEEDER_PLAYER_SKIN_LEGS) 
+	}
+	else if (feederID == FEEDER_PLAYER_SKIN_LEGS)
 	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount) 
+		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount)
 		{
 			//return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegIcons[index];
 			return trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegNames[index]));
 		}
-	} 
+	}
 	else if (feederID == FEEDER_COLORCHOICES)
 	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount) 
+		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount)
 		{
 			return trap->R_RegisterShaderNoMip( uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorShader[index]);
 		}
@@ -8088,18 +8087,18 @@ static qhandle_t UI_FeederItemImage(float feederID, int index) {
 
 	else if ( feederID == FEEDER_SIEGE_BASE_CLASS)
 	{
-		int team,baseClass; 
+		int team,baseClass;
 
 		team = (int)trap->Cvar_VariableValue("ui_team");
 		baseClass = (int)trap->Cvar_VariableValue("ui_siege_class");
 
-		if ((team == SIEGETEAM_TEAM1) || 
-			(team == SIEGETEAM_TEAM2)) 
+		if ((team == SIEGETEAM_TEAM1) ||
+			(team == SIEGETEAM_TEAM2))
 		{
 			// Is it a valid base class?
 			if ((baseClass >= SPC_INFANTRY) && (baseClass < SPC_MAX))
 			{
-				if (index >= 0) 
+				if (index >= 0)
 				{
 					return(BG_GetUIPortrait(team, baseClass, index));
 				}
@@ -8241,25 +8240,25 @@ int UI_UpdateNormalMenuCharacter( void ) {
 	return result;
 }
 
-qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item) 
+qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 {
 	static char info[MAX_STRING_CHARS];
 	const int feederID = feederFloat;
 
-	if (feederID == FEEDER_Q3HEADS) 
+	if (feederID == FEEDER_Q3HEADS)
 	{
 		int actual = -1;
 		UI_SelectedTeamHead(index, &actual);
 		uiInfo.q3SelectedHead = index;
 		trap->Cvar_Set("ui_selectedModelIndex", va("%i", index));
 		index = actual;
-		if (index >= 0 && index < uiInfo.q3HeadCount) 
+		if (index >= 0 && index < uiInfo.q3HeadCount)
 		{
 			trap->Cvar_Set( "model", uiInfo.q3HeadNames[index]);	//standard model
 			trap->Cvar_Set ( "char_color_red", "255" );			//standard colors
 			trap->Cvar_Set ( "char_color_green", "255" );
 			trap->Cvar_Set ( "char_color_blue", "255" );
-			
+
 			//Raz: Model selection preview (From JA+ code)
 			if ( !UI_UpdateNormalMenuCharacter() )
 			{
@@ -8267,8 +8266,8 @@ qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 				UI_FeederSelection( feederFloat, uiInfo.q3SelectedHead, item );
 			}
 		}
-	} 
-	else if (feederID == FEEDER_MOVES) 
+	}
+	else if (feederID == FEEDER_MOVES)
 	{
 		itemDef_t *item;
 		menuDef_t *menu;
@@ -8346,8 +8345,8 @@ qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 				}
 			}
 		}
-	} 
-	else if (feederID == FEEDER_MOVES_TITLES) 
+	}
+	else if (feederID == FEEDER_MOVES_TITLES)
 	{
 		itemDef_t *item;
 		menuDef_t *menu;
@@ -8408,7 +8407,7 @@ qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 		}
 		g_siegedFeederForcedSet = 0;
 	}
-	else if (feederID == FEEDER_FORCECFG) 
+	else if (feederID == FEEDER_FORCECFG)
 	{
 		int newindex = index;
 
@@ -8429,13 +8428,13 @@ qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 			}
 		}
 
-		if (index >= 0 && index < uiInfo.forceConfigCount) 
+		if (index >= 0 && index < uiInfo.forceConfigCount)
 		{
 				UI_ForceConfigHandle(uiInfo.forceConfigSelected, index);
 				uiInfo.forceConfigSelected = index;
 		}
-	} 
-	else if (feederID == FEEDER_MAPS || feederID == FEEDER_ALLMAPS) 
+	}
+	else if (feederID == FEEDER_MAPS || feederID == FEEDER_ALLMAPS)
 	{
 		int actual, map;
 		const char *checkValid = NULL;
@@ -8502,62 +8501,62 @@ qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 	} else if (feederID == FEEDER_DEMOS) {
 		uiInfo.demoIndex = index;
 	}
-	else if (feederID == FEEDER_COLORCHOICES) 
+	else if (feederID == FEEDER_COLORCHOICES)
 	{
 		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount)
 		{
 			Item_RunScript(item, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorActionText[index]);
 		}
 	}
-	else if (feederID == FEEDER_PLAYER_SKIN_HEAD) 
+	else if (feederID == FEEDER_PLAYER_SKIN_HEAD)
 	{
 		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount)
 		{
 			trap->Cvar_Set("ui_char_skin_head", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadNames[index]);
 		}
-	} 
-	else if (feederID == FEEDER_PLAYER_SKIN_TORSO) 
+	}
+	else if (feederID == FEEDER_PLAYER_SKIN_TORSO)
 	{
 		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount)
 		{
 			trap->Cvar_Set("ui_char_skin_torso", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoNames[index]);
 		}
-	} 
-	else if (feederID == FEEDER_PLAYER_SKIN_LEGS) 
+	}
+	else if (feederID == FEEDER_PLAYER_SKIN_LEGS)
 	{
 		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount)
 		{
 			trap->Cvar_Set("ui_char_skin_legs", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegNames[index]);
 		}
-	} 
-	else if (feederID == FEEDER_PLAYER_SPECIES) 
+	}
+	else if (feederID == FEEDER_PLAYER_SPECIES)
 	{
 		uiInfo.playerSpeciesIndex = index;
-	} 
-	else if (feederID == FEEDER_LANGUAGES) 
+	}
+	else if (feederID == FEEDER_LANGUAGES)
 	{
 		uiInfo.languageCountIndex = index;
-	} 
+	}
 	else if (  feederID == FEEDER_SIEGE_BASE_CLASS )
 	{
-		int team,baseClass; 
+		int team,baseClass;
 
 		team = (int)trap->Cvar_VariableValue("ui_team");
 		baseClass = (int)trap->Cvar_VariableValue("ui_siege_class");
 
 		UI_UpdateCvarsForClass(team, baseClass, index);
 	}
-	else if (feederID == FEEDER_SIEGE_CLASS_WEAPONS) 
+	else if (feederID == FEEDER_SIEGE_CLASS_WEAPONS)
 	{
 //		trap->Cvar_VariableStringBuffer( va("ui_class_weapondesc%i", index), info, sizeof(info) );
 //		trap->Cvar_Set( "ui_itemforceinvdesc", info );
-	} 
-	else if (feederID == FEEDER_SIEGE_CLASS_INVENTORY) 
+	}
+	else if (feederID == FEEDER_SIEGE_CLASS_INVENTORY)
 	{
 //		trap->Cvar_VariableStringBuffer( va("ui_class_itemdesc%i", index), info, sizeof(info) );
 //		trap->Cvar_Set( "ui_itemforceinvdesc", info );
-	} 
-	else if (feederID == FEEDER_SIEGE_CLASS_FORCE) 
+	}
+	else if (feederID == FEEDER_SIEGE_CLASS_FORCE)
 	{
 		int i;
 //		int validCnt = 0;
@@ -8572,7 +8571,7 @@ qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 				trap->Cvar_Set( "ui_itemforceinvdesc", forcepowerDesc[i] );
 			}
 		}
-	} 
+	}
 	return qtrue;
 }
 
@@ -8614,21 +8613,21 @@ static qboolean GameType_Parse(char **p, qboolean join) {
 					return qfalse;
 				}
 			}
-	
+
 			if (join) {
 				if (uiInfo.numJoinGameTypes < MAX_GAMETYPES) {
 					uiInfo.numJoinGameTypes++;
 				} else {
 					Com_Printf("Too many net game types, last one replace!\n");
-				}		
+				}
 			} else {
 				if (uiInfo.numGameTypes < MAX_GAMETYPES) {
 					uiInfo.numGameTypes++;
 				} else {
 					Com_Printf("Too many game types, last one replace!\n");
-				}		
+				}
 			}
-	 
+
 			token = COM_ParseExt((const char **)p, qtrue);
 			if (token[0] != '}') {
 				return qfalse;
@@ -8661,7 +8660,7 @@ static qboolean MapList_Parse(char **p) {
 		}
 
 		if (token[0] == '{') {
-			if (!String_Parse(p, &uiInfo.mapList[uiInfo.mapCount].mapName) || !String_Parse(p, &uiInfo.mapList[uiInfo.mapCount].mapLoadName) 
+			if (!String_Parse(p, &uiInfo.mapList[uiInfo.mapCount].mapName) || !String_Parse(p, &uiInfo.mapList[uiInfo.mapCount].mapLoadName)
 				||!Int_Parse(p, &uiInfo.mapList[uiInfo.mapCount].teamMembers) ) {
 				return qfalse;
 			}
@@ -8678,7 +8677,7 @@ static qboolean MapList_Parse(char **p) {
 					uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << (token[0] - 0x030));
 				} else {
 					break;
-				} 
+				}
 			}
 
 			//mapList[mapCount].imageName = String_Alloc(va("levelshots/%s", mapList[mapCount].mapLoadName));
@@ -8880,7 +8879,7 @@ static qboolean bIsImageFile(const char* dirptr, const char* skinname)
 		Com_sprintf(fpath, MAX_QPATH, "models/players/%s/icon_%s.tga", dirptr, skinname);
 		trap->FS_Open(fpath, &f, FS_READ);
 	}
-	if (f) 
+	if (f)
 	{
 		trap->FS_Close(f);
 		return qtrue;
@@ -8897,7 +8896,7 @@ static qboolean bIsSkinFile(const char* dirptr, const char* skinname)
 
 	Com_sprintf(fpath, MAX_QPATH, "models/players/%s/model_%s.skin", dirptr, skinname);
 	trap->FS_Open(fpath, &f, FS_READ);
-	if (f) 
+	if (f)
 	{
 		trap->FS_Close(f);
 		return qtrue;
@@ -8913,7 +8912,7 @@ static qboolean bIsAnimFile(const char* dirptr)
 
 	Com_sprintf(fpath, MAX_QPATH, "models/players/%s/animation.cfg", dirptr);
 	trap->FS_Open(fpath, &f, FS_READ);
-	if (f) 
+	if (f)
 	{
 		trap->FS_Close(f);
 		return qtrue;
@@ -8951,13 +8950,13 @@ static void UI_BuildQ3Model_List( void )
 	for (i=0; i<numdirs && uiInfo.q3HeadCount < MAX_Q3PLAYERMODELS; i++,dirptr+=dirlen+1)
 	{
 		dirlen = strlen(dirptr);
-		
+
 		if ( dirlen && dirptr[dirlen-1] == '/' )
 			dirptr[dirlen-1] = '\0';
 
 		if ( !strcmp( dirptr, "." ) || !strcmp( dirptr, ".." ) )
 			continue;
-			
+
 
 		numfiles = trap->FS_GetFileList( va("models/players/%s",dirptr), "skin", filelist, sizeof(filelist) );
 		fileptr  = filelist;
@@ -9091,7 +9090,7 @@ static void UI_BuildQ3Model_List( void )
 				return;
 			}
 		}
-	}	
+	}
 
 }
 
@@ -9192,7 +9191,7 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad )
 		char fpath[2048];
 
 		dirlen = strlen(dirptr);
-		
+
 		if (dirlen)
 		{
 			if (dirptr[dirlen-1]=='/')
@@ -9205,12 +9204,12 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad )
 
 		if (!strcmp(dirptr,".") || !strcmp(dirptr,".."))
 			continue;
-			
+
 		Com_sprintf(fpath, 2048, "models/players/%s/PlayerChoice.txt", dirptr);
 		filelen = trap->FS_Open(fpath, &f, FS_READ);
 
 		if (f)
-		{ 
+		{
 			char buffer[2048];
 			char	skinname[64];
 			int		numfiles;
@@ -9246,11 +9245,11 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad )
 				{ //if it exists
 					if (Q_stricmpn(skinname,"head_",5) == 0)
 					{
-						if (uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinHeadCount < MAX_PLAYERMODELS) 
+						if (uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinHeadCount < MAX_PLAYERMODELS)
 						{
 							Q_strncpyz(
-								uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinHeadNames[uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinHeadCount++], 
-								skinname, 
+								uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinHeadNames[uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinHeadCount++],
+								skinname,
 								sizeof(uiInfo.playerSpecies[0].SkinHeadNames[0])
 								);
 							iSkinParts |= 1<<0;
@@ -9258,10 +9257,10 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad )
 					} else
 					if (Q_stricmpn(skinname,"torso_",6) == 0)
 					{
-						if (uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinTorsoCount < MAX_PLAYERMODELS) 
+						if (uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinTorsoCount < MAX_PLAYERMODELS)
 						{
-							Q_strncpyz(uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinTorsoNames[uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinTorsoCount++], 
-								skinname, 
+							Q_strncpyz(uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinTorsoNames[uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinTorsoCount++],
+								skinname,
 								sizeof(uiInfo.playerSpecies[0].SkinTorsoNames[0])
 								);
 							iSkinParts |= 1<<1;
@@ -9269,11 +9268,11 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad )
 					} else
 					if (Q_stricmpn(skinname,"lower_",6) == 0)
 					{
-						if (uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinLegCount < MAX_PLAYERMODELS) 
+						if (uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinLegCount < MAX_PLAYERMODELS)
 						{
-							Q_strncpyz(uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinLegNames[uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinLegCount++], 
-								skinname, 
-								sizeof(uiInfo.playerSpecies[0].SkinLegNames[0]) 
+							Q_strncpyz(uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinLegNames[uiInfo.playerSpecies[uiInfo.playerSpeciesCount].SkinLegCount++],
+								skinname,
+								sizeof(uiInfo.playerSpecies[0].SkinLegNames[0])
 								);
 								iSkinParts |= 1<<2;
 						}
@@ -9346,7 +9345,7 @@ void UI_Init( qboolean inGameLoad ) {
 	if ( japp_crashHandler.integer )
 		ActivateCrashHandler();
 
-	// Register identifier and support flags this way to ensure validity	
+	// Register identifier and support flags this way to ensure validity
 	trap->Cvar_Register( NULL, "csf", va( "%X", JAPP_CLIENT_FLAGS ), CVAR_USERINFO|CVAR_ROM );
 
 	#ifdef FAV_SERVERS
@@ -9415,8 +9414,8 @@ void UI_Init( qboolean inGameLoad ) {
 	uiInfo.uiDC.getBindingBuf					= trap->Key_GetBindingBuf;
 	uiInfo.uiDC.keynumToStringBuf				= trap->Key_KeynumToStringBuf;
 	uiInfo.uiDC.executeText						= trap->Cmd_ExecuteText;
-	uiInfo.uiDC.Error							= trap->Error; 
-	uiInfo.uiDC.Print							= trap->Print; 
+	uiInfo.uiDC.Error							= trap->Error;
+	uiInfo.uiDC.Print							= trap->Print;
 	uiInfo.uiDC.Pause							= &UI_Pause;
 	uiInfo.uiDC.ownerDrawWidth					= &UI_OwnerDrawWidth;
 	uiInfo.uiDC.registerSound					= trap->S_RegisterSound;
@@ -9488,7 +9487,7 @@ void UI_Init( qboolean inGameLoad ) {
 	UI_LoadMenus( menuSet, qtrue );
 	UI_LoadMenus( "ui/jampingame.txt", qtrue );
 #endif
-	
+
 	{
 		//Raz: Truncate the name, try and avoid overflow glitches for long names and menu feeders
 	//	trap->Cvar_Register( NULL, "ui_name", UI_Cvar_VariableString( "name" ), CVAR_INTERNAL );	//get this now, jic the menus change again trying to setName before getName
@@ -9556,7 +9555,7 @@ void UI_Refresh( int realtime ) {
 		UI_BuildServerStatus( qfalse );
 		// refresh find player list
 		UI_BuildFindPlayerList( qfalse );
-	} 
+	}
 	// draw cursor
 	UI_SetColor( NULL );
 	if ( Menu_Count() > 0 && (trap->Key_GetCatcher() & KEYCATCH_UI) ) {
@@ -9669,11 +9668,11 @@ static void UI_ReadableSize ( char *buf, int bufsize, int value )
 {
 	if (value > 1024*1024*1024 ) { // gigs
 		Com_sprintf( buf, bufsize, "%d", value / (1024*1024*1024) );
-		Com_sprintf( buf+strlen(buf), bufsize-strlen(buf), ".%02d GB", 
+		Com_sprintf( buf+strlen(buf), bufsize-strlen(buf), ".%02d GB",
 			(value % (1024*1024*1024))*100 / (1024*1024*1024) );
 	} else if (value > 1024*1024 ) { // megs
 		Com_sprintf( buf, bufsize, "%d", value / (1024*1024) );
-		Com_sprintf( buf+strlen(buf), bufsize-strlen(buf), ".%02d MB", 
+		Com_sprintf( buf+strlen(buf), bufsize-strlen(buf), ".%02d MB",
 			(value % (1024*1024))*100 / (1024*1024) );
 	} else if (value > 1024 ) { // kilos
 		Com_sprintf( buf, bufsize, "%d KB", value / 1024 );
@@ -9770,7 +9769,7 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 			int n = downloadSize / xferRate; // estimated time for entire d/l in secs
 
 			// We do it in K (/1024) because we'd overflow around 4MB
-			UI_PrintTime ( dlTimeBuf, sizeof dlTimeBuf, 
+			UI_PrintTime ( dlTimeBuf, sizeof dlTimeBuf,
 				(n - (((downloadCount/1024) * n) / (downloadSize/1024))) * 1000);
 
 			Text_PaintCenter(leftWidth, yStart+216, scale, &colorWhite, dlTimeBuf, 0, iMenuFont);
@@ -10087,7 +10086,7 @@ void JP_ParseFavServers( void )
 		token = TP_ParseToken();
 		if ( !token[0] )
 			break;
-		
+
 		if ( uiLocal.serversCount < MAX_SERVERS )
 		{
 			if ( !JP_ProcessFavServer( token ) )
@@ -10152,7 +10151,7 @@ float UI_Font_HeightPixels( const int iFontIndex, const float scale ) {
 Q_EXPORT uiExport_t* QDECL GetModuleAPI( int apiVersion, uiImport_t *import )
 {
 	static uiExport_t uie = {0};
-	
+
 	assert( import );
 	trap = import;
 	Com_Printf	= trap->Print;

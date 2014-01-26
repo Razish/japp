@@ -45,7 +45,7 @@ static int JPLua_Server_GetSSF( lua_State *L ) {
 static int JPLua_Server_GetPlayers( lua_State *L ) {
 	int top = 0;
 	int i = 1, clientNum = 0;
-	
+
 	lua_newtable( L );
 	top = lua_gettop( L );
 
@@ -78,7 +78,19 @@ void JPLua_Register_Server( lua_State *L ) {
 	lua_pushvalue( L, -2 ); // Re-push metatable to top of stack
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
-	luaL_register( L, NULL, jplua_server_meta ); // Fill metatable with fields
+	// fill metatable with fields
+#if LUA_VERSION_NUM > 501
+	{
+		const luaL_Reg *r;
+		for ( r=jplua_server_meta; r->name; r++ ) {
+			lua_pushcfunction( L, r->func );
+			lua_setfield( L, -2, r->name );
+		}
+	}
+#else
+	luaL_register( L, NULL, jplua_server_meta );
+#endif
+
 	lua_pop( L, -1 ); // Pop the Server class metatable from the stack
 }
 

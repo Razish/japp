@@ -68,11 +68,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\lua\bit.c" />
     <ClCompile Include="..\lua\lapi.c" />
     <ClCompile Include="..\lua\lauxlib.c" />
     <ClCompile Include="..\lua\lbaselib.c" />
+    <ClCompile Include="..\lua\lbitlib.c" />
     <ClCompile Include="..\lua\lcode.c" />
+    <ClCompile Include="..\lua\lcorolib.c" />
+    <ClCompile Include="..\lua\lctype.c" />
     <ClCompile Include="..\lua\ldblib.c" />
     <ClCompile Include="..\lua\ldebug.c" />
     <ClCompile Include="..\lua\ldo.c" />
@@ -99,7 +101,6 @@
     <ClCompile Include="..\lua\lundump.c" />
     <ClCompile Include="..\lua\lvm.c" />
     <ClCompile Include="..\lua\lzio.c" />
-    <ClCompile Include="..\lua\print.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

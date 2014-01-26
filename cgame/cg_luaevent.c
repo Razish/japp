@@ -38,7 +38,7 @@ int JPLua_Event_AddListener( lua_State *L ) {
 	}
 
 	trap->Print( "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
-	
+
 	return 0;
 }
 
@@ -62,7 +62,7 @@ int JPLua_Event_RemoveListener( lua_State *L ) {
 	}
 
 	trap->Print( "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
-	
+
 	return 0;
 }
 
@@ -83,7 +83,7 @@ void JPLua_Event_Shutdown( void ) {
 		//RAZTODO: Refcount because multiple plugins can register the same command
 		//Remove all console commands
 		while ( nextConsoleCmd ) {
-			lua_unref( JPLua.state, consoleCmd->handle );
+			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, consoleCmd->handle );
 			nextConsoleCmd = consoleCmd->next;
 
 			free( consoleCmd );
@@ -92,7 +92,7 @@ void JPLua_Event_Shutdown( void ) {
 
 		// remove all server commands
 		while ( nextServerCmd ) {
-			lua_unref( JPLua.state, serverCmd->handle );
+			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, serverCmd->handle );
 			nextServerCmd = serverCmd->next;
 
 			free( serverCmd );

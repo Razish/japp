@@ -5,7 +5,7 @@
 
 #define	CGAME_API_VERSION		1
 
-#define	CMD_BACKUP			64	
+#define	CMD_BACKUP			64
 #define	CMD_MASK			(CMD_BACKUP - 1)
 // allow a lot of command backups for very fast systems
 // multiple commands may be combined into a single packet, so this
@@ -425,7 +425,7 @@ typedef enum cgameExportLegacy_e {
 	CG_DRAW_ACTIVE_FRAME,
 	CG_CROSSHAIR_PLAYER,
 	CG_LAST_ATTACKER,
-	CG_KEY_EVENT, 
+	CG_KEY_EVENT,
 	CG_MOUSE_EVENT,
 	CG_EVENT_HANDLING,
 	CG_POINT_CONTENTS,
@@ -474,7 +474,7 @@ typedef struct cgameImport_s {
 	void			(*Cvar_Set)								( const char *var_name, const char *value );
 	void			(*Cvar_Update)							( vmCvar_t *vmCvar );
 	void			(*Cvar_VariableStringBuffer)			( const char *var_name, char *buffer, int bufsize );
-	
+
 	// command
 	void			(*AddCommand)							( const char *cmd_name );
 	int				(*Cmd_Argc)								( void );
@@ -498,11 +498,11 @@ typedef struct cgameImport_s {
 	clipHandle_t	(*CM_InlineModel)						( int index );
 	void			(*CM_LoadMap)							( const char *mapname, qboolean subBSP );
 	int				(*CM_NumInlineModels)					( void );
-	int				(*CM_PointContents)						( const vector3 *p, clipHandle_t model );
+	uint32_t		(*CM_PointContents)						( const vector3 *p, clipHandle_t model );
 	int				(*CM_RegisterTerrain)					( const char *config );
 	clipHandle_t	(*CM_TempModel)							( const vector3 *mins, const vector3 *maxs, int capsule );
 	void			(*CM_Trace)								( trace_t *results, const vector3 *start, const vector3 *end, const vector3 *mins, const vector3 *maxs, clipHandle_t model, int brushmask, int capsule );
-	int				(*CM_TransformedPointContents)			( const vector3 *p, clipHandle_t model, const vector3 *origin, const vector3 *angles );
+	uint32_t		(*CM_TransformedPointContents)			( const vector3 *p, clipHandle_t model, const vector3 *origin, const vector3 *angles );
 	void			(*CM_TransformedTrace)					( trace_t *results, const vector3 *start, const vector3 *end, const vector3 *mins, const vector3 *maxs, clipHandle_t model, int brushmask, const vector3 *origin, const vector3 *angles, int capsule );
 	void			(*RMG_Init)								( int terrainID, const char *terrainInfo );
 
@@ -705,7 +705,7 @@ typedef struct cgameExport_s {
 	void			(*KeyEvent)					( int key, qboolean down );
 	void			(*MouseEvent)				( int x, int y );
 	void			(*EventHandling)			( int type );
-	int				(*PointContents)			( void );
+	uint32_t		(*PointContents)			( void );
 	void			(*GetLerpOrigin)			( void );
 	void			(*GetLerpData)				( void );
 	void			(*Trace)					( void );

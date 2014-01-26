@@ -3,7 +3,7 @@
 // cg_syscalls.c -- this file is only included when building a dll
 // cg_syscalls.asm is included instead when building a qvm
 #include "cg_local.h"
- 
+
 static intptr_t (QDECL *Q_syscall)( intptr_t arg, ... ) = (intptr_t (QDECL *)( intptr_t, ...))-1;
 
 static void TranslateSyscalls( void );
@@ -29,7 +29,7 @@ void trap_Error( const char *fmt ) {
 	exit(1);
 }
 int trap_Milliseconds( void ) {
-	return Q_syscall( CG_MILLISECONDS ); 
+	return Q_syscall( CG_MILLISECONDS );
 }
 void trap_PrecisionTimer_Start( void **theNewTimer ) {
 	Q_syscall( CG_PRECISIONTIMER_START, theNewTimer );
@@ -111,10 +111,10 @@ clipHandle_t trap_CM_TempBoxModel( const vector3 *mins, const vector3 *maxs ) {
 clipHandle_t trap_CM_TempCapsuleModel( const vector3 *mins, const vector3 *maxs ) {
 	return Q_syscall( CG_CM_TEMPCAPSULEMODEL, mins, maxs );
 }
-int trap_CM_PointContents( const vector3 *p, clipHandle_t model ) {
+uint32_t trap_CM_PointContents( const vector3 *p, clipHandle_t model ) {
 	return Q_syscall( CG_CM_POINTCONTENTS, p, model );
 }
-int trap_CM_TransformedPointContents( const vector3 *p, clipHandle_t model, const vector3 *origin, const vector3 *angles ) {
+uint32_t trap_CM_TransformedPointContents( const vector3 *p, clipHandle_t model, const vector3 *origin, const vector3 *angles ) {
 	return Q_syscall( CG_CM_TRANSFORMEDPOINTCONTENTS, p, model, origin, angles );
 }
 void trap_CM_BoxTrace( trace_t *results, const vector3 *start, const vector3 *end, const vector3 *mins, const vector3 *maxs, clipHandle_t model, int brushmask ) {
@@ -428,7 +428,7 @@ void trap_SnapVector( vector3 *v ) {
 int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits) {
   return Q_syscall(CG_CIN_PLAYCINEMATIC, arg0, xpos, ypos, width, height, bits);
 }
- 
+
 // stops playing the cinematic and ends it.  should always return FMV_EOF
 // cinematics must be stopped in reverse order of when they are started
 e_status trap_CIN_StopCinematic(int handle) {
@@ -440,13 +440,13 @@ e_status trap_CIN_StopCinematic(int handle) {
 e_status trap_CIN_RunCinematic (int handle) {
   return Q_syscall(CG_CIN_RUNCINEMATIC, handle);
 }
- 
+
 
 // draws the current frame
 void trap_CIN_DrawCinematic (int handle) {
   Q_syscall(CG_CIN_DRAWCINEMATIC, handle);
 }
- 
+
 
 // allows you to resize the animation dynamically
 void trap_CIN_SetExtents (int handle, int x, int y, int w, int h) {
@@ -486,7 +486,7 @@ void trap_FX_AddScheduledEffects( qboolean skyPortal ) {
 }
 void trap_FX_Draw2DEffects ( float screenXScale, float screenYScale ) {
 	Q_syscall( CG_FX_DRAW_2D_EFFECTS, PASSFLOAT(screenXScale), PASSFLOAT(screenYScale) );
-}	
+}
 int	trap_FX_InitSystem( refdef_t* refdef ) {
 	return Q_syscall( CG_FX_INIT_SYSTEM, refdef );
 }

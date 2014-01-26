@@ -100,7 +100,7 @@ static void G_Give( gentity_t *ent, const char *name, const char *args, int argc
 		if ( !give_all )
 			return;
 	}
-	
+
 	if ( !give_all && !Q_stricmp( name, "weaponnum" ) ) {
 		ent->client->ps.stats[STAT_WEAPONS] |= (1 << atoi( args ));
 		return;
@@ -443,7 +443,7 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 				if ( ent->health > 0 ) {
 					ent->flags &= ~FL_GODMODE;
 					ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
-					player_die( ent, ent, ent, 100000, MOD_TEAM_CHANGE ); 
+					player_die( ent, ent, ent, 100000, MOD_TEAM_CHANGE );
 				}
 			}
 
@@ -524,8 +524,8 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 extern void G_LeaveVehicle( gentity_t *ent, qboolean ConCheck );
 void StopFollowing( gentity_t *ent ) {
 	int i=0;
-	ent->client->ps.persistant[ PERS_TEAM ] = TEAM_SPECTATOR;	
-	ent->client->sess.sessionTeam = TEAM_SPECTATOR;	
+	ent->client->ps.persistant[ PERS_TEAM ] = TEAM_SPECTATOR;
+	ent->client->sess.sessionTeam = TEAM_SPECTATOR;
 	ent->client->sess.spectatorState = SPECTATOR_FREE;
 	ent->client->ps.pm_flags &= ~PMF_FOLLOW;
 	ent->r.svFlags &= ~SVF_BOT;
@@ -1286,7 +1286,7 @@ static qboolean G_VoteClientkick( gentity_t *ent, int numArgs, const char *arg1,
 		trap->SendServerCommand( ent-g_entities, va("print \"there is no client with the client number %d.\n\"", n ) );
 		return qfalse;
 	}
-		
+
 	Com_sprintf( level.voteString, sizeof(level.voteString ), "%s %s", arg1, arg2 );
 	Com_sprintf( level.voteDisplayString, sizeof(level.voteDisplayString), "%s %s", arg1, g_entities[n].client->pers.netname );
 	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
@@ -1697,9 +1697,9 @@ validVote:
 	ent->client->pers.vote = 1;
 
 	trap->SetConfigstring( CS_VOTE_TIME,	va( "%i", level.voteTime ) );
-	trap->SetConfigstring( CS_VOTE_STRING,	level.voteDisplayString );	
+	trap->SetConfigstring( CS_VOTE_STRING,	level.voteDisplayString );
 	trap->SetConfigstring( CS_VOTE_YES,		va( "%i", level.voteYes ) );
-	trap->SetConfigstring( CS_VOTE_NO,		va( "%i", level.voteNo ) );	
+	trap->SetConfigstring( CS_VOTE_NO,		va( "%i", level.voteNo ) );
 }
 
 static void Cmd_Vote_f( gentity_t *ent ) {
@@ -1734,7 +1734,7 @@ static void Cmd_Vote_f( gentity_t *ent ) {
 	else {
 		level.voteNo++;
 		ent->client->pers.vote = 2;
-		trap->SetConfigstring( CS_VOTE_NO, va("%i", level.voteNo ) );	
+		trap->SetConfigstring( CS_VOTE_NO, va("%i", level.voteNo ) );
 	}
 
 	// a majority will be determined in CheckVote, which will also account for players entering or leaving
@@ -1795,7 +1795,7 @@ int G_ItemUsable( playerState_t *ps, int forcedUse ) {
 
 	if ( ps->m_iVehicleNum )
 		return 0;
-	
+
 	if ( ps->pm_flags & PMF_USE_ITEM_HELD )
 		return 0;
 
@@ -1941,7 +1941,7 @@ void Cmd_SaberAttackCycle_f( gentity_t *ent ) {
 	if ( ent->client->saber[0].model[0] && ent->client->saber[1].model[0] ) {
 		// no cycling for akimbo
 		if ( WP_SaberCanTurnOffSomeBlades( &ent->client->saber[1] ) ) {
-			// can turn second saber off 
+			// can turn second saber off
 			if ( ent->client->ps.saberHolstered == 1 ) {
 				// have one holstered, unholster it
 				G_Sound( ent, CHAN_AUTO, ent->client->saber[1].soundOn );
@@ -2127,7 +2127,7 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 
 	// unlagged!
 	tr = G_RealTrace( ent, 256.0f );
-	
+
 	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *challenged = &g_entities[tr->entityNum];
 
@@ -2366,7 +2366,7 @@ static void Cmd_Sabercolor_f( gentity_t *ent ) {
 	* Strip colour codes from identifier???
 	* Create structure to contain identifier and short-name, add to linked list
 	* Loop through all clients, check for match against identifier
-	
+
 /whoischan <identifier>
 	* Strip invalid (non-alphanumeric?) characters from identifier
 	* Strip colour codes from identifier???
@@ -2915,7 +2915,7 @@ static void Cmd_Origin_f( gentity_t *ent ) {
 	char		arg1[64];
 	int			targetClient;
 	gentity_t	*targ;
-	
+
 	//Self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT ) : ent-g_entities;
@@ -3078,7 +3078,6 @@ static const command_t commands[] = {
 	{ "where",				Cmd_Where_f,				GTB_ALL,					CMDFLAG_NOINTERMISSION },
 	{ "whoischan",			Cmd_WhoisChannel_f,			GTB_ALL,					0 },
 	{ "wrists",				Cmd_Kill_f,					GTB_ALL,					CMDFLAG_ALIVE|CMDFLAG_NOINTERMISSION },
-	{ NULL,					NULL,						GTB_ALL,					0 },
 };
 static size_t numCommands = ARRAY_LEN( commands );
 
@@ -3167,10 +3166,11 @@ void G_PrintCommands( gentity_t *ent ) {
 	int toggle = 0;
 	unsigned int count = 0;
 	const unsigned int limit = 72;
+	size_t i;
 
 	Q_strcat( buf, sizeof( buf ), "Regular commands:\n   " );
 
-	for ( command=commands; command && command->name; command++ ) {
+	for ( i=0, command=commands; i<numCommands; i++, command++ ) {
 		char *tmpMsg = NULL;
 
 		// if it's not allowed to be executed at the moment, continue

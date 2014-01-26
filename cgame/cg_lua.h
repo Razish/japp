@@ -30,7 +30,7 @@ void JPLua_DPrintf( const char *msg, ... );
 	}
 
 typedef struct jplua_cimport_table_s {
-	char *name;
+	const char *name;
 	lua_CFunction function;
 } jplua_cimport_table_t;
 

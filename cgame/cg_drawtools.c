@@ -14,10 +14,10 @@ Coordinates are 640*480 virtual values
 */
 void CG_DrawRect( float x, float y, float width, float height, float size, const vector4 *color ) {
 	trap->R_SetColor( color );
-	
+
 	CG_DrawTopBottom(x, y, width, height, size);
 	CG_DrawSides(x, y, width, height, size);
-	
+
 	trap->R_SetColor( NULL );
 }
 
@@ -178,7 +178,7 @@ void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 	size = 0.03125;
 	size2 = 0.0625;
 
-	trap->R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol + size, frow + size2, 
+	trap->R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol + size, frow + size2,
 		cgs.media.charsetShader );
 
 }
@@ -194,7 +194,7 @@ Coordinates are at 640 by 480 virtual resolution
 ==================
 */
 #include "ui/menudef.h"	// for "ITEM_TEXTSTYLE_SHADOWED"
-void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor, 
+void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor,
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars )
 {
 	if (trap->R_Language_IsAsian())
@@ -203,12 +203,12 @@ void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor
 		//
 		vector4 color;
 		memcpy(&color,setColor, sizeof(color));	// de-const it
-		CG_Text_Paint(x, y, 1.0f,	// float scale, 
-						&color,		// vector4 color, 
-						string,		// const char *text, 
-						0.0f,		// float adjust, 
-						0,			// int limit, 
-						shadow ? ITEM_TEXTSTYLE_SHADOWED : 0,	// int style, 
+		CG_Text_Paint(x, y, 1.0f,	// float scale,
+						&color,		// vector4 color,
+						string,		// const char *text,
+						0.0f,		// float adjust,
+						0,			// int limit,
+						shadow ? ITEM_TEXTSTYLE_SHADOWED : 0,	// int style,
 						FONT_MEDIUM		// iMenuFont
 						) ;
 	}
@@ -338,7 +338,7 @@ void CG_TileClear( void ) {
 	w = cgs.glconfig.vidWidth;
 	h = cgs.glconfig.vidHeight;
 
-	if ( refdef->x == 0 && refdef->y == 0 && 
+	if ( refdef->x == 0 && refdef->y == 0 &&
 		refdef->width == w && refdef->height == h ) {
 		return;		// full screen rendering
 	}
@@ -427,7 +427,7 @@ void CG_LerpColour( const vector4 *start, const vector4 *end, vector4 *out, floa
 CG_ColorForHealth
 =================
 */
-void CG_ColorForGivenHealth( vector4 *hcolor, int health ) 
+void CG_ColorForGivenHealth( vector4 *hcolor, int health )
 {
 	// set the color based on health
 	hcolor->r = 1.0;
@@ -445,7 +445,7 @@ void CG_ColorForGivenHealth( vector4 *hcolor, int health )
 CG_ColorForHealth
 =================
 */
-void CG_ColorForHealth( vector4 *hcolor ) 
+void CG_ColorForHealth( vector4 *hcolor )
 {
 	int		health;
 	int		count;
@@ -455,7 +455,7 @@ void CG_ColorForHealth( vector4 *hcolor )
 	// be sustained at the current health / armor level
 	health = cg.snap->ps.stats[STAT_HEALTH];
 
-	if ( health <= 0 ) 
+	if ( health <= 0 )
 	{
 		VectorClear4( hcolor );	// black
 		hcolor->a = 1;
@@ -464,7 +464,7 @@ void CG_ColorForHealth( vector4 *hcolor )
 
 	count = cg.snap->ps.stats[STAT_ARMOR];
 	max = health * ARMOR_PROTECTION / ( 1.0 - ARMOR_PROTECTION );
-	if ( max < count ) 
+	if ( max < count )
 		count = max;
 	health += count;
 
@@ -480,7 +480,7 @@ Take x,y positions as if 640 x 480 and scales them to the proper resolution
 
 ==============
 */
-void CG_DrawNumField( int x, int y, int width, int value, int charWidth, int charHeight, int style, qboolean zeroFill ) 
+void CG_DrawNumField( int x, int y, int width, int value, int charWidth, int charHeight, int style, qboolean zeroFill )
 {
 	char	num[16], *ptr;
 	int		l;
@@ -513,6 +513,8 @@ void CG_DrawNumField( int x, int y, int width, int value, int charWidth, int cha
 	case 4:
 		value = value > 9999 ? 9999 : value;
 		value = value < -999 ? -999 : value;
+		break;
+	default:
 		break;
 	}
 
@@ -592,9 +594,9 @@ void CG_DrawNumField( int x, int y, int width, int value, int charWidth, int cha
 }
 
 #include "ui/ui_shared.h"	// for some text style junk
-void UI_DrawProportionalString( int x, int y, const char* str, int style, const vector4 *color ) 
+void UI_DrawProportionalString( int x, int y, const char* str, int style, const vector4 *color )
 {
-	// having all these different style defines (1 for UI, one for CG, and now one for the re->font stuff) 
+	// having all these different style defines (1 for UI, one for CG, and now one for the re->font stuff)
 	//	is dumb, but for now...
 	//
 	int iStyle = 0;
@@ -624,9 +626,9 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, const 
 	CG_Text_Paint( x, y, 1.0, color, str, 0, 0, iStyle, iMenuFont );
 }
 
-void UI_DrawScaledProportionalString( int x, int y, const char* str, int style, const vector4 *color, float scale ) 
+void UI_DrawScaledProportionalString( int x, int y, const char* str, int style, const vector4 *color, float scale )
 {
-	// having all these different style defines (1 for UI, one for CG, and now one for the re->font stuff) 
+	// having all these different style defines (1 for UI, one for CG, and now one for the re->font stuff)
 	//	is dumb, but for now...
 	//
 	int iStyle = 0;

@@ -107,7 +107,7 @@ static void Sniper_HoldPosition( void )
 {
 	NPC_FreeCombatPoint( NPCInfo->combatPoint, qtrue );
 	NPCInfo->goalEntity = NULL;
-	
+
 	/*if ( TIMER_Done( NPC, "stand" ) )
 	{//FIXME: what if can't shoot from this pos?
 		TIMER_Set( NPC, "duck", Q_irand( 2000, 4000 ) );
@@ -129,13 +129,13 @@ static qboolean Sniper_Move( void )
 	NPCInfo->combatMove = qtrue;//always move straight toward our goal
 
 	moved = NPC_MoveToGoal( qtrue );
-	
+
 	//Get the move info
 	NAV_GetLastMove( &info );
 
 	//FIXME: if we bump into another one of our guys and can't get around him, just stop!
 	//If we hit our target, then stop and fire!
-	if ( info.flags & NIF_COLLISION ) 
+	if ( info.flags & NIF_COLLISION )
 	{
 		if ( info.blocker == NPC->enemy )
 		{
@@ -149,7 +149,7 @@ static qboolean Sniper_Move( void )
 		if ( (NPCInfo->scriptFlags&SCF_CHASE_ENEMIES) && NPCInfo->goalEntity && NPCInfo->goalEntity == NPC->enemy )
 		{//we were running after enemy
 			//Try to find a combat point that can hit the enemy
-			int cpFlags = (CP_CLEAR|CP_HAS_ROUTE);
+			uint32_t cpFlags = (CP_CLEAR|CP_HAS_ROUTE);
 			int cp;
 			if ( NPCInfo->scriptFlags&SCF_USE_CP_NEAREST )
 			{
@@ -217,8 +217,8 @@ void NPC_BSSniper_Patrol( void )
 					NPCInfo->lastAlertID = level.alertEvents[alertEvent].ID;
 					if ( level.alertEvents[alertEvent].level == AEL_DISCOVERED )
 					{
-						if ( level.alertEvents[alertEvent].owner && 
-							level.alertEvents[alertEvent].owner->client && 
+						if ( level.alertEvents[alertEvent].owner &&
+							level.alertEvents[alertEvent].owner->client &&
 							level.alertEvents[alertEvent].owner->health >= 0 &&
 							level.alertEvents[alertEvent].owner->client->playerTeam == NPC->client->enemyTeam )
 						{//an enemy
@@ -246,15 +246,15 @@ void NPC_BSSniper_Patrol( void )
 				//NOTE: stops walking or doing anything else below
 				vector3	dir, angles;
 				float	o_yaw, o_pitch;
-				
+
 				VectorSubtract( &NPCInfo->investigateGoal, &NPC->client->renderInfo.eyePoint, &dir );
 				vectoangles( &dir, &angles );
-				
+
 				o_yaw = NPCInfo->desiredYaw;
 				o_pitch = NPCInfo->desiredPitch;
 				NPCInfo->desiredYaw = angles.yaw;
 				NPCInfo->desiredPitch = angles.pitch;
-				
+
 				NPC_UpdateAngles( qtrue, qtrue );
 
 				NPCInfo->desiredYaw = o_yaw;
@@ -341,7 +341,7 @@ static void Sniper_CheckMoveState( void )
 	if ( ( NPCInfo->goalEntity != NPC->enemy ) && ( NPCInfo->goalEntity != NULL ) )
 	{
 		//Did we make it?
-		if ( NAV_HitNavGoal( &NPC->r.currentOrigin, &NPC->r.mins, &NPC->r.maxs, &NPCInfo->goalEntity->r.currentOrigin, 16, FlyingCreature( NPC ) ) || 
+		if ( NAV_HitNavGoal( &NPC->r.currentOrigin, &NPC->r.mins, &NPC->r.maxs, &NPCInfo->goalEntity->r.currentOrigin, 16, FlyingCreature( NPC ) ) ||
 			( NPCInfo->squadState == SQUAD_SCOUT && enemyLOS2 && enemyDist2 <= 10000 ) )
 		{
 			//we got where we wanted to go, set timers based on why we were running
@@ -388,7 +388,7 @@ static void Sniper_ResolveBlockedShot( void )
 			if ( (NPCInfo->scriptFlags&SCF_CHASE_ENEMIES) && (!NPCInfo->goalEntity || NPCInfo->goalEntity == NPC->enemy) )
 			{//we were running after enemy
 				//Try to find a combat point that can hit the enemy
-				int cpFlags = (CP_CLEAR|CP_HAS_ROUTE);
+				uint32_t cpFlags = (CP_CLEAR|CP_HAS_ROUTE);
 				int cp;
 
 				if ( NPCInfo->scriptFlags&SCF_USE_CP_NEAREST )
@@ -493,7 +493,7 @@ qboolean Sniper_EvaluateShot( int hit )
 	}
 
 	hitEnt = &g_entities[hit];
-	if ( hit == NPC->enemy->s.number 
+	if ( hit == NPC->enemy->s.number
 		|| ( hitEnt && hitEnt->client && hitEnt->client->playerTeam == NPC->client->enemyTeam )
 		|| ( hitEnt && hitEnt->takedamage && ((hitEnt->r.svFlags&SVF_GLASS_BRUSH)||hitEnt->health < 40||NPC->s.weapon == WP_EMPLACED_GUN) )
 		|| ( hitEnt && (hitEnt->r.svFlags&SVF_GLASS_BRUSH)) )
@@ -629,7 +629,7 @@ NPC_BSSniper_Attack
 void Sniper_StartHide( void )
 {
 	int duckTime = Q_irand( 2000, 5000 );
-	
+
 	TIMER_Set( NPC, "duck", duckTime );
 	TIMER_Set( NPC, "watch", 500 );
 	TIMER_Set( NPC, "attackDelay", duckTime + Q_irand( 500, 2000 ) );
@@ -678,7 +678,7 @@ void NPC_BSSniper_Attack( void )
 			{//use primary fire
 				trace_t	trace;
 				trap->Trace ( &trace, &NPC->enemy->r.currentOrigin, &NPC->enemy->r.mins, &NPC->enemy->r.maxs, &NPC->r.currentOrigin, NPC->enemy->s.number, NPC->enemy->clipmask, qfalse, 0, 0 );
-				if ( !trace.allsolid && !trace.startsolid && (trace.fraction == 1.0 || trace.entityNum == NPC->s.number ) )
+				if ( !trace.allsolid && !trace.startsolid && (FloatCompare( trace.fraction, 1.0f, 0.001f ) || trace.entityNum == NPC->s.number ) )
 				{//he can get right to me
 					NPCInfo->scriptFlags &= ~SCF_ALT_FIRE;
 					//reset fire-timing variables
@@ -790,9 +790,9 @@ void NPC_BSSniper_Attack( void )
 		TIMER_Set( NPC, "duck", -1 );
 	}
 
-	if ( TIMER_Done( NPC, "duck" ) 
-		&& TIMER_Done( NPC, "watch" ) 
-		&& (TIMER_Get( NPC, "attackDelay" )-level.time) > 1000 
+	if ( TIMER_Done( NPC, "duck" )
+		&& TIMER_Done( NPC, "watch" )
+		&& (TIMER_Get( NPC, "attackDelay" )-level.time) > 1000
 		&& NPC->attackDebounceTime < level.time )
 	{
 		if ( enemyLOS2 && (NPCInfo->scriptFlags&SCF_ALT_FIRE) )

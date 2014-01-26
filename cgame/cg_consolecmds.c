@@ -335,7 +335,7 @@ static void CG_HudReload_f( void ) {
 	Menu_Reset();
 
 	hudSet = cg_hudFiles.string;
-	if ( hudSet[0] == '\0' ) 
+	if ( hudSet[0] == '\0' )
 		hudSet = "ui/jahud.txt";
 
 	CG_LoadMenus( hudSet );
@@ -343,11 +343,11 @@ static void CG_HudReload_f( void ) {
 
 
 typedef struct command_s {
-	char	*name;
-	void	(*func)( void );
+	const char *name;
+	void (*func)( void );
 } command_t;
 
-static command_t commands[] = {
+static const command_t commands[] = {
 	{ "+scores",					CG_ScoresDown_f },
 	{ "-scores",					CG_ScoresUp_f },
 	{ "addbot",						NULL },
@@ -439,7 +439,7 @@ static command_t commands[] = {
 	{ "weapprev",					CG_PrevWeapon_f },
 	{ "zoom",						NULL },
 };
-static size_t numCommands = ARRAY_LEN( commands );
+static const size_t numCommands = ARRAY_LEN( commands );
 
 static int cmdcmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((command_t*)b)->name );
@@ -448,7 +448,7 @@ static int cmdcmp( const void *a, const void *b ) {
 // The string has been tokenized and can be retrieved with Cmd_Argc() / Cmd_Argv()
 qboolean CG_ConsoleCommand( void ) {
 	const char *cmd = NULL;
-	command_t *command = NULL;
+	const command_t *command = NULL;
 
 	if ( JPLua_Event_ConsoleCommand() )
 		return qtrue;
@@ -467,7 +467,7 @@ qboolean CG_ConsoleCommand( void ) {
 }
 
 void CG_InitConsoleCommands( void ) {
-	command_t *cmd = commands;
+	const command_t *cmd = commands;
 	size_t i;
 
 	for ( i=0; i<numCommands; i++, cmd++ )

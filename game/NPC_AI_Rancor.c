@@ -1,7 +1,7 @@
 // leave this line at the top of all AI_xxxx.cpp files for PCH reasons...
 #include "g_headers.h"
 
-	    
+
 #include "b_local.h"
 
 extern void G_GetBoltPosition( gentity_t *self, int boltIndex, vector3 *pos, int modelIndex );
@@ -65,7 +65,7 @@ void Rancor_Idle( void )
 
 qboolean Rancor_CheckRoar( gentity_t *self )
 {
-	if ( !self->wait )
+	if ( !(int)self->wait )
 	{//haven't ever gotten mad yet
 		self->wait = 1;//do this only once
 		self->client->ps.eFlags2 |= EF2_ALERTED;
@@ -106,7 +106,7 @@ void Rancor_Patrol( void )
 	Rancor_CheckRoar( NPC );
 	TIMER_Set( NPC, "lookForNewEnemy", Q_irand( 5000, 15000 ) );
 }
- 
+
 /*
 -------------------------
 Rancor_Move
@@ -209,12 +209,12 @@ void Rancor_Swing( qboolean tryGrab )
 		{
 			continue;
 		}
-		
+
 		if ( radiusEnt == NPC )
 		{//Skip the rancor ent
 			continue;
 		}
-		
+
 		if ( radiusEnt->client == NULL )
 		{//must be a client
 			continue;
@@ -224,10 +224,10 @@ void Rancor_Swing( qboolean tryGrab )
 		{//can't be one already being held
 			continue;
 		}
-		
+
 		if ( DistanceSquared( &radiusEnt->r.currentOrigin, &boltOrg ) <= radiusSquared )
 		{
-			if ( tryGrab 
+			if ( tryGrab
 				&& NPC->count != 1 //don't have one in hand or in mouth already - FIXME: allow one in hand and any number in mouth!
 				&& radiusEnt->client->NPC_class != CLASS_RANCOR
 				&& radiusEnt->client->NPC_class != CLASS_GALAKMECH
@@ -325,12 +325,12 @@ void Rancor_Smash( void )
 		{
 			continue;
 		}
-		
+
 		if ( radiusEnt == NPC )
 		{//Skip the rancor ent
 			continue;
 		}
-		
+
 		if ( radiusEnt->client == NULL )
 		{//must be a client
 			continue;
@@ -340,7 +340,7 @@ void Rancor_Smash( void )
 		{//can't be one being held
 			continue;
 		}
-		
+
 		distSq = DistanceSquared( &radiusEnt->r.currentOrigin, &boltOrg );
 		if ( distSq <= radiusSquared )
 		{
@@ -349,12 +349,12 @@ void Rancor_Smash( void )
 			{//close enough to do damage, too
 				G_Damage( radiusEnt, NPC, NPC, &vec3_origin, &radiusEnt->r.currentOrigin, Q_irand( 10, 25 ), DAMAGE_NO_ARMOR|DAMAGE_NO_KNOCKBACK, MOD_MELEE );
 			}
-			if ( radiusEnt->health > 0 
+			if ( radiusEnt->health > 0
 				&& radiusEnt->client
 				&& radiusEnt->client->NPC_class != CLASS_RANCOR
 				&& radiusEnt->client->NPC_class != CLASS_ATST )
 			{
-				if ( distSq < halfRadSquared 
+				if ( distSq < halfRadSquared
 					|| radiusEnt->client->ps.groundEntityNum != ENTITYNUM_NONE )
 				{//within range of my fist or withing ground-shaking range and not in the air
 					G_Knockdown( radiusEnt );//, NPC, vec3_origin, 100, qtrue );
@@ -382,12 +382,12 @@ void Rancor_Bite( void )
 		{
 			continue;
 		}
-		
+
 		if ( radiusEnt == NPC )
 		{//Skip the rancor ent
 			continue;
 		}
-		
+
 		if ( radiusEnt->client == NULL )
 		{//must be a client
 			continue;
@@ -397,7 +397,7 @@ void Rancor_Bite( void )
 		{//can't be one already being held
 			continue;
 		}
-		
+
 		if ( DistanceSquared( &radiusEnt->r.currentOrigin, &boltOrg ) <= radiusSquared )
 		{
 			G_Damage( radiusEnt, NPC, NPC, &vec3_origin, &radiusEnt->r.currentOrigin, Q_irand( 15, 30 ), DAMAGE_NO_ARMOR|DAMAGE_NO_KNOCKBACK, MOD_MELEE );
@@ -544,6 +544,8 @@ void Rancor_Attack( float distance, qboolean doCharge )
 				G_AddEvent( NPC->activator, EV_JUMP, NPC->activator->health );
 			}
 			break;
+		default:
+			break;
 		}
 	}
 	else if ( TIMER_Done2( NPC, "attack_dmg2", qtrue ) )
@@ -585,6 +587,8 @@ void Rancor_Attack( float distance, qboolean doCharge )
 				NPC->count = 2;
 				TIMER_Set( NPC, "clearGrabbed", 2600 );
 			}
+			break;
+		default:
 			break;
 		}
 	}
@@ -639,7 +643,7 @@ void Rancor_Combat( void )
 			TIMER_Set( NPC, "lookForNewEnemy", 0 );
 			NPCInfo->consecutiveBlockedMoves++;
 		}
-		else 
+		else
 		{
 			NPCInfo->consecutiveBlockedMoves = 0;
 		}
@@ -654,7 +658,7 @@ void Rancor_Combat( void )
 		qboolean	advance;
 		qboolean	doCharge;
 
-		distance	= Distance( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );	
+		distance	= Distance( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
 		advance = (qboolean)( distance > (NPC->r.maxs.x+MIN_DISTANCE) ? qtrue : qfalse  );
 		doCharge = qfalse;
 
@@ -663,7 +667,7 @@ void Rancor_Combat( void )
 			vector3	yawOnlyAngles;
 			VectorSet( &yawOnlyAngles, 0, NPC->r.currentAngles.yaw, 0 );
 			if ( NPC->enemy->health > 0
-				&& fabs(distance-250) <= 80 
+				&& fabs(distance-250) <= 80
 				&& InFOV3( &NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin, &yawOnlyAngles, 30, 30 ) )
 			{
 				if ( !Q_irand( 0, 9 ) )
@@ -697,15 +701,15 @@ void Rancor_Combat( void )
 NPC_Rancor_Pain
 -------------------------
 */
-void NPC_Rancor_Pain( gentity_t *self, gentity_t *attacker, int damage ) 
+void NPC_Rancor_Pain( gentity_t *self, gentity_t *attacker, int damage )
 {
 	qboolean hitByRancor = qfalse;
 	if ( attacker&&attacker->client&&attacker->client->NPC_class==CLASS_RANCOR )
 	{
 		hitByRancor = qtrue;
 	}
-	if ( attacker 
-		&& attacker->inuse 
+	if ( attacker
+		&& attacker->inuse
 		&& attacker != self->enemy
 		&& !(attacker->flags&FL_NOTARGET) )
 	{
@@ -715,7 +719,7 @@ void NPC_Rancor_Pain( gentity_t *self, gentity_t *attacker, int damage )
 				|| !self->enemy
 				|| self->enemy->health == 0
 				|| (self->enemy->client&&self->enemy->client->NPC_class == CLASS_RANCOR)
-				|| (self->NPC && self->NPC->consecutiveBlockedMoves>=10 && DistanceSquared( &attacker->r.currentOrigin, &self->r.currentOrigin ) < DistanceSquared( &self->enemy->r.currentOrigin, &self->r.currentOrigin )) ) 
+				|| (self->NPC && self->NPC->consecutiveBlockedMoves>=10 && DistanceSquared( &attacker->r.currentOrigin, &self->r.currentOrigin ) < DistanceSquared( &self->enemy->r.currentOrigin, &self->r.currentOrigin )) )
 			{//if my enemy is dead (or attacked by player) and I'm not still holding/eating someone, turn on the attacker
 				//FIXME: if can't nav to my enemy, take this guy if I can nav to him
 				G_SetEnemy( self, attacker );
@@ -739,7 +743,7 @@ void NPC_Rancor_Pain( gentity_t *self, gentity_t *attacker, int damage )
 				&& self->client->ps.legsAnim != BOTH_ATTACK2 )
 			{//cant interrupt one of the big attack anims
 				/*
-				if ( self->count != 1 
+				if ( self->count != 1
 					|| attacker == self->activator
 					|| (self->client->ps.legsAnim != BOTH_ATTACK1&&self->client->ps.legsAnim != BOTH_ATTACK3) )
 				*/
@@ -782,14 +786,14 @@ void Rancor_CheckDropVictim( void )
 {
 	vector3 mins;
 	vector3 maxs;
-	vector3 start; 
-	vector3 end; 
+	vector3 start;
+	vector3 end;
 	trace_t	trace;
 
 	VectorSet( &mins, NPC->activator->r.mins.x-1, NPC->activator->r.mins.y-1, 0 );
 	VectorSet( &maxs, NPC->activator->r.maxs.x+1, NPC->activator->r.maxs.y+1, 1 );
-	VectorSet( &start, NPC->activator->r.currentOrigin.x, NPC->activator->r.currentOrigin.y, NPC->activator->r.absmin.z ); 
-	VectorSet( &end, NPC->activator->r.currentOrigin.x, NPC->activator->r.currentOrigin.y, NPC->activator->r.absmax.z-1 ); 
+	VectorSet( &start, NPC->activator->r.currentOrigin.x, NPC->activator->r.currentOrigin.y, NPC->activator->r.absmin.z );
+	VectorSet( &end, NPC->activator->r.currentOrigin.x, NPC->activator->r.currentOrigin.y, NPC->activator->r.absmax.z-1 );
 
 	trap->Trace( &trace, &start, &mins, &maxs, &end, NPC->activator->s.number, NPC->activator->clipmask, qfalse, 0, 0 );
 	if ( !trace.allsolid && !trace.startsolid && trace.fraction >= 1.0f )
@@ -846,8 +850,8 @@ void NPC_BSRancor_Default( void )
 	{
 		Rancor_DropVictim( NPC );
 	}
-	else if ( NPC->client->ps.legsAnim == BOTH_PAIN2 
-		&& NPC->count == 1 
+	else if ( NPC->client->ps.legsAnim == BOTH_PAIN2
+		&& NPC->count == 1
 		&& NPC->activator )
 	{
 		if ( !Q_irand( 0, 3 ) )
@@ -929,7 +933,7 @@ void NPC_BSRancor_Default( void )
 		}
 		Rancor_Combat();
 	}
-	else 
+	else
 	{
 		if ( TIMER_Done(NPC,"idlenoise") )
 		{

@@ -27,7 +27,7 @@ void trap_Error( const char *fmt ) {
 	exit(1);
 }
 int trap_Milliseconds( void ) {
-	return Q_syscall( G_MILLISECONDS ); 
+	return Q_syscall( G_MILLISECONDS );
 }
 void trap_PrecisionTimer_Start(void **theNewTimer) {
 	Q_syscall(G_PRECISIONTIMER_START, theNewTimer);
@@ -112,7 +112,7 @@ void trap_Trace( trace_t *results, const vector3 *start, const vector3 *mins, co
 void trap_G2Trace( trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentmask, int g2TraceType, int traceLod ) {
 	Q_syscall( G_G2TRACE, results, start, mins, maxs, end, passEntityNum, contentmask, g2TraceType, traceLod );
 }
-int trap_PointContents( const vector3 *point, int passEntityNum ) {
+uint32_t trap_PointContents( const vector3 *point, int passEntityNum ) {
 	return Q_syscall( G_POINT_CONTENTS, point, passEntityNum );
 }
 qboolean trap_InPVS( const vector3 *p1, const vector3 *p2 ) {
@@ -453,7 +453,7 @@ int trap_AAS_BBoxAreas(vector3 *absmins, vector3 *absmaxs, int *areas, int maxar
 int trap_AAS_AreaInfo( int areanum, void *info ) {
 	return Q_syscall( BOTLIB_AAS_AREA_INFO, areanum, info );
 }
-int trap_AAS_PointContents(vector3 *point) {
+uint32_t trap_AAS_PointContents(vector3 *point) {
 	return Q_syscall( BOTLIB_AAS_POINT_CONTENTS, point );
 }
 int trap_AAS_NextBSPEntity(int ent) {
@@ -495,7 +495,7 @@ int trap_AAS_PredictClientMovement(void *move, int entnum, vector3 *origin, int 
 void trap_EA_Say(int client, char *str) {
 	Q_syscall( BOTLIB_EA_SAY, client, str );
 }
-void trap_EA_SayTeam(int client, char *str) {
+void trap_EA_SayTeam(int client, const char *str) {
 	Q_syscall( BOTLIB_EA_SAY_TEAM, client, str );
 }
 void trap_EA_Command(int client, char *command) {

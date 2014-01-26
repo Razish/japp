@@ -13,8 +13,8 @@ int			CM_NumInlineModels( void );
 char		*CM_EntityString (void);
 
 // returns an ORed contents mask
-int			CM_PointContents( const vec3_t p, clipHandle_t model );
-int			CM_TransformedPointContents( const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles );
+uint32_t	CM_PointContents( const vec3_t p, clipHandle_t model );
+uint32_t	CM_TransformedPointContents( const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles );
 
 void		CM_BoxTrace ( trace_t *results, const vec3_t start, const vec3_t end,
 						  const vec3_t mins, const vec3_t maxs,
@@ -48,7 +48,7 @@ bool		CM_GenericBoxCollide(const vec3pair_t abounds, const vec3pair_t bbounds);
 void		CM_CalcExtents(const vec3_t start, const vec3_t end, const struct traceWork_s *tw, vec3pair_t bounds);
 
 // cm_tag.c
-int			CM_LerpTag( orientation_t *tag,  clipHandle_t model, int startFrame, int endFrame, 
+int			CM_LerpTag( orientation_t *tag,  clipHandle_t model, int startFrame, int endFrame,
 					 float frac, const char *tagName );
 
 

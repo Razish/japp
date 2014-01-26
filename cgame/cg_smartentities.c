@@ -4,9 +4,9 @@
 //	Concept, Proof-of-Concept and development of "Smart Entities" by Deathspike.
 //	Based and tested on MultiPlugin framework for testing and development interests.
 //	Later ported to MovieBattles and went into live testing.
-//	
+//
 //	Adapted by Scooper
-//	
+//
 //	Haxxored by Raz0r
 //	==============================
 
@@ -26,12 +26,12 @@ float VectorAngle( const vector3 *a, const vector3 *b )
 
 void MakeVector(const vector3 *ain, vector3 *vout)
 {
-	float pitch, yaw, tmp;		
-	
+	float pitch, yaw, tmp;
+
 	pitch =	(float) (ain->pitch * M_PI/180.0f);
 	yaw =	(float) (ain->yaw * M_PI/180.0f);
 	tmp =	(float) cosf(pitch);
-	
+
 	vout->x = (float) (-tmp * -cosf(yaw));
 	vout->y = (float) (sinf(yaw)*tmp);
 	vout->z = (float) -sinf(pitch);
@@ -88,9 +88,9 @@ qboolean SE_IsPlayerCrouching( int entitiy )
 		case BOTH_GETUP_FROLL_F:
 		case BOTH_GETUP_FROLL_L:
 		case BOTH_GETUP_FROLL_R:
-		{
 			return qtrue;
-		}
+		default:
+			break;
 	}
 
 	switch((ps->torsoAnim))
@@ -115,9 +115,9 @@ qboolean SE_IsPlayerCrouching( int entitiy )
 		case BOTH_GETUP_FROLL_F:
 		case BOTH_GETUP_FROLL_L:
 		case BOTH_GETUP_FROLL_R:
-		{
 			return qtrue;
-		}
+		default:
+			break;
 	}
 
 	return qfalse;
@@ -133,7 +133,7 @@ qboolean SE_RenderInFOV( vector3 *testOrigin )
 	refdef_t *refdef = CG_GetRefdef();
 
 	VectorCopy(&refdef->vieworg, &tmp);
-	VectorSubtract(testOrigin, &tmp, &aim);	
+	VectorSubtract(testOrigin, &tmp, &aim);
 	MakeVector(&refdef->viewangles, &view);
 
 	if (VectorAngle(&view,&aim) > (refdef->fov_x/1.2))
@@ -160,7 +160,7 @@ qboolean SE_RenderIsVisible( vector3 *startPos, vector3 *testOrigin, qboolean re
 			|| (( results.surfaceFlags & MATERIAL_MASK ) == MATERIAL_GLASS )
 			|| (( results.surfaceFlags & MATERIAL_MASK ) == MATERIAL_SHATTERGLASS ))
 		{//	FIXME: This is a quick hack to render people and things through glass and force fields,
-		//	but will also take effect even if there is another wall between them (and double glass). 
+		//	but will also take effect even if there is another wall between them (and double glass).
 		//	Which is bad, of course - but nothing i can prevent right now.
 			if ( reversedCheck || SE_RenderIsVisible( testOrigin, startPos, qtrue ))
 				return qtrue;
@@ -189,7 +189,7 @@ qboolean SE_RenderPlayerPoints( qboolean isCrouching, vector3 *playerAngles, vec
 {
 	int		isHeight			= (( isCrouching ) ? 32 : 56 );
 	vector3	forward, right, up;
-	
+
 	AngleVectors( playerAngles, &forward, &right, &up );
 
 	VectorMA( playerOrigin,		 32,	&up,		&playerPoints[0] );

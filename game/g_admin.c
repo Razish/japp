@@ -777,7 +777,7 @@ static void AM_Teleport( gentity_t *ent ) {
 			if ( trap->Argc() == 6 ) {
 				vector3 angles = { 0.0f };
 				char argR[8]={0};
-	
+
 				trap->Argv( 5, argR, sizeof( argR ) );
 				angles.yaw = atoi( argR );
 				TeleportPlayer( &g_entities[targetClient], &telePos, &angles );
@@ -858,13 +858,13 @@ static void AM_ListTelemarks( gentity_t *ent ) {
 	char msg[3096] = {0};
 	telemark_t *tm = NULL;
 	int i = 0;
-	
+
 	// append each mark to the end of the string
 	Q_strcat( msg, sizeof( msg ), "- Named telemarks\n" );
 	Q_strcat( msg, sizeof( msg ), va( "ID %-32s Location\n", "Name" ) );
 	for ( tm=telemarks, i=0; tm; tm=tm->next, i++ )
 		Q_strcat( msg, sizeof( msg ), va( "%2i %-32s %s\n", i, tm->name, vtos( &tm->position ) ) );
-	
+
 	// send in one big chunk
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
 }
@@ -932,9 +932,9 @@ static void AM_Poll( gentity_t *ent ) {
 		level.clients[i].mGameFlags &= ~PSG_VOTED;
 
 	trap->SetConfigstring( CS_VOTE_TIME,		va( "%i", level.voteTime ) );
-	trap->SetConfigstring( CS_VOTE_STRING,	level.voteDisplayString );	
+	trap->SetConfigstring( CS_VOTE_STRING,	level.voteDisplayString );
 	trap->SetConfigstring( CS_VOTE_YES,		va( "%i", level.voteYes ) );
-	trap->SetConfigstring( CS_VOTE_NO,		va( "%i", level.voteNo ) );	
+	trap->SetConfigstring( CS_VOTE_NO,		va( "%i", level.voteNo ) );
 }
 
 // kill the current vote
@@ -1753,7 +1753,7 @@ static const adminCommand_t adminCommands[] = {
 	{ "guntelemark",	PRIV_TELEPORT,	AM_GunTeleportMark	}, // mark targeted location
 	{ "guntelerev",		PRIV_TELEPORT,	AM_GunTeleportRev	}, // teleport targeted client to self
 };
-static const int numAdminCommands = ARRAY_LEN( adminCommands );
+static const size_t numAdminCommands = ARRAY_LEN( adminCommands );
 
 static int cmdcmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((adminCommand_t*)b)->cmd );
@@ -1801,6 +1801,7 @@ void AM_PrintCommands( gentity_t *ent ) {
 	int toggle = 0;
 	unsigned int count = 0;
 	const unsigned int limit = 72;
+	size_t i;
 
 	Q_strcat( buf, sizeof( buf ), "Admin commands:\n   " );
 
@@ -1810,7 +1811,7 @@ void AM_PrintCommands( gentity_t *ent ) {
 		return;
 	}
 
-	for ( command=adminCommands; command && command->cmd; command++ ) {
+	for ( i=0, command=adminCommands; i<numAdminCommands; i++, command++ ) {
 		if ( AM_HasPrivilege( ent, command->privilege ) ) {
 			char *tmpMsg = va( " ^%c%s", (++toggle&1?COLOR_GREEN:COLOR_YELLOW), command->cmd );
 

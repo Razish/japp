@@ -1,6 +1,6 @@
 ////////////////////////////////
-//							  
-// Jedi Knight Galaxies crash handler 
+//
+// Jedi Knight Galaxies crash handler
 //
 // In the somewhat unlikely event of a crash
 // this code will create a thorough crash log so the cause can be determined
@@ -148,14 +148,14 @@ static unsigned long DisasmBacktrace(unsigned char *block, unsigned long base, u
 	ud_t ud;
 
 	// Check if block is not NULL
-	if (block == NULL)	
+	if (block == NULL)
 		return 0;
 
 	// Clamp range to 0-127
-	if (n < 0) {		
+	if (n < 0) {
 		n = 0;
 	} else if (n > 127) {
-		n = 127; 
+		n = 127;
 	}
 
 	// No need to process this one, just return the IP
@@ -163,14 +163,14 @@ static unsigned long DisasmBacktrace(unsigned char *block, unsigned long base, u
 		return ip;
 
 	// Ensure the IP is within range
-	if (ip > base + size)		
+	if (ip > base + size)
 		ip = base + size;
 
 	// If the goal instruction is guaranteed going to go under the base address
 	// don't bother searching and just return the base address
 	if (ip <= base + n)
 		return base;
-  
+
 
 	// Calculate how far back we should start scanning
 	// assuming an instruction cannot be larger than 16 bytes.
@@ -212,13 +212,13 @@ static unsigned int GetJumpTarget(ud_t *ud, int operand)
 {
 	switch (ud->operand[0].size) {
 		case 8:
-			return ud->pc + ud->operand[operand].lval.sbyte; 
+			return ud->pc + ud->operand[operand].lval.sbyte;
 			break;
 		case 16:
-			return ud->pc + ud->operand[operand].lval.sword; 
+			return ud->pc + ud->operand[operand].lval.sword;
 			break;
 		case 32:
-			return ud->pc + ud->operand[operand].lval.sdword; 
+			return ud->pc + ud->operand[operand].lval.sdword;
 			break;
 		default:
 			return 0;
@@ -226,7 +226,7 @@ static unsigned int GetJumpTarget(ud_t *ud, int operand)
 	}
 }
 
-static const char *JKG_Crash_GetCrashlogName() {
+static const char *JKG_Crash_GetCrashlogName( void ) {
 	static char buf[1024] = {0};
 	time_t rawtime;
 
@@ -466,11 +466,11 @@ const char *JKG_GetOSDisplayString( )
 		}
 	}
 	else
-	{  
+	{
 		switch(osvi.dwPlatformId)
 		{
 		case VER_PLATFORM_WIN32s:
-			strcat(name, "Windows 32s");	
+			strcat(name, "Windows 32s");
 			break;
 		case VER_PLATFORM_WIN32_WINDOWS:
 			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
@@ -507,7 +507,7 @@ static void JKG_Crash_AddOSData(fileHandle_t f) {
 static int GetModuleNamePtr(void* ptr, char *buffFile, char *buffName, void ** ModuleBase, int * ModuleSize) {
 	MODULEENTRY32 M = {0};
 	HANDLE	hSnapshot;
-	
+
 	// BUFFERS MUST BE (AT LEAST) 260 BYTES!!
 	if (buffFile) buffFile[0]=0;
 	if (buffName) buffName[0]=0;
@@ -515,7 +515,7 @@ static int GetModuleNamePtr(void* ptr, char *buffFile, char *buffName, void ** M
 	if (ModuleSize) *ModuleSize = 0;
 
 	hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, 0);
-	
+
 	if ((hSnapshot != INVALID_HANDLE_VALUE) && Module32First(hSnapshot, &M)) {
 		do {
 			if (ptr > (void *)M.modBaseAddr && ptr <= (void *)(M.modBaseAddr+M.modBaseSize)) {
@@ -588,7 +588,7 @@ static void JKG_Crash_AddCrashInfo(struct _EXCEPTION_POINTERS *EI, fileHandle_t 
 	PEXCEPTION_RECORD ER = EI->ExceptionRecord;
 	GetModuleFileNameA(NULL, buffFile, MAX_PATH);
 	JKG_FS_WriteString(va("Process: %s\n", buffFile),f);
-	
+
 	ModuleBase = SymGetModuleBase(GetCurrentProcess(), (DWORD)EI->ExceptionRecord->ExceptionAddress);
 	if (ModuleBase) {
 		GetModuleBaseName(GetCurrentProcess(), (HMODULE)ModuleBase, buffName, 260);
@@ -596,7 +596,7 @@ static void JKG_Crash_AddCrashInfo(struct _EXCEPTION_POINTERS *EI, fileHandle_t 
 	} else {
 		JKG_FS_WriteString("Exception in module: Unknown\n", f);
 	}
-	
+
 	/*if (GetModuleNamePtr(ER->ExceptionAddress,buffFile,buffName,(void **)&ModuleBase,NULL)) {
 		JKG_FS_WriteString(va("Exception in module: %s\n", buffFile), f);
 	} else {
@@ -736,7 +736,7 @@ static void JKG_Crash_DisAsm(struct _EXCEPTION_POINTERS *EI, fileHandle_t f) {
 				}
 			}
 		}
-		
+
 		JKG_FS_WriteString(va("0x%08X - %-30s", (unsigned int)ud_insn_off(&da), ud_insn_asm(&da)), f);
 		if ( ((da.mnemonic >= UD_Ija && da.mnemonic <= UD_Ijz ) || da.mnemonic == UD_Icall ) && da.operand[0].type == UD_OP_JIMM) {
 			// Its a call or jump, see if we got a symbol for it
@@ -782,7 +782,7 @@ static void JKG_Crash_DisAsm(struct _EXCEPTION_POINTERS *EI, fileHandle_t f) {
 	}
 	JKG_FS_WriteString("vvvvvvvvvv\n\n", f);
 	free(sym);
-	
+
 }
 
 void JKG_Crash_HandleStackFrame(STACKFRAME *sf) {
@@ -806,7 +806,7 @@ static void JKG_Crash_BackTrace(struct _EXCEPTION_POINTERS *EI, fileHandle_t f) 
 	int gotsource;
 	int sourcedisp;
 	CONTEXT ctx = *EI->ContextRecord;	// Copy of the context, since it may be changed
-	
+
 	memset(&sf, 0, sizeof(STACKFRAME));
 	memset(&line, 0, sizeof(IMAGEHLP_LINE));
 	line.SizeOfStruct=sizeof(IMAGEHLP_LINE);
@@ -819,7 +819,7 @@ static void JKG_Crash_BackTrace(struct _EXCEPTION_POINTERS *EI, fileHandle_t f) 
 	memset(sym, 0, 1024);
 	sym->MaxNameLength = 800;
 	sym->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
-	
+
 	proc = GetCurrentProcess();
 	thread = GetCurrentThread();
 	if (StackBackupStart) {
@@ -836,7 +836,7 @@ static void JKG_Crash_BackTrace(struct _EXCEPTION_POINTERS *EI, fileHandle_t f) 
 		} else {
 			GetModuleBaseName(proc,(HMODULE)dmod, ModName, 260);
 		}
-		
+
 		if (SymGetLineFromAddr(GetCurrentProcess(), sf.AddrPC.Offset, (PDWORD)&sourcedisp, &line)) {
 			gotsource = 1;
 		} else {
@@ -937,7 +937,7 @@ static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*E
 	JKG_FS_WriteString("Side: Client-side\n", f);
 #endif
 	JKG_FS_WriteString("Build Date/Time: "__DATE__" "__TIME__"\n", f);
-	
+
 	JKG_Crash_AddOSData(f);
 	JKG_FS_WriteString("Crash type: Exception\n\n"
 					   "----------------------------------------\n"
@@ -1063,7 +1063,7 @@ static const char * JKG_GetMemRegion(unsigned int address) {
 	return "Unknown";
 }
 
-static void JKG_Free_MemoryMap() {
+static void JKG_Free_MemoryMap( void ) {
 	memblock_t *block, *next;
 	block = memblocks;
 	while (block) {
@@ -1074,7 +1074,7 @@ static void JKG_Free_MemoryMap() {
 	memblocks = NULL;
 }
 
-static void JKG_Enum_MemoryMap() {
+static void JKG_Enum_MemoryMap( void ) {
 	char buffer[1024];
 	const char *line;
 
@@ -1188,7 +1188,7 @@ static void JKG_Crash_AddCrashInfo(int signal, siginfo_t *siginfo, ucontext_t *c
 					break;
 				default:
 					JKG_FS_WriteString("Exception cause: Unknown\n", f);
-					break;	
+					break;
 			}
 			break;
 

@@ -124,7 +124,7 @@ Ghoul2 Insert Start
 Ghoul2 Insert End
 */
 #define CS_LOCATIONS			(CS_G2BONES+MAX_G2BONES)
-#define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS) 
+#define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS)
 #define CS_EFFECTS				(CS_PARTICLES+MAX_LOCATIONS)
 #define	CS_LIGHT_STYLES			(CS_EFFECTS + MAX_FX)
 
@@ -227,7 +227,7 @@ typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
 extern vector3 WP_MuzzlePoint[WP_NUM_WEAPONS];
 
-extern int forcePowerSorted[NUM_FORCE_POWERS];
+extern const int forcePowerSorted[NUM_FORCE_POWERS];
 
 typedef enum saberLock_e
 {
@@ -320,7 +320,7 @@ extern stringID_table_t footstepTypeTable[NUM_FOOTSTEP_TYPES+1];
 //indices for AEV_SABER_SPIN data
 #define	AED_SABER_SPIN_SABERNUM		0
 #define	AED_SABER_SPIN_TYPE			1	//0 = saberspinoff, 1 = saberspin, 2-4 = saberspin1-saberspin3
-#define	AED_SABER_SPIN_PROBABILITY	2	
+#define	AED_SABER_SPIN_PROBABILITY	2
 
 typedef enum
 {//NOTENOTE:  Be sure to update animEventTypeTable and ParseAnimationEvtBlock(...) if you change this enum list!
@@ -330,13 +330,13 @@ typedef enum
 	AEV_EFFECT,		//# animID AEV_EFFECT framenum effectpath boltName chancetoplay
 	AEV_FIRE,		//# animID AEV_FIRE framenum altfire chancetofire
 	AEV_MOVE,		//# animID AEV_MOVE framenum forwardpush rightpush uppush
-	AEV_SOUNDCHAN,  //# animID AEV_SOUNDCHAN framenum CHANNEL soundpath randomlow randomhi chancetoplay 
-	AEV_SABER_SWING,  //# animID AEV_SABER_SWING framenum CHANNEL randomlow randomhi chancetoplay 
-	AEV_SABER_SPIN,  //# animID AEV_SABER_SPIN framenum CHANNEL chancetoplay 
+	AEV_SOUNDCHAN,  //# animID AEV_SOUNDCHAN framenum CHANNEL soundpath randomlow randomhi chancetoplay
+	AEV_SABER_SWING,  //# animID AEV_SABER_SWING framenum CHANNEL randomlow randomhi chancetoplay
+	AEV_SABER_SPIN,  //# animID AEV_SABER_SPIN framenum CHANNEL chancetoplay
 	AEV_NUM_AEV
 } animEventType_t;
 
-typedef struct animevent_s 
+typedef struct animevent_s
 {
 	animEventType_t	eventType;
 	unsigned short	keyFrame;			//Frame to play event on
@@ -389,7 +389,7 @@ typedef enum {
 } pmtype_t;
 
 typedef enum {
-	WEAPON_READY, 
+	WEAPON_READY,
 	WEAPON_RAISING,
 	WEAPON_DROPPING,
 	WEAPON_FIRING,
@@ -411,8 +411,8 @@ typedef enum forceMasteries_e {
 	NUM_FORCE_MASTERY_LEVELS
 } forceMasteries_t;
 
-extern char *forceMasteryLevels[NUM_FORCE_MASTERY_LEVELS];
-extern int forceMasteryPoints[NUM_FORCE_MASTERY_LEVELS];
+extern const char *forceMasteryLevels[NUM_FORCE_MASTERY_LEVELS];
+extern const int forceMasteryPoints[NUM_FORCE_MASTERY_LEVELS];
 
 extern int bgForcePowerCost[NUM_FORCE_POWERS][NUM_FORCE_POWER_LEVELS];
 
@@ -505,7 +505,7 @@ typedef struct pmove_s {
 	// callbacks to test the world
 	// these will be different functions during game and cgame
 	void		(*trace)( trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentMask );
-	int			(*pointcontents)( const vector3 *point, int passEntityNum );
+	uint32_t	(*pointcontents)( const vector3 *point, int passEntityNum );
 
 	int			checkDuelLoss;
 
@@ -552,7 +552,7 @@ typedef enum {
 	//MAKE SURE STAT_WEAPONS REMAINS 4!!!!
 	//There is a hardcoded reference in msg.cpp to send it in 32 bits -rww
 	STAT_WEAPONS = 4,					// 16 bit fields
-	STAT_ARMOR,				
+	STAT_ARMOR,
 	STAT_DEAD_YAW,					// look this direction when dead (FIXME: get rid of?)
 	STAT_CLIENTS_READY,				// bit mask of clients wishing to exit the intermission (FIXME: configstring?)
 	STAT_MAX_HEALTH,				// health / armor limit, changable by handicap
@@ -590,20 +590,20 @@ typedef enum {
 #define EF_RADAROBJECT		(0x00000004u) // display on team radar
 #define EF_TELEPORT_BIT		(0x00000008u) // toggled every time the origin abruptly changes
 #define EF_SHADER_ANIM		(0x00000010u) // Animating shader (by s.frame)
-#define EF_PLAYER_EVENT		(0x00000020u) // 
+#define EF_PLAYER_EVENT		(0x00000020u) //
 #define EF_RAG				(0x00000040u) // ragdoll him even if he's alive
 #define EF_PERMANENT		(0x00000080u) // rww - I am claiming this. (for permanent entities)
 #define EF_NODRAW			(0x00000100u) // may have an event, but no model (unspawned items)
 #define EF_FIRING			(0x00000200u) // for lightning gun
 #define EF_ALT_FIRING		(0x00000400u) // for alt-fires, mostly for lightning guns though
 #define EF_JETPACK_ACTIVE	(0x00000800u) // jetpack is activated
-#define EF_NOT_USED_1		(0x00001000u) // 
+#define EF_NOT_USED_1		(0x00001000u) //
 #define EF_TALK				(0x00002000u) // draw a talk balloon
 #define EF_CONNECTION		(0x00004000u) // draw a connection trouble sprite
 #define EF_ALT_DIM			(0x00008000u) // Player is in the alternate dimension
 #define EF_GRAPPLE_SWING	(0x00010000u) // swinging on grapple hook
-#define EF_NOT_USED_2		(0x00020000u) // 
-#define EF_NOT_USED_3		(0x00040000u) // 
+#define EF_NOT_USED_2		(0x00020000u) //
+#define EF_NOT_USED_3		(0x00040000u) //
 #define EF_BODYPUSH			(0x00080000u) // rww - claiming this for fullbody push effect
 #define EF_DOUBLE_AMMO		(0x00100000u) // Hacky way to get around ammo max
 #define EF_SEEKERDRONE		(0x00200000u) // show seeker drone floating around head
@@ -616,7 +616,7 @@ typedef enum {
 #define EF_CLIENTSMOOTH		(0x10000000u) // standard lerporigin smooth override on client
 #define EF_JETPACK			(0x20000000u) // rww - wearing a jetpack
 #define EF_JETPACK_FLAMING	(0x40000000u) // rww - jetpack fire effect
-#define EF_NOT_USED_4		(0x80000000u) // 
+#define EF_NOT_USED_4		(0x80000000u) //
 
 //These new EF2_??? flags were added for NPCs, they really should not be used often.
 //NOTE: we only allow 10 of these!
@@ -992,7 +992,7 @@ typedef enum {
 	EV_PUSHFAIL,
 
 	EV_SIEGESPEC,
-	
+
 } entity_event_t;			// There is a maximum of 256 events (8 bits transmission, 2 high bits for uniqueness)
 
 
@@ -1038,7 +1038,7 @@ typedef enum {
 //team task
 typedef enum {
 	TEAMTASK_NONE,
-	TEAMTASK_OFFENSE, 
+	TEAMTASK_OFFENSE,
 	TEAMTASK_DEFENSE,
 	TEAMTASK_PATROL,
 	TEAMTASK_FOLLOW,
@@ -1168,7 +1168,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 //rwwRMG - added in CONTENTS_TERRAIN
 // content masks
-#define	MASK_ALL				(-1)
+#define	MASK_ALL				(0xFFFFFFFFu)
 #define	MASK_SOLID				(CONTENTS_SOLID|CONTENTS_TERRAIN)
 #define	MASK_PLAYERSOLID		(CONTENTS_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_BODY|CONTENTS_TERRAIN)
 #define	MASK_NPCSOLID			(CONTENTS_SOLID|CONTENTS_MONSTERCLIP|CONTENTS_BODY|CONTENTS_TERRAIN)
@@ -1213,7 +1213,7 @@ typedef enum entityType_s {
 							// this avoids having to set eFlags and eventNum
 	ET_MAX
 } entityType_t;
-stringID_table_t eTypes[ET_MAX];
+extern const stringID_table_t eTypes[ET_MAX];
 
 
 
@@ -1225,7 +1225,7 @@ stringID_table_t eTypes[ET_MAX];
 #if defined(_GAME) || defined(_CGAME)
 
 typedef enum {
-	F_INT, 
+	F_INT,
 	F_FLOAT,
 	F_LSTRING,			// string on disk, pointer in memory, TAG_LEVEL
 	F_VECTOR,
@@ -1255,11 +1255,10 @@ typedef enum {
 
 
 
-typedef struct BG_field_s
-{
-	char	*name;
-	int		ofs;
-	fieldtype_t	type;
+typedef struct BG_field_s {
+	const char *name;
+	int ofs;
+	fieldtype_t type;
 } BG_field_t;
 
 
@@ -1527,7 +1526,7 @@ typedef struct saberTrail_s {
 
 	// Marks stuff
 	qboolean	haveOldPos[2];
-	vector3		oldPos[2];		
+	vector3		oldPos[2];
 	vector3		oldNormal[2];	// store this in case we don't have a connect-the-dots situation
 								//	..then we'll need the normal to project a mark blob onto the impact point
 } saberTrail_t;
@@ -1636,10 +1635,10 @@ typedef struct saberInfo_s {
 	float			animSpeedScale;							// 1.0 - plays normal attack animations faster/slower
 
 	//done in both cgame and game (BG code)
-	int				kataMove;								// LS_INVALID - if set, player will execute this move when they press both attack buttons at the same time 
-	int				lungeAtkMove;							// LS_INVALID - if set, player will execute this move when they crouch+fwd+attack 
-	int				jumpAtkUpMove;							// LS_INVALID - if set, player will execute this move when they jump+attack 
-	int				jumpAtkFwdMove;							// LS_INVALID - if set, player will execute this move when they jump+fwd+attack 
+	int				kataMove;								// LS_INVALID - if set, player will execute this move when they press both attack buttons at the same time
+	int				lungeAtkMove;							// LS_INVALID - if set, player will execute this move when they crouch+fwd+attack
+	int				jumpAtkUpMove;							// LS_INVALID - if set, player will execute this move when they jump+attack
+	int				jumpAtkFwdMove;							// LS_INVALID - if set, player will execute this move when they jump+fwd+attack
 	int				jumpAtkBackMove;						// LS_INVALID - if set, player will execute this move when they jump+back+attack
 	int				jumpAtkRightMove;						// LS_INVALID - if set, player will execute this move when they jump+rightattack
 	int				jumpAtkLeftMove;						// LS_INVALID - if set, player will execute this move when they jump+left+attack
@@ -1656,7 +1655,7 @@ typedef struct saberInfo_s {
 	int				bladeStyle2Start;						// 0 - if set, blades from this number and higher use the following values (otherwise, they use the normal values already set)
 
 	//***The following can be different for the extra blades - not setting them individually defaults them to the value for the whole saber (and first blade)***
-	
+
 	//done in cgame (client-side code)
 	int				trailStyle, trailStyle2;				// 0 - default (0) is normal, 1 is a motion blur and 2 is no trail at all (good for real-sword type mods)
 	int				g2MarksShader, g2MarksShader2;			// none - if set, the game will use this shader for marks on enemies instead of the default "gfx/damage/saberglowmark"
@@ -1782,10 +1781,10 @@ void BG_SI_DeactivateTrail ( saberInfo_t *saber, float duration );
 extern void BG_AttachToRancor( void *ghoul2,float rancYaw, vector3 *rancOrigin,int time,qhandle_t *modelList, vector3 *modelScale,qboolean inMouth, vector3 *out_origin, vector3 *out_angles, vector3 out_axis[3] );
 void BG_ClearRocketLock( playerState_t *ps );
 
-extern int WeaponReadyAnim[WP_NUM_WEAPONS];
-extern int WeaponAttackAnim[WP_NUM_WEAPONS];
+extern const int WeaponReadyAnim[WP_NUM_WEAPONS];
+extern const int WeaponAttackAnim[WP_NUM_WEAPONS];
 
-extern int forcePowerDarkLight[NUM_FORCE_POWERS];
+extern const int forcePowerDarkLight[NUM_FORCE_POWERS];
 
 
 #define ARENAS_PER_TIER		4

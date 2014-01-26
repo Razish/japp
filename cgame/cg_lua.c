@@ -75,12 +75,12 @@ int JPLua_LoadFile( lua_State *L, const char *file ) {
 	gfd.f = f;
 	gfd.dataRemaining = len;
 
-	status = (lua_load( L, JPLua_LoadFile_Reader, &gfd, va("@%s", file) ) || lua_pcall( L, 0, 0, 0 ));
+	status = (lua_load( L, JPLua_LoadFile_Reader, &gfd, va( "@%s", file ), NULL ) || lua_pcall( L, 0, 0, 0 ));
 	if ( status ) {
 		Com_Printf( "JPLua_LoadFile: Failed to load %s: %s\n", file, lua_tostring( L, -1 ) );
 		lua_pop( L, 1 );
 	}
-	
+
 	trap->FS_Close( f );
 	return status;
 }
@@ -414,14 +414,14 @@ int JPLua_Export_Trace( lua_State *L ) {
 	CG_Trace( &tr, &start, &mins, &maxs, &end, skipNumber, mask );
 
 //	CG_TestLine( start, end, 1000, 0, 1 );
-	
+
 	lua_newtable( L );
 	top = lua_gettop( L );
 	lua_pushstring( L, "allsolid" ); lua_pushboolean( L, !!tr.allsolid ); lua_settable( L, top );
 	lua_pushstring( L, "startsolid" ); lua_pushboolean( L, !!tr.startsolid ); lua_settable( L, top );
 	lua_pushstring( L, "entityNum" ); lua_pushinteger( L, tr.entityNum ); lua_settable( L, top );
 	lua_pushstring( L, "fraction" ); lua_pushnumber( L, tr.fraction ); lua_settable( L, top );
-	
+
 	lua_pushstring( L, "endpos" );
 		lua_newtable( L ); top2 = lua_gettop( L );
 		lua_pushstring( L, "x" ); lua_pushnumber( L, tr.endpos.x ); lua_settable( L, top2 );
@@ -585,9 +585,9 @@ static void JPLua_PostInit( lua_State *L ) {
 	int i=0, numFolders=0, folderLen=0;
 
 	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_YELLOW"JA++ Lua (CL) is initialising "S_COLOR_CYAN"****************\n" );
-	
+
 	JPLua_LoadFile( L, va( "%sinit"JPLUA_EXTENSION, baseDir ) );
-	lua_getfield( L, LUA_GLOBALSINDEX, "JPLua" );
+	lua_getglobal( L, "JPLua" );
 	lua_getfield( L, -1, "version" );
 	JPLua.version = lua_tointeger( L, -1 );
 	lua_pop( L, 1 );
@@ -604,7 +604,7 @@ static void JPLua_PostInit( lua_State *L ) {
 		if ( Q_stricmp( folderName, "." ) && Q_stricmp( folderName, ".." ) ) {
 			char fileList[16384] = {0}, *fileName = NULL;
 			int j=0, numFiles=0, fileLen=0;
-			
+
 			numFiles = trap->FS_GetFileList( va( "%s%s", pluginDir, folderName ), JPLUA_EXTENSION, fileList, sizeof( fileList ) );
 			fileName = fileList;
 
@@ -636,7 +636,7 @@ void JPLua_Init( void ) {
 
 	//Initialise and load base libraries
 	memset( JPLua_Framework, -1, sizeof( JPLua_Framework ) );
-	JPLua.state = lua_open();
+	JPLua.state = luaL_newstate();
 	if ( !JPLua.state ) {
 		//TODO: Fail gracefully
 		return;
@@ -653,7 +653,7 @@ void JPLua_Init( void ) {
 	// There are some stuff in the base library that we don't want
 	lua_pushnil( JPLua.state );	lua_setglobal( JPLua.state, "dofile" );
 	lua_pushnil( JPLua.state );	lua_setglobal( JPLua.state, "loadfile" );
-	lua_pushnil( JPLua.state );	lua_setglobal( JPLua.state, "load" ); 
+	lua_pushnil( JPLua.state );	lua_setglobal( JPLua.state, "load" );
 	lua_pushnil( JPLua.state );	lua_setglobal( JPLua.state, "loadstring" );
 
 	// Some libraries we want, but not certain elements in them

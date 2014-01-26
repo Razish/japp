@@ -213,7 +213,7 @@ void CG_ChatboxOutgoing( void ) {
 }
 
 // This function is called recursively when a logical message has to be split into multiple lines
-void CG_ChatboxAddMessage( const char *message, qboolean multiLine, char *cbName ) {
+void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *cbName ) {
 	chatBox_t *cb = CG_GetChatboxByName( cbName );
 	chatEntry_t *chat = &cb->chatBuffer[MAX_CHATBOX_ENTRIES-1];
 	int strLength = 0;
@@ -599,35 +599,38 @@ void CG_ChatboxClear( void ) {
 }
 
 void CG_ChatboxEscape( void ) {
+	static int count = 0;
+	count++;
+	Com_Printf( "Closing chatbox %02i\n", count );
 	chatActive = qfalse;
 	trap->Key_SetCatcher( trap->Key_GetCatcher() & ~KEYCATCH_CGAME );
 }
 
 void CG_MessageModeAll_f( void ) {
 	if ( chatActive )
-		return;
+		CG_ChatboxEscape();
 	chatActive = qtrue;
 	chatMode = CHAT_ALL;
 	chatTargetClient = -1;
 	Field_Clear( &chatField );
 //	chatField.widthInChars = 30;
-	trap->Key_SetCatcher( trap->Key_GetCatcher() ^ KEYCATCH_CGAME );
+	trap->Key_SetCatcher( trap->Key_GetCatcher() | KEYCATCH_CGAME );
 }
 
 void CG_MessageModeTeam_f( void ) {
 	if ( chatActive )
-		return;
+		CG_ChatboxEscape();
 	chatActive = qtrue;
 	chatMode = CHAT_TEAM;
 	chatTargetClient = -1;
 	Field_Clear( &chatField );
 //	chatField.widthInChars = 25;
-	trap->Key_SetCatcher( trap->Key_GetCatcher() ^ KEYCATCH_CGAME );
+	trap->Key_SetCatcher( trap->Key_GetCatcher() | KEYCATCH_CGAME );
 }
 
 void CG_MessageModeTell_f( void ) {
 	if ( chatActive )
-		return;
+		CG_ChatboxEscape();
 
 	if ( (chatTargetClient = CG_CrosshairPlayer()) == -1 )
 		return;
@@ -636,7 +639,7 @@ void CG_MessageModeTell_f( void ) {
 	chatMode = CHAT_WHISPER;
 	Field_Clear( &chatField );
 //	chatField.widthInChars = 25;
-	trap->Key_SetCatcher( trap->Key_GetCatcher() ^ KEYCATCH_CGAME );
+	trap->Key_SetCatcher( trap->Key_GetCatcher() | KEYCATCH_CGAME );
 }
 
 static void Field_CharEvent( field_t *edit, int key ) {
@@ -711,9 +714,10 @@ static void Field_CharEvent( field_t *edit, int key ) {
 			CG_ChatboxHistoryDn();
 			break;
 
-		case A_ESCAPE:
-			CG_ChatboxEscape();
-			break;
+		//RAZFIXME: A_ESCAPE doesn't work, engine is eating it?
+	//	case A_ESCAPE:
+	//		CG_ChatboxEscape();
+	//		break;
 
 		case A_CURSOR_RIGHT:
 			if ( edit->cursor < fieldLen )

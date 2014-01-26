@@ -122,23 +122,22 @@ int	LongNoSwap( int l ) {
 	return l;
 }
 
-qint64_t Long64Swap( qint64_t ll ) {
+void Long64Swap( qint64_t *l64 ) {
 	qint64_t result;
 
-	result.b0 = ll.b7;
-	result.b1 = ll.b6;
-	result.b2 = ll.b5;
-	result.b3 = ll.b4;
-	result.b4 = ll.b3;
-	result.b5 = ll.b2;
-	result.b6 = ll.b1;
-	result.b7 = ll.b0;
+	result.b0 = l64->b7;
+	result.b1 = l64->b6;
+	result.b2 = l64->b5;
+	result.b3 = l64->b4;
+	result.b4 = l64->b3;
+	result.b5 = l64->b2;
+	result.b6 = l64->b1;
+	result.b7 = l64->b0;
 
-	return result;
+	*l64 = result;
 }
 
-qint64_t Long64NoSwap( qint64_t ll ) {
-	return ll;
+void Long64NoSwap( qint64_t *ll ) {
 }
 
 float FloatSwap( const float *f ) {
@@ -231,9 +230,9 @@ int COM_Compress( char *data_p ) {
 
 			// skip /* */ comments
 			else if ( c == '/' && in[1] == '*' ) {
-				while ( *in && ( *in != '*' || in[1] != '/' ) ) 
+				while ( *in && ( *in != '*' || in[1] != '/' ) )
 					in++;
-				if ( *in ) 
+				if ( *in )
 					in += 2;
 			}
 
@@ -260,7 +259,7 @@ int COM_Compress( char *data_p ) {
 					*out++ = ' ';
 					whitespace = qfalse;
 				}
-				
+
 				// copy quoted strings unmolested
 				if ( c == '"' ) {
 					*out++ = c;
@@ -526,7 +525,7 @@ qboolean Q_StringIsNumber( const char *s ) {
 		return qfalse;
 
 	ret = strtod( s, &p );
-	
+
 	if ( ret == HUGE_VAL || errno == ERANGE )
 		return qfalse;
 
@@ -577,7 +576,7 @@ void Q_strncpyz( char *dest, const char *src, int destsize ) {
 		return;
 	}
 	if ( destsize < 1 ) {
-		Com_Error( ERR_FATAL,"Q_strncpyz: destsize < 1" ); 
+		Com_Error( ERR_FATAL,"Q_strncpyz: destsize < 1" );
 		return;
 	}
 
@@ -620,18 +619,18 @@ int Q_stricmpn( const char *s1, const char *s2, int n ) {
 // case sensitive length compare
 int Q_strncmp( const char *s1, const char *s2, int n ) {
 	int c1, c2;
-	
+
 	do {
 		c1 = *s1++;
 		c2 = *s2++;
 
 		if ( !n-- )
 			return 0; // strings are equal until end point
-		
+
 		if ( c1 != c2 )
 			return c1 < c2 ? -1 : 1;
 	} while ( c1 );
-	
+
 	return 0; // strings are equal
 }
 
@@ -909,7 +908,7 @@ char *Info_ValueForKey( const char *s, const char *key ) {
 	char *o, pkey[BIG_INFO_KEY];
 	static char value[2][BIG_INFO_VALUE]; // use two buffers so compares work without stomping on each other
 	static int vIndex = 0;
-	
+
 	if ( !s || !key )
 		return "";
 

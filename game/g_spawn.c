@@ -446,7 +446,7 @@ void MatrixMultiply3f( vector3 m[3], vector3 *vec, vector3 *result )
 	result->y = m[1].x*vec->x + m[1].y*vec->y + m[1].z*vec->z;
 	result->z = m[2].x*vec->x + m[2].y*vec->y + m[2].z*vec->z;
 }
- 
+
 void MatrixIdentity( vector3 m[3] )
 {
 	VectorSet( &m[0], 1, 0, 0 );
@@ -590,7 +590,7 @@ void SP_jp_portal( gentity_t *ent )
 		else
 		{//Found a portal to link with
 			vector3 mat[3], mat_inv[3];
-			
+
 			ent->s.health = found->s.number;
 			found->s.health = ent->s.number;
 			from = found;
@@ -895,7 +895,7 @@ so message texts can be multi-line
 char *G_NewString( const char *string ) {
 	char	*newb, *new_p;
 	int		i,len;
-	
+
 	len = strlen(string) + 1;
 
 	//Raz: dyn alloc, not G_Alloc :O
@@ -917,7 +917,7 @@ char *G_NewString( const char *string ) {
 			*new_p++ = string[i];
 		}
 	}
-	
+
 	return newb;
 }
 
@@ -933,7 +933,7 @@ Spawn an entity and fill in all of the level fields from
 level.spawnVars[], then call the class specfic spawn function
 ===================
 */
-void BG_ParseField( BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent );
+void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent );
 void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 	int			i;
 	gentity_t	*ent;
@@ -1203,7 +1203,7 @@ qboolean G_ParseSpawnVars( qboolean inSubBSP ) {
 	}
 
 	// go through all the key / value pairs
-	while ( 1 ) {	
+	while ( 1 ) {
 		// parse key
 		if ( !trap->GetEntityToken( keyname, sizeof( keyname ) ) ) {
 			trap->Error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
@@ -1212,8 +1212,8 @@ qboolean G_ParseSpawnVars( qboolean inSubBSP ) {
 		if ( keyname[0] == '}' ) {
 			break;
 		}
-		
-		// parse value	
+
+		// parse value
 		if ( !trap->GetEntityToken( com_token, sizeof( com_token ) ) ) {
 			trap->Error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
 		}
@@ -1238,8 +1238,7 @@ qboolean G_ParseSpawnVars( qboolean inSubBSP ) {
 }
 
 
-static	char *defaultStyles[32][3] = 
-{
+static const char *defaultStyles[32][3] = {
 	{	// 0 normal
 		"z",
 		"z",
@@ -1427,7 +1426,7 @@ BSP Options
 */
 extern void EWebPrecache(void); //g_items.c
 float g_cullDistance;
-void SP_worldspawn( void ) 
+void SP_worldspawn( void )
 {
 	char		*text, temp[32];
 	int			i;
@@ -1443,7 +1442,7 @@ void SP_worldspawn( void )
 		trap->Error( ERR_DROP, "SP_worldspawn: The first entity isn't 'worldspawn'" );
 	}
 
-	for ( i = 0 ; i < level.numSpawnVars ; i++ ) 
+	for ( i = 0 ; i < level.numSpawnVars ; i++ )
 	{
 		if ( Q_stricmp( "spawnscript", level.spawnVars[i][0] ) == 0 )
 		{//ONly let them set spawnscript, we don't want them setting an angle or something on the world.
@@ -1518,7 +1517,7 @@ void SP_worldspawn( void )
 	if ( g_restarted.integer ) {
 		trap->Cvar_Set( "g_restarted", "0" );
 		level.warmupTime = 0;
-	} 
+	}
 
 	//Raz: Fix warmup
 	else if ( g_doWarmup.integer && level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL && level.gametype != GT_SIEGE ) { // Turn it on
@@ -1530,7 +1529,7 @@ void SP_worldspawn( void )
 	trap->SetConfigstring(CS_LIGHT_STYLES+(LS_STYLES_START*3)+0, defaultStyles[0][0]);
 	trap->SetConfigstring(CS_LIGHT_STYLES+(LS_STYLES_START*3)+1, defaultStyles[0][1]);
 	trap->SetConfigstring(CS_LIGHT_STYLES+(LS_STYLES_START*3)+2, defaultStyles[0][2]);
-	
+
 	for(i=1;i<LS_NUM_STYLES;i++)
 	{
 		Com_sprintf(temp, sizeof(temp), "ls_%dr", i);
@@ -1550,10 +1549,10 @@ void SP_worldspawn( void )
 
 		if (lengthRed != lengthGreen || lengthGreen != lengthBlue)
 		{
-			Com_Error(ERR_DROP, "Style %d has inconsistent lengths: R %d, G %d, B %d", 
+			Com_Error(ERR_DROP, "Style %d has inconsistent lengths: R %d, G %d, B %d",
 				i, lengthRed, lengthGreen, lengthBlue);
 		}
-	}		
+	}
 }
 
 //rww - Planning on having something here?
@@ -1620,7 +1619,7 @@ void G_SpawnEntitiesFromString( qboolean inSubBSP ) {
 	// parse ents
 	while( G_ParseSpawnVars(inSubBSP) ) {
 		G_SpawnGEntityFromSpawnVars(inSubBSP);
-	}	
+	}
 
 	if( g_entities[ENTITYNUM_WORLD].behaviorSet[BSET_SPAWN] && g_entities[ENTITYNUM_WORLD].behaviorSet[BSET_SPAWN][0] )
 	{//World has a spawn script, but we don't want the world in ICARUS and running scripts,

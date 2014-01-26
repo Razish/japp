@@ -114,7 +114,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 
 
 	if ( pVeh->m_pPilot /*&& (pilotPS->weapon == WP_NONE || pilotPS->weapon == WP_MELEE )*/ &&
-		(pVeh->m_ucmd.buttons & BUTTON_ALT_ATTACK) && pVeh->m_pVehicleInfo->turboSpeed )
+		(pVeh->m_ucmd.buttons & BUTTON_ALT_ATTACK) && (int)pVeh->m_pVehicleInfo->turboSpeed )
 	{
 		if ((curTime - pVeh->m_iTurboTime)>pVeh->m_pVehicleInfo->turboRecharge)
 		{
@@ -144,10 +144,10 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 		speedInc = pVeh->m_pVehicleInfo->acceleration * pVeh->m_fTimeModifier;
 	}
 
-	if ( parentPS->speed || parentPS->groundEntityNum == ENTITYNUM_NONE  ||
+	if ( (int)parentPS->speed || parentPS->groundEntityNum == ENTITYNUM_NONE  ||
 		 pVeh->m_ucmd.forwardmove || pVeh->m_ucmd.upmove > 0 )
-	{ 
-		if ( pVeh->m_ucmd.forwardmove > 0 && speedInc )
+	{
+		if ( pVeh->m_ucmd.forwardmove > 0 && (int)speedInc )
 		{
 			parentPS->speed += speedInc;
 		}
@@ -193,7 +193,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 
 		//pVeh->m_ucmd.rightmove = 0;
 
-		/*if ( !pVeh->m_pVehicleInfo->strafePerc 
+		/*if ( !pVeh->m_pVehicleInfo->strafePerc
 			|| (!g_speederControlScheme->value && !parent->s.number) )
 		{//if in a strafe-capable vehicle, clear strafing unless using alternate control scheme
 			pVeh->m_ucmd.rightmove = 0;
@@ -233,7 +233,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh )
 	/********************************************************************************/
 	bgEntity_t *parent = pVeh->m_pParentEntity;
 	playerState_t *parentPS, *riderPS;
-	
+
 	bgEntity_t *rider = NULL;
 	if (parent->s.owner != ENTITYNUM_NONE)
 	{
@@ -253,7 +253,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh )
 	if (rider)
 	{
 		float angDif = AngleSubtract(pVeh->m_vOrientation->yaw, riderPS->viewangles.yaw);
-		if (parentPS && parentPS->speed)
+		if (parentPS && (int)parentPS->speed)
 		{
 			float s = parentPS->speed;
 			float maxDif = pVeh->m_pVehicleInfo->turningSpeed*4.0f; //magic number hackery
@@ -285,7 +285,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh )
 	else
 	{
 		float turnSpeed = pVeh->m_pVehicleInfo->turningSpeed;
-		if ( !pVeh->m_pVehicleInfo->turnWhenStopped 
+		if ( !pVeh->m_pVehicleInfo->turnWhenStopped
 			&& !parentPS->speed )//FIXME: or !pVeh->m_ucmd.forwardmove?
 		{//can't turn when not moving
 			//FIXME: or ramp up to max turnSpeed?
@@ -329,20 +329,20 @@ void AnimalProcessOri(Vehicle_t *pVeh)
 #ifdef _GAME //back to our game-only functions
 static void AnimateVehicle( Vehicle_t *pVeh )
 {
-	animNumber_t	Anim = BOTH_VT_IDLE; 
+	animNumber_t	Anim = BOTH_VT_IDLE;
 	int				iFlags = SETANIM_FLAG_NORMAL, iBlend = 300;
 	gentity_t *		pilot = (gentity_t *)pVeh->m_pPilot;
 	gentity_t *		parent = (gentity_t *)pVeh->m_pParentEntity;
 	float			fSpeedPercToMax;
 
 	// We're dead (boarding is reused here so I don't have to make another variable :-).
-	if ( parent->health <= 0 ) 
+	if ( parent->health <= 0 )
 	{
 		/*
 		if ( pVeh->m_iBoarding != -999 )	// Animate the death just once!
 		{
 			pVeh->m_iBoarding = -999;
-			iFlags = SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD; 
+			iFlags = SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD;
 
 			// FIXME! Why do you keep repeating over and over!!?!?!? Bastard!
 			//Vehicle_SetAnim( parent, SETANIM_LEGS, BOTH_VT_DEATH1, iFlags, iBlend );
@@ -416,7 +416,7 @@ static void AnimateVehicle( Vehicle_t *pVeh )
 
 	// Percentage of maximum speed relative to current speed.
 	//float fSpeed = VectorLength( client->ps.velocity );
-	fSpeedPercToMax = parent->client->ps.speed / pVeh->m_pVehicleInfo->speedMax; 
+	fSpeedPercToMax = parent->client->ps.speed / pVeh->m_pVehicleInfo->speedMax;
 
 
 	// Going in reverse...
@@ -526,7 +526,7 @@ static void AnimateRiders( Vehicle_t *pVeh )
 			}
 			WeaponPose = (pVeh->m_ulFlags&VEH_SABERINLEFTHAND)?(WPOSE_SABERLEFT):(WPOSE_SABERRIGHT);
 		}
-		
+
 
  		if (Attacking && WeaponPose)
 		{// Attack!

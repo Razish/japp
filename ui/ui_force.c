@@ -2,7 +2,7 @@
 /*
 =======================================================================
 
-FORCE INTERFACE 
+FORCE INTERFACE
 
 =======================================================================
 */
@@ -122,13 +122,13 @@ void UI_InitForceShaders(void)
 }
 
 // Draw the stars spent on the current force power
-void UI_DrawForceStars(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int forceindex, int val, int min, int max) 
+void UI_DrawForceStars(rectDef_t *rect, float scale, const vector4 *color, int textStyle, int forceindex, int val, int min, int max)
 {
 	int	i,pad = 4;
 	int	xPos,width = 16;
 	int starcolor;
 
-	if (val < min || val > max) 
+	if (val < min || val > max)
 	{
 		val = min;
 	}
@@ -203,7 +203,7 @@ int UI_TranslateFCFIndex(int index)
 	return index-uiInfo.forceConfigDarkIndexBegin;
 }
 
-void UI_SaveForceTemplate()
+void UI_SaveForceTemplate( void )
 {
 	char *selectedName = UI_Cvar_VariableString("ui_SaveFCF");
 	char fcfString[512];
@@ -293,9 +293,9 @@ void UI_SaveForceTemplate()
 }
 
 
-// 
+//
 extern qboolean UI_TrueJediEnabled( void );
-void UpdateForceUsed()
+void UpdateForceUsed( void )
 {
 	int curpower, currank;
 	menuDef_t *menu;
@@ -581,7 +581,7 @@ void UI_ReadLegalForce(void)
 		singleBuf[0] = fcfString[i];
 		singleBuf[1] = 0;
 		iBuf = atoi(singleBuf);	// So, that means that Force Power "c" wants to be set to rank "iBuf".
-		
+
 		if (iBuf < 0)
 		{
 			iBuf = 0;
@@ -601,7 +601,7 @@ void UI_ReadLegalForce(void)
 
 		// Accrue cost for each assigned rank for this power.
 		for (currank=FORCE_LEVEL_1;currank<=forcePowerRank;currank++)
-		{	
+		{
 			if (bgForcePowerCost[c][currank] > uiForceAvailable)
 			{	// Break out, we can't afford any more power.
 				break;
@@ -636,7 +636,7 @@ void UI_ReadLegalForce(void)
 	}
 }
 
-void UI_UpdateForcePowers()
+void UI_UpdateForcePowers( void )
 {
 	char *forcePowers = UI_Cvar_VariableString("forcepowers");
 	char readBuf[256];
@@ -766,9 +766,9 @@ validitycheck:
 extern int	uiSkinColor;
 extern int	uiHoldSkinColor;
 
-qboolean UI_SkinColor_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type) 
+qboolean UI_SkinColor_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type)
 {
-  if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER) 
+  if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER)
   {
   	int i = num;
 
@@ -806,7 +806,7 @@ qboolean UI_SkinColor_HandleKey(uint32_t flags, float *special, int key, int num
 
 
 
-qboolean UI_ForceSide_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type) 
+qboolean UI_ForceSide_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type)
 {
 	char info[MAX_INFO_VALUE];
 
@@ -826,7 +826,7 @@ qboolean UI_ForceSide_HandleKey(uint32_t flags, float *special, int key, int num
 		}
 	}
 
-	if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER) 
+	if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER)
 	{
 		int i = num;
 		int x = 0;
@@ -874,7 +874,7 @@ qboolean UI_ForceSide_HandleKey(uint32_t flags, float *special, int key, int num
 	return qfalse;
 }
 
-qboolean UI_JediNonJedi_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type) 
+qboolean UI_JediNonJedi_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type)
 {
 	char info[MAX_INFO_VALUE];
 
@@ -886,7 +886,7 @@ qboolean UI_JediNonJedi_HandleKey(uint32_t flags, float *special, int key, int n
 		return qfalse;
 	}
 
-	if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER) 
+	if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER)
 	{
 		int i = num;
 		int x = 0;
@@ -951,9 +951,9 @@ qboolean UI_JediNonJedi_HandleKey(uint32_t flags, float *special, int key, int n
 	return qfalse;
 }
 
-qboolean UI_ForceMaxRank_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type) 
+qboolean UI_ForceMaxRank_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type)
 {
-  if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER) 
+  if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER)
   {
   	int i = num;
 
@@ -993,17 +993,17 @@ qboolean UI_ForceMaxRank_HandleKey(uint32_t flags, float *special, int key, int 
 
 
 // This function will either raise or lower a power by one rank.
-qboolean UI_ForcePowerRank_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type) 
+qboolean UI_ForcePowerRank_HandleKey(uint32_t flags, float *special, int key, int num, int min, int max, int type)
 {
 	qboolean raising;
 
-	if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER || key == A_BACKSPACE) 
+	if (key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER || key == A_BACKSPACE)
 	{
 		int forcepower, rank;
 
 		//this will give us the index as long as UI_FORCE_RANK is always one below the first force rank index
 		forcepower = (type-UI_FORCE_RANK)-1;
-		
+
 		//the power is disabled on the server
 		if (uiForcePowersDisabled[forcepower])
 		{
@@ -1302,7 +1302,7 @@ void UI_ForceConfigHandle( int oldindex, int newindex )
 		singleBuf[0] = fcfBuffer[i];
 		singleBuf[1] = 0;
 		iBuf = atoi(singleBuf);	// So, that means that Force Power "c" wants to be set to rank "iBuf".
-		
+
 		if (iBuf < 0)
 		{
 			iBuf = 0;
@@ -1322,7 +1322,7 @@ void UI_ForceConfigHandle( int oldindex, int newindex )
 
 		// Accrue cost for each assigned rank for this power.
 		for (currank=FORCE_LEVEL_1;currank<=forcePowerRank;currank++)
-		{	
+		{
 			if (bgForcePowerCost[c][currank] > uiForceAvailable)
 			{	// Break out, we can't afford any more power.
 				break;

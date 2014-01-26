@@ -32,9 +32,9 @@
 // Zoom vars
 #define	ZOOM_TIME			150		// not currently used?
 #define MAX_ZOOM_FOV		3.0f
-#define ZOOM_IN_TIME		1500.0f	
+#define ZOOM_IN_TIME		1500.0f
 #define ZOOM_OUT_TIME		100.0f
-#define ZOOM_START_PERCENT	0.3f	
+#define ZOOM_START_PERCENT	0.3f
 
 #define	ITEM_BLOB_TIME		200
 #define	MUZZLE_FLASH_TIME	20
@@ -280,7 +280,7 @@ typedef struct centity_s {
 //	int				errorTime;		// decay the error from this time
 //	vector3			errorOrigin;
 //	vector3			errorAngles;
-	
+
 //	qboolean		extrapolated;	// false if origin / angles is an interpolation
 //	vector3			rawOrigin;
 	vector3			rawAngles;
@@ -329,7 +329,7 @@ typedef struct centity_s {
 	float			bodyHeight;
 
 	int				torsoBolt;
-	
+
 	vector3			turAngles;
 
 	vector3			frame_minus1;
@@ -355,7 +355,7 @@ typedef struct centity_s {
 	int				trickAlphaTime;
 
 	int				teamPowerEffectTime;
-	qboolean		teamPowerType; //0 regen, 1 heal, 2 drain, 3 absorb
+	int				teamPowerType; //0 regen, 1 heal, 2 drain, 3 absorb
 
 	qboolean		isRagging;
 	qboolean		ownerRagging;
@@ -548,7 +548,7 @@ typedef struct localEntity_s {
 		} fragment;
 	} data;
 
-	refEntity_t		refEntity;		
+	refEntity_t		refEntity;
 } localEntity_t;
 
 //======================================================================
@@ -680,7 +680,7 @@ typedef struct cg_s {
 	int			clientFrame;		// incremented each frame
 
 	int			clientNum;
-	
+
 	qboolean	demoPlayback;
 	qboolean	levelShot;			// taking a level menu screenshot
 	int			deferredPlayerLoading;
@@ -724,7 +724,7 @@ typedef struct cg_s {
 	qboolean	hyperspace;				// true if prediction has hit a trigger_teleport
 	playerState_t	predictedPlayerState;
 	playerState_t	predictedVehicleState;
-	
+
 	//centity_t		predictedPlayerEntity;
 	//rww - I removed this and made it use cg_entities[clnum] directly.
 
@@ -1035,7 +1035,7 @@ extern cgscreffects_t cgScreenEffects;
 void CGCam_Shake( float intensity, int duration );
 void CGCam_SetMusicMult( float multiplier, int duration );
 
-typedef enum 
+typedef enum
 {
 	CHUNK_METAL1 = 0,
 	CHUNK_METAL2,
@@ -1420,10 +1420,10 @@ typedef struct
 	// DISRUPTOR
 	fxHandle_t  disruptorRingsEffect;
 	fxHandle_t  disruptorProjectileEffect;
-	fxHandle_t  disruptorWallImpactEffect;	
-	fxHandle_t  disruptorFleshImpactEffect;	
-	fxHandle_t  disruptorAltMissEffect;	
-	fxHandle_t  disruptorAltHitEffect;	
+	fxHandle_t  disruptorWallImpactEffect;
+	fxHandle_t  disruptorFleshImpactEffect;
+	fxHandle_t  disruptorAltMissEffect;
+	fxHandle_t  disruptorAltHitEffect;
 
 	// BOWCASTER
 	fxHandle_t	bowcasterShotEffect;
@@ -1432,7 +1432,7 @@ typedef struct
 	// REPEATER
 	fxHandle_t  repeaterProjectileEffect;
 	fxHandle_t  repeaterAltProjectileEffect;
-	fxHandle_t  repeaterWallImpactEffect;	
+	fxHandle_t  repeaterWallImpactEffect;
 	fxHandle_t  repeaterFleshImpactEffect;
 	fxHandle_t  repeaterAltWallImpactEffect;
 
@@ -1724,12 +1724,12 @@ void CG_FillRect( float x, float y, float width, float height, const vector4 *co
 void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
 void CG_DrawRotatePic( float x, float y, float width, float height,float angle, qhandle_t hShader );
 void CG_DrawRotatePic2( float x, float y, float width, float height,float angle, qhandle_t hShader );
-void CG_DrawString( float x, float y, const char *string, 
+void CG_DrawString( float x, float y, const char *string,
 				   float charWidth, float charHeight, const float *modulate );
 
 void CG_DrawNumField (int x, int y, int width, int value,int charWidth,int charHeight,int style,qboolean zeroFill);
 
-void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor, 
+void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor,
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars );
 void CG_DrawBigString( int x, int y, const char *s, float alpha );
 void CG_DrawBigStringColor( int x, int y, const char *s, const vector4 *color );
@@ -1812,10 +1812,10 @@ void CG_TriggerAnimSounds( centity_t *cent );
 // cg_predict.c
 //
 void CG_BuildSolidList( void );
-int	CG_PointContents( const vector3 *point, int passEntityNum );
-void CG_Trace( trace_t *result, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, 
+uint32_t CG_PointContents( const vector3 *point, int passEntityNum );
+void CG_Trace( trace_t *result, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end,
 					 int skipNumber, int mask );
-void CG_G2Trace( trace_t *result, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, 
+void CG_G2Trace( trace_t *result, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end,
 					 int skipNumber, int mask );
 void CG_PredictPlayerState( void );
 void CG_LoadDeferredPlayers( void );
@@ -1846,9 +1846,9 @@ void CG_ManualEntityRender(centity_t *cent);
 void CG_Beam( centity_t *cent );
 void CG_AdjustPositionForMover( const vector3 *in, int moverNum, int fromTime, int toTime, vector3 *out );
 
-void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
+void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 							qhandle_t parentModel, char *tagName );
-void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
+void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 							qhandle_t parentModel, char *tagName );
 
 /*
@@ -1893,11 +1893,11 @@ void CG_OutOfAmmoChange( int oldWeapon );	// should this be in pmove?
 //
 void	CG_InitMarkPolys( void );
 void	CG_AddMarks( void );
-void	CG_ImpactMark( qhandle_t markShader, 
-				    const vector3 *origin, const vector3 *dir, 
-					float orientation, 
-				    float r, float g, float b, float a, 
-					qboolean alphaFade, 
+void	CG_ImpactMark( qhandle_t markShader,
+				    const vector3 *origin, const vector3 *dir,
+					float orientation,
+				    float r, float g, float b, float a,
+					qboolean alphaFade,
 					float radius, qboolean temporary );
 
 //
@@ -1994,7 +1994,7 @@ void FX_ConcAltShot( vector3 *start, vector3 *end );
 // Effects related prototypes
 //-----------------------------
 
-// Environmental effects 
+// Environmental effects
 void CG_Spark( vector3 *origin, vector3 *dir );
 
 // Weapon prototypes
@@ -2016,7 +2016,7 @@ void FX_ForceDrained(vector3 *origin, vector3 *dir);
 // Effects related prototypes
 //-----------------------------
 
-// Environmental effects 
+// Environmental effects
 void CG_Spark( vector3 *origin, vector3 *dir );
 
 // Weapon prototypes
@@ -2098,7 +2098,7 @@ void CG_ChatboxInit( void );
 qboolean CG_ChatboxActive( void );
 void CG_ChatboxDraw( void );
 void CG_ChatboxEscape( void );
-void CG_ChatboxAddMessage( const char *message, qboolean multiLine, char *cbName );
+void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *cbName );
 
 
 refdef_t *CG_GetRefdef( void );

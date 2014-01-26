@@ -149,7 +149,7 @@ void CG_ParseServerinfo( void ) {
 
 	cgs.japp.jp_cinfo = atoi( Info_ValueForKey( info, "jp_cinfo" ) );
 	cgs.japp.overbounce = atoi( Info_ValueForKey( info, "pmove_overbounce" ) );
-	
+
 	//Raz: Server support flags
 	tinfo = Info_ValueForKey( info, "ssf" );
 	if ( !Q_stricmpn( Info_ValueForKey( info, "gamename" ), "JA+ Mod", 7 ) )
@@ -245,7 +245,7 @@ static void CG_ParseWarmup( void ) {
 
 //Raz: This is a reverse map of flag statuses as seen in g_team.c
 //static char ctfFlagStatusRemap[] = { '0', '1', '*', '*', '2' };
-static char ctfFlagStatusRemap[] = { 	
+static char ctfFlagStatusRemap[] = {
 	FLAG_ATBASE,
 	FLAG_TAKEN,
 	//FLAG_TAKEN_RED,	// these were used for 1-flag CTF
@@ -260,7 +260,7 @@ CG_SetConfigValues
 Called on load to set the initial values from configure strings
 ================
 */
-void CG_SetConfigValues( void ) 
+void CG_SetConfigValues( void )
 {
 	const char *s;
 	const char *str;
@@ -277,10 +277,10 @@ void CG_SetConfigValues( void )
 		redflagId = s[0] - '0';
 		blueflagId = s[1] - '0';
 
-		if ( redflagId >= 0 && redflagId < (signed)ARRAY_LEN( ctfFlagStatusRemap ) ) 
+		if ( redflagId >= 0 && redflagId < (signed)ARRAY_LEN( ctfFlagStatusRemap ) )
 			cgs.redflag = ctfFlagStatusRemap[redflagId];
 
-		if ( blueflagId >= 0 && blueflagId < (signed)ARRAY_LEN( ctfFlagStatusRemap ) ) 
+		if ( blueflagId >= 0 && blueflagId < (signed)ARRAY_LEN( ctfFlagStatusRemap ) )
 			cgs.blueflag = ctfFlagStatusRemap[blueflagId];
 	}
 	cg.warmup = atoi( CG_ConfigString( CS_WARMUP ) );
@@ -444,12 +444,12 @@ static void CG_RegisterCustomSounds(clientInfo_t *ci, int setType, const char *p
 		return;
 	}
 
-	for ( i = 0 ; i<iTableEntries; i++ ) 
+	for ( i = 0 ; i<iTableEntries; i++ )
 	{
 		sfxHandle_t hSFX;
 		const char *s = GetCustomSoundForType(setType, i);
 
-		if ( !s ) 
+		if ( !s )
 		{
 			break;
 		}
@@ -485,7 +485,7 @@ static void CG_RegisterCustomSounds(clientInfo_t *ci, int setType, const char *p
 				}
 			}
 		}
-		
+
 		SetCustomSoundForType(ci, setType, i, hSFX);
 	}
 }
@@ -909,10 +909,10 @@ static void CG_ConfigStringModified( void ) {
 			// format is rb where its red/blue, 0 is at base, 1 is taken, 2 is dropped
 			int redflagId = str[0] - '0', blueflagId = str[1] - '0';
 
-			if ( redflagId >= 0 && redflagId < ARRAY_LEN( ctfFlagStatusRemap ) ) 
+			if ( redflagId >= 0 && redflagId < ARRAY_LEN( ctfFlagStatusRemap ) )
 				cgs.redflag = ctfFlagStatusRemap[redflagId];
 
-			if ( blueflagId >= 0 && blueflagId < ARRAY_LEN( ctfFlagStatusRemap ) )  
+			if ( blueflagId >= 0 && blueflagId < ARRAY_LEN( ctfFlagStatusRemap ) )
 				cgs.blueflag = ctfFlagStatusRemap[blueflagId];
 		}
 	}
@@ -923,7 +923,7 @@ static void CG_ConfigStringModified( void ) {
 	{
 		CG_SetLightstyle(num - CS_LIGHT_STYLES);
 	}
-		
+
 }
 
 //frees all ghoul2 stuff and npc stuff from a centity -rww
@@ -1335,7 +1335,7 @@ static void CG_ServerCommand( void ) {
 
 #if 0
 	// never seems to get used -Ste
-	if ( !strcmp( cmd, "spd" ) ) 
+	if ( !strcmp( cmd, "spd" ) )
 	{
 		const char *ID;
 		int holdInt,count,i;
@@ -1426,7 +1426,7 @@ static void CG_ServerCommand( void ) {
 		int indexNum = 0;
 		int argNum = trap->Cmd_Argc();
 		int i = 1;
-		
+
 		if (argNum < 1)
 		{
 			return;
@@ -1451,7 +1451,7 @@ static void CG_ServerCommand( void ) {
 
 			i++;
 		}
-		
+
 		return;
 	}
 
@@ -1461,7 +1461,7 @@ static void CG_ServerCommand( void ) {
 		int argNum = trap->Cmd_Argc();
 		centity_t *clent = NULL;
 		centity_t *trackerent = NULL;
-		
+
 		if (argNum < 1)
 		{
 			assert(0);
@@ -1507,7 +1507,7 @@ static void CG_ServerCommand( void ) {
 		int indexNum = 0;
 		int argNum = trap->Cmd_Argc();
 		centity_t *clent;
-		
+
 		if (argNum < 1)
 		{
 			assert(0);
@@ -1552,11 +1552,11 @@ static void CG_ServerCommand( void ) {
 
 			if (side)
 			{
-				body->teamPowerType = qtrue; //light side
+				body->teamPowerType = 1; //light side
 			}
 			else
 			{
-				body->teamPowerType = qfalse; //dark side
+				body->teamPowerType = 0; //dark side
 			}
 
 			CG_BodyQueueCopy(body, clent->currentState.number, weaponIndex);
@@ -1574,7 +1574,7 @@ static void CG_ServerCommand( void ) {
 			clent->isRagging = qfalse;
 			trap->G2API_SetRagDoll(clent->ghoul2, NULL); //calling with null parms resets to no ragdoll.
 		}
-		
+
 		//clear all the decals as well
 		trap->G2API_ClearSkinGore(clent->ghoul2);
 
