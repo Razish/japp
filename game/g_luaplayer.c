@@ -351,6 +351,19 @@ static int JPLua_Player_Kill( lua_State *L ) {
 	return 0;
 }
 
+//Func: Player:SetVelocity( x, y, z )
+static int JPLua_Player_SetVelocity( lua_State *L ) 
+{
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+
+	ent->playerState->velocity.x = lua_tonumber( L, 2 ); //x
+	ent->playerState->velocity.y = lua_tonumber( L, 3 ); //y
+	ent->playerState->velocity.z = 	lua_tonumber( L, 4 ); //z
+
+	return 0;
+}
+
 //Func: Player:TakeWeapon( integer weaponID )
 //Retn: N/A
 static int JPLua_Player_TakeWeapon( lua_State *L ) {
@@ -463,6 +476,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "IsWeaponHolstered",	JPLua_Player_IsWeaponHolstered },
 	{ "Kick",				JPLua_Player_Kick },
 	{ "Kill",				JPLua_Player_Kill },
+	{ "SetVelocity",		JPLua_Player_SetVelocity },
 	{ "TakeWeapon",			JPLua_Player_TakeWeapon },
 	{ "Teleport",			JPLua_Player_Teleport },
 
