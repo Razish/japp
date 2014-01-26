@@ -211,7 +211,7 @@ static int JPLua_Player_GetSaberStyle( lua_State *L ) {
 }
 
 //Func: Player:GetScore()
-//Retn: wot score the playah got rite now m8
+//Retn: an integer with the score that the player has
 static int JPLua_Player_GetScore( lua_State *L )
 {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
@@ -366,8 +366,12 @@ static int JPLua_Player_Kill( lua_State *L ) {
 //Retn: N/A
 static int JPLua_Player_SetArmor( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	int armour = lua_tointeger(L, 2);
 
-	level.clients[player->clientNum].ps.stats[STAT_ARMOR] = lua_tointeger(L, 2);
+	if(armour < 0)
+		armour = 0;
+
+	level.clients[player->clientNum].ps.stats[STAT_ARMOR] = armour;
 
 	return 0;
 }
@@ -376,9 +380,14 @@ static int JPLua_Player_SetArmor( lua_State *L ) {
 //Retn: N/A
 static int JPLua_Player_SetHealth( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	int hp = lua_tointeger(L, 2);
 	gentity_t *ent = &g_entities[player->clientNum];
 
-	ent->health = lua_tointeger(L, 2);
+	if(hp <= 0 )
+		return 0;
+	
+	ent->health = hp;
+	level.clients[player->clientNum].ps.stats[STAT_HEALTH] = hp;
 
 	return 0;
 }
