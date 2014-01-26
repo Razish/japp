@@ -357,9 +357,13 @@ static int JPLua_Player_SetVelocity( lua_State *L )
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	gentity_t *ent = &g_entities[player->clientNum];
 
-	ent->playerState->velocity.x = lua_tonumber( L, 2 ); //x
-	ent->playerState->velocity.y = lua_tonumber( L, 3 ); //y
-	ent->playerState->velocity.z = 	lua_tonumber( L, 4 ); //z
+	lua_getfield( L, 2, "x" );	ent->playerState->velocity.x = lua_tonumber( L, -1 ); //x
+	lua_getfield( L, 2, "y" );	ent->playerState->velocity.y = lua_tonumber( L, -1 ); //y
+	lua_getfield( L, 2, "z" );	ent->playerState->velocity.z = 	lua_tonumber( L, -1 ); //z
+
+	
+	
+	
 
 	return 0;
 }
