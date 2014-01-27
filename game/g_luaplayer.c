@@ -211,12 +211,10 @@ static int JPLua_Player_GetSaberStyle( lua_State *L ) {
 }
 
 //Func: Player:GetScore()
-//Retn: an integer with the score that the player has
-static int JPLua_Player_GetScore( lua_State *L )
-{
+//Retn: integer of the player's score
+static int JPLua_Player_GetScore( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	lua_pushinteger( L, level.clients[player->clientNum].ps.persistant[PERS_SCORE] );
-
 	return 1;
 }
 
@@ -362,16 +360,61 @@ static int JPLua_Player_Kill( lua_State *L ) {
 	return 0;
 }
 
+//Func: Player:RemoveEntityFlag( integer bit )
+//Retn: string errorMsg if it failed, otherwise nothing
+static int JPLua_Player_RemoveEntityFlag( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	uint32_t bit = lua_tointeger( L, 2 );
+	int i, found = 0;
+
+	for ( i=0; i<32; i++ ) {
+		if ( bit & (1<<i) )
+			found++;
+	}
+
+	if ( found > 1 ) {
+		lua_pushfstring( L, "too many bits removed (%i)\n", found );
+		return 1;
+	}
+
+	g_entities[player->clientNum].client->ps.eFlags &= ~bit;
+
+	return 0;
+}
+
 //Func: Player:SetArmor()
 //Retn: N/A
 static int JPLua_Player_SetArmor( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	int armour = lua_tointeger(L, 2);
+	int armour = lua_tointeger( L, 2 );
 
-	if(armour < 0)
+	if ( armour < 0 )
 		armour = 0;
 
 	level.clients[player->clientNum].ps.stats[STAT_ARMOR] = armour;
+
+	return 0;
+}
+
+
+//Func: Player:SetEntityFlag( integer bit )
+//Retn: string errorMsg if it failed, otherwise nothing
+static int JPLua_Player_SetEntityFlag( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	uint32_t bit = lua_tointeger( L, 2 );
+	int i, found = 0;
+
+	for ( i=0; i<32; i++ ) {
+		if ( bit & (1<<i) )
+			found++;
+	}
+
+	if ( found > 1 ) {
+		lua_pushfstring( L, "too many bits set (%i)\n", found );
+		return 1;
+	}
+
+	g_entities[player->clientNum].client->ps.eFlags |= bit;
 
 	return 0;
 }
@@ -380,26 +423,24 @@ static int JPLua_Player_SetArmor( lua_State *L ) {
 //Retn: N/A
 static int JPLua_Player_SetHealth( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	int hp = lua_tointeger(L, 2);
+	int hp = lua_tointeger( L, 2 );
 	gentity_t *ent = &g_entities[player->clientNum];
 
-	if(hp <= 0 )
+	if ( hp < 1 )
 		return 0;
-	
-	ent->health = hp;
-	level.clients[player->clientNum].ps.stats[STAT_HEALTH] = hp;
+
+	ent->health = ent->client->ps.stats[STAT_HEALTH] = hp;
 
 	return 0;
 }
 
 //Func: Player:SetScore()
 //Retn: N/A
-static int JPLua_Player_SetScore( lua_State *L )
-{
+static int JPLua_Player_SetScore( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 
-	g_entities[player->clientNum].client->ps.persistant[PERS_SCORE] = lua_tointeger(L, 2);
-	
+	g_entities[player->clientNum].client->ps.persistant[PERS_SCORE] = lua_tointeger( L, 2 );
+
 	return 0;
 }
 
@@ -407,18 +448,13 @@ static int JPLua_Player_SetScore( lua_State *L )
 
 //Func: Player:SetVelocity( x, y, z )
 //Retn: N/A
-static int JPLua_Player_SetVelocity( lua_State *L ) 
-{
+static int JPLua_Player_SetVelocity( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	gentity_t *ent = &g_entities[player->clientNum];
 
 	lua_getfield( L, 2, "x" );	ent->playerState->velocity.x = lua_tonumber( L, -1 ); //x
 	lua_getfield( L, 2, "y" );	ent->playerState->velocity.y = lua_tonumber( L, -1 ); //y
-	lua_getfield( L, 2, "z" );	ent->playerState->velocity.z = 	lua_tonumber( L, -1 ); //z
-
-	
-	
-	
+	lua_getfield( L, 2, "z" );	ent->playerState->velocity.z = lua_tonumber( L, -1 ); //z
 
 	return 0;
 }
@@ -536,7 +572,9 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "IsWeaponHolstered",	JPLua_Player_IsWeaponHolstered },
 	{ "Kick",				JPLua_Player_Kick },
 	{ "Kill",				JPLua_Player_Kill },
+	{ "RemoveEntityFlag",	JPLua_Player_RemoveEntityFlag },
 	{ "SetArmor",			JPLua_Player_SetArmor },
+	{ "SetEntityFlag",		JPLua_Player_SetEntityFlag },
 	{ "SetHealth",			JPLua_Player_SetHealth },
 	{ "SetScore",			JPLua_Player_SetScore },
 	{ "SetVelocity",		JPLua_Player_SetVelocity },
@@ -548,6 +586,8 @@ static const struct luaL_Reg jplua_player_meta[] = {
 
 // Register the Player class for Lua
 void JPLua_Register_Player( lua_State *L ) {
+	const luaL_Reg *r;
+
 	luaL_newmetatable( L, PLAYER_META ); // Create metatable for Player class, push on stack
 
 	// Lua won't attempt to directly index userdata, only via metatables
@@ -558,12 +598,9 @@ void JPLua_Register_Player( lua_State *L ) {
 
 	// fill metatable with fields
 #if LUA_VERSION_NUM > 501
-	{
-		const luaL_Reg *r;
-		for ( r=jplua_player_meta; r->name; r++ ) {
-			lua_pushcfunction( L, r->func );
-			lua_setfield( L, -2, r->name );
-		}
+	for ( r=jplua_player_meta; r->name; r++ ) {
+		lua_pushcfunction( L, r->func );
+		lua_setfield( L, -2, r->name );
 	}
 #else
 	luaL_register( L, NULL, jplua_player_meta );

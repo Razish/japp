@@ -301,6 +301,7 @@ elif plat == 'Windows':
 	libs['ui'] = []
 
 # compiler options
+analyse = int( ARGUMENTS.get( 'analyse', 0 ) )
 if plat == 'Linux':
 	env['CC'] = ARGUMENTS.get( 'compiler', 'gcc' )
 	env['CPPDEFINES'] = [ '__GCC__' ]
@@ -321,9 +322,9 @@ if plat == 'Linux':
 		'-Wunreachable-code',
 	#	'-Wwrite-strings',
 		]
-	if int( ARGUMENTS.get( 'analyse', 0 ) ):
+	if analyse:
 		env['CC'] = 'clang'
-		env['CCFLAGS'] += [ '--analyze' ]
+		env['CCFLAGS'] += [ '--analyze -O3' ]
 	if force32:
 		env['CCFLAGS'] += [ '-m32' ]
 		env['LINKFLAGS'] += [ '-m32' ]
@@ -341,8 +342,8 @@ if int( ARGUMENTS.get( 'debug', 0 ) ):
 		env['CCFLAGS'] += [ '/Zi', '/Od' ]
 	env['CPPDEFINES'] += [ '_DEBUG' ]
 else:
-	if plat == 'Linux':
-		env['CCFLAGS'] += [ '-O3' ]
+	if plat == 'Linux' and not analyse:
+		env['CCFLAGS'] += [ '-O2' ] # analysis sets higher optimisation level
 	elif plat == 'Windows':
 		env['CCFLAGS'] += [ '/O2' ]
 	env['CPPDEFINES'] += [ 'NDEBUG' ]
