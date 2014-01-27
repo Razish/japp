@@ -34,6 +34,7 @@ typedef struct adminUser_s {
 	char		password[64];	// password
 	uint32_t	privileges;		// 32 privs
 	char		loginMsg[128];	// login message
+	int			rank;			// rank
 
 	struct adminUser_s *next;
 } adminUser_t;
@@ -66,7 +67,7 @@ typedef struct adminUser_s {
 #define PRIV_RENAME		(0x02000000u)
 #define PRIV_LOCKTEAM	(0x04000000u)
 
-void		AM_AddAdmin				( const char *user, const char *pass, uint32_t privileges, const char *loginMsg );
+void		AM_AddAdmin				( const char *user, const char *pass, uint32_t privileges, const int rank, const char *loginMsg  );
 void		AM_DeleteAdmin			( const char *user );
 void		AM_ListAdmins			( void );
 void		AM_LoadAdmins			( void );
