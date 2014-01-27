@@ -3904,7 +3904,8 @@ void ClientDisconnect( int clientNum ) {
 
 	// make sure this client slot is unignored
 	for ( i=0, other=g_entities; i<MAX_CLIENTS; i++, other++ ) {
-		other->client->pers.ignore[clientNum] = qfalse;
+		if ( other->inuse && other->client )
+			other->client->pers.ignore[clientNum] = qfalse;
 		ent->client->pers.ignore[i] = qfalse;
 	}
 

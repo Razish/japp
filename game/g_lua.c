@@ -61,10 +61,10 @@ static const char *JPLua_LoadFile_Reader( lua_State *L, void *ud, size_t *sz ) {
 
 // Loads a file using JA's FS functions, only use THIS to load files into lua!
 int JPLua_LoadFile( lua_State *L, const char *file ) {
-	fileHandle_t	f		= 0;
-	int				len		= trap->FS_Open( file, &f, FS_READ );
-	gfd_t			gfd;
-	int				status;
+	fileHandle_t f = 0;
+	int	len	= trap->FS_Open( file, &f, FS_READ );
+	gfd_t gfd;
+	int	status;
 
 	// file doesn't exist
 	if ( !f || len <= 0 ) {
