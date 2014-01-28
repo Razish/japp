@@ -138,11 +138,10 @@ void JPLua_Event_ClientSpawn( int clientNum, qboolean firstSpawn )
 		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTSPAWN] )
 		{
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTSPAWN] );
-#if 0
+
 			// Create a player instance for this client number and push on stack
+
 			JPLua_Player_CreateRef( JPLua.state, clientNum );
-#endif
-			lua_pushinteger( JPLua.state, clientNum );
 			lua_pushboolean( JPLua.state, firstSpawn );
 			JPLUACALL( JPLua.state, 2, 0 );
 		}
