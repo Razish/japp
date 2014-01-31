@@ -81,7 +81,7 @@ void MineMonster_Patrol( void )
 		return;
 	}
 }
- 
+
 /*
 -------------------------
 MineMonster_Move
@@ -131,7 +131,7 @@ void MineMonster_Attack( void )
 	if ( !TIMER_Exists( NPC, "attacking" ))
 	{
 		// usually try and play a jump attack if the player somehow got above them....or just really rarely
-		if ( NPC->enemy && ((NPC->enemy->r.currentOrigin.z - NPC->r.currentOrigin.z > 10 && random() > 0.1f ) 
+		if ( NPC->enemy && ((NPC->enemy->r.currentOrigin.z - NPC->r.currentOrigin.z > 10 && random() > 0.1f )
 						|| random() > 0.8f ))
 		{
 			// Going to do ATTACK4
@@ -205,7 +205,7 @@ void MineMonster_Combat( void )
 	// Sometimes I have problems with facing the enemy I'm attacking, so force the issue so I don't look dumb
 	NPC_FaceEnemy( qtrue );
 
-	distance	= DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );	
+	distance	= DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
 
 	advance = (qboolean)( distance > MIN_DISTANCE_SQR ? qtrue : qfalse  );
 

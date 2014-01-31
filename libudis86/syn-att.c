@@ -16,7 +16,7 @@
  * opr_cast() - Prints an operand cast.
  * -----------------------------------------------------------------------------
  */
-static void 
+static void
 opr_cast(struct ud* u, struct ud_operand* op)
 {
   switch(op->size) {
@@ -30,7 +30,7 @@ opr_cast(struct ud* u, struct ud_operand* op)
  * gen_operand() - Generates assembly output for each operand.
  * -----------------------------------------------------------------------------
  */
-static void 
+static void
 gen_operand(struct ud* u, struct ud_operand* op)
 {
   switch(op->type) {
@@ -46,12 +46,12 @@ gen_operand(struct ud* u, struct ud_operand* op)
 			if (op->lval.sbyte < 0)
 				mkasm(u, "-0x%x", (-op->lval.sbyte) & 0xff);
 			else	mkasm(u, "0x%x", op->lval.sbyte);
-		} 
-		else if (op->offset == 16) 
+		}
+		else if (op->offset == 16)
 			mkasm(u, "0x%x", op->lval.uword);
-		else if (op->offset == 32) 
+		else if (op->offset == 32)
 			mkasm(u, "0x%lx", op->lval.udword);
-		else if (op->offset == 64) 
+		else if (op->offset == 64)
 			mkasm(u, "0x" FMT64 "x", op->lval.uqword);
 
 		if (op->base)
@@ -81,7 +81,7 @@ gen_operand(struct ud* u, struct ud_operand* op)
 	case UD_OP_JIMM:
 		switch (op->size) {
 			case  8:
-				mkasm(u, "0x" FMT64 "x", u->pc + op->lval.sbyte); 
+				mkasm(u, "0x" FMT64 "x", u->pc + op->lval.sbyte);
 				break;
 			case 16:
 				mkasm(u, "0x" FMT64 "x", u->pc + op->lval.sword);
@@ -96,25 +96,25 @@ gen_operand(struct ud* u, struct ud_operand* op)
 	case UD_OP_PTR:
 		switch (op->size) {
 			case 32:
-				mkasm(u, "$0x%x, $0x%x", op->lval.ptr.seg, 
+				mkasm(u, "$0x%x, $0x%x", op->lval.ptr.seg,
 					op->lval.ptr.off & 0xFFFF);
 				break;
 			case 48:
-				mkasm(u, "$0x%x, $0x%lx", op->lval.ptr.seg, 
+				mkasm(u, "$0x%x, $0x%lx", op->lval.ptr.seg,
 					op->lval.ptr.off);
 				break;
 		}
 		break;
-			
+
 	default: return;
   }
 }
 
 /* =============================================================================
- * translates to AT&T syntax 
+ * translates to AT&T syntax
  * =============================================================================
  */
-extern void 
+extern void
 ud_translate_att(struct ud *u)
 {
   int size = 0;
@@ -122,7 +122,7 @@ ud_translate_att(struct ud *u)
   /* check if P_OSO prefix is used */
   if (! P_OSO(u->itab_entry->prefix) && u->pfx_opr) {
 	switch (u->dis_mode) {
-		case 16: 
+		case 16:
 			mkasm(u, "o32 ");
 			break;
 		case 32:
@@ -135,7 +135,7 @@ ud_translate_att(struct ud *u)
   /* check if P_ASO prefix was used */
   if (! P_ASO(u->itab_entry->prefix) && u->pfx_adr) {
 	switch (u->dis_mode) {
-		case 16: 
+		case 16:
 			mkasm(u, "a32 ");
 			break;
 		case 32:
@@ -156,8 +156,8 @@ ud_translate_att(struct ud *u)
 
   /* special instructions */
   switch (u->mnemonic) {
-	case UD_Iretf: 
-		mkasm(u, "lret "); 
+	case UD_Iretf:
+		mkasm(u, "lret ");
 		break;
 	case UD_Idb:
 		mkasm(u, ".byte 0x%x", u->operand[0].lval.ubyte);

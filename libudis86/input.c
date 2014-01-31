@@ -13,7 +13,7 @@
  * inp_buff_hook() - Hook for buffered inputs.
  * -----------------------------------------------------------------------------
  */
-static int 
+static int
 inp_buff_hook(struct ud* u)
 {
   if (u->inp_buff < u->inp_buff_end)
@@ -26,7 +26,7 @@ inp_buff_hook(struct ud* u)
  * inp_file_hook() - Hook for FILE inputs.
  * -----------------------------------------------------------------------------
  */
-static int 
+static int
 inp_file_hook(struct ud* u)
 {
   return fgetc(u->inp_file);
@@ -37,7 +37,7 @@ inp_file_hook(struct ud* u)
  * ud_inp_set_hook() - Sets input hook.
  * =============================================================================
  */
-extern void 
+extern void
 ud_set_input_hook(register struct ud* u, int (*hook)(struct ud*))
 {
   u->inp_hook = hook;
@@ -48,7 +48,7 @@ ud_set_input_hook(register struct ud* u, int (*hook)(struct ud*))
  * ud_inp_set_buffer() - Set buffer as input.
  * =============================================================================
  */
-extern void 
+extern void
 ud_set_input_buffer(register struct ud* u, uint8_t* buf, size_t len)
 {
   u->inp_hook = inp_buff_hook;
@@ -62,7 +62,7 @@ ud_set_input_buffer(register struct ud* u, uint8_t* buf, size_t len)
  * ud_input_set_file() - Set buffer as input.
  * =============================================================================
  */
-extern void 
+extern void
 ud_set_input_file(register struct ud* u, FILE* f)
 {
   u->inp_hook = inp_file_hook;
@@ -75,7 +75,7 @@ ud_set_input_file(register struct ud* u, FILE* f)
  * ud_input_skip() - Skip n input bytes.
  * =============================================================================
  */
-extern void 
+extern void
 ud_input_skip(struct ud* u, size_t n)
 {
   while (n--) {
@@ -87,7 +87,7 @@ ud_input_skip(struct ud* u, size_t n)
  * ud_input_end() - Test for end of input.
  * =============================================================================
  */
-extern int 
+extern int
 ud_input_end(struct ud* u)
 {
   return (u->inp_curr == u->inp_fill) && u->inp_end;
@@ -104,10 +104,10 @@ ud_input_end(struct ud* u)
  * A buffer inp_sess stores the bytes disassembled for a single session.
  * -----------------------------------------------------------------------------
  */
-extern uint8_t inp_next(struct ud* u) 
+extern uint8_t inp_next(struct ud* u)
 {
   int c = -1;
-  /* if current pointer is not upto the fill point in the 
+  /* if current pointer is not upto the fill point in the
    * input cache.
    */
   if ( u->inp_curr != u->inp_fill ) {
@@ -138,7 +138,7 @@ extern uint8_t inp_next(struct ud* u)
  * -----------------------------------------------------------------------------
  */
 extern void
-inp_back(struct ud* u) 
+inp_back(struct ud* u)
 {
   if ( u->inp_ctr > 0 ) {
 	--u->inp_curr;
@@ -147,11 +147,11 @@ inp_back(struct ud* u)
 }
 
 /* -----------------------------------------------------------------------------
- * inp_peek() - Peek into the next byte in source. 
+ * inp_peek() - Peek into the next byte in source.
  * -----------------------------------------------------------------------------
  */
 extern uint8_t
-inp_peek(struct ud* u) 
+inp_peek(struct ud* u)
 {
   uint8_t r = inp_next(u);
   if ( !u->error ) inp_back(u); /* Don't backup if there was an error */
@@ -163,7 +163,7 @@ inp_peek(struct ud* u)
  * -----------------------------------------------------------------------------
  */
 extern void
-inp_move(struct ud* u, size_t n) 
+inp_move(struct ud* u, size_t n)
 {
   while (n--)
 	inp_next(u);
@@ -173,13 +173,13 @@ inp_move(struct ud* u, size_t n)
  *  inp_uintN() - return uintN from source.
  *------------------------------------------------------------------------------
  */
-extern uint8_t 
+extern uint8_t
 inp_uint8(struct ud* u)
 {
   return inp_next(u);
 }
 
-extern uint16_t 
+extern uint16_t
 inp_uint16(struct ud* u)
 {
   uint16_t r, ret;
@@ -189,7 +189,7 @@ inp_uint16(struct ud* u)
   return ret | (r << 8);
 }
 
-extern uint32_t 
+extern uint32_t
 inp_uint32(struct ud* u)
 {
   uint32_t r, ret;
@@ -203,7 +203,7 @@ inp_uint32(struct ud* u)
   return ret | (r << 24);
 }
 
-extern uint64_t 
+extern uint64_t
 inp_uint64(struct ud* u)
 {
   uint64_t r, ret;

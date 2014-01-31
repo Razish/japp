@@ -13,4 +13,4 @@ void FX_ForceDrained(vector3 *origin, vector3 *dir)
 	VectorScale(dir, -1.0, dir);
 	trap->FX_PlayEffectID(cgs.effects.forceDrained, origin, dir, -1, -1, qfalse);
 }
-	
+

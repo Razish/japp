@@ -16,7 +16,7 @@
 #include "qcommon/q_shared.h"
 #include "g_local.h"
 
-/* if USE_EPSILON_TEST is true then we do a check: 
+/* if USE_EPSILON_TEST is true then we do a check:
 if |dv|<EPSILON then dv=0.0;
 else no check is done (which is less robust)
 */
@@ -58,7 +58,7 @@ else no check is done (which is less robust)
 #define SUB( dest, v1, v2 ) \
 	dest[0] = v1[0]-v2[0]; \
 	dest[1] = v1[1]-v2[1]; \
-	dest[2] = v1[2]-v2[2]; 
+	dest[2] = v1[2]-v2[2];
 #endif
 
 // Intersect
@@ -70,7 +70,7 @@ static void ISECT( float VV0, float VV1, float VV2, float D0, float D1, float D2
 // Edge-Edge test
 /* this edge to edge test is based on Franlin Antonio's gem:
 "Faster Line Segment Intersection", in Graphics Gems III,
-pp. 199-202 */ 
+pp. 199-202 */
 #define EDGE_EDGE_TEST( V0, U0, U1 ) \
 	Bx = U0->data[i0]-U1->data[i0]; \
 	By = U0->data[i1]-U1->data[i1]; \
@@ -92,7 +92,7 @@ pp. 199-202 */
 			if ( e <= 0 && e >= f ) \
 				return qtrue; \
 		} \
-	}                                
+	}
 
 #define EDGE_AGAINST_TRI_EDGES( V0, V1, U0, U1, U2 ) \
 { \
@@ -162,14 +162,14 @@ qboolean coplanar_tri_tri( vector3 *N, vector3 *V0, vector3 *V1, vector3 *V2, ve
 		if ( A.z > A.y )
 		{
 			i0=0;      /* A[2] is greatest */
-			i1=1;                                           
+			i1=1;
 		}
 		else
 		{
 			i0=0;      /* A[1] is greatest */
 			i1=2;
 		}
-	}               
+	}
 
 	/* test all edges of triangle 1 against the edges of triangle 2 */
 	EDGE_AGAINST_TRI_EDGES( V0, V1, U0, U1, U2 );

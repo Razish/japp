@@ -6,7 +6,7 @@
 
 #define	MAX_DLIGHTS		32			// can't be increased, because bit flags are used on surfaces
 #define	MAX_ENTITIES	2048		// 11 bits, can't be increased without changing drawsurf bit packing (QSORT_ENTITYNUM_SHIFT)
-#define	MAX_MINI_ENTITIES	1024		
+#define	MAX_MINI_ENTITIES	1024
 
 #define	TR_WORLDENT		(MAX_ENTITIES-1)
 
@@ -37,7 +37,7 @@
 // refdef flags
 #define RDF_NOWORLDMODEL	(0x0001u) // used for player configuration screen
 #define RDF_HYPERSPACE		(0x0004u) // teleportation effect
-#define RDF_SKYBOXPORTAL	(0x0008u) 
+#define RDF_SKYBOXPORTAL	(0x0008u)
 #define RDF_DRAWSKYBOX		(0x0010u) // the above marks a scene as being a 'portal sky'.  this flag says to draw it or not
 #define RDF_AUTOMAP			(0x0020u) // means this scene is to draw the automap -rww
 #define	RDF_NOFOG			(0x0040u) // no global fog in this scene (but still brush fog) -rww
@@ -76,7 +76,7 @@ typedef enum {
 	RT_MAX_REF_ENTITY_TYPE
 } refEntityType_t;
 
-typedef struct miniRefEntity_s 
+typedef struct miniRefEntity_s
 {
 	refEntityType_t		reType;
 	int					renderfx;
@@ -165,7 +165,7 @@ typedef struct refEntity_s {
 	qhandle_t	customSkin;			// NULL for default skin
 
 	// texturing
-	union	
+	union
 	{
 		struct
 		{
@@ -176,13 +176,13 @@ typedef struct refEntity_s {
 
 	// extra sprite information
 	union {
-		struct 
+		struct
 		{
 			float rotation;
 			float radius;
 			byte  vertRGBA[4][4];
 		} sprite;
-		struct 
+		struct
 		{
 			float width;
 			float width2;
@@ -203,7 +203,7 @@ typedef struct refEntity_s {
 			float bias;
 			qboolean wrap;
 		} cylinder;
-		struct 
+		struct
 		{
 			float width;
 			float deviation;

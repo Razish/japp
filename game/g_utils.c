@@ -39,7 +39,7 @@ static const char *BuildShaderStateConfig( void ) {
 	static char buf[MAX_STRING_CHARS*4];
 	char out[(MAX_QPATH*2) + 5];
 	int i;
-  
+
 	memset( buf, 0, MAX_STRING_CHARS );
 	for ( i=0; i<remapCount; i++ ) {
 		Com_sprintf( out, sizeof( out ), "%s=%s:%5.2f@", remappedShaders[i].oldShader, remappedShaders[i].newShader, remappedShaders[i].timeOffset );
@@ -301,7 +301,7 @@ void GlobalUse( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 
 void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *string ) {
 	gentity_t *t;
-	
+
 	if ( !ent )
 		return;
 
@@ -447,7 +447,7 @@ gentity_t *G_Spawn( void ) {
 		G_SpewEntList();
 		trap->Error( ERR_DROP, "G_Spawn: no free entities" );
 	}
-	
+
 	// open up a new slot
 	level.num_entities++;
 
@@ -477,7 +477,7 @@ static int gG2KillNum = 0;
 void G_SendG2KillQueue( void ) {
 	char g2KillString[1024];
 	int i = 0;
-	
+
 	if ( !gG2KillNum )
 		return;
 
@@ -1012,7 +1012,7 @@ void TryUse( gentity_t *ent ) {
 
 	//Trace ahead to find a valid target
 	trap->Trace( &trace, &src, &vec3_origin, &vec3_origin, &dest, ent->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, qfalse, 0, 0 );
-	
+
 	if ( trace.fraction == 1.0f || trace.entityNum == ENTITYNUM_NONE ) //Raz: slot 0 fix
 		goto tryJetPack;
 
@@ -1075,7 +1075,7 @@ void TryUse( gentity_t *ent ) {
 	}
 
 	//Check for a use command
-	if ( ValidUseTarget( target ) && (level.gametype != GT_SIEGE 
+	if ( ValidUseTarget( target ) && (level.gametype != GT_SIEGE
 		|| !target->alliedTeam || target->alliedTeam != ent->client->sess.sessionTeam || g_ff_objectives.integer) )
 	{
 		if ( ent->client->ps.torsoAnim == BOTH_BUTTON_HOLD || ent->client->ps.torsoAnim == BOTH_CONSOLE1 )
@@ -1379,7 +1379,7 @@ float ShortestLineSegBewteen2LineSegs( vector3 *start1, vector3 *end1, vector3 *
 		VectorMA( start2, t, &v2, close_pnt2 );
 
 		current_dist = Distance( close_pnt1, close_pnt2 );
-		//now, if none of those if's fired, you are done. 
+		//now, if none of those if's fired, you are done.
 		if ( done )
 			return current_dist;
 		//If they did fire, then we need to do some additional tests.

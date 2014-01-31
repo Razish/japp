@@ -2,26 +2,26 @@
 
 #include "ai.h"
 
-#define NPCAI_CHECK_WEAPON			(0x00000001u) // 
-#define NPCAI_BURST_WEAPON			(0x00000002u) // 
-#define NPCAI_MOVING				(0x00000004u) // 
-#define NPCAI_TOUCHED_GOAL			(0x00000008u) // 
-#define NPCAI_PUSHED				(0x00000010u) // 
-#define NPCAI_NO_COLL_AVOID			(0x00000020u) // 
-#define NPCAI_BLOCKED				(0x00000040u) // 
-#define NPCAI_UNUSED00000080		(0x00000080u) // 
-#define NPCAI_OFF_PATH				(0x00000100u) // 
-#define NPCAI_IN_SQUADPOINT			(0x00000200u) // 
-#define NPCAI_STRAIGHT_TO_DESTPOS	(0x00000400u) // 
-#define NPCAI_UNUSED00000800		(0x00000800u) // 
-#define NPCAI_NO_SLOWDOWN			(0x00001000u) // 
+#define NPCAI_CHECK_WEAPON			(0x00000001u) //
+#define NPCAI_BURST_WEAPON			(0x00000002u) //
+#define NPCAI_MOVING				(0x00000004u) //
+#define NPCAI_TOUCHED_GOAL			(0x00000008u) //
+#define NPCAI_PUSHED				(0x00000010u) //
+#define NPCAI_NO_COLL_AVOID			(0x00000020u) //
+#define NPCAI_BLOCKED				(0x00000040u) //
+#define NPCAI_UNUSED00000080		(0x00000080u) //
+#define NPCAI_OFF_PATH				(0x00000100u) //
+#define NPCAI_IN_SQUADPOINT			(0x00000200u) //
+#define NPCAI_STRAIGHT_TO_DESTPOS	(0x00000400u) //
+#define NPCAI_UNUSED00000800		(0x00000800u) //
+#define NPCAI_NO_SLOWDOWN			(0x00001000u) //
 #define NPCAI_LOST					(0x00002000u) // Can't nav to his goal
 #define NPCAI_SHIELDS				(0x00004000u) // Has shields, borg can adapt
 #define NPCAI_GREET_ALLIES			(0x00008000u) // Say hi to nearby allies
-#define NPCAI_FORM_TELE_NAV			(0x00010000u) // Tells formation people to use nav info to get to 
+#define NPCAI_FORM_TELE_NAV			(0x00010000u) // Tells formation people to use nav info to get to
 #define NPCAI_ENROUTE_TO_HOMEWP 	(0x00020000u) // Lets us know to run our lostenemyscript when we get to homeWp
 #define NPCAI_MATCHPLAYERWEAPON 	(0x00040000u) // Match the player's weapon except when it changes during cinematics
-#define NPCAI_UNUSED00080000		(0x00080000u) // 
+#define NPCAI_UNUSED00080000		(0x00080000u) //
 #define NPCAI_DIE_ON_IMPACT			(0x00100000u) // Next time you crashland, die!
 #define NPCAI_CUSTOM_GRAVITY		(0x00200000u) // Don't use g_gravity, I fly!
 
@@ -115,7 +115,7 @@ typedef struct gNPCstats_e
 #define	MAX_ENEMY_POS_LAG	2400
 #define	ENEMY_POS_LAG_INTERVAL	100
 #define	ENEMY_POS_LAG_STEPS	(MAX_ENEMY_POS_LAG/ENEMY_POS_LAG_INTERVAL)
-typedef struct 
+typedef struct
 {
 	//FIXME: Put in playerInfo or something
 	int			timeOfDeath;			//FIXME do we really need both of these
@@ -169,7 +169,7 @@ typedef struct
 	int			investigateSoundDebounceTime;
 	int			greetingDebounceTime;//when we can greet someone next
 	gentity_t	*eventOwner;
-	
+
 	//bState-specific fields
 	gentity_t	*coverTarg;
 	jumpState_t	jumpState;
@@ -236,7 +236,7 @@ typedef struct
 	int			goalRadius;
 
 	//FIXME: These may be redundant
-	
+
 	/*
 	int			weaponTime;		//Time until refire is valid
 	int			jumpTime;
@@ -261,7 +261,7 @@ typedef struct
 	gentity_t	*watchTarget;	//for BS_CINEMATIC, keeps facing this ent
 
 	int			ffireCount;		//sigh... you'd think I'd be able to find a way to do this without having to use 3 int fields, but...
-	int			ffireDebounce;	
+	int			ffireDebounce;
 	int			ffireFadeDebounce;
 } gNPC_t;
 

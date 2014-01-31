@@ -15,10 +15,10 @@ void FX_DisruptorMainShot( vector3 *start, vector3 *end )
 //	vector3	dir;
 //	float	len;
 
-	trap->FX_AddLine( start, end, 0.1f, 6.0f, 0.0f, 
+	trap->FX_AddLine( start, end, 0.1f, 6.0f, 0.0f,
 							1.0f, 0.0f, 0.0f,
 							&WHITE, &WHITE, 0.0f,
-							150, trap->R_RegisterShader( "gfx/effects/redLine" ), 
+							150, trap->R_RegisterShader( "gfx/effects/redLine" ),
 							FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 //	VectorSubtract( end, start, dir );
@@ -118,10 +118,10 @@ FX_DisruptorAltShot
 */
 void FX_DisruptorAltShot( vector3 *start, vector3 *end, qboolean fullCharge )
 {
-	trap->FX_AddLine( start, end, 0.1f, 10.0f, 0.0f, 
+	trap->FX_AddLine( start, end, 0.1f, 10.0f, 0.0f,
 							1.0f, 0.0f, 0.0f,
 							&WHITE, &WHITE, 0.0f,
-							175, trap->R_RegisterShader( "gfx/effects/redLine" ), 
+							175, trap->R_RegisterShader( "gfx/effects/redLine" ),
 							FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 	if ( fullCharge )
@@ -129,10 +129,10 @@ void FX_DisruptorAltShot( vector3 *start, vector3 *end, qboolean fullCharge )
 		vector3	YELLER={0.8f,0.7f,0.0f};
 
 		// add some beef
-		trap->FX_AddLine( start, end, 0.1f, 7.0f, 0.0f, 
+		trap->FX_AddLine( start, end, 0.1f, 7.0f, 0.0f,
 							1.0f, 0.0f, 0.0f,
 							&YELLER, &YELLER, 0.0f,
-							150, trap->R_RegisterShader( "gfx/misc/whiteline2" ), 
+							150, trap->R_RegisterShader( "gfx/misc/whiteline2" ),
 							FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 	}
 }
@@ -154,7 +154,7 @@ void FX_DisruptorAltMiss( vector3 *origin, vector3 *normal )
 	VectorCopy( &c1, &c2 );
 	c1.z += 4;
 	c2.z += 12;
-	
+
 	VectorAdd( origin, normal, &pos );
 	pos.z += 28;
 
@@ -176,7 +176,7 @@ void FX_DisruptorAltMiss( vector3 *origin, vector3 *normal )
 	b.alpha1 = 0.0f;
 	b.alpha2 = 0.2f;
 	b.alphaParm = 0.5f;
-	
+
 	VectorCopy(&WHITE, &b.sRGB);
 	VectorCopy(&WHITE, &b.eRGB);
 

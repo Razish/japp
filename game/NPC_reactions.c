@@ -42,7 +42,7 @@ static void NPC_CheckAttacker( gentity_t *other, int mod )
 	//FIXME: I don't see anything in here that would stop teammates from taking a teammate
 	//			as an enemy.  Ideally, there would be code before this to prevent that from
 	//			happening, but that is presumptuous.
-	
+
 	//valid ent - FIXME: a VALIDENT macro would be nice here
 	if ( !other )
 		return;
@@ -54,7 +54,7 @@ static void NPC_CheckAttacker( gentity_t *other, int mod )
 		return;
 
 	//Don't take a target that doesn't want to be
-	if ( other->flags & FL_NOTARGET ) 
+	if ( other->flags & FL_NOTARGET )
 		return;
 
 //	if ( NPC->svFlags & SVF_LOCKEDENEMY )
@@ -206,13 +206,13 @@ void NPC_ChoosePainAnimation( gentity_t *self, gentity_t *other, vector3 *point,
 {
 	int		pain_anim = -1;
 	float	pain_chance;
-	
+
 	//If we've already taken pain, then don't take it again
 	if ( level.time < self->painDebounceTime && /*mod != MOD_ELECTROCUTE &&*/ mod != MOD_MELEE ) //rwwFIXMEFIXME: MOD_ELECTROCUTE
 	{//FIXME: if hit while recoving from losing a saber lock, we should still play a pain anim?
 		return;
 	}
-	
+
 	if ( self->s.weapon == WP_THERMAL && self->client->ps.weaponTime > 0 )
 	{//don't interrupt thermal throwing anim
 		return;
@@ -244,7 +244,7 @@ void NPC_ChoosePainAnimation( gentity_t *self, gentity_t *other, vector3 *point,
 	{//ally shot by player always complains
 		pain_chance = 1.1f;
 	}
-	else 
+	else
 	{
 		if ( other && (other->s.weapon == WP_SABER || mod == MOD_CRUSH) )
 		{
@@ -338,7 +338,7 @@ void NPC_ChoosePainAnimation( gentity_t *self, gentity_t *other, vector3 *point,
 		{
 			G_AddVoiceEvent( self, Q_irand(EV_CHOKE1, EV_CHOKE3), 0 );
 		}
-		
+
 		//Setup the timing for it
 		/*
 		if ( mod == MOD_ELECTROCUTE )
@@ -369,17 +369,17 @@ void NPC_Pain(gentity_t *self, gentity_t *attacker, int damage)
 
 	VectorCopy(&gPainPoint, &point);
 
-	if ( self->NPC == NULL ) 
+	if ( self->NPC == NULL )
 		return;
 
-	if ( other == NULL ) 
+	if ( other == NULL )
 		return;
 
 	//or just remove ->pain in player_die?
 	if ( self->client->ps.pm_type == PM_DEAD )
 		return;
 
-	if ( other == self ) 
+	if ( other == self )
 		return;
 
 	//MCG: Ignore damage from your own team for now
@@ -392,17 +392,17 @@ void NPC_Pain(gentity_t *self, gentity_t *attacker, int damage)
 	//	}
 	}
 
-	if ( self->client->playerTeam 
-		&& other->client 
-		&& otherTeam == self->client->playerTeam 
-	/*	&& (!player->client->ps.viewEntity || other->s.number != player->client->ps.viewEntity)*/) 
+	if ( self->client->playerTeam
+		&& other->client
+		&& otherTeam == self->client->playerTeam
+	/*	&& (!player->client->ps.viewEntity || other->s.number != player->client->ps.viewEntity)*/)
 	//rwwFIXMEFIXME: Will need modification when player controllable npcs are done
 	{//hit by a teammate
 		if ( other != self->enemy && self != other->enemy )
 		{//we weren't already enemies
-			if ( self->enemy || other->enemy 
-				
-				//|| (other->s.number&&other->s.number!=player->client->ps.viewEntity) 
+			if ( self->enemy || other->enemy
+
+				//|| (other->s.number&&other->s.number!=player->client->ps.viewEntity)
 				//rwwFIXMEFIXME: same
 
 				/*|| (!other->s.number&&Q_irand( 0, 3 ))*/ )
@@ -413,7 +413,7 @@ void NPC_Pain(gentity_t *self, gentity_t *attacker, int damage)
 				{//Run any pain instructions
 					if ( self->health <= (self->client->ps.stats[STAT_MAX_HEALTH]/3) && G_ActivateBehavior(self, BSET_FLEE) )
 					{
-						
+
 					}
 					else// if( VALIDSTRING( self->behaviorSet[BSET_PAIN] ) )
 					{
@@ -532,7 +532,7 @@ NPC_Touch
 -------------------------
 */
 extern qboolean INV_SecurityKeyGive( gentity_t *target, const char *keyname );
-void NPC_Touch(gentity_t *self, gentity_t *other, trace_t *trace) 
+void NPC_Touch(gentity_t *self, gentity_t *other, trace_t *trace)
 {
 	if(!self->NPC)
 		return;
@@ -590,15 +590,15 @@ void NPC_Touch(gentity_t *self, gentity_t *other, trace_t *trace)
 		}
 	}
 
-	if ( other->client ) 
+	if ( other->client )
 	{//FIXME:  if pushing against another bot, both ucmd.rightmove = 127???
 		//Except if not facing one another...
-		if ( other->health > 0 ) 
+		if ( other->health > 0 )
 		{
 			NPCInfo->touchedByPlayer = other;
 		}
 
-		if ( other == NPCInfo->goalEntity ) 
+		if ( other == NPCInfo->goalEntity )
 		{
 			NPCInfo->aiFlags |= NPCAI_TOUCHED_GOAL;
 		}
@@ -630,9 +630,9 @@ void NPC_Touch(gentity_t *self, gentity_t *other, trace_t *trace)
 		}
 		*/
 	}
-	else 
+	else
 	{//FIXME: check for SVF_NONNPC_ENEMY flag here?
-		if ( other->health > 0 ) 
+		if ( other->health > 0 )
 		{
 			//if ( NPC->enemy == other && (other->svFlags&SVF_NONNPC_ENEMY) )
 			if (0) //rwwFIXMEFIXME: Can probably just check if num < MAX_CLIENTS for non-npc enemy stuff
@@ -641,7 +641,7 @@ void NPC_Touch(gentity_t *self, gentity_t *other, trace_t *trace)
 			}
 		}
 
-		if ( other == NPCInfo->goalEntity ) 
+		if ( other == NPCInfo->goalEntity )
 		{
 			NPCInfo->aiFlags |= NPCAI_TOUCHED_GOAL;
 		}
@@ -784,7 +784,7 @@ void NPC_Respond( gentity_t *self, int userNum )
 		if ( !self->enemy )
 		{
 			/*
-			if ( !(self->svFlags&SVF_IGNORE_ENEMIES) 
+			if ( !(self->svFlags&SVF_IGNORE_ENEMIES)
 				&& (self->NPC->scriptFlags&SCF_LOOK_FOR_ENEMIES)
 				&& self->client->enemyTeam == TEAM_ENEMY )
 				*/
@@ -925,7 +925,7 @@ void NPC_Respond( gentity_t *self, int userNum )
 	default:
 		break;
 	}
-	
+
 	if ( event != -1 )
 	{
 		//hack here because we reuse some "combat" and "extra" sounds
@@ -1005,7 +1005,7 @@ NPC_Use
 */
 extern void Add_Batteries( gentity_t *ent, int *count );
 
-void NPC_Use( gentity_t *self, gentity_t *other, gentity_t *activator ) 
+void NPC_Use( gentity_t *self, gentity_t *other, gentity_t *activator )
 {
 	if (self->client->ps.pm_type == PM_DEAD)
 	{//or just remove ->pain in player_die?
@@ -1080,7 +1080,7 @@ void NPC_Use( gentity_t *self, gentity_t *other, gentity_t *activator )
 //		{//Heal me NOW, dammit!
 //			NPC_TakePatient( activator );
 //		}
-		else if ( activator && !self->enemy 
+		else if ( activator && !self->enemy
 			&& activator->s.number >= 0 && activator->s.number < MAX_CLIENTS
 			&& /*!gi.VoiceVolume[self->s.number] &&*/ !(self->NPC->scriptFlags&SCF_NO_RESPONSE) )
 			//rwwFIXMEFIXME: voice volume support?
@@ -1100,7 +1100,7 @@ void NPC_CheckPlayerAim( void )
 
 	if ( player && player->client && player->client->ps.weapon > (int)(WP_NONE) && player->client->ps.weapon < (int)(WP_TRICORDER) )
 	{//player has a weapon ready
-		if ( g_crosshairEntNum == NPC->s.number && level.time - g_crosshairEntTime < 200 
+		if ( g_crosshairEntNum == NPC->s.number && level.time - g_crosshairEntTime < 200
 			&& g_crosshairSameEntTime >= 3000 && g_crosshairEntDist < 256 )
 		{//if the player holds the crosshair on you for a few seconds
 			//ask them what the fuck they're doing

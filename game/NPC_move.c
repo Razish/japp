@@ -104,7 +104,7 @@ static void NPC_LadderMove( vector3 *dir )
 	//ALSO: Need to be able to get off at top
 	//ALSO: Need to play an anim
 	//ALSO: Need transitionary anims?
-	
+
 	if ( ( dir->z > 0 ) || ( dir->z < 0 && NPC->client->ps.groundEntityNum == ENTITYNUM_NONE ) )
 	{
 		//Set our movement direction
@@ -132,7 +132,7 @@ QINLINE qboolean NPC_GetMoveInformation( vector3 *dir, float *distance )
 	//Get our move info
 	VectorSubtract( &NPCInfo->goalEntity->r.currentOrigin, &NPC->r.currentOrigin, dir );
 	*distance = VectorNormalize( dir );
-	
+
 	VectorCopy( &NPCInfo->goalEntity->r.currentOrigin, &NPCInfo->blockedDest );
 
 	return qtrue;
@@ -187,7 +187,7 @@ qboolean NPC_GetMoveDirection( vector3 *out, float *distance )
 		{
 			//Can't reach goal, just face
 			vectoangles( &frameNavInfo.direction, &angles );
-			NPCInfo->desiredYaw	= AngleNormalize360( angles.yaw );		
+			NPCInfo->desiredYaw	= AngleNormalize360( angles.yaw );
 			VectorCopy( &frameNavInfo.direction, out );
 			*distance = frameNavInfo.distance;
 			return qfalse;
@@ -201,7 +201,7 @@ qboolean NPC_GetMoveDirection( vector3 *out, float *distance )
 	{
 		//FIXME: Emit a warning, this is a worst case scenario
 		//FIXME: if we have a clear path to our goal (exluding bodies), but then this
-		//			check (against bodies only) fails, shouldn't we fall back 
+		//			check (against bodies only) fails, shouldn't we fall back
 		//			to macro navigation?  Like so:
 		if ( !(frameNavInfo.flags&NIF_MACRO_NAV) )
 		{//we had a clear path to goal and didn't try macro nav, but can't avoid collision so try macro nav here
@@ -210,7 +210,7 @@ qboolean NPC_GetMoveDirection( vector3 *out, float *distance )
 			{
 				//Can't reach goal, just face
 				vectoangles( &frameNavInfo.direction, &angles );
-				NPCInfo->desiredYaw	= AngleNormalize360( angles.yaw );		
+				NPCInfo->desiredYaw	= AngleNormalize360( angles.yaw );
 				VectorCopy( &frameNavInfo.direction, out );
 				*distance = frameNavInfo.distance;
 				return qfalse;
@@ -268,7 +268,7 @@ qboolean NPC_GetMoveDirectionAltRoute( vector3 *out, float *distance, qboolean t
 		{
 			//Can't reach goal, just face
 			vectoangles( &frameNavInfo.direction, &angles );
-			NPCInfo->desiredYaw	= AngleNormalize360( angles.yaw );		
+			NPCInfo->desiredYaw	= AngleNormalize360( angles.yaw );
 			VectorCopy( &frameNavInfo.direction, out );
 			*distance = frameNavInfo.distance;
 			return qfalse;
@@ -290,7 +290,7 @@ qboolean NPC_GetMoveDirectionAltRoute( vector3 *out, float *distance, qboolean t
 				{
 					//Can't reach goal, just face
 					vectoangles( &frameNavInfo.direction, &angles );
-					NPCInfo->desiredYaw	= AngleNormalize360( angles.yaw );		
+					NPCInfo->desiredYaw	= AngleNormalize360( angles.yaw );
 					VectorCopy( &frameNavInfo.direction, out );
 					*distance = frameNavInfo.distance;
 					return qfalse;
@@ -343,7 +343,7 @@ void G_UcmdMoveForDir( gentity_t *self, usercmd_t *cmd, vector3 *dir )
 
 	/*
 	vector3	wishvel;
-	for ( int i = 0 ; i < 3 ; i++ ) 
+	for ( int i = 0 ; i < 3 ; i++ )
 	{
 		wishvel[i] = forward[i]*cmd->forwardmove + right[i]*cmd->rightmove;
 	}
@@ -365,7 +365,7 @@ NPC_MoveToGoal
 #if	AI_TIMERS
 extern int navTime;
 #endif//	AI_TIMERS
-qboolean NPC_MoveToGoal( qboolean tryStraight ) 
+qboolean NPC_MoveToGoal( qboolean tryStraight )
 {
 	float	distance;
 	vector3	dir;
@@ -420,12 +420,12 @@ qboolean NPC_MoveToGoal( qboolean tryStraight )
 		//FIXME: strafe instead of turn if change in dir is small and temporary
 		NPCInfo->desiredPitch	= 0.0f;
 		NPCInfo->desiredYaw		= AngleNormalize360( NPCInfo->lastPathAngles.yaw );
-		
+
 		//Pitch towards the goal and also update if flying or swimming
 		if ( (NPC->client->ps.eFlags2&EF2_FLYING) )//moveType == MT_FLYSWIM )
 		{
 			NPCInfo->desiredPitch = AngleNormalize360( NPCInfo->lastPathAngles.pitch );
-			
+
 			if ( dir.z )
 			{
 				float scale = (dir.z * distance);
@@ -461,7 +461,7 @@ qboolean NPC_SlideMoveToGoal( void )
 	qboolean ret;
 
 	NPCInfo->combatMove = qtrue;
-	
+
 	ret = NPC_MoveToGoal( qtrue );
 
 	NPCInfo->desiredYaw	= saveYaw;

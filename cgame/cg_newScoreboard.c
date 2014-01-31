@@ -292,7 +292,7 @@ int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHand
 				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
-			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1<<score->client) ) 
+			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1<<score->client) )
 			{
 				tmp = "READY";
 				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
@@ -440,7 +440,7 @@ int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHand
 				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
-			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1<<score->client) ) 
+			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1<<score->client) )
 			{
 				tmp = "READY";
 				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
@@ -601,7 +601,7 @@ int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHand
 				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 			}
 
-			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1<<score->client) ) 
+			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1<<score->client) )
 			{
 				tmp = "READY";
 				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight/2.0) - (trap->R_Font_HeightPixels( fontHandle, fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );

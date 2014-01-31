@@ -72,8 +72,8 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 	parentPS = pVeh->m_pParentEntity->playerState;
 
 	// If we're flying, make us accelerate at 40% (about half) acceleration rate, and restore the pitch
-	// to origin (straight) position (at 5% increments). 
-	if ( pVeh->m_ulFlags & VEH_FLYING ) 
+	// to origin (straight) position (at 5% increments).
+	if ( pVeh->m_ulFlags & VEH_FLYING )
 	{
 		speedInc = pVeh->m_pVehicleInfo->acceleration * pVeh->m_fTimeModifier * 0.4f;
 	}
@@ -149,9 +149,9 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 		parentPS->speed = 0;
 	}
 	else if (
-		(curTime > pVeh->m_iTurboTime) && 
-		!(pVeh->m_ulFlags&VEH_FLYING) && 
-		pVeh->m_ucmd.forwardmove<0 && 
+		(curTime > pVeh->m_iTurboTime) &&
+		!(pVeh->m_ulFlags&VEH_FLYING) &&
+		pVeh->m_ucmd.forwardmove<0 &&
 		fabs(pVeh->m_vOrientation->roll)>25.0f)
 	{
 		pVeh->m_ulFlags |= VEH_SLIDEBREAKING;
@@ -181,7 +181,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 
 	if ( parentPS->speed || parentPS->groundEntityNum == ENTITYNUM_NONE  ||
 		 pVeh->m_ucmd.forwardmove || pVeh->m_ucmd.upmove > 0 )
-	{ 
+	{
 		if ( pVeh->m_ucmd.forwardmove > 0 && speedInc )
 		{
 			parentPS->speed += speedInc;
@@ -371,7 +371,7 @@ void AnimateRiders( Vehicle_t *pVeh )
 			// Set the animation, which won't be interrupted until it's completed.
 			// TODO: But what if he's killed? Should the animation remain persistant???
 			iFlags = SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD;
-			
+
 			BG_SetAnim(pVeh->m_pPilot->playerState, bgAllAnims[pVeh->m_pPilot->localAnimIndex].anims,
 				SETANIM_BOTH, Anim, iFlags, iBlend);
 		}
@@ -397,7 +397,7 @@ void AnimateRiders( Vehicle_t *pVeh )
 		Anim = BOTH_VS_REV;
 		iBlend = 500;
 	}
-	else 
+	else
 	{
 		qboolean HasWeapon	= ((pilotPS->weapon != WP_NONE) && (pilotPS->weapon != WP_MELEE));
 		qboolean Attacking	= (HasWeapon && !!(pVeh->m_ucmd.buttons&BUTTON_ATTACK));
@@ -442,13 +442,13 @@ void AnimateRiders( Vehicle_t *pVeh )
 			}
 			WeaponPose = (pVeh->m_ulFlags&VEH_SABERINLEFTHAND)?(WPOSE_SABERLEFT):(WPOSE_SABERRIGHT);
 		}
-		
+
 
  		if (Attacking && WeaponPose)
 		{// Attack!
 			iBlend	= 100;
  			iFlags	= SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD|SETANIM_FLAG_RESTART;
-	
+
 			// Auto Aiming
 			//===============================================
 			if (!Left && !Right)		// Allow player strafe keys to override

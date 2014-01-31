@@ -259,7 +259,7 @@ qboolean AM_CanInflict(  gentity_t *entInflicter, gentity_t *entVictim )
 		if( japp_passRankConflicts.integer )
 		{
 			G_LogPrintf( va("%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s (User: %s) (Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank, entVictim->client->pers.netname, victim->user, victim->rank ) );
-			return qtrue; 
+			return qtrue;
 		}
 		else
 		{
@@ -747,12 +747,12 @@ static void AM_Teleport( gentity_t *ent ) {
 		char arg1[64], arg2[64];
 		int targetClient1, targetClient2;
 
-			
+
 
 		trap->Argv( 1, arg1, sizeof( arg1 ) );	targetClient1 = G_ClientFromString( ent, arg1, FINDCL_SUBSTR );
 		trap->Argv( 2, arg2, sizeof( arg2 ) );	targetClient2 = G_ClientFromString( ent, arg2, FINDCL_SUBSTR );
 
-			if( !AM_CanInflict( ent, &g_entities[targetClient1] ) ) 
+			if( !AM_CanInflict( ent, &g_entities[targetClient1] ) )
 		return;
 
 		// first arg is a valid client, attempt to find destination
@@ -862,7 +862,7 @@ static void AM_GunTeleportRev( gentity_t *ent ) {
 		AngleVectors( &ent->client->ps.viewangles, &angles, NULL, NULL );
 		VectorMA( &ent->client->ps.origin, 48.0f, &angles, &telepos );
 
-		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) ) 
+		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
 			return;
 
 		TeleportPlayer( &g_entities[tr->entityNum], &telepos, &level.clients[tr->entityNum].ps.viewangles );
@@ -1035,7 +1035,7 @@ static void AM_ForceTeam( gentity_t *ent ) {
 
 	targ = &g_entities[targetClient];
 
-	if( !AM_CanInflict( ent, targ ) ) 
+	if( !AM_CanInflict( ent, targ ) )
 			return;
 
 	if ( targ->inuse && targ->client && targ->client->pers.connected )
@@ -1048,7 +1048,7 @@ static void AM_GunSpectate( gentity_t *ent ) {
 
 	if ( tr->entityNum < MAX_CLIENTS )
 	{
-		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) ) 
+		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
 			return;
 		SetTeam( &g_entities[tr->entityNum], "s", qtrue );
 	}
@@ -1069,7 +1069,7 @@ static void AM_Protect( gentity_t *ent ) {
 
 	targ = &g_entities[targetClient];
 
-	if( !AM_CanInflict( ent, targ ) ) 
+	if( !AM_CanInflict( ent, targ ) )
 			return;
 
 	targ->client->ps.eFlags			^= EF_INVULNERABLE;
@@ -1084,10 +1084,10 @@ static void AM_GunProtect( gentity_t *ent ) {
 
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
 		gclient_t *cl = &level.clients[tr->entityNum];
-		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) ) 
+		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
 			return;
 
-		
+
 		cl->ps.eFlags			^= EF_INVULNERABLE;
 		cl->invulnerableTimer	= !!(cl->ps.eFlags & EF_INVULNERABLE) ? level.time : 0x7FFFFFFF;
 	}
@@ -1170,7 +1170,7 @@ static void AM_Slap( gentity_t *ent ) {
 	if ( targetClient == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[targetClient] ) ) 
+	if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
 			return;
 
 	Slap( &g_entities[targetClient] );
@@ -1182,7 +1182,7 @@ static void AM_GunSlap( gentity_t *ent ) {
 
 	if ( tr->entityNum < MAX_CLIENTS )
 	{
-		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) ) 
+		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
 			return;
 		Slap( &g_entities[tr->entityNum] );
 	}
@@ -1220,7 +1220,7 @@ static void AM_Freeze( gentity_t *ent ) {
 		int i;
 		for ( i=0; i<MAX_CLIENTS; i++ )
 		{
-			if( !AM_CanInflict( ent, &g_entities[i] ) ) 
+			if( !AM_CanInflict( ent, &g_entities[i] ) )
 				return;
 			Freeze( &level.clients[i] );
 		}
@@ -1230,7 +1230,7 @@ static void AM_Freeze( gentity_t *ent ) {
 	else if ( clientNum != -1 ) {
 		gclient_t *cl = &level.clients[clientNum];
 
-		if( !AM_CanInflict( ent, &g_entities[clientNum] ) ) 
+		if( !AM_CanInflict( ent, &g_entities[clientNum] ) )
 			return;
 
 		if ( cl->pers.adminData.isFrozen ) {
@@ -1253,7 +1253,7 @@ static void AM_GunFreeze( gentity_t *ent ) {
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
 		gclient_t *cl = &level.clients[tr->entityNum];
 
-		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) ) 
+		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
 			return;
 
 		if ( cl->pers.adminData.isFrozen ) {
@@ -1290,7 +1290,7 @@ static void AM_Silence( gentity_t *ent ) {
 		int i;
 		for ( i=0; i<MAX_CLIENTS; i++ )
 		{
-			if( !AM_CanInflict( ent, &g_entities[i] ) ) 
+			if( !AM_CanInflict( ent, &g_entities[i] ) )
 				return;
 			level.clients[i].pers.adminData.canTalk = qfalse;
 		}
@@ -1302,7 +1302,7 @@ static void AM_Silence( gentity_t *ent ) {
 	if ( targetClient == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[targetClient] ) ) 
+	if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
 			return;
 
 	level.clients[targetClient].pers.adminData.canTalk = qfalse;
@@ -1327,7 +1327,7 @@ static void AM_Unsilence( gentity_t *ent ) {
 		int i;
 		for ( i=0; i<MAX_CLIENTS; i++ )
 		{
-			if( !AM_CanInflict( ent, &g_entities[i] ) ) 
+			if( !AM_CanInflict( ent, &g_entities[i] ) )
 				return;
 			level.clients[i].pers.adminData.canTalk = qtrue;
 		}
@@ -1339,7 +1339,7 @@ static void AM_Unsilence( gentity_t *ent ) {
 	if ( targetClient == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[targetClient] ) ) 
+	if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
 			return;
 
 	level.clients[targetClient].pers.adminData.canTalk = qtrue;
@@ -1364,7 +1364,7 @@ static void AM_Slay( gentity_t *ent ) {
 	if ( targetClient == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[targetClient] ) ) 
+	if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
 			return;
 
 	Cmd_Kill_f( &g_entities[targetClient] );
@@ -1393,7 +1393,7 @@ static void AM_Kick( gentity_t *ent ) {
 	if ( clientNum == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[clientNum] ) ) 
+	if( !AM_CanInflict( ent, &g_entities[clientNum] ) )
 			return;
 
 	Q_strncpyz( string, va( "Kicked!\nReason: %s", reason ? reason : "Not specified" ), sizeof( string ) );
@@ -1418,7 +1418,7 @@ static void AM_Ban( gentity_t *ent ) {
 		if ( targetClient == -1 )
 			return;
 
-		if( !AM_CanInflict( ent, &g_entities[targetClient] ) ) 
+		if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
 			return;
 
 		Q_strncpyz( arg1, g_entities[targetClient].client->sess.IP, sizeof( arg1 ) );
@@ -1645,7 +1645,7 @@ static void AM_Merc( gentity_t *ent ) {
 
 	targ = &g_entities[targetClient];
 
-	if( !AM_CanInflict( ent, targ ) ) 
+	if( !AM_CanInflict( ent, targ ) )
 			return;
 
 	targ->client->pers.adminData.merc = !targ->client->pers.adminData.merc;
@@ -1706,7 +1706,7 @@ static void AM_Rename( gentity_t *ent ) {
 	if ( targetClient == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[targetClient] ) ) 
+	if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
 			return;
 
 	cl = &level.clients[targetClient];

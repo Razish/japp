@@ -252,7 +252,7 @@ typedef struct playerSpeciesInfo_s {
 
 typedef struct uiInfo_s {
 	displayContextDef_t		uiDC;
-	
+
 	int						characterCount;
 	int						botIndex;
 
@@ -274,7 +274,7 @@ typedef struct uiInfo_s {
 	int						teamIndex;
 	int						playerRefresh;
 	int						playerIndex;
-	int						playerNumber; 
+	int						playerNumber;
 	char					playerNames[MAX_CLIENTS][MAX_NETNAME];
 	char					teamNames[MAX_CLIENTS][MAX_TEAMNAME];
 	int						teamClientNums[MAX_CLIENTS];
@@ -354,7 +354,7 @@ typedef struct uiInfo_s {
 extern uiInfo_t uiInfo;
 
 qboolean	UI_ConsoleCommand( int realTime );
-void		UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ); 
+void		UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader );
 void		UI_FillRect( float x, float y, float width, float height, const vector4 *color );
 char		*UI_Cvar_VariableString( const char *var_name );
 int			UI_GetNumBots( void );

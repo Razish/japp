@@ -18,7 +18,7 @@
  * opr_cast() - Prints an operand cast.
  * -----------------------------------------------------------------------------
  */
-static void 
+static void
 opr_cast(struct ud* u, struct ud_operand* op)
 {
   switch(op->size) {
@@ -30,7 +30,7 @@ opr_cast(struct ud* u, struct ud_operand* op)
 	default: break;
   }
   if (u->br_far)
-	mkasm(u, "far "); 
+	mkasm(u, "far ");
   else if (u->br_near)
 	mkasm(u, "near ");
 }
@@ -50,7 +50,7 @@ static void gen_operand(struct ud* u, struct ud_operand* op, int syn_cast)
 
 		int op_f = 0;
 
-		if (syn_cast) 
+		if (syn_cast)
 			opr_cast(u, op);
 
 		mkasm(u, "[");
@@ -85,16 +85,16 @@ static void gen_operand(struct ud* u, struct ud_operand* op, int syn_cast)
 				if (op->lval.sdword < 0)
 					mkasm(u, "-0x%x", -op->lval.sdword);
 				else	mkasm(u, "%s0x%x", (op_f) ? "+" : "", op->lval.sdword);
-			} 
+			}
 			else	mkasm(u, "%s0x%lx", (op_f) ? "+" : "", op->lval.udword);
 		}
-		else if (op->offset == 64) 
+		else if (op->offset == 64)
 			mkasm(u, "%s0x" FMT64 "x", (op_f) ? "+" : "", op->lval.uqword);
 
 		mkasm(u, "]");
 		break;
 	}
-			
+
 	case UD_OP_IMM:
 		if (syn_cast) opr_cast(u, op);
 		switch (op->size) {
@@ -111,7 +111,7 @@ static void gen_operand(struct ud* u, struct ud_operand* op, int syn_cast)
 		switch (op->size) {
 			case  8:
 				if (u->mnemonic >= UD_Ija && u->mnemonic <= UD_Ijz) mkasm(u, "short ");
-				mkasm(u, "0x" FMT64 "x", u->pc + op->lval.sbyte); 
+				mkasm(u, "0x" FMT64 "x", u->pc + op->lval.sbyte);
 				break;
 			case 16:
 				mkasm(u, "0x" FMT64 "x", u->pc + op->lval.sword);
@@ -126,11 +126,11 @@ static void gen_operand(struct ud* u, struct ud_operand* op, int syn_cast)
 	case UD_OP_PTR:
 		switch (op->size) {
 			case 32:
-				mkasm(u, "word 0x%x:0x%x", op->lval.ptr.seg, 
+				mkasm(u, "word 0x%x:0x%x", op->lval.ptr.seg,
 					op->lval.ptr.off & 0xFFFF);
 				break;
 			case 48:
-				mkasm(u, "dword 0x%x:0x%lx", op->lval.ptr.seg, 
+				mkasm(u, "dword 0x%x:0x%lx", op->lval.ptr.seg,
 					op->lval.ptr.off);
 				break;
 		}
@@ -146,7 +146,7 @@ static void gen_operand(struct ud* u, struct ud_operand* op, int syn_cast)
 }
 
 /* =============================================================================
- * translates to intel syntax 
+ * translates to intel syntax
  * =============================================================================
  */
 extern void ud_translate_intel(struct ud* u)
@@ -156,7 +156,7 @@ extern void ud_translate_intel(struct ud* u)
   /* check if P_OSO prefix is used */
   if (! P_OSO(u->itab_entry->prefix) && u->pfx_opr) {
 	switch (u->dis_mode) {
-		case 16: 
+		case 16:
 			mkasm(u, "o32 ");
 			break;
 		case 32:
@@ -169,7 +169,7 @@ extern void ud_translate_intel(struct ud* u)
   /* check if P_ASO prefix was used */
   if (! P_ASO(u->itab_entry->prefix) && u->pfx_adr) {
 	switch (u->dis_mode) {
-		case 16: 
+		case 16:
 			mkasm(u, "a32 ");
 			break;
 		case 32:

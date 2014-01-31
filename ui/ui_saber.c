@@ -250,7 +250,7 @@ qboolean UI_SaberValidForPlayerInMP( const char *saberName )
 	}
 }
 
-void UI_SaberLoadParms( void ) 
+void UI_SaberLoadParms( void )
 {
 	ui_saber_parms_parsed = qtrue;
 	UI_CacheSaberGlowGraphics();
@@ -418,7 +418,7 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	//	refEnts to do each glow blob individually
 	saber.saberLength = length;
 
-	// Jeff, I did this because I foolishly wished to have a bright halo as the saber is unleashed.  
+	// Jeff, I did this because I foolishly wished to have a bright halo as the saber is unleashed.
 	// It's not quite what I'd hoped tho.  If you have any ideas, go for it!  --Pat
 	if (length < lengthMax)
 		radiusmult = 1.0 + (2.0 / length);		// Note this creates a curve, and length cannot be < 0.5.
@@ -797,7 +797,7 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 
 	tagName = va( "*blade%d", bladeNum+1 );
 	bolt = trap->G2API_AddBolt( item->ghoul2,saberModel, tagName );
-	
+
 	if ( bolt == -1 )
 	{
 		tagHack = qtrue;
@@ -808,7 +808,7 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 			bolt = 0;
 		}
 	}
-	
+
 //	angles.pitch = curYaw;
 //	angles.roll = 0;
 
@@ -817,7 +817,7 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 	// work the matrix axis stuff into the original axis and origins used.
 	BG_GiveMeVectorFromMatrix(&boltMatrix, ORIGIN, &org_);
 	BG_GiveMeVectorFromMatrix(&boltMatrix, NEGATIVE_Y, &axis_[0]);//front (was NEGATIVE_Y, but the md3->glm exporter screws up this tag somethin' awful)
-																//		...changed this back to NEGATIVE_Y		
+																//		...changed this back to NEGATIVE_Y
 	BG_GiveMeVectorFromMatrix(&boltMatrix, NEGATIVE_X, &axis_[1]);//right ... and changed this to NEGATIVE_X
 	BG_GiveMeVectorFromMatrix(&boltMatrix, POSITIVE_Z, &axis_[2]);//up
 
@@ -1213,7 +1213,7 @@ void UI_SaberAttachToChar( itemDef_t *item )
 		//bolt sabers
 		char modelPath[MAX_QPATH];
 		char skinPath[MAX_QPATH];
-		char saber[MAX_QPATH]; 
+		char saber[MAX_QPATH];
 
 		UI_GetSaberForMenu( saber, saberNum );
 

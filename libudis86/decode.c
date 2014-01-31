@@ -42,76 +42,76 @@ static int get_prefixes( struct ud* u )
     uint8_t curr;
 
     /* if in error state, bail out */
-    if ( u->error ) 
-        return -1; 
+    if ( u->error )
+        return -1;
 
     /* keep going as long as there are prefixes available */
     for ( i = 0; have_pfx ; ++i ) {
 
         /* Get next byte. */
-        inp_next(u); 
-        if ( u->error ) 
+        inp_next(u);
+        if ( u->error )
             return -1;
         curr = inp_curr( u );
 
         /* rex prefixes in 64bit mode */
         if ( u->dis_mode == 64 && ( curr & 0xF0 ) == 0x40 ) {
-            u->pfx_rex = curr;  
+            u->pfx_rex = curr;
         } else {
-            switch ( curr )  
+            switch ( curr )
             {
-            case 0x2E : 
-                u->pfx_seg = UD_R_CS; 
+            case 0x2E :
+                u->pfx_seg = UD_R_CS;
                 u->pfx_rex = 0;
                 break;
-            case 0x36 :     
-                u->pfx_seg = UD_R_SS; 
+            case 0x36 :
+                u->pfx_seg = UD_R_SS;
                 u->pfx_rex = 0;
                 break;
-            case 0x3E : 
-                u->pfx_seg = UD_R_DS; 
+            case 0x3E :
+                u->pfx_seg = UD_R_DS;
                 u->pfx_rex = 0;
                 break;
-            case 0x26 : 
-                u->pfx_seg = UD_R_ES; 
+            case 0x26 :
+                u->pfx_seg = UD_R_ES;
                 u->pfx_rex = 0;
                 break;
-            case 0x64 : 
-                u->pfx_seg = UD_R_FS; 
+            case 0x64 :
+                u->pfx_seg = UD_R_FS;
                 u->pfx_rex = 0;
                 break;
-            case 0x65 : 
-                u->pfx_seg = UD_R_GS; 
+            case 0x65 :
+                u->pfx_seg = UD_R_GS;
                 u->pfx_rex = 0;
                 break;
-            case 0x67 : /* adress-size override prefix */ 
+            case 0x67 : /* adress-size override prefix */
                 u->pfx_adr = 0x67;
                 u->pfx_rex = 0;
                 break;
-            case 0xF0 : 
+            case 0xF0 :
                 u->pfx_lock = 0xF0;
                 u->pfx_rex  = 0;
                 break;
-            case 0x66: 
+            case 0x66:
                 /* the 0x66 sse prefix is only effective if no other sse prefix
                  * has already been specified.
                  */
                 if ( !u->pfx_insn ) u->pfx_insn = 0x66;
-                u->pfx_opr = 0x66;           
+                u->pfx_opr = 0x66;
                 u->pfx_rex = 0;
                 break;
             case 0xF2:
                 u->pfx_insn  = 0xF2;
-                u->pfx_repne = 0xF2; 
+                u->pfx_repne = 0xF2;
                 u->pfx_rex   = 0;
                 break;
             case 0xF3:
                 u->pfx_insn = 0xF3;
-                u->pfx_rep  = 0xF3; 
-                u->pfx_repe = 0xF3; 
+                u->pfx_rep  = 0xF3;
+                u->pfx_repe = 0xF3;
                 u->pfx_rex  = 0;
                 break;
-            default : 
+            default :
                 /* No more prefixes */
                 have_pfx = 0;
                 break;
@@ -126,11 +126,11 @@ static int get_prefixes( struct ud* u )
     }
 
     /* return status */
-    if ( u->error ) 
-        return -1; 
+    if ( u->error )
+        return -1;
 
-    /* rewind back one byte in stream, since the above loop 
-     * stops with a non-prefix byte. 
+    /* rewind back one byte in stream, since the above loop
+     * stops with a non-prefix byte.
      */
     inp_back(u);
 
@@ -162,18 +162,18 @@ static int search_itab( struct ud * u )
     enum ud_itab_index table;
     uint8_t peek;
     uint8_t did_peek = 0;
-    uint8_t curr; 
+    uint8_t curr;
     uint8_t index;
 
     /* if in state of error, return */
-    if ( u->error ) 
+    if ( u->error )
         return -1;
 
     /* get first byte of opcode. */
-    inp_next(u); 
-    if ( u->error ) 
+    inp_next(u);
+    if ( u->error )
         return -1;
-    curr = inp_curr(u); 
+    curr = inp_curr(u);
 
     /* resolve xchg, nop, pause crazyness */
     if ( 0x90 == curr ) {
@@ -203,7 +203,7 @@ static int search_itab( struct ud * u )
             }
         } else if ( 0xF2 == u->pfx_insn ) {
             if ( ud_itab_list[ ITAB__PFX_SSEF2__0F ][ curr ].mnemonic != UD_Iinvalid ) {
-                table = ITAB__PFX_SSEF2__0F; 
+                table = ITAB__PFX_SSEF2__0F;
                 u->pfx_repne = 0;
             }
         } else if ( 0xF3 == u->pfx_insn ) {
@@ -215,7 +215,7 @@ static int search_itab( struct ud * u )
         }
     /* pick an instruction from the 1byte table */
     } else {
-        table = ITAB__1BYTE; 
+        table = ITAB__1BYTE;
     }
 
     index = curr;
@@ -227,7 +227,7 @@ search:
     /* if mnemonic constant is a standard instruction constant
      * our search is over.
      */
-    
+
     if ( e->mnemonic < UD_Id3vil ) {
         if ( e->mnemonic == UD_Iinvalid ) {
             if ( did_peek ) {
@@ -254,8 +254,8 @@ search:
         index    = MODRM_MOD( peek );
         if ( index == 3 )
            index = ITAB__MOD_INDX__11;
-        else 
-           index = ITAB__MOD_INDX__NOT_11; 
+        else
+           index = ITAB__MOD_INDX__NOT_11;
         break;
 
     case UD_Igrp_rm:
@@ -275,35 +275,35 @@ search:
         break;
 
     case UD_Igrp_osize:
-        if ( u->opr_mode == 64 ) 
+        if ( u->opr_mode == 64 )
             index = ITAB__MODE_INDX__64;
-        else if ( u->opr_mode == 32 ) 
+        else if ( u->opr_mode == 32 )
             index = ITAB__MODE_INDX__32;
         else
             index = ITAB__MODE_INDX__16;
         break;
- 
+
     case UD_Igrp_asize:
-        if ( u->adr_mode == 64 ) 
+        if ( u->adr_mode == 64 )
             index = ITAB__MODE_INDX__64;
-        else if ( u->adr_mode == 32 ) 
+        else if ( u->adr_mode == 32 )
             index = ITAB__MODE_INDX__32;
         else
             index = ITAB__MODE_INDX__16;
-        break;               
+        break;
 
     case UD_Igrp_mode:
-        if ( u->dis_mode == 64 ) 
+        if ( u->dis_mode == 64 )
             index = ITAB__MODE_INDX__64;
-        else if ( u->dis_mode == 32 ) 
+        else if ( u->dis_mode == 32 )
             index = ITAB__MODE_INDX__32;
         else
             index = ITAB__MODE_INDX__16;
         break;
 
     case UD_Igrp_vendor:
-        if ( u->vendor == UD_VENDOR_INTEL ) 
-            index = ITAB__VENDOR_INDX__INTEL; 
+        if ( u->vendor == UD_VENDOR_INTEL )
+            index = ITAB__VENDOR_INDX__INTEL;
         else if ( u->vendor == UD_VENDOR_AMD )
             index = ITAB__VENDOR_INDX__AMD;
         else
@@ -332,13 +332,13 @@ found_entry:
 
 static unsigned int resolve_operand_size( const struct ud * u, unsigned int s )
 {
-    switch ( s ) 
+    switch ( s )
     {
     case SZ_V:
         return ( u->opr_mode );
-    case SZ_Z:  
+    case SZ_Z:
         return ( u->opr_mode == 16 ) ? 16 : 32;
-    case SZ_P:  
+    case SZ_P:
         return ( u->opr_mode == 16 ) ? SZ_WP : SZ_DP;
     case SZ_MDQ:
         return ( u->opr_mode == 16 ) ? 32 : u->opr_mode;
@@ -389,10 +389,10 @@ static int resolve_mnemonic( struct ud* u )
  * decode_a()- Decodes operands of the type seg:offset
  * -----------------------------------------------------------------------------
  */
-static void 
+static void
 decode_a(struct ud* u, struct ud_operand *op)
 {
-  if (u->opr_mode == 16) {  
+  if (u->opr_mode == 16) {
     /* seg16:off16 */
     op->type = UD_OP_PTR;
     op->size = 32;
@@ -408,14 +408,14 @@ decode_a(struct ud* u, struct ud_operand *op)
 }
 
 /* -----------------------------------------------------------------------------
- * decode_gpr() - Returns decoded General Purpose Register 
+ * decode_gpr() - Returns decoded General Purpose Register
  * -----------------------------------------------------------------------------
  */
-static enum ud_type 
+static enum ud_type
 decode_gpr(register struct ud* u, unsigned int s, unsigned char rm)
 {
   s = resolve_operand_size(u, s);
-        
+
   switch (s) {
     case 64:
         return UD_R_RAX + rm;
@@ -437,19 +437,19 @@ decode_gpr(register struct ud* u, unsigned int s, unsigned char rm)
 }
 
 /* -----------------------------------------------------------------------------
- * resolve_gpr64() - 64bit General Purpose Register-Selection. 
+ * resolve_gpr64() - 64bit General Purpose Register-Selection.
  * -----------------------------------------------------------------------------
  */
-static enum ud_type 
+static enum ud_type
 resolve_gpr64(struct ud* u, enum ud_operand_code gpr_op)
 {
   if (gpr_op >= OP_rAXr8 && gpr_op <= OP_rDIr15)
-    gpr_op = (gpr_op - OP_rAXr8) | (REX_B(u->pfx_rex) << 3);          
+    gpr_op = (gpr_op - OP_rAXr8) | (REX_B(u->pfx_rex) << 3);
   else  gpr_op = (gpr_op - OP_rAX);
 
   if (u->opr_mode == 16)
     return gpr_op + UD_R_AX;
-  if (u->dis_mode == 32 || 
+  if (u->dis_mode == 32 ||
     (u->opr_mode == 32 && ! (REX_W(u->pfx_rex) || u->default64))) {
     return gpr_op + UD_R_EAX;
   }
@@ -458,25 +458,25 @@ resolve_gpr64(struct ud* u, enum ud_operand_code gpr_op)
 }
 
 /* -----------------------------------------------------------------------------
- * resolve_gpr32 () - 32bit General Purpose Register-Selection. 
+ * resolve_gpr32 () - 32bit General Purpose Register-Selection.
  * -----------------------------------------------------------------------------
  */
-static enum ud_type 
+static enum ud_type
 resolve_gpr32(struct ud* u, enum ud_operand_code gpr_op)
 {
   gpr_op = gpr_op - OP_eAX;
 
-  if (u->opr_mode == 16) 
+  if (u->opr_mode == 16)
     return gpr_op + UD_R_AX;
 
   return gpr_op +  UD_R_EAX;
 }
 
 /* -----------------------------------------------------------------------------
- * resolve_reg() - Resolves the register type 
+ * resolve_reg() - Resolves the register type
  * -----------------------------------------------------------------------------
  */
-static enum ud_type 
+static enum ud_type
 resolve_reg(struct ud* u, unsigned int type, unsigned char i)
 {
   switch (type) {
@@ -494,7 +494,7 @@ resolve_reg(struct ud* u, unsigned int type, unsigned char i)
  * decode_imm() - Decodes Immediate values.
  * -----------------------------------------------------------------------------
  */
-static void 
+static void
 decode_imm(struct ud* u, unsigned int s, struct ud_operand *op)
 {
   op->size = resolve_operand_size(u, s);
@@ -513,9 +513,9 @@ decode_imm(struct ud* u, unsigned int s, struct ud_operand *op)
  * decode_modrm() - Decodes ModRM Byte
  * -----------------------------------------------------------------------------
  */
-static void 
-decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s, 
-         unsigned char rm_type, struct ud_operand *opreg, 
+static void
+decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s,
+         unsigned char rm_type, struct ud_operand *opreg,
          unsigned char reg_size, unsigned char reg_type)
 {
   unsigned char mod, rm, reg;
@@ -535,8 +535,8 @@ decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s,
     if (rm_type ==  T_GPR)
         op->base = decode_gpr(u, op->size, rm);
     else    op->base = resolve_reg(u, rm_type, (REX_B(u->pfx_rex) << 3) | (rm&7));
-  } 
-  /* else its memory addressing */  
+  }
+  /* else its memory addressing */
   else {
     op->type = UD_OP_MEM;
 
@@ -550,7 +550,7 @@ decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s,
             op->offset = 8;
         else if (mod == 2)
             op->offset = 32;
-        else if (mod == 0 && (rm & 7) == 5) {           
+        else if (mod == 0 && (rm & 7) == 5) {
             op->base = UD_R_RIP;
             op->offset = 32;
         } else  op->offset = 0;
@@ -558,7 +558,7 @@ decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s,
         /* Scale-Index-Base (SIB) */
         if ((rm & 7) == 4) {
             inp_next(u);
-            
+
             op->scale = (1 << SIB_S(inp_curr(u))) & ~1;
             op->index = UD_R_RAX + (SIB_I(inp_curr(u)) | (REX_X(u->pfx_rex) << 3));
             op->base  = UD_R_RAX + (SIB_B(inp_curr(u)) | (REX_B(u->pfx_rex) << 3));
@@ -570,14 +570,14 @@ decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s,
             }
 
             if (op->base == UD_R_RBP || op->base == UD_R_R13) {
-                if (mod == 0) 
+                if (mod == 0)
                     op->base = UD_NONE;
                 if (mod == 1)
                     op->offset = 8;
                 else op->offset = 32;
             }
         }
-    } 
+    }
 
     /* 32-Bit addressing mode */
     else if (u->adr_mode == 32) {
@@ -617,7 +617,7 @@ decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s,
                 else op->offset = 32;
             }
         }
-    } 
+    }
 
     /* 16bit addressing mode */
     else  {
@@ -638,10 +638,10 @@ decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s,
         }
         else if (mod == 1)
             op->offset = 8;
-        else if (mod == 2) 
+        else if (mod == 2)
             op->offset = 16;
     }
-  }  
+  }
 
   /* extract offset, if any */
   switch(op->offset) {
@@ -656,7 +656,7 @@ decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s,
   if (opreg) {
     opreg->type = UD_OP_REG;
     opreg->size = resolve_operand_size(u, reg_size);
-    if (reg_type == T_GPR) 
+    if (reg_type == T_GPR)
         opreg->base = decode_gpr(u, opreg->size, reg);
     else opreg->base = resolve_reg(u, reg_type, reg);
   }
@@ -666,21 +666,21 @@ decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s,
  * decode_o() - Decodes offset
  * -----------------------------------------------------------------------------
  */
-static void 
+static void
 decode_o(struct ud* u, unsigned int s, struct ud_operand *op)
 {
   switch (u->adr_mode) {
     case 64:
-        op->offset = 64; 
-        op->lval.uqword = inp_uint64(u); 
+        op->offset = 64;
+        op->lval.uqword = inp_uint64(u);
         break;
     case 32:
-        op->offset = 32; 
-        op->lval.udword = inp_uint32(u); 
+        op->offset = 32;
+        op->lval.udword = inp_uint32(u);
         break;
     case 16:
-        op->offset = 16; 
-        op->lval.uword  = inp_uint16(u); 
+        op->offset = 16;
+        op->lval.uword  = inp_uint16(u);
         break;
     default:
         return;
@@ -709,13 +709,13 @@ static int disasm_operands(register struct ud* u)
 
   /* iop = instruction operand */
   register struct ud_operand* iop = u->operand;
-    
+
   switch(mop1t) {
-    
+
     case OP_A :
         decode_a(u, &(iop[0]));
         break;
-    
+
     /* M[b] ... */
     case OP_M :
         if (MODRM_MOD(inp_peek(u)) == 3)
@@ -810,7 +810,7 @@ static int disasm_operands(register struct ud* u)
             iop[1].base = resolve_gpr64(u, mop2t);
         }
         else if (mop2t == OP_O) {
-            decode_o(u, mop2s, &(iop[1]));  
+            decode_o(u, mop2s, &(iop[1]));
             iop[0].size = resolve_operand_size(u, mop2s);
         }
         break;
@@ -819,7 +819,7 @@ static int disasm_operands(register struct ud* u)
     case OP_ALr8b : case OP_CLr9b : case OP_DLr10b : case OP_BLr11b :
     case OP_AHr12b: case OP_CHr13b: case OP_DHr14b : case OP_BHr15b :
     {
-        ud_type_t gpr = (mop1t - OP_ALr8b) + UD_R_AL + 
+        ud_type_t gpr = (mop1t - OP_ALr8b) + UD_R_AL +
                         (REX_B(u->pfx_rex) << 3);
         if (UD_R_AH <= gpr && u->pfx_rex)
             gpr = gpr + 4;
@@ -859,7 +859,7 @@ static int disasm_operands(register struct ud* u)
 
     /* J */
     case OP_J :
-        decode_imm(u, mop1s, &(iop[0]));        
+        decode_imm(u, mop1s, &(iop[0]));
         iop[0].type = UD_OP_JIMM;
         break ;
 
@@ -870,7 +870,7 @@ static int disasm_operands(register struct ud* u)
         decode_modrm(u, &(iop[0]), mop1s, T_MMX, NULL, 0, T_NONE);
         if (mop2t == OP_I)
             decode_imm(u, mop2s, &(iop[1]));
-        break; 
+        break;
 
     /* VR, I */
     case OP_VR:
@@ -879,7 +879,7 @@ static int disasm_operands(register struct ud* u)
         decode_modrm(u, &(iop[0]), mop1s, T_XMM, NULL, 0, T_NONE);
         if (mop2t == OP_I)
             decode_imm(u, mop2s, &(iop[1]));
-        break; 
+        break;
 
     /* P, Q[,I]/W/E[,I],VR */
     case OP_P :
@@ -967,7 +967,7 @@ static int disasm_operands(register struct ud* u)
         iop[0].size = 16;
 
         if (mop2t == OP_eAX) {
-            iop[1].type = UD_OP_REG;    
+            iop[1].type = UD_OP_REG;
             iop[1].base = resolve_gpr32(u, mop2t);
         } else if (mop2t == OP_AL) {
             iop[1].type = UD_OP_REG;
@@ -987,7 +987,7 @@ static int disasm_operands(register struct ud* u)
             iop[1].base = UD_R_AL;
             iop[1].size = 16;
         } else if (mop2t == OP_eAX) {
-            iop[1].type = UD_OP_REG;    
+            iop[1].type = UD_OP_REG;
             iop[1].base = resolve_gpr32(u, mop2t);
         }
         break;
@@ -1002,7 +1002,7 @@ static int disasm_operands(register struct ud* u)
         else if (mop2t == OP_eAX)
             iop[1].base = resolve_gpr32(u, mop2t);
         else if (mop2t == OP_rAX)
-            iop[1].base = resolve_gpr64(u, mop2t);      
+            iop[1].base = resolve_gpr64(u, mop2t);
         break;
 
     /* 3 */
@@ -1042,7 +1042,7 @@ static int disasm_operands(register struct ud* u)
 }
 
 /* -----------------------------------------------------------------------------
- * clear_insn() - clear instruction pointer 
+ * clear_insn() - clear instruction pointer
  * -----------------------------------------------------------------------------
  */
 static int clear_insn(register struct ud* u)
@@ -1064,14 +1064,14 @@ static int clear_insn(register struct ud* u)
   memset( &u->operand[ 0 ], 0, sizeof( struct ud_operand ) );
   memset( &u->operand[ 1 ], 0, sizeof( struct ud_operand ) );
   memset( &u->operand[ 2 ], 0, sizeof( struct ud_operand ) );
- 
+
   return 0;
 }
 
 static int do_mode( struct ud* u )
 {
   /* if in error state, bail out */
-  if ( u->error ) return -1; 
+  if ( u->error ) return -1;
 
   /* propagate perfix effects */
   if ( u->dis_mode == 64 ) {  /* set 64bit-mode flags */
@@ -1082,16 +1082,16 @@ static int do_mode( struct ud* u )
         return -1;
     }
 
-    /* effective rex prefix is the  effective mask for the 
+    /* effective rex prefix is the  effective mask for the
      * instruction hard-coded in the opcode map.
      */
-    u->pfx_rex = ( u->pfx_rex & 0x40 ) | 
-                 ( u->pfx_rex & REX_PFX_MASK( u->itab_entry->prefix ) ); 
+    u->pfx_rex = ( u->pfx_rex & 0x40 ) |
+                 ( u->pfx_rex & REX_PFX_MASK( u->itab_entry->prefix ) );
 
-    /* whether this instruction has a default operand size of 
+    /* whether this instruction has a default operand size of
      * 64bit, also hardcoded into the opcode map.
      */
-    u->default64 = P_DEF64( u->itab_entry->prefix ); 
+    u->default64 = P_DEF64( u->itab_entry->prefix );
     /* calculate effective operand size */
     if ( REX_W( u->pfx_rex ) ) {
         u->opr_mode = 64;
@@ -1135,7 +1135,7 @@ static int gen_hex( struct ud *u )
   char* src_hex;
 
   /* bail out if in error stat. */
-  if ( u->error ) return -1; 
+  if ( u->error ) return -1;
   /* output buffer pointe */
   src_hex = ( char* ) u->insn_hexcode;
   /* for each byte used to decode instruction */
@@ -1175,7 +1175,7 @@ unsigned int ud_decode( struct ud* u )
     /* mark the sequence of bytes as invalid. */
     u->itab_entry = & ie_invalid;
     u->mnemonic = u->itab_entry->mnemonic;
-  } 
+  }
 
   u->insn_offset = u->pc; /* set offset of instruction */
   u->insn_fill = 0;   /* set translation buffer index to 0 */

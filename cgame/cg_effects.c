@@ -77,7 +77,7 @@ CG_SmokePuff
 Adds a smoke puff or blood trail localEntity.
 =====================
 */
-localEntity_t *CG_SmokePuff( const vector3 *p, const vector3 *vel, 
+localEntity_t *CG_SmokePuff( const vector3 *p, const vector3 *vel,
 				   float radius,
 				   float r, float g, float b, float a,
 				   float duration,
@@ -110,7 +110,7 @@ localEntity_t *CG_SmokePuff( const vector3 *p, const vector3 *vel,
 		le->lifeRate = 1.0 / ( le->endTime - le->startTime );
 	}
 	le->color[0] = r;
-	le->color[1] = g; 
+	le->color[1] = g;
 	le->color[2] = b;
 	le->color[3] = a;
 
@@ -250,7 +250,7 @@ void CG_ThrowChunk( vector3 *origin, vector3 *velocity, qhandle_t hModel, int op
 //
 //----------------------------
 
-// Since we have shared verts when we tesselate the glass sheet, it helps to have a 
+// Since we have shared verts when we tesselate the glass sheet, it helps to have a
 //	random offset table set up up front.
 
 static float offX[20][20],
@@ -298,7 +298,7 @@ static void CG_DoGlassQuad( vector3 p[4], vector2 uv[4], qboolean stick, int tim
 			rgb1, rgb1, 0.0f,		// rgb start, rgb end, rgb parm ( not used )
 			rotDelta, bounce, time,	// rotation amount, bounce, and time to delay motion for ( zero if no delay );
 			6000,					// life
-			cgi_R_RegisterShader( "gfx/misc/test_crackle" ), 
+			cgi_R_RegisterShader( "gfx/misc/test_crackle" ),
 			FX_APPLY_PHYSICS | FX_ALPHA_NONLINEAR | FX_USE_ALPHA );
 
 	if ( random() > 0.95f && pol )
@@ -400,7 +400,7 @@ static void CG_CalcBiLerp( vector3 verts[4], vector3 subVerts[4], vector2 uv[4] 
 	VectorMA(		&temp,			       uv[3].y,	&subVerts[3],	&subVerts[3] );
 }
 // bilinear
-//f(p',q') = (1 - y) × {[(1 - x) × f(p,q)] + [x × f(p,q+1)]} + y × {[(1 - x) × f(p+1,q)] + [x × f(p+1,q+1)]}. 
+//f(p',q') = (1 - y) × {[(1 - x) × f(p,q)] + [x × f(p,q+1)]} + y × {[(1 - x) × f(p+1,q)] + [x × f(p+1,q+1)]}.
 
 
 static void CG_CalcHeightWidth( vector3 verts[4], float *height, float *width )
@@ -410,24 +410,24 @@ static void CG_CalcHeightWidth( vector3 verts[4], float *height, float *width )
 	VectorSubtract( &verts[3], &verts[0], &dir1 ); // v
 	VectorSubtract( &verts[1], &verts[0], &dir2 ); // p-a
 	CrossProduct( &dir1, &dir2, &cross );
-	*width = VectorNormalize( &cross ) / VectorNormalize( &dir1 ); // v 
+	*width = VectorNormalize( &cross ) / VectorNormalize( &dir1 ); // v
 	VectorSubtract( &verts[2], &verts[0], &dir2 ); // p-a
 	CrossProduct( &dir1, &dir2, &cross );
-	*width += VectorNormalize( &cross ) / VectorNormalize( &dir1 ); // v 
+	*width += VectorNormalize( &cross ) / VectorNormalize( &dir1 ); // v
 	*width *= 0.5f;
 
 	VectorSubtract( &verts[1], &verts[0], &dir1 ); // v
 	VectorSubtract( &verts[2], &verts[0], &dir2 ); // p-a
 	CrossProduct( &dir1, &dir2, &cross );
-	*height = VectorNormalize( &cross ) / VectorNormalize( &dir1 ); // v 
+	*height = VectorNormalize( &cross ) / VectorNormalize( &dir1 ); // v
 	VectorSubtract( &verts[3], &verts[0], &dir2 ); // p-a
 	CrossProduct( &dir1, &dir2, &cross );
-	*height += VectorNormalize( &cross ) / VectorNormalize( &dir1 ); // v 
+	*height += VectorNormalize( &cross ) / VectorNormalize( &dir1 ); // v
 	*height *= 0.5f;
 }
-//Consider a line in 3D with position vector "a" and direction vector "v" and 
+//Consider a line in 3D with position vector "a" and direction vector "v" and
 // let "p" be the position vector of an arbitrary point in 3D
-//dist = len( crossprod(p-a,v) ) / len(v); 
+//dist = len( crossprod(p-a,v) ) / len(v);
 
 void CG_InitGlass( void )
 {
@@ -621,9 +621,9 @@ void CG_DoGlass( vector3 verts[4], vector3 *normal, vector3 *dmgPt, vector3 *dmg
 			Vector2Set( &biPoints[3], xx, zz + stepHeight );
 
 			CG_CalcBiLerp( verts, subVerts, biPoints );
-			
+
 			dif = DistanceSquared( &subVerts[0], dmgPt ) * timeDecay - random() * 32;
-			
+
 			// If we decrease dif, we are increasing the impact area, making it more likely to blow out large holes
 			dif -= dmgRadius * dmgRadius;
 
@@ -694,7 +694,7 @@ void CG_GlassShatter_Old(int entnum, vector3 *org, vector3 *mins, vector3 *maxs)
 
 		Com_sprintf(chunkname, sizeof(chunkname), "models/chunks/glass/glchunks_%i.md3", Q_irand(1, 6));
 		VectorCopy(org, &shardorg);
-	
+
 		dif.x = (maxs->x-mins->x)/2;
 		dif.y = (maxs->y-mins->y)/2;
 		dif.z = (maxs->z-mins->z)/2;
@@ -818,7 +818,7 @@ void CG_CreateDebris(int entnum, vector3 *org, vector3 *mins, vector3 *maxs, int
 			debrismodel = dbModels_Rocks[Q_irand(0, NUM_DEBRIS_MODELS_ROCKS-1)];
 
 		VectorCopy(org, &shardorg);
-	
+
 		dif.x = (maxs->x - mins->x)/2;
 		dif.y = (maxs->y - mins->y)/2;
 		dif.z = (maxs->z - mins->z)/2;
@@ -1003,7 +1003,7 @@ Fun chunk spewer
 -------------------------
 */
 
-void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3 *mins, const vector3 *maxs, 
+void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3 *mins, const vector3 *maxs,
 						float speed, int numChunks, material_t chunkType, int customChunk, float baseScale )
 {
 	localEntity_t	*le;
@@ -1181,7 +1181,7 @@ void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3
 			le->bounceFactor = 0.2f + random() * 0.2f;
 			le->leFlags |= LEF_TUMBLE;
 			//le->ownerGentNum = owner;
-			le->leBounceSoundType = bounce; 
+			le->leBounceSoundType = bounce;
 
 			// Make sure that we have the desired start size set
 			le->radius = flrand( baseScale * 0.75f, baseScale * 1.25f );
@@ -1223,10 +1223,10 @@ void CG_ScorePlum( int client, vector3 *org, int score ) {
 	le->endTime = cg.time + 4000;
 	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
 
-	
+
 	le->color[0] = le->color[1] = le->color[2] = le->color[3] = 1.0;
 	le->radius = score;
-	
+
 	VectorCopy( org, &le->pos.trBase );
 	if (org->z >= lastPos.z - 20 && org->z <= lastPos.z + 20) {
 		le->pos.trBase.z -= 20;
@@ -1250,7 +1250,7 @@ void CG_ScorePlum( int client, vector3 *org, int score ) {
 CG_MakeExplosion
 ====================
 */
-localEntity_t *CG_MakeExplosion( vector3 *origin, vector3 *dir, 
+localEntity_t *CG_MakeExplosion( vector3 *origin, vector3 *dir,
 								qhandle_t hModel, int numFrames, qhandle_t shader,
 								int msec, qboolean isSprite, float scale, uint32_t flags )
 {
@@ -1268,7 +1268,7 @@ localEntity_t *CG_MakeExplosion( vector3 *origin, vector3 *dir,
 
 	ex = CG_AllocLocalEntity();
 	if ( isSprite ) {
-		ex->leType = LE_SPRITE_EXPLOSION; 
+		ex->leType = LE_SPRITE_EXPLOSION;
 		ex->refEntity.rotation = rand() % 360;
 		ex->radius = scale;
 		VectorScale( dir, 16, &tmpVec );
@@ -1293,7 +1293,7 @@ localEntity_t *CG_MakeExplosion( vector3 *origin, vector3 *dir,
 
 	ex->startTime = cg.time - offset;
 	ex->endTime = ex->startTime + msec;
-	
+
 	// bias the time so all shader effects start correctly
 	ex->refEntity.shaderTime = ex->startTime / 1000.0f;
 
@@ -1410,7 +1410,7 @@ void CG_Bleed( vector3 *origin, int entityNum ) {
 
 	ex->startTime = cg.time;
 	ex->endTime = ex->startTime + 500;
-	
+
 	VectorCopy ( origin, &ex->refEntity.origin);
 	ex->refEntity.reType = RT_SPRITE;
 	ex->refEntity.rotation = rand() % 360;

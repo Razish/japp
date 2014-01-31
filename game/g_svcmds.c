@@ -157,7 +157,7 @@ static void SV_AdminAdd_f( void ) {
 			argPrivs[MAX_TOKEN_CHARS] = {0},
 			argRank[MAX_TOKEN_CHARS] = {0},
 			*argMsg = NULL;
-			
+
 
 	if ( trap->Argc() < 5 ) {
 		trap->Print( "Syntax: adminadd <user> <pass> <privileges> <rank> <login message>\n" );
@@ -169,7 +169,7 @@ static void SV_AdminAdd_f( void ) {
 	trap->Argv( 3,	argPrivs,	sizeof( argPrivs ) );
 	trap->Argv( 4,	argRank,	sizeof( argRank ) );
 	argMsg = ConcatArgs( 5 );
-	
+
 	AM_AddAdmin( argUser, argPass, atoi( argPrivs ), atoi( argRank ), argMsg  );
 	AM_SaveAdmins();
 }
@@ -223,7 +223,7 @@ static void SV_BanAdd_f( void ) {
 static void SV_BanDel_f( void ) {
 	char ip[NET_ADDRSTRMAXLEN] = {0};
 	byteAlias_t *bIP = NULL;
-	
+
 	if ( trap->Argc() < 2 ) {
 		trap->Print( "Syntax: bandel <ip>\n" );
 		return;

@@ -52,7 +52,7 @@
 //
 //	0   32   80  112  144   240  320  400   <-- pixel position
 //  bot head bot head score ping time name
-//  
+//
 //  wins/losses are drawn on bot icon now
 
 static qboolean localClient; // true if local client has been displayed
@@ -63,7 +63,7 @@ static qboolean localClient; // true if local client has been displayed
 CG_DrawScoreboard
 =================
 */
-static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, float fade, qboolean largeFormat ) 
+static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, float fade, qboolean largeFormat )
 {
 	//vector3	headAngles;
 	clientInfo_t	*ci;
@@ -76,7 +76,7 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 		Com_Printf( "Bad score->client: %i\n", score->client );
 		return;
 	}
-	
+
 	ci = &cgs.clientinfo[score->client];
 
 	// draw the handicap or bot skill marker (unless player has flag)
@@ -118,14 +118,14 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 
 
 	// highlight your position
-	if ( score->client == cg.snap->ps.clientNum ) 
+	if ( score->client == cg.snap->ps.clientNum )
 	{
 		vector4 hcolor;
 		int		rank;
 
 		localClient = qtrue;
 
-		if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR 
+		if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR
 			|| cgs.gametype >= GT_TEAM ) {
 			rank = -1;
 		} else {
@@ -173,17 +173,17 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 		}
 
 		CG_Text_Paint (SB_PING_X, y, 1.0f * scale, &colorWhite, va("%i", score->ping),0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
-		CG_Text_Paint (SB_TIME_X, y, 1.0f * scale, &colorWhite, va("%i", score->time),0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );	
+		CG_Text_Paint (SB_TIME_X, y, 1.0f * scale, &colorWhite, va("%i", score->time),0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
 	}
 	else
 	{
 		CG_Text_Paint (SB_SCORE_X, y, 1.0f * scale, &colorWhite, "-",0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
-		CG_Text_Paint (SB_PING_X, y, 1.0f * scale, &colorWhite, "-",0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );	
+		CG_Text_Paint (SB_PING_X, y, 1.0f * scale, &colorWhite, "-",0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
 		CG_Text_Paint (SB_TIME_X, y, 1.0f * scale, &colorWhite, "-",0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
 	}
 
 	// add the "ready" marker for intermission exiting
-	if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & ( 1 << score->client ) ) 
+	if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & ( 1 << score->client ) )
 	{
 		CG_Text_Paint( cg_scoreboardSkinIcons.integer ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite, CG_GetStringEdString("MP_INGAME", "READY"), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
 	}
@@ -198,7 +198,7 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 CG_TeamScoreboard
 =================
 */
-static int CG_TeamScoreboard( int y, team_t team, float fade, int maxClients, int lineHeight, qboolean countOnly ) 
+static int CG_TeamScoreboard( int y, team_t team, float fade, int maxClients, int lineHeight, qboolean countOnly )
 {
 	int		i;
 	score_t	*score;
@@ -339,7 +339,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 		fadeColor = &colorWhite;
 	} else {
 		fadeColor = CG_FadeColor( cg.scoreFadeTime, FADE_TIME );
-		
+
 		if ( !fadeColor ) {
 			// next time scoreboard comes up, don't print killer
 			cg.deferredPlayerLoading = 0;
@@ -441,7 +441,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 	else if ( cgs.gametype < GT_TEAM)
 	{
 #if 0
-		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) 
+		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR )
 		{
 			char sPlace[256];
 			char sOf[256];
@@ -484,7 +484,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 	//	y = SB_HEADER-24;
 		x = ( SCREEN_WIDTH ) / 2;
 		y = SB_HEADER-24;
-		
+
 		CG_Text_Paint ( x - CG_Text_Width ( s, 1.0f, FONT_MEDIUM ) / 2, y, 1.0f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
 	}
 	else if (cgs.gametype == GT_SIEGE && (cg_siegeWinTeam == 1 || cg_siegeWinTeam == 2))
@@ -500,7 +500,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 		x = ( SCREEN_WIDTH ) / 2;
 		y = 60;
-		
+
 		CG_Text_Paint ( x - CG_Text_Width ( s, 1.0f, FONT_MEDIUM ) / 2, y, 1.0f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
 	}
 

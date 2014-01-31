@@ -113,7 +113,7 @@ void CG_BloodTrail( localEntity_t *le ) {
 	for ( ; t <= t2; t += step ) {
 		BG_EvaluateTrajectory( &le->pos, t, &newOrigin );
 
-		blood = CG_SmokePuff( &newOrigin, &vec3_origin, 
+		blood = CG_SmokePuff( &newOrigin, &vec3_origin,
 					  20,		// radius
 					  1, 1, 1, 1,	// color
 					  2000,		// trailTime
@@ -154,7 +154,7 @@ CG_FragmentBounceSound
 */
 void CG_FragmentBounceSound( localEntity_t *le, trace_t *trace ) {
 	// half the fragments will make a bounce sounds
-	if ( rand() & 1 ) 
+	if ( rand() & 1 )
 	{
 		sfxHandle_t	s = 0;
 
@@ -178,7 +178,7 @@ void CG_FragmentBounceSound( localEntity_t *le, trace_t *trace ) {
 		// bouncers only make the sound once...
 		// FIXME: arbitrary...change if it bugs you
 		le->leBounceSoundType = LEBS_NONE;
-	} 
+	}
 	else if ( rand() & 1 )
 	{
 		// we may end up bouncing again, but each bounce reduces the chance of playing the sound again or they may make a lot of noise when they settle
@@ -210,8 +210,8 @@ void CG_ReflectVelocity( localEntity_t *le, trace_t *trace ) {
 	le->pos.trTime = cg.time;
 
 	// check for stop, making sure that even on low FPS systems it doesn't bobble
-	if ( trace->allsolid || 
-		( trace->plane.normal.z > 0 && 
+	if ( trace->allsolid ||
+		( trace->plane.normal.z > 0 &&
 		( le->pos.trDelta.z < 40 || le->pos.trDelta.z < -cg.frametime * le->pos.trDelta.z ) ) ) {
 		le->pos.trType = TR_STATIONARY;
 	} else {
@@ -238,7 +238,7 @@ void CG_AddFragment( localEntity_t *le ) {
 		// sink into the ground if near the removal time
 		int		t;
 		float	t_e;
-		
+
 		t = le->endTime - cg.time;
 		if ( t < (SINK_TIME*2) ) {
 			le->refEntity.renderfx |= RF_FORCE_ENT_ALPHA;
@@ -728,7 +728,7 @@ void CG_AddOLine( localEntity_t *le )
 	re = &le->refEntity;
 
 	frac = (cg.time - le->startTime) / ( float ) ( le->endTime - le->startTime );
-	if ( frac > 1 ) 
+	if ( frac > 1 )
 		frac = 1.0;	// can happen during connection problems
 	else if (frac < 0)
 		frac = 0.0;

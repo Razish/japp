@@ -67,7 +67,7 @@
 enum ud_operand_code {
     OP_NONE,
 
-    OP_A,      OP_E,      OP_M,       OP_G,       
+    OP_A,      OP_E,      OP_M,       OP_G,
     OP_I,
 
     OP_AL,     OP_CL,     OP_DL,      OP_BL,
@@ -79,25 +79,25 @@ enum ud_operand_code {
     OP_AX,     OP_CX,     OP_DX,      OP_BX,
     OP_SI,     OP_DI,     OP_SP,      OP_BP,
 
-    OP_rAX,    OP_rCX,    OP_rDX,     OP_rBX,  
+    OP_rAX,    OP_rCX,    OP_rDX,     OP_rBX,
     OP_rSP,    OP_rBP,    OP_rSI,     OP_rDI,
 
-    OP_rAXr8,  OP_rCXr9,  OP_rDXr10,  OP_rBXr11,  
+    OP_rAXr8,  OP_rCXr9,  OP_rDXr10,  OP_rBXr11,
     OP_rSPr12, OP_rBPr13, OP_rSIr14,  OP_rDIr15,
 
     OP_eAX,    OP_eCX,    OP_eDX,     OP_eBX,
     OP_eSP,    OP_eBP,    OP_eSI,     OP_eDI,
 
-    OP_ES,     OP_CS,     OP_SS,      OP_DS,  
+    OP_ES,     OP_CS,     OP_SS,      OP_DS,
     OP_FS,     OP_GS,
 
     OP_ST0,    OP_ST1,    OP_ST2,     OP_ST3,
     OP_ST4,    OP_ST5,    OP_ST6,     OP_ST7,
 
-    OP_J,      OP_S,      OP_O,          
-    OP_I1,     OP_I3, 
+    OP_J,      OP_S,      OP_O,
+    OP_I1,     OP_I3,
 
-    OP_V,      OP_W,      OP_Q,       OP_P, 
+    OP_V,      OP_W,      OP_Q,       OP_P,
 
     OP_R,      OP_C,  OP_D,       OP_VR,  OP_PR
 };
@@ -116,8 +116,8 @@ enum ud_operand_size {
     SZ_RDQ = 7,
 
     /* the following values are used as is,
-     * and thus hard-coded. changing them 
-     * will break internals 
+     * and thus hard-coded. changing them
+     * will break internals
      */
     SZ_B   = 8,
     SZ_W   = 16,
@@ -242,20 +242,20 @@ enum ud_operand_size {
 #define O_BHr15b  { OP_BHr15b,   SZ_NA    }
 
 
-/* A single operand of an entry in the instruction table. 
+/* A single operand of an entry in the instruction table.
  * (internal use only)
  */
-struct ud_itab_entry_operand 
+struct ud_itab_entry_operand
 {
   enum ud_operand_code type;
   enum ud_operand_size size;
 };
 
 
-/* A single entry in an instruction table. 
+/* A single entry in an instruction table.
  *(internal use only)
  */
-struct ud_itab_entry 
+struct ud_itab_entry
 {
   enum ud_mnemonic_code         mnemonic;
   struct ud_itab_entry_operand  operand1;

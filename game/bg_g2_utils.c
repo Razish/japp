@@ -18,7 +18,7 @@ void BG_AttachToRancor( void *ghoul2,
 					   float rancYaw,
 					   vector3 *rancOrigin,
 					   int time,
-					   qhandle_t *modelList, 
+					   qhandle_t *modelList,
 					   vector3 *modelScale,
 					   qboolean inMouth,
 					   vector3 *out_origin,
@@ -39,7 +39,7 @@ void BG_AttachToRancor( void *ghoul2,
 		boltIndex = trap->G2API_AddBolt(ghoul2, 0, "*r_hand");
 	}
 	VectorSet( &rancAngles, 0, rancYaw, 0 );
-	trap->G2API_GetBoltMatrix( ghoul2, 0, boltIndex, 
+	trap->G2API_GetBoltMatrix( ghoul2, 0, boltIndex,
 			&boltMatrix, &rancAngles, rancOrigin, time,
 			modelList, modelScale );
 	// Storing ent position, bolt position, and bolt axis

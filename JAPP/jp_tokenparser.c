@@ -85,12 +85,12 @@ static const char *TP_ParseExt( qboolean allowLineBreaks )
 				data++;
 		}
 
-		else if ( c == '/' && data[1] == '*' ) 
+		else if ( c == '/' && data[1] == '*' )
 		{//skip block comments
 			data += 2;
-			while ( *data && (*data != '*' || data[1] != '/') ) 
+			while ( *data && (*data != '*' || data[1] != '/') )
 				data++;
-			if ( *data ) 
+			if ( *data )
 				data += 2;
 		}
 		else
@@ -213,7 +213,7 @@ qboolean TP_ParseFloat( float *f )
 {
 	const char	*token = TP_ParseExt( qfalse );
 
-	if ( !token[0] ) 
+	if ( !token[0] )
 		return qtrue;
 
 	*f = atoff( token );
@@ -229,9 +229,9 @@ qboolean TP_ParseVec3( vector3 *vec )
 	{
 		token = TP_ParseExt( qfalse );
 
-		if ( !token[0] ) 
+		if ( !token[0] )
 			return qtrue;
-		
+
 		vec->data[i] = atoff( token );
 	}
 
@@ -246,21 +246,21 @@ qboolean TP_ParseVec4( vector4 *vec )
 	for ( i=0; i<4; i++ )
 	{
 		token = TP_ParseExt( qfalse );
-		if ( !token[0] ) 
+		if ( !token[0] )
 			return qtrue;
-		
+
 		vec->data[i] = atoff( token );
 	}
 
 	return qfalse;
 }
 
-qboolean TP_ParseByte( byte *i ) 
+qboolean TP_ParseByte( byte *i )
 {
 	const char	*token;
 
 	token = TP_ParseExt( qfalse );
-	if ( !token[0] ) 
+	if ( !token[0] )
 		return qtrue;
 
 	*i = (byte)atoi( token );

@@ -10,7 +10,7 @@ G_BounceObject
 
 ================
 */
-void G_BounceObject( gentity_t *ent, trace_t *trace ) 
+void G_BounceObject( gentity_t *ent, trace_t *trace )
 {
 	vector3	velocity;
 	float	dot, bounceFactor;
@@ -29,7 +29,7 @@ void G_BounceObject( gentity_t *ent, trace_t *trace )
 	VectorMA( &velocity, -2*dot*bounceFactor, &trace->plane.normal, &ent->s.pos.trDelta );
 
 	//FIXME: customized or material-based impact/bounce sounds
-	if ( ent->flags & FL_BOUNCE_HALF ) 
+	if ( ent->flags & FL_BOUNCE_HALF )
 	{
 		VectorScale( &ent->s.pos.trDelta, 0.5, &ent->s.pos.trDelta );
 
@@ -68,14 +68,14 @@ G_RunObject
 */
 extern void DoImpact( gentity_t *self, gentity_t *other, qboolean damageSelf );
 extern void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope );
-void G_RunObject( gentity_t *ent ) 
+void G_RunObject( gentity_t *ent )
 {
 	vector3		origin, oldOrg;
 	trace_t		tr;
 	gentity_t	*traceEnt = NULL;
 
 	//FIXME: floaters need to stop floating up after a while, even if gravity stays negative?
-	if ( ent->s.pos.trType == TR_STATIONARY )//g_gravity.value <= 0 && 
+	if ( ent->s.pos.trType == TR_STATIONARY )//g_gravity.value <= 0 &&
 	{
 		ent->s.pos.trType = TR_GRAVITY;
 		VectorCopy( &ent->r.currentOrigin, &ent->s.pos.trBase );
@@ -102,13 +102,13 @@ void G_RunObject( gentity_t *ent )
 	// ignoring interactions with the missile owner
 	trap->Trace( &tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &origin, ent->parent ? ent->parent->s.number : ent->s.number, ent->clipmask, qfalse, 0, 0 );
 
-	if ( !tr.startsolid && !tr.allsolid && tr.fraction ) 
+	if ( !tr.startsolid && !tr.allsolid && tr.fraction )
 	{
 		VectorCopy( &tr.endpos, &ent->r.currentOrigin );
 		trap->LinkEntity( (sharedEntity_t *)ent );
 	}
 	else
-	//if ( tr.startsolid ) 
+	//if ( tr.startsolid )
 	{
 		tr.fraction = 0;
 	}
@@ -129,7 +129,7 @@ void G_RunObject( gentity_t *ent )
 	}
 	*/
 
-	if ( tr.fraction == 1 ) 
+	if ( tr.fraction == 1 )
 	{
 		if ( g_gravity.value <= 0 )
 		{
@@ -189,7 +189,7 @@ void G_RunObject( gentity_t *ent )
 	}
 
 	//do impact physics
-	if ( ent->s.pos.trType == TR_GRAVITY )//tr.fraction < 1.0 && 
+	if ( ent->s.pos.trType == TR_GRAVITY )//tr.fraction < 1.0 &&
 	{//FIXME: only do this if no trDelta
 		if ( g_gravity.value <= 0 || tr.plane.normal.z < 0.7 )
 		{

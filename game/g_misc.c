@@ -46,7 +46,7 @@ void SP_info_notnull( gentity_t *self ){
 /*QUAKED lightJunior (0 0.7 0.3) (-8 -8 -8) (8 8 8) nonlinear angle negative_spot negative_point
 Non-displayed light that only affects dynamic game models, but does not contribute to lightmaps
 "light" overrides the default 300 intensity.
-Nonlinear checkbox gives inverse square falloff instead of linear 
+Nonlinear checkbox gives inverse square falloff instead of linear
 Angle adds light:surface angle calculations (only valid for "Linear" lights) (wolf)
 Lights pointed at a target will be spotlights.
 "radius" overrides the default 64 unit radius of a spotlight at the target point.
@@ -106,7 +106,7 @@ static void misc_lightstyle_set ( gentity_t *ent)
 			trap->SetConfigstring(CS_LIGHT_STYLES + (mLightStyle*3)+1, "a");
 			trap->SetConfigstring(CS_LIGHT_STYLES + (mLightStyle*3)+2, "a");
 		}
-	} 
+	}
 	else
 	{	//Turn myself on now
 		if (mLightSwitchStyle)	//i have a light style i'd like to use when on
@@ -397,7 +397,7 @@ void SP_misc_portal_camera(gentity_t *ent) {
 /*QUAKED misc_bsp (1 0 0) (-16 -16 -16) (16 16 16)
 "bspmodel"		arbitrary .bsp file to display
 */
-void SP_misc_bsp(gentity_t *ent) 
+void SP_misc_bsp(gentity_t *ent)
 {
 	char	temp[MAX_QPATH];
 	char	*out;
@@ -410,7 +410,7 @@ void SP_misc_bsp(gentity_t *ent)
 	// don't support rotation any other way
 	ent->s.angles.x = 0.0;
 	ent->s.angles.z = 0.0;
-	
+
 	G_SpawnString("bspmodel", "", &out);
 
 	ent->s.eFlags = EF_PERMANENT;
@@ -489,7 +489,7 @@ densityMap - how dense the client models are packed
 */
 void AddSpawnField(char *field, char *value);
 #define MAX_INSTANCE_TYPES		16
-void SP_terrain(gentity_t *ent) 
+void SP_terrain(gentity_t *ent)
 {
 	char				temp[MAX_INFO_STRING];
 	char				final[MAX_QPATH];
@@ -518,7 +518,7 @@ void SP_terrain(gentity_t *ent)
 		trap->Cvar_VariableStringBuffer("RMG_terrain", temp, MAX_QPATH);
 		Com_sprintf(final, MAX_QPATH, "%s", temp);
 		AddSpawnField("terrainDef", temp);
- 
+
 		trap->Cvar_VariableStringBuffer("RMG_instances", temp, MAX_QPATH);
 		Com_sprintf(final, MAX_QPATH, "%s", temp);
 		AddSpawnField("instanceDef", temp);
@@ -568,7 +568,7 @@ void SP_terrain(gentity_t *ent)
 	Info_SetValueForKey(temp, "miscentDef", value);
 
 	Info_SetValueForKey(temp, "missionType", missionType);
-	
+
 	for(i = 0; i < MAX_INSTANCE_TYPES; i++)
 	{
 		trap->Cvar_VariableStringBuffer(va("RMG_instance%d", i), final, MAX_QPATH);
@@ -611,7 +611,7 @@ void SP_terrain(gentity_t *ent)
 	trap->LinkEntity((sharedEntity_t *)ent);
 
 	// If running RMG then initialize the terrain and handle team skins
-	if ( RMG.integer ) 
+	if ( RMG.integer )
 	{
 		trap->RMG_Init(/*terrainID*/);
 
@@ -702,9 +702,9 @@ will explode.
 void SP_misc_skyportal (gentity_t *ent)
 {
 	char	*fov;
-	vector3	fogv;	//----(SA)	
-	int		fogn;	//----(SA)	
-	int		fogf;	//----(SA)	
+	vector3	fogv;	//----(SA)
+	int		fogn;	//----(SA)
+	int		fogf;	//----(SA)
 	int		isfog = 0;	// (SA)
 
 	float	fov_x;
@@ -898,7 +898,7 @@ void HolocronThink(gentity_t *ent)
 			HolocronPopOut(ent);
 			ent->enemy->client->ps.holocronsCarried[ent->count] = 0;
 			ent->enemy = NULL;
-			
+
 			goto justthink;
 		}
 	}
@@ -1161,7 +1161,7 @@ void check_recharge(gentity_t *ent)
 		ent->activator = NULL;
 		ent->fly_sound_debounce_time = 0;
 	}
-	
+
 	if (!ent->activator)
 	{ //don't recharge during use
 		if (ent->genericValue8 < level.time)
@@ -1209,9 +1209,9 @@ void shield_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *a
 		return;
 	}
 
-	if ( level.gametype == GT_SIEGE 
-		&& other 
-		&& other->client 
+	if ( level.gametype == GT_SIEGE
+		&& other
+		&& other->client
 		&& other->client->siegeClass )
 	{
 		if ( !bgSiegeClasses[other->client->siegeClass].maxarmor )
@@ -1231,9 +1231,9 @@ void shield_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *a
 		}
 		self->setTime = level.time + 100;
 
-		if ( level.gametype == GT_SIEGE 
-			&& other 
-			&& other->client 
+		if ( level.gametype == GT_SIEGE
+			&& other
+			&& other->client
 			&& other->client->siegeClass != -1 )
 		{
 			maxArmor = bgSiegeClasses[other->client->siegeClass].maxarmor;
@@ -2237,7 +2237,7 @@ void SP_fx_runner( gentity_t *ent )
 		return;
 	}
 
-	// Try and associate an effect file, unfortunately we won't know if this worked or not 
+	// Try and associate an effect file, unfortunately we won't know if this worked or not
 	//	until the CGAME trys to register it...
 	ent->s.modelindex = G_EffectIndex( fxFile );
 
@@ -2248,7 +2248,7 @@ void SP_fx_runner( gentity_t *ent )
 	ent->s.modelindex2 = FX_STATE_OFF;
 
 	// Give us a bit of time to spawn in the other entities, since we may have to target one of 'em
-	ent->think = fx_runner_link; 
+	ent->think = fx_runner_link;
 	ent->nextthink = level.time + 400;
 
 	// Save our position and link us up!
@@ -2267,7 +2267,7 @@ This world effect will spawn space dust globally into the level.
 */
 //----------------------------------------------------------
 void SP_CreateSpaceDust( gentity_t *ent )
-{ 
+{
 	G_EffectIndex(va("*spacedust %i", ent->count));
 	//G_EffectIndex("*constantwind ( 10 -10 0 )");
 }
@@ -2280,7 +2280,7 @@ This world effect will spawn snow globally into the level.
 */
 //----------------------------------------------------------
 void SP_CreateSnow( gentity_t *ent )
-{ 
+{
 	G_EffectIndex("*snow");
 	G_EffectIndex("*fog");
 	G_EffectIndex("*constantwind (100 100 -100)");
@@ -2293,7 +2293,7 @@ This world effect will spawn rain globally into the level.
 */
 //----------------------------------------------------------
 void SP_CreateRain( gentity_t *ent )
-{ 
+{
 	G_EffectIndex(va("*rain init %i", ent->count));
 }
 
@@ -2391,7 +2391,7 @@ void maglock_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			self->activator->flags &= ~FL_INACTIVE;
 		}
 	}
-	
+
 	//use targets
 	G_UseTargets( self, attacker );
 	//die
@@ -2404,8 +2404,8 @@ gentity_t *G_FindDoorTrigger( gentity_t *ent );
 
 void SP_misc_maglock ( gentity_t *self )
 {
-	//NOTE: May have to make these only work on doors that are either untargeted 
-	//		or are targeted by a trigger, not doors fired off by scripts, counters 
+	//NOTE: May have to make these only work on doors that are either untargeted
+	//		or are targeted by a trigger, not doors fired off by scripts, counters
 	//		or other such things?
 	self->s.modelindex = G_ModelIndex( "models/map_objects/imp_detention/door_lock.md3" );
 	self->genericValue1 = G_EffectIndex( "maglock/explosion" );
@@ -2553,7 +2553,7 @@ void misc_faller_create( gentity_t *ent, gentity_t *other, gentity_t *activator 
 	faller->s.modelGhoul2 = 1;
 	faller->s.modelindex = G_ModelIndex("models/players/stormtrooper/model.glm");
 	faller->s.g2radius = 100;
-	
+
 	faller->s.customRGBA[0]=Q_irand(1,255);
 	faller->s.customRGBA[1]=Q_irand(1,255);
 	faller->s.customRGBA[2]=Q_irand(1,255);
@@ -2561,7 +2561,7 @@ void misc_faller_create( gentity_t *ent, gentity_t *other, gentity_t *activator 
 
 	VectorSet(&faller->r.mins, -15, -15, DEFAULT_MINS_2);
 	VectorSet(&faller->r.maxs, 15, 15, DEFAULT_MAXS_2);
-	
+
 	faller->clipmask = MASK_PLAYERSOLID;
 	faller->r.contents = MASK_PLAYERSOLID;
 
@@ -2804,7 +2804,7 @@ reference_tag_t	*TAG_Add( const char *name, const char *owner, vector3 *origin, 
 	}
 
 	tagOwner = TAG_FindOwner( owner );
-	
+
 	if (!tagOwner)
 	{
 		//Create a new owner list
@@ -2816,7 +2816,7 @@ reference_tag_t	*TAG_Add( const char *name, const char *owner, vector3 *origin, 
 			return 0;
 		}
 	}
-	
+
 	//This is actually reverse order of how SP does it because of the way we're storing/allocating.
 	//Now that we have the owner, we want to get the first free reftag on the owner itself.
 	tag = FirstFreeRefTag(tagOwner);
@@ -2912,7 +2912,7 @@ int	TAG_GetAngles( const char *owner, const char *name, vector3 *angles )
 	}
 
 	VectorCopy( &tag->angles, angles );
-	
+
 	return 1;
 }
 
@@ -2975,12 +2975,12 @@ If you target a ref_tag at an entity, that will set the ref_tag's
 angles toward that entity.
 
 If you set the ref_tag's ownername to the ownername of an entity,
-it makes that entity is the owner of the ref_tag.  This means 
+it makes that entity is the owner of the ref_tag.  This means
 that the owner, and only the owner, may refer to that tag.
 
 Tags may not have the same name as another tag with the same
 owner.  However, tags with different owners may have the same
-name as one another.  In this way, scripts can generically 
+name as one another.  In this way, scripts can generically
 refer to tags by name, and their owners will automatically
 specifiy which tag is being referred to.
 
@@ -3001,12 +3001,12 @@ If you target a ref_tag at an entity, that will set the ref_tag's
 angles toward that entity.
 
 If you set the ref_tag's ownername to the ownername of an entity,
-it makes that entity is the owner of the ref_tag.  This means 
+it makes that entity is the owner of the ref_tag.  This means
 that the owner, and only the owner, may refer to that tag.
 
 Tags may not have the same name as another tag with the same
 owner.  However, tags with different owners may have the same
-name as one another.  In this way, scripts can generically 
+name as one another.  In this way, scripts can generically
 refer to tags by name, and their owners will automatically
 specifiy which tag is being referred to.
 
@@ -3029,7 +3029,7 @@ void ref_link ( gentity_t *ent )
 			VectorSubtract( &target->s.origin, &ent->s.origin, &dir );
 			VectorNormalize( &dir );
 			vectoangles( &dir, &ent->s.angles );
-			
+
 			//FIXME: Does pitch get flipped?
 		}
 		else
@@ -3037,7 +3037,7 @@ void ref_link ( gentity_t *ent )
 			Com_Printf( S_COLOR_RED"ERROR: ref_tag (%s) has invalid target (%s)", ent->targetname, ent->target );
 		}
 	}
-	
+
 	//Add the tag
 	TAG_Add( ent->targetname, ent->ownername, &ent->s.origin, &ent->s.angles, 16, 0 );
 
@@ -3066,7 +3066,7 @@ TOGGLE - keep firing until used again (fires at intervals of "wait")
 
 "wait" - debounce time between refires (defaults to 500)
 
-"target" - what to aim at (will update aim every frame if it's a moving target)  
+"target" - what to aim at (will update aim every frame if it's a moving target)
 
 "weapon" - specify the weapon to use (default is WP_BLASTER)
 	WP_BRYAR_PISTOL
@@ -3232,7 +3232,7 @@ void SP_misc_weapon_shooter( gentity_t *self )
 	}
 }
 
-/*QUAKED misc_weather_zone (0 .5 .8) ? 
+/*QUAKED misc_weather_zone (0 .5 .8) ?
 Determines a region to check for weather contents - will significantly reduce load time
 */
 void SP_misc_weather_zone( gentity_t *ent )

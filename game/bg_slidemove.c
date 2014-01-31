@@ -97,7 +97,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 			}
 		}
 	}
-	
+
 	if ( trace->entityNum < ENTITYNUM_WORLD && hitEnt->s.eType == ET_MOVER && hitEnt->s.apos.trType != TR_STATIONARY
 		&& (hitEnt->spawnflags & 16) /*IMPACT*/ && !Q_stricmp( "func_rotating", hitEnt->classname ) )
 	{
@@ -311,9 +311,9 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 						//	hitEnt->m_pVehicle->m_vOrientation->roll = AngleNormalize180( hitEnt->m_pVehicle->m_vOrientation->roll-yawTurnStrength/turnDivider*pSelfVeh->m_fTimeModifier );
 							hitEnt->m_pVehicle->m_vFullAngleVelocity.roll = AngleNormalize180( hitEnt->m_pVehicle->m_vOrientation->roll-yawTurnStrength/turnDivider*pSelfVeh->m_fTimeModifier );
 						}
-						//NOTE: will these angle changes stick or will they be stomped 
-						//		when the vehicle goes through its own update and re-grabs 
-						//		its angles from its pilot...?  Should we do a 
+						//NOTE: will these angle changes stick or will they be stomped
+						//		when the vehicle goes through its own update and re-grabs
+						//		its angles from its pilot...?  Should we do a
 						//		SetClientViewAngles on the pilot?
 						/*
 						SetClientViewAngle( hitEnt, hitEnt->m_pVehicle->m_vOrientation );
@@ -336,7 +336,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 				G_AddEvent( (gentity_t *)pEnt, EV_PLAY_EFFECT_ID, pSelfVeh->m_pVehicleInfo->iImpactFX );
 			}
 			pEnt->m_pVehicle->m_iHitDebounce = pm->cmd.serverTime + 200;
-			magnitude /= pSelfVeh->m_pVehicleInfo->toughness * 50.0f; 
+			magnitude /= pSelfVeh->m_pVehicleInfo->toughness * 50.0f;
 
 			if ( hitEnt && (hitEnt->s.eType != ET_TERRAIN || !(hitEnt->spawnflags & 1) || pSelfVeh->m_pVehicleInfo->type == VH_FIGHTER) ) {
 				// don't damage the vehicle from terrain that doesn't want to damage vehicles
@@ -430,10 +430,10 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 qboolean PM_GroundSlideOkay( float zNormal ) {
 	if ( zNormal > 0 && pm->ps->velocity.z > 0 ) {
 		if ( pm->ps->legsAnim == BOTH_WALL_RUN_RIGHT
-			|| pm->ps->legsAnim == BOTH_WALL_RUN_LEFT 
+			|| pm->ps->legsAnim == BOTH_WALL_RUN_LEFT
 			|| pm->ps->legsAnim == BOTH_WALL_RUN_RIGHT_STOP
-			|| pm->ps->legsAnim == BOTH_WALL_RUN_LEFT_STOP 
-			|| pm->ps->legsAnim == BOTH_FORCEWALLRUNFLIP_START 
+			|| pm->ps->legsAnim == BOTH_WALL_RUN_LEFT_STOP
+			|| pm->ps->legsAnim == BOTH_FORCEWALLRUNFLIP_START
 			|| pm->ps->legsAnim == BOTH_FORCELONGLEAP_START
 			|| pm->ps->legsAnim == BOTH_FORCELONGLEAP_ATTACK
 			|| pm->ps->legsAnim == BOTH_FORCELONGLEAP_LAND
@@ -530,7 +530,7 @@ qboolean PM_SlideMove( qboolean gravity ) {
 	float time_left, into;
 	vector3 endVelocity, endClipVelocity;
 //	qboolean damageSelf = qtrue;
-	
+
 	numbumps = 4;
 
 	VectorCopy( &pm->ps->velocity, &primal_velocity );
@@ -712,7 +712,7 @@ qboolean PM_SlideMove( qboolean gravity ) {
 	return ( bumpcount != 0 );
 }
 
-void PM_StepSlideMove( qboolean gravity ) { 
+void PM_StepSlideMove( qboolean gravity ) {
 	vector3 start_o, start_v, down_o, down_v;
 	trace_t trace;
 	vector3 up, down;
@@ -802,7 +802,7 @@ void PM_StepSlideMove( qboolean gravity ) {
 			//Then it might still be okay, so we figure out the slope of the entire move
 			//from (A) to (B) and if that slope is walk-upabble, then it's okay
 			VectorSubtract( &trace.endpos, &down_o, &stepVec );
-			VectorNormalize( &stepVec ); 
+			VectorNormalize( &stepVec );
 			if ( stepVec.z > (1.0f-MIN_WALK_NORMAL) )
 				skipStep = qtrue;
 		}

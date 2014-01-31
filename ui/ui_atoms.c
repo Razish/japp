@@ -59,13 +59,13 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		UI_Report();
 		return qtrue;
 	}
-	
+
 	if ( Q_stricmp (cmd, "ui_load") == 0 ) {
 		UI_Load();
 		return qtrue;
 	}
 
-	if ( Q_stricmp (cmd, "ui_opensiegemenu" ) == 0 ) 
+	if ( Q_stricmp (cmd, "ui_opensiegemenu" ) == 0 )
 	{
 		if ( trap->Cvar_VariableValue ( "g_gametype" ) == GT_SIEGE )
 		{
@@ -78,7 +78,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		return qtrue;
 	}
 
-	if ( !Q_stricmp( cmd, "ui_openmenu" ) ) 
+	if ( !Q_stricmp( cmd, "ui_openmenu" ) )
 	{
 		//if ( trap->Cvar_VariableValue ( "developer" ) )
 		{
@@ -246,7 +246,7 @@ void UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
 		t0 = 0;
 		t1 = 1;
 	}
-	
+
 	trap->R_DrawStretchPic( x, y, w, h, s0, t0, s1, t1, hShader );
 }
 

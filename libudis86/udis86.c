@@ -17,7 +17,7 @@
  * ud_init() - Initializes ud_t object.
  * =============================================================================
  */
-extern void 
+extern void
 ud_init(struct ud* u)
 {
   memset((void*)u, 0, sizeof(struct ud));
@@ -30,7 +30,7 @@ ud_init(struct ud* u)
 }
 
 /* =============================================================================
- * ud_disassemble() - disassembles one instruction and returns the number of 
+ * ud_disassemble() - disassembles one instruction and returns the number of
  * bytes disassembled. A zero means end of disassembly.
  * =============================================================================
  */
@@ -40,10 +40,10 @@ ud_disassemble(struct ud* u)
   if (ud_input_end(u))
 	return 0;
 
- 
+
   u->insn_buffer[0] = u->insn_hexcode[0] = 0;
 
- 
+
   if (ud_decode(u) == 0)
 	return 0;
   if (u->translator)
@@ -55,7 +55,7 @@ ud_disassemble(struct ud* u)
  * ud_set_mode() - Set Disassemly Mode.
  * =============================================================================
  */
-extern void 
+extern void
 ud_set_mode(struct ud* u, uint8_t m)
 {
   switch(m) {
@@ -70,7 +70,7 @@ ud_set_mode(struct ud* u, uint8_t m)
  * ud_set_vendor() - Set vendor.
  * =============================================================================
  */
-extern void 
+extern void
 ud_set_vendor(struct ud* u, unsigned v)
 {
   switch(v) {
@@ -83,10 +83,10 @@ ud_set_vendor(struct ud* u, unsigned v)
 }
 
 /* =============================================================================
- * ud_set_pc() - Sets code origin. 
+ * ud_set_pc() - Sets code origin.
  * =============================================================================
  */
-extern void 
+extern void
 ud_set_pc(struct ud* u, uint64_t o)
 {
   u->pc = o;
@@ -96,7 +96,7 @@ ud_set_pc(struct ud* u, uint64_t o)
  * ud_set_syntax() - Sets the output syntax.
  * =============================================================================
  */
-extern void 
+extern void
 ud_set_syntax(struct ud* u, void (*t)(struct ud*))
 {
   u->translator = t;
@@ -106,8 +106,8 @@ ud_set_syntax(struct ud* u, void (*t)(struct ud*))
  * ud_insn() - returns the disassembled instruction
  * =============================================================================
  */
-extern char* 
-ud_insn_asm(struct ud* u) 
+extern char*
+ud_insn_asm(struct ud* u)
 {
   return u->insn_buffer;
 }
@@ -117,7 +117,7 @@ ud_insn_asm(struct ud* u)
  * =============================================================================
  */
 extern uint64_t
-ud_insn_off(struct ud* u) 
+ud_insn_off(struct ud* u)
 {
   return u->insn_offset;
 }
@@ -127,8 +127,8 @@ ud_insn_off(struct ud* u)
  * ud_insn_hex() - Returns hex form of disassembled instruction.
  * =============================================================================
  */
-extern char* 
-ud_insn_hex(struct ud* u) 
+extern char*
+ud_insn_hex(struct ud* u)
 {
   return u->insn_hexcode;
 }
@@ -137,8 +137,8 @@ ud_insn_hex(struct ud* u)
  * ud_insn_ptr() - Returns code disassembled.
  * =============================================================================
  */
-extern uint8_t* 
-ud_insn_ptr(struct ud* u) 
+extern uint8_t*
+ud_insn_ptr(struct ud* u)
 {
   return u->inp_sess;
 }
@@ -147,8 +147,8 @@ ud_insn_ptr(struct ud* u)
  * ud_insn_len() - Returns the count of bytes disassembled.
  * =============================================================================
  */
-extern unsigned int 
-ud_insn_len(struct ud* u) 
+extern unsigned int
+ud_insn_len(struct ud* u)
 {
   return u->inp_ctr;
 }
