@@ -127,7 +127,6 @@ static int JPLua_Player_GetAnimations( lua_State *L ) {
 	int legsTimer = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 
-
 	if ( player->clientNum == cg.clientNum ) {
 		torsoAnim = cg.predictedPlayerState.torsoAnim;
 		torsoTimer = cg.predictedPlayerState.torsoTimer;
@@ -146,6 +145,7 @@ static int JPLua_Player_GetAnimations( lua_State *L ) {
 	lua_pushstring( L, "torsoTimer" ); lua_pushnumber( L, torsoTimer ); lua_settable( L, top );
 	lua_pushstring( L, "legsAnim" ); lua_pushnumber( L, legsAnim ); lua_settable( L, top );
 	lua_pushstring( L, "legsTimer" ); lua_pushnumber( L, legsTimer ); lua_settable( L, top );
+
 	return 1;
 }
 
@@ -236,8 +236,7 @@ static int JPLua_Player_GetClientInfo( lua_State *L ) {
 //Func: Player:GetDuelingPartner()
 //Retn: nil if Player is not dueling, or Player:GetID() != self:GetID() due to lack of reliable information
 //		Player object of the client Player is dueling
-static int JPLua_Player_GetDuelingPartner( lua_State *L )
-{
+static int JPLua_Player_GetDuelingPartner( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	if ( !cg_entities[player->clientNum].currentState.bolt1 || player->clientNum != cg.clientNum )
 		lua_pushnil( L );
@@ -498,6 +497,8 @@ static const struct luaL_Reg jplua_player_meta[] = {
 
 // Register the Player class for Lua
 void JPLua_Register_Player( lua_State *L ) {
+	const luaL_Reg *r;
+
 	luaL_newmetatable( L, PLAYER_META ); // Create metatable for Player class, push on stack
 
 	// Lua won't attempt to directly index userdata, only via metatables
@@ -508,12 +509,9 @@ void JPLua_Register_Player( lua_State *L ) {
 
 	// fill metatable with fields
 #if LUA_VERSION_NUM > 501
-	{
-		const luaL_Reg *r;
-		for ( r=jplua_player_meta; r->name; r++ ) {
-			lua_pushcfunction( L, r->func );
-			lua_setfield( L, -2, r->name );
-		}
+	for ( r=jplua_player_meta; r->name; r++ ) {
+		lua_pushcfunction( L, r->func );
+		lua_setfield( L, -2, r->name );
 	}
 #else
 	luaL_register( L, NULL, jplua_player_meta );

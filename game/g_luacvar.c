@@ -182,6 +182,8 @@ static const struct luaL_Reg jplua_cvar_meta[] = {
 
 // Register the Cvar class for Lua
 void JPLua_Register_Cvar( lua_State *L ) {
+	const luaL_Reg *r;
+
 	luaL_newmetatable( L, CVAR_META ); // Create metatable for Cvar class, push on stack
 
 	// Lua won't attempt to directly index userdata, only via metatables
@@ -192,12 +194,9 @@ void JPLua_Register_Cvar( lua_State *L ) {
 
 	// fill metatable with fields
 #if LUA_VERSION_NUM > 501
-	{
-		const luaL_Reg *r;
-		for ( r=jplua_cvar_meta; r->name; r++ ) {
-			lua_pushcfunction( L, r->func );
-			lua_setfield( L, -2, r->name );
-		}
+	for ( r=jplua_cvar_meta; r->name; r++ ) {
+		lua_pushcfunction( L, r->func );
+		lua_setfield( L, -2, r->name );
 	}
 #else
 	luaL_register( L, NULL, jplua_cvar_meta );

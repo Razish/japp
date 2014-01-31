@@ -25,7 +25,6 @@ typedef struct gfd_s {// JPLua File Data
 } gfd_t;
 
 void JPLua_DPrintf( const char *msg, ... ) {
-
 #ifdef JPLUA_DEBUG
 	va_list argptr;
 	char text[1024] = { 0 };
@@ -36,6 +35,15 @@ void JPLua_DPrintf( const char *msg, ... ) {
 
 	Com_Printf( "%s", text );
 #endif
+}
+
+qboolean JPLua_Call( lua_State *L, int argCount, int resCount ) {
+	if ( lua_pcall( L, argCount, resCount, 0 ) ) {
+		Com_Printf( S_COLOR_GREEN"JPLua: "S_COLOR_RED"Error: %s\n", lua_tostring( L, -1 ) );
+		lua_pop( L, 1 );
+		return qfalse;
+	}
+	return qtrue;
 }
 
 // Called by the loader, never access it directly
@@ -362,8 +370,28 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	//Communication
 	{ "SendReliableCommand", JPLua_Export_SendReliableCommand } // SendReliableCommand( integer clientNum, string cmd )
 };
+static const size_t cimportsSize = ARRAY_LEN( JPLua_CImports );
 
-static const int cimportsSize = ARRAY_LEN( JPLua_CImports );
+void JPLua_PushUserinfo( lua_State *L, int clientNum ) {
+	const char *s;
+	char userinfo[MAX_INFO_STRING], key[BIG_INFO_KEY], value[BIG_INFO_VALUE];
+	int top = 0;
+
+	lua_newtable( L );
+	top = lua_gettop( L );
+
+	//RAZTODO: cache userinfo somehow :/
+	trap->GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	s = userinfo;
+	while ( s ) {
+		Info_NextPair( &s, key, value );
+
+		if ( !key[0] )
+			break;
+
+		lua_pushstring( L, key ); lua_pushstring( L, value ); lua_settable( L, top );
+	}
+}
 
 // Lua calls this if it panics, it'll then terminate the server with exit(EXIT_FAILURE)
 // This error should never happen in a clean release version of JA++!
@@ -421,7 +449,6 @@ static void JPLua_PostInit( lua_State *L ) {
 	for ( i=0; i<numFolders; i++ ) {
 		Q_strstrip( folderName, "/\\", NULL );
 		folderLen = strlen( folderName );
-		//folderName[folderLen] = '\0'; // not necessary?
 		if ( Q_stricmp( folderName, "." ) && Q_stricmp( folderName, ".." ) ) {
 			char fileList[16384] = {0}, *fileName = NULL;
 			int j=0, numFiles=0, fileLen=0;
@@ -432,7 +459,6 @@ static void JPLua_PostInit( lua_State *L ) {
 			for ( j=0; j<numFiles; j++ ) {
 				Q_strstrip( fileName, "/\\", NULL );
 				fileLen = strlen( fileName );
-			//	fileName[fileLen] = '\0'; // not necessary?
 				if ( !Q_stricmp( fileName, "plugin"JPLUA_EXTENSION ) ) {
 					JPLua_LoadPlugin( folderName, fileName );
 					break;

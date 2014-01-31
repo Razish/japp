@@ -7,7 +7,7 @@
 //		EVENT HANDLERS
 //================================
 
-stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
+static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 	ENUM2STRING(JPLUA_EVENT_UNLOAD),
 	ENUM2STRING(JPLUA_EVENT_RUNFRAME),
 	ENUM2STRING(JPLUA_EVENT_HUD),
@@ -77,7 +77,7 @@ void JPLua_Event_Shutdown( void ) {
 		// fire the unload event
 		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_UNLOAD] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_UNLOAD] );
-			JPLUACALL( JPLua.state, 0, 0 );
+			JPLua_Call( JPLua.state, 0, 0 );
 		}
 
 		//RAZTODO: Refcount because multiple plugins can register the same command
@@ -110,7 +110,7 @@ void JPLua_Event_RunFrame( void ) {
 	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
 		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_RUNFRAME] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_RUNFRAME] );
-			JPLUACALL( JPLua.state, 0, 0 );
+			JPLua_Call( JPLua.state, 0, 0 );
 		}
 	}
 #endif // JPLUA
@@ -123,7 +123,7 @@ qboolean JPLua_Event_HUD( void ) {
 	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
 		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_HUD] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_HUD] );
-			JPLUACALL( JPLua.state, 0, 1 );
+			JPLua_Call( JPLua.state, 0, 1 );
 			if ( !ret )
 				ret = !!lua_tointeger( JPLua.state, -1 );
 		}
@@ -144,7 +144,7 @@ char *JPLua_Event_ChatMessageRecieved( const char *msg ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CHATMSGRECV] );
 
 			lua_pushstring( JPLua.state, tmpMsg );
-			JPLUACALL( JPLua.state, 1, 1 );
+			JPLua_Call( JPLua.state, 1, 1 );
 
 			// returned nil, no use passing it to other plugins
 			if ( lua_type( JPLua.state, -1 ) == LUA_TNIL )
@@ -173,7 +173,7 @@ char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targ
 			lua_pushstring( JPLua.state, tmpMsg );
 			lua_pushinteger( JPLua.state, mode );
 			lua_pushinteger( JPLua.state, targetClient );
-			JPLUACALL( JPLua.state, 3, 1 );
+			JPLua_Call( JPLua.state, 3, 1 );
 
 			// returned nil, no use passing it to other plugins
 			if ( lua_type( JPLua.state, -1 ) == LUA_TNIL )
@@ -200,7 +200,7 @@ void JPLua_Event_ClientConnect( int clientNum ) {
 			// Create a player instance for this client number and push on stack
 			JPLua_Player_CreateRef( JPLua.state, clientNum );
 
-			JPLUACALL( JPLua.state, 1, 0 );
+			JPLua_Call( JPLua.state, 1, 0 );
 		}
 	}
 #endif // JPLUA
@@ -286,7 +286,7 @@ void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientI
 				lua_pushstring( JPLua.state, "gender" );		lua_pushnumber( JPLua.state, ci->gender );			lua_settable( JPLua.state, top1 );
 			}
 
-			JPLUACALL( JPLua.state, 3, 0 );
+			JPLua_Call( JPLua.state, 3, 0 );
 		}
 	}
 #endif
@@ -302,7 +302,7 @@ void JPLua_Event_Pain( int clientNum, int health ) {
 			JPLua_Player_CreateRef( JPLua.state, clientNum );
 			lua_pushinteger( JPLua.state, health );
 
-			JPLUACALL( JPLua.state, 2, 0 );
+			JPLua_Call( JPLua.state, 2, 0 );
 		}
 	}
 #endif // JPLUA
@@ -317,7 +317,7 @@ void JPLua_Event_SaberTouch( int victim, int attacker ) {
 			JPLua_Player_CreateRef( JPLua.state, victim );
 			JPLua_Player_CreateRef( JPLua.state, attacker );
 
-			JPLUACALL( JPLua.state, 2, 0 );
+			JPLua_Call( JPLua.state, 2, 0 );
 		}
 	}
 #endif // JPLUA
@@ -346,7 +346,7 @@ qboolean JPLua_Event_ConsoleCommand( void ) {
 					lua_settable( JPLua.state, top );
 				}
 
-				JPLUACALL( JPLua.state, 1, 0 );
+				JPLua_Call( JPLua.state, 1, 0 );
 				if ( !ret )
 					ret = qtrue;
 			}
@@ -380,7 +380,7 @@ qboolean JPLua_Event_ServerCommand( void ) {
 					lua_settable( JPLua.state, top );
 				}
 
-				JPLUACALL( JPLua.state, 1, 1 );
+				JPLua_Call( JPLua.state, 1, 1 );
 				return qtrue;
 			}
 

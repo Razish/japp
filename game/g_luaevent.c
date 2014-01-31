@@ -7,29 +7,25 @@
 //		EVENT HANDLERS
 //================================
 
-stringID_table_t jplua_events[JPLUA_EVENT_MAX] =
-{
+static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 	ENUM2STRING(JPLUA_EVENT_UNLOAD),
 	ENUM2STRING(JPLUA_EVENT_RUNFRAME),
-//	ENUM2STRING(JPLUA_EVENT_CLIENTCONNECT),
+	ENUM2STRING(JPLUA_EVENT_CLIENTCONNECT),
 	ENUM2STRING(JPLUA_EVENT_CLIENTSPAWN),
 };
 
-int JPLua_Event_AddListener( lua_State *L )
-{//Called by Lua!
+// called by lua
+int JPLua_Event_AddListener( lua_State *L ) {
 	int i = 0;
 	const char *listenerArg = lua_tostring( L, -2 );
 
-	if ( lua_type( L, -1 ) != LUA_TFUNCTION || lua_type( L, -2 ) != LUA_TSTRING )
-	{
+	if ( lua_type( L, -1 ) != LUA_TFUNCTION || lua_type( L, -2 ) != LUA_TSTRING ) {
 		G_LogPrintf( "JPLua: AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 		return 0;
 	}
 
-	for ( i=0; i<JPLUA_EVENT_MAX; i++ )
-	{//Loop 'til we find the event we want to listen for
-		if ( !Q_stricmp( listenerArg, jplua_events[i].name ) )
-		{
+	for ( i=0; i<JPLUA_EVENT_MAX; i++ ) {
+		if ( !Q_stricmp( listenerArg, jplua_events[i].name ) ) {
 			JPLua.currentPlugin->eventListeners[i] = luaL_ref( L, LUA_REGISTRYINDEX );
 			return 0;
 		}
@@ -40,21 +36,18 @@ int JPLua_Event_AddListener( lua_State *L )
 	return 0;
 }
 
-int JPLua_Event_RemoveListener( lua_State *L )
-{//Called by Lua!
+// called by lua
+int JPLua_Event_RemoveListener( lua_State *L ) {
 	int i = 0;
 	const char *listenerArg = lua_tostring( L, -1 );
 
-	if ( lua_type( L, -1 ) != LUA_TSTRING )
-	{
+	if ( lua_type( L, -1 ) != LUA_TSTRING ) {
 		G_LogPrintf( "JPLua: RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 		return 0;
 	}
 
-	for ( i=0; i<JPLUA_EVENT_MAX; i++ )
-	{//Loop 'til we find the event we want to remove the listener for
-		if ( !Q_stricmp( listenerArg, jplua_events[i].name ) )
-		{
+	for ( i=0; i<JPLUA_EVENT_MAX; i++ ) {
+		if ( !Q_stricmp( listenerArg, jplua_events[i].name ) ) {
 			luaL_unref( L, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[i] );
 			JPLua.currentPlugin->eventListeners[i] = 0;
 			return 0;
@@ -68,8 +61,7 @@ int JPLua_Event_RemoveListener( lua_State *L )
 
 #endif // JPLUA
 
-void JPLua_Event_Shutdown( void )
-{
+void JPLua_Event_Shutdown( void ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
 			JPLua.currentPlugin;
@@ -79,15 +71,15 @@ void JPLua_Event_Shutdown( void )
 		jplua_plugin_command_t *clientCmd = JPLua.currentPlugin->clientCmds, *nextClientCmd = clientCmd;
 		jplua_plugin_command_t *serverCmd = JPLua.currentPlugin->serverCmds, *nextServerCmd = serverCmd;
 
-		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_UNLOAD] )
-		{//Fire the unload event
+		// fire the unload event
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_UNLOAD] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_UNLOAD] );
-			JPLUACALL( JPLua.state, 0, 0 );
+			JPLua_Call( JPLua.state, 0, 0 );
 		}
 
 		//RAZTODO: Refcount because multiple plugins can register the same command
-		while ( nextClientCmd )
-		{//Remove all console commands
+		// remove all console commands
+		while ( nextClientCmd ) {
 			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, clientCmd->handle );
 			nextClientCmd = clientCmd->next;
 
@@ -95,8 +87,8 @@ void JPLua_Event_Shutdown( void )
 			clientCmd = nextClientCmd;
 		}
 
-		while ( nextServerCmd )
-		{//Remove all server commands
+		// remove all server commands
+		while ( nextServerCmd ) {
 			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, serverCmd->handle );
 			nextServerCmd = serverCmd->next;
 
@@ -110,67 +102,75 @@ void JPLua_Event_Shutdown( void )
 #endif // JPLUA
 }
 
-void JPLua_Event_RunFrame( void )
-{
+void JPLua_Event_RunFrame( void ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
 			JPLua.currentPlugin;
 			JPLua.currentPlugin = JPLua.currentPlugin->next
 		)
 	{
-		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_RUNFRAME] )
-		{
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_RUNFRAME] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_RUNFRAME] );
-			JPLUACALL( JPLua.state, 0, 0 );
+			JPLua_Call( JPLua.state, 0, 0 );
 		}
 	}
 #endif // JPLUA
 }
 
-void JPLua_Event_ClientSpawn( int clientNum, qboolean firstSpawn )
-{
+void JPLua_Event_ClientSpawn( int clientNum, qboolean firstSpawn ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
 			JPLua.currentPlugin;
 			JPLua.currentPlugin = JPLua.currentPlugin->next
 		)
 	{
-		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTSPAWN] )
-		{
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTSPAWN] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTSPAWN] );
 
 			// Create a player instance for this client number and push on stack
 
 			JPLua_Player_CreateRef( JPLua.state, clientNum );
 			lua_pushboolean( JPLua.state, firstSpawn );
-			JPLUACALL( JPLua.state, 2, 0 );
+			JPLua_Call( JPLua.state, 2, 0 );
 		}
 	}
 #endif
 }
 
-/*
-void JPLua_Event_ClientConnect( int clientNum )
-{
+const char *JPLua_Event_ClientConnect( int clientNum, const char *userinfo, const char *IP, qboolean firstTime ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
 			JPLua.currentPlugin;
 			JPLua.currentPlugin = JPLua.currentPlugin->next
 		)
 	{
-		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] )
-		{
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] );
 
 			// Create a player instance for this client number and push on stack
-			JPLua_Player_CreateRef( JPLua.state, clientNum );
+			lua_pushinteger( JPLua.state, clientNum );
+			JPLua_PushUserinfo( JPLua.state, clientNum );
+			lua_pushstring( JPLua.state, IP );
+			lua_pushboolean( JPLua.state, !!firstTime );
 
-			JPLUACALL( JPLua.state, 1, 0 );
+			JPLua_Call( JPLua.state, 4, 1 );
+
+			// connection allowed, pass to other plugins
+			if ( lua_type( JPLua.state, -1 ) == LUA_TNIL )
+				continue;
+
+			// denied, no use passing it to other plugins
+			if ( lua_type( JPLua.state, -1 ) == LUA_TSTRING )
+				return lua_tostring( JPLua.state, -1 );
+			else {
+				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CLIENTCONNECT), expected string or nil but got %s\n", JPLua.currentPlugin->name, lua_typename( JPLua.state, -1 ) );
+				return NULL;
+			}
 		}
 	}
 #endif
+	return NULL;
 }
-*/
 
 qboolean JPLua_Event_ClientCommand( int clientNum ) {
 	qboolean ret = qfalse;
@@ -182,15 +182,13 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 	{
 		jplua_plugin_command_t *cmd = JPLua.currentPlugin->clientCmds;
 
-		while ( cmd )
-		{
+		while ( cmd ) {
 			int top = 0, i = 0, numArgs = trap->Argc();
 			char arg1[MAX_TOKEN_CHARS] = {0};
 
 			trap->Argv( 0, arg1, sizeof( arg1 ) );
 
-			if ( !Q_stricmp( arg1, cmd->command ) )
-			{
+			if ( !Q_stricmp( arg1, cmd->command ) ) {
 				lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, cmd->handle );
 
 				lua_pushnumber( JPLua.state, clientNum );
@@ -198,8 +196,7 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 				//Push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
-				for ( i=1; i<numArgs; i++ )
-				{
+				for ( i=1; i<numArgs; i++ ) {
 					char argN[MAX_TOKEN_CHARS] = {0};
 					trap->Argv( i, argN, sizeof( argN ) );
 					lua_pushnumber( JPLua.state, i );
@@ -207,7 +204,7 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 					lua_settable( JPLua.state, top );
 				}
 
-				JPLUACALL( JPLua.state, 2, 0 );
+				JPLua_Call( JPLua.state, 2, 0 );
 				if ( !ret )
 					ret = qtrue;
 			}
@@ -219,8 +216,7 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 	return ret;
 }
 
-qboolean JPLua_Event_ServerCommand( void )
-{
+qboolean JPLua_Event_ServerCommand( void ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
 			JPLua.currentPlugin;
@@ -229,22 +225,19 @@ qboolean JPLua_Event_ServerCommand( void )
 	{
 		jplua_plugin_command_t *cmd = JPLua.currentPlugin->serverCmds;
 
-		while ( cmd )
-		{
+		while ( cmd ) {
 			int top = 0, i = 0, numArgs = trap->Argc();
 			char arg1[MAX_TOKEN_CHARS] = {0};
 
 			trap->Argv( 0, arg1, sizeof( arg1 ) );
 
-			if ( !Q_stricmp( arg1, cmd->command ) )
-			{
+			if ( !Q_stricmp( arg1, cmd->command ) ) {
 				lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, cmd->handle );
 
 				//Push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
-				for ( i=1; i<numArgs; i++ )
-				{
+				for ( i=1; i<numArgs; i++ ) {
 					char argN[MAX_TOKEN_CHARS] = {0};
 					trap->Argv( i, argN, sizeof( argN ) );
 					lua_pushnumber( JPLua.state, i );
@@ -252,7 +245,7 @@ qboolean JPLua_Event_ServerCommand( void )
 					lua_settable( JPLua.state, top );
 				}
 
-				JPLUACALL( JPLua.state, 1, 1 );
+				JPLua_Call( JPLua.state, 1, 1 );
 				return qtrue;
 			}
 

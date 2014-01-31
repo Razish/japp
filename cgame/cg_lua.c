@@ -39,6 +39,15 @@ void JPLua_DPrintf( const char *msg, ... ) {
 #endif
 }
 
+qboolean JPLua_Call( lua_State *L, int argCount, int resCount ) {
+	if ( lua_pcall( L, argCount, resCount, 0 ) ) {
+		Com_Printf( S_COLOR_GREEN"JPLua: "S_COLOR_RED"Error: %s\n", lua_tostring( L, -1 ) );
+		lua_pop( L, 1 );
+		return qfalse;
+	}
+	return qtrue;
+}
+
 // Called by the loader, never access it directly
 static const char *JPLua_LoadFile_Reader( lua_State *L, void *ud, size_t *sz ) {
 	gfd_t *gfd = (gfd_t *)ud;
@@ -413,8 +422,6 @@ int JPLua_Export_Trace( lua_State *L ) {
 
 	CG_Trace( &tr, &start, &mins, &maxs, &end, skipNumber, mask );
 
-//	CG_TestLine( start, end, 1000, 0, 1 );
-
 	lua_newtable( L );
 	top = lua_gettop( L );
 	lua_pushstring( L, "allsolid" ); lua_pushboolean( L, !!tr.allsolid ); lua_settable( L, top );
@@ -600,7 +607,6 @@ static void JPLua_PostInit( lua_State *L ) {
 	for ( i=0; i<numFolders; i++ ) {
 		Q_strstrip( folderName, "/\\", NULL );
 		folderLen = strlen( folderName );
-		//folderName[folderLen] = '\0'; // not necessary?
 		if ( Q_stricmp( folderName, "." ) && Q_stricmp( folderName, ".." ) ) {
 			char fileList[16384] = {0}, *fileName = NULL;
 			int j=0, numFiles=0, fileLen=0;
@@ -611,7 +617,6 @@ static void JPLua_PostInit( lua_State *L ) {
 			for ( j=0; j<numFiles; j++ ) {
 				Q_strstrip( fileName, "/\\", NULL );
 				fileLen = strlen( fileName );
-			//	fileName[fileLen] = '\0'; // not necessary?
 				if ( !Q_stricmp( fileName, "plugin"JPLUA_EXTENSION ) ) {
 					JPLua_LoadPlugin( folderName, fileName );
 					break;
@@ -694,7 +699,7 @@ void JPLua_Init( void ) {
 }
 
 void JPLua_Shutdown( void ) {
-	if ( JPLua.state != NULL ) {
+	if ( JPLua.state ) {
 		jplua_plugin_t *nextPlugin = JPLua.plugins;
 
 		JPLua_Event_Shutdown();

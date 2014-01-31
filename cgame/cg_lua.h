@@ -14,20 +14,14 @@
 void JPLua_Init( void );
 void JPLua_Shutdown( void );
 
-int JPLua_StackDump (lua_State *L);
+int JPLua_StackDump( lua_State *L );
 
 int JPLua_Push_ToString( lua_State *L );
 int JPLua_Push_Pairs( lua_State *L );
 
 void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize );
 void JPLua_DPrintf( const char *msg, ... );
-
-#define JPLUACALL( lua, argCount, resCount ) \
-	if ( lua_pcall( lua, argCount, resCount, 0 ) ) { \
-		char *err = (char *)lua_tostring( lua, -1 ); \
-		Com_Printf( S_COLOR_GREEN"JPLua: "S_COLOR_RED"Error: %s\n", err ); \
-		lua_pop( lua, 1 ); \
-	}
+qboolean JPLua_Call( lua_State *L, int argCount, int resCount );
 
 typedef struct jplua_cimport_table_s {
 	const char *name;
@@ -63,7 +57,5 @@ typedef struct jplua_s {
 	qboolean initialised;
 } jplua_t;
 extern jplua_t JPLua;
-
-extern stringID_table_t jplua_events[JPLUA_EVENT_MAX];
 
 #endif // JPLUA

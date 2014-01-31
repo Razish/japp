@@ -222,25 +222,9 @@ static int JPLua_Player_GetScore( lua_State *L ) {
 //Func: Player:GetUserinfo()
 //Retn: Table of userinfo keys/values
 static int JPLua_Player_GetUserinfo( lua_State *L ) {
-	const char *s;
-	char userinfo[MAX_INFO_STRING], key[BIG_INFO_KEY], value[BIG_INFO_VALUE];
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	int top = 0;
 
-	lua_newtable( L );
-	top = lua_gettop( L );
-
-	//RAZTODO: cache userinfo somehow :/
-	trap->GetUserinfo( player->clientNum, userinfo, sizeof( userinfo ) );
-	s = userinfo;
-	while ( s ) {
-		Info_NextPair( &s, key, value );
-
-		if ( !key[0] )
-			break;
-
-		lua_pushstring( L, key ); lua_pushstring( L, value ); lua_settable( L, top );
-	}
+	JPLua_PushUserinfo( L, player->clientNum );
 
 	return 1;
 }

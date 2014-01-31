@@ -226,7 +226,7 @@ const char *G_RefreshNextMap(int gametype, qboolean forced)
 		}
 
 		type = Info_ValueForKey(level.arenas.infos[n], "type");
-		
+
 		typeBits = G_GetMapTypeBits(type);
 		if (typeBits & (1 << gametype))
 		{
@@ -281,7 +281,7 @@ void G_LoadArenas( void ) {
 		G_LoadArenasFromFile(filename);
 	}
 //	trap->Print( "%i arenas parsed\n", level.arenas.num );
-	
+
 	for( n = 0; n < level.arenas.num; n++ ) {
 		Info_SetValueForKey( level.arenas.infos[n], "num", va( "%i", n ) );
 	}
@@ -315,7 +315,7 @@ void G_LoadArenas( void ) {
 		fileptr += len + 1;
 	}
 //	trap->Print( "%i arenas parsed\n", level.arenas.num );
-	
+
 	for( n = 0; n < level.arenas.num; n++ ) {
 		Info_SetValueForKey( level.arenas.infos[n], "num", va( "%i", n ) );
 	}
@@ -852,8 +852,10 @@ void G_AddBot( const char *name, float skill, const char *team, int delay, char 
 	preTeam = bot->client->sess.sessionTeam;
 
 	// have it connect to the game as a normal client
-	if ( ClientConnect( clientNum, qtrue, qtrue ) )
+	if ( ClientConnect( clientNum, qtrue, qtrue ) ) {
+		trap->DropClient( clientNum, "ClientConnect failed" );
 		return;
+	}
 
 	if ( bot->client->sess.sessionTeam != preTeam )
 	{

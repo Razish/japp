@@ -2335,6 +2335,7 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	gclient_t *client;
 	uint32_t finalCSF = 0;
 	char *value, userinfo[MAX_INFO_STRING], tmpIP[NET_ADDRSTRMAXLEN];
+	const char *result = NULL;
 
 	ent->s.number = clientNum;
 	ent->classname = "connecting";
@@ -2417,6 +2418,11 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		Com_Printf( msg ); // we build a string of client mod detection
 	}
 
+	if ( (result=JPLua_Event_ClientConnect( clientNum, userinfo, tmpIP, firstTime )) ) {
+		Com_Printf( "Denied: %s\n", result );
+		return result;
+	}
+
 	// they can connect
 	ent->client = level.clients+clientNum;
 	client = ent->client;
@@ -2470,11 +2476,13 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		Q_strncpyz( client->sess.IP, tmpIP, sizeof( client->sess.IP ) );
 	}
 
-	G_LogPrintf( "ClientConnect: %i (%s) [IP: %s]\n", clientNum, client->pers.netname, tmpIP);
+	G_LogPrintf( "ClientConnect: %i (%s) [IP: %s]\n", clientNum, client->pers.netname, tmpIP );
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
-	if ( firstTime )
-		trap->SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " %s\n\"", client->pers.netname, G_GetStringEdString("MP_SVGAME", "PLCONNECT")) );
+	if ( firstTime ) {
+		trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s\n\"", client->pers.netname,
+			G_GetStringEdString( "MP_SVGAME", "PLCONNECT" ) ) );
+	}
 
 	if ( level.gametype >= GT_TEAM && client->sess.sessionTeam != TEAM_SPECTATOR )
 		BroadcastTeamChange( client, -1 );
