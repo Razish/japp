@@ -3852,21 +3852,6 @@ void ClientSpawn(gentity_t *ent) {
 	trap->ICARUS_InitEnt( (sharedEntity_t *)ent );
 }
 
-
-/*
-===========
-ClientDisconnect
-
-Called when a player drops from the server.
-Will not be called between levels.
-
-This should NOT be called directly by any game logic,
-call trap->DropClient(), which will call this and do
-server system housekeeping.
-============
-*/
-extern void G_LeaveVehicle( gentity_t* ent, qboolean ConCheck );
-
 void G_ClearVote( gentity_t *ent ) {
 	if ( !level.voteTime )
 		return;
@@ -3885,17 +3870,28 @@ void G_ClearVote( gentity_t *ent ) {
 	ent->client->pers.vote = 0;
 }
 
+extern void G_LeaveVehicle( gentity_t *ent, qboolean ConCheck );
+
+// Called when a player drops from the server.
+// Will not be called between levels.
+// This should NOT be called directly by any game logic. Call trap->DropClient() which will call this and do server
+//	system housekeeping.
 void ClientDisconnect( int clientNum ) {
 	gentity_t *ent, *tent, *other;
 	int i;
 
-	// cleanup if we are kicking a bot that
-	// hasn't spawned yet
+	// cleanup if we are kicking a bot that hasn't spawned yet
 	G_RemoveQueuedBotBegin( clientNum );
 
 	ent = g_entities + clientNum;
-	if ( !ent->client || ent->client->pers.connected == CON_DISCONNECTED )
+	if ( !ent->client || ent->client->pers.connected == CON_DISCONNECTED ) {
+		G_LogPrintf( "ClientDisconnect: tried to disconnect an inactive client %i\n", clientNum );
 		return;
+	}
+
+	G_LogPrintf( "ClientDisconnect: %i\n", clientNum );
+
+	JPLua_Event_ClientDisconnect( clientNum );
 
 	for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
 		if ( ent->client->ps.fd.forcePowersActive & (1 << i) )
@@ -3940,8 +3936,6 @@ void ClientDisconnect( int clientNum ) {
 	if ( ent->client->hook )
 		Weapon_HookFree( ent->client->hook );
 
-	G_LogPrintf( "ClientDisconnect: %i\n", clientNum );
-
 	// if we are playing in tourney mode, give a win to the other player and clear his frags for this round
 	if ( level.gametype == GT_DUEL && !level.intermissiontime && !level.warmupTime ) {
 		if ( level.sortedClients[1] == clientNum ) {
@@ -3963,10 +3957,8 @@ void ClientDisconnect( int clientNum ) {
 		level.intermissiontime = 0;
 	}
 
-	if (ent->ghoul2 && trap->G2API_HaveWeGhoul2Models(ent->ghoul2))
-	{
-		trap->G2API_CleanGhoul2Models(&ent->ghoul2);
-	}
+	if ( ent->ghoul2 && trap->G2API_HaveWeGhoul2Models( ent->ghoul2 ) )
+		trap->G2API_CleanGhoul2Models( &ent->ghoul2 );
 
 	for ( i=0; i<MAX_SABERS; i++ ) {
 		if ( ent->client->weaponGhoul2[i] && trap->G2API_HaveWeGhoul2Models( ent->client->weaponGhoul2[i] ) )

@@ -11,7 +11,9 @@ static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 	ENUM2STRING(JPLUA_EVENT_UNLOAD),
 	ENUM2STRING(JPLUA_EVENT_RUNFRAME),
 	ENUM2STRING(JPLUA_EVENT_CLIENTCONNECT),
+	ENUM2STRING(JPLUA_EVENT_CLIENTDISCONNECT),
 	ENUM2STRING(JPLUA_EVENT_CLIENTSPAWN),
+	ENUM2STRING(JPLUA_EVENT_CLIENTCOMMAND),
 };
 
 // called by lua
@@ -147,7 +149,6 @@ const char *JPLua_Event_ClientConnect( int clientNum, const char *userinfo, cons
 		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] );
 
-			// Create a player instance for this client number and push on stack
 			lua_pushinteger( JPLua.state, clientNum );
 			JPLua_PushInfostring( JPLua.state, userinfo );
 			lua_pushstring( JPLua.state, IP );
@@ -172,6 +173,25 @@ const char *JPLua_Event_ClientConnect( int clientNum, const char *userinfo, cons
 	return NULL;
 }
 
+void JPLua_Event_ClientDisconnect( int clientNum ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins;
+			JPLua.currentPlugin;
+			JPLua.currentPlugin = JPLua.currentPlugin->next
+		)
+	{
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTDISCONNECT] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTDISCONNECT] );
+
+			// Create a player instance for this client number and push on stack
+			JPLua_Player_CreateRef( JPLua.state, clientNum );
+
+			JPLua_Call( JPLua.state, 1, 0 );
+		}
+	}
+#endif
+}
+
 qboolean JPLua_Event_ClientCommand( int clientNum ) {
 	qboolean ret = qfalse;
 #ifdef JPLUA
@@ -180,10 +200,30 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 			JPLua.currentPlugin = JPLua.currentPlugin->next
 		)
 	{
+		int top = 0, i = 0, numArgs = trap->Argc();
 		jplua_plugin_command_t *cmd = JPLua.currentPlugin->clientCmds;
 
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCOMMAND] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCOMMAND] );
+
+			// Create a player instance for this client number and push on stack
+			JPLua_Player_CreateRef( JPLua.state, clientNum );
+
+			//Push table of arguments
+			lua_newtable( JPLua.state );
+			top = lua_gettop( JPLua.state );
+			for ( i=0; i<numArgs; i++ ) {
+				char argN[MAX_TOKEN_CHARS];
+				trap->Argv( i, argN, sizeof( argN ) );
+				lua_pushnumber( JPLua.state, i+1 );
+				lua_pushstring( JPLua.state, argN );
+				lua_settable( JPLua.state, top );
+			}
+
+			JPLua_Call( JPLua.state, 2, 0 );
+		}
+
 		while ( cmd ) {
-			int top = 0, i = 0, numArgs = trap->Argc();
 			char arg1[MAX_TOKEN_CHARS] = {0};
 
 			trap->Argv( 0, arg1, sizeof( arg1 ) );
@@ -191,13 +231,13 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 			if ( !Q_stricmp( arg1, cmd->command ) ) {
 				lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, cmd->handle );
 
-				lua_pushnumber( JPLua.state, clientNum );
+				JPLua_Player_CreateRef( JPLua.state, clientNum );
 
 				//Push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
 				for ( i=1; i<numArgs; i++ ) {
-					char argN[MAX_TOKEN_CHARS] = {0};
+					char argN[MAX_TOKEN_CHARS];
 					trap->Argv( i, argN, sizeof( argN ) );
 					lua_pushnumber( JPLua.state, i );
 					lua_pushstring( JPLua.state, argN );
