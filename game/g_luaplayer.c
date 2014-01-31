@@ -223,8 +223,11 @@ static int JPLua_Player_GetScore( lua_State *L ) {
 //Retn: Table of userinfo keys/values
 static int JPLua_Player_GetUserinfo( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	char userinfo[MAX_INFO_STRING];
 
-	JPLua_PushUserinfo( L, player->clientNum );
+	trap->GetUserinfo( player->clientNum, userinfo, sizeof( userinfo ) );
+
+	JPLua_PushInfostring( L, userinfo );
 
 	return 1;
 }

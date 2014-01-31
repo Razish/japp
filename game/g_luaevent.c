@@ -149,7 +149,7 @@ const char *JPLua_Event_ClientConnect( int clientNum, const char *userinfo, cons
 
 			// Create a player instance for this client number and push on stack
 			lua_pushinteger( JPLua.state, clientNum );
-			JPLua_PushUserinfo( JPLua.state, clientNum );
+			JPLua_PushInfostring( JPLua.state, userinfo );
 			lua_pushstring( JPLua.state, IP );
 			lua_pushboolean( JPLua.state, !!firstTime );
 

@@ -22,7 +22,7 @@ void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize );
 void JPLua_DPrintf( const char *msg, ... );
 qboolean JPLua_Call( lua_State *L, int argCount, int resCount );
 
-void JPLua_PushUserinfo( lua_State *L, int clientNum );
+void JPLua_PushInfostring( lua_State *L, const char *info );
 
 typedef struct jplua_cimport_table_s {
 	const char *name;

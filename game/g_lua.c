@@ -372,17 +372,16 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 };
 static const size_t cimportsSize = ARRAY_LEN( JPLua_CImports );
 
-void JPLua_PushUserinfo( lua_State *L, int clientNum ) {
+void JPLua_PushInfostring( lua_State *L, const char *info ) {
 	const char *s;
-	char userinfo[MAX_INFO_STRING], key[BIG_INFO_KEY], value[BIG_INFO_VALUE];
+	char key[BIG_INFO_KEY], value[BIG_INFO_VALUE];
 	int top = 0;
 
 	lua_newtable( L );
 	top = lua_gettop( L );
 
 	//RAZTODO: cache userinfo somehow :/
-	trap->GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
-	s = userinfo;
+	s = info;
 	while ( s ) {
 		Info_NextPair( &s, key, value );
 
