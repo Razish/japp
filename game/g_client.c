@@ -2007,7 +2007,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	int team=TEAM_FREE, health=100, maxHealth=100;
 	const char *s=NULL;
 	char *value=NULL, userinfo[MAX_INFO_STRING], buf[MAX_INFO_STRING], oldClientinfo[MAX_INFO_STRING], model[MAX_QPATH],
-		forcePowers[MAX_QPATH], oldname[MAX_NETNAME], className[MAX_QPATH], color1[16], color2[16],
+		forcePowers[DEFAULT_FORCEPOWERS_LEN], oldname[MAX_NETNAME], className[MAX_QPATH], color1[16], color2[16],
 		cp_sbRGB1[MAX_INFO_STRING], cp_sbRGB2[MAX_INFO_STRING];
 	qboolean modelChanged = qfalse;
 	gender_t gender = GENDER_MALE;
@@ -2029,7 +2029,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	s = G_ValidateUserinfo( userinfo );
 	if ( s && *s ) {
 		G_SecurityLogPrintf( "Client %d (%s) failed userinfo validation: %s [IP: %s]\n", clientNum,
-			Info_ValueForKey( userinfo, "name" ), s, client->sess.IP );
+			ent->client->pers.netname, s, client->sess.IP );
 		trap->DropClient( clientNum, va( "Failed userinfo validation: %s", s ) );
 		G_LogPrintf( "Userinfo: %s\n", userinfo );
 		return qfalse;
@@ -2078,6 +2078,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		}
 		else {
 			trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldname, G_GetStringEdString( "MP_SVGAME", "PLRENAME" ), client->pers.netname ) );
+			G_LogPrintf( "ClientRename: %i [%s] \"%s^7\" -> \"%s^7\"\n", clientNum, ent->client->sess.IP, oldname, ent->client->pers.netname );
 			client->pers.netnameTime = level.time + 5000;
 		}
 	}
@@ -2240,11 +2241,9 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	Q_strcat( buf, sizeof( buf ), va( "n\\%s\\", client->pers.netname ) );
 	Q_strcat( buf, sizeof( buf ), va( "t\\%i\\", client->sess.sessionTeam ) );
 	Q_strcat( buf, sizeof( buf ), va( "model\\%s\\", model ) );
-
 		 if ( gender == GENDER_MALE )	Q_strcat( buf, sizeof( buf ), va( "ds\\%c\\", 'm' ) );
 	else if ( gender == GENDER_FEMALE )	Q_strcat( buf, sizeof( buf ), va( "ds\\%c\\", 'f' ) );
 	else								Q_strcat( buf, sizeof( buf ), va( "ds\\%c\\", 'n' ) );
-
 	Q_strcat( buf, sizeof( buf ), va( "st\\%s\\", client->pers.saber1 ) );
 	Q_strcat( buf, sizeof( buf ), va( "st2\\%s\\", client->pers.saber2 ) );
 	Q_strcat( buf, sizeof( buf ), va( "c1\\%s\\", color1 ) );
