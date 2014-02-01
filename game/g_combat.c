@@ -2162,6 +2162,15 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	if ( self->client->hook )
 		Weapon_HookFree( self->client->hook );
 
+	if ( self-g_entities < MAX_CLIENTS )
+	{
+		if( !(inflictor-g_entities < MAX_CLIENTS) )
+			JPLua_Event_PlayerDeath( self->s.number, meansOfDeath, -1 );
+		else
+			JPLua_Event_PlayerDeath( self->s.number, meansOfDeath, inflictor->s.number );
+		
+	}
+
 	self->client->ps.heldByClient = 0;
 	self->client->beingThrown = 0;
 	self->client->doingThrow = 0;

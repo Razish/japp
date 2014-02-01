@@ -11,6 +11,7 @@ typedef enum jplua_event_e {
 	JPLUA_EVENT_CLIENTDISCONNECT,
 	JPLUA_EVENT_CLIENTSPAWN,
 	JPLUA_EVENT_CLIENTCOMMAND,
+	JPLUA_EVENT_PLAYERDEATH,
 	JPLUA_EVENT_MAX
 } jplua_event_t;
 
@@ -26,3 +27,4 @@ void JPLua_Event_ClientDisconnect( int clientNum );
 void JPLua_Event_ClientSpawn( int clientNum, qboolean firstSpawn );
 qboolean JPLua_Event_ClientCommand( int clientNum );
 qboolean JPLua_Event_ServerCommand( void );
+void JPLua_Event_PlayerDeath( int clientNum, int death_modifier, int inflictor );
