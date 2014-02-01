@@ -85,12 +85,15 @@ void JPLua_Serialiser_IterateTableWrite( cJSON *parent, const char *name, lua_St
 		int valueType = lua_type( L, -1 );
 
 		cJSON_AddIntegerToObject( item, "key_type", keyType );
-		if ( keyType == LUA_TSTRING )
+		if ( keyType == LUA_TSTRING ) {
 			cJSON_AddStringToObject( item, "key", lua_tostring( L, -2 ) );
-		else if ( keyType == LUA_TNUMBER )
+		}
+		else if ( keyType == LUA_TNUMBER ) {
 			cJSON_AddIntegerToObject( item, "key", lua_tointeger( L, -2 ) );
-		else
+		}
+		else {
 			Com_Printf( "Can not serialise key in table %s: invalid type %s\n", name, lua_typename( L, keyType ) );
+		}
 
 		cJSON_AddIntegerToObject( item, "value_type", valueType );
 		if ( valueType == LUA_TTABLE ) {
@@ -103,12 +106,15 @@ void JPLua_Serialiser_IterateTableWrite( cJSON *parent, const char *name, lua_St
 			lua_pushvalue( L, -1 );
 			JPLua_Serialiser_IterateTableWrite( item, "value", L );
 		}
-		else if ( valueType == LUA_TNUMBER )
+		else if ( valueType == LUA_TNUMBER ) {
 			cJSON_AddNumberToObject( item, "value", lua_tonumber( L, -1 ) );
-		else if ( valueType == LUA_TBOOLEAN )
+		}
+		else if ( valueType == LUA_TBOOLEAN ) {
 			cJSON_AddIntegerToObject( item, "value", !!lua_toboolean( L, -1 ) );
-		else if ( valueType == LUA_TSTRING )
+		}
+		else if ( valueType == LUA_TSTRING ) {
 			cJSON_AddStringToObject( item, "value", lua_tostring( L, -1 ) );
+		}
 		else {
 			Com_Printf( "Can not serialise value in table %s: invalid type %s\n", name, lua_typename( L, valueType ) );
 			cJSON_Delete( item );
@@ -147,22 +153,28 @@ void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_Sta
 		if ( (tmp=cJSON_ToString( it )) )
 			Q_strncpyz( k, tmp, sizeof( k ) );
 
-		if ( kType == LUA_TSTRING )
+		if ( kType == LUA_TSTRING ) {
 			lua_pushstring( L, k );
-		else if ( kType == LUA_TNUMBER )
+		}
+		else if ( kType == LUA_TNUMBER ) {
 			lua_pushnumber( L, cJSON_ToNumber( it ) );
-		else
+		}
+		else {
 			Com_Printf( "Invalid key type %s when reading table %s\n", lua_typename( L, kType ), name );
+		}
 
 		// value must be created based on type.
 		it = cJSON_GetObjectItem( e, "value" );
 		vType = cJSON_ToInteger( cJSON_GetObjectItem( e, "value_type" ) );
-		if ( vType == LUA_TTABLE )
-			JPLua_Serialiser_IterateTableRead( it, k, L );
-		else if ( vType == LUA_TNUMBER )
+		if ( vType == LUA_TTABLE ) {
+			JPLua_Serialiser_IterateTableRead( e, "value", L );
+		}
+		else if ( vType == LUA_TNUMBER ) {
 			lua_pushnumber( L, cJSON_ToNumber( it ) );
-		else if ( vType == LUA_TBOOLEAN )
+		}
+		else if ( vType == LUA_TBOOLEAN ) {
 			lua_pushboolean( L, cJSON_ToBoolean( it ) );
+		}
 		else if ( vType == LUA_TSTRING ) {
 			char v[1024*8]; // should be plenty..
 			if ( (tmp=cJSON_ToString( it )) )

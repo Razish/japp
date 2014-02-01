@@ -599,9 +599,6 @@ void CG_ChatboxClear( void ) {
 }
 
 void CG_ChatboxEscape( void ) {
-	static int count = 0;
-	count++;
-	Com_Printf( "Closing chatbox %02i\n", count );
 	chatActive = qfalse;
 	trap->Key_SetCatcher( trap->Key_GetCatcher() & ~KEYCATCH_CGAME );
 }
