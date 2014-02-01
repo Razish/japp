@@ -312,7 +312,7 @@ void JPLua_Event_PlayerDeath( int clientNum, int death_modifier, int inflictor )
 			JPLua_Player_CreateRef( JPLua.state, clientNum ); //victim
 			lua_pushnumber( JPLua.state, death_modifier ); //method of death
 
-			if( inflictor > MAX_CLIENTS || inflictor < 0 ) //-1 will hit this (which is passed in player_die if inflictor is not a player)
+			if( inflictor >= MAX_CLIENTS || inflictor < 0 ) //-1 will hit this (which is passed in player_die if inflictor is not a player)
 				lua_pushnil( JPLua.state ); //nil because not player
 			else
 				JPLua_Player_CreateRef( JPLua.state, inflictor ); 
