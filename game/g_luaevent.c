@@ -297,7 +297,7 @@ qboolean JPLua_Event_ServerCommand( void ) {
 	return qfalse;
 }
 
-void JPLua_Event_PlayerDeath( int clientNum, int death_modifier, int inflictor )
+void JPLua_Event_PlayerDeath( int clientNum, int MOD, int inflictor )
 {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
@@ -310,7 +310,7 @@ void JPLua_Event_PlayerDeath( int clientNum, int death_modifier, int inflictor )
 
 			// Create a player instance for this client number and push on stack
 			JPLua_Player_CreateRef( JPLua.state, clientNum ); //victim
-			lua_pushnumber( JPLua.state, death_modifier ); //method of death
+			lua_pushnumber( JPLua.state, MOD ); //method of death
 
 			if( inflictor >= MAX_CLIENTS || inflictor < 0 ) //-1 will hit this (which is passed in player_die if inflictor is not a player)
 				lua_pushnil( JPLua.state ); //nil because not player
