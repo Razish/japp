@@ -524,7 +524,7 @@ static void serialize_string_ptr(const char *str, cJSON_StringBuilder *sb)
 					break;
 				default:
 					cJSON_SB_AddChar(sb, 'u');
-					snprintf(ubuff, 5, "%04x", (size_t)*(ptr-1));
+					snprintf(ubuff, 5, "%04x", (unsigned int)*(ptr-1));
 					cJSON_SB_AddStringN(sb, ubuff, 4);
 					break;
 			}

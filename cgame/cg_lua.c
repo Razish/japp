@@ -1,4 +1,3 @@
-
 #include "cg_local.h"
 #include "qcommon/q_shared.h"
 #include "json/cJSON.h"
@@ -273,16 +272,6 @@ static int JPLua_Export_RemapShader( lua_State *L ) {
 	return 0;
 }
 
-static int JPLua_Export_ResolveHostname( lua_State *L ) {
-	char buf[1024] = { 0 };
-
-	JPLua_Util_ArgAsString( L, &buf[0], sizeof( buf ) );
-
-	lua_pushnil( L );
-	lua_pushstring( L, S_COLOR_RED"ResolveHostname is not supported by this version of JA++" );
-	return 2;
-}
-
 static int JPLua_Export_AddConsoleCommand( lua_State *L ) {
 	jplua_plugin_command_t *cmd = JPLua.currentPlugin->consoleCmds;
 	int funcType = lua_type( L, 2 );
@@ -468,9 +457,9 @@ static int JPLua_RegisterPlugin( lua_State *L ) {
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	lua_pushstring( L, "name" );	lua_pushstring( L, JPLua.currentPlugin->name );		lua_settable( L, top );
-	lua_pushstring( L, "version" );	lua_pushstring( L, JPLua.currentPlugin->version );	lua_settable( L, top );
-	lua_pushstring( L, "UID" );		lua_pushinteger( L, JPLua.currentPlugin->UID );		lua_settable( L, top );
+	lua_pushstring( L, "name" );	lua_pushstring( L, JPLua.currentPlugin->name );					lua_settable( L, top );
+	lua_pushstring( L, "version" );	lua_pushstring( L, JPLua.currentPlugin->version );				lua_settable( L, top );
+	lua_pushstring( L, "UID" );		lua_pushfstring( L, "%p", (void *)JPLua.currentPlugin->UID );	lua_settable( L, top );
 
 	//save in the registry, but push on stack again straight away
 	JPLua.currentPlugin->handle = luaL_ref( L, LUA_REGISTRYINDEX );
@@ -538,7 +527,6 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	//Misc
 	{ "RemapShader", JPLua_Export_RemapShader }, // RemapShader( string oldshader, string newshader, string timeoffset )
 	{ "StartLocalSound", JPLua_Export_StartLocalSound }, // StartLocalSound( integer soundHandle, integer channelNum )
-	{ "ResolveHostname", JPLua_Export_ResolveHostname }, // string ResolveHostname( string hostname )
 	{ "GetTime", JPLua_Export_GetTime }, // integer GetTime()
 	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
 	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
@@ -584,7 +572,7 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 		JPLua.currentPlugin = nextPlugin;
 	}
 	else
-		trap->Print( "%-15s%-32s%-8s%X\n", "Loaded plugin:", JPLua.currentPlugin->name, JPLua.currentPlugin->version, JPLua.currentPlugin->UID );
+		trap->Print( "%-15s%-32s%-8s%0p\n", "Loaded plugin:", JPLua.currentPlugin->name, JPLua.currentPlugin->version, (void*)JPLua.currentPlugin->UID );
 }
 
 static void JPLua_PostInit( lua_State *L ) {

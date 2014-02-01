@@ -3,6 +3,7 @@
 #include "json/cJSON.h"
 
 #include "g_lua.h"
+#include "g_luaserialiser.h"
 
 #ifdef JPLUA
 
@@ -329,9 +330,9 @@ static int JPLua_RegisterPlugin( lua_State *L ) {
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	lua_pushstring( L, "name" );	lua_pushstring( L, JPLua.currentPlugin->name );		lua_settable( L, top );
-	lua_pushstring( L, "version" );	lua_pushstring( L, JPLua.currentPlugin->version );	lua_settable( L, top );
-	lua_pushstring( L, "UID" );		lua_pushinteger( L, JPLua.currentPlugin->UID );		lua_settable( L, top );
+	lua_pushstring( L, "name" );	lua_pushstring( L, JPLua.currentPlugin->name );					lua_settable( L, top );
+	lua_pushstring( L, "version" );	lua_pushstring( L, JPLua.currentPlugin->version );				lua_settable( L, top );
+	lua_pushstring( L, "UID" );		lua_pushfstring( L, "%p", (void *)JPLua.currentPlugin->UID );	lua_settable( L, top );
 
 	//save in the registry, but push on stack again straight away
 	JPLua.currentPlugin->handle = luaL_ref( L, LUA_REGISTRYINDEX );
@@ -353,6 +354,8 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "RegisterPlugin", JPLua_RegisterPlugin }, // plugin RegisterPlugin( string name, string version )
 	{ "AddListener", JPLua_Event_AddListener }, // AddListener( string name, function listener )
 	{ "RemoveListener", JPLua_Event_RemoveListener }, // RemoveListener( string name )
+	{ "GetSerialiser", JPLua_GetSerialiser }, // Serialiser GetSerialiser( string fileName )
+
 	{ "AddClientCommand", JPLua_Export_AddClientCommand }, // AddClientCommand( string cmd )
 	{ "AddServerCommand", JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
 
@@ -425,7 +428,7 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 		JPLua.currentPlugin = nextPlugin;
 	}
 	else
-		Com_Printf( "%-15s%-32s%-8s%X\n", "Loaded plugin:", JPLua.currentPlugin->name, JPLua.currentPlugin->version, JPLua.currentPlugin->UID );
+		Com_Printf( "%-15s%-32s%-8s%0p\n", "Loaded plugin:", JPLua.currentPlugin->name, JPLua.currentPlugin->version, (void*)JPLua.currentPlugin->UID );
 }
 
 static void JPLua_PostInit( lua_State *L ) {
@@ -520,12 +523,9 @@ void JPLua_Init( void ) {
 		lua_register( JPLua.state, JPLua_CImports[i].name, JPLua_CImports[i].function );
 
 	// Register our classes
-	/*
-	JPLua_Register_Server( JPLua.state );
-	JPLua_Register_Serialiser( JPLua.state );
-	*/
 	JPLua_Register_Player( JPLua.state );
 	JPLua_Register_Cvar( JPLua.state );
+	JPLua_Register_Serialiser( JPLua.state );
 
 	// -- FRAMEWORK INITIALISATION begin
 	lua_getglobal( JPLua.state, "tostring" );	JPLua_Framework[JPLUA_FRAMEWORK_TOSTRING]	= luaL_ref( JPLua.state, LUA_REGISTRYINDEX );
@@ -542,7 +542,7 @@ void JPLua_Init( void ) {
 }
 
 void JPLua_Shutdown( void ) {
-	if ( JPLua.state != NULL ) {
+	if ( JPLua.state ) {
 		jplua_plugin_t *nextPlugin = JPLua.plugins;
 
 		JPLua_Event_Shutdown();

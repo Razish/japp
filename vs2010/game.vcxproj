@@ -119,6 +119,7 @@
     <ClCompile Include="..\game\g_luacvar.c" />
     <ClCompile Include="..\game\g_luaevent.c" />
     <ClCompile Include="..\game\g_luaplayer.c" />
+    <ClCompile Include="..\game\g_luaserialiser.c" />
     <ClCompile Include="..\game\g_main.c" />
     <ClCompile Include="..\game\g_mem.c" />
     <ClCompile Include="..\game\g_misc.c" />

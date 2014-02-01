@@ -141,6 +141,7 @@ files['game'] = [
 	'game/g_luacvar.c',
 	'game/g_luaevent.c',
 	'game/g_luaplayer.c',
+	'game/g_luaserialiser.c',
 	'game/g_main.c',
 	'game/g_mem.c',
 	'game/g_misc.c',
@@ -292,8 +293,8 @@ files['ui'] = [
 
 # set up libraries to link with
 if plat == 'Linux':
-	libs['game'] = [ 'm' ]
-	libs['cgame'] = [ 'm' ]
+	libs['game'] = [ 'm', 'readline' ]
+	libs['cgame'] = [ 'm', 'readline' ]
 	libs['ui'] = [ 'm' ]
 elif plat == 'Windows':
 	libs['game'] = []
@@ -358,6 +359,8 @@ project = ARGUMENTS.get( 'project', '' )
 if project == 'game':
 	env['CPPPATH'] = [ '.', './game' ]
 	env['CPPDEFINES'] += [ '_GAME', 'JK2AWARDS', 'JPLUA' ]
+	if plat == 'Linux':
+		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
 	env['LIBS'] = libs['game']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'jampgame'+arch, files['game'] )
@@ -365,6 +368,8 @@ if project == 'game':
 elif project == 'cgame':
 	env['CPPPATH'] = [ '.', './cgame', './game' ]
 	env['CPPDEFINES'] += [ '_CGAME', 'JK2AWARDS', 'JPLUA' ]
+	if plat == 'Linux':
+		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
 	env['LIBS'] = libs['cgame']
 	env['LIBPREFIX'] = ''
 	env.SharedLibrary( 'cgame'+arch, files['cgame'] )
