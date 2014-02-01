@@ -257,8 +257,8 @@ void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode )
 	int len = 0;
 
 	serialiser = (jplua_serialiser_t *)lua_newuserdata( L, sizeof( jplua_serialiser_t ) );
-	Q_strncpyz( serialiser->fileName, path, sizeof( serialiser->fileName ) );
-	len = trap->FS_Open( path, &serialiser->fileHandle, mode );
+	Com_sprintf( serialiser->fileName, sizeof( serialiser->fileName ), "lua/sv/%s/%s", JPLua.currentPlugin->name, path );
+	len = trap->FS_Open( serialiser->fileName, &serialiser->fileHandle, mode );
 
 	if ( mode == FS_WRITE ) {
 		serialiser->write = qtrue;
