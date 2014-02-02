@@ -395,6 +395,15 @@ void JPLua_PushInfostring( lua_State *L, const char *info ) {
 	}
 }
 
+void JPLua_PopInfostring( lua_State *L, char *info ) {
+	lua_pushnil( L );
+	while ( lua_next( L, -2 ) ) {
+		Info_SetValueForKey( info, lua_tostring( L, -2 ), lua_tostring( L, -1 ) );
+		lua_pop( L, 1 );
+	}
+	lua_pop( L, 1 );
+}
+
 // Lua calls this if it panics, it'll then terminate the server with exit(EXIT_FAILURE)
 // This error should never happen in a clean release version of JA++!
 static int JPLuaI_Error( lua_State *L ) {

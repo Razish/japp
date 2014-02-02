@@ -190,7 +190,6 @@ void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_Sta
 //Retn: --
 int JPLua_Serialiser_AddTable( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
-	const char *tableName = NULL;
 	luaL_argcheck( L, lua_type( L, 2 ) == LUA_TSTRING, 2, "'string' expected" );
 	luaL_argcheck( L, lua_type( L, 3 ) == LUA_TTABLE, 3, "'table' expected" );
 
@@ -199,8 +198,7 @@ int JPLua_Serialiser_AddTable( lua_State *L ) {
 		return 0;
 	}
 
-	tableName = lua_tostring( L, 2 );
-	JPLua_Serialiser_IterateTableWrite( serialiser->outRoot, tableName, L );
+	JPLua_Serialiser_IterateTableWrite( serialiser->outRoot, lua_tostring( L, 2 ), L );
 
 	return 0;
 }
@@ -209,7 +207,6 @@ int JPLua_Serialiser_AddTable( lua_State *L ) {
 //Retn: table
 int JPLua_Serialiser_GetTable( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
-	const char *tableName = NULL;
 	luaL_argcheck( L, lua_type( L, 2 ) == LUA_TSTRING, 2, "'string' expected" );
 
 	if ( !serialiser->read ) {
@@ -217,8 +214,7 @@ int JPLua_Serialiser_GetTable( lua_State *L ) {
 		return 0;
 	}
 
-	tableName = lua_tostring( L, 2 );
-	JPLua_Serialiser_IterateTableRead( serialiser->inRoot, tableName, L );
+	JPLua_Serialiser_IterateTableRead( serialiser->inRoot, lua_tostring( L, 2 ), L );
 
 	return 1;
 }

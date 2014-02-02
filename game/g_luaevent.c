@@ -14,6 +14,7 @@ static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 	ENUM2STRING(JPLUA_EVENT_CLIENTDISCONNECT),
 	ENUM2STRING(JPLUA_EVENT_CLIENTSPAWN),
 	ENUM2STRING(JPLUA_EVENT_CLIENTCOMMAND),
+	ENUM2STRING(JPLUA_EVENT_CLIENTUSERINFOCHANGED),
 	ENUM2STRING(JPLUA_EVENT_PLAYERDEATH),
 };
 
@@ -297,8 +298,36 @@ qboolean JPLua_Event_ServerCommand( void ) {
 	return qfalse;
 }
 
-void JPLua_Event_PlayerDeath( int clientNum, int MOD, int inflictor )
-{
+qboolean JPLua_Event_ClientUserinfoChanged( int clientNum, char *userinfo ) {
+	qboolean ret = qfalse;
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins;
+			JPLua.currentPlugin;
+			JPLua.currentPlugin = JPLua.currentPlugin->next
+		)
+	{
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTUSERINFOCHANGED] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTUSERINFOCHANGED] );
+
+			lua_pushinteger( JPLua.state, clientNum );
+			JPLua_PushInfostring( JPLua.state, userinfo );
+
+			JPLua_Call( JPLua.state, 2, 1 );
+
+			// they wanted to modify it, parse it out and apply it
+			if ( lua_type( JPLua.state, -1 ) == LUA_TTABLE ) {
+				JPLua_PopInfostring( JPLua.state, userinfo );
+				ret = qtrue;
+			}
+			else if ( lua_type( JPLua.state, -1 ) != LUA_TNIL )
+				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CLIENTUSERINFOCHANGED), expected table or nil but got %s\n", JPLua.currentPlugin->name, lua_typename( JPLua.state, -1 ) );
+		}
+	}
+#endif
+	return ret;
+}
+
+void JPLua_Event_PlayerDeath( int clientNum, int mod, int inflictor ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins;
 			JPLua.currentPlugin;
@@ -309,13 +338,13 @@ void JPLua_Event_PlayerDeath( int clientNum, int MOD, int inflictor )
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_PLAYERDEATH] );
 
 			// Create a player instance for this client number and push on stack
-			JPLua_Player_CreateRef( JPLua.state, clientNum ); //victim
-			lua_pushnumber( JPLua.state, MOD ); //method of death
+			JPLua_Player_CreateRef( JPLua.state, clientNum ); // victim
+			lua_pushinteger( JPLua.state, mod ); // method of death
 
-			if( inflictor >= MAX_CLIENTS || inflictor < 0 ) //-1 will hit this (which is passed in player_die if inflictor is not a player)
-				lua_pushnil( JPLua.state ); //nil because not player
+			if ( inflictor >= MAX_CLIENTS || inflictor < 0 ) // -1 will hit this (which is passed in player_die if inflictor is not a player)
+				lua_pushnil( JPLua.state ); // nil because not player
 			else
-				JPLua_Player_CreateRef( JPLua.state, inflictor ); 
+				JPLua_Player_CreateRef( JPLua.state, inflictor );
 
 			JPLua_Call( JPLua.state, 3, 0 );
 		}

@@ -2014,6 +2014,9 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	trap->GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
+	if ( JPLua_Event_ClientUserinfoChanged( clientNum, userinfo ) )
+		trap->SetUserinfo( clientNum, userinfo );
+
 	//Raz: Scooper's code for userinfo spamming
 	if ( japp_antiUserinfoFlood.integer ) {
 		ent->userinfoChanged = level.time;
