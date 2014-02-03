@@ -790,7 +790,13 @@ void CG_MouseEvent(int x, int y) {
 }
 
 void CG_EventHandling( int type ) {
-	// ...
+	switch ( type ) {
+	case CGAME_EVENT_NONE:
+		CG_ChatboxClose();
+		break;
+	default:
+		break;
+	}
 }
 
 void CG_KeyEvent( int key, qboolean down ) {

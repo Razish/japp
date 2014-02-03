@@ -186,7 +186,7 @@ void CG_ChatboxOutgoing( void ) {
 	char *msg = chatField.buffer;
 
 	// remove the key catcher
-	CG_ChatboxEscape();
+	CG_ChatboxClose();
 
 	// commit the current line to history
 	CG_GetNewChatHistory( chatField.buffer );
@@ -203,7 +203,6 @@ void CG_ChatboxOutgoing( void ) {
 		trap->SendClientCommand( va( "say %s", msg ) );
 		break;
 	case CHAT_TEAM:
-	//	CG_HandleTeamBinds( chatField.buffer, sizeof( chatField.buffer ) );
 		trap->SendClientCommand( va( "say_team %s", msg ) );
 		break;
 	case CHAT_WHISPER:
@@ -598,45 +597,32 @@ void CG_ChatboxClear( void ) {
 	//TODO: Clear chat history?
 }
 
-void CG_ChatboxEscape( void ) {
-	chatActive = qfalse;
-	trap->Key_SetCatcher( trap->Key_GetCatcher() & ~KEYCATCH_CGAME );
-}
-
-void CG_MessageModeAll_f( void ) {
+void CG_ChatboxOpen( int mode ) {
 	if ( chatActive )
-		CG_ChatboxEscape();
-	chatActive = qtrue;
-	chatMode = CHAT_ALL;
-	chatTargetClient = -1;
-	Field_Clear( &chatField );
-//	chatField.widthInChars = 30;
-	trap->Key_SetCatcher( trap->Key_GetCatcher() | KEYCATCH_CGAME );
-}
-
-void CG_MessageModeTeam_f( void ) {
-	if ( chatActive )
-		CG_ChatboxEscape();
-	chatActive = qtrue;
-	chatMode = CHAT_TEAM;
-	chatTargetClient = -1;
-	Field_Clear( &chatField );
-//	chatField.widthInChars = 25;
-	trap->Key_SetCatcher( trap->Key_GetCatcher() | KEYCATCH_CGAME );
-}
-
-void CG_MessageModeTell_f( void ) {
-	if ( chatActive )
-		CG_ChatboxEscape();
-
-	if ( (chatTargetClient = CG_CrosshairPlayer()) == -1 )
 		return;
 
+	switch ( mode ) {
+	case CHAT_ALL:
+	case CHAT_TEAM:
+		chatTargetClient = -1;
+		break;
+	case CHAT_WHISPER:
+		if ( (chatTargetClient = CG_CrosshairPlayer()) == -1 )
+			return;
+		break;
+	default:
+		break;
+	}
+
 	chatActive = qtrue;
-	chatMode = CHAT_WHISPER;
+	chatMode = mode;
 	Field_Clear( &chatField );
-//	chatField.widthInChars = 25;
 	trap->Key_SetCatcher( trap->Key_GetCatcher() | KEYCATCH_CGAME );
+}
+
+void CG_ChatboxClose( void ) {
+	chatActive = qfalse;
+	trap->Key_SetCatcher( trap->Key_GetCatcher() & ~KEYCATCH_CGAME );
 }
 
 static void Field_CharEvent( field_t *edit, int key ) {
@@ -710,11 +696,6 @@ static void Field_CharEvent( field_t *edit, int key ) {
 		case A_CURSOR_DOWN:
 			CG_ChatboxHistoryDn();
 			break;
-
-		//RAZFIXME: A_ESCAPE doesn't work, engine is eating it?
-	//	case A_ESCAPE:
-	//		CG_ChatboxEscape();
-	//		break;
 
 		case A_CURSOR_RIGHT:
 			if ( edit->cursor < fieldLen )

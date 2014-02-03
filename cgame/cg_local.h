@@ -2076,31 +2076,26 @@ qboolean CG_ContainsChannelEscapeChar( char *text );
 char *CG_RemoveChannelEscapeChar( char *text );
 
 // chatbox tabs
+
+void CG_ChatboxOpen( int mode );
+void CG_ChatboxClose( void );
+void CG_ChatboxClear( void );
+void CG_ChatboxOutgoing( void );
+void CG_ChatboxChar( int key );
+void CG_ChatboxTabComplete( void );
+
+// navigation
+void CG_ChatboxScroll( int direction );
+void CG_ChatboxHistoryUp( void );
+void CG_ChatboxHistoryDn( void );
 void CG_ChatboxSelectTabNext( void );
 void CG_ChatboxSelectTabNextNoKeys( void );
 void CG_ChatboxSelectTabPrevNoKeys( void );
 void CG_ChatboxSelect( char *cbName );
-
-// chatbox history
-void CG_ChatboxHistoryUp( void );
-void CG_ChatboxHistoryDn( void );
-
-// chatbox events
-void CG_MessageModeAll_f( void );
-void CG_MessageModeTeam_f( void );
-void CG_MessageModeTell_f( void );
-void CG_ChatboxTabComplete( void );
-void CG_ChatboxScroll( int direction );
-void CG_ChatboxChar( int key );
-void CG_ChatboxOutgoing( void );
-void CG_ChatboxClear( void );
-
-// chatbox management
+void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *cbName );
 void CG_ChatboxInit( void );
 qboolean CG_ChatboxActive( void );
 void CG_ChatboxDraw( void );
-void CG_ChatboxEscape( void );
-void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *cbName );
 
 
 refdef_t *CG_GetRefdef( void );

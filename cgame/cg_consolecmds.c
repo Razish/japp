@@ -341,6 +341,17 @@ static void CG_HudReload_f( void ) {
 	CG_LoadMenus( hudSet );
 }
 
+void CG_MessageModeAll_f( void ) {
+	CG_ChatboxOpen( CHAT_ALL );
+}
+
+void CG_MessageModeTeam_f( void ) {
+	CG_ChatboxOpen( CHAT_TEAM );
+}
+
+void CG_MessageModeTell_f( void ) {
+	CG_ChatboxOpen( CHAT_WHISPER );
+}
 
 typedef struct command_s {
 	const char *name;
