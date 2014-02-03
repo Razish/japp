@@ -32,47 +32,6 @@ static int JPLua_Serialiser_ToString( lua_State *L ) {
 	return 1;
 }
 
-/*
-{
-	"test" : [{
-			"key_type" : 4,
-			"key" : "pos",
-			"value_type" : 5,
-			"value" : [{
-					"key_type" : 4,
-					"key" : "x",
-					"value_type" : 3,
-					"value" : 100
-				}, {
-					"key_type" : 4,
-					"key" : "z",
-					"value_type" : 3,
-					"value" : 300
-				}, {
-					"key_type" : 4,
-					"key" : "y",
-					"value_type" : 3,
-					"value" : 200
-				}]
-		}, {
-			"key_type" : 4,
-			"key" : "tab",
-			"value_type" : 5,
-			"value" : [{
-					"key_type" : 4,
-					"key" : "merp",
-					"value_type" : 3,
-					"value" : 1337
-				}]
-		}, {
-			"key_type" : 4,
-			"key" : "herp",
-			"value_type" : 4,
-			"value" : "derp"
-		}]
-}
-*/
-
 void JPLua_Serialiser_IterateTableWrite( cJSON *parent, const char *name, lua_State *L ) {
 	cJSON *table = cJSON_CreateArray();
 	int tableIndex = lua_gettop( L );
@@ -186,12 +145,21 @@ void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_Sta
 	}
 }
 
+int JPLua_Serialiser_Close( lua_State *L );
+
 //Func: AddTable( string name, table )
 //Retn: --
 int JPLua_Serialiser_AddTable( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
-	luaL_argcheck( L, lua_type( L, 2 ) == LUA_TSTRING, 2, "'string' expected" );
-	luaL_argcheck( L, lua_type( L, 3 ) == LUA_TTABLE, 3, "'table' expected" );
+
+	if ( lua_type( L, 2 ) != LUA_TSTRING )  {
+		JPLua_Serialiser_Close( L );
+		luaL_argcheck( L, 1, 2, "'string' expected" );
+	}
+	if ( lua_type( L, 3 ) != LUA_TTABLE ) {
+		JPLua_Serialiser_Close( L );
+		luaL_argcheck( L, 1, 3, "'table' expected" );
+	}
 
 	if ( !serialiser->write ) {
 		Com_Printf( "Serialiser is not available to write table\n" );
@@ -207,7 +175,11 @@ int JPLua_Serialiser_AddTable( lua_State *L ) {
 //Retn: table
 int JPLua_Serialiser_GetTable( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
-	luaL_argcheck( L, lua_type( L, 2 ) == LUA_TSTRING, 2, "'string' expected" );
+
+	if ( lua_type( L, 2 ) != LUA_TSTRING )  {
+		JPLua_Serialiser_Close( L );
+		luaL_argcheck( L, 1, 2, "'string' expected" );
+	}
 
 	if ( !serialiser->read ) {
 		Com_Printf( "Serialiser is not available to read table\n" );

@@ -1354,11 +1354,8 @@ number DistanceSquared( const vector3 *p1, const vector3 *p2 ) {
 
 // fast vector normalize routine that does not check to make sure
 // that length != 0, nor does it return length, uses rsqrt approximation
-void VectorNormalizeFast( vector3 *vec )
-{
-	float ilength;
-
-	ilength = Q_rsqrt( DotProduct( vec, vec ) );
+void VectorNormalizeFast( vector3 *vec ) {
+	float ilength = Q_rsqrt( DotProduct( vec, vec ) );
 
 	vec->x *= ilength;
 	vec->y *= ilength;
@@ -1366,31 +1363,24 @@ void VectorNormalizeFast( vector3 *vec )
 }
 
 number VectorNormalize( vector3 *vec ) {
-	float length, ilength;
-
-	length = vec->x*vec->x + vec->y*vec->y + vec->z*vec->z;
-	length = sqrt( length );
+	float length = DotProduct( vec, vec );
 
 	if ( length ) {
-		ilength = 1/length;
-		vec->x *= ilength;
-		vec->y *= ilength;
-		vec->z *= ilength;
+		float reciprocal = 1.0f/(float)sqrt( length );
+		length *= reciprocal;
+		VectorScale( vec, reciprocal, vec );
 	}
 
 	return length;
 }
 
 number VectorNormalize2( const vector3 *vec, vector3 *vecOut ) {
-	float length, ilength;
-
-	length = sqrtf( vec->x*vec->x + vec->y*vec->y + vec->z*vec->z );
+	float length = DotProduct( vec, vec );
 
 	if ( length ) {
-		ilength = 1/length;
-		vecOut->x = vec->x * ilength;
-		vecOut->y = vec->y * ilength;
-		vecOut->z = vec->z * ilength;
+		float reciprocal = 1.0f/(float)sqrtf( length );
+		length *= reciprocal;
+		VectorScale( vec, reciprocal, vecOut );
 	}
 	else
 		VectorClear( vecOut );

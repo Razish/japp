@@ -20,10 +20,11 @@ int JPLua_GetPlayer( lua_State *L ) {
 		int i=0;
 		//RAZTODO: copy G_ClientFromString
 		for ( i=0; i<cgs.maxclients; i++ ) {
-			char nameClean[36] = {0};
-			char nameClean2[36] = {0};
+			char nameClean[36], nameClean2[36];
+
 			if ( !cgs.clientinfo[i].infoValid )
 				continue;
+
 			Q_strncpyz( nameClean, cgs.clientinfo[i].name, sizeof( nameClean ) );
 			Q_strncpyz( nameClean2, name, sizeof( nameClean2 ) );
 			Q_CleanString( nameClean, STRIP_COLOUR );
@@ -98,9 +99,9 @@ static int JPLua_Player_GetAmmo( lua_State *L ) {
 //Func: Player:GetAngles()
 //Retn: Table of pitch/yaw/roll view angles
 static int JPLua_Player_GetAngles( lua_State *L ) {
-	int top = 0;
+	int top;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	vector3 angles = { 0.0f };
+	vector3 angles;
 
 	if ( player->clientNum == cg.clientNum )
 		VectorCopy( &cg.predictedPlayerState.viewangles, &angles );
@@ -120,11 +121,7 @@ static int JPLua_Player_GetAngles( lua_State *L ) {
 //Func: Player:GetAnimations()
 //Retn: Table of Legs/Torso anims and Legs/Torso timers
 static int JPLua_Player_GetAnimations( lua_State *L ) {
-	int top = 0;
-	int torsoAnim = 0;
-	int torsoTimer = 0;
-	int legsAnim = 0;
-	int legsTimer = 0;
+	int top, torsoAnim, legsAnim, torsoTimer = 0, legsTimer = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 
 	if ( player->clientNum == cg.clientNum ) {
@@ -342,9 +339,9 @@ static int JPLua_Player_GetName( lua_State *L ) {
 //Func: Player:GetPosition()
 //Retn: Table of x/y/z position
 static int JPLua_Player_GetPosition( lua_State *L ) {
-	int top = 0;
+	int top;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	vector3 position = { 0.0f };
+	vector3 position;
 
 	if ( player->clientNum == cg.clientNum )
 		VectorCopy( &cg.predictedPlayerState.origin, &position );
@@ -375,9 +372,9 @@ static int JPLua_Player_GetSaberStyle( lua_State *L ) {
 //Func: Player:GetVelocity()
 //Retn: Table of x/y/z velocity
 static int JPLua_Player_GetVelocity( lua_State *L ) {
-	int top = 0;
+	int top;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	vector3 velocity = { 0.0f };
+	vector3 velocity;
 
 	if ( player->clientNum == cg.clientNum )
 		VectorCopy( &cg.predictedPlayerState.velocity, &velocity );
@@ -405,6 +402,7 @@ static int JPLua_Player_GetWeapon( lua_State *L ) {
 //Retn: boolean expressing whether the Player is alive
 static int JPLua_Player_IsAlive( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+
 	//RAZFIXME: Check clientNum bounds
 	if ( player->clientNum == cg.clientNum ) {
 		if ( cg.predictedPlayerState.stats[STAT_HEALTH] > 0 && !(cg.predictedPlayerState.eFlags & EF_DEAD) && cg.predictedPlayerState.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {

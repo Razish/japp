@@ -15,7 +15,7 @@ static const char *baseDir = "lua/";
 static const char *pluginDir = "lua/sv/";
 #define JPLUA_EXTENSION ".lua"
 
-jplua_t JPLua = { 0 };
+jplua_t JPLua;
 
 #define JPLUA_LOAD_CHUNKSIZE 1024
 
@@ -28,10 +28,10 @@ typedef struct gfd_s {// JPLua File Data
 void JPLua_DPrintf( const char *msg, ... ) {
 #ifdef JPLUA_DEBUG
 	va_list argptr;
-	char text[1024] = { 0 };
+	char text[1024] = {0};
 
 	va_start( argptr, msg );
-	vsprintf( text, msg, argptr );
+	Q_vsnprintf( text, sizeof( text ), msg, argptr );
 	va_end( argptr );
 
 	Com_Printf( "%s", text );
@@ -71,9 +71,9 @@ static const char *JPLua_LoadFile_Reader( lua_State *L, void *ud, size_t *sz ) {
 // Loads a file using JA's FS functions, only use THIS to load files into lua!
 int JPLua_LoadFile( lua_State *L, const char *file ) {
 	fileHandle_t f = 0;
-	int	len	= trap->FS_Open( file, &f, FS_READ );
+	int len = trap->FS_Open( file, &f, FS_READ );
 	gfd_t gfd;
-	int	status;
+	int status;
 
 	// file doesn't exist
 	if ( !f || len <= 0 ) {
@@ -141,7 +141,7 @@ int JPLua_Push_Pairs( lua_State *L ) {
 }
 
 void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize ) {
-	int args = lua_gettop(L);
+	int args = lua_gettop( L );
 	const char *res;
 	int i;
 
@@ -163,9 +163,9 @@ void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize ) {
 }
 
 static int JPLua_Export_Print( lua_State *L ) {
-	char buf[16384] = { 0 };
+	char buf[16384] = {0};
 
-	JPLua_Util_ArgAsString( L, &buf[0], sizeof( buf ) );
+	JPLua_Util_ArgAsString( L, buf, sizeof( buf ) );
 	trap->Print( "%s\n", buf );
 
 	return 0;
@@ -180,7 +180,7 @@ static int JPLua_Export_Require( lua_State *L ) {
 static int JPLua_Export_AddClientCommand( lua_State *L ) {
 	jplua_plugin_command_t *cmd = JPLua.currentPlugin->clientCmds;
 
-	if ( lua_type( L, -1 ) != LUA_TFUNCTION || lua_type( L, -2 ) != LUA_TSTRING ) {
+	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
 		G_LogPrintf( "JPLua: AddClientCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->name );
 		return 0;
 	}
@@ -208,7 +208,7 @@ static int JPLua_Export_AddClientCommand( lua_State *L ) {
 static int JPLua_Export_AddServerCommand( lua_State *L ) {
 	jplua_plugin_command_t *cmd = JPLua.currentPlugin->serverCmds;
 
-	if ( lua_type( L, -1 ) != LUA_TFUNCTION || lua_type( L, -2 ) != LUA_TSTRING ) {
+	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
 		G_LogPrintf( "JPLua: AddServerCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->name );
 		return 0;
 	}
@@ -261,12 +261,11 @@ static int JPLua_Export_GetRealTime( lua_State *L ) {
 }
 
 int JPLua_Export_Trace( lua_State *L ) {
-	trace_t tr={0};
-	vector3 start={0},end={0};
-	float size=0;
-	vector3 mins={0},maxs={0};
-	int skipNumber=0,mask=0;
-	int top=0, top2=0, top3=0;
+	trace_t tr;
+	vector3 start, end, mins, maxs;
+	float size;
+	int skipNumber, mask;
+	int top, top2, top3;
 
 	lua_getfield( L, 1, "x" ); start.x = lua_tonumber( L, -1 );
 	lua_getfield( L, 1, "y" ); start.y = lua_tonumber( L, -1 );
@@ -318,10 +317,10 @@ int JPLua_Export_Trace( lua_State *L ) {
 }
 
 static int JPLua_RegisterPlugin( lua_State *L ) {
-	int top = 0;
+	int top;
 
-	Q_strncpyz( JPLua.currentPlugin->name, lua_tostring( L, 1 ), sizeof( JPLua.currentPlugin->name ) );
-	Q_CleanString( JPLua.currentPlugin->name, STRIP_COLOUR );
+	Q_strncpyz( JPLua.currentPlugin->longname, lua_tostring( L, 1 ), sizeof( JPLua.currentPlugin->longname ) );
+	Q_CleanString( JPLua.currentPlugin->longname, STRIP_COLOUR );
 	Q_strncpyz( JPLua.currentPlugin->version, lua_tostring( L, 2 ), sizeof( JPLua.currentPlugin->version ) );
 	Q_CleanString( JPLua.currentPlugin->version, STRIP_COLOUR );
 	JPLua.currentPlugin->requiredJPLuaVersion = lua_isnumber( L, 3 ) ? lua_tointeger( L, 3 ) : JPLua.version;
@@ -330,7 +329,7 @@ static int JPLua_RegisterPlugin( lua_State *L ) {
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	lua_pushstring( L, "name" );	lua_pushstring( L, JPLua.currentPlugin->name );					lua_settable( L, top );
+	lua_pushstring( L, "name" );	lua_pushstring( L, JPLua.currentPlugin->longname );				lua_settable( L, top );
 	lua_pushstring( L, "version" );	lua_pushstring( L, JPLua.currentPlugin->version );				lua_settable( L, top );
 	lua_pushstring( L, "UID" );		lua_pushfstring( L, "%p", (void *)JPLua.currentPlugin->UID );	lua_settable( L, top );
 
@@ -408,7 +407,7 @@ void JPLua_PopInfostring( lua_State *L, char *info ) {
 // This error should never happen in a clean release version of JA++!
 static int JPLuaI_Error( lua_State *L ) {
 	trap->Print( S_COLOR_RED"*************** JA++ LUA ERROR ***************" );
-	trap->Print( S_COLOR_RED"unprotected error in call to Lua API (%s)\n", lua_tostring(L,-1) );
+	trap->Print( S_COLOR_RED"unprotected error in call to Lua API (%s)\n", lua_tostring( L, -1 ) );
 	return 0;
 }
 
@@ -424,7 +423,8 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 	}
 
 	memset( JPLua.currentPlugin, 0, sizeof( jplua_plugin_t ) );
-	Q_strncpyz( JPLua.currentPlugin->name, "<null>", sizeof( JPLua.currentPlugin->name ) );
+	Q_strncpyz( JPLua.currentPlugin->longname, "<null>", sizeof( JPLua.currentPlugin->longname ) );
+	Q_strncpyz( JPLua.currentPlugin->name, pluginName, sizeof( JPLua.currentPlugin->name ) );
 	JPLua_LoadFile( JPLua.state, va( "%s%s/%s", pluginDir, pluginName, fileName ) );
 
 	if ( JPLua.currentPlugin->requiredJPLuaVersion > JPLua.version ) {
@@ -437,7 +437,7 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 		JPLua.currentPlugin = nextPlugin;
 	}
 	else
-		Com_Printf( "%-15s%-32s%-8s%0p\n", "Loaded plugin:", JPLua.currentPlugin->name, JPLua.currentPlugin->version, (void*)JPLua.currentPlugin->UID );
+		Com_Printf( "%-15s%-32s%-8s%0p\n", "Loaded plugin:", JPLua.currentPlugin->longname, JPLua.currentPlugin->version, (void*)JPLua.currentPlugin->UID );
 }
 
 static void JPLua_PostInit( lua_State *L ) {

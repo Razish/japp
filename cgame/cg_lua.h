@@ -35,7 +35,7 @@ typedef struct jplua_plugin_command_s {
 } jplua_plugin_command_t;
 
 typedef struct jplua_plugin_s {
-	char name[32];
+	char name[32], longname[32];
 	char version[8];
 	unsigned int requiredJPLuaVersion;
 	intptr_t UID;

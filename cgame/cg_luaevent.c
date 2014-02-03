@@ -22,9 +22,9 @@ static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 // called by Lua
 int JPLua_Event_AddListener( lua_State *L ) {
 	int i = 0;
-	const char *listenerArg = lua_tostring( L, -2 );
+	const char *listenerArg = lua_tostring( L, 1 );
 
-	if ( lua_type( L, -1 ) != LUA_TFUNCTION || lua_type( L, -2 ) != LUA_TSTRING ) {
+	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
 		trap->Print( "JPLua: AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 		return 0;
 	}
@@ -45,9 +45,9 @@ int JPLua_Event_AddListener( lua_State *L ) {
 // called by Lua
 int JPLua_Event_RemoveListener( lua_State *L ) {
 	int i = 0;
-	const char *listenerArg = lua_tostring( L, -1 );
+	const char *listenerArg = lua_tostring( L, 1 );
 
-	if ( lua_type( L, -1 ) != LUA_TSTRING ) {
+	if ( lua_type( L, 1 ) != LUA_TSTRING ) {
 		trap->Print( "JPLua: RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 		return 0;
 	}
@@ -337,6 +337,7 @@ qboolean JPLua_Event_ConsoleCommand( void ) {
 			if ( !Q_stricmp( CG_Argv( 0 ), cmd->command ) && cmd->handle ) {
 				lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, cmd->handle );
 
+				lua_pushstring( JPLua.state, CG_Argv( 0 ) );
 				// push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
@@ -346,7 +347,9 @@ qboolean JPLua_Event_ConsoleCommand( void ) {
 					lua_settable( JPLua.state, top );
 				}
 
-				JPLua_Call( JPLua.state, 1, 0 );
+				lua_pushstring( JPLua.state, ConcatArgs( 0 ) );
+
+				JPLua_Call( JPLua.state, 3, 0 );
 				if ( !ret )
 					ret = qtrue;
 			}
@@ -365,10 +368,9 @@ qboolean JPLua_Event_ServerCommand( void ) {
 		jplua_plugin_command_t *cmd = JPLua.currentPlugin->serverCmds;
 
 		while ( cmd ) {
-			int top = 0;
-			int i = 0;
-
 			if ( !Q_stricmp( CG_Argv( 0 ), cmd->command ) ) {
+				int top, i;
+
 				lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, cmd->handle );
 
 				//Push table of arguments
@@ -380,7 +382,7 @@ qboolean JPLua_Event_ServerCommand( void ) {
 					lua_settable( JPLua.state, top );
 				}
 
-				JPLua_Call( JPLua.state, 1, 1 );
+				JPLua_Call( JPLua.state, 1, 0 );
 				return qtrue;
 			}
 

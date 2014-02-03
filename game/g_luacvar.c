@@ -78,7 +78,7 @@ static int JPLua_Cvar_GetFlags( lua_State *L ) {
 //Retn: integer of the Cvar's value
 static int JPLua_Cvar_GetInteger( lua_State *L ) {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
-	char buf[MAX_CVAR_VALUE_STRING] = {0};
+	char buf[MAX_CVAR_VALUE_STRING];
 
 	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
 	if ( buf[0] )
@@ -93,7 +93,7 @@ static int JPLua_Cvar_GetInteger( lua_State *L ) {
 //Retn: string of the Cvar's value
 static int JPLua_Cvar_GetString( lua_State *L ) {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
-	char buf[MAX_CVAR_VALUE_STRING] = {0};
+	char buf[MAX_CVAR_VALUE_STRING];
 
 	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
 	if ( buf[0] )
@@ -108,7 +108,7 @@ static int JPLua_Cvar_GetString( lua_State *L ) {
 //Retn: floating point number of the Cvar's value
 static int JPLua_Cvar_GetFloat( lua_State *L ) {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
-	char buf[MAX_CVAR_VALUE_STRING] = {0};
+	char buf[MAX_CVAR_VALUE_STRING];
 
 	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
 	if ( buf[0] )
@@ -142,8 +142,8 @@ static int JPLua_Cvar_Set( lua_State *L ) {
 // Push a Cvar instance for a client number onto the stack
 void JPLua_Cvar_CreateRef( lua_State *L, const char *name ) {
 	jplua_cvar_t *luaCvar = NULL;
+	char buf[MAX_CVAR_VALUE_STRING];
 
-	char buf[MAX_CVAR_VALUE_STRING] = {0};
 	trap->Cvar_VariableStringBuffer( name, buf, sizeof( buf ) );
 	if ( !buf[0] ) { //RAZFIXME: This isn't exactly reliable. Could be an empty cvar.
 		lua_pushnil( L );

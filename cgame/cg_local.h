@@ -2060,6 +2060,8 @@ void CG_ScoresDown_f( void );
 void CG_TrueViewInit( void );
 void CG_AdjustEyePos( const char *modelName );
 
+char *ConcatArgs( int start );
+
 qboolean Server_Supports( uint32_t supportFlag );
 void HandleTeamBinds( char *buf, int bufsize );
 

@@ -81,14 +81,16 @@ static int JPLua_Player_GetAmmo( lua_State *L ) {
 static int JPLua_Player_GetAnimations( lua_State *L ) {
 	int top = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	playerState_t *ps = &g_entities[player->clientNum].client->ps;
 
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	lua_pushstring( L, "torsoAnim" ); lua_pushnumber( L, level.clients[player->clientNum].ps.torsoAnim ); lua_settable( L, top );
-	lua_pushstring( L, "torsoTimer" ); lua_pushnumber( L, level.clients[player->clientNum].ps.torsoTimer ); lua_settable( L, top );
-	lua_pushstring( L, "legsAnim" ); lua_pushnumber( L, level.clients[player->clientNum].ps.legsAnim ); lua_settable( L, top );
-	lua_pushstring( L, "legsTimer" ); lua_pushnumber( L, level.clients[player->clientNum].ps.legsTimer ); lua_settable( L, top );
+	lua_pushstring( L, "torsoAnim" ); lua_pushnumber( L, ps->torsoAnim ); lua_settable( L, top );
+	lua_pushstring( L, "torsoTimer" ); lua_pushnumber( L, ps->torsoTimer ); lua_settable( L, top );
+	lua_pushstring( L, "legsAnim" ); lua_pushnumber( L, ps->legsAnim ); lua_settable( L, top );
+	lua_pushstring( L, "legsTimer" ); lua_pushnumber( L, ps->legsTimer ); lua_settable( L, top );
+
 	return 1;
 }
 

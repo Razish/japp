@@ -21,9 +21,9 @@ static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 // called by lua
 int JPLua_Event_AddListener( lua_State *L ) {
 	int i = 0;
-	const char *listenerArg = lua_tostring( L, -2 );
+	const char *listenerArg = lua_tostring( L, 1 );
 
-	if ( lua_type( L, -1 ) != LUA_TFUNCTION || lua_type( L, -2 ) != LUA_TSTRING ) {
+	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
 		G_LogPrintf( "JPLua: AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 		return 0;
 	}
@@ -43,9 +43,9 @@ int JPLua_Event_AddListener( lua_State *L ) {
 // called by lua
 int JPLua_Event_RemoveListener( lua_State *L ) {
 	int i = 0;
-	const char *listenerArg = lua_tostring( L, -1 );
+	const char *listenerArg = lua_tostring( L, 1 );
 
-	if ( lua_type( L, -1 ) != LUA_TSTRING ) {
+	if ( lua_type( L, 1 ) != LUA_TSTRING ) {
 		G_LogPrintf( "JPLua: RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 		return 0;
 	}
@@ -202,7 +202,7 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 			JPLua.currentPlugin = JPLua.currentPlugin->next
 		)
 	{
-		int top = 0, i = 0, numArgs = trap->Argc();
+		int top, i, numArgs = trap->Argc();
 		jplua_plugin_command_t *cmd = JPLua.currentPlugin->clientCmds;
 
 		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCOMMAND] ) {
@@ -226,7 +226,7 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 		}
 
 		while ( cmd ) {
-			char arg1[MAX_TOKEN_CHARS] = {0};
+			char arg1[MAX_TOKEN_CHARS];
 
 			trap->Argv( 0, arg1, sizeof( arg1 ) );
 
@@ -268,8 +268,8 @@ qboolean JPLua_Event_ServerCommand( void ) {
 		jplua_plugin_command_t *cmd = JPLua.currentPlugin->serverCmds;
 
 		while ( cmd ) {
-			int top = 0, i = 0, numArgs = trap->Argc();
-			char arg1[MAX_TOKEN_CHARS] = {0};
+			int top, i, numArgs = trap->Argc();
+			char arg1[MAX_TOKEN_CHARS];
 
 			trap->Argv( 0, arg1, sizeof( arg1 ) );
 
@@ -280,7 +280,7 @@ qboolean JPLua_Event_ServerCommand( void ) {
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
 				for ( i=1; i<numArgs; i++ ) {
-					char argN[MAX_TOKEN_CHARS] = {0};
+					char argN[MAX_TOKEN_CHARS];
 					trap->Argv( i, argN, sizeof( argN ) );
 					lua_pushnumber( JPLua.state, i );
 					lua_pushstring( JPLua.state, argN );

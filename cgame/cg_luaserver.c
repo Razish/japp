@@ -43,8 +43,7 @@ static int JPLua_Server_GetSSF( lua_State *L ) {
 //Func: Server:GetPlayers()
 //Retn: Indexed table of Player objects ordered by clientNum
 static int JPLua_Server_GetPlayers( lua_State *L ) {
-	int top = 0;
-	int i = 1, clientNum = 0;
+	int top, i = 1, clientNum;
 
 	lua_newtable( L );
 	top = lua_gettop( L );

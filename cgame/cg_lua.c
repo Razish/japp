@@ -15,7 +15,7 @@ static const char *baseDir = "lua/";
 static const char *pluginDir = "lua/cl/";
 #define JPLUA_EXTENSION ".lua"
 
-jplua_t JPLua = { 0 };
+jplua_t JPLua;
 
 #define JPLUA_LOAD_CHUNKSIZE 1024
 
@@ -28,7 +28,7 @@ typedef struct gfd_s {// JPLua File Data
 void JPLua_DPrintf( const char *msg, ... ) {
 #ifdef JPLUA_DEBUG
 	va_list argptr;
-	char text[1024] = { 0 };
+	char text[1024] = {0};
 
 	va_start( argptr, msg );
 	Q_vsnprintf( text, sizeof( text ), msg, argptr );
@@ -70,10 +70,10 @@ static const char *JPLua_LoadFile_Reader( lua_State *L, void *ud, size_t *sz ) {
 
 // Loads a file using JA's FS functions, only use THIS to load files into lua!
 int JPLua_LoadFile( lua_State *L, const char *file ) {
-	fileHandle_t	f		= 0;
-	int				len		= trap->FS_Open( file, &f, FS_READ );
-	gfd_t			gfd;
-	int				status;
+	fileHandle_t f = 0;
+	int len = trap->FS_Open( file, &f, FS_READ );
+	gfd_t gfd;
+	int status;
 
 	// File doesn't exist
 	if ( !f || len <= 0 ) {
@@ -173,10 +173,10 @@ void JPLua_TableToColour( vector4 *out, lua_State *L, int idx ) {
 }
 
 static int JPLua_Export_Print( lua_State *L ) {
-	char buf[15360] = { 0 };
+	char buf[16384] = {0};
 
 	JPLua_Util_ArgAsString( L, buf, sizeof( buf ) );
-	Com_Printf( buf );
+	Com_Printf( "%s", buf );
 
 	return 0;
 }
@@ -207,26 +207,25 @@ static int JPLua_Export_DrawText( lua_State *L ) {
 }
 
 static int JPLua_Export_DrawPic( lua_State *L ) {
-	int shader = 0;
-	vector4 colour = { 1.0f };
-	int height = 0, width = 0, y = 0, x = 0;
+	vector4 colour;
+	int x, y, w, h, shader;
 
-	shader		= (int)lua_tonumber( L, -1 );
-	JPLua_TableToColour( &colour, L, -2 );
-	height		= (int)lua_tonumber( L, -3 );
-	width		= (int)lua_tonumber( L, -4 );
-	y			= (int)lua_tonumber( L, -5 );
-	x			= (int)lua_tonumber( L, -6 );
+	x = lua_tointeger( L, 1 );
+	y = lua_tointeger( L, 2 );
+	w = lua_tointeger( L, 3 );
+	h = lua_tointeger( L, 4 );
+	JPLua_TableToColour( &colour, L, 5 );
+	shader = lua_tointeger( L, 6 );
 
 	trap->R_SetColor( &colour );
-		CG_DrawPic( x, y, width, height, shader );
+		CG_DrawPic( x, y, w, h, shader );
 	trap->R_SetColor( NULL );
 
 	return 0;
 }
 
 static int JPLua_Export_RegisterShader( lua_State *L ) {
-	lua_pushinteger( L, trap->R_RegisterShader( lua_tostring( L, -1 ) ) );
+	lua_pushinteger( L, trap->R_RegisterShader( lua_tostring( L, 1 ) ) );
 	return 1;
 }
 
@@ -248,27 +247,27 @@ static int JPLua_Export_SendChatText( lua_State *L ) {
 }
 
 static int JPLua_Export_SendServerCommand( lua_State *L ) {
-	trap->SendClientCommand( lua_tostring( L, -1 ) );
+	trap->SendClientCommand( lua_tostring( L, 1 ) );
 	return 0;
 }
 
 static int JPLua_Export_SendConsoleCommand( lua_State *L ) {
-	trap->SendConsoleCommand( lua_tostring( L, -1 ) );
+	trap->SendConsoleCommand( lua_tostring( L, 1 ) );
 	return 0;
 }
 
 static int JPLua_Export_RegisterSound( lua_State *L ) {
-	lua_pushinteger( L, trap->S_RegisterSound( lua_tostring( L, -1 ) ) );
+	lua_pushinteger( L, trap->S_RegisterSound( lua_tostring( L, 1 ) ) );
 	return 1;
 }
 
 static int JPLua_Export_StartLocalSound( lua_State *L ) {
-	trap->S_StartLocalSound( lua_tonumber( L, -2 ), lua_tonumber( L, -1 ) );
+	trap->S_StartLocalSound( lua_tonumber( L, 1 ), lua_tonumber( L, 2 ) );
 	return 0;
 }
 
 static int JPLua_Export_RemapShader( lua_State *L ) {
-	trap->R_RemapShader( lua_tostring( L, -3 ), lua_tostring( L, -2 ), lua_tostring( L, -1 ) );
+	trap->R_RemapShader( lua_tostring( L, 1 ), lua_tostring( L, 2 ), lua_tostring( L, 3 ) );
 	return 0;
 }
 
@@ -277,7 +276,7 @@ static int JPLua_Export_AddConsoleCommand( lua_State *L ) {
 	int funcType = lua_type( L, 2 );
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING || (funcType != LUA_TFUNCTION && funcType != LUA_TNIL) ) {
-		trap->Print( "JPLua: AddConsoleCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->name );
+		trap->Print( "JPLua: AddConsoleCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->longname );
 		return 0;
 	}
 
@@ -306,8 +305,8 @@ static int JPLua_Export_AddConsoleCommand( lua_State *L ) {
 static int JPLua_Export_AddServerCommand( lua_State *L ) {
 	jplua_plugin_command_t *cmd = JPLua.currentPlugin->serverCmds;
 
-	if ( lua_type( L, -1 ) != LUA_TFUNCTION || lua_type( L, -2 ) != LUA_TSTRING ) {
-		trap->Print( "JPLua: AddServerCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->name );
+	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
+		trap->Print( "JPLua: AddServerCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->longname );
 		return 0;
 	}
 
@@ -387,12 +386,11 @@ static int JPLua_Export_GetFPS( lua_State *L ) {
 }
 
 int JPLua_Export_Trace( lua_State *L ) {
-	trace_t tr={0};
-	vector3 start={0},end={0};
-	float size=0;
-	vector3 mins={0},maxs={0};
-	int skipNumber=0,mask=0;
-	int top=0, top2=0, top3=0;
+	trace_t tr;
+	vector3 start, end, mins, maxs;
+	float size;
+	int skipNumber, mask;
+	int top, top2, top3;
 
 	lua_getfield( L, 1, "x" ); start.x = lua_tonumber( L, -1 );
 	lua_getfield( L, 1, "y" ); start.y = lua_tonumber( L, -1 );
@@ -446,18 +444,17 @@ int JPLua_Export_Trace( lua_State *L ) {
 static int JPLua_RegisterPlugin( lua_State *L ) {
 	int top = 0;
 
-	Q_strncpyz( JPLua.currentPlugin->name, lua_tostring( L, 1 ), sizeof( JPLua.currentPlugin->name ) );
-	Q_CleanString( JPLua.currentPlugin->name, STRIP_COLOUR );
+	Q_strncpyz( JPLua.currentPlugin->longname, lua_tostring( L, 1 ), sizeof( JPLua.currentPlugin->longname ) );
+	Q_CleanString( JPLua.currentPlugin->longname, STRIP_COLOUR );
 	Q_strncpyz( JPLua.currentPlugin->version, lua_tostring( L, 2 ), sizeof( JPLua.currentPlugin->version ) );
 	Q_CleanString( JPLua.currentPlugin->version, STRIP_COLOUR );
 	JPLua.currentPlugin->requiredJPLuaVersion = lua_isnumber( L, 3 ) ? lua_tointeger( L, 3 ) : JPLua.version;
 	JPLua.currentPlugin->UID = (intptr_t)JPLua.currentPlugin;
 
-	//lua_newtable( L );
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	lua_pushstring( L, "name" );	lua_pushstring( L, JPLua.currentPlugin->name );					lua_settable( L, top );
+	lua_pushstring( L, "name" );	lua_pushstring( L, JPLua.currentPlugin->longname );				lua_settable( L, top );
 	lua_pushstring( L, "version" );	lua_pushstring( L, JPLua.currentPlugin->version );				lua_settable( L, top );
 	lua_pushstring( L, "UID" );		lua_pushfstring( L, "%p", (void *)JPLua.currentPlugin->UID );	lua_settable( L, top );
 
@@ -469,10 +466,10 @@ static int JPLua_RegisterPlugin( lua_State *L ) {
 }
 
 int JPLua_Export_TestLine( lua_State *L ) {
-	vector3 start={0},end={0};
-	float radius=0;
-	int time=0;
-	unsigned int color=0;
+	vector3 start, end;
+	float radius;
+	int time;
+	unsigned int color;
 
 	lua_getfield( L, 1, "x" ); start.x = lua_tonumber( L, -1 );
 	lua_getfield( L, 1, "y" ); start.y = lua_tonumber( L, -1 );
@@ -543,7 +540,7 @@ static const int cimportsSize = ARRAY_LEN( JPLua_CImports );
 // This error should never happen in a clean release version of JA++!
 static int JPLuaI_Error( lua_State *L ) {
 	trap->Print( S_COLOR_RED"*************** JA++ LUA ERROR ***************" );
-	trap->Print( S_COLOR_RED"unprotected error in call to Lua API (%s)\n", lua_tostring(L,-1) );
+	trap->Print( S_COLOR_RED"unprotected error in call to Lua API (%s)\n", lua_tostring( L, -1 ) );
 	return 0;
 }
 
@@ -559,7 +556,8 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 	}
 
 	memset( JPLua.currentPlugin, 0, sizeof( jplua_plugin_t ) );
-	Q_strncpyz( JPLua.currentPlugin->name, "<null>", sizeof( JPLua.currentPlugin->name ) );
+	Q_strncpyz( JPLua.currentPlugin->longname, "<null>", sizeof( JPLua.currentPlugin->longname ) );
+	Q_strncpyz( JPLua.currentPlugin->name, pluginName, sizeof( JPLua.currentPlugin->name ) );
 	JPLua_LoadFile( JPLua.state, va( "%s%s/%s", pluginDir, pluginName, fileName ) );
 
 	if ( JPLua.currentPlugin->requiredJPLuaVersion > JPLua.version ) {
@@ -572,7 +570,7 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 		JPLua.currentPlugin = nextPlugin;
 	}
 	else
-		trap->Print( "%-15s%-32s%-8s%0p\n", "Loaded plugin:", JPLua.currentPlugin->name, JPLua.currentPlugin->version, (void*)JPLua.currentPlugin->UID );
+		trap->Print( "%-15s%-32s%-8s%0p\n", "Loaded plugin:", JPLua.currentPlugin->longname, JPLua.currentPlugin->version, (void*)JPLua.currentPlugin->UID );
 }
 
 static void JPLua_PostInit( lua_State *L ) {
