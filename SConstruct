@@ -2,7 +2,7 @@
 # JA++ SCons project file
 # written by Raz0r
 #
-# targets:
+# projects:
 #	game
 #	cgame
 #	ui
@@ -14,7 +14,7 @@
 #	analyse		run static analysis
 #
 # example:
-#	scons game=1 debug=1 force32=1 compiler=clang
+#	scons project=game debug=1 force32=1 compiler=clang
 #
 
 import platform
@@ -24,7 +24,7 @@ import commands
 plat = platform.system() # Windows or Linux
 try:
 	bits = int( platform.architecture()[0][:2] ) # 32 or 64
-except (ValueError, TypeError):
+except( ValueError, TypeError ):
 	bits = None
 arch = None # platform-specific, set manually
 
@@ -32,7 +32,8 @@ print( '\n********************************\n' )
 print( 'Configuring build environment...' )
 env = Environment()
 
-env['ENV']['TERM'] = os.environ['TERM']
+if plat != 'Windows':
+	env['ENV']['TERM'] = os.environ['TERM']
 
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 if force32:
@@ -297,9 +298,9 @@ if plat == 'Linux':
 	libs['cgame'] = [ 'm', 'readline' ]
 	libs['ui'] = [ 'm' ]
 elif plat == 'Windows':
-	libs['game'] = []
-	libs['cgame'] = []
-	libs['ui'] = []
+	libs['game'] = [ 'user32' ]
+	libs['cgame'] = [ 'user32', 'Advapi32' ]
+	libs['ui'] = [ 'user32' ]
 
 # compiler options
 analyse = int( ARGUMENTS.get( 'analyse', 0 ) )
@@ -331,16 +332,16 @@ if plat == 'Linux':
 		env['LINKFLAGS'] += [ '-m32' ]
 elif plat == 'Windows':
 	# assume msvc
-	env['CCFLAGS'] = [ '/Gm', '/GS', '/Zc:wchar_t', '/WX-', '/RTC1', '/MDd', '/EHsc', '/nologo', '/W4', '/wd"4100"', '/wd"4127"', '/wd"4996"' ]
+	env['CCFLAGS'] = [ '/GS', '/Zc:wchar_t', '/WX-', '/MDd', '/EHsc', '/nologo', '/W4', '/wd"4100"', '/wd"4127"', '/wd"4996"' ]
 	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS','/MACHINE:'+arch ]
-	env['CPPDEFINES'] = [ '_CRT_SECURE_NO_WARNINGS', 'WIN32', '_WINDOWS' ]
+	env['CPPDEFINES'] = [ 'WIN32', '_WINDOWS' ]
 
 # debug / release
 if int( ARGUMENTS.get( 'debug', 0 ) ):
 	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-g3' ]
 	elif plat == 'Windows':
-		env['CCFLAGS'] += [ '/Zi', '/Od' ]
+		env['CCFLAGS'] += [ '/Zi', '/Od', '/RTC1', '/Gm' ]
 	env['CPPDEFINES'] += [ '_DEBUG' ]
 else:
 	if plat == 'Linux' and not analyse:
@@ -353,6 +354,8 @@ else:
 status, rev = commands.getstatusoutput( 'git rev-parse HEAD' )
 if status == 0:
 	env['CPPDEFINES'] += [ 'REVISION=\\"'+rev+'\\"' ]
+
+env['CPPDEFINES'] += [ 'SCONS_BUILD' ]
 
 # targets
 project = ARGUMENTS.get( 'project', '' )

@@ -7,7 +7,7 @@
 
 #ifdef JPLUA
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(SCONS_BUILD)
 	#pragma comment( lib, "lua" )
 #endif
 
