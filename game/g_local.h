@@ -424,7 +424,7 @@ typedef struct clientSession_s {
 	spectatorState_t	spectatorState;
 	int					spectatorClient; // for chasecam and follow mode
 	int					wins, losses; // tournament stats
-	int					selectedFP; // check against this, if doesn't match value in playerstate then update userinfo
+	unsigned int		selectedFP; // check against this, if doesn't match value in playerstate then update userinfo
 	int					saberLevel; // similar to above method, but for current saber attack level
 	int					setForce; // set to true once player is given the chance to set force powers
 	int					updateUITime; // only update userinfo for FP/SL if < level.time

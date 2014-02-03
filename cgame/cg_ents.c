@@ -249,7 +249,7 @@ void CG_S_UpdateLoopingSounds(int entityNum)
 		Sil: even if he is not there anymore
 	*/
 	if ( (cent->currentState.eFlags & EF_SOUNDTRACKER)
-		&& (!cg.snap || cent->currentState.trickedentindex != cg.snap->ps.clientNum) )
+		&& (!cg.snap || (signed)cent->currentState.trickedentindex != cg.snap->ps.clientNum) )
 	{//keep sound for this entity updated in accordance with its attached entity at all times
 		//entity out of range
 		if ( !cg_entities[cent->currentState.trickedentindex].currentValid )

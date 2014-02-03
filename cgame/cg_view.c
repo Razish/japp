@@ -1977,7 +1977,7 @@ void CG_UpdateSoundTrackers( void )
 		if (cent && (cent->currentState.eFlags & EF_SOUNDTRACKER) && cent->currentState.number == num)
 			//make sure the thing is valid at least.
 		{ //keep sound for this entity updated in accordance with its attached entity at all times
-			if (cg.snap && cent->currentState.trickedentindex == cg.snap->ps.clientNum)
+			if (cg.snap && (signed)cent->currentState.trickedentindex == cg.snap->ps.clientNum)
 			{ //this is actually the player, so center the sound origin right on top of us
 				VectorCopy(&refdef->vieworg, &cent->lerpOrigin);
 				trap->S_UpdateEntityPosition( cent->currentState.number, &cent->lerpOrigin );

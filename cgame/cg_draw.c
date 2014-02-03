@@ -6441,7 +6441,7 @@ static void CG_DrawCrosshairNames( void ) {
 
 static void CG_DrawClientNames( void ) {
 	const char *name = NULL;
-	unsigned int i;
+	int i;
 	const centity_t *cent = NULL;
 	const int fontHandle = MenuFontToHandle( FONT_JAPPSMALL );
 	const float fontScale = 0.75f, fontHeight = trap->R_Font_HeightPixels( fontHandle, fontScale );

@@ -487,7 +487,7 @@ static void JPLua_PostInit( lua_State *L ) {
 
 // initialise the JPLua system
 void JPLua_Init( void ) {
-	int i = 0;
+	size_t i = 0;
 
 	if ( !g_jplua.integer )
 		return;

@@ -1874,26 +1874,26 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 
 			if (index < 1 && cg_entities[es->eventParm].currentState.isJediMaster)
 			{ //a holocron most likely
-				index = cg_entities[es->eventParm].currentState.trickedentindex4;
-				trap->S_StartSound (NULL, es->number, CHAN_AUTO,	cgs.media.holocronPickup );
+				unsigned int fpIndex = cg_entities[es->eventParm].currentState.trickedentindex4;
+				trap->S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.holocronPickup );
 
-				if (es->number == cg.snap->ps.clientNum && showPowersName[index])
+				if ( es->number == cg.snap->ps.clientNum && showPowersName[fpIndex] )
 				{
 					const char *strText = CG_GetStringEdString("MP_INGAME", "PICKUPLINE");
 
 					//Com_Printf("%s %s\n", strText, showPowersName[index]);
-					CG_CenterPrint( va("%s %s\n", strText, CG_GetStringEdString("SP_INGAME",showPowersName[index])), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+					CG_CenterPrint( va("%s %s\n", strText, CG_GetStringEdString("SP_INGAME",showPowersName[fpIndex])), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 				}
 
 				//Show the player their force selection bar in case picking the holocron up changed the current selection
-				if (index != FP_SABER_OFFENSE && index != FP_SABER_DEFENSE && index != FP_SABERTHROW &&
-					index != FP_LEVITATION &&
+				if (fpIndex != FP_SABER_OFFENSE && fpIndex != FP_SABER_DEFENSE && fpIndex != FP_SABERTHROW &&
+					fpIndex != FP_LEVITATION &&
 					es->number == cg.snap->ps.clientNum &&
-					(index == cg.snap->ps.fd.forcePowerSelected || !(cg.snap->ps.fd.forcePowersActive & (1 << cg.snap->ps.fd.forcePowerSelected))))
+					(fpIndex == cg.snap->ps.fd.forcePowerSelected || !(cg.snap->ps.fd.forcePowersActive & (1 << cg.snap->ps.fd.forcePowerSelected))))
 				{
-					if (cg.forceSelect != index)
+					if (cg.forceSelect != fpIndex)
 					{
-						cg.forceSelect = index;
+						cg.forceSelect = fpIndex;
 						newindex = qtrue;
 					}
 				}
@@ -2889,7 +2889,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 
 	case EV_GIVE_NEW_RANK:
 		DEBUGNAME("EV_GIVE_NEW_RANK");
-		if (es->trickedentindex == cg.snap->ps.clientNum)
+		if ((signed)es->trickedentindex == cg.snap->ps.clientNum)
 		{
 			trap->Cvar_Set("ui_rankChange", va("%i", es->eventParm));
 

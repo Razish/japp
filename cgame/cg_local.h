@@ -747,7 +747,7 @@ typedef struct cg_s {
 	// input state sent to server
 	int			weaponSelect;
 
-	int			forceSelect;
+	unsigned int forceSelect;
 	int			itemSelect;
 
 	// auto rotating items

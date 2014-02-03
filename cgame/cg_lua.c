@@ -533,7 +533,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "TestLine", JPLua_Export_TestLine }, // traceResult Trace( stuff )
 };
 
-static const int cimportsSize = ARRAY_LEN( JPLua_CImports );
+static const size_t cimportsSize = ARRAY_LEN( JPLua_CImports );
 
 
 // Lua calls this if it panics, it'll then terminate the server with exit(EXIT_FAILURE)
@@ -620,7 +620,7 @@ static void JPLua_PostInit( lua_State *L ) {
 
 // initialise the JPLua system
 void JPLua_Init( void ) {
-	int i = 0;
+	size_t i = 0;
 
 	if ( !cg_jplua.integer )
 		return;
