@@ -35,7 +35,6 @@ static void CG_Viewpos_f (void) {
 }
 
 void CG_ScoresDown_f( void ) {
-
 	CG_BuildSpectatorString();
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		// the scores are more than two seconds out of data,

@@ -1,4 +1,4 @@
-;// Copyright (C) 1999-2000 Id Software, Inc.
+// Copyright (C) 1999-2000 Id Software, Inc.
 //
 // cg_view.c -- setup all the parameters (position, angle, etc)
 // for a 3D rendering

@@ -8057,9 +8057,7 @@ void CG_Draw2D( void ) {
 	if ( cg.levelShot )
 		return;
 
-	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR)
-	{
-
+	if ( cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR ) {
 		cgRageTime = 0;
 		cgRageFadeTime = 0;
 		cgRageFadeVal = 0;
@@ -8484,8 +8482,23 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	// optionally draw the tournement scoreboard instead
 	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR && ( cg.snap->ps.pm_flags & PMF_SCOREBOARD ) ) {
 		//RAZTODO: tourney scoreboard?
+		cg.currentRefdef = REFDEF_SCOREBOARD;
+		refdef = CG_GetRefdef();
+
+		refdef->rdflags |= RDF_NOWORLDMODEL;
+
 		CG_TileClear();
-		CG_Draw2D();
+		if ( !cg_newChatbox.integer )
+			CG_ChatBox_DrawStrings();
+		else
+			CG_ChatboxDraw();
+
+		CG_ScoresDown_f();
+		CG_DrawScoreboard();
+
+		cg.currentRefdef = REFDEF_DEFAULT;
+		refdef = CG_GetRefdef();
+		return;
 	}
 
 	switch ( stereoView ) {

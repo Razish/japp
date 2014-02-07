@@ -673,6 +673,7 @@ typedef enum refdefView_e {
 	REFDEF_DEFAULT=0,
 	REFDEF_AUTOMAP,
 	REFDEF_ALTVIEW,
+	REFDEF_SCOREBOARD,
 	REFDEF_MAX
 } refdefViews_t;
 
