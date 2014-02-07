@@ -2678,23 +2678,19 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	//Raz: Set admin data
 	client->pers.adminData.canTalk = qtrue;
 
+	JPLua_Event_ClientBegin( clientNum );
 
-	G_ClearClientLog(clientNum);
+	G_ClearClientLog( clientNum );
 }
 
 #if 1
-static qboolean AllForceDisabled(int force)
-{
+static qboolean AllForceDisabled( int force ) {
 	int i;
 
-	if (force)
-	{
-		for (i=0;i<NUM_FORCE_POWERS;i++)
-		{
-			if (!(force & (1<<i)))
-			{
+	if ( force ) {
+		for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
+			if ( !(force & (1<<i)) )
 				return qfalse;
-			}
 		}
 
 		return qtrue;
@@ -2705,8 +2701,7 @@ static qboolean AllForceDisabled(int force)
 #endif
 
 //Convenient interface to set all my limb breakage stuff up -rww
-void G_BreakArm(gentity_t *ent, int arm)
-{
+void G_BreakArm( gentity_t *ent, int arm ) {
 	int anim = -1;
 
 	assert(ent && ent->client);

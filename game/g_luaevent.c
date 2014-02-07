@@ -12,6 +12,7 @@ static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 	ENUM2STRING(JPLUA_EVENT_RUNFRAME),
 	ENUM2STRING(JPLUA_EVENT_CLIENTCONNECT),
 	ENUM2STRING(JPLUA_EVENT_CLIENTDISCONNECT),
+	ENUM2STRING(JPLUA_EVENT_CLIENTBEGIN),
 	ENUM2STRING(JPLUA_EVENT_CLIENTSPAWN),
 	ENUM2STRING(JPLUA_EVENT_CLIENTCOMMAND),
 	ENUM2STRING(JPLUA_EVENT_CLIENTUSERINFOCHANGED),
@@ -184,6 +185,25 @@ void JPLua_Event_ClientDisconnect( int clientNum ) {
 	{
 		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTDISCONNECT] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTDISCONNECT] );
+
+			// Create a player instance for this client number and push on stack
+			JPLua_Player_CreateRef( JPLua.state, clientNum );
+
+			JPLua_Call( JPLua.state, 1, 0 );
+		}
+	}
+#endif
+}
+
+void JPLua_Event_ClientBegin( int clientNum ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins;
+			JPLua.currentPlugin;
+			JPLua.currentPlugin = JPLua.currentPlugin->next
+		)
+	{
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTBEGIN] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTBEGIN] );
 
 			// Create a player instance for this client number and push on stack
 			JPLua_Player_CreateRef( JPLua.state, clientNum );
