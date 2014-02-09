@@ -237,7 +237,11 @@ static const char *JKG_Crash_GetCrashlogName( void ) {
 }
 
 static void JP_ForceQuit( void ) {
+#ifdef _GAME
 	trap->Error( ERR_DROP, "Server crash\n" );
+#else
+	trap->Error( ERR_DROP, "Client crash\n" );
+#endif
 }
 
 #ifdef _WIN32
@@ -923,7 +927,11 @@ static LONG WINAPI UnhandledExceptionHandler (struct _EXCEPTION_POINTERS *EI /*E
 	InitSymbolPath(SymPath, NULL);
 	SymInitialize(GetCurrentProcess(), SymPath, TRUE);
 	Com_Printf("------------------------------------------------------------\n");
-	Com_Printf("Server crashed. Creating crash log %s...\n", filename);
+#ifdef _GAME
+	Com_Printf( "Server crashed. Creating crash log %s...\n", filename );
+#else
+	Com_Printf( "Client crashed. Creating crash log %s...\n", filename );
+#endif
 
 	trap->FS_Open( filename, &f, FS_WRITE );
 
@@ -1406,9 +1414,9 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 	bCrashing = 1;
 	Com_Printf("------------------------------------------------------------\n");
 #ifdef _GAME
-	Com_Printf("Server crashed. Creating crash log %s...\n", filename);
+	Com_Printf( "Server crashed. Creating crash log %s...\n", filename );
 #else
-	Com_Printf("Client crashed. Creating crash log %s...\n", filename);
+	Com_Printf( "Client crashed. Creating crash log %s...\n", filename );
 #endif
 	trap->FS_Open( filename, &f, FS_WRITE );
 	JKG_FS_WriteString("========================================\n"
