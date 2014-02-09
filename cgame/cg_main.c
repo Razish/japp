@@ -3091,15 +3091,25 @@ void CG_PmoveClientPointerUpdate( void );
 void WP_SaberLoadParms( void );
 void BG_VehicleLoadParms( void );
 
-/*
-=================
-CG_Init
+#define LOG_DIRECTORY "logs/cl/"
+static void CG_OpenLog( const char *filename, fileHandle_t *f, qboolean sync ) {
+	trap->FS_Open( filename, f, sync ? FS_APPEND_SYNC : FS_APPEND );
+	if ( *f )
+		trap->Print( "Logging to %s\n", filename );
+	else
+		trap->Print( "WARNING: Couldn't open logfile: %s\n", filename );
+}
 
-Called after every level change or subsystem restart
-Will perform callbacks to make the loading info screen update.
-=================
-*/
+static void CG_CloseLog( fileHandle_t *f ) {
+	if ( !*f )
+		return;
 
+	trap->FS_Close( *f );
+	*f = NULL_FILE;
+}
+
+// Called after every level change or subsystem restart
+// Will perform callbacks to make the loading info screen update.
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback )
 {
 	static const gitem_t *item;
@@ -3340,38 +3350,13 @@ Ghoul2 Insert End
 	//now get all the cgame only cents
 	CG_SpawnCGameOnlyEnts();
 
-	// console logging
-	if ( cg_logConsole.string[0] ) {
-		trap->FS_Open( cg_logConsole.string, &cg.log.console, FS_APPEND );
-		if ( cg.log.console )
-			trap->Print( "Logging to %s\n", cg_logConsole.string );
-		else
-			trap->Print( "WARNING: Couldn't open logfile: %s\n", cg_logConsole.string );
-	}
-	else
-		trap->Print( "Not logging console to disk.\n" );
-
-	// chat logging
-	if ( cg_logChat.string[0] ) {
-		trap->FS_Open( cg_logChat.string, &cg.log.chat, FS_APPEND );
-		if ( cg.log.chat )
-			trap->Print( "Logging to %s\n", cg_logChat.string );
-		else
-			trap->Print( "WARNING: Couldn't open logfile: %s\n", cg_logChat.string );
-	}
-	else
-		trap->Print( "Not logging chat to disk.\n" );
-
-	// security logging
-	if ( cg_logSecurity.string[0] ) {
-		trap->FS_Open( cg_logSecurity.string, &cg.log.security, FS_APPEND );
-		if ( cg.log.security )
-			trap->Print( "Logging to %s\n", cg_logSecurity.string );
-		else
-			trap->Print( "WARNING: Couldn't open logfile: %s\n", cg_logSecurity.string );
-	}
-	else
-		trap->Print( "Not logging security to disk.\n" );
+	// logging
+	if ( cg_logConsole.integer )	CG_OpenLog( LOG_DIRECTORY "console.log", &cg.log.console, cg_logConsole.integer == 2 );
+	else							trap->Print( "Not logging console to disk.\n" );
+	if ( cg_logChat.integer )		CG_OpenLog( LOG_DIRECTORY "chat.log", &cg.log.chat, cg_logChat.integer == 2 );
+	else							trap->Print( "Not logging chat to disk.\n" );
+	if ( cg_logSecurity.integer )	CG_OpenLog( LOG_DIRECTORY "security.log", &cg.log.security, cg_logSecurity.integer == 2 );
+	else							trap->Print( "Not logging security events to disk.\n" );
 
 	#ifdef JPLUA
 		//Raz: Lua!
@@ -3492,13 +3477,12 @@ void CG_Shutdown( void )
 		JPLua_Shutdown();
 	#endif // JPLUA
 
-
-	//Raz: Close log file!
-	CG_LogPrintf( cg.log.console, "End logging\n------------------------------------------------------------\n\n" );
+	// close log files
 	CG_LogPrintf( cg.log.chat, "End logging\n------------------------------------------------------------\n\n" );
-	trap->FS_Close( cg.log.console );
-	trap->FS_Close( cg.log.chat );
-	trap->FS_Close( cg.log.security );
+	CG_LogPrintf( cg.log.console, "End logging\n------------------------------------------------------------\n\n" );
+	CG_CloseLog( &cg.log.chat );
+	CG_CloseLog( &cg.log.console );
+	CG_CloseLog( &cg.log.security );
 }
 
 /*
@@ -3689,58 +3673,35 @@ Print to the logfile with a time stamp if it is open
 */
 
 void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
-	va_list		argptr;
-	char		string[1024] = {0};
-	int			mins, seconds, msec, l;
+	va_list argptr;
+	char string[1024] = {0};
+	size_t len;
 
-	msec = cg.time - cgs.levelStartTime;
+	if ( cg_logFormat.integer == 0 ) {
+		int msec = cg.time - cgs.levelStartTime;
+		int secs = msec / 1000;
+		int mins = secs / 60;
+		secs %= 60;
+		msec %= 1000;
 
-	seconds = msec / 1000;
-	mins = seconds / 60;
-	seconds %= 60;
-//	msec %= 1000;
+		Com_sprintf( string, sizeof( string ), "%i:%02i ", mins, secs );
+	}
+	else {
+		time_t rawtime;
+		time( &rawtime );
+		strftime( string, sizeof( string ), "[%Y-%m-%d] [%H:%M:%S] ", gmtime( &rawtime ) );
+	}
 
-	Com_sprintf( string, sizeof( string ), "%i:%02i ", mins, seconds );
-	l = strlen( string );
+	len = strlen( string );
 
 	va_start( argptr, fmt );
-	Q_vsnprintf( string + l, sizeof( string ) - l, fmt, argptr );
+	Q_vsnprintf( string+len, sizeof( string )-len, fmt, argptr );
 	va_end( argptr );
 
 	if ( !fileHandle )
 		return;
 
 	trap->FS_Write( string, strlen( string ), fileHandle );
-}
-
-/*
-=================
-CG_SecurityLogPrintf
-
-Print to the security logfile with a time stamp if it is open
-=================
-*/
-void QDECL CG_SecurityLogPrintf( const char *fmt, ... ) {
-	va_list		argptr;
-	char		string[1024] = {0};
-	time_t		rawtime;
-	int			timeLen=0;
-
-	time( &rawtime );
-	localtime( &rawtime );
-	strftime( string, sizeof( string ), "[%Y-%m-%d] [%H:%M:%S] ", gmtime( &rawtime ) );
-	timeLen = strlen( string );
-
-	va_start( argptr, fmt );
-	Q_vsnprintf( string+timeLen, sizeof( string ) - timeLen, fmt, argptr );
-	va_end( argptr );
-
-	trap->Print( "%s", string + timeLen );
-
-	if ( !cg.log.security )
-		return;
-
-	trap->FS_Write( string, strlen( string ), cg.log.security );
 }
 
 static void _CG_MouseEvent( int x, int y ) {

@@ -241,41 +241,43 @@ void AM_SaveAdmins( void ) {
 	AM_WriteAccounts( f );
 }
 
-//Returns qtrue if inflicter is higher on the rank hierarchy, and qtrue on equal if japp_passRankConflicts is 1. Otherwise, returns qfalse and prints a message to the inflicter to warn them.
-qboolean AM_CanInflict(  gentity_t *entInflicter, gentity_t *entVictim )
-{
+// returns qtrue if inflicter is higher on the rank hierarchy, and qtrue on equal if japp_passRankConflicts is 1.
+//	otherwise, returns qfalse and prints a message to the inflicter to warn them.
+qboolean AM_CanInflict( gentity_t *entInflicter, gentity_t *entVictim ) {
 	adminUser_t *inflicter = entInflicter->client->pers.adminUser;
 	adminUser_t *victim = entVictim->client->pers.adminUser;
-	//If either one is not an admin, they lose by default.
 
-	if(!victim)
-		return qtrue; //Auto win, victim isn't even a badmin.
+	// if either one is not an admin, they lose by default.
+	if ( !victim )
+		return qtrue; // victim isn't an admin.
 
-	if(entInflicter == entVictim)
-		return qtrue; //You can abuse yourself, of course.
+	if ( entInflicter == entVictim )
+		return qtrue; // you can abuse yourself, of course.
 
-	if( inflicter->rank == victim->rank )
-	{
-		if( japp_passRankConflicts.integer )
-		{
-			G_LogPrintf( va("%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s (User: %s) (Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank, entVictim->client->pers.netname, victim->user, victim->rank ) );
+	if( inflicter->rank == victim->rank ) {
+		if ( japp_passRankConflicts.integer ) {
+			G_LogPrintf( level.log.console, "%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s"
+				"(User: %s) (Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank,
+				entVictim->client->pers.netname, victim->user, victim->rank );
 			return qtrue;
 		}
-		else
-		{
-			trap->SendServerCommand( entInflicter->s.number, "print \"^1Can not use admin commands on those of an equal rank: (japp_passRankConflicts)\n\"");
+		else {
+			trap->SendServerCommand( entInflicter->s.number, "print \""S_COLOR_RED"Can not use admin commands on those of"
+				"an equal rank: (japp_passRankConflicts)\n\"");
 			return qfalse;
 		}
 	}
 
-	if( inflicter->rank > victim->rank )
-	{
-		G_LogPrintf( va("%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s (User: %s) (Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank, entVictim->client->pers.netname, victim->user, victim->rank ) );
-		return qtrue; //inflicter is of a higher rank and so he/she can freely abuse those lesser.
+	if ( inflicter->rank > victim->rank ) {
+		// inflicter is of a higher rank and so he/she can freely abuse those lesser.
+		G_LogPrintf( level.log.console, "%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s (User: %s)"
+			"(Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank, entVictim->client->pers.netname,
+			victim->user, victim->rank );
+		return qtrue;
 	}
-	else
-	{
-		trap->SendServerCommand( entInflicter->s.number, "print \"^1Can not use admin commands on those of a higher rank.\n\"");
+	else {
+		trap->SendServerCommand( entInflicter->s.number, "print \""S_COLOR_RED"Can not use admin commands on those of a"
+			"higher rank.\n\"" );
 		return qfalse;
 	}
 }
@@ -641,7 +643,7 @@ static void AM_Announce( gentity_t *ent ) {
 		trap->SendServerCommand( ent-g_entities, va( "cp \"Relay:\n%s\"", msg ) ); //Helena wanted me to relay it back to the sender
 	}
 
-	G_LogPrintf( "AM_Announce: Start\nSender: %s\nMessage: %s\nAM_Announce: End\n", ent->client->pers.netname, msg );
+	G_LogPrintf( level.log.console, "AM_Announce: Start\nSender: %s\nMessage: %s\nAM_Announce: End\n", ent->client->pers.netname, msg );
 
 	return;
 }
@@ -979,7 +981,8 @@ static void AM_Poll( gentity_t *ent ) {
 	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
 	Q_strstrip( level.voteStringClean, "\"\n\r", NULL );
 
-	trap->SendServerCommand( -1, va("print \"%s"S_COLOR_WHITE" %s\n\"", ent->client->pers.netname, G_GetStringEdString("MP_SVGAME", "PLCALLEDVOTE") ) );
+	trap->SendServerCommand( -1, va("print \"%s"S_COLOR_WHITE" %s\n\"", ent->client->pers.netname, G_GetStringEdString(
+		"MP_SVGAME", "PLCALLEDVOTE" ) ) );
 	level.voteExecuteDelay = japp_voteDelay.integer;
 	level.voteTime = level.time;
 	level.voteYes = 0;
@@ -1075,7 +1078,8 @@ static void AM_Protect( gentity_t *ent ) {
 	targ->client->ps.eFlags			^= EF_INVULNERABLE;
 	targ->client->invulnerableTimer	= !!( targ->client->ps.eFlags & EF_INVULNERABLE ) ? 0x7FFFFFFF : level.time;
 
-	trap->SendServerCommand( ent-g_entities, va( "print \"%s "S_COLOR_WHITE"has been %s\n\"", targ->client->pers.netname, !!(targ->client->ps.eFlags&EF_INVULNERABLE)?S_COLOR_GREEN"protected":S_COLOR_RED"unprotected" ) );
+	trap->SendServerCommand( ent-g_entities, va( "print \"%s "S_COLOR_WHITE"has been %s\n\"", targ->client->pers.netname,
+		!!(targ->client->ps.eFlags&EF_INVULNERABLE)?S_COLOR_GREEN"protected":S_COLOR_RED"unprotected" ) );
 }
 
 // protect/unprotect the targeted client
@@ -1120,8 +1124,10 @@ static void AM_Empower( gentity_t *ent ) {
 		targ->client->pers.adminData.forcePowersKnown = targ->client->ps.fd.forcePowersKnown;
 
 		for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
-			targ->client->pers.adminData.forcePowerBaseLevel[i] = targ->client->ps.fd.forcePowerBaseLevel[i];		targ->client->ps.fd.forcePowerBaseLevel[i] = 3;
-			targ->client->pers.adminData.forcePowerLevel[i] = targ->client->ps.fd.forcePowerLevel[i];				targ->client->ps.fd.forcePowerLevel[i] = 3;
+			targ->client->pers.adminData.forcePowerBaseLevel[i] = targ->client->ps.fd.forcePowerBaseLevel[i];
+			targ->client->ps.fd.forcePowerBaseLevel[i] = 3;
+			targ->client->pers.adminData.forcePowerLevel[i] = targ->client->ps.fd.forcePowerLevel[i];
+			targ->client->ps.fd.forcePowerLevel[i] = 3;
 			targ->client->ps.fd.forcePowersKnown |= (1<<i);
 		}
 	}
@@ -1511,7 +1517,8 @@ static void AM_EntSpawn( gentity_t *ent ) {
 	trace_t		*tr = G_RealTrace( ent, 0.0f );
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent-g_entities, "print \"AM_EntSpawn: syntax is 'amspawn entity' where 'entity' is misc_model, info_player_start, etc\n\"" );
+		trap->SendServerCommand( ent-g_entities, "print \"AM_EntSpawn: syntax is 'amspawn entity' where 'entity' is"
+			"misc_model, info_player_start, etc\n\"" );
 		return;
 	}
 	trap->Argv( 1, buf, sizeof( buf ) );
@@ -1587,7 +1594,8 @@ static void AM_Map( gentity_t *ent ) {
 		if ( i >= 0 && i < GT_MAX_GAME_TYPE )
 			gametype = i;
 		else {
-			trap->SendServerCommand( ent-g_entities, va( "print \"AM_Map: argument 1 must be a valid gametype or gametype number identifier\n\"", map, BG_GetGametypeString( gametype ) ) );
+			trap->SendServerCommand( ent-g_entities, va( "print \"AM_Map: argument 1 must be a valid gametype or gametype"
+				"number identifier\n\"", map, BG_GetGametypeString( gametype ) ) );
 			return;
 		}
 	}
@@ -1596,7 +1604,8 @@ static void AM_Map( gentity_t *ent ) {
 
 	if ( !japp_allowAnyGametype.integer ) {
 		if ( !G_DoesMapSupportGametype( map, gametype ) ) {
-			trap->SendServerCommand( ent-g_entities, va( "print \"Map: %s does not support gametype: %s, or the map doesn't exist.\n\"", map, BG_GetGametypeString( gametype ) ) );
+			trap->SendServerCommand( ent-g_entities, va( "print \"Map: %s does not support gametype: %s, or the map doesn't"
+				"exist.\n\"", map, BG_GetGametypeString( gametype ) ) );
 			return;
 		}
 	}
@@ -1912,7 +1921,7 @@ qboolean AM_HandleCommands( gentity_t *ent, const char *cmd ) {
 		return qtrue;
 	}
 
-	G_LogPrintf( "* Admin command (%s) executed by (%s)\n", cmd, ent->client->pers.netname );
+	G_LogPrintf( level.log.console, "* Admin command (%s) executed by (%s)\n", cmd, ent->client->pers.netname );
 	command->func( ent );
 
 	return qtrue;

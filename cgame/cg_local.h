@@ -926,7 +926,7 @@ Ghoul2 Insert End
 	chatBoxItem_t		chatItems[MAX_CHATBOX_ITEMS];
 	int					chatItemActive;
 
-	struct japp {
+	struct {
 		uint32_t		SSF;
 		int				fps;		//	FPS for stats HUD
 		qboolean		timestamp24Hour;
@@ -934,21 +934,18 @@ Ghoul2 Insert End
 
 		//Smod: strafe helper
 		refEntity_t		velocityVect;
-		refEntity_t		leftIdeal;
-		refEntity_t		rightIdeal;
+		refEntity_t		leftIdeal, rightIdeal;
 		qboolean		isfixedVector;
 		vector3			fixedVector;
 
 		qboolean		fakeGun;
 	} japp;
 
-	struct log {
-		fileHandle_t	console;
-		fileHandle_t	chat;
-		fileHandle_t	security;
+	struct {
+		fileHandle_t chat, console, security;
 	} log;
 
-	struct scoreboard {
+	struct {
 		char	spectatorList[MAX_STRING_CHARS];
 		int		spectatorLen;
 		float	spectatorX;
@@ -968,17 +965,12 @@ Ghoul2 Insert End
 	struct {
 		ivector4	rgba;
 		qboolean	forceAlpha;
-	} duelColour;
+	} duelColour, shieldColour;
 
 	struct {
 		vector3		amount;
 		number		speed;
 	} gunIdleDrift;
-
-	struct {
-		ivector4	rgba;
-		qboolean	forceAlpha;
-	} shieldColour;
 
 	struct {
 		number		pitch, roll, up;
@@ -993,8 +985,7 @@ Ghoul2 Insert End
 	ivector2	moveKeysPos;
 	ivector2	statsPos;
 	ivector2	strafeTrailWeights;
-	ivector3	allyColour;
-	ivector3	enemyColour;
+	ivector3	allyColour, enemyColour;
 	ivector4	bubbleColour;
 	ivector4	strafeHelperColour;
 
@@ -2056,7 +2047,6 @@ void CG_LoadHudMenu( void );
 qboolean SE_RenderThisEntity( vector3 *testOrigin, int gameEntity );
 void SE_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity );
 void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... );
-void QDECL CG_SecurityLogPrintf( const char *fmt, ... );
 void CG_ScoresDown_f( void );
 void CG_TrueViewInit( void );
 void CG_AdjustEyePos( const char *modelName );

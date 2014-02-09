@@ -335,7 +335,7 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam ) {
 		}
 	}
 
-	G_LogPrintf ( "setteam:  %i %s %s\n", client-level.clients, TeamName ( oldTeam ), TeamName ( client->sess.sessionTeam ) );
+	G_LogPrintf( level.log.console, "setteam:  %i %s %s\n", client-level.clients, TeamName ( oldTeam ), TeamName ( client->sess.sessionTeam ) );
 }
 
 static qboolean G_PowerDuelCheckFail( gentity_t *ent ) {
@@ -1026,7 +1026,7 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 	switch ( mode ) {
 	default:
 	case SAY_ADMIN:
-		G_LogPrintf( "amsay: %s: %s\n", ent->client->pers.netname, chatText );
+		G_LogPrintf( level.log.console, "amsay: %s: %s\n", ent->client->pers.netname, chatText );
 		Com_sprintf (name, sizeof(name), S_COLOR_YELLOW"<Admin>"S_COLOR_WHITE"%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_YELLOW;
 		break;
@@ -1036,7 +1036,7 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 			isMeCmd = qtrue;
 			chatText += 4; //Skip "^7* "
 		}
-		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, chatText );
+		G_LogPrintf( level.log.console, "say: %s: %s\n", ent->client->pers.netname, chatText );
 		if ( isMeCmd ) {
 			Com_sprintf( name, sizeof( name ), S_COLOR_WHITE"* %s"S_COLOR_WHITE""EC" ", ent->client->pers.netname );
 			color = COLOR_WHITE;
@@ -1047,7 +1047,7 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 		}
 		break;
 	case SAY_TEAM:
-		G_LogPrintf( "sayteam: %s: %s\n", ent->client->pers.netname, chatText );
+		G_LogPrintf( level.log.console, "sayteam: %s: %s\n", ent->client->pers.netname, chatText );
 		if ( Team_GetLocationMsg( ent, location, sizeof( location ) ) ) {
 			Com_sprintf( name, sizeof( name ), EC"(%s%c%c"EC")"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 			locMsg = location;
@@ -1073,7 +1073,7 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 
 	if ( returnToSender ) {
 		//Raz: Silly kids, make it look like they said something
-		G_SecurityLogPrintf( "%s attempted to send a bogus message: %s\n", ent->client->pers.netnameClean, text );
+		G_LogPrintf( level.log.security, "%s attempted to send a bogus message: %s\n", ent->client->pers.netnameClean, text );
 		G_SayTo( ent, ent, mode, color, name, text, locMsg );
 		return;
 	}
@@ -1103,7 +1103,7 @@ static void Cmd_Say_f( gentity_t *ent ) {
 	//Raz: BOF
 	if ( strlen( p ) > MAX_SAY_TEXT ) {
 		p[MAX_SAY_TEXT-1] = '\0';
-		G_SecurityLogPrintf( "Cmd_Say_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
+		G_LogPrintf( level.log.security, "Cmd_Say_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
 
 	G_Say( ent, NULL, SAY_ALL, p );
@@ -1120,7 +1120,7 @@ static void Cmd_SayTeam_f( gentity_t *ent ) {
 	//Raz: BOF
 	if ( strlen( p ) > MAX_SAY_TEXT ) {
 		p[MAX_SAY_TEXT-1] = '\0';
-		G_SecurityLogPrintf( "Cmd_SayTeam_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
+		G_LogPrintf( level.log.security, "Cmd_SayTeam_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
 
 	G_Say( ent, NULL, (level.gametype>=GT_TEAM) ? SAY_TEAM : SAY_ALL, p );
@@ -1148,10 +1148,10 @@ static void Cmd_Tell_f( gentity_t *ent ) {
 	//Raz: BOF
 	if ( strlen( p ) > MAX_SAY_TEXT ) {
 		p[MAX_SAY_TEXT-1] = '\0';
-		G_SecurityLogPrintf( "Cmd_Tell_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
+		G_LogPrintf( level.log.security, "Cmd_Tell_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
 
-	G_LogPrintf( "tell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, p );
+	G_LogPrintf( level.log.console, "tell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, p );
 	G_Say( ent, target, SAY_TELL, p );
 	// don't tell to the player self if it was already directed to this player
 	// also don't send the chat back to a bot
@@ -1239,7 +1239,7 @@ static void Cmd_GameCommand_f( gentity_t *ent ) {
 	if ( !target->inuse || !target->client )
 		return;
 
-	G_LogPrintf( "tell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, gc_orders[order] );
+	G_LogPrintf( level.log.console, "tell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, gc_orders[order] );
 	G_Say( ent, target, SAY_TELL, gc_orders[order] );
 	// don't tell to the player self if it was already directed to this player
 	// also don't send the chat back to a bot
@@ -3110,7 +3110,7 @@ void ClientCommand( int clientNum ) {
 
 	ent = g_entities + clientNum;
 	if ( !ent->client || ent->client->pers.connected != CON_CONNECTED ) {
-		G_SecurityLogPrintf( "ClientCommand(%d) without an active connection\n", clientNum );
+		G_LogPrintf( level.log.security, "ClientCommand(%d) without an active connection\n", clientNum );
 		return; // not fully in game yet
 	}
 

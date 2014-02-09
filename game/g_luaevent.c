@@ -25,7 +25,7 @@ int JPLua_Event_AddListener( lua_State *L ) {
 	const char *listenerArg = lua_tostring( L, 1 );
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
-		G_LogPrintf( "JPLua: AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+		G_LogPrintf( level.log.console, "JPLua: AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 		return 0;
 	}
 
@@ -36,7 +36,7 @@ int JPLua_Event_AddListener( lua_State *L ) {
 		}
 	}
 
-	G_LogPrintf( "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+	G_LogPrintf( level.log.console, "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 
 	return 0;
 }
@@ -47,7 +47,7 @@ int JPLua_Event_RemoveListener( lua_State *L ) {
 	const char *listenerArg = lua_tostring( L, 1 );
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING ) {
-		G_LogPrintf( "JPLua: RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+		G_LogPrintf( level.log.console, "JPLua: RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 		return 0;
 	}
 
@@ -59,7 +59,7 @@ int JPLua_Event_RemoveListener( lua_State *L ) {
 		}
 	}
 
-	G_LogPrintf( "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+	G_LogPrintf( level.log.console, "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
 
 	return 0;
 }

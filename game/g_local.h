@@ -27,8 +27,6 @@ extern vector3 gPainPoint;
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	"JA+ Mod v2.6 B1"//"JA++ 0.2 build 2"
 
-#define SECURITY_LOG "security.log"
-
 #define BODY_QUEUE_SIZE		8
 
 #ifndef INFINITE
@@ -814,8 +812,6 @@ typedef struct level_locals_s {
 
 	int			warmupTime;			// restart match at this time
 
-	fileHandle_t	logFile;
-
 	// store latched cvars here that we want to get at often
 	int			maxclients;
 
@@ -907,7 +903,9 @@ typedef struct level_locals_s {
 
 	char		mTeamFilter[MAX_QPATH];
 
-	fileHandle_t securityLog;
+	struct {
+		fileHandle_t console, security;
+	} log;
 
 	char		rawmapname[MAX_QPATH];
 
@@ -1248,8 +1246,7 @@ void G_PowerDuelCount(int *loners, int *doubles, qboolean countSpec);
 void FindIntermissionPoint( void );
 void SetLeader(int team, int client);
 void G_RunThink (gentity_t *ent);
-void QDECL G_LogPrintf( const char *fmt, ... );
-void QDECL G_SecurityLogPrintf( const char *fmt, ... );
+void QDECL G_LogPrintf( fileHandle_t filehandle, const char *fmt, ... );
 void SendScoreboardMessageToAllClients( void );
 const char *G_GetStringEdString(char *refSection, char *refName);
 

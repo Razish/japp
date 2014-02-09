@@ -2423,10 +2423,6 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		}
 	}
 
-	//Raz: Added client name
-	//		moved this down so we can ignore picking up dropped flags for x ms
-//	G_LogPrintf( "Item: %i %s %s\n", other->s.number, other->client?other->client->pers.netname:"<null>", ent->item->classname );
-
 	predict = other->client->pers.predictItemPickup;
 
 	// call the item-specific pickup function
@@ -2492,7 +2488,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		return;
 	}
 
-	G_LogPrintf( "Item: %i %s %s\n", other->s.number, other->client?other->client->pers.netname:"<null>", ent->item->classname );
+	G_LogPrintf( level.log.console, "Item: %i %s %s\n", other->s.number, other->client?other->client->pers.netname:"<null>", ent->item->classname );
 
 	// play the normal pickup sound
 	if (predict) {

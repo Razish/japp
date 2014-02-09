@@ -181,7 +181,7 @@ static int JPLua_Export_AddClientCommand( lua_State *L ) {
 	jplua_plugin_command_t *cmd = JPLua.currentPlugin->clientCmds;
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
-		G_LogPrintf( "JPLua: AddClientCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->name );
+		G_LogPrintf( level.log.console, "JPLua: AddClientCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->name );
 		return 0;
 	}
 
@@ -209,7 +209,7 @@ static int JPLua_Export_AddServerCommand( lua_State *L ) {
 	jplua_plugin_command_t *cmd = JPLua.currentPlugin->serverCmds;
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
-		G_LogPrintf( "JPLua: AddServerCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->name );
+		G_LogPrintf( level.log.console, "JPLua: AddServerCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->name );
 		return 0;
 	}
 

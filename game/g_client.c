@@ -2031,10 +2031,10 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	// check for malformed or illegal info strings
 	s = G_ValidateUserinfo( userinfo );
 	if ( s && *s ) {
-		G_SecurityLogPrintf( "Client %d (%s) failed userinfo validation: %s [IP: %s]\n", clientNum,
+		G_LogPrintf( level.log.security, "Client %d (%s) failed userinfo validation: %s [IP: %s]\n", clientNum,
 			ent->client->pers.netname, s, client->sess.IP );
 		trap->DropClient( clientNum, va( "Failed userinfo validation: %s", s ) );
-		G_LogPrintf( "Userinfo: %s\n", userinfo );
+		G_LogPrintf( level.log.security, "Userinfo: %s\n", userinfo );
 		return qfalse;
 	}
 
@@ -2046,7 +2046,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	//Raz: cp_pluginDisable
 	s = Info_ValueForKey( userinfo, "cp_pluginDisable" );
 	if ( s[0] && sscanf( s, "%u", &client->pers.CPD ) != 1 )
-		G_SecurityLogPrintf( "ClientUserinfoChanged(): Client %i (%s) userinfo 'cp_pluginDisable' was found, but invalid. [IP: %s]\n", clientNum, client->pers.netname, client->sess.IP );
+		G_LogPrintf( level.log.security, "ClientUserinfoChanged(): Client %i (%s) userinfo 'cp_pluginDisable' was found, but invalid. [IP: %s]\n", clientNum, client->pers.netname, client->sess.IP );
 
 	s = Info_ValueForKey( userinfo, "cjp_client" );
 	if ( s[0] )
@@ -2081,7 +2081,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		}
 		else {
 			trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldname, G_GetStringEdString( "MP_SVGAME", "PLRENAME" ), client->pers.netname ) );
-			G_LogPrintf( "ClientRename: %i [%s] \"%s^7\" -> \"%s^7\"\n", clientNum, ent->client->sess.IP, oldname, ent->client->pers.netname );
+			G_LogPrintf( level.log.console, "ClientRename: %i [%s] \"%s^7\" -> \"%s^7\"\n", clientNum, ent->client->sess.IP, oldname, ent->client->pers.netname );
 			client->pers.netnameTime = level.time + 5000;
 		}
 	}
@@ -2289,9 +2289,9 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	if ( g_logClientInfo.integer ) {
 		if ( strcmp( oldClientinfo, buf ) )
-			G_LogPrintf( "ClientUserinfoChanged: %i %s\n", clientNum, buf );
+			G_LogPrintf( level.log.console, "ClientUserinfoChanged: %i %s\n", clientNum, buf );
 		else
-			G_LogPrintf( "ClientUserinfoChanged: %i <no change>\n", clientNum );
+			G_LogPrintf( level.log.console, "ClientUserinfoChanged: %i <no change>\n", clientNum );
 	}
 
 	return qtrue;
@@ -2381,7 +2381,7 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	if ( ent->inuse ) {
 		// if a player reconnects quickly after a disconnect, the client disconnect may never be called, thus flag can get lost in the ether
-		G_LogPrintf( "Forcing disconnect on active client: %i\n", clientNum );
+		G_LogPrintf( level.log.console, "Forcing disconnect on active client: %i\n", clientNum );
 		// so lets just fix up anything that should happen on a disconnect
 		ClientDisconnect( clientNum );
 	}
@@ -2392,7 +2392,7 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		value = Info_ValueForKey( userinfo, "cjp_client" );
 		if ( Q_strchrs( value, "\n\r;\"" ) ) {
 			// Spoofed userinfo
-			G_SecurityLogPrintf( "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum, tmpIP );
+			G_LogPrintf( level.log.security, "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 		Q_strcat( msg, sizeof( msg ), va( "cjp_client: %s...", value[0] ? value : "basejka" ) );
@@ -2407,12 +2407,12 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		//Raz: CLIENT SUPPORT HINTING
 		value = Info_ValueForKey( userinfo, "csf" );
 		if ( Q_strchrs( value, "\n\r;\"" ) ) {
-			G_SecurityLogPrintf( "ClientConnect(%d): Spoofed userinfo 'csf'. [IP: %s]\n", clientNum, tmpIP );
+			G_LogPrintf( level.log.security, "ClientConnect(%d): Spoofed userinfo 'csf'. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 
 		if ( value[0] && sscanf( value, "%X", &finalCSF ) != 1 ) {
-			G_LogPrintf( "ClientConnect(%d): userinfo 'csf' was found, but empty. [IP: %s]\n", clientNum, tmpIP );
+			G_LogPrintf( level.log.security, "ClientConnect(%d): userinfo 'csf' was found, but empty. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 		Q_strcat( msg, sizeof( msg ), va( " final csf 0x%X\n", finalCSF ) );
@@ -2472,13 +2472,13 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		if ( !tmpIP[0] ) {
 			// No IP sent when connecting, probably an unban hack attempt
 			client->pers.connected = CON_DISCONNECTED;
-			G_SecurityLogPrintf( "Client %i (%s) sent no IP when connecting.\n", clientNum, client->pers.netname );
+			G_LogPrintf( level.log.security, "Client %i (%s) sent no IP when connecting.\n", clientNum, client->pers.netname );
 			return "Invalid userinfo detected";
 		}
 		Q_strncpyz( client->sess.IP, tmpIP, sizeof( client->sess.IP ) );
 	}
 
-	G_LogPrintf( "ClientConnect: %i (%s) [IP: %s]\n", clientNum, client->pers.netname, tmpIP );
+	G_LogPrintf( level.log.console, "ClientConnect: %i (%s) [IP: %s]\n", clientNum, client->pers.netname, tmpIP );
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
 	if ( firstTime ) {
@@ -2670,7 +2670,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 			trap->SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " %s\n\"", client->pers.netname, G_GetStringEdString("MP_SVGAME", "PLENTER")) );
 		}
 	}
-	G_LogPrintf( "ClientBegin: %i\n", clientNum );
+	G_LogPrintf( level.log.console, "ClientBegin: %i\n", clientNum );
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();
@@ -3883,11 +3883,11 @@ void ClientDisconnect( int clientNum ) {
 
 	ent = g_entities + clientNum;
 	if ( !ent->client || ent->client->pers.connected == CON_DISCONNECTED ) {
-		G_LogPrintf( "ClientDisconnect: tried to disconnect an inactive client %i\n", clientNum );
+		G_LogPrintf( level.log.security, "ClientDisconnect: tried to disconnect an inactive client %i\n", clientNum );
 		return;
 	}
 
-	G_LogPrintf( "ClientDisconnect: %i\n", clientNum );
+	G_LogPrintf( level.log.console, "ClientDisconnect: %i\n", clientNum );
 
 	JPLua_Event_ClientDisconnect( clientNum );
 

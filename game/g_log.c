@@ -246,7 +246,7 @@ void G_LogWeaponOutput(void)
 		return;
 	}
 
-	G_LogPrintf("*****************************Weapon Log:\n" );
+	G_LogPrintf( level.log.console, "*****************************Weapon Log:\n" );
 
 	memset(totalpickups, 0, sizeof(totalpickups));
 	memset(totaltime, 0, sizeof(totaltime));
@@ -288,14 +288,14 @@ void G_LogWeaponOutput(void)
 		}
 	}
 
-	G_LogPrintf(  "\n****Data by Weapon:\n" );
+	G_LogPrintf( level.log.console, "\n****Data by Weapon:\n" );
 	for (j=0; j<WP_NUM_WEAPONS; j++)
 	{
-		G_LogPrintf("%15s:  Pickups: %4d,  Time:  %5d,  Deaths: %5d\n",
-				weaponNameFromIndex[j], totalpickups[j], (int)(totaltime[j]/1000), totaldeaths[j]);
+		G_LogPrintf( level.log.console, "%15s:  Pickups: %4d,  Time:  %5d,  Deaths: %5d\n", weaponNameFromIndex[j],
+			totalpickups[j], (int)(totaltime[j]/1000), totaldeaths[j] );
 	}
 
-	G_LogPrintf(  "\n****Combat Data by Weapon:\n" );
+	G_LogPrintf( level.log.console, "\n****Combat Data by Weapon:\n" );
 	for (j=0; j<WP_NUM_WEAPONS; j++)
 	{
 		if (totalshots[j] > 0)
@@ -306,18 +306,17 @@ void G_LogWeaponOutput(void)
 		{
 			pershot = 0;
 		}
-		G_LogPrintf("%15s:  Damage: %6d,  Kills: %5d,  Dmg per Shot: %f\n",
-				weaponNameFromIndex[j], totaldamage[j], totalkills[j], pershot);
+		G_LogPrintf( level.log.console, "%15s:  Damage: %6d,  Kills: %5d,  Dmg per Shot: %f\n", weaponNameFromIndex[j],
+			totaldamage[j], totalkills[j], pershot );
 	}
 
-	G_LogPrintf(  "\n****Combat Data By Damage Type:\n" );
+	G_LogPrintf( level.log.console, "\n****Combat Data By Damage Type:\n" );
 	for (j=0; j<MOD_MAX; j++)
 	{
-		G_LogPrintf("%25s:  Damage: %6d,  Kills: %5d\n",
-				modNames[j], totaldamageMOD[j], totalkillsMOD[j]);
+		G_LogPrintf( level.log.console, "%25s:  Damage: %6d,  Kills: %5d\n", modNames[j], totaldamageMOD[j], totalkillsMOD[j] );
 	}
 
-	G_LogPrintf("\n");
+	G_LogPrintf( level.log.console, "\n");
 
 
 

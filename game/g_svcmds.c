@@ -273,7 +273,7 @@ static void SV_BotList_f( void ) {
 static void SV_Cointoss_f( void ) {
 	qboolean heads = !!(Q_irand( 0, QRAND_MAX-1 )&1);
 	trap->SendServerCommand( -1, va( "cp \"Cointoss result: %s\n\"", heads ? S_COLOR_GREEN"HEADS" : S_COLOR_YELLOW"TAILS" ) );
-	G_LogPrintf( "Cointoss result: %s\n", heads ? S_COLOR_GREEN"HEADS" : S_COLOR_YELLOW"TAILS" );
+	G_LogPrintf( level.log.console, "Cointoss result: %s\n", heads ? S_COLOR_GREEN"HEADS" : S_COLOR_YELLOW"TAILS" );
 }
 
 static void SV_EntityList_f( void ) {

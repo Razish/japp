@@ -156,7 +156,7 @@ void CG_ParseServerinfo( void ) {
 		cg.japp.SSF = JAPLUS_SERVER_FLAGS;
 
 	if ( tinfo[0] && sscanf( tinfo, "%X", &cg.japp.SSF ) != 1 )
-		CG_SecurityLogPrintf( "CG_ParseServerinfo: serverinfo 'ssf' was found, but invalid.\n"  );
+		CG_LogPrintf( cg.log.security, "CG_ParseServerinfo: serverinfo 'ssf' was found, but invalid.\n"  );
 	Com_Printf( "Server support hints: 0x%X\n", cg.japp.SSF );
 
 	mapname = Info_ValueForKey( info, "mapname" );

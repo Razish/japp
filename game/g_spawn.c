@@ -1523,7 +1523,7 @@ void SP_worldspawn( void )
 	else if ( g_doWarmup.integer && level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL && level.gametype != GT_SIEGE ) { // Turn it on
 		level.warmupTime = -1;
 		trap->SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
-		G_LogPrintf( "Warmup:\n" );
+		G_LogPrintf( level.log.console, "Warmup:\n" );
 	}
 
 	trap->SetConfigstring(CS_LIGHT_STYLES+(LS_STYLES_START*3)+0, defaultStyles[0][0]);
