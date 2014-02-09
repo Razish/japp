@@ -131,6 +131,14 @@ static int JPLua_Player_GetEFlags2( lua_State *L ) {
 	return 1;
 }
 
+//Func: Player:GetFlags()
+//Retn: bit-mask of various entity flags (See 'Flags' table)
+static int JPLua_Player_GetFlags( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	lua_pushinteger( L, g_entities[player->clientNum].flags );
+	return 1;
+}
+
 //Func: Player:GetForce()
 //Retn: integer amount of Player's force mana points
 static int JPLua_Player_GetForce( lua_State *L ) {
@@ -349,9 +357,9 @@ static int JPLua_Player_Kill( lua_State *L ) {
 	return 0;
 }
 
-//Func: Player:RemoveEntityFlag( integer bit )
+//Func: Player:RemoveEFlag( integer bit )
 //Retn: string errorMsg if it failed, otherwise nothing
-static int JPLua_Player_RemoveEntityFlag( lua_State *L ) {
+static int JPLua_Player_RemoveEFlag( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	uint32_t bit = lua_tointeger( L, 2 );
 	int i, found = 0;
@@ -366,7 +374,51 @@ static int JPLua_Player_RemoveEntityFlag( lua_State *L ) {
 		return 1;
 	}
 
-	g_entities[player->clientNum].client->ps.eFlags &= ~bit;
+	level.clients[player->clientNum].ps.eFlags &= ~bit;
+
+	return 0;
+}
+
+//Func: Player:RemoveEFlag2( integer bit )
+//Retn: string errorMsg if it failed, otherwise nothing
+static int JPLua_Player_RemoveEFlag2( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	uint32_t bit = lua_tointeger( L, 2 );
+	int i, found = 0;
+
+	for ( i=0; i<32; i++ ) {
+		if ( bit & (1<<i) )
+			found++;
+	}
+
+	if ( found > 1 ) {
+		lua_pushfstring( L, "too many bits removed (%i)\n", found );
+		return 1;
+	}
+
+	level.clients[player->clientNum].ps.eFlags2 &= ~bit;
+
+	return 0;
+}
+
+//Func: Player:RemoveFlag( integer bit )
+//Retn: string errorMsg if it failed, otherwise nothing
+static int JPLua_Player_RemoveFlag( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	uint32_t bit = lua_tointeger( L, 2 );
+	int i, found = 0;
+
+	for ( i=0; i<32; i++ ) {
+		if ( bit & (1<<i) )
+			found++;
+	}
+
+	if ( found > 1 ) {
+		lua_pushfstring( L, "too many bits removed (%i)\n", found );
+		return 1;
+	}
+
+	g_entities[player->clientNum].flags &= ~bit;
 
 	return 0;
 }
@@ -386,9 +438,9 @@ static int JPLua_Player_SetArmor( lua_State *L ) {
 }
 
 
-//Func: Player:SetEntityFlag( integer bit )
+//Func: Player:SetEFlag( integer bit )
 //Retn: string errorMsg if it failed, otherwise nothing
-static int JPLua_Player_SetEntityFlag( lua_State *L ) {
+static int JPLua_Player_SetEFlag( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	uint32_t bit = lua_tointeger( L, 2 );
 	int i, found = 0;
@@ -403,7 +455,51 @@ static int JPLua_Player_SetEntityFlag( lua_State *L ) {
 		return 1;
 	}
 
-	g_entities[player->clientNum].client->ps.eFlags |= bit;
+	level.clients[player->clientNum].ps.eFlags |= bit;
+
+	return 0;
+}
+
+//Func: Player:SetEFlag2( integer bit )
+//Retn: string errorMsg if it failed, otherwise nothing
+static int JPLua_Player_SetEFlag2( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	uint32_t bit = lua_tointeger( L, 2 );
+	int i, found = 0;
+
+	for ( i=0; i<32; i++ ) {
+		if ( bit & (1<<i) )
+			found++;
+	}
+
+	if ( found > 1 ) {
+		lua_pushfstring( L, "too many bits set (%i)\n", found );
+		return 1;
+	}
+
+	level.clients[player->clientNum].ps.eFlags2 |= bit;
+
+	return 0;
+}
+
+//Func: Player:SetFlag( integer bit )
+//Retn: string errorMsg if it failed, otherwise nothing
+static int JPLua_Player_SetFlag( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	uint32_t bit = lua_tointeger( L, 2 );
+	int i, found = 0;
+
+	for ( i=0; i<32; i++ ) {
+		if ( bit & (1<<i) )
+			found++;
+	}
+
+	if ( found > 1 ) {
+		lua_pushfstring( L, "too many bits set (%i)\n", found );
+		return 1;
+	}
+
+	g_entities[player->clientNum].flags |= bit;
 
 	return 0;
 }
@@ -542,6 +638,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "GetDuelingPartner",	JPLua_Player_GetDuelingPartner },
 	{ "GetEFlags",			JPLua_Player_GetEFlags },
 	{ "GetEFlags2",			JPLua_Player_GetEFlags2 },
+	{ "GetFlags",			JPLua_Player_GetFlags },
 	{ "GetForce",			JPLua_Player_GetForce },
 	{ "GetHealth",			JPLua_Player_GetHealth },
 	{ "GetID",				JPLua_Player_GetID },
@@ -561,9 +658,13 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "IsWeaponHolstered",	JPLua_Player_IsWeaponHolstered },
 	{ "Kick",				JPLua_Player_Kick },
 	{ "Kill",				JPLua_Player_Kill },
-	{ "RemoveEntityFlag",	JPLua_Player_RemoveEntityFlag },
+	{ "RemoveEFlag",		JPLua_Player_RemoveEFlag },
+	{ "RemoveEFlag2",		JPLua_Player_RemoveEFlag2 },
+	{ "RemoveFlag",			JPLua_Player_RemoveFlag },
 	{ "SetArmor",			JPLua_Player_SetArmor },
-	{ "SetEntityFlag",		JPLua_Player_SetEntityFlag },
+	{ "SetEFlag",			JPLua_Player_SetEFlag },
+	{ "SetEFlag2",			JPLua_Player_SetEFlag2 },
+	{ "SetFlag",			JPLua_Player_SetFlag },
 	{ "SetHealth",			JPLua_Player_SetHealth },
 	{ "SetScore",			JPLua_Player_SetScore },
 	{ "SetVelocity",		JPLua_Player_SetVelocity },

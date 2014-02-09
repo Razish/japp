@@ -67,7 +67,7 @@ extern vector3 gPainPoint;
 #define	FL_BOUNCE					(0x00002000u) // for missiles
 #define	FL_BOUNCE_HALF				(0x00004000u) // for missiles
 #define	FL_BOUNCE_SHRAPNEL			(0x00008000u) // special shrapnel flag
-#define	FL_VEH_BOARDING				(0x00010000u) // special shrapnel flag
+#define	FL_VEH_BOARDING				(0x00010000u) //
 #define FL_DMG_BY_SABER_ONLY		(0x00020000u) // only take dmg from saber
 #define FL_DMG_BY_HEAVY_WEAP_ONLY	(0x00040000u) // only take dmg from explosives
 #define FL_BBRUSH					(0x00080000u) // i am a breakable brush
