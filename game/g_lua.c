@@ -359,6 +359,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "AddServerCommand", JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
 
 	{ "GetPlayer", JPLua_GetPlayer }, // Player GetPlayer( integer clientNum )
+	{ "GetPlayerTable", JPLua_Player_GetMetaTable }, // Player.meta GetPlayerTable()
 	{ "CreateCvar", JPLua_CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
 

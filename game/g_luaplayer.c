@@ -628,6 +628,11 @@ jplua_player_t *JPLua_CheckPlayer( lua_State *L, int idx ) {
 	return (jplua_player_t *)ud;
 }
 
+int JPLua_Player_GetMetaTable( lua_State *L ) {
+	luaL_getmetatable( L, PLAYER_META );
+	return 1;
+}
+
 static const struct luaL_Reg jplua_player_meta[] = {
 	{ "__eq",				JPLua_Player_Equals },
 	{ "__tostring",			JPLua_Player_ToString },
