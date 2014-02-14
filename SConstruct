@@ -332,7 +332,7 @@ if plat == 'Linux':
 		env['LINKFLAGS'] += [ '-m32' ]
 elif plat == 'Windows':
 	# assume msvc
-	env['CCFLAGS'] = [ '/GS', '/Zc:wchar_t', '/WX-', '/MDd', '/EHsc', '/nologo', '/W4', '/wd"4100"', '/wd"4127"', '/wd"4996"' ]
+	env['CCFLAGS'] = [ '/GS', '/Zc:wchar_t', '/WX-', '/EHsc', '/nologo', '/W4', '/wd"4100"', '/wd"4127"', '/wd"4996"' ]
 	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS','/MACHINE:'+arch ]
 	env['CPPDEFINES'] = [ 'WIN32', '_WINDOWS' ]
 
@@ -341,13 +341,13 @@ if int( ARGUMENTS.get( 'debug', 0 ) ):
 	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-g3' ]
 	elif plat == 'Windows':
-		env['CCFLAGS'] += [ '/Zi', '/Od', '/RTC1', '/Gm' ]
+		env['CCFLAGS'] += [ '/Zi', '/Od', '/RTC1', '/Gm', '/MDd' ]
 	env['CPPDEFINES'] += [ '_DEBUG' ]
 else:
 	if plat == 'Linux' and not analyse:
 		env['CCFLAGS'] += [ '-O2' ] # analysis sets higher optimisation level
 	elif plat == 'Windows':
-		env['CCFLAGS'] += [ '/O2' ]
+		env['CCFLAGS'] += [ '/O2', '/MD' ]
 	env['CPPDEFINES'] += [ 'NDEBUG' ]
 
 # get git revision
