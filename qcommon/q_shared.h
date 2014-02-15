@@ -176,7 +176,7 @@ float FloatSwap( const float *f );
 	static QINLINE float BigFloat(const float *l) { return FloatSwap(l); }
 	#define LittleFloat
 
-	#define	PATH_SEP '\\'
+	#define	PATH_SEP "\\"
 
 #endif // _WIN32
 
@@ -205,7 +205,7 @@ float FloatSwap( const float *f );
 		#define CPUSTRING "MacOSX-other"
 	#endif
 
-	#define	PATH_SEP	'/'
+	#define	PATH_SEP "/"
 
 	#define __rlwimi(out, in, shift, maskBegin, maskEnd) asm("rlwimi %0,%1,%2,%3,%4" : "=r" (out) : "r" (in), "i" (shift), "i" (maskBegin), "i" (maskEnd))
 	#define __dcbt(addr, offset) asm("dcbt %0,%1" : : "b" (addr), "r" (offset))
@@ -254,7 +254,7 @@ float FloatSwap( const float *f );
 
 	#define	CPUSTRING "MacOS-PPC"
 
-	#define	PATH_SEP ':'
+	#define	PATH_SEP ":"
 
 	void Sys_PumpEvents( void );
 
@@ -291,7 +291,7 @@ float FloatSwap( const float *f );
 		#define	CPUSTRING "linux-other"
 	#endif
 
-	#define	PATH_SEP '/'
+	#define	PATH_SEP "/"
 	#define RAND_MAX 2147483647
 
 	// bk001205 - try
@@ -341,7 +341,7 @@ float FloatSwap( const float *f );
 		#define CPUSTRING "freebsd-other"
 	#endif
 
-	#define	PATH_SEP '/'
+	#define	PATH_SEP "/"
 
 	// bk010116 - omitted Q3STATIC (see Linux above), broken target
 

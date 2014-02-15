@@ -193,17 +193,17 @@ static void AM_WriteAccounts( fileHandle_t f ) {
 	Q_WriteJSONToFile( root, f );
 }
 
+#define ADMIN_FILE "admins.json"
 // load admin accounts from disk after logging everyone out
 void AM_LoadAdmins( void ) {
-	char *buf = NULL, loadPath[MAX_QPATH] = {0};
+	char *buf = NULL;
 	unsigned int len = 0;
 	fileHandle_t f = 0;
 
 	AM_ClearAccounts();
 
-	Q_strncpyz( loadPath, "admins.json", sizeof( loadPath ) );
-	len = trap->FS_Open( loadPath, &f, FS_READ );
-	Com_Printf( "Loading admin accounts (%s)\n", loadPath );
+	len = trap->FS_Open( ADMIN_FILE, &f, FS_READ );
+	Com_Printf( "Loading admin accounts (" ADMIN_FILE ")\n" );
 
 	// no file
 	if ( !f )
@@ -231,12 +231,10 @@ void AM_LoadAdmins( void ) {
 
 // save admin accounts to disk
 void AM_SaveAdmins( void ) {
-	char loadPath[MAX_QPATH] = {0};
 	fileHandle_t f;
 
-	Q_strncpyz( loadPath, "admins.json", sizeof( loadPath ) );
-	trap->FS_Open( loadPath, &f, FS_WRITE );
-	Com_Printf( "Saving admins (%s)\n", loadPath );
+	trap->FS_Open( ADMIN_FILE, &f, FS_WRITE );
+	Com_Printf( "Saving admins (" ADMIN_FILE ")\n" );
 
 	AM_WriteAccounts( f );
 }
@@ -447,7 +445,7 @@ void AM_LoadTelemarks( void ) {
 
 	AM_ClearTelemarks();
 
-	Com_sprintf( loadPath, sizeof( loadPath ), "telemarks\\%s.json", level.rawmapname );
+	Com_sprintf( loadPath, sizeof( loadPath ), "telemarks" PATH_SEP "%s.json", level.rawmapname );
 	len = trap->FS_Open( loadPath, &f, FS_READ );
 	Com_Printf( "Loading telemarks (%s)\n", loadPath );
 
@@ -480,7 +478,7 @@ void AM_SaveTelemarks( void ) {
 	char loadPath[MAX_QPATH] = {0};
 	fileHandle_t f;
 
-	Com_sprintf( loadPath, sizeof( loadPath ), "telemarks\\%s.json", level.rawmapname );
+	Com_sprintf( loadPath, sizeof( loadPath ), "telemarks" PATH_SEP "%s.json", level.rawmapname );
 	trap->FS_Open( loadPath, &f, FS_WRITE );
 	Com_Printf( "Saving telemarks (%s)\n", loadPath );
 
