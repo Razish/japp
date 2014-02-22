@@ -9,15 +9,9 @@
 #include "cg_lights.h"
 #include "Ghoul2/G2.h"
 #include "ui/ui_public.h"
-
 #include "cg_luaevent.h"
+#include "cg_media.h"
 
-/*
-=================
-CG_ParseScores
-
-=================
-*/
 static QINLINE int GetScoreOffset( void ) {
 	return Server_Supports( SSF_SCOREBOARD_KD ) ? 15 : 14;
 }
@@ -722,13 +716,6 @@ CG_ConfigStringModified
 
 ================
 */
-extern int cgSiegeRoundState;
-extern int cgSiegeRoundTime;
-void CG_ParseSiegeObjectiveStatus(const char *str);
-void CG_ParseWeatherEffect(const char *str);
-extern void CG_ParseSiegeState(const char *str); //cg_main.c
-extern int cg_beatingSiegeTime;
-extern int cg_siegeWinTeam;
 static void CG_ConfigStringModified( void ) {
 	const char	*str;
 	int		num;
@@ -1089,7 +1076,7 @@ static void CG_MapRestart( void ) {
 
 	// play the "fight" sound if this is a restart without warmup
 	if ( cg.warmup == 0 && cgs.gametype != GT_SIEGE && cgs.gametype != GT_POWERDUEL/* && cgs.gametype == GT_DUEL */) {
-		trap->S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
+		trap->S_StartLocalSound( media.sounds.warning.countFight, CHAN_ANNOUNCER );
 		CG_CenterPrint( CG_GetStringEdString("MP_SVGAME", "BEGIN_DUEL"), 120, GIANTCHAR_WIDTH*2 );
 	}
 	/*
@@ -1628,7 +1615,7 @@ static void CG_ServerCommand( void ) {
 
 		if ( !cg_teamChatsOnly.integer ) {
 			char cbName[MAX_CHATBOX_IDENTIFIER_SIZE] = "normal";
-			trap->S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+			trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 			Q_strncpyz( text, msg, MAX_SAY_TEXT );
 
 			if ( CG_ContainsChannelEscapeChar( text ) )
@@ -1649,7 +1636,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "tchat" ) ) {
-		trap->S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+		trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 		Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
 		CG_LogPrintf( cg.log.console, va( "%s\n", text ) );
@@ -1687,7 +1674,7 @@ static void CG_ServerCommand( void ) {
 				trap->SE_GetStringTextString(loc+1, loc, sizeof( loc ) );
 			}
 
-			trap->S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+			trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 			//Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
 			Com_sprintf(text, sizeof( text ), "%s"S_COLOR_WHITE"<%s> ^%s%s", name, loc, color, message);
 			CG_RemoveChatEscapeChar( text );
@@ -1723,7 +1710,7 @@ static void CG_ServerCommand( void ) {
 			trap->SE_GetStringTextString(loc+1, loc, sizeof( loc ) );
 		}
 
-		trap->S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+		trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 		//Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
 		Com_sprintf(text, sizeof( text ), "%s"S_COLOR_WHITE"<%s> ^%s%s", name, loc, color, message);
 		CG_RemoveChatEscapeChar( text );

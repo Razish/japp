@@ -2,6 +2,7 @@
 
 #include "cg_local.h"
 #include "fx_local.h"
+#include "cg_media.h"
 
 /*
 ---------------------------
@@ -53,13 +54,11 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end )
 		{
 			VectorSet4( &color1, 1.0f, 0.0f, 0.0f, 1.0f );
 			VectorSet4( &color2, 1.0f, 0.0f, 0.0f, 1.0f );
-		//	muzzleEffect = cgs.effects.weapons.divergenceMuzzleRed;
 		}
 		else if ( ci->team == TEAM_BLUE )
 		{
 			VectorSet4( &color1, 0.0f, 0.0f, 1.0f, 1.0f );
 			VectorSet4( &color2, 0.0f, 0.0f, 1.0f, 1.0f );
-		//	muzzleEffect = cgs.effects.weapons.divergenceMuzzleBlue;
 		}
 		else
 		{
@@ -187,7 +186,7 @@ void FX_DisruptorAltMiss( vector3 *origin, vector3 *normal )
 
 	trap->FX_AddBezier(&b);
 
-	trap->FX_PlayEffectID( cgs.effects.disruptorAltMissEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.disruptor.altMiss, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -197,7 +196,7 @@ FX_DisruptorAltHit
 */
 
 void FX_DisruptorAltHit( vector3 *origin, vector3 *normal ) {
-	trap->FX_PlayEffectID( cgs.effects.disruptorAltHitEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.disruptor.altHit, origin, normal, -1, -1, qfalse );
 }
 
 
@@ -209,7 +208,7 @@ FX_DisruptorHitWall
 */
 
 void FX_DisruptorHitWall( vector3 *origin, vector3 *normal ) {
-	trap->FX_PlayEffectID( cgs.effects.disruptorWallImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.disruptor.wallImpact, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -219,5 +218,5 @@ FX_DisruptorHitPlayer
 */
 
 void FX_DisruptorHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
-	trap->FX_PlayEffectID( cgs.effects.disruptorFleshImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.disruptor.fleshImpact, origin, normal, -1, -1, qfalse );
 }

@@ -147,22 +147,32 @@ void CG_PrecachePlayersForSiegeTeam(int team)
 	}
 }
 
-void CG_InitSiegeMode(void)
-{
-	char			levelname[MAX_QPATH];
-	char			btime[1024];
-	char			teams[2048];
+void CG_InitSiegeMode( void ) {
+	char levelname[MAX_QPATH], btime[1024], teams[2048], teamIcon[128];
+	const char *s;
 	static char teamInfo[MAX_SIEGE_INFO_SIZE] = {0};
-	int				len = 0;
-	int				i = 0;
-	int				j = 0;
-	siegeClass_t		*cl;
-	siegeTeam_t		*sTeam;
-	fileHandle_t	f;
-	char			teamIcon[128];
+	int len = 0, i = 0, j = 0;
+	siegeClass_t *cl;
+	siegeTeam_t *sTeam;
+	fileHandle_t f;
 
 	//Raz: moved to the heap
 	teamInfo[0] = '\0';
+
+	s = CG_ConfigString( CS_SIEGE_STATE );
+	if ( s[0] )
+		CG_ParseSiegeState( s );
+
+	s = CG_ConfigString( CS_SIEGE_WINTEAM );
+	if ( s[0] )
+		cg_siegeWinTeam = atoi( s );
+
+	if ( cgs.gametype == GT_SIEGE ) {
+		CG_ParseSiegeObjectiveStatus( CG_ConfigString( CS_SIEGE_OBJECTIVES ) );
+		cg_beatingSiegeTime = atoi( CG_ConfigString( CS_SIEGE_TIMEOVERRIDE ) );
+		if ( cg_beatingSiegeTime )
+			CG_SetSiegeTimerCvar( cg_beatingSiegeTime );
+	}
 
 	if (cgs.gametype != GT_SIEGE)
 	{

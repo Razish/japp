@@ -6,12 +6,20 @@
 #include "tr_types.h"
 #include "bg_public.h"
 #include "cg_public.h"
-//#include "cg_lua.h"
 
-// The entire cgame module is unloaded and reloaded on each level change,
-// so there is NO persistant data between levels on the client side.
-// If you absolutely need something stored, it can either be kept
-// by the server in the server stored userinfos, or stashed in a cvar.
+extern int cgSiegeRoundBeganTime;
+extern int cgSiegeRoundState;
+extern int cgSiegeRoundTime;
+extern int cg_beatingSiegeTime;
+extern int cg_siegeWinTeam;
+
+extern autoMapInput_t cg_autoMapInput;
+extern int cg_autoMapInputTime;
+
+// the entire cgame module is unloaded and reloaded on each level change, so there is NO persistant data between levels
+//	on the client side.
+// if you absolutely need something stored, it can either be kept by the server in the server stored userinfos, or
+//	stashed in a cvar.
 
 #define	POWERUP_BLINKS		5
 
@@ -877,7 +885,7 @@ typedef struct cg_s {
 	int     nextOrbitTime;
 
 	//qboolean cameraMode;		// if rendering from a loaded camera
-	int			loadLCARSStage;
+	float		loadFrac;
 
 	int			forceHUDTotalFlashTime;
 	int			forceHUDNextFlashTime;
@@ -942,7 +950,7 @@ Ghoul2 Insert End
 	} japp;
 
 	struct {
-		fileHandle_t chat, console, security;
+		fileHandle_t chat, console, debug, security;
 	} log;
 
 	struct {
@@ -1027,8 +1035,7 @@ extern cgscreffects_t cgScreenEffects;
 void CGCam_Shake( float intensity, int duration );
 void CGCam_SetMusicMult( float multiplier, int duration );
 
-typedef enum
-{
+typedef enum chunkModels_e {
 	CHUNK_METAL1 = 0,
 	CHUNK_METAL2,
 	CHUNK_ROCK1,
@@ -1039,487 +1046,7 @@ typedef enum
 	CHUNK_WHITE_METAL,
 	NUM_CHUNK_TYPES
 } chunkModels_t;
-#define NUM_CHUNK_MODELS	4
-
-// all of the model, shader, and sound references that are
-// loaded at gamestate time are stored in cgMedia_t
-// Other media that can be tied to clients, weapons, or items are
-// stored in the clientInfo_t, itemInfo_t, weaponInfo_t, and powerupInfo_t
-typedef struct cgMedia_s {
-	qhandle_t	charsetShader;
-	qhandle_t	whiteShader;
-
-	qhandle_t	loadBarLED;
-	qhandle_t	loadBarLEDCap;
-	qhandle_t	loadBarLEDSurround;
-
-	qhandle_t	bryarFrontFlash;
-	qhandle_t	greenFrontFlash;
-	qhandle_t	lightningFlash;
-
-	qhandle_t	itemHoloModel;
-	qhandle_t	redFlagModel;
-	qhandle_t	blueFlagModel;
-
-	qhandle_t	teamStatusBar;
-
-	qhandle_t	deferShader;
-
-	qhandle_t	radarShader;
-	qhandle_t	siegeItemShader;
-	qhandle_t	mAutomapPlayerIcon;
-	qhandle_t	mAutomapRocketIcon;
-
-	qhandle_t	wireframeAutomapFrame_left;
-	qhandle_t	wireframeAutomapFrame_right;
-	qhandle_t	wireframeAutomapFrame_top;
-	qhandle_t	wireframeAutomapFrame_bottom;
-
-//Chunks
-	qhandle_t	chunkModels[NUM_CHUNK_TYPES][4];
-	sfxHandle_t	chunkSound;
-	sfxHandle_t	grateSound;
-	sfxHandle_t	rockBreakSound;
-	sfxHandle_t	rockBounceSound[2];
-	sfxHandle_t	metalBounceSound[2];
-	sfxHandle_t	glassChunkSound;
-	sfxHandle_t	crateBreakSound[2];
-
-	qhandle_t	hackerIconShader;
-
-	// Saber shaders
-	//-----------------------------
-	qhandle_t	forceCoronaShader;
-
-	qhandle_t	redSaberGlowShader;
-	qhandle_t	redSaberCoreShader;
-	qhandle_t	orangeSaberGlowShader;
-	qhandle_t	orangeSaberCoreShader;
-	qhandle_t	yellowSaberGlowShader;
-	qhandle_t	yellowSaberCoreShader;
-	qhandle_t	greenSaberGlowShader;
-	qhandle_t	greenSaberCoreShader;
-	qhandle_t	blueSaberGlowShader;
-	qhandle_t	blueSaberCoreShader;
-	qhandle_t	purpleSaberGlowShader;
-	qhandle_t	purpleSaberCoreShader;
-	qhandle_t	rgbSaberGlowShader;
-	qhandle_t	rgbSaberCoreShader;
-
-	qhandle_t	rgbSaberGlow2Shader;
-	qhandle_t	rgbSaberCore2Shader;
-	qhandle_t	rgbSaberTrail2Shader;
-
-	qhandle_t	rgbSaberGlow3Shader;
-	qhandle_t	rgbSaberCore3Shader;
-	qhandle_t	rgbSaberTrail3Shader;
-
-	qhandle_t	rgbSaberGlow4Shader;
-	qhandle_t	rgbSaberCore4Shader;
-	qhandle_t	rgbSaberTrail4Shader;
-
-	qhandle_t	rgbSaberGlow5Shader;
-	qhandle_t	rgbSaberCore5Shader;
-	qhandle_t	rgbSaberTrail5Shader;
-
-	qhandle_t	blackSaberGlowShader;
-	qhandle_t	blackSaberCoreShader;
-	qhandle_t	blackBlurShader;
-
-	qhandle_t	sfxSaberTrailShader;
-	qhandle_t	sfxSaberBladeShader;
-	qhandle_t	sfxSaberBlade2Shader;
-	qhandle_t	sfxSaberEndShader;
-	qhandle_t	sfxSaberEnd2Shader;
-
-	qhandle_t	saberBlurShader;
-	qhandle_t	swordTrailShader;
-
-	qhandle_t	yellowDroppedSaberShader;
-
-	qhandle_t	rivetMarkShader;
-
-	qhandle_t	teamRedShader;
-	qhandle_t	teamBlueShader;
-
-	qhandle_t	powerDuelAllyShader;
-
-	qhandle_t	balloonShader;
-	qhandle_t	vchatShader;
-	qhandle_t	connectionShader;
-
-	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
-	qhandle_t	lagometerShader;
-	qhandle_t	backTileShader;
-
-	qhandle_t	numberShaders[11];
-	qhandle_t	smallnumberShaders[11];
-	qhandle_t	chunkyNumberShaders[11];
-
-	qhandle_t	electricBodyShader;
-	qhandle_t	electricBody2Shader;
-
-	qhandle_t	fsrMarkShader;
-	qhandle_t	fslMarkShader;
-	qhandle_t	fshrMarkShader;
-	qhandle_t	fshlMarkShader;
-
-	qhandle_t	refractionShader;
-
-	qhandle_t	cloakedShader;
-
-	qhandle_t	boltShader;
-
-	qhandle_t	shadowMarkShader;
-
-	//glass shard shader
-	qhandle_t	glassShardShader;
-
-	// wall mark shaders
-	qhandle_t	wakeMarkShader;
-
-	// Pain view shader
-	qhandle_t	viewPainShader;
-	qhandle_t	viewPainShader_Shields;
-	qhandle_t	viewPainShader_ShieldsAndHealth;
-
-	qhandle_t	itemRespawningPlaceholder;
-	qhandle_t	itemRespawningRezOut;
-
-	qhandle_t	playerShieldDamage;
-	qhandle_t	protectShader;
-	qhandle_t	forceSightBubble;
-	qhandle_t	forceShell;
-	qhandle_t	sightShell;
-
-	// Disruptor zoom graphics
-	qhandle_t	disruptorMask;
-	qhandle_t	disruptorInsert;
-	qhandle_t	disruptorLight;
-	qhandle_t	disruptorInsertTick;
-	qhandle_t	disruptorChargeShader;
-
-	// Binocular graphics
-	qhandle_t	binocularCircle;
-	qhandle_t	binocularMask;
-	qhandle_t	binocularArrow;
-	qhandle_t	binocularTri;
-	qhandle_t	binocularStatic;
-	qhandle_t	binocularOverlay;
-
-	// weapon effect models
-	qhandle_t	lightningExplosionModel;
-
-	// explosion assets
-	qhandle_t	explosionModel;
-	qhandle_t	surfaceExplosionShader;
-
-	qhandle_t	disruptorShader;
-
-	qhandle_t	solidWhite;
-
-	qhandle_t	heartShader;
-
-	// All the player shells
-	qhandle_t	ysaliredShader;
-	qhandle_t	ysaliblueShader;
-	qhandle_t	ysalimariShader;
-	qhandle_t	boonShader;
-	qhandle_t	endarkenmentShader;
-	qhandle_t	enlightenmentShader;
-	qhandle_t	invulnerabilityShader;
-
-#ifdef JK2AWARDS
-	// medals shown during gameplay
-	qhandle_t	medalImpressive;
-	qhandle_t	medalExcellent;
-	qhandle_t	medalGauntlet;
-	qhandle_t	medalDefend;
-	qhandle_t	medalAssist;
-	qhandle_t	medalCapture;
-#endif
-
-	// sounds
-	sfxHandle_t	selectSound;
-	sfxHandle_t	footsteps[FOOTSTEP_TOTAL][4];
-
-	sfxHandle_t	winnerSound;
-	sfxHandle_t	loserSound;
-
-	sfxHandle_t crackleSound;
-
-	sfxHandle_t	grenadeBounce1;
-	sfxHandle_t	grenadeBounce2;
-
-	sfxHandle_t teamHealSound;
-	sfxHandle_t teamRegenSound;
-
-	sfxHandle_t	teleInSound;
-	sfxHandle_t	teleOutSound;
-	sfxHandle_t	respawnSound;
-	sfxHandle_t talkSound;
-	sfxHandle_t landSound;
-	sfxHandle_t fallSound;
-
-	sfxHandle_t oneMinuteSound;
-	sfxHandle_t fiveMinuteSound;
-
-	sfxHandle_t threeFragSound;
-	sfxHandle_t twoFragSound;
-	sfxHandle_t oneFragSound;
-
-#ifdef JK2AWARDS
-	sfxHandle_t impressiveSound;
-	sfxHandle_t excellentSound;
-	sfxHandle_t deniedSound;
-	sfxHandle_t humiliationSound;
-	sfxHandle_t defendSound;
-	sfxHandle_t holyShitSound;
-#endif
-
-	/*
-	sfxHandle_t takenLeadSound;
-	sfxHandle_t tiedLeadSound;
-	sfxHandle_t lostLeadSound;
-	*/
-
-	sfxHandle_t rollSound;
-
-	sfxHandle_t watrInSound;
-	sfxHandle_t watrOutSound;
-	sfxHandle_t watrUnSound;
-
-	sfxHandle_t noforceSound;
-
-	sfxHandle_t deploySeeker;
-	sfxHandle_t medkitSound;
-
-	// teamplay sounds
-#ifdef JK2AWARDS
-	sfxHandle_t captureAwardSound;
-#endif
-	sfxHandle_t redScoredSound;
-	sfxHandle_t blueScoredSound;
-	sfxHandle_t redLeadsSound;
-	sfxHandle_t blueLeadsSound;
-	sfxHandle_t teamsTiedSound;
-
-	sfxHandle_t redFlagReturnedSound;
-	sfxHandle_t blueFlagReturnedSound;
-	sfxHandle_t	redTookFlagSound;
-	sfxHandle_t blueTookFlagSound;
-
-	sfxHandle_t redYsalReturnedSound;
-	sfxHandle_t blueYsalReturnedSound;
-	sfxHandle_t	redTookYsalSound;
-	sfxHandle_t blueTookYsalSound;
-
-	sfxHandle_t	drainSound;
-
-	//music blips
-	sfxHandle_t	happyMusic;
-	sfxHandle_t dramaticFailure;
-
-	// tournament sounds
-	sfxHandle_t	count3Sound;
-	sfxHandle_t	count2Sound;
-	sfxHandle_t	count1Sound;
-	sfxHandle_t	countFightSound;
-
-	// new stuff
-	qhandle_t patrolShader;
-	qhandle_t assaultShader;
-	qhandle_t campShader;
-	qhandle_t followShader;
-	qhandle_t defendShader;
-	qhandle_t retrieveShader;
-	qhandle_t escortShader;
-	qhandle_t flagShaders[3];
-
-	qhandle_t halfShieldModel;
-	qhandle_t halfShieldShader;
-
-	qhandle_t demp2Shell;
-	qhandle_t demp2ShellShader;
-
-	qhandle_t cursor;
-	qhandle_t selectCursor;
-	qhandle_t sizeCursor;
-
-	//weapon icons
-	qhandle_t weaponIcons[WP_NUM_WEAPONS];
-	qhandle_t weaponIcons_NA[WP_NUM_WEAPONS];
-
-	//holdable inventory item icons
-	qhandle_t invenIcons[HI_NUM_HOLDABLE];
-
-	//force power icons
-	qhandle_t forcePowerIcons[NUM_FORCE_POWERS];
-
-	qhandle_t rageRecShader;
-
-	//other HUD parts
-	int			currentBackground;
-	qhandle_t	weaponIconBackground;
-	qhandle_t	forceIconBackground;
-	qhandle_t	inventoryIconBackground;
-
-	sfxHandle_t	holocronPickup;
-
-	// Zoom
-	sfxHandle_t	zoomStart;
-	sfxHandle_t	zoomLoop;
-	sfxHandle_t	zoomEnd;
-	sfxHandle_t	disruptorZoomLoop;
-
-	qhandle_t	bdecal_bodyburn1;
-	qhandle_t	bdecal_saberglow;
-	qhandle_t	bdecal_burn1;
-	qhandle_t	mSaberDamageGlow;
-
-	// For vehicles only now
-	sfxHandle_t	noAmmoSound;
-
-	struct {
-		qhandle_t	scoreboardLine;
-	} japp;
-} cgMedia_t;
-
-
-// Stored FX handles
-//--------------------
-typedef struct
-{
-	//concussion
-	fxHandle_t	concussionShotEffect;
-	fxHandle_t	concussionImpactEffect;
-
-	// BRYAR PISTOL
-	fxHandle_t	bryarShotEffect;
-	fxHandle_t	bryarPowerupShotEffect;
-	fxHandle_t	bryarWallImpactEffect;
-	fxHandle_t	bryarWallImpactEffect2;
-	fxHandle_t	bryarWallImpactEffect3;
-	fxHandle_t	bryarFleshImpactEffect;
-	fxHandle_t	bryarDroidImpactEffect;
-
-	// BLASTER
-	fxHandle_t  blasterShotEffect;
-	fxHandle_t  blasterWallImpactEffect;
-	fxHandle_t  blasterFleshImpactEffect;
-	fxHandle_t  blasterDroidImpactEffect;
-
-	// DISRUPTOR
-	fxHandle_t  disruptorRingsEffect;
-	fxHandle_t  disruptorProjectileEffect;
-	fxHandle_t  disruptorWallImpactEffect;
-	fxHandle_t  disruptorFleshImpactEffect;
-	fxHandle_t  disruptorAltMissEffect;
-	fxHandle_t  disruptorAltHitEffect;
-
-	// BOWCASTER
-	fxHandle_t	bowcasterShotEffect;
-	fxHandle_t	bowcasterImpactEffect;
-
-	// REPEATER
-	fxHandle_t  repeaterProjectileEffect;
-	fxHandle_t  repeaterAltProjectileEffect;
-	fxHandle_t  repeaterWallImpactEffect;
-	fxHandle_t  repeaterFleshImpactEffect;
-	fxHandle_t  repeaterAltWallImpactEffect;
-
-	// DEMP2
-	fxHandle_t  demp2ProjectileEffect;
-	fxHandle_t  demp2WallImpactEffect;
-	fxHandle_t  demp2FleshImpactEffect;
-
-	// FLECHETTE
-	fxHandle_t	flechetteShotEffect;
-	fxHandle_t	flechetteAltShotEffect;
-	fxHandle_t	flechetteWallImpactEffect;
-	fxHandle_t	flechetteFleshImpactEffect;
-
-	// ROCKET
-	fxHandle_t  rocketShotEffect;
-	fxHandle_t  rocketExplosionEffect;
-
-	// THERMAL
-	fxHandle_t	thermalExplosionEffect;
-	fxHandle_t	thermalShockwaveEffect;
-
-	// TRIPMINE
-	fxHandle_t	tripmineLaserFX;
-	fxHandle_t	tripmineGlowFX;
-
-	//FORCE
-	fxHandle_t forceLightning;
-	fxHandle_t forceLightningWide;
-
-	fxHandle_t forceDrain;
-	fxHandle_t forceDrainWide;
-	fxHandle_t forceDrained;
-
-	//TURRET
-	fxHandle_t turretShotEffect;
-
-	//Whatever
-	fxHandle_t itemCone;
-
-	fxHandle_t	mSparks;
-	fxHandle_t	mSaberCut;
-	fxHandle_t	mTurretMuzzleFlash;
-	fxHandle_t	mSaberBlock;
-	fxHandle_t	mSaberBloodSparks;
-	fxHandle_t	mSaberBloodSparksSmall;
-	fxHandle_t	mSaberBloodSparksMid;
-	fxHandle_t	mSpawn;
-	fxHandle_t	mJediSpawn;
-	fxHandle_t	mBlasterDeflect;
-	fxHandle_t	mBlasterSmoke;
-	fxHandle_t	mForceConfustionOld;
-	fxHandle_t	mDisruptorDeathSmoke;
-	fxHandle_t	mSparkExplosion;
-	fxHandle_t	mTurretExplode;
-	fxHandle_t	mEmplacedExplode;
-	fxHandle_t	mEmplacedDeadSmoke;
-	fxHandle_t	mTripmineExplosion;
-	fxHandle_t	mDetpackExplosion;
-	fxHandle_t	mFlechetteAltBlow;
-	fxHandle_t	mStunBatonFleshImpact;
-	fxHandle_t	mAltDetonate;
-	fxHandle_t	mSparksExplodeNoSound;
-	fxHandle_t	mTripMineLaster;
-	fxHandle_t	mEmplacedMuzzleFlash;
-	fxHandle_t	mConcussionAltRing;
-	fxHandle_t	mHyperspaceStars;
-	fxHandle_t	mBlackSmoke;
-	fxHandle_t	mShipDestDestroyed;
-	fxHandle_t	mShipDestBurning;
-	fxHandle_t	mBobaJet;
-
-	//footstep effects
-	fxHandle_t footstepMud;
-	fxHandle_t footstepSand;
-	fxHandle_t footstepSnow;
-	fxHandle_t footstepGravel;
-	//landing effects
-	fxHandle_t landingMud;
-	fxHandle_t landingSand;
-	fxHandle_t landingDirt;
-	fxHandle_t landingSnow;
-	fxHandle_t landingGravel;
-	//splashes
-	fxHandle_t waterSplash;
-	fxHandle_t lavaSplash;
-	fxHandle_t acidSplash;
-
-	//Raz: Portals
-	fxHandle_t portalBlue;
-	fxHandle_t portalOrange;
-
-	fxHandle_t flamethrower;
-} cgEffects_t;
-
+#define NUM_CHUNK_MODELS 4
 
 // The client game static (cgs) structure hold everything
 // loaded or calculated from the gamestate.  It will NOT
@@ -1605,12 +1132,6 @@ typedef struct cgs_s {
 	int cursorY;
 	void *capturedItem;
 	qhandle_t activeCursor;
-
-	// media
-	cgMedia_t		media;
-
-	// effects
-	cgEffects_t		effects;
 
 	//Raz: serverinfo vars
 	struct {
@@ -1758,45 +1279,49 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vector3 *he
 void CG_DrawActive( stereoFrame_t stereoView );
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D );
 void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team );
-void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle,int font);
-void CG_Text_Paint(float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont);
-float CG_Text_Width(const char *text, float scale, int iMenuFont);
-float CG_Text_Height(const char *text, float scale, int iMenuFont);
-float CG_GetValue(int ownerDraw);
-qboolean CG_OwnerDrawVisible(uint32_t flags);
-void CG_RunMenuScript(char **args);
-qboolean CG_DeferMenuScript(char **args);
-void CG_ShowResponseHead(void);
-void CG_GetTeamColor(vector4 *color);
-const char *CG_GetGameStatusText(void);
-const char *CG_GetKillerText(void);
-void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, void *ghoul2, int g2radius, qhandle_t skin, vector3 *origin, vector3 *angles );
-void CG_Text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader);
-qboolean CG_YourTeamHasFlag(void);
-qboolean CG_OtherTeamHasFlag(void);
-qboolean CG_YourTeamDroppedFlag(void);
-qboolean CG_OtherTeamDroppedFlag(void);
-qhandle_t CG_StatusHandle(int task);
-int MenuFontToHandle(int iMenuFont);
+void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags,
+	int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle,int font );
+void CG_Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit,
+	int style, int iMenuFont );
+float CG_Text_Width( const char *text, float scale, int iMenuFont );
+float CG_Text_Height( const char *text, float scale, int iMenuFont );
+float CG_GetValue( int ownerDraw );
+qboolean CG_OwnerDrawVisible( uint32_t flags );
+void CG_RunMenuScript( char **args );
+qboolean CG_DeferMenuScript( char **args );
+void CG_ShowResponseHead( void );
+void CG_GetTeamColor( vector4 *color );
+const char *CG_GetGameStatusText( void );
+const char *CG_GetKillerText( void );
+void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, void *ghoul2, int g2radius, qhandle_t skin,
+	vector3 *origin, vector3 *angles );
+void CG_Text_PaintChar( float x, float y, float width, float height, float scale, float s, float t, float s2, float t2,
+	qhandle_t hShader );
+qboolean CG_YourTeamHasFlag( void );
+qboolean CG_OtherTeamHasFlag( void );
+qboolean CG_YourTeamDroppedFlag( void );
+qboolean CG_OtherTeamDroppedFlag( void );
+qhandle_t CG_StatusHandle( int task );
+int MenuFontToHandle( int iMenuFont );
 
 
 //
 // cg_player.c
 //
-qboolean CG_RagDoll(centity_t *cent, vector3 *forcedAngles);
-qboolean CG_G2TraceCollide(trace_t *tr, vector3* const mins, vector3* const maxs, vector3 *lastValidStart, vector3 *lastValidEnd);
-void CG_AddGhoul2Mark(int shader, float size, vector3 *start, vector3 *end, int entnum,
-					  vector3 *entposition, float entangle, void *ghoul2, vector3 *scale, int lifeTime);
+qboolean CG_RagDoll( centity_t *cent, vector3 *forcedAngles );
+qboolean CG_G2TraceCollide( trace_t *tr, const vector3 *mins, const vector3 *maxs, vector3 *lastValidStart, vector3 *lastValidEnd );
+void CG_AddGhoul2Mark( int shader, float size, vector3 *start, vector3 *end, int entnum, vector3 *entposition, float entangle,
+	void *ghoul2, vector3 *scale, int lifeTime );
 
-void CG_CreateNPCClient(clientInfo_t **ci);
-void CG_DestroyNPCClient(clientInfo_t **ci);
+void CG_CreateNPCClient( clientInfo_t **ci );
+void CG_DestroyNPCClient( clientInfo_t **ci );
 
 void CG_Player( centity_t *cent );
 void CG_ResetPlayerEntity( centity_t *cent );
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team );
 void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized );
 sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
-void CG_PlayerShieldHit(int entitynum, vector3 *angles, int amount);
+void CG_PlayerShieldHit( int entitynum, vector3 *angles, int amount );
 void CG_TriggerAnimSounds( centity_t *cent );
 
 
@@ -1806,9 +1331,9 @@ void CG_TriggerAnimSounds( centity_t *cent );
 void CG_BuildSolidList( void );
 uint32_t CG_PointContents( const vector3 *point, int passEntityNum );
 void CG_Trace( trace_t *result, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end,
-					 int skipNumber, int mask );
+	int skipNumber, int mask );
 void CG_G2Trace( trace_t *result, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end,
-					 int skipNumber, int mask );
+	int skipNumber, int mask );
 void CG_PredictPlayerState( void );
 void CG_LoadDeferredPlayers( void );
 
@@ -1820,33 +1345,31 @@ void CG_CheckEvents( centity_t *cent );
 const char	*CG_PlaceString( int rank );
 void CG_EntityEvent( centity_t *cent, vector3 *position );
 void CG_PainEvent( centity_t *cent, int health );
-void CG_ReattachLimb(centity_t *source);
+void CG_ReattachLimb( centity_t *source );
 
 
 //
 // cg_ents.c
 //
 
-void CG_S_AddLoopingSound(int entityNum, const vector3 *origin, const vector3 *velocity, sfxHandle_t sfx);
-void CG_S_AddRealLoopingSound(int entityNum, const vector3 *origin, const vector3 *velocity, sfxHandle_t sfx);
-void CG_S_StopLoopingSound(int entityNum, sfxHandle_t sfx);
-void CG_S_UpdateLoopingSounds(int entityNum);
+void CG_S_AddLoopingSound( int entityNum, const vector3 *origin, const vector3 *velocity, sfxHandle_t sfx );
+void CG_S_AddRealLoopingSound( int entityNum, const vector3 *origin, const vector3 *velocity, sfxHandle_t sfx );
+void CG_S_StopLoopingSound( int entityNum, sfxHandle_t sfx );
+void CG_S_UpdateLoopingSounds( int entityNum );
 
 void CG_SetEntitySoundPosition( centity_t *cent );
 void CG_AddPacketEntities( qboolean isPortal );
-void CG_ManualEntityRender(centity_t *cent);
+void CG_ManualEntityRender( centity_t *cent );
 void CG_Beam( centity_t *cent );
 void CG_AdjustPositionForMover( const vector3 *in, int moverNum, int fromTime, int toTime, vector3 *out );
 
-void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							qhandle_t parentModel, char *tagName );
-void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							qhandle_t parentModel, char *tagName );
+void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, char *tagName );
+void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, char *tagName );
 
 /*
 Ghoul2 Insert Start
 */
-void ScaleModelAxis(refEntity_t	*ent);
+void ScaleModelAxis( refEntity_t *ent );
 /*
 Ghoul2 Insert End
 */
@@ -1854,12 +1377,12 @@ Ghoul2 Insert End
 //
 // cg_turret.c
 //
-void TurretClientRun(centity_t *ent);
+void TurretClientRun( centity_t *ent );
 
 //
 // cg_weapons.c
 //
-void CG_GetClientWeaponMuzzleBoltPoint(int clIndex, vector3 *to);
+void CG_GetClientWeaponMuzzleBoltPoint( int clIndex, vector3 *to );
 
 void CG_NextWeapon_f( void );
 void CG_PrevWeapon_f( void );
@@ -2022,10 +1545,6 @@ void FX_BlasterAltFireThink( centity_t *cent, const struct weaponInfo_s *weapon 
 void FX_BlasterWeaponHitWall( vector3 *origin, vector3 *normal );
 void FX_BlasterWeaponHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid );
 
-void		CG_Init_CG(void);
-void		CG_Init_CGents(void);
-
-
 void CG_SetGhoul2Info( refEntity_t *ent, centity_t *cent);
 void CG_CreateBBRefEnts(entityState_t *s1, vector3 *origin );
 
@@ -2037,12 +1556,25 @@ void CG_CheckPlayerG2Weapons(playerState_t *ps, centity_t *cent);
 
 void CG_SetSiegeTimerCvar( int msec );
 
-/*
-Ghoul2 Insert End
-*/
+void CG_PrecacheNPCSounds( const char *str );
+int CG_HandleAppendedSkin( char *modelName );
+void CG_CacheG2AnimInfo( char *modelName );
+void CG_ParseSiegeObjectiveStatus( const char *str );
+int	CG_GetClassCount(team_t team,int siegeClass );
+int CG_GetTeamNonScoreCount(team_t team);
 
-
+void CG_InitItems( void );
+void CG_InitJetpackGhoul2( void );
+void CG_CleanJetpackGhoul2( void );
+void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback );
+void CG_Shutdown( void );
+void CG_CalcEntityLerpPositions( centity_t *cent );
+void CG_ROFF_NotetrackCallback( centity_t *cent, const char *notetrack);
 void CG_LoadHudMenu( void );
+void CG_ParseWeatherEffect( const char *str );
+void CG_ParseSiegeObjectiveStatus( const char *str );
+void CG_ParseSiegeState( const char *str );
+float CG_Cvar_Get( const char *cvar );
 
 qboolean SE_RenderThisEntity( vector3 *testOrigin, int gameEntity );
 void SE_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity );

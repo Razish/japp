@@ -617,9 +617,11 @@ static void JPLua_PostInit( lua_State *L ) {
 
 	return;
 }
+#endif // JPLUA
 
 // initialise the JPLua system
 void JPLua_Init( void ) {
+#ifdef JPLUA
 	size_t i = 0;
 
 	if ( !cg_jplua.integer )
@@ -682,9 +684,11 @@ void JPLua_Init( void ) {
 
 	//Call our base scripts
 	JPLua_PostInit( JPLua.state );
+#endif
 }
 
 void JPLua_Shutdown( void ) {
+#ifdef JPLUA
 	if ( JPLua.state ) {
 		jplua_plugin_t *nextPlugin = JPLua.plugins;
 
@@ -705,6 +709,5 @@ void JPLua_Shutdown( void ) {
 		JPLua.state = NULL;
 		JPLua.initialised = qfalse;
 	}
+#endif
 }
-
-#endif // JPLUA

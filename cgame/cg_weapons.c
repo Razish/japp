@@ -3,6 +3,7 @@
 // cg_weapons.c -- events and effects dealing with weapons
 #include "cg_local.h"
 #include "fx_local.h"
+#include "cg_media.h"
 
 /*
 Ghoul2 Insert Start
@@ -250,123 +251,6 @@ static void CG_CalculateWeaponPosition( vector3 *origin, vector3 *angles ) {
 	}
 }
 
-
-/*
-===============
-CG_LightningBolt
-
-Origin will be the exact tag point, which is slightly
-different than the muzzle point used for determining hits.
-The cent should be the non-predicted cent if it is from the player,
-so the endpoint will reflect the simulated strike (lagging the predicted
-angle)
-===============
-*/
-static void CG_LightningBolt( centity_t *cent, vector3 *origin ) {
-//	trace_t  trace;
-	refEntity_t  beam;
-//	vector3   forward;
-//	vector3   muzzlePoint, endPoint;
-
-	//Must be a durational weapon that continuously generates an effect.
-	if ( cent->currentState.weapon == WP_DEMP2 && cent->currentState.eFlags & EF_ALT_FIRING )
-	{ /*nothing*/ }
-	else
-	{
-		return;
-	}
-
-	memset( &beam, 0, sizeof( beam ) );
-
-	// NOTENOTE No lightning gun-ish stuff yet.
-/*
-	// CPMA  "true" lightning
-	if ((cent->currentState.number == cg.predictedPlayerState.clientNum) && (cg_trueLightning.value != 0)) {
-		vector3 angle;
-		int i;
-
-		for (i = 0; i < 3; i++) {
-			float a = cent->lerpAngles[i] - refdef->viewangles[i];
-			if (a > 180) {
-				a -= 360;
-			}
-			if (a < -180) {
-				a += 360;
-			}
-
-			angle[i] = refdef->viewangles[i] + a * (1.0 - cg_trueLightning.value);
-			if (angle[i] < 0) {
-				angle[i] += 360;
-			}
-			if (angle[i] > 360) {
-				angle[i] -= 360;
-			}
-		}
-
-		AngleVectors(angle, forward, NULL, NULL );
-		VectorCopy(cent->lerpOrigin, muzzlePoint );
-//		VectorCopy(refdef->vieworg, muzzlePoint );
-	} else {
-		// !CPMA
-		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
-		VectorCopy(cent->lerpOrigin, muzzlePoint );
-	}
-
-	// FIXME: crouch
-	muzzlePoint[2] += DEFAULT_VIEWHEIGHT;
-
-	VectorMA( muzzlePoint, 14, forward, muzzlePoint );
-
-	// project forward by the lightning range
-	VectorMA( muzzlePoint, LIGHTNING_RANGE, forward, endPoint );
-
-	// see if it hit a wall
-	CG_Trace( &trace, muzzlePoint, vec3_origin, vec3_origin, endPoint,
-		cent->currentState.number, MASK_SHOT );
-
-	// this is the endpoint
-	VectorCopy( trace.endpos, beam.oldorigin );
-
-	// use the provided origin, even though it may be slightly
-	// different than the muzzle origin
-	VectorCopy( origin, beam.origin );
-
-	beam.reType = RT_LIGHTNING;
-	beam.customShader = cgs.media.lightningShader;
-	SE_R_AddRefEntityToScene( &beam );
-*/
-
-	// NOTENOTE No lightning gun-ish stuff yet.
-/*
-	// add the impact flare if it hit something
-	if ( trace.fraction < 1.0 ) {
-		vector3	angles;
-		vector3	dir;
-
-		VectorSubtract( beam.oldorigin, beam.origin, dir );
-		VectorNormalize( dir );
-
-		memset( &beam, 0, sizeof( beam ) );
-		beam.hModel = cgs.media.lightningExplosionModel;
-
-		VectorMA( trace.endpos, -16, dir, beam.origin );
-
-		// make a random orientation
-		angles[0] = rand() % 360;
-		angles[1] = rand() % 360;
-		angles[2] = rand() % 360;
-		AnglesToAxis( angles, beam.axis );
-		SE_R_AddRefEntityToScene( &beam );
-	}
-*/
-}
-
-
-/*
-========================
-CG_AddWeaponWithPowerups
-========================
-*/
 static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups ) {
 	// add powerup effects
 	SE_R_AddRefEntityToScene( gun, MAX_CLIENTS );
@@ -375,13 +259,9 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups ) {
 	{ //add electrocution shell
 		int preShader = gun->customShader;
 		if ( rand() & 1 )
-		{
-			gun->customShader = cgs.media.electricBodyShader;
-		}
+			gun->customShader = media.gfx.world.electricBody;
 		else
-		{
-			gun->customShader = cgs.media.electricBody2Shader;
-		}
+			gun->customShader = media.gfx.world.electricBody2;
 		SE_R_AddRefEntityToScene( gun, MAX_CLIENTS );
 		gun->customShader = preShader; //set back just to be safe
 	}
@@ -584,18 +464,18 @@ Ghoul2 Insert End
 		{
 			// Hardcoded max charge time of 1 second
 			val = ( cg.time - cent->currentState.constantLight ) * 0.001f;
-			shader = cgs.media.bryarFrontFlash;
+			shader = media.gfx.world.bryarFrontFlash;
 		}
 		else if ( cent->currentState.weapon == WP_BOWCASTER )
 		{
 			// Hardcoded max charge time of 1 second
 			val = ( cg.time - cent->currentState.constantLight ) * 0.001f;
-			shader = cgs.media.greenFrontFlash;
+			shader = media.gfx.world.greenFrontFlash;
 		}
 		else if ( cent->currentState.weapon == WP_DEMP2 )
 		{
 			val = ( cg.time - cent->currentState.constantLight ) * 0.001f;
-			shader = cgs.media.lightningFlash;
+			shader = media.gfx.world.lightningFlash;
 			scale = 1.75f;
 		}
 
@@ -717,9 +597,6 @@ Ghoul2 Insert End
 			}
 		}
 
-		// add lightning bolt
-		CG_LightningBolt( nonPredictedCent, &flashorigin );
-
 		if ( weapon->flashDlightColor.r || weapon->flashDlightColor.g || weapon->flashDlightColor.b )
 			trap->R_AddLightToScene( &flashorigin, 300 + (rand()&31), weapon->flashDlightColor.r, weapon->flashDlightColor.g, weapon->flashDlightColor.b );
 	}
@@ -759,14 +636,6 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	// allow the gun to be completely removed
 	if ( !cg.japp.fakeGun && (!cg_drawGun.integer || cg.predictedPlayerState.zoomMode || cg_trueGuns.integer
 		|| cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) ) {
-		vector3		origin;
-
-		if ( cg.predictedPlayerState.eFlags & EF_FIRING ) {
-			// special hack for lightning gun...
-			VectorCopy( &refdef->vieworg, &origin );
-			VectorMA( &origin, -8, &refdef->viewaxis[2], &origin );
-			CG_LightningBolt( &cg_entities[ps->clientNum], &origin );
-		}
 		return;
 	}
 
@@ -1116,15 +985,15 @@ void CG_DrawWeaponSelect( void ) {
 
 		++iconCnt;					// Good icon
 
-		if (cgs.media.weaponIcons[i])
+		if (media.gfx.interface.weaponIcons[i])
 		{
 			CG_RegisterWeapon( i );
 
 			trap->R_SetColor(&colorTable[CT_WHITE]);
 			if (!CG_WeaponCheck(i))
-				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, cgs.media.weaponIcons_NA[i] );
+				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, media.gfx.interface.weaponIconsInactive[i] );
 			else
-				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, cgs.media.weaponIcons[i] );
+				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, media.gfx.interface.weaponIcons[i] );
 
 			holdX -= (smallIconSize+pad);
 		}
@@ -1136,85 +1005,62 @@ void CG_DrawWeaponSelect( void ) {
 	}
 
 	// Current Center Icon
-	if (cgs.media.weaponIcons[cg.weaponSelect])
-	{
+	if ( media.gfx.interface.weaponIcons[cg.weaponSelect] ) {
 		CG_RegisterWeapon( cg.weaponSelect );
 
 		trap->R_SetColor( &colorTable[CT_WHITE]);
-		if (!CG_WeaponCheck(cg.weaponSelect))
-			CG_DrawPic( x-(bigIconSize/2), (y-((bigIconSize-smallIconSize)/2))+10+yOffset, bigIconSize, bigIconSize, cgs.media.weaponIcons_NA[cg.weaponSelect] );
+		if ( !CG_WeaponCheck( cg.weaponSelect ) )
+			CG_DrawPic( x-(bigIconSize/2), (y-((bigIconSize-smallIconSize)/2))+10+yOffset, bigIconSize, bigIconSize, media.gfx.interface.weaponIconsInactive[cg.weaponSelect] );
 		else
-			CG_DrawPic( x-(bigIconSize/2), (y-((bigIconSize-smallIconSize)/2))+10+yOffset, bigIconSize, bigIconSize, cgs.media.weaponIcons[cg.weaponSelect] );
+			CG_DrawPic( x-(bigIconSize/2), (y-((bigIconSize-smallIconSize)/2))+10+yOffset, bigIconSize, bigIconSize, media.gfx.interface.weaponIcons[cg.weaponSelect] );
 	}
 
 	if ( cg.weaponSelect == WP_CONCUSSION )
-	{
 		i = WP_ROCKET_LAUNCHER;
-	}
 	else
-	{
 		i = cg.weaponSelect + 1;
-	}
+
 	if (i> LAST_USEABLE_WEAPON)
-	{
 		i = 1;
-	}
 
 	// Right side ICONS
 	// Work forwards from current icon
 	holdX = x + (bigIconSize/2) + pad;
-	for (iconCnt=1;iconCnt<(sideRightIconCnt+1);i++)
-	{
+	for ( iconCnt=1; iconCnt<(sideRightIconCnt+1); i++ ) {
 		if ( i == WP_CONCUSSION )
-		{
 			i++;
-		}
 		else if ( i == WP_ROCKET_LAUNCHER && !drewConc && cg.weaponSelect != WP_CONCUSSION )
-		{
 			i = WP_CONCUSSION;
-		}
-		if (i>LAST_USEABLE_WEAPON)
-		{
+		if ( i > LAST_USEABLE_WEAPON )
 			i = 1;
-		}
 
-		if ( !(bits & ( 1 << i )))	// Does he have this weapon?
-		{
-			if ( i == WP_CONCUSSION )
-			{
+		if ( !(bits & (1<<i)) ) {
+			if ( i == WP_CONCUSSION ) {
 				drewConc = qtrue;
 				i = WP_FLECHETTE;
 			}
 			continue;
 		}
 
-		if ( !CG_WeaponSelectable(i) &&
-			(i == WP_THERMAL || i == WP_TRIP_MINE) )
-		{ //Don't show thermal and tripmine when out of them
+		// Don't show thermal and tripmine when out of them
+		if ( !CG_WeaponSelectable( i ) && (i == WP_THERMAL || i == WP_TRIP_MINE) )
 			continue;
-		}
 
-		++iconCnt;					// Good icon
+		++iconCnt; // Good icon
 
-		if (/*weaponData[i].weaponIcon[0]*/cgs.media.weaponIcons[i])
-		{
+		if ( media.gfx.interface.weaponIcons[i] ) {
 			CG_RegisterWeapon( i );
 			// No ammo for this weapon?
 			trap->R_SetColor( &colorTable[CT_WHITE]);
-			if (!CG_WeaponCheck(i))
-			{
-				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, cgs.media.weaponIcons_NA[i] );
-			}
+			if ( !CG_WeaponCheck( i ) )
+				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, media.gfx.interface.weaponIconsInactive[i] );
 			else
-			{
-				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, cgs.media.weaponIcons[i] );
-			}
+				CG_DrawPic( holdX, y+10+yOffset, smallIconSize, smallIconSize, media.gfx.interface.weaponIcons[i] );
 
 
 			holdX += (smallIconSize+pad);
 		}
-		if ( i == WP_CONCUSSION )
-		{
+		if ( i == WP_CONCUSSION ) {
 			drewConc = qtrue;
 			i = WP_FLECHETTE;
 		}
@@ -1774,7 +1620,7 @@ void CG_FireWeapon( centity_t *cent, qboolean altFire ) {
 
 	// play quad sound if needed
 	if ( cent->currentState.powerups & ( 1 << PW_QUAD ) ) {
-		//trap->S_StartSound (NULL, cent->currentState.number, CHAN_ITEM, cgs.media.quadSound );
+	//	trap->S_StartSound( NULL, cent->currentState.number, CHAN_ITEM, media.snd.quad );
 	}
 
 
@@ -1904,7 +1750,7 @@ void CG_MissileHitWall(int weapon, int clientNum, vector3 *origin, vector3 *dir,
 	case WP_DEMP2:
 		if (altFire)
 		{
-			trap->FX_PlayEffectID(cgs.effects.mAltDetonate, origin, dir, -1, -1, qfalse);
+			trap->FX_PlayEffectID(media.efx.demp2.altDetonate, origin, dir, -1, -1, qfalse);
 		}
 		else
 		{
@@ -1930,8 +1776,8 @@ void CG_MissileHitWall(int weapon, int clientNum, vector3 *origin, vector3 *dir,
 		break;
 
 	case WP_THERMAL:
-		trap->FX_PlayEffectID( cgs.effects.thermalExplosionEffect, origin, dir, -1, -1, qfalse );
-		trap->FX_PlayEffectID( cgs.effects.thermalShockwaveEffect, origin, &up, -1, -1, qfalse );
+		trap->FX_PlayEffectID( media.efx.thermal.explosion, origin, dir, -1, -1, qfalse );
+		trap->FX_PlayEffectID( media.efx.thermal.shockwave, origin, &up, -1, -1, qfalse );
 		break;
 
 	case WP_EMPLACED_GUN:
@@ -2039,7 +1885,7 @@ void CG_MissileHitPlayer(int weapon, vector3 *origin, vector3 *dir, int entityNu
 		*/
 		if (altFire)
 		{
-			trap->FX_PlayEffectID(cgs.effects.mAltDetonate, origin, dir, -1, -1, qfalse);
+			trap->FX_PlayEffectID(media.efx.demp2.altDetonate, origin, dir, -1, -1, qfalse);
 		}
 		else
 		{
@@ -2056,8 +1902,8 @@ void CG_MissileHitPlayer(int weapon, vector3 *origin, vector3 *dir, int entityNu
 		break;
 
 	case WP_THERMAL:
-		trap->FX_PlayEffectID( cgs.effects.thermalExplosionEffect, origin, dir, -1, -1, qfalse );
-		trap->FX_PlayEffectID( cgs.effects.thermalShockwaveEffect, origin, &up, -1, -1, qfalse );
+		trap->FX_PlayEffectID( media.efx.thermal.explosion, origin, dir, -1, -1, qfalse );
+		trap->FX_PlayEffectID( media.efx.thermal.shockwave, origin, &up, -1, -1, qfalse );
 		break;
 	case WP_EMPLACED_GUN:
 		//FIXME: Its own effect?
@@ -2194,37 +2040,32 @@ Ghoul2 Insert Start
 // create one instance of all the weapons we are going to use so we can just copy this info into each clients gun ghoul2 object in fast way
 static void *g2WeaponInstances[MAX_WEAPONS];
 
-void CG_InitG2Weapons(void)
-{
+void CG_InitG2Weapons( void ) {
 	int i = 0;
 	const gitem_t *item;
-	memset(g2WeaponInstances, 0, sizeof(g2WeaponInstances));
-	for ( item = bg_itemlist + 1 ; item->classname ; item++ )
-	{
-		if ( item->giType == IT_WEAPON )
-		{
-			assert(item->giTag < MAX_WEAPONS);
 
-			// initialise model
-			trap->G2API_InitGhoul2Model(&g2WeaponInstances[/*i*/item->giTag], item->world_model[0], 0, 0, 0, 0, 0);
-//			trap->G2API_InitGhoul2Model(&g2WeaponInstances[i], item->world_model[0],G_ModelIndex( item->world_model[0] ) , 0, 0, 0, 0);
-			if (g2WeaponInstances[/*i*/item->giTag])
-			{
+	memset( g2WeaponInstances, 0, sizeof( g2WeaponInstances ) );
+
+	for ( item=bg_itemlist+1; item->classname; item++ ) {
+		if ( item->giType == IT_WEAPON ) {
+			assert( item->giTag < MAX_WEAPONS );
+
+			trap->G2API_InitGhoul2Model( &g2WeaponInstances[item->giTag], item->world_model[0], 0, 0, 0, 0, 0 );
+		//	trap->G2API_InitGhoul2Model( &g2WeaponInstances[i], item->world_model[0], G_ModelIndex( item->world_model[0] ), 0, 0, 0, 0 );
+			if ( g2WeaponInstances[item->giTag] ) {
 				// indicate we will be bolted to model 0 (ie the player) on bolt 0 (always the right hand) when we get copied
-				trap->G2API_SetBoltInfo(g2WeaponInstances[/*i*/item->giTag], 0, 0);
+				trap->G2API_SetBoltInfo( g2WeaponInstances[item->giTag], 0, 0 );
 				// now set up the gun bolt on it
-				if (item->giTag == WP_SABER)
-					trap->G2API_AddBolt(g2WeaponInstances[/*i*/item->giTag], 0, "*blade1");
+				if ( item->giTag == WP_SABER )
+					trap->G2API_AddBolt( g2WeaponInstances[item->giTag], 0, "*blade1" );
 				else
-					trap->G2API_AddBolt(g2WeaponInstances[/*i*/item->giTag], 0, "*flash");
+					trap->G2API_AddBolt( g2WeaponInstances[item->giTag], 0, "*flash" );
 				i++;
 			}
-			if (i == MAX_WEAPONS)
-			{
-				assert(0);
+			if ( i == MAX_WEAPONS ) {
+				assert( 0 );
 				break;
 			}
-
 		}
 	}
 }

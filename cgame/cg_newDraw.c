@@ -1,5 +1,6 @@
 #include "cg_local.h"
 #include "ui/ui_shared.h"
+#include "cg_media.h"
 
 extern displayContextDef_t cgDC;
 
@@ -14,28 +15,28 @@ int CG_GetSelectedPlayer( void ) {
 qhandle_t CG_StatusHandle( int task ) {
 	switch ( task ) {
 		case TEAMTASK_OFFENSE :
-			return cgs.media.assaultShader;
+			return media.gfx.interface.team.assault;
 
 		case TEAMTASK_DEFENSE :
-			return cgs.media.defendShader;
+			return media.gfx.interface.team.defend;
 
 		case TEAMTASK_PATROL :
-			return cgs.media.patrolShader;
+			return media.gfx.interface.team.patrol;
 
 		case TEAMTASK_FOLLOW :
-			return cgs.media.followShader;
+			return media.gfx.interface.team.follow;
 
 		case TEAMTASK_CAMP :
-			return cgs.media.campShader;
+			return media.gfx.interface.team.camp;
 
 		case TEAMTASK_RETRIEVE :
-			return cgs.media.retrieveShader;
+			return media.gfx.interface.team.retrieve;
 
 		case TEAMTASK_ESCORT :
-			return cgs.media.escortShader;
+			return media.gfx.interface.team.escort;
 
 		default :
-			return cgs.media.assaultShader;
+			return media.gfx.interface.team.assault;
 	}
 }
 
@@ -386,7 +387,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 
 			CG_GetColorForHealth( ci->health, ci->armor, &hcolor );
 			trap->R_SetColor(&hcolor);
-			CG_DrawPic( xx, y + 1, PIC_WIDTH - 2, PIC_WIDTH - 2, cgs.media.heartShader );
+			CG_DrawPic( xx, y + 1, PIC_WIDTH - 2, PIC_WIDTH - 2, media.gfx.interface.heart );
 
 			//Com_sprintf (st, sizeof(st), "%3i %3i", ci->health,	ci->armor);
 			//CG_Text_Paint(xx, y + text_y, scale, hcolor, st, 0, 0);
@@ -399,7 +400,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 			if ( cg_weapons[ci->curWeapon].weaponIcon ) {
 				CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, cg_weapons[ci->curWeapon].weaponIcon );
 			} else {
-				CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, cgs.media.deferShader );
+				CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, media.gfx.interface.defer );
 			}
 #endif
 
@@ -776,9 +777,9 @@ void CG_MouseEvent(int x, int y) {
 	n = Display_CursorType(cgs.cursorX, cgs.cursorY);
 	cgs.activeCursor = 0;
 	if (n == CURSOR_ARROW) {
-		cgs.activeCursor = cgs.media.selectCursor;
+		cgs.activeCursor = media.gfx.interface.cursorSelect;
 	} else if (n == CURSOR_SIZER) {
-		cgs.activeCursor = cgs.media.sizeCursor;
+		cgs.activeCursor = media.gfx.interface.cursorSize;
 	}
 
   if (cgs.capturedItem) {

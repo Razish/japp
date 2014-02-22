@@ -219,6 +219,7 @@ typedef enum gametype_e {
 #define GTB_NOTTEAM			(0x003Fu) // **SPECIAL: All of the above gametypes, i.e. not team-based
 #define GTB_TEAM			(0x0040u) // team deathmatch
 #define GTB_SIEGE			(0x0080u) // siege
+#define GTB_NOTFLAG			(0x00FFu) // **SPECIAL: All of the above gametypes, i.e. not flag-related
 #define GTB_CTF				(0x0100u) // capture the flag
 #define GTB_CTY				(0x0200u) // capture the ysalimiri
 #define GTB_ALL				(0x01FFu) // all
@@ -690,8 +691,7 @@ typedef enum powerup_e {
 } powerup_t;
 
 typedef enum holdable_e {
-	HI_NONE,
-
+	HI_NONE=0,
 	HI_SEEKER,
 	HI_SHIELD,
 	HI_MEDPAC,
@@ -699,12 +699,10 @@ typedef enum holdable_e {
 	HI_BINOCULARS,
 	HI_SENTRY_GUN,
 	HI_JETPACK,
-
 	HI_HEALTHDISP,
 	HI_AMMODISP,
 	HI_EWEB,
 	HI_CLOAK,
-
 	HI_NUM_HOLDABLE
 } holdable_t;
 

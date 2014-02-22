@@ -319,7 +319,7 @@ static void SpawnTelemark( telemark_t *tm, vector3 *position ) {
 	}
 }
 
-// add or update an existing admin account (user, pass, privileges, login mesage)
+// add or update an existing telemark
 static telemark_t *AM_AddTelemark( const char *name, vector3 *position ) {
 	telemark_t *tm = NULL;
 
@@ -878,7 +878,7 @@ static void AM_Telemark( gentity_t *ent ) {
 	else
 		Com_sprintf( name, sizeof( name ), "default_%s", ent->client->pers.netnameClean );
 
-	AM_AddTelemark( name, &ent->client->ps.origin );
+	ent->client->pers.adminData.telemark = AM_AddTelemark( name, &ent->client->ps.origin );
 }
 
 // mark targeted location

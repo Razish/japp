@@ -245,6 +245,7 @@ files['cgame'] = [
 	'cgame/cg_luaserver.c',
 	'cgame/cg_main.c',
 	'cgame/cg_marks.c',
+	'cgame/cg_media.c',
 	'cgame/cg_newDraw.c',
 	'cgame/cg_newScoreboard.c',
 	'cgame/cg_players.c',

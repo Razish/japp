@@ -2,6 +2,7 @@
 #include "ui/ui_public.h"
 #include "ui/ui_shared.h"
 #include "qcommon/qfiles.h"	// for STYLE_BLINK etc
+#include "cg_media.h"
 
 static int JP_GetScoreboardFont( void ) {
 	return Q_clampi( FONT_SMALL, cg_newScoreboardFont.integer, FONT_NUM_FONTS );
@@ -219,7 +220,7 @@ int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHand
 		return 0;
 
 	trap->R_SetColor( &background );
-		CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight*1.5, cgs.media.japp.scoreboardLine );
+		CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight*1.5, media.gfx.interface.scoreboardLine );
 	trap->R_SetColor( NULL );
 
 	tmp = "Name";
@@ -250,7 +251,7 @@ int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHand
 			else
 				trap->R_SetColor( &background );
 
-			CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight, cgs.media.japp.scoreboardLine );
+			CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight, media.gfx.interface.scoreboardLine );
 			trap->R_SetColor( NULL );
 
 			y += lineHeight;
@@ -275,14 +276,14 @@ int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHand
 			if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags&EF_CONNECTION) )
 			{
 				trap->R_SetColor( &white );
-					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, cgs.media.connectionShader );
+					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, media.gfx.interface.connection );
 				trap->R_SetColor( NULL );
 			}
 
 			else if ( cg.snap->ps.duelInProgress && (ci-cgs.clientinfo == cg.snap->ps.duelIndex || ci-cgs.clientinfo == cg.snap->ps.clientNum) )
 			{
 				trap->R_SetColor( &white );
-					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, cgs.media.powerDuelAllyShader );
+					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, media.gfx.interface.powerduelAlly );
 				trap->R_SetColor( NULL );
 			}
 
@@ -365,7 +366,7 @@ int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHand
 		return 0;
 
 	trap->R_SetColor( teamBackground );
-		CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight*1.5, cgs.media.japp.scoreboardLine );
+		CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight*1.5, media.gfx.interface.scoreboardLine );
 	trap->R_SetColor( NULL );
 
 	tmp = "Name";
@@ -405,7 +406,7 @@ int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHand
 			else
 				trap->R_SetColor( teamBackground );
 
-			CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight, cgs.media.japp.scoreboardLine );
+			CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight, media.gfx.interface.scoreboardLine );
 			trap->R_SetColor( NULL );
 
 			y += lineHeight;
@@ -430,7 +431,7 @@ int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHand
 			if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags&EF_CONNECTION) )
 			{
 				trap->R_SetColor( &white );
-					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, cgs.media.connectionShader );
+					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, media.gfx.interface.connection );
 				trap->R_SetColor( NULL );
 			}
 
@@ -519,7 +520,7 @@ int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHand
 		return 0;
 
 	trap->R_SetColor( teamBackground );
-		CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight*1.5, cgs.media.japp.scoreboardLine );
+		CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight*1.5, media.gfx.interface.scoreboardLine );
 	trap->R_SetColor( NULL );
 
 	tmp = "Name";
@@ -559,7 +560,7 @@ int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHand
 			else
 				trap->R_SetColor( teamBackground );
 
-			CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight, cgs.media.japp.scoreboardLine );
+			CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f*2 + 5.0f, lineHeight, media.gfx.interface.scoreboardLine );
 			trap->R_SetColor( NULL );
 
 			y += lineHeight;
@@ -584,14 +585,14 @@ int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHand
 			if ( ci->powerups & ((1<<PW_BLUEFLAG)|(1<<PW_REDFLAG)) )
 			{
 				trap->R_SetColor( &white );
-					CG_DrawPic( x+5.0f, y, lineHeight, lineHeight, cgs.media.flagShaders[FLAG_TAKEN] );
+					CG_DrawPic( x+5.0f, y, lineHeight, lineHeight, media.gfx.interface.team.flags[FLAG_TAKEN] );
 				trap->R_SetColor( NULL );
 			}
 
 			else if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags&EF_CONNECTION) )
 			{
 				trap->R_SetColor( &white );
-					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, cgs.media.connectionShader );
+					CG_DrawPic( x+5.0f, y+1.0, lineHeight-2.0f, lineHeight-2.0f, media.gfx.interface.connection );
 				trap->R_SetColor( NULL );
 			}
 

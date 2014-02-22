@@ -3,6 +3,8 @@
 // cg_info.c -- display information while data is being loading
 
 #include "cg_local.h"
+#include "ui/ui_shared.h"
+#include "cg_media.h"
 
 #define MAX_LOADING_PLAYER_ICONS	16
 #define MAX_LOADING_ITEM_ICONS		26
@@ -20,7 +22,6 @@ CG_LoadingString
 */
 void CG_LoadingString( const char *s ) {
 	Q_strncpyz( cg.infoScreenText, s, sizeof( cg.infoScreenText ) );
-
 	trap->UpdateScreen();
 }
 
@@ -336,31 +337,25 @@ void CG_DrawInformation( void ) {
 	}
 }
 
-/*
-===================
-CG_LoadBar
-===================
-*/
-void CG_LoadBar(void)
-{
-	const int numticks = 9, tickwidth = 40, tickheight = 8;
-	const int tickpadx = 20, tickpady = 12;
-	const int capwidth = 8;
-	const int barwidth = numticks*tickwidth+tickpadx*2+capwidth*2, barleft = ((640-barwidth)/2);
-	const int barheight = tickheight + tickpady*2, bartop = 480-barheight;
-	const int capleft = barleft+tickpadx, tickleft = capleft+capwidth, ticktop = bartop+tickpady;
+void CG_LoadBar( void ) {
+	const float barWidth = 480.0f, barHeight = 12.0f;
+	const float barX = (SCREEN_WIDTH-barWidth)/2.0f, barY = SCREEN_HEIGHT-8.0f-barHeight;
+	const float capWidth = 8.0f;
 
 	trap->R_SetColor( &colorWhite );
-	// Draw background
-	CG_DrawPic(barleft, bartop, barwidth, barheight, cgs.media.loadBarLEDSurround);
 
-	// Draw left cap (backwards)
-	CG_DrawPic(tickleft, ticktop, -capwidth, tickheight, cgs.media.loadBarLEDCap);
+	// background, left cap, bar, right cap
+	CG_DrawPic( barX, barY, barWidth, barHeight, media.gfx.interface.loadBarLEDSurround );
+	CG_DrawPic( barX+capWidth, barY, -capWidth, barHeight, media.gfx.interface.loadBarLEDCap );
+	CG_DrawPic( barX+capWidth, barY, ((barWidth-(capWidth*2.0f))*cg.loadFrac), barHeight, media.gfx.interface.loadBarLED );
+	CG_DrawPic( barX+((barWidth-(capWidth*2.0f))*cg.loadFrac)+capWidth, barY, capWidth, barHeight, media.gfx.interface.loadBarLEDCap );
 
-	// Draw bar
-	CG_DrawPic(tickleft, ticktop, tickwidth*cg.loadLCARSStage, tickheight, cgs.media.loadBarLED);
+	if ( cg.loadFrac > 0.0f ) {
+		char text[64];
+		float textWidth;
 
-	// Draw right cap
-	CG_DrawPic(tickleft+tickwidth*cg.loadLCARSStage, ticktop, capwidth, tickheight, cgs.media.loadBarLEDCap);
+		Com_sprintf( text, sizeof( text ), "%3i%%", (int)(floorf(cg.loadFrac * 100.0f)) );
+		textWidth = CG_Text_Width( text, 1.0f, FONT_JAPPMONO );
+		CG_Text_Paint( (SCREEN_WIDTH/2.0f) - (textWidth/2.0f), SCREEN_HEIGHT-64.0f, 1.0f, &colorWhite, text, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_JAPPMONO );
+	}
 }
-

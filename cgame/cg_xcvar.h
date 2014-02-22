@@ -111,6 +111,11 @@ XCVAR_DEF( cg_jumpSounds,						"0",								NULL,					CVAR_ARCHIVE )
 XCVAR_DEF( cg_lagometer,						"0",								NULL,					CVAR_ARCHIVE )
 XCVAR_DEF( cg_logChat,							"1",								NULL,					CVAR_ARCHIVE )
 XCVAR_DEF( cg_logConsole,						"1",								NULL,					CVAR_ARCHIVE )
+#ifdef _DEBUG
+XCVAR_DEF( cg_logDebug,							"1",								NULL,					CVAR_ARCHIVE )
+#else
+XCVAR_DEF( cg_logDebug,							"0",								NULL,					CVAR_ARCHIVE )
+#endif
 XCVAR_DEF( cg_logFormat,						"1",								NULL,					CVAR_ARCHIVE )
 XCVAR_DEF( cg_logSecurity,						"1",								NULL,					CVAR_ARCHIVE )
 XCVAR_DEF( cg_marks,							"1",								NULL,					CVAR_ARCHIVE )

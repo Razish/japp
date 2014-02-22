@@ -685,18 +685,17 @@ typedef enum saber_colors_e {
 	NUM_SABER_COLORS
 } saber_colors_t;
 
-typedef enum forcePowers_e
-{
-	FP_FIRST = 0,//marker
-	FP_HEAL = 0,//instant
-	FP_LEVITATION,//hold/duration
-	FP_SPEED,//duration
-	FP_PUSH,//hold/duration
-	FP_PULL,//hold/duration
-	FP_TELEPATHY,//instant
-	FP_GRIP,//hold/duration
-	FP_LIGHTNING,//hold/duration
-	FP_RAGE,//duration
+typedef enum forcePowers_e {
+	FP_FIRST=0, // marker
+	FP_HEAL=0, // instant
+	FP_LEVITATION, // hold/duration
+	FP_SPEED, // duration
+	FP_PUSH, // hold/duration
+	FP_PULL, // hold/duration
+	FP_TELEPATHY, // instant
+	FP_GRIP, // hold/duration
+	FP_LIGHTNING, // hold/duration
+	FP_RAGE, // duration
 	FP_PROTECT,
 	FP_ABSORB,
 	FP_TEAM_HEAL,
@@ -722,8 +721,7 @@ typedef enum forcePowerLevels_e
 #define	FORCE_LEVEL_5 (FORCE_LEVEL_4+1)
 
 //rww - a C-ified structure version of the class which fires off callbacks and gives arguments to update ragdoll status.
-typedef enum sharedERagPhase_e
-{
+typedef enum sharedERagPhase_e {
 	RP_START_DEATH_ANIM,
 	RP_END_DEATH_ANIM,
 	RP_DEATH_COLLISION,
@@ -733,8 +731,7 @@ typedef enum sharedERagPhase_e
 	RP_DISABLE_EFFECTORS  // this removes effectors given by the effectorsToTurnOff member
 } sharedERagPhase_t;
 
-enum sharedERagEffector
-{
+enum sharedERagEffector_e {
 	RE_MODEL_ROOT=			0x00000001, //"model_root"
 	RE_PELVIS=				0x00000002, //"pelvis"
 	RE_LOWER_LUMBAR=		0x00000004, //"lower_lumbar"

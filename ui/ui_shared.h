@@ -536,5 +536,3 @@ qboolean UI_OutOfMemory( void );
 
 void Controls_GetConfig( void );
 void Controls_SetConfig(qboolean restart);
-
-extern const char *HolocronIcons[NUM_FORCE_POWERS];

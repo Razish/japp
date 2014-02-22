@@ -3,14 +3,10 @@
 // cg_ents.c -- present snapshot entities, happens every single frame
 
 #include "cg_local.h"
-/*
-Ghoul2 Insert Start
-*/
 #include "qcommon/q_shared.h"
 #include "Ghoul2/G2.h"
-/*
-Ghoul2 Insert end
-*/
+#include "cg_media.h"
+
 
 extern qboolean CG_InFighter( void );
 static void CG_Missile( centity_t *cent );
@@ -468,7 +464,7 @@ void CG_Special( centity_t *cent ) {
 	if ( s1->userInt1 )
 	{
 		VectorMA( &s1->origin, 64.0f, &s1->boneAngles1, &s1->angles );
-		trap->FX_PlayEffectID( s1->userInt2 ? cgs.effects.portalOrange : cgs.effects.portalBlue, &s1->origin, &s1->boneAngles1, -1, -1, qfalse );
+		trap->FX_PlayEffectID( s1->userInt2 ? media.efx.portal.orange : media.efx.portal.blue, &s1->origin, &s1->boneAngles1, -1, -1, qfalse );
 	//	CG_TestLine( s1->origin, s1->angles, 400, 4, 1 );
 
 		//If the portal is linked, show it
@@ -632,27 +628,6 @@ void ScaleModelAxis(refEntity_t	*ent)
 Ghoul2 Insert End
 */
 
-const char *forceHolocronModels[] = {
-	"models/map_objects/mp/lt_heal.md3",		//FP_HEAL,
-	"models/map_objects/mp/force_jump.md3",		//FP_LEVITATION,
-	"models/map_objects/mp/force_speed.md3",	//FP_SPEED,
-	"models/map_objects/mp/force_push.md3",		//FP_PUSH,
-	"models/map_objects/mp/force_pull.md3",		//FP_PULL,
-	"models/map_objects/mp/lt_telepathy.md3",	//FP_TELEPATHY,
-	"models/map_objects/mp/dk_grip.md3",		//FP_GRIP,
-	"models/map_objects/mp/dk_lightning.md3",	//FP_LIGHTNING,
-	"models/map_objects/mp/dk_rage.md3",		//FP_RAGE,
-	"models/map_objects/mp/lt_protect.md3",		//FP_PROTECT,
-	"models/map_objects/mp/lt_absorb.md3",		//FP_ABSORB,
-	"models/map_objects/mp/lt_healother.md3",	//FP_TEAM_HEAL,
-	"models/map_objects/mp/dk_powerother.md3",	//FP_TEAM_FORCE,
-	"models/map_objects/mp/dk_drain.md3",		//FP_DRAIN,
-	"models/map_objects/mp/force_sight.md3",	//FP_SEE,
-	"models/map_objects/mp/saber_attack.md3",	//FP_SABER_OFFENSE,
-	"models/map_objects/mp/saber_defend.md3",	//FP_SABER_DEFENSE,
-	"models/map_objects/mp/saber_throw.md3"		//FP_SABERTHROW
-};
-
 void CG_Disintegration(centity_t *cent, refEntity_t *ent)
 {
 	vector3 tempAng, hitLoc;
@@ -674,13 +649,13 @@ void CG_Disintegration(centity_t *cent, refEntity_t *ent)
 	if ( (cg_newFX.integer & NEWFX_DISINT) )
 	{
 		ent->renderfx = RF_DISINTEGRATE2;
-		ent->customShader = cgs.media.orangeSaberGlowShader;
+		ent->customShader = media.gfx.world.saber.orange.glow;
 		SE_R_AddRefEntityToScene( ent, cent->currentState.number );
 	}
 	else
 	{
 		ent->renderfx |= RF_DISINTEGRATE2;
-		ent->customShader = cgs.media.disruptorShader;
+		ent->customShader = media.gfx.world.disruptor;
 		SE_R_AddRefEntityToScene( ent, cent->currentState.number );
 
 		ent->renderfx &= ~(RF_DISINTEGRATE2);
@@ -708,16 +683,16 @@ void CG_Disintegration(centity_t *cent, refEntity_t *ent)
 			VectorSet(&fxDir, 0, 0, 1);
 			fxOrg.z += crandom() * 2;
 			if ( random() > 0.82f )
-				trap->FX_PlayEffectID( cgs.effects.mBlackSmoke, &fxOrg, &fxDir, -1, -1, qfalse );
+				trap->FX_PlayEffectID( media.efx.blackSmoke, &fxOrg, &fxDir, -1, -1, qfalse );
 			return;
 		}
 		fxOrg.z += crandom() * 20;
 
-		trap->FX_PlayEffectID( cgs.effects.mDisruptorDeathSmoke, &fxOrg, &fxDir, -1, -1, qfalse );
+		trap->FX_PlayEffectID( media.efx.disruptorDeathSmoke, &fxOrg, &fxDir, -1, -1, qfalse );
 
 		if ( random() > 0.5f )
 		{
-			trap->FX_PlayEffectID( cgs.effects.mDisruptorDeathSmoke, &fxOrg, &fxDir, -1, -1, qfalse );
+			trap->FX_PlayEffectID( media.efx.disruptorDeathSmoke, &fxOrg, &fxDir, -1, -1, qfalse );
 		}
 	}
 }
@@ -1204,7 +1179,7 @@ static void CG_General( centity_t *cent ) {
 				BG_GiveMeVectorFromMatrix(&matrix, ORIGIN, &boltOrg);
 				BG_GiveMeVectorFromMatrix(&matrix, NEGATIVE_Y, &boltAng);
 
-				trap->FX_PlayEffectID(cgs.effects.mBlasterSmoke, &boltOrg, &boltAng, -1, -1, qfalse);
+				trap->FX_PlayEffectID(media.efx.blasterSmoke, &boltOrg, &boltAng, -1, -1, qfalse);
 			}
 
 			cent->bolt4 = newBolt;
@@ -1228,7 +1203,7 @@ static void CG_General( centity_t *cent ) {
 				BG_GiveMeVectorFromMatrix(&matrix, ORIGIN, &boltOrg);
 				BG_GiveMeVectorFromMatrix(&matrix, NEGATIVE_Y, &boltAng);
 
-				trap->FX_PlayEffectID(cgs.effects.mBlasterSmoke, &boltOrg, &boltAng, -1, -1, qfalse);
+				trap->FX_PlayEffectID(media.efx.blasterSmoke, &boltOrg, &boltAng, -1, -1, qfalse);
 			}
 
 			if (cent->currentState.modelGhoul2 == G2_MODELPART_RARM || cent->currentState.modelGhoul2 == G2_MODELPART_RHAND || cent->currentState.modelGhoul2 == G2_MODELPART_WAIST)
@@ -1289,7 +1264,7 @@ static void CG_General( centity_t *cent ) {
 				{
 					boltAng.y = 1;
 				}
-				trap->FX_PlayEffectID(cgs.effects.mBlasterSmoke, &boltOrg, &boltAng, -1, -1, qfalse);
+				trap->FX_PlayEffectID(media.efx.blasterSmoke, &boltOrg, &boltAng, -1, -1, qfalse);
 
 				cent->trailTime = cg.time + 400;
 			}
@@ -1417,7 +1392,7 @@ Ghoul2 Insert End
 	if (s1->eType == ET_HOLOCRON && s1->modelindex < -100)
 	{ //special render, it's a holocron
 		//Using actual models now:
-		ent.hModel = trap->R_RegisterModel(forceHolocronModels[s1->modelindex+128]);
+		ent.hModel = media.models.forceHolocrons[s1->modelindex+128];
 
 		//Rotate them
 		VectorCopy( &cg.autoAngles, &cent->lerpAngles );
@@ -1552,13 +1527,13 @@ Ghoul2 Insert End
 
 			if (lightSide)
 			{ //might be temporary, dunno.
-				ent.customShader = cgs.media.playerShieldDamage;
+				ent.customShader = media.gfx.world.playerShieldDamage;
 			}
 			else
 			{
-				ent.customShader = cgs.media.redSaberGlowShader;
+				ent.customShader = media.gfx.world.saber.red.glow;
 			}
-		//	ent.customShader = cgs.media.sightShell;
+		//	ent.customShader = media.gfx.world.sightShell;
 
 			//slowly move the glowing part upward, out of the fading body
 			/*
@@ -1587,15 +1562,15 @@ Ghoul2 Insert End
 					ent.shaderRGBA[3] = 255;
 					if ( rand() & 1 )
 					{
-						ent.customShader = cgs.media.electricBodyShader;
+						ent.customShader = media.gfx.world.electricBody;
 					}
 					else
 					{
-						ent.customShader = cgs.media.electricBody2Shader;
+						ent.customShader = media.gfx.world.electricBody2;
 					}
 					if ( random() > 0.9f )
 					{
-						trap->S_StartSound ( NULL, cent->currentState.number, CHAN_AUTO, cgs.media.crackleSound );
+						trap->S_StartSound ( NULL, cent->currentState.number, CHAN_AUTO, media.sounds.environment.crackle );
 					}
 					SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 				}
@@ -1628,7 +1603,7 @@ Ghoul2 Insert End
 		//refEntity_t sRef;
 		//memcpy( &sRef, &ent, sizeof( sRef ) );
 
-		ent.customShader = cgs.media.solidWhite;
+		ent.customShader = media.gfx.world.solidWhite;
 		ent.renderfx = RF_RGB_TINT;
 		wv = sin( cg.time * 0.003f ) * 0.08f + 0.1f;
 		ent.shaderRGBA[0] = wv * 255;
@@ -1650,10 +1625,10 @@ Ghoul2 Insert End
 			fxSArgs.rotation = 0.0f;
 			fxSArgs.bounce = 0.0f;
 			fxSArgs.life = 1.0f;
-			fxSArgs.shader = cgs.media.yellowDroppedSaberShader;
+			fxSArgs.shader = media.gfx.world.yellowDroppedSaber;
 			fxSArgs.flags = 0x08000000;
 
-			//trap->FX_AddSprite( org, NULL, NULL, 5.5f, 5.5f, wv, wv, 0.0f, 0.0f, 1.0f, cgs.media.yellowSaberGlowShader, 0x08000000 );
+			//trap->FX_AddSprite( org, NULL, NULL, 5.5f, 5.5f, wv, wv, 0.0f, 0.0f, 1.0f, media.gfx.world.saber.yellow.glow, 0x08000000 );
 			trap->FX_AddSprite(&fxSArgs);
 		}
 	}
@@ -1665,7 +1640,7 @@ Ghoul2 Insert End
 		//refEntity_t sRef;
 		//memcpy( &sRef, &ent, sizeof( sRef ) );
 
-		ent.customShader = cgs.media.solidWhite;
+		ent.customShader = media.gfx.world.solidWhite;
 		ent.renderfx = RF_RGB_TINT;
 		wv = sin( cg.time * 0.005f ) * 0.08f + 0.1f; //* 0.08f + 0.1f;
 
@@ -1731,18 +1706,18 @@ Ghoul2 Insert End
 		{ //dark
 			fxSArgs.sAlpha *= 3;
 			fxSArgs.eAlpha *= 3;
-			fxSArgs.shader = cgs.media.redSaberGlowShader;
+			fxSArgs.shader = media.gfx.world.saber.red.glow;
 			trap->FX_AddSprite(&fxSArgs);
 		}
 		else if (cent->currentState.trickedentindex3 == 2)
 		{ //light
 			fxSArgs.sAlpha *= 1.5f;
 			fxSArgs.eAlpha *= 1.5f;
-			fxSArgs.shader = cgs.media.redSaberGlowShader;
+			fxSArgs.shader = media.gfx.world.saber.red.glow;
 			trap->FX_AddSprite(&fxSArgs);
-			fxSArgs.shader = cgs.media.greenSaberGlowShader;
+			fxSArgs.shader = media.gfx.world.saber.green.glow;
 			trap->FX_AddSprite(&fxSArgs);
-			fxSArgs.shader = cgs.media.blueSaberGlowShader;
+			fxSArgs.shader = media.gfx.world.saber.blue.glow;
 			trap->FX_AddSprite(&fxSArgs);
 		}
 		else
@@ -1753,16 +1728,16 @@ Ghoul2 Insert End
 			{ //saber power
 				fxSArgs.sAlpha *= 1.5;
 				fxSArgs.eAlpha *= 1.5;
-				fxSArgs.shader = cgs.media.greenSaberGlowShader;
+				fxSArgs.shader = media.gfx.world.saber.green.glow;
 				trap->FX_AddSprite(&fxSArgs);
 			}
 			else
 			{
 				fxSArgs.sAlpha *= 0.5;
 				fxSArgs.eAlpha *= 0.5;
-				fxSArgs.shader = cgs.media.greenSaberGlowShader;
+				fxSArgs.shader = media.gfx.world.saber.green.glow;
 				trap->FX_AddSprite(&fxSArgs);
-				fxSArgs.shader = cgs.media.blueSaberGlowShader;
+				fxSArgs.shader = media.gfx.world.saber.blue.glow;
 				trap->FX_AddSprite(&fxSArgs);
 			}
 		}
@@ -1773,7 +1748,7 @@ Ghoul2 Insert End
 		if (cent->currentState.bolt2 == 1)
 		{
 			VectorMA( &ent.origin, 6.6f, &ent.axis[0], &beamOrg );// forward
-			beamID = cgs.effects.tripmineGlowFX;
+			beamID = media.efx.tripmine.glow;
 			trap->FX_PlayEffectID( beamID, &beamOrg, &cent->currentState.pos.trDelta, -1, -1, qfalse );
 		}
 		else
@@ -1781,7 +1756,7 @@ Ghoul2 Insert End
 			int i = 0;
 
 			VectorMA( &ent.origin, 6.6f, &ent.axis[0], &beamOrg );// forward
-			beamID = cgs.effects.tripmineLaserFX;
+			beamID = media.efx.tripmine.laser;
 
 			if (cg.snap->ps.fd.forcePowersActive & (1 << FP_SEE))
 			{
@@ -1914,7 +1889,7 @@ Ghoul2 Insert Start
 		VectorCopy(&cent->lerpOrigin, &ent.origin);
 		VectorCopy( &cent->currentState.angles, &cent->lerpAngles );
 		AnglesToAxis(&cent->lerpAngles, ent.axis);
-		ent.hModel = cgs.media.itemHoloModel;
+		ent.hModel = media.models.itemHolo;
 
 		doGrey = CG_GreyItem(item->giType, item->giTag, cg.snap->ps.fd.forceSide);
 
@@ -1931,7 +1906,7 @@ Ghoul2 Insert Start
 
 		if (!doGrey)
 		{
-			trap->FX_PlayEffectID(cgs.effects.itemCone, &ent.origin, &uNorm, -1, -1, qfalse);
+			trap->FX_PlayEffectID(media.efx.itemCone, &ent.origin, &uNorm, -1, -1, qfalse);
 		}
 	}
 
@@ -2143,7 +2118,7 @@ Ghoul2 Insert End
 		ent.shaderRGBA[0] = 0;
 		ent.shaderRGBA[1] = 200;
 		ent.shaderRGBA[2] = 85;
-		ent.customShader = cgs.media.itemRespawningPlaceholder;
+		ent.customShader = media.gfx.world.itemRespawningPlaceholder;
 	}
 
 	// increase the size of the weapons when they are presented as items
@@ -2152,7 +2127,7 @@ Ghoul2 Insert End
 		VectorScale( &ent.axis[1], 1.5, &ent.axis[1] );
 		VectorScale( &ent.axis[2], 1.5, &ent.axis[2] );
 		ent.nonNormalizedAxes = qtrue;
-		//trap->S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, cgs.media.weaponHoverSound );
+	//	trap->S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, media.sounds.weaponHoverSound );
 	}
 
 	if (!(cent->currentState.eFlags & EF_DROPPEDWEAPON) &&
@@ -2180,7 +2155,7 @@ Ghoul2 Insert End
 
 		ent.renderfx &= ~RF_FORCE_ENT_ALPHA;
 
-		ent.customShader = cgs.media.itemRespawningRezOut;
+		ent.customShader = media.gfx.world.itemRespawningRezOut;
 
 		/*
 		ent.shaderRGBA[0] = 0;
@@ -2219,13 +2194,13 @@ Ghoul2 Insert End
 
 		if ( cg.predictedPlayerState.duelInProgress )
 		{
-			ent.customShader = cgs.media.whiteShader;
+			ent.customShader = media.gfx.world.whiteShader;
 			ent.shaderRGBA[0] = ent.shaderRGBA[1] = ent.shaderRGBA[2] = 16;
 			ent.renderfx |= RF_RGB_TINT;
 			SE_R_AddRefEntityToScene(&ent, cent->currentState.number);
 
 			ent.renderfx &= ~RF_RGB_TINT;
-			ent.customShader = cgs.media.playerShieldDamage;
+			ent.customShader = media.gfx.world.playerShieldDamage;
 		}
 
 		SE_R_AddRefEntityToScene(&ent, cent->currentState.number);
@@ -2319,7 +2294,7 @@ void CG_CreateDistortionTrailPart(centity_t *cent, float scale, vector3 *pos)
 	ScaleModelAxis(&ent);
 
 	ent.hModel = trap->R_RegisterModel("models/weapons2/merr_sonn/trailmodel.md3");
-	ent.customShader = cgs.media.itemRespawningRezOut;//cgs.media.cloakedShader;//cgs.media.halfShieldShader;
+	ent.customShader = media.gfx.world.itemRespawningRezOut;//media.gfx.world.cloakedShader;//media.gfx.world.halfShieldShader;
 
 #if 1
 	ent.renderfx = (RF_DISTORTION|RF_FORCE_ENT_ALPHA);
@@ -2378,7 +2353,7 @@ static void CG_Missile( centity_t *cent ) {
 		{//Raz: Portals
 			vector3 pos;
 			BG_EvaluateTrajectory( &s1->pos, cg.time, &pos );
-			trap->FX_PlayEffectID( (cent->currentState.eFlags & EF_ALT_FIRING) ? cgs.effects.mBobaJet : cgs.effects.itemCone, &pos, &s1->angles, -1, -1, qfalse );
+			trap->FX_PlayEffectID( (cent->currentState.eFlags & EF_ALT_FIRING) ? media.efx.bobaJet : media.efx.itemCone, &pos, &s1->angles, -1, -1, qfalse );
 			return;
 		}
 		else
@@ -2638,7 +2613,7 @@ Ghoul2 Insert End
 		//refEntity_t sRef;
 		//memcpy( &sRef, &ent, sizeof( sRef ) );
 
-		ent.customShader = cgs.media.solidWhite;
+		ent.customShader = media.gfx.world.solidWhite;
 		ent.renderfx = RF_RGB_TINT;
 		wv = sin( cg.time * 0.003f ) * 0.08f + 0.1f;
 		ent.shaderRGBA[0] = wv * 255;
@@ -2660,10 +2635,10 @@ Ghoul2 Insert End
 			fxSArgs.rotation = 0.0f;
 			fxSArgs.bounce = 0.0f;
 			fxSArgs.life = 1.0f;
-			fxSArgs.shader = cgs.media.yellowDroppedSaberShader;
+			fxSArgs.shader = media.gfx.world.yellowDroppedSaber;
 			fxSArgs.flags = 0x08000000;
 
-			//trap->FX_AddSprite( org, NULL, NULL, 5.5f, 5.5f, wv, wv, 0.0f, 0.0f, 1.0f, cgs.media.yellowSaberGlowShader, 0x08000000 );
+			//trap->FX_AddSprite( org, NULL, NULL, 5.5f, 5.5f, wv, wv, 0.0f, 0.0f, 1.0f, media.gfx.world.saber.yellow.glow, 0x08000000 );
 			trap->FX_AddSprite(&fxSArgs);
 		}
 
@@ -2672,7 +2647,7 @@ Ghoul2 Insert End
 		ent.shaderRGBA[2] = 0;
 
 		ent.renderfx |= RF_DEPTHHACK;
-		ent.customShader = cgs.media.forceSightBubble;
+		ent.customShader = media.gfx.world.forceSightBubble;
 
 		SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 	}
@@ -2682,7 +2657,7 @@ Ghoul2 Insert End
 		vector3	beamOrg;
 
 		VectorMA( &ent.origin, 8, &ent.axis[0], &beamOrg );// forward
-		trap->FX_PlayEffectID( cgs.effects.mTripMineLaster, &beamOrg, &ent.axis[0], -1, -1, qfalse );
+		trap->FX_PlayEffectID( media.efx.tripmine.laser, &beamOrg, &ent.axis[0], -1, -1, qfalse );
 	}
 }
 
@@ -3652,7 +3627,7 @@ void CG_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha )
 		VectorCopy( color, &apArgs.rgb2 );
 		VectorCopy( &rot, &apArgs.rotationDelta );
 		apArgs.killTime = cg.frametime;
-		apArgs.shader = cgs.media.solidWhite;
+		apArgs.shader = media.gfx.world.solidWhite;
 
 		trap->FX_AddPoly( &apArgs );
 

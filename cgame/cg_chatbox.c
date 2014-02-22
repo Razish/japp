@@ -3,6 +3,7 @@
 #include "ui/menudef.h"
 #include "ui/keycodes.h"
 #include "cg_luaevent.h"
+#include "cg_media.h"
 
 // qcommon.h
 #define	MAX_EDIT_LINE 256
@@ -527,7 +528,7 @@ void CG_ChatboxTabComplete( void ) {
 				CG_ChatboxAddMessage( va( S_COLOR_GREEN"- "S_COLOR_WHITE"%s", matches[i] ), qfalse, "normal" );
 		//	if ( numMatches > 3 )
 		//		CG_ChatboxAddMessage( S_COLOR_GREEN"- "S_COLOR_WHITE"[...] truncated", qfalse, "normal" );
-			trap->S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+			trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 		}
 	}
 }

@@ -4,6 +4,7 @@
 // of event processing
 
 #include "cg_local.h"
+#include "cg_media.h"
 
 /*
 ==================
@@ -51,7 +52,7 @@ void CG_BubbleTrail( vector3 *start, vector3 *end, float spacing ) {
 		re->reType = RT_SPRITE;
 		re->rotation = 0;
 		re->radius = 3;
-		re->customShader = 0;//cgs.media.waterBubbleShader;
+		re->customShader = 0;//media.gfx.world.waterBubble;
 		re->shaderRGBA[0] = 0xff;
 		re->shaderRGBA[1] = 0xff;
 		re->shaderRGBA[2] = 0xff;
@@ -179,7 +180,7 @@ void CG_TestLine( vector3 *start, vector3 *end, int time, unsigned int color, in
 
 	re->reType = RT_LINE;
 	re->radius = 0.5*radius;
-	re->customShader = cgs.media.whiteShader; //trap->R_RegisterShaderNoMip("textures/colombia/canvas_doublesided");
+	re->customShader = media.gfx.world.whiteShader; //trap->R_RegisterShaderNoMip("textures/colombia/canvas_doublesided");
 
 	re->shaderTexCoord.x = re->shaderTexCoord.y = 1.0f;
 
@@ -360,7 +361,7 @@ static void CG_DoGlassQuad( vector3 p[4], vector2 uv[4], qboolean stick, int tim
 	apArgs.bounce = bounce;
 	apArgs.motionDelay = time;
 	apArgs.killTime = 6000;
-	apArgs.shader = cgs.media.glassShardShader;
+	apArgs.shader = media.gfx.world.glassShard;
 	apArgs.flags = (FX_APPLY_PHYSICS | FX_ALPHA_NONLINEAR | FX_USE_ALPHA);
 
 	trap->FX_AddPoly(&apArgs);
@@ -1027,11 +1028,11 @@ void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3
 	default:
 		break;
 	case MAT_GLASS:
-		trap->S_StartSound( NULL, owner, CHAN_BODY, cgs.media.glassChunkSound );
+		trap->S_StartSound( NULL, owner, CHAN_BODY, media.sounds.environment.glassChunk );
 		return;
 		break;
 	case MAT_GRATE1:
-		trap->S_StartSound( NULL, owner, CHAN_BODY, cgs.media.grateSound );
+		trap->S_StartSound( NULL, owner, CHAN_BODY, media.sounds.environment.grate );
 		return;
 		break;
 	case MAT_ELECTRICAL:// (sparks)
@@ -1043,23 +1044,23 @@ void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3
 	case MAT_GREY_STONE:
 	case MAT_WHITE_METAL:  // not quite sure what this stuff is supposed to be...it's for Stu
 	case MAT_SNOWY_ROCK:
-		trap->S_StartSound( NULL, owner, CHAN_BODY, cgs.media.rockBreakSound );
+		trap->S_StartSound( NULL, owner, CHAN_BODY, media.sounds.environment.rockBreak );
 		bounce = LEBS_ROCK;
 		speedMod = 0.5f; // rock blows up less
 		break;
 	case MAT_GLASS_METAL:
-		trap->S_StartSound( NULL, owner, CHAN_BODY, cgs.media.glassChunkSound ); // FIXME: should probably have a custom sound
+		trap->S_StartSound( NULL, owner, CHAN_BODY, media.sounds.environment.glassChunk ); // FIXME: should probably have a custom sound
 		bounce = LEBS_METAL;
 		break;
 	case MAT_CRATE1:
 	case MAT_CRATE2:
-		trap->S_StartSound( NULL, owner, CHAN_BODY, cgs.media.crateBreakSound[Q_irand(0,1)] );
+		trap->S_StartSound( NULL, owner, CHAN_BODY, media.sounds.environment.crateBreak[Q_irand(0,1)] );
 		break;
 	case MAT_METAL:
 	case MAT_METAL2:
 	case MAT_METAL3:
 	case MAT_ELEC_METAL:// FIXME: maybe have its own sound?
-		trap->S_StartSound( NULL, owner, CHAN_BODY, cgs.media.chunkSound );
+		trap->S_StartSound( NULL, owner, CHAN_BODY, media.sounds.environment.chunk );
 		bounce = LEBS_METAL;
 		speedMod = 0.8f; // metal blows up a bit more
 		break;
@@ -1095,49 +1096,49 @@ void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3
 			default:
 				break;
 			case MAT_METAL2: //bluegrey
-				chunkModel = cgs.media.chunkModels[CHUNK_METAL2][Q_irand(0, 3)];
+				chunkModel = media.models.chunks[CHUNK_METAL2][Q_irand(0, 3)];
 				break;
 			case MAT_GREY_STONE://gray
-				chunkModel = cgs.media.chunkModels[CHUNK_ROCK1][Q_irand(0, 3)];
+				chunkModel = media.models.chunks[CHUNK_ROCK1][Q_irand(0, 3)];
 				break;
 			case MAT_LT_STONE: //tan
-				chunkModel = cgs.media.chunkModels[CHUNK_ROCK2][Q_irand(0, 3)];
+				chunkModel = media.models.chunks[CHUNK_ROCK2][Q_irand(0, 3)];
 				break;
 			case MAT_DRK_STONE://brown
-				chunkModel = cgs.media.chunkModels[CHUNK_ROCK3][Q_irand(0, 3)];
+				chunkModel = media.models.chunks[CHUNK_ROCK3][Q_irand(0, 3)];
 				break;
 			case MAT_SNOWY_ROCK://gray & brown
 				if ( Q_irand( 0, 1 ) )
 				{
-					chunkModel = cgs.media.chunkModels[CHUNK_ROCK1][Q_irand(0, 3)];
+					chunkModel = media.models.chunks[CHUNK_ROCK1][Q_irand(0, 3)];
 				}
 				else
 				{
-					chunkModel = cgs.media.chunkModels[CHUNK_ROCK3][Q_irand(0, 3)];
+					chunkModel = media.models.chunks[CHUNK_ROCK3][Q_irand(0, 3)];
 				}
 				break;
 			case MAT_WHITE_METAL:
-				chunkModel = cgs.media.chunkModels[CHUNK_WHITE_METAL][Q_irand(0, 3)];
+				chunkModel = media.models.chunks[CHUNK_WHITE_METAL][Q_irand(0, 3)];
 				break;
 			case MAT_CRATE1://yellow multi-colored crate chunks
-				chunkModel = cgs.media.chunkModels[CHUNK_CRATE1][Q_irand(0, 3)];
+				chunkModel = media.models.chunks[CHUNK_CRATE1][Q_irand(0, 3)];
 				break;
 			case MAT_CRATE2://red multi-colored crate chunks
-				chunkModel = cgs.media.chunkModels[CHUNK_CRATE2][Q_irand(0, 3)];
+				chunkModel = media.models.chunks[CHUNK_CRATE2][Q_irand(0, 3)];
 				break;
 			case MAT_ELEC_METAL:
 			case MAT_GLASS_METAL:
 			case MAT_METAL://grey
-				chunkModel = cgs.media.chunkModels[CHUNK_METAL1][Q_irand(0, 3)];
+				chunkModel = media.models.chunks[CHUNK_METAL1][Q_irand(0, 3)];
 				break;
 			case MAT_METAL3:
 				if ( rand() & 1 )
 				{
-					chunkModel = cgs.media.chunkModels[CHUNK_METAL1][Q_irand(0, 3)];
+					chunkModel = media.models.chunks[CHUNK_METAL1][Q_irand(0, 3)];
 				}
 				else
 				{
-					chunkModel = cgs.media.chunkModels[CHUNK_METAL2][Q_irand(0, 3)];
+					chunkModel = media.models.chunks[CHUNK_METAL2][Q_irand(0, 3)];
 				}
 				break;
 			}
@@ -1359,7 +1360,7 @@ void CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float 
 	VectorNormalize( &direction );
 
 	//Tag the last one with a light
-	le = CG_MakeExplosion( origin, &direction, cgs.media.explosionModel, 6, cgs.media.surfaceExplosionShader, 500,
+	le = CG_MakeExplosion( origin, &direction, media.models.explosion, 6, media.gfx.world.surfaceExplosion, 500,
 		qfalse, radius * 0.02f + (random() * 0.3f), 0);
 	le->light = 150;
 	VectorSet( &le->lightColor, 0.9f, 0.8f, 0.5f );
@@ -1370,7 +1371,7 @@ void CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float 
 			(origin->x + (16 + (crandom() * 8))*crandom()),
 			(origin->y + (16 + (crandom() * 8))*crandom()),
 			(origin->z + (16 + (crandom() * 8))*crandom()) );
-		CG_MakeExplosion( &new_org, &direction, cgs.media.explosionModel, 6, cgs.media.surfaceExplosionShader,
+		CG_MakeExplosion( &new_org, &direction, media.models.explosion, 6, media.gfx.world.surfaceExplosion,
 			300 + (rand() & 99), qfalse, radius * 0.05f + (crandom() *0.3f), 0);
 	}
 
@@ -1385,7 +1386,7 @@ void CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float 
 		VectorMA( origin, -8, normal, &temp_org );
 		//Impact mark
 		//FIXME: Replace mark
-		//CG_ImpactMark( cgs.media.burnMarkShader, origin, normal, random()*360, 1,1,1,1, qfalse, 8, qfalse );
+		//CG_ImpactMark( media.gfx.world.burnMarkShader, origin, normal, random()*360, 1,1,1,1, qfalse, 8, qfalse );
 	}
 }
 
@@ -1416,7 +1417,7 @@ void CG_Bleed( vector3 *origin, int entityNum ) {
 	ex->refEntity.rotation = rand() % 360;
 	ex->refEntity.radius = 24;
 
-	ex->refEntity.customShader = 0;//cgs.media.bloodExplosionShader;
+	ex->refEntity.customShader = 0;//media.gfx.world.bloodExplosion;
 
 	// don't show player's own blood in view
 	if ( entityNum == cg.snap->ps.clientNum ) {

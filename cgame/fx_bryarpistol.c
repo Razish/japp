@@ -2,6 +2,7 @@
 
 #include "cg_local.h"
 #include "fx_local.h"
+#include "cg_media.h"
 
 /*
 -------------------------
@@ -19,7 +20,7 @@ void FX_BryarProjectileThink(  centity_t *cent, const struct weaponInfo_s *weapo
 	if ( VectorNormalize2( &cent->currentState.pos.trDelta, &forward ) == 0.0f )
 		forward.z = 1.0f;
 
-	trap->FX_PlayEffectID( cgs.effects.bryarShotEffect, &cent->lerpOrigin, &forward, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.pistol.shot, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 }
 
 /*
@@ -28,7 +29,7 @@ FX_BryarHitWall
 -------------------------
 */
 void FX_BryarHitWall( vector3 *origin, vector3 *normal ) {
-	trap->FX_PlayEffectID( cgs.effects.bryarWallImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.pistol.wallImpact, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -37,7 +38,7 @@ FX_BryarHitPlayer
 -------------------------
 */
 void FX_BryarHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
-	trap->FX_PlayEffectID( humanoid ? cgs.effects.bryarFleshImpactEffect : cgs.effects.bryarDroidImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( humanoid ? media.efx.pistol.fleshImpact : media.efx.pistol.droidImpact, origin, normal, -1, -1, qfalse );
 }
 
 
@@ -62,12 +63,12 @@ void FX_BryarAltProjectileThink(  centity_t *cent, const struct weaponInfo_s *we
 	for (t = 1; t < cent->currentState.generic1; t++ )
 	{
 		// just add ourselves over, and over, and over when we are charged
-		trap->FX_PlayEffectID( cgs.effects.bryarPowerupShotEffect, &cent->lerpOrigin, &forward, -1, -1, qfalse );
+		trap->FX_PlayEffectID( media.efx.pistol.powerupShot, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 	}
 
 	//	for ( int t = 1; t < cent->gent->count; t++ )	// The single player stores the charge in count, which isn't accessible on the client
 
-	trap->FX_PlayEffectID( cgs.effects.bryarShotEffect, &cent->lerpOrigin, &forward, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.pistol.shot, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 }
 
 /*
@@ -81,16 +82,16 @@ void FX_BryarAltHitWall( vector3 *origin, vector3 *normal, int power )
 	{
 	case 4:
 	case 5:
-		trap->FX_PlayEffectID( cgs.effects.bryarWallImpactEffect3, origin, normal, -1, -1, qfalse );
+		trap->FX_PlayEffectID( media.efx.pistol.wallImpact3, origin, normal, -1, -1, qfalse );
 		break;
 
 	case 2:
 	case 3:
-		trap->FX_PlayEffectID( cgs.effects.bryarWallImpactEffect2, origin, normal, -1, -1, qfalse );
+		trap->FX_PlayEffectID( media.efx.pistol.wallImpact2, origin, normal, -1, -1, qfalse );
 		break;
 
 	default:
-		trap->FX_PlayEffectID( cgs.effects.bryarWallImpactEffect, origin, normal, -1, -1, qfalse );
+		trap->FX_PlayEffectID( media.efx.pistol.wallImpact, origin, normal, -1, -1, qfalse );
 		break;
 	}
 }
@@ -101,7 +102,7 @@ FX_BryarAltHitPlayer
 -------------------------
 */
 void FX_BryarAltHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
-	trap->FX_PlayEffectID( humanoid ? cgs.effects.bryarFleshImpactEffect : cgs.effects.bryarDroidImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( humanoid ? media.efx.pistol.fleshImpact : media.efx.pistol.droidImpact, origin, normal, -1, -1, qfalse );
 }
 
 
@@ -118,7 +119,7 @@ void FX_TurretProjectileThink(  centity_t *cent, const struct weaponInfo_s *weap
 	if ( VectorNormalize2( &cent->currentState.pos.trDelta, &forward ) == 0.0f )
 		forward.z = 1.0f;
 
-	trap->FX_PlayEffectID( cgs.effects.turretShotEffect, &cent->lerpOrigin, &forward, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.turretShot, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 }
 
 /*
@@ -127,7 +128,7 @@ FX_TurretHitWall
 -------------------------
 */
 void FX_TurretHitWall( vector3 *origin, vector3 *normal ) {
-	trap->FX_PlayEffectID( cgs.effects.bryarWallImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.pistol.wallImpact, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -136,7 +137,7 @@ FX_TurretHitPlayer
 -------------------------
 */
 void FX_TurretHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
-	trap->FX_PlayEffectID( humanoid ? cgs.effects.bryarFleshImpactEffect : cgs.effects.bryarDroidImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( humanoid ? media.efx.pistol.fleshImpact : media.efx.pistol.droidImpact, origin, normal, -1, -1, qfalse );
 }
 
 
@@ -148,7 +149,7 @@ FX_ConcussionHitWall
 -------------------------
 */
 void FX_ConcussionHitWall( vector3 *origin, vector3 *normal ) {
-	trap->FX_PlayEffectID( cgs.effects.concussionImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.concussion.impact, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -157,7 +158,7 @@ FX_ConcussionHitPlayer
 -------------------------
 */
 void FX_ConcussionHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
-	trap->FX_PlayEffectID( cgs.effects.concussionImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.concussion.impact, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -171,7 +172,7 @@ void FX_ConcussionProjectileThink(  centity_t *cent, const struct weaponInfo_s *
 	if ( VectorNormalize2( &cent->currentState.pos.trDelta, &forward ) == 0.0f )
 		forward.z = 1.0f;
 
-	trap->FX_PlayEffectID( cgs.effects.concussionShotEffect, &cent->lerpOrigin, &forward, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.concussion.shot, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 }
 
 /*

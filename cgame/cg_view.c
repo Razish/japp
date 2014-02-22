@@ -6,6 +6,7 @@
 #include "bg_saga.h"
 #include "cg_lights.h"
 #include "cg_luaevent.h"
+#include "cg_media.h"
 
 #define CAMERA_SIZE	4
 
@@ -1271,7 +1272,7 @@ static int CG_CalcFov( void ) {
 
 					if (zoomSoundTime < cg.time || zoomSoundTime > cg.time + 10000)
 					{
-						trap->S_StartSound(&refdef->vieworg, ENTITYNUM_WORLD, CHAN_LOCAL, cgs.media.disruptorZoomLoop);
+						trap->S_StartSound( &refdef->vieworg, ENTITYNUM_WORLD, CHAN_LOCAL, media.sounds.weapons.zoomLoop );
 						zoomSoundTime = cg.time + 300;
 					}
 				}
@@ -1373,7 +1374,7 @@ static void CG_DamageBlendBlob( void )
 
 	if (cg.snap->ps.damageType == 0)
 	{ //pure health
-		ent.customShader = cgs.media.viewPainShader;
+		ent.customShader = media.gfx.interface.pain;
 		ent.shaderRGBA[0] = 180 * ( 1.0 - ((float)t / maxTime) );
 		ent.shaderRGBA[1] = 50 * ( 1.0 - ((float)t / maxTime) );
 		ent.shaderRGBA[2] = 50 * ( 1.0 - ((float)t / maxTime) );
@@ -1381,7 +1382,7 @@ static void CG_DamageBlendBlob( void )
 	}
 	else if (cg.snap->ps.damageType == 1)
 	{ //pure shields
-		ent.customShader = cgs.media.viewPainShader_Shields;
+		ent.customShader = media.gfx.interface.painShields;
 		ent.shaderRGBA[0] = 50 * ( 1.0 - ((float)t / maxTime) );
 		ent.shaderRGBA[1] = 180 * ( 1.0 - ((float)t / maxTime) );
 		ent.shaderRGBA[2] = 50 * ( 1.0 - ((float)t / maxTime) );
@@ -1389,7 +1390,7 @@ static void CG_DamageBlendBlob( void )
 	}
 	else
 	{ //shields and health
-		ent.customShader = cgs.media.viewPainShader_ShieldsAndHealth;
+		ent.customShader = media.gfx.interface.painShieldsAndHealth;
 		ent.shaderRGBA[0] = 180 * ( 1.0 - ((float)t / maxTime) );
 		ent.shaderRGBA[1] = 180 * ( 1.0 - ((float)t / maxTime) );
 		ent.shaderRGBA[2] = 50 * ( 1.0 - ((float)t / maxTime) );
@@ -1746,7 +1747,7 @@ static void CG_PowerupTimerSounds( void ) {
 			continue;
 		}
 		if ( ( t - cg.time ) / POWERUP_BLINK_TIME != ( t - cg.oldTime ) / POWERUP_BLINK_TIME ) {
-			//trap->S_StartSound( NULL, cg.snap->ps.clientNum, CHAN_ITEM, cgs.media.wearOffSound );
+		//	trap->S_StartSound( NULL, cg.snap->ps.clientNum, CHAN_ITEM, media.snd.wearOff );
 		}
 	}
 }
@@ -1760,61 +1761,50 @@ extern qboolean cg_skyOri;
 extern vector3 cg_skyOriPos;
 extern float cg_skyOriScale;
 extern qboolean cg_noFogOutsidePortal;
-void CG_DrawSkyBoxPortal(const char *cstr)
-{
-	refdef_t backuprefdef;
-	float fov_x;
-	float fov_y;
-	float x;
+void CG_DrawSkyBoxPortal( const char *cstr ) {
+	refdef_t backuprefdef, *refdef = CG_GetRefdef();
+	float fov_x, fov_y, x, f=0.0f;
 	char *token;
-	float f = 0;
-	refdef_t *refdef = CG_GetRefdef();
 
 	//backuprefdef = cg.refdef;
 	memcpy( &backuprefdef, refdef, sizeof( backuprefdef ) );
 
-	token = COM_ParseExt(&cstr, qfalse);
-	if (!token || !token[0])
-	{
-		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring\n");
+	token = COM_ParseExt( &cstr, qfalse );
+	if ( !token || !token[0] ) {
+		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring\n" );
 		return;
 	}
-	refdef->vieworg.x = atof(token);
+	refdef->vieworg.x = atof( token );
 
-	token = COM_ParseExt(&cstr, qfalse);
-	if (!token || !token[0])
-	{
-		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring\n");
+	token = COM_ParseExt( &cstr, qfalse );
+	if ( !token || !token[0] ) {
+		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring\n" );
 		return;
 	}
-	refdef->vieworg.y = atof(token);
+	refdef->vieworg.y = atof( token );
 
-	token = COM_ParseExt(&cstr, qfalse);
-	if (!token || !token[0])
-	{
-		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring\n");
+	token = COM_ParseExt( &cstr, qfalse );
+	if ( !token || !token[0] ) {
+		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring\n" );
 		return;
 	}
-	refdef->vieworg.z = atof(token);
+	refdef->vieworg.z = atof( token );
 
-	token = COM_ParseExt(&cstr, qfalse);
-	if (!token || !token[0])
-	{
-		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring\n");
+	token = COM_ParseExt( &cstr, qfalse );
+	if ( !token || !token[0] ) {
+		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring\n" );
 		return;
 	}
-//	fov_x = atoi(token);
+//	fov_x = atof( token );
 
 	// setup fog the first time, ignore this part of the configstring after that
-	token = COM_ParseExt(&cstr, qfalse);
-	if (!token || !token[0])
-	{
+	token = COM_ParseExt( &cstr, qfalse );
+	if ( !token || !token[0] ) {
 		trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog state\n" );
 	}
-	else
-	{
-		if(atoi(token))
-		{	// this camera has fog
+	else {
+		if ( atoi( token ) ) {
+			// this camera has fog
 			token = COM_ParseExt( &cstr, qfalse );
 			if ( !VALIDSTRING( token ) )
 				trap->Error( ERR_DROP, "CG_DrawSkyBoxPortal: error parsing skybox configstring.  No fog[0]\n" );
@@ -1832,61 +1822,49 @@ void CG_DrawSkyBoxPortal(const char *cstr)
 		}
 	}
 
-	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION )
-	{
+	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		// if in intermission, use a fixed value
-		if(!cg.renderingThirdPerson && (cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER
-		|| cg.predictedPlayerState.weapon == WP_MELEE) && cg_trueFOV.value)
+		if ( !cg.renderingThirdPerson &&
+			(cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
+			&& cg_trueFOV.value )
 		{
 			fov_x = cg_trueFOV.value;
 		}
 		else
-		{
 			fov_x = cg_fov.value;
-		}
 	}
-	else
-	{
-		if(!cg.renderingThirdPerson && (cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER
-		|| cg.predictedPlayerState.weapon == WP_MELEE) && cg_trueFOV.value
-		&& (cg.predictedPlayerState.pm_type != PM_SPECTATOR)
-		&& (cg.predictedPlayerState.pm_type != PM_INTERMISSION))
+	else {
+		if ( !cg.renderingThirdPerson &&
+			(cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
+			&& cg_trueFOV.value && cg.predictedPlayerState.pm_type != PM_SPECTATOR
+			&& cg.predictedPlayerState.pm_type != PM_INTERMISSION )
 		{
 			fov_x = cg_trueFOV.value;
 		}
 		else
-		{
 			fov_x = cg_fov.value;
-		}
 		if ( fov_x < 1 )
-		{
 			fov_x = 1;
-		}
 		else if ( fov_x > 160 )
-		{
 			fov_x = 160;
-		}
 
-		if (cg.predictedPlayerState.zoomMode)
-		{
+		if ( cg.predictedPlayerState.zoomMode )
 			fov_x = zoomFov;
-		}
 
 		// do smooth transitions for zooming
-		if (cg.predictedPlayerState.zoomMode)
-		{ //zoomed/zooming in
-			f = ( cg.time - cg.zoomTime ) / (float)ZOOM_OUT_TIME;
-			if ( f > 1.0 ) {
+		if ( cg.predictedPlayerState.zoomMode ) {
+			// zoomed/zooming in
+			f = (cg.time - cg.zoomTime) / (float)ZOOM_OUT_TIME;
+			if ( f > 1.0f )
 				fov_x = zoomFov;
-			} else {
-				fov_x = fov_x + f * ( zoomFov - fov_x );
-			}
+			else
+				fov_x = fov_x + f * (zoomFov - fov_x);
 		}
-		else
-		{ //zooming out
-			f = ( cg.time - cg.zoomTime ) / (float)ZOOM_OUT_TIME;
-			if ( f <= 1.0 )
-				fov_x = zoomFov + f * ( fov_x - zoomFov);
+		else {
+			// zooming out
+			f = (cg.time - cg.zoomTime) / (float)ZOOM_OUT_TIME;
+			if ( f <= 1.0f )
+				fov_x = zoomFov + f * (fov_x - zoomFov);
 		}
 	}
 
@@ -1903,25 +1881,22 @@ void CG_DrawSkyBoxPortal(const char *cstr)
 
 	refdef->time = cg.time;
 
-	if ( !cg.hyperspace)
-	{ //rww - also had to add this to add effects being rendered in portal sky areas properly.
-		trap->FX_AddScheduledEffects(qtrue);
-	}
+	if ( !cg.hyperspace )
+		trap->FX_AddScheduledEffects( qtrue );
 
-	CG_AddPacketEntities(qtrue); //rww - There was no proper way to put real entities inside the portal view before.
-									//This will put specially flagged entities in the render.
+	CG_AddPacketEntities( qtrue );
 
-	if (cg_skyOri)
-	{ //ok, we want to orient the sky refdef vieworg based on the normal vieworg's relation to the ori pos
+	// ok, we want to orient the sky refdef vieworg based on the normal vieworg's relation to the ori pos
+	if ( cg_skyOri ) {
 		vector3 dif;
 
-		VectorSubtract(&backuprefdef.vieworg, &cg_skyOriPos, &dif);
-		VectorScale(&dif, cg_skyOriScale, &dif);
-		VectorAdd(&refdef->vieworg, &dif, &refdef->vieworg);
+		VectorSubtract( &backuprefdef.vieworg, &cg_skyOriPos, &dif );
+		VectorScale( &dif, cg_skyOriScale, &dif );
+		VectorAdd( &refdef->vieworg, &dif, &refdef->vieworg );
 	}
 
-	if (cg_noFogOutsidePortal)
-	{ //make sure no fog flag is stripped first, and make sure it is set on the normal refdef
+	if ( cg_noFogOutsidePortal ) {
+		// make sure no fog flag is stripped first, and make sure it is set on the normal refdef
 		refdef->rdflags &= ~RDF_NOFOG;
 		backuprefdef.rdflags |= RDF_NOFOG;
 	}
@@ -1929,15 +1904,10 @@ void CG_DrawSkyBoxPortal(const char *cstr)
 	// draw the skybox
 	trap->R_RenderScene( refdef );
 
-	//cg.refdef = backuprefdef;
+//	cg.refdef = backuprefdef;
 	memcpy( refdef, &backuprefdef, sizeof( backuprefdef ) );
 }
 
-/*
-=====================
-CG_AddBufferedSound
-=====================
-*/
 void CG_AddBufferedSound( sfxHandle_t sfx ) {
 	if ( !sfx )
 		return;
@@ -2379,10 +2349,10 @@ void CG_DrawAutoMap(void)
 	refdef.width = w*hScale;
 	refdef.height = h*vScale;
 
-	CG_DrawPic(x-SIDEFRAME_WIDTH, y, SIDEFRAME_WIDTH, h, cgs.media.wireframeAutomapFrame_left);
-	CG_DrawPic(x+w, y, SIDEFRAME_WIDTH, h, cgs.media.wireframeAutomapFrame_right);
-	CG_DrawPic(x-SIDEFRAME_WIDTH, y-SIDEFRAME_HEIGHT, w+(SIDEFRAME_WIDTH*2), SIDEFRAME_HEIGHT, cgs.media.wireframeAutomapFrame_top);
-	CG_DrawPic(x-SIDEFRAME_WIDTH, y+h, w+(SIDEFRAME_WIDTH*2), SIDEFRAME_HEIGHT, cgs.media.wireframeAutomapFrame_bottom);
+	CG_DrawPic( x-SIDEFRAME_WIDTH, y, SIDEFRAME_WIDTH, h, media.gfx.interface.automap.frameLeft );
+	CG_DrawPic( x+w, y, SIDEFRAME_WIDTH, h, media.gfx.interface.automap.frameRight );
+	CG_DrawPic( x-SIDEFRAME_WIDTH, y-SIDEFRAME_HEIGHT, w+(SIDEFRAME_WIDTH*2), SIDEFRAME_HEIGHT, media.gfx.interface.automap.frameTop );
+	CG_DrawPic( x-SIDEFRAME_WIDTH, y+h, w+(SIDEFRAME_WIDTH*2), SIDEFRAME_HEIGHT, media.gfx.interface.automap.frameBottom );
 
 	refdef.time = cg.time;
 
@@ -2503,7 +2473,7 @@ void CG_DrawAltView(int clientNum)
 	}
 	else
 	{
-		CG_DrawPic( altViewX, altViewY, 160, 160, cgs.media.backTileShader );
+		CG_DrawPic( altViewX, altViewY, 160, 160, media.gfx.interface.backTile );
 	}
 
 	altViewX += 160;
@@ -2750,7 +2720,7 @@ void CG_AddMovementVectors( void ){
 	}
 
 	cg.japp.leftIdeal.reType		= cg.japp.rightIdeal.reType			= cg.japp.velocityVect.reType			= RT_LINE;
-	cg.japp.leftIdeal.customShader	= cg.japp.rightIdeal.customShader	= cg.japp.velocityVect.customShader		= cgs.media.rgbSaberCoreShader;
+	cg.japp.leftIdeal.customShader	= cg.japp.rightIdeal.customShader	= cg.japp.velocityVect.customShader		= media.gfx.world.saber.rgb.core;
 
 	if (addIdealVectors() && cg_strafeHelperVelocity.integer)
 		addVelocityVector();
@@ -3127,7 +3097,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	if ( trap->Key_GetCatcher() & KEYCATCH_CGAME && !CG_ChatboxActive() ) {
 		displayContextDef_t *dc = Display_GetContext();
-		CG_DrawPic( (float)dc->cursorx, (float)dc->cursory, 40.0f, 40.0f, cgs.media.cursor);
+		CG_DrawPic( (float)dc->cursorx, (float)dc->cursory, 40.0f, 40.0f, media.gfx.interface.cursor );
 	}
 
 	trap->R_SetColor( NULL );

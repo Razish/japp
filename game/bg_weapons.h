@@ -1,13 +1,11 @@
+#pragma once
+
 // Filename:-	bg_weapons.h
 //
 // This crosses both client and server.  It could all be crammed into bg_public, but isolation of this type of data is best.
 
-#ifndef __WEAPONS_H__
-#define __WEAPONS_H__
-
-typedef enum {
-	WP_NONE,
-
+typedef enum weapon_e {
+	WP_NONE=0,
 	WP_STUN_BATON,
 	WP_MELEE,
 	WP_SABER,
@@ -26,27 +24,18 @@ typedef enum {
 	WP_BRYAR_OLD,
 	WP_EMPLACED_GUN,
 	WP_TURRET,
-
-//	WP_GAUNTLET,
-//	WP_MACHINEGUN,			// Bryar
-//	WP_SHOTGUN,				// Blaster
-//	WP_GRENADE_LAUNCHER,	// Thermal
-//	WP_LIGHTNING,			//
-//	WP_RAILGUN,				//
-//	WP_GRAPPLING_HOOK,
-
 	WP_NUM_WEAPONS
 } weapon_t;
 
-//anything > this will be considered not player useable
-#define LAST_USEABLE_WEAPON			WP_BRYAR_OLD
+#define FIRST_WEAPON		(WP_BRYAR_PISTOL) // this is the first weapon for next and prev weapon switching
+#define LAST_USEABLE_WEAPON (WP_BRYAR_OLD) // anything > this will be considered not player useable
+#define MAX_PLAYER_WEAPONS	(WP_NUM_WEAPONS-1) // this is the max you can switch to and get with the give all.
 
-typedef enum //# ammo_e
-{
-	AMMO_NONE,
-	AMMO_FORCE,		// AMMO_PHASER
-	AMMO_BLASTER,	// AMMO_STARFLEET,
-	AMMO_POWERCELL,	// AMMO_ALIEN,
+typedef enum ammo_e {
+	AMMO_NONE=0,
+	AMMO_FORCE,
+	AMMO_BLASTER,
+	AMMO_POWERCELL,
 	AMMO_METAL_BOLTS,
 	AMMO_ROCKETS,
 	AMMO_EMPLACED,
@@ -56,9 +45,7 @@ typedef enum //# ammo_e
 	AMMO_MAX
 } ammo_t;
 
-
-typedef struct weaponData_s
-{
+typedef struct weaponData_s {
 	char	longName[32];		// Spawning name
 
 	int		ammoIndex;			// Index to proper ammo slot
@@ -81,31 +68,9 @@ typedef struct weaponData_s
 	int		maxCharge;			// stop subtracting once charged for this many ms
 	int		altMaxCharge;		// above for secondary
 } weaponData_t;
-
-
-typedef struct  ammoData_s
-{
-//	char	icon[32];	// Name of ammo icon file
-	int		max;		// Max amount player can hold of ammo
-} ammoData_t;
-
-
 extern weaponData_t weaponData[WP_NUM_WEAPONS];
+
+typedef struct ammoData_s {
+	int		max;				// Max amount player can hold of ammo
+} ammoData_t;
 extern ammoData_t ammoData[AMMO_MAX];
-
-// Specific weapon information
-
-#define FIRST_WEAPON		WP_BRYAR_PISTOL		// this is the first weapon for next and prev weapon switching
-#define MAX_PLAYER_WEAPONS	WP_NUM_WEAPONS-1	// this is the max you can switch to and get with the give all.
-
-
-#define DEFAULT_SHOTGUN_SPREAD	700
-#define DEFAULT_SHOTGUN_COUNT	11
-
-#define	LIGHTNING_RANGE		768
-
-
-
-
-
-#endif//#ifndef __WEAPONS_H__

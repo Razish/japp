@@ -1,6 +1,7 @@
 // DEMP2 Weapon
 
 #include "cg_local.h"
+#include "cg_media.h"
 
 /*
 ---------------------------
@@ -15,7 +16,7 @@ void FX_DEMP2_ProjectileThink( centity_t *cent, const struct weaponInfo_s *weapo
 	if ( VectorNormalize2( &cent->currentState.pos.trDelta, &forward ) == 0.0f )
 		forward.z = 1.0f;
 
-	trap->FX_PlayEffectID( cgs.effects.demp2ProjectileEffect, &cent->lerpOrigin, &forward, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.demp2.projectile, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 }
 
 /*
@@ -25,7 +26,7 @@ FX_DEMP2_HitWall
 */
 
 void FX_DEMP2_HitWall( vector3 *origin, vector3 *normal ) {
-	trap->FX_PlayEffectID( cgs.effects.demp2WallImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.demp2.wallImpact, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -35,7 +36,7 @@ FX_DEMP2_HitPlayer
 */
 
 void FX_DEMP2_HitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
-	trap->FX_PlayEffectID( cgs.effects.demp2FleshImpactEffect, origin, normal, -1, -1, qfalse );
+	trap->FX_PlayEffectID( media.efx.demp2.fleshImpact, origin, normal, -1, -1, qfalse );
 }
 
 /*
@@ -246,8 +247,8 @@ void FX_DEMP2_AltDetonate( vector3 *org, float size )
 	ex->endTime = ex->startTime + 800;//1600;
 
 	ex->radius = size;
-	ex->refEntity.customShader = cgs.media.demp2ShellShader;
-	ex->refEntity.hModel = cgs.media.demp2Shell;
+	ex->refEntity.customShader = media.gfx.world.demp2Shell;
+	ex->refEntity.hModel = media.models.demp2Shell;
 	VectorCopy( org, &ex->refEntity.origin );
 
 	ex->color[0] = ex->color[1] = ex->color[2] = 255.0f;

@@ -95,6 +95,7 @@
     <ClCompile Include="..\cgame\cg_luaserver.c" />
     <ClCompile Include="..\cgame\cg_main.c" />
     <ClCompile Include="..\cgame\cg_marks.c" />
+    <ClCompile Include="..\cgame\cg_media.c" />
     <ClCompile Include="..\cgame\cg_newDraw.c" />
     <ClCompile Include="..\cgame\cg_newScoreboard.c" />
     <ClCompile Include="..\cgame\cg_players.c" />
