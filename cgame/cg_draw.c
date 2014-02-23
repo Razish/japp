@@ -7679,6 +7679,9 @@ static void CG_Draw2DScreenTints( void )
 	vector4			hcolor;
 	refdef_t *refdef = CG_GetRefdef();
 
+	if ( !cg_drawScreenTints.integer )
+		return;
+
 	if (cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR)
 	{
 		if (cg.snap->ps.fd.forcePowersActive & (1 << FP_RAGE))
