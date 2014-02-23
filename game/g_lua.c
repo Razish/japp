@@ -255,6 +255,26 @@ static int JPLua_Export_GetMap( lua_State *L ) {
 	return 1;
 }
 
+//Func: GetPlayers()
+//Retn: Indexed table of Player objects ordered by clientNum
+static int JPLua_Export_GetPlayers( lua_State *L ) {
+	int top, i = 1, clNum;
+	gclient_t *cl = NULL;
+
+	lua_newtable( L );
+	top = lua_gettop( L );
+
+	for ( cl=level.clients, clNum=0; clNum<level.numConnectedClients; clNum++, cl++ ) {
+		if ( cl->pers.connected == CON_DISCONNECTED )
+			continue;
+		lua_pushnumber( L, i++ );
+		JPLua_Player_CreateRef( L, clNum );
+		lua_settable( L, top );
+	}
+
+	return 1;
+}
+
 static int JPLua_Export_GetRealTime( lua_State *L ) {
 	lua_pushinteger( L, trap->Milliseconds() );
 	return 1;
@@ -367,6 +387,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "GetTime", JPLua_Export_GetTime }, // integer GetTime()
 	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
 	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
+	{ "GetPlayers", JPLua_Export_GetPlayers }, // {Player,...} GetPlayers()
 	{ "GetRealTime", JPLua_Export_GetRealTime }, // integer GetRealTime()
 	{ "RayTrace", JPLua_Export_Trace }, // traceResult Trace( stuff )
 
