@@ -224,6 +224,26 @@ static int JPLua_Export_DrawPic( lua_State *L ) {
 	return 0;
 }
 
+static int JPLua_Export_DrawRotatedPic( lua_State *L ) {
+	vector4 colour;
+	int x, y, w, h, shader;
+	float angle;
+
+	x = lua_tointeger( L, 1 );
+	y = lua_tointeger( L, 2 );
+	w = lua_tointeger( L, 3 );
+	h = lua_tointeger( L, 4 );
+	angle = lua_tonumber( L, 5 );
+	JPLua_TableToColour( &colour, L, 6 );
+	shader = lua_tointeger( L, 7 );
+
+	trap->R_SetColor( &colour );
+		CG_DrawRotatePic2( x, y, w, h, angle, shader );
+	trap->R_SetColor( NULL );
+
+	return 0;
+}
+
 static int JPLua_Export_RegisterShader( lua_State *L ) {
 	lua_pushinteger( L, trap->R_RegisterShader( lua_tostring( L, 1 ) ) );
 	return 1;
@@ -513,6 +533,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "DrawRect", JPLua_Export_DrawRect }, // DrawRect( float x, float y, float width, float height, table { float r, float g, float b, float a } )
 	{ "DrawText", JPLua_Export_DrawText }, // DrawText( float x, float y, string text, table { float r, float g, float b, float a }, float scale, integer fontStyle, integer fontIndex )
 	{ "DrawPic", JPLua_Export_DrawPic }, // DrawPic( float x, float y, float width, float height, table { float r, float g, float b, float a }, integer shaderHandle )
+	{ "DrawRotatedPic", JPLua_Export_DrawRotatedPic }, // DrawPic( float x, float y, float width, float height, float angle, table { float r, float g, float b, float a }, integer shaderHandle )
 	{ "Font_StringLengthPixels", JPLua_Export_Font_StringLengthPixels }, // integer Font_StringLengthPixels( string str, integer fontHandle, float scale )
 	{ "Font_StringHeightPixels", JPLua_Export_Font_StringHeightPixels }, // integer Font_StringHeightPixels( integer fontHandle, float scale )
 
