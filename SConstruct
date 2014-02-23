@@ -223,6 +223,7 @@ files['cgame'] = [
 	'game/FighterNPC.c',
 	'game/SpeederNPC.c',
 	'game/WalkerNPC.c',
+	'JAPP/jp_crashExtra.c',
 	'JAPP/jp_promode.c',
 	'JAPP/jp_tokenparser.c',
 	'json/cJSON.c',

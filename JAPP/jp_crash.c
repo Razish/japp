@@ -106,7 +106,43 @@ int StrToDword(const char *str) {
 	return result;
 }
 
-void JKG_ExtCrashInfo(int fileHandle) {
+#ifdef _WIN32
+	#include <windows.h>
+	#define Sys_LoadLibrary(f) (void *)LoadLibrary(f)
+	#define Sys_UnloadLibrary(h) FreeLibrary((HMODULE)h)
+	#define Sys_LoadFunction(h,fn) GetProcAddress((HMODULE)h,fn)
+	#define Sys_LibraryError() "unknown"
+#else
+	#define Sys_LoadLibrary(f) dlopen(f, RTLD_GLOBAL)
+	#define Sys_UnloadLibrary(h) dlclose(h)
+	#define Sys_LoadFunction(h,fn) dlsym(h,fn)
+	#define Sys_LibraryError() dlerror()
+#endif
+
+void *Q_LoadLibrary( const char *name, void (QDECL **func)(int) ) {
+	void *libHandle = NULL;
+	char fsGame[MAX_CVAR_VALUE_STRING];
+	trap->Cvar_VariableStringBuffer( "fs_game", fsGame, sizeof( fsGame ) );
+
+	libHandle = Sys_LoadLibrary( va( "%s/%s", fsGame, name ) );
+
+	if ( !libHandle ) {
+		Com_Printf( "Q_LoadLibrary(%s) failed: \"%s\"\n", name, Sys_LibraryError() );
+		return NULL;
+	}
+
+
+	*func = (void (QDECL *)(int))Sys_LoadFunction( libHandle, "CrashReport" );
+	if ( !*func ) {
+		Com_Printf ( "Q_LoadLibrary(%s) failed to find CrashReport function:\n\"%s\" !\n", name, Sys_LibraryError() );
+		Sys_UnloadLibrary( libHandle );
+		return NULL;
+	}
+
+	return libHandle;
+}
+
+void JKG_ExtCrashInfo( int fileHandle ) {
 #ifdef _GAME
 	char cs[1024];
 	// In case of a crash, the auxiliary library will write a report
@@ -133,7 +169,14 @@ void JKG_ExtCrashInfo(int fileHandle) {
 		JKG_FS_WriteString("+--+------------------------------------+----+----------------------+\n",f);
 	}
 #else
-	// TODO: communicate with cgame for server info?
+		void (*func)( int );
+		void *dllHandle;
+		char libName[MAX_OSPATH] = "cgame"ARCH_STRING DLL_EXT;
+
+		if ( (dllHandle = Q_LoadLibrary( libName, &func )) ) {
+			func( fileHandle );
+			Sys_UnloadLibrary( dllHandle );
+		}
 #endif
 }
 

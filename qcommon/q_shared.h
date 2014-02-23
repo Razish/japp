@@ -152,19 +152,7 @@ float FloatSwap( const float *f );
 	#define	QDECL __cdecl
 
 	// buildstring will be incorporated into the version string
-	#ifdef NDEBUG
-		#ifdef _M_IX86
-			#define	CPUSTRING "win-x86"
-		#elif defined _M_ALPHA
-			#define	CPUSTRING "win-AXP"
-		#endif
-	#else
-		#ifdef _M_IX86
-			#define	CPUSTRING "win-x86-debug"
-		#elif defined _M_ALPHA
-			#define	CPUSTRING "win-AXP-debug"
-		#endif
-	#endif
+	#define ARCH_STRING "x86"
 
 	#define QINLINE __inline
 //	#define USE_SSE
@@ -177,6 +165,7 @@ float FloatSwap( const float *f );
 	#define LittleFloat
 
 	#define	PATH_SEP "\\"
+	#define DLL_EXT ".dll"
 
 #endif // _WIN32
 
@@ -197,15 +186,20 @@ float FloatSwap( const float *f );
 	#define stricmp strcasecmp
 	#define QINLINE /*inline*/
 
-	#ifdef __ppc__
-		#define CPUSTRING "MacOSX-ppc"
-	#elif defined __i386__
-		#define CPUSTRING "MacOSX-i386"
-	#else
-		#define CPUSTRING "MacOSX-other"
+	#if defined(__ppc__)
+		#define ARCH_STRING "ppc"
+		#define Q3_BIG_ENDIAN
+	#elif defined(__i386__)
+		#define ARCH_STRING "x86"
+		#define Q3_LITTLE_ENDIAN
+	#elif defined(__x86_64__)
+		#define idx64
+		#define ARCH_STRING "x86_64"
+		#define Q3_LITTLE_ENDIAN
 	#endif
 
 	#define	PATH_SEP "/"
+	#define DLL_EXT ".dylib"
 
 	#define __rlwimi(out, in, shift, maskBegin, maskEnd) asm("rlwimi %0,%1,%2,%3,%4" : "=r" (out) : "r" (in), "i" (shift), "i" (maskBegin), "i" (maskEnd))
 	#define __dcbt(addr, offset) asm("dcbt %0,%1" : : "b" (addr), "r" (offset))
@@ -243,33 +237,6 @@ float FloatSwap( const float *f );
 
 // ================================================================
 //
-// MAC DEFINES
-//
-// ================================================================
-
-#ifdef __MACOS__
-
-	#include <MacTypes.h>
-	#define QINLINE inline
-
-	#define	CPUSTRING "MacOS-PPC"
-
-	#define	PATH_SEP ":"
-
-	void Sys_PumpEvents( void );
-
-	#define BigShort
-	static inline short LittleShort( short l ) { return ShortSwap( l ); }
-	#define BigLong
-	static inline int LittleLong( int l ) { return LongSwap( l ); }
-	#define BigFloat
-	static inline float LittleFloat( const float l ) { return FloatSwap( &l ); }
-
-#endif // __MACOS__
-
-
-// ================================================================
-//
 // LINUX DEFINES
 //
 // ================================================================
@@ -283,15 +250,40 @@ float FloatSwap( const float *f );
 
 	#define QINLINE inline
 
-	#ifdef __i386__
-		#define	CPUSTRING "linux-i386"
-	#elif defined __axp__
-		#define	CPUSTRING "linux-alpha"
-	#else
-		#define	CPUSTRING "linux-other"
+	#if defined(__i386__)
+		#define ARCH_STRING "i386"
+	#elif defined(__x86_64__)
+		#define idx64
+		#define ARCH_STRING "x86_64"
+	#elif defined(__powerpc64__)
+		#define ARCH_STRING "ppc64"
+	#elif defined(__powerpc__)
+		#define ARCH_STRING "ppc"
+	#elif defined(__s390__)
+		#define ARCH_STRING "s390"
+	#elif defined(__s390x__)
+		#define ARCH_STRING "s390x"
+	#elif defined(__ia64__)
+		#define ARCH_STRING "ia64"
+	#elif defined(__alpha__)
+		#define ARCH_STRING "alpha"
+	#elif defined(__sparc__)
+		#define ARCH_STRING "sparc"
+	#elif defined(__arm__)
+		#define ARCH_STRING "arm"
+	#elif defined(__cris__)
+		#define ARCH_STRING "cris"
+	#elif defined(__hppa__)
+		#define ARCH_STRING "hppa"
+	#elif defined(__mips__)
+		#define ARCH_STRING "mips"
+	#elif defined(__sh__)
+		#define ARCH_STRING "sh"
 	#endif
 
 	#define	PATH_SEP "/"
+	#define DLL_EXT ".so"
+
 	#define RAND_MAX 2147483647
 
 	// bk001205 - try
@@ -333,15 +325,17 @@ float FloatSwap( const float *f );
 
 	#define QINLINE inline
 
-	#ifdef __i386__
-		#define CPUSTRING "freebsd-i386"
-	#elif defined __axp__
-		#define CPUSTRING "freebsd-alpha"
-	#else
-		#define CPUSTRING "freebsd-other"
+	#if defined(__i386__)
+		#define ARCH_STRING "i386"
+	#elif defined(__amd64__)
+		#define idx64
+		#define ARCH_STRING "amd64"
+	#elif defined(__axp__)
+		#define ARCH_STRING "alpha"
 	#endif
 
 	#define	PATH_SEP "/"
+	#define DLL_EXT ".so"
 
 	// bk010116 - omitted Q3STATIC (see Linux above), broken target
 
