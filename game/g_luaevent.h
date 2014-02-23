@@ -14,6 +14,7 @@ typedef enum jplua_event_e {
 	JPLUA_EVENT_CLIENTCOMMAND,
 	JPLUA_EVENT_CLIENTUSERINFOCHANGED,
 	JPLUA_EVENT_PLAYERDEATH,
+	JPLUA_EVENT_PAIN,
 	JPLUA_EVENT_MAX
 } jplua_event_t;
 
@@ -32,3 +33,4 @@ qboolean JPLua_Event_ClientCommand( int clientNum );
 qboolean JPLua_Event_ServerCommand( void );
 qboolean JPLua_Event_ClientUserinfoChanged( int clientNum, char *userinfo );
 void JPLua_Event_PlayerDeath( int clientNum, int mod, int inflictor );
+void JPLua_Event_Pain( int target, int inflictor, int attacker, int health, int armor, uint32_t dflags, int mod );

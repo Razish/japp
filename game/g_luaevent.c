@@ -17,6 +17,7 @@ static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 	ENUM2STRING(JPLUA_EVENT_CLIENTCOMMAND),
 	ENUM2STRING(JPLUA_EVENT_CLIENTUSERINFOCHANGED),
 	ENUM2STRING(JPLUA_EVENT_PLAYERDEATH),
+	ENUM2STRING(JPLUA_EVENT_PAIN),
 };
 
 // called by lua
@@ -367,6 +368,30 @@ void JPLua_Event_PlayerDeath( int clientNum, int mod, int inflictor ) {
 				JPLua_Player_CreateRef( JPLua.state, inflictor );
 
 			JPLua_Call( JPLua.state, 3, 0 );
+		}
+	}
+#endif // JPLUA
+}
+
+void JPLua_Event_Pain( int target, int inflictor, int attacker, int health, int armor, uint32_t dflags, int mod ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins;
+			JPLua.currentPlugin;
+			JPLua.currentPlugin = JPLua.currentPlugin->next
+		)
+	{
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_PAIN] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_PAIN] );
+
+			JPLua_Player_CreateRef( JPLua.state, target );
+			JPLua_Player_CreateRef( JPLua.state, inflictor );
+			JPLua_Player_CreateRef( JPLua.state, attacker );
+			lua_pushinteger( JPLua.state, health );
+			lua_pushinteger( JPLua.state, armor );
+			lua_pushinteger( JPLua.state, dflags );
+			lua_pushinteger( JPLua.state, mod );
+
+			JPLua_Call( JPLua.state, 7, 0 );
 		}
 	}
 #endif // JPLUA

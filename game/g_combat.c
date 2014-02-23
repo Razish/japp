@@ -4,6 +4,7 @@
 
 #include "b_local.h"
 #include "bg_saga.h"
+#include "g_luaevent.h"
 
 extern int G_ShipSurfaceForSurfName( const char *surfaceName );
 extern qboolean G_FlyVehicleDestroySurface( gentity_t *veh, int surface );
@@ -4670,11 +4671,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 
 	take -= asave;
 
-	//Raz: Added
 	if ( japp_damageNotifications.integer ) {
 		trap->SendServerCommand( attacker-g_entities, va( "chat \""S_COLOR_WHITE"* Damage given: "S_COLOR_RED"%i"
 			S_COLOR_WHITE"/"S_COLOR_GREEN"%i "S_COLOR_WHITE" (%i)\"", take, asave, take+asave ) );
 	}
+
+	JPLua_Event_Pain( targ-g_entities, inflictor-g_entities, attacker-g_entities, take, asave, dflags, mod );
 
 	if ( targ->client )
 	{//update vehicle shields and armor, check for explode
