@@ -14,7 +14,6 @@ Q_EXPORT void dllEntry( intptr_t (QDECL *syscallptr)( intptr_t arg,... ) ) {
 	TranslateSyscalls();
 }
 
-
 int PASSFLOAT( float x ) {
 	byteAlias_t ba;
 	ba.f = x;
@@ -318,7 +317,7 @@ void trap_R_AutomapElevAdj(float newHeight) {
 qboolean trap_R_InitWireframeAutomap(void) {
 	return Q_syscall( CG_R_INITWIREFRAMEAUTO );
 }
-void trap_FX_AddLine( vector3 *start, vector3 *end, float size1, float size2, float sizeParm, float alpha1, float alpha2, float alphaParm, vector3 *sRGB, vector3 *eRGB, float rgbParm, int killTime, qhandle_t shader, uint32_t flags) {
+void trap_FX_AddLine( vector3 *start, vector3 *end, float size1, float size2, float sizeParm, float alpha1, float alpha2, float alphaParm, const vector3 *sRGB, const vector3 *eRGB, float rgbParm, int killTime, qhandle_t shader, uint32_t flags) {
 	Q_syscall( CG_FX_ADDLINE, start, end, PASSFLOAT(size1), PASSFLOAT(size2), PASSFLOAT(sizeParm), PASSFLOAT(alpha1), PASSFLOAT(alpha2), PASSFLOAT(alphaParm), sRGB, eRGB, PASSFLOAT(rgbParm), killTime, shader, flags);
 }
 void trap_GetGlconfig( glconfig_t *glconfig ) {
@@ -469,13 +468,13 @@ void trap_FX_PlayEffect( const char *file, vector3 *org, vector3 *fwd, int vol, 
 void trap_FX_PlayEntityEffect( const char *file, vector3 *org, vector3 axis[3], const int boltInfo, const int entNum, int vol, int rad ) {
 	Q_syscall( CG_FX_PLAY_ENTITY_EFFECT, file, org, axis, boltInfo, entNum, vol, rad );
 }
-void trap_FX_PlayEffectID( int id, vector3 *org, vector3 *fwd, int vol, int rad ) {
+void trap_FX_PlayEffectID( int id, const vector3 *org, const vector3 *fwd, int vol, int rad ) {
 	Q_syscall( CG_FX_PLAY_EFFECT_ID, id, org, fwd, vol, rad );
 }
-void trap_FX_PlayPortalEffectID( int id, vector3 *org, vector3 *fwd, int vol, int rad ) {
+void trap_FX_PlayPortalEffectID( int id, const vector3 *org, const vector3 *fwd, int vol, int rad ) {
 	Q_syscall( CG_FX_PLAY_PORTAL_EFFECT_ID, id, org, fwd);
 }
-void trap_FX_PlayEntityEffectID( int id, vector3 *org, vector3 axis[3], const int boltInfo, const int entNum, int vol, int rad ) {
+void trap_FX_PlayEntityEffectID( int id, const vector3 *org, const vector3 axis[3], const int boltInfo, const int entNum, int vol, int rad ) {
 	Q_syscall( CG_FX_PLAY_ENTITY_EFFECT_ID, id, org, axis, boltInfo, entNum, vol, rad );
 }
 qboolean trap_FX_PlayBoltedEffectID( int id, vector3 *org, void *ghoul2, const int boltNum, const int entNum, const int modelNum, int iLooptime, qboolean isRelative ) {
@@ -735,7 +734,7 @@ void CGSyscall_CM_Trace( trace_t *results, const vector3 *start, const vector3 *
 void CGSyscall_CM_TransformedTrace( trace_t *results, const vector3 *start, const vector3 *end, const vector3 *mins, const vector3 *maxs, clipHandle_t model, int brushmask, const vector3 *origin, const vector3 *angles, int capsule ) { if ( capsule ) trap_CM_TransformedCapsuleTrace( results, start, end, mins, maxs, model, brushmask, origin, angles ); else trap_CM_TransformedBoxTrace( results, start, end, mins, maxs, model, brushmask, origin, angles ); }
 void CGSyscall_R_AddPolysToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int num ) { trap_R_AddPolyToScene( hShader, numVerts, verts ); }
 float CGSyscall_R_GetDistanceCull( void ) { float tmp; trap_R_GetDistanceCull( &tmp ); return tmp; }
-void CGSyscall_FX_PlayEffectID( int id, vector3 *org, vector3 *fwd, int vol, int rad, qboolean isPortal ) { if ( isPortal ) trap_FX_PlayPortalEffectID( id, org, fwd, vol, rad ); else trap_FX_PlayEffectID( id, org, fwd, vol, rad ); }
+void CGSyscall_FX_PlayEffectID( int id, const vector3 *org, const vector3 *fwd, int vol, int rad, qboolean isPortal ) { if ( isPortal ) trap_FX_PlayPortalEffectID( id, org, fwd, vol, rad ); else trap_FX_PlayEffectID( id, org, fwd, vol, rad ); }
 void CGSyscall_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) { trap_G2API_CollisionDetect( collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, fRadius ); }
 
 void QDECL CG_Error( int level, const char *error, ... ) {

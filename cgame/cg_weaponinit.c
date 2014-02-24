@@ -1,16 +1,7 @@
-//
-// cg_weaponinit.c -- events and effects dealing with weapons
 #include "cg_local.h"
 #include "fx_local.h"
 
-
-/*
-=================
-CG_RegisterWeapon
-
-The server says this item is used on this level
-=================
-*/
+// The server says this item is used on this level
 void CG_RegisterWeapon( int weaponNum ) {
 	weaponInfo_t	*weaponInfo;
 	const gitem_t	*item, *ammo;
@@ -63,11 +54,8 @@ void CG_RegisterWeapon( int weaponNum ) {
 
 	weaponInfo->flashModel = NULL_HANDLE;
 
-	if ( weaponNum == WP_DISRUPTOR ||
-		weaponNum == WP_FLECHETTE ||
-		weaponNum == WP_REPEATER ||
-		weaponNum == WP_ROCKET_LAUNCHER ||
-		weaponNum == WP_CONCUSSION )
+	if ( weaponNum == WP_DISRUPTOR || weaponNum == WP_FLECHETTE || weaponNum == WP_REPEATER
+		|| weaponNum == WP_ROCKET_LAUNCHER || weaponNum == WP_CONCUSSION )
 	{
 		Q_strncpyz( path, item->view_model, sizeof( path ) );
 		COM_StripExtension( path, path, sizeof( path ) );

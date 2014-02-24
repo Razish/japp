@@ -167,7 +167,6 @@ typedef struct playerEntity_s {
 	lerpFrame_t	legs, torso, flag;
 	int			painTime;
 	int			painDirection;	// flip from 0 to 1
-	int			lightningFiring;
 
 	// machinegun spinning
 	float		barrelAngle;

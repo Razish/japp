@@ -610,11 +610,11 @@ typedef struct cgameImport_s {
 	e_status		(*CIN_StopCinematic)					( int handle );
 
 	// FX
-	void			(*FX_AddLine)							( vector3 *start, vector3 *end, float size1, float size2, float sizeParm, float alpha1, float alpha2, float alphaParm, vector3 *sRGB, vector3 *eRGB, float rgbParm, int killTime, qhandle_t shader, uint32_t flags );
+	void			(*FX_AddLine)							( vector3 *start, vector3 *end, float size1, float size2, float sizeParm, float alpha1, float alpha2, float alphaParm, const vector3 *sRGB, const vector3 *eRGB, float rgbParm, int killTime, qhandle_t shader, uint32_t flags );
 	int				(*FX_RegisterEffect)					( const char *file );
 	void			(*FX_PlayEffect)						( const char *file, vector3 *org, vector3 *fwd, int vol, int rad );
-	void			(*FX_PlayEffectID)						( int id, vector3 *org, vector3 *fwd, int vol, int rad, qboolean isPortal );
-	void			(*FX_PlayEntityEffectID)				( int id, vector3 *org, vector3 axis[3], const int boltInfo, const int entNum, int vol, int rad );
+	void			(*FX_PlayEffectID)						( int id, const vector3 *org, const vector3 *fwd, int vol, int rad, qboolean isPortal );
+	void			(*FX_PlayEntityEffectID)				( int id, const vector3 *org, const vector3 axis[3], const int boltInfo, const int entNum, int vol, int rad );
 	qboolean		(*FX_PlayBoltedEffectID)				( int id, vector3 *org, void *pGhoul2, const int boltNum, const int entNum, const int modelNum, int iLooptime, qboolean isRelative );
 	void			(*FX_AddScheduledEffects)				( qboolean portal );
 	int				(*FX_InitSystem)						( refdef_t *refdef );

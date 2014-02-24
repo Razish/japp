@@ -1,8 +1,4 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
-#ifndef __TR_TYPES_H
-#define __TR_TYPES_H
-
+#pragma once
 
 #define	MAX_DLIGHTS		32			// can't be increased, because bit flags are used on surfaces
 #define	MAX_ENTITIES	2048		// 11 bits, can't be increased without changing drawsurf bit packing (QSORT_ENTITYNUM_SHIFT)
@@ -59,7 +55,7 @@ typedef struct poly_s {
 	polyVert_t			*verts;
 } poly_t;
 
-typedef enum {
+typedef enum refEntityType_e {
 	RT_MODEL,
 	RT_POLY,
 	RT_SPRITE,
@@ -76,8 +72,7 @@ typedef enum {
 	RT_MAX_REF_ENTITY_TYPE
 } refEntityType_t;
 
-typedef struct miniRefEntity_s
-{
+typedef struct miniRefEntity_s {
 	refEntityType_t		reType;
 	int					renderfx;
 
@@ -165,10 +160,8 @@ typedef struct refEntity_s {
 	qhandle_t	customSkin;			// NULL for default skin
 
 	// texturing
-	union
-	{
-		struct
-		{
+	union {
+		struct {
 			int		miniStart;
 			int		miniCount;
 		} uMini;
@@ -176,26 +169,22 @@ typedef struct refEntity_s {
 
 	// extra sprite information
 	union {
-		struct
-		{
+		struct {
 			float rotation;
 			float radius;
 			byte  vertRGBA[4][4];
 		} sprite;
-		struct
-		{
+		struct {
 			float width;
 			float width2;
 			float stscale;
 		} line;
-		struct	// that whole put-the-opening-brace-on-the-same-line-as-the-beginning-of-the-definition coding style is fecal
-		{
+		struct {
 			float	width;
 			vector3	control1;
 			vector3	control2;
 		} bezier;
-		struct
-		{
+		struct {
 			float width;
 			float width2;
 			float stscale;
@@ -203,8 +192,7 @@ typedef struct refEntity_s {
 			float bias;
 			qboolean wrap;
 		} cylinder;
-		struct
-		{
+		struct {
 			float width;
 			float deviation;
 			float stscale;
@@ -254,7 +242,7 @@ typedef struct refdef_s {
 } refdef_t;
 
 
-typedef enum {
+typedef enum stereoFrame_e {
 	STEREO_CENTER,
 	STEREO_LEFT,
 	STEREO_RIGHT
@@ -268,7 +256,7 @@ typedef enum {
 ** being run right now.  These are constant once the OpenGL
 ** subsystem is initialized.
 */
-typedef enum {
+typedef enum textureCompression_e {
 	TC_NONE,
 	TC_S3TC,
 	TC_S3TC_DXT
@@ -312,6 +300,3 @@ typedef struct glconfig_s {
 #define OPENGL_DRIVER_NAME	"opengl32"
 
 #endif	// !defined _WIN32
-
-
-#endif	// __TR_TYPES_H

@@ -1,16 +1,7 @@
-// Heavy Repeater Weapon
-
 #include "cg_local.h"
 #include "cg_media.h"
 
-/*
----------------------------
-FX_RepeaterProjectileThink
----------------------------
-*/
-
-void FX_RepeaterProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon )
-{
+void FX_RepeaterProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon ) {
 	vector3 forward;
 
 	if ( VectorNormalize2( &cent->currentState.pos.trDelta, &forward ) == 0.0f )
@@ -19,29 +10,15 @@ void FX_RepeaterProjectileThink( centity_t *cent, const struct weaponInfo_s *wea
 	trap->FX_PlayEffectID( media.efx.repeater.projectile, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 }
 
-/*
-------------------------
-FX_RepeaterHitWall
-------------------------
-*/
-
 void FX_RepeaterHitWall( vector3 *origin, vector3 *normal ) {
 	trap->FX_PlayEffectID( media.efx.repeater.wallImpact, origin, normal, -1, -1, qfalse );
 }
-
-/*
-------------------------
-FX_RepeaterHitPlayer
-------------------------
-*/
 
 void FX_RepeaterHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
 	trap->FX_PlayEffectID( media.efx.repeater.fleshImpact, origin, normal, -1, -1, qfalse );
 }
 
-//q3pro/QtZ code
-void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon )
-{
+void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon ) {
 	refEntity_t ent;
 	vector3 ang;
 	float scale = 1.0f;
@@ -93,35 +70,33 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon )
 	trap->R_AddLightToScene( &cent->lerpOrigin, 400, 0.13f, 0.43f, 0.87f );
 }
 
-static void CG_DistortionOrb( centity_t *cent )
-{
+static void CG_DistortionOrb( centity_t *cent ) {
 	refEntity_t ent;
 	vector3 ang;
 	float scale = 0.5f;
 	float vLen;
 	refdef_t *refdef = CG_GetRefdef();
 
-	if (!cg_renderToTextureFX.integer)
-	{
+	if ( !cg_renderToTextureFX.integer )
 		return;
-	}
+
 	memset( &ent, 0, sizeof( ent ) );
 
 	VectorCopy( &cent->lerpOrigin, &ent.origin );
 
-	VectorSubtract(&ent.origin, &refdef->vieworg, &ent.axis[0]);
-	vLen = VectorLength(&ent.axis[0]);
-	if (VectorNormalize(&ent.axis[0]) <= 0.1f)
-	{	// Entity is right on vieworg.  quit.
-		return;
-	}
+	VectorSubtract( &ent.origin, &refdef->vieworg, &ent.axis[0] );
+	vLen = VectorLength( &ent.axis[0] );
 
-//	VectorCopy(refdef->viewaxis[2], ent.axis[2]);
-//	CrossProduct(ent.axis[0], ent.axis[2], ent.axis[1]);
-	vectoangles(&ent.axis[0], &ang);
+	// Entity is right on vieworg.  quit.
+	if ( VectorNormalize( &ent.axis[0] ) <= 0.1f )
+		return;
+
+//	VectorCopy( refdef->viewaxis[2], ent.axis[2] );
+//	CrossProduct( ent.axis[0], ent.axis[2], ent.axis[1] );
+	vectoangles( &ent.axis[0], &ang );
 	ang.roll = cent->trickAlpha;
 	cent->trickAlpha += 16; //spin the half-sphere to give a "screwdriver" effect
-	AnglesToAxis(&ang, ent.axis);
+	AnglesToAxis( &ang, ent.axis );
 
 	//radius must be a power of 2, and is the actual captured texture size
 		 if ( vLen < 128 )	ent.radius = 256;
@@ -129,9 +104,9 @@ static void CG_DistortionOrb( centity_t *cent )
 	else if ( vLen < 512 )	ent.radius = 64;
 	else					ent.radius = 32;
 
-	VectorScale(&ent.axis[0],  scale, &ent.axis[0]);
-	VectorScale(&ent.axis[1],  scale, &ent.axis[1]);
-	VectorScale(&ent.axis[2], -scale, &ent.axis[2]);
+	VectorScale( &ent.axis[0],  scale, &ent.axis[0] );
+	VectorScale( &ent.axis[1],  scale, &ent.axis[1] );
+	VectorScale( &ent.axis[2], -scale, &ent.axis[2] );
 
 	ent.hModel = media.models.halfShield;
 	ent.customShader = 0;//media.gfx.world.halfShield;
@@ -150,46 +125,26 @@ static void CG_DistortionOrb( centity_t *cent )
 	SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 }
 
-/*
-------------------------------
-FX_RepeaterAltProjectileThink
------------------------------
-*/
-
-void FX_RepeaterAltProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon )
-{
+void FX_RepeaterAltProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon ) {
 	vector3 forward;
 
 	if ( VectorNormalize2( &cent->currentState.pos.trDelta, &forward ) == 0.0f )
 		forward.z = 1.0f;
 
-	if ( (cg_newFX.integer & NEWFX_REPEATER_ALT) )
-	{
+	if ( (cg_newFX.integer & NEWFX_REPEATER_ALT) ) {
 		FX_Mortar_Missile( cent, weapon );
 		return;
 	}
 
-	if (cg_repeaterOrb.integer)
-		CG_DistortionOrb(cent);
+	if ( cg_repeaterOrb.integer )
+		CG_DistortionOrb( cent );
 
 	trap->FX_PlayEffectID( media.efx.repeater.altProjectile, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 }
 
-/*
-------------------------
-FX_RepeaterAltHitWall
-------------------------
-*/
-
 void FX_RepeaterAltHitWall( vector3 *origin, vector3 *normal ) {
 	trap->FX_PlayEffectID( media.efx.repeater.altWallImpact, origin, normal, -1, -1, qfalse );
 }
-
-/*
-------------------------
-FX_RepeaterAltHitPlayer
-------------------------
-*/
 
 void FX_RepeaterAltHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
 	trap->FX_PlayEffectID( media.efx.repeater.altWallImpact, origin, normal, -1, -1, qfalse );

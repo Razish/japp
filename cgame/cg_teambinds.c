@@ -87,7 +87,7 @@ typedef struct teamBind_s {
 	const char *(*GetValue)( void );
 } teamBind_t;
 
-teamBind_t teamBinds[] = {
+static const teamBind_t teamBinds[] = {
 	{ "#p",	TB_NearestPickup }, // Nearest pickup
 	{ "#n",	TB_NearestAlly },	// Nearest ally
 	{ "#r",	TB_LastPickup },	// Recent/last pickup
@@ -97,11 +97,11 @@ teamBind_t teamBinds[] = {
 	{ "#w",	TB_Weapon },		// Weapon
 	{ "#t",	TB_Time },			// Time (XX:YY counting up)
 };
-static const int numTeamBinds = ARRAY_LEN( teamBinds );
+static const size_t numTeamBinds = ARRAY_LEN( teamBinds );
 
 void HandleTeamBinds( char *buf, int bufsize ) {
 	char *p = buf;
-	int i=0;
+	size_t i=0;
 	for ( i=0; i<numTeamBinds; i++ ) {
 		char *tmp = NULL;
 		if ( !strstr( p, teamBinds[i].key ) )

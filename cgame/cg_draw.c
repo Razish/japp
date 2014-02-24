@@ -8480,7 +8480,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	// optionally draw the tournement scoreboard instead
-	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR && ( cg.snap->ps.pm_flags & PMF_SCOREBOARD ) ) {
+	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR && (cg.snap->ps.pm_flags & PMF_SCOREBOARD) ) {
 		//RAZTODO: tourney scoreboard?
 		cg.currentRefdef = REFDEF_SCOREBOARD;
 		refdef = CG_GetRefdef();

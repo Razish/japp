@@ -1,6 +1,4 @@
-//
-// fx_*.c
-//
+#pragma once
 
 // NOTENOTE This is not the best, DO NOT CHANGE THESE!
 #define	FX_ALPHA_LINEAR		(0x00000001u)
