@@ -641,10 +641,8 @@ static qboolean CG_WeaponSelectable( int i ) {
 		return qfalse;
 	}
 
-	if ( !(cg.predictedPlayerState.stats[STAT_WEAPONS] & (1<<i)) ) {
-		Com_Printf( "Don't have that weapon %i\n", i );
+	if ( !(cg.predictedPlayerState.stats[STAT_WEAPONS] & (1<<i)) )
 		return qfalse;
-	}
 
 	return qtrue;
 }
