@@ -177,7 +177,7 @@ static const vector3 cameramaxs = {  CAMERA_SIZE,  CAMERA_SIZE,  CAMERA_SIZE };
 static vector3 camerafwd, cameraup;
 static vector3 cameraFocusAngles[MAX_CLIENTS], cameraFocusLoc[MAX_CLIENTS];
 static vector3 cameraIdealTarget[MAX_CLIENTS], cameraIdealLoc[MAX_CLIENTS];
-static vector3 cameraCurTarget[MAX_CLIENTS] = { 0, 0, 0 },	cameraCurLoc[MAX_CLIENTS] = { 0, 0, 0 };
+vector3 cameraCurTarget[MAX_CLIENTS] = { 0, 0, 0 },	cameraCurLoc[MAX_CLIENTS] = { 0, 0, 0 };
 static int cameraLastFrame[MAX_CLIENTS] = { 0 };
 static float cameraLastYaw[MAX_CLIENTS] = { 0 };
 static float cameraStiffFactor[MAX_CLIENTS] = { 0.0f };

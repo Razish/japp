@@ -17,7 +17,7 @@ static const char *pluginDir = "lua/sv/";
 
 jplua_t JPLua;
 
-#define JPLUA_LOAD_CHUNKSIZE 1024
+#define JPLUA_LOAD_CHUNKSIZE (1024)
 
 typedef struct gfd_s {// JPLua File Data
 	fileHandle_t f;
@@ -169,6 +169,37 @@ static int JPLua_Export_Print( lua_State *L ) {
 	trap->Print( "%s\n", buf );
 
 	return 0;
+}
+
+static const char
+	*vectorComponents[] = { "x", "y", "z", "w" },
+	*colourComponents[] = { "r", "g", "b", "a" };
+void JPLua_ReadVector( float *out, int components, lua_State *L, int idx ) {
+	int i=0;
+
+	for ( i=0; i<components ; i++ ) {
+		lua_getfield( L, idx, vectorComponents[i] );
+		out[i] = lua_tonumber( L, -1 );
+	}
+}
+
+void JPLua_ReadColour( float *out, int components, lua_State *L, int idx ) {
+	int i=0;
+
+	for ( i=0; i<components ; i++ ) {
+		lua_getfield( L, idx, colourComponents[i] );
+		out[i] = lua_tonumber( L, -1 );
+	}
+}
+
+void JPLua_ReadFloats( float *out, int numComponents, lua_State *L, int idx ) {
+	int i=0;
+
+	lua_pushnil( L );
+	for ( i=0; i<numComponents && lua_next( L, idx ); i++ ) {
+		out[i] = lua_tonumber( L, -1 );
+		lua_pop( L, 1 );
+	}
 }
 
 static int JPLua_Export_Require( lua_State *L ) {

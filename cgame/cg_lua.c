@@ -162,12 +162,33 @@ void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize ) {
 	return;
 }
 
-void JPLua_TableToColour( vector4 *out, lua_State *L, int idx ) {
+static const char
+	*vectorComponents[] = { "x", "y", "z", "w" },
+	*colourComponents[] = { "r", "g", "b", "a" };
+void JPLua_ReadVector( float *out, int numComponents, lua_State *L, int idx ) {
+	int i=0;
+
+	for ( i=0; i<numComponents ; i++ ) {
+		lua_getfield( L, idx, vectorComponents[i] );
+		out[i] = lua_tonumber( L, -1 );
+	}
+}
+
+void JPLua_ReadColour( float *out, int numComponents, lua_State *L, int idx ) {
+	int i=0;
+
+	for ( i=0; i<numComponents ; i++ ) {
+		lua_getfield( L, idx, colourComponents[i] );
+		out[i] = lua_tonumber( L, -1 );
+	}
+}
+
+void JPLua_ReadFloats( float *out, int numComponents, lua_State *L, int idx ) {
 	int i=0;
 
 	lua_pushnil( L );
-	for ( i=0; i<4 && lua_next( L, idx ); i++ ) {
-		out->data[i] = lua_tonumber( L, -1 );
+	for ( i=0; i<numComponents && lua_next( L, idx ); i++ ) {
+		out[i] = lua_tonumber( L, -1 );
 		lua_pop( L, 1 );
 	}
 }
@@ -190,7 +211,7 @@ static int JPLua_Export_Require( lua_State *L ) {
 static int JPLua_Export_DrawRect( lua_State *L ) {
 	vector4 colour = { 1.0f };
 
-	JPLua_TableToColour( &colour, L, 5 );
+	JPLua_ReadFloats( colour.data, 4, L, 5 );
 
 	CG_FillRect( (float)lua_tonumber( L, 1 ), (float)lua_tonumber( L, 2 ), (float)lua_tonumber( L, 3 ), (float)lua_tonumber( L, 4 ), &colour );
 	return 0;
@@ -199,7 +220,7 @@ static int JPLua_Export_DrawRect( lua_State *L ) {
 static int JPLua_Export_DrawText( lua_State *L ) {
 	vector4 colour = { 1.0f };
 
-	JPLua_TableToColour( &colour, L, 4 );
+	JPLua_ReadFloats( colour.data, 4, L, 4 );
 
 	CG_Text_Paint( (float)lua_tonumber( L, 1 ), (float)lua_tonumber( L, 2 ), (float)lua_tonumber( L, 5 ), &colour, lua_tostring( L, 3 ), 0.0f, 0, lua_tointeger( L, 6 ), lua_tointeger( L, 7 ) );
 
@@ -214,7 +235,7 @@ static int JPLua_Export_DrawPic( lua_State *L ) {
 	y = lua_tointeger( L, 2 );
 	w = lua_tointeger( L, 3 );
 	h = lua_tointeger( L, 4 );
-	JPLua_TableToColour( &colour, L, 5 );
+	JPLua_ReadFloats( colour.data, 4, L, 5 );
 	shader = lua_tointeger( L, 6 );
 
 	trap->R_SetColor( &colour );
@@ -234,7 +255,7 @@ static int JPLua_Export_DrawRotatedPic( lua_State *L ) {
 	w = lua_tointeger( L, 3 );
 	h = lua_tointeger( L, 4 );
 	angle = lua_tonumber( L, 5 );
-	JPLua_TableToColour( &colour, L, 6 );
+	JPLua_ReadFloats( colour.data, 4, L, 6 );
 	shader = lua_tointeger( L, 7 );
 
 	trap->R_SetColor( &colour );
@@ -360,6 +381,21 @@ static int JPLua_Export_Font_StringHeightPixels( lua_State *L ) {
 //	lua_pushnumber( L, trap->R_Font_HeightPixels( lua_tointeger( L, 1 ), (float)lua_tonumber( L, 2 ) ) );
 	lua_pushnumber( L, CG_Text_Height( lua_tostring( L, 1 ), (float)lua_tonumber( L, 2 ), lua_tointeger( L, 3 ) ) );
 	return 1;
+}
+
+static int JPLua_Export_WorldCoordToScreenCoord( lua_State *L ) {
+	vector3 v;
+	float x, y;
+	JPLua_ReadVector( v.data, 3, L, 1 );
+	if ( CG_WorldCoordToScreenCoordFloat( &v, &x, &y ) ) {
+		lua_pushnumber( L, x );
+		lua_pushnumber( L, y );
+		return 2;
+	}
+	else {
+		lua_pushnil( L );
+		return 1;
+	}
 }
 
 static int JPLua_Export_GetTime( lua_State *L ) {
@@ -536,6 +572,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "DrawRotatedPic", JPLua_Export_DrawRotatedPic }, // DrawPic( float x, float y, float width, float height, float angle, table { float r, float g, float b, float a }, integer shaderHandle )
 	{ "Font_StringLengthPixels", JPLua_Export_Font_StringLengthPixels }, // integer Font_StringLengthPixels( string str, integer fontHandle, float scale )
 	{ "Font_StringHeightPixels", JPLua_Export_Font_StringHeightPixels }, // integer Font_StringHeightPixels( integer fontHandle, float scale )
+	{ "WorldCoordToScreenCoord", JPLua_Export_WorldCoordToScreenCoord }, // { float x, float y } WorldCoordToScreenCoord( Vector3 pos )
 
 	//Communication
 	{ "SendChatText", JPLua_Export_SendChatText }, // SendChatText( string text )

@@ -531,15 +531,13 @@ static int JPLua_Player_SetScore( lua_State *L ) {
 
 
 
-//Func: Player:SetVelocity( x, y, z )
+//Func: Player:SetVelocity( Vector3 velocity )
 //Retn: N/A
 static int JPLua_Player_SetVelocity( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	gentity_t *ent = &g_entities[player->clientNum];
 
-	lua_getfield( L, 2, "x" );	ent->playerState->velocity.x = lua_tonumber( L, -1 ); //x
-	lua_getfield( L, 2, "y" );	ent->playerState->velocity.y = lua_tonumber( L, -1 ); //y
-	lua_getfield( L, 2, "z" );	ent->playerState->velocity.z = lua_tonumber( L, -1 ); //z
+	JPLua_ReadVector( ent->client->ps.velocity.data, 3, L, 2 );
 
 	return 0;
 }

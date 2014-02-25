@@ -19,6 +19,9 @@ int JPLua_Push_ToString( lua_State *L );
 int JPLua_Push_Pairs( lua_State *L );
 
 void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize );
+void JPLua_ReadVector( float *out, int numComponents, lua_State *L, int idx );
+void JPLua_ReadColour( float *out, int numComponents, lua_State *L, int idx );
+void JPLua_ReadFloats( float *out, int numComponents, lua_State *L, int idx );
 void JPLua_DPrintf( const char *msg, ... );
 qboolean JPLua_Call( lua_State *L, int argCount, int resCount );
 
