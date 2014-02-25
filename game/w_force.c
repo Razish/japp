@@ -3222,7 +3222,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 			if ( push_list[x]->client )
 			{//FIXME: make enemy jedi able to hunker down and resist this?
 				int otherPushPower = push_list[x]->client->ps.fd.forcePowerLevel[powerUse];
-				qboolean canPullWeapon = qtrue;
+				qboolean canPullWeapon = japp_allowWeaponPull.integer ? qtrue : qfalse;
 				float dirLen = 0;
 
 				if ( g_debugMelee.integer )
