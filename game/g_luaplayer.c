@@ -519,6 +519,46 @@ static int JPLua_Player_SetHealth( lua_State *L ) {
 	return 0;
 }
 
+//Func: Player:SetName( string name, [boolean announce] )
+//Retn: N/A
+static int JPLua_Player_SetName( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	const char *name = lua_tostring( L, 2 );
+	char info[MAX_INFO_STRING], oldName[MAX_NETNAME];
+	gentity_t *ent = &g_entities[player->clientNum];
+
+	if ( !name || !*name || strlen( name ) >= MAX_NETNAME )
+		return 0;
+
+	Q_strncpyz( oldName, ent->client->pers.netname, sizeof( oldName ) );
+
+	ClientCleanName( name, ent->client->pers.netname, sizeof( ent->client->pers.netname ) );
+
+	if ( !strcmp( oldName, ent->client->pers.netname ) )
+		return 0;
+
+	Q_strncpyz( ent->client->pers.netnameClean, ent->client->pers.netname, sizeof( ent->client->pers.netnameClean ) );
+	Q_CleanString( ent->client->pers.netnameClean, STRIP_COLOUR );
+
+	// update clientinfo
+	trap->GetConfigstring( CS_PLAYERS+player->clientNum, info, sizeof( info ) );
+	Info_SetValueForKey( info, "n", name );
+	trap->SetConfigstring( CS_PLAYERS+player->clientNum, info );
+
+	// update userinfo (in engine)
+	trap->GetUserinfo( player->clientNum, info, sizeof( info ) );
+	Info_SetValueForKey( info, "name", name );
+	trap->SetUserinfo( player->clientNum, info );
+
+	// announce if requested
+	if ( lua_toboolean( L, 3 ) == 1 ) {
+		trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldName, G_GetStringEdString( "MP_SVGAME",
+			"PLRENAME" ), ent->client->pers.netname ) );
+	}
+
+	return 0;
+}
+
 //Func: Player:SetScore()
 //Retn: N/A
 static int JPLua_Player_SetScore( lua_State *L ) {
@@ -669,6 +709,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "SetEFlag2",			JPLua_Player_SetEFlag2 },
 	{ "SetFlag",			JPLua_Player_SetFlag },
 	{ "SetHealth",			JPLua_Player_SetHealth },
+	{ "SetName",			JPLua_Player_SetName },
 	{ "SetScore",			JPLua_Player_SetScore },
 	{ "SetVelocity",		JPLua_Player_SetVelocity },
 	{ "TakeWeapon",			JPLua_Player_TakeWeapon },
