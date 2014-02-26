@@ -6,7 +6,7 @@ static const vector3 WHITE = { 1.0f, 1.0f, 1.0f };
 
 void FX_DisruptorMainShot( vector3 *start, vector3 *end ) {
 	trap->FX_AddLine( start, end, 0.1f, 6.0f, 0.0f, 1.0f, 0.0f, 0.0f, &WHITE, &WHITE, 0.0f, 150,
-		trap->R_RegisterShader( "gfx/effects/redLine" ), FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
+		trap->R_RegisterShaderNoMip( "gfx/effects/redLine" ), FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 }
 
 //q3pro/QtZ code
@@ -41,7 +41,7 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end ) {
 	reGlow->shaderTime = cg.time / 1600.0f;
 	reGlow->reType = RT_LINE;
 	reGlow->radius = 3.0f;
-	reGlow->customShader = trap->R_RegisterShader( "gfx/misc/whiteline2" );
+	reGlow->customShader = trap->R_RegisterShaderNoMip( "gfx/misc/whiteline2" );
 	VectorCopy(start, &reGlow->origin);
 	VectorCopy(end, &reGlow->oldorigin);
 	reGlow->shaderRGBA[0] = color1.r * 255;
@@ -61,7 +61,7 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end ) {
 	reCore->shaderTime = cg.time / 1600.0f;
 	reCore->reType = RT_LINE;
 	reCore->radius = 1.0f;
-	reCore->customShader = trap->R_RegisterShader( "gfx/misc/whiteline2" );
+	reCore->customShader = trap->R_RegisterShaderNoMip( "gfx/misc/whiteline2" );
 	VectorCopy(start, &reCore->origin);
 	VectorCopy(end, &reCore->oldorigin);
 	reCore->shaderRGBA[0] = color1.r * 255;
@@ -78,14 +78,14 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end ) {
 
 void FX_DisruptorAltShot( vector3 *start, vector3 *end, qboolean fullCharge ) {
 	trap->FX_AddLine( start, end, 0.1f, 10.0f, 0.0f, 1.0f, 0.0f, 0.0f, &WHITE, &WHITE, 0.0f, 175,
-		trap->R_RegisterShader( "gfx/effects/redLine" ), FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
+		trap->R_RegisterShaderNoMip( "gfx/effects/redLine" ), FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 
 	if ( fullCharge ) {
 		const vector3 YELLER = { 0.8f, 0.7f, 0.0f };
 
 		// add some beef
 		trap->FX_AddLine( start, end, 0.1f, 7.0f, 0.0f, 1.0f, 0.0f, 0.0f, &YELLER, &YELLER, 0.0f, 150,
-			trap->R_RegisterShader( "gfx/misc/whiteline2" ), FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
+			trap->R_RegisterShaderNoMip( "gfx/misc/whiteline2" ), FX_SIZE_LINEAR | FX_ALPHA_LINEAR );
 	}
 }
 
@@ -122,7 +122,7 @@ void FX_DisruptorAltMiss( vector3 *origin, vector3 *normal ) {
 
 	b.rgbParm = 0.0f;
 	b.killTime = 4000;
-	b.shader = trap->R_RegisterShader( "gfx/effects/smokeTrail" );
+	b.shader = trap->R_RegisterShaderNoMip( "gfx/effects/smokeTrail" );
 	b.flags = FX_ALPHA_WAVE;
 
 	trap->FX_AddBezier( &b );
