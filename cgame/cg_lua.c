@@ -186,6 +186,12 @@ void JPLua_ReadColour( float *out, int numComponents, lua_State *L, int idx ) {
 void JPLua_ReadFloats( float *out, int numComponents, lua_State *L, int idx ) {
 	int i=0;
 
+	if ( lua_type( L, idx ) != LUA_TTABLE ) {
+		Com_Printf( "JPLua_ReadFloats failed, not a table\n" );
+		JPLua_StackDump( L );
+		return;
+	}
+
 	lua_pushnil( L );
 	for ( i=0; i<numComponents && lua_next( L, idx ); i++ ) {
 		out[i] = lua_tonumber( L, -1 );
@@ -213,7 +219,8 @@ static int JPLua_Export_DrawRect( lua_State *L ) {
 
 	JPLua_ReadFloats( colour.data, 4, L, 5 );
 
-	CG_FillRect( (float)lua_tonumber( L, 1 ), (float)lua_tonumber( L, 2 ), (float)lua_tonumber( L, 3 ), (float)lua_tonumber( L, 4 ), &colour );
+	CG_FillRect( (float)lua_tonumber( L, 1 ), (float)lua_tonumber( L, 2 ), (float)lua_tonumber( L, 3 ),
+		(float)lua_tonumber( L, 4 ), &colour );
 	return 0;
 }
 
@@ -222,7 +229,8 @@ static int JPLua_Export_DrawText( lua_State *L ) {
 
 	JPLua_ReadFloats( colour.data, 4, L, 4 );
 
-	CG_Text_Paint( (float)lua_tonumber( L, 1 ), (float)lua_tonumber( L, 2 ), (float)lua_tonumber( L, 5 ), &colour, lua_tostring( L, 3 ), 0.0f, 0, lua_tointeger( L, 6 ), lua_tointeger( L, 7 ) );
+	CG_Text_Paint( (float)lua_tonumber( L, 1 ), (float)lua_tonumber( L, 2 ), (float)lua_tonumber( L, 5 ), &colour,
+		lua_tostring( L, 3 ), 0.0f, 0, lua_tointeger( L, 6 ), lua_tointeger( L, 7 ) );
 
 	return 0;
 }
@@ -317,7 +325,8 @@ static int JPLua_Export_AddConsoleCommand( lua_State *L ) {
 	int funcType = lua_type( L, 2 );
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING || (funcType != LUA_TFUNCTION && funcType != LUA_TNIL) ) {
-		trap->Print( "JPLua: AddConsoleCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->longname );
+		trap->Print( "JPLua: AddConsoleCommand failed, function signature invalid registering %s (plugin: %s) - Is it up"
+			" to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->longname );
 		return 0;
 	}
 
@@ -347,7 +356,8 @@ static int JPLua_Export_AddServerCommand( lua_State *L ) {
 	jplua_plugin_command_t *cmd = JPLua.currentPlugin->serverCmds;
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
-		trap->Print( "JPLua: AddServerCommand failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->longname );
+		trap->Print( "JPLua: AddServerCommand failed, function signature invalid registering %s (plugin: %s) - Is it up"
+			" to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->longname );
 		return 0;
 	}
 
@@ -627,8 +637,10 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 			JPLua.plugins = nextPlugin;
 		JPLua.currentPlugin = nextPlugin;
 	}
-	else
-		trap->Print( "%-15s%-32s%-8s%0p\n", "Loaded plugin:", JPLua.currentPlugin->longname, JPLua.currentPlugin->version, (void*)JPLua.currentPlugin->UID );
+	else {
+		trap->Print( "%-15s%-32s%-8s%0p\n", "Loaded plugin:", JPLua.currentPlugin->longname, JPLua.currentPlugin->version,
+			(void*)JPLua.currentPlugin->UID );
+	}
 }
 
 static void JPLua_PostInit( lua_State *L ) {
