@@ -2,7 +2,7 @@
 #include "cg_local.h"
 #include "ui/menudef.h"
 #include "ui/keycodes.h"
-#include "cg_luaevent.h"
+#include "bg_luaevent.h"
 #include "cg_media.h"
 
 // qcommon.h

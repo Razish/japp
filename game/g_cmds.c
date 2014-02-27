@@ -4,6 +4,7 @@
 #include "bg_saga.h"
 #include "g_admin.h"
 #include "ui/menudef.h" // for the voice chats
+#include "bg_luaevent.h"
 
 //rww - for getting bot commands...
 int AcceptBotCommand( char *cmd, gentity_t *pl );

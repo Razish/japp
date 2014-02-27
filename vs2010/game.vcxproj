@@ -93,6 +93,12 @@
     <ClCompile Include="..\game\ai_wpnav.c" />
     <ClCompile Include="..\game\AnimalNPC.c" />
     <ClCompile Include="..\game\bg_g2_utils.c" />
+    <ClCompile Include="..\game\bg_lua.c" />
+    <ClCompile Include="..\game\bg_luacvar.c" />
+    <ClCompile Include="..\game\bg_luaevent.c" />
+    <ClCompile Include="..\game\bg_luaplayer.c" />
+    <ClCompile Include="..\game\bg_luaserialiser.c" />
+    <ClCompile Include="..\game\bg_luavector.c" />
     <ClCompile Include="..\game\bg_misc.c" />
     <ClCompile Include="..\game\bg_panimate.c" />
     <ClCompile Include="..\game\bg_pmove.c" />
@@ -115,11 +121,6 @@
     <ClCompile Include="..\game\g_ICARUScb.c" />
     <ClCompile Include="..\game\g_items.c" />
     <ClCompile Include="..\game\g_log.c" />
-    <ClCompile Include="..\game\g_lua.c" />
-    <ClCompile Include="..\game\g_luacvar.c" />
-    <ClCompile Include="..\game\g_luaevent.c" />
-    <ClCompile Include="..\game\g_luaplayer.c" />
-    <ClCompile Include="..\game\g_luaserialiser.c" />
     <ClCompile Include="..\game\g_main.c" />
     <ClCompile Include="..\game\g_mem.c" />
     <ClCompile Include="..\game\g_misc.c" />

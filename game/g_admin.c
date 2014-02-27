@@ -14,6 +14,7 @@
 #include "g_local.h"
 #include "g_admin.h"
 #include "json/cJSON.h"
+#include "bg_lua.h"
 
 static adminUser_t *adminUsers = NULL;
 static telemark_t *telemarks = NULL;

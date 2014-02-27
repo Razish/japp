@@ -5,7 +5,7 @@
 
 #include "cg_local.h"
 #include "bg_saga.h"
-#include "cg_lua.h"
+#include "bg_lua.h"
 
 void CG_TargetCommand_f( void ) {
 	int		targetNum;

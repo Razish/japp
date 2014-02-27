@@ -6,6 +6,7 @@
 #include "g_nav.h"
 #include "bg_saga.h"
 #include "JAPP/jp_crash.h"
+#include "bg_lua.h"
 
 level_locals_t	level;
 

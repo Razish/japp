@@ -1,7 +1,7 @@
 #include "cg_local.h"
 #include "bg_saga.h"
 #include "cg_lights.h"
-#include "cg_luaevent.h"
+#include "bg_luaevent.h"
 #include "cg_media.h"
 
 #define CAMERA_SIZE	4

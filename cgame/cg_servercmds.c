@@ -3,7 +3,7 @@
 #include "cg_lights.h"
 #include "Ghoul2/G2.h"
 #include "ui/ui_public.h"
-#include "cg_luaevent.h"
+#include "bg_luaevent.h"
 #include "cg_media.h"
 #include "JAPP/jp_promode.h"
 

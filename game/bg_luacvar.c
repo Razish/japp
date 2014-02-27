@@ -1,5 +1,9 @@
-#include "g_local.h"
-#include "g_lua.h"
+#if defined(_GAME)
+	#include "g_local.h"
+#elif defined(_CGAME)
+	#include "cg_local.h"
+#endif
+#include "bg_lua.h"
 
 #ifdef JPLUA
 
@@ -145,7 +149,8 @@ void JPLua_Cvar_CreateRef( lua_State *L, const char *name ) {
 	char buf[MAX_CVAR_VALUE_STRING];
 
 	trap->Cvar_VariableStringBuffer( name, buf, sizeof( buf ) );
-	if ( !buf[0] ) { //RAZFIXME: This isn't exactly reliable. Could be an empty cvar.
+	//RAZFIXME: This isn't exactly reliable. Could be an empty cvar.
+	if ( !buf[0] ) {
 		lua_pushnil( L );
 		return;
 	}
@@ -166,18 +171,18 @@ jplua_cvar_t *JPLua_CheckCvar( lua_State *L, int idx ) {
 }
 
 static const struct luaL_Reg jplua_cvar_meta[] = {
-	{ "__tostring",		JPLua_Cvar_ToString },
-	{ "GetName",		JPLua_Cvar_GetName },
-	{ "GetDefault",		JPLua_Cvar_GetDefault },
-	{ "GetFlags",		JPLua_Cvar_GetFlags },
+	{ "__tostring",	JPLua_Cvar_ToString },
+	{ "GetName",	JPLua_Cvar_GetName },
+	{ "GetDefault",	JPLua_Cvar_GetDefault },
+	{ "GetFlags",	JPLua_Cvar_GetFlags },
 
-	{ "GetInteger",		JPLua_Cvar_GetInteger },
-	{ "GetString",		JPLua_Cvar_GetString },
-	{ "GetFloat",		JPLua_Cvar_GetFloat },
+	{ "GetInteger",	JPLua_Cvar_GetInteger },
+	{ "GetString",	JPLua_Cvar_GetString },
+	{ "GetFloat",	JPLua_Cvar_GetFloat },
 
-	{ "Reset",			JPLua_Cvar_Reset },
-	{ "Set",			JPLua_Cvar_Set },
-	{ NULL, NULL }
+	{ "Reset",		JPLua_Cvar_Reset },
+	{ "Set",		JPLua_Cvar_Set },
+	{ NULL,			NULL }
 };
 
 // Register the Cvar class for Lua
@@ -193,14 +198,10 @@ void JPLua_Register_Cvar( lua_State *L ) {
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
 	// fill metatable with fields
-#if LUA_VERSION_NUM > 501
 	for ( r=jplua_cvar_meta; r->name; r++ ) {
 		lua_pushcfunction( L, r->func );
 		lua_setfield( L, -2, r->name );
 	}
-#else
-	luaL_register( L, NULL, jplua_cvar_meta );
-#endif
 
 	lua_pop( L, -1 ); // Pop the Cvar class metatable from the stack
 }

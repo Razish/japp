@@ -1,5 +1,5 @@
 #include "cg_local.h"
-#include "cg_lua.h"
+#include "bg_lua.h"
 
 #ifdef JPLUA
 
@@ -60,11 +60,11 @@ static int JPLua_Server_GetPlayers( lua_State *L ) {
 }
 
 static const struct luaL_Reg jplua_server_meta[] = {
-	{ "__tostring",		JPLua_Server_ToString },
-	{ "GetName",		JPLua_Server_GetName },
-	{ "GetSSF",			JPLua_Server_GetSSF },
-	{ "GetPlayers",		JPLua_Server_GetPlayers },
-	{ NULL, NULL }
+	{ "__tostring",	JPLua_Server_ToString },
+	{ "GetName",	JPLua_Server_GetName },
+	{ "GetSSF",		JPLua_Server_GetSSF },
+	{ "GetPlayers",	JPLua_Server_GetPlayers },
+	{ NULL,			NULL }
 };
 
 // Register the Server class for Lua
@@ -79,14 +79,10 @@ void JPLua_Register_Server( lua_State *L ) {
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
 	// fill metatable with fields
-#if LUA_VERSION_NUM > 501
 	for ( r=jplua_server_meta; r->name; r++ ) {
 		lua_pushcfunction( L, r->func );
 		lua_setfield( L, -2, r->name );
 	}
-#else
-	luaL_register( L, NULL, jplua_server_meta );
-#endif
 
 	lua_pop( L, -1 ); // Pop the Server class metatable from the stack
 }

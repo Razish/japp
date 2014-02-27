@@ -89,11 +89,6 @@
     <ClCompile Include="..\cgame\cg_info.c" />
     <ClCompile Include="..\cgame\cg_light.c" />
     <ClCompile Include="..\cgame\cg_localents.c" />
-    <ClCompile Include="..\cgame\cg_lua.c" />
-    <ClCompile Include="..\cgame\cg_luacvar.c" />
-    <ClCompile Include="..\cgame\cg_luaevent.c" />
-    <ClCompile Include="..\cgame\cg_luaplayer.c" />
-    <ClCompile Include="..\cgame\cg_luaserialiser.c" />
     <ClCompile Include="..\cgame\cg_luaserver.c" />
     <ClCompile Include="..\cgame\cg_main.c" />
     <ClCompile Include="..\cgame\cg_marks.c" />
@@ -126,6 +121,12 @@
     <ClCompile Include="..\cgame\fx_rocketlauncher.c" />
     <ClCompile Include="..\game\AnimalNPC.c" />
     <ClCompile Include="..\game\bg_g2_utils.c" />
+    <ClCompile Include="..\game\bg_lua.c" />
+    <ClCompile Include="..\game\bg_luacvar.c" />
+    <ClCompile Include="..\game\bg_luaevent.c" />
+    <ClCompile Include="..\game\bg_luaplayer.c" />
+    <ClCompile Include="..\game\bg_luaserialiser.c" />
+    <ClCompile Include="..\game\bg_luavector.c" />
     <ClCompile Include="..\game\bg_misc.c" />
     <ClCompile Include="..\game\bg_panimate.c" />
     <ClCompile Include="..\game\bg_pmove.c" />

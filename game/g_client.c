@@ -3,6 +3,7 @@
 #include "g_local.h"
 #include "Ghoul2/G2.h"
 #include "bg_saga.h"
+#include "bg_luaevent.h"
 
 // g_client.c -- client functions that don't happen every frame
 

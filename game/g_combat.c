@@ -4,7 +4,7 @@
 
 #include "b_local.h"
 #include "bg_saga.h"
-#include "g_luaevent.h"
+#include "bg_luaevent.h"
 
 extern int G_ShipSurfaceForSurfName( const char *surfaceName );
 extern qboolean G_FlyVehicleDestroySurface( gentity_t *veh, int surface );

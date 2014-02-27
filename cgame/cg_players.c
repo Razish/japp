@@ -5,7 +5,7 @@
 #include "Ghoul2/G2.h"
 #include "bg_saga.h"
 #include "fx_local.h"
-#include "cg_luaevent.h"
+#include "bg_luaevent.h"
 #include "cg_media.h"
 
 extern void CheckCameraLocation( vector3 *OldeyeOrigin );

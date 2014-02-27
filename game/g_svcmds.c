@@ -4,6 +4,7 @@
 // this file holds commands that can be executed by the server console, but not remote clients
 
 #include "g_local.h"
+#include "bg_lua.h"
 
 //RAZFIXME: Use G_ClientFromString
 gclient_t *ClientForString( const char *s ) {

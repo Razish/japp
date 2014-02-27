@@ -1,7 +1,11 @@
-#include "g_local.h"
-#include "g_lua.h"
+#if defined(_GAME)
+	#include "g_local.h"
+#elif defined(_CGAME)
+	#include "cg_local.h"
+#endif
+#include "bg_lua.h"
 #include "json/cJSON.h"
-#include "g_luaserialiser.h"
+#include "bg_luaserialiser.h"
 
 #ifdef JPLUA
 
@@ -281,14 +285,10 @@ void JPLua_Register_Serialiser( lua_State *L ) {
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
 	// fill metatable with fields
-#if LUA_VERSION_NUM > 501
 	for ( r=jplua_serialiser_meta; r->name; r++ ) {
 		lua_pushcfunction( L, r->func );
 		lua_setfield( L, -2, r->name );
 	}
-#else
-	luaL_register( L, NULL, jplua_serialiser_meta );
-#endif
 
 	lua_pop( L, -1 ); // Pop the Serialiser class metatable from the stack
 }

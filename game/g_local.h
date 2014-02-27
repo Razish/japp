@@ -8,7 +8,6 @@
 #include "bg_public.h"
 #include "bg_vehicles.h"
 #include "g_public.h"
-#include "g_lua.h"
 
 typedef struct gentity_s gentity_t;
 

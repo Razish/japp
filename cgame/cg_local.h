@@ -1574,6 +1574,7 @@ void CG_ParseWeatherEffect( const char *str );
 void CG_ParseSiegeObjectiveStatus( const char *str );
 void CG_ParseSiegeState( const char *str );
 float CG_Cvar_Get( const char *cvar );
+const char *CG_GetLocationString( const char *loc );
 
 qboolean SE_RenderThisEntity( vector3 *testOrigin, int gameEntity );
 void SE_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity );

@@ -1,35 +1,46 @@
-#include "cg_local.h"
-#include "cg_lua.h"
+#if defined(_GAME)
+	#include "g_local.h"
+#elif defined(_CGAME)
+	#include "cg_local.h"
+#endif
+#include "bg_lua.h"
 
 #ifdef JPLUA
-
-//================================
-//		EVENT HANDLERS
-//================================
 
 static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 	ENUM2STRING(JPLUA_EVENT_UNLOAD),
 	ENUM2STRING(JPLUA_EVENT_RUNFRAME),
-	ENUM2STRING(JPLUA_EVENT_HUD),
 	ENUM2STRING(JPLUA_EVENT_CHATMSGRECV),
 	ENUM2STRING(JPLUA_EVENT_CHATMSGSEND),
+	ENUM2STRING(JPLUA_EVENT_CLIENTBEGIN),
+	ENUM2STRING(JPLUA_EVENT_CLIENTCOMMAND),
 	ENUM2STRING(JPLUA_EVENT_CLIENTCONNECT),
+	ENUM2STRING(JPLUA_EVENT_CLIENTDISCONNECT),
 	ENUM2STRING(JPLUA_EVENT_CLIENTINFO),
+	ENUM2STRING(JPLUA_EVENT_CLIENTSPAWN),
+	ENUM2STRING(JPLUA_EVENT_CLIENTUSERINFOCHANGED),
+	ENUM2STRING(JPLUA_EVENT_HUD),
 	ENUM2STRING(JPLUA_EVENT_PAIN),
+	ENUM2STRING(JPLUA_EVENT_PLAYERDEATH),
 	ENUM2STRING(JPLUA_EVENT_SABERTOUCH),
 };
 
-// called by Lua
+// called by lua
 int JPLua_Event_AddListener( lua_State *L ) {
 	int i = 0;
 	const char *listenerArg = lua_tostring( L, 1 );
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
-		trap->Print( "JPLua: AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+#if defined(_GAME)
+		G_LogPrintf( level.log.console, "JPLua: AddListener failed, function signature invalid registering %s (plugin: "
+			"%s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+#elif defined(_CGAME)
+		trap->Print( "JPLua: AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up to "
+			"date?\n", listenerArg, JPLua.currentPlugin->name );
+#endif
 		return 0;
 	}
 
-	// loop 'til we find the event we want to listen for
 	for ( i=0; i<JPLUA_EVENT_MAX; i++ ) {
 		if ( !Q_stricmp( listenerArg, jplua_events[i].name ) ) {
 			JPLua.currentPlugin->eventListeners[i] = luaL_ref( L, LUA_REGISTRYINDEX );
@@ -37,22 +48,33 @@ int JPLua_Event_AddListener( lua_State *L ) {
 		}
 	}
 
-	trap->Print( "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+#if defined(_GAME)
+	G_LogPrintf( level.log.console, "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n",
+		listenerArg, JPLua.currentPlugin->name );
+#elif defined(_CGAME)
+	trap->Print( "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n",
+		listenerArg, JPLua.currentPlugin->name );
+#endif
 
 	return 0;
 }
 
-// called by Lua
+// called by lua
 int JPLua_Event_RemoveListener( lua_State *L ) {
 	int i = 0;
 	const char *listenerArg = lua_tostring( L, 1 );
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING ) {
-		trap->Print( "JPLua: RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+#if defined(_GAME)
+		G_LogPrintf( level.log.console, "JPLua: RemoveListener failed, function signature invalid registering %s (plugin:"
+			" %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+#elif defined(_CGAME)
+		trap->Print( "JPLua: RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it up to"
+			" date?\n", listenerArg, JPLua.currentPlugin->name );
+#endif
 		return 0;
 	}
 
-	// loop 'til we find the event we want to remove the listener for
 	for ( i=0; i<JPLUA_EVENT_MAX; i++ ) {
 		if ( !Q_stricmp( listenerArg, jplua_events[i].name ) ) {
 			luaL_unref( L, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[i] );
@@ -61,7 +83,13 @@ int JPLua_Event_RemoveListener( lua_State *L ) {
 		}
 	}
 
-	trap->Print( "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
+#if defined(_GAME)
+	G_LogPrintf( level.log.console, "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to "
+		"date?\n", listenerArg, JPLua.currentPlugin->name );
+#elif defined(_CGAME)
+	trap->Print( "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n",
+		listenerArg, JPLua.currentPlugin->name );
+#endif
 
 	return 0;
 }
@@ -71,7 +99,11 @@ int JPLua_Event_RemoveListener( lua_State *L ) {
 void JPLua_Event_Shutdown( void ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+#if defined(_GAME)
+		jplua_plugin_command_t *clientCmd = JPLua.currentPlugin->clientCmds, *nextClientCmd = clientCmd;
+#elif defined(_CGAME)
 		jplua_plugin_command_t *consoleCmd = JPLua.currentPlugin->consoleCmds, *nextConsoleCmd = consoleCmd;
+#endif
 		jplua_plugin_command_t *serverCmd = JPLua.currentPlugin->serverCmds, *nextServerCmd = serverCmd;
 
 		// fire the unload event
@@ -81,7 +113,16 @@ void JPLua_Event_Shutdown( void ) {
 		}
 
 		//RAZTODO: Refcount because multiple plugins can register the same command
-		//Remove all console commands
+		// remove all console commands
+#if defined(_GAME)
+		while ( nextClientCmd ) {
+			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, clientCmd->handle );
+			nextClientCmd = clientCmd->next;
+
+			free( clientCmd );
+			clientCmd = nextClientCmd;
+		}
+#elif defined(_CGAME)
 		while ( nextConsoleCmd ) {
 			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, consoleCmd->handle );
 			nextConsoleCmd = consoleCmd->next;
@@ -89,6 +130,7 @@ void JPLua_Event_Shutdown( void ) {
 			free( consoleCmd );
 			consoleCmd = nextConsoleCmd;
 		}
+#endif
 
 		// remove all server commands
 		while ( nextServerCmd ) {
@@ -99,7 +141,11 @@ void JPLua_Event_Shutdown( void ) {
 			serverCmd = nextServerCmd;
 		}
 
+#if defined(_GAME)
+		JPLua.currentPlugin->clientCmds = NULL;
+#elif defined(_CGAME)
 		JPLua.currentPlugin->consoleCmds = NULL;
+#endif
 		JPLua.currentPlugin->serverCmds = NULL;
 	}
 #endif // JPLUA
@@ -116,23 +162,7 @@ void JPLua_Event_RunFrame( void ) {
 #endif // JPLUA
 }
 
-qboolean JPLua_Event_HUD( void ) {
-	qboolean ret = qfalse;
-
-#ifdef JPLUA
-	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
-		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_HUD] ) {
-			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_HUD] );
-			JPLua_Call( JPLua.state, 0, 1 );
-			if ( !ret )
-				ret = !!lua_tointeger( JPLua.state, -1 );
-		}
-	}
-#endif //JPLUA
-
-	return ret;
-}
-
+#ifdef _CGAME
 char *JPLua_Event_ChatMessageRecieved( const char *msg ) {
 	static char tmpMsg[MAX_SAY_TEXT] = {0}; // although a chat message can only be MAX_SAY_TEXT long..-name?
 
@@ -151,15 +181,19 @@ char *JPLua_Event_ChatMessageRecieved( const char *msg ) {
 				return NULL;
 			else if ( lua_type( JPLua.state, -1 ) == LUA_TSTRING )
 				Q_strncpyz( tmpMsg, lua_tostring( JPLua.state, -1 ), MAX_SAY_TEXT );
-			else
-				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CHATMSGRECV), expected string or nil but got %s", JPLua.currentPlugin->name, lua_typename( JPLua.state, -1 ) );
+			else {
+				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CHATMSGRECV), expected string or nil but got %s",
+					JPLua.currentPlugin->name, lua_typename( JPLua.state, -1 ) );
+			}
 		}
 	}
 #endif // JPLUA
 
 	return tmpMsg;
 }
+#endif
 
+#ifdef _CGAME
 char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targetClient ) {
 	static char tmpMsg[MAX_STRING_CHARS] = {0}; // although a chat message can only be MAX_SAY_TEXT long..-name?
 
@@ -181,7 +215,8 @@ char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targ
 			else if ( lua_type( JPLua.state, -1 ) == LUA_TSTRING )
 				Q_strncpyz( tmpMsg, lua_tostring( JPLua.state, -1 ), MAX_SAY_TEXT );
 			else {
-				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CHATMSGSEND), expected string or nil but got %s\n", JPLua.currentPlugin->name, lua_typename( JPLua.state, -1 ) );
+				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CHATMSGSEND), expected string or nil but got %s\n",
+					JPLua.currentPlugin->name, lua_typename( JPLua.state, -1 ) );
 				return NULL;
 			}
 		}
@@ -190,14 +225,123 @@ char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targ
 
 	return tmpMsg;
 }
+#endif
 
+#ifdef _GAME
+void JPLua_Event_ClientBegin( int clientNum ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTBEGIN] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTBEGIN] );
+
+			JPLua_Player_CreateRef( JPLua.state, clientNum );
+
+			JPLua_Call( JPLua.state, 1, 0 );
+		}
+	}
+#endif
+}
+#endif
+
+#ifdef _GAME
+qboolean JPLua_Event_ClientCommand( int clientNum ) {
+	qboolean ret = qfalse;
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		int top, i, numArgs = trap->Argc();
+		jplua_plugin_command_t *cmd = JPLua.currentPlugin->clientCmds;
+
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCOMMAND] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCOMMAND] );
+
+			JPLua_Player_CreateRef( JPLua.state, clientNum );
+
+			//Push table of arguments
+			lua_newtable( JPLua.state );
+			top = lua_gettop( JPLua.state );
+			for ( i=0; i<numArgs; i++ ) {
+				char argN[MAX_TOKEN_CHARS];
+				trap->Argv( i, argN, sizeof( argN ) );
+				lua_pushnumber( JPLua.state, i+1 );
+				lua_pushstring( JPLua.state, argN );
+				lua_settable( JPLua.state, top );
+			}
+
+			JPLua_Call( JPLua.state, 2, 0 );
+		}
+
+		while ( cmd ) {
+			char arg1[MAX_TOKEN_CHARS];
+
+			trap->Argv( 0, arg1, sizeof( arg1 ) );
+
+			if ( !Q_stricmp( arg1, cmd->command ) ) {
+				lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, cmd->handle );
+
+				JPLua_Player_CreateRef( JPLua.state, clientNum );
+
+				//Push table of arguments
+				lua_newtable( JPLua.state );
+				top = lua_gettop( JPLua.state );
+				for ( i=1; i<numArgs; i++ ) {
+					char argN[MAX_TOKEN_CHARS];
+					trap->Argv( i, argN, sizeof( argN ) );
+					lua_pushnumber( JPLua.state, i );
+					lua_pushstring( JPLua.state, argN );
+					lua_settable( JPLua.state, top );
+				}
+
+				JPLua_Call( JPLua.state, 2, 0 );
+				if ( !ret )
+					ret = qtrue;
+			}
+
+			cmd = cmd->next;
+		}
+	}
+#endif // JPLUA
+	return ret;
+}
+#endif
+
+#if defined(_GAME)
+const char *JPLua_Event_ClientConnect( int clientNum, const char *userinfo, const char *IP, qboolean firstTime ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] );
+
+			lua_pushinteger( JPLua.state, clientNum );
+			JPLua_PushInfostring( JPLua.state, userinfo );
+			lua_pushstring( JPLua.state, IP );
+			lua_pushboolean( JPLua.state, !!firstTime );
+
+			JPLua_Call( JPLua.state, 4, 1 );
+
+			// connection allowed, pass to other plugins
+			if ( lua_type( JPLua.state, -1 ) == LUA_TNIL )
+				continue;
+
+			// denied, no use passing it to other plugins
+			if ( lua_type( JPLua.state, -1 ) == LUA_TSTRING )
+				return lua_tostring( JPLua.state, -1 );
+			else {
+				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CLIENTCONNECT), expected string or nil but got %s\n",
+					JPLua.currentPlugin->name, lua_typename( JPLua.state, -1 ) );
+				return NULL;
+			}
+		}
+	}
+#endif
+	return NULL;
+}
+#elif defined(_CGAME)
 void JPLua_Event_ClientConnect( int clientNum ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
 		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] );
 
-			// Create a player instance for this client number and push on stack
 			JPLua_Player_CreateRef( JPLua.state, clientNum );
 
 			JPLua_Call( JPLua.state, 1, 0 );
@@ -205,7 +349,25 @@ void JPLua_Event_ClientConnect( int clientNum ) {
 	}
 #endif // JPLUA
 }
+#endif
 
+#ifdef _GAME
+void JPLua_Event_ClientDisconnect( int clientNum ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTDISCONNECT] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTDISCONNECT] );
+
+			JPLua_Player_CreateRef( JPLua.state, clientNum );
+
+			JPLua_Call( JPLua.state, 1, 0 );
+		}
+	}
+#endif
+}
+#endif
+
+#ifdef _CGAME
 void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientInfo_t *newInfo ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
@@ -291,14 +453,99 @@ void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientI
 	}
 #endif
 }
+#endif
 
+#ifdef _GAME
+void JPLua_Event_ClientSpawn( int clientNum, qboolean firstSpawn ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTSPAWN] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTSPAWN] );
+
+			JPLua_Player_CreateRef( JPLua.state, clientNum );
+			lua_pushboolean( JPLua.state, firstSpawn );
+			JPLua_Call( JPLua.state, 2, 0 );
+		}
+	}
+#endif
+}
+#endif
+
+#ifdef _GAME
+qboolean JPLua_Event_ClientUserinfoChanged( int clientNum, char *userinfo ) {
+	qboolean ret = qfalse;
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTUSERINFOCHANGED] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_CLIENTUSERINFOCHANGED] );
+
+			lua_pushinteger( JPLua.state, clientNum );
+			JPLua_PushInfostring( JPLua.state, userinfo );
+
+			JPLua_Call( JPLua.state, 2, 1 );
+
+			// they wanted to modify it, parse it out and apply it
+			if ( lua_type( JPLua.state, -1 ) == LUA_TTABLE ) {
+				JPLua_PopInfostring( JPLua.state, userinfo );
+				ret = qtrue;
+			}
+			else if ( lua_type( JPLua.state, -1 ) != LUA_TNIL ) {
+				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CLIENTUSERINFOCHANGED), expected table or nil but"
+					"got %s\n", JPLua.currentPlugin->name, lua_typename( JPLua.state, -1 ) );
+			}
+		}
+	}
+#endif
+	return ret;
+}
+#endif
+
+#ifdef _CGAME
+qboolean JPLua_Event_HUD( void ) {
+	qboolean ret = qfalse;
+
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_HUD] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_HUD] );
+			JPLua_Call( JPLua.state, 0, 1 );
+			if ( !ret )
+				ret = !!lua_tointeger( JPLua.state, -1 );
+		}
+	}
+#endif //JPLUA
+
+	return ret;
+}
+#endif
+
+#if defined(_GAME)
+void JPLua_Event_Pain( int target, int inflictor, int attacker, int health, int armor, uint32_t dflags, int mod ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_PAIN] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_PAIN] );
+
+			JPLua_Player_CreateRef( JPLua.state, target );
+			JPLua_Player_CreateRef( JPLua.state, inflictor );
+			JPLua_Player_CreateRef( JPLua.state, attacker );
+			lua_pushinteger( JPLua.state, health );
+			lua_pushinteger( JPLua.state, armor );
+			lua_pushinteger( JPLua.state, dflags );
+			lua_pushinteger( JPLua.state, mod );
+
+			JPLua_Call( JPLua.state, 7, 0 );
+		}
+	}
+#endif // JPLUA
+}
+#elif defined(_CGAME)
 void JPLua_Event_Pain( int clientNum, int health ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
 		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_PAIN] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_PAIN] );
 
-			// Create a player instance for this client number and push on stack
 			JPLua_Player_CreateRef( JPLua.state, clientNum );
 			lua_pushinteger( JPLua.state, health );
 
@@ -307,7 +554,31 @@ void JPLua_Event_Pain( int clientNum, int health ) {
 	}
 #endif // JPLUA
 }
+#endif
 
+#ifdef _GAME
+void JPLua_Event_PlayerDeath( int clientNum, int mod, int inflictor ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		if ( JPLua.currentPlugin->eventListeners[JPLUA_EVENT_PLAYERDEATH] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[JPLUA_EVENT_PLAYERDEATH] );
+
+			JPLua_Player_CreateRef( JPLua.state, clientNum ); // victim
+			lua_pushinteger( JPLua.state, mod ); // method of death
+
+			if ( inflictor >= MAX_CLIENTS || inflictor < 0 ) // -1 means inflictor is not a player
+				lua_pushnil( JPLua.state ); // nil because not player
+			else
+				JPLua_Player_CreateRef( JPLua.state, inflictor );
+
+			JPLua_Call( JPLua.state, 3, 0 );
+		}
+	}
+#endif // JPLUA
+}
+#endif
+
+#ifdef _CGAME
 void JPLua_Event_SaberTouch( int victim, int attacker ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
@@ -322,7 +593,9 @@ void JPLua_Event_SaberTouch( int victim, int attacker ) {
 	}
 #endif // JPLUA
 }
+#endif
 
+#ifdef _CGAME
 qboolean JPLua_Event_ConsoleCommand( void ) {
 	qboolean ret = qfalse;
 
@@ -361,7 +634,45 @@ qboolean JPLua_Event_ConsoleCommand( void ) {
 
 	return ret;
 }
+#endif
 
+#if defined(_GAME)
+qboolean JPLua_Event_ServerCommand( void ) {
+#ifdef JPLUA
+	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
+		jplua_plugin_command_t *cmd = JPLua.currentPlugin->serverCmds;
+
+		while ( cmd ) {
+			int top, i, numArgs = trap->Argc();
+			char arg1[MAX_TOKEN_CHARS];
+
+			trap->Argv( 0, arg1, sizeof( arg1 ) );
+
+			if ( !Q_stricmp( arg1, cmd->command ) ) {
+				lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, cmd->handle );
+
+				//Push table of arguments
+				lua_newtable( JPLua.state );
+				top = lua_gettop( JPLua.state );
+				for ( i=1; i<numArgs; i++ ) {
+					char argN[MAX_TOKEN_CHARS];
+					trap->Argv( i, argN, sizeof( argN ) );
+					lua_pushnumber( JPLua.state, i );
+					lua_pushstring( JPLua.state, argN );
+					lua_settable( JPLua.state, top );
+				}
+
+				JPLua_Call( JPLua.state, 1, 1 );
+				return qtrue;
+			}
+
+			cmd = cmd->next;
+		}
+	}
+#endif // JPLUA
+	return qfalse;
+}
+#elif defined(_CGAME)
 qboolean JPLua_Event_ServerCommand( void ) {
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
@@ -393,3 +704,4 @@ qboolean JPLua_Event_ServerCommand( void ) {
 
 	return qfalse;
 }
+#endif

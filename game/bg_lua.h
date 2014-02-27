@@ -4,10 +4,13 @@
 #include "../lua/lualib.h"
 #include "../lua/lauxlib.h"
 
-#include "cg_luaplayer.h"
+#include "bg_luacvar.h"
+#include "bg_luaevent.h"
+#include "bg_luaplayer.h"
+#ifdef _CGAME
 #include "cg_luaserver.h"
-#include "cg_luacvar.h"
-#include "cg_luaevent.h"
+#endif
+#include "bg_luavector.h"
 
 #ifdef JPLUA
 
@@ -25,6 +28,9 @@ void JPLua_ReadColour( float *out, int numComponents, lua_State *L, int idx );
 void JPLua_ReadFloats( float *out, int numComponents, lua_State *L, int idx );
 void JPLua_DPrintf( const char *msg, ... );
 qboolean JPLua_Call( lua_State *L, int argCount, int resCount );
+
+void JPLua_PushInfostring( lua_State *L, const char *info );
+void JPLua_PopInfostring( lua_State *L, char *info );
 
 typedef struct jplua_cimport_table_s {
 	const char *name;
@@ -46,8 +52,13 @@ typedef struct jplua_plugin_s {
 
 	int eventListeners[JPLUA_EVENT_MAX]; // references to listener functions in lua stored in the registry
 
+#ifdef _CGAME
 	jplua_plugin_command_t *consoleCmds; //Linked list of console commands
 	jplua_plugin_command_t *serverCmds; //Linked list of server commands
+#else
+	jplua_plugin_command_t *clientCmds; // linked list of client commands
+	jplua_plugin_command_t *serverCmds; // linked list of server commands
+#endif
 
 	struct jplua_plugin_s *next;
 } jplua_plugin_t;
