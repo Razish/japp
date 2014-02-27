@@ -400,34 +400,11 @@ void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientI
 				lua_pushstring( JPLua.state, "duelTeam" );		lua_pushnumber( JPLua.state, ci->duelTeam );		lua_settable( JPLua.state, top1 );
 				lua_pushstring( JPLua.state, "botSkill" );		lua_pushnumber( JPLua.state, ci->botSkill );		lua_settable( JPLua.state, top1 );
 
-				lua_pushstring( JPLua.state, "color1" );
-				lua_newtable( JPLua.state ); top2 = lua_gettop( JPLua.state );
-				lua_pushstring( JPLua.state, "r" );				lua_pushnumber( JPLua.state, ci->color1.r );		lua_settable( JPLua.state, top2 );
-				lua_pushstring( JPLua.state, "g" );				lua_pushnumber( JPLua.state, ci->color1.g );		lua_settable( JPLua.state, top2 );
-				lua_pushstring( JPLua.state, "b" );				lua_pushnumber( JPLua.state, ci->color1.b );		lua_settable( JPLua.state, top2 );
-				lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "color1" );		JPLua_Vector_CreateRef( JPLua.state, ci->color1.r, ci->color1.g, ci->color1.b );	lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "color2" );		JPLua_Vector_CreateRef( JPLua.state, ci->color2.r, ci->color2.g, ci->color2.b );	lua_settable( JPLua.state, top1 );
 
-				lua_pushstring( JPLua.state, "color2" );
-				lua_newtable( JPLua.state ); top2 = lua_gettop( JPLua.state );
-				lua_pushstring( JPLua.state, "r" );				lua_pushnumber( JPLua.state, ci->color2.r );		lua_settable( JPLua.state, top2 );
-				lua_pushstring( JPLua.state, "g" );				lua_pushnumber( JPLua.state, ci->color2.g );		lua_settable( JPLua.state, top2 );
-				lua_pushstring( JPLua.state, "b" );				lua_pushnumber( JPLua.state, ci->color2.b );		lua_settable( JPLua.state, top2 );
-				lua_settable( JPLua.state, top1 );
-
-				lua_pushstring( JPLua.state, "rgb1" );
-				lua_newtable( JPLua.state ); top2 = lua_gettop( JPLua.state );
-				lua_pushstring( JPLua.state, "r" );				lua_pushnumber( JPLua.state, ci->rgb1.r );			lua_settable( JPLua.state, top2 );
-				lua_pushstring( JPLua.state, "g" );				lua_pushnumber( JPLua.state, ci->rgb1.g );			lua_settable( JPLua.state, top2 );
-				lua_pushstring( JPLua.state, "b" );				lua_pushnumber( JPLua.state, ci->rgb1.b );			lua_settable( JPLua.state, top2 );
-				lua_settable( JPLua.state, top1 );
-
-				lua_pushstring( JPLua.state, "rgb2" );
-				lua_newtable( JPLua.state ); top2 = lua_gettop( JPLua.state );
-				lua_pushstring( JPLua.state, "r" );				lua_pushnumber( JPLua.state, ci->rgb2.r );			lua_settable( JPLua.state, top2 );
-				lua_pushstring( JPLua.state, "g" );				lua_pushnumber( JPLua.state, ci->rgb2.g );			lua_settable( JPLua.state, top2 );
-				lua_pushstring( JPLua.state, "b" );				lua_pushnumber( JPLua.state, ci->rgb2.b );			lua_settable( JPLua.state, top2 );
-				lua_settable( JPLua.state, top1 );
-
+				lua_pushstring( JPLua.state, "rgb1" );			JPLua_Vector_CreateRef( JPLua.state, ci->rgb1.r, ci->rgb1.g, ci->rgb1.b );	lua_settable( JPLua.state, top1 );
+				lua_pushstring( JPLua.state, "rgb2" );			JPLua_Vector_CreateRef( JPLua.state, ci->rgb2.r, ci->rgb2.g, ci->rgb2.b );	lua_settable( JPLua.state, top1 );
 				lua_pushstring( JPLua.state, "icolor1" );		lua_pushnumber( JPLua.state, ci->icolor1 );			lua_settable( JPLua.state, top1 );
 				lua_pushstring( JPLua.state, "icolor2" );		lua_pushnumber( JPLua.state, ci->icolor2 );			lua_settable( JPLua.state, top1 );
 				lua_pushstring( JPLua.state, "score" );			lua_pushnumber( JPLua.state, ci->score );			lua_settable( JPLua.state, top1 );

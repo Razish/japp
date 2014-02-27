@@ -211,7 +211,7 @@ static int JPLua_Player_GetArmor( lua_State *L ) {
 //Func: Player:GetClientInfo()
 //Retn: key/value table of the player's Clientinfo
 static int JPLua_Player_GetClientInfo( lua_State *L ) {
-	int top=0, top2=0, i=0;
+	int top=0, i=0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	clientInfo_t *ci = &cgs.clientinfo[player->clientNum];
 	entityState_t *es = &cg_entities[player->clientNum].currentState;
@@ -256,26 +256,9 @@ static int JPLua_Player_GetClientInfo( lua_State *L ) {
 		lua_pushstring( L, "deaths" ); lua_pushnil( L ); lua_settable( L, top );
 	}
 
-	lua_pushstring( L, "rgb1" );
-		lua_newtable( L ); top2 = lua_gettop( L );
-		lua_pushstring( L, "r" ); lua_pushnumber( L, ci->rgb1.r ); lua_settable( L, top2 );
-		lua_pushstring( L, "g" ); lua_pushnumber( L, ci->rgb1.g ); lua_settable( L, top2 );
-		lua_pushstring( L, "b" ); lua_pushnumber( L, ci->rgb1.b ); lua_settable( L, top2 );
-	lua_settable( L, top );
-
-	lua_pushstring( L, "rgb2" );
-		lua_newtable( L ); top2 = lua_gettop( L );
-		lua_pushstring( L, "r" ); lua_pushnumber( L, ci->rgb2.r ); lua_settable( L, top2 );
-		lua_pushstring( L, "g" ); lua_pushnumber( L, ci->rgb2.g ); lua_settable( L, top2 );
-		lua_pushstring( L, "b" ); lua_pushnumber( L, ci->rgb2.b ); lua_settable( L, top2 );
-	lua_settable( L, top );
-
-	lua_pushstring( L, "skinRGB" );
-		lua_newtable( L ); top2 = lua_gettop( L );
-		lua_pushstring( L, "r" ); lua_pushnumber( L, es->customRGBA[0] ); lua_settable( L, top2 );
-		lua_pushstring( L, "g" ); lua_pushnumber( L, es->customRGBA[1] ); lua_settable( L, top2 );
-		lua_pushstring( L, "b" ); lua_pushnumber( L, es->customRGBA[2] ); lua_settable( L, top2 );
-	lua_settable( L, top );
+	lua_pushstring( L, "rgb1" ); JPLua_Vector_CreateRef( L, ci->rgb1.r, ci->rgb1.g, ci->rgb1.b ); lua_settable( L, top );
+	lua_pushstring( L, "rgb2" ); JPLua_Vector_CreateRef( L, ci->rgb2.r, ci->rgb2.g, ci->rgb2.b ); lua_settable( L, top );
+	lua_pushstring( L, "skinRGB" ); JPLua_Vector_CreateRef( L, es->customRGBA[0], es->customRGBA[1], es->customRGBA[2] ); lua_settable( L, top );
 
 	return 1;
 }
@@ -947,19 +930,9 @@ static int JPLua_Player_TakeWeapon( lua_State *L ) {
 static int JPLua_Player_Teleport( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	gentity_t *ent = &g_entities[player->clientNum];
-	vector3 pos, angles;
+	vector3 *pos = JPLua_CheckVector( L, 2 ), *angles = JPLua_CheckVector( L, 3 );
 
-	// get position
-	lua_getfield( L, 2, "x" );	pos.x = lua_tonumber( L, -1 );
-	lua_getfield( L, 2, "y" );	pos.y = lua_tonumber( L, -1 );
-	lua_getfield( L, 2, "z" );	pos.z = lua_tonumber( L, -1 );
-
-	// get angles
-	lua_getfield( L, 3, "pitch" );	angles.pitch = lua_tonumber( L, -1 );
-	lua_getfield( L, 3, "yaw" );	angles.yaw = lua_tonumber( L, -1 );
-	lua_getfield( L, 3, "roll" );	angles.roll = lua_tonumber( L, -1 );
-
-	TeleportPlayer( ent, &pos, &angles );
+	TeleportPlayer( ent, pos, angles );
 
 	return 0;
 }
