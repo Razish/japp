@@ -188,18 +188,7 @@ static int JPLua_Export_Print( lua_State *L ) {
 	return 0;
 }
 
-static const char
-	*vectorComponents[] = { "x", "y", "z", "w" },
-	*colourComponents[] = { "r", "g", "b", "a" };
-void JPLua_ReadVector( float *out, int numComponents, lua_State *L, int idx ) {
-	int i=0;
-
-	for ( i=0; i<numComponents ; i++ ) {
-		lua_getfield( L, idx, vectorComponents[i] );
-		out[i] = lua_tonumber( L, -1 );
-	}
-}
-
+static const char *colourComponents[] = { "r", "g", "b", "a" };
 void JPLua_ReadColour( float *out, int numComponents, lua_State *L, int idx ) {
 	int i=0;
 
@@ -797,10 +786,9 @@ int JPLua_Export_TestLine( lua_State *L ) {
 
 #ifdef _CGAME
 static int JPLua_Export_WorldCoordToScreenCoord( lua_State *L ) {
-	vector3 v;
+	vector3 *v = JPLua_CheckVector( L, 1 );
 	float x, y;
-	JPLua_ReadVector( v.data, 3, L, 1 );
-	if ( CG_WorldCoordToScreenCoordFloat( &v, &x, &y ) ) {
+	if ( CG_WorldCoordToScreenCoordFloat( v, &x, &y ) ) {
 		lua_pushnumber( L, x );
 		lua_pushnumber( L, y );
 		return 2;

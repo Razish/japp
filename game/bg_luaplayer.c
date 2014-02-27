@@ -892,9 +892,10 @@ static int JPLua_Player_SetScore( lua_State *L ) {
 //Retn: N/A
 static int JPLua_Player_SetVelocity( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	vector3 *v = JPLua_CheckVector( L, 2 );
 	gentity_t *ent = &g_entities[player->clientNum];
 
-	JPLua_ReadVector( ent->client->ps.velocity.data, 3, L, 2 );
+	VectorCopy( v, &ent->client->ps.velocity );
 
 	return 0;
 }

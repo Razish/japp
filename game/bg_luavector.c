@@ -43,6 +43,10 @@ static int JPLua_Vector_Index( lua_State *L ) {
 		lua_pushnumber( L, v->y );
 	else if ( !strcmp( key, "z" ) || !strcmp( key, "b" ) || !strcmp( key, "roll" ) )
 		lua_pushnumber( L, v->z );
+	else if ( !strcmp( key, "length" ) )
+		lua_pushnumber( L, VectorLength( v ) );
+	else if ( !strcmp( key, "lengthSquared" ) )
+		lua_pushnumber( L, VectorLengthSquared( v ) );
 	else
 		lua_pushnil( L );
 
@@ -141,6 +145,105 @@ static int JPLua_Vector_ToString( lua_State *L ) {
 	return 1;
 }
 
+//Func: Vector3:Cross( Vector3 to )
+//Retn: Vector3
+static int JPLua_Vector_Cross( lua_State *L ) {
+	vector3 *from = JPLua_CheckVector( L, 1 ), *to = JPLua_CheckVector( L, 2 ), v;
+
+	CrossProduct( from, to, &v );
+	JPLua_Vector_CreateRef( L, v.x, v.y, v.z );
+
+	return 1;
+}
+
+//Func: Vector3:Distance( Vector3 to )
+//Retn: float
+static int JPLua_Vector_Distance( lua_State *L ) {
+	vector3 *from = JPLua_CheckVector( L, 1 ), *to = JPLua_CheckVector( L, 2 );
+
+	lua_pushnumber( L, Distance( from, to ) );
+
+	return 1;
+}
+
+//Func: Vector3:DistanceSquared( Vector3 to )
+//Retn: float
+static int JPLua_Vector_DistanceSquared( lua_State *L ) {
+	vector3 *from = JPLua_CheckVector( L, 1 ), *to = JPLua_CheckVector( L, 2 );
+
+	lua_pushnumber( L, DistanceSquared( from, to ) );
+
+	return 1;
+}
+
+//Func: Vector3:Dot( Vector3 to )
+//Retn: Vector3
+static int JPLua_Vector_Dot( lua_State *L ) {
+	vector3 *from = JPLua_CheckVector( L, 1 ), *to = JPLua_CheckVector( L, 2 );
+
+	lua_pushnumber( L, DotProduct( from, to ) );
+
+	return 1;
+}
+
+//Func: Vector3:Lerp( float frac, Vector3 to )
+//Retn: Vector3
+static int JPLua_Vector_Lerp( lua_State *L ) {
+	vector3 *from = JPLua_CheckVector( L, 1 ), *to = JPLua_CheckVector( L, 3 ), v;
+	float f = luaL_checknumber( L, 2 );
+
+	VectorLerp( from, f, to, &v );
+
+	JPLua_Vector_CreateRef( L, v.x, v.y, v.z );
+
+	return 1;
+}
+
+//Func: Vector3:MA( float scale, Vector3 to )
+//Retn: Vector3
+static int JPLua_Vector_MA( lua_State *L ) {
+	vector3 *from = JPLua_CheckVector( L, 1 ), *to = JPLua_CheckVector( L, 3 ), v;
+	float f = luaL_checknumber( L, 2 );
+
+	VectorMA( from, f, to, &v );
+
+	JPLua_Vector_CreateRef( L, v.x, v.y, v.z );
+
+	return 1;
+}
+
+//Func: Vector3:Normalise()
+//Retn: float length
+static int JPLua_Vector_Normalise( lua_State *L ) {
+	vector3 *v = JPLua_CheckVector( L, 1 );
+
+	lua_pushnumber( L, VectorNormalize( v ) );
+
+	return 1;
+}
+
+//Func: Vector3:NormaliseFast()
+//Retn: N/A
+static int JPLua_Vector_NormaliseFast( lua_State *L ) {
+	vector3 *v = JPLua_CheckVector( L, 1 );
+
+	VectorNormalizeFast( v );
+
+	return 1;
+}
+
+//Func: Vector3:NormaliseCopy()
+//Retn: Vector3
+static int JPLua_Vector_NormaliseCopy( lua_State *L ) {
+	vector3 *v1 = JPLua_CheckVector( L, 1 ), v2;
+	float length = VectorNormalize2( v1, &v2 );
+
+	JPLua_Vector_CreateRef( L, v2.x, v2.y, v2.z );
+	lua_pushnumber( L, length );
+
+	return 2;
+}
+
 // Push a Vector instance onto the stack
 void JPLua_Vector_CreateRef( lua_State *L, float x, float y, float z ) {
 	vector3 *v = NULL;
@@ -163,15 +266,24 @@ vector3 *JPLua_CheckVector( lua_State *L, int idx ) {
 }
 
 static const struct luaL_Reg jplua_vector_meta[] = {
-	{ "__index",	JPLua_Vector_Index },
-	{ "__newindex",	JPLua_Vector_NewIndex },
-	{ "__add",		JPLua_Vector_Add },
-	{ "__eq",		JPLua_Vector_Equals },
-	{ "__div",		JPLua_Vector_Divide },
-	{ "__mul",		JPLua_Vector_Multiply },
-	{ "__sub",		JPLua_Vector_Subtract },
-	{ "__tostring",	JPLua_Vector_ToString },
-	{ NULL,			NULL }
+	{ "__index",			JPLua_Vector_Index },
+	{ "__newindex",			JPLua_Vector_NewIndex },
+	{ "__add",				JPLua_Vector_Add },
+	{ "__eq",				JPLua_Vector_Equals },
+	{ "__div",				JPLua_Vector_Divide },
+	{ "__mul",				JPLua_Vector_Multiply },
+	{ "__sub",				JPLua_Vector_Subtract },
+	{ "__tostring",			JPLua_Vector_ToString },
+	{ "Cross",				JPLua_Vector_Cross },
+	{ "Distance",			JPLua_Vector_Distance },
+	{ "DistanceSquared",	JPLua_Vector_DistanceSquared },
+	{ "Dot",				JPLua_Vector_Dot },
+	{ "Lerp",				JPLua_Vector_Lerp },
+	{ "MA",					JPLua_Vector_MA },
+	{ "Normalise",			JPLua_Vector_Normalise },
+	{ "NormaliseFast",		JPLua_Vector_NormaliseFast },
+	{ "NormaliseCopy",		JPLua_Vector_NormaliseCopy },
+	{ NULL,					NULL }
 };
 
 // Register the Vector class for Lua
