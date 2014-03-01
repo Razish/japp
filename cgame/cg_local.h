@@ -1475,7 +1475,7 @@ void CG_ShaderStateChanged(void);
 //
 // cg_playerstate.c
 //
-int CG_IsMindTricked(int trickIndex1, int trickIndex2, int trickIndex3, int trickIndex4, int client);
+qboolean CG_IsMindTricked(int trickIndex1, int trickIndex2, int trickIndex3, int trickIndex4, int client);
 void CG_Respawn( void );
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 void CG_CheckChangedPredictableEvents( playerState_t *ps );
@@ -1630,6 +1630,7 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end );
 #define NEWFX_REPEATER_ALT	(0x0004u)
 #define NEWFX_SIMPLEFLAG	(0x0008u)
 #define NEWFX_TRANSFLAG		(0x0010u)
+#define NEWFX_SFXSABERS		(0X0020u)
 
 #define DRAWTIMER_ENABLE	(0x0001u)
 #define DRAWTIMER_COUNTDOWN	(0x0002u)

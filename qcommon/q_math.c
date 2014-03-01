@@ -1304,7 +1304,7 @@ number VectorLength( const vector3 *vec ) {
 
 	return res;
 #else
-	return (number)sqrt( vec->x*vec->x + vec->y*vec->y + vec->z*vec->z );
+	return sqrtf( vec->x*vec->x + vec->y*vec->y + vec->z*vec->z );
 #endif
 }
 
@@ -1585,35 +1585,30 @@ void MatrixMultiply( const vector3 in1[3], const vector3 in2[3], vector3 out[3] 
 }
 
 
-void AngleVectors( const vector3 *angles, vector3 *forward, vector3 *right, vector3 *up) {
-	float		angle;
-	static float		sr, sp, sy, cr, cp, cy;
-	// static to help MS compiler fp bugs
+void AngleVectors( const vector3 *angles, vector3 *forward, vector3 *right, vector3 *up ) {
+	float angle, sr, sp, sy, cr, cp, cy;
 
 	angle = angles->yaw * (M_PI*2 / 360);
-	sy = sin(angle);
-	cy = cos(angle);
+	sy = sinf( angle );
+	cy = cosf( angle );
 	angle = angles->pitch * (M_PI*2 / 360);
-	sp = sin(angle);
-	cp = cos(angle);
+	sp = sinf( angle );
+	cp = cosf( angle );
 	angle = angles->roll * (M_PI*2 / 360);
-	sr = sin(angle);
-	cr = cos(angle);
+	sr = sinf( angle );
+	cr = cosf( angle );
 
-	if (forward)
-	{
+	if ( forward ) {
 		forward->x = cp*cy;
 		forward->y = cp*sy;
 		forward->z = -sp;
 	}
-	if (right)
-	{
+	if ( right ) {
 		right->x = (-1*sr*sp*cy+-1*cr*-sy);
 		right->y = (-1*sr*sp*sy+-1*cr*cy);
 		right->z = -1*sr*cp;
 	}
-	if (up)
-	{
+	if ( up ) {
 		up->x = (cr*sp*cy+-sr*-sy);
 		up->y = (cr*sp*sy+-sr*cy);
 		up->z = cr*cp;

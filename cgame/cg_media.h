@@ -39,7 +39,8 @@ typedef struct cgMedia_s {
 		} environment;
 
 		struct {
-			sfxHandle_t drain;
+			sfxHandle_t drain, drain2;
+			sfxHandle_t lightning;
 			sfxHandle_t noforce;
 			sfxHandle_t teamHeal;
 			sfxHandle_t teamRegen;
@@ -52,6 +53,17 @@ typedef struct cgMedia_s {
 			sfxHandle_t select;
 			sfxHandle_t talk;
 		} interface;
+
+		struct {
+			sfxHandle_t jetpackHover;
+			sfxHandle_t jetpackLoop;
+		} items;
+
+		struct {
+			sfxHandle_t hit[3];
+			sfxHandle_t hitWall[3];
+			sfxHandle_t turnOn, turnOff;
+		} saber;
 
 		struct {
 			sfxHandle_t blueFlagReturned;
@@ -85,6 +97,7 @@ typedef struct cgMedia_s {
 			sfxHandle_t grenadeBounce1;
 			sfxHandle_t grenadeBounce2;
 			sfxHandle_t	noAmmo;
+			sfxHandle_t stunBatonIdle;
 			sfxHandle_t zoomEnd;
 			sfxHandle_t zoomLoop;
 			sfxHandle_t zoomStart;
@@ -207,10 +220,12 @@ typedef struct cgMedia_s {
 			qhandle_t cloaked;
 			qhandle_t demp2Shell;
 			qhandle_t disruptor;
+			qhandle_t electric;
 			qhandle_t electricBody;
 			qhandle_t electricBody2;
 			qhandle_t endarkenment;
 			qhandle_t enlightenment;
+			qhandle_t forcePush;
 			qhandle_t forceShell;
 			qhandle_t forceSightBubble;
 			qhandle_t glassShard;
@@ -223,11 +238,13 @@ typedef struct cgMedia_s {
 			qhandle_t playerShieldDamage;
 			qhandle_t protect;
 			qhandle_t refraction;
+			qhandle_t refraction2;
 			qhandle_t rivetMark;
 			qhandle_t saberDamageGlow;
 			qhandle_t shadowMark;
 			qhandle_t sightShell;
 			qhandle_t solidWhite;
+			qhandle_t strafeTrail;
 			qhandle_t surfaceExplosion;
 			qhandle_t wakeMark;
 			qhandle_t whiteShader;
@@ -390,6 +407,7 @@ typedef struct cgMedia_s {
 		qhandle_t halfShield;
 		qhandle_t itemHolo;
 		qhandle_t redFlag;
+		qhandle_t seeker;
 	} models;
 } cgMedia_t;
 extern cgMedia_t media;

@@ -36,8 +36,7 @@ void FX_BryarAltProjectileThink(  centity_t *cent, const struct weaponInfo_s *we
 }
 
 void FX_BryarAltHitWall( vector3 *origin, vector3 *normal, int power ) {
-	switch( power )
-	{
+	switch ( power ) {
 	case 4:
 	case 5:
 		trap->FX_PlayEffectID( media.efx.pistol.wallImpact3, origin, normal, -1, -1, qfalse );
