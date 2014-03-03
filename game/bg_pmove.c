@@ -2343,20 +2343,26 @@ static qboolean PM_CheckJump( void )
 							if ( pm->ps->legsTimer < 1 )
 							{//not in the middle of a legsAnim
 								int anim = (pm->ps->legsAnim);
-								int newAnim = -1;
-								switch ( anim )
-								{
+								int newAnim;
+								switch ( anim ) {
 								case BOTH_FORCEJUMP1:
 									newAnim = BOTH_FORCELAND1;//BOTH_FORCEINAIR1;
 									break;
+
 								case BOTH_FORCEJUMPBACK1:
 									newAnim = BOTH_FORCELANDBACK1;//BOTH_FORCEINAIRBACK1;
 									break;
+
 								case BOTH_FORCEJUMPLEFT1:
 									newAnim = BOTH_FORCELANDLEFT1;//BOTH_FORCEINAIRLEFT1;
 									break;
+
 								case BOTH_FORCEJUMPRIGHT1:
 									newAnim = BOTH_FORCELANDRIGHT1;//BOTH_FORCEINAIRRIGHT1;
+									break;
+
+								default:
+									newAnim = -1;
 									break;
 								}
 								if ( newAnim != -1 )
@@ -2562,17 +2568,14 @@ static qboolean PM_CheckJump( void )
 				AngleVectors( &fwdAngles, &fwd, &right, NULL );
 
 				//trace-check for a wall, if necc.
-				switch ( anim )
-				{
+				switch ( anim ) {
 				case BOTH_WALL_FLIP_LEFT:
-					//NOTE: purposely falls through to next case!
 				case BOTH_WALL_RUN_LEFT:
 					doTrace = qtrue;
 					VectorMA( &pm->ps->origin, -16, &right, &traceto );
 					break;
 
 				case BOTH_WALL_FLIP_RIGHT:
-					//NOTE: purposely falls through to next case!
 				case BOTH_WALL_RUN_RIGHT:
 					doTrace = qtrue;
 					VectorMA( &pm->ps->origin, 16, &right, &traceto );
@@ -2581,6 +2584,8 @@ static qboolean PM_CheckJump( void )
 				case BOTH_WALL_FLIP_BACK1:
 					doTrace = qtrue;
 					VectorMA( &pm->ps->origin, 16, &fwd, &traceto );
+					break;
+				default:
 					break;
 				}
 
@@ -3996,25 +4001,32 @@ static void PM_CrashLandEffect( void )
 	if ( delta >= 30 )
 	{
 		vector3 bottom;
-		int	effectID = -1;
+		int	effectID;
 		int material = (pml.groundTrace.surfaceFlags&MATERIAL_MASK);
 		VectorSet( &bottom, pm->ps->origin.x,pm->ps->origin.y,pm->ps->origin.z+pm->mins.z+1 );
-		switch ( material )
-		{
+		switch ( material ) {
 		case MATERIAL_MUD:
 			effectID = EFFECT_LANDING_MUD;
 			break;
+
 		case MATERIAL_SAND:
 			effectID = EFFECT_LANDING_SAND;
 			break;
+
 		case MATERIAL_DIRT:
 			effectID = EFFECT_LANDING_DIRT;
 			break;
+
 		case MATERIAL_SNOW:
 			effectID = EFFECT_LANDING_SNOW;
 			break;
+
 		case MATERIAL_GRAVEL:
 			effectID = EFFECT_LANDING_GRAVEL;
+			break;
+
+		default:
+			effectID = -1;
 			break;
 		}
 
@@ -4072,9 +4084,8 @@ static void PM_CrashLand( void ) {
 		pm->ps->legsAnim == BOTH_A7_KICK_R_AIR ||
 		pm->ps->legsAnim == BOTH_A7_KICK_L_AIR)
 	{
-		int landAnim = -1;
-		switch ( pm->ps->legsAnim )
-		{
+		int landAnim;
+		switch ( pm->ps->legsAnim ) {
 		case BOTH_A7_KICK_F_AIR:
 			landAnim = BOTH_FORCELAND1;
 			break;
@@ -4086,6 +4097,9 @@ static void PM_CrashLand( void ) {
 			break;
 		case BOTH_A7_KICK_L_AIR:
 			landAnim = BOTH_FORCELANDLEFT1;
+			break;
+		default:
+			landAnim = -1;
 			break;
 		}
 		if ( landAnim != -1 )
@@ -4913,10 +4927,8 @@ void PM_Use( void )
 	pm->ps->useTime = USE_DELAY;
 }
 
-qboolean PM_WalkingAnim( int anim )
-{
-	switch ( anim )
-	{
+qboolean PM_WalkingAnim( int anim ) {
+	switch ( anim ) {
 	case BOTH_WALK1:				//# Normal walk
 	case BOTH_WALK2:				//# Normal walk with saber
 	case BOTH_WALK_STAFF:			//# Normal walk with staff
@@ -4929,15 +4941,13 @@ qboolean PM_WalkingAnim( int anim )
 	case BOTH_WALKBACK_STAFF:		//# Walk backwards with staff
 	case BOTH_WALKBACK_DUAL:		//# Walk backwards with dual
 		return qtrue;
-		break;
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
-qboolean PM_RunningAnim( int anim )
-{
-	switch ( (anim) )
-	{
+qboolean PM_RunningAnim( int anim ) {
+	switch ( anim ) {
 	case BOTH_RUN1:
 	case BOTH_RUN2:
 	case BOTH_RUN_STAFF:
@@ -4951,36 +4961,32 @@ qboolean PM_RunningAnim( int anim )
 	case BOTH_RUNSTRAFE_LEFT1:	//# Sidestep left: should loop
 	case BOTH_RUNSTRAFE_RIGHT1:	//# Sidestep right: should loop
 		return qtrue;
-		break;
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
-qboolean PM_SwimmingAnim( int anim )
-{
-	switch ( anim )
-	{
+qboolean PM_SwimmingAnim( int anim ) {
+	switch ( anim ) {
 	case BOTH_SWIM_IDLE1:		//# Swimming Idle 1
 	case BOTH_SWIMFORWARD:		//# Swim forward loop
 	case BOTH_SWIMBACKWARD:		//# Swim backward loop
 		return qtrue;
-		break;
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
-qboolean PM_RollingAnim( int anim )
-{
-	switch ( anim )
-	{
+qboolean PM_RollingAnim( int anim ) {
+	switch ( anim ) {
 	case BOTH_ROLL_F:			//# Roll forward
 	case BOTH_ROLL_B:			//# Roll backward
 	case BOTH_ROLL_L:			//# Roll left
 	case BOTH_ROLL_R:			//# Roll right
 		return qtrue;
-		break;
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
 void PM_AnglesForSlope( const float yaw, const vector3 *slope, vector3 *angles )
@@ -5072,10 +5078,8 @@ void PM_FootSlopeTrace( float *pDiff, float *pInterval )
 	}
 }
 
-qboolean BG_InSlopeAnim( int anim )
-{
-	switch ( anim )
-	{
+qboolean BG_InSlopeAnim( int anim ) {
+	switch ( anim ) {
 	case LEGS_LEFTUP1:			//# On a slope with left foot 4 higher than right
 	case LEGS_LEFTUP2:			//# On a slope with left foot 8 higher than right
 	case LEGS_LEFTUP3:			//# On a slope with left foot 12 higher than right
@@ -5127,9 +5131,9 @@ qboolean BG_InSlopeAnim( int anim )
 	case LEGS_S5_RUP4:
 	case LEGS_S5_RUP5:
 		return qtrue;
-		break;
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
 #define	SLOPE_RECALC_INT 100
@@ -5437,13 +5441,10 @@ qboolean PM_AdjustStandAnimForSlope( void )
 extern int WeaponReadyLegsAnim[WP_NUM_WEAPONS];
 
 //rww - slowly back out of slope leg anims, to prevent skipping between slope anims and general jittering
-int PM_LegsSlopeBackTransition(int desiredAnim)
-{
+int PM_LegsSlopeBackTransition( int desiredAnim ) {
 	int anim = pm->ps->legsAnim;
-	int resultingAnim = desiredAnim;
 
-	switch ( anim )
-	{
+	switch ( anim ) {
 	case LEGS_LEFTUP2:			//# On a slope with left foot 8 higher than right
 	case LEGS_LEFTUP3:			//# On a slope with left foot 12 higher than right
 	case LEGS_LEFTUP4:			//# On a slope with left foot 16 higher than right
@@ -5484,20 +5485,17 @@ int PM_LegsSlopeBackTransition(int desiredAnim)
 	case LEGS_S5_RUP3:
 	case LEGS_S5_RUP4:
 	case LEGS_S5_RUP5:
-		if (pm->ps->slopeRecalcTime < pm->cmd.serverTime)
-		{
-			resultingAnim = anim-1;
+		VectorClear( &pm->ps->velocity );
+		if ( pm->ps->slopeRecalcTime < pm->cmd.serverTime ) {
 			pm->ps->slopeRecalcTime = pm->cmd.serverTime + 8;//SLOPE_RECALC_INT;
+			return anim-1;
 		}
 		else
-		{
-			resultingAnim = anim;
-		}
-		VectorClear(&pm->ps->velocity);
-		break;
-	}
+			return anim;
 
-	return resultingAnim;
+	default:
+		return desiredAnim;
+	}
 }
 
 static int JP_GetJPFixRoll( void ) {
@@ -6358,131 +6356,92 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 	else
 	{
 		// If you want your weapon to be a charging weapon, just set this bit up
-		switch( pm->ps->weapon )
-		{
-		//------------------
+		switch ( pm->ps->weapon ) {
 		case WP_BRYAR_PISTOL:
-
-			// alt-fire charges the weapon
-			//if ( pm->gametype == GT_SIEGE )
-			if (1)
-			{
-				if ( pm->cmd.buttons & BUTTON_ALT_ATTACK )
-				{
-					charging = qtrue;
-					altFire = qtrue;
-				}
+			if ( pm->cmd.buttons & BUTTON_ALT_ATTACK ) {
+				charging = qtrue;
+				altFire = qtrue;
 			}
 			break;
 
 		case WP_CONCUSSION:
 			if ( pm->cmd.buttons & BUTTON_ALT_ATTACK )
-			{
 				altFire = qtrue;
-			}
 			break;
 
 		case WP_BRYAR_OLD:
-
-			// alt-fire charges the weapon
-			if ( pm->cmd.buttons & BUTTON_ALT_ATTACK )
-			{
+			if ( pm->cmd.buttons & BUTTON_ALT_ATTACK ) {
 				charging = qtrue;
 				altFire = qtrue;
 			}
 			break;
 
-		//------------------
 		case WP_BOWCASTER:
-
-			// primary fire charges the weapon
 			if ( pm->cmd.buttons & BUTTON_ATTACK )
-			{
 				charging = qtrue;
-			}
 			break;
 
-		//------------------
 		case WP_ROCKET_LAUNCHER:
 			if ( (pm->cmd.buttons & BUTTON_ALT_ATTACK)
-				&& pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] >= weaponData[pm->ps->weapon].altEnergyPerShot )
-			{
-				PM_RocketLock(2048,qfalse);
+				&& pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] >= weaponData[pm->ps->weapon].altEnergyPerShot ) {
+				PM_RocketLock( 2048, qfalse );
 				charging = qtrue;
 				altFire = qtrue;
 			}
 			break;
 
-		//------------------
 		case WP_THERMAL:
-
-			if ( pm->cmd.buttons & BUTTON_ALT_ATTACK )
-			{
+			if ( pm->cmd.buttons & BUTTON_ALT_ATTACK ) {
 				altFire = qtrue; // override default of not being an alt-fire
 				charging = qtrue;
 			}
 			else if ( pm->cmd.buttons & BUTTON_ATTACK )
-			{
 				charging = qtrue;
-			}
 			break;
 
 		case WP_DEMP2:
-			if ( pm->cmd.buttons & BUTTON_ALT_ATTACK )
-			{
+			if ( pm->cmd.buttons & BUTTON_ALT_ATTACK ) {
 				altFire = qtrue; // override default of not being an alt-fire
 				charging = qtrue;
 			}
 			break;
 
 		case WP_DISRUPTOR:
-			if ((pm->cmd.buttons & BUTTON_ATTACK) &&
-				pm->ps->zoomMode == 1 &&
-				pm->ps->zoomLocked)
-			{
-				if (!pm->cmd.forwardmove &&
-					!pm->cmd.rightmove &&
-					pm->cmd.upmove <= 0)
-				{
+			if ( (pm->cmd.buttons & BUTTON_ATTACK) && pm->ps->zoomMode == 1 && pm->ps->zoomLocked ) {
+				if ( !pm->cmd.forwardmove && !pm->cmd.rightmove && pm->cmd.upmove <= 0 ) {
 					charging = qtrue;
 					altFire = qtrue;
 				}
-				else
-				{
+				else {
 					charging = qfalse;
 					altFire = qfalse;
 				}
 			}
 
-			if (pm->ps->zoomMode != 1 &&
-				pm->ps->weaponstate == WEAPON_CHARGING_ALT)
-			{
+			if ( pm->ps->zoomMode != 1 && pm->ps->weaponstate == WEAPON_CHARGING_ALT ) {
 				pm->ps->weaponstate = WEAPON_READY;
 				charging = qfalse;
 				altFire = qfalse;
 			}
+			break;
+
+		default:
+			break;
 
 		} // end switch
 	}
 
 	// set up the appropriate weapon state based on the button that's down.
 	//	Note that we ALWAYS return if charging is set ( meaning the buttons are still down )
-	if ( charging )
-	{
-		if ( altFire )
-		{
-			if ( pm->ps->weaponstate != WEAPON_CHARGING_ALT )
-			{
+	if ( charging ) {
+		if ( altFire ) {
+			if ( pm->ps->weaponstate != WEAPON_CHARGING_ALT ) {
 				// charge isn't started, so do it now
 				pm->ps->weaponstate = WEAPON_CHARGING_ALT;
 				pm->ps->weaponChargeTime = pm->cmd.serverTime;
 				pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].altChargeSubTime;
-
-#ifdef _DEBUG
-			//	Com_Printf("Starting charge\n");
-#endif
-				assert(pm->ps->weapon > WP_NONE);
-				BG_AddPredictableEventToPlayerstate(EV_WEAPON_CHARGE_ALT, pm->ps->weapon, pm->ps);
+				assert( pm->ps->weapon > WP_NONE );
+				BG_AddPredictableEventToPlayerstate( EV_WEAPON_CHARGE_ALT, pm->ps->weapon, pm->ps );
 			}
 
 			if ( vehicleRocketLock )
@@ -8428,23 +8387,24 @@ void PM_AdjustAttackStates( pmove_t *pmove )
 	}
 }
 
-void BG_CmdForRoll( playerState_t *ps, int anim, usercmd_t *pCmd )
-{
-	switch ( (anim) )
-	{
+void BG_CmdForRoll( playerState_t *ps, int anim, usercmd_t *pCmd ) {
+	switch ( anim ) {
 	case BOTH_ROLL_F:
 		if ( !(JP_GetJPFixRoll() == 3 && (pCmd->forwardmove < 0)) )
 			pCmd->forwardmove = 127;
 		pCmd->rightmove = 0;
 		break;
+
 	case BOTH_ROLL_B:
 		pCmd->forwardmove = -127;
 		pCmd->rightmove = 0;
 		break;
+
 	case BOTH_ROLL_R:
 		pCmd->forwardmove = 0;
 		pCmd->rightmove = 127;
 		break;
+
 	case BOTH_ROLL_L:
 		pCmd->forwardmove = 0;
 		pCmd->rightmove = -127;
@@ -8457,12 +8417,10 @@ void BG_CmdForRoll( playerState_t *ps, int anim, usercmd_t *pCmd )
 		break;
 
 	case BOTH_GETUP_FROLL_R:
+		// end of anim
 		if ( ps->legsTimer <= 250 )
-		{//end of anim
 			pCmd->forwardmove = pCmd->rightmove = 0;
-		}
-		else
-		{
+		else {
 			pCmd->forwardmove = 0;
 			pCmd->rightmove = 48;
 			//NOTE: speed is 400
@@ -8476,12 +8434,10 @@ void BG_CmdForRoll( playerState_t *ps, int anim, usercmd_t *pCmd )
 		break;
 
 	case BOTH_GETUP_FROLL_L:
+		// end of anim
 		if ( ps->legsTimer <= 250 )
-		{//end of anim
 			pCmd->forwardmove = pCmd->rightmove = 0;
-		}
-		else
-		{
+		else {
 			pCmd->forwardmove = 0;
 			pCmd->rightmove = -48;
 			//NOTE: speed is 400
@@ -8489,16 +8445,13 @@ void BG_CmdForRoll( playerState_t *ps, int anim, usercmd_t *pCmd )
 		break;
 
 	case BOTH_GETUP_BROLL_B:
+		// end of anim
 		if ( ps->torsoTimer <= 250 )
-		{//end of anim
 			pCmd->forwardmove = pCmd->rightmove = 0;
-		}
-		else if ( PM_AnimLength( 0, (animNumber_t)ps->legsAnim ) - ps->torsoTimer < 350 )
-		{//beginning of anim
+		// beginning of anim
+		else if ( PM_AnimLength( 0, (animNumber_t)ps->legsAnim )-ps->torsoTimer < 350 )
 			pCmd->forwardmove = pCmd->rightmove = 0;
-		}
-		else
-		{
+		else {
 			//FIXME: ramp down over length of anim
 			pCmd->forwardmove = -64;
 			pCmd->rightmove = 0;
@@ -8507,16 +8460,13 @@ void BG_CmdForRoll( playerState_t *ps, int anim, usercmd_t *pCmd )
 		break;
 
 	case BOTH_GETUP_FROLL_B:
+		// end of anim
 		if ( ps->torsoTimer <= 100 )
-		{//end of anim
 			pCmd->forwardmove = pCmd->rightmove = 0;
-		}
+		// beginning of anim
 		else if ( PM_AnimLength( 0, (animNumber_t)ps->legsAnim ) - ps->torsoTimer < 200 )
-		{//beginning of anim
 			pCmd->forwardmove = pCmd->rightmove = 0;
-		}
-		else
-		{
+		else {
 			//FIXME: ramp down over length of anim
 			pCmd->forwardmove = -64;
 			pCmd->rightmove = 0;
@@ -8525,16 +8475,13 @@ void BG_CmdForRoll( playerState_t *ps, int anim, usercmd_t *pCmd )
 		break;
 
 	case BOTH_GETUP_BROLL_F:
+		// end of anim
 		if ( ps->torsoTimer <= 550 )
-		{//end of anim
 			pCmd->forwardmove = pCmd->rightmove = 0;
-		}
+		// beginning of anim
 		else if ( PM_AnimLength( 0, (animNumber_t)ps->legsAnim ) - ps->torsoTimer < 150 )
-		{//beginning of anim
 			pCmd->forwardmove = pCmd->rightmove = 0;
-		}
-		else
-		{
+		else {
 			pCmd->forwardmove = 64;
 			pCmd->rightmove = 0;
 			//NOTE: speed is 400
@@ -8542,17 +8489,18 @@ void BG_CmdForRoll( playerState_t *ps, int anim, usercmd_t *pCmd )
 		break;
 
 	case BOTH_GETUP_FROLL_F:
+		// end of anim
 		if ( ps->torsoTimer <= 100 )
-		{//end of anim
 			pCmd->forwardmove = pCmd->rightmove = 0;
-		}
-		else
-		{
+		else {
 			//FIXME: ramp down over length of anim
 			pCmd->forwardmove = 64;
 			pCmd->rightmove = 0;
 			//NOTE: speed is 400
 		}
+		break;
+
+	default:
 		break;
 	}
 	pCmd->upmove = 0;
@@ -8773,30 +8721,27 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 		ps->speed *= saber->moveSpeedScale;
 }
 
-qboolean BG_InRollAnim( entityState_t *cent )
-{
-	switch ( (cent->legsAnim) )
-	{
+qboolean BG_InRollAnim( entityState_t *cent ) {
+	switch ( cent->legsAnim ) {
 	case BOTH_ROLL_F:
 	case BOTH_ROLL_B:
 	case BOTH_ROLL_R:
 	case BOTH_ROLL_L:
 		return qtrue;
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
-qboolean BG_InKnockDown( int anim )
-{
-	switch ( (anim) )
-	{
+qboolean BG_InKnockDown( int anim ) {
+	switch ( anim ) {
 	case BOTH_KNOCKDOWN1:
 	case BOTH_KNOCKDOWN2:
 	case BOTH_KNOCKDOWN3:
 	case BOTH_KNOCKDOWN4:
 	case BOTH_KNOCKDOWN5:
 		return qtrue;
-		break;
+
 	case BOTH_GETUP1:
 	case BOTH_GETUP2:
 	case BOTH_GETUP3:
@@ -8818,23 +8763,22 @@ qboolean BG_InKnockDown( int anim )
 	case BOTH_GETUP_FROLL_L:
 	case BOTH_GETUP_FROLL_R:
 		return qtrue;
-		break;
+
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
-qboolean BG_InRollES( entityState_t *ps, int anim )
-{
-	switch ( (anim) )
-	{
+qboolean BG_InRollES( entityState_t *ps, int anim ) {
+	switch ( anim ) {
 	case BOTH_ROLL_F:
 	case BOTH_ROLL_B:
 	case BOTH_ROLL_R:
 	case BOTH_ROLL_L:
 		return qtrue;
-		break;
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
 void BG_IK_MoveArm(void *ghoul2, int lHandBolt, int time, entityState_t *ent, int basePose, vector3 *desiredPos, qboolean *ikInProgress,
@@ -9341,10 +9285,8 @@ static float BG_SwingAngles( float destination, float swingTolerance, float clam
 //#define BONE_BASED_LEG_ANGLES
 
 //I apologize for this function
-qboolean BG_InRoll2( entityState_t *es )
-{
-	switch ( (es->legsAnim) )
-	{
+qboolean BG_InRoll2( entityState_t *es ) {
+	switch ( es->legsAnim ) {
 	case BOTH_GETUP_BROLL_B:
 	case BOTH_GETUP_BROLL_F:
 	case BOTH_GETUP_BROLL_L:
@@ -9358,40 +9300,30 @@ qboolean BG_InRoll2( entityState_t *es )
 	case BOTH_ROLL_R:
 	case BOTH_ROLL_L:
 		return qtrue;
-		break;
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
 
 extern qboolean BG_SaberLockBreakAnim( int anim ); //bg_panimate.c
-void BG_G2PlayerAngles(void *ghoul2, int motionBolt, entityState_t *cent, int time, vector3 *cent_lerpOrigin,
-					   vector3 *cent_lerpAngles, vector3 legs[3], vector3 *legsAngles, qboolean *tYawing,
-					   qboolean *tPitching, qboolean *lYawing, float *tYawAngle, float *tPitchAngle,
-					   float *lYawAngle, int frametime, vector3 *turAngles, vector3 *modelScale, int ciLegs,
-					   int ciTorso, int *corrTime, vector3 *lookAngles, vector3 *lastHeadAngles, int lookTime,
-					   entityState_t *emplaced, int *crazySmoothFactor)
+void BG_G2PlayerAngles( void *ghoul2, int motionBolt, entityState_t *cent, int time, vector3 *cent_lerpOrigin,
+	vector3 *cent_lerpAngles, vector3 legs[3], vector3 *legsAngles, qboolean *tYawing, qboolean *tPitching,
+	qboolean *lYawing, float *tYawAngle, float *tPitchAngle, float *lYawAngle, int frametime, vector3 *turAngles,
+	vector3 *modelScale, int ciLegs, int ciTorso, int *corrTime, vector3 *lookAngles, vector3 *lastHeadAngles,
+	int lookTime, entityState_t *emplaced, int *crazySmoothFactor )
 {
-	int					adddir = 0;
-	static int			dir;
-	static int			i;
-//	static int			movementOffsets[8] = { 0, 22, 45, -22, 0, 22, -45, -22 };
-	float				degrees_negative = 0;
-	float				degrees_positive = 0;
-	static float		dif;
-	static float		dest;
-	static float		speed; //, speed_dif, speed_desired;
-	static const float	lookSpeed = 1.5f;
+	int adddir = 0;
+	float degrees_negative = 0, degrees_positive = 0;
+	static int dir, i;
+	static float dif, dest, speed;
+	static const float lookSpeed = 1.5f;
 #ifdef BONE_BASED_LEG_ANGLES
-	static float		legBoneYaw;
+	static float legBoneYaw;
 #endif
-	static vector3		eyeAngles;
-	static vector3		neckAngles;
-	static vector3		velocity;
-	static vector3		torsoAngles, headAngles;
-	static vector3		velPos, velAng;
-	static vector3		ulAngles, llAngles, viewAngles, angles, thoracicAngles = {0,0,0};
-	static vector3		headClampMinAngles = {-25,-55,-10}, headClampMaxAngles = {50,50,10};
+	static vector3 eyeAngles, neckAngles, velocity, torsoAngles, headAngles, velPos, velAng, ulAngles, llAngles,
+		viewAngles, angles, thoracicAngles = { 0, 0, 0 }, headClampMinAngles = { -25, -55, -10 },
+		headClampMaxAngles = { 50, 50, 10 };
 
 	if ( cent->m_iVehicleNum || cent->forceFrame || BG_SaberLockBreakAnim(cent->legsAnim) || BG_SaberLockBreakAnim(cent->torsoAnim) )
 	{ //a vehicle or riding a vehicle - in either case we don't need to be in here
@@ -9980,20 +9912,18 @@ void PM_VehicleViewAngles(playerState_t *ps, bgEntity_t *veh, usercmd_t *ucmd)
 }
 
 //see if a weapon is ok to use on a vehicle
-qboolean PM_WeaponOkOnVehicle( int weapon )
-{
+qboolean PM_WeaponOkOnVehicle( int weapon ) {
 	//FIXME: check g_vehicleInfo for our vehicle?
-	switch ( weapon )
-	{
-	//case WP_NONE:
+	switch ( weapon ) {
 	case WP_MELEE:
 	case WP_SABER:
 	case WP_BLASTER:
-	//case WP_THERMAL:
+//	case WP_THERMAL:
 		return qtrue;
 		break;
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
 //do we have a weapon that's ok for using on the vehicle?

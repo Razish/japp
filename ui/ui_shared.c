@@ -144,11 +144,7 @@ const char *types [] = {
 	NULL
 };
 
-
-extern int MenuFontToHandle(int iMenuFont);
-
-
-
+extern qhandle_t MenuFontToHandle( int iMenuFont );
 
 /*
 ===============
@@ -819,16 +815,11 @@ void Window_Paint(windowDef_t *w, float fadeAmount, float fadeClamp, float fadeC
 }
 
 
-void Item_SetScreenCoords(itemDef_t *item, float x, float y)
-{
-
-	if (item == NULL)
-	{
+void Item_SetScreenCoords( itemDef_t *item, float x, float y ) {
+	if ( !item )
 		return;
-	}
 
-	if (item->window.border != 0)
-	{
+	if ( item->window.border ) {
 		x += item->window.borderSize;
 		y += item->window.borderSize;
 	}
@@ -842,21 +833,19 @@ void Item_SetScreenCoords(itemDef_t *item, float x, float y)
 	item->textRect.w = 0;
 	item->textRect.h = 0;
 
-	switch ( item->type)
+	switch ( item->type ) {
+	case ITEM_TYPE_TEXTSCROLL:
 	{
-		case ITEM_TYPE_TEXTSCROLL:
-		{
-			textScrollDef_t *scrollPtr = (textScrollDef_t*)item->typeData;
-			if ( scrollPtr )
-			{
-				scrollPtr->startPos = 0;
-				scrollPtr->endPos = 0;
-			}
-
-			Item_TextScroll_BuildLines ( item );
-
-			break;
+		textScrollDef_t *scrollPtr = (textScrollDef_t*)item->typeData;
+		if ( scrollPtr ) {
+			scrollPtr->startPos = 0;
+			scrollPtr->endPos = 0;
 		}
+		Item_TextScroll_BuildLines( item );
+		break;
+	}
+	default:
+		break;
 	}
 }
 
@@ -3132,15 +3121,11 @@ void Item_SetMouseOver(itemDef_t *item, qboolean focus) {
 }
 
 
-qboolean Item_OwnerDraw_HandleKey(itemDef_t *item, int key) {
-  if (item && DC->ownerDrawHandleKey)
-  {
-
-	  // yep this is an ugly hack
-	  if( key == A_MOUSE1 || key == A_MOUSE2 )
-	  {
-		switch( item->window.ownerDraw )
-		{
+qboolean Item_OwnerDraw_HandleKey( itemDef_t *item, int key ) {
+	if ( item && DC->ownerDrawHandleKey ) {
+		// yep this is an ugly hack
+		if ( key == A_MOUSE1 || key == A_MOUSE2 ) {
+			switch ( item->window.ownerDraw ) {
 			case UI_FORCE_SIDE:
 			case UI_FORCE_RANK_HEAL:
 			case UI_FORCE_RANK_LEVITATION:
@@ -3160,18 +3145,17 @@ qboolean Item_OwnerDraw_HandleKey(itemDef_t *item, int key) {
 			case UI_FORCE_RANK_SABERATTACK:
 			case UI_FORCE_RANK_SABERDEFEND:
 			case UI_FORCE_RANK_SABERTHROW:
-	  			if(!Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory) )
-				{
+				if ( !Rect_ContainsPoint( &item->window.rect, DC->cursorx, DC->cursory ) )
 					return qfalse;
-				}
 				break;
+			default:
+				break;
+			}
 		}
-	  }
 
-
-    return DC->ownerDrawHandleKey(item->window.ownerDraw, item->window.ownerDrawFlags, &item->special.f, key);
-  }
-  return qfalse;
+		return DC->ownerDrawHandleKey( item->window.ownerDraw, item->window.ownerDrawFlags, &item->special.f, key );
+	}
+	return qfalse;
 }
 
 qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolean force) {
@@ -3967,16 +3951,14 @@ static void Scroll_Slider_ThumbFunc(void *p) {
 	DC->setCVar(si->item->cvar, va("%f", value));
 }
 
-void Item_StartCapture(itemDef_t *item, int key)
-{
+void Item_StartCapture( itemDef_t *item, int key ) {
 	uint32_t flags;
-	switch (item->type)
-	{
+	switch ( item->type ) {
 	case ITEM_TYPE_EDITFIELD:
 	case ITEM_TYPE_NUMERICFIELD:
 	case ITEM_TYPE_LISTBOX:
-		flags = Item_ListBox_OverLB(item, DC->cursorx, DC->cursory);
-		if (flags & (WINDOW_LB_LEFTARROW | WINDOW_LB_RIGHTARROW)) {
+		flags = Item_ListBox_OverLB( item, DC->cursorx, DC->cursory );
+		if ( flags & (WINDOW_LB_LEFTARROW|WINDOW_LB_RIGHTARROW) ) {
 			scrollInfo.nextScrollTime = DC->realTime + SCROLL_TIME_START;
 			scrollInfo.nextAdjustTime = DC->realTime + SCROLL_TIME_ADJUST;
 			scrollInfo.adjustValue = SCROLL_TIME_START;
@@ -3986,7 +3968,8 @@ void Item_StartCapture(itemDef_t *item, int key)
 			captureData = &scrollInfo;
 			captureFunc = &Scroll_ListBox_AutoFunc;
 			itemCapture = item;
-		} else if (flags & WINDOW_LB_THUMB) {
+		}
+		else if ( flags & WINDOW_LB_THUMB ) {
 			scrollInfo.scrollKey = key;
 			scrollInfo.item = item;
 			scrollInfo.xStart = DC->cursorx;
@@ -3998,9 +3981,8 @@ void Item_StartCapture(itemDef_t *item, int key)
 		break;
 
 	case ITEM_TYPE_TEXTSCROLL:
-		flags = Item_TextScroll_OverLB (item, DC->cursorx, DC->cursory);
-		if (flags & (WINDOW_LB_LEFTARROW | WINDOW_LB_RIGHTARROW))
-		{
+		flags = Item_TextScroll_OverLB( item, DC->cursorx, DC->cursory );
+		if ( flags & (WINDOW_LB_LEFTARROW|WINDOW_LB_RIGHTARROW) ) {
 			scrollInfo.nextScrollTime = DC->realTime + SCROLL_TIME_START;
 			scrollInfo.nextAdjustTime = DC->realTime + SCROLL_TIME_ADJUST;
 			scrollInfo.adjustValue = SCROLL_TIME_START;
@@ -4011,8 +3993,7 @@ void Item_StartCapture(itemDef_t *item, int key)
 			captureFunc = &Scroll_TextScroll_AutoFunc;
 			itemCapture = item;
 		}
-		else if (flags & WINDOW_LB_THUMB)
-		{
+		else if ( flags & WINDOW_LB_THUMB ) {
 			scrollInfo.scrollKey = key;
 			scrollInfo.item = item;
 			scrollInfo.xStart = DC->cursorx;
@@ -4024,8 +4005,8 @@ void Item_StartCapture(itemDef_t *item, int key)
 		break;
 
 	case ITEM_TYPE_SLIDER:
-		flags = Item_Slider_OverSlider(item, DC->cursorx, DC->cursory);
-		if (flags & WINDOW_LB_THUMB) {
+		flags = Item_Slider_OverSlider( item, DC->cursorx, DC->cursory );
+		if ( flags & WINDOW_LB_THUMB ) {
 			scrollInfo.scrollKey = key;
 			scrollInfo.item = item;
 			scrollInfo.xStart = DC->cursorx;
@@ -4034,6 +4015,8 @@ void Item_StartCapture(itemDef_t *item, int key)
 			captureFunc = &Scroll_Slider_ThumbFunc;
 			itemCapture = item;
 		}
+		break;
+	default:
 		break;
 	}
 }
@@ -4427,124 +4410,105 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 
 	// default handling
 	switch ( key ) {
-
 	case A_F11:
-		if (DC->getCVarValue("developer")) {
+		if ( DC->getCVarValue( "developer" ) )
 			debugMode ^= 1;
-		}
 		break;
 
 	case A_F12:
-		if (DC->getCVarValue("developer")) {
-			DC->executeText(EXEC_APPEND, "screenshot\n");
-		}
+		if ( DC->getCVarValue( "developer" ) )
+			DC->executeText( EXEC_APPEND, "screenshot\n" );
 		break;
+
 	case A_KP_8:
 	case A_CURSOR_UP:
-		Menu_SetPrevCursorItem(menu);
+		Menu_SetPrevCursorItem( menu );
 		break;
 
 	case A_ESCAPE:
-		if (!g_waitingForKey && menu->onESC) {
+		if ( !g_waitingForKey && menu->onESC ) {
 			itemDef_t it;
 			it.parent = menu;
-			Item_RunScript(&it, menu->onESC);
+			Item_RunScript( &it, menu->onESC );
 		}
 		g_waitingForKey = qfalse;
 		break;
+
 	case A_TAB:
 	case A_KP_2:
 	case A_CURSOR_DOWN:
-		Menu_SetNextCursorItem(menu);
+		Menu_SetNextCursorItem( menu );
 		break;
 
 	case A_MOUSE1:
 	case A_MOUSE2:
-		if (item) {
-			if (item->type == ITEM_TYPE_TEXT) {
-				if (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory))
-				{
-					Item_Action(item);
-				}
-			} else if (item->type == ITEM_TYPE_EDITFIELD || item->type == ITEM_TYPE_NUMERICFIELD) {
-				if (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory))
-				{
-					Item_Action(item);
+		if ( item ) {
+			if ( item->type == ITEM_TYPE_TEXT ) {
+				if ( Rect_ContainsPoint( &item->window.rect, DC->cursorx, DC->cursory ) )
+					Item_Action( item );
+			}
+			else if ( item->type == ITEM_TYPE_EDITFIELD || item->type == ITEM_TYPE_NUMERICFIELD ) {
+				if ( Rect_ContainsPoint( &item->window.rect, DC->cursorx, DC->cursory ) ) {
+					Item_Action( item );
 					item->cursorPos = 0;
 					g_editingField = qtrue;
 					g_editItem = item;
-					DC->setOverstrikeMode(qtrue);
+					DC->setOverstrikeMode( qtrue );
 				}
 			}
-
-// add new types here as needed
-/* Notes:
-	Most controls will use the dpad to move through the selection possibilies.  Buttons are the only exception.
-	Buttons will be assumed to all be on one menu together.  If the start or A button is pressed on a control focus, that
-	means that the menu is accepted and move onto the next menu.  If the start or A button is pressed on a button focus it
-	should just process the action and not support the accept functionality.
-*/
-
-				else if ( item->type == ITEM_TYPE_MULTI || item->type == ITEM_TYPE_YESNO || item->type == ITEM_TYPE_SLIDER)
-				{
-					if (Item_HandleAccept(item))
-					{
-						//Item processed it overriding the menu processing
-						return;
-					}
-					else if (menu->onAccept)
-					{
-						itemDef_t it;
-						it.parent = menu;
-						Item_RunScript(&it, menu->onAccept);
-					}
-				}
-				else {
-					if (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory))
-					{
-
-						Item_Action(item);
-					}
+			else if ( item->type == ITEM_TYPE_MULTI || item->type == ITEM_TYPE_YESNO || item->type == ITEM_TYPE_SLIDER ) {
+				if ( Item_HandleAccept( item ) )
+					return;
+				else if ( menu->onAccept ) {
+					itemDef_t it;
+					it.parent = menu;
+					Item_RunScript( &it, menu->onAccept );
 				}
 			}
-			break;
+			else if ( Rect_ContainsPoint( &item->window.rect, DC->cursorx, DC->cursory ) )
+				Item_Action( item );
+		}
+		break;
 
-		case A_JOY0:
-		case A_JOY1:
-		case A_JOY2:
-		case A_JOY3:
-		case A_JOY4:
-		case A_AUX0:
-		case A_AUX1:
-		case A_AUX2:
-		case A_AUX3:
-		case A_AUX4:
-		case A_AUX5:
-		case A_AUX6:
-		case A_AUX7:
-		case A_AUX8:
-		case A_AUX9:
-		case A_AUX10:
-		case A_AUX11:
-		case A_AUX12:
-		case A_AUX13:
-		case A_AUX14:
-		case A_AUX15:
-		case A_AUX16:
-			break;
-		case A_KP_ENTER:
-		case A_ENTER:
-			if (item) {
-				if (item->type == ITEM_TYPE_EDITFIELD || item->type == ITEM_TYPE_NUMERICFIELD) {
-					item->cursorPos = 0;
-					g_editingField = qtrue;
-					g_editItem = item;
-					DC->setOverstrikeMode(qtrue);
-				} else {
-						Item_Action(item);
-				}
+	case A_JOY0:
+	case A_JOY1:
+	case A_JOY2:
+	case A_JOY3:
+	case A_JOY4:
+	case A_AUX0:
+	case A_AUX1:
+	case A_AUX2:
+	case A_AUX3:
+	case A_AUX4:
+	case A_AUX5:
+	case A_AUX6:
+	case A_AUX7:
+	case A_AUX8:
+	case A_AUX9:
+	case A_AUX10:
+	case A_AUX11:
+	case A_AUX12:
+	case A_AUX13:
+	case A_AUX14:
+	case A_AUX15:
+	case A_AUX16:
+		break;
+
+	case A_KP_ENTER:
+	case A_ENTER:
+		if ( item ) {
+			if ( item->type == ITEM_TYPE_EDITFIELD || item->type == ITEM_TYPE_NUMERICFIELD ) {
+				item->cursorPos = 0;
+				g_editingField = qtrue;
+				g_editItem = item;
+				DC->setOverstrikeMode( qtrue );
 			}
-			break;
+			else
+				Item_Action( item );
+		}
+		break;
+	default:
+		break;
 	}
 }
 
@@ -5367,6 +5331,9 @@ qboolean Item_Bind_HandleKey( itemDef_t *item, int key, qboolean down ) {
 
 			case '`':
 				return qtrue;
+
+			default:
+				break;
 		}
 	}
 
@@ -8328,8 +8295,7 @@ qboolean ItemParse_cvar( itemDef_t *item, int handle )
 	{
 		editFieldDef_t *editPtr;
 
-		switch ( item->type )
-		{
+		switch ( item->type ) {
 			case ITEM_TYPE_EDITFIELD:
 			case ITEM_TYPE_NUMERICFIELD:
 			case ITEM_TYPE_YESNO:
@@ -8340,6 +8306,8 @@ qboolean ItemParse_cvar( itemDef_t *item, int handle )
 				editPtr->minVal = -1;
 				editPtr->maxVal = -1;
 				editPtr->defVal = -1;
+				break;
+			default:
 				break;
 		}
 	}
@@ -9116,29 +9084,25 @@ static void Item_TextScroll_BuildLines ( itemDef_t* item )
 
 // Item_InitControls
 // init's special control types
-void Item_InitControls(itemDef_t *item)
-{
-	if (item == NULL)
-	{
+void Item_InitControls( itemDef_t *item ) {
+	if ( !item )
 		return;
-	}
 
-	switch ( item->type )
+	switch ( item->type ) {
+	case ITEM_TYPE_LISTBOX:
 	{
-		case ITEM_TYPE_LISTBOX:
-		{
-			listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
-			item->cursorPos = 0;
-			if (listPtr)
-			{
-				listPtr->cursorPos = 0;
-				listPtr->startPos = 0;
-				listPtr->endPos = 0;
-				listPtr->cursorPos = 0;
-			}
-
-			break;
+		listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
+		item->cursorPos = 0;
+		if ( listPtr ) {
+			listPtr->cursorPos = 0;
+			listPtr->startPos = 0;
+			listPtr->endPos = 0;
+			listPtr->cursorPos = 0;
 		}
+		break;
+	}
+	default:
+		break;
 	}
 }
 

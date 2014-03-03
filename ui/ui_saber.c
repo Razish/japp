@@ -885,6 +885,8 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 				VectorScale( &axis_[1], 0.25f, &axis_[1] );
 				VectorAdd( &axis_[0], &axis_[1], &axis_[0] );
 				break;
+			default:
+				break;
 			}
 			break;
 		case SABER_SAI:
@@ -909,6 +911,8 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 				VectorMA( &org_, 2*1.0f, &axis_[0], &org_ );
 				VectorMA( &org_, 2*1.0f, &axis_[2], &org_ );
 				VectorMA( &org_, -2*1.0f, &axis_[1], &org_ );
+				break;
+			default:
 				break;
 			}
 			break;
@@ -946,6 +950,8 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 				VectorAdd( &axis_[0], &axis_[2], &axis_[0] );
 				VectorMA( &org_, 8*1.0f, &axis_[0], &org_ );
 				break;
+			default:
+				break;
 			}
 			break;
 		case SABER_TRIDENT:
@@ -965,6 +971,8 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 			case 3:
 				VectorMA( &org_, -32*1.0f, &axis_[0], &org_ );
 				VectorScale( &axis_[0], -1, &axis_[0] );
+				break;
+			default:
 				break;
 			}
 			break;
@@ -1096,30 +1104,25 @@ void UI_GetSaberForMenu( char *saber, int saberNum )
 
 	switch ( uiInfo.movesTitleIndex )
 	{
-	case 0://MD_ACROBATICS:
+	case MD_ACROBATICS:
 		break;
-	case 1://MD_SINGLE_FAST:
-	case 2://MD_SINGLE_MEDIUM:
-	case 3://MD_SINGLE_STRONG:
+	case MD_SINGLE_FAST:
+	case MD_SINGLE_MEDIUM:
+	case MD_SINGLE_STRONG:
 		if ( saberType != SABER_SINGLE )
-		{
-			Q_strncpyz(saber,"single_1",MAX_QPATH);
-		}
+			Q_strncpyz( saber, "single_1", MAX_QPATH );
 		break;
-	case 4://MD_DUAL_SABERS:
+	case MD_DUAL_SABERS:
 		if ( saberType != SABER_SINGLE )
-		{
-			Q_strncpyz(saber,"single_1",MAX_QPATH);
-		}
+			Q_strncpyz( saber, "single_1", MAX_QPATH );
 		break;
-	case 5://MD_SABER_STAFF:
+	case MD_SABER_STAFF:
 		if ( saberType == SABER_SINGLE || saberType == SABER_NONE )
-		{
-			Q_strncpyz(saber,"dual_1",MAX_QPATH);
-		}
+			Q_strncpyz( saber, "dual_1", MAX_QPATH );
+		break;
+	default:
 		break;
 	}
-
 }
 
 void UI_SaberDrawBlades( itemDef_t *item, vector3 *origin, vector3 *angles )

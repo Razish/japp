@@ -3783,6 +3783,9 @@ Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t ar
 
 	case GAME_GETITEMINDEXBYTAG:
 		return BG_GetItemIndexByTag(arg0, arg1);
+
+	default:
+		break;
 	}
 
 	return -1;

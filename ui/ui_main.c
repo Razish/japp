@@ -75,17 +75,6 @@ typedef enum moveDataSounds_e
 	MDS_MOVE_SOUNDS_MAX
 } moveDataSounds_t;
 
-typedef enum moveDataTitles_e
-{
-	MD_ACROBATICS = 0,
-	MD_SINGLE_FAST,
-	MD_SINGLE_MEDIUM,
-	MD_SINGLE_STRONG,
-	MD_DUAL_SABERS,
-	MD_SABER_STAFF,
-	MD_MOVE_TITLE_MAX
-} moveDataTitles_t;
-
 // Some hard coded badness
 // At some point maybe this should be externalized to a .dat file
 const char *datapadMoveTitleData[MD_MOVE_TITLE_MAX] =
@@ -644,10 +633,8 @@ void _UI_DrawRect( float x, float y, float width, float height, float size, cons
 	trap->R_SetColor( NULL );
 }
 
-int MenuFontToHandle(int iMenuFont)
-{
-	switch (iMenuFont)
-	{
+qhandle_t MenuFontToHandle( int iMenuFont ) {
+	switch ( iMenuFont ) {
 	case FONT_SMALL: return uiInfo.uiDC.Assets.qhSmallFont;
 	case FONT_MEDIUM: return uiInfo.uiDC.Assets.qhMediumFont;
 	case FONT_LARGE: return uiInfo.uiDC.Assets.qhBigFont;
@@ -656,52 +643,70 @@ int MenuFontToHandle(int iMenuFont)
 	case FONT_JAPPLARGE: return uiInfo.uiDC.Assets.japp.fontLarge;
 	case FONT_JAPPSMALL: return uiInfo.uiDC.Assets.japp.fontSmall;
 	case FONT_JAPPMONO: return uiInfo.uiDC.Assets.japp.fontMono;
+	default: return uiInfo.uiDC.Assets.qhMediumFont;
 	}
-
-	return uiInfo.uiDC.Assets.qhMediumFont;	// 0;
 }
 
 float Text_Width(const char *text, float scale, int iMenuFont)
 {
-	int iFontIndex = MenuFontToHandle(iMenuFont);
+	qhandle_t iFontIndex = MenuFontToHandle(iMenuFont);
 
 	return trap->R_Font_StrLenPixels(text, iFontIndex, scale);
 }
 
 float Text_Height(const char *text, float scale, int iMenuFont)
 {
-	int iFontIndex = MenuFontToHandle(iMenuFont);
+	qhandle_t iFontIndex = MenuFontToHandle(iMenuFont);
 
 	return trap->R_Font_HeightPixels(iFontIndex, scale);
 }
 
-void Text_Paint(float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont)
+void Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style,
+	int iMenuFont )
 {
-	int iStyleOR = 0;
+	uint32_t iStyleOR = 0;
+	qhandle_t iFontIndex = MenuFontToHandle( iMenuFont );
 
-	int iFontIndex = MenuFontToHandle(iMenuFont);
-	//
 	// kludge.. convert JK2 menu styles to SOF2 printstring ctrl codes...
-	//
-	switch (style)
-	{
-	case  ITEM_TEXTSTYLE_NORMAL:			iStyleOR = 0;break;					// JK2 normal text
-	case  ITEM_TEXTSTYLE_BLINK:				iStyleOR = (int)STYLE_BLINK;break;		// JK2 fast blinking
-	case  ITEM_TEXTSTYLE_PULSE:				iStyleOR = (int)STYLE_BLINK;break;		// JK2 slow pulsing
-	case  ITEM_TEXTSTYLE_SHADOWED:			iStyleOR = (int)STYLE_DROPSHADOW;break;	// JK2 drop shadow
-	case  ITEM_TEXTSTYLE_OUTLINED:			iStyleOR = (int)STYLE_DROPSHADOW;break;	// JK2 drop shadow
-	case  ITEM_TEXTSTYLE_OUTLINESHADOWED:	iStyleOR = (int)STYLE_DROPSHADOW;break;	// JK2 drop shadow
-	case  ITEM_TEXTSTYLE_SHADOWEDMORE:		iStyleOR = (int)STYLE_DROPSHADOW;break;	// JK2 drop shadow
+	switch ( style ) {
+	// fast blinking
+	case ITEM_TEXTSTYLE_BLINK:
+		iStyleOR = STYLE_BLINK;
+		break;
+
+	// slow pulsing
+	case ITEM_TEXTSTYLE_PULSE:
+		iStyleOR = STYLE_BLINK;
+		break;
+
+	// drop shadow
+	case ITEM_TEXTSTYLE_SHADOWED:
+		iStyleOR = STYLE_DROPSHADOW;
+		break;
+
+	// drop shadow
+	case ITEM_TEXTSTYLE_OUTLINED:
+		iStyleOR = STYLE_DROPSHADOW;
+		break;
+
+	// drop shadow
+	case ITEM_TEXTSTYLE_OUTLINESHADOWED:
+		iStyleOR = STYLE_DROPSHADOW;
+		break;
+
+	// drop shadow
+	case ITEM_TEXTSTYLE_SHADOWEDMORE:
+		iStyleOR = STYLE_DROPSHADOW;
+		break;
+
+	// normal text
+	case ITEM_TEXTSTYLE_NORMAL:
+	default:
+		iStyleOR = 0;
+		break;
 	}
 
-	trap->R_Font_DrawString(	x,		// int ox
-		y,		// int oy
-		text,	// const char *text
-		color,	// paletteRGBA_c c
-		iStyleOR | iFontIndex,	// const int iFontHandle
-		!limit?-1:limit,		// iCharLimit (-1 = none)
-		scale	// const float scale = 1.0f
-		);
+	trap->R_Font_DrawString( x, y, text, color, iStyleOR|iFontIndex, !limit ? -1 : limit, scale );
 }
 
 
@@ -723,7 +728,7 @@ void Text_PaintWithCursor(float x, float y, float scale, const vector4 *color, c
 		sTemp[iCopyCount] = '\0';
 
 		{
-			int iFontIndex = MenuFontToHandle( iMenuFont );
+			qhandle_t iFontIndex = MenuFontToHandle( iMenuFont );
 			float iNextXpos  = trap->R_Font_StrLenPixels(sTemp, iFontIndex, scale );
 
 			Text_Paint(x+iNextXpos, y, scale, color, va("%c",cursor), 0, limit, style|ITEM_TEXTSTYLE_BLINK, iMenuFont);
@@ -738,7 +743,7 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const v
 {
 	// this is kinda dirty, but...
 	//
-	int iFontIndex = MenuFontToHandle(iMenuFont);
+	qhandle_t iFontIndex = MenuFontToHandle(iMenuFont);
 
 	//float fMax = *maxX;
 	float iPixelLen = trap->R_Font_StrLenPixels(text, iFontIndex, scale);
@@ -858,121 +863,113 @@ void UI_SetActiveMenu( uiMenuCommand_t menu ) {
 
 	// this should be the ONLY way the menu system is brought up
 	// enusure minumum menu data is cached
-	if (Menu_Count() > 0) {
-		vector3 v;
-		v.x = v.y = v.z = 0;
+	if ( Menu_Count() > 0 ) {
 		switch ( menu ) {
 		case UIMENU_NONE:
 			trap->Key_SetCatcher( trap->Key_GetCatcher() & ~KEYCATCH_UI );
 			trap->Key_ClearStates();
 			trap->Cvar_Set( "cl_paused", "0" );
 			Menus_CloseAll();
-
 			return;
-		case UIMENU_MAIN:
-			{
-				//	trap->Cvar_Set( "sv_killserver", "1" );
-				trap->Key_SetCatcher( KEYCATCH_UI );
-				//	trap->S_StartLocalSound( trap_S_RegisterSound("sound/misc/menu_background.wav", qfalse) , CHAN_LOCAL_SOUND );
-				//	trap->S_StartBackgroundTrack("sound/misc/menu_background.wav", NULL);
-				if (uiInfo.inGameLoad)
-					UI_LoadNonIngame();
-\
-				Menus_CloseAll();
-				Menus_ActivateByName("main");
-				trap->Cvar_VariableStringBuffer("com_errorMessage", buf, sizeof(buf));
 
-				if (buf[0])
-				{
-					if (!ui_singlePlayerActive.integer)
-					{
-						Menus_ActivateByName("error_popmenu");
-					}
-					else
-					{
-						trap->Cvar_Set("com_errorMessage", "");
-					}
-				}
-				return;
+		case UIMENU_MAIN:
+		{
+			trap->Key_SetCatcher( KEYCATCH_UI );
+			if ( uiInfo.inGameLoad )
+				UI_LoadNonIngame();
+
+			Menus_CloseAll();
+			Menus_ActivateByName( "main" );
+			trap->Cvar_VariableStringBuffer( "com_errorMessage", buf, sizeof( buf ) );
+
+			if ( buf[0] ) {
+				if ( !ui_singlePlayerActive.integer )
+					Menus_ActivateByName( "error_popmenu" );
+				else
+					trap->Cvar_Set( "com_errorMessage", "" );
 			}
+			return;
+		}
 
 		case UIMENU_TEAM:
 			trap->Key_SetCatcher( KEYCATCH_UI );
-			Menus_ActivateByName("team");
+			Menus_ActivateByName( "team" );
 			return;
+
 		case UIMENU_POSTGAME:
-			//trap->Cvar_Set( "sv_killserver", "1" );
 			trap->Key_SetCatcher( KEYCATCH_UI );
-			if (uiInfo.inGameLoad)
+			if ( uiInfo.inGameLoad )
 				UI_LoadNonIngame();
 			Menus_CloseAll();
-			Menus_ActivateByName("endofgame");
+			Menus_ActivateByName( "endofgame" );
 			return;
+
 		case UIMENU_INGAME:
 			trap->Cvar_Set( "cl_paused", "1" );
 			trap->Key_SetCatcher( KEYCATCH_UI );
 			UI_BuildPlayerList();
 			Menus_CloseAll();
-			Menus_ActivateByName("ingame");
+			Menus_ActivateByName( "ingame" );
 			return;
+
 		case UIMENU_PLAYERCONFIG:
-			// trap->Cvar_Set( "cl_paused", "1" );
 			trap->Key_SetCatcher( KEYCATCH_UI );
 			UI_BuildPlayerList();
 			Menus_CloseAll();
-			Menus_ActivateByName("ingame_player");
+			Menus_ActivateByName( "ingame_player" );
 			UpdateForceUsed();
 			return;
+
 		case UIMENU_PLAYERFORCE:
-			// trap->Cvar_Set( "cl_paused", "1" );
 			trap->Key_SetCatcher( KEYCATCH_UI );
 			UI_BuildPlayerList();
 			Menus_CloseAll();
-			Menus_ActivateByName("ingame_playerforce");
+			Menus_ActivateByName( "ingame_playerforce" );
 			UpdateForceUsed();
 			return;
+
 		case UIMENU_SIEGEMESSAGE:
-			// trap->Cvar_Set( "cl_paused", "1" );
 			trap->Key_SetCatcher( KEYCATCH_UI );
 			Menus_CloseAll();
-			Menus_ActivateByName("siege_popmenu");
+			Menus_ActivateByName( "siege_popmenu" );
 			return;
+
 		case UIMENU_SIEGEOBJECTIVES:
-			// trap->Cvar_Set( "cl_paused", "1" );
 			trap->Key_SetCatcher( KEYCATCH_UI );
 			Menus_CloseAll();
-			Menus_ActivateByName("ingame_siegeobjectives");
+			Menus_ActivateByName( "ingame_siegeobjectives" );
 			return;
+
 		case UIMENU_VOICECHAT:
-			// trap->Cvar_Set( "cl_paused", "1" );
-			// No chatin non-siege games.
-
-			if (trap->Cvar_VariableValue( "g_gametype" ) < GT_TEAM)
-			{
-				return;
-			}
+		//	if ( trap->Cvar_VariableValue( "g_gametype" ) < GT_TEAM )
+		//		return;
 
 			trap->Key_SetCatcher( KEYCATCH_UI );
 			Menus_CloseAll();
-			Menus_ActivateByName("ingame_voicechat");
+			Menus_ActivateByName( "ingame_voicechat" );
 			return;
+
 		case UIMENU_CLOSEALL:
 			Menus_CloseAll();
 			return;
+
 		case UIMENU_CLASSSEL:
 			trap->Key_SetCatcher( KEYCATCH_UI );
 			Menus_CloseAll();
-			Menus_ActivateByName("ingame_siegeclass");
+			Menus_ActivateByName( "ingame_siegeclass" );
 			return;
+
+		default:
+			break;
 		}
 	}
 }
 
-void UI_DrawCenteredPic(qhandle_t image, int w, int h) {
-	int x, y;
-	x = (SCREEN_WIDTH - w) / 2;
-	y = (SCREEN_HEIGHT - h) / 2;
-	UI_DrawHandlePic(x, y, w, h, image);
+void UI_DrawCenteredPic( qhandle_t image, int w, int h ) {
+	float x, y;
+	x = (SCREEN_WIDTH - w) / 2.0f;
+	y = (SCREEN_HEIGHT - h) / 2.0f;
+	UI_DrawHandlePic( x, y, w, h, image );
 }
 
 int frameCount = 0;
@@ -4090,48 +4087,50 @@ static void UI_StartSkirmish(qboolean next) {
 	}
 }
 
-static void UI_Update(const char *name) {
-	int	val = trap->Cvar_VariableValue(name);
+static void UI_Update( const char *name ) {
+	int	val = trap->Cvar_VariableValue( name );
 
-	if (Q_stricmp(name, "s_khz") == 0)
-	{
+	if ( !Q_stricmp( name, "s_khz" ) ) {
 		trap->Cmd_ExecuteText( EXEC_APPEND, "snd_restart\n" );
 		return;
 	}
 
-	if ( !Q_stricmp( name, "ui_SetName" ) )
-	{
-		//Raz: Truncate the name, try and avoid overflow glitches for long names and menu feeders
-	//	trap->Cvar_Set( "name", UI_Cvar_VariableString( "ui_Name" ) );
-		char buf[MAX_NETNAME] = {0};
+	if ( !Q_stricmp( name, "ui_SetName" ) ) {
+		char buf[MAX_NETNAME];
 		Q_strncpyz( buf, UI_Cvar_VariableString( "ui_Name" ), sizeof( buf ) );
 		trap->Cvar_Set( "name", buf );
 	}
-	else if (Q_stricmp(name, "ui_setRate") == 0) {
-		float rate = trap->Cvar_VariableValue("rate");
-		if (rate >= 5000) {
-			trap->Cvar_Set("cl_maxpackets", "30");
-			trap->Cvar_Set("cl_packetdup", "1");
-		} else if (rate >= 4000) {
-			trap->Cvar_Set("cl_maxpackets", "15");
-			trap->Cvar_Set("cl_packetdup", "2");		// favor less prediction errors when there's packet loss
-		} else {
-			trap->Cvar_Set("cl_maxpackets", "15");
-			trap->Cvar_Set("cl_packetdup", "1");		// favor lower bandwidth
+
+	else if ( !Q_stricmp( name, "ui_setRate" ) ) {
+		float rate = trap->Cvar_VariableValue( "rate" );
+		if ( rate >= 15000 ) {
+			trap->Cvar_Set( "cl_maxpackets", "63" );
+			trap->Cvar_Set( "cl_packetdup", "1" );
+		}
+		else if ( rate >= 5000 ) {
+			trap->Cvar_Set( "cl_maxpackets", "30" );
+			trap->Cvar_Set( "cl_packetdup", "1" );
+		}
+		else if ( rate >= 4000 ) {
+			// favor less prediction errors when there's packet loss
+			trap->Cvar_Set( "cl_maxpackets", "15" );
+			trap->Cvar_Set( "cl_packetdup", "2" );
+		}
+		else {
+			// favor lower bandwidth
+			trap->Cvar_Set( "cl_maxpackets", "15" );
+			trap->Cvar_Set( "cl_packetdup", "1" );
 		}
 	}
-	else if ( !Q_stricmp( name, "ui_GetName" ) )
-	{
-		//Raz: Truncate the name, try and avoid overflow glitches for long names and menu feeders
-	//	trap->Cvar_Set( "ui_Name", UI_Cvar_VariableString( "name" ) );
-		char buf[MAX_NETNAME] = {0};
+
+	else if ( !Q_stricmp( name, "ui_GetName" ) ) {
+		char buf[MAX_NETNAME];
 		Q_strncpyz( buf, UI_Cvar_VariableString( "name" ), sizeof( buf ) );
 		trap->Cvar_Set( "ui_Name", buf );
 	}
-	else if (Q_stricmp(name, "ui_r_colorbits") == 0)
-	{
-		switch (val)
-		{
+
+	else if ( !Q_stricmp( name, "ui_r_colorbits" ) ) {
+		switch ( val ) {
 			case 0:
 				trap->Cvar_SetValue( "ui_r_depthbits", 0 );
 				break;
@@ -4141,34 +4140,15 @@ static void UI_Update(const char *name) {
 				break;
 
 			case 32:
+			default:
 				trap->Cvar_SetValue( "ui_r_depthbits", 24 );
 				break;
 		}
 	}
-#if 0
-	else if (Q_stricmp(name, "ui_r_lodbias") == 0)
-	{
-		switch (val)
-		{
-			case 0:
-				trap->Cvar_SetValue( "ui_r_subdivisions", 4 );
-				break;
-			case 1:
-				trap->Cvar_SetValue( "ui_r_subdivisions", 12 );
-				break;
 
-			case 2:
-				trap->Cvar_SetValue( "ui_r_subdivisions", 20 );
-				break;
-		}
-	}
-#endif
-	else if (Q_stricmp(name, "ui_r_glCustom") == 0)
-	{
-		switch (val)
-		{
+	else if ( !Q_stricmp( name, "ui_r_glCustom" ) ) {
+		switch ( val ) {
 			case 0:	// high quality
-
 				trap->Cvar_SetValue( "ui_r_fullScreen", 1 );
 				trap->Cvar_SetValue( "ui_r_subdivisions", 4 );
 				trap->Cvar_SetValue( "ui_r_lodbias", 0 );
@@ -4179,7 +4159,7 @@ static void UI_Update(const char *name) {
 				trap->Cvar_SetValue( "ui_r_texturebits", 32 );
 				trap->Cvar_SetValue( "ui_r_fastSky", 0 );
 				trap->Cvar_SetValue( "ui_r_inGameVideo", 1 );
-				//trap->Cvar_SetValue( "ui_cg_shadows", 2 );//stencil
+			//	trap->Cvar_SetValue( "ui_cg_shadows", 2 );//stencil
 				trap->Cvar_Set( "ui_r_texturemode", "GL_LINEAR_MIPMAP_LINEAR" );
 				break;
 
@@ -4194,12 +4174,11 @@ static void UI_Update(const char *name) {
 				trap->Cvar_SetValue( "ui_r_texturebits", 0 );
 				trap->Cvar_SetValue( "ui_r_fastSky", 0 );
 				trap->Cvar_SetValue( "ui_r_inGameVideo", 1 );
-				//trap->Cvar_SetValue( "ui_cg_shadows", 2 );
+			//	trap->Cvar_SetValue( "ui_cg_shadows", 2 );
 				trap->Cvar_Set( "ui_r_texturemode", "GL_LINEAR_MIPMAP_LINEAR" );
 				break;
 
 			case 2: // fast
-
 				trap->Cvar_SetValue( "ui_r_fullScreen", 1 );
 				trap->Cvar_SetValue( "ui_r_subdivisions", 12 );
 				trap->Cvar_SetValue( "ui_r_lodbias", 1 );
@@ -4210,12 +4189,11 @@ static void UI_Update(const char *name) {
 				trap->Cvar_SetValue( "ui_r_texturebits", 0 );
 				trap->Cvar_SetValue( "ui_r_fastSky", 1 );
 				trap->Cvar_SetValue( "ui_r_inGameVideo", 0 );
-				//trap->Cvar_SetValue( "ui_cg_shadows", 1 );
+			//	trap->Cvar_SetValue( "ui_cg_shadows", 1 );
 				trap->Cvar_Set( "ui_r_texturemode", "GL_LINEAR_MIPMAP_NEAREST" );
 				break;
 
 			case 3: // fastest
-
 				trap->Cvar_SetValue( "ui_r_fullScreen", 1 );
 				trap->Cvar_SetValue( "ui_r_subdivisions", 20 );
 				trap->Cvar_SetValue( "ui_r_lodbias", 2 );
@@ -4226,32 +4204,42 @@ static void UI_Update(const char *name) {
 				trap->Cvar_SetValue( "ui_r_texturebits", 16 );
 				trap->Cvar_SetValue( "ui_r_fastSky", 1 );
 				trap->Cvar_SetValue( "ui_r_inGameVideo", 0 );
-				//trap->Cvar_SetValue( "ui_cg_shadows", 0 );
+			//	trap->Cvar_SetValue( "ui_cg_shadows", 0 );
 				trap->Cvar_Set( "ui_r_texturemode", "GL_LINEAR_MIPMAP_NEAREST" );
-			break;
+				break;
+
+			case 4: // pro
+				trap->Cvar_SetValue( "ui_r_fullScreen", 1 );
+				trap->Cvar_SetValue( "ui_r_subdivisions", 80 );
+				trap->Cvar_SetValue( "ui_r_lodbias", 5 );
+				trap->Cvar_SetValue( "ui_r_colorbits", 32 );
+				trap->Cvar_SetValue( "ui_r_depthbits", 0 );
+				trap->Cvar_SetValue( "ui_r_mode", 3 );
+				trap->Cvar_SetValue( "ui_r_picmip", 16 );
+				trap->Cvar_SetValue( "ui_r_texturebits", 32 );
+				trap->Cvar_SetValue( "ui_r_fastSky", 1 );
+				trap->Cvar_SetValue( "ui_r_inGameVideo", 0 );
+			//	trap->Cvar_SetValue( "ui_cg_shadows", 0 );
+				trap->Cvar_Set( "ui_r_texturemode", "GL_NEAREST" );
+				break;
+
+			default:
+				break;
 		}
 	}
-	else if (Q_stricmp(name, "ui_mousePitch") == 0)
-	{
-		if (val == 0)
-		{
+
+	else if ( !Q_stricmp( name, "ui_mousePitch" ) ) {
+		if ( val == 0 )
 			trap->Cvar_SetValue( "m_pitch", 0.022f );
-		}
 		else
-		{
 			trap->Cvar_SetValue( "m_pitch", -0.022f );
-		}
 	}
-	else if (Q_stricmp(name, "ui_mousePitchVeh") == 0)
-	{
-		if (val == 0)
-		{
+
+	else if ( !Q_stricmp( name, "ui_mousePitchVeh" ) ) {
+		if ( val == 0 )
 			trap->Cvar_SetValue( "m_pitchVeh", 0.022f );
-		}
 		else
-		{
 			trap->Cvar_SetValue( "m_pitchVeh", -0.022f );
-		}
 	}
 }
 
@@ -7428,6 +7416,9 @@ static int UI_FeederCount( int feederID ) {
 				count++;
 		}
 		return count;
+
+	default:
+		break;
 	}
 
 	return 0;
@@ -7601,9 +7592,9 @@ static const char *UI_FeederItemText( int feederID, int index, int column, qhand
 
 			switch ( column ) {
 			case SORT_HOST:
-				if ( ping <= 0 ) {
+				if ( ping <= 0 )
 					return Info_ValueForKey( info, "addr" );
-				}
+
 				else {
 					int gametype = atoi( Info_ValueForKey( info, "gametype" ) );
 					//check for password
@@ -7680,6 +7671,9 @@ static const char *UI_FeederItemText( int feederID, int index, int column, qhand
 					return "...";
 				else
 					return Info_ValueForKey( info, "ping" );
+
+			default:
+				break;
 			}
 		}
 		break;
@@ -7767,6 +7761,9 @@ static const char *UI_FeederItemText( int feederID, int index, int column, qhand
 
 	case FEEDER_SIEGE_BASE_CLASS:
 	case FEEDER_SIEGE_CLASS_WEAPONS:
+		return "";
+
+	default:
 		return "";
 	}
 
@@ -7950,6 +7947,9 @@ static qhandle_t UI_FeederItemImage( int feederID, int index ) {
 		}
 		break;
 	}
+
+	default:
+		break;
 
 	}
 
@@ -9977,6 +9977,9 @@ Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t ar
 	case UI_MENU_RESET:
 		Menu_Reset();
 		return 0;
+
+	default:
+		break;
 	}
 
 	return -1;

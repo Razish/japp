@@ -455,6 +455,7 @@ static const char *parse_string(cJSON *item, const char *str)
 						case 3: *--ptr2 = ((uc | 0x80) & 0xBF); uc >>= 6;
 						case 2: *--ptr2 = ((uc | 0x80) & 0xBF); uc >>= 6;
 						case 1: *--ptr2 = (char)(uc | firstByteMark[len]);
+						default: break;
 					}
 					ptr2 += len;
 					ptr += 4;
@@ -646,6 +647,8 @@ static void serialize_value(cJSON *item, int depth, int fmt, cJSON_StringBuilder
 			break;
 		case cJSON_Object:
 			serialize_object(item, depth, fmt, sb);
+			break;
+		default:
 			break;
 	}
 }

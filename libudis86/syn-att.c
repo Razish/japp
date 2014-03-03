@@ -103,6 +103,8 @@ gen_operand(struct ud* u, struct ud_operand* op)
 				mkasm(u, "$0x%x, $0x%lx", op->lval.ptr.seg,
 					op->lval.ptr.off);
 				break;
+			default:
+				break;
 		}
 		break;
 
@@ -129,6 +131,8 @@ ud_translate_att(struct ud *u)
 		case 64:
  			mkasm(u, "o16 ");
 			break;
+		default:
+			break;
 	}
   }
 
@@ -143,6 +147,8 @@ ud_translate_att(struct ud *u)
 			break;
 		case 64:
  			mkasm(u, "a32 ");
+			break;
+		default:
 			break;
 	}
   }

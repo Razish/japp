@@ -133,6 +133,8 @@ static void gen_operand(struct ud* u, struct ud_operand* op, int syn_cast)
 				mkasm(u, "dword 0x%x:0x%lx", op->lval.ptr.seg,
 					op->lval.ptr.off);
 				break;
+			default:
+				break;
 		}
 		break;
 
@@ -163,6 +165,8 @@ extern void ud_translate_intel(struct ud* u)
 		case 64:
  			mkasm(u, "o16 ");
 			break;
+		default:
+			break;
 	}
   }
 
@@ -177,6 +181,8 @@ extern void ud_translate_intel(struct ud* u)
 			break;
 		case 64:
  			mkasm(u, "a32 ");
+			break;
+		default:
 			break;
 	}
   }

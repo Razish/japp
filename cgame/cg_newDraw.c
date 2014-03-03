@@ -244,7 +244,7 @@ const char *CG_GetGameStatusText(void) {
 	return "";
 }
 
-extern int MenuFontToHandle( int iMenuFont );
+extern qhandle_t MenuFontToHandle( int iMenuFont );
 
 // maxX param is initially an X limit, but is also used as feedback. 0 = text was clipped to fit within, else maxX = next pos
 void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vector4 *color, const char *text, float adjust,
@@ -253,7 +253,7 @@ void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vect
 	qboolean bIsTrailingPunctuation;
 
 	// this is kinda dirty, but...
-	int iFontIndex = MenuFontToHandle( iMenuFont );
+	qhandle_t iFontIndex = MenuFontToHandle( iMenuFont );
 
 	//float fMax = *maxX;
 	float iPixelLen = trap->R_Font_StrLenPixels( text, iFontIndex, scale );

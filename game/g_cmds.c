@@ -577,6 +577,9 @@ static void Cmd_Team_f( gentity_t *ent ) {
 		case TEAM_SPECTATOR:
 			trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "PRINTSPECTEAM" ) ) );
 			break;
+		default:
+			assert( !"Unknown old team in Cmd_Team_f" );
+			break;
 		}
 		return;
 	}

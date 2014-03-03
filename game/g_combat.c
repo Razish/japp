@@ -625,17 +625,15 @@ void CheckAlmostCapture( gentity_t *self, gentity_t *attacker ) {
 #endif
 }
 
-qboolean G_InKnockDown( playerState_t *ps )
-{
-	switch ( (ps->legsAnim) )
-	{
+qboolean G_InKnockDown( playerState_t *ps ) {
+	switch ( ps->legsAnim ) {
 	case BOTH_KNOCKDOWN1:
 	case BOTH_KNOCKDOWN2:
 	case BOTH_KNOCKDOWN3:
 	case BOTH_KNOCKDOWN4:
 	case BOTH_KNOCKDOWN5:
 		return qtrue;
-		break;
+
 	case BOTH_GETUP1:
 	case BOTH_GETUP2:
 	case BOTH_GETUP3:
@@ -649,9 +647,10 @@ qboolean G_InKnockDown( playerState_t *ps )
 	case BOTH_FORCE_GETUP_B4:
 	case BOTH_FORCE_GETUP_B5:
 		return qtrue;
-		break;
+
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
 static int G_CheckSpecialDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int hitLoc )
@@ -669,8 +668,7 @@ static int G_CheckSpecialDeathAnim( gentity_t *self, vector3 *point, int damage,
 	else if ( G_InKnockDown( &self->client->ps ) )
 	{//since these happen a lot, let's handle them case by case
 		int animLength = bgAllAnims[self->localAnimIndex].anims[self->client->ps.legsAnim].numFrames * fabsf((float)(bgHumanoidAnimations[self->client->ps.legsAnim].frameLerp));
-		switch ( self->client->ps.legsAnim )
-		{
+		switch ( self->client->ps.legsAnim ) {
 		case BOTH_KNOCKDOWN1:
 			if ( animLength - self->client->ps.legsTimer > 100 )
 			{//on our way down
@@ -1140,6 +1138,8 @@ static int G_CheckSpecialDeathAnim( gentity_t *self, vector3 *point, int damage,
 				}
 			}
 			break;
+		default:
+			break;
 		}
 	}
 
@@ -1148,7 +1148,7 @@ static int G_CheckSpecialDeathAnim( gentity_t *self, vector3 *point, int damage,
 
 int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int hitLoc )
 {//FIXME: play dead flop anims on body if in an appropriate _DEAD anim when this func is called
-	int deathAnim = -1;
+	int deathAnim;
 	int max_health;
 	int legAnim = 0;
 	vector3 objVelocity;
@@ -1204,8 +1204,7 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 	}
 
 	//dead flops
-	switch( legAnim )
-	{
+	switch ( legAnim ) {
 	case BOTH_DEATH1:		//# First Death anim
 	case BOTH_DEAD1:
 	case BOTH_DEATH2:			//# Second Death anim
@@ -1221,20 +1220,8 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 	case BOTH_DEADBACKWARD1:		//# First thrown backward death finished pose
 	case BOTH_DEADBACKWARD2:		//# Second thrown backward death finished pose
 		deathAnim = -2;
-		/*
-		// done with the anim
-		if ( PM_FinishedCurrentLegsAnim( self ) )
-			deathAnim = BOTH_DEADFLOP2;
-		else
-			deathAnim = -2;
-		*/
 		break;
 
-		/*
-	case BOTH_DEADFLOP2:
-		deathAnim = BOTH_DEADFLOP2;
-		break;
-		*/
 	case BOTH_DEATH10:			//#
 	case BOTH_DEAD10:
 	case BOTH_DEATH15:			//#
@@ -1242,18 +1229,10 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 	case BOTH_DEADFORWARD1:		//# First thrown forward death finished pose
 	case BOTH_DEADFORWARD2:		//# Second thrown forward death finished pose
 		deathAnim = -2;
-		/*
-		// done with the anim
-		if ( PM_FinishedCurrentLegsAnim( self ) )
-			deathAnim = BOTH_DEADFLOP1;
-		else
-			deathAnim = -2;
-		*/
 		break;
 
 	case BOTH_DEADFLOP1:
 		deathAnim = -2;
-		//deathAnim = BOTH_DEADFLOP1;
 		break;
 
 	case BOTH_DEAD3:				//# Third Death finished pose
@@ -1292,6 +1271,10 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 	case BOTH_FALLDEATH1INAIR:	//# Fall forward off a high cliff and splat death - loop
 	case BOTH_FALLDEATH1LAND:	//# Fall forward off a high cliff and splat death - hit bottom
 		deathAnim = -2;
+		break;
+
+	default:
+		deathAnim = -1;
 		break;
 	}
 	if ( deathAnim == -1 )
@@ -4479,6 +4462,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			case MOD_DET_PACK_SPLASH:
 				damage *= 0.75f;
 				break;
+			default:
+				break;
 			}
 		}
 		else if ( (client->ps.trueNonJedi || (level.gametype == GT_SIEGE&&client->ps.weapon != WP_SABER))
@@ -4827,6 +4812,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 						dot = DotProduct( &vUp, &impactDir );
 						if ( dot > 0 )	targ->m_pVehicle->m_vOrientation->roll += impactStrength;
 						else			targ->m_pVehicle->m_vOrientation->roll -= impactStrength;
+						break;
+					default:
 						break;
 					}
 

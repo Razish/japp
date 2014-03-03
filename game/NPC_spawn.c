@@ -925,8 +925,7 @@ void NPC_Begin (gentity_t *ent)
 	if ( !Q_stricmp( "rodian", ent->NPC_type ) )
 	{//sniper
 		//NOTE: this will get overridden by any aim settings in their spawnscripts
-		switch ( g_spSkill.integer )
-		{
+		switch ( g_spSkill.integer ) {
 		case 0:
 			ent->NPC->stats.aim = 1;
 			break;
@@ -936,6 +935,8 @@ void NPC_Begin (gentity_t *ent)
 		case 2:
 			ent->NPC->stats.aim = Q_irand( 3, 4 );
 			break;
+		default:
+			break;
 		}
 	}
 	else if ( ent->client->NPC_class == CLASS_STORMTROOPER
@@ -943,8 +944,7 @@ void NPC_Begin (gentity_t *ent)
 		|| ent->client->NPC_class == CLASS_IMPWORKER
 		|| !Q_stricmp( "rodian2", ent->NPC_type ) )
 	{//tweak yawspeed for these NPCs based on difficulty
-		switch ( g_spSkill.integer )
-		{
+		switch ( g_spSkill.integer ) {
 		case 0:
 			ent->NPC->stats.yawSpeed *= 0.75f;
 			if ( ent->client->NPC_class == CLASS_IMPWORKER )
@@ -965,18 +965,21 @@ void NPC_Begin (gentity_t *ent)
 				ent->NPC->stats.aim -= Q_irand( 0, 2 );
 			}
 			break;
+		default:
+			break;
 		}
 	}
 	else if ( ent->client->NPC_class == CLASS_REBORN
 		|| ent->client->NPC_class == CLASS_SHADOWTROOPER )
 	{
-		switch ( g_spSkill.integer )
-		{
+		switch ( g_spSkill.integer ) {
 		case 1:
 			ent->NPC->stats.yawSpeed *= 1.25f;
 			break;
 		case 2:
 			ent->NPC->stats.yawSpeed *= 1.5f;
+			break;
+		default:
 			break;
 		}
 	}
@@ -2619,8 +2622,7 @@ void SP_NPC_Cultist( gentity_t *self)
 		{
 			self->NPC_type = NULL;
 			self->spawnflags = 0;//fast, no throw
-			switch ( Q_irand( 0, 2 ) )
-			{
+			switch ( Q_irand( 0, 2 ) ) {
 			case 0://medium
 				self->spawnflags |= 1;
 				break;
@@ -2629,6 +2631,9 @@ void SP_NPC_Cultist( gentity_t *self)
 				break;
 			case 2://all
 				self->spawnflags |= 4;
+				break;
+			default:
+				// can't happen
 				break;
 			}
 			if ( Q_irand( 0, 1 ) )
@@ -3077,12 +3082,9 @@ NOTSOLID - Starts not solid
 STARTINSOLID - Don't try to fix if spawn in solid
 SHY - Spawner is shy
 */
-void SP_NPC_Weequay( gentity_t *self)
-{
-	if ( !self->NPC_type )
-	{
-		switch ( Q_irand( 0, 3 ) )
-		{
+void SP_NPC_Weequay( gentity_t *self ) {
+	if ( !self->NPC_type ) {
+		switch ( Q_irand( 0, 3 ) ) {
 		case 0:
 			self->NPC_type = "Weequay";
 			break;
@@ -3094,6 +3096,9 @@ void SP_NPC_Weequay( gentity_t *self)
 			break;
 		case 3:
 			self->NPC_type = "Weequay4";
+			break;
+		default:
+			// can't happen
 			break;
 		}
 	}

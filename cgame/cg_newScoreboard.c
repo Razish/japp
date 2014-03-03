@@ -9,7 +9,7 @@ static int JP_GetScoreboardFont( void ) {
 }
 
 static void DrawServerInformation( float fade ) {
-	const int fontHandle = MenuFontToHandle( FONT_JAPPLARGE );
+	const qhandle_t fontHandle = MenuFontToHandle( FONT_JAPPLARGE );
 	const float fontScale = 0.5f, lineHeight=14.0f;
 	const char *tmp = NULL;
 	float y = 20.0f;
@@ -111,7 +111,7 @@ static void DrawServerInformation( float fade ) {
 }
 
 static void DrawPlayerCount_Free( float fade ) {
-	const int fontHandle = MenuFontToHandle( FONT_JAPPLARGE );
+	const qhandle_t fontHandle = MenuFontToHandle( FONT_JAPPLARGE );
 	const float fontScale = 0.5f, width = SCREEN_WIDTH/2.0f, lineHeight = 14.0f;
 	float y = 108.0f;
 	const char *tmp = NULL;
@@ -143,7 +143,7 @@ static void DrawPlayerCount_Free( float fade ) {
 }
 
 void DrawPlayerCount_Team( float fade ) {
-	const int fontHandle = MenuFontToHandle( FONT_JAPPLARGE );
+	const qhandle_t fontHandle = MenuFontToHandle( FONT_JAPPLARGE );
 	const float fontScale = 0.5f, width = SCREEN_WIDTH/2.0f, lineHeight = 14.0f;
 	float y = 108.0f;
 	const char *tmp = NULL;
@@ -793,7 +793,7 @@ static int ListPlayers_Team( float fade, float x, float y, float fontScale, int 
 }
 
 static void DrawSpectators( float fade ) {
-	const int fontHandle = MenuFontToHandle( JP_GetScoreboardFont() );
+	const qhandle_t fontHandle = MenuFontToHandle( JP_GetScoreboardFont() );
 	const float fontScale = 0.5f, lineHeight = 14.0f;
 	float y = 128.0f;
 	const vector4 white = { 1.0f, 1.0f, 1.0f, fade };
@@ -815,7 +815,7 @@ static void DrawSpectators( float fade ) {
 }
 
 static void DrawPlayers_Free( float fade ) {
-	const int fontHandle = MenuFontToHandle( JP_GetScoreboardFont() );
+	const qhandle_t fontHandle = MenuFontToHandle( JP_GetScoreboardFont() );
 	const float fontScale = 0.45f, lineHeight = 14.0f;
 	float x = 0, y = 128.0f;
 	const int playerCount = PlayerCount( TEAM_FREE );
@@ -829,7 +829,7 @@ static void DrawPlayers_Free( float fade ) {
 }
 
 static void DrawPlayers_Team( float fade ) {
-	const int fontHandle = MenuFontToHandle( JP_GetScoreboardFont() );
+	const qhandle_t fontHandle = MenuFontToHandle( JP_GetScoreboardFont() );
 	const float fontScale = 0.5f, lineHeight = 14.0f;
 	float x = 0, y = 128.0f;
 

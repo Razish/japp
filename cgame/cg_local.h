@@ -1301,7 +1301,7 @@ qboolean CG_OtherTeamHasFlag( void );
 qboolean CG_YourTeamDroppedFlag( void );
 qboolean CG_OtherTeamDroppedFlag( void );
 qhandle_t CG_StatusHandle( int task );
-int MenuFontToHandle( int iMenuFont );
+qhandle_t MenuFontToHandle( int iMenuFont );
 
 
 //

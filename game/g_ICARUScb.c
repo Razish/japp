@@ -952,6 +952,9 @@ int	Q3_GetTag( int entID, const char *name, int lookup, vector3 *info )
 	case TYPE_ANGLES:
 		return TAG_GetAngles( ent->ownername, name, info );
 		break;
+
+	default:
+		break;
 	}
 
 	return 0;
@@ -4593,63 +4596,78 @@ Q3_SetBehaviorSet
 ?
 ============
 */
-static qboolean Q3_SetBehaviorSet( int entID, int toSet, const char *scriptname)
-{
-	gentity_t	*ent  = &g_entities[entID];
-	bSet_t		bSet = BSET_INVALID;
+static qboolean Q3_SetBehaviorSet( int entID, int toSet, const char *scriptname ) {
+	gentity_t *ent  = &g_entities[entID];
+	bSet_t bSet;
 
-	if ( !ent )
-	{
-		G_DebugPrint( WL_WARNING, "Q3_SetBehaviorSet: invalid entID %d\n", entID);
+	if ( !ent ) {
+		G_DebugPrint( WL_WARNING, "Q3_SetBehaviorSet: invalid entID %d\n", entID );
 		return qfalse;
 	}
 
-	switch(toSet)
-	{
+	switch( toSet ) {
 	case SET_SPAWNSCRIPT:
 		bSet = BSET_SPAWN;
 		break;
+
 	case SET_USESCRIPT:
 		bSet = BSET_USE;
 		break;
+
 	case SET_AWAKESCRIPT:
 		bSet = BSET_AWAKE;
 		break;
+
 	case SET_ANGERSCRIPT:
 		bSet = BSET_ANGER;
 		break;
+
 	case SET_ATTACKSCRIPT:
 		bSet = BSET_ATTACK;
 		break;
+
 	case SET_VICTORYSCRIPT:
 		bSet = BSET_VICTORY;
 		break;
+
 	case SET_LOSTENEMYSCRIPT:
 		bSet = BSET_LOSTENEMY;
 		break;
+
 	case SET_PAINSCRIPT:
 		bSet = BSET_PAIN;
 		break;
+
 	case SET_FLEESCRIPT:
 		bSet = BSET_FLEE;
 		break;
+
 	case SET_DEATHSCRIPT:
 		bSet = BSET_DEATH;
 		break;
+
 	case SET_DELAYEDSCRIPT:
 		bSet = BSET_DELAYED;
 		break;
+
 	case SET_BLOCKEDSCRIPT:
 		bSet = BSET_BLOCKED;
 		break;
+
 	case SET_FFIRESCRIPT:
 		bSet = BSET_FFIRE;
 		break;
+
 	case SET_FFDEATHSCRIPT:
 		bSet = BSET_FFDEATH;
 		break;
+
 	case SET_MINDTRICKSCRIPT:
 		bSet = BSET_MINDTRICK;
+		break;
+
+	default:
+		bSet = BSET_INVALID;
 		break;
 	}
 

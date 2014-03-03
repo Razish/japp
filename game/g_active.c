@@ -823,34 +823,37 @@ void G_CheapWeaponFire(int entNum, int ev)
 		return;
 	}
 
-	switch (ev)
-	{
+	switch ( ev ) {
 		case EV_FIRE_WEAPON:
-			if (ent->m_pVehicle && ent->m_pVehicle->m_pVehicleInfo->type == VH_SPEEDER &&
-				ent->client && ent->client->ps.m_iVehicleNum)
-			{ //a speeder with a pilot
-				gentity_t *rider = &g_entities[ent->client->ps.m_iVehicleNum-1];
-				if (rider->inuse && rider->client)
-				{ //pilot is valid...
-                    if (rider->client->ps.weapon != WP_MELEE &&
-						(rider->client->ps.weapon != WP_SABER || !BG_SabersOff(&rider->client->ps)))
-					{ //can only attack on speeder when using melee or when saber is holstered
-						break;
-					}
+		if ( ent->m_pVehicle && ent->m_pVehicle->m_pVehicleInfo->type == VH_SPEEDER && ent->client
+			&& ent->client->ps.m_iVehicleNum )
+		{ //a speeder with a pilot
+			gentity_t *rider = &g_entities[ent->client->ps.m_iVehicleNum-1];
+			if ( rider->inuse && rider->client ) {
+				// pilot is valid...
+                   if ( rider->client->ps.weapon != WP_MELEE && (rider->client->ps.weapon != WP_SABER
+					|| !BG_SabersOff( &rider->client->ps ) ) )
+				{ //can only attack on speeder when using melee or when saber is holstered
+					break;
 				}
 			}
+		}
 
-			FireWeapon( ent, qfalse );
-			ent->client->dangerTime = level.time;
-			ent->client->ps.eFlags &= ~EF_INVULNERABLE;
-			ent->client->invulnerableTimer = 0;
-			break;
-		case EV_ALT_FIRE:
-			FireWeapon( ent, qtrue );
-			ent->client->dangerTime = level.time;
-			ent->client->ps.eFlags &= ~EF_INVULNERABLE;
-			ent->client->invulnerableTimer = 0;
-			break;
+		FireWeapon( ent, qfalse );
+		ent->client->dangerTime = level.time;
+		ent->client->ps.eFlags &= ~EF_INVULNERABLE;
+		ent->client->invulnerableTimer = 0;
+		break;
+
+	case EV_ALT_FIRE:
+		FireWeapon( ent, qtrue );
+		ent->client->dangerTime = level.time;
+		ent->client->ps.eFlags &= ~EF_INVULNERABLE;
+		ent->client->invulnerableTimer = 0;
+		break;
+
+	default:
+		break;
 	}
 }
 
@@ -1216,18 +1219,19 @@ void G_AddPushVecToUcmd( gentity_t *self, usercmd_t *ucmd )
 	}
 }
 
-qboolean G_StandingAnim( int anim )
-{//NOTE: does not check idles or special (cinematic) stands
-	switch ( anim )
-	{
+//NOTE: does not check idles or special (cinematic) stands
+qboolean G_StandingAnim( int anim ) {
+	switch ( anim ) {
 	case BOTH_STAND1:
 	case BOTH_STAND2:
 	case BOTH_STAND3:
 	case BOTH_STAND4:
 		return qtrue;
 		break;
+
+	default:
+		return qfalse;
 	}
-	return qfalse;
 }
 
 qboolean G_ActionButtonPressed( int buttons ) {
@@ -1308,9 +1312,10 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				ent->client->ps.legsTimer = 0;
 				brokeOut = qtrue;
 				break;
+			default:
+				break;
 			}
-			switch ( ent->client->ps.torsoAnim )
-			{
+			switch ( ent->client->ps.torsoAnim ) {
 			case BOTH_STAND1IDLE1:
 			case BOTH_STAND2IDLE1:
 			case BOTH_STAND2IDLE2:
@@ -1320,6 +1325,8 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 				ent->client->ps.weaponTime = 0;
 				ent->client->ps.saberMove = LS_READY;
 				brokeOut = qtrue;
+				break;
+			default:
 				break;
 			}
 		}
@@ -1339,9 +1346,8 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 	}
 	else if ( level.time - ent->client->idleTime > 5000 )
 	{//been idle for 5 seconds
-		int	idleAnim = -1;
-		switch ( ent->client->ps.legsAnim )
-		{
+		int	idleAnim;
+		switch ( ent->client->ps.legsAnim ) {
 		case BOTH_STAND1:
 			idleAnim = BOTH_STAND1IDLE1;
 			break;
@@ -1353,6 +1359,9 @@ void G_CheckClientIdle( gentity_t *ent, usercmd_t *ucmd )
 			break;
 		case BOTH_STAND5:
 			idleAnim = BOTH_STAND5IDLE1;
+			break;
+		default:
+			idleAnim = -1;
 			break;
 		}
 
@@ -1629,8 +1638,7 @@ void G_SetTauntAnim( gentity_t *ent, int taunt )
 		&& ent->client->ps.saberLockTime < level.time )
 	{
 		int anim = -1;
-		switch ( taunt )
-		{
+		switch ( taunt ) {
 		case TAUNT_TAUNT:
 			if ( ent->client->ps.weapon != WP_SABER )
 			{
@@ -1691,6 +1699,8 @@ void G_SetTauntAnim( gentity_t *ent, int taunt )
 					}
 					ent->client->ps.saberHolstered = 0;
 					anim = BOTH_STAFF_TAUNT;
+					break;
+				default:
 					break;
 				}
 			}
@@ -1794,6 +1804,8 @@ void G_SetTauntAnim( gentity_t *ent, int taunt )
 					case SS_STAFF:
 						anim = BOTH_SHOWOFF_STAFF;
 						break;
+					default:
+						break;
 					}
 				}
 			}
@@ -1811,8 +1823,7 @@ void G_SetTauntAnim( gentity_t *ent, int taunt )
 			}
 			else
 			{
-				switch ( ent->client->ps.fd.saberAnimLevel )
-				{
+				switch ( ent->client->ps.fd.saberAnimLevel ) {
 				case SS_FAST:
 				case SS_TAVION:
 					anim = BOTH_VICTORY_FAST;
@@ -1851,8 +1862,12 @@ void G_SetTauntAnim( gentity_t *ent, int taunt )
 					ent->client->ps.saberHolstered = 0;
 					anim = BOTH_VICTORY_STAFF;
 					break;
+				default:
+					break;
 				}
 			}
+			break;
+		default:
 			break;
 		}
 		if ( anim != -1 )
@@ -2992,20 +3007,25 @@ void ClientThink_real( gentity_t *ent ) {
 					}
 					else
 					{//normal attack
-						switch ( ent->client->ps.fd.saberAnimLevel )
-						{
+						switch ( ent->client->ps.fd.saberAnimLevel ) {
 						case SS_FAST:
 							lockHits = 1;
 							break;
+
 						case SS_MEDIUM:
 						case SS_TAVION:
 						case SS_DUAL:
 						case SS_STAFF:
 							lockHits = 2;
 							break;
+
 						case SS_STRONG:
 						case SS_DESANN:
 							lockHits = 3;
+							break;
+
+						default:
+							lockHits = 0;
 							break;
 						}
 					}

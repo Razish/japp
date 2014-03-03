@@ -1123,6 +1123,9 @@ static int CG_FeederCount( int feederID ) {
 
 	case FEEDER_SCOREBOARD:
 		return cg.numScores;
+
+	default:
+		break;
 	}
 
 	return count;

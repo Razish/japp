@@ -1105,6 +1105,9 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	case WP_BLASTER:
 		WP_FireBlasterMissile( ent, &ent->s.origin, &dir, qfalse );
 		break;
+	//TODO: other weapon types
+	default:
+		break;
 	}
 
 	G_AddEvent( ent, EV_FIRE_WEAPON, 0 );

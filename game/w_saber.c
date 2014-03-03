@@ -1937,6 +1937,8 @@ static QINLINE qboolean WP_GetSaberDeflectionAngle( gentity_t *attacker, gentity
 		case Q_BL:
 			defQuad = Q_BR;
 			break;
+		default:
+			break;
 		}
 
 		if ( quadDiff > 4 )
@@ -2337,17 +2339,15 @@ static QINLINE qboolean G_G2TraceCollide(trace_t *tr, vector3 *lastValidStart, v
 	return qfalse;
 }
 
-static QINLINE qboolean G_SaberInBackAttack(int move)
-{
-	switch (move)
-	{
+static QINLINE qboolean G_SaberInBackAttack( int move ) {
+	switch ( move ) {
 	case LS_A_BACK:
 	case LS_A_BACK_CR:
 	case LS_A_BACKSTAB:
 		return qtrue;
+	default:
+		return qfalse;
 	}
-
-	return qfalse;
 }
 
 qboolean saberCheckKnockdown_Thrown(gentity_t *saberent, gentity_t *saberOwner, gentity_t *other);
@@ -3399,6 +3399,8 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 			{
 				return FORCE_LEVEL_3;
 			}
+			break;
+		default:
 			break;
 		}
 		return FORCE_LEVEL_0;
@@ -8633,6 +8635,8 @@ static void G_KickSomeMofos(gentity_t *ent)
 				}
 			}
 			break;
+		default:
+			break;
 		}
 	}
 
@@ -9829,6 +9833,8 @@ int WP_MissileBlockForBlock( int saberBlock )
 	case BLOCKED_TOP:
 		return BLOCKED_TOP_PROJ;
 		break;
+	default:
+		break;
 	}
 	return saberBlock;
 }
@@ -9914,8 +9920,7 @@ void WP_SaberBlock( gentity_t *playerent, vector3 *hitloc, qboolean missileBlock
 		}
 		else
 		{
-			switch(Q_irand(0,3))
-			{
+			switch ( Q_irand( 0, 3 ) ) {
 			case 0:
 				playerent->client->ps.saberBlocked = BLOCKED_UPPER_RIGHT;
 				break;
@@ -9925,6 +9930,8 @@ void WP_SaberBlock( gentity_t *playerent, vector3 *hitloc, qboolean missileBlock
 				break;
 			case 3:
 				playerent->client->ps.saberBlocked = BLOCKED_TOP;
+				break;
+			default:
 				break;
 			}
 		}

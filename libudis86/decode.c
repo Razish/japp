@@ -630,6 +630,7 @@ decode_modrm(struct ud* u, struct ud_operand *op, unsigned int s,
             case 5: op->base = UD_R_DI; break;
             case 6: op->base = UD_R_BP; break;
             case 7: op->base = UD_R_BX; break;
+            default: break;
         }
 
         if (mod == 0 && rm == 6) {

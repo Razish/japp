@@ -332,34 +332,26 @@ int transitionMove[Q_NUM_QUADS][Q_NUM_QUADS] =
 	{	LS_T1_BL_BR,	LS_T1_BR__R,	LS_T1_BR_TR,	LS_T1_BR_T_,	LS_T1_BR_TL,	LS_T1_BR__L,	LS_T1_BR_BL,	LS_NONE		},
 };
 
-saberMoveName_t PM_AttackMoveForQuad( int quad )
-{
-	switch ( quad )
-	{
+saberMoveName_t PM_AttackMoveForQuad( int quad ) {
+	switch ( quad ) {
 	case Q_B:
 	case Q_BR:
 		return LS_A_BR2TL;
-		break;
 	case Q_R:
 		return LS_A_R2L;
-		break;
 	case Q_TR:
 		return LS_A_TR2BL;
-		break;
 	case Q_T:
 		return LS_A_T2B;
-		break;
 	case Q_TL:
 		return LS_A_TL2BR;
-		break;
 	case Q_L:
 		return LS_A_L2R;
-		break;
 	case Q_BL:
 		return LS_A_BL2TR;
-		break;
+	default:
+		return LS_NONE;
 	}
-	return LS_NONE;
 }
 
 qboolean PM_SaberKataDone(int curmove, int newmove);
@@ -381,6 +373,8 @@ int PM_SaberAnimTransitionAnim( int curmove, int newmove )
 			//transition is the start
 			retmove = LS_S_TL2BR + (newmove-LS_A_TL2BR);
 			break;
+		default:
+			break;
 		}
 	}
 	else
@@ -401,6 +395,8 @@ int PM_SaberAnimTransitionAnim( int curmove, int newmove )
 			case LS_A_T2B:
 				//transition is the return
 				retmove = LS_R_TL2BR + (newmove-LS_A_TL2BR);
+				break;
+			default:
 				break;
 			}
 			break;
@@ -458,24 +454,6 @@ int PM_SaberAnimTransitionAnim( int curmove, int newmove )
 				case LS_R_R2L:
 				case LS_R_TR2BL:
 				case LS_R_T2B:
-				//transitioning from a bounce
-				/*
-				case LS_BOUNCE_UL2LL:
-				case LS_BOUNCE_LL2UL:
-				case LS_BOUNCE_L2LL:
-				case LS_BOUNCE_L2UL:
-				case LS_BOUNCE_UR2LR:
-				case LS_BOUNCE_LR2UR:
-				case LS_BOUNCE_R2LR:
-				case LS_BOUNCE_R2UR:
-				case LS_BOUNCE_TOP:
-				case LS_OVER_UR2UL:
-				case LS_OVER_UL2UR:
-				case LS_BOUNCE_UR:
-				case LS_BOUNCE_UL:
-				case LS_BOUNCE_LR:
-				case LS_BOUNCE_LL:
-				*/
 				//transitioning from a parry/reflection/knockaway/broken parry
 				case LS_PARRY_UP:
 				case LS_PARRY_UR:
@@ -508,10 +486,14 @@ int PM_SaberAnimTransitionAnim( int curmove, int newmove )
 					retmove = transitionMove[saberMoveData[curmove].endQuad][saberMoveData[newmove].startQuad];
 					break;
 				//NB: transitioning from transitions is fine
+				default:
+					break;
 				}
 			}
 			break;
 		//transitioning to any other anim is not supported
+		default:
+			break;
 		}
 	}
 
@@ -895,12 +877,6 @@ int PM_SaberLockLoseAnim( playerState_t *genemy, qboolean victory, qboolean supe
 	int loseAnim = -1;
 	switch ( genemy->torsoAnim )
 	{
-/*
-	default:
-#ifdef _DEBUG
-		Com_Printf( S_COLOR_RED"ERROR-PM_SaberLockBreak: %s not in saberlock anim, anim = (%d)%s\n", genemy->NPC_type, genemy->client->ps.torsoAnim, animTable[genemy->client->ps.torsoAnim].name );
-#endif
-*/
 	case BOTH_BF2LOCK:
 		if ( superBreak )
 		{
@@ -1005,6 +981,8 @@ int PM_SaberLockLoseAnim( playerState_t *genemy, qboolean victory, qboolean supe
 			}
 		}
 		break;
+	default:
+		break;
 	}
 	if ( loseAnim != -1 )
 	{
@@ -1018,11 +996,9 @@ int PM_SaberLockLoseAnim( playerState_t *genemy, qboolean victory, qboolean supe
 	return loseAnim;
 }
 
-int PM_SaberLockResultAnim( playerState_t *duelist, qboolean superBreak, qboolean won )
-{
+int PM_SaberLockResultAnim( playerState_t *duelist, qboolean superBreak, qboolean won ) {
 	int baseAnim = duelist->torsoAnim;
-	switch ( baseAnim )
-	{
+	switch ( baseAnim ) {
 	case BOTH_LK_S_S_S_L_2:		//lock if I'm using single vs. a single and other intitiated
 		baseAnim = BOTH_LK_S_S_S_L_1;
 		break;
@@ -1040,6 +1016,8 @@ int PM_SaberLockResultAnim( playerState_t *duelist, qboolean superBreak, qboolea
 		break;
 	case BOTH_LK_ST_ST_T_L_2:	//lock if I'm using staff vs. a staff and other initiated
 		baseAnim = BOTH_LK_ST_ST_T_L_1;
+		break;
+	default:
 		break;
 	}
 	//what kind of break?
@@ -1472,41 +1450,25 @@ qboolean PM_SaberInBrokenParry( int move )
 }
 
 
-int PM_BrokenParryForParry( int move )
-{
-	switch ( move )
-	{
-	case LS_PARRY_UP:
-		return LS_H1_T_;
-		break;
-	case LS_PARRY_UR:
-		return LS_H1_TR;
-		break;
-	case LS_PARRY_UL:
-		return LS_H1_TL;
-		break;
-	case LS_PARRY_LR:
-		return LS_H1_BL;
-		break;
-	case LS_PARRY_LL:
-		return LS_H1_BR;
-		break;
-	case LS_READY:
-		return LS_H1_B_;
-		break;
+int PM_BrokenParryForParry( int move ) {
+	switch ( move ) {
+	case LS_PARRY_UP:	return LS_H1_T_;
+	case LS_PARRY_UR:	return LS_H1_TR;
+	case LS_PARRY_UL:	return LS_H1_TL;
+	case LS_PARRY_LR:	return LS_H1_BL;
+	case LS_PARRY_LL:	return LS_H1_BR;
+	case LS_READY:		return LS_H1_B_;
+	default:			return LS_NONE;
 	}
-	return LS_NONE;
 }
 
 #define BACK_STAB_DISTANCE 128
 
-qboolean PM_CanBackstab(void)
-{
+qboolean PM_CanBackstab( void ) {
 	trace_t tr;
-	vector3 flatAng;
-	vector3 fwd, back;
-	vector3 trmins = {-15, -15, -8};
-	vector3 trmaxs = {15, 15, 8};
+	vector3 flatAng, fwd, back,
+		trmins = { -15, -15, -8 },
+		trmaxs = {  15,  15,  8 };
 
 	VectorCopy(&pm->ps->viewangles, &flatAng);
 	flatAng.pitch = 0;
@@ -1873,7 +1835,7 @@ float PM_WalkableGroundDistance(void)
 }
 
 qboolean BG_SaberInTransitionAny( int move );
-static qboolean PM_CanDoDualDoubleAttacks(void)
+static qboolean PM_CanDoDualDoubleAttacks( void )
 {
 	if ( pm->ps->weapon == WP_SABER )
 	{
@@ -1929,6 +1891,8 @@ static qboolean PM_CheckEnemyPresence( int dir, float radius )
 	case DIR_BACK:
 		AngleVectors( &angles, &checkDir, NULL, NULL );
 		VectorScale( &checkDir, -1, &checkDir );
+		break;
+	default:
 		break;
 	}
 
@@ -3209,6 +3173,8 @@ weapChecks:
 			case SS_STAFF:
 				PM_SetSaberMove( LS_STAFF_SOULCAL );
 				break;
+			default:
+				break;
 			}
 			pm->ps->weaponstate = WEAPON_FIRING;
 			//G_DrainPowerForSpecialMove( pm->gent, FP_SABER_OFFENSE, SABER_ALT_ATTACK_POWER );//FP_SPEED, SINGLE_SPECIAL_POWER );
@@ -3443,6 +3409,8 @@ weapChecks:
 					newmove = LS_A_BL2TR;
 					break;
 				//shouldn't be a parry that ends at L, R or B
+				default:
+					break;
 				}
 			}
 

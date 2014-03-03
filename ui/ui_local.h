@@ -31,6 +31,16 @@ void UI_ClearScores( void );
 void UI_LoadArenas( void );
 void UI_LoadForceConfig_List( void );
 
+typedef enum moveDataTitles_e {
+	MD_ACROBATICS = 0,
+	MD_SINGLE_FAST,
+	MD_SINGLE_MEDIUM,
+	MD_SINGLE_STRONG,
+	MD_DUAL_SABERS,
+	MD_SABER_STAFF,
+	MD_MOVE_TITLE_MAX
+} moveDataTitles_t;
+
 //
 // ui_players.c
 //

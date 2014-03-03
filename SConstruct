@@ -325,7 +325,7 @@ if plat == 'Linux':
 	#	'-Wshadow',
 	#	'-Wsign-conversion',
 		'-Wstrict-prototypes',
-	#	'-Wswitch-default',
+		'-Wswitch-default',
 		'-Wuninitialized',
 		'-Wunreachable-code',
 	#	'-Wwrite-strings',

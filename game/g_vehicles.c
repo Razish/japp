@@ -497,6 +497,8 @@ qboolean VEH_TryEject( Vehicle_t *pVeh,
 		// Bottom?.
 		case VEH_EJECT_BOTTOM:
 			break;
+		default:
+			break;
 	}
 	VectorNormalize( &vVehLeaveDir );
 	//NOTE: not sure why following line was needed - MCG
@@ -1544,6 +1546,7 @@ maintainSelfDuringBoarding:
 		case 2: shiftSound=pVeh->m_pVehicleInfo->soundShift2; break;
 		case 3: shiftSound=pVeh->m_pVehicleInfo->soundShift3; break;
 		case 4: shiftSound=pVeh->m_pVehicleInfo->soundShift4; break;
+		default: break;
 		}
 		if (shiftSound)
 		{

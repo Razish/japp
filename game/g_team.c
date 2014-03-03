@@ -276,26 +276,29 @@ static char ctfFlagStatusRemap[] = { '0', '1', '*', '*', '2' };
 void Team_SetFlagStatus( int team, flagStatus_t status ) {
 	qboolean modified = qfalse;
 
-	switch( team ) {
+	switch ( team ) {
 	case TEAM_RED:	// CTF
-		if( teamgame.redStatus != status ) {
+		if ( teamgame.redStatus != status ) {
 			teamgame.redStatus = status;
 			modified = qtrue;
 		}
 		break;
 
 	case TEAM_BLUE:	// CTF
-		if( teamgame.blueStatus != status ) {
+		if ( teamgame.blueStatus != status ) {
 			teamgame.blueStatus = status;
 			modified = qtrue;
 		}
 		break;
 
 	case TEAM_FREE:	// One Flag CTF
-		if( teamgame.flagStatus != status ) {
+		if ( teamgame.flagStatus != status ) {
 			teamgame.flagStatus = status;
 			modified = qtrue;
 		}
+		break;
+
+	default:
 		break;
 	}
 
@@ -600,22 +603,25 @@ void Team_TakeFlagSound( gentity_t *ent, int team ) {
 
 	// only play sound when the flag was at the base
 	// or not picked up the last 10 seconds
-	switch(team) {
-		case TEAM_RED:
-			if( teamgame.blueStatus != FLAG_ATBASE ) {
-				if (teamgame.blueTakenTime > level.time - 10000)
-					return;
-			}
-			teamgame.blueTakenTime = level.time;
-			break;
+	switch ( team ) {
+	case TEAM_RED:
+		if ( teamgame.blueStatus != FLAG_ATBASE ) {
+			if ( teamgame.blueTakenTime > level.time - 10000 )
+				return;
+		}
+		teamgame.blueTakenTime = level.time;
+		break;
 
-		case TEAM_BLUE:	// CTF
-			if( teamgame.redStatus != FLAG_ATBASE ) {
-				if (teamgame.redTakenTime > level.time - 10000)
-					return;
-			}
-			teamgame.redTakenTime = level.time;
-			break;
+	case TEAM_BLUE:	// CTF
+		if ( teamgame.redStatus != FLAG_ATBASE ) {
+			if ( teamgame.redTakenTime > level.time - 10000 )
+				return;
+		}
+		teamgame.redTakenTime = level.time;
+		break;
+
+	default:
+		break;
 	}
 
 	te = G_TempEntity( &ent->s.pos.trBase, EV_GLOBAL_TEAM_SOUND );

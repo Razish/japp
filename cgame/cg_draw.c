@@ -83,39 +83,34 @@ const char *showPowersName[] =
 //Called from UI shared code. For now we'll just redirect to the normal anim load function.
 
 
-int UI_ParseAnimationFile(const char *filename, animation_t *animset, qboolean isHumanoid)
-{
-	return BG_ParseAnimationFile(filename, animset, isHumanoid);
+int UI_ParseAnimationFile( const char *filename, animation_t *animset, qboolean isHumanoid ) {
+	return BG_ParseAnimationFile( filename, animset, isHumanoid );
 }
 
-int MenuFontToHandle( int iMenuFont ) {
+qhandle_t MenuFontToHandle( int iMenuFont ) {
 	switch ( iMenuFont ) {
 		case FONT_SMALL:		return cgDC.Assets.qhSmallFont;
 		case FONT_SMALL2:		return cgDC.Assets.qhSmall2Font;
 		case FONT_MEDIUM:		return cgDC.Assets.qhMediumFont;
-		case FONT_LARGE:		return cgDC.Assets.qhMediumFont;//cgDC.Assets.qhBigFont;
-			//fixme? Big fonr isn't registered...?
+		case FONT_LARGE:		return cgDC.Assets.qhBigFont;
 		//Raz: fonts
 		case FONT_JAPPLARGE:	return cgDC.Assets.japp.fontLarge;
 		case FONT_JAPPSMALL:	return cgDC.Assets.japp.fontSmall;
 		case FONT_JAPPMONO:		return cgDC.Assets.japp.fontMono;
-		default:
-			break;
+		default:				return cgDC.Assets.qhMediumFont;
 	}
-
-	return cgDC.Assets.qhMediumFont;
 }
 
 float CG_Text_Width(const char *text, float scale, int iMenuFont)
 {
-	int iFontIndex = MenuFontToHandle(iMenuFont);
+	qhandle_t iFontIndex = MenuFontToHandle(iMenuFont);
 
 	return trap->R_Font_StrLenPixels(text, iFontIndex, scale);
 }
 
 float CG_Text_Height(const char *text, float scale, int iMenuFont)
 {
-	int iFontIndex = MenuFontToHandle(iMenuFont);
+	qhandle_t iFontIndex = MenuFontToHandle(iMenuFont);
 
 	return trap->R_Font_HeightPixels(iFontIndex, scale);
 }
@@ -123,7 +118,7 @@ float CG_Text_Height(const char *text, float scale, int iMenuFont)
 #include "qcommon/qfiles.h"	// for STYLE_BLINK etc
 void CG_Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont ) {
 	int iStyleOR = 0;
-	int iFontIndex = MenuFontToHandle( iMenuFont );
+	qhandle_t iFontIndex = MenuFontToHandle( iMenuFont );
 
 	switch ( style ) {
 	case  ITEM_TEXTSTYLE_NORMAL:			iStyleOR = 0;break;					// JK2 normal text
@@ -6426,7 +6421,7 @@ static void CG_DrawCrosshairNames( void ) {
 	else if ( cg_drawCrosshairNames.integer == 1 )
 		UI_DrawProportionalString( 320, 170, name, UI_CENTER, &tcolor );
 	else if ( cg_drawCrosshairNames.integer >= 2 && !CG_FadeColor2( &tcolor, cg.crosshairClientTime, 250.0f ) ) {
-		int fontHandle = MenuFontToHandle( FONT_JAPPSMALL );
+		qhandle_t fontHandle = MenuFontToHandle( FONT_JAPPSMALL );
 		float fontScale = 0.875f;
 		if ( cg_drawCrosshairNames.integer == 3 )
 			fontScale *= tcolor.a;
@@ -6440,7 +6435,7 @@ static void CG_DrawClientNames( void ) {
 	const char *name = NULL;
 	int i;
 	const centity_t *cent = NULL;
-	const int fontHandle = MenuFontToHandle( FONT_JAPPSMALL );
+	const qhandle_t fontHandle = MenuFontToHandle( FONT_JAPPSMALL );
 	const float fontScale = 0.75f, fontHeight = trap->R_Font_HeightPixels( fontHandle, fontScale );
 	const vector4 *colour = &g_color_table[ColorIndex(COLOR_WHITE)];
 	float x, y;
@@ -7006,20 +7001,12 @@ void CG_DrawTimedMenus( void ) {
 	}
 }
 
-void CG_DrawFlagStatusQ3P( void )
-{
-	int		myFlag		= 0,
-			theirFlag	= 0,
-			team		= 0,
-			fontHandle	= MenuFontToHandle( FONT_JAPPLARGE );
-	float	iconSize	= ICON_SIZE,
-			textOffset	= 20.0f,
-			x			= SCREEN_WIDTH/2.0f,
-			y			= SCREEN_HEIGHT-iconSize,
-			fontScale	= 0.75f;
-	vector4	faded		= { 0.25f, 0.25f, 0.25f, 0.75f },
-			defer		= { 1.0f, 1.0f, 1.0f, 0.9f };
-	char	*tmp		= NULL;
+void CG_DrawFlagStatusQ3P( void ) {
+	qhandle_t myFlag, theirFlag, fontHandle = MenuFontToHandle( FONT_JAPPLARGE );
+	const float iconSize = ICON_SIZE, fontScale = 0.75f, textOffset = 20.0f, x = SCREEN_WIDTH/2.0f, y = SCREEN_HEIGHT-iconSize;
+	const vector4 faded = { 0.25f, 0.25f, 0.25f, 0.75f }, defer = { 1.0f, 1.0f, 1.0f, 0.9f };
+	const char *tmp = NULL;
+	int team;
 
 	if ( !cg.snap )
 		return;
@@ -7029,19 +7016,16 @@ void CG_DrawFlagStatusQ3P( void )
 
 	team = cg.snap->ps.persistant[PERS_TEAM];
 
-	if ( team == TEAM_RED )
-	{
+	if ( team == TEAM_RED ) {
 		myFlag = trap->R_RegisterShaderNoMip( (cgs.gametype == GT_CTY) ? "gfx/hud/mpi_rflag_x" : "gfx/hud/mpi_rflag" );
 		theirFlag = trap->R_RegisterShaderNoMip( (cgs.gametype == GT_CTY) ? "gfx/hud/mpi_bflag_ys" : "gfx/hud/mpi_bflag" );
 	}
-	else
-	{
+	else {
 		myFlag = trap->R_RegisterShaderNoMip( (cgs.gametype == GT_CTY) ? "gfx/hud/mpi_bflag_x" : "gfx/hud/mpi_bflag" );
 		theirFlag = trap->R_RegisterShaderNoMip( (cgs.gametype == GT_CTY) ? "gfx/hud/mpi_rflag_ys" : "gfx/hud/mpi_rflag" );
 	}
 
-	if ( CG_OtherTeamHasFlag() )
-	{
+	if ( CG_OtherTeamHasFlag() ) {
 		trap->R_SetColor( &faded );
 		CG_DrawPic( x - (iconSize*1.5f), y, iconSize, iconSize, myFlag );
 
@@ -7051,8 +7035,7 @@ void CG_DrawFlagStatusQ3P( void )
 	//	trap->R_Font_DrawString( ICON_SIZE, 96 + (ICON_SIZE/2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale )), "Flag stolen!", colorYellow, fontHandle, -1, fontScale );
 		trap->R_SetColor( NULL );
 	}
-	else if ( CG_OtherTeamDroppedFlag() )
-	{
+	else if ( CG_OtherTeamDroppedFlag() ) {
 		trap->R_SetColor( &faded );
 		CG_DrawPic( x - (iconSize*1.5f), y, iconSize, iconSize, myFlag );
 		trap->R_SetColor( NULL );
@@ -7060,20 +7043,17 @@ void CG_DrawFlagStatusQ3P( void )
 	else
 		CG_DrawPic( x - (iconSize*1.5f), y, iconSize, iconSize, myFlag );
 
-	if ( team == TEAM_RED )
-	{
+	if ( team == TEAM_RED ) {
 		tmp = va( "%i", cgs.scores1 );
 		trap->R_Font_DrawString( x - (iconSize*1.5f) + (iconSize/2.0f) - (trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0f), y - textOffset, tmp, &colorTable[CT_HUD_RED], fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 	}
-	else
-	{
+	else {
 		tmp = va( "%i", cgs.scores2 );
 		trap->R_Font_DrawString( x - (iconSize*1.5f) + (iconSize/2.0f) - (trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0f), y - textOffset, tmp, &colorTable[CT_CYAN], fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 	}
 	trap->R_SetColor( NULL );
 
-	if ( CG_YourTeamHasFlag() )
-	{
+	if ( CG_YourTeamHasFlag() ) {
 		trap->R_SetColor( &faded );
 		CG_DrawPic( x + (iconSize*0.5f), y, iconSize, iconSize, theirFlag );
 
@@ -7082,8 +7062,7 @@ void CG_DrawFlagStatusQ3P( void )
 
 		trap->R_SetColor( NULL );
 	}
-	else if ( CG_YourTeamDroppedFlag() )
-	{
+	else if ( CG_YourTeamDroppedFlag() ) {
 		trap->R_SetColor( &faded );
 		CG_DrawPic( x + (iconSize*0.5f), y, iconSize, iconSize, theirFlag );
 
@@ -7091,13 +7070,11 @@ void CG_DrawFlagStatusQ3P( void )
 	}
 	else
 		CG_DrawPic( x + (iconSize*0.5f), y, iconSize, iconSize, theirFlag );
-	if ( team == TEAM_RED )
-	{
+	if ( team == TEAM_RED ) {
 		tmp = va( "%i", cgs.scores2 );
 		trap->R_Font_DrawString( x + (iconSize*0.5f) + (iconSize/2.0f) - (trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0f), y - textOffset, tmp, &colorTable[CT_CYAN], fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 	}
-	else
-	{
+	else {
 		tmp = va( "%i", cgs.scores1 );
 		trap->R_Font_DrawString( x + (iconSize*0.5f) + (iconSize/2.0f) - (trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale )/2.0f), y - textOffset, tmp, &colorTable[CT_HUD_RED], fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 	}
