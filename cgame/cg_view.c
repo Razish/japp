@@ -548,7 +548,7 @@ static void CG_OffsetThirdPersonView( int clientNum ) {
 			cameraStiffFactor[clientNum] = 0.0f;
 		else if ( cameraStiffFactor[clientNum] > 2.5f )
 			cameraStiffFactor[clientNum] = 0.75f;
-		else // 1 to 2 scales from 0.0 to 0.5
+		else // 1 to 2 scales from 0.0f to 0.5f
 			cameraStiffFactor[clientNum] = (cameraStiffFactor[clientNum]-1.0f)*0.5f;
 		cameraLastYaw[clientNum] = cameraFocusAngles[clientNum].yaw;
 
@@ -564,7 +564,7 @@ static void CG_OffsetThirdPersonView( int clientNum ) {
 	VectorSubtract( &cameraCurTarget[clientNum], &cameraCurLoc[clientNum], &diff );
 	{
 		float dist = VectorNormalize(&diff);
-		//under normal circumstances, should never be 0.00000 and so on.
+		//under normal circumstances, should never be 0.00000f and so on.
 		if ( !dist || (diff.x == 0 || diff.y == 0) )
 		{//must be hitting something, need some value to calc angles, so use cam forward
 			VectorCopy( &camerafwd, &diff );
@@ -763,11 +763,11 @@ qboolean CG_CalcFOVFromX( float fov_x ) {
 		const float aspect = (float)cgs.glconfig.vidWidth/(float)cgs.glconfig.vidHeight;
 		const float desiredFov = fov_x;
 
-		fov_x = atan( tan( desiredFov*M_PI / 360.0f ) * baseAspect*aspect )*360.0f / M_PI;
+		fov_x = atanf( tanf( desiredFov*M_PI / 360.0f ) * baseAspect*aspect )*360.0f / M_PI;
 	}
 
-	x = refdef->width / tan( fov_x / 360 * M_PI );
-	fov_y = atan2( refdef->height, x );
+	x = refdef->width / tanf( fov_x / 360 * M_PI );
+	fov_y = atan2f( refdef->height, x );
 	fov_y = fov_y * 360 / M_PI;
 
 	// there's a problem with this, it only takes the leafbrushes into account, not the entity brushes, so if you give
@@ -885,17 +885,17 @@ static int CG_CalcFov( void ) {
 		const float aspect = (float)cgs.glconfig.vidWidth/(float)cgs.glconfig.vidHeight;
 		const float desiredFov = fov_x;
 
-		fov_x = atan( tan( desiredFov*M_PI / 360.0f ) * baseAspect*aspect )*360.0f / M_PI;
+		fov_x = atanf( tanf( desiredFov*M_PI / 360.0f ) * baseAspect*aspect )*360.0f / M_PI;
 	}
 
-	x = refdef->width / tan( fov_x / 360 * M_PI );
-	fov_y = atan2( refdef->height, x );
+	x = refdef->width / tanf( fov_x / 360 * M_PI );
+	fov_y = atan2f( refdef->height, x );
 	fov_y = fov_y * 360 / M_PI;
 
 	// warp if underwater
 	refdef->viewContents = CG_PointContents( &refdef->vieworg, -1 );
 	if ( refdef->viewContents & (CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA) ){
-		phase = cg.time / 1000.0 * WAVE_FREQUENCY * M_PI * 2;
+		phase = cg.time / 1000.0f * WAVE_FREQUENCY * M_PI * 2;
 		v = WAVE_AMPLITUDE * sin( phase );
 		fov_x += v;
 		fov_y -= v;
@@ -939,7 +939,7 @@ static void CG_DamageBlendBlob( void ) {
 	VectorMA( &ent.origin, cg.damageX * -8, &refdef->viewaxis[1], &ent.origin );
 	VectorMA( &ent.origin, cg.damageY * 8, &refdef->viewaxis[2], &ent.origin );
 
-	ent.radius = cg.damageValue * 3 * ( 1.0 - ((float)t / maxTime) );
+	ent.radius = cg.damageValue * 3 * ( 1.0f - ((float)t / maxTime) );
 
 	if ( cg.snap->ps.damageType == 0 ) {
 		// pure health
@@ -1168,7 +1168,7 @@ static int CG_CalcViewValues( int clientNum ) {
 
 		trap->GetUserCmd( cmdNum, &cmd );
 		if ( !(cg.snap->ps.pm_flags & PMF_FOLLOW) && !cg.demoPlayback && cmd.serverTime <= cg.snap->ps.commandTime )
-			VectorMA( &refdef->vieworg, (cg.time - ps->commandTime) * 0.001, &ps->velocity, &refdef->vieworg );
+			VectorMA( &refdef->vieworg, (cg.time - ps->commandTime) * 0.001f, &ps->velocity, &refdef->vieworg );
 	}
 
 	// add error decay
@@ -1351,7 +1351,7 @@ void CG_DrawSkyBoxPortal( const char *cstr ) {
 
 	//RAZFIXME: skyportal FOV
 	x = refdef->width / tan( fov_x / 360 * M_PI );
-	fov_y = atan2( refdef->height, x );
+	fov_y = atan2f( refdef->height, x );
 	fov_y = fov_y * 360 / M_PI;
 
 	refdef->fov_x = fov_x;
@@ -1457,7 +1457,7 @@ void CG_SE_UpdateShake( vector3 *origin, vector3 *angles ) {
 	cgScreenEffects.FOV = CAMERA_DEFAULT_FOV;
 	cgScreenEffects.FOV2 = CAMERA_DEFAULT_FOV;
 
-	//intensity_scale now also takes into account FOV with 90.0 as normal
+	//intensity_scale now also takes into account FOV with 90.0f as normal
 	intensity_scale = 1.0f - ( (float) ( cg.time - cgScreenEffects.shake_start ) / (float) cgScreenEffects.shake_duration )
 		* (((cgScreenEffects.FOV+cgScreenEffects.FOV2)/2.0f)/90.0f);
 
@@ -1681,7 +1681,7 @@ void CG_DrawAutoMap( void ) {
 	//guess this doesn't need to be done every frame, but eh
 	trap->R_GetRealRes( &vWidth, &vHeight );
 
-	//set scaling values so that the 640x480 will result at 1.0/1.0
+	//set scaling values so that the 640x480 will result at 1.0f/1.0f
 	hScale = vWidth/SCREEN_WIDTH;
 	vScale = vHeight/SCREEN_HEIGHT;
 
@@ -1774,7 +1774,7 @@ void CG_DrawAltView( int clientNum ) {
 		//guess this doesn't need to be done every frame, but eh
 		trap->R_GetRealRes( &vWidth, &vHeight );
 
-		//set scaling values so that the 640x480 will result at 1.0/1.0
+		//set scaling values so that the 640x480 will result at 1.0f/1.0f
 		hScale = vWidth/SCREEN_WIDTH;
 		vScale = vHeight/SCREEN_HEIGHT;
 

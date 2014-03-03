@@ -60,8 +60,8 @@ void P_DamageFeedback( gentity_t *player ) {
 		client->damage_fromWorld = qfalse;
 	} else {
 		vectoangles( &client->damage_from, &angles );
-		client->ps.damagePitch = angles.pitch/360.0 * 256;
-		client->ps.damageYaw = angles.yaw/360.0 * 256;
+		client->ps.damagePitch = angles.pitch/360.0f * 256;
+		client->ps.damageYaw = angles.yaw/360.0f * 256;
 
 		//cap them since we can't send negative values in here across the net
 		if (client->ps.damagePitch < 0)
@@ -261,7 +261,7 @@ void DoImpact( gentity_t *self, gentity_t *other, qboolean damageSelf )
 
 			dot = DotProduct( &dir1, &dir2 );
 
-			if ( dot >= 0.2 )
+			if ( dot >= 0.2f )
 				force = dot;
 			else
 				force = 0;
@@ -934,7 +934,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 					}
 					else
 					{
-						damage = delta*0.16; //good enough for now, I guess
+						damage = delta*0.16f; //good enough for now, I guess
 					}
 				}
 
@@ -1205,8 +1205,8 @@ void G_AddPushVecToUcmd( gentity_t *self, usercmd_t *ucmd )
 	self->client->ps.speed = VectorNormalize(&moveDir);
 	//moveDir is now our intended move velocity plus our push Vector
 
-	fMove = 127.0 * DotProduct(&forward, &moveDir);
-	rMove = 127.0 * DotProduct(&right, &moveDir);
+	fMove = 127.0f * DotProduct(&forward, &moveDir);
+	rMove = 127.0f * DotProduct(&right, &moveDir);
 	ucmd->forwardmove = floor(fMove);//If in the same dir , will be positive
 	ucmd->rightmove = floor(rMove);//If in the same dir , will be positive
 
@@ -2315,13 +2315,13 @@ void ClientThink_real( gentity_t *ent ) {
 						// if the NPC is locked into a Yaw, we want to check the lockedDesiredYaw...otherwise the NPC can't walk backwards, because it always thinks it trying to turn according to desiredYaw
 						//if( client->renderInfo.renderFlags & RF_LOCKEDANGLE ) // yeah I know the RF_ flag is a pretty ugly hack...
 						if (0) //rwwFIXMEFIXME: ...
-							turndelta = (180 - fabs( AngleDelta( ent->r.currentAngles.yaw, ent->NPC->lockedDesiredYaw ) ))/180;
+							turndelta = (180 - fabsf( AngleDelta( ent->r.currentAngles.yaw, ent->NPC->lockedDesiredYaw ) ))/180;
 						else
-							turndelta = (180 - fabs( AngleDelta( ent->r.currentAngles.yaw, ent->NPC->desiredYaw ) ))/180;
+							turndelta = (180 - fabsf( AngleDelta( ent->r.currentAngles.yaw, ent->NPC->desiredYaw ) ))/180;
 
 						if ( turndelta < 0.75f )
 							client->ps.speed = 0;
-						else if ( ent->NPC->distToGoal < 100 && turndelta < 1.0 )
+						else if ( ent->NPC->distToGoal < 100 && turndelta < 1.0f )
 						{//Turn is greater than 45 degrees or closer than 100 to goal
 							client->ps.speed = floor( client->ps.speed * turndelta );
 						}
@@ -2731,7 +2731,7 @@ void ClientThink_real( gentity_t *ent ) {
 					trap->Trace(&tr, &intendedOrigin, &ent->r.mins, &ent->r.maxs, &intendedOrigin, ent->s.number, ent->clipmask, qfalse, 0, 0);
 					trap->Trace(&tr2, &ent->client->ps.origin, &ent->r.mins, &ent->r.maxs, &intendedOrigin, ent->s.number, CONTENTS_SOLID, qfalse, 0, 0);
 
-					if (tr.fraction == 1.0 && !tr.startsolid && tr2.fraction == 1.0 && !tr2.startsolid)
+					if (tr.fraction == 1.0f && !tr.startsolid && tr2.fraction == 1.0f && !tr2.startsolid)
 					{
 						VectorCopy(&intendedOrigin, &ent->client->ps.origin);
 
@@ -2766,7 +2766,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	/*
 	if ( client->ps.powerups[PW_HASTE] ) {
-		client->ps.speed *= 1.3;
+		client->ps.speed *= 1.3f;
 	}
 	*/
 
@@ -3628,7 +3628,7 @@ void ClientThink_real( gentity_t *ent ) {
 		float dt;
 		if ( atTime > ent->jpModelScaleTimeStart + ent->jpModelScaleTimeEnd )
 			atTime = ent->jpModelScaleTimeStart + ent->jpModelScaleTimeEnd;
-		dt = ( atTime - ent->jpModelScaleTimeEnd ) * 0.001;
+		dt = ( atTime - ent->jpModelScaleTimeEnd ) * 0.001f;
 		if ( dt < 0 )
 			dt = 0;
 

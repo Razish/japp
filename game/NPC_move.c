@@ -41,7 +41,7 @@ qboolean NPC_ClearPathToGoal( vector3 *dir, gentity_t *goal )
 	if (!FlyingCreature(NPC))
 	{
 		//See if we're too far above
-		if ( fabs( NPC->r.currentOrigin.z - goal->r.currentOrigin.z ) > 48 )
+		if ( fabsf( NPC->r.currentOrigin.z - goal->r.currentOrigin.z ) > 48 )
 			return qfalse;
 	}
 

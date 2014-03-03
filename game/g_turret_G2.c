@@ -387,7 +387,7 @@ static void turretG2_fire ( gentity_t *ent, vector3 *start, vector3 *dir )
 		bolt->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 		//bolt->trigger_formation = qfalse;		// don't draw tail on first frame
 
-		VectorSet( &bolt->r.maxs, 1.5, 1.5, 1.5 );
+		VectorSet( &bolt->r.maxs, 1.5f, 1.5f, 1.5f );
 		VectorScale( &bolt->r.maxs, -1, &bolt->r.mins );
 		bolt->s.pos.trType = TR_LINEAR;
 		bolt->s.pos.trTime = level.time;
@@ -536,13 +536,13 @@ static void turretG2_aim( gentity_t *self )
 	else
 	{
 		// no enemy, so make us slowly sweep back and forth as if searching for a new one
-//		diffYaw = sin( level.time * 0.0001f + self->count ) * 5.0f;	// don't do this for now since it can make it go into walls.
+//		diffYaw = sinf( level.time * 0.0001f + self->count ) * 5.0f;	// don't do this for now since it can make it go into walls.
 	}
 
 	if ( diffYaw )
 	{
 		// cap max speed....
-		if ( fabs(diffYaw) > maxYawSpeed )
+		if ( fabsf(diffYaw) > maxYawSpeed )
 		{
 			diffYaw = ( diffYaw >= 0 ? maxYawSpeed : -maxYawSpeed );
 		}
@@ -559,7 +559,7 @@ static void turretG2_aim( gentity_t *self )
 	if ( diffPitch )
 	{
 		// cap max speed
-		if ( fabs(diffPitch) > maxPitchSpeed )
+		if ( fabsf(diffPitch) > maxPitchSpeed )
 			self->speed += (diffPitch > 0.0f) ? -maxPitchSpeed : maxPitchSpeed;
 		// small enough, so just add half the diff so we smooth out the stopping
 		else
@@ -715,7 +715,7 @@ static qboolean turretG2_find_enemies( gentity_t *self )
 
 		trap->Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT, qfalse, 0, 0 );
 
-		if ( !tr.allsolid && !tr.startsolid && ( tr.fraction == 1.0 || tr.entityNum == target->s.number ))
+		if ( !tr.allsolid && !tr.startsolid && ( tr.fraction == 1.0f || tr.entityNum == target->s.number ))
 		{
 			// Only acquire if have a clear shot, Is it in range and closer than our best?
 			VectorSubtract( &target->r.currentOrigin, &self->r.currentOrigin, &enemyDir );

@@ -35,8 +35,8 @@
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-40
-#define ARMOR_PROTECTION		0.50 // Shields only stop 50% of armor-piercing dmg
-#define ARMOR_REDUCTION_FACTOR	0.50 // Certain damage doesn't take off armor as efficiently
+#define ARMOR_PROTECTION		0.50f // Shields only stop 50% of armor-piercing dmg
+#define ARMOR_REDUCTION_FACTOR	0.50f // Certain damage doesn't take off armor as efficiently
 
 #define	JUMP_VELOCITY		225//270
 
@@ -1629,8 +1629,8 @@ typedef struct saberInfo_s {
 	qhandle_t		swingSound[3];							// none - if set, plays one of these 3 sounds when swung during an attack - NOTE: must provide all 3!!!
 
 	//done in game (server-side code)
-	float			moveSpeedScale;							// 1.0 - you move faster/slower when using this saber
-	float			animSpeedScale;							// 1.0 - plays normal attack animations faster/slower
+	float			moveSpeedScale;							// 1.0f - you move faster/slower when using this saber
+	float			animSpeedScale;							// 1.0f - plays normal attack animations faster/slower
 
 	//done in both cgame and game (BG code)
 	int				kataMove;								// LS_INVALID - if set, player will execute this move when they press both attack buttons at the same time

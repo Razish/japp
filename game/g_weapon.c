@@ -245,13 +245,13 @@ static void WP_FireBryarPistol( gentity_t *ent, qboolean altFire )
 			count = 5;
 
 		if (count > 1)
-			damage *= (count*1.7);
+			damage *= (count*1.7f);
 		else
-			damage *= (count*1.5);
+			damage *= (count*1.5f);
 
 		missile->s.generic1 = count; // The missile will then render according to the charge level.
 
-		boxSize = BRYAR_ALT_SIZE*(count*0.5);
+		boxSize = BRYAR_ALT_SIZE*(count*0.5f);
 
 		VectorSet( &missile->r.maxs,  boxSize,  boxSize,  boxSize );
 		VectorSet( &missile->r.mins, -boxSize, -boxSize, -boxSize );
@@ -1139,7 +1139,7 @@ void DEMP2_AltRadiusDamage( gentity_t *ent )
 
 	radius = frac * 200.0f; // 200 is max radius...the model is aprox. 100 units tall...the fx draw code mults. this by 2.
 
-	fact = ent->count*0.6;
+	fact = ent->count*0.6f;
 
 	if (fact < 1)
 		fact = 1;
@@ -1294,7 +1294,7 @@ static void WP_DEMP2_AltFire( gentity_t *ent )
 	else if ( count > 3 )
 		count = 3;
 
-	fact = count*0.8;
+	fact = count*0.8f;
 	if (fact < 1)
 		fact = 1;
 	damage *= fact;
@@ -1654,7 +1654,7 @@ void rocketThink( gentity_t *ent )
 		}
 
 
-		// a dot of 1.0 means right-on-target.
+		// a dot of 1.0f means right-on-target.
 		if ( dot < 0.0f )
 		{
 			// Go in the direction opposite, start a 180.
@@ -1673,7 +1673,7 @@ void rocketThink( gentity_t *ent )
 			}
 
 			// Yeah we've adjusted horizontally, but let's split the difference vertically, so we kinda try to move towards it.
-			newdir.z = ( (targetdir.z*newDirMult) + (ent->movedir.z*oldDirMult) ) * 0.5;
+			newdir.z = ( (targetdir.z*newDirMult) + (ent->movedir.z*oldDirMult) ) * 0.5f;
 
 			// let's also slow down a lot
 			vel *= 0.5f;
@@ -2006,7 +2006,7 @@ qboolean WP_LobFire( gentity_t *self, vector3 *start, vector3 *target, vector3 *
 
 		VectorScale( &targetDir, shotSpeed, &shotVel );
 		travelTime = targetDist/shotSpeed;
-		shotVel.z += travelTime * 0.5 * g_gravity.value;
+		shotVel.z += travelTime * 0.5f * g_gravity.value;
 
 		if ( !hitCount )
 		{//save the first (ideal) one as the failCase (fallback value)
@@ -2048,7 +2048,7 @@ qboolean WP_LobFire( gentity_t *self, vector3 *start, vector3 *target, vector3 *
 					{//hit the enemy, that's perfect!
 						break;
 					}
-					else if ( trace.plane.normal.z > 0.7 && DistanceSquared( &trace.endpos, target ) < 4096 )//hit within 64 of desired location, should be okay
+					else if ( trace.plane.normal.z > 0.7f && DistanceSquared( &trace.endpos, target ) < 4096 )//hit within 64 of desired location, should be okay
 					{//close enough!
 						break;
 					}
@@ -2539,9 +2539,9 @@ void charge_stick (gentity_t *self, gentity_t *other, trace_t *trace)
 		VectorCopy(&trace->plane.normal, &vNor);
 		VectorNormalize(&vNor);
 		VectorNPos(&self->s.pos.trDelta, &tN);
-		self->s.pos.trDelta.x += vNor.x*(tN.x*(((float)Q_irand(1, 10))*0.1));
-		self->s.pos.trDelta.y += vNor.y*(tN.y*(((float)Q_irand(1, 10))*0.1));
-		self->s.pos.trDelta.z += vNor.z*(tN.z*(((float)Q_irand(1, 10))*0.1));
+		self->s.pos.trDelta.x += vNor.x*(tN.x*(((float)Q_irand(1, 10))*0.1f));
+		self->s.pos.trDelta.y += vNor.y*(tN.y*(((float)Q_irand(1, 10))*0.1f));
+		self->s.pos.trDelta.z += vNor.z*(tN.z*(((float)Q_irand(1, 10))*0.1f));
 
 		vectoangles(&vNor, &self->s.angles);
 		vectoangles(&vNor, &self->s.apos.trBase);
@@ -3803,8 +3803,8 @@ void G_EstimateCamPos( vector3 *viewAngles, vector3 *cameraFocusLoc, float viewh
 	if ( !bg_fighterAltControl.integer )
 	{//clamp view pitch
 		cameraFocusAngles.pitch = AngleNormalize180( cameraFocusAngles.pitch );
-			 if (cameraFocusAngles.pitch >  80.0)	cameraFocusAngles.pitch =  80.0;
-		else if (cameraFocusAngles.pitch < -80.0)	cameraFocusAngles.pitch = -80.0;
+			 if (cameraFocusAngles.pitch >  80.0f)	cameraFocusAngles.pitch =  80.0f;
+		else if (cameraFocusAngles.pitch < -80.0f)	cameraFocusAngles.pitch = -80.0f;
 	}
 	AngleVectors(&cameraFocusAngles, &camerafwd, NULL, &cameraup);
 
@@ -3816,7 +3816,7 @@ void G_EstimateCamPos( vector3 *viewAngles, vector3 *cameraFocusLoc, float viewh
 	//NOTE: on cgame, this uses the thirdpersontargetdamp value, we ignore that here
 	VectorCopy( &cameraIdealTarget, &cameraCurTarget );
 	trap->Trace( &trace, cameraFocusLoc, &cameramins, &cameramaxs, &cameraCurTarget, ignoreEntNum, MASK_CAMERACLIP, qfalse, 0, 0 );
-	if (trace.fraction < 1.0)
+	if (trace.fraction < 1.0f)
 	{
 		VectorCopy(&trace.endpos, &cameraCurTarget);
 	}
@@ -3825,7 +3825,7 @@ void G_EstimateCamPos( vector3 *viewAngles, vector3 *cameraFocusLoc, float viewh
 	//NOTE: on cgame, this uses the thirdpersoncameradamp value, we ignore that here
 	VectorCopy( &cameraIdealLoc, &cameraCurLoc );
 	trap->Trace(&trace, &cameraCurTarget, &cameramins, &cameramaxs, &cameraCurLoc, ignoreEntNum, MASK_CAMERACLIP, qfalse, 0, 0);
-	if (trace.fraction < 1.0)
+	if (trace.fraction < 1.0f)
 	{
 		VectorCopy( &trace.endpos, &cameraCurLoc );
 	}
@@ -3833,7 +3833,7 @@ void G_EstimateCamPos( vector3 *viewAngles, vector3 *cameraFocusLoc, float viewh
 	VectorSubtract(&cameraCurTarget, &cameraCurLoc, &diff);
 	{
 		float dist = VectorNormalize(&diff);
-		//under normal circumstances, should never be 0.00000 and so on.
+		//under normal circumstances, should never be 0.00000f and so on.
 		if ( !dist || (diff.x == 0 || diff.y == 0) )
 		{//must be hitting something, need some value to calc angles, so use cam forward
 			VectorCopy( &camerafwd, &diff );
@@ -3861,7 +3861,7 @@ void WP_GetVehicleCamPos( gentity_t *ent, gentity_t *pilot, vector3 *camPos )
 	if ( ent->client->ps.hackingTime )
 	{
 		thirdPersonHorzOffset	+= (((float)ent->client->ps.hackingTime)/MAX_STRAFE_TIME) * -80.0f;
-		thirdPersonRange	+= fabs(((float)ent->client->ps.hackingTime)/MAX_STRAFE_TIME) * 100.0f;
+		thirdPersonRange	+= fabsf(((float)ent->client->ps.hackingTime)/MAX_STRAFE_TIME) * 100.0f;
 	}
 
 	if ( ent->m_pVehicle->m_pVehicleInfo->cameraPitchDependantVertOffset )
@@ -3880,8 +3880,8 @@ void WP_GetVehicleCamPos( gentity_t *ent, gentity_t *pilot, vector3 *camPos )
 		}
 		else
 			vertOffset = 30;
-			 if ( pilot->client->ps.viewangles.pitch > 0 )	pitchOffset = pilot->client->ps.viewangles.pitch*-0.75;
-		else if ( pilot->client->ps.viewangles.pitch < 0 )	pitchOffset = pilot->client->ps.viewangles.pitch*-0.75;
+			 if ( pilot->client->ps.viewangles.pitch > 0 )	pitchOffset = pilot->client->ps.viewangles.pitch*-0.75f;
+		else if ( pilot->client->ps.viewangles.pitch < 0 )	pitchOffset = pilot->client->ps.viewangles.pitch*-0.75f;
 		else												pitchOffset = 0;
 	}
 
@@ -4679,7 +4679,7 @@ void emplaced_gun_update(gentity_t *self)
 		self->s.time = 0;
 		self->genericValue4 = 0;
 		self->genericValue3 = 0;
-		self->health = EMPLACED_GUN_HEALTH*0.4;
+		self->health = EMPLACED_GUN_HEALTH*0.4f;
 		self->s.health = self->health;
 	}
 
@@ -4811,7 +4811,7 @@ void SP_emplaced_gun( gentity_t *ent )
 
 	if (ent->spawnflags & EMPLACED_CANRESPAWN)
 	{ //make it somewhat easier to kill if it can respawn
-		ent->health *= 0.4;
+		ent->health *= 0.4f;
 	}
 
 	ent->maxHealth = ent->health;

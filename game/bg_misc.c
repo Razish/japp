@@ -798,7 +798,7 @@ float vectoyaw( const vector3 *vec ) {
 		yaw = 0;
 	} else {
 		if (vec->pitch) {
-			yaw = ( atan2( vec->yaw, vec->pitch) * 180 / M_PI );
+			yaw = ( atan2f( vec->yaw, vec->pitch) * 180 / M_PI );
 		} else if (vec->yaw > 0) {
 			yaw = 90;
 		} else {
@@ -1343,18 +1343,18 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vector3 *result 
 		VectorCopy( &tr->trBase, result );
 		break;
 	case TR_LINEAR:
-		deltaTime = ( atTime - tr->trTime ) * 0.001;	// milliseconds to seconds
+		deltaTime = ( atTime - tr->trTime ) * 0.001f;	// milliseconds to seconds
 		VectorMA( &tr->trBase, deltaTime, &tr->trDelta, result );
 		break;
 	case TR_SINE:
 		deltaTime = ( atTime - tr->trTime ) / (float) tr->trDuration;
-		phase = sin( deltaTime * M_PI * 2 );
+		phase = sinf( deltaTime * M_PI * 2 );
 		VectorMA( &tr->trBase, phase, &tr->trDelta, result );
 		break;
 	case TR_LINEAR_STOP:
 		if ( atTime > tr->trTime + tr->trDuration )
 			atTime = tr->trTime + tr->trDuration;
-		deltaTime = ( atTime - tr->trTime ) * 0.001;	// milliseconds to seconds
+		deltaTime = ( atTime - tr->trTime ) * 0.001f;	// milliseconds to seconds
 		if ( deltaTime < 0 )
 			deltaTime = 0;
 		VectorMA( &tr->trBase, deltaTime, &tr->trDelta, result );
@@ -1371,14 +1371,14 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vector3 *result 
 		}
 		else
 		{//FIXME: maybe scale this somehow?  So that it starts out faster and stops faster?
-			deltaTime = tr->trDuration*0.001f*((float)cos( DEG2RAD(90.0f - (90.0f*((float)(atTime-tr->trTime))/(float)tr->trDuration)) ));
+			deltaTime = tr->trDuration*0.001f*((float)cosf( DEG2RAD(90.0f - (90.0f*((float)(atTime-tr->trTime))/(float)tr->trDuration)) ));
 		}
 		VectorMA( &tr->trBase, deltaTime, &tr->trDelta, result );
 		break;
 	case TR_GRAVITY:
-		deltaTime = ( atTime - tr->trTime ) * 0.001;	// milliseconds to seconds
+		deltaTime = ( atTime - tr->trTime ) * 0.001f;	// milliseconds to seconds
 		VectorMA( &tr->trBase, deltaTime, &tr->trDelta, result );
-		result->data[2] -= 0.5 * DEFAULT_GRAVITY * deltaTime * deltaTime;		// FIXME: local gravity...
+		result->data[2] -= 0.5f * DEFAULT_GRAVITY * deltaTime * deltaTime;		// FIXME: local gravity...
 		break;
 	default:
 #ifdef _GAME
@@ -1411,8 +1411,8 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vector3 *re
 		break;
 	case TR_SINE:
 		deltaTime = ( atTime - tr->trTime ) / (float) tr->trDuration;
-		phase = cos( deltaTime * M_PI * 2 );	// derivative of sin = cos
-		phase *= 0.5;
+		phase = cosf( deltaTime * M_PI * 2 );	// derivative of sin = cos
+		phase *= 0.5f;
 		VectorScale( &tr->trDelta, phase, result );
 		break;
 	case TR_LINEAR_STOP:
@@ -1428,11 +1428,11 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vector3 *re
 			VectorClear( result );
 			return;
 		}
-		deltaTime = tr->trDuration*0.001f*((float)cos( DEG2RAD(90.0f - (90.0f*((float)(atTime-tr->trTime))/(float)tr->trDuration)) ));
+		deltaTime = tr->trDuration*0.001f*((float)cosf( DEG2RAD(90.0f - (90.0f*((float)(atTime-tr->trTime))/(float)tr->trDuration)) ));
 		VectorScale( &tr->trDelta, deltaTime, result );
 		break;
 	case TR_GRAVITY:
-		deltaTime = ( atTime - tr->trTime ) * 0.001;	// milliseconds to seconds
+		deltaTime = ( atTime - tr->trTime ) * 0.001f;	// milliseconds to seconds
 		VectorCopy( &tr->trDelta, result );
 		result->data[2] -= DEFAULT_GRAVITY * deltaTime;		// FIXME: local gravity...
 		break;

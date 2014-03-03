@@ -21,7 +21,7 @@ extern void ForceJump( gentity_t *self, usercmd_t *ucmd );
 #define	LIGHT_SCALE			0.25f
 
 #define	REALIZE_THRESHOLD	0.6f
-#define CAUTIOUS_THRESHOLD	( REALIZE_THRESHOLD * 0.3 )
+#define CAUTIOUS_THRESHOLD	( REALIZE_THRESHOLD * 0.3f )
 
 #define	MAX_CHECK_THRESHOLD	1
 
@@ -1069,7 +1069,7 @@ qboolean NPC_MoveDirClear( int forwardmove, int rightmove, qboolean reset )
 		return qtrue;
 	}
 	/*
-	if ( fabs( AngleDelta( NPC->r.currentAngles.yaw, NPCInfo->desiredYaw ) ) < 5.0 )//!ucmd.angles.yaw )
+	if ( fabsf( AngleDelta( NPC->r.currentAngles.yaw, NPCInfo->desiredYaw ) ) < 5.0f )//!ucmd.angles.yaw )
 	{//Not turning much, don't do this
 		//NOTE: Should this not happen only if you're not turning AT ALL?
 		//	You could be turning slowly but moving fast, so that would
@@ -1104,7 +1104,7 @@ qboolean NPC_MoveDirClear( int forwardmove, int rightmove, qboolean reset )
 		VectorCopy( &testPos, &trace.endpos );
 		//return qtrue;
 	}
-	if ( trace.fraction < 0.6 )
+	if ( trace.fraction < 0.6f )
 	{//Going to bump into something very close, don't move, just turn
 		if ( (NPC->enemy && trace.entityNum == NPC->enemy->s.number) || (NPCInfo->goalEntity && trace.entityNum == NPCInfo->goalEntity->s.number) )
 		{//okay to bump into enemy or goal
@@ -1142,7 +1142,7 @@ qboolean NPC_MoveDirClear( int forwardmove, int rightmove, qboolean reset )
 		return qtrue;
 	}
 
-	if ( trace.fraction < 1.0 )
+	if ( trace.fraction < 1.0f )
 	{//Not going off a cliff
 		//FIXME: what if plane.normal is sloped?  We'll slide off, not land... plus this doesn't account for slide-movement...
 		//Com_Printf( "%d walk off cliff okay will hit entnum %d at dropdist of %4.2f\n", level.time, trace.entityNum, (trace.fraction*bottom_max) );
@@ -1153,8 +1153,8 @@ qboolean NPC_MoveDirClear( int forwardmove, int rightmove, qboolean reset )
 	if ( reset )
 	{//actually want to screw with the ucmd
 		//Com_Printf( "%d avoiding walk off cliff\n", level.time );
-		ucmd.forwardmove *= -1.0;//= 0;
-		ucmd.rightmove *= -1.0;//= 0;
+		ucmd.forwardmove *= -1.0f;//= 0;
+		ucmd.rightmove *= -1.0f;//= 0;
 		VectorScale( &NPC->client->ps.moveDir, -1, &NPC->client->ps.moveDir );
 	}
 	return qfalse;
@@ -2500,7 +2500,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 		{
 			if ( rightdot > 12
 				|| (rightdot > 3 && zdiff < 5)
-				|| (!incoming&&fabs(hitdir.z)<0.25f) )//was normalized, 0.3
+				|| (!incoming&&fabsf(hitdir.z)<0.25f) )//was normalized, 0.3f
 			{//coming from right
 				if ( doDodge )
 				{
@@ -2548,7 +2548,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 			}
 			else if ( rightdot < -12
 				|| (rightdot < -3 && zdiff < 5)
-				|| (!incoming&&fabs(hitdir.z)<0.25f) )//was normalized, -0.3
+				|| (!incoming&&fabsf(hitdir.z)<0.25f) )//was normalized, -0.3f
 			{//coming from left
 				if ( doDodge )
 				{
@@ -2644,7 +2644,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 		}
 		if ( incoming || !saberBusy )
 		{
-			if ( rightdot > 8 || (rightdot > 3 && zdiff < -11) )//was normalized, 0.2
+			if ( rightdot > 8 || (rightdot > 3 && zdiff < -11) )//was normalized, 0.2f
 			{
 				if ( doDodge )
 				{
@@ -2675,7 +2675,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 					Com_Printf( "mid-UR block\n" );
 				}
 			}
-			else if ( rightdot < -8 || (rightdot < -3 && zdiff < -11) )//was normalized, -0.2
+			else if ( rightdot < -8 || (rightdot < -3 && zdiff < -11) )//was normalized, -0.2f
 			{
 				if ( doDodge )
 				{
@@ -3107,7 +3107,7 @@ static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bl
 	{//estimate
 		VectorSubtract( saberPoint, axisPoint, dir );
 		VectorNormalize( dir );
-		VectorMA( axisPoint, NPC->r.maxs[0]*1.22, dir, hitloc );
+		VectorMA( axisPoint, NPC->r.maxs[0]*1.22f, dir, hitloc );
 	}
 	else
 	{
@@ -3200,7 +3200,7 @@ static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bl
 		/*
 		VectorSubtract( saberPoint, axisPoint, dir );
 		VectorNormalize( dir );
-		VectorMA( axisPoint, NPC->r.maxs[0]*1.22, dir, hitloc );
+		VectorMA( axisPoint, NPC->r.maxs[0]*1.22f, dir, hitloc );
 		*/
 	}
 	else
@@ -3238,7 +3238,7 @@ static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bl
 		{
 			if ( NPC->client->NPC_class == CLASS_TAVION )
 			{
-				TIMER_Set( NPC, "parryTime", Q_irand( parryReCalcTime/2, parryReCalcTime*1.5 ) );
+				TIMER_Set( NPC, "parryTime", Q_irand( parryReCalcTime/2, parryReCalcTime*1.5f ) );
 			}
 			else if ( NPCInfo->rank >= RANK_LT_JG )
 			{//fencers and higher hold a parry less
@@ -3355,7 +3355,7 @@ static void Jedi_EvasionSaber( vector3 *enemy_movedir, float enemy_dist, vector3
 			facingAmt = DotProduct( enemy_movedir, &dirEnemy2Me );
 		}
 
-		if ( flrand( 0.25, 1 ) < facingAmt )
+		if ( flrand( 0.25f, 1 ) < facingAmt )
 		{//coming at/facing me!
 			int whichDefense = 0;
 			if ( NPC->client->ps.weaponTime || NPC->client->ps.saberInFlight || NPC->client->NPC_class == CLASS_BOBAFETT )
@@ -3388,7 +3388,7 @@ static void Jedi_EvasionSaber( vector3 *enemy_movedir, float enemy_dist, vector3
 						//Com_Printf( "(%d) raise agg - enemy threw saber\n", level.time );
 						Jedi_Aggression( NPC, 1 );
 					}
-					if ( DotProduct( &saberMoveDir, &saberDir2Me ) > 0.5 )
+					if ( DotProduct( &saberMoveDir, &saberDir2Me ) > 0.5f )
 					{//it's heading towards me
 						if ( saberDist < 100 )
 						{//it's close
@@ -3420,7 +3420,7 @@ static void Jedi_EvasionSaber( vector3 *enemy_movedir, float enemy_dist, vector3
 					vector3	fwd;
 					//see if I'm facing him
 					AngleVectors( &NPC->client->ps.viewangles, &fwd, NULL, NULL );
-					if ( DotProduct( enemy_dir, &fwd ) < 0.5 )
+					if ( DotProduct( enemy_dir, &fwd ) < 0.5f )
 					{//I'm not really facing him, best option is to strafe
 						whichDefense = Q_irand( 5, 16 );
 					}
@@ -3666,18 +3666,18 @@ static void Jedi_SetEnemyInfo( vector3 *enemy_dest, vector3 *enemy_dir, float *e
 		enemy_dest->z += NPC->enemy->r.mins.z + 24;//get it's origin to a height I can work with
 		VectorSubtract( enemy_dest, &NPC->r.currentOrigin, enemy_dir );
 		//FIXME: enemy_dist calc needs to include all blade lengths, and include distance from hand to start of blade....
-		*enemy_dist = VectorNormalize( enemy_dir );// - (NPC->client->ps.saberLengthMax + NPC->r.maxs[0]*1.5 + 16);
+		*enemy_dist = VectorNormalize( enemy_dir );// - (NPC->client->ps.saberLengthMax + NPC->r.maxs[0]*1.5f + 16);
 	}
 	else
 	{//see where enemy is headed
 		VectorCopy( &NPC->enemy->client->ps.velocity, enemy_movedir );
 		*enemy_movespeed = VectorNormalize( enemy_movedir );
 		//figure out where he'll be, say, 3 frames from now
-		VectorMA( &NPC->enemy->r.currentOrigin, *enemy_movespeed * 0.001 * prediction, enemy_movedir, enemy_dest );
+		VectorMA( &NPC->enemy->r.currentOrigin, *enemy_movespeed * 0.001f * prediction, enemy_movedir, enemy_dest );
 		//figure out what dir the enemy's estimated position is from me and how far from the tip of my saber he is
 		VectorSubtract( enemy_dest, &NPC->r.currentOrigin, enemy_dir );//NPC->client->renderInfo.muzzlePoint
 		//FIXME: enemy_dist calc needs to include all blade lengths, and include distance from hand to start of blade....
-		*enemy_dist = VectorNormalize( enemy_dir ) - (NPC->client->saber[0].blade[0].lengthMax + NPC->r.maxs.x*1.5 + 16); //just use the blade 0 len I guess
+		*enemy_dist = VectorNormalize( enemy_dir ) - (NPC->client->saber[0].blade[0].lengthMax + NPC->r.maxs.x*1.5f + 16); //just use the blade 0 len I guess
 		//FIXME: keep a group of enemies around me and use that info to make decisions...
 		//		For instance, if there are multiple enemies, evade more, push them away
 		//		and use medium attacks.  If enemies are using blasters, switch to fast.
@@ -4359,7 +4359,7 @@ static qboolean Jedi_AttackDecide( int enemy_dist )
 }
 
 #define	APEX_HEIGHT		200.0f
-#define	PARA_WIDTH		(sqrt(APEX_HEIGHT)+sqrt(APEX_HEIGHT))
+#define	PARA_WIDTH		(sqrtf(APEX_HEIGHT)+sqrtf(APEX_HEIGHT))
 #define	JUMP_SPEED		200.0f
 
 static qboolean Jedi_Jump( vector3 *dest, int goalEntNum )
@@ -4374,7 +4374,7 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum )
 		enemy_diff[2] = 0;
 		float enemy_xy_diff = VectorNormalize( enemy_diff );
 
-		VectorScale( enemy_diff, enemy_xy_diff*0.8, NPC->client->ps.velocity );
+		VectorScale( enemy_diff, enemy_xy_diff*0.8f, NPC->client->ps.velocity );
 		if ( enemy_z_diff < 64 )
 		{
 			NPC->client->ps.velocity[2] = enemy_xy_diff;
@@ -4403,7 +4403,7 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum )
 
 			VectorScale( &targetDir, shotSpeed, &shotVel );
 			travelTime = targetDist/shotSpeed;
-			shotVel.z += travelTime * 0.5 * NPC->client->ps.gravity;
+			shotVel.z += travelTime * 0.5f * NPC->client->ps.gravity;
 
 			if ( !hitCount )
 			{//save the first one as the worst case scenario
@@ -4457,7 +4457,7 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum )
 								blocked = qtrue;
 								break;
 							}
-							if ( trace.plane.normal.z > 0.7 && DistanceSquared( &trace.endpos, dest ) < 4096 )//hit within 64 of desired location, should be okay
+							if ( trace.plane.normal.z > 0.7f && DistanceSquared( &trace.endpos, dest ) < 4096 )//hit within 64 of desired location, should be okay
 							{//close enough!
 								break;
 							}
@@ -4558,9 +4558,9 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum )
 		//somewhere... PARA_WIDTH
 		/*
 		apexHeight = (APEX_HEIGHT * PARA_WIDTH/xy) + (APEX_HEIGHT * z/128);
-		if ( apexHeight < APEX_HEIGHT * 0.5 )
+		if ( apexHeight < APEX_HEIGHT * 0.5f )
 		{
-			apexHeight = APEX_HEIGHT*0.5;
+			apexHeight = APEX_HEIGHT*0.5f;
 		}
 		else if ( apexHeight > APEX_HEIGHT * 2 )
 		{
@@ -4568,14 +4568,14 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum )
 		}
 		*/
 
-		z = (sqrt(apexHeight + z) - sqrt(apexHeight));
+		z = (sqrtf(apexHeight + z) - sqrtf(apexHeight));
 
 		assert(z >= 0);
 
 //		Com_Printf("apex is %4.2f percent from p1: ", (xy-z)*0.5/xy*100.0f);
 
 		xy -= z;
-		xy *= 0.5;
+		xy *= 0.5f;
 
 		assert(xy > 0);
 
@@ -4586,7 +4586,7 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum )
 
 		//Now we have the apex, aim for it
 		height = apex.z - NPC->r.currentOrigin.z;
-		time = sqrt( height / ( .5 * NPC->client->ps.gravity ) );//was 0.5, but didn't work well for very long jumps
+		time = sqrtf( height / ( .5f * NPC->client->ps.gravity ) );//was 0.5f, but didn't work well for very long jumps
 		if ( !(int)time )
 		{
 			//Com_Printf( S_COLOR_RED"ERROR: no time in jump\n" );
@@ -4597,7 +4597,7 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum )
 		NPC->client->ps.velocity.z = 0;
 		dist = VectorNormalize( &NPC->client->ps.velocity );
 
-		forward = dist / time * 1.25;//er... probably bad, but...
+		forward = dist / time * 1.25f;//er... probably bad, but...
 		VectorScale( &NPC->client->ps.velocity, forward, &NPC->client->ps.velocity );
 
 		//FIXME:  Uh.... should we trace/EvaluateTrajectory this to make sure we have clearance and we land where we want?
@@ -4662,10 +4662,10 @@ static qboolean Jedi_TryJump( gentity_t *goal )
 									trace_t	trace;
 									vector3	bottom;
 
-									if ( Q_irand( 0, 1 ) )	dest.x += NPC->enemy->r.maxs.x*1.25;
-									else					dest.x += NPC->enemy->r.mins.x*1.25;
-									if ( Q_irand( 0, 1 ) )	dest.y += NPC->enemy->r.maxs.y*1.25;
-									else					dest.y += NPC->enemy->r.mins.y*1.25;
+									if ( Q_irand( 0, 1 ) )	dest.x += NPC->enemy->r.maxs.x*1.25f;
+									else					dest.x += NPC->enemy->r.mins.x*1.25f;
+									if ( Q_irand( 0, 1 ) )	dest.y += NPC->enemy->r.maxs.y*1.25f;
+									else					dest.y += NPC->enemy->r.mins.y*1.25f;
 									VectorCopy( &dest, &bottom );
 									bottom.z -= 128;
 									trap->Trace( &trace, &dest, &NPC->r.mins, &NPC->r.maxs, &bottom, goal->s.number, NPC->clipmask, qfalse, 0, 0 );
@@ -5056,7 +5056,7 @@ static void Jedi_Combat( void )
 				VectorCopy( NPC->r.currentOrigin, end );
 				end[2] += 36;
 				trap->Trace( &trace, NPC->r.currentOrigin, NPC->r.mins, NPC->r.maxs, end, NPC->s.number, NPC->clipmask|CONTENTS_BOTCLIP, qfalse, 0, 0 );
-				if ( !trace.allsolid && !trace.startsolid && trace.fraction >= 1.0 )
+				if ( !trace.allsolid && !trace.startsolid && trace.fraction >= 1.0f )
 				{
 					vector3 angles, forward;
 					VectorCopy( NPC->client->ps.viewangles, angles );
@@ -5066,7 +5066,7 @@ static void Jedi_Combat( void )
 					trap->Trace( &trace, NPC->r.currentOrigin, NPC->r.mins, NPC->r.maxs, end, NPC->s.number, NPC->clipmask|CONTENTS_BOTCLIP, qfalse, 0, 0 );
 					if ( !trace.allsolid && !trace.startsolid )
 					{
-						if ( trace.fraction >= 1.0 || trace.plane.normal[2] > 0 )
+						if ( trace.fraction >= 1.0f || trace.plane.normal[2] > 0 )
 						{
 							ucmd.upmove = 127;
 							ucmd.forwardmove = 127;
@@ -5491,7 +5491,7 @@ static void Jedi_Patrol( void )
 							saberDist = VectorNormalize( &saberDir2Me );
 							VectorCopy( &saber->s.pos.trDelta, &saberMoveDir );
 							VectorNormalize( &saberMoveDir );
-							if ( DotProduct( &saberMoveDir, &saberDir2Me ) > 0.5 )
+							if ( DotProduct( &saberMoveDir, &saberDir2Me ) > 0.5f )
 							{//it's heading towards me
 								if ( saberDist < 200 )
 								{//incoming!
@@ -5683,7 +5683,7 @@ void NPC_BSJedi_FollowLeader( void )
 		}
 		if ( NPCInfo->aiFlags & NPCAI_BLOCKED )
 		{//try to jump to the blockedDest
-			if ( fabs(NPCInfo->blockedDest.z-NPC->r.currentOrigin.z) > 64 )
+			if ( fabsf(NPCInfo->blockedDest.z-NPC->r.currentOrigin.z) > 64 )
 			{
 				gentity_t *tempGoal = G_Spawn();//ugh, this is NOT good...?
 				G_SetOrigin( tempGoal, &NPCInfo->blockedDest );

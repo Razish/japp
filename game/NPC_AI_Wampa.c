@@ -388,7 +388,7 @@ void Wampa_Combat( void )
 			vector3	yawOnlyAngles;
 			VectorSet( &yawOnlyAngles, 0, NPC->r.currentAngles.yaw, 0 );
 			if ( NPC->enemy->health > 0//enemy still alive
-				&& fabs(distance-350) <= 80 //enemy anywhere from 270 to 430 away
+				&& fabsf(distance-350) <= 80 //enemy anywhere from 270 to 430 away
 				&& InFOV3( &NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin, &yawOnlyAngles, 20, 20 ) )//enemy generally in front
 			{//10% chance of doing charge anim
 				if ( !Q_irand( 0, 9 ) )

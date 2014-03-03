@@ -53,12 +53,12 @@ void NPC_BSAdvanceFight (void)
 		float		distanceToEnemy;
 		qboolean	attack_ok = qfalse;
 		qboolean	dead_on = qfalse;
-		float		attack_scale = 1.0;
+		float		attack_scale = 1.0f;
 		float		aim_off;
 		float		max_aim_off = 64;
 
 		//Yaw to enemy
-		VectorMA(&NPC->enemy->r.absmin, 0.5, &NPC->enemy->r.maxs, &enemy_org);
+		VectorMA(&NPC->enemy->r.absmin, 0.5f, &NPC->enemy->r.maxs, &enemy_org);
 		CalcEntitySpot( NPC, SPOT_WEAPON, &muzzle );
 
 		VectorSubtract (&enemy_org, &muzzle, &delta);
@@ -93,7 +93,7 @@ void NPC_BSAdvanceFight (void)
 					if( traceEnt != NPC->enemy &&
 						(!traceEnt || !traceEnt->client || !NPC->client->enemyTeam || NPC->client->enemyTeam != traceEnt->client->playerTeam) )
 					{//no, so shoot for the head
-						attack_scale *= 0.75;
+						attack_scale *= 0.75f;
 						trap->Trace ( &tr, &muzzle, NULL, NULL, &enemy_head, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 						traceEnt = &g_entities[tr.entityNum];
 					}
@@ -106,7 +106,7 @@ void NPC_BSAdvanceFight (void)
 					}
 					else
 					{
-						attack_scale *= 0.5;
+						attack_scale *= 0.5f;
 						if(NPC->client->playerTeam)
 						{
 							if(traceEnt && traceEnt->client && traceEnt->client->playerTeam)
@@ -137,7 +137,7 @@ void NPC_BSAdvanceFight (void)
 						aim_off = VectorLength(&diff);
 						if(aim_off > random() * max_aim_off)//FIXME: use aim value to allow poor aim?
 						{
-							attack_scale *= 0.75;
+							attack_scale *= 0.75f;
 							//see if where we're going to shoot is too far from his head
 							VectorSubtract(&hitspot, &enemy_head, &diff);
 							aim_off = VectorLength(&diff);
@@ -339,7 +339,7 @@ void NPC_BSSleep( void )
 	if ( level.time > NPCInfo->enemyCheckDebounceTime )
 	{
 		if ( NPC_CheckSoundEvents() != -1 )
-		{//only 1 alert per second per 0.1 of vigilance
+		{//only 1 alert per second per 0.1f of vigilance
 			NPCInfo->enemyCheckDebounceTime = level.time + (NPCInfo->stats.vigilance * 10000);
 			G_ActivateBehavior(NPC, BSET_AWAKE);
 		}
@@ -473,7 +473,7 @@ void NPC_BSFollowLeader (void)
 			else
 				NPC_AimAdjust( 1 );
 
-			//NPC_CheckCanAttack(1.0, qfalse);
+			//NPC_CheckCanAttack(1.0f, qfalse);
 		}
 		else
 			NPC_AimAdjust( -1 );
@@ -506,13 +506,13 @@ void NPC_BSFollowLeader (void)
 		float	backupdist, walkdist, minrundist;
 		float	leaderHDist;
 
-		if ( NPCInfo->followDist )
+		if ( (int)NPCInfo->followDist )
 		{
 			followDist = NPCInfo->followDist;
 		}
 		backupdist = followDist/2.0f;
-		walkdist = followDist*0.83;
-		minrundist = followDist*1.33;
+		walkdist = followDist*0.83f;
+		minrundist = followDist*1.33f;
 
 		VectorSubtract(&NPC->client->leader->r.currentOrigin, &NPC->r.currentOrigin, &vec);
 		leaderDist = VectorLength( &vec );//FIXME: make this just nav distance?
@@ -543,7 +543,7 @@ void NPC_BSFollowLeader (void)
 	}
 }
 #define	APEX_HEIGHT		200.0f
-#define	PARA_WIDTH		(sqrt(APEX_HEIGHT)+sqrt(APEX_HEIGHT))
+#define	PARA_WIDTH		(sqrtf(APEX_HEIGHT)+sqrtf(APEX_HEIGHT))
 #define	JUMP_SPEED		200.0f
 void NPC_BSJump (void)
 {
@@ -613,9 +613,9 @@ void NPC_BSJump (void)
 		/*
 		//Determine most desirable apex height
 		apexHeight = (APEX_HEIGHT * PARA_WIDTH/xy) + (APEX_HEIGHT * z/128);
-		if ( apexHeight < APEX_HEIGHT * 0.5 )
+		if ( apexHeight < APEX_HEIGHT * 0.5f )
 		{
-			apexHeight = APEX_HEIGHT*0.5;
+			apexHeight = APEX_HEIGHT*0.5f;
 		}
 		else if ( apexHeight > APEX_HEIGHT * 2 )
 		{
@@ -626,7 +626,7 @@ void NPC_BSJump (void)
 		//FIXME: length of xy will change curve of parabola, need to account for this
 		//somewhere... PARA_WIDTH
 
-		z = (sqrt(apexHeight + z) - sqrt(apexHeight));
+		z = (sqrtf(apexHeight + z) - sqrtf(apexHeight));
 
 		assert(z >= 0);
 
@@ -635,7 +635,7 @@ void NPC_BSJump (void)
 		// Don't need to set apex xy if NPC is jumping directly up.
 		if ( xy > 0.0f ) {
 			xy -= z;
-			xy *= 0.5;
+			xy *= 0.5f;
 			assert( xy > 0 );
 
 			VectorMA( &p1, xy, &dir, &apex );
@@ -648,8 +648,8 @@ void NPC_BSJump (void)
 
 		//Now we have the apex, aim for it
 		height = apex.z - NPC->r.currentOrigin.z;
-		time = sqrt( height / ( .5 * NPC->client->ps.gravity ) );
-		if ( !time )
+		time = sqrtf( height / ( .5f * NPC->client->ps.gravity ) );
+		if ( !(int)time )
 		{
 //			Com_Printf("ERROR no time in jump\n");
 			return;
@@ -677,7 +677,7 @@ void NPC_BSJump (void)
 		{
 			VectorAdd(&NPC->r.mins, &NPC->pos1, &p1);
 			VectorAdd(&NPC->r.maxs, &NPC->pos1, &p2);
-		//	G_Cube( &p1, &p2, &NPCDEBUG_BLUE, 0.5 );
+		//	G_Cube( &p1, &p2, &NPCDEBUG_BLUE, 0.5f );
 		}
 
 		if ( NPC->s.groundEntityNum != ENTITYNUM_NONE)
@@ -1299,7 +1299,7 @@ void NPC_BSFlee( void )
 
 					VectorSubtract( &branchPos, &NPC->r.currentOrigin, &runDir );
 					VectorNormalize( &runDir );
-					if ( DotProduct( &runDir, &dangerDir ) > flrand( 0, 0.5 ) )
+					if ( DotProduct( &runDir, &dangerDir ) > flrand( 0, 0.5f ) )
 					{//don't run toward danger
 						continue;
 					}

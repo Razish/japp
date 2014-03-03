@@ -46,7 +46,7 @@ typedef struct vehWeaponInfo_s
 	float	fG2MarkSize;//size (diameter) of the ghoul2 mark
 	int		iLoopSound;	//index of loopSound
 	float	fSpeed;		//speed of projectile/range of traceline
-	float	fHoming;		//0.0 = not homing, 0.5 = half vel to targ, half cur vel, 1.0 = all vel to targ
+	float	fHoming;		//0.0f = not homing, 0.5f = half vel to targ, half cur vel, 1.0f = all vel to targ
 	float	fHomingFOV;		//missile will lose lock on if DotProduct of missile direction and direction to target ever drops below this (-1 to 1, -1 = never lose target, 0 = lose if ship gets behind missile, 1 = pretty much will lose it's target right away)
 	int		iLockOnTime;	//0 = no lock time needed, else # of ms needed to lock on
 	int		iDamage;		//damage done when traceline or projectile directly hits target
@@ -147,7 +147,7 @@ typedef struct vehicleInfo_s
 	float		acceleration;	//when pressing on accelerator
 	float		decelIdle;		//when giving no input, how quickly it drops to speedIdle
 	float		throttleSticks;	//if true, speed stays at whatever you accel/decel to, unless you turbo or brake
-	float		strafePerc;		//multiplier on current speed for strafing.  If 1.0f, you can strafe at the same speed as you're going forward, 0.5 is half, 0 is no strafing
+	float		strafePerc;		//multiplier on current speed for strafing.  If 1.0f, you can strafe at the same speed as you're going forward, 0.5f is half, 0 is no strafing
 
 	//handling stats
 	float		bankingSpeed;	//how quickly it pitches and rolls (not under player control)
@@ -168,7 +168,7 @@ typedef struct vehicleInfo_s
 	int			armor;			//total points of damage it can take
 	int			shields;		//energy shield damage points
 	int			shieldRechargeMS;//energy shield milliseconds per point recharged
-	float		toughness;		//modifies incoming damage, 1.0 is normal, 0.5 is half, etc.  Simulates being made of tougher materials/construction
+	float		toughness;		//modifies incoming damage, 1.0f is normal, 0.5f is half, etc.  Simulates being made of tougher materials/construction
 	int			malfunctionArmorLevel;//when armor drops to or below this point, start malfunctioning
 	int			surfDestruction; //can parts of this thing be torn off on impact? -rww
 
@@ -264,7 +264,7 @@ typedef struct vehicleInfo_s
 	float		cameraHorzOffset;//how far to left/right (negative/positive) of of the vehicle origin the camera should be - normal is 0
 	float		cameraPitchOffset;//a modifier on the camera's pitch (up/down angle) to the vehicle - normal is 0
 	float		cameraFOV;		//third person camera FOV, default is 80
-	float		cameraAlpha;	//fade out the vehicle to this alpha (0.1-1.0f) if it's in the way of the crosshair
+	float		cameraAlpha;	//fade out the vehicle to this alpha (0.1f-1.0f) if it's in the way of the crosshair
 	qboolean	cameraPitchDependantVertOffset;//use the hacky AT-ST pitch dependant vertical offset
 
 	//NOTE: some info on what vehicle weapon to use?  Like ATST or TIE bomber or TIE fighter or X-Wing...?

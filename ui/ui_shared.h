@@ -82,11 +82,11 @@
 #define ASSET_SLIDER_BAR			"menu/new/slider"
 #define ASSET_SLIDER_THUMB			"menu/new/sliderthumb"
 #define ASSET_SLIDER_THUMB_DEFAULT	"menu/new/sliderthumbdefault"
-#define SCROLLBAR_SIZE 16.0
-#define SLIDER_WIDTH 96.0
-#define SLIDER_HEIGHT 16.0
-#define SLIDER_THUMB_WIDTH 12.0
-#define SLIDER_THUMB_HEIGHT 20.0
+#define SCROLLBAR_SIZE 16.0f
+#define SLIDER_WIDTH 96.0f
+#define SLIDER_HEIGHT 16.0f
+#define SLIDER_THUMB_WIDTH 12.0f
+#define SLIDER_THUMB_HEIGHT 20.0f
 #define	NUM_CROSSHAIRS			9
 
 typedef struct scriptDef_s {
@@ -125,9 +125,8 @@ typedef struct windowDef_s {
 } windowDef_t;
 
 typedef struct colorRangeDef_s {
-	vector4	color;
-	float		low;
-	float		high;
+	vector4 color;
+	float low, high;
 } colorRangeDef_t;
 
 // FIXME: combine flags into bitfields to save space
@@ -189,14 +188,12 @@ typedef struct modelDef_s {
 	int angle2; //Raz: Added
 	int angle3; //Raz: Added
 	vector3 origin;
-	float fov_x;
-	float fov_y;
+	float fov_x, fov_y;
 	int rotationSpeed;
 	int rotationSpeed2; //Raz: Added
 	int rotationSpeed3; //Raz: Added
 
-	vector3 g2mins; //required
-	vector3 g2maxs; //required
+	vector3 g2mins, g2maxs; //required
 	vector3 g2scale; //optional
 	int g2skin; //optional
 	int g2anim; //optional
@@ -248,14 +245,12 @@ typedef struct itemDef_s {
 	int			type;						// text, button, radiobutton, checkbox, textfield, listbox, combo
 	int			alignment;					// left center right
 	int			textalignment;				// ( optional ) alignment for text within rect based on text width
-	float		textalignx;					// ( optional ) text alignment x coord
-	float		textaligny;					// ( optional ) text alignment x coord
+	float		textalignx, textaligny;		// ( optional ) text alignment x coord
 	float		textscale;					// scale percentage from 72pts
 	int			textStyle;					// ( optional ) style, normal and shadowed are it for now
 	const char	*text;						// display text
 	const char	*text2;						// display text, 2nd line
-	float		text2alignx;				// ( optional ) text2 alignment x coord
-	float		text2aligny;				// ( optional ) text2 alignment y coord
+	float		text2alignx, text2aligny;	// ( optional ) text2 alignment y coord
 	void		*parent;					// menu owner
 	qhandle_t	asset;						// handle to asset
 	void		*ghoul2;					// ghoul2 instance if available instead of a model.
@@ -284,7 +279,7 @@ typedef struct itemDef_s {
 	sfxHandle_t focusSound;
 	int			numColors;					// number of color ranges
 	colorRangeDef_t colorRanges[MAX_COLOR_RANGES];
-	float		special;					// used for feeder id's etc.. diff per type
+	byteAlias_t	special;					// used for feeder id's etc.. diff per type
 	int			cursorPos;					// cursor position in characters
 	void		*typeData;					// type specific data ptr's
 	const char	*descText;					//	Description text
@@ -319,8 +314,7 @@ typedef struct menuDef_s {
 	vector4 focusColor;						// focus color for items
 	vector4 disableColor;					// focus color for items
 	itemDef_t *items[MAX_MENUITEMS];		// items this menu contains
-	int			descX;						// X position of description
-	int			descY;						// X position of description
+	int			descX, descY;				// position of description
 	vector4		descColor;					// description text color for items
 	int			descAlignment;				// Description of alignment
 	float		descScale;					// Description scale
@@ -364,8 +358,7 @@ typedef struct cachedAssets_s {
 	float fadeClamp;
 	int fadeCycle;
 	float fadeAmount;
-	float shadowX;
-	float shadowY;
+	float shadowX, shadowY;
 	vector4 shadowColor;
 	float shadowFadeClamp;
 	qboolean fontRegistered;
@@ -378,12 +371,7 @@ typedef struct cachedAssets_s {
 
 	sfxHandle_t moveRollSound;
 	sfxHandle_t moveJumpSound;
-	sfxHandle_t datapadmoveSaberSound1;
-	sfxHandle_t datapadmoveSaberSound2;
-	sfxHandle_t datapadmoveSaberSound3;
-	sfxHandle_t datapadmoveSaberSound4;
-	sfxHandle_t datapadmoveSaberSound5;
-	sfxHandle_t datapadmoveSaberSound6;
+	sfxHandle_t datapadmoveSaberSound[6];
 
 	// player settings
 	qhandle_t fxBasePic;
@@ -437,10 +425,10 @@ typedef struct displayContextDef_s {
 	qboolean		(*getOverstrikeMode)				( void );
 	void			(*startLocalSound)					( sfxHandle_t sfx, int channelNum );
 	qboolean		(*ownerDrawHandleKey)				( int ownerDraw, uint32_t flags, float *special, int key );
-	int				(*feederCount)						( float feederID );
-	const char *	(*feederItemText)					( float feederID, int index, int column, qhandle_t *handle1, qhandle_t *handle2, qhandle_t *handle3 );
-	qhandle_t		(*feederItemImage)					( float feederID, int index );
-	qboolean		(*feederSelection)					( float feederID, int index, itemDef_t *item );
+	int				(*feederCount)						( int feederID );
+	const char *	(*feederItemText)					( int feederID, int index, int column, qhandle_t *handle1, qhandle_t *handle2, qhandle_t *handle3 );
+	qhandle_t		(*feederItemImage)					( int feederID, int index );
+	qboolean		(*feederSelection)					( int feederID, int index, itemDef_t *item );
 	void			(*keynumToStringBuf)				( int keynum, char *buf, int buflen );
 	void			(*getBindingBuf)					( int keynum, char *buf, int buflen );
 	void			(*setBinding)						( int keynum, const char *binding );
@@ -457,13 +445,11 @@ typedef struct displayContextDef_s {
 	void			(*drawCinematic)					( int handle, float x, float y, float w, float h );
 	void			(*runCinematicFrame)				( int handle );
 
-	float			yscale;
-	float			xscale;
+	float			yscale, xscale;
 	float			bias;
 	int				realTime;
 	int				frameTime;
-	int				cursorx;
-	int				cursory;
+	int				cursorx, cursory;
 	qboolean		debug;
 
 	cachedAssets_t	Assets;

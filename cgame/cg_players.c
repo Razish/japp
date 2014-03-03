@@ -1594,7 +1594,7 @@ static void _PlayerFootStep( const vector3 *origin, const float orientation, con
 	}
 
 	// fade the shadow out with height
-	//	alpha = 1.0 - trace.fraction;
+	//	alpha = 1.0f - trace.fraction;
 
 	// add the mark as a temporary, so it goes directly to the renderer without taking a spot in the cg_marks array
 	if ( trace.plane.normal.x || trace.plane.normal.y || trace.plane.normal.z )
@@ -2871,7 +2871,7 @@ static void CG_G2SetHeadAnim( centity_t *cent, int anim ) {
 	const int blendTime = 50;
 	const animation_t *animations = bgAllAnims[cent->localAnimIndex].anims;
 	uint32_t animFlags = BONE_ANIM_OVERRIDE;//| BONE_ANIM_BLEND;
-	// animSpeed is 1.0 if the frameLerp (ms/frame) is 50 (20 fps).
+	// animSpeed is 1.0f if the frameLerp (ms/frame) is 50 (20 fps).
 	const float timeScaleMod = (timescale.value>0.0001f) ? (1.0f/timescale.value) : 1.0f;
 	float animSpeed = 50.0f / animations[anim].frameLerp * timeScaleMod;
 	int	firstFrame, lastFrame;
@@ -2880,7 +2880,7 @@ static void CG_G2SetHeadAnim( centity_t *cent, int anim ) {
 		return;
 	if ( anim == FACE_DEAD )
 		animFlags |= BONE_ANIM_OVERRIDE_FREEZE;
-	// animSpeed is 1.0 if the frameLerp (ms/frame) is 50 (20 fps).
+	// animSpeed is 1.0f if the frameLerp (ms/frame) is 50 (20 fps).
 	if ( animSpeed < 0 ) {
 		// play anim backwards
 		lastFrame = animations[anim].firstFrame -1;
@@ -2967,7 +2967,7 @@ qboolean CG_G2PlayerHeadAnims( centity_t *cent ) {
 			// don't do aux if in a slient part of speech
 			if ( ci->facial_aux < 0 ) {
 				if ( -ci->facial_aux < cg.time )
-					ci->facial_aux = cg.time + flrand(7000.0, 10000.0);
+					ci->facial_aux = cg.time + flrand(7000.0f, 10000.0f);
 				else
 					anim = FACE_ALERT;
 			}
@@ -3502,7 +3502,7 @@ static void CG_ForcePushBlur( vector3 *org, centity_t *cent ) {
 			VectorCopy( org, &cent->pushEffectOrigin );
 		}
 
-		//scale from 1.0f to 0.1f then hold at 0.1 for the rest of the duration
+		//scale from 1.0f to 0.1f then hold at 0.1f for the rest of the duration
 		if ( cent->currentState.powerups & (1<<PW_PULL) )
 			scale = (float)(REFRACT_EFFECT_DURATION-tDif)*0.003f;
 		else
@@ -3708,7 +3708,7 @@ void CG_DrawPlayerShield( centity_t *cent, vector3 *origin ) {
 		alpha = 255;
 
 	// Make it bigger, but tighter if more solid
-	scale = 1.4f - ((float)alpha*(0.4f/255.0f));		// Range from 1.0 to 1.4
+	scale = 1.4f - ((float)alpha*(0.4f/255.0f));		// Range from 1.0f to 1.4f
 	VectorScale( &ent.axis[0], scale, &ent.axis[0] );
 	VectorScale( &ent.axis[1], scale, &ent.axis[1] );
 	VectorScale( &ent.axis[2], scale, &ent.axis[2] );
@@ -4053,7 +4053,7 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	saber.reType = RT_LINE;
 	radiusStart = radius/3.0f;
 	saber.radius = (radiusStart + crandom() * radiusRange)*radiusmult;
-//	saber.radius = (1.0 + crandom() * 0.2f)*radiusmult;
+//	saber.radius = (1.0f + crandom() * 0.2f)*radiusmult;
 
 	saber.shaderTexCoord.x = saber.shaderTexCoord.y = 1.0f;
 
@@ -5688,9 +5688,9 @@ void CG_AddLightningBeam( vector3 *start, vector3 *end ) {
 	VectorMA( &b.start, 0.6666f * len, &dir, &c2 );
 
 	// get some chaos values that really aren't very chaotic :)
-	s1 = sin( cg.time * 0.005f ) * 2 + crandom() * 0.2f;
-	s2 = sin( cg.time * 0.001f );
-	s3 = sin( cg.time * 0.011f );
+	s1 = sinf( cg.time * 0.005f ) * 2 + crandom() * 0.2f;
+	s2 = sinf( cg.time * 0.001f );
+	s3 = sinf( cg.time * 0.011f );
 
 	VectorSet( &chaos, len * 0.01f * s1, len * 0.02f * s2, len * 0.04f * (s1 + s2 + s3) );
 
@@ -7339,7 +7339,7 @@ void CG_Player( centity_t *cent ) {
 		cent->currentState.trickedentindex3, cent->currentState.trickedentindex4, cg.snap->ps.clientNum ) )
 	{
 		if ( cent->trickAlpha > 1 ) {
-			cent->trickAlpha -= (cg.time - cent->trickAlphaTime)*0.5;
+			cent->trickAlpha -= (cg.time - cent->trickAlphaTime)*0.5f;
 			cent->trickAlphaTime = cg.time;
 
 			if ( cent->trickAlpha < 0 )
@@ -7903,7 +7903,7 @@ skipTrueView:
 			reframe_minus2.shaderRGBA[0] = stColor.r*255;
 			reframe_minus2.shaderRGBA[1] = stColor.g*255;
 			reframe_minus2.shaderRGBA[2] = stColor.b*255;
-			reframe_minus2.shaderRGBA[3] = (stColor.a*255)*0.75;
+			reframe_minus2.shaderRGBA[3] = (stColor.a*255)*0.75f;
 
 			// Same as above but do it between trail points instead of the player and first trail entry
 			VectorSubtract( &cent->frame_minus22, &cent->frame_minus12, &tDir );
@@ -9425,5 +9425,5 @@ void CG_ResetPlayerEntity( centity_t *cent ) {
 	}
 
 	if ( cg_debugPosition.integer )
-		trap->Print( "%i ResetPlayerEntity yaw=%i\n", cent->currentState.number, cent->pe.torso.yawAngle );
+		trap->Print( "%i ResetPlayerEntity yaw=%.2f\n", cent->currentState.number, cent->pe.torso.yawAngle );
 }

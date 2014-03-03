@@ -33,7 +33,7 @@ void CalcEntitySpot ( const gentity_t *ent, const spot_t spot, vector3 *point )
 		if(VectorCompare(&ent->r.currentOrigin, &vec3_origin))
 		{//brush
 			VectorSubtract(&ent->r.absmax, &ent->r.absmin, point);//size
-			VectorMA(&ent->r.absmin, 0.5, point, point);
+			VectorMA(&ent->r.absmin, 0.5f, point, point);
 		}
 		else
 		{
@@ -120,7 +120,7 @@ void CalcEntitySpot ( const gentity_t *ent, const spot_t spot, vector3 *point )
 
 	case SPOT_LEGS:
 		VectorCopy ( &ent->r.currentOrigin, point );
-		point->z += (ent->r.mins.z * 0.5);
+		point->z += (ent->r.mins.z * 0.5f);
 		break;
 
 	case SPOT_WEAPON:
@@ -151,7 +151,7 @@ void CalcEntitySpot ( const gentity_t *ent, const spot_t spot, vector3 *point )
 		VectorCopy( &start, &end );
 		end.z -= 64;
 		trap->Trace( &tr, &start, &ent->r.mins, &ent->r.maxs, &end, ent->s.number, MASK_PLAYERSOLID, qfalse, 0, 0 );
-		if ( tr.fraction < 1.0 )
+		if ( tr.fraction < 1.0f )
 		{
 			VectorCopy( &tr.endpos, point);
 			break;
@@ -242,26 +242,26 @@ qboolean NPC_UpdateAngles ( qboolean doPitch, qboolean doYaw )
 	{
 		// decay yaw error
 		error = AngleDelta ( NPC->client->ps.viewangles.yaw, targetYaw );
-		if( fabs(error) > MIN_ANGLE_ERROR )
+		if( fabsf(error) > MIN_ANGLE_ERROR )
 		{
 			if ( error )
 			{
 				exact = qfalse;
 
-				decay = 60.0 + yawSpeed * 3;
+				decay = 60.0f + yawSpeed * 3;
 				decay *= 50.0f / 1000.0f;//msec
 
-				if ( error < 0.0 )
+				if ( error < 0.0f )
 				{
 					error += decay;
-					if ( error > 0.0 )
-						error = 0.0;
+					if ( error > 0.0f )
+						error = 0.0f;
 				}
 				else
 				{
 					error -= decay;
-					if ( error < 0.0 )
-						error = 0.0;
+					if ( error < 0.0f )
+						error = 0.0f;
 				}
 			}
 		}
@@ -274,26 +274,26 @@ qboolean NPC_UpdateAngles ( qboolean doPitch, qboolean doYaw )
 	{
 		// decay pitch error
 		error = AngleDelta ( NPC->client->ps.viewangles.pitch, targetPitch );
-		if ( fabs(error) > MIN_ANGLE_ERROR )
+		if ( fabsf(error) > MIN_ANGLE_ERROR )
 		{
 			if ( error )
 			{
 				exact = qfalse;
 
-				decay = 60.0 + yawSpeed * 3;
+				decay = 60.0f + yawSpeed * 3;
 				decay *= 50.0f / 1000.0f;//msec
 
-				if ( error < 0.0 )
+				if ( error < 0.0f )
 				{
 					error += decay;
-					if ( error > 0.0 )
-						error = 0.0;
+					if ( error > 0.0f )
+						error = 0.0f;
 				}
 				else
 				{
 					error -= decay;
-					if ( error < 0.0 )
-						error = 0.0;
+					if ( error < 0.0f )
+						error = 0.0f;
 				}
 			}
 		}
@@ -377,19 +377,19 @@ qboolean NPC_UpdateFiringAngles ( qboolean doPitch, qboolean doYaw )
 		{
 			exact = qfalse;
 
-			decay = 60.0 + 80.0;
+			decay = 60.0f + 80.0f;
 			decay *= 50.0f / 1000.0f;//msec
-			if ( diff < 0.0 )
+			if ( diff < 0.0f )
 			{
 				diff += decay;
-				if ( diff > 0.0 )
-					diff = 0.0;
+				if ( diff > 0.0f )
+					diff = 0.0f;
 			}
 			else
 			{
 				diff -= decay;
-				if ( diff < 0.0 )
-					diff = 0.0;
+				if ( diff < 0.0f )
+					diff = 0.0f;
 			}
 		}
 
@@ -414,19 +414,19 @@ qboolean NPC_UpdateFiringAngles ( qboolean doPitch, qboolean doYaw )
 		{
 			exact = qfalse;
 
-			decay = 60.0 + 80.0;
+			decay = 60.0f + 80.0f;
 			decay *= 50.0f / 1000.0f;//msec
-			if ( diff < 0.0 )
+			if ( diff < 0.0f )
 			{
 				diff += decay;
-				if ( diff > 0.0 )
-					diff = 0.0;
+				if ( diff > 0.0f )
+					diff = 0.0f;
 			}
 			else
 			{
 				diff -= decay;
-				if ( diff < 0.0 )
-					diff = 0.0;
+				if ( diff < 0.0f )
+					diff = 0.0f;
 			}
 		}
 
@@ -466,19 +466,19 @@ void NPC_UpdateShootAngles (vector3 *angles, qboolean doPitch, qboolean doYaw )
 		error = AngleDelta ( NPCInfo->shootAngles.yaw, targetYaw );
 		if ( error )
 		{
-			decay = 60.0 + 80.0 * NPCInfo->stats.aim;
+			decay = 60.0f + 80.0f * NPCInfo->stats.aim;
 			decay *= 100.0f / 1000.0f;//msec
-			if ( error < 0.0 )
+			if ( error < 0.0f )
 			{
 				error += decay;
-				if ( error > 0.0 )
-					error = 0.0;
+				if ( error > 0.0f )
+					error = 0.0f;
 			}
 			else
 			{
 				error -= decay;
-				if ( error < 0.0 )
-					error = 0.0;
+				if ( error < 0.0f )
+					error = 0.0f;
 			}
 		}
 		NPCInfo->shootAngles.yaw = targetYaw + error;
@@ -490,19 +490,19 @@ void NPC_UpdateShootAngles (vector3 *angles, qboolean doPitch, qboolean doYaw )
 		error = AngleDelta ( NPCInfo->shootAngles.pitch, targetPitch );
 		if ( error )
 		{
-			decay = 60.0 + 80.0 * NPCInfo->stats.aim;
+			decay = 60.0f + 80.0f * NPCInfo->stats.aim;
 			decay *= 100.0f / 1000.0f;//msec
-			if ( error < 0.0 )
+			if ( error < 0.0f )
 			{
 				error += decay;
-				if ( error > 0.0 )
-					error = 0.0;
+				if ( error > 0.0f )
+					error = 0.0f;
 			}
 			else
 			{
 				error -= decay;
-				if ( error < 0.0 )
-					error = 0.0;
+				if ( error < 0.0f )
+					error = 0.0f;
 			}
 		}
 		NPCInfo->shootAngles.pitch = targetPitch + error;
@@ -1218,7 +1218,7 @@ qboolean NPC_FacePosition( vector3 *position, qboolean doPitch )
 	if ( NPC->enemy && NPC->enemy->client && NPC->enemy->client->NPC_class == CLASS_ATST )
 	{
 		// FIXME: this is kind of dumb, but it was the easiest way to get it to look sort of ok
-		NPCInfo->desiredYaw	+= flrand( -5, 5 ) + sin( level.time * 0.004f ) * 7;
+		NPCInfo->desiredYaw	+= flrand( -5, 5 ) + sinf( level.time * 0.004f ) * 7;
 		NPCInfo->desiredPitch += flrand( -2, 2 );
 	}
 	//Face that yaw
@@ -1228,7 +1228,7 @@ qboolean NPC_FacePosition( vector3 *position, qboolean doPitch )
 	yawDelta = AngleNormalize360( NPCInfo->desiredYaw - ( SHORT2ANGLE( ucmd.angles.yaw + client->ps.delta_angles.yaw ) ) );
 
 	//See if we are facing properly
-	if ( fabs( yawDelta ) > VALID_ATTACK_CONE )
+	if ( fabsf( yawDelta ) > VALID_ATTACK_CONE )
 		facing = qfalse;
 
 	if ( doPitch )
@@ -1238,7 +1238,7 @@ qboolean NPC_FacePosition( vector3 *position, qboolean doPitch )
 		float pitchDelta = NPCInfo->desiredPitch - currentAngles;
 
 		//See if we are facing properly
-		if ( fabs( pitchDelta ) > VALID_ATTACK_CONE )
+		if ( fabsf( pitchDelta ) > VALID_ATTACK_CONE )
 			facing = qfalse;
 	}
 

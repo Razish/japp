@@ -1315,7 +1315,7 @@ float NPC_MaxDistSquaredForWeapon (void)
 	case WP_SABER:
 		if ( NPC->client && NPC->client->saber[0].blade[0].lengthMax )
 		{//FIXME: account for whether enemy and I are heading towards each other!
-			return (NPC->client->saber[0].blade[0].lengthMax + NPC->r.maxs.x*1.5)*(NPC->client->saber[0].blade[0].lengthMax + NPC->r.maxs.x*1.5);
+			return (NPC->client->saber[0].blade[0].lengthMax + NPC->r.maxs.x*1.5f)*(NPC->client->saber[0].blade[0].lengthMax + NPC->r.maxs.x*1.5f);
 		}
 		else
 		{
@@ -1514,7 +1514,7 @@ gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis
 											float	dot;
 											VectorNormalize( &diff );
 											dot = DotProduct( &newenemy->client->hiddenDir, &diff );
-											if ( dot > 0.5 )
+											if ( dot > 0.5f )
 											{//I'm not looking in the right dir toward them to see them
 												failed = qtrue;
 											}
@@ -1657,7 +1657,7 @@ gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis
 
 									VectorNormalize( &diff );
 									dot = DotProduct( &newenemy->client->hiddenDir, &diff );
-									if ( dot > 0.5 )
+									if ( dot > 0.5f )
 									{//I'm not looking in the right dir toward them to see them
 										continue;
 									}
@@ -1803,7 +1803,7 @@ gentity_t *NPC_PickAlly ( qboolean facingEachOther, float range, qboolean ignore
 							VectorNormalize(&vf);
 							dot = DotProduct(&diff, &vf);
 
-							if ( dot < 0.5 )
+							if ( dot < 0.5f )
 							{//Not facing in dir to me
 								continue;
 							}
@@ -1812,7 +1812,7 @@ gentity_t *NPC_PickAlly ( qboolean facingEachOther, float range, qboolean ignore
 							VectorNormalize(&vf);
 							dot = DotProduct(&diff, &vf);
 
-							if ( dot > -0.5 )
+							if ( dot > -0.5f )
 							{//I'm not facing opposite of dir to me
 								continue;
 							}
@@ -2170,7 +2170,7 @@ Simply checks aggression and returns true or false
 qboolean NPC_CheckAttack (float scale)
 {
 	if(!scale)
-		scale = 1.0;
+		scale = 1.0f;
 
 	if(((float)NPCInfo->stats.aggression) * scale < flrand(0, 4))
 	{
@@ -2192,7 +2192,7 @@ Simply checks evasion and returns true or false
 qboolean NPC_CheckDefend (float scale)
 {
 	if(!scale)
-		scale = 1.0;
+		scale = 1.0f;
 
 	if((float)(NPCInfo->stats.evasion) > random() * 4 * scale)
 		return qtrue;
@@ -2225,7 +2225,7 @@ qboolean NPC_CheckCanAttack (float attack_scale, qboolean stationary)
 	//enemy!!!
 	if(!attack_scale)
 	{
-		attack_scale = 1.0;
+		attack_scale = 1.0f;
 	}
 	//Yaw to enemy
 	CalcEntitySpot( NPC->enemy, SPOT_HEAD, &enemy_org );
@@ -2274,7 +2274,7 @@ qboolean NPC_CheckCanAttack (float attack_scale, qboolean stationary)
 			{
 				if ( NPC->enemy->client->buttons & BUTTON_ATTACK )
 				{//FIXME: determine if enemy fire angles would hit me or get close
-					if ( NPC_CheckDefend( 1.0 ) )//FIXME: Check self-preservation?  Health?
+					if ( NPC_CheckDefend( 1.0f ) )//FIXME: Check self-preservation?  Health?
 					{//duck and don't shoot
 						attack_ok = qfalse;
 						ucmd.upmove = -127;
@@ -2308,7 +2308,7 @@ qboolean NPC_CheckCanAttack (float attack_scale, qboolean stationary)
 				enemy_org[1] += 0.3*Q_flrand(NPC->enemy->r.mins[1], NPC->enemy->r.maxs[1]);
 				enemy_org[2] -= NPC->enemy->r.maxs[2]*Q_flrand(0.0f, 1.0f);
 
-				attack_scale *= 0.75;
+				attack_scale *= 0.75f;
 				trap->Trace ( &tr, muzzle, NULL, NULL, enemy_org, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );
 				ShotThroughGlass(&tr, NPC->enemy, enemy_org, MASK_SHOT);
 				traceEnt = &g_entities[tr.entityNum];
@@ -2323,7 +2323,7 @@ qboolean NPC_CheckCanAttack (float attack_scale, qboolean stationary)
 			}
 			else
 			{
-				attack_scale *= 0.5;
+				attack_scale *= 0.5f;
 				if(NPC->client->playerTeam)
 				{
 					if(traceEnt && traceEnt->client && traceEnt->client->playerTeam)
@@ -2372,7 +2372,7 @@ qboolean NPC_CheckCanAttack (float attack_scale, qboolean stationary)
 					aim_off = VectorLength(&diff);
 					if(aim_off > random() * max_aim_off)//FIXME: use aim value to allow poor aim?
 					{
-						attack_scale *= 0.75;
+						attack_scale *= 0.75f;
 						//see if where we're going to shoot is too far from his head
 						VectorSubtract(&hitspot, &enemy_org, &diff);
 						aim_off = VectorLength(&diff);
@@ -2466,7 +2466,7 @@ void SP_point_combat( gentity_t *self )
 		return;
 	}
 
-	self->s.origin.z += 0.125;
+	self->s.origin.z += 0.125f;
 	G_SetOrigin(self, &self->s.origin);
 	trap->LinkEntity((sharedEntity_t *)self);
 
@@ -2725,7 +2725,7 @@ int NPC_FindCombatPoint( const vector3 *position, const vector3 *avoidPosition, 
 			dot = DotProduct( &eDir2Me, &eDir2CP );
 
 			//Not far enough behind enemy from current pos
-			if ( dot >= 0.4 )
+			if ( dot >= 0.4f )
 				continue;
 		}
 
@@ -2990,7 +2990,7 @@ void NPC_SetPickUpGoal( gentity_t *foundWeap )
 	//NPCInfo->goalEntity = foundWeap;
 	VectorCopy( &foundWeap->r.currentOrigin, &org );
 	org.z += 24 - (foundWeap->r.mins.z*-1);//adjust the origin so that I am on the ground
-	NPC_SetMoveGoal( NPC, &org, foundWeap->r.maxs.x*0.75, qfalse, -1, foundWeap );
+	NPC_SetMoveGoal( NPC, &org, foundWeap->r.maxs.x*0.75f, qfalse, -1, foundWeap );
 	NPCInfo->tempGoal->waypoint = foundWeap->waypoint;
 	NPCInfo->tempBehavior = BS_DEFAULT;
 	NPCInfo->squadState = SQUAD_TRANSITION;

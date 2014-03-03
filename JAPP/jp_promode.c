@@ -6,7 +6,7 @@
 // Physics
 float	cpm_pm_airstopaccelerate = 1;
 float	cpm_pm_aircontrol = 0;
-float	cpm_pm_strafeaccelerate = 1.0;
+float	cpm_pm_strafeaccelerate = 1.0f;
 float	cpm_pm_wishspeed = 400;
 
 void CPM_UpdateSettings( int num ) {
@@ -16,14 +16,14 @@ void CPM_UpdateSettings( int num ) {
 	// Physics
 	cpm_pm_airstopaccelerate = 1;
 	cpm_pm_aircontrol = 0;
-	cpm_pm_strafeaccelerate = 1.0;
+	cpm_pm_strafeaccelerate = 1.0f;
 	cpm_pm_wishspeed = 400;
 	pm_accelerate = 10.0f;
-	pm_friction = 6.0;
+	pm_friction = 6.0f;
 
 	if ( num ) {
 		// Physics
-		cpm_pm_airstopaccelerate = 2.5;
+		cpm_pm_airstopaccelerate = 2.5f;
 		cpm_pm_aircontrol = 150;
 		cpm_pm_strafeaccelerate = 70;
 		cpm_pm_wishspeed = 30;

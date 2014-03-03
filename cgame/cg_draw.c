@@ -225,7 +225,7 @@ static void CG_DrawZoomMask( void )
 
 		CG_DrawPic( 212, 367, 200, 28, media.gfx.interface.binoculars.overlay );
 
-		color1.r = sin( cg.time * 0.01f ) * 0.5f + 0.5f;
+		color1.r = sinf( cg.time * 0.01f ) * 0.5f + 0.5f;
 		color1.r = color1.g = color1.b = color1.r*color1.r;
 		color1.a = 1.0f;
 
@@ -272,7 +272,7 @@ static void CG_DrawZoomMask( void )
 		if ( level >= 99 )
 		{
 			// Fully zoomed, so make the rotating insert pulse
-			VectorSet4( &color1, 1.0f, 1.0f, 1.0f, 0.7f + sin( cg.time * 0.01f )*0.3f );
+			VectorSet4( &color1, 1.0f, 1.0f, 1.0f, 0.7f + sinf( cg.time * 0.01f )*0.3f );
 
 			trap->R_SetColor( &color1 );
 		}
@@ -298,8 +298,8 @@ static void CG_DrawZoomMask( void )
 
 		for ( int t = 0; t < 5; t++ )
 		{
-			cx = 320 + sin( (t*10+45)/57.296f ) * 192;
-			cy = 240 + cos( (t*10+45)/57.296f ) * 192;
+			cx = 320 + sinf( (t*10+45)/57.296f ) * 192;
+			cy = 240 + cosf( (t*10+45)/57.296f ) * 192;
 
 			CG_DrawRotatePic2( cx, cy, 24, 38, 45 - t * 10, trap->R_RegisterShader( va("gfx/2d/char%d",val[4-t] )));
 		}
@@ -332,8 +332,8 @@ static void CG_DrawZoomMask( void )
 
 		for (fi = 18.5f; fi <= 18.5f + max; fi+= 3 ) // going from 15 to 45 degrees, with 5 degree increments
 		{
-			cx = 320 + sin( (fi+90.0f)/57.296f ) * 190;
-			cy = 240 + cos( (fi+90.0f)/57.296f ) * 190;
+			cx = 320 + sinf( (fi+90.0f)/57.296f ) * 190;
+			cy = 240 + cosf( (fi+90.0f)/57.296f ) * 190;
 
 			CG_DrawRotatePic2( cx, cy, 12, 24, 90 - fi, media.gfx.interface.disruptor.insertTick );
 		}
@@ -456,15 +456,15 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean fo
 		// offset the origin y and z to center the flag
 		trap->R_ModelBounds( cm, &mins, &maxs );
 
-		origin.z = -0.5 * ( mins.z + maxs.z );
-		origin.y = 0.5 * ( mins.y + maxs.y );
+		origin.z = -0.5f * ( mins.z + maxs.z );
+		origin.y = 0.5f * ( mins.y + maxs.y );
 
 		// calculate distance so the flag nearly fills the box
 		// assume heads are taller than wide
-		len = 0.5 * ( maxs.z - mins.z );
-		origin.x = len / 0.268;	// len / tan( fov/2 )
+		len = 0.5f * ( maxs.z - mins.z );
+		origin.x = len / 0.268f;	// len / tanf( fov/2 )
 
-		angles.yaw = 60 * sin( cg.time / 2000.0 );;
+		angles.yaw = 60 * sinf( cg.time / 2000.0f );;
 
 		if( team == TEAM_RED ) {
 			handle = media.models.redFlag;
@@ -1218,8 +1218,8 @@ void JP_DrawMovementKeys( void )
 	Com_sprintf( str2, sizeof( str2 ), va( "^%cA ^%cS ^%cD", (cmd.rightmove < 0) ? COLOR_RED : COLOR_WHITE,
 		(cmd.forwardmove < 0) ? COLOR_RED : COLOR_WHITE, (cmd.rightmove > 0) ? COLOR_RED : COLOR_WHITE ) );
 
-	CG_Text_Paint( cg.moveKeysPos.x - max(w1,w2)/2.0, cg.moveKeysPos.y,				cg_hudMovementKeysScale.value, &colorWhite, str1, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex );
-	CG_Text_Paint( cg.moveKeysPos.x - max(w1,w2)/2.0, cg.moveKeysPos.y + height,	cg_hudMovementKeysScale.value, &colorWhite, str2, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex );
+	CG_Text_Paint( cg.moveKeysPos.x - max(w1,w2)/2.0f, cg.moveKeysPos.y,				cg_hudMovementKeysScale.value, &colorWhite, str1, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex );
+	CG_Text_Paint( cg.moveKeysPos.x - max(w1,w2)/2.0f, cg.moveKeysPos.y + height,	cg_hudMovementKeysScale.value, &colorWhite, str2, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex );
 #endif
 }
 
@@ -2132,7 +2132,7 @@ void CG_DrawVehicleAmmo( const menuDef_t *menuHUD, const centity_t *veh )
 			&& cg_vehicleAmmoWarning == 0 )
 		{
 			memcpy(&calcColor, &g_color_table[ColorIndex(COLOR_RED)], sizeof(vector4));
-			calcColor.a = sin(cg.time*0.005)*0.5f+0.5f;
+			calcColor.a = sinf(cg.time*0.005f)*0.5f+0.5f;
 		}
 		else
 		{
@@ -2203,7 +2203,7 @@ void CG_DrawVehicleAmmoUpper( const menuDef_t *menuHUD, const centity_t *veh )
 			&& cg_vehicleAmmoWarning == 0 )
 		{
 			memcpy(&calcColor, &g_color_table[ColorIndex(COLOR_RED)], sizeof(vector4));
-			calcColor.a = sin(cg.time*0.005)*0.5f+0.5f;
+			calcColor.a = sinf(cg.time*0.005f)*0.5f+0.5f;
 		}
 		else
 		{
@@ -2275,7 +2275,7 @@ void CG_DrawVehicleAmmoLower( const menuDef_t *menuHUD, const centity_t *veh )
 			&& cg_vehicleAmmoWarning == 1 )
 		{
 			memcpy(&calcColor, &g_color_table[ColorIndex(COLOR_RED)], sizeof(vector4));
-			calcColor.a = sin(cg.time*0.005)*0.5f+0.5f;
+			calcColor.a = sinf(cg.time*0.005f)*0.5f+0.5f;
 		}
 		else
 		{
@@ -3063,7 +3063,7 @@ static float CG_DrawEnemyInfo ( float y )
 			title = CG_GetStringEdString("MP_INGAME", "GET_SABER");
 
 
-			size = ICON_SIZE * 1.25;
+			size = ICON_SIZE * 1.25f;
 			y += 5;
 
 			CG_DrawPic( 640 - size - 12 + xOffset, y, size, size, media.gfx.interface.weaponIcons[WP_SABER] );
@@ -3152,7 +3152,7 @@ static float CG_DrawEnemyInfo ( float y )
 
 	ci = &cgs.clientinfo[ clientNum ];
 
-	size = ICON_SIZE * 1.25;
+	size = ICON_SIZE * 1.25f;
 	y += 5;
 
 	if ( ci->modelIcon )
@@ -3424,9 +3424,9 @@ float CG_DrawRadar ( float y )
 		AngleVectors ( &cg.predictedPlayerState.viewangles, &dirLook, NULL, NULL );
 
 		dirLook.z = 0;
-		anglePlayer = atan2( dirPlayer.pitch, dirPlayer.yaw );
+		anglePlayer = atan2f( dirPlayer.pitch, dirPlayer.yaw );
 		VectorNormalize( &dirLook );
-		angleLook = atan2( dirLook.pitch, dirLook.yaw );
+		angleLook = atan2f( dirLook.pitch, dirLook.yaw );
 		angle = angleLook - anglePlayer;
 
 		switch ( cent->currentState.eType )
@@ -4036,7 +4036,7 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 		ci = cgs.clientinfo + sortedTeamPlayers[i];
 		if ( ci->infoValid && ci->team == cg.snap->ps.persistant[PERS_TEAM]) {
 
-			hcolor.r = hcolor.g = hcolor.b = hcolor.a = 1.0;
+			hcolor.r = hcolor.g = hcolor.b = hcolor.a = 1.0f;
 
 			xx = x + TINYCHAR_WIDTH;
 
@@ -4155,13 +4155,13 @@ static void CG_DrawPowerupIcons(int y)
 					icoShader = trap->R_RegisterShader( item->icon );
 				}
 
-				CG_DrawPic( (640-(ico_size*1.1)) + xOffset, y, ico_size, ico_size, icoShader );
+				CG_DrawPic( (640-(ico_size*1.1f)) + xOffset, y, ico_size, ico_size, icoShader );
 
 				y += ico_size;
 
 				if (j != PW_REDFLAG && j != PW_BLUEFLAG && secondsleft < 999)
 				{
-					UI_DrawProportionalString((640-(ico_size*1.1))+(ico_size/2) + xOffset, y-8, va("%i", secondsleft), UI_CENTER | UI_BIGFONT | UI_DROPSHADOW, &colorTable[CT_WHITE]);
+					UI_DrawProportionalString((640-(ico_size*1.1f))+(ico_size/2) + xOffset, y-8, va("%i", secondsleft), UI_CENTER | UI_BIGFONT | UI_DROPSHADOW, &colorTable[CT_WHITE]);
 				}
 
 				y += (ico_size/3);
@@ -4506,10 +4506,10 @@ static void CG_DrawLagometer( void ) {
 	trap->R_SetColor( NULL );
 
 	if ( cg_noPredict.integer || g_synchronousClients.integer ) {
-		CG_DrawBigString( ax, ay, "snc", 1.0 );
+		CG_DrawBigString( ax, ay, "snc", 1.0f );
 	}
 	else if ( cg.snap && cg_lagometer.integer == 2 )
-		trap->R_Font_DrawString( ax, ay, va( "%i", cg.snap->ping), &colorTable[CT_WHITE], MenuFontToHandle( FONT_SMALL ), -1, 0.5 );
+		trap->R_Font_DrawString( ax, ay, va( "%i", cg.snap->ping), &colorTable[CT_WHITE], MenuFontToHandle( FONT_SMALL ), -1, 0.5f );
 
 	CG_DrawDisconnect();
 }
@@ -4539,7 +4539,7 @@ void CG_DrawSiegeMessageNonMenu( const char *str )
 		trap->SE_GetStringTextString(str+1, text, sizeof(text));
 		str = text;
 	}
-	CG_CenterPrint(str, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH);
+	CG_CenterPrint(str, SCREEN_HEIGHT * 0.30f, BIGCHAR_WIDTH);
 }
 
 /*
@@ -4603,7 +4603,7 @@ static void CG_DrawCenterString( void ) {
 	int		x, y, w;
 	int h;
 	vector4 *color;
-	const float scale = 1.0; //0.5
+	const float scale = 1.0f; //0.5f
 
 
 	if ( !cg.centerPrintTime ) {
@@ -4941,7 +4941,7 @@ void CG_LerpCrosshairPos( float *x, float *y )
 	{//blend from old pos
 		float maxMove = 30.0f * ((float)cg.frametime/500.0f) * 640.0f/480.0f;
 		float xDiff = (*x - cg_crosshairPrevPosX);
-		if ( fabs(xDiff) > CRAZY_CROSSHAIR_MAX_ERROR_X )
+		if ( fabsf(xDiff) > CRAZY_CROSSHAIR_MAX_ERROR_X )
 			maxMove = CRAZY_CROSSHAIR_MAX_ERROR_X;
 		if ( xDiff > maxMove )
 			*x = cg_crosshairPrevPosX + maxMove;
@@ -4954,7 +4954,7 @@ void CG_LerpCrosshairPos( float *x, float *y )
 	{//blend from old pos
 		float maxMove = 30.0f * ((float)cg.frametime/500.0f);
 		float yDiff = (*y - cg_crosshairPrevPosY);
-		if ( fabs(yDiff) > CRAZY_CROSSHAIR_MAX_ERROR_Y )
+		if ( fabsf(yDiff) > CRAZY_CROSSHAIR_MAX_ERROR_Y )
 			maxMove = CRAZY_CROSSHAIR_MAX_ERROR_X;
 		if ( yDiff > maxMove )
 			*y = cg_crosshairPrevPosY + maxMove;
@@ -5017,9 +5017,9 @@ static void CG_DrawCrosshair( vector3 *worldPoint, int chEntValid ) {
 
 			if ( crossEnt->currentState.powerups & (1 <<PW_CLOAKED) )
 			{ //don't show up for cloaked guys
-				ecolor.r = 1.0;//R
-				ecolor.g = 1.0;//G
-				ecolor.b = 1.0;//B
+				ecolor.r = 1.0f;//R
+				ecolor.g = 1.0f;//G
+				ecolor.b = 1.0f;//B
 			}
 			else if ( crossEnt->currentState.number < MAX_CLIENTS )
 			{
@@ -5027,24 +5027,24 @@ static void CG_DrawCrosshair( vector3 *worldPoint, int chEntValid ) {
 					cgs.clientinfo[crossEnt->currentState.number].team == cgs.clientinfo[cg.snap->ps.clientNum].team )
 				{
 					//Allies are green
-					ecolor.r = 0.0;//R
-					ecolor.g = 1.0;//G
-					ecolor.b = 0.0;//B
+					ecolor.r = 0.0f;//R
+					ecolor.g = 1.0f;//G
+					ecolor.b = 0.0f;//B
 				}
 				else
 				{
 					if (cgs.gametype == GT_POWERDUEL &&
 						cgs.clientinfo[crossEnt->currentState.number].duelTeam == cgs.clientinfo[cg.snap->ps.clientNum].duelTeam)
 					{ //on the same duel team in powerduel, so he's a friend
-						ecolor.r = 0.0;//R
-						ecolor.g = 1.0;//G
-						ecolor.b = 0.0;//B
+						ecolor.r = 0.0f;//R
+						ecolor.g = 1.0f;//G
+						ecolor.b = 0.0f;//B
 					}
 					else
 					{ //Enemies are red
-						ecolor.r = 1.0;//R
-						ecolor.g = 0.0;//G
-						ecolor.b = 0.0;//B
+						ecolor.r = 1.0f;//R
+						ecolor.g = 0.0f;//G
+						ecolor.b = 0.0f;//B
 					}
 				}
 
@@ -5281,8 +5281,8 @@ static void CG_DrawCrosshair( vector3 *worldPoint, int chEntValid ) {
 		hShader = media.gfx.interface.crosshairs[cg_drawCrosshair.integer % NUM_CROSSHAIRS];
 	}
 
-	chX = x + refdef->x + 0.5 * (640 - w);
-	chY = y + refdef->y + 0.5 * (480 - h);
+	chX = x + refdef->x + 0.5f * (640 - w);
+	chY = y + refdef->y + 0.5f * (480 - h);
 	trap->R_DrawStretchPic( chX, chY, w, h, 0, 0, 1, 1, hShader );
 
 	//draw a health bar directly under the crosshair if we're looking at something
@@ -5328,7 +5328,7 @@ static void CG_DrawCrosshair( vector3 *worldPoint, int chEntValid ) {
 	if ( corona ) // drawing extra bits
 	{
 		ecolor.a = 0.5f;
-		ecolor.r = ecolor.g = ecolor.b = (1 - ecolor.a) * ( sin( cg.time * 0.001f ) * 0.08f + 0.35f ); // don't draw full color
+		ecolor.r = ecolor.g = ecolor.b = (1 - ecolor.a) * ( sinf( cg.time * 0.001f ) * 0.08f + 0.35f ); // don't draw full color
 		ecolor.a = 1.0f;
 
 		trap->R_SetColor( &ecolor );
@@ -5336,8 +5336,8 @@ static void CG_DrawCrosshair( vector3 *worldPoint, int chEntValid ) {
 		w *= 2.0f;
 		h *= 2.0f;
 
-		trap->R_DrawStretchPic( x + refdef->x + 0.5 * (640 - w),
-			y + refdef->y + 0.5 * (480 - h),
+		trap->R_DrawStretchPic( x + refdef->x + 0.5f * (640 - w),
+			y + refdef->y + 0.5f * (480 - h),
 			w, h, 0, 0, 1, 1, media.gfx.interface.forceCorona );
 	}
 	trap->R_SetColor( NULL );
@@ -5415,7 +5415,7 @@ void CG_SaberClashFlare( void )
 	// Don't do clashes for things that are behind us
 	VectorSubtract( &cg_saberFlashPos, &refdef->vieworg, &dif );
 
-	if ( DotProduct( &dif, &refdef->viewaxis[0] ) < 0.2 )
+	if ( DotProduct( &dif, &refdef->viewaxis[0] ) < 0.2f )
 	{
 		return;
 	}
@@ -6005,7 +6005,7 @@ static void CG_DrawRocketLocking( int lockEntNum, int lockTime )
 		// we are locked and loaded baby
 		if ( dif == 8 )
 		{
-			color.r = color.g = color.b = sin( cg.time * 0.05f ) * 0.5f + 0.5f;
+			color.r = color.g = color.b = sinf( cg.time * 0.05f ) * 0.5f + 0.5f;
 			color.a = 1.0f; // this art is additive, so the alpha value does nothing
 
 			trap->R_SetColor( &color );
@@ -6430,7 +6430,7 @@ static void CG_DrawCrosshairNames( void ) {
 		float fontScale = 0.875f;
 		if ( cg_drawCrosshairNames.integer == 3 )
 			fontScale *= tcolor.a;
-		trap->R_Font_DrawString( SCREEN_WIDTH/2.0 - trap->R_Font_StrLenPixels( name, fontHandle, fontScale )/2.0, SCREEN_HEIGHT/2.0 - 70.0, name, &tcolor, fontHandle, -1, fontScale );
+		trap->R_Font_DrawString( SCREEN_WIDTH/2.0f - trap->R_Font_StrLenPixels( name, fontHandle, fontScale )/2.0f, SCREEN_HEIGHT/2.0f - 70.0f, name, &tcolor, fontHandle, -1, fontScale );
 	}
 
 	trap->R_SetColor( NULL );
@@ -6507,11 +6507,11 @@ static void CG_DrawSpectator(void)
 		trap->R_SetColor( &colorTable[CT_WHITE] );
 		if ( cgs.clientinfo[cgs.duelist1].modelIcon )
 		{
-			CG_DrawPic( 10, SCREEN_HEIGHT-(size*1.5), size, size, cgs.clientinfo[cgs.duelist1].modelIcon );
+			CG_DrawPic( 10, SCREEN_HEIGHT-(size*1.5f), size, size, cgs.clientinfo[cgs.duelist1].modelIcon );
 		}
 		if ( cgs.clientinfo[cgs.duelist2].modelIcon )
 		{
-			CG_DrawPic( SCREEN_WIDTH-size-10, SCREEN_HEIGHT-(size*1.5), size, size, cgs.clientinfo[cgs.duelist2].modelIcon );
+			CG_DrawPic( SCREEN_WIDTH-size-10, SCREEN_HEIGHT-(size*1.5f), size, size, cgs.clientinfo[cgs.duelist2].modelIcon );
 		}
 
 // nmckenzie: DUEL_HEALTH
@@ -6519,25 +6519,25 @@ static void CG_DrawSpectator(void)
 		{
 			if ( cgs.showDuelHealths >= 1)
 			{	// draw the healths on the two guys - how does this interact with power duel, though?
-				CG_DrawDuelistHealth ( 10, SCREEN_HEIGHT-(size*1.5) - 12, 64, 8, 1 );
-				CG_DrawDuelistHealth ( SCREEN_WIDTH-size-10, SCREEN_HEIGHT-(size*1.5) - 12, 64, 8, 2 );
+				CG_DrawDuelistHealth ( 10, SCREEN_HEIGHT-(size*1.5f) - 12, 64, 8, 1 );
+				CG_DrawDuelistHealth ( SCREEN_WIDTH-size-10, SCREEN_HEIGHT-(size*1.5f) - 12, 64, 8, 2 );
 			}
 		}
 
 		if (cgs.gametype != GT_POWERDUEL)
 		{
 			Com_sprintf(text, sizeof(text), "%i/%i", cgs.clientinfo[cgs.duelist1].score, cgs.fraglimit );
-			CG_Text_Paint( 42 - CG_Text_Width( text, 1.0f, 2 ) / 2, SCREEN_HEIGHT-(size*1.5) + 64, 1.0f, &colorWhite, text, 0, 0, 0, 2 );
+			CG_Text_Paint( 42 - CG_Text_Width( text, 1.0f, 2 ) / 2, SCREEN_HEIGHT-(size*1.5f) + 64, 1.0f, &colorWhite, text, 0, 0, 0, 2 );
 
 			Com_sprintf(text, sizeof(text), "%i/%i", cgs.clientinfo[cgs.duelist2].score, cgs.fraglimit );
-			CG_Text_Paint( SCREEN_WIDTH-size+22 - CG_Text_Width( text, 1.0f, 2 ) / 2, SCREEN_HEIGHT-(size*1.5) + 64, 1.0f, &colorWhite, text, 0, 0, 0, 2 );
+			CG_Text_Paint( SCREEN_WIDTH-size+22 - CG_Text_Width( text, 1.0f, 2 ) / 2, SCREEN_HEIGHT-(size*1.5f) + 64, 1.0f, &colorWhite, text, 0, 0, 0, 2 );
 		}
 
 		if (cgs.gametype == GT_POWERDUEL && cgs.duelist3 != -1)
 		{
 			if ( cgs.clientinfo[cgs.duelist3].modelIcon )
 			{
-				CG_DrawPic( SCREEN_WIDTH-size-10, SCREEN_HEIGHT-(size*2.8), size, size, cgs.clientinfo[cgs.duelist3].modelIcon );
+				CG_DrawPic( SCREEN_WIDTH-size-10, SCREEN_HEIGHT-(size*2.8f), size, size, cgs.clientinfo[cgs.duelist3].modelIcon );
 			}
 		}
 	}
@@ -6548,11 +6548,11 @@ static void CG_DrawSpectator(void)
 		s2 = CG_GetStringEdString("MP_INGAME", "SPEC_CHOOSEJOIN"); //s = "press ESC and use the JOIN menu to play";
 
 	trap->R_SetColor( &colour );
-	CG_DrawPic( (SCREEN_WIDTH/3.0) - ((SCREEN_WIDTH/3.0)/2.0), 0, (SCREEN_WIDTH/3.0)*2.0, 60.0f, media.gfx.interface.forceIconBackground );
+	CG_DrawPic( (SCREEN_WIDTH/3.0f) - ((SCREEN_WIDTH/3.0f)/2.0f), 0, (SCREEN_WIDTH/3.0f)*2.0f, 60.0f, media.gfx.interface.forceIconBackground );
 	trap->R_SetColor( NULL );
 
-	CG_Text_Paint ( (SCREEN_WIDTH/2.0) - (CG_Text_Width( s, 0.5f, FONT_JAPPLARGE )/2.0), 0/*420*/, 0.5f, &colorWhite, s, 0, 0, 0, FONT_JAPPLARGE );
-	CG_Text_Paint ( (SCREEN_WIDTH/2.0) - (CG_Text_Width( s2, 0.5f, FONT_JAPPLARGE )/2.0), 16/*440*/, 0.5f, &colorWhite, s2, 0, 0, 0, FONT_JAPPLARGE );
+	CG_Text_Paint ( (SCREEN_WIDTH/2.0f) - (CG_Text_Width( s, 0.5f, FONT_JAPPLARGE )/2.0f), 0/*420*/, 0.5f, &colorWhite, s, 0, 0, 0, FONT_JAPPLARGE );
+	CG_Text_Paint ( (SCREEN_WIDTH/2.0f) - (CG_Text_Width( s2, 0.5f, FONT_JAPPLARGE )/2.0f), 16/*440*/, 0.5f, &colorWhite, s2, 0, 0, 0, FONT_JAPPLARGE );
 
 #endif
 }
@@ -6730,7 +6730,7 @@ static qboolean CG_DrawScoreboard( void ) {
 	}
 
 	if ( cg.showScores || cg.predictedPlayerState.pm_type == PM_DEAD || cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
-		fade = 1.0;
+		fade = 1.0f;
 		fadeColor = colorWhite;
 	} else {
 		fadeColor = CG_FadeColor( cg.scoreFadeTime, FADE_TIME );
@@ -7058,7 +7058,7 @@ void CG_DrawFlagStatusQ3P( void )
 		trap->R_SetColor( NULL );
 	}
 	else
-		CG_DrawPic( x - (iconSize*1.5), y, iconSize, iconSize, myFlag );
+		CG_DrawPic( x - (iconSize*1.5f), y, iconSize, iconSize, myFlag );
 
 	if ( team == TEAM_RED )
 	{
@@ -7485,10 +7485,10 @@ static void CG_DrawSiegeHUDItem(void)
 		VectorSet(&maxs, 16, 16, 32);
 	}
 
-	origin.z = -0.5 * ( mins.z + maxs.z );
-	origin.y = 0.5 * ( mins.y + maxs.y );
-	len = 0.5 * ( maxs.z - mins.z );
-	origin.x = len / 0.268;
+	origin.z = -0.5f * ( mins.z + maxs.z );
+	origin.y = 0.5f * ( mins.y + maxs.y );
+	len = 0.5f * ( maxs.z - mins.z );
+	origin.x = len / 0.268f;
 
 	VectorClear(&angles);
 	angles.yaw = cg.autoAngles.yaw;
@@ -7720,7 +7720,7 @@ static void CG_Draw2DScreenTints( void )
 
 			rageTime = cgRageFadeVal;
 
-			cgRageFadeVal -= (cg.time - cgRageFadeTime)*0.000005;
+			cgRageFadeVal -= (cg.time - cgRageFadeTime)*0.000005f;
 
 			if (rageTime < 0)
 				rageTime = 0;
@@ -7807,7 +7807,7 @@ static void CG_Draw2DScreenTints( void )
 
 			rageRecTime = cgRageRecFadeVal;
 
-			cgRageRecFadeVal -= (cg.time - cgRageRecFadeTime)*0.000005;
+			cgRageRecFadeVal -= (cg.time - cgRageRecFadeTime)*0.000005f;
 
 			if (rageRecTime < 0)
 				rageRecTime = 0;
@@ -8016,8 +8016,8 @@ static void CG_Draw2DScreenTints( void )
 
 	if ( (refdef->viewContents&CONTENTS_LAVA) )
 	{//tint screen red
-		float phase = cg.time / 1000.0 * WAVE_FREQUENCY * M_PI * 2;
-		hcolor.a = 0.5 + (0.15f*sin( phase ));
+		float phase = cg.time / 1000.0f * WAVE_FREQUENCY * M_PI * 2;
+		hcolor.a = 0.5f + (0.15f*sinf( phase ));
 		hcolor.r = 0.7f;
 		hcolor.g = 0;
 		hcolor.b = 0;
@@ -8026,8 +8026,8 @@ static void CG_Draw2DScreenTints( void )
 	}
 	else if ( (refdef->viewContents&CONTENTS_SLIME) )
 	{//tint screen green
-		float phase = cg.time / 1000.0 * WAVE_FREQUENCY * M_PI * 2;
-		hcolor.a = 0.4 + (0.1f*sin( phase ));
+		float phase = cg.time / 1000.0f * WAVE_FREQUENCY * M_PI * 2;
+		hcolor.a = 0.4f + (0.1f*sinf( phase ));
 		hcolor.r = 0;
 		hcolor.g = 0.7f;
 		hcolor.b = 0;
@@ -8289,7 +8289,7 @@ void CG_Draw2D( void ) {
 		switch (cgSiegeRoundState)
 		{
 		case 1:
-			CG_CenterPrint(CG_GetStringEdString("MP_INGAME", "WAITING_FOR_PLAYERS"), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH);
+			CG_CenterPrint(CG_GetStringEdString("MP_INGAME", "WAITING_FOR_PLAYERS"), SCREEN_HEIGHT * 0.30f, BIGCHAR_WIDTH);
 			break;
 		case 2:
 			rTime = (SIEGE_ROUND_BEGIN_TIME - (cg.time - cgSiegeRoundTime));
@@ -8333,7 +8333,7 @@ void CG_Draw2D( void ) {
 			}
 
 			strcpy(pStr, va("%s %i...", CG_GetStringEdString("MP_INGAME", "ROUNDBEGINSIN"), rTime));
-			CG_CenterPrint(pStr, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH);
+			CG_CenterPrint(pStr, SCREEN_HEIGHT * 0.30f, BIGCHAR_WIDTH);
 			//same
 			break;
 		default:
@@ -8344,7 +8344,7 @@ void CG_Draw2D( void ) {
 	}
 	else if (cgSiegeRoundTime)
 	{
-		CG_CenterPrint("", SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH);
+		CG_CenterPrint("", SCREEN_HEIGHT * 0.30f, BIGCHAR_WIDTH);
 		cgSiegeRoundTime = 0;
 
 		//cgSiegeRoundBeganTime = cg.time;

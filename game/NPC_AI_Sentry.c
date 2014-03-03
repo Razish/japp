@@ -221,9 +221,9 @@ void Sentry_MaintainHeight( void )
 		dif = (NPC->enemy->r.currentOrigin.z+NPC->enemy->r.maxs.z) - NPC->r.currentOrigin.z;
 
 		// cap to prevent dramatic height shifts
-		if ( fabs( dif ) > 8 )
+		if ( fabsf( dif ) > 8 )
 		{
-			if ( fabs( dif ) > SENTRY_HOVER_HEIGHT )
+			if ( fabsf( dif ) > SENTRY_HOVER_HEIGHT )
 			{
 				dif = ( dif < 0 ? -24 : 24 );
 			}
@@ -248,7 +248,7 @@ void Sentry_MaintainHeight( void )
 		{
 			dif = goal->r.currentOrigin.z - NPC->r.currentOrigin.z;
 
-			if ( fabs( dif ) > SENTRY_HOVER_HEIGHT )
+			if ( fabsf( dif ) > SENTRY_HOVER_HEIGHT )
 			{
 				ucmd.upmove = ( ucmd.upmove < 0 ? -4 : 4 );
 			}
@@ -258,7 +258,7 @@ void Sentry_MaintainHeight( void )
 				{
 					NPC->client->ps.velocity.z *= SENTRY_VELOCITY_DECAY;
 
-					if ( fabs( NPC->client->ps.velocity.z ) < 2 )
+					if ( fabsf( NPC->client->ps.velocity.z ) < 2 )
 					{
 						NPC->client->ps.velocity.z = 0;
 					}
@@ -270,7 +270,7 @@ void Sentry_MaintainHeight( void )
 		{
 			NPC->client->ps.velocity.z *= SENTRY_VELOCITY_DECAY;
 
-			if ( fabs( NPC->client->ps.velocity.z ) < 1 )
+			if ( fabsf( NPC->client->ps.velocity.z ) < 1 )
 			{
 				NPC->client->ps.velocity.z = 0;
 			}
@@ -282,7 +282,7 @@ void Sentry_MaintainHeight( void )
 	{
 		NPC->client->ps.velocity.x *= SENTRY_VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.x ) < 1 )
+		if ( fabsf( NPC->client->ps.velocity.x ) < 1 )
 		{
 			NPC->client->ps.velocity.x = 0;
 		}
@@ -292,7 +292,7 @@ void Sentry_MaintainHeight( void )
 	{
 		NPC->client->ps.velocity.y *= SENTRY_VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.y ) < 1 )
+		if ( fabsf( NPC->client->ps.velocity.y ) < 1 )
 		{
 			NPC->client->ps.velocity.y = 0;
 		}

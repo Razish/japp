@@ -44,7 +44,7 @@ void CG_BubbleTrail( vector3 *start, vector3 *end, float spacing ) {
 		le->leType = LE_MOVE_SCALE_FADE;
 		le->startTime = cg.time;
 		le->endTime = cg.time + 1000 + random() * 250;
-		le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+		le->lifeRate = 1.0f / ( le->endTime - le->startTime );
 
 		re = &le->refEntity;
 		re->shaderTime = cg.time / 1000.0f;
@@ -58,7 +58,7 @@ void CG_BubbleTrail( vector3 *start, vector3 *end, float spacing ) {
 		re->shaderRGBA[2] = 0xff;
 		re->shaderRGBA[3] = 0xff;
 
-		le->color[3] = 1.0;
+		le->color[3] = 1.0f;
 
 		le->pos.trType = TR_LINEAR;
 		le->pos.trTime = cg.time;
@@ -105,10 +105,10 @@ localEntity_t *CG_SmokePuff( const vector3 *p, const vector3 *vel,
 	le->fadeInTime = fadeInTime;
 	le->endTime = startTime + duration;
 	if ( fadeInTime > startTime ) {
-		le->lifeRate = 1.0 / ( le->endTime - le->fadeInTime );
+		le->lifeRate = 1.0f / ( le->endTime - le->fadeInTime );
 	}
 	else {
-		le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+		le->lifeRate = 1.0f / ( le->endTime - le->startTime );
 	}
 	le->color[0] = r;
 	le->color[1] = g;
@@ -171,7 +171,7 @@ void CG_TestLine( vector3 *start, vector3 *end, int time, unsigned int color, in
 	le->leType = LE_LINE;
 	le->startTime = cg.time;
 	le->endTime = cg.time + time;
-	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+	le->lifeRate = 1.0f / ( le->endTime - le->startTime );
 
 	re = &le->refEntity;
 	VectorCopy( start, &re->origin );
@@ -179,7 +179,7 @@ void CG_TestLine( vector3 *start, vector3 *end, int time, unsigned int color, in
 	re->shaderTime = cg.time / 1000.0f;
 
 	re->reType = RT_LINE;
-	re->radius = 0.5*radius;
+	re->radius = 0.5f*radius;
 	re->customShader = media.gfx.world.whiteShader; //trap->R_RegisterShaderNoMip("textures/colombia/canvas_doublesided");
 
 	re->shaderTexCoord.x = re->shaderTexCoord.y = 1.0f;
@@ -201,7 +201,7 @@ void CG_TestLine( vector3 *start, vector3 *end, int time, unsigned int color, in
 		re->shaderRGBA[3] = 0xff;
 	}
 
-	le->color[3] = 1.0;
+	le->color[3] = 1.0f;
 
 	//re->renderfx |= RF_DEPTHHACK;
 }
@@ -523,8 +523,8 @@ void CG_DoGlass( vector3 verts[4], vector3 *normal, vector3 *dmgPt, vector3 *dmg
 
 	//Attempt to scale the glass directly to the size of the window
 
-	stepWidth = (0.25f - (width*0.0002)); //(width*0.0005));
-	mxWidth = width*0.2;
+	stepWidth = (0.25f - (width*0.0002f)); //(width*0.0005f));
+	mxWidth = width*0.2f;
 	timeDecay = ( timeDecay + TIME_DECAY_FAST ) * 0.5f;
 
 	if (stepWidth < 0.01f)
@@ -707,9 +707,9 @@ void CG_GlassShatter_Old(int entnum, vector3 *org, vector3 *mins, vector3 *maxs)
 		if (dif.z < 2)
 			dif.z = 2;
 
-		difx.x = Q_irand(1, (dif.x*0.9)*2);
-		difx.y = Q_irand(1, (dif.y*0.9)*2);
-		difx.z = Q_irand(1, (dif.z*0.9)*2);
+		difx.x = Q_irand(1, (dif.x*0.9f)*2);
+		difx.y = Q_irand(1, (dif.y*0.9f)*2);
+		difx.z = Q_irand(1, (dif.z*0.9f)*2);
 
 		if (difx.x > dif.x)		shardorg.x += difx.x-(dif.x);
 		else					shardorg.x -= difx.x;
@@ -831,9 +831,9 @@ void CG_CreateDebris(int entnum, vector3 *org, vector3 *mins, vector3 *maxs, int
 		if (dif.z < 2)
 			dif.z = 2;
 
-		difx.x = Q_irand(1, (dif.x*0.9)*2);
-		difx.y = Q_irand(1, (dif.y*0.9)*2);
-		difx.z = Q_irand(1, (dif.z*0.9)*2);
+		difx.x = Q_irand(1, (dif.x*0.9f)*2);
+		difx.y = Q_irand(1, (dif.y*0.9f)*2);
+		difx.z = Q_irand(1, (dif.z*0.9f)*2);
 
 		if ( difx.x > dif.x )	shardorg.x += difx.x-(dif.x);
 		else					shardorg.x -= difx.x;
@@ -1222,10 +1222,10 @@ void CG_ScorePlum( int client, vector3 *org, int score ) {
 	le->leType = LE_SCOREPLUM;
 	le->startTime = cg.time;
 	le->endTime = cg.time + 4000;
-	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+	le->lifeRate = 1.0f / ( le->endTime - le->startTime );
 
 
-	le->color[0] = le->color[1] = le->color[2] = le->color[3] = 1.0;
+	le->color[0] = le->color[1] = le->color[2] = le->color[3] = 1.0f;
 	le->radius = score;
 
 	VectorCopy( org, &le->pos.trBase );
@@ -1315,7 +1315,7 @@ localEntity_t *CG_MakeExplosion( vector3 *origin, vector3 *dir,
 	VectorCopy ( &newOrigin, &ex->refEntity.origin);
 	VectorCopy ( &newOrigin, &ex->refEntity.oldorigin );
 
-	ex->color[0] = ex->color[1] = ex->color[2] = 1.0;
+	ex->color[0] = ex->color[1] = ex->color[2] = 1.0f;
 
 	return ex;
 }

@@ -1,10 +1,10 @@
 
 
-#define CT_LTBLUE1	0.367	0.261	0.722
-#define CT_DKBLUE1	0.199	0.0		0.398
+#define CT_LTBLUE1	0.367f	0.261f	0.722f
+#define CT_DKBLUE1	0.199f	0.0f		0.398f
 
-#define CT_LTCYAN	0		0.5		0.5
-#define CT_DKCYAN	0		0.25	0.25
+#define CT_LTCYAN	0		0.5f		0.5f
+#define CT_DKCYAN	0		0.25f	0.25f
 
 #define ITEM_TYPE_TEXT			0		// simple text
 #define ITEM_TYPE_BUTTON		1		// button, basically text with a border

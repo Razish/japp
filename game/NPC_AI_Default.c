@@ -84,7 +84,7 @@ qboolean NPC_StandTrackAndShoot (gentity_t *NPC, qboolean canDuck)
 	qboolean	attack_ok = qfalse;
 	qboolean	duck_ok = qfalse;
 	qboolean	faced = qfalse;
-	float		attack_scale = 1.0;
+	float		attack_scale = 1.0f;
 
 	//First see if we're hurt bad- if so, duck
 	//FIXME: if even when ducked, we can shoot someone, we should.
@@ -112,7 +112,7 @@ qboolean NPC_StandTrackAndShoot (gentity_t *NPC, qboolean canDuck)
 				{
 					if ( NPC->enemy->client->buttons & BUTTON_ATTACK )
 					{//FIXME: determine if enemy fire angles would hit me or get close
-						if ( NPC_CheckDefend( 1.0 ) )//FIXME: Check self-preservation?  Health?
+						if ( NPC_CheckDefend( 1.0f ) )//FIXME: Check self-preservation?  Health?
 						{
 							duck_ok = qtrue;
 						}
@@ -167,7 +167,7 @@ void NPC_BSStandGuard (void)
 	//FIXME: Use Snapshot info
 	if ( NPC->enemy == NULL )
 	{//Possible to pick one up by being shot
-		if( random() < 0.5 )
+		if( random() < 0.5f )
 		{
 			if(NPC->client->enemyTeam)
 			{
@@ -220,7 +220,7 @@ void NPC_BSHuntAndKill( void )
 		{
 			if ( !NPC_EnemyTooFar( NPC->enemy, 0, qtrue ) )
 			{//Enemy is close enough to shoot - FIXME: this next func does this also, but need to know here for info on whether ot not to turn later
-				NPC_CheckCanAttack( 1.0, qfalse );
+				NPC_CheckCanAttack( 1.0f, qfalse );
 				turned = qtrue;
 			}
 		}
@@ -231,7 +231,7 @@ void NPC_BSHuntAndKill( void )
 			//FIXME, use IdealDistance to determin if we need to close distance
 			VectorSubtract(&NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin, &vec);
 			enemyDist = VectorLength(&vec);
-			if( enemyDist > 48 && ((enemyDist*1.5)*(enemyDist*1.5) >= NPC_MaxDistSquaredForWeapon() ||
+			if( enemyDist > 48 && ((enemyDist*1.5f)*(enemyDist*1.5f) >= NPC_MaxDistSquaredForWeapon() ||
 				oEVis != VIS_SHOOT ||
 				//!(ucmd.buttons & BUTTON_ATTACK) ||
 				enemyDist > IdealDistance(NPC)*3 ) )
@@ -316,7 +316,7 @@ void NPC_BSStandAndShoot (void)
 					{//Our team is strong enough to rush
 						teamCounter[NPC->playerTeam]++;
 						if(teamNumbers[NPC->playerTeam] * 17 <= teamCounter[NPC->playerTeam])
-						{//ok, we waited 1.7 think cycles on average and everyone is go, let's do it!
+						{//ok, we waited 1.7f think cycles on average and everyone is go, let's do it!
 							//FIXME: Should we do this to everyone on our team?
 							NPCInfo->behaviorState = BS_HUNT_AND_KILL;
 							//FIXME: if the tide changes, we should retreat!
@@ -342,7 +342,7 @@ void NPC_BSStandAndShoot (void)
 		ucmd.upmove = -127;
 		if(NPC->enemy)
 		{
-			NPC_CheckCanAttack(1.0, qtrue);
+			NPC_CheckCanAttack(1.0f, qtrue);
 		}
 		return;
 	}
@@ -392,7 +392,7 @@ void NPC_BSRunAndShoot (void)
 		ucmd.upmove = -127;
 		if ( NPC->enemy )
 		{
-			NPC_CheckCanAttack( 1.0, qfalse );
+			NPC_CheckCanAttack( 1.0f, qfalse );
 		}
 		return;
 	}
@@ -559,8 +559,8 @@ void NPC_BSPointShoot (qboolean shoot)
 				pitchMissAllow = 8.0f;
 			}
 
-			yawMiss = tan(DEG2RAD(AngleDelta ( NPC->client->ps.viewangles.yaw, NPCInfo->desiredYaw ))) * dist;
-			pitchMiss = tan(DEG2RAD(AngleDelta ( NPC->client->ps.viewangles.pitch, NPCInfo->desiredPitch))) * dist;
+			yawMiss = tanf( DEG2RAD( AngleDelta( NPC->client->ps.viewangles.yaw, NPCInfo->desiredYaw ) ) ) * dist;
+			pitchMiss = tanf( DEG2RAD( AngleDelta( NPC->client->ps.viewangles.pitch, NPCInfo->desiredPitch ) ) ) * dist;
 
 			if ( yawMissAllow >= yawMiss && pitchMissAllow > pitchMiss )
 			{
@@ -589,7 +589,7 @@ void NPC_BSMove(void)
 	NPC_CheckEnemy(qtrue, qfalse, qtrue);
 	if(NPC->enemy)
 	{
-		NPC_CheckCanAttack(1.0, qfalse);
+		NPC_CheckCanAttack(1.0f, qfalse);
 	}
 	else
 	{
@@ -599,7 +599,7 @@ void NPC_BSMove(void)
 	goal = UpdateGoal();
 	if(goal)
 	{
-//		NPCInfo->moveToGoalMod = 1.0;
+//		NPCInfo->moveToGoalMod = 1.0f;
 
 		NPC_SlideMoveToGoal();
 	}

@@ -16,11 +16,14 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-
 #undef PI
-#define PI	((lua_Number)(3.1415926535897932384626433832795))
-#define RADIANS_PER_DEGREE	((lua_Number)(PI/180.0))
-
+#if defined(LUA_NUMBER_DOUBLE)
+	#define PI ((lua_Number)(3.1415926535897932384626433832795))
+	#define RADIANS_PER_DEGREE ((lua_Number)(PI/180.0))
+#elif defined(LUA_NUMBER_FLOAT)
+	#define PI ((lua_Number)(3.1415926535897932384626433832795f))
+	#define RADIANS_PER_DEGREE ((lua_Number)(PI/180.0f))
+#endif
 
 
 static int math_abs (lua_State *L) {

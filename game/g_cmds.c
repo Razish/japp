@@ -1860,7 +1860,7 @@ int G_ItemUsable( playerState_t *ps, int forcedUse ) {
 		fwd.z = 0;
 		VectorMA( &ps->origin, 64, &fwd, &dest );
 		trap->Trace( &tr, &ps->origin, &mins, &maxs, &dest, ps->clientNum, MASK_SHOT, qfalse, 0, 0 );
-		if ( tr.fraction > 0.9 && !tr.startsolid && !tr.allsolid ) {
+		if ( tr.fraction > 0.9f && !tr.startsolid && !tr.allsolid ) {
 			VectorCopy( &tr.endpos, &pos );
 			VectorSet( &dest, pos.x, pos.y, pos.z-4096 );
 			trap->Trace( &tr, &pos, &mins, &maxs, &dest, ps->clientNum, MASK_SOLID, qfalse, 0, 0 );

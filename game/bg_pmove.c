@@ -64,9 +64,9 @@ int		c_pmove = 0;
 float forceSpeedLevels[4] =
 {
 	1, //rank 0?
-	1.25,
-	1.5,
-	1.75
+	1.25f,
+	1.5f,
+	1.75f
 };
 
 int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
@@ -357,10 +357,10 @@ void PM_pitch_roll_for_slope( bgEntity_t *forwhom, vector3 *pass_slope, vector3 
 		VectorCopy( &startspot, &endspot );
 		endspot.z -= 300;
 		pm->trace( &trace, &pm->ps->origin, &vec3_origin, &vec3_origin, &endspot, forwhom->s.number, MASK_SOLID );
-//		if(trace_fraction>0.05&&forwhom.movetype==MOVETYPE_STEP)
+//		if(trace_fraction>0.05f&&forwhom.movetype==MOVETYPE_STEP)
 //			forwhom.flags(-)FL_ONGROUND;
 
-		if ( trace.fraction >= 1.0 )
+		if ( trace.fraction >= 1.0f )
 			return;
 
 		if( !( &trace.plane ) )
@@ -417,7 +417,7 @@ void PM_pitch_roll_for_slope( bgEntity_t *forwhom, vector3 *pass_slope, vector3 
 		pm->ps->viewangles.pitch = dot * pitch;
 		pm->ps->viewangles.roll = ((1-Q_fabs(dot)) * pitch * mod);
 		oldmins2 = pm->mins.z;
-		pm->mins.z = -24 + 12 * fabs(pm->ps->viewangles.pitch)/180.0f;
+		pm->mins.z = -24 + 12 * fabsf(pm->ps->viewangles.pitch)/180.0f;
 		//FIXME: if it gets bigger, move up
 		if ( oldmins2 > pm->mins.z )
 		{//our mins is now lower, need to move up
@@ -431,7 +431,7 @@ void PM_pitch_roll_for_slope( bgEntity_t *forwhom, vector3 *pass_slope, vector3 
 	else
 	{
 		forwhom->currentAngles.pitch = dot * pitch;
-		forwhom->currentAngles.roll = ((1-Q_fabs(dot)) * pitch * mod);
+		forwhom->currentAngles.roll = ((1-Q_fabsf(dot)) * pitch * mod);
 	}
 	*/
 }
@@ -521,7 +521,7 @@ static void PM_SetVehicleAngles( vector3 *normal )
 	{//in water
 		//view pitch has some influence when in water
 		//FIXME: take center of gravity into account?
-		vAngles.pitch += (pm->ps->viewangles.pitch-vAngles.pitch)*0.75f + (pitchBias*0.5);
+		vAngles.pitch += (pm->ps->viewangles.pitch-vAngles.pitch)*0.75f + (pitchBias*0.5f);
 	}
 	else if ( normal )
 	{//have a valid surface below me
@@ -558,7 +558,7 @@ static void PM_SetVehicleAngles( vector3 *normal )
 
 			// Magic number fun!  Speed is used for banking, so modulate the speed by a sine wave
 			//FIXME: this banks too early
-			speed *= sin( (150 + pml.frametime) * 0.003 );
+			speed *= sinf( (150 + pml.frametime) * 0.003f );
 
 			// Clamp to prevent harsh rolling
 			if ( speed > 60 )
@@ -597,9 +597,9 @@ static void PM_SetVehicleAngles( vector3 *normal )
 		//bank faster the higher the difference is
 #if 0
 		else if ( i == 0/*PITCH*/ )
-			curVehicleBankingSpeed = vehicleBankingSpeed*fabs(AngleNormalize180(AngleSubtract( vAngles.pitch, pVeh->m_vOrientation->pitch )))/(g_vehicleInfo[pm->ps->vehicleIndex].pitchLimit/2.0f);
+			curVehicleBankingSpeed = vehicleBankingSpeed*fabsf(AngleNormalize180(AngleSubtract( vAngles.pitch, pVeh->m_vOrientation->pitch )))/(g_vehicleInfo[pm->ps->vehicleIndex].pitchLimit/2.0f);
 		else if ( i == 2/*ROLL*/ )
-			curVehicleBankingSpeed = vehicleBankingSpeed*fabs(AngleNormalize180(AngleSubtract( vAngles.roll, pVeh->m_vOrientation->roll )))/(g_vehicleInfo[pm->ps->vehicleIndex].rollLimit/2.0f);
+			curVehicleBankingSpeed = vehicleBankingSpeed*fabsf(AngleNormalize180(AngleSubtract( vAngles.roll, pVeh->m_vOrientation->roll )))/(g_vehicleInfo[pm->ps->vehicleIndex].rollLimit/2.0f);
 
 		if ( curVehicleBankingSpeed )
 #endif
@@ -684,7 +684,7 @@ void PM_HoverTrace( void )
 		//if ( pm->ps->waterheight < pm->ps->origin.z+pm->maxs[2] )
 		if (pm->waterlevel <= 1)
 		{//part of us is sticking out of water
-			if ( fabs(pm->ps->velocity.x) + fabs(pm->ps->velocity.y) > 100 )
+			if ( fabsf(pm->ps->velocity.x) + fabsf(pm->ps->velocity.y) > 100 )
 			{//moving at a decent speed
 				if ( Q_irand( pml.frametime, 100 ) >= 50 )
 				{//splash
@@ -738,8 +738,8 @@ void PM_HoverTrace( void )
 		if (trace->plane.normal.x > 0.5f || trace->plane.normal.x < -0.5f ||
 			trace->plane.normal.y > 0.5f || trace->plane.normal.y < -0.5f)
 		{ //steep slanted hill, don't go up it.
-			float d = fabs(trace->plane.normal.x);
-			float e = fabs(trace->plane.normal.y);
+			float d = fabsf(trace->plane.normal.x);
+			float e = fabsf(trace->plane.normal.y);
 			if (e > d)
 			{
 				d = e;
@@ -761,7 +761,7 @@ void PM_HoverTrace( void )
 				}
 				if ( (trace->contents&(CONTENTS_WATER|CONTENTS_SLIME|CONTENTS_LAVA)) )
 				{//hovering on water, make a spash if moving
-					if ( fabs(pm->ps->velocity.x) + fabs(pm->ps->velocity.y) > 100 )
+					if ( fabsf(pm->ps->velocity.x) + fabsf(pm->ps->velocity.y) > 100 )
 					{//moving at a decent speed
 						if ( Q_irand( pml.frametime, 100 ) >= 50 )
 						{//splash
@@ -1058,7 +1058,7 @@ static void PM_Friction( void ) {
 	{
 		if (pm->ps->pm_type == PM_FLOAT)
 		{ //almost no friction while floating
-			drop += speed*0.1*pml.frametime;
+			drop += speed*0.1f*pml.frametime;
 		}
 		else
 		{
@@ -1150,7 +1150,7 @@ PM_CmdScale
 
 Returns the scale factor to apply to cmd movements
 This allows the clients to use axial -127 to 127 values for all directions
-without getting a sqrt(2) distortion in speed.
+without getting a sqrtf(2) distortion in speed.
 ============
 */
 static float PM_CmdScale( usercmd_t *cmd ) {
@@ -1166,10 +1166,10 @@ static float PM_CmdScale( usercmd_t *cmd ) {
 		return 0;
 
 	if ( GetCInfo( CINFO_VQ3PHYS ) )
-		total = sqrt( cmd->forwardmove*cmd->forwardmove + cmd->rightmove*cmd->rightmove + umove*umove );
+		total = sqrtf( cmd->forwardmove*cmd->forwardmove + cmd->rightmove*cmd->rightmove + umove*umove );
 	else
-		total = sqrt( (float)(cmd->forwardmove*cmd->forwardmove + cmd->rightmove*cmd->rightmove + umove*umove) );
-	scale = (float)pm->ps->speed * max / ( 127.0 * total );
+		total = sqrtf( (float)(cmd->forwardmove*cmd->forwardmove + cmd->rightmove*cmd->rightmove + umove*umove) );
+	scale = (float)pm->ps->speed * max / ( 127.0f * total );
 
 	return scale;
 }
@@ -1634,7 +1634,7 @@ qboolean PM_AdjustAngleForWallJump( playerState_t *ps, usercmd_t *ucmd, qboolean
 		if ( //ucmd->upmove <= 0 &&
 			ps->legsTimer > 100 &&
 			trace.fraction < 1.0f &&
-			fabs(trace.plane.normal.z) <= 0.2f/*MAX_WALL_GRAB_SLOPE*/ )
+			fabsf(trace.plane.normal.z) <= 0.2f/*MAX_WALL_GRAB_SLOPE*/ )
 		{//still a vertical wall there
 			//FIXME: don't pull around 90 turns
 			/*
@@ -1726,7 +1726,7 @@ qboolean PM_AdjustAngleForWallJump( playerState_t *ps, usercmd_t *ucmd, qboolean
 #define LEDGEGRABMINDISTANCE	22
 
 //distance at which the animation grabs the ledge
-#define LEDGEHOROFFSET			22.3
+#define LEDGEHOROFFSET			22.3f
 
 //lets go of a ledge
 static void BG_LetGoofLedge( playerState_t *ps ) {
@@ -1932,7 +1932,7 @@ static qboolean LedgeTrace( trace_t *trace, vector3 *dir, float *lerpup, float *
 
 	if( trace->fraction < 1 )
 	{//hit a wall, pop into the wall and fire down to find top of wall
-		VectorMA(&trace->endpos, 0.5, dir, &traceTo);
+		VectorMA(&trace->endpos, 0.5f, dir, &traceTo);
 
 		VectorCopy(&traceTo, &traceFrom);
 
@@ -1940,7 +1940,7 @@ static qboolean LedgeTrace( trace_t *trace, vector3 *dir, float *lerpup, float *
 
 		pm->trace( trace, &traceFrom, NULL, NULL, &traceTo, pm->ps->clientNum, MASK_DEADSOLID );
 
-		if ( trace->fraction == 1.0 || trace->startsolid )
+		if ( trace->fraction == 1.0f || trace->startsolid )
 			return qfalse;
 	}
 
@@ -1951,7 +1951,7 @@ static qboolean LedgeTrace( trace_t *trace, vector3 *dir, float *lerpup, float *
 
 		pm->trace( trace, &traceFrom, NULL, NULL, &traceTo, pm->ps->clientNum, MASK_DEADSOLID );
 
-		if ( trace->fraction == 1.0 || trace->startsolid )
+		if ( trace->fraction == 1.0f || trace->startsolid )
 			return qfalse;
 
 		//found something, let's try to find the top face.
@@ -1979,7 +1979,7 @@ static qboolean LedgeTrace( trace_t *trace, vector3 *dir, float *lerpup, float *
 		pm->trace( trace, &traceFrom, NULL, NULL, &traceTo, pm->ps->clientNum, MASK_DEADSOLID );
 
 		vectoangles(&trace->plane.normal, &wallangles);
-		if ( trace->fraction == 1.0 || wallangles.pitch > 20 || wallangles.pitch < -20 )
+		if ( trace->fraction == 1.0f || wallangles.pitch > 20 || wallangles.pitch < -20 )
 			return qfalse;//no ledge or too steep of a ledge
 
 		*lerpfwd = Distance(&trace->endpos, &traceFrom) - LEDGEHOROFFSET;
@@ -2304,7 +2304,7 @@ static qboolean PM_CheckJump( void )
 								dotR = DotProduct( &facingRight, &pm->ps->velocity );
 								dotF = DotProduct( &facingFwd, &pm->ps->velocity );
 
-								if ( fabs(dotR) > fabs(dotF) * 1.5 )
+								if ( fabsf(dotR) > fabsf(dotF) * 1.5f )
 								{
 									if ( dotR > 150 )
 									{
@@ -2593,7 +2593,7 @@ static qboolean PM_CheckJump( void )
 					VectorNormalize( &idealNormal );
 				}
 
-				if ( !doTrace || (trace.fraction < 1.0f && (trace.entityNum < MAX_CLIENTS || DotProduct(&wallNormal,&idealNormal) > 0.7)) )
+				if ( !doTrace || (trace.fraction < 1.0f && (trace.entityNum < MAX_CLIENTS || DotProduct(&wallNormal,&idealNormal) > 0.7f)) )
 				{//there is a wall there.. or hit a client
 					if ( (anim != BOTH_WALL_RUN_LEFT
 							&& anim != BOTH_WALL_RUN_RIGHT
@@ -2976,8 +2976,8 @@ static qboolean PM_CheckJump( void )
 						VectorNormalize( &idealNormal );
 						traceEnt = PM_BGEntForNum(trace.entityNum);
 						if ( trace.fraction < 1.0f
-							&&fabs(trace.plane.normal.z) <= 0.2f/*MAX_WALL_GRAB_SLOPE*/
-							&&((trace.entityNum<ENTITYNUM_WORLD&&traceEnt&&traceEnt->s.solid!=SOLID_BMODEL)||DotProduct(&trace.plane.normal,&idealNormal)>0.7) )
+							&&fabsf(trace.plane.normal.z) <= 0.2f/*MAX_WALL_GRAB_SLOPE*/
+							&&((trace.entityNum<ENTITYNUM_WORLD&&traceEnt&&traceEnt->s.solid!=SOLID_BMODEL)||DotProduct(&trace.plane.normal,&idealNormal)>0.7f) )
 						{//there is a wall there
 							float dot = DotProduct( &pm->ps->velocity, &trace.plane.normal );
 							if ( dot < 1.0f )
@@ -3725,8 +3725,8 @@ static void PM_WalkMove( void ) {
 	if ( pm->waterlevel ) {
 		float	waterScale;
 
-		waterScale = pm->waterlevel / 3.0;
-		waterScale = 1.0 - ( 1.0 - pm_swimScale ) * waterScale;
+		waterScale = pm->waterlevel / 3.0f;
+		waterScale = 1.0f - ( 1.0f - pm_swimScale ) * waterScale;
 		if ( wishspeed > pm->ps->speed * waterScale ) {
 			wishspeed = pm->ps->speed * waterScale;
 		}
@@ -3839,7 +3839,7 @@ static void PM_NoclipMove( void ) {
 	{
 		drop = 0;
 
-		friction = pm_friction*1.5;	// extra friction
+		friction = pm_friction*1.5f;	// extra friction
 		control = speed < pm_stopspeed ? pm_stopspeed : speed;
 		drop += control*friction*pml.frametime;
 
@@ -3992,7 +3992,7 @@ static void PM_CrashLandEffect( void )
 	{
 		return;
 	}
-	delta = fabs(pml.previous_velocity.z)/10;//VectorLength( pml.previous_velocity );?
+	delta = fabsf(pml.previous_velocity.z)/10;//VectorLength( pml.previous_velocity );?
 	if ( delta >= 30 )
 	{
 		vector3 bottom;
@@ -4054,10 +4054,10 @@ static void PM_CrashLand( void ) {
 		pm->ps->inAirAnim = qfalse;
 		return;
 	}
-	t = (-b - sqrt( den ) ) / ( 2 * a );
+	t = (-b - sqrtf( den ) ) / ( 2 * a );
 
 	delta = vel + t * acc;
-	delta = delta*delta * 0.0001;
+	delta = delta*delta * 0.0001f;
 
 #ifdef _GAME
 	PM_CrashLandEffect();
@@ -4188,10 +4188,10 @@ static void PM_CrashLand( void ) {
 
 	// reduce falling damage if there is standing water
 	if ( pm->waterlevel == 2 ) {
-		delta *= 0.25;
+		delta *= 0.25f;
 	}
 	if ( pm->waterlevel == 1 ) {
-		delta *= 0.5;
+		delta *= 0.5f;
 	}
 
 	if ( delta < 1 ) {
@@ -4262,14 +4262,14 @@ static void PM_CrashLand( void ) {
 							dmgLess = 0;
 						}
 
-						delta_send -= (dmgLess*0.3);
+						delta_send -= (dmgLess*0.3f);
 
 						if (delta_send < 8)
 						{
 							delta_send = 8;
 						}
 
-						//Com_Printf("Damage sub: %i\n", (int)((dmgLess*0.1)));
+						//Com_Printf("Damage sub: %i\n", (int)((dmgLess*0.1f)));
 					}
 				}
 			}
@@ -4333,7 +4333,7 @@ static int PM_CorrectAllSolid( trace_t *trace ) {
 				if ( !trace->allsolid ) {
 					point.x = pm->ps->origin.x;
 					point.y = pm->ps->origin.y;
-					point.z = pm->ps->origin.z - 0.25;
+					point.z = pm->ps->origin.z - 0.25f;
 
 					pm->trace (trace, &pm->ps->origin, &pm->mins, &pm->maxs, &point, pm->ps->clientNum, pm->tracemask);
 					pml.groundTrace = *trace;
@@ -4392,7 +4392,7 @@ static void PM_GroundTraceMissed( void ) {
 		point.z -= 64;
 
 		pm->trace (&trace, &pm->ps->origin, &pm->mins, &pm->maxs, &point, pm->ps->clientNum, pm->tracemask);
-		if ( trace.fraction == 1.0 || pm->ps->pm_type == PM_FLOAT ) {
+		if ( trace.fraction == 1.0f || pm->ps->pm_type == PM_FLOAT ) {
 			if ( pm->ps->velocity.z <= 0 && !(pm->ps->pm_flags&PMF_JUMP_HELD))
 			{
 				//PM_SetAnim(SETANIM_LEGS,BOTH_INAIR1,SETANIM_FLAG_OVERRIDE, 100);
@@ -4421,7 +4421,7 @@ static void PM_GroundTraceMissed( void ) {
 		point.z -= 64;
 
 		pm->trace (&trace, &pm->ps->origin, &pm->mins, &pm->maxs, &point, pm->ps->clientNum, pm->tracemask);
-		if ( trace.fraction == 1.0 || pm->ps->pm_type == PM_FLOAT )
+		if ( trace.fraction == 1.0f || pm->ps->pm_type == PM_FLOAT )
 		{
 			pm->ps->inAirAnim = qtrue;
 		}
@@ -4462,7 +4462,7 @@ static void PM_GroundTrace( void ) {
 
 	point.x = pm->ps->origin.x;
 	point.y = pm->ps->origin.y;
-	point.z = pm->ps->origin.z - 0.25;
+	point.z = pm->ps->origin.z - 0.25f;
 
 	pm->trace (&trace, &pm->ps->origin, &pm->mins, &pm->maxs, &point, pm->ps->clientNum, pm->tracemask);
 	pml.groundTrace = trace;
@@ -4482,7 +4482,7 @@ static void PM_GroundTrace( void ) {
 	}
 
 	// if the trace didn't hit anything, we are in free fall
-	if ( trace.fraction == 1.0 ) {
+	if ( trace.fraction == 1.0f ) {
 		PM_GroundTraceMissed();
 		pml.groundPlane = qfalse;
 		pml.walking = qfalse;
@@ -5547,7 +5547,7 @@ static void PM_Footsteps( void ) {
 	// calculate speed and cycle to be used for
 	// all cyclic walking effects
 	//
-	pm->xyspeed = sqrt( pm->ps->velocity.x*pm->ps->velocity.x + pm->ps->velocity.y*pm->ps->velocity.y );
+	pm->xyspeed = sqrtf( pm->ps->velocity.x*pm->ps->velocity.x + pm->ps->velocity.y*pm->ps->velocity.y );
 
 	if (pm->ps->saberMove == LS_SPINATTACK)
 	{
@@ -5665,7 +5665,7 @@ static void PM_Footsteps( void ) {
 	{
 		int rolled = 0;
 		qboolean canRoll = qfalse;
-		bobmove = 0.5;	// ducked characters bob much faster
+		bobmove = 0.5f;	// ducked characters bob much faster
 
 #if 0
 		if ( ( (PM_RunningAnim( pm->ps->legsAnim ) && VectorLengthSquared( &pm->ps->velocity ) >= 40000/*200*200*/)
@@ -5728,7 +5728,7 @@ static void PM_Footsteps( void ) {
 	else if ((pm->ps->pm_flags & PMF_ROLLING) && !BG_InRoll(pm->ps, pm->ps->legsAnim) &&
 		!PM_InRollComplete(pm->ps, pm->ps->legsAnim))
 	{
-		bobmove = 0.5;	// ducked characters bob much faster
+		bobmove = 0.5f;	// ducked characters bob much faster
 
 		if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN )
 		{
@@ -6684,7 +6684,7 @@ int PM_ItemUsable(playerState_t *ps, int forcedUse)
 		fwd.z = 0;
 		VectorMA(&ps->origin, 64, &fwd, &dest);
 		pm->trace(&tr, &ps->origin, &mins, &maxs, &dest, ps->clientNum, MASK_SHOT );
-		if (tr.fraction > 0.9 && !tr.startsolid && !tr.allsolid)
+		if (tr.fraction > 0.9f && !tr.startsolid && !tr.allsolid)
 		{
 			VectorCopy(&tr.endpos, &pos);
 			VectorSet( &dest, pos.x, pos.y, pos.z - 4096 );
@@ -8019,17 +8019,17 @@ static void PM_Weapon( void )
 
 	/*
 	if ( pm->ps->powerups[PW_HASTE] ) {
-		addTime /= 1.3;
+		addTime /= 1.3f;
 	}
 	*/
 
 	if (pm->ps->fd.forcePowersActive & (1 << FP_RAGE))
 	{
-		addTime *= 0.75;
+		addTime *= 0.75f;
 	}
 	else if (pm->ps->fd.forceRageRecoveryTime > pm->cmd.serverTime)
 	{
-		addTime *= 1.5;
+		addTime *= 1.5f;
 	}
 
 	pm->ps->weaponTime += addTime;
@@ -8198,7 +8198,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 			if ( i == 0/*PITCH*/ )
 			{
 				int pitchClamp = ANGLE2SHORT(AngleNormalize180(pm_entVeh->m_pVehicle->m_vPrevRiderViewAngles.pitch+10.0f));
-				// don't let the player look up or down more than 22.5 degrees
+				// don't let the player look up or down more than 22.5f degrees
 				if ( temp > pitchClamp )
 				{
 					ps->delta_angles.data[i] = pitchClamp - cmd->angles.data[i];
@@ -8213,7 +8213,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 			if ( i == 1/*YAW*/ )
 			{
 				int yawClamp = ANGLE2SHORT(AngleNormalize180(pm_entVeh->m_pVehicle->m_vPrevRiderViewAngles.yaw+10.0f));
-				// don't let the player look left or right more than 22.5 degrees
+				// don't let the player look left or right more than 22.5f degrees
 				if ( temp > yawClamp )
 				{
 					ps->delta_angles.data[i] = yawClamp - cmd->angles.data[i];
@@ -8704,9 +8704,9 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 			if ( ps->speed > 50 )
 			{ //can't roll unless you're able to move normally
 				if ((ps->legsAnim) == BOTH_ROLL_B)
-					ps->speed = ps->legsTimer/2.5;//450;
+					ps->speed = ps->legsTimer/2.5f;//450;
 				else
-					ps->speed = ps->legsTimer/1.5;//450;
+					ps->speed = ps->legsTimer/1.5f;//450;
 				if (ps->speed > 600)
 					ps->speed = 600;
 				//Automatically slow down as the roll ends.
@@ -8746,7 +8746,7 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 						if ( pm->cmd.forwardmove < 0 )
 							ps->speed = ps->legsTimer/20.0f;
 						else
-							ps->speed = ps->legsTimer/1.5;
+							ps->speed = ps->legsTimer/1.5f;
 					}
 				}
 				else
@@ -8756,9 +8756,9 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 			}
 			else
 			{
-				ps->speed = ps->legsTimer/1.5;
+				ps->speed = ps->legsTimer/1.5f;
 			}
-		//	ps->speed = ps->legsTimer/5.0;
+		//	ps->speed = ps->legsTimer/5.0f;
 		}
 		if (JP_GetJPFixRoll() < 3 && ps->speed > 600.0f )
 			ps->speed = 600.0f;
@@ -9091,27 +9091,27 @@ static void BG_G2ClientNeckAngles( void *ghoul2, int time, const vector3 *lookAn
 	}
 	else if ( thoracicAngles->pitch )
 	{//already been set above, blend them
-		thoracicAngles->pitch = (thoracicAngles->pitch + (lA.pitch * 0.4)) * 0.5f;
+		thoracicAngles->pitch = (thoracicAngles->pitch + (lA.pitch * 0.4f)) * 0.5f;
 	}
 	else
 	{
-		thoracicAngles->pitch = lA.pitch * 0.4;
+		thoracicAngles->pitch = lA.pitch * 0.4f;
 	}
 	if ( thoracicAngles->yaw )
 	{//already been set above, blend them
-		thoracicAngles->yaw = (thoracicAngles->yaw + (lA.yaw * 0.1)) * 0.5f;
+		thoracicAngles->yaw = (thoracicAngles->yaw + (lA.yaw * 0.1f)) * 0.5f;
 	}
 	else
 	{
-		thoracicAngles->yaw = lA.yaw * 0.1;
+		thoracicAngles->yaw = lA.yaw * 0.1f;
 	}
 	if ( thoracicAngles->roll )
 	{//already been set above, blend them
-		thoracicAngles->roll = (thoracicAngles->roll + (lA.roll * 0.1)) * 0.5f;
+		thoracicAngles->roll = (thoracicAngles->roll + (lA.roll * 0.1f)) * 0.5f;
 	}
 	else
 	{
-		thoracicAngles->roll = lA.roll * 0.1;
+		thoracicAngles->roll = lA.roll * 0.1f;
 	}
 
 	if(BG_InLedgeMove( cent->legsAnim ))
@@ -9125,9 +9125,9 @@ static void BG_G2ClientNeckAngles( void *ghoul2, int time, const vector3 *lookAn
 		neckAngles->yaw		= lA.yaw * 0.3f;
 		neckAngles->roll	= lA.roll * 0.3f;
 
-		headAngles->pitch	= lA.pitch * 0.4;
-		headAngles->yaw		= lA.yaw * 0.6;
-		headAngles->roll	= lA.roll * 0.6;
+		headAngles->pitch	= lA.pitch * 0.4f;
+		headAngles->yaw		= lA.yaw * 0.6f;
+		headAngles->roll	= lA.roll * 0.6f;
 	}
 
 	/* //non-applicable SP code
@@ -9301,13 +9301,13 @@ static float BG_SwingAngles( float destination, float swingTolerance, float clam
 	// modify the speed depending on the delta
 	// so it doesn't seem so linear
 	swing = AngleSubtract( destination, *angle );
-	scale = fabs( swing );
-	if ( scale < swingTolerance * 0.5 ) {
-		scale = 0.5;
+	scale = fabsf( swing );
+	if ( scale < swingTolerance * 0.5f ) {
+		scale = 0.5f;
 	} else if ( scale < swingTolerance ) {
-		scale = 1.0;
+		scale = 1.0f;
 	} else {
-		scale = 2.0;
+		scale = 2.0f;
 	}
 
 	// swing towards the destination angle
@@ -9478,9 +9478,9 @@ void BG_G2PlayerAngles(void *ghoul2, int motionBolt, entityState_t *cent, int ti
 
 	// only show a fraction of the pitch angle in the torso
 	if ( headAngles.pitch > 180 ) {
-		dest = (-360 + headAngles.pitch) * 0.75;
+		dest = (-360 + headAngles.pitch) * 0.75f;
 	} else {
-		dest = headAngles.pitch * 0.75;
+		dest = headAngles.pitch * 0.75f;
 	}
 
 	if (cent->m_iVehicleNum)
@@ -9623,7 +9623,7 @@ void BG_G2PlayerAngles(void *ghoul2, int motionBolt, entityState_t *cent, int ti
 
 	VectorCopy( cent_lerpAngles, &viewAngles );
 	viewAngles.yaw = viewAngles.roll = 0;
-	viewAngles.pitch *= 0.5;
+	viewAngles.pitch *= 0.5f;
 
 	VectorSet( &angles, 0, legsAngles->yaw, 0 );
 
@@ -10089,7 +10089,7 @@ void PM_VehFaceHyperspacePoint(bgEntity_t *veh)
 		for ( i = 0; i < 3; i++ )
 		{
 			aDelta = AngleSubtract(veh->playerState->hyperSpaceangles.data[i], veh->m_pVehicle->m_vOrientation[i]);
-			if ( fabs( aDelta ) < turnRate )
+			if ( fabsf( aDelta ) < turnRate )
 			{//all is good
 				veh->playerState->viewangles.data[i] = veh->playerState->hyperSpaceangles.data[i];
 				matchedAxes++;
@@ -10097,7 +10097,7 @@ void PM_VehFaceHyperspacePoint(bgEntity_t *veh)
 			else
 			{
 				aDelta = AngleSubtract(veh->playerState->hyperSpaceangles.data[i], veh->playerState->viewangles.data[i]);
-				if ( fabs( aDelta ) < turnRate )
+				if ( fabsf( aDelta ) < turnRate )
 				{
 					veh->playerState->viewangles.data[i] = veh->playerState->hyperSpaceangles.data[i];
 				}
@@ -10172,7 +10172,7 @@ void PM_VehFaceHyperspacePoint(bgEntity_t *veh)
 		for ( i = 0; i < 3; i++ )
 		{
 			aDelta = AngleSubtract(veh->playerState->hyperSpaceAngles.data[i], veh->m_pVehicle->m_vOrientation->data[i]);
-			if ( fabs( aDelta ) < turnRate )
+			if ( fabsf( aDelta ) < turnRate )
 			{//all is good
 				pm->ps->viewangles.data[i] = veh->playerState->hyperSpaceAngles.data[i];
 				matchedAxes++;
@@ -10180,7 +10180,7 @@ void PM_VehFaceHyperspacePoint(bgEntity_t *veh)
 			else
 			{
 				aDelta = AngleSubtract(veh->playerState->hyperSpaceAngles.data[i], pm->ps->viewangles.data[i]);
-				if ( fabs( aDelta ) < turnRate )
+				if ( fabsf( aDelta ) < turnRate )
 				{
 					pm->ps->viewangles.data[i] = veh->playerState->hyperSpaceAngles.data[i];
 				}
@@ -10816,7 +10816,7 @@ void PmoveSingle (pmove_t *pmove) {
 	// save old velocity for crashlanding
 	VectorCopy (&pm->ps->velocity, &pml.previous_velocity);
 
-	pml.frametime = pml.msec * 0.001;
+	pml.frametime = pml.msec * 0.001f;
 
 	if (pm->ps->clientNum >= MAX_CLIENTS &&
 		pm_entSelf &&
@@ -10924,7 +10924,7 @@ void PmoveSingle (pmove_t *pmove) {
 	{
 		pm->cmd.upmove = 0;
 		pm->cmd.forwardmove = 0;//50;
-		pm->cmd.rightmove = 0;//*= 0.1;
+		pm->cmd.rightmove = 0;//*= 0.1f;
 	}
 
 	if ( pm->ps->pm_type == PM_SPECTATOR ) {
@@ -10978,7 +10978,7 @@ void PmoveSingle (pmove_t *pmove) {
 	else if (gPMDoSlowFall)
 	{
 		savedGravity = pm->ps->gravity;
-		pm->ps->gravity *= 0.5;
+		pm->ps->gravity *= 0.5f;
 	}
 
 	//if we're in jetpack mode then see if we should be jetting around

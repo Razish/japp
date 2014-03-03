@@ -635,9 +635,8 @@ typedef union ivector4_u {
 
 typedef	signed int fixed4_t, fixed8_t, fixed16_t;
 
-#ifndef M_PI
-	#define M_PI 3.14159265358979323846f // matches value in gcc v2 math.h
-#endif
+#undef M_PI
+#define M_PI 3.14159265358979323846f // matches value in gcc v2 math.h
 
 
 typedef enum saberBlockType_e {
@@ -1157,7 +1156,7 @@ float	Q_random( int *seed );
 float	Q_crandom( int *seed );
 
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
-#define crandom()	(2.0 * (random() - 0.5))
+#define crandom()	(2.0f * (random() - 0.5f))
 
 void vectoangles( const vector3 *value1, vector3 *angles);
 void AnglesToAxis( const vector3 *angles, vector3 axis[3] );
@@ -1414,7 +1413,7 @@ PlaneTypeForNormal
 =================
 */
 
-#define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
+#define PlaneTypeForNormal(x) (x[0] == 1.0f ? PLANE_X : (x[1] == 1.0f ? PLANE_Y : (x[2] == 1.0f ? PLANE_Z : PLANE_NON_AXIAL) ) )
 
 // plane_t structure
 // !!! if this is changed, it must be changed in asm code too !!!
@@ -1457,7 +1456,7 @@ typedef struct trace_s {
 	byte		startsolid;	// if true, the initial point was in a solid area
 	short		entityNum;	// entity the contacted sirface is a part of
 
-	float		fraction;	// time completed, 1.0 = didn't hit anything
+	float		fraction;	// time completed, 1.0f = didn't hit anything
 	vector3		endpos;		// final position
 	cplane_t	plane;		// surface normal at impact, transformed to world space
 	uint32_t	surfaceFlags;	// surface hit
@@ -1530,7 +1529,7 @@ typedef enum soundChannel_e {
 */
 
 #define	ANGLE2SHORT(x)	((int)((x)*65536/360) & 65535)
-#define	SHORT2ANGLE(x)	((x)*(360.0/65536))
+#define	SHORT2ANGLE(x)	((x)*(360.0f/65536))
 
 #define	SNAPFLAG_RATE_DELAYED	1
 #define	SNAPFLAG_NOT_ACTIVE		2	// snapshot used during connection and for zombies

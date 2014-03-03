@@ -50,7 +50,7 @@ extern int cg_autoMapInputTime;
 #define	ATTACKER_HEAD_TIME	10000
 #define	REWARD_TIME			3000
 
-#define	PULSE_SCALE			1.5			// amount to scale up the icons when activating
+#define	PULSE_SCALE			1.5f			// amount to scale up the icons when activating
 
 #define	MAX_STEP_CHANGE		32
 
@@ -459,12 +459,12 @@ typedef struct localEntity_s {
 	int				endTime;
 	int				fadeInTime;
 
-	float			lifeRate;			// 1.0 / (endTime - startTime)
+	float			lifeRate;			// 1.0f / (endTime - startTime)
 
 	trajectory_t	pos;
 	trajectory_t	angles;
 
-	float			bounceFactor;		// 0.0 = no bounce, 1.0 = perfect
+	float			bounceFactor;		// 0.0f = no bounce, 1.0f = perfect
 	int				bounceSound;		// optional sound index to play upon bounce
 
 	float			alpha;

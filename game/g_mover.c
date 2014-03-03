@@ -528,15 +528,15 @@ void CalcTeamDoorCenter ( gentity_t *ent, vector3 *center )
 
 	//Start with our center
 	VectorAdd(&ent->r.mins, &ent->r.maxs, center);
-	VectorScale(center, 0.5, center);
+	VectorScale(center, 0.5f, center);
 	for ( slave = ent->teamchain ; slave ; slave = slave->teamchain )
 	{
 		//Find slave's center
 		VectorAdd(&slave->r.mins, &slave->r.maxs, &slavecenter);
-		VectorScale(&slavecenter, 0.5, &slavecenter);
+		VectorScale(&slavecenter, 0.5f, &slavecenter);
 		//Add that to our own, find middle
 		VectorAdd(center, &slavecenter, center);
-		VectorScale(center, 0.5, center);
+		VectorScale(center, 0.5f, center);
 	}
 }
 
@@ -570,7 +570,7 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 	case MOVER_1TO2:
 		VectorCopy( &ent->pos1, &ent->s.pos.trBase );
 		VectorSubtract( &ent->pos2, &ent->pos1, &delta );
-		f = 1000.0 / ent->s.pos.trDuration;
+		f = 1000.0f / ent->s.pos.trDuration;
 		VectorScale( &delta, f, &ent->s.pos.trDelta );
 		if ( ent->alt_fire )
 		{
@@ -585,7 +585,7 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 	case MOVER_2TO1:
 		VectorCopy( &ent->pos2, &ent->s.pos.trBase );
 		VectorSubtract( &ent->pos1, &ent->pos2, &delta );
-		f = 1000.0 / ent->s.pos.trDuration;
+		f = 1000.0f / ent->s.pos.trDuration;
 		VectorScale( &delta, f, &ent->s.pos.trDelta );
 		if ( ent->alt_fire )
 		{
@@ -781,7 +781,7 @@ void Use_BinaryMover_Go( gentity_t *ent )
 			VectorScale( &ent->s.pos.trDelta, fPartial, &curDelta );
 			fPartial /= ent->s.pos.trDuration;
 			fPartial /= 0.001f;
-			fPartial = acos( fPartial );
+			fPartial = acosf( fPartial );
 			fPartial = RAD2DEG( fPartial );
 			fPartial = (90.0f - fPartial)/90.0f*ent->s.pos.trDuration;
 			partial = total - floor( fPartial );
@@ -817,7 +817,7 @@ void Use_BinaryMover_Go( gentity_t *ent )
 			VectorScale( &ent->s.pos.trDelta, fPartial, &curDelta );
 			fPartial /= ent->s.pos.trDuration;
 			fPartial /= 0.001f;
-			fPartial = acos( fPartial );
+			fPartial = acosf( fPartial );
 			fPartial = RAD2DEG( fPartial );
 			fPartial = (90.0f - fPartial)/90.0f*ent->s.pos.trDuration;
 			partial = total - floor( fPartial );
@@ -1062,8 +1062,8 @@ static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other, trace_
 
 	axis = ent->count;
 	VectorClear(&dir);
-	if (fabs(other->s.origin.data[axis] - ent->r.absmax.data[axis]) <
-		fabs(other->s.origin.data[axis] - ent->r.absmin.data[axis])) {
+	if (fabsf(other->s.origin.data[axis] - ent->r.absmax.data[axis]) <
+		fabsf(other->s.origin.data[axis] - ent->r.absmin.data[axis])) {
 		origin.data[axis] = ent->r.absmin.data[axis] - 25; //Raz: was 10
 		dir.data[axis] = -1;
 	}
@@ -1073,7 +1073,7 @@ static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other, trace_
 	}
 	for (i = 0; i < 3; i++) {
 		if (i == axis) continue;
-		origin.data[i] = (ent->r.absmin.data[i] + ent->r.absmax.data[i]) * 0.5;
+		origin.data[i] = (ent->r.absmin.data[i] + ent->r.absmax.data[i]) * 0.5f;
 	}
 
 	vectoangles(&dir, &angles);
@@ -1437,9 +1437,9 @@ void SP_func_door (gentity_t *ent)
 	// calculate second position
 	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 	G_SetMovedir( &ent->s.angles, &ent->movedir );
-	abs_movedir.x = fabs( ent->movedir.x );
-	abs_movedir.y = fabs( ent->movedir.y );
-	abs_movedir.z = fabs( ent->movedir.z );
+	abs_movedir.x = fabsf( ent->movedir.x );
+	abs_movedir.y = fabsf( ent->movedir.y );
+	abs_movedir.z = fabsf( ent->movedir.z );
 	VectorSubtract( &ent->r.maxs, &ent->r.mins, &size );
 	distance = DotProduct( &abs_movedir, &size ) - lip;
 	VectorMA( &ent->pos1, distance, &ent->movedir, &ent->pos2 );
@@ -1564,11 +1564,11 @@ void SpawnPlatTrigger( gentity_t *ent ) {
 	tmax.z = ent->pos1.z + ent->r.maxs.z + 8;
 
 	if (tmax.x <= tmin.x) {
-		tmin.x = ent->pos1.x + (ent->r.mins.x + ent->r.maxs.x) *0.5;
+		tmin.x = ent->pos1.x + (ent->r.mins.x + ent->r.maxs.x) *0.5f;
 		tmax.x = tmin.x + 1;
 	}
 	if (tmax.y <= tmin.y) {
-		tmin.y = ent->pos1.y + (ent->r.mins.y + ent->r.maxs.y) *0.5;
+		tmin.y = ent->pos1.y + (ent->r.mins.y + ent->r.maxs.y) *0.5f;
 		tmax.y = tmin.y + 1;
 	}
 
@@ -1703,9 +1703,9 @@ void SP_func_button( gentity_t *ent ) {
 	G_SpawnFloat( "lip", "4", &lip );
 
 	G_SetMovedir( &ent->s.angles, &ent->movedir );
-	abs_movedir.x = fabs(ent->movedir.x);
-	abs_movedir.y = fabs(ent->movedir.y);
-	abs_movedir.z = fabs(ent->movedir.z);
+	abs_movedir.x = fabsf(ent->movedir.x);
+	abs_movedir.y = fabsf(ent->movedir.y);
+	abs_movedir.z = fabsf(ent->movedir.z);
 	VectorSubtract( &ent->r.maxs, &ent->r.mins, &size );
 	distance = abs_movedir.x * size.x + abs_movedir.y * size.y + abs_movedir.z * size.z - lip;
 	VectorMA (&ent->pos1, distance, &ent->movedir, &ent->pos2);
@@ -2273,12 +2273,12 @@ void SP_func_pendulum(gentity_t *ent) {
 	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 
 	// find pendulum length
-	length = fabs( ent->r.mins.z );
+	length = fabsf( ent->r.mins.z );
 	if ( length < 8 ) {
 		length = 8;
 	}
 
-	freq = 1 / ( M_PI * 2 ) * sqrt( g_gravity.value / ( 3 * length ) );
+	freq = 1 / ( M_PI * 2 ) * sqrtf( g_gravity.value / ( 3 * length ) );
 
 	ent->s.pos.trDuration = ( 1000 / freq );
 
@@ -2414,7 +2414,7 @@ void funcBBrushDieGo (gentity_t *self)
 
 	// This formula really has no logical basis other than the fact that it seemed to be the closest to yielding the results that I wanted.
 	// Volume is length * width * height...then break that volume down based on how many chunks we have
-	scale = sqrt( sqrt( org.x * org.y * org.z )) * 1.75f;
+	scale = sqrtf( sqrtf( org.x * org.y * org.z ) ) * 1.75f;
 
 	if ( scale > 48 )
 	{
@@ -2434,7 +2434,7 @@ void funcBBrushDieGo (gentity_t *self)
 		numChunks *= self->radius;
 	}
 
-	VectorMA( &self->r.absmin, 0.5, &org, &org );
+	VectorMA( &self->r.absmin, 0.5f, &org, &org );
 	VectorAdd( &self->r.absmin,&self->r.absmax, &org );
 	VectorScale( &org, 0.5f, &org );
 
@@ -2548,7 +2548,7 @@ void funcBBrushPain(gentity_t *self, gentity_t *attacker, int damage)
 		// This formula really has no logical basis other than the fact that it seemed to be the closest to yielding the results that I wanted.
 		// Volume is length * width * height...then break that volume down based on how many chunks we have
 		scale = VectorLength( &org ) / 100.0f;
-		VectorMA( &self->r.absmin, 0.5, &org, &org );
+		VectorMA( &self->r.absmin, 0.5f, &org, &org );
 		VectorAdd( &self->r.absmin, &self->r.absmax, &org );
 		VectorScale( &org, 0.5f, &org );
 		if ( attacker != NULL && attacker->client )

@@ -1,20 +1,6 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 
-/*****************************************************************************
- * name:		ai_main.c
- *
- * desc:		Quake3 bot AI
- *
- * $Archive: /MissionPack/code/game/ai_main.c $
- * $Author: osman $
- * $Revision: 1.5 $
- * $Modtime: 6/06/01 1:11p $
- * $Date: 2003/03/15 23:43:59 $
- *
- *****************************************************************************/
-
-
 #include "g_local.h"
 #include "qcommon/q_shared.h"
 #include "botlib.h"		//bot lib interface
@@ -420,10 +406,10 @@ float AngleDifference(float ang1, float ang2) {
 
 	diff = ang1 - ang2;
 	if (ang1 > ang2) {
-		if (diff > 180.0) diff -= 360.0;
+		if (diff > 180.0f) diff -= 360.0f;
 	}
 	else {
-		if (diff < -180.0) diff += 360.0;
+		if (diff < -180.0f) diff += 360.0f;
 	}
 	return diff;
 }
@@ -441,10 +427,10 @@ float BotChangeViewAngle(float angle, float ideal_angle, float speed) {
 	if (angle == ideal_angle) return angle;
 	move = ideal_angle - angle;
 	if (ideal_angle > angle) {
-		if (move > 180.0) move -= 360.0;
+		if (move > 180.0f) move -= 360.0f;
 	}
 	else {
-		if (move < -180.0) move += 360.0;
+		if (move < -180.0f) move += 360.0f;
 	}
 	if (move > 0) {
 		if (move > speed) move = speed;
@@ -478,7 +464,7 @@ void BotChangeViewAngles(bot_state_t *bs, float thinktime) {
 
 	if (factor > 1)
 		factor = 1;
-	if (factor < 0.001)
+	if (factor < 0.001f)
 		factor = 0.001f;
 
 	maxchange = bs->skills.maxturn;
@@ -498,7 +484,7 @@ void BotChangeViewAngles(bot_state_t *bs, float thinktime) {
 		if (anglespeed < -maxchange) anglespeed = -maxchange;
 		bs->viewangles.data[i] += anglespeed;
 		bs->viewangles.data[i] = AngleMod(bs->viewangles.data[i]);
-		bs->viewanglespeed.data[i] *= 0.45 * (1 - factor);
+		bs->viewanglespeed.data[i] *= 0.45f * (1 - factor);
 	}
 	if (bs->viewangles.pitch > 180) bs->viewangles.pitch -= 360;
 	trap->EA_View(bs->client, &bs->viewangles);
@@ -637,7 +623,7 @@ BotAIRegularUpdate
 void BotAIRegularUpdate(void) {
 	if (regularupdate_time < FloatTime()) {
 		trap->BotUpdateEntityItems();
-		regularupdate_time = FloatTime() + 0.3;
+		regularupdate_time = FloatTime() + 0.3f;
 	}
 }
 
@@ -1950,7 +1936,7 @@ void UpdateEventTracker(void)
 			gBotEventTracker[i].eventSequence = level.clients[i].ps.eventSequence;
 			gBotEventTracker[i].events[0] = level.clients[i].ps.events[0];
 			gBotEventTracker[i].events[1] = level.clients[i].ps.events[1];
-			gBotEventTracker[i].eventTime = level.time + 0.5;
+			gBotEventTracker[i].eventTime = level.time + 0.5f;
 		}
 
 		i++;
@@ -1970,22 +1956,22 @@ int InFieldOfVision(vector3 *viewangles, float fov, vector3 *angles)
 		diff = angles->data[i] - angle;
 		if (angles->data[i] > angle)
 		{
-			if (diff > 180.0)
-				diff -= 360.0;
+			if (diff > 180.0f)
+				diff -= 360.0f;
 		}
 		else
 		{
-			if (diff < -180.0)
-				diff += 360.0;
+			if (diff < -180.0f)
+				diff += 360.0f;
 		}
 		if (diff > 0)
 		{
-			if (diff > fov * 0.5)
+			if (diff > fov * 0.5f)
 				return 0;
 		}
 		else
 		{
-			if (diff < -fov * 0.5)
+			if (diff < -fov * 0.5f)
 				return 0;
 		}
 	}
@@ -2342,7 +2328,7 @@ gentity_t *GetNearestBadThing(bot_state_t *bs)
 			if (ent->s.weapon != WP_THERMAL && ent->s.weapon != WP_FLECHETTE &&
 				ent->s.weapon != WP_DET_PACK && ent->s.weapon != WP_TRIP_MINE)
 			{
-				factor = 0.5;
+				factor = 0.5f;
 
 				if (ent->s.weapon && glen <= 256 && bs->settings.skill > 2)
 				{ //it's a projectile so push it away
@@ -4309,9 +4295,9 @@ void BotAimLeading(bot_state_t *bs, vector3 *headlevel, float leadAmount)
 		vtotal = 400;
 
 	if (vtotal)
-		x = (bs->frame_Enemy_Len*0.9)*leadAmount*(vtotal*0.0012); //hardly calculated with an exact science, but it works
+		x = (bs->frame_Enemy_Len*0.9f)*leadAmount*(vtotal*0.0012f); //hardly calculated with an exact science, but it works
 	else
-		x = (bs->frame_Enemy_Len*0.9)*leadAmount; //hardly calculated with an exact science, but it works
+		x = (bs->frame_Enemy_Len*0.9f)*leadAmount; //hardly calculated with an exact science, but it works
 
 	predictedSpot.x = headlevel->x + (movementVector.x*x);
 	predictedSpot.y = headlevel->y + (movementVector.y*x);
@@ -4379,14 +4365,14 @@ void BotAimOffsetGoalAngles(bot_state_t *bs)
 		}
 		else
 		{
-			accVal += accVal*0.25; //if he's moving he's this much harder to hit
+			accVal += accVal*0.25f; //if he's moving he's this much harder to hit
 		}
 
 		if (g_entities[bs->client].s.pos.trDelta.x ||
 			g_entities[bs->client].s.pos.trDelta.y ||
 			g_entities[bs->client].s.pos.trDelta.z)
 		{
-			accVal += accVal*0.15; //make it somewhat harder to aim if we're moving also
+			accVal += accVal*0.15f; //make it somewhat harder to aim if we're moving also
 		}
 	}
 
@@ -6175,9 +6161,9 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 		if (bs->frame_Waypoint_Vis || (bs->wpCurrent->flags & WPFLAG_NOVIS))
 		{
 			if (RMG.integer)
-				bs->wpSeenTime = level.time + 5000; //if we lose sight of the point, we have 1.5 seconds to regain it before we drop it
+				bs->wpSeenTime = level.time + 5000; //if we lose sight of the point, we have 1.5f seconds to regain it before we drop it
 			else
-				bs->wpSeenTime = level.time + 1500; //if we lose sight of the point, we have 1.5 seconds to regain it before we drop it
+				bs->wpSeenTime = level.time + 1500; //if we lose sight of the point, we have 1.5f seconds to regain it before we drop it
 		}
 		VectorCopy(&bs->wpCurrent->origin, &bs->goalPosition);
 		if (bs->wpDirection)
@@ -6381,7 +6367,7 @@ void StandardBotAI(bot_state_t *bs, float thinktime)
 
 	bs->doingFallback = doingFallback;
 
-	if (bs->timeToReact < level.time && bs->currentEnemy && bs->enemySeenTime > level.time + (ENEMY_FORGET_MS - (ENEMY_FORGET_MS*0.2)))
+	if (bs->timeToReact < level.time && bs->currentEnemy && bs->enemySeenTime > level.time + (ENEMY_FORGET_MS - (ENEMY_FORGET_MS*0.2f)))
 	{
 		if ( bs->frame_Enemy_Vis ) {
 			CombatBotAI( bs, thinktime );

@@ -86,7 +86,7 @@ const vehField_t vehWeaponFields[NUM_VWEAP_PARMS] = {
 	{"g2MarkSize", VWFOFS(fG2MarkSize), VF_FLOAT},	//size (diameter) of the ghoul2 mark
 	{"loopSound", VWFOFS(iLoopSound), VF_SOUND_CLIENT},	//index of loopSound
 	{"speed", VWFOFS(fSpeed), VF_FLOAT},		//speed of projectile/range of traceline
-	{"homing", VWFOFS(fHoming), VF_FLOAT},		//0.0 = not homing, 0.5 = half vel to targ, half cur vel, 1.0 = all vel to targ
+	{"homing", VWFOFS(fHoming), VF_FLOAT},		//0.0f = not homing, 0.5f = half vel to targ, half cur vel, 1.0f = all vel to targ
 	{"homingFOV", VWFOFS(fHomingFOV), VF_FLOAT},//missile will lose lock on if DotProduct of missile direction and direction to target ever drops below this (-1 to 1, -1 = never lose target, 0 = lose if ship gets behind missile, 1 = pretty much will lose it's target right away)
 	{"lockOnTime", VWFOFS(iLockOnTime), VF_INT},	//0 = no lock time needed, else # of ms needed to lock on
 	{"damage", VWFOFS(iDamage), VF_INT},		//damage done when traceline or projectile directly hits target
@@ -381,7 +381,7 @@ const vehField_t vehicleFields[] =
 	{"acceleration", VFOFS(acceleration), VF_FLOAT},	//when pressing on accelerator
 	{"decelIdle", VFOFS(decelIdle), VF_FLOAT},		//when giving no input, how quickly it drops to speedIdle
 	{"throttleSticks", VFOFS(throttleSticks), VF_BOOL},//if true, speed stays at whatever you accel/decel to, unless you turbo or brake
-	{"strafePerc", VFOFS(strafePerc), VF_FLOAT},		//multiplier on current speed for strafing.  If 1.0f, you can strafe at the same speed as you're going forward, 0.5 is half, 0 is no strafing
+	{"strafePerc", VFOFS(strafePerc), VF_FLOAT},		//multiplier on current speed for strafing.  If 1.0f, you can strafe at the same speed as you're going forward, 0.5f is half, 0 is no strafing
 
 	//handling stats
 	{"bankingSpeed", VFOFS(bankingSpeed), VF_FLOAT},	//how quickly it pitches and rolls (not under player control)
@@ -402,7 +402,7 @@ const vehField_t vehicleFields[] =
 	{"armor", VFOFS(armor), VF_INT},			//total points of damage it can take
 	{"shields", VFOFS(shields), VF_INT},			//energy shield damage points
 	{"shieldRechargeMS", VFOFS(shieldRechargeMS), VF_INT},//energy shield milliseconds per point recharged
-	{"toughness", VFOFS(toughness), VF_FLOAT},		//modifies incoming damage, 1.0 is normal, 0.5 is half, etc.  Simulates being made of tougher materials/construction
+	{"toughness", VFOFS(toughness), VF_FLOAT},		//modifies incoming damage, 1.0f is normal, 0.5f is half, etc.  Simulates being made of tougher materials/construction
 	{"malfunctionArmorLevel", VFOFS(malfunctionArmorLevel), VF_INT},//when armor drops to or below this point, start malfunctioning
 	{"surfDestruction", VFOFS(surfDestruction), VF_INT},
 
@@ -524,7 +524,7 @@ const vehField_t vehicleFields[] =
 	{"cameraHorzOffset", VFOFS(cameraHorzOffset), VF_FLOAT},//how far to left/right (negative/positive) of of the vehicle origin the camera should be - normal is 0
 	{"cameraPitchOffset", VFOFS(cameraPitchOffset), VF_FLOAT},//a modifier on the camera's pitch (up/down angle) to the vehicle - normal is 0
 	{"cameraFOV", VFOFS(cameraFOV), VF_FLOAT},			//third person camera FOV, default is 80
-	{"cameraAlpha", VFOFS(cameraAlpha), VF_FLOAT},		//fade out the vehicle to this alpha (0.1-1.0f) if it's in the way of the crosshair
+	{"cameraAlpha", VFOFS(cameraAlpha), VF_FLOAT},		//fade out the vehicle to this alpha (0.1f-1.0f) if it's in the way of the crosshair
 	{"cameraPitchDependantVertOffset", VFOFS(cameraPitchDependantVertOffset), VF_BOOL},		//use the hacky AT-ST pitch dependant vertical offset
 //===TURRETS===========================================================================
 	//Turret 1
@@ -645,7 +645,7 @@ void BG_VehicleSetDefaults( vehicleInfo_t *vehicle )
 	vehicle->accelIdle = 0;						//if speedIdle > 0, how quickly it goes up to that speed
 	vehicle->acceleration = VEH_DEFAULT_ACCEL;	//when pressing on accelerator (1/2 this when going in reverse)
 	vehicle->decelIdle = VEH_DEFAULT_DECEL;		//when giving no input, how quickly it desired speed drops to speedIdle
-	vehicle->strafePerc = VEH_DEFAULT_STRAFE_PERC;//multiplier on current speed for strafing.  If 1.0f, you can strafe at the same speed as you're going forward, 0.5 is half, 0 is no strafing
+	vehicle->strafePerc = VEH_DEFAULT_STRAFE_PERC;//multiplier on current speed for strafing.  If 1.0f, you can strafe at the same speed as you're going forward, 0.5f is half, 0 is no strafing
 
 	//handling stats
 	vehicle->bankingSpeed = VEH_DEFAULT_BANKING_SPEED;	//how quickly it pitches and rolls (not under player control)
@@ -661,7 +661,7 @@ void BG_VehicleSetDefaults( vehicleInfo_t *vehicle )
 	//durability stats
 	vehicle->mass = VEH_DEFAULT_MASS;			//for momentum and impact force (player mass is 10)
 	vehicle->armor = VEH_DEFAULT_MAX_ARMOR;		//total points of damage it can take
-	vehicle->toughness = VEH_DEFAULT_TOUGHNESS;	//modifies incoming damage, 1.0 is normal, 0.5 is half, etc.  Simulates being made of tougher materials/construction
+	vehicle->toughness = VEH_DEFAULT_TOUGHNESS;	//modifies incoming damage, 1.0f is normal, 0.5f is half, etc.  Simulates being made of tougher materials/construction
 	vehicle->malfunctionArmorLevel = 0;			//when armor drops to or below this point, start malfunctioning
 
 	//visuals & sounds

@@ -391,7 +391,7 @@ void SP_misc_portal_camera(gentity_t *ent) {
 
 	G_SpawnFloat( "roll", "0", &roll );
 
-	ent->s.clientNum = roll/360.0 * 256;
+	ent->s.clientNum = roll/360.0f * 256;
 }
 
 /*QUAKED misc_bsp (1 0 0) (-16 -16 -16) (16 16 16)
@@ -405,11 +405,11 @@ void SP_misc_bsp(gentity_t *ent)
 	int		tempint;
 
 	G_SpawnFloat( "angle", "0", &newAngle );
-	if (newAngle != 0.0)
+	if (newAngle != 0.0f)
 		ent->s.angles.y = newAngle;
 	// don't support rotation any other way
-	ent->s.angles.x = 0.0;
-	ent->s.angles.z = 0.0;
+	ent->s.angles.x = 0.0f;
+	ent->s.angles.z = 0.0f;
 
 	G_SpawnString("bspmodel", "", &out);
 
@@ -658,7 +658,7 @@ void G_PortalifyEntities(gentity_t *ent)
 
 			trap->Trace(&tr, &ent->s.origin, &vec3_origin, &vec3_origin, &scan->r.currentOrigin, ent->s.number, CONTENTS_SOLID, qfalse, 0, 0);
 
-			if (tr.fraction == 1.0 || (tr.entityNum == scan->s.number && tr.entityNum != ENTITYNUM_NONE && tr.entityNum != ENTITYNUM_WORLD))
+			if (tr.fraction == 1.0f || (tr.entityNum == scan->s.number && tr.entityNum != ENTITYNUM_NONE && tr.entityNum != ENTITYNUM_WORLD))
 			{
 				if (!scan->client || scan->s.eType == ET_NPC)
 				{ //making a client a portal entity would be bad.
@@ -1007,7 +1007,7 @@ void SP_misc_holocron(gentity_t *ent)
 		return;
 	}
 
-	//add the 0.1 back after the trace
+	//add the 0.1f back after the trace
 	ent->r.maxs.z += 0.1f;
 
 	// allow to ride movers
@@ -1126,9 +1126,9 @@ void InitShooter( gentity_t *ent, int weapon ) {
 	G_SetMovedir( &ent->s.angles, &ent->movedir );
 
 	if ( !ent->random ) {
-		ent->random = 1.0;
+		ent->random = 1.0f;
 	}
-	ent->random = sin( M_PI * ent->random / 180 );
+	ent->random = sinf( M_PI * ent->random / 180 );
 	// target might be a moving object, so we can't set movedir for it
 	if ( ent->target ) {
 		ent->think = InitShooter_Finish;
@@ -1394,7 +1394,7 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 		self->activator = activator;
 		while (i < AMMO_MAX)
 		{
-			add = ammoData[i].max*0.05;
+			add = ammoData[i].max*0.05f;
 			if (add < 1)
 			{
 				add = 1;
@@ -1438,7 +1438,7 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 			i++;
 			if (!self->genericValue12 && gaveSome)
 			{
-				int sub = (add*0.2);
+				int sub = (add*0.2f);
 				if (sub < 1)
 				{
 					sub = 1;
@@ -1504,7 +1504,7 @@ void SP_misc_ammo_floor_unit(gentity_t *ent)
 		return;
 	}
 
-	//add the 0.1 back after the trace
+	//add the 0.1f back after the trace
 	ent->r.maxs.z += 0.1f;
 
 	// allow to ride movers
@@ -1599,7 +1599,7 @@ void SP_misc_shield_floor_unit( gentity_t *ent )
 		return;
 	}
 
-	//add the 0.1 back after the trace
+	//add the 0.1f back after the trace
 	ent->r.maxs.z += 0.1f;
 
 	// allow to ride movers
@@ -1747,7 +1747,7 @@ void ammo_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *act
 			int i = AMMO_BLASTER;
 			while (i < AMMO_MAX)
 			{
-				add = ammoData[i].max*0.1;
+				add = ammoData[i].max*0.1f;
 				if (add < 1)
 				{
 					add = 1;
@@ -2435,7 +2435,7 @@ void maglock_link( gentity_t *self )
 		G_FreeEntity( self );
 		return;
 	}
-	if ( trace.fraction == 1.0 )
+	if ( trace.fraction == 1.0f )
 	{
 		self->think = maglock_link;
 		self->nextthink = level.time + 100;

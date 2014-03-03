@@ -1544,7 +1544,7 @@ void CalculatePaths(void)
 
 	if (RMG.integer)
 	{
-		maxNeighborDist = DEFAULT_GRID_SPACING + (DEFAULT_GRID_SPACING*0.5);
+		maxNeighborDist = DEFAULT_GRID_SPACING + (DEFAULT_GRID_SPACING*0.5f);
 	}
 
 	VectorSet( &mins, -15, -15, -15 );

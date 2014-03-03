@@ -668,7 +668,7 @@ static int G_CheckSpecialDeathAnim( gentity_t *self, vector3 *point, int damage,
 	}
 	else if ( G_InKnockDown( &self->client->ps ) )
 	{//since these happen a lot, let's handle them case by case
-		int animLength = bgAllAnims[self->localAnimIndex].anims[self->client->ps.legsAnim].numFrames * fabs((float)(bgHumanoidAnimations[self->client->ps.legsAnim].frameLerp));
+		int animLength = bgAllAnims[self->localAnimIndex].anims[self->client->ps.legsAnim].numFrames * fabsf((float)(bgHumanoidAnimations[self->client->ps.legsAnim].frameLerp));
 		switch ( self->client->ps.legsAnim )
 		{
 		case BOTH_KNOCKDOWN1:
@@ -1378,15 +1378,15 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 			case HL_ARM_RT:
 			case HL_HAND_RT:
 			case HL_BACK_RT:
-				if ( damage <= max_health*0.25 )
+				if ( damage <= max_health*0.25f )
 				{
 					deathAnim = BOTH_DEATH9;//chest right: snap, fall forward
 				}
-				else if ( damage <= max_health*0.5 )
+				else if ( damage <= max_health*0.5f )
 				{
 					deathAnim = BOTH_DEATH3;//chest right: back
 				}
-				else if ( damage <= max_health*0.75 )
+				else if ( damage <= max_health*0.75f )
 				{
 					deathAnim = BOTH_DEATH6;//chest right: spin
 				}
@@ -1419,15 +1419,15 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 			case HL_ARM_LT:
 			case HL_HAND_LT:
 			case HL_BACK_LT:
-				if ( damage <= max_health*0.25 )
+				if ( damage <= max_health*0.25f )
 				{
 					deathAnim = BOTH_DEATH11;//chest left: snap, fall forward
 				}
-				else if ( damage <= max_health*0.5 )
+				else if ( damage <= max_health*0.5f )
 				{
 					deathAnim = BOTH_DEATH7;//chest left: back
 				}
-				else if ( damage <= max_health*0.75 )
+				else if ( damage <= max_health*0.75f )
 				{
 					deathAnim = BOTH_DEATH12;//chest left: spin
 				}
@@ -1458,7 +1458,7 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 				break;
 			case HL_CHEST:
 			case HL_WAIST:
-				if ( damage <= max_health*0.25 || !VectorLengthSquared( &objVelocity ) )
+				if ( damage <= max_health*0.25f || !VectorLengthSquared( &objVelocity ) )
 				{
 					if ( !Q_irand( 0, 1 ) )
 					{
@@ -1469,11 +1469,11 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 						deathAnim = BOTH_DEATH19;//gut: fall left
 					}
 				}
-				else if ( damage <= max_health*0.5 )
+				else if ( damage <= max_health*0.5f )
 				{
 					deathAnim = BOTH_DEATH2;//chest: backward short
 				}
-				else if ( damage <= max_health*0.75 )
+				else if ( damage <= max_health*0.75f )
 				{
 					if ( !Q_irand( 0, 1 ) )
 					{
@@ -1490,7 +1490,7 @@ int G_PickDeathAnim( gentity_t *self, vector3 *point, int damage, int mod, int h
 				}
 				break;
 			case HL_HEAD:
-				if ( damage <= max_health*0.5 )
+				if ( damage <= max_health*0.5f )
 				{
 					deathAnim = BOTH_DEATH17;//head/back: croak
 				}
@@ -2771,8 +2771,8 @@ void G_ApplyKnockback( gentity_t *targ, vector3 *newDir, float knockback )
 
 	if ( g_gravity.value > 0 )
 	{
-		VectorScale( newDir, g_knockback.value * (float)knockback / mass * 0.8, &kvel );
-		kvel.z = newDir->z * g_knockback.value * (float)knockback / mass * 1.5;
+		VectorScale( newDir, g_knockback.value * (float)knockback / mass * 0.8f, &kvel );
+		kvel.z = newDir->z * g_knockback.value * (float)knockback / mass * 1.5f;
 	}
 	else
 	{
@@ -2835,9 +2835,9 @@ int RaySphereIntersections( vector3 *origin, float radius, vector3 *point, vecto
 
 	d = b * b - 4 * c;
 	if (d > 0) {
-		t = (- b + sqrt(d)) / 2;
+		t = (- b + sqrtf(d)) / 2;
 		VectorMA(point, t, dir, &intersections[0]);
-		t = (- b - sqrt(d)) / 2;
+		t = (- b - sqrtf(d)) / 2;
 		VectorMA(point, t, dir, &intersections[1]);
 		return 2;
 	}
@@ -4025,11 +4025,11 @@ void G_LocationBasedDamageModifier(gentity_t *ent, vector3 *point, int mod, uint
 	{
 	case HL_FOOT_RT:
 	case HL_FOOT_LT:
-		*damage *= 0.5;
+		*damage *= 0.5f;
 		break;
 	case HL_LEG_RT:
 	case HL_LEG_LT:
-		*damage *= 0.7;
+		*damage *= 0.7f;
 		break;
 	case HL_WAIST:
 	case HL_BACK_RT:
@@ -4041,14 +4041,14 @@ void G_LocationBasedDamageModifier(gentity_t *ent, vector3 *point, int mod, uint
 		break; //normal damage
 	case HL_ARM_RT:
 	case HL_ARM_LT:
-		*damage *= 0.85;
+		*damage *= 0.85f;
 		break;
 	case HL_HAND_RT:
 	case HL_HAND_LT:
-		*damage *= 0.6;
+		*damage *= 0.6f;
 		break;
 	case HL_HEAD:
-		*damage *= 1.3;
+		*damage *= 1.3f;
 		break;
 	default:
 		break; //do nothing then
@@ -4279,7 +4279,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 	{//rage overridden by no_protection
 		if (targ && targ->client && (targ->client->ps.fd.forcePowersActive & (1 << FP_RAGE)))
 		{
-			damage *= 0.5;
+			damage *= 0.5f;
 		}
 	}
 
@@ -4477,13 +4477,13 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			case MOD_TRIP_MINE_SPLASH:
 			case MOD_TIMED_MINE_SPLASH:
 			case MOD_DET_PACK_SPLASH:
-				damage *= 0.75;
+				damage *= 0.75f;
 				break;
 			}
 		}
 		else if ( (client->ps.trueNonJedi || (level.gametype == GT_SIEGE&&client->ps.weapon != WP_SABER))
 			&& mod == MOD_SABER )
-		{//if the target is a trueNonJedi, take more saber damage... combined with the 1.5 in the w_saber stuff, this is 6 times damage!
+		{//if the target is a trueNonJedi, take more saber damage... combined with the 1.5f in the w_saber stuff, this is 6 times damage!
 			if ( damage < 100 )
 			{
 				damage *= 4;
@@ -4499,7 +4499,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		targ->client->siegeClass != -1 && (bgSiegeClasses[targ->client->siegeClass].classflags & (1<<CFL_STRONGAGAINSTPHYSICAL)))
 	{ //this class is flagged to take less damage from physical attacks.
 		//For now I'm just decreasing against any client-based attack, this can be changed later I guess.
-		damage *= 0.5;
+		damage *= 0.5f;
 	}
 
 	// check for completely getting out of the damage
@@ -4627,7 +4627,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		if ( ( dflags & DAMAGE_RADIUS ) || ( mod == MOD_FALLING ) ) {
 			return;
 		}
-		damage *= 0.5;
+		damage *= 0.5f;
 	}
 
 	// add to the attacker's hit counter (if the target isn't a general entity like a prox mine)
@@ -4648,11 +4648,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 	if ( targ == attacker && !(dflags & DAMAGE_NO_SELF_PROTECTION)) {
 		if ( level.gametype == GT_SIEGE )
 		{
-			damage *= 1.5;
+			damage *= 1.5f;
 		}
 		else
 		{
-			damage *= 0.5;
+			damage *= 0.5f;
 		}
 	}
 
@@ -5040,7 +5040,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			}
 			//flicker for as many ms as damage was absorbed (*20)
 			//therefore 10 damage causes 1/5 of a seond of flickering, whereas
-			//a full 100 causes 2 seconds (but is reduced to 1.5 seconds due to the max)
+			//a full 100 causes 2 seconds (but is reduced to 1.5f seconds due to the max)
 
 	*/
 		}
@@ -5251,41 +5251,41 @@ qboolean CanDamage (gentity_t *targ, vector3 *origin) {
 	// use the midpoint of the bounds instead of the origin, because
 	// bmodels may have their origin is 0,0,0
 	VectorAdd (&targ->r.absmin, &targ->r.absmax, &midpoint);
-	VectorScale (&midpoint, 0.5, &midpoint);
+	VectorScale (&midpoint, 0.5f, &midpoint);
 
 	VectorCopy (&midpoint, &dest);
 	trap->Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
-	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
+	if (tr.fraction == 1.0f || tr.entityNum == targ->s.number)
 		return qtrue;
 
 	// this should probably check in the plane of projection,
 	// rather than in world coordinate, and also include Z
 	VectorCopy (&midpoint, &dest);
-	dest.x += 15.0;
-	dest.y += 15.0;
+	dest.x += 15.0f;
+	dest.y += 15.0f;
 	trap->Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
-	if (tr.fraction == 1.0)
+	if (tr.fraction == 1.0f)
 		return qtrue;
 
 	VectorCopy (&midpoint, &dest);
-	dest.x += 15.0;
-	dest.y -= 15.0;
+	dest.x += 15.0f;
+	dest.y -= 15.0f;
 	trap->Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
-	if (tr.fraction == 1.0)
+	if (tr.fraction == 1.0f)
 		return qtrue;
 
 	VectorCopy (&midpoint, &dest);
-	dest.x -= 15.0;
-	dest.y += 15.0;
+	dest.x -= 15.0f;
+	dest.y += 15.0f;
 	trap->Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
-	if (tr.fraction == 1.0)
+	if (tr.fraction == 1.0f)
 		return qtrue;
 
 	VectorCopy (&midpoint, &dest);
-	dest.x -= 15.0;
-	dest.y -= 15.0;
+	dest.x -= 15.0f;
+	dest.y -= 15.0f;
 	trap->Trace ( &tr, origin, &vec3_origin, &vec3_origin, &dest, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
-	if (tr.fraction == 1.0)
+	if (tr.fraction == 1.0f)
 		return qtrue;
 
 
@@ -5363,7 +5363,7 @@ qboolean G_RadiusDamage ( vector3 *origin, gentity_t *attacker, float damage, fl
 			continue;
 		}
 
-		points = damage * ( 1.0 - dist / radius );
+		points = damage * ( 1.0f - dist / radius );
 
 		if( CanDamage (ent, origin) ) {
 			if( LogAccuracyHit( ent, attacker ) ) {

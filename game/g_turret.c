@@ -164,7 +164,7 @@ static void turret_fire ( gentity_t *ent, vector3 *start, vector3 *dir )
 	bolt->clipmask = MASK_SHOT | CONTENTS_LIGHTSABER;
 	//bolt->trigger_formation = qfalse;		// don't draw tail on first frame
 
-	VectorSet( &bolt->r.maxs, 1.5, 1.5, 1.5 );
+	VectorSet( &bolt->r.maxs, 1.5f, 1.5f, 1.5f );
 	VectorScale( &bolt->r.maxs, -1, &bolt->r.mins );
 	bolt->s.pos.trType = TR_LINEAR;
 	bolt->s.pos.trTime = level.time;
@@ -286,7 +286,7 @@ static void turret_aim( gentity_t *self )
 	else
 	{//FIXME: Pan back and forth in original facing
 		// no enemy, so make us slowly sweep back and forth as if searching for a new one
-		desiredAngles.yaw = sin( level.time * 0.0001f + top->count );
+		desiredAngles.yaw = sinf( level.time * 0.0001f + top->count );
 		desiredAngles.yaw *=  60.0f;
 		desiredAngles.yaw += self->s.angles.yaw;
 		desiredAngles.yaw = AngleNormalize180( desiredAngles.yaw );
@@ -298,13 +298,13 @@ static void turret_aim( gentity_t *self )
 	if ( diffYaw )
 	{
 		// cap max speed....
-		if ( fabs(diffYaw) > turnSpeed )
+		if ( fabsf(diffYaw) > turnSpeed )
 			diffYaw = ( diffYaw >= 0 ? turnSpeed : -turnSpeed );
 	}
 	if ( diffPitch )
 	{
 		// cap max speed
-		if ( fabs(diffPitch) > turnSpeed )
+		if ( fabsf(diffPitch) > turnSpeed )
 			diffPitch = (diffPitch > 0.0f ? turnSpeed : -turnSpeed );
 	}
 	// ...then set up our desired yaw
@@ -439,7 +439,7 @@ static qboolean turret_find_enemies( gentity_t *self )
 
 		trap->Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT, qfalse, 0, 0 );
 
-		if ( !tr.allsolid && !tr.startsolid && ( tr.fraction == 1.0 || tr.entityNum == target->s.number ))
+		if ( !tr.allsolid && !tr.startsolid && ( tr.fraction == 1.0f || tr.entityNum == target->s.number ))
 		{
 			// Only acquire if have a clear shot, Is it in range and closer than our best?
 			VectorSubtract( &target->r.currentOrigin, &top->r.currentOrigin, &enemyDir );

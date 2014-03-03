@@ -648,7 +648,7 @@ Initializes a window structure ( windowDef_t ) with defaults
 void Window_Init(windowDef_t *w) {
 	memset(w, 0, sizeof(windowDef_t));
 	w->borderSize = 1;
-	w->foreColor.r = w->foreColor.g = w->foreColor.b = w->foreColor.a = 1.0;
+	w->foreColor.r = w->foreColor.g = w->foreColor.b = w->foreColor.a = 1.0f;
 	w->cinematic = -1;
 }
 
@@ -658,7 +658,7 @@ void Fade(uint32_t *flags, float *f, float clamp, int *nextTime, int offsetTime,
 			*nextTime = DC->realTime + offsetTime;
 			if (*flags & WINDOW_FADINGOUT) {
 				*f -= fadeAmount;
-				if (bFlags && *f <= 0.0) {
+				if (bFlags && *f <= 0.0f) {
 					*flags &= ~(WINDOW_FADINGOUT | WINDOW_VISIBLE);
 				}
 			} else {
@@ -778,12 +778,12 @@ void Window_Paint(windowDef_t *w, float fadeAmount, float fadeClamp, float fadeC
 			{
 				// red
 				color.r = 1;
-				color.g = color.b = .5;
+				color.g = color.b = .5f;
 			}
 			else
 			{
 				color.b = 1;
-				color.r = color.g = .5;
+				color.r = color.g = .5f;
 			}
 			color.a = 1;
 			DC->drawRect(w->rect.x, w->rect.y, w->rect.w, w->rect.h, w->borderSize, &color);
@@ -2659,7 +2659,7 @@ qboolean Item_TextScroll_HandleKey ( itemDef_t *item, int key, qboolean down, qb
 
 int Item_ListBox_MaxScroll(itemDef_t *item) {
 	listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
-	int count = DC->feederCount(item->special);
+	int count = DC->feederCount( item->special.i );
 	int max;
 
 	if (item->window.flags & WINDOW_HORIZONTAL) {
@@ -3169,14 +3169,14 @@ qboolean Item_OwnerDraw_HandleKey(itemDef_t *item, int key) {
 	  }
 
 
-    return DC->ownerDrawHandleKey(item->window.ownerDraw, item->window.ownerDrawFlags, &item->special, key);
+    return DC->ownerDrawHandleKey(item->window.ownerDraw, item->window.ownerDrawFlags, &item->special.f, key);
   }
   return qfalse;
 }
 
 qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolean force) {
 	listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
-	int count = DC->feederCount(item->special);
+	int count = DC->feederCount(item->special.i);
 	int max, viewmax;
 	if (force || (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory) && item->window.flags & WINDOW_HASFOCUS))
 	{
@@ -3199,7 +3199,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 						listPtr->startPos = listPtr->cursorPos - viewmax + 1;
 					}
 					item->cursorPos = listPtr->cursorPos;
-					DC->feederSelection(item->special, item->cursorPos, NULL);
+					DC->feederSelection(item->special.i, item->cursorPos, NULL);
 				}
 				else {
 					listPtr->startPos--;
@@ -3224,7 +3224,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 						listPtr->startPos = listPtr->cursorPos - viewmax + 1;
 					}
 					item->cursorPos = listPtr->cursorPos;
-					DC->feederSelection(item->special, item->cursorPos, NULL);
+					DC->feederSelection(item->special.i, item->cursorPos, NULL);
 				}
 				else {
 					listPtr->startPos++;
@@ -3263,7 +3263,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 						listPtr->startPos = listPtr->cursorPos - viewmax + 1;
 					}
 					item->cursorPos = listPtr->cursorPos;
-					DC->feederSelection(item->special, item->cursorPos, NULL);
+					DC->feederSelection(item->special.i, item->cursorPos, NULL);
 				}
 				else {
 					listPtr->startPos--;
@@ -3288,7 +3288,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 						listPtr->startPos = listPtr->cursorPos - viewmax + 1;
 					}
 					item->cursorPos = listPtr->cursorPos;
-					DC->feederSelection(item->special, item->cursorPos, NULL);
+					DC->feederSelection(item->special.i, item->cursorPos, NULL);
 				}
 				else {
 					listPtr->startPos++;
@@ -3301,7 +3301,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 			//Raz: Added
 			if ( key == A_MWHEELUP )
 			{
-				listPtr->startPos -= ((int)item->special == FEEDER_Q3HEADS) ? viewmax : 1;
+				listPtr->startPos -= (item->special.i == FEEDER_Q3HEADS) ? viewmax : 1;
 				if (listPtr->startPos < 0)
 				{
 					listPtr->startPos = 0;
@@ -3313,7 +3313,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 			}
 			if ( key == A_MWHEELDOWN )
 			{
-				listPtr->startPos += ((int)item->special == FEEDER_Q3HEADS) ? viewmax : 1;
+				listPtr->startPos += (item->special.i == FEEDER_Q3HEADS) ? viewmax : 1;
 				if (listPtr->startPos > max)
 				{
 					listPtr->startPos = max;
@@ -3364,7 +3364,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 
 					item->cursorPos = listPtr->cursorPos;
 
-					if (!DC->feederSelection(item->special, item->cursorPos, item))
+					if (!DC->feederSelection(item->special.i, item->cursorPos, item))
 					{
 						item->cursorPos = listPtr->cursorPos = prePos;
 					}
@@ -3396,7 +3396,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 					listPtr->startPos = listPtr->cursorPos - viewmax + 1;
 				}
 				item->cursorPos = listPtr->cursorPos;
-				DC->feederSelection(item->special, item->cursorPos, NULL);
+				DC->feederSelection(item->special.i, item->cursorPos, NULL);
 			}
 			else {
 				listPtr->startPos -= viewmax;
@@ -3420,7 +3420,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 					listPtr->startPos = listPtr->cursorPos - viewmax + 1;
 				}
 				item->cursorPos = listPtr->cursorPos;
-				DC->feederSelection(item->special, item->cursorPos, NULL);
+				DC->feederSelection(item->special.i, item->cursorPos, NULL);
 			}
 			else {
 				listPtr->startPos += viewmax;
@@ -3575,9 +3575,9 @@ qboolean Item_Multi_HandleKey(itemDef_t *item, int key)
 						DC->setCVar(item->cvar, va("%f", value ));
 					}
 				}
-				if (item->special)
+				if (item->special.i)
 				{//its a feeder?
-					DC->feederSelection(item->special, current, item);
+					DC->feederSelection(item->special.i, current, item);
 				}
 
 				return qtrue;
@@ -4621,17 +4621,17 @@ void Item_TextColor(itemDef_t *item, vector4 *newColor) {
 	Fade(&item->window.flags, &item->window.foreColor.a, parent->fadeClamp, &item->window.nextTime, parent->fadeCycle, qtrue, parent->fadeAmount);
 
 	if (item->window.flags & WINDOW_HASFOCUS) {
-		lowLight.r = 0.8 * parent->focusColor.r;
-		lowLight.g = 0.8 * parent->focusColor.g;
-		lowLight.b = 0.8 * parent->focusColor.b;
-		lowLight.a = 0.8 * parent->focusColor.a;
-		LerpColor( &parent->focusColor, &lowLight, newColor, 0.5+0.5*sin((float)(DC->realTime / PULSE_DIVISOR)) );
+		lowLight.r = 0.8f * parent->focusColor.r;
+		lowLight.g = 0.8f * parent->focusColor.g;
+		lowLight.b = 0.8f * parent->focusColor.b;
+		lowLight.a = 0.8f * parent->focusColor.a;
+		LerpColor( &parent->focusColor, &lowLight, newColor, 0.5f+0.5f*sinf((float)(DC->realTime / PULSE_DIVISOR)) );
 	} else if (item->textStyle == ITEM_TEXTSTYLE_BLINK && !((DC->realTime/BLINK_DIVISOR) & 1)) {
-		lowLight.r = 0.8 * item->window.foreColor.r;
-		lowLight.g = 0.8 * item->window.foreColor.g;
-		lowLight.b = 0.8 * item->window.foreColor.b;
-		lowLight.a = 0.8 * item->window.foreColor.a;
-		LerpColor( &item->window.foreColor, &lowLight, newColor, 0.5+0.5*sin((float)(DC->realTime / PULSE_DIVISOR)) );
+		lowLight.r = 0.8f * item->window.foreColor.r;
+		lowLight.g = 0.8f * item->window.foreColor.g;
+		lowLight.b = 0.8f * item->window.foreColor.b;
+		lowLight.a = 0.8f * item->window.foreColor.a;
+		LerpColor( &item->window.foreColor, &lowLight, newColor, 0.5f+0.5f*sinf((float)(DC->realTime / PULSE_DIVISOR)) );
 	} else {
 		memcpy(newColor, &item->window.foreColor, sizeof(vector4));
 		// items can be enabled and disabled based on cvars
@@ -4692,7 +4692,7 @@ void Item_Text_AutoWrapped_Paint(itemDef_t *item) {
 	//Item_SetTextExtents(item, &width, &height, textPtr);
 	//if (item->value == 0)
 	//{
-	//	item->value = (int)(0.5 + (float)DC->textWidth(textPtr, item->textscale, item->font) / item->window.rect.w);
+	//	item->value = (int)(0.5f + (float)DC->textWidth(textPtr, item->textscale, item->font) / item->window.rect.w);
 	//}
 	height = DC->textHeight(textPtr, item->textscale, item->iMenuFont);
 
@@ -4873,11 +4873,11 @@ void Item_TextField_Paint(itemDef_t *item) {
 	}
 
 	if (item->window.flags & WINDOW_HASFOCUS) {
-		lowLight.r = 0.8 * parent->focusColor.r;
-		lowLight.g = 0.8 * parent->focusColor.g;
-		lowLight.b = 0.8 * parent->focusColor.b;
-		lowLight.a = 0.8 * parent->focusColor.a;
-		LerpColor( &parent->focusColor, &lowLight, &newColor, 0.5+0.5*sin((float)(DC->realTime / PULSE_DIVISOR)) );
+		lowLight.r = 0.8f * parent->focusColor.r;
+		lowLight.g = 0.8f * parent->focusColor.g;
+		lowLight.b = 0.8f * parent->focusColor.b;
+		lowLight.a = 0.8f * parent->focusColor.a;
+		LerpColor( &parent->focusColor, &lowLight, &newColor, 0.5f+0.5f*sinf((float)(DC->realTime / PULSE_DIVISOR)) );
 	} else {
 		memcpy(&newColor, &item->window.foreColor, sizeof(vector4));
 	}
@@ -4902,11 +4902,11 @@ void Item_YesNo_Paint(itemDef_t *item) {
 	value = (item->cvar) ? DC->getCVarValue(item->cvar) : 0;
 
 	if (item->window.flags & WINDOW_HASFOCUS) {
-		lowLight.r = 0.8 * parent->focusColor.r;
-		lowLight.g = 0.8 * parent->focusColor.g;
-		lowLight.b = 0.8 * parent->focusColor.b;
-		lowLight.a = 0.8 * parent->focusColor.a;
-		LerpColor( &parent->focusColor, &lowLight, &newColor,0.5+0.5*sin((float)(DC->realTime / PULSE_DIVISOR)) );
+		lowLight.r = 0.8f * parent->focusColor.r;
+		lowLight.g = 0.8f * parent->focusColor.g;
+		lowLight.b = 0.8f * parent->focusColor.b;
+		lowLight.a = 0.8f * parent->focusColor.a;
+		LerpColor( &parent->focusColor, &lowLight, &newColor,0.5f+0.5f*sinf((float)(DC->realTime / PULSE_DIVISOR)) );
 	} else {
 		memcpy(&newColor, &item->window.foreColor, sizeof(vector4));
 	}
@@ -4939,11 +4939,11 @@ void Item_Multi_Paint(itemDef_t *item) {
 	char	temp[MAX_STRING_CHARS];
 
 	if (item->window.flags & WINDOW_HASFOCUS) {
-		lowLight.r = 0.8 * parent->focusColor.r;
-		lowLight.g = 0.8 * parent->focusColor.g;
-		lowLight.b = 0.8 * parent->focusColor.b;
-		lowLight.a = 0.8 * parent->focusColor.a;
-		LerpColor( &parent->focusColor, &lowLight, &newColor, 0.5+0.5*sin((float)(DC->realTime / PULSE_DIVISOR)) );
+		lowLight.r = 0.8f * parent->focusColor.r;
+		lowLight.g = 0.8f * parent->focusColor.g;
+		lowLight.b = 0.8f * parent->focusColor.b;
+		lowLight.a = 0.8f * parent->focusColor.a;
+		LerpColor( &parent->focusColor, &lowLight, &newColor, 0.5f+0.5f*sinf((float)(DC->realTime / PULSE_DIVISOR)) );
 	} else {
 		memcpy(&newColor, &item->window.foreColor, sizeof(vector4));
 	}
@@ -5197,11 +5197,11 @@ void Item_Slider_Paint(itemDef_t *item) {
 	menuDef_t *parent = (menuDef_t*)item->parent;
 
 	if (item->window.flags & WINDOW_HASFOCUS) {
-		lowLight.r = 0.8 * parent->focusColor.r;
-		lowLight.g = 0.8 * parent->focusColor.g;
-		lowLight.b = 0.8 * parent->focusColor.b;
-		lowLight.a = 0.8 * parent->focusColor.a;
-		LerpColor( &parent->focusColor, &lowLight, &newColor, 0.5+0.5*sin((float)(DC->realTime / PULSE_DIVISOR)) );
+		lowLight.r = 0.8f * parent->focusColor.r;
+		lowLight.g = 0.8f * parent->focusColor.g;
+		lowLight.b = 0.8f * parent->focusColor.b;
+		lowLight.a = 0.8f * parent->focusColor.a;
+		LerpColor( &parent->focusColor, &lowLight, &newColor, 0.5f+0.5f*sinf((float)(DC->realTime / PULSE_DIVISOR)) );
 	} else {
 		memcpy(&newColor, &item->window.foreColor, sizeof(vector4));
 	}
@@ -5275,7 +5275,7 @@ void Item_Bind_Paint(itemDef_t *item)
 			lowLight.b = 0.8f * parent->focusColor.b;
 			lowLight.a = 0.8f * parent->focusColor.a;
 		}
-		LerpColor( &parent->focusColor, &lowLight, &newColor, 0.5+0.5*sin((float)(DC->realTime / PULSE_DIVISOR)) );
+		LerpColor( &parent->focusColor, &lowLight, &newColor, 0.5f+0.5f*sinf((float)(DC->realTime / PULSE_DIVISOR)) );
 	}
 	else
 	{
@@ -5557,25 +5557,25 @@ void Item_Model_Paint(itemDef_t *item)
 		DC->modelBounds( item->asset, &mins, &maxs );
 	}
 
-	origin.z = -0.5 * ( mins.z + maxs.z);
-	origin.y = 0.5 * ( mins.y + maxs.y );
+	origin.z = -0.5f * ( mins.z + maxs.z);
+	origin.y = 0.5f * ( mins.y + maxs.y );
 
 	// calculate distance so the model nearly fills the box
 	if (qtrue)
 	{
-		float len = 0.5 * ( maxs.z - mins.z );
-		origin.x = len / 0.268;	// len / tan( fov/2 )
-		//origin[0] = len / tan(w/2);
+		float len = 0.5f * ( maxs.z - mins.z );
+		origin.x = len / 0.268f;	// len / tanf( fov/2 )
+		//origin[0] = len / tanf(w/2);
 	}
 	else
 	{
 		origin.x = item->textscale;
 	}
 	refdef.fov_x = (modelPtr->fov_x) ? modelPtr->fov_x : (int)((float)refdef.width / 640.0f * 90.0f);
-	refdef.fov_y = (modelPtr->fov_y) ? modelPtr->fov_y : atan2( refdef.height, refdef.width / tan( refdef.fov_x / 360 * M_PI ) ) * ( 360 / M_PI );
+	refdef.fov_y = (modelPtr->fov_y) ? modelPtr->fov_y : atan2f( refdef.height, refdef.width / tanf( refdef.fov_x / 360 * M_PI ) ) * ( 360 / M_PI );
 
 	//refdef.fov_x = (int)((float)refdef.width / 640.0f * 90.0f);
-	//refdef.fov_y = atan2( refdef.height, refdef.width / tan( refdef.fov_x / 360 * M_PI ) ) * ( 360 / M_PI );
+	//refdef.fov_y = atan2f( refdef.height, refdef.width / tanf( refdef.fov_x / 360 * M_PI ) ) * ( 360 / M_PI );
 
 	DC->clearScene();
 
@@ -5761,7 +5761,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 	// elements are enumerated from the DC and either text or image handles are acquired from the DC as well
 	// textscale is used to size the text, textalignx and textaligny are used to size image elements
 	// there is no clipping available so only the last completely visible item is painted
-	count = DC->feederCount(item->special);
+	count = DC->feederCount(item->special.i);
 
 	if (listPtr->startPos > (count?count-1:count))
 	{//probably changed feeders, so reset
@@ -5771,7 +5771,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 	{//probably changed feeders, so reset
 		item->cursorPos = (count?count-1:count);
 		// NOTE : might consider moving this to any spot in here we change the cursor position
-		DC->feederSelection( item->special, item->cursorPos, NULL );
+		DC->feederSelection( item->special.i, item->cursorPos, NULL );
 	}
 
 
@@ -5823,7 +5823,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 			{
 				// always draw at least one
 				// which may overdraw the box if it is too small for the element
-				image = DC->feederItemImage(item->special, i);
+				image = DC->feederItemImage(item->special.i, i);
 				if (image)
 				{
 #ifndef _CGAME
@@ -5864,7 +5864,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 
 #ifdef	_DEBUG
 		// Show pic name
-		text = DC->feederItemText(item->special, item->cursorPos, 0, &optionalImage1, &optionalImage2, &optionalImage3);
+		text = DC->feederItemText(item->special.i, item->cursorPos, 0, &optionalImage1, &optionalImage2, &optionalImage3);
 		if (text)
 		{
 			DC->drawText(item->window.rect.x, item->window.rect.y+item->window.rect.h, item->textscale, &item->window.foreColor, text, 0, 0, item->textStyle, item->iMenuFont);
@@ -5880,7 +5880,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 
 			// draw scrollbar to right side of the window
 			x = item->window.rect.x + item->window.rect.w - SCROLLBAR_SIZE - 1;
-			if ( (int)item->special == FEEDER_Q3HEADS )
+			if ( item->special.i == FEEDER_Q3HEADS )
 			{
 				x -= 2;
 			}
@@ -5921,7 +5921,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 					{
 						// always draw at least one
 						// which may overdraw the box if it is too small for the element
-						image = DC->feederItemImage(item->special, i);
+						image = DC->feederItemImage(item->special.i, i);
 					//	if (image)
 						{
 		#ifndef _CGAME
@@ -5977,7 +5977,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 				{
 					// always draw at least one
 					// which may overdraw the box if it is too small for the element
-					image = DC->feederItemImage(item->special, i);
+					image = DC->feederItemImage(item->special.i, i);
 					if (image)
 					{
 						DC->drawHandlePic(x+1, y+1, listPtr->elementWidth - 2, listPtr->elementHeight - 2, image);
@@ -6018,7 +6018,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 					{
 						char	temp[MAX_STRING_CHARS] = {0};
 						int imageStartX = listPtr->columnInfo[j].pos;
-						text = DC->feederItemText(item->special, i, j, &optionalImage1, &optionalImage2, &optionalImage3);
+						text = DC->feederItemText(item->special.i, i, j, &optionalImage1, &optionalImage2, &optionalImage3);
 
 						if( !text )
 						{
@@ -6068,7 +6068,7 @@ void Item_ListBox_Paint(itemDef_t *item) {
 				}
 				else
 				{
-					text = DC->feederItemText(item->special, i, 0, &optionalImage1, &optionalImage2, &optionalImage3 );
+					text = DC->feederItemText(item->special.i, i, 0, &optionalImage1, &optionalImage2, &optionalImage3 );
 					if ( optionalImage1 >= 0 || optionalImage2 >= 0 || optionalImage3 >= 0)
 					{
 						//DC->drawHandlePic(x + 4 + listPtr->elementHeight, y, listPtr->columnInfo[j].width, listPtr->columnInfo[j].width, optionalImage);
@@ -6125,17 +6125,17 @@ void Item_OwnerDraw_Paint(itemDef_t *item) {
 		}
 
 		if (item->window.flags & WINDOW_HASFOCUS) {
-			lowLight.r = 0.8 * parent->focusColor.r;
-			lowLight.g = 0.8 * parent->focusColor.g;
-			lowLight.b = 0.8 * parent->focusColor.b;
-			lowLight.a = 0.8 * parent->focusColor.a;
-			LerpColor( &parent->focusColor, &lowLight, &color, 0.5+0.5*sin((float)(DC->realTime / PULSE_DIVISOR)) );
+			lowLight.r = 0.8f * parent->focusColor.r;
+			lowLight.g = 0.8f * parent->focusColor.g;
+			lowLight.b = 0.8f * parent->focusColor.b;
+			lowLight.a = 0.8f * parent->focusColor.a;
+			LerpColor( &parent->focusColor, &lowLight, &color, 0.5f+0.5f*sinf((float)(DC->realTime / PULSE_DIVISOR)) );
 		} else if (item->textStyle == ITEM_TEXTSTYLE_BLINK && !((DC->realTime/BLINK_DIVISOR) & 1)) {
-			lowLight.r = 0.8 * item->window.foreColor.r;
-			lowLight.g = 0.8 * item->window.foreColor.g;
-			lowLight.b = 0.8 * item->window.foreColor.b;
-			lowLight.a = 0.8 * item->window.foreColor.a;
-			LerpColor( &item->window.foreColor, &lowLight, &color, 0.5+0.5*sin((float)(DC->realTime / PULSE_DIVISOR)) );
+			lowLight.r = 0.8f * item->window.foreColor.r;
+			lowLight.g = 0.8f * item->window.foreColor.g;
+			lowLight.b = 0.8f * item->window.foreColor.b;
+			lowLight.a = 0.8f * item->window.foreColor.a;
+			LerpColor( &item->window.foreColor, &lowLight, &color, 0.5f+0.5f*sinf((float)(DC->realTime / PULSE_DIVISOR)) );
 		}
 
 		if (item->disabled)
@@ -6155,12 +6155,12 @@ void Item_OwnerDraw_Paint(itemDef_t *item) {
 			Item_Text_Paint(item);
 			if (item->text[0]) {
 				// +8 is an offset kludge to properly align owner draw items that have text combined with them
-				DC->ownerDrawItem(item->textRect.x + item->textRect.w + 8, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special, item->textscale, &color, item->window.background, item->textStyle,item->iMenuFont);
+				DC->ownerDrawItem(item->textRect.x + item->textRect.w + 8, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special.f, item->textscale, &color, item->window.background, item->textStyle,item->iMenuFont);
 			} else {
-				DC->ownerDrawItem(item->textRect.x + item->textRect.w, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special, item->textscale, &color, item->window.background, item->textStyle,item->iMenuFont);
+				DC->ownerDrawItem(item->textRect.x + item->textRect.w, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special.f, item->textscale, &color, item->window.background, item->textStyle,item->iMenuFont);
 			}
 		} else {
-			DC->ownerDrawItem(item->window.rect.x, item->window.rect.y, item->window.rect.w, item->window.rect.h, item->textalignx, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special, item->textscale, &color, item->window.background, item->textStyle,item->iMenuFont);
+			DC->ownerDrawItem(item->window.rect.x, item->window.rect.y, item->window.rect.w, item->window.rect.h, item->textalignx, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special.f, item->textscale, &color, item->window.background, item->textStyle,item->iMenuFont);
 		}
 	}
 }
@@ -6194,8 +6194,8 @@ void Item_Paint(itemDef_t *item)
 			rx = item->window.rectClient.x + w - item->window.rectEffects.x;
 			ry = item->window.rectClient.y + h - item->window.rectEffects.y;
 			a = 3 * M_PI / 180;
-			c = cos(a);
-			s = sin(a);
+			c = cosf(a);
+			s = sinf(a);
 			item->window.rectClient.x = (rx * c - ry * s) + item->window.rectEffects.x - w;
 			item->window.rectClient.y = (rx * s + ry * c) + item->window.rectEffects.y - h;
 			Item_UpdatePosition(item);
@@ -6783,7 +6783,7 @@ void Menu_ScrollFeeder(menuDef_t *menu, int feeder, qboolean down) {
 	if (menu) {
 		int i;
 		for (i = 0; i < menu->itemCount; i++) {
-			if (menu->items[i]->special == feeder) {
+			if (menu->items[i]->special.i == feeder) {
 				Item_ListBox_HandleKey(menu->items[i], (down) ? A_CURSOR_DOWN : A_CURSOR_UP, qtrue, qtrue);
 				return;
 			}
@@ -6805,14 +6805,14 @@ void Menu_SetFeederSelection(menuDef_t *menu, int feeder, int index, const char 
 	if (menu) {
 		int i;
 		for (i = 0; i < menu->itemCount; i++) {
-			if (menu->items[i]->special == feeder) {
+			if (menu->items[i]->special.i == feeder) {
 				if (index == 0) {
 					listBoxDef_t *listPtr = (listBoxDef_t*)menu->items[i]->typeData;
 					listPtr->cursorPos = 0;
 					listPtr->startPos = 0;
 				}
 				menu->items[i]->cursorPos = index;
-				DC->feederSelection(menu->items[i]->special, menu->items[i]->cursorPos, NULL);
+				DC->feederSelection(menu->items[i]->special.i, menu->items[i]->cursorPos, NULL);
 				return;
 			}
 		}
@@ -7962,9 +7962,9 @@ qboolean ItemParse_elementheight( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-// feeder <float>
+// feeder <int>
 qboolean ItemParse_feeder( itemDef_t *item, int handle ) {
-	if (!PC_Float_Parse(handle, &item->special)) {
+	if (!PC_Int_Parse(handle, &item->special.i)) {
 		return qfalse;
 	}
 	return qtrue;
@@ -8295,7 +8295,7 @@ qboolean ItemParse_action( itemDef_t *item, int handle ) {
 }
 
 qboolean ItemParse_special( itemDef_t *item, int handle ) {
-	if (!PC_Float_Parse(handle, &item->special)) {
+	if (!PC_Float_Parse(handle, &item->special.f)) {
 		return qfalse;
 	}
 	return qtrue;
@@ -8465,7 +8465,7 @@ qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 		return qfalse;
 	}
 
-	if (!Q_stricmp(token.string,"feeder") && item->special == FEEDER_PLAYER_SPECIES)
+	if (!Q_stricmp(token.string,"feeder") && item->special.i == FEEDER_PLAYER_SPECIES)
 	{
 #ifndef _CGAME
 		for (; multiPtr->count < uiInfo.playerSpeciesCount; multiPtr->count++)
@@ -8479,7 +8479,7 @@ qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 		return qtrue;
 	}
 	// languages
-	if (!Q_stricmp(token.string,"feeder") && item->special == FEEDER_LANGUAGES)
+	if (!Q_stricmp(token.string,"feeder") && item->special.i == FEEDER_LANGUAGES)
 	{
 #ifndef _CGAME
 		for (; multiPtr->count < uiInfo.languageCount; multiPtr->count++)
@@ -9700,8 +9700,8 @@ void Menu_PaintAll( void ) {
 
 	if (debugMode) {
 		vector4 v = {1, 1, 1, 1};
-		DC->drawText(5, 25, .75, &v, va("fps: %f", DC->FPS), 0, 0, 0, 0);
-		DC->drawText(5, 45, .75, &v, va("x: %d  y:%d", DC->cursorx,DC->cursory), 0, 0, 0, 0);
+		DC->drawText(5, 25, .75f, &v, va("fps: %f", DC->FPS), 0, 0, 0, 0);
+		DC->drawText(5, 45, .75f, &v, va("x: %d  y:%d", DC->cursorx,DC->cursory), 0, 0, 0, 0);
 	}
 }
 

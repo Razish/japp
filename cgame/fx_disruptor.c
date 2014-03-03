@@ -37,7 +37,7 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end ) {
 	leGlow->leType = LE_FADE_RGB;
 	leGlow->startTime = cg.time;
 	leGlow->endTime = cg.time + 1600;
-	leGlow->lifeRate = 1.0 / (leGlow->endTime - leGlow->startTime);
+	leGlow->lifeRate = 1.0f / (leGlow->endTime - leGlow->startTime);
 	reGlow->shaderTime = cg.time / 1600.0f;
 	reGlow->reType = RT_LINE;
 	reGlow->radius = 3.0f;
@@ -48,16 +48,16 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end ) {
 	reGlow->shaderRGBA[1] = color1.g * 255;
 	reGlow->shaderRGBA[2] = color1.b * 255;
 	reGlow->shaderRGBA[3] = 255;
-	leGlow->color[0] = color1.r * 0.75;
-	leGlow->color[1] = color1.g * 0.75;
-	leGlow->color[2] = color1.b * 0.75;
+	leGlow->color[0] = color1.r * 0.75f;
+	leGlow->color[1] = color1.g * 0.75f;
+	leGlow->color[2] = color1.b * 0.75f;
 	leGlow->color[3] = 1.0f;
 
 	//Core
 	leCore->leType = LE_FADE_RGB;
 	leCore->startTime = cg.time;
 	leCore->endTime = cg.time + 1600;
-	leCore->lifeRate = 1.0 / (leCore->endTime - leCore->startTime);
+	leCore->lifeRate = 1.0f / (leCore->endTime - leCore->startTime);
 	reCore->shaderTime = cg.time / 1600.0f;
 	reCore->reType = RT_LINE;
 	reCore->radius = 1.0f;

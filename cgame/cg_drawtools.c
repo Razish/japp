@@ -40,22 +40,22 @@ void CG_GetColorForHealth( int health, int armor, vector4 *hcolor ) {
 		return;
 	}
 	count = armor;
-	max = health * ARMOR_PROTECTION / ( 1.0 - ARMOR_PROTECTION );
+	max = health * ARMOR_PROTECTION / ( 1.0f - ARMOR_PROTECTION );
 	if ( max < count ) {
 		count = max;
 	}
 	health += count;
 
 	// set the color based on health
-	hcolor->r = 1.0;
-	hcolor->a = 1.0;
-		 if ( health >= 100 )	hcolor->b = 1.0;
+	hcolor->r = 1.0f;
+	hcolor->a = 1.0f;
+		 if ( health >= 100 )	hcolor->b = 1.0f;
 	else if ( health < 66 )		hcolor->b = 0;
-	else						hcolor->b = ( health - 66 ) / 33.0;
+	else						hcolor->b = ( health - 66 ) / 33.0f;
 
-		 if ( health > 60 )		hcolor->g = 1.0;
+		 if ( health > 60 )		hcolor->g = 1.0f;
 	else if ( health < 30 )		hcolor->g = 0;
-	else						hcolor->g = ( health - 30 ) / 30.0;
+	else						hcolor->g = ( health - 30 ) / 30.0f;
 }
 
 /*
@@ -173,10 +173,10 @@ void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 	row = ch>>4;
 	col = ch&15;
 
-	frow = row*0.0625;
-	fcol = col*0.0625;
-	size = 0.03125;
-	size2 = 0.0625;
+	frow = row*0.0625f;
+	fcol = col*0.0625f;
+	size = 0.03125f;
+	size2 = 0.0625f;
 
 	trap->R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol + size, frow + size2, media.gfx.interface.charset );
 
@@ -313,10 +313,10 @@ refresh window.
 static void CG_TileClearBox( int x, int y, int w, int h, qhandle_t hShader ) {
 	float	s1, t1, s2, t2;
 
-	s1 = x/64.0;
-	t1 = y/64.0;
-	s2 = (x+w)/64.0;
-	t2 = (y+h)/64.0;
+	s1 = x/64.0f;
+	t1 = y/64.0f;
+	s2 = (x+w)/64.0f;
+	t2 = (y+h)/64.0f;
 	trap->R_DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
 }
 
@@ -389,7 +389,7 @@ vector4 *CG_FadeColor( int startMsec, int totalMsec ) {
 	// fade out
 	VectorSet4( &color, 1.0f, 1.0f, 1.0f, 1.0f );
 	if ( totalMsec - t < fadeTime )
-		color.a = ( totalMsec - t ) * 1.0/fadeTime;
+		color.a = ( totalMsec - t ) * 1.0f/fadeTime;
 
 	return &color;
 }
@@ -429,14 +429,14 @@ CG_ColorForHealth
 void CG_ColorForGivenHealth( vector4 *hcolor, int health )
 {
 	// set the color based on health
-	hcolor->r = 1.0;
-		 if ( health >= 100 )	hcolor->b = 1.0;
+	hcolor->r = 1.0f;
+		 if ( health >= 100 )	hcolor->b = 1.0f;
 	else if ( health < 66 )		hcolor->b = 0;
-	else						hcolor->b = ( health - 66 ) / 33.0;
+	else						hcolor->b = ( health - 66 ) / 33.0f;
 
-		 if ( health > 60 )		hcolor->g = 1.0;
+		 if ( health > 60 )		hcolor->g = 1.0f;
 	else if ( health < 30 ) 	hcolor->g = 0;
-	else						hcolor->g = ( health - 30 ) / 30.0;
+	else						hcolor->g = ( health - 30 ) / 30.0f;
 }
 
 /*
@@ -462,12 +462,12 @@ void CG_ColorForHealth( vector4 *hcolor )
 	}
 
 	count = cg.snap->ps.stats[STAT_ARMOR];
-	max = health * ARMOR_PROTECTION / ( 1.0 - ARMOR_PROTECTION );
+	max = health * ARMOR_PROTECTION / ( 1.0f - ARMOR_PROTECTION );
 	if ( max < count )
 		count = max;
 	health += count;
 
-	hcolor->a = 1.0;
+	hcolor->a = 1.0f;
 	CG_ColorForGivenHealth( hcolor, health );
 }
 
@@ -609,11 +609,11 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, const 
 		break;
 
 	case UI_CENTER:
-		x -= CG_Text_Width( str, 1.0, iMenuFont ) / 2;
+		x -= CG_Text_Width( str, 1.0f, iMenuFont ) / 2;
 		break;
 
 	case UI_RIGHT:
-		x -= CG_Text_Width( str, 1.0, iMenuFont ) / 2;
+		x -= CG_Text_Width( str, 1.0f, iMenuFont ) / 2;
 		break;
 	}
 
@@ -622,7 +622,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, const 
 	else if ( style & (UI_BLINK|UI_PULSE) )
 		iStyle = ITEM_TEXTSTYLE_BLINK;
 
-	CG_Text_Paint( x, y, 1.0, color, str, 0, 0, iStyle, iMenuFont );
+	CG_Text_Paint( x, y, 1.0f, color, str, 0, 0, iStyle, iMenuFont );
 }
 
 void UI_DrawScaledProportionalString( int x, int y, const char* str, int style, const vector4 *color, float scale )

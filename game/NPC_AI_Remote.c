@@ -52,7 +52,7 @@ void Remote_MaintainHeight( void )
 	{
 		NPC->client->ps.velocity.z *= VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.z ) < 2 )
+		if ( fabsf( NPC->client->ps.velocity.z ) < 2 )
 		{
 			NPC->client->ps.velocity.z = 0;
 		}
@@ -68,9 +68,9 @@ void Remote_MaintainHeight( void )
 			dif = (NPC->enemy->r.currentOrigin.z +  Q_irand( 0, NPC->enemy->r.maxs.z+8 )) - NPC->r.currentOrigin.z;
 
 			// cap to prevent dramatic height shifts
-			if ( fabs( dif ) > 2 )
+			if ( fabsf( dif ) > 2 )
 			{
-				if ( fabs( dif ) > 24 )
+				if ( fabsf( dif ) > 24 )
 				{
 					dif = ( dif < 0 ? -24 : 24 );
 				}
@@ -97,7 +97,7 @@ void Remote_MaintainHeight( void )
 		{
 			dif = goal->r.currentOrigin.z - NPC->r.currentOrigin.z;
 
-			if ( fabs( dif ) > 24 )
+			if ( fabsf( dif ) > 24 )
 			{
 				dif = ( dif < 0 ? -24 : 24 );
 				NPC->client->ps.velocity.z = (NPC->client->ps.velocity.z+dif)/2;
@@ -110,7 +110,7 @@ void Remote_MaintainHeight( void )
 	{
 		NPC->client->ps.velocity.x *= VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.x ) < 1 )
+		if ( fabsf( NPC->client->ps.velocity.x ) < 1 )
 		{
 			NPC->client->ps.velocity.x = 0;
 		}
@@ -120,7 +120,7 @@ void Remote_MaintainHeight( void )
 	{
 		NPC->client->ps.velocity.y *= VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.y ) < 1 )
+		if ( fabsf( NPC->client->ps.velocity.y ) < 1 )
 		{
 			NPC->client->ps.velocity.y = 0;
 		}
@@ -314,8 +314,8 @@ void Remote_Attack( void )
 	distance	= (int) DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
 	visible		= NPC_ClearLOS4( NPC->enemy );
 	idealDist	= MIN_DISTANCE_SQR+(MIN_DISTANCE_SQR*flrand( 0, 1 ));
-	advance		= (qboolean)(distance > idealDist*1.25);
-	retreat		= (qboolean)(distance < idealDist*0.75);
+	advance		= (qboolean)(distance > idealDist*1.25f);
+	retreat		= (qboolean)(distance < idealDist*0.75f);
 
 	// If we cannot see our target, move to see it
 	if ( visible == qfalse )

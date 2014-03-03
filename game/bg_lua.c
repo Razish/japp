@@ -111,8 +111,7 @@ int JPLua_LoadFile( lua_State *L, const char *file ) {
 }
 
 int JPLua_StackDump( lua_State *L ) {
-	int i;
-	int top = lua_gettop( L );
+	int i, top = lua_gettop( L );
 
 	// repeat for each level
 	for ( i=1; i<=top; i++ ) {
@@ -125,7 +124,7 @@ int JPLua_StackDump( lua_State *L ) {
 			trap->Print( lua_toboolean( L, i ) ? "true" : "false" );
 			break;
 		case LUA_TNUMBER:
-			trap->Print( "%g", lua_tonumber( L, i ) );
+			trap->Print( LUA_NUMBER_FMT, lua_tonumber( L, i ) );
 			break;
 		default:
 			trap->Print( "%s", lua_typename( L, t ) );

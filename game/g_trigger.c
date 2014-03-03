@@ -414,7 +414,7 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace )
 
 		AngleVectors( &other->client->ps.viewangles, &forward, NULL, NULL );
 
-		if ( DotProduct( &self->movedir, &forward ) < 0.5 )
+		if ( DotProduct( &self->movedir, &forward ) < 0.5f )
 		{//Not Within 45 degrees
 			return;
 		}
@@ -1079,7 +1079,7 @@ void AimAtTarget( gentity_t *self ) {
 
 	height = ent->s.origin.z - origin.z;
 	gravity = g_gravity.value;
-	time = sqrt( height / ( .5 * gravity ) );
+	time = sqrtf( height / ( .5f * gravity ) );
 	if ( !time ) {
 		G_FreeEntity( self );
 		return;

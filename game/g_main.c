@@ -1250,7 +1250,7 @@ void CalculateRanks( void ) {
 			trap->SetConfigstring( CS_SCORES2, va("%i", level.clients[ level.sortedClients[1] ].ps.persistant[PERS_SCORE] ) );
 		}
 
-		if (level.gametype != GT_DUEL || level.gametype != GT_POWERDUEL)
+		if ( level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL )
 		{ //when not in duel, use this configstring to pass the index of the player currently in first place
 			if ( level.numConnectedClients >= 1 )
 			{
@@ -2931,7 +2931,7 @@ void G_RunFrame( int levelTime ) {
 			}
 			else if (timeDif < 1150)
 			{
-				useDif = (timeDif/1000); //scale from 0.1 up to 1
+				useDif = (timeDif/1000); //scale from 0.1f up to 1
 				if (useDif < 0.1f)
 				{
 					useDif = 0.1f;

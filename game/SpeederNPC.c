@@ -152,7 +152,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 		(curTime > pVeh->m_iTurboTime) &&
 		!(pVeh->m_ulFlags&VEH_FLYING) &&
 		pVeh->m_ucmd.forwardmove<0 &&
-		fabs(pVeh->m_vOrientation->roll)>25.0f)
+		fabsf(pVeh->m_vOrientation->roll)>25.0f)
 	{
 		pVeh->m_ulFlags |= VEH_SLIDEBREAKING;
 	}
@@ -297,7 +297,7 @@ void ProcessOrientCommands( Vehicle_t *pVeh )
 
 		if (parentPS->electrifyTime > pm->cmd.serverTime)
 		{ //do some crazy stuff
-			pVeh->m_vOrientation->yaw += (sin(pm->cmd.serverTime/1000.0f)*3.0f)*pVeh->m_fTimeModifier;
+			pVeh->m_vOrientation->yaw += (sinf(pm->cmd.serverTime/1000.0f)*3.0f)*pVeh->m_fTimeModifier;
 		}
 	}
 

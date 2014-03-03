@@ -105,7 +105,7 @@ void NAVNEW_PushBlocker( gentity_t *self, gentity_t *blocker, vector3 *right, qb
 	VectorCopy( &blocker->r.mins, &mins );
 	mins.z += STEPSIZE;
 
-	moveamt = (self->r.maxs.y + blocker->r.maxs.y) * 1.2;//yes, magic number
+	moveamt = (self->r.maxs.y + blocker->r.maxs.y) * 1.2f;//yes, magic number
 
 	VectorMA( &blocker->r.currentOrigin, -moveamt, right, &end );
 	trap->Trace( &tr, &blocker->r.currentOrigin, &mins, &blocker->r.maxs, &end, blocker->s.number, blocker->clipmask|CONTENTS_BOTCLIP, qfalse, 0, 0);
@@ -233,8 +233,8 @@ qboolean NAVNEW_SidestepBlocker( gentity_t *self, gentity_t *blocker, vector3 *b
 	yaw = vectoyaw( blocked_dir );
 
 	//Get the avoid radius
-	avoidRadius = sqrt( (blocker->r.maxs.x*blocker->r.maxs.x) + (blocker->r.maxs.y*blocker->r.maxs.y) )
-				+ sqrt( (self->r.maxs.x*self->r.maxs.x) + (self->r.maxs.y*self->r.maxs.y) );
+	avoidRadius = sqrtf( (blocker->r.maxs.x*blocker->r.maxs.x) + (blocker->r.maxs.y*blocker->r.maxs.y) )
+				+ sqrtf( (self->r.maxs.x*self->r.maxs.x) + (self->r.maxs.y*self->r.maxs.y) );
 
 	//See if we're inside our avoidance radius
 	arcAngle = ( blocked_dist <= avoidRadius ) ? 135 : ( ( avoidRadius / blocked_dist ) * 90 );
@@ -260,7 +260,7 @@ qboolean NAVNEW_SidestepBlocker( gentity_t *self, gentity_t *blocker, vector3 *b
 		AngleVectors( &avoidAngles, movedir, NULL, NULL );
 		VectorMA( &self->r.currentOrigin, blocked_dist, movedir, &block_pos );
 		trap->Trace( &tr, &self->r.currentOrigin, &mins, &self->r.maxs, &block_pos, self->s.number, self->clipmask|CONTENTS_BOTCLIP, qfalse, 0, 0 );
-		return (tr.fraction==1.0&&!tr.allsolid&&!tr.startsolid);
+		return (tr.fraction==1.0f&&!tr.allsolid&&!tr.startsolid);
 	}
 
 	//test right

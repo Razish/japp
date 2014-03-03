@@ -348,7 +348,7 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 					tmp = "--";
 					trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
 						fontScale )/2.0f, y + (lineHeight/2.0f) - (trap->R_Font_HeightPixels( fontHandle,
-						fontScale )/2.0)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
+						fontScale )/2.0f)-1.0f, tmp, &white, fontHandle|STYLE_DROPSHADOW, -1, fontScale );
 				}
 				else
 				{//Ping
@@ -835,11 +835,11 @@ static void DrawPlayers_Team( float fade ) {
 
 	if ( cgs.scores1 >= cgs.scores2 ) {
 		ListPlayers_Team( fade, x,						y, fontScale, fontHandle, lineHeight, TEAM_RED );
-		ListPlayers_Team( fade, x + SCREEN_WIDTH/2.0,	y, fontScale, fontHandle, lineHeight, TEAM_BLUE );
+		ListPlayers_Team( fade, x + SCREEN_WIDTH/2.0f,	y, fontScale, fontHandle, lineHeight, TEAM_BLUE );
 	}
 	else {
 		ListPlayers_Team( fade, x,						y, fontScale, fontHandle, lineHeight, TEAM_BLUE );
-		ListPlayers_Team( fade, x + SCREEN_WIDTH/2.0,	y, fontScale, fontHandle, lineHeight, TEAM_RED );
+		ListPlayers_Team( fade, x + SCREEN_WIDTH/2.0f,	y, fontScale, fontHandle, lineHeight, TEAM_RED );
 	}
 
 	DrawSpectators( fade );

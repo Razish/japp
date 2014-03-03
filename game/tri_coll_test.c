@@ -17,11 +17,11 @@
 #include "g_local.h"
 
 /* if USE_EPSILON_TEST is true then we do a check:
-if |dv|<EPSILON then dv=0.0;
+if |dv|<EPSILON then dv=0.0f;
 else no check is done (which is less robust)
 */
 #define USE_EPSILON_TEST 1
-#define EPSILON 0.000001
+#define EPSILON 0.000001f
 
 
 // Cross product
@@ -140,9 +140,9 @@ qboolean coplanar_tri_tri( vector3 *N, vector3 *V0, vector3 *V1, vector3 *V2, ve
 
 	/* first project onto an axis-aligned plane, that maximizes the area */
 	/* of the triangles, compute indices: i0,i1. */
-	A.x = fabs( N->x );
-	A.y = fabs( N->y );
-	A.z = fabs( N->z );
+	A.x = fabsf( N->x );
+	A.y = fabsf( N->y );
+	A.z = fabsf( N->z );
 
 	if ( A.x > A.y )
 	{
@@ -230,9 +230,9 @@ qboolean tri_tri_intersect( vector3 *V0, vector3 *V1, vector3 *V2, vector3 *U0, 
 
 	/* coplanarity robustness check */
 #if USE_EPSILON_TEST
-	if ( fabs( du0 ) < EPSILON ) du0 = 0.0f;
-	if ( fabs( du1 ) < EPSILON ) du1 = 0.0f;
-	if ( fabs( du2 ) < EPSILON ) du2 = 0.0f;
+	if ( fabsf( du0 ) < EPSILON ) du0 = 0.0f;
+	if ( fabsf( du1 ) < EPSILON ) du1 = 0.0f;
+	if ( fabsf( du2 ) < EPSILON ) du2 = 0.0f;
 #endif
 	du0du1 = du0*du1;
 	du0du2 = du0*du2;
@@ -253,9 +253,9 @@ qboolean tri_tri_intersect( vector3 *V0, vector3 *V1, vector3 *V2, vector3 *U0, 
 	dv2 = DOT( &N2, V2 )+d2;
 
 #if USE_EPSILON_TEST
-	if ( fabs( dv0 ) < EPSILON ) dv0 = 0.0f;
-	if ( fabs( dv1 ) < EPSILON ) dv1 = 0.0f;
-	if ( fabs( dv2 ) < EPSILON ) dv2 = 0.0f;
+	if ( fabsf( dv0 ) < EPSILON ) dv0 = 0.0f;
+	if ( fabsf( dv1 ) < EPSILON ) dv1 = 0.0f;
+	if ( fabsf( dv2 ) < EPSILON ) dv2 = 0.0f;
 #endif
 
 	dv0dv1=dv0*dv1;
@@ -268,10 +268,10 @@ qboolean tri_tri_intersect( vector3 *V0, vector3 *V1, vector3 *V2, vector3 *U0, 
 	CROSS( &D, &N1, &N2 );
 
 	/* compute and index to the largest component of D */
-	max = fabs( D.x );
+	max = fabsf( D.x );
 	index = 0;
-	b = fabs( D.y );
-	c = fabs( D.z );
+	b = fabsf( D.y );
+	c = fabsf( D.z );
 	if ( b > max ) {
 		max = b;
 		index = 1;

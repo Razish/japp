@@ -1224,7 +1224,7 @@ static void CG_ServerCommand( void ) {
 	if ( !strcmp( cmd, "cp" ) ) {
 		char strEd[MAX_STRINGED_SV_STRING];
 		CG_CheckSVStringEdRef( strEd, CG_Argv( 1 ) );
-		CG_CenterPrint( strEd, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+		CG_CenterPrint( strEd, SCREEN_HEIGHT * 0.30f, BIGCHAR_WIDTH );
 		return;
 	}
 
@@ -1235,8 +1235,8 @@ static void CG_ServerCommand( void ) {
 			x++;
 		trap->SE_GetStringTextString( x, strEd, MAX_STRINGED_SV_STRING );
 		//Raz: From OJP
-	//	CG_CenterPrint( strEd, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
-		CG_CenterPrint( strEd, SCREEN_HEIGHT * 0.20, BIGCHAR_WIDTH );
+	//	CG_CenterPrint( strEd, SCREEN_HEIGHT * 0.30f, BIGCHAR_WIDTH );
+		CG_CenterPrint( strEd, SCREEN_HEIGHT * 0.20f, BIGCHAR_WIDTH );
 		return;
 	}
 

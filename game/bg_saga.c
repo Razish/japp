@@ -1,14 +1,5 @@
 // Copyright (C) 2000-2002 Raven Software, Inc.
 //
-/*****************************************************************************
- * name:		bg_saga.c
- *
- * desc:		Siege module, shared for game, cgame, and ui.
- *
- * $Author: osman $
- * $Revision: 1.9 $
- *
- *****************************************************************************/
 #include "qcommon/q_shared.h"
 #include "bg_public.h"
 #include "bg_saga.h"

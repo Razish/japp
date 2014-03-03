@@ -1372,7 +1372,7 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 		VectorCopy( &ent->r.currentOrigin, &bottom );
 		bottom.z = MIN_WORLD_COORD;
 		trap->Trace( &tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &bottom, ent->s.number, MASK_NPCSOLID, qfalse, 0, 0 );
-		if ( !tr.allsolid && !tr.startsolid && tr.fraction < 1.0 )
+		if ( !tr.allsolid && !tr.startsolid && tr.fraction < 1.0f )
 		{
 			G_SetOrigin( ent, &tr.endpos );
 		}
@@ -2193,7 +2193,7 @@ void SP_NPC_Vehicle( gentity_t *self)
 	G_SpawnFloat( "dropTime", "0", &dropTime );
 	if ( dropTime )
 	{
-		self->fly_sound_debounce_time = ceil(dropTime*1000.0);
+		self->fly_sound_debounce_time = ceil(dropTime*1000.0f);
 	}
 
 	G_SpawnInt( "showhealth", "0", &t );

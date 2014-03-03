@@ -40,9 +40,9 @@
 
 #define SB_RATING_WIDTH	    0 // (6 * BIGCHAR_WIDTH)
 #define SB_NAME_X			(SB_SCORELINE_X)
-#define SB_SCORE_X			(SB_SCORELINE_X + .40 * SB_SCORELINE_WIDTH)
-#define SB_PING_X			(SB_SCORELINE_X + .60 * SB_SCORELINE_WIDTH)
-#define SB_TIME_X			(SB_SCORELINE_X + .85 * SB_SCORELINE_WIDTH)
+#define SB_SCORE_X			(SB_SCORELINE_X + .40f * SB_SCORELINE_WIDTH)
+#define SB_PING_X			(SB_SCORELINE_X + .60f * SB_SCORELINE_WIDTH)
+#define SB_TIME_X			(SB_SCORELINE_X + .85f * SB_SCORELINE_WIDTH)
 
 // The new and improved score board
 //
@@ -137,7 +137,7 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 			hcolor.b = 0.7f;
 		}
 
-		hcolor.a = fade * 0.7;
+		hcolor.a = fade * 0.7f;
 		CG_FillRect( SB_SCORELINE_X - 5, y /*+ 2*/, SB_SCORELINE_WIDTH /*- SB_SCORELINE_X * 2 + 10*/, largeFormat?SB_NORMAL_HEIGHT:SB_INTER_HEIGHT, &hcolor );
 	}
 

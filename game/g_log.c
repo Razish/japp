@@ -862,7 +862,7 @@ qboolean CalculateSharpshooter(gentity_t *ent, int *frags)
 	gentity_t	*player = NULL;
 
 	// if this guy didn't get one kill per minute, reject him right now
-	if ( ((float)(G_WeaponLogKills[ent-g_entities][MOD_DISRUPTOR_SNIPER]))/((float)(playTime)) < 1.0 )
+	if ( ((float)(G_WeaponLogKills[ent-g_entities][MOD_DISRUPTOR_SNIPER]))/((float)(playTime)) < 1.0f )
 	{
 		return qfalse;
 	}
@@ -904,7 +904,7 @@ qboolean CalculateUntouchable(gentity_t *ent)
 		return qfalse;
 	}
 	//------------------------------------------------------ MUST HAVE ACHIEVED 2 KILLS PER MINUTE
-	if ( ((float)ent->client->ps.persistant[PERS_SCORE])/((float)(playTime)) < 2.0  || playTime==0)
+	if ( ((float)ent->client->ps.persistant[PERS_SCORE])/((float)(playTime)) < 2.0f  || playTime==0)
 		return qfalse;
 	//------------------------------------------------------ MUST HAVE ACHIEVED 2 KILLS PER MINUTE
 
@@ -994,10 +994,10 @@ qboolean CalculateTactician(gentity_t *ent, int *kills)
 		return qfalse;
 	}
 	//------------------------------------------------------ MUST HAVE ACHIEVED 2 KILLS PER MINUTE
-	if (playTime<0.3)
+	if (playTime<0.3f)
 		return qfalse;
 
-	if ( ((float)ent->client->ps.persistant[PERS_SCORE])/((float)(playTime)) < 2.0 )
+	if ( ((float)ent->client->ps.persistant[PERS_SCORE])/((float)(playTime)) < 2.0f )
 		return qfalse;
 	//------------------------------------------------------ MUST HAVE ACHIEVED 2 KILLS PER MINUTE
 
@@ -1098,7 +1098,7 @@ qboolean CalculateDemolitionist(gentity_t *ent, int *kills)
 		nKills += G_WeaponLogKills[i][MOD_DET_PACK_SPLASH];
 
 		// if this guy didn't get two explosive kills per minute, reject him right now
-		if ( ((float)nKills)/((float)(playTime)) < 2.0 )
+		if ( ((float)nKills)/((float)(playTime)) < 2.0f )
 		{
 			continue;
 		}

@@ -1,19 +1,6 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 
-/*****************************************************************************
- * name:		be_ea.h
- *
- * desc:		elementary actions
- *
- * $Archive: /source/code/botlib/be_ea.h $
- * $Author: osman $
- * $Revision: 1.4 $
- * $Modtime: 10/05/99 3:32p $
- * $Date: 2003/03/15 23:44:00 $
- *
- *****************************************************************************/
-
 //ClientCommand elementary actions
 void EA_Say(int client, char *str);
 void EA_SayTeam(int client, char *str);

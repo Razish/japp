@@ -146,7 +146,7 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 	RotatePointAroundVector( &axis[2], &axis[0], &axis[1], orientation );
 	CrossProduct( &axis[0], &axis[2], &axis[1] );
 
-	texCoordScale = 0.5 * 1.0 / radius;
+	texCoordScale = 0.5f * 1.0f / radius;
 
 	// create the full polygon
 	for ( i = 0 ; i < 3 ; i++ ) {
@@ -183,8 +183,8 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 			VectorCopy( &markPoints[mf->firstPoint + j], &v->xyz );
 
 			VectorSubtract( &v->xyz, origin, &delta );
-			v->st[0] = 0.5 + DotProduct( &delta, &axis[1] ) * texCoordScale;
-			v->st[1] = 0.5 + DotProduct( &delta, &axis[2] ) * texCoordScale;
+			v->st[0] = 0.5f + DotProduct( &delta, &axis[1] ) * texCoordScale;
+			v->st[1] = 0.5f + DotProduct( &delta, &axis[2] ) * texCoordScale;
 			{
 				int k;
 				for ( k=0; k<4; k++ )
@@ -248,7 +248,7 @@ void CG_AddMarks( void ) {
 		//if ( mp->markShader == media.gfx.world.energyMark ) {
 		if (0) {
 
-			fade = 450 - 450 * ( (cg.time - mp->time ) / 3000.0 );
+			fade = 450 - 450 * ( (cg.time - mp->time ) / 3000.0f );
 			if ( fade < 255 ) {
 				if ( fade < 0 ) {
 					fade = 0;

@@ -15,7 +15,7 @@ extern qboolean FlyingCreature( gentity_t *ent );
 #define	MAX_VIEW_DIST		1024
 #define MAX_VIEW_SPEED		250
 #define	MAX_LIGHT_INTENSITY 255
-#define	MIN_LIGHT_THRESHOLD	0.1
+#define	MIN_LIGHT_THRESHOLD	0.1f
 
 #define	DISTANCE_SCALE		0.25f
 #define	DISTANCE_THRESHOLD	0.075f
@@ -24,7 +24,7 @@ extern qboolean FlyingCreature( gentity_t *ent );
 #define	LIGHT_SCALE			0.25f
 
 #define	REALIZE_THRESHOLD	0.6f
-#define CAUTIOUS_THRESHOLD	( REALIZE_THRESHOLD * 0.75 )
+#define CAUTIOUS_THRESHOLD	( REALIZE_THRESHOLD * 0.75f )
 
 qboolean NPC_CheckPlayerTeamStealth( void );
 

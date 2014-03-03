@@ -73,9 +73,9 @@ void Seeker_MaintainHeight( void )
 			}
 
 			// cap to prevent dramatic height shifts
-			if ( fabs( dif ) > 2*difFactor )
+			if ( fabsf( dif ) > 2*difFactor )
 			{
-				if ( fabs( dif ) > 24*difFactor )
+				if ( fabsf( dif ) > 24*difFactor )
 				{
 					dif = ( dif < 0 ? -24*difFactor : 24*difFactor );
 				}
@@ -104,7 +104,7 @@ void Seeker_MaintainHeight( void )
 		{
 			dif = goal->r.currentOrigin.z - NPC->r.currentOrigin.z;
 
-			if ( fabs( dif ) > 24 )
+			if ( fabsf( dif ) > 24 )
 			{
 				ucmd.upmove = ( ucmd.upmove < 0 ? -4 : 4 );
 			}
@@ -114,7 +114,7 @@ void Seeker_MaintainHeight( void )
 				{
 					NPC->client->ps.velocity.z *= VELOCITY_DECAY;
 
-					if ( fabs( NPC->client->ps.velocity.z ) < 2 )
+					if ( fabsf( NPC->client->ps.velocity.z ) < 2 )
 					{
 						NPC->client->ps.velocity.z = 0;
 					}
@@ -128,7 +128,7 @@ void Seeker_MaintainHeight( void )
 	{
 		NPC->client->ps.velocity.x *= VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.x ) < 1 )
+		if ( fabsf( NPC->client->ps.velocity.x ) < 1 )
 			NPC->client->ps.velocity.x = 0;
 	}
 
@@ -136,7 +136,7 @@ void Seeker_MaintainHeight( void )
 	{
 		NPC->client->ps.velocity.y *= VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.y ) < 1 )
+		if ( fabsf( NPC->client->ps.velocity.y ) < 1 )
 			NPC->client->ps.velocity.y = 0;
 	}
 }
@@ -208,7 +208,7 @@ void Seeker_Strafe( void )
 			float dis, upPush;
 
 			VectorSubtract( &tr.endpos, &NPC->r.currentOrigin, &dir );
-			dir.z *= 0.25; // do less upward change
+			dir.z *= 0.25f; // do less upward change
 			dis = VectorNormalize( &dir );
 
 			// Try to move the desired enemy side
@@ -464,8 +464,8 @@ void Seeker_FollowOwner( void )
 		// generally circle the player closely till we take an enemy..this is our target point
 		if ( NPC->client->NPC_class == CLASS_BOBAFETT )
 		{
-			pt.x = owner->r.currentOrigin.x + cos( level.time * 0.001f + NPC->random ) * 250;
-			pt.y = owner->r.currentOrigin.y + sin( level.time * 0.001f + NPC->random ) * 250;
+			pt.x = owner->r.currentOrigin.x + cosf( level.time * 0.001f + NPC->random ) * 250;
+			pt.y = owner->r.currentOrigin.y + sinf( level.time * 0.001f + NPC->random ) * 250;
 			if ( NPC->client->jetPackTime < level.time )
 			{
 				pt.z = NPC->r.currentOrigin.z - 64;
@@ -477,8 +477,8 @@ void Seeker_FollowOwner( void )
 		}
 		else
 		{
-			pt.x = owner->r.currentOrigin.x + cos( level.time * 0.001f + NPC->random ) * 56;
-			pt.y = owner->r.currentOrigin.y + sin( level.time * 0.001f + NPC->random ) * 56;
+			pt.x = owner->r.currentOrigin.x + cosf( level.time * 0.001f + NPC->random ) * 56;
+			pt.y = owner->r.currentOrigin.y + sinf( level.time * 0.001f + NPC->random ) * 56;
 			pt.z = owner->r.currentOrigin.z + 40;
 		}
 

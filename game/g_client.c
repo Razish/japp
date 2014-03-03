@@ -3697,7 +3697,7 @@ void ClientSpawn(gentity_t *ent) {
 	}
 	else if (client->ps.stats[STAT_MAX_HEALTH] <= 100)
 	{
-		ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] * 1.25;
+		ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] * 1.25f;
 	}
 	else if (client->ps.stats[STAT_MAX_HEALTH] < 125)
 	{
@@ -3721,7 +3721,7 @@ void ClientSpawn(gentity_t *ent) {
 	}
 	else
 	{
-		client->ps.stats[STAT_ARMOR] = client->ps.stats[STAT_MAX_HEALTH] * 0.25;
+		client->ps.stats[STAT_ARMOR] = client->ps.stats[STAT_MAX_HEALTH] * 0.25f;
 	}
 
 	G_SetOrigin( ent, &spawn_origin );

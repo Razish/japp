@@ -150,7 +150,7 @@ qboolean NAV_HitNavGoal( vector3 *point, vector3 *mins, vector3 *maxs, vector3 *
 		{//Allow for a little z difference
 			vector3	diff;
 			VectorSubtract( point, dest, &diff );
-			if ( fabs(diff.z) <= 24 )
+			if ( fabsf(diff.z) <= 24 )
 			{
 				diff.z = 0;
 			}
@@ -247,7 +247,7 @@ qboolean NAV_ClearPathToPoint( gentity_t *self, vector3 *pmins, vector3 *pmaxs, 
 		}
 
 		//Made it
-		if ( trace.fraction == 1.0 )
+		if ( trace.fraction == 1.0f )
 		{
 			return qtrue;
 		}
@@ -272,7 +272,7 @@ qboolean NAV_ClearPathToPoint( gentity_t *self, vector3 *pmins, vector3 *pmaxs, 
 				//	G_DrawEdge( point, trace.endpos, EDGE_PATH );
 					VectorAdd(&g_entities[trace.entityNum].r.mins, &g_entities[trace.entityNum].r.currentOrigin, &p1);
 					VectorAdd(&g_entities[trace.entityNum].r.maxs, &g_entities[trace.entityNum].r.currentOrigin, &p2);
-				//	G_CubeOutline( p1, p2, FRAMETIME, 0x0000ff, 0.5 );
+				//	G_CubeOutline( p1, p2, FRAMETIME, 0x0000ff, 0.5f );
 				}
 				//FIXME: if it is a bmodel, light up the surf?
 			}
@@ -305,7 +305,7 @@ qboolean NAV_ClearPathToPoint( gentity_t *self, vector3 *pmins, vector3 *pmaxs, 
 			//	G_DrawEdge( self->r.currentOrigin, trace.endpos, EDGE_PATH );
 				VectorAdd(&g_entities[trace.entityNum].r.mins, &g_entities[trace.entityNum].r.currentOrigin, &p1);
 				VectorAdd(&g_entities[trace.entityNum].r.maxs, &g_entities[trace.entityNum].r.currentOrigin, &p2);
-			//	G_CubeOutline( p1, p2, FRAMETIME, 0x0000ff, 0.5 );
+			//	G_CubeOutline( p1, p2, FRAMETIME, 0x0000ff, 0.5f );
 			}
 			//FIXME: if it is a bmodel, light up the surf?
 		}
@@ -484,7 +484,7 @@ qboolean NAV_CheckAhead( gentity_t *self, vector3 *end, trace_t *trace, int clip
 		return qtrue;
 
 	//See if we're too far above
-	if ( fabs( self->r.currentOrigin.z - end->z ) > 48 )
+	if ( fabsf( self->r.currentOrigin.z - end->z ) > 48 )
 		return qfalse;
 
 	//This is a work around
@@ -574,8 +574,8 @@ qboolean NAV_Bypass( gentity_t *self, gentity_t *blocker, vector3 *blocked_dir, 
 	yaw = vectoyaw( blocked_dir );
 
 	//Get the avoid radius
-	avoidRadius = sqrt( (blocker->r.maxs.x*blocker->r.maxs.x) + (blocker->r.maxs.y*blocker->r.maxs.y) )
-				+ sqrt( (self->r.maxs.x*self->r.maxs.x) + (self->r.maxs.y*self->r.maxs.y) );
+	avoidRadius = sqrtf( (blocker->r.maxs.x*blocker->r.maxs.x) + (blocker->r.maxs.y*blocker->r.maxs.y) )
+				+ sqrtf( (self->r.maxs.x*self->r.maxs.x) + (self->r.maxs.y*self->r.maxs.y) );
 
 	//See if we're inside our avoidance radius
 	arcAngle = ( blocked_dist <= avoidRadius ) ? 135 : ( ( avoidRadius / blocked_dist ) * 90 );
@@ -700,7 +700,7 @@ qboolean NAV_TrueCollision( gentity_t *self, gentity_t *blocker, vector3 *movedi
 	//See if it's even feasible
 	dot = DotProduct( movedir, &velocityDir );
 
-	if ( dot < 0.85 )
+	if ( dot < 0.85f )
 		return qfalse;
 
 	VectorMA( &self->r.currentOrigin, speed*FRAMETIME, &velocityDir, &testPos );
@@ -736,8 +736,8 @@ qboolean NAV_StackedCanyon( gentity_t *self, gentity_t *blocker, vector3 *pathDi
 	PerpendicularVector( &perp, pathDir );
 	CrossProduct( pathDir, &perp, &cross );
 
-	avoidRadius = sqrt( (blocker->r.maxs.x*blocker->r.maxs.x) + (blocker->r.maxs.y*blocker->r.maxs.y) )
-				+ sqrt( (self->r.maxs.x*self->r.maxs.x) + (self->r.maxs.y*self->r.maxs.y) );
+	avoidRadius = sqrtf( (blocker->r.maxs.x*blocker->r.maxs.x) + (blocker->r.maxs.y*blocker->r.maxs.y) )
+				+ sqrtf( (self->r.maxs.x*self->r.maxs.x) + (self->r.maxs.y*self->r.maxs.y) );
 
 	VectorMA( &blocker->r.currentOrigin, avoidRadius, &cross, &test );
 
@@ -755,7 +755,7 @@ qboolean NAV_StackedCanyon( gentity_t *self, gentity_t *blocker, vector3 *pathDi
 
 		VectorAdd( &test, &self->r.mins, &mins );
 		VectorAdd( &test, &self->r.maxs, &maxs );
-	//	G_Cube( mins, maxs, RED, 0.25 );
+	//	G_Cube( mins, maxs, RED, 0.25f );
 	}
 
 	if ( tr.startsolid == qfalse && tr.allsolid == qfalse )
@@ -780,7 +780,7 @@ qboolean NAV_StackedCanyon( gentity_t *self, gentity_t *blocker, vector3 *pathDi
 
 		VectorAdd( &test, &self->r.mins, &mins );
 		VectorAdd( &test, &self->r.maxs, &maxs );
-	//	G_Cube( mins, maxs, RED, 0.25 );
+	//	G_Cube( mins, maxs, RED, 0.25f );
 	}
 
 	return qtrue;
@@ -966,7 +966,7 @@ int NAV_TestBestNode( gentity_t *self, int startID, int endID, qboolean failEdge
 	}
 
 	//See if we're too far above
-	if ( self->s.weapon != WP_SABER && fabs( self->r.currentOrigin.z - end.z ) > 48 )
+	if ( self->s.weapon != WP_SABER && fabsf( self->r.currentOrigin.z - end.z ) > 48 )
 	{
 	}
 	else
@@ -998,7 +998,7 @@ int NAV_TestBestNode( gentity_t *self, int startID, int endID, qboolean failEdge
 					return startID;
 				}
 				//we can keep heading to the door, it should open
-				if ( self->s.weapon != WP_SABER && fabs( self->r.currentOrigin.z - end.z ) > 48 )
+				if ( self->s.weapon != WP_SABER && fabsf( self->r.currentOrigin.z - end.z ) > 48 )
 				{//too far above
 				}
 				else
@@ -1344,7 +1344,7 @@ void SP_waypoint_navgoal( gentity_t *ent )
 
 	VectorSet( &ent->r.mins, -16, -16, -24 );
 	VectorSet( &ent->r.maxs,  16,  16,  32 );
-	ent->s.origin.z += 0.125;
+	ent->s.origin.z += 0.125f;
 	if ( !(ent->spawnflags&1) && G_CheckInSolid( ent, qfalse ) )
 	{
 		Com_Printf(S_COLOR_RED"ERROR: Waypoint_navgoal %s at %s in solid!\n", ent->targetname, vtos(&ent->r.currentOrigin));
@@ -1374,7 +1374,7 @@ void SP_waypoint_navgoal_8( gentity_t *ent )
 {
 	VectorSet( &ent->r.mins, -8, -8, -24 );
 	VectorSet( &ent->r.maxs,  8,  8,  32 );
-	ent->s.origin.z += 0.125;
+	ent->s.origin.z += 0.125f;
 	if ( !(ent->spawnflags&1) && G_CheckInSolid( ent, qfalse ) )
 	{
 		Com_Printf(S_COLOR_RED"ERROR: Waypoint_navgoal_8 %s at %s in solid!\n", ent->targetname, vtos(&ent->r.currentOrigin));
@@ -1405,7 +1405,7 @@ void SP_waypoint_navgoal_4( gentity_t *ent )
 {
 	VectorSet( &ent->r.mins, -4, -4, -24 );
 	VectorSet( &ent->r.maxs,  4,  4,  32 );
-	ent->s.origin.z += 0.125;
+	ent->s.origin.z += 0.125f;
 	if ( !(ent->spawnflags&1) && G_CheckInSolid( ent, qfalse ) )
 	{
 		Com_Printf(S_COLOR_RED"ERROR: Waypoint_navgoal_4 %s at %s in solid!\n", ent->targetname, vtos(&ent->r.currentOrigin));
@@ -1436,7 +1436,7 @@ void SP_waypoint_navgoal_2( gentity_t *ent )
 {
 	VectorSet( &ent->r.mins, -2, -2, -24 );
 	VectorSet( &ent->r.maxs,  2,  2,  32 );
-	ent->s.origin.z += 0.125;
+	ent->s.origin.z += 0.125f;
 	if ( !(ent->spawnflags&1) && G_CheckInSolid( ent, qfalse ) )
 	{
 		Com_Printf(S_COLOR_RED"ERROR: Waypoint_navgoal_2 %s at %s in solid!\n", ent->targetname, vtos(&ent->r.currentOrigin));
@@ -1467,7 +1467,7 @@ void SP_waypoint_navgoal_1( gentity_t *ent )
 {
 	VectorSet( &ent->r.mins, -1, -1, -24 );
 	VectorSet( &ent->r.maxs,  1,  1,  32 );
-	ent->s.origin.z += 0.125;
+	ent->s.origin.z += 0.125f;
 	if ( !(ent->spawnflags&1) && G_CheckInSolid( ent, qfalse ) )
 	{
 		Com_Printf(S_COLOR_RED"ERROR: Waypoint_navgoal_1 %s at %s in solid!\n", ent->targetname, vtos(&ent->r.currentOrigin));

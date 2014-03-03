@@ -1,14 +1,5 @@
 // Copyright (C) 2000-2002 Raven Software, Inc.
 //
-/*****************************************************************************
- * name:		g_exphysics.c
- *
- * desc:		Custom physics system (Expensive Physics)
- *
- * $Author: osman $
- * $Revision: 1.4 $
- *
- *****************************************************************************/
 #include "g_local.h"
 
 #define MAX_GRAVITY_PULL 512
@@ -124,7 +115,7 @@ void G_RunExPhys(gentity_t *ent, float gravity, float mass, float bounce, qboole
 
 			trap->Trace(&tr, &boneOrg, &tMins, &tMaxs, &projectedBoneOrg, ent->s.number, ent->clipmask, qfalse, 0, 0);
 
-			if (tr.fraction != 1.0 || tr.startsolid || tr.allsolid)
+			if (tr.fraction != 1.0f || tr.startsolid || tr.allsolid)
 			{ //we've hit something
 				//Store the "deepest" collision we have
                 if (!hasFirstCollision)

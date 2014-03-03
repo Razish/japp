@@ -107,7 +107,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 	}
 	else if ( (fabsf( pm->ps->velocity.x ) + fabsf( pm->ps->velocity.y )) < 100.0f && pm->ps->velocity.z > -100.0f )
 #else
-	if ( (fabsf( pm->ps->velocity.x ) + fabs( pm->ps->velocity.y )) < 100.0f && pm->ps->velocity.z > -100.0f )
+	if ( (fabsf( pm->ps->velocity.x ) + fabsf( pm->ps->velocity.y )) < 100.0f && pm->ps->velocity.z > -100.0f )
 #endif
 	{// we're landing, we're cool
 		// this was annoying me -rww
@@ -347,7 +347,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 						mult = 1.0f;
 					if ( hitEnt->inuse && hitEnt->takedamage ) {
 						// if the other guy takes damage, don't hurt us a lot for ramming him
-						//unless it's a vehicle, then we get 1.5 times damage
+						//unless it's a vehicle, then we get 1.5f times damage
 						if ( hitEnt->s.eType == ET_NPC && hitEnt->s.NPC_class == CLASS_VEHICLE && hitEnt->m_pVehicle )
 							mult = 1.5f;
 						else
@@ -538,7 +538,7 @@ qboolean PM_SlideMove( qboolean gravity ) {
 
 	if ( gravity ) {
 		endVelocity.z -= pm->ps->gravity * pml.frametime;
-		pm->ps->velocity.z = ( pm->ps->velocity.z + endVelocity.z ) * 0.5;
+		pm->ps->velocity.z = ( pm->ps->velocity.z + endVelocity.z ) * 0.5f;
 		primal_velocity.z = endVelocity.z;
 		if ( pml.groundPlane ) {
 			// slide along the ground plane
@@ -743,7 +743,7 @@ void PM_StepSlideMove( qboolean gravity ) {
 	pm->trace( &trace, &start_o, &pm->mins, &pm->maxs, &down, pm->ps->clientNum, pm->tracemask );
 	VectorSet( &up, 0, 0, 1 );
 	// never step up when you still have up velocity
-	if ( pm->ps->velocity.z > 0 && (trace.fraction == 1.0 || DotProduct( &trace.plane.normal, &up ) < 0.7f) )
+	if ( pm->ps->velocity.z > 0 && (trace.fraction == 1.0f || DotProduct( &trace.plane.normal, &up ) < 0.7f) )
 		return;
 
 	VectorCopy( &pm->ps->origin, &down_o );
@@ -825,7 +825,7 @@ void PM_StepSlideMove( qboolean gravity ) {
 		}
 		else {
 			VectorCopy( &trace.endpos, &pm->ps->origin );
-			if ( pm->stepSlideFix && trace.fraction < 1.0 )
+			if ( pm->stepSlideFix && trace.fraction < 1.0f )
 				PM_ClipVelocity( &pm->ps->velocity, &trace.plane.normal, &pm->ps->velocity, OVERCLIP );
 		}
 	}
@@ -835,7 +835,7 @@ void PM_StepSlideMove( qboolean gravity ) {
 			VectorCopy( &down_v, &pm->ps->velocity );
 		}
 	}
-	if ( !pm->stepSlideFix && trace.fraction < 1.0 )
+	if ( !pm->stepSlideFix && trace.fraction < 1.0f )
 		PM_ClipVelocity( &pm->ps->velocity, &trace.plane.normal, &pm->ps->velocity, OVERCLIP );
 
 	// use the step move

@@ -68,7 +68,7 @@ void NPC_ClearGoal( void )
 
 	if ( !NPCInfo->lastGoalEntity )
 	{
-		SetGoal( NULL, 0.0 );
+		SetGoal( NULL, 0.0f );
 		return;
 	}
 
@@ -82,7 +82,7 @@ void NPC_ClearGoal( void )
 		return;
 	}
 
-	SetGoal( NULL, 0.0 );
+	SetGoal( NULL, 0.0f );
 }
 
 /*

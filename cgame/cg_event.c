@@ -300,7 +300,7 @@ clientkilled:
 			s = va("%s %s", sKilledStr, targetName );
 		}
 		//if (!(cg_singlePlayerActive.integer && cg_cameraOrbit.integer)) {
-			CG_CenterPrint( s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+			CG_CenterPrint( s, SCREEN_HEIGHT * 0.30f, BIGCHAR_WIDTH );
 		//}
 		// print the text message as well
 	}
@@ -1874,7 +1874,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 					const char *strText = CG_GetStringEdString("MP_INGAME", "PICKUPLINE");
 
 					//Com_Printf("%s %s\n", strText, showPowersName[index]);
-					CG_CenterPrint( va("%s %s\n", strText, CG_GetStringEdString("SP_INGAME",showPowersName[fpIndex])), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+					CG_CenterPrint( va("%s %s\n", strText, CG_GetStringEdString("SP_INGAME",showPowersName[fpIndex])), SCREEN_HEIGHT * 0.30f, BIGCHAR_WIDTH );
 				}
 
 				//Show the player their force selection bar in case picking the holocron up changed the current selection
@@ -2366,7 +2366,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 					{
 						CG_Trace(&tr, &refdef->vieworg, NULL, NULL, &es->origin, ENTITYNUM_NONE, CONTENTS_TERRAIN|CONTENTS_SOLID);
 
-						if (tr.fraction == 1.0 || tr.entityNum < MAX_CLIENTS)
+						if (tr.fraction == 1.0f || tr.entityNum < MAX_CLIENTS)
 						{
 							cullPass = qtrue;
 						}
@@ -2425,7 +2425,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 				{
 					CG_Trace(&tr, &refdef->vieworg, NULL, NULL, &es->origin, ENTITYNUM_NONE, CONTENTS_TERRAIN|CONTENTS_SOLID);
 
-					if (tr.fraction == 1.0 || tr.entityNum < MAX_CLIENTS)
+					if (tr.fraction == 1.0f || tr.entityNum < MAX_CLIENTS)
 					{
 						cullPass = qtrue;
 					}

@@ -421,9 +421,9 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	// Jeff, I did this because I foolishly wished to have a bright halo as the saber is unleashed.
 	// It's not quite what I'd hoped tho.  If you have any ideas, go for it!  --Pat
 	if (length < lengthMax)
-		radiusmult = 1.0 + (2.0 / length);		// Note this creates a curve, and length cannot be < 0.5.
+		radiusmult = 1.0f + (2.0f / length);		// Note this creates a curve, and length cannot be < 0.5.
 	else
-		radiusmult = 1.0;
+		radiusmult = 1.0f;
 
 	for ( i=0; i<3; i++ )
 		rgb.data[i] *= 255;
@@ -464,7 +464,7 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	saber.reType = RT_LINE;
 	radiusStart = radius/3.0f;
 	saber.radius = (radiusStart + crandom() * radiusRange)*radiusmult;
-	//	saber.radius = (1.0 + crandom() * 0.2f)*radiusmult;
+	//	saber.radius = (1.0f + crandom() * 0.2f)*radiusmult;
 
 	saber.shaderTexCoord.x = saber.shaderTexCoord.y = 1.0f;
 
@@ -499,7 +499,7 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	sbak.shaderRGBA[0] = sbak.shaderRGBA[1] = sbak.shaderRGBA[2] = sbak.shaderRGBA[3] = 0xff;
 
 	lol = Q_fabs((sinf((float)trap->Milliseconds() / 400.0f)));
-	lol = (lol * 0.1f) + 1.0;
+	lol = (lol * 0.1f) + 1.0f;
 	sbak.radius = lol;
 
 	SE_R_AddRefEntityToScene( &sbak, MAX_CLIENTS );
@@ -575,15 +575,15 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 
 	if (blade_len < lengthMax)
 	{
-		radiusmult = 0.5 + ((blade_len / lengthMax)/2);
+		radiusmult = 0.5f + ((blade_len / lengthMax)/2);
 	}
 	else
 	{
-		radiusmult = 1.0;
+		radiusmult = 1.0f;
 	}
 
-	effectradius	= ((radius * 1.6 * 1.0f) + crandom() * 0.1f)*radiusmult;
-	coreradius		= ((radius * 0.4 * 1.0f) + crandom() * 0.1f)*radiusmult;
+	effectradius	= ((radius * 1.6f * 1.0f) + crandom() * 0.1f)*radiusmult;
+	coreradius		= ((radius * 0.4f * 1.0f) + crandom() * 0.1f)*radiusmult;
 
 	UI_RGBForSaberColor( color, &rgb, bnum );
 	for(i=0;i<3;i++)
@@ -697,8 +697,8 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 		}
 	}
 
-	VectorMA( blade_muz, blade_len - 0.5, &blade_dir, blade_tip );
-	VectorMA( trail_muz, trail_len - 0.5, &trail_dir, trail_tip );
+	VectorMA( blade_muz, blade_len - 0.5f, &blade_dir, blade_tip );
+	VectorMA( trail_muz, trail_len - 0.5f, &trail_dir, trail_tip );
 
 	if(base_len > 2)
 	{
@@ -724,7 +724,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 
 		// Do the hot core
 		VectorMA( blade_muz, base_len, &base_dir, &saber.origin );
-		VectorMA( blade_muz, -0.1, &base_dir, &saber.oldorigin );
+		VectorMA( blade_muz, -0.1f, &base_dir, &saber.oldorigin );
 
 		saber.customShader = sfxSaberBladeShader;
 		saber.reType = RT_LINE;

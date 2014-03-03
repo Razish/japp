@@ -1161,7 +1161,7 @@ qboolean G_ClearTrace( vector3 *start, vector3 *mins, vector3 *maxs, vector3 *en
 
 	trap->Trace( &tr, start, mins, maxs, end, ignore, clipmask, qfalse, 0, 0 );
 
-	if ( tr.allsolid || tr.startsolid || tr.fraction < 1.0 )
+	if ( tr.allsolid || tr.startsolid || tr.fraction < 1.0f )
 		return qfalse;
 
 	return qtrue;
@@ -1191,7 +1191,7 @@ qboolean G_CheckInSolid( gentity_t *self, qboolean fix ) {
 	if ( trace.allsolid || trace.startsolid )
 		return qtrue;
 
-	if ( trace.fraction < 1.0 ) {
+	if ( trace.fraction < 1.0f ) {
 		// Put them at end of trace and check again
 		if ( fix ) {
 			vector3 neworg;
@@ -1291,7 +1291,7 @@ qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3
 		trap->Trace( &tr, &start, &vec3_origin, &vec3_origin, &end, ignore, clipmask, qfalse, 0, 0 );
 		if ( tr.allsolid || tr.startsolid )
 			return qfalse;
-		if ( tr.fraction < 1.0 ) {
+		if ( tr.fraction < 1.0f ) {
 			VectorCopy( &start, &end );
 			end.data[i] += maxs->data[i]-(mins->data[i]*tr.fraction);
 
@@ -1300,7 +1300,7 @@ qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3
 			if ( tr.allsolid || tr.startsolid )
 				return qfalse;
 
-			if ( tr.fraction < 1.0 )
+			if ( tr.fraction < 1.0f )
 				return qfalse;
 
 			VectorCopy( &end, &start );

@@ -1070,12 +1070,12 @@ static void HandleEntityAdjustment(void)
 	}
 	else
 	{
-		origin.x = origin.y = origin.z = 0.0;
+		origin.x = origin.y = origin.z = 0.0f;
 	}
 
 	rotation = DEG2RAD(level.mRotationAdjust);
-	newOrigin.x = origin.x*cos(rotation) - origin.y*sin(rotation);
-	newOrigin.y = origin.x*sin(rotation) + origin.y*cos(rotation);
+	newOrigin.x = origin.x*cosf(rotation) - origin.y*sinf(rotation);
+	newOrigin.y = origin.x*sinf(rotation) + origin.y*cosf(rotation);
 	newOrigin.z = origin.z;
 	VectorAdd(&newOrigin, &level.mOriginAdjust, &newOrigin);
 	// damn VMs don't handle outputing a float that is compatible with sscanf in all cases
@@ -1101,7 +1101,7 @@ static void HandleEntityAdjustment(void)
 		}
 		else
 		{
-			angles.y = 0.0;
+			angles.y = 0.0f;
 		}
 		angles.y = fmod(angles.y + level.mRotationAdjust, 360.0f);
 		Com_sprintf(temp, MAX_QPATH, "%0.0f", angles.y);
@@ -1117,7 +1117,7 @@ static void HandleEntityAdjustment(void)
 	}
 	else
 	{
-		angles.x = angles.y = angles.z = 0.0;
+		angles.x = angles.y = angles.z = 0.0f;
 	}
 	angles.y = fmod(angles.y + level.mRotationAdjust, 360.0f);
 	Com_sprintf(temp, MAX_QPATH, "%0.0f %0.0f %0.0f", angles.x, angles.y, angles.z);

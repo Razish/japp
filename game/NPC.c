@@ -394,10 +394,10 @@ void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope )
 		VectorCopy( &startspot, &endspot );
 		endspot.z -= 300;
 		trap->Trace( &trace, &forwhom->r.currentOrigin, &vec3_origin, &vec3_origin, &endspot, forwhom->s.number, MASK_SOLID, qfalse, 0, 0 );
-//		if(trace_fraction>0.05&&forwhom.movetype==MOVETYPE_STEP)
+//		if(trace_fraction>0.05f&&forwhom.movetype==MOVETYPE_STEP)
 //			forwhom.flags(-)FL_ONGROUND;
 
-		if ( trace.fraction >= 1.0 )
+		if ( trace.fraction >= 1.0f )
 			return;
 
 		if( !( &trace.plane ) )
@@ -438,7 +438,7 @@ void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope )
 		forwhom->client->ps.viewangles.pitch = dot * pitch;
 		forwhom->client->ps.viewangles.roll = ((1-Q_fabs(dot)) * pitch * mod);
 		oldmins2 = forwhom->r.mins.z;
-		forwhom->r.mins.z = -24 + 12 * fabs(forwhom->client->ps.viewangles.pitch)/180.0f;
+		forwhom->r.mins.z = -24 + 12 * fabsf( forwhom->client->ps.viewangles.pitch )/180.0f;
 		//FIXME: if it gets bigger, move up
 		if ( oldmins2 > forwhom->r.mins.z )
 		{//our mins is now lower, need to move up
@@ -640,10 +640,10 @@ void ClearNPCGlobals( void )
 //===============
 
 extern	qboolean	showBBoxes;
-vector3 NPCDEBUG_RED = {1.0, 0.0, 0.0};
-vector3 NPCDEBUG_GREEN = {0.0, 1.0, 0.0};
-vector3 NPCDEBUG_BLUE = {0.0, 0.0, 1.0};
-vector3 NPCDEBUG_LIGHT_BLUE = {0.3f, 0.7f, 1.0};
+vector3 NPCDEBUG_RED = {1.0f, 0.0f, 0.0f};
+vector3 NPCDEBUG_GREEN = {0.0f, 1.0f, 0.0f};
+vector3 NPCDEBUG_BLUE = {0.0f, 0.0f, 1.0f};
+vector3 NPCDEBUG_LIGHT_BLUE = {0.3f, 0.7f, 1.0f};
 //extern void G_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha );
 extern void G_Line( vector3 *start, vector3 *end, vector3 *color, float alpha );
 extern void G_Cylinder( vector3 *start, vector3 *end, float radius, vector3 *color );
@@ -661,7 +661,7 @@ void NPC_ShowDebugInfo (void)
 			{
 				VectorAdd( &found->r.currentOrigin, &found->r.mins, &mins );
 				VectorAdd( &found->r.currentOrigin, &found->r.maxs, &maxs );
-			//	G_Cube( &mins, &maxs, &NPCDEBUG_RED, 0.25 );
+			//	G_Cube( &mins, &maxs, &NPCDEBUG_RED, 0.25f );
 			}
 		}
 	}
@@ -1697,7 +1697,7 @@ void NPC_CheckInSolid(void)
 	trace_t	trace;
 	vector3	point;
 	VectorCopy(&NPC->r.currentOrigin, &point);
-	point.z -= 0.25;
+	point.z -= 0.25f;
 
 	trap->Trace(&trace, &NPC->r.currentOrigin, &NPC->r.mins, &NPC->r.maxs, &point, NPC->s.number, NPC->clipmask, qfalse, 0, 0);
 	if(!trace.startsolid && !trace.allsolid)

@@ -1,14 +1,5 @@
 // Copyright (C) 2000-2002 Raven Software, Inc.
 //
-/*****************************************************************************
- * name:		g_saga.c
- *
- * desc:		Game-side module for Siege gametype.
- *
- * $Author: Rich Whitehouse $
- * $Revision: 1.6 $
- *
- *****************************************************************************/
 #include "g_local.h"
 #include "bg_saga.h"
 

@@ -153,7 +153,7 @@ typedef struct refEntity_s {
 
 	// previous data for frame interpolation
 	int			oldframe;
-	float		backlerp;			// 0.0 = current, 1.0 = old
+	float		backlerp;			// 0.0f = current, 1.0f = old
 
 	// texturing
 	int			skinNum;			// inline skin index

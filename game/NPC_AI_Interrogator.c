@@ -151,9 +151,9 @@ void Interrogator_MaintainHeight( void )
 		dif = (NPC->enemy->r.currentOrigin.z + NPC->enemy->r.maxs.z) - NPC->r.currentOrigin.z;
 
 		// cap to prevent dramatic height shifts
-		if ( fabs( dif ) > 2 )
+		if ( fabsf( dif ) > 2 )
 		{
-			if ( fabs( dif ) > 16 )
+			if ( fabsf( dif ) > 16 )
 			{
 				dif = ( dif < 0 ? -16 : 16 );
 			}
@@ -177,7 +177,7 @@ void Interrogator_MaintainHeight( void )
 		{
 			dif = goal->r.currentOrigin.z - NPC->r.currentOrigin.z;
 
-			if ( fabs( dif ) > 24 )
+			if ( fabsf( dif ) > 24 )
 			{
 				ucmd.upmove = ( ucmd.upmove < 0 ? -4 : 4 );
 			}
@@ -187,7 +187,7 @@ void Interrogator_MaintainHeight( void )
 				{
 					NPC->client->ps.velocity.z *= VELOCITY_DECAY;
 
-					if ( fabs( NPC->client->ps.velocity.z ) < 2 )
+					if ( fabsf( NPC->client->ps.velocity.z ) < 2 )
 					{
 						NPC->client->ps.velocity.z = 0;
 					}
@@ -199,7 +199,7 @@ void Interrogator_MaintainHeight( void )
 		{
 			NPC->client->ps.velocity.z *= VELOCITY_DECAY;
 
-			if ( fabs( NPC->client->ps.velocity.z ) < 1 )
+			if ( fabsf( NPC->client->ps.velocity.z ) < 1 )
 			{
 				NPC->client->ps.velocity.z = 0;
 			}
@@ -211,7 +211,7 @@ void Interrogator_MaintainHeight( void )
 	{
 		NPC->client->ps.velocity.x *= VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.x ) < 1 )
+		if ( fabsf( NPC->client->ps.velocity.x ) < 1 )
 		{
 			NPC->client->ps.velocity.x = 0;
 		}
@@ -221,7 +221,7 @@ void Interrogator_MaintainHeight( void )
 	{
 		NPC->client->ps.velocity.y *= VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.y ) < 1 )
+		if ( fabsf( NPC->client->ps.velocity.y ) < 1 )
 		{
 			NPC->client->ps.velocity.y = 0;
 		}
@@ -263,7 +263,7 @@ void Interrogator_Strafe( void )
 			dif = (NPC->enemy->r.currentOrigin.z + 32) - NPC->r.currentOrigin.z;
 
 			// cap to prevent dramatic height shifts
-			if ( fabs( dif ) > 8 )
+			if ( fabsf( dif ) > 8 )
 			{
 				dif = ( dif < 0 ? -HUNTER_UPWARD_PUSH : HUNTER_UPWARD_PUSH );
 			}

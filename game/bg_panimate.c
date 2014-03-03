@@ -1602,14 +1602,14 @@ int BG_AnimLength( int index, animNumber_t anim )
 		return -1;
 	}
 
-	return bgAllAnims[index].anims[anim].numFrames * fabs((float)(bgAllAnims[index].anims[anim].frameLerp));
+	return bgAllAnims[index].anims[anim].numFrames * fabsf((float)(bgAllAnims[index].anims[anim].frameLerp));
 }
 
 //just use whatever pm->animations is
 int PM_AnimLength( int index, animNumber_t anim ) {
 	if ( anim >= MAX_ANIMATIONS || !pm->animations )
 		return -1;
-	return pm->animations[anim].numFrames * fabs( (float)(pm->animations[anim].frameLerp) );
+	return pm->animations[anim].numFrames * fabsf( (float)(pm->animations[anim].frameLerp) );
 }
 
 void PM_DebugLegsAnim(int anim)
@@ -2847,7 +2847,7 @@ void BG_SetAnimFinal(playerState_t *ps, animation_t *animations,
 				int dur;
 				int speedDif;
 
-				dur = (animations[anim].numFrames-1) * fabs((float)(animations[anim].frameLerp));
+				dur = (animations[anim].numFrames-1) * fabsf((float)(animations[anim].frameLerp));
 				speedDif = dur - (dur * editAnimSpeed);
 				dur += speedDif;
 				if (dur > 1)
@@ -2856,17 +2856,17 @@ void BG_SetAnimFinal(playerState_t *ps, animation_t *animations,
 				}
 				else
 				{
-					ps->torsoTimer = fabs((float)(animations[anim].frameLerp));
+					ps->torsoTimer = fabsf((float)(animations[anim].frameLerp));
 				}
 			}
 			else
 			{
-				ps->torsoTimer = ((animations[anim].numFrames ) * fabs((float)(animations[anim].frameLerp)));
+				ps->torsoTimer = ((animations[anim].numFrames ) * fabsf((float)(animations[anim].frameLerp)));
 			}
 
 			if (ps->fd.forcePowersActive & (1 << FP_RAGE))
 			{
-				ps->torsoTimer /= 1.7;
+				ps->torsoTimer /= 1.7f;
 			}
 		}
 	}
@@ -2898,7 +2898,7 @@ setAnimLegs:
 				int speedDif;
 
 
-				dur = (animations[anim].numFrames-1) * fabs((float)(animations[anim].frameLerp));
+				dur = (animations[anim].numFrames-1) * fabsf((float)(animations[anim].frameLerp));
 				speedDif = dur - (dur * editAnimSpeed);
 				dur += speedDif;
 				if (dur > 1)
@@ -2907,12 +2907,12 @@ setAnimLegs:
 				}
 				else
 				{
-					ps->legsTimer = fabs((float)(animations[anim].frameLerp));
+					ps->legsTimer = fabsf((float)(animations[anim].frameLerp));
 				}
 			}
 			else
 			{
-				ps->legsTimer = ((animations[anim].numFrames ) * fabs((float)(animations[anim].frameLerp)));
+				ps->legsTimer = ((animations[anim].numFrames ) * fabsf((float)(animations[anim].frameLerp)));
 			}
 
 			if (PM_RunningAnim(anim) ||
@@ -2920,11 +2920,11 @@ setAnimLegs:
 			{
 				if (ps->fd.forcePowersActive & (1 << FP_RAGE))
 				{
-					ps->legsTimer /= 1.3;
+					ps->legsTimer /= 1.3f;
 				}
 				else if (ps->fd.forcePowersActive & (1 << FP_SPEED))
 				{
-					ps->legsTimer /= 1.7;
+					ps->legsTimer /= 1.7f;
 				}
 			}
 		}
@@ -3069,7 +3069,7 @@ float BG_GetTorsoAnimPoint(playerState_t * ps, int AnimIndex)
 
 	if( animSpeedFactor > 0 )
 	{
-		attackAnimLength = (bgAllAnims[AnimIndex].anims[ps->legsAnim].numFrames-1) * fabs((float)(bgAllAnims[AnimIndex].anims[ps->legsAnim].frameLerp)) * (1/animSpeedFactor);
+		attackAnimLength = (bgAllAnims[AnimIndex].anims[ps->legsAnim].numFrames-1) * fabsf((float)(bgAllAnims[AnimIndex].anims[ps->legsAnim].frameLerp)) * (1/animSpeedFactor);
 		attackAnimLength--;
 	}
 
@@ -3096,7 +3096,7 @@ float BG_GetLegsAnimPoint(playerState_t * ps, int AnimIndex)
 
 	if( animSpeedFactor > 0 )
 	{
-		attackAnimLength = (bgAllAnims[AnimIndex].anims[ps->legsAnim].numFrames-1) * fabs((float)(bgAllAnims[AnimIndex].anims[ps->legsAnim].frameLerp)) * (1/animSpeedFactor);
+		attackAnimLength = (bgAllAnims[AnimIndex].anims[ps->legsAnim].numFrames-1) * fabsf((float)(bgAllAnims[AnimIndex].anims[ps->legsAnim].frameLerp)) * (1/animSpeedFactor);
 		attackAnimLength--;
 	}
 

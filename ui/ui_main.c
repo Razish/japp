@@ -1041,6 +1041,7 @@ char *GetMenuBuffer(const char *filename) {
 
 qboolean Asset_Parse(int handle) {
 	pc_token_t token;
+	const char *s = NULL;
 
 	if (!trap->PC_ReadToken(handle, &token))
 		return qfalse;
@@ -1229,62 +1230,12 @@ qboolean Asset_Parse(int handle) {
 
 			continue;
 		}
-		if (Q_stricmp(token.string, "datapadmoveSaberSound1") == 0)
-		{
-			if (trap->PC_ReadToken(handle,&token))
-			{
-				uiInfo.uiDC.Assets.datapadmoveSaberSound1 = trap->S_RegisterSound( token.string );
-			}
 
-			continue;
-		}
-
-		if (Q_stricmp(token.string, "datapadmoveSaberSound2") == 0)
-		{
-			if (trap->PC_ReadToken(handle,&token))
-			{
-				uiInfo.uiDC.Assets.datapadmoveSaberSound2 = trap->S_RegisterSound( token.string );
-			}
-
-			continue;
-		}
-
-		if (Q_stricmp(token.string, "datapadmoveSaberSound3") == 0)
-		{
-			if (trap->PC_ReadToken(handle,&token))
-			{
-				uiInfo.uiDC.Assets.datapadmoveSaberSound3 = trap->S_RegisterSound( token.string );
-			}
-
-			continue;
-		}
-
-		if (Q_stricmp(token.string, "datapadmoveSaberSound4") == 0)
-		{
-			if (trap->PC_ReadToken(handle,&token))
-			{
-				uiInfo.uiDC.Assets.datapadmoveSaberSound4 = trap->S_RegisterSound( token.string );
-			}
-
-			continue;
-		}
-
-		if (Q_stricmp(token.string, "datapadmoveSaberSound5") == 0)
-		{
-			if (trap->PC_ReadToken(handle,&token))
-			{
-				uiInfo.uiDC.Assets.datapadmoveSaberSound5 = trap->S_RegisterSound( token.string );
-			}
-
-			continue;
-		}
-
-		if (Q_stricmp(token.string, "datapadmoveSaberSound6") == 0)
-		{
-			if (trap->PC_ReadToken(handle,&token))
-			{
-				uiInfo.uiDC.Assets.datapadmoveSaberSound6 = trap->S_RegisterSound( token.string );
-			}
+		s = "datapadmoveSaberSound";
+		if ( !Q_stricmpn( token.string, s, strlen( s ) ) ) {
+			int i = '0' - s[strlen(s)];
+			if ( i >= 0 && i <= 5 && trap->PC_ReadToken( handle, &token ) )
+				uiInfo.uiDC.Assets.datapadmoveSaberSound[i] = trap->S_RegisterSound( token.string );
 
 			continue;
 		}
@@ -1877,9 +1828,9 @@ static void UI_DrawTeamMember(rectDef_t *rect, float scale, const vector4 *color
 
 	if (numval > maxcl)
 	{
-		finalColor.r *= 0.5;
-		finalColor.g *= 0.5;
-		finalColor.b *= 0.5;
+		finalColor.r *= 0.5f;
+		finalColor.g *= 0.5f;
+		finalColor.b *= 0.5f;
 
 		value = -1;
 	}
@@ -2540,11 +2491,11 @@ static void UI_DrawServerRefreshDate(rectDef_t *rect, float scale, const vector4
 	if (uiInfo.serverStatus.refreshActive)
 	{
 		vector4 lowLight, newColor;
-		lowLight.r = 0.8 * color->r;
-		lowLight.g = 0.8 * color->g;
-		lowLight.b = 0.8 * color->b;
-		lowLight.a = 0.8 * color->a;
-		LerpColor(color,&lowLight,&newColor,0.5+0.5*sin((float)(uiInfo.uiDC.realTime / PULSE_DIVISOR)));
+		lowLight.r = 0.8f * color->r;
+		lowLight.g = 0.8f * color->g;
+		lowLight.b = 0.8f * color->b;
+		lowLight.a = 0.8f * color->a;
+		LerpColor(color,&lowLight,&newColor,0.5f+0.5f*sin((float)(uiInfo.uiDC.realTime / PULSE_DIVISOR)));
 
 		trap->SE_GetStringTextString("MP_INGAME_GETTINGINFOFORSERVERS", holdSPString, sizeof(holdSPString));
 		Text_Paint(rect->x, rect->y, scale, &newColor, va((char *) holdSPString, trap->LAN_GetServerCount(ui_netSource.integer)), 0, 0, textStyle, iMenuFont);
@@ -6531,7 +6482,7 @@ static void UI_RunMenuScript(char **args)
 				item = (itemDef_t *) Menu_FindItemByName((menuDef_t *) menu, "maplist");
 				if (item)
 				{
-					uiInfo.uiDC.feederSelection(item->special, item->cursorPos, item);
+					uiInfo.uiDC.feederSelection(item->special.i, item->cursorPos, item);
 				}
 			}
 		}
@@ -7331,201 +7282,158 @@ static void UI_BuildServerStatus(qboolean force) {
 UI_FeederCount
 ==================
 */
-static int UI_FeederCount(float feederID)
-{
-	int team,baseClass,count=0,i;
+static int UI_FeederCount( int feederID ) {
+	int team, baseClass, count=0, i;
 	static char info[MAX_STRING_CHARS];
 
-	switch ( (int)feederID )
-	{
-		case FEEDER_SABER_SINGLE_INFO:
-
-			for (i=0;i<MAX_SABER_HILTS;i++)
-			{
-				if (saberSingleHiltInfo[i])
-				{
-					count++;
-				}
-				else
-				{//done
-					break;
-				}
-			}
-			return count;
-
-		case FEEDER_SABER_STAFF_INFO:
-
-			for (i=0;i<MAX_SABER_HILTS;i++)
-			{
-				if (saberStaffHiltInfo[i])
-				{
-					count++;
-				}
-				else
-				{//done
-					break;
-				}
-			}
-			return count;
-
-		case FEEDER_Q3HEADS:
-			return UI_HeadCountByColor();
-
-		case FEEDER_SIEGE_TEAM1:
-			if (!siegeTeam1)
-			{
-				UI_SetSiegeTeams();
-				if (!siegeTeam1)
-				{
-					return 0;
-				}
-			}
-			return siegeTeam1->numClasses;
-		case FEEDER_SIEGE_TEAM2:
-			if (!siegeTeam2)
-			{
-				UI_SetSiegeTeams();
-				if (!siegeTeam2)
-				{
-					return 0;
-				}
-			}
-			return siegeTeam2->numClasses;
-
-		case FEEDER_FORCECFG:
-			if (uiForceSide == FORCESIDE_LIGHT)
-			{
-				return uiInfo.forceConfigCount-uiInfo.forceConfigLightIndexBegin;
-			}
+	switch ( feederID ) {
+	case FEEDER_SABER_SINGLE_INFO:
+		for ( i=0; i<MAX_SABER_HILTS; i++ ) {
+			if ( saberSingleHiltInfo[i] )
+				count++;
 			else
+				break;
+		}
+		return count;
+
+	case FEEDER_SABER_STAFF_INFO:
+		for ( i=0; i<MAX_SABER_HILTS; i++ ) {
+			if ( saberStaffHiltInfo[i] )
+				count++;
+			else
+				break;
+		}
+		return count;
+
+	case FEEDER_Q3HEADS:
+		return UI_HeadCountByColor();
+
+	case FEEDER_SIEGE_TEAM1:
+		if ( !siegeTeam1 ) {
+			UI_SetSiegeTeams();
+			if ( !siegeTeam1 )
+				return 0;
+		}
+		return siegeTeam1->numClasses;
+
+	case FEEDER_SIEGE_TEAM2:
+		if ( !siegeTeam2 ) {
+			UI_SetSiegeTeams();
+			if ( !siegeTeam2 )
+				return 0;
+		}
+		return siegeTeam2->numClasses;
+
+	case FEEDER_FORCECFG:
+		if ( uiForceSide == FORCESIDE_LIGHT )
+			return uiInfo.forceConfigCount-uiInfo.forceConfigLightIndexBegin;
+		else
+			return uiInfo.forceConfigLightIndexBegin+1;
+
+	case FEEDER_CINEMATICS:
+		return 0;
+
+	case FEEDER_MAPS:
+	case FEEDER_ALLMAPS:
+		return UI_MapCountByGameType( feederID == FEEDER_MAPS ? qtrue : qfalse );
+
+	case FEEDER_SERVERS:
+		return uiInfo.serverStatus.numDisplayServers;
+
+	case FEEDER_SERVERSTATUS:
+		return Q_clampi( 0, uiInfo.serverStatusInfo.numLines, MAX_SERVERSTATUS_LINES );
+
+	case FEEDER_FINDPLAYER:
+		return uiInfo.numFoundPlayerServers;
+
+	case FEEDER_PLAYER_LIST:
+		if ( uiInfo.uiDC.realTime > uiInfo.playerRefresh ) {
+			uiInfo.playerRefresh = uiInfo.uiDC.realTime + 3000;
+			UI_BuildPlayerList();
+		}
+		return uiInfo.playerCount;
+
+	case FEEDER_MODS:
+		return uiInfo.modCount;
+
+	case FEEDER_DEMOS:
+		return uiInfo.demoCount;
+
+	case FEEDER_MOVES :
+		for ( i=0; i<MAX_MOVES ;i++ ) {
+			if ( datapadMoveData[uiInfo.movesTitleIndex][i].title )
+				count++;
+		}
+		return count;
+
+	case FEEDER_MOVES_TITLES :
+		return MD_MOVE_TITLE_MAX;
+
+	case FEEDER_PLAYER_SPECIES:
+		return uiInfo.playerSpeciesCount;
+
+	case FEEDER_PLAYER_SKIN_HEAD:
+		return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount;
+
+	case FEEDER_PLAYER_SKIN_TORSO:
+		return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount;
+
+	case FEEDER_PLAYER_SKIN_LEGS:
+		return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount;
+
+	case FEEDER_COLORCHOICES:
+		return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount;
+
+	case FEEDER_SIEGE_BASE_CLASS:
+		team = (int)trap->Cvar_VariableValue( "ui_team" );
+		baseClass = (int)trap->Cvar_VariableValue( "ui_siege_class" );
+
+		if ( team == SIEGETEAM_TEAM1 || team == SIEGETEAM_TEAM2 ) {
+			// Is it a valid base class?
+			if ( baseClass >= SPC_INFANTRY && baseClass < SPC_MAX )
+				return BG_SiegeCountBaseClass( team, baseClass );
+		}
+		return 0;
+
+	// Get the count of weapons
+	case FEEDER_SIEGE_CLASS_WEAPONS:
+		//count them up
+		for ( i=0; i<WP_NUM_WEAPONS; i++ ) {
+			trap->Cvar_VariableStringBuffer( va( "ui_class_weapon%i", i ), info, sizeof( info ) );
+			if ( Q_stricmp( info, "gfx/2d/select" ) )
+				count++;
+		}
+		return count;
+
+	// Get the count of inventory
+	case FEEDER_SIEGE_CLASS_INVENTORY:
+		//count them up
+		for ( i=0; i<HI_NUM_HOLDABLE; i++ ) {
+			trap->Cvar_VariableStringBuffer( va( "ui_class_item%i", i ), info, sizeof( info ) );
+			// A hack so health and ammo dispenser icons don't show up.
+			if ( Q_stricmp( info,"gfx/2d/select" ) && Q_stricmp( info,"gfx/hud/i_icon_healthdisp" )
+				&& Q_stricmp( info,"gfx/hud/i_icon_ammodisp" ) )
 			{
-				return uiInfo.forceConfigLightIndexBegin+1;
+				count++;
 			}
-			//return uiInfo.forceConfigCount;
+		}
+		return count;
 
-		case FEEDER_CINEMATICS:
-			return 0;
-
-		case FEEDER_MAPS:
-		case FEEDER_ALLMAPS:
-			return UI_MapCountByGameType(feederID == FEEDER_MAPS ? qtrue : qfalse);
-
-		case FEEDER_SERVERS:
-			return uiInfo.serverStatus.numDisplayServers;
-
-		case FEEDER_SERVERSTATUS:
-			return Q_clampi( 0, uiInfo.serverStatusInfo.numLines, MAX_SERVERSTATUS_LINES );
-
-		case FEEDER_FINDPLAYER:
-			return uiInfo.numFoundPlayerServers;
-
-		case FEEDER_PLAYER_LIST:
-			if (uiInfo.uiDC.realTime > uiInfo.playerRefresh)
-			{
-				uiInfo.playerRefresh = uiInfo.uiDC.realTime + 3000;
-				UI_BuildPlayerList();
-			}
-			return uiInfo.playerCount;
-
-		case FEEDER_MODS:
-			return uiInfo.modCount;
-
-		case FEEDER_DEMOS:
-			return uiInfo.demoCount;
-
-		case FEEDER_MOVES :
-
-			for (i=0;i<MAX_MOVES;i++)
-			{
-				if (datapadMoveData[uiInfo.movesTitleIndex][i].title)
-				{
-					count++;
-				}
-			}
-
-			return count;
-
-		case FEEDER_MOVES_TITLES :
-			return (MD_MOVE_TITLE_MAX);
-
-		case FEEDER_PLAYER_SPECIES:
-			return uiInfo.playerSpeciesCount;
-
-		case FEEDER_PLAYER_SKIN_HEAD:
-			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount;
-
-		case FEEDER_PLAYER_SKIN_TORSO:
-			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount;
-
-		case FEEDER_PLAYER_SKIN_LEGS:
-			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount;
-
-		case FEEDER_COLORCHOICES:
-			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount;
-
-		case FEEDER_SIEGE_BASE_CLASS:
-			team = (int)trap->Cvar_VariableValue("ui_team");
-			baseClass = (int)trap->Cvar_VariableValue("ui_siege_class");
-
-			if ((team == SIEGETEAM_TEAM1) ||
-				(team == SIEGETEAM_TEAM2))
-			{
-				// Is it a valid base class?
-				if ((baseClass >= SPC_INFANTRY) && (baseClass < SPC_MAX))
-				{
-					return (BG_SiegeCountBaseClass( team, baseClass ));
-				}
-			}
-			return 0;
-
-		// Get the count of weapons
-		case FEEDER_SIEGE_CLASS_WEAPONS:
-			//count them up
-			for (i=0;i< WP_NUM_WEAPONS;i++)
-			{
-				trap->Cvar_VariableStringBuffer( va("ui_class_weapon%i", i), info, sizeof(info) );
-				if (Q_stricmp(info,"gfx/2d/select")!=0)
-				{
-					count++;
-				}
-			}
-
-			return count;
-
-		// Get the count of inventory
-		case FEEDER_SIEGE_CLASS_INVENTORY:
-			//count them up
-			for (i=0;i< HI_NUM_HOLDABLE;i++)
-			{
-				trap->Cvar_VariableStringBuffer( va("ui_class_item%i", i), info, sizeof(info) );
-				// A hack so health and ammo dispenser icons don't show up.
-				if ((Q_stricmp(info,"gfx/2d/select")!=0) &&
-					(Q_stricmp(info,"gfx/hud/i_icon_healthdisp")!=0) &&
-					(Q_stricmp(info,"gfx/hud/i_icon_ammodisp")!=0))
-				{
-					count++;
-				}
-			}
-			return count;
-
-		// Get the count of force powers
-		case FEEDER_SIEGE_CLASS_FORCE:
-			//count them up
-			for (i=0;i< NUM_FORCE_POWERS;i++)
-			{
-				trap->Cvar_VariableStringBuffer( va("ui_class_power%i", i), info, sizeof(info) );
-				if (Q_stricmp(info,"gfx/2d/select")!=0)
-				{
-					count++;
-				}
-			}
-			return count;
+	// Get the count of force powers
+	case FEEDER_SIEGE_CLASS_FORCE:
+		//count them up
+		for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
+			trap->Cvar_VariableStringBuffer( va( "ui_class_power%i", i ), info, sizeof( info ) );
+			if ( Q_stricmp( info, "gfx/2d/select" ) )
+				count++;
+		}
+		return count;
 	}
 
 	return 0;
 }
 
-static const char *UI_SelectedMap(int index, int *actual) {
+static const char *UI_SelectedMap( int index, int *actual ) {
 	int i, c;
 	c = 0;
 	*actual = 0;
@@ -7614,597 +7522,438 @@ static void UI_UpdatePendingPings( void ) {
 	uiInfo.serverStatus.refreshtime = uiInfo.uiDC.realTime + 1000;
 }
 
-static const char *UI_FeederItemText(float feederID, int index, int column,
-									 qhandle_t *handle1, qhandle_t *handle2, qhandle_t *handle3) {
-	static char info[MAX_STRING_CHARS]; // don't change this size without changing the sizes inside the SaberProperName calls
-	static char hostname[MAX_HOSTNAMELENGTH];
-	static char clientBuff[32];
-	static char needPass[32];
+static const char *UI_FeederItemText( int feederID, int index, int column, qhandle_t *handle1, qhandle_t *handle2,
+	qhandle_t *handle3 )
+{
+	static char info[MAX_STRING_CHARS], hostname[MAX_HOSTNAMELENGTH], clientBuff[32];
 	static int lastColumn = -1;
 	static int lastTime = 0;
+
 	*handle1 = *handle2 = *handle3 = -1;
 
-	if (feederID == FEEDER_SABER_SINGLE_INFO)
-	{
-		//char *saberProperName=0;
+	switch ( feederID ) {
+	case FEEDER_SABER_SINGLE_INFO:
 		UI_SaberProperNameForSaber( saberSingleHiltInfo[index], info, sizeof( info ) );
 		return info;
-	}
-	else if	(feederID == FEEDER_SABER_STAFF_INFO)
-	{
-		//char *saberProperName=0;
+
+	case FEEDER_SABER_STAFF_INFO:
 		UI_SaberProperNameForSaber( saberStaffHiltInfo[index], info, sizeof( info ) );
 		return info;
-	}
-	else if (feederID == FEEDER_Q3HEADS) {
+
+	case FEEDER_Q3HEADS:
+	{
 		int actual;
-		return UI_SelectedTeamHead(index, &actual);
+		return UI_SelectedTeamHead( index, &actual );
 	}
-	else if (feederID == FEEDER_SIEGE_TEAM1)
-	{
-		return ""; //nothing I guess, the description part can cover this
-		/*
-		if (!siegeTeam1)
-		{
-			UI_SetSiegeTeams();
-			if (!siegeTeam1)
-			{
-				return "";
-			}
-		}
 
-		if (siegeTeam1->classes[index])
-		{
-			return siegeTeam1->classes[index]->name;
-		}
+	case FEEDER_SIEGE_TEAM1:
+	case FEEDER_SIEGE_TEAM2:
 		return "";
-		*/
-	}
-	else if (feederID == FEEDER_SIEGE_TEAM2)
-	{
-		return ""; //nothing I guess, the description part can cover this
-		/*
-		if (!siegeTeam1)
-		{
-			UI_SetSiegeTeams();
-			if (!siegeTeam1)
-			{
-				return "";
-			}
-		}
 
-		if (siegeTeam2->classes[index])
-		{
-			return siegeTeam2->classes[index]->name;
-		}
-		return "";
-		*/
-	}
-	else if (feederID == FEEDER_FORCECFG) {
-		if (index >= 0 && index < uiInfo.forceConfigCount) {
-			if (index == 0)
-			{ //always show "custom"
+	case FEEDER_FORCECFG:
+		if ( index >= 0 && index < uiInfo.forceConfigCount ) {
+			if ( index == 0 )
 				return uiInfo.forceConfigNames[index];
-			}
-			else
-			{
-				if (uiForceSide == FORCESIDE_LIGHT)
-				{
+			else {
+				if ( uiForceSide == FORCESIDE_LIGHT ) {
 					index += uiInfo.forceConfigLightIndexBegin;
-					if (index < 0)
-					{
+					if ( index < 0 )
 						return NULL;
-					}
-					if (index >= uiInfo.forceConfigCount)
-					{
+					if ( index >= uiInfo.forceConfigCount )
 						return NULL;
-					}
 					return uiInfo.forceConfigNames[index];
 				}
-				else if (uiForceSide == FORCESIDE_DARK)
-				{
+				else if ( uiForceSide == FORCESIDE_DARK ) {
 					index += uiInfo.forceConfigDarkIndexBegin;
-					if (index < 0)
-					{
+					if ( index < 0 )
 						return NULL;
-					}
-					if (index > uiInfo.forceConfigLightIndexBegin)
-					{ //dark gets read in before light
+					if ( index > uiInfo.forceConfigLightIndexBegin )
 						return NULL;
-					}
-					if (index >= uiInfo.forceConfigCount)
-					{
+					if ( index >= uiInfo.forceConfigCount )
 						return NULL;
-					}
 					return uiInfo.forceConfigNames[index];
 				}
 				else
-				{
 					return NULL;
-				}
 			}
 		}
-	} else if (feederID == FEEDER_MAPS || feederID == FEEDER_ALLMAPS) {
+		break;
+
+	case FEEDER_MAPS:
+	case FEEDER_ALLMAPS:
+	{
 		int actual;
-		return UI_SelectedMap(index, &actual);
-	} else if (feederID == FEEDER_SERVERS) {
-		if (index >= 0 && index < uiInfo.serverStatus.numDisplayServers) {
+		return UI_SelectedMap( index, &actual );
+	}
+
+	case FEEDER_SERVERS:
+		if ( index >= 0 && index < uiInfo.serverStatus.numDisplayServers ) {
 			int ping, game;
-			if (lastColumn != column || lastTime > uiInfo.uiDC.realTime + 5000) {
-				trap->LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS);
+			if ( lastColumn != column || lastTime > uiInfo.uiDC.realTime + 5000 ) {
+				trap->LAN_GetServerInfo( ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, sizeof( info ) );
 				lastColumn = column;
 				lastTime = uiInfo.uiDC.realTime;
 			}
-			ping = atoi(Info_ValueForKey(info, "ping"));
-			if (ping == -1) {
-				// if we ever see a ping that is out of date, do a server refresh
-				// UI_UpdatePendingPings();
-			}
-			switch (column) {
-				case SORT_HOST :
-					if (ping <= 0) {
-						return Info_ValueForKey(info, "addr");
-					} else {
-						int gametype = atoi( Info_ValueForKey( info, "gametype" ) );
-						//check for password
-						if ( atoi(Info_ValueForKey(info, "needpass")) )
-						{
-							*handle3 = uiInfo.uiDC.Assets.needPass;
+			ping = atoi( Info_ValueForKey( info, "ping" ) );
+			// if we ever see a ping that is out of date, do a server refresh
+		//	if ( ping == -1 )
+		//		UI_UpdatePendingPings();
+
+			switch ( column ) {
+			case SORT_HOST:
+				if ( ping <= 0 ) {
+					return Info_ValueForKey( info, "addr" );
+				}
+				else {
+					int gametype = atoi( Info_ValueForKey( info, "gametype" ) );
+					//check for password
+					if ( atoi( Info_ValueForKey( info, "needpass" ) ) )
+						*handle3 = uiInfo.uiDC.Assets.needPass;
+					//check for saberonly and restricted force powers
+					if ( gametype != GT_JEDIMASTER ) {
+						qboolean saberOnly = qtrue, restrictedForce = qfalse, allForceDisabled = qfalse;
+						int wDisable, i;
+
+						//check force
+						restrictedForce = atoi( Info_ValueForKey( info, "fdisable" ) );
+						if ( UI_AllForceDisabled( restrictedForce ) ) {
+							// all force powers are disabled
+							allForceDisabled = qtrue;
+							*handle2 = uiInfo.uiDC.Assets.noForce;
 						}
-						//check for saberonly and restricted force powers
-						if ( gametype != GT_JEDIMASTER )
-						{
-							qboolean saberOnly = qtrue;
-							qboolean restrictedForce = qfalse;
-							qboolean allForceDisabled = qfalse;
-							int wDisable, i = 0;
+						else if ( restrictedForce )
+							*handle2 = uiInfo.uiDC.Assets.forceRestrict;
 
-							//check force
-							restrictedForce = atoi(Info_ValueForKey(info, "fdisable"));
-							if ( UI_AllForceDisabled( restrictedForce ) )
-							{//all force powers are disabled
-								allForceDisabled = qtrue;
-								*handle2 = uiInfo.uiDC.Assets.noForce;
-							}
-							else if ( restrictedForce )
-							{//at least one force power is disabled
-								*handle2 = uiInfo.uiDC.Assets.forceRestrict;
-							}
+						//check weaps
+						wDisable = atoi( Info_ValueForKey( info, "wdisable" ) );
 
-							//check weaps
-							wDisable = atoi(Info_ValueForKey(info, "wdisable"));
-
-							while ( i < WP_NUM_WEAPONS )
-							{
-								if ( !(wDisable & (1 << i)) && i != WP_SABER && i != WP_NONE )
-								{
-									saberOnly = qfalse;
-								}
-
-								i++;
-							}
-							if ( saberOnly )
-							{
-								*handle1 = uiInfo.uiDC.Assets.saberOnly;
-							}
-							else if ( atoi(Info_ValueForKey(info, "truejedi")) != 0 )
-							{
-								if ( gametype != GT_HOLOCRON
-									&& gametype != GT_JEDIMASTER
-									&& !saberOnly
-									&& !allForceDisabled )
-								{//truejedi is on and allowed in this mode
-									*handle1 = uiInfo.uiDC.Assets.trueJedi;
-								}
-							}
+						for ( i=0; i<WP_NUM_WEAPONS; i++ ) {
+							if ( !(wDisable & (1<<i)) && i != WP_SABER && i != WP_NONE )
+								saberOnly = qfalse;
 						}
-						if ( ui_netSource.integer == AS_LOCAL ) {
-							int nettype = atoi(Info_ValueForKey(info, "nettype"));
-
-							if (nettype < 0 || nettype >= numNetNames) {
-								nettype = 0;
-							}
-
-							Com_sprintf( hostname, sizeof(hostname), "%s [%s]",
-											Info_ValueForKey(info, "hostname"),
-											netNames[nettype] );
-							return hostname;
-						}
-						else {
-							if (atoi(Info_ValueForKey(info, "sv_allowAnonymous")) != 0) {				// anonymous server
-								Com_sprintf( hostname, sizeof(hostname), "(A) %s",
-												Info_ValueForKey(info, "hostname"));
-							} else {
-								Com_sprintf( hostname, sizeof(hostname), "%s",
-												Info_ValueForKey(info, "hostname"));
-							}
-							return hostname;
+						if ( saberOnly )
+							*handle1 = uiInfo.uiDC.Assets.saberOnly;
+						else if ( atoi( Info_ValueForKey( info, "truejedi" ) ) ) {
+							// truejedi is on and allowed in this mode
+							if ( gametype != GT_HOLOCRON && gametype != GT_JEDIMASTER && !saberOnly && !allForceDisabled )
+								*handle1 = uiInfo.uiDC.Assets.trueJedi;
 						}
 					}
-				case SORT_MAP :
-					return Info_ValueForKey(info, "mapname");
-				case SORT_CLIENTS :
-					Com_sprintf( clientBuff, sizeof(clientBuff), "%s (%s)", Info_ValueForKey(info, "clients"), Info_ValueForKey(info, "sv_maxclients"));
-					return clientBuff;
-				case SORT_GAME :
-					game = atoi(Info_ValueForKey(info, "gametype"));
-					if (game >= 0 && game < (signed)numGameTypes) {
-						strcpy(needPass,gameTypes[game]);
-					} else {
-						if (ping <= 0)
-						{
-							strcpy(needPass,"Inactive");
-						}
-						strcpy(needPass,"Unknown");
-					}
+					if ( ui_netSource.integer == AS_LOCAL ) {
+						int nettype = atoi( Info_ValueForKey( info, "nettype" ) );
 
-					return needPass;
-				case SORT_PING :
-					if (ping <= 0) {
-						return "...";
-					} else {
-						return Info_ValueForKey(info, "ping");
+						if ( nettype < 0 || nettype >= numNetNames )
+							nettype = 0;
+
+						Com_sprintf( hostname, sizeof( hostname ), "%s [%s]", Info_ValueForKey( info, "hostname" ),
+							netNames[nettype] );
+						return hostname;
 					}
+					else {
+						if ( atoi( Info_ValueForKey( info, "sv_allowAnonymous" ) ) )
+							Com_sprintf( hostname, sizeof( hostname ), "(A) %s", Info_ValueForKey( info, "hostname" ) );
+						else
+							Q_strncpyz( hostname, Info_ValueForKey( info, "hostname" ), sizeof( hostname ) );
+						return hostname;
+					}
+				}
+			case SORT_MAP:
+				return Info_ValueForKey( info, "mapname" );
+
+			case SORT_CLIENTS:
+				Com_sprintf( clientBuff, sizeof( clientBuff ), "%s (%s)", Info_ValueForKey( info, "clients" ),
+					Info_ValueForKey( info, "sv_maxclients" ) );
+				return clientBuff;
+
+			case SORT_GAME:
+				game = atoi( Info_ValueForKey( info, "gametype" ) );
+				if ( game >= 0 && game < (signed)numGameTypes )
+					return gameTypes[game];
+				else {
+					if ( ping <= 0 )
+						return "Inactive";
+					return "Unknown";
+				}
+
+			case SORT_PING :
+				if ( ping <= 0 )
+					return "...";
+				else
+					return Info_ValueForKey( info, "ping" );
 			}
 		}
-	} else if (feederID == FEEDER_SERVERSTATUS) {
+		break;
+
+	case FEEDER_SERVERSTATUS:
 		if ( index >= 0 && index < uiInfo.serverStatusInfo.numLines ) {
-			if ( column >= 0 && column < 4 ) {
+			if ( column >= 0 && column < 4 )
 				return uiInfo.serverStatusInfo.lines[index][column];
-			}
 		}
-	} else if (feederID == FEEDER_FINDPLAYER) {
-		if ( index >= 0 && index < uiInfo.numFoundPlayerServers ) {
-			//return uiInfo.foundPlayerServerAddresses[index];
+		break;
+
+	case FEEDER_FINDPLAYER:
+		if ( index >= 0 && index < uiInfo.numFoundPlayerServers )
 			return uiInfo.foundPlayerServerNames[index];
-		}
-	} else if (feederID == FEEDER_PLAYER_LIST) {
-		if (index >= 0 && index < uiInfo.playerCount) {
+
+	case FEEDER_PLAYER_LIST:
+		if ( index >= 0 && index < uiInfo.playerCount )
 			return uiInfo.playerNames[index];
-		}
-	} else if (feederID == FEEDER_TEAM_LIST) {
-		if (index >= 0 && index < uiInfo.myTeamCount) {
+
+	case FEEDER_TEAM_LIST:
+		if ( index >= 0 && index < uiInfo.myTeamCount )
 			return uiInfo.teamNames[index];
-		}
-	} else if (feederID == FEEDER_MODS) {
-		if (index >= 0 && index < uiInfo.modCount) {
-			if (uiInfo.modList[index].modDescr && *uiInfo.modList[index].modDescr) {
+
+	case FEEDER_MODS:
+		if ( index >= 0 && index < uiInfo.modCount ) {
+			if ( uiInfo.modList[index].modDescr && *uiInfo.modList[index].modDescr )
 				return uiInfo.modList[index].modDescr;
-			} else {
+			else
 				return uiInfo.modList[index].modName;
-			}
 		}
-	} else if (feederID == FEEDER_CINEMATICS) {
+		break;
+
+	case FEEDER_CINEMATICS:
 		return 0;
-	} else if (feederID == FEEDER_DEMOS) {
-		if (index >= 0 && index < uiInfo.demoCount) {
+
+	case FEEDER_DEMOS:
+		if ( index >= 0 && index < uiInfo.demoCount )
 			return uiInfo.demoList[index];
-		}
-	}
-	else if (feederID == FEEDER_MOVES)
-	{
+
+	case FEEDER_MOVES:
 		return datapadMoveData[uiInfo.movesTitleIndex][index].title;
-	}
-	else if (feederID == FEEDER_MOVES_TITLES)
-	{
+
+	case FEEDER_MOVES_TITLES:
 		return datapadMoveTitleData[index];
-	}
-	else if (feederID == FEEDER_PLAYER_SPECIES)
-	{
+
+	case FEEDER_PLAYER_SPECIES:
 		return uiInfo.playerSpecies[index].Name;
-	}
-	else if (feederID == FEEDER_LANGUAGES)
-	{
+
+	case FEEDER_LANGUAGES:
 		return 0;
-	}
-	else if (feederID == FEEDER_COLORCHOICES)
-	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount)
-		{
-			*handle1 = trap->R_RegisterShaderNoMip( uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorShader[index]);
+
+	case FEEDER_COLORCHOICES:
+		if ( index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount ) {
+			*handle1 = trap->R_RegisterShaderNoMip( uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorShader[index] );
 			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorShader[index];
 		}
-	}
-	else if (feederID == FEEDER_PLAYER_SKIN_HEAD)
-	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount)
-		{
-			*handle1 = trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadNames[index]));
+		break;
+
+	case FEEDER_PLAYER_SKIN_HEAD:
+		if ( index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount ) {
+			*handle1 = trap->R_RegisterShaderNoMip( va( "models/players/%s/icon_%s",
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name,
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadNames[index] ) );
 			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadNames[index];
 		}
-	}
-	else if (feederID == FEEDER_PLAYER_SKIN_TORSO)
-	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount)
-		{
-			*handle1 = trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoNames[index]));
+		break;
+
+	case FEEDER_PLAYER_SKIN_TORSO:
+		if ( index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount ) {
+			*handle1 = trap->R_RegisterShaderNoMip( va( "models/players/%s/icon_%s",
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name,
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoNames[index] ) );
 			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoNames[index];
 		}
-	}
-	else if (feederID == FEEDER_PLAYER_SKIN_LEGS)
-	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount)
-		{
-			*handle1 = trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegNames[index]));
+		break;
+
+	case FEEDER_PLAYER_SKIN_LEGS:
+		if ( index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount  ) {
+			*handle1 = trap->R_RegisterShaderNoMip( va( "models/players/%s/icon_%s",
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name,
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegNames[index] ) );
 			return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegNames[index];
 		}
-	}
-	else if (feederID == FEEDER_SIEGE_BASE_CLASS)
-	{
+		break;
+
+	case FEEDER_SIEGE_BASE_CLASS:
+	case FEEDER_SIEGE_CLASS_WEAPONS:
 		return "";
 	}
-	else if (feederID == FEEDER_SIEGE_CLASS_WEAPONS)
-	{
-		return "";
-	}
+
 	return "";
 }
 
-static qhandle_t UI_FeederItemImage(float feederID, int index) {
+static qhandle_t UI_FeederItemImage( int feederID, int index ) {
 	int	validCnt,i;
 	static char info[MAX_STRING_CHARS];
 
-	if (feederID == FEEDER_SABER_SINGLE_INFO)
-	{
+	switch ( feederID ) {
+	case FEEDER_SABER_SINGLE_INFO:
 		return 0;
-	}
-	else if (feederID == FEEDER_SABER_STAFF_INFO)
-	{
+
+	case FEEDER_SABER_STAFF_INFO:
 		return 0;
-	}
-	else if (feederID == FEEDER_Q3HEADS)
+
+	case FEEDER_Q3HEADS:
 	{
 		int actual = -1;
-		UI_SelectedTeamHead(index, &actual);
+		UI_SelectedTeamHead( index, &actual );
 		index = actual;
 
-		if (index >= 0 && index < uiInfo.q3HeadCount)
-		{ //we want it to load them as it draws them, like the TA feeder
-			  //return uiInfo.q3HeadIcons[index];
-			int selModel = trap->Cvar_VariableValue("ui_selectedModelIndex");
+		if ( index >= 0 && index < uiInfo.q3HeadCount ) {
+			// we want it to load them as it draws them, like the TA feeder
+			int selModel = trap->Cvar_VariableValue( "ui_selectedModelIndex" );
 
-			if (selModel != -1)
-			{
-				if (uiInfo.q3SelectedHead != selModel)
-				{
+			if ( selModel != -1 ) {
+				if ( uiInfo.q3SelectedHead != selModel ) {
 					uiInfo.q3SelectedHead = selModel;
-					//UI_FeederSelection(FEEDER_Q3HEADS, uiInfo.q3SelectedHead);
-					Menu_SetFeederSelection(NULL, FEEDER_Q3HEADS, selModel, NULL);
+					Menu_SetFeederSelection( NULL, FEEDER_Q3HEADS, selModel, NULL );
 				}
 			}
 
-			if (!uiInfo.q3HeadIcons[index])
-			{ //this isn't the best way of doing this I guess, but I didn't want a whole seperate string array
-			  //for storing shader names. I can't just replace q3HeadNames with the shader name, because we
-			  //print what's in q3HeadNames and the icon name would look funny.
-#if 0
-				char iconNameFromSkinName[256];
-				int i = 0;
-				int skinPlace;
-
-				i = strlen(uiInfo.q3HeadNames[index]);
-
-				while (uiInfo.q3HeadNames[index][i] != '/')
-				{
-					i--;
-				}
-
-				i++;
-				skinPlace = i; //remember that this is where the skin name begins
-
-				//now, build a full path out of what's in q3HeadNames, into iconNameFromSkinName
-				Com_sprintf(iconNameFromSkinName, sizeof(iconNameFromSkinName), "models/players/%s", uiInfo.q3HeadNames[index]);
-
-				i = strlen(iconNameFromSkinName);
-
-				while (iconNameFromSkinName[i] != '/')
-				{
-					i--;
-				}
-
-				i++;
-				iconNameFromSkinName[i] = 0; //terminate, and append..
-				Q_strcat(iconNameFromSkinName, 256, "icon_");
-
-				//and now, for the final step, append the skin name from q3HeadNames onto the end of iconNameFromSkinName
-				i = strlen(iconNameFromSkinName);
-
-				while (uiInfo.q3HeadNames[index][skinPlace])
-				{
-					iconNameFromSkinName[i] = uiInfo.q3HeadNames[index][skinPlace];
-					i++;
-					skinPlace++;
-				}
-				iconNameFromSkinName[i] = 0;
-
-				//and now we are ready to register (thankfully this will only happen once)
-				uiInfo.q3HeadIcons[index] = trap->R_RegisterShaderNoMip(iconNameFromSkinName);
-				if ( !uiInfo.q3HeadIcons[index] )
-					uiInfo.q3HeadIcons[index] = trap->R_RegisterShaderNoMip( "gfx/2d/defer.tga" );
-#endif
-			}
 			return uiInfo.q3HeadIcons[index];
 		}
+		break;
 	}
-	else if (feederID == FEEDER_SIEGE_TEAM1)
-	{
-		if (!siegeTeam1)
-		{
+
+	case FEEDER_SIEGE_TEAM1:
+		if ( !siegeTeam1 ) {
 			UI_SetSiegeTeams();
-			if (!siegeTeam1)
-			{
+			if ( !siegeTeam1 )
 				return 0;
-			}
 		}
 
-		if (siegeTeam1->classes[index])
-		{
+		if ( siegeTeam1->classes[index] )
 			return siegeTeam1->classes[index]->uiPortraitShader;
-		}
 		return 0;
-	}
-	else if (feederID == FEEDER_SIEGE_TEAM2)
-	{
-		if (!siegeTeam2)
-		{
+
+	case FEEDER_SIEGE_TEAM2:
+		if ( !siegeTeam2 ) {
 			UI_SetSiegeTeams();
-			if (!siegeTeam2)
-			{
+			if ( !siegeTeam2 )
 				return 0;
-			}
 		}
 
-		if (siegeTeam2->classes[index])
-		{
+		if ( siegeTeam2->classes[index] )
 			return siegeTeam2->classes[index]->uiPortraitShader;
-		}
 		return 0;
-	}
-	else if (feederID == FEEDER_ALLMAPS || feederID == FEEDER_MAPS)
+
+	case FEEDER_ALLMAPS:
+	case FEEDER_MAPS:
 	{
 		int actual;
-		UI_SelectedMap(index, &actual);
+		UI_SelectedMap( index, &actual );
 		index = actual;
-		if (index >= 0 && index < uiInfo.mapCount) {
-			if (uiInfo.mapList[index].levelShot == -1) {
-				uiInfo.mapList[index].levelShot = trap->R_RegisterShaderNoMip(uiInfo.mapList[index].imageName);
-			}
+		if ( index >= 0 && index < uiInfo.mapCount ) {
+			if ( uiInfo.mapList[index].levelShot == -1 )
+				uiInfo.mapList[index].levelShot = trap->R_RegisterShaderNoMip( uiInfo.mapList[index].imageName );
 			return uiInfo.mapList[index].levelShot;
 		}
-	}
-	else if (feederID == FEEDER_PLAYER_SKIN_HEAD)
-	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount)
-		{
-			//return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadIcons[index];
-			return trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadNames[index]));
-		}
-	}
-	else if (feederID == FEEDER_PLAYER_SKIN_TORSO)
-	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount)
-		{
-			//return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoIcons[index];
-			return trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoNames[index]));
-		}
-	}
-	else if (feederID == FEEDER_PLAYER_SKIN_LEGS)
-	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount)
-		{
-			//return uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegIcons[index];
-			return trap->R_RegisterShaderNoMip(va("models/players/%s/icon_%s", uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name, uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegNames[index]));
-		}
-	}
-	else if (feederID == FEEDER_COLORCHOICES)
-	{
-		if (index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount)
-		{
-			return trap->R_RegisterShaderNoMip( uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorShader[index]);
-		}
+		break;
 	}
 
-	else if ( feederID == FEEDER_SIEGE_BASE_CLASS)
+	case FEEDER_PLAYER_SKIN_HEAD:
+		if ( index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadCount ) {
+			return trap->R_RegisterShaderNoMip( va( "models/players/%s/icon_%s",
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name,
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinHeadNames[index] ) );
+		}
+		break;
+
+	case FEEDER_PLAYER_SKIN_TORSO:
+		if ( index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoCount ) {
+			return trap->R_RegisterShaderNoMip( va( "models/players/%s/icon_%s",
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name,
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinTorsoNames[index] ) );
+		}
+		break;
+
+	case FEEDER_PLAYER_SKIN_LEGS:
+		if ( index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegCount ) {
+			return trap->R_RegisterShaderNoMip( va( "models/players/%s/icon_%s",
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].Name,
+				uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].SkinLegNames[index] ) );
+		}
+		break;
+
+	case FEEDER_COLORCHOICES:
+		if ( index >= 0 && index < uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorCount ) {
+			return trap->R_RegisterShaderNoMip( uiInfo.playerSpecies[uiInfo.playerSpeciesIndex].ColorShader[index] );
+		}
+		break;
+
+	case FEEDER_SIEGE_BASE_CLASS:
 	{
-		int team,baseClass;
+		int team, baseClass;
 
-		team = (int)trap->Cvar_VariableValue("ui_team");
-		baseClass = (int)trap->Cvar_VariableValue("ui_siege_class");
+		team = (int)trap->Cvar_VariableValue( "ui_team" );
+		baseClass = (int)trap->Cvar_VariableValue( "ui_siege_class" );
 
-		if ((team == SIEGETEAM_TEAM1) ||
-			(team == SIEGETEAM_TEAM2))
-		{
+		if ( team == SIEGETEAM_TEAM1 || team == SIEGETEAM_TEAM2 ) {
 			// Is it a valid base class?
-			if ((baseClass >= SPC_INFANTRY) && (baseClass < SPC_MAX))
-			{
-				if (index >= 0)
-				{
-					return(BG_GetUIPortrait(team, baseClass, index));
-				}
+			if ( baseClass >= SPC_INFANTRY && baseClass < SPC_MAX ) {
+				if ( index >= 0 )
+					return BG_GetUIPortrait( team, baseClass, index );
 			}
 		}
+		break;
 	}
-	else if ( feederID == FEEDER_SIEGE_CLASS_WEAPONS)
-	{
+
+	case FEEDER_SIEGE_CLASS_WEAPONS:
 		validCnt = 0;
 		//count them up
-		for (i=0;i< WP_NUM_WEAPONS;i++)
-		{
-			trap->Cvar_VariableStringBuffer( va("ui_class_weapon%i", i), info, sizeof(info) );
-			if (Q_stricmp(info,"gfx/2d/select")!=0)
-			{
-				if (validCnt == index)
-				{
-					return(trap->R_RegisterShaderNoMip(info));
-				}
+		for ( i=0; i<WP_NUM_WEAPONS; i++ ) {
+			trap->Cvar_VariableStringBuffer( va( "ui_class_weapon%i", i ), info, sizeof( info ) );
+			if ( Q_stricmp( info, "gfx/2d/select" ) ) {
+				if ( validCnt == index )
+					return trap->R_RegisterShaderNoMip( info );
 				validCnt++;
 			}
 		}
-	}
-	else if ( feederID == FEEDER_SIEGE_CLASS_INVENTORY)
-	{
+		break;
+
+	case FEEDER_SIEGE_CLASS_INVENTORY:
 		validCnt = 0;
 		//count them up
-		for (i=0;i< HI_NUM_HOLDABLE;i++)
-		{
-			trap->Cvar_VariableStringBuffer( va("ui_class_item%i", i), info, sizeof(info) );
+		for ( i=0; i<HI_NUM_HOLDABLE; i++ ) {
+			trap->Cvar_VariableStringBuffer( va( "ui_class_item%i", i ), info, sizeof( info ) );
 			// A hack so health and ammo dispenser icons don't show up.
-			if ((Q_stricmp(info,"gfx/2d/select")!=0)
-				&& (Q_stricmp(info,"gfx/hud/i_icon_healthdisp")!=0) &&
-				(Q_stricmp(info,"gfx/hud/i_icon_ammodisp")!=0))
+			if ( Q_stricmp( info, "gfx/2d/select" ) && Q_stricmp( info, "gfx/hud/i_icon_healthdisp" )
+				&& Q_stricmp( info, "gfx/hud/i_icon_ammodisp" ) )
 			{
-				if (validCnt == index)
-				{
-					return(trap->R_RegisterShaderNoMip(info));
-				}
+				if ( validCnt == index )
+					return trap->R_RegisterShaderNoMip( info );
 				validCnt++;
 			}
 		}
-	}
-	else if ( feederID == FEEDER_SIEGE_CLASS_FORCE)
+		break;
+
+	case FEEDER_SIEGE_CLASS_FORCE:
 	{
-		int slotI=0;
+		int slotI = 0;
 		static char info2[MAX_STRING_CHARS];
 		menuDef_t *menu;
 		itemDef_t *item;
 
-
 		validCnt = 0;
 
-
-		menu = Menu_GetFocused();	// Get current menu
-		if (menu)
-		{
-			item = (itemDef_t *) Menu_FindItemByName((menuDef_t *) menu, "base_class_force_feed");
-			if (item)
-			{
-				listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
-				if (listPtr)
-				{
+		if ( (menu=Menu_GetFocused()) ) {
+			if ( (item=Menu_FindItemByName( menu, "base_class_force_feed" )) ) {
+				listBoxDef_t *listPtr = (listBoxDef_t *)item->typeData;
+				if ( listPtr )
 					slotI = listPtr->startPos;
-				}
 			}
 		}
 
 		//count them up
-		for (i=0;i< NUM_FORCE_POWERS;i++)
-		{
-			trap->Cvar_VariableStringBuffer( va("ui_class_power%i", i), info, sizeof(info) );
-			if (Q_stricmp(info,"gfx/2d/select")!=0)
-			{
-				if (validCnt == index)
-				{
-					trap->Cvar_VariableStringBuffer( va("ui_class_powerlevel%i", validCnt), info2, sizeof(info2) );
+		for ( i=0; i<NUM_FORCE_POWERS; i++ ) {
+			trap->Cvar_VariableStringBuffer( va( "ui_class_power%i", i ), info, sizeof( info ) );
+			if ( Q_stricmp( info, "gfx/2d/select" ) ) {
+				if ( validCnt == index ) {
+					trap->Cvar_VariableStringBuffer( va( "ui_class_powerlevel%i", validCnt ), info2, sizeof( info2 ) );
 
-					trap->Cvar_Set(va("ui_class_powerlevelslot%i", index-slotI), info2);
-					return(trap->R_RegisterShaderNoMip(info));
+					trap->Cvar_Set( va( "ui_class_powerlevelslot%i", index-slotI ), info2 );
+					return trap->R_RegisterShaderNoMip( info );
 				}
 				validCnt++;
 			}
 		}
+		break;
 	}
 
-  return 0;
+	}
+
+	return 0;
 }
 
 int UI_UpdateNormalMenuCharacter( void ) {
@@ -8259,10 +8008,9 @@ int UI_UpdateNormalMenuCharacter( void ) {
 	return result;
 }
 
-qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
+qboolean UI_FeederSelection( int feederID, int index, itemDef_t *item)
 {
 	static char info[MAX_STRING_CHARS];
-	const int feederID = feederFloat;
 
 	if (feederID == FEEDER_Q3HEADS)
 	{
@@ -8282,7 +8030,7 @@ qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 			if ( !UI_UpdateNormalMenuCharacter() )
 			{
 				uiInfo.q3HeadNames[actual][0] = '\0';
-				UI_FeederSelection( feederFloat, uiInfo.q3SelectedHead, item );
+				UI_FeederSelection( feederID, uiInfo.q3SelectedHead, item );
 			}
 		}
 	}
@@ -8328,31 +8076,7 @@ qboolean UI_FeederSelection(float feederFloat, int index, itemDef_t *item)
 						else if (datapadMoveData[uiInfo.movesTitleIndex][index].sound == MDS_SABER)
 						{
 							// Randomly choose one sound
-							int soundI = Q_irand( 1, 6 );
-							sfxHandle_t *soundPtr;
-							soundPtr = &uiInfo.uiDC.Assets.datapadmoveSaberSound1;
-							if (soundI == 2)
-							{
-								soundPtr = &uiInfo.uiDC.Assets.datapadmoveSaberSound2;
-							}
-							else if (soundI == 3)
-							{
-								soundPtr = &uiInfo.uiDC.Assets.datapadmoveSaberSound3;
-							}
-							else if (soundI == 4)
-							{
-								soundPtr = &uiInfo.uiDC.Assets.datapadmoveSaberSound4;
-							}
-							else if (soundI == 5)
-							{
-								soundPtr = &uiInfo.uiDC.Assets.datapadmoveSaberSound5;
-							}
-							else if (soundI == 6)
-							{
-								soundPtr = &uiInfo.uiDC.Assets.datapadmoveSaberSound6;
-							}
-
-							trap->S_StartLocalSound( *soundPtr, CHAN_LOCAL );
+							trap->S_StartLocalSound( uiInfo.uiDC.Assets.datapadmoveSaberSound[Q_irand( 0, 5 )], CHAN_LOCAL );
 						}
 
 						if (datapadMoveData[uiInfo.movesTitleIndex][index].desc)
@@ -9375,12 +9099,12 @@ void UI_Init( qboolean inGameLoad ) {
 	trap->GetGlconfig( &uiInfo.uiDC.glconfig );
 
 	// for 640x480 virtualized screen
-	uiInfo.uiDC.yscale = uiInfo.uiDC.glconfig.vidHeight * (1.0/480.0);
-	uiInfo.uiDC.xscale = uiInfo.uiDC.glconfig.vidWidth * (1.0/640.0);
+	uiInfo.uiDC.yscale = uiInfo.uiDC.glconfig.vidHeight * (1.0f/480.0f);
+	uiInfo.uiDC.xscale = uiInfo.uiDC.glconfig.vidWidth * (1.0f/640.0f);
 
 	// wide screen
 	if ( uiInfo.uiDC.glconfig.vidWidth * 480 > uiInfo.uiDC.glconfig.vidHeight * 640 )
-		uiInfo.uiDC.bias = 0.5 * ( uiInfo.uiDC.glconfig.vidWidth - ( uiInfo.uiDC.glconfig.vidHeight * (640.0/480.0) ) );
+		uiInfo.uiDC.bias = 0.5f * ( uiInfo.uiDC.glconfig.vidWidth - ( uiInfo.uiDC.glconfig.vidHeight * (640.0f/480.0f) ) );
 	else
 		uiInfo.uiDC.bias = 0;
 
@@ -9732,7 +9456,7 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 	int leftWidth;
 	const char *s;
 
-	vector4 colorLtGreyAlpha = {0, 0, 0, .5};
+	vector4 colorLtGreyAlpha = {0, 0, 0, .5f};
 
 	UI_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &colorLtGreyAlpha );
 

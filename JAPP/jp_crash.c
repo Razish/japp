@@ -1362,7 +1362,7 @@ static void JKG_Crash_DisAsm(ucontext_t *ctx, fileHandle_t f) {
 		}
 
 		JKG_FS_WriteString(va("0x%08X - %-30s", (unsigned int)ud_insn_off(&da), ud_insn_asm(&da)), f);
-		if ( ((da.mnemonic >= UD_Ija && da.mnemonic <= UD_Ijz ) || da.mnemonic == UD_Icall ) && da.operand[0].type == UD_OP_JIMM) {
+		if ( ((da.mnemonic >= UD_Ija || da.mnemonic <= UD_Ijz ) || da.mnemonic == UD_Icall ) && da.operand[0].type == UD_OP_JIMM) {
 			// Its a call or jump, see if we got a symbol for it
 			// BUT FIRST ;P
 			// Since debug compiles employ a call table, we'll disassemble it first

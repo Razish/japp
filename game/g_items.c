@@ -67,21 +67,21 @@ int adjustRespawnTime(float preRespawnTime, int itemType, int itemTag)
 	{	// Start scaling the respawn times.
 		if (level.numPlayingClients > 32)
 		{	// 1/4 time minimum.
-			respawnTime *= 0.25;
+			respawnTime *= 0.25f;
 		}
 		else if (level.numPlayingClients > 12)
-		{	// From 12-32, scale from 0.5 to 0.25;
-			respawnTime *= 20.0 / (float)(level.numPlayingClients + 8);
+		{	// From 12-32, scale from 0.5f to 0.25f;
+			respawnTime *= 20.0f / (float)(level.numPlayingClients + 8);
 		}
 		else
-		{	// From 4-12, scale from 1.0 to 0.5;
-			respawnTime *= 8.0 / (float)(level.numPlayingClients + 4);
+		{	// From 4-12, scale from 1.0f to 0.5f;
+			respawnTime *= 8.0f / (float)(level.numPlayingClients + 4);
 		}
 	}
 
-	if (respawnTime < 1.0)
+	if (respawnTime < 1.0f)
 	{	// No matter what, don't go lower than 1 second, or the pickups become very noisy!
-		respawnTime = 1.0;
+		respawnTime = 1.0f;
 	}
 
 	return ((int)respawnTime);
@@ -397,7 +397,7 @@ qboolean PlaceShield(gentity_t *playerent)
 	fwd.z = 0;
 	VectorMA(&playerent->client->ps.origin, SHIELD_PLACEDIST, &fwd, &dest);
 	trap->Trace (&tr, &playerent->client->ps.origin, &mins, &maxs, &dest, playerent->s.number, MASK_SHOT, qfalse, 0, 0 );
-	if (tr.fraction > 0.9)
+	if (tr.fraction > 0.9f)
 	{//room in front
 		VectorCopy(&tr.endpos, &pos);
 		// drop to floor
@@ -409,7 +409,7 @@ qboolean PlaceShield(gentity_t *playerent)
 			shield = G_Spawn();
 
 			// Figure out what direction the shield is facing.
-			if (fabs(fwd.x) > fabs(fwd.y))
+			if (fabsf(fwd.x) > fabsf(fwd.y))
 			{	// shield is north/south, facing east.
 				shield->s.angles.yaw = 0;
 			}
@@ -418,7 +418,7 @@ qboolean PlaceShield(gentity_t *playerent)
 				shield->s.angles.yaw = 90;
 			}
 			shield->think = CreateShield;
-			shield->nextthink = level.time + 500;	// power up after .5 seconds
+			shield->nextthink = level.time + 500;	// power up after .5f seconds
 			shield->parent = playerent;
 
 			// Set team number.
@@ -603,7 +603,7 @@ static qboolean pas_find_enemies( gentity_t *self )
 
 		trap->Trace( &tr, &org2, NULL, NULL, &org, self->s.number, MASK_SHOT, qfalse, 0, 0 );
 
-		if ( !tr.allsolid && !tr.startsolid && ( tr.fraction == 1.0 || tr.entityNum == target->s.number ))
+		if ( !tr.allsolid && !tr.startsolid && ( tr.fraction == 1.0f || tr.entityNum == target->s.number ))
 		{
 			// Only acquire if have a clear shot, Is it in range and closer than our best?
 			VectorSubtract( &target->r.currentOrigin, &self->r.currentOrigin, &enemyDir );
@@ -835,14 +835,14 @@ void pas_think( gentity_t *ent )
 	else
 	{
 		// no enemy, so make us slowly sweep back and forth as if searching for a new one
-		diffYaw = sin( level.time * 0.0001f + ent->count ) * 2.0f;
+		diffYaw = sinf( level.time * 0.0001f + ent->count ) * 2.0f;
 	}
 
-	if ( fabs(diffYaw) > 0.25f )
+	if ( fabsf(diffYaw) > 0.25f )
 	{
 		moved = qtrue;
 
-		if ( fabs(diffYaw) > 10.0f )
+		if ( fabsf(diffYaw) > 10.0f )
 		{
 			// cap max speed
 			ent->speed += (diffYaw > 0.0f) ? -10.0f : 10.0f;
@@ -855,11 +855,11 @@ void pas_think( gentity_t *ent )
 	}
 
 
-	if ( fabs(diffPitch) > 0.25f )
+	if ( fabsf(diffPitch) > 0.25f )
 	{
 		moved = qtrue;
 
-		if ( fabs(diffPitch) > 4.0f )
+		if ( fabsf(diffPitch) > 4.0f )
 		{
 			// cap max speed
 			ent->random += (diffPitch > 0.0f) ? -4.0f : 4.0f;
@@ -1261,7 +1261,7 @@ void G_SpecialSpawnItem(gentity_t *ent, const gitem_t *item)
 	ent->nextthink = level.time + 50;
 	ent->clipmask = MASK_SOLID;
 
-	ent->physicsBounce = 0.50;		// items are bouncy
+	ent->physicsBounce = 0.50f;		// items are bouncy
 	VectorSet (&ent->r.mins, -8, -8, -0);
 	VectorSet (&ent->r.maxs,  8,  8,  16);
 
@@ -2026,13 +2026,13 @@ int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 
 		// if not facing, no sound
 		AngleVectors( &client->ps.viewangles, &forward, NULL, NULL );
-		if ( DotProduct( &delta, &forward ) < 0.4 ) {
+		if ( DotProduct( &delta, &forward ) < 0.4f ) {
 			continue;
 		}
 
 		// if not line of sight, no sound
 		trap->Trace( &tr, &client->ps.origin, NULL, NULL, &ent->s.pos.trBase, ENTITYNUM_NONE, CONTENTS_SOLID, qfalse, 0, 0 );
-		if ( tr.fraction != 1.0 ) {
+		if ( tr.fraction != 1.0f ) {
 			continue;
 		}
 
@@ -2146,10 +2146,10 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 			// New method:  If the player has less than half the minimum, give them the minimum, else add 1/2 the min.
 
 			// drop the quantity if the already have over the minimum
-			if ( other->client->ps.ammo[ ent->item->giTag ] < quantity*0.5 ) {
+			if ( other->client->ps.ammo[ ent->item->giTag ] < quantity*0.5f ) {
 				quantity = quantity - other->client->ps.ammo[ ent->item->giTag ];
 			} else {
-				quantity = quantity*0.5;		// only add half the value.
+				quantity = quantity*0.5f;		// only add half the value.
 			}
 
 			// Old method:  If the player has less than the minimum, give them the minimum, else just add 1.
@@ -2942,8 +2942,8 @@ void FinishSpawningItem( gentity_t *ent ) {
 	} else {
 		// drop to floor
 
-		//if it is directly even with the floor it will return startsolid, so raise up by 0.1
-		//and temporarily subtract 0.1 from the z maxs so that going up doesn't push into the ceiling
+		//if it is directly even with the floor it will return startsolid, so raise up by 0.1f
+		//and temporarily subtract 0.1f from the z maxs so that going up doesn't push into the ceiling
 		ent->s.origin.z += 0.1f;
 		ent->r.maxs.z -= 0.1f;
 
@@ -2955,7 +2955,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 			return;
 		}
 
-		//add the 0.1 back after the trace
+		//add the 0.1f back after the trace
 		ent->r.maxs.z += 0.1f;
 
 		// allow to ride movers
@@ -3138,7 +3138,7 @@ void G_SpawnItem (gentity_t *ent, const gitem_t *item) {
 	ent->nextthink = level.time + FRAMETIME * 2;
 	ent->think = FinishSpawningItem;
 
-	ent->physicsBounce = 0.50;		// items are bouncy
+	ent->physicsBounce = 0.50f;		// items are bouncy
 
 	if ( item->giType == IT_POWERUP ) {
 		G_SoundIndex( "sound/items/respawn1" );
@@ -3178,7 +3178,7 @@ void G_BounceItem( gentity_t *ent, trace_t *trace ) {
 
 	// check for stop
 	if ( trace->plane.normal.z > 0 && ent->s.pos.trDelta.z < 40 ) {
-		trace->endpos.z += 1.0;	// make sure it is off ground
+		trace->endpos.z += 1.0f;	// make sure it is off ground
 		VectorSnap( &trace->endpos );
 		G_SetOrigin( ent, &trace->endpos );
 		ent->s.groundEntityNum = trace->entityNum;

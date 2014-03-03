@@ -1,17 +1,5 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
-/*****************************************************************************
- * name:		botlib.h
- *
- * desc:		bot AI library
- *
- * $Archive: /source/code/game/botai.h $
- * $Author: osman $
- * $Revision: 1.4 $
- * $Modtime: 03/01/00 3:32p $
- * $Date: 2003/03/15 23:44:00 $
- *
- *****************************************************************************/
 
 #define	BOTLIB_API_VERSION		2
 
@@ -115,7 +103,7 @@ typedef struct bsp_trace_s
 {
 	qboolean		allsolid;	// if true, plane is not valid
 	qboolean		startsolid;	// if true, the initial point was in a solid area
-	float			fraction;	// time completed, 1.0 = didn't hit anything
+	float			fraction;	// time completed, 1.0f = didn't hit anything
 	vector3			endpos;		// final position
 	cplane_t		plane;		// surface normal at impact
 	float			exp_dist;	// expanded plane distance

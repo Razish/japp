@@ -1519,7 +1519,7 @@ qboolean PM_CanBackstab(void)
 
 	pm->trace(&tr, &pm->ps->origin, &trmins, &trmaxs, &back, pm->ps->clientNum, MASK_PLAYERSOLID);
 
-	if (tr.fraction != 1.0 && tr.entityNum >= 0 && tr.entityNum < ENTITYNUM_NONE)
+	if (tr.fraction != 1.0f && tr.entityNum >= 0 && tr.entityNum < ENTITYNUM_NONE)
 	{
 		bgEntity_t *bgEnt = PM_BGEntForNum(tr.entityNum);
 
@@ -1698,7 +1698,7 @@ qboolean PM_SomeoneInFront(trace_t *tr)
 
 	pm->trace(tr, &pm->ps->origin, &trmins, &trmaxs, &back, pm->ps->clientNum, MASK_PLAYERSOLID);
 
-	if (tr->fraction != 1.0 && tr->entityNum >= 0 && tr->entityNum < ENTITYNUM_NONE)
+	if (tr->fraction != 1.0f && tr->entityNum >= 0 && tr->entityNum < ENTITYNUM_NONE)
 	{
 		bgEntity_t *bgEnt = PM_BGEntForNum(tr->entityNum);
 

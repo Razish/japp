@@ -256,11 +256,16 @@ union luai_Cast { double l_d; LUA_INT32 l_p[2]; };
 
 #if !defined(lua_number2unsigned)	/* { */
 /* the following definition assures proper modulo behavior */
-#if defined(LUA_NUMBER_DOUBLE) || defined(LUA_NUMBER_FLOAT)
+#if defined(LUA_NUMBER_DOUBLE)
 #include <math.h>
 #define SUPUNSIGNED	((lua_Number)(~(lua_Unsigned)0) + 1)
 #define lua_number2unsigned(i,n)  \
 	((i)=(lua_Unsigned)((n) - floor((n)/SUPUNSIGNED)*SUPUNSIGNED))
+#elif defined(LUA_NUMBER_FLOAT)
+#include <math.h>
+#define SUPUNSIGNED	((lua_Number)(~(lua_Unsigned)0) + 1)
+#define lua_number2unsigned(i,n)  \
+	((i)=(lua_Unsigned)((n) - floorf((n)/SUPUNSIGNED)*SUPUNSIGNED))
 #else
 #define lua_number2unsigned(i,n)	((i)=(lua_Unsigned)(n))
 #endif

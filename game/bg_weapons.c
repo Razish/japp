@@ -17,7 +17,7 @@ vector3 WP_MuzzlePoint[WP_NUM_WEAPONS] =
 	{12,	6,		-6	},	// WP_BLASTER,
 	{12,	6,		-6	},	// WP_DISRUPTOR,
 	{12,	2,		-6	},	// WP_BOWCASTER,
-	{12,	4.5,	-6	},	// WP_REPEATER,
+	{12,	4.5f,	-6	},	// WP_REPEATER,
 	{12,	6,		-6	},	// WP_DEMP2,
 	{12,	6,		-6	},	// WP_FLECHETTE,
 	{12,	8,		-4	},	// WP_ROCKET_LAUNCHER,

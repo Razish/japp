@@ -360,7 +360,7 @@ static void AnimateVehicle( Vehicle_t *pVeh )
 			{
 				Anim = BOTH_VT_WALK_FWD_L;
 			}
-			else if ( fYawDelta > 0.0001 )
+			else if ( fYawDelta > 0.0001f )
 			{
 				Anim = BOTH_VT_WALK_FWD_R;
 			}
@@ -377,7 +377,7 @@ static void AnimateVehicle( Vehicle_t *pVeh )
 			{
 				Anim = BOTH_VT_RUN_FWD_L;
 			}
-			else if ( fYawDelta > 0.0001 )
+			else if ( fYawDelta > 0.0001f )
 			{
 				Anim = BOTH_VT_RUN_FWD_R;
 			}

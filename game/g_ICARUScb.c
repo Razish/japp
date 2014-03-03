@@ -1268,7 +1268,7 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value )
 	case SET_WIDTH://## %f="0.0" # Width of NPC bounding box
 		*value = ent->r.mins.x;
 		break;
-	case SET_TIMESCALE://## %f="0.0" # Speed-up slow down game (0 - 1.0)
+	case SET_TIMESCALE://## %f="0.0" # Speed-up slow down game (0 - 1.0f)
 		return 0;
 		break;
 	case SET_CAMERA_GROUP_Z_OFS://## %s="NULL" # all ents with this cameraGroup will be focused on
@@ -1283,7 +1283,7 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value )
 		return 0;
 		break;
 
-	case SET_VIGILANCE://## %f="0.0" # How often to look for enemies (0 - 1.0)
+	case SET_VIGILANCE://## %f="0.0" # How often to look for enemies (0 - 1.0f)
 		return 0;
 		break;
 
@@ -2122,7 +2122,7 @@ static void Q3_SetOriginOffset( int entID, int axis, float offset )
 	duration = 0;
 	if ( ent->speed )
 	{
-		duration = fabs(offset)/fabs(ent->speed)*1000.0f;
+		duration = fabsf(offset)/fabsf(ent->speed)*1000.0f;
 	}
 	Q3_Lerp2Origin( -1, entID, &origin, duration );
 }
@@ -2286,7 +2286,7 @@ static qboolean Q3_SetNavGoal( int entID, const char *name )
 			else
 			{
 				ent->NPC->goalEntity = targ;
-				ent->NPC->goalRadius = sqrt(ent->r.maxs.x+ent->r.maxs.x) + sqrt(targ->r.maxs.x+targ->r.maxs.x);
+				ent->NPC->goalRadius = sqrtf(ent->r.maxs.x+ent->r.maxs.x) + sqrtf(targ->r.maxs.x+targ->r.maxs.x);
 				ent->NPC->aiFlags &= ~NPCAI_TOUCHED_GOAL;
 			}
 		}
@@ -2619,7 +2619,7 @@ static qboolean Q3_SetBState( int entID, const char *bs_name )
 		ent->NPC->tempBehavior = BS_DEFAULT;//need to clear any temp behaviour
 		if ( ent->NPC->behaviorState == BS_NOCLIP && bSID != BS_NOCLIP )
 		{//need to rise up out of the floor after noclipping
-			ent->r.currentOrigin.z += 0.125;
+			ent->r.currentOrigin.z += 0.125f;
 			G_SetOrigin( ent, &ent->r.currentOrigin );
 		}
 		ent->NPC->behaviorState = bSID;

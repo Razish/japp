@@ -1028,7 +1028,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 
 	if ((int)forcePower == FP_SPEED && overrideAmt)
 	{
-		BG_ForcePowerDrain( &self->client->ps, forcePower, overrideAmt*0.025 );
+		BG_ForcePowerDrain( &self->client->ps, forcePower, overrideAmt*0.025f );
 	}
 	else if ((int)forcePower != FP_GRIP && (int)forcePower != FP_DRAIN)
 	{ //grip and drain drain as damage is done
@@ -1147,7 +1147,7 @@ void ForceTeamHeal( gentity_t *self )
 
 	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL] == FORCE_LEVEL_2)
 	{
-		radius *= 1.5;
+		radius *= 1.5f;
 	}
 	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL] == FORCE_LEVEL_3)
 	{
@@ -1252,7 +1252,7 @@ void ForceTeamForceReplenish( gentity_t *self )
 
 	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] == FORCE_LEVEL_2)
 	{
-		radius *= 1.5;
+		radius *= 1.5f;
 	}
 	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] == FORCE_LEVEL_3)
 	{
@@ -1362,7 +1362,7 @@ void ForceGrip( gentity_t *self )
 
 	trap->Trace(&tr, &tfrom, NULL, NULL, &tto, self->s.number, MASK_PLAYERSOLID, qfalse, 0, 0);
 
-	if ( tr.fraction != 1.0 &&
+	if ( tr.fraction != 1.0f &&
 		tr.entityNum != ENTITYNUM_NONE &&
 		g_entities[tr.entityNum].client &&
 		!g_entities[tr.entityNum].client->ps.fd.forceGripCripple &&
@@ -1770,13 +1770,13 @@ void ForceShootLightning( gentity_t *self )
 			}
 
 			VectorSubtract( &traceEnt->r.absmax, &traceEnt->r.absmin, &size );
-			VectorMA( &traceEnt->r.absmin, 0.5, &size, &ent_org );
+			VectorMA( &traceEnt->r.absmin, 0.5f, &size, &ent_org );
 
 			//see if they're in front of me
 			//must be within the forward cone
 			VectorSubtract( &ent_org, &center, &dir );
 			VectorNormalize( &dir );
-			if ( (dot = DotProduct( &dir, &forward )) < 0.5 )
+			if ( (dot = DotProduct( &dir, &forward )) < 0.5f )
 				continue;
 
 			//must be close enough
@@ -1808,7 +1808,7 @@ void ForceShootLightning( gentity_t *self )
 		VectorMA( &self->client->ps.origin, 2048, &forward, &end );
 
 		trap->Trace( &tr, &self->client->ps.origin, &vec3_origin, &vec3_origin, &end, self->s.number, MASK_SHOT, qfalse, 0, 0 );
-		if ( tr.entityNum == ENTITYNUM_NONE || tr.fraction == 1.0 || tr.allsolid || tr.startsolid )
+		if ( tr.entityNum == ENTITYNUM_NONE || tr.fraction == 1.0f || tr.allsolid || tr.startsolid )
 		{
 			return;
 		}
@@ -2048,13 +2048,13 @@ int ForceShootDrain( gentity_t *self )
 			}
 
 			VectorSubtract( &traceEnt->r.absmax, &traceEnt->r.absmin, &size );
-			VectorMA( &traceEnt->r.absmin, 0.5, &size, &ent_org );
+			VectorMA( &traceEnt->r.absmin, 0.5f, &size, &ent_org );
 
 			//see if they're in front of me
 			//must be within the forward cone
 			VectorSubtract( &ent_org, &center, &dir );
 			VectorNormalize( &dir );
-			if ( (dot = DotProduct( &dir, &forward )) < 0.5 )
+			if ( (dot = DotProduct( &dir, &forward )) < 0.5f )
 				continue;
 
 			//must be close enough
@@ -2087,7 +2087,7 @@ int ForceShootDrain( gentity_t *self )
 		VectorMA( &self->client->ps.origin, 2048, &forward, &end );
 
 		trap->Trace( &tr, &self->client->ps.origin, &vec3_origin, &vec3_origin, &end, self->s.number, MASK_SHOT, qfalse, 0, 0 );
-		if ( tr.entityNum == ENTITYNUM_NONE || tr.fraction == 1.0 || tr.allsolid || tr.startsolid || !g_entities[tr.entityNum].client || !g_entities[tr.entityNum].inuse )
+		if ( tr.entityNum == ENTITYNUM_NONE || tr.fraction == 1.0f || tr.allsolid || tr.startsolid || !g_entities[tr.entityNum].client || !g_entities[tr.entityNum].inuse )
 		{
 			return 0;
 		}
@@ -2548,7 +2548,7 @@ void ForceTelepathy(gentity_t *self)
 
 	if (self->client->ps.fd.forcePowerLevel[FP_TELEPATHY] == FORCE_LEVEL_1)
 	{
-		if (tr.fraction != 1.0 &&
+		if (tr.fraction != 1.0f &&
 			tr.entityNum != ENTITYNUM_NONE &&
 			g_entities[tr.entityNum].inuse &&
 			g_entities[tr.entityNum].client &&
@@ -2955,7 +2955,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 
 		trap->Trace(&tr, &tfrom, NULL, NULL, &tto, self->s.number, MASK_PLAYERSOLID, qfalse, 0, 0);
 
-		if (tr.fraction != 1.0 &&
+		if (tr.fraction != 1.0f &&
 			tr.entityNum != ENTITYNUM_NONE)
 		{
 			if (!g_entities[tr.entityNum].client && g_entities[tr.entityNum].s.eType == ET_NPC)
@@ -3147,11 +3147,11 @@ void ForceThrow( gentity_t *self, qboolean pull )
 		}
 
 		VectorSubtract( &ent->r.absmax, &ent->r.absmin, &size );
-		VectorMA( &ent->r.absmin, 0.5, &size, &ent_org );
+		VectorMA( &ent->r.absmin, 0.5f, &size, &ent_org );
 
 		VectorSubtract( &ent_org, &center, &dir );
 		VectorNormalize( &dir );
-		if ( (dot1 = DotProduct( &dir, &forward )) < 0.6 )
+		if ( (dot1 = DotProduct( &dir, &forward )) < 0.6f )
 			continue;
 
 		dist = VectorLength( &v );
@@ -3286,15 +3286,15 @@ void ForceThrow( gentity_t *self, qboolean pull )
 
 						if (powerDif >= 3)
 						{
-							pushPowerMod -= pushPowerMod*0.2;
+							pushPowerMod -= pushPowerMod*0.2f;
 						}
 						else if (powerDif == 2)
 						{
-							pushPowerMod -= pushPowerMod*0.4;
+							pushPowerMod -= pushPowerMod*0.4f;
 						}
 						else if (powerDif == 1)
 						{
-							pushPowerMod -= pushPowerMod*0.8;
+							pushPowerMod -= pushPowerMod*0.8f;
 						}
 
 						if (pushPowerMod < 0)
@@ -3403,7 +3403,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 					push_list[x]->client->ps.otherKillerTime = level.time + 5000;
 					push_list[x]->client->ps.otherKillerDebounceTime = level.time + 100;
 
-					pushPowerMod -= (dirLen*0.7);
+					pushPowerMod -= (dirLen*0.7f);
 					if (pushPowerMod < 16)
 					{
 						pushPowerMod = 16;
@@ -3463,7 +3463,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 				VectorNormalize( &forward );
 				VectorMA( &trFrom, radius, &forward, &end );
 				trap->Trace( &tr, &trFrom, &vec3_origin, &vec3_origin, &end, self->s.number, MASK_SHOT, qfalse, 0, 0 );
-				if ( tr.entityNum != push_list[x]->s.number || tr.fraction == 1.0 || tr.allsolid || tr.startsolid )
+				if ( tr.entityNum != push_list[x]->s.number || tr.fraction == 1.0f || tr.allsolid || tr.startsolid )
 				{//must be pointing right at it
 					continue;
 				}
@@ -3471,7 +3471,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 				if ( VectorCompare( &vec3_origin, &push_list[x]->s.origin ) )
 				{//does not have an origin brush, so pos1 & pos2 are relative to world origin, need to calc center
 					VectorSubtract( &push_list[x]->r.absmax, &push_list[x]->r.absmin, &size );
-					VectorMA( &push_list[x]->r.absmin, 0.5, &size, &center );
+					VectorMA( &push_list[x]->r.absmin, 0.5f, &size, &center );
 					if ( (push_list[x]->spawnflags&1) && push_list[x]->moverState == MOVER_POS1 )
 					{//if at pos1 and started open, make sure we get the center where it *started* because we're going to add back in the relative values pos1 and pos2
 						VectorSubtract( &center, &push_list[x]->pos1, &center );
@@ -4479,9 +4479,9 @@ void SeekerDroneUpdate(gentity_t *self)
 		elevated.z += 40;
 
 		angle = ((level.time / 12) & 255) * (M_PI * 2) / 255; //magical numbers make magic happen
-		dir.x = cos(angle) * 20;
-		dir.y = sin(angle) * 20;
-		dir.z = cos(angle) * 5;
+		dir.x = cosf(angle) * 20;
+		dir.y = sinf(angle) * 20;
+		dir.z = cosf(angle) * 5;
 		VectorAdd(&elevated, &dir, &org);
 
 		a.roll = 0;
@@ -4522,9 +4522,9 @@ void SeekerDroneUpdate(gentity_t *self)
 		elevated.z -= 55-prefig;
 
 		angle = ((level.time / 12) & 255) * (M_PI * 2) / 255; //magical numbers make magic happen
-		dir.x = cos(angle) * 20;
-		dir.y = sin(angle) * 20;
-		dir.z = cos(angle) * 5;
+		dir.x = cosf(angle) * 20;
+		dir.y = sinf(angle) * 20;
+		dir.z = cosf(angle) * 5;
 		VectorAdd(&elevated, &dir, &org);
 
 		a.roll = 0;
@@ -4578,9 +4578,9 @@ void SeekerDroneUpdate(gentity_t *self)
 		elevated.z += 40;
 
 		angle = ((level.time / 12) & 255) * (M_PI * 2) / 255; //magical numbers make magic happen
-		dir.x = cos(angle) * 20;
-		dir.y = sin(angle) * 20;
-		dir.z = cos(angle) * 5;
+		dir.x = cosf(angle) * 20;
+		dir.y = sinf(angle) * 20;
+		dir.z = cosf(angle) * 5;
 		VectorAdd(&elevated, &dir, &org);
 
 		//org is now where the thing should be client-side because it uses the same time-based offset

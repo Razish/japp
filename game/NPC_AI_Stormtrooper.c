@@ -18,7 +18,7 @@ extern qboolean FlyingCreature( gentity_t *ent );
 #define	MAX_VIEW_DIST		1024
 #define MAX_VIEW_SPEED		250
 #define	MAX_LIGHT_INTENSITY 255
-#define	MIN_LIGHT_THRESHOLD	0.1
+#define	MIN_LIGHT_THRESHOLD	0.1f
 #define	ST_MIN_LIGHT_THRESHOLD 30
 #define	ST_MAX_LIGHT_THRESHOLD 180
 #define	DISTANCE_THRESHOLD	0.075f
@@ -31,7 +31,7 @@ extern qboolean FlyingCreature( gentity_t *ent );
 #define	TURNING_SCALE		0.25f	//
 
 #define	REALIZE_THRESHOLD	0.6f
-#define CAUTIOUS_THRESHOLD	( REALIZE_THRESHOLD * 0.75 )
+#define CAUTIOUS_THRESHOLD	( REALIZE_THRESHOLD * 0.75f )
 
 qboolean NPC_CheckPlayerTeamStealth( void );
 
@@ -966,7 +966,7 @@ static void ST_LookAround( void )
 	float	perc = (float) ( level.time - NPCInfo->pauseTime ) / (float) NPCInfo->investigateDebounceTime;
 
 	//Keep looking at the spot
-	if ( perc < 0.25 )
+	if ( perc < 0.25f )
 	{
 		VectorCopy( &NPCInfo->investigateGoal, &lookPos );
 	}
@@ -1653,11 +1653,11 @@ uint32_t ST_GetCPFlags( void )
 			{//FIXME: make sure he;s giving orders with these lines
 				if ( Q_irand( 0, 1 ) )
 				{
-					ST_Speech( NPC, SPEECH_CHASE, 0.5 );
+					ST_Speech( NPC, SPEECH_CHASE, 0.5f );
 				}
 				else
 				{
-					ST_Speech( NPC, SPEECH_YELL, 0.5 );
+					ST_Speech( NPC, SPEECH_YELL, 0.5f );
 				}
 			}
 			cpFlags = (CP_CLEAR|CP_COVER|CP_AVOID|CP_SAFE|CP_RETREAT);
@@ -2381,7 +2381,7 @@ void ST_Commander( void )
 								dot = DotProduct( &eDir2Me, &eDir2CP );
 							}
 
-							if ( dot < 0.4 )
+							if ( dot < 0.4f )
 							{//flanking!
 								NPC_ST_StoreMovementSpeech( SPEECH_OUTFLANK, -1 );
 							}

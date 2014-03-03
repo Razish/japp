@@ -60,9 +60,9 @@ void ImperialProbe_MaintainHeight( void )
 		dif = NPC->enemy->r.currentOrigin.z - NPC->r.currentOrigin.z;
 
 		// cap to prevent dramatic height shifts
-		if ( fabs( dif ) > 8 )
+		if ( fabsf( dif ) > 8 )
 		{
-			if ( fabs( dif ) > 16 )
+			if ( fabsf( dif ) > 16 )
 			{
 				dif = ( dif < 0 ? -16 : 16 );
 			}
@@ -86,7 +86,7 @@ void ImperialProbe_MaintainHeight( void )
 		{
 			dif = goal->r.currentOrigin.z - NPC->r.currentOrigin.z;
 
-			if ( fabs( dif ) > 24 )
+			if ( fabsf( dif ) > 24 )
 			{
 				ucmd.upmove = ( ucmd.upmove < 0 ? -4 : 4 );
 			}
@@ -96,7 +96,7 @@ void ImperialProbe_MaintainHeight( void )
 				{
 					NPC->client->ps.velocity.z *= VELOCITY_DECAY;
 
-					if ( fabs( NPC->client->ps.velocity.z ) < 2 )
+					if ( fabsf( NPC->client->ps.velocity.z ) < 2 )
 					{
 						NPC->client->ps.velocity.z = 0;
 					}
@@ -108,7 +108,7 @@ void ImperialProbe_MaintainHeight( void )
 		{
 			NPC->client->ps.velocity.z *= VELOCITY_DECAY;
 
-			if ( fabs( NPC->client->ps.velocity.z ) < 1 )
+			if ( fabsf( NPC->client->ps.velocity.z ) < 1 )
 			{
 				NPC->client->ps.velocity.z = 0;
 			}
@@ -136,7 +136,7 @@ void ImperialProbe_MaintainHeight( void )
 				{
 					NPC->client->ps.velocity[2] *= VELOCITY_DECAY;
 
-					if ( fabs( NPC->client->ps.velocity[2] ) < 1 )
+					if ( fabsf( NPC->client->ps.velocity[2] ) < 1 )
 					{
 						NPC->client->ps.velocity[2] = 0;
 					}
@@ -150,17 +150,17 @@ void ImperialProbe_MaintainHeight( void )
 	{
 		NPC->client->ps.velocity.x *= VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.x ) < 1 )
+		if ( fabsf( NPC->client->ps.velocity.x ) < 1 )
 		{
 			NPC->client->ps.velocity.x = 0;
 		}
 	}
 
-	if ( NPC->client->ps.velocity.y )
+	if ( (int)NPC->client->ps.velocity.y )
 	{
 		NPC->client->ps.velocity.y *= VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.y ) < 1 )
+		if ( fabsf( NPC->client->ps.velocity.y ) < 1 )
 		{
 			NPC->client->ps.velocity.y = 0;
 		}
@@ -458,7 +458,7 @@ void NPC_Probe_Pain(gentity_t *self, gentity_t *attacker, int damage)
 				G_PlayEffect( "env/med_explode2", origin );
 				self->client->clientInfo.headModel = 0;
 				self->client->moveType = MT_RUNJUMP;
-				self->client->ps.gravity = g_gravity->value*.1;
+				self->client->ps.gravity = g_gravity->value*.1f;
 			}
 			*/
 

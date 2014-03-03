@@ -416,7 +416,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 	//FIXME: if turbotime is up and we're waiting for it to recharge, should our max speed drop while we recharge?
 	else if ( (curTime - pVeh->m_iTurboTime)<3000 )
 	{//still waiting for the recharge
-		speedMax = pVeh->m_pVehicleInfo->speedMax*0.75;
+		speedMax = pVeh->m_pVehicleInfo->speedMax*0.75f;
 	}
 	*/
 	else
@@ -977,7 +977,7 @@ void FighterRollAdjust(Vehicle_t *pVeh, playerState_t *riderPS, playerState_t *p
 */
 	float angDif = AngleSubtract(pVeh->m_vPrevRiderViewAngles->yaw,riderPS->viewangles->yaw);///2.0f;//AngleSubtract(pVeh->m_vPrevRiderViewAngles->yaw, riderPS->viewangles->yaw);
 	/*
-	if ( fabs( angDif ) < FIGHTER_TURNING_DEADZONE )
+	if ( fabsf( angDif ) < FIGHTER_TURNING_DEADZONE )
 	{
 		angDif = 0.0f;
 	}
@@ -1043,7 +1043,7 @@ void FighterRollAdjust(Vehicle_t *pVeh, playerState_t *riderPS, playerState_t *p
 void FighterYawAdjust(Vehicle_t *pVeh, playerState_t *riderPS, playerState_t *parentPS)
 {
 	float angDif = AngleSubtract(pVeh->m_vPrevRiderViewAngles->yaw,riderPS->viewangles->yaw);///2.0f;//AngleSubtract(pVeh->m_vPrevRiderViewAngles->yaw, riderPS->viewangles->yaw);
-	if ( fabs( angDif ) < FIGHTER_TURNING_DEADZONE )
+	if ( fabsf( angDif ) < FIGHTER_TURNING_DEADZONE )
 	{
 		angDif = 0.0f;
 	}
@@ -1108,7 +1108,7 @@ void FighterYawAdjust(Vehicle_t *pVeh, playerState_t *riderPS, playerState_t *pa
 void FighterPitchAdjust(Vehicle_t *pVeh, playerState_t *riderPS, playerState_t *parentPS)
 {
 	float angDif = AngleSubtract(0,riderPS->viewangles->pitch);//AngleSubtract(pVeh->m_vPrevRiderViewAngles->pitch, riderPS->viewangles->pitch);
-	if ( fabs( angDif ) < FIGHTER_TURNING_DEADZONE )
+	if ( fabsf( angDif ) < FIGHTER_TURNING_DEADZONE )
 	{
 		angDif = 0.0f;
 	}

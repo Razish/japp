@@ -6,12 +6,6 @@
 
 #include "g_local.h"
 
-
-gentity_t	*podium1;
-gentity_t	*podium2;
-gentity_t	*podium3;
-
-
 /*
 ==================
 UpdateTournamentInfo

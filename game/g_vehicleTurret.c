@@ -274,7 +274,7 @@ static qboolean VEH_TurretFindEnemies( Vehicle_t *pVeh,
 		trap->Trace( &tr, &org2, NULL, NULL, &org, parent->s.number, MASK_SHOT, qfalse, 0, 0 );
 
 		if ( tr.entityNum == target->s.number
-			|| (!tr.allsolid && !tr.startsolid && tr.fraction == 1.0 ) )
+			|| (!tr.allsolid && !tr.startsolid && tr.fraction == 1.0f ) )
 		{
 			// Only acquire if have a clear shot, Is it in range and closer than our best?
 			VectorSubtract( &target->r.currentOrigin, &org2, &enemyDir );

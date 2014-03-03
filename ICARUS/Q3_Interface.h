@@ -93,11 +93,11 @@ typedef enum //# setType_e
 	SET_Z_OFFSET,//## %f="0.0" # Vertical offset from original origin... offset/ent's speed * 1000ms is duration
 	SET_DPITCH,//## %f="0.0" # Pitch for NPC to turn to
 	SET_DYAW,//## %f="0.0" # Yaw for NPC to turn to
-	SET_TIMESCALE,//## %f="0.0" # Speed-up slow down game (0 - 1.0)
+	SET_TIMESCALE,//## %f="0.0" # Speed-up slow down game (0 - 1.0f)
 	SET_CAMERA_GROUP_Z_OFS,//## %s="NULL" # when following an ent with the camera, apply this z ofs
 	SET_VISRANGE,//## %f="0.0" # How far away NPC can see
 	SET_EARSHOT,//## %f="0.0" # How far an NPC can hear
-	SET_VIGILANCE,//## %f="0.0" # How often to look for enemies (0 - 1.0)
+	SET_VIGILANCE,//## %f="0.0" # How often to look for enemies (0 - 1.0f)
 	SET_GRAVITY,//## %f="0.0" # Change this ent's gravity - 800 default
 	SET_FACEAUX,		//## %f="0.0" # Set face to Aux expression for number of seconds
 	SET_FACEBLINK,		//## %f="0.0" # Set face to Blink expression for number of seconds

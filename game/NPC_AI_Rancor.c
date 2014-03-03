@@ -667,7 +667,7 @@ void Rancor_Combat( void )
 			vector3	yawOnlyAngles;
 			VectorSet( &yawOnlyAngles, 0, NPC->r.currentAngles.yaw, 0 );
 			if ( NPC->enemy->health > 0
-				&& fabs(distance-250) <= 80
+				&& fabsf(distance-250) <= 80
 				&& InFOV3( &NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin, &yawOnlyAngles, 30, 30 ) )
 			{
 				if ( !Q_irand( 0, 9 ) )

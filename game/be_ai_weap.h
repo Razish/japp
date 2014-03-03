@@ -1,19 +1,6 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 
-/*****************************************************************************
- * name:		be_ai_weap.h
- *
- * desc:		weapon AI
- *
- * $Archive: /source/code/botlib/be_ai_weap.h $
- * $Author: osman $
- * $Revision: 1.4 $
- * $Modtime: 10/05/99 3:32p $
- * $Date: 2003/03/15 23:44:00 $
- *
- *****************************************************************************/
-
 //projectile flags
 #define PFL_WINDOWDAMAGE			1		//projectile damages through window
 #define PFL_RETURN					2		//set when projectile returns to owner

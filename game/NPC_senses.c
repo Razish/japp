@@ -14,7 +14,7 @@ qboolean G_ClearLineOfSight(const vector3 *point1, const vector3 *point2, int ig
 	gentity_t	*hit;
 
 	trap->Trace ( &tr, point1, NULL, NULL, point2, ignore, clipmask, qfalse, 0, 0 );
-	if ( tr.fraction == 1.0 )
+	if ( tr.fraction == 1.0f )
 	{
 		return qtrue;
 	}
@@ -26,7 +26,7 @@ qboolean G_ClearLineOfSight(const vector3 *point1, const vector3 *point2, int ig
 		VectorCopy(&tr.endpos, &newpoint1);
 		trap->Trace (&tr, &newpoint1, NULL, NULL, point2, hit->s.number, clipmask, qfalse, 0, 0 );
 
-		if ( tr.fraction == 1.0 )
+		if ( tr.fraction == 1.0f )
 		{
 			return qtrue;
 		}
@@ -55,7 +55,7 @@ qboolean CanSee ( gentity_t *ent )
 	CalcEntitySpot( ent, SPOT_ORIGIN, &spot );
 	trap->Trace ( &tr, &eyes, NULL, NULL, &spot, NPC->s.number, MASK_OPAQUE, qfalse, 0, 0 );
 	ShotThroughGlass (&tr, ent, &spot, MASK_OPAQUE);
-	if ( tr.fraction == 1.0 )
+	if ( tr.fraction == 1.0f )
 	{
 		return qtrue;
 	}
@@ -63,7 +63,7 @@ qboolean CanSee ( gentity_t *ent )
 	CalcEntitySpot( ent, SPOT_HEAD, &spot );
 	trap->Trace ( &tr, &eyes, NULL, NULL, &spot, NPC->s.number, MASK_OPAQUE, qfalse, 0, 0 );
 	ShotThroughGlass (&tr, ent, &spot, MASK_OPAQUE);
-	if ( tr.fraction == 1.0 )
+	if ( tr.fraction == 1.0f )
 	{
 		return qtrue;
 	}
@@ -71,7 +71,7 @@ qboolean CanSee ( gentity_t *ent )
 	CalcEntitySpot( ent, SPOT_LEGS, &spot );
 	trap->Trace ( &tr, &eyes, NULL, NULL, &spot, NPC->s.number, MASK_OPAQUE, qfalse, 0, 0 );
 	ShotThroughGlass (&tr, ent, &spot, MASK_OPAQUE);
-	if ( tr.fraction == 1.0 )
+	if ( tr.fraction == 1.0f )
 	{
 		return qtrue;
 	}
@@ -818,7 +818,7 @@ float NPC_GetHFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, floa
 
 	vectoangles ( &deltaVector, &angles );
 
-	delta = fabs( AngleDelta ( facing->yaw, angles.yaw ) );
+	delta = fabsf( AngleDelta ( facing->yaw, angles.yaw ) );
 
 	if ( delta > hFOV )
 		return 0.0f;
@@ -841,7 +841,7 @@ float NPC_GetVFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, floa
 
 	vectoangles ( &deltaVector, &angles );
 
-	delta = fabs( AngleDelta ( facing->pitch, angles.pitch ) );
+	delta = fabsf( AngleDelta ( facing->pitch, angles.pitch ) );
 
 	if ( delta > vFOV )
 		return 0.0f;
@@ -869,8 +869,8 @@ int G_FindLocalInterestPoint( gentity_t *self )
 		if ( trap->InPVS( &level.interestPoints[i].origin, &eyes ) )
 		{
 			VectorSubtract( &level.interestPoints[i].origin, &eyes, &diffVec );
-			if ( (fabs(diffVec.x) + fabs(diffVec.y)) / 2 < 48 &&
-				fabs(diffVec.z) > (fabs(diffVec.x) + fabs(diffVec.y)) / 2 )
+			if ( (fabsf(diffVec.x) + fabsf(diffVec.y)) / 2 < 48 &&
+				fabsf(diffVec.z) > (fabsf(diffVec.x) + fabsf(diffVec.y)) / 2 )
 			{//Too close to look so far up or down
 				continue;
 			}

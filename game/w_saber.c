@@ -176,7 +176,7 @@ static QINLINE int G_SaberAttackPower(gentity_t *ent, qboolean attacking)
 	if ((ent->client->ps.brokenLimbs & (1 << BROKENLIMB_RARM)) ||
 		(ent->client->ps.brokenLimbs & (1 << BROKENLIMB_LARM)))
 	{ //We're very weak when one of our arms is broken
-		baseLevel *= 0.3;
+		baseLevel *= 0.3f;
 	}
 
 	//Cap at reasonable values now.
@@ -744,7 +744,7 @@ static QINLINE void G_G2NPCAngles(gentity_t *ent, vector3 legs[3], vector3 *angl
 
 			VectorCopy( &ent->client->ps.viewangles, &viewAngles );
 //			viewAngles.yaw = viewAngles.roll = 0;
-			viewAngles.pitch *= 0.5;
+			viewAngles.pitch *= 0.5f;
 			VectorCopy( &viewAngles, &lookAngles );
 
 			lookAngles.y = 0;
@@ -1150,7 +1150,7 @@ int G_SaberLockAnim( int attackerSaberStyle, int defenderSaberStyle, int topOrSi
 }
 
 extern qboolean BG_CheckIncrementLockAnim( int anim, int winOrLose ); //bg_saber.c
-#define LOCK_IDEAL_DIST_JKA 46.0f//all of the new saberlocks are 46.08 from each other because Richard Lico is da MAN
+#define LOCK_IDEAL_DIST_JKA 46.0f//all of the new saberlocks are 46.08f from each other because Richard Lico is da MAN
 
 static QINLINE qboolean WP_SabersCheckLock2( gentity_t *attacker, gentity_t *defender, sabersLockMode_t lockMode )
 {
@@ -1224,7 +1224,7 @@ static QINLINE qboolean WP_SabersCheckLock2( gentity_t *attacker, gentity_t *def
 	}
 	else
 	{//use the new system
-		idealDist = LOCK_IDEAL_DIST_JKA;//all of the new saberlocks are 46.08 from each other because Richard Lico is da MAN
+		idealDist = LOCK_IDEAL_DIST_JKA;//all of the new saberlocks are 46.08f from each other because Richard Lico is da MAN
 		if ( lockMode == LOCK_TOP )
 		{//top lock
 			attAnim = G_SaberLockAnim( attacker->client->ps.fd.saberAnimLevel, defender->client->ps.fd.saberAnimLevel, SABERLOCK_TOP, SABERLOCK_LOCK, SABERLOCK_WIN );
@@ -1455,7 +1455,7 @@ qboolean WP_SabersCheckLock( gentity_t *ent1, gentity_t *ent2 )
 		}
 	}
 
-	if ( fabs( ent1->r.currentOrigin.z-ent2->r.currentOrigin.z ) > 16 )
+	if ( fabsf( ent1->r.currentOrigin.z-ent2->r.currentOrigin.z ) > 16 )
 	{
 		return qfalse;
 	}
@@ -1902,7 +1902,7 @@ static QINLINE qboolean WP_GetSaberDeflectionAngle( gentity_t *attacker, gentity
 		int attQuadStart = saberMoveData[attacker->client->ps.saberMove].startQuad;
 		int attQuadEnd = saberMoveData[attacker->client->ps.saberMove].endQuad;
 		int defQuad = saberMoveData[defender->client->ps.saberMove].endQuad;
-		int quadDiff = fabs((float)(defQuad-attQuadStart));
+		int quadDiff = fabsf((float)(defQuad-attQuadStart));
 
 		if ( defender->client->ps.saberMove == LS_READY )
 		{
@@ -2175,7 +2175,7 @@ static QINLINE int G_GetAttackDamage( gentity_t *self, int minDmg, int maxDmg, f
 	int speedDif = 0;
 	int totalDamage = maxDmg;
 	float peakPoint = 0;
-	float attackAnimLength = bgAllAnims[self->localAnimIndex].anims[self->client->ps.torsoAnim].numFrames * fabs((float)(bgAllAnims[self->localAnimIndex].anims[self->client->ps.torsoAnim].frameLerp));
+	float attackAnimLength = bgAllAnims[self->localAnimIndex].anims[self->client->ps.torsoAnim].numFrames * fabsf((float)(bgAllAnims[self->localAnimIndex].anims[self->client->ps.torsoAnim].frameLerp));
 	float currentPoint = 0;
 	float damageFactor = 0;
 	float animSpeedFactor = 1.0f;
@@ -2206,7 +2206,7 @@ static QINLINE int G_GetAttackDamage( gentity_t *self, int minDmg, int maxDmg, f
 static QINLINE float G_GetAnimPoint(gentity_t *self)
 {
 	int speedDif = 0;
-	float attackAnimLength = bgAllAnims[self->localAnimIndex].anims[self->client->ps.torsoAnim].numFrames * fabs((float)(bgAllAnims[self->localAnimIndex].anims[self->client->ps.torsoAnim].frameLerp));
+	float attackAnimLength = bgAllAnims[self->localAnimIndex].anims[self->client->ps.torsoAnim].numFrames * fabsf((float)(bgAllAnims[self->localAnimIndex].anims[self->client->ps.torsoAnim].frameLerp));
 	float currentPoint = 0;
 	float animSpeedFactor = 1.0f;
 	float animPercentage = 0;
@@ -3864,7 +3864,7 @@ static QINLINE qboolean CheckSaberDamageOriginal(gentity_t *self, int rSaberNum,
 
 			trDif++;
 
-			while (tr.fraction == 1.0 && traceTests < 4 && tr.entityNum >= ENTITYNUM_NONE)
+			while (tr.fraction == 1.0f && traceTests < 4 && tr.entityNum >= ENTITYNUM_NONE)
 			{
 				if ( (level.time-self->client->saber[rSaberNum].blade[rBladeNum].trail.lastTime) > 100 )
 				{//no valid last pos, use current
@@ -4272,7 +4272,7 @@ static QINLINE qboolean CheckSaberDamageOriginal(gentity_t *self, int rSaberNum,
 		if ((self->client->ps.brokenLimbs & (1 << BROKENLIMB_RARM)) ||
 			(self->client->ps.brokenLimbs & (1 << BROKENLIMB_LARM)))
 		{ //weaken it if an arm is broken
-			dmg *= 0.3;
+			dmg *= 0.3f;
 			if (dmg <= SABER_NONATTACK_DAMAGE)
 			{
 				dmg = SABER_NONATTACK_DAMAGE+1;
@@ -4296,7 +4296,7 @@ static QINLINE qboolean CheckSaberDamageOriginal(gentity_t *self, int rSaberNum,
 	{ //always x2 when we're powerdueling alone... er, so, we apparently no longer want this?  So they say.
 		if ( duel_fraglimit.integer )
 		{
-			//dmg *= 1.5 - (.4 * (float)self->client->sess.wins / (float)duel_fraglimit.integer);
+			//dmg *= 1.5f - (.4f * (float)self->client->sess.wins / (float)duel_fraglimit.integer);
 
 		}
 		//dmg *= 2;
@@ -4495,7 +4495,7 @@ static QINLINE qboolean CheckSaberDamageOriginal(gentity_t *self, int rSaberNum,
 			{ //not a "jedi", so make them suffer more
 				if ( dmg > SABER_NONATTACK_DAMAGE )
 				{ //don't bother increasing just for idle touch damage
-					dmg *= 1.5;
+					dmg *= 1.5f;
 				}
 			}
 			/*
@@ -4504,7 +4504,7 @@ static QINLINE qboolean CheckSaberDamageOriginal(gentity_t *self, int rSaberNum,
 			{ //not a "jedi", so make them suffer more
 				if ( dmg > SABER_NONATTACK_DAMAGE )
 				{ //don't bother increasing just for idle touch damage
-					dmg *= 1.5;
+					dmg *= 1.5f;
 				}
 			}
 			*/
@@ -4519,11 +4519,11 @@ static QINLINE qboolean CheckSaberDamageOriginal(gentity_t *self, int rSaberNum,
 						{ //don't reduce damage if it's only 1, or if this is an unblockable attack
 							if (dmg == SABER_HITDAMAGE)
 							{ //level 1 attack
-								dmg *= 0.7;
+								dmg *= 0.7f;
 							}
 							else
 							{
-								dmg *= 0.5;
+								dmg *= 0.5f;
 							}
 						}
 					}
@@ -4830,7 +4830,7 @@ blockStuff:
 			didDefense = qtrue;
 		}
 		else if ((selfSaberLevel > FORCE_LEVEL_2 || unblockable) && //if we're doing a special attack, we can send them into a broken parry too (MP only)
-				 ( otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] < selfSaberLevel || (otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == selfSaberLevel && (Q_irand(1, 10) >= otherSaberLevel*1.5 || unblockable)) ) &&
+				 ( otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] < selfSaberLevel || (otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == selfSaberLevel && (Q_irand(1, 10) >= otherSaberLevel*1.5f || unblockable)) ) &&
 				 PM_SaberInParry(otherOwner->client->ps.saberMove) &&
 				 !PM_SaberInBrokenParry(otherOwner->client->ps.saberMove) &&
 				 !PM_SaberInParry(self->client->ps.saberMove) &&
@@ -5225,7 +5225,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 
 			trDif++;
 
-			while (tr.fraction == 1.0 && traceTests < 4 && tr.entityNum >= ENTITYNUM_NONE)
+			while (tr.fraction == 1.0f && traceTests < 4 && tr.entityNum >= ENTITYNUM_NONE)
 			{
 				if ( (level.time-self->client->saber[rSaberNum].blade[rBladeNum].trail.lastTime) > 100 )
 				{//no valid last pos, use current
@@ -5509,7 +5509,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 			/*
 			if (g_entities[tr.entityNum].client && g_entities[tr.entityNum].client->ps.usingATST)
 			{
-				dmg *= 0.1;
+				dmg *= 0.1f;
 			}
 			*/
 
@@ -5517,7 +5517,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 			{ //not a "jedi", so make them suffer more
 				if (dmg > SABER_NONATTACK_DAMAGE)
 				{ //don't bother increasing just for idle touch damage
-					dmg *= 1.5;
+					dmg *= 1.5f;
 				}
 			}
 
@@ -5527,11 +5527,11 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 				{ //don't reduce damage if it's only 1, or if this is an unblockable attack
 					if (dmg == SABER_HITDAMAGE)
 					{ //level 1 attack
-						dmg *= 0.7;
+						dmg *= 0.7f;
 					}
 					else
 					{
-						dmg *= 0.5;
+						dmg *= 0.5f;
 					}
 				}
 			}
@@ -5720,7 +5720,7 @@ blockStuff:
 			didDefense = qtrue;
 		}
 		else if ((self->client->ps.fd.saberAnimLevel > FORCE_LEVEL_2 || unblockable) && //if we're doing a special attack, we can send them into a broken parry too (MP only)
-				 ( otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] < self->client->ps.fd.saberAnimLevel || (otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == self->client->ps.fd.saberAnimLevel && (Q_irand(1, 10) >= otherOwner->client->ps.fd.saberAnimLevel*1.5 || unblockable)) ) &&
+				 ( otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] < self->client->ps.fd.saberAnimLevel || (otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == self->client->ps.fd.saberAnimLevel && (Q_irand(1, 10) >= otherOwner->client->ps.fd.saberAnimLevel*1.5f || unblockable)) ) &&
 				 PM_SaberInParry(otherOwner->client->ps.saberMove) &&
 				 !PM_SaberInBrokenParry(otherOwner->client->ps.saberMove) &&
 				 !PM_SaberInParry(self->client->ps.saberMove) &&
@@ -6015,7 +6015,7 @@ void G_SPSaberDamageTraceLerped( gentity_t *self, int saberNum, int bladeNum, ve
 			curDirFrac = 1.0f;
 		}
 		//NOTE: if saber spun at least 180 degrees since last damage trace, this is not reliable...!
-		if ( fabs(curDirFrac) < 1.0f - MAX_SABER_SWING_INC )
+		if ( fabsf(curDirFrac) < 1.0f - MAX_SABER_SWING_INC )
 		{//the saber blade spun more than 33 degrees since the last damage trace
 			curDirFrac = dirInc = 1.0f/((1.0f - curDirFrac)/MAX_SABER_SWING_INC);
 		}
@@ -6692,7 +6692,7 @@ static QINLINE qboolean CheckThrownSaberDamaged(gentity_t *saberent, gentity_t *
 			if (ent->s.eType == ET_MOVER)
 			{
 				VectorSubtract( &ent->r.absmax, &ent->r.absmin, &entOrigin );
-				VectorMA( &ent->r.absmin, 0.5, &entOrigin, &entOrigin );
+				VectorMA( &ent->r.absmin, 0.5f, &entOrigin, &entOrigin );
 				VectorAdd( &ent->r.absmin, &ent->r.absmax, &entOrigin );
 				VectorScale( &entOrigin, 0.5f, &entOrigin );
 			}
@@ -9197,7 +9197,7 @@ nextStep:
 		fVSpeed += self->client->ps.velocity.z;
 	}
 
-	//fVSpeed *= 0.08;
+	//fVSpeed *= 0.08f;
 	fVSpeed *= 1.6f/sv_fps.value;
 
 	//Cap it off at reasonable values so the saber box doesn't go flying ahead of us or
@@ -9693,9 +9693,9 @@ nextStep:
 										//Now that I have the angle, I'll just say the base for it is the difference between the two start
 										//points (even though that's quite possibly completely false)
 										VectorSubtract(&boltOrigin, &oldSaberStart, &saberSubBase);
-										saberMidPoint.x = boltOrigin.x + (saberSubBase.x*0.5);
-										saberMidPoint.y = boltOrigin.y + (saberSubBase.y*0.5);
-										saberMidPoint.z = boltOrigin.z + (saberSubBase.z*0.5);
+										saberMidPoint.x = boltOrigin.x + (saberSubBase.x*0.5f);
+										saberMidPoint.y = boltOrigin.y + (saberSubBase.y*0.5f);
+										saberMidPoint.z = boltOrigin.z + (saberSubBase.z*0.5f);
 
 										AngleVectors(&saberMidAngle, &saberMidDir, 0, 0);
 										saberMidEnd.x = saberMidPoint.x + saberMidDir.x*self->client->saber[rSaberNum].blade[rBladeNum].lengthMax;
@@ -9905,7 +9905,7 @@ void WP_SaberBlock( gentity_t *playerent, vector3 *hitloc, qboolean missileBlock
 	}
 	else if (zdiff > 13)
 	{	// The upper half has three viable blocks...
-		if (rightdot > 0.25)
+		if (rightdot > 0.25f)
 		{	// In the right quadrant...
 			if (Q_irand(0,1))
 				playerent->client->ps.saberBlocked = BLOCKED_UPPER_LEFT;

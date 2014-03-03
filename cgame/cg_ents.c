@@ -26,7 +26,7 @@ void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 
 	// lerp the tag
 	trap->R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
-		1.0 - parent->backlerp, tagName );
+		1.0f - parent->backlerp, tagName );
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( &parent->origin, &entity->origin );
@@ -57,7 +57,7 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 //AxisClear( entity->axis );
 	// lerp the tag
 	trap->R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
-		1.0 - parent->backlerp, tagName );
+		1.0f - parent->backlerp, tagName );
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( &parent->origin, &entity->origin );
@@ -376,11 +376,11 @@ localEntity_t *FX_AddOrientedLine(vector3 *start, vector3 *end, vector3 *normal,
 	le->refEntity.shaderRGBA[2] = 0xff;
 	le->refEntity.shaderRGBA[3] = 0xff;
 
-	le->color[0] = 1.0;
-	le->color[1] = 1.0;
-	le->color[2] = 1.0;
-	le->color[3] = 1.0;
-	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+	le->color[0] = 1.0f;
+	le->color[1] = 1.0f;
+	le->color[2] = 1.0f;
+	le->color[3] = 1.0f;
+	le->lifeRate = 1.0f / ( le->endTime - le->startTime );
 
 	return(le);
 }
@@ -442,7 +442,7 @@ void FX_DrawPortableShield(centity_t *cent)
 	else
 		shader = trap->R_RegisterShader( (team == TEAM_RED) ? "gfx/misc/red_portashield" : "gfx/misc/blue_portashield" );
 
-	FX_AddOrientedLine(&start, &end, &normal, 1.0f, height, 0.0f, 1.0f, 1.0f, 50.0, shader);
+	FX_AddOrientedLine(&start, &end, &normal, 1.0f, height, 0.0f, 1.0f, 1.0f, 50.0f, shader);
 }
 
 /*
@@ -1428,7 +1428,7 @@ Ghoul2 Insert End
 		val = (1.0f - (float)(cent->currentState.time - cg.time) / 3200.0f ) * 0.3f;
 
 		ent.customShader = trap->R_RegisterShader( "gfx/effects/turretflashdie" );
-		ent.shaderRGBA[0] = (sin( cg.time * 0.04f ) * val * 0.4f + val) * 255;
+		ent.shaderRGBA[0] = (sinf( cg.time * 0.04f ) * val * 0.4f + val) * 255;
 		ent.shaderRGBA[1] = ent.shaderRGBA[2] = 0;
 
 		ent.shaderRGBA[3] = 100;
@@ -1459,7 +1459,7 @@ Ghoul2 Insert End
 			vector3 hitLoc, tempAng;
 			float tempLength;
 			int curTimeDif = ((cg.time + 60000) - cent->bodyFadeTime);
-			int tMult = curTimeDif*0.08;
+			int tMult = curTimeDif*0.08f;
 
 			ent.renderfx |= RF_FORCE_ENT_ALPHA;
 
@@ -1470,7 +1470,7 @@ Ghoul2 Insert End
 			}
 			*/
 
-			if (curTimeDif*0.1 > 254)
+			if (curTimeDif*0.1f > 254)
 			{
 				ent.shaderRGBA[3] = 0;
 			}
@@ -1605,7 +1605,7 @@ Ghoul2 Insert End
 
 		ent.customShader = media.gfx.world.solidWhite;
 		ent.renderfx = RF_RGB_TINT;
-		wv = sin( cg.time * 0.003f ) * 0.08f + 0.1f;
+		wv = sinf( cg.time * 0.003f ) * 0.08f + 0.1f;
 		ent.shaderRGBA[0] = wv * 255;
 		ent.shaderRGBA[1] = wv * 255;
 		ent.shaderRGBA[2] = wv * 0;
@@ -1642,7 +1642,7 @@ Ghoul2 Insert End
 
 		ent.customShader = media.gfx.world.solidWhite;
 		ent.renderfx = RF_RGB_TINT;
-		wv = sin( cg.time * 0.005f ) * 0.08f + 0.1f; //* 0.08f + 0.1f;
+		wv = sinf( cg.time * 0.005f ) * 0.08f + 0.1f; //* 0.08f + 0.1f;
 
 		if (cent->currentState.trickedentindex3 == 1)
 		{ //dark
@@ -1687,7 +1687,7 @@ Ghoul2 Insert End
 
 		org.z += 18;
 
-		wv = sin( cg.time * 0.002f ) * 0.08f + 0.1f; //* 0.08f + 0.1f;
+		wv = sinf( cg.time * 0.002f ) * 0.08f + 0.1f; //* 0.08f + 0.1f;
 
 		VectorCopy(&org, &fxSArgs.origin);
 		VectorClear(&fxSArgs.vel);
@@ -1726,15 +1726,15 @@ Ghoul2 Insert End
 				(s1->modelindex+128) == FP_SABER_DEFENSE ||
 				(s1->modelindex+128) == FP_SABERTHROW)
 			{ //saber power
-				fxSArgs.sAlpha *= 1.5;
-				fxSArgs.eAlpha *= 1.5;
+				fxSArgs.sAlpha *= 1.5f;
+				fxSArgs.eAlpha *= 1.5f;
 				fxSArgs.shader = media.gfx.world.saber.green.glow;
 				trap->FX_AddSprite(&fxSArgs);
 			}
 			else
 			{
-				fxSArgs.sAlpha *= 0.5;
-				fxSArgs.eAlpha *= 0.5;
+				fxSArgs.sAlpha *= 0.5f;
+				fxSArgs.eAlpha *= 0.5f;
 				fxSArgs.shader = media.gfx.world.saber.green.glow;
 				trap->FX_AddSprite(&fxSArgs);
 				fxSArgs.shader = media.gfx.world.saber.blue.glow;
@@ -1964,7 +1964,7 @@ Ghoul2 Insert End
 				return;
 
 			ent.shaderRGBA[0] = ent.shaderRGBA[1] = ent.shaderRGBA[2] = 200;
-			ent.shaderRGBA[3] = 150 + sin(cg.time*0.01)*30;
+			ent.shaderRGBA[3] = 150 + sinf(cg.time*0.01f)*30;
 		}
 		else
 			ent.shaderRGBA[3] = 255;
@@ -1998,8 +1998,8 @@ Ghoul2 Insert End
 		(item->giType == IT_WEAPON || item->giType == IT_POWERUP))
 	{
 		// items bob up and down continuously
-		scale = 0.005 + cent->currentState.number * 0.00001;
-		cent->lerpOrigin.z += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
+		scale = 0.005f + cent->currentState.number * 0.00001f;
+		cent->lerpOrigin.z += 4 + cosf( ( cg.time + 1000 ) *  scale ) * 4;
 	}
 	else
 	{
@@ -2123,9 +2123,9 @@ Ghoul2 Insert End
 
 	// increase the size of the weapons when they are presented as items
 	if ( item->giType == IT_WEAPON ) {
-		VectorScale( &ent.axis[0], 1.5, &ent.axis[0] );
-		VectorScale( &ent.axis[1], 1.5, &ent.axis[1] );
-		VectorScale( &ent.axis[2], 1.5, &ent.axis[2] );
+		VectorScale( &ent.axis[0], 1.5f, &ent.axis[0] );
+		VectorScale( &ent.axis[1], 1.5f, &ent.axis[1] );
+		VectorScale( &ent.axis[2], 1.5f, &ent.axis[2] );
 		ent.nonNormalizedAxes = qtrue;
 	//	trap->S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, media.sounds.weaponHoverSound );
 	}
@@ -2142,7 +2142,7 @@ Ghoul2 Insert End
 		int a;
 
 		alpha = (float)msec / ITEM_SCALEUP_TIME;
-		a = alpha * 255.0;
+		a = alpha * 255.0f;
 		if (a <= 0)
 			a=1;
 
@@ -2615,7 +2615,7 @@ Ghoul2 Insert End
 
 		ent.customShader = media.gfx.world.solidWhite;
 		ent.renderfx = RF_RGB_TINT;
-		wv = sin( cg.time * 0.003f ) * 0.08f + 0.1f;
+		wv = sinf( cg.time * 0.003f ) * 0.08f + 0.1f;
 		ent.shaderRGBA[0] = wv * 255;
 		ent.shaderRGBA[1] = wv * 255;
 		ent.shaderRGBA[2] = wv * 0;
@@ -2779,7 +2779,7 @@ static void CG_Mover( centity_t *cent ) {
 					const float	alpha = timeFrac<0.5f?timeFrac/0.5f:1.0f;
 					drawMe = qtrue;
 					VectorMA( &refdef->vieworg, 1000.0f+((1.0f-timeFrac)*1000.0f), &refdef->viewaxis[0], &cent->lerpOrigin );
-					VectorSet( &cent->lerpAngles, refdef->viewangles.pitch, refdef->viewangles.yaw-90.0f, 0 );//cos( ( cg.time + 1000 ) *  scale ) * 4 );
+					VectorSet( &cent->lerpAngles, refdef->viewangles.pitch, refdef->viewangles.yaw-90.0f, 0 );//cosf( ( cg.time + 1000 ) *  scale ) * 4 );
 					ent.shaderRGBA[0] = ent.shaderRGBA[1] = ent.shaderRGBA[2] = 255;
 					ent.shaderRGBA[3] = alpha*255;
 				}
@@ -2903,7 +2903,7 @@ static void CG_Portal( centity_t *cent ) {
 	ent.reType = RT_PORTALSURFACE;
 	ent.oldframe = s1->powerups;
 	ent.frame = s1->frame;		// rotation speed
-	ent.skinNum = s1->clientNum/256.0 * 360;	// roll offset
+	ent.skinNum = s1->clientNum/256.0f * 360;	// roll offset
 /*
 Ghoul2 Insert Start
 */
@@ -3299,7 +3299,7 @@ void CG_AddPacketEntities( qboolean isPortal ) {
 
 	// the auto-rotating items will all have the same axis
 	cg.autoAngles.pitch = 0;
-	cg.autoAngles.yaw = ( cg.time & 2047 ) * 360 / 2048.0;
+	cg.autoAngles.yaw = ( cg.time & 2047 ) * 360 / 2048.0f;
 	cg.autoAngles.roll = 0;
 
 	cg.autoAnglesFast.pitch = 0;

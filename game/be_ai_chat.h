@@ -1,17 +1,5 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
-/*****************************************************************************
- * name:		be_ai_chat.h
- *
- * desc:		char AI
- *
- * $Archive: /source/code/botlib/be_ai_chat.h $
- * $Author: osman $
- * $Revision: 1.4 $
- * $Modtime: 10/05/99 3:32p $
- * $Date: 2003/03/15 23:43:59 $
- *
- *****************************************************************************/
 
 #define MAX_MESSAGE_SIZE		256
 #define MAX_CHATTYPE_NAME		32

@@ -1103,24 +1103,28 @@ static qboolean CG_OwnerDrawHandleKey(int ownerDraw, uint32_t flags, float *spec
 }
 
 
-static int CG_FeederCount(float feederID) {
-	int i, count;
-	count = 0;
-	if (feederID == FEEDER_REDTEAM_LIST) {
-		for (i = 0; i < cg.numScores; i++) {
-			if (cg.scores[i].team == TEAM_RED) {
+static int CG_FeederCount( int feederID ) {
+	int i, count=0;
+
+	switch ( feederID ) {
+	case FEEDER_REDTEAM_LIST:
+		for ( i=0; i<cg.numScores; i++ ) {
+			if ( cg.scores[i].team == TEAM_RED )
 				count++;
-			}
 		}
-	} else if (feederID == FEEDER_BLUETEAM_LIST) {
-		for (i = 0; i < cg.numScores; i++) {
-			if (cg.scores[i].team == TEAM_BLUE) {
+		break;
+
+	case FEEDER_BLUETEAM_LIST:
+		for ( i=0; i<cg.numScores; i++ ) {
+			if ( cg.scores[i].team == TEAM_BLUE )
 				count++;
-			}
 		}
-	} else if (feederID == FEEDER_SCOREBOARD) {
+		break;
+
+	case FEEDER_SCOREBOARD:
 		return cg.numScores;
 	}
+
 	return count;
 }
 
@@ -1178,21 +1182,20 @@ static clientInfo_t * CG_InfoFromScoreIndex(int index, int team, int *scoreIndex
 	return &cgs.clientinfo[ cg.scores[index].client ];
 }
 
-static const char *CG_FeederItemText(float feederID, int index, int column,
-									 qhandle_t *handle1, qhandle_t *handle2, qhandle_t *handle3) {
+static const char *CG_FeederItemText( int feederID, int index, int column, qhandle_t *handle1, qhandle_t *handle2,
+	qhandle_t *handle3 )
+{
 	const gitem_t *item;
-	int scoreIndex = 0;
+	int scoreIndex=0, team=-1;
 	clientInfo_t *info = NULL;
-	int team = -1;
 	score_t *sp = NULL;
 
 	*handle1 = *handle2 = *handle3 = -1;
 
-	if (feederID == FEEDER_REDTEAM_LIST) {
+	if ( feederID == FEEDER_REDTEAM_LIST )
 		team = TEAM_RED;
-	} else if (feederID == FEEDER_BLUETEAM_LIST) {
+	else if ( feederID == FEEDER_BLUETEAM_LIST )
 		team = TEAM_BLUE;
-	}
 
 	info = CG_InfoFromScoreIndex(index, team, &scoreIndex);
 	sp = &cg.scores[scoreIndex];
@@ -1254,35 +1257,34 @@ static const char *CG_FeederItemText(float feederID, int index, int column,
 	return "";
 }
 
-static qhandle_t CG_FeederItemImage(float feederID, int index) {
-	return 0;
+static qhandle_t CG_FeederItemImage( int feederID, int index ) {
+	return NULL_HANDLE;
 }
 
-static qboolean CG_FeederSelection(float feederID, int index, itemDef_t *item) {
+static qboolean CG_FeederSelection( int feederID, int index, itemDef_t *item ) {
 	if ( cgs.gametype >= GT_TEAM ) {
-		int i, count;
-		int team = (feederID == FEEDER_REDTEAM_LIST) ? TEAM_RED : TEAM_BLUE;
-		count = 0;
-		for (i = 0; i < cg.numScores; i++) {
-			if (cg.scores[i].team == team) {
-				if (index == count) {
+		int i, count=0, team = (feederID == FEEDER_REDTEAM_LIST) ? TEAM_RED : TEAM_BLUE;
+
+		for ( i=0; i<cg.numScores; i++ ) {
+			if ( cg.scores[i].team == team ) {
+				if ( index == count)
 					cg.selectedScore = i;
-				}
 				count++;
 			}
 		}
-	} else {
-		cg.selectedScore = index;
 	}
+	else
+		cg.selectedScore = index;
 
 	return qtrue;
 }
 
 float CG_Cvar_Get( const char *cvar ) {
 	char buff[128];
-	memset(buff, 0, sizeof(buff));
-	trap->Cvar_VariableStringBuffer(cvar, buff, sizeof(buff));
-	return atof(buff);
+
+	trap->Cvar_VariableStringBuffer( cvar, buff, sizeof( buff ) );
+
+	return (float)atof( buff );
 }
 
 void CG_Text_PaintWithCursor(float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont) {

@@ -1,19 +1,6 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 
-/*****************************************************************************
- * name:		be_aas.h
- *
- * desc:		Area Awareness System, stuff exported to the AI
- *
- * $Archive: /source/code/botlib/be_aas.h $
- * $Author: osman $
- * $Revision: 1.4 $
- * $Modtime: 10/05/99 3:32p $
- * $Date: 2003/03/15 23:43:59 $
- *
- *****************************************************************************/
-
 #ifndef MAX_STRINGFIELD
 #define MAX_STRINGFIELD				80
 #endif
@@ -68,7 +55,7 @@ typedef enum
 typedef struct aas_trace_s
 {
 	qboolean	startsolid;	// if true, the initial point was in a solid area
-	float		fraction;	// time completed, 1.0 = didn't hit anything
+	float		fraction;	// time completed, 1.0f = didn't hit anything
 	vector3		endpos;		// final position
 	int			ent;		// entity blocking the trace
 	int			lastarea;	// last area the trace was in (zero if none)
@@ -91,7 +78,7 @@ typedef struct bsp_trace_s
 {
 	qboolean		allsolid;	// if true, plane is not valid
 	qboolean		startsolid;	// if true, the initial point was in a solid area
-	float			fraction;	// time completed, 1.0 = didn't hit anything
+	float			fraction;	// time completed, 1.0f = didn't hit anything
 	vector3			endpos;		// final position
 	cplane_t		plane;		// surface normal at impact
 	float			exp_dist;	// expanded plane distance

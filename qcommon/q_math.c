@@ -211,7 +211,7 @@ float	Q_random( int *seed ) {
 }
 
 float	Q_crandom( int *seed ) {
-	return 2.0 * ( Q_random( seed ) - 0.5 );
+	return 2.0f * ( Q_random( seed ) - 0.5f );
 }
 
 //i wrote this function in a console test app and it appeared faster
@@ -461,10 +461,10 @@ void RotatePointAroundVector( vector3 *dst, const vector3 *dir, const vector3 *p
 	zrot[0].x = zrot[1].y = zrot[2].z = 1.0f;
 
 	rad = DEG2RAD( degrees );
-	zrot[0].x =  cos( rad );
-	zrot[0].y =  sin( rad );
-	zrot[1].x = -sin( rad );
-	zrot[1].y =  cos( rad );
+	zrot[0].x =  cosf( rad );
+	zrot[0].y =  sinf( rad );
+	zrot[1].x = -sinf( rad );
+	zrot[1].y =  cosf( rad );
 
 	MatrixMultiply( m, zrot, tmpmat );
 	MatrixMultiply( tmpmat, im, rot );
@@ -512,7 +512,7 @@ void vectoangles( const vector3 *value1, vector3 *angles ) {
 	}
 	else {
 		if ( value1->x ) {
-			yaw = ( atan2 ( value1->y, value1->x ) * 180.0f / M_PI );
+			yaw = ( atan2f ( value1->y, value1->x ) * 180.0f / M_PI );
 		}
 		else if ( value1->y > 0.0f ) {
 			yaw = 90.0f;
@@ -525,7 +525,7 @@ void vectoangles( const vector3 *value1, vector3 *angles ) {
 		}
 
 		forward = sqrt ( value1->x*value1->x + value1->y*value1->y );
-		pitch = ( atan2(value1->z, forward) * 180.0f / M_PI );
+		pitch = ( atan2f(value1->z, forward) * 180.0f / M_PI );
 		if ( pitch < 0 ) {
 			pitch += 360.0f;
 		}
@@ -707,7 +707,7 @@ void AnglesSubtract( vector3 *v1, vector3 *v2, vector3 *v3 ) {
 
 
 float AngleMod(float a) {
-	a = (360.0/65536) * ((int)(a*(65536/360.0)) & 65535);
+	a = (360.0f/65536) * ((int)(a*(65536/360.0f)) & 65535);
 	return a;
 }
 
@@ -720,7 +720,7 @@ returns angle normalized to the range [0 <= angle < 360]
 =================
 */
 float AngleNormalize360 ( float angle ) {
-	return (360.0 / 65536) * ((int)(angle * (65536 / 360.0)) & 65535);
+	return (360.0f / 65536) * ((int)(angle * (65536 / 360.0f)) & 65535);
 }
 
 
@@ -733,8 +733,8 @@ returns angle normalized to the range [-180 < angle <= 180]
 */
 float AngleNormalize180 ( float angle ) {
 	angle = AngleNormalize360( angle );
-	if ( angle > 180.0 ) {
-		angle -= 360.0;
+	if ( angle > 180.0f ) {
+		angle -= 360.0f;
 	}
 	return angle;
 }
@@ -1147,7 +1147,7 @@ number DistanceHorizontal( const vector3 *p1, const vector3 *p2 ) {
 	vector3	v;
 
 	VectorSubtract( p2, p1, &v );
-	return sqrt( v.x*v.x + v.y*v.y );	//Leave off the z component
+	return sqrtf( v.x*v.x + v.y*v.y );	//Leave off the z component
 }
 
 number DistanceHorizontalSquared( const vector3 *p1, const vector3 *p2 ) {
@@ -1366,7 +1366,7 @@ number VectorNormalize( vector3 *vec ) {
 	float length = DotProduct( vec, vec );
 
 	if ( length ) {
-		float reciprocal = 1.0f/(float)sqrt( length );
+		float reciprocal = 1.0f/(float)sqrtf( length );
 		length *= reciprocal;
 		VectorScale( vec, reciprocal, vec );
 	}
@@ -1679,10 +1679,10 @@ void NormalToLatLong( const vector3 *normal, byte bytes[2] )
 	{
 		int	a, b;
 
-		a = (int)(RAD2DEG( (number)atan2( normal->y, normal->x ) ) * (255.0f / 360.0f ));
+		a = (int)(RAD2DEG( (number)atan2f( normal->y, normal->x ) ) * (255.0f / 360.0f ));
 		a &= 0xff;
 
-		b = (int)(RAD2DEG( (number)acos( normal->z ) ) * ( 255.0f / 360.0f ));
+		b = (int)(RAD2DEG( (number)acosf( normal->z ) ) * ( 255.0f / 360.0f ));
 		b &= 0xff;
 
 		bytes[0] = b;	// longitude
@@ -1704,7 +1704,7 @@ void Rand_Init(int seed)
 	holdrand = seed;
 }
 
-// Returns a float min <= x < max (exclusive; will get max - 0.00001; but never max)
+// Returns a float min <= x < max (exclusive; will get max - 0.00001f; but never max)
 
 float flrand(float min, float max)
 {
@@ -1840,7 +1840,7 @@ qboolean G_FindClosestPointOnLineSegment( const vector3 *start, const vector3 *e
 
 	//Get length of side from End2Result using sine of theta
 	distEnd2From = VectorLength( &vecEnd2From );//c
-	cos_theta = cos(DEG2RAD(theta));//cos(theta)
+	cos_theta = cosf(DEG2RAD(theta));//cos(theta)
 	distEnd2Result = cos_theta * distEnd2From;//b
 
 	//Extrapolate to find result
@@ -1906,7 +1906,7 @@ float G_PointDistFromLineSegment( const vector3 *start, const vector3 *end, cons
 	theta = 90 * (1 - dot);//theta
 
 	//Get length of side from End2Result using sine of theta
-	cos_theta = cos(DEG2RAD(theta));//cos(theta)
+	cos_theta = cosf(DEG2RAD(theta));//cos(theta)
 	distEnd2Result = cos_theta * distEnd2From;//b
 
 	//Extrapolate to find result

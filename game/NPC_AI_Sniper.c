@@ -13,7 +13,7 @@ extern qboolean FlyingCreature( gentity_t *ent );
 #define	MAX_VIEW_DIST		1024
 #define MAX_VIEW_SPEED		250
 #define	MAX_LIGHT_INTENSITY 255
-#define	MIN_LIGHT_THRESHOLD	0.1
+#define	MIN_LIGHT_THRESHOLD	0.1f
 
 #define	DISTANCE_SCALE		0.25f
 #define	DISTANCE_THRESHOLD	0.075f
@@ -22,7 +22,7 @@ extern qboolean FlyingCreature( gentity_t *ent );
 #define	LIGHT_SCALE			0.25f
 
 #define	REALIZE_THRESHOLD	0.6f
-#define CAUTIOUS_THRESHOLD	( REALIZE_THRESHOLD * 0.75 )
+#define CAUTIOUS_THRESHOLD	( REALIZE_THRESHOLD * 0.75f )
 
 qboolean NPC_CheckPlayerTeamStealth( void );
 
@@ -539,22 +539,22 @@ void Sniper_FaceEnemy( void )
 							aimError = qtrue;
 							if ( !Q_irand( 0, 1 ) )
 							{
-								VectorMA( &target, NPC->enemy->r.maxs.z*flrand(1.5, 4), &right, &target );
+								VectorMA( &target, NPC->enemy->r.maxs.z*flrand(1.5f, 4), &right, &target );
 							}
 							else
 							{
-								VectorMA( &target, NPC->enemy->r.mins.z*flrand(1.5, 4), &right, &target );
+								VectorMA( &target, NPC->enemy->r.mins.z*flrand(1.5f, 4), &right, &target );
 							}
 						}
 						if ( !aimError || !Q_irand( 0, 1 ) )
 						{
 							if ( !Q_irand( 0, 1 ) )
 							{
-								VectorMA( &target, NPC->enemy->r.maxs.z*flrand(1.5, 4), &up, &target );
+								VectorMA( &target, NPC->enemy->r.maxs.z*flrand(1.5f, 4), &up, &target );
 							}
 							else
 							{
-								VectorMA( &target, NPC->enemy->r.mins.z*flrand(1.5, 4), &up, &target );
+								VectorMA( &target, NPC->enemy->r.mins.z*flrand(1.5f, 4), &up, &target );
 							}
 						}
 						trap->Trace( &trace, &muzzle, &vec3_origin, &vec3_origin, &target, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );

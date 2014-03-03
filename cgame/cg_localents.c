@@ -275,7 +275,7 @@ void CG_AddFragment( localEntity_t *le ) {
 
 	// trace a line from previous position to new position
 	CG_Trace( &trace, &le->refEntity.origin, NULL, NULL, &newOrigin, -1, CONTENTS_SOLID );
-	if ( trace.fraction == 1.0 ) {
+	if ( trace.fraction == 1.0f ) {
 		// still in free fall
 		VectorCopy( &newOrigin, &le->refEntity.origin );
 
@@ -399,7 +399,7 @@ static void CG_AddMoveScaleFade( localEntity_t *le ) {
 
 	if ( le->fadeInTime > le->startTime && cg.time < le->fadeInTime ) {
 		// fade / grow time
-		c = 1.0 - (float) ( le->fadeInTime - cg.time ) / ( le->fadeInTime - le->startTime );
+		c = 1.0f - (float) ( le->fadeInTime - cg.time ) / ( le->fadeInTime - le->startTime );
 	}
 	else {
 		// fade / grow time
@@ -409,7 +409,7 @@ static void CG_AddMoveScaleFade( localEntity_t *le ) {
 	re->shaderRGBA[3] = 0xff * c * le->color[3];
 
 	if ( !( le->leFlags & LEF_PUFF_DONT_SCALE ) ) {
-		re->radius = le->radius * ( 1.0 - c ) + 8;
+		re->radius = le->radius * ( 1.0f - c ) + 8;
 	}
 
 	BG_EvaluateTrajectory( &le->pos, cg.time, &re->origin );
@@ -448,7 +448,7 @@ static void CG_AddPuff( localEntity_t *le ) {
 	re->shaderRGBA[2] = le->color[2] * c;
 
 	if ( !( le->leFlags & LEF_PUFF_DONT_SCALE ) ) {
-		re->radius = le->radius * ( 1.0 - c ) + 8;
+		re->radius = le->radius * ( 1.0f - c ) + 8;
 	}
 
 	BG_EvaluateTrajectory( &le->pos, cg.time, &re->origin );
@@ -487,7 +487,7 @@ static void CG_AddScaleFade( localEntity_t *le ) {
 	c = ( le->endTime - cg.time ) * le->lifeRate;
 
 	re->shaderRGBA[3] = 0xff * c * le->color[3];
-	re->radius = le->radius * ( 1.0 - c ) + 8;
+	re->radius = le->radius * ( 1.0f - c ) + 8;
 
 	// if the view would be "inside" the sprite, kill the sprite
 	// so it doesn't add too much overdraw
@@ -526,9 +526,9 @@ static void CG_AddFallScaleFade( localEntity_t *le ) {
 
 	re->shaderRGBA[3] = 0xff * c * le->color[3];
 
-	re->origin.z = le->pos.trBase.z - ( 1.0 - c ) * le->pos.trDelta.z;
+	re->origin.z = le->pos.trBase.z - ( 1.0f - c ) * le->pos.trDelta.z;
 
-	re->radius = le->radius * ( 1.0 - c ) + 16;
+	re->radius = le->radius * ( 1.0f - c ) + 16;
 
 	// if the view would be "inside" the sprite, kill the sprite
 	// so it doesn't add too much overdraw
@@ -562,10 +562,10 @@ static void CG_AddExplosion( localEntity_t *ex ) {
 		float		light;
 
 		light = (float)( cg.time - ex->startTime ) / ( ex->endTime - ex->startTime );
-		if ( light < 0.5 ) {
-			light = 1.0;
+		if ( light < 0.5f ) {
+			light = 1.0f;
 		} else {
-			light = 1.0 - ( light - 0.5 ) * 2;
+			light = 1.0f - ( light - 0.5f ) * 2;
 		}
 		light = ex->light * light;
 		trap->R_AddLightToScene(&ent->origin, light, ex->lightColor.r, ex->lightColor.g, ex->lightColor.b );
@@ -585,16 +585,16 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 
 	c = ( le->endTime - cg.time ) / ( float ) ( le->endTime - le->startTime );
 	if ( c > 1 ) {
-		c = 1.0;	// can happen during connection problems
+		c = 1.0f;	// can happen during connection problems
 	}
 
 	re.shaderRGBA[0] = 0xff;
 	re.shaderRGBA[1] = 0xff;
 	re.shaderRGBA[2] = 0xff;
-	re.shaderRGBA[3] = 0xff * c * 0.33;
+	re.shaderRGBA[3] = 0xff * c * 0.33f;
 
 	re.reType = RT_SPRITE;
-	re.radius = 42 * ( 1.0 - c ) + 30;
+	re.radius = 42 * ( 1.0f - c ) + 30;
 
 	SE_R_AddRefEntityToScene( &re, MAX_CLIENTS );
 
@@ -603,10 +603,10 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 		float		light;
 
 		light = (float)( cg.time - le->startTime ) / ( le->endTime - le->startTime );
-		if ( light < 0.5 ) {
-			light = 1.0;
+		if ( light < 0.5f ) {
+			light = 1.0f;
 		} else {
-			light = 1.0 - ( light - 0.5 ) * 2;
+			light = 1.0f - ( light - 0.5f ) * 2;
 		}
 		light = le->light * light;
 		trap->R_AddLightToScene(&re.origin, light, le->lightColor.r, le->lightColor.g, le->lightColor.b );
@@ -666,7 +666,7 @@ void CG_AddScorePlum( localEntity_t *le ) {
 		}
 
 	}
-	if (c < 0.25)
+	if (c < 0.25f)
 		re->shaderRGBA[3] = 0xff * 4 * c;
 	else
 		re->shaderRGBA[3] = 0xff;
@@ -680,7 +680,7 @@ void CG_AddScorePlum( localEntity_t *le ) {
 	CrossProduct(&dir, &up, &vec);
 	VectorNormalize(&vec);
 
-	VectorMA(&origin, -10 + 20 * sin(c * 2 * M_PI), &vec, &origin);
+	VectorMA(&origin, -10 + 20 * sinf(c * 2 * M_PI), &vec, &origin);
 
 	// if the view would be "inside" the sprite, kill the sprite
 	// so it doesn't add too much overdraw
@@ -730,9 +730,9 @@ void CG_AddOLine( localEntity_t *le )
 
 	frac = (cg.time - le->startTime) / ( float ) ( le->endTime - le->startTime );
 	if ( frac > 1 )
-		frac = 1.0;	// can happen during connection problems
+		frac = 1.0f;	// can happen during connection problems
 	else if (frac < 0)
-		frac = 0.0;
+		frac = 0.0f;
 
 	// Use the liferate to set the scale over time.
 	re->data.line.width = le->data.line.width + (le->data.line.dwidth * frac);

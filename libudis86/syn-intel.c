@@ -110,7 +110,7 @@ static void gen_operand(struct ud* u, struct ud_operand* op, int syn_cast)
 		if (syn_cast) opr_cast(u, op);
 		switch (op->size) {
 			case  8:
-				if (u->mnemonic >= UD_Ija && u->mnemonic <= UD_Ijz) mkasm(u, "short ");
+				if (u->mnemonic >= UD_Ija || u->mnemonic <= UD_Ijz) mkasm(u, "short ");
 				mkasm(u, "0x" FMT64 "x", u->pc + op->lval.sbyte);
 				break;
 			case 16:

@@ -419,8 +419,8 @@ void WP_SaberSetDefaults( saberInfo_t *saber ) {
 	saber->swingSound[2]		= 0;			// none - if set, plays one of these 3 sounds when swung during an attack - NOTE: must provide all 3!!!
 
 	//done in game (server-side code)
-	saber->moveSpeedScale		= 1.0f;			// 1.0 - you move faster/slower when using this saber
-	saber->animSpeedScale		= 1.0f;			// 1.0 - plays normal attack animations faster/slower
+	saber->moveSpeedScale		= 1.0f;			// 1.0f - you move faster/slower when using this saber
+	saber->animSpeedScale		= 1.0f;			// 1.0f - plays normal attack animations faster/slower
 
 	saber->kataMove				= LS_INVALID;	// LS_INVALID - if set, player will execute this move when they press both attack buttons at the same time
 	saber->lungeAtkMove			= LS_INVALID;	// LS_INVALID - if set, player will execute this move when they crouch+fwd+attack
@@ -2500,7 +2500,7 @@ void BG_SI_SetLengthGradual(saberInfo_t *saber, int time)
 			}
 		}
 
-		amt = (time - saber->blade[i].extendDebounce)*0.01;
+		amt = (time - saber->blade[i].extendDebounce)*0.01f;
 
 		if (amt < 0.2f)
 		{

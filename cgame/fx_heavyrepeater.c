@@ -58,7 +58,7 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon ) {
 	ent.renderfx		= (RF_RGB_TINT|RF_MINLIGHT);
 	SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 
-	scale = (1.15 + Q_fabs( sinf( cg.time / 80.0f ) )*0.65f);
+	scale = (1.15f + Q_fabs( sinf( cg.time / 80.0f ) )*0.65f);
 	VectorScale( &ent.axis[0], scale, &ent.axis[0] );
 	VectorScale( &ent.axis[1], scale, &ent.axis[1] );
 	VectorScale( &ent.axis[2], scale, &ent.axis[2] );
