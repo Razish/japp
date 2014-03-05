@@ -731,12 +731,14 @@ static int JPLua_Export_SendChatText( lua_State *L ) {
 }
 #endif
 
-#ifdef _CGAME
 static int JPLua_Export_SendConsoleCommand( lua_State *L ) {
+#if defined(_GAME)
+	trap->SendConsoleCommand( lua_tointeger( L, 1 ), va( "%s\n", lua_tostring( L, 2 ) ) );
+#elif defined(_CGAME)
 	trap->SendConsoleCommand( lua_tostring( L, 1 ) );
+#endif
 	return 0;
 }
-#endif
 
 #ifdef _GAME
 static int JPLua_Export_SendReliableCommand( lua_State *L ) {
@@ -844,8 +846,8 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "RemoveListener",				JPLua_Event_RemoveListener }, // RemoveListener( string name )
 #ifdef _CGAME
 	{ "SendChatText",				JPLua_Export_SendChatText }, // SendChatText( string text )
-	{ "SendConsoleCommand",			JPLua_Export_SendConsoleCommand }, // SendConsoleCommand( string command )
 #endif
+	{ "SendConsoleCommand",			JPLua_Export_SendConsoleCommand }, // SendConsoleCommand( string command )
 #ifdef _GAME
 	{ "SendReliableCommand",		JPLua_Export_SendReliableCommand }, // SendReliableCommand( integer clientNum, string cmd )
 #endif
