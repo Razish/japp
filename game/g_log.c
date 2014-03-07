@@ -239,7 +239,7 @@ void G_LogWeaponOutput(void)
 	int percharacter[WP_NUM_WEAPONS];
 //	char info[1024];
 //	char mapname[128];
-	char *nameptr, *unknownname="<Unknown>";
+	const char *nameptr, *unknownname="<Unknown>";
 
 	if (!g_statLog.integer)
 	{

@@ -338,7 +338,7 @@ void PC_SourceWarning(int handle, char *format, ...) {
 PC_SourceError
 =================
 */
-void PC_SourceError(int handle, char *format, ...) {
+void PC_SourceError(int handle, const char *format, ...) {
 	int line;
 	char filename[128];
 	va_list argptr;
@@ -547,25 +547,19 @@ qboolean String_Parse(char **p, const char **out) {
 PC_String_Parse
 =================
 */
-qboolean PC_String_Parse(int handle, const char **out)
-{
-	static char*	squiggy = "}";
-	pc_token_t		token;
+qboolean PC_String_Parse( int handle, const char **out ) {
+	static const char *squiggy = "}";
+	pc_token_t token;
 
-	if (!trap->PC_ReadToken(handle, &token))
-	{
+	if ( !trap->PC_ReadToken( handle, &token ) )
 		return qfalse;
-	}
 
 	// Save some memory by not return the end squiggy as an allocated string
-	if ( !Q_stricmp ( token.string, "}" ) )
-	{
+	if ( !Q_stricmp( token.string, "}" ) )
 		*(out) = squiggy;
-	}
 	else
-	{
-		*(out) = String_Alloc(token.string);
-	}
+		*(out) = String_Alloc( token.string );
+
 	return qtrue;
 }
 
@@ -1354,7 +1348,7 @@ qboolean Script_SetItemRect(itemDef_t *item, char **args)
 	return qtrue;
 }
 
-void Menu_ShowGroup (menuDef_t *menu, char *groupName, qboolean showFlag)
+void Menu_ShowGroup (menuDef_t *menu, const char *groupName, qboolean showFlag)
 {
 	itemDef_t *item;
 	int count,j;

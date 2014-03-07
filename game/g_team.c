@@ -358,16 +358,11 @@ Note that bonuses are not cumulative.  You get one, they are in importance
 order.
 ================
 */
-void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker)
-{
-	int i;
-	gentity_t *ent;
-	int flag_pw, enemy_flag_pw;
-	int otherteam;
-	gentity_t *flag, *carrier = NULL;
-	char *c;
+void Team_FragBonuses( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker ) {
+	int i, team, flag_pw, enemy_flag_pw, otherteam;
+	gentity_t *ent, *flag, *carrier = NULL;
+	const char *c;
 	vector3 v1, v2;
-	int team;
 
 	// no bonus for fragging yourself or team mates
 	if (!targ->client || !attacker->client || targ == attacker || OnSameTeam(targ, attacker))
@@ -379,10 +374,11 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		return; // whoever died isn't on a team
 
 	// same team, if the flag at base, check to he has the enemy flag
-	if (team == TEAM_RED) {
+	if ( team == TEAM_RED ) {
 		flag_pw = PW_REDFLAG;
 		enemy_flag_pw = PW_BLUEFLAG;
-	} else {
+	}
+	else {
 		flag_pw = PW_BLUEFLAG;
 		enemy_flag_pw = PW_REDFLAG;
 	}
@@ -536,7 +532,7 @@ void Team_CheckHurtCarrier(gentity_t *targ, gentity_t *attacker)
 
 
 gentity_t *Team_ResetFlag( int team ) {
-	char *c;
+	const char *c;
 	gentity_t *ent, *rent = NULL;
 
 	switch (team) {
@@ -1071,39 +1067,32 @@ go to a random point that doesn't telefrag
 */
 #define	MAX_TEAM_SPAWN_POINTS	32
 gentity_t *SelectRandomTeamSpawnPoint( int teamstate, team_t team, int siegeClass ) {
-	gentity_t	*spot;
-	int			count;
-	int			selection;
-	gentity_t	*spots[MAX_TEAM_SPAWN_POINTS];
-	char		*classname;
-	qboolean	mustBeEnabled = qfalse;
+	gentity_t *spot, *spots[MAX_TEAM_SPAWN_POINTS];
+	int count, selection;
+	const char *classname;
+	qboolean mustBeEnabled = qfalse;
 
-	if (level.gametype == GT_SIEGE)
-	{
-		if (team == SIEGETEAM_TEAM1)
-		{
+	if ( level.gametype == GT_SIEGE ) {
+		if ( team == SIEGETEAM_TEAM1 )
 			classname = "info_player_siegeteam1";
-		}
 		else
-		{
 			classname = "info_player_siegeteam2";
-		}
 
 		mustBeEnabled = qtrue; //siege spawn points need to be "enabled" to be used (because multiple spawnpoint sets can be placed at once)
 	}
-	else
-	{
-		if (teamstate == TEAM_BEGIN) {
-			if (team == TEAM_RED)
+	else {
+		if ( teamstate == TEAM_BEGIN ) {
+			if ( team == TEAM_RED )
 				classname = "team_CTF_redplayer";
-			else if (team == TEAM_BLUE)
+			else if ( team == TEAM_BLUE )
 				classname = "team_CTF_blueplayer";
 			else
 				return NULL;
-		} else {
-			if (team == TEAM_RED)
+		}
+		else {
+			if ( team == TEAM_RED )
 				classname = "team_CTF_redspawn";
-			else if (team == TEAM_BLUE)
+			else if ( team == TEAM_BLUE )
 				classname = "team_CTF_bluespawn";
 			else
 				return NULL;

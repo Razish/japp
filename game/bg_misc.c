@@ -2309,8 +2309,7 @@ void BG_TempFree( int size )
 	bg_poolTail += size;
 }
 
-char *BG_StringAlloc ( const char *source )
-{
+char *BG_StringAlloc( const char *source ) {
 	char *dest;
 	int len = strlen( source + 1 );
 
@@ -2318,13 +2317,12 @@ char *BG_StringAlloc ( const char *source )
 		Com_Printf( "BG_StringAlloc: %i bytes\n", len );
 	#endif
 
-	dest = BG_Alloc ( len );
-	strcpy ( dest, source );
+	dest = BG_Alloc( len );
+	strcpy( dest, source );
 	return dest;
 }
 
-qboolean BG_OutOfMemory ( void )
-{
+qboolean BG_OutOfMemory ( void ) {
 	return bg_poolSize >= MAX_POOL_SIZE;
 }
 
@@ -2341,10 +2339,8 @@ const char *gametypeStringShort[GT_MAX_GAME_TYPE] = {
 	"CTY"
 };
 
-const char *BG_GetGametypeString( int gametype )
-{
-	switch ( gametype )
-	{
+const char *BG_GetGametypeString( int gametype ) {
+	switch ( gametype ) {
 	case GT_FFA:
 		return "Free For All";
 	case GT_HOLOCRON:
@@ -2372,8 +2368,7 @@ const char *BG_GetGametypeString( int gametype )
 	}
 }
 
-int BG_GetGametypeForString( const char *gametype )
-{
+int BG_GetGametypeForString( const char *gametype ) {
 		 if ( !Q_stricmp( gametype, "ffa" )
 			||!Q_stricmp( gametype, "dm" ) )			return GT_FFA;
 	else if ( !Q_stricmp( gametype, "holocron" ) )		return GT_HOLOCRON;

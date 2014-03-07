@@ -7,23 +7,23 @@
 #include "fx_local.h"
 #include "bg_luaevent.h"
 #include "cg_media.h"
+#include "bg_vehicles.h"
 
 extern void CheckCameraLocation( vector3 *oldEyeOrigin );
 
 extern vmCvar_t	cg_thirdPersonAlpha;
 
-extern int			cgSiegeTeam1PlShader;
-extern int			cgSiegeTeam2PlShader;
+extern int cgSiegeTeam1PlShader;
+extern int cgSiegeTeam2PlShader;
 
 extern void CG_AddRadarEnt( centity_t *cent );	//cg_ents.c
 extern void CG_AddBracketedEnt( centity_t *cent );	//cg_ents.c
 extern qboolean CG_InFighter( void );
 extern qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum );
 
-
 //for g2 surface routines
-#define TURN_ON				0x00000000
-#define TURN_OFF			0x00000100
+#define TURN_ON		(0x00000000u)
+#define TURN_OFF	(0x00000100u)
 
 extern stringID_table_t animTable [MAX_ANIMATIONS+1];
 
@@ -332,7 +332,8 @@ qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team
 
 static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelName, const char *skinName, const char *teamName, int clientNum ) {
 	int handle, checkSkin;
-	char afilename[MAX_QPATH], GLAName[MAX_QPATH], surfOff[MAX_SURF_LIST_SIZE], surfOn[MAX_SURF_LIST_SIZE], *slash, *useSkinName;
+	char afilename[MAX_QPATH], GLAName[MAX_QPATH], surfOff[MAX_SURF_LIST_SIZE], surfOn[MAX_SURF_LIST_SIZE], *slash;
+	const char *useSkinName;
 	vector3	tempVec = { 0.0f, 0.0f, 0.0f };
 	qboolean badModel = qfalse;
 
@@ -721,7 +722,8 @@ void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 void CG_LoadClientInfo( clientInfo_t *ci ) {
 	qboolean modelloaded;
 	int clientNum, i;
-	char teamname[MAX_QPATH], *fallbackModel = DEFAULT_MODEL;
+	char teamname[MAX_QPATH];
+	const char *fallbackModel = DEFAULT_MODEL;
 
 	if ( ci->gender == GENDER_FEMALE )
 		fallbackModel = "jan";
@@ -818,7 +820,7 @@ static void CG_InitG2SaberData( int saberNum, clientInfo_t *ci ) {
 
 	if ( ci->ghoul2Weapons[saberNum] ) {
 		int k = 0, tagBolt;
-		char *tagName;
+		const char *tagName;
 
 		if ( ci->saber[saberNum].skin )
 			trap->G2API_SetSkin( ci->ghoul2Weapons[saberNum], 0, ci->saber[saberNum].skin, ci->saber[saberNum].skin );
@@ -1023,11 +1025,11 @@ static void CG_SetDeferredClientInfo( clientInfo_t *ci ) {
 }
 
 void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *saberName );
-void ParseRGBSaber( char *str, vector3 *c );
+void ParseRGBSaber( const char *str, vector3 *c );
 void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	clientInfo_t *ci, newInfo;
-	const char  *configstring, *v;
-	char *slash, *yo;
+	const char  *configstring, *v, *yo;
+	char *slash;
 	void *oldGhoul2, *oldG2Weapons[MAX_SABERS];
 	int i, k, r, g, b, full;
 	qboolean saberUpdate[MAX_SABERS];
@@ -1142,7 +1144,9 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	// model
 	v = Info_ValueForKey( configstring, "model" );
 	if ( cg_forceModel.integer && clientNum != cg.clientNum ) {
-		char modelStr[MAX_QPATH], *skin = NULL;
+		char modelStr[MAX_QPATH];
+		const char *skin = NULL;
+		size_t len;
 
 		// ally model for teammates unless we're in a non-team game, i.e. FFA where everyone is on TEAM_FREE
 		if ( cgs.gametype < GT_TEAM || newInfo.team != cgs.clientinfo[cg.snap ? cg.snap->ps.clientNum : cg.clientNum].team )
@@ -1150,12 +1154,13 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 		else
 			Q_strncpyz( modelStr, cg_forceAllyModel.string, sizeof( modelStr ) );
 
-		if ( !(skin = strchr( modelStr, '/' )) )
-			skin = "default";
+		if ( (skin = strchr( modelStr, '/' )) )
+			modelStr[skin++-modelStr] = '\0';
 		else
-			*skin++ = 0;
+			skin = "default";
+		len = strlen( skin )+1;
 
-		Q_strncpyz( newInfo.skinName, skin, sizeof( newInfo.skinName ) );
+		Q_strncpyz( newInfo.skinName, skin, min( len, sizeof( newInfo.skinName ) ) );
 		Q_strncpyz( newInfo.modelName, modelStr, sizeof( newInfo.modelName ) );
 
 	}
@@ -3779,16 +3784,15 @@ void RGB_LerpColor( vector3 *from, vector3 *to, float frac, vector3 *out ) {
 		out->data[i] += diff.data[i] * frac;
 }
 
-int getint( char **buf ) {
-	return (int)strtod( *buf, buf );
+int getint( const char **buf ) {
+	return (int)strtod( *buf, (char **)buf );
 }
 
-void ParseRGBSaber( char *str, vector3 *c ) {
-	char *p = str;
+void ParseRGBSaber( const char *str, vector3 *c ) {
 	int i;
 
-	for ( i=0; i<3; i++, p++ )
-		c->data[i] = getint( &p );
+	for ( i=0; i<3; i++, str++ )
+		c->data[i] = getint( &str );
 }
 
 static void CG_RGBForSaberColor( saber_colors_t color, vector3 *rgb, int cnum, int bnum ) {
@@ -5802,7 +5806,7 @@ qhandle_t CG_HandleAppendedSkin( char *modelName ) {
 			// go back to the first /, should be the path point
 			if ( (p=Q_strrchr( baseFolder, '/' )) ) {
 				// got it.. terminate at the slash and register.
-				char *useSkinName;
+				const char *useSkinName;
 
 				*p = '\0';
 
@@ -5820,27 +5824,26 @@ qhandle_t CG_HandleAppendedSkin( char *modelName ) {
 }
 
 // Create a temporary ghoul2 instance and get the gla name so we can try loading animation data and sounds.
-void BG_GetVehicleModelName( char *modelname, int len );
-void BG_GetVehicleSkinName( char *skinname, int len );
-
 void CG_CacheG2AnimInfo( char *modelName ) {
 	void *g2 = NULL;
 	char *slash, useModel[MAX_QPATH], useSkin[MAX_QPATH];
 	int animIndex;
 
-	Q_strncpyz( useModel, modelName, sizeof( useModel ) );
-	Q_strncpyz( useSkin, modelName, sizeof( useSkin ) );
-
 	if ( modelName[0] == '$' ) {
 		// it's a vehicle name actually, let's precache the whole vehicle
-		BG_GetVehicleModelName( useModel, sizeof( useModel ) );
-		BG_GetVehicleSkinName( useSkin, sizeof( useSkin ) );
+		Q_strncpyz( useModel, BG_GetVehicleModelName( modelName ), sizeof( useModel ) );
+		Q_strncpyz( useSkin, BG_GetVehicleSkinName( modelName ), sizeof( useSkin ) );
 		if ( useSkin[0] )
 			trap->R_RegisterSkin( va( "models/players/%s/model_%s.skin", useModel, useSkin ) );
 		else
 			trap->R_RegisterSkin( va( "models/players/%s/model_default.skin", useModel ) );
 		Q_strncpyz( useModel, va( "models/players/%s/model.glm", useModel ), sizeof( useModel ) );
 	}
+	else {
+		Q_strncpyz( useModel, modelName, sizeof( useModel ) );
+		Q_strncpyz( useSkin, modelName, sizeof( useSkin ) );
+	}
+
 
 	trap->G2API_InitGhoul2Model( &g2, useModel, 0, 0, 0, 0, 0 );
 
@@ -5927,7 +5930,7 @@ void CG_G2AnimEntModelLoad( centity_t *cent ) {
 
 			cent->m_pVehicle->m_pParentEntity = (bgEntity_t *)cent;
 
-			BG_GetVehicleModelName( modelName, sizeof( modelName ) );
+			Q_strncpyz( modelName, BG_GetVehicleModelName( cModelName ), sizeof( modelName ) );
 			if ( cent->m_pVehicle->m_pVehicleInfo->skin && cent->m_pVehicle->m_pVehicleInfo->skin[0] )
 				skinID = trap->R_RegisterSkin( va( "models/players/%s/model_%s.skin", modelName, cent->m_pVehicle->m_pVehicleInfo->skin ) );
 			else
@@ -5943,7 +5946,8 @@ void CG_G2AnimEntModelLoad( centity_t *cent ) {
 		trap->G2API_InitGhoul2Model( &cent->ghoul2, modelName, 0, skinID, 0, 0, 0 );
 
 		if ( cent->ghoul2 ) {
-			char GLAName[MAX_QPATH], originalModelName[MAX_QPATH], *saber;
+			char GLAName[MAX_QPATH], originalModelName[MAX_QPATH];
+			const char *saber;
 			int j;
 
 			if ( cent->currentState.NPC_class == CLASS_VEHICLE && cent->m_pVehicle ) {
@@ -5985,7 +5989,7 @@ void CG_G2AnimEntModelLoad( centity_t *cent ) {
 			}
 
 			if ( cent->currentState.npcSaber1 ) {
-				saber = (char *)CG_ConfigString( CS_MODELS+cent->currentState.npcSaber1 );
+				saber = CG_ConfigString( CS_MODELS+cent->currentState.npcSaber1 );
 				assert( !saber || !saber[0] || saber[0] == '@' );
 				//valid saber names should always start with '@' for NPCs
 
@@ -5995,7 +5999,7 @@ void CG_G2AnimEntModelLoad( centity_t *cent ) {
 				}
 			}
 			if ( cent->currentState.npcSaber2 ) {
-				saber = (char *)CG_ConfigString( CS_MODELS+cent->currentState.npcSaber2 );
+				saber = CG_ConfigString( CS_MODELS+cent->currentState.npcSaber2 );
 				assert( !saber || !saber[0] || saber[0] == '@' );
 				//valid saber names should always start with '@' for NPCs
 
@@ -8546,7 +8550,7 @@ stillDoSaber:
 
 				if ( addBolts ) {
 					int m, tagBolt;
-					char *tagName;
+					const char *tagName;
 
 					for ( m=0; m<ci->saber[0].numBlades; m++ ) {
 						tagName = va( "*blade%i", m+1 );

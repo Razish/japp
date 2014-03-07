@@ -43,7 +43,7 @@ extern void NPC_GalakMech_Init( gentity_t *ent );
 extern void NPC_Protocol_Precache( void );
 extern void Boba_Precache( void );
 extern void NPC_Wampa_Precache( void );
-gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle, vector3 *origin );
+gentity_t *NPC_SpawnType( gentity_t *ent, const char *npc_type, const char *targetname, qboolean isVehicle, vector3 *origin );
 
 extern void Rancor_SetBolts( gentity_t *self );
 extern void Wampa_SetBolts( gentity_t *self );
@@ -51,32 +51,11 @@ extern void Wampa_SetBolts( gentity_t *self );
 #define	NSF_DROP_TO_FLOOR	16
 
 // PAIN functions...
-//
-extern void funcBBrushPain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void misc_model_breakable_pain	(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Pain					(gentity_t *self, gentity_t *attacker, int damage);
-extern void station_pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void func_usable_pain			(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_ATST_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_ST_Pain					(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Jedi_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Droid_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Probe_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_MineMonster_Pain		(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Howler_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Seeker_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Remote_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void emplaced_gun_pain			(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Mark1_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_GM_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Sentry_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Mark2_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void PlayerPain					(gentity_t *self, gentity_t *attacker, int damage);
-extern void GasBurst					(gentity_t *self, gentity_t *attacker, int damage);
-extern void CrystalCratePain			(gentity_t *self, gentity_t *attacker, int damage);
-extern void TurretPain					(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Wampa_Pain				(gentity_t *self, gentity_t *attacker, int damage);
-extern void NPC_Rancor_Pain				(gentity_t *self, gentity_t *attacker, int damage);
+typedef void (PAIN_FUNC)( gentity_t *self, gentity_t *attacker, int damage );
+extern PAIN_FUNC funcBBrushPain, misc_model_breakable_pain, NPC_Pain, station_pain, func_usable_pain, NPC_ATST_Pain,
+	NPC_ST_Pain, NPC_Jedi_Pain, NPC_Droid_Pain, NPC_Probe_Pain, NPC_MineMonster_Pain, NPC_Howler_Pain, NPC_Seeker_Pain,
+	NPC_Remote_Pain, emplaced_gun_pain, NPC_Mark1_Pain, NPC_GM_Pain, NPC_Sentry_Pain, NPC_Mark2_Pain, PlayerPain, GasBurst,
+	CrystalCratePain, TurretPain, NPC_Wampa_Pain, NPC_Rancor_Pain;
 
 int WP_SetSaberModel( gclient_t *client, class_t npcClass )
 {
@@ -89,7 +68,6 @@ int WP_SetSaberModel( gclient_t *client, class_t npcClass )
 NPC_PainFunc
 -------------------------
 */
-typedef void (PAIN_FUNC) (gentity_t *self, gentity_t *attacker, int damage);
 
 PAIN_FUNC *NPC_PainFunc( gentity_t *ent )
 {
@@ -1197,7 +1175,7 @@ void NPC_Begin (gentity_t *ent)
 		//check for droidunit
 		if ( ent->m_pVehicle->m_iDroidUnitTag != -1 )
 		{
-			char	*droidNPCType = NULL;
+			const char *droidNPCType = NULL;
 			gentity_t *droidEnt = NULL;
 			if ( ent->model2
 				&& ent->model2[0] )
@@ -1940,7 +1918,7 @@ teamnodmg - team that NPC does not take damage from (turrets and other auto-defe
 */
 extern void NPC_PrecacheAnimationCFG( const char *NPC_type );
 void NPC_Precache ( gentity_t *spawner );
-void NPC_PrecacheType( char *NPC_type )
+void NPC_PrecacheType( const char *NPC_type )
 {
 	gentity_t *fakespawner = G_Spawn();
 	if ( fakespawner )
@@ -2084,7 +2062,7 @@ teamnodmg - team that NPC does not take damage from (turrets and other auto-defe
 */
 qboolean NPC_VehiclePrecache( gentity_t *spawner )
 {
-	char *droidNPCType = NULL;
+	const char *droidNPCType = NULL;
 	//This will precache the vehicle
 	vehicleInfo_t *pVehInfo;
 	int iVehIndex = BG_VehicleGetIndex( spawner->NPC_type );
@@ -3809,7 +3787,7 @@ void SP_NPC_Droid_Protocol( gentity_t *self)
 NPC_Spawn_f
 */
 
-gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle, vector3 *origin ) {
+gentity_t *NPC_SpawnType( gentity_t *ent, const char *npc_type, const char *targetname, qboolean isVehicle, vector3 *origin ) {
 	gentity_t *NPCspawner = G_Spawn();
 	vector3 forward, end;
 	trace_t trace;

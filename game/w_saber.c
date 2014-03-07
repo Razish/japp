@@ -703,8 +703,7 @@ static QINLINE qboolean G_CheckLookTarget( gentity_t *ent, vector3 *lookAngles, 
 void NPC_SetBoneAngles(gentity_t *ent, const char *bone, vector3 *angles);
 static QINLINE void G_G2NPCAngles(gentity_t *ent, vector3 legs[3], vector3 *angles)
 {
-	char *craniumBone = "cranium";
-	char *thoracicBone = "thoracic"; //only used by atst so doesn't need a case
+	static const char *craniumBone = "cranium", *thoracicBone = "thoracic";
 	qboolean looking = qfalse;
 	vector3 viewAngles;
 	vector3 lookAngles;

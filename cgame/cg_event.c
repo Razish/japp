@@ -41,57 +41,43 @@ Also called by scoreboard drawing
 ===================
 */
 const char	*CG_PlaceString( int rank ) {
-	static char	str[64];
-	char	*s, *t;
+	static char str[64];
+	const char *s, *t;
 	// number extenstions, eg 1st, 2nd, 3rd, 4th etc.
 	// note that the rules are different for french, but by changing the required strip strings they seem to work
-	char sST[10];
-	char sND[10];
-	char sRD[10];
-	char sTH[10];
-	char sTiedFor[64];	// german is much longer, super safe...
+	char sST[10], sND[10], sRD[10], sTH[10], sTiedFor[64]; // german is much longer, super safe...
 
-	trap->SE_GetStringTextString("MP_INGAME_NUMBER_ST",sST, sizeof(sST) );
-	trap->SE_GetStringTextString("MP_INGAME_NUMBER_ND",sND, sizeof(sND) );
-	trap->SE_GetStringTextString("MP_INGAME_NUMBER_RD",sRD, sizeof(sRD) );
-	trap->SE_GetStringTextString("MP_INGAME_NUMBER_TH",sTH, sizeof(sTH) );
-	trap->SE_GetStringTextString("MP_INGAME_TIED_FOR" ,sTiedFor,sizeof(sTiedFor) );
-	strcat(sTiedFor," ");	// save worrying about translators adding spaces or not
+	trap->SE_GetStringTextString( "MP_INGAME_NUMBER_ST", sST, sizeof( sST ) );
+	trap->SE_GetStringTextString( "MP_INGAME_NUMBER_ND", sND, sizeof( sND ) );
+	trap->SE_GetStringTextString( "MP_INGAME_NUMBER_RD", sRD, sizeof( sRD ) );
+	trap->SE_GetStringTextString( "MP_INGAME_NUMBER_TH", sTH, sizeof( sTH ) );
+	trap->SE_GetStringTextString( "MP_INGAME_TIED_FOR" , sTiedFor, sizeof( sTiedFor ) );
+	strcat( sTiedFor, " " ); // save worrying about translators adding spaces or not
 
 	if ( rank & RANK_TIED_FLAG ) {
 		rank &= ~RANK_TIED_FLAG;
-		t = sTiedFor;//"Tied for ";
-	} else {
+		t = sTiedFor;
+	}
+	else
 		t = "";
-	}
 
-	if ( rank == 1 ) {
-		s = va("1%s",sST);//S_COLOR_BLUE "1st" S_COLOR_WHITE;		// draw in blue
-	} else if ( rank == 2 ) {
-		s = va("2%s",sND);//S_COLOR_RED "2nd" S_COLOR_WHITE;		// draw in red
-	} else if ( rank == 3 ) {
-		s = va("3%s",sRD);//S_COLOR_YELLOW "3rd" S_COLOR_WHITE;		// draw in yellow
-	} else if ( rank == 11 ) {
-		s = va("11%s",sTH);
-	} else if ( rank == 12 ) {
-		s = va("12%s",sTH);
-	} else if ( rank == 13 ) {
-		s = va("13%s",sTH);
-	} else if ( rank % 10 == 1 ) {
-		s = va("%i%s", rank,sST);
-	} else if ( rank % 10 == 2 ) {
-		s = va("%i%s", rank,sND);
-	} else if ( rank % 10 == 3 ) {
-		s = va("%i%s", rank,sRD);
-	} else {
-		s = va("%i%s", rank,sTH);
-	}
+		 if ( rank ==  1 )		s = va( "1%s", sST );
+	else if ( rank ==  2 )		s = va( "2%s", sND );
+	else if ( rank ==  3 )		s = va( "3%s", sRD );
+	else if ( rank == 11 )		s = va( "11%s", sTH );
+	else if ( rank == 12 )		s = va( "12%s", sTH );
+	else if ( rank == 13 )		s = va( "13%s", sTH );
+	else if ( rank % 10 == 1 )	s = va( "%i%s", rank, sST );
+	else if ( rank % 10 == 2 )	s = va( "%i%s", rank, sND );
+	else if ( rank % 10 == 3 )	s = va( "%i%s", rank, sRD );
+	else						s = va( "%i%s", rank, sTH );
 
 	Com_sprintf( str, sizeof( str ), "%s%s", t, s );
+
 	return str;
 }
 
-qboolean CG_ThereIsAMaster(void);
+qboolean CG_ThereIsAMaster( void );
 
 /*
 =============
@@ -246,7 +232,7 @@ clientkilled:
 
 	// check for kill messages from the current clientNum
 	if ( attacker == cg.snap->ps.clientNum ) {
-		char	*s;
+		const char *s;
 
 		if ( cgs.gametype < GT_TEAM && cgs.gametype != GT_DUEL && cgs.gametype != GT_POWERDUEL ) {
 			if (cgs.gametype == GT_JEDIMASTER &&
@@ -655,24 +641,18 @@ Also called by playerstate transition
 ================
 */
 void CG_PainEvent( centity_t *cent, int health ) {
-	char	*snd;
+	const char *snd;
 
 	// don't do more than two pain sounds a second
-	if ( cg.time - cent->pe.painTime < 500 ) {
+	if ( cg.time - cent->pe.painTime < 500 )
 		return;
-	}
 
-	if ( health < 25 ) {
-		snd = "*pain25.wav";
-	} else if ( health < 50 ) {
-		snd = "*pain50.wav";
-	} else if ( health < 75 ) {
-		snd = "*pain75.wav";
-	} else {
-		snd = "*pain100.wav";
-	}
-	trap->S_StartSound( NULL, cent->currentState.number, CHAN_VOICE,
-		CG_CustomSound( cent->currentState.number, snd ) );
+		 if ( health < 25 )		snd = "*pain25.wav";
+	else if ( health < 50 )		snd = "*pain50.wav";
+	else if ( health < 75 )		snd = "*pain75.wav";
+	else						snd = "*pain100.wav";
+
+	trap->S_StartSound( NULL, cent->currentState.number, CHAN_VOICE, CG_CustomSound( cent->currentState.number, snd ) );
 
 	// save pain time for programitic twitch animation
 	cent->pe.painTime = cg.time;
@@ -771,7 +751,7 @@ const char *CG_TeamName(int team)
 void CG_PrintCTFMessage(clientInfo_t *ci, const char *teamName, int ctfMessage)
 {
 	char printMsg[1024];
-	char *refName = NULL;
+	const char *refName = NULL;
 	const char *psStringEDString = NULL;
 
 	switch (ctfMessage)

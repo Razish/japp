@@ -582,7 +582,7 @@ void CheckAlmostCapture( gentity_t *self, gentity_t *attacker ) {
 #if 1
 	gentity_t	*ent;
 	vector3		dir;
-	char		*classname;
+	const char *classname;
 
 	// if this player was carrying a flag
 	if ( self->client->ps.powerups[PW_REDFLAG] ||
@@ -590,20 +590,16 @@ void CheckAlmostCapture( gentity_t *self, gentity_t *attacker ) {
 		self->client->ps.powerups[PW_NEUTRALFLAG] ) {
 		// get the goal flag this player should have been going for
 		if ( level.gametype == GT_CTF || level.gametype == GT_CTY ) {
-			if ( self->client->sess.sessionTeam == TEAM_BLUE ) {
+			if ( self->client->sess.sessionTeam == TEAM_BLUE )
 				classname = "team_CTF_blueflag";
-			}
-			else {
+			else
 				classname = "team_CTF_redflag";
-			}
 		}
 		else {
-			if ( self->client->sess.sessionTeam == TEAM_BLUE ) {
+			if ( self->client->sess.sessionTeam == TEAM_BLUE )
 				classname = "team_CTF_redflag";
-			}
-			else {
+			else
 				classname = "team_CTF_blueflag";
-			}
 		}
 		ent = NULL;
 		do
@@ -1833,8 +1829,7 @@ extern qboolean g_noPDuelCheck;
 void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
 	gentity_t	*ent;
 	int			i, anim, contents, killer;
-	char		*killerName;
-	const char	*obit;
+	const char *killerName, *obit;
 	qboolean	wasJediMaster = qfalse;
 	int			sPMType = 0;
 	char		buf[512] = {0};
@@ -2837,7 +2832,7 @@ int RaySphereIntersections( vector3 *origin, float radius, vector3 *point, vecto
 rww - beginning of the majority of the dismemberment and location based damage code.
 ===================================
 */
-char *hitLocName[HL_MAX] =
+const char *hitLocName[HL_MAX] =
 {
 	"none",	//HL_NONE = 0,
 	"right foot",	//HL_FOOT_RT,
@@ -3748,7 +3743,7 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 			//if ( g_dismemberProbabilities->value<=0.0f||G_Dismemberable( ent, *hitLoc ) )
 			if (1) //Fix me?
 			{//either we don't care about probabilties or the probability let us continue
-				char *tagName = NULL;
+				const char *tagName = NULL;
 				float	aoa = 0.5f;
 				//dir must be roughly perpendicular to the hitLoc's cap bolt
 				switch ( *hitLoc )

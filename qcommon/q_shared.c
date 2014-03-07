@@ -424,7 +424,7 @@ qboolean COM_ParseVec4( const char **buffer, vector4 *c ) {
 	return qfalse;
 }
 
-void COM_MatchToken( const char **buf_p, char *match ) {
+void COM_MatchToken( const char **buf_p, const char *match ) {
 	char *token = COM_Parse( buf_p );
 
 	if ( strcmp( token, match ) )
@@ -888,9 +888,9 @@ void Com_sprintf( char *dest, int size, const char *fmt, ... ) {
 
 // varargs format buffer
 // uses a circular buffer, copy after use
-char *va( const char *format, ... ) {
+const char *va( const char *format, ... ) {
 	va_list argptr;
-	static char string[MAX_VA_BUFFERS][MAX_VA_STRING];	// in case va is called by nested functions
+	static char string[MAX_VA_BUFFERS][MAX_VA_STRING]; // in case va is called by nested functions
 	static int index = 0;
 	char *buf;
 
@@ -904,7 +904,7 @@ char *va( const char *format, ... ) {
 
 // Searches the string for the given key and returns the associated value, or an empty string.
 //	FIXME: overflow check?
-char *Info_ValueForKey( const char *s, const char *key ) {
+const char *Info_ValueForKey( const char *s, const char *key ) {
 	char *o, pkey[BIG_INFO_KEY];
 	static char value[2][BIG_INFO_VALUE]; // use two buffers so compares work without stomping on each other
 	static int vIndex = 0;

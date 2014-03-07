@@ -349,7 +349,7 @@ void BotResetState(bot_state_t *bs);
 int NumBots(void);
 
 void BotUtilizePersonality(bot_state_t *bs);
-int BotDoChat(bot_state_t *bs, char *section, int always);
+int BotDoChat(bot_state_t *bs, const char *section, int always);
 void StandardBotAI(bot_state_t *bs, float thinktime);
 void BotWaypointRender(void);
 int OrgVisibleBox(vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2, int ignore);

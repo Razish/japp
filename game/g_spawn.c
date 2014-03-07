@@ -935,10 +935,11 @@ level.spawnVars[], then call the class specfic spawn function
 */
 void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent );
 void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
-	int			i;
-	gentity_t	*ent;
-	char		*s, *value, *gametypeName;
-	static char *gametypeNames[] = {"ffa", "holocron", "jedimaster", "duel", "powerduel", "single", "team", "siege", "ctf", "cty"};
+	int i;
+	gentity_t *ent;
+	char *s, *value;
+	const char *gametypeName;
+	static const char *gametypeNames[] = {"ffa", "holocron", "jedimaster", "duel", "powerduel", "single", "team", "siege", "ctf", "cty"};
 
 	// get the next free entity
 	ent = G_Spawn();
@@ -1036,21 +1037,18 @@ char *G_AddSpawnVarToken( const char *string ) {
 	return dest;
 }
 
-void AddSpawnField(char *field, char *value)
-{
+void AddSpawnField( const char *field, char *value ) {
 	int	i;
 
-	for(i=0;i<level.numSpawnVars;i++)
-	{
-		if (Q_stricmp(level.spawnVars[i][0], field) == 0)
-		{
-			level.spawnVars[ i ][1] = G_AddSpawnVarToken( value );
+	for ( i=0; i<level.numSpawnVars; i++ ) {
+		if ( !Q_stricmp( level.spawnVars[i][0], field ) ) {
+			level.spawnVars[i][1] = G_AddSpawnVarToken( value );
 			return;
 		}
 	}
 
-	level.spawnVars[ level.numSpawnVars ][0] = G_AddSpawnVarToken( field );
-	level.spawnVars[ level.numSpawnVars ][1] = G_AddSpawnVarToken( value );
+	level.spawnVars[level.numSpawnVars][0] = G_AddSpawnVarToken( field );
+	level.spawnVars[level.numSpawnVars][1] = G_AddSpawnVarToken( value );
 	level.numSpawnVars++;
 }
 

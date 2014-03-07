@@ -629,7 +629,7 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vector3 *avoidPoint, vector3 *origin
 	//in Team DM, look for a team start spot first, if any
 	if ( level.gametype == GT_TEAM && team != TEAM_FREE && team != TEAM_SPECTATOR )
 	{//team-game, either red or blue
-		char *classname = (team == TEAM_RED) ? "info_player_start_red" : "info_player_start_blue";
+		const char *classname = (team == TEAM_RED) ? "info_player_start_red" : "info_player_start_blue";
 
 		while ( (spot = G_Find( spot, FOFS( classname ), classname )) != NULL )
 		{
@@ -735,34 +735,19 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vector3 *avoidPoint, vector3 *origin
 	return list_spot[rnd];
 }
 
-gentity_t *SelectDuelSpawnPoint( int team, vector3 *avoidPoint, vector3 *origin, vector3 *angles )
-{
-	gentity_t	*spot;
+gentity_t *SelectDuelSpawnPoint( int team, vector3 *avoidPoint, vector3 *origin, vector3 *angles ) {
+	gentity_t	*spot, *list_spot[64];
 	vector3		delta;
-	float		dist;
-	float		list_dist[64];
-	gentity_t	*list_spot[64];
+	float		dist, list_dist[64];
 	int			numSpots, rnd, i, j;
-	char		*spotName;
+	const char *spotName;
 
-	if (team == DUELTEAM_LONE)
-	{
-		spotName = "info_player_duel1";
-	}
-	else if (team == DUELTEAM_DOUBLE)
-	{
-		spotName = "info_player_duel2";
-	}
-	else if (team == DUELTEAM_SINGLE)
-	{
-		spotName = "info_player_duel";
-	}
-	else
-	{
-		spotName = "info_player_deathmatch";
-	}
+		 if ( team == DUELTEAM_LONE )	spotName = "info_player_duel1";
+	else if ( team == DUELTEAM_DOUBLE )	spotName = "info_player_duel2";
+	else if ( team == DUELTEAM_SINGLE )	spotName = "info_player_duel";
+	else								spotName = "info_player_deathmatch";
+
 tryAgain:
-
 	numSpots = 0;
 	spot = NULL;
 
@@ -1391,7 +1376,7 @@ qboolean G_SaberModelSetup(gentity_t *ent)
 			if (ent->client->weaponGhoul2[i])
 			{
 				int j = 0;
-				char *tagName;
+				const char *tagName;
 				int tagBolt;
 
 				if (ent->client->saber[i].skin)
@@ -1465,7 +1450,7 @@ void *g2SaberInstance = NULL;
 qboolean BG_IsValidCharacterModel(const char *modelName, const char *skinName);
 qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team, vector3 *colors );
 
-void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
+void SetupGameGhoul2Model(gentity_t *ent, const char *modelname, char *skinName)
 {
 	int handle;
 	char		afilename[MAX_QPATH];
@@ -1498,73 +1483,53 @@ void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
 		trap->G2API_SetSkin(precachedKyle, 0, defSkin, defSkin);
 	}
 
-	if (precachedKyle && trap->G2API_HaveWeGhoul2Models(precachedKyle))
-	{
+	if ( precachedKyle && trap->G2API_HaveWeGhoul2Models( precachedKyle ) ) {
 		//rww - allow option for perplayer models on server for collision and bolt stuff.
 		if ( d_perPlayerGhoul2.integer || ent->s.number >= MAX_CLIENTS ) {
-			char modelFullPath[MAX_QPATH];
-			char truncModelName[MAX_QPATH];
-			char skin[MAX_QPATH];
-			char vehicleName[MAX_QPATH];
-			int skinHandle = 0;
-			int i = 0;
+			char modelFullPath[MAX_QPATH], truncModelName[MAX_QPATH], skin[MAX_QPATH], vehicleName[MAX_QPATH];
+			int skinHandle=0, i=0;
 			char *p;
 
 			// If this is a vehicle, get it's model name.
-			if ( ent->client->NPC_class == CLASS_VEHICLE )
-			{
-				Q_strncpyz(vehicleName, modelname, sizeof( vehicleName ) );
-				BG_GetVehicleModelName(modelname, strlen( modelname ));
-				strcpy(truncModelName, modelname);
-				skin[0] = 0;
-				if ( ent->m_pVehicle
-					&& ent->m_pVehicle->m_pVehicleInfo
-					&& ent->m_pVehicle->m_pVehicleInfo->skin
+			if ( ent->client->NPC_class == CLASS_VEHICLE ) {
+				const char *vehModel = BG_GetVehicleModelName( modelname );
+				Q_strncpyz( vehicleName, modelname, sizeof( vehicleName ) );
+				Q_strncpyz( truncModelName, vehModel, sizeof( truncModelName ) );
+				skin[0] = '\0';
+				if ( ent->m_pVehicle && ent->m_pVehicle->m_pVehicleInfo && ent->m_pVehicle->m_pVehicleInfo->skin
 					&& ent->m_pVehicle->m_pVehicleInfo->skin[0] )
 				{
-					skinHandle = trap->R_RegisterSkin(va("models/players/%s/model_%s.skin", modelname, ent->m_pVehicle->m_pVehicleInfo->skin));
+					skinHandle = trap->R_RegisterSkin( va( "models/players/%s/model_%s.skin", vehModel,
+						ent->m_pVehicle->m_pVehicleInfo->skin ) );
 				}
 				else
-				{
-					skinHandle = trap->R_RegisterSkin(va("models/players/%s/model_default.skin", modelname));
-				}
+					skinHandle = trap->R_RegisterSkin( va( "models/players/%s/model_default.skin", vehModel ) );
 			}
-			else
-			{
-				if (skinName && skinName[0])
-				{
-					strcpy(skin, skinName);
-					strcpy(truncModelName, modelname);
+			else {
+				if ( skinName && skinName[0] ) {
+					Q_strncpyz( skin, skinName, sizeof( skin ) );
+					Q_strncpyz( truncModelName, modelname, sizeof( truncModelName ) );
 				}
-				else
-				{
-					strcpy(skin, "default");
+				else {
+					Q_strncpyz( skin, "default", sizeof( skin ) );
+					Q_strncpyz( truncModelName, modelname, sizeof( truncModelName ) );
+					p = Q_strrchr( truncModelName, '/' );
 
-					strcpy(truncModelName, modelname);
-					p = Q_strrchr(truncModelName, '/');
+					if ( p ) {
+						*p++ = '\0';
 
-					if (p)
-					{
-						*p = 0;
-						p++;
+						while ( p && *p )
+							skin[i++] = *p++;
 
-						while (p && *p)
-						{
-							skin[i] = *p;
-							i++;
-							p++;
-						}
-						skin[i] = 0;
+						skin[i] = '\0';
 					}
 
-					if (!BG_IsValidCharacterModel(truncModelName, skin))
-					{
-						strcpy(truncModelName, "kyle");
-						strcpy(skin, "default");
+					if ( !BG_IsValidCharacterModel( truncModelName, skin ) ) {
+						Q_strncpyz( truncModelName, "kyle", sizeof( truncModelName ) );
+						Q_strncpyz( skin, "default", sizeof( skin ) );
 					}
 
-					if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer )
-					{
+					if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer ) {
 						//Also adjust customRGBA for team colors.
 						vector3 colorOverride;
 
@@ -1594,24 +1559,19 @@ void SetupGameGhoul2Model(gentity_t *ent, char *modelname, char *skinName)
 				}
 			}
 
-			if (skin[0])
-			{
-				char *useSkinName;
+			if ( skin[0] ) {
+				const char *useSkinName;
 
-				if (strchr(skin, '|'))
-				{//three part skin
-					useSkinName = va("models/players/%s/|%s", truncModelName, skin);
-				}
+				if ( strchr( skin, '|' ) )
+					useSkinName = va( "models/players/%s/|%s", truncModelName, skin );
 				else
-				{
-					useSkinName = va("models/players/%s/model_%s.skin", truncModelName, skin);
-				}
+					useSkinName = va( "models/players/%s/model_%s.skin", truncModelName, skin );
 
-				skinHandle = trap->R_RegisterSkin(useSkinName);
+				skinHandle = trap->R_RegisterSkin( useSkinName );
 			}
 
-			strcpy(modelFullPath, va("models/players/%s/model.glm", truncModelName));
-			handle = trap->G2API_InitGhoul2Model(&ent->ghoul2, modelFullPath, 0, skinHandle, -20, 0, 0);
+			Q_strncpyz( modelFullPath, va( "models/players/%s/model.glm", truncModelName ), sizeof( modelFullPath ) );
+			handle = trap->G2API_InitGhoul2Model( &ent->ghoul2, modelFullPath, 0, skinHandle, -20, 0, 0 );
 
 			if (handle<0)
 			{ //Huh. Guess we don't have this model. Use the default.
@@ -1843,7 +1803,7 @@ if desired.
 ============
 */
 
-qboolean G_SetSaber(gentity_t *ent, int saberNum, char *saberName, qboolean siegeOverride);
+qboolean G_SetSaber(gentity_t *ent, int saberNum, const char *saberName, qboolean siegeOverride);
 void G_ValidateSiegeClassForTeam(gentity_t *ent, int team);
 
 typedef struct userinfoValidate_s {
@@ -2006,8 +1966,8 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	gentity_t *ent = g_entities + clientNum;
 	gclient_t *client = ent->client;
 	int team=TEAM_FREE, health=100, maxHealth=100;
-	const char *s=NULL;
-	char *value=NULL, userinfo[MAX_INFO_STRING], buf[MAX_INFO_STRING], oldClientinfo[MAX_INFO_STRING], model[MAX_QPATH],
+	const char *s=NULL, *value=NULL;
+	char userinfo[MAX_INFO_STRING], buf[MAX_INFO_STRING], oldClientinfo[MAX_INFO_STRING], model[MAX_QPATH],
 		forcePowers[DEFAULT_FORCEPOWERS_LEN], oldname[MAX_NETNAME], className[MAX_QPATH], color1[16], color2[16],
 		cp_sbRGB1[MAX_INFO_STRING], cp_sbRGB2[MAX_INFO_STRING];
 	qboolean modelChanged = qfalse;
@@ -2278,7 +2238,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	// only going to be true for allowable server-side custom skeleton cases
 	if ( modelChanged ) {
 		// update the server g2 instance if appropriate
-		char *modelname = Info_ValueForKey( userinfo, "model" );
+		const char *modelname = Info_ValueForKey( userinfo, "model" );
 		SetupGameGhoul2Model( ent, modelname, NULL );
 
 		if ( ent->ghoul2 && ent->client )
@@ -2337,8 +2297,8 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	gentity_t *ent = g_entities+clientNum, *te = NULL;
 	gclient_t *client;
 	uint32_t finalCSF = 0;
-	char *value, userinfo[MAX_INFO_STRING], tmpIP[NET_ADDRSTRMAXLEN];
-	const char *result = NULL;
+	char userinfo[MAX_INFO_STRING], tmpIP[NET_ADDRSTRMAXLEN], tmp[MAX_INFO_VALUE];
+	const char *result = NULL, *value = NULL;
 
 	ent->s.number = clientNum;
 	ent->classname = "connecting";
@@ -2390,15 +2350,15 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	//Raz: userinfo check
 	if ( !isBot ) {
 		char msg[2048] = { 0 };
-		value = Info_ValueForKey( userinfo, "cjp_client" );
-		if ( Q_strchrs( value, "\n\r;\"" ) ) {
+		Q_strncpyz( tmp, Info_ValueForKey( userinfo, "cjp_client" ), sizeof( tmp ) );
+		if ( Q_strchrs( tmp, "\n\r;\"" ) ) {
 			// Spoofed userinfo
 			G_LogPrintf( level.log.security, "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
-		Q_strcat( msg, sizeof( msg ), va( "cjp_client: %s...", value[0] ? value : "basejka" ) );
-		if ( value[0] ) {
-			Q_CleanString( value, STRIP_COLOUR|STRIP_EXTASCII );
+		Q_strcat( msg, sizeof( msg ), va( "cjp_client: %s...", tmp[0] ? tmp : "basejka" ) );
+		if ( tmp[0] ) {
+			Q_CleanString( tmp, STRIP_COLOUR|STRIP_EXTASCII );
 			Q_strcat( msg, sizeof( msg ), va( " assumed JA+ csf 0x%X...", JAPLUS_CLIENT_FLAGS ) );
 			finalCSF = JAPLUS_CLIENT_FLAGS;
 		}
@@ -2516,12 +2476,12 @@ void SetTeamQuick(gentity_t *ent, int team, qboolean doBegin);
 void G_WriteClientSessionData( gclient_t *client );
 void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *saberName );
 void ClientBegin( int clientNum, qboolean allowTeamReset ) {
-	gentity_t	*ent;
-	gclient_t	*client;
-	gentity_t	*tent;
-	int			flags, i;
-	char		userinfo[MAX_INFO_VALUE], *modelname;
-	int			spawnCount;
+	gentity_t *ent, *tent;
+	gclient_t *client;
+	uint32_t flags;
+	int i, spawnCount;
+	char userinfo[MAX_INFO_VALUE];
+	const char *modelname;
 
 	ent = g_entities + clientNum;
 
@@ -3023,19 +2983,20 @@ Initializes all non-persistant parts of playerState
 
 extern qboolean WP_HasForcePowers( const playerState_t *ps );
 void ClientSpawn(gentity_t *ent) {
-	int					i = 0, index = 0, saveSaberNum = ENTITYNUM_NONE, wDisable = 0, savedSiegeIndex = 0, maxHealth = 100;
-	vector3				spawn_origin, spawn_angles;
-	gentity_t			*spawnPoint = NULL;
-	gclient_t			*client = NULL;
-	clientPersistant_t	saved;
-	clientSession_t		savedSess;
-	forcedata_t			savedForce;
-	saberInfo_t			saberSaved[MAX_SABERS];
-	int					persistant[MAX_PERSISTANT] = {0};
-	int					flags, gameFlags, savedPing, accuracy_hits, accuracy_shots, eventSequence;
-	void				*g2WeaponPtrs[MAX_SABERS];
-	char				userinfo[MAX_INFO_STRING] = {0}, *key = NULL, *value = NULL, *saber = NULL;
-	qboolean			changedSaber = qfalse, inSiegeWithClass = qfalse;
+	int i, index=0, saveSaberNum=ENTITYNUM_NONE, savedSiegeIndex=0, maxHealth=100, gameFlags, savedPing, accuracy_hits,
+		accuracy_shots, eventSequence, persistant[MAX_PERSISTANT];
+	vector3 spawn_origin, spawn_angles;
+	gentity_t *spawnPoint = NULL;
+	gclient_t *client = NULL;
+	clientPersistant_t saved;
+	clientSession_t savedSess;
+	forcedata_t savedForce;
+	saberInfo_t saberSaved[MAX_SABERS];
+	uint32_t flags, wDisable=0;
+	void *g2WeaponPtrs[MAX_SABERS];
+	char userinfo[MAX_INFO_STRING] = {0};
+	const char *key = NULL, *value = NULL, *saber = NULL;
+	qboolean changedSaber = qfalse, inSiegeWithClass = qfalse;
 
 	index = ent - g_entities;
 	client = ent->client;

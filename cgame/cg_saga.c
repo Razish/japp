@@ -283,7 +283,7 @@ void CG_InitSiegeMode( void ) {
 
 				if ( cl->forcedSkin[0] ) {
 					// also has a forced skin, precache it.
-					char *useSkinName;
+					const char *useSkinName;
 
 					if ( strchr( cl->forcedSkin, '|' ) )
 						useSkinName = va( "models/players/%s/|%s", cl->forcedModel, cl->forcedSkin );
@@ -336,7 +336,7 @@ QINLINE static char *CG_SiegeObjectiveBuffer( int team, int objective ) {
 
 void CG_ParseSiegeObjectiveStatus( const char *str ) {
 	int i = 0, team = SIEGETEAM_TEAM1;
-	char *cvarName, *s;
+	const char *cvarName, *s;
 	int objectiveNum = 0;
 
 	if ( !str || !str[0] )

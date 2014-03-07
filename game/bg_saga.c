@@ -13,8 +13,6 @@
 	#include "ui/ui_local.h"
 #endif
 
-#define SIEGECHAR_TAB 9 //perhaps a bit hacky, but I don't think there's any define existing for "tab"
-
 //Could use strap stuff but I don't particularly care at the moment anyway.
 
 char		siege_info[MAX_SIEGE_INFO_SIZE];
@@ -160,7 +158,7 @@ void BG_SiegeStripTabs(char *buf)
 
 	while (buf[i])
 	{
-		if (buf[i] != SIEGECHAR_TAB)
+		if (buf[i] != '\t')
 		{ //not a tab, just stick it in
 			buf[i_r] = buf[i];
 		}
@@ -176,22 +174,19 @@ void BG_SiegeStripTabs(char *buf)
 	buf[i_r] = '\0';
 }
 
-int BG_SiegeGetValueGroup(char *buf, char *group, char *outbuf)
-{
-	int i = 0;
-	int j;
+int BG_SiegeGetValueGroup( const char *buf, const char *group, char *outbuf ) {
+	int i=0, j, parseGroups=0;
 	char checkGroup[4096];
 	qboolean isGroup;
-	int parseGroups = 0;
 
 	while (buf[i])
 	{
-		if (buf[i] != ' ' && buf[i] != '{' && buf[i] != '}' && buf[i] != '\n' && buf[i] != '\r' && buf[i] != SIEGECHAR_TAB)
+		if (buf[i] != ' ' && buf[i] != '{' && buf[i] != '}' && buf[i] != '\n' && buf[i] != '\r' && buf[i] != '\t')
 		{ //we're on a valid character
 			if (buf[i] == '/' &&
 				buf[i+1] == '/')
 			{ //this is a comment, so skip over it
-				while (buf[i] && buf[i] != '\n' && buf[i] != '\r' && buf[i] != SIEGECHAR_TAB)
+				while (buf[i] && buf[i] != '\n' && buf[i] != '\r' && buf[i] != '\t')
 				{
 					i++;
 				}
@@ -200,7 +195,7 @@ int BG_SiegeGetValueGroup(char *buf, char *group, char *outbuf)
 			{ //parse to the next space/endline/eos and check this value against our group value.
 				j = 0;
 
-				while (buf[i] != ' ' && buf[i] != '\n' && buf[i] != '\r' && buf[i] != SIEGECHAR_TAB && buf[i] != '{' && buf[i])
+				while (buf[i] != ' ' && buf[i] != '\n' && buf[i] != '\r' && buf[i] != '\t' && buf[i] != '{' && buf[i])
 				{
 					if (buf[i] == '/' && buf[i+1] == '/')
 					{ //hit a comment, break out.
@@ -233,7 +228,7 @@ int BG_SiegeGetValueGroup(char *buf, char *group, char *outbuf)
 
 				isGroup = qfalse;
 
-				while (buf[i] && (buf[i] == ' ' || buf[i] == SIEGECHAR_TAB || buf[i] == '\n' || buf[i] == '\r'))
+				while (buf[i] && (buf[i] == ' ' || buf[i] == '\t' || buf[i] == '\n' || buf[i] == '\r'))
 				{ //parse to the next valid character
 					i++;
 				}
@@ -393,11 +388,8 @@ int BG_SiegeGetValueGroup(char *buf, char *group, char *outbuf)
 	return 0; //guess we never found it.
 }
 
-int BG_SiegeGetPairedValue(char *buf, char *key, char *outbuf)
-{
-	int i = 0;
-	int j;
-	int k;
+int BG_SiegeGetPairedValue( const char *buf, const char *key, char *outbuf ) {
+	int i=0, j, k;
 	char checkKey[4096];
 
 	while (buf[i])
@@ -416,7 +408,7 @@ int BG_SiegeGetPairedValue(char *buf, char *key, char *outbuf)
 			{ //parse to the next space/endline/eos and check this value against our key value.
 				j = 0;
 
-				while (buf[i] != ' ' && buf[i] != '\n' && buf[i] != '\r' && buf[i] != SIEGECHAR_TAB && buf[i])
+				while (buf[i] != ' ' && buf[i] != '\n' && buf[i] != '\r' && buf[i] != '\t' && buf[i])
 				{
 					if (buf[i] == '/' && buf[i+1] == '/')
 					{ //hit a comment, break out.
@@ -475,7 +467,7 @@ int BG_SiegeGetPairedValue(char *buf, char *key, char *outbuf)
 					{ //make sure we didn't stop on a comment, if we did then this is considered an error in the file.
 						if (!Q_stricmp(checkKey, key))
 						{ //guess so. Parse along to the next valid character, then put that into the output buffer and return 1.
-							while ((buf[i] == ' ' || buf[i] == '\n' || buf[i] == '\r' || buf[i] == SIEGECHAR_TAB) && buf[i])
+							while ((buf[i] == ' ' || buf[i] == '\n' || buf[i] == '\r' || buf[i] == '\t') && buf[i])
 							{
 								i++;
 							}
@@ -733,14 +725,13 @@ int BG_SiegeTranslateGenericTable(char *buf, stringID_table_t *table, qboolean b
 	return items;
 }
 
-char *classTitles[SPC_MAX] =
-{
-"infantry",			// SPC_INFANTRY
-"vanguard",			// SPC_VANGUARD
-"support",			// SPC_SUPPORT
-"jedi_general",		// SPC_JEDI
-"demolitionist",	// SPC_DEMOLITIONIST
-"heavy_weapons",	// SPC_HEAVY_WEAPONS
+const char *classTitles[SPC_MAX] = {
+	"infantry",			// SPC_INFANTRY
+	"vanguard",			// SPC_VANGUARD
+	"support",			// SPC_SUPPORT
+	"jedi_general",		// SPC_JEDI
+	"demolitionist",	// SPC_DEMOLITIONIST
+	"heavy_weapons",	// SPC_HEAVY_WEAPONS
 };
 
 

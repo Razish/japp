@@ -1064,7 +1064,7 @@ void ItemUse_Sentry( gentity_t *ent )
 	SP_PAS( sentry );
 }
 
-extern gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboolean isVehicle );
+extern gentity_t *NPC_SpawnType( gentity_t *ent, const char *npc_type, const char *targetname, qboolean isVehicle );
 void ItemUse_Seeker(gentity_t *ent)
 {
 	if ( level.gametype == GT_SIEGE && d_siegeSeekerNPC.integer )
@@ -1452,7 +1452,7 @@ void EWebPain(gentity_t *self, gentity_t *attacker, int damage)
 }
 
 //special routine for tracking angles between client and server
-void EWeb_SetBoneAngles(gentity_t *ent, char *bone, vector3 *angles)
+void EWeb_SetBoneAngles(gentity_t *ent, const char *bone, vector3 *angles)
 {
 	int *thebone = &ent->s.boneIndex1;
 	int *firstFree = NULL;

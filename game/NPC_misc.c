@@ -7,11 +7,10 @@
 /*
 Debug_Printf
 */
-void Debug_Printf (vmCvar_t *cv, int debugLevel, char *fmt, ...)
-{
-	char		*color;
-	va_list		argptr;
-	char		msg[1024];
+void Debug_Printf( vmCvar_t *cv, int debugLevel, const char *fmt, ... ) {
+	const char *color;
+	va_list argptr;
+	char msg[1024];
 
 	if (cv->value < debugLevel)
 		return;
@@ -36,11 +35,10 @@ void Debug_Printf (vmCvar_t *cv, int debugLevel, char *fmt, ...)
 /*
 Debug_NPCPrintf
 */
-void Debug_NPCPrintf (gentity_t *printNPC, vmCvar_t *cv, int debugLevel, char *fmt, ...)
-{
-	int			color;
-	va_list		argptr;
-	char		msg[1024];
+void Debug_NPCPrintf( gentity_t *printNPC, vmCvar_t *cv, int debugLevel, const char *fmt, ... ) {
+	const char *color;
+	va_list argptr;
+	char msg[1024];
 
 	if (cv->value < debugLevel)
 	{
@@ -53,17 +51,17 @@ void Debug_NPCPrintf (gentity_t *printNPC, vmCvar_t *cv, int debugLevel, char *f
 //	}
 
 	if (debugLevel == DEBUG_LEVEL_DETAIL)
-		color = COLOR_WHITE;
+		color = S_COLOR_WHITE;
 	else if (debugLevel == DEBUG_LEVEL_INFO)
-		color = COLOR_GREEN;
+		color = S_COLOR_GREEN;
 	else if (debugLevel == DEBUG_LEVEL_WARNING)
-		color = COLOR_YELLOW;
+		color = S_COLOR_YELLOW;
 	else //if (debugLevel == DEBUG_LEVEL_ERROR)
-		color = COLOR_RED;
+		color = S_COLOR_RED;
 
 	va_start (argptr,fmt);
 	Q_vsnprintf( msg, sizeof( msg ), fmt, argptr );
 	va_end (argptr);
 
-	Com_Printf ("%c%c%5i (%s) %s", Q_COLOR_ESCAPE, color, level.time, printNPC->targetname, msg);
+	Com_Printf ("%s%5i (%s) %s", color, level.time, printNPC->targetname, msg);
 }

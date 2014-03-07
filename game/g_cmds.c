@@ -814,8 +814,7 @@ static void Cmd_ForceChanged_f( gentity_t *ent ) {
 
 extern qboolean WP_SaberStyleValidForSaber( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel );
 extern qboolean WP_UseFirstValidSaberStyle( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int *saberAnimLevel );
-qboolean G_SetSaber(gentity_t *ent, int saberNum, char *saberName, qboolean siegeOverride)
-{
+qboolean G_SetSaber( gentity_t *ent, int saberNum, const char *saberName, qboolean siegeOverride ) {
 	char truncSaberName[MAX_QPATH] = {0};
 
 	if ( !siegeOverride && level.gametype == GT_SIEGE && ent->client->siegeClass != -1 &&
@@ -1166,7 +1165,8 @@ static void Cmd_Tell_f( gentity_t *ent ) {
 //siege voice command
 static void Cmd_VoiceCommand_f( gentity_t *ent ) {
 	gentity_t *te;
-	char *s, arg[MAX_TOKEN_CHARS];
+	const char *s;
+	char arg[MAX_TOKEN_CHARS];
 	int i = 0;
 
 	if ( trap->Argc() < 2 )
@@ -1406,7 +1406,7 @@ static void Cmd_MapList_f( gentity_t *ent ) {
 		Q_CleanString( map, STRIP_COLOUR );
 
 		if ( G_DoesMapSupportGametype( map, level.gametype ) ) {
-			char *tmpMsg = va( " ^%c%s", (++toggle&1) ? COLOR_GREEN : COLOR_YELLOW, map );
+			const char *tmpMsg = va( " ^%c%s", (++toggle&1) ? COLOR_GREEN : COLOR_YELLOW, map );
 			if ( strlen( buf ) + strlen( tmpMsg ) >= sizeof( buf ) ) {
 				trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", buf ) );
 				buf[0] = '\0';
@@ -1419,9 +1419,9 @@ static void Cmd_MapList_f( gentity_t *ent ) {
 }
 
 static qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	char s[MAX_CVAR_VALUE_STRING] = {0}, bspName[MAX_QPATH] = {0}, *mapName = NULL, *mapName2 = NULL;
+	char s[MAX_CVAR_VALUE_STRING] = {0}, bspName[MAX_QPATH] = {0};
+	const char *mapName = NULL, *mapName2 = NULL, *arenaInfo = NULL;
 	fileHandle_t fp = NULL_FILE;
-	const char *arenaInfo;
 
 	// didn't specify a map, show available maps
 	if ( numArgs < 3 ) {
@@ -2893,7 +2893,7 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 }
 
 static void Cmd_Ready_f( gentity_t *ent ) {
-	char *publicMsg = NULL;
+	const char *publicMsg = NULL;
 	gentity_t *e = NULL;
 	int i = 0;
 
@@ -2955,8 +2955,8 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 		return;
 	}
 	else {
-		char saber1[MAX_TOKEN_CHARS], saber2[MAX_TOKEN_CHARS];
-		char *saber, *key, *value, userinfo[MAX_INFO_STRING];
+		char saber1[MAX_TOKEN_CHARS], saber2[MAX_TOKEN_CHARS], userinfo[MAX_INFO_STRING];
+		const char *saber, *key, *value;
 		int i;
 
 		// first saber
@@ -3175,7 +3175,7 @@ void G_PrintCommands( gentity_t *ent ) {
 	Q_strcat( buf, sizeof( buf ), "Regular commands:\n   " );
 
 	for ( i=0, command=commands; i<numCommands; i++, command++ ) {
-		char *tmpMsg = NULL;
+		const char *tmpMsg = NULL;
 
 		// if it's not allowed to be executed at the moment, continue
 		if ( G_CmdValid( ent, command ) )

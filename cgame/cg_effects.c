@@ -899,7 +899,7 @@ void CG_MiscModelExplosion( vector3 *mins, vector3 *maxs, int size, material_t c
 	int		ct = 13;
 	float	r;
 	vector3	org, mid, dir;
-	char	*effect = NULL, *effect2 = NULL;
+	const char	*effect = NULL, *effect2 = NULL;
 	int		eID1, eID2 = 0;
 	int		i;
 

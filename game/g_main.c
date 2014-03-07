@@ -1935,10 +1935,10 @@ qboolean g_endPDuel = qfalse;
 void CheckExitRules( void ) {
  	int			i;
 	gclient_t	*cl;
-	char *sKillLimit;
+	const char *sKillLimit;
 	qboolean printLimit = qtrue;
-	// if at the intermission, wait for all non-bots to
-	// signal ready, then go to next level
+
+	// if at the intermission, wait for all non-bots to signal ready, then go to next level
 	if ( level.intermissiontime ) {
 		CheckIntermissionExit ();
 		return;
@@ -1991,24 +1991,6 @@ void CheckExitRules( void ) {
 		return;
 	}
 
-	/*
-	if (level.gametype == GT_POWERDUEL)
-	{
-		if (level.numPlayingClients < 3)
-		{
-			if (!level.intermissiontime)
-			{
-				if (d_powerDuelPrint.integer)
-				{
-					Com_Printf("POWERDUEL WIN CONDITION: Duel forfeit (1)\n");
-				}
-				LogExit("Duel forfeit.");
-				return;
-			}
-		}
-	}
-	*/
-
 	// check for sudden death
 	if (level.gametype != GT_SIEGE)
 	{
@@ -2047,110 +2029,6 @@ void CheckExitRules( void ) {
 			g_endPDuel = qfalse;
 			LogExit("Powerduel ended.");
 		}
-
-		//yeah, this stuff was completely insane.
-		/*
-		int duelists[3];
-		duelists[0] = level.sortedClients[0];
-		duelists[1] = level.sortedClients[1];
-		duelists[2] = level.sortedClients[2];
-
-		if (duelists[0] != -1 &&
-			duelists[1] != -1 &&
-			duelists[2] != -1)
-		{
-			if (!g_entities[duelists[0]].inuse ||
-				!g_entities[duelists[0]].client ||
-				g_entities[duelists[0]].client->ps.stats[STAT_HEALTH] <= 0 ||
-				g_entities[duelists[0]].client->sess.sessionTeam != TEAM_FREE)
-			{ //The lone duelist lost, give the other two wins (if applicable) and him a loss
-				if (g_entities[duelists[0]].inuse &&
-					g_entities[duelists[0]].client)
-				{
-					g_entities[duelists[0]].client->sess.losses++;
-					ClientUserinfoChanged(duelists[0]);
-				}
-				if (g_entities[duelists[1]].inuse &&
-					g_entities[duelists[1]].client)
-				{
-					if (g_entities[duelists[1]].client->ps.stats[STAT_HEALTH] > 0 &&
-						g_entities[duelists[1]].client->sess.sessionTeam == TEAM_FREE)
-					{
-						g_entities[duelists[1]].client->sess.wins++;
-					}
-					else
-					{
-						g_entities[duelists[1]].client->sess.losses++;
-					}
-					ClientUserinfoChanged(duelists[1]);
-				}
-				if (g_entities[duelists[2]].inuse &&
-					g_entities[duelists[2]].client)
-				{
-					if (g_entities[duelists[2]].client->ps.stats[STAT_HEALTH] > 0 &&
-						g_entities[duelists[2]].client->sess.sessionTeam == TEAM_FREE)
-					{
-						g_entities[duelists[2]].client->sess.wins++;
-					}
-					else
-					{
-						g_entities[duelists[2]].client->sess.losses++;
-					}
-					ClientUserinfoChanged(duelists[2]);
-				}
-
-				//Will want to parse indecies for two out at some point probably
-				trap->SetConfigstring ( CS_CLIENT_DUELWINNER, va("%i", duelists[1] ) );
-
-				if (d_powerDuelPrint.integer)
-				{
-					Com_Printf("POWERDUEL WIN CONDITION: Coupled duelists won (1)\n");
-				}
-				LogExit( "Coupled duelists won." );
-				gDuelExit = qfalse;
-			}
-			else if ((!g_entities[duelists[1]].inuse ||
-				!g_entities[duelists[1]].client ||
-				g_entities[duelists[1]].client->sess.sessionTeam != TEAM_FREE ||
-				g_entities[duelists[1]].client->ps.stats[STAT_HEALTH] <= 0) &&
-				(!g_entities[duelists[2]].inuse ||
-				!g_entities[duelists[2]].client ||
-				g_entities[duelists[2]].client->sess.sessionTeam != TEAM_FREE ||
-				g_entities[duelists[2]].client->ps.stats[STAT_HEALTH] <= 0))
-			{ //the coupled duelists lost, give the lone duelist a win (if applicable) and the couple both losses
-				if (g_entities[duelists[1]].inuse &&
-					g_entities[duelists[1]].client)
-				{
-					g_entities[duelists[1]].client->sess.losses++;
-					ClientUserinfoChanged(duelists[1]);
-				}
-				if (g_entities[duelists[2]].inuse &&
-					g_entities[duelists[2]].client)
-				{
-					g_entities[duelists[2]].client->sess.losses++;
-					ClientUserinfoChanged(duelists[2]);
-				}
-
-				if (g_entities[duelists[0]].inuse &&
-					g_entities[duelists[0]].client &&
-					g_entities[duelists[0]].client->ps.stats[STAT_HEALTH] > 0 &&
-					g_entities[duelists[0]].client->sess.sessionTeam == TEAM_FREE)
-				{
-					g_entities[duelists[0]].client->sess.wins++;
-					ClientUserinfoChanged(duelists[0]);
-				}
-
-				trap->SetConfigstring ( CS_CLIENT_DUELWINNER, va("%i", duelists[0] ) );
-
-				if (d_powerDuelPrint.integer)
-				{
-					Com_Printf("POWERDUEL WIN CONDITION: Lone duelist won (1)\n");
-				}
-				LogExit( "Lone duelist won." );
-				gDuelExit = qfalse;
-			}
-		}
-		*/
 		return;
 	}
 
@@ -3452,21 +3330,15 @@ void G_RunFrame( int levelTime ) {
 	g_LastFrameTime = level.time;
 }
 
-const char *G_GetStringEdString(char *refSection, char *refName)
-{
-	/*
-	static char text[1024]={0};
-	trap->SP_GetStringTextString(va("%s_%s", refSection, refName), text, sizeof(text));
-	return text;
-	*/
+const char *G_GetStringEdString( const char *refSection, const char *refName ) {
+	// Well, it would've been lovely doing it the above way, but it would mean mixing languages for the client depending
+	//	on what the server is. So we'll mark this as a stringed reference with @@@ and send the refname to the client,
+	//	and when it goes to print it will get scanned for the stringed reference indication and dealt with properly.
 
-	//Well, it would've been lovely doing it the above way, but it would mean mixing
-	//languages for the client depending on what the server is. So we'll mark this as
-	//a stringed reference with @@@ and send the refname to the client, and when it goes
-	//to print it will get scanned for the stringed reference indication and dealt with
-	//properly.
 	static char text[1024]={0};
-	Com_sprintf(text, sizeof(text), "@@@%s", refName);
+
+	Com_sprintf( text, sizeof( text ), "@@@%s", refName );
+
 	return text;
 }
 

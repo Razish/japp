@@ -768,7 +768,7 @@ void UI_SaberDrawBlade( itemDef_t *item, char *saberName, int saberModel, saberT
 	float bladeLength,bladeRadius;
 	char bladeColorString[MAX_QPATH];
 	int snum;
-	char *tagName;
+	const char *tagName;
 	int bolt;
 	qboolean tagHack = qfalse;
 	int styleToUse = atoi(UI_Cvar_VariableString( "cg_saberBladeStyle" ));

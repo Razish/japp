@@ -486,36 +486,21 @@ static const char *skillLevels[] = {
 };
 static const size_t numSkillLevels = ARRAY_LEN( skillLevels );
 
-static const char *gameTypes[] = {
-	"FFA",
-	"Holocron",
-	"JediMaster",
-	"Duel",
-	"PowerDuel",
-	"SP",
-	"Team FFA",
-	"Siege",
-	"CTF",
-	"CTY"
-};
-static const size_t numGameTypes = 	ARRAY_LEN( gameTypes );
-
-static char* netNames[] = {
+static const char *netNames[] = {
 	"???",
 	"UDP",
 	NULL
 };
-
 static const int numNetNames = ARRAY_LEN( netNames ) - 1;
 
 const char *UI_GetStringEdString(const char *refSection, const char *refName);
 
-const char *UI_TeamName(int team)  {
-	if (team==TEAM_RED)
+const char *UI_TeamName( int team ) {
+	if ( team == TEAM_RED )
 		return "RED";
-	else if (team==TEAM_BLUE)
+	else if ( team == TEAM_BLUE )
 		return "BLUE";
-	else if (team==TEAM_SPECTATOR)
+	else if ( team == TEAM_SPECTATOR )
 		return "SPECTATOR";
 	return "FREE";
 }
@@ -1385,7 +1370,7 @@ void UI_LoadMenus(const char *menuFile, qboolean reset) {
 }
 
 void UI_Load( void ) {
-	char *menuSet;
+	const char *menuSet;
 	char lastName[1024];
 	menuDef_t *menu = Menu_GetFocused();
 
@@ -3279,7 +3264,7 @@ static qboolean UI_InSoloMenu( void )
 {
 	menuDef_t *menu;
 	itemDef_t *item;
-	char *name = "solo_gametypefield";
+	const char *name = "solo_gametypefield";
 
 	menu = Menu_GetFocused();	// Get current menu (either video or ingame video, I would assume)
 
@@ -3449,7 +3434,7 @@ static qboolean UI_TeamMember_HandleKey(uint32_t flags, float *special, int key,
 		// 0 - None
 		// 1 - Human
 		// 2..NumCharacters - Bot
-		char *cvar = va(blue ? "ui_blueteam%i" : "ui_redteam%i", num);
+		const char *cvar = va(blue ? "ui_blueteam%i" : "ui_redteam%i", num);
 		int value = trap->Cvar_VariableValue(cvar);
 		int maxcl = trap->Cvar_VariableValue( "sv_maxClients" );
 		int numval = num;
@@ -4393,7 +4378,7 @@ static void UI_SetBotButton ( void )
 	int server;
 	menuDef_t *menu;
 	itemDef_t *item;
-	char *name = "addBot";
+	const char *name = "addBot";
 
 	server = trap->Cvar_VariableValue( "sv_running" );
 
@@ -4565,7 +4550,7 @@ void UI_FindCurrentSiegeTeamClass( void )
 {
 	menuDef_t *menu;
 	int myTeam = (int)(trap->Cvar_VariableValue("ui_myteam"));
-	char *itemname;
+	const char *itemname;
 	itemDef_t *item;
 	int	baseClass;
 
@@ -4815,11 +4800,8 @@ static void UI_UpdateSaberHilt( qboolean secondSaber )
 {
 	menuDef_t *menu;
 	itemDef_t *item;
-	char model[MAX_QPATH];
-	char modelPath[MAX_QPATH];
-	char skinPath[MAX_QPATH];
-	char *itemName;
-	char *saberCvarName;
+	char model[MAX_QPATH], modelPath[MAX_QPATH], skinPath[MAX_QPATH];
+	const char *itemName, *saberCvarName;
 	int	animRunLength;
 
 	menu = Menu_GetFocused();	// Get current menu (either video or ingame video, I would assume)
@@ -6495,7 +6477,7 @@ static void UI_GetTeamColor(vector4 *color) {
 void UI_SetSiegeTeams(void)
 {
 	char			info[MAX_INFO_VALUE];
-	char			*mapname = NULL;
+	const char		*mapname = NULL;
 	char			levelname[MAX_QPATH];
 	char			btime[1024];
 	char			teams[2048];
@@ -6683,7 +6665,7 @@ UI_HeadCountByColor
 */
 static int UI_HeadCountByColor( void ) {
 	int i, c;
-	char *teamname;
+	const char *teamname;
 	char saved[MAX_QPATH];
 
 	c = 0;
@@ -6930,21 +6912,17 @@ static void UI_BuildServerDisplayList(int force) {
 //	}
 }
 
-typedef struct serverStatusCvar_s {
-	char *name, *altName;
-} serverStatusCvar_t;
-
-serverStatusCvar_t serverStatusCvars[] = {
-	{"sv_hostname", "Name"},
-	{"Address", ""},
-	{"gamename", "Game name"},
-	{"g_gametype", "Game type"},
-	{"mapname", "Map"},
-	{"version", ""},
-	{"protocol", ""},
-	{"timelimit", ""},
-	{"fraglimit", ""},
-	{NULL, NULL}
+struct serverStatusCvar_s { const char *name, *altName; } serverStatusCvars[] = {
+	{ "sv_hostname",	"Name" },
+	{ "Address",		"" },
+	{ "gamename",		"Game name" },
+	{ "g_gametype",		"Game type" },
+	{ "mapname",		"Map" },
+	{ "version",		"" },
+	{ "protocol",		"" },
+	{ "timelimit",		"" },
+	{ "fraglimit",		"" },
+	{ NULL,				NULL}
 };
 
 /*
@@ -6954,7 +6932,7 @@ UI_SortServerStatusInfo
 */
 static void UI_SortServerStatusInfo( serverStatusInfo_t *info ) {
 	int i, j, index, numLines;
-	char *tmp1, *tmp2;
+	const char *tmp1, *tmp2;
 
 	// FIXME: if "gamename" == "base" or "missionpack" then
 	// replace the gametype number by FFA, CTF etc.
@@ -7448,7 +7426,7 @@ UI_HeadCountByColor
 ==================
 */
 static const char *UI_SelectedTeamHead(int index, int *actual) {
-	char *teamname;
+	const char *teamname;
 	int i,c=0;
 	char saved[MAX_QPATH] = { 0 };
 
@@ -7658,8 +7636,8 @@ static const char *UI_FeederItemText( int feederID, int index, int column, qhand
 
 			case SORT_GAME:
 				game = atoi( Info_ValueForKey( info, "gametype" ) );
-				if ( game >= 0 && game < (signed)numGameTypes )
-					return gameTypes[game];
+				if ( game >= 0 && game < GT_MAX_GAME_TYPE )
+					return gametypeStringShort[game];
 				else {
 					if ( ping <= 0 )
 						return "Inactive";

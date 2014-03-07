@@ -576,7 +576,7 @@ static void AM_Status( gentity_t *ent ) {
 
 	// build a list of clients
 	for ( i=0; i<MAX_CLIENTS; i++ ) {
-		char *tmpMsg = NULL;
+		const char *tmpMsg = NULL;
 		if ( !g_entities[i].inuse )
 			continue;
 
@@ -1945,7 +1945,7 @@ void AM_PrintCommands( gentity_t *ent ) {
 
 	for ( i=0, command=adminCommands; i<numAdminCommands; i++, command++ ) {
 		if ( AM_HasPrivilege( ent, command->privilege ) ) {
-			char *tmpMsg = va( " ^%c%s", (++toggle&1?COLOR_GREEN:COLOR_YELLOW), command->cmd );
+			const char *tmpMsg = va( " ^%c%s", (++toggle&1?COLOR_GREEN:COLOR_YELLOW), command->cmd );
 
 			//newline if we reach limit
 			if ( count >= limit ) {

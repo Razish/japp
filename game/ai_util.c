@@ -157,7 +157,7 @@ void B_CleanupAlloc(void)
 #endif
 }
 
-int GetValueGroup(char *buf, char *group, char *outbuf)
+int GetValueGroup(const char *buf, const char *group, char *outbuf)
 {
 	char *place, *placesecond;
 	int failure;
@@ -230,7 +230,7 @@ int GetValueGroup(char *buf, char *group, char *outbuf)
 	return 1;
 }
 
-int GetPairedValue(char *buf, char *key, char *outbuf)
+int GetPairedValue(char *buf, const char *key, char *outbuf)
 {
 	char *place, *placesecond;
 	int startpoint, startletter;
@@ -322,7 +322,7 @@ int GetPairedValue(char *buf, char *key, char *outbuf)
 	return 1;
 }
 
-int BotDoChat(bot_state_t *bs, char *section, int always)
+int BotDoChat(bot_state_t *bs, const char *section, int always)
 {
 	char *chatgroup;
 	int rVal;

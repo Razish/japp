@@ -21,7 +21,7 @@ void turretG2_base_use( gentity_t *self, gentity_t *other, gentity_t *activator 
 #define name3 "models/map_objects/wedge/laser_cannon_model.glm"
 
 //special routine for tracking angles between client and server -rww
-void G2Tur_SetBoneAngles(gentity_t *ent, char *bone, vector3 *angles)
+void G2Tur_SetBoneAngles(gentity_t *ent, const char *bone, vector3 *angles)
 {
 	int *thebone = &ent->s.boneIndex1;
 	int *firstFree = NULL;

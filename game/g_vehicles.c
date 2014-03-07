@@ -2256,7 +2256,7 @@ void G_VehicleSetDamageLocFlags( gentity_t *veh, int impactDir, int deathPoint )
 
 qboolean G_FlyVehicleDestroySurface( gentity_t *veh, int surface )
 {
-	char *surfName[4]; //up to 4 surfs at once
+	const char *surfName[4]; //up to 4 surfs at once
 	int numSurfs = 0;
 	int smashedBits = 0;
 

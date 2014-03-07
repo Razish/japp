@@ -328,7 +328,7 @@ void CG_SayTeam_f( void ) {
 
 #include "ui/ui_shared.h"
 static void CG_HudReload_f( void ) {
-	char *hudSet = NULL;
+	const char *hudSet = NULL;
 
 	String_Init();
 	Menu_Reset();

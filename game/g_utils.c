@@ -369,11 +369,11 @@ void G_InitGentity( gentity_t *e ) {
 // give us some decent info on all the active ents -rww
 static void G_SpewEntList( void ) {
 	int i=0, numNPC=0, numProjectile=0, numTempEnt=0, numTempEntST=0;
-	char className[MAX_STRING_CHARS], *str;
+	char className[MAX_STRING_CHARS], buf[256]={0};
 	gentity_t *ent;
 	fileHandle_t fh;
 	time_t rawtime;
-	char buf[256]={0};
+	const char *str;
 
 	time( &rawtime );
 	strftime( buf, sizeof( buf ), "%Y-%m-%d_%H-%M-%S", gmtime( &rawtime ) );

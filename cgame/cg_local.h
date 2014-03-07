@@ -1362,8 +1362,8 @@ void CG_ManualEntityRender( centity_t *cent );
 void CG_Beam( centity_t *cent );
 void CG_AdjustPositionForMover( const vector3 *in, int moverNum, int fromTime, int toTime, vector3 *out );
 
-void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, char *tagName );
-void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, char *tagName );
+void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, const char *tagName );
+void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, const char *tagName );
 
 /*
 Ghoul2 Insert Start

@@ -494,7 +494,7 @@ void Menu_Reset( void );
 qboolean Menus_AnyFullScreenVisible( void );
 void  Menus_Activate(menuDef_t *menu);
 itemDef_t *Menu_FindItemByName(menuDef_t *menu, const char *p);
-void Menu_ShowGroup (menuDef_t *menu, char *itemName, qboolean showFlag);
+void Menu_ShowGroup (menuDef_t *menu, const char *itemName, qboolean showFlag);
 void Menu_ItemDisable(menuDef_t *menu, char *name,int disableFlag);
 int Menu_ItemsMatchingGroup(menuDef_t *menu, const char *name);
 itemDef_t *Menu_GetMatchingItemByNumber(menuDef_t *menu, int index, const char *name);

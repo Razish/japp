@@ -1229,8 +1229,7 @@ qboolean COM_ParseVec4( const char **buffer, vector4 *c);
 #define TT_PUNCTUATION				5			// punctuation
 #endif
 
-typedef struct pc_token_s
-{
+typedef struct pc_token_s {
 	int type;
 	int subtype;
 	int intvalue;
@@ -1240,7 +1239,7 @@ typedef struct pc_token_s
 
 // data is an in/out parm, returns a parsed out token
 
-void	COM_MatchToken( const char**buf_p, char *match );
+void COM_MatchToken( const char**buf_p, const char *match );
 
 void SkipBracedSection (const char **program);
 void SkipRestOfLine ( const char **data );
@@ -1249,7 +1248,7 @@ void Parse1DMatrix (const char **buf_p, int x, float *m);
 void Parse2DMatrix (const char **buf_p, int y, int x, float *m);
 void Parse3DMatrix (const char **buf_p, int z, int y, int x, float *m);
 
-void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
+void QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
 
 
 // mode parm for FS_FOpenFile
@@ -1295,14 +1294,14 @@ const char *Q_stristr( const char *s, const char *find );
 void Q_CleanString( char *string, uint32_t flags );
 void Q_ConvertLinefeeds( char *string );
 void Com_sprintf( char *dest, int size, const char *fmt, ... );
-char *va( const char *format, ... );
+const char *va( const char *format, ... );
 
 //=============================================
 
 // 64-bit integers for global rankings interface
 // implemented as a struct for qvm compatibility
 typedef struct qint64_s {
-	byte	b0, b1, b2, b3, b4, b5, b6, b7;
+	byte b0, b1, b2, b3, b4, b5, b6, b7;
 } qint64_t;
 
 //=============================================
@@ -1310,7 +1309,7 @@ typedef struct qint64_s {
 //
 // key / value info strings
 //
-char *Info_ValueForKey( const char *s, const char *key );
+const char *Info_ValueForKey( const char *s, const char *key );
 void Info_RemoveKey( char *s, const char *key );
 void Info_RemoveKey_Big( char *s, const char *key );
 void Info_SetValueForKey( char *s, const char *key, const char *value );

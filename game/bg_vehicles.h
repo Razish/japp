@@ -623,4 +623,5 @@ typedef struct Vehicle_s
 #endif
 
 int BG_VehicleGetIndex( const char *vehicleName );
-void BG_GetVehicleModelName( char *modelname, int len );
+const char *BG_GetVehicleModelName( const char *modelname );
+const char *BG_GetVehicleSkinName( const char *skinname );

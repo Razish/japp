@@ -19,23 +19,20 @@ Modifies the entities position and axis by the given
 tag location
 ======================
 */
-void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							qhandle_t parentModel, char *tagName ) {
-	int				i;
-	orientation_t	lerped;
+void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, const char *tagName ) {
+	int i;
+	orientation_t lerped;
 
 	// lerp the tag
-	trap->R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
-		1.0f - parent->backlerp, tagName );
+	trap->R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame, 1.0f - parent->backlerp, tagName );
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( &parent->origin, &entity->origin );
-	for ( i = 0 ; i < 3 ; i++ ) {
+	for ( i=0; i<3; i++ )
 		VectorMA( &entity->origin, lerped.origin.data[i], &parent->axis[i], &entity->origin );
-	}
 
 	// had to cast away the const to avoid compiler problems...
-	MatrixMultiply( lerped.axis, ((refEntity_t *)parent)->axis, entity->axis );
+	MatrixMultiply( lerped.axis, parent->axis, entity->axis );
 	entity->backlerp = parent->backlerp;
 }
 
@@ -48,26 +45,23 @@ Modifies the entities position and axis by the given
 tag location
 ======================
 */
-void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							qhandle_t parentModel, char *tagName ) {
-	int				i;
-	orientation_t	lerped;
-	vector3			tempAxis[3];
+void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, const char *tagName ) {
+	int i;
+	orientation_t lerped;
+	vector3 tempAxis[3];
 
-//AxisClear( entity->axis );
+//	AxisClear( entity->axis );
 	// lerp the tag
-	trap->R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
-		1.0f - parent->backlerp, tagName );
+	trap->R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame, 1.0f - parent->backlerp, tagName );
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( &parent->origin, &entity->origin );
-	for ( i = 0 ; i < 3 ; i++ ) {
+	for ( i=0; i<3; i++ )
 		VectorMA( &entity->origin, lerped.origin.data[i], &parent->axis[i], &entity->origin );
-	}
 
 	// had to cast away the const to avoid compiler problems...
 	MatrixMultiply( entity->axis, lerped.axis, tempAxis );
-	MatrixMultiply( tempAxis, ((refEntity_t *)parent)->axis, entity->axis );
+	MatrixMultiply( tempAxis, parent->axis, entity->axis );
 }
 
 
@@ -1014,13 +1008,8 @@ static void CG_General( centity_t *cent ) {
 
 		if (!cent->ghoul2)
 		{
-			const char *rotateBone;
-			char	limbName[MAX_QPATH];
-			char	stubName[MAX_QPATH];
-			char	limbCapName[MAX_QPATH];
-			char	stubCapName[MAX_QPATH];
-			char *limbTagName;
-			char *stubTagName;
+			const char *rotateBone, *limbTagName, *stubTagName;
+			char limbName[MAX_QPATH], stubName[MAX_QPATH], limbCapName[MAX_QPATH], stubCapName[MAX_QPATH];
 			int newBolt;
 			int limbBit = (1 << (cent->currentState.modelGhoul2-10));
 

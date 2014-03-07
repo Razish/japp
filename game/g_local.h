@@ -144,9 +144,9 @@ struct gentity_s {
 	int				taskID[NUM_TIDS];
 	parms_t			*parms;
 	char			*behaviorSet[NUM_BSETS];
-	char			*script_targetname;
+	const char		*script_targetname;
 	int				delayScriptTime;
-	char			*fullName;
+	const char		*fullName;
 //	bool			dynalloc_fullname;
 
 	//rww - targetname and classname are now shared as well. ICARUS needs access to them.
@@ -211,7 +211,7 @@ struct gentity_s {
 
 	uint32_t	flags;				// FL_* variables
 
-	char		*model, *model2;
+	const char	*model, *model2;
 	int			freetime;			// level.time when the object was freed
 
 	int			eventTime;			// events will be cleared EVENT_VALID_MSEC after set
@@ -544,8 +544,7 @@ typedef struct gclient_s {
 
 	int			legsAnimExecute;
 	int			torsoAnimExecute;
-	qboolean	legsLastFlip;
-	qboolean	torsoLastFlip;
+	qboolean	legsLastFlip, torsoLastFlip;
 
 	qboolean	readyToExit;		// wishes to leave the intermission
 
@@ -663,8 +662,7 @@ typedef struct gclient_s {
 	renderInfo_t	renderInfo;
 
 	//mostly NPC stuff:
-	npcteam_t	playerTeam;
-	npcteam_t	enemyTeam;
+	npcteam_t	playerTeam, enemyTeam;
 	char		*squadname;
 	gentity_t	*team_leader;
 	gentity_t	*leader;
@@ -956,7 +954,7 @@ void Cmd_SaberAttackCycle_f(gentity_t *ent);
 int G_ItemUsable(playerState_t *ps, int forcedUse);
 void Cmd_ToggleSaber_f(gentity_t *ent);
 void Cmd_EngageDuel_f(gentity_t *ent);
-qboolean G_SetSaber( gentity_t *ent, int saberNum, char *saberName, qboolean siegeOverride );
+qboolean G_SetSaber( gentity_t *ent, int saberNum, const char *saberName, qboolean siegeOverride );
 gentity_t *G_GetDuelWinner(gclient_t *client);
 
 //
@@ -1247,7 +1245,7 @@ void SetLeader(int team, int client);
 void G_RunThink (gentity_t *ent);
 void QDECL G_LogPrintf( fileHandle_t filehandle, const char *fmt, ... );
 void SendScoreboardMessageToAllClients( void );
-const char *G_GetStringEdString(char *refSection, char *refName);
+const char *G_GetStringEdString( const char *refSection, const char *refName );
 
 //
 // g_client.c

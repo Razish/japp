@@ -328,7 +328,7 @@ if plat == 'Linux':
 		'-Wswitch-default',
 		'-Wuninitialized',
 		'-Wunreachable-code',
-	#	'-Wwrite-strings',
+		'-Wwrite-strings',
 		]
 	if analyse:
 		env['CC'] = 'clang'

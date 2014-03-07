@@ -2214,9 +2214,9 @@ void fx_runner_link( gentity_t *ent )
 //----------------------------------------------------------
 void SP_fx_runner( gentity_t *ent )
 {
-	char *fxFile;
+	const char *fxFile;
 
-	G_SpawnString( "fxFile", "", &fxFile );
+	G_SpawnString( "fxFile", "", (char **)&fxFile );
 	// Get our defaults
 	G_SpawnInt( "delay", "200", &ent->delay );
 	G_SpawnFloat( "random", "0", &ent->random );

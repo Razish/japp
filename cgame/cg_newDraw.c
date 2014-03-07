@@ -445,7 +445,7 @@ void CG_DrawTeamSpectators( rectDef_t *rect, float scale, const vector4 *color, 
 void CG_DrawMedal( int ownerDraw, rectDef_t *rect, float scale, const vector4 *color, qhandle_t shader ) {
 	score_t *score = &cg.scores[cg.selectedScore];
 	float value = 0;
-	char *text = NULL;
+	const char *text = NULL;
 	vector4 newColour;
 
 	VectorCopy4( color, &newColour );

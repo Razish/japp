@@ -735,7 +735,7 @@ void BG_VehicleClampData( vehicleInfo_t *vehicle )
 	}
 }
 
-static qboolean BG_ParseVehicleParm( vehicleInfo_t *vehicle, char *parmName, char *pValue )
+static qboolean BG_ParseVehicleParm( vehicleInfo_t *vehicle, const char *parmName, char *pValue )
 {
 	int		i;
 	vector3	vec;
@@ -1396,35 +1396,37 @@ int BG_VehicleGetIndex( const char *vehicleName )
 	return (VEH_VehicleIndexForName( vehicleName ));
 }
 
-//We get the vehicle name passed in as modelname
-//with a $ in front of it.
-//we are expected to then get the model for the
-//vehicle and stomp over modelname with it.
-void BG_GetVehicleModelName( char *modelname, int len )
-{
-	char *vehName = &modelname[1];
-	int vIndex = BG_VehicleGetIndex(vehName);
-	assert(modelname[0] == '$');
+// we get the vehicle name passed in as modelname with a $ in front of it.
+const char *BG_GetVehicleModelName( const char *modelname ) {
+	const char *vehName = &modelname[1];
+	int vIndex = BG_VehicleGetIndex( vehName );
+	assert( modelname[0] == '$' );
 
-	if (vIndex == VEHICLE_NONE)
-		Com_Error(ERR_DROP, "BG_GetVehicleModelName:  couldn't find vehicle %s", vehName);
+	if ( vIndex == VEHICLE_NONE ) {
+		Com_Error( ERR_DROP, "BG_GetVehicleModelName:  couldn't find vehicle %s", vehName );
+		return "";
+	}
 
-	Q_strncpyz( modelname, g_vehicleInfo[vIndex].model, len );
+    if ( !VALIDSTRING( g_vehicleInfo[vIndex].model ) )
+		return "";
+	else
+		return g_vehicleInfo[vIndex].model;
 }
 
-void BG_GetVehicleSkinName(char *skinname, int len)
-{
-	char *vehName = &skinname[1];
-	int vIndex = BG_VehicleGetIndex(vehName);
-	assert(skinname[0] == '$');
+const char *BG_GetVehicleSkinName( const char *skinname ) {
+	const char *vehName = &skinname[1];
+	int vIndex = BG_VehicleGetIndex( vehName );
+	assert( skinname[0] == '$' );
 
-	if (vIndex == VEHICLE_NONE)
-		Com_Error(ERR_DROP, "BG_GetVehicleSkinName:  couldn't find vehicle %s", vehName);
+	if ( vIndex == VEHICLE_NONE ) {
+		Com_Error( ERR_DROP, "BG_GetVehicleSkinName:  couldn't find vehicle %s", vehName );
+		return "";
+	}
 
     if ( !VALIDSTRING( g_vehicleInfo[vIndex].skin ) )
-		skinname[0] = 0;
+		return "";
 	else
-		Q_strncpyz( skinname, g_vehicleInfo[vIndex].skin, len );
+		return g_vehicleInfo[vIndex].skin;
 }
 
 #if defined(_GAME) || defined(_CGAME)

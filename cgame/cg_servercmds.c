@@ -76,8 +76,7 @@ static void CG_ParseTeamInfo( void ) {
 
 // This is called explicitly when the gamestate is first received, and whenever the server updates any serverinfo flagged cvars
 void CG_ParseServerinfo( void ) {
-	const char *info = NULL, *tinfo = NULL;
-	char *mapname;
+	const char *info=NULL, *tinfo=NULL, *mapname;
 	int i, fraglimit, timelimit;
 
 	info = CG_ConfigString( CS_SERVERINFO );

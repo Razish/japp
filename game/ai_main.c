@@ -308,7 +308,9 @@ int PassLovedOneCheck(bot_state_t *bs, gentity_t *ent);
 
 void ExitLevel( void );
 
-void QDECL BotAI_Print(int type, char *fmt, ...) { return; }
+void QDECL BotAI_Print( int type, const char *fmt, ... ) {
+	//FIXME: add BotAI_Print
+}
 
 qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower );
 

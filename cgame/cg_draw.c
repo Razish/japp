@@ -1129,7 +1129,7 @@ void JP_DrawStats( void )
 	Com_sprintf( speedStr, sizeof( speedStr ), "%s%04.01f ups", ( speed >= 800.0f ? S_COLOR_RED : ( speed >= 550.0f ? S_COLOR_YELLOW : S_COLOR_WHITE ) ), speed );
 
 	{
-		char *statStr = va( "%-12s%i\n%-12s%i\n%-12s%.2f\n\n%-12s%i\n%-12s%i\n\n%-12s%s\n%-12s%s\n\n%-12s%s",
+		const char *statStr = va( "%-12s%i\n%-12s%i\n%-12s%.2f\n\n%-12s%i\n%-12s%i\n\n%-12s%s\n%-12s%s\n\n%-12s%s",
 				"Score", cg.snap->ps.persistant[PERS_SCORE],
 				"Deaths", cg.snap->ps.persistant[PERS_KILLED],
 				"Ratio", cg.snap->ps.persistant[PERS_KILLED] ? (float)((float)cg.snap->ps.persistant[PERS_SCORE]/(float)cg.snap->ps.persistant[PERS_KILLED]) : (float)cg.snap->ps.persistant[PERS_SCORE],
@@ -1298,7 +1298,7 @@ void CG_DrawHUD( centity_t *cent )
 	if ( cg_debugInfo.integer )
 	{
 		int x = 0, y = SCREEN_HEIGHT-80;
-		char *str = NULL;
+		const char *str = NULL;
 		entityState_t *es = &cg_entities[cg.snap->ps.clientNum].currentState;
 		playerState_t *ps = &cg.predictedPlayerState;
 
@@ -2644,18 +2644,15 @@ void CG_DrawVehicleDamage(const centity_t *veh,int brokenLimbs,const menuDef_t	*
 
 
 // Used on both damage indicators :  player vehicle and the vehicle the player is locked on
-void CG_DrawVehicleDamageHUD(const centity_t *veh,int brokenLimbs,float percShields,char *menuName, float alpha)
-{
-	menuDef_t		*menuHUD;
-	itemDef_t		*item;
-	vector4			color;
+void CG_DrawVehicleDamageHUD( const centity_t *veh, int brokenLimbs, float percShields, const char *menuName, float alpha ) {
+	menuDef_t *menuHUD;
+	itemDef_t *item;
+	vector4 color;
 
-	menuHUD = Menus_FindByName(menuName);
+	menuHUD = Menus_FindByName( menuName );
 
 	if ( !menuHUD )
-	{
 		return;
-	}
 
 	item = Menu_FindItemByName(menuHUD, "background");
 	if (item)
@@ -3195,15 +3192,12 @@ CG_DrawSnapshot
 ==================
 */
 static float CG_DrawSnapshot( float y ) {
-	char		*s;
-	int			w;
-	int			xOffset = 0;
+	const char *s;
+	float w;
 
-	s = va( "time:%i snap:%i cmd:%i", cg.snap->serverTime,
-		cg.latestSnapshotNum, cgs.serverCommandSequence );
+	s = va( "time:%i snap:%i cmd:%i", cg.snap->serverTime, cg.latestSnapshotNum, cgs.serverCommandSequence );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-
-	CG_DrawBigString( 635 - w + xOffset, y + 2, s, 1.0F);
+	CG_DrawBigString( 635 - w, y + 2, s, 1.0f );
 
 	return y + BIGCHAR_HEIGHT + 4;
 }
@@ -3216,14 +3210,13 @@ CG_DrawFPS
 #define IDEAL_FPS (60.0f)
 #define	FPS_FRAMES (16)
 static float CG_DrawFPS( float y ) {
-	char		*s;
-	int			w;
+	const char *s;
+	int w;
 	static unsigned short previousTimes[FPS_FRAMES];
 	static unsigned short index;
 	static int	previous, lastupdate;
-	int		t, i, fps, total;
+	int t, i, fps, total;
 	unsigned short frameTime;
-	const int		xOffset = 0;
 	int maxFPS = atoi( CG_Cvar_VariableString( "com_maxFPS" ) );
 
 
@@ -3232,8 +3225,7 @@ static float CG_DrawFPS( float y ) {
 	t = trap->Milliseconds();
 	frameTime = t - previous;
 	previous = t;
-	if (t - lastupdate > 100)	//don't sample faster than this
-	{
+	if ( t - lastupdate > 100 ) {
 		lastupdate = t;
 		previousTimes[index % FPS_FRAMES] = frameTime;
 		index++;
@@ -3247,30 +3239,28 @@ static float CG_DrawFPS( float y ) {
 
 	cg.japp.fps = fps = 1000.0f * (float)( (float)(FPS_FRAMES) / (float)total );
 
-	if ( cg_drawFPS.integer )
-	{
+	if ( cg_drawFPS.integer ) {
 		vector4 fpsColour = { 1.0f, 1.0f, 1.0f, 1.0f }, fpsGood = { 0.0f, 1.0f, 0.0f, 1.0f }, fpsBad = { 1.0f, 0.0f, 0.0f, 1.0f };
-		CG_LerpColour( &fpsBad, &fpsGood, &fpsColour, min( max(0.0f, fps) / max(IDEAL_FPS, maxFPS), 1.0f ) );
+		CG_LerpColour( &fpsBad, &fpsGood, &fpsColour, min( max( 0.0f, fps ) / max( IDEAL_FPS, maxFPS ), 1.0f ) );
 
-		//	s = va( "%ifps", fps );
-		//	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		//	CG_DrawBigString( 635 - w + xOffset, y + 2, s, 1.0F);
+	//	s = va( "%ifps", fps );
+	//	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	//	CG_DrawBigString( 635 - w + xOffset, y + 2, s, 1.0F);
 
 		s = va( "%ifps", fps );
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		CG_DrawStringExt( (SCREEN_WIDTH-5) - w + xOffset, y + 2, s, &fpsColour, qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+		CG_DrawStringExt( (SCREEN_WIDTH-5) - w, y + 2, s, &fpsColour, qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
 		y += BIGCHAR_HEIGHT + 4;
-		//	w = CG_Text_Width( s, 1.0f, FONT_JAPPMONO );
-		//	CG_Text_Paint( (SCREEN_WIDTH-5) - w + xOffset, y + 2, 1.0f, &fpsColour, s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_JAPPMONO );
+	//	w = CG_Text_Width( s, 1.0f, FONT_JAPPMONO );
+	//	CG_Text_Paint( (SCREEN_WIDTH-5) - w, y + 2, 1.0f, &fpsColour, s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_JAPPMONO );
 	}
-	if ( cg_drawFPS.integer == 2 )
-	{
+	if ( cg_drawFPS.integer == 2 ) {
 	//	int font = FONT_JAPPMONO;
 	//	float scale = 0.5f;
 		s = va( "%i/%3.2f msec", frameTime, 1000.0f/(float)fps );
 
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		CG_DrawStringExt( (SCREEN_WIDTH-5) - w + xOffset, y + 2, s, &colorTable[CT_LTGREY], qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+		CG_DrawStringExt( (SCREEN_WIDTH-5) - w, y + 2, s, &colorTable[CT_LTGREY], qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
 
 	//	w = CG_Text_Width( s, scale, font );
 	//	CG_Text_Paint( (SCREEN_WIDTH-5) - w - 5, y - 2, scale, &colorTable[CT_LTGREY], s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, font );
@@ -3282,8 +3272,7 @@ static float CG_DrawFPS( float y ) {
 
 // nmckenzie: DUEL_HEALTH
 #define MAX_HEALTH_FOR_IFACE	100
-void CG_DrawHealthBarRough (float x, float y, int width, int height, float ratio, const vector4 *color1, const vector4 *color2)
-{
+void CG_DrawHealthBarRough( float x, float y, int width, int height, float ratio, const vector4 *color1, const vector4 *color2 ) {
 	float midpoint, remainder;
 	vector4 color3 = {1, 0, 0, .7f};
 
@@ -3857,36 +3846,10 @@ float CG_DrawRadar ( float y )
 	return y+(RADAR_RADIUS*2);
 }
 
-/*
-=================
-CG_DrawTimer
-=================
-*/
 static float CG_DrawTimer( float y ) {
-#if 0
-	char		*s;
-	int			w;
-	int			mins, seconds, tens;
-	int			msec;
-	int			xOffset = 0;
-
-	if ( !cg_drawTimer.integer )
-		return y;
-
-	msec = cg.time - cgs.levelStartTime;
-
-	seconds = msec / 1000;
-	mins = seconds / 60;
-	seconds -= mins * 60;
-	tens = seconds / 10;
-	seconds -= tens * 10;
-
-	s = va( "%i:%i%i", mins, tens, seconds );
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-#else
 //	vector4 *timeColour = NULL;
 	int msec=0, secs=0, mins=0, limitSec=cgs.timelimit*60;
-	char *s = NULL;
+	const char *s = NULL;
 	float w;
 
 	if ( !cg_drawTimer.integer )
@@ -3911,8 +3874,7 @@ static float CG_DrawTimer( float y ) {
 	}
 */
 
-	if ( cgs.timelimit && (cg_drawTimer.integer & DRAWTIMER_COUNTDOWN) )
-	{// count down
+	if ( cgs.timelimit && (cg_drawTimer.integer & DRAWTIMER_COUNTDOWN) ) {// count down
 		msec = limitSec*1000 - (msec);
 		secs = msec/1000;
 		mins = secs/60;
@@ -3924,7 +3886,6 @@ static float CG_DrawTimer( float y ) {
 	s = va( "%i:%02i", mins, secs );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-#endif
 	CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
 
 	return y + BIGCHAR_HEIGHT + 4;
@@ -6626,8 +6587,8 @@ CG_DrawTeamVote
 =================
 */
 static void CG_DrawTeamVote(void) {
-	char	*s;
-	int		sec, cs_offset;
+	const char *s;
+	int sec, cs_offset;
 
 	if ( cgs.clientinfo[cg.clientNum].team == TEAM_RED )
 		cs_offset = 0;
@@ -7483,108 +7444,80 @@ chatbox functionality -rww
 
 //utility func, insert a string into a string at the specified
 //place (assuming this will not overflow the buffer)
-void CG_ChatBox_StrInsert(char *buffer, int place, char *str)
-{
-	int insLen = strlen(str);
-	int i = strlen(buffer);
-	int k = 0;
+void CG_ChatBox_StrInsert( char *buffer, int place, const char *str ) {
+	int insLen = strlen( str );
+	int i, k=0;
 
-	buffer[i+insLen+1] = 0; //terminate the string at its new length
-	while (i >= place)
-	{
+	i = strlen( buffer );
+	buffer[i+insLen+1] = '\0'; //terminate the string at its new length
+	for ( ; i>=place; i-- ) {
 		buffer[i+insLen] = buffer[i];
-		i--;
 	}
 
 	i++;
-	while (k < insLen)
-	{
-		buffer[i] = str[k];
-		i++;
-		k++;
+	while ( k<insLen ) {
+		buffer[i++] = str[k++];
 	}
 }
 
 //add chatbox string
-void CG_ChatBox_AddString(char *chatStr)
-{
+void CG_ChatBox_AddString( char *chatStr ) {
 	chatBoxItem_t *chat = &cg.chatItems[cg.chatItemActive];
 	float chatLen;
 
-	if (cg_chatbox.integer<=0)
-	{ //don't bother then.
+	if ( cg_chatbox.integer <= 0 )
 		return;
-	}
 
-	memset(chat, 0, sizeof(chatBoxItem_t));
+	memset( chat, 0, sizeof( chatBoxItem_t ) );
 
-	if (strlen(chatStr) > sizeof(chat->string))
-	{ //too long, terminate at proper len.
-		chatStr[sizeof(chat->string)-1] = 0;
-	}
+	if ( strlen( chatStr ) >= sizeof( chat->string ) )
+		chatStr[sizeof( chat->string )-1] = '\0';
 
-	strcpy(chat->string, chatStr);
+	Q_strncpyz( chat->string, chatStr, sizeof( chat->string ) );
 	chat->time = cg.time + cg_chatbox.integer;
 
 	chat->lines = 1;
 
-	chatLen = CG_Text_Width(chat->string, 1.0f, FONT_SMALL);
-	if (chatLen > CHATBOX_CUTOFF_LEN)
-	{ //we have to break it into segments...
-        int i = 0;
-		int lastLinePt = 0;
+	chatLen = CG_Text_Width( chat->string, 1.0f, FONT_SMALL );
+	if ( chatLen > CHATBOX_CUTOFF_LEN ) {
+		// we have to break it into segments...
+        int i, lastLinePt = 0;
 		char s[2];
 
 		chatLen = 0;
-		while (chat->string[i])
-		{
+		for ( i=0; chat->string[i]; i++ ) {
 			s[0] = chat->string[i];
 			s[1] = 0;
-			chatLen += CG_Text_Width(s, 0.65f, FONT_SMALL);
+			chatLen += CG_Text_Width( s, 0.65f, FONT_SMALL );
 
-			if (chatLen >= CHATBOX_CUTOFF_LEN)
-			{
-				int j = i;
-				while (j > 0 && j > lastLinePt)
-				{
-					if (chat->string[j] == ' ')
-					{
+			if ( chatLen >= CHATBOX_CUTOFF_LEN ) {
+				int j;
+				for ( j=i; j>0 && j>lastLinePt; j-- ) {
+					if ( chat->string[j] == ' ' )
 						break;
-					}
-					j--;
 				}
-				if (chat->string[j] == ' ')
-				{
+				if ( chat->string[j] == ' ' )
 					i = j;
-				}
 
                 chat->lines++;
-				CG_ChatBox_StrInsert(chat->string, i, "\n");
-				i++;
+				CG_ChatBox_StrInsert( chat->string, i++, "\n" );
 				chatLen = 0;
 				lastLinePt = i+1;
 			}
-			i++;
 		}
 	}
 
-	cg.chatItemActive++;
-	if (cg.chatItemActive >= MAX_CHATBOX_ITEMS)
-	{
+	if ( ++cg.chatItemActive >= MAX_CHATBOX_ITEMS )
 		cg.chatItemActive = 0;
-	}
 }
 
 //insert item into array (rearranging the array if necessary)
-void CG_ChatBox_ArrayInsert(chatBoxItem_t **array, int insPoint, int maxNum, chatBoxItem_t *item)
-{
-    if (array[insPoint])
-	{ //recursively call, to move everything up to the top
-		if (insPoint+1 >= maxNum)
-		{
-			trap->Error( ERR_DROP, "CG_ChatBox_ArrayInsert: Exceeded array size");
-		}
-		CG_ChatBox_ArrayInsert(array, insPoint+1, maxNum, array[insPoint]);
+void CG_ChatBox_ArrayInsert( chatBoxItem_t **array, int insPoint, int maxNum, chatBoxItem_t *item ) {
+    if ( array[insPoint] ) {
+		// recursively call, to move everything up to the top
+		if ( insPoint+1 >= maxNum )
+			trap->Error( ERR_DROP, "CG_ChatBox_ArrayInsert: Exceeded array size" );
+		CG_ChatBox_ArrayInsert( array, insPoint+1, maxNum, array[insPoint] );
 	}
 
 	//now that we have moved anything that would be in this slot up, insert what we want into the slot
@@ -7592,61 +7525,41 @@ void CG_ChatBox_ArrayInsert(chatBoxItem_t **array, int insPoint, int maxNum, cha
 }
 
 //go through all the chat strings and draw them if they are not yet expired
-static QINLINE void CG_ChatBox_DrawStrings(void)
-{
+static QINLINE void CG_ChatBox_DrawStrings( void ) {
 	chatBoxItem_t *drawThese[MAX_CHATBOX_ITEMS];
-	int numToDraw = 0;
-	int linesToDraw = 0;
-	int i = 0;
-	int x = 30;
-	float y = cg.scoreBoardShowing ? 475 : cg_chatboxHeight.integer;
-	float fontScale = 0.65f;
+	int numToDraw = 0, linesToDraw = 0, i = 0, x = 30;
+	float y = cg.scoreBoardShowing ? 475.0f : cg_chatboxHeight.integer;
+	const float fontScale = 0.65f;
 
-	if (!cg_chatbox.integer)
-	{
+	if ( !cg_chatbox.integer )
 		return;
-	}
 
-	memset(drawThese, 0, sizeof(drawThese));
+	memset( drawThese, 0, sizeof( drawThese ) );
 
-	while (i < MAX_CHATBOX_ITEMS)
-	{
-		if (cg.chatItems[i].time >= cg.time)
-		{
-			int check = numToDraw;
-			int insertionPoint = numToDraw;
+	for ( i=0; i<MAX_CHATBOX_ITEMS; i++ ) {
+		if ( cg.chatItems[i].time >= cg.time ) {
+			int check, insertionPoint = numToDraw;
 
-			while (check >= 0)
-			{
-				if (drawThese[check] &&
-					cg.chatItems[i].time < drawThese[check]->time)
-				{ //insert here
+			for ( check=numToDraw; check >= 0; check-- ) {
+				if ( drawThese[check] && cg.chatItems[i].time < drawThese[check]->time )
 					insertionPoint = check;
-				}
-				check--;
 			}
-			CG_ChatBox_ArrayInsert(drawThese, insertionPoint, MAX_CHATBOX_ITEMS, &cg.chatItems[i]);
+			CG_ChatBox_ArrayInsert( drawThese, insertionPoint, MAX_CHATBOX_ITEMS, &cg.chatItems[i] );
 			numToDraw++;
 			linesToDraw += cg.chatItems[i].lines;
 		}
-		i++;
 	}
 
-	if (!numToDraw)
-	{ //nothing, then, just get out of here now.
+	if ( !numToDraw )
 		return;
-	}
 
-	//move initial point up so we draw bottom-up (visually)
+	// move initial point up so we draw bottom-up (visually)
 	y -= (CHATBOX_FONT_HEIGHT*fontScale)*linesToDraw;
 
 	//we have the items we want to draw, just quickly loop through them now
-	i = 0;
-	while (i < numToDraw)
-	{
-		CG_Text_Paint(x, y, fontScale, &colorWhite, drawThese[i]->string, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+	for ( i=0; i<numToDraw; i++ ) {
+		CG_Text_Paint( x, y, fontScale, &colorWhite, drawThese[i]->string, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
 		y += ((CHATBOX_FONT_HEIGHT*fontScale)*drawThese[i]->lines);
-		i++;
 	}
 }
 
