@@ -3634,9 +3634,8 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	//Raz: Scooper's userinfo spam code
-	if ( japp_antiUserinfoFlood.integer )
-	{
-		if ( ent->userinfoSpam > 0 && ent->userinfoChanged + 2000 < level.time )
+	if ( japp_antiUserinfoFlood.integer ) {
+		if ( (ent->r.svFlags & SVF_BOT) || (ent->userinfoSpam > 0 && ent->userinfoChanged + 2000 < level.time) )
 			ent->userinfoSpam = 0;
 	}
 

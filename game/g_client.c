@@ -1979,7 +1979,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		trap->SetUserinfo( clientNum, userinfo );
 
 	//Raz: Scooper's code for userinfo spamming
-	if ( japp_antiUserinfoFlood.integer ) {
+	if ( japp_antiUserinfoFlood.integer && !(ent->r.svFlags & SVF_BOT) ) {
 		ent->userinfoChanged = level.time;
 
 		if ( ent->userinfoSpam > 12 ) {
@@ -3935,6 +3935,8 @@ void ClientDisconnect( int clientNum ) {
 	ent->r.contents = 0;
 
 	G_ClearVote( ent );
+	ent->userinfoChanged = 0;
+	ent->userinfoSpam = 0;
 
 	//Raz: Siege item/ATST/reconnect fix http://www.lucasforums.com/showpost.php?p=2143165&postcount=92
 	if ( ent->client->holdingObjectiveItem > 0 ) {
