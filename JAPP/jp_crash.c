@@ -1193,60 +1193,60 @@ static void JKG_Crash_AddOSData(fileHandle_t f) {
 	uname(&un);
 	JKG_FS_WriteString(va("Operating system: %s %s %s %s %s %s\n",un.sysname, un.nodename, un.release, un.version, un.machine, un.domainname), f);
 }
-static void JKG_Crash_AddCrashInfo(int signal, siginfo_t *siginfo, ucontext_t *ctx, fileHandle_t f) {
-	JKG_FS_WriteString(va("Exception code: %s (%i)\n", strsignal(signal), signal), f);
-	JKG_FS_WriteString(va("Exception address: %p\n", ctx->uc_mcontext.gregs[REG_EIP]), f);
-	JKG_FS_WriteString(va("Exception in module: %s\n", JKG_GetMemRegion(ctx->uc_mcontext.gregs[REG_EIP])), f);
-	switch (signal) {
-		case SIGSEGV:
-			switch (siginfo->si_code) {
-				case SEGV_MAPERR:
-					JKG_FS_WriteString("Exception cause: Address not mapped to object\n", f);
-					break;
-				case SEGV_ACCERR:
-					JKG_FS_WriteString("Exception cause: Invalid permissions for mapped object\n", f);
-					break;
-				default:
-					JKG_FS_WriteString("Exception cause: Unknown\n", f);
-					break;
-			}
-			break;
-		case SIGILL:
-			switch (siginfo->si_code) {
-				case ILL_ILLOPC:
-					JKG_FS_WriteString("Exception cause: Illegal opcode\n", f);
-					break;
-				case ILL_ILLOPN:
-					JKG_FS_WriteString("Exception cause: Illegal operand\n", f);
-					break;
-				case ILL_ILLADR:
-					JKG_FS_WriteString("Exception cause: Illegal addressing mode\n", f);
-					break;
-				case ILL_ILLTRP:
-					JKG_FS_WriteString("Exception cause: Illegal trap\n", f);
-					break;
-				case ILL_PRVOPC:
-					JKG_FS_WriteString("Exception cause: Privileged opcode\n", f);
-					break;
-				case ILL_PRVREG:
-					JKG_FS_WriteString("Exception cause: Privileged register\n", f);
-					break;
-				case ILL_COPROC:
-					JKG_FS_WriteString("Exception cause: Coprocessor error\n", f);
-					break;
-				case ILL_BADSTK:
-					JKG_FS_WriteString("Exception cause: Internal stack error\n", f);
-					break;
-				default:
-					JKG_FS_WriteString("Exception cause: Unknown\n", f);
-					break;
-			}
-			break;
-
+static void JKG_Crash_AddCrashInfo( int signal, siginfo_t *siginfo, ucontext_t *ctx, fileHandle_t f ) {
+	JKG_FS_WriteString( va( "Exception code: %s (%i)\n", strsignal( signal ), signal ), f );
+	JKG_FS_WriteString( va( "Exception address: %p\n", ctx->uc_mcontext.gregs[REG_EIP] ), f );
+	JKG_FS_WriteString( va( "Exception in module: %s\n", JKG_GetMemRegion( ctx->uc_mcontext.gregs[REG_EIP] ) ), f );
+	switch ( signal ) {
+	case SIGSEGV:
+		switch ( siginfo->si_code ) {
+			case SEGV_MAPERR:
+				JKG_FS_WriteString( "Exception cause: Address not mapped to object\n", f );
+				break;
+			case SEGV_ACCERR:
+				JKG_FS_WriteString( "Exception cause: Invalid permissions for mapped object\n", f );
+				break;
+			default:
+				JKG_FS_WriteString( "Exception cause: Unknown\n", f );
+				break;
+		}
+		break;
+	case SIGILL:
+		switch ( siginfo->si_code ) {
+			case ILL_ILLOPC:
+				JKG_FS_WriteString( "Exception cause: Illegal opcode\n", f );
+				break;
+			case ILL_ILLOPN:
+				JKG_FS_WriteString( "Exception cause: Illegal operand\n", f );
+				break;
+			case ILL_ILLADR:
+				JKG_FS_WriteString( "Exception cause: Illegal addressing mode\n", f );
+				break;
+			case ILL_ILLTRP:
+				JKG_FS_WriteString( "Exception cause: Illegal trap\n", f );
+				break;
+			case ILL_PRVOPC:
+				JKG_FS_WriteString( "Exception cause: Privileged opcode\n", f );
+				break;
+			case ILL_PRVREG:
+				JKG_FS_WriteString( "Exception cause: Privileged register\n", f );
+				break;
+			case ILL_COPROC:
+				JKG_FS_WriteString( "Exception cause: Coprocessor error\n", f );
+				break;
+			case ILL_BADSTK:
+				JKG_FS_WriteString( "Exception cause: Internal stack error\n", f );
+				break;
+			default:
+				JKG_FS_WriteString( "Exception cause: Unknown\n", f );
+				break;
+		}
+		break;
+	default:
+		break;
 	}
-	if (siginfo && signal == SIGSEGV) {
-		JKG_FS_WriteString(va("Attempted to reference memory address: %p\n", siginfo->si_addr), f);
-	}
+	if ( siginfo && signal == SIGSEGV )
+		JKG_FS_WriteString( va( "Attempted to reference memory address: %p\n", siginfo->si_addr ), f );
 }
 
 static void JKG_Crash_AddRegisterDump(ucontext_t *ctx, fileHandle_t f) {
