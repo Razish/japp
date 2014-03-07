@@ -32,8 +32,6 @@ extern qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const 
 extern qboolean NPC_CheckEnemyStealth( void );
 extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 
-extern gitem_t	*BG_FindItemForAmmo( ammo_t ammo );
-
 extern void ForceThrow( gentity_t *self, qboolean pull );
 extern void ForceLightning( gentity_t *self );
 extern void ForceHeal( gentity_t *self );

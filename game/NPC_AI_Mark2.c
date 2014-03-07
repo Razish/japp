@@ -10,8 +10,6 @@
 #define MIN_DISTANCE		24
 #define MIN_DISTANCE_SQR	( MIN_DISTANCE * MIN_DISTANCE )
 
-extern gitem_t	*BG_FindItemForAmmo( ammo_t ammo );
-
 //Local state enums
 enum
 {

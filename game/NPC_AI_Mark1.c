@@ -38,8 +38,6 @@ qboolean NPC_CheckPlayerTeamStealth( void );
 void Mark1_BlasterAttack(qboolean advance);
 void DeathFX( gentity_t *ent );
 
-extern gitem_t *BG_FindItemForAmmo( ammo_t ammo );
-
 /*
 -------------------------
 NPC_Mark1_Precache

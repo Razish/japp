@@ -1,7 +1,6 @@
 #include "b_local.h"
 #include "g_nav.h"
 
-extern gitem_t	*BG_FindItemForAmmo( ammo_t ammo );
 extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 
 #define MIN_DISTANCE		256

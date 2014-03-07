@@ -3458,21 +3458,26 @@ void ClientSpawn(gentity_t *ent) {
 
 			client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
 
-			for ( i=WP_SABER; i<WP_NUM_WEAPONS; i++ )
-			{
-				if ( (client->ps.stats[STAT_WEAPONS] & (1 << i)) )
-				{
+			// give ammo for all available weapons
+			for ( i=WP_BRYAR_PISTOL; i<=LAST_USEABLE_WEAPON; i++ ) {
+				if ( japp_spawnWeaps.integer & (1<<i) ) {
+					ammo_t ammo = weaponData[i].ammoIndex;
+					const gitem_t *it = BG_FindItemForAmmo( ammo );
+					if ( it )
+						client->ps.ammo[ammo] += it->quantity;
+				}
+			}
+
+			for ( i=WP_SABER; i<WP_NUM_WEAPONS; i++ ) {
+				if ( (client->ps.stats[STAT_WEAPONS] & (1<<i)) ) {
 					newWeap = i;
 					break;
 				}
 			}
 
-			if ( newWeap == WP_NUM_WEAPONS )
-			{
-				for ( i=WP_STUN_BATON; i<WP_SABER; i++ )
-				{
-					if ( (client->ps.stats[STAT_WEAPONS] & (1 << i)) )
-					{
+			if ( newWeap == WP_NUM_WEAPONS ) {
+				for ( i=WP_STUN_BATON; i<WP_SABER; i++ ) {
+					if ( (client->ps.stats[STAT_WEAPONS] & (1<<i)) ) {
 						newWeap = i;
 						break;
 					}
