@@ -726,7 +726,7 @@ void G_AddBot( const char *name, float skill, const char *team, int delay, char 
 	if ( clientNum == -1 ) {
 //		trap->Print( S_COLOR_RED "Unable to add bot.  All player slots are in use.\n" );
 //		trap->Print( S_COLOR_RED "Start server with more 'open' slots.\n" );
-		trap->SendServerCommand( -1, va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "UNABLE_TO_ADD_BOT")));
+		trap->SendServerCommand( -1, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "UNABLE_TO_ADD_BOT" ) ) );
 		return;
 	}
 
@@ -854,7 +854,8 @@ void G_AddBot( const char *name, float skill, const char *team, int delay, char 
 
 	// have it connect to the game as a normal client
 	if ( ClientConnect( clientNum, qtrue, qtrue ) ) {
-		trap->DropClient( clientNum, "ClientConnect failed" );
+	//	trap->DropClient( clientNum, "ClientConnect failed" );
+		trap->BotFreeClient( clientNum );
 		return;
 	}
 
@@ -882,8 +883,10 @@ void G_AddBot( const char *name, float skill, const char *team, int delay, char 
 		bot->client->ps.persistant[ PERS_TEAM ] = bot->client->sess.sessionTeam;
 
 		G_ReadSessionData( bot->client );
-		if ( !ClientUserinfoChanged( clientNum ) )
+		if ( !ClientUserinfoChanged( clientNum ) ) {
+			trap->BotFreeClient( clientNum );
 			return;
+		}
 	}
 
 	if (level.gametype == GT_DUEL ||
