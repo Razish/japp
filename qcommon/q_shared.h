@@ -108,10 +108,11 @@
 	#error "Could not determine architecture"
 #endif
 
+#define JAPP_VERSION_SMALL "JA++, "XSTRING(QARCH)" bits, "__DATE__
 #ifdef REVISION
 	#define JAPP_VERSION "JA++, "XSTRING(QARCH)" bits, "__DATE__", "REVISION
 #else
-	#define JAPP_VERSION "JA++, "XSTRING(QARCH)" bits, "__DATE__
+	#define JAPP_VERSION JAPP_VERSION_SMALL
 #endif
 
 // this is the define for determining if we have an asm version of a C function

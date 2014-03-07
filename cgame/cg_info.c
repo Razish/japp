@@ -131,6 +131,19 @@ void CG_DrawInformation( void ) {
 	// some extra space after hostname and motd
 	y += 10;
 
+#ifdef _DEBUG
+	// debug build
+	UI_DrawProportionalString( 320, y, "DEBUG BUILD", UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
+	y += iPropHeight;
+#endif
+
+	// JA++ version
+	UI_DrawProportionalString( 320, y, JAPP_VERSION_SMALL, UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, &colorWhite );
+	y += iPropHeight;
+
+	// some extra space after hostname and motd
+	y += 10;
+
 	// map-specific message (long map name)
 	s = CG_ConfigString( CS_MESSAGE );
 	if ( s[0] ) {
