@@ -8,7 +8,7 @@
 #	ui
 #
 # options:
-#	debug		generate debug information
+#	debug		generate debug information. value 2 also enables optimisations
 #	force32		force 32 bit target when on 64 bit machine
 #	compiler=?	use an alternate compiler
 #	analyse		run static analysis
@@ -28,14 +28,19 @@ except( ValueError, TypeError ):
 	bits = None
 arch = None # platform-specific, set manually
 
-print( '\n********************************\n' )
 print( 'Configuring build environment...' )
 env = Environment()
 
 if plat != 'Windows':
 	env['ENV']['TERM'] = os.environ['TERM']
 
+project = ARGUMENTS.get( 'project', '' )
+compiler = ARGUMENTS.get( 'compiler', 'gcc' )
+analyse = int( ARGUMENTS.get( 'analyse', 0 ) )
+debug = int( ARGUMENTS.get( 'debug', 0 ) )
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
+
+# architecture settings, needed for binary names, also passed as a preprocessor definition
 if force32:
 	bits = 32
 
@@ -45,7 +50,6 @@ if bits == 32:
 	elif plat == 'Linux':
 		arch = 'i386'
 	#TODO: Mac
-
 elif bits == 64:
 	if plat == 'Windows':
 		arch = 'x64'
@@ -53,8 +57,17 @@ elif bits == 64:
 		arch = 'x86_64'
 	#TODO: Mac
 
+# Notify the user of the build configuration
 print( 'Building for ' + plat + ' (' + str(bits) + ' bits, treated as \'' + arch + '\')' )
-print( '\n********************************\n' )
+if debug:
+	print( 'With debugging symbols' )
+if not debug or debug == 2:
+	print( 'Optimisation enabled' )
+if force32:
+	print( 'Forcing 32 bit compile' )
+if analyse:
+	print( 'WARNING: Running static analysis mode. Will not produce binaries' )
+print( '' )
 
 files = {}
 libs = {}
@@ -307,9 +320,8 @@ elif plat == 'Windows':
 	libs['ui'] = [ 'user32' ]
 
 # compiler options
-analyse = int( ARGUMENTS.get( 'analyse', 0 ) )
 if plat == 'Linux':
-	env['CC'] = ARGUMENTS.get( 'compiler', 'gcc' )
+	env['CC'] = compiler
 	env['CPPDEFINES'] = [ '__GCC__' ]
 	env['CCFLAGS'] = [
 		'-Wall', '-Wextra',
@@ -343,18 +355,19 @@ elif plat == 'Windows':
 	env['CPPDEFINES'] = [ 'WIN32', '_WINDOWS' ]
 
 # debug / release
-if int( ARGUMENTS.get( 'debug', 0 ) ):
+if not debug or debug == 2:
+	if plat == 'Linux' and not analyse:
+		env['CCFLAGS'] += [ '-O2' ] # analysis sets higher optimisation level
+	elif plat == 'Windows':
+		env['CCFLAGS'] += [ '/O2', '/MD' ]
+	if not debug:
+		env['CPPDEFINES'] += [ 'NDEBUG' ]
+if debug:
 	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-g3' ]
 	elif plat == 'Windows':
 		env['CCFLAGS'] += [ '/Zi', '/Od', '/RTC1', '/Gm', '/MDd' ]
 	env['CPPDEFINES'] += [ '_DEBUG' ]
-else:
-	if plat == 'Linux' and not analyse:
-		env['CCFLAGS'] += [ '-O2' ] # analysis sets higher optimisation level
-	elif plat == 'Windows':
-		env['CCFLAGS'] += [ '/O2', '/MD' ]
-	env['CPPDEFINES'] += [ 'NDEBUG' ]
 
 # get git revision
 status, rev = commands.getstatusoutput( 'git rev-parse HEAD' )
@@ -364,7 +377,6 @@ if status == 0:
 env['CPPDEFINES'] += [ 'SCONS_BUILD' ]
 
 # targets
-project = ARGUMENTS.get( 'project', '' )
 if project == 'game':
 	env['CPPPATH'] = [ '.', './game' ]
 	env['CPPDEFINES'] += [ '_GAME', 'JK2AWARDS', 'JPLUA' ]
