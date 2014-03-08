@@ -379,7 +379,7 @@ env['CPPDEFINES'] += [ 'SCONS_BUILD' ]
 # targets
 if project == 'game':
 	env['CPPPATH'] = [ '.', './game' ]
-	env['CPPDEFINES'] += [ '_GAME', 'JK2AWARDS', 'JPLUA' ]
+	env['CPPDEFINES'] += [ '_GAME', 'JPLUA' ]
 	if plat == 'Linux':
 		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
 	env['LIBS'] = libs['game']
@@ -388,7 +388,7 @@ if project == 'game':
 
 elif project == 'cgame':
 	env['CPPPATH'] = [ '.', './cgame', './game' ]
-	env['CPPDEFINES'] += [ '_CGAME', 'JK2AWARDS', 'JPLUA' ]
+	env['CPPDEFINES'] += [ '_CGAME', 'JPLUA' ]
 	if plat == 'Linux':
 		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
 	env['LIBS'] = libs['cgame']

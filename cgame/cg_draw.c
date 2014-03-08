@@ -4162,26 +4162,19 @@ static void CG_DrawUpperRight( void ) {
 	CG_DrawPowerupIcons(y);
 }
 
-/*
-===================
-CG_DrawReward
-===================
-*/
-#ifdef JK2AWARDS
 static void CG_DrawReward( void ) {
-	vector4	*color;
-	int		i, count;
-	float	x, y;
-	char	buf[32];
+	vector4 *color;
+	int i, count;
+	float x, y;
+	char buf[32];
 
-	if ( !cg_drawRewards.integer ) {
+	if ( !cg_drawRewards.integer )
 		return;
-	}
 
 	color = CG_FadeColor( cg.rewardTime, REWARD_TIME );
 	if ( !color ) {
-		if (cg.rewardStack > 0) {
-			for(i = 0; i < cg.rewardStack; i++) {
+		if ( cg.rewardStack > 0 ) {
+			for ( i=0; i<cg.rewardStack; i++ ) {
 				cg.rewardSound[i] = cg.rewardSound[i+1];
 				cg.rewardShader[i] = cg.rewardShader[i+1];
 				cg.rewardCount[i] = cg.rewardCount[i+1];
@@ -4189,53 +4182,34 @@ static void CG_DrawReward( void ) {
 			cg.rewardTime = cg.time;
 			cg.rewardStack--;
 			color = CG_FadeColor( cg.rewardTime, REWARD_TIME );
-			trap->S_StartLocalSound(cg.rewardSound[0], CHAN_ANNOUNCER);
-		} else {
-			return;
+			trap->S_StartLocalSound( cg.rewardSound[0], CHAN_ANNOUNCER );
 		}
+		else
+			return;
 	}
 
 	trap->R_SetColor( color );
-
-	/*
-	count = cg.rewardCount[0]/10;				// number of big rewards to draw
-
-	if (count) {
-		y = 4;
-		x = 320 - count * ICON_SIZE;
-		for ( i = 0 ; i < count ; i++ ) {
-			CG_DrawPic( x, y, (ICON_SIZE*2)-4, (ICON_SIZE*2)-4, cg.rewardShader[0] );
-			x += (ICON_SIZE*2);
-		}
-	}
-
-	count = cg.rewardCount[0] - count*10;		// number of small rewards to draw
-	*/
 
 	if ( cg.rewardCount[0] >= 10 ) {
 		y = 56;
 		x = 320 - ICON_SIZE/2;
 		CG_DrawPic( x, y, ICON_SIZE-4, ICON_SIZE-4, cg.rewardShader[0] );
-		Com_sprintf(buf, sizeof(buf), "%d", cg.rewardCount[0]);
+		Com_sprintf( buf, sizeof( buf ), "%d", cg.rewardCount[0] );
 		x = ( SCREEN_WIDTH - SMALLCHAR_WIDTH * CG_DrawStrlen( buf ) ) / 2;
-		CG_DrawStringExt( x, y+ICON_SIZE, buf, color, qfalse, qtrue,
-								SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
+		CG_DrawStringExt( x, y+ICON_SIZE, buf, color, qfalse, qtrue, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 	}
 	else {
-
 		count = cg.rewardCount[0];
 
 		y = 56;
 		x = 320 - count * ICON_SIZE/2;
-		for ( i = 0 ; i < count ; i++ ) {
+		for ( i=0; i<count; i++ ) {
 			CG_DrawPic( x, y, ICON_SIZE-4, ICON_SIZE-4, cg.rewardShader[0] );
 			x += ICON_SIZE;
 		}
 	}
 	trap->R_SetColor( NULL );
 }
-#endif
-
 
 qboolean CG_DrawMapChange( void )
 {
@@ -8103,10 +8077,8 @@ void CG_Draw2D( void ) {
 			}
 
 			CG_DrawPickupItem();
-#ifdef JK2AWARDS
 			//Do we want to use this system again at some point?
 			CG_DrawReward();
-#endif
 		}
 
 	}

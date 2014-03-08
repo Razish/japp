@@ -212,7 +212,6 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps ) {
 	}
 }
 
-#ifdef JK2AWARDS
 static void pushReward( sfxHandle_t sfx, qhandle_t shader, int rewardCount ) {
 	if ( cg.rewardStack < (MAX_REWARDSTACK-1) ) {
 		cg.rewardStack++;
@@ -221,7 +220,6 @@ static void pushReward( sfxHandle_t sfx, qhandle_t shader, int rewardCount ) {
 		cg.rewardCount[cg.rewardStack] = rewardCount;
 	}
 }
-#endif
 
 int cgAnnouncerTime = 0; //to prevent announce sounds from playing on top of each other
 
@@ -267,7 +265,6 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 	if ( cg.intermissionStarted || (cg.snap && cg.snap->ps.pm_type == PM_INTERMISSION) )
 		return;
 
-#ifdef JK2AWARDS
 	// reward sounds
 	if ( ps->persistant[PERS_CAPTURES] != ops->persistant[PERS_CAPTURES] )
 		pushReward( media.sounds.awards.capture, media.gfx.interface.medals.capture, ps->persistant[PERS_CAPTURES] );
@@ -292,7 +289,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		else if ( (ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_HOLYSHIT) != (ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_HOLYSHIT) )
 			trap->S_StartLocalSound( media.sounds.awards.holyShit, CHAN_ANNOUNCER );
 	}
-#endif
+
 	// timelimit warnings
 	if ( cgs.timelimit > 0 && cgAnnouncerTime < cg.time ) {
 		int msec = cg.time - cgs.levelStartTime;
