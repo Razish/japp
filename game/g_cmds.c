@@ -1345,6 +1345,14 @@ static qboolean G_VoteGametype( gentity_t *ent, int numArgs, const char *arg1, c
 	return qtrue;
 }
 
+static qboolean G_VoteInstagib( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
+	int n = !!atoi( arg2 );
+	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %i", arg1, n );
+	Q_strncpyz( level.voteDisplayString, level.voteString, sizeof( level.voteDisplayString ) );
+	Q_strncpyz( level.voteStringClean, level.voteString, sizeof( level.voteStringClean ) );
+	return qtrue;
+}
+
 static qboolean G_VotePromode( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
 	int n = !!atoi( arg2 );
 	Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %i", arg1, n );
@@ -1549,6 +1557,7 @@ static voteString_t validVoteStrings[] = {
 	{ "cointoss",				"coinflip",			G_VoteCointoss,			0,		GTB_ALL,								qfalse,			NULL,		"" },
 	{ "fraglimit",				"frags",			G_VoteFraglimit,		1,		GTB_ALL & ~(GTB_SIEGE|GTB_CTF|GTB_CTY),	qtrue,			"<num>",	"" },
 	{ "g_gametype",				"gametype gt mode",	G_VoteGametype,			1,		GTB_ALL,								qtrue,			"<name>",	"" },
+	{ "japp_instagib",			"instagib insta",	G_VoteInstagib,			1,		GTB_ALL,								qtrue,			"<0-1>",	"" },
 	{ "japp_promode",			"promode cpm",		G_VotePromode,			1,		GTB_ALL,								qtrue,			"<0-1>",	"" },
 	{ "japp_shootFromEye",		"shootfromeye",		G_VoteShootFromEye,		1,		GTB_ALL,								qfalse,			"<0-1>",	"" },
 	{ "japp_speedCaps",			"speedcaps",		G_VoteSpeedcaps,		1,		GTB_CTF|GTB_CTY,						qfalse,			"<0-1>",	"" },

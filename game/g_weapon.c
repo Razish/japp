@@ -604,20 +604,18 @@ static void WP_DisruptorMainFire( gentity_t *ent )
 }
 
 
-qboolean G_CanDisruptify(gentity_t *ent)
-{
-	if (!ent || !ent->inuse || !ent->client || ent->s.eType != ET_NPC ||
-		ent->s.NPC_class != CLASS_VEHICLE || !ent->m_pVehicle)
-	{ //not vehicle
-		return qtrue;
-	}
+qboolean G_CanDisruptify( gentity_t *ent ) {
+	// instagib handles disruption in G_Damage
+	if ( japp_instagib.integer )
+		return qfalse;
 
-	if (ent->m_pVehicle->m_pVehicleInfo->type == VH_ANIMAL)
-	{ //animal is only type that can be disintigeiteigerated
+	if ( !ent || !ent->inuse || !ent->client || ent->s.eType != ET_NPC || ent->s.NPC_class != CLASS_VEHICLE || !ent->m_pVehicle )
 		return qtrue;
-	}
 
-	//don't do it to any other veh
+	if ( ent->m_pVehicle->m_pVehicleInfo->type == VH_ANIMAL )
+		return qtrue;
+
+	// don't do it to any other veh
 	return qfalse;
 }
 
@@ -827,20 +825,19 @@ void WP_DisruptorAltFire( gentity_t *ent )
 
 				G_Damage( traceEnt, ent, ent, &forward, &tr.endpos, damage, DAMAGE_NO_KNOCKBACK, MOD_DISRUPTOR_SNIPER );
 
-				if (traceEnt->client && preHealth > 0 && traceEnt->health <= 0 && fullCharge &&
-					G_CanDisruptify(traceEnt))
-				{ //was killed by a fully charged sniper shot, so disintegrate
-					VectorCopy(&preAng, &traceEnt->client->ps.viewangles);
+				if ( traceEnt->client && preHealth > 0 && traceEnt->health <= 0 && fullCharge && G_CanDisruptify( traceEnt ) ) {
+					// was killed by a fully charged sniper shot, so disintegrate
+					VectorCopy( &preAng, &traceEnt->client->ps.viewangles );
 
 					traceEnt->client->ps.eFlags |= EF_DISINTEGRATION;
-					VectorCopy(&tr.endpos, &traceEnt->client->ps.lastHitLoc);
+					VectorCopy( &tr.endpos, &traceEnt->client->ps.lastHitLoc );
 
 					traceEnt->client->ps.legsAnim = preLegs;
 					traceEnt->client->ps.torsoAnim = preTorso;
 
-					traceEnt->r.contents = 0;
+					traceEnt->r.contents = CONTENTS_NONE;
 
-					VectorClear(&traceEnt->client->ps.velocity);
+					VectorClear( &traceEnt->client->ps.velocity );
 				}
 
 				tent = G_TempEntity( &tr.endpos, EV_DISRUPTOR_HIT );

@@ -435,20 +435,7 @@ void LookAtKiller( gentity_t *self, gentity_t *inflictor, gentity_t *attacker ) 
 	self->client->ps.stats[STAT_DEAD_YAW] = vectoyaw( &dir );
 }
 
-/*
-==================
-GibEntity
-==================
-*/
-void GibEntity( gentity_t *self, int killer ) {
-	G_AddEvent( self, EV_GIB_PLAYER, killer );
-	self->takedamage = qfalse;
-	self->s.eType = ET_INVISIBLE;
-	self->r.contents = 0;
-}
-
-void BodyRid(gentity_t *ent)
-{
+void BodyRid( gentity_t *ent ) {
 	trap->UnlinkEntity( (sharedEntity_t *)ent );
 	ent->physicsObject = qfalse;
 }
@@ -2482,15 +2469,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	}
 	self->client->ps.zoomMode = 0;	// Turn off zooming when we die
 
-	//rww - 07/19/02 - I removed this because it isn't working and it's ugly (for people on the outside)
-	/*
-	self->s.angles[0] = 0;
-	self->s.angles[2] = 0;
-	LookAtKiller (self, inflictor, attacker);
-
-	VectorCopy( self->s.angles, self->client->ps.viewangles );
-	*/
-
 	self->s.loopSound = 0;
 	self->s.loopIsSoundset = qfalse;
 
@@ -2508,89 +2486,57 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	self->client->ps.stats[STAT_HOLDABLE_ITEMS] = 0;
 	self->client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
 
-	// NOTENOTE No gib deaths right now, this is star wars.
-	/*
-	// never gib in a nodrop
-	if ( (self->health <= GIB_HEALTH && !(contents & CONTENTS_NODROP) && g_blood.integer) || meansOfDeath == MOD_SUICIDE)
 	{
-		// gib death
-		GibEntity( self, killer );
-	}
-	else
-	*/
-	{
-		// normal death
+		static int deathAnim;
 
-		static int i;
+		anim = G_PickDeathAnim( self, &self->pos1, damage, meansOfDeath, HL_NONE );
 
-		anim = G_PickDeathAnim(self, &self->pos1, damage, meansOfDeath, HL_NONE);
-
-		if (anim >= 1)
-		{ //Some droids don't have death anims
-			// for the no-blood option, we need to prevent the health
-			// from going to gib level
-			if ( self->health <= GIB_HEALTH ) {
+		if ( anim >= 1 ) {
+			// Some droids don't have death anims
+			if ( self->health <= GIB_HEALTH )
 				self->health = GIB_HEALTH+1;
-			}
 
 			self->client->respawnTime = level.time + 1000;//((self->client->animations[anim].numFrames*40)/(50.0f / self->client->animations[anim].frameLerp))+300;
 
 			sPMType = self->client->ps.pm_type;
 			self->client->ps.pm_type = PM_NORMAL; //don't want pm type interfering with our setanim calls.
 
-			if (self->inuse)
-			{ //not disconnecting
-				G_SetAnim(self, NULL, SETANIM_BOTH, anim, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD|SETANIM_FLAG_RESTART, 0);
-			}
+			if ( self->inuse )
+				G_SetAnim( self, NULL, SETANIM_BOTH, anim, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD|SETANIM_FLAG_RESTART, 0 );
 
 			self->client->ps.pm_type = sPMType;
 
-			if (meansOfDeath == MOD_SABER || (meansOfDeath == MOD_MELEE && G_HeavyMelee( attacker )) )//saber or heavy melee (claws)
-			{ //update the anim on the actual skeleton (so bolt point will reflect the correct position) and then check for dismem
-				G_UpdateClientAnims(self, 1.0f);
-				G_CheckForDismemberment(self, attacker, &self->pos1, damage, anim, qfalse);
+			//TODO: extra dismemberment
+			if ( meansOfDeath == MOD_SABER || (meansOfDeath == MOD_MELEE && G_HeavyMelee( attacker )) ) {
+				// update the anim on the actual skeleton (so bolt point will reflect the correct position) and then
+				//	check for dismem
+				G_UpdateClientAnims( self, 1.0f );
+				G_CheckForDismemberment( self, attacker, &self->pos1, damage, anim, qfalse );
 			}
 		}
-		else if (self->NPC && self->client && self->client->NPC_class != CLASS_MARK1 &&
-			self->client->NPC_class != CLASS_VEHICLE)
-		{ //in this case if we're an NPC it's my guess that we want to get removed straight away.
+		else if ( self->NPC && self->client && self->client->NPC_class != CLASS_MARK1
+			&& self->client->NPC_class != CLASS_VEHICLE )
+		{
+			// in this case if we're an NPC it's my guess that we want to get removed straight away.
 			self->think = G_FreeEntity;
 			self->nextthink = level.time;
 		}
 
-		//self->client->ps.legsAnim = anim;
-		//self->client->ps.torsoAnim = anim;
-//		self->client->ps.pm_flags |= PMF_UPDATE_ANIM;		// Make sure the pmove sets up the GHOUL2 anims.
+		G_AddEvent( self, EV_DEATH1+deathAnim, !!wasJediMaster );
 
-		//rww - do this on respawn, not death
-		//CopyToBodyQue (self);
-
-		//G_AddEvent( self, EV_DEATH1 + i, killer );
-		if (wasJediMaster)
-		{
-			G_AddEvent( self, EV_DEATH1 + i, 1 );
-		}
-		else
-		{
-			G_AddEvent( self, EV_DEATH1 + i, 0 );
-		}
-
-		if (self != attacker)
-		{ //don't make NPCs want to murder you on respawn for killing yourself!
+		if ( self != attacker )
 			G_DeathAlert( self, attacker );
-		}
 
 		// the body can still be gibbed
-		if (!self->NPC)
-		{ //don't remove NPCs like this!
+		if ( !self->NPC )
 			self->die = body_die;
-		}
 
 		//It won't gib, it will disintegrate (because this is Star Wars).
 		self->takedamage = qtrue;
 
 		// globally cycle through the different death animations
-		i = ( i + 1 ) % 3;
+		++deathAnim;
+		deathAnim %= 3;
 	}
 
 	if ( self->NPC )
@@ -2635,7 +2581,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 
 	// Start any necessary death fx for this entity
 	DeathFX( self );
-
 
 	if (level.gametype == GT_POWERDUEL && !g_noPDuelCheck)
 	{ //powerduel checks
@@ -4651,6 +4596,15 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 
 	take -= asave;
 
+	if ( japp_instagib.integer && mod != MOD_UNKNOWN && mod != MOD_FORCE_DARK && mod != MOD_WATER && mod != MOD_SLIME
+		&& mod != MOD_LAVA && mod != MOD_CRUSH && mod != MOD_TELEFRAG && mod != MOD_FALLING && mod != MOD_SUICIDE
+		&& mod != MOD_TRIGGER_HURT && mod != MOD_TEAM_CHANGE )
+	{
+		// instagib
+		shieldAbsorbed = 0;
+		take = targ->health;
+	}
+
 	if ( japp_damageNotifications.integer ) {
 		trap->SendServerCommand( attacker-g_entities, va( "chat \""S_COLOR_WHITE"* Damage given: "S_COLOR_RED"%i"
 			S_COLOR_WHITE"/"S_COLOR_GREEN"%i "S_COLOR_WHITE" (%i)\"", take, asave, take+asave ) );
@@ -4985,202 +4939,132 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		}
 	}
 
-	if (shieldAbsorbed)
-	{
-		/*
-		if ( targ->client->NPC_class == CLASS_VEHICLE )
-		{
-			targ->client->ps.electrifyTime = level.time + Q_irand( 500, 1000 );
-		}
-		else
-		*/
-		{
-			gentity_t	*evEnt;
-
-			// Send off an event to show a shield shell on the player, pointing in the right direction.
-			//evEnt = G_TempEntity(vec3_origin, EV_SHIELD_HIT);
-			//rww - er.. what the? This isn't broadcast, why is it being set on vec3_origin?!
-			evEnt = G_TempEntity(&targ->r.currentOrigin, EV_SHIELD_HIT);
-			evEnt->s.otherEntityNum = targ->s.number;
-			evEnt->s.eventParm = DirToByte(dir);
-			evEnt->s.time2=shieldAbsorbed;
-	/*
-			shieldAbsorbed *= 20;
-
-			if (shieldAbsorbed > 1500)
-			{
-				shieldAbsorbed = 1500;
-			}
-			if (shieldAbsorbed < 200)
-			{
-				shieldAbsorbed = 200;
-			}
-
-			if (targ->client->ps.powerups[PW_SHIELDHIT] < (level.time + shieldAbsorbed))
-			{
-				targ->client->ps.powerups[PW_SHIELDHIT] = level.time + shieldAbsorbed;
-			}
-			//flicker for as many ms as damage was absorbed (*20)
-			//therefore 10 damage causes 1/5 of a seond of flickering, whereas
-			//a full 100 causes 2 seconds (but is reduced to 1.5f seconds due to the max)
-
-	*/
-		}
+	// Send off an event to show a shield shell on the player, pointing in the right direction.
+	if ( shieldAbsorbed ) {
+		gentity_t *evEnt = G_TempEntity( &targ->r.currentOrigin, EV_SHIELD_HIT );
+		evEnt->s.otherEntityNum = targ->s.number;
+		evEnt->s.eventParm = DirToByte( dir );
+		evEnt->s.time2=shieldAbsorbed;
 	}
 
 	// do the damage
-	if (take)
-	{
-		if (targ->client && targ->s.number < MAX_CLIENTS &&
-			(mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT))
-		{ //uh.. shock them or something. what the hell, I don't know.
-            if (targ->client->ps.weaponTime <= 0)
-			{ //yeah, we were supposed to be beta a week ago, I don't feel like
-				//breaking the game so I'm gonna be safe and only do this only
-				//if your weapon is not busy
+	if ( take ) {
+		if ( targ->client && targ->s.number < MAX_CLIENTS && (mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT) ) {
+			// uh.. shock them or something. what the hell, I don't know.
+            if ( targ->client->ps.weaponTime <= 0 ) {
+				// yeah, we were supposed to be beta a week ago, I don't feel like breaking the game so I'm gonna be
+				//	safe and only do this only if your weapon is not busy
 				targ->client->ps.weaponTime = 2000;
 				targ->client->ps.electrifyTime = level.time + 2000;
-				if (targ->client->ps.weaponstate == WEAPON_CHARGING ||
-					targ->client->ps.weaponstate == WEAPON_CHARGING_ALT)
-				{
+				if ( targ->client->ps.weaponstate == WEAPON_CHARGING || targ->client->ps.weaponstate == WEAPON_CHARGING_ALT )
 					targ->client->ps.weaponstate = WEAPON_READY;
-				}
 			}
 		}
 
-		if ( !(dflags & DAMAGE_NO_PROTECTION) )
-		{//rage overridden by no_protection
-			if (targ->client && (targ->client->ps.fd.forcePowersActive & (1 << FP_RAGE)) && (inflictor->client || attacker->client))
+		if ( !(dflags & DAMAGE_NO_PROTECTION) ) {
+			// rage overridden by no_protection
+			if ( targ->client && (targ->client->ps.fd.forcePowersActive & (1<<FP_RAGE)) && (inflictor->client || attacker->client))
 			{
 				take /= (targ->client->ps.fd.forcePowerLevel[FP_RAGE]+1);
 			}
 		}
 		targ->health = targ->health - take;
 
-		if ( (targ->flags&FL_UNDYING) )
-		{//take damage down to 1, but never die
+		if ( (targ->flags & FL_UNDYING) ) {
+			// take damage down to 1, but never die
 			if ( targ->health < 1 )
-			{
 				targ->health = 1;
-			}
 		}
 
-		if ( targ->client ) {
+		if ( targ->client )
 			targ->client->ps.stats[STAT_HEALTH] = targ->health;
-		}
 
-		if ( !(dflags & DAMAGE_NO_PROTECTION) )
-		{//rage overridden by no_protection
-			if (targ->client && (targ->client->ps.fd.forcePowersActive & (1 << FP_RAGE)) && (inflictor->client || attacker->client))
+		if ( !(dflags & DAMAGE_NO_PROTECTION) ) {//rage overridden by no_protection
+			if ( targ->client && (targ->client->ps.fd.forcePowersActive & (1<<FP_RAGE)) && (inflictor->client || attacker->client))
 			{
-				if (targ->health <= 0)
-				{
+				if ( targ->health <= 0 )
 					targ->health = 1;
-				}
-				if (targ->client->ps.stats[STAT_HEALTH] <= 0)
-				{
+				if ( targ->client->ps.stats[STAT_HEALTH] <= 0 )
 					targ->client->ps.stats[STAT_HEALTH] = 1;
-				}
 			}
 		}
 
 		//We want to go ahead and set gPainHitLoc regardless of if we have a pain func,
 		//so we can adjust the location damage too.
-		if (targ->client && targ->ghoul2 && targ->client->g2LastSurfaceTime == level.time)
-		{ //We updated the hit surface this frame, so it's valid.
+		if ( targ->client && targ->ghoul2 && targ->client->g2LastSurfaceTime == level.time ) {
+			// We updated the hit surface this frame, so it's valid.
 			char hitSurface[MAX_QPATH];
 
-			trap->G2API_GetSurfaceName(targ->ghoul2, targ->client->g2LastSurfaceHit, 0, hitSurface);
+			trap->G2API_GetSurfaceName( targ->ghoul2, targ->client->g2LastSurfaceHit, 0, hitSurface );
 
-			if (hitSurface[0])
-			{
-				G_GetHitLocFromSurfName(targ, hitSurface, &gPainHitLoc, point, dir, &vec3_origin, mod);
-			}
+			if ( hitSurface[0] )
+				G_GetHitLocFromSurfName( targ, hitSurface, &gPainHitLoc, point, dir, &vec3_origin, mod );
 			else
-			{
 				gPainHitLoc = -1;
-			}
 
-			if (gPainHitLoc < HL_MAX && gPainHitLoc >= 0 && targ->locationDamage[gPainHitLoc] < Q3_INFINITE &&
-				(targ->s.eType == ET_PLAYER || targ->s.NPC_class != CLASS_VEHICLE))
+			if ( gPainHitLoc < HL_MAX && gPainHitLoc >= 0 && targ->locationDamage[gPainHitLoc] < Q3_INFINITE
+				&& (targ->s.eType == ET_PLAYER || targ->s.NPC_class != CLASS_VEHICLE) )
 			{
 				targ->locationDamage[gPainHitLoc] += take;
 
-				if (g_armBreakage.integer && !targ->client->ps.brokenLimbs &&
-					targ->client->ps.stats[STAT_HEALTH] > 0 && targ->health > 0 &&
-					!(targ->s.eFlags & EF_DEAD))
+				if ( g_armBreakage.integer && !targ->client->ps.brokenLimbs && targ->client->ps.stats[STAT_HEALTH] > 0
+					&& targ->health > 0 && !(targ->s.eFlags & EF_DEAD) )
 				{ //check for breakage
-					if (targ->locationDamage[HL_ARM_RT]+targ->locationDamage[HL_HAND_RT] >= 80)
-					{
-						G_BreakArm(targ, BROKENLIMB_RARM);
-					}
-					else if (targ->locationDamage[HL_ARM_LT]+targ->locationDamage[HL_HAND_LT] >= 80)
-					{
-						G_BreakArm(targ, BROKENLIMB_LARM);
-					}
+					if ( targ->locationDamage[HL_ARM_RT]+targ->locationDamage[HL_HAND_RT] >= 80 )
+						G_BreakArm( targ, BROKENLIMB_RARM );
+					else if ( targ->locationDamage[HL_ARM_LT]+targ->locationDamage[HL_HAND_LT] >= 80 )
+						G_BreakArm( targ, BROKENLIMB_LARM );
 				}
 			}
 		}
 		else
-		{
 			gPainHitLoc = -1;
-		}
 
-		if (targ->maxHealth)
-		{ //if this is non-zero this guy should be updated his s.health to send to the client
-			G_ScaleNetHealth(targ);
-		}
+		if ( targ->maxHealth )
+			G_ScaleNetHealth( targ );
 
 		if ( targ->health <= 0 ) {
-			if ( client )
-			{
+			if ( client ) {
 				targ->flags |= FL_NO_KNOCKBACK;
 
-				if (point)
-				{
+				if ( point )
 					VectorCopy( point, &targ->pos1 );
-				}
 				else
-				{
-					VectorCopy(&targ->client->ps.origin, &targ->pos1);
-				}
+					VectorCopy( &targ->client->ps.origin, &targ->pos1 );
 			}
-			else if (targ->s.eType == ET_NPC)
-			{ //g2animent
-				VectorCopy(point, &targ->pos1);
-			}
+			else if ( targ->s.eType == ET_NPC )
+				VectorCopy( point, &targ->pos1 );
 
-			if (targ->health < -999)
+			if ( targ->health < -999 )
 				targ->health = -999;
 
 			// If we are a breaking glass brush, store the damage point so we can do cool things with it.
-			if ( targ->r.svFlags & SVF_GLASS_BRUSH )
-			{
+			if ( targ->r.svFlags & SVF_GLASS_BRUSH ) {
 				VectorCopy( point, &targ->pos1 );
-				if (dir)
-				{
+				if ( dir )
 					VectorCopy( dir, &targ->pos2 );
-				}
 				else
-				{
-					VectorClear(&targ->pos2);
-				}
+					VectorClear( &targ->pos2 );
 			}
 
-			if (targ->s.eType == ET_NPC &&
-				targ->client &&
-				(targ->s.eFlags & EF_DEAD))
-			{ //an NPC that's already dead. Maybe we can cut some more limbs off!
+			if ( japp_instagib.integer && targ->client ) {
+				targ->client->ps.eFlags |= EF_DISINTEGRATION;
+				VectorCopy( &targ->pos1, &targ->client->ps.lastHitLoc );
+				targ->r.contents = CONTENTS_NONE;
+				VectorClear( &targ->client->ps.velocity );
+			}
+			else if ( targ->s.eType == ET_NPC && targ->client && (targ->s.eFlags & EF_DEAD) ) {
+				// an NPC that's already dead. Maybe we can cut some more limbs off!
 				if ( (mod == MOD_SABER || (mod == MOD_MELEE && G_HeavyMelee( attacker )) )//saber or heavy melee (claws)
 					&& take > 2
-					&& !(dflags&DAMAGE_NO_DISMEMBER) )
+					&& !(dflags & DAMAGE_NO_DISMEMBER) )
 				{
-					G_CheckForDismemberment(targ, attacker, &targ->pos1, take, targ->client->ps.torsoAnim, qtrue);
+					G_CheckForDismemberment( targ, attacker, &targ->pos1, take, targ->client->ps.torsoAnim, qtrue );
 				}
 			}
 
 			targ->enemy = attacker;
-			targ->die (targ, inflictor, attacker, take, mod);
+			targ->die( targ, inflictor, attacker, take, mod );
 			G_ActivateBehavior( targ, BSET_DEATH );
 			return;
 		}
