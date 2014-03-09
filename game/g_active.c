@@ -2386,7 +2386,7 @@ void ClientThink_real( gentity_t *ent ) {
 		(!ent->NPC || ent->s.NPC_class != CLASS_VEHICLE)) //if riding a vehicle it will manage our speed and such
 	{
 		// set speed
-		client->ps.speed = g_speed.value;
+		client->ps.speed = client->pers.speed ? client->pers.speed : g_speed.value;
 
 		//Check for a siege class speed multiplier
 		if (level.gametype == GT_SIEGE &&

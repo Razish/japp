@@ -871,6 +871,19 @@ static int JPLua_Player_SetScore( lua_State *L ) {
 #endif
 
 #ifdef _GAME
+//Func: Player:SetSpeed( integer speed )
+//Retn: N/A
+static int JPLua_Player_SetSpeed( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+
+	ent->client->pers.speed = luaL_checkinteger( L, 2 );
+
+	return 0;
+}
+#endif
+
+#ifdef _GAME
 //Func: Player:SetVelocity( Vector3 velocity )
 //Retn: N/A
 static int JPLua_Player_SetVelocity( lua_State *L ) {
@@ -1024,6 +1037,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "SetHealth",			JPLua_Player_SetHealth },
 	{ "SetName",			JPLua_Player_SetName },
 	{ "SetScore",			JPLua_Player_SetScore },
+	{ "SetSpeed",			JPLua_Player_SetSpeed },
 	{ "SetVelocity",		JPLua_Player_SetVelocity },
 	{ "TakeWeapon",			JPLua_Player_TakeWeapon },
 	{ "Teleport",			JPLua_Player_Teleport },
