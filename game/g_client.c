@@ -3385,64 +3385,6 @@ void ClientSpawn(gentity_t *ent) {
 			client->ps.weapon = WP_BRYAR_PISTOL;
 		}
 	}
-#ifdef _DISABLED
-	else
-	{//jediVmerc is incompatible with this gametype, turn it off!
-		trap->Cvar_Set( "g_jediVmerc", "0" );
-		if (level.gametype == GT_HOLOCRON)
-		{
-			//always get free saber level 1 in holocron
-			client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_SABER );	//these are precached in g_items, ClearRegisteredItems()
-		}
-		else
-		{
-			if (client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE])
-			{
-				client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_SABER );	//these are precached in g_items, ClearRegisteredItems()
-			}
-			else
-			{ //if you don't have saber attack rank then you don't get a saber
-				client->ps.stats[STAT_WEAPONS] |= (1 << WP_MELEE);
-			}
-		}
-
-		if (level.gametype != GT_SIEGE)
-		{
-			if (!wDisable || !(wDisable & (1 << WP_BRYAR_PISTOL)))
-			{
-				client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_BRYAR_PISTOL );
-			}
-			else if (level.gametype == GT_JEDIMASTER)
-			{
-				client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_BRYAR_PISTOL );
-			}
-		}
-
-		if (level.gametype == GT_JEDIMASTER)
-		{
-			client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_SABER);
-			client->ps.stats[STAT_WEAPONS] |= (1 << WP_MELEE);
-		}
-
-		if (client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER))
-		{
-			client->ps.weapon = WP_SABER;
-		}
-		else if (client->ps.stats[STAT_WEAPONS] & (1 << WP_BRYAR_PISTOL))
-		{
-			client->ps.weapon = WP_BRYAR_PISTOL;
-		}
-		else
-		{
-			client->ps.weapon = WP_MELEE;
-		}
-	}
-#endif
-
-	/*
-	client->ps.stats[STAT_HOLDABLE_ITEMS] |= ( 1 << HI_BINOCULARS );
-	client->ps.stats[STAT_HOLDABLE_ITEM] = BG_GetItemIndexByTag(HI_BINOCULARS, IT_HOLDABLE);
-	*/
 
 	if ( level.gametype != GT_SIEGE )
 	{

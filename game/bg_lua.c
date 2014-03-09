@@ -304,7 +304,8 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 }
 
 static void JPLua_PostInit( lua_State *L ) {
-	char folderList[16384] = {0}, *folderName = NULL;
+	static char folderList[16384];
+	char *folderName = folderList;
 	int i=0, numFolders=0, folderLen=0;
 
 #if defined(_GAME)
@@ -328,11 +329,11 @@ static void JPLua_PostInit( lua_State *L ) {
 		Q_strstrip( folderName, "/\\", NULL );
 		folderLen = strlen( folderName );
 		if ( Q_stricmp( folderName, "." ) && Q_stricmp( folderName, ".." ) ) {
-			char fileList[16384] = {0}, *fileName = NULL;
+			static char fileList[16384];
+			char *fileName = fileList;
 			int j=0, numFiles=0, fileLen=0;
 
 			numFiles = trap->FS_GetFileList( va( "%s%s", pluginDir, folderName ), JPLUA_EXTENSION, fileList, sizeof( fileList ) );
-			fileName = fileList;
 
 			for ( j=0; j<numFiles; j++ ) {
 				Q_strstrip( fileName, "/\\", NULL );

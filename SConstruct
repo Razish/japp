@@ -114,7 +114,7 @@ files['udis86'] = [
 	'libudis86/syn-att.c',
 	'libudis86/syn-intel.c',
 	'libudis86/syn.c',
-	'libudis86/udis86.c' ]
+	'libudis86/udis86.c' ] if bits == 32 else []
 
 files['game'] = [
 	'qcommon/q_math.c',
@@ -330,16 +330,31 @@ if plat == 'Linux':
 		'-Wno-sign-compare',
 		'-Wno-unused-parameter',
 		'-Waggregate-return',
+	#	'-Wbad-function-cast',
+	#	'-Wcast-qual',
+		'-Wdeclaration-after-statement',
 	#	'-Wdouble-promotion',
 	#	'-Wfloat-equal',
 		'-Winit-self',
+		'-Winline',
 		'-Wlogical-op',
+	#	'-Wlong-long',
+		'-Wmissing-include-dirs',
+		'-Wnested-externs',
+		'-Wold-style-definition',
+		'-Woverlength-strings',
+		'-Wpointer-arith',
+	#	'-Wredundant-decls',
 	#	'-Wshadow',
 	#	'-Wsign-conversion',
+		'-Wstack-usage=32768',
 		'-Wstrict-prototypes',
+	#	'-Wsuggest-attribute=const',
 		'-Wswitch-default',
+		'-Wundef',
 		'-Wuninitialized',
 		'-Wunreachable-code',
+	#	'-Wunsuffixed-float-constants',
 		'-Wwrite-strings',
 		]
 	if analyse:

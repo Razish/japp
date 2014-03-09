@@ -5,11 +5,11 @@
 #include "bg_vehicles.h"
 #include "bg_weapons.h"
 
-#ifdef _GAME
+#if defined(_GAME)
 	#include "g_local.h"
-#elif _CGAME
+#elif defined(_CGAME)
 	#include "cgame/cg_local.h"
-#elif _UI
+#elif defined(_UI)
 	#include "ui/ui_local.h"
 #endif
 
@@ -177,21 +177,21 @@ static qboolean BG_ParseVehWeaponParm( vehWeaponInfo_t *vehWeapon, char *parmNam
 			case VF_EFFECT:	// take the string, get the G_EffectIndex
 				#ifdef _GAME
 				//	*(int *)(b+vehWeaponFields[i].ofs) = G_EffectIndex( value );
-				#elif _CGAME
+				#elif defined(_CGAME)
 					*(int *)(b+vehWeaponFields[i].ofs) = trap->FX_RegisterEffect( value );
 				#endif
 				break;
 			case VF_EFFECT_CLIENT:	// (MP cgame only) take the string, get the index
 				#ifdef _GAME
 					//*(int *)(b+vehWeaponFields[i].ofs) = G_EffectIndex( value );
-				#elif _CGAME
+				#elif defined(_CGAME)
 					*(int *)(b+vehWeaponFields[i].ofs) = trap->FX_RegisterEffect( value );
 				#endif
 				break;
 			case VF_SHADER:	// (cgame only) take the string, call trap->R_RegisterShader
 				#ifdef _UI
 					*(int *)(b+vehWeaponFields[i].ofs) = trap->R_RegisterShaderNoMip( value );
-				#elif _CGAME
+				#elif defined(_CGAME)
 					*(int *)(b+vehWeaponFields[i].ofs) = trap->R_RegisterShader( value );
 				#endif
 				break;

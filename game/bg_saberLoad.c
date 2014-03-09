@@ -4,20 +4,20 @@
 #include "bg_local.h"
 #include "w_saber.h"
 
-#if defined( _GAME )
+#if defined(_GAME)
 	#include "g_local.h"
-#elif defined( _CGAME )
+#elif defined(_CGAME)
 	#include "cgame/cg_local.h"
-#elif _UI
+#elif defined(_UI)
 	#include "ui/ui_local.h"
 #endif
 
 extern stringID_table_t animTable [MAX_ANIMATIONS+1];
 
 int BG_SoundIndex( const char *sound ) {
-#if defined( _GAME )
+#if defined(_GAME)
 	return G_SoundIndex( sound );
-#elif defined( _CGAME ) || defined( _UI )
+#elif defined(_CGAME) || defined(_UI)
 	return trap->S_RegisterSound( sound );
 #endif
 }

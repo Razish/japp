@@ -88,9 +88,9 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 	}
 	speedIdleDec = pVeh->m_pVehicleInfo->decelIdle * pVeh->m_fTimeModifier;
 
-#ifdef _GAME
+#if defined(_GAME)
 	curTime = level.time;
-#elif _CGAME
+#elif defined(_CGAME)
 	//FIXME: pass in ucmd?  Not sure if this is reliable...
 	curTime = pm->cmd.serverTime;
 #endif
@@ -384,9 +384,9 @@ void AnimateRiders( Vehicle_t *pVeh )
 
 	pilotPS = pVeh->m_pPilot->playerState;
 
-#ifdef _GAME
+#if defined(_GAME)
 	curTime = level.time;
-#elif _CGAME
+#elif defined(_CGAME)
 	//FIXME: pass in ucmd?  Not sure if this is reliable...
 	curTime = pm->cmd.serverTime;
 #endif

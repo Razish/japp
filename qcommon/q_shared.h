@@ -77,11 +77,9 @@
 	extern int g_G2AllocServer;
 #endif
 
-#if (defined _MSC_VER)
+#if defined(_MSC_VER)
 	#define Q_EXPORT __declspec(dllexport)
-#elif (defined __SUNPRO_C)
-	#define Q_EXPORT __global
-#elif ((__GNUC__ >= 3) && (!__EMX__) && (!sun))
+#elif __GNUC__ >= 3
 	#define Q_EXPORT __attribute__((visibility("default")))
 #else
 	#define Q_EXPORT
@@ -1146,7 +1144,6 @@ void ClearBounds( vector3 *mins, vector3 *maxs );
 number DistanceHorizontal( const vector3 *p1, const vector3 *p2 );
 number DistanceHorizontalSquared( const vector3 *p1, const vector3 *p2 );
 void AddPointToBounds( const vector3 *v, vector3 *mins, vector3 *maxs );
-void VectorRotate( vector3 *in, vector3 matrix[3], vector3 *out );
 int Q_log2(int val);
 
 float Q_acos(float c);
@@ -1168,7 +1165,6 @@ void AxisCopy( vector3 in[3], vector3 out[3] );
 void SetPlaneSignbits( struct cplane_s *out );
 int BoxOnPlaneSide (vector3 *emins, vector3 *emaxs, struct cplane_s *plane);
 
-double	fmod( double x, double y );
 float	AngleMod(float a);
 float	LerpAngle (float from, float to, float frac);
 float	AngleSubtract( float a1, float a2 );
@@ -1248,9 +1244,6 @@ void SkipRestOfLine ( const char **data );
 void Parse1DMatrix (const char **buf_p, int x, float *m);
 void Parse2DMatrix (const char **buf_p, int y, int x, float *m);
 void Parse3DMatrix (const char **buf_p, int z, int y, int x, float *m);
-
-void QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
-
 
 // mode parm for FS_FOpenFile
 typedef enum fsMode_e {

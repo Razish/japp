@@ -2018,9 +2018,6 @@ Runs the specified effect, can also be targeted at an info_notnull to orient the
 */
 #define FX_RUNNER_RESERVED 0x800000
 #define FX_ENT_RADIUS 32
-extern int	BMS_START;
-extern int	BMS_MID;
-extern int	BMS_END;
 //----------------------------------------------------------
 void fx_runner_think( gentity_t *ent )
 {

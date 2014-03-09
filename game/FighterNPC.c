@@ -1,9 +1,9 @@
 #include "bg_public.h"
 #include "bg_vehicles.h"
 
-#ifdef _GAME
+#if defined(_GAME)
 	#include "g_local.h"
-#elif _CGAME
+#elif defined(_CGAME)
 	#include "cgame/cg_local.h"
 #endif
 
@@ -246,7 +246,7 @@ qboolean FighterIsLaunching( Vehicle_t *pVeh, playerState_t *parentPS )
 
 qboolean FighterSuspended( Vehicle_t *pVeh, playerState_t *parentPS )
 {
-#ifdef _GAME//only do this check on game side, because if it's cgame, it's being predicted, and it's only predicted if the local client is the driver
+#if defined(_GAME) //only do this check on game side, because if it's cgame, it's being predicted, and it's only predicted if the local client is the driver
 	if (!pVeh->m_pPilot//empty
 		&& !(int)parentPS->speed//not moving
 		&& pVeh->m_ucmd.forwardmove <= 0//not trying to go forward for whatever reason
@@ -256,7 +256,7 @@ qboolean FighterSuspended( Vehicle_t *pVeh, playerState_t *parentPS )
 		return qtrue;
 	}
 	return qfalse;
-#elif _CGAME
+#elif defined(_CGAME)
 	return qfalse;
 #endif
 }
@@ -302,9 +302,9 @@ static void ProcessMoveCommands( Vehicle_t *pVeh )
 				{//just started hyperspace
 //MIKE: This is going to play the sound twice for the predicting client, I suggest using
 //a predicted event or only doing it game-side. -rich
-#ifdef _GAME
+#if defined(_GAME)
 					//G_EntitySound( ((gentity_t *)(pVeh->m_pParentEntity)), CHAN_LOCAL, pVeh->m_pVehicleInfo->soundHyper );
-#elif _CGAME
+#elif defined(_CGAME)
 					trap->S_StartSound( NULL, pm->ps->clientNum, CHAN_LOCAL, pVeh->m_pVehicleInfo->soundHyper );
 #endif
 				}
@@ -1267,9 +1267,9 @@ static void ProcessOrientCommands( Vehicle_t *pVeh )
 	float	curRoll = 0.0f;
 	qboolean isDead = qfalse;
 	qboolean isLandingOrLanded = qfalse;
-#ifdef _GAME
+#if defined(_GAME)
 	int curTime = level.time;
-#elif _CGAME
+#elif defined(_CGAME)
 	//FIXME: pass in ucmd?  Not sure if this is reliable...
 	int curTime = pm->cmd.serverTime;
 #endif

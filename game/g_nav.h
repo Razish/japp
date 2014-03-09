@@ -65,7 +65,7 @@
 	void NAV_ShowDebugInfo( void );
 
 	int NAV_GetNearestNode( gentity_t *self, int lastNode );
-	extern int NAV_TestBestNode( gentity_t *self, int startID, int endID, qboolean failEdge );
+	int NAV_TestBestNode( gentity_t *self, int startID, int endID, qboolean failEdge );
 
 	qboolean NPC_GetMoveDirection( vector3 *out, float *distance );
 	void NPC_MoveToGoalExt( vector3 *point );

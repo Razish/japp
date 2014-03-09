@@ -1491,7 +1491,7 @@ qboolean VectorCompare( const vector3 *vec1, const vector3 *vec2 ) {
 	return qfalse;
 }
 
-#if _MSC_VER // windows
+#ifdef _MSC_VER // windows
 
 	#include <float.h>
 	#pragma fenv_access( on )
@@ -1514,7 +1514,7 @@ Round a vector to integers for more efficient network transmission
 ======================
 */
 void VectorSnap( vector3 *v ) {
-#if _MSC_VER
+#ifdef _MSC_VER
 	unsigned int oldcontrol, newcontrol;
 
 	_controlfp_s( &oldcontrol, 0, 0 );

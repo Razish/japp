@@ -559,11 +559,9 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 	case SABER_ELEC2:
 		glow = rgbSaberGlowShader;
 		break;
-#if _DISABLED
 	case SABER_BLACK:
 		glow = blackSaberGlowShader;
 		break;
-#endif
 	default:
 		glow = blueSaberGlowShader;
 		break;

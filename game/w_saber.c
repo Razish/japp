@@ -103,7 +103,7 @@ qboolean G_CanBeEnemy( gentity_t *self, gentity_t *enemy )
 //This function gets the attack power which is used to decide broken parries,
 //knockaways, and numerous other things. It is not directly related to the
 //actual amount of damage done, however. -rww
-static QINLINE int G_SaberAttackPower(gentity_t *ent, qboolean attacking)
+static int G_SaberAttackPower(gentity_t *ent, qboolean attacking)
 {
 	int baseLevel;
 	assert(ent && ent->client);
@@ -358,7 +358,7 @@ void SaberGotHit( gentity_t *self, gentity_t *other, trace_t *trace )
 
 qboolean BG_SuperBreakLoseAnim( int anim );
 
-static QINLINE void SetSaberBoxSize(gentity_t *saberent)
+static void SetSaberBoxSize(gentity_t *saberent)
 {
 	gentity_t *owner = NULL;
 	vector3 saberOrg, saberTip;
@@ -987,8 +987,7 @@ static QINLINE void G_G2PlayerAngles( gentity_t *ent, vector3 legs[3], vector3 *
 	}
 }
 
-static QINLINE qboolean SaberAttacking( gentity_t *self )
-{
+static qboolean SaberAttacking( gentity_t *self ) {
 	if ( PM_SaberInParry(self->client->ps.saberMove) )
 		return qfalse;
 	if ( PM_SaberInBrokenParry(self->client->ps.saberMove) )
@@ -1151,7 +1150,7 @@ int G_SaberLockAnim( int attackerSaberStyle, int defenderSaberStyle, int topOrSi
 extern qboolean BG_CheckIncrementLockAnim( int anim, int winOrLose ); //bg_saber.c
 #define LOCK_IDEAL_DIST_JKA 46.0f//all of the new saberlocks are 46.08f from each other because Richard Lico is da MAN
 
-static QINLINE qboolean WP_SabersCheckLock2( gentity_t *attacker, gentity_t *defender, sabersLockMode_t lockMode )
+static qboolean WP_SabersCheckLock2( gentity_t *attacker, gentity_t *defender, sabersLockMode_t lockMode )
 {
 	int		attAnim, defAnim = 0;
 	float	attStart = 0.5f, defStart = 0.5f;
@@ -1869,7 +1868,7 @@ int PM_SaberBounceForAttack( int move );
 int PM_SaberDeflectionForQuad( int quad );
 
 extern stringID_table_t animTable[MAX_ANIMATIONS+1];
-static QINLINE qboolean WP_GetSaberDeflectionAngle( gentity_t *attacker, gentity_t *defender, float saberHitFraction )
+static qboolean WP_GetSaberDeflectionAngle( gentity_t *attacker, gentity_t *defender, float saberHitFraction )
 {
 	qboolean animBasedDeflection = qtrue;
 	int attSaberLevel, defSaberLevel;
@@ -2171,7 +2170,7 @@ int G_KnockawayForParry( int move )
 #define SABER_NONATTACK_DAMAGE 1
 
 //For strong attacks, we ramp damage based on the point in the attack animation
-static QINLINE int G_GetAttackDamage( gentity_t *self, int minDmg, int maxDmg, float multPoint )
+static int G_GetAttackDamage( gentity_t *self, int minDmg, int maxDmg, float multPoint )
 {
 	int speedDif = 0;
 	int totalDamage = maxDmg;
@@ -2204,7 +2203,7 @@ static QINLINE int G_GetAttackDamage( gentity_t *self, int minDmg, int maxDmg, f
 }
 
 //Get the point in the animation and return a percentage of the current point in the anim between 0 and the total anim length (0.0f - 1.0f)
-static QINLINE float G_GetAnimPoint(gentity_t *self)
+static float G_GetAnimPoint(gentity_t *self)
 {
 	int speedDif = 0;
 	float attackAnimLength = bgAllAnims[self->localAnimIndex].anims[self->client->ps.torsoAnim].numFrames * fabsf((float)(bgAllAnims[self->localAnimIndex].anims[self->client->ps.torsoAnim].frameLerp));
@@ -2246,7 +2245,7 @@ static QINLINE qboolean G_ClientIdleInWorld(gentity_t *ent)
 	return qfalse;
 }
 
-static QINLINE qboolean G_G2TraceCollide(trace_t *tr, vector3 *lastValidStart, vector3 *lastValidEnd, vector3 *traceMins, vector3 *traceMaxs)
+static qboolean G_G2TraceCollide(trace_t *tr, vector3 *lastValidStart, vector3 *lastValidEnd, vector3 *traceMins, vector3 *traceMaxs)
 { //Hit the ent with the normal trace, try the collision trace.
 	G2Trace_t		G2Trace;
 	gentity_t		*g2Hit;
@@ -2608,8 +2607,8 @@ static QINLINE qboolean G_SaberFaceCollisionCheck(int fNum, saberFace_t *fList, 
 }
 
 //check for collision of 2 blades -rww
-static QINLINE qboolean G_SaberCollide(gentity_t *atk, gentity_t *def, vector3 *atkStart,
-						vector3 *atkEnd, vector3 *atkMins, vector3 *atkMaxs, vector3 *impactPoint)
+static qboolean G_SaberCollide(gentity_t *atk, gentity_t *def, vector3 *atkStart, vector3 *atkEnd, vector3 *atkMins,
+	vector3 *atkMaxs, vector3 *impactPoint )
 {
 	static int i, j;
 
@@ -3742,7 +3741,7 @@ static float saberHitFraction = 1.0f;
 qboolean BG_SuperBreakWinAnim( int anim );
 
 // JA version
-static QINLINE qboolean CheckSaberDamageOriginal(gentity_t *self, int rSaberNum, int rBladeNum, vector3 *saberStart, vector3 *saberEnd, qboolean doInterpolate, int trMask, qboolean extrapolate )
+static qboolean CheckSaberDamageOriginal(gentity_t *self, int rSaberNum, int rBladeNum, vector3 *saberStart, vector3 *saberEnd, qboolean doInterpolate, int trMask, qboolean extrapolate )
 {
 	static trace_t tr;
 	static vector3 dir;
@@ -5123,7 +5122,7 @@ blockStuff:
 }
 
 // JK2 version
-static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBladeNum, vector3 *saberStart, vector3 *saberEnd, qboolean doInterpolate, int trMask, qboolean extrapolate )
+static qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBladeNum, vector3 *saberStart, vector3 *saberEnd, qboolean doInterpolate, int trMask, qboolean extrapolate )
 {
 	trace_t tr;
 	vector3 dir;
@@ -6545,7 +6544,7 @@ void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd  )
 
 void thrownSaberTouch (gentity_t *saberent, gentity_t *other, trace_t *trace);
 
-static QINLINE qboolean CheckThrownSaberDamaged(gentity_t *saberent, gentity_t *saberOwner, gentity_t *ent, int dist, int returning, qboolean noDCheck)
+static qboolean CheckThrownSaberDamaged(gentity_t *saberent, gentity_t *saberOwner, gentity_t *ent, int dist, int returning, qboolean noDCheck)
 {
 	vector3 vecsub;
 	float veclen;
@@ -6778,7 +6777,7 @@ static QINLINE qboolean CheckThrownSaberDamaged(gentity_t *saberent, gentity_t *
 	return qtrue;
 }
 
-static QINLINE void saberCheckRadiusDamage(gentity_t *saberent, int returning)
+static void saberCheckRadiusDamage(gentity_t *saberent, int returning)
 { //we're going to cheat and damage players within the saber's radius, just for the sake of doing things more "efficiently" (and because the saber entity has no server g2 instance)
 	int i = 0;
 	int dist = 0;

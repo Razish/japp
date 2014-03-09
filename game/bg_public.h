@@ -1777,7 +1777,7 @@ float BG_SI_Length(saberInfo_t *saber);
 float BG_SI_LengthMax(saberInfo_t *saber);
 void BG_SI_ActivateTrail ( saberInfo_t *saber, float duration );
 void BG_SI_DeactivateTrail ( saberInfo_t *saber, float duration );
-extern void BG_AttachToRancor( void *ghoul2,float rancYaw, vector3 *rancOrigin,int time,qhandle_t *modelList, vector3 *modelScale,qboolean inMouth, vector3 *out_origin, vector3 *out_angles, vector3 out_axis[3] );
+void BG_AttachToRancor( void *ghoul2,float rancYaw, vector3 *rancOrigin,int time,qhandle_t *modelList, vector3 *modelScale,qboolean inMouth, vector3 *out_origin, vector3 *out_angles, vector3 out_axis[3] );
 void BG_ClearRocketLock( playerState_t *ps );
 
 extern const int WeaponReadyAnim[WP_NUM_WEAPONS];

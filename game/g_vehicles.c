@@ -1179,7 +1179,7 @@ static qboolean Update( Vehicle_t *pVeh, const usercmd_t *pUmcd )
 
 #ifdef _GAME
 	curTime = level.time;
-#elif _CGAME
+#elif defined(_CGAME)
 	//FIXME: pass in ucmd?  Not sure if this is reliable...
 	curTime = pm->cmd.serverTime;
 #endif

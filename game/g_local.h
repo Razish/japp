@@ -1054,7 +1054,7 @@ void NET_AddrToString( char *out, size_t size, void *addr );
 // g_object.c
 //
 
-extern void G_RunObject			( gentity_t *ent );
+void G_RunObject			( gentity_t *ent );
 
 
 void G_AddPredictableEvent( gentity_t *ent, int event, int eventParm );
@@ -1292,16 +1292,15 @@ void G_WriteSessionData( void );
 //
 // NPC_senses.cpp
 //
-extern void AddSightEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, float addLight ); //addLight = 0.0f
-extern void AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, qboolean needLOS ); //needLOS = qfalse
-extern qboolean G_CheckForDanger( gentity_t *self, int alertEvent );
-extern int G_CheckAlertEvents( gentity_t *self, qboolean checkSight, qboolean checkSound, float maxSeeDist, float maxHearDist, int ignoreAlert, qboolean mustHaveOwner, int minAlertLevel ); //ignoreAlert = -1, mustHaveOwner = qfalse, minAlertLevel = AEL_MINOR
-extern qboolean G_CheckForDanger( gentity_t *self, int alertEvent );
-extern qboolean G_ClearLOS( gentity_t *self, const vector3 *start, const vector3 *end );
-extern qboolean G_ClearLOS2( gentity_t *self, gentity_t *ent, const vector3 *end );
-extern qboolean G_ClearLOS3( gentity_t *self, const vector3 *start, gentity_t *ent );
-extern qboolean G_ClearLOS4( gentity_t *self, gentity_t *ent );
-extern qboolean G_ClearLOS5( gentity_t *self, const vector3 *end );
+void AddSightEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, float addLight ); //addLight = 0.0f
+void AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, qboolean needLOS ); //needLOS = qfalse
+qboolean G_CheckForDanger( gentity_t *self, int alertEvent );
+int G_CheckAlertEvents( gentity_t *self, qboolean checkSight, qboolean checkSound, float maxSeeDist, float maxHearDist, int ignoreAlert, qboolean mustHaveOwner, int minAlertLevel ); //ignoreAlert = -1, mustHaveOwner = qfalse, minAlertLevel = AEL_MINOR
+qboolean G_ClearLOS( gentity_t *self, const vector3 *start, const vector3 *end );
+qboolean G_ClearLOS2( gentity_t *self, gentity_t *ent, const vector3 *end );
+qboolean G_ClearLOS3( gentity_t *self, const vector3 *start, gentity_t *ent );
+qboolean G_ClearLOS4( gentity_t *self, gentity_t *ent );
+qboolean G_ClearLOS5( gentity_t *self, const vector3 *end );
 
 //
 // g_arenas.c
@@ -1386,7 +1385,7 @@ float NPC_GetHFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, floa
 float NPC_GetVFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, float vFOV );
 
 
-extern void G_SetEnemy (gentity_t *self, gentity_t *enemy);
+void G_SetEnemy (gentity_t *self, gentity_t *enemy);
 qboolean InFront( vector3 *spot, vector3 *from, vector3 *fromAngles, float threshHold );
 
 // ai_main.c
