@@ -10,10 +10,6 @@
 
 #define	FOFS(x) offsetof(gentity_t, x)
 
-#ifndef INFINITE
-	#define INFINITE				(1000000)
-#endif
-
 #include "qcommon/q_shared.h"
 #include "bg_public.h"
 #include "bg_vehicles.h"
