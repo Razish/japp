@@ -264,8 +264,6 @@ struct ud_itab_entry
   uint32_t                      prefix;
 };
 
-extern const char * ud_lookup_mnemonic( enum ud_mnemonic_code c );
-
 #endif /* UD_DECODE_H */
 
 /* vim:cindent

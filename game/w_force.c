@@ -1,4 +1,5 @@
 #include "b_local.h"
+#include "bg_local.h"
 #include "w_saber.h"
 #include "ai_main.h"
 #include "Ghoul2/G2.h"
@@ -11,8 +12,6 @@ extern void NPC_Jedi_PlayConfusionSound( gentity_t *self );
 extern void NPC_UseResponse( gentity_t *self, gentity_t *user, qboolean useWhenDone );
 //NEEDED FOR MIND-TRICK on NPCS=========================================================
 extern void Jedi_Decloak( gentity_t *self );
-
-extern vmCvar_t		g_saberRestrictForce;
 
 extern qboolean BG_FullBodyTauntAnim( int anim );
 

@@ -344,7 +344,7 @@ if plat == 'Linux':
 		'-Wold-style-definition',
 		'-Woverlength-strings',
 		'-Wpointer-arith',
-	#	'-Wredundant-decls',
+		'-Wredundant-decls',
 	#	'-Wshadow',
 	#	'-Wsign-conversion',
 		'-Wstack-usage=32768',

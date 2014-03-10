@@ -87,7 +87,7 @@
 #define SLIDER_HEIGHT 16.0f
 #define SLIDER_THUMB_WIDTH 12.0f
 #define SLIDER_THUMB_HEIGHT 20.0f
-#define	NUM_CROSSHAIRS			9
+#define	NUM_CROSSHAIRS (9)
 
 typedef struct scriptDef_s {
 	const char *command;

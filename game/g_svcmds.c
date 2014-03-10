@@ -98,14 +98,6 @@ void G_ShuffleTeams(void)
 	trap->SendServerCommand( -1, "cp \""S_COLOR_RED"Teams have been shuffled!\n\"");
 }
 
-char *ConcatArgs( int start );
-
-/*
-=================
-ConsoleCommand
-
-=================
-*/
 const char *G_GetArenaInfoByMap( const char *map );
 
 static void SV_AddBot_f( void ) {

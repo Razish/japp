@@ -2,7 +2,6 @@
 #include "Ghoul2/G2.h"
 #include "qcommon/q_shared.h"
 
-void G_SetEnemy( gentity_t *self, gentity_t *enemy );
 void finish_spawning_turretG2( gentity_t *base );
 void ObjectDie (gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath );
 void turretG2_base_use( gentity_t *self, gentity_t *other, gentity_t *activator );

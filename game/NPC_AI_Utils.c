@@ -11,9 +11,7 @@
 
 qboolean AI_ValidateGroupMember( AIGroupInfo_t *group, gentity_t *member );
 
-extern void G_TestLine(vector3 *start, vector3 *end, int color, int time);
-
-extern int NAV_FindClosestWaypointForPoint( gentity_t *ent, vector3 *point );
+int NAV_FindClosestWaypointForPoint( gentity_t *ent, vector3 *point );
 int AI_ClosestGroupEntityNumToPoint( AIGroupInfo_t *group, vector3 *point )
 {
 	int	markerWP = WAYPOINT_NONE;

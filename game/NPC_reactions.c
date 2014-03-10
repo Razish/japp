@@ -3,25 +3,22 @@
 #include "anims.h"
 #include "w_saber.h"
 
-extern qboolean G_CheckForStrongAttackMomentum( gentity_t *self );
-extern void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
-extern void cgi_S_StartSound( vector3 *origin, int entityNum, int entchannel, sfxHandle_t sfx );
-extern qboolean Q3_TaskIDPending( gentity_t *ent, taskID_t taskType );
-extern qboolean NPC_CheckLookTarget( gentity_t *self );
-extern void NPC_SetLookTarget( gentity_t *self, int entNum, int clearTime );
-extern qboolean Jedi_WaitingAmbush( gentity_t *self );
-extern void Jedi_Ambush( gentity_t *self );
-extern qboolean NPC_SomeoneLookingAtMe(gentity_t *ent);
+qboolean G_CheckForStrongAttackMomentum( gentity_t *self );
+void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
+void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
+void cgi_S_StartSound( vector3 *origin, int entityNum, int entchannel, sfxHandle_t sfx );
+qboolean Q3_TaskIDPending( gentity_t *ent, taskID_t taskType );
+qboolean NPC_CheckLookTarget( gentity_t *self );
+qboolean Jedi_WaitingAmbush( gentity_t *self );
+void Jedi_Ambush( gentity_t *self );
+qboolean NPC_SomeoneLookingAtMe(gentity_t *ent);
 
-extern qboolean BG_SaberInSpecialAttack( int anim );
-extern qboolean PM_SpinningSaberAnim( int anim );
-extern qboolean PM_SpinningAnim( int anim );
-extern qboolean PM_InKnockDown( playerState_t *ps );
-extern qboolean BG_FlippingAnim( int anim );
-extern qboolean PM_RollingAnim( int anim );
-extern qboolean PM_InCartwheel( int anim );
-extern qboolean BG_CrouchAnim( int anim );
+qboolean PM_SpinningSaberAnim( int anim );
+qboolean PM_SpinningAnim( int anim );
+qboolean PM_InKnockDown( playerState_t *ps );
+qboolean PM_RollingAnim( int anim );
+qboolean PM_InCartwheel( int anim );
+qboolean BG_CrouchAnim( int anim );
 
 extern int	teamLastEnemyTime[];
 extern int killPlayerTimer;

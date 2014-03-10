@@ -1,7 +1,6 @@
 #include "b_local.h"
 #include "g_nav.h"
 
-qboolean NAV_CheckAhead( gentity_t *self, vector3 *end, trace_t *trace, int clipmask );
 qboolean NAV_TestForBlocked( gentity_t *self, gentity_t *goal, gentity_t *blocker, float distance, uint32_t *flags );
 
 void G_Line( vector3 *start, vector3 *end, vector3 *color, float alpha );

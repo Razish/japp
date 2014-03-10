@@ -3,9 +3,8 @@
 #include "b_local.h"
 #include "Ghoul2/G2.h"
 
-extern void G_SetEnemy( gentity_t *self, gentity_t *enemy );
-extern void WP_CalcVehMuzzle(gentity_t *ent, int muzzleNum);
-extern gentity_t *WP_FireVehicleWeapon( gentity_t *ent, vector3 *start, vector3 *dir, vehWeaponInfo_t *vehWeapon, qboolean alt_fire, qboolean isTurretWeap );
+void WP_CalcVehMuzzle(gentity_t *ent, int muzzleNum);
+gentity_t *WP_FireVehicleWeapon( gentity_t *ent, vector3 *start, vector3 *dir, vehWeaponInfo_t *vehWeapon, qboolean alt_fire, qboolean isTurretWeap );
 
 extern void G_VehMuzzleFireFX( gentity_t *ent, gentity_t *broadcaster, int muzzlesFired );
 //-----------------------------------------------------

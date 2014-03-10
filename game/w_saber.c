@@ -6,8 +6,6 @@
 
 #define SABER_BOX_SIZE 16.0f
 extern bot_state_t *botstates[MAX_CLIENTS];
-extern qboolean InFront( vector3 *spot, vector3 *from, vector3 *fromAngles, float threshHold );
-extern void G_TestLine(vector3 *start, vector3 *end, int color, int time);
 
 int saberSpinSound = 0;
 
@@ -20,7 +18,6 @@ qboolean BG_SaberInReturn( int move );
 qboolean BG_InKnockDownOnGround( playerState_t *ps );
 qboolean BG_StabDownAnim( int anim );
 qboolean BG_SabersOff( playerState_t *ps );
-qboolean BG_SaberInTransitionAny( int move );
 qboolean BG_SaberInAttackPure( int move );
 qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum );
 qboolean WP_SaberBladeDoTransitionDamage( saberInfo_t *saber, int bladeNum );
@@ -6133,8 +6130,6 @@ void G_SPSaberDamageTraceLerped( gentity_t *self, int saberNum, int bladeNum, ve
 		*/
 	}
 }
-
-qboolean BG_SaberInTransitionAny( int move );
 
 qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower );
 qboolean InFOV3( vector3 *spot, vector3 *from, vector3 *fromAngles, int hFOV, int vFOV );

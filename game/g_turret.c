@@ -3,7 +3,6 @@
 #include "g_local.h"
 #include "qcommon/q_shared.h"
 
-void G_SetEnemy( gentity_t *self, gentity_t *enemy );
 qboolean turret_base_spawn_top( gentity_t *base );
 void ObjectDie (gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath );
 

@@ -346,7 +346,6 @@ static void CG_UpdateThirdPersonTargetDamp( int clientNum ) {
 	//	full volume traces each frame is a bit scary to think about.
 }
 
-extern void CG_CalcEntityLerpPositions( centity_t *cent ); //cg_ents.c
 // This can be called every interval, at the user's discretion.
 static void CG_UpdateThirdPersonCameraDamp( int clientNum ) {
 	trace_t trace;
@@ -450,7 +449,6 @@ static void CG_UpdateThirdPersonCameraDamp( int clientNum ) {
 	//	full volume traces each frame is a bit scary to think about.
 }
 
-extern vmCvar_t cg_thirdPersonHorzOffset;
 extern qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh );
 
 static void CG_OffsetThirdPersonView( int clientNum ) {

@@ -1788,23 +1788,7 @@ void SetupGameGhoul2Model(gentity_t *ent, const char *modelname, char *skinName)
 	}
 }
 
-
-
-
-/*
-===========
-ClientUserInfoChanged
-
-Called from ClientConnect when the player first connects and
-directly by the server system when the player updates a userinfo variable.
-
-The game can override any of the settings and call trap->SetUserinfo
-if desired.
-============
-*/
-
-qboolean G_SetSaber(gentity_t *ent, int saberNum, const char *saberName, qboolean siegeOverride);
-void G_ValidateSiegeClassForTeam(gentity_t *ent, int team);
+void G_ValidateSiegeClassForTeam( gentity_t *ent, int team );
 
 typedef struct userinfoValidate_s {
 	const char		*field, *fieldClean;
@@ -1962,6 +1946,9 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	return NULL;
 }
 
+// Called from ClientConnect when the player first connects and directly by the server system when the player updates a
+//	userinfo variable.
+// The game can override any of the settings and call trap->SetUserinfo if desired.
 qboolean ClientUserinfoChanged( int clientNum ) {
 	gentity_t *ent = g_entities + clientNum;
 	gclient_t *client = ent->client;

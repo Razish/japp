@@ -1067,8 +1067,6 @@ void DeactivateCrashHandler( void ) {
 int oldactsset = 0;
 struct sigaction oldact[NSIG];
 
-extern char *strsignal(int __sig) __THROW;
-
 void (*OldHandler)(int signal, siginfo_t *siginfo, ucontext_t *ctx);
 
 static int m_crashloop=0;
@@ -1128,15 +1126,14 @@ static void JKG_Free_MemoryMap( void ) {
 static void JKG_Enum_MemoryMap( void ) {
 	char buffer[1024];
 	const char *line;
-
 	int skipspaces;
-
 	memblock_t *mb;
+	FILE *f = NULL;
 
 	if (memblocks) {
 		JKG_Free_MemoryMap();
 	}
-	FILE *f;
+
 	f = fopen("/proc/self/maps", "r");
 	if (!f) {
 		return;

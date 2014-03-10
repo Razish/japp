@@ -425,7 +425,6 @@ void Rancor_Bite( void )
 	}
 }
 //------------------------------
-extern void TossClientItems( gentity_t *self );
 void Rancor_Attack( float distance, qboolean doCharge )
 {
 	if ( !TIMER_Exists( NPC, "attacking" ) )

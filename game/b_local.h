@@ -40,7 +40,12 @@ void RestoreNPCGlobals(void);
 void NPC_Think ( gentity_t *self);
 
 //NPC_reactions.cpp
-void NPC_Pain(gentity_t *self, gentity_t *attacker, int damage);
+typedef void (PAIN_FUNC)( gentity_t *self, gentity_t *attacker, int damage );
+extern PAIN_FUNC funcBBrushPain, misc_model_breakable_pain, NPC_Pain, station_pain, func_usable_pain, NPC_ATST_Pain,
+	NPC_ST_Pain, NPC_Jedi_Pain, NPC_Droid_Pain, NPC_Probe_Pain, NPC_MineMonster_Pain, NPC_Howler_Pain, NPC_Seeker_Pain,
+	NPC_Remote_Pain, emplaced_gun_pain, NPC_Mark1_Pain, NPC_GM_Pain, NPC_Sentry_Pain, NPC_Mark2_Pain, PlayerPain, GasBurst,
+	CrystalCratePain, TurretPain, NPC_Wampa_Pain, NPC_Rancor_Pain;
+
 void NPC_Touch( gentity_t *self, gentity_t *other, trace_t *trace );
 void NPC_Use( gentity_t *self, gentity_t *other, gentity_t *activator );
 float NPC_GetPainChance( gentity_t *self, int damage );
@@ -83,7 +88,6 @@ void NPC_BSRemove (void);
 void NPC_BSSearch (void);
 void NPC_BSSearchStart (int	homeWp, bState_t bState);
 void NPC_BSWander (void);
-void NPC_BSFlee( void );
 void NPC_StartFlee( gentity_t *enemy, vector3 *dangerPoint, int dangerLevel, int fleeTimeMin, int fleeTimeMax );
 void G_StartFlee( gentity_t *self, gentity_t *enemy, vector3 *dangerPoint, int dangerLevel, int fleeTimeMin, int fleeTimeMax );
 
@@ -176,15 +180,15 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC );
 void NPC_LoadParms( void );
 
 //NPC_utils
-int	teamNumbers[TEAM_NUM_TEAMS];
-int	teamStrength[TEAM_NUM_TEAMS];
-int	teamCounter[TEAM_NUM_TEAMS];
+extern int teamNumbers[TEAM_NUM_TEAMS];
+extern int teamStrength[TEAM_NUM_TEAMS];
+extern int teamCounter[TEAM_NUM_TEAMS];
+
 void CalcEntitySpot ( const gentity_t *ent, const spot_t spot, vector3 *point );
 qboolean NPC_UpdateAngles ( qboolean doPitch, qboolean doYaw );
 void NPC_UpdateShootAngles (vector3 *angles, qboolean doPitch, qboolean doYaw );
 qboolean NPC_UpdateFiringAngles ( qboolean doPitch, qboolean doYaw );
 void SetTeamNumbers (void);
-qboolean G_ActivateBehavior (gentity_t *self, int bset );
 void NPC_AimWiggle( vector3 *enemy_org );
 void NPC_SetLookTarget( gentity_t *self, int entNum, int clearTime );
 
@@ -197,9 +201,6 @@ float IdealDistance ( gentity_t *self );
 
 //g_squad
 void NPC_SetSayState (gentity_t *self, gentity_t *to, int saying);
-
-//g_utils
-qboolean G_CheckInSolid (gentity_t *self, qboolean fix);
 
 //MCG - End============================================================
 

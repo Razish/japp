@@ -3897,7 +3897,6 @@ static float CG_DrawTimer( float y ) {
 CG_DrawTeamOverlay
 =================
 */
-extern const char *CG_GetLocationString(const char *loc); //cg_main.c
 static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 	int x, w, h, xx;
 	int i, j, len;
@@ -7229,9 +7228,6 @@ vector3 gCGFallVector;
 CG_Draw2D
 =================
 */
-extern int cgSiegeRoundState;
-extern int cgSiegeRoundTime;
-
 extern int team1Timed;
 extern int team2Timed;
 

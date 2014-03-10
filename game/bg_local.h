@@ -95,7 +95,8 @@ void PM_SetSaberMove(short newMove);
 
 void PM_SetForceJumpZStart(float value);
 
-void BG_CycleInven(playerState_t *ps, int direction);
+void BG_CycleForce( playerState_t *ps, int direction );
+void BG_CycleInven( playerState_t *ps, int direction );
 
 qboolean GetCInfo( uint32_t bit );
 qboolean GetCPD( bgEntity_t *self, uint32_t bit );

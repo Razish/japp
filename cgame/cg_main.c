@@ -3,6 +3,7 @@
 // cg_main.c -- initialization and primary entry point for cgame
 #include "cg_local.h"
 #include "bg_lua.h"
+#include "bg_local.h"
 #include "ui/ui_shared.h"
 #include "cg_lights.h"
 #include "cg_media.h"
@@ -1916,7 +1917,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	cg.renderingThirdPerson = cg_thirdPerson.integer;
 	cg.weaponSelect = WP_BRYAR_PISTOL;
 	cgs.redflag = cgs.blueflag = -1;
-	cgs.flagStatus = -1;
 	cg.demoPlayback = demoPlayback;
 	cgs.levelStartTime = atoi( CG_ConfigString( CS_LEVEL_START_TIME ) );
 

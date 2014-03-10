@@ -454,7 +454,6 @@ void MatrixIdentity( vector3 m[3] )
 	VectorSet( &m[2], 0, 0, 1 );
 }
 
-extern void G_TestLine( vector3 *start, vector3 *end, int color, int time );
 void jp_portal_touch( gentity_t *self, gentity_t *other, trace_t *trace )
 {
 	//Remove the touch function for a while to avoid flooding

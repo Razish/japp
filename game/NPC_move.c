@@ -7,7 +7,6 @@
 
 void G_Cylinder( vector3 *start, vector3 *end, float radius, vector3 *color );
 
-qboolean G_BoundsOverlap(const vector3 *mins1, const vector3 *maxs1, const vector3 *mins2, const vector3 *maxs2);
 int NAV_Steer( gentity_t *self, vector3 *dir, float distance );
 extern int GetTime ( int lastTime );
 

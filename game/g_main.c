@@ -33,8 +33,6 @@ qboolean G_ParseSpawnVars( qboolean inSubBSP );
 void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP );
 
 
-qboolean NAV_ClearPathToPoint( gentity_t *self, vector3 *pmins, vector3 *pmaxs, vector3 *point, int clipmask, int okToHitEntNum );
-qboolean NPC_ClearLOS2( gentity_t *ent, const vector3 *end );
 int NAVNEW_ClearPathBetweenPoints(vector3 *start, vector3 *end, vector3 *mins, vector3 *maxs, int ignore, int clipmask);
 qboolean NAV_CheckNodeFailedForEnt( gentity_t *ent, int nodeNum );
 qboolean G_EntIsUnlockedDoor( int entityNum );
@@ -2732,7 +2730,6 @@ Advances the non-player objects in the world
 */
 void ClearNPCGlobals( void );
 void AI_UpdateGroups( void );
-void ClearPlayerAlertEvents( void );
 void SiegeCheckTimers(void);
 void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd );
 extern void Jedi_Decloak( gentity_t *self );

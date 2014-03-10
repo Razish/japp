@@ -259,18 +259,8 @@ qboolean	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vector3 *move,
 	return qfalse;
 }
 
-
-void G_ExplodeMissile( gentity_t *ent );
-
-/*
-============
-G_MoverPush
-
-Objects need to be moved back on a failed push,
-otherwise riders would continue to slide.
-If qfalse is returned, *obstacle will be the blocking entity
-============
-*/
+// Objects need to be moved back on a failed push, otherwise riders would continue to slide.
+// If qfalse is returned, *obstacle will be the blocking entity
 void NPC_RemoveBody( gentity_t *self );
 qboolean G_MoverPush( gentity_t *pusher, vector3 *move, vector3 *amove, gentity_t **obstacle ) {
 	int			i, e;
@@ -2976,7 +2966,6 @@ void SP_func_glass( gentity_t *ent ) {
 
 void func_usable_use (gentity_t *self, gentity_t *other, gentity_t *activator);
 
-extern gentity_t	*G_TestEntityPosition( gentity_t *ent );
 void func_wait_return_solid( gentity_t *self )
 {
 	//once a frame, see if it's clear.

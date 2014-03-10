@@ -1722,7 +1722,6 @@ void rocketThink( gentity_t *ent )
 	return;
 }
 
-extern void G_ExplodeMissile( gentity_t *ent );
 void RocketDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod)
 {
 	self->die = 0;

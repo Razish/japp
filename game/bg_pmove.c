@@ -641,7 +641,6 @@ void BG_VehicleTurnRateForSpeed( Vehicle_t *pVeh, float speed, float *mPitchOver
 	#if !defined(MACOS_X) && !defined(__GCC__)
 		typedef struct gentity_s gentity_t;
 	#endif
-	gentity_t *G_PlayEffectID( const int fxID, vector3 *org, vector3 *ang );
 #endif
 
 
@@ -8100,97 +8099,70 @@ static void PM_DropTimers( void ) {
 	}
 }
 
-// Following function is stateless (at the moment). And hoisting it out
-// of the namespace here is easier than fixing all the places it's used,
-// which includes files that are also compiled in SP. We do need to make
-// sure we only get one copy in the linker, though.
-
-
-extern	vmCvar_t	bg_fighterAltControl;
-qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh )
-{
-	if ( bg_fighterAltControl.integer
-		&& ps->clientNum < MAX_CLIENTS //real client
-		&& ps->m_iVehicleNum//in a vehicle
-		&& pVeh //valid vehicle data pointer
-		&& pVeh->m_pVehicleInfo//valid vehicle info
-		&& pVeh->m_pVehicleInfo->type == VH_FIGHTER )//fighter
-		//FIXME: specify per vehicle instead of assuming true for all fighters
-		//FIXME: map/server setting?
-	{//can roll and pitch without limitation!
+// Following function is stateless (at the moment). And hoisting it out of the namespace here is easier than fixing all
+//	the places it's used, which includes files that are also compiled in SP. We do need to make sure we only get one copy
+//	in the linker, though.
+qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh ) {
+	//FIXME: specify per vehicle instead of assuming true for all fighters
+	//FIXME: map/server setting?
+	if ( bg_fighterAltControl.integer && ps->clientNum < MAX_CLIENTS && ps->m_iVehicleNum && pVeh && pVeh->m_pVehicleInfo
+		&& pVeh->m_pVehicleInfo->type == VH_FIGHTER )
+	{
+		// can roll and pitch without limitation!
 		return qtrue;
 	}
 	return qfalse;
 }
 
-
-/*
-================
-PM_UpdateViewAngles
-
-This can be used as another entry point when only the viewangles
-are being updated isntead of a full move
-================
-*/
+// This can be used as another entry point when only the viewangles are being updated instead of a full move
 void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
-	short		temp;
-	int		i;
+	short temp;
+	int i;
 
-	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPINTERMISSION) {
-		return;		// no view changes at all
-	}
+	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPINTERMISSION )
+		return;
 
-	if ( ps->pm_type != PM_SPECTATOR && ps->stats[STAT_HEALTH] <= 0 ) {
+	if ( ps->pm_type != PM_SPECTATOR && ps->stats[STAT_HEALTH] <= 0 )
 		return;		// no view changes at all
-	}
 
 	// circularly clamp the angles with deltas
-	for (i=0 ; i<3 ; i++) {
+	for ( i=0; i<3; i++ ) {
 		temp = cmd->angles.data[i] + ps->delta_angles.data[i];
 #ifdef VEH_CONTROL_SCHEME_4
-		if ( pm_entVeh
-			&& pm_entVeh->m_pVehicle
-			&& pm_entVeh->m_pVehicle->m_pVehicleInfo
+		if ( pm_entVeh && pm_entVeh->m_pVehicle && pm_entVeh->m_pVehicle->m_pVehicleInfo
 			&& pm_entVeh->m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER
 			&& (cmd->serverTime-pm_entVeh->playerState->hyperSpaceTime) >= HYPERSPACE_TIME )
 		{//in a vehicle and not hyperspacing
-			if ( i == 0/*PITCH*/ )
-			{
-				int pitchClamp = ANGLE2SHORT(AngleNormalize180(pm_entVeh->m_pVehicle->m_vPrevRiderViewAngles.pitch+10.0f));
+			if ( i == 0/*PITCH*/ ) {
+				int pitchClamp = ANGLE2SHORT( AngleNormalize180( pm_entVeh->m_pVehicle->m_vPrevRiderViewAngles.pitch+10.0f ) );
 				// don't let the player look up or down more than 22.5f degrees
-				if ( temp > pitchClamp )
-				{
+				if ( temp > pitchClamp ) {
 					ps->delta_angles.data[i] = pitchClamp - cmd->angles.data[i];
 					temp = pitchClamp;
 				}
-				else if ( temp < -pitchClamp )
-				{
+				else if ( temp < -pitchClamp ) {
 					ps->delta_angles.data[i] = -pitchClamp - cmd->angles.data[i];
 					temp = -pitchClamp;
 				}
 			}
-			if ( i == 1/*YAW*/ )
-			{
-				int yawClamp = ANGLE2SHORT(AngleNormalize180(pm_entVeh->m_pVehicle->m_vPrevRiderViewAngles.yaw+10.0f));
+			if ( i == 1/*YAW*/ ) {
+				int yawClamp = ANGLE2SHORT( AngleNormalize180( pm_entVeh->m_pVehicle->m_vPrevRiderViewAngles.yaw+10.0f ) );
 				// don't let the player look left or right more than 22.5f degrees
-				if ( temp > yawClamp )
-				{
+				if ( temp > yawClamp ) {
 					ps->delta_angles.data[i] = yawClamp - cmd->angles.data[i];
 					temp = yawClamp;
 				}
-				else if ( temp < -yawClamp )
-				{
+				else if ( temp < -yawClamp ) {
 					ps->delta_angles.data[i] = -yawClamp - cmd->angles.data[i];
 					temp = -yawClamp;
 				}
 			}
 		}
 #else //VEH_CONTROL_SCHEME_4
-		if ( pm_entVeh && BG_UnrestrainedPitchRoll( ps, pm_entVeh->m_pVehicle ) )
-		{//in a fighter
+		if ( pm_entVeh && BG_UnrestrainedPitchRoll( ps, pm_entVeh->m_pVehicle ) ) {
 			/*
-			if ( i == ROLL )
-			{//get roll from vehicle
+			if ( i == ROLL ) {
+				// get roll from vehicle
 				ps->viewangles.roll = pm_entVeh->playerState->viewangles.roll;//->m_pVehicle->m_vOrientation->roll;
 				continue;
 
@@ -8198,8 +8170,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 			*/
 		}
 #endif // VEH_CONTROL_SCHEME_4
-		else
-		{
+		else {
 			if ( i == 0/*PITCH*/ ) {
 				// don't let the player look up or down more than 90 degrees
 				if ( temp > 16000 ) {
@@ -8211,7 +8182,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 				}
 			}
 		}
-		ps->viewangles.data[i] = SHORT2ANGLE(temp);
+		ps->viewangles.data[i] = SHORT2ANGLE( temp );
 	}
 }
 

@@ -1,8 +1,6 @@
 #include "b_local.h"
 
-//static void R5D2_LookAround( void );
-float NPC_GetPainChance( gentity_t *self, int damage );
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
+void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 
 #define TURN_OFF   0x00000100
 

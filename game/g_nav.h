@@ -70,5 +70,4 @@
 	qboolean NPC_GetMoveDirection( vector3 *out, float *distance );
 	void NPC_MoveToGoalExt( vector3 *point );
 	void NAV_FindPlayerWaypoint( int clNum );
-	qboolean NAV_CheckAhead( gentity_t *self, vector3 *end, trace_t *trace, int clipmask );
 #endif

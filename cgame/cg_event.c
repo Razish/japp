@@ -7,6 +7,7 @@
 #include "ui/ui_shared.h"
 #include "ui/ui_public.h"
 #include "bg_luaevent.h"
+#include "bg_local.h"
 #include "ui/menudef.h"
 #include "Ghoul2/G2.h"
 #include "cg_media.h"
@@ -2483,7 +2484,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			cg.renderingThirdPerson || cg_trueGuns.integer
 			|| cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
 		{ //h4q3ry
-			CG_GetClientWeaponMuzzleBoltPoint(cent->currentState.eventParm, &cent->currentState.origin2);
+			CG_GetWeaponMuzzleBolt(cent->currentState.eventParm, &cent->currentState.origin2);
 		}
 		else
 		{
@@ -2503,7 +2504,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		if (cent->currentState.eventParm != cg.snap->ps.clientNum ||
 			cg.renderingThirdPerson)
 		{ //h4q3ry
-			CG_GetClientWeaponMuzzleBoltPoint(cent->currentState.eventParm, &cent->currentState.origin2);
+			CG_GetWeaponMuzzleBolt(cent->currentState.eventParm, &cent->currentState.origin2);
 		}
 		else
 		{

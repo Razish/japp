@@ -6,12 +6,11 @@
 #include "bg_saga.h"
 #include "bg_luaevent.h"
 
-extern int G_ShipSurfaceForSurfName( const char *surfaceName );
-extern qboolean G_FlyVehicleDestroySurface( gentity_t *veh, int surface );
-extern void G_VehicleSetDamageLocFlags( gentity_t *veh, int impactDir, int deathPoint );
-extern void G_VehUpdateShields( gentity_t *targ );
-extern void G_LetGoOfWall( gentity_t *ent );
-extern void BG_ClearRocketLock( playerState_t *ps );
+int G_ShipSurfaceForSurfName( const char *surfaceName );
+qboolean G_FlyVehicleDestroySurface( gentity_t *veh, int surface );
+void G_VehicleSetDamageLocFlags( gentity_t *veh, int impactDir, int deathPoint );
+void G_VehUpdateShields( gentity_t *targ );
+void G_LetGoOfWall( gentity_t *ent );
 //rww - pd
 void BotDamageNotification(gclient_t *bot, gentity_t *attacker);
 //end rww

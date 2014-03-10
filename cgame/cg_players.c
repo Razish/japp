@@ -11,8 +11,6 @@
 
 extern void CheckCameraLocation( vector3 *oldEyeOrigin );
 
-extern vmCvar_t	cg_thirdPersonAlpha;
-
 extern int cgSiegeTeam1PlShader;
 extern int cgSiegeTeam2PlShader;
 

@@ -8,26 +8,23 @@
 
 extern vector3 playerMins;
 extern vector3 playerMaxs;
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
-extern void PM_SetTorsoAnimTimer( gentity_t *ent, int *torsoAnimTimer, int time );
-extern void PM_SetLegsAnimTimer( gentity_t *ent, int *legsAnimTimer, int time );
-extern void NPC_BSNoClip ( void );
-extern void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
-extern void NPC_ApplyRoff (void);
-extern void NPC_TempLookTarget ( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
-extern void NPC_CheckPlayerAim ( void );
-extern void NPC_CheckAllClear ( void );
-extern void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
-extern qboolean NPC_CheckLookTarget( gentity_t *self );
-extern void NPC_SetLookTarget( gentity_t *self, int entNum, int clearTime );
-extern void Mark1_dying( gentity_t *self );
-extern void NPC_BSCinematic( void );
-extern int GetTime ( int lastTime );
-extern void NPC_BSGM_Default( void );
-extern void NPC_CheckCharmed( void );
-extern qboolean Boba_Flying( gentity_t *self );
 
-extern vmCvar_t		g_saberRealisticCombat;
+void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
+void PM_SetTorsoAnimTimer( gentity_t *ent, int *torsoAnimTimer, int time );
+void PM_SetLegsAnimTimer( gentity_t *ent, int *legsAnimTimer, int time );
+void NPC_BSNoClip ( void );
+void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
+void NPC_ApplyRoff (void);
+void NPC_TempLookTarget ( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
+void NPC_CheckPlayerAim ( void );
+void NPC_CheckAllClear ( void );
+qboolean NPC_CheckLookTarget( gentity_t *self );
+void Mark1_dying( gentity_t *self );
+void NPC_BSCinematic( void );
+int GetTime ( int lastTime );
+void NPC_BSGM_Default( void );
+void NPC_CheckCharmed( void );
+qboolean Boba_Flying( gentity_t *self );
 
 //Local Variables
 gentity_t		*NPC;
@@ -36,9 +33,8 @@ gclient_t		*client;
 usercmd_t		ucmd;
 visibility_t	enemyVisibility;
 
-void NPC_SetAnim( gentity_t *ent, int type, int anim, uint32_t setAnimFlags );
 void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope );
-extern void GM_Dying( gentity_t *self );
+void GM_Dying( gentity_t *self );
 
 extern int eventClearTime;
 
@@ -834,7 +830,6 @@ void NPC_CheckAttackScript(void)
 	G_ActivateBehavior(NPC, BSET_ATTACK);
 }
 
-float NPC_MaxDistSquaredForWeapon (void);
 void NPC_CheckAttackHold(void)
 {
 	vector3		vec;

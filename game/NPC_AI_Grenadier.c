@@ -26,8 +26,6 @@ extern qboolean FlyingCreature( gentity_t *ent );
 #define	REALIZE_THRESHOLD	0.6f
 #define CAUTIOUS_THRESHOLD	( REALIZE_THRESHOLD * 0.75f )
 
-qboolean NPC_CheckPlayerTeamStealth( void );
-
 static qboolean enemyLOS3;
 static qboolean enemyCS3;
 static qboolean faceEnemy3;

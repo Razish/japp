@@ -24,8 +24,6 @@ extern qboolean BG_CrouchAnim( int anim );
 static vector3 shieldMins = {-60, -60, -24 };
 static vector3 shieldMaxs = {60, 60, 80};
 
-extern qboolean NPC_CheckPlayerTeamStealth( void );
-
 static qboolean enemyLOS4;
 static qboolean enemyCS4;
 static qboolean hitAlly4;

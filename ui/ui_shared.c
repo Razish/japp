@@ -31,10 +31,6 @@ typedef struct scrollInfo_s {
 } scrollInfo_t;
 
 #ifndef _CGAME	// Defined in ui_main.c, not in the namespace
-extern vmCvar_t	ui_char_color_red;
-extern vmCvar_t	ui_char_color_green;
-extern vmCvar_t	ui_char_color_blue;
-extern vmCvar_t	se_language;
 
 // Some extern functions hoisted from the middle of this file to get all the non-cgame,
 // non-namespace stuff together
@@ -143,8 +139,6 @@ const char *types [] = {
 	"ITEM_TYPE_TEXTSCROLL",
 	NULL
 };
-
-extern qhandle_t MenuFontToHandle( int iMenuFont );
 
 /*
 ===============

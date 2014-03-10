@@ -14,6 +14,7 @@
 #include "be_ai_weap.h"
 //
 #include "ai_main.h"
+#include "bg_local.h"
 #include "w_saber.h"
 //
 #include "chars.h"
@@ -5442,9 +5443,6 @@ int BotWeaponBlockable(int weapon)
 		return 1;
 	}
 }
-
-void Cmd_EngageDuel_f(gentity_t *ent);
-void Cmd_ToggleSaber_f(gentity_t *ent);
 
 //movement overrides
 void Bot_SetForcedMovement(int bot, int forward, int right, int up)

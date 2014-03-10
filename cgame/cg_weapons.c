@@ -1088,7 +1088,7 @@ void CG_OutOfAmmoChange( int oldWeapon ) {
 	trap->S_MuteSound( cg.snap->ps.clientNum, CHAN_WEAPON );
 }
 
-void CG_GetClientWeaponMuzzleBoltPoint( int clIndex, vector3 *to ) {
+void CG_GetWeaponMuzzleBolt( int clIndex, vector3 *to ) {
 	centity_t *cent;
 	mdxaBone_t	boltMatrix;
 

@@ -3,11 +3,11 @@
 #include "anims.h"
 #include "w_saber.h"
 
-extern qboolean BG_SabersOff( playerState_t *ps );
+qboolean BG_SabersOff( playerState_t *ps );
 
-extern void CG_DrawAlert( vector3 *origin, float rating );
-extern void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
-extern void ForceJump( gentity_t *self, usercmd_t *ucmd );
+void CG_DrawAlert( vector3 *origin, float rating );
+void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
+void ForceJump( gentity_t *self, usercmd_t *ucmd );
 
 #define	MAX_VIEW_DIST		2048
 #define MAX_VIEW_SPEED		100
@@ -25,47 +25,33 @@ extern void ForceJump( gentity_t *self, usercmd_t *ucmd );
 
 #define	MAX_CHECK_THRESHOLD	1
 
-extern void NPC_ClearLookTarget( gentity_t *self );
-extern void NPC_SetLookTarget( gentity_t *self, int entNum, int clearTime );
-extern void NPC_TempLookTarget( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
-extern qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3 *maxs, int ignore, int clipmask );
-extern qboolean NPC_CheckEnemyStealth( void );
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
+void NPC_ClearLookTarget( gentity_t *self );
+void NPC_TempLookTarget( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
+qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3 *maxs, int ignore, int clipmask );
+qboolean NPC_CheckEnemyStealth( void );
+void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 
-extern void ForceThrow( gentity_t *self, qboolean pull );
-extern void ForceLightning( gentity_t *self );
-extern void ForceHeal( gentity_t *self );
-extern void ForceRage( gentity_t *self );
-extern void ForceProtect( gentity_t *self );
-extern void ForceAbsorb( gentity_t *self );
-extern int WP_MissileBlockForBlock( int saberBlock );
-extern qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hitLoc, vector3 *point, vector3 *dir, vector3 *bladeDir, int mod );
-extern qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower, int overrideAmt );
-extern qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int overrideAmt );
-extern void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower );
-extern void WP_DeactivateSaber( gentity_t *self, qboolean clearLength ); //clearLength = qfalse
-extern void WP_ActivateSaber( gentity_t *self );
+void ForceLightning( gentity_t *self );
+int WP_MissileBlockForBlock( int saberBlock );
+qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hitLoc, vector3 *point, vector3 *dir, vector3 *bladeDir, int mod );
+qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower, int overrideAmt );
+qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int overrideAmt );
+void WP_DeactivateSaber( gentity_t *self, qboolean clearLength ); //clearLength = qfalse
+void WP_ActivateSaber( gentity_t *self );
 
-extern qboolean PM_SaberInStart( int move );
-extern qboolean BG_SaberInSpecialAttack( int anim );
-extern qboolean BG_SaberInAttack( int move );
-extern qboolean PM_SaberInBounce( int move );
-extern qboolean PM_SaberInParry( int move );
-extern qboolean PM_SaberInKnockaway( int move );
-extern qboolean PM_SaberInBrokenParry( int move );
-extern qboolean PM_SaberInDeflect( int move );
-extern qboolean BG_SpinningSaberAnim( int anim );
-extern qboolean BG_FlippingAnim( int anim );
-extern qboolean PM_RollingAnim( int anim );
-extern qboolean PM_InKnockDown( playerState_t *ps );
-extern qboolean BG_InRoll( playerState_t *ps, int anim );
-extern qboolean BG_CrouchAnim( int anim );
+qboolean PM_SaberInStart( int move );
+qboolean PM_SaberInBounce( int move );
+qboolean PM_SaberInParry( int move );
+qboolean PM_SaberInKnockaway( int move );
+qboolean PM_SaberInBrokenParry( int move );
+qboolean PM_SaberInDeflect( int move );
+qboolean PM_RollingAnim( int anim );
+qboolean PM_InKnockDown( playerState_t *ps );
+qboolean BG_CrouchAnim( int anim );
 
-extern qboolean NPC_SomeoneLookingAtMe(gentity_t *ent);
+qboolean NPC_SomeoneLookingAtMe(gentity_t *ent);
 
-extern int WP_GetVelocityForForceJump( gentity_t *self, vector3 *jumpVel, usercmd_t *ucmd );
-
-extern void G_TestLine(vector3 *start, vector3 *end, int color, int time);
+int WP_GetVelocityForForceJump( gentity_t *self, vector3 *jumpVel, usercmd_t *ucmd );
 
 static void Jedi_Aggression( gentity_t *self, int change );
 qboolean Jedi_WaitingAmbush( gentity_t *self );
@@ -6035,7 +6021,6 @@ static void Jedi_Attack( void )
 }
 
 extern void NPC_BSST_Patrol( void );
-extern void NPC_BSSniper_Default( void );
 void NPC_BSJedi_Default( void )
 {
 

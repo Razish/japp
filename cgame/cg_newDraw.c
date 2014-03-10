@@ -160,9 +160,9 @@ qboolean CG_OwnerDrawVisible( uint32_t flags ) {
 		return CG_YourTeamHasFlag();
 
 	if ( flags & (CG_SHOW_BLUE_TEAM_HAS_REDFLAG|CG_SHOW_RED_TEAM_HAS_BLUEFLAG) ) {
-		if ( flags & CG_SHOW_BLUE_TEAM_HAS_REDFLAG && (cgs.redflag == FLAG_TAKEN || cgs.flagStatus == FLAG_TAKEN_RED) )
+		if ( flags & CG_SHOW_BLUE_TEAM_HAS_REDFLAG && cgs.redflag == FLAG_TAKEN )
 			return qtrue;
-		else if ( flags & CG_SHOW_RED_TEAM_HAS_BLUEFLAG && (cgs.blueflag == FLAG_TAKEN || cgs.flagStatus == FLAG_TAKEN_BLUE) )
+		else if ( flags & CG_SHOW_RED_TEAM_HAS_BLUEFLAG && cgs.blueflag == FLAG_TAKEN )
 			return qtrue;
 		return qfalse;
 	}
@@ -244,8 +244,6 @@ const char *CG_GetGameStatusText(void) {
 	return "";
 }
 
-extern qhandle_t MenuFontToHandle( int iMenuFont );
-
 // maxX param is initially an X limit, but is also used as feedback. 0 = text was clipped to fit within, else maxX = next pos
 void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vector4 *color, const char *text, float adjust,
 	int limit, int iMenuFont )
@@ -296,7 +294,6 @@ void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vect
 
 #define PIC_WIDTH 12
 
-extern const char *CG_GetLocationString( const char *loc ); //cg_main.c
 void CG_DrawNewTeamInfo( rectDef_t *rect, float text_x, float text_y, float scale, const vector4 *color, qhandle_t shader ) {
 	int xx, i, j, len, count;
 	float y, pwidth, lwidth, maxx, leftOver;

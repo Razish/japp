@@ -52,7 +52,6 @@ static const char *TB_LastPickup( void ) {
 		return "";
 }
 
-extern const char *CG_GetLocationString( const char *loc );
 static const char *TB_Location( void ) {
 	return CG_GetLocationString( CG_ConfigString( CS_LOCATIONS + cgs.clientinfo[cg.clientNum].location ) );
 }

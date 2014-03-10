@@ -7,7 +7,6 @@ extern qboolean G_EntIsBreakable( int entityNum );
 extern qboolean G_EntIsRemovableUsable( int entNum );
 extern qboolean G_FindClosestPointOnLineSegment( const vector3 *start, const vector3 *end, const vector3 *from, vector3 *result );
 
-void G_TestLine( vector3 *start, vector3 *end, int color, int time );
 void G_DrawNode( vector3 *origin, int type ) {
 }
 
@@ -23,7 +22,6 @@ qboolean FlyingCreature( gentity_t *ent )
 	return qfalse;
 }
 
-qboolean NAV_CheckAhead( gentity_t *self, vector3 *end, trace_t *trace, int clipmask );
 void NAV_StoreWaypoint( gentity_t *ent );
 
 extern vector3 NPCDEBUG_RED;

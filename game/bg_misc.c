@@ -342,9 +342,7 @@ qboolean BG_FileExists(const char *fileName)
 	return qfalse;
 }
 
-#if defined(_GAME)
-	char *G_NewString( const char *string );
-#elif defined(_CGAME)
+#ifdef _CGAME
 	char *CG_NewString( const char *string );
 #endif
 

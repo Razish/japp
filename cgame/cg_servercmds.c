@@ -527,9 +527,6 @@ void CG_HandleNPCSounds( centity_t *cent ) {
 		memset( &cent->npcClient->jediSounds, 0, sizeof( cent->npcClient->jediSounds ) );
 }
 
-int CG_HandleAppendedSkin( char *modelName );
-void CG_CacheG2AnimInfo( char *modelName );
-
 void SetDuelistHealthsFromConfigString( const char *str ) {
 	char buf[64];
 	int c = 0, i = 0;

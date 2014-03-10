@@ -66,8 +66,7 @@ G_RunObject
   TODO:  When free-floating in air, apply some friction to your trDelta (based on mass?)
 ================
 */
-extern void DoImpact( gentity_t *self, gentity_t *other, qboolean damageSelf );
-extern void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope );
+void DoImpact( gentity_t *self, gentity_t *other, qboolean damageSelf );
 void G_RunObject( gentity_t *ent )
 {
 	vector3		origin, oldOrg;

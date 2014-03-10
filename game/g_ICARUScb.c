@@ -1852,7 +1852,6 @@ MoveOwner
   Argument		: sharedEntity_t *self
 ============
 */
-qboolean SpotWouldTelefrag2( gentity_t *mover, vector3 *dest );
 void MoveOwner( gentity_t *self )
 {
 	gentity_t *owner = &g_entities[self->r.ownerNum];

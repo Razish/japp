@@ -34,7 +34,6 @@ enum
 	LSTATE_FIRED4,
 };
 
-qboolean NPC_CheckPlayerTeamStealth( void );
 void Mark1_BlasterAttack(qboolean advance);
 void DeathFX( gentity_t *ent );
 

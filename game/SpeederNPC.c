@@ -308,12 +308,8 @@ void ProcessOrientCommands( Vehicle_t *pVeh )
 
 #ifdef _GAME
 
-extern void PM_SetAnim(pmove_t	*pm,int setAnimParts,int anim,int setAnimFlags, int blendTime);
-extern int PM_AnimLength( int index, animNumber_t anim );
-
 // This function makes sure that the vehicle is properly animated.
-void AnimateVehicle( Vehicle_t *pVeh )
-{
+void AnimateVehicle( Vehicle_t *pVeh ) {
 }
 
 #endif //_GAME

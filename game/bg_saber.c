@@ -860,20 +860,14 @@ int PM_SaberLockWinAnim( qboolean victory, qboolean superBreak )
 }
 
 // Need to avoid nesting namespaces!
-#ifdef _GAME //including game headers on cgame is FORBIDDEN ^_^
-
-#include "g_local.h"
-extern void NPC_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags );
-extern gentity_t g_entities[];
-
+#ifdef _GAME
+	#include "g_local.h"
+	extern void NPC_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags );
 #elif defined _CGAME
-
-#include "cg_local.h" //ahahahahhahahaha@$!$!
-
+	#include "cg_local.h"
 #endif
 
-int PM_SaberLockLoseAnim( playerState_t *genemy, qboolean victory, qboolean superBreak )
-{
+int PM_SaberLockLoseAnim( playerState_t *genemy, qboolean victory, qboolean superBreak ) {
 	int loseAnim = -1;
 	switch ( genemy->torsoAnim )
 	{
@@ -1834,7 +1828,6 @@ float PM_WalkableGroundDistance(void)
 	return VectorLength(&down);
 }
 
-qboolean BG_SaberInTransitionAny( int move );
 static qboolean PM_CanDoDualDoubleAttacks( void )
 {
 	if ( pm->ps->weapon == WP_SABER )

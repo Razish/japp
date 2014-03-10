@@ -9,53 +9,43 @@
 
 extern void G_DebugPrint( int level, const char *format, ... );
 
-extern qboolean G_CheckInSolid (gentity_t *self, qboolean fix);
-extern qboolean ClientUserinfoChanged( int clientNum );
-extern qboolean SpotWouldTelefrag2( gentity_t *mover, vector3 *dest );
-extern void Jedi_Cloak( gentity_t *self );
+void Jedi_Cloak( gentity_t *self );
 
-extern void Q3_SetParm (int entID, int parmNum, const char *parmValue);
-extern team_t TranslateTeamName( const char *name );
+void Q3_SetParm (int entID, int parmNum, const char *parmValue);
+team_t TranslateTeamName( const char *name );
 extern char	*TeamNames[TEAM_NUM_TEAMS];
 
-extern void PM_SetTorsoAnimTimer( gentity_t *ent, int *torsoAnimTimer, int time );
-extern void PM_SetLegsAnimTimer( gentity_t *ent, int *legsAnimTimer, int time );
+void PM_SetTorsoAnimTimer( gentity_t *ent, int *torsoAnimTimer, int time );
+void PM_SetLegsAnimTimer( gentity_t *ent, int *legsAnimTimer, int time );
 
-extern void ST_ClearTimers( gentity_t *ent );
-extern void Jedi_ClearTimers( gentity_t *ent );
-extern void NPC_ShadowTrooper_Precache( void );
-extern void NPC_Gonk_Precache( void );
-extern void NPC_Mouse_Precache( void );
-extern void NPC_Seeker_Precache( void );
-extern void NPC_Remote_Precache( void );
-extern void	NPC_R2D2_Precache(void);
-extern void	NPC_R5D2_Precache(void);
-extern void NPC_Probe_Precache(void);
-extern void NPC_Interrogator_Precache(gentity_t *self);
-extern void NPC_MineMonster_Precache( void );
-extern void NPC_Howler_Precache( void );
-extern void NPC_ATST_Precache(void);
-extern void NPC_Sentry_Precache(void);
-extern void NPC_Mark1_Precache(void);
-extern void NPC_Mark2_Precache(void);
-extern void NPC_GalakMech_Precache( void );
-extern void NPC_GalakMech_Init( gentity_t *ent );
-extern void NPC_Protocol_Precache( void );
-extern void Boba_Precache( void );
-extern void NPC_Wampa_Precache( void );
+void ST_ClearTimers( gentity_t *ent );
+void Jedi_ClearTimers( gentity_t *ent );
+void NPC_ShadowTrooper_Precache( void );
+void NPC_Gonk_Precache( void );
+void NPC_Mouse_Precache( void );
+void NPC_Seeker_Precache( void );
+void NPC_Remote_Precache( void );
+void NPC_R2D2_Precache(void);
+void NPC_R5D2_Precache(void);
+void NPC_Probe_Precache(void);
+void NPC_Interrogator_Precache(gentity_t *self);
+void NPC_MineMonster_Precache( void );
+void NPC_Howler_Precache( void );
+void NPC_ATST_Precache(void);
+void NPC_Sentry_Precache(void);
+void NPC_Mark1_Precache(void);
+void NPC_Mark2_Precache(void);
+void NPC_GalakMech_Precache( void );
+void NPC_GalakMech_Init( gentity_t *ent );
+void NPC_Protocol_Precache( void );
+void Boba_Precache( void );
+void NPC_Wampa_Precache( void );
 gentity_t *NPC_SpawnType( gentity_t *ent, const char *npc_type, const char *targetname, qboolean isVehicle, vector3 *origin );
 
-extern void Rancor_SetBolts( gentity_t *self );
-extern void Wampa_SetBolts( gentity_t *self );
+void Rancor_SetBolts( gentity_t *self );
+void Wampa_SetBolts( gentity_t *self );
 
 #define	NSF_DROP_TO_FLOOR	16
-
-// PAIN functions...
-typedef void (PAIN_FUNC)( gentity_t *self, gentity_t *attacker, int damage );
-extern PAIN_FUNC funcBBrushPain, misc_model_breakable_pain, NPC_Pain, station_pain, func_usable_pain, NPC_ATST_Pain,
-	NPC_ST_Pain, NPC_Jedi_Pain, NPC_Droid_Pain, NPC_Probe_Pain, NPC_MineMonster_Pain, NPC_Howler_Pain, NPC_Seeker_Pain,
-	NPC_Remote_Pain, emplaced_gun_pain, NPC_Mark1_Pain, NPC_GM_Pain, NPC_Sentry_Pain, NPC_Mark2_Pain, PlayerPain, GasBurst,
-	CrystalCratePain, TurretPain, NPC_Wampa_Pain, NPC_Rancor_Pain;
 
 int WP_SetSaberModel( gclient_t *client, class_t npcClass )
 {

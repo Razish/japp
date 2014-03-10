@@ -592,7 +592,6 @@ qboolean CG_UsingEWeb( void ) {
 }
 
 extern void CG_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha );
-extern vmCvar_t cg_showVehBounds;
 pmove_t cg_vehPmove;
 qboolean cg_vehPmoveSet = qfalse;
 
