@@ -3435,7 +3435,7 @@ The down side would be that it does not necessarily look alright from a
 first person perspective.
 ===============
 */
-void CalcMuzzlePoint ( gentity_t *ent, vector3 *forward, vector3 *right, vector3 *up, vector3 *muzzlePoint )
+void CalcMuzzlePoint ( const gentity_t *ent, vector3 *forward, vector3 *right, vector3 *up, vector3 *muzzlePoint )
 {
 	vector3 muzzleOffPoint;
 

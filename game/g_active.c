@@ -101,7 +101,6 @@ void P_DamageFeedback( gentity_t *player ) {
 	//
 	client->damage_blood = 0;
 	client->damage_armor = 0;
-	client->damage_knockback = 0;
 }
 
 
@@ -2601,200 +2600,17 @@ void ClientThink_real( gentity_t *ent ) {
 		}
 	}
 
-	if (ent->client->doingThrow > level.time)
-	{
-		gentity_t *throwee = &g_entities[ent->client->throwingIndex];
-
-		if (!throwee->inuse || !throwee->client || throwee->health < 1 ||
-			throwee->client->sess.sessionTeam == TEAM_SPECTATOR ||
-			(throwee->client->ps.pm_flags & PMF_FOLLOW) ||
-			throwee->client->throwingIndex != ent->s.number)
-		{
-			ent->client->doingThrow = 0;
-			ent->client->ps.forceHandExtend = HANDEXTEND_NONE;
-
-			if (throwee->inuse && throwee->client)
-			{
-				throwee->client->ps.heldByClient = 0;
-				throwee->client->beingThrown = 0;
-
-				if (throwee->client->ps.forceHandExtend != HANDEXTEND_POSTTHROWN)
-				{
-					throwee->client->ps.forceHandExtend = HANDEXTEND_NONE;
-				}
-			}
-		}
-	}
-
-	if (ent->client->beingThrown > level.time)
-	{
-		gentity_t *thrower = &g_entities[ent->client->throwingIndex];
-
-		if (!thrower->inuse || !thrower->client || thrower->health < 1 ||
-			thrower->client->sess.sessionTeam == TEAM_SPECTATOR ||
-			(thrower->client->ps.pm_flags & PMF_FOLLOW) ||
-			thrower->client->throwingIndex != ent->s.number)
-		{
-			ent->client->ps.heldByClient = 0;
-			ent->client->beingThrown = 0;
-
-			if (ent->client->ps.forceHandExtend != HANDEXTEND_POSTTHROWN)
-			{
-				ent->client->ps.forceHandExtend = HANDEXTEND_NONE;
-			}
-
-			if (thrower->inuse && thrower->client)
-			{
-				thrower->client->doingThrow = 0;
-				thrower->client->ps.forceHandExtend = HANDEXTEND_NONE;
-			}
-		}
-		else if (thrower->inuse && thrower->client && thrower->ghoul2 &&
-			trap->G2API_HaveWeGhoul2Models(thrower->ghoul2))
-		{
-#if 0
-			int lHandBolt = trap->G2API_AddBolt(thrower->ghoul2, 0, "*l_hand");
-			int pelBolt = trap->G2API_AddBolt(thrower->ghoul2, 0, "pelvis");
-
-
-			if (lHandBolt != -1 && pelBolt != -1)
-#endif
-			{
-				float pDif = 40.0f;
-				vector3 boltOrg, pBoltOrg;
-				vector3 tAngles;
-				vector3 vDif;
-				vector3 entDir, otherAngles;
-				vector3 fwd, right;
-
-				//Always look at the thrower.
-				VectorSubtract( &thrower->client->ps.origin, &ent->client->ps.origin, &entDir );
-				VectorCopy( &ent->client->ps.viewangles, &otherAngles );
-				otherAngles.yaw = vectoyaw( &entDir );
-				SetClientViewAngle( ent, &otherAngles );
-
-				VectorCopy(&thrower->client->ps.viewangles, &tAngles);
-				tAngles.pitch = tAngles.roll = 0;
-
-				//Get the direction between the pelvis and position of the hand
-				VectorCopy(&thrower->client->ps.origin, &pBoltOrg);
-				AngleVectors(&tAngles, &fwd, &right, 0);
-				boltOrg.x = pBoltOrg.x + fwd.x*8 + right.x*pDif;
-				boltOrg.y = pBoltOrg.y + fwd.y*8 + right.y*pDif;
-				boltOrg.z = pBoltOrg.z;
-				//G_TestLine(boltOrg, pBoltOrg, 0x0000ff, 50);
-
-				VectorSubtract(&ent->client->ps.origin, &boltOrg, &vDif);
-				if (VectorLength(&vDif) > 32.0f && (thrower->client->doingThrow - level.time) < 4500)
-				{ //the hand is too far away, and can no longer hold onto us, so escape.
-					ent->client->ps.heldByClient = 0;
-					ent->client->beingThrown = 0;
-					thrower->client->doingThrow = 0;
-
-					thrower->client->ps.forceHandExtend = HANDEXTEND_NONE;
-					G_EntitySound( thrower, CHAN_VOICE, G_SoundIndex("*pain25.wav") );
-
-					ent->client->ps.forceDodgeAnim = 2;
-					ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-					ent->client->ps.forceHandExtendTime = level.time + 500;
-					ent->client->ps.velocity.z = 400;
-					G_PreDefSound(&ent->client->ps.origin, PDSOUND_FORCEJUMP);
-				}
-				else if ((client->beingThrown - level.time) < 4000)
-				{ //step into the next part of the throw, and go flying back
-					float vScale = 400.0f;
-					ent->client->ps.forceHandExtend = HANDEXTEND_POSTTHROWN;
-					ent->client->ps.forceHandExtendTime = level.time + 1200;
-					ent->client->ps.forceDodgeAnim = 0;
-
-					thrower->client->ps.forceHandExtend = HANDEXTEND_POSTTHROW;
-					thrower->client->ps.forceHandExtendTime = level.time + 200;
-
-					ent->client->ps.heldByClient = 0;
-
-					ent->client->ps.heldByClient = 0;
-					ent->client->beingThrown = 0;
-					thrower->client->doingThrow = 0;
-
-					AngleVectors(&thrower->client->ps.viewangles, &vDif, 0, 0);
-					ent->client->ps.velocity.x = vDif.x*vScale;
-					ent->client->ps.velocity.y = vDif.y*vScale;
-					ent->client->ps.velocity.z = 400;
-
-					G_EntitySound( ent, CHAN_VOICE, G_SoundIndex("*pain100.wav") );
-					G_EntitySound( thrower, CHAN_VOICE, G_SoundIndex("*jump1.wav") );
-
-					//Set the thrower as the "other killer", so if we die from fall/impact damage he is credited.
-					ent->client->ps.otherKiller = thrower->s.number;
-					ent->client->ps.otherKillerTime = level.time + 8000;
-					ent->client->ps.otherKillerDebounceTime = level.time + 100;
-				}
-				else
-				{ //see if we can move to be next to the hand.. if it's not clear, break the throw.
-					vector3 intendedOrigin;
-					trace_t tr;
-					trace_t tr2;
-
-					VectorSubtract(&boltOrg, &pBoltOrg, &vDif);
-					VectorNormalize(&vDif);
-
-					VectorClear(&ent->client->ps.velocity);
-					intendedOrigin.x = pBoltOrg.x + vDif.x*pDif;
-					intendedOrigin.y = pBoltOrg.y + vDif.y*pDif;
-					intendedOrigin.z = thrower->client->ps.origin.z;
-
-					trap->Trace(&tr, &intendedOrigin, &ent->r.mins, &ent->r.maxs, &intendedOrigin, ent->s.number, ent->clipmask, qfalse, 0, 0);
-					trap->Trace(&tr2, &ent->client->ps.origin, &ent->r.mins, &ent->r.maxs, &intendedOrigin, ent->s.number, CONTENTS_SOLID, qfalse, 0, 0);
-
-					if (tr.fraction == 1.0f && !tr.startsolid && tr2.fraction == 1.0f && !tr2.startsolid)
-					{
-						VectorCopy(&intendedOrigin, &ent->client->ps.origin);
-
-						if ((client->beingThrown - level.time) < 4800)
-						{
-							ent->client->ps.heldByClient = thrower->s.number+1;
-						}
-					}
-					else
-					{ //if the guy can't be put here then it's time to break the throw off.
-						ent->client->ps.heldByClient = 0;
-						ent->client->beingThrown = 0;
-						thrower->client->doingThrow = 0;
-
-						thrower->client->ps.forceHandExtend = HANDEXTEND_NONE;
-						G_EntitySound( thrower, CHAN_VOICE, G_SoundIndex("*pain25.wav") );
-
-						ent->client->ps.forceDodgeAnim = 2;
-						ent->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-						ent->client->ps.forceHandExtendTime = level.time + 500;
-						ent->client->ps.velocity.z = 400;
-						G_PreDefSound(&ent->client->ps.origin, PDSOUND_FORCEJUMP);
-					}
-				}
-			}
-		}
-	}
-	else if (ent->client->ps.heldByClient)
-	{
+	if ( ent->client->ps.heldByClient )
 		ent->client->ps.heldByClient = 0;
-	}
 
+	// Will probably never need this again, since we have g2 properly serverside now.
 	/*
-	if ( client->ps.powerups[PW_HASTE] ) {
-		client->ps.speed *= 1.3f;
-	}
-	*/
-
-	//Will probably never need this again, since we have g2 properly serverside now.
-	//But just in case.
-	/*
-	if (client->ps.usingATST && ent->health > 0)
-	{ //we have special shot clip boxes as an ATST
+	if ( client->ps.usingATST && ent->health > 0 ) {
+		// we have special shot clip boxes as an ATST
 		ent->r.contents |= CONTENTS_NOSHOT;
-		ATST_ManageDamageBoxes(ent);
+		ATST_ManageDamageBoxes( ent );
 	}
-	else
-	{
+	else {
 		ent->r.contents &= ~CONTENTS_NOSHOT;
 		client->damageBoxHandle_Head = 0;
 		client->damageBoxHandle_RLeg = 0;
@@ -2802,13 +2618,10 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 	*/
 
-	//rww - moved this stuff into the pmove code so that it's predicted properly
-	//BG_AdjustClientSpeed(&client->ps, &client->pers.cmd, level.time);
-
 	// set up for pmove
 	oldEventSequence = client->ps.eventSequence;
 
-	memset (&pm, 0, sizeof(pm));
+	memset( &pm, 0, sizeof( pm ) );
 
 	if ( ent->flags & FL_FORCE_GESTURE ) {
 		ent->flags &= ~FL_FORCE_GESTURE;
@@ -2954,23 +2767,6 @@ void ClientThink_real( gentity_t *ent ) {
 	pm.noSpecMove = g_noSpecMove.integer;
 
 	pm.nonHumanoid = (ent->localAnimIndex > 0);
-
-	VectorCopy( &client->ps.origin, &client->oldOrigin );
-
-	/*
-	if (level.intermissionQueued != 0 && g_singlePlayer.integer) {
-		if ( level.time - level.intermissionQueued >= 1000  ) {
-			pm.cmd.buttons = 0;
-			pm.cmd.forwardmove = 0;
-			pm.cmd.rightmove = 0;
-			pm.cmd.upmove = 0;
-			if ( level.time - level.intermissionQueued >= 2000 && level.time - level.intermissionQueued <= 2500 ) {
-				trap->SendConsoleCommand( EXEC_APPEND, "centerview\n");
-			}
-			ent->client->ps.pm_type = PM_SPINTERMISSION;
-		}
-	}
-	*/
 
 	//Set up bg entity data
 	pm.baseEnt = (bgEntity_t *)g_entities;
@@ -4008,8 +3804,8 @@ void ClientEndFrame( gentity_t *ent ) {
 		ent->client->pers.teamState.lastfraggedcarrier += time_delta;
 		ent->client->respawnTime += time_delta;
 		ent->pain_debounce_time += time_delta;
-		ent->client->force.drainDebounce += time_delta;
-		ent->client->force.lightningDebounce += time_delta;
+		ent->client->forceDebounce.drain += time_delta;
+		ent->client->forceDebounce.lightning += time_delta;
 		ent->client->ps.fd.forcePowerRegenDebounceTime += time_delta;
 	}
 

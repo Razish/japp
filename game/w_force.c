@@ -4166,10 +4166,10 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 		}
 		else
 		{
-			while ( self->client->force.drainDebounce < level.time )
+			while ( self->client->forceDebounce.drain < level.time )
 			{
 				ForceShootDrain( self );
-				self->client->force.drainDebounce += FORCE_DEBOUNCE_TIME;
+				self->client->forceDebounce.drain += FORCE_DEBOUNCE_TIME;
 			}
 		}
 		break;
@@ -4195,11 +4195,11 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 		}
 		else
 		{
-			while ( self->client->force.lightningDebounce < level.time )
+			while ( self->client->forceDebounce.lightning < level.time )
 			{
 				ForceShootLightning( self );
 				BG_ForcePowerDrain( &self->client->ps, forcePower, 0 );
-				self->client->force.lightningDebounce += FORCE_DEBOUNCE_TIME;
+				self->client->forceDebounce.lightning += FORCE_DEBOUNCE_TIME;
 			}
 		}
 		break;
@@ -5166,9 +5166,9 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 	}
 
 	if ( !(self->client->ps.fd.forcePowersActive & (1<<FP_DRAIN)) )
-		self->client->force.drainDebounce = level.time;
+		self->client->forceDebounce.drain = level.time;
 	if ( !(self->client->ps.fd.forcePowersActive & (1<<FP_LIGHTNING)) )
-		self->client->force.lightningDebounce = level.time;
+		self->client->forceDebounce.lightning = level.time;
 
 	if ( (!self->client->ps.fd.forcePowersActive || self->client->ps.fd.forcePowersActive == (1 << FP_DRAIN)) &&
 			!self->client->ps.saberInFlight && (self->client->ps.weapon != WP_SABER || !BG_SaberInSpecial(self->client->ps.saberMove)) )

@@ -5454,7 +5454,7 @@ qboolean Q3_Set( int taskID, int entID, const char *type_name, const char *data 
 	case SET_PARM14:
 	case SET_PARM15:
 	case SET_PARM16:
-		Q3_SetParm( entID, (toSet-SET_PARM1), (char *) data );
+		Q3_SetParm( entID, (toSet-SET_PARM1), data );
 		break;
 
 	case SET_SPAWNSCRIPT:

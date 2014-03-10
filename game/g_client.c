@@ -3224,7 +3224,6 @@ void ClientSpawn(gentity_t *ent) {
 //	client->areabits = savedAreaBits;
 	client->accuracy_hits = accuracy_hits;
 	client->accuracy_shots = accuracy_shots;
-	client->lastkilled_client = -1;
 
 	for ( i=0; i<MAX_PERSISTANT; i++ )
 		client->ps.persistant[i] = persistant[i];
@@ -3847,7 +3846,6 @@ void ClientDisconnect( int clientNum ) {
 	if ( level.gametype == GT_DUEL && ent->client->sess.sessionTeam == TEAM_FREE && level.intermissiontime ) {
 		trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
 		level.restarted = qtrue;
-		level.changemap = NULL;
 		level.intermissiontime = 0;
 	}
 

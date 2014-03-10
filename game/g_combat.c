@@ -2137,8 +2137,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	}
 
 	self->client->ps.heldByClient = 0;
-	self->client->beingThrown = 0;
-	self->client->doingThrow = 0;
 	BG_ClearRocketLock( &self->client->ps );
 	self->client->isHacking = 0;
 	self->client->ps.hackingTime = 0;
@@ -2261,8 +2259,6 @@ extern void RunEmplacedWeapon( gentity_t *ent, usercmd_t **ucmd );
 	}
 
 	if (attacker && attacker->client) {
-		attacker->client->lastkilled_client = self->s.number;
-
 		G_CheckVictoryScript(attacker);
 
 		if ( attacker == self || OnSameTeam (self, attacker ) ) {
@@ -4835,7 +4831,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		}
 		client->damage_armor += asave;
 		client->damage_blood += take;
-		client->damage_knockback += knockback;
 		if ( dir ) {
 			VectorCopy ( dir, &client->damage_from );
 			client->damage_fromWorld = qfalse;
@@ -4857,12 +4852,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 	// See if it's the player hurting the emeny flag carrier
 	if( level.gametype == GT_CTF || level.gametype == GT_CTY) {
 		Team_CheckHurtCarrier(targ, attacker);
-	}
-
-	if (targ->client) {
-		// set the last client who damaged the target
-		targ->client->lasthurt_client = attacker->s.number;
-		targ->client->lasthurt_mod = mod;
 	}
 
 	if ( !(dflags & DAMAGE_NO_PROTECTION) )

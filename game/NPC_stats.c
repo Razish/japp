@@ -3181,7 +3181,7 @@ Ghoul2 Insert Start
 
 		if (!NPC->NPC_type)
 		{ //just do this for now so NPC_Precache can see the name.
-			NPC->NPC_type = (char *)NPCName;
+			NPC->NPC_type = NPCName;
 			setTypeBack = qtrue;
 		}
 

@@ -132,7 +132,7 @@ void CalcEntitySpot ( const gentity_t *ent, const spot_t spot, vector3 *point )
 		{
 			AngleVectors( &ent->client->ps.viewangles, &forward, &right, &up );
 		}
-		CalcMuzzlePoint( (gentity_t*)ent, &forward, &right, &up, point );
+		CalcMuzzlePoint( ent, &forward, &right, &up, point );
 		//NOTE: automatically takes leaning into account!
 		break;
 

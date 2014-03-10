@@ -429,7 +429,7 @@ void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, 
 		case F_PARM14:
 		case F_PARM15:
 		case F_PARM16:
-			Q3_SetParm( ((gentity_t *)(ent))->s.number, (f->type - F_PARM1), (char *) value );
+			Q3_SetParm( ((gentity_t *)(ent))->s.number, (f->type - F_PARM1), value );
 			break;
 #endif
 		default:

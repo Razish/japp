@@ -1512,7 +1512,6 @@ void ExitLevel (void) {
 			if ( !level.restarted ) {
 				trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
 				level.restarted = qtrue;
-				level.changemap = NULL;
 				level.intermissiontime = 0;
 			}
 			return;
@@ -1532,7 +1531,6 @@ void ExitLevel (void) {
 	{
 		trap->SendConsoleCommand( EXEC_APPEND, "vstr nextmap\n" );
 	}
-	level.changemap = NULL;
 	level.intermissiontime = 0;
 
 	if (level.gametype == GT_SIEGE &&
