@@ -2346,21 +2346,8 @@ qboolean NPC_CheckCanAttack (float attack_scale, qboolean stationary)
 			if( !dead_on )
 			{//We're not going to hit him directly, try a suppressing fire
 				//see if where we're going to shoot is too far from his origin
-				if(traceEnt && (traceEnt->health <= 30 || EntIsGlass(traceEnt)))
-				{//easy to kill - go for it
-					//if(traceEnt->die == ExplodeDeath_Wait && traceEnt->splashDamage)
-					if (0) //rwwFIXMEFIXME: ExplodeDeath_Wait?
-					{//going to explode, don't shoot if close to self
-						VectorSubtract(&NPC->r.currentOrigin, &traceEnt->r.currentOrigin, &diff);
-						if(VectorLengthSquared(&diff) < traceEnt->splashRadius*traceEnt->splashRadius)
-						{//Too close to shoot!
-							attack_ok = qfalse;
-						}
-						else
-						{//Hey, it might kill him, do it!
-							attack_scale *= 2;//
-						}
-					}
+				if ( traceEnt && (traceEnt->health <= 30 || EntIsGlass( traceEnt )) ) {
+					// easy to kill - go for it
 				}
 				else
 				{

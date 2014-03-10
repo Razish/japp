@@ -944,7 +944,6 @@ void turret_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int 
 
 	g_entities[self->genericValue3].client->ps.fd.sentryDeployed = qfalse;
 
-	//ExplodeDeath( self );
 	G_FreeEntity( self );
 }
 
