@@ -211,7 +211,7 @@ sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
 		}
 	}
 
-	if ( cgs.gametype == GT_SIEGE ) {
+	{//if ( cgs.gametype == GT_SIEGE ) {
 		for ( i=0; i<MAX_CUSTOM_SIEGE_SOUNDS; i++ ) {
 			if ( !bg_customSiegeSoundNames[i] ) {
 				numCSiegeSounds = i;
@@ -228,9 +228,9 @@ sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
 	}
 
 	for ( i=0; i<MAX_CUSTOM_SOUNDS; i++ ) {
-		if ( i < numCSounds && !strcmp( lSoundName, cg_customSoundNames[i] ) )
+			 if ( i < numCSounds && !strcmp( lSoundName, cg_customSoundNames[i] ) )
 			return ci->sounds[i];
-		else if ( cgs.gametype == GT_SIEGE && i < numCSiegeSounds && !strcmp( lSoundName, bg_customSiegeSoundNames[i] ) ) //siege only
+		else if ( i < numCSiegeSounds && !strcmp( lSoundName, bg_customSiegeSoundNames[i] ) ) //siege only
 			return ci->siegeSounds[i];
 		else if ( i < numCDuelSounds && !strcmp( lSoundName, cg_customDuelSoundNames[i] ) ) // taunts etc
 			return ci->duelSounds[i];
@@ -655,7 +655,7 @@ void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 		}
 	}
 
-	if ( cgs.gametype == GT_SIEGE ) {
+	{//if ( cgs.gametype == GT_SIEGE ) {
 		for ( i=0; i<MAX_CUSTOM_SIEGE_SOUNDS; i++ ) {
 			s = bg_customSiegeSoundNames[i];
 			if ( !s )
@@ -683,9 +683,8 @@ void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 		}
 	}
 
-	//Raz: ignore the check for duel gametypes, we can taunt in any gametype
-	//if ( cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL )
-	{ //load the Duel sounds then
+	{//if ( cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL ) {
+		// load the Duel sounds then
 		for ( i=0; i<MAX_CUSTOM_DUEL_SOUNDS; i++ ) {
 			s = cg_customDuelSoundNames[i];
 			if ( !s )

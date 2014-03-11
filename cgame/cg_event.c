@@ -1221,18 +1221,14 @@ const char	*cg_stringEdVoiceChatTable[MAX_CUSTOM_SIEGE_SOUNDS] =
 };
 
 //stupid way of figuring out what string to use for voice chats
-const char *CG_GetStringForVoiceSound(const char *s)
-{
-	int i = 0;
-	while (i < MAX_CUSTOM_SIEGE_SOUNDS)
-	{
-		if (bg_customSiegeSoundNames[i] &&
-			!Q_stricmp(bg_customSiegeSoundNames[i], s))
-		{ //get the matching reference name
-			assert(cg_stringEdVoiceChatTable[i]);
-			return CG_GetStringEdString("MENUS", (char *)cg_stringEdVoiceChatTable[i]);
+const char *CG_GetStringForVoiceSound( const char *s ) {
+	int i;
+	for ( i=0; i<MAX_CUSTOM_SIEGE_SOUNDS; i++ ) {
+		if ( bg_customSiegeSoundNames[i] && !Q_stricmp( bg_customSiegeSoundNames[i], s ) ) {
+			// get the matching reference name
+			assert( cg_stringEdVoiceChatTable[i] );
+			return CG_GetStringEdString( "MENUS", cg_stringEdVoiceChatTable[i] );
 		}
-		i++;
 	}
 
 	return "voice chat";
@@ -3162,42 +3158,34 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 
 	case EV_VOICECMD_SOUND:
 		DEBUGNAME("EV_VOICECMD_SOUND");
-		if (es->groundEntityNum >= MAX_CLIENTS)
-		{ //don't ever use this unless it is being used on a real client
-			break;
-		}
-		{
-			sfxHandle_t sfx = cgs.gameSounds[ es->eventParm ];
-		//	clientInfo_t *ci = &cgs.clientinfo[es->groundEntityNum];
+		if ( es->groundEntityNum >= 0 && es->groundEntityNum < MAX_CLIENTS ) {
+			sfxHandle_t sfx = cgs.gameSounds[es->eventParm];
 			centity_t *vChatEnt = &cg_entities[es->groundEntityNum];
-			char descr[1024] = {0};
+			char descr[1024];
 
 			ci = &cgs.clientinfo[es->groundEntityNum];
 
 			Q_strncpyz( descr, CG_GetStringForVoiceSound( CG_ConfigString( CS_SOUNDS + es->eventParm ) ), sizeof( descr ) );
 
-			if (!sfx)
-			{
+			if ( !sfx ) {
 				s = CG_ConfigString( CS_SOUNDS + es->eventParm );
 				sfx = CG_CustomSound( es->groundEntityNum, s );
 			}
 
-			if (sfx)
-			{
-				if (es->groundEntityNum != cg.predictedPlayerState.clientNum)
-				{ //play on the head as well to simulate hearing in radio and in world
-					if (ci->team == cg.predictedPlayerState.persistant[PERS_TEAM])
-					{ //don't hear it if this person is on the other team, but they can still
-						//hear it in the world spot.
-						trap->S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_MENU1, sfx);
+			if ( sfx ) {
+				if ( es->groundEntityNum != cg.predictedPlayerState.clientNum ) {
+					// play on the head as well to simulate hearing in radio and in world
+					if ( ci->team == cg.predictedPlayerState.persistant[PERS_TEAM] ) {
+						// don't hear it if this person is on the other team, but they can still hear it in the world spot.
+						trap->S_StartSound( NULL, cg.snap->ps.clientNum, CHAN_MENU1, sfx );
 					}
 				}
-				if (ci->team == cg.predictedPlayerState.persistant[PERS_TEAM])
-				{ //add to the chat box
-					//hear it in the world spot.
-					char vchatstr[1024] = {0};
-					Q_strncpyz( vchatstr, va( "<%s"S_COLOR_WHITE"> %s\n", ci->name, descr ), sizeof( vchatstr ) );
-					trap->Print(vchatstr);
+				if ( ci->team == cg.predictedPlayerState.persistant[PERS_TEAM] ) {
+					// add to the chat box
+					// hear it in the world spot.
+					char vchatstr[1024];
+					Q_strncpyz( vchatstr, va( "<%s" S_COLOR_WHITE "> %s\n", ci->name, descr ), sizeof( vchatstr ) );
+					trap->Print( vchatstr );
 					if ( !cg_newChatbox.integer )
 						CG_ChatBox_AddString( vchatstr );
 					else
@@ -3205,7 +3193,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 				}
 
 				//and play in world for everyone
-				trap->S_StartSound (NULL, es->groundEntityNum, CHAN_VOICE, sfx);
+				trap->S_StartSound( NULL, es->groundEntityNum, CHAN_VOICE, sfx );
 				vChatEnt->vChatTime = cg.time + 1000;
 			}
 		}

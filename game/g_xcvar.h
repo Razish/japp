@@ -154,6 +154,7 @@ XCVAR_DEF( japp_allowLedgeGrab,				"0",					CVU_Ledge,		CVAR_NONE,										qtru
 XCVAR_DEF( japp_allowSaberSwitch,			"0",					NULL,			CVAR_NONE,										qtrue )
 XCVAR_DEF( japp_allowStab,					"1",					CVU_Stab,		CVAR_NONE,										qtrue )
 XCVAR_DEF( japp_allowToggleSpecialAttacks,	"0",					CVU_ToggleAtk,	CVAR_NONE,										qtrue )
+XCVAR_DEF( japp_allowVoiceChat,				"960",					NULL,			CVAR_NONE,										qfalse )
 XCVAR_DEF( japp_allowWeaponDrop,			"0",					NULL,			CVAR_NONE,										qtrue )
 XCVAR_DEF( japp_allowWeaponPull,			"1",					NULL,			CVAR_NONE,										qtrue )
 XCVAR_DEF( japp_alwaysSpawnPowerups,		"0",					NULL,			CVAR_NONE,										qfalse )

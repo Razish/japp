@@ -96,8 +96,7 @@ const int bgToggleableSurfaceDebris[BG_NUM_TOGGLEABLE_SURFACES] =
 	-1
 };
 
-const char	*bg_customSiegeSoundNames[MAX_CUSTOM_SIEGE_SOUNDS] =
-{
+const char	*bg_customSiegeSoundNames[MAX_CUSTOM_SIEGE_SOUNDS] = {
 	"*att_attack",
 	"*att_primary",
 	"*att_second",

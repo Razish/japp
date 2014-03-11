@@ -470,7 +470,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		navCalcPathTime = 0;
 	}
 
-	if ( level.gametype == GT_SIEGE )
+//	if ( level.gametype == GT_SIEGE )
 	{//just get these configstrings registered now...
 		for ( i=0; i<MAX_CUSTOM_SIEGE_SOUNDS; i++ )
 		{

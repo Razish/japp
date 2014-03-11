@@ -1172,6 +1172,11 @@ static void Cmd_VoiceCommand_f( gentity_t *ent ) {
 	if ( trap->Argc() < 2 )
 		return;
 
+	if ( !(japp_allowVoiceChat.integer & (1<<level.gametype)) ) {
+		trap->SendServerCommand( ent-g_entities, "print \"voice_cmd is not applicable in this gametype\n\"" );
+		return;
+	}
+
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR || ent->client->tempSpectate >= level.time ) {
 		trap->SendServerCommand( ent-g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NOVOICECHATASSPEC" ) ) );
 		return;
@@ -3086,7 +3091,7 @@ static const command_t commands[] = {
 	{ "team",				Cmd_Team_f,					GTB_ALL,					CMDFLAG_NOINTERMISSION },
 	{ "tell",				Cmd_Tell_f,					GTB_ALL,					0 },
 	{ "t_use",				Cmd_TargetUse_f,			GTB_ALL,					CMDFLAG_CHEAT|CMDFLAG_ALIVE },
-	{ "voice_cmd",			Cmd_VoiceCommand_f,			GTB_ALL & ~(GTB_NOTTEAM),	0 },
+	{ "voice_cmd",			Cmd_VoiceCommand_f,			GTB_ALL,					0 },
 	{ "vote",				Cmd_Vote_f,					GTB_ALL,					CMDFLAG_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				GTB_ALL,					CMDFLAG_NOINTERMISSION },
 	{ "whoischan",			Cmd_WhoisChannel_f,			GTB_ALL,					0 },
