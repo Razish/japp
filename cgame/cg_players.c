@@ -6033,7 +6033,7 @@ void CG_G2AnimEntModelLoad( centity_t *cent ) {
 			if ( GLAName[0] && !strstr( GLAName, "players/_humanoid/" ) ) {
 				// it doesn't use humanoid anims.
 				if ( (slash=Q_strrchr( GLAName, '/' )) ) {
-					Q_strncpyz( slash, "/animation.cfg", sizeof( slash ) - (slash-GLAName) );
+					Q_strncpyz( slash, "/animation.cfg", sizeof( GLAName ) - (slash-GLAName) );
 
 					cent->localAnimIndex = BG_ParseAnimationFile( GLAName, NULL, qfalse );
 				}
