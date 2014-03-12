@@ -59,7 +59,8 @@ typedef struct gentity_s gentity_t;
 
 #define FINDCL_SUBSTR				(0x0001u)
 #define FINDCL_FIRSTMATCH			(0x0002u)
-#define FINDCL_PRINT				(0x0004u)
+#define FINDCL_CASE					(0x0004u)
+#define FINDCL_PRINT				(0x0008u)
 
 
 #define SPF_BUTTON_USABLE			(0x0001u)

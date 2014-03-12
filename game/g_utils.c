@@ -1479,11 +1479,16 @@ static qboolean G_ValidClient( const gclient_t *cl ) {
 	return qtrue;
 }
 
-static qboolean compareSubstring( const char *s1, const char *s2 ) {
+static qboolean cmpSubCase( const char *s1, const char *s2 ) {
 	return (strstr( s1, s2 ) != NULL) ? qtrue : qfalse;
 }
-
-static qboolean compareWhole( const char *s1, const char *s2 ) {
+static qboolean cmpSub( const char *s1, const char *s2 ) {
+	return (Q_stristr( s1, s2 ) != NULL) ? qtrue : qfalse;
+}
+static qboolean cmpWholeCase( const char *s1, const char *s2 ) {
+	return (!strcmp( s1, s2 )) ? qtrue : qfalse;
+}
+static qboolean cmpWhole( const char *s1, const char *s2 ) {
 	return (!Q_stricmp( s1, s2 )) ? qtrue : qfalse;
 }
 
@@ -1494,7 +1499,12 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 	qboolean substr = !!(flags & FINDCL_SUBSTR);
 	qboolean firstMatch = !!(flags & FINDCL_FIRSTMATCH);
 	qboolean print = !!(flags & FINDCL_PRINT);
-	qboolean (*compareFunc)(const char *s1, const char *s2) = substr ? compareSubstring : compareWhole;
+	qboolean caseSensitive = !!(flags & FINDCL_CASE);
+	qboolean (*compareFunc)( const char *s1, const char *s2 );
+	if ( caseSensitive )
+		compareFunc = substr ? cmpSubCase : cmpWholeCase;
+	else
+		compareFunc = substr ? cmpSub : cmpWhole;
 
 	// First check for clientNum match
 	if ( Q_StringIsInteger( match ) ) {
