@@ -748,13 +748,8 @@ static void AM_Teleport( gentity_t *ent ) {
 		char arg1[64], arg2[64];
 		int targetClient1, targetClient2;
 
-
-
 		trap->Argv( 1, arg1, sizeof( arg1 ) );	targetClient1 = G_ClientFromString( ent, arg1, FINDCL_SUBSTR );
 		trap->Argv( 2, arg2, sizeof( arg2 ) );	targetClient2 = G_ClientFromString( ent, arg2, FINDCL_SUBSTR );
-
-			if( !AM_CanInflict( ent, &g_entities[targetClient1] ) )
-		return;
 
 		// first arg is a valid client, attempt to find destination
 		if ( targetClient1 != -1 ) {
@@ -762,6 +757,9 @@ static void AM_Teleport( gentity_t *ent ) {
 			if ( targetClient2 == -1 ) {
 				char cleanedInput[MAX_TELEMARK_NAME_LEN];
 				telemark_t *tm = NULL;
+
+				if ( !AM_CanInflict( ent, &g_entities[targetClient1] ) )
+					return;
 
 				Q_strncpyz( cleanedInput, arg2, sizeof( cleanedInput ) );
 				Q_CleanString( cleanedInput, STRIP_COLOUR );
@@ -779,6 +777,9 @@ static void AM_Teleport( gentity_t *ent ) {
 			else {
 				vector3 targetPos, telePos, angles;
 				trace_t tr;
+
+				if ( !AM_CanInflict( ent, &g_entities[targetClient1] ) || !AM_CanInflict( ent, &g_entities[targetClient2] ) )
+					return;
 
 				VectorCopy( &level.clients[targetClient2].ps.origin, &targetPos );
 				VectorCopy( &level.clients[targetClient2].ps.viewangles, &angles );
@@ -817,11 +818,12 @@ static void AM_Teleport( gentity_t *ent ) {
 		trap->Argv( 1, argC, sizeof( argC ) );
 		targetClient = G_ClientFromString( ent, argC, FINDCL_SUBSTR|FINDCL_PRINT );
 
-		if ( targetClient == -1 )
-			return;
-		else {
+		if ( targetClient != -1 ) {
 			vector3	telePos;
 			char argX[16]={0}, argY[16]={0}, argZ[16]={0};
+
+			if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
+				return;
 
 			trap->Argv( 2, argX, sizeof( argX ) );
 			trap->Argv( 3, argY, sizeof( argY ) );
@@ -841,7 +843,6 @@ static void AM_Teleport( gentity_t *ent ) {
 			else
 				TeleportPlayer( &g_entities[targetClient], &telePos, &g_entities[targetClient].client->ps.viewangles );
 		}
-
 	}
 }
 
