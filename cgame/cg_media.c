@@ -402,7 +402,7 @@ static const resource_t gfx[] = {
 	{ &media.gfx.interface.smallNumbers[9],							"gfx/2d/numbers/t_nine",						RFL_NOMIP,	GTB_ALL },
 	{ &media.gfx.interface.smallNumbers[10],						"gfx/2d/numbers/t_minus",						RFL_NOMIP,	GTB_ALL },
 	{ &media.gfx.interface.teamStatusBar,							"gfx/2d/colorbar",								RFL_NOMIP,	GTB_ALL&~GTB_NOTTEAM },
-	{ &media.gfx.interface.vchat,									"gfx/mp/vchat_icon",							RFL_NOMIP,	GTB_SIEGE },
+	{ &media.gfx.interface.vchat,									"gfx/mp/vchat_icon",							RFL_NOMIP,	GTB_ALL },
 	{ &media.gfx.interface.weaponIconBackground,					"gfx/hud/background",							RFL_NOMIP,	GTB_ALL },
 //	{ &media.gfx.interface.weaponIcons[WP_NONE],					NULL,											RFL_NOMIP,	GTB_ALL },
 	{ &media.gfx.interface.weaponIcons[WP_STUN_BATON],				"gfx/hud/w_icon_stunbaton",						RFL_NOMIP,	GTB_ALL },
