@@ -422,6 +422,16 @@ static void CVU_ChatboxSize( void ) {
 	}
 }
 
+static void CVU_CrosshairColour( void ) {
+	ivector4 *v = &cg.crosshair.colour;
+	if ( sscanf( cg_crosshairColour.string, "%i %i %i %i", &v->r, &v->g, &v->b, &v->a ) != 4 ) {
+		v->r = 255;
+		v->g = 255;
+		v->b = 255;
+		v->a = 255;
+	}
+}
+
 static void CVU_ChatboxBG( void ) {
 	vector4 *v = &cg.chatbox.background;
 	if ( sscanf( cg_chatboxBackground.string, "%f %f %f %f", &v->r, &v->g, &v->b, &v->a ) != 4 ) {

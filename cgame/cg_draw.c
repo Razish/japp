@@ -4862,15 +4862,14 @@ CG_DrawCrosshair
 
 float cg_crosshairPrevPosX = 0;
 float cg_crosshairPrevPosY = 0;
-#define CRAZY_CROSSHAIR_MAX_ERROR_X	(100.0f*640.0f/480.0f)
+#define CRAZY_CROSSHAIR_MAX_ERROR_X	(100.0f*SCREEN_WIDTH/(float)SCREEN_HEIGHT)
 #define CRAZY_CROSSHAIR_MAX_ERROR_Y	(100.0f)
-void CG_LerpCrosshairPos( float *x, float *y )
-{
-	if ( cg_crosshairPrevPosX )
-	{//blend from old pos
-		float maxMove = 30.0f * ((float)cg.frametime/500.0f) * 640.0f/480.0f;
+void CG_LerpCrosshairPos( float *x, float *y ) {
+	float maxMove = 30.0f * ((float)cg.frametime/500.0f) * SCREEN_WIDTH/(float)SCREEN_HEIGHT;
+	if ( cg_crosshairPrevPosX ) {
+		// blend from old pos
 		float xDiff = (*x - cg_crosshairPrevPosX);
-		if ( fabsf(xDiff) > CRAZY_CROSSHAIR_MAX_ERROR_X )
+		if ( fabsf( xDiff ) > CRAZY_CROSSHAIR_MAX_ERROR_X )
 			maxMove = CRAZY_CROSSHAIR_MAX_ERROR_X;
 		if ( xDiff > maxMove )
 			*x = cg_crosshairPrevPosX + maxMove;
@@ -4879,11 +4878,10 @@ void CG_LerpCrosshairPos( float *x, float *y )
 	}
 	cg_crosshairPrevPosX = *x;
 
-	if ( cg_crosshairPrevPosY )
-	{//blend from old pos
-		float maxMove = 30.0f * ((float)cg.frametime/500.0f);
+	if ( cg_crosshairPrevPosY ) {
+		// blend from old pos
 		float yDiff = (*y - cg_crosshairPrevPosY);
-		if ( fabsf(yDiff) > CRAZY_CROSSHAIR_MAX_ERROR_Y )
+		if ( fabsf( yDiff)  > CRAZY_CROSSHAIR_MAX_ERROR_Y )
 			maxMove = CRAZY_CROSSHAIR_MAX_ERROR_X;
 		if ( yDiff > maxMove )
 			*y = cg_crosshairPrevPosY + maxMove;
@@ -4894,15 +4892,12 @@ void CG_LerpCrosshairPos( float *x, float *y )
 }
 
 vector3 cg_crosshairPos={0,0,0};
-static void CG_DrawCrosshair( vector3 *worldPoint, int chEntValid ) {
-	float		w, h;
-	qhandle_t	hShader = 0;
-	float		f;
-	float		x, y;
-	qboolean	corona = qfalse;
-	vector4		ecolor = {0,0,0,0};
-	centity_t	*crossEnt = NULL;
-	float		chX, chY;
+static void CG_DrawCrosshair( vector3 *worldPoint, qboolean chEntValid ) {
+	float x, y, w, h, f, chX, chY;
+	qhandle_t hShader = 0;
+	qboolean corona = qfalse;
+	vector4 colour = { 0.0f };
+	centity_t *crossEnt = NULL;
 	refdef_t *refdef = CG_GetRefdef();
 
 	trap->R_SetColor( NULL );
@@ -4913,261 +4908,161 @@ static void CG_DrawCrosshair( vector3 *worldPoint, int chEntValid ) {
 	if ( !cg_drawCrosshair.integer )
 		return;
 
-	if (cg.snap->ps.fallingToDeath)
-		return;
-
-	if ( cg.predictedPlayerState.zoomMode != 0 )
+	if ( cg.snap->ps.fallingToDeath || cg.predictedPlayerState.zoomMode != 0 )
 		return;
 
 	if ( cg_crosshairHealth.integer )
-	{
-		vector4 hcolor;
-
-		CG_ColorForHealth( &hcolor );
-		trap->R_SetColor( &hcolor );
-	}
-	else
-	{
-		//set color based on what kind of ent is under crosshair
-		if ( cg.crosshairClientNum >= ENTITYNUM_WORLD )
+		CG_ColorForHealth( &colour );
+	else if ( cg_crosshairTint.integer ) {
+		// set color based on what kind of ent is under crosshair
+		if ( cg.crosshairClientNum >= ENTITYNUM_WORLD || !chEntValid
+			|| cg_entities[cg.crosshairClientNum].currentState.powerups & (1 <<PW_CLOAKED) )
 		{
-			trap->R_SetColor( NULL );
+			VectorSet4( &colour, 1.0f, 1.0f, 1.0f, 1.0f );
 		}
-		//rwwFIXMEFIXME: Write this a different way, it's getting a bit too sloppy looking
-		else if (chEntValid &&
-			(cg_entities[cg.crosshairClientNum].currentState.number < MAX_CLIENTS ||
-			cg_entities[cg.crosshairClientNum].currentState.eType == ET_NPC ||
-			cg_entities[cg.crosshairClientNum].currentState.shouldtarget ||
-			cg_entities[cg.crosshairClientNum].currentState.health || //always show ents with health data under crosshair
-			(cg_entities[cg.crosshairClientNum].currentState.eType == ET_MOVER && cg_entities[cg.crosshairClientNum].currentState.bolt1 && cg.predictedPlayerState.weapon == WP_SABER) ||
-			(cg_entities[cg.crosshairClientNum].currentState.eType == ET_MOVER && cg_entities[cg.crosshairClientNum].currentState.teamowner)))
-		{
-			crossEnt = &cg_entities[cg.crosshairClientNum];
-
-			if ( crossEnt->currentState.powerups & (1 <<PW_CLOAKED) )
-			{ //don't show up for cloaked guys
-				ecolor.r = 1.0f;//R
-				ecolor.g = 1.0f;//G
-				ecolor.b = 1.0f;//B
-			}
-			else if ( crossEnt->currentState.number < MAX_CLIENTS )
+		else {
+			entityState_t *es = &cg_entities[cg.crosshairClientNum].currentState;
+			if ( chEntValid && (es->number < MAX_CLIENTS || es->eType == ET_NPC || es->shouldtarget || es->health
+				|| (es->eType == ET_MOVER && es->bolt1 && cg.predictedPlayerState.weapon == WP_SABER)
+				|| (es->eType == ET_MOVER && es->teamowner)) )
 			{
-				if (cgs.gametype >= GT_TEAM &&
-					cgs.clientinfo[crossEnt->currentState.number].team == cgs.clientinfo[cg.snap->ps.clientNum].team )
-				{
-					//Allies are green
-					ecolor.r = 0.0f;//R
-					ecolor.g = 1.0f;//G
-					ecolor.b = 0.0f;//B
-				}
-				else
-				{
-					if (cgs.gametype == GT_POWERDUEL &&
-						cgs.clientinfo[crossEnt->currentState.number].duelTeam == cgs.clientinfo[cg.snap->ps.clientNum].duelTeam)
-					{ //on the same duel team in powerduel, so he's a friend
-						ecolor.r = 0.0f;//R
-						ecolor.g = 1.0f;//G
-						ecolor.b = 0.0f;//B
-					}
-					else
-					{ //Enemies are red
-						ecolor.r = 1.0f;//R
-						ecolor.g = 0.0f;//G
-						ecolor.b = 0.0f;//B
-					}
-				}
+				crossEnt = &cg_entities[cg.crosshairClientNum];
 
-				if (cg.snap->ps.duelInProgress)
-				{
-					if (crossEnt->currentState.number != cg.snap->ps.duelIndex)
-					{ //grey out crosshair for everyone but your foe if you're in a duel
-						ecolor.r = 0.4f;
-						ecolor.g = 0.4f;
-						ecolor.b = 0.4f;
-					}
-				}
-				else if (crossEnt->currentState.bolt1)
-				{ //this fellow is in a duel. We just checked if we were in a duel above, so
-				  //this means we aren't and he is. Which of course means our crosshair greys out over him.
-					ecolor.r = 0.4f;
-					ecolor.g = 0.4f;
-					ecolor.b = 0.4f;
-				}
-			}
-			else if (crossEnt->currentState.shouldtarget || crossEnt->currentState.eType == ET_NPC)
-			{
-				//VectorCopy( crossEnt->startRGBA, ecolor );
-				if ( !ecolor.r && !ecolor.g && !ecolor.b )
-				{
-					// We really don't want black, so set it to yellow
-					ecolor.r = 1.0f;//R
-					ecolor.g = 0.8f;//G
-					ecolor.b = 0.3f;//B
-				}
-
-				if (crossEnt->currentState.eType == ET_NPC)
-				{
-					int plTeam;
-					if (cgs.gametype == GT_SIEGE)
-						plTeam = cg.predictedPlayerState.persistant[PERS_TEAM];
-					else
-						plTeam = NPCTEAM_PLAYER;
-
-					if ( crossEnt->currentState.powerups & (1 <<PW_CLOAKED) )
+				if ( crossEnt->currentState.number < MAX_CLIENTS ) {
+					if ( cgs.gametype >= GT_TEAM
+						&& cgs.clientinfo[crossEnt->currentState.number].team == cgs.clientinfo[cg.snap->ps.clientNum].team )
 					{
-						ecolor.r = 1.0f;//R
-						ecolor.g = 1.0f;//G
-						ecolor.b = 1.0f;//B
+						// ally
+						VectorSet4( &colour, 0.0f, 1.0f, 0.0, 1.0f );
 					}
-					else if ( !crossEnt->currentState.teamowner )
-					{ //not on a team
-						if (!crossEnt->currentState.teamowner ||
-							crossEnt->currentState.NPC_class == CLASS_VEHICLE)
-						{ //neutral
-							if (crossEnt->currentState.owner < MAX_CLIENTS)
-							{ //base color on who is pilotting this thing
+					else {
+						if ( cgs.gametype == GT_POWERDUEL
+							&& cgs.clientinfo[crossEnt->currentState.number].duelTeam == cgs.clientinfo[cg.snap->ps.clientNum].duelTeam )
+						{
+							// ally
+							VectorSet4( &colour, 0.0f, 1.0f, 0.0f, 1.0f );
+						}
+						// enemy
+						else
+							VectorSet4( &colour, 1.0f, 0.0f, 0.0f, 1.0f );
+					}
+
+					// grey - we're dueling this person
+					if ( cg.snap->ps.duelInProgress ) {
+						if ( crossEnt->currentState.number != cg.snap->ps.duelIndex )
+							VectorSet4( &colour, 0.4f, 0.4f, 0.4f, 1.0f );
+					}
+					// grey - we're dueling, they aren't
+					else if ( crossEnt->currentState.bolt1 )
+						VectorSet4( &colour, 0.4f, 0.4f, 0.4f, 1.0f );
+				}
+				else if ( crossEnt->currentState.shouldtarget || crossEnt->currentState.eType == ET_NPC ) {
+					// neutral
+					VectorSet4( &colour, 1.0f, 0.8f, 0.3f, 1.0f );
+
+					if ( crossEnt->currentState.eType == ET_NPC ) {
+						int plTeam;
+						if ( cgs.gametype == GT_SIEGE )
+							plTeam = cg.predictedPlayerState.persistant[PERS_TEAM];
+						else
+							plTeam = NPCTEAM_PLAYER;
+
+						if ( crossEnt->currentState.powerups & (1 <<PW_CLOAKED) )
+							VectorSet4( &colour, 1.0f, 1.0f, 1.0f, 1.0f );
+						else if ( !crossEnt->currentState.teamowner ) {
+							// not on a team
+							if ( crossEnt->currentState.owner < MAX_CLIENTS ) {
+								// vehicle
 								clientInfo_t *ci = &cgs.clientinfo[crossEnt->currentState.owner];
 
-								if (cgs.gametype >= GT_TEAM && ci->team == cg.predictedPlayerState.persistant[PERS_TEAM])
-								{ //friendly
-									ecolor.r = 0.0f;//R
-									ecolor.g = 1.0f;//G
-									ecolor.b = 0.0f;//B
-								}
+								// ally
+								if ( cgs.gametype >= GT_TEAM && ci->team == cg.predictedPlayerState.persistant[PERS_TEAM] )
+									VectorSet4( &colour, 0.0f, 1.0f, 0.0f, 1.0f );
+								// enemy
 								else
-								{ //hostile
-									ecolor.r = 1.0f;//R
-									ecolor.g = 0.0f;//G
-									ecolor.b = 0.0f;//B
-								}
+									VectorSet4( &colour, 1.0f, 0.0f, 0.0f, 1.0f );
 							}
+							// neutral
 							else
-							{ //unmanned
-								ecolor.r = 1.0f;//R
-								ecolor.g = 1.0f;//G
-								ecolor.b = 0.0f;//B
-							}
+								VectorSet4( &colour, 1.0f, 1.0f, 0.0f, 1.0f );
 						}
+						// enemy
+						else if ( crossEnt->currentState.teamowner != plTeam )
+							VectorSet4( &colour, 1.0f, 0.0f, 0.0f, 1.0f );
+						// ally
 						else
-						{
-							ecolor.r = 1.0f;//R
-							ecolor.g = 0.0f;//G
-							ecolor.b = 0.0f;//B
-						}
+							VectorSet4( &colour, 0.0f, 1.0f, 0.0f, 1.0f );
 					}
-					else if ( crossEnt->currentState.teamowner != plTeam )
-					{// on enemy team
-						ecolor.r = 1.0f;//R
-						ecolor.g = 0.0f;//G
-						ecolor.b = 0.0f;//B
+					else if ( crossEnt->currentState.teamowner == TEAM_RED
+						|| crossEnt->currentState.teamowner == TEAM_BLUE )
+					{
+						// neutral
+						if ( cgs.gametype < GT_TEAM )
+							VectorSet4( &colour, 1.0f, 1.0f, 0.0f, 1.0f );
+						// enemy
+						else if ( crossEnt->currentState.teamowner != cgs.clientinfo[cg.snap->ps.clientNum].team )
+							VectorSet4( &colour, 1.0f, 0.0f, 0.0f, 1.0f );
+						// ally
+						else
+							VectorSet4( &colour, 0.0f, 1.0f, 0.0f, 1.0f );
 					}
+					else if ( crossEnt->currentState.owner == cg.snap->ps.clientNum || (cgs.gametype >= GT_TEAM
+						&& crossEnt->currentState.teamowner == cgs.clientinfo[cg.snap->ps.clientNum].team) )
+					{
+						// ally
+						VectorSet4( &colour, 0.0f, 1.0f, 0.0f, 1.0f );
+					}
+					else if ( crossEnt->currentState.teamowner == 16 || (cgs.gametype >= GT_TEAM
+						&& crossEnt->currentState.teamowner
+						&& crossEnt->currentState.teamowner != cgs.clientinfo[cg.snap->ps.clientNum].team) )
+					{
+						// enemy
+						VectorSet4( &colour, 1.0f, 0.0f, 0.0f, 1.0f );
+					}
+				}
+				else if ( crossEnt->currentState.eType == ET_MOVER && crossEnt->currentState.bolt1
+					&& cg.predictedPlayerState.weapon == WP_SABER )
+				{
+					// can push/pull this mover. Only show it if we're using the saber.
+					VectorSet4( &colour, 0.2f, 0.5f, 1.0f, 1.0f );
+					corona = qtrue;
+				}
+				else if ( crossEnt->currentState.eType == ET_MOVER && crossEnt->currentState.teamowner ) {
+					// neutral
+					if ( cgs.gametype < GT_TEAM )
+						VectorSet4( &colour, 1.0f, 1.0f, 0.0f, 1.0f );
+					// enemy
+					else if ( cg.predictedPlayerState.persistant[PERS_TEAM] != crossEnt->currentState.teamowner )
+						VectorSet4( &colour, 1.0f, 0.0f, 0.0f, 1.0f );
+					// ally
 					else
-					{ //a friend
-						ecolor.r = 0.0f;//R
-						ecolor.g = 1.0f;//G
-						ecolor.b = 0.0f;//B
-					}
+						VectorSet4( &colour, 0.0f, 1.0f, 0.0f, 1.0f );
 				}
-				else if ( crossEnt->currentState.teamowner == TEAM_RED
-					|| crossEnt->currentState.teamowner == TEAM_BLUE )
-				{
-					if (cgs.gametype < GT_TEAM)
-					{ //not teamplay, just neutral then
-						ecolor.r = 1.0f;//R
-						ecolor.g = 1.0f;//G
-						ecolor.b = 0.0f;//B
-					}
-					else if ( crossEnt->currentState.teamowner != cgs.clientinfo[cg.snap->ps.clientNum].team )
-					{ //on the enemy team
-						ecolor.r = 1.0f;//R
-						ecolor.g = 0.0f;//G
-						ecolor.b = 0.0f;//B
-					}
+				else if ( crossEnt->currentState.health ) {
+					// neutral
+					if ( !crossEnt->currentState.teamowner || cgs.gametype < GT_TEAM )
+						VectorSet4( &colour, 1.0f, 1.0f, 0.0f, 1.0f );
+					// ally
+					else if ( crossEnt->currentState.teamowner == cg.predictedPlayerState.persistant[PERS_TEAM] )
+						VectorSet4( &colour, 0.0f, 1.0f, 0.0f, 1.0f );
+					// enemy
 					else
-					{ //on my team
-						ecolor.r = 0.0f;//R
-						ecolor.g = 1.0f;//G
-						ecolor.b = 0.0f;//B
-					}
-				}
-				else if (crossEnt->currentState.owner == cg.snap->ps.clientNum ||
-					(cgs.gametype >= GT_TEAM && crossEnt->currentState.teamowner == cgs.clientinfo[cg.snap->ps.clientNum].team))
-				{
-					ecolor.r = 0.0f;//R
-					ecolor.g = 1.0f;//G
-					ecolor.b = 0.0f;//B
-				}
-				else if (crossEnt->currentState.teamowner == 16 ||
-					(cgs.gametype >= GT_TEAM && crossEnt->currentState.teamowner && crossEnt->currentState.teamowner != cgs.clientinfo[cg.snap->ps.clientNum].team))
-				{
-					ecolor.r = 1.0f;//R
-					ecolor.g = 0.0f;//G
-					ecolor.b = 0.0f;//B
+						VectorSet4( &colour, 1.0f, 0.0f, 0.0f, 1.0f );
 				}
 			}
-			else if (crossEnt->currentState.eType == ET_MOVER && crossEnt->currentState.bolt1 && cg.predictedPlayerState.weapon == WP_SABER)
-			{ //can push/pull this mover. Only show it if we're using the saber.
-				ecolor.r = 0.2f;
-				ecolor.g = 0.5f;
-				ecolor.b = 1.0f;
-
-				corona = qtrue;
-			}
-			else if (crossEnt->currentState.eType == ET_MOVER && crossEnt->currentState.teamowner)
-			{ //a team owns this - if it's my team green, if not red, if not teamplay then yellow
-				if (cgs.gametype < GT_TEAM)
-				{
-					ecolor.r = 1.0f;//R
-					ecolor.g = 1.0f;//G
-					ecolor.b = 0.0f;//B
-				}
-                else if (cg.predictedPlayerState.persistant[PERS_TEAM] != crossEnt->currentState.teamowner)
-				{ //not my team
-					ecolor.r = 1.0f;//R
-					ecolor.g = 0.0f;//G
-					ecolor.b = 0.0f;//B
-				}
-				else
-				{ //my team
-					ecolor.r = 0.0f;//R
-					ecolor.g = 1.0f;//G
-					ecolor.b = 0.0f;//B
-				}
-			}
-			else if (crossEnt->currentState.health)
-			{
-				if (!crossEnt->currentState.teamowner || cgs.gametype < GT_TEAM)
-				{ //not owned by a team or teamplay
-					ecolor.r = 1.0f;
-					ecolor.g = 1.0f;
-					ecolor.b = 0.0f;
-				}
-				else if (crossEnt->currentState.teamowner == cg.predictedPlayerState.persistant[PERS_TEAM])
-				{ //owned by my team
-					ecolor.r = 0.0f;
-					ecolor.g = 1.0f;
-					ecolor.b = 0.0f;
-				}
-				else
-				{ //hostile
-					ecolor.r = 1.0f;
-					ecolor.g = 0.0f;
-					ecolor.b = 0.0f;
-				}
-			}
-
-			ecolor.a = 1.0f;
-
-			trap->R_SetColor( &ecolor );
 		}
 	}
+	else {
+		colour.r = cg.crosshair.colour.r/255.0f;
+		colour.g = cg.crosshair.colour.g/255.0f;
+		colour.b = cg.crosshair.colour.b/255.0f;
+		colour.a = cg.crosshair.colour.a/255.0f;
+	}
 
-	if ( cg.predictedPlayerState.m_iVehicleNum )
-	{//I'm in a vehicle
+	if ( cg.predictedPlayerState.m_iVehicleNum ) {
+		// we're in a vehicle
 		centity_t *vehCent = &cg_entities[cg.predictedPlayerState.m_iVehicleNum];
-	    if ( vehCent
-			&& vehCent->m_pVehicle
-			&& vehCent->m_pVehicle->m_pVehicleInfo
+	    if ( vehCent && vehCent->m_pVehicle && vehCent->m_pVehicle->m_pVehicleInfo
 			&& vehCent->m_pVehicle->m_pVehicleInfo->crosshairShaderHandle )
 		{
 			hShader = vehCent->m_pVehicle->m_pVehicleInfo->crosshairShaderHandle;
@@ -5177,9 +5072,7 @@ static void CG_DrawCrosshair( vector3 *worldPoint, int chEntValid ) {
 		h = w;
 	}
 	else
-	{
 		w = h = cg_crosshairSize.value;
-	}
 
 	// pulse the size of the crosshair when picking up items
 	f = cg.time - cg.itemPickupBlendTime;
@@ -5189,86 +5082,71 @@ static void CG_DrawCrosshair( vector3 *worldPoint, int chEntValid ) {
 		h *= ( 1 + f );
 	}
 
-	if ( worldPoint && VectorLength( worldPoint ) )
-	{
+	if ( worldPoint && VectorLength( worldPoint ) ) {
 		if ( !CG_WorldCoordToScreenCoordFloat( worldPoint, &x, &y ) )
-		{//off screen, don't draw it
 			return;
-		}
-		//CG_LerpCrosshairPos( &x, &y );
-		x -= 320;
-		y -= 240;
+		if ( cg_crosshairLerp.integer )
+			CG_LerpCrosshairPos( &x, &y );
+		x -= (SCREEN_WIDTH/2.0f);
+		y -= (SCREEN_HEIGHT/2.0f);
 	}
-	else
-	{
+	else {
 		x = cg_crosshairX.integer;
 		y = cg_crosshairY.integer;
 	}
 
 	if ( !hShader )
-	{
 		hShader = media.gfx.interface.crosshairs[cg_drawCrosshair.integer % NUM_CROSSHAIRS];
-	}
 
-	chX = x + refdef->x + 0.5f * (640 - w);
-	chY = y + refdef->y + 0.5f * (480 - h);
+	chX = x + refdef->x + 0.5f * (SCREEN_WIDTH - w);
+	chY = y + refdef->y + 0.5f * (SCREEN_HEIGHT - h);
+
+	trap->R_SetColor( &colour );
 	trap->R_DrawStretchPic( chX, chY, w, h, 0, 0, 1, 1, hShader );
 
-	//draw a health bar directly under the crosshair if we're looking at something
-	//that takes damage
-	if (crossEnt &&
-		crossEnt->currentState.maxhealth)
-	{
-		CG_DrawHealthBar(crossEnt, chX, chY, w, h);
+	// draw a health bar directly under the crosshair if we're looking at something that takes damage
+	if ( crossEnt && crossEnt->currentState.maxhealth ) {
+		CG_DrawHealthBar( crossEnt, chX, chY, w, h );
 		chY += HEALTH_HEIGHT*2;
 	}
-	else if (crossEnt && crossEnt->currentState.number < MAX_CLIENTS)
-	{
-		if (cgs.gametype == GT_SIEGE)
-		{
-			CG_DrawSiegeInfo(crossEnt, chX, chY, w, h);
+	else if ( crossEnt && crossEnt->currentState.number < MAX_CLIENTS ) {
+		if ( cgs.gametype == GT_SIEGE ) {
+			CG_DrawSiegeInfo( crossEnt, chX, chY, w, h );
 			chY += HEALTH_HEIGHT*4;
 		}
-		if (cg.crosshairVehNum && cg.time == cg.crosshairVehTime)
-		{ //it was in the crosshair this frame
+		if ( cg.crosshairVehNum && cg.time == cg.crosshairVehTime ) {
+			// it was in the crosshair this frame
 			centity_t *hisVeh = &cg_entities[cg.crosshairVehNum];
 
-			if (hisVeh->currentState.eType == ET_NPC &&
-				hisVeh->currentState.NPC_class == CLASS_VEHICLE &&
-				hisVeh->currentState.maxhealth &&
-				hisVeh->m_pVehicle)
-			{ //draw the health for this vehicle
-				CG_DrawHealthBar(hisVeh, chX, chY, w, h);
+			if ( hisVeh->currentState.eType == ET_NPC && hisVeh->currentState.NPC_class == CLASS_VEHICLE
+				&& hisVeh->currentState.maxhealth && hisVeh->m_pVehicle )
+			{
+				// draw the health for this vehicle
+				CG_DrawHealthBar( hisVeh, chX, chY, w, h );
 				chY += HEALTH_HEIGHT*2;
 			}
 		}
 	}
 
-	if (cg.predictedPlayerState.hackingTime)
-	{ //hacking something
-		CG_DrawHaqrBar(chX, chY, w, h);
-	}
+	if ( cg.predictedPlayerState.hackingTime )
+		CG_DrawHaqrBar( chX, chY, w, h );
 
-	if (cg_genericTimerBar > cg.time)
-	{ //draw generic timing bar, can be used for whatever
+	if ( cg_genericTimerBar > cg.time )
 		CG_DrawGenericTimerBar();
-	}
 
-	if ( corona ) // drawing extra bits
-	{
-		ecolor.a = 0.5f;
-		ecolor.r = ecolor.g = ecolor.b = (1 - ecolor.a) * ( sinf( cg.time * 0.001f ) * 0.08f + 0.35f ); // don't draw full color
-		ecolor.a = 1.0f;
-
-		trap->R_SetColor( &ecolor );
+	if ( corona ) {
+		colour.a = 0.5f;
+		colour.r = colour.g = colour.b = (1 - colour.a) * ( sinf( cg.time * 0.001f ) * 0.08f + 0.35f );
+		colour.a = 1.0f;
 
 		w *= 2.0f;
 		h *= 2.0f;
 
-		trap->R_DrawStretchPic( x + refdef->x + 0.5f * (640 - w),
-			y + refdef->y + 0.5f * (480 - h),
+		trap->R_SetColor( &colour );
+		trap->R_DrawStretchPic( x + refdef->x + 0.5f * (SCREEN_WIDTH - w), y + refdef->y + 0.5f * (SCREEN_HEIGHT - h),
 			w, h, 0, 0, 1, 1, media.gfx.interface.forceCorona );
 	}
+
 	trap->R_SetColor( NULL );
 }
 
@@ -6055,138 +5933,106 @@ CG_`Entity
 */
 #define MAX_XHAIR_DIST_ACCURACY	20000.0f
 static void CG_ScanForCrosshairEntity( void ) {
-	trace_t		trace;
-	vector3		start, end;
-	int			content;
-	int			ignore;
-	qboolean	bVehCheckTraceFromCamPos = qfalse;
+	trace_t trace;
+	vector3 start, end;
+	uint32_t content;
+	int ignore, traces=0;
+	qboolean bVehCheckTraceFromCamPos = qfalse;
 	refdef_t *refdef = CG_GetRefdef();
-	int traces = 0;
 
 	ignore = cg.predictedPlayerState.clientNum;
 
-	if ( cg_dynamicCrosshair.integer )
-	{
+	if ( cg_dynamicCrosshair.integer ) {
 		vector3 d_f, d_rt, d_up;
-		/*
-		if ( cg.snap->ps.weapon == WP_NONE ||
-			cg.snap->ps.weapon == WP_SABER ||
-			cg.snap->ps.weapon == WP_STUN_BATON)
-		{
-			VectorCopy( refdef->vieworg, start );
-			AngleVectors( refdef->viewangles, d_f, d_rt, d_up );
-		}
-		else
-		*/
-		//For now we still want to draw the crosshair in relation to the player's world coordinates
-		//even if we have a melee weapon/no weapon.
-		if ( cg.predictedPlayerState.m_iVehicleNum && (cg.predictedPlayerState.eFlags&EF_NODRAW) )
-		{//we're *inside* a vehicle
-			//do the vehicle's crosshair instead
+		// For now we still want to draw the crosshair in relation to the player's world coordinates even if we have a
+		//	melee weapon/no weapon.
+		if ( cg.predictedPlayerState.m_iVehicleNum && (cg.predictedPlayerState.eFlags & EF_NODRAW) ) {
+			// we're *inside* a vehicle
 			centity_t *veh = &cg_entities[cg.predictedPlayerState.m_iVehicleNum];
 			qboolean gunner = qfalse;
 
-			//if (veh->currentState.owner == cg.predictedPlayerState.clientNum)
-			{ //the pilot
-				ignore = cg.predictedPlayerState.m_iVehicleNum;
-				gunner = CG_CalcVehicleMuzzlePoint(cg.predictedPlayerState.m_iVehicleNum, &start, &d_f, &d_rt, &d_up);
-			}
-			/*
-			else
-			{ //a passenger
-				ignore = cg.predictedPlayerState.m_iVehicleNum;
-				VectorCopy( veh->lerpOrigin, start );
-				AngleVectors( veh->lerpAngles, d_f, d_rt, d_up );
-				VectorMA(start, 32.0f, d_f, start); //super hack
-			}
-			*/
-			if ( veh->m_pVehicle
-				&& veh->m_pVehicle->m_pVehicleInfo
-				&& veh->m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER
-				&& cg.distanceCull > MAX_XHAIR_DIST_ACCURACY
+			ignore = cg.predictedPlayerState.m_iVehicleNum;
+			gunner = CG_CalcVehicleMuzzlePoint(cg.predictedPlayerState.m_iVehicleNum, &start, &d_f, &d_rt, &d_up);
+
+			if ( veh->m_pVehicle && veh->m_pVehicle->m_pVehicleInfo
+				&& veh->m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER && cg.distanceCull > MAX_XHAIR_DIST_ACCURACY
 				&& !gunner )
 			{
-				//NOTE: on huge maps, the crosshair gets inaccurate at close range,
-				//		so we'll do an extra G2 trace from the refdef->vieworg
-				//		to see if we hit anything closer and auto-aim at it if so
+				// on huge maps, the crosshair gets inaccurate at close range, so we'll do an extra G2 trace from the
+				//	refdef->vieworg to see if we hit anything closer and auto-aim at it if so
 				bVehCheckTraceFromCamPos = qtrue;
 			}
 		}
-		else if (cg.snap && cg.snap->ps.weapon == WP_EMPLACED_GUN && cg.snap->ps.emplacedIndex &&
-			cg_entities[cg.snap->ps.emplacedIndex].ghoul2 && cg_entities[cg.snap->ps.emplacedIndex].currentState.weapon == WP_NONE)
-		{ //locked into our e-web, calc the muzzle from it
-			CG_CalcEWebMuzzlePoint(&cg_entities[cg.snap->ps.emplacedIndex], &start, &d_f, &d_rt, &d_up);
-		}
-		else
+		else if ( cg.snap && cg.snap->ps.weapon == WP_EMPLACED_GUN && cg.snap->ps.emplacedIndex
+			&& cg_entities[cg.snap->ps.emplacedIndex].ghoul2
+			&& cg_entities[cg.snap->ps.emplacedIndex].currentState.weapon == WP_NONE )
 		{
-			if (cg.snap && cg.snap->ps.weapon == WP_EMPLACED_GUN && cg.snap->ps.emplacedIndex)
-			{
+			// locked into our e-web, calc the muzzle from it
+			CG_CalcEWebMuzzlePoint( &cg_entities[cg.snap->ps.emplacedIndex], &start, &d_f, &d_rt, &d_up );
+		}
+		else {
+			if ( cg.snap && cg.snap->ps.weapon == WP_EMPLACED_GUN && cg.snap->ps.emplacedIndex ) {
 				vector3 pitchConstraint;
 
 				ignore = cg.snap->ps.emplacedIndex;
 
-				VectorCopy(&refdef->viewangles, &pitchConstraint);
+				VectorCopy( &refdef->viewangles, &pitchConstraint );
 
-				if (cg.renderingThirdPerson)
-					VectorCopy(&cg.predictedPlayerState.viewangles, &pitchConstraint);
+				if ( cg.renderingThirdPerson )
+					VectorCopy( &cg.predictedPlayerState.viewangles, &pitchConstraint );
 				else
-					VectorCopy(&refdef->viewangles, &pitchConstraint);
+					VectorCopy( &refdef->viewangles, &pitchConstraint );
 
-				if (pitchConstraint.pitch > 40)
+				if ( pitchConstraint.pitch > 40 )
 					pitchConstraint.pitch = 40;
 
 				AngleVectors( &pitchConstraint, &d_f, &d_rt, &d_up );
 			}
-			else
-			{
+			else {
 				vector3 pitchConstraint;
 
-				if (cg.renderingThirdPerson)
-					VectorCopy(&cg.predictedPlayerState.viewangles, &pitchConstraint);
+				if ( cg.renderingThirdPerson )
+					VectorCopy( &cg.predictedPlayerState.viewangles, &pitchConstraint );
 				else
-					VectorCopy(&refdef->viewangles, &pitchConstraint);
+					VectorCopy( &refdef->viewangles, &pitchConstraint );
 
 				AngleVectors( &pitchConstraint, &d_f, &d_rt, &d_up );
 			}
-			CG_CalcMuzzlePoint(cg.snap->ps.clientNum, &start);
+			CG_CalcMuzzlePoint( cg.snap->ps.clientNum, &start );
 		}
 
 		VectorMA( &start, cg.distanceCull, &d_f, &end );
 	}
-	else
-	{
+	else {
 		VectorCopy( &refdef->vieworg, &start );
 		VectorMA( &start, 131072, &refdef->viewaxis[0], &end );
 	}
 
 traceAgain:
-	if ( cg_dynamicCrosshair.integer && cg_dynamicCrosshairPrecision.integer )
-	{ //then do a trace with ghoul2 models in mind
-		CG_G2Trace( &trace, &start, &vec3_origin, &vec3_origin, &end,
-			ignore, CONTENTS_SOLID|CONTENTS_BODY );
-		if ( bVehCheckTraceFromCamPos )
-		{
-			//NOTE: this MUST stay up to date with the method used in WP_VehCheckTraceFromCamPos
+	if ( cg_dynamicCrosshair.integer && cg_dynamicCrosshairPrecision.integer ) {
+		// then do a trace with ghoul2 models in mind
+		CG_G2Trace( &trace, &start, &vec3_origin, &vec3_origin, &end, ignore, CONTENTS_SOLID|CONTENTS_BODY );
+		if ( bVehCheckTraceFromCamPos ) {
+			// this MUST stay up to date with the method used in WP_VehCheckTraceFromCamPos
 			centity_t *veh = &cg_entities[cg.predictedPlayerState.m_iVehicleNum];
-			trace_t	extraTrace;
-			vector3	viewDir2End, extraEnd;
-			float	minAutoAimDist = Distance( &veh->lerpOrigin, &refdef->vieworg ) + (veh->m_pVehicle->m_pVehicleInfo->length/2.0f) + 200.0f;
+			trace_t extraTrace;
+			vector3 viewDir2End, extraEnd;
+			float minAutoAimDist = Distance( &veh->lerpOrigin, &refdef->vieworg ) + (veh->m_pVehicle->m_pVehicleInfo->length/2.0f) + 200.0f;
 
 			VectorSubtract( &end, &refdef->vieworg, &viewDir2End );
 			VectorNormalize( &viewDir2End );
 			VectorMA( &refdef->vieworg, MAX_XHAIR_DIST_ACCURACY, &viewDir2End, &extraEnd );
-			CG_G2Trace( &extraTrace, &refdef->vieworg, &vec3_origin, &vec3_origin, &extraEnd,
-				ignore, CONTENTS_SOLID|CONTENTS_BODY );
-			if ( !extraTrace.allsolid
-				&& !extraTrace.startsolid )
-			{
-				if ( extraTrace.fraction < 1.0f )
-				{
-					if ( (extraTrace.fraction*MAX_XHAIR_DIST_ACCURACY) > minAutoAimDist )
-					{
-						if ( ((extraTrace.fraction*MAX_XHAIR_DIST_ACCURACY)-Distance( &veh->lerpOrigin, &refdef->vieworg )) < (trace.fraction*cg.distanceCull) )
-						{//this trace hit *something* that's closer than the thing the main trace hit, so use this result instead
-							memcpy( &trace, &extraTrace, sizeof( trace_t ) );
+			CG_G2Trace( &extraTrace, &refdef->vieworg, &vec3_origin, &vec3_origin, &extraEnd, ignore,
+				CONTENTS_SOLID|CONTENTS_BODY );
+			if ( !extraTrace.allsolid && !extraTrace.startsolid ) {
+				if ( extraTrace.fraction < 1.0f ) {
+					if ( (extraTrace.fraction*MAX_XHAIR_DIST_ACCURACY) > minAutoAimDist ) {
+						if ( ((extraTrace.fraction * MAX_XHAIR_DIST_ACCURACY)
+							- Distance( &veh->lerpOrigin, &refdef->vieworg )) < (trace.fraction * cg.distanceCull) )
+						{
+							// this trace hit *something* that's closer than the thing the main trace hit, so use this
+							//	result instead
+							memcpy( &trace, &extraTrace, sizeof( trace ) );
 						}
 					}
 				}
@@ -6194,43 +6040,25 @@ traceAgain:
 		}
 	}
 	else
-	{
 		CG_Trace( &trace, &start, &vec3_origin, &vec3_origin, &end, ignore, CONTENTS_SOLID|CONTENTS_BODY );
-	}
 
-	if (trace.entityNum < MAX_CLIENTS)
-	{
-		if (CG_IsMindTricked(cg_entities[trace.entityNum].currentState.trickedentindex,
-			cg_entities[trace.entityNum].currentState.trickedentindex2,
-			cg_entities[trace.entityNum].currentState.trickedentindex3,
-			cg_entities[trace.entityNum].currentState.trickedentindex4,
-			cg.snap->ps.clientNum))
+	if ( trace.entityNum < MAX_CLIENTS ) {
+		entityState_t *es = &cg_entities[trace.entityNum].currentState;
+		if ( CG_IsMindTricked( es->trickedentindex, es->trickedentindex2, es->trickedentindex3, es->trickedentindex4,
+			cg.snap->ps.clientNum ) )
 		{
-			if (cg.crosshairClientNum == trace.entityNum)
-			{
+			if ( cg.crosshairClientNum == trace.entityNum ) {
 				cg.crosshairClientNum = ENTITYNUM_NONE;
 				cg.crosshairClientTime = 0;
 			}
 
-			CG_DrawCrosshair(&trace.endpos, 0);
+			CG_DrawCrosshair( &trace.endpos, qfalse );
 
-			return; //this entity is mind-tricking the current client, so don't render it
-		}
-		/*
-		if ( (cg_entities[trace.entityNum].currentState.bolt1 && !(cg_entities[trace.entityNum].currentState.eFlags & EF_DEAD) && cg_entities[trace.entityNum].currentState.number != cg.snap->ps.clientNum && (!cg.snap->ps.duelInProgress || cg.snap->ps.duelIndex != cg_entities[trace.entityNum].currentState.number)) )
-		{
-			if ( cg.crosshairClientNum == trace.entityNum )
-			{
-				cg.crosshairClientNum = ENTITYNUM_NONE;
-				cg.crosshairClientTime = 0;
-			}
-			CG_DrawCrosshair( trace.endpos, 0 );
+			// this entity is mind-tricking the current client, so don't render it
 			return;
 		}
-		*/
 
-		if ( cg.snap->ps.duelInProgress && cg.snap->ps.duelIndex != trace.entityNum )
-		{
+		if ( cg.snap->ps.duelInProgress && cg.snap->ps.duelIndex != trace.entityNum ) {
 			ignore = trace.entityNum;
 			VectorCopy( &trace.endpos, &start );
 			traces++;
@@ -6241,29 +6069,25 @@ traceAgain:
 		}
 	}
 
-	if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR)
-	{
-		if (trace.entityNum < /*MAX_CLIENTS*/ENTITYNUM_WORLD)
-		{
+	if ( cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
+		if ( trace.entityNum < /*MAX_CLIENTS*/ENTITYNUM_WORLD ) {
 			centity_t *veh = &cg_entities[trace.entityNum];
 			cg.crosshairClientNum = trace.entityNum;
 			cg.crosshairClientTime = cg.time;
 
-			if ( veh->currentState.eType == ET_NPC &&
-				veh->currentState.NPC_class == CLASS_VEHICLE &&
-				veh->currentState.owner < MAX_CLIENTS )
-			{ //draw the name of the pilot then
+			if ( veh->currentState.eType == ET_NPC && veh->currentState.NPC_class == CLASS_VEHICLE
+				&& veh->currentState.owner < MAX_CLIENTS )
+			{
+				// draw the name of the pilot then
 				cg.crosshairClientNum = veh->currentState.owner;
 				cg.crosshairVehNum = veh->currentState.number;
 				cg.crosshairVehTime = cg.time;
 			}
 
-			CG_DrawCrosshair(&trace.endpos, 1);
+			CG_DrawCrosshair( &trace.endpos, qtrue );
 		}
 		else
-		{
-			CG_DrawCrosshair(&trace.endpos, 0);
-		}
+			CG_DrawCrosshair( &trace.endpos, qfalse );
 	}
 
 	if ( cg_drawCrosshairNames.integer >= 2 && trace.entityNum >= MAX_CLIENTS )
@@ -6271,9 +6095,8 @@ traceAgain:
 
 	// if the player is in fog, don't show it
 	content = trap->CM_PointContents( &trace.endpos, 0 );
-	if ( content & CONTENTS_FOG ) {
+	if ( content & CONTENTS_FOG )
 		return;
-	}
 
 	// update the fade timer
 	cg.crosshairClientNum = trace.entityNum;
@@ -8002,10 +7825,11 @@ void CG_Draw2D( void ) {
 */
 	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
 		CG_DrawSpectator();
-		CG_DrawCrosshair( NULL, 0 );
+		CG_DrawCrosshair( NULL, qfalse );
 		CG_DrawClientNames();
 		CG_SaberClashFlare();
-	} else {
+	}
+	else {
 		// don't draw any status if dead or the scoreboard is being explicitly shown
 		if ( !cg.showScores && cg.snap->ps.stats[STAT_HEALTH] > 0 ) {
 

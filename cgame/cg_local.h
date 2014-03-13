@@ -674,6 +674,10 @@ typedef struct cg_s {
 	} scoreboard;
 
 	struct {
+		ivector4		colour;
+	} crosshair;
+
+	struct {
 		ivector2		pos;
 		struct {
 			number			scale;

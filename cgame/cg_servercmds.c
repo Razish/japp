@@ -256,23 +256,19 @@ void CG_ShaderStateChanged( void ) {
 	while ( o && *o ) {
 		n = strstr( o, "=" );
 		if ( n && *n ) {
-			Q_strncpyz( originalShader, o, n-o );
-			originalShader[n-o] = '\0';
+			Q_strncpyz( originalShader, o, (n-o)+1 );
 			n++;
 
 			t = strstr( n, ":" );
-			if ( t && *t ) {
-				Q_strncpyz( newShader, n, t-n );
-				newShader[t-n] = '\0';
-			}
+			if ( t && *t )
+				Q_strncpyz( newShader, n, (t-n)+1 );
 			else
 				break;
 
 			t++;
 			o = strstr( t, "@" );
-			if ( o && *o ) {
-				Q_strncpyz( timeOffset, t, o-t );
-				timeOffset[o-t] = '\0';
+			if ( o ) {
+				Q_strncpyz( timeOffset, t, (o-t)+1 );
 				o++;
 				trap->R_RemapShader( originalShader, newShader, timeOffset );
 			}

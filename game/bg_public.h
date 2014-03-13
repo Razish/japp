@@ -1160,7 +1160,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #define	DF_NO_FALLING			(0x0008u)
 #define DF_FIXED_FOV			(0x0010u)
 #define	DF_NO_FOOTSTEPS			(0x0020u)
-#define DF_NO_DROWN				(0x0040u) //RAZTODO
+#define DF_NO_DROWN				(0x0040u)
 #define DF_FIXED_YAW			(0x0080u) //RAZTODO: Er, what do..
 #define DF_NO_FIXED_ANIMS		(0x0100u) //RAZTODO: Whut?
 #define DF_NO_REALISTIC_HOOK	(0x0200u) //RAZTODO: Whut?
