@@ -949,7 +949,7 @@ void NPC_BuildRandom( gentity_t *NPC )
 }
 #endif
 
-extern void SetupGameGhoul2Model(gentity_t *ent, const char *modelname, char *skinName);
+extern void SetupGameGhoul2Model( gentity_t *ent, char *modelname, char *skinName );
 qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 {
 	const char	*token;
@@ -3177,7 +3177,7 @@ Ghoul2 Insert Start
 			//we put the $ in front to indicate a name and not a model
 			strcpy(playerModel, va("$%s", NPCName));
 		}
-		SetupGameGhoul2Model(NPC, playerModel, customSkin);
+		SetupGameGhoul2Model( NPC, playerModel, customSkin );
 
 		if (!NPC->NPC_type)
 		{ //just do this for now so NPC_Precache can see the name.

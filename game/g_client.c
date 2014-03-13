@@ -1450,14 +1450,9 @@ void *g2SaberInstance = NULL;
 qboolean BG_IsValidCharacterModel(const char *modelName, const char *skinName);
 qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team, vector3 *colors );
 
-void SetupGameGhoul2Model(gentity_t *ent, const char *modelname, char *skinName)
-{
+void SetupGameGhoul2Model( gentity_t *ent, char *modelname, char *skinName ) {
 	int handle;
-	char		afilename[MAX_QPATH];
-#if 0
-	char		/**GLAName,*/ *slash;
-#endif
-	char		GLAName[MAX_QPATH];
+	char afilename[MAX_QPATH], GLAName[MAX_QPATH];
 	vector3	tempVec = {0,0,0};
 
 	// First things first.  If this is a ghoul2 model, then let's make sure we demolish this first.
@@ -1494,6 +1489,7 @@ void SetupGameGhoul2Model(gentity_t *ent, const char *modelname, char *skinName)
 			if ( ent->client->NPC_class == CLASS_VEHICLE ) {
 				const char *vehModel = BG_GetVehicleModelName( modelname );
 				Q_strncpyz( vehicleName, modelname, sizeof( vehicleName ) );
+				Q_strncpyz( modelname, vehModel, strlen( modelname ) ); // should only remove the $
 				Q_strncpyz( truncModelName, vehModel, sizeof( truncModelName ) );
 				skin[0] = '\0';
 				if ( ent->m_pVehicle && ent->m_pVehicle->m_pVehicleInfo && ent->m_pVehicle->m_pVehicleInfo->skin
@@ -2225,8 +2221,10 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	// only going to be true for allowable server-side custom skeleton cases
 	if ( modelChanged ) {
 		// update the server g2 instance if appropriate
-		const char *modelname = Info_ValueForKey( userinfo, "model" );
+		char modelname[MAX_QPATH];
+		Q_strncpyz( modelname, Info_ValueForKey( userinfo, "model" ), sizeof( modelname ) );
 		SetupGameGhoul2Model( ent, modelname, NULL );
+		Info_SetValueForKey( userinfo, "model", modelname );
 
 		if ( ent->ghoul2 && ent->client )
 			ent->client->renderInfo.lastG2 = NULL; //update the renderinfo bolts next update.
@@ -2468,7 +2466,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	uint32_t flags;
 	int i, spawnCount;
 	char userinfo[MAX_INFO_VALUE];
-	const char *modelname;
+	char modelname[MAX_QPATH];
 
 	ent = g_entities + clientNum;
 
@@ -2587,9 +2585,10 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	WP_SaberInitBladeData( ent );
 
 	// First time model setup for that player.
-	trap->GetUserinfo( clientNum, userinfo, sizeof(userinfo) );
-	modelname = Info_ValueForKey (userinfo, "model");
-	SetupGameGhoul2Model(ent, modelname, NULL);
+	trap->GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	Q_strncpyz( modelname, Info_ValueForKey( userinfo, "model" ), sizeof( modelname ) );
+	SetupGameGhoul2Model( ent, modelname, NULL );
+	Info_SetValueForKey( userinfo, "model", modelname );
 
 	if ( ent->ghoul2 && ent->client )
 		ent->client->renderInfo.lastG2 = NULL; //update the renderinfo bolts next update.

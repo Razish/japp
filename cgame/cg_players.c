@@ -5932,7 +5932,7 @@ void CG_G2AnimEntModelLoad( centity_t *cent ) {
 				skinID = trap->R_RegisterSkin( va( "models/players/%s/model_%s.skin", modelName, cent->m_pVehicle->m_pVehicleInfo->skin ) );
 			else
 				skinID = trap->R_RegisterSkin( va( "models/players/%s/model_default.skin", modelName ) );
-			Com_sprintf( modelName, sizeof( modelName ), "models/players/%s/model.glm", modelName );
+			Q_strncpyz( modelName, va( "models/players/%s/model.glm", modelName ), sizeof( modelName ) );
 		}
 		else
 			skinID = CG_HandleAppendedSkin( modelName ); //get the skin if there is one.
