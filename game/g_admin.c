@@ -243,8 +243,17 @@ void AM_SaveAdmins( void ) {
 // returns qtrue if inflicter is higher on the rank hierarchy, and qtrue on equal if japp_passRankConflicts is 1.
 //	otherwise, returns qfalse and prints a message to the inflicter to warn them.
 qboolean AM_CanInflict( gentity_t *entInflicter, gentity_t *entVictim ) {
-	adminUser_t *inflicter = entInflicter->client->pers.adminUser;
-	adminUser_t *victim = entVictim->client->pers.adminUser;
+	adminUser_t *inflicter, *victim;
+
+	// if they're not valid, pretend we can inflict divine punishment on them
+	if ( !entInflicter || !entInflicter->inuse || !entInflicter->client
+		|| !entVictim || !entVictim->inuse || !entVictim->client )
+	{
+		return qtrue;
+	}
+
+	inflicter = entInflicter->client->pers.adminUser;
+	victim = entVictim->client->pers.adminUser;
 
 	// if either one is not an admin, they lose by default.
 	if ( !victim )
@@ -253,7 +262,7 @@ qboolean AM_CanInflict( gentity_t *entInflicter, gentity_t *entVictim ) {
 	if ( entInflicter == entVictim )
 		return qtrue; // you can abuse yourself, of course.
 
-	if( inflicter->rank == victim->rank ) {
+	if ( inflicter->rank == victim->rank ) {
 		if ( japp_passRankConflicts.integer ) {
 			G_LogPrintf( level.log.console, "%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s"
 				"(User: %s) (Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank,
@@ -512,8 +521,8 @@ static void AM_Login( gentity_t *ent ) {
 	}
 
 	if ( user ) {
-		char *loginMsg = ent->client->pers.adminUser->loginMsg;
-		char *sendMsg = NULL, *tmp = NULL;
+		const char *loginMsg = ent->client->pers.adminUser->loginMsg;
+		char *sendMsg = NULL;
 
 		if ( !VALIDSTRING( loginMsg ) ) {
 			trap->SendServerCommand( ent-g_entities, "print \"You have logged in\n\"" );
@@ -521,11 +530,7 @@ static void AM_Login( gentity_t *ent ) {
 		}
 
 		sendMsg = Q_strrep( ent->client->pers.adminUser->loginMsg, "$name", ent->client->pers.netname );
-		if ( (tmp=Q_strrep( sendMsg, "\\n", "\n" )) ) {
-			free( sendMsg );
-			sendMsg = tmp;
-			tmp = NULL;
-		}
+		Q_ConvertLinefeeds( sendMsg );
 		trap->SendServerCommand( -1, va( "print \"%s\n\"", sendMsg ) );
 		free( sendMsg );
 	}
@@ -542,22 +547,21 @@ static void AM_Logout( gentity_t *ent ) {
 // display list of admins
 static void AM_WhoIs( gentity_t *ent ) {
 	int i;
-	char msg[1024-128] = { 0 };
-	gclient_t *cl;
+	char msg[1024-128] = {0};
+	gentity_t *e = NULL;
 
 	Q_strcat( msg, sizeof( msg ), S_COLOR_WHITE"Name                                Admin User                      Rank\n" );
 
 	// if the client is an admin, append their name and 'user' to the string
-	for ( i=0; i<MAX_CLIENTS; i++ ) {
-		cl = &level.clients[i];
-		if ( cl->pers.adminUser ) {
-			char strName[MAX_NETNAME] = {0}, strAdmin[32] = {0}, strRank[12] = {0};
+	for ( i=0, e=g_entities; i<level.maxclients; i++, e++ ) {
+		if ( e->client->pers.adminUser ) {
+			char strName[MAX_NETNAME], strAdmin[32], strRank[12];
 
-			Q_strncpyz( strName, cl->pers.netname, sizeof( strName ) );
+			Q_strncpyz( strName, e->client->pers.netname, sizeof( strName ) );
 			Q_CleanString( strName, STRIP_COLOUR );
-			Q_strncpyz( strAdmin, (cl->pers.adminUser) ? cl->pers.adminUser->user : "", sizeof( strAdmin ) );
+			Q_strncpyz( strAdmin, (e->client->pers.adminUser) ? e->client->pers.adminUser->user : "", sizeof( strAdmin ) );
 			Q_CleanString( strAdmin, STRIP_COLOUR );
-			Q_strncpyz( strRank, va( "%d", cl->pers.adminUser->rank ), sizeof( strRank ) );
+			Q_strncpyz( strRank, va( "%d", e->client->pers.adminUser->rank ), sizeof( strRank ) );
 
 			Q_strcat( msg, sizeof( msg ), va( "%-36s%-32s%-12s\n", strName, strAdmin, strRank ) );
 		}
@@ -570,28 +574,22 @@ static void AM_WhoIs( gentity_t *ent ) {
 static void AM_Status( gentity_t *ent ) {
 	int i;
 	char msg[1024-128] = {0};
-	gclient_t *cl;
+	gentity_t *e;
 
 	Q_strcat( msg, sizeof( msg ), S_COLOR_WHITE"clientNum   Name                                IP                      Admin User\n" );
 
 	// build a list of clients
-	for ( i=0; i<MAX_CLIENTS; i++ ) {
+	for ( i=0, e=g_entities; i<level.maxclients; i++, e++ ) {
 		const char *tmpMsg = NULL;
-		if ( !g_entities[i].inuse )
-			continue;
 
-		cl = &level.clients[i];
-		if ( cl->pers.netname[0] ) {
-			char strNum[12] = {0};
-			char strName[MAX_NETNAME] = {0};
-			char strIP[NET_ADDRSTRMAXLEN] = {0};
-			char strAdmin[32] = {0};
+		if ( e->client->pers.netname[0] ) {
+			char strNum[12], strName[MAX_NETNAME], strIP[NET_ADDRSTRMAXLEN], strAdmin[32];
 
 			Q_strncpyz( strNum, va( "(%i)", i ), sizeof( strNum ) );
-			Q_strncpyz( strName, cl->pers.netname, sizeof( strName ) );
+			Q_strncpyz( strName, e->client->pers.netname, sizeof( strName ) );
 			Q_CleanString( strName, STRIP_COLOUR );
-			Q_strncpyz( strIP, cl->sess.IP, sizeof( strIP ) );
-			Q_strncpyz( strAdmin, (cl->pers.adminUser) ? cl->pers.adminUser->user : "", sizeof( strAdmin ) );
+			Q_strncpyz( strIP, e->client->sess.IP, sizeof( strIP ) );
+			Q_strncpyz( strAdmin, (e->client->pers.adminUser) ? e->client->pers.adminUser->user : "", sizeof( strAdmin ) );
 			Q_CleanString( strAdmin, STRIP_COLOUR );
 
 			tmpMsg = va( "%-12s%-36s%-24s%-32s\n", strNum, strName, strIP, strAdmin );
@@ -639,10 +637,11 @@ static void AM_Announce( gentity_t *ent ) {
 	// valid client
 	else {
 		trap->SendServerCommand( targetClient, va( "cp \"%s\"", msg ) );
-		trap->SendServerCommand( ent-g_entities, va( "cp \"Relay:\n%s\"", msg ) ); //Helena wanted me to relay it back to the sender
+		trap->SendServerCommand( ent-g_entities, va( "cp \"Relay:\n%s\"", msg ) );
 	}
 
-	G_LogPrintf( level.log.console, "AM_Announce: Start\nSender: %s\nMessage: %s\nAM_Announce: End\n", ent->client->pers.netname, msg );
+	G_LogPrintf( level.log.console, "AM_Announce: Start\nSender: %s\nMessage: %s\nAM_Announce: End\n",
+		ent->client->pers.netname, msg );
 
 	return;
 }
@@ -663,7 +662,7 @@ static void AM_Ghost( gentity_t *ent ) {
 
 	targ = &g_entities[targetClient];
 
-	if( !AM_CanInflict( ent, targ ) )
+	if ( !AM_CanInflict( ent, targ ) )
 		return;
 
 	if ( targ->client->pers.adminData.isGhost ) {
@@ -829,11 +828,11 @@ static void AM_Teleport( gentity_t *ent ) {
 			trap->Argv( 3, argY, sizeof( argY ) );
 			trap->Argv( 4, argZ, sizeof( argZ ) );
 
-			VectorCopy( tv( atoi(argX), atoi(argY), atoi(argZ) ), &telePos );
+			VectorCopy( tv( atoi( argX ), atoi( argY ), atoi( argZ ) ), &telePos );
 			// amtele c x y z r
 			if ( trap->Argc() == 6 ) {
 				vector3 angles = { 0.0f };
-				char argR[8]={0};
+				char argR[8];
 
 				trap->Argv( 5, argR, sizeof( argR ) );
 				angles.yaw = atoi( argR );
@@ -851,6 +850,7 @@ static void AM_GunTeleport( gentity_t *ent ) {
 	trace_t *tr = G_RealTrace( ent, 0.0f );
 	vector3 telepos;
 
+	// don't get stuck in walls
 	VectorMA( &tr->endpos, 48.0f, &tr->plane.normal, &telepos );
 	TeleportPlayer( ent, &telepos, &ent->client->ps.viewangles );
 }
@@ -895,7 +895,8 @@ static void AM_GunTeleportMark( gentity_t *ent ) {
 	tent = G_PlayEffect( EFFECT_EXPLOSION, &tr->endpos, &tr->plane.normal );
 	tent->r.svFlags |= SVF_SINGLECLIENT;
 	tent->r.singleClient = ent->s.number;
-	trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_CYAN"Teleport mark created at "S_COLOR_YELLOW"%s\n\"", vtos( &telePos ) ) );
+	trap->SendServerCommand( ent-g_entities, va( "print \""S_COLOR_CYAN"Teleport mark created at "S_COLOR_YELLOW"%s\n\"",
+		vtos( &telePos ) ) );
 }
 
 // remove a telemark from the list
@@ -971,7 +972,7 @@ static void AM_Poll( gentity_t *ent ) {
 	}
 
 	trap->Argv( 0, arg1, sizeof( arg1 ) );
-	//Q_strncpyz( arg2, ConcatArgs( 2 ), sizeof( arg2 ) );
+//	Q_strncpyz( arg2, ConcatArgs( 2 ), sizeof( arg2 ) );
 	Q_strncpyz( arg2, ent->client->pers.netname, sizeof( arg2 ) );
 	Q_CleanString( arg2, STRIP_COLOUR );
 	Q_strstrip( arg2, "\n\r;\"", NULL );
@@ -1033,13 +1034,14 @@ static void AM_ForceTeam( gentity_t *ent ) {
 	trap->Argv( 2, arg2, sizeof( arg2 ) );
 	targetClient = (trap->Argc()>1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR|FINDCL_PRINT ) : ent-g_entities;
 
+	//TODO: amforceteam -1
 	if ( targetClient == -1 )
 		return;
 
 	targ = &g_entities[targetClient];
 
-	if( !AM_CanInflict( ent, targ ) )
-			return;
+	if ( !AM_CanInflict( ent, targ ) )
+		return;
 
 	if ( targ->inuse && targ->client && targ->client->pers.connected )
 		SetTeam( targ, arg2, qtrue );
@@ -1049,9 +1051,8 @@ static void AM_ForceTeam( gentity_t *ent ) {
 static void AM_GunSpectate( gentity_t *ent ) {
 	trace_t *tr = G_RealTrace( ent, 0.0f );
 
-	if ( tr->entityNum < MAX_CLIENTS )
-	{
-		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
+	if ( tr->entityNum < MAX_CLIENTS ) {
+		if ( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
 			return;
 		SetTeam( &g_entities[tr->entityNum], "s", qtrue );
 	}
@@ -1059,7 +1060,7 @@ static void AM_GunSpectate( gentity_t *ent ) {
 
 // protect/unprotect the specified client
 static void AM_Protect( gentity_t *ent ) {
-	char arg1[64] = { 0 };
+	char arg1[64];
 	int targetClient;
 	gentity_t *targ;
 
@@ -1072,11 +1073,11 @@ static void AM_Protect( gentity_t *ent ) {
 
 	targ = &g_entities[targetClient];
 
-	if( !AM_CanInflict( ent, targ ) )
-			return;
+	if ( !AM_CanInflict( ent, targ ) )
+		return;
 
-	targ->client->ps.eFlags			^= EF_INVULNERABLE;
-	targ->client->invulnerableTimer	= !!( targ->client->ps.eFlags & EF_INVULNERABLE ) ? 0x7FFFFFFF : level.time;
+	targ->client->ps.eFlags ^= EF_INVULNERABLE;
+	targ->client->invulnerableTimer = !!( targ->client->ps.eFlags & EF_INVULNERABLE ) ? 0x7FFFFFFF : level.time;
 
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s "S_COLOR_WHITE"has been %s\n\"", targ->client->pers.netname,
 		!!(targ->client->ps.eFlags&EF_INVULNERABLE)?S_COLOR_GREEN"protected":S_COLOR_RED"unprotected" ) );
@@ -1087,19 +1088,19 @@ static void AM_GunProtect( gentity_t *ent ) {
 	trace_t *tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
-		gclient_t *cl = &level.clients[tr->entityNum];
-		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
+		gentity_t *e = g_entities + tr->entityNum;
+
+		if ( !AM_CanInflict( ent, e ) )
 			return;
 
-
-		cl->ps.eFlags			^= EF_INVULNERABLE;
-		cl->invulnerableTimer	= !!(cl->ps.eFlags & EF_INVULNERABLE) ? level.time : 0x7FFFFFFF;
+		e->client->ps.eFlags ^= EF_INVULNERABLE;
+		e->client->invulnerableTimer = !!(e->client->ps.eFlags & EF_INVULNERABLE) ? level.time : 0x7FFFFFFF;
 	}
 }
 
 static void AM_Empower( gentity_t *ent ) {
 	char arg1[64] = {0};
-	int targetClient;
+	int i, targetClient;
 	gentity_t *targ;
 
 	// can empower: self, partial name, clientNum
@@ -1111,14 +1112,12 @@ static void AM_Empower( gentity_t *ent ) {
 
 	targ = &g_entities[targetClient];
 
-	if( !AM_CanInflict( ent, targ ) )
-			return;
-
+	if ( !AM_CanInflict( ent, targ ) )
+		return;
 
 	targ->client->pers.adminData.empowered = !targ->client->pers.adminData.empowered;
 	targ->client->ps.fd.forcePowerSelected = 0; // HACK: What the actual fuck
 	if ( targ->client->pers.adminData.empowered ) {
-		int i = 0;
 		targ->client->ps.eFlags |= EF_BODYPUSH;
 
 		targ->client->pers.adminData.forcePowersKnown = targ->client->ps.fd.forcePowersKnown;
@@ -1132,7 +1131,6 @@ static void AM_Empower( gentity_t *ent ) {
 		}
 	}
 	else {
-		int i = 0;
 		targ->client->ps.eFlags &= ~EF_BODYPUSH;
 
 		targ->client->ps.fd.forcePowersKnown = targ->client->pers.adminData.forcePowersKnown;
@@ -1146,7 +1144,7 @@ static void AM_Empower( gentity_t *ent ) {
 extern void G_Knockdown( gentity_t *self, gentity_t *attacker, const vector3 *pushDir, float strength, qboolean breakSaberLock );
 static void Slap( gentity_t *targ ) {
 	vector3 newDir = { 0.0f, 0.0f, 0.0f };
-	int i=0;
+	int i;
 
 	for ( i=0; i<2; i++ ) {
 		newDir.data[i] = crandom();
@@ -1176,8 +1174,8 @@ static void AM_Slap( gentity_t *ent ) {
 	if ( targetClient == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
-			return;
+	if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
+		return;
 
 	Slap( &g_entities[targetClient] );
 }
@@ -1186,9 +1184,8 @@ static void AM_Slap( gentity_t *ent ) {
 static void AM_GunSlap( gentity_t *ent ) {
 	trace_t *tr = G_RealTrace( ent, 0.0f );
 
-	if ( tr->entityNum < MAX_CLIENTS )
-	{
-		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
+	if ( tr->entityNum < MAX_CLIENTS ) {
+		if ( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
 			return;
 		Slap( &g_entities[tr->entityNum] );
 	}
@@ -1205,8 +1202,9 @@ static void Unfreeze( gclient_t *cl ) {
 
 // freeze specified client on the spot
 static void AM_Freeze( gentity_t *ent ) {
-	char arg1[64] = { 0 };
+	char arg1[64];
 	int clientNum;
+	gentity_t *e = NULL;
 
 	if ( trap->Argc() < 2 ) {
 		trap->SendServerCommand( ent-g_entities, "print \"Please specify a player to be frozen (Or -1 for all)\n\"" );
@@ -1221,34 +1219,46 @@ static void AM_Freeze( gentity_t *ent ) {
 	if ( arg1[0] == '-' && arg1[1] == '1' )
 		clientNum = -2;
 
-	// freeze everyone
+	// freeze/unfreeze everyone
 	if ( clientNum == -2 ) {
+		qboolean allFrozen = qtrue;
 		int i;
-		for ( i=0; i<MAX_CLIENTS; i++ )
-		{
-			if( !AM_CanInflict( ent, &g_entities[i] ) )
-				return;
-			Freeze( &level.clients[i] );
+		for ( i=0, e=g_entities; i<level.maxclients; i++, e++ ) {
+			if ( !e->client->pers.adminData.isFrozen ) {
+				allFrozen = qfalse;
+				break;
+			}
 		}
-		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_CYAN"frozen\n\"" );
+		for ( i=0, e=g_entities; i<level.maxclients; i++, e++ ) {
+			if ( !AM_CanInflict( ent, e ) )
+				continue;
+
+			if ( allFrozen )
+				Unfreeze( e->client );
+			else
+				Freeze( e->client );
+		}
+		trap->SendServerCommand( -1, va( "cp \"You have all been "S_COLOR_CYAN"%sfrozen\n\"", allFrozen?"un":"" ) );
 	}
 	// freeze specified clientNum
 	else if ( clientNum != -1 ) {
-		gclient_t *cl = &level.clients[clientNum];
+		const char *pre = "";
+		e = g_entities + clientNum;
 
-		if( !AM_CanInflict( ent, &g_entities[clientNum] ) )
+		if ( e->client->pers.adminData.isFrozen )
+			pre = "un";
+
+		if ( !AM_CanInflict( ent, e ) )
 			return;
 
-		if ( cl->pers.adminData.isFrozen ) {
-			Unfreeze( cl );
-			trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"unfrozen\n\"", cl->pers.netname ) );
-			trap->SendServerCommand( clientNum, "cp \"You have been "S_COLOR_CYAN"unfrozen\n\"" );
-		}
-		else {
-			Freeze( cl );
-			trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"frozen\n\"", cl->pers.netname ) );
-			trap->SendServerCommand( clientNum, "cp \"You have been "S_COLOR_CYAN"frozen\n\"" );
-		}
+		if ( e->client->pers.adminData.isFrozen )
+			Unfreeze( e->client );
+		else
+			Freeze( e->client );
+
+		trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"%sfrozen\n\"",
+			e->client->pers.netname, pre ) );
+		trap->SendServerCommand( clientNum, va( "cp \"You have been "S_COLOR_CYAN"%sfrozen\n\"", pre ) );
 	}
 }
 
@@ -1257,31 +1267,26 @@ static void AM_GunFreeze( gentity_t *ent ) {
 	trace_t	*tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
-		gclient_t *cl = &level.clients[tr->entityNum];
+		gentity_t *e = g_entities + tr->entityNum;
+		const char *pre = e->client->pers.adminData.isFrozen ? "un" : "";
 
-		if( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) )
+		if( !AM_CanInflict( ent, e ) )
 			return;
 
-		if ( cl->pers.adminData.isFrozen ) {
-			Unfreeze( cl );
-			trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"unfrozen\n\"", cl->pers.netname ) );
-			trap->SendServerCommand( tr->entityNum, "cp \"You have been "S_COLOR_CYAN"unfrozen\n\"" );
-		}
-		else {
-			Freeze( cl );
-			trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"frozen\n\"", cl->pers.netname ) );
-			trap->SendServerCommand( tr->entityNum, "cp \"You have been "S_COLOR_CYAN"frozen\n\"" );
-		}
+		if ( e->client->pers.adminData.isFrozen )
+			Unfreeze( e->client );
+		else
+			Freeze( e->client );
+
+		trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"%sfrozen\n\"",
+			e->client->pers.netname, pre ) );
+		trap->SendServerCommand( tr->entityNum, va( "cp \"You have been "S_COLOR_CYAN"%sfrozen\n\"", pre ) );
 	}
-#ifdef _DEBUG
-	else
-		trap->SendServerCommand( ent-g_entities, "print \"Gunfreeze missed!\n\"" );
-#endif
 }
 
 // silence specified client
 static void AM_Silence( gentity_t *ent ) {
-	char arg1[64] = { 0 };
+	char arg1[64];
 	int targetClient;
 
 	if ( trap->Argc() < 2 ) {
@@ -1294,10 +1299,9 @@ static void AM_Silence( gentity_t *ent ) {
 	// silence everyone
 	if ( atoi( arg1 ) == -1 ) {
 		int i;
-		for ( i=0; i<MAX_CLIENTS; i++ )
-		{
-			if( !AM_CanInflict( ent, &g_entities[i] ) )
-				return;
+		for ( i=0; i<level.maxclients; i++ ) {
+			if ( !AM_CanInflict( ent, &g_entities[i] ) )
+				continue;
 			level.clients[i].pers.adminData.canTalk = qfalse;
 		}
 		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_CYAN"silenced\n\"" );
@@ -1308,11 +1312,12 @@ static void AM_Silence( gentity_t *ent ) {
 	if ( targetClient == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
-			return;
+	if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
+		return;
 
 	level.clients[targetClient].pers.adminData.canTalk = qfalse;
-	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"silenced\n\"", level.clients[targetClient].pers.netname ) );
+	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"silenced\n\"",
+		level.clients[targetClient].pers.netname ) );
 	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_CYAN"silenced\n\"" );
 }
 
@@ -1331,10 +1336,9 @@ static void AM_Unsilence( gentity_t *ent ) {
 	// unsilence everyone
 	if ( atoi( arg1 ) == -1 ) {
 		int i;
-		for ( i=0; i<MAX_CLIENTS; i++ )
-		{
-			if( !AM_CanInflict( ent, &g_entities[i] ) )
-				return;
+		for ( i=0; i<level.maxclients; i++ ) {
+			if ( !AM_CanInflict( ent, &g_entities[i] ) )
+				continue;
 			level.clients[i].pers.adminData.canTalk = qtrue;
 		}
 		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_CYAN"unsilenced\n\"" );
@@ -1345,8 +1349,8 @@ static void AM_Unsilence( gentity_t *ent ) {
 	if ( targetClient == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
-			return;
+	if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
+		return;
 
 	level.clients[targetClient].pers.adminData.canTalk = qtrue;
 	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"un-silenced\n\"", level.clients[targetClient].pers.netname ) );
@@ -1370,11 +1374,12 @@ static void AM_Slay( gentity_t *ent ) {
 	if ( targetClient == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
-			return;
+	if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
+		return;
 
 	Cmd_Kill_f( &g_entities[targetClient] );
-	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_RED"slain\n\"", level.clients[targetClient].pers.netname ) );
+	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_RED"slain\n\"",
+		level.clients[targetClient].pers.netname ) );
 	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_RED"slain\n\"" );
 }
 
@@ -1399,8 +1404,8 @@ static void AM_Kick( gentity_t *ent ) {
 	if ( clientNum == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[clientNum] ) )
-			return;
+	if ( !AM_CanInflict( ent, &g_entities[clientNum] ) )
+		return;
 
 	Q_strncpyz( string, va( "Kicked!\nReason: %s", reason ? reason : "Not specified" ), sizeof( string ) );
 	trap->DropClient( clientNum, string );
@@ -1424,7 +1429,7 @@ static void AM_Ban( gentity_t *ent ) {
 		if ( targetClient == -1 )
 			return;
 
-		if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
+		if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
 			return;
 
 		Q_strncpyz( arg1, g_entities[targetClient].client->sess.IP, sizeof( arg1 ) );
@@ -1517,7 +1522,7 @@ static void AM_EntSpawn( gentity_t *ent ) {
 	trace_t		*tr = G_RealTrace( ent, 0.0f );
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent-g_entities, "print \"AM_EntSpawn: syntax is 'amspawn entity' where 'entity' is"
+		trap->SendServerCommand( ent-g_entities, "print \"AM_EntSpawn: syntax is 'amspawn entity' where 'entity' is "
 			"misc_model, info_player_start, etc\n\"" );
 		return;
 	}
@@ -1577,8 +1582,8 @@ static void AM_ReloadLua( gentity_t *ent ) {
 
 // change map and gamemode
 static void AM_Map( gentity_t *ent ) {
-	char gametypeStr[32], map[MAX_QPATH];
-	char *filter = NULL, *args = ConcatArgs( 1 );
+	char gametypeStr[32], map[MAX_QPATH], *args = ConcatArgs( 1 );
+	const char *filter = NULL;
 	int gametype = 0, i = 0;
 
 	if ( trap->Argc() < 2 ) {
@@ -1610,12 +1615,8 @@ static void AM_Map( gentity_t *ent ) {
 		}
 	}
 
-	if ( (filter = strchr( args, ';' )) != NULL ) {
-		*filter = '\0';
-		Com_Printf( "AM_Map: %s passed suspicious arguments that contained ; or \\n!\n", ent->client->pers.netname );
-	}
-	if ( (filter = strchr( args, '\n' )) != NULL ) {
-		*filter = '\0';
+	if ( (filter = Q_strchrs( args, ";\n" )) != NULL ) {
+		args[filter-args] = '\0';
 		Com_Printf( "AM_Map: %s passed suspicious arguments that contained ; or \\n!\n", ent->client->pers.netname );
 	}
 
@@ -1626,14 +1627,11 @@ static void AM_Map( gentity_t *ent ) {
 }
 
 static void AM_Vstr( gentity_t *ent ) {
-	char *filter = NULL, *args = ConcatArgs( 1 );
+	char *args = ConcatArgs( 1 );
+	const char *filter = NULL;
 
-	if ( (filter = strchr( args, ';' )) != NULL ) {
-		*filter = '\0';
-		Com_Printf( "AM_Vstr: %s attempted to issue a non-vstr command\n", ent->client->pers.netname );
-	}
-	if ( (filter = strchr( args, '\n' )) != NULL ) {
-		*filter = '\0';
+	if ( (filter = Q_strchrs( args, ";\n" )) != NULL ) {
+		args[filter-args] = '\0';
 		Com_Printf( "AM_Vstr: %s attempted to issue a non-vstr command\n", ent->client->pers.netname );
 	}
 
@@ -1654,8 +1652,8 @@ static void AM_Merc( gentity_t *ent ) {
 
 	targ = &g_entities[targetClient];
 
-	if( !AM_CanInflict( ent, targ ) )
-			return;
+	if ( !AM_CanInflict( ent, targ ) )
+		return;
 
 	targ->client->pers.adminData.merc = !targ->client->pers.adminData.merc;
 	// give everything between WP_NONE and LAST_USEABLE_WEAPON
@@ -1701,7 +1699,7 @@ static void AM_Rename( gentity_t *ent ) {
 	char arg1[MAX_NETNAME], arg2[MAX_NETNAME], oldName[MAX_NETNAME];
 	char info[MAX_INFO_STRING];
 	int targetClient;
-	gclient_t *cl;
+	gentity_t *e = NULL;
 
 	if ( trap->Argc() != 3 ) {
 		trap->SendServerCommand( ent-g_entities, "print \""S_COLOR_YELLOW"Usage: \\amrename <client> <name>\n\"" );
@@ -1715,30 +1713,30 @@ static void AM_Rename( gentity_t *ent ) {
 	if ( targetClient == -1 )
 		return;
 
-	if( !AM_CanInflict( ent, &g_entities[targetClient] ) )
-			return;
-
-	cl = &level.clients[targetClient];
-	Q_strncpyz( oldName, cl->pers.netname, sizeof( oldName ) );
-	ClientCleanName( arg2, cl->pers.netname, sizeof( cl->pers.netname ) );
-
-	if ( !strcmp( oldName, cl->pers.netname ) )
+	e = g_entities + targetClient;
+	if ( !AM_CanInflict( ent, e ) )
 		return;
 
-	Q_strncpyz( cl->pers.netnameClean, cl->pers.netname, sizeof( cl->pers.netnameClean ) );
-	Q_CleanString( cl->pers.netnameClean, STRIP_COLOUR );
+	Q_strncpyz( oldName, e->client->pers.netname, sizeof( oldName ) );
+	ClientCleanName( arg2, e->client->pers.netname, sizeof( e->client->pers.netname ) );
+
+	if ( !strcmp( oldName, e->client->pers.netname ) )
+		return;
+
+	Q_strncpyz( e->client->pers.netnameClean, e->client->pers.netname, sizeof( e->client->pers.netnameClean ) );
+	Q_CleanString( e->client->pers.netnameClean, STRIP_COLOUR );
 
 	// update clientinfo
 	trap->GetConfigstring( CS_PLAYERS+targetClient, info, sizeof( info ) );
-	Info_SetValueForKey( info, "n", cl->pers.netname );
+	Info_SetValueForKey( info, "n", e->client->pers.netname );
 	trap->SetConfigstring( CS_PLAYERS+targetClient, info );
 
 	// update userinfo (in engine)
 	trap->GetUserinfo( targetClient, info, sizeof( info ) );
-	Info_SetValueForKey( info, "name", cl->pers.netname );
+	Info_SetValueForKey( info, "name", e->client->pers.netname );
 	trap->SetUserinfo( targetClient, info );
 	trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldName, G_GetStringEdString( "MP_SVGAME",
-		"PLRENAME" ), cl->pers.netname ) );
+		"PLRENAME" ), e->client->pers.netname ) );
 }
 
 static void AM_LockTeam( gentity_t *ent ) {
@@ -1828,9 +1826,6 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 	trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"team has been unlocked\n\"", TeamName( team ) ) );
 }
 
-//Walk around no weapon no melee
-//admin chat logs
-
 typedef struct adminCommand_s {
 	const char	*cmd;
 	uint32_t	privilege;
@@ -1901,9 +1896,9 @@ qboolean AM_HasPrivilege( const gentity_t *ent, uint32_t privilege ) {
 	return qfalse;
 }
 
-//	Handle admin related commands.
-//	Return true if the command exists and/or everything was handled fine.
-//	Return false if command didn't exist, so we can tell them.
+// handle admin related commands.
+// return true if the command exists and/or everything was handled fine.
+// return false if command didn't exist, so we can tell them.
 qboolean AM_HandleCommands( gentity_t *ent, const char *cmd ) {
 	adminCommand_t *command = NULL;
 
