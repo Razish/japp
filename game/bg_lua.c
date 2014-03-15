@@ -16,6 +16,8 @@
 	#pragma comment( lib, "lua" )
 #endif
 
+#define JPLUA_VERSION 7
+
 static const char *baseDir = "lua/";
 #if defined(_GAME)
 	static const char *pluginDir = "lua/sv/";
@@ -50,7 +52,7 @@ void JPLua_DPrintf( const char *msg, ... ) {
 // Lua calls this if it panics, it'll then terminate the server with exit(EXIT_FAILURE)
 // This error should never happen in a clean release version of JA++!
 static int JPLuaI_Error( lua_State *L ) {
-	trap->Print( S_COLOR_RED"*************** JA++ LUA ERROR ***************" );
+	trap->Print( S_COLOR_RED"*************** JA++ LUA ERROR ***************\n" );
 	trap->Print( S_COLOR_RED"unprotected error in call to Lua API (%s)\n", lua_tostring( L, -1 ) );
 	return 0;
 }
@@ -255,7 +257,7 @@ static int JPLua_RegisterPlugin( lua_State *L ) {
 	Q_CleanString( JPLua.currentPlugin->longname, STRIP_COLOUR );
 	Q_strncpyz( JPLua.currentPlugin->version, lua_tostring( L, 2 ), sizeof( JPLua.currentPlugin->version ) );
 	Q_CleanString( JPLua.currentPlugin->version, STRIP_COLOUR );
-	JPLua.currentPlugin->requiredJPLuaVersion = lua_isnumber( L, 3 ) ? lua_tointeger( L, 3 ) : JPLua.version;
+	JPLua.currentPlugin->requiredJPLuaVersion = lua_isnumber( L, 3 ) ? lua_tointeger( L, 3 ) : JPLUA_VERSION;
 	JPLua.currentPlugin->UID = (intptr_t)JPLua.currentPlugin;
 
 	lua_newtable( L );
@@ -288,7 +290,7 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 	Q_strncpyz( JPLua.currentPlugin->name, pluginName, sizeof( JPLua.currentPlugin->name ) );
 	JPLua_LoadFile( JPLua.state, va( "%s%s/%s", pluginDir, pluginName, fileName ) );
 
-	if ( JPLua.currentPlugin->requiredJPLuaVersion > JPLua.version ) {
+	if ( JPLua.currentPlugin->requiredJPLuaVersion > JPLUA_VERSION ) {
 		jplua_plugin_t *nextPlugin = JPLua.currentPlugin->next;
 		trap->Print( "%s requires JPLua version %i\n", pluginName, JPLua.currentPlugin->requiredJPLuaVersion );
 		luaL_unref( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->handle );
@@ -303,6 +305,48 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 	}
 }
 
+static int JPLua_System_Index( lua_State *L ) {
+	const char *key = lua_tostring( L, 2 );
+
+	// see if this key is a function/constant in the metatable
+	lua_getmetatable( L, 1 );
+	lua_getfield( L, -1, key );
+	if ( !lua_isnil( L, -1 ) )
+		return 1;
+
+	if ( !strcmp( key, "version" ) )
+		lua_pushinteger( L, JPLUA_VERSION );
+	else
+		lua_pushnil( L );
+
+	return 1;
+}
+static int JPLua_System_NewIndex( lua_State *L ) {
+	return luaL_error( L, "Attempt to modify read-only data (JPLua)" );
+}
+static const struct luaL_Reg jplua_system_meta[] = {
+	{ "__index",	JPLua_System_Index },
+	{ "__newindex",	JPLua_System_NewIndex },
+	{ NULL,			NULL }
+};
+static void JPLua_Register_System( lua_State *L ) {
+	const luaL_Reg *r;
+
+	// register the metatable
+	luaL_newmetatable( L, "JPLua.Meta" );
+	for ( r=jplua_system_meta; r->name; r++ ) {
+		lua_pushcfunction( L, r->func );
+		lua_setfield( L, -2, r->name );
+	}
+	lua_pop( L, -1 );
+
+	// create a global table named JPLua
+	lua_newtable( L );
+		luaL_getmetatable( L, "JPLua.Meta" );
+		lua_setmetatable( L, -2 );
+	lua_setglobal( L, "JPLua" );
+}
+
 static void JPLua_PostInit( lua_State *L ) {
 	static char folderList[16384];
 	char *folderName = folderList;
@@ -314,11 +358,8 @@ static void JPLua_PostInit( lua_State *L ) {
 	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_YELLOW"JA++ Lua (CL) is initialising "S_COLOR_CYAN"****************\n" );
 #endif
 
+	JPLua_Register_System( L );
 	JPLua_LoadFile( L, va( "%sinit"JPLUA_EXTENSION, baseDir ) );
-	lua_getglobal( L, "JPLua" );
-	lua_getfield( L, -1, "version" );
-	JPLua.version = lua_tointeger( L, -1 );
-	lua_pop( L, 1 );
 	JPLua.initialised = qtrue;
 
 	trap->Print( "%-15s%-32s%-8s%s\n", "               ", "Name", "Version", "Unique ID" );

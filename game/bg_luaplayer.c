@@ -884,6 +884,19 @@ static int JPLua_Player_SetSpeed( lua_State *L ) {
 #endif
 
 #ifdef _GAME
+//Func: Player:SetTeam( string team )
+//Retn: N/A
+static int JPLua_Player_SetTeam( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	const char *team = luaL_checkstring( L, 2 );
+
+	SetTeam( &g_entities[player->clientNum], team, qtrue );
+
+	return 0;
+}
+#endif
+
+#ifdef _GAME
 //Func: Player:SetVelocity( Vector3 velocity )
 //Retn: N/A
 static int JPLua_Player_SetVelocity( lua_State *L ) {
@@ -1038,6 +1051,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "SetName",			JPLua_Player_SetName },
 	{ "SetScore",			JPLua_Player_SetScore },
 	{ "SetSpeed",			JPLua_Player_SetSpeed },
+	{ "SetTeam",			JPLua_Player_SetTeam },
 	{ "SetVelocity",		JPLua_Player_SetVelocity },
 	{ "TakeWeapon",			JPLua_Player_TakeWeapon },
 	{ "Teleport",			JPLua_Player_Teleport },
