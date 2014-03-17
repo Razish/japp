@@ -347,11 +347,55 @@ static void JPLua_Register_System( lua_State *L ) {
 	lua_setglobal( L, "JPLua" );
 }
 
-static void JPLua_PostInit( lua_State *L ) {
+static void JPLua_LoadPluginDir( qboolean inPK3 ) {
 	static char folderList[16384];
 	char *folderName = folderList;
-	int i=0, numFolders=0, folderLen=0;
+	int i, numFolders;
 
+	memset( folderList, 0, sizeof( folderList ) );
+	numFolders = trap->FS_GetFileList( pluginDir, inPK3 ? "" : "/", folderList, sizeof( folderList ) );
+	for ( i=0; i<numFolders; i++ ) {
+		size_t skipLenFolder = inPK3 ? 1 : 0, folderLen = 0;
+		qboolean skip = qfalse;
+		char *s;
+
+		if ( folderName[0] == '.' )
+			skip = qtrue;
+
+		if ( (s = (char *)Q_strchrs( folderName, "/\\" )) ) {
+			if ( !s[1] )
+				skip = qtrue;
+			*s = '\0';
+			skipLenFolder = strlen( ++s ) + 1;
+		}
+		folderLen = strlen( folderName ) + 1;
+		if ( !skip ) {
+			static char fileList[16384];
+			char *fileName = fileList;
+			int j, numFiles;
+
+			memset( fileList, 0, sizeof( fileList ) );
+			numFiles = trap->FS_GetFileList( va( "%s%s", pluginDir, folderName ), JPLUA_EXTENSION, fileList, sizeof( fileList ) );
+
+			for ( j=0; j<numFiles; j++ ) {
+				size_t skipLenFile = 1, fileLen = 0;
+				if ( (s = (char *)Q_strchrs( fileName, "/\\" )) ) {
+					*s = '\0';
+					skipLenFile = strlen( ++s ) + 1;
+				}
+				fileLen = strlen( fileName ) + 1;
+				if ( !Q_stricmp( fileName, "plugin"JPLUA_EXTENSION ) ) {
+					JPLua_LoadPlugin( folderName, fileName );
+					break;
+				}
+				fileName += fileLen + skipLenFile;
+			}
+		}
+		folderName += folderLen + skipLenFolder;
+	}
+}
+
+static void JPLua_PostInit( lua_State *L ) {
 #if defined(_GAME)
 	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_YELLOW"JA++ Lua (SV) is initialising "S_COLOR_CYAN"****************\n" );
 #elif defined(_CGAME)
@@ -363,39 +407,15 @@ static void JPLua_PostInit( lua_State *L ) {
 	JPLua.initialised = qtrue;
 
 	trap->Print( "%-15s%-32s%-8s%s\n", "               ", "Name", "Version", "Unique ID" );
-
-	numFolders = trap->FS_GetFileList( pluginDir, "/", folderList, sizeof( folderList ) );
-	folderName = folderList;
-	for ( i=0; i<numFolders; i++ ) {
-		Q_strstrip( folderName, "/\\", NULL );
-		folderLen = strlen( folderName );
-		if ( Q_stricmp( folderName, "." ) && Q_stricmp( folderName, ".." ) ) {
-			static char fileList[16384];
-			char *fileName = fileList;
-			int j=0, numFiles=0, fileLen=0;
-
-			numFiles = trap->FS_GetFileList( va( "%s%s", pluginDir, folderName ), JPLUA_EXTENSION, fileList, sizeof( fileList ) );
-
-			for ( j=0; j<numFiles; j++ ) {
-				Q_strstrip( fileName, "/\\", NULL );
-				fileLen = strlen( fileName );
-				if ( !Q_stricmp( fileName, "plugin"JPLUA_EXTENSION ) ) {
-					JPLua_LoadPlugin( folderName, fileName );
-					break;
-				}
-				fileName += fileLen+1;
-			}
-		}
-		folderName += folderLen+1;
-	}
+	//TODO: handle duplicates, i.e. one in pk3, one out of pk3
+	JPLua_LoadPluginDir( qtrue );
+	JPLua_LoadPluginDir( qfalse );
 
 #if defined(_GAME)
 	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_GREEN"JA++ Lua (SV) is initialised "S_COLOR_GREEN"****************\n" );
 #elif defined(_CGAME)
 	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_GREEN"JA++ Lua (CL) is initialised "S_COLOR_GREEN"****************\n" );
 #endif
-
-	return;
 }
 
 #ifdef _GAME

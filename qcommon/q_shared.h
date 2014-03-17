@@ -2570,4 +2570,5 @@ enum {
 vector3 *tv( float x, float y, float z );
 char *vtos( const vector3 *v );
 void Q_WriteJSONToFile( void *root, fileHandle_t f );
+void Q_BinaryDump( const char *filename, const void *buffer, size_t len );
 qboolean FloatCompare( float f1, float f2, float epsilon );

@@ -1242,3 +1242,11 @@ void Q_WriteJSONToFile( void *root, fileHandle_t f ) {
 	free( (void *)serialised );
 	cJSON_Delete( (cJSON *)root );
 }
+
+void Q_BinaryDump( const char *filename, const void *buffer, size_t len ) {
+	fileHandle_t f = NULL_FILE;
+	trap->FS_Open( filename, &f, FS_WRITE );
+	trap->FS_Write( buffer, (int)len, f );
+	trap->FS_Close( f );
+	f = NULL_FILE;
+}
