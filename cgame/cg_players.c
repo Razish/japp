@@ -6293,7 +6293,7 @@ static void CG_ForceElectrocution( centity_t *cent, const vector3 *origin, vecto
 	vector3 fxOrg, fxOrg2, dir, rgb;
 	mdxaBone_t boltMatrix;
 	trace_t tr;
-	int iter=0, bolt, torsoBolt, elbowLBolt, elbowRBolt, handLBolt, handRBolt, footLBolt, footRBolt;
+	int iter=0, bolt=-1, torsoBolt, elbowLBolt, elbowRBolt, handLBolt, handRBolt, footLBolt, footRBolt;
 
 	VectorSet( &rgb, 1, 1, 1 );
 
@@ -6318,7 +6318,7 @@ static void CG_ForceElectrocution( centity_t *cent, const vector3 *origin, vecto
 		footRBolt	= trap->G2API_AddBolt( cent->ghoul2, 0, "*foot_rg" );
 	}
 	else
-		bolt = torsoBolt = elbowLBolt = elbowRBolt = handLBolt = handRBolt = footLBolt = footRBolt = -1;
+		torsoBolt = elbowLBolt = elbowRBolt = handLBolt = handRBolt = footLBolt = footRBolt = -1;
 
 	// Pick a random start point
 	while ( bolt < 0 ) {
