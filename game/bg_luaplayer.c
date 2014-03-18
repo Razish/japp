@@ -593,6 +593,43 @@ static int JPLua_Player_IsBot( lua_State *L ) {
 	return 1;
 }
 
+//Func: Player:IsUnderWater()
+//Retn: boolean expressing whether the Player is under water
+static int JPLua_Player_IsUnderWater(lua_State *L) {
+	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
+#if defined(_GAME)
+	int oldEventSequence = 0;
+	int i = 0;
+	int event = 0;
+	int eventSequence = level.clients[player->clientNum].ps.eventSequence;
+
+	if (oldEventSequence < eventSequence - MAX_PS_EVENTS)
+	{
+		oldEventSequence = eventSequence - MAX_PS_EVENTS;
+	}
+
+	for (i = oldEventSequence; i < eventSequence; i++)
+	{
+		event = level.clients[player->clientNum].ps.events[i & (MAX_PS_EVENTS - 1)];
+		if (event == 20)
+		{
+			lua_pushboolean(L, 1);
+			return 1;
+		}
+	}
+#endif
+#if defined(_CGAME)
+	if(cg_entities[player->clientNum].currentState.event == 20)
+	{
+		lua_pushboolean(L, 1);
+		return 1;
+	}
+#endif
+
+	lua_pushboolean(L, 0);
+	return 1;
+}
+
 //Func: Player:IsWeaponHolstered()
 //Retn: integer expressing the holstered state of the saber
 //		0 - all applicable sabers are activated
@@ -1036,6 +1073,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 #endif
 	{ "IsAlive",			JPLua_Player_IsAlive },
 	{ "IsBot",				JPLua_Player_IsBot },
+	{ "IsUnderWater",		JPLua_Player_IsUnderWater },
 	{ "IsWeaponHolstered",	JPLua_Player_IsWeaponHolstered },
 #ifdef _GAME
 	{ "Kick",				JPLua_Player_Kick },
