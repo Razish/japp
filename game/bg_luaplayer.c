@@ -593,6 +593,28 @@ static int JPLua_Player_IsBot( lua_State *L ) {
 	return 1;
 }
 
+#ifdef _GAME
+//Func: Player:IsTeamMate(int target)
+//Retn: boolean expressing whether the target is teammate of player
+static int JPLua_Player_IsTeamMate(lua_State *L) {
+	jplua_player_t *self = JPLua_CheckPlayer(L, 1);
+	int target = lua_tointeger(L, 2);
+	if (target < 0 || target >= MAX_CLIENTS || !g_entities[target].inuse)
+	{
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	else if (level.clients[self->clientNum].sess.sessionTeam == level.clients[target].sess.sessionTeam)
+	{
+		lua_pushboolean(L, 1);
+		return 1;
+	}
+
+	lua_pushboolean(L, 0);
+	return 1;
+}
+#endif
+
 //Func: Player:IsWeaponHolstered()
 //Retn: integer expressing the holstered state of the saber
 //		0 - all applicable sabers are activated
@@ -1035,11 +1057,14 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "IsAdmin",			JPLua_Player_IsAdmin },
 #endif
 	{ "IsAlive",			JPLua_Player_IsAlive },
-	{ "IsBot",				JPLua_Player_IsBot },
+	{ "IsBot",			JPLua_Player_IsBot },
+#ifdef _GAME
+	{ "IsTeamMate",			JPLua_Player_IsTeamMate },
+#endif
 	{ "IsWeaponHolstered",	JPLua_Player_IsWeaponHolstered },
 #ifdef _GAME
-	{ "Kick",				JPLua_Player_Kick },
-	{ "Kill",				JPLua_Player_Kill },
+	{ "Kick",			JPLua_Player_Kick },
+	{ "Kill",			JPLua_Player_Kill },
 	{ "RemoveEFlag",		JPLua_Player_RemoveEFlag },
 	{ "RemoveEFlag2",		JPLua_Player_RemoveEFlag2 },
 	{ "RemoveFlag",			JPLua_Player_RemoveFlag },
