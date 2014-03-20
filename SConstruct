@@ -30,11 +30,11 @@ arch = None # platform-specific, set manually
 
 print( 'Configuring build environment...' )
 
-project = ARGUMENTS.get( 'project', '' )
-compiler = ARGUMENTS.get( 'compiler', 'gcc' )
 analyse = int( ARGUMENTS.get( 'analyse', 0 ) )
+compiler = ARGUMENTS.get( 'compiler', 'gcc' )
 debug = int( ARGUMENTS.get( 'debug', 0 ) )
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
+project = ARGUMENTS.get( 'project', '' )
 
 # architecture settings, needed for binary names, also passed as a preprocessor definition
 if force32:
@@ -396,32 +396,28 @@ if status == 0:
 	env['CPPDEFINES'] += [ 'REVISION=\\"'+rev+'\\"' ]
 
 env['CPPDEFINES'] += [ 'SCONS_BUILD' ]
+env['LIBPREFIX'] = ''
+env['CPPPATH'] = [ '.', './game' ]
+env['LIBS'] = libs[project]
 
 # targets
 if project == 'game':
-	env['CPPPATH'] = [ '.', './game' ]
 	env['CPPDEFINES'] += [ '_GAME', 'JPLUA' ]
 	if plat == 'Linux':
 		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
-	env['LIBS'] = libs['game']
-	env['LIBPREFIX'] = ''
-	env.SharedLibrary( 'jampgame'+arch, files['game'] )
+	env.SharedLibrary( 'jampgame'+arch, files[project] )
 
 elif project == 'cgame':
-	env['CPPPATH'] = [ '.', './cgame', './game' ]
+	env['CPPPATH'] += [ './cgame' ]
 	env['CPPDEFINES'] += [ '_CGAME', 'JPLUA' ]
 	if plat == 'Linux':
 		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
-	env['LIBS'] = libs['cgame']
-	env['LIBPREFIX'] = ''
-	env.SharedLibrary( 'cgame'+arch, files['cgame'] )
+	env.SharedLibrary( 'cgame'+arch, files[project] )
 
 elif project == 'ui':
-	env['CPPPATH'] = [ '.', './ui', './game' ]
+	env['CPPPATH'] += [ './ui' ]
 	env['CPPDEFINES'] += [ '_UI' ]
-	env['LIBS'] = libs['ui']
-	env['LIBPREFIX'] = ''
-	env.SharedLibrary( 'ui'+arch, files['ui'] )
+	env.SharedLibrary( 'ui'+arch, files[project] )
 
 else:
 	print( 'no project specified' )
