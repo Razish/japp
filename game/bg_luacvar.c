@@ -1,7 +1,7 @@
 #if defined(_GAME)
-	#include "g_local.h"
+#include "g_local.h"
 #elif defined(_CGAME)
-	#include "cg_local.h"
+#include "cg_local.h"
 #endif
 #include "bg_lua.h"
 
@@ -57,7 +57,7 @@ static int JPLua_Cvar_GetName( lua_State *L ) {
 //Func: Cvar:GetDefault()
 //Retn: string of the Cvar's default value
 static int JPLua_Cvar_GetDefault( lua_State *L ) {
-//	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
+	//	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 
 	//No way to get the cvar's default value without engine funcs
 	//RAZTODO: search the local vmCvar table anyway?
@@ -69,7 +69,7 @@ static int JPLua_Cvar_GetDefault( lua_State *L ) {
 //Func: Cvar:GetFlags()
 //Retn: bit-mask of the Cvar's behaviour flags
 static int JPLua_Cvar_GetFlags( lua_State *L ) {
-//	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
+	//	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 
 	// No way to get the cvar's flags without engine funcs
 	//RAZTODO: search the local vmCvar table anyway?
@@ -84,7 +84,7 @@ static int JPLua_Cvar_GetInteger( lua_State *L ) {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 	char buf[MAX_CVAR_VALUE_STRING];
 
-	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
+	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof(buf) );
 	if ( buf[0] )
 		lua_pushinteger( L, atoi( buf ) );
 	else
@@ -99,7 +99,7 @@ static int JPLua_Cvar_GetString( lua_State *L ) {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 	char buf[MAX_CVAR_VALUE_STRING];
 
-	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
+	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof(buf) );
 	if ( buf[0] )
 		lua_pushstring( L, buf );
 	else
@@ -114,7 +114,7 @@ static int JPLua_Cvar_GetFloat( lua_State *L ) {
 	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 	char buf[MAX_CVAR_VALUE_STRING];
 
-	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof( buf ) );
+	trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof(buf) );
 	if ( buf[0] )
 		lua_pushnumber( L, (lua_Number)atof( buf ) );
 	else
@@ -126,7 +126,7 @@ static int JPLua_Cvar_GetFloat( lua_State *L ) {
 //Func: Cvar:Reset()
 //Retn: --
 static int JPLua_Cvar_Reset( lua_State *L ) {
-//	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
+	//	jplua_cvar_t *luaCvar = JPLua_CheckCvar( L, 1 );
 	//RAZTODO: Search the local vmCvar table anyway?
 
 	return 0;
@@ -148,14 +148,14 @@ void JPLua_Cvar_CreateRef( lua_State *L, const char *name ) {
 	jplua_cvar_t *luaCvar = NULL;
 	char buf[MAX_CVAR_VALUE_STRING];
 
-	trap->Cvar_VariableStringBuffer( name, buf, sizeof( buf ) );
+	trap->Cvar_VariableStringBuffer( name, buf, sizeof(buf) );
 	//RAZFIXME: This isn't exactly reliable. Could be an empty cvar.
 	if ( !buf[0] ) {
 		lua_pushnil( L );
 		return;
 	}
 
-	luaCvar = (jplua_cvar_t *)lua_newuserdata( L, sizeof( jplua_cvar_t ) );
+	luaCvar = (jplua_cvar_t *)lua_newuserdata( L, sizeof(jplua_cvar_t) );
 	luaCvar->name = name;
 
 	luaL_getmetatable( L, CVAR_META );
@@ -171,18 +171,18 @@ jplua_cvar_t *JPLua_CheckCvar( lua_State *L, int idx ) {
 }
 
 static const struct luaL_Reg jplua_cvar_meta[] = {
-	{ "__tostring",	JPLua_Cvar_ToString },
-	{ "GetName",	JPLua_Cvar_GetName },
-	{ "GetDefault",	JPLua_Cvar_GetDefault },
-	{ "GetFlags",	JPLua_Cvar_GetFlags },
+	{ "__tostring", JPLua_Cvar_ToString },
+	{ "GetName", JPLua_Cvar_GetName },
+	{ "GetDefault", JPLua_Cvar_GetDefault },
+	{ "GetFlags", JPLua_Cvar_GetFlags },
 
-	{ "GetInteger",	JPLua_Cvar_GetInteger },
-	{ "GetString",	JPLua_Cvar_GetString },
-	{ "GetFloat",	JPLua_Cvar_GetFloat },
+	{ "GetInteger", JPLua_Cvar_GetInteger },
+	{ "GetString", JPLua_Cvar_GetString },
+	{ "GetFloat", JPLua_Cvar_GetFloat },
 
-	{ "Reset",		JPLua_Cvar_Reset },
-	{ "Set",		JPLua_Cvar_Set },
-	{ NULL,			NULL }
+	{ "Reset", JPLua_Cvar_Reset },
+	{ "Set", JPLua_Cvar_Set },
+	{ NULL, NULL }
 };
 
 // Register the Cvar class for Lua
@@ -198,7 +198,7 @@ void JPLua_Register_Cvar( lua_State *L ) {
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
 	// fill metatable with fields
-	for ( r=jplua_cvar_meta; r->name; r++ ) {
+	for ( r = jplua_cvar_meta; r->name; r++ ) {
 		lua_pushcfunction( L, r->func );
 		lua_setfield( L, -2, r->name );
 	}

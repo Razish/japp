@@ -17,17 +17,17 @@ void *G_Alloc( int size ) {
 	char	*p;
 
 	if ( g_debugAlloc.integer ) {
-		trap->Print( "G_Alloc of %i bytes (%i left)\n", size, POOLSIZE - allocPoint - ( ( size + 31 ) & ~31 ) );
+		trap->Print( "G_Alloc of %i bytes (%i left)\n", size, POOLSIZE - allocPoint - ((size + 31) & ~31) );
 	}
 
 	if ( allocPoint + size > POOLSIZE ) {
-	  trap->Error( ERR_DROP, "G_Alloc: failed on allocation of %i bytes\n", size ); // bk010103 - was %u, but is signed
+		trap->Error( ERR_DROP, "G_Alloc: failed on allocation of %i bytes\n", size ); // bk010103 - was %u, but is signed
 		return NULL;
 	}
 
 	p = &memoryPool[allocPoint];
 
-	allocPoint += ( size + 31 ) & ~31;
+	allocPoint += (size + 31) & ~31;
 
 	return p;
 }

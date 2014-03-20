@@ -29,7 +29,7 @@ void CreepToPosition( vector3 *ideal, vector3 *current ) {
 	if ( doNegative ) {
 		current->yaw -= max_degree_switch;
 
-		if ( current->yaw < ideal->yaw && (current->yaw+(max_degree_switch*2)) >= ideal->yaw )
+		if ( current->yaw < ideal->yaw && (current->yaw + (max_degree_switch * 2)) >= ideal->yaw )
 			current->yaw = ideal->yaw;
 		if ( current->yaw < 0 )
 			current->yaw += 361;
@@ -37,7 +37,7 @@ void CreepToPosition( vector3 *ideal, vector3 *current ) {
 	else {
 		current->yaw += max_degree_switch;
 
-		if ( current->yaw > ideal->yaw && (current->yaw-(max_degree_switch*2)) <= ideal->yaw )
+		if ( current->yaw > ideal->yaw && (current->yaw - (max_degree_switch * 2)) <= ideal->yaw )
 			current->yaw = ideal->yaw;
 		if ( current->yaw > 360 )
 			current->yaw -= 361;
@@ -66,7 +66,7 @@ void CreepToPosition( vector3 *ideal, vector3 *current ) {
 	if ( doNegative ) {
 		current->pitch -= max_degree_switch;
 
-		if ( current->pitch < ideal->pitch && (current->pitch+(max_degree_switch*2)) >= ideal->pitch )
+		if ( current->pitch < ideal->pitch && (current->pitch + (max_degree_switch * 2)) >= ideal->pitch )
 			current->pitch = ideal->pitch;
 		if ( current->pitch < 0 )
 			current->pitch += 361;
@@ -74,7 +74,7 @@ void CreepToPosition( vector3 *ideal, vector3 *current ) {
 	else {
 		current->pitch += max_degree_switch;
 
-		if ( current->pitch > ideal->pitch && (current->pitch-(max_degree_switch*2)) <= ideal->pitch )
+		if ( current->pitch > ideal->pitch && (current->pitch - (max_degree_switch * 2)) <= ideal->pitch )
 			current->pitch = ideal->pitch;
 		if ( current->pitch > 360 )
 			current->pitch -= 361;
@@ -85,7 +85,7 @@ void TurretClientRun( centity_t *ent ) {
 	if ( !ent->ghoul2 ) {
 		weaponInfo_t *weaponInfo;
 
-		trap->G2API_InitGhoul2Model( &ent->ghoul2, CG_ConfigString( CS_MODELS+ent->currentState.modelindex ), 0, 0, 0, 0, 0 );
+		trap->G2API_InitGhoul2Model( &ent->ghoul2, CG_ConfigString( CS_MODELS + ent->currentState.modelindex ), 0, 0, 0, 0, 0 );
 
 		if ( !ent->ghoul2 )
 			return;
@@ -110,8 +110,7 @@ void TurretClientRun( centity_t *ent ) {
 
 	if ( ent->currentState.fireflag == 2 ) {
 		// I'm about to blow
-		if ( &ent->turAngles )
-		{
+		if ( &ent->turAngles ) {
 			trap->G2API_SetBoneAngles( ent->ghoul2, 0, "bone_hinge", &ent->turAngles, BONE_ANGLES_REPLACE, NEGATIVE_Y,
 				NEGATIVE_Z, NEGATIVE_X, NULL, 100, cg.time );
 		}
@@ -161,7 +160,7 @@ void TurretClientRun( centity_t *ent ) {
 		if ( !ent->dustTrailTime )
 			ent->dustTrailTime = cg.time;
 
-		turnAmount = (cg.time-ent->dustTrailTime)*0.03f;
+		turnAmount = (cg.time - ent->dustTrailTime)*0.03f;
 
 		if ( turnAmount > 360 )
 			turnAmount = 360;

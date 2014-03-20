@@ -1,7 +1,7 @@
 #if defined(_GAME)
-	#include "g_local.h"
+#include "g_local.h"
 #elif defined(_CGAME)
-	#include "cg_local.h"
+#include "cg_local.h"
 #endif
 #include "bg_lua.h"
 
@@ -44,34 +44,34 @@ int JPLua_GetPlayer( lua_State *L ) {
 	else if ( lua_type( L, 1 ) == LUA_TSTRING ) {
 		const char *name = lua_tostring( L, 1 );
 		int numFound = 0;
-		int i=0;
+		int i = 0;
 		//RAZTODO: copy G_ClientFromString
-		for ( i=0; i<cgs.maxclients; i++ ) {
+		for ( i = 0; i < cgs.maxclients; i++ ) {
 			char nameClean[36], nameClean2[36];
 
 			if ( !cgs.clientinfo[i].infoValid )
 				continue;
 
-			Q_strncpyz( nameClean, cgs.clientinfo[i].name, sizeof( nameClean ) );
-			Q_strncpyz( nameClean2, name, sizeof( nameClean2 ) );
+			Q_strncpyz( nameClean, cgs.clientinfo[i].name, sizeof(nameClean) );
+			Q_strncpyz( nameClean2, name, sizeof(nameClean2) );
 			Q_CleanString( nameClean, STRIP_COLOUR );
 			Q_CleanString( nameClean2, STRIP_COLOUR );
 			if ( !Q_stricmp( nameClean, nameClean2 ) ) {
 				num = i;
-				clientsFound |= (1<<i);
+				clientsFound |= (1 << i);
 				numFound++;
 			}
 		}
 
 		if ( numFound > 1 ) {
-			int top=0;
+			int top = 0;
 			lua_pushnil( L );
 			lua_pushstring( L, "Multiple matches" );
 
 			lua_newtable( L );
 			top = lua_gettop( L );
-			for ( i=0; i<cgs.maxclients; i++ ) {
-				if ( clientsFound & (1<<i) ) {
+			for ( i = 0; i < cgs.maxclients; i++ ) {
+				if ( clientsFound & (1 << i) ) {
 					lua_pushnumber( L, i );
 					JPLua_Player_CreateRef( L, i );
 					lua_settable( L, top );
@@ -150,7 +150,7 @@ static int JPLua_Player_GetAngles( lua_State *L ) {
 //Func: Player:GetAnimations()
 //Retn: Table of Legs/Torso anims and Legs/Torso timers
 static int JPLua_Player_GetAnimations( lua_State *L ) {
-	int top, torsoAnim=0, torsoTimer=0, legsAnim=0, legsTimer=0;
+	int top, torsoAnim = 0, torsoTimer = 0, legsAnim = 0, legsTimer = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
 	playerState_t *ps = &g_entities[player->clientNum].client->ps;
@@ -162,15 +162,15 @@ static int JPLua_Player_GetAnimations( lua_State *L ) {
 #ifdef _CGAME
 	if ( player->clientNum == cg.clientNum ) {
 #endif
-		torsoAnim	= ps->torsoAnim;
-		torsoTimer	= ps->torsoTimer;
-		legsAnim	= ps->legsAnim;
-		legsTimer	= ps->legsTimer;
+		torsoAnim = ps->torsoAnim;
+		torsoTimer = ps->torsoTimer;
+		legsAnim = ps->legsAnim;
+		legsTimer = ps->legsTimer;
 #ifdef _CGAME
 	}
 	else {
-		torsoAnim	= es->torsoAnim;
-		legsAnim	= es->legsAnim;
+		torsoAnim = es->torsoAnim;
+		legsAnim = es->legsAnim;
 	}
 #endif
 
@@ -211,13 +211,13 @@ static int JPLua_Player_GetArmor( lua_State *L ) {
 //Func: Player:GetClientInfo()
 //Retn: key/value table of the player's Clientinfo
 static int JPLua_Player_GetClientInfo( lua_State *L ) {
-	int top=0, i=0;
+	int top = 0, i = 0;
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	clientInfo_t *ci = &cgs.clientinfo[player->clientNum];
 	entityState_t *es = &cg_entities[player->clientNum].currentState;
 	score_t	*score = NULL; // for ping and other scoreboard information
 
-	for ( i=0; i<cg.numScores; i++ ) {
+	for ( i = 0; i < cg.numScores; i++ ) {
 		if ( cg.scores[i].client == player->clientNum ) {
 			score = &cg.scores[i];
 			break;
@@ -241,7 +241,7 @@ static int JPLua_Player_GetClientInfo( lua_State *L ) {
 	lua_pushstring( L, "deferred" ); lua_pushboolean( L, !!ci->deferred ); lua_settable( L, top );
 	lua_pushstring( L, "gender" ); lua_pushinteger( L, ci->gender ); lua_settable( L, top );
 	if ( score ) {
-		lua_pushstring( L, "ping" ); lua_pushinteger( L, (player->clientNum==cg.clientNum) ? cg.snap->ping : score->ping ); lua_settable( L, top );
+		lua_pushstring( L, "ping" ); lua_pushinteger( L, (player->clientNum == cg.clientNum) ? cg.snap->ping : score->ping ); lua_settable( L, top );
 		lua_pushstring( L, "time" ); lua_pushinteger( L, score->time ); lua_settable( L, top );
 		lua_pushstring( L, "deaths" ); lua_pushinteger( L, score->deaths ); lua_settable( L, top );
 	}
@@ -378,12 +378,12 @@ static int JPLua_Player_GetLocation( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
 	char location[64];
-	if ( Team_GetLocationMsg( &g_entities[player->clientNum], location, sizeof( location ) ) )
+	if ( Team_GetLocationMsg( &g_entities[player->clientNum], location, sizeof(location) ) )
 		lua_pushstring( L, location );
 	else
 		lua_pushnil( L );
 #elif defined(_CGAME)
-	lua_pushstring( L, CG_GetLocationString( CG_ConfigString( CS_LOCATIONS+cgs.clientinfo[player->clientNum].location ) ) );
+	lua_pushstring( L, CG_GetLocationString( CG_ConfigString( CS_LOCATIONS + cgs.clientinfo[player->clientNum].location ) ) );
 #endif
 
 	return 1;
@@ -475,7 +475,7 @@ static int JPLua_Player_GetUserinfo( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	char userinfo[MAX_INFO_STRING];
 
-	trap->GetUserinfo( player->clientNum, userinfo, sizeof( userinfo ) );
+	trap->GetUserinfo( player->clientNum, userinfo, sizeof(userinfo) );
 
 	JPLua_PushInfostring( L, userinfo );
 
@@ -522,7 +522,7 @@ static int JPLua_Player_GiveWeapon( lua_State *L ) {
 	if ( wp <= WP_NONE || wp >= WP_NUM_WEAPONS )
 		return 0;
 
-	level.clients[player->clientNum].ps.stats[STAT_WEAPONS] |= (1<<wp);
+	level.clients[player->clientNum].ps.stats[STAT_WEAPONS] |= (1 << wp);
 
 	return 0;
 }
@@ -557,8 +557,7 @@ static int JPLua_Player_IsAlive( lua_State *L ) {
 
 #if defined(_GAME)
 	if ( level.clients[player->clientNum].ps.stats[STAT_HEALTH] > 0 && !(level.clients[player->clientNum].ps.eFlags & EF_DEAD)
-		&& level.clients[player->clientNum].ps.persistant[PERS_TEAM] != TEAM_SPECTATOR )
-	{
+		&& level.clients[player->clientNum].ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 		lua_pushboolean( L, 1 );
 		return 1;
 	}
@@ -647,8 +646,8 @@ static int JPLua_Player_RemoveEFlag( lua_State *L ) {
 	uint32_t bit = lua_tointeger( L, 2 );
 	int i, found = 0;
 
-	for ( i=0; i<32; i++ ) {
-		if ( bit & (1<<i) )
+	for ( i = 0; i<32; i++ ) {
+		if ( bit & (1 << i) )
 			found++;
 	}
 
@@ -671,8 +670,8 @@ static int JPLua_Player_RemoveEFlag2( lua_State *L ) {
 	uint32_t bit = lua_tointeger( L, 2 );
 	int i, found = 0;
 
-	for ( i=0; i<32; i++ ) {
-		if ( bit & (1<<i) )
+	for ( i = 0; i<32; i++ ) {
+		if ( bit & (1 << i) )
 			found++;
 	}
 
@@ -695,8 +694,8 @@ static int JPLua_Player_RemoveFlag( lua_State *L ) {
 	uint32_t bit = lua_tointeger( L, 2 );
 	int i, found = 0;
 
-	for ( i=0; i<32; i++ ) {
-		if ( bit & (1<<i) )
+	for ( i = 0; i<32; i++ ) {
+		if ( bit & (1 << i) )
 			found++;
 	}
 
@@ -735,8 +734,8 @@ static int JPLua_Player_SetEFlag( lua_State *L ) {
 	uint32_t bit = lua_tointeger( L, 2 );
 	int i, found = 0;
 
-	for ( i=0; i<32; i++ ) {
-		if ( bit & (1<<i) )
+	for ( i = 0; i<32; i++ ) {
+		if ( bit & (1 << i) )
 			found++;
 	}
 
@@ -759,8 +758,8 @@ static int JPLua_Player_SetEFlag2( lua_State *L ) {
 	uint32_t bit = lua_tointeger( L, 2 );
 	int i, found = 0;
 
-	for ( i=0; i<32; i++ ) {
-		if ( bit & (1<<i) )
+	for ( i = 0; i<32; i++ ) {
+		if ( bit & (1 << i) )
 			found++;
 	}
 
@@ -783,8 +782,8 @@ static int JPLua_Player_SetFlag( lua_State *L ) {
 	uint32_t bit = lua_tointeger( L, 2 );
 	int i, found = 0;
 
-	for ( i=0; i<32; i++ ) {
-		if ( bit & (1<<i) )
+	for ( i = 0; i<32; i++ ) {
+		if ( bit & (1 << i) )
 			found++;
 	}
 
@@ -828,23 +827,23 @@ static int JPLua_Player_SetName( lua_State *L ) {
 	if ( !name || !*name || strlen( name ) >= MAX_NETNAME )
 		return 0;
 
-	Q_strncpyz( oldName, ent->client->pers.netname, sizeof( oldName ) );
+	Q_strncpyz( oldName, ent->client->pers.netname, sizeof(oldName) );
 
-	ClientCleanName( name, ent->client->pers.netname, sizeof( ent->client->pers.netname ) );
+	ClientCleanName( name, ent->client->pers.netname, sizeof(ent->client->pers.netname) );
 
 	if ( !strcmp( oldName, ent->client->pers.netname ) )
 		return 0;
 
-	Q_strncpyz( ent->client->pers.netnameClean, ent->client->pers.netname, sizeof( ent->client->pers.netnameClean ) );
+	Q_strncpyz( ent->client->pers.netnameClean, ent->client->pers.netname, sizeof(ent->client->pers.netnameClean) );
 	Q_CleanString( ent->client->pers.netnameClean, STRIP_COLOUR );
 
 	// update clientinfo
-	trap->GetConfigstring( CS_PLAYERS+player->clientNum, info, sizeof( info ) );
+	trap->GetConfigstring( CS_PLAYERS + player->clientNum, info, sizeof(info) );
 	Info_SetValueForKey( info, "n", name );
-	trap->SetConfigstring( CS_PLAYERS+player->clientNum, info );
+	trap->SetConfigstring( CS_PLAYERS + player->clientNum, info );
 
 	// update userinfo (in engine)
-	trap->GetUserinfo( player->clientNum, info, sizeof( info ) );
+	trap->GetUserinfo( player->clientNum, info, sizeof(info) );
 	Info_SetValueForKey( info, "name", name );
 	trap->SetUserinfo( player->clientNum, info );
 
@@ -922,18 +921,18 @@ static int JPLua_Player_TakeWeapon( lua_State *L ) {
 	if ( wp <= WP_NONE || wp >= WP_NUM_WEAPONS )
 		return 0;
 
-	ent->client->ps.stats[STAT_WEAPONS] &= ~(1<<wp);
+	ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << wp);
 
-	for ( i=WP_SABER; i<WP_NUM_WEAPONS; i++ ) {
-		if ( ent->client->ps.stats[STAT_WEAPONS] & (1<<i) ) {
+	for ( i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
+		if ( ent->client->ps.stats[STAT_WEAPONS] & (1 << i) ) {
 			newWeapon = i;
 			break;
 		}
 	}
 
 	if ( newWeapon == WP_NUM_WEAPONS ) {
-		for ( i=WP_STUN_BATON; i<WP_SABER; i++ ) {
-			if ( ent->client->ps.stats[STAT_WEAPONS] & (1<<i) ) {
+		for ( i = WP_STUN_BATON; i < WP_SABER; i++ ) {
+			if ( ent->client->ps.stats[STAT_WEAPONS] & (1 << i) ) {
 				newWeapon = i;
 				break;
 			}
@@ -977,7 +976,7 @@ void JPLua_Player_CreateRef( lua_State *L, int num ) {
 		return;
 	}
 
-	player = (jplua_player_t *)lua_newuserdata( L, sizeof( jplua_player_t ) );
+	player = (jplua_player_t *)lua_newuserdata( L, sizeof(jplua_player_t) );
 	player->clientNum = num;
 
 	luaL_getmetatable( L, PLAYER_META );
@@ -998,65 +997,65 @@ int JPLua_Player_GetMetaTable( lua_State *L ) {
 }
 
 static const struct luaL_Reg jplua_player_meta[] = {
-	{ "__eq",				JPLua_Player_Equals },
-	{ "__tostring",			JPLua_Player_ToString },
-	{ "GetAmmo",			JPLua_Player_GetAmmo },
-	{ "GetAngles",			JPLua_Player_GetAngles },
-	{ "GetAnimations",		JPLua_Player_GetAnimations },
-	{ "GetArmor",			JPLua_Player_GetArmor },
+	{ "__eq", JPLua_Player_Equals },
+	{ "__tostring", JPLua_Player_ToString },
+	{ "GetAmmo", JPLua_Player_GetAmmo },
+	{ "GetAngles", JPLua_Player_GetAngles },
+	{ "GetAnimations", JPLua_Player_GetAnimations },
+	{ "GetArmor", JPLua_Player_GetArmor },
 #ifdef _CGAME
-	{ "GetClientInfo",		JPLua_Player_GetClientInfo },
+	{ "GetClientInfo", JPLua_Player_GetClientInfo },
 #endif
-	{ "GetDuelingPartner",	JPLua_Player_GetDuelingPartner },
-	{ "GetEFlags",			JPLua_Player_GetEFlags },
-	{ "GetEFlags2",			JPLua_Player_GetEFlags2 },
+	{ "GetDuelingPartner", JPLua_Player_GetDuelingPartner },
+	{ "GetEFlags", JPLua_Player_GetEFlags },
+	{ "GetEFlags2", JPLua_Player_GetEFlags2 },
 #ifdef _GAME
-	{ "GetFlags",			JPLua_Player_GetFlags },
+	{ "GetFlags", JPLua_Player_GetFlags },
 #endif
-	{ "GetForce",			JPLua_Player_GetForce },
-	{ "GetHealth",			JPLua_Player_GetHealth },
-	{ "GetID",				JPLua_Player_GetID },
+	{ "GetForce", JPLua_Player_GetForce },
+	{ "GetHealth", JPLua_Player_GetHealth },
+	{ "GetID", JPLua_Player_GetID },
 #ifdef _CGAME
-	{ "GetLastPickup",		JPLua_Player_GetLastPickup },
+	{ "GetLastPickup", JPLua_Player_GetLastPickup },
 #endif
-	{ "GetLocation",		JPLua_Player_GetLocation },
-	{ "GetMaxAmmo",			JPLua_Player_GetMaxAmmo },
-	{ "GetName",			JPLua_Player_GetName },
-	{ "GetPosition",		JPLua_Player_GetPosition },
-	{ "GetSaberStyle",		JPLua_Player_GetSaberStyle },
+	{ "GetLocation", JPLua_Player_GetLocation },
+	{ "GetMaxAmmo", JPLua_Player_GetMaxAmmo },
+	{ "GetName", JPLua_Player_GetName },
+	{ "GetPosition", JPLua_Player_GetPosition },
+	{ "GetSaberStyle", JPLua_Player_GetSaberStyle },
 #ifdef _GAME
-	{ "GetScore",			JPLua_Player_GetScore },
-	{ "GetUserinfo",		JPLua_Player_GetUserinfo },
+	{ "GetScore", JPLua_Player_GetScore },
+	{ "GetUserinfo", JPLua_Player_GetUserinfo },
 #endif
-	{ "GetVelocity",		JPLua_Player_GetVelocity },
-	{ "GetWeapon",			JPLua_Player_GetWeapon },
+	{ "GetVelocity", JPLua_Player_GetVelocity },
+	{ "GetWeapon", JPLua_Player_GetWeapon },
 #ifdef _GAME
-	{ "GiveWeapon",			JPLua_Player_GiveWeapon },
-	{ "IsAdmin",			JPLua_Player_IsAdmin },
+	{ "GiveWeapon", JPLua_Player_GiveWeapon },
+	{ "IsAdmin", JPLua_Player_IsAdmin },
 #endif
-	{ "IsAlive",			JPLua_Player_IsAlive },
-	{ "IsBot",				JPLua_Player_IsBot },
-	{ "IsWeaponHolstered",	JPLua_Player_IsWeaponHolstered },
+	{ "IsAlive", JPLua_Player_IsAlive },
+	{ "IsBot", JPLua_Player_IsBot },
+	{ "IsWeaponHolstered", JPLua_Player_IsWeaponHolstered },
 #ifdef _GAME
-	{ "Kick",				JPLua_Player_Kick },
-	{ "Kill",				JPLua_Player_Kill },
-	{ "RemoveEFlag",		JPLua_Player_RemoveEFlag },
-	{ "RemoveEFlag2",		JPLua_Player_RemoveEFlag2 },
-	{ "RemoveFlag",			JPLua_Player_RemoveFlag },
-	{ "SetArmor",			JPLua_Player_SetArmor },
-	{ "SetEFlag",			JPLua_Player_SetEFlag },
-	{ "SetEFlag2",			JPLua_Player_SetEFlag2 },
-	{ "SetFlag",			JPLua_Player_SetFlag },
-	{ "SetHealth",			JPLua_Player_SetHealth },
-	{ "SetName",			JPLua_Player_SetName },
-	{ "SetScore",			JPLua_Player_SetScore },
-	{ "SetSpeed",			JPLua_Player_SetSpeed },
-	{ "SetTeam",			JPLua_Player_SetTeam },
-	{ "SetVelocity",		JPLua_Player_SetVelocity },
-	{ "TakeWeapon",			JPLua_Player_TakeWeapon },
-	{ "Teleport",			JPLua_Player_Teleport },
+	{ "Kick", JPLua_Player_Kick },
+	{ "Kill", JPLua_Player_Kill },
+	{ "RemoveEFlag", JPLua_Player_RemoveEFlag },
+	{ "RemoveEFlag2", JPLua_Player_RemoveEFlag2 },
+	{ "RemoveFlag", JPLua_Player_RemoveFlag },
+	{ "SetArmor", JPLua_Player_SetArmor },
+	{ "SetEFlag", JPLua_Player_SetEFlag },
+	{ "SetEFlag2", JPLua_Player_SetEFlag2 },
+	{ "SetFlag", JPLua_Player_SetFlag },
+	{ "SetHealth", JPLua_Player_SetHealth },
+	{ "SetName", JPLua_Player_SetName },
+	{ "SetScore", JPLua_Player_SetScore },
+	{ "SetSpeed", JPLua_Player_SetSpeed },
+	{ "SetTeam", JPLua_Player_SetTeam },
+	{ "SetVelocity", JPLua_Player_SetVelocity },
+	{ "TakeWeapon", JPLua_Player_TakeWeapon },
+	{ "Teleport", JPLua_Player_Teleport },
 #endif
-	{ NULL,					NULL }
+	{ NULL, NULL }
 };
 
 // Register the Player class for Lua
@@ -1072,7 +1071,7 @@ void JPLua_Register_Player( lua_State *L ) {
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
 	// fill metatable with fields
-	for ( r=jplua_player_meta; r->name; r++ ) {
+	for ( r = jplua_player_meta; r->name; r++ ) {
 		lua_pushcfunction( L, r->func );
 		lua_setfield( L, -2, r->name );
 	}

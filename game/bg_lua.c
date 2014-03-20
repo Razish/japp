@@ -1,7 +1,7 @@
 #if defined(_GAME)
-	#include "g_local.h"
+#include "g_local.h"
 #elif defined(_CGAME)
-	#include "cg_local.h"
+#include "cg_local.h"
 #endif
 
 #include "qcommon/q_shared.h"
@@ -13,16 +13,16 @@
 #ifdef JPLUA
 
 #if defined(_MSC_VER) && !defined(SCONS_BUILD)
-	#pragma comment( lib, "lua" )
+#pragma comment( lib, "lua" )
 #endif
 
 #define JPLUA_VERSION 7
 
 static const char *baseDir = "lua/";
 #if defined(_GAME)
-	static const char *pluginDir = "lua/sv/";
+static const char *pluginDir = "lua/sv/";
 #elif defined(_CGAME)
-	static const char *pluginDir = "lua/cl/";
+static const char *pluginDir = "lua/cl/";
 #endif
 #define JPLUA_EXTENSION ".lua"
 
@@ -116,7 +116,7 @@ int JPLua_StackDump( lua_State *L ) {
 	int i, top = lua_gettop( L );
 
 	// repeat for each level
-	for ( i=1; i<=top; i++ ) {
+	for ( i = 1; i <= top; i++ ) {
 		int t = lua_type( L, i );
 		switch ( t ) {
 		case LUA_TSTRING:
@@ -166,7 +166,7 @@ void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize ) {
 	// Lets do this a lil different, concat all args and use that as the message ^^
 	JPLua_Push_ToString( L ); // Ref to tostring (instead of a global lookup, in case someone changes it)
 
-	for ( i=1; i<=args; i++ ) {
+	for ( i = 1; i <= args; i++ ) {
 		lua_pushvalue( L, -1 );
 		lua_pushvalue( L, i );
 		lua_call( L, 1, 1 ); // Assume this will never error out
@@ -181,9 +181,9 @@ void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize ) {
 }
 
 static int JPLua_Export_Print( lua_State *L ) {
-	char buf[16384] = {0};
+	char buf[16384] = { 0 };
 
-	JPLua_Util_ArgAsString( L, buf, sizeof( buf ) );
+	JPLua_Util_ArgAsString( L, buf, sizeof(buf) );
 	trap->Print( "%s\n", buf );
 
 	return 0;
@@ -191,16 +191,16 @@ static int JPLua_Export_Print( lua_State *L ) {
 
 static const char *colourComponents[] = { "r", "g", "b", "a" };
 void JPLua_ReadColour( float *out, int numComponents, lua_State *L, int idx ) {
-	int i=0;
+	int i = 0;
 
-	for ( i=0; i<numComponents ; i++ ) {
+	for ( i = 0; i < numComponents; i++ ) {
 		lua_getfield( L, idx, colourComponents[i] );
 		out[i] = lua_tonumber( L, -1 );
 	}
 }
 
 void JPLua_ReadFloats( float *out, int numComponents, lua_State *L, int idx ) {
-	int i=0;
+	int i = 0;
 
 	if ( lua_type( L, idx ) != LUA_TTABLE ) {
 		trap->Print( "JPLua_ReadFloats failed, not a table\n" );
@@ -209,7 +209,7 @@ void JPLua_ReadFloats( float *out, int numComponents, lua_State *L, int idx ) {
 	}
 
 	lua_pushnil( L );
-	for ( i=0; i<numComponents && lua_next( L, idx ); i++ ) {
+	for ( i = 0; i < numComponents && lua_next( L, idx ); i++ ) {
 		out[i] = lua_tonumber( L, -1 );
 		lua_pop( L, 1 );
 	}
@@ -253,9 +253,9 @@ static int JPLua_Export_Require( lua_State *L ) {
 static int JPLua_RegisterPlugin( lua_State *L ) {
 	int top;
 
-	Q_strncpyz( JPLua.currentPlugin->longname, lua_tostring( L, 1 ), sizeof( JPLua.currentPlugin->longname ) );
+	Q_strncpyz( JPLua.currentPlugin->longname, lua_tostring( L, 1 ), sizeof(JPLua.currentPlugin->longname) );
 	Q_CleanString( JPLua.currentPlugin->longname, STRIP_COLOUR );
-	Q_strncpyz( JPLua.currentPlugin->version, lua_tostring( L, 2 ), sizeof( JPLua.currentPlugin->version ) );
+	Q_strncpyz( JPLua.currentPlugin->version, lua_tostring( L, 2 ), sizeof(JPLua.currentPlugin->version) );
 	Q_CleanString( JPLua.currentPlugin->version, STRIP_COLOUR );
 	JPLua.currentPlugin->requiredJPLuaVersion = lua_isnumber( L, 3 ) ? lua_tointeger( L, 3 ) : JPLUA_VERSION;
 	JPLua.currentPlugin->UID = (intptr_t)JPLua.currentPlugin;
@@ -277,17 +277,17 @@ static int JPLua_RegisterPlugin( lua_State *L ) {
 static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 	if ( !JPLua.plugins ) {
 		// first plugin
-		JPLua.plugins = (jplua_plugin_t *)malloc( sizeof( jplua_plugin_t ) );
+		JPLua.plugins = (jplua_plugin_t *)malloc( sizeof(jplua_plugin_t) );
 		JPLua.currentPlugin = JPLua.plugins;
 	}
 	else {
-		JPLua.currentPlugin->next = (jplua_plugin_t *)malloc( sizeof( jplua_plugin_t ) );
+		JPLua.currentPlugin->next = (jplua_plugin_t *)malloc( sizeof(jplua_plugin_t) );
 		JPLua.currentPlugin = JPLua.currentPlugin->next;
 	}
 
-	memset( JPLua.currentPlugin, 0, sizeof( jplua_plugin_t ) );
-	Q_strncpyz( JPLua.currentPlugin->longname, "<null>", sizeof( JPLua.currentPlugin->longname ) );
-	Q_strncpyz( JPLua.currentPlugin->name, pluginName, sizeof( JPLua.currentPlugin->name ) );
+	memset( JPLua.currentPlugin, 0, sizeof(jplua_plugin_t) );
+	Q_strncpyz( JPLua.currentPlugin->longname, "<null>", sizeof(JPLua.currentPlugin->longname) );
+	Q_strncpyz( JPLua.currentPlugin->name, pluginName, sizeof(JPLua.currentPlugin->name) );
 	JPLua_LoadFile( JPLua.state, va( "%s%s/%s", pluginDir, pluginName, fileName ) );
 
 	if ( JPLua.currentPlugin->requiredJPLuaVersion > JPLUA_VERSION ) {
@@ -325,16 +325,16 @@ static int JPLua_System_NewIndex( lua_State *L ) {
 	return luaL_error( L, "Attempt to modify read-only data (JPLua)" );
 }
 static const struct luaL_Reg jplua_system_meta[] = {
-	{ "__index",	JPLua_System_Index },
-	{ "__newindex",	JPLua_System_NewIndex },
-	{ NULL,			NULL }
+	{ "__index", JPLua_System_Index },
+	{ "__newindex", JPLua_System_NewIndex },
+	{ NULL, NULL }
 };
 static void JPLua_Register_System( lua_State *L ) {
 	const luaL_Reg *r;
 
 	// register the metatable
 	luaL_newmetatable( L, "JPLua.Meta" );
-	for ( r=jplua_system_meta; r->name; r++ ) {
+	for ( r = jplua_system_meta; r->name; r++ ) {
 		lua_pushcfunction( L, r->func );
 		lua_setfield( L, -2, r->name );
 	}
@@ -342,8 +342,8 @@ static void JPLua_Register_System( lua_State *L ) {
 
 	// create a global table named JPLua
 	lua_newtable( L );
-		luaL_getmetatable( L, "JPLua.Meta" );
-		lua_setmetatable( L, -2 );
+	luaL_getmetatable( L, "JPLua.Meta" );
+	lua_setmetatable( L, -2 );
 	lua_setglobal( L, "JPLua" );
 }
 
@@ -352,9 +352,9 @@ static void JPLua_LoadPluginDir( qboolean inPK3 ) {
 	char *folderName = folderList;
 	int i, numFolders;
 
-	memset( folderList, 0, sizeof( folderList ) );
-	numFolders = trap->FS_GetFileList( pluginDir, inPK3 ? "" : "/", folderList, sizeof( folderList ) );
-	for ( i=0; i<numFolders; i++ ) {
+	memset( folderList, 0, sizeof(folderList) );
+	numFolders = trap->FS_GetFileList( pluginDir, inPK3 ? "" : "/", folderList, sizeof(folderList) );
+	for ( i = 0; i < numFolders; i++ ) {
 		size_t skipLenFolder = inPK3 ? 1 : 0, folderLen = 0;
 		qboolean skip = qfalse;
 		char *s;
@@ -374,10 +374,10 @@ static void JPLua_LoadPluginDir( qboolean inPK3 ) {
 			char *fileName = fileList;
 			int j, numFiles;
 
-			memset( fileList, 0, sizeof( fileList ) );
-			numFiles = trap->FS_GetFileList( va( "%s%s", pluginDir, folderName ), JPLUA_EXTENSION, fileList, sizeof( fileList ) );
+			memset( fileList, 0, sizeof(fileList) );
+			numFiles = trap->FS_GetFileList( va( "%s%s", pluginDir, folderName ), JPLUA_EXTENSION, fileList, sizeof(fileList) );
 
-			for ( j=0; j<numFiles; j++ ) {
+			for ( j = 0; j < numFiles; j++ ) {
 				size_t skipLenFile = 1, fileLen = 0;
 				if ( (s = (char *)Q_strchrs( fileName, "/\\" )) ) {
 					*s = '\0';
@@ -428,21 +428,21 @@ static int JPLua_Export_AddClientCommand( lua_State *L ) {
 		return 0;
 	}
 
-	while ( cmd && cmd->next)
+	while ( cmd && cmd->next )
 		cmd = cmd->next;
 
 	if ( cmd ) {
-		cmd->next = (jplua_plugin_command_t *)malloc( sizeof( jplua_plugin_command_t ) );
-		memset( cmd->next, 0, sizeof( jplua_plugin_command_t ) );
+		cmd->next = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
+		memset( cmd->next, 0, sizeof(jplua_plugin_command_t) );
 		cmd = cmd->next;
 	}
 	else {
-		JPLua.currentPlugin->clientCmds = (jplua_plugin_command_t *)malloc( sizeof( jplua_plugin_command_t ) );
-		memset( JPLua.currentPlugin->clientCmds, 0, sizeof( jplua_plugin_command_t ) );
+		JPLua.currentPlugin->clientCmds = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
+		memset( JPLua.currentPlugin->clientCmds, 0, sizeof(jplua_plugin_command_t) );
 		cmd = JPLua.currentPlugin->clientCmds;
 	}
 
-	Q_strncpyz( cmd->command, lua_tostring( L, -2 ), sizeof( cmd->command ) );
+	Q_strncpyz( cmd->command, lua_tostring( L, -2 ), sizeof(cmd->command) );
 	cmd->handle = luaL_ref( L, LUA_REGISTRYINDEX );
 
 	return 0;
@@ -460,21 +460,21 @@ static int JPLua_Export_AddConsoleCommand( lua_State *L ) {
 		return 0;
 	}
 
-	while ( cmd && cmd->next)
+	while ( cmd && cmd->next )
 		cmd = cmd->next;
 
 	if ( cmd ) {
-		cmd->next = (jplua_plugin_command_t *)malloc( sizeof( jplua_plugin_command_t ) );
-		memset( cmd->next, 0, sizeof( jplua_plugin_command_t ) );
+		cmd->next = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
+		memset( cmd->next, 0, sizeof(jplua_plugin_command_t) );
 		cmd = cmd->next;
 	}
 	else {
-		JPLua.currentPlugin->consoleCmds = (jplua_plugin_command_t *)malloc( sizeof( jplua_plugin_command_t ) );
-		memset( JPLua.currentPlugin->consoleCmds, 0, sizeof( jplua_plugin_command_t ) );
+		JPLua.currentPlugin->consoleCmds = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
+		memset( JPLua.currentPlugin->consoleCmds, 0, sizeof(jplua_plugin_command_t) );
 		cmd = JPLua.currentPlugin->consoleCmds;
 	}
 
-	Q_strncpyz( cmd->command, lua_tostring( L, 1 ), sizeof( cmd->command ) );
+	Q_strncpyz( cmd->command, lua_tostring( L, 1 ), sizeof(cmd->command) );
 	if ( funcType != LUA_TNIL )
 		cmd->handle = luaL_ref( L, LUA_REGISTRYINDEX );
 
@@ -497,21 +497,21 @@ static int JPLua_Export_AddServerCommand( lua_State *L ) {
 		return 0;
 	}
 
-	while ( cmd && cmd->next)
+	while ( cmd && cmd->next )
 		cmd = cmd->next;
 
 	if ( cmd ) {
-		cmd->next = (jplua_plugin_command_t *)malloc( sizeof( jplua_plugin_command_t ) );
-		memset( cmd->next, 0, sizeof( jplua_plugin_command_t ) );
+		cmd->next = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
+		memset( cmd->next, 0, sizeof(jplua_plugin_command_t) );
 		cmd = cmd->next;
 	}
 	else {
-		JPLua.currentPlugin->serverCmds = (jplua_plugin_command_t *)malloc( sizeof( jplua_plugin_command_t ) );
-		memset( JPLua.currentPlugin->serverCmds, 0, sizeof( jplua_plugin_command_t ) );
+		JPLua.currentPlugin->serverCmds = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
+		memset( JPLua.currentPlugin->serverCmds, 0, sizeof(jplua_plugin_command_t) );
 		cmd = JPLua.currentPlugin->serverCmds;
 	}
 
-	Q_strncpyz( cmd->command, lua_tostring( L, -2 ), sizeof( cmd->command ) );
+	Q_strncpyz( cmd->command, lua_tostring( L, -2 ), sizeof(cmd->command) );
 	cmd->handle = luaL_ref( L, LUA_REGISTRYINDEX );
 
 	return 0;
@@ -530,7 +530,7 @@ static int JPLua_Export_DrawPic( lua_State *L ) {
 	shader = lua_tointeger( L, 6 );
 
 	trap->R_SetColor( &colour );
-		CG_DrawPic( x, y, w, h, shader );
+	CG_DrawPic( x, y, w, h, shader );
 	trap->R_SetColor( NULL );
 
 	return 0;
@@ -564,7 +564,7 @@ static int JPLua_Export_DrawRotatedPic( lua_State *L ) {
 	shader = lua_tointeger( L, 7 );
 
 	trap->R_SetColor( &colour );
-		CG_DrawRotatePic2( x, y, w, h, angle, shader );
+	CG_DrawRotatePic2( x, y, w, h, angle, shader );
 	trap->R_SetColor( NULL );
 
 	return 0;
@@ -609,7 +609,7 @@ static int JPLua_Export_GetMap( lua_State *L ) {
 #if defined(_GAME)
 
 	char mapname[MAX_CVAR_VALUE_STRING];
-	COM_StripExtension( level.rawmapname, mapname, sizeof( mapname ) );
+	COM_StripExtension( level.rawmapname, mapname, sizeof(mapname) );
 	lua_pushstring( L, mapname );
 
 #elif defined(_CGAME)
@@ -624,27 +624,26 @@ static int JPLua_Export_GetMap( lua_State *L ) {
 static int JPLua_Export_GetMapTime( lua_State *L ) {
 #if defined(_GAME)
 
-	int msec = level.time-level.startTime;
+	int msec = level.time - level.startTime;
 	int seconds = msec / 1000;
 	int mins = seconds / 60;
 	seconds %= 60;
-//	msec %= 1000;
+	//	msec %= 1000;
 	lua_pushstring( L, va( "%02i:%02i", mins, seconds ) );
 	return 1;
 
 #elif defined(_CGAME)
 
-	int msec=0, secs=0, mins=0, limitSec=cgs.timelimit*60;
+	int msec = 0, secs = 0, mins = 0, limitSec = cgs.timelimit * 60;
 
-	msec = cg.time-cgs.levelStartTime;
-	secs = msec/1000;
-	mins = secs/60;
+	msec = cg.time - cgs.levelStartTime;
+	secs = msec / 1000;
+	mins = secs / 60;
 
-	if ( cgs.timelimit && (cg_drawTimer.integer & DRAWTIMER_COUNTDOWN) )
-	{// count down
-		msec = limitSec*1000 - (msec);
-		secs = msec/1000;
-		mins = secs/60;
+	if ( cgs.timelimit && (cg_drawTimer.integer & DRAWTIMER_COUNTDOWN) ) {// count down
+		msec = limitSec * 1000 - (msec);
+		secs = msec / 1000;
+		mins = secs / 60;
 	}
 
 	secs %= 60;
@@ -667,7 +666,7 @@ static int JPLua_Export_GetPlayers( lua_State *L ) {
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	for ( cl=level.clients, clNum=0; clNum<level.numConnectedClients; clNum++, cl++ ) {
+	for ( cl = level.clients, clNum = 0; clNum < level.numConnectedClients; clNum++, cl++ ) {
 		if ( cl->pers.connected == CON_DISCONNECTED )
 			continue;
 		lua_pushnumber( L, i++ );
@@ -729,23 +728,23 @@ int JPLua_Export_Trace( lua_State *L ) {
 	lua_pushstring( L, "fraction" ); lua_pushnumber( L, tr.fraction ); lua_settable( L, top );
 
 	lua_pushstring( L, "endpos" );
-		lua_newtable( L ); top2 = lua_gettop( L );
-		lua_pushstring( L, "x" ); lua_pushnumber( L, tr.endpos.x ); lua_settable( L, top2 );
-		lua_pushstring( L, "y" ); lua_pushnumber( L, tr.endpos.y ); lua_settable( L, top2 );
-		lua_pushstring( L, "z" ); lua_pushnumber( L, tr.endpos.z ); lua_settable( L, top2 );
+	lua_newtable( L ); top2 = lua_gettop( L );
+	lua_pushstring( L, "x" ); lua_pushnumber( L, tr.endpos.x ); lua_settable( L, top2 );
+	lua_pushstring( L, "y" ); lua_pushnumber( L, tr.endpos.y ); lua_settable( L, top2 );
+	lua_pushstring( L, "z" ); lua_pushnumber( L, tr.endpos.z ); lua_settable( L, top2 );
 	lua_settable( L, top );
 
 	lua_pushstring( L, "plane" );
-		lua_newtable( L ); top2 = lua_gettop( L );
-		lua_pushstring( L, "normal" );
-			lua_newtable( L ); top3 = lua_gettop( L );
-				lua_pushstring( L, "x" ); lua_pushnumber( L, tr.plane.normal.x ); lua_settable( L, top3 );
-				lua_pushstring( L, "y" ); lua_pushnumber( L, tr.plane.normal.y ); lua_settable( L, top3 );
-				lua_pushstring( L, "z" ); lua_pushnumber( L, tr.plane.normal.z ); lua_settable( L, top3 );
-			lua_settable( L, top2 );
-		lua_pushstring( L, "dist" ); lua_pushnumber( L, tr.plane.dist ); lua_settable( L, top2 );
-		lua_pushstring( L, "type" ); lua_pushinteger( L, tr.plane.type ); lua_settable( L, top2 );
-		lua_pushstring( L, "signbits" ); lua_pushinteger( L, tr.plane.signbits ); lua_settable( L, top2 );
+	lua_newtable( L ); top2 = lua_gettop( L );
+	lua_pushstring( L, "normal" );
+	lua_newtable( L ); top3 = lua_gettop( L );
+	lua_pushstring( L, "x" ); lua_pushnumber( L, tr.plane.normal.x ); lua_settable( L, top3 );
+	lua_pushstring( L, "y" ); lua_pushnumber( L, tr.plane.normal.y ); lua_settable( L, top3 );
+	lua_pushstring( L, "z" ); lua_pushnumber( L, tr.plane.normal.z ); lua_settable( L, top3 );
+	lua_settable( L, top2 );
+	lua_pushstring( L, "dist" ); lua_pushnumber( L, tr.plane.dist ); lua_settable( L, top2 );
+	lua_pushstring( L, "type" ); lua_pushinteger( L, tr.plane.type ); lua_settable( L, top2 );
+	lua_pushstring( L, "signbits" ); lua_pushinteger( L, tr.plane.signbits ); lua_settable( L, top2 );
 	lua_settable( L, top );
 
 	lua_pushstring( L, "surfaceFlags" ); lua_pushinteger( L, tr.surfaceFlags ); lua_settable( L, top );
@@ -865,65 +864,65 @@ static int JPLua_Export_WorldCoordToScreenCoord( lua_State *L ) {
 
 static const jplua_cimport_table_t JPLua_CImports[] = {
 #ifdef _GAME
-	{ "AddClientCommand",			JPLua_Export_AddClientCommand }, // AddClientCommand( string cmd )
+	{ "AddClientCommand", JPLua_Export_AddClientCommand }, // AddClientCommand( string cmd )
 #endif
 #ifdef _CGAME
-	{ "AddConsoleCommand",			JPLua_Export_AddConsoleCommand }, // AddConsoleCommand( string cmd )
+	{ "AddConsoleCommand", JPLua_Export_AddConsoleCommand }, // AddConsoleCommand( string cmd )
 #endif
-	{ "AddListener",				JPLua_Event_AddListener }, // AddListener( string name, function listener )
-	{ "AddServerCommand",			JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
-	{ "CreateCvar",					JPLua_CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
+	{ "AddListener", JPLua_Event_AddListener }, // AddListener( string name, function listener )
+	{ "AddServerCommand", JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
+	{ "CreateCvar", JPLua_CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
 #ifdef _CGAME
-	{ "DrawPic",					JPLua_Export_DrawPic }, // DrawPic( float x, float y, float width, float height, table { float r, float g, float b, float a }, integer shaderHandle )
-	{ "DrawRect",					JPLua_Export_DrawRect }, // DrawRect( float x, float y, float width, float height, table { float r, float g, float b, float a } )
-	{ "DrawRotatedPic",				JPLua_Export_DrawRotatedPic }, // DrawPic( float x, float y, float width, float height, float angle, table { float r, float g, float b, float a }, integer shaderHandle )
-	{ "DrawText",					JPLua_Export_DrawText }, // DrawText( float x, float y, string text, table { float r, float g, float b, float a }, float scale, integer fontStyle, integer fontIndex )
-	{ "Font_StringHeightPixels",	JPLua_Export_Font_StringHeightPixels }, // integer Font_StringHeightPixels( integer fontHandle, float scale )
-	{ "Font_StringLengthPixels",	JPLua_Export_Font_StringLengthPixels }, // integer Font_StringLengthPixels( string str, integer fontHandle, float scale )
+	{ "DrawPic", JPLua_Export_DrawPic }, // DrawPic( float x, float y, float width, float height, table { float r, float g, float b, float a }, integer shaderHandle )
+	{ "DrawRect", JPLua_Export_DrawRect }, // DrawRect( float x, float y, float width, float height, table { float r, float g, float b, float a } )
+	{ "DrawRotatedPic", JPLua_Export_DrawRotatedPic }, // DrawPic( float x, float y, float width, float height, float angle, table { float r, float g, float b, float a }, integer shaderHandle )
+	{ "DrawText", JPLua_Export_DrawText }, // DrawText( float x, float y, string text, table { float r, float g, float b, float a }, float scale, integer fontStyle, integer fontIndex )
+	{ "Font_StringHeightPixels", JPLua_Export_Font_StringHeightPixels }, // integer Font_StringHeightPixels( integer fontHandle, float scale )
+	{ "Font_StringLengthPixels", JPLua_Export_Font_StringLengthPixels }, // integer Font_StringLengthPixels( string str, integer fontHandle, float scale )
 #endif
-	{ "GetCvar",					JPLua_GetCvar }, // Cvar GetCvar( string name )
+	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
 #ifdef _CGAME
-	{ "GetFPS",						JPLua_Export_GetFPS }, // integer GetFPS()
+	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
 #endif
-	{ "GetMap",						JPLua_Export_GetMap }, // string GetMap()
-	{ "GetMapTime",					JPLua_Export_GetMapTime }, // string GetMapTime()
-	{ "GetPlayer",					JPLua_GetPlayer }, // Player GetPlayer( integer clientNum )
+	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
+	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
+	{ "GetPlayer", JPLua_GetPlayer }, // Player GetPlayer( integer clientNum )
 #ifdef _GAME
-	{ "GetPlayers",					JPLua_Export_GetPlayers }, // {Player,...} GetPlayers()
+	{ "GetPlayers", JPLua_Export_GetPlayers }, // {Player,...} GetPlayers()
 #endif
-	{ "GetPlayerTable",				JPLua_Player_GetMetaTable }, // Player.meta GetPlayerTable()
-	{ "GetRealTime",				JPLua_Export_GetRealTime }, // integer GetRealTime()
-	{ "GetSerialiser",				JPLua_GetSerialiser }, // Serialiser GetSerialiser( string fileName )
+	{ "GetPlayerTable", JPLua_Player_GetMetaTable }, // Player.meta GetPlayerTable()
+	{ "GetRealTime", JPLua_Export_GetRealTime }, // integer GetRealTime()
+	{ "GetSerialiser", JPLua_GetSerialiser }, // Serialiser GetSerialiser( string fileName )
 #ifdef _CGAME
-	{ "GetServer",					JPLua_GetServer }, // Server GetServer()
+	{ "GetServer", JPLua_GetServer }, // Server GetServer()
 #endif
-	{ "GetTime",					JPLua_Export_GetTime }, // integer GetTime()
-	{ "RayTrace",					JPLua_Export_Trace }, // traceResult Trace( stuff )
-	{ "RegisterPlugin",				JPLua_RegisterPlugin }, // plugin RegisterPlugin( string name, string version )
+	{ "GetTime", JPLua_Export_GetTime }, // integer GetTime()
+	{ "RayTrace", JPLua_Export_Trace }, // traceResult Trace( stuff )
+	{ "RegisterPlugin", JPLua_RegisterPlugin }, // plugin RegisterPlugin( string name, string version )
 #ifdef _CGAME
-	{ "RegisterShader",				JPLua_Export_RegisterShader }, // integer RegisterShader( string path )
-	{ "RegisterSound",				JPLua_Export_RegisterSound }, // integer RegisterSound( string path )
-	{ "RemapShader",				JPLua_Export_RemapShader }, // RemapShader( string oldshader, string newshader, string timeoffset )
+	{ "RegisterShader", JPLua_Export_RegisterShader }, // integer RegisterShader( string path )
+	{ "RegisterSound", JPLua_Export_RegisterSound }, // integer RegisterSound( string path )
+	{ "RemapShader", JPLua_Export_RemapShader }, // RemapShader( string oldshader, string newshader, string timeoffset )
 #endif
-	{ "RemoveListener",				JPLua_Event_RemoveListener }, // RemoveListener( string name )
+	{ "RemoveListener", JPLua_Event_RemoveListener }, // RemoveListener( string name )
 #ifdef _CGAME
-	{ "SendChatText",				JPLua_Export_SendChatText }, // SendChatText( string text )
+	{ "SendChatText", JPLua_Export_SendChatText }, // SendChatText( string text )
 #endif
-	{ "SendConsoleCommand",			JPLua_Export_SendConsoleCommand }, // SendConsoleCommand( string command )
+	{ "SendConsoleCommand", JPLua_Export_SendConsoleCommand }, // SendConsoleCommand( string command )
 #ifdef _GAME
-	{ "SendReliableCommand",		JPLua_Export_SendReliableCommand }, // SendReliableCommand( integer clientNum, string cmd )
+	{ "SendReliableCommand", JPLua_Export_SendReliableCommand }, // SendReliableCommand( integer clientNum, string cmd )
 #endif
 #ifdef _CGAME
-	{ "SendServerCommand",			JPLua_Export_SendServerCommand }, // SendServerCommand( string command )
+	{ "SendServerCommand", JPLua_Export_SendServerCommand }, // SendServerCommand( string command )
 #endif
-	{ "StackDump",					JPLua_StackDump },
+	{ "StackDump", JPLua_StackDump },
 #ifdef _CGAME
-	{ "StartLocalSound",			JPLua_Export_StartLocalSound }, // StartLocalSound( integer soundHandle, integer channelNum )
-	{ "TestLine",					JPLua_Export_TestLine }, // traceResult Trace( stuff )
+	{ "StartLocalSound", JPLua_Export_StartLocalSound }, // StartLocalSound( integer soundHandle, integer channelNum )
+	{ "TestLine", JPLua_Export_TestLine }, // traceResult Trace( stuff )
 #endif
-	{ "Vector3",					JPLua_GetVector3 }, // Vector Vector3( [float x, float y, float z] )
+	{ "Vector3", JPLua_GetVector3 }, // Vector Vector3( [float x, float y, float z] )
 #ifdef _CGAME
-	{ "WorldCoordToScreenCoord",	JPLua_Export_WorldCoordToScreenCoord }, // { float x, float y } WorldCoordToScreenCoord( Vector3 pos )
+	{ "WorldCoordToScreenCoord", JPLua_Export_WorldCoordToScreenCoord }, // { float x, float y } WorldCoordToScreenCoord( Vector3 pos )
 #endif
 };
 static const size_t cimportsSize = ARRAY_LEN( JPLua_CImports );
@@ -944,7 +943,7 @@ void JPLua_Init( void ) {
 	}
 
 	//Initialise and load base libraries
-	memset( JPLua_Framework, -1, sizeof( JPLua_Framework ) );
+	memset( JPLua_Framework, -1, sizeof(JPLua_Framework) );
 	JPLua.state = luaL_newstate();
 	if ( !JPLua.state ) {
 		//TODO: Fail gracefully
@@ -979,7 +978,7 @@ void JPLua_Init( void ) {
 	lua_pushcclosure( JPLua.state, JPLua_Export_Print, 0 );	lua_setglobal( JPLua.state, "print" );
 	lua_pushcclosure( JPLua.state, JPLua_Export_Require, 0 );	lua_setglobal( JPLua.state, "require" );
 
-	for ( i=0; i<cimportsSize; i++ )
+	for ( i = 0; i < cimportsSize; i++ )
 		lua_register( JPLua.state, JPLua_CImports[i].name, JPLua_CImports[i].function );
 
 	// Register our classes
@@ -992,10 +991,10 @@ void JPLua_Init( void ) {
 	JPLua_Register_Vector( JPLua.state );
 
 	// -- FRAMEWORK INITIALISATION begin
-	lua_getglobal( JPLua.state, "tostring" );	JPLua_Framework[JPLUA_FRAMEWORK_TOSTRING]	= luaL_ref( JPLua.state, LUA_REGISTRYINDEX );
-	lua_getglobal( JPLua.state, "pairs" );		JPLua_Framework[JPLUA_FRAMEWORK_PAIRS]		= luaL_ref( JPLua.state, LUA_REGISTRYINDEX );
+	lua_getglobal( JPLua.state, "tostring" );	JPLua_Framework[JPLUA_FRAMEWORK_TOSTRING] = luaL_ref( JPLua.state, LUA_REGISTRYINDEX );
+	lua_getglobal( JPLua.state, "pairs" );		JPLua_Framework[JPLUA_FRAMEWORK_PAIRS] = luaL_ref( JPLua.state, LUA_REGISTRYINDEX );
 
-	for ( i=0; i<JPLUA_FRAMEWORK_MAX; i++ ) {
+	for ( i = 0; i < JPLUA_FRAMEWORK_MAX; i++ ) {
 		if ( JPLua_Framework[i] < 0 )
 			Com_Error( ERR_FATAL, "FATAL ERROR: Could not properly initialize the JPLua framework!\n" );
 	}

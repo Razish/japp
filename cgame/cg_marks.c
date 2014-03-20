@@ -33,8 +33,8 @@ void	CG_InitMarkPolys( void ) {
 	cg_activeMarkPolys.nextMark = &cg_activeMarkPolys;
 	cg_activeMarkPolys.prevMark = &cg_activeMarkPolys;
 	cg_freeMarkPolys = cg_markPolys;
-	for ( i = 0 ; i < MAX_MARK_POLYS - 1 ; i++ ) {
-		cg_markPolys[i].nextMark = &cg_markPolys[i+1];
+	for ( i = 0; i < MAX_MARK_POLYS - 1; i++ ) {
+		cg_markPolys[i].nextMark = &cg_markPolys[i + 1];
 	}
 }
 
@@ -73,7 +73,7 @@ markPoly_t	*CG_AllocMark( void ) {
 		// no free entities, so free the one at the end of the chain
 		// remove the oldest active entity
 		time = cg_activeMarkPolys.prevMark->time;
-		while (cg_activeMarkPolys.prevMark && time == cg_activeMarkPolys.prevMark->time) {
+		while ( cg_activeMarkPolys.prevMark && time == cg_activeMarkPolys.prevMark->time ) {
 			CG_FreeMarkPoly( cg_activeMarkPolys.prevMark );
 		}
 	}
@@ -81,7 +81,7 @@ markPoly_t	*CG_AllocMark( void ) {
 	le = cg_freeMarkPolys;
 	cg_freeMarkPolys = cg_freeMarkPolys->nextMark;
 
-	memset( le, 0, sizeof( *le ) );
+	memset( le, 0, sizeof(*le) );
 
 	// link into the active list
 	le->nextMark = cg_activeMarkPolys.nextMark;
@@ -108,8 +108,8 @@ passed to the renderer.
 #define	MAX_MARK_POINTS		384
 
 void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *dir,
-				   float orientation, float red, float green, float blue, float alpha,
-				   qboolean alphaFade, float radius, qboolean temporary ) {
+	float orientation, float red, float green, float blue, float alpha,
+	qboolean alphaFade, float radius, qboolean temporary ) {
 	vector3			axis[3];
 	float			texCoordScale;
 	vector3			originalPoints[4];
@@ -120,15 +120,14 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 	vector3			markPoints[MAX_MARK_POINTS];
 	vector3			projection;
 
-	assert(markShader);
+	assert( markShader );
 
 	if ( !cg_marks.integer ) {
 		return;
 	}
-	else if (cg_marks.integer == 2)
-	{
-		trap->R_AddDecalToScene(markShader, origin, dir, orientation, red, green, blue, alpha,
-			alphaFade, radius, temporary);
+	else if ( cg_marks.integer == 2 ) {
+		trap->R_AddDecalToScene( markShader, origin, dir, orientation, red, green, blue, alpha,
+			alphaFade, radius, temporary );
 		return;
 	}
 
@@ -149,7 +148,7 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 	texCoordScale = 0.5f * 1.0f / radius;
 
 	// create the full polygon
-	for ( i = 0 ; i < 3 ; i++ ) {
+	for ( i = 0; i < 3; i++ ) {
 		originalPoints[0].data[i] = origin->data[i] - radius * axis[1].data[i] - radius * axis[2].data[i];
 		originalPoints[1].data[i] = origin->data[i] + radius * axis[1].data[i] - radius * axis[2].data[i];
 		originalPoints[2].data[i] = origin->data[i] + radius * axis[1].data[i] + radius * axis[2].data[i];
@@ -159,15 +158,15 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 	// get the fragments
 	VectorScale( dir, -20, &projection );
 	numFragments = trap->R_MarkFragments( 4, originalPoints,
-					&projection, MAX_MARK_POINTS, &markPoints[0],
-					MAX_MARK_FRAGMENTS, markFragments );
+		&projection, MAX_MARK_POINTS, &markPoints[0],
+		MAX_MARK_FRAGMENTS, markFragments );
 
 	colors[0] = red * 255;
 	colors[1] = green * 255;
 	colors[2] = blue * 255;
 	colors[3] = alpha * 255;
 
-	for ( i = 0, mf = markFragments ; i < numFragments ; i++, mf++ ) {
+	for ( i = 0, mf = markFragments; i < numFragments; i++, mf++ ) {
 		polyVert_t	*v;
 		polyVert_t	verts[MAX_VERTS_ON_POLY];
 		markPoly_t	*mark;
@@ -177,7 +176,7 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 		if ( mf->numPoints > MAX_VERTS_ON_POLY ) {
 			mf->numPoints = MAX_VERTS_ON_POLY;
 		}
-		for ( j = 0, v = verts ; j < mf->numPoints ; j++, v++ ) {
+		for ( j = 0, v = verts; j < mf->numPoints; j++, v++ ) {
 			vector3		delta;
 
 			VectorCopy( &markPoints[mf->firstPoint + j], &v->xyz );
@@ -187,7 +186,7 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 			v->st[1] = 0.5f + DotProduct( &delta, &axis[2] ) * texCoordScale;
 			{
 				int k;
-				for ( k=0; k<4; k++ )
+				for ( k = 0; k < 4; k++ )
 					v->modulate[k] = colors[k];
 			}
 		}
@@ -208,7 +207,7 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 		mark->color[1] = green;
 		mark->color[2] = blue;
 		mark->color[3] = alpha;
-		memcpy( mark->verts, verts, mf->numPoints * sizeof( verts[0] ) );
+		memcpy( mark->verts, verts, mf->numPoints * sizeof(verts[0]) );
 		markTotal++;
 	}
 }
@@ -233,7 +232,7 @@ void CG_AddMarks( void ) {
 	}
 
 	mp = cg_activeMarkPolys.nextMark;
-	for ( ; mp != &cg_activeMarkPolys ; mp = next ) {
+	for ( ; mp != &cg_activeMarkPolys; mp = next ) {
 		// grab next now, so if the local entity is freed we
 		// still have it
 		next = mp->nextMark;
@@ -246,15 +245,15 @@ void CG_AddMarks( void ) {
 
 		// fade out the energy bursts
 		//if ( mp->markShader == media.gfx.world.energyMark ) {
-		if (0) {
+		if ( 0 ) {
 
-			fade = 450 - 450 * ( (cg.time - mp->time ) / 3000.0f );
+			fade = 450 - 450 * ((cg.time - mp->time) / 3000.0f);
 			if ( fade < 255 ) {
 				if ( fade < 0 ) {
 					fade = 0;
 				}
 				if ( mp->verts[0].modulate[0] != 0 ) {
-					for ( j = 0 ; j < mp->poly.numVerts ; j++ ) {
+					for ( j = 0; j < mp->poly.numVerts; j++ ) {
 						mp->verts[j].modulate[0] = mp->color[0] * fade;
 						mp->verts[j].modulate[1] = mp->color[1] * fade;
 						mp->verts[j].modulate[2] = mp->color[2] * fade;
@@ -268,23 +267,21 @@ void CG_AddMarks( void ) {
 		if ( t < MARK_FADE_TIME ) {
 			fade = 255 * t / MARK_FADE_TIME;
 			if ( mp->alphaFade ) {
-				for ( j = 0 ; j < mp->poly.numVerts ; j++ ) {
+				for ( j = 0; j < mp->poly.numVerts; j++ ) {
 					mp->verts[j].modulate[3] = fade;
 				}
 			}
-			else
-			{
+			else {
 				float f = (float)t / MARK_FADE_TIME;
-				for ( j = 0 ; j < mp->poly.numVerts ; j++ ) {
+				for ( j = 0; j < mp->poly.numVerts; j++ ) {
 					mp->verts[j].modulate[0] = mp->color[0] * f;
 					mp->verts[j].modulate[1] = mp->color[1] * f;
 					mp->verts[j].modulate[2] = mp->color[2] * f;
 				}
 			}
 		}
-		else
-		{
-			for ( j = 0 ; j < mp->poly.numVerts ; j++ ) {
+		else {
+			for ( j = 0; j < mp->poly.numVerts; j++ ) {
 				mp->verts[j].modulate[0] = mp->color[0];
 				mp->verts[j].modulate[1] = mp->color[1];
 				mp->verts[j].modulate[2] = mp->color[2];

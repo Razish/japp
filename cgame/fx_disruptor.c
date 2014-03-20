@@ -15,8 +15,8 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end ) {
 	refEntity_t   *reCore = &leCore->refEntity;
 	localEntity_t *leGlow = CG_AllocLocalEntity();
 	refEntity_t   *reGlow = &leGlow->refEntity;
-	vector4 color1 = { ci->rgb1.r/255.0f, ci->rgb1.g/255.0f, ci->rgb1.b/255.0f, 1.0f },
-			color2 = { ci->rgb2.r/255.0f, ci->rgb2.g/255.0f, ci->rgb2.b/255.0f, 1.0f };
+	vector4 color1 = { ci->rgb1.r / 255.0f, ci->rgb1.g / 255.0f, ci->rgb1.b / 255.0f, 1.0f },
+		color2 = { ci->rgb2.r / 255.0f, ci->rgb2.g / 255.0f, ci->rgb2.b / 255.0f, 1.0f };
 
 	if ( cgs.gametype >= GT_TEAM ) {
 		if ( ci->team == TEAM_RED ) {
@@ -42,8 +42,8 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end ) {
 	reGlow->reType = RT_LINE;
 	reGlow->radius = 3.0f;
 	reGlow->customShader = trap->R_RegisterShaderNoMip( "gfx/misc/whiteline2" );
-	VectorCopy(start, &reGlow->origin);
-	VectorCopy(end, &reGlow->oldorigin);
+	VectorCopy( start, &reGlow->origin );
+	VectorCopy( end, &reGlow->oldorigin );
 	reGlow->shaderRGBA[0] = color1.r * 255;
 	reGlow->shaderRGBA[1] = color1.g * 255;
 	reGlow->shaderRGBA[2] = color1.b * 255;
@@ -62,8 +62,8 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end ) {
 	reCore->reType = RT_LINE;
 	reCore->radius = 1.0f;
 	reCore->customShader = trap->R_RegisterShaderNoMip( "gfx/misc/whiteline2" );
-	VectorCopy(start, &reCore->origin);
-	VectorCopy(end, &reCore->oldorigin);
+	VectorCopy( start, &reCore->origin );
+	VectorCopy( end, &reCore->oldorigin );
 	reCore->shaderRGBA[0] = color1.r * 255;
 	reCore->shaderRGBA[1] = color1.g * 255;
 	reCore->shaderRGBA[2] = color1.b * 255;
@@ -117,8 +117,8 @@ void FX_DisruptorAltMiss( vector3 *origin, vector3 *normal ) {
 	b.alpha2 = 0.2f;
 	b.alphaParm = 0.5f;
 
-	VectorCopy(&WHITE, &b.sRGB);
-	VectorCopy(&WHITE, &b.eRGB);
+	VectorCopy( &WHITE, &b.sRGB );
+	VectorCopy( &WHITE, &b.eRGB );
 
 	b.rgbParm = 0.0f;
 	b.killTime = 4000;

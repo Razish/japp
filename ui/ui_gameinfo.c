@@ -56,7 +56,7 @@ int UI_ParseInfos( char *buf, int max, char *infos[] ) {
 			if ( !strcmp( token, "}" ) ) {
 				break;
 			}
-			Q_strncpyz( key, token, sizeof( key ) );
+			Q_strncpyz( key, token, sizeof(key) );
 
 			token = COM_ParseExt( (const char **)&buf, qfalse );
 			if ( !token[0] ) {
@@ -65,20 +65,17 @@ int UI_ParseInfos( char *buf, int max, char *infos[] ) {
 			Info_SetValueForKey( info, key, token );
 		}
 		//NOTE: extra space for arena number
-		infos[count] = (char *) UI_Alloc(strlen(info) + strlen("\\num\\") + strlen(va("%d", MAX_ARENAS)) + 1);
-		if (infos[count]) {
-			strcpy(infos[count], info);
+		infos[count] = (char *)UI_Alloc( strlen( info ) + strlen( "\\num\\" ) + strlen( va( "%d", MAX_ARENAS ) ) + 1 );
+		if ( infos[count] ) {
+			strcpy( infos[count], info );
 #ifdef _DEBUG
-			if (trap->Cvar_VariableValue("com_buildScript"))
-			{
-				const char *botFile = Info_ValueForKey(info, "personality");
-				if (botFile && botFile[0])
-				{
+			if ( trap->Cvar_VariableValue( "com_buildScript" ) ) {
+				const char *botFile = Info_ValueForKey( info, "personality" );
+				if ( botFile && botFile[0] ) {
 					int fh = 0;
-					trap->FS_Open(botFile, &fh, FS_READ);
-					if (fh)
-					{
-						trap->FS_Close(fh);
+					trap->FS_Open( botFile, &fh, FS_READ );
+					if ( fh ) {
+						trap->FS_Close( fh );
 					}
 				}
 			}
@@ -131,70 +128,71 @@ void UI_LoadArenas( void ) {
 	uiInfo.mapCount = 0;
 
 	// get all arenas from .arena files
-	numdirs = trap->FS_GetFileList("scripts", ".arena", dirlist, 1024 );
-	dirptr  = dirlist;
-	for (i = 0; i < numdirs; i++, dirptr += dirlen+1) {
-		dirlen = strlen(dirptr);
-		strcpy(filename, "scripts/");
-		strcat(filename, dirptr);
-		UI_LoadArenasFromFile(filename);
+	numdirs = trap->FS_GetFileList( "scripts", ".arena", dirlist, 1024 );
+	dirptr = dirlist;
+	for ( i = 0; i < numdirs; i++, dirptr += dirlen + 1 ) {
+		dirlen = strlen( dirptr );
+		strcpy( filename, "scripts/" );
+		strcat( filename, dirptr );
+		UI_LoadArenasFromFile( filename );
 	}
-//	trap->Print( va( "%i arenas parsed\n", ui_numArenas ) );
-	if (UI_OutOfMemory()) {
-		trap->Print(S_COLOR_YELLOW"WARNING: not anough memory in pool to load all arenas\n");
+	//	trap->Print( va( "%i arenas parsed\n", ui_numArenas ) );
+	if ( UI_OutOfMemory() ) {
+		trap->Print( S_COLOR_YELLOW"WARNING: not anough memory in pool to load all arenas\n" );
 	}
 
-	for( n = 0; n < ui_numArenas; n++ ) {
+	for ( n = 0; n < ui_numArenas; n++ ) {
 		// determine type
 
 		uiInfo.mapList[uiInfo.mapCount].cinematic = -1;
-		uiInfo.mapList[uiInfo.mapCount].mapLoadName = String_Alloc(Info_ValueForKey(ui_arenaInfos[n], "map"));
-		uiInfo.mapList[uiInfo.mapCount].mapName = String_Alloc(Info_ValueForKey(ui_arenaInfos[n], "longname"));
+		uiInfo.mapList[uiInfo.mapCount].mapLoadName = String_Alloc( Info_ValueForKey( ui_arenaInfos[n], "map" ) );
+		uiInfo.mapList[uiInfo.mapCount].mapName = String_Alloc( Info_ValueForKey( ui_arenaInfos[n], "longname" ) );
 		uiInfo.mapList[uiInfo.mapCount].levelShot = -1;
-		uiInfo.mapList[uiInfo.mapCount].imageName = String_Alloc(va("levelshots/%s", uiInfo.mapList[uiInfo.mapCount].mapLoadName));
+		uiInfo.mapList[uiInfo.mapCount].imageName = String_Alloc( va( "levelshots/%s", uiInfo.mapList[uiInfo.mapCount].mapLoadName ) );
 		uiInfo.mapList[uiInfo.mapCount].typeBits = 0;
 
 		type = Info_ValueForKey( ui_arenaInfos[n], "type" );
 		// if no type specified, it will be treated as "ffa"
-		if( *type ) {
-			if( strstr( type, "ffa" ) ) {
+		if ( *type ) {
+			if ( strstr( type, "ffa" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_FFA);
 				//Raz: JK2 gametypes
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_JEDIMASTER);
 			}
-			if( strstr( type, "holocron" ) ) {
+			if ( strstr( type, "holocron" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_HOLOCRON);
 			}
-			if( strstr( type, "jedimaster" ) ) {
+			if ( strstr( type, "jedimaster" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_JEDIMASTER);
 			}
-			if( strstr( type, "duel" ) ) {
+			if ( strstr( type, "duel" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_DUEL);
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_POWERDUEL);
 			}
-			if( strstr( type, "powerduel" ) ) {
+			if ( strstr( type, "powerduel" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_DUEL);
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_POWERDUEL);
 			}
-			if( strstr( type, "siege" ) ) {
+			if ( strstr( type, "siege" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_SIEGE);
 			}
-			if( strstr( type, "ctf" ) ) {
+			if ( strstr( type, "ctf" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_CTF);
 				//Raz: JK2 gametypes
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_CTY);
 			}
-			if( strstr( type, "cty" ) ) {
+			if ( strstr( type, "cty" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_CTY);
 			}
-		} else {
+		}
+		else {
 			uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_FFA);
 			//Raz: JK2 gametypes
 			uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_JEDIMASTER);
 		}
 
 		uiInfo.mapCount++;
-		if (uiInfo.mapCount >= MAX_MAPS) {
+		if ( uiInfo.mapCount >= MAX_MAPS ) {
 			break;
 		}
 	}
@@ -226,18 +224,16 @@ static void UI_LoadBotsFromFile( const char *filename ) {
 	trap->FS_Read( buf, len, f );
 	buf[len] = 0;
 
-	stopMark = strstr(buf, "@STOPHERE");
+	stopMark = strstr( buf, "@STOPHERE" );
 
 	//This bot is in place as a mark for modview's bot viewer.
 	//If we hit it just stop and trace back to the beginning of the bot define and cut the string off.
 	//This is only done in the UI and not the game so that "test" bots can be added manually and still
 	//not show up in the menu.
-	if (stopMark)
-	{
+	if ( stopMark ) {
 		int startPoint = stopMark - buf;
 
-		while (buf[startPoint] != '{')
-		{
+		while ( buf[startPoint] != '{' ) {
 			startPoint--;
 		}
 
@@ -246,7 +242,7 @@ static void UI_LoadBotsFromFile( const char *filename ) {
 
 	trap->FS_Close( f );
 
-	COM_Compress(buf);
+	COM_Compress( buf );
 
 	ui_numBots += UI_ParseInfos( buf, MAX_BOTS - ui_numBots, &ui_botInfos[ui_numBots] );
 }
@@ -267,24 +263,24 @@ void UI_LoadBots( void ) {
 
 	ui_numBots = 0;
 
-	trap->Cvar_Register( &botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM );
-	if( *botsFile.string ) {
-		UI_LoadBotsFromFile(botsFile.string);
+	trap->Cvar_Register( &botsFile, "g_botsFile", "", CVAR_INIT | CVAR_ROM );
+	if ( *botsFile.string ) {
+		UI_LoadBotsFromFile( botsFile.string );
 	}
 	else {
-		UI_LoadBotsFromFile("botfiles/bots.txt");
+		UI_LoadBotsFromFile( "botfiles/bots.txt" );
 	}
 
 	// get all bots from .bot files
-	numdirs = trap->FS_GetFileList("scripts", ".bot", dirlist, 1024 );
-	dirptr  = dirlist;
-	for (i = 0; i < numdirs; i++, dirptr += dirlen+1) {
-		dirlen = strlen(dirptr);
-		strcpy(filename, "scripts/");
-		strcat(filename, dirptr);
-		UI_LoadBotsFromFile(filename);
+	numdirs = trap->FS_GetFileList( "scripts", ".bot", dirlist, 1024 );
+	dirptr = dirlist;
+	for ( i = 0; i < numdirs; i++, dirptr += dirlen + 1 ) {
+		dirlen = strlen( dirptr );
+		strcpy( filename, "scripts/" );
+		strcat( filename, dirptr );
+		UI_LoadBotsFromFile( filename );
 	}
-//	trap->Print( va( "%i bots parsed\n", ui_numBots ) );
+	//	trap->Print( va( "%i bots parsed\n", ui_numBots ) );
 }
 
 
@@ -294,7 +290,7 @@ UI_GetBotInfoByNumber
 ===============
 */
 char *UI_GetBotInfoByNumber( int num ) {
-	if( num < 0 || num >= ui_numBots ) {
+	if ( num < 0 || num >= ui_numBots ) {
 		trap->Print( va( S_COLOR_RED "Invalid bot number: %i\n", num ) );
 		return NULL;
 	}
@@ -311,7 +307,7 @@ const char *UI_GetBotInfoByName( const char *name ) {
 	int		n;
 	const char *value;
 
-	for ( n = 0; n < ui_numBots ; n++ ) {
+	for ( n = 0; n < ui_numBots; n++ ) {
 		value = Info_ValueForKey( ui_botInfos[n], "name" );
 		if ( !Q_stricmp( value, name ) ) {
 			return ui_botInfos[n];

@@ -48,7 +48,7 @@ static int JPLua_Server_GetPlayers( lua_State *L ) {
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	for ( clientNum=0; clientNum<MAX_CLIENTS; clientNum++ ) {
+	for ( clientNum = 0; clientNum < MAX_CLIENTS; clientNum++ ) {
 		if ( cgs.clientinfo[clientNum].infoValid ) {
 			lua_pushnumber( L, i++ );
 			JPLua_Player_CreateRef( L, clientNum );
@@ -60,11 +60,11 @@ static int JPLua_Server_GetPlayers( lua_State *L ) {
 }
 
 static const struct luaL_Reg jplua_server_meta[] = {
-	{ "__tostring",	JPLua_Server_ToString },
-	{ "GetName",	JPLua_Server_GetName },
-	{ "GetSSF",		JPLua_Server_GetSSF },
-	{ "GetPlayers",	JPLua_Server_GetPlayers },
-	{ NULL,			NULL }
+	{ "__tostring", JPLua_Server_ToString },
+	{ "GetName", JPLua_Server_GetName },
+	{ "GetSSF", JPLua_Server_GetSSF },
+	{ "GetPlayers", JPLua_Server_GetPlayers },
+	{ NULL, NULL }
 };
 
 // Register the Server class for Lua
@@ -79,7 +79,7 @@ void JPLua_Register_Server( lua_State *L ) {
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
 	// fill metatable with fields
-	for ( r=jplua_server_meta; r->name; r++ ) {
+	for ( r = jplua_server_meta; r->name; r++ ) {
 		lua_pushcfunction( L, r->func );
 		lua_setfield( L, -2, r->name );
 	}

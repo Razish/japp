@@ -1,7 +1,7 @@
 #if defined(_GAME)
-	#include "g_local.h"
+#include "g_local.h"
 #elif defined(_CGAME)
-	#include "cg_local.h"
+#include "cg_local.h"
 #endif
 #include "bg_lua.h"
 #include "json/cJSON.h"
@@ -102,7 +102,7 @@ void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_Sta
 	t = cJSON_GetObjectItem( parent, name );
 	numElements = cJSON_GetArraySize( t );
 
-	for ( i=0; i<numElements; i++ ) {
+	for ( i = 0; i < numElements; i++ ) {
 		cJSON *e, *it;
 		int kType, vType;
 		const char *tmp;
@@ -113,8 +113,8 @@ void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_Sta
 		// key
 		it = cJSON_GetObjectItem( e, "key" );
 		kType = cJSON_ToInteger( cJSON_GetObjectItem( e, "key_type" ) );
-		if ( (tmp=cJSON_ToString( it )) )
-			Q_strncpyz( k, tmp, sizeof( k ) );
+		if ( (tmp = cJSON_ToString( it )) )
+			Q_strncpyz( k, tmp, sizeof(k) );
 
 		if ( kType == LUA_TSTRING ) {
 			lua_pushstring( L, k );
@@ -139,9 +139,9 @@ void JPLua_Serialiser_IterateTableRead( cJSON *parent, const char *name, lua_Sta
 			lua_pushboolean( L, cJSON_ToBoolean( it ) );
 		}
 		else if ( vType == LUA_TSTRING ) {
-			char v[1024*8]; // should be plenty..
-			if ( (tmp=cJSON_ToString( it )) )
-				Q_strncpyz( v, tmp, sizeof( v ) );
+			char v[1024 * 8]; // should be plenty..
+			if ( (tmp = cJSON_ToString( it )) )
+				Q_strncpyz( v, tmp, sizeof(v) );
 			lua_pushstring( L, v );
 		}
 
@@ -156,7 +156,7 @@ int JPLua_Serialiser_Close( lua_State *L );
 int JPLua_Serialiser_AddTable( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
 
-	if ( lua_type( L, 2 ) != LUA_TSTRING )  {
+	if ( lua_type( L, 2 ) != LUA_TSTRING ) {
 		JPLua_Serialiser_Close( L );
 		luaL_argcheck( L, 1, 2, "'string' expected" );
 	}
@@ -180,7 +180,7 @@ int JPLua_Serialiser_AddTable( lua_State *L ) {
 int JPLua_Serialiser_GetTable( lua_State *L ) {
 	jplua_serialiser_t *serialiser = JPLua_CheckSerialiser( L, 1 );
 
-	if ( lua_type( L, 2 ) != LUA_TSTRING )  {
+	if ( lua_type( L, 2 ) != LUA_TSTRING ) {
 		JPLua_Serialiser_Close( L );
 		luaL_argcheck( L, 1, 2, "'string' expected" );
 	}
@@ -228,8 +228,8 @@ void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode )
 	jplua_serialiser_t *serialiser = NULL;
 	int len = 0;
 
-	serialiser = (jplua_serialiser_t *)lua_newuserdata( L, sizeof( jplua_serialiser_t ) );
-	Com_sprintf( serialiser->fileName, sizeof( serialiser->fileName ), "lua/sv/%s/%s", JPLua.currentPlugin->name, path );
+	serialiser = (jplua_serialiser_t *)lua_newuserdata( L, sizeof(jplua_serialiser_t) );
+	Com_sprintf( serialiser->fileName, sizeof(serialiser->fileName), "lua/sv/%s/%s", JPLua.currentPlugin->name, path );
 	len = trap->FS_Open( serialiser->fileName, &serialiser->fileHandle, mode );
 
 	if ( mode == FS_WRITE ) {
@@ -265,11 +265,11 @@ jplua_serialiser_t *JPLua_CheckSerialiser( lua_State *L, int idx ) {
 }
 
 static const struct luaL_Reg jplua_serialiser_meta[] = {
-	{ "__tostring",	JPLua_Serialiser_ToString },
-	{ "AddTable",	JPLua_Serialiser_AddTable },
-	{ "ReadTable",	JPLua_Serialiser_GetTable },
-	{ "Close",		JPLua_Serialiser_Close },
-	{ NULL,			NULL }
+	{ "__tostring", JPLua_Serialiser_ToString },
+	{ "AddTable", JPLua_Serialiser_AddTable },
+	{ "ReadTable", JPLua_Serialiser_GetTable },
+	{ "Close", JPLua_Serialiser_Close },
+	{ NULL, NULL }
 };
 
 // Register the Serialiser class for Lua
@@ -285,7 +285,7 @@ void JPLua_Register_Serialiser( lua_State *L ) {
 	lua_settable( L, -3 ); // metatable.__index = metatable
 
 	// fill metatable with fields
-	for ( r=jplua_serialiser_meta; r->name; r++ ) {
+	for ( r = jplua_serialiser_meta; r->name; r++ ) {
 		lua_pushcfunction( L, r->func );
 		lua_setfield( L, -2, r->name );
 	}

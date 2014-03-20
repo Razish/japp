@@ -11,11 +11,12 @@
 
 #else
 
-	#ifdef _CGAME
-		Q_EXPORT void QDECL CrashReport( int fileHandle ) {
-		//	char text[] = "Test from cgame\n";
-		//	trap->FS_Write( text, strlen( text ), fileHandle );
-		}
-	#endif
+#ifdef _CGAME
+Q_EXPORT void QDECL CrashReport( int fileHandle ) {
+	//	char text[] = "Test from cgame\n";
+	//	trap->FS_Write( text, strlen( text ), fileHandle );
+}
+
+#endif
 
 #endif //QARCH == 32

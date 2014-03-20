@@ -11,16 +11,14 @@
 #define MIN_DISTANCE_SQR	( MIN_DISTANCE * MIN_DISTANCE )
 
 //Local state enums
-enum
-{
+enum {
 	LSTATE_NONE = 0,
 	LSTATE_DROPPINGDOWN,
 	LSTATE_DOWN,
 	LSTATE_RISINGUP,
 };
 
-void NPC_Mark2_Precache( void )
-{
+void NPC_Mark2_Precache( void ) {
 	G_SoundIndex( "sound/chars/mark2/misc/mark2_explo" );// blows up on death
 	G_SoundIndex( "sound/chars/mark2/misc/mark2_pain" );
 	G_SoundIndex( "sound/chars/mark2/misc/mark2_fire" );
@@ -31,10 +29,10 @@ void NPC_Mark2_Precache( void )
 	G_EffectIndex( "blaster/smoke_bolton" );
 	G_EffectIndex( "bryar/muzzle_flash" );
 
-	RegisterItem( BG_FindItemForWeapon( WP_BRYAR_PISTOL ));
-	RegisterItem( BG_FindItemForAmmo( 	AMMO_METAL_BOLTS));
-	RegisterItem( BG_FindItemForAmmo( AMMO_POWERCELL ));
-	RegisterItem( BG_FindItemForAmmo( AMMO_BLASTER ));
+	RegisterItem( BG_FindItemForWeapon( WP_BRYAR_PISTOL ) );
+	RegisterItem( BG_FindItemForAmmo( AMMO_METAL_BOLTS ) );
+	RegisterItem( BG_FindItemForAmmo( AMMO_POWERCELL ) );
+	RegisterItem( BG_FindItemForAmmo( AMMO_BLASTER ) );
 }
 
 /*
@@ -42,23 +40,21 @@ void NPC_Mark2_Precache( void )
 NPC_Mark2_Part_Explode
 -------------------------
 */
-void NPC_Mark2_Part_Explode( gentity_t *self, int bolt )
-{
-	if ( bolt >=0 )
-	{
+void NPC_Mark2_Part_Explode( gentity_t *self, int bolt ) {
+	if ( bolt >= 0 ) {
 		mdxaBone_t	boltMatrix;
 		vector3		org, dir;
 
 		trap->G2API_GetBoltMatrix( self->ghoul2, 0,
-					bolt,
-					&boltMatrix, &self->r.currentAngles, &self->r.currentOrigin, level.time,
-					NULL, &self->modelScale );
+			bolt,
+			&boltMatrix, &self->r.currentAngles, &self->r.currentOrigin, level.time,
+			NULL, &self->modelScale );
 
 		BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, &org );
 		BG_GiveMeVectorFromMatrix( &boltMatrix, NEGATIVE_Y, &dir );
 
-		G_PlayEffectID( G_EffectIndex("env/med_explode2"), &org, &dir );
-		G_PlayEffectID( G_EffectIndex("blaster/smoke_bolton"), &org, &dir );
+		G_PlayEffectID( G_EffectIndex( "env/med_explode2" ), &org, &dir );
+		G_PlayEffectID( G_EffectIndex( "blaster/smoke_bolton" ), &org, &dir );
 	}
 
 	//G_PlayEffectID( G_EffectIndex("blaster/smoke_bolton"), self->playerModel, bolt, self->s.number);
@@ -72,35 +68,30 @@ NPC_Mark2_Pain
 - look at what was hit and see if it should be removed from the model.
 -------------------------
 */
-void NPC_Mark2_Pain(gentity_t *self, gentity_t *attacker, int damage)
-{
-	int newBolt,i;
+void NPC_Mark2_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
+	int newBolt, i;
 	int hitLoc = gPainHitLoc;
 
 	NPC_Pain( self, attacker, damage );
 
-	for (i=0;i<3;i++)
-	{
-		if ((hitLoc==HL_GENERIC1+i) && (self->locationDamage[HL_GENERIC1+i] > AMMO_POD_HEALTH))	// Blow it up?
+	for ( i = 0; i<3; i++ ) {
+		if ( (hitLoc == HL_GENERIC1 + i) && (self->locationDamage[HL_GENERIC1 + i] > AMMO_POD_HEALTH) )	// Blow it up?
 		{
-			if (self->locationDamage[hitLoc] >= AMMO_POD_HEALTH)
-			{
-				newBolt = trap->G2API_AddBolt( self->ghoul2, 0, va("torso_canister%d",(i+1)) );
-				if ( newBolt != -1 )
-				{
-					NPC_Mark2_Part_Explode(self,newBolt);
+			if ( self->locationDamage[hitLoc] >= AMMO_POD_HEALTH ) {
+				newBolt = trap->G2API_AddBolt( self->ghoul2, 0, va( "torso_canister%d", (i + 1) ) );
+				if ( newBolt != -1 ) {
+					NPC_Mark2_Part_Explode( self, newBolt );
 				}
-				NPC_SetSurfaceOnOff( self, va("torso_canister%d",(i+1)), TURN_OFF );
+				NPC_SetSurfaceOnOff( self, va( "torso_canister%d", (i + 1) ), TURN_OFF );
 				break;
 			}
 		}
 	}
 
-	G_Sound( self, CHAN_AUTO, G_SoundIndex( "sound/chars/mark2/misc/mark2_pain" ));
+	G_Sound( self, CHAN_AUTO, G_SoundIndex( "sound/chars/mark2/misc/mark2_pain" ) );
 
 	// If any pods were blown off, kill him
-	if (self->count > 0)
-	{
+	if ( self->count > 0 ) {
 		G_Damage( self, NULL, NULL, NULL, NULL, self->health, DAMAGE_NO_PROTECTION, MOD_UNKNOWN );
 	}
 }
@@ -110,10 +101,8 @@ void NPC_Mark2_Pain(gentity_t *self, gentity_t *attacker, int damage)
 Mark2_Hunt
 -------------------------
 */
-void Mark2_Hunt(void)
-{
-	if ( NPCInfo->goalEntity == NULL )
-	{
+void Mark2_Hunt( void ) {
+	if ( NPCInfo->goalEntity == NULL ) {
 		NPCInfo->goalEntity = NPC->enemy;
 	}
 
@@ -129,37 +118,34 @@ void Mark2_Hunt(void)
 Mark2_FireBlaster
 -------------------------
 */
-void Mark2_FireBlaster(qboolean advance)
-{
-	vector3	muzzle1,enemy_org1,delta1,angleToEnemy1;
+void Mark2_FireBlaster( qboolean advance ) {
+	vector3	muzzle1, enemy_org1, delta1, angleToEnemy1;
 	static	vector3	forward, vright, up;
-//	static	vector3	muzzle;
+	//	static	vector3	muzzle;
 	gentity_t	*missile;
 	mdxaBone_t	boltMatrix;
-	int bolt = trap->G2API_AddBolt(NPC->ghoul2, 0, "*flash");
+	int bolt = trap->G2API_AddBolt( NPC->ghoul2, 0, "*flash" );
 
 	trap->G2API_GetBoltMatrix( NPC->ghoul2, 0,
-				bolt,
-				&boltMatrix, &NPC->r.currentAngles, &NPC->r.currentOrigin, level.time,
-				NULL, &NPC->modelScale );
+		bolt,
+		&boltMatrix, &NPC->r.currentAngles, &NPC->r.currentOrigin, level.time,
+		NULL, &NPC->modelScale );
 
 	BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, &muzzle1 );
 
-	if (NPC->health)
-	{
+	if ( NPC->health ) {
 		CalcEntitySpot( NPC->enemy, SPOT_HEAD, &enemy_org1 );
-		VectorSubtract (&enemy_org1, &muzzle1, &delta1);
-		vectoangles ( &delta1, &angleToEnemy1 );
-		AngleVectors (&angleToEnemy1, &forward, &vright, &up);
+		VectorSubtract( &enemy_org1, &muzzle1, &delta1 );
+		vectoangles( &delta1, &angleToEnemy1 );
+		AngleVectors( &angleToEnemy1, &forward, &vright, &up );
 	}
-	else
-	{
-		AngleVectors (&NPC->r.currentAngles, &forward, &vright, &up);
+	else {
+		AngleVectors( &NPC->r.currentAngles, &forward, &vright, &up );
 	}
 
-	G_PlayEffectID( G_EffectIndex("bryar/muzzle_flash"), &muzzle1, &forward );
+	G_PlayEffectID( G_EffectIndex( "bryar/muzzle_flash" ), &muzzle1, &forward );
 
-	G_Sound( NPC, CHAN_AUTO, G_SoundIndex("sound/chars/mark2/misc/mark2_fire"));
+	G_Sound( NPC, CHAN_AUTO, G_SoundIndex( "sound/chars/mark2/misc/mark2_fire" ) );
 
 	missile = CreateMissile( &muzzle1, &forward, 1600, 10000, NPC, qfalse );
 
@@ -178,23 +164,20 @@ void Mark2_FireBlaster(qboolean advance)
 Mark2_BlasterAttack
 -------------------------
 */
-void Mark2_BlasterAttack(qboolean advance)
-{
+void Mark2_BlasterAttack( qboolean advance ) {
 	if ( TIMER_Done( NPC, "attackDelay" ) )	// Attack?
 	{
-		if (NPCInfo->localState == LSTATE_NONE)	// He's up so shoot less often.
+		if ( NPCInfo->localState == LSTATE_NONE )	// He's up so shoot less often.
 		{
-			TIMER_Set( NPC, "attackDelay", Q_irand( 500, 2000) );
+			TIMER_Set( NPC, "attackDelay", Q_irand( 500, 2000 ) );
 		}
-		else
-		{
-			TIMER_Set( NPC, "attackDelay", Q_irand( 100, 500) );
+		else {
+			TIMER_Set( NPC, "attackDelay", Q_irand( 100, 500 ) );
 		}
-		Mark2_FireBlaster(advance);
+		Mark2_FireBlaster( advance );
 		return;
 	}
-	else if (advance)
-	{
+	else if ( advance ) {
 		Mark2_Hunt();
 	}
 }
@@ -204,88 +187,77 @@ void Mark2_BlasterAttack(qboolean advance)
 Mark2_AttackDecision
 -------------------------
 */
-void Mark2_AttackDecision( void )
-{
+void Mark2_AttackDecision( void ) {
 	float		distance;
 	qboolean	visible;
 	qboolean	advance;
 
 	NPC_FaceEnemy( qtrue );
 
-	distance	= (int) DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
-	visible		= NPC_ClearLOS4( NPC->enemy );
-	advance		= (qboolean)(distance > MIN_DISTANCE_SQR);
+	distance = (int)DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
+	visible = NPC_ClearLOS4( NPC->enemy );
+	advance = (qboolean)(distance > MIN_DISTANCE_SQR);
 
 	// He's been ordered to get up
-	if (NPCInfo->localState == LSTATE_RISINGUP)
-	{
+	if ( NPCInfo->localState == LSTATE_RISINGUP ) {
 		NPC->flags &= ~FL_SHIELDED;
-		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_RUN1START, SETANIM_FLAG_HOLD|SETANIM_FLAG_OVERRIDE );
-		if ((NPC->client->ps.legsTimer<=0) &&
-			NPC->client->ps.torsoAnim == BOTH_RUN1START )
-		{
+		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_RUN1START, SETANIM_FLAG_HOLD | SETANIM_FLAG_OVERRIDE );
+		if ( (NPC->client->ps.legsTimer <= 0) &&
+			NPC->client->ps.torsoAnim == BOTH_RUN1START ) {
 			NPCInfo->localState = LSTATE_NONE;	// He's up again.
 		}
 		return;
 	}
 
 	// If we cannot see our target, move to see it
-	if ((!visible) || (!NPC_FaceEnemy(qtrue)))
-	{
+	if ( (!visible) || (!NPC_FaceEnemy( qtrue )) ) {
 		// If he's going down or is down, make him get up
-		if ((NPCInfo->localState == LSTATE_DOWN) || (NPCInfo->localState == LSTATE_DROPPINGDOWN))
-		{
+		if ( (NPCInfo->localState == LSTATE_DOWN) || (NPCInfo->localState == LSTATE_DROPPINGDOWN) ) {
 			if ( TIMER_Done( NPC, "downTime" ) )	// Down being down?? (The delay is so he doesn't pop up and down when the player goes in and out of range)
 			{
 				NPCInfo->localState = LSTATE_RISINGUP;
-				NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_RUN1STOP, SETANIM_FLAG_HOLD|SETANIM_FLAG_OVERRIDE );
-				TIMER_Set( NPC, "runTime", Q_irand( 3000, 8000) );	// So he runs for a while before testing to see if he should drop down.
+				NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_RUN1STOP, SETANIM_FLAG_HOLD | SETANIM_FLAG_OVERRIDE );
+				TIMER_Set( NPC, "runTime", Q_irand( 3000, 8000 ) );	// So he runs for a while before testing to see if he should drop down.
 			}
 		}
-		else
-		{
+		else {
 			Mark2_Hunt();
 		}
 		return;
 	}
 
 	// He's down but he could advance if he wants to.
-	if ((advance) && (TIMER_Done( NPC, "downTime" )) && (NPCInfo->localState == LSTATE_DOWN))
-	{
+	if ( (advance) && (TIMER_Done( NPC, "downTime" )) && (NPCInfo->localState == LSTATE_DOWN) ) {
 		NPCInfo->localState = LSTATE_RISINGUP;
-		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_RUN1STOP, SETANIM_FLAG_HOLD|SETANIM_FLAG_OVERRIDE );
-		TIMER_Set( NPC, "runTime", Q_irand( 3000, 8000) );	// So he runs for a while before testing to see if he should drop down.
+		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_RUN1STOP, SETANIM_FLAG_HOLD | SETANIM_FLAG_OVERRIDE );
+		TIMER_Set( NPC, "runTime", Q_irand( 3000, 8000 ) );	// So he runs for a while before testing to see if he should drop down.
 	}
 
 	NPC_FaceEnemy( qtrue );
 
 	// Dropping down to shoot
-	if (NPCInfo->localState == LSTATE_DROPPINGDOWN)
-	{
-		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_RUN1STOP, SETANIM_FLAG_HOLD|SETANIM_FLAG_OVERRIDE );
-		TIMER_Set( NPC, "downTime", Q_irand( 3000, 9000) );
+	if ( NPCInfo->localState == LSTATE_DROPPINGDOWN ) {
+		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_RUN1STOP, SETANIM_FLAG_HOLD | SETANIM_FLAG_OVERRIDE );
+		TIMER_Set( NPC, "downTime", Q_irand( 3000, 9000 ) );
 
-		if ((NPC->client->ps.legsTimer<=0) && NPC->client->ps.torsoAnim == BOTH_RUN1STOP )
-		{
+		if ( (NPC->client->ps.legsTimer <= 0) && NPC->client->ps.torsoAnim == BOTH_RUN1STOP ) {
 			NPC->flags |= FL_SHIELDED;
 			NPCInfo->localState = LSTATE_DOWN;
 		}
 	}
 	// He's down and shooting
-	else if (NPCInfo->localState == LSTATE_DOWN)
-	{
+	else if ( NPCInfo->localState == LSTATE_DOWN ) {
 		NPC->flags |= FL_SHIELDED;//only damagable by lightsabers and missiles
 
-		Mark2_BlasterAttack(qfalse);
+		Mark2_BlasterAttack( qfalse );
 	}
-	else if (TIMER_Done( NPC, "runTime" ))	// Lowering down to attack. But only if he's done running at you.
+	else if ( TIMER_Done( NPC, "runTime" ) )	// Lowering down to attack. But only if he's done running at you.
 	{
 		NPCInfo->localState = LSTATE_DROPPINGDOWN;
 	}
-	else if (advance)
-	{
+	else if ( advance ) {
 		// We can see enemy so shoot him if timer lets you.
-		Mark2_BlasterAttack(advance);
+		Mark2_BlasterAttack( advance );
 	}
 }
 
@@ -295,29 +267,24 @@ void Mark2_AttackDecision( void )
 Mark2_Patrol
 -------------------------
 */
-void Mark2_Patrol( void )
-{
-	if ( NPC_CheckPlayerTeamStealth() )
-	{
-//		G_Sound( NPC, G_SoundIndex("sound/chars/mark1/misc/anger.wav"));
+void Mark2_Patrol( void ) {
+	if ( NPC_CheckPlayerTeamStealth() ) {
+		//		G_Sound( NPC, G_SoundIndex("sound/chars/mark1/misc/anger.wav"));
 		NPC_UpdateAngles( qtrue, qtrue );
 		return;
 	}
 
 	//If we have somewhere to go, then do that
-	if (!NPC->enemy)
-	{
-		if ( UpdateGoal() )
-		{
+	if ( !NPC->enemy ) {
+		if ( UpdateGoal() ) {
 			ucmd.buttons |= BUTTON_WALKING;
 			NPC_MoveToGoal( qtrue );
 			NPC_UpdateAngles( qtrue, qtrue );
 		}
 
 		//randomly talk
-		if (TIMER_Done(NPC,"patrolNoise"))
-		{
-//			G_Sound( NPC, G_SoundIndex(va("sound/chars/mark1/misc/talk%d.wav",	Q_irand(1, 4))));
+		if ( TIMER_Done( NPC, "patrolNoise" ) ) {
+			//			G_Sound( NPC, G_SoundIndex(va("sound/chars/mark1/misc/talk%d.wav",	Q_irand(1, 4))));
 
 			TIMER_Set( NPC, "patrolNoise", Q_irand( 2000, 4000 ) );
 		}
@@ -329,8 +296,7 @@ void Mark2_Patrol( void )
 Mark2_Idle
 -------------------------
 */
-void Mark2_Idle( void )
-{
+void Mark2_Idle( void ) {
 	NPC_BSIdle();
 }
 
@@ -339,19 +305,15 @@ void Mark2_Idle( void )
 NPC_BSMark2_Default
 -------------------------
 */
-void NPC_BSMark2_Default( void )
-{
-	if ( NPC->enemy )
-	{
+void NPC_BSMark2_Default( void ) {
+	if ( NPC->enemy ) {
 		NPCInfo->goalEntity = NPC->enemy;
 		Mark2_AttackDecision();
 	}
-	else if ( NPCInfo->scriptFlags & SCF_LOOK_FOR_ENEMIES )
-	{
+	else if ( NPCInfo->scriptFlags & SCF_LOOK_FOR_ENEMIES ) {
 		Mark2_Patrol();
 	}
-	else
-	{
+	else {
 		Mark2_Idle();
 	}
 }

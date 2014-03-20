@@ -24,7 +24,7 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon ) {
 	float scale = 1.0f;
 	refdef_t *refdef = CG_GetRefdef();
 
-	memset( &ent, 0, sizeof( ent ) );
+	memset( &ent, 0, sizeof(ent) );
 
 	VectorCopy( &cent->lerpOrigin, &ent.origin );
 
@@ -32,8 +32,8 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon ) {
 	if ( VectorNormalize( &ent.axis[0] ) <= 0.1f )
 		return;
 
-//	VectorCopy(refdef->viewaxis[2], ent.axis[2]);
-//	CrossProduct(ent.axis[0], ent.axis[2], ent.axis[1]);
+	//	VectorCopy(refdef->viewaxis[2], ent.axis[2]);
+	//	CrossProduct(ent.axis[0], ent.axis[2], ent.axis[1]);
 	vectoangles( &ent.axis[0], &ang );
 	ang.roll = cent->trickAlpha;
 	cent->trickAlpha += 12; //spin the half-sphere to give a "screwdriver" effect
@@ -41,8 +41,8 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon ) {
 
 	//radius must be a power of 2, and is the actual captured texture size
 	scale = 0.37f;
-	VectorScale( &ent.axis[0],  scale, &ent.axis[0] );
-	VectorScale( &ent.axis[1],  scale, &ent.axis[1] );
+	VectorScale( &ent.axis[0], scale, &ent.axis[0] );
+	VectorScale( &ent.axis[1], scale, &ent.axis[1] );
 	VectorScale( &ent.axis[2], -scale, &ent.axis[2] );
 
 
@@ -50,12 +50,12 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon ) {
 
 	ent.shaderRGBA[0] = 128;	ent.shaderRGBA[1] = 43;		ent.shaderRGBA[2] = 255;	ent.shaderRGBA[3] = 48;
 	ent.customShader = trap->R_RegisterShaderNoMip( "gfx/effects/shock_ripple" );
-	ent.renderfx = (RF_RGB_TINT|RF_FORCE_ENT_ALPHA);
+	ent.renderfx = (RF_RGB_TINT | RF_FORCE_ENT_ALPHA);
 	SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 
 	ent.shaderRGBA[0] = 255;	ent.shaderRGBA[1] = 255;	ent.shaderRGBA[2] = 255;	ent.shaderRGBA[3] = 255;
-	ent.customShader	= trap->R_RegisterShaderNoMip( "gfx/effects/caustic1" );
-	ent.renderfx		= (RF_RGB_TINT|RF_MINLIGHT);
+	ent.customShader = trap->R_RegisterShaderNoMip( "gfx/effects/caustic1" );
+	ent.renderfx = (RF_RGB_TINT | RF_MINLIGHT);
 	SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 
 	scale = (1.15f + Q_fabs( sinf( cg.time / 80.0f ) )*0.65f);
@@ -64,7 +64,7 @@ void FX_Mortar_Missile( centity_t *cent, const struct weaponInfo_s *weapon ) {
 	VectorScale( &ent.axis[2], scale, &ent.axis[2] );
 	ent.shaderRGBA[0] = 51;		ent.shaderRGBA[1] = 119;	ent.shaderRGBA[2] = 255;	ent.shaderRGBA[3] = 255;
 	ent.customShader = trap->R_RegisterShaderNoMip( "gfx/effects/eplosion_wave" );
-	ent.renderfx = (RF_RGB_TINT|RF_ALPHA_DEPTH);
+	ent.renderfx = (RF_RGB_TINT | RF_ALPHA_DEPTH);
 	SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 
 	trap->R_AddLightToScene( &cent->lerpOrigin, 400, 0.13f, 0.43f, 0.87f );
@@ -80,7 +80,7 @@ static void CG_DistortionOrb( centity_t *cent ) {
 	if ( !cg_renderToTextureFX.integer )
 		return;
 
-	memset( &ent, 0, sizeof( ent ) );
+	memset( &ent, 0, sizeof(ent) );
 
 	VectorCopy( &cent->lerpOrigin, &ent.origin );
 
@@ -91,28 +91,28 @@ static void CG_DistortionOrb( centity_t *cent ) {
 	if ( VectorNormalize( &ent.axis[0] ) <= 0.1f )
 		return;
 
-//	VectorCopy( refdef->viewaxis[2], ent.axis[2] );
-//	CrossProduct( ent.axis[0], ent.axis[2], ent.axis[1] );
+	//	VectorCopy( refdef->viewaxis[2], ent.axis[2] );
+	//	CrossProduct( ent.axis[0], ent.axis[2], ent.axis[1] );
 	vectoangles( &ent.axis[0], &ang );
 	ang.roll = cent->trickAlpha;
 	cent->trickAlpha += 16; //spin the half-sphere to give a "screwdriver" effect
 	AnglesToAxis( &ang, ent.axis );
 
 	//radius must be a power of 2, and is the actual captured texture size
-		 if ( vLen < 128 )	ent.radius = 256;
+	if ( vLen < 128 )	ent.radius = 256;
 	else if ( vLen < 256 )	ent.radius = 128;
 	else if ( vLen < 512 )	ent.radius = 64;
 	else					ent.radius = 32;
 
-	VectorScale( &ent.axis[0],  scale, &ent.axis[0] );
-	VectorScale( &ent.axis[1],  scale, &ent.axis[1] );
+	VectorScale( &ent.axis[0], scale, &ent.axis[0] );
+	VectorScale( &ent.axis[1], scale, &ent.axis[1] );
 	VectorScale( &ent.axis[2], -scale, &ent.axis[2] );
 
 	ent.hModel = media.models.halfShield;
 	ent.customShader = 0;//media.gfx.world.halfShield;
 
 #if 1
-	ent.renderfx = (RF_DISTORTION|RF_RGB_TINT);
+	ent.renderfx = (RF_DISTORTION | RF_RGB_TINT);
 
 	//tint the whole thing a shade of blue
 	ent.shaderRGBA[0] = 200.0f;

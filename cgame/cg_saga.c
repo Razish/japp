@@ -33,15 +33,15 @@ void CG_PrecacheSiegeObjectiveAssetsForTeam( int myTeam ) {
 	}
 
 	if ( myTeam == SIEGETEAM_TEAM1 )
-		Com_sprintf( teamstr, sizeof( teamstr ), team1 );
+		Com_sprintf( teamstr, sizeof(teamstr), team1 );
 	else
-		Com_sprintf( teamstr, sizeof( teamstr ), team2 );
+		Com_sprintf( teamstr, sizeof(teamstr), team2 );
 
 	if ( BG_SiegeGetValueGroup( siege_info, teamstr, cgParseObjectives ) ) {
 		int i;
-		for ( i=1; i<32; i++ ) {
+		for ( i = 1; i < 32; i++ ) {
 			// eh, just try 32 I guess
-			Com_sprintf( objstr, sizeof( objstr ), "Objective%i", i );
+			Com_sprintf( objstr, sizeof(objstr), "Objective%i", i );
 
 			if ( BG_SiegeGetValueGroup( cgParseObjectives, objstr, foundobjective ) ) {
 				char str[MAX_QPATH];
@@ -74,22 +74,22 @@ void CG_PrecachePlayersForSiegeTeam( int team ) {
 	if ( !stm )
 		return;
 
-	for ( i=0; i<stm->numClasses; i++ ) {
+	for ( i = 0; i < stm->numClasses; i++ ) {
 		siegeClass_t *scl = stm->classes[i];
 
 		if ( scl->forcedModel[0] ) {
 			clientInfo_t fake;
 
-			memset( &fake, 0, sizeof( fake ) );
-			Q_strncpyz( fake.modelName, scl->forcedModel, sizeof( fake.modelName ) );
+			memset( &fake, 0, sizeof(fake) );
+			Q_strncpyz( fake.modelName, scl->forcedModel, sizeof(fake.modelName) );
 
 			trap->R_RegisterModel( va( "models/players/%s/model.glm", scl->forcedModel ) );
 			if ( scl->forcedSkin[0] ) {
 				trap->R_RegisterSkin( va( "models/players/%s/model_%s.skin", scl->forcedModel, scl->forcedSkin ) );
-				Q_strncpyz( fake.skinName, scl->forcedSkin, sizeof( fake.skinName ) );
+				Q_strncpyz( fake.skinName, scl->forcedSkin, sizeof(fake.skinName) );
 			}
 			else
-				Q_strncpyz( fake.skinName, "default", sizeof( fake.skinName ) );
+				Q_strncpyz( fake.skinName, "default", sizeof(fake.skinName) );
 
 			//precache the sounds for the model...
 			CG_LoadCISounds( &fake, qtrue );
@@ -100,7 +100,7 @@ void CG_PrecachePlayersForSiegeTeam( int team ) {
 void CG_InitSiegeMode( void ) {
 	char levelname[MAX_QPATH], btime[1024], teams[2048], teamIcon[128];
 	const char *s;
-	static char teamInfo[MAX_SIEGE_INFO_SIZE] = {0};
+	static char teamInfo[MAX_SIEGE_INFO_SIZE] = { 0 };
 	int len = 0, i = 0, j = 0;
 	siegeClass_t *cl;
 	siegeTeam_t *sTeam;
@@ -127,17 +127,17 @@ void CG_InitSiegeMode( void ) {
 	if ( cgs.gametype != GT_SIEGE )
 		goto failure;
 
-	Com_sprintf( levelname, sizeof( levelname ), "%s", cgs.mapname );
+	Com_sprintf( levelname, sizeof(levelname), "%s", cgs.mapname );
 
 	// strip extension
-	i = strlen( levelname )-1;
+	i = strlen( levelname ) - 1;
 	while ( i > 0 && levelname[i] && levelname[i] != '.' )
 		i--;
 	if ( !i )
 		goto failure;
 	levelname[i] = '\0';
 
-	Com_sprintf( levelname, sizeof( levelname ), "%s.siege", levelname );
+	Com_sprintf( levelname, sizeof(levelname), "%s.siege", levelname );
 
 	if ( !levelname[0] )
 		goto failure;
@@ -155,31 +155,31 @@ void CG_InitSiegeMode( void ) {
 	if ( BG_SiegeGetValueGroup( siege_info, "Teams", teams ) ) {
 		char buf[1024];
 
-		trap->Cvar_VariableStringBuffer( "cg_siegeTeam1", buf, sizeof( buf ) );
+		trap->Cvar_VariableStringBuffer( "cg_siegeTeam1", buf, sizeof(buf) );
 		if ( buf[0] && Q_stricmp( buf, "none" ) )
-			Q_strncpyz( team1, buf, sizeof( team1 ) );
+			Q_strncpyz( team1, buf, sizeof(team1) );
 		else
 			BG_SiegeGetPairedValue( teams, "team1", team1 );
 
 		if ( team1[0] == '@' ) {
 			// it's a damn stringed reference.
 			char b[256];
-			trap->SE_GetStringTextString( team1+1, b, sizeof( b ) );
+			trap->SE_GetStringTextString( team1 + 1, b, sizeof(b) );
 			trap->Cvar_Set( "cg_siegeTeam1Name", b );
 		}
 		else
 			trap->Cvar_Set( "cg_siegeTeam1Name", team1 );
 
-		trap->Cvar_VariableStringBuffer( "cg_siegeTeam2", buf, sizeof( buf ) );
+		trap->Cvar_VariableStringBuffer( "cg_siegeTeam2", buf, sizeof(buf) );
 		if ( buf[0] && Q_stricmp( buf, "none" ) )
-			Q_strncpyz( team2, buf, sizeof( team2 ) );
+			Q_strncpyz( team2, buf, sizeof(team2) );
 		else
 			BG_SiegeGetPairedValue( teams, "team2", team2 );
 
 		if ( team2[0] == '@' ) {
 			// it's a damn stringed reference.
 			char b[256];
-			trap->SE_GetStringTextString( team2+1, b, sizeof( b ) );
+			trap->SE_GetStringTextString( team2 + 1, b, sizeof(b) );
 			trap->Cvar_Set( "cg_siegeTeam2Name", b );
 		}
 		else
@@ -193,7 +193,7 @@ void CG_InitSiegeMode( void ) {
 			trap->Cvar_Set( "team1_icon", teamIcon );
 
 		if ( BG_SiegeGetPairedValue( teamInfo, "Timed", btime ) ) {
-			team1Timed = atoi( btime )*1000;
+			team1Timed = atoi( btime ) * 1000;
 			CG_SetSiegeTimerCvar( team1Timed );
 		}
 		else
@@ -217,7 +217,7 @@ void CG_InitSiegeMode( void ) {
 			trap->Cvar_Set( "team2_icon", teamIcon );
 
 		if ( BG_SiegeGetPairedValue( teamInfo, "Timed", btime ) ) {
-			team2Timed = atoi( btime )*1000;
+			team2Timed = atoi( btime ) * 1000;
 			CG_SetSiegeTimerCvar( team2Timed );
 		}
 		else
@@ -322,9 +322,9 @@ QINLINE static char *CG_SiegeObjectiveBuffer( int team, int objective ) {
 	char teamstr[1024];
 
 	if ( team == SIEGETEAM_TEAM1 )
-		Com_sprintf( teamstr, sizeof( teamstr ), team1 );
+		Com_sprintf( teamstr, sizeof(teamstr), team1 );
 	else
-		Com_sprintf( teamstr, sizeof( teamstr ), team2 );
+		Com_sprintf( teamstr, sizeof(teamstr), team2 );
 
 	if ( BG_SiegeGetValueGroup( siege_info, teamstr, cgParseObjectives ) ) {
 		if ( BG_SiegeGetValueGroup( cgParseObjectives, va( "Objective%i", objective ), buf ) )
@@ -345,7 +345,7 @@ void CG_ParseSiegeObjectiveStatus( const char *str ) {
 	while ( str[i] ) {
 		if ( str[i] == '|' ) {
 			// switch over to team2, this is the next section
-            team = SIEGETEAM_TEAM2;
+			team = SIEGETEAM_TEAM2;
 			objectiveNum = 0;
 		}
 		else if ( str[i] == '-' ) {
@@ -426,9 +426,9 @@ void CG_SiegeRoundOver( centity_t *ent, int won ) {
 		return;
 
 	if ( myTeam == SIEGETEAM_TEAM1 )
-		Com_sprintf( teamstr, sizeof( teamstr ), team1 );
+		Com_sprintf( teamstr, sizeof(teamstr), team1 );
 	else
-		Com_sprintf( teamstr, sizeof( teamstr ), team2 );
+		Com_sprintf( teamstr, sizeof(teamstr), team2 );
 
 	if ( BG_SiegeGetValueGroup( siege_info, teamstr, cgParseObjectives ) ) {
 		if ( won == myTeam )
@@ -443,12 +443,12 @@ void CG_SiegeRoundOver( centity_t *ent, int won ) {
 		soundstr[0] = '\0';
 
 		if ( myTeam == won )
-			Com_sprintf( teamstr, sizeof( teamstr ), "roundover_sound_wewon" );
+			Com_sprintf( teamstr, sizeof(teamstr), "roundover_sound_wewon" );
 		else
-			Com_sprintf( teamstr, sizeof( teamstr ), "roundover_sound_welost" );
+			Com_sprintf( teamstr, sizeof(teamstr), "roundover_sound_welost" );
 
 		if ( BG_SiegeGetPairedValue( cgParseObjectives, teamstr, appstring ) )
-			Com_sprintf( soundstr, sizeof( soundstr ), appstring );
+			Com_sprintf( soundstr, sizeof(soundstr), appstring );
 
 		if ( soundstr[0] )
 			trap->S_StartLocalSound( trap->S_RegisterSound( soundstr ), CHAN_ANNOUNCER );
@@ -461,9 +461,9 @@ void CG_SiegeGetObjectiveDescription( int team, int objective, char *buffer ) {
 	buffer[0] = '\0'; //set to 0 ahead of time in case we fail to find the objective group/name
 
 	if ( team == SIEGETEAM_TEAM1 )
-		Com_sprintf( teamstr, sizeof( teamstr ), team1 );
+		Com_sprintf( teamstr, sizeof(teamstr), team1 );
 	else
-		Com_sprintf( teamstr, sizeof( teamstr ), team2 );
+		Com_sprintf( teamstr, sizeof(teamstr), team2 );
 
 	if ( BG_SiegeGetValueGroup( siege_info, teamstr, cgParseObjectives ) ) {
 		// found the team group
@@ -476,9 +476,9 @@ int CG_SiegeGetObjectiveFinal( int team, int objective ) {
 	char finalStr[64], teamstr[1024], objectiveStr[8192];
 
 	if ( team == SIEGETEAM_TEAM1 )
-		Com_sprintf( teamstr, sizeof( teamstr ), team1 );
+		Com_sprintf( teamstr, sizeof(teamstr), team1 );
 	else
-		Com_sprintf( teamstr, sizeof( teamstr ), team2 );
+		Com_sprintf( teamstr, sizeof(teamstr), team2 );
 
 	if ( BG_SiegeGetValueGroup( siege_info, teamstr, cgParseObjectives ) ) {
 		if ( BG_SiegeGetValueGroup( cgParseObjectives, va( "Objective%i", objective ), objectiveStr ) ) {
@@ -501,16 +501,16 @@ void CG_SiegeBriefingDisplay( int team, int dontshow ) {
 		return;
 
 	if ( team == SIEGETEAM_TEAM1 )
-		Com_sprintf( teamstr, sizeof( teamstr ), team1 );
+		Com_sprintf( teamstr, sizeof(teamstr), team1 );
 	else
-		Com_sprintf( teamstr, sizeof( teamstr ), team2 );
+		Com_sprintf( teamstr, sizeof(teamstr), team2 );
 
 	if ( useTeam != SIEGETEAM_TEAM1 && useTeam != SIEGETEAM_TEAM2 )
 		useTeam = SIEGETEAM_TEAM2;
 
 	trap->Cvar_Set( "siege_primobj_inuse", "0" );
 
-	for ( i=1; 1<16; i++ ) {
+	for ( i = 1; 1<16; i++ ) {
 		//Get the value for this objective on this team
 		//Now set the cvar for the menu to display.
 
@@ -518,7 +518,7 @@ void CG_SiegeBriefingDisplay( int team, int dontshow ) {
 		primary = (CG_SiegeGetObjectiveFinal( useTeam, i ) > 0) ? qtrue : qfalse;
 
 		properValue[0] = '\0';
-		trap->Cvar_VariableStringBuffer( va( "team%i_objective%i", useTeam, i ), properValue, sizeof( properValue ) );
+		trap->Cvar_VariableStringBuffer( va( "team%i_objective%i", useTeam, i ), properValue, sizeof(properValue) );
 		if ( primary )
 			trap->Cvar_Set( "siege_primobj", properValue );
 		else
@@ -526,7 +526,7 @@ void CG_SiegeBriefingDisplay( int team, int dontshow ) {
 
 		//Now set the long desc cvar for the menu to display.
 		properValue[0] = '\0';
-		trap->Cvar_VariableStringBuffer( va( "team%i_objective%i_longdesc", useTeam, i ), properValue, sizeof( properValue ) );
+		trap->Cvar_VariableStringBuffer( va( "team%i_objective%i_longdesc", useTeam, i ), properValue, sizeof(properValue) );
 		if ( primary )
 			trap->Cvar_Set( "siege_primobj_longdesc", properValue );
 		else
@@ -534,7 +534,7 @@ void CG_SiegeBriefingDisplay( int team, int dontshow ) {
 
 		//Now set the gfx cvar for the menu to display.
 		properValue[0] = '\0';
-		trap->Cvar_VariableStringBuffer( va( "team%i_objective%i_gfx", useTeam, i ), properValue, sizeof( properValue ) );
+		trap->Cvar_VariableStringBuffer( va( "team%i_objective%i_gfx", useTeam, i ), properValue, sizeof(properValue) );
 		if ( primary )
 			trap->Cvar_Set( "siege_primobj_gfx", properValue );
 		else
@@ -542,7 +542,7 @@ void CG_SiegeBriefingDisplay( int team, int dontshow ) {
 
 		//Now set the mapicon cvar for the menu to display.
 		properValue[0] = '\0';
-		trap->Cvar_VariableStringBuffer( va( "team%i_objective%i_mapicon", useTeam, i ), properValue, sizeof( properValue ) );
+		trap->Cvar_VariableStringBuffer( va( "team%i_objective%i_mapicon", useTeam, i ), properValue, sizeof(properValue) );
 		if ( primary )
 			trap->Cvar_Set( "siege_primobj_mapicon", properValue );
 		else
@@ -550,7 +550,7 @@ void CG_SiegeBriefingDisplay( int team, int dontshow ) {
 
 		//Now set the mappos cvar for the menu to display.
 		properValue[0] = '\0';
-		trap->Cvar_VariableStringBuffer( va( "team%i_objective%i_mappos", useTeam, i ), properValue, sizeof( properValue ) );
+		trap->Cvar_VariableStringBuffer( va( "team%i_objective%i_mappos", useTeam, i ), properValue, sizeof(properValue) );
 		if ( primary )
 			trap->Cvar_Set( "siege_primobj_mappos", properValue );
 		else
@@ -601,7 +601,7 @@ void CG_SiegeBriefingDisplay( int team, int dontshow ) {
 
 void CG_SiegeObjectiveCompleted( centity_t *ent, int won, int objectivenum ) {
 	int myTeam, success = 0;
-	static char foundobjective[MAX_SIEGE_INFO_SIZE] = {0};
+	static char foundobjective[MAX_SIEGE_INFO_SIZE] = { 0 };
 	char teamstr[64], objstr[256], appstring[1024], soundstr[1024];
 	playerState_t *ps = NULL;
 
@@ -621,12 +621,12 @@ void CG_SiegeObjectiveCompleted( centity_t *ent, int won, int objectivenum ) {
 		return;
 
 	if ( won == SIEGETEAM_TEAM1 )
-		Com_sprintf( teamstr, sizeof( teamstr ), team1 );
+		Com_sprintf( teamstr, sizeof(teamstr), team1 );
 	else
-		Com_sprintf( teamstr, sizeof( teamstr ), team2 );
+		Com_sprintf( teamstr, sizeof(teamstr), team2 );
 
 	if ( BG_SiegeGetValueGroup( siege_info, teamstr, cgParseObjectives ) ) {
-		Com_sprintf( objstr, sizeof( objstr ), "Objective%i", objectivenum );
+		Com_sprintf( objstr, sizeof(objstr), "Objective%i", objectivenum );
 
 		if ( BG_SiegeGetValueGroup( cgParseObjectives, objstr, foundobjective ) ) {
 			if ( myTeam == SIEGETEAM_TEAM1 )
@@ -641,12 +641,12 @@ void CG_SiegeObjectiveCompleted( centity_t *ent, int won, int objectivenum ) {
 			soundstr[0] = '\0';
 
 			if ( myTeam == SIEGETEAM_TEAM1 )
-				Com_sprintf( teamstr, sizeof( teamstr ), "sound_team1" );
+				Com_sprintf( teamstr, sizeof(teamstr), "sound_team1" );
 			else
-				Com_sprintf( teamstr, sizeof( teamstr ), "sound_team2" );
+				Com_sprintf( teamstr, sizeof(teamstr), "sound_team2" );
 
 			if ( BG_SiegeGetPairedValue( foundobjective, teamstr, appstring ) )
-				Com_sprintf( soundstr, sizeof( soundstr ), appstring );
+				Com_sprintf( soundstr, sizeof(soundstr), appstring );
 			if ( soundstr[0] )
 				trap->S_StartLocalSound( trap->S_RegisterSound( soundstr ), CHAN_ANNOUNCER );
 		}
@@ -666,15 +666,15 @@ void CG_ParseSiegeExtendedDataEntry( const char *conStr ) {
 
 	while ( *str && argParses < 4 ) {
 		i = 0;
-        while ( *str && *str != '|' ) {
+		while ( *str && *str != '|' ) {
 			s[i] = *str;
 			i++;
 			//Raz: May need to revert this change, but =o..
-		//	*str++;
+			//	*str++;
 			str++;
 		}
 		s[i] = '\0';
-        switch ( argParses ) {
+		switch ( argParses ) {
 		case 0:
 			clNum = atoi( s );
 			break;
@@ -726,17 +726,17 @@ void CG_ParseSiegeExtendedData( void ) {
 		return;
 	}
 
-	for ( i=0; i<numEntries; i++ )
-		CG_ParseSiegeExtendedDataEntry( CG_Argv( i+1 ) );
+	for ( i = 0; i < numEntries; i++ )
+		CG_ParseSiegeExtendedDataEntry( CG_Argv( i + 1 ) );
 }
 
 void CG_SetSiegeTimerCvar( int msec ) {
 	int mins, tens, secs;
 
-	secs  = msec / 1000;
-	mins  = secs / 60;
+	secs = msec / 1000;
+	mins = secs / 60;
 	secs -= mins * 60;
-	tens  = secs / 10;
+	tens = secs / 10;
 	secs -= tens * 10;
 
 	trap->Cvar_Set( "ui_siegeTimer", va( "%i:%i%i", mins, tens, secs ) );
@@ -749,13 +749,13 @@ void CG_TrueViewInit( void ) {
 	len = trap->FS_Open( "trueview.cfg", &f, FS_READ );
 
 	if ( !f ) {
-	//	trap->Print("Error: File Not Found: trueview.cfg\n");
+		//	trap->Print("Error: File Not Found: trueview.cfg\n");
 		true_view_valid = 0;
 		return;
 	}
 
 	if ( len <= 0 || len >= MAX_TRUEVIEW_INFO_SIZE ) {
-	//	trap->Print("Error: trueview.cfg is over the filesize limit. (%i)\n", MAX_TRUEVIEW_INFO_SIZE);
+		//	trap->Print("Error: trueview.cfg is over the filesize limit. (%i)\n", MAX_TRUEVIEW_INFO_SIZE);
 		trap->FS_Close( f );
 		true_view_valid = 0;
 		return;

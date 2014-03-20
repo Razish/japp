@@ -5,17 +5,17 @@
 #include "json/cJSON.h"
 
 #ifdef _GAME
-	#include "g_local.h"
+#include "g_local.h"
 #elif defined(_CGAME)
-	#include "cg_local.h"
+#include "cg_local.h"
 #elif defined(_UI)
-	#include "ui_local.h"
+#include "ui_local.h"
 #endif
 
 int GetIDForString( const stringID_table_t *table, const char *string ) {
 	const stringID_table_t *t;
 
-	for ( t=table; VALIDSTRING( t->name ); t++ ) {
+	for ( t = table; VALIDSTRING( t->name ); t++ ) {
 		if ( !Q_stricmp( t->name, string ) )
 			return t->id;
 	}
@@ -26,7 +26,7 @@ int GetIDForString( const stringID_table_t *table, const char *string ) {
 const char *GetStringForID( const stringID_table_t *table, int id ) {
 	const stringID_table_t *t;
 
-	for ( t=table; VALIDSTRING( t->name ); t++ ) {
+	for ( t = table; VALIDSTRING( t->name ); t++ ) {
 		if ( t->id == id )
 			return t->name;
 	}
@@ -67,9 +67,9 @@ int Q_bumpi( int min, int value ) {
 char *COM_SkipPath( char *pathname ) {
 	char *last;
 
-	for ( last=pathname; *pathname; pathname++ ) {
+	for ( last = pathname; *pathname; pathname++ ) {
 		if ( *pathname == '/' )
-			last = pathname+1;
+			last = pathname + 1;
 	}
 
 	return last;
@@ -78,10 +78,10 @@ char *COM_SkipPath( char *pathname ) {
 void COM_StripExtension( const char *in, char *out, int destsize ) {
 	const char *dot = strrchr( in, '.' ), *slash;
 	if ( dot && (!(slash = strrchr( in, '/' )) || slash < dot) )
-		destsize = (destsize < dot-in+1 ? destsize : dot-in+1);
+		destsize = (destsize < dot - in + 1 ? destsize : dot - in + 1);
 
 	if ( in == out && destsize > 1 )
-		out[destsize-1] = '\0';
+		out[destsize - 1] = '\0';
 	else
 		Q_strncpyz( out, in, destsize );
 }
@@ -97,10 +97,10 @@ void COM_DefaultExtension( char *path, int maxSize, const char *extension ) {
 short ShortSwap( short l ) {
 	byte b1, b2;
 
-	b1 = l&255;
-	b2 = (l>>8)&255;
+	b1 = l & 255;
+	b2 = (l >> 8) & 255;
 
-	return (b1<<8) + b2;
+	return (b1 << 8) + b2;
 }
 
 short ShortNoSwap( short l ) {
@@ -110,12 +110,12 @@ short ShortNoSwap( short l ) {
 int LongSwap( int l ) {
 	byte b1, b2, b3, b4;
 
-	b1 = l&255;
-	b2 = (l>>8)&255;
-	b3 = (l>>16)&255;
-	b4 = (l>>24)&255;
+	b1 = l & 255;
+	b2 = (l >> 8) & 255;
+	b3 = (l >> 16) & 255;
+	b4 = (l >> 24) & 255;
 
-	return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
+	return ((int)b1 << 24) + ((int)b2 << 16) + ((int)b3 << 8) + b4;
 }
 
 int	LongNoSwap( int l ) {
@@ -159,7 +159,7 @@ static int com_lines;
 
 void COM_BeginParseSession( const char *name ) {
 	com_lines = 0;
-	Com_sprintf( com_parsename, sizeof( com_parsename ), "%s", name );
+	Com_sprintf( com_parsename, sizeof(com_parsename), "%s", name );
 }
 
 int COM_GetCurrentParseLine( void ) {
@@ -175,7 +175,7 @@ void COM_ParseError( char *format, ... ) {
 	static char string[4096];
 
 	va_start( argptr, format );
-	Q_vsnprintf( string, sizeof( string ), format, argptr );
+	Q_vsnprintf( string, sizeof(string), format, argptr );
 	va_end( argptr );
 
 	Com_Printf( "ERROR: %s, line %d: %s\n", com_parsename, com_lines, string );
@@ -186,7 +186,7 @@ void COM_ParseWarning( char *format, ... ) {
 	static char string[4096];
 
 	va_start( argptr, format );
-	Q_vsnprintf( string, sizeof( string ), format, argptr );
+	Q_vsnprintf( string, sizeof(string), format, argptr );
 	va_end( argptr );
 
 	Com_Printf( "WARNING: %s, line %d: %s\n", com_parsename, com_lines, string );
@@ -221,7 +221,7 @@ int COM_Compress( char *data_p ) {
 
 	in = out = data_p;
 	if ( in ) {
-		while ((c = *in) != 0) {
+		while ( (c = *in) != 0 ) {
 			// skip double slash comments
 			if ( c == '/' && in[1] == '/' ) {
 				while ( *in && *in != '\n' )
@@ -230,7 +230,7 @@ int COM_Compress( char *data_p ) {
 
 			// skip /* */ comments
 			else if ( c == '/' && in[1] == '*' ) {
-				while ( *in && ( *in != '*' || in[1] != '/' ) )
+				while ( *in && (*in != '*' || in[1] != '/') )
 					in++;
 				if ( *in )
 					in += 2;
@@ -327,7 +327,7 @@ char *COM_ParseExt( const char **data_p, qboolean allowLineBreaks ) {
 		}
 
 		// skip /* */ comments
-		else if ( c=='/' && data[1] == '*' ) {
+		else if ( c == '/' && data[1] == '*' ) {
 			data += 2;
 			while ( *data && (*data != '*' || data[1] != '/') )
 				data++;
@@ -344,9 +344,9 @@ char *COM_ParseExt( const char **data_p, qboolean allowLineBreaks ) {
 		data++;
 		while ( 1 ) {
 			c = *data++;
-			if ( c=='\"' || !c ) {
+			if ( c == '\"' || !c ) {
 				com_token[len] = 0;
-				*data_p = (char *) data;
+				*data_p = (char *)data;
 				return com_token;
 			}
 			if ( len < MAX_TOKEN_CHARS ) {
@@ -366,12 +366,12 @@ char *COM_ParseExt( const char **data_p, qboolean allowLineBreaks ) {
 	} while ( c > 32 );
 
 	if ( len == MAX_TOKEN_CHARS ) {
-//		Com_Printf( "Token exceeded %i chars, discarded.\n", MAX_TOKEN_CHARS );
+		//		Com_Printf( "Token exceeded %i chars, discarded.\n", MAX_TOKEN_CHARS );
 		len = 0;
 	}
 	com_token[len] = '\0';
 
-	*data_p = (char *) data;
+	*data_p = (char *)data;
 	return com_token;
 }
 
@@ -415,7 +415,7 @@ qboolean COM_ParseVec4( const char **buffer, vector4 *c ) {
 	int i;
 	float f;
 
-	for ( i=0; i<4; i++ ) {
+	for ( i = 0; i < 4; i++ ) {
 		if ( COM_ParseFloat( buffer, &f ) )
 			return qtrue;
 		c->data[i] = f;
@@ -470,7 +470,7 @@ void Parse1DMatrix( const char **buf_p, int x, float *m ) {
 
 	COM_MatchToken( buf_p, "(" );
 
-	for ( i=0; i<x; i++ ) {
+	for ( i = 0; i < x; i++ ) {
 		token = COM_Parse( buf_p );
 		m[i] = atof( token );
 	}
@@ -483,7 +483,7 @@ void Parse2DMatrix( const char **buf_p, int y, int x, float *m ) {
 
 	COM_MatchToken( buf_p, "(" );
 
-	for ( i=0; i<y; i++ )
+	for ( i = 0; i < y; i++ )
 		Parse1DMatrix( buf_p, x, m + i*x );
 
 	COM_MatchToken( buf_p, ")" );
@@ -494,7 +494,7 @@ void Parse3DMatrix( const char **buf_p, int z, int y, int x, float *m ) {
 
 	COM_MatchToken( buf_p, "(" );
 
-	for ( i=0; i<z; i++ )
+	for ( i = 0; i < z; i++ )
 		Parse2DMatrix( buf_p, y, x, m + i*(x*y) );
 
 	COM_MatchToken( buf_p, ")" );
@@ -537,7 +537,7 @@ qboolean Q_StringIsInteger( const char *s ) {
 	int i, len;
 	qboolean foundDigit = qfalse;
 
-	for ( i=0, len=strlen( s ); i<len; i++ ) {
+	for ( i = 0, len = strlen( s ); i < len; i++ ) {
 		if ( !isdigit( s[i] ) )
 			return qfalse;
 
@@ -555,7 +555,7 @@ qboolean Q_isintegral( float f ) {
 // returns last instance of a character in a string
 char *Q_strrchr( const char *string, char c ) {
 	size_t len = strlen( string );
-	char *p = (char *)string+len;
+	char *p = (char *)string + len;
 	while ( p >= string ) {
 		if ( *p == c )
 			return p;
@@ -576,12 +576,12 @@ void Q_strncpyz( char *dest, const char *src, int destsize ) {
 		return;
 	}
 	if ( destsize < 1 ) {
-		Com_Error( ERR_FATAL,"Q_strncpyz: destsize < 1" );
+		Com_Error( ERR_FATAL, "Q_strncpyz: destsize < 1" );
 		return;
 	}
 
-	strncpy( dest, src, destsize-1 );
-	dest[destsize-1] = 0;
+	strncpy( dest, src, destsize - 1 );
+	dest[destsize - 1] = 0;
 }
 
 // case insensitive length compare
@@ -643,7 +643,7 @@ int Q_stricmp( const char *s1, const char *s2 ) {
 void Q_strlwr( char *s1 ) {
 	char *s;
 
-	for ( s=s1; *s; s++ )
+	for ( s = s1; *s; s++ )
 		*s = tolower( *s );
 }
 
@@ -651,7 +651,7 @@ void Q_strlwr( char *s1 ) {
 void Q_strupr( char *s1 ) {
 	char *s;
 
-	for ( s=s1; *s; s++ )
+	for ( s = s1; *s; s++ )
 		*s = toupper( *s );
 }
 
@@ -662,7 +662,7 @@ void Q_strcat( char *dest, int size, const char *src ) {
 	len = strlen( dest );
 	if ( len >= size )
 		Com_Error( ERR_FATAL, "Q_strcat: already overflowed" );
-	Q_strncpyz( dest+len, src, size-len );
+	Q_strncpyz( dest + len, src, size - len );
 }
 
 // find the first occurrence of find in s
@@ -696,7 +696,7 @@ int Q_PrintStrlen( const char *string ) {
 	if ( !string )
 		return 0;
 
-	for ( p=string, len=0; *p; /**/ ) {
+	for ( p = string, len = 0; *p; /**/ ) {
 		if ( Q_IsColorString( p ) ) {
 			p += 2;
 			continue;
@@ -716,13 +716,13 @@ int Q_PrintStrlen( const char *string ) {
 //				Q_strstrip( "Bo\nb is h\rairy!!", "\n\r!", "12" );	// "Bo1b is h2airy"
 //				Q_strstrip( "Bo\nb is h\rairy!!", "\n\r!", NULL );	// "Bob is hairy"
 void Q_strstrip( char *string, const char *strip, const char *repl ) {
-	char		*out=string, *p=string, c;
-	const char	*s=strip;
-	int			replaceLen = repl?strlen( repl ):0, offset=0;
+	char		*out = string, *p = string, c;
+	const char	*s = strip;
+	int			replaceLen = repl ? strlen( repl ) : 0, offset = 0;
 
 	while ( (c = *p++) != '\0' ) {
-		for ( s=strip; *s; s++ ) {
-			offset = s-strip;
+		for ( s = strip; *s; s++ ) {
+			offset = s - strip;
 			if ( c == *s ) {
 				if ( !repl || offset >= replaceLen )
 					c = *p++;
@@ -741,7 +741,7 @@ const char *Q_strchrs( const char *string, const char *search ) {
 	const char *p = string, *s = search;
 
 	while ( *p != '\0' ) {
-		for ( s=search; *s != '\0'; s++ ) {
+		for ( s = search; *s != '\0'; s++ ) {
 			if ( *p == *s )
 				return p;
 		}
@@ -757,7 +757,7 @@ char *Q_strrep( const char *subject, const char *search, const char *replace ) {
 	char *tok = NULL, *newstr = NULL;
 	size_t searchLen, replaceLen;
 
-	if ( !(tok=(char *)strstr( subject, search )) )
+	if ( !(tok = (char *)strstr( subject, search )) )
 		return strdup( subject );
 
 	searchLen = strlen( search );
@@ -769,7 +769,7 @@ char *Q_strrep( const char *subject, const char *search, const char *replace ) {
 
 	memcpy( newstr, subject, tok - subject );
 	memcpy( newstr + (tok - subject), replace, replaceLen );
-	memcpy( newstr + (tok - subject) + replaceLen, tok + searchLen, strlen( subject ) - searchLen - ( tok - subject ) );
+	memcpy( newstr + (tok - subject) + replaceLen, tok + searchLen, strlen( subject ) - searchLen - (tok - subject) );
 	memset( newstr + strlen( subject ) - searchLen + replaceLen, 0, 1 );
 
 	return newstr;
@@ -782,10 +782,9 @@ void Q_strrev( char *str ) {
 	if ( !VALIDSTRING( str ) )
 		return;
 
-	for ( p1=str, p2=str+strlen( str )-1;
+	for ( p1 = str, p2 = str + strlen( str ) - 1;
 		p2 > p1;
-		++p1, --p2 )
-	{
+		++p1, --p2 ) {
 		*p1 ^= *p2;
 		*p2 ^= *p1;
 		*p1 ^= *p2;
@@ -829,7 +828,7 @@ void Q_ConvertLinefeeds( char *string ) {
 		doPass = qfalse;
 		r = w = string;
 		while ( *r ) {
-			if ( *r == '\\' && *(r+1) && *(r+1) == 'n' ) {
+			if ( *r == '\\' && *(r + 1) && *(r + 1) == 'n' ) {
 				doPass = qtrue;
 				*w = '\n';
 				r += 2;
@@ -861,7 +860,7 @@ int Q_vsnprintf( char *str, size_t size, const char *format, va_list args ) {
 	int ret = _vsnprintf( str, size, format, args );
 
 	if ( ret < 0 || ret == (int)size ) {
-		str[size-1] = '\0';
+		str[size - 1] = '\0';
 		return (int)size;
 	}
 
@@ -896,7 +895,7 @@ const char *va( const char *format, ... ) {
 
 	va_start( argptr, format );
 	buf = (char *)&string[index++ & VA_MASK];
-	Q_vsnprintf( buf, MAX_VA_STRING-1, format, argptr );
+	Q_vsnprintf( buf, MAX_VA_STRING - 1, format, argptr );
 	va_end( argptr );
 
 	return buf;
@@ -1011,7 +1010,7 @@ void Info_RemoveKey( char *s, const char *key ) {
 		*o = '\0';
 
 		if ( !strcmp( key, pkey ) ) {
-			memmove( start, s, strlen( s )+1); // remove this part
+			memmove( start, s, strlen( s ) + 1 ); // remove this part
 			return;
 		}
 
@@ -1056,7 +1055,7 @@ void Info_RemoveKey_Big( char *s, const char *key ) {
 		*o = '\0';
 
 		if ( !strcmp( key, pkey ) ) {
-			memmove( start, s, strlen( s )+1); // remove this part
+			memmove( start, s, strlen( s ) + 1 ); // remove this part
 			return;
 		}
 
@@ -1070,7 +1069,7 @@ void Info_RemoveKey_Big( char *s, const char *key ) {
 qboolean Info_Validate( const char *s ) {
 	const char *c;
 
-	for ( c=s; *c != '\0'; c++ ) {
+	for ( c = s; *c != '\0'; c++ ) {
 		if ( !Q_isprint( *c ) || *c == '\"' || *c == ';' )
 			return qfalse;
 	}
@@ -1097,7 +1096,7 @@ void Info_SetValueForKey( char *s, const char *key, const char *value ) {
 	if ( !value || !strlen( value ) )
 		return;
 
-	Com_sprintf( newi, sizeof( newi ), "\\%s\\%s", key, value );
+	Com_sprintf( newi, sizeof(newi), "\\%s\\%s", key, value );
 
 	if ( strlen( newi ) + strlen( s ) >= MAX_INFO_STRING ) {
 		Com_Printf( "Info string length exceeded\n" );
@@ -1117,7 +1116,7 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 	if ( strlen( s ) >= BIG_INFO_STRING )
 		Com_Error( ERR_DROP, "Info_SetValueForKey_Big: oversize infostring" );
 
-	for( /**/; *blacklist; ++blacklist ) {
+	for ( /**/; *blacklist; ++blacklist ) {
 		if ( strchr( key, *blacklist ) || strchr( value, *blacklist ) ) {
 			Com_Printf( S_COLOR_YELLOW"Can't use keys or values with a '%c': %s = %s\n", *blacklist, key, value );
 			return;
@@ -1128,7 +1127,7 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 	if ( !value )
 		return;
 
-	Com_sprintf( newi, sizeof( newi ), "\\%s\\%s", key, value );
+	Com_sprintf( newi, sizeof(newi), "\\%s\\%s", key, value );
 
 	if ( strlen( newi ) + strlen( s ) >= BIG_INFO_STRING ) {
 		Com_Printf( "BIG Info string length exceeded\n" );
@@ -1139,73 +1138,73 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 }
 
 const vector4 colorTable[CT_MAX] = {
-	{ 0.0f,		0.0f,	0.0f,	0.0f },		// CT_NONE
-	{ 0.0f,		0.0f,	0.0f,	1.0f },		// CT_BLACK
-	{ 1.0f,		0.0f,	0.0f,	1.0f },		// CT_RED
-	{ 0.0f,		1.0f,	0.0f,	1.0f },		// CT_GREEN
-	{ 0.0f,		0.0f,	1.0f,	1.0f },		// CT_BLUE
-	{ 1.0f,		1.0f,	0.0f,	1.0f },		// CT_YELLOW
-	{ 1.0f,		0.0f,	1.0f,	1.0f },		// CT_MAGENTA
-	{ 0.0f,		1.0f,	1.0f,	1.0f },		// CT_CYAN
-	{ 1.0f,		1.0f,	1.0f,	1.0f },		// CT_WHITE
-	{ 0.75f,	0.75f,	0.75f,	1.0f },		// CT_LTGREY
-	{ 0.50f,	0.50f,	0.50f,	1.0f },		// CT_MDGREY
-	{ 0.25f,	0.25f,	0.25f,	1.0f },		// CT_DKGREY
-	{ 0.15f,	0.15f,	0.15f,	1.0f },		// CT_DKGREY2
-	{ 0.810f,	0.530f,	0.0f,	1.0f },		// CT_VLTORANGE -- needs values
-	{ 0.810f,	0.530f,	0.0f,	1.0f },		// CT_LTORANGE
-	{ 0.610f,	0.330f,	0.0f,	1.0f },		// CT_DKORANGE
-	{ 0.402f,	0.265f,	0.0f,	1.0f },		// CT_VDKORANGE
-	{ 0.503f,	0.375f,	0.996f,	1.0f },		// CT_VLTBLUE1
-	{ 0.367f,	0.261f,	0.722f,	1.0f },		// CT_LTBLUE1
-	{ 0.199f,	0.0f,	0.398f,	1.0f },		// CT_DKBLUE1
-	{ 0.160f,	0.117f,	0.324f,	1.0f },		// CT_VDKBLUE1
-	{ 0.300f,	0.628f,	0.816f,	1.0f },		// CT_VLTBLUE2 -- needs values
-	{ 0.300f,	0.628f,	0.816f,	1.0f },		// CT_LTBLUE2
-	{ 0.191f,	0.289f,	0.457f,	1.0f },		// CT_DKBLUE2
-	{ 0.125f,	0.250f,	0.324f,	1.0f },		// CT_VDKBLUE2
-	{ 0.796f,	0.398f,	0.199f,	1.0f },		// CT_VLTBROWN1 -- needs values
-	{ 0.796f,	0.398f,	0.199f,	1.0f },		// CT_LTBROWN1
-	{ 0.558f,	0.207f,	0.027f,	1.0f },		// CT_DKBROWN1
-	{ 0.328f,	0.125f,	0.035f,	1.0f },		// CT_VDKBROWN1
-	{ 0.996f,	0.796f,	0.398f,	1.0f },		// CT_VLTGOLD1 -- needs values
-	{ 0.996f,	0.796f,	0.398f,	1.0f },		// CT_LTGOLD1
-	{ 0.605f,	0.441f,	0.113f,	1.0f },		// CT_DKGOLD1
-	{ 0.386f,	0.308f,	0.148f,	1.0f },		// CT_VDKGOLD1
-	{ 0.648f,	0.562f,	0.784f,	1.0f },		// CT_VLTPURPLE1 -- needs values
-	{ 0.648f,	0.562f,	0.784f,	1.0f },		// CT_LTPURPLE1
-	{ 0.437f,	0.335f,	0.597f,	1.0f },		// CT_DKPURPLE1
-	{ 0.308f,	0.269f,	0.375f,	1.0f },		// CT_VDKPURPLE1
-	{ 0.816f,	0.531f,	0.710f,	1.0f },		// CT_VLTPURPLE2 -- needs values
-	{ 0.816f,	0.531f,	0.710f,	1.0f },		// CT_LTPURPLE2
-	{ 0.566f,	0.269f,	0.457f,	1.0f },		// CT_DKPURPLE2
-	{ 0.343f,	0.226f,	0.316f,	1.0f },		// CT_VDKPURPLE2
-	{ 0.929f,	0.597f,	0.929f,	1.0f },		// CT_VLTPURPLE3
-	{ 0.570f,	0.371f,	0.570f,	1.0f },		// CT_LTPURPLE3
-	{ 0.355f,	0.199f,	0.355f,	1.0f },		// CT_DKPURPLE3
-	{ 0.285f,	0.136f,	0.230f,	1.0f },		// CT_VDKPURPLE3
-	{ 0.953f,	0.378f,	0.250f,	1.0f },		// CT_VLTRED1
-	{ 0.953f,	0.378f,	0.250f,	1.0f },		// CT_LTRED1
-	{ 0.593f,	0.121f,	0.109f,	1.0f },		// CT_DKRED1
-	{ 0.429f,	0.171f,	0.113f,	1.0f },		// CT_VDKRED1
-	{ 0.25f,	0.0f,	0.0f,	1.0f },		// CT_VDKRED
-	{ 0.70f,	0.0f,	0.0f,	1.0f },		// CT_DKRED
-	{ 0.717f,	0.902f,	1.0f,	1.0f },		// CT_VLTAQUA
-	{ 0.574f,	0.722f,	0.804f,	1.0f },		// CT_LTAQUA
-	{ 0.287f,	0.361f,	0.402f,	1.0f },		// CT_DKAQUA
-	{ 0.143f,	0.180f,	0.201f,	1.0f },		// CT_VDKAQUA
-	{ 0.871f,	0.386f,	0.375f,	1.0f },		// CT_LTPINK
-	{ 0.435f,	0.193f,	0.187f,	1.0f },		// CT_DKPINK
-	{ 0.0f,		0.5f,	0.5f,	1.0f },		// CT_LTCYAN
-	{ 0.0f,		0.25f,	0.25f,	1.0f },		// CT_DKCYAN
-	{ 0.179f,	0.51f,	0.92f,	1.0f },		// CT_LTBLUE3
-	{ 0.199f,	0.71f,	0.92f,	1.0f },		// CT_LTBLUE3
-	{ 0.5f,		0.05f,	0.4f,	1.0f },		// CT_DKBLUE3
-	{ 0.0f,		0.613f,	0.097f,	1.0f },		// CT_HUD_GREEN
-	{ 0.835f,	0.015f,	0.015f,	1.0f },		// CT_HUD_RED
-	{ 0.567f,	0.685f,	1.0f,	0.75f },	// CT_ICON_BLUE
-	{ 0.515f,	0.406f,	0.507f,	1.0f },		// CT_NO_AMMO_RED
-	{ 1.0f,		0.658f,	0.062f,	1.0f },		// CT_HUD_ORANGE
+	{ 0.0f, 0.0f, 0.0f, 0.0f },		// CT_NONE
+	{ 0.0f, 0.0f, 0.0f, 1.0f },		// CT_BLACK
+	{ 1.0f, 0.0f, 0.0f, 1.0f },		// CT_RED
+	{ 0.0f, 1.0f, 0.0f, 1.0f },		// CT_GREEN
+	{ 0.0f, 0.0f, 1.0f, 1.0f },		// CT_BLUE
+	{ 1.0f, 1.0f, 0.0f, 1.0f },		// CT_YELLOW
+	{ 1.0f, 0.0f, 1.0f, 1.0f },		// CT_MAGENTA
+	{ 0.0f, 1.0f, 1.0f, 1.0f },		// CT_CYAN
+	{ 1.0f, 1.0f, 1.0f, 1.0f },		// CT_WHITE
+	{ 0.75f, 0.75f, 0.75f, 1.0f },		// CT_LTGREY
+	{ 0.50f, 0.50f, 0.50f, 1.0f },		// CT_MDGREY
+	{ 0.25f, 0.25f, 0.25f, 1.0f },		// CT_DKGREY
+	{ 0.15f, 0.15f, 0.15f, 1.0f },		// CT_DKGREY2
+	{ 0.810f, 0.530f, 0.0f, 1.0f },		// CT_VLTORANGE -- needs values
+	{ 0.810f, 0.530f, 0.0f, 1.0f },		// CT_LTORANGE
+	{ 0.610f, 0.330f, 0.0f, 1.0f },		// CT_DKORANGE
+	{ 0.402f, 0.265f, 0.0f, 1.0f },		// CT_VDKORANGE
+	{ 0.503f, 0.375f, 0.996f, 1.0f },		// CT_VLTBLUE1
+	{ 0.367f, 0.261f, 0.722f, 1.0f },		// CT_LTBLUE1
+	{ 0.199f, 0.0f, 0.398f, 1.0f },		// CT_DKBLUE1
+	{ 0.160f, 0.117f, 0.324f, 1.0f },		// CT_VDKBLUE1
+	{ 0.300f, 0.628f, 0.816f, 1.0f },		// CT_VLTBLUE2 -- needs values
+	{ 0.300f, 0.628f, 0.816f, 1.0f },		// CT_LTBLUE2
+	{ 0.191f, 0.289f, 0.457f, 1.0f },		// CT_DKBLUE2
+	{ 0.125f, 0.250f, 0.324f, 1.0f },		// CT_VDKBLUE2
+	{ 0.796f, 0.398f, 0.199f, 1.0f },		// CT_VLTBROWN1 -- needs values
+	{ 0.796f, 0.398f, 0.199f, 1.0f },		// CT_LTBROWN1
+	{ 0.558f, 0.207f, 0.027f, 1.0f },		// CT_DKBROWN1
+	{ 0.328f, 0.125f, 0.035f, 1.0f },		// CT_VDKBROWN1
+	{ 0.996f, 0.796f, 0.398f, 1.0f },		// CT_VLTGOLD1 -- needs values
+	{ 0.996f, 0.796f, 0.398f, 1.0f },		// CT_LTGOLD1
+	{ 0.605f, 0.441f, 0.113f, 1.0f },		// CT_DKGOLD1
+	{ 0.386f, 0.308f, 0.148f, 1.0f },		// CT_VDKGOLD1
+	{ 0.648f, 0.562f, 0.784f, 1.0f },		// CT_VLTPURPLE1 -- needs values
+	{ 0.648f, 0.562f, 0.784f, 1.0f },		// CT_LTPURPLE1
+	{ 0.437f, 0.335f, 0.597f, 1.0f },		// CT_DKPURPLE1
+	{ 0.308f, 0.269f, 0.375f, 1.0f },		// CT_VDKPURPLE1
+	{ 0.816f, 0.531f, 0.710f, 1.0f },		// CT_VLTPURPLE2 -- needs values
+	{ 0.816f, 0.531f, 0.710f, 1.0f },		// CT_LTPURPLE2
+	{ 0.566f, 0.269f, 0.457f, 1.0f },		// CT_DKPURPLE2
+	{ 0.343f, 0.226f, 0.316f, 1.0f },		// CT_VDKPURPLE2
+	{ 0.929f, 0.597f, 0.929f, 1.0f },		// CT_VLTPURPLE3
+	{ 0.570f, 0.371f, 0.570f, 1.0f },		// CT_LTPURPLE3
+	{ 0.355f, 0.199f, 0.355f, 1.0f },		// CT_DKPURPLE3
+	{ 0.285f, 0.136f, 0.230f, 1.0f },		// CT_VDKPURPLE3
+	{ 0.953f, 0.378f, 0.250f, 1.0f },		// CT_VLTRED1
+	{ 0.953f, 0.378f, 0.250f, 1.0f },		// CT_LTRED1
+	{ 0.593f, 0.121f, 0.109f, 1.0f },		// CT_DKRED1
+	{ 0.429f, 0.171f, 0.113f, 1.0f },		// CT_VDKRED1
+	{ 0.25f, 0.0f, 0.0f, 1.0f },		// CT_VDKRED
+	{ 0.70f, 0.0f, 0.0f, 1.0f },		// CT_DKRED
+	{ 0.717f, 0.902f, 1.0f, 1.0f },		// CT_VLTAQUA
+	{ 0.574f, 0.722f, 0.804f, 1.0f },		// CT_LTAQUA
+	{ 0.287f, 0.361f, 0.402f, 1.0f },		// CT_DKAQUA
+	{ 0.143f, 0.180f, 0.201f, 1.0f },		// CT_VDKAQUA
+	{ 0.871f, 0.386f, 0.375f, 1.0f },		// CT_LTPINK
+	{ 0.435f, 0.193f, 0.187f, 1.0f },		// CT_DKPINK
+	{ 0.0f, 0.5f, 0.5f, 1.0f },		// CT_LTCYAN
+	{ 0.0f, 0.25f, 0.25f, 1.0f },		// CT_DKCYAN
+	{ 0.179f, 0.51f, 0.92f, 1.0f },		// CT_LTBLUE3
+	{ 0.199f, 0.71f, 0.92f, 1.0f },		// CT_LTBLUE3
+	{ 0.5f, 0.05f, 0.4f, 1.0f },		// CT_DKBLUE3
+	{ 0.0f, 0.613f, 0.097f, 1.0f },		// CT_HUD_GREEN
+	{ 0.835f, 0.015f, 0.015f, 1.0f },		// CT_HUD_RED
+	{ 0.567f, 0.685f, 1.0f, 0.75f },	// CT_ICON_BLUE
+	{ 0.515f, 0.406f, 0.507f, 1.0f },		// CT_NO_AMMO_RED
+	{ 1.0f, 0.658f, 0.062f, 1.0f },		// CT_HUD_ORANGE
 };
 
 #define NUM_TEMPVECS 8
@@ -1213,7 +1212,7 @@ static vector3 tempVecs[NUM_TEMPVECS];
 vector3 *tv( float x, float y, float z ) {
 	static int index;
 	vector3 *v = &tempVecs[index++];
-	index &= NUM_TEMPVECS-1;
+	index &= NUM_TEMPVECS - 1;
 
 	VectorSet( v, x, y, z );
 
@@ -1224,7 +1223,7 @@ static char tempStrs[NUM_TEMPVECS][32];
 char *vtos( const vector3 *v ) {
 	static int index;
 	char *s = tempStrs[index++];
-	index &= NUM_TEMPVECS-1;
+	index &= NUM_TEMPVECS - 1;
 
 	Com_sprintf( s, 32, "(%i %i %i)", (int)v->x, (int)v->y, (int)v->z );
 

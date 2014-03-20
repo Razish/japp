@@ -10,31 +10,28 @@ G_BounceObject
 
 ================
 */
-void G_BounceObject( gentity_t *ent, trace_t *trace )
-{
+void G_BounceObject( gentity_t *ent, trace_t *trace ) {
 	vector3	velocity;
 	float	dot, bounceFactor;
 	int		hitTime;
 
 	// reflect the velocity on the trace plane
-	hitTime = level.previousTime + ( level.time - level.previousTime ) * trace->fraction;
+	hitTime = level.previousTime + (level.time - level.previousTime) * trace->fraction;
 	BG_EvaluateTrajectoryDelta( &ent->s.pos, hitTime, &velocity );
 	dot = DotProduct( &velocity, &trace->plane.normal );
-//	bounceFactor = 60/ent->mass;		// NOTENOTE Mass is not yet implemented
+	//	bounceFactor = 60/ent->mass;		// NOTENOTE Mass is not yet implemented
 	bounceFactor = 1.0f;
-	if ( bounceFactor > 1.0f )
-	{
+	if ( bounceFactor > 1.0f ) {
 		bounceFactor = 1.0f;
 	}
-	VectorMA( &velocity, -2*dot*bounceFactor, &trace->plane.normal, &ent->s.pos.trDelta );
+	VectorMA( &velocity, -2 * dot*bounceFactor, &trace->plane.normal, &ent->s.pos.trDelta );
 
 	//FIXME: customized or material-based impact/bounce sounds
-	if ( ent->flags & FL_BOUNCE_HALF )
-	{
+	if ( ent->flags & FL_BOUNCE_HALF ) {
 		VectorScale( &ent->s.pos.trDelta, 0.5f, &ent->s.pos.trDelta );
 
 		// check for stop
-		if ( ((trace->plane.normal.z > 0.7f&&g_gravity.value>0) || (trace->plane.normal.z<-0.7f&&g_gravity.value<0)) && ((ent->s.pos.trDelta.z<40&&g_gravity.value>0)||(ent->s.pos.trDelta.z>-40&&g_gravity.value<0)) ) //this can happen even on very slightly sloped walls, so changed it from > 0 to > 0.7f
+		if ( ((trace->plane.normal.z > 0.7f&&g_gravity.value > 0) || (trace->plane.normal.z < -0.7f&&g_gravity.value<0)) && ((ent->s.pos.trDelta.z<40 && g_gravity.value>0) || (ent->s.pos.trDelta.z>-40 && g_gravity.value < 0)) ) //this can happen even on very slightly sloped walls, so changed it from > 0 to > 0.7f
 		{
 			//G_SetOrigin( ent, trace->endpos );
 			//ent->nextthink = level.time + 500;
@@ -62,13 +59,12 @@ void G_BounceObject( gentity_t *ent, trace_t *trace )
 ================
 G_RunObject
 
-  TODO:  When transition to 0 grav, push away from surface you were resting on
-  TODO:  When free-floating in air, apply some friction to your trDelta (based on mass?)
+TODO:  When transition to 0 grav, push away from surface you were resting on
+TODO:  When free-floating in air, apply some friction to your trDelta (based on mass?)
 ================
 */
 void DoImpact( gentity_t *self, gentity_t *other, qboolean damageSelf );
-void G_RunObject( gentity_t *ent )
-{
+void G_RunObject( gentity_t *ent ) {
 	vector3		origin, oldOrg;
 	trace_t		tr;
 	gentity_t	*traceEnt = NULL;
@@ -79,8 +75,7 @@ void G_RunObject( gentity_t *ent )
 		ent->s.pos.trType = TR_GRAVITY;
 		VectorCopy( &ent->r.currentOrigin, &ent->s.pos.trBase );
 		ent->s.pos.trTime = level.previousTime;//?necc?
-		if ( !g_gravity.value )
-		{
+		if ( !g_gravity.value ) {
 			ent->s.pos.trDelta.z += 100;
 		}
 	}
@@ -93,21 +88,19 @@ void G_RunObject( gentity_t *ent )
 	//Get current angles?
 	BG_EvaluateTrajectory( &ent->s.apos, level.time, &ent->r.currentAngles );
 
-	if ( VectorCompare( &ent->r.currentOrigin, &origin ) )
-	{//error - didn't move at all!
+	if ( VectorCompare( &ent->r.currentOrigin, &origin ) ) {//error - didn't move at all!
 		return;
 	}
 	// trace a line from the previous position to the current position,
 	// ignoring interactions with the missile owner
 	trap->Trace( &tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &origin, ent->parent ? ent->parent->s.number : ent->s.number, ent->clipmask, qfalse, 0, 0 );
 
-	if ( !tr.startsolid && !tr.allsolid && tr.fraction )
-	{
+	if ( !tr.startsolid && !tr.allsolid && tr.fraction ) {
 		VectorCopy( &tr.endpos, &ent->r.currentOrigin );
 		trap->LinkEntity( (sharedEntity_t *)ent );
 	}
 	else
-	//if ( tr.startsolid )
+		//if ( tr.startsolid )
 	{
 		tr.fraction = 0;
 	}
@@ -116,24 +109,21 @@ void G_RunObject( gentity_t *ent )
 	/*
 	if ( !(ent->s.eFlags & EF_TELEPORT_BIT) && !(ent->svFlags & SVF_NO_TELEPORT) )
 	{
-		G_MoverTouchTeleportTriggers( ent, oldOrg );
-		if ( ent->s.eFlags & EF_TELEPORT_BIT )
-		{//was teleported
-			return;
-		}
+	G_MoverTouchTeleportTriggers( ent, oldOrg );
+	if ( ent->s.eFlags & EF_TELEPORT_BIT )
+	{//was teleported
+	return;
+	}
 	}
 	else
 	{
-		ent->s.eFlags &= ~EF_TELEPORT_BIT;
+	ent->s.eFlags &= ~EF_TELEPORT_BIT;
 	}
 	*/
 
-	if ( tr.fraction == 1 )
-	{
-		if ( g_gravity.value <= 0 )
-		{
-			if ( ent->s.apos.trType == TR_STATIONARY )
-			{
+	if ( tr.fraction == 1 ) {
+		if ( g_gravity.value <= 0 ) {
+			if ( ent->s.apos.trType == TR_STATIONARY ) {
 				VectorCopy( &ent->r.currentAngles, &ent->s.apos.trBase );
 				ent->s.apos.trType = TR_LINEAR;
 				ent->s.apos.trDelta.y = flrand( -300, 300 );
@@ -143,12 +133,10 @@ void G_RunObject( gentity_t *ent )
 			}
 		}
 		//friction in zero-G
-		if ( !g_gravity.value )
-		{
+		if ( !g_gravity.value ) {
 			float friction = 0.975f;
 			//friction -= ent->mass/1000.0f;
-			if ( friction < 0.1f )
-			{
+			if ( friction < 0.1f ) {
 				friction = 0.1f;
 			}
 
@@ -163,56 +151,45 @@ void G_RunObject( gentity_t *ent )
 
 	//Do impact damage
 	traceEnt = &g_entities[tr.entityNum];
-	if ( tr.fraction || (traceEnt && traceEnt->takedamage) )
-	{
-		if ( !VectorCompare( &ent->r.currentOrigin, &oldOrg ) )
-		{//moved and impacted
-			if ( (traceEnt && traceEnt->takedamage) )
-			{//hurt someone
-//				G_Sound( ent, G_SoundIndex( "sound/movers/objects/objectHurt.wav" ) );
+	if ( tr.fraction || (traceEnt && traceEnt->takedamage) ) {
+		if ( !VectorCompare( &ent->r.currentOrigin, &oldOrg ) ) {//moved and impacted
+			if ( (traceEnt && traceEnt->takedamage) ) {//hurt someone
+				//				G_Sound( ent, G_SoundIndex( "sound/movers/objects/objectHurt.wav" ) );
 			}
-//			G_Sound( ent, G_SoundIndex( "sound/movers/objects/objectHit.wav" ) );
+			//			G_Sound( ent, G_SoundIndex( "sound/movers/objects/objectHit.wav" ) );
 		}
 
-		if (ent->s.weapon != WP_SABER)
-		{
+		if ( ent->s.weapon != WP_SABER ) {
 			DoImpact( ent, traceEnt, qtrue );
 		}
 	}
 
-	if ( !ent || (ent->takedamage&&ent->health <= 0) )
-	{//been destroyed by impact
+	if ( !ent || (ent->takedamage&&ent->health <= 0) ) {//been destroyed by impact
 		//chunks?
-//		G_Sound( ent, G_SoundIndex( "sound/movers/objects/objectBreak.wav" ) );
+		//		G_Sound( ent, G_SoundIndex( "sound/movers/objects/objectBreak.wav" ) );
 		return;
 	}
 
 	//do impact physics
 	if ( ent->s.pos.trType == TR_GRAVITY )//tr.fraction < 1.0f &&
 	{//FIXME: only do this if no trDelta
-		if ( g_gravity.value <= 0 || tr.plane.normal.z < 0.7f )
-		{
-			if ( ent->flags&(FL_BOUNCE|FL_BOUNCE_HALF) )
-			{
-				if ( tr.fraction <= 0.0f )
-				{
+		if ( g_gravity.value <= 0 || tr.plane.normal.z < 0.7f ) {
+			if ( ent->flags&(FL_BOUNCE | FL_BOUNCE_HALF) ) {
+				if ( tr.fraction <= 0.0f ) {
 					VectorCopy( &tr.endpos, &ent->r.currentOrigin );
 					VectorCopy( &tr.endpos, &ent->s.pos.trBase );
 					VectorClear( &ent->s.pos.trDelta );
 					ent->s.pos.trTime = level.time;
 				}
-				else
-				{
+				else {
 					G_BounceObject( ent, &tr );
 				}
 			}
-			else
-			{//slide down?
+			else {//slide down?
 				//FIXME: slide off the slope
 			}
 		}
-		else
-		{
+		else {
 			ent->s.apos.trType = TR_STATIONARY;
 			pitch_roll_for_slope( ent, &tr.plane.normal );
 			//ent->r.currentAngles[0] = 0;//FIXME: match to slope
@@ -224,8 +201,7 @@ void G_RunObject( gentity_t *ent )
 			G_StopObjectMoving( ent );
 		}
 	}
-	else if (ent->s.weapon != WP_SABER)
-	{
+	else if ( ent->s.weapon != WP_SABER ) {
 		ent->s.apos.trType = TR_STATIONARY;
 		pitch_roll_for_slope( ent, &tr.plane.normal );
 		//ent->r.currentAngles[0] = 0;//FIXME: match to slope
@@ -238,8 +214,7 @@ void G_RunObject( gentity_t *ent )
 }
 
 
-void G_StopObjectMoving( gentity_t *object )
-{
+void G_StopObjectMoving( gentity_t *object ) {
 	object->s.pos.trType = TR_STATIONARY;
 	VectorCopy( &object->r.currentOrigin, &object->s.origin );
 	VectorCopy( &object->r.currentOrigin, &object->s.pos.trBase );
@@ -254,14 +229,13 @@ void G_StopObjectMoving( gentity_t *object )
 	*/
 }
 
-void G_StartObjectMoving( gentity_t *object, vector3 *dir, float speed, trType_t trType )
-{
-	VectorNormalize (dir);
+void G_StartObjectMoving( gentity_t *object, vector3 *dir, float speed, trType_t trType ) {
+	VectorNormalize( dir );
 
 	//object->s.eType = ET_GENERAL;
 	object->s.pos.trType = trType;
 	VectorCopy( &object->r.currentOrigin, &object->s.pos.trBase );
-	VectorScale(dir, speed, &object->s.pos.trDelta );
+	VectorScale( dir, speed, &object->s.pos.trDelta );
 	object->s.pos.trTime = level.time;
 
 	/*
@@ -273,12 +247,10 @@ void G_StartObjectMoving( gentity_t *object, vector3 *dir, float speed, trType_t
 	*/
 
 	//FIXME: make these objects go through G_RunObject automatically, like missiles do
-	if ( object->think == NULL )
-	{
+	if ( object->think == NULL ) {
 		object->nextthink = level.time + FRAMETIME;
 		object->think = G_RunObject;
 	}
-	else
-	{//You're responsible for calling RunObject
+	else {//You're responsible for calling RunObject
 	}
 }

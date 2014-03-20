@@ -12,7 +12,7 @@ void CG_TargetCommand_f( void ) {
 	char	test[4];
 
 	targetNum = CG_CrosshairPlayer();
-	if (!targetNum ) {
+	if ( !targetNum ) {
 		return;
 	}
 
@@ -21,15 +21,15 @@ void CG_TargetCommand_f( void ) {
 
 }
 
-static void CG_SizeUp_f (void) {
-	trap->Cvar_Set("cg_viewSize", va("%i",(int)(cg_viewSize.integer+10)));
+static void CG_SizeUp_f( void ) {
+	trap->Cvar_Set( "cg_viewSize", va( "%i", (int)(cg_viewSize.integer + 10) ) );
 }
 
-static void CG_SizeDown_f (void) {
-	trap->Cvar_Set("cg_viewSize", va("%i",(int)(cg_viewSize.integer-10)));
+static void CG_SizeDown_f( void ) {
+	trap->Cvar_Set( "cg_viewSize", va( "%i", (int)(cg_viewSize.integer - 10) ) );
 }
 
-static void CG_Viewpos_f (void) {
+static void CG_Viewpos_f( void ) {
 	refdef_t *refdef = CG_GetRefdef();
 	trap->Print( "%s (%i %i %i) : %i\n", cgs.mapname, (int)refdef->vieworg.x, (int)refdef->vieworg.y, (int)refdef->vieworg.z, (int)refdef->viewangles.yaw );
 }
@@ -46,9 +46,10 @@ void CG_ScoresDown_f( void ) {
 		// displayed, but if this is the first hit, clear them out
 		if ( !cg.showScores ) {
 			cg.showScores = qtrue;
-		//	cg.numScores = 0;
+			//	cg.numScores = 0;
 		}
-	} else {
+	}
+	else {
 		// show the cached contents even if they just pressed if it
 		// is within two seconds
 		cg.showScores = qtrue;
@@ -71,8 +72,8 @@ static void CG_TellTarget_f( void ) {
 	if ( clientNum == -1 )
 		return;
 
-	trap->Cmd_Args( message, sizeof( message ) );
-	Com_sprintf( command, sizeof( command ), "tell %i %s", clientNum, message );
+	trap->Cmd_Args( message, sizeof(message) );
+	Com_sprintf( command, sizeof(command), "tell %i %s", clientNum, message );
 	trap->SendClientCommand( command );
 }
 
@@ -86,8 +87,8 @@ static void CG_TellAttacker_f( void ) {
 		return;
 	}
 
-	trap->Cmd_Args( message, sizeof( message ) );
-	Com_sprintf( command, sizeof( command ), "tell %i %s", clientNum, message );
+	trap->Cmd_Args( message, sizeof(message) );
+	Com_sprintf( command, sizeof(command), "tell %i %s", clientNum, message );
 	trap->SendClientCommand( command );
 }
 
@@ -95,39 +96,38 @@ void CG_SiegeBriefingDisplay( int team, int dontshow );
 static void CG_SiegeBriefing_f( void ) {
 	int team;
 
-	if (cgs.gametype != GT_SIEGE)
+	if ( cgs.gametype != GT_SIEGE )
 		return;
 
 	team = cg.predictedPlayerState.persistant[PERS_TEAM];
-	if (team != SIEGETEAM_TEAM1 && team != SIEGETEAM_TEAM2)
+	if ( team != SIEGETEAM_TEAM1 && team != SIEGETEAM_TEAM2 )
 		return;
 
-	CG_SiegeBriefingDisplay(team, 0);
+	CG_SiegeBriefingDisplay( team, 0 );
 }
 
 static void CG_SiegeCvarUpdate_f( void ) {
 	int team;
 
-	if (cgs.gametype != GT_SIEGE)
+	if ( cgs.gametype != GT_SIEGE )
 		return;
 
 	team = cg.predictedPlayerState.persistant[PERS_TEAM];
 
-	if (team != SIEGETEAM_TEAM1 && team != SIEGETEAM_TEAM2)
+	if ( team != SIEGETEAM_TEAM1 && team != SIEGETEAM_TEAM2 )
 		return;
 
-	CG_SiegeBriefingDisplay(team, 1);
+	CG_SiegeBriefingDisplay( team, 1 );
 }
 
 static void CG_SiegeCompleteCvarUpdate_f( void ) {
-	if (cgs.gametype != GT_SIEGE)
-	{ //Cannot be displayed unless in this gametype
+	if ( cgs.gametype != GT_SIEGE ) { //Cannot be displayed unless in this gametype
 		return;
 	}
 
 	// Set up cvars for both teams
-	CG_SiegeBriefingDisplay(SIEGETEAM_TEAM1, 1);
-	CG_SiegeBriefingDisplay(SIEGETEAM_TEAM2, 1);
+	CG_SiegeBriefingDisplay( SIEGETEAM_TEAM1, 1 );
+	CG_SiegeBriefingDisplay( SIEGETEAM_TEAM2, 1 );
 }
 
 static void CG_CopyNames_f( void ) {
@@ -136,27 +136,26 @@ static void CG_CopyNames_f( void ) {
 	int			bytes = 0;
 	HGLOBAL		clipbuffer;
 	int			i;
-	char		buf[1216] = {0};	//(32*36) = 1152 + 64 scrap
+	char		buf[1216] = { 0 };	//(32*36) = 1152 + 64 scrap
 
-	memset( buf, 0, sizeof( buf ) );
+	memset( buf, 0, sizeof(buf) );
 	buf[0] = '\0';
 
-	for ( i=0; i<MAX_CLIENTS; i++ )
-	{
+	for ( i = 0; i < MAX_CLIENTS; i++ ) {
 		char *toClip = NULL;
 		if ( cgs.clientinfo[i].infoValid ) {
 			toClip = cgs.clientinfo[i].name;
-			Q_strcat( buf, sizeof( buf ), va( "%s\n", toClip ) );
+			Q_strcat( buf, sizeof(buf), va( "%s\n", toClip ) );
 		}
 	}
-	Q_strcat( buf, sizeof( buf ), "\r\n" );	//Clipboard requires CRLF ending
+	Q_strcat( buf, sizeof(buf), "\r\n" );	//Clipboard requires CRLF ending
 	bytes = strlen( buf );
 
 	OpenClipboard( NULL );
 	EmptyClipboard();
 
-	clipbuffer	= GlobalAlloc( GMEM_DDESHARE, bytes+1 );
-	buffer		= (char far *)GlobalLock( clipbuffer ); // 'argument 1' might be '0': this does not adhere to the specification for the function 'GlobalLock'
+	clipbuffer = GlobalAlloc( GMEM_DDESHARE, bytes + 1 );
+	buffer = (char far *)GlobalLock( clipbuffer ); // 'argument 1' might be '0': this does not adhere to the specification for the function 'GlobalLock'
 
 	if ( !buffer )
 		return;// GetLastError() * -1; // Do what you want to signal error
@@ -173,7 +172,7 @@ static void CG_CopyNames_f( void ) {
 
 static void CG_ShowPlayerID_f( void ) {
 	int i;
-	for ( i=0; i<MAX_CLIENTS; i++ ) {
+	for ( i = 0; i < MAX_CLIENTS; i++ ) {
 		if ( cgs.clientinfo[i].infoValid )
 			Com_Printf( S_COLOR_WHITE"("S_COLOR_CYAN"%i"S_COLOR_WHITE") %s\n", i, cgs.clientinfo[i].name );
 	}
@@ -205,41 +204,39 @@ static const size_t numPluginDisableOpts = ARRAY_LEN( pluginDisableStrings );
 // 0x30025430 JA+ cgame 1.4 beta3
 static void CG_PluginDisable_f( void ) {
 	uint32_t i;
-	if ( trap->Cmd_Argc() > 1 )
-	{
-		char arg[8]={0}, buf[16]={0};
+	if ( trap->Cmd_Argc() > 1 ) {
+		char arg[8] = { 0 }, buf[16] = { 0 };
 		int current, index;
 		uint32_t toggle;
-		trap->Cmd_Argv( 1, arg, sizeof( arg ) );
+		trap->Cmd_Argv( 1, arg, sizeof(arg) );
 		index = toggle = atoi( arg );
 		if ( toggle >= numPluginDisableOpts ) {
 			Com_Printf( "Invalid pluginDisable value: %u\n", toggle );
 			return;
 		}
 
-		trap->Cvar_VariableStringBuffer( "cp_pluginDisable", buf, sizeof( buf ) );
+		trap->Cvar_VariableStringBuffer( "cp_pluginDisable", buf, sizeof(buf) );
 		current = atoi( buf );
-		toggle = (1<<index);
+		toggle = (1 << index);
 		trap->Cvar_Set( "cp_pluginDisable", va( "%i", toggle ^ current ) );
 
-		Com_Printf( "%s %s\n", pluginDisableStrings[index], ((current&toggle)?S_COLOR_GREEN"Allowed":S_COLOR_RED"Disallowed") );
+		Com_Printf( "%s %s\n", pluginDisableStrings[index], ((current&toggle) ? S_COLOR_GREEN"Allowed" : S_COLOR_RED"Disallowed") );
 	}
-	else
-	{
-		char buf[16]={0};
-		trap->Cvar_VariableStringBuffer( "cp_pluginDisable", buf, sizeof( buf ) );
+	else {
+		char buf[16] = { 0 };
+		trap->Cvar_VariableStringBuffer( "cp_pluginDisable", buf, sizeof(buf) );
 
 		Com_Printf( "Usage: /pluginDisable <ID>\n" );
-		for ( i=0; i<numPluginDisableOpts; i++ ) {
-			qboolean allowed = !(atoi( buf ) & (1<<i));
-			Com_Printf( S_COLOR_WHITE"("S_COLOR_CYAN"%i"S_COLOR_WHITE") ^%c%s\n", i, (allowed?COLOR_GREEN:COLOR_RED), pluginDisableStrings[i] );
+		for ( i = 0; i < numPluginDisableOpts; i++ ) {
+			qboolean allowed = !(atoi( buf ) & (1 << i));
+			Com_Printf( S_COLOR_WHITE"("S_COLOR_CYAN"%i"S_COLOR_WHITE") ^%c%s\n", i, (allowed ? COLOR_GREEN : COLOR_RED), pluginDisableStrings[i] );
 		}
 	}
 }
 
 static void CG_ScrollChat_f( void ) {
-	char args[8]={0};
-	trap->Cmd_Args( args, sizeof( args ) );
+	char args[8] = { 0 };
+	trap->Cmd_Args( args, sizeof(args) );
 	CG_ChatboxScroll( atoi( args ) );
 }
 
@@ -260,24 +257,23 @@ static void Cmd_ChatboxSelectTabPrevNoKeys( void ) {
 
 static void CG_ChatboxFindTab_f( void ) {
 	char args[128];
-	trap->Cmd_Args( args, sizeof( args ) );
+	trap->Cmd_Args( args, sizeof(args) );
 	CG_ChatboxSelect( args );
 }
 
 #ifdef JPLUA
 
-void CG_LuaDoString_f( void )
-{
+void CG_LuaDoString_f( void ) {
 	char arg[MAX_TOKEN_CHARS];
-	char buf[4096]={0};
-	int i=0;
+	char buf[4096] = { 0 };
+	int i = 0;
 	int argc = trap->Cmd_Argc();
 
 	if ( argc < 2 || !JPLua.state )
 		return;
 
-	for ( i=1; i<argc; i++ ) {
-		trap->Cmd_Argv( i, arg, sizeof( arg ) );
+	for ( i = 1; i < argc; i++ ) {
+		trap->Cmd_Argv( i, arg, sizeof(arg) );
 		Q_strcat( buf, sizeof(buf), va( "%s ", arg ) );
 	}
 
@@ -296,18 +292,19 @@ void CG_LuaReload_f( void ) {
 
 //cg_consolecmds.c
 
-void CG_FixDirection(void){
-	if (cg.japp.isfixedVector){
+void CG_FixDirection( void ) {
+	if ( cg.japp.isfixedVector ) {
 		cg.japp.isfixedVector = qfalse;
-		trap->Print("Direction unset.\n");
+		trap->Print( "Direction unset.\n" );
 		return;
 	}
 
-	if (trap->Cmd_Argc() == 3){
+	if ( trap->Cmd_Argc() == 3 ) {
 		cg.japp.fixedVector.x = atof( CG_Argv( 1 ) );
 		cg.japp.fixedVector.y = atof( CG_Argv( 2 ) );
-	} else {
-		AngleVectors( &cg.predictedPlayerState.viewangles, &cg.japp.fixedVector, NULL, NULL);
+	}
+	else {
+		AngleVectors( &cg.predictedPlayerState.viewangles, &cg.japp.fixedVector, NULL, NULL );
 	}
 
 	cg.japp.fixedVector.z = 0;
@@ -320,9 +317,9 @@ void CG_FakeGun_f( void ) {
 }
 
 void CG_SayTeam_f( void ) {
-	char buf[MAX_TOKEN_CHARS] = {0};
-	trap->Cmd_Args( buf, sizeof( buf ) );
-	HandleTeamBinds( buf, sizeof( buf ) );
+	char buf[MAX_TOKEN_CHARS] = { 0 };
+	trap->Cmd_Args( buf, sizeof(buf) );
+	HandleTeamBinds( buf, sizeof(buf) );
 	trap->SendClientCommand( va( "say_team %s", buf ) );
 }
 
@@ -354,100 +351,100 @@ void CG_MessageModeTell_f( void ) {
 
 typedef struct command_s {
 	const char *name;
-	void (*func)( void );
+	void( *func )(void);
 } command_t;
 
 static const command_t commands[] = {
-	{ "+scores",					CG_ScoresDown_f },
-	{ "-scores",					CG_ScoresUp_f },
-	{ "addbot",						NULL },
-	{ "bot_order",					NULL },
-	{ "briefing",					CG_SiegeBriefing_f },
-	{ "callvote",					NULL },
-	{ "cgmenu",						CG_Menu_f },
-	{ "chattabfind",				CG_ChatboxFindTab_f },
-	{ "chattabnext",				Cmd_ChatboxSelectTabNextNoKeys },
-	{ "chattabprev",				Cmd_ChatboxSelectTabPrevNoKeys },
-	{ "clearchat",					CG_ClearChat_f },
-	{ "copynames",					CG_CopyNames_f },
-	{ "engage_duel",				NULL },
-	{ "fakegun",					CG_FakeGun_f },
-	{ "follow",						NULL },
-	{ "forcechanged",				NULL },
-	{ "forcenext",					CG_NextForcePower_f },
-	{ "forceprev",					CG_PrevForcePower_f },
-	{ "force_absorb",				NULL },
-	{ "force_distract",				NULL },
-	{ "force_forcepowerother",		NULL },
-	{ "force_heal",					NULL },
-	{ "force_healother",			NULL },
-	{ "force_protect",				NULL },
-	{ "force_pull",					NULL },
-	{ "force_rage",					NULL },
-	{ "force_seeing",				NULL },
-	{ "force_speed",				NULL },
-	{ "force_throw",				NULL },
-	{ "give",						NULL },
-	{ "god",						NULL },
-	{ "hud_reload",					CG_HudReload_f },
-	{ "invnext",					CG_NextInventory_f },
-	{ "invprev",					CG_PrevInventory_f },
-	{ "kill",						NULL },
-	{ "levelshot",					NULL },
-	{ "loaddefered",				NULL },
-	{ "loaddeferred",				CG_LoadDeferredPlayers },
+	{ "+scores", CG_ScoresDown_f },
+	{ "-scores", CG_ScoresUp_f },
+	{ "addbot", NULL },
+	{ "bot_order", NULL },
+	{ "briefing", CG_SiegeBriefing_f },
+	{ "callvote", NULL },
+	{ "cgmenu", CG_Menu_f },
+	{ "chattabfind", CG_ChatboxFindTab_f },
+	{ "chattabnext", Cmd_ChatboxSelectTabNextNoKeys },
+	{ "chattabprev", Cmd_ChatboxSelectTabPrevNoKeys },
+	{ "clearchat", CG_ClearChat_f },
+	{ "copynames", CG_CopyNames_f },
+	{ "engage_duel", NULL },
+	{ "fakegun", CG_FakeGun_f },
+	{ "follow", NULL },
+	{ "forcechanged", NULL },
+	{ "forcenext", CG_NextForcePower_f },
+	{ "forceprev", CG_PrevForcePower_f },
+	{ "force_absorb", NULL },
+	{ "force_distract", NULL },
+	{ "force_forcepowerother", NULL },
+	{ "force_heal", NULL },
+	{ "force_healother", NULL },
+	{ "force_protect", NULL },
+	{ "force_pull", NULL },
+	{ "force_rage", NULL },
+	{ "force_seeing", NULL },
+	{ "force_speed", NULL },
+	{ "force_throw", NULL },
+	{ "give", NULL },
+	{ "god", NULL },
+	{ "hud_reload", CG_HudReload_f },
+	{ "invnext", CG_NextInventory_f },
+	{ "invprev", CG_PrevInventory_f },
+	{ "kill", NULL },
+	{ "levelshot", NULL },
+	{ "loaddefered", NULL },
+	{ "loaddeferred", CG_LoadDeferredPlayers },
 #ifdef JPLUA
-	{ "lua",						CG_LuaDoString_f },
-	{ "lua_reload",					CG_LuaReload_f },
+	{ "lua", CG_LuaDoString_f },
+	{ "lua_reload", CG_LuaReload_f },
 #endif // JPLUA
-	{ "messagemodeAll",				CG_MessageModeAll_f },
-	{ "messagemodeTeam",			CG_MessageModeTeam_f },
-	{ "messageModeTell",			CG_MessageModeTell_f },
-	{ "nextframe",					CG_TestModelNextFrame_f },
-	{ "nextskin",					CG_TestModelNextSkin_f },
-	{ "noclip",						NULL },
-	{ "notarget",					NULL },
-	{ "npc",						NULL },
-	{ "pluginDisable",				CG_PluginDisable_f },
-	{ "prevframe",					CG_TestModelPrevFrame_f },
-	{ "prevskin",					CG_TestModelPrevSkin_f },
-	{ "saberAttackCycle",			NULL },
-	{ "say",						NULL },
-	{ "say_team",					CG_SayTeam_f },
-	{ "scrollChat",					CG_ScrollChat_f },
-	{ "setviewpos",					NULL },
-	{ "showPlayerID",				CG_ShowPlayerID_f },
-	{ "siegeCompleteCvarUpdate",	CG_SiegeCompleteCvarUpdate_f },
-	{ "siegeCvarUpdate",			CG_SiegeCvarUpdate_f },
-	{ "sizedown",					CG_SizeDown_f },
-	{ "sizeup",						CG_SizeUp_f },
-	{ "sm_fix_direction",			CG_FixDirection },
-	{ "stats",						NULL },
-	{ "sv_forcenext",				NULL },
-	{ "sv_forceprev",				NULL },
-	{ "sv_invnext",					NULL },
-	{ "sv_invprev",					NULL },
-	{ "sv_saberswitch",				NULL },
-	{ "tcmd",						CG_TargetCommand_f },
-	{ "team",						NULL },
-	{ "teamtask",					NULL },
-	{ "tell",						NULL },
-	{ "tell_attacker",				CG_TellAttacker_f },
-	{ "tell_target",				CG_TellTarget_f },
-	{ "testgun",					CG_TestGun_f },
-	{ "testmodel",					CG_TestModel_f },
-	{ "use_bacta",					NULL },
-	{ "use_electrobinoculars",		NULL },
-	{ "use_field",					NULL },
-	{ "use_seeker",					NULL },
-	{ "use_sentry",					NULL },
-	{ "viewpos",					CG_Viewpos_f },
-	{ "vote",						NULL },
-	{ "weapnext",					CG_NextWeapon_f },
-	{ "weapon",						CG_Weapon_f },
-	{ "weaponclean",				CG_WeaponClean_f },
-	{ "weapprev",					CG_PrevWeapon_f },
-	{ "zoom",						NULL },
+	{ "messagemodeAll", CG_MessageModeAll_f },
+	{ "messagemodeTeam", CG_MessageModeTeam_f },
+	{ "messageModeTell", CG_MessageModeTell_f },
+	{ "nextframe", CG_TestModelNextFrame_f },
+	{ "nextskin", CG_TestModelNextSkin_f },
+	{ "noclip", NULL },
+	{ "notarget", NULL },
+	{ "npc", NULL },
+	{ "pluginDisable", CG_PluginDisable_f },
+	{ "prevframe", CG_TestModelPrevFrame_f },
+	{ "prevskin", CG_TestModelPrevSkin_f },
+	{ "saberAttackCycle", NULL },
+	{ "say", NULL },
+	{ "say_team", CG_SayTeam_f },
+	{ "scrollChat", CG_ScrollChat_f },
+	{ "setviewpos", NULL },
+	{ "showPlayerID", CG_ShowPlayerID_f },
+	{ "siegeCompleteCvarUpdate", CG_SiegeCompleteCvarUpdate_f },
+	{ "siegeCvarUpdate", CG_SiegeCvarUpdate_f },
+	{ "sizedown", CG_SizeDown_f },
+	{ "sizeup", CG_SizeUp_f },
+	{ "sm_fix_direction", CG_FixDirection },
+	{ "stats", NULL },
+	{ "sv_forcenext", NULL },
+	{ "sv_forceprev", NULL },
+	{ "sv_invnext", NULL },
+	{ "sv_invprev", NULL },
+	{ "sv_saberswitch", NULL },
+	{ "tcmd", CG_TargetCommand_f },
+	{ "team", NULL },
+	{ "teamtask", NULL },
+	{ "tell", NULL },
+	{ "tell_attacker", CG_TellAttacker_f },
+	{ "tell_target", CG_TellTarget_f },
+	{ "testgun", CG_TestGun_f },
+	{ "testmodel", CG_TestModel_f },
+	{ "use_bacta", NULL },
+	{ "use_electrobinoculars", NULL },
+	{ "use_field", NULL },
+	{ "use_seeker", NULL },
+	{ "use_sentry", NULL },
+	{ "viewpos", CG_Viewpos_f },
+	{ "vote", NULL },
+	{ "weapnext", CG_NextWeapon_f },
+	{ "weapon", CG_Weapon_f },
+	{ "weaponclean", CG_WeaponClean_f },
+	{ "weapprev", CG_PrevWeapon_f },
+	{ "zoom", NULL },
 };
 static const size_t numCommands = ARRAY_LEN( commands );
 
@@ -463,9 +460,9 @@ qboolean CG_ConsoleCommand( void ) {
 	if ( JPLua_Event_ConsoleCommand() )
 		return qtrue;
 
-	cmd = CG_Argv(0);
+	cmd = CG_Argv( 0 );
 
-	command = (command_t *)bsearch( cmd, commands, numCommands, sizeof( commands[0] ), cmdcmp );
+	command = (command_t *)bsearch( cmd, commands, numCommands, sizeof(commands[0]), cmdcmp );
 	if ( !command )
 		return qfalse;
 
@@ -480,6 +477,6 @@ void CG_InitConsoleCommands( void ) {
 	const command_t *cmd = commands;
 	size_t i;
 
-	for ( i=0; i<numCommands; i++, cmd++ )
+	for ( i = 0; i < numCommands; i++, cmd++ )
 		trap->AddCommand( cmd->name );
 }

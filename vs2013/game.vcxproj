@@ -38,7 +38,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)</OutDir>
+    <OutDir>../../japlus/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>jamp$(ProjectName)x86</TargetName>
@@ -46,7 +46,7 @@
     <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)</OutDir>
+    <OutDir>../../japlus/</OutDir>
     <TargetName>jamp$(ProjectName)x86</TargetName>
     <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>

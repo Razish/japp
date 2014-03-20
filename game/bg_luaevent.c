@@ -1,28 +1,28 @@
 #if defined(_GAME)
-	#include "g_local.h"
+#include "g_local.h"
 #elif defined(_CGAME)
-	#include "cg_local.h"
+#include "cg_local.h"
 #endif
 #include "bg_lua.h"
 
 #ifdef JPLUA
 
 static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
-	ENUM2STRING(JPLUA_EVENT_UNLOAD),
-	ENUM2STRING(JPLUA_EVENT_RUNFRAME),
-	ENUM2STRING(JPLUA_EVENT_CHATMSGRECV),
-	ENUM2STRING(JPLUA_EVENT_CHATMSGSEND),
-	ENUM2STRING(JPLUA_EVENT_CLIENTBEGIN),
-	ENUM2STRING(JPLUA_EVENT_CLIENTCOMMAND),
-	ENUM2STRING(JPLUA_EVENT_CLIENTCONNECT),
-	ENUM2STRING(JPLUA_EVENT_CLIENTDISCONNECT),
-	ENUM2STRING(JPLUA_EVENT_CLIENTINFO),
-	ENUM2STRING(JPLUA_EVENT_CLIENTSPAWN),
-	ENUM2STRING(JPLUA_EVENT_CLIENTUSERINFOCHANGED),
-	ENUM2STRING(JPLUA_EVENT_HUD),
-	ENUM2STRING(JPLUA_EVENT_PAIN),
-	ENUM2STRING(JPLUA_EVENT_PLAYERDEATH),
-	ENUM2STRING(JPLUA_EVENT_SABERTOUCH),
+	ENUM2STRING( JPLUA_EVENT_UNLOAD ),
+	ENUM2STRING( JPLUA_EVENT_RUNFRAME ),
+	ENUM2STRING( JPLUA_EVENT_CHATMSGRECV ),
+	ENUM2STRING( JPLUA_EVENT_CHATMSGSEND ),
+	ENUM2STRING( JPLUA_EVENT_CLIENTBEGIN ),
+	ENUM2STRING( JPLUA_EVENT_CLIENTCOMMAND ),
+	ENUM2STRING( JPLUA_EVENT_CLIENTCONNECT ),
+	ENUM2STRING( JPLUA_EVENT_CLIENTDISCONNECT ),
+	ENUM2STRING( JPLUA_EVENT_CLIENTINFO ),
+	ENUM2STRING( JPLUA_EVENT_CLIENTSPAWN ),
+	ENUM2STRING( JPLUA_EVENT_CLIENTUSERINFOCHANGED ),
+	ENUM2STRING( JPLUA_EVENT_HUD ),
+	ENUM2STRING( JPLUA_EVENT_PAIN ),
+	ENUM2STRING( JPLUA_EVENT_PLAYERDEATH ),
+	ENUM2STRING( JPLUA_EVENT_SABERTOUCH ),
 };
 
 // called by lua
@@ -41,7 +41,7 @@ int JPLua_Event_AddListener( lua_State *L ) {
 		return 0;
 	}
 
-	for ( i=0; i<JPLUA_EVENT_MAX; i++ ) {
+	for ( i = 0; i < JPLUA_EVENT_MAX; i++ ) {
 		if ( !Q_stricmp( listenerArg, jplua_events[i].name ) ) {
 			JPLua.currentPlugin->eventListeners[i] = luaL_ref( L, LUA_REGISTRYINDEX );
 			return 0;
@@ -75,7 +75,7 @@ int JPLua_Event_RemoveListener( lua_State *L ) {
 		return 0;
 	}
 
-	for ( i=0; i<JPLUA_EVENT_MAX; i++ ) {
+	for ( i = 0; i < JPLUA_EVENT_MAX; i++ ) {
 		if ( !Q_stricmp( listenerArg, jplua_events[i].name ) ) {
 			luaL_unref( L, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[i] );
 			JPLua.currentPlugin->eventListeners[i] = 0;
@@ -164,7 +164,7 @@ void JPLua_Event_RunFrame( void ) {
 
 #ifdef _CGAME
 char *JPLua_Event_ChatMessageRecieved( const char *msg ) {
-	static char tmpMsg[MAX_SAY_TEXT] = {0}; // although a chat message can only be MAX_SAY_TEXT long..-name?
+	static char tmpMsg[MAX_SAY_TEXT] = { 0 }; // although a chat message can only be MAX_SAY_TEXT long..-name?
 
 	Q_strncpyz( tmpMsg, msg, MAX_SAY_TEXT );
 
@@ -195,9 +195,9 @@ char *JPLua_Event_ChatMessageRecieved( const char *msg ) {
 
 #ifdef _CGAME
 char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targetClient ) {
-	static char tmpMsg[MAX_STRING_CHARS] = {0}; // although a chat message can only be MAX_SAY_TEXT long..-name?
+	static char tmpMsg[MAX_STRING_CHARS] = { 0 }; // although a chat message can only be MAX_SAY_TEXT long..-name?
 
-	Q_strncpyz( tmpMsg, msg, sizeof( tmpMsg ) );
+	Q_strncpyz( tmpMsg, msg, sizeof(tmpMsg) );
 
 #ifdef JPLUA
 	for ( JPLua.currentPlugin = JPLua.plugins; JPLua.currentPlugin; JPLua.currentPlugin = JPLua.currentPlugin->next ) {
@@ -259,10 +259,10 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 			//Push table of arguments
 			lua_newtable( JPLua.state );
 			top = lua_gettop( JPLua.state );
-			for ( i=0; i<numArgs; i++ ) {
+			for ( i = 0; i < numArgs; i++ ) {
 				char argN[MAX_TOKEN_CHARS];
-				trap->Argv( i, argN, sizeof( argN ) );
-				lua_pushnumber( JPLua.state, i+1 );
+				trap->Argv( i, argN, sizeof(argN) );
+				lua_pushnumber( JPLua.state, i + 1 );
 				lua_pushstring( JPLua.state, argN );
 				lua_settable( JPLua.state, top );
 			}
@@ -273,7 +273,7 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 		while ( cmd ) {
 			char arg1[MAX_TOKEN_CHARS];
 
-			trap->Argv( 0, arg1, sizeof( arg1 ) );
+			trap->Argv( 0, arg1, sizeof(arg1) );
 
 			if ( !Q_stricmp( arg1, cmd->command ) ) {
 				lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, cmd->handle );
@@ -283,9 +283,9 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 				//Push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
-				for ( i=1; i<numArgs; i++ ) {
+				for ( i = 1; i < numArgs; i++ ) {
 					char argN[MAX_TOKEN_CHARS];
-					trap->Argv( i, argN, sizeof( argN ) );
+					trap->Argv( i, argN, sizeof(argN) );
 					lua_pushnumber( JPLua.state, i );
 					lua_pushstring( JPLua.state, argN );
 					lua_settable( JPLua.state, top );
@@ -379,7 +379,7 @@ void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientI
 			// Create a player instance for this client number and push on stack
 			JPLua_Player_CreateRef( JPLua.state, clientNum );
 
-			for ( i=0; i<2; i++ ) {
+			for ( i = 0; i < 2; i++ ) {
 				clientInfo_t *ci = i ? newInfo : oldInfo;
 				lua_newtable( JPLua.state );
 				top1 = lua_gettop( JPLua.state );
@@ -591,7 +591,7 @@ qboolean JPLua_Event_ConsoleCommand( void ) {
 				// push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
-				for ( i=1; i<trap->Cmd_Argc(); i++ ) {
+				for ( i = 1; i < trap->Cmd_Argc(); i++ ) {
 					lua_pushnumber( JPLua.state, i );
 					lua_pushstring( JPLua.state, CG_Argv( i ) );
 					lua_settable( JPLua.state, top );
@@ -623,7 +623,7 @@ qboolean JPLua_Event_ServerCommand( void ) {
 			int top, i, numArgs = trap->Argc();
 			char arg1[MAX_TOKEN_CHARS];
 
-			trap->Argv( 0, arg1, sizeof( arg1 ) );
+			trap->Argv( 0, arg1, sizeof(arg1) );
 
 			if ( !Q_stricmp( arg1, cmd->command ) ) {
 				lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, cmd->handle );
@@ -631,9 +631,9 @@ qboolean JPLua_Event_ServerCommand( void ) {
 				//Push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
-				for ( i=1; i<numArgs; i++ ) {
+				for ( i = 1; i < numArgs; i++ ) {
 					char argN[MAX_TOKEN_CHARS];
-					trap->Argv( i, argN, sizeof( argN ) );
+					trap->Argv( i, argN, sizeof(argN) );
 					lua_pushnumber( JPLua.state, i );
 					lua_pushstring( JPLua.state, argN );
 					lua_settable( JPLua.state, top );
@@ -664,7 +664,7 @@ qboolean JPLua_Event_ServerCommand( void ) {
 				//Push table of arguments
 				lua_newtable( JPLua.state );
 				top = lua_gettop( JPLua.state );
-				for ( i=1; i<trap->Cmd_Argc(); i++ ) {
+				for ( i = 1; i < trap->Cmd_Argc(); i++ ) {
 					lua_pushnumber( JPLua.state, i );
 					lua_pushstring( JPLua.state, CG_Argv( i ) );
 					lua_settable( JPLua.state, top );

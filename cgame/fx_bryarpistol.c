@@ -2,7 +2,7 @@
 #include "fx_local.h"
 #include "cg_media.h"
 
-void FX_BryarProjectileThink(  centity_t *cent, const struct weaponInfo_s *weapon ) {
+void FX_BryarProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon ) {
 	vector3 forward;
 
 	if ( VectorNormalize2( &cent->currentState.pos.trDelta, &forward ) == 0.0f )
@@ -19,7 +19,7 @@ void FX_BryarHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid ) {
 	trap->FX_PlayEffectID( humanoid ? media.efx.pistol.fleshImpact : media.efx.pistol.droidImpact, origin, normal, -1, -1, qfalse );
 }
 
-void FX_BryarAltProjectileThink(  centity_t *cent, const struct weaponInfo_s *weapon ) {
+void FX_BryarAltProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon ) {
 	vector3 forward;
 	int t;
 
@@ -27,7 +27,7 @@ void FX_BryarAltProjectileThink(  centity_t *cent, const struct weaponInfo_s *we
 		forward.z = 1.0f;
 
 	// see if we have some sort of extra charge going on
-	for ( t=1; t<cent->currentState.generic1; t++ ) {
+	for ( t = 1; t < cent->currentState.generic1; t++ ) {
 		// just add ourselves over, and over, and over when we are charged
 		trap->FX_PlayEffectID( media.efx.pistol.powerupShot, &cent->lerpOrigin, &forward, -1, -1, qfalse );
 	}

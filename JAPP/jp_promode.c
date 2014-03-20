@@ -36,14 +36,14 @@ void CPM_PM_Aircontrol( pmove_t *pmove, vector3 *wishdir, float wishspeed ) {
 	float zspeed, speed, dot, k;
 
 	// can't control movement if not moving forward or backward
-	if ( (pmove->ps->movementDir && pmove->ps->movementDir !=4 ) || (int)wishspeed == 0 )
+	if ( (pmove->ps->movementDir && pmove->ps->movementDir != 4) || (int)wishspeed == 0 )
 		return;
 
 	zspeed = pmove->ps->velocity.z;
 	pmove->ps->velocity.z = 0;
 	speed = VectorNormalize( &pmove->ps->velocity );
 
-	dot = DotProduct( &pmove->ps->velocity, wishdir);
+	dot = DotProduct( &pmove->ps->velocity, wishdir );
 	k = 32;
 	k *= cpm_pm_aircontrol*dot*dot*pml.frametime;
 

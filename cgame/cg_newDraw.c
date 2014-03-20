@@ -13,35 +13,35 @@ int CG_GetSelectedPlayer( void ) {
 
 qhandle_t CG_StatusHandle( int task ) {
 	switch ( task ) {
-		case TEAMTASK_OFFENSE:
-			return media.gfx.interface.team.assault;
+	case TEAMTASK_OFFENSE:
+		return media.gfx.interface.team.assault;
 
-		case TEAMTASK_DEFENSE:
-			return media.gfx.interface.team.defend;
+	case TEAMTASK_DEFENSE:
+		return media.gfx.interface.team.defend;
 
-		case TEAMTASK_PATROL:
-			return media.gfx.interface.team.patrol;
+	case TEAMTASK_PATROL:
+		return media.gfx.interface.team.patrol;
 
-		case TEAMTASK_FOLLOW:
-			return media.gfx.interface.team.follow;
+	case TEAMTASK_FOLLOW:
+		return media.gfx.interface.team.follow;
 
-		case TEAMTASK_CAMP:
-			return media.gfx.interface.team.camp;
+	case TEAMTASK_CAMP:
+		return media.gfx.interface.team.camp;
 
-		case TEAMTASK_RETRIEVE:
-			return media.gfx.interface.team.retrieve;
+	case TEAMTASK_RETRIEVE:
+		return media.gfx.interface.team.retrieve;
 
-		case TEAMTASK_ESCORT:
-			return media.gfx.interface.team.escort;
+	case TEAMTASK_ESCORT:
+		return media.gfx.interface.team.escort;
 
-		default:
-			return media.gfx.interface.team.assault;
+	default:
+		return media.gfx.interface.team.assault;
 	}
 }
 
 float CG_GetValue( int ownerDraw ) {
 	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
- 	clientInfo_t *ci;
+	clientInfo_t *ci;
 	playerState_t *ps = &cg.snap->ps;
 
 	switch ( ownerDraw ) {
@@ -159,7 +159,7 @@ qboolean CG_OwnerDrawVisible( uint32_t flags ) {
 	if ( flags & CG_SHOW_YOURTEAMHASENEMYFLAG )
 		return CG_YourTeamHasFlag();
 
-	if ( flags & (CG_SHOW_BLUE_TEAM_HAS_REDFLAG|CG_SHOW_RED_TEAM_HAS_BLUEFLAG) ) {
+	if ( flags & (CG_SHOW_BLUE_TEAM_HAS_REDFLAG | CG_SHOW_RED_TEAM_HAS_BLUEFLAG) ) {
 		if ( flags & CG_SHOW_BLUE_TEAM_HAS_REDFLAG && cgs.redflag == FLAG_TAKEN )
 			return qtrue;
 		else if ( flags & CG_SHOW_RED_TEAM_HAS_BLUEFLAG && cgs.blueflag == FLAG_TAKEN )
@@ -183,12 +183,12 @@ qboolean CG_OwnerDrawVisible( uint32_t flags ) {
 	}
 
 	if ( flags & CG_SHOW_HEALTHCRITICAL ) {
-		if (cg.snap->ps.stats[STAT_HEALTH] < 25)
+		if ( cg.snap->ps.stats[STAT_HEALTH] < 25 )
 			return qtrue;
 	}
 
 	if ( flags & CG_SHOW_HEALTHOK ) {
-		if (cg.snap->ps.stats[STAT_HEALTH] >= 25)
+		if ( cg.snap->ps.stats[STAT_HEALTH] >= 25 )
 			return qtrue;
 	}
 
@@ -219,16 +219,16 @@ const char *CG_GetKillerText( void ) {
 	return "";
 }
 
-const char *CG_GetGameStatusText(void) {
+const char *CG_GetGameStatusText( void ) {
 	if ( cgs.gametype == GT_POWERDUEL )
 		return "";
 
 	else if ( cgs.gametype < GT_TEAM ) {
 		if ( cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 			char sPlaceWith[256];
-			trap->SE_GetStringTextString( "MP_INGAME_PLACE_WITH", sPlaceWith, sizeof( sPlaceWith ) );
+			trap->SE_GetStringTextString( "MP_INGAME_PLACE_WITH", sPlaceWith, sizeof(sPlaceWith) );
 
-			return va( "%s %s %i", CG_PlaceString( cg.snap->ps.persistant[PERS_RANK]+1 ), sPlaceWith, cg.snap->ps.persistant[PERS_SCORE] );
+			return va( "%s %s %i", CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ), sPlaceWith, cg.snap->ps.persistant[PERS_SCORE] );
 		}
 	}
 
@@ -246,8 +246,7 @@ const char *CG_GetGameStatusText(void) {
 
 // maxX param is initially an X limit, but is also used as feedback. 0 = text was clipped to fit within, else maxX = next pos
 void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vector4 *color, const char *text, float adjust,
-	int limit, int iMenuFont )
-{
+	int limit, int iMenuFont ) {
 	qboolean bIsTrailingPunctuation;
 
 	// this is kinda dirty, but...
@@ -258,15 +257,14 @@ void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vect
 	if ( x + iPixelLen > *maxX ) {
 		// whole text won't fit, so we need to print just the amount that does...
 		//  Ok, this is slow and tacky, but only called occasionally, and it works...
-		char sTemp[4096] = {0};	// lazy assumption
+		char sTemp[4096] = { 0 };	// lazy assumption
 		const char *psText = text;
 		char *psOut = &sTemp[0];
 		char *psOutLastGood = psOut;
 		unsigned int uiLetter;
 
-		while ( *psText && (x + trap->R_Font_StrLenPixels( sTemp, iFontIndex, scale ) <= *maxX )
-			&& psOut < &sTemp[sizeof( sTemp )-1] )
-		{
+		while ( *psText && (x + trap->R_Font_StrLenPixels( sTemp, iFontIndex, scale ) <= *maxX)
+			&& psOut < &sTemp[sizeof(sTemp)-1] ) {
 			int iAdvanceCount;
 			psOutLastGood = psOut;
 
@@ -306,7 +304,7 @@ void CG_DrawNewTeamInfo( rectDef_t *rect, float text_x, float text_y, float scal
 	// max player name width
 	pwidth = 0;
 	count = (numSortedTeamPlayers > 8) ? 8 : numSortedTeamPlayers;
-	for ( i=0; i<count; i++ ) {
+	for ( i = 0; i<count; i++ ) {
 		ci = cgs.clientinfo + sortedTeamPlayers[i];
 		if ( ci->infoValid && ci->team == cg.snap->ps.persistant[PERS_TEAM] ) {
 			len = CG_Text_Width( ci->name, scale, 0 );
@@ -317,8 +315,8 @@ void CG_DrawNewTeamInfo( rectDef_t *rect, float text_x, float text_y, float scal
 
 	// max location name width
 	lwidth = 0;
-	for ( i=1; i<MAX_LOCATIONS; i++ ) {
-		p = CG_GetLocationString( CG_ConfigString( CS_LOCATIONS+i ) );
+	for ( i = 1; i<MAX_LOCATIONS; i++ ) {
+		p = CG_GetLocationString( CG_ConfigString( CS_LOCATIONS + i ) );
 		if ( p && *p ) {
 			len = CG_Text_Width( p, scale, 0 );
 			if ( len > lwidth )
@@ -328,13 +326,13 @@ void CG_DrawNewTeamInfo( rectDef_t *rect, float text_x, float text_y, float scal
 
 	y = rect->y;
 
-	for ( i=0; i<count; i++ ) {
+	for ( i = 0; i < count; i++ ) {
 		ci = cgs.clientinfo + sortedTeamPlayers[i];
 		if ( ci->infoValid && ci->team == cg.snap->ps.persistant[PERS_TEAM] ) {
 			xx = rect->x + 1;
-			for ( j=0; j<=PW_NUM_POWERUPS; j++ ) {
-				if ( ci->powerups & (1<<j) ) {
-					if ( (item=BG_FindItemForPowerup( j )) ) {
+			for ( j = 0; j <= PW_NUM_POWERUPS; j++ ) {
+				if ( ci->powerups & (1 << j) ) {
+					if ( (item = BG_FindItemForPowerup( j )) ) {
 						CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, trap->R_RegisterShader( item->icon ) );
 						xx += PIC_WIDTH;
 					}
@@ -348,8 +346,8 @@ void CG_DrawNewTeamInfo( rectDef_t *rect, float text_x, float text_y, float scal
 			trap->R_SetColor( &hcolor );
 			CG_DrawPic( xx, y + 1, PIC_WIDTH - 2, PIC_WIDTH - 2, media.gfx.interface.heart );
 
-		//	Com_sprintf( st, sizeof(st), "%3i %3i", ci->health,	ci->armor );
-		//	CG_Text_Paint( xx, y + text_y, scale, hcolor, st, 0, 0 );
+			//	Com_sprintf( st, sizeof(st), "%3i %3i", ci->health,	ci->armor );
+			//	CG_Text_Paint( xx, y + text_y, scale, hcolor, st, 0, 0 );
 
 			// draw weapon icon
 			xx += PIC_WIDTH + 1;
@@ -367,7 +365,7 @@ void CG_DrawNewTeamInfo( rectDef_t *rect, float text_x, float text_y, float scal
 
 			CG_Text_Paint_Limit( &maxx, xx, y + text_y, scale, color, ci->name, 0, 0, FONT_MEDIUM );
 
-			p = CG_GetLocationString( CG_ConfigString( CS_LOCATIONS+ci->location ) );
+			p = CG_GetLocationString( CG_ConfigString( CS_LOCATIONS + ci->location ) );
 			if ( !p || !*p )
 				p = "unknown";
 
@@ -511,15 +509,14 @@ void CG_DrawMedal( int ownerDraw, rectDef_t *rect, float scale, const vector4 *c
 	if ( text ) {
 		newColour.a = 1.0f;
 		value = CG_Text_Width( text, scale, 0 );
-		CG_Text_Paint( rect->x + (rect->w - value) / 2, rect->y + rect->h + 10 , scale, &newColour, text, 0, 0, 0, FONT_MEDIUM );
+		CG_Text_Paint( rect->x + (rect->w - value) / 2, rect->y + rect->h + 10, scale, &newColour, text, 0, 0, 0, FONT_MEDIUM );
 	}
 
 	trap->R_SetColor( NULL );
 }
 
 void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags,
-	int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle, int font )
-{
+	int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle, int font ) {
 	//Ignore all this, at least for now. May put some stat stuff back in menu files later.
 #if 0
 	rectDef_t rect;
@@ -527,8 +524,8 @@ void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_
 	if ( cg_drawStatus.integer == 0 )
 		return;
 
-//	if ( ownerDrawFlags != 0 && !CG_OwnerDrawVisible( ownerDrawFlags ) )
-//		return;
+	//	if ( ownerDrawFlags != 0 && !CG_OwnerDrawVisible( ownerDrawFlags ) )
+	//		return;
 
 	rect.x = x;
 	rect.y = y;
@@ -755,10 +752,9 @@ void CG_MouseEvent( int x, int y ) {
 
 	if ( (cg.predictedPlayerState.pm_type == PM_NORMAL || cg.predictedPlayerState.pm_type == PM_JETPACK
 		|| cg.predictedPlayerState.pm_type == PM_FLOAT || cg.predictedPlayerState.pm_type == PM_SPECTATOR)
-		&& cg.showScores == qfalse )
-	{
-	//	trap->Key_SetCatcher( 0 );
-	//	return;
+		&& cg.showScores == qfalse ) {
+		//	trap->Key_SetCatcher( 0 );
+		//	return;
 	}
 
 	cgs.cursorX += x;
@@ -808,8 +804,7 @@ void CG_KeyEvent( int key, qboolean down ) {
 
 	if ( cg.predictedPlayerState.pm_type == PM_NORMAL || cg.predictedPlayerState.pm_type == PM_JETPACK
 		|| cg.predictedPlayerState.pm_type == PM_NORMAL || (cg.predictedPlayerState.pm_type == PM_SPECTATOR
-		&& cg.showScores == qfalse) )
-	{
+		&& cg.showScores == qfalse) ) {
 		CG_EventHandling( CGAME_EVENT_NONE );
 		trap->Key_SetCatcher( 0 );
 		return;
@@ -823,9 +818,9 @@ void CG_KeyEvent( int key, qboolean down ) {
 		cgs.capturedItem = Display_CaptureItem( cgs.cursorX, cgs.cursorY );
 }
 
-int CG_ClientNumFromName(const char *p) {
+int CG_ClientNumFromName( const char *p ) {
 	int i;
-	for ( i=0; i<cgs.maxclients; i++ ) {
+	for ( i = 0; i < cgs.maxclients; i++ ) {
 		if ( cgs.clientinfo[i].infoValid && !Q_stricmp( cgs.clientinfo[i].name, p ) )
 			return i;
 	}

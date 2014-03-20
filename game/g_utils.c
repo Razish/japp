@@ -7,8 +7,8 @@
 #include "qcommon/q_shared.h"
 
 typedef struct shaderRemap_s {
-  char oldShader[MAX_QPATH], newShader[MAX_QPATH];
-  float timeOffset;
+	char oldShader[MAX_QPATH], newShader[MAX_QPATH];
+	float timeOffset;
 } shaderRemap_t;
 
 #define MAX_SHADER_REMAPS (128)
@@ -19,31 +19,31 @@ static shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
 static void AddRemap( const char *oldShader, const char *newShader, float timeOffset ) {
 	int i;
 
-	for ( i=0; i<remapCount; i++ ) {
+	for ( i = 0; i < remapCount; i++ ) {
 		if ( !Q_stricmp( oldShader, remappedShaders[i].oldShader ) ) {
 			// found it, just update this one
-			Q_strncpyz( remappedShaders[i].newShader, newShader, sizeof( remappedShaders[i].newShader ) );
+			Q_strncpyz( remappedShaders[i].newShader, newShader, sizeof(remappedShaders[i].newShader) );
 			remappedShaders[i].timeOffset = timeOffset;
 			return;
 		}
 	}
 	if ( remapCount < MAX_SHADER_REMAPS ) {
-		Q_strncpyz( remappedShaders[remapCount].newShader, newShader, sizeof( remappedShaders[remapCount].newShader ) );
-		Q_strncpyz( remappedShaders[remapCount].oldShader, oldShader, sizeof( remappedShaders[remapCount].oldShader ) );
+		Q_strncpyz( remappedShaders[remapCount].newShader, newShader, sizeof(remappedShaders[remapCount].newShader) );
+		Q_strncpyz( remappedShaders[remapCount].oldShader, oldShader, sizeof(remappedShaders[remapCount].oldShader) );
 		remappedShaders[remapCount].timeOffset = timeOffset;
 		remapCount++;
 	}
 }
 
 static const char *BuildShaderStateConfig( void ) {
-	static char buf[MAX_STRING_CHARS*4];
-	char out[(MAX_QPATH*2) + 5];
+	static char buf[MAX_STRING_CHARS * 4];
+	char out[(MAX_QPATH * 2) + 5];
 	int i;
 
 	memset( buf, 0, MAX_STRING_CHARS );
-	for ( i=0; i<remapCount; i++ ) {
-		Com_sprintf( out, sizeof( out ), "%s=%s:%5.2f@", remappedShaders[i].oldShader, remappedShaders[i].newShader, remappedShaders[i].timeOffset );
-		Q_strcat( buf, sizeof( buf ), out);
+	for ( i = 0; i < remapCount; i++ ) {
+		Com_sprintf( out, sizeof(out), "%s=%s:%5.2f@", remappedShaders[i].oldShader, remappedShaders[i].newShader, remappedShaders[i].timeOffset );
+		Q_strcat( buf, sizeof(buf), out );
 	}
 
 	return buf;
@@ -56,8 +56,8 @@ static int G_FindConfigstringIndex( const char *name, int start, int max, qboole
 	if ( !name || !name[0] )
 		return 0;
 
-	for ( i=1; i<max; i++ ) {
-		trap->GetConfigstring( start+i, s, sizeof( s ) );
+	for ( i = 1; i < max; i++ ) {
+		trap->GetConfigstring( start + i, s, sizeof(s) );
 		if ( !s[0] )
 			break;
 
@@ -71,7 +71,7 @@ static int G_FindConfigstringIndex( const char *name, int start, int max, qboole
 	if ( i == max )
 		trap->Error( ERR_DROP, "G_FindConfigstringIndex: overflow" );
 
-	trap->SetConfigstring( start+i, name );
+	trap->SetConfigstring( start + i, name );
 
 	return i;
 }
@@ -110,7 +110,7 @@ void G_TeamCommand( team_t team, const char *cmd ) {
 	int i = 0;
 	gclient_t *cl = NULL;
 
-	for ( i=0, cl=level.clients; i<level.maxclients; i++, cl++ ) {
+	for ( i = 0, cl = level.clients; i < level.maxclients; i++, cl++ ) {
 		if ( cl->pers.connected == CON_CONNECTED && cl->sess.sessionTeam == team )
 			trap->SendServerCommand( i, cmd );
 	}
@@ -128,7 +128,7 @@ gentity_t *G_Find( gentity_t *from, int fieldofs, const char *match ) {
 	else
 		from++;
 
-	for ( ; from<&g_entities[level.num_entities]; from++ ) {
+	for ( ; from < &g_entities[level.num_entities]; from++ ) {
 		if ( !from->inuse )
 			continue;
 		s = *(char **)((byte *)from + fieldofs);
@@ -147,27 +147,27 @@ int G_RadiusList( vector3 *origin, float radius, gentity_t *ignore, qboolean tak
 	gentity_t *ent;
 	int entityList[MAX_GENTITIES], numListedEntities;
 	vector3 mins, maxs, v;
-	int i, e, count=0;
+	int i, e, count = 0;
 
 	if ( radius < 1 )
 		radius = 1;
 
-	for ( i=0; i<3; i++ ) {
+	for ( i = 0; i < 3; i++ ) {
 		mins.data[i] = origin->data[i] - radius;
 		maxs.data[i] = origin->data[i] + radius;
 	}
 
 	numListedEntities = trap->EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
 
-	for ( e=0; e<numListedEntities ; e++ ) {
+	for ( e = 0; e < numListedEntities; e++ ) {
 		ent = &g_entities[entityList[e]];
 
 		if ( (ent == ignore) || !ent->inuse || ent->takedamage != takeDamage )
 			continue;
 
 		// find the distance from the edge of the bounding box
-		for ( i=0; i<3; i++ ) {
-				 if ( origin->data[i] < ent->r.absmin.data[i] )	v.data[i] = ent->r.absmin.data[i] - origin->data[i];
+		for ( i = 0; i < 3; i++ ) {
+			if ( origin->data[i] < ent->r.absmin.data[i] )	v.data[i] = ent->r.absmin.data[i] - origin->data[i];
 			else if ( origin->data[i] > ent->r.absmax.data[i] )	v.data[i] = origin->data[i] - ent->r.absmax.data[i];
 			else												v.data[i] = 0;
 		}
@@ -184,7 +184,7 @@ int G_RadiusList( vector3 *origin, float radius, gentity_t *ignore, qboolean tak
 
 void G_Throw( gentity_t *targ, vector3 *newDir, float push ) {
 	vector3 kvel;
-	float mass = (targ->physicsBounce>0) ? targ->physicsBounce : 200;
+	float mass = (targ->physicsBounce > 0) ? targ->physicsBounce : 200;
 
 	if ( g_gravity.value > 0 ) {
 		VectorScale( newDir, g_knockback.value * push / mass * 0.8f, &kvel );
@@ -203,7 +203,7 @@ void G_Throw( gentity_t *targ, vector3 *newDir, float push ) {
 
 	// set the timer so that the other client can't cancel out the movement immediately
 	if ( targ->client && !targ->client->ps.pm_time ) {
-		targ->client->ps.pm_time = Q_clampi( 50, push*2, 200 );
+		targ->client->ps.pm_time = Q_clampi( 50, push * 2, 200 );
 		targ->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 	}
 }
@@ -218,14 +218,14 @@ void G_AllocateVehicleObject( Vehicle_t **pVeh ) {
 
 	if ( !g_vehiclePoolInit ) {
 		g_vehiclePoolInit = qtrue;
-		memset( g_vehiclePoolOccupied, 0, sizeof( g_vehiclePoolOccupied ) );
+		memset( g_vehiclePoolOccupied, 0, sizeof(g_vehiclePoolOccupied) );
 	}
 
-	for ( i=0; i<MAX_VEHICLES_AT_A_TIME; i++ ) {
+	for ( i = 0; i < MAX_VEHICLES_AT_A_TIME; i++ ) {
 		// iterate through and try to find a free one
 		if ( !g_vehiclePoolOccupied[i] ) {
 			g_vehiclePoolOccupied[i] = qtrue;
-			memset( &g_vehiclePool[i], 0, sizeof( Vehicle_t ) );
+			memset( &g_vehiclePool[i], 0, sizeof(Vehicle_t) );
 			*pVeh = &g_vehiclePool[i];
 			return;
 		}
@@ -237,7 +237,7 @@ void G_AllocateVehicleObject( Vehicle_t **pVeh ) {
 // free the pointer, sort of a lame method
 void G_FreeVehicleObject( Vehicle_t *pVeh ) {
 	int i = 0;
-	for ( i=0; i<MAX_VEHICLES_AT_A_TIME; i++ ) {
+	for ( i = 0; i < MAX_VEHICLES_AT_A_TIME; i++ ) {
 		if ( g_vehiclePoolOccupied[i] && &g_vehiclePool[i] == pVeh ) {
 			// guess this is it
 			g_vehiclePoolOccupied[i] = qfalse;
@@ -249,18 +249,18 @@ void G_FreeVehicleObject( Vehicle_t *pVeh ) {
 static gclient_t *gClPtrs[MAX_GENTITIES];
 
 void G_CreateFakeClient( int entNum, gclient_t **cl ) {
-//	trap->TrueMalloc( (void **)cl, sizeof( gclient_t ) );
+	//	trap->TrueMalloc( (void **)cl, sizeof( gclient_t ) );
 	if ( !gClPtrs[entNum] )
-		gClPtrs[entNum] = (gclient_t *)BG_Alloc( sizeof( gclient_t ) );
+		gClPtrs[entNum] = (gclient_t *)BG_Alloc( sizeof(gclient_t) );
 
 	*cl = gClPtrs[entNum];
 }
 
 // Finally reworked PM_SetAnim to allow non-pmove calls, so we take our local anim index into account and make the call -rww
-void BG_SetAnim( playerState_t *ps, animation_t *animations, int setAnimParts,int anim,uint32_t setAnimFlags, int blendTime );
+void BG_SetAnim( playerState_t *ps, animation_t *animations, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime );
 void G_SetAnim( gentity_t *ent, usercmd_t *ucmd, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime ) {
 	assert( ent->client );
-    BG_SetAnim( &ent->client->ps, bgAllAnims[ent->localAnimIndex].anims, setAnimParts, anim, setAnimFlags, blendTime );
+	BG_SetAnim( &ent->client->ps, bgAllAnims[ent->localAnimIndex].anims, setAnimParts, anim, setAnimFlags, blendTime );
 }
 
 // Selects a random entity from among the targets
@@ -341,10 +341,10 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 // The editor only specifies a single value for angles (yaw), but we have special constants to generate an up or down direction.
 //	Angles will be cleared, because it is being used to represent a direction instead of an orientation.
 void G_SetMovedir( vector3 *angles, vector3 *movedir ) {
-	static vector3 VEC_UP		= { 0, -1,  0 };
-	static vector3 MOVEDIR_UP	= { 0,  0,  1 };
-	static vector3 VEC_DOWN		= { 0, -2,  0 };
-	static vector3 MOVEDIR_DOWN	= { 0,  0, -1 };
+	static vector3 VEC_UP = { 0, -1, 0 };
+	static vector3 MOVEDIR_UP = { 0, 0, 1 };
+	static vector3 VEC_DOWN = { 0, -2, 0 };
+	static vector3 MOVEDIR_DOWN = { 0, 0, -1 };
 
 	if ( VectorCompare( angles, &VEC_UP ) )
 		VectorCopy( &MOVEDIR_UP, movedir );
@@ -359,7 +359,7 @@ void G_SetMovedir( vector3 *angles, vector3 *movedir ) {
 void G_InitGentity( gentity_t *e ) {
 	e->inuse = qtrue;
 	e->classname = "noclass";
-	e->s.number = e-g_entities;
+	e->s.number = e - g_entities;
 	e->r.ownerNum = ENTITYNUM_NONE;
 	e->s.modelGhoul2 = 0; //assume not
 
@@ -368,19 +368,19 @@ void G_InitGentity( gentity_t *e ) {
 
 // give us some decent info on all the active ents -rww
 static void G_SpewEntList( void ) {
-	int i=0, numNPC=0, numProjectile=0, numTempEnt=0, numTempEntST=0;
-	char className[MAX_STRING_CHARS], buf[256]={0};
+	int i = 0, numNPC = 0, numProjectile = 0, numTempEnt = 0, numTempEntST = 0;
+	char className[MAX_STRING_CHARS], buf[256] = { 0 };
 	gentity_t *ent;
 	fileHandle_t fh;
 	time_t rawtime;
 	const char *str;
 
 	time( &rawtime );
-	strftime( buf, sizeof( buf ), "%Y-%m-%d_%H-%M-%S", gmtime( &rawtime ) );
+	strftime( buf, sizeof(buf), "%Y-%m-%d_%H-%M-%S", gmtime( &rawtime ) );
 	trap->FS_Open( va( "entspew_%s.txt", buf ), &fh, FS_WRITE );
-	trap->FS_Write( va( "================================\nEntspew triggered at: %s\n================================\n\n", buf ), sizeof( buf ), fh );
+	trap->FS_Write( va( "================================\nEntspew triggered at: %s\n================================\n\n", buf ), sizeof(buf), fh );
 
-	for ( i=0, ent=g_entities; i<ENTITYNUM_MAX_NORMAL; i++, ent++ ) {
+	for ( i = 0, ent = g_entities; i < ENTITYNUM_MAX_NORMAL; i++, ent++ ) {
 		if ( ent->inuse ) {
 			if ( ent->s.eType == ET_NPC )
 				numNPC++;
@@ -391,16 +391,16 @@ static void G_SpewEntList( void ) {
 				if ( ent->s.eFlags & EF_SOUNDTRACKER )
 					numTempEntST++;
 
-				str = va( "TEMPENT %4i: EV %i\n", ent->s.number, ent->s.eType-ET_EVENTS );
+				str = va( "TEMPENT %4i: EV %i\n", ent->s.number, ent->s.eType - ET_EVENTS );
 				Com_Printf( str );
 				if ( fh )
 					trap->FS_Write( str, strlen( str ), fh );
 			}
 
 			if ( ent->classname && ent->classname[0] )
-				Q_strncpyz( className, ent->classname, sizeof( className ) );
+				Q_strncpyz( className, ent->classname, sizeof(className) );
 			else
-				Q_strncpyz( className, "Unknown", sizeof( className ) );
+				Q_strncpyz( className, "Unknown", sizeof(className) );
 			str = va( "ENT %4i: Classname %s\n", ent->s.number, className );
 			Com_Printf( str );
 			if ( fh )
@@ -424,9 +424,9 @@ gentity_t *G_Spawn( void ) {
 	int i, force;
 	gentity_t *e = NULL;
 
-	for ( force=0; force<2; force++ ) {
+	for ( force = 0; force < 2; force++ ) {
 		// if we go through all entities and can't find one to free, override the normal minimum times before use
-		for ( i=MAX_CLIENTS, e=&g_entities[MAX_CLIENTS]; i<level.num_entities; i++, e++ ) {
+		for ( i = MAX_CLIENTS, e = &g_entities[MAX_CLIENTS]; i<level.num_entities; i++, e++ ) {
 			if ( e->inuse )
 				continue;
 
@@ -452,7 +452,7 @@ gentity_t *G_Spawn( void ) {
 	level.num_entities++;
 
 	// let the server system know that there are more entities
-	trap->LocateGameData( (sharedEntity_t *)level.gentities, level.num_entities, sizeof( gentity_t ), &level.clients[0].ps, sizeof( level.clients[0] ) );
+	trap->LocateGameData( (sharedEntity_t *)level.gentities, level.num_entities, sizeof(gentity_t), &level.clients[0].ps, sizeof(level.clients[0]) );
 
 	G_InitGentity( e );
 	return e;
@@ -462,7 +462,7 @@ qboolean G_EntitiesFree( void ) {
 	int i;
 	gentity_t *e;
 
-	for ( i=MAX_CLIENTS, e=&g_entities[MAX_CLIENTS]; i<level.num_entities; i++, e++ ) {
+	for ( i = MAX_CLIENTS, e = &g_entities[MAX_CLIENTS]; i < level.num_entities; i++, e++ ) {
 		if ( !e->inuse )
 			return qtrue;
 	}
@@ -481,10 +481,10 @@ void G_SendG2KillQueue( void ) {
 	if ( !gG2KillNum )
 		return;
 
-	Com_sprintf( g2KillString, sizeof( g2KillString ), "kg2" );
+	Com_sprintf( g2KillString, sizeof(g2KillString), "kg2" );
 
-	for ( i=0; i<gG2KillNum && i < 64; i++ )
-		Q_strcat( g2KillString, sizeof( g2KillString ), va( " %i", gG2KillIndex[i] ) );
+	for ( i = 0; i < gG2KillNum && i < 64; i++ )
+		Q_strcat( g2KillString, sizeof(g2KillString), va( " %i", gG2KillIndex[i] ) );
 
 	trap->SendServerCommand( -1, g2KillString );
 
@@ -554,7 +554,7 @@ void G_FreeEntity( gentity_t *ed ) {
 			G_FreeEntity( &g_entities[saberEntNum] );
 		}
 
-		for ( i=0; i<MAX_SABERS; i++ ) {
+		for ( i = 0; i < MAX_SABERS; i++ ) {
 			if ( ed->client->weaponGhoul2[i] && trap->G2API_HaveWeGhoul2Models( ed->client->weaponGhoul2[i] ) )
 				trap->G2API_CleanGhoul2Models( &ed->client->weaponGhoul2[i] );
 		}
@@ -564,11 +564,11 @@ void G_FreeEntity( gentity_t *ed ) {
 		int i = 0;
 		gentity_t *ent = NULL;
 
-		for ( i=0, ent=g_entities; i<MAX_CLIENTS; i++, ent++ ) {
+		for ( i = 0, ent = g_entities; i < MAX_CLIENTS; i++, ent++ ) {
 			if ( ent && ent->inuse && ent->client ) {
 				int ch = 0;
 
-				for ( ch=TRACK_CHANNEL_NONE-50; ch<NUM_TRACK_CHANNELS-50; ch++ ) {
+				for ( ch = TRACK_CHANNEL_NONE - 50; ch < NUM_TRACK_CHANNELS - 50; ch++ ) {
 					if ( ent->client->ps.fd.killSoundEntIndex[ch] == ed->s.number )
 						ent->client->ps.fd.killSoundEntIndex[ch] = 0;
 				}
@@ -579,7 +579,7 @@ void G_FreeEntity( gentity_t *ed ) {
 		trap->SendServerCommand( -1, va( "kls %i %i", ed->s.trickedentindex, ed->s.number ) );
 	}
 
-	memset( ed, 0, sizeof( *ed ) );
+	memset( ed, 0, sizeof(*ed) );
 	ed->classname = "freed";
 	ed->freetime = level.time;
 	ed->inuse = qfalse;
@@ -602,7 +602,7 @@ gentity_t *G_TempEntity( vector3 *origin, int event ) {
 	VectorCopy( origin, &snapped );
 	VectorSnap( &snapped );		// save network bandwidth
 	G_SetOrigin( e, &snapped );
-//	VectorCopy( snapped, e->s.origin );
+	//	VectorCopy( snapped, e->s.origin );
 
 	// find cluster for PVS
 	trap->LinkEntity( (sharedEntity_t *)e );
@@ -614,8 +614,7 @@ gentity_t *G_TempEntity( vector3 *origin, int event ) {
 void G_ScaleNetHealth( gentity_t *self ) {
 	int maxHealth = self->maxHealth;
 
-    if ( maxHealth < 1000 )
-	{ //it's good then
+	if ( maxHealth < 1000 ) { //it's good then
 		self->s.maxhealth = maxHealth;
 		self->s.health = self->health;
 
@@ -626,8 +625,8 @@ void G_ScaleNetHealth( gentity_t *self ) {
 	}
 
 	// otherwise, scale it down
-	self->s.maxhealth = (maxHealth/100);
-	self->s.health = (self->health/100);
+	self->s.maxhealth = (maxHealth / 100);
+	self->s.health = (self->health / 100);
 
 	if ( self->s.health < 0 )
 		self->s.health = 0;
@@ -647,7 +646,7 @@ void G_KillBox( gentity_t *ent ) {
 	VectorAdd( &ent->client->ps.origin, &ent->r.maxs, &maxs );
 	num = trap->EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
 
-	for ( i=0; i<num; i++ ) {
+	for ( i = 0; i < num; i++ ) {
 		hit = &g_entities[touch[i]];
 		if ( !hit->client )
 			continue;
@@ -675,15 +674,15 @@ void G_AvoidBox( gentity_t *ent ) {
 	VectorAdd( &ent->client->ps.origin, &ent->r.maxs, &maxs );
 	num = trap->EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
 
-	for ( i=0; i<num; i++ ) {
-		vector3 newOrg = { ent->client->ps.origin.x, ent->client->ps.origin.y, ent->client->ps.origin.z+64.0f };
+	for ( i = 0; i < num; i++ ) {
+		vector3 newOrg = { ent->client->ps.origin.x, ent->client->ps.origin.y, ent->client->ps.origin.z + 64.0f };
 		hit = &g_entities[touch[i]];
 
 		if ( !hit->client || hit->s.number == ent->s.number || hit->s.number == ent->r.ownerNum )
 			continue;
 
 		TeleportPlayer( ent, &newOrg, &ent->client->ps.viewangles );
-	//	G_Damage( hit, ent, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG );
+		//	G_Damage( hit, ent, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG );
 	}
 
 }
@@ -708,13 +707,14 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm ) {
 	// clients need to add the event in playerState_t instead of entityState_t
 	if ( ent->client ) {
 		bits = ent->client->ps.externalEvent & EV_EVENT_BITS;
-		bits = ( bits + EV_EVENT_BIT1 ) & EV_EVENT_BITS;
+		bits = (bits + EV_EVENT_BIT1) & EV_EVENT_BITS;
 		ent->client->ps.externalEvent = event | bits;
 		ent->client->ps.externalEventParm = eventParm;
 		ent->client->ps.externalEventTime = level.time;
-	} else {
+	}
+	else {
 		bits = ent->s.event & EV_EVENT_BITS;
-		bits = ( bits + EV_EVENT_BIT1 ) & EV_EVENT_BITS;
+		bits = (bits + EV_EVENT_BIT1) & EV_EVENT_BITS;
 		ent->s.event = event | bits;
 		ent->s.eventParm = eventParm;
 	}
@@ -754,7 +754,7 @@ gentity_t *G_ScreenShake( vector3 *org, gentity_t *target, float intensity, int 
 	te->s.time = duration;
 
 	if ( target )
-		te->s.modelindex = target->s.number+1;
+		te->s.modelindex = target->s.number + 1;
 	else
 		te->s.modelindex = 0;
 
@@ -791,21 +791,20 @@ void G_Sound( gentity_t *ent, int channel, int soundIndex ) {
 
 	// let the client remember the index of the player entity so he can kill the most recent sound on request
 	if ( ent && ent->client && channel > TRACK_CHANNEL_NONE ) {
-		if ( g_entities[ent->client->ps.fd.killSoundEntIndex[channel-50]].inuse &&
-			ent->client->ps.fd.killSoundEntIndex[channel-50] > MAX_CLIENTS)
-		{
-			G_MuteSound( ent->client->ps.fd.killSoundEntIndex[channel-50], CHAN_VOICE );
-			if ( ent->client->ps.fd.killSoundEntIndex[channel-50] > MAX_CLIENTS && g_entities[ent->client->ps.fd.killSoundEntIndex[channel-50]].inuse )
-				G_FreeEntity( &g_entities[ent->client->ps.fd.killSoundEntIndex[channel-50]] );
-			ent->client->ps.fd.killSoundEntIndex[channel-50] = 0;
+		if ( g_entities[ent->client->ps.fd.killSoundEntIndex[channel - 50]].inuse &&
+			ent->client->ps.fd.killSoundEntIndex[channel - 50] > MAX_CLIENTS ) {
+			G_MuteSound( ent->client->ps.fd.killSoundEntIndex[channel - 50], CHAN_VOICE );
+			if ( ent->client->ps.fd.killSoundEntIndex[channel - 50] > MAX_CLIENTS && g_entities[ent->client->ps.fd.killSoundEntIndex[channel - 50]].inuse )
+				G_FreeEntity( &g_entities[ent->client->ps.fd.killSoundEntIndex[channel - 50]] );
+			ent->client->ps.fd.killSoundEntIndex[channel - 50] = 0;
 		}
 
-		ent->client->ps.fd.killSoundEntIndex[channel-50] = te->s.number;
+		ent->client->ps.fd.killSoundEntIndex[channel - 50] = te->s.number;
 		te->s.trickedentindex = ent->s.number;
 		te->s.eFlags = EF_SOUNDTRACKER;
 		//Raz: Looping sound fixed so all players get information about it, which can be needed later
 		te->r.svFlags |= SVF_BROADCAST;
-	//	te->freeAfterEvent = qfalse;
+		//	te->freeAfterEvent = qfalse;
 	}
 }
 
@@ -851,7 +850,7 @@ void G_UseDispenserOn( gentity_t *ent, int dispType, gentity_t *target ) {
 	if ( dispType == HI_HEALTHDISP ) {
 		target->client->ps.stats[STAT_HEALTH] += 4;
 
-		if (target->client->ps.stats[STAT_HEALTH] > target->client->ps.stats[STAT_MAX_HEALTH])
+		if ( target->client->ps.stats[STAT_HEALTH] > target->client->ps.stats[STAT_MAX_HEALTH] )
 			target->client->ps.stats[STAT_HEALTH] = target->client->ps.stats[STAT_MAX_HEALTH];
 
 		target->client->isMedHealed = level.time + 500;
@@ -862,7 +861,7 @@ void G_UseDispenserOn( gentity_t *ent, int dispType, gentity_t *target ) {
 			//do the next increment based on the amount of ammo used per normal shot.
 			target->client->ps.ammo[weaponData[target->client->ps.weapon].ammoIndex] += weaponData[target->client->ps.weapon].energyPerShot;
 
-			if (target->client->ps.ammo[weaponData[target->client->ps.weapon].ammoIndex] > ammoData[weaponData[target->client->ps.weapon].ammoIndex].max)
+			if ( target->client->ps.ammo[weaponData[target->client->ps.weapon].ammoIndex] > ammoData[weaponData[target->client->ps.weapon].ammoIndex].max )
 				target->client->ps.ammo[weaponData[target->client->ps.weapon].ammoIndex] = ammoData[weaponData[target->client->ps.weapon].ammoIndex].max;
 
 			// base the next supply time on how long the weapon takes to fire. Seems fair enough.
@@ -900,8 +899,7 @@ int G_CanUseDispOn( gentity_t *ent, int dispType ) {
 
 qboolean TryHeal( gentity_t *ent, gentity_t *target ) {
 	if ( level.gametype == GT_SIEGE && ent->client->siegeClass != -1 && target && target->inuse && target->maxHealth
-		&& target->healingclass && target->healingclass[0] && target->health > 0 && target->health < target->maxHealth )
-	{
+		&& target->healingclass && target->healingclass[0] && target->health > 0 && target->health < target->maxHealth ) {
 		siegeClass_t *scl = &bgSiegeClasses[ent->client->siegeClass];
 
 		if ( !Q_stricmp( scl->name, target->healingclass ) ) {
@@ -928,7 +926,7 @@ qboolean TryHeal( gentity_t *ent, gentity_t *target ) {
 			if ( ent->client->ps.torsoAnim == BOTH_BUTTON_HOLD || ent->client->ps.torsoAnim == BOTH_CONSOLE1 )
 				ent->client->ps.torsoTimer = 500;
 			else
-				G_SetAnim( ent, NULL, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD, 0 );
+				G_SetAnim( ent, NULL, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0 );
 
 			return qtrue;
 		}
@@ -938,10 +936,10 @@ qboolean TryHeal( gentity_t *ent, gentity_t *target ) {
 }
 
 #define USE_DISTANCE (64.0f)
-extern void Touch_Button(gentity_t *ent, gentity_t *other, trace_t *trace );
+extern void Touch_Button( gentity_t *ent, gentity_t *other, trace_t *trace );
 extern qboolean gSiegeRoundBegun;
-static vector3 playerMins = {-15, -15, DEFAULT_MINS_2 };
-static vector3 playerMaxs = { 15,  15, DEFAULT_MAXS_2 };
+static vector3 playerMins = { -15, -15, DEFAULT_MINS_2 };
+static vector3 playerMaxs = { 15, 15, DEFAULT_MAXS_2 };
 // Try and use an entity in the world, directly ahead of us
 void TryUse( gentity_t *ent ) {
 	gentity_t *target;
@@ -1011,14 +1009,14 @@ void TryUse( gentity_t *ent ) {
 	VectorMA( &src, USE_DISTANCE, &vf, &dest );
 
 	//Trace ahead to find a valid target
-	trap->Trace( &trace, &src, &vec3_origin, &vec3_origin, &dest, ent->s.number, MASK_OPAQUE|CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, qfalse, 0, 0 );
+	trap->Trace( &trace, &src, &vec3_origin, &vec3_origin, &dest, ent->s.number, MASK_OPAQUE | CONTENTS_SOLID | CONTENTS_BODY | CONTENTS_ITEM | CONTENTS_CORPSE, qfalse, 0, 0 );
 
 	if ( trace.fraction == 1.0f || trace.entityNum == ENTITYNUM_NONE ) //Raz: slot 0 fix
 		goto tryJetPack;
 
 	target = &g_entities[trace.entityNum];
 
-//Enable for corpse dragging
+	//Enable for corpse dragging
 #if 0
 	if ( target->inuse && target->s.eType == ET_BODY && ent->client->bodyGrabTime < level.time ) {
 		// then grab the body
@@ -1054,10 +1052,9 @@ void TryUse( gentity_t *ent ) {
 		}
 	}
 
-	if ( (ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & ((1 << HI_HEALTHDISP)|(1 << HI_AMMODISP))) &&
+	if ( (ent->client->ps.stats[STAT_HOLDABLE_ITEMS] & ((1 << HI_HEALTHDISP) | (1 << HI_AMMODISP))) &&
 		target && target->inuse && target->client && target->health > 0 && OnSameTeam( ent, target ) &&
-		(G_CanUseDispOn( target, HI_HEALTHDISP ) || G_CanUseDispOn( target, HI_AMMODISP )) )
-	{
+		(G_CanUseDispOn( target, HI_HEALTHDISP ) || G_CanUseDispOn( target, HI_AMMODISP )) ) {
 		// a live target that's on my team, we can use him
 		if ( G_CanUseDispOn( target, HI_HEALTHDISP ) )
 			G_UseDispenserOn( ent, HI_HEALTHDISP, target );
@@ -1068,7 +1065,7 @@ void TryUse( gentity_t *ent ) {
 		if ( ent->client->ps.torsoAnim == BOTH_BUTTON_HOLD )
 			ent->client->ps.torsoTimer = 500;
 		else
-			G_SetAnim( ent, NULL, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD, 0 );
+			G_SetAnim( ent, NULL, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0 );
 
 		ent->client->ps.weaponTime = ent->client->ps.torsoTimer;
 		return;
@@ -1076,15 +1073,14 @@ void TryUse( gentity_t *ent ) {
 
 	//Check for a use command
 	if ( ValidUseTarget( target ) && (level.gametype != GT_SIEGE
-		|| !target->alliedTeam || target->alliedTeam != ent->client->sess.sessionTeam || g_ff_objectives.integer) )
-	{
+		|| !target->alliedTeam || target->alliedTeam != ent->client->sess.sessionTeam || g_ff_objectives.integer) ) {
 		if ( ent->client->ps.torsoAnim == BOTH_BUTTON_HOLD || ent->client->ps.torsoAnim == BOTH_CONSOLE1 )
 			ent->client->ps.torsoTimer = 500;
 		else
-			G_SetAnim( ent, NULL, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD, 0 );
+			G_SetAnim( ent, NULL, SETANIM_TORSO, BOTH_BUTTON_HOLD, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0 );
 		ent->client->ps.weaponTime = ent->client->ps.torsoTimer;
 		if ( target->touch == Touch_Button )
-			target->touch(target, ent, NULL);
+			target->touch( target, ent, NULL );
 		else
 			GlobalUse( target, ent, ent );
 		return;
@@ -1110,11 +1106,11 @@ tryJetPack:
 		VectorSet( &fAng, 0.0f, ent->client->ps.viewangles.yaw, 0.0f );
 		AngleVectors( &fAng, &fwd, 0, 0 );
 
-        VectorMA( &ent->client->ps.origin, 64.0f, &fwd, &fwd );
+		VectorMA( &ent->client->ps.origin, 64.0f, &fwd, &fwd );
 		trap->Trace( &trToss, &ent->client->ps.origin, &playerMins, &playerMaxs, &fwd, ent->s.number, ent->clipmask, qfalse, 0, 0 );
 		if ( trToss.fraction == 1.0f && !trToss.allsolid && !trToss.startsolid ) {
 			ItemUse_UseDisp( ent, HI_AMMODISP );
-			G_AddEvent( ent, EV_USE_ITEM0+HI_AMMODISP, 0 );
+			G_AddEvent( ent, EV_USE_ITEM0 + HI_AMMODISP, 0 );
 			return;
 		}
 	}
@@ -1123,7 +1119,7 @@ tryJetPack:
 qboolean G_PointInBounds( vector3 *point, vector3 *mins, vector3 *maxs ) {
 	int i;
 
-	for ( i=0; i<3; i++ ) {
+	for ( i = 0; i < 3; i++ ) {
 		if ( point->data[i] < mins->data[i] )	return qfalse;
 		if ( point->data[i] > maxs->data[i] )	return qfalse;
 	}
@@ -1138,11 +1134,11 @@ qboolean G_BoxInBounds( vector3 *point, vector3 *mins, vector3 *maxs, vector3 *b
 	VectorAdd( point, maxs, &boxMaxs );
 
 	if ( boxMaxs.x > boundsMaxs->x ||
-		 boxMaxs.y > boundsMaxs->y ||
-		 boxMaxs.z > boundsMaxs->z ||
-		 boxMins.x < boundsMins->x ||
-		 boxMins.y < boundsMins->y ||
-		 boxMins.z < boundsMins->z )
+		boxMaxs.y > boundsMaxs->y ||
+		boxMaxs.z > boundsMaxs->z ||
+		boxMins.x < boundsMins->x ||
+		boxMins.y < boundsMins->y ||
+		boxMins.z < boundsMins->z )
 		return qfalse;
 
 	// box is completely contained within bounds
@@ -1182,12 +1178,12 @@ qboolean G_CheckInSolid( gentity_t *self, qboolean fix ) {
 	trace_t trace;
 	vector3 end, mins;
 
-	VectorCopy(&self->r.currentOrigin, &end);
+	VectorCopy( &self->r.currentOrigin, &end );
 	end.z += self->r.mins.z;
-	VectorCopy(&self->r.mins, &mins);
+	VectorCopy( &self->r.mins, &mins );
 	mins.z = 0;
 
-	trap->Trace(&trace, &self->r.currentOrigin, &mins, &self->r.maxs, &end, self->s.number, self->clipmask, qfalse, 0, 0);
+	trap->Trace( &trace, &self->r.currentOrigin, &mins, &self->r.maxs, &end, self->s.number, self->clipmask, qfalse, 0, 0 );
 	if ( trace.allsolid || trace.startsolid )
 		return qtrue;
 
@@ -1217,9 +1213,9 @@ int DebugLine( vector3 *start, vector3 *end, int color ) {
 
 	VectorCopy( start, &points[0] );
 	VectorCopy( start, &points[1] );
-//	points[1][2] -= 2;
+	//	points[1][2] -= 2;
 	VectorCopy( end, &points[2] );
-//	points[2][2] -= 2;
+	//	points[2][2] -= 2;
 	VectorCopy( end, &points[3] );
 
 
@@ -1233,15 +1229,15 @@ int DebugLine( vector3 *start, vector3 *end, int color ) {
 
 	VectorNormalize( &cross );
 
-	VectorMA( &points[0],  2, &cross, &points[0] );
+	VectorMA( &points[0], 2, &cross, &points[0] );
 	VectorMA( &points[1], -2, &cross, &points[1] );
 	VectorMA( &points[2], -2, &cross, &points[2] );
-	VectorMA( &points[3],  2, &cross, &points[3] );
+	VectorMA( &points[3], 2, &cross, &points[3] );
 
 	return trap->DebugPolygonCreate( color, 4, points );
 }
 
-void G_ROFF_NotetrackCallback( gentity_t *cent, const char *notetrack) {
+void G_ROFF_NotetrackCallback( gentity_t *cent, const char *notetrack ) {
 	char type[256];
 	int i = 0, addlArg = 0;
 
@@ -1285,7 +1281,7 @@ qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3
 
 	VectorCopy( point, &start );
 
-	for ( i=0; i<3; i++ ) {
+	for ( i = 0; i < 3; i++ ) {
 		VectorCopy( &start, &end );
 		end.data[i] += mins->data[i];
 		trap->Trace( &tr, &start, &vec3_origin, &vec3_origin, &end, ignore, clipmask, qfalse, 0, 0 );
@@ -1293,7 +1289,7 @@ qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3
 			return qfalse;
 		if ( tr.fraction < 1.0f ) {
 			VectorCopy( &start, &end );
-			end.data[i] += maxs->data[i]-(mins->data[i]*tr.fraction);
+			end.data[i] += maxs->data[i] - (mins->data[i] * tr.fraction);
 
 			trap->Trace( &tr, &start, &vec3_origin, &vec3_origin, &end, ignore, clipmask, qfalse, 0, 0 );
 
@@ -1347,10 +1343,9 @@ float ShortestLineSegBewteen2LineSegs( vector3 *start1, vector3 *end1, vector3 *
 	denom = (v1v2 * v1v2) - (v1v1 * v2v2);
 
 	//if denom is small, then skip all this and jump to the section marked below
-	if ( fabsf( denom ) > 0.001f )
-	{
-		float s = -( (v2v2*DotProduct( &v1, &start_dif )) - (v1v2*DotProduct( &v2, &start_dif )) ) / denom;
-		float t =  ( (v1v1*DotProduct( &v2, &start_dif )) - (v1v2*DotProduct( &v1, &start_dif )) ) / denom;
+	if ( fabsf( denom ) > 0.001f ) {
+		float s = -((v2v2*DotProduct( &v1, &start_dif )) - (v1v2*DotProduct( &v2, &start_dif ))) / denom;
+		float t = ((v1v1*DotProduct( &v2, &start_dif )) - (v1v2*DotProduct( &v1, &start_dif ))) / denom;
 		qboolean done = qtrue;
 
 		if ( s < 0 ) {
@@ -1500,7 +1495,7 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 	qboolean firstMatch = !!(flags & FINDCL_FIRSTMATCH);
 	qboolean print = !!(flags & FINDCL_PRINT);
 	qboolean caseSensitive = !!(flags & FINDCL_CASE);
-	qboolean (*compareFunc)( const char *s1, const char *s2 );
+	qboolean( *compareFunc )(const char *s1, const char *s2);
 	if ( caseSensitive )
 		compareFunc = substr ? cmpSubCase : cmpWholeCase;
 	else
@@ -1509,26 +1504,26 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 	// First check for clientNum match
 	if ( Q_StringIsInteger( match ) ) {
 		i = atoi( match );
-		if ( i >=0 && i < level.numConnectedClients ) {
+		if ( i >= 0 && i < level.numConnectedClients ) {
 			if ( G_ValidClient( &level.clients[i] ) )
 				return i;
 			if ( print )
-				trap->SendServerCommand( ent-g_entities, va( "print \"Client %d is not on the server\n\"", i ) );
+				trap->SendServerCommand( ent - g_entities, va( "print \"Client %d is not on the server\n\"", i ) );
 			return -1;
 		}
 		else {
 			if ( print )
-				trap->SendServerCommand( ent-g_entities, va( "print \"Client %d is out of range [0, %d]\n\"", i, level.numConnectedClients-1 ) );
+				trap->SendServerCommand( ent - g_entities, va( "print \"Client %d is out of range [0, %d]\n\"", i, level.numConnectedClients - 1 ) );
 			return -1;
 		}
 	}
 
 	// Failed, check for a name match
-	Q_strncpyz( cleanedMatch, match, sizeof( cleanedMatch ) );
+	Q_strncpyz( cleanedMatch, match, sizeof(cleanedMatch) );
 	Q_CleanString( cleanedMatch, STRIP_COLOUR );
 
 	if ( firstMatch ) {
-		for ( i=0, cl=level.clients; i<level.numConnectedClients; i++, cl++ ) {
+		for ( i = 0, cl = level.clients; i < level.numConnectedClients; i++, cl++ ) {
 			if ( compareFunc( cl->pers.netnameClean, cleanedMatch ) && G_ValidClient( cl ) )
 				return i;
 		}
@@ -1537,7 +1532,7 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 		int numMatches, matches[MAX_CLIENTS];
 
 		// find all matching names
-		for ( i=0, numMatches=0, cl=level.clients; i<level.numConnectedClients; i++, cl++ ) {
+		for ( i = 0, numMatches = 0, cl = level.clients; i < level.numConnectedClients; i++, cl++ ) {
 			if ( compareFunc( cl->pers.netnameClean, cleanedMatch ) && G_ValidClient( cl ) )
 				matches[numMatches++] = i;
 		}
@@ -1549,19 +1544,19 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 		// multiple matches, can occur on substrings and if duplicate names are allowed
 		else if ( numMatches ) {
 			char msg[MAX_TOKEN_CHARS];
-			Com_sprintf( msg, sizeof( msg ), "Found %d matches:\n", numMatches );
-			for ( i=0; i<numMatches; i++ ) {
-				Q_strcat( msg, sizeof( msg ), va( "  "S_COLOR_WHITE"("S_COLOR_CYAN"%02i"S_COLOR_WHITE") %s\n", matches[i],
+			Com_sprintf( msg, sizeof(msg), "Found %d matches:\n", numMatches );
+			for ( i = 0; i < numMatches; i++ ) {
+				Q_strcat( msg, sizeof(msg), va( "  "S_COLOR_WHITE"("S_COLOR_CYAN"%02i"S_COLOR_WHITE") %s\n", matches[i],
 					level.clients[matches[i]].pers.netname ) );
 			}
-			trap->SendServerCommand( ent-g_entities, va( "print \"%s\"", msg ) );
+			trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
 			return -1;
 		}
 	}
 
 	//Failed, target client does not exist
 	if ( print )
-		trap->SendServerCommand( ent-g_entities, va( "print \"Client %s does not exist\n\"", cleanedMatch ) );
+		trap->SendServerCommand( ent - g_entities, va( "print \"Client %s does not exist\n\"", cleanedMatch ) );
 	return -1;
 }
 
@@ -1581,11 +1576,11 @@ trace_t *G_RealTrace( gentity_t *ent, float dist ) {
 	AngleVectors( &ent->client->ps.viewangles, &end, NULL, NULL );
 	VectorMA( &start, dist ? dist : 16384.0f, &end, &end );
 
-	trap->Trace( &tr, &start, NULL, NULL, &end, ent->s.number, MASK_OPAQUE|CONTENTS_BODY|CONTENTS_ITEM|CONTENTS_CORPSE, qfalse, 0, 0 );
+	trap->Trace( &tr, &start, NULL, NULL, &end, ent->s.number, MASK_OPAQUE | CONTENTS_BODY | CONTENTS_ITEM | CONTENTS_CORPSE, qfalse, 0, 0 );
 
-	#ifdef _DEBUG
-		G_TestLine( &start, &tr.endpos, 0xFF, 7500 );
-	#endif
+#ifdef _DEBUG
+	G_TestLine( &start, &tr.endpos, 0xFF, 7500 );
+#endif
 
 	if ( japp_unlagged.integer )
 		G_UnTimeShiftAllClients( ent );

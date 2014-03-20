@@ -29,10 +29,6 @@ except( ValueError, TypeError ):
 arch = None # platform-specific, set manually
 
 print( 'Configuring build environment...' )
-env = Environment()
-
-if plat != 'Windows':
-	env['ENV']['TERM'] = os.environ['TERM']
 
 project = ARGUMENTS.get( 'project', '' )
 compiler = ARGUMENTS.get( 'compiler', 'gcc' )
@@ -51,11 +47,7 @@ if bits == 32:
 		arch = 'i386'
 	#TODO: Mac
 elif bits == 64:
-	if plat == 'Windows':
-		arch = 'x64'
-	elif plat == 'Linux':
-		arch = 'x86_64'
-	#TODO: Mac
+	arch = 'x86_64'
 
 # Notify the user of the build configuration
 print( 'Building for ' + plat + ' (' + str(bits) + ' bits, treated as \'' + arch + '\')' )
@@ -68,6 +60,10 @@ if force32:
 if analyse:
 	print( 'WARNING: Running static analysis mode. Will not produce binaries' )
 print( '' )
+
+env = Environment( TARGET_ARCH = arch )
+if plat != 'Windows':
+	env['ENV']['TERM'] = os.environ['TERM']
 
 files = {}
 libs = {}
@@ -360,29 +356,39 @@ if plat == 'Linux':
 	if analyse:
 		env['CC'] = 'clang'
 		env['CCFLAGS'] += [ '--analyze -O3' ]
-	if force32:
+	if bits == 32:
 		env['CCFLAGS'] += [ '-m32' ]
 		env['LINKFLAGS'] += [ '-m32' ]
 elif plat == 'Windows':
 	# assume msvc
-	env['CCFLAGS'] = [ '/GS', '/Zc:wchar_t', '/WX-', '/EHsc', '/nologo', '/W4', '/wd"4100"', '/wd"4127"', '/wd"4996"' ]
-	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS','/MACHINE:'+arch ]
-	env['CPPDEFINES'] = [ 'WIN32', '_WINDOWS' ]
+	env['CCFLAGS'] = [ '/nologo', '/W4', '/WX-', '/GS', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/GF', '/TC', '/errorReport:prompt', '/EHs', '/EHc', '/Ot', '/Zi' ]
+	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS', '/MACHINE:'+arch, '/LTCG' ]
+	env['CPPDEFINES'] = [ '_WINDLL', '_MSC_EXTENSIONS', '_INTEGRAL_MAX_BITS=64', '_WIN32', '_MT', '_DLL', '_M_FP_PRECISE' ]
+	if bits == 32:
+		env['CCFLAGS'] += [ '/analyze-', '/Zp8', '/Gs', '/Oy-' ]
+		env['CPPDEFINES'] += [ '_M_IX86=600', '_M_IX86_FP=2' ]
+	elif bits == 64:
+		env['CCFLAGS'] += [ '/Zp16' ]
+		env['CPPDEFINES'] += [ '_M_AMD64=100', '_M_X64=100', '_WIN64' ]
 
 # debug / release
 if not debug or debug == 2:
 	if plat == 'Linux' and not analyse:
 		env['CCFLAGS'] += [ '-O2' ] # analysis sets higher optimisation level
 	elif plat == 'Windows':
-		env['CCFLAGS'] += [ '/O2', '/MD' ]
+		env['CCFLAGS'] += [ '/GL', '/Gm-', '/MD', '/O2', '/Oi' ]
+		if bits == 64:
+			env['CCFLAGS'] += [ '/Oy' ]
 	if not debug:
 		env['CPPDEFINES'] += [ 'NDEBUG' ]
 if debug:
 	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-g3' ]
 	elif plat == 'Windows':
-		env['CCFLAGS'] += [ '/Zi', '/Od', '/RTC1', '/Gm', '/MDd' ]
-	env['CPPDEFINES'] += [ '_DEBUG' ]
+		env['CCFLAGS'] += [ '/Gm', '/FD', '/MDd', '/Od', '/RTC1', '/RTCs', '/RTCu' ]
+		if bits == 32:
+			env['CCFLAGS'] += [ '/FC', '/ZI' ]
+	env['CPPDEFINES'] += [ '_DEBUG', '__MSVC_RUNTIME_CHECKS' ]
 
 # get git revision
 status, rev = commands.getstatusoutput( 'git rev-parse HEAD' )

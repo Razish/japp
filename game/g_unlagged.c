@@ -56,13 +56,15 @@ void G_StoreTrail( gentity_t *ent ) {
 	if ( ent->r.svFlags & SVF_BOT ) {
 		// bots move only once per frame
 		newtime = level.time;
-	} else {
+	}
+	else {
 		// calculate the actual server time
 		// (we set level.frameStartTime every G_RunFrame)
 		newtime = level.previousTime + trap->Milliseconds() - level.frameStartTime;
 		if ( newtime > level.time ) {
 			newtime = level.time;
-		} else if ( newtime <= level.previousTime ) {
+		}
+		else if ( newtime <= level.previousTime ) {
 			newtime = level.previousTime + 1;
 		}
 	}
@@ -76,7 +78,7 @@ void G_StoreTrail( gentity_t *ent ) {
 	ent->client->trail[head].time = newtime;
 
 	// FOR TESTING ONLY
-//	Com_Printf("level.previousTime: %d, level.time: %d, newtime: %d\n", level.previousTime, level.time, newtime);
+	//	Com_Printf("level.previousTime: %d, level.time: %d, newtime: %d\n", level.previousTime, level.time, newtime);
 }
 
 
@@ -123,8 +125,7 @@ void G_TimeShiftClient( gentity_t *ent, int time ) {
 		if ( j < 0 ) {
 			j = NUM_CLIENT_TRAILS - 1;
 		}
-	}
-	while ( j != ent->client->trailHead );
+	} while ( j != ent->client->trailHead );
 
 	// if we got past the first iteration above, we've sandwiched (or wrapped)
 	if ( j != k ) {
@@ -140,12 +141,11 @@ void G_TimeShiftClient( gentity_t *ent, int time ) {
 
 		// if we haven't wrapped back to the head, we've sandwiched, so
 		// we shift the client's position back to where he was at "time"
-		if ( j != ent->client->trailHead )
-		{
+		if ( j != ent->client->trailHead ) {
 			float	frac = (float)(ent->client->trail[k].time - time) / (float)(ent->client->trail[k].time - ent->client->trail[j].time);
 
 			// FOR TESTING ONLY
-//			Com_Printf( "level time: %d, fire time: %d, j time: %d, k time: %d\n", level.time, time, ent->client->trail[j].time, ent->client->trail[k].time );
+			//			Com_Printf( "level time: %d, fire time: %d, j time: %d, k time: %d\n", level.time, time, ent->client->trail[j].time, ent->client->trail[k].time );
 
 			// interpolate between the two origins to give position at time index "time"
 			TimeShiftLerp( frac, &ent->client->trail[k].currentOrigin, &ent->client->trail[j].currentOrigin, &ent->r.currentOrigin );
@@ -157,7 +157,8 @@ void G_TimeShiftClient( gentity_t *ent, int time ) {
 
 			// this will recalculate absmin and absmax
 			trap->LinkEntity( (sharedEntity_t *)ent );
-		} else {
+		}
+		else {
 			// we wrapped, so grab the earliest
 			VectorCopy( &ent->client->trail[k].currentAngles, &ent->r.currentAngles );
 			VectorCopy( &ent->client->trail[k].currentOrigin, &ent->r.currentOrigin );
@@ -180,8 +181,8 @@ except for "skip"
 =====================
 */
 void G_TimeShiftAllClients( int time, gentity_t *skip ) {
-	int i=0;
-	gentity_t *ent=NULL;
+	int i = 0;
+	gentity_t *ent = NULL;
 
 	if ( shifted ) {
 		trap->Print( "WARNING: Tried to shift all clients when they were already shifted!\n" );
@@ -191,12 +192,12 @@ void G_TimeShiftAllClients( int time, gentity_t *skip ) {
 	if ( time > level.time )
 		time = level.time;
 
-	for ( i=0, ent=g_entities; i<MAX_CLIENTS; i++, ent++ ) {
+	for ( i = 0, ent = g_entities; i < MAX_CLIENTS; i++, ent++ ) {
 		if ( ent->client &&
-			 ent->inuse &&
-			 ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
-			 ent->client->tempSpectate < level.time &&
-			 ent != skip ) {
+			ent->inuse &&
+			ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
+			ent->client->tempSpectate < level.time &&
+			ent != skip ) {
 			G_TimeShiftClient( ent, time );
 		}
 	}
@@ -236,20 +237,20 @@ except for "skip"
 =======================
 */
 void G_UnTimeShiftAllClients( gentity_t *skip ) {
-	int i=0;
-	gentity_t *ent=NULL;
+	int i = 0;
+	gentity_t *ent = NULL;
 
 	if ( !shifted ) {
 		trap->Print( "WARNING: Tried to unshift all clients when they weren't shifted!\n" );
 		return;
 	}
 
-	for ( i=0, ent=g_entities; i<MAX_CLIENTS; i++, ent++ ) {
+	for ( i = 0, ent = g_entities; i < MAX_CLIENTS; i++, ent++ ) {
 		if ( ent->client &&
-			 ent->inuse &&
-			 ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
-			 ent->client->tempSpectate < level.time &&
-			 ent != skip ) {
+			ent->inuse &&
+			ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
+			ent->client->tempSpectate < level.time &&
+			ent != skip ) {
 			G_UnTimeShiftClient( ent );
 		}
 	}

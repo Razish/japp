@@ -20,22 +20,18 @@ static float		zOffset[MAX_MISC_ENTS]; //some models need a z offset for culling,
 
 static int			NumMiscEnts = 0;
 
-void CG_MiscEnt(void);
+void CG_MiscEnt( void );
 void CG_DoCameraShake( vector3 *origin, float intensity, int radius, int time );
 
 //do we have any force powers that we would normally need to cycle to?
-qboolean CG_NoUseableForce(void)
-{
+qboolean CG_NoUseableForce( void ) {
 	int i = FP_HEAL;
-	while (i < NUM_FORCE_POWERS)
-	{
-		if (i != FP_SABERTHROW &&
+	while ( i < NUM_FORCE_POWERS ) {
+		if ( i != FP_SABERTHROW &&
 			i != FP_SABER_OFFENSE &&
 			i != FP_SABER_DEFENSE &&
-			i != FP_LEVITATION)
-		{ //valid selectable power
-			if (cg.predictedPlayerState.fd.forcePowersKnown & (1 << i))
-			{ //we have it
+			i != FP_LEVITATION ) { //valid selectable power
+			if ( cg.predictedPlayerState.fd.forcePowersKnown & (1 << i) ) { //we have it
 				return qfalse;
 			}
 		}
@@ -46,91 +42,78 @@ qboolean CG_NoUseableForce(void)
 	return qtrue;
 }
 
-static uint32_t C_PointContents(void)
-{
+static uint32_t C_PointContents( void ) {
 	TCGPointContents	*data = (TCGPointContents *)cg.sharedBuffer;
 
 	return CG_PointContents( &data->mPoint, data->mPassEntityNum );
 }
 
-static void C_GetLerpOrigin(void)
-{
+static void C_GetLerpOrigin( void ) {
 	TCGVectorData		*data = (TCGVectorData *)cg.sharedBuffer;
 
-	VectorCopy(&cg_entities[data->mEntityNum].lerpOrigin, &data->mPoint);
+	VectorCopy( &cg_entities[data->mEntityNum].lerpOrigin, &data->mPoint );
 }
 
-static void C_GetLerpData(void)
-{//only used by FX system to pass to getboltmat
+static void C_GetLerpData( void ) {//only used by FX system to pass to getboltmat
 	TCGGetBoltData		*data = (TCGGetBoltData *)cg.sharedBuffer;
 
-	VectorCopy(&cg_entities[data->mEntityNum].lerpOrigin, &data->mOrigin);
-	VectorCopy(&cg_entities[data->mEntityNum].modelScale, &data->mScale);
-	VectorCopy(&cg_entities[data->mEntityNum].lerpAngles, &data->mAngles);
-	if (cg_entities[data->mEntityNum].currentState.eType == ET_PLAYER)
-	{ //normal player
+	VectorCopy( &cg_entities[data->mEntityNum].lerpOrigin, &data->mOrigin );
+	VectorCopy( &cg_entities[data->mEntityNum].modelScale, &data->mScale );
+	VectorCopy( &cg_entities[data->mEntityNum].lerpAngles, &data->mAngles );
+	if ( cg_entities[data->mEntityNum].currentState.eType == ET_PLAYER ) { //normal player
 		data->mAngles.pitch = 0.0f;
 		data->mAngles.roll = 0.0f;
 	}
-	else if (cg_entities[data->mEntityNum].currentState.eType == ET_NPC)
-	{ //an NPC
+	else if ( cg_entities[data->mEntityNum].currentState.eType == ET_NPC ) { //an NPC
 		Vehicle_t *pVeh = cg_entities[data->mEntityNum].m_pVehicle;
-		if (!pVeh)
-		{ //for vehicles, we may or may not want to 0 out pitch and roll
+		if ( !pVeh ) { //for vehicles, we may or may not want to 0 out pitch and roll
 			data->mAngles.pitch = 0.0f;
 			data->mAngles.roll = 0.0f;
 		}
-		else if (pVeh->m_pVehicleInfo->type == VH_SPEEDER)
-		{ //speeder wants no pitch but a roll
+		else if ( pVeh->m_pVehicleInfo->type == VH_SPEEDER ) { //speeder wants no pitch but a roll
 			data->mAngles.pitch = 0.0f;
 		}
-		else if (pVeh->m_pVehicleInfo->type != VH_FIGHTER)
-		{ //fighters want all angles
+		else if ( pVeh->m_pVehicleInfo->type != VH_FIGHTER ) { //fighters want all angles
 			data->mAngles.pitch = 0.0f;
 			data->mAngles.roll = 0.0f;
 		}
 	}
 }
 
-static void C_Trace(void)
-{
+static void C_Trace( void ) {
 	TCGTrace	*td = (TCGTrace *)cg.sharedBuffer;
 
-	CG_Trace(&td->mResult, &td->mStart, &td->mMins, &td->mMaxs, &td->mEnd, td->mSkipNumber, td->mMask);
+	CG_Trace( &td->mResult, &td->mStart, &td->mMins, &td->mMaxs, &td->mEnd, td->mSkipNumber, td->mMask );
 }
 
-static void C_G2Trace(void)
-{
+static void C_G2Trace( void ) {
 	TCGTrace	*td = (TCGTrace *)cg.sharedBuffer;
 
-	CG_G2Trace(&td->mResult, &td->mStart, &td->mMins, &td->mMaxs, &td->mEnd, td->mSkipNumber, td->mMask);
+	CG_G2Trace( &td->mResult, &td->mStart, &td->mMins, &td->mMaxs, &td->mEnd, td->mSkipNumber, td->mMask );
 }
 
-static void C_G2Mark(void)
-{
+static void C_G2Mark( void ) {
 	TCGG2Mark	*td = (TCGG2Mark *)cg.sharedBuffer;
 	trace_t		trace;
 	vector3		end;
 
-	VectorMA(&td->start, 64, &td->dir, &end);
-	CG_G2Trace(&trace, &td->start, NULL, NULL, &end, ENTITYNUM_NONE, MASK_PLAYERSOLID);
+	VectorMA( &td->start, 64, &td->dir, &end );
+	CG_G2Trace( &trace, &td->start, NULL, NULL, &end, ENTITYNUM_NONE, MASK_PLAYERSOLID );
 
-	if (trace.entityNum < ENTITYNUM_WORLD &&
-		cg_entities[trace.entityNum].ghoul2)
-	{ //hit someone with a ghoul2 instance, let's project the decal on them then.
+	if ( trace.entityNum < ENTITYNUM_WORLD &&
+		cg_entities[trace.entityNum].ghoul2 ) { //hit someone with a ghoul2 instance, let's project the decal on them then.
 		centity_t *cent = &cg_entities[trace.entityNum];
 
 		//CG_TestLine(tr.endpos, end, 2000, 0x0000ff, 1);
 
-		CG_AddGhoul2Mark(td->shader, td->size, &trace.endpos, &end, trace.entityNum,
+		CG_AddGhoul2Mark( td->shader, td->size, &trace.endpos, &end, trace.entityNum,
 			&cent->lerpOrigin, cent->lerpAngles.yaw, cent->ghoul2, &cent->modelScale,
-			Q_irand(2000, 4000));
+			Q_irand( 2000, 4000 ) );
 		//I'm making fx system decals have a very short lifetime.
 	}
 }
 
-static void CG_DebugBoxLines(vector3 *mins, vector3 *maxs, int duration)
-{
+static void CG_DebugBoxLines( vector3 *mins, vector3 *maxs, int duration ) {
 	vector3 start, end;
 	vector3 vert;
 
@@ -144,138 +127,133 @@ static void CG_DebugBoxLines(vector3 *mins, vector3 *maxs, int duration)
 	vert.y = mins->y;
 	start.x = vert.x;
 	start.y = vert.y;
-	CG_TestLine(&start, &vert, duration, 0x00000ff, 1);
+	CG_TestLine( &start, &vert, duration, 0x00000ff, 1 );
 
 	vert.x = mins->x;
 	vert.y = maxs->y;
 	start.x = vert.x;
 	start.y = vert.y;
-	CG_TestLine(&start, &vert, duration, 0x00000ff, 1);
+	CG_TestLine( &start, &vert, duration, 0x00000ff, 1 );
 
 	vert.x = maxs->x;
 	vert.y = mins->y;
 	start.x = vert.x;
 	start.y = vert.y;
-	CG_TestLine(&start, &vert, duration, 0x00000ff, 1);
+	CG_TestLine( &start, &vert, duration, 0x00000ff, 1 );
 
 	vert.x = maxs->x;
 	vert.y = maxs->y;
 	start.x = vert.x;
 	start.y = vert.y;
-	CG_TestLine(&start, &vert, duration, 0x00000ff, 1);
+	CG_TestLine( &start, &vert, duration, 0x00000ff, 1 );
 
 	// top of box
-	VectorCopy(maxs, &start);
-	VectorCopy(maxs, &end);
+	VectorCopy( maxs, &start );
+	VectorCopy( maxs, &end );
 	start.x -= x;
-	CG_TestLine(&start, &end, duration, 0x00000ff, 1);
+	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
 	end.x = start.x;
 	end.y -= y;
-	CG_TestLine(&start, &end, duration, 0x00000ff, 1);
+	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
 	start.y = end.y;
 	start.x += x;
-	CG_TestLine(&start, &end, duration, 0x00000ff, 1);
-	CG_TestLine(&start, maxs, duration, 0x00000ff, 1);
+	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, maxs, duration, 0x00000ff, 1 );
 
 	// bottom of box
-	VectorCopy(mins, &start);
-	VectorCopy(mins, &end);
+	VectorCopy( mins, &start );
+	VectorCopy( mins, &end );
 	start.x += x;
-	CG_TestLine(&start, &end, duration, 0x00000ff, 1);
+	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
 	end.x = start.x;
 	end.y += y;
-	CG_TestLine(&start, &end, duration, 0x00000ff, 1);
+	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
 	start.y = end.y;
 	start.x -= x;
-	CG_TestLine(&start, &end, duration, 0x00000ff, 1);
-	CG_TestLine(&start, mins, duration, 0x00000ff, 1);
+	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, mins, duration, 0x00000ff, 1 );
 }
 
 //handle ragdoll callbacks, for events and debugging -rww
-static int CG_RagCallback(int callType)
-{
-	switch(callType)
-	{
+static int CG_RagCallback( int callType ) {
+	switch ( callType ) {
 	case RAG_CALLBACK_DEBUGBOX:
-		{
-			ragCallbackDebugBox_t *callData = (ragCallbackDebugBox_t *)cg.sharedBuffer;
+	{
+		ragCallbackDebugBox_t *callData = (ragCallbackDebugBox_t *)cg.sharedBuffer;
 
-			CG_DebugBoxLines(&callData->mins, &callData->maxs, callData->duration);
-		}
+		CG_DebugBoxLines( &callData->mins, &callData->maxs, callData->duration );
+	}
 		break;
 	case RAG_CALLBACK_DEBUGLINE:
-		{
-			ragCallbackDebugLine_t *callData = (ragCallbackDebugLine_t *)cg.sharedBuffer;
+	{
+		ragCallbackDebugLine_t *callData = (ragCallbackDebugLine_t *)cg.sharedBuffer;
 
-			CG_TestLine(&callData->start, &callData->end, callData->time, callData->color, callData->radius);
-		}
+		CG_TestLine( &callData->start, &callData->end, callData->time, callData->color, callData->radius );
+	}
 		break;
 	case RAG_CALLBACK_BONESNAP:
-		{
-			ragCallbackBoneSnap_t *callData = (ragCallbackBoneSnap_t *)cg.sharedBuffer;
-			centity_t *cent = &cg_entities[callData->entNum];
-			int snapSound = trap->S_RegisterSound(va("sound/player/bodyfall_human%i.wav", Q_irand(1, 3)));
+	{
+		ragCallbackBoneSnap_t *callData = (ragCallbackBoneSnap_t *)cg.sharedBuffer;
+		centity_t *cent = &cg_entities[callData->entNum];
+		int snapSound = trap->S_RegisterSound( va( "sound/player/bodyfall_human%i.wav", Q_irand( 1, 3 ) ) );
 
-			trap->S_StartSound(&cent->lerpOrigin, callData->entNum, CHAN_AUTO, snapSound);
-		}
+		trap->S_StartSound( &cent->lerpOrigin, callData->entNum, CHAN_AUTO, snapSound );
+	}
 	case RAG_CALLBACK_BONEIMPACT:
 		break;
 	case RAG_CALLBACK_BONEINSOLID:
 #if 0
-		{
-			ragCallbackBoneInSolid_t *callData = (ragCallbackBoneInSolid_t *)cg.sharedBuffer;
+	{
+		ragCallbackBoneInSolid_t *callData = (ragCallbackBoneInSolid_t *)cg.sharedBuffer;
 
-			if (callData->solidCount > 16)
-			{ //don't bother if we're just tapping into solidity, we'll probably recover on our own
-				centity_t *cent = &cg_entities[callData->entNum];
-				vector3 slideDir;
+		if (callData->solidCount > 16)
+		{ //don't bother if we're just tapping into solidity, we'll probably recover on our own
+			centity_t *cent = &cg_entities[callData->entNum];
+			vector3 slideDir;
 
-				VectorSubtract(cent->lerpOrigin, callData->bonePos, slideDir);
-				VectorAdd(cent->ragOffsets, slideDir, cent->ragOffsets);
+			VectorSubtract(cent->lerpOrigin, callData->bonePos, slideDir);
+			VectorAdd(cent->ragOffsets, slideDir, cent->ragOffsets);
 
-				cent->hasRagOffset = qtrue;
-			}
+			cent->hasRagOffset = qtrue;
 		}
+	}
 #endif
 		break;
 	case RAG_CALLBACK_TRACELINE:
-		{
-			ragCallbackTraceLine_t *callData = (ragCallbackTraceLine_t *)cg.sharedBuffer;
+	{
+		ragCallbackTraceLine_t *callData = (ragCallbackTraceLine_t *)cg.sharedBuffer;
 
-			CG_Trace(&callData->tr, &callData->start, &callData->mins, &callData->maxs,
-				&callData->end, callData->ignore, callData->mask);
-		}
+		CG_Trace( &callData->tr, &callData->start, &callData->mins, &callData->maxs,
+			&callData->end, callData->ignore, callData->mask );
+	}
 		break;
 	default:
-		Com_Error(ERR_DROP, "Invalid callType in CG_RagCallback");
+		Com_Error( ERR_DROP, "Invalid callType in CG_RagCallback" );
 		break;
 	}
 
 	return 0;
 }
 
-static void C_ImpactMark(void)
-{
+static void C_ImpactMark( void ) {
 	TCGImpactMark	*data = (TCGImpactMark *)cg.sharedBuffer;
 
 	/*
 	CG_ImpactMark((int)arg0, (const float *)arg1, (const float *)arg2, (float)arg3,
-		(float)arg4, (float)arg5, (float)arg6, (float)arg7, qtrue, (float)arg8, qfalse);
+	(float)arg4, (float)arg5, (float)arg6, (float)arg7, qtrue, (float)arg8, qfalse);
 	*/
-	CG_ImpactMark(data->mHandle, &data->mPoint, &data->mAngle, data->mRotation,
-		data->mRed, data->mGreen, data->mBlue, data->mAlphaStart, qtrue, data->mSizeStart, qfalse);
+	CG_ImpactMark( data->mHandle, &data->mPoint, &data->mAngle, data->mRotation,
+		data->mRed, data->mGreen, data->mBlue, data->mAlphaStart, qtrue, data->mSizeStart, qfalse );
 }
 
-void CG_MiscEnt(void)
-{
+void CG_MiscEnt( void ) {
 	int			modelIndex;
 	refEntity_t	*RefEnt;
 	TCGMiscEnt	*data = (TCGMiscEnt *)cg.sharedBuffer;
 	vector3		mins, maxs;
 	float		*radius, *zOff;
 
-	if (NumMiscEnts >= MAX_MISC_ENTS)
-	{
+	if ( NumMiscEnts >= MAX_MISC_ENTS ) {
 		return;
 	}
 
@@ -283,33 +261,31 @@ void CG_MiscEnt(void)
 	zOff = &zOffset[NumMiscEnts];
 	RefEnt = &MiscEnts[NumMiscEnts++];
 
-	modelIndex = trap->R_RegisterModel(data->mModel);
-	if (modelIndex == 0)
-	{
-		Com_Error(ERR_DROP, "client_model has invalid model definition");
+	modelIndex = trap->R_RegisterModel( data->mModel );
+	if ( modelIndex == 0 ) {
+		Com_Error( ERR_DROP, "client_model has invalid model definition" );
 		return;
 	}
 
 	*zOff = 0;
 
-	memset(RefEnt, 0, sizeof(refEntity_t));
+	memset( RefEnt, 0, sizeof(refEntity_t) );
 	RefEnt->reType = RT_MODEL;
 	RefEnt->hModel = modelIndex;
 	RefEnt->frame = 0;
-	trap->R_ModelBounds(modelIndex, &mins, &maxs);
-	VectorCopy(&data->mScale, &RefEnt->modelScale);
-	VectorCopy(&data->mOrigin, &RefEnt->origin);
+	trap->R_ModelBounds( modelIndex, &mins, &maxs );
+	VectorCopy( &data->mScale, &RefEnt->modelScale );
+	VectorCopy( &data->mOrigin, &RefEnt->origin );
 
-	VectorScaleVector(&mins, &data->mScale, &mins);
-	VectorScaleVector(&maxs, &data->mScale, &maxs);
-	*radius = Distance(&mins, &maxs);
+	VectorScaleVector( &mins, &data->mScale, &mins );
+	VectorScaleVector( &maxs, &data->mScale, &maxs );
+	*radius = Distance( &mins, &maxs );
 
 	AnglesToAxis( &data->mAngles, RefEnt->axis );
-	ScaleModelAxis(RefEnt);
+	ScaleModelAxis( RefEnt );
 }
 
-void CG_DrawMiscEnts(void)
-{
+void CG_DrawMiscEnts( void ) {
 	int			i;
 	refEntity_t	*RefEnt;
 	float		*radius, *zOff;
@@ -320,22 +296,18 @@ void CG_DrawMiscEnts(void)
 	RefEnt = MiscEnts;
 	radius = Radius;
 	zOff = zOffset;
-	for(i=0;i<NumMiscEnts;i++)
-	{
-		VectorCopy(&RefEnt->origin, &cullOrigin);
+	for ( i = 0; i < NumMiscEnts; i++ ) {
+		VectorCopy( &RefEnt->origin, &cullOrigin );
 		cullOrigin.z += 1.0f;
 
-		if (*zOff)
-		{
+		if ( *zOff ) {
 			cullOrigin.z += *zOff;
 		}
 
-		if (cg.snap && trap->R_InPVS(&refdef->vieworg, &cullOrigin, cg.snap->areamask))
-		{
-			VectorSubtract(&RefEnt->origin, &refdef->vieworg, &difference);
-			if (VectorLength(&difference)-(*radius) <= cg.distanceCull)
-			{
-				SE_R_AddRefEntityToScene(RefEnt, MAX_CLIENTS);
+		if ( cg.snap && trap->R_InPVS( &refdef->vieworg, &cullOrigin, cg.snap->areamask ) ) {
+			VectorSubtract( &RefEnt->origin, &refdef->vieworg, &difference );
+			if ( VectorLength( &difference ) - (*radius) <= cg.distanceCull ) {
+				SE_R_AddRefEntityToScene( RefEnt, MAX_CLIENTS );
 			}
 		}
 		RefEnt++;
@@ -377,10 +349,10 @@ static void CVU_ForceColour( void ) {
 static void CVU_ForceModel( void ) {
 	int i;
 
-	for ( i=0; i<MAX_CLIENTS; i++ ) {
+	for ( i = 0; i < MAX_CLIENTS; i++ ) {
 		const char *clientInfo;
 
-		clientInfo = CG_ConfigString( CS_PLAYERS+i );
+		clientInfo = CG_ConfigString( CS_PLAYERS + i );
 		if ( !VALIDSTRING( clientInfo ) )
 			continue;
 
@@ -391,7 +363,7 @@ static void CVU_ForceModel( void ) {
 static void CVU_TeamOverlay( void ) {
 	// If team overlay is on, ask for updates from the server.  If its off,
 	// let the server know so we don't receive it
-	if ( cg_drawTeamOverlay.integer > 0 && cgs.gametype >= GT_SINGLE_PLAYER)
+	if ( cg_drawTeamOverlay.integer > 0 && cgs.gametype >= GT_SINGLE_PLAYER )
 		trap->Cvar_Set( "teamoverlay", "1" );
 	else
 		trap->Cvar_Set( "teamoverlay", "0" );
@@ -468,19 +440,19 @@ static void CVU_GunAlign( void ) {
 static void CVU_GunBob( void ) {
 	vector3 *v = &cg.gunBob;
 	if ( sscanf( cg_gunBob.string, "%f %f %f", &v->pitch, &v->yaw, &v->roll ) != 3 ) {
-		v->pitch	= 0.005f;
-		v->yaw		= 0.01f;
-		v->roll		= 0.005f;
+		v->pitch = 0.005f;
+		v->yaw = 0.01f;
+		v->roll = 0.005f;
 	}
 }
 
 static void CVU_GunDrift( void ) {
 	vector3 *v = &cg.gunIdleDrift.amount;
 	if ( sscanf( cg_gunIdleDrift.string, "%f %f %f %f", &v->pitch, &v->yaw, &v->roll, &cg.gunIdleDrift.speed ) != 4 ) {
-		v->pitch				= 0.01f;
-		v->yaw					= 0.01f;
-		v->roll					= 0.01f;
-		cg.gunIdleDrift.speed	= 0.001f;
+		v->pitch = 0.01f;
+		v->yaw = 0.01f;
+		v->roll = 0.01f;
+		cg.gunIdleDrift.speed = 0.001f;
 	}
 }
 
@@ -543,10 +515,10 @@ static void CVU_StrafeTrailWeights( void ) {
 static void CVU_ViewBob( void ) {
 	int tmp;
 	if ( sscanf( cg_viewBob.string, "%f %f %f %i", &cg.viewBob.pitch, &cg.viewBob.roll, &cg.viewBob.up, &tmp ) != 4 ) {
-		cg.viewBob.pitch	= 0.002f;
-		cg.viewBob.roll		= 0.002f;
-		cg.viewBob.up		= 0.005f;
-		cg.viewBob.fall		= qtrue;
+		cg.viewBob.pitch = 0.002f;
+		cg.viewBob.roll = 0.002f;
+		cg.viewBob.up = 0.005f;
+		cg.viewBob.fall = qtrue;
 	}
 	else
 		cg.viewBob.fall = tmp;
@@ -555,9 +527,9 @@ static void CVU_ViewBob( void ) {
 static void CVU_AutomapAngle( void ) {
 	vector3 *v = &cg.automapAngle;
 	if ( sscanf( r_autoMapAngle.string, "%f %f %f", &v->pitch, &v->yaw, &v->roll ) != 3 ) {
-		v->pitch	= 90.0f;
-		v->yaw		= 0.0f;
-		v->roll		= 0.0f;
+		v->pitch = 90.0f;
+		v->yaw = 0.0f;
+		v->roll = 0.0f;
 	}
 }
 
@@ -580,18 +552,18 @@ static void CVU_AccelSize( void ) {
 typedef struct cvarTable_s {
 	vmCvar_t	*vmCvar;
 	const char	*cvarName, *defaultString;
-	void		(*update)( void );
+	void( *update )(void);
 	uint32_t	cvarFlags;
 } cvarTable_t;
 
 #define XCVAR_DECL
-	#include "cg_xcvar.h"
+#include "cg_xcvar.h"
 #undef XCVAR_DECL
 
 static cvarTable_t cvarTable[] = {
-	#define XCVAR_LIST
-		#include "cg_xcvar.h"
-	#undef XCVAR_LIST
+#define XCVAR_LIST
+#include "cg_xcvar.h"
+#undef XCVAR_LIST
 };
 
 static int cvarTableSize = ARRAY_LEN( cvarTable );
@@ -605,7 +577,7 @@ void CG_RegisterCvars( void ) {
 	int			i;
 	cvarTable_t	*cv;
 
-	for ( i=0, cv=cvarTable; i<cvarTableSize; i++, cv++ ) {
+	for ( i = 0, cv = cvarTable; i < cvarTableSize; i++, cv++ ) {
 		trap->Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
 		if ( cv->update )
 			cv->update();
@@ -616,7 +588,7 @@ void CG_UpdateCvars( void ) {
 	int			i;
 	cvarTable_t	*cv;
 
-	for ( i=0, cv=cvarTable; i<cvarTableSize; i++, cv++ ) {
+	for ( i = 0, cv = cvarTable; i<cvarTableSize; i++, cv++ ) {
 		if ( cv->vmCvar ) {
 			int modCount = cv->vmCvar->modificationCount;
 			trap->Cvar_Update( cv->vmCvar );
@@ -629,7 +601,7 @@ void CG_UpdateCvars( void ) {
 }
 
 int CG_CrosshairPlayer( void ) {
-	if ( cg.time > ( cg.crosshairClientTime + 1000 ) )
+	if ( cg.time > (cg.crosshairClientTime + 1000) )
 		return -1;
 
 	if ( cg.crosshairClientNum >= MAX_CLIENTS )
@@ -648,7 +620,7 @@ int CG_LastAttacker( void ) {
 const char *CG_Argv( int arg ) {
 	static char	buffer[MAX_STRING_CHARS];
 
-	trap->Cmd_Argv( arg, buffer, sizeof( buffer ) );
+	trap->Cmd_Argv( arg, buffer, sizeof(buffer) );
 
 	return buffer;
 }
@@ -656,7 +628,7 @@ const char *CG_Argv( int arg ) {
 const char *CG_Cvar_VariableString( const char *var_name ) {
 	static char	buffer[MAX_STRING_CHARS];
 
-	trap->Cvar_VariableStringBuffer( var_name, buffer, sizeof( buffer ) );
+	trap->Cvar_VariableStringBuffer( var_name, buffer, sizeof(buffer) );
 
 	return buffer;
 }
@@ -692,7 +664,7 @@ void CG_ParseSiegeState( const char *str ) {
 			i++, j++;
 		}
 		b[j] = '\0';
-		cgSiegeRoundTime = atoi(b);
+		cgSiegeRoundTime = atoi( b );
 		if ( cgSiegeRoundState == 0 || cgSiegeRoundState == 2 )
 			cgSiegeRoundBeganTime = cgSiegeRoundTime;
 	}
@@ -701,11 +673,11 @@ void CG_ParseSiegeState( const char *str ) {
 }
 
 const char *CG_GetStringEdString( const char *refSection, const char *refName ) {
-	static char text[2][1024]={{0}};
+	static char text[2][1024] = { { 0 } };
 	static int index = 0;
 
 	index ^= 1;
-	trap->SE_GetStringTextString( va( "%s_%s", refSection, refName ), text[index], sizeof( text[0] ) );
+	trap->SE_GetStringTextString( va( "%s_%s", refSection, refName ), text[index], sizeof(text[0]) );
 
 	return text[index];
 }
@@ -747,7 +719,7 @@ CG_BuildSpectatorString
 
 =======================
 */
-void CG_BuildSpectatorString(void) {
+void CG_BuildSpectatorString( void ) {
 #if 0
 	int i;
 	cg.spectatorList[0] = 0;
@@ -767,19 +739,17 @@ void CG_BuildSpectatorString(void) {
 		cg.spectatorWidth = -1;
 	}
 #else
-	int i=0;
+	int i = 0;
 
 	cg.scoreboard.spectatorList[0] = '\0';
 
-	for ( i=0; i<cg.numScores; i++ )
-	{
+	for ( i = 0; i < cg.numScores; i++ ) {
 		if ( cg.scores[i].team == TEAM_SPECTATOR )
-			Q_strcat( cg.scoreboard.spectatorList, sizeof( cg.scoreboard.spectatorList ), va( S_COLOR_WHITE"%s  ", cgs.clientinfo[cg.scores[i].client].name ) );
+			Q_strcat( cg.scoreboard.spectatorList, sizeof(cg.scoreboard.spectatorList), va( S_COLOR_WHITE"%s  ", cgs.clientinfo[cg.scores[i].client].name ) );
 	}
 
 	i = strlen( cg.scoreboard.spectatorList );
-	if ( i != cg.scoreboard.spectatorLen )
-	{//new spectator info
+	if ( i != cg.scoreboard.spectatorLen ) {//new spectator info
 		cg.scoreboard.spectatorLen = i;
 		cg.scoreboard.spectatorX = SCREEN_WIDTH;
 		cg.scoreboard.spectatorResetTime = cg.time;
@@ -794,13 +764,13 @@ static void CG_RegisterClients( void ) {
 	CG_LoadingClient( cg.clientNum );
 	CG_NewClientInfo( cg.clientNum, qfalse );
 
-	for ( i=0; i<MAX_CLIENTS; i++ ) {
+	for ( i = 0; i < MAX_CLIENTS; i++ ) {
 		const char *clientInfo;
 
 		if ( cg.clientNum == i )
 			continue;
 
-		clientInfo = CG_ConfigString( CS_PLAYERS+i );
+		clientInfo = CG_ConfigString( CS_PLAYERS + i );
 		if ( !clientInfo[0] )
 			continue;
 		CG_LoadingClient( i );
@@ -816,7 +786,7 @@ const char *CG_ConfigString( int index ) {
 		trap->Error( ERR_DROP, "CG_ConfigString: bad index: %i", index );
 		return NULL;
 	}
-	return cgs.gameState.stringData + cgs.gameState.stringOffsets[ index ];
+	return cgs.gameState.stringData + cgs.gameState.stringOffsets[index];
 }
 
 void CG_StartMusic( qboolean bForceStart ) {
@@ -825,13 +795,13 @@ void CG_StartMusic( qboolean bForceStart ) {
 
 	// start the background music
 	s = (char *)CG_ConfigString( CS_MUSIC );
-	Q_strncpyz( parm1, COM_Parse( (const char **)&s ), sizeof( parm1 ) );
-	Q_strncpyz( parm2, COM_Parse( (const char **)&s ), sizeof( parm2 ) );
+	Q_strncpyz( parm1, COM_Parse( (const char **)&s ), sizeof(parm1) );
+	Q_strncpyz( parm2, COM_Parse( (const char **)&s ), sizeof(parm2) );
 
 	trap->S_StartBackgroundTrack( parm1, parm2, !bForceStart );
 }
 
-char *CG_GetMenuBuffer(const char *filename) {
+char *CG_GetMenuBuffer( const char *filename ) {
 	int	len;
 	fileHandle_t	f;
 	static char buf[MAX_MENUFILE];
@@ -859,20 +829,20 @@ char *CG_GetMenuBuffer(const char *filename) {
 // new hud stuff ( mission pack )
 // ==============================
 //
-qboolean CG_Asset_Parse(int handle) {
+qboolean CG_Asset_Parse( int handle ) {
 	pc_token_t token;
 
-	if (!trap->PC_ReadToken(handle, &token))
+	if ( !trap->PC_ReadToken( handle, &token ) )
 		return qfalse;
-	if (Q_stricmp(token.string, "{") != 0) {
+	if ( Q_stricmp( token.string, "{" ) != 0 ) {
 		return qfalse;
 	}
 
 	while ( 1 ) {
-		if (!trap->PC_ReadToken(handle, &token))
+		if ( !trap->PC_ReadToken( handle, &token ) )
 			return qfalse;
 
-		if (Q_stricmp(token.string, "}") == 0) {
+		if ( Q_stricmp( token.string, "}" ) == 0 ) {
 			return qtrue;
 		}
 
@@ -884,7 +854,7 @@ qboolean CG_Asset_Parse(int handle) {
 				return qfalse;
 			}
 
-//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.textFont);
+			//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.textFont);
 			cgDC.Assets.qhMediumFont = cgDC.RegisterFont(token.string);
 			continue;
 		}
@@ -895,7 +865,7 @@ qboolean CG_Asset_Parse(int handle) {
 			if (!trap->PC_ReadToken(handle, &token) || !PC_Int_Parse(handle, &pointSize)) {
 				return qfalse;
 			}
-//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.smallFont);
+			//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.smallFont);
 			cgDC.Assets.qhSmallFont = cgDC.RegisterFont(token.string);
 			continue;
 		}
@@ -906,7 +876,7 @@ qboolean CG_Asset_Parse(int handle) {
 			if (!trap->PC_ReadToken(handle, &token) || !PC_Int_Parse(handle, &pointSize)) {
 				return qfalse;
 			}
-//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.smallFont);
+			//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.smallFont);
 			cgDC.Assets.qhSmall2Font = cgDC.RegisterFont(token.string);
 			continue;
 		}
@@ -917,7 +887,7 @@ qboolean CG_Asset_Parse(int handle) {
 			if (!trap->PC_ReadToken(handle, &token) || !PC_Int_Parse(handle, &pointSize)) {
 				return qfalse;
 			}
-//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.bigFont);
+			//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.bigFont);
 			cgDC.Assets.qhBigFont = cgDC.RegisterFont(token.string);
 			continue;
 		}
@@ -928,24 +898,24 @@ qboolean CG_Asset_Parse(int handle) {
 			if (!trap->PC_ReadToken(handle, &token) || !PC_Int_Parse(handle, &pointSize)) {
 				return qfalse;
 			}
-//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.bigFont);
+			//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.bigFont);
 			cgDC.Assets.japp.fontMono = cgDC.RegisterFont(token.string);
 			continue;
 		}
 #endif
 
 		// gradientbar
-		if (Q_stricmp(token.string, "gradientbar") == 0) {
-			if (!trap->PC_ReadToken(handle, &token)) {
+		if ( Q_stricmp( token.string, "gradientbar" ) == 0 ) {
+			if ( !trap->PC_ReadToken( handle, &token ) ) {
 				return qfalse;
 			}
-			cgDC.Assets.gradientBar = trap->R_RegisterShaderNoMip(token.string);
+			cgDC.Assets.gradientBar = trap->R_RegisterShaderNoMip( token.string );
 			continue;
 		}
 
 		// enterMenuSound
-		if (Q_stricmp(token.string, "menuEnterSound") == 0) {
-			if (!trap->PC_ReadToken(handle, &token)) {
+		if ( Q_stricmp( token.string, "menuEnterSound" ) == 0 ) {
+			if ( !trap->PC_ReadToken( handle, &token ) ) {
 				return qfalse;
 			}
 			cgDC.Assets.menuEnterSound = trap->S_RegisterSound( token.string );
@@ -953,8 +923,8 @@ qboolean CG_Asset_Parse(int handle) {
 		}
 
 		// exitMenuSound
-		if (Q_stricmp(token.string, "menuExitSound") == 0) {
-			if (!trap->PC_ReadToken(handle, &token)) {
+		if ( Q_stricmp( token.string, "menuExitSound" ) == 0 ) {
+			if ( !trap->PC_ReadToken( handle, &token ) ) {
 				return qfalse;
 			}
 			cgDC.Assets.menuExitSound = trap->S_RegisterSound( token.string );
@@ -962,8 +932,8 @@ qboolean CG_Asset_Parse(int handle) {
 		}
 
 		// itemFocusSound
-		if (Q_stricmp(token.string, "itemFocusSound") == 0) {
-			if (!trap->PC_ReadToken(handle, &token)) {
+		if ( Q_stricmp( token.string, "itemFocusSound" ) == 0 ) {
+			if ( !trap->PC_ReadToken( handle, &token ) ) {
 				return qfalse;
 			}
 			cgDC.Assets.itemFocusSound = trap->S_RegisterSound( token.string );
@@ -971,59 +941,59 @@ qboolean CG_Asset_Parse(int handle) {
 		}
 
 		// menuBuzzSound
-		if (Q_stricmp(token.string, "menuBuzzSound") == 0) {
-			if (!trap->PC_ReadToken(handle, &token)) {
+		if ( Q_stricmp( token.string, "menuBuzzSound" ) == 0 ) {
+			if ( !trap->PC_ReadToken( handle, &token ) ) {
 				return qfalse;
 			}
 			cgDC.Assets.menuBuzzSound = trap->S_RegisterSound( token.string );
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "cursor") == 0) {
-			if (!PC_String_Parse(handle, &cgDC.Assets.cursorStr)) {
+		if ( Q_stricmp( token.string, "cursor" ) == 0 ) {
+			if ( !PC_String_Parse( handle, &cgDC.Assets.cursorStr ) ) {
 				return qfalse;
 			}
-			cgDC.Assets.cursor = trap->R_RegisterShaderNoMip( cgDC.Assets.cursorStr);
+			cgDC.Assets.cursor = trap->R_RegisterShaderNoMip( cgDC.Assets.cursorStr );
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "fadeClamp") == 0) {
-			if (!PC_Float_Parse(handle, &cgDC.Assets.fadeClamp)) {
-				return qfalse;
-			}
-			continue;
-		}
-
-		if (Q_stricmp(token.string, "fadeCycle") == 0) {
-			if (!PC_Int_Parse(handle, &cgDC.Assets.fadeCycle)) {
+		if ( Q_stricmp( token.string, "fadeClamp" ) == 0 ) {
+			if ( !PC_Float_Parse( handle, &cgDC.Assets.fadeClamp ) ) {
 				return qfalse;
 			}
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "fadeAmount") == 0) {
-			if (!PC_Float_Parse(handle, &cgDC.Assets.fadeAmount)) {
+		if ( Q_stricmp( token.string, "fadeCycle" ) == 0 ) {
+			if ( !PC_Int_Parse( handle, &cgDC.Assets.fadeCycle ) ) {
 				return qfalse;
 			}
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "shadowX") == 0) {
-			if (!PC_Float_Parse(handle, &cgDC.Assets.shadowX)) {
+		if ( Q_stricmp( token.string, "fadeAmount" ) == 0 ) {
+			if ( !PC_Float_Parse( handle, &cgDC.Assets.fadeAmount ) ) {
 				return qfalse;
 			}
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "shadowY") == 0) {
-			if (!PC_Float_Parse(handle, &cgDC.Assets.shadowY)) {
+		if ( Q_stricmp( token.string, "shadowX" ) == 0 ) {
+			if ( !PC_Float_Parse( handle, &cgDC.Assets.shadowX ) ) {
 				return qfalse;
 			}
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "shadowColor") == 0) {
-			if (!PC_Color_Parse(handle, &cgDC.Assets.shadowColor)) {
+		if ( Q_stricmp( token.string, "shadowY" ) == 0 ) {
+			if ( !PC_Float_Parse( handle, &cgDC.Assets.shadowY ) ) {
+				return qfalse;
+			}
+			continue;
+		}
+
+		if ( Q_stricmp( token.string, "shadowColor" ) == 0 ) {
+			if ( !PC_Color_Parse( handle, &cgDC.Assets.shadowColor ) ) {
 				return qfalse;
 			}
 			cgDC.Assets.shadowFadeClamp = cgDC.Assets.shadowColor.a;
@@ -1033,18 +1003,18 @@ qboolean CG_Asset_Parse(int handle) {
 	return qfalse; // bk001204 - why not?
 }
 
-void CG_ParseMenu(const char *menuFile) {
+void CG_ParseMenu( const char *menuFile ) {
 	pc_token_t token;
 	int handle;
 
-	handle = trap->PC_LoadSource(menuFile);
-	if (!handle)
-		handle = trap->PC_LoadSource("ui/testhud.menu");
-	if (!handle)
+	handle = trap->PC_LoadSource( menuFile );
+	if ( !handle )
+		handle = trap->PC_LoadSource( "ui/testhud.menu" );
+	if ( !handle )
 		return;
 
 	while ( 1 ) {
-		if (!trap->PC_ReadToken( handle, &token )) {
+		if ( !trap->PC_ReadToken( handle, &token ) ) {
 			break;
 		}
 
@@ -1062,40 +1032,40 @@ void CG_ParseMenu(const char *menuFile) {
 			break;
 		}
 
-		if (Q_stricmp(token.string, "assetGlobalDef") == 0) {
-			if (CG_Asset_Parse(handle)) {
+		if ( Q_stricmp( token.string, "assetGlobalDef" ) == 0 ) {
+			if ( CG_Asset_Parse( handle ) ) {
 				continue;
-			} else {
+			}
+			else {
 				break;
 			}
 		}
 
 
-		if (Q_stricmp(token.string, "menudef") == 0) {
+		if ( Q_stricmp( token.string, "menudef" ) == 0 ) {
 			// start a new menu
-			Menu_New(handle);
+			Menu_New( handle );
 		}
 	}
-	trap->PC_FreeSource(handle);
+	trap->PC_FreeSource( handle );
 }
 
 
-qboolean CG_Load_Menu(const char **p)
-{
+qboolean CG_Load_Menu( const char **p ) {
 
 	char *token;
 
-	token = COM_ParseExt((const char **)p, qtrue);
+	token = COM_ParseExt( (const char **)p, qtrue );
 
-	if (token[0] != '{') {
+	if ( token[0] != '{' ) {
 		return qfalse;
 	}
 
 	while ( 1 ) {
 
-		token = COM_ParseExt((const char **)p, qtrue);
+		token = COM_ParseExt( (const char **)p, qtrue );
 
-		if (Q_stricmp(token, "}") == 0) {
+		if ( Q_stricmp( token, "}" ) == 0 ) {
 			return qtrue;
 		}
 
@@ -1103,30 +1073,30 @@ qboolean CG_Load_Menu(const char **p)
 			return qfalse;
 		}
 
-		CG_ParseMenu(token);
+		CG_ParseMenu( token );
 	}
 	return qfalse;
 }
 
 
-static qboolean CG_OwnerDrawHandleKey(int ownerDraw, uint32_t flags, float *special, int key) {
+static qboolean CG_OwnerDrawHandleKey( int ownerDraw, uint32_t flags, float *special, int key ) {
 	return qfalse;
 }
 
 
 static int CG_FeederCount( int feederID ) {
-	int i, count=0;
+	int i, count = 0;
 
 	switch ( feederID ) {
 	case FEEDER_REDTEAM_LIST:
-		for ( i=0; i<cg.numScores; i++ ) {
+		for ( i = 0; i < cg.numScores; i++ ) {
 			if ( cg.scores[i].team == TEAM_RED )
 				count++;
 		}
 		break;
 
 	case FEEDER_BLUETEAM_LIST:
-		for ( i=0; i<cg.numScores; i++ ) {
+		for ( i = 0; i < cg.numScores; i++ ) {
 			if ( cg.scores[i].team == TEAM_BLUE )
 				count++;
 		}
@@ -1143,23 +1113,24 @@ static int CG_FeederCount( int feederID ) {
 }
 
 
-void CG_SetScoreSelection(void *p) {
+void CG_SetScoreSelection( void *p ) {
 	menuDef_t *menu = (menuDef_t*)p;
 	playerState_t *ps = &cg.snap->ps;
 	int i, red, blue;
 	red = blue = 0;
-	for (i = 0; i < cg.numScores; i++) {
-		if (cg.scores[i].team == TEAM_RED) {
+	for ( i = 0; i < cg.numScores; i++ ) {
+		if ( cg.scores[i].team == TEAM_RED ) {
 			red++;
-		} else if (cg.scores[i].team == TEAM_BLUE) {
+		}
+		else if ( cg.scores[i].team == TEAM_BLUE ) {
 			blue++;
 		}
-		if (ps->clientNum == cg.scores[i].client) {
+		if ( ps->clientNum == cg.scores[i].client ) {
 			cg.selectedScore = i;
 		}
 	}
 
-	if (menu == NULL) {
+	if ( menu == NULL ) {
 		// just interested in setting the selected score
 		return;
 	}
@@ -1167,24 +1138,25 @@ void CG_SetScoreSelection(void *p) {
 	if ( cgs.gametype >= GT_TEAM ) {
 		int feeder = FEEDER_REDTEAM_LIST;
 		i = red;
-		if (cg.scores[cg.selectedScore].team == TEAM_BLUE) {
+		if ( cg.scores[cg.selectedScore].team == TEAM_BLUE ) {
 			feeder = FEEDER_BLUETEAM_LIST;
 			i = blue;
 		}
-		Menu_SetFeederSelection(menu, feeder, i, NULL);
-	} else {
-		Menu_SetFeederSelection(menu, FEEDER_SCOREBOARD, cg.selectedScore, NULL);
+		Menu_SetFeederSelection( menu, feeder, i, NULL );
+	}
+	else {
+		Menu_SetFeederSelection( menu, FEEDER_SCOREBOARD, cg.selectedScore, NULL );
 	}
 }
 
 // FIXME: might need to cache this info
-static clientInfo_t * CG_InfoFromScoreIndex(int index, int team, int *scoreIndex) {
+static clientInfo_t * CG_InfoFromScoreIndex( int index, int team, int *scoreIndex ) {
 	int i, count;
 	if ( cgs.gametype >= GT_TEAM ) {
 		count = 0;
-		for (i = 0; i < cg.numScores; i++) {
-			if (cg.scores[i].team == team) {
-				if (count == index) {
+		for ( i = 0; i < cg.numScores; i++ ) {
+			if ( cg.scores[i].team == team ) {
+				if ( count == index ) {
 					*scoreIndex = i;
 					return &cgs.clientinfo[cg.scores[i].client];
 				}
@@ -1193,14 +1165,13 @@ static clientInfo_t * CG_InfoFromScoreIndex(int index, int team, int *scoreIndex
 		}
 	}
 	*scoreIndex = index;
-	return &cgs.clientinfo[ cg.scores[index].client ];
+	return &cgs.clientinfo[cg.scores[index].client];
 }
 
 static const char *CG_FeederItemText( int feederID, int index, int column, qhandle_t *handle1, qhandle_t *handle2,
-	qhandle_t *handle3 )
-{
+	qhandle_t *handle3 ) {
 	const gitem_t *item;
-	int scoreIndex=0, team=-1;
+	int scoreIndex = 0, team = -1;
 	clientInfo_t *info = NULL;
 	score_t *sp = NULL;
 
@@ -1211,60 +1182,65 @@ static const char *CG_FeederItemText( int feederID, int index, int column, qhand
 	else if ( feederID == FEEDER_BLUETEAM_LIST )
 		team = TEAM_BLUE;
 
-	info = CG_InfoFromScoreIndex(index, team, &scoreIndex);
+	info = CG_InfoFromScoreIndex( index, team, &scoreIndex );
 	sp = &cg.scores[scoreIndex];
 
-	if (info && info->infoValid) {
-		switch (column) {
-			case 0:
-				if ( info->powerups & ( 1 << PW_NEUTRALFLAG ) ) {
-					item = BG_FindItemForPowerup( PW_NEUTRALFLAG );
-					*handle1 = cg_items[ ITEM_INDEX(item) ].icon;
-				} else if ( info->powerups & ( 1 << PW_REDFLAG ) ) {
-					item = BG_FindItemForPowerup( PW_REDFLAG );
-					*handle1 = cg_items[ ITEM_INDEX(item) ].icon;
-				} else if ( info->powerups & ( 1 << PW_BLUEFLAG ) ) {
-					item = BG_FindItemForPowerup( PW_BLUEFLAG );
-					*handle1 = cg_items[ ITEM_INDEX(item) ].icon;
-				}
+	if ( info && info->infoValid ) {
+		switch ( column ) {
+		case 0:
+			if ( info->powerups & (1 << PW_NEUTRALFLAG) ) {
+				item = BG_FindItemForPowerup( PW_NEUTRALFLAG );
+				*handle1 = cg_items[ITEM_INDEX( item )].icon;
+			}
+			else if ( info->powerups & (1 << PW_REDFLAG) ) {
+				item = BG_FindItemForPowerup( PW_REDFLAG );
+				*handle1 = cg_items[ITEM_INDEX( item )].icon;
+			}
+			else if ( info->powerups & (1 << PW_BLUEFLAG) ) {
+				item = BG_FindItemForPowerup( PW_BLUEFLAG );
+				*handle1 = cg_items[ITEM_INDEX( item )].icon;
+			}
 			break;
-			case 1:
-				if (team == -1) {
+		case 1:
+			if ( team == -1 ) {
+				return "";
+			}
+			else {
+				*handle1 = CG_StatusHandle( info->teamTask );
+			}
+			break;
+		case 2:
+			if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << sp->client) ) {
+				return "Ready";
+			}
+			if ( team == -1 ) {
+				if ( cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL ) {
+					return va( "%i/%i", info->wins, info->losses );
+				}
+				else if ( info->infoValid && info->team == TEAM_SPECTATOR ) {
+					return "Spectator";
+				}
+				else {
 					return "";
-				} else {
-					*handle1 = CG_StatusHandle(info->teamTask);
 				}
-		  break;
-			case 2:
-				if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << sp->client ) ) {
-					return "Ready";
-				}
-				if (team == -1) {
-					if (cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL) {
-						return va("%i/%i", info->wins, info->losses);
-					} else if (info->infoValid && info->team == TEAM_SPECTATOR ) {
-						return "Spectator";
-					} else {
-						return "";
-					}
-				}
+			}
 			break;
-			case 3:
-				return info->name;
+		case 3:
+			return info->name;
 			break;
-			case 4:
-				return va("%i", info->score);
+		case 4:
+			return va( "%i", info->score );
 			break;
-			case 5:
-				return va("%4i", sp->time);
+		case 5:
+			return va( "%4i", sp->time );
 			break;
-			case 6:
-				if ( sp->ping == -1 ) {
-					return "connecting";
-				}
-				return va("%4i", sp->ping);
-			default:
-				break;
+		case 6:
+			if ( sp->ping == -1 ) {
+				return "connecting";
+			}
+			return va( "%4i", sp->ping );
+		default:
+			break;
 		}
 	}
 
@@ -1277,11 +1253,11 @@ static qhandle_t CG_FeederItemImage( int feederID, int index ) {
 
 static qboolean CG_FeederSelection( int feederID, int index, itemDef_t *item ) {
 	if ( cgs.gametype >= GT_TEAM ) {
-		int i, count=0, team = (feederID == FEEDER_REDTEAM_LIST) ? TEAM_RED : TEAM_BLUE;
+		int i, count = 0, team = (feederID == FEEDER_REDTEAM_LIST) ? TEAM_RED : TEAM_BLUE;
 
-		for ( i=0; i<cg.numScores; i++ ) {
+		for ( i = 0; i < cg.numScores; i++ ) {
 			if ( cg.scores[i].team == team ) {
-				if ( index == count)
+				if ( index == count )
 					cg.selectedScore = i;
 				count++;
 			}
@@ -1296,13 +1272,13 @@ static qboolean CG_FeederSelection( int feederID, int index, itemDef_t *item ) {
 float CG_Cvar_Get( const char *cvar ) {
 	char buff[128];
 
-	trap->Cvar_VariableStringBuffer( cvar, buff, sizeof( buff ) );
+	trap->Cvar_VariableStringBuffer( cvar, buff, sizeof(buff) );
 
 	return (float)atof( buff );
 }
 
-void CG_Text_PaintWithCursor(float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont) {
-	CG_Text_Paint(x, y, scale, color, text, 0, limit, style, iMenuFont);
+void CG_Text_PaintWithCursor( float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont ) {
+	CG_Text_Paint( x, y, scale, color, text, 0, limit, style, iMenuFont );
 }
 
 static int CG_OwnerDrawWidth( int ownerDraw, float scale ) {
@@ -1323,21 +1299,21 @@ static int CG_OwnerDrawWidth( int ownerDraw, float scale ) {
 	return 0;
 }
 
-static int CG_PlayCinematic(const char *name, float x, float y, float w, float h) {
-  return trap->CIN_PlayCinematic(name, x, y, w, h, CIN_loop);
+static int CG_PlayCinematic( const char *name, float x, float y, float w, float h ) {
+	return trap->CIN_PlayCinematic( name, x, y, w, h, CIN_loop );
 }
 
-static void CG_StopCinematic(int handle) {
-  trap->CIN_StopCinematic(handle);
+static void CG_StopCinematic( int handle ) {
+	trap->CIN_StopCinematic( handle );
 }
 
-static void CG_DrawCinematic(int handle, float x, float y, float w, float h) {
-  trap->CIN_SetExtents(handle, x, y, w, h);
-  trap->CIN_DrawCinematic(handle);
+static void CG_DrawCinematic( int handle, float x, float y, float w, float h ) {
+	trap->CIN_SetExtents( handle, x, y, w, h );
+	trap->CIN_DrawCinematic( handle );
 }
 
-static void CG_RunCinematicFrame(int handle) {
-  trap->CIN_RunCinematic(handle);
+static void CG_RunCinematicFrame( int handle ) {
+	trap->CIN_RunCinematic( handle );
 }
 
 /*
@@ -1395,97 +1371,96 @@ void CG_LoadMenus( const char *menuFile ) {
 		}
 	}
 
-//	trap->Print( "UI menu load time = %d milli seconds\n", trap->Milliseconds() - start );
+	//	trap->Print( "UI menu load time = %d milli seconds\n", trap->Milliseconds() - start );
 }
 
 void CG_LoadHudMenu( void ) {
 	const char *hudSet;
 
-	cgDC.registerShaderNoMip			= trap->R_RegisterShaderNoMip;
-	cgDC.setColor						= trap->R_SetColor;
-	cgDC.drawHandlePic					= CG_DrawPic;
-	cgDC.drawStretchPic					= trap->R_DrawStretchPic;
-	cgDC.drawText						= CG_Text_Paint;
-	cgDC.textWidth						= CG_Text_Width;
-	cgDC.textHeight						= CG_Text_Height;
-	cgDC.registerModel					= trap->R_RegisterModel;
-	cgDC.modelBounds					= trap->R_ModelBounds;
-	cgDC.fillRect						= CG_FillRect;
-	cgDC.drawRect						= CG_DrawRect;
-	cgDC.drawSides						= CG_DrawSides;
-	cgDC.drawTopBottom					= CG_DrawTopBottom;
-	cgDC.clearScene						= trap->R_ClearScene;
-	cgDC.addRefEntityToScene			= SE_R_AddRefEntityToScene;
-	cgDC.renderScene					= trap->R_RenderScene;
-	cgDC.RegisterFont					= trap->R_RegisterFont;
-	cgDC.Font_StrLenPixels				= trap->R_Font_StrLenPixels;
-	cgDC.Font_StrLenChars				= trap->R_Font_StrLenChars;
-	cgDC.Font_HeightPixels				= trap->R_Font_HeightPixels;
-	cgDC.Font_DrawString				= trap->R_Font_DrawString;
-	cgDC.Language_IsAsian				= trap->R_Language_IsAsian;
-	cgDC.Language_UsesSpaces			= trap->R_Language_UsesSpaces;
-	cgDC.AnyLanguage_ReadCharFromString	= trap->R_AnyLanguage_ReadCharFromString;
-	cgDC.ownerDrawItem					= CG_OwnerDraw;
-	cgDC.getValue						= CG_GetValue;
-	cgDC.ownerDrawVisible				= CG_OwnerDrawVisible;
-	cgDC.runScript						= CG_RunMenuScript;
-	cgDC.deferScript					= CG_DeferMenuScript;
-	cgDC.getTeamColor					= CG_GetTeamColor;
-	cgDC.setCVar						= trap->Cvar_Set;
-	cgDC.getCVarString					= trap->Cvar_VariableStringBuffer;
-	cgDC.getCVarValue					= CG_Cvar_Get;
-	cgDC.drawTextWithCursor				= CG_Text_PaintWithCursor;
-	cgDC.startLocalSound				= trap->S_StartLocalSound;
-	cgDC.ownerDrawHandleKey				= CG_OwnerDrawHandleKey;
-	cgDC.feederCount					= CG_FeederCount;
-	cgDC.feederItemImage				= CG_FeederItemImage;
-	cgDC.feederItemText					= CG_FeederItemText;
-	cgDC.feederSelection				= CG_FeederSelection;
-	cgDC.Error							= trap->Error;
-	cgDC.Print							= trap->Print;
-	cgDC.ownerDrawWidth					= CG_OwnerDrawWidth;
-	cgDC.registerSound					= trap->S_RegisterSound;
-	cgDC.startBackgroundTrack			= trap->S_StartBackgroundTrack;
-	cgDC.stopBackgroundTrack			= trap->S_StopBackgroundTrack;
-	cgDC.playCinematic					= CG_PlayCinematic;
-	cgDC.stopCinematic					= CG_StopCinematic;
-	cgDC.drawCinematic					= CG_DrawCinematic;
-	cgDC.runCinematicFrame				= CG_RunCinematicFrame;
+	cgDC.registerShaderNoMip = trap->R_RegisterShaderNoMip;
+	cgDC.setColor = trap->R_SetColor;
+	cgDC.drawHandlePic = CG_DrawPic;
+	cgDC.drawStretchPic = trap->R_DrawStretchPic;
+	cgDC.drawText = CG_Text_Paint;
+	cgDC.textWidth = CG_Text_Width;
+	cgDC.textHeight = CG_Text_Height;
+	cgDC.registerModel = trap->R_RegisterModel;
+	cgDC.modelBounds = trap->R_ModelBounds;
+	cgDC.fillRect = CG_FillRect;
+	cgDC.drawRect = CG_DrawRect;
+	cgDC.drawSides = CG_DrawSides;
+	cgDC.drawTopBottom = CG_DrawTopBottom;
+	cgDC.clearScene = trap->R_ClearScene;
+	cgDC.addRefEntityToScene = SE_R_AddRefEntityToScene;
+	cgDC.renderScene = trap->R_RenderScene;
+	cgDC.RegisterFont = trap->R_RegisterFont;
+	cgDC.Font_StrLenPixels = trap->R_Font_StrLenPixels;
+	cgDC.Font_StrLenChars = trap->R_Font_StrLenChars;
+	cgDC.Font_HeightPixels = trap->R_Font_HeightPixels;
+	cgDC.Font_DrawString = trap->R_Font_DrawString;
+	cgDC.Language_IsAsian = trap->R_Language_IsAsian;
+	cgDC.Language_UsesSpaces = trap->R_Language_UsesSpaces;
+	cgDC.AnyLanguage_ReadCharFromString = trap->R_AnyLanguage_ReadCharFromString;
+	cgDC.ownerDrawItem = CG_OwnerDraw;
+	cgDC.getValue = CG_GetValue;
+	cgDC.ownerDrawVisible = CG_OwnerDrawVisible;
+	cgDC.runScript = CG_RunMenuScript;
+	cgDC.deferScript = CG_DeferMenuScript;
+	cgDC.getTeamColor = CG_GetTeamColor;
+	cgDC.setCVar = trap->Cvar_Set;
+	cgDC.getCVarString = trap->Cvar_VariableStringBuffer;
+	cgDC.getCVarValue = CG_Cvar_Get;
+	cgDC.drawTextWithCursor = CG_Text_PaintWithCursor;
+	cgDC.startLocalSound = trap->S_StartLocalSound;
+	cgDC.ownerDrawHandleKey = CG_OwnerDrawHandleKey;
+	cgDC.feederCount = CG_FeederCount;
+	cgDC.feederItemImage = CG_FeederItemImage;
+	cgDC.feederItemText = CG_FeederItemText;
+	cgDC.feederSelection = CG_FeederSelection;
+	cgDC.Error = trap->Error;
+	cgDC.Print = trap->Print;
+	cgDC.ownerDrawWidth = CG_OwnerDrawWidth;
+	cgDC.registerSound = trap->S_RegisterSound;
+	cgDC.startBackgroundTrack = trap->S_StartBackgroundTrack;
+	cgDC.stopBackgroundTrack = trap->S_StopBackgroundTrack;
+	cgDC.playCinematic = CG_PlayCinematic;
+	cgDC.stopCinematic = CG_StopCinematic;
+	cgDC.drawCinematic = CG_DrawCinematic;
+	cgDC.runCinematicFrame = CG_RunCinematicFrame;
 
-	Init_Display(&cgDC);
+	Init_Display( &cgDC );
 
 	Menu_Reset();
 
 	hudSet = cg_hudFiles.string;
-	if (hudSet[0] == '\0')
-	{
+	if ( hudSet[0] == '\0' ) {
 		hudSet = "ui/jahud.txt";
 	}
 
-	CG_LoadMenus(hudSet);
+	CG_LoadMenus( hudSet );
 
 }
 
 void CG_AssetCache( void ) {
-//	Com_Printf( "Menu Size: %i bytes\n", sizeof( Menus ) );
-	cgDC.Assets.gradientBar			= trap->R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
-	cgDC.Assets.fxBasePic			= trap->R_RegisterShaderNoMip( ART_FX_BASE );
-	cgDC.Assets.fxPic[0]			= trap->R_RegisterShaderNoMip( ART_FX_RED );
-	cgDC.Assets.fxPic[1]			= trap->R_RegisterShaderNoMip( ART_FX_YELLOW );
-	cgDC.Assets.fxPic[2]			= trap->R_RegisterShaderNoMip( ART_FX_GREEN );
-	cgDC.Assets.fxPic[3]			= trap->R_RegisterShaderNoMip( ART_FX_TEAL );
-	cgDC.Assets.fxPic[4]			= trap->R_RegisterShaderNoMip( ART_FX_BLUE );
-	cgDC.Assets.fxPic[5]			= trap->R_RegisterShaderNoMip( ART_FX_CYAN );
-	cgDC.Assets.fxPic[6]			= trap->R_RegisterShaderNoMip( ART_FX_WHITE );
-	cgDC.Assets.scrollBar			= trap->R_RegisterShaderNoMip( ASSET_SCROLLBAR );
-	cgDC.Assets.scrollBarArrowDown	= trap->R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
-	cgDC.Assets.scrollBarArrowUp	= trap->R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
-	cgDC.Assets.scrollBarArrowLeft	= trap->R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWLEFT );
-	cgDC.Assets.scrollBarArrowRight	= trap->R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWRIGHT );
-	cgDC.Assets.scrollBarThumb		= trap->R_RegisterShaderNoMip( ASSET_SCROLL_THUMB );
-	cgDC.Assets.sliderBar			= trap->R_RegisterShaderNoMip( ASSET_SLIDER_BAR );
-	cgDC.Assets.sliderThumb			= trap->R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
-	cgDC.Assets.sliderThumbDefault	= trap->R_RegisterShaderNoMip( ASSET_SLIDER_THUMB_DEFAULT );
+	//	Com_Printf( "Menu Size: %i bytes\n", sizeof( Menus ) );
+	cgDC.Assets.gradientBar = trap->R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
+	cgDC.Assets.fxBasePic = trap->R_RegisterShaderNoMip( ART_FX_BASE );
+	cgDC.Assets.fxPic[0] = trap->R_RegisterShaderNoMip( ART_FX_RED );
+	cgDC.Assets.fxPic[1] = trap->R_RegisterShaderNoMip( ART_FX_YELLOW );
+	cgDC.Assets.fxPic[2] = trap->R_RegisterShaderNoMip( ART_FX_GREEN );
+	cgDC.Assets.fxPic[3] = trap->R_RegisterShaderNoMip( ART_FX_TEAL );
+	cgDC.Assets.fxPic[4] = trap->R_RegisterShaderNoMip( ART_FX_BLUE );
+	cgDC.Assets.fxPic[5] = trap->R_RegisterShaderNoMip( ART_FX_CYAN );
+	cgDC.Assets.fxPic[6] = trap->R_RegisterShaderNoMip( ART_FX_WHITE );
+	cgDC.Assets.scrollBar = trap->R_RegisterShaderNoMip( ASSET_SCROLLBAR );
+	cgDC.Assets.scrollBarArrowDown = trap->R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
+	cgDC.Assets.scrollBarArrowUp = trap->R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
+	cgDC.Assets.scrollBarArrowLeft = trap->R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWLEFT );
+	cgDC.Assets.scrollBarArrowRight = trap->R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWRIGHT );
+	cgDC.Assets.scrollBarThumb = trap->R_RegisterShaderNoMip( ASSET_SCROLL_THUMB );
+	cgDC.Assets.sliderBar = trap->R_RegisterShaderNoMip( ASSET_SLIDER_BAR );
+	cgDC.Assets.sliderThumb = trap->R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
+	cgDC.Assets.sliderThumbDefault = trap->R_RegisterShaderNoMip( ASSET_SLIDER_THUMB_DEFAULT );
 }
 
 void CG_TransitionPermanent( void ) {
@@ -1494,7 +1469,7 @@ void CG_TransitionPermanent( void ) {
 
 	cg_numpermanents = 0;
 
-	for ( i=0, cent=cg_entities; i<MAX_GENTITIES; i++, cent++ ) {
+	for ( i = 0, cent = cg_entities; i < MAX_GENTITIES; i++, cent++ ) {
 		if ( trap->GetDefaultState( i, &cent->currentState ) ) {
 			cent->nextState = cent->currentState;
 			VectorCopy( &cent->currentState.origin, &cent->lerpOrigin );
@@ -1515,7 +1490,7 @@ static byte cg_strPool[MAX_CGSTRPOOL_SIZE];
 char *CG_StrPool_Alloc( int size ) {
 	char *giveThemThis;
 
-	if ( cg_strPoolSize+size >= MAX_CGSTRPOOL_SIZE )
+	if ( cg_strPoolSize + size >= MAX_CGSTRPOOL_SIZE )
 		Com_Error( ERR_DROP, "You exceeded the cgame string pool size. Bad programmer!\n" );
 
 	giveThemThis = (char *)&cg_strPool[cg_strPoolSize];
@@ -1534,23 +1509,22 @@ void CG_StrPool_Reset( void ) {
 // Builds a copy of the string, translating \n to real linefeeds so message texts can be multi-line
 char *CG_NewString( const char *string ) {
 	char *newb, *new_p;
-	int i,l;
+	int i, l;
 
-	l = strlen( string )+1;
+	l = strlen( string ) + 1;
 
-//	newb = CG_StrPool_Alloc( l );
+	//	newb = CG_StrPool_Alloc( l );
 	newb = malloc( l );
 
 	new_p = newb;
 
 	// turn \n into a real linefeed
-	for ( i=0; i<l; i++ ) {
-		if ( string[i] == '\\' && i < l-1 ) {
+	for ( i = 0; i < l; i++ ) {
+		if ( string[i] == '\\' && i < l - 1 ) {
 			i++;
 			if ( string[i] == 'n' )
 				*new_p++ = '\n';
-			else
-			{
+			else {
 				if ( string[i] == 'r' )
 					*new_p++ = '\r';
 				else
@@ -1584,19 +1558,19 @@ typedef struct cgSpawnEnt_s {
 
 //spawn fields for our cgame "entity"
 static const BG_field_t cg_spawnFields[] = {
-	{ "angle",			CGFOFS( angle ),		F_FLOAT },
-	{ "angles",			CGFOFS( angles ),		F_VECTOR },
-	{ "classname",		CGFOFS( classname ),	F_LSTRING },
-	{ "fogstart",		CGFOFS( fogstart ),		F_FLOAT },
-	{ "maxs",			CGFOFS( maxs ),			F_VECTOR },
-	{ "mins",			CGFOFS( mins ),			F_VECTOR },
-	{ "model",			CGFOFS( model ),		F_LSTRING },
-	{ "modelscale",		CGFOFS( fScale ),		F_FLOAT },
-	{ "modelscale_vec",	CGFOFS( scale ),		F_VECTOR },
-	{ "onlyfoghere",	CGFOFS( onlyFogHere ),	F_INT },
-	{ "origin",			CGFOFS( origin ),		F_VECTOR },
-	{ "radarrange",		CGFOFS( radarrange ),	F_FLOAT },
-	{ "zoffset",		CGFOFS( zoffset ),		F_FLOAT },
+	{ "angle", CGFOFS( angle ), F_FLOAT },
+	{ "angles", CGFOFS( angles ), F_VECTOR },
+	{ "classname", CGFOFS( classname ), F_LSTRING },
+	{ "fogstart", CGFOFS( fogstart ), F_FLOAT },
+	{ "maxs", CGFOFS( maxs ), F_VECTOR },
+	{ "mins", CGFOFS( mins ), F_VECTOR },
+	{ "model", CGFOFS( model ), F_LSTRING },
+	{ "modelscale", CGFOFS( fScale ), F_FLOAT },
+	{ "modelscale_vec", CGFOFS( scale ), F_VECTOR },
+	{ "onlyfoghere", CGFOFS( onlyFogHere ), F_INT },
+	{ "origin", CGFOFS( origin ), F_VECTOR },
+	{ "radarrange", CGFOFS( radarrange ), F_FLOAT },
+	{ "zoffset", CGFOFS( zoffset ), F_FLOAT },
 };
 
 static int cg_numSpawnVars;
@@ -1658,11 +1632,11 @@ void CG_CreateModelFromSpawnEnt( cgSpawnEnt_t *ent ) {
 
 	modelIndex = trap->R_RegisterModel( ent->model );
 	if ( modelIndex == 0 ) {
-		Com_Error( ERR_DROP, "misc_model_static failed to load model '%s'",ent->model );
+		Com_Error( ERR_DROP, "misc_model_static failed to load model '%s'", ent->model );
 		return;
 	}
 
-	memset( RefEnt, 0, sizeof( refEntity_t ) );
+	memset( RefEnt, 0, sizeof(refEntity_t) );
 	RefEnt->reType = RT_MODEL;
 	RefEnt->hModel = modelIndex;
 	RefEnt->frame = 0;
@@ -1697,7 +1671,7 @@ char *CG_AddSpawnVarToken( const char *string ) {
 	}
 
 	dest = cg_spawnVarChars + cg_numSpawnVarChars;
-	memcpy( dest, string, l+1 );
+	memcpy( dest, string, l + 1 );
 
 	cg_numSpawnVarChars += l + 1;
 
@@ -1712,8 +1686,7 @@ cgame version of G_ParseSpawnVars, for ents that don't really
 need to take up an entity slot (e.g. static models) -rww
 ====================
 */
-qboolean CG_ParseSpawnVars( void )
-{
+qboolean CG_ParseSpawnVars( void ) {
 	char		keyname[MAX_TOKEN_CHARS];
 	char		com_token[MAX_TOKEN_CHARS];
 
@@ -1721,45 +1694,39 @@ qboolean CG_ParseSpawnVars( void )
 	cg_numSpawnVarChars = 0;
 
 	// parse the opening brace
-	if ( !trap->R_GetEntityToken( com_token, sizeof( com_token ) ) ) {
+	if ( !trap->R_GetEntityToken( com_token, sizeof(com_token) ) ) {
 		// end of spawn string
 		return qfalse;
 	}
 	if ( com_token[0] != '{' ) {
-		trap->Error( ERR_DROP, "CG_ParseSpawnVars: found %s when expecting {",com_token );
+		trap->Error( ERR_DROP, "CG_ParseSpawnVars: found %s when expecting {", com_token );
 	}
 
 	// go through all the key / value pairs
-	while ( 1 )
-	{
+	while ( 1 ) {
 		// parse key
-		if ( !trap->R_GetEntityToken( keyname, sizeof( keyname ) ) )
-		{
+		if ( !trap->R_GetEntityToken( keyname, sizeof(keyname) ) ) {
 			trap->Error( ERR_DROP, "CG_ParseSpawnVars: EOF without closing brace" );
 		}
 
-		if ( keyname[0] == '}' )
-		{
+		if ( keyname[0] == '}' ) {
 			break;
 		}
 
 		// parse value
-		if ( !trap->R_GetEntityToken( com_token, sizeof( com_token ) ) )
-		{ //this happens on mike's test level, I don't know why. Fixme?
+		if ( !trap->R_GetEntityToken( com_token, sizeof(com_token) ) ) { //this happens on mike's test level, I don't know why. Fixme?
 			//trap->Error( ERR_DROP, "CG_ParseSpawnVars: EOF without closing brace" );
 			break;
 		}
 
-		if ( com_token[0] == '}' )
-		{
+		if ( com_token[0] == '}' ) {
 			trap->Error( ERR_DROP, "CG_ParseSpawnVars: closing brace without data" );
 		}
-		if ( cg_numSpawnVars == MAX_SPAWN_VARS )
-		{
+		if ( cg_numSpawnVars == MAX_SPAWN_VARS ) {
 			trap->Error( ERR_DROP, "CG_ParseSpawnVars: MAX_SPAWN_VARS" );
 		}
-		cg_spawnVars[ cg_numSpawnVars ][0] = CG_AddSpawnVarToken( keyname );
-		cg_spawnVars[ cg_numSpawnVars ][1] = CG_AddSpawnVarToken( com_token );
+		cg_spawnVars[cg_numSpawnVars][0] = CG_AddSpawnVarToken( keyname );
+		cg_spawnVars[cg_numSpawnVars][1] = CG_AddSpawnVarToken( com_token );
 		cg_numSpawnVars++;
 	}
 
@@ -1777,47 +1744,37 @@ void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, 
 
 extern float cg_linearFogOverride; //cg_view.c
 extern float cg_radarRange;//cg_draw.c
-void CG_SpawnCGameEntFromVars(void)
-{
+void CG_SpawnCGameEntFromVars( void ) {
 	int i;
 	cgSpawnEnt_t ent;
 
-	memset(&ent, 0, sizeof(ent));
+	memset( &ent, 0, sizeof(ent) );
 
-	for (i = 0; i < cg_numSpawnVars; i++)
-	{ //shove all this stuff into our data structure used specifically for getting spawn info
+	for ( i = 0; i < cg_numSpawnVars; i++ ) { //shove all this stuff into our data structure used specifically for getting spawn info
 		BG_ParseField( cg_spawnFields, ARRAY_LEN( cg_spawnFields ), cg_spawnVars[i][0], cg_spawnVars[i][1], (byte *)&ent );
 	}
 
-	if (ent.classname && ent.classname[0])
-	{ //we'll just stricmp this bastard, since there aren't all that many cgame-only things, and they all have special handling
-		if (!Q_stricmp(ent.classname, "worldspawn"))
-		{ //I'd like some info off this guy
-			if (ent.fogstart)
-			{ //linear fog method
+	if ( ent.classname && ent.classname[0] ) { //we'll just stricmp this bastard, since there aren't all that many cgame-only things, and they all have special handling
+		if ( !Q_stricmp( ent.classname, "worldspawn" ) ) { //I'd like some info off this guy
+			if ( ent.fogstart ) { //linear fog method
 				cg_linearFogOverride = ent.fogstart;
 			}
 			//get radarRange off of worldspawn
-			if (ent.radarrange)
-			{ //linear fog method
+			if ( ent.radarrange ) { //linear fog method
 				cg_radarRange = ent.radarrange;
 			}
 		}
-		else if (!Q_stricmp(ent.classname, "misc_model_static"))
-		{ //we've got us a static model
-			CG_CreateModelFromSpawnEnt(&ent);
+		else if ( !Q_stricmp( ent.classname, "misc_model_static" ) ) { //we've got us a static model
+			CG_CreateModelFromSpawnEnt( &ent );
 		}
-		else if (!Q_stricmp(ent.classname, "misc_skyportal_orient"))
-		{ //a sky portal orientation point
-			CG_CreateSkyOriFromSpawnEnt(&ent);
+		else if ( !Q_stricmp( ent.classname, "misc_skyportal_orient" ) ) { //a sky portal orientation point
+			CG_CreateSkyOriFromSpawnEnt( &ent );
 		}
-		else if (!Q_stricmp(ent.classname, "misc_skyportal"))
-		{ //might as well parse this thing cgame side for the extra info I want out of it
-			CG_CreateSkyPortalFromSpawnEnt(&ent);
+		else if ( !Q_stricmp( ent.classname, "misc_skyportal" ) ) { //might as well parse this thing cgame side for the extra info I want out of it
+			CG_CreateSkyPortalFromSpawnEnt( &ent );
 		}
-		else if (!Q_stricmp(ent.classname, "misc_weather_zone"))
-		{ //might as well parse this thing cgame side for the extra info I want out of it
-			CG_CreateWeatherZoneFromSpawnEnt(&ent);
+		else if ( !Q_stricmp( ent.classname, "misc_weather_zone" ) ) { //might as well parse this thing cgame side for the extra info I want out of it
+			CG_CreateWeatherZoneFromSpawnEnt( &ent );
 		}
 	}
 
@@ -1833,22 +1790,18 @@ Parses entity string data for cgame-only entities, that we can throw away on
 the server and never even bother sending. -rww
 ==============
 */
-void CG_SpawnCGameOnlyEnts(void)
-{
+void CG_SpawnCGameOnlyEnts( void ) {
 	//make sure it is reset
-	trap->R_GetEntityToken(NULL, -1);
+	trap->R_GetEntityToken( NULL, -1 );
 
-	if (!CG_ParseSpawnVars())
-	{ //first one is gonna be the world spawn
-		trap->Error(ERR_DROP, "no entities for cgame parse");
+	if ( !CG_ParseSpawnVars() ) { //first one is gonna be the world spawn
+		trap->Error( ERR_DROP, "no entities for cgame parse" );
 	}
-	else
-	{ //parse the world spawn info we want
+	else { //parse the world spawn info we want
 		CG_SpawnCGameEntFromVars();
 	}
 
-	while(CG_ParseSpawnVars())
-	{ //now run through the whole list, and look for things we care about cgame-side
+	while ( CG_ParseSpawnVars() ) { //now run through the whole list, and look for things we care about cgame-side
 		CG_SpawnCGameEntFromVars();
 	}
 }
@@ -1887,11 +1840,11 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	const char	*s;
 
 	// clear out globals
-	memset( cg_entities, 0, sizeof( cg_entities ) );
-	memset( &cg, 0, sizeof( cg ) );
-	memset( cg_items, 0, sizeof( cg_items ) );
-	memset( &cgs, 0, sizeof( cgs ) );
-	memset( cg_weapons, 0, sizeof( cg_weapons ) );
+	memset( cg_entities, 0, sizeof(cg_entities) );
+	memset( &cg, 0, sizeof(cg) );
+	memset( cg_items, 0, sizeof(cg_items) );
+	memset( &cgs, 0, sizeof(cgs) );
+	memset( cg_weapons, 0, sizeof(cg_weapons) );
 
 	trap->RegisterSharedMemory( cg.sharedBuffer );
 
@@ -1949,7 +1902,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	String_Init();
 	CG_LoadingString( "Saber hilts" );
 	WP_SaberLoadParms();
-//	CG_LoadingString( "Media" );
+	//	CG_LoadingString( "Media" );
 	CG_LoadMedia();
 	CG_LoadingString( "Siege data" );
 	CG_InitSiegeMode();
@@ -1980,19 +1933,17 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 
 #ifdef _WIN32
 	{//Detect the timestamp format via the registry
-		#define JP_TIMESTAMP_REGISTRY_KEY "Control Panel\\International"
-		#define JP_TIMESTAMP_REGISTRY_NAME "sTimeFormat"
+#define JP_TIMESTAMP_REGISTRY_KEY "Control Panel\\International"
+#define JP_TIMESTAMP_REGISTRY_NAME "sTimeFormat"
 		char registryValue[256] = { 0 };
 		HKEY hkey;
-		unsigned long datalen = sizeof( registryValue );  // data field length(in), data returned length(out)
+		unsigned long datalen = sizeof(registryValue);  // data field length(in), data returned length(out)
 		unsigned long datatype; // #defined in winnt.h (predefined types 0-11)
 		LSTATUS error;
 		if ( (error = RegOpenKeyExA( (HKEY)HKEY_CURRENT_USER, (LPCSTR)JP_TIMESTAMP_REGISTRY_KEY, (DWORD)0,
-			(REGSAM)KEY_QUERY_VALUE, &hkey )) == ERROR_SUCCESS )
-		{
+			(REGSAM)KEY_QUERY_VALUE, &hkey )) == ERROR_SUCCESS ) {
 			if ( (error = RegQueryValueExA( (HKEY)hkey, (LPCSTR)JP_TIMESTAMP_REGISTRY_NAME, (LPDWORD)NULL,
-				(LPDWORD)&datatype, (LPBYTE)registryValue, (LPDWORD)&datalen)) == ERROR_SUCCESS )
-			{
+				(LPDWORD)&datatype, (LPBYTE)registryValue, (LPDWORD)&datalen )) == ERROR_SUCCESS ) {
 				if ( registryValue[0] == 'H' )
 					cg.japp.timestamp24Hour = qtrue;
 				RegCloseKey( hkey );
@@ -2008,36 +1959,32 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	CG_LoadingString( "" );
 
 	// post-init stuff
-	trap->Cvar_VariableStringBuffer( "rate", buf, sizeof( buf ) );
+	trap->Cvar_VariableStringBuffer( "rate", buf, sizeof(buf) );
 	if ( atoi( buf ) == 4000 )
 		trap->Print( S_COLOR_YELLOW"WARNING: Default /rate value detected. Suggest typing /rate 25000 for a smoother connection!\n" );
 }
 
 //makes sure returned string is in localized format
-const char *CG_GetLocationString(const char *loc)
-{
-	static char text[1024]={0};
+const char *CG_GetLocationString( const char *loc ) {
+	static char text[1024] = { 0 };
 
-	if (!loc || loc[0] != '@')
-	{ //just a raw string
+	if ( !loc || loc[0] != '@' ) { //just a raw string
 		return loc;
 	}
 
-	trap->SE_GetStringTextString(loc+1, text, sizeof(text));
+	trap->SE_GetStringTextString( loc + 1, text, sizeof(text) );
 	return text;
 }
 
 //clean up all the ghoul2 allocations, the nice and non-hackly way -rww
-void CG_KillCEntityG2(int entNum);
-void CG_DestroyAllGhoul2(void)
-{
+void CG_KillCEntityG2( int entNum );
+void CG_DestroyAllGhoul2( void ) {
 	int i = 0;
 	int j;
 
-//	Com_Printf("... CGameside GHOUL2 Cleanup\n");
-	while (i < MAX_GENTITIES)
-	{ //free all dynamically allocated npc client info structs and ghoul2 instances
-		CG_KillCEntityG2(i);
+	//	Com_Printf("... CGameside GHOUL2 Cleanup\n");
+	while ( i < MAX_GENTITIES ) { //free all dynamically allocated npc client info structs and ghoul2 instances
+		CG_KillCEntityG2( i );
 		i++;
 	}
 
@@ -2045,14 +1992,11 @@ void CG_DestroyAllGhoul2(void)
 	CG_ShutDownG2Weapons();
 
 	i = 0;
-	while (i < MAX_ITEMS)
-	{ //and now for items
+	while ( i < MAX_ITEMS ) { //and now for items
 		j = 0;
-		while (j < MAX_ITEM_MODELS)
-		{
-			if (cg_items[i].g2Models[j] && trap->G2_HaveWeGhoul2Models(cg_items[i].g2Models[j]))
-			{
-				trap->G2API_CleanGhoul2Models(&cg_items[i].g2Models[j]);
+		while ( j < MAX_ITEM_MODELS ) {
+			if ( cg_items[i].g2Models[j] && trap->G2_HaveWeGhoul2Models( cg_items[i].g2Models[j] ) ) {
+				trap->G2API_CleanGhoul2Models( &cg_items[i].g2Models[j] );
 				cg_items[i].g2Models[j] = NULL;
 			}
 			j++;
@@ -2071,18 +2015,17 @@ CG_Shutdown
 Called before every level change or subsystem restart
 =================
 */
-void CG_Shutdown( void )
-{
+void CG_Shutdown( void ) {
 	BG_ClearAnimsets(); //free all dynamic allocations made through the engine
 
 	CG_DestroyAllGhoul2();
 
-//	Com_Printf("... FX System Cleanup\n");
+	//	Com_Printf("... FX System Cleanup\n");
 	trap->FX_FreeSystem();
 	trap->ROFF_Clean();
 
 	//reset weather
-	trap->R_WorldEffectCommand("die");
+	trap->R_WorldEffectCommand( "die" );
 
 	UI_CleanupGhoul2();
 	//If there was any ghoul2 stuff in our side of the shared ui code, then remove it now.
@@ -2090,10 +2033,10 @@ void CG_Shutdown( void )
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data
 
-	#ifdef JPLUA
-		//Raz: Lua!
-		JPLua_Shutdown();
-	#endif // JPLUA
+#ifdef JPLUA
+	//Raz: Lua!
+	JPLua_Shutdown();
+#endif // JPLUA
 
 	// close log files
 	CG_LogPrintf( cg.log.chat, "End logging\n------------------------------------------------------------\n\n" );
@@ -2108,43 +2051,36 @@ void CG_Shutdown( void )
 CG_NextForcePower_f
 ===============
 */
-void CG_NextForcePower_f( void )
-{
+void CG_NextForcePower_f( void ) {
 	int current;
 	usercmd_t cmd;
-	if ( !cg.snap )
-	{
+	if ( !cg.snap ) {
 		return;
 	}
 
-	if (cg.predictedPlayerState.pm_type == PM_SPECTATOR)
-	{
+	if ( cg.predictedPlayerState.pm_type == PM_SPECTATOR ) {
 		return;
 	}
 
 	current = trap->GetCurrentCmdNumber();
-	trap->GetUserCmd(current, &cmd);
-	if ((cmd.buttons & BUTTON_USE) || CG_NoUseableForce())
-	{
+	trap->GetUserCmd( current, &cmd );
+	if ( (cmd.buttons & BUTTON_USE) || CG_NoUseableForce() ) {
 		CG_NextInventory_f();
 		return;
 	}
 
-	if (cg.snap->ps.pm_flags & PMF_FOLLOW)
-	{
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
-//	BG_CycleForce(&cg.snap->ps, 1);
-	if (cg.forceSelect != -1)
-	{
+	//	BG_CycleForce(&cg.snap->ps, 1);
+	if ( cg.forceSelect != -1 ) {
 		cg.snap->ps.fd.forcePowerSelected = cg.forceSelect;
 	}
 
-	BG_CycleForce(&cg.snap->ps, 1);
+	BG_CycleForce( &cg.snap->ps, 1 );
 
-	if (cg.snap->ps.fd.forcePowersKnown & (1 << cg.snap->ps.fd.forcePowerSelected))
-	{
+	if ( cg.snap->ps.fd.forcePowersKnown & (1 << cg.snap->ps.fd.forcePowerSelected) ) {
 		cg.forceSelect = cg.snap->ps.fd.forcePowerSelected;
 		cg.forceSelectTime = cg.time;
 	}
@@ -2155,103 +2091,84 @@ void CG_NextForcePower_f( void )
 CG_PrevForcePower_f
 ===============
 */
-void CG_PrevForcePower_f( void )
-{
+void CG_PrevForcePower_f( void ) {
 	int current;
 	usercmd_t cmd;
-	if ( !cg.snap )
-	{
+	if ( !cg.snap ) {
 		return;
 	}
 
-	if (cg.predictedPlayerState.pm_type == PM_SPECTATOR)
-	{
+	if ( cg.predictedPlayerState.pm_type == PM_SPECTATOR ) {
 		return;
 	}
 
 	current = trap->GetCurrentCmdNumber();
-	trap->GetUserCmd(current, &cmd);
-	if ((cmd.buttons & BUTTON_USE) || CG_NoUseableForce())
-	{
+	trap->GetUserCmd( current, &cmd );
+	if ( (cmd.buttons & BUTTON_USE) || CG_NoUseableForce() ) {
 		CG_PrevInventory_f();
 		return;
 	}
 
-	if (cg.snap->ps.pm_flags & PMF_FOLLOW)
-	{
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
-//	BG_CycleForce(&cg.snap->ps, -1);
-	if (cg.forceSelect != -1)
-	{
+	//	BG_CycleForce(&cg.snap->ps, -1);
+	if ( cg.forceSelect != -1 ) {
 		cg.snap->ps.fd.forcePowerSelected = cg.forceSelect;
 	}
 
-	BG_CycleForce(&cg.snap->ps, -1);
+	BG_CycleForce( &cg.snap->ps, -1 );
 
-	if (cg.snap->ps.fd.forcePowersKnown & (1 << cg.snap->ps.fd.forcePowerSelected))
-	{
+	if ( cg.snap->ps.fd.forcePowersKnown & (1 << cg.snap->ps.fd.forcePowerSelected) ) {
 		cg.forceSelect = cg.snap->ps.fd.forcePowerSelected;
 		cg.forceSelectTime = cg.time;
 	}
 }
 
-void CG_NextInventory_f(void)
-{
-	if ( !cg.snap )
-	{
+void CG_NextInventory_f( void ) {
+	if ( !cg.snap ) {
 		return;
 	}
 
-	if (cg.snap->ps.pm_flags & PMF_FOLLOW)
-	{
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
-	if (cg.predictedPlayerState.pm_type == PM_SPECTATOR)
-	{
+	if ( cg.predictedPlayerState.pm_type == PM_SPECTATOR ) {
 		return;
 	}
 
-	if (cg.itemSelect != -1)
-	{
-		cg.snap->ps.stats[STAT_HOLDABLE_ITEM] = BG_GetItemIndexByTag(cg.itemSelect, IT_HOLDABLE);
+	if ( cg.itemSelect != -1 ) {
+		cg.snap->ps.stats[STAT_HOLDABLE_ITEM] = BG_GetItemIndexByTag( cg.itemSelect, IT_HOLDABLE );
 	}
-	BG_CycleInven(&cg.snap->ps, 1);
+	BG_CycleInven( &cg.snap->ps, 1 );
 
-	if (cg.snap->ps.stats[STAT_HOLDABLE_ITEM])
-	{
+	if ( cg.snap->ps.stats[STAT_HOLDABLE_ITEM] ) {
 		cg.itemSelect = bg_itemlist[cg.snap->ps.stats[STAT_HOLDABLE_ITEM]].giTag;
 		cg.invenSelectTime = cg.time;
 	}
 }
 
-void CG_PrevInventory_f(void)
-{
-	if ( !cg.snap )
-	{
+void CG_PrevInventory_f( void ) {
+	if ( !cg.snap ) {
 		return;
 	}
 
-	if (cg.snap->ps.pm_flags & PMF_FOLLOW)
-	{
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
-	if (cg.predictedPlayerState.pm_type == PM_SPECTATOR)
-	{
+	if ( cg.predictedPlayerState.pm_type == PM_SPECTATOR ) {
 		return;
 	}
 
-	if (cg.itemSelect != -1)
-	{
-		cg.snap->ps.stats[STAT_HOLDABLE_ITEM] = BG_GetItemIndexByTag(cg.itemSelect, IT_HOLDABLE);
+	if ( cg.itemSelect != -1 ) {
+		cg.snap->ps.stats[STAT_HOLDABLE_ITEM] = BG_GetItemIndexByTag( cg.itemSelect, IT_HOLDABLE );
 	}
-	BG_CycleInven(&cg.snap->ps, -1);
+	BG_CycleInven( &cg.snap->ps, -1 );
 
-	if (cg.snap->ps.stats[STAT_HOLDABLE_ITEM])
-	{
+	if ( cg.snap->ps.stats[STAT_HOLDABLE_ITEM] ) {
 		cg.itemSelect = bg_itemlist[cg.snap->ps.stats[STAT_HOLDABLE_ITEM]].giTag;
 		cg.invenSelectTime = cg.time;
 	}
@@ -2264,14 +2181,14 @@ char *ConcatArgs( int start ) {
 
 	len = 0;
 	c = trap->Cmd_Argc();
-	for ( i=start; i<c; i++ ) {
-		trap->Cmd_Argv( i, arg, sizeof( arg ) );
+	for ( i = start; i < c; i++ ) {
+		trap->Cmd_Argv( i, arg, sizeof(arg) );
 		tlen = strlen( arg );
-		if ( len+tlen >= MAX_STRING_CHARS-1 )
+		if ( len + tlen >= MAX_STRING_CHARS - 1 )
 			break;
 		memcpy( line + len, arg, tlen );
 		len += tlen;
-		if ( i != c-1 ) {
+		if ( i != c - 1 ) {
 			line[len] = ' ';
 			len++;
 		}
@@ -2292,7 +2209,7 @@ Print to the logfile with a time stamp if it is open
 
 void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	va_list argptr;
-	char string[1024] = {0};
+	char string[1024] = { 0 };
 	size_t len;
 
 	if ( cg_logFormat.integer == 0 ) {
@@ -2302,18 +2219,18 @@ void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 		secs %= 60;
 		msec %= 1000;
 
-		Com_sprintf( string, sizeof( string ), "%i:%02i ", mins, secs );
+		Com_sprintf( string, sizeof(string), "%i:%02i ", mins, secs );
 	}
 	else {
 		time_t rawtime;
 		time( &rawtime );
-		strftime( string, sizeof( string ), "[%Y-%m-%d] [%H:%M:%S] ", gmtime( &rawtime ) );
+		strftime( string, sizeof(string), "[%Y-%m-%d] [%H:%M:%S] ", gmtime( &rawtime ) );
 	}
 
 	len = strlen( string );
 
 	va_start( argptr, fmt );
-	Q_vsnprintf( string+len, sizeof( string )-len, fmt, argptr );
+	Q_vsnprintf( string + len, sizeof(string)-len, fmt, argptr );
 	va_end( argptr );
 
 	if ( !fileHandle )
@@ -2379,7 +2296,7 @@ static void CG_MapChange( void ) {
 static void CG_AutomapInput( void ) {
 	autoMapInput_t *autoInput = (autoMapInput_t *)cg.sharedBuffer;
 
-	memcpy( &cg_autoMapInput, autoInput, sizeof( autoMapInput_t ) );
+	memcpy( &cg_autoMapInput, autoInput, sizeof(autoMapInput_t) );
 
 #if 0
 	if ( !arg0 ) //if this is non-0, it's actually a one-frame mouse event
@@ -2407,28 +2324,27 @@ GetModuleAPI
 
 cgameImport_t *trap = NULL;
 
-typedef int (*R_Font_StrLenPixels_t)( const char *text, const int iFontIndex, const float scale );
-int (*R_Font_StrLenPixels)( const char *text, const int iFontIndex, const float scale );
+typedef int( *R_Font_StrLenPixels_t )(const char *text, const int iFontIndex, const float scale);
+int( *R_Font_StrLenPixels )(const char *text, const int iFontIndex, const float scale);
 float CG_Font_StrLenPixels( const char *text, const int iFontIndex, const float scale ) {
 	float width = (float)R_Font_StrLenPixels( text, iFontIndex, 4.0f );
-	return (width/4.0f) * scale;
+	return (width / 4.0f) * scale;
 }
 
-int (*R_Font_HeightPixels)( const int iFontIndex, const float scale );
-typedef int (*R_Font_HeightPixels_t)( const int iFontIndex, const float scale );
+int( *R_Font_HeightPixels )(const int iFontIndex, const float scale);
+typedef int( *R_Font_HeightPixels_t )(const int iFontIndex, const float scale);
 float CG_Font_HeightPixels( const int iFontIndex, const float scale ) {
 	float height = (float)R_Font_HeightPixels( iFontIndex, 4.0f );
-	return (height/4.0f) * scale;
+	return (height / 4.0f) * scale;
 }
 
-Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *import )
-{
-	static cgameExport_t cge = {0};
+Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *import ) {
+	static cgameExport_t cge = { 0 };
 
 	assert( import );
 	trap = import;
-	Com_Printf	= trap->Print;
-	Com_Error	= trap->Error;
+	Com_Printf = trap->Print;
+	Com_Error = trap->Error;
 
 	//HACK: work-around for JA's crappy width calculation
 	R_Font_StrLenPixels = (R_Font_StrLenPixels_t)trap->R_Font_StrLenPixels;
@@ -2436,40 +2352,40 @@ Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *impor
 	trap->R_Font_StrLenPixels = CG_Font_StrLenPixels;
 	trap->R_Font_HeightPixels = CG_Font_HeightPixels;
 
-	memset( &cge, 0, sizeof( cge ) );
+	memset( &cge, 0, sizeof(cge) );
 
 	if ( apiVersion != CGAME_API_VERSION ) {
 		trap->Print( "Mismatched CGAME_API_VERSION: expected %i, got %i\n", CGAME_API_VERSION, apiVersion );
 		return NULL;
 	}
 
-	cge.Init					= CG_Init;
-	cge.Shutdown				= CG_Shutdown;
-	cge.ConsoleCommand			= CG_ConsoleCommand;
-	cge.DrawActiveFrame			= CG_DrawActiveFrame;
-	cge.CrosshairPlayer			= CG_CrosshairPlayer;
-	cge.LastAttacker			= CG_LastAttacker;
-	cge.KeyEvent				= CG_KeyEvent;
-	cge.MouseEvent				= _CG_MouseEvent;
-	cge.EventHandling			= CG_EventHandling;
-	cge.PointContents			= C_PointContents;
-	cge.GetLerpOrigin			= C_GetLerpOrigin;
-	cge.GetLerpData				= C_GetLerpData;
-	cge.Trace					= C_Trace;
-	cge.G2Trace					= C_G2Trace;
-	cge.G2Mark					= C_G2Mark;
-	cge.RagCallback				= CG_RagCallback;
-	cge.IncomingConsoleCommand	= CG_IncomingConsoleCommand;
-	cge.NoUseableForce			= CG_NoUseableForce;
-	cge.GetOrigin				= CG_GetOrigin;
-	cge.GetAngles				= CG_GetAngles;
-	cge.GetOriginTrajectory		= CG_GetOriginTrajectory;
-	cge.GetAngleTrajectory		= CG_GetAngleTrajectory;
-	cge.ROFF_NotetrackCallback	= _CG_ROFF_NotetrackCallback;
-	cge.MapChange				= CG_MapChange;
-	cge.AutomapInput			= CG_AutomapInput;
-	cge.MiscEnt					= CG_MiscEnt;
-	cge.CameraShake				= CG_FX_CameraShake;
+	cge.Init = CG_Init;
+	cge.Shutdown = CG_Shutdown;
+	cge.ConsoleCommand = CG_ConsoleCommand;
+	cge.DrawActiveFrame = CG_DrawActiveFrame;
+	cge.CrosshairPlayer = CG_CrosshairPlayer;
+	cge.LastAttacker = CG_LastAttacker;
+	cge.KeyEvent = CG_KeyEvent;
+	cge.MouseEvent = _CG_MouseEvent;
+	cge.EventHandling = CG_EventHandling;
+	cge.PointContents = C_PointContents;
+	cge.GetLerpOrigin = C_GetLerpOrigin;
+	cge.GetLerpData = C_GetLerpData;
+	cge.Trace = C_Trace;
+	cge.G2Trace = C_G2Trace;
+	cge.G2Mark = C_G2Mark;
+	cge.RagCallback = CG_RagCallback;
+	cge.IncomingConsoleCommand = CG_IncomingConsoleCommand;
+	cge.NoUseableForce = CG_NoUseableForce;
+	cge.GetOrigin = CG_GetOrigin;
+	cge.GetAngles = CG_GetAngles;
+	cge.GetOriginTrajectory = CG_GetOriginTrajectory;
+	cge.GetAngleTrajectory = CG_GetAngleTrajectory;
+	cge.ROFF_NotetrackCallback = _CG_ROFF_NotetrackCallback;
+	cge.MapChange = CG_MapChange;
+	cge.AutomapInput = CG_AutomapInput;
+	cge.MiscEnt = CG_MiscEnt;
+	cge.CameraShake = CG_FX_CameraShake;
 
 
 	return &cge;
@@ -2484,8 +2400,7 @@ This must be the very first function compiled into the .q3vm file
 ================
 */
 Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t arg2, intptr_t arg3, intptr_t arg4,
-	intptr_t arg5, intptr_t arg6, intptr_t arg7, intptr_t arg8, intptr_t arg9, intptr_t arg10, intptr_t arg11 )
-{
+	intptr_t arg5, intptr_t arg6, intptr_t arg7, intptr_t arg8, intptr_t arg9, intptr_t arg10, intptr_t arg11 ) {
 	switch ( command ) {
 
 	case CG_INIT:
@@ -2534,8 +2449,8 @@ Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t ar
 
 	case CG_GET_GHOUL2:
 		return (intptr_t)cg_entities[arg0].ghoul2; //NOTE: This is used by the effect bolting which is actually not used at all.
-											  //I'm fairly sure if you try to use it with vm's it will just give you total
-											  //garbage. In other words, use at your own risk.
+		//I'm fairly sure if you try to use it with vm's it will just give you total
+		//garbage. In other words, use at your own risk.
 
 	case CG_GET_MODEL_LIST:
 		return (intptr_t)cgs.gameModels;

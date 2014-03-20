@@ -12,8 +12,8 @@ void CG_CheckAmmo( void ) {
 	// see about how many seconds of ammo we have remaining
 	weapons = cg.snap->ps.stats[STAT_WEAPONS];
 	total = 0;
-	for ( i=WP_BRYAR_PISTOL; i<WP_NUM_WEAPONS; i++ ) {
-		if ( !(weapons & (1<<i)) )
+	for ( i = WP_BRYAR_PISTOL; i < WP_NUM_WEAPONS; i++ ) {
+		if ( !(weapons & (1 << i)) )
 			continue;
 		switch ( i ) {
 		case WP_BRYAR_PISTOL:
@@ -122,12 +122,12 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 	// clamp the position
 	if ( cg.damageX > 1.0f )
 		cg.damageX = 1.0f;
-	if ( cg.damageX < - 1.0f )
+	if ( cg.damageX < -1.0f )
 		cg.damageX = -1.0f;
 
 	if ( cg.damageY > 1.0f )
 		cg.damageY = 1.0f;
-	if ( cg.damageY < - 1.0f )
+	if ( cg.damageY < -1.0f )
 		cg.damageY = -1.0f;
 
 	// don't let the screen flashes vary as much
@@ -156,29 +156,29 @@ void CG_CheckPlayerstateEvents( playerState_t *ps, playerState_t *ops ) {
 	centity_t *cent;
 
 	if ( ps->externalEvent && ps->externalEvent != ops->externalEvent ) {
-		cent = &cg_entities[ ps->clientNum ];
+		cent = &cg_entities[ps->clientNum];
 		cent->currentState.event = ps->externalEvent;
 		cent->currentState.eventParm = ps->externalEventParm;
 		CG_EntityEvent( cent, &cent->lerpOrigin );
 	}
 
-	cent = &cg_entities[ ps->clientNum ];
+	cent = &cg_entities[ps->clientNum];
 	// go through the predictable events buffer
 	for ( i = ps->eventSequence - MAX_PS_EVENTS; i < ps->eventSequence; i++ ) {
 		// if we have a new predictable event
 		if ( i >= ops->eventSequence
 			// or the server told us to play another event instead of a predicted event we already issued
 			// or something the server told us changed our prediction causing a different event
-			|| (i > ops->eventSequence - MAX_PS_EVENTS && ps->events[i & (MAX_PS_EVENTS-1)] != ops->events[i & (MAX_PS_EVENTS-1)]) ) {
+			|| (i > ops->eventSequence - MAX_PS_EVENTS && ps->events[i & (MAX_PS_EVENTS - 1)] != ops->events[i & (MAX_PS_EVENTS - 1)]) ) {
 
-			event = ps->events[ i & (MAX_PS_EVENTS-1) ];
+			event = ps->events[i & (MAX_PS_EVENTS - 1)];
 			cent->currentState.event = event;
-			cent->currentState.eventParm = ps->eventParms[ i & (MAX_PS_EVENTS-1) ];
+			cent->currentState.eventParm = ps->eventParms[i & (MAX_PS_EVENTS - 1)];
 			//Raz: Swoop camera fix
-		//	cent->playerState = ps;
+			//	cent->playerState = ps;
 			CG_EntityEvent( cent, &cent->lerpOrigin );
 
-			cg.predictableEvents[ i & (MAX_PREDICTED_EVENTS-1) ] = event;
+			cg.predictableEvents[i & (MAX_PREDICTED_EVENTS - 1)] = event;
 
 			cg.eventSequence++;
 		}
@@ -196,14 +196,14 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps ) {
 		// if this event is not further back in than the maximum predictable events we remember
 		if ( i > cg.eventSequence - MAX_PREDICTED_EVENTS ) {
 			// if the new playerstate event is different from a previously predicted one
-			if ( ps->events[i & (MAX_PS_EVENTS-1)] != cg.predictableEvents[i & (MAX_PREDICTED_EVENTS-1) ] ) {
+			if ( ps->events[i & (MAX_PS_EVENTS - 1)] != cg.predictableEvents[i & (MAX_PREDICTED_EVENTS - 1)] ) {
 
-				event = ps->events[ i & (MAX_PS_EVENTS-1) ];
+				event = ps->events[i & (MAX_PS_EVENTS - 1)];
 				cent->currentState.event = event;
-				cent->currentState.eventParm = ps->eventParms[ i & (MAX_PS_EVENTS-1) ];
+				cent->currentState.eventParm = ps->eventParms[i & (MAX_PS_EVENTS - 1)];
 				CG_EntityEvent( cent, &cent->lerpOrigin );
 
-				cg.predictableEvents[ i & (MAX_PREDICTED_EVENTS-1) ] = event;
+				cg.predictableEvents[i & (MAX_PREDICTED_EVENTS - 1)] = event;
 
 				if ( cg_showMiss.integer )
 					trap->Print( "WARNING: changed predicted event\n" );
@@ -213,7 +213,7 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps ) {
 }
 
 static void pushReward( sfxHandle_t sfx, qhandle_t shader, int rewardCount ) {
-	if ( cg.rewardStack < (MAX_REWARDSTACK-1) ) {
+	if ( cg.rewardStack < (MAX_REWARDSTACK - 1) ) {
 		cg.rewardStack++;
 		cg.rewardSound[cg.rewardStack] = sfx;
 		cg.rewardShader[cg.rewardStack] = shader;
@@ -293,17 +293,17 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 	// timelimit warnings
 	if ( cgs.timelimit > 0 && cgAnnouncerTime < cg.time ) {
 		int msec = cg.time - cgs.levelStartTime;
-		if ( !( cg.timelimitWarnings & 4 ) && msec > ( cgs.timelimit * 60 + 2 ) * 1000 ) {
+		if ( !(cg.timelimitWarnings & 4) && msec >( cgs.timelimit * 60 + 2 ) * 1000 ) {
 			cg.timelimitWarnings |= 1 | 2 | 4;
 			//RAZFIXME: Add sudden death sound
-		//	trap->S_StartLocalSound( media.sounds.suddenDeath, CHAN_ANNOUNCER );
+			//	trap->S_StartLocalSound( media.sounds.suddenDeath, CHAN_ANNOUNCER );
 		}
-		else if ( !( cg.timelimitWarnings & 2 ) && msec > (cgs.timelimit - 1) * 60 * 1000 ) {
+		else if ( !(cg.timelimitWarnings & 2) && msec > (cgs.timelimit - 1) * 60 * 1000 ) {
 			cg.timelimitWarnings |= 1 | 2;
 			trap->S_StartLocalSound( media.sounds.warning.oneMinute, CHAN_ANNOUNCER );
 			cgAnnouncerTime = cg.time + 3000;
 		}
-		else if ( cgs.timelimit > 5 && !( cg.timelimitWarnings & 1 ) && msec > (cgs.timelimit - 5) * 60 * 1000 ) {
+		else if ( cgs.timelimit > 5 && !(cg.timelimitWarnings & 1) && msec > (cgs.timelimit - 5) * 60 * 1000 ) {
 			cg.timelimitWarnings |= 1;
 			trap->S_StartLocalSound( media.sounds.warning.fiveMinute, CHAN_ANNOUNCER );
 			cgAnnouncerTime = cg.time + 3000;
@@ -311,22 +311,22 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 	}
 
 	// fraglimit warnings
-	if ( cgs.fraglimit > 0 && cgs.gametype < GT_CTF && cgs.gametype != GT_DUEL && cgs.gametype != GT_POWERDUEL && cgs.gametype != GT_SIEGE && cgAnnouncerTime < cg.time) {
+	if ( cgs.fraglimit > 0 && cgs.gametype < GT_CTF && cgs.gametype != GT_DUEL && cgs.gametype != GT_POWERDUEL && cgs.gametype != GT_SIEGE && cgAnnouncerTime < cg.time ) {
 		highScore = cgs.scores1;
 		if ( cgs.gametype == GT_TEAM && cgs.scores2 > highScore )
 			highScore = cgs.scores2;
 
-		if ( !( cg.fraglimitWarnings & 4 ) && highScore == (cgs.fraglimit - 1) ) {
+		if ( !(cg.fraglimitWarnings & 4) && highScore == (cgs.fraglimit - 1) ) {
 			cg.fraglimitWarnings |= 1 | 2 | 4;
 			CG_AddBufferedSound( media.sounds.warning.oneFrag );
 			cgAnnouncerTime = cg.time + 3000;
 		}
-		else if ( cgs.fraglimit > 2 && !( cg.fraglimitWarnings & 2 ) && highScore == (cgs.fraglimit - 2) ) {
+		else if ( cgs.fraglimit > 2 && !(cg.fraglimitWarnings & 2) && highScore == (cgs.fraglimit - 2) ) {
 			cg.fraglimitWarnings |= 1 | 2;
 			CG_AddBufferedSound( media.sounds.warning.twoFrag );
 			cgAnnouncerTime = cg.time + 3000;
 		}
-		else if ( cgs.fraglimit > 3 && !( cg.fraglimitWarnings & 1 ) && highScore == (cgs.fraglimit - 3) ) {
+		else if ( cgs.fraglimit > 3 && !(cg.fraglimitWarnings & 1) && highScore == (cgs.fraglimit - 3) ) {
 			cg.fraglimitWarnings |= 1;
 			CG_AddBufferedSound( media.sounds.warning.threeFrag );
 			cgAnnouncerTime = cg.time + 3000;

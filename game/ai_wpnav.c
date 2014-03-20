@@ -18,84 +18,70 @@ int nodenum; //so we can connect broken trails
 
 uint32_t gLevelFlags = 0;
 
-char *GetFlagStr( uint32_t flags )
-{
+char *GetFlagStr( uint32_t flags ) {
 	char *flagstr;
 	int i;
 
-	flagstr = (char *)B_TempAlloc(128);
+	flagstr = (char *)B_TempAlloc( 128 );
 	i = 0;
 
-	if (!flags)
-	{
-		strcpy(flagstr, "none\0");
+	if ( !flags ) {
+		strcpy( flagstr, "none\0" );
 		goto fend;
 	}
 
-	if (flags & WPFLAG_JUMP)
-	{
+	if ( flags & WPFLAG_JUMP ) {
 		flagstr[i] = 'j';
 		i++;
 	}
 
-	if (flags & WPFLAG_DUCK)
-	{
+	if ( flags & WPFLAG_DUCK ) {
 		flagstr[i] = 'd';
 		i++;
 	}
 
-	if (flags & WPFLAG_SNIPEORCAMPSTAND)
-	{
+	if ( flags & WPFLAG_SNIPEORCAMPSTAND ) {
 		flagstr[i] = 'c';
 		i++;
 	}
 
-	if (flags & WPFLAG_WAITFORFUNC)
-	{
+	if ( flags & WPFLAG_WAITFORFUNC ) {
 		flagstr[i] = 'f';
 		i++;
 	}
 
-	if (flags & WPFLAG_SNIPEORCAMP)
-	{
+	if ( flags & WPFLAG_SNIPEORCAMP ) {
 		flagstr[i] = 's';
 		i++;
 	}
 
-	if (flags & WPFLAG_ONEWAY_FWD)
-	{
+	if ( flags & WPFLAG_ONEWAY_FWD ) {
 		flagstr[i] = 'x';
 		i++;
 	}
 
-	if (flags & WPFLAG_ONEWAY_BACK)
-	{
+	if ( flags & WPFLAG_ONEWAY_BACK ) {
 		flagstr[i] = 'y';
 		i++;
 	}
 
-	if (flags & WPFLAG_GOALPOINT)
-	{
+	if ( flags & WPFLAG_GOALPOINT ) {
 		flagstr[i] = 'g';
 		i++;
 	}
 
-	if (flags & WPFLAG_NOVIS)
-	{
+	if ( flags & WPFLAG_NOVIS ) {
 		flagstr[i] = 'n';
 		i++;
 	}
 
-	if (flags & WPFLAG_NOMOVEFUNC)
-	{
+	if ( flags & WPFLAG_NOMOVEFUNC ) {
 		flagstr[i] = 'm';
 		i++;
 	}
 
-	if (flags & WPFLAG_RED_FLAG)
-	{
-		if (i)
-		{
+	if ( flags & WPFLAG_RED_FLAG ) {
+		if ( i ) {
 			flagstr[i] = ' ';
 			i++;
 		}
@@ -117,10 +103,8 @@ char *GetFlagStr( uint32_t flags )
 		i++;
 	}
 
-	if (flags & WPFLAG_BLUE_FLAG)
-	{
-		if (i)
-		{
+	if ( flags & WPFLAG_BLUE_FLAG ) {
+		if ( i ) {
 			flagstr[i] = ' ';
 			i++;
 		}
@@ -144,10 +128,8 @@ char *GetFlagStr( uint32_t flags )
 		i++;
 	}
 
-	if (flags & WPFLAG_SIEGE_IMPERIALOBJ)
-	{
-		if (i)
-		{
+	if ( flags & WPFLAG_SIEGE_IMPERIALOBJ ) {
+		if ( i ) {
 			flagstr[i] = ' ';
 			i++;
 		}
@@ -169,10 +151,8 @@ char *GetFlagStr( uint32_t flags )
 		i++;
 	}
 
-	if (flags & WPFLAG_SIEGE_REBELOBJ)
-	{
-		if (i)
-		{
+	if ( flags & WPFLAG_SIEGE_REBELOBJ ) {
+		if ( i ) {
 			flagstr[i] = ' ';
 			i++;
 		}
@@ -196,22 +176,20 @@ char *GetFlagStr( uint32_t flags )
 
 	flagstr[i] = '\0';
 
-	if (i == 0)
-	{
-		strcpy(flagstr, "unknown\0");
+	if ( i == 0 ) {
+		strcpy( flagstr, "unknown\0" );
 	}
 
 fend:
 	return flagstr;
 }
 
-void G_TestLine(vector3 *start, vector3 *end, int color, int time)
-{
+void G_TestLine( vector3 *start, vector3 *end, int color, int time ) {
 	gentity_t *te;
 
 	te = G_TempEntity( start, EV_TESTLINE );
-	VectorCopy(start, &te->s.origin);
-	VectorCopy(end, &te->s.origin2);
+	VectorCopy( start, &te->s.origin );
+	VectorCopy( end, &te->s.origin2 );
 	te->s.time2 = time;
 	{
 		static int r = 0;
@@ -222,8 +200,7 @@ void G_TestLine(vector3 *start, vector3 *end, int color, int time)
 	te->r.svFlags |= SVF_BROADCAST;
 }
 
-void BotWaypointRender(void)
-{
+void BotWaypointRender( void ) {
 	int i, n;
 	int inc_checker;
 	int bestindex;
@@ -235,15 +212,13 @@ void BotWaypointRender(void)
 	char *flagstr;
 	vector3 a;
 
-	if (!gBotEdit)
-	{
+	if ( !gBotEdit ) {
 		return;
 	}
 
 	bestindex = 0;
 
-	if (gWPRenderTime > level.time)
-	{
+	if ( gWPRenderTime > level.time ) {
 		goto checkprint;
 	}
 
@@ -252,55 +227,47 @@ void BotWaypointRender(void)
 	i = gWPRenderedFrame;
 	inc_checker = gWPRenderedFrame;
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse)
-		{
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse ) {
 			plum = G_TempEntity( &gWPArray[i]->origin, EV_SCOREPLUM );
 			plum->r.svFlags |= SVF_BROADCAST;
 			plum->s.time = i;
 
 			n = 0;
 
-			while (n < gWPArray[i]->neighbornum)
-			{
-				if (gWPArray[i]->neighbors[n].forceJumpTo && gWPArray[gWPArray[i]->neighbors[n].num])
-					G_TestLine(&gWPArray[i]->origin, &gWPArray[gWPArray[i]->neighbors[n].num]->origin, 0x0000ff, 5000);
+			while ( n < gWPArray[i]->neighbornum ) {
+				if ( gWPArray[i]->neighbors[n].forceJumpTo && gWPArray[gWPArray[i]->neighbors[n].num] )
+					G_TestLine( &gWPArray[i]->origin, &gWPArray[gWPArray[i]->neighbors[n].num]->origin, 0x0000ff, 5000 );
 				n++;
 			}
 
 			gWPRenderedFrame++;
 		}
-		else
-		{
+		else {
 			gWPRenderedFrame = 0;
 			break;
 		}
 
-		if ((i - inc_checker) > 4)
-		{
+		if ( (i - inc_checker) > 4 ) {
 			break; //don't render too many at once
 		}
 		i++;
 	}
 
-	if (i >= gWPNum)
-	{
+	if ( i >= gWPNum ) {
 		gWPRenderTime = level.time + 1500; //wait a bit after we finish doing the whole trail
 		gWPRenderedFrame = 0;
 	}
 
 checkprint:
 
-	if (!bot_wp_info.value)
-	{
+	if ( !bot_wp_info.value ) {
 		return;
 	}
 
 	viewent = &g_entities[0]; //only show info to the first client
 
-	if (!viewent || !viewent->client)
-	{ //client isn't in the game yet?
+	if ( !viewent || !viewent->client ) { //client isn't in the game yet?
 		return;
 	}
 
@@ -309,16 +276,13 @@ checkprint:
 
 	i = 0;
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse)
-		{
-			VectorSubtract(&viewent->client->ps.origin, &gWPArray[i]->origin, &a);
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse ) {
+			VectorSubtract( &viewent->client->ps.origin, &gWPArray[i]->origin, &a );
 
-			checkdist = VectorLength(&a);
+			checkdist = VectorLength( &a );
 
-			if (checkdist < bestdist)
-			{
+			if ( checkdist < bestdist ) {
 				bestdist = checkdist;
 				bestindex = i;
 				gotbestindex = 1;
@@ -327,34 +291,29 @@ checkprint:
 		i++;
 	}
 
-	if (gotbestindex && bestindex != gLastPrintedIndex)
-	{
-		flagstr = GetFlagStr(gWPArray[bestindex]->flags);
+	if ( gotbestindex && bestindex != gLastPrintedIndex ) {
+		flagstr = GetFlagStr( gWPArray[bestindex]->flags );
 		gLastPrintedIndex = bestindex;
-		trap->Print(S_COLOR_YELLOW "Waypoint %i\nFlags - %i (%s) (w%f)\nOrigin - (%i %i %i)\n", (int)(gWPArray[bestindex]->index), (int)(gWPArray[bestindex]->flags), flagstr, gWPArray[bestindex]->weight, (int)(gWPArray[bestindex]->origin.x), (int)(gWPArray[bestindex]->origin.y), (int)(gWPArray[bestindex]->origin.z));
+		trap->Print( S_COLOR_YELLOW "Waypoint %i\nFlags - %i (%s) (w%f)\nOrigin - (%i %i %i)\n", (int)(gWPArray[bestindex]->index), (int)(gWPArray[bestindex]->flags), flagstr, gWPArray[bestindex]->weight, (int)(gWPArray[bestindex]->origin.x), (int)(gWPArray[bestindex]->origin.y), (int)(gWPArray[bestindex]->origin.z) );
 		//GetFlagStr allocates 128 bytes for this, if it's changed then obviously this must be as well
-		B_TempFree(128); //flagstr
+		B_TempFree( 128 ); //flagstr
 
 		plum = G_TempEntity( &gWPArray[bestindex]->origin, EV_SCOREPLUM );
 		plum->r.svFlags |= SVF_BROADCAST;
 		plum->s.time = bestindex; //render it once
 	}
-	else if (!gotbestindex)
-	{
+	else if ( !gotbestindex ) {
 		gLastPrintedIndex = -1;
 	}
 }
 
-void TransferWPData(int from, int to)
-{
-	if (!gWPArray[to])
-	{
-		gWPArray[to] = (wpobject_t *)B_Alloc(sizeof(wpobject_t));
+void TransferWPData( int from, int to ) {
+	if ( !gWPArray[to] ) {
+		gWPArray[to] = (wpobject_t *)B_Alloc( sizeof(wpobject_t) );
 	}
 
-	if (!gWPArray[to])
-	{
-		trap->Print(S_COLOR_RED "FATAL ERROR: Could not allocated memory for waypoint\n");
+	if ( !gWPArray[to] ) {
+		trap->Print( S_COLOR_RED "FATAL ERROR: Could not allocated memory for waypoint\n" );
 	}
 
 	assert( gWPArray[from] );
@@ -366,28 +325,23 @@ void TransferWPData(int from, int to)
 	gWPArray[to]->forceJumpTo = gWPArray[from]->forceJumpTo;
 	gWPArray[to]->index = to;
 	gWPArray[to]->inuse = gWPArray[from]->inuse;
-	VectorCopy(&gWPArray[from]->origin, &gWPArray[to]->origin);
+	VectorCopy( &gWPArray[from]->origin, &gWPArray[to]->origin );
 }
 
-void CreateNewWP(vector3 *origin, int flags)
-{
-	if (gWPNum >= MAX_WPARRAY_SIZE)
-	{
-		if (!RMG.integer)
-		{
-			trap->Print(S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE);
+void CreateNewWP( vector3 *origin, int flags ) {
+	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
+		if ( !RMG.integer ) {
+			trap->Print( S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE );
 		}
 		return;
 	}
 
-	if (!gWPArray[gWPNum])
-	{
-		gWPArray[gWPNum] = (wpobject_t *)B_Alloc(sizeof(wpobject_t));
+	if ( !gWPArray[gWPNum] ) {
+		gWPArray[gWPNum] = (wpobject_t *)B_Alloc( sizeof(wpobject_t) );
 	}
 
-	if (!gWPArray[gWPNum])
-	{
-		trap->Print(S_COLOR_RED "ERROR: Could not allocated memory for waypoint\n");
+	if ( !gWPArray[gWPNum] ) {
+		trap->Print( S_COLOR_RED "ERROR: Could not allocated memory for waypoint\n" );
 	}
 
 	gWPArray[gWPNum]->flags = flags;
@@ -397,27 +351,23 @@ void CreateNewWP(vector3 *origin, int flags)
 	gWPArray[gWPNum]->disttonext = 0; //calculated elsewhere
 	gWPArray[gWPNum]->index = gWPNum;
 	gWPArray[gWPNum]->inuse = 1;
-	VectorCopy(origin, &gWPArray[gWPNum]->origin);
+	VectorCopy( origin, &gWPArray[gWPNum]->origin );
 	gWPNum++;
 }
 
-void CreateNewWP_FromObject(wpobject_t *wp)
-{
+void CreateNewWP_FromObject( wpobject_t *wp ) {
 	int i;
 
-	if (gWPNum >= MAX_WPARRAY_SIZE)
-	{
+	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
 		return;
 	}
 
-	if (!gWPArray[gWPNum])
-	{
-		gWPArray[gWPNum] = (wpobject_t *)B_Alloc(sizeof(wpobject_t));
+	if ( !gWPArray[gWPNum] ) {
+		gWPArray[gWPNum] = (wpobject_t *)B_Alloc( sizeof(wpobject_t) );
 	}
 
-	if (!gWPArray[gWPNum])
-	{
-		trap->Print(S_COLOR_RED "ERROR: Could not allocated memory for waypoint\n");
+	if ( !gWPArray[gWPNum] ) {
+		trap->Print( S_COLOR_RED "ERROR: Could not allocated memory for waypoint\n" );
 	}
 
 	gWPArray[gWPNum]->flags = wp->flags;
@@ -427,26 +377,23 @@ void CreateNewWP_FromObject(wpobject_t *wp)
 	gWPArray[gWPNum]->forceJumpTo = wp->forceJumpTo;
 	gWPArray[gWPNum]->index = gWPNum;
 	gWPArray[gWPNum]->inuse = 1;
-	VectorCopy(&wp->origin, &gWPArray[gWPNum]->origin);
+	VectorCopy( &wp->origin, &gWPArray[gWPNum]->origin );
 	gWPArray[gWPNum]->neighbornum = wp->neighbornum;
 
 	i = wp->neighbornum;
 
-	while (i >= 0)
-	{
+	while ( i >= 0 ) {
 		gWPArray[gWPNum]->neighbors[i].num = wp->neighbors[i].num;
 		gWPArray[gWPNum]->neighbors[i].forceJumpTo = wp->neighbors[i].forceJumpTo;
 
 		i--;
 	}
 
-	if (gWPArray[gWPNum]->flags & WPFLAG_RED_FLAG)
-	{
+	if ( gWPArray[gWPNum]->flags & WPFLAG_RED_FLAG ) {
 		flagRed = gWPArray[gWPNum];
 		oFlagRed = flagRed;
 	}
-	else if (gWPArray[gWPNum]->flags & WPFLAG_BLUE_FLAG)
-	{
+	else if ( gWPArray[gWPNum]->flags & WPFLAG_BLUE_FLAG ) {
 		flagBlue = gWPArray[gWPNum];
 		oFlagBlue = flagBlue;
 	}
@@ -454,43 +401,36 @@ void CreateNewWP_FromObject(wpobject_t *wp)
 	gWPNum++;
 }
 
-void RemoveWP(void)
-{
-	if (gWPNum <= 0)
-	{
+void RemoveWP( void ) {
+	if ( gWPNum <= 0 ) {
 		return;
 	}
 
 	gWPNum--;
 
-	if (!gWPArray[gWPNum] || !gWPArray[gWPNum]->inuse)
-	{
+	if ( !gWPArray[gWPNum] || !gWPArray[gWPNum]->inuse ) {
 		return;
 	}
 
 	//B_Free((wpobject_t *)gWPArray[gWPNum]);
-	if (gWPArray[gWPNum])
-	{
+	if ( gWPArray[gWPNum] ) {
 		memset( gWPArray[gWPNum], 0, sizeof(*gWPArray[gWPNum]) );
 	}
 
 	//gWPArray[gWPNum] = NULL;
 
-	if (gWPArray[gWPNum])
-	{
+	if ( gWPArray[gWPNum] ) {
 		gWPArray[gWPNum]->inuse = 0;
 	}
 }
 
-void RemoveAllWP(void)
-{
-	while(gWPNum) {
+void RemoveAllWP( void ) {
+	while ( gWPNum ) {
 		RemoveWP();
 	}
 }
 
-void RemoveWP_InTrail(int afterindex)
-{
+void RemoveWP_InTrail( int afterindex ) {
 	int foundindex;
 	int foundanindex;
 	int didchange;
@@ -501,16 +441,13 @@ void RemoveWP_InTrail(int afterindex)
 	didchange = 0;
 	i = 0;
 
-	if (afterindex < 0 || afterindex >= gWPNum)
-	{
-		trap->Print(S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex);
+	if ( afterindex < 0 || afterindex >= gWPNum ) {
+		trap->Print( S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex );
 		return;
 	}
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex)
-		{
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex ) {
 			foundindex = i;
 			foundanindex = 1;
 			break;
@@ -519,18 +456,15 @@ void RemoveWP_InTrail(int afterindex)
 		i++;
 	}
 
-	if (!foundanindex)
-	{
-		trap->Print(S_COLOR_YELLOW "Waypoint index %i should exist, but does not (?)\n", afterindex);
+	if ( !foundanindex ) {
+		trap->Print( S_COLOR_YELLOW "Waypoint index %i should exist, but does not (?)\n", afterindex );
 		return;
 	}
 
 	i = 0;
 
-	while (i <= gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->index == foundindex)
-		{
+	while ( i <= gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->index == foundindex ) {
 			//B_Free(gWPArray[i]);
 
 			//Keep reusing the memory
@@ -540,9 +474,8 @@ void RemoveWP_InTrail(int afterindex)
 			gWPArray[i]->inuse = 0;
 			didchange = 1;
 		}
-		else if (gWPArray[i] && didchange)
-		{
-			TransferWPData(i, i-1);
+		else if ( gWPArray[i] && didchange ) {
+			TransferWPData( i, i - 1 );
 			//B_Free(gWPArray[i]);
 
 			//Keep reusing the memory
@@ -557,8 +490,7 @@ void RemoveWP_InTrail(int afterindex)
 	gWPNum--;
 }
 
-int CreateNewWP_InTrail(vector3 *origin, int flags, int afterindex)
-{
+int CreateNewWP_InTrail( vector3 *origin, int flags, int afterindex ) {
 	int foundindex;
 	int foundanindex;
 	int i;
@@ -567,25 +499,20 @@ int CreateNewWP_InTrail(vector3 *origin, int flags, int afterindex)
 	foundanindex = 0;
 	i = 0;
 
-	if (gWPNum >= MAX_WPARRAY_SIZE)
-	{
-		if (!RMG.integer)
-		{
-			trap->Print(S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE);
+	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
+		if ( !RMG.integer ) {
+			trap->Print( S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE );
 		}
 		return 0;
 	}
 
-	if (afterindex < 0 || afterindex >= gWPNum)
-	{
-		trap->Print(S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex);
+	if ( afterindex < 0 || afterindex >= gWPNum ) {
+		trap->Print( S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex );
 		return 0;
 	}
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex)
-		{
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex ) {
 			foundindex = i;
 			foundanindex = 1;
 			break;
@@ -594,27 +521,22 @@ int CreateNewWP_InTrail(vector3 *origin, int flags, int afterindex)
 		i++;
 	}
 
-	if (!foundanindex)
-	{
-		trap->Print(S_COLOR_YELLOW "Waypoint index %i should exist, but does not (?)\n", afterindex);
+	if ( !foundanindex ) {
+		trap->Print( S_COLOR_YELLOW "Waypoint index %i should exist, but does not (?)\n", afterindex );
 		return 0;
 	}
 
 	i = gWPNum;
 
-	while (i >= 0)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index != foundindex)
-		{
-			TransferWPData(i, i+1);
+	while ( i >= 0 ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index != foundindex ) {
+			TransferWPData( i, i + 1 );
 		}
-		else if (gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == foundindex)
-		{
+		else if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == foundindex ) {
 			i++;
 
-			if (!gWPArray[i])
-			{
-				gWPArray[i] = (wpobject_t *)B_Alloc(sizeof(wpobject_t));
+			if ( !gWPArray[i] ) {
+				gWPArray[i] = (wpobject_t *)B_Alloc( sizeof(wpobject_t) );
 			}
 
 			gWPArray[i]->flags = flags;
@@ -624,7 +546,7 @@ int CreateNewWP_InTrail(vector3 *origin, int flags, int afterindex)
 			gWPArray[i]->forceJumpTo = 0;
 			gWPArray[i]->index = i;
 			gWPArray[i]->inuse = 1;
-			VectorCopy(origin, &gWPArray[i]->origin);
+			VectorCopy( origin, &gWPArray[i]->origin );
 			gWPNum++;
 			break;
 		}
@@ -635,8 +557,7 @@ int CreateNewWP_InTrail(vector3 *origin, int flags, int afterindex)
 	return 1;
 }
 
-int CreateNewWP_InsertUnder(vector3 *origin, int flags, int afterindex)
-{
+int CreateNewWP_InsertUnder( vector3 *origin, int flags, int afterindex ) {
 	int foundindex;
 	int foundanindex;
 	int i;
@@ -645,25 +566,20 @@ int CreateNewWP_InsertUnder(vector3 *origin, int flags, int afterindex)
 	foundanindex = 0;
 	i = 0;
 
-	if (gWPNum >= MAX_WPARRAY_SIZE)
-	{
-		if (!RMG.integer)
-		{
-			trap->Print(S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE);
+	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
+		if ( !RMG.integer ) {
+			trap->Print( S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE );
 		}
 		return 0;
 	}
 
-	if (afterindex < 0 || afterindex >= gWPNum)
-	{
-		trap->Print(S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex);
+	if ( afterindex < 0 || afterindex >= gWPNum ) {
+		trap->Print( S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex );
 		return 0;
 	}
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex)
-		{
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex ) {
 			foundindex = i;
 			foundanindex = 1;
 			break;
@@ -672,28 +588,23 @@ int CreateNewWP_InsertUnder(vector3 *origin, int flags, int afterindex)
 		i++;
 	}
 
-	if (!foundanindex)
-	{
-		trap->Print(S_COLOR_YELLOW "Waypoint index %i should exist, but does not (?)\n", afterindex);
+	if ( !foundanindex ) {
+		trap->Print( S_COLOR_YELLOW "Waypoint index %i should exist, but does not (?)\n", afterindex );
 		return 0;
 	}
 
 	i = gWPNum;
 
-	while (i >= 0)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index != foundindex)
-		{
-			TransferWPData(i, i+1);
+	while ( i >= 0 ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index != foundindex ) {
+			TransferWPData( i, i + 1 );
 		}
-		else if (gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == foundindex)
-		{
+		else if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == foundindex ) {
 			//i++;
-			TransferWPData(i, i+1);
+			TransferWPData( i, i + 1 );
 
-			if (!gWPArray[i])
-			{
-				gWPArray[i] = (wpobject_t *)B_Alloc(sizeof(wpobject_t));
+			if ( !gWPArray[i] ) {
+				gWPArray[i] = (wpobject_t *)B_Alloc( sizeof(wpobject_t) );
 			}
 
 			gWPArray[i]->flags = flags;
@@ -703,7 +614,7 @@ int CreateNewWP_InsertUnder(vector3 *origin, int flags, int afterindex)
 			gWPArray[i]->forceJumpTo = 0;
 			gWPArray[i]->index = i;
 			gWPArray[i]->inuse = 1;
-			VectorCopy(origin, &gWPArray[i]->origin);
+			VectorCopy( origin, &gWPArray[i]->origin );
 			gWPNum++;
 			break;
 		}
@@ -714,14 +625,12 @@ int CreateNewWP_InsertUnder(vector3 *origin, int flags, int afterindex)
 	return 1;
 }
 
-void TeleportToWP(gentity_t *pl, int afterindex)
-{
+void TeleportToWP( gentity_t *pl, int afterindex ) {
 	int foundindex;
 	int foundanindex;
 	int i;
 
-	if (!pl || !pl->client)
-	{
+	if ( !pl || !pl->client ) {
 		return;
 	}
 
@@ -729,16 +638,13 @@ void TeleportToWP(gentity_t *pl, int afterindex)
 	foundanindex = 0;
 	i = 0;
 
-	if (afterindex < 0 || afterindex >= gWPNum)
-	{
-		trap->Print(S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex);
+	if ( afterindex < 0 || afterindex >= gWPNum ) {
+		trap->Print( S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex );
 		return;
 	}
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex)
-		{
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex ) {
 			foundindex = i;
 			foundanindex = 1;
 			break;
@@ -747,58 +653,48 @@ void TeleportToWP(gentity_t *pl, int afterindex)
 		i++;
 	}
 
-	if (!foundanindex)
-	{
-		trap->Print(S_COLOR_YELLOW "Waypoint index %i should exist, but does not (?)\n", afterindex);
+	if ( !foundanindex ) {
+		trap->Print( S_COLOR_YELLOW "Waypoint index %i should exist, but does not (?)\n", afterindex );
 		return;
 	}
 
-	VectorCopy(&gWPArray[foundindex]->origin, &pl->client->ps.origin);
+	VectorCopy( &gWPArray[foundindex]->origin, &pl->client->ps.origin );
 
 	return;
 }
 
-void WPFlagsModify(int wpnum, int flags)
-{
-	if (wpnum < 0 || wpnum >= gWPNum || !gWPArray[wpnum] || !gWPArray[wpnum]->inuse)
-	{
-		trap->Print(S_COLOR_YELLOW "WPFlagsModify: Waypoint %i does not exist\n", wpnum);
+void WPFlagsModify( int wpnum, int flags ) {
+	if ( wpnum < 0 || wpnum >= gWPNum || !gWPArray[wpnum] || !gWPArray[wpnum]->inuse ) {
+		trap->Print( S_COLOR_YELLOW "WPFlagsModify: Waypoint %i does not exist\n", wpnum );
 		return;
 	}
 
 	gWPArray[wpnum]->flags = flags;
 }
 
-static int NotWithinRange(int base, int extent)
-{
-	if (extent > base && base+5 >= extent)
-	{
+static int NotWithinRange( int base, int extent ) {
+	if ( extent > base && base + 5 >= extent ) {
 		return 0;
 	}
 
-	if (extent < base && base-5 <= extent)
-	{
+	if ( extent < base && base - 5 <= extent ) {
 		return 0;
 	}
 
 	return 1;
 }
 
-int NodeHere(vector3 *spot)
-{
+int NodeHere( vector3 *spot ) {
 	int i;
 
 	i = 0;
 
-	while (i < nodenum)
-	{
-		if ((int)nodetable[i].origin.x == (int)spot->x &&
-			(int)nodetable[i].origin.y == (int)spot->y)
-		{
-			if ((int)nodetable[i].origin.z == (int)spot->z ||
-				((int)nodetable[i].origin.z < (int)spot->z && (int)nodetable[i].origin.z+5 > (int)spot->z) ||
-				((int)nodetable[i].origin.z > (int)spot->z && (int)nodetable[i].origin.z-5 < (int)spot->z))
-			{
+	while ( i < nodenum ) {
+		if ( (int)nodetable[i].origin.x == (int)spot->x &&
+			(int)nodetable[i].origin.y == (int)spot->y ) {
+			if ( (int)nodetable[i].origin.z == (int)spot->z ||
+				((int)nodetable[i].origin.z < (int)spot->z && (int)nodetable[i].origin.z + 5 >( int )spot->z) ||
+				((int)nodetable[i].origin.z >( int )spot->z && (int)nodetable[i].origin.z - 5 < (int)spot->z) ) {
 				return 1;
 			}
 		}
@@ -808,22 +704,19 @@ int NodeHere(vector3 *spot)
 	return 0;
 }
 
-int CanGetToVector(vector3 *org1, vector3 *org2, vector3 *mins, vector3 *maxs)
-{
+int CanGetToVector( vector3 *org1, vector3 *org2, vector3 *mins, vector3 *maxs ) {
 	trace_t tr;
 
-	trap->Trace(&tr, org1, mins, maxs, org2, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
+	trap->Trace( &tr, org1, mins, maxs, org2, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
 
-	if (tr.fraction == 1 && !tr.startsolid && !tr.allsolid)
-	{
+	if ( tr.fraction == 1 && !tr.startsolid && !tr.allsolid ) {
 		return 1;
 	}
 
 	return 0;
 }
 
-int CanGetToVectorTravel(vector3 *org1, vector3 *moveTo, vector3 *mins, vector3 *maxs)
-{
+int CanGetToVectorTravel( vector3 *org1, vector3 *moveTo, vector3 *mins, vector3 *maxs ) {
 	trace_t tr;
 	vector3 stepTo;
 	vector3 stepSub;
@@ -837,19 +730,18 @@ int CanGetToVectorTravel(vector3 *org1, vector3 *moveTo, vector3 *mins, vector3 
 	int traceMask = MASK_PLAYERSOLID;
 	qboolean initialDone = qfalse;
 
-	VectorCopy(org1, &workingOrg);
-	VectorCopy(org1, &lastIncrement);
+	VectorCopy( org1, &workingOrg );
+	VectorCopy( org1, &lastIncrement );
 
-	VectorCopy(moveTo, &stepTo);
+	VectorCopy( moveTo, &stepTo );
 	stepTo.z = workingOrg.z;
 
-	VectorSubtract(&stepTo, &workingOrg, &stepSub);
-	stepSize = VectorLength(&stepSub); //make the step size the length of the original positions without Z
+	VectorSubtract( &stepTo, &workingOrg, &stepSub );
+	stepSize = VectorLength( &stepSub ); //make the step size the length of the original positions without Z
 
-	VectorNormalize(&stepSub);
+	VectorNormalize( &stepSub );
 
-	while (!initialDone || didMove)
-	{
+	while ( !initialDone || didMove ) {
 		initialDone = qtrue;
 		didMove = 0;
 
@@ -857,15 +749,13 @@ int CanGetToVectorTravel(vector3 *org1, vector3 *moveTo, vector3 *mins, vector3 
 		stepGoal.y = workingOrg.y + stepSub.y*stepSize;
 		stepGoal.z = workingOrg.z + stepSub.z*stepSize;
 
-		trap->Trace(&tr, &workingOrg, mins, maxs, &stepGoal, ENTITYNUM_NONE, traceMask, qfalse, 0, 0);
+		trap->Trace( &tr, &workingOrg, mins, maxs, &stepGoal, ENTITYNUM_NONE, traceMask, qfalse, 0, 0 );
 
-		if (!tr.startsolid && !tr.allsolid && tr.fraction)
-		{
+		if ( !tr.startsolid && !tr.allsolid && tr.fraction ) {
 			vector3 vecSub;
-			VectorSubtract(&workingOrg, &tr.endpos, &vecSub);
+			VectorSubtract( &workingOrg, &tr.endpos, &vecSub );
 
-			if (VectorLength(&vecSub) > (stepSize/2))
-			{
+			if ( VectorLength( &vecSub ) > (stepSize / 2) ) {
 				workingOrg.x = tr.endpos.x;
 				workingOrg.y = tr.endpos.y;
 				//trap->LinkEntity((sharedEntity_t *)self);
@@ -873,42 +763,38 @@ int CanGetToVectorTravel(vector3 *org1, vector3 *moveTo, vector3 *mins, vector3 
 			}
 		}
 
-		if (didMove != 1)
-		{ //stair check
+		if ( didMove != 1 ) { //stair check
 			vector3 trFrom;
 			vector3 trTo;
 			vector3 trDir;
 			vector3 vecMeasure;
 
-			VectorCopy(&tr.endpos, &trFrom);
+			VectorCopy( &tr.endpos, &trFrom );
 			trFrom.z += 16;
 
-			VectorSubtract(/*tr.endpos*/&stepGoal, &workingOrg, &trDir);
-			VectorNormalize(&trDir);
-			trTo.x = tr.endpos.x + trDir.x*2;
-			trTo.y = tr.endpos.y + trDir.y*2;
-			trTo.z = tr.endpos.z + trDir.z*2;
+			VectorSubtract(/*tr.endpos*/&stepGoal, &workingOrg, &trDir );
+			VectorNormalize( &trDir );
+			trTo.x = tr.endpos.x + trDir.x * 2;
+			trTo.y = tr.endpos.y + trDir.y * 2;
+			trTo.z = tr.endpos.z + trDir.z * 2;
 			trTo.z += 16;
 
-			VectorSubtract(&trFrom, &trTo, &vecMeasure);
+			VectorSubtract( &trFrom, &trTo, &vecMeasure );
 
-			if (VectorLength(&vecMeasure) > 1)
-			{
-				trap->Trace(&tr, &trFrom, mins, maxs, &trTo, ENTITYNUM_NONE, traceMask, qfalse, 0, 0);
+			if ( VectorLength( &vecMeasure ) > 1 ) {
+				trap->Trace( &tr, &trFrom, mins, maxs, &trTo, ENTITYNUM_NONE, traceMask, qfalse, 0, 0 );
 
-				if (!tr.startsolid && !tr.allsolid && tr.fraction == 1)
-				{ //clear trace here, probably up a step
+				if ( !tr.startsolid && !tr.allsolid && tr.fraction == 1 ) { //clear trace here, probably up a step
 					vector3 trDown;
 					vector3 trUp;
-					VectorCopy(&tr.endpos, &trUp);
-					VectorCopy(&tr.endpos, &trDown);
+					VectorCopy( &tr.endpos, &trUp );
+					VectorCopy( &tr.endpos, &trDown );
 					trDown.z -= 16;
 
-					trap->Trace(&tr, &trFrom, mins, maxs, &trTo, ENTITYNUM_NONE, traceMask, qfalse, 0, 0);
+					trap->Trace( &tr, &trFrom, mins, maxs, &trTo, ENTITYNUM_NONE, traceMask, qfalse, 0, 0 );
 
-					if (!tr.startsolid && !tr.allsolid)
-					{ //plop us down on the step after moving up
-						VectorCopy(&tr.endpos, &workingOrg);
+					if ( !tr.startsolid && !tr.allsolid ) { //plop us down on the step after moving up
+						VectorCopy( &tr.endpos, &workingOrg );
 						//trap->LinkEntity((sharedEntity_t *)self);
 						didMove = 1;
 					}
@@ -916,28 +802,25 @@ int CanGetToVectorTravel(vector3 *org1, vector3 *moveTo, vector3 *mins, vector3 
 			}
 		}
 
-		VectorSubtract(&lastIncrement, &workingOrg, &finalMeasure);
-		measureLength = VectorLength(&finalMeasure);
+		VectorSubtract( &lastIncrement, &workingOrg, &finalMeasure );
+		measureLength = VectorLength( &finalMeasure );
 
-		if (!measureLength)
-		{ //no progress, break out. If last movement was a sucess didMove will equal 1.
+		if ( !measureLength ) { //no progress, break out. If last movement was a sucess didMove will equal 1.
 			break;
 		}
 
 		stepSize -= measureLength; //subtract the progress distance from the step size so we don't overshoot the mark.
-		if (stepSize <= 0)
-		{
+		if ( stepSize <= 0 ) {
 			break;
 		}
 
-		VectorCopy(&workingOrg, &lastIncrement);
+		VectorCopy( &workingOrg, &lastIncrement );
 	}
 
 	return didMove;
 }
 
-int ConnectTrail(int startindex, int endindex, qboolean behindTheScenes)
-{
+int ConnectTrail( int startindex, int endindex, qboolean behindTheScenes ) {
 	int foundit;
 	int cancontinue;
 	int i;
@@ -957,33 +840,28 @@ int ConnectTrail(int startindex, int endindex, qboolean behindTheScenes)
 	vector3 validspotpos;
 	trace_t tr;
 
-	if (RMG.integer)
-	{ //this might be temporary. Or not.
-		if (!(gWPArray[startindex]->flags & WPFLAG_NEVERONEWAY) &&
-			!(gWPArray[endindex]->flags & WPFLAG_NEVERONEWAY))
-		{
+	if ( RMG.integer ) { //this might be temporary. Or not.
+		if ( !(gWPArray[startindex]->flags & WPFLAG_NEVERONEWAY) &&
+			!(gWPArray[endindex]->flags & WPFLAG_NEVERONEWAY) ) {
 			gWPArray[startindex]->flags |= WPFLAG_ONEWAY_FWD;
 			gWPArray[endindex]->flags |= WPFLAG_ONEWAY_BACK;
 		}
 		return 0;
 	}
 
-	if (!RMG.integer)
-	{
+	if ( !RMG.integer ) {
 		branchDistance = TABLE_BRANCH_DISTANCE;
 	}
-	else
-	{
+	else {
 		branchDistance = 512; //be less precise here, terrain is fairly broad, and we don't want to take an hour precalculating
 	}
 
-	if (RMG.integer)
-	{
+	if ( RMG.integer ) {
 		maxDistFactor = 700;
 	}
 
 	VectorSet( &mins, -15, -15, 0 );
-	VectorSet( &maxs,  15,  15, 0 );
+	VectorSet( &maxs, 15, 15, 0 );
 
 	nodenum = 0;
 	foundit = 0;
@@ -992,10 +870,10 @@ int ConnectTrail(int startindex, int endindex, qboolean behindTheScenes)
 
 	successnodeindex = 0;
 
-	while (i < MAX_NODETABLE_SIZE) //clear it out before using it
+	while ( i < MAX_NODETABLE_SIZE ) //clear it out before using it
 	{
 		nodetable[i].flags = 0;
-//		nodetable[i].index = 0;
+		//		nodetable[i].index = 0;
 		nodetable[i].inuse = 0;
 		nodetable[i].neighbornum = 0;
 		nodetable[i].origin.x = 0;
@@ -1008,45 +886,42 @@ int ConnectTrail(int startindex, int endindex, qboolean behindTheScenes)
 		i++;
 	}
 
-	if (!behindTheScenes)
-	{
-		trap->Print(S_COLOR_YELLOW "Point %i is not connected to %i - Repairing...\n", startindex, endindex);
+	if ( !behindTheScenes ) {
+		trap->Print( S_COLOR_YELLOW "Point %i is not connected to %i - Repairing...\n", startindex, endindex );
 	}
 
-	VectorCopy(&gWPArray[startindex]->origin, &startplace);
+	VectorCopy( &gWPArray[startindex]->origin, &startplace );
 
-	VectorCopy(&startplace, &starttrace);
+	VectorCopy( &startplace, &starttrace );
 
 	starttrace.z -= 4096;
 
-	trap->Trace(&tr, &startplace, NULL, NULL, &starttrace, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
+	trap->Trace( &tr, &startplace, NULL, NULL, &starttrace, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
 
 	baseheight = startplace.z - tr.endpos.z;
 
 	cancontinue = 1;
 
-	VectorCopy(&startplace, &nodetable[nodenum].origin);
+	VectorCopy( &startplace, &nodetable[nodenum].origin );
 	nodetable[nodenum].weight = 1;
 	nodetable[nodenum].inuse = 1;
-//	nodetable[nodenum].index = nodenum;
+	//	nodetable[nodenum].index = nodenum;
 	nodenum++;
 
-	while (nodenum < MAX_NODETABLE_SIZE && !foundit && cancontinue)
-	{
-		if (RMG.integer)
-		{ //adjust the branch distance dynamically depending on the distance from the start and end points.
+	while ( nodenum < MAX_NODETABLE_SIZE && !foundit && cancontinue ) {
+		if ( RMG.integer ) { //adjust the branch distance dynamically depending on the distance from the start and end points.
 			vector3 startDist;
 			vector3 endDist;
 			float startDistf;
 			float endDistf;
 
-			VectorSubtract(&nodetable[nodenum-1].origin, &gWPArray[startindex]->origin, &startDist);
-			VectorSubtract(&nodetable[nodenum-1].origin, &gWPArray[endindex]->origin, &endDist);
+			VectorSubtract( &nodetable[nodenum - 1].origin, &gWPArray[startindex]->origin, &startDist );
+			VectorSubtract( &nodetable[nodenum - 1].origin, &gWPArray[endindex]->origin, &endDist );
 
-			startDistf = VectorLength(&startDist);
-			endDistf = VectorLength(&endDist);
+			startDistf = VectorLength( &startDist );
+			endDistf = VectorLength( &endDist );
 
-				 if ( startDistf <  64 || endDistf <  64 )	branchDistance =  64;
+			if ( startDistf < 64 || endDistf < 64 )	branchDistance = 64;
 			else if ( startDistf < 128 || endDistf < 128 )	branchDistance = 128;
 			else if ( startDistf < 256 || endDistf < 256 )	branchDistance = 256;
 			else if ( startDistf < 512 || endDistf < 512 )	branchDistance = 512;
@@ -1056,141 +931,126 @@ int ConnectTrail(int startindex, int endindex, qboolean behindTheScenes)
 		i = 0;
 		prenodestart = nodenum;
 
-		while (i < prenodestart)
-		{
-			if (extendednodes[i] != 1)
-			{
-				VectorSubtract(&gWPArray[endindex]->origin, &nodetable[i].origin, &a);
-				fvecmeas = VectorLength(&a);
+		while ( i < prenodestart ) {
+			if ( extendednodes[i] != 1 ) {
+				VectorSubtract( &gWPArray[endindex]->origin, &nodetable[i].origin, &a );
+				fvecmeas = VectorLength( &a );
 
-				if (fvecmeas < 128 && CanGetToVector(&gWPArray[endindex]->origin, &nodetable[i].origin, &mins, &maxs))
-				{
+				if ( fvecmeas < 128 && CanGetToVector( &gWPArray[endindex]->origin, &nodetable[i].origin, &mins, &maxs ) ) {
 					foundit = 1;
 					successnodeindex = i;
 					break;
 				}
 
-				VectorCopy(&nodetable[i].origin, &testspot);
+				VectorCopy( &nodetable[i].origin, &testspot );
 				testspot.x += branchDistance;
 
-				VectorCopy(&testspot, &starttrace);
+				VectorCopy( &testspot, &starttrace );
 
 				starttrace.z -= 4096;
 
-				trap->Trace(&tr, &testspot, NULL, NULL, &starttrace, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
+				trap->Trace( &tr, &testspot, NULL, NULL, &starttrace, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
 
-				testspot.z = tr.endpos.z+baseheight;
+				testspot.z = tr.endpos.z + baseheight;
 
-				if (!NodeHere(&testspot) && !tr.startsolid && !tr.allsolid && CanGetToVector(&nodetable[i].origin, &testspot, &mins, &maxs))
-				{
-					VectorCopy(&testspot, &nodetable[nodenum].origin);
+				if ( !NodeHere( &testspot ) && !tr.startsolid && !tr.allsolid && CanGetToVector( &nodetable[i].origin, &testspot, &mins, &maxs ) ) {
+					VectorCopy( &testspot, &nodetable[nodenum].origin );
 					nodetable[nodenum].inuse = 1;
-//					nodetable[nodenum].index = nodenum;
-					nodetable[nodenum].weight = nodetable[i].weight+1;
+					//					nodetable[nodenum].index = nodenum;
+					nodetable[nodenum].weight = nodetable[i].weight + 1;
 					nodetable[nodenum].neighbornum = i;
-					if ((nodetable[i].origin.z - nodetable[nodenum].origin.z) > 50)
-					{ //if there's a big drop, make sure we know we can't just magically fly back up
+					if ( (nodetable[i].origin.z - nodetable[nodenum].origin.z) > 50 ) { //if there's a big drop, make sure we know we can't just magically fly back up
 						nodetable[nodenum].flags = WPFLAG_ONEWAY_FWD;
 					}
 					nodenum++;
 					cancontinue = 1;
 				}
 
-				if (nodenum >= MAX_NODETABLE_SIZE)
-				{
+				if ( nodenum >= MAX_NODETABLE_SIZE ) {
 					break; //failure
 				}
 
-				VectorCopy(&nodetable[i].origin, &testspot);
+				VectorCopy( &nodetable[i].origin, &testspot );
 				testspot.x -= branchDistance;
 
-				VectorCopy(&testspot, &starttrace);
+				VectorCopy( &testspot, &starttrace );
 
 				starttrace.z -= 4096;
 
-				trap->Trace(&tr, &testspot, NULL, NULL, &starttrace, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
+				trap->Trace( &tr, &testspot, NULL, NULL, &starttrace, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
 
 				testspot.z = tr.endpos.z + baseheight;
 
-				if (!NodeHere(&testspot) && !tr.startsolid && !tr.allsolid && CanGetToVector(&nodetable[i].origin, &testspot, &mins, &maxs))
-				{
-					VectorCopy(&testspot, &nodetable[nodenum].origin);
+				if ( !NodeHere( &testspot ) && !tr.startsolid && !tr.allsolid && CanGetToVector( &nodetable[i].origin, &testspot, &mins, &maxs ) ) {
+					VectorCopy( &testspot, &nodetable[nodenum].origin );
 					nodetable[nodenum].inuse = 1;
-//					nodetable[nodenum].index = nodenum;
-					nodetable[nodenum].weight = nodetable[i].weight+1;
+					//					nodetable[nodenum].index = nodenum;
+					nodetable[nodenum].weight = nodetable[i].weight + 1;
 					nodetable[nodenum].neighbornum = i;
-					if ((nodetable[i].origin.z - nodetable[nodenum].origin.z) > 50)
-					{ //if there's a big drop, make sure we know we can't just magically fly back up
+					if ( (nodetable[i].origin.z - nodetable[nodenum].origin.z) > 50 ) { //if there's a big drop, make sure we know we can't just magically fly back up
 						nodetable[nodenum].flags = WPFLAG_ONEWAY_FWD;
 					}
 					nodenum++;
 					cancontinue = 1;
 				}
 
-				if (nodenum >= MAX_NODETABLE_SIZE)
-				{
+				if ( nodenum >= MAX_NODETABLE_SIZE ) {
 					break; //failure
 				}
 
-				VectorCopy(&nodetable[i].origin, &testspot);
+				VectorCopy( &nodetable[i].origin, &testspot );
 				testspot.y += branchDistance;
 
-				VectorCopy(&testspot, &starttrace);
+				VectorCopy( &testspot, &starttrace );
 
 				starttrace.z -= 4096;
 
-				trap->Trace(&tr, &testspot, NULL, NULL, &starttrace, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
+				trap->Trace( &tr, &testspot, NULL, NULL, &starttrace, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
 
 				testspot.z = tr.endpos.z + baseheight;
 
-				if (!NodeHere(&testspot) && !tr.startsolid && !tr.allsolid && CanGetToVector(&nodetable[i].origin, &testspot, &mins, &maxs))
-				{
-					VectorCopy(&testspot, &nodetable[nodenum].origin);
+				if ( !NodeHere( &testspot ) && !tr.startsolid && !tr.allsolid && CanGetToVector( &nodetable[i].origin, &testspot, &mins, &maxs ) ) {
+					VectorCopy( &testspot, &nodetable[nodenum].origin );
 					nodetable[nodenum].inuse = 1;
-//					nodetable[nodenum].index = nodenum;
-					nodetable[nodenum].weight = nodetable[i].weight+1;
+					//					nodetable[nodenum].index = nodenum;
+					nodetable[nodenum].weight = nodetable[i].weight + 1;
 					nodetable[nodenum].neighbornum = i;
-					if ((nodetable[i].origin.z - nodetable[nodenum].origin.z) > 50)
-					{ //if there's a big drop, make sure we know we can't just magically fly back up
+					if ( (nodetable[i].origin.z - nodetable[nodenum].origin.z) > 50 ) { //if there's a big drop, make sure we know we can't just magically fly back up
 						nodetable[nodenum].flags = WPFLAG_ONEWAY_FWD;
 					}
 					nodenum++;
 					cancontinue = 1;
 				}
 
-				if (nodenum >= MAX_NODETABLE_SIZE)
-				{
+				if ( nodenum >= MAX_NODETABLE_SIZE ) {
 					break; //failure
 				}
 
-				VectorCopy(&nodetable[i].origin, &testspot);
+				VectorCopy( &nodetable[i].origin, &testspot );
 				testspot.y -= branchDistance;
 
-				VectorCopy(&testspot, &starttrace);
+				VectorCopy( &testspot, &starttrace );
 
 				starttrace.z -= 4096;
 
-				trap->Trace(&tr, &testspot, NULL, NULL, &starttrace, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
+				trap->Trace( &tr, &testspot, NULL, NULL, &starttrace, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
 
 				testspot.z = tr.endpos.z + baseheight;
 
-				if (!NodeHere(&testspot) && !tr.startsolid && !tr.allsolid && CanGetToVector(&nodetable[i].origin, &testspot, &mins, &maxs))
-				{
-					VectorCopy(&testspot, &nodetable[nodenum].origin);
+				if ( !NodeHere( &testspot ) && !tr.startsolid && !tr.allsolid && CanGetToVector( &nodetable[i].origin, &testspot, &mins, &maxs ) ) {
+					VectorCopy( &testspot, &nodetable[nodenum].origin );
 					nodetable[nodenum].inuse = 1;
-//					nodetable[nodenum].index = nodenum;
-					nodetable[nodenum].weight = nodetable[i].weight+1;
+					//					nodetable[nodenum].index = nodenum;
+					nodetable[nodenum].weight = nodetable[i].weight + 1;
 					nodetable[nodenum].neighbornum = i;
-					if ((nodetable[i].origin.z - nodetable[nodenum].origin.z) > 50)
-					{ //if there's a big drop, make sure we know we can't just magically fly back up
+					if ( (nodetable[i].origin.z - nodetable[nodenum].origin.z) > 50 ) { //if there's a big drop, make sure we know we can't just magically fly back up
 						nodetable[nodenum].flags = WPFLAG_ONEWAY_FWD;
 					}
 					nodenum++;
 					cancontinue = 1;
 				}
 
-				if (nodenum >= MAX_NODETABLE_SIZE)
-				{
+				if ( nodenum >= MAX_NODETABLE_SIZE ) {
 					break; //failure
 				}
 
@@ -1201,64 +1061,56 @@ int ConnectTrail(int startindex, int endindex, qboolean behindTheScenes)
 		}
 	}
 
-	if (!foundit)
-	{
+	if ( !foundit ) {
 #ifndef _DEBUG //if debug just always print this.
 		if (!behindTheScenes)
 #endif
 		{
-			trap->Print(S_COLOR_RED "Could not link %i to %i, unreachable by node branching.\n", startindex, endindex);
+			trap->Print( S_COLOR_RED "Could not link %i to %i, unreachable by node branching.\n", startindex, endindex );
 		}
 		gWPArray[startindex]->flags |= WPFLAG_ONEWAY_FWD;
 		gWPArray[endindex]->flags |= WPFLAG_ONEWAY_BACK;
-		if (!behindTheScenes)
-		{
-			trap->Print(S_COLOR_YELLOW "Since points cannot be connected, point %i has been flagged as only-forward and point %i has been flagged as only-backward.\n", startindex, endindex);
+		if ( !behindTheScenes ) {
+			trap->Print( S_COLOR_YELLOW "Since points cannot be connected, point %i has been flagged as only-forward and point %i has been flagged as only-backward.\n", startindex, endindex );
 		}
 
 		/*while (nodenum >= 0)
 		{
-			if (nodetable[nodenum].origin.x || nodetable[nodenum].origin.y || nodetable[nodenum].origin.z)
-			{
-				CreateNewWP(nodetable[nodenum].origin, nodetable[nodenum].flags);
-			}
+		if (nodetable[nodenum].origin.x || nodetable[nodenum].origin.y || nodetable[nodenum].origin.z)
+		{
+		CreateNewWP(nodetable[nodenum].origin, nodetable[nodenum].flags);
+		}
 
-			nodenum--;
+		nodenum--;
 		}*/
 		//The above code transfers nodes into the "rendered" waypoint array. Strictly for debugging.
 
-		if (!behindTheScenes)
-		{ //just use what we have if we're auto-pathing the level
+		if ( !behindTheScenes ) { //just use what we have if we're auto-pathing the level
 			return 0;
 		}
-		else
-		{
+		else {
 			vector3 endDist;
 			int nCount = 0;
 			int idealNode = -1;
 			float bestDist = 0;
 			float testDist;
 
-			if (nodenum <= 10)
-			{ //not enough to even really bother.
+			if ( nodenum <= 10 ) { //not enough to even really bother.
 				return 0;
 			}
 
 			//Since it failed, find whichever node is closest to the desired end.
-			while (nCount < nodenum)
-			{
-				VectorSubtract(&nodetable[nCount].origin, &gWPArray[endindex]->origin, &endDist);
-				testDist = VectorLength(&endDist);
-				if (idealNode == -1)
-				{
+			while ( nCount < nodenum ) {
+				VectorSubtract( &nodetable[nCount].origin, &gWPArray[endindex]->origin, &endDist );
+				testDist = VectorLength( &endDist );
+				if ( idealNode == -1 ) {
 					idealNode = nCount;
 					bestDist = testDist;
 					nCount++;
 					continue;
 				}
 
-				if (testDist < bestDist)
-				{
+				if ( testDist < bestDist ) {
 					idealNode = nCount;
 					bestDist = testDist;
 				}
@@ -1266,8 +1118,7 @@ int ConnectTrail(int startindex, int endindex, qboolean behindTheScenes)
 				nCount++;
 			}
 
-			if (idealNode == -1)
-			{
+			if ( idealNode == -1 ) {
 				return 0;
 			}
 
@@ -1278,28 +1129,23 @@ int ConnectTrail(int startindex, int endindex, qboolean behindTheScenes)
 	i = successnodeindex;
 	insertindex = startindex;
 	failsafe = 0;
-	VectorCopy(&gWPArray[startindex]->origin, &validspotpos);
+	VectorCopy( &gWPArray[startindex]->origin, &validspotpos );
 
-	while (failsafe < MAX_NODETABLE_SIZE && i < MAX_NODETABLE_SIZE && i >= 0)
-	{
-		VectorSubtract(&validspotpos, &nodetable[i].origin, &a);
-		if (!nodetable[nodetable[i].neighbornum].inuse || !CanGetToVectorTravel(&validspotpos, /*nodetable[nodetable[i].neighbornum].origin*/&nodetable[i].origin, &mins, &maxs) || VectorLength(&a) > maxDistFactor || (!CanGetToVectorTravel(&validspotpos, &gWPArray[endindex]->origin, &mins, &maxs) && CanGetToVectorTravel(&nodetable[i].origin, &gWPArray[endindex]->origin, &mins, &maxs)) )
-		{
+	while ( failsafe < MAX_NODETABLE_SIZE && i < MAX_NODETABLE_SIZE && i >= 0 ) {
+		VectorSubtract( &validspotpos, &nodetable[i].origin, &a );
+		if ( !nodetable[nodetable[i].neighbornum].inuse || !CanGetToVectorTravel( &validspotpos, /*nodetable[nodetable[i].neighbornum].origin*/&nodetable[i].origin, &mins, &maxs ) || VectorLength( &a ) > maxDistFactor || (!CanGetToVectorTravel( &validspotpos, &gWPArray[endindex]->origin, &mins, &maxs ) && CanGetToVectorTravel( &nodetable[i].origin, &gWPArray[endindex]->origin, &mins, &maxs )) ) {
 			nodetable[i].flags |= WPFLAG_CALCULATED;
-			if (!CreateNewWP_InTrail(&nodetable[i].origin, nodetable[i].flags, insertindex))
-			{
-				if (!behindTheScenes)
-				{
-					trap->Print(S_COLOR_RED "Could not link %i to %i, waypoint limit hit.\n", startindex, endindex);
+			if ( !CreateNewWP_InTrail( &nodetable[i].origin, nodetable[i].flags, insertindex ) ) {
+				if ( !behindTheScenes ) {
+					trap->Print( S_COLOR_RED "Could not link %i to %i, waypoint limit hit.\n", startindex, endindex );
 				}
 				return 0;
 			}
 
-			VectorCopy(&nodetable[i].origin, &validspotpos);
+			VectorCopy( &nodetable[i].origin, &validspotpos );
 		}
 
-		if (i == 0)
-		{
+		if ( i == 0 ) {
 			break;
 		}
 
@@ -1308,122 +1154,104 @@ int ConnectTrail(int startindex, int endindex, qboolean behindTheScenes)
 		failsafe++;
 	}
 
-	if (!behindTheScenes)
-	{
-		trap->Print(S_COLOR_YELLOW "Finished connecting %i to %i.\n", startindex, endindex);
+	if ( !behindTheScenes ) {
+		trap->Print( S_COLOR_YELLOW "Finished connecting %i to %i.\n", startindex, endindex );
 	}
 
 	return 1;
 }
 
-int OpposingEnds(int start, int end)
-{
-	if (!gWPArray[start] || !gWPArray[start]->inuse || !gWPArray[end] || !gWPArray[end]->inuse)
-	{
+int OpposingEnds( int start, int end ) {
+	if ( !gWPArray[start] || !gWPArray[start]->inuse || !gWPArray[end] || !gWPArray[end]->inuse ) {
 		return 0;
 	}
 
-	if ((gWPArray[start]->flags & WPFLAG_ONEWAY_FWD) &&
-		(gWPArray[end]->flags & WPFLAG_ONEWAY_BACK))
-	{
+	if ( (gWPArray[start]->flags & WPFLAG_ONEWAY_FWD) &&
+		(gWPArray[end]->flags & WPFLAG_ONEWAY_BACK) ) {
 		return 1;
 	}
 
 	return 0;
 }
 
-int DoorBlockingSection(int start, int end)
-{ //if a door blocks the trail, we'll just have to assume the points on each side are in visibility when it's open
+int DoorBlockingSection( int start, int end ) { //if a door blocks the trail, we'll just have to assume the points on each side are in visibility when it's open
 	trace_t tr;
 	gentity_t *testdoor;
 	int start_trace_index;
 
-	if (!gWPArray[start] || !gWPArray[start]->inuse || !gWPArray[end] || !gWPArray[end]->inuse)
-	{
+	if ( !gWPArray[start] || !gWPArray[start]->inuse || !gWPArray[end] || !gWPArray[end]->inuse ) {
 		return 0;
 	}
 
-	trap->Trace(&tr, &gWPArray[start]->origin, NULL, NULL, &gWPArray[end]->origin, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
+	trap->Trace( &tr, &gWPArray[start]->origin, NULL, NULL, &gWPArray[end]->origin, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
 
-	if (tr.fraction == 1)
-	{
+	if ( tr.fraction == 1 ) {
 		return 0;
 	}
 
 	testdoor = &g_entities[tr.entityNum];
 
-	if (!testdoor)
-	{
+	if ( !testdoor ) {
 		return 0;
 	}
 
-	if (!strstr(testdoor->classname, "func_"))
-	{
+	if ( !strstr( testdoor->classname, "func_" ) ) {
 		return 0;
 	}
 
 	start_trace_index = tr.entityNum;
 
-	trap->Trace(&tr, &gWPArray[end]->origin, NULL, NULL, &gWPArray[start]->origin, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
+	trap->Trace( &tr, &gWPArray[end]->origin, NULL, NULL, &gWPArray[start]->origin, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
 
-	if (tr.fraction == 1)
-	{
+	if ( tr.fraction == 1 ) {
 		return 0;
 	}
 
-	if (start_trace_index == tr.entityNum)
-	{
+	if ( start_trace_index == tr.entityNum ) {
 		return 1;
 	}
 
 	return 0;
 }
 
-int RepairPaths(qboolean behindTheScenes)
-{
+int RepairPaths( qboolean behindTheScenes ) {
 	int i;
 	vector3 a;
 	float maxDistFactor = 400;
 
-	if (!gWPNum)
-	{
+	if ( !gWPNum ) {
 		return 0;
 	}
 
-	if (RMG.integer)
-	{
+	if ( RMG.integer ) {
 		maxDistFactor = 800; //higher tolerance here.
 	}
 
 	i = 0;
 
-	trap->Cvar_Update(&bot_wp_distconnect);
-	trap->Cvar_Update(&bot_wp_visconnect);
+	trap->Cvar_Update( &bot_wp_distconnect );
+	trap->Cvar_Update( &bot_wp_visconnect );
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse && gWPArray[i+1] && gWPArray[i+1]->inuse)
-		{
-			VectorSubtract(&gWPArray[i]->origin, &gWPArray[i+1]->origin, &a);
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i + 1] && gWPArray[i + 1]->inuse ) {
+			VectorSubtract( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, &a );
 
-			if (!(gWPArray[i+1]->flags & WPFLAG_NOVIS) &&
-				!(gWPArray[i+1]->flags & WPFLAG_JUMP) && //don't calculate on jump points because they might not always want to be visible (in cases of force jumping)
+			if ( !(gWPArray[i + 1]->flags & WPFLAG_NOVIS) &&
+				!(gWPArray[i + 1]->flags & WPFLAG_JUMP) && //don't calculate on jump points because they might not always want to be visible (in cases of force jumping)
 				!(gWPArray[i]->flags & WPFLAG_CALCULATED) && //don't calculate it again
-				!OpposingEnds(i, i+1) &&
-				((bot_wp_distconnect.value && VectorLength(&a) > maxDistFactor) || (!OrgVisible(&gWPArray[i]->origin, &gWPArray[i+1]->origin, ENTITYNUM_NONE) && bot_wp_visconnect.value) ) &&
-				!DoorBlockingSection(i, i+1))
-			{
-				ConnectTrail(i, i+1, behindTheScenes);
+				!OpposingEnds( i, i + 1 ) &&
+				((bot_wp_distconnect.value && VectorLength( &a ) > maxDistFactor) || (!OrgVisible( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, ENTITYNUM_NONE ) && bot_wp_visconnect.value)) &&
+				!DoorBlockingSection( i, i + 1 ) ) {
+				ConnectTrail( i, i + 1, behindTheScenes );
 
-				if (gWPNum >= MAX_WPARRAY_SIZE)
-				{ //Bad!
+				if ( gWPNum >= MAX_WPARRAY_SIZE ) { //Bad!
 					gWPNum = MAX_WPARRAY_SIZE;
 					break;
 				}
 
 				/*if (!ctRet)
 				{
-					return 0;
+				return 0;
 				}*/ //we still want to write it..
 			}
 		}
@@ -1434,22 +1262,19 @@ int RepairPaths(qboolean behindTheScenes)
 	return 1;
 }
 
-int OrgVisibleCurve(vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2, int ignore)
-{
+int OrgVisibleCurve( vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2, int ignore ) {
 	trace_t tr;
 	vector3 evenorg1;
 
-	VectorCopy(org1, &evenorg1);
+	VectorCopy( org1, &evenorg1 );
 	evenorg1.z = org2->z;
 
-	trap->Trace(&tr, &evenorg1, mins, maxs, org2, ignore, MASK_SOLID, qfalse, 0, 0);
+	trap->Trace( &tr, &evenorg1, mins, maxs, org2, ignore, MASK_SOLID, qfalse, 0, 0 );
 
-	if (tr.fraction == 1 && !tr.startsolid && !tr.allsolid)
-	{
-		trap->Trace(&tr, &evenorg1, mins, maxs, org1, ignore, MASK_SOLID, qfalse, 0, 0);
+	if ( tr.fraction == 1 && !tr.startsolid && !tr.allsolid ) {
+		trap->Trace( &tr, &evenorg1, mins, maxs, org1, ignore, MASK_SOLID, qfalse, 0, 0 );
 
-		if (tr.fraction == 1 && !tr.startsolid && !tr.allsolid)
-		{
+		if ( tr.fraction == 1 && !tr.startsolid && !tr.allsolid ) {
 			return 1;
 		}
 	}
@@ -1457,78 +1282,65 @@ int OrgVisibleCurve(vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2, 
 	return 0;
 }
 
-int CanForceJumpTo(int baseindex, int testingindex, float distance)
-{
+int CanForceJumpTo( int baseindex, int testingindex, float distance ) {
 	float heightdif;
 	vector3 xy_base, xy_test, v, mins, maxs;
 	wpobject_t *wpBase = gWPArray[baseindex];
 	wpobject_t *wpTest = gWPArray[testingindex];
 
 	VectorSet( &mins, -15, -15, -15 );
-	VectorSet( &maxs,  15,  15,  15 );
+	VectorSet( &maxs, 15, 15, 15 );
 
-	if (!wpBase || !wpBase->inuse || !wpTest || !wpTest->inuse)
-	{
+	if ( !wpBase || !wpBase->inuse || !wpTest || !wpTest->inuse ) {
 		return 0;
 	}
 
-	if (distance > 400)
-	{
+	if ( distance > 400 ) {
 		return 0;
 	}
 
-	VectorCopy(&wpBase->origin, &xy_base);
-	VectorCopy(&wpTest->origin, &xy_test);
+	VectorCopy( &wpBase->origin, &xy_base );
+	VectorCopy( &wpTest->origin, &xy_test );
 
 	xy_base.z = xy_test.z;
 
-	VectorSubtract(&xy_base, &xy_test, &v);
+	VectorSubtract( &xy_base, &xy_test, &v );
 
-	if (VectorLength(&v) > MAX_NEIGHBOR_LINK_DISTANCE)
-	{
+	if ( VectorLength( &v ) > MAX_NEIGHBOR_LINK_DISTANCE ) {
 		return 0;
 	}
 
-	if ((int)wpBase->origin.z < (int)wpTest->origin.z)
-	{
+	if ( (int)wpBase->origin.z < (int)wpTest->origin.z ) {
 		heightdif = wpTest->origin.z - wpBase->origin.z;
 	}
-	else
-	{
+	else {
 		return 0; //err..
 	}
 
-	if (heightdif < 128)
-	{ //don't bother..
+	if ( heightdif < 128 ) { //don't bother..
 		return 0;
 	}
 
-	if (heightdif > 512)
-	{ //too high
+	if ( heightdif > 512 ) { //too high
 		return 0;
 	}
 
-	if (!OrgVisibleCurve(&wpBase->origin, &mins, &maxs, &wpTest->origin, ENTITYNUM_NONE))
-	{
+	if ( !OrgVisibleCurve( &wpBase->origin, &mins, &maxs, &wpTest->origin, ENTITYNUM_NONE ) ) {
 		return 0;
 	}
 
-	if (heightdif > 400)
-	{
+	if ( heightdif > 400 ) {
 		return 3;
 	}
-	else if (heightdif > 256)
-	{
+	else if ( heightdif > 256 ) {
 		return 2;
 	}
-	else
-	{
+	else {
 		return 1;
 	}
 }
 
-void CalculatePaths(void)
-{
+void CalculatePaths( void ) {
 	int i;
 	int c;
 	int forceJumpable;
@@ -1537,28 +1349,23 @@ void CalculatePaths(void)
 	vector3 a;
 	vector3 mins, maxs;
 
-	if (!gWPNum)
-	{
+	if ( !gWPNum ) {
 		return;
 	}
 
-	if (RMG.integer)
-	{
+	if ( RMG.integer ) {
 		maxNeighborDist = DEFAULT_GRID_SPACING + (DEFAULT_GRID_SPACING*0.5f);
 	}
 
 	VectorSet( &mins, -15, -15, -15 );
-	VectorSet( &maxs,  15,  15,  15 );
+	VectorSet( &maxs, 15, 15, 15 );
 
 	//now clear out all the neighbor data before we recalculate
 	i = 0;
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->neighbornum)
-		{
-			while (gWPArray[i]->neighbornum >= 0)
-			{
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->neighbornum ) {
+			while ( gWPArray[i]->neighbornum >= 0 ) {
 				gWPArray[i]->neighbors[gWPArray[i]->neighbornum].num = 0;
 				gWPArray[i]->neighbors[gWPArray[i]->neighbornum].forceJumpTo = 0;
 				gWPArray[i]->neighbornum--;
@@ -1571,40 +1378,32 @@ void CalculatePaths(void)
 
 	i = 0;
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse)
-		{
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse ) {
 			c = 0;
 
-			while (c < gWPNum)
-			{
-				if (gWPArray[c] && gWPArray[c]->inuse && i != c &&
-					NotWithinRange(i, c))
-				{
-					VectorSubtract(&gWPArray[i]->origin, &gWPArray[c]->origin, &a);
+			while ( c < gWPNum ) {
+				if ( gWPArray[c] && gWPArray[c]->inuse && i != c &&
+					NotWithinRange( i, c ) ) {
+					VectorSubtract( &gWPArray[i]->origin, &gWPArray[c]->origin, &a );
 
-					nLDist = VectorLength(&a);
-					forceJumpable = CanForceJumpTo(i, c, nLDist);
+					nLDist = VectorLength( &a );
+					forceJumpable = CanForceJumpTo( i, c, nLDist );
 
-					if ((nLDist < maxNeighborDist || forceJumpable) &&
+					if ( (nLDist < maxNeighborDist || forceJumpable) &&
 						((int)gWPArray[i]->origin.z == (int)gWPArray[c]->origin.z || forceJumpable) &&
-						(OrgVisibleBox(&gWPArray[i]->origin, &mins, &maxs, &gWPArray[c]->origin, ENTITYNUM_NONE) || forceJumpable))
-					{
+						(OrgVisibleBox( &gWPArray[i]->origin, &mins, &maxs, &gWPArray[c]->origin, ENTITYNUM_NONE ) || forceJumpable) ) {
 						gWPArray[i]->neighbors[gWPArray[i]->neighbornum].num = c;
-						if (forceJumpable && ((int)gWPArray[i]->origin.z != (int)gWPArray[c]->origin.z || nLDist < maxNeighborDist))
-						{
+						if ( forceJumpable && ((int)gWPArray[i]->origin.z != (int)gWPArray[c]->origin.z || nLDist < maxNeighborDist) ) {
 							gWPArray[i]->neighbors[gWPArray[i]->neighbornum].forceJumpTo = 999;//forceJumpable; //FJSR
 						}
-						else
-						{
+						else {
 							gWPArray[i]->neighbors[gWPArray[i]->neighbornum].forceJumpTo = 0;
 						}
 						gWPArray[i]->neighbornum++;
 					}
 
-					if (gWPArray[i]->neighbornum >= MAX_NEIGHBOR_SIZE)
-					{
+					if ( gWPArray[i]->neighbornum >= MAX_NEIGHBOR_SIZE ) {
 						break;
 					}
 				}
@@ -1615,27 +1414,23 @@ void CalculatePaths(void)
 	}
 }
 
-gentity_t *GetObjectThatTargets(gentity_t *ent)
-{
+gentity_t *GetObjectThatTargets( gentity_t *ent ) {
 	gentity_t *next = NULL;
 
-	if (!ent->targetname)
-	{
+	if ( !ent->targetname ) {
 		return NULL;
 	}
 
-	next = G_Find( next, FOFS(target), ent->targetname );
+	next = G_Find( next, FOFS( target ), ent->targetname );
 
-	if (next)
-	{
+	if ( next ) {
 		return next;
 	}
 
 	return NULL;
 }
 
-void CalculateSiegeGoals(void)
-{
+void CalculateSiegeGoals( void ) {
 	int i = 0;
 	int looptracker = 0;
 	int wpindex = 0;
@@ -1643,48 +1438,40 @@ void CalculateSiegeGoals(void)
 	gentity_t *ent;
 	gentity_t *tent = NULL, *t2ent = NULL;
 
-	while (i < level.num_entities)
-	{
+	while ( i < level.num_entities ) {
 		ent = &g_entities[i];
 
 		tent = NULL;
 
-		if (ent && ent->classname && strcmp(ent->classname, "info_siege_objective") == 0)
-		{
+		if ( ent && ent->classname && strcmp( ent->classname, "info_siege_objective" ) == 0 ) {
 			tent = ent;
-			t2ent = GetObjectThatTargets(tent);
+			t2ent = GetObjectThatTargets( tent );
 			looptracker = 0;
 
-			while (t2ent && looptracker < 2048)
-			{ //looptracker keeps us from getting stuck in case something is set up weird on this map
+			while ( t2ent && looptracker < 2048 ) { //looptracker keeps us from getting stuck in case something is set up weird on this map
 				tent = t2ent;
-				t2ent = GetObjectThatTargets(tent);
+				t2ent = GetObjectThatTargets( tent );
 				looptracker++;
 			}
 
-			if (looptracker >= 2048)
-			{ //something unpleasent has happened
+			if ( looptracker >= 2048 ) { //something unpleasent has happened
 				tent = NULL;
 				break;
 			}
 		}
 
-		if (tent && ent && tent != ent)
-		{ //tent should now be the object attached to the mission objective
-			dif.x = (tent->r.absmax.x+tent->r.absmin.x)/2;
-			dif.y = (tent->r.absmax.y+tent->r.absmin.y)/2;
-			dif.z = (tent->r.absmax.z+tent->r.absmin.z)/2;
+		if ( tent && ent && tent != ent ) { //tent should now be the object attached to the mission objective
+			dif.x = (tent->r.absmax.x + tent->r.absmin.x) / 2;
+			dif.y = (tent->r.absmax.y + tent->r.absmin.y) / 2;
+			dif.z = (tent->r.absmax.z + tent->r.absmin.z) / 2;
 
-			wpindex = GetNearestVisibleWP(&dif, tent->s.number);
+			wpindex = GetNearestVisibleWP( &dif, tent->s.number );
 
-			if (wpindex != -1 && gWPArray[wpindex] && gWPArray[wpindex]->inuse)
-			{ //found the waypoint nearest the center of this objective-related object
-				if (ent->side == SIEGETEAM_TEAM1)
-				{
+			if ( wpindex != -1 && gWPArray[wpindex] && gWPArray[wpindex]->inuse ) { //found the waypoint nearest the center of this objective-related object
+				if ( ent->side == SIEGETEAM_TEAM1 ) {
 					gWPArray[wpindex]->flags |= WPFLAG_SIEGE_IMPERIALOBJ;
 				}
-				else
-				{
+				else {
 					gWPArray[wpindex]->flags |= WPFLAG_SIEGE_REBELOBJ;
 				}
 
@@ -1717,8 +1504,7 @@ float botGlobalNavWeaponWeights[WP_NUM_WEAPONS] =
 	0//WP_EMPLACED_GUN,
 };
 
-int GetNearestVisibleWPToItem(vector3 *org, int ignore)
-{
+int GetNearestVisibleWPToItem( vector3 *org, int ignore ) {
 	int i;
 	float bestdist;
 	float flLen;
@@ -1730,19 +1516,16 @@ int GetNearestVisibleWPToItem(vector3 *org, int ignore)
 	bestindex = -1;
 
 	VectorSet( &mins, -15, -15, 0 );
-	VectorSet( &maxs,  15,  15, 0 );
+	VectorSet( &maxs, 15, 15, 0 );
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse &&
-			gWPArray[i]->origin.z-15 < org->z &&
-			gWPArray[i]->origin.z+15 > org->z)
-		{
-			VectorSubtract(org, &gWPArray[i]->origin, &a);
-			flLen = VectorLength(&a);
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse &&
+			gWPArray[i]->origin.z - 15 < org->z &&
+			gWPArray[i]->origin.z + 15 > org->z ) {
+			VectorSubtract( org, &gWPArray[i]->origin, &a );
+			flLen = VectorLength( &a );
 
-			if (flLen < bestdist && trap->InPVS(org, &gWPArray[i]->origin) && OrgVisibleBox(org, &mins, &maxs, &gWPArray[i]->origin, ignore))
-			{
+			if ( flLen < bestdist && trap->InPVS( org, &gWPArray[i]->origin ) && OrgVisibleBox( org, &mins, &maxs, &gWPArray[i]->origin, ignore ) ) {
 				bestdist = flLen;
 				bestindex = i;
 			}
@@ -1754,25 +1537,20 @@ int GetNearestVisibleWPToItem(vector3 *org, int ignore)
 	return bestindex;
 }
 
-void CalculateWeightGoals(void)
-{ //set waypoint weights depending on weapon and item placement
+void CalculateWeightGoals( void ) { //set waypoint weights depending on weapon and item placement
 	int i = 0;
 	int wpindex = 0;
 	gentity_t *ent;
 	float weight;
 
-	trap->Cvar_Update(&bot_wp_clearweight);
+	trap->Cvar_Update( &bot_wp_clearweight );
 
-	if (bot_wp_clearweight.integer)
-	{ //if set then flush out all weight/goal values before calculating them again
-		while (i < gWPNum)
-		{
-			if (gWPArray[i] && gWPArray[i]->inuse)
-			{
+	if ( bot_wp_clearweight.integer ) { //if set then flush out all weight/goal values before calculating them again
+		while ( i < gWPNum ) {
+			if ( gWPArray[i] && gWPArray[i]->inuse ) {
 				gWPArray[i]->weight = 0;
 
-				if (gWPArray[i]->flags & WPFLAG_GOALPOINT)
-				{
+				if ( gWPArray[i]->flags & WPFLAG_GOALPOINT ) {
 					gWPArray[i]->flags -= WPFLAG_GOALPOINT;
 				}
 			}
@@ -1783,15 +1561,13 @@ void CalculateWeightGoals(void)
 
 	i = 0;
 
-	while (i < level.num_entities)
-	{
+	while ( i < level.num_entities ) {
 		ent = &g_entities[i];
 
 		weight = 0;
 
-		if (ent && ent->classname)
-		{
-				 if ( !strcmp( ent->classname, "item_seeker" ) )				weight = 2;
+		if ( ent && ent->classname ) {
+			if ( !strcmp( ent->classname, "item_seeker" ) )				weight = 2;
 			else if ( !strcmp( ent->classname, "item_shield" ) )				weight = 2;
 			else if ( !strcmp( ent->classname, "item_medpac" ) )				weight = 2;
 			else if ( !strcmp( ent->classname, "item_sentry_gun" ) )			weight = 2;
@@ -1803,12 +1579,10 @@ void CalculateWeightGoals(void)
 			else if ( ent->item && ent->item->giType == IT_AMMO )				weight = 3;
 		}
 
-		if (ent && weight)
-		{
-			wpindex = GetNearestVisibleWPToItem(&ent->s.pos.trBase, ent->s.number);
+		if ( ent && weight ) {
+			wpindex = GetNearestVisibleWPToItem( &ent->s.pos.trBase, ent->s.number );
 
-			if (wpindex != -1 && gWPArray[wpindex] && gWPArray[wpindex]->inuse)
-			{ //found the waypoint nearest the center of this object
+			if ( wpindex != -1 && gWPArray[wpindex] && gWPArray[wpindex]->inuse ) { //found the waypoint nearest the center of this object
 				gWPArray[wpindex]->weight = weight;
 				gWPArray[wpindex]->flags |= WPFLAG_GOALPOINT;
 				gWPArray[wpindex]->associated_entity = ent->s.number;
@@ -1819,37 +1593,32 @@ void CalculateWeightGoals(void)
 	}
 }
 
-void CalculateJumpRoutes(void)
-{
+void CalculateJumpRoutes( void ) {
 	int i = 0;
 	float nheightdif = 0;
 	float pheightdif = 0;
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse)
-		{
-			if (gWPArray[i]->flags & WPFLAG_JUMP)
-			{
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse ) {
+			if ( gWPArray[i]->flags & WPFLAG_JUMP ) {
 				nheightdif = 0;
 				pheightdif = 0;
 
 				gWPArray[i]->forceJumpTo = 0;
 
-				if (gWPArray[i-1] && gWPArray[i-1]->inuse && (gWPArray[i-1]->origin.z+16) < gWPArray[i]->origin.z)
-					nheightdif = (gWPArray[i]->origin.z - gWPArray[i-1]->origin.z);
+				if ( gWPArray[i - 1] && gWPArray[i - 1]->inuse && (gWPArray[i - 1]->origin.z + 16) < gWPArray[i]->origin.z )
+					nheightdif = (gWPArray[i]->origin.z - gWPArray[i - 1]->origin.z);
 
-				if (gWPArray[i+1] && gWPArray[i+1]->inuse && (gWPArray[i+1]->origin.z+16) < gWPArray[i]->origin.z)
-					pheightdif = (gWPArray[i]->origin.z - gWPArray[i+1]->origin.z);
+				if ( gWPArray[i + 1] && gWPArray[i + 1]->inuse && (gWPArray[i + 1]->origin.z + 16) < gWPArray[i]->origin.z )
+					pheightdif = (gWPArray[i]->origin.z - gWPArray[i + 1]->origin.z);
 
-				if (nheightdif > pheightdif)
+				if ( nheightdif > pheightdif )
 					pheightdif = nheightdif;
 
-				if (pheightdif)
-				{
-						 if (pheightdif > 500)	gWPArray[i]->forceJumpTo = 999; //FORCE_LEVEL_3; //FJSR
-					else if (pheightdif > 256)	gWPArray[i]->forceJumpTo = 999; //FORCE_LEVEL_2; //FJSR
-					else if (pheightdif > 128)	gWPArray[i]->forceJumpTo = 999; //FORCE_LEVEL_1; //FJSR
+				if ( pheightdif ) {
+					if ( pheightdif > 500 )	gWPArray[i]->forceJumpTo = 999; //FORCE_LEVEL_3; //FJSR
+					else if ( pheightdif > 256 )	gWPArray[i]->forceJumpTo = 999; //FORCE_LEVEL_2; //FJSR
+					else if ( pheightdif > 128 )	gWPArray[i]->forceJumpTo = 999; //FORCE_LEVEL_1; //FJSR
 				}
 			}
 		}
@@ -1858,8 +1627,7 @@ void CalculateJumpRoutes(void)
 	}
 }
 
-int LoadPathData(const char *filename)
-{
+int LoadPathData( const char *filename ) {
 	fileHandle_t f;
 	char *fileString;
 	char *currentVar;
@@ -1871,43 +1639,38 @@ int LoadPathData(const char *filename)
 
 	i = 0;
 
-	routePath = (char *)B_TempAlloc(1024);
+	routePath = (char *)B_TempAlloc( 1024 );
 
-	Com_sprintf(routePath, 1024, "botroutes/%s.wnt\0", filename);
+	Com_sprintf( routePath, 1024, "botroutes/%s.wnt\0", filename );
 
-	len = trap->FS_Open(routePath, &f, FS_READ);
+	len = trap->FS_Open( routePath, &f, FS_READ );
 
-	B_TempFree(1024); //routePath
+	B_TempFree( 1024 ); //routePath
 
-	if (!f)
-	{
-		trap->Print(S_COLOR_YELLOW "Bot route data not found for %s\n", filename);
+	if ( !f ) {
+		trap->Print( S_COLOR_YELLOW "Bot route data not found for %s\n", filename );
 		return 2;
 	}
 
-	if (len >= 524288)
-	{
-		trap->Print(S_COLOR_RED "Route file exceeds maximum length\n");
+	if ( len >= 524288 ) {
+		trap->Print( S_COLOR_RED "Route file exceeds maximum length\n" );
 		return 0;
 	}
 
-	fileString = (char *)B_TempAlloc(524288);
-	currentVar = (char *)B_TempAlloc(2048);
+	fileString = (char *)B_TempAlloc( 524288 );
+	currentVar = (char *)B_TempAlloc( 2048 );
 
-	trap->FS_Read(fileString, len, f);
+	trap->FS_Read( fileString, len, f );
 
-	if (fileString[i] == 'l')
-	{ //contains a "levelflags" entry..
+	if ( fileString[i] == 'l' ) { //contains a "levelflags" entry..
 		char readLFlags[64];
 		i_cv = 0;
 
-		while (fileString[i] != ' ')
-		{
+		while ( fileString[i] != ' ' ) {
 			i++;
 		}
 		i++;
-		while (fileString[i] != '\n')
-		{
+		while ( fileString[i] != '\n' ) {
 			readLFlags[i_cv] = fileString[i];
 			i_cv++;
 			i++;
@@ -1915,15 +1678,13 @@ int LoadPathData(const char *filename)
 		readLFlags[i_cv] = 0;
 		i++;
 
-		gLevelFlags = atoi(readLFlags);
+		gLevelFlags = atoi( readLFlags );
 	}
-	else
-	{
+	else {
 		gLevelFlags = 0;
 	}
 
-	while (i < len)
-	{
+	while ( i < len ) {
 		i_cv = 0;
 
 		thiswp.index = 0;
@@ -1939,112 +1700,101 @@ int LoadPathData(const char *filename)
 		thiswp.disttonext = 0;
 		nei_num = 0;
 
-		while (nei_num < MAX_NEIGHBOR_SIZE)
-		{
+		while ( nei_num < MAX_NEIGHBOR_SIZE ) {
 			thiswp.neighbors[nei_num].num = 0;
 			thiswp.neighbors[nei_num].forceJumpTo = 0;
 
 			nei_num++;
 		}
 
-		while (fileString[i] != ' ')
-		{
+		while ( fileString[i] != ' ' ) {
 			currentVar[i_cv] = fileString[i];
 			i_cv++;
 			i++;
 		}
 		currentVar[i_cv] = '\0';
 
-		thiswp.index = atoi(currentVar);
+		thiswp.index = atoi( currentVar );
 
 		i_cv = 0;
 		i++;
 
-		while (fileString[i] != ' ')
-		{
+		while ( fileString[i] != ' ' ) {
 			currentVar[i_cv] = fileString[i];
 			i_cv++;
 			i++;
 		}
 		currentVar[i_cv] = '\0';
 
-		thiswp.flags = atoi(currentVar);
+		thiswp.flags = atoi( currentVar );
 
 		i_cv = 0;
 		i++;
 
-		while (fileString[i] != ' ')
-		{
+		while ( fileString[i] != ' ' ) {
 			currentVar[i_cv] = fileString[i];
 			i_cv++;
 			i++;
 		}
 		currentVar[i_cv] = '\0';
 
-		thiswp.weight = atof(currentVar);
+		thiswp.weight = atof( currentVar );
 
 		i_cv = 0;
 		i++;
 		i++;
 
-		while (fileString[i] != ' ')
-		{
+		while ( fileString[i] != ' ' ) {
 			currentVar[i_cv] = fileString[i];
 			i_cv++;
 			i++;
 		}
 		currentVar[i_cv] = '\0';
 
-		thiswp.origin.x = atof(currentVar);
+		thiswp.origin.x = atof( currentVar );
 
 		i_cv = 0;
 		i++;
 
-		while (fileString[i] != ' ')
-		{
+		while ( fileString[i] != ' ' ) {
 			currentVar[i_cv] = fileString[i];
 			i_cv++;
 			i++;
 		}
 		currentVar[i_cv] = '\0';
 
-		thiswp.origin.y = atof(currentVar);
+		thiswp.origin.y = atof( currentVar );
 
 		i_cv = 0;
 		i++;
 
-		while (fileString[i] != ')')
-		{
+		while ( fileString[i] != ')' ) {
 			currentVar[i_cv] = fileString[i];
 			i_cv++;
 			i++;
 		}
 		currentVar[i_cv] = '\0';
 
-		thiswp.origin.z = atof(currentVar);
+		thiswp.origin.z = atof( currentVar );
 
 		i += 4;
 
-		while (fileString[i] != '}')
-		{
+		while ( fileString[i] != '}' ) {
 			i_cv = 0;
-			while (fileString[i] != ' ' && fileString[i] != '-')
-			{
+			while ( fileString[i] != ' ' && fileString[i] != '-' ) {
 				currentVar[i_cv] = fileString[i];
 				i_cv++;
 				i++;
 			}
 			currentVar[i_cv] = '\0';
 
-			thiswp.neighbors[thiswp.neighbornum].num = atoi(currentVar);
+			thiswp.neighbors[thiswp.neighbornum].num = atoi( currentVar );
 
-			if (fileString[i] == '-')
-			{
+			if ( fileString[i] == '-' ) {
 				i_cv = 0;
 				i++;
 
-				while (fileString[i] != ' ')
-				{
+				while ( fileString[i] != ' ' ) {
 					currentVar[i_cv] = fileString[i];
 					i_cv++;
 					i++;
@@ -2053,8 +1803,7 @@ int LoadPathData(const char *filename)
 
 				thiswp.neighbors[thiswp.neighbornum].forceJumpTo = 999; //atoi(currentVar); //FJSR
 			}
-			else
-			{
+			else {
 				thiswp.neighbors[thiswp.neighbornum].forceJumpTo = 0;
 			}
 
@@ -2067,27 +1816,25 @@ int LoadPathData(const char *filename)
 		i++;
 		i++;
 
-		while (fileString[i] != '\n')
-		{
+		while ( fileString[i] != '\n' ) {
 			currentVar[i_cv] = fileString[i];
 			i_cv++;
 			i++;
 		}
 		currentVar[i_cv] = '\0';
 
-		thiswp.disttonext = atof(currentVar);
+		thiswp.disttonext = atof( currentVar );
 
-		CreateNewWP_FromObject(&thiswp);
+		CreateNewWP_FromObject( &thiswp );
 		i++;
 	}
 
-	B_TempFree(524288); //fileString
-	B_TempFree(2048); //currentVar
+	B_TempFree( 524288 ); //fileString
+	B_TempFree( 2048 ); //currentVar
 
-	trap->FS_Close(f);
+	trap->FS_Close( f );
 
-	if (level.gametype == GT_SIEGE)
-	{
+	if ( level.gametype == GT_SIEGE ) {
 		CalculateSiegeGoals();
 	}
 
@@ -2102,8 +1849,7 @@ int LoadPathData(const char *filename)
 	return 1;
 }
 
-void FlagObjects(void)
-{
+void FlagObjects( void ) {
 	int i = 0, bestindex = 0, found = 0;
 	float bestdist = 999999, tlen = 0;
 	gentity_t *flag_red, *flag_blue, *ent;
@@ -2114,20 +1860,18 @@ void FlagObjects(void)
 	flag_blue = NULL;
 
 	VectorSet( &mins, -15, -15, -5 );
-	VectorSet( &maxs,  15,  15,  5 );
+	VectorSet( &maxs, 15, 15, 5 );
 
-	while (i < level.num_entities)
-	{
+	while ( i < level.num_entities ) {
 		ent = &g_entities[i];
 
-		if ( VALIDENT( ent ) && ent->classname)
-		{
-			if (!flag_red && strcmp(ent->classname, "team_CTF_redflag") == 0)
+		if ( VALIDENT( ent ) && ent->classname ) {
+			if ( !flag_red && strcmp( ent->classname, "team_CTF_redflag" ) == 0 )
 				flag_red = ent;
-			else if (!flag_blue && strcmp(ent->classname, "team_CTF_blueflag") == 0)
+			else if ( !flag_blue && strcmp( ent->classname, "team_CTF_blueflag" ) == 0 )
 				flag_blue = ent;
 
-			if (flag_red && flag_blue)
+			if ( flag_red && flag_blue )
 				break;
 		}
 
@@ -2136,24 +1880,19 @@ void FlagObjects(void)
 
 	i = 0;
 
-	if (!flag_red || !flag_blue)
-	{
+	if ( !flag_red || !flag_blue ) {
 		return;
 	}
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse)
-		{
-			VectorSubtract(&flag_red->s.pos.trBase, &gWPArray[i]->origin, &a);
-			tlen = VectorLength(&a);
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse ) {
+			VectorSubtract( &flag_red->s.pos.trBase, &gWPArray[i]->origin, &a );
+			tlen = VectorLength( &a );
 
-			if (tlen < bestdist)
-			{
-				trap->Trace(&tr, &flag_red->s.pos.trBase, &mins, &maxs, &gWPArray[i]->origin, flag_red->s.number, MASK_SOLID, qfalse, 0, 0);
+			if ( tlen < bestdist ) {
+				trap->Trace( &tr, &flag_red->s.pos.trBase, &mins, &maxs, &gWPArray[i]->origin, flag_red->s.number, MASK_SOLID, qfalse, 0, 0 );
 
-				if (tr.fraction == 1 || tr.entityNum == flag_red->s.number)
-				{
+				if ( tr.fraction == 1 || tr.entityNum == flag_red->s.number ) {
 					bestdist = tlen;
 					bestindex = i;
 					found = 1;
@@ -2165,8 +1904,7 @@ void FlagObjects(void)
 		i++;
 	}
 
-	if (found)
-	{
+	if ( found ) {
 		gWPArray[bestindex]->flags |= WPFLAG_RED_FLAG;
 		flagRed = gWPArray[bestindex];
 		oFlagRed = flagRed;
@@ -2178,19 +1916,15 @@ void FlagObjects(void)
 	found = 0;
 	i = 0;
 
-	while (i < gWPNum)
-	{
-		if (gWPArray[i] && gWPArray[i]->inuse)
-		{
-			VectorSubtract(&flag_blue->s.pos.trBase, &gWPArray[i]->origin, &a);
-			tlen = VectorLength(&a);
+	while ( i < gWPNum ) {
+		if ( gWPArray[i] && gWPArray[i]->inuse ) {
+			VectorSubtract( &flag_blue->s.pos.trBase, &gWPArray[i]->origin, &a );
+			tlen = VectorLength( &a );
 
-			if (tlen < bestdist)
-			{
-				trap->Trace(&tr, &flag_blue->s.pos.trBase, &mins, &maxs, &gWPArray[i]->origin, flag_blue->s.number, MASK_SOLID, qfalse, 0, 0);
+			if ( tlen < bestdist ) {
+				trap->Trace( &tr, &flag_blue->s.pos.trBase, &mins, &maxs, &gWPArray[i]->origin, flag_blue->s.number, MASK_SOLID, qfalse, 0, 0 );
 
-				if (tr.fraction == 1 || tr.entityNum == flag_blue->s.number)
-				{
+				if ( tr.fraction == 1 || tr.entityNum == flag_blue->s.number ) {
 					bestdist = tlen;
 					bestindex = i;
 					found = 1;
@@ -2202,8 +1936,7 @@ void FlagObjects(void)
 		i++;
 	}
 
-	if (found)
-	{
+	if ( found ) {
 		gWPArray[bestindex]->flags |= WPFLAG_BLUE_FLAG;
 		flagBlue = gWPArray[bestindex];
 		oFlagBlue = flagBlue;
@@ -2211,8 +1944,7 @@ void FlagObjects(void)
 	}
 }
 
-int SavePathData(const char *filename)
-{
+int SavePathData( const char *filename ) {
 	fileHandle_t f;
 	char *fileString;
 	char *storeString;
@@ -2224,28 +1956,26 @@ int SavePathData(const char *filename)
 	fileString = NULL;
 	i = 0;
 
-	if (!gWPNum)
-	{
+	if ( !gWPNum ) {
 		return 0;
 	}
 
-	routePath = (char *)B_TempAlloc(1024);
+	routePath = (char *)B_TempAlloc( 1024 );
 
-	Com_sprintf(routePath, 1024, "botroutes/%s.wnt\0", filename);
+	Com_sprintf( routePath, 1024, "botroutes/%s.wnt\0", filename );
 
-	trap->FS_Open(routePath, &f, FS_WRITE);
+	trap->FS_Open( routePath, &f, FS_WRITE );
 
-	B_TempFree(1024); //routePath
+	B_TempFree( 1024 ); //routePath
 
-	if (!f)
-	{
-		trap->Print(S_COLOR_RED "ERROR: Could not open file to write path data\n");
+	if ( !f ) {
+		trap->Print( S_COLOR_RED "ERROR: Could not open file to write path data\n" );
 		return 0;
 	}
 
-	if (!RepairPaths(qfalse)) //check if we can see all waypoints from the last. If not, try to branch over.
+	if ( !RepairPaths( qfalse ) ) //check if we can see all waypoints from the last. If not, try to branch over.
 	{
-		trap->FS_Close(f);
+		trap->FS_Close( f );
 		return 0;
 	}
 
@@ -2253,89 +1983,78 @@ int SavePathData(const char *filename)
 
 	FlagObjects(); //currently only used for flagging waypoints nearest CTF flags
 
-	fileString = (char *)B_TempAlloc(524288);
-	storeString = (char *)B_TempAlloc(4096);
+	fileString = (char *)B_TempAlloc( 524288 );
+	storeString = (char *)B_TempAlloc( 4096 );
 
-	Com_sprintf(fileString, 524288, "%i %i %f (%f %f %f) { ", gWPArray[i]->index, gWPArray[i]->flags, gWPArray[i]->weight, gWPArray[i]->origin.x, gWPArray[i]->origin.y, gWPArray[i]->origin.z);
+	Com_sprintf( fileString, 524288, "%i %i %f (%f %f %f) { ", gWPArray[i]->index, gWPArray[i]->flags, gWPArray[i]->weight, gWPArray[i]->origin.x, gWPArray[i]->origin.y, gWPArray[i]->origin.z );
 
 	n = 0;
 
-	while (n < gWPArray[i]->neighbornum)
-	{
-		if (gWPArray[i]->neighbors[n].forceJumpTo)
-		{
-			Com_sprintf(storeString, 4096, "%s%i-%i ", storeString, gWPArray[i]->neighbors[n].num, gWPArray[i]->neighbors[n].forceJumpTo);
+	while ( n < gWPArray[i]->neighbornum ) {
+		if ( gWPArray[i]->neighbors[n].forceJumpTo ) {
+			Com_sprintf( storeString, 4096, "%s%i-%i ", storeString, gWPArray[i]->neighbors[n].num, gWPArray[i]->neighbors[n].forceJumpTo );
 		}
-		else
-		{
-			Com_sprintf(storeString, 4096, "%s%i ", storeString, gWPArray[i]->neighbors[n].num);
+		else {
+			Com_sprintf( storeString, 4096, "%s%i ", storeString, gWPArray[i]->neighbors[n].num );
 		}
 		n++;
 	}
 
-	if (gWPArray[i+1] && gWPArray[i+1]->inuse && gWPArray[i+1]->index)
-	{
-		VectorSubtract(&gWPArray[i]->origin, &gWPArray[i+1]->origin, &a);
-		flLen = VectorLength(&a);
+	if ( gWPArray[i + 1] && gWPArray[i + 1]->inuse && gWPArray[i + 1]->index ) {
+		VectorSubtract( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, &a );
+		flLen = VectorLength( &a );
 	}
-	else
-	{
+	else {
 		flLen = 0;
 	}
 
 	gWPArray[i]->disttonext = flLen;
 
-	Com_sprintf(fileString, 524288, "%s} %f\n", fileString, flLen);
+	Com_sprintf( fileString, 524288, "%s} %f\n", fileString, flLen );
 
 	i++;
 
-	while (i < gWPNum)
-	{
+	while ( i < gWPNum ) {
 		//sprintf(fileString, "%s%i %i %f (%f %f %f) { ", fileString, gWPArray[i]->index, gWPArray[i]->flags, gWPArray[i]->weight, gWPArray[i]->origin.x, gWPArray[i]->origin.y, gWPArray[i]->origin.z);
-		Com_sprintf(storeString, 4096, "%i %i %f (%f %f %f) { ", gWPArray[i]->index, gWPArray[i]->flags, gWPArray[i]->weight, gWPArray[i]->origin.x, gWPArray[i]->origin.y, gWPArray[i]->origin.z);
+		Com_sprintf( storeString, 4096, "%i %i %f (%f %f %f) { ", gWPArray[i]->index, gWPArray[i]->flags, gWPArray[i]->weight, gWPArray[i]->origin.x, gWPArray[i]->origin.y, gWPArray[i]->origin.z );
 
 		n = 0;
 
-		while (n < gWPArray[i]->neighbornum)
-		{
-			if (gWPArray[i]->neighbors[n].forceJumpTo)
-			{
-				Com_sprintf(storeString, 4096, "%s%i-%i ", storeString, gWPArray[i]->neighbors[n].num, gWPArray[i]->neighbors[n].forceJumpTo);
+		while ( n < gWPArray[i]->neighbornum ) {
+			if ( gWPArray[i]->neighbors[n].forceJumpTo ) {
+				Com_sprintf( storeString, 4096, "%s%i-%i ", storeString, gWPArray[i]->neighbors[n].num, gWPArray[i]->neighbors[n].forceJumpTo );
 			}
-			else
-			{
-				Com_sprintf(storeString, 4096, "%s%i ", storeString, gWPArray[i]->neighbors[n].num);
+			else {
+				Com_sprintf( storeString, 4096, "%s%i ", storeString, gWPArray[i]->neighbors[n].num );
 			}
 			n++;
 		}
 
-		if (gWPArray[i+1] && gWPArray[i+1]->inuse && gWPArray[i+1]->index)
-		{
-			VectorSubtract(&gWPArray[i]->origin, &gWPArray[i+1]->origin, &a);
-			flLen = VectorLength(&a);
+		if ( gWPArray[i + 1] && gWPArray[i + 1]->inuse && gWPArray[i + 1]->index ) {
+			VectorSubtract( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, &a );
+			flLen = VectorLength( &a );
 		}
-		else
-		{
+		else {
 			flLen = 0;
 		}
 
 		gWPArray[i]->disttonext = flLen;
 
-		Com_sprintf(storeString, 4096, "%s} %f\n", storeString, flLen);
+		Com_sprintf( storeString, 4096, "%s} %f\n", storeString, flLen );
 
-		strcat(fileString, storeString);
+		strcat( fileString, storeString );
 
 		i++;
 	}
 
-	trap->FS_Write(fileString, strlen(fileString), f);
+	trap->FS_Write( fileString, strlen( fileString ), f );
 
-	B_TempFree(524288); //fileString
-	B_TempFree(4096); //storeString
+	B_TempFree( 524288 ); //fileString
+	B_TempFree( 4096 ); //storeString
 
-	trap->FS_Close(f);
+	trap->FS_Close( f );
 
-	trap->Print("Path data has been saved and updated. You may need to restart the level for some things to be properly calculated.\n");
+	trap->Print( "Path data has been saved and updated. You may need to restart the level for some things to be properly calculated.\n" );
 
 	return 1;
 }
@@ -2344,21 +2063,18 @@ int SavePathData(const char *filename)
 int gSpawnPointNum = 0;
 gentity_t *gSpawnPoints[MAX_SPAWNPOINT_ARRAY];
 
-int G_NearestNodeToPoint(vector3 *point)
-{ //gets the node on the entire grid which is nearest to the specified coordinates.
+int G_NearestNodeToPoint( vector3 *point ) { //gets the node on the entire grid which is nearest to the specified coordinates.
 	vector3 vSub;
 	int bestIndex = -1;
 	int i = 0;
 	float bestDist = 0;
 	float testDist = 0;
 
-	while (i < nodenum)
-	{
-		VectorSubtract(&nodetable[i].origin, point, &vSub);
-		testDist = VectorLength(&vSub);
+	while ( i < nodenum ) {
+		VectorSubtract( &nodetable[i].origin, point, &vSub );
+		testDist = VectorLength( &vSub );
 
-		if (bestIndex == -1)
-		{
+		if ( bestIndex == -1 ) {
 			bestIndex = i;
 			bestDist = testDist;
 
@@ -2366,8 +2082,7 @@ int G_NearestNodeToPoint(vector3 *point)
 			continue;
 		}
 
-		if (testDist < bestDist)
-		{
+		if ( testDist < bestDist ) {
 			bestIndex = i;
 			bestDist = testDist;
 		}
@@ -2377,12 +2092,10 @@ int G_NearestNodeToPoint(vector3 *point)
 	return bestIndex;
 }
 
-void G_NodeClearForNext(void)
-{ //reset nodes for the next trail connection.
+void G_NodeClearForNext( void ) { //reset nodes for the next trail connection.
 	int i = 0;
 
-	while (i < nodenum)
-	{
+	while ( i < nodenum ) {
 		nodetable[i].flags = 0;
 		nodetable[i].weight = 99999;
 
@@ -2390,28 +2103,23 @@ void G_NodeClearForNext(void)
 	}
 }
 
-void G_NodeClearFlags(void)
-{ //only clear out flags so nodes can be reused.
+void G_NodeClearFlags( void ) { //only clear out flags so nodes can be reused.
 	int i = 0;
 
-	while (i < nodenum)
-	{
+	while ( i < nodenum ) {
 		nodetable[i].flags = 0;
 
 		i++;
 	}
 }
 
-int G_NodeMatchingXY(float x, float y)
-{ //just get the first unflagged node with the matching x,y coordinates.
+int G_NodeMatchingXY( float x, float y ) { //just get the first unflagged node with the matching x,y coordinates.
 	int i = 0;
 
-	while (i < nodenum)
-	{
-		if (nodetable[i].origin.x == x &&
+	while ( i < nodenum ) {
+		if ( nodetable[i].origin.x == x &&
 			nodetable[i].origin.y == y &&
-			!nodetable[i].flags)
-		{
+			!nodetable[i].flags ) {
 			return i;
 		}
 
@@ -2421,21 +2129,17 @@ int G_NodeMatchingXY(float x, float y)
 	return -1;
 }
 
-int G_NodeMatchingXY_BA(int x, int y, int final)
-{ //return the node with the lowest weight that matches the specified x,y coordinates.
+int G_NodeMatchingXY_BA( int x, int y, int final ) { //return the node with the lowest weight that matches the specified x,y coordinates.
 	int i = 0;
 	int bestindex = -1;
 	float bestWeight = 9999;
 
-	while (i < nodenum)
-	{
-		if ((int)nodetable[i].origin.x == x &&
+	while ( i < nodenum ) {
+		if ( (int)nodetable[i].origin.x == x &&
 			(int)nodetable[i].origin.y == y &&
 			!nodetable[i].flags &&
-			((nodetable[i].weight < bestWeight) || (i == final)))
-		{
-			if (i == final)
-			{
+			((nodetable[i].weight < bestWeight) || (i == final)) ) {
+			if ( i == final ) {
 				return i;
 			}
 			bestindex = i;
@@ -2448,8 +2152,7 @@ int G_NodeMatchingXY_BA(int x, int y, int final)
 	return bestindex;
 }
 
-int G_RecursiveConnection(int start, int end, int weight, qboolean traceCheck, float baseHeight)
-{
+int G_RecursiveConnection( int start, int end, int weight, qboolean traceCheck, float baseHeight ) {
 	int indexDirections[4]; //0 == down, 1 == up, 2 == left, 3 == right
 	int recursiveIndex = -1;
 	int i = 0;
@@ -2463,57 +2166,49 @@ int G_RecursiveConnection(int start, int end, int weight, qboolean traceCheck, f
 	givenXY.x = nodetable[start].origin.x;
 	givenXY.y = nodetable[start].origin.y;
 	givenXY.x -= DEFAULT_GRID_SPACING;
-	indexDirections[0] = G_NodeMatchingXY(givenXY.x, givenXY.y);
+	indexDirections[0] = G_NodeMatchingXY( givenXY.x, givenXY.y );
 
 	givenXY.x = nodetable[start].origin.x;
 	givenXY.y = nodetable[start].origin.y;
 	givenXY.x += DEFAULT_GRID_SPACING;
-	indexDirections[1] = G_NodeMatchingXY(givenXY.x, givenXY.y);
+	indexDirections[1] = G_NodeMatchingXY( givenXY.x, givenXY.y );
 
 	givenXY.x = nodetable[start].origin.x;
 	givenXY.y = nodetable[start].origin.y;
 	givenXY.y -= DEFAULT_GRID_SPACING;
-	indexDirections[2] = G_NodeMatchingXY(givenXY.x, givenXY.y);
+	indexDirections[2] = G_NodeMatchingXY( givenXY.x, givenXY.y );
 
 	givenXY.x = nodetable[start].origin.x;
 	givenXY.y = nodetable[start].origin.y;
 	givenXY.y += DEFAULT_GRID_SPACING;
-	indexDirections[3] = G_NodeMatchingXY(givenXY.x, givenXY.y);
+	indexDirections[3] = G_NodeMatchingXY( givenXY.x, givenXY.y );
 
 	i = 0;
-	while (i < 4)
-	{
-		if (indexDirections[i] == end)
-		{ //we've connected all the way to the destination.
+	while ( i < 4 ) {
+		if ( indexDirections[i] == end ) { //we've connected all the way to the destination.
 			return indexDirections[i];
 		}
 
-		if (indexDirections[i] != -1 && nodetable[indexDirections[i]].flags)
-		{ //this point is already used, so it's not valid.
+		if ( indexDirections[i] != -1 && nodetable[indexDirections[i]].flags ) { //this point is already used, so it's not valid.
 			indexDirections[i] = -1;
 		}
-		else if (indexDirections[i] != -1)
-		{ //otherwise mark it as used.
+		else if ( indexDirections[i] != -1 ) { //otherwise mark it as used.
 			nodetable[indexDirections[i]].flags = 1;
 		}
 
-		if (indexDirections[i] != -1 && traceCheck)
-		{ //if we care about trace visibility between nodes, perform the check and mark as not valid if the trace isn't clear.
-			trap->Trace(&tr, &nodetable[start].origin, NULL, NULL, &nodetable[indexDirections[i]].origin, ENTITYNUM_NONE, CONTENTS_SOLID, qfalse, 0, 0);
+		if ( indexDirections[i] != -1 && traceCheck ) { //if we care about trace visibility between nodes, perform the check and mark as not valid if the trace isn't clear.
+			trap->Trace( &tr, &nodetable[start].origin, NULL, NULL, &nodetable[indexDirections[i]].origin, ENTITYNUM_NONE, CONTENTS_SOLID, qfalse, 0, 0 );
 
-			if (tr.fraction != 1)
-			{
+			if ( tr.fraction != 1 ) {
 				indexDirections[i] = -1;
 			}
 		}
 
-		if (indexDirections[i] != -1)
-		{ //it's still valid, so keep connecting via this point.
-			recursiveIndex = G_RecursiveConnection(indexDirections[i], end, passWeight, traceCheck, baseHeight);
+		if ( indexDirections[i] != -1 ) { //it's still valid, so keep connecting via this point.
+			recursiveIndex = G_RecursiveConnection( indexDirections[i], end, passWeight, traceCheck, baseHeight );
 		}
 
-		if (recursiveIndex != -1)
-		{ //the result of the recursive check was valid, so return it.
+		if ( recursiveIndex != -1 ) { //the result of the recursive check was valid, so return it.
 			return recursiveIndex;
 		}
 
@@ -2811,8 +2506,7 @@ void CreateAsciiNodeTableRepresentation(int start, int end)
 }
 #endif
 
-qboolean G_BackwardAttachment(int start, int finalDestination, int insertAfter)
-{ //After creating a node path between 2 points, this function links the 2 points with actual waypoint data.
+qboolean G_BackwardAttachment( int start, int finalDestination, int insertAfter ) { //After creating a node path between 2 points, this function links the 2 points with actual waypoint data.
 	int indexDirections[4]; //0 == down, 1 == up, 2 == left, 3 == right
 	int i = 0;
 	int lowestWeight = 9999;
@@ -2822,36 +2516,32 @@ qboolean G_BackwardAttachment(int start, int finalDestination, int insertAfter)
 	givenXY.x = nodetable[start].origin.x;
 	givenXY.y = nodetable[start].origin.y;
 	givenXY.x -= DEFAULT_GRID_SPACING;
-	indexDirections[0] = G_NodeMatchingXY_BA(givenXY.x, givenXY.y, finalDestination);
+	indexDirections[0] = G_NodeMatchingXY_BA( givenXY.x, givenXY.y, finalDestination );
 
 	givenXY.x = nodetable[start].origin.x;
 	givenXY.y = nodetable[start].origin.y;
 	givenXY.y += DEFAULT_GRID_SPACING;
-	indexDirections[1] = G_NodeMatchingXY_BA(givenXY.x, givenXY.y, finalDestination);
+	indexDirections[1] = G_NodeMatchingXY_BA( givenXY.x, givenXY.y, finalDestination );
 
 	givenXY.x = nodetable[start].origin.x;
 	givenXY.y = nodetable[start].origin.y;
 	givenXY.y -= DEFAULT_GRID_SPACING;
-	indexDirections[2] = G_NodeMatchingXY_BA(givenXY.x, givenXY.y, finalDestination);
+	indexDirections[2] = G_NodeMatchingXY_BA( givenXY.x, givenXY.y, finalDestination );
 
 	givenXY.x = nodetable[start].origin.x;
 	givenXY.y = nodetable[start].origin.y;
 	givenXY.y += DEFAULT_GRID_SPACING;
-	indexDirections[3] = G_NodeMatchingXY_BA(givenXY.x, givenXY.y, finalDestination);
+	indexDirections[3] = G_NodeMatchingXY_BA( givenXY.x, givenXY.y, finalDestination );
 
-	while (i < 4)
-	{
-		if (indexDirections[i] != -1)
-		{
-			if (indexDirections[i] == finalDestination)
-			{ //hooray, we've found the original point and linked all the way back to it.
-				CreateNewWP_InsertUnder(&nodetable[start].origin, 0, insertAfter);
-				CreateNewWP_InsertUnder(&nodetable[indexDirections[i]].origin, 0, insertAfter);
+	while ( i < 4 ) {
+		if ( indexDirections[i] != -1 ) {
+			if ( indexDirections[i] == finalDestination ) { //hooray, we've found the original point and linked all the way back to it.
+				CreateNewWP_InsertUnder( &nodetable[start].origin, 0, insertAfter );
+				CreateNewWP_InsertUnder( &nodetable[indexDirections[i]].origin, 0, insertAfter );
 				return qtrue;
 			}
 
-			if (nodetable[indexDirections[i]].weight < lowestWeight && nodetable[indexDirections[i]].weight && !nodetable[indexDirections[i]].flags /*&& (nodetable[indexDirections[i]].origin.z-64 < nodetable[start].origin.z)*/)
-			{
+			if ( nodetable[indexDirections[i]].weight < lowestWeight && nodetable[indexDirections[i]].weight && !nodetable[indexDirections[i]].flags /*&& (nodetable[indexDirections[i]].origin.z-64 < nodetable[start].origin.z)*/ ) {
 				desiredIndex = indexDirections[i];
 				lowestWeight = nodetable[indexDirections[i]].weight;
 			}
@@ -2859,19 +2549,16 @@ qboolean G_BackwardAttachment(int start, int finalDestination, int insertAfter)
 		i++;
 	}
 
-	if (desiredIndex != -1)
-	{ //Create a waypoint here, and then recursively call this function for the next neighbor with the lowest weight.
-		if (gWPNum < 3900)
-		{
-			CreateNewWP_InsertUnder(&nodetable[start].origin, 0, insertAfter);
+	if ( desiredIndex != -1 ) { //Create a waypoint here, and then recursively call this function for the next neighbor with the lowest weight.
+		if ( gWPNum < 3900 ) {
+			CreateNewWP_InsertUnder( &nodetable[start].origin, 0, insertAfter );
 		}
-		else
-		{
+		else {
 			return qfalse;
 		}
 
 		nodetable[start].flags = 1;
-		return G_BackwardAttachment(desiredIndex, finalDestination, insertAfter);
+		return G_BackwardAttachment( desiredIndex, finalDestination, insertAfter );
 	}
 
 	return qfalse;
@@ -2882,8 +2569,7 @@ qboolean G_BackwardAttachment(int start, int finalDestination, int insertAfter)
 #define PATH_TIME_DEBUG
 #endif
 
-void G_RMGPathing(void)
-{ //Generate waypoint information on-the-fly for the random mission.
+void G_RMGPathing( void ) { //Generate waypoint information on-the-fly for the random mission.
 	float placeX, placeY, placeZ;
 	int i = 0;
 	int gridSpacing = DEFAULT_GRID_SPACING;
@@ -2895,11 +2581,10 @@ void G_RMGPathing(void)
 #endif
 	vector3 downVec, trMins, trMaxs;
 	trace_t tr;
-	gentity_t *terrain = G_Find( NULL, FOFS(classname), "terrain" );
+	gentity_t *terrain = G_Find( NULL, FOFS( classname ), "terrain" );
 
-	if (!terrain || !terrain->inuse || terrain->s.eType != ET_TERRAIN)
-	{
-		trap->Print("Error: RMG with no terrain!\n");
+	if ( !terrain || !terrain->inuse || terrain->s.eType != ET_TERRAIN ) {
+		trap->Print( "Error: RMG with no terrain!\n" );
 		return;
 	}
 
@@ -2908,28 +2593,24 @@ void G_RMGPathing(void)
 #endif
 
 	nodenum = 0;
-	memset(&nodetable, 0, sizeof(nodetable));
+	memset( &nodetable, 0, sizeof(nodetable) );
 
-	VectorSet(&trMins, -15, -15, DEFAULT_MINS_2);
-	VectorSet(&trMaxs,  15,  15, DEFAULT_MAXS_2);
+	VectorSet( &trMins, -15, -15, DEFAULT_MINS_2 );
+	VectorSet( &trMaxs, 15, 15, DEFAULT_MAXS_2 );
 
 	placeX = terrain->r.absmin.x;
 	placeY = terrain->r.absmin.y;
-	placeZ = terrain->r.absmax.z-400;
+	placeZ = terrain->r.absmax.z - 400;
 
 	//skim through the entirety of the terrain limits and drop nodes, removing
 	//nodes that start in solid or fall too high on the terrain.
-	while (placeY < terrain->r.absmax.y)
-	{
-		if (nodenum >= MAX_NODETABLE_SIZE)
-		{
+	while ( placeY < terrain->r.absmax.y ) {
+		if ( nodenum >= MAX_NODETABLE_SIZE ) {
 			break;
 		}
 
-		while (placeX < terrain->r.absmax.x)
-		{
-			if (nodenum >= MAX_NODETABLE_SIZE)
-			{
+		while ( placeX < terrain->r.absmax.x ) {
+			if ( nodenum >= MAX_NODETABLE_SIZE ) {
 				break;
 			}
 
@@ -2937,18 +2618,16 @@ void G_RMGPathing(void)
 			nodetable[nodenum].origin.y = placeY;
 			nodetable[nodenum].origin.z = placeZ;
 
-			VectorCopy(&nodetable[nodenum].origin, &downVec);
+			VectorCopy( &nodetable[nodenum].origin, &downVec );
 			downVec.z -= 3000;
-			trap->Trace(&tr, &nodetable[nodenum].origin, &trMins, &trMaxs, &downVec, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0);
+			trap->Trace( &tr, &nodetable[nodenum].origin, &trMins, &trMaxs, &downVec, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
 
-			if ((tr.entityNum >= ENTITYNUM_WORLD || g_entities[tr.entityNum].s.eType == ET_TERRAIN) && tr.endpos.z < terrain->r.absmin.z+750)
-			{ //only drop nodes on terrain directly
-				VectorCopy(&tr.endpos, &nodetable[nodenum].origin);
+			if ( (tr.entityNum >= ENTITYNUM_WORLD || g_entities[tr.entityNum].s.eType == ET_TERRAIN) && tr.endpos.z < terrain->r.absmin.z + 750 ) { //only drop nodes on terrain directly
+				VectorCopy( &tr.endpos, &nodetable[nodenum].origin );
 				nodenum++;
 			}
-			else
-			{
-				VectorClear(&nodetable[nodenum].origin);
+			else {
+				VectorClear( &nodetable[nodenum].origin );
 			}
 
 			placeX += gridSpacing;
@@ -2961,25 +2640,21 @@ void G_RMGPathing(void)
 	G_NodeClearForNext();
 
 	//The grid has been placed down, now use it to connect the points in the level.
-	while (i < gSpawnPointNum-1)
-	{
-		if (!gSpawnPoints[i] || !gSpawnPoints[i]->inuse || !gSpawnPoints[i+1] || !gSpawnPoints[i+1]->inuse)
-		{
+	while ( i < gSpawnPointNum - 1 ) {
+		if ( !gSpawnPoints[i] || !gSpawnPoints[i]->inuse || !gSpawnPoints[i + 1] || !gSpawnPoints[i + 1]->inuse ) {
 			i++;
 			continue;
 		}
 
-		nearestIndex = G_NearestNodeToPoint(&gSpawnPoints[i]->s.origin);
-		nearestIndexForNext = G_NearestNodeToPoint(&gSpawnPoints[i+1]->s.origin);
+		nearestIndex = G_NearestNodeToPoint( &gSpawnPoints[i]->s.origin );
+		nearestIndexForNext = G_NearestNodeToPoint( &gSpawnPoints[i + 1]->s.origin );
 
-		if (nearestIndex == -1 || nearestIndexForNext == -1)
-		{ //Looks like there is no grid data near one of the points. Ideally, this will never happen.
+		if ( nearestIndex == -1 || nearestIndexForNext == -1 ) { //Looks like there is no grid data near one of the points. Ideally, this will never happen.
 			i++;
 			continue;
 		}
 
-		if (nearestIndex == nearestIndexForNext)
-		{ //Two spawn points on top of each other? We don't need to do both points, keep going until the next differs.
+		if ( nearestIndex == nearestIndexForNext ) { //Two spawn points on top of each other? We don't need to do both points, keep going until the next differs.
 			i++;
 			continue;
 		}
@@ -2989,12 +2664,10 @@ void G_RMGPathing(void)
 
 		//For now I am going to branch out mindlessly, but I will probably want to use some sort of A* algorithm
 		//here to lessen the time taken.
-		if (G_RecursiveConnection(nearestIndex, nearestIndexForNext, 0, qtrue, terrain->r.absmin.z) != nearestIndexForNext)
-		{ //failed to branch to where we want. Oh well, try it without trace checks.
+		if ( G_RecursiveConnection( nearestIndex, nearestIndexForNext, 0, qtrue, terrain->r.absmin.z ) != nearestIndexForNext ) { //failed to branch to where we want. Oh well, try it without trace checks.
 			G_NodeClearForNext();
 
-			if (G_RecursiveConnection(nearestIndex, nearestIndexForNext, 0, qfalse, terrain->r.absmin.z) != nearestIndexForNext)
-			{ //still failed somehow. Just disregard this point.
+			if ( G_RecursiveConnection( nearestIndex, nearestIndexForNext, 0, qfalse, terrain->r.absmin.z ) != nearestIndexForNext ) { //still failed somehow. Just disregard this point.
 				G_NodeClearForNext();
 				i++;
 				continue;
@@ -3010,20 +2683,16 @@ void G_RMGPathing(void)
 		CreateAsciiNodeTableRepresentation(nearestIndex, nearestIndexForNext);
 #endif
 #endif
-		if (G_BackwardAttachment(nearestIndexForNext, nearestIndex, gWPNum-1))
-		{ //successfully connected the trail from nearestIndex to nearestIndexForNext
-			if (gSpawnPoints[i+1]->inuse && gSpawnPoints[i+1]->item &&
-				gSpawnPoints[i+1]->item->giType == IT_TEAM)
-			{ //This point is actually a CTF flag.
-				if (gSpawnPoints[i+1]->item->giTag == PW_REDFLAG || gSpawnPoints[i+1]->item->giTag == PW_BLUEFLAG)
-				{ //Place a waypoint on the flag next in the trail, so the nearest grid point will link to it.
-					CreateNewWP_InsertUnder(&gSpawnPoints[i+1]->s.origin, WPFLAG_NEVERONEWAY, gWPNum-1);
+		if ( G_BackwardAttachment( nearestIndexForNext, nearestIndex, gWPNum - 1 ) ) { //successfully connected the trail from nearestIndex to nearestIndexForNext
+			if ( gSpawnPoints[i + 1]->inuse && gSpawnPoints[i + 1]->item &&
+				gSpawnPoints[i + 1]->item->giType == IT_TEAM ) { //This point is actually a CTF flag.
+				if ( gSpawnPoints[i + 1]->item->giTag == PW_REDFLAG || gSpawnPoints[i + 1]->item->giTag == PW_BLUEFLAG ) { //Place a waypoint on the flag next in the trail, so the nearest grid point will link to it.
+					CreateNewWP_InsertUnder( &gSpawnPoints[i + 1]->s.origin, WPFLAG_NEVERONEWAY, gWPNum - 1 );
 				}
 			}
 
 		}
-		else
-		{
+		else {
 			break;
 		}
 
@@ -3035,12 +2704,12 @@ void G_RMGPathing(void)
 		i++;
 	}
 
-	RepairPaths(qtrue); //this has different behaviour for RMG and will just flag all points one way that don't trace to each other.
+	RepairPaths( qtrue ); //this has different behaviour for RMG and will just flag all points one way that don't trace to each other.
 
 #ifdef PATH_TIME_DEBUG
 	endTime = trap->Milliseconds();
 
-	trap->Print("Total routing time taken: %ims\n", (endTime - startTime));
+	trap->Print( "Total routing time taken: %ims\n", (endTime - startTime) );
 #endif
 
 #ifdef ASCII_ART_DEBUG
@@ -3048,31 +2717,26 @@ void G_RMGPathing(void)
 #endif
 }
 
-void BeginAutoPathRoutine(void)
-{ //Called for RMG levels.
+void BeginAutoPathRoutine( void ) { //Called for RMG levels.
 	int i = 0;
 	gentity_t *ent = NULL;
 	vector3 v;
 
 	gSpawnPointNum = 0;
 
-	CreateNewWP(&vec3_origin, 0); //create a dummy waypoint to insert under
+	CreateNewWP( &vec3_origin, 0 ); //create a dummy waypoint to insert under
 
-	while (i < level.num_entities)
-	{
+	while ( i < level.num_entities ) {
 		ent = &g_entities[i];
 
-		if ( VALIDENT( ent ) && VALIDSTRING( ent->classname ) && !Q_stricmp(ent->classname, "info_player_deathmatch"))
-		{
-			if (ent->s.origin.z < 1280)
-			{ //h4x
+		if ( VALIDENT( ent ) && VALIDSTRING( ent->classname ) && !Q_stricmp( ent->classname, "info_player_deathmatch" ) ) {
+			if ( ent->s.origin.z < 1280 ) { //h4x
 				gSpawnPoints[gSpawnPointNum] = ent;
 				gSpawnPointNum++;
 			}
 		}
-		else if (ent && ent->inuse && ent->item && ent->item->giType == IT_TEAM &&
-			(ent->item->giTag == PW_REDFLAG || ent->item->giTag == PW_BLUEFLAG))
-		{ //also make it path to flags in CTF.
+		else if ( ent && ent->inuse && ent->item && ent->item->giType == IT_TEAM &&
+			(ent->item->giTag == PW_REDFLAG || ent->item->giTag == PW_BLUEFLAG) ) { //also make it path to flags in CTF.
 			gSpawnPoints[gSpawnPointNum] = ent;
 			gSpawnPointNum++;
 		}
@@ -3080,26 +2744,24 @@ void BeginAutoPathRoutine(void)
 		i++;
 	}
 
-	if (gSpawnPointNum < 1)
-	{
+	if ( gSpawnPointNum < 1 ) {
 		return;
 	}
 
 	G_RMGPathing();
 
 	//rww - Using a faster in-engine version because we're having to wait for this stuff to get done as opposed to just saving it once.
-	trap->BotUpdateWaypoints(gWPNum, gWPArray);
-	trap->BotCalculatePaths(RMG.integer);
+	trap->BotUpdateWaypoints( gWPNum, gWPArray );
+	trap->BotCalculatePaths( RMG.integer );
 	//CalculatePaths(); //make everything nice and connected
 
 	FlagObjects(); //currently only used for flagging waypoints nearest CTF flags
 
 	i = 0;
 
-	while (i < gWPNum-1)
-	{ //disttonext is normally set on save, and when a file is loaded. For RMG we must do it after calc'ing.
-		VectorSubtract(&gWPArray[i]->origin, &gWPArray[i+1]->origin, &v);
-		gWPArray[i]->disttonext = VectorLength(&v);
+	while ( i < gWPNum - 1 ) { //disttonext is normally set on save, and when a file is loaded. For RMG we must do it after calc'ing.
+		VectorSubtract( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, &v );
+		gWPArray[i]->disttonext = VectorLength( &v );
 		i++;
 	}
 
@@ -3108,68 +2770,55 @@ void BeginAutoPathRoutine(void)
 
 extern vmCvar_t bot_normgpath;
 
-void LoadPath_ThisLevel(void)
-{
+void LoadPath_ThisLevel( void ) {
 	vmCvar_t	mapname;
 	int			i = 0;
 	gentity_t	*ent = NULL;
 
 	trap->Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
 
-	if (RMG.integer)
-	{ //If RMG, generate the path on-the-fly
-		trap->Cvar_Register(&bot_normgpath, "bot_normgpath", "1", CVAR_CHEAT);
+	if ( RMG.integer ) { //If RMG, generate the path on-the-fly
+		trap->Cvar_Register( &bot_normgpath, "bot_normgpath", "1", CVAR_CHEAT );
 		//note: This is disabled for now as I'm using standard bot nav
 		//on premade terrain levels.
 
-		if (!bot_normgpath.integer)
-		{ //autopath the random map
+		if ( !bot_normgpath.integer ) { //autopath the random map
 			BeginAutoPathRoutine();
 		}
-		else
-		{ //try loading standard nav data
-			LoadPathData(level.rawmapname);
+		else { //try loading standard nav data
+			LoadPathData( level.rawmapname );
 		}
 
 		gLevelFlags |= LEVELFLAG_NOPOINTPREDICTION;
 	}
-	else
-	{
-		if (LoadPathData(level.rawmapname) == 2)
-		{
+	else {
+		if ( LoadPathData( level.rawmapname ) == 2 ) {
 			//enter "edit" mode if cheats enabled?
 		}
 	}
 
-	trap->Cvar_Update(&bot_wp_edit);
+	trap->Cvar_Update( &bot_wp_edit );
 
-	if (bot_wp_edit.value)
-	{
+	if ( bot_wp_edit.value ) {
 		gBotEdit = 1;
 	}
-	else
-	{
+	else {
 		gBotEdit = 0;
 	}
 
 	//set the flag entities
-	while (i < level.num_entities)
-	{
+	while ( i < level.num_entities ) {
 		ent = &g_entities[i];
 
-		if (ent && ent->inuse && ent->classname)
-		{
-			if (!eFlagRed && strcmp(ent->classname, "team_CTF_redflag") == 0)
-			{
+		if ( ent && ent->inuse && ent->classname ) {
+			if ( !eFlagRed && strcmp( ent->classname, "team_CTF_redflag" ) == 0 ) {
 				eFlagRed = ent;
 			}
-			else if (!eFlagBlue && strcmp(ent->classname, "team_CTF_blueflag") == 0)
-			{
+			else if ( !eFlagBlue && strcmp( ent->classname, "team_CTF_blueflag" ) == 0 ) {
 				eFlagBlue = ent;
 			}
 
-			if (eFlagRed && eFlagBlue)
-			{
+			if ( eFlagRed && eFlagBlue ) {
 				break;
 			}
 		}
@@ -3178,8 +2827,7 @@ void LoadPath_ThisLevel(void)
 	}
 }
 
-gentity_t *GetClosestSpawn(gentity_t *ent)
-{
+gentity_t *GetClosestSpawn( gentity_t *ent ) {
 	gentity_t	*spawn;
 	gentity_t	*closestSpawn = NULL;
 	float		closestDist = -1;
@@ -3187,20 +2835,17 @@ gentity_t *GetClosestSpawn(gentity_t *ent)
 
 	spawn = NULL;
 
-	while (i < level.num_entities)
-	{
+	while ( i < level.num_entities ) {
 		spawn = &g_entities[i];
 
-		if (spawn && spawn->inuse && (!Q_stricmp(spawn->classname, "info_player_start") || !Q_stricmp(spawn->classname, "info_player_deathmatch")) )
-		{
+		if ( spawn && spawn->inuse && (!Q_stricmp( spawn->classname, "info_player_start" ) || !Q_stricmp( spawn->classname, "info_player_deathmatch" )) ) {
 			float checkDist;
 			vector3 vSub;
 
-			VectorSubtract(&ent->client->ps.origin, &spawn->r.currentOrigin, &vSub);
-			checkDist = VectorLength(&vSub);
+			VectorSubtract( &ent->client->ps.origin, &spawn->r.currentOrigin, &vSub );
+			checkDist = VectorLength( &vSub );
 
-			if (closestDist == -1 || checkDist < closestDist)
-			{
+			if ( closestDist == -1 || checkDist < closestDist ) {
 				closestSpawn = spawn;
 				closestDist = checkDist;
 			}
@@ -3212,20 +2857,17 @@ gentity_t *GetClosestSpawn(gentity_t *ent)
 	return closestSpawn;
 }
 
-gentity_t *GetNextSpawnInIndex(gentity_t *currentSpawn)
-{
+gentity_t *GetNextSpawnInIndex( gentity_t *currentSpawn ) {
 	gentity_t	*spawn;
 	gentity_t	*nextSpawn = NULL;
-	int			i = currentSpawn->s.number+1;
+	int			i = currentSpawn->s.number + 1;
 
 	spawn = NULL;
 
-	while (i < level.num_entities)
-	{
+	while ( i < level.num_entities ) {
 		spawn = &g_entities[i];
 
-		if (spawn && spawn->inuse && (!Q_stricmp(spawn->classname, "info_player_start") || !Q_stricmp(spawn->classname, "info_player_deathmatch")) )
-		{
+		if ( spawn && spawn->inuse && (!Q_stricmp( spawn->classname, "info_player_start" ) || !Q_stricmp( spawn->classname, "info_player_deathmatch" )) ) {
 			nextSpawn = spawn;
 			break;
 		}
@@ -3233,16 +2875,13 @@ gentity_t *GetNextSpawnInIndex(gentity_t *currentSpawn)
 		i++;
 	}
 
-	if (!nextSpawn)
-	{ //loop back around to 0
+	if ( !nextSpawn ) { //loop back around to 0
 		i = MAX_CLIENTS;
 
-		while (i < level.num_entities)
-		{
+		while ( i < level.num_entities ) {
 			spawn = &g_entities[i];
 
-			if (spawn && spawn->inuse && (!Q_stricmp(spawn->classname, "info_player_start") || !Q_stricmp(spawn->classname, "info_player_deathmatch")) )
-			{
+			if ( spawn && spawn->inuse && (!Q_stricmp( spawn->classname, "info_player_start" ) || !Q_stricmp( spawn->classname, "info_player_deathmatch" )) ) {
 				nextSpawn = spawn;
 				break;
 			}
@@ -3254,15 +2893,13 @@ gentity_t *GetNextSpawnInIndex(gentity_t *currentSpawn)
 	return nextSpawn;
 }
 
-int AcceptBotCommand(char *cmd, gentity_t *pl)
-{
+int AcceptBotCommand( char *cmd, gentity_t *pl ) {
 	int OptionalArgument, i;
 	int FlagsFromArgument;
 	char *OptionalSArgument, *RequiredSArgument;
-//	vmCvar_t mapname;
+	//	vmCvar_t mapname;
 
-	if (!gBotEdit)
-	{
+	if ( !gBotEdit ) {
 		return 0;
 	}
 
@@ -3275,160 +2912,131 @@ int AcceptBotCommand(char *cmd, gentity_t *pl)
 	//if a waypoint editing related command is issued, bots will deactivate.
 	//once bot_wp_save is issued and the trail is recalculated, bots will activate again.
 
-	if (!pl || !pl->client)
-	{
+	if ( !pl || !pl->client ) {
 		return 0;
 	}
 
-	if (Q_stricmp (cmd, "bot_wp_cmdlist") == 0) //lists all the bot waypoint commands.
+	if ( Q_stricmp( cmd, "bot_wp_cmdlist" ) == 0 ) //lists all the bot waypoint commands.
 	{
-		trap->Print(S_COLOR_YELLOW "bot_wp_add" S_COLOR_WHITE " - Add a waypoint (optional int parameter will insert the point after the specified waypoint index in a trail)\n\n");
-		trap->Print(S_COLOR_YELLOW "bot_wp_rem" S_COLOR_WHITE " - Remove a waypoint (removes last unless waypoint index is specified as a parameter)\n\n");
-		trap->Print(S_COLOR_YELLOW "bot_wp_addflagged" S_COLOR_WHITE " - Same as wp_add, but adds a flagged point (type bot_wp_addflagged for help)\n\n");
-		trap->Print(S_COLOR_YELLOW "bot_wp_switchflags" S_COLOR_WHITE " - Switches flags on an existing waypoint (type bot_wp_switchflags for help)\n\n");
-		trap->Print(S_COLOR_YELLOW "bot_wp_tele" S_COLOR_WHITE " - Teleport yourself to the specified waypoint's location\n");
-		trap->Print(S_COLOR_YELLOW "bot_wp_killoneways" S_COLOR_WHITE " - Removes oneway (backward and forward) flags on all waypoints in the level\n\n");
-		trap->Print(S_COLOR_YELLOW "bot_wp_save" S_COLOR_WHITE " - Saves all waypoint data into a file for later use\n");
+		trap->Print( S_COLOR_YELLOW "bot_wp_add" S_COLOR_WHITE " - Add a waypoint (optional int parameter will insert the point after the specified waypoint index in a trail)\n\n" );
+		trap->Print( S_COLOR_YELLOW "bot_wp_rem" S_COLOR_WHITE " - Remove a waypoint (removes last unless waypoint index is specified as a parameter)\n\n" );
+		trap->Print( S_COLOR_YELLOW "bot_wp_addflagged" S_COLOR_WHITE " - Same as wp_add, but adds a flagged point (type bot_wp_addflagged for help)\n\n" );
+		trap->Print( S_COLOR_YELLOW "bot_wp_switchflags" S_COLOR_WHITE " - Switches flags on an existing waypoint (type bot_wp_switchflags for help)\n\n" );
+		trap->Print( S_COLOR_YELLOW "bot_wp_tele" S_COLOR_WHITE " - Teleport yourself to the specified waypoint's location\n" );
+		trap->Print( S_COLOR_YELLOW "bot_wp_killoneways" S_COLOR_WHITE " - Removes oneway (backward and forward) flags on all waypoints in the level\n\n" );
+		trap->Print( S_COLOR_YELLOW "bot_wp_save" S_COLOR_WHITE " - Saves all waypoint data into a file for later use\n" );
 
 		return 1;
 	}
 
-	if (Q_stricmp (cmd, "bot_wp_add") == 0)
-	{
+	if ( Q_stricmp( cmd, "bot_wp_add" ) == 0 ) {
 		gDeactivated = 1;
 		OptionalSArgument = ConcatArgs( 1 );
 
-		if (OptionalSArgument)
-		{
-			OptionalArgument = atoi(OptionalSArgument);
+		if ( OptionalSArgument ) {
+			OptionalArgument = atoi( OptionalSArgument );
 		}
 
-		if (OptionalSArgument && OptionalSArgument[0])
-		{
-			CreateNewWP_InTrail(&pl->client->ps.origin, 0, OptionalArgument);
+		if ( OptionalSArgument && OptionalSArgument[0] ) {
+			CreateNewWP_InTrail( &pl->client->ps.origin, 0, OptionalArgument );
 		}
-		else
-		{
-			CreateNewWP(&pl->client->ps.origin, 0);
+		else {
+			CreateNewWP( &pl->client->ps.origin, 0 );
 		}
 		return 1;
 	}
 
-	if (Q_stricmp (cmd, "bot_wp_rem") == 0)
-	{
+	if ( Q_stricmp( cmd, "bot_wp_rem" ) == 0 ) {
 		gDeactivated = 1;
 
 		OptionalSArgument = ConcatArgs( 1 );
 
-		if (OptionalSArgument)
-		{
-			OptionalArgument = atoi(OptionalSArgument);
+		if ( OptionalSArgument ) {
+			OptionalArgument = atoi( OptionalSArgument );
 		}
 
-		if (OptionalSArgument && OptionalSArgument[0])
-		{
-			RemoveWP_InTrail(OptionalArgument);
+		if ( OptionalSArgument && OptionalSArgument[0] ) {
+			RemoveWP_InTrail( OptionalArgument );
 		}
-		else
-		{
+		else {
 			RemoveWP();
 		}
 
 		return 1;
 	}
 
-	if (Q_stricmp (cmd, "bot_wp_tele") == 0)
-	{
+	if ( Q_stricmp( cmd, "bot_wp_tele" ) == 0 ) {
 		gDeactivated = 1;
 		OptionalSArgument = ConcatArgs( 1 );
 
-		if (OptionalSArgument)
-		{
-			OptionalArgument = atoi(OptionalSArgument);
+		if ( OptionalSArgument ) {
+			OptionalArgument = atoi( OptionalSArgument );
 		}
 
-		if (OptionalSArgument && OptionalSArgument[0])
-		{
-			TeleportToWP(pl, OptionalArgument);
+		if ( OptionalSArgument && OptionalSArgument[0] ) {
+			TeleportToWP( pl, OptionalArgument );
 		}
-		else
-		{
-			trap->Print(S_COLOR_YELLOW "You didn't specify an index. Assuming last.\n");
-			TeleportToWP(pl, gWPNum-1);
+		else {
+			trap->Print( S_COLOR_YELLOW "You didn't specify an index. Assuming last.\n" );
+			TeleportToWP( pl, gWPNum - 1 );
 		}
 		return 1;
 	}
 
-	if (Q_stricmp (cmd, "bot_wp_spawntele") == 0)
-	{
-		gentity_t *closestSpawn = GetClosestSpawn(pl);
+	if ( Q_stricmp( cmd, "bot_wp_spawntele" ) == 0 ) {
+		gentity_t *closestSpawn = GetClosestSpawn( pl );
 
-		if (!closestSpawn)
-		{ //There should always be a spawn point..
+		if ( !closestSpawn ) { //There should always be a spawn point..
 			return 1;
 		}
 
-		closestSpawn = GetNextSpawnInIndex(closestSpawn);
+		closestSpawn = GetNextSpawnInIndex( closestSpawn );
 
-		if (closestSpawn)
-		{
-			VectorCopy(&closestSpawn->r.currentOrigin, &pl->client->ps.origin);
+		if ( closestSpawn ) {
+			VectorCopy( &closestSpawn->r.currentOrigin, &pl->client->ps.origin );
 		}
 		return 1;
 	}
 
-	if (Q_stricmp (cmd, "bot_wp_addflagged") == 0)
-	{
+	if ( Q_stricmp( cmd, "bot_wp_addflagged" ) == 0 ) {
 		gDeactivated = 1;
 
 		RequiredSArgument = ConcatArgs( 1 );
 
-		if (!RequiredSArgument || !RequiredSArgument[0])
-		{
-			trap->Print(S_COLOR_YELLOW "Flag string needed for bot_wp_addflagged\nj - Jump point\nd - Duck point\nc - Snipe or camp standing\nf - Wait for func\nm - Do not move to when func is under\ns - Snipe or camp\nx - Oneway, forward\ny - Oneway, back\ng - Mission goal\nn - No visibility\nExample (for a point the bot would jump at, and reverse on when traveling a trail backwards):\nbot_wp_addflagged jx\n");
+		if ( !RequiredSArgument || !RequiredSArgument[0] ) {
+			trap->Print( S_COLOR_YELLOW "Flag string needed for bot_wp_addflagged\nj - Jump point\nd - Duck point\nc - Snipe or camp standing\nf - Wait for func\nm - Do not move to when func is under\ns - Snipe or camp\nx - Oneway, forward\ny - Oneway, back\ng - Mission goal\nn - No visibility\nExample (for a point the bot would jump at, and reverse on when traveling a trail backwards):\nbot_wp_addflagged jx\n" );
 			return 1;
 		}
 
-		while (RequiredSArgument[i])
-		{
-			if (RequiredSArgument[i] == 'j')
-			{
+		while ( RequiredSArgument[i] ) {
+			if ( RequiredSArgument[i] == 'j' ) {
 				FlagsFromArgument |= WPFLAG_JUMP;
 			}
-			else if (RequiredSArgument[i] == 'd')
-			{
+			else if ( RequiredSArgument[i] == 'd' ) {
 				FlagsFromArgument |= WPFLAG_DUCK;
 			}
-			else if (RequiredSArgument[i] == 'c')
-			{
+			else if ( RequiredSArgument[i] == 'c' ) {
 				FlagsFromArgument |= WPFLAG_SNIPEORCAMPSTAND;
 			}
-			else if (RequiredSArgument[i] == 'f')
-			{
+			else if ( RequiredSArgument[i] == 'f' ) {
 				FlagsFromArgument |= WPFLAG_WAITFORFUNC;
 			}
-			else if (RequiredSArgument[i] == 's')
-			{
+			else if ( RequiredSArgument[i] == 's' ) {
 				FlagsFromArgument |= WPFLAG_SNIPEORCAMP;
 			}
-			else if (RequiredSArgument[i] == 'x')
-			{
+			else if ( RequiredSArgument[i] == 'x' ) {
 				FlagsFromArgument |= WPFLAG_ONEWAY_FWD;
 			}
-			else if (RequiredSArgument[i] == 'y')
-			{
+			else if ( RequiredSArgument[i] == 'y' ) {
 				FlagsFromArgument |= WPFLAG_ONEWAY_BACK;
 			}
-			else if (RequiredSArgument[i] == 'g')
-			{
+			else if ( RequiredSArgument[i] == 'g' ) {
 				FlagsFromArgument |= WPFLAG_GOALPOINT;
 			}
-			else if (RequiredSArgument[i] == 'n')
-			{
+			else if ( RequiredSArgument[i] == 'n' ) {
 				FlagsFromArgument |= WPFLAG_NOVIS;
 			}
-			else if (RequiredSArgument[i] == 'm')
-			{
+			else if ( RequiredSArgument[i] == 'm' ) {
 				FlagsFromArgument |= WPFLAG_NOMOVEFUNC;
 			}
 
@@ -3437,74 +3045,58 @@ int AcceptBotCommand(char *cmd, gentity_t *pl)
 
 		OptionalSArgument = ConcatArgs( 2 );
 
-		if (OptionalSArgument)
-		{
-			OptionalArgument = atoi(OptionalSArgument);
+		if ( OptionalSArgument ) {
+			OptionalArgument = atoi( OptionalSArgument );
 		}
 
-		if (OptionalSArgument && OptionalSArgument[0])
-		{
-			CreateNewWP_InTrail(&pl->client->ps.origin, FlagsFromArgument, OptionalArgument);
+		if ( OptionalSArgument && OptionalSArgument[0] ) {
+			CreateNewWP_InTrail( &pl->client->ps.origin, FlagsFromArgument, OptionalArgument );
 		}
-		else
-		{
-			CreateNewWP(&pl->client->ps.origin, FlagsFromArgument);
+		else {
+			CreateNewWP( &pl->client->ps.origin, FlagsFromArgument );
 		}
 		return 1;
 	}
 
-	if (Q_stricmp (cmd, "bot_wp_switchflags") == 0)
-	{
+	if ( Q_stricmp( cmd, "bot_wp_switchflags" ) == 0 ) {
 		gDeactivated = 1;
 
 		RequiredSArgument = ConcatArgs( 1 );
 
-		if (!RequiredSArgument || !RequiredSArgument[0])
-		{
-			trap->Print(S_COLOR_YELLOW "Flag string needed for bot_wp_switchflags\nType bot_wp_addflagged for a list of flags and their corresponding characters, or use 0 for no flags.\nSyntax: bot_wp_switchflags <flags> <n>\n");
+		if ( !RequiredSArgument || !RequiredSArgument[0] ) {
+			trap->Print( S_COLOR_YELLOW "Flag string needed for bot_wp_switchflags\nType bot_wp_addflagged for a list of flags and their corresponding characters, or use 0 for no flags.\nSyntax: bot_wp_switchflags <flags> <n>\n" );
 			return 1;
 		}
 
-		while (RequiredSArgument[i])
-		{
-			if (RequiredSArgument[i] == 'j')
-			{
+		while ( RequiredSArgument[i] ) {
+			if ( RequiredSArgument[i] == 'j' ) {
 				FlagsFromArgument |= WPFLAG_JUMP;
 			}
-			else if (RequiredSArgument[i] == 'd')
-			{
+			else if ( RequiredSArgument[i] == 'd' ) {
 				FlagsFromArgument |= WPFLAG_DUCK;
 			}
-			else if (RequiredSArgument[i] == 'c')
-			{
+			else if ( RequiredSArgument[i] == 'c' ) {
 				FlagsFromArgument |= WPFLAG_SNIPEORCAMPSTAND;
 			}
-			else if (RequiredSArgument[i] == 'f')
-			{
+			else if ( RequiredSArgument[i] == 'f' ) {
 				FlagsFromArgument |= WPFLAG_WAITFORFUNC;
 			}
-			else if (RequiredSArgument[i] == 's')
-			{
+			else if ( RequiredSArgument[i] == 's' ) {
 				FlagsFromArgument |= WPFLAG_SNIPEORCAMP;
 			}
-			else if (RequiredSArgument[i] == 'x')
-			{
+			else if ( RequiredSArgument[i] == 'x' ) {
 				FlagsFromArgument |= WPFLAG_ONEWAY_FWD;
 			}
-			else if (RequiredSArgument[i] == 'y')
-			{
+			else if ( RequiredSArgument[i] == 'y' ) {
 				FlagsFromArgument |= WPFLAG_ONEWAY_BACK;
 			}
-			else if (RequiredSArgument[i] == 'g')
-			{
+			else if ( RequiredSArgument[i] == 'g' ) {
 				FlagsFromArgument |= WPFLAG_GOALPOINT;
 			}
-			else if (RequiredSArgument[i] == 'n')
-			{
+			else if ( RequiredSArgument[i] == 'n' ) {
 				FlagsFromArgument |= WPFLAG_NOVIS;
 			}
-			else if (RequiredSArgument[i] == 'm')
-			{
+			else if ( RequiredSArgument[i] == 'm' ) {
 				FlagsFromArgument |= WPFLAG_NOMOVEFUNC;
 			}
 
@@ -3513,36 +3105,28 @@ int AcceptBotCommand(char *cmd, gentity_t *pl)
 
 		OptionalSArgument = ConcatArgs( 2 );
 
-		if (OptionalSArgument)
-		{
-			OptionalArgument = atoi(OptionalSArgument);
+		if ( OptionalSArgument ) {
+			OptionalArgument = atoi( OptionalSArgument );
 		}
 
-		if (OptionalSArgument && OptionalSArgument[0])
-		{
-			WPFlagsModify(OptionalArgument, FlagsFromArgument);
+		if ( OptionalSArgument && OptionalSArgument[0] ) {
+			WPFlagsModify( OptionalArgument, FlagsFromArgument );
 		}
-		else
-		{
-			trap->Print(S_COLOR_YELLOW "Waypoint number (to modify) needed for bot_wp_switchflags\nSyntax: bot_wp_switchflags <flags> <n>\n");
+		else {
+			trap->Print( S_COLOR_YELLOW "Waypoint number (to modify) needed for bot_wp_switchflags\nSyntax: bot_wp_switchflags <flags> <n>\n" );
 		}
 		return 1;
 	}
 
-	if (Q_stricmp (cmd, "bot_wp_killoneways") == 0)
-	{
+	if ( Q_stricmp( cmd, "bot_wp_killoneways" ) == 0 ) {
 		i = 0;
 
-		while (i < gWPNum)
-		{
-			if (gWPArray[i] && gWPArray[i]->inuse)
-			{
-				if (gWPArray[i]->flags & WPFLAG_ONEWAY_FWD)
-				{
+		while ( i < gWPNum ) {
+			if ( gWPArray[i] && gWPArray[i]->inuse ) {
+				if ( gWPArray[i]->flags & WPFLAG_ONEWAY_FWD ) {
 					gWPArray[i]->flags -= WPFLAG_ONEWAY_FWD;
 				}
-				if (gWPArray[i]->flags & WPFLAG_ONEWAY_BACK)
-				{
+				if ( gWPArray[i]->flags & WPFLAG_ONEWAY_BACK ) {
 					gWPArray[i]->flags -= WPFLAG_ONEWAY_BACK;
 				}
 			}
@@ -3553,10 +3137,9 @@ int AcceptBotCommand(char *cmd, gentity_t *pl)
 		return 1;
 	}
 
-	if ( !Q_stricmp( cmd, "bot_wp_save" ) )
-	{
+	if ( !Q_stricmp( cmd, "bot_wp_save" ) ) {
 		gDeactivated = 0;
-		SavePathData(level.rawmapname);
+		SavePathData( level.rawmapname );
 		return 1;
 	}
 

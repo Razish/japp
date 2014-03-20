@@ -23,7 +23,7 @@ void FX_DEMP2_AltDetonate( vector3 *org, float size ) {
 
 	ex = CG_AllocLocalEntity();
 	ex->leType = LE_FADE_SCALE_MODEL;
-	memset( &ex->refEntity, 0, sizeof( refEntity_t ));
+	memset( &ex->refEntity, 0, sizeof(refEntity_t) );
 
 	ex->refEntity.renderfx |= RF_VOLUMETRIC;
 

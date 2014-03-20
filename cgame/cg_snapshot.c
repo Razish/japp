@@ -55,7 +55,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 		if ( trap->G2API_AddBolt( cg_entities[snap->ps.clientNum].ghoul2, 0, "face" ) == -1 )
 			cg_entities[snap->ps.clientNum].noFace = qtrue;
 	}
-	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].currentState, qfalse );
+	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[snap->ps.clientNum].currentState, qfalse );
 
 	// sort out solid entities
 	CG_BuildSolidList();
@@ -66,12 +66,12 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	// what the server has indicated the current weapon is
 	CG_Respawn();
 
-	for ( i=0; i<cg.snap->numEntities; i++ ) {
-		state = &cg.snap->entities[ i ];
-		cent = &cg_entities[ state->number ];
+	for ( i = 0; i < cg.snap->numEntities; i++ ) {
+		state = &cg.snap->entities[i];
+		cent = &cg_entities[state->number];
 
-		memcpy( &cent->currentState, state, sizeof( entityState_t ) );
-	//	cent->currentState = *state;
+		memcpy( &cent->currentState, state, sizeof(entityState_t) );
+		//	cent->currentState = *state;
 		cent->interpolate = qfalse;
 		cent->currentValid = qtrue;
 
@@ -82,19 +82,19 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	}
 
 	// auto record demo
-	if ( cg_autoRecordDemo.integer & (1<<cgs.gametype) && cg.warmup <= 0 && !cg.demoPlayback ) {
+	if ( cg_autoRecordDemo.integer & (1 << cgs.gametype) && cg.warmup <= 0 && !cg.demoPlayback ) {
 		time_t rawtime;
-		char buf[256] = {0}, timeStr[64] = {0}, mapName[MAX_QPATH] = {0};
+		char buf[256] = { 0 }, timeStr[64] = { 0 }, mapName[MAX_QPATH] = { 0 };
 
 		time( &rawtime );
-		strftime( timeStr, sizeof( timeStr ), "%Y-%m-%d_%H-%M-%S", gmtime( &rawtime ) );
-		Q_strncpyz( mapName, cgs.mapname + 5, sizeof( mapName ) );
+		strftime( timeStr, sizeof(timeStr), "%Y-%m-%d_%H-%M-%S", gmtime( &rawtime ) );
+		Q_strncpyz( mapName, cgs.mapname + 5, sizeof(mapName) );
 		Q_strstrip( mapName, "/", "-" );
-		COM_StripExtension( mapName, mapName, sizeof( mapName ) );
-		Com_sprintf( buf, sizeof( buf ), "%s_%s_%s_%s", timeStr, gametypeStringShort[cgs.gametype], mapName, cgs.clientinfo[cg.clientNum].name );
+		COM_StripExtension( mapName, mapName, sizeof(mapName) );
+		Com_sprintf( buf, sizeof(buf), "%s_%s_%s_%s", timeStr, gametypeStringShort[cgs.gametype], mapName, cgs.clientinfo[cg.clientNum].name );
 		Q_strstrip( buf, "\n\r;?*<>|\\/\"", NULL );
 		Q_strstrip( buf, " ", "_" );
-		Q_CleanString( buf, STRIP_COLOUR|STRIP_EXTASCII );
+		Q_CleanString( buf, STRIP_COLOUR | STRIP_EXTASCII );
 		trap->SendConsoleCommand( va( "stoprecord; record %s\n", buf ) );
 	}
 
@@ -122,8 +122,8 @@ static void CG_TransitionSnapshot( void ) {
 	CG_ExecuteNewServerCommands( cg.nextSnap->serverCommandSequence );
 
 	// clear the currentValid flag for all entities in the existing snapshot
-	for ( i=0; i<cg.snap->numEntities; i++ ) {
-		cent = &cg_entities[ cg.snap->entities[ i ].number ];
+	for ( i = 0; i < cg.snap->numEntities; i++ ) {
+		cent = &cg_entities[cg.snap->entities[i].number];
 		cent->currentValid = qfalse;
 	}
 
@@ -131,13 +131,13 @@ static void CG_TransitionSnapshot( void ) {
 	oldFrame = cg.snap;
 	cg.snap = cg.nextSnap;
 
-//	CG_CheckPlayerG2Weapons( &cg.snap->ps, &cg_entities[cg.snap->ps.clientNum] );
-//	CG_CheckPlayerG2Weapons( &cg.snap->ps, &cg.predictedPlayerEntity );
-	BG_PlayerStateToEntityState( &cg.snap->ps, &cg_entities[ cg.snap->ps.clientNum ].currentState, qfalse );
-	cg_entities[ cg.snap->ps.clientNum ].interpolate = qfalse;
+	//	CG_CheckPlayerG2Weapons( &cg.snap->ps, &cg_entities[cg.snap->ps.clientNum] );
+	//	CG_CheckPlayerG2Weapons( &cg.snap->ps, &cg.predictedPlayerEntity );
+	BG_PlayerStateToEntityState( &cg.snap->ps, &cg_entities[cg.snap->ps.clientNum].currentState, qfalse );
+	cg_entities[cg.snap->ps.clientNum].interpolate = qfalse;
 
-	for ( i=0; i<cg.snap->numEntities; i++ ) {
-		cent = &cg_entities[ cg.snap->entities[ i ].number ];
+	for ( i = 0; i < cg.snap->numEntities; i++ ) {
+		cent = &cg_entities[cg.snap->entities[i].number];
 		CG_TransitionEntity( cent );
 
 		// remember time of snapshot this entity was last updated in
@@ -159,8 +159,7 @@ static void CG_TransitionSnapshot( void ) {
 		// if we are not doing client side movement prediction for any
 		// reason, then the client events and view changes will be issued now
 		if ( cg.demoPlayback || (cg.snap->ps.pm_flags & PMF_FOLLOW) || cg_noPredict.integer
-			|| g_synchronousClients.integer || CG_UsingEWeb() )
-		{
+			|| g_synchronousClients.integer || CG_UsingEWeb() ) {
 			CG_TransitionPlayerState( ps, ops );
 		}
 	}
@@ -174,19 +173,19 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 
 	cg.nextSnap = snap;
 
-//	CG_CheckPlayerG2Weapons( &cg.snap->ps, &cg_entities[cg.snap->ps.clientNum] );
-//	CG_CheckPlayerG2Weapons( &cg.snap->ps, &cg.predictedPlayerEntity );
-	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].nextState, qfalse );
-//	cg_entities[ cg.snap->ps.clientNum ].interpolate = qtrue;
+	//	CG_CheckPlayerG2Weapons( &cg.snap->ps, &cg_entities[cg.snap->ps.clientNum] );
+	//	CG_CheckPlayerG2Weapons( &cg.snap->ps, &cg.predictedPlayerEntity );
+	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[snap->ps.clientNum].nextState, qfalse );
+	//	cg_entities[ cg.snap->ps.clientNum ].interpolate = qtrue;
 	//No longer want to do this, as the cg_entities[clnum] and cg.predictedPlayerEntity are one in the same.
 
 	// check for extrapolation errors
-	for ( num=0; num<snap->numEntities; num++ ) {
+	for ( num = 0; num < snap->numEntities; num++ ) {
 		es = &snap->entities[num];
-		cent = &cg_entities[ es->number ];
+		cent = &cg_entities[es->number];
 
-		memcpy( &cent->nextState, es, sizeof( entityState_t ) );
-	//	cent->nextState = *es;
+		memcpy( &cent->nextState, es, sizeof(entityState_t) );
+		//	cent->nextState = *es;
 
 		// if this frame is a teleport, or the entity wasn't in the previous frame, don't interpolate
 		if ( !cent->currentValid || ((cent->currentState.eFlags ^ es->eFlags) & EF_TELEPORT_BIT) )
@@ -252,7 +251,7 @@ static snapshot_t *CG_ReadNextSnapshot( void ) {
 
 		// record as a dropped packet
 		//RAZFIXME: Why did I comment this out...
-	//	CG_AddLagometerSnapshotInfo( NULL );
+		//	CG_AddLagometerSnapshotInfo( NULL );
 
 		// If there are additional snapshots, continue trying to read them.
 	}
