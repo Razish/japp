@@ -12,8 +12,7 @@
 // all of the locals will be zeroed before each
 // pmove, just to make damn sure we don't have
 // any differences when running on client or server
-typedef struct
-{
+typedef struct {
 	vector3		forward, right, up;
 	float		frametime;
 
@@ -63,15 +62,15 @@ qboolean PM_PainAnim( int anim );
 qboolean PM_JumpingAnim( int anim );
 qboolean PM_LandingAnim( int anim );
 qboolean PM_SpinningAnim( int anim );
-qboolean PM_InOnGroundAnim ( int anim );
+qboolean PM_InOnGroundAnim( int anim );
 qboolean PM_InRollComplete( playerState_t *ps, int anim );
 
 int PM_AnimLength( int index, animNumber_t anim );
 
-int PM_GetSaberStance(void);
-float PM_GroundDistance(void);
-qboolean PM_SomeoneInFront(trace_t *tr);
-saberMoveName_t PM_SaberFlipOverAttackMove(void);
+int PM_GetSaberStance( void );
+float PM_GroundDistance( void );
+qboolean PM_SomeoneInFront( trace_t *tr );
+saberMoveName_t PM_SaberFlipOverAttackMove( void );
 saberMoveName_t PM_SaberJumpAttackMove( void );
 
 void PM_ClipVelocity( vector3 *in, vector3 *normal, vector3 *out, float overbounce );
@@ -90,10 +89,10 @@ void PM_FinishWeaponChange( void );
 
 void PM_SetAnim( int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime );
 
-void PM_WeaponLightsaber(void);
-void PM_SetSaberMove(short newMove);
+void PM_WeaponLightsaber( void );
+void PM_SetSaberMove( short newMove );
 
-void PM_SetForceJumpZStart(float value);
+void PM_SetForceJumpZStart( float value );
 
 void BG_CycleForce( playerState_t *ps, int direction );
 void BG_CycleInven( playerState_t *ps, int direction );

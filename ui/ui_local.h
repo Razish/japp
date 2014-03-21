@@ -11,7 +11,7 @@
 
 // ui_cvar.c
 #define XCVAR_PROTO
-	#include "ui_xcvar.h"
+#include "ui_xcvar.h"
 #undef XCVAR_PROTO
 void UI_RegisterCvars( void );
 void UI_UpdateCvars( void );
@@ -75,8 +75,8 @@ typedef struct playerInfo_s {
 	qhandle_t		torsoSkin;
 	lerpFrame_t		torso;
 
-//	qhandle_t		headModel;
-//	qhandle_t		headSkin;
+	//	qhandle_t		headModel;
+	//	qhandle_t		headSkin;
 
 	animation_t		animations[MAX_TOTALANIMATIONS];
 
@@ -376,8 +376,7 @@ void		SE_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity );
 
 #ifdef FAV_SERVERS
 #define MAX_SERVERS 64
-typedef struct favServer_s
-{
+typedef struct favServer_s {
 	char	name[32];
 	char	ip[32];
 	//RAZTODO: +connect params
@@ -389,13 +388,12 @@ void JP_QueryServer( void );
 #endif
 
 typedef enum updateStatus_e {
-	JAPP_UPDATE_UPTODATE=0,
+	JAPP_UPDATE_UPTODATE = 0,
 	JAPP_UPDATE_OUTDATED,
 	JAPP_UPDATE_UPDATED,
 } updateStatus_t;
 
-typedef struct uiLocal_s
-{
+typedef struct uiLocal_s {
 #ifdef FAV_SERVERS
 	favServer_t		servers[MAX_SERVERS];
 	unsigned int	serversCount;

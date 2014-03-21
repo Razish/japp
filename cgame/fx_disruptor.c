@@ -15,8 +15,11 @@ void CG_RailTrail( clientInfo_t *ci, vector3 *start, vector3 *end ) {
 	refEntity_t   *reCore = &leCore->refEntity;
 	localEntity_t *leGlow = CG_AllocLocalEntity();
 	refEntity_t   *reGlow = &leGlow->refEntity;
-	vector4 color1 = { ci->rgb1.r / 255.0f, ci->rgb1.g / 255.0f, ci->rgb1.b / 255.0f, 1.0f },
-		color2 = { ci->rgb2.r / 255.0f, ci->rgb2.g / 255.0f, ci->rgb2.b / 255.0f, 1.0f };
+	vector4 color1, color2;
+	VectorSet4( &color1, ci->rgb1.r, ci->rgb1.g, ci->rgb1.b, 255.0f );
+	VectorSet4( &color2, ci->rgb2.r, ci->rgb2.g, ci->rgb2.b, 255.0f );
+	VectorScale4( &color1, 1.0f / 255.0f, &color1 );
+	VectorScale4( &color2, 1.0f / 255.0f, &color2 );
 
 	if ( cgs.gametype >= GT_TEAM ) {
 		if ( ci->team == TEAM_RED ) {

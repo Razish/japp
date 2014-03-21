@@ -1,8 +1,7 @@
 #ifndef __Q3_REGISTERS__
 #define __Q3_REGISTERS__
 
-enum
-{
+enum {
 	VTYPE_NONE = 0,
 	VTYPE_FLOAT,
 	VTYPE_STRING,

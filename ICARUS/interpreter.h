@@ -11,8 +11,7 @@ typedef float	vector_t[3];
 
 //If you modify this, you MUST modify in g_ICARUScb.c as well.
 //Token defines
-enum
-{
+enum {
 	TK_BLOCK_START = TK_USERDEF,
 	TK_BLOCK_END,
 	TK_VECTOR_START,
@@ -29,8 +28,7 @@ enum
 };
 
 //ID defines
-enum
-{
+enum {
 	ID_AFFECT = NUM_USER_TOKENS,
 	ID_SOUND,
 	ID_MOVE,
@@ -68,10 +66,9 @@ enum
 };
 
 //Type defines
-enum
-{
+enum {
 	//Wait types
-	TYPE_WAIT_COMPLETE	 = NUM_IDS,
+	TYPE_WAIT_COMPLETE = NUM_IDS,
 	TYPE_WAIT_TRIGGERED,
 
 	//Set types
@@ -103,8 +100,7 @@ enum
 	NUM_TYPES
 };
 
-enum
-{
+enum {
 	MSG_COMPLETED,
 	MSG_EOF,
 	NUM_MESSAGES,

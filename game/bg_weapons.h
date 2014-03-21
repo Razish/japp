@@ -5,7 +5,7 @@
 // This crosses both client and server.  It could all be crammed into bg_public, but isolation of this type of data is best.
 
 typedef enum weapon_e {
-	WP_NONE=0,
+	WP_NONE = 0,
 	WP_STUN_BATON,
 	WP_MELEE,
 	WP_SABER,
@@ -32,7 +32,7 @@ typedef enum weapon_e {
 #define MAX_PLAYER_WEAPONS	(WP_NUM_WEAPONS-1) // this is the max you can switch to and get with the give all.
 
 typedef enum ammo_e {
-	AMMO_NONE=0,
+	AMMO_NONE = 0,
 	AMMO_FORCE,
 	AMMO_BLASTER,
 	AMMO_POWERCELL,

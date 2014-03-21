@@ -675,7 +675,11 @@ void G_AvoidBox( gentity_t *ent ) {
 	num = trap->EntitiesInBox( &mins, &maxs, touch, MAX_GENTITIES );
 
 	for ( i = 0; i < num; i++ ) {
-		vector3 newOrg = { ent->client->ps.origin.x, ent->client->ps.origin.y, ent->client->ps.origin.z + 64.0f };
+		vector3 newOrg;
+
+		VectorCopy( &ent->client->ps.origin, &newOrg );
+		newOrg.z += 64.0f;
+
 		hit = &g_entities[touch[i]];
 
 		if ( !hit->client || hit->s.number == ent->s.number || hit->s.number == ent->r.ownerNum )
@@ -853,7 +857,7 @@ void G_UseDispenserOn( gentity_t *ent, int dispType, gentity_t *target ) {
 		if ( target->client->ps.stats[STAT_HEALTH] > target->client->ps.stats[STAT_MAX_HEALTH] )
 			target->client->ps.stats[STAT_HEALTH] = target->client->ps.stats[STAT_MAX_HEALTH];
 
-		target->client->isMedHealed = level.time + 500;
+		target->client->timeMedHealed = level.time + 500;
 		target->health = target->client->ps.stats[STAT_HEALTH];
 	}
 	else if ( dispType == HI_AMMODISP ) {
@@ -867,7 +871,7 @@ void G_UseDispenserOn( gentity_t *ent, int dispType, gentity_t *target ) {
 			// base the next supply time on how long the weapon takes to fire. Seems fair enough.
 			ent->client->medSupplyDebounce = level.time + weaponData[target->client->ps.weapon].fireTime;
 		}
-		target->client->isMedSupplied = level.time + 500;
+		target->client->timeMedSupplied = level.time + 500;
 	}
 }
 

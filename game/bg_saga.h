@@ -19,8 +19,7 @@
 #define		MAX_EXDATA_ENTS_TO_SEND				MAX_CLIENTS //max number of extended data for ents to send
 
 // The basic siege player classes
-typedef enum
-{
+typedef enum {
 	SPC_INFANTRY = 0,
 	SPC_VANGUARD,
 	SPC_SUPPORT,
@@ -30,8 +29,7 @@ typedef enum
 	SPC_MAX
 } siegePlayerClassFlags_t;
 
-typedef enum
-{
+typedef enum {
 	CFL_MORESABERDMG = 0,
 	CFL_STRONGAGAINSTPHYSICAL,
 	CFL_FASTFORCEREGEN,
@@ -90,17 +88,17 @@ extern int bgNumSiegeTeams;
 
 int BG_SiegeGetValueGroup( const char *buf, const char *group, char *outbuf );
 int BG_SiegeGetPairedValue( const char *buf, const char *key, char *outbuf );
-void BG_SiegeStripTabs(char *buf);
+void BG_SiegeStripTabs( char *buf );
 
-void BG_SiegeLoadClasses(siegeClassDesc_t *descBuffer);
-void BG_SiegeLoadTeams(void);
+void BG_SiegeLoadClasses( siegeClassDesc_t *descBuffer );
+void BG_SiegeLoadTeams( void );
 
-siegeTeam_t *BG_SiegeFindThemeForTeam(int team);
-void BG_PrecacheSabersForSiegeTeam(int team);
-siegeClass_t *BG_SiegeFindClassByName(const char *classname);
-qboolean BG_SiegeCheckClassLegality(int team, char *classname);
-void BG_SiegeSetTeamTheme(int team, char *themeName);
-int BG_SiegeFindClassIndexByName(const char *classname);
+siegeTeam_t *BG_SiegeFindThemeForTeam( int team );
+void BG_PrecacheSabersForSiegeTeam( int team );
+siegeClass_t *BG_SiegeFindClassByName( const char *classname );
+qboolean BG_SiegeCheckClassLegality( int team, char *classname );
+void BG_SiegeSetTeamTheme( int team, char *themeName );
+int BG_SiegeFindClassIndexByName( const char *classname );
 
 // for ui
 int BG_GetUIPortrait( const int team, const short classIndex, const short cntIndex );

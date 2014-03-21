@@ -2,13 +2,13 @@
 
 /*
 Raz:	I only want warnings disabled if we're NOT going to work around them *for a reason*
-		This is simply because things have to be done a certain way, but MSVC doesn't like it. Nit-picky.
-		If there's only one specific case, you may want to push the warning and pop	back on for later warnings...
+This is simply because things have to be done a certain way, but MSVC doesn't like it. Nit-picky.
+If there's only one specific case, you may want to push the warning and pop	back on for later warnings...
 
-	#pragma warning( push )
-	#pragma warning( disable : 1337 )
-	...Some code...
-	#pragma warning( pop )	//revert anything changed in the pushed segment of the code
+#pragma warning( push )
+#pragma warning( disable : 1337 )
+...Some code...
+#pragma warning( pop )	//revert anything changed in the pushed segment of the code
 */
 
 #if defined(_WIN32) && !defined(MINGW32)
@@ -27,9 +27,7 @@ Raz:	I only want warnings disabled if we're NOT going to work around them *for a
 #pragma warning( error		: 4700 )	// uninitialized local variable 'x' used					Raz0r
 
 #pragma warning( disable	: 4100 )	// unreferenced formal parameter							Raz0r
-#pragma warning( disable	: 4115 )	// named type definition in parentheses						Raz0r
 #pragma warning( disable	: 4127 )	// conditional expression is constant						Raz0r
-#pragma warning( disable	: 4204 )	// non-constant aggregate initializer						Raz0r
 #pragma warning( disable	: 4244 )	// conversion from 'x' to 'y', possible loss of data		Raz0r
 #pragma warning( disable	: 4245 )	// conversion from 'x' to 'y', signed/unsigned mismatch		Raz0r
 #pragma warning( disable	: 4305 )	// truncation from 'x' to 'y'								Raz0r
@@ -40,5 +38,5 @@ Raz:	I only want warnings disabled if we're NOT going to work around them *for a
 /*	Warnings disabled in project settings	*/
 /*	Project		No.			Warning														Dev
 	Game		4206		nonstandard extension used : translation unit is empty		Raz0r
-*/
+	*/
 #endif //_WIN32 && !MINGW32

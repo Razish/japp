@@ -4314,8 +4314,9 @@ static qboolean PM_CanStand( void ) {
 
 	for ( x = pm->mins.x + 5.0f; canStand && x <= (pm->maxs.x - 5.0f); x += 10.0f ) {
 		for ( y = pm->mins.y + 5.0f; y <= (pm->maxs.y - 5.0f); y += 10.0f ) {
-			vector3 start = { x, y, pm->maxs.z };
-			vector3 end = { x, y, pm->ps->standheight };
+			vector3 start, end;
+			VectorSet( &start, x, y, pm->maxs.z );
+			VectorSet( &end, x, y, pm->ps->standheight );
 
 			VectorAdd( &start, &pm->ps->origin, &start );
 			VectorAdd( &end, &pm->ps->origin, &end );

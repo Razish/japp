@@ -204,17 +204,17 @@ typedef struct refEntity_s {
 	float		endTime;
 	float		saberLength;
 
-/*
-Ghoul2 Insert Start
-*/
+	/*
+	Ghoul2 Insert Start
+	*/
 	vector3		angles;				// rotation angles - used for Ghoul2
 
 	vector3		modelScale;			// axis scale for models
-//	CGhoul2Info_v	*ghoul2;  		// has to be at the end of the ref-ent in order for it to be created properly
+	//	CGhoul2Info_v	*ghoul2;  		// has to be at the end of the ref-ent in order for it to be created properly
 	void		*ghoul2;  		// has to be at the end of the ref-ent in order for it to be created properly
-/*
-Ghoul2 Insert End
-*/
+	/*
+	Ghoul2 Insert End
+	*/
 } refEntity_t;
 
 

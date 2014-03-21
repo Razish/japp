@@ -5,8 +5,7 @@
 
 // these are the key numbers that should be passed to KeyEvent
 
-typedef enum
-{
+typedef enum {
 	A_NULL = 0,
 	A_SHIFT,
 	A_CTRL,

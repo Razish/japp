@@ -5,8 +5,7 @@
 typedef struct Vehicle_s Vehicle_t;
 typedef struct bgEntity_s bgEntity_t;
 
-typedef enum vehicleType_e
-{
+typedef enum vehicleType_e {
 	VH_NONE = 0,	//0 just in case anyone confuses VH_NONE and VEHICLE_NONE below
 	VH_WALKER,		//something you ride inside of, it walks like you, like an AT-ST
 	VH_FIGHTER,		//something you fly inside of, like an X-Wing or TIE fighter
@@ -16,23 +15,21 @@ typedef enum vehicleType_e
 	VH_NUM_VEHICLES
 } vehicleType_t;
 
-typedef enum
-{
-	WPOSE_NONE	= 0,
+typedef enum {
+	WPOSE_NONE = 0,
 	WPOSE_BLASTER,
 	WPOSE_SABERLEFT,
 	WPOSE_SABERRIGHT,
 } EWeaponPose;
 
-extern stringID_table_t VehicleTable[VH_NUM_VEHICLES+1];
+extern stringID_table_t VehicleTable[VH_NUM_VEHICLES + 1];
 
 //===========================================================================================================
 //START VEHICLE WEAPONS
 //===========================================================================================================
-typedef struct vehWeaponInfo_s
-{
-//*** IMPORTANT!!! *** the number of variables in the vehWeaponStats_t struct (including all elements of arrays) must be reflected by NUM_VWEAP_PARMS!!!
-//*** IMPORTANT!!! *** vWeapFields table correponds to this structure!
+typedef struct vehWeaponInfo_s {
+	//*** IMPORTANT!!! *** the number of variables in the vehWeaponStats_t struct (including all elements of arrays) must be reflected by NUM_VWEAP_PARMS!!!
+	//*** IMPORTANT!!! *** vWeapFields table correponds to this structure!
 	char	*name;
 	qboolean	bIsProjectile;	//traceline or entity?
 	qboolean	bHasGravity;	//if a projectile, drops
@@ -81,8 +78,7 @@ extern int	numVehicleWeapons;
 #define		MAX_VEHICLE_TURRETS			2
 #define		MAX_VEHICLE_TURRET_MUZZLES	2
 
-typedef struct turretStats_s
-{
+typedef struct turretStats_s {
 	int			iWeapon;	//what vehWeaponInfo index to use
 	int			iDelay;		//delay between turret muzzle shots
 	int			iAmmoMax;	//how much ammo it has
@@ -104,9 +100,8 @@ typedef struct turretStats_s
 	int			passengerNum;//which passenger, if any, has control of this turret (overrides AI)
 } turretStats_t;
 
-typedef struct vehWeaponStats_s
-{
-//*** IMPORTANT!!! *** See note at top of next structure!!! ***
+typedef struct vehWeaponStats_s {
+	//*** IMPORTANT!!! *** See note at top of next structure!!! ***
 	// Weapon stuff.
 	int			ID;//index into the weapon data
 	// The delay between shots for each weapon.
@@ -123,9 +118,8 @@ typedef struct vehWeaponStats_s
 	int			soundNoAmmo;
 } vehWeaponStats_t;
 
-typedef struct vehicleInfo_s
-{
-//*** IMPORTANT!!! *** vehFields table correponds to this structure!
+typedef struct vehicleInfo_s {
+	//*** IMPORTANT!!! *** vehFields table correponds to this structure!
 	char		*name;	//unique name of the vehicle
 
 	//general data
@@ -269,10 +263,10 @@ typedef struct vehicleInfo_s
 
 	//NOTE: some info on what vehicle weapon to use?  Like ATST or TIE bomber or TIE fighter or X-Wing...?
 
-//===VEH_PARM_MAX========================================================================
-//*** IMPORTANT!!! *** vehFields table correponds to this structure!
+	//===VEH_PARM_MAX========================================================================
+	//*** IMPORTANT!!! *** vehFields table correponds to this structure!
 
-//THE FOLLOWING FIELDS are not in the vehFields table because they are internal variables, not read in from the .veh file
+	//THE FOLLOWING FIELDS are not in the vehFields table because they are internal variables, not read in from the .veh file
 	int			modelIndex;		//set internally, not until this vehicle is spawned into the level
 
 	// NOTE: Please note that most of this stuff has been converted from C++ classes to generic C.
@@ -283,75 +277,75 @@ typedef struct vehicleInfo_s
 	// inherited from, only contained and reimplemented (through an object and a setup function respectively)). -AReis
 
 	// Makes sure that the vehicle is properly animated.
-	void (*AnimateVehicle)( Vehicle_t *pVeh );
+	void( *AnimateVehicle )(Vehicle_t *pVeh);
 
 	// Makes sure that the rider's in this vehicle are properly animated.
-	void (*AnimateRiders)( Vehicle_t *pVeh );
+	void( *AnimateRiders )(Vehicle_t *pVeh);
 
 	// Determine whether this entity is able to board this vehicle or not.
-	qboolean (*ValidateBoard)( Vehicle_t *pVeh, bgEntity_t *pEnt );
+	qboolean( *ValidateBoard )(Vehicle_t *pVeh, bgEntity_t *pEnt);
 
 	// Set the parent entity of this Vehicle NPC.
-	void (*SetParent)( Vehicle_t *pVeh, bgEntity_t *pParentEntity );
+	void( *SetParent )(Vehicle_t *pVeh, bgEntity_t *pParentEntity);
 
 	// Add a pilot to the vehicle.
-	void (*SetPilot)( Vehicle_t *pVeh, bgEntity_t *pPilot );
+	void( *SetPilot )(Vehicle_t *pVeh, bgEntity_t *pPilot);
 
 	// Add a passenger to the vehicle (false if we're full).
-	qboolean (*AddPassenger)( Vehicle_t *pVeh );
+	qboolean( *AddPassenger )(Vehicle_t *pVeh);
 
 	// Animate the vehicle and it's riders.
-	void (*Animate)( Vehicle_t *pVeh );
+	void( *Animate )(Vehicle_t *pVeh);
 
 	// Board this Vehicle (get on). The first entity to board an empty vehicle becomes the Pilot.
-	qboolean (*Board)( Vehicle_t *pVeh, bgEntity_t *pEnt );
+	qboolean( *Board )(Vehicle_t *pVeh, bgEntity_t *pEnt);
 
 	// Eject an entity from the vehicle.
-	qboolean (*Eject)( Vehicle_t *pVeh, bgEntity_t *pEnt, qboolean forceEject );
+	qboolean( *Eject )(Vehicle_t *pVeh, bgEntity_t *pEnt, qboolean forceEject);
 
 	// Eject all the inhabitants of this vehicle.
-	qboolean (*EjectAll)( Vehicle_t *pVeh );
+	qboolean( *EjectAll )(Vehicle_t *pVeh);
 
 	// Start a delay until the vehicle dies.
-	void (*StartDeathDelay)( Vehicle_t *pVeh, int iDelayTime );
+	void( *StartDeathDelay )(Vehicle_t *pVeh, int iDelayTime);
 
 	// Update death sequence.
-	void (*DeathUpdate)( Vehicle_t *pVeh );
+	void( *DeathUpdate )(Vehicle_t *pVeh);
 
 	// Register all the assets used by this vehicle.
-	void (*RegisterAssets)( Vehicle_t *pVeh );
+	void( *RegisterAssets )(Vehicle_t *pVeh);
 
 	// Initialize the vehicle (should be called by Spawn?).
-	qboolean (*Initialize)( Vehicle_t *pVeh );
+	qboolean( *Initialize )(Vehicle_t *pVeh);
 
 	// Like a think or move command, this updates various vehicle properties.
-	qboolean (*Update)( Vehicle_t *pVeh, const usercmd_t *pUcmd );
+	qboolean( *Update )(Vehicle_t *pVeh, const usercmd_t *pUcmd);
 
 	// Update the properties of a Rider (that may reflect what happens to the vehicle).
 	//
 	//	[return]		bool			True if still in vehicle, false if otherwise.
-	qboolean (*UpdateRider)( Vehicle_t *pVeh, bgEntity_t *pRider, usercmd_t *pUcmd );
+	qboolean( *UpdateRider )(Vehicle_t *pVeh, bgEntity_t *pRider, usercmd_t *pUcmd);
 
 	// ProcessMoveCommands the Vehicle.
-	void (*ProcessMoveCommands)( Vehicle_t *pVeh );
+	void( *ProcessMoveCommands )(Vehicle_t *pVeh);
 
 	// ProcessOrientCommands the Vehicle.
-	void (*ProcessOrientCommands)( Vehicle_t *pVeh );
+	void( *ProcessOrientCommands )(Vehicle_t *pVeh);
 
 	// Attachs all the riders of this vehicle to their appropriate position/tag (*driver, *pass1, *pass2, whatever...).
-	void (*AttachRiders)( Vehicle_t *pVeh );
+	void( *AttachRiders )(Vehicle_t *pVeh);
 
 	// Make someone invisible and un-collidable.
-	void (*Ghost)( Vehicle_t *pVeh, bgEntity_t *pEnt );
+	void( *Ghost )(Vehicle_t *pVeh, bgEntity_t *pEnt);
 
 	// Make someone visible and collidable.
-	void (*UnGhost)( Vehicle_t *pVeh, bgEntity_t *pEnt );
+	void( *UnGhost )(Vehicle_t *pVeh, bgEntity_t *pEnt);
 
 	// Get the pilot of this vehicle.
-	const bgEntity_t *(*GetPilot)( Vehicle_t *pVeh );
+	const bgEntity_t *(*GetPilot)(Vehicle_t *pVeh);
 
 	// Whether this vehicle is currently inhabited (by anyone) or not.
-	qboolean (*Inhabited)( Vehicle_t *pVeh );
+	qboolean( *Inhabited )(Vehicle_t *pVeh);
 } vehicleInfo_t;
 
 
@@ -396,8 +390,7 @@ extern int	numVehicles;
 #define	VEH_MOUNT_THROW_RIGHT		-6
 
 
-typedef enum
-{
+typedef enum {
 	VEH_EJECT_LEFT,
 	VEH_EJECT_RIGHT,
 	VEH_EJECT_FRONT,
@@ -444,8 +437,7 @@ typedef enum
 #define SHIPSURF_BROKEN_F	(0x0020u) // wing 4
 #define SHIPSURF_BROKEN_G	(0x0040u) // front
 
-typedef struct
-{
+typedef struct {
 	//linked firing mode
 	qboolean	linked;//weapon 1's muzzles are in linked firing mode
 	//current weapon ammo
@@ -456,8 +448,7 @@ typedef struct
 	int			nextMuzzle;
 } vehWeaponStatus_t;
 
-typedef struct
-{
+typedef struct {
 	//current weapon ammo
 	int			ammo;
 	//debouncer for ammo recharge
@@ -471,8 +462,7 @@ typedef struct
 } vehTurretStatus_t;
 // This is the implementation of the vehicle interface and any of the other variables needed. This
 // is what actually represents a vehicle. -AReis.
-typedef struct Vehicle_s
-{
+typedef struct Vehicle_s {
 	// The entity who pilots/drives this vehicle.
 	// NOTE: This is redundant (since m_pParentEntity->owner _should_ be the pilot). This makes things clearer though.
 	bgEntity_t *m_pPilot;
@@ -617,9 +607,9 @@ typedef struct Vehicle_s
 	//the guy who was previously the pilot
 	bgEntity_t *	m_pOldPilot;
 #if defined(__GCC__) || defined(MINGW32) || defined(MACOS_X)
-	} _Vehicle_t;
+} _Vehicle_t;
 #else
-	} Vehicle_t;
+} Vehicle_t;
 #endif
 
 int BG_VehicleGetIndex( const char *vehicleName );

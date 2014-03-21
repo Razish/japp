@@ -92,10 +92,10 @@
 #define LUA_LDIR	"!\\lua\\"
 #define LUA_CDIR	"!\\"
 #define LUA_PATH_DEFAULT  \
-		LUA_LDIR"?.lua;"  LUA_LDIR"?\\init.lua;" \
-		LUA_CDIR"?.lua;"  LUA_CDIR"?\\init.lua;" ".\\?.lua"
+	LUA_LDIR"?.lua;"  LUA_LDIR"?\\init.lua;" \
+	LUA_CDIR"?.lua;"  LUA_CDIR"?\\init.lua;" ".\\?.lua"
 #define LUA_CPATH_DEFAULT \
-		LUA_CDIR"?.dll;" LUA_CDIR"loadall.dll;" ".\\?.dll"
+	LUA_CDIR"?.dll;" LUA_CDIR"loadall.dll;" ".\\?.dll"
 
 #else			/* }{ */
 
@@ -104,10 +104,10 @@
 #define LUA_LDIR	LUA_ROOT "share/lua/" LUA_VDIR
 #define LUA_CDIR	LUA_ROOT "lib/lua/" LUA_VDIR
 #define LUA_PATH_DEFAULT  \
-		LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
-		LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua;" "./?.lua"
+	LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
+	LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua;" "./?.lua"
 #define LUA_CPATH_DEFAULT \
-		LUA_CDIR"?.so;" LUA_CDIR"loadall.so;" "./?.so"
+	LUA_CDIR"?.so;" LUA_CDIR"loadall.so;" "./?.so"
 #endif			/* } */
 
 
@@ -175,7 +175,7 @@
 ** default definition.
 */
 #if defined(__GNUC__) && ((__GNUC__*100 + __GNUC_MINOR__) >= 302) && \
-    defined(__ELF__)		/* { */
+	defined(__ELF__)		/* { */
 #define LUAI_FUNC	__attribute__((visibility("hidden"))) extern
 #define LUAI_DDEC	LUAI_FUNC
 #define LUAI_DDEF	/* empty */
@@ -264,8 +264,8 @@
 */
 #define lua_cpcall(L,f,u)  \
 	(lua_pushcfunction(L, (f)), \
-	 lua_pushlightuserdata(L,(u)), \
-	 lua_pcall(L,1,0,0))
+	lua_pushlightuserdata(L,(u)), \
+	lua_pcall(L,1,0,0))
 
 
 /*

@@ -3063,7 +3063,7 @@ static const emote_t emotes[NUM_EMOTES] = {
 static void SetEmote( gentity_t *ent, const emote_t *emote ) {
 	uint32_t animParts = 0u, animFlags = 0u;
 
-	if ( !(japp_allowEmotes.integer & (1<<level.gametype)) ) {
+	if ( !(japp_allowEmotes.integer & (1 << level.gametype)) ) {
 		trap->SendServerCommand( ent - g_entities, "print \"Emotes are not allowed in this gametype\n\"" );
 		return;
 	}
@@ -3071,8 +3071,7 @@ static void SetEmote( gentity_t *ent, const emote_t *emote ) {
 	// busy
 	if ( ent->client->ps.weaponTime > 0 || ent->client->ps.saberMove > LS_READY || ent->client->ps.fd.forcePowersActive
 		|| ent->client->ps.groundEntityNum == ENTITYNUM_NONE || ent->client->ps.duelInProgress
-		|| BG_InKnockDown( ent->client->ps.legsAnim ) || BG_InRoll( &ent->client->ps, ent->client->ps.legsAnim ) )
-	{
+		|| BG_InKnockDown( ent->client->ps.legsAnim ) || BG_InRoll( &ent->client->ps, ent->client->ps.legsAnim ) ) {
 		return;
 	}
 

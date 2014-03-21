@@ -47,19 +47,19 @@ PCX files are used for 8 bit images
 */
 
 typedef struct pcx_s {
-    char	manufacturer;
-    char	version;
-    char	encoding;
-    char	bits_per_pixel;
-    unsigned short	xmin,ymin,xmax,ymax;
-    unsigned short	hres,vres;
-    unsigned char	palette[48];
-    char	reserved;
-    char	color_planes;
-    unsigned short	bytes_per_line;
-    unsigned short	palette_type;
-    char	filler[58];
-    unsigned char	data;			// unbounded
+	char	manufacturer;
+	char	version;
+	char	encoding;
+	char	bits_per_pixel;
+	unsigned short	xmin, ymin, xmax, ymax;
+	unsigned short	hres, vres;
+	unsigned char	palette[48];
+	char	reserved;
+	char	color_planes;
+	unsigned short	bytes_per_line;
+	unsigned short	palette_type;
+	char	filler[58];
+	unsigned char	data;			// unbounded
 } pcx_t;
 
 
@@ -191,7 +191,7 @@ typedef struct md3Header_s {
 /*
 ==============================================================================
 
-  .BSP file format
+.BSP file format
 
 ==============================================================================
 */
@@ -355,8 +355,7 @@ typedef struct drawVert_s {
 	byte		color[MAXLIGHTMAPS][4];
 } drawVert_t;
 
-typedef struct
-{
+typedef struct {
 	byte		ambientLight[MAXLIGHTMAPS][3];
 	byte		directLight[MAXLIGHTMAPS][3];
 	byte		styles[MAXLIGHTMAPS];
@@ -405,8 +404,7 @@ typedef struct dsurface_s {
 #define STYLE_BLINK			(0x40000000u)
 #define	SET_MASK			(0x00ffffffu)
 
-typedef struct
-{
+typedef struct {
 	short		width;					// number of pixels wide
 	short		height;					// number of scan lines
 	short		horizAdvance;			// number of pixels to advance to the next char
@@ -422,8 +420,7 @@ typedef struct
 // this file corresponds 1:1 with the "*.fontdat" files, so don't change it unless you're going to
 //	recompile the fontgen util and regenerate all the fonts!
 //
-typedef struct dfontdat_s
-{
+typedef struct dfontdat_s {
 	glyphInfo_t		mGlyphs[GLYPH_COUNT];
 
 	short			mPointSize;

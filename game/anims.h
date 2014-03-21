@@ -822,8 +822,8 @@ typedef enum animNumber_e {
 	//Sabers locked anims
 	//* #sep BOTH_ SABER LOCKED ANIMS
 	//BOTH_(DL, S, ST)_(DL, S, ST)_(T, S)_(L, B, SB)_1(_W, _L)
-//===Single locks==================================================================
-//SINGLE vs. DUAL
+	//===Single locks==================================================================
+	//SINGLE vs. DUAL
 	//side locks - I'm using a single and they're using dual
 	BOTH_LK_S_DL_S_B_1_L,	//normal break I lost
 	BOTH_LK_S_DL_S_B_1_W,	//normal break I won
@@ -836,7 +836,7 @@ typedef enum animNumber_e {
 	BOTH_LK_S_DL_T_L_1,		//lock if I'm using single vs. a dual
 	BOTH_LK_S_DL_T_SB_1_L,	//super break I lost
 	BOTH_LK_S_DL_T_SB_1_W,	//super break I won
-//SINGLE vs. STAFF
+	//SINGLE vs. STAFF
 	//side locks
 	BOTH_LK_S_ST_S_B_1_L,	//normal break I lost
 	BOTH_LK_S_ST_S_B_1_W,	//normal break I won
@@ -849,7 +849,7 @@ typedef enum animNumber_e {
 	BOTH_LK_S_ST_T_L_1,		//lock if I'm using single vs. a staff
 	BOTH_LK_S_ST_T_SB_1_L,	//super break I lost
 	BOTH_LK_S_ST_T_SB_1_W,	//super break I won
-//SINGLE vs. SINGLE
+	//SINGLE vs. SINGLE
 	//side locks
 	BOTH_LK_S_S_S_B_1_L,	//normal break I lost
 	BOTH_LK_S_S_S_B_1_W,	//normal break I won
@@ -862,8 +862,8 @@ typedef enum animNumber_e {
 	BOTH_LK_S_S_T_L_1,		//lock if I'm using single vs. a single and I initiated
 	BOTH_LK_S_S_T_SB_1_L,	//super break I lost
 	BOTH_LK_S_S_T_SB_1_W,	//super break I won
-//===Dual Saber locks==================================================================
-//DUAL vs. DUAL
+	//===Dual Saber locks==================================================================
+	//DUAL vs. DUAL
 	//side locks
 	BOTH_LK_DL_DL_S_B_1_L,	//normal break I lost
 	BOTH_LK_DL_DL_S_B_1_W,	//normal break I won
@@ -876,7 +876,7 @@ typedef enum animNumber_e {
 	BOTH_LK_DL_DL_T_L_1,	//lock if I'm using dual vs. dual and I initiated
 	BOTH_LK_DL_DL_T_SB_1_L,	//super break I lost
 	BOTH_LK_DL_DL_T_SB_1_W,	//super break I won
-//DUAL vs. STAFF
+	//DUAL vs. STAFF
 	//side locks
 	BOTH_LK_DL_ST_S_B_1_L,	//normal break I lost
 	BOTH_LK_DL_ST_S_B_1_W,	//normal break I won
@@ -889,7 +889,7 @@ typedef enum animNumber_e {
 	BOTH_LK_DL_ST_T_L_1,	//lock if I'm using dual vs. a staff
 	BOTH_LK_DL_ST_T_SB_1_L,	//super break I lost
 	BOTH_LK_DL_ST_T_SB_1_W,	//super break I won
-//DUAL vs. SINGLE
+	//DUAL vs. SINGLE
 	//side locks
 	BOTH_LK_DL_S_S_B_1_L,	//normal break I lost
 	BOTH_LK_DL_S_S_B_1_W,	//normal break I won
@@ -902,8 +902,8 @@ typedef enum animNumber_e {
 	BOTH_LK_DL_S_T_L_1,		//lock if I'm using dual vs. a single
 	BOTH_LK_DL_S_T_SB_1_L,	//super break I lost
 	BOTH_LK_DL_S_T_SB_1_W,	//super break I won
-//===Saber Staff locks==================================================================
-//STAFF vs. DUAL
+	//===Saber Staff locks==================================================================
+	//STAFF vs. DUAL
 	//side locks
 	BOTH_LK_ST_DL_S_B_1_L,	//normal break I lost
 	BOTH_LK_ST_DL_S_B_1_W,	//normal break I won
@@ -916,7 +916,7 @@ typedef enum animNumber_e {
 	BOTH_LK_ST_DL_T_L_1,	//lock if I'm using staff vs. dual
 	BOTH_LK_ST_DL_T_SB_1_L,	//super break I lost
 	BOTH_LK_ST_DL_T_SB_1_W,	//super break I won
-//STAFF vs. STAFF
+	//STAFF vs. STAFF
 	//side locks
 	BOTH_LK_ST_ST_S_B_1_L,	//normal break I lost
 	BOTH_LK_ST_ST_S_B_1_W,	//normal break I won
@@ -929,7 +929,7 @@ typedef enum animNumber_e {
 	BOTH_LK_ST_ST_T_L_1,	//lock if I'm using staff vs. a staff and I initiated
 	BOTH_LK_ST_ST_T_SB_1_L,	//super break I lost
 	BOTH_LK_ST_ST_T_SB_1_W,	//super break I won
-//STAFF vs. SINGLE
+	//STAFF vs. SINGLE
 	//side locks
 	BOTH_LK_ST_S_S_B_1_L,	//normal break I lost
 	BOTH_LK_ST_S_S_B_1_W,	//normal break I won
@@ -942,14 +942,14 @@ typedef enum animNumber_e {
 	BOTH_LK_ST_S_T_L_1,		//lock if I'm using staff vs. a single
 	BOTH_LK_ST_S_T_SB_1_L,	//super break I lost
 	BOTH_LK_ST_S_T_SB_1_W,	//super break I won
-//Special cases for same saber style vs. each other (won't fit in nice 5-anim size lists above)
+	//Special cases for same saber style vs. each other (won't fit in nice 5-anim size lists above)
 	BOTH_LK_S_S_S_L_2,		//lock if I'm using single vs. a single and other intitiated
 	BOTH_LK_S_S_T_L_2,		//lock if I'm using single vs. a single and other initiated
 	BOTH_LK_DL_DL_S_L_2,	//lock if I'm using dual vs. dual and other initiated
 	BOTH_LK_DL_DL_T_L_2,	//lock if I'm using dual vs. dual and other initiated
 	BOTH_LK_ST_ST_S_L_2,	//lock if I'm using staff vs. a staff and other initiated
 	BOTH_LK_ST_ST_T_L_2,	//lock if I'm using staff vs. a staff and other initiated
-//===End Saber locks==================================================================
+	//===End Saber locks==================================================================
 	//old locks
 	BOTH_BF2RETURN,	//#
 	BOTH_BF2BREAK,	//#

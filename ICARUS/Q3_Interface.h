@@ -239,19 +239,19 @@ typedef enum //# setType_e
 	SET_TACTICAL_SHOW,		//## %t="TACTICAL" # Show tactical info on mission objectives screen
 	SET_TACTICAL_HIDE,		//## %t="TACTICAL" # Hide tactical info on mission objectives screen
 	SET_OBJECTIVE_CLEARALL,	//## # Force all objectives to be hidden
-/*
-	SET_OBJECTIVEFOSTER,
-*/
-	SET_MISSIONSTATUSTEXT,	//## %t="STATUSTEXT" # Text to appear in mission status screen
-	SET_MENU_SCREEN,//## %t="MENUSCREENS" # Brings up specified menu screen
+	/*
+		SET_OBJECTIVEFOSTER,
+		*/
+		SET_MISSIONSTATUSTEXT,	//## %t="STATUSTEXT" # Text to appear in mission status screen
+		SET_MENU_SCREEN,//## %t="MENUSCREENS" # Brings up specified menu screen
 
-	SET_CLOSINGCREDITS,		//## # Show closing credits
+		SET_CLOSINGCREDITS,		//## # Show closing credits
 
-	//in-bhc tables
-	SET_LEAN,//## %t="LEAN_TYPES" # Lean left, right or stop leaning
+		//in-bhc tables
+		SET_LEAN,//## %t="LEAN_TYPES" # Lean left, right or stop leaning
 
-	//# #eol
-	SET_
+		//# #eol
+		SET_
 } setType_t;
 
 #ifdef __cplusplus

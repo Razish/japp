@@ -47,9 +47,9 @@
 #define REX_X(r)        ( ( 0x3 & ( r ) )  >> 1 )
 #define REX_B(r)        ( ( 0x1 & ( r ) )  >> 0 )
 #define REX_PFX_MASK(n) ( ( P_REXW(n) << 3 ) | \
-                          ( P_REXR(n) << 2 ) | \
-                          ( P_REXX(n) << 1 ) | \
-                          ( P_REXB(n) << 0 ) )
+	( P_REXR(n) << 2 ) | \
+	( P_REXX(n) << 1 ) | \
+	( P_REXB(n) << 0 ) )
 
 /* scable-index-base bits */
 #define SIB_S(b)        ( ( b ) >> 6 )
@@ -65,65 +65,65 @@
 /* operand type constants -- order is important! */
 
 enum ud_operand_code {
-    OP_NONE,
+	OP_NONE,
 
-    OP_A,      OP_E,      OP_M,       OP_G,
-    OP_I,
+	OP_A, OP_E, OP_M, OP_G,
+	OP_I,
 
-    OP_AL,     OP_CL,     OP_DL,      OP_BL,
-    OP_AH,     OP_CH,     OP_DH,      OP_BH,
+	OP_AL, OP_CL, OP_DL, OP_BL,
+	OP_AH, OP_CH, OP_DH, OP_BH,
 
-    OP_ALr8b,  OP_CLr9b,  OP_DLr10b,  OP_BLr11b,
-    OP_AHr12b, OP_CHr13b, OP_DHr14b,  OP_BHr15b,
+	OP_ALr8b, OP_CLr9b, OP_DLr10b, OP_BLr11b,
+	OP_AHr12b, OP_CHr13b, OP_DHr14b, OP_BHr15b,
 
-    OP_AX,     OP_CX,     OP_DX,      OP_BX,
-    OP_SI,     OP_DI,     OP_SP,      OP_BP,
+	OP_AX, OP_CX, OP_DX, OP_BX,
+	OP_SI, OP_DI, OP_SP, OP_BP,
 
-    OP_rAX,    OP_rCX,    OP_rDX,     OP_rBX,
-    OP_rSP,    OP_rBP,    OP_rSI,     OP_rDI,
+	OP_rAX, OP_rCX, OP_rDX, OP_rBX,
+	OP_rSP, OP_rBP, OP_rSI, OP_rDI,
 
-    OP_rAXr8,  OP_rCXr9,  OP_rDXr10,  OP_rBXr11,
-    OP_rSPr12, OP_rBPr13, OP_rSIr14,  OP_rDIr15,
+	OP_rAXr8, OP_rCXr9, OP_rDXr10, OP_rBXr11,
+	OP_rSPr12, OP_rBPr13, OP_rSIr14, OP_rDIr15,
 
-    OP_eAX,    OP_eCX,    OP_eDX,     OP_eBX,
-    OP_eSP,    OP_eBP,    OP_eSI,     OP_eDI,
+	OP_eAX, OP_eCX, OP_eDX, OP_eBX,
+	OP_eSP, OP_eBP, OP_eSI, OP_eDI,
 
-    OP_ES,     OP_CS,     OP_SS,      OP_DS,
-    OP_FS,     OP_GS,
+	OP_ES, OP_CS, OP_SS, OP_DS,
+	OP_FS, OP_GS,
 
-    OP_ST0,    OP_ST1,    OP_ST2,     OP_ST3,
-    OP_ST4,    OP_ST5,    OP_ST6,     OP_ST7,
+	OP_ST0, OP_ST1, OP_ST2, OP_ST3,
+	OP_ST4, OP_ST5, OP_ST6, OP_ST7,
 
-    OP_J,      OP_S,      OP_O,
-    OP_I1,     OP_I3,
+	OP_J, OP_S, OP_O,
+	OP_I1, OP_I3,
 
-    OP_V,      OP_W,      OP_Q,       OP_P,
+	OP_V, OP_W, OP_Q, OP_P,
 
-    OP_R,      OP_C,  OP_D,       OP_VR,  OP_PR
+	OP_R, OP_C, OP_D, OP_VR, OP_PR
 };
 
 
 /* operand size constants */
 
 enum ud_operand_size {
-    SZ_NA  = 0,
-    SZ_Z   = 1,
-    SZ_V   = 2,
-    SZ_P   = 3,
-    SZ_WP  = 4,
-    SZ_DP  = 5,
-    SZ_MDQ = 6,
-    SZ_RDQ = 7,
+	SZ_NA = 0,
+	SZ_Z = 1,
+	SZ_V = 2,
+	SZ_P = 3,
+	SZ_WP = 4,
+	SZ_DP = 5,
+	SZ_MDQ = 6,
+	SZ_RDQ = 7,
 
-    /* the following values are used as is,
-     * and thus hard-coded. changing them
-     * will break internals
-     */
-    SZ_B   = 8,
-    SZ_W   = 16,
-    SZ_D   = 32,
-    SZ_Q   = 64,
-    SZ_T   = 80,
+	/* the following values are used as is,
+	 * and thus hard-coded. changing them
+	 * will break internals
+	 */
+	 SZ_B = 8,
+	 SZ_W = 16,
+	 SZ_D = 32,
+	 SZ_Q = 64,
+	 SZ_T = 80,
 };
 
 /* itab entry operand definitions */
@@ -245,23 +245,21 @@ enum ud_operand_size {
 /* A single operand of an entry in the instruction table.
  * (internal use only)
  */
-struct ud_itab_entry_operand
-{
-  enum ud_operand_code type;
-  enum ud_operand_size size;
+struct ud_itab_entry_operand {
+	enum ud_operand_code type;
+	enum ud_operand_size size;
 };
 
 
 /* A single entry in an instruction table.
  *(internal use only)
  */
-struct ud_itab_entry
-{
-  enum ud_mnemonic_code         mnemonic;
-  struct ud_itab_entry_operand  operand1;
-  struct ud_itab_entry_operand  operand2;
-  struct ud_itab_entry_operand  operand3;
-  uint32_t                      prefix;
+struct ud_itab_entry {
+	enum ud_mnemonic_code         mnemonic;
+	struct ud_itab_entry_operand  operand1;
+	struct ud_itab_entry_operand  operand2;
+	struct ud_itab_entry_operand  operand3;
+	uint32_t                      prefix;
 };
 
 #endif /* UD_DECODE_H */

@@ -388,11 +388,11 @@ void G_SetClientSound( gentity_t *ent ) {
 		ent->client->ps.loopSound = level.snd_hack;
 		ent->s.loopIsSoundset = qfalse;
 	}
-	else if ( ent->client && ent->client->isMedHealed > level.time ) { //loop healing sound
+	else if ( ent->client && ent->client->timeMedHealed > level.time ) { //loop healing sound
 		ent->client->ps.loopSound = level.snd_medHealed;
 		ent->s.loopIsSoundset = qfalse;
 	}
-	else if ( ent->client && ent->client->isMedSupplied > level.time ) { //loop supplying sound
+	else if ( ent->client && ent->client->timeMedSupplied > level.time ) { //loop supplying sound
 		ent->client->ps.loopSound = level.snd_medSupplied;
 		ent->s.loopIsSoundset = qfalse;
 	}

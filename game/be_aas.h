@@ -43,8 +43,7 @@
 	TFL_TELEPORT|TFL_ELEVATOR|\
 	TFL_AIR|TFL_WATER|TFL_JUMPPAD|TFL_FUNCBOB
 
-typedef enum
-{
+typedef enum {
 	SOLID_NOT,			// no interaction with other objects
 	SOLID_TRIGGER,		// only touch when inside, after moving
 	SOLID_BBOX,			// touch on edge
@@ -52,8 +51,7 @@ typedef enum
 } solid_t;
 
 //a trace is returned when a box is swept through the AAS world
-typedef struct aas_trace_s
-{
+typedef struct aas_trace_s {
 	qboolean	startsolid;	// if true, the initial point was in a solid area
 	float		fraction;	// time completed, 1.0f = didn't hit anything
 	vector3		endpos;		// final position
@@ -68,31 +66,30 @@ typedef struct aas_trace_s
 //bsp_trace_t hit surface
 typedef struct bsp_surface_s
 {
-	char name[16];
-	uint32_t flags;
-	int value;
+char name[16];
+uint32_t flags;
+int value;
 } bsp_surface_t;
 
 //a trace is returned when a box is swept through the BSP world
 typedef struct bsp_trace_s
 {
-	qboolean		allsolid;	// if true, plane is not valid
-	qboolean		startsolid;	// if true, the initial point was in a solid area
-	float			fraction;	// time completed, 1.0f = didn't hit anything
-	vector3			endpos;		// final position
-	cplane_t		plane;		// surface normal at impact
-	float			exp_dist;	// expanded plane distance
-	int				sidenum;	// number of the brush side hit
-	bsp_surface_t	surface;	// hit surface
-	uint32_t		contents;	// contents on other side of surface hit
-	int				ent;		// number of entity hit
+qboolean		allsolid;	// if true, plane is not valid
+qboolean		startsolid;	// if true, the initial point was in a solid area
+float			fraction;	// time completed, 1.0f = didn't hit anything
+vector3			endpos;		// final position
+cplane_t		plane;		// surface normal at impact
+float			exp_dist;	// expanded plane distance
+int				sidenum;	// number of the brush side hit
+bsp_surface_t	surface;	// hit surface
+uint32_t		contents;	// contents on other side of surface hit
+int				ent;		// number of entity hit
 } bsp_trace_t;
 //
 */
 
 //entity info
-typedef struct aas_entityinfo_s
-{
+typedef struct aas_entityinfo_s {
 	int		valid;			// true if updated this frame
 	int		type;			// entity type
 	uint32_t flags;			// entity flags
@@ -161,8 +158,7 @@ typedef struct aas_clientmove_s {
 #define ALTROUTEGOAL_CLUSTERPORTALS		(0x0002u)
 #define ALTROUTEGOAL_VIEWPORTALS		(0x0004u)
 
-typedef struct aas_altroutegoal_s
-{
+typedef struct aas_altroutegoal_s {
 	vector3 origin;
 	int areanum;
 	unsigned short starttraveltime;

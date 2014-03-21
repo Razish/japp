@@ -13,7 +13,8 @@ static void DrawServerInformation( float fade ) {
 	const float fontScale = 0.5f, lineHeight = 14.0f;
 	const char *tmp = NULL;
 	float y = 20.0f;
-	vector4 colour = { 1.0f, 1.0f, 1.0f, fade };
+	vector4 colour = { 1.0f, 1.0f, 1.0f, 1.0f };
+	colour.a = fade;
 
 	// server name
 	trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( cgs.japp.serverName, fontHandle, fontScale ) / 2.0f,
@@ -115,8 +116,10 @@ static void DrawPlayerCount_Free( float fade ) {
 	const float fontScale = 0.5f, width = SCREEN_WIDTH / 2.0f, lineHeight = 14.0f;
 	float y = 108.0f;
 	const char *tmp = NULL;
-	vector4 colour = { 1.0f, 1.0f, 1.0f, fade };
+	vector4 colour = { 1.0f, 1.0f, 1.0f, 1.0f };
 	int i, freeCount = 0, specCount = 0, botCount = 0;
+
+	colour.a = fade;
 
 	for ( i = 0; i < cg.numScores; i++ ) {
 		clientInfo_t *ci = &cgs.clientinfo[cg.scores[i].client];
@@ -147,8 +150,9 @@ void DrawPlayerCount_Team( float fade ) {
 	const float fontScale = 0.5f, width = SCREEN_WIDTH / 2.0f, lineHeight = 14.0f;
 	float y = 108.0f;
 	const char *tmp = NULL;
-	vector4 colour = { 1.0f, 1.0f, 1.0f, fade };
+	vector4 colour = { 1.0f, 1.0f, 1.0f, 1.0f };
 	int i, redCount = 0, blueCount = 0, specCount = 0, pingAccumRed = 0, pingAvgRed = 0, pingAccumBlue = 0, pingAvgBlue = 0;
+	colour.a = fade;
 
 	for ( i = 0; i < cg.numScores; i++ ) {
 		if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_RED ) {
@@ -231,12 +235,16 @@ static int PlayerCount( team_t team ) {
 static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int fontHandle, float lineHeight, int startIndex,
 	int playerCount ) {
 	const char *tmp = NULL;
-	const vector4 white = { 1.0f, 1.0f, 1.0f, fade },
-		background = { 0.75f, 0.75f, 0.75f, 0.6f*fade },
-		blue = { 0.6f, 0.6f, 1.0f, fade };
+	vector4 white = { 1.0f, 1.0f, 1.0f, 1.0f },
+		background = { 0.75f, 0.75f, 0.75f, 1.0f },
+		blue = { 0.6f, 0.6f, 1.0f, 1.0f };
 	int i, count = playerCount, column = 0;
 	const float endX = SCREEN_WIDTH / 2.0f, columnOffset[] = { /*name*/80.0f, /*score*/170.0f, /*ping*/270.0f, /*time*/295.0f };
 	float savedY = 0.0f;
+
+	white.a = fade;
+	background.a = 0.6f * fade;
+	blue.a = fade;
 
 	if ( !count )
 		return 0;
@@ -292,8 +300,10 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 		score_t *score = &cg.scores[i];
 		clientInfo_t *ci = &cgs.clientinfo[score->client];
 		if ( ci->team == TEAM_FREE ) {
-			vector4	pingColour = { 1.0f, 1.0f, 1.0f, fade };
-			const vector4 pingGood = { 0.0f, 1.0f, 0.0f, fade }, pingBad = { 1.0f, 0.0f, 0.0f, fade };
+			vector4	pingColour = { 1.0f, 1.0f, 1.0f, 1.0f }, pingGood = { 0.0f, 1.0f, 0.0f, 1.0f },
+				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
+			pingColour.a = pingGood.a = pingBad.a = fade;
+
 			CG_LerpColour( &pingGood, &pingBad, &pingColour, min( score->ping / 300.0f, 1.0f ) );
 
 			column = 0;
@@ -372,16 +382,18 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 // returns number of players on team 'team'
 static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int fontHandle, float lineHeight, team_t team ) {
 	const char *tmp = NULL;
-	const vector4	white = { 1.0f, 1.0f, 1.0f, fade },
-		blue = { 0.6f, 0.6f, 1.0f, fade },
-		background = { 0.75f, 0.75f, 0.75f, 0.6f*fade },
-		teamRed = { 0.7f, 0.4f, 0.4f, 0.6f*fade },
-		teamBlue = { 0.4f, 0.4f, 0.7f, 0.6f*fade };
+	vector4	white = { 1.0f, 1.0f, 1.0f, 1.0f },
+		blue = { 0.6f, 0.6f, 1.0f, 1.0f },
+		background = { 0.75f, 0.75f, 0.75f, 1.0f },
+		teamRed = { 0.7f, 0.4f, 0.4f, 1.0f },
+		teamBlue = { 0.4f, 0.4f, 0.7f, 1.0f };
 	const vector4 *teamBackground = &background;
 	int i, count = 0, column = 0;
 	const float endX = SCREEN_WIDTH / 2.0f, columnOffset[] = { /*name*/80.0f, /*score*/170.0f, /*capture*/195.0f,
 		/*defend*/220.f, /*assist*/245.f, /*ping*/270.0f, /*time*/295.0f };
 	float savedY = 0.0f;
+	white.a = blue.a = fade;
+	background.a = teamRed.a = teamBlue.a = 0.6f * fade;
 
 	if ( team == TEAM_RED )
 		teamBackground = &teamRed;
@@ -462,8 +474,9 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 		score_t *score = &cg.scores[i];
 		clientInfo_t *ci = &cgs.clientinfo[score->client];
 		if ( ci->team == team ) {
-			vector4	pingColour = { 1.0f, 1.0f, 1.0f, fade };
-			const vector4 pingGood = { 0.0f, 1.0f, 0.0f, fade }, pingBad = { 1.0f, 0.0f, 0.0f, fade };
+			vector4	pingColour = { 1.0f, 1.0f, 1.0f, 1.0f }, pingGood = { 0.0f, 1.0f, 0.0f, 1.0f },
+				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
+			pingColour.a = pingGood.a = pingBad.a = fade;
 			CG_LerpColour( &pingGood, &pingBad, &pingColour, min( score->ping / 300.0f, 1.0f ) );
 
 			column = 0;
@@ -547,16 +560,18 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 // returns number of players on team 'team'
 static int ListPlayers_CTF( float fade, float x, float y, float fontScale, int fontHandle, float lineHeight, team_t team ) {
 	const char *tmp = NULL;
-	const vector4	white = { 1.0f, 1.0f, 1.0f, fade },
-		blue = { 0.6f, 0.6f, 1.0f, fade },
-		background = { 0.75f, 0.75f, 0.75f, 0.6f*fade },
-		teamRed = { 0.7f, 0.4f, 0.4f, 0.6f*fade },
-		teamBlue = { 0.4f, 0.4f, 0.7f, 0.6f*fade };
+	vector4 white = { 1.0f, 1.0f, 1.0f, 1.0f },
+		blue = { 0.6f, 0.6f, 1.0f, 1.0f },
+		background = { 0.75f, 0.75f, 0.75f, 1.0f },
+		teamRed = { 0.7f, 0.4f, 0.4f, 1.0f },
+		teamBlue = { 0.4f, 0.4f, 0.7f, 1.0f };
 	const vector4	*teamBackground = &background;
 	int i, count = 0, column = 0;
 	const float endX = SCREEN_WIDTH / 2.0f, columnOffset[] = { /*name*/80.0f, /*score*/170.0f, /*capture*/195.0f,
 		/*defend*/220.f, /*assist*/245.f, /*ping*/270.0f, /*time*/295.0f };
 	float savedY = 0.0f;
+	white.a = blue.a = fade;
+	background.a = teamRed.a = teamBlue.a = 0.6f * fade;
 
 	if ( team == TEAM_RED )
 		teamBackground = &teamRed;
@@ -637,8 +652,9 @@ static int ListPlayers_CTF( float fade, float x, float y, float fontScale, int f
 		score_t *score = &cg.scores[i];
 		clientInfo_t *ci = &cgs.clientinfo[score->client];
 		if ( ci->team == team ) {
-			vector4 pingColour = { 1.0f, 1.0f, 1.0f, fade };
-			const vector4  pingGood = { 0.0f, 1.0f, 0.0f, fade }, pingBad = { 1.0f, 0.0f, 0.0f, fade };
+			vector4 pingColour = { 1.0f, 1.0f, 1.0f, 1.0f }, pingGood = { 0.0f, 1.0f, 0.0f, 1.0f },
+				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
+			pingColour.a = pingGood.a = pingBad.a = fade;
 			CG_LerpColour( &pingGood, &pingBad, &pingColour, min( score->ping / 300.0f, 1.0f ) );
 
 			column = 0;
@@ -791,7 +807,8 @@ static void DrawSpectators( float fade ) {
 	const qhandle_t fontHandle = MenuFontToHandle( JP_GetScoreboardFont() );
 	const float fontScale = 0.5f, lineHeight = 14.0f;
 	float y = 128.0f;
-	const vector4 white = { 1.0f, 1.0f, 1.0f, fade };
+	vector4 white = { 1.0f, 1.0f, 1.0f, 1.0f };
+	white.a = fade;
 
 	CG_BuildSpectatorString();
 	cg.scoreboard.spectatorWidth = CG_Text_Width( cg.scoreboard.spectatorList, fontScale, fontHandle );

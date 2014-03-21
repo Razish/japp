@@ -9,8 +9,8 @@
 
 
 // Bryar
-void FX_BryarProjectileThink(  centity_t *cent, const struct weaponInfo_s *weapon );
-void FX_BryarAltProjectileThink(  centity_t *cent, const struct weaponInfo_s *weapon );
+void FX_BryarProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon );
+void FX_BryarAltProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon );
 
 // Disruptor
 void FX_DisruptorMainShot( vector3 *start, vector3 *end );

@@ -67,25 +67,25 @@ typedef struct adminUser_s {
 #define PRIV_RENAME		(0x02000000u)
 #define PRIV_LOCKTEAM	(0x04000000u)
 
-void		AM_AddAdmin				( const char *user, const char *pass, uint32_t privileges, const int rank, const char *loginMsg  );
-void		AM_DeleteAdmin			( const char *user );
-void		AM_ListAdmins			( void );
-void		AM_LoadAdmins			( void );
-void		AM_SaveAdmins			( void );
-void		AM_LoadTelemarks		( void );
-void		AM_SaveTelemarks		( void );
+void		AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const int rank, const char *loginMsg );
+void		AM_DeleteAdmin( const char *user );
+void		AM_ListAdmins( void );
+void		AM_LoadAdmins( void );
+void		AM_SaveAdmins( void );
+void		AM_LoadTelemarks( void );
+void		AM_SaveTelemarks( void );
 
-qboolean	AM_HasPrivilege			( const gentity_t *ent, uint32_t privilege );
-void		AM_PrintCommands		( gentity_t *ent );
-qboolean	AM_HandleCommands		( gentity_t *ent, const char *cmd );
+qboolean	AM_HasPrivilege( const gentity_t *ent, uint32_t privilege );
+void		AM_PrintCommands( gentity_t *ent );
+qboolean	AM_HandleCommands( gentity_t *ent, const char *cmd );
 
 // bans
-void		JKG_Bans_Clear			( void );
-void		JKG_Bans_LoadBans		( void );
-void		JKG_Bans_Init			( void );
-void		JKG_Bans_SaveBans		( void );
-void		JKG_Bans_List			( void );
-qboolean	JKG_Bans_Remove			( byte *ip );
-int			JKG_Bans_AddBanString	( const char *ip, const char *duration, const char *reason );
-const char	*JKG_Bans_IsBanned		( byte *ip );
-byteAlias_t *BuildByteFromIP		( const char *ip );
+void		JKG_Bans_Clear( void );
+void		JKG_Bans_LoadBans( void );
+void		JKG_Bans_Init( void );
+void		JKG_Bans_SaveBans( void );
+void		JKG_Bans_List( void );
+qboolean	JKG_Bans_Remove( byte *ip );
+int			JKG_Bans_AddBanString( const char *ip, const char *duration, const char *reason );
+const char	*JKG_Bans_IsBanned( byte *ip );
+byteAlias_t *BuildByteFromIP( const char *ip );

@@ -23,11 +23,11 @@
 #define JAPLUS_CLIENT_VERSION	"1.4B4"
 
 #if defined(_GAME)
-	// ...
+// ...
 #elif defined(_CGAME) || defined(_UI)
 //	#define JPLUA_DEBUG
-	#define RAZTEST //Vehicles? First person stuff?
-	#define IMPROVED_RAGDOLL
+#define RAZTEST //Vehicles? First person stuff?
+#define IMPROVED_RAGDOLL
 //	#define FAV_SERVERS // jappeng adds this to engine
 #endif
 
@@ -69,20 +69,20 @@
 */
 
 #ifdef _DEBUG
-	#define G2_PERFORMANCE_ANALYSIS
-	#define _FULL_G2_LEAK_CHECKING
-	extern int g_Ghoul2Allocations;
-	extern int g_G2ServerAlloc;
-	extern int g_G2ClientAlloc;
-	extern int g_G2AllocServer;
+#define G2_PERFORMANCE_ANALYSIS
+#define _FULL_G2_LEAK_CHECKING
+extern int g_Ghoul2Allocations;
+extern int g_G2ServerAlloc;
+extern int g_G2ClientAlloc;
+extern int g_G2AllocServer;
 #endif
 
 #if defined(_MSC_VER)
-	#define Q_EXPORT __declspec(dllexport)
+#define Q_EXPORT __declspec(dllexport)
 #elif __GNUC__ >= 3
-	#define Q_EXPORT __attribute__((visibility("default")))
+#define Q_EXPORT __attribute__((visibility("default")))
 #else
-	#define Q_EXPORT
+#define Q_EXPORT
 #endif
 
 #include <assert.h>
@@ -99,31 +99,31 @@
 #include <stdint.h>
 
 #if UINTPTR_MAX == 0xffffffff
-	#define QARCH 32
+#define QARCH 32
 #elif UINTPTR_MAX == 0xffffffffffffffff
-	#define QARCH 64
+#define QARCH 64
 #else
-	#error "Could not determine architecture"
+#error "Could not determine architecture"
 #endif
 
 #define JAPP_VERSION_SMALL "JA++, "XSTRING(QARCH)" bits, "__DATE__
 #ifdef REVISION
-	#define JAPP_VERSION "JA++, "XSTRING(QARCH)" bits, "__DATE__", "REVISION
+#define JAPP_VERSION "JA++, "XSTRING(QARCH)" bits, "__DATE__", "REVISION
 #else
-	#define JAPP_VERSION JAPP_VERSION_SMALL
+#define JAPP_VERSION JAPP_VERSION_SMALL
 #endif
 
 // this is the define for determining if we have an asm version of a C function
 #if (defined(_M_IX86) || defined(__i386__)) && !defined(__sun__) && !defined(__LCC__)
-	#define id386	1
+#define id386	1
 #else
-	#define id386	0
+#define id386	0
 #endif
 
 #if (defined(powerc) || defined(powerpc) || defined(ppc) || defined(__ppc) || defined(__ppc__)) && !defined(C_ONLY)
-	#define idppc	1
+#define idppc	1
 #else
-	#define idppc	0
+#define idppc	0
 #endif
 
 // for windows fastcall option
@@ -142,29 +142,29 @@ float FloatSwap( const float *f );
 
 #ifdef _WIN32
 
-	//Raz: added
-	#define WIN32_LEAN_AND_MEAN
-	#define NOSCROLL
-	#include <windows.h>
+//Raz: added
+#define WIN32_LEAN_AND_MEAN
+#define NOSCROLL
+#include <windows.h>
 
-	#undef QDECL
-	#define	QDECL __cdecl
+#undef QDECL
+#define	QDECL __cdecl
 
-	// buildstring will be incorporated into the version string
-	#define ARCH_STRING "x86"
+// buildstring will be incorporated into the version string
+#define ARCH_STRING "x86"
 
-	#define QINLINE __inline
+#define QINLINE __inline
 //	#define USE_SSE
 
-	static QINLINE short BigShort( short l) { return ShortSwap(l); }
-	#define LittleShort
-	static QINLINE int BigLong(int l) { return LongSwap(l); }
-	#define LittleLong
-	static QINLINE float BigFloat(const float *l) { return FloatSwap(l); }
-	#define LittleFloat
+static QINLINE short BigShort( short l ) { return ShortSwap( l ); }
+#define LittleShort
+static QINLINE int BigLong( int l ) { return LongSwap( l ); }
+#define LittleLong
+static QINLINE float BigFloat( const float *l ) { return FloatSwap( l ); }
+#define LittleFloat
 
-	#define	PATH_SEP "\\"
-	#define DLL_EXT ".dll"
+#define	PATH_SEP "\\"
+#define DLL_EXT ".dll"
 
 #endif // _WIN32
 
@@ -177,59 +177,59 @@ float FloatSwap( const float *f );
 
 #ifdef MACOS_X
 
-	#include <sys/mman.h>
-	#include <unistd.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
-	#define __cdecl
-	#define __declspec(x)
-	#define stricmp strcasecmp
-	#define QINLINE /*inline*/
+#define __cdecl
+#define __declspec(x)
+#define stricmp strcasecmp
+#define QINLINE /*inline*/
 
-	#if defined(__ppc__)
-		#define ARCH_STRING "ppc"
-		#define Q3_BIG_ENDIAN
-	#elif defined(__i386__)
-		#define ARCH_STRING "x86"
-		#define Q3_LITTLE_ENDIAN
-	#elif defined(__x86_64__)
-		#define idx64
-		#define ARCH_STRING "x86_64"
-		#define Q3_LITTLE_ENDIAN
-	#endif
+#if defined(__ppc__)
+#define ARCH_STRING "ppc"
+#define Q3_BIG_ENDIAN
+#elif defined(__i386__)
+#define ARCH_STRING "x86"
+#define Q3_LITTLE_ENDIAN
+#elif defined(__x86_64__)
+#define idx64
+#define ARCH_STRING "x86_64"
+#define Q3_LITTLE_ENDIAN
+#endif
 
-	#define	PATH_SEP "/"
-	#define DLL_EXT ".dylib"
+#define	PATH_SEP "/"
+#define DLL_EXT ".dylib"
 
-	#define __rlwimi(out, in, shift, maskBegin, maskEnd) asm("rlwimi %0,%1,%2,%3,%4" : "=r" (out) : "r" (in), "i" (shift), "i" (maskBegin), "i" (maskEnd))
-	#define __dcbt(addr, offset) asm("dcbt %0,%1" : : "b" (addr), "r" (offset))
+#define __rlwimi(out, in, shift, maskBegin, maskEnd) asm("rlwimi %0,%1,%2,%3,%4" : "=r" (out) : "r" (in), "i" (shift), "i" (maskBegin), "i" (maskEnd))
+#define __dcbt(addr, offset) asm("dcbt %0,%1" : : "b" (addr), "r" (offset))
 
-	static inline unsigned int __lwbrx(register void *addr, register int offset) {
-		register unsigned int word;
+static inline unsigned int __lwbrx(register void *addr, register int offset) {
+	register unsigned int word;
 
-		asm("lwbrx %0,%2,%1" : "=r" (word) : "r" (addr), "b" (offset));
-		return word;
-	}
+	asm("lwbrx %0,%2,%1" : "=r" (word) : "r" (addr), "b" (offset));
+	return word;
+}
 
-	static inline unsigned short __lhbrx(register void *addr, register int offset) {
-		register unsigned short halfword;
+static inline unsigned short __lhbrx(register void *addr, register int offset) {
+	register unsigned short halfword;
 
-		asm("lhbrx %0,%2,%1" : "=r" (halfword) : "r" (addr), "b" (offset));
-		return halfword;
-	}
+	asm("lhbrx %0,%2,%1" : "=r" (halfword) : "r" (addr), "b" (offset));
+	return halfword;
+}
 
-	static inline float __fctiw(register float f) {
-		register float fi;
+static inline float __fctiw(register float f) {
+	register float fi;
 
-		asm("fctiw %0,%1" : "=f" (fi) : "f" (f));
-		return fi;
-	}
+	asm("fctiw %0,%1" : "=f" (fi) : "f" (f));
+	return fi;
+}
 
-	#define BigShort
-	static inline short LittleShort( short l ) { return ShortSwap( l ); }
-	#define BigLong
-	static inline int LittleLong( int l ) { return LongSwap( l ); }
-	#define BigFloat
-	static inline float LittleFloat( const float l ) { return FloatSwap( &l ); }
+#define BigShort
+static inline short LittleShort( short l ) { return ShortSwap( l ); }
+#define BigLong
+static inline int LittleLong( int l ) { return LongSwap( l ); }
+#define BigFloat
+static inline float LittleFloat( const float l ) { return FloatSwap( &l ); }
 
 #endif // MACOS_X
 
@@ -241,73 +241,73 @@ float FloatSwap( const float *f );
 // ================================================================
 
 #ifdef __linux__
-	#include <sys/mman.h>
-	#include <unistd.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
-	// bk001205 - from Makefile
-	#define stricmp strcasecmp
+// bk001205 - from Makefile
+#define stricmp strcasecmp
 
-	#define QINLINE inline
+#define QINLINE inline
 
-	#if defined(__i386__)
-		#define ARCH_STRING "i386"
-	#elif defined(__x86_64__)
-		#define idx64
-		#define ARCH_STRING "x86_64"
-	#elif defined(__powerpc64__)
-		#define ARCH_STRING "ppc64"
-	#elif defined(__powerpc__)
-		#define ARCH_STRING "ppc"
-	#elif defined(__s390__)
-		#define ARCH_STRING "s390"
-	#elif defined(__s390x__)
-		#define ARCH_STRING "s390x"
-	#elif defined(__ia64__)
-		#define ARCH_STRING "ia64"
-	#elif defined(__alpha__)
-		#define ARCH_STRING "alpha"
-	#elif defined(__sparc__)
-		#define ARCH_STRING "sparc"
-	#elif defined(__arm__)
-		#define ARCH_STRING "arm"
-	#elif defined(__cris__)
-		#define ARCH_STRING "cris"
-	#elif defined(__hppa__)
-		#define ARCH_STRING "hppa"
-	#elif defined(__mips__)
-		#define ARCH_STRING "mips"
-	#elif defined(__sh__)
-		#define ARCH_STRING "sh"
-	#endif
+#if defined(__i386__)
+#define ARCH_STRING "i386"
+#elif defined(__x86_64__)
+#define idx64
+#define ARCH_STRING "x86_64"
+#elif defined(__powerpc64__)
+#define ARCH_STRING "ppc64"
+#elif defined(__powerpc__)
+#define ARCH_STRING "ppc"
+#elif defined(__s390__)
+#define ARCH_STRING "s390"
+#elif defined(__s390x__)
+#define ARCH_STRING "s390x"
+#elif defined(__ia64__)
+#define ARCH_STRING "ia64"
+#elif defined(__alpha__)
+#define ARCH_STRING "alpha"
+#elif defined(__sparc__)
+#define ARCH_STRING "sparc"
+#elif defined(__arm__)
+#define ARCH_STRING "arm"
+#elif defined(__cris__)
+#define ARCH_STRING "cris"
+#elif defined(__hppa__)
+#define ARCH_STRING "hppa"
+#elif defined(__mips__)
+#define ARCH_STRING "mips"
+#elif defined(__sh__)
+#define ARCH_STRING "sh"
+#endif
 
-	#define	PATH_SEP "/"
-	#define DLL_EXT ".so"
+#define	PATH_SEP "/"
+#define DLL_EXT ".so"
 
-	#define RAND_MAX 2147483647
+#define RAND_MAX 2147483647
 
-	// bk001205 - try
-	#ifdef Q3_STATIC
-		#define	GAME_HARD_LINKED
-		#define	CGAME_HARD_LINKED
-		#define	UI_HARD_LINKED
-		#define	BOTLIB_HARD_LINKED
-	#endif
+// bk001205 - try
+#ifdef Q3_STATIC
+#define	GAME_HARD_LINKED
+#define	CGAME_HARD_LINKED
+#define	UI_HARD_LINKED
+#define	BOTLIB_HARD_LINKED
+#endif
 
-	#if !idppc
-		inline static short BigShort( short l ) { return ShortSwap( l ); }
-		#define LittleShort
-		inline static int BigLong( int l ) { return LongSwap( l ); }
-		#define LittleLong
-		inline static float BigFloat( const float *l ) { return FloatSwap( l ); }
-		#define LittleFloat
-	#else // idppc
-		#define BigShort
-		inline static short LittleShort( short l ) { return ShortSwap( l ); }
-		#define BigLong
-		inline static int LittleLong( int l ) { return LongSwap( l ); }
-		#define BigFloat
-		inline static float LittleFloat( const float *l ) { return FloatSwap( l ); }
-	#endif // idppc
+#if !idppc
+inline static short BigShort( short l ) { return ShortSwap( l ); }
+#define LittleShort
+inline static int BigLong( int l ) { return LongSwap( l ); }
+#define LittleLong
+inline static float BigFloat( const float *l ) { return FloatSwap( l ); }
+#define LittleFloat
+#else // idppc
+#define BigShort
+inline static short LittleShort( short l ) { return ShortSwap( l ); }
+#define BigLong
+inline static int LittleLong( int l ) { return LongSwap( l ); }
+#define BigFloat
+inline static float LittleFloat( const float *l ) { return FloatSwap( l ); }
+#endif // idppc
 
 #endif // __linux__
 
@@ -320,39 +320,39 @@ float FloatSwap( const float *f );
 
 #ifdef __FreeBSD__ // rb010123
 
-	#define stricmp strcasecmp
+#define stricmp strcasecmp
 
-	#define QINLINE inline
+#define QINLINE inline
 
-	#if defined(__i386__)
-		#define ARCH_STRING "i386"
-	#elif defined(__amd64__)
-		#define idx64
-		#define ARCH_STRING "amd64"
-	#elif defined(__axp__)
-		#define ARCH_STRING "alpha"
-	#endif
+#if defined(__i386__)
+#define ARCH_STRING "i386"
+#elif defined(__amd64__)
+#define idx64
+#define ARCH_STRING "amd64"
+#elif defined(__axp__)
+#define ARCH_STRING "alpha"
+#endif
 
-	#define	PATH_SEP "/"
-	#define DLL_EXT ".so"
+#define	PATH_SEP "/"
+#define DLL_EXT ".so"
 
-	// bk010116 - omitted Q3STATIC (see Linux above), broken target
+// bk010116 - omitted Q3STATIC (see Linux above), broken target
 
-	#if !idppc
-		static short BigShort( short l ) { return ShortSwap( l ); }
-		#define LittleShort
-		static int BigLong( int l ) { LongSwap( l ); }
-		#define LittleLong
-		static float BigFloat( const float *l ) { FloatSwap( l ); }
-		#define LittleFloat
-	#else // idppc
-		#define BigShort
-		static short LittleShort( short l ) { return ShortSwap( l ); }
-		#define BigLong
-		static int LittleLong( int l ) { return LongSwap( l ); }
-		#define BigFloat
-		static float LittleFloat( const float *l ) { return FloatSwap( l ); }
-	#endif // idppc
+#if !idppc
+static short BigShort( short l ) { return ShortSwap( l ); }
+#define LittleShort
+static int BigLong( int l ) { LongSwap( l ); }
+#define LittleLong
+static float BigFloat( const float *l ) { FloatSwap( l ); }
+#define LittleFloat
+#else // idppc
+#define BigShort
+static short LittleShort( short l ) { return ShortSwap( l ); }
+#define BigLong
+static int LittleLong( int l ) { return LongSwap( l ); }
+#define BigFloat
+static float LittleFloat( const float *l ) { return FloatSwap( l ); }
+#endif // idppc
 
 #endif // __FreeBSD__
 
@@ -368,7 +368,7 @@ typedef unsigned short word;
 typedef unsigned long ulong;
 
 enum qboolean_e {
-	qfalse=0,
+	qfalse = 0,
 	qtrue
 };
 typedef uint32_t qboolean;
@@ -395,34 +395,34 @@ typedef int32_t qhandle_t, thandle_t, fxHandle_t, sfxHandle_t, fileHandle_t, cli
 //		should probably be in the platform specific definitions
 #if defined (_MSC_VER) && (_MSC_VER >= 1600)
 
-	// vsnprintf is ISO/IEC 9899:1999
-	// abstracting this to make it portable
-	int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
+// vsnprintf is ISO/IEC 9899:1999
+// abstracting this to make it portable
+int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
 
 #elif defined (_MSC_VER)
 
-	#include <io.h>
+#include <io.h>
 
-	typedef signed __int64 int64_t;
-	typedef signed __int32 int32_t;
-	typedef signed __int16 int16_t;
-	typedef signed __int8  int8_t;
-	typedef unsigned __int64 uint64_t;
-	typedef unsigned __int32 uint32_t;
-	typedef unsigned __int16 uint16_t;
-	typedef unsigned __int8  uint8_t;
+typedef signed __int64 int64_t;
+typedef signed __int32 int32_t;
+typedef signed __int16 int16_t;
+typedef signed __int8  int8_t;
+typedef unsigned __int64 uint64_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int8  uint8_t;
 
-	// vsnprintf is ISO/IEC 9899:1999
-	// abstracting this to make it portable
-	int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
+// vsnprintf is ISO/IEC 9899:1999
+// abstracting this to make it portable
+int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
 #else // not using MSVC
 
-	#define Q_vsnprintf vsnprintf
+#define Q_vsnprintf vsnprintf
 
 #endif
 
 #ifndef NULL
-	#define NULL ((void *)0)
+#define NULL ((void *)0)
 #endif
 
 #define	MAX_QINT			0x7fffffff
@@ -455,9 +455,9 @@ typedef int32_t qhandle_t, thandle_t, fxHandle_t, sfxHandle_t, fileHandle_t, cli
 
 #define	MAX_QPATH			64		// max length of a quake game pathname
 #ifdef PATH_MAX
-	#define MAX_OSPATH			PATH_MAX
+#define MAX_OSPATH			PATH_MAX
 #else
-	#define	MAX_OSPATH			256		// max length of a filesystem pathname
+#define	MAX_OSPATH			256		// max length of a filesystem pathname
 #endif
 
 #define	MAX_NAME_LENGTH		32		// max length of a client name
@@ -489,7 +489,7 @@ typedef enum cbufExec_t {
 
 //For system-wide prints
 typedef enum warningLevel_e {
-	WL_ERROR=1,
+	WL_ERROR = 1,
 	WL_WARNING,
 	WL_VERBOSE,
 	WL_DEBUG
@@ -555,7 +555,7 @@ typedef enum errorParm_e {
 #define UI_PULSE		0x00004000
 
 #if defined(_DEBUG) && !defined(BSPC)
-	#define HUNK_DEBUG
+#define HUNK_DEBUG
 #endif
 
 typedef enum ha_pref_e {
@@ -566,8 +566,8 @@ typedef enum ha_pref_e {
 
 void *Hunk_Alloc( int size, ha_pref preference );
 
-void Com_Memset (void* dest, const int val, const size_t count);
-void Com_Memcpy (void* dest, const void* src, const size_t count);
+void Com_Memset( void* dest, const int val, const size_t count );
+void Com_Memcpy( void* dest, const void* src, const size_t count );
 
 #define CIN_system	1
 #define CIN_loop	2
@@ -589,8 +589,8 @@ typedef float number;
 typedef signed int integer;
 
 #ifdef _MSC_VER
-	#pragma warning( push )
-	#pragma warning( disable : 4201 )
+#pragma warning( push )
+#pragma warning( disable : 4201 )
 #endif
 
 typedef union vector2_u {
@@ -633,7 +633,7 @@ typedef union ivector4_u {
 } ivector4;
 
 #ifdef _MSC_VER
-	#pragma warning( pop )
+#pragma warning( pop )
 #endif
 
 typedef	signed int fixed4_t, fixed8_t, fixed16_t;
@@ -682,8 +682,8 @@ typedef enum saber_colors_e {
 } saber_colors_t;
 
 typedef enum forcePowers_e {
-	FP_FIRST=0, // marker
-	FP_HEAL=0, // instant
+	FP_FIRST = 0, // marker
+	FP_HEAL = 0, // instant
 	FP_LEVITATION, // hold/duration
 	FP_SPEED, // duration
 	FP_PUSH, // hold/duration
@@ -704,8 +704,7 @@ typedef enum forcePowers_e {
 	NUM_FORCE_POWERS
 } forcePowers_t;
 
-typedef enum forcePowerLevels_e
-{
+typedef enum forcePowerLevels_e {
 	FORCE_LEVEL_0,
 	FORCE_LEVEL_1,
 	FORCE_LEVEL_2,
@@ -728,35 +727,34 @@ typedef enum sharedERagPhase_e {
 } sharedERagPhase_t;
 
 enum sharedERagEffector_e {
-	RE_MODEL_ROOT=			0x00000001, //"model_root"
-	RE_PELVIS=				0x00000002, //"pelvis"
-	RE_LOWER_LUMBAR=		0x00000004, //"lower_lumbar"
-	RE_UPPER_LUMBAR=		0x00000008, //"upper_lumbar"
-	RE_THORACIC=			0x00000010, //"thoracic"
-	RE_CRANIUM=				0x00000020, //"cranium"
-	RE_RHUMEROUS=			0x00000040, //"rhumerus"
-	RE_LHUMEROUS=			0x00000080, //"lhumerus"
-	RE_RRADIUS=				0x00000100, //"rradius"
-	RE_LRADIUS=				0x00000200, //"lradius"
-	RE_RFEMURYZ=			0x00000400, //"rfemurYZ"
-	RE_LFEMURYZ=			0x00000800, //"lfemurYZ"
-	RE_RTIBIA=				0x00001000, //"rtibia"
-	RE_LTIBIA=				0x00002000, //"ltibia"
-	RE_RHAND=				0x00004000, //"rhand"
-	RE_LHAND=				0x00008000, //"lhand"
-	RE_RTARSAL=				0x00010000, //"rtarsal"
-	RE_LTARSAL=				0x00020000, //"ltarsal"
-	RE_RTALUS=				0x00040000, //"rtalus"
-	RE_LTALUS=				0x00080000, //"ltalus"
-	RE_RRADIUSX=			0x00100000, //"rradiusX"
-	RE_LRADIUSX=			0x00200000, //"lradiusX"
-	RE_RFEMURX=				0x00400000, //"rfemurX"
-	RE_LFEMURX=				0x00800000, //"lfemurX"
-	RE_CEYEBROW=			0x01000000 //"ceyebrow"
+	RE_MODEL_ROOT = 0x00000001, //"model_root"
+	RE_PELVIS = 0x00000002, //"pelvis"
+	RE_LOWER_LUMBAR = 0x00000004, //"lower_lumbar"
+	RE_UPPER_LUMBAR = 0x00000008, //"upper_lumbar"
+	RE_THORACIC = 0x00000010, //"thoracic"
+	RE_CRANIUM = 0x00000020, //"cranium"
+	RE_RHUMEROUS = 0x00000040, //"rhumerus"
+	RE_LHUMEROUS = 0x00000080, //"lhumerus"
+	RE_RRADIUS = 0x00000100, //"rradius"
+	RE_LRADIUS = 0x00000200, //"lradius"
+	RE_RFEMURYZ = 0x00000400, //"rfemurYZ"
+	RE_LFEMURYZ = 0x00000800, //"lfemurYZ"
+	RE_RTIBIA = 0x00001000, //"rtibia"
+	RE_LTIBIA = 0x00002000, //"ltibia"
+	RE_RHAND = 0x00004000, //"rhand"
+	RE_LHAND = 0x00008000, //"lhand"
+	RE_RTARSAL = 0x00010000, //"rtarsal"
+	RE_LTARSAL = 0x00020000, //"ltarsal"
+	RE_RTALUS = 0x00040000, //"rtalus"
+	RE_LTALUS = 0x00080000, //"ltalus"
+	RE_RRADIUSX = 0x00100000, //"rradiusX"
+	RE_LRADIUSX = 0x00200000, //"lradiusX"
+	RE_RFEMURX = 0x00400000, //"rfemurX"
+	RE_LFEMURX = 0x00800000, //"lfemurX"
+	RE_CEYEBROW = 0x01000000 //"ceyebrow"
 } sharedERagEffector_t;
 
-typedef struct sharedRagDollParams_s
-{
+typedef struct sharedRagDollParams_s {
 	vector3 angles;
 	vector3 position;
 	vector3 scale;
@@ -777,15 +775,14 @@ typedef struct sharedRagDollParams_s
 
 	int RagPhase;
 
-// effector control, used for RP_DISABLE_EFFECTORS call
+	// effector control, used for RP_DISABLE_EFFECTORS call
 
 	int effectorsToTurnOff;  // set this to an | of the above flags for a RP_DISABLE_EFFECTORS
 
 } sharedRagDollParams_t;
 
 //And one for updating during model animation.
-typedef struct sharedRagDollUpdateParams_s
-{
+typedef struct sharedRagDollUpdateParams_s {
 	vector3 angles;
 	vector3 position;
 	vector3 scale;
@@ -795,8 +792,7 @@ typedef struct sharedRagDollUpdateParams_s
 } sharedRagDollUpdateParams_t;
 
 //rww - update parms for ik bone stuff
-typedef struct sharedIKMoveParams_s
-{
+typedef struct sharedIKMoveParams_s {
 	char boneName[512]; //name of bone
 	vector3 desiredOrigin; //world coordinate that this bone should be attempting to reach
 	vector3 origin; //world coordinate of the entity who owns the g2 instance that owns the bone
@@ -804,8 +800,7 @@ typedef struct sharedIKMoveParams_s
 } sharedIKMoveParams_t;
 
 
-typedef struct sharedSetBoneIKStateParams_s
-{
+typedef struct sharedSetBoneIKStateParams_s {
 	vector3 pcjMins; //ik joint limit
 	vector3 pcjMaxs; //ik joint limit
 	vector3 origin; //origin of caller
@@ -819,15 +814,13 @@ typedef struct sharedSetBoneIKStateParams_s
 	qboolean forceAnimOnBone; //normally if the bone has specified start/end frames already it will leave it alone.. if this is true, then the animation will be restarted on the bone with the specified frames anyway.
 } sharedSetBoneIKStateParams_t;
 
-enum sharedEIKMoveState_e
-{
+enum sharedEIKMoveState_e {
 	IKS_NONE = 0,
 	IKS_DYNAMIC
 } sharedEIKMoveState_t;
 
 //material stuff needs to be shared
-typedef enum material_e
-{
+typedef enum material_e {
 	MAT_METAL = 0,	// scorched blue-grey metal
 	MAT_GLASS,		// not a real chunk type, just plays an effect with glass sprites
 	MAT_ELECTRICAL,	// sparks only
@@ -859,14 +852,12 @@ typedef enum material_e
 
 #define DEFAULT_GRID_SPACING 400
 
-typedef struct wpneighbor_s
-{
+typedef struct wpneighbor_s {
 	int num;
 	int forceJumpTo;
 } wpneighbor_t;
 
-typedef struct wpobject_s
-{
+typedef struct wpobject_s {
 	vector3 origin;
 	int inuse;
 	int index;
@@ -902,8 +893,7 @@ extern const vector3 bytedirs[NUMVERTEXNORMALS];
 #define	GIANTCHAR_WIDTH		32
 #define	GIANTCHAR_HEIGHT	48
 
-typedef enum ct_table_e
-{
+typedef enum ct_table_e {
 	CT_NONE,
 	CT_BLACK,
 	CT_RED,
@@ -1033,7 +1023,7 @@ extern const vector4 colorDkBlue;
 #define S_COLOR_ORANGE	"^8"
 #define S_COLOR_GREY	"^9"
 
-extern const vector4 g_color_table[Q_COLOR_BITS+1];
+extern const vector4 g_color_table[Q_COLOR_BITS + 1];
 
 #define	MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
 #define	MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
@@ -1046,22 +1036,22 @@ extern	vector3	axisDefault[3];
 #if idppc
 
 static inline float Q_rsqrt( float number ) {
-		float x = 0.5f * number;
-                float y;
+	float x = 0.5f * number;
+	float y;
 #ifdef __GNUC__
-                asm("frsqrte %0,%1" : "=f" (y) : "f" (number));
+	asm("frsqrte %0,%1" : "=f" (y) : "f" (number));
 #else
-		y = __frsqrte( number );
+	y = __frsqrte( number );
 #endif
-		return y * (1.5f - (x * y * y));
-	}
+	return y * (1.5f - (x * y * y));
+}
 
 #ifdef __GNUC__
 static inline float Q_fabs(float x) {
-    float abs_x;
+	float abs_x;
 
-    asm("fabs %0,%1" : "=f" (abs_x) : "f" (x));
-    return abs_x;
+	asm("fabs %0,%1" : "=f" (abs_x) : "f" (x));
+	return abs_x;
 }
 #else
 #define Q_fabs __fabsf
@@ -1080,7 +1070,7 @@ float Q_rsqrt( float f );		// reciprocal square root
 signed char ClampChar( int i );
 signed short ClampShort( int i );
 
-float Q_powf ( float x, int y );
+float Q_powf( float x, int y );
 
 // this isn't a real cheap function to call!
 int DirToByte( vector3 *dir );
@@ -1090,10 +1080,10 @@ void ByteToDir( int b, vector3 *dir );
 #define minimum( x, y ) ((x) < (y) ? (x) : (y))
 #define maximum( x, y ) ((x) > (y) ? (x) : (y))
 #ifndef min
-	#define min minimum
+#define min minimum
 #endif
 #ifndef max
-	#define max maximum
+#define max maximum
 #endif
 
 #define DEG2RAD( a ) ( ( (a) * M_PI ) / 180.0F )
@@ -1138,8 +1128,8 @@ void		VectorSnapTowards( vector3 *v, vector3 *to );
 #define VectorAdvance(a,s,b,c)			(((c)[0]=(a)[0] + s * ((b)[0] - (a)[0])),((c)[1]=(a)[1] + s * ((b)[1] - (a)[1])),((c)[2]=(a)[2] + s * ((b)[2] - (a)[2])))
 #define VectorAverage(a,b,c)			(((c)[0]=((a)[0]+(b)[0])*0.5f),((c)[1]=((a)[1]+(b)[1])*0.5f),((c)[2]=((a)[2]+(b)[2])*0.5f))
 
-unsigned ColorBytes3 (float r, float g, float b);
-unsigned ColorBytes4 (float r, float g, float b, float a);
+unsigned ColorBytes3( float r, float g, float b );
+unsigned ColorBytes4( float r, float g, float b, float a );
 
 float NormalizeColor( const vector3 *in, vector3 *out );
 
@@ -1148,10 +1138,10 @@ void ClearBounds( vector3 *mins, vector3 *maxs );
 number DistanceHorizontal( const vector3 *p1, const vector3 *p2 );
 number DistanceHorizontalSquared( const vector3 *p1, const vector3 *p2 );
 void AddPointToBounds( const vector3 *v, vector3 *mins, vector3 *maxs );
-int Q_log2(int val);
+int Q_log2( int val );
 
-float Q_acos(float c);
-float Q_asin(float c);
+float Q_acos( float c );
+float Q_asin( float c );
 
 int		Q_rand( int *seed );
 float	Q_random( int *seed );
@@ -1160,23 +1150,23 @@ float	Q_crandom( int *seed );
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0f * (random() - 0.5f))
 
-void vectoangles( const vector3 *value1, vector3 *angles);
+void vectoangles( const vector3 *value1, vector3 *angles );
 void AnglesToAxis( const vector3 *angles, vector3 axis[3] );
 
 void AxisClear( vector3 axis[3] );
 void AxisCopy( vector3 in[3], vector3 out[3] );
 
 void SetPlaneSignbits( struct cplane_s *out );
-int BoxOnPlaneSide (vector3 *emins, vector3 *emaxs, struct cplane_s *plane);
+int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *plane );
 
-float	AngleMod(float a);
-float	LerpAngle (float from, float to, float frac);
+float	AngleMod( float a );
+float	LerpAngle( float from, float to, float frac );
 float	AngleSubtract( float a1, float a2 );
 void	AnglesSubtract( vector3 *v1, vector3 *v2, vector3 *v3 );
 
-float AngleNormalize360 ( float angle );
-float AngleNormalize180 ( float angle );
-float AngleDelta ( float angle1, float angle2 );
+float AngleNormalize360( float angle );
+float AngleNormalize180( float angle );
+float AngleDelta( float angle1, float angle2 );
 
 qboolean PlaneFromPoints( vector4 *plane, const vector3 *a, const vector3 *b, const vector3 *c );
 void ProjectPointOnPlane( vector3 *dst, const vector3 *p, const vector3 *normal );
@@ -1188,7 +1178,7 @@ void MakeNormalVectors( const vector3 *forward, vector3 *right, vector3 *up );
 //int	PlaneTypeForNormal (vector3 *normal);
 
 void MatrixMultiply( const vector3 in1[3], const vector3 in2[3], vector3 out[3] );
-void AngleVectors( const vector3 *angles, vector3 *forward, vector3 *right, vector3 *up);
+void AngleVectors( const vector3 *angles, vector3 *forward, vector3 *right, vector3 *up );
 void PerpendicularVector( vector3 *dst, const vector3 *src );
 void NormalToLatLong( const vector3 *normal, byte bytes[2] ); //rwwRMG - added
 
@@ -1216,7 +1206,7 @@ void	COM_ParseWarning( char *format, ... );
 qboolean COM_ParseString( const char **data, const char **s );
 qboolean COM_ParseInt( const char **data, int *i );
 qboolean COM_ParseFloat( const char **data, float *f );
-qboolean COM_ParseVec4( const char **buffer, vector4 *c);
+qboolean COM_ParseVec4( const char **buffer, vector4 *c );
 //int		COM_ParseInfos( char *buf, int max, char infos[][MAX_INFO_STRING] );
 
 #define MAX_TOKENLENGTH		1024
@@ -1242,12 +1232,12 @@ typedef struct pc_token_s {
 
 void COM_MatchToken( const char**buf_p, const char *match );
 
-void SkipBracedSection (const char **program);
-void SkipRestOfLine ( const char **data );
+void SkipBracedSection( const char **program );
+void SkipRestOfLine( const char **data );
 
-void Parse1DMatrix (const char **buf_p, int x, float *m);
-void Parse2DMatrix (const char **buf_p, int y, int x, float *m);
-void Parse3DMatrix (const char **buf_p, int z, int y, int x, float *m);
+void Parse1DMatrix( const char **buf_p, int x, float *m );
+void Parse2DMatrix( const char **buf_p, int y, int x, float *m );
+void Parse3DMatrix( const char **buf_p, int z, int y, int x, float *m );
 
 // mode parm for FS_FOpenFile
 typedef enum fsMode_e {
@@ -1316,11 +1306,11 @@ void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
 #if defined( _GAME ) || defined( _CGAME ) || defined( _UI )
-	void (*Com_Error)( int level, const char *error, ... );
-	void (*Com_Printf)( const char *msg, ... );
+void( *Com_Error )(int level, const char *error, ...);
+void( *Com_Printf )(const char *msg, ...);
 #else
-	void QDECL Com_Error( int level, const char *error, ... );
-	void QDECL Com_Printf( const char *msg, ... );
+void QDECL Com_Error( int level, const char *error, ... );
+void QDECL Com_Printf( const char *msg, ... );
 #endif
 
 
@@ -1337,18 +1327,18 @@ default values.
 
 #define CVAR_NONE			0x00000000
 #define	CVAR_ARCHIVE		0x00000001		// set to cause it to be saved to vars.rc
-											// used for system variables, not for player
-											// specific configurations
+// used for system variables, not for player
+// specific configurations
 #define	CVAR_USERINFO		0x00000002		// sent to server on connect or change
 #define	CVAR_SERVERINFO		0x00000004		// sent in response to front end requests
 #define	CVAR_SYSTEMINFO		0x00000008		// these cvars will be duplicated on all clients
 #define	CVAR_INIT			0x00000010		// don't allow change from console at all,
-											// but can be set from the command line
+// but can be set from the command line
 #define	CVAR_LATCH			0x00000020		// will only change when C code next does
-											// a Cvar_Get(), so it can't be changed
-											// without proper initialization.  modified
-											// will be set, even though the value hasn't
-											// changed yet
+// a Cvar_Get(), so it can't be changed
+// without proper initialization.  modified
+// will be set, even though the value hasn't
+// changed yet
 #define	CVAR_ROM			0x00000040		// display only, cannot be set by user at all (can be set by code)
 #define	CVAR_USER_CREATED	0x00000080		// created by a set command
 #define	CVAR_TEMP			0x00000100		// can be set even when cheats are disabled, but is not archived
@@ -1424,8 +1414,7 @@ typedef struct cplane_s {
 /*
 Ghoul2 Insert Start
 */
-typedef struct CollisionRecord_s
-{
+typedef struct CollisionRecord_s {
 	float		mDistance;
 	int			mEntityNum;
 	int			mModelIndex;
@@ -1458,14 +1447,14 @@ typedef struct trace_s {
 	cplane_t	plane;		// surface normal at impact, transformed to world space
 	uint32_t	surfaceFlags;	// surface hit
 	uint32_t	contents;	// contents on other side of surface hit
-/*
-Ghoul2 Insert Start
-*/
+	/*
+	Ghoul2 Insert Start
+	*/
 	//rww - removed this for now, it's just wasting space in the trace structure.
-//	CollisionRecord_t G2CollisionMap[MAX_G2_COLLISIONS];	// map that describes all of the parts of ghoul2 models that got hit
-/*
-Ghoul2 Insert End
-*/
+	//	CollisionRecord_t G2CollisionMap[MAX_G2_COLLISIONS];	// map that describes all of the parts of ghoul2 models that got hit
+	/*
+	Ghoul2 Insert End
+	*/
 } trace_t;
 
 // trace->entityNum can also be 0 to (MAX_GENTITIES-1)
@@ -1520,7 +1509,7 @@ typedef enum soundChannel_e {
 /*
 ========================================================================
 
-  ELEMENTS COMMUNICATED ACROSS THE NET
+ELEMENTS COMMUNICATED ACROSS THE NET
 
 ========================================================================
 */
@@ -1549,12 +1538,12 @@ typedef enum soundChannel_e {
 							//rww - I am raising this 1 bit. SP actually has room for 1024 ents - none - world - 1 client.
 							//Which means 1021 useable entities. However we have 32 clients.. so if we keep our limit
 							//at 1024 we are not going to be able to load any SP levels at the edge of the ent limit.
-#define		MAX_GENTITIES	(1024+(MAX_CLIENTS-1))
+							#define		MAX_GENTITIES	(1024+(MAX_CLIENTS-1))
 							//rww - we do have enough room to send over 2048 ents now. However, I cannot live with the guilt of
 							//actually increasing the entity limit to 2048 (as it would slow down countless things, and
 							//there are tons of ent list traversals all over the place). So I am merely going to give enough
 							//to compensate for our larger maxclients.
-*/
+							*/
 
 // entitynums are communicated with GENTITY_BITS, so any reserved
 // values thatare going to be communcated over the net need to
@@ -1736,7 +1725,7 @@ typedef struct playerState_s {
 	float		speed;
 	int			basespeed; //used in prediction to know base server g_speed value when modifying speed between updates
 	ivector3	delta_angles;	// add to command angles to get view direction
-									// changed by spawns, rotating objects, and teleporters
+	// changed by spawns, rotating objects, and teleporters
 
 	int			slopeRecalcTime; //this is NOT sent across the net and is maintained seperately on game and cgame in pmove code.
 
@@ -1754,9 +1743,9 @@ typedef struct playerState_s {
 	qboolean	torsoFlip;
 
 	int			movementDir;	// a number 0 to 7 that represents the reletive angle
-								// of movement to the view angle (axial and diagonals)
-								// when at rest, the value will remain unchanged
-								// used to twist the legs during strafing
+	// of movement to the view angle (axial and diagonals)
+	// when at rest, the value will remain unchanged
+	// used to twist the legs during strafing
 
 	uint32_t	eFlags, eFlags2;	// copied to entityState_t->eFlags(2), EF(2)_???
 
@@ -1982,8 +1971,7 @@ typedef struct playerState_s {
 #endif
 } playerState_t;
 
-typedef struct siegePers_s
-{
+typedef struct siegePers_s {
 	qboolean	beatingTime;
 	int			lastTeam;
 	int			lastTime;
@@ -2001,10 +1989,10 @@ typedef struct siegePers_s
 #define	BUTTON_USE_HOLDABLE		4
 #define	BUTTON_GESTURE			8
 #define	BUTTON_WALKING			16			// walking can't just be infered from MOVE_RUN
-										// because a key pressed late in the frame will
-										// only generate a small move value for that frame
-										// walking will use different animations and
-										// won't generate footsteps
+// because a key pressed late in the frame will
+// only generate a small move value for that frame
+// walking will use different animations and
+// won't generate footsteps
 #define	BUTTON_USE				32			// the ol' use key returns!
 #define BUTTON_FORCEGRIP		64			//
 #define BUTTON_ALT_ATTACK		128
@@ -2035,10 +2023,9 @@ typedef struct siegePers_s
 */
 
 #define	MOVE_RUN			120			// if forwardmove or rightmove are >= MOVE_RUN,
-										// then BUTTON_WALKING should be set
+// then BUTTON_WALKING should be set
 
-typedef enum genCmds_e
-{
+typedef enum genCmds_e {
 	GENCMD_SABERSWITCH = 1,
 	GENCMD_ENGAGE_DUEL,
 	GENCMD_FORCE_HEAL,
@@ -2128,8 +2115,7 @@ typedef struct addbezierArgStruct_s {
 	uint32_t flags;
 } addbezierArgStruct_t;
 
-typedef struct addspriteArgStruct_s
-{
+typedef struct addspriteArgStruct_s {
 	vector3 origin;
 	vector3 vel;
 	vector3 accel;
@@ -2144,8 +2130,7 @@ typedef struct addspriteArgStruct_s
 	uint32_t flags;
 } addspriteArgStruct_t;
 
-typedef struct effectTrailVertStruct_s
-{
+typedef struct effectTrailVertStruct_s {
 	vector3	origin;
 
 	// very specifc case, we can modulate the color and the alpha
@@ -2171,8 +2156,7 @@ typedef struct effectTrailArgStruct_s {
 	int							mKillTime;
 } effectTrailArgStruct_t;
 
-typedef struct addElectricityArgStruct_s
-{
+typedef struct addElectricityArgStruct_s {
 	vector3 start;
 	vector3 end;
 	float size1;
@@ -2456,10 +2440,10 @@ typedef enum flagStatus_e {
 #define CDCHKSUM_LEN 2
 
 #define QRAND_MAX 32768
-void Rand_Init(int seed);
-float flrand(float min, float max);
-int irand(int min, int max);
-int Q_irand(int value1, int value2);
+void Rand_Init( int seed );
+float flrand( float min, float max );
+int irand( int min, int max );
+int Q_irand( int value1, int value2 );
 
 /*
 Ghoul2 Insert Start
@@ -2469,8 +2453,7 @@ typedef struct mdxaBone_s { float matrix[3][4]; } mdxaBone_t;
 
 // For ghoul2 axis use
 
-typedef enum Eorientations
-{
+typedef enum Eorientations {
 	ORIGIN = 0,
 	POSITIVE_X,
 	POSITIVE_Z,
@@ -2488,15 +2471,14 @@ Ghoul2 Insert End
 //
 #define TAGDEF(blah) TAG_ ## blah
 typedef enum {
-	#include "qcommon/tags.h"
+#include "qcommon/tags.h"
 } tags_t;
 typedef char memtag_t;
 
 //rww - conveniently toggle "gore" code, for model decals and stuff.
 #define _G2_GORE
 
-typedef struct SSkinGoreData_s
-{
+typedef struct SSkinGoreData_s {
 	vector3			angles;
 	vector3			position;
 	int				currentTime;
@@ -2542,16 +2524,15 @@ typedef struct stringID_table_s {
 	int id;
 } stringID_table_t;
 
-int GetIDForString ( const stringID_table_t *table, const char *string );
+int GetIDForString( const stringID_table_t *table, const char *string );
 const char *GetStringForID( const stringID_table_t *table, int id );
 
 
 // stuff to help out during development process, force reloading/uncacheing of certain filetypes...
 //
-typedef enum
-{
+typedef enum {
 	eForceReload_NOTHING,
-//	eForceReload_BSP,	// not used in MP codebase
+	//	eForceReload_BSP,	// not used in MP codebase
 	eForceReload_MODELS,
 	eForceReload_ALL
 
@@ -2560,7 +2541,7 @@ typedef enum
 
 enum {
 	FONT_NONE,
-	FONT_SMALL=1,
+	FONT_SMALL = 1,
 	FONT_MEDIUM,
 	FONT_LARGE,
 	FONT_SMALL2,

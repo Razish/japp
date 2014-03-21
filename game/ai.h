@@ -1,21 +1,18 @@
 #pragma once
 
 //Distance ratings
-typedef enum
-{
+typedef enum {
 	DIST_MELEE,
 	DIST_LONG,
 } distance_e;
 
 //Attack types
-typedef enum
-{
+typedef enum {
 	ATTACK_MELEE,
 	ATTACK_RANGE,
 } attack_e;
 
-enum
-{
+enum {
 	SQUAD_IDLE,					//No target found, waiting
 	SQUAD_STAND_AND_SHOOT,		//Standing in position and shoot (no cover)
 	SQUAD_RETREAT,				//Running away from combat
@@ -83,8 +80,7 @@ void NPC_BSRancor_Default( void );
 //Group AI
 #define	MAX_FRAME_GROUPS	32
 // !!!!!!!!!! LOADSAVE-affecting structure !!!!!!!!!!
-typedef struct AIGroupMember_s
-{
+typedef struct AIGroupMember_s {
 	int	number;
 	int waypoint;
 	int pathCostToEnemy;
@@ -93,8 +89,7 @@ typedef struct AIGroupMember_s
 
 #define MAX_GROUP_MEMBERS 32
 // !!!!!!!!!! LOADSAVE-affecting structure !!!!!!!!!!
-typedef struct AIGroupInfo_s
-{
+typedef struct AIGroupInfo_s {
 	int			numGroup;
 	qboolean	processed;
 	npcteam_t	team;
@@ -110,8 +105,8 @@ typedef struct AIGroupInfo_s
 	int			activeMemberNum;
 	gentity_t	*commander;
 	vector3		enemyLastSeenPos;
-	int			numState[ NUM_SQUAD_STATES ];
-	AIGroupMember_t member[ MAX_GROUP_MEMBERS ];
+	int			numState[NUM_SQUAD_STATES];
+	AIGroupMember_t member[MAX_GROUP_MEMBERS];
 } AIGroupInfo_t;
 
 int	AI_GetGroupSize( vector3 *origin, int radius, team_t playerTeam, gentity_t *avoid );

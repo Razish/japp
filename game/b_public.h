@@ -67,8 +67,8 @@
 
 //extern qboolean showWaypoints;
 
-typedef enum {VIS_UNKNOWN, VIS_NOT, VIS_PVS, VIS_360, VIS_FOV, VIS_SHOOT} visibility_t;
-typedef enum {SPOT_ORIGIN, SPOT_CHEST, SPOT_HEAD, SPOT_HEAD_LEAN, SPOT_WEAPON, SPOT_LEGS, SPOT_GROUND} spot_t;
+typedef enum { VIS_UNKNOWN, VIS_NOT, VIS_PVS, VIS_360, VIS_FOV, VIS_SHOOT } visibility_t;
+typedef enum { SPOT_ORIGIN, SPOT_CHEST, SPOT_HEAD, SPOT_HEAD_LEAN, SPOT_WEAPON, SPOT_LEGS, SPOT_GROUND } spot_t;
 
 typedef enum //# lookMode_e
 {
@@ -85,8 +85,7 @@ typedef enum //# jumpState_e
 	JS_LANDING
 } jumpState_t;
 
-typedef struct gNPCstats_e
-{//Stats, loaded in, and can be set by scripts
+typedef struct gNPCstats_e {//Stats, loaded in, and can be set by scripts
 	//AI
 	int		aggression;			//			"
 	int		aim;				//			"
@@ -115,8 +114,7 @@ typedef struct gNPCstats_e
 #define	MAX_ENEMY_POS_LAG	2400
 #define	ENEMY_POS_LAG_INTERVAL	100
 #define	ENEMY_POS_LAG_STEPS	(MAX_ENEMY_POS_LAG/ENEMY_POS_LAG_INTERVAL)
-typedef struct
-{
+typedef struct {
 	//FIXME: Put in playerInfo or something
 	int			timeOfDeath;			//FIXME do we really need both of these
 	gentity_t	*touchedByPlayer;
@@ -265,10 +263,10 @@ typedef struct
 	int			ffireFadeDebounce;
 } gNPC_t;
 
-void G_SquadPathsInit(void);
+void G_SquadPathsInit( void );
 void NPC_InitGame( void );
 void G_LoadBoltOns( void );
 void Svcmd_NPC_f( void );
-void NAV_DebugShowWaypoints (void);
-void NAV_DebugShowBoxes (void);
-void NAV_DebugShowSquadPaths (void);
+void NAV_DebugShowWaypoints( void );
+void NAV_DebugShowBoxes( void );
+void NAV_DebugShowSquadPaths( void );
