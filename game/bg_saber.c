@@ -481,7 +481,6 @@ int PM_SaberAnimTransitionAnim( int curmove, int newmove ) {
 	return retmove;
 }
 
-extern qboolean BG_InKnockDown( int anim );
 saberMoveName_t PM_CheckStabDown( void ) {
 	vector3 faceFwd, facingAngles;
 	vector3 fwd;

@@ -1720,6 +1720,7 @@ int BG_InGrappleMove(int anim);
 int BG_BrokenParryForAttack( int move );
 int BG_BrokenParryForParry( int move );
 int BG_KnockawayForParry( int move );
+qboolean BG_InKnockDown( int anim );
 qboolean BG_InRoll( playerState_t *ps, int anim );
 qboolean BG_InDeathAnim( int anim );
 qboolean BG_InSaberLockOld( int anim );

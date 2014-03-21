@@ -526,6 +526,11 @@ typedef struct gclient_s {
 	int					lastScoresTime; // level.time the last scoreboard message was went
 	qboolean			scoresWaiting;
 	struct {
+		qboolean			freeze;
+		int					returnAnim;
+		uint32_t			animParts, animFlags;
+	} emote;
+	struct {
 		int					drain, lightning;
 	} forceDebounce;
 } gclient_t;

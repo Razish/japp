@@ -7124,7 +7124,6 @@ void UpdateClientRenderinfo( gentity_t *self, vector3 *renderOrigin, vector3 *re
 #define STAFF_KICK_RANGE 16
 extern void G_GetBoltPosition( gentity_t *self, int boltIndex, vector3 *pos, int modelIndex ); //NPC_utils.c
 
-extern qboolean BG_InKnockDown( int anim );
 static qboolean G_KickDownable( gentity_t *ent ) {
 	if ( !d_saberKickTweak.integer ) {
 		return qtrue;

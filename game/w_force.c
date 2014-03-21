@@ -484,8 +484,6 @@ void WP_SpawnInitForcePowers( gentity_t *ent ) {
 	}
 }
 
-extern qboolean BG_InKnockDown( int anim ); //bg_pmove.c
-
 int ForcePowerUsableOn( gentity_t *attacker, gentity_t *other, forcePowers_t forcePower ) {
 	if ( other && other->client && BG_HasYsalamiri( level.gametype, &other->client->ps ) ) {
 		return 0;

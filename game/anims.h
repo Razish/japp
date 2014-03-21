@@ -1,10 +1,6 @@
-#ifndef __ANIMS_H__
-#define __ANIMS_H__
-// playerAnimations
+#pragma once
 
-
-typedef enum //# animNumber_e
-{
+typedef enum animNumber_e {
 	//=================================================
 	//HEAD ANIMS
 	//=================================================
@@ -1841,7 +1837,3 @@ typedef enum //# animNumber_e
 } animNumber_t;
 
 #define SABER_ANIM_GROUP_SIZE (BOTH_A2_T__B_ - BOTH_A1_T__B_)
-
-
-#endif// #ifndef __ANIMS_H__
-

@@ -1977,8 +1977,10 @@ void ClientThink_real( gentity_t *ent ) {
 				client->ps.eFlags |= EF_JETPACK_ACTIVE;
 				killJetFlags = qfalse;
 			}
+			else if ( client->pers.adminData.isFrozen || client->emote.freeze )
+				client->ps.pm_type = PM_FREEZE;
 			else
-				client->ps.pm_type = (client->pers.adminData.isFrozen) ? PM_FREEZE : PM_NORMAL;
+				client->ps.pm_type = PM_NORMAL;
 		}
 	}
 
@@ -2997,6 +2999,13 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( (ent->client->pers.cmd.buttons & BUTTON_USE) && ent->client->ps.useDelay < level.time ) {
 		TryUse( ent );
 		ent->client->ps.useDelay = level.time + 100;
+	}
+
+	// leave emotes
+	if ( ent->client->emote.freeze && (ent->client->pers.cmd.upmove < 0 || ent->client->pers.cmd.buttons & BUTTON_USE) ) {
+		ent->client->emote.freeze = qfalse;
+		G_SetAnim( ent, NULL, ent->client->emote.animParts, ent->client->emote.returnAnim, ent->client->emote.animFlags,
+			0 );
 	}
 
 	// link entity now, after any personal teleporters have been used

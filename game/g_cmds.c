@@ -5,6 +5,7 @@
 #include "g_admin.h"
 #include "ui/menudef.h" // for the voice chats
 #include "bg_luaevent.h"
+#include "bg_public.h"
 
 //rww - for getting bot commands...
 int AcceptBotCommand( char *cmd, gentity_t *pl );
@@ -3021,6 +3022,97 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 	}
 }
 
+#define EMF_NONE	(0x00u)
+#define EMF_FREEZE	(0x01u)
+#define EMF_TORSO	(0x02u)
+#define EMF_LEGS	(0x04u)
+#define EMF_HOLSTER	(0x08u)
+#define EMF_LOOP	(0x10u)
+
+#define EMF_DEFAULT (EMF_FREEZE | EMF_TORSO | EMF_LEGS)
+
+typedef struct emote_s {
+	animNumber_t startAnim, holdAnim, returnAnim;
+	int blendTime;
+	uint32_t flags;
+} emote_t;
+
+typedef enum emotes_e {
+	EMOTE_SMACK,
+	EMOTE_HEAL,
+	EMOTE_STEPBACK,
+	EMOTE_HARLEM,
+	EMOTE_NOD,
+	EMOTE_SHAKE,
+	EMOTE_HELLO,
+	EMOTE_ATEASE,
+	NUM_EMOTES,
+} emotes_t;
+
+static const emote_t emotes[NUM_EMOTES] = {
+	{ -1, BOTH_FORCEGRIP3THROW, -1, 200, EMF_TORSO | EMF_LEGS }, // EMOTE_SMACK
+	{ -1, BOTH_FORCEHEAL_START, BOTH_FORCEHEAL_STOP, 200, EMF_DEFAULT }, // EMOTE_HEAL
+	{ -1, BOTH_FORCE_2HANDEDLIGHTNING, -1, 200, EMF_TORSO | EMF_LEGS }, // EMOTE_STEPBACK
+	{ -1, BOTH_FORCE_DRAIN_GRABBED, -1, 200, EMF_DEFAULT | EMF_LOOP }, // EMOTE_HARLEM
+	{ -1, BOTH_HEADNOD, -1, 200, EMF_TORSO }, // EMOTE_NOD
+	{ -1, BOTH_HEADSHAKE, -1, 200, EMF_TORSO }, // EMOTE_SHAKE
+	{ -1, BOTH_SILENCEGESTURE1, -1, 200, EMF_TORSO }, // EMOTE_HELLO
+	{ -1, BOTH_STAND4, -1, 200, EMF_DEFAULT }, // EMOTE_ATEASE
+};
+
+static void SetEmote( gentity_t *ent, const emote_t *emote ) {
+	uint32_t animParts = 0u, animFlags = 0u;
+
+	if ( !(japp_allowEmotes.integer & (1<<level.gametype)) ) {
+		trap->SendServerCommand( ent - g_entities, "print \"Emotes are not allowed in this gametype\n\"" );
+		return;
+	}
+
+	// busy
+	if ( ent->client->ps.weaponTime > 0 || ent->client->ps.saberMove > LS_READY || ent->client->ps.fd.forcePowersActive
+		|| ent->client->ps.groundEntityNum == ENTITYNUM_NONE || ent->client->ps.duelInProgress
+		|| BG_InKnockDown( ent->client->ps.legsAnim ) || BG_InRoll( &ent->client->ps, ent->client->ps.legsAnim ) )
+	{
+		return;
+	}
+
+	if ( emote->flags & EMF_TORSO )
+		animParts |= SETANIM_TORSO;
+	if ( emote->flags & EMF_LEGS )
+		animParts |= SETANIM_LEGS;
+
+	if ( emote->flags & EMF_LOOP )
+		animFlags |= SETANIM_FLAG_PACE;
+	if ( emote->flags & EMF_FREEZE ) {
+		animFlags |= SETANIM_FLAG_HOLD;
+		VectorClear( &ent->client->ps.velocity );
+		ent->client->emote.freeze = qtrue;
+	}
+
+	animFlags |= SETANIM_FLAG_OVERRIDE;
+
+	if ( (emote->flags & EMF_HOLSTER) && ent->client->ps.weapon == WP_SABER && ent->client->ps.saberHolstered < 2 ) {
+		ent->client->ps.saberCanThrow = qfalse;
+		ent->client->ps.forceRestricted = qtrue;
+		ent->client->ps.saberMove = LS_NONE;
+		ent->client->ps.saberBlocked = 0;
+		ent->client->ps.saberBlocking = 0;
+		ent->client->ps.saberHolstered = 2;
+		if ( ent->client->saber[0].soundOff )
+			G_Sound( ent, CHAN_AUTO, ent->client->saber[0].soundOff );
+		if ( ent->client->saber[1].model[0] && ent->client->saber[1].soundOff )
+			G_Sound( ent, CHAN_AUTO, ent->client->saber[1].soundOff );
+	}
+
+	G_SetAnim( ent, NULL, animParts, emote->holdAnim, animFlags, emote->blendTime );
+	ent->client->emote.returnAnim = emote->returnAnim;
+	ent->client->emote.animParts = animParts;
+	ent->client->emote.animFlags = animFlags;
+}
+
+static void Cmd_EmoteAtEase_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_ATEASE] ); }
+static void Cmd_EmoteHarlem_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_HARLEM] ); }
+
 #define CMDFLAG_NOINTERMISSION	(0x0001u)
 #define CMDFLAG_CHEAT			(0x0002u)
 #define CMDFLAG_ALIVE			(0x0004u)
@@ -3042,6 +3134,8 @@ static int cmdcmp( const void *a, const void *b ) {
 }
 
 static const command_t commands[] = {
+	{ "amatease", Cmd_EmoteAtEase_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amharlem", Cmd_EmoteHarlem_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "aminfo", Cmd_AMInfo_f, GTB_ALL, 0 },
 	{ "callvote", Cmd_CallVote_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "debugBMove_Back", Cmd_BotMoveBack_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
