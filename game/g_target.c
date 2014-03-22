@@ -751,7 +751,10 @@ void scriptrunner_run( gentity_t *self ) {
 			if ( developer.integer ) {
 				Com_Printf( "target_scriptrunner running %s on activator %s\n", self->behaviorSet[BSET_USE], self->activator->targetname );
 			}
-			trap->ICARUS_RunScript( (sharedEntity_t *)self->activator, va( "%s/%s", Q3_SCRIPT_DIR, self->behaviorSet[BSET_USE] ) );
+			if ( !strncmp( self->behaviorSet[BSET_USE], Q3_SCRIPT_DIR "/", strlen( Q3_SCRIPT_DIR "/" ) ) )
+				trap->ICARUS_RunScript( (sharedEntity_t *)self->activator, self->behaviorSet[BSET_USE] );
+			else
+				trap->ICARUS_RunScript( (sharedEntity_t *)self->activator, va( "%s/%s", Q3_SCRIPT_DIR, self->behaviorSet[BSET_USE] ) );
 		}
 		else {
 			if ( developer.integer && self->activator ) {
@@ -859,10 +862,17 @@ void SP_target_deactivate( gentity_t *self ) {
 	self->use = target_deactivate_use;
 }
 
+void ExitLevel( void );
 void target_level_change_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	G_ActivateBehavior( self, BSET_USE );
 
-	trap->SendConsoleCommand( EXEC_NOW, va( "map %s", self->message ) );
+	if ( !self->message || self->message[0] == '+' ) {
+		trap->Print( "Tier selection not supported yet!\n" );
+		return;
+	}
+
+	trap->Cvar_Set( "nextmap", va( "map %s", self->message ) );
+	ExitLevel();
 }
 
 /*QUAKED target_level_change (1 0 0) (-4 -4 -4) (4 4 4)

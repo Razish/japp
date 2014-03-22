@@ -1330,12 +1330,6 @@ static qboolean G_VoteGametype( gentity_t *ent, int numArgs, const char *arg1, c
 		gt = GT_FFA;
 	}
 
-	// logically invalid gametypes, or gametypes not fully implemented in MP
-	if ( gt == GT_SINGLE_PLAYER ) {
-		trap->SendServerCommand( ent - g_entities, va( "print \"This gametype is not supported (%s).\n\"", arg2 ) );
-		return qfalse;
-	}
-
 	level.votingGametype = qtrue;
 	level.votingGametypeTo = gt;
 

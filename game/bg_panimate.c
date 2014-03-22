@@ -2303,7 +2303,7 @@ Override animations for upper body
 ===================
 */
 void BG_StartTorsoAnim( playerState_t *ps, int anim ) {
-	if ( ps->pm_type >= PM_DEAD ) {
+	if ( ps->pm_type >= PM_DEAD && pm->gametype != GT_SINGLE_PLAYER ) {
 		assert( !BG_InDeathAnim( anim ) );
 		//please let me know if this assert fires on you (ideally before you close/ignore it) -rww
 		return;

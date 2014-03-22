@@ -1465,7 +1465,7 @@ qboolean PM_AdjustAngleForWallJump( playerState_t *ps, usercmd_t *ucmd, qboolean
 			return qfalse;
 			break;
 		}
-		if ( pm->debugMelee ) {//uber-skillz
+		if ( pm->debugMelee == 2 ) {//uber-skillz
 			if ( ucmd->upmove > 0 ) {//hold on until you let go manually
 				if ( BG_InReboundHold( ps->legsAnim ) ) {//keep holding
 					if ( ps->legsTimer < 150 ) {

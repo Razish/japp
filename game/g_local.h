@@ -39,7 +39,6 @@ typedef struct gentity_s gentity_t;
 #define	START_TIME_NAV_CALC			(FRAMETIME*5) // time-delay after map start to connect waypoints and calc routes
 #define	START_TIME_FIND_WAYPOINT	(FRAMETIME*6) // time-delay after map start after which it's okay to try to find your best waypoint
 #define	MAX_G_SHARED_BUFFER_SIZE	(1024*8)
-#define SP_PODIUM_MODEL				"models/mapobjects/podium/podium4.md3"
 #define	FOLLOW_ACTIVE1				(-1)
 #define	FOLLOW_ACTIVE2				(-2)
 #define	MAX_VOTE_COUNT				(3)

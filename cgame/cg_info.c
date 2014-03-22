@@ -267,6 +267,7 @@ void CG_DrawInformation( void ) {
 		break;
 
 	case GT_SINGLE_PLAYER:
+		//COOPTODO: Rules for cooperative missions - map specific?
 		break;
 
 	case GT_DUEL:

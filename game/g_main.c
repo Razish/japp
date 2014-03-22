@@ -16,8 +16,8 @@ extern int fatalErrors;
 
 int killPlayerTimer = 0;
 
-gentity_t		g_entities[MAX_GENTITIES];
-gclient_t		g_clients[MAX_CLIENTS];	//Raz: Not directly accessed. level.clients[] should be used
+gentity_t g_entities[MAX_GENTITIES];
+static gclient_t g_clients[MAX_CLIENTS]; //Raz: Not directly accessed. level.clients[] should be used
 
 qboolean gDuelExit = qfalse;
 
@@ -426,9 +426,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	SaveRegisteredItems();
 
-
 	if ( level.gametype == GT_SINGLE_PLAYER || trap->Cvar_VariableIntegerValue( "com_buildScript" ) ) {
-		G_ModelIndex( SP_PODIUM_MODEL );
 		G_SoundIndex( "sound/player/gurp1.wav" );
 		G_SoundIndex( "sound/player/gurp2.wav" );
 	}

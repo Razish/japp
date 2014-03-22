@@ -904,7 +904,6 @@ static void CG_General( centity_t *cent ) {
 		/*cent->currentState.modelindex < MAX_CLIENTS &&*/
 		cent->currentState.weapon == G2_MODEL_PART ) { //special case for client limbs
 		centity_t *clEnt;
-		int dismember_settings = cg_dismember.integer;
 		float smoothFactor = 0.5f*timescale.value;
 		int k = 0;
 		vector3 posDif;
@@ -916,11 +915,11 @@ static void CG_General( centity_t *cent ) {
 		else
 			clEnt = &cg_entities[cent->currentState.otherEntityNum2];
 
-		if ( !dismember_settings ) { //This client does not wish to see dismemberment.
+		if ( !cg_dismember.integer ) { //This client does not wish to see dismemberment.
 			return;
 		}
 
-		if ( dismember_settings < 2 && (cent->currentState.modelGhoul2 == G2_MODELPART_HEAD || cent->currentState.modelGhoul2 == G2_MODELPART_WAIST) ) { //dismember settings are not high enough to display decaps and torso slashes
+		if ( cg_dismember.integer < 2 && (cent->currentState.modelGhoul2 == G2_MODELPART_HEAD || cent->currentState.modelGhoul2 == G2_MODELPART_WAIST) ) { //dismember settings are not high enough to display decaps and torso slashes
 			return;
 		}
 

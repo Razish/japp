@@ -4,7 +4,7 @@
 
 // Cvar instance userdata type
 typedef struct jplua_cvar_s {
-	const char *name;
+	char name[MAX_CVAR_VALUE_STRING];
 } jplua_cvar_t;
 
 void JPLua_Cvar_CreateRef( lua_State *L, const char *name );

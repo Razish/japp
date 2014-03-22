@@ -72,6 +72,11 @@ void NPC_ShadowTrooper_Precache( void ) {
 	G_SoundIndex( "sound/chars/shadowtrooper/decloak.wav" );
 }
 
+void NPC_Rosh_Dark_Precache( void ) {
+	G_EffectIndex( "force/kothos_beam.efx" );
+	G_EffectIndex( "force/kothos_recharge.efx" );
+}
+
 void Jedi_ClearTimers( gentity_t *ent ) {
 	TIMER_Set( ent, "roamTime", 0 );
 	TIMER_Set( ent, "chatter", 0 );

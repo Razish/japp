@@ -9,7 +9,8 @@ void InitTrigger( gentity_t *self ) {
 	if ( !VectorCompare( &self->s.angles, &vec3_origin ) )
 		G_SetMovedir( &self->s.angles, &self->movedir );
 
-	trap->SetBrushModel( (sharedEntity_t *)self, self->model );
+	if ( self->model )
+		trap->SetBrushModel( (sharedEntity_t *)self, self->model );
 	self->r.contents = CONTENTS_TRIGGER;		// replaces the -1 from trap->SetBrushModel
 	self->r.svFlags = SVF_NOCLIENT;
 

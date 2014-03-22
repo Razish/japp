@@ -159,6 +159,9 @@ void UI_LoadArenas( void ) {
 				//Raz: JK2 gametypes
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_JEDIMASTER);
 			}
+			if ( strstr( type, "coop" ) ) {
+				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_SINGLE_PLAYER);
+			}
 			if ( strstr( type, "holocron" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_HOLOCRON);
 			}

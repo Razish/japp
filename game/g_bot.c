@@ -606,13 +606,6 @@ void G_CheckBotSpawn( void ) {
 		}
 		ClientBegin( botSpawnQueue[n].clientNum, qfalse );
 		botSpawnQueue[n].spawnTime = 0;
-
-		/*
-		if( level.gametype == GT_SINGLE_PLAYER ) {
-		trap->GetUserinfo( botSpawnQueue[n].clientNum, userinfo, sizeof(userinfo) );
-		PlayerIntroSound( Info_ValueForKey (userinfo, "model") );
-		}
-		*/
 	}
 }
 
@@ -893,66 +886,6 @@ void G_AddBot( const char *name, float skill, const char *team, int delay, char 
 		AddBotToSpawnQueue( clientNum, delay );
 	}
 }
-
-#if 0
-/*
-===============
-G_SpawnBots
-===============
-*/
-static void G_SpawnBots( char *botList, int baseDelay ) {
-	char		*bot;
-	char		*p;
-	float		skill;
-	int			delay;
-	char		bots[MAX_INFO_VALUE];
-
-	podium1 = NULL;
-	podium2 = NULL;
-	podium3 = NULL;
-
-	skill = trap->Cvar_VariableValue( "g_spSkill" );
-	if( skill < 1 ) {
-		trap->Cvar_Set( "g_spSkill", "1" );
-		skill = 1;
-	}
-	else if ( skill > 5 ) {
-		trap->Cvar_Set( "g_spSkill", "5" );
-		skill = 5;
-	}
-
-	Q_strncpyz( bots, botList, sizeof(bots) );
-	p = &bots[0];
-	delay = baseDelay;
-	while( *p ) {
-		//skip spaces
-		while( *p && *p == ' ' ) {
-			p++;
-		}
-		if( !p ) {
-			break;
-		}
-
-		// mark start of bot name
-		bot = p;
-
-		// skip until space of null
-		while( *p && *p != ' ' ) {
-			p++;
-		}
-		if( *p ) {
-			*p++ = 0;
-		}
-
-		// we must add the bot this way, calling G_AddBot directly at this stage
-		// does "Bad Things"
-		trap->SendConsoleCommand( EXEC_INSERT, va("addbot \"%s\" %f free %i\n", bot, skill, delay) );
-
-		delay += BOT_BEGIN_DELAY_INCREMENT;
-	}
-}
-#endif
-
 
 /*
 ===============

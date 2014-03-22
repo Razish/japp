@@ -115,7 +115,8 @@ static int JPLua_Player_ToString( lua_State *L ) {
 static int JPLua_Player_GetAmmo( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	int weapon = level.clients[player->clientNum].ps.weapon;
+	gentity_t *ent = g_entities + player->clientNum;
+	int weapon = ent->client->ps.weapon;
 #elif defined(_CGAME)
 	int weapon = cg.predictedPlayerState.weapon;
 #endif
@@ -124,7 +125,7 @@ static int JPLua_Player_GetAmmo( lua_State *L ) {
 		weapon = lua_tointeger( L, 2 );
 
 #if defined(_GAME)
-	lua_pushinteger( L, level.clients[player->clientNum].ps.ammo[weaponData[weapon].ammoIndex] );
+	lua_pushinteger( L, ent->client->ps.ammo[weaponData[weapon].ammoIndex] );
 #elif defined(_CGAME)
 	if ( player->clientNum == cg.clientNum )
 		lua_pushinteger( L, cg.predictedPlayerState.ammo[weaponData[weapon].ammoIndex] );
@@ -137,7 +138,7 @@ static int JPLua_Player_GetAmmo( lua_State *L ) {
 static int JPLua_Player_GetAngles( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	vector3 *angles = &level.clients[player->clientNum].ps.viewangles;
+	vector3 *angles = &g_entities[player->clientNum].client->ps.viewangles;
 #elif defined(_CGAME)
 	vector3 *angles = (player->clientNum == cg.clientNum) ? &cg.predictedPlayerState.viewangles : &cg_entities[player->clientNum].lerpAngles;
 #endif
@@ -191,7 +192,7 @@ static int JPLua_Player_GetAnimations( lua_State *L ) {
 static int JPLua_Player_GetArmor( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	playerState_t *ps = &level.clients[player->clientNum].ps;
+	playerState_t *ps = &g_entities[player->clientNum].client->ps;
 #elif defined(_CGAME)
 	playerState_t *ps = &cg.predictedPlayerState;
 #endif
@@ -270,10 +271,11 @@ static int JPLua_Player_GetClientInfo( lua_State *L ) {
 static int JPLua_Player_GetDuelingPartner( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	if ( !level.clients[player->clientNum].ps.duelInProgress )
-		lua_pushnil( L );
+	playerState_t *ps = &g_entities[player->clientNum].client->ps;
+	if ( ps->duelInProgress )
+		JPLua_Player_CreateRef( L, ps->duelIndex ); 
 	else
-		JPLua_Player_CreateRef( L, level.clients[player->clientNum].ps.duelIndex );
+		lua_pushnil( L );
 #elif defined(_CGAME)
 	if ( !cg_entities[player->clientNum].currentState.bolt1 || player->clientNum != cg.clientNum )
 		lua_pushnil( L );
@@ -289,7 +291,7 @@ static int JPLua_Player_GetDuelingPartner( lua_State *L ) {
 static int JPLua_Player_GetEFlags( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	lua_pushinteger( L, level.clients[player->clientNum].ps.eFlags );
+	lua_pushinteger( L, g_entities[player->clientNum].client->ps.eFlags );
 #elif defined(_CGAME)
 	lua_pushinteger( L, cg_entities[player->clientNum].currentState.eFlags );
 #endif
@@ -301,7 +303,7 @@ static int JPLua_Player_GetEFlags( lua_State *L ) {
 static int JPLua_Player_GetEFlags2( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	lua_pushinteger( L, level.clients[player->clientNum].ps.eFlags2 );
+	lua_pushinteger( L, g_entities[player->clientNum].client->ps.eFlags2 );
 #elif defined(_CGAME)
 	lua_pushinteger( L, cg_entities[player->clientNum].currentState.eFlags2 );
 #endif
@@ -324,7 +326,7 @@ static int JPLua_Player_GetFlags( lua_State *L ) {
 static int JPLua_Player_GetForce( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	lua_pushinteger( L, level.clients[player->clientNum].ps.fd.forcePower );
+	lua_pushinteger( L, g_entities[player->clientNum].client->ps.fd.forcePower );
 #elif defined(_CGAME)
 	if ( player->clientNum == cg.clientNum )
 		lua_pushinteger( L, cg.predictedPlayerState.fd.forcePower );
@@ -340,7 +342,7 @@ static int JPLua_Player_GetForce( lua_State *L ) {
 static int JPLua_Player_GetHealth( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	lua_pushinteger( L, level.clients[player->clientNum].ps.stats[STAT_HEALTH] );
+	lua_pushinteger( L, g_entities[player->clientNum].client->ps.stats[STAT_HEALTH] );
 #elif defined(_CGAME)
 	if ( player->clientNum == cg.clientNum )
 		lua_pushinteger( L, cg.predictedPlayerState.stats[STAT_HEALTH] );
@@ -395,7 +397,7 @@ static int JPLua_Player_GetLocation( lua_State *L ) {
 static int JPLua_Player_GetMaxAmmo( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	int weapon = level.clients[player->clientNum].ps.weapon;
+	int weapon = g_entities[player->clientNum].client->ps.weapon;
 #elif defined(_CGAME)
 	int weapon = cg.predictedPlayerState.weapon;
 #endif
@@ -418,7 +420,7 @@ static int JPLua_Player_GetMaxAmmo( lua_State *L ) {
 static int JPLua_Player_GetName( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	lua_pushstring( L, level.clients[player->clientNum].pers.netname );
+	lua_pushstring( L, g_entities[player->clientNum].client->pers.netname );
 #elif defined(_CGAME)
 	lua_pushstring( L, cgs.clientinfo[player->clientNum].name );
 #endif
@@ -430,7 +432,7 @@ static int JPLua_Player_GetName( lua_State *L ) {
 static int JPLua_Player_GetPosition( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	vector3 *pos = &level.clients[player->clientNum].ps.origin;
+	vector3 *pos = &g_entities[player->clientNum].client->ps.origin;
 #elif defined(_CGAME)
 	vector3 *pos = (player->clientNum == cg.clientNum) ? &cg.predictedPlayerState.origin : &cg_entities[player->clientNum].currentState.pos.trBase;
 #endif
@@ -447,7 +449,7 @@ static int JPLua_Player_GetSaberStyle( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 
 #if defined(_GAME)
-	lua_pushinteger( L, level.clients[player->clientNum].ps.fd.saberDrawAnimLevel );
+	lua_pushinteger( L, g_entities[player->clientNum].client->ps.fd.saberDrawAnimLevel );
 #elif defined(_CGAME)
 	if ( player->clientNum == cg.clientNum )
 		lua_pushinteger( L, cg.predictedPlayerState.fd.saberDrawAnimLevel );
@@ -463,7 +465,7 @@ static int JPLua_Player_GetSaberStyle( lua_State *L ) {
 //Retn: integer of the player's score
 static int JPLua_Player_GetScore( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	lua_pushinteger( L, level.clients[player->clientNum].ps.persistant[PERS_SCORE] );
+	lua_pushinteger( L, g_entities[player->clientNum].client->ps.persistant[PERS_SCORE] );
 	return 1;
 }
 #endif
@@ -488,7 +490,7 @@ static int JPLua_Player_GetUserinfo( lua_State *L ) {
 static int JPLua_Player_GetVelocity( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	vector3 *vel = &level.clients[player->clientNum].ps.velocity;
+	vector3 *vel = &g_entities[player->clientNum].client->ps.velocity;
 #elif defined(_CGAME)
 	vector3 *vel = (player->clientNum == cg.clientNum) ? &cg.predictedPlayerState.velocity : &cg_entities[player->clientNum].currentState.pos.trDelta;
 #endif
@@ -504,7 +506,7 @@ static int JPLua_Player_GetWeapon( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 
 #if defined(_GAME)
-	lua_pushinteger( L, level.clients[player->clientNum].ps.weapon );
+	lua_pushinteger( L, g_entities[player->clientNum].client->ps.weapon );
 #elif defined(_CGAME)
 	lua_pushinteger( L, cg_entities[player->clientNum].currentState.weapon );
 #endif
@@ -522,7 +524,7 @@ static int JPLua_Player_GiveWeapon( lua_State *L ) {
 	if ( wp <= WP_NONE || wp >= WP_NUM_WEAPONS )
 		return 0;
 
-	level.clients[player->clientNum].ps.stats[STAT_WEAPONS] |= (1 << wp);
+	g_entities[player->clientNum].client->ps.stats[STAT_WEAPONS] |= (1 << wp);
 
 	return 0;
 }
@@ -533,7 +535,7 @@ static int JPLua_Player_GiveWeapon( lua_State *L ) {
 //Retn: boolean loggedIn, string adminUser, integer adminPermissions
 static int JPLua_Player_IsAdmin( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	gclient_t *cl = &level.clients[player->clientNum];
+	gclient_t *cl = g_entities[player->clientNum].client;
 
 	if ( cl->pers.adminUser ) {
 		lua_pushboolean( L, 1 );
@@ -556,8 +558,9 @@ static int JPLua_Player_IsAlive( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 
 #if defined(_GAME)
-	if ( level.clients[player->clientNum].ps.stats[STAT_HEALTH] > 0 && !(level.clients[player->clientNum].ps.eFlags & EF_DEAD)
-		&& level.clients[player->clientNum].ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
+	if ( g_entities[player->clientNum].client->ps.stats[STAT_HEALTH] > 0
+		&& !(g_entities[player->clientNum].client->ps.eFlags & EF_DEAD)
+		&& g_entities[player->clientNum].client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 		lua_pushboolean( L, 1 );
 		return 1;
 	}
@@ -656,7 +659,7 @@ static int JPLua_Player_RemoveEFlag( lua_State *L ) {
 		return 1;
 	}
 
-	level.clients[player->clientNum].ps.eFlags &= ~bit;
+	g_entities[player->clientNum].client->ps.eFlags &= ~bit;
 
 	return 0;
 }
@@ -680,7 +683,7 @@ static int JPLua_Player_RemoveEFlag2( lua_State *L ) {
 		return 1;
 	}
 
-	level.clients[player->clientNum].ps.eFlags2 &= ~bit;
+	g_entities[player->clientNum].client->ps.eFlags2 &= ~bit;
 
 	return 0;
 }
@@ -720,7 +723,7 @@ static int JPLua_Player_SetArmor( lua_State *L ) {
 	if ( armour < 0 )
 		armour = 0;
 
-	level.clients[player->clientNum].ps.stats[STAT_ARMOR] = armour;
+	g_entities[player->clientNum].client->ps.stats[STAT_ARMOR] = armour;
 
 	return 0;
 }
@@ -744,7 +747,7 @@ static int JPLua_Player_SetEFlag( lua_State *L ) {
 		return 1;
 	}
 
-	level.clients[player->clientNum].ps.eFlags |= bit;
+	g_entities[player->clientNum].client->ps.eFlags |= bit;
 
 	return 0;
 }
@@ -768,7 +771,7 @@ static int JPLua_Player_SetEFlag2( lua_State *L ) {
 		return 1;
 	}
 
-	level.clients[player->clientNum].ps.eFlags2 |= bit;
+	g_entities[player->clientNum].client->ps.eFlags2 |= bit;
 
 	return 0;
 }

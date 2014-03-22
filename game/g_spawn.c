@@ -173,10 +173,6 @@ void SP_info_player_intermission_blue( gentity_t *ent );
 void SP_info_jedimaster_start( gentity_t *ent );
 void SP_info_player_start_red( gentity_t *ent );
 void SP_info_player_start_blue( gentity_t *ent );
-void SP_info_firstplace( gentity_t *ent );
-void SP_info_secondplace( gentity_t *ent );
-void SP_info_thirdplace( gentity_t *ent );
-void SP_info_podium( gentity_t *ent );
 
 void SP_info_siege_objective( gentity_t *ent );
 void SP_info_siege_radaricon( gentity_t *ent );
@@ -343,6 +339,8 @@ void SP_NPC_Cultist_Saber( gentity_t *self );
 void SP_NPC_Cultist_Saber_Powers( gentity_t *self );
 void SP_NPC_Cultist_Destroyer( gentity_t *self );
 void SP_NPC_Cultist_Commando( gentity_t *self );
+
+void SP_NPC_Rosh_Penin( gentity_t *self );
 
 void SP_waypoint( gentity_t *ent );
 void SP_waypoint_small( gentity_t *ent );
@@ -734,6 +732,7 @@ spawn_t	spawns[] = {
 	{ "npc_reborn_new", SP_NPC_Reborn_New },
 	{ "npc_reelo", SP_NPC_Reelo },
 	{ "npc_rodian", SP_NPC_Rodian },
+	{ "npc_rosh_penin", SP_NPC_Rosh_Penin },
 	{ "npc_shadowtrooper", SP_NPC_ShadowTrooper },
 	{ "npc_snowtrooper", SP_NPC_Snowtrooper },
 	{ "npc_spawner", SP_NPC_spawner },

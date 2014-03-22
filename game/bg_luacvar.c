@@ -38,6 +38,7 @@ static int JPLua_Cvar_ToString( lua_State *L ) {
 		lua_pushfstring( L, "Cvar(%s)", cvar->name );
 	else
 		lua_pushstring( L, "Cvar(nil)" );
+
 	return 1;
 }
 
@@ -156,7 +157,7 @@ void JPLua_Cvar_CreateRef( lua_State *L, const char *name ) {
 	}
 
 	luaCvar = (jplua_cvar_t *)lua_newuserdata( L, sizeof(jplua_cvar_t) );
-	luaCvar->name = name;
+	Q_strncpyz( luaCvar->name, name, sizeof(luaCvar->name) );
 
 	luaL_getmetatable( L, CVAR_META );
 	lua_setmetatable( L, -2 );

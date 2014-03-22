@@ -1463,6 +1463,12 @@ void SP_misc_ammo_floor_unit( gentity_t *ent ) {
 	}
 }
 
+void Precache_Key( void ) {
+	G_ModelIndex( "models/items/key.md3" );
+	G_SoundIndex( "sound/weapons/key_pkup.wav" );
+}
+//COOPFIXME: misc_security_key etc
+
 /*QUAKED misc_shield_floor_unit (1 0 0) (-16 -16 0) (16 16 40)
 model="/models/items/a_shield_converter.md3"
 Gives shield energy when used.
@@ -2790,7 +2796,7 @@ void ref_link( gentity_t *ent ) {
 			//FIXME: Does pitch get flipped?
 		}
 		else {
-			Com_Printf( S_COLOR_RED"ERROR: ref_tag (%s) has invalid target (%s)", ent->targetname, ent->target );
+			Com_Printf( S_COLOR_RED"ERROR: ref_tag (%s) has invalid target (%s)\n", ent->targetname, ent->target );
 		}
 	}
 

@@ -3466,7 +3466,7 @@ void ClientSpawn( gentity_t *ent ) {
 	*/
 	//Disabled. At least for now. Not sure if I'll want to do it or not eventually.
 
-	JPLua_Event_ClientSpawn( ent->s.number, (client->ps.persistant[PERS_SPAWN_COUNT] == 1) ? qtrue : qfalse );
+	JPLua_Event_ClientSpawn( ent - g_entities, (client->ps.persistant[PERS_SPAWN_COUNT] == 1) ? qtrue : qfalse );
 
 	// run a client frame to drop exactly to the floor,
 	// initialize animations and other things

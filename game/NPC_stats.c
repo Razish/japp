@@ -2842,3 +2842,95 @@ void NPC_LoadParms( void ) {
 		}
 	}
 }
+
+void NPC_ShadowTrooper_Precache( void );
+void NPC_Gonk_Precache( void );
+void NPC_Mouse_Precache( void );
+void NPC_Seeker_Precache( void );
+void NPC_Remote_Precache( void );
+void NPC_R2D2_Precache( void );
+void NPC_R5D2_Precache( void );
+void NPC_Probe_Precache( void );
+void NPC_Interrogator_Precache( void );
+void NPC_MineMonster_Precache( void );
+void NPC_Howler_Precache( void );
+void NPC_Rancor_Precache( void );
+void NPC_MutantRancor_Precache( void );
+void NPC_Wampa_Precache( void );
+void NPC_ATST_Precache( void );
+void NPC_Sentry_Precache( void );
+void NPC_Mark1_Precache( void );
+void NPC_Mark2_Precache( void );
+void NPC_Protocol_Precache( void );
+void Boba_Precache( void );
+void RT_Precache( void );
+void SandCreature_Precache( void );
+void NPC_TavionScepter_Precache( void );
+void NPC_TavionSithSword_Precache( void );
+void NPC_Rosh_Dark_Precache( void );
+void NPC_Tusken_Precache( void );
+void NPC_Saboteur_Precache( void );
+void NPC_CultistDestroyer_Precache( void );
+void NPC_GalakMech_Precache( void );
+
+typedef struct precache_s {
+	const char *classname;
+	void( *precache )(void);
+} precache_t;
+
+// MUST be alphabetically sorted, we use bsearch on it for speed. all lower-case for consistency
+static precache_t precacheList[] = {
+	{ "atst", NPC_ATST_Precache },
+	{ "boba_fett", Boba_Precache },
+	{ "galak_mech", NPC_GalakMech_Precache },
+	{ "gonk", NPC_Gonk_Precache },
+	{ "howler", NPC_Howler_Precache },
+	{ "interrogator", NPC_Interrogator_Precache },
+	{ "mark1", NPC_Mark1_Precache },
+	{ "mark2", NPC_Mark2_Precache },
+	{ "minemonster", NPC_MineMonster_Precache },
+	{ "mouse", NPC_Mouse_Precache },
+	{ "mutant_rancor",			/*Mutant*/NPC_Rancor_Precache },
+	{ "probe", NPC_Probe_Precache },
+	{ "protocol", NPC_Protocol_Precache },
+	{ "r2d2", NPC_R2D2_Precache },
+	{ "r5d2", NPC_R5D2_Precache },
+	{ "rancor", NPC_Rancor_Precache },
+	{ "remote", NPC_Remote_Precache },
+	{ "rosh_dark", NPC_Rosh_Dark_Precache },
+	{ "seeker", NPC_Seeker_Precache },
+	{ "sentry", NPC_Sentry_Precache },
+	{ "shadowtrooper", NPC_ShadowTrooper_Precache },
+	{ "wampa", NPC_Wampa_Precache },
+
+	//	{ "sand_creature",			SandCreature_Precache },
+	//	{ "rockettrooper2",			RT_Precache },
+	//	{ "rockettrooper2Officer",	RT_Precache },
+	//	{ "tavion_scepter",			NPC_TavionScepter_Precache },
+	//	{ "tavion_sith_sword",		NPC_TavionSithSword_Precache },
+	//	{ "tusken",					NPC_Tusken_Precache },
+	//	{ "saboteur",				NPC_Saboteur_Precache },
+	//	{ "cultist_destroyer",		NPC_CultistDestroyer_Precache },
+	//	{ "jawa",					NPC_Jawa_Precache },
+};
+static const int numPrecacheItems = ARRAY_LEN( precacheList );
+
+int classcmp( const void *a, const void *b ) {
+	return Q_stricmp( (const char *)a, ((precache_t*)b)->classname );
+}
+
+void NPC_PrecacheByClassName( const char *type ) {
+	precache_t *npcPrecache = NULL;
+
+	if ( !VALIDSTRING( type ) )
+		return;
+
+	npcPrecache = (precache_t *)bsearch( type, precacheList, numPrecacheItems, sizeof(precacheList[0]), classcmp );
+
+	// nothing to precache
+	if ( !npcPrecache || !npcPrecache->precache )
+		return;
+
+	// pass it on
+	npcPrecache->precache();
+}
