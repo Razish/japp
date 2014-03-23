@@ -319,6 +319,11 @@ elif plat == 'Windows':
 if plat == 'Linux':
 	env['CC'] = compiler
 	env['CPPDEFINES'] = [ '__GCC__' ]
+	env['CFLAGS'] = [ '-Wdeclaration-after-statement',
+		'-Wnested-externs',
+		'-Wold-style-definition',
+		'-Wstrict-prototypes',
+	]
 	env['CCFLAGS'] = [
 		'-Wall', '-Wextra',
 		'-Wno-missing-braces',
@@ -328,7 +333,6 @@ if plat == 'Linux':
 		'-Waggregate-return',
 	#	'-Wbad-function-cast',
 	#	'-Wcast-qual',
-		'-Wdeclaration-after-statement',
 	#	'-Wdouble-promotion',
 	#	'-Wfloat-equal',
 		'-Winit-self',
@@ -336,15 +340,12 @@ if plat == 'Linux':
 		'-Wlogical-op',
 	#	'-Wlong-long',
 		'-Wmissing-include-dirs',
-		'-Wnested-externs',
-		'-Wold-style-definition',
 		'-Woverlength-strings',
 		'-Wpointer-arith',
 		'-Wredundant-decls',
 	#	'-Wshadow',
 	#	'-Wsign-conversion',
 		'-Wstack-usage=32768',
-		'-Wstrict-prototypes',
 	#	'-Wsuggest-attribute=const',
 		'-Wswitch-default',
 		'-Wundef',
@@ -353,6 +354,7 @@ if plat == 'Linux':
 	#	'-Wunsuffixed-float-constants',
 		'-Wwrite-strings',
 		]
+	env['CXXFLAGS'] += [ '-std=c++11' ]
 	if analyse:
 		env['CC'] = 'clang'
 		env['CCFLAGS'] += [ '--analyze -O3' ]
@@ -385,10 +387,11 @@ if debug:
 	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-g3' ]
 	elif plat == 'Windows':
+		env['CPPDEFINES'] += [ '__MSVC_RUNTIME_CHECKS' ]
 		env['CCFLAGS'] += [ '/Gm', '/FD', '/MDd', '/Od', '/RTC1', '/RTCs', '/RTCu' ]
 		if bits == 32:
 			env['CCFLAGS'] += [ '/FC', '/ZI' ]
-	env['CPPDEFINES'] += [ '_DEBUG', '__MSVC_RUNTIME_CHECKS' ]
+	env['CPPDEFINES'] += [ '_DEBUG' ]
 
 # get git revision
 status, rev = commands.getstatusoutput( 'git rev-parse HEAD' )
