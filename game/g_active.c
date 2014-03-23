@@ -2652,8 +2652,8 @@ void ClientThink_real( gentity_t *ent ) {
 			ent->r.contents = 0;
 		}
 
-		for ( i = 0, other = g_entities; i < level.numConnectedClients; i++, other++ ) {
-			if ( i != ent - g_entities ) {
+		for ( i = 0, other = g_entities; i < level.maxclients; i++, other++ ) {
+			if ( i != ent - g_entities && ent->inuse && ent->client->pers.connected != CON_DISCONNECTED ) {
 				qboolean selfDueling = ent->client->ps.duelInProgress;
 				int selfDuelist = ent->client->ps.duelIndex;
 				int selfNum = ent->s.number;
@@ -2670,8 +2670,8 @@ void ClientThink_real( gentity_t *ent ) {
 
 		Pmove( &pm );
 
-		for ( i = 0, other = g_entities; i < level.numConnectedClients; i++, other++ ) {
-			if ( i != ent - g_entities ) {
+		for ( i = 0, other = g_entities; i < level.maxclients; i++, other++ ) {
+			if ( i != ent - g_entities && ent->inuse && ent->client->pers.connected != CON_DISCONNECTED ) {
 				qboolean selfDueling = ent->client->ps.duelInProgress;
 				int selfDuelist = ent->client->ps.duelIndex;
 				int selfNum = ent->s.number;

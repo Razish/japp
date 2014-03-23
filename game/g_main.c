@@ -1538,9 +1538,8 @@ void LogExit( const char *string ) {
 
 	// don't send more than 32 scores (FIXME?)
 	numSorted = level.numConnectedClients;
-	if ( numSorted > 32 ) {
-		numSorted = 32;
-	}
+	if ( numSorted > MAX_CLIENTS )
+		numSorted = MAX_CLIENTS;
 
 	if ( level.gametype >= GT_TEAM ) {
 		G_LogPrintf( level.log.console, "red:%i  blue:%i\n", level.teamScores[TEAM_RED], level.teamScores[TEAM_BLUE] );
@@ -1594,9 +1593,10 @@ void CheckIntermissionExit( void ) {
 	ready = 0;
 	notReady = 0;
 	readyMask = 0u;
-	for ( i = 0, cl = level.clients; i < level.numConnectedClients; i++, cl++ ) {
+	for ( i = 0, cl = level.clients; i < level.maxclients; i++, cl++ ) {
 		if ( cl->pers.connected != CON_CONNECTED )
 			continue;
+
 		if ( g_entities[i].r.svFlags & SVF_BOT )
 			continue;
 
@@ -2173,8 +2173,7 @@ void CheckTournament( void ) {
 
 				g_dontFrickinCheck = qtrue;
 			}
-			else if ( level.numPlayingClients > 0 ||
-				level.numConnectedClients > 0 ) {
+			else if ( level.numPlayingClients > 0 || level.numConnectedClients > 0 ) {
 				if ( g_duelPrintTimer < level.time ) { //print once every 10 seconds
 					int lone = 0, dbl = 0;
 
@@ -2383,18 +2382,21 @@ void CheckVote( void ) {
 }
 
 void CheckReady( void ) {
-	int i = 0, readyCount = 0;
+	int i = 0, readyCount = 0, playerCount;
 	gentity_t *ent = NULL;
 
 	if ( !g_doWarmup.integer || (level.warmupTime == 0) || !level.numPlayingClients || level.restarted || level.allReady )
 		return;
 
+	playerCount = level.numPlayingClients;
 	for ( i = 0, ent = g_entities; i < sv_maxclients.integer; i++, ent++ ) {
 		if ( ent->client->pers.ready )
 			readyCount++;
+		if ( ent->r.svFlags & SVF_BOT )
+			playerCount--;
 	}
 
-	if ( readyCount >= (level.numConnectedClients + 1) / 2 ) {
+	if ( readyCount >= (playerCount + 1) / 2 ) {
 		level.warmupTime = level.time + 3000;
 		level.allReady = qtrue;
 	}

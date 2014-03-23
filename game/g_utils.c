@@ -1471,13 +1471,6 @@ void GetAnglesForDirection( const vector3 *p1, const vector3 *p2, vector3 *out )
 	vectoangles( &v, out );
 }
 
-static qboolean G_ValidClient( const gclient_t *cl ) {
-	if ( cl->pers.connected == CON_DISCONNECTED )
-		return qfalse;
-
-	return qtrue;
-}
-
 static qboolean cmpSubCase( const char *s1, const char *s2 ) {
 	return (strstr( s1, s2 ) != NULL) ? qtrue : qfalse;
 }
@@ -1494,7 +1487,7 @@ static qboolean cmpWhole( const char *s1, const char *s2 ) {
 int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags ) {
 	char cleanedMatch[MAX_NETNAME];
 	int i;
-	gclient_t *cl;
+	gentity_t *e;
 	qboolean substr = !!(flags & FINDCL_SUBSTR);
 	qboolean firstMatch = !!(flags & FINDCL_FIRSTMATCH);
 	qboolean print = !!(flags & FINDCL_PRINT);
@@ -1508,8 +1501,9 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 	// First check for clientNum match
 	if ( Q_StringIsInteger( match ) ) {
 		i = atoi( match );
-		if ( i >= 0 && i < level.numConnectedClients ) {
-			if ( G_ValidClient( &level.clients[i] ) )
+		if ( i >= 0 && i < level.maxclients ) {
+			e = g_entities + i;
+			if ( e->inuse && e->client->pers.connected != CON_DISCONNECTED )
 				return i;
 			if ( print )
 				trap->SendServerCommand( ent - g_entities, va( "print \"Client %d is not on the server\n\"", i ) );
@@ -1517,7 +1511,7 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 		}
 		else {
 			if ( print )
-				trap->SendServerCommand( ent - g_entities, va( "print \"Client %d is out of range [0, %d]\n\"", i, level.numConnectedClients - 1 ) );
+				trap->SendServerCommand( ent - g_entities, va( "print \"Client %d is out of range [0, %d]\n\"", i, level.maxclients - 1 ) );
 			return -1;
 		}
 	}
@@ -1527,17 +1521,21 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 	Q_CleanString( cleanedMatch, STRIP_COLOUR );
 
 	if ( firstMatch ) {
-		for ( i = 0, cl = level.clients; i < level.numConnectedClients; i++, cl++ ) {
-			if ( compareFunc( cl->pers.netnameClean, cleanedMatch ) && G_ValidClient( cl ) )
+		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
+			if ( compareFunc( e->client->pers.netnameClean, cleanedMatch ) && e->inuse
+				&& e->client->pers.connected != CON_DISCONNECTED ) {
 				return i;
+			}
 		}
 	}
 	else {
 		int numMatches, matches[MAX_CLIENTS];
 
 		// find all matching names
-		for ( i = 0, numMatches = 0, cl = level.clients; i < level.numConnectedClients; i++, cl++ ) {
-			if ( compareFunc( cl->pers.netnameClean, cleanedMatch ) && G_ValidClient( cl ) )
+		for ( i = 0, numMatches = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
+			if ( !e->inuse || e->client->pers.connected == CON_DISCONNECTED )
+				continue;
+			if ( compareFunc( e->client->pers.netnameClean, cleanedMatch ) )
 				matches[numMatches++] = i;
 		}
 
@@ -1551,7 +1549,7 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 			Com_sprintf( msg, sizeof(msg), "Found %d matches:\n", numMatches );
 			for ( i = 0; i < numMatches; i++ ) {
 				Q_strcat( msg, sizeof(msg), va( "  "S_COLOR_WHITE"("S_COLOR_CYAN"%02i"S_COLOR_WHITE") %s\n", matches[i],
-					level.clients[matches[i]].pers.netname ) );
+					g_entities[matches[i]].client->pers.netname ) );
 			}
 			trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
 			return -1;

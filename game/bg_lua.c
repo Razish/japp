@@ -661,13 +661,13 @@ static int JPLua_Export_GetMapTime( lua_State *L ) {
 //TODO: client-side version of this
 static int JPLua_Export_GetPlayers( lua_State *L ) {
 	int top, i = 1, clNum;
-	gclient_t *cl = NULL;
+	gentity_t *ent;
 
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	for ( cl = level.clients, clNum = 0; clNum < level.numConnectedClients; clNum++, cl++ ) {
-		if ( cl->pers.connected == CON_DISCONNECTED )
+	for ( ent = g_entities, clNum = 0; clNum < level.maxclients; ent++, clNum++ ) {
+		if ( !ent->inuse || ent->client->pers.connected == CON_DISCONNECTED )
 			continue;
 		lua_pushnumber( L, i++ );
 		JPLua_Player_CreateRef( L, clNum );

@@ -273,7 +273,7 @@ static int JPLua_Player_GetDuelingPartner( lua_State *L ) {
 #if defined(_GAME)
 	playerState_t *ps = &g_entities[player->clientNum].client->ps;
 	if ( ps->duelInProgress )
-		JPLua_Player_CreateRef( L, ps->duelIndex ); 
+		JPLua_Player_CreateRef( L, ps->duelIndex );
 	else
 		lua_pushnil( L );
 #elif defined(_CGAME)
@@ -595,6 +595,26 @@ static int JPLua_Player_IsBot( lua_State *L ) {
 	return 1;
 }
 
+//Func: Player:IsUnderwater()
+//Retn: boolean expressing if the player is underwater
+static int JPLua_Player_IsUnderwater( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	qboolean underwater = qfalse;
+#if defined(_GAME)
+	if ( g_entities[player->clientNum].waterlevel == 3 )
+		underwater = qtrue;
+#elif defined(_CGAME)
+	vector3 *pos = (player->clientNum == cg.clientNum) ? &cg.predictedPlayerState.origin
+		: &cg_entities[player->clientNum].currentState.pos.trBase; // not cent->lerpOrigin?
+	if ( CG_PointContents( pos, -1 ) & (CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA) )
+		underwater = qtrue;
+#endif
+
+	lua_pushboolean( L, underwater ? 1 : 0 );
+
+	return 1;
+}
+
 //Func: Player:IsWeaponHolstered()
 //Retn: integer expressing the holstered state of the saber
 //		0 - all applicable sabers are activated
@@ -638,6 +658,34 @@ static int JPLua_Player_Kill( lua_State *L ) {
 	player_die( ent, ent, ent, 100000, MOD_SUICIDE );
 
 	return 0;
+}
+#endif
+
+#ifdef _GAME
+//Func: Player:OnSameTeam( Player p2 )
+//Retn: boolean expressing whether the specified player is on this player's team
+static int JPLua_Player_OnSameTeam( lua_State *L ) {
+	jplua_player_t *self = JPLua_CheckPlayer( L, 1 ), *other = JPLua_CheckPlayer( L, 2 );
+	lua_pushboolean( L, OnSameTeam( &g_entities[self->clientNum], &g_entities[other->clientNum] ) ? 1 : 0 );
+	return 1;
+}
+#endif
+
+#ifdef _CGAME
+//Func: Player:OnSameTeam()
+//Retn: boolean expressing whether this player is on your team
+static int JPLua_Player_OnSameTeam( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 2 );
+	const clientInfo_t *ci = &cgs.clientinfo[player->clientNum];
+
+	if ( cgs.gametype >= GT_TEAM && ci->team == cgs.clientinfo[cg.clientNum].team )
+		lua_pushboolean( L, 1 );
+	else if ( cgs.gametype == GT_POWERDUEL && ci->duelTeam == cgs.clientinfo[cg.clientNum].duelTeam )
+		lua_pushboolean( L, 1 );
+	else
+		lua_pushboolean( L, 0 );
+
+	return 1;
 }
 #endif
 
@@ -1038,10 +1086,14 @@ static const struct luaL_Reg jplua_player_meta[] = {
 #endif
 	{ "IsAlive", JPLua_Player_IsAlive },
 	{ "IsBot", JPLua_Player_IsBot },
+	{ "IsUnderwater", JPLua_Player_IsUnderwater },
 	{ "IsWeaponHolstered", JPLua_Player_IsWeaponHolstered },
 #ifdef _GAME
 	{ "Kick", JPLua_Player_Kick },
 	{ "Kill", JPLua_Player_Kill },
+#endif
+	{ "OnSameTeam", JPLua_Player_OnSameTeam },
+#ifdef _GAME
 	{ "RemoveEFlag", JPLua_Player_RemoveEFlag },
 	{ "RemoveEFlag2", JPLua_Player_RemoveEFlag2 },
 	{ "RemoveFlag", JPLua_Player_RemoveFlag },

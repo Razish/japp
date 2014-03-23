@@ -581,12 +581,11 @@ static void AM_Status( gentity_t *ent ) {
 	for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
 		const char *tmpMsg = NULL;
 
-		if ( e->client->pers.netname[0] ) {
+		if ( e->inuse && ent->client->pers.connected != CON_DISCONNECTED ) {
 			char strNum[12], strName[MAX_NETNAME], strIP[NET_ADDRSTRMAXLEN], strAdmin[32];
 
 			Q_strncpyz( strNum, va( "(%i)", i ), sizeof(strNum) );
-			Q_strncpyz( strName, e->client->pers.netname, sizeof(strName) );
-			Q_CleanString( strName, STRIP_COLOUR );
+			Q_strncpyz( strName, e->client->pers.netnameClean, sizeof(strName) );
 			Q_strncpyz( strIP, e->client->sess.IP, sizeof(strIP) );
 			Q_strncpyz( strAdmin, (e->client->pers.adminUser) ? e->client->pers.adminUser->user : "", sizeof(strAdmin) );
 			Q_CleanString( strAdmin, STRIP_COLOUR );

@@ -1108,6 +1108,22 @@ static void Cmd_Say_f( gentity_t *ent ) {
 	G_Say( ent, NULL, SAY_ALL, p );
 }
 
+static void Cmd_SayAdmin_f( gentity_t *ent ) {
+	char *p = NULL;
+
+	if ( trap->Argc() < 2 )
+		return;
+
+	p = ConcatArgs( 1 );
+
+	if ( strlen( p ) > MAX_SAY_TEXT ) {
+		p[MAX_SAY_TEXT - 1] = '\0';
+		G_LogPrintf( level.log.security, "Cmd_SayAdmin_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
+	}
+
+	G_Say( ent, NULL, SAY_ADMIN, p );
+}
+
 static void Cmd_SayTeam_f( gentity_t *ent ) {
 	char *p = NULL;
 
@@ -3130,6 +3146,7 @@ static const command_t commands[] = {
 	{ "amatease", Cmd_EmoteAtEase_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amharlem", Cmd_EmoteHarlem_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "aminfo", Cmd_AMInfo_f, GTB_ALL, 0 },
+	{ "amsay", Cmd_SayAdmin_f, GTB_ALL, 0 },
 	{ "callvote", Cmd_CallVote_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "debugBMove_Back", Cmd_BotMoveBack_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
 	{ "debugBMove_Forward", Cmd_BotMoveForward_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },

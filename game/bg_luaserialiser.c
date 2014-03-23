@@ -11,6 +11,12 @@
 
 static const char SERIALISER_META[] = "Serialiser.meta";
 
+#if defined(_GAME)
+static const char *pluginDir = "lua/sv/";
+#elif defined(_CGAME)
+static const char *pluginDir = "lua/cl/";
+#endif
+
 //Func: GetSerialiser( string fileName )
 //Retn: Serialiser object
 int JPLua_GetSerialiser( lua_State *L ) {
@@ -229,7 +235,7 @@ void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode )
 	int len = 0;
 
 	serialiser = (jplua_serialiser_t *)lua_newuserdata( L, sizeof(jplua_serialiser_t) );
-	Com_sprintf( serialiser->fileName, sizeof(serialiser->fileName), "lua/sv/%s/%s", JPLua.currentPlugin->name, path );
+	Com_sprintf( serialiser->fileName, sizeof(serialiser->fileName), "%s%s/%s", pluginDir, JPLua.currentPlugin->name, path );
 	len = trap->FS_Open( serialiser->fileName, &serialiser->fileHandle, mode );
 
 	if ( mode == FS_WRITE ) {
@@ -237,19 +243,22 @@ void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode )
 		serialiser->read = qfalse;
 		serialiser->outRoot = cJSON_CreateObject();
 	}
-	else if ( mode == FS_READ && len > 0 ) {
-		char *contents = (char *)malloc( len );
-
-		trap->FS_Read( contents, len, serialiser->fileHandle );
-
+	else if ( mode == FS_READ ) {
 		serialiser->read = qtrue;
 		serialiser->write = qfalse;
-		serialiser->inRoot = cJSON_Parse( contents );
-		if ( !serialiser->inRoot )
-			Com_Printf( "Couldn't parse serialised JSON data %s\n", path );
+		if ( len > 0 ) {
+			char *contents = (char *)malloc( len );
 
-		free( contents );
-		contents = NULL;
+			trap->FS_Read( contents, len, serialiser->fileHandle );
+			serialiser->inRoot = cJSON_Parse( contents );
+			if ( !serialiser->inRoot )
+				Com_Printf( "Couldn't parse serialised JSON data %s\n", path );
+
+			free( contents );
+			contents = NULL;
+		}
+		else
+			serialiser->inRoot = NULL;
 	}
 
 	luaL_getmetatable( L, SERIALISER_META );
