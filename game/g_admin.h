@@ -80,12 +80,12 @@ void		AM_PrintCommands( gentity_t *ent );
 qboolean	AM_HandleCommands( gentity_t *ent, const char *cmd );
 
 // bans
-void		JKG_Bans_Clear( void );
-void		JKG_Bans_LoadBans( void );
-void		JKG_Bans_Init( void );
-void		JKG_Bans_SaveBans( void );
-void		JKG_Bans_List( void );
-qboolean	JKG_Bans_Remove( byte *ip );
-int			JKG_Bans_AddBanString( const char *ip, const char *duration, const char *reason );
-const char	*JKG_Bans_IsBanned( byte *ip );
+void		JP_Bans_Clear( void );
+void		JP_Bans_LoadBans( void );
+void		JP_Bans_Init( void );
+void		JP_Bans_SaveBans( void );
+void		JP_Bans_List( void );
+qboolean	JP_Bans_Remove( byte *ip );
+int			JP_Bans_AddBanString( const char *ip, const char *duration, const char *reason );
+const char	*JP_Bans_IsBanned( byte *ip );
 byteAlias_t *BuildByteFromIP( const char *ip );

@@ -1449,7 +1449,7 @@ static void AM_Ban( gentity_t *ent ) {
 		if ( trap->Argc() >= 4 )
 			arg3 = ConcatArgs( 3 );				//	Reason
 
-		JKG_Bans_AddBanString( arg1, arg2, arg3 );
+		JP_Bans_AddBanString( arg1, arg2, arg3 );
 		Com_sprintf( string, sizeof(string), "Banned!\nReason: %s", arg3 ? arg3 : "Not specified" );
 		trap->DropClient( targetClient, string );
 		//	ClientDisconnect( targetClient );
@@ -1469,7 +1469,7 @@ static void AM_BanIP( gentity_t *ent ) {
 		if ( trap->Argc() >= 4 )
 			arg3 = ConcatArgs( 3 ); // Reason
 
-		JKG_Bans_AddBanString( arg1, arg2, arg3 );
+		JP_Bans_AddBanString( arg1, arg2, arg3 );
 	}
 
 	return;

@@ -1,13 +1,8 @@
+// manage IP bans
+// there is support for subnet bans (using * as wildcard) and temporary bans (with reason)
+// bans are stored in BANFILE as JSON
 //
-//
-//	JKG Ban system
-//
-// This module manages IP bans
-//
-// There is support for subnet bans (using * as wildcard) and temporary bans (with reason)
-// The bans are stored in a file specified by g_banfile (bans.dat by default) in json format
-//
-// Structure sample:
+// example:
 //	{
 //		"nextid" : 1,
 //		"bans" : [{
@@ -18,7 +13,6 @@
 //				"ip" : [10, 0, 0, 0]
 //			}]
 //	}
-//
 
 #include "g_local.h"
 #include "json/cJSON.h"
@@ -37,7 +31,7 @@ typedef struct banentry_s {
 static banentry_t *banlist = NULL;
 static unsigned int nextBanId = 0;
 
-void JKG_Bans_Clear( void ) {
+void JP_Bans_Clear( void ) {
 	banentry_t *entry, *next = NULL;
 
 	for ( entry = banlist; entry; entry = next ) {
@@ -48,7 +42,7 @@ void JKG_Bans_Clear( void ) {
 	banlist = 0;
 }
 
-void JKG_Bans_LoadBans( void ) {
+void JP_Bans_LoadBans( void ) {
 	char			*buffer;
 	fileHandle_t	f;
 	unsigned int	len;
@@ -77,7 +71,7 @@ void JKG_Bans_LoadBans( void ) {
 		return;
 	}
 
-	JKG_Bans_Clear();
+	JP_Bans_Clear();
 
 	nextBanId = cJSON_ToInteger( cJSON_GetObjectItem( root, "nextid" ) );
 	bans = cJSON_GetObjectItem( root, "bans" );
@@ -104,11 +98,11 @@ void JKG_Bans_LoadBans( void ) {
 	cJSON_Delete( root );
 }
 
-void JKG_Bans_Init( void ) {
-	JKG_Bans_LoadBans();
+void JP_Bans_Init( void ) {
+	JP_Bans_LoadBans();
 }
 
-void JKG_Bans_SaveBans( void ) {
+void JP_Bans_SaveBans( void ) {
 	cJSON			*root, *bans, *item, *ip;
 	const char		*buffer;
 	fileHandle_t	f;
@@ -174,7 +168,7 @@ void JKG_Bans_SaveBans( void ) {
 /* Same as above, but adds bans by string */
 /* A '*' can be used as a wildcard to make range bans (ie 150.10.*.*) */
 
-int JKG_Bans_AddBanString( const char *ip, const char *duration, const char *reason ) {
+int JP_Bans_AddBanString( const char *ip, const char *duration, const char *reason ) {
 	byteAlias_t		m;
 	unsigned char	mask = 0u;
 	int				i, c;
@@ -282,7 +276,7 @@ int JKG_Bans_AddBanString( const char *ip, const char *duration, const char *rea
 	entry->next = banlist;
 	banlist = entry;
 
-	JKG_Bans_SaveBans();
+	JP_Bans_SaveBans();
 
 	return entry->id;
 }
@@ -312,7 +306,7 @@ static const char *GetRemainingTime( unsigned int expireTime ) {
 		(days == 1) ? "" : "s", hours, minutes, seconds );
 }
 
-const char *JKG_Bans_IsBanned( byte *ip ) {
+const char *JP_Bans_IsBanned( byte *ip ) {
 	banentry_t *entry, *prev = NULL;
 
 	for ( entry = banlist; entry; prev = entry, entry = entry ? entry->next : NULL ) {// Find the ban entry
@@ -401,7 +395,7 @@ Faulty:
 	return &m;
 }
 
-void JKG_Bans_List( void ) {
+void JP_Bans_List( void ) {
 	banentry_t *entry;
 
 	for ( entry = banlist; entry; entry = entry->next ) {
@@ -431,7 +425,7 @@ void JKG_Bans_List( void ) {
 	}
 }
 
-qboolean JKG_Bans_Remove( byte *ip ) {
+qboolean JP_Bans_Remove( byte *ip ) {
 	banentry_t	*entry;
 	banentry_t	*prev = NULL;
 

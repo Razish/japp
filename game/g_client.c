@@ -2162,7 +2162,7 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		//Raz: Check if they're banned
 		byteAlias_t *ba;
 		ba = BuildByteFromIP( value );
-		value = (char *)JKG_Bans_IsBanned( ba->b );
+		value = (char *)JP_Bans_IsBanned( ba->b );
 		if ( value )
 			return value;
 	}

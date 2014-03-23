@@ -499,7 +499,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	//Raz: Load admins + telemarks
 	AM_LoadAdmins();
 	AM_LoadTelemarks();
-	JKG_Bans_Init();
+	JP_Bans_Init();
 
 #ifdef JPLUA
 	//As: BEGIN THE LUAS
@@ -518,8 +518,8 @@ void G_ShutdownGame( int restart ) {
 	gentity_t *ent;
 
 	//	trap->Print ("==== ShutdownGame ====\n");
-	JKG_Bans_SaveBans();
-	JKG_Bans_Clear();
+	JP_Bans_SaveBans();
+	JP_Bans_Clear();
 	AM_SaveTelemarks();
 
 	BG_ClearAnimsets(); //free all dynamic allocations made through the engine

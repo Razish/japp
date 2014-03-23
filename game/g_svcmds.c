@@ -205,7 +205,7 @@ static void SV_BanAdd_f( void ) {
 	trap->Argv( 2, duration, sizeof(duration) );
 	if ( trap->Argc() >= 4 )
 		reason = ConcatArgs( 3 );
-	JKG_Bans_AddBanString( ip, duration, reason );
+	JP_Bans_AddBanString( ip, duration, reason );
 }
 
 static void SV_BanDel_f( void ) {
@@ -219,7 +219,7 @@ static void SV_BanDel_f( void ) {
 
 	trap->Argv( 1, ip, sizeof(ip) );
 	bIP = BuildByteFromIP( ip );
-	if ( JKG_Bans_Remove( bIP->b ) )
+	if ( JP_Bans_Remove( bIP->b ) )
 		trap->Print( "Removing ban on %s\n", ip );
 	else
 		trap->Print( "No ban found for %s\n", ip );
@@ -227,12 +227,12 @@ static void SV_BanDel_f( void ) {
 
 static void SV_BanList_f( void ) {
 	trap->Print( "Listing bans\n" );
-	JKG_Bans_List();
+	JP_Bans_List();
 }
 
 static void SV_BanReload_f( void ) {
 	trap->Print( "Reloading bans\n" );
-	JKG_Bans_LoadBans();
+	JP_Bans_LoadBans();
 }
 
 static void SV_BotList_f( void ) {
