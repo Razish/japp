@@ -2304,8 +2304,7 @@ CheckVote
 void CheckVote( void ) {
 	if ( level.voteExecuteTime && level.voteExecuteTime < level.time ) {
 		level.voteExecuteTime = 0;
-		if ( !level.votePoll )
-			trap->SendConsoleCommand( EXEC_APPEND, va( "%s\n", level.voteString ) );
+		trap->SendConsoleCommand( EXEC_APPEND, va( "%s\n", level.voteString ) );
 
 		if ( level.votingGametype ) {
 			if ( level.gametype != level.votingGametypeTo ) { //If we're voting to a different game type, be sure to refresh all the map stuff
@@ -2353,27 +2352,33 @@ void CheckVote( void ) {
 	if ( !level.voteTime ) {
 		return;
 	}
-	if ( level.time - level.voteTime >= VOTE_TIME || level.voteYes + level.voteNo == 0 ) {
+	if ( level.time - level.voteTime >= VOTE_TIME || (level.voteYes + level.voteNo == 0 && !level.votePoll) ) {
 		trap->SendServerCommand( -1, va( "print \"%s (%s)\n\"", G_GetStringEdString( "MP_SVGAME", "VOTEFAILED" ), level.voteStringClean ) );
 	}
 	else {
 		if ( level.voteYes > level.numVotingClients / 2 ) {
 			// execute the command, then remove the vote
 			trap->SendServerCommand( -1, va( "print \"%s (%s)\n\"", G_GetStringEdString( "MP_SVGAME", "VOTEPASSED" ), level.voteStringClean ) );
-			level.voteExecuteTime = level.time + level.voteExecuteDelay;
+			if ( !level.votePoll )
+				level.voteExecuteTime = level.time + level.voteExecuteDelay;
 		}
 
 		// same behavior as a timeout
-		//Raz: Fix uneven vote bug
-		/*	"that reminds me another bug that enty discovered recently,
-			if you have odd amount of players, lets say 3 for example,
-			and vote is called, then only 1 vote of No will fail the vote,
-			i.e. if player A calls vote, player B votes No, then vote fails,
-			even if player C would vote Yes and it should have been 2:1 and passed" */
-		//	else if ( level.voteNo >= level.numVotingClients/2 )
 		else if ( level.voteNo >= (level.numVotingClients + 1) / 2 )
 			trap->SendServerCommand( -1, va( "print \"%s (%s)\n\"", G_GetStringEdString( "MP_SVGAME", "VOTEFAILED" ), level.voteStringClean ) );
 
+		else if ( level.votePoll ) {
+			static int lastPrint = 0;
+			if ( lastPrint < level.time - 5000 ) {
+				char msg[MAX_STRING_CHARS - 128];
+				Com_sprintf( msg, sizeof(msg), va( "%s\ncalled a poll\n\n%s", level.voteStringPollCreator,
+					level.voteStringPoll ) );
+				trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
+				Com_Printf( "%s\n", msg );
+				lastPrint = level.time;
+			}
+			return;
+		}
 		else // still waiting for a majority
 			return;
 	}
@@ -2383,6 +2388,7 @@ void CheckVote( void ) {
 
 void CheckReady( void ) {
 	int i = 0, readyCount = 0, playerCount;
+	float f = 0.0f, t = 0.0f;
 	gentity_t *ent = NULL;
 
 	if ( !g_doWarmup.integer || (level.warmupTime == 0) || !level.numPlayingClients || level.restarted || level.allReady )
@@ -2396,15 +2402,18 @@ void CheckReady( void ) {
 			playerCount--;
 	}
 
-	if ( readyCount >= (playerCount + 1) / 2 ) {
+	f = (float)readyCount / (float)playerCount;
+	t = (japp_readyThreshold.value - f); // 100 players 33 ready 0.50 needed, [f, t] = [0.33333, 0.16666], numRequired = total*t
+	if ( f >= japp_readyThreshold.value ) {
 		level.warmupTime = level.time + 3000;
 		level.allReady = qtrue;
 	}
-	else {
+	else if ( playerCount ) {
 		static int lastPrint = 0;
 		if ( lastPrint < level.time - g_warmupPrintDelay.integer ) {
 			char msg[MAX_STRING_CHARS / 2] = { 0 };
-			Com_sprintf( msg, sizeof(msg), S_COLOR_GREEN"Waiting for players to ready up!\n%i more needed\n\nType /ready", ((level.numConnectedClients + 1) / 2) - readyCount, level.numConnectedClients );
+			Com_sprintf( msg, sizeof(msg), S_COLOR_GREEN"Waiting for players to ready up!\n%i more needed\n\nType /ready",
+				(int)ceilf( (float)(playerCount) * t ) );
 			trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
 			Com_Printf( "%s\n", msg );
 			lastPrint = level.time;

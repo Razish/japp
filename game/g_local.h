@@ -613,6 +613,8 @@ typedef struct level_locals_s {
 	int					voteExecuteDelay;		// set per-vote
 	int					voteYes, voteNo;
 	qboolean			votePoll;
+	char				voteStringPoll[MAX_STRING_CHARS];
+	char				voteStringPollCreator[MAX_NETNAME];
 	int					numVotingClients;		// set by CalculateRanks
 	qboolean			votingGametype;
 	int					votingGametypeTo;

@@ -970,7 +970,9 @@ static void AM_Poll( gentity_t *ent ) {
 	}
 
 	trap->Argv( 0, arg1, sizeof(arg1) );
-	//	Q_strncpyz( arg2, ConcatArgs( 2 ), sizeof( arg2 ) );
+	Q_strncpyz( level.voteStringPoll, ConcatArgs( 1 ), sizeof(level.voteStringPoll) );
+	Q_strncpyz( level.voteStringPollCreator, ent->client->pers.netnameClean, sizeof(level.voteStringPollCreator) );
+		
 	Q_strncpyz( arg2, ent->client->pers.netname, sizeof(arg2) );
 	Q_CleanString( arg2, STRIP_COLOUR );
 	Q_strstrip( arg2, "\n\r;\"", NULL );
@@ -982,14 +984,25 @@ static void AM_Poll( gentity_t *ent ) {
 
 	trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s\n\"", ent->client->pers.netname, G_GetStringEdString(
 		"MP_SVGAME", "PLCALLEDVOTE" ) ) );
+
+	// still a vote waiting to be executed
+	if ( level.voteExecuteTime ) {
+		level.voteExecuteTime = 0;
+		if ( !level.votePoll )
+			trap->SendConsoleCommand( EXEC_APPEND, va( "%s\n", level.voteString ) );
+	}
+
 	level.voteExecuteDelay = japp_voteDelay.integer;
 	level.voteTime = level.time;
 	level.voteYes = 0;
 	level.voteNo = 0;
 	level.votePoll = qtrue;
+	level.votingGametype = qfalse;
 
-	for ( i = 0; i < level.maxclients; i++ )
+	for ( i = 0; i < level.maxclients; i++ ) {
 		level.clients[i].mGameFlags &= ~PSG_VOTED;
+		level.clients[i].pers.vote = 0;
+	}
 
 	trap->SetConfigstring( CS_VOTE_TIME, va( "%i", level.voteTime ) );
 	trap->SetConfigstring( CS_VOTE_STRING, level.voteDisplayString );
@@ -1092,7 +1105,7 @@ static void AM_GunProtect( gentity_t *ent ) {
 			return;
 
 		e->client->ps.eFlags ^= EF_INVULNERABLE;
-		e->client->invulnerableTimer = !!(e->client->ps.eFlags & EF_INVULNERABLE) ? level.time : 0x7FFFFFFF;
+		e->client->invulnerableTimer = !!(e->client->ps.eFlags & EF_INVULNERABLE) ? 0x7FFFFFFF : level.time;
 	}
 }
 
