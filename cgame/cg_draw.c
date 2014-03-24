@@ -7062,10 +7062,6 @@ static void CG_Draw2DScreenTints( void ) {
 			}
 		}
 
-		if ( cg.snap->ps.rocketLockIndex != ENTITYNUM_NONE && (cg.time - cg.snap->ps.rocketLockTime) > 0 ) {
-			CG_DrawRocketLocking( cg.snap->ps.rocketLockIndex, cg.snap->ps.rocketLockTime );
-		}
-
 		if ( BG_HasYsalamiri( cgs.gametype, &cg.snap->ps ) ) {
 			if ( !cgYsalTime ) {
 				cgYsalTime = cg.time;
