@@ -10,7 +10,6 @@
 		089C1680FE841241C02AAC07 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		561B1B4B15E422F500903484 /* jp_promode.c in Sources */ = {isa = PBXBuildFile; fileRef = 561B1B4715E422F500903484 /* jp_promode.c */; };
 		561B1B4C15E422F500903484 /* jp_tokenparser.c in Sources */ = {isa = PBXBuildFile; fileRef = 561B1B4815E422F500903484 /* jp_tokenparser.c */; };
-		5638837D186C84A70085216A /* bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 5638835D186C84A70085216A /* bit.c */; };
 		5638837E186C84A70085216A /* lapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 5638835E186C84A70085216A /* lapi.c */; };
 		5638837F186C84A70085216A /* lauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 5638835F186C84A70085216A /* lauxlib.c */; };
 		56388380186C84A70085216A /* lbaselib.c in Sources */ = {isa = PBXBuildFile; fileRef = 56388360186C84A70085216A /* lbaselib.c */; };
@@ -41,19 +40,25 @@
 		56388399186C84A70085216A /* lundump.c in Sources */ = {isa = PBXBuildFile; fileRef = 56388379186C84A70085216A /* lundump.c */; };
 		5638839A186C84A70085216A /* lvm.c in Sources */ = {isa = PBXBuildFile; fileRef = 5638837A186C84A70085216A /* lvm.c */; };
 		5638839B186C84A70085216A /* lzio.c in Sources */ = {isa = PBXBuildFile; fileRef = 5638837B186C84A70085216A /* lzio.c */; };
-		5638839C186C84A70085216A /* print.c in Sources */ = {isa = PBXBuildFile; fileRef = 5638837C186C84A70085216A /* print.c */; };
 		5638839E186C84C40085216A /* cg_newScoreboard.c in Sources */ = {isa = PBXBuildFile; fileRef = 5638839D186C84C40085216A /* cg_newScoreboard.c */; };
 		563883A0186C84DF0085216A /* cg_teambinds.c in Sources */ = {isa = PBXBuildFile; fileRef = 5638839F186C84DF0085216A /* cg_teambinds.c */; };
-		565830BD15EFC0420079C919 /* cg_lua.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8815E4084800F4A3E0 /* cg_lua.c */; };
-		565830BE15EFC0420079C919 /* cg_luacvar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8915E4084800F4A3E0 /* cg_luacvar.c */; };
-		565830BF15EFC0430079C919 /* cg_luaevent.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8A15E4084800F4A3E0 /* cg_luaevent.c */; };
-		565830C015EFC0440079C919 /* cg_luaplayer.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8B15E4084800F4A3E0 /* cg_luaplayer.c */; };
-		565830C115EFC0460079C919 /* cg_luaserialiser.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8C15E4084800F4A3E0 /* cg_luaserialiser.c */; };
 		565830C215EFC0480079C919 /* cg_luaserver.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8D15E4084800F4A3E0 /* cg_luaserver.c */; };
 		5658315F15EFC22E0079C919 /* cJSON.c in Sources */ = {isa = PBXBuildFile; fileRef = 5658315E15EFC22E0079C919 /* cJSON.c */; };
 		565832D615EFE5650079C919 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 565832D515EFE5650079C919 /* OpenGL.framework */; };
 		565DADD50C4FF78D008167FA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		565DAE0C0C4FF78D008167FA /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
+		568BB62718E0C08400ED39A3 /* q_math.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB62518E0C08400ED39A3 /* q_math.c */; };
+		568BB62818E0C08400ED39A3 /* q_shared.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB62618E0C08400ED39A3 /* q_shared.c */; };
+		568BB62A18E0C0A000ED39A3 /* cg_media.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB62918E0C0A000ED39A3 /* cg_media.c */; };
+		568BB62E18E0C0D800ED39A3 /* lbitlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB62B18E0C0D800ED39A3 /* lbitlib.c */; };
+		568BB62F18E0C0D800ED39A3 /* lcorolib.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB62C18E0C0D800ED39A3 /* lcorolib.c */; };
+		568BB63018E0C0D800ED39A3 /* lctype.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB62D18E0C0D800ED39A3 /* lctype.c */; };
+		568BB63718E0C0FD00ED39A3 /* bg_lua.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB63118E0C0FD00ED39A3 /* bg_lua.c */; };
+		568BB63818E0C0FD00ED39A3 /* bg_luacvar.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB63218E0C0FD00ED39A3 /* bg_luacvar.c */; };
+		568BB63918E0C0FD00ED39A3 /* bg_luaevent.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB63318E0C0FD00ED39A3 /* bg_luaevent.c */; };
+		568BB63A18E0C0FD00ED39A3 /* bg_luaplayer.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB63418E0C0FD00ED39A3 /* bg_luaplayer.c */; };
+		568BB63B18E0C0FD00ED39A3 /* bg_luaserialiser.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB63518E0C0FD00ED39A3 /* bg_luaserialiser.c */; };
+		568BB63C18E0C0FD00ED39A3 /* bg_luavector.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB63618E0C0FD00ED39A3 /* bg_luavector.c */; };
 		5694CB9415E4084800F4A3E0 /* cg_chatbox.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8615E4084800F4A3E0 /* cg_chatbox.c */; };
 		5694CB9C15E4084800F4A3E0 /* cg_serverModification.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8E15E4084800F4A3E0 /* cg_serverModification.c */; };
 		5694CB9D15E4084800F4A3E0 /* cg_smartentities.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8F15E4084800F4A3E0 /* cg_smartentities.c */; };
@@ -103,8 +108,6 @@
 		56E4CE8D121EFFA3004E7206 /* bg_vehicleLoad.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE7C121EFFA3004E7206 /* bg_vehicleLoad.c */; };
 		56E4CE8E121EFFA3004E7206 /* bg_weapons.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE7D121EFFA3004E7206 /* bg_weapons.c */; };
 		56E4CE8F121EFFA3004E7206 /* FighterNPC.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE7E121EFFA3004E7206 /* FighterNPC.c */; };
-		56E4CE90121EFFA3004E7206 /* q_math.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE7F121EFFA3004E7206 /* q_math.c */; };
-		56E4CE91121EFFA3004E7206 /* q_shared.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE80121EFFA3004E7206 /* q_shared.c */; };
 		56E4CE92121EFFA3004E7206 /* SpeederNPC.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE81121EFFA3004E7206 /* SpeederNPC.c */; };
 		56E4CE93121EFFA3004E7206 /* WalkerNPC.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE82121EFFA3004E7206 /* WalkerNPC.c */; };
 		56E4CE95121EFFB3004E7206 /* ui_shared.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE94121EFFB3004E7206 /* ui_shared.c */; };
@@ -181,7 +184,6 @@
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		561B1B4715E422F500903484 /* jp_promode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_promode.c; path = ../JAPP/jp_promode.c; sourceTree = SOURCE_ROOT; };
 		561B1B4815E422F500903484 /* jp_tokenparser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jp_tokenparser.c; path = ../JAPP/jp_tokenparser.c; sourceTree = SOURCE_ROOT; };
-		5638835D186C84A70085216A /* bit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bit.c; path = ../lua/bit.c; sourceTree = "<group>"; };
 		5638835E186C84A70085216A /* lapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lapi.c; path = ../lua/lapi.c; sourceTree = "<group>"; };
 		5638835F186C84A70085216A /* lauxlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lauxlib.c; path = ../lua/lauxlib.c; sourceTree = "<group>"; };
 		56388360186C84A70085216A /* lbaselib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lbaselib.c; path = ../lua/lbaselib.c; sourceTree = "<group>"; };
@@ -212,18 +214,24 @@
 		56388379186C84A70085216A /* lundump.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lundump.c; path = ../lua/lundump.c; sourceTree = "<group>"; };
 		5638837A186C84A70085216A /* lvm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lvm.c; path = ../lua/lvm.c; sourceTree = "<group>"; };
 		5638837B186C84A70085216A /* lzio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lzio.c; path = ../lua/lzio.c; sourceTree = "<group>"; };
-		5638837C186C84A70085216A /* print.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = print.c; path = ../lua/print.c; sourceTree = "<group>"; };
 		5638839D186C84C40085216A /* cg_newScoreboard.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_newScoreboard.c; path = ../cgame/cg_newScoreboard.c; sourceTree = "<group>"; };
 		5638839F186C84DF0085216A /* cg_teambinds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_teambinds.c; path = ../cgame/cg_teambinds.c; sourceTree = "<group>"; };
 		5658315E15EFC22E0079C919 /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cJSON.c; path = ../json/cJSON.c; sourceTree = SOURCE_ROOT; };
 		565832D515EFE5650079C919 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		565DAE130C4FF78D008167FA /* cgame.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cgame.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		568BB62518E0C08400ED39A3 /* q_math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = q_math.c; path = ../qcommon/q_math.c; sourceTree = "<group>"; };
+		568BB62618E0C08400ED39A3 /* q_shared.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = q_shared.c; path = ../qcommon/q_shared.c; sourceTree = "<group>"; };
+		568BB62918E0C0A000ED39A3 /* cg_media.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_media.c; path = ../cgame/cg_media.c; sourceTree = "<group>"; };
+		568BB62B18E0C0D800ED39A3 /* lbitlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lbitlib.c; path = ../lua/lbitlib.c; sourceTree = "<group>"; };
+		568BB62C18E0C0D800ED39A3 /* lcorolib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lcorolib.c; path = ../lua/lcorolib.c; sourceTree = "<group>"; };
+		568BB62D18E0C0D800ED39A3 /* lctype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lctype.c; path = ../lua/lctype.c; sourceTree = "<group>"; };
+		568BB63118E0C0FD00ED39A3 /* bg_lua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_lua.c; path = ../game/bg_lua.c; sourceTree = "<group>"; };
+		568BB63218E0C0FD00ED39A3 /* bg_luacvar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_luacvar.c; path = ../game/bg_luacvar.c; sourceTree = "<group>"; };
+		568BB63318E0C0FD00ED39A3 /* bg_luaevent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_luaevent.c; path = ../game/bg_luaevent.c; sourceTree = "<group>"; };
+		568BB63418E0C0FD00ED39A3 /* bg_luaplayer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_luaplayer.c; path = ../game/bg_luaplayer.c; sourceTree = "<group>"; };
+		568BB63518E0C0FD00ED39A3 /* bg_luaserialiser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_luaserialiser.c; path = ../game/bg_luaserialiser.c; sourceTree = "<group>"; };
+		568BB63618E0C0FD00ED39A3 /* bg_luavector.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_luavector.c; path = ../game/bg_luavector.c; sourceTree = "<group>"; };
 		5694CB8615E4084800F4A3E0 /* cg_chatbox.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 2; name = cg_chatbox.c; path = ../cgame/cg_chatbox.c; sourceTree = SOURCE_ROOT; };
-		5694CB8815E4084800F4A3E0 /* cg_lua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_lua.c; path = ../cgame/cg_lua.c; sourceTree = SOURCE_ROOT; };
-		5694CB8915E4084800F4A3E0 /* cg_luacvar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_luacvar.c; path = ../cgame/cg_luacvar.c; sourceTree = SOURCE_ROOT; };
-		5694CB8A15E4084800F4A3E0 /* cg_luaevent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_luaevent.c; path = ../cgame/cg_luaevent.c; sourceTree = SOURCE_ROOT; };
-		5694CB8B15E4084800F4A3E0 /* cg_luaplayer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_luaplayer.c; path = ../cgame/cg_luaplayer.c; sourceTree = SOURCE_ROOT; };
-		5694CB8C15E4084800F4A3E0 /* cg_luaserialiser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_luaserialiser.c; path = ../cgame/cg_luaserialiser.c; sourceTree = SOURCE_ROOT; };
 		5694CB8D15E4084800F4A3E0 /* cg_luaserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_luaserver.c; path = ../cgame/cg_luaserver.c; sourceTree = SOURCE_ROOT; };
 		5694CB8E15E4084800F4A3E0 /* cg_serverModification.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_serverModification.c; path = ../cgame/cg_serverModification.c; sourceTree = SOURCE_ROOT; };
 		5694CB8F15E4084800F4A3E0 /* cg_smartentities.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_smartentities.c; path = ../cgame/cg_smartentities.c; sourceTree = SOURCE_ROOT; };
@@ -273,8 +281,6 @@
 		56E4CE7C121EFFA3004E7206 /* bg_vehicleLoad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_vehicleLoad.c; path = ../game/bg_vehicleLoad.c; sourceTree = SOURCE_ROOT; };
 		56E4CE7D121EFFA3004E7206 /* bg_weapons.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_weapons.c; path = ../game/bg_weapons.c; sourceTree = SOURCE_ROOT; };
 		56E4CE7E121EFFA3004E7206 /* FighterNPC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = FighterNPC.c; path = ../game/FighterNPC.c; sourceTree = SOURCE_ROOT; };
-		56E4CE7F121EFFA3004E7206 /* q_math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = q_math.c; path = ../game/q_math.c; sourceTree = SOURCE_ROOT; };
-		56E4CE80121EFFA3004E7206 /* q_shared.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = q_shared.c; path = ../game/q_shared.c; sourceTree = SOURCE_ROOT; };
 		56E4CE81121EFFA3004E7206 /* SpeederNPC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SpeederNPC.c; path = ../game/SpeederNPC.c; sourceTree = SOURCE_ROOT; };
 		56E4CE82121EFFA3004E7206 /* WalkerNPC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = WalkerNPC.c; path = ../game/WalkerNPC.c; sourceTree = SOURCE_ROOT; };
 		56E4CE94121EFFB3004E7206 /* ui_shared.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ui_shared.c; path = ../ui/ui_shared.c; sourceTree = SOURCE_ROOT; };
@@ -338,12 +344,8 @@
 		08FB77AFFE84173DC02AAC07 /* cgame */ = {
 			isa = PBXGroup;
 			children = (
+				568BB62918E0C0A000ED39A3 /* cg_media.c */,
 				5694CB8615E4084800F4A3E0 /* cg_chatbox.c */,
-				5694CB8815E4084800F4A3E0 /* cg_lua.c */,
-				5694CB8915E4084800F4A3E0 /* cg_luacvar.c */,
-				5694CB8A15E4084800F4A3E0 /* cg_luaevent.c */,
-				5694CB8B15E4084800F4A3E0 /* cg_luaplayer.c */,
-				5694CB8C15E4084800F4A3E0 /* cg_luaserialiser.c */,
 				5638839D186C84C40085216A /* cg_newScoreboard.c */,
 				5694CB8D15E4084800F4A3E0 /* cg_luaserver.c */,
 				5694CB8E15E4084800F4A3E0 /* cg_serverModification.c */,
@@ -407,7 +409,9 @@
 		565830CC15EFC09D0079C919 /* lua */ = {
 			isa = PBXGroup;
 			children = (
-				5638835D186C84A70085216A /* bit.c */,
+				568BB62B18E0C0D800ED39A3 /* lbitlib.c */,
+				568BB62C18E0C0D800ED39A3 /* lcorolib.c */,
+				568BB62D18E0C0D800ED39A3 /* lctype.c */,
 				5638835E186C84A70085216A /* lapi.c */,
 				5638835F186C84A70085216A /* lauxlib.c */,
 				56388360186C84A70085216A /* lbaselib.c */,
@@ -438,7 +442,6 @@
 				56388379186C84A70085216A /* lundump.c */,
 				5638837A186C84A70085216A /* lvm.c */,
 				5638837B186C84A70085216A /* lzio.c */,
-				5638837C186C84A70085216A /* print.c */,
 			);
 			name = lua;
 			sourceTree = "<group>";
@@ -454,6 +457,14 @@
 		F5C12684034158F301A80169 /* game */ = {
 			isa = PBXGroup;
 			children = (
+				568BB63118E0C0FD00ED39A3 /* bg_lua.c */,
+				568BB63218E0C0FD00ED39A3 /* bg_luacvar.c */,
+				568BB63318E0C0FD00ED39A3 /* bg_luaevent.c */,
+				568BB63418E0C0FD00ED39A3 /* bg_luaplayer.c */,
+				568BB63518E0C0FD00ED39A3 /* bg_luaserialiser.c */,
+				568BB63618E0C0FD00ED39A3 /* bg_luavector.c */,
+				568BB62518E0C08400ED39A3 /* q_math.c */,
+				568BB62618E0C08400ED39A3 /* q_shared.c */,
 				56E4CE72121EFFA3004E7206 /* AnimalNPC.c */,
 				56E4CE73121EFFA3004E7206 /* bg_g2_utils.c */,
 				56E4CE75121EFFA3004E7206 /* bg_misc.c */,
@@ -466,8 +477,6 @@
 				56E4CE7C121EFFA3004E7206 /* bg_vehicleLoad.c */,
 				56E4CE7D121EFFA3004E7206 /* bg_weapons.c */,
 				56E4CE7E121EFFA3004E7206 /* FighterNPC.c */,
-				56E4CE7F121EFFA3004E7206 /* q_math.c */,
-				56E4CE80121EFFA3004E7206 /* q_shared.c */,
 				56E4CE81121EFFA3004E7206 /* SpeederNPC.c */,
 				56E4CE82121EFFA3004E7206 /* WalkerNPC.c */,
 			);
@@ -526,6 +535,8 @@
 /* Begin PBXProject section */
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = 565DAE140C4FF78E008167FA /* Build configuration list for PBXProject "cgame" */;
 			compatibilityVersion = "Xcode 2.4";
 			developmentRegion = English;
@@ -593,8 +604,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				56E4CE4F121EFF71004E7206 /* cg_consolecmds.c in Sources */,
+				568BB62F18E0C0D800ED39A3 /* lcorolib.c in Sources */,
+				568BB62818E0C08400ED39A3 /* q_shared.c in Sources */,
 				56E4CE50121EFF71004E7206 /* cg_draw.c in Sources */,
 				56E4CE51121EFF71004E7206 /* cg_drawtools.c in Sources */,
+				568BB62718E0C08400ED39A3 /* q_math.c in Sources */,
 				56E4CE52121EFF71004E7206 /* cg_effects.c in Sources */,
 				56E4CE53121EFF71004E7206 /* cg_ents.c in Sources */,
 				56E4CE54121EFF71004E7206 /* cg_event.c in Sources */,
@@ -605,6 +619,7 @@
 				56E4CE59121EFF71004E7206 /* cg_marks.c in Sources */,
 				56E4CE5A121EFF71004E7206 /* cg_newDraw.c in Sources */,
 				56E4CE5B121EFF71004E7206 /* cg_players.c in Sources */,
+				568BB62E18E0C0D800ED39A3 /* lbitlib.c in Sources */,
 				56E4CE5C121EFF71004E7206 /* cg_playerstate.c in Sources */,
 				56E4CE5D121EFF71004E7206 /* cg_predict.c in Sources */,
 				56E4CE5E121EFF71004E7206 /* cg_saga.c in Sources */,
@@ -615,9 +630,11 @@
 				56E4CE64121EFF71004E7206 /* cg_turret.c in Sources */,
 				56E4CE65121EFF71004E7206 /* cg_view.c in Sources */,
 				56E4CE66121EFF71004E7206 /* cg_weaponinit.c in Sources */,
+				568BB63818E0C0FD00ED39A3 /* bg_luacvar.c in Sources */,
 				56E4CE67121EFF71004E7206 /* cg_weapons.c in Sources */,
 				56E4CE68121EFF71004E7206 /* fx_blaster.c in Sources */,
 				56E4CE69121EFF71004E7206 /* fx_bowcaster.c in Sources */,
+				568BB63C18E0C0FD00ED39A3 /* bg_luavector.c in Sources */,
 				56E4CE6A121EFF71004E7206 /* fx_bryarpistol.c in Sources */,
 				56E4CE6B121EFF71004E7206 /* fx_demp2.c in Sources */,
 				56E4CE6C121EFF71004E7206 /* fx_disruptor.c in Sources */,
@@ -626,8 +643,10 @@
 				56E4CE6F121EFF71004E7206 /* fx_heavyrepeater.c in Sources */,
 				56E4CE70121EFF71004E7206 /* fx_rocketlauncher.c in Sources */,
 				56E4CE83121EFFA3004E7206 /* AnimalNPC.c in Sources */,
+				568BB62A18E0C0A000ED39A3 /* cg_media.c in Sources */,
 				56E4CE84121EFFA3004E7206 /* bg_g2_utils.c in Sources */,
 				56E4CE86121EFFA3004E7206 /* bg_misc.c in Sources */,
+				568BB63918E0C0FD00ED39A3 /* bg_luaevent.c in Sources */,
 				56E4CE87121EFFA3004E7206 /* bg_panimate.c in Sources */,
 				56E4CE88121EFFA3004E7206 /* bg_pmove.c in Sources */,
 				56E4CE89121EFFA3004E7206 /* bg_saber.c in Sources */,
@@ -636,9 +655,8 @@
 				56E4CE8C121EFFA3004E7206 /* bg_slidemove.c in Sources */,
 				56E4CE8D121EFFA3004E7206 /* bg_vehicleLoad.c in Sources */,
 				56E4CE8E121EFFA3004E7206 /* bg_weapons.c in Sources */,
+				568BB63718E0C0FD00ED39A3 /* bg_lua.c in Sources */,
 				56E4CE8F121EFFA3004E7206 /* FighterNPC.c in Sources */,
-				56E4CE90121EFFA3004E7206 /* q_math.c in Sources */,
-				56E4CE91121EFFA3004E7206 /* q_shared.c in Sources */,
 				56E4CE92121EFFA3004E7206 /* SpeederNPC.c in Sources */,
 				56E4CE93121EFFA3004E7206 /* WalkerNPC.c in Sources */,
 				56E4CE95121EFFB3004E7206 /* ui_shared.c in Sources */,
@@ -647,14 +665,9 @@
 				5694CB9D15E4084800F4A3E0 /* cg_smartentities.c in Sources */,
 				561B1B4B15E422F500903484 /* jp_promode.c in Sources */,
 				561B1B4C15E422F500903484 /* jp_tokenparser.c in Sources */,
-				565830BD15EFC0420079C919 /* cg_lua.c in Sources */,
-				565830BE15EFC0420079C919 /* cg_luacvar.c in Sources */,
-				565830BF15EFC0430079C919 /* cg_luaevent.c in Sources */,
-				565830C015EFC0440079C919 /* cg_luaplayer.c in Sources */,
-				565830C115EFC0460079C919 /* cg_luaserialiser.c in Sources */,
+				568BB63018E0C0D800ED39A3 /* lctype.c in Sources */,
 				565830C215EFC0480079C919 /* cg_luaserver.c in Sources */,
 				5658315F15EFC22E0079C919 /* cJSON.c in Sources */,
-				5638837D186C84A70085216A /* bit.c in Sources */,
 				5638837E186C84A70085216A /* lapi.c in Sources */,
 				5638837F186C84A70085216A /* lauxlib.c in Sources */,
 				56388380186C84A70085216A /* lbaselib.c in Sources */,
@@ -670,6 +683,7 @@
 				5638838A186C84A70085216A /* llex.c in Sources */,
 				5638838B186C84A70085216A /* lmathlib.c in Sources */,
 				5638838C186C84A70085216A /* lmem.c in Sources */,
+				568BB63A18E0C0FD00ED39A3 /* bg_luaplayer.c in Sources */,
 				5638838D186C84A70085216A /* loadlib.c in Sources */,
 				5638838E186C84A70085216A /* lobject.c in Sources */,
 				5638838F186C84A70085216A /* lopcodes.c in Sources */,
@@ -685,8 +699,8 @@
 				56388399186C84A70085216A /* lundump.c in Sources */,
 				5638839A186C84A70085216A /* lvm.c in Sources */,
 				5638839B186C84A70085216A /* lzio.c in Sources */,
-				5638839C186C84A70085216A /* print.c in Sources */,
 				5638839E186C84C40085216A /* cg_newScoreboard.c in Sources */,
+				568BB63B18E0C0FD00ED39A3 /* bg_luaserialiser.c in Sources */,
 				563883A0186C84DF0085216A /* cg_teambinds.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -852,6 +866,7 @@
 		565DAE150C4FF78E008167FA /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
 				GCC_VERSION = "";
@@ -863,6 +878,7 @@
 		565DAE160C4FF78E008167FA /* Deployment - Native */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
@@ -875,6 +891,7 @@
 		565DAE170C4FF78E008167FA /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
 				GCC_VERSION = "";
@@ -934,10 +951,7 @@
 		565DAE1F0C4FF7C9008167FA /* Deployment - Universal */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;

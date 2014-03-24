@@ -15,6 +15,10 @@
 		5658340015EFF10F0079C919 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 565833FF15EFF10F0079C919 /* libcrypto.dylib */; };
 		565DAD9C0C4FF701008167FA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		565DADAD0C4FF701008167FA /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
+		568BB61F18E0BF5400ED39A3 /* q_math.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB61D18E0BF5400ED39A3 /* q_math.c */; };
+		568BB62018E0BF5400ED39A3 /* q_shared.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB61E18E0BF5400ED39A3 /* q_shared.c */; };
+		568BB62218E0BF7600ED39A3 /* ui_cvar.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB62118E0BF7600ED39A3 /* ui_cvar.c */; };
+		568BB62418E0BFA000ED39A3 /* bg_saberLoad.c in Sources */ = {isa = PBXBuildFile; fileRef = 568BB62318E0BFA000ED39A3 /* bg_saberLoad.c */; };
 		56E4CE03121EFEC2004E7206 /* ui_atoms.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CDFC121EFEC2004E7206 /* ui_atoms.c */; };
 		56E4CE04121EFEC2004E7206 /* ui_force.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CDFD121EFEC2004E7206 /* ui_force.c */; };
 		56E4CE05121EFEC2004E7206 /* ui_gameinfo.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CDFE121EFEC2004E7206 /* ui_gameinfo.c */; };
@@ -26,8 +30,6 @@
 		56E4CE13121EFEF8004E7206 /* bg_saga.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE0C121EFEF8004E7206 /* bg_saga.c */; };
 		56E4CE14121EFEF8004E7206 /* bg_vehicleLoad.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE0D121EFEF8004E7206 /* bg_vehicleLoad.c */; };
 		56E4CE15121EFEF8004E7206 /* bg_weapons.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE0E121EFEF8004E7206 /* bg_weapons.c */; };
-		56E4CE16121EFEF8004E7206 /* q_math.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE0F121EFEF8004E7206 /* q_math.c */; };
-		56E4CE17121EFEF8004E7206 /* q_shared.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE10121EFEF8004E7206 /* q_shared.c */; };
 		F5D461E10341868601A80169 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -106,6 +108,10 @@
 		565833FF15EFF10F0079C919 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
 		565DADB30C4FF701008167FA /* Info-ui__Upgraded_.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-ui__Upgraded_.plist"; sourceTree = "<group>"; };
 		565DADB40C4FF702008167FA /* ui.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ui.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		568BB61D18E0BF5400ED39A3 /* q_math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = q_math.c; path = ../qcommon/q_math.c; sourceTree = "<group>"; };
+		568BB61E18E0BF5400ED39A3 /* q_shared.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = q_shared.c; path = ../qcommon/q_shared.c; sourceTree = "<group>"; };
+		568BB62118E0BF7600ED39A3 /* ui_cvar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ui_cvar.c; path = ../ui/ui_cvar.c; sourceTree = "<group>"; };
+		568BB62318E0BFA000ED39A3 /* bg_saberLoad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_saberLoad.c; path = ../game/bg_saberLoad.c; sourceTree = "<group>"; };
 		56E4CDFC121EFEC2004E7206 /* ui_atoms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ui_atoms.c; path = ../ui/ui_atoms.c; sourceTree = SOURCE_ROOT; };
 		56E4CDFD121EFEC2004E7206 /* ui_force.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ui_force.c; path = ../ui/ui_force.c; sourceTree = SOURCE_ROOT; };
 		56E4CDFE121EFEC2004E7206 /* ui_gameinfo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ui_gameinfo.c; path = ../ui/ui_gameinfo.c; sourceTree = SOURCE_ROOT; };
@@ -117,8 +123,6 @@
 		56E4CE0C121EFEF8004E7206 /* bg_saga.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_saga.c; path = ../game/bg_saga.c; sourceTree = SOURCE_ROOT; };
 		56E4CE0D121EFEF8004E7206 /* bg_vehicleLoad.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_vehicleLoad.c; path = ../game/bg_vehicleLoad.c; sourceTree = SOURCE_ROOT; };
 		56E4CE0E121EFEF8004E7206 /* bg_weapons.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bg_weapons.c; path = ../game/bg_weapons.c; sourceTree = SOURCE_ROOT; };
-		56E4CE0F121EFEF8004E7206 /* q_math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = q_math.c; path = ../game/q_math.c; sourceTree = SOURCE_ROOT; };
-		56E4CE10121EFEF8004E7206 /* q_shared.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = q_shared.c; path = ../game/q_shared.c; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -205,12 +209,13 @@
 		F5C12684034158F301A80169 /* game */ = {
 			isa = PBXGroup;
 			children = (
+				568BB62318E0BFA000ED39A3 /* bg_saberLoad.c */,
+				568BB61D18E0BF5400ED39A3 /* q_math.c */,
+				568BB61E18E0BF5400ED39A3 /* q_shared.c */,
 				56E4CE0B121EFEF8004E7206 /* bg_misc.c */,
 				56E4CE0C121EFEF8004E7206 /* bg_saga.c */,
 				56E4CE0D121EFEF8004E7206 /* bg_vehicleLoad.c */,
 				56E4CE0E121EFEF8004E7206 /* bg_weapons.c */,
-				56E4CE0F121EFEF8004E7206 /* q_math.c */,
-				56E4CE10121EFEF8004E7206 /* q_shared.c */,
 			);
 			name = game;
 			sourceTree = "<group>";
@@ -218,6 +223,7 @@
 		F5FC338B03536E6D01A80169 /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				568BB62118E0BF7600ED39A3 /* ui_cvar.c */,
 				56E4CDFC121EFEC2004E7206 /* ui_atoms.c */,
 				56E4CDFD121EFEC2004E7206 /* ui_force.c */,
 				56E4CDFE121EFEC2004E7206 /* ui_gameinfo.c */,
@@ -273,6 +279,8 @@
 /* Begin PBXProject section */
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = 565DADB50C4FF702008167FA /* Build configuration list for PBXProject "ui" */;
 			compatibilityVersion = "Xcode 2.4";
 			developmentRegion = English;
@@ -339,18 +347,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				56E4CE03121EFEC2004E7206 /* ui_atoms.c in Sources */,
+				568BB62218E0BF7600ED39A3 /* ui_cvar.c in Sources */,
 				56E4CE04121EFEC2004E7206 /* ui_force.c in Sources */,
+				568BB62018E0BF5400ED39A3 /* q_shared.c in Sources */,
 				56E4CE05121EFEC2004E7206 /* ui_gameinfo.c in Sources */,
 				56E4CE06121EFEC2004E7206 /* ui_main.c in Sources */,
 				56E4CE07121EFEC2004E7206 /* ui_saber.c in Sources */,
 				56E4CE08121EFEC2004E7206 /* ui_shared.c in Sources */,
 				56E4CE09121EFEC2004E7206 /* ui_syscalls.c in Sources */,
 				56E4CE12121EFEF8004E7206 /* bg_misc.c in Sources */,
+				568BB61F18E0BF5400ED39A3 /* q_math.c in Sources */,
 				56E4CE13121EFEF8004E7206 /* bg_saga.c in Sources */,
 				56E4CE14121EFEF8004E7206 /* bg_vehicleLoad.c in Sources */,
 				56E4CE15121EFEF8004E7206 /* bg_weapons.c in Sources */,
-				56E4CE16121EFEF8004E7206 /* q_math.c in Sources */,
-				56E4CE17121EFEF8004E7206 /* q_shared.c in Sources */,
+				568BB62418E0BFA000ED39A3 /* bg_saberLoad.c in Sources */,
 				5658334615EFEBB90079C919 /* cJSON.c in Sources */,
 				5658337C15EFED0C0079C919 /* jp_tokenparser.c in Sources */,
 				56056E2F186C876200CC97EA /* jp_crash.c in Sources */,
@@ -517,6 +527,7 @@
 		565DADB60C4FF702008167FA /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_DEBUGGING_SYMBOLS = full;
@@ -533,6 +544,7 @@
 		565DADB70C4FF702008167FA /* Deployment - Native */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = _UI;
@@ -546,6 +558,7 @@
 		565DADB80C4FF702008167FA /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = _UI;
 				GCC_VERSION = "";
@@ -605,10 +618,7 @@
 		565DADC90C4FF781008167FA /* Deployment - Universal */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = _UI;
