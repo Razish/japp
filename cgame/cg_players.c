@@ -5054,7 +5054,7 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 							if ( cg.time - client->saber[saberNum].blade[bladeNum].hitWallDebounceTime >= 100 ) {
 								// ugh, need to have a real sound debouncer... or do this game-side
 								client->saber[saberNum].blade[bladeNum].hitWallDebounceTime = cg.time;
-								trap->S_StartSound( &trace.endpos, -1, CHAN_WEAPON, media.sounds.saber.hitWall[Q_irand( 1, 3 )] );
+								trap->S_StartSound( &trace.endpos, -1, CHAN_WEAPON, media.sounds.saber.hitWall[Q_irand( 0, 2 )] );
 							}
 						}
 					}
