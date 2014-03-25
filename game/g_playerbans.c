@@ -296,6 +296,7 @@ static const char *GetRemainingTime( unsigned int expireTime ) {
 
 	diff = expireTime - curr;
 
+	//TODO: consider years, months
 	days = diff / 86400;	diff -= (days * 86400);
 	hours = diff / 3600;	diff -= (hours * 3600);
 	minutes = diff / 60;	diff -= (minutes * 60);
@@ -397,13 +398,16 @@ Faulty:
 
 void JP_Bans_List( void ) {
 	banentry_t *entry;
+	int numBans = 0;
+
+	//TODO: table header
 
 	for ( entry = banlist; entry; entry = entry->next ) {
 		char buf[MAX_STRING_CHARS] = { 0 };
 		char tmp[16] = { 0 };
 		int i = 0;
 
-		Q_strcat( buf, sizeof(buf), va( "  %3d ", entry->id ) );
+		Q_strcat( buf, sizeof(buf), va( " #%03d ", ++numBans ) );
 
 		// build IP
 		if ( entry->mask & 1 )	Q_strcat( tmp, sizeof(tmp), "*" );
@@ -430,10 +434,10 @@ qboolean JP_Bans_Remove( byte *ip ) {
 	banentry_t	*prev = NULL;
 
 	for ( entry = banlist; entry; prev = entry, entry = entry ? entry->next : NULL ) {// Find the ban entry
-		if ( entry->mask & 1 && entry->ip.b[0] != ip[0] ) continue;	//	*.0.0.0
-		if ( entry->mask & 2 && entry->ip.b[1] != ip[1] ) continue;	//	0.*.0.0
-		if ( entry->mask & 4 && entry->ip.b[2] != ip[2] ) continue;	//	0.0.*.0
-		if ( entry->mask & 8 && entry->ip.b[3] != ip[3] ) continue;	//	0.0.0.*
+		if ( !(entry->mask & 1) && entry->ip.b[0] != ip[0] ) continue;	//	*.0.0.0
+		if ( !(entry->mask & 2) && entry->ip.b[1] != ip[1] ) continue;	//	0.*.0.0
+		if ( !(entry->mask & 4) && entry->ip.b[2] != ip[2] ) continue;	//	0.0.*.0
+		if ( !(entry->mask & 8) && entry->ip.b[3] != ip[3] ) continue;	//	0.0.0.*
 
 		// If we get here, we got a match
 		if ( !prev )	banlist = entry->next;		//	root item
