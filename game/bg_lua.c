@@ -28,13 +28,16 @@ static const char *pluginDir = "lua/cl/";
 
 jplua_t JPLua;
 
-#define JPLUA_LOAD_CHUNKSIZE (1024)
+qboolean JPLua_IteratePlugins( jplua_plugin_t **plugin ) {
+	if ( !*plugin )
+		*plugin = JPLua.plugins;
+	else
+		*plugin = (*plugin)->next;
 
-typedef struct gfd_s {// JPLua File Data
-	fileHandle_t f;
-	int dataRemaining;
-	char buff[JPLUA_LOAD_CHUNKSIZE];
-} gfd_t;
+	JPLua.currentPlugin = *plugin;
+
+	return (*plugin != NULL) ? qtrue : qfalse;
+}
 
 void JPLua_DPrintf( const char *msg, ... ) {
 #ifdef JPLUA_DEBUG
@@ -65,6 +68,13 @@ qboolean JPLua_Call( lua_State *L, int argCount, int resCount ) {
 	}
 	return qtrue;
 }
+
+#define JPLUA_LOAD_CHUNKSIZE (1024)
+typedef struct gfd_s {// JPLua File Data
+	fileHandle_t f;
+	int dataRemaining;
+	char buff[JPLUA_LOAD_CHUNKSIZE];
+} gfd_t;
 
 // Called by the loader, never access it directly
 static const char *JPLua_LoadFile_Reader( lua_State *L, void *ud, size_t *sz ) {
@@ -424,7 +434,7 @@ static int JPLua_Export_AddClientCommand( lua_State *L ) {
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
 		G_LogPrintf( level.log.console, "JPLua: AddClientCommand failed, function signature invalid registering %s"
-			"(plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->name );
+			"(plugin: %s) - Is it up to date?\n", lua_tostring( L, 1 ), JPLua.currentPlugin->name );
 		return 0;
 	}
 
@@ -442,7 +452,7 @@ static int JPLua_Export_AddClientCommand( lua_State *L ) {
 		cmd = JPLua.currentPlugin->clientCmds;
 	}
 
-	Q_strncpyz( cmd->command, lua_tostring( L, -2 ), sizeof(cmd->command) );
+	Q_strncpyz( cmd->command, lua_tostring( L, 1 ), sizeof(cmd->command) );
 	cmd->handle = luaL_ref( L, LUA_REGISTRYINDEX );
 
 	return 0;
@@ -456,7 +466,7 @@ static int JPLua_Export_AddConsoleCommand( lua_State *L ) {
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING || (funcType != LUA_TFUNCTION && funcType != LUA_TNIL) ) {
 		trap->Print( "JPLua: AddConsoleCommand failed, function signature invalid registering %s (plugin: %s) - Is it up"
-			" to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->longname );
+			" to date?\n", lua_tostring( L, 1 ), JPLua.currentPlugin->longname );
 		return 0;
 	}
 

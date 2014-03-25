@@ -79,6 +79,7 @@
     <ClCompile Include="..\qcommon\q_shared.c" />
     <ClCompile Include="..\JAPP\jp_crash.c" />
     <ClCompile Include="..\JAPP\jp_promode.c" />
+    <ClCompile Include="..\JAPP\jp_stack.c" />
     <ClCompile Include="..\JAPP\jp_tokenparser.c" />
     <ClCompile Include="..\json\cJSON.c" />
     <ClCompile Include="..\libudis86\decode.c" />

@@ -16,7 +16,6 @@
 
 void JPLua_Init( void );
 void JPLua_Shutdown( void );
-
 int JPLua_StackDump( lua_State *L );
 
 int JPLua_Push_ToString( lua_State *L );
@@ -62,6 +61,8 @@ typedef struct jplua_plugin_s {
 
 	struct jplua_plugin_s *next;
 } jplua_plugin_t;
+
+qboolean JPLua_IteratePlugins( jplua_plugin_t **plugin );
 
 typedef struct jplua_s {
 	lua_State *state;
