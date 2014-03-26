@@ -106,9 +106,9 @@ extern int g_G2AllocServer;
 #error "Could not determine architecture"
 #endif
 
-#define JAPP_VERSION_SMALL "JA++, "XSTRING(QARCH)" bits, "__DATE__
+#define JAPP_VERSION_SMALL "JA++, " XSTRING( QARCH ) " bits, " __DATE__
 #ifdef REVISION
-#define JAPP_VERSION "JA++, "XSTRING(QARCH)" bits, "__DATE__", "REVISION
+#define JAPP_VERSION JAPP_VERSION_SMALL ", " REVISION
 #else
 #define JAPP_VERSION JAPP_VERSION_SMALL
 #endif

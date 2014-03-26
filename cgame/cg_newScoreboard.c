@@ -107,7 +107,6 @@ static void DrawServerInformation( float fade ) {
 
 	default:
 		break;
-
 	}
 }
 
@@ -495,7 +494,8 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 
 			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
 				tmp = "READY";
-				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f, tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle,
+					fontScale ) / 2.0f) - 1.0f, tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
 			}
 
 			// Name
@@ -881,6 +881,57 @@ static void DrawPlayers( float fade ) {
 	}
 }
 
+static const char *months[12] = { "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+// e.g. #st, #nd, #rd, #th
+static const char *GetDateSuffix( int date ) {
+	switch ( date%10 ) {
+	case 1:
+		return "st";
+	case 2:
+		return "nd";
+	case 3:
+		return "rd";
+	default:
+		return "th";
+	}
+
+	// should not happen
+	return NULL;
+}
+
+// shows current date and JA++ version
+static void DrawClientInfo( float fade ) {
+	struct tm *timeinfo;
+	time_t tm;
+	char buf[256];
+	const qhandle_t fontHandle = MenuFontToHandle( FONT_JAPPMONO );
+	const float fontScale = 0.5f;
+	const float lineHeight = trap->R_Font_HeightPixels( fontHandle, fontScale );
+	float y = SCREEN_HEIGHT - lineHeight - 4.0f;
+	vector4 colour;
+
+	VectorCopy4( &g_color_table[ColorIndex( COLOR_ORANGE )], &colour );
+	colour.a = fade;
+
+#ifdef REVISION
+	// JA++ version
+	trap->R_Font_DrawString( SCREEN_WIDTH - trap->R_Font_StrLenPixels( REVISION, fontHandle, fontScale ) - 21.0f, y,
+		REVISION, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+	y -= lineHeight;
+#endif
+
+	// date
+	time( &tm );
+	timeinfo = localtime( &tm );
+
+	Com_sprintf( buf, sizeof(buf), "%s %i%s %04i, %02i:%02i:%02i", months[timeinfo->tm_mon], timeinfo->tm_mday,
+		GetDateSuffix( timeinfo->tm_mday ), 1900+timeinfo->tm_year, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+
+	trap->R_Font_DrawString( SCREEN_WIDTH - trap->R_Font_StrLenPixels( buf, fontHandle, fontScale ) - 12.0f, y, buf,
+		&colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+}
+
 //Scoreboard entry point
 //	This will be called even if the scoreboard is not showing - and will return false if it has faded aka 'not showing'
 //	It will return true if the scoreboard is showing
@@ -902,6 +953,8 @@ qboolean CG_DrawQ3PScoreboard( void ) {
 
 	DrawPlayerCount( fade );
 	DrawPlayers( fade );
+
+	DrawClientInfo( fade );
 
 	CG_LoadDeferredPlayers();
 	return qtrue;

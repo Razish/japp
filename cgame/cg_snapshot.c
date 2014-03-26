@@ -87,7 +87,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 		char buf[256] = { 0 }, timeStr[64] = { 0 }, mapName[MAX_QPATH] = { 0 };
 
 		time( &rawtime );
-		strftime( timeStr, sizeof(timeStr), "%Y-%m-%d_%H-%M-%S", gmtime( &rawtime ) );
+		strftime( timeStr, sizeof(timeStr), "%Y-%m-%d_%H-%M-%S", localtime( &rawtime ) );
 		Q_strncpyz( mapName, cgs.mapname + 5, sizeof(mapName) );
 		Q_strstrip( mapName, "/", "-" );
 		COM_StripExtension( mapName, mapName, sizeof(mapName) );
