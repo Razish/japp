@@ -365,7 +365,7 @@ if plat == 'Linux':
 		env['LINKFLAGS'] += [ '-m32' ]
 elif plat == 'Windows':
 	# assume msvc
-	env['CCFLAGS'] = [ '/nologo', '/W4', '/WX-', '/GS', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/GF', '/TC', '/errorReport:prompt', '/EHs', '/EHc', '/Ot', '/Zi' ]
+	env['CCFLAGS'] = [ '/nologo', '/W4', '/WX-', '/GS', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/GF', '/TC', '/errorReport:prompt', '/EHs', '/EHc', '/Ot', '/Zi', '/MP' ]
 	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS', '/MACHINE:'+arch, '/LTCG' ]
 	env['CPPDEFINES'] = [ '_WINDLL', '_MSC_EXTENSIONS', '_INTEGRAL_MAX_BITS=64', '_WIN32', '_MT', '_DLL', '_M_FP_PRECISE' ]
 	if bits == 32:
