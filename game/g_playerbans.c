@@ -147,27 +147,8 @@ void JP_Bans_SaveBans( void ) {
 	cJSON_Delete( root );
 }
 
-/* Adds a ban to the banlist
-|* Duration format:
-|*
-|* <count><specifier> (eg. '12h' for a 12 hour ban)
-|*
-|* Specifiers:
-|*
-|* s: seconds
-|* m: minutes
-|* h: hours
-|* d: days
-|* n: months (30 days)
-|* y: years  (365 days)
-|*
-|* Specify a NULL duration or a duration of '0' to make the ban permanent
-|*
-\*/
-
-/* Same as above, but adds bans by string */
-/* A '*' can be used as a wildcard to make range bans (ie 150.10.*.*) */
-
+// Specify a NULL duration or a duration of '0' to make the ban permanent
+// * can be used as a wildcard to make range bans (ie 150.10.*.*)
 int JP_Bans_AddBanString( const char *ip, const char *duration, const char *reason ) {
 	byteAlias_t		m;
 	unsigned char	mask = 0u;
@@ -285,8 +266,7 @@ int JP_Bans_AddBanString( const char *ip, const char *duration, const char *reas
 // If the IP is not banned, NULL will be returned
 
 static const char *GetRemainingTime( unsigned int expireTime ) {
-	unsigned int	curr = time( NULL );
-	unsigned int	diff, days, hours, minutes, seconds;
+	unsigned int diff, years, months, days, hours, minutes, seconds, curr = time( NULL );
 
 	if ( !expireTime )
 		return "Permanent";
@@ -296,15 +276,16 @@ static const char *GetRemainingTime( unsigned int expireTime ) {
 
 	diff = expireTime - curr;
 
-	//TODO: consider years, months
-	days = diff / 86400;	diff -= (days * 86400);
-	hours = diff / 3600;	diff -= (hours * 3600);
-	minutes = diff / 60;	diff -= (minutes * 60);
-
+	//TODO: this doesn't consider how many days are in each month, leap years, etc. not really a major problem, but
+	//	worth considering in the future
+	years = diff / 31536000;	diff -= (years * 31536000);
+	months = diff / 2592000;	diff -= (months * 2592000);
+	days = diff / 86400;		diff -= (days * 86400);
+	hours = diff / 3600;		diff -= (hours * 3600);
+	minutes = diff / 60;		diff -= (minutes * 60);
 	seconds = diff;
 
-	return (days) ? va( "%02i:%02i:%02i", hours, minutes, seconds ) : va( "%i day%s - %02i:%02i:%02i", days,
-		(days == 1) ? "" : "s", hours, minutes, seconds );
+	return va( "%01iy%02im%02id %02i:%02i:%02i", years, months, days, hours, minutes, seconds );
 }
 
 const char *JP_Bans_IsBanned( byte *ip ) {
