@@ -6109,7 +6109,7 @@ static void CG_DrawWarmup( void ) {
 		return;
 	}
 
-	if ( sec < 0 ) {
+	if ( sec < 0 && !cg.scoreBoardShowing ) {
 		//		s = "Waiting for players";
 		s = CG_GetStringEdString( "MP_INGAME", "WAITING_FOR_PLAYERS" );
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;

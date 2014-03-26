@@ -2390,16 +2390,28 @@ void CheckReady( void ) {
 	int i = 0, readyCount = 0, playerCount;
 	float f = 0.0f, t = 0.0f;
 	gentity_t *ent = NULL;
+	uint16_t readyMask = 0u;
 
-	if ( !g_doWarmup.integer || (level.warmupTime == 0) || !level.numPlayingClients || level.restarted || level.allReady )
+	if ( !g_doWarmup.integer || level.warmupTime == 0 || !level.numPlayingClients || level.restarted || level.allReady )
 		return;
 
 	playerCount = level.numPlayingClients;
 	for ( i = 0, ent = g_entities; i < sv_maxclients.integer; i++, ent++ ) {
-		if ( ent->client->pers.ready )
+		if ( !ent->inuse || ent->client->pers.connected == CON_DISCONNECTED )
+			continue;
+		if ( ent->client->pers.ready ) {
 			readyCount++;
+			if ( i < 16 )
+				readyMask |= (1 << i);
+		}
 		if ( ent->r.svFlags & SVF_BOT )
 			playerCount--;
+	}
+
+	for ( i = 0, ent = g_entities; i < sv_maxclients.integer; i++, ent++ ) {
+		if ( !ent->inuse || ent->client->pers.connected == CON_DISCONNECTED )
+			continue;
+		ent->client->ps.stats[STAT_CLIENTS_READY] = readyMask;
 	}
 
 	f = (float)readyCount / (float)playerCount;
@@ -2694,7 +2706,7 @@ void G_RunFrame( int levelTime ) {
 	}
 	if ( level.pause.state == PAUSE_PAUSED ) {
 		if ( lastMsgTime < level.time - 500 ) {
-			trap->SendServerCommand( -1, va( "cp \"Match has been paused.\n%.0f seconds remaining\n\"", ceil( (level.pause.time - level.time) / 1000.0f ) ) );
+			trap->SendServerCommand( -1, va( "cp \"Match has been paused.\n%.0f seconds remaining\n\"", ceilf( (level.pause.time - level.time) / 1000.0f ) ) );
 			lastMsgTime = level.time;
 		}
 
@@ -2703,7 +2715,7 @@ void G_RunFrame( int levelTime ) {
 	}
 	if ( level.pause.state == PAUSE_UNPAUSING ) {
 		if ( lastMsgTime < level.time - 500 ) {
-			trap->SendServerCommand( -1, va( "cp \"MATCH IS UNPAUSING\nin %.0f...\n\"", ceil( (level.pause.time - level.time) / 1000.0f ) ) );
+			trap->SendServerCommand( -1, va( "cp \"MATCH IS UNPAUSING\nin %.0f...\n\"", ceilf( (level.pause.time - level.time) / 1000.0f ) ) );
 			lastMsgTime = level.time;
 		}
 

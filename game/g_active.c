@@ -3418,7 +3418,7 @@ static void G_SendScoreboardUpdate( gentity_t *ent ) {
 
 		//Protect against client overflow
 		j = strlen( entry );
-		if ( stringlength + j >= 1022 )
+		if ( stringlength + j >= sizeof( string )-2)
 			break;
 
 		strcpy( string + stringlength, entry );
@@ -3450,7 +3450,8 @@ void ClientEndFrame( gentity_t *ent ) {
 	}
 
 	// see if there is a scoreboard message pending
-	G_SendScoreboardUpdate( ent );
+	if ( !(ent->r.svFlags & SVF_BOT) )
+		G_SendScoreboardUpdate( ent );
 
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		SpectatorClientEndFrame( ent );

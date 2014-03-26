@@ -2913,6 +2913,9 @@ static void Cmd_Ready_f( gentity_t *ent ) {
 	gentity_t *e = NULL;
 	int i = 0;
 
+	if ( !g_doWarmup.integer || level.warmupTime == 0 || level.restarted || level.allReady )
+		return;
+
 	ent->client->pers.ready = !ent->client->pers.ready;
 
 	if ( ent->client->pers.ready ) {
