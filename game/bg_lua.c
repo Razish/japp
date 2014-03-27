@@ -39,6 +39,16 @@ qboolean JPLua_IteratePlugins( jplua_plugin_t **plugin ) {
 	return (*plugin != NULL) ? qtrue : qfalse;
 }
 
+// stateless version of the above - does not set JPLua.currentPlugin
+qboolean JPLua_IteratePluginsTemp( jplua_plugin_t **plugin ) {
+	if ( !*plugin )
+		*plugin = JPLua.plugins;
+	else
+		*plugin = (*plugin)->next;
+
+	return (*plugin != NULL) ? qtrue : qfalse;
+}
+
 void JPLua_DPrintf( const char *msg, ... ) {
 #ifdef JPLUA_DEBUG
 	va_list argptr;
@@ -368,9 +378,17 @@ static void JPLua_LoadPluginDir( qboolean inPK3 ) {
 		size_t skipLenFolder = inPK3 ? 1 : 0, folderLen = 0;
 		qboolean skip = qfalse;
 		char *s;
+		jplua_plugin_t *plugin = NULL;
 
 		if ( folderName[0] == '.' )
 			skip = qtrue;
+
+		// check for loading the same plugin twice
+		// this can happen when listing plugins outside of PK3s when plugins have written files using the Serialiser
+		while ( JPLua_IteratePluginsTemp( &plugin ) ) {
+			if ( !Q_stricmp( folderName, plugin->name ) )
+				skip = qtrue;
+		}
 
 		if ( (s = (char *)Q_strchrs( folderName, "/\\" )) ) {
 			if ( !s[1] )
