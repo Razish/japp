@@ -212,56 +212,10 @@ extern qboolean BG_ParseLiteral( const char **data, const char *string );
 //
 // NPC parameters file : scripts/NPCs.cfg
 //
-#define MAX_NPC_DATA_SIZE 0x20000
+#define MAX_NPC_DATA_SIZE (512 * 1024)
 char	NPCParms[MAX_NPC_DATA_SIZE];
 
-/*
-team_t TranslateTeamName( const char *name )
-{
-int n;
-
-for ( n = (NPCTEAM_FREE + 1); n < NPCTEAM_NUM_TEAMS; n++ )
-{
-if ( Q_stricmp( TeamNames[n], name ) == 0 )
-{
-return ((team_t) n);
-}
-}
-
-return NPCTEAM_FREE;
-}
-
-class_t TranslateClassName( const char *name )
-{
-int n;
-
-for ( n = (CLASS_NONE + 1); n < CLASS_NUM_CLASSES; n++ )
-{
-if ( Q_stricmp( ClassNames[n], name ) == 0 )
-{
-return ((class_t) n);
-}
-}
-
-return CLASS_NONE;  // I hope this never happens, maybe print a warning
-}
-*/
-
-/*
-static race_t TranslateRaceName( const char *name )
-{
-if ( !Q_stricmp( name, "human" ) )
-{
-return RACE_HUMAN;
-}
-return RACE_NONE;
-}
-*/
-/*
-static rank_t TranslateRankName( const char *name )
-
-Should be used to determine pip bolt-ons
-*/
+// Should be used to determine pip bolt-ons
 static rank_t TranslateRankName( const char *name ) {
 	if ( !Q_stricmp( name, "civilian" ) ) {
 		return RANK_CIVILIAN;
@@ -2823,7 +2777,8 @@ void NPC_LoadParms( void ) {
 		}
 		else {
 			if ( totallen + len >= MAX_NPC_DATA_SIZE ) {
-				trap->Error( ERR_DROP, "NPC extensions (*.npc) are too large" );
+				trap->Error( ERR_DROP, "NPC extensions (*.npc) are too large (%i > %i)", totallen + len,
+					MAX_NPC_DATA_SIZE );
 			}
 			trap->FS_Read( npcParseBuffer, len, f );
 			npcParseBuffer[len] = 0;
