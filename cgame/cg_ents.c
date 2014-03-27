@@ -1678,7 +1678,7 @@ static void CG_Item( centity_t *cent ) {
 
 	if ( (item->giType == IT_WEAPON || item->giType == IT_POWERUP) &&
 		!(cent->currentState.eFlags & EF_DROPPEDWEAPON) &&
-		!cg_simpleItems.integer ) {
+		!(cg_simpleItems.value > 0.0f) ) {
 		vector3 uNorm;
 		qboolean doGrey;
 
@@ -1744,11 +1744,11 @@ static void CG_Item( centity_t *cent ) {
 		return;
 	}
 
-	if ( cg_simpleItems.integer && item->giType != IT_TEAM ) {
+	if ( cg_simpleItems.value > 0.0f && item->giType != IT_TEAM ) {
 		memset( &ent, 0, sizeof(ent) );
 		ent.reType = RT_SPRITE;
 		VectorCopy( &cent->lerpOrigin, &ent.origin );
-		ent.radius = 14;
+		ent.radius = 14 * cg_simpleItems.value;
 		ent.customShader = cg_items[es->modelindex].icon;
 		ent.shaderRGBA[0] = ent.shaderRGBA[1] = ent.shaderRGBA[2] = 255;
 
@@ -1986,32 +1986,8 @@ static void CG_Item( centity_t *cent ) {
 		SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 	}
 
-	//rww - As far as I can see, this is useless.
-	/*
-	if ( item->giType == IT_WEAPON && wi->barrelModel ) {
-	refEntity_t	barrel;
-
-	memset( &barrel, 0, sizeof( barrel ) );
-
-	barrel.hModel = wi->barrelModel;
-
-	VectorCopy( ent.lightingOrigin, barrel.lightingOrigin );
-	barrel.shadowPlane = ent.shadowPlane;
-	barrel.renderfx = ent.renderfx;
-
-	barrel.customShader = ent.customShader;
-
-	CG_PositionRotatedEntityOnTag( &barrel, &ent, wi->weaponModel, "tag_barrel" );
-
-	AxisCopy( ent.axis, barrel.axis );
-	barrel.nonNormalizedAxes = ent.nonNormalizedAxes;
-
-	SE_R_AddRefEntityToScene( &barrel );
-	}
-	*/
-
 	// accompanying rings / spheres for powerups
-	if ( !cg_simpleItems.integer ) {
+	if ( !(cg_simpleItems.value > 0.0f) ) {
 		vector3 spinAngles;
 
 		VectorClear( &spinAngles );
