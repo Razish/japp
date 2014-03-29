@@ -1036,7 +1036,7 @@ void MaintainBodyQueue( gentity_t *ent ) { //do whatever should be done taking r
 	qboolean doRCG = qfalse;
 
 	assert( ent && ent->client );
-	if ( ent->client->tempSpectate > level.time ||
+	if ( ent->client->tempSpectate >= level.time ||
 		(ent->client->ps.eFlags2 & EF2_SHIP_DEATH) ) {
 		ent->client->noCorpse = qtrue;
 	}
@@ -1086,7 +1086,7 @@ void respawn( gentity_t *ent ) {
 
 	if ( level.gametype == GT_SIEGE ) {
 		if ( g_siegeRespawn.integer ) {
-			if ( ent->client->tempSpectate <= level.time ) {
+			if ( ent->client->tempSpectate < level.time ) {
 				int minDel = g_siegeRespawn.integer * 2000;
 				if ( minDel < 20000 ) {
 					minDel = 20000;

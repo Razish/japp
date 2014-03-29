@@ -972,7 +972,7 @@ static void AM_Poll( gentity_t *ent ) {
 	trap->Argv( 0, arg1, sizeof(arg1) );
 	Q_strncpyz( level.voteStringPoll, ConcatArgs( 1 ), sizeof(level.voteStringPoll) );
 	Q_strncpyz( level.voteStringPollCreator, ent->client->pers.netnameClean, sizeof(level.voteStringPollCreator) );
-		
+
 	Q_strncpyz( arg2, ent->client->pers.netname, sizeof(arg2) );
 	Q_CleanString( arg2, STRIP_COLOUR );
 	Q_strstrip( arg2, "\n\r;\"", NULL );
@@ -1235,12 +1235,18 @@ static void AM_Freeze( gentity_t *ent ) {
 		qboolean allFrozen = qtrue;
 		int i;
 		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
+			if ( !e->inuse || e->client->pers.connected == CON_DISCONNECTED )
+				continue;
+
 			if ( !e->client->pers.adminData.isFrozen ) {
 				allFrozen = qfalse;
 				break;
 			}
 		}
 		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
+			if ( !e->inuse || e->client->pers.connected == CON_DISCONNECTED )
+				continue;
+
 			if ( !AM_CanInflict( ent, e ) )
 				continue;
 
@@ -1310,9 +1316,14 @@ static void AM_Silence( gentity_t *ent ) {
 	// silence everyone
 	if ( atoi( arg1 ) == -1 ) {
 		int i;
-		for ( i = 0; i < level.maxclients; i++ ) {
-			if ( !AM_CanInflict( ent, &g_entities[i] ) )
+		gentity_t *e;
+		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
+			if ( !e->inuse || ent->client->pers.connected == CON_DISCONNECTED )
 				continue;
+
+			if ( !AM_CanInflict( ent, e ) )
+				continue;
+
 			level.clients[i].pers.adminData.canTalk = qfalse;
 		}
 		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_CYAN"silenced\n\"" );
@@ -1347,9 +1358,14 @@ static void AM_Unsilence( gentity_t *ent ) {
 	// unsilence everyone
 	if ( atoi( arg1 ) == -1 ) {
 		int i;
-		for ( i = 0; i < level.maxclients; i++ ) {
-			if ( !AM_CanInflict( ent, &g_entities[i] ) )
+		gentity_t *e;
+		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
+			if ( !e->inuse || ent->client->pers.connected == CON_DISCONNECTED )
 				continue;
+
+			if ( !AM_CanInflict( ent, e ) )
+				continue;
+
 			level.clients[i].pers.adminData.canTalk = qtrue;
 		}
 		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_CYAN"unsilenced\n\"" );
@@ -1368,11 +1384,12 @@ static void AM_Unsilence( gentity_t *ent ) {
 	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_CYAN"un-silenced\n\"" );
 }
 
-extern void Cmd_Kill_f( gentity_t *ent );
+void Cmd_Kill_f( gentity_t *ent );
 // slay the specified client
 static void AM_Slay( gentity_t *ent ) {
 	char arg1[64] = { 0 };
 	int targetClient;
+	gentity_t *targetEnt = NULL;
 
 	if ( trap->Argc() < 2 ) {
 		trap->SendServerCommand( ent - g_entities, "print \"Please specify a player to be slain\n\"" );
@@ -1381,16 +1398,39 @@ static void AM_Slay( gentity_t *ent ) {
 
 	trap->Argv( 1, arg1, sizeof(arg1) );
 
+	if ( atoi( arg1 ) == -1 ) {
+		int i;
+		gentity_t *e;
+		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
+			if ( !e->inuse || ent->client->pers.connected == CON_DISCONNECTED
+				|| ent->client->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR || ent->client->tempSpectate >= level.time ) {
+				continue;
+			}
+
+			if ( !AM_CanInflict( ent, e ) )
+				continue;
+
+			Cmd_Kill_f( e );
+		}
+		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_RED"slain\n\"" );
+		return;
+	}
+
 	targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT );
 	if ( targetClient == -1 )
 		return;
 
-	if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
+	targetEnt = g_entities + targetClient;
+
+	if ( targetEnt->client->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR || targetEnt->client->tempSpectate >= level.time )
 		return;
 
-	Cmd_Kill_f( &g_entities[targetClient] );
+	if ( !AM_CanInflict( ent, targetEnt ) )
+		return;
+
+	Cmd_Kill_f( targetEnt );
 	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_RED"slain\n\"",
-		level.clients[targetClient].pers.netname ) );
+		targetEnt->client->pers.netname ) );
 	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_RED"slain\n\"" );
 }
 
@@ -1578,7 +1618,7 @@ static void AM_Lua( gentity_t *ent ) {
 	if ( luaL_dostring( JPLua.state, args ) != 0 )
 		trap->SendServerCommand( ent - g_entities, va( "print \""S_COLOR_RED"Lua Error: %s\n\"", lua_tostring( JPLua.state, -1 ) ) );
 #else
-	trap->SendServerCommand( ent-g_entities, "print \"Lua is not supported on this server\n\"" );
+	trap->SendServerCommand( ent - g_entities, "print \"Lua is not supported on this server\n\"" );
 #endif
 }
 
@@ -1587,7 +1627,7 @@ static void AM_ReloadLua( gentity_t *ent ) {
 	JPLua_Shutdown();
 	JPLua_Init();
 #else
-	trap->SendServerCommand( ent-g_entities, "print \"Lua is not supported on this server\n\"" );
+	trap->SendServerCommand( ent - g_entities, "print \"Lua is not supported on this server\n\"" );
 #endif
 }
 

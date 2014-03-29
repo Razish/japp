@@ -1915,7 +1915,7 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	// spectators don't do much
-	if ( client->sess.sessionTeam == TEAM_SPECTATOR || client->tempSpectate > level.time ) {
+	if ( client->sess.sessionTeam == TEAM_SPECTATOR || client->tempSpectate >= level.time ) {
 		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD ) {
 			return;
 		}
@@ -2959,7 +2959,6 @@ void ClientThink_real( gentity_t *ent ) {
 			Weapon_HookFree( client->hook );
 
 		else if ( ent->client->hook &&
-			Client_Supports( ent, CSF_GRAPPLE_SWING ) &&
 			ent->client->hookHasBeenFired &&
 			!ent->client->fireHeld ) {
 			if ( !(pm.cmd.buttons & BUTTON_GRAPPLE) ) {
