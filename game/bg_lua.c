@@ -875,6 +875,14 @@ static int JPLua_Export_SetKeyCatcher( lua_State *L ) {
 #endif
 
 #ifdef _CGAME
+static int JPLua_Export_SetMousePos( lua_State *L ) {
+	cgs.cursorX = lua_tointeger( L, 1 );
+	cgs.cursorY = lua_tointeger( L, 2 );
+	return 0;
+}
+#endif
+
+#ifdef _CGAME
 static int JPLua_Export_StartLocalSound( lua_State *L ) {
 	trap->S_StartLocalSound( lua_tonumber( L, 1 ), lua_tonumber( L, 2 ) );
 	return 0;
@@ -978,6 +986,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 #ifdef _CGAME
 	{ "SendServerCommand", JPLua_Export_SendServerCommand }, // SendServerCommand( string command )
 	{ "SetKeyCatcher", JPLua_Export_SetKeyCatcher }, // SetKeyCatcher( integer catcherMask )
+	{ "SetMousePos", JPLua_Export_SetMousePos }, // SetMousePos( integer x, integer y )
 #endif
 	{ "StackDump", JPLua_StackDump },
 #ifdef _CGAME

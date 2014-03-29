@@ -1479,10 +1479,10 @@ typedef struct orientation_s {
 
 // in order from highest priority to lowest
 // if none of the catchers are active, bound key strings will be executed
-#define KEYCATCH_CONSOLE		0x0001
-#define	KEYCATCH_UI					0x0002
-#define	KEYCATCH_MESSAGE		0x0004
-#define	KEYCATCH_CGAME			0x0008
+#define KEYCATCH_CONSOLE	(0x0001u)
+#define	KEYCATCH_UI			(0x0002u)
+#define	KEYCATCH_MESSAGE	(0x0004u)
+#define	KEYCATCH_CGAME		(0x0008u)
 
 
 // sound channels
