@@ -3671,7 +3671,8 @@ void CG_DrawPlayerShield( centity_t *cent, vector3 *origin ) {
 	float scale;
 
 	// Don't draw the shield when the player is dead.
-	if ( cent->currentState.eFlags & EF_DEAD || cg_shieldStyle.integer != -1 || !cg.renderingThirdPerson ) {
+	if ( cent->currentState.eFlags & EF_DEAD || cg_shieldStyle.integer != -1 || (!cg.renderingThirdPerson
+		&& cent->currentState.number == cg.clientNum) ) {
 		cent->shieldHit = qfalse;
 		return;
 	}
@@ -3702,7 +3703,7 @@ void CG_DrawPlayerShield( centity_t *cent, vector3 *origin ) {
 }
 
 void CG_PlayerHitFX( centity_t *cent ) {
-	if ( cent->damageTime > cg.time && cent->currentState.NPC_class != CLASS_VEHICLE && cg.renderingThirdPerson ) {
+	if ( cent->damageTime > cg.time && cent->currentState.NPC_class != CLASS_VEHICLE ) {
 		CG_DrawPlayerShield( cent, &cent->lerpOrigin );
 		cent->shieldHit = qtrue;
 	}
@@ -8737,7 +8738,8 @@ stillDoSaber:
 
 	if ( ((cent->shieldHit || (cg_shieldTest.integer && cent->currentState.number == cg.clientNum))
 		&& cg_shieldStyle.integer != -1 && !(cent->playerState->eFlags & EF_DEAD)
-		&& (cent->currentState.number != cg.clientNum || cg.predictedPlayerState.zoomMode == 0)) ) {
+		&& (cent->currentState.number != cg.clientNum || (cg.predictedPlayerState.zoomMode == 0
+		&& cg.renderingThirdPerson))) ) {
 		uint32_t rfx = legs.renderfx;
 		int i, customShader = legs.customShader;
 		byte savedRGBA[4] = { 0xff };
