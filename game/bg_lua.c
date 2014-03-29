@@ -633,6 +633,13 @@ static int JPLua_Export_GetFPS( lua_State *L ) {
 }
 #endif
 
+#ifdef _CGAME
+static int JPLua_Export_GetKeyCatcher( lua_State *L ) {
+	lua_pushinteger( L, trap->Key_GetCatcher() );
+	return 1;
+}
+#endif
+
 static int JPLua_Export_GetMap( lua_State *L ) {
 #if defined(_GAME)
 
@@ -684,6 +691,22 @@ static int JPLua_Export_GetMapTime( lua_State *L ) {
 
 #endif
 }
+
+#ifdef _CGAME
+static int JPLua_Export_GetMousePos( lua_State *L ) {
+	if ( trap->Key_GetCatcher() & KEYCATCH_CGAME ) {
+		int top;
+		lua_newtable( L );
+		top = lua_gettop( L );
+		lua_pushstring( L, "x" ); lua_pushinteger( L, cgs.cursorX ); lua_settop( L, top );
+		lua_pushstring( L, "y" ); lua_pushinteger( L, cgs.cursorY ); lua_settop( L, top );
+	}
+	else
+		lua_pushnil( L );
+
+	return 1;
+}
+#endif
 
 #ifdef _GAME
 //TODO: client-side version of this
@@ -802,6 +825,14 @@ static int JPLua_Export_RemapShader( lua_State *L ) {
 #endif
 
 #ifdef _CGAME
+static int JPLua_Export_SetKeyCatcher( lua_State *L ) {
+	uint32_t catcherMask = (uint32_t)lua_tointeger( L, 1 );
+	trap->Key_SetCatcher( catcherMask );
+	return 0;
+}
+#endif
+
+#ifdef _CGAME
 extern void CG_ChatBox_AddString( char *chatStr ); //cg_draw.c
 static int JPLua_Export_SendChatText( lua_State *L ) {
 	char text[MAX_SAY_TEXT] = { 0 };
@@ -911,9 +942,13 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
 #ifdef _CGAME
 	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
+	{ "GetKeyCatcher", JPLua_Export_GetKeyCatcher }, // integer GetKeyCatcher()
 #endif
 	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
 	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
+#ifdef _CGAME
+	{ "GetMousePos", JPLua_Export_GetMousePos }, // [{x,y}, nil] GetMousePos
+#endif
 	{ "GetPlayer", JPLua_GetPlayer }, // Player GetPlayer( integer clientNum )
 #ifdef _GAME
 	{ "GetPlayers", JPLua_Export_GetPlayers }, // {Player,...} GetPlayers()
@@ -942,6 +977,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 #endif
 #ifdef _CGAME
 	{ "SendServerCommand", JPLua_Export_SendServerCommand }, // SendServerCommand( string command )
+	{ "SetKeyCatcher", JPLua_Export_SetKeyCatcher }, // SetKeyCatcher( integer catcherMask )
 #endif
 	{ "StackDump", JPLua_StackDump },
 #ifdef _CGAME
