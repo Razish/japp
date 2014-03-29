@@ -825,14 +825,6 @@ static int JPLua_Export_RemapShader( lua_State *L ) {
 #endif
 
 #ifdef _CGAME
-static int JPLua_Export_SetKeyCatcher( lua_State *L ) {
-	uint32_t catcherMask = (uint32_t)lua_tointeger( L, 1 );
-	trap->Key_SetCatcher( catcherMask );
-	return 0;
-}
-#endif
-
-#ifdef _CGAME
 extern void CG_ChatBox_AddString( char *chatStr ); //cg_draw.c
 static int JPLua_Export_SendChatText( lua_State *L ) {
 	char text[MAX_SAY_TEXT] = { 0 };
@@ -870,6 +862,14 @@ static int JPLua_Export_SendReliableCommand( lua_State *L ) {
 #ifdef _CGAME
 static int JPLua_Export_SendServerCommand( lua_State *L ) {
 	trap->SendClientCommand( lua_tostring( L, 1 ) );
+	return 0;
+}
+#endif
+
+#ifdef _CGAME
+static int JPLua_Export_SetKeyCatcher( lua_State *L ) {
+	uint32_t catcherMask = (uint32_t)lua_tointeger( L, 1 );
+	trap->Key_SetCatcher( catcherMask );
 	return 0;
 }
 #endif
