@@ -885,7 +885,7 @@ static const char *months[12] = { "Jan", "Feb", "Mar", "Apr", "May", "June", "Ju
 
 // e.g. #st, #nd, #rd, #th
 static const char *GetDateSuffix( int date ) {
-	switch ( date%10 ) {
+	switch ( date % 10 ) {
 	case 1:
 		return "st";
 	case 2:
@@ -923,7 +923,7 @@ static void DrawClientInfo( float fade ) {
 	timeinfo = localtime( &tm );
 
 	Com_sprintf( buf, sizeof(buf), "%s %i%s %04i, %02i:%02i:%02i", months[timeinfo->tm_mon], timeinfo->tm_mday,
-		GetDateSuffix( timeinfo->tm_mday ), 1900+timeinfo->tm_year, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+		GetDateSuffix( timeinfo->tm_mday ), 1900 + timeinfo->tm_year, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
 
 	trap->R_Font_DrawString( SCREEN_WIDTH - trap->R_Font_StrLenPixels( buf, fontHandle, fontScale ) - 12.0f, y, buf,
 		&colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );

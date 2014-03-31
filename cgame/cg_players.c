@@ -2254,7 +2254,7 @@ static void CG_RunLerpFrame( centity_t *cent, clientInfo_t *ci, lerpFrame_t *lf,
 	if ( lf->frameTime == lf->oldFrameTime )
 		lf->backlerp = 0;
 	else
-		lf->backlerp = 1.0f - (float)( cg.time - lf->oldFrameTime ) / ( lf->frameTime - lf->oldFrameTime );
+		lf->backlerp = 1.0f - (float)(cg.time - lf->oldFrameTime) / (lf->frameTime - lf->oldFrameTime);
 #else
 	// calculate current lerp value
 	if ( lf->frameTime ) {
@@ -2578,19 +2578,18 @@ qboolean CG_RagDoll( centity_t *cent, vector3 *forcedAngles ) {
 			float animSpeed;
 
 			if ( trap->G2API_GetBoneAnim( cent->ghoul2, "model_root", cg.time, &currentFrame, &startFrame, &endFrame,
-				&flags, &animSpeed, cgs.gameModels, 0 ) )
-			{ //lock the anim on the current frame.
+				&flags, &animSpeed, cgs.gameModels, 0 ) ) { //lock the anim on the current frame.
 				int blendTime = 500;
 				animation_t *curAnim = &bgAllAnims[cent->localAnimIndex].anims[cent->currentState.legsAnim];
 
-				if ( currentFrame >= (curAnim->firstFrame + curAnim->numFrames-1) )
-					currentFrame = (curAnim->firstFrame + curAnim->numFrames-2);
+				if ( currentFrame >= (curAnim->firstFrame + curAnim->numFrames - 1) )
+					currentFrame = (curAnim->firstFrame + curAnim->numFrames - 2);
 
-				trap->G2API_SetBoneAnim( cent->ghoul2, 0, "lower_lumbar", currentFrame, currentFrame+1, flags, animSpeed,
+				trap->G2API_SetBoneAnim( cent->ghoul2, 0, "lower_lumbar", currentFrame, currentFrame + 1, flags, animSpeed,
 					cg.time, currentFrame, blendTime );
-				trap->G2API_SetBoneAnim( cent->ghoul2, 0, "model_root", currentFrame, currentFrame+1, flags, animSpeed,
+				trap->G2API_SetBoneAnim( cent->ghoul2, 0, "model_root", currentFrame, currentFrame + 1, flags, animSpeed,
 					cg.time, currentFrame, blendTime );
-				trap->G2API_SetBoneAnim( cent->ghoul2, 0, "Motion", currentFrame, currentFrame+1, flags, animSpeed,
+				trap->G2API_SetBoneAnim( cent->ghoul2, 0, "Motion", currentFrame, currentFrame + 1, flags, animSpeed,
 					cg.time, currentFrame, blendTime );
 			}
 		}
