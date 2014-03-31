@@ -42,7 +42,7 @@ void CG_LoadingClient( int clientNum ) {
 }
 
 static void CG_LoadBar( void ) {
-	const float barWidth = 480.0f, barHeight = 12.0f;
+	const float barWidth = SCREEN_HEIGHT, barHeight = 12.0f;
 	const float barX = (SCREEN_WIDTH - barWidth) / 2.0f, barY = SCREEN_HEIGHT - 8.0f - barHeight;
 	const float capWidth = 8.0f;
 
@@ -92,11 +92,11 @@ void CG_DrawInformation( void ) {
 	// the first 150 rows are reserved for the client connection
 	// screen to write into
 	if ( cg.infoScreenText[0] ) {
-		UI_DrawProportionalString( 320, 128 - 32, va( CG_GetStringEdString( "MENUS", "LOADING_MAPNAME" ), cg.infoScreenText ),
-			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), 128 - 32, va( CG_GetStringEdString( "MENUS", "LOADING_MAPNAME" ),
+			cg.infoScreenText ), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 	}
 	else {
-		UI_DrawProportionalString( 320, 128 - 32, CG_GetStringEdString( "MENUS", "AWAITING_SNAPSHOT" ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), 128 - 32, CG_GetStringEdString( "MENUS", "AWAITING_SNAPSHOT" ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 	}
 
@@ -107,12 +107,12 @@ void CG_DrawInformation( void ) {
 	Q_strncpyz( buf, Info_ValueForKey( info, "sv_hostname" ), sizeof(buf) );
 	// allow colours, don't allow extended ASCII
 	Q_CleanString( buf, STRIP_EXTASCII );
-	UI_DrawProportionalString( 320, y, buf, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
+	UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, buf, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 	y += iPropHeight;
 
 	// pure server
 	if ( atoi( Info_ValueForKey( sysInfo, "sv_pure" ) ) ) {
-		UI_DrawProportionalString( 320, y, CG_GetStringEdString( "MP_INGAME", "PURE_SERVER" ), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW,
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, CG_GetStringEdString( "MP_INGAME", "PURE_SERVER" ), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW,
 			&colorWhite );
 		y += iPropHeight;
 	}
@@ -120,25 +120,25 @@ void CG_DrawInformation( void ) {
 	// server-specific message of the day
 	s = CG_ConfigString( CS_MOTD );
 	if ( s[0] ) {
-		UI_DrawProportionalString( 320, y, s, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, s, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 	}
 
 	trap->Cvar_VariableStringBuffer( "cl_motdString", buf, sizeof(buf) );
 	if ( buf[0] )
-		UI_DrawProportionalString( 320, 425, buf, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), 425, buf, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 
 	// some extra space after hostname and motd
 	y += 10;
 
 #ifdef _DEBUG
 	// debug build
-	UI_DrawProportionalString( 320, y, "DEBUG BUILD", UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
+	UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, "DEBUG BUILD", UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 	y += iPropHeight;
 #endif
 
 	// JA++ version
-	UI_DrawProportionalString( 320, y, JAPP_VERSION_SMALL, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
+	UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, JAPP_VERSION_SMALL, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 	y += iPropHeight;
 
 	// some extra space after hostname and motd
@@ -147,26 +147,26 @@ void CG_DrawInformation( void ) {
 	// map-specific message (long map name)
 	s = CG_ConfigString( CS_MESSAGE );
 	if ( s[0] ) {
-		UI_DrawProportionalString( 320, y, s, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, s, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 	}
 
 	// cheats warning
 	if ( atoi( Info_ValueForKey( sysInfo, "sv_cheats" ) ) ) {
-		UI_DrawProportionalString( 320, y, CG_GetStringEdString( "MP_INGAME", "CHEATSAREENABLED" ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, CG_GetStringEdString( "MP_INGAME", "CHEATSAREENABLED" ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
 	}
 
 	// game type
 	s = BG_GetGametypeString( cgs.gametype );
-	UI_DrawProportionalString( 320, y, s, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
+	UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, s, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 	y += iPropHeight;
 
 	if ( cgs.gametype != GT_SIEGE ) {
 		value = atoi( Info_ValueForKey( info, "timelimit" ) );
 		if ( value ) {
-			UI_DrawProportionalString( 320, y, va( "%s %i", CG_GetStringEdString( "MP_INGAME", "TIMELIMIT" ), value ),
+			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s %i", CG_GetStringEdString( "MP_INGAME", "TIMELIMIT" ), value ),
 				UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 			y += iPropHeight;
 		}
@@ -174,7 +174,7 @@ void CG_DrawInformation( void ) {
 		if ( cgs.gametype < GT_CTF ) {
 			value = atoi( Info_ValueForKey( info, "fraglimit" ) );
 			if ( value ) {
-				UI_DrawProportionalString( 320, y, va( "%s %i", CG_GetStringEdString( "MP_INGAME", "FRAGLIMIT" ), value ),
+				UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s %i", CG_GetStringEdString( "MP_INGAME", "FRAGLIMIT" ), value ),
 					UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 				y += iPropHeight;
 			}
@@ -182,7 +182,7 @@ void CG_DrawInformation( void ) {
 			if ( cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL ) {
 				value = atoi( Info_ValueForKey( info, "duel_fraglimit" ) );
 				if ( value ) {
-					UI_DrawProportionalString( 320, y, va( "%s %i", CG_GetStringEdString( "MP_INGAME", "WINLIMIT" ), value ),
+					UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s %i", CG_GetStringEdString( "MP_INGAME", "WINLIMIT" ), value ),
 						UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 					y += iPropHeight;
 				}
@@ -193,7 +193,7 @@ void CG_DrawInformation( void ) {
 	if ( cgs.gametype >= GT_CTF ) {
 		value = atoi( Info_ValueForKey( info, "capturelimit" ) );
 		if ( value ) {
-			UI_DrawProportionalString( 320, y, va( "%s %i", CG_GetStringEdString( "MP_INGAME", "CAPTURELIMIT" ), value ),
+			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s %i", CG_GetStringEdString( "MP_INGAME", "CAPTURELIMIT" ), value ),
 				UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 			y += iPropHeight;
 		}
@@ -202,7 +202,7 @@ void CG_DrawInformation( void ) {
 	if ( cgs.gametype >= GT_TEAM ) {
 		value = atoi( Info_ValueForKey( info, "g_forceBasedTeams" ) );
 		if ( value ) {
-			UI_DrawProportionalString( 320, y, CG_GetStringEdString( "MP_INGAME", "FORCEBASEDTEAMS" ),
+			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, CG_GetStringEdString( "MP_INGAME", "FORCEBASEDTEAMS" ),
 				UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 			y += iPropHeight;
 		}
@@ -216,12 +216,12 @@ void CG_DrawInformation( void ) {
 
 		value = atoi( Info_ValueForKey( info, "g_maxForceRank" ) );
 		if ( value && !valueNOFP && value < NUM_FORCE_MASTERY_LEVELS ) {
-			UI_DrawProportionalString( 320, y, va( "%s %s", fmStr, CG_GetStringEdString( "MP_INGAME",
+			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s %s", fmStr, CG_GetStringEdString( "MP_INGAME",
 				forceMasteryLevels[value] ) ), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 			y += iPropHeight;
 		}
 		else if ( !valueNOFP ) {
-			UI_DrawProportionalString( 320, y, va( "%s %s", fmStr, CG_GetStringEdString( "MP_INGAME",
+			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s %s", fmStr, CG_GetStringEdString( "MP_INGAME",
 				forceMasteryLevels[NUM_FORCE_MASTERY_LEVELS - 1] ) ), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 			y += iPropHeight;
 		}
@@ -230,13 +230,13 @@ void CG_DrawInformation( void ) {
 			? "g_duelWeaponDisable" : "g_weaponDisable" ) );
 		//RAZTODO: weapon disable
 		if ( cgs.gametype != GT_JEDIMASTER && value ) {
-			UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "SABERONLYSET" ) ),
+			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "SABERONLYSET" ) ),
 				UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 			y += iPropHeight;
 		}
 
 		if ( valueNOFP ) {
-			UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "NOFPSET" ) ),
+			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "NOFPSET" ) ),
 				UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 			y += iPropHeight;
 		}
@@ -246,23 +246,23 @@ void CG_DrawInformation( void ) {
 	y += iPropHeight;
 	switch ( cgs.gametype ) {
 	case GT_FFA:
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_FFA_1" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_FFA_1" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		break;
 
 	case GT_HOLOCRON:
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_HOLO_1" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_HOLO_1" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_HOLO_2" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_HOLO_2" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		break;
 
 	case GT_JEDIMASTER:
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_JEDI_1" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_JEDI_1" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_JEDI_2" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_JEDI_2" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		break;
 
@@ -271,26 +271,26 @@ void CG_DrawInformation( void ) {
 		break;
 
 	case GT_DUEL:
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_DUEL_1" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_DUEL_1" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_DUEL_2" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_DUEL_2" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		break;
 
 	case GT_POWERDUEL:
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_POWERDUEL_1" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_POWERDUEL_1" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_POWERDUEL_2" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_POWERDUEL_2" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		break;
 
 	case GT_TEAM:
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_TEAM_1" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_TEAM_1" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_TEAM_2" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_TEAM_2" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		break;
 
@@ -298,18 +298,18 @@ void CG_DrawInformation( void ) {
 		break;
 
 	case GT_CTF:
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTF_1" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTF_1" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTF_2" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTF_2" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		break;
 
 	case GT_CTY:
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTY_1" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTY_1" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		y += iPropHeight;
-		UI_DrawProportionalString( 320, y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTY_2" ) ),
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), y, va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTY_2" ) ),
 			UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 		break;
 	default:

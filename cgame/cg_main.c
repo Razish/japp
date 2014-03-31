@@ -458,7 +458,7 @@ static void CVU_GunDrift( void ) {
 
 static void CVU_LagPos( void ) {
 	ivector2 *v = &cg.lagometerPos;
-	if ( sscanf( cg_hudLagometerPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
+	if ( sscanf( cg_lagometerPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
 		v->x = 48;
 		v->y = 160;
 	}
@@ -466,9 +466,9 @@ static void CVU_LagPos( void ) {
 
 static void CVU_MoveKeysPos( void ) {
 	ivector2 *v = &cg.moveKeysPos;
-	if ( sscanf( cg_hudMovementKeysPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
-		v->x = 320;
-		v->y = 240;
+	if ( sscanf( cg_movementKeysPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
+		v->x = (SCREEN_WIDTH / 2);
+		v->y = (SCREEN_HEIGHT / 2);
 	}
 }
 
@@ -476,7 +476,7 @@ static void CVU_StatsPos( void ) {
 	ivector2 *v = &cg.statsPos;
 	if ( sscanf( cg_hudStatsPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
 		v->x = 2;
-		v->y = 240;
+		v->y = (SCREEN_HEIGHT / 2);
 	}
 }
 
@@ -536,7 +536,7 @@ static void CVU_AutomapAngle( void ) {
 static void CVU_AccelPos( void ) {
 	ivector2 *v = &cg.accelerometer.position;
 	if ( sscanf( cg_accelerometerPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
-		v->x = 320;
+		v->x = (SCREEN_WIDTH / 2);
 		v->y = 360;
 	}
 }

@@ -895,9 +895,6 @@ static const char *GetDateSuffix( int date ) {
 	default:
 		return "th";
 	}
-
-	// should not happen
-	return NULL;
 }
 
 // shows current date and JA++ version

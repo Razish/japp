@@ -8501,12 +8501,12 @@ void UI_Init( qboolean inGameLoad ) {
 	trap->GetGlconfig( &uiInfo.uiDC.glconfig );
 
 	// for 640x480 virtualized screen
-	uiInfo.uiDC.yscale = uiInfo.uiDC.glconfig.vidHeight * (1.0f / 480.0f);
-	uiInfo.uiDC.xscale = uiInfo.uiDC.glconfig.vidWidth * (1.0f / 640.0f);
+	uiInfo.uiDC.yscale = uiInfo.uiDC.glconfig.vidHeight * (1.0f / (float)SCREEN_HEIGHT);
+	uiInfo.uiDC.xscale = uiInfo.uiDC.glconfig.vidWidth * (1.0f / (float)SCREEN_WIDTH);
 
 	// wide screen
-	if ( uiInfo.uiDC.glconfig.vidWidth * 480 > uiInfo.uiDC.glconfig.vidHeight * 640 )
-		uiInfo.uiDC.bias = 0.5f * (uiInfo.uiDC.glconfig.vidWidth - (uiInfo.uiDC.glconfig.vidHeight * (640.0f / 480.0f)));
+	if ( uiInfo.uiDC.glconfig.vidWidth * SCREEN_HEIGHT > uiInfo.uiDC.glconfig.vidHeight * SCREEN_WIDTH )
+		uiInfo.uiDC.bias = 0.5f * (uiInfo.uiDC.glconfig.vidWidth - (uiInfo.uiDC.glconfig.vidHeight * ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT)));
 	else
 		uiInfo.uiDC.bias = 0;
 
@@ -8884,7 +8884,7 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 	downloadCount = trap->Cvar_VariableValue( "cl_downloadCount" );
 	downloadTime = trap->Cvar_VariableValue( "cl_downloadTime" );
 
-	leftWidth = 320;
+	leftWidth = (SCREEN_WIDTH / 2);
 
 	UI_SetColor( &colorWhite );
 
@@ -8969,12 +8969,12 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 	}
 
 	if ( !overlay ) {
-		centerPoint = 320;
+		centerPoint = (SCREEN_WIDTH / 2);
 		yStart = 130;
 		scale = 1.0f;	// -ste
 	}
 	else {
-		centerPoint = 320;
+		centerPoint = (SCREEN_WIDTH / 2);
 		yStart = 32;
 		scale = 1.0f;	// -ste
 		//RAZTODO: see results without returning

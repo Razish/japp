@@ -218,7 +218,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 	chatEntry_t *chat = &cb->chatBuffer[MAX_CHATBOX_ENTRIES - 1];
 	int strLength = 0;
 	int i = 0;
-	float accumLength = 0.0f; //cg_chatTimeStamp.integer ? CG_Text_Width( EXAMPLE_TIMESTAMP, cg_hudChatS.value, CG_GetChatboxFont() ) : 0.0f;
+	float accumLength = 0.0f;
 	char buf[CHAT_MESSAGE_LENGTH] = { 0 };
 	struct tm *timeinfo;
 	time_t tm;
@@ -412,8 +412,6 @@ void CG_ChatboxDraw( void ) {
 	//i is the ideal index. Now offset for scrolling
 	i += currentChatbox->scrollAmount;
 
-	//	CG_FillRect( cg_hudChatX.value, cg_hudChatY.value+1.75f, max( cg_hudChatW.value, 192.0f ), cg_chatLH.value*cg_chatLines.integer, backgroundColour );
-
 	currentChatbox->notification = qfalse;
 
 	if ( cg_chatboxTabs.integer )
@@ -449,9 +447,6 @@ void CG_ChatboxDraw( void ) {
 			}
 		}
 	}
-
-	//	if ( last->isUsed && last->time < cg.time-cg_chatBox.integer && !currentChatbox->scrollAmount && cg_chatBox.integer > 1 )
-	//		CG_Text_Paint( cg_hudChatX.value, cg_hudChatY.value + (cg_chatLH.value * numLines), cg_hudChatS.value, colorWhite, va( "%s%s", (cg_chatTimeStamp.integer ? last->timeStamp : ""), last->message ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
 }
 
 void CG_ChatboxScroll( int direction ) {

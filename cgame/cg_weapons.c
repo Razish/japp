@@ -719,7 +719,7 @@ void CG_DrawWeaponSelect( void ) {
 	bigIconSize = 80;
 	pad = 12;
 
-	x = 320;
+	x = (SCREEN_WIDTH / 2);
 	y = 410;
 
 	// Left side ICONS
@@ -839,9 +839,9 @@ void CG_DrawWeaponSelect( void ) {
 		Q_strupr( upperKey );
 
 		if ( trap->SE_GetStringTextString( va( "SP_INGAME_%s", upperKey ), text, sizeof(text) ) )
-			UI_DrawProportionalString( 320, y + 45 + yOffset, text, UI_CENTER | UI_SMALLFONT, &textColor );
+			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y + 45 + yOffset, text, UI_CENTER | UI_SMALLFONT, &textColor );
 		else
-			UI_DrawProportionalString( 320, y + 45 + yOffset, cg_weapons[cg.weaponSelect].item->classname, UI_CENTER | UI_SMALLFONT, &textColor );
+			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y + 45 + yOffset, cg_weapons[cg.weaponSelect].item->classname, UI_CENTER | UI_SMALLFONT, &textColor );
 	}
 
 	trap->R_SetColor( NULL );

@@ -867,8 +867,8 @@ void Menu_PostParse( menuDef_t *menu ) {
 	if ( menu->fullScreen ) {
 		menu->window.rect.x = 0;
 		menu->window.rect.y = 0;
-		menu->window.rect.w = 640;
-		menu->window.rect.h = 480;
+		menu->window.rect.w = SCREEN_WIDTH;
+		menu->window.rect.h = SCREEN_HEIGHT;
 	}
 	Menu_UpdatePosition( menu );
 }
@@ -5181,11 +5181,8 @@ void Item_Model_Paint( itemDef_t *item ) {
 	else {
 		origin.x = item->textscale;
 	}
-	refdef.fov_x = (modelPtr->fov_x) ? modelPtr->fov_x : (int)((float)refdef.width / 640.0f * 90.0f);
+	refdef.fov_x = (modelPtr->fov_x) ? modelPtr->fov_x : (int)((float)refdef.width / (float)SCREEN_WIDTH * 90.0f);
 	refdef.fov_y = (modelPtr->fov_y) ? modelPtr->fov_y : atan2f( refdef.height, refdef.width / tanf( refdef.fov_x / 360 * M_PI ) ) * (360 / M_PI);
-
-	//refdef.fov_x = (int)((float)refdef.width / 640.0f * 90.0f);
-	//refdef.fov_y = atan2f( refdef.height, refdef.width / tanf( refdef.fov_x / 360 * M_PI ) ) * ( 360 / M_PI );
 
 	DC->clearScene();
 

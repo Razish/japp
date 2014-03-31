@@ -56,6 +56,8 @@
       <AdditionalIncludeDirectories>../;../game/</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;_GAME;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link />
     <Link>
@@ -69,6 +71,7 @@
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>../;../game/</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;_GAME;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
