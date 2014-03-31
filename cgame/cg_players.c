@@ -8051,8 +8051,10 @@ skipTrail:
 	}
 
 	//fullbody push effect
-	if ( cent->currentState.eFlags & EF_BODYPUSH )
+	if ( (cent->currentState.eFlags & EF_BODYPUSH) && (cent->currentState.number != cg.clientNum
+		|| cg.renderingThirdPerson) ) {
 		CG_ForcePushBodyBlur( cent );
+	}
 
 	if ( cent->currentState.powerups & (1 << PW_DISINT_4) ) {
 		vector3 tAng, efOrg;
