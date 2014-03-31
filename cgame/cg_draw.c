@@ -2731,40 +2731,23 @@ CG_DrawMiniScoreboard
 ================
 */
 static float CG_DrawMiniScoreboard( float y ) {
-	char temp[MAX_QPATH];
-	int xOffset = 0;
+	char s[MAX_QPATH];
 
-	if ( !cg_drawScores.integer ) {
+	if ( !cg_drawScores.integer || cgs.gametype == GT_SIEGE )
 		return y;
-	}
-
-	if ( cgs.gametype == GT_SIEGE ) { //don't bother with this in siege
-		return y;
-	}
 
 	if ( cgs.gametype >= GT_TEAM ) {
-		strcpy( temp, va( "%s: ", CG_GetStringEdString( "MP_INGAME", "RED" ) ) );
-		Q_strcat( temp, MAX_QPATH, cgs.scores1 == SCORE_NOT_PRESENT ? "-" : (va( "%i", cgs.scores1 )) );
-		Q_strcat( temp, MAX_QPATH, va( " %s: ", CG_GetStringEdString( "MP_INGAME", "BLUE" ) ) );
-		Q_strcat( temp, MAX_QPATH, cgs.scores2 == SCORE_NOT_PRESENT ? "-" : (va( "%i", cgs.scores2 )) );
+		float w;
+		Q_strncpyz( s, va( "%s: ", CG_GetStringEdString( "MP_INGAME", "RED" ) ), sizeof(s) );
+		Q_strcat( s, sizeof(s), cgs.scores1 == SCORE_NOT_PRESENT ? "-" : (va( "%i", cgs.scores1 )) );
+		Q_strcat( s, sizeof(s), va( " %s: ", CG_GetStringEdString( "MP_INGAME", "BLUE" ) ) );
+		Q_strcat( s, sizeof(s), cgs.scores2 == SCORE_NOT_PRESENT ? "-" : (va( "%i", cgs.scores2 )) );
 
-		CG_Text_Paint( 630 - CG_Text_Width( temp, 0.7f, FONT_MEDIUM ) + xOffset, y, 0.7f, &colorWhite, temp, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM );
-		y += 15;
+		w = CG_Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer );
+		CG_Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &g_color_table[ColorIndex( COLOR_WHITE )], s, 0, 0,
+			ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer );
+		return y + CG_Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer );
 	}
-	else {
-		/*
-		strcpy ( temp, "1st: " );
-		Q_strcat ( temp, MAX_QPATH, cgs.scores1==SCORE_NOT_PRESENT?"-":(va("%i",cgs.scores1)) );
-
-		Q_strcat ( temp, MAX_QPATH, " 2nd: " );
-		Q_strcat ( temp, MAX_QPATH, cgs.scores2==SCORE_NOT_PRESENT?"-":(va("%i",cgs.scores2)) );
-
-		CG_Text_Paint( 630 - CG_Text_Width ( temp, 0.7f, FONT_SMALL ), y, 0.7f, colorWhite, temp, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM );
-		y += 15;
-		*/
-		//rww - no longer doing this. Since the attacker now shows who is first, we print the score there.
-	}
-
 
 	return y;
 }
@@ -2781,19 +2764,8 @@ static float CG_DrawEnemyInfo( float y ) {
 	clientInfo_t	*ci;
 	int xOffset = 0;
 
-	if ( !cg.snap ) {
-		return y;
-	}
-
-	if ( !cg_drawEnemyInfo.integer ) {
-		return y;
-	}
-
-	if ( cg.predictedPlayerState.stats[STAT_HEALTH] <= 0 ) {
-		return y;
-	}
-
-	if ( cgs.gametype == GT_POWERDUEL ) { //just get out of here then
+	if ( !cg.snap || !cg_drawEnemyInfo.integer || cg.predictedPlayerState.stats[STAT_HEALTH] <= 0
+		|| cgs.gametype == GT_POWERDUEL ) {
 		return y;
 	}
 
@@ -2852,39 +2824,11 @@ static float CG_DrawEnemyInfo( float y ) {
 		}
 	}
 	else {
-		/*
-		title = "Attacker";
-		clientNum = cg.predictedPlayerState.persistant[PERS_ATTACKER];
-
-		if ( clientNum < 0 || clientNum >= MAX_CLIENTS || clientNum == cg.snap->ps.clientNum )
-		{
-		return y;
-		}
-
-		if ( cg.time - cg.attackerTime > ATTACKER_HEAD_TIME )
-		{
-		cg.attackerTime = 0;
-		return y;
-		}
-		*/
-		//As of current, we don't want to draw the attacker. Instead, draw whoever is in first place.
-		if ( cgs.duelWinner < 0 || cgs.duelWinner >= MAX_CLIENTS ) {
+		if ( cgs.duelWinner < 0 || cgs.duelWinner >= MAX_CLIENTS )
 			return y;
-		}
-
 
 		title = va( "%s: %i", CG_GetStringEdString( "MP_INGAME", "LEADER" ), cgs.scores1 );
 
-		/*
-		if (cgs.scores1 == 1)
-		{
-		title = va("%i kill", cgs.scores1);
-		}
-		else
-		{
-		title = va("%i kills", cgs.scores1);
-		}
-		*/
 		clientNum = cgs.duelWinner;
 	}
 
@@ -2956,17 +2900,13 @@ CG_DrawFPS
 #define	FPS_FRAMES (16)
 static float CG_DrawFPS( float y ) {
 	const char *s;
-	int w;
-	static unsigned short previousTimes[FPS_FRAMES];
-	static unsigned short index;
-	static int	previous, lastupdate;
-	int t, i, fps, total;
+	int w, t, i, fps, total;
+	static unsigned short previousTimes[FPS_FRAMES], index;
+	static int previous, lastupdate;
 	unsigned short frameTime;
 	int maxFPS = atoi( CG_Cvar_VariableString( "com_maxFPS" ) );
 
-
-	// don't use serverTime, because that will be drifting to
-	// correct for internet lag changes, timescales, timedemos, etc
+	// don't use serverTime, because that will be drifting to correct for internet lag changes, timescales, timedemos, etc
 	t = trap->Milliseconds();
 	frameTime = t - previous;
 	previous = t;
@@ -2988,29 +2928,20 @@ static float CG_DrawFPS( float y ) {
 		vector4 fpsColour = { 1.0f, 1.0f, 1.0f, 1.0f }, fpsGood = { 0.0f, 1.0f, 0.0f, 1.0f }, fpsBad = { 1.0f, 0.0f, 0.0f, 1.0f };
 		CG_LerpColour( &fpsBad, &fpsGood, &fpsColour, min( max( 0.0f, fps ) / max( IDEAL_FPS, maxFPS ), 1.0f ) );
 
-		//	s = va( "%ifps", fps );
-		//	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		//	CG_DrawBigString( 635 - w + xOffset, y + 2, s, 1.0F);
-
 		s = va( "%ifps", fps );
-		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		CG_DrawStringExt( (SCREEN_WIDTH - 5) - w, y + 2, s, &fpsColour, qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
-		y += BIGCHAR_HEIGHT + 4;
-		//	w = CG_Text_Width( s, 1.0f, FONT_JAPPMONO );
-		//	CG_Text_Paint( (SCREEN_WIDTH-5) - w, y + 2, 1.0f, &fpsColour, s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_JAPPMONO );
+		w = CG_Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer );
+		CG_Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &fpsColour, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED,
+			cg_topRightFont.integer );
+		y += CG_Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer );
 	}
 	if ( cg_drawFPS.integer == 2 ) {
-		//	int font = FONT_JAPPMONO;
-		//	float scale = 0.5f;
 		s = va( "%i/%3.2f msec", frameTime, 1000.0f / (float)fps );
 
-		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		CG_DrawStringExt( (SCREEN_WIDTH - 5) - w, y + 2, s, &colorTable[CT_LTGREY], qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+		w = CG_Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer );
+		CG_Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &g_color_table[ColorIndex( COLOR_GREY )], s, 0, 0,
+			ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer );
 
-		//	w = CG_Text_Width( s, scale, font );
-		//	CG_Text_Paint( (SCREEN_WIDTH-5) - w - 5, y - 2, scale, &colorTable[CT_LTGREY], s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, font );
-
-		y += BIGCHAR_HEIGHT + 4;
+		y += CG_Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer );
 	}
 	return y;
 }
@@ -3513,7 +3444,7 @@ float CG_DrawRadar( float y ) {
 }
 
 static float CG_DrawTimer( float y ) {
-	//	vector4 *timeColour = NULL;
+	const vector4 *timeColour = NULL;
 	int msec = 0, secs = 0, mins = 0, limitSec = cgs.timelimit * 60;
 	const char *s = NULL;
 	float w;
@@ -3525,20 +3456,18 @@ static float CG_DrawTimer( float y ) {
 	secs = msec / 1000;
 	mins = secs / 60;
 
-	/*
-		timeColour = &colorTable[CT_WHITE];
-		if ( cgs.timelimit && (cg_drawTimer.integer & DRAWTIMER_COLOUR) ) {
+	timeColour = &g_color_table[ColorIndex( COLOR_WHITE )];
+	if ( cgs.timelimit && (cg_drawTimer.integer & DRAWTIMER_COLOUR) ) {
 		// final minute
-		if ( secs >= limitSec-60 )
-		timeColour = &colorTable[CT_RED];
+		if ( secs >= limitSec - 60 )
+			timeColour = &g_color_table[ColorIndex( COLOR_RED )];
 		// last quarter
-		else if ( secs >= limitSec-(limitSec/4) )
-		timeColour = &colorTable[CT_HUD_ORANGE];
+		else if ( secs >= limitSec - (limitSec / 4) )
+			timeColour = &g_color_table[ColorIndex( COLOR_ORANGE )];
 		// half way
-		else if ( secs >= limitSec/2 )
-		timeColour = &colorTable[CT_YELLOW];
-		}
-		*/
+		else if ( secs >= limitSec / 2 )
+			timeColour = &g_color_table[ColorIndex( COLOR_YELLOW )];
+	}
 
 	if ( cgs.timelimit && (cg_drawTimer.integer & DRAWTIMER_COUNTDOWN) ) {// count down
 		msec = limitSec * 1000 - (msec);
@@ -3550,11 +3479,11 @@ static float CG_DrawTimer( float y ) {
 	//	msec %= 1000;
 
 	s = va( "%i:%02i", mins, secs );
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	w = CG_Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer );
+	CG_Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, timeColour, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED,
+		cg_topRightFont.integer );
 
-	CG_DrawBigString( 635 - w, y + 2, s, 1.0F );
-
-	return y + BIGCHAR_HEIGHT + 4;
+	return y + CG_Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer );
 }
 
 
@@ -5713,13 +5642,15 @@ static void CG_DrawClientNames( void ) {
 	const vector4 *colour = &g_color_table[ColorIndex( COLOR_WHITE )];
 	float x, y;
 
-	if ( !cg_drawSpectatorNames.integer )
+	if ( !cg_drawSpectatorNames.integer || !cg.snap )
 		return;
 
 	for ( i = 0, cent = cg_entities; i < cgs.maxclients; i++, cent++ ) {
 		vector3 point;
 
 		if ( !cgs.clientinfo[i].infoValid || cgs.clientinfo[i].team == TEAM_SPECTATOR )
+			continue;
+		if ( !trap->R_InPVS( &CG_GetRefdef()->vieworg, &cent->lerpOrigin, cg.snap->areamask ) )
 			continue;
 
 		name = cgs.clientinfo[i].name;
