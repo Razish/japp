@@ -149,6 +149,48 @@
     <ClCompile Include="..\json\cJSON.c" />
     <ClCompile Include="..\ui\ui_shared.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\cgame\animtable.h" />
+    <ClInclude Include="..\cgame\cg_lights.h" />
+    <ClInclude Include="..\cgame\cg_local.h" />
+    <ClInclude Include="..\cgame\cg_luaserver.h" />
+    <ClInclude Include="..\cgame\cg_media.h" />
+    <ClInclude Include="..\cgame\cg_public.h" />
+    <ClInclude Include="..\cgame\cg_xcvar.h" />
+    <ClInclude Include="..\cgame\fx_local.h" />
+    <ClInclude Include="..\cgame\tr_types.h" />
+    <ClInclude Include="..\game\ai.h" />
+    <ClInclude Include="..\game\anims.h" />
+    <ClInclude Include="..\game\bg_local.h" />
+    <ClInclude Include="..\game\bg_lua.h" />
+    <ClInclude Include="..\game\bg_luacvar.h" />
+    <ClInclude Include="..\game\bg_luaevent.h" />
+    <ClInclude Include="..\game\bg_luaplayer.h" />
+    <ClInclude Include="..\game\bg_luaserialiser.h" />
+    <ClInclude Include="..\game\bg_luavector.h" />
+    <ClInclude Include="..\game\bg_public.h" />
+    <ClInclude Include="..\game\bg_saga.h" />
+    <ClInclude Include="..\game\bg_vehicles.h" />
+    <ClInclude Include="..\game\bg_weapons.h" />
+    <ClInclude Include="..\game\b_public.h" />
+    <ClInclude Include="..\game\surfaceflags.h" />
+    <ClInclude Include="..\game\teams.h" />
+    <ClInclude Include="..\Ghoul2\G2.h" />
+    <ClInclude Include="..\JAPP\jp_cinfo.h" />
+    <ClInclude Include="..\JAPP\jp_csflags.h" />
+    <ClInclude Include="..\JAPP\jp_promode.h" />
+    <ClInclude Include="..\JAPP\jp_ssflags.h" />
+    <ClInclude Include="..\JAPP\jp_stack.h" />
+    <ClInclude Include="..\json\cJSON.h" />
+    <ClInclude Include="..\qcommon\disablewarnings.h" />
+    <ClInclude Include="..\qcommon\qfiles.h" />
+    <ClInclude Include="..\qcommon\q_asm.h" />
+    <ClInclude Include="..\qcommon\q_shared.h" />
+    <ClInclude Include="..\qcommon\tags.h" />
+    <ClInclude Include="..\ui\keycodes.h" />
+    <ClInclude Include="..\ui\menudef.h" />
+    <ClInclude Include="..\ui\ui_shared.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -35,8 +35,4 @@ If there's only one specific case, you may want to push the warning and pop	back
 #pragma warning( disable	: 4131 )	// 'x' : uses old-style declarator							Raz0r
 #pragma warning( disable	: 4996 )	// This function or variable may be unsafe.					Raz0r
 
-/*	Warnings disabled in project settings	*/
-/*	Project		No.			Warning														Dev
-	Game		4206		nonstandard extension used : translation unit is empty		Raz0r
-	*/
 #endif //_WIN32 && !MINGW32
