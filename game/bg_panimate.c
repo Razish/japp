@@ -1930,8 +1930,8 @@ int BG_ParseAnimationEvtFile( const char *as_filename, int animFileIndex, int ev
 			torsoAnimEvents[i].eventType = AEV_NONE;
 			legsAnimEvents[i].eventType = AEV_NONE;
 			//Frame to play event on
-			torsoAnimEvents[i].keyFrame = -1;
-			legsAnimEvents[i].keyFrame = -1;
+			torsoAnimEvents[i].keyFrame = 0xFFFFu;
+			legsAnimEvents[i].keyFrame = 0xFFFFu;
 			//we allow storage of one string, temporarily (in case we have to look up an index later, then make sure to set stringData to NULL so we only do the look-up once)
 			torsoAnimEvents[i].stringData = NULL;
 			legsAnimEvents[i].stringData = NULL;

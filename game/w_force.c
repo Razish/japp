@@ -175,7 +175,7 @@ void WP_InitForcePowers( gentity_t *ent ) {
 		ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
 	}
 
-	ent->client->ps.fd.forcePowerSelected = -1;
+	ent->client->ps.fd.forcePowerSelected = 0xFFFFFFFFu;
 	ent->client->ps.fd.forceSide = 0;
 
 	// if in siege, then use the powers for this class, and skip all this nonsense.

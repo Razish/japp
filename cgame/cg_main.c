@@ -1873,7 +1873,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;
 	cg.itemSelect = -1;
-	cg.forceSelect = -1;
+	cg.forceSelect = 0xFFFFFFFFu;
 	cg.forceHUDActive = qtrue;
 	cg.forceHUDTotalFlashTime = 0;
 	cg.forceHUDNextFlashTime = 0;

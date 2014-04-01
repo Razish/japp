@@ -1897,7 +1897,7 @@ static const adminCommand_t adminCommands[] = {
 	{ "amkillvote", PRIV_KILLVOTE, AM_KillVote }, // kill the current vote
 	{ "amlisttele", PRIV_TELEPORT, AM_ListTelemarks }, // list all marked positions
 	{ "amlockteam", PRIV_LOCKTEAM, AM_LockTeam }, // prevent clients from joining a team
-	{ "amlogout", -1, AM_Logout }, // logout
+	{ "amlogout", 0xFFFFFFFFu, AM_Logout }, // logout
 	{ "amluaexec", PRIV_LUA, AM_Lua }, // execute Lua code
 	{ "amluareload", PRIV_LUA, AM_ReloadLua }, // reload JPLua system
 	{ "ammap", PRIV_MAP, AM_Map }, // change map and gamemode
@@ -1908,7 +1908,7 @@ static const adminCommand_t adminCommands[] = {
 	{ "ampsay", PRIV_ANNOUNCE, AM_Announce }, // announce a message to the specified client (Or all)
 	{ "amremap", PRIV_REMAP, AM_Remap }, // shader remapping
 	{ "amremovetele", PRIV_TELEPORT, AM_RemoveTelemark }, // remove a telemark from the list
-	{ "amrename", PRIV_RENAME, AM_Rename }, // rename a c;ient
+	{ "amrename", PRIV_RENAME, AM_Rename }, // rename a client
 	{ "amsavetele", PRIV_TELEPORT, AM_SaveTelemarksCmd }, // save marked positions RAZFIXME: Temporary?
 	{ "amseetele", PRIV_TELEPORT, AM_SeeTelemarks }, // visualise all telemarks
 	{ "amsilence", PRIV_SILENCE, AM_Silence }, // silence specified client
