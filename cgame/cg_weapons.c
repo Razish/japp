@@ -449,7 +449,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	clientInfo_t *ci = NULL;
 	vector3 angles;
 	weaponInfo_t *weapon = NULL;
-	float cgFov = 0.0f;
+	float desiredFov = 0.0f;
 	refdef_t *refdef = CG_GetRefdef();
 
 	// no gun if in third person view or a camera is active
@@ -461,12 +461,12 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 		&& cg_trueFOV.value
 		&& cg.predictedPlayerState.pm_type != PM_SPECTATOR
 		&& cg.predictedPlayerState.pm_type != PM_INTERMISSION ) {
-		cgFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_trueFOV.value;
+		desiredFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_trueFOV.value;
 	}
 	else
-		cgFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_fov.value;
+		desiredFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_fov.value;
 
-	cgFov = Q_clampi( 1, cgFov, 180 );
+	desiredFov = Q_clampi( 1, desiredFov, 180 );
 
 	// allow the gun to be completely removed
 	if ( !cg.japp.fakeGun && (!cg_drawGun.integer || cg.predictedPlayerState.zoomMode || cg_trueGuns.integer
@@ -495,17 +495,17 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 
 	if ( cg_fovViewmodel.integer ) {
 		float fracDistFOV, fracWeapFOV;
+		float fov = desiredFov;
 		if ( cg_fovAspectAdjust.integer ) {
 			// Based on LordHavoc's code for Darkplaces
 			// http://www.quakeworld.nu/forum/topic/53/what-does-your-qw-look-like/page/30
 			const float baseAspect = 0.75f; // 3/4
 			const float aspect = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight;
-			const float desiredFov = cgFov;
 
-			cgFov = atanf( tanf( desiredFov*M_PI / 360.0f ) * baseAspect*aspect )*360.0f / M_PI;
+			fov = atanf( tanf( desiredFov*M_PI / 360.0f ) * baseAspect*aspect )*360.0f / M_PI;
 		}
-		fracDistFOV = tanf( CG_GetRefdef()->fov_x * (M_PI / 180) * 0.5f );
-		fracWeapFOV = (1.0f / fracDistFOV) * tanf( cgFov * (M_PI / 180) * 0.5f );
+		fracDistFOV = tanf( refdef->fov_x * M_PI / 360.0f );
+		fracWeapFOV = (1.0f / fracDistFOV) * tanf( fov * M_PI / 360.0f );
 		VectorScale( &hand.axis[0], fracWeapFOV, &hand.axis[0] );
 	}
 
