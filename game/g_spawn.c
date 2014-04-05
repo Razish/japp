@@ -632,8 +632,8 @@ spawn_t	spawns[] = {
 	{ "fx_snow", SP_CreateSnow },
 	{ "fx_spacedust", SP_CreateSpaceDust },
 	{ "gametype_item", SP_gametype_item },
-	{ "info_jedimaster_start", SP_info_jedimaster_start },
 	{ "info_camp", SP_info_camp },
+	{ "info_jedimaster_start", SP_info_jedimaster_start },
 	{ "info_notnull", SP_info_notnull }, // use target_position instead
 	{ "info_null", SP_info_null },
 	{ "info_player_deathmatch", SP_info_player_deathmatch },
