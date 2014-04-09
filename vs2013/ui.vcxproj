@@ -38,7 +38,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)</OutDir>
+    <OutDir>../../japlus/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>$(ProjectName)x86</TargetName>
@@ -46,7 +46,7 @@
     <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)</OutDir>
+    <OutDir>../../japlus/</OutDir>
     <TargetName>$(ProjectName)x86</TargetName>
     <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -55,6 +55,8 @@
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>../;../ui/;../game/</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;_UI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link />
     <Link>
@@ -68,6 +70,7 @@
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>../;../ui/;../game/</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;_UI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -101,6 +104,38 @@
     <ClCompile Include="..\ui\ui_saber.c" />
     <ClCompile Include="..\ui\ui_shared.c" />
     <ClCompile Include="..\ui\ui_syscalls.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\cgame\animtable.h" />
+    <ClInclude Include="..\cgame\tr_types.h" />
+    <ClInclude Include="..\game\anims.h" />
+    <ClInclude Include="..\game\bg_local.h" />
+    <ClInclude Include="..\game\bg_public.h" />
+    <ClInclude Include="..\game\bg_saga.h" />
+    <ClInclude Include="..\game\bg_vehicles.h" />
+    <ClInclude Include="..\game\bg_weapons.h" />
+    <ClInclude Include="..\game\b_public.h" />
+    <ClInclude Include="..\game\surfaceflags.h" />
+    <ClInclude Include="..\game\teams.h" />
+    <ClInclude Include="..\Ghoul2\G2.h" />
+    <ClInclude Include="..\JAPP\jp_cinfo.h" />
+    <ClInclude Include="..\JAPP\jp_crash.h" />
+    <ClInclude Include="..\JAPP\jp_csflags.h" />
+    <ClInclude Include="..\JAPP\jp_ssflags.h" />
+    <ClInclude Include="..\JAPP\jp_tokenparser.h" />
+    <ClInclude Include="..\qcommon\disablewarnings.h" />
+    <ClInclude Include="..\qcommon\game_version.h" />
+    <ClInclude Include="..\qcommon\qfiles.h" />
+    <ClInclude Include="..\qcommon\q_asm.h" />
+    <ClInclude Include="..\qcommon\q_shared.h" />
+    <ClInclude Include="..\qcommon\tags.h" />
+    <ClInclude Include="..\ui\keycodes.h" />
+    <ClInclude Include="..\ui\menudef.h" />
+    <ClInclude Include="..\ui\ui_force.h" />
+    <ClInclude Include="..\ui\ui_local.h" />
+    <ClInclude Include="..\ui\ui_public.h" />
+    <ClInclude Include="..\ui\ui_shared.h" />
+    <ClInclude Include="..\ui\ui_xcvar.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -11,7 +11,7 @@
 
 // ui_cvar.c
 #define XCVAR_PROTO
-	#include "ui_xcvar.h"
+#include "ui_xcvar.h"
 #undef XCVAR_PROTO
 void UI_RegisterCvars( void );
 void UI_UpdateCvars( void );
@@ -22,7 +22,7 @@ void UI_UpdateCvars( void );
 //
 // ui_main.c
 //
-qboolean UI_FeederSelection( float feederID, int index, itemDef_t *item );
+qboolean UI_FeederSelection( int feederID, int index, itemDef_t *item );
 void UI_Report( void );
 void UI_Load( void );
 void UI_LoadMenus( const char *menuFile, qboolean reset );
@@ -30,6 +30,16 @@ void UI_ShowPostGame( qboolean newHigh );
 void UI_ClearScores( void );
 void UI_LoadArenas( void );
 void UI_LoadForceConfig_List( void );
+
+typedef enum moveDataTitles_e {
+	MD_ACROBATICS = 0,
+	MD_SINGLE_FAST,
+	MD_SINGLE_MEDIUM,
+	MD_SINGLE_STRONG,
+	MD_DUAL_SABERS,
+	MD_SABER_STAFF,
+	MD_MOVE_TITLE_MAX
+} moveDataTitles_t;
 
 //
 // ui_players.c
@@ -65,8 +75,8 @@ typedef struct playerInfo_s {
 	qhandle_t		torsoSkin;
 	lerpFrame_t		torso;
 
-//	qhandle_t		headModel;
-//	qhandle_t		headSkin;
+	//	qhandle_t		headModel;
+	//	qhandle_t		headSkin;
 
 	animation_t		animations[MAX_TOTALANIMATIONS];
 
@@ -226,7 +236,7 @@ typedef struct pendingServerStatus_s {
 
 typedef struct serverStatusInfo_s {
 	char address[MAX_ADDRESSLENGTH];
-	char *lines[MAX_SERVERSTATUS_LINES][4];
+	const char *lines[MAX_SERVERSTATUS_LINES][4];
 	char text[MAX_SERVERSTATUS_TEXT];
 	char pings[MAX_CLIENTS * 3];
 	int numLines;
@@ -252,7 +262,7 @@ typedef struct playerSpeciesInfo_s {
 
 typedef struct uiInfo_s {
 	displayContextDef_t		uiDC;
-	
+
 	int						characterCount;
 	int						botIndex;
 
@@ -274,7 +284,7 @@ typedef struct uiInfo_s {
 	int						teamIndex;
 	int						playerRefresh;
 	int						playerIndex;
-	int						playerNumber; 
+	int						playerNumber;
 	char					playerNames[MAX_CLIENTS][MAX_NETNAME];
 	char					teamNames[MAX_CLIENTS][MAX_TEAMNAME];
 	int						teamClientNums[MAX_CLIENTS];
@@ -354,20 +364,19 @@ typedef struct uiInfo_s {
 extern uiInfo_t uiInfo;
 
 qboolean	UI_ConsoleCommand( int realTime );
-void		UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ); 
+void		UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader );
 void		UI_FillRect( float x, float y, float width, float height, const vector4 *color );
 char		*UI_Cvar_VariableString( const char *var_name );
 int			UI_GetNumBots( void );
 void		UI_LoadBots( void );
-char		*UI_GetBotNameByNumber( int num );
+const char	*UI_GetBotNameByNumber( int num );
 qboolean	UI_SaberModelForSaber( const char *saberName, char *saberModel );
 qboolean	UI_SaberTypeForSaber( const char *saberName, char *saberType );
 void		SE_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity );
 
 #ifdef FAV_SERVERS
 #define MAX_SERVERS 64
-typedef struct favServer_s
-{
+typedef struct favServer_s {
 	char	name[32];
 	char	ip[32];
 	//RAZTODO: +connect params
@@ -379,13 +388,12 @@ void JP_QueryServer( void );
 #endif
 
 typedef enum updateStatus_e {
-	JAPP_UPDATE_UPTODATE=0,
+	JAPP_UPDATE_UPTODATE = 0,
 	JAPP_UPDATE_OUTDATED,
 	JAPP_UPDATE_UPDATED,
 } updateStatus_t;
 
-typedef struct uiLocal_s
-{
+typedef struct uiLocal_s {
 #ifdef FAV_SERVERS
 	favServer_t		servers[MAX_SERVERS];
 	unsigned int	serversCount;

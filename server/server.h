@@ -14,14 +14,14 @@
 //=============================================================================
 
 #define	PERS_SCORE				0		// !!! MUST NOT CHANGE, SERVER AND
-										// GAME BOTH REFERENCE !!!
+// GAME BOTH REFERENCE !!!
 
 #define	MAX_ENT_CLUSTERS	16
 
 typedef struct svEntity_s {
 	struct worldSector_s *worldSector;
 	struct svEntity_s *nextEntityInWorldSector;
-	
+
 	entityState_t	baseline;		// for delta compression of initial sighting
 	int			numClusters;		// if -1, use headnode instead
 	int			clusternums[MAX_ENT_CLUSTERS];
@@ -86,8 +86,8 @@ typedef struct clientState_s {
 #endif
 	int				num_entities;
 	int				first_entity;		// into the circular sv_packet_entities[]
-										// the entities MUST be in increasing state number
-										// order, otherwise the delta compression will fail
+	// the entities MUST be in increasing state number
+	// order, otherwise the delta compression will fail
 	int				messageSent;		// time the message was transmitted
 	int				messageAcked;		// time the message was acked
 	int				messageSize;		// used to rate drop packets
@@ -96,7 +96,7 @@ typedef struct clientState_s {
 typedef enum {
 	CS_FREE,		// can be reused for a new connection
 	CS_ZOMBIE,		// client has been disconnected, but don't reuse
-					// connection for a couple seconds
+	// connection for a couple seconds
 	CS_CONNECTED,	// has been assigned to a client_t, but no gamestate yet
 	CS_PRIMED,		// gamestate has been sent, but client hasn't sent a usercmd
 	CS_ACTIVE		// client is fully in game
@@ -128,8 +128,8 @@ typedef struct client_s {
 	// downloading
 	char			downloadName[MAX_QPATH]; // if not empty string, we are downloading
 	fileHandle_t	download;			// file being downloaded
- 	int				downloadSize;		// total bytes (can't use EOF because of paks)
- 	int				downloadCount;		// bytes sent
+	int				downloadSize;		// total bytes (can't use EOF because of paks)
+	int				downloadCount;		// bytes sent
 	int				downloadClientBlock;	// last block we sent to the client, awaiting ack
 	int				downloadCurrentBlock;	// current block number
 	int				downloadXmitBlock;	// last block we xmited
@@ -240,16 +240,16 @@ extern	cvar_t	*sv_allowAnonymous;
 //
 // sv_main.c
 //
-void SV_FinalMessage (char *message);
+void SV_FinalMessage( char *message );
 //void QDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...);
 
 
-void SV_AddOperatorCommands (void);
-void SV_RemoveOperatorCommands (void);
+void SV_AddOperatorCommands( void );
+void SV_RemoveOperatorCommands( void );
 
 
-void SV_MasterHeartbeat (void);
-void SV_MasterShutdown (void);
+void SV_MasterHeartbeat( void );
+void SV_MasterShutdown( void );
 
 
 
@@ -259,7 +259,7 @@ void SV_MasterShutdown (void);
 //
 void SV_SetConfigstring( int index, const char *val );
 void SV_GetConfigstring( int index, char *buffer, int bufferSize );
-int SV_AddConfigstring (const char *name, int start, int max);
+int SV_AddConfigstring( const char *name, int start, int max );
 
 void SV_SetUserinfo( int index, const char *val );
 void SV_GetUserinfo( int index, char *buffer, int bufferSize );
@@ -286,9 +286,9 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd );
 void SV_DropClient( client_t *drop, const char *reason );
 
 void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK );
-void SV_ClientThink (client_t *cl, usercmd_t *cmd);
+void SV_ClientThink( client_t *cl, usercmd_t *cmd );
 
-void SV_WriteDownloadToClient( client_t *cl , msg_t *msg );
+void SV_WriteDownloadToClient( client_t *cl, msg_t *msg );
 
 // Need to broadcast info about clients on join/leave
 //
@@ -301,7 +301,7 @@ void SV_Heartbeat_f( void );
 //
 void SV_AddServerCommand( client_t *client, const char *cmd );
 void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg );
-void SV_WriteFrameToClient (client_t *client, msg_t *msg);
+void SV_WriteFrameToClient( client_t *client, msg_t *msg );
 void SV_SendMessageToClient( msg_t *msg, client_t *client );
 void SV_SendClientMessages( void );
 void SV_SendClientSnapshot( client_t *client );
@@ -314,36 +314,36 @@ sharedEntity_t *SV_GentityNum( int num );
 playerState_t *SV_GameClientNum( int num );
 svEntity_t	*SV_SvEntityForGentity( sharedEntity_t *gEnt );
 sharedEntity_t *SV_GEntityForSvEntity( svEntity_t *svEnt );
-void		SV_InitGameProgs ( void );
-void		SV_ShutdownGameProgs ( void );
+void		SV_InitGameProgs( void );
+void		SV_ShutdownGameProgs( void );
 void		SV_RestartGameProgs( void );
-qboolean	SV_inPVS (const vector3 *p1, const vector3 *p2);
+qboolean	SV_inPVS( const vector3 *p1, const vector3 *p2 );
 
 //
 // sv_bot.c
 //
 void		SV_BotFrame( int time );
-int			SV_BotAllocateClient(void);
+int			SV_BotAllocateClient( void );
 void		SV_BotFreeClient( int clientNum );
 
-void		SV_BotInitCvars(void);
+void		SV_BotInitCvars( void );
 int			SV_BotLibSetup( void );
 int			SV_BotLibShutdown( void );
 int			SV_BotGetSnapshotEntity( int client, int ent );
 int			SV_BotGetConsoleMessage( int client, char *buf, int size );
 
-void *Bot_GetMemoryGame(int size);
-void Bot_FreeMemoryGame(void *ptr);
+void *Bot_GetMemoryGame( int size );
+void Bot_FreeMemoryGame( void *ptr );
 
-int BotImport_DebugPolygonCreate(int color, int numPoints, vector3 *points);
-void BotImport_DebugPolygonDelete(int id);
+int BotImport_DebugPolygonCreate( int color, int numPoints, vector3 *points );
+void BotImport_DebugPolygonDelete( int id );
 
 //============================================================
 //
 // high level object sorting to reduce interaction tests
 //
 
-void SV_ClearWorld (void);
+void SV_ClearWorld( void );
 // called after the world model has been loaded, before linking any entities
 
 void SV_UnlinkEntity( sharedEntity_t *ent );
@@ -373,7 +373,7 @@ int SV_AreaEntities( const vector3 *mins, const vector3 *maxs, int *entityList, 
 // The world entity is never returned in this list.
 
 
-int SV_PointContents( const vector3 *p, int passEntityNum );
+uint32_t SV_PointContents( const vector3 *p, int passEntityNum );
 // returns the CONTENTS_* value from the world and all entities at the given point.
 
 
@@ -395,7 +395,7 @@ void SV_ClipToEntity( trace_t *trace, const vector3 *start, const vector3 *mins,
 //
 // sv_net_chan.c
 //
-void SV_Netchan_Transmit( client_t *client, msg_t *msg);	//int length, const byte *data );
+void SV_Netchan_Transmit( client_t *client, msg_t *msg );	//int length, const byte *data );
 void SV_Netchan_TransmitNextFragment( netchan_t *chan );
 qboolean SV_Netchan_Process( client_t *client, msg_t *msg );
 

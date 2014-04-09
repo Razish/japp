@@ -2,19 +2,19 @@
 # JA++ SCons project file
 # written by Raz0r
 #
-# targets:
+# projects:
 #	game
 #	cgame
 #	ui
 #
 # options:
-#	debug		generate debug information
+#	debug		generate debug information. value 2 also enables optimisations
 #	force32		force 32 bit target when on 64 bit machine
 #	compiler=?	use an alternate compiler
 #	analyse		run static analysis
 #
 # example:
-#	scons game=1 debug=1 force32=1 compiler=clang
+#	scons project=game debug=1 force32=1 compiler=clang
 #
 
 import platform
@@ -24,17 +24,19 @@ import commands
 plat = platform.system() # Windows or Linux
 try:
 	bits = int( platform.architecture()[0][:2] ) # 32 or 64
-except (ValueError, TypeError):
+except( ValueError, TypeError ):
 	bits = None
 arch = None # platform-specific, set manually
 
-print( '\n********************************\n' )
 print( 'Configuring build environment...' )
-env = Environment()
 
-env['ENV']['TERM'] = os.environ['TERM']
-
+analyse = int( ARGUMENTS.get( 'analyse', 0 ) )
+compiler = ARGUMENTS.get( 'compiler', 'gcc' )
+debug = int( ARGUMENTS.get( 'debug', 0 ) )
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
+project = ARGUMENTS.get( 'project', '' )
+
+# architecture settings, needed for binary names, also passed as a preprocessor definition
 if force32:
 	bits = 32
 
@@ -44,26 +46,36 @@ if bits == 32:
 	elif plat == 'Linux':
 		arch = 'i386'
 	#TODO: Mac
-
 elif bits == 64:
-	if plat == 'Windows':
-		arch = 'x64'
-	elif plat == 'Linux':
-		arch = 'x86_64'
-	#TODO: Mac
+	arch = 'x86_64'
 
+# Notify the user of the build configuration
 print( 'Building for ' + plat + ' (' + str(bits) + ' bits, treated as \'' + arch + '\')' )
-print( '\n********************************\n' )
+if debug:
+	print( 'With debugging symbols' )
+if not debug or debug == 2:
+	print( 'Optimisation enabled' )
+if force32:
+	print( 'Forcing 32 bit compile' )
+if analyse:
+	print( 'WARNING: Running static analysis mode. Will not produce binaries' )
+print( '' )
+
+env = Environment( TARGET_ARCH = arch )
+if plat != 'Windows':
+	env['ENV']['TERM'] = os.environ['TERM']
 
 files = {}
 libs = {}
 
 files['lua'] = [
-	'lua/bit.c',
 	'lua/lapi.c',
 	'lua/lauxlib.c',
 	'lua/lbaselib.c',
+	'lua/lbitlib.c',
 	'lua/lcode.c',
+	'lua/lcorolib.c',
+	'lua/lctype.c',
 	'lua/ldblib.c',
 	'lua/ldebug.c',
 	'lua/ldo.c',
@@ -89,8 +101,7 @@ files['lua'] = [
 	'lua/lua.c',
 	'lua/lundump.c',
 	'lua/lvm.c',
-	'lua/lzio.c',
-	'lua/print.c' ]
+	'lua/lzio.c' ]
 
 files['udis86'] = [
 	'libudis86/decode.c',
@@ -99,13 +110,14 @@ files['udis86'] = [
 	'libudis86/syn-att.c',
 	'libudis86/syn-intel.c',
 	'libudis86/syn.c',
-	'libudis86/udis86.c' ]
+	'libudis86/udis86.c' ] if bits == 32 else []
 
 files['game'] = [
 	'qcommon/q_math.c',
 	'qcommon/q_shared.c',
 	'JAPP/jp_crash.c',
 	'JAPP/jp_promode.c',
+	'JAPP/jp_stack.c',
 	'JAPP/jp_tokenparser.c',
 	'json/cJSON.c',
 	'game/ai_main.c',
@@ -113,6 +125,12 @@ files['game'] = [
 	'game/ai_wpnav.c',
 	'game/AnimalNPC.c',
 	'game/bg_g2_utils.c',
+	'game/bg_lua.c',
+	'game/bg_luacvar.c',
+	'game/bg_luaevent.c',
+	'game/bg_luaplayer.c',
+	'game/bg_luaserialiser.c',
+	'game/bg_luavector.c',
 	'game/bg_misc.c',
 	'game/bg_panimate.c',
 	'game/bg_pmove.c',
@@ -136,10 +154,6 @@ files['game'] = [
 	'game/g_ICARUScb.c',
 	'game/g_items.c',
 	'game/g_log.c',
-	'game/g_lua.c',
-	'game/g_luacvar.c',
-	'game/g_luaevent.c',
-	'game/g_luaplayer.c',
 	'game/g_main.c',
 	'game/g_mem.c',
 	'game/g_misc.c',
@@ -208,6 +222,12 @@ files['cgame'] = [
 	'qcommon/q_shared.c',
 	'game/AnimalNPC.c',
 	'game/bg_g2_utils.c',
+	'game/bg_lua.c',
+	'game/bg_luacvar.c',
+	'game/bg_luaevent.c',
+	'game/bg_luaplayer.c',
+	'game/bg_luaserialiser.c',
+	'game/bg_luavector.c',
 	'game/bg_misc.c',
 	'game/bg_panimate.c',
 	'game/bg_pmove.c',
@@ -220,7 +240,9 @@ files['cgame'] = [
 	'game/FighterNPC.c',
 	'game/SpeederNPC.c',
 	'game/WalkerNPC.c',
+	'JAPP/jp_crashExtra.c',
 	'JAPP/jp_promode.c',
+	'JAPP/jp_stack.c',
 	'JAPP/jp_tokenparser.c',
 	'json/cJSON.c',
 	'ui/ui_shared.c',
@@ -234,14 +256,10 @@ files['cgame'] = [
 	'cgame/cg_info.c',
 	'cgame/cg_light.c',
 	'cgame/cg_localents.c',
-	'cgame/cg_lua.c',
-	'cgame/cg_luacvar.c',
-	'cgame/cg_luaevent.c',
-	'cgame/cg_luaplayer.c',
-	'cgame/cg_luaserialiser.c',
 	'cgame/cg_luaserver.c',
 	'cgame/cg_main.c',
 	'cgame/cg_marks.c',
+	'cgame/cg_media.c',
 	'cgame/cg_newDraw.c',
 	'cgame/cg_newScoreboard.c',
 	'cgame/cg_players.c',
@@ -291,72 +309,120 @@ files['ui'] = [
 
 # set up libraries to link with
 if plat == 'Linux':
-	libs['game'] = [ 'm' ]
-	libs['cgame'] = [ 'm' ]
+	libs['game'] = [ 'm', 'readline' ]
+	libs['cgame'] = [ 'm', 'readline' ]
 	libs['ui'] = [ 'm' ]
 elif plat == 'Windows':
-	libs['game'] = []
-	libs['cgame'] = []
-	libs['ui'] = []
+	libs['game'] = [ 'user32' ]
+	libs['cgame'] = [ 'user32', 'Advapi32' ]
+	libs['ui'] = [ 'user32' ]
 
 # compiler options
 if plat == 'Linux':
+	env['CC'] = compiler
 	env['CPPDEFINES'] = [ '__GCC__' ]
-	env['CCFLAGS'] = [ '-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-missing-field-initializers', '-Wno-sign-compare', '-Wno-unused-parameter' ]
-	env['CC'] = ARGUMENTS.get( 'compiler', 'gcc' )
-	if int( ARGUMENTS.get( 'analyse', 0 ) ):
+	env['CFLAGS'] = [ '-Wdeclaration-after-statement',
+		'-Wnested-externs',
+		'-Wold-style-definition',
+		'-Wstrict-prototypes',
+	]
+	env['CCFLAGS'] = [
+		'-Wall', '-Wextra',
+		'-Wno-missing-braces',
+		'-Wno-missing-field-initializers',
+		'-Wno-sign-compare',
+		'-Wno-unused-parameter',
+		'-Waggregate-return',
+	#	'-Wbad-function-cast',
+	#	'-Wcast-qual',
+	#	'-Wdouble-promotion',
+	#	'-Wfloat-equal',
+		'-Winit-self',
+		'-Winline',
+		'-Wlogical-op',
+	#	'-Wlong-long',
+		'-Wmissing-include-dirs',
+		'-Woverlength-strings',
+		'-Wpointer-arith',
+		'-Wredundant-decls',
+	#	'-Wshadow',
+	#	'-Wsign-conversion',
+		'-Wstack-usage=32768',
+	#	'-Wsuggest-attribute=const',
+		'-Wswitch-default',
+		'-Wundef',
+		'-Wuninitialized',
+		'-Wunreachable-code',
+	#	'-Wunsuffixed-float-constants',
+		'-Wwrite-strings',
+		]
+	env['CXXFLAGS'] += [ '-std=c++11' ]
+	if analyse:
 		env['CC'] = 'clang'
-		env['CCFLAGS'] += [ '--analyze' ]
-	if force32:
+		env['CCFLAGS'] += [ '--analyze -O3' ]
+	if bits == 32:
 		env['CCFLAGS'] += [ '-m32' ]
 		env['LINKFLAGS'] += [ '-m32' ]
 elif plat == 'Windows':
 	# assume msvc
-	env['CCFLAGS'] = [ '/Gm', '/GS', '/Zc:wchar_t', '/WX-', '/RTC1', '/MDd', '/EHsc', '/nologo', '/W4', '/wd"4100"', '/wd"4127"', '/wd"4996"' ]
-	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS','/MACHINE:'+arch ]
-	env['CPPDEFINES'] = [ '_CRT_SECURE_NO_WARNINGS', 'WIN32', '_WINDOWS' ]
+	env['CCFLAGS'] = [ '/nologo', '/W4', '/WX-', '/GS', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/GF', '/TC', '/errorReport:prompt', '/EHs', '/EHc', '/Ot', '/Zi', '/MP' ]
+	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS', '/MACHINE:'+arch, '/LTCG' ]
+	env['CPPDEFINES'] = [ '_WINDLL', '_MSC_EXTENSIONS', '_INTEGRAL_MAX_BITS=64', '_WIN32', '_MT', '_DLL', '_M_FP_PRECISE' ]
+	if bits == 32:
+		env['CCFLAGS'] += [ '/analyze-', '/Zp8', '/Gs', '/Oy-' ]
+		env['CPPDEFINES'] += [ '_M_IX86=600', '_M_IX86_FP=2' ]
+	elif bits == 64:
+		env['CCFLAGS'] += [ '/Zp16' ]
+		env['CPPDEFINES'] += [ '_M_AMD64=100', '_M_X64=100', '_WIN64' ]
 
 # debug / release
-if int( ARGUMENTS.get( 'debug', 0 ) ):
+if not debug or debug == 2:
+	if plat == 'Linux' and not analyse:
+		env['CCFLAGS'] += [ '-O2' ] # analysis sets higher optimisation level
+	elif plat == 'Windows':
+		env['CCFLAGS'] += [ '/GL', '/Gm-', '/MD', '/O2', '/Oi' ]
+		if bits == 64:
+			env['CCFLAGS'] += [ '/Oy' ]
+	if not debug:
+		env['CPPDEFINES'] += [ 'NDEBUG' ]
+if debug:
 	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-g3' ]
 	elif plat == 'Windows':
-		env['CCFLAGS'] += [ '/Zi', '/Od' ]
+		env['CPPDEFINES'] += [ '__MSVC_RUNTIME_CHECKS' ]
+		env['CCFLAGS'] += [ '/Gm', '/FD', '/MDd', '/Od', '/RTC1', '/RTCs', '/RTCu' ]
+		if bits == 32:
+			env['CCFLAGS'] += [ '/FC', '/ZI' ]
 	env['CPPDEFINES'] += [ '_DEBUG' ]
-else:
-	if plat == 'Linux':
-		env['CCFLAGS'] += [ '-O2' ]
-	elif plat == 'Windows':
-		env['CCFLAGS'] += [ '/O2' ]
-	env['CPPDEFINES'] += [ 'NDEBUG' ]
 
 # get git revision
 status, rev = commands.getstatusoutput( 'git rev-parse HEAD' )
 if status == 0:
 	env['CPPDEFINES'] += [ 'REVISION=\\"'+rev+'\\"' ]
 
+env['CPPDEFINES'] += [ 'SCONS_BUILD' ]
+env['LIBPREFIX'] = ''
+env['CPPPATH'] = [ '.', './game' ]
+env['LIBS'] = libs[project]
+
 # targets
-project = ARGUMENTS.get( 'project', '' )
 if project == 'game':
-	env['CPPPATH'] = [ '.', './game' ]
-	env['CPPDEFINES'] += [ '_GAME', 'JK2AWARDS', 'JPLUA' ]
-	env['LIBS'] = libs['game']
-	env['LIBPREFIX'] = ''
-	env.SharedLibrary( 'jampgame'+arch, files['game'] )
+	env['CPPDEFINES'] += [ '_GAME', 'JPLUA' ]
+	if plat == 'Linux':
+		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
+	env.SharedLibrary( 'jampgame'+arch, files[project] )
 
 elif project == 'cgame':
-	env['CPPPATH'] = [ '.', './cgame', './game' ]
-	env['CPPDEFINES'] += [ '_CGAME', 'JK2AWARDS', 'JPLUA' ]
-	env['LIBS'] = libs['cgame']
-	env['LIBPREFIX'] = ''
-	env.SharedLibrary( 'cgame'+arch, files['cgame'] )
+	env['CPPPATH'] += [ './cgame' ]
+	env['CPPDEFINES'] += [ '_CGAME', 'JPLUA' ]
+	if plat == 'Linux':
+		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
+	env.SharedLibrary( 'cgame'+arch, files[project] )
 
 elif project == 'ui':
-	env['CPPPATH'] = [ '.', './ui', './game' ]
+	env['CPPPATH'] += [ './ui' ]
 	env['CPPDEFINES'] += [ '_UI' ]
-	env['LIBS'] = libs['ui']
-	env['LIBPREFIX'] = ''
-	env.SharedLibrary( 'ui'+arch, files['ui'] )
+	env.SharedLibrary( 'ui'+arch, files[project] )
 
 else:
 	print( 'no project specified' )

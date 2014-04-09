@@ -1,4 +1,4 @@
-	// Copyright (C) 2001-2002 Raven Software
+// Copyright (C) 2001-2002 Raven Software
 //
 // bg_weapons.c -- part of bg_pmove functionality
 
@@ -7,28 +7,28 @@
 #include "bg_local.h"
 
 // Muzzle point table...
-vector3 WP_MuzzlePoint[WP_NUM_WEAPONS] = 
+vector3 WP_MuzzlePoint[WP_NUM_WEAPONS] =
 {//	Fwd,	right,	up.
-	{0,		0,		0	},	// WP_NONE,
-	{0	,	8,		0	},	// {-12	,	8,		0	},	// WP_STUN_BATON,
-	{0	,	8,		0	},	// WP_MELEE,
-	{8	,	16,		0	},	// WP_SABER,				 
-	{12,	6,		-6	},	// WP_BRYAR_PISTOL,
-	{12,	6,		-6	},	// WP_BLASTER,
-	{12,	6,		-6	},	// WP_DISRUPTOR,
-	{12,	2,		-6	},	// WP_BOWCASTER,
-	{12,	4.5,	-6	},	// WP_REPEATER,
-	{12,	6,		-6	},	// WP_DEMP2,
-	{12,	6,		-6	},	// WP_FLECHETTE,
-	{12,	8,		-4	},	// WP_ROCKET_LAUNCHER,
-	{12,	0,		-4	},	// WP_THERMAL,
-	{12,	0,		-10	},	// WP_TRIP_MINE,
-	{12,	0,		-4	},	// WP_DET_PACK,
-	{12,	6,		-6	},	// WP_CONCUSSION
-	{12,	6,		-6	},	// WP_BRYAR_OLD,
+	{ 0, 0, 0 },	// WP_NONE,
+	{ 0, 8, 0 },	// {-12	,	8,		0	},	// WP_STUN_BATON,
+	{ 0, 8, 0 },	// WP_MELEE,
+	{ 8, 16, 0 },	// WP_SABER,
+	{ 12, 6, -6 },	// WP_BRYAR_PISTOL,
+	{ 12, 6, -6 },	// WP_BLASTER,
+	{ 12, 6, -6 },	// WP_DISRUPTOR,
+	{ 12, 2, -6 },	// WP_BOWCASTER,
+	{ 12, 4.5f, -6 },	// WP_REPEATER,
+	{ 12, 6, -6 },	// WP_DEMP2,
+	{ 12, 6, -6 },	// WP_FLECHETTE,
+	{ 12, 8, -4 },	// WP_ROCKET_LAUNCHER,
+	{ 12, 0, -4 },	// WP_THERMAL,
+	{ 12, 0, -10 },	// WP_TRIP_MINE,
+	{ 12, 0, -4 },	// WP_DET_PACK,
+	{ 12, 6, -6 },	// WP_CONCUSSION
+	{ 12, 6, -6 },	// WP_BRYAR_OLD,
 };
 
-weaponData_t weaponData[WP_NUM_WEAPONS] = 
+weaponData_t weaponData[WP_NUM_WEAPONS] =
 {
 	{	// WP_NONE
 		"No Weapon",			//	char	classname[32];		// Spawning name
@@ -355,46 +355,46 @@ weaponData_t weaponData[WP_NUM_WEAPONS] =
 	}
 };
 
-ammoData_t ammoData[AMMO_MAX] = 
+ammoData_t ammoData[AMMO_MAX] =
 {
 	{	// AMMO_NONE
-//		"",				//	char	icon[32];	// Name of ammo icon file
+		//		"",				//	char	icon[32];	// Name of ammo icon file
 		0				//	int		max;		// Max amount player can hold of ammo
 	},
 	{	// AMMO_FORCE
-//		"",				//	char	icon[32];	// Name of ammo icon file
+		//		"",				//	char	icon[32];	// Name of ammo icon file
 		100				//	int		max;		// Max amount player can hold of ammo
 	},
 	{	// AMMO_BLASTER
-//		"",				//	char	icon[32];	// Name of ammo icon file
+		//		"",				//	char	icon[32];	// Name of ammo icon file
 		300				//	int		max;		// Max amount player can hold of ammo
 	},
 	{	// AMMO_POWERCELL
-//		"",				//	char	icon[32];	// Name of ammo icon file
+		//		"",				//	char	icon[32];	// Name of ammo icon file
 		300				//	int		max;		// Max amount player can hold of ammo
 	},
 	{	// AMMO_METAL_BOLTS
-//		"",				//	char	icon[32];	// Name of ammo icon file
+		//		"",				//	char	icon[32];	// Name of ammo icon file
 		300				//	int		max;		// Max amount player can hold of ammo
 	},
 	{	// AMMO_ROCKETS
-//		"",				//	char	icon[32];	// Name of ammo icon file
+		//		"",				//	char	icon[32];	// Name of ammo icon file
 		25				//	int		max;		// Max amount player can hold of ammo
 	},
 	{	// AMMO_EMPLACED
-//		"",				//	char	icon[32];	// Name of ammo icon file
+		//		"",				//	char	icon[32];	// Name of ammo icon file
 		800				//	int		max;		// Max amount player can hold of ammo
 	},
 	{	// AMMO_THERMAL
-//		"",				//	char	icon[32];	// Name of ammo icon file
+		//		"",				//	char	icon[32];	// Name of ammo icon file
 		10				//	int		max;		// Max amount player can hold of ammo
 	},
 	{	// AMMO_TRIPMINE
-//		"",				//	char	icon[32];	// Name of ammo icon file
+		//		"",				//	char	icon[32];	// Name of ammo icon file
 		10				//	int		max;		// Max amount player can hold of ammo
 	},
 	{	// AMMO_DETPACK
-//		"",				//	char	icon[32];	// Name of ammo icon file
+		//		"",				//	char	icon[32];	// Name of ammo icon file
 		10				//	int		max;		// Max amount player can hold of ammo
 	}
 };

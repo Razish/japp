@@ -38,7 +38,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)</OutDir>
+    <OutDir>../../japlus/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>jamp$(ProjectName)x86</TargetName>
@@ -46,7 +46,7 @@
     <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)</OutDir>
+    <OutDir>../../japlus/</OutDir>
     <TargetName>jamp$(ProjectName)x86</TargetName>
     <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -54,8 +54,10 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>../;../game/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDLL;_GAME;JK2AWARDS;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;_GAME;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link />
     <Link>
@@ -68,7 +70,8 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>../;../game/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDLL;_GAME;JK2AWARDS;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;_GAME;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -81,6 +84,7 @@
     <ClCompile Include="..\qcommon\q_shared.c" />
     <ClCompile Include="..\JAPP\jp_crash.c" />
     <ClCompile Include="..\JAPP\jp_promode.c" />
+    <ClCompile Include="..\JAPP\jp_stack.c" />
     <ClCompile Include="..\JAPP\jp_tokenparser.c" />
     <ClCompile Include="..\json\cJSON.c" />
     <ClCompile Include="..\libudis86\decode.c" />
@@ -95,6 +99,12 @@
     <ClCompile Include="..\game\ai_wpnav.c" />
     <ClCompile Include="..\game\AnimalNPC.c" />
     <ClCompile Include="..\game\bg_g2_utils.c" />
+    <ClCompile Include="..\game\bg_lua.c" />
+    <ClCompile Include="..\game\bg_luacvar.c" />
+    <ClCompile Include="..\game\bg_luaevent.c" />
+    <ClCompile Include="..\game\bg_luaplayer.c" />
+    <ClCompile Include="..\game\bg_luaserialiser.c" />
+    <ClCompile Include="..\game\bg_luavector.c" />
     <ClCompile Include="..\game\bg_misc.c" />
     <ClCompile Include="..\game\bg_panimate.c" />
     <ClCompile Include="..\game\bg_pmove.c" />
@@ -117,10 +127,6 @@
     <ClCompile Include="..\game\g_ICARUScb.c" />
     <ClCompile Include="..\game\g_items.c" />
     <ClCompile Include="..\game\g_log.c" />
-    <ClCompile Include="..\game\g_lua.c" />
-    <ClCompile Include="..\game\g_luacvar.c" />
-    <ClCompile Include="..\game\g_luaevent.c" />
-    <ClCompile Include="..\game\g_luaplayer.c" />
     <ClCompile Include="..\game\g_main.c" />
     <ClCompile Include="..\game\g_mem.c" />
     <ClCompile Include="..\game\g_misc.c" />
@@ -184,6 +190,70 @@
     <ClCompile Include="..\game\w_force.c" />
     <ClCompile Include="..\game\w_saber.c" />
     <ClCompile Include="..\game\WalkerNPC.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\cgame\animtable.h" />
+    <ClInclude Include="..\cgame\tr_types.h" />
+    <ClInclude Include="..\game\ai.h" />
+    <ClInclude Include="..\game\ai_main.h" />
+    <ClInclude Include="..\game\anims.h" />
+    <ClInclude Include="..\game\be_aas.h" />
+    <ClInclude Include="..\game\be_ai_char.h" />
+    <ClInclude Include="..\game\be_ai_chat.h" />
+    <ClInclude Include="..\game\be_ai_gen.h" />
+    <ClInclude Include="..\game\be_ai_goal.h" />
+    <ClInclude Include="..\game\be_ai_move.h" />
+    <ClInclude Include="..\game\be_ai_weap.h" />
+    <ClInclude Include="..\game\be_ea.h" />
+    <ClInclude Include="..\game\bg_local.h" />
+    <ClInclude Include="..\game\bg_lua.h" />
+    <ClInclude Include="..\game\bg_luacvar.h" />
+    <ClInclude Include="..\game\bg_luaevent.h" />
+    <ClInclude Include="..\game\bg_luaplayer.h" />
+    <ClInclude Include="..\game\bg_luaserialiser.h" />
+    <ClInclude Include="..\game\bg_luavector.h" />
+    <ClInclude Include="..\game\bg_public.h" />
+    <ClInclude Include="..\game\bg_saga.h" />
+    <ClInclude Include="..\game\bg_vehicles.h" />
+    <ClInclude Include="..\game\bg_weapons.h" />
+    <ClInclude Include="..\game\botlib.h" />
+    <ClInclude Include="..\game\b_local.h" />
+    <ClInclude Include="..\game\b_public.h" />
+    <ClInclude Include="..\game\chars.h" />
+    <ClInclude Include="..\game\g_admin.h" />
+    <ClInclude Include="..\game\g_headers.h" />
+    <ClInclude Include="..\game\g_ICARUScb.h" />
+    <ClInclude Include="..\game\g_local.h" />
+    <ClInclude Include="..\game\g_nav.h" />
+    <ClInclude Include="..\game\g_public.h" />
+    <ClInclude Include="..\game\g_team.h" />
+    <ClInclude Include="..\game\g_unlagged.h" />
+    <ClInclude Include="..\game\g_xcvar.h" />
+    <ClInclude Include="..\game\say.h" />
+    <ClInclude Include="..\game\teams.h" />
+    <ClInclude Include="..\game\w_saber.h" />
+    <ClInclude Include="..\Ghoul2\G2.h" />
+    <ClInclude Include="..\ICARUS\interpreter.h" />
+    <ClInclude Include="..\ICARUS\Q3_Interface.h" />
+    <ClInclude Include="..\ICARUS\Q3_Registers.h" />
+    <ClInclude Include="..\JAPP\jp_cinfo.h" />
+    <ClInclude Include="..\JAPP\jp_crash.h" />
+    <ClInclude Include="..\JAPP\jp_csflags.h" />
+    <ClInclude Include="..\JAPP\jp_promode.h" />
+    <ClInclude Include="..\JAPP\jp_ssflags.h" />
+    <ClInclude Include="..\JAPP\jp_stack.h" />
+    <ClInclude Include="..\json\cJSON.h" />
+    <ClInclude Include="..\qcommon\disablewarnings.h" />
+    <ClInclude Include="..\qcommon\game_version.h" />
+    <ClInclude Include="..\qcommon\q_asm.h" />
+    <ClInclude Include="..\qcommon\q_shared.h" />
+    <ClInclude Include="..\qcommon\tags.h" />
+    <ClInclude Include="..\ui\keycodes.h" />
+    <ClInclude Include="..\ui\ui_local.h" />
+    <ClInclude Include="..\ui\ui_public.h" />
+    <ClInclude Include="..\ui\ui_shared.h" />
+    <ClInclude Include="..\ui\ui_xcvar.h" />
+    <ClInclude Include="..\win32\AutoVersion.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

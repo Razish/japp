@@ -17,24 +17,20 @@ static char tp_token[MAX_TOKEN_LENGTH] = { 0 };
 static int tp_lines = 0;
 static const char *tp_data = NULL;
 
-void TP_NewParseSession( const char *data )
-{
-	tp_lines	= 1;
-	tp_data		= data;
-	tp_token[0]	= 0;
+void TP_NewParseSession( const char *data ) {
+	tp_lines = 1;
+	tp_data = data;
+	tp_token[0] = 0;
 }
 
-static const char *TP_SkipWhitespace( const char *data, qboolean *hasNewLines )
-{
+static const char *TP_SkipWhitespace( const char *data, qboolean *hasNewLines ) {
 	int c;
 
-	while ( (c = *data) <= ' ')
-	{
+	while ( (c = *data) <= ' ' ) {
 		if ( !c )
 			return NULL;
 
-		if ( c == '\n' )
-		{
+		if ( c == '\n' ) {
 			tp_lines++;
 			*hasNewLines = qtrue;
 		}
@@ -44,75 +40,64 @@ static const char *TP_SkipWhitespace( const char *data, qboolean *hasNewLines )
 	return data;
 }
 
-static const char *TP_ParseExt( qboolean allowLineBreaks )
-{
-	int			len			= 0;
+static const char *TP_ParseExt( qboolean allowLineBreaks ) {
+	int			len = 0;
 	qboolean	hasNewLines = qfalse;
-	const char	*data		= tp_data;
+	const char	*data = tp_data;
 	char		quotechar;
-	char		c			= 0;
+	char		c = 0;
 
 	tp_token[0] = 0;
 
-	if ( !data )
-	{// make sure incoming data is valid
+	if ( !data ) {// make sure incoming data is valid
 		tp_data = NULL;
 		return tp_token;
 	}
 
-	while ( 1 )
-	{
+	while ( 1 ) {
 		//skip whitespace
 		data = TP_SkipWhitespace( data, &hasNewLines );
 
-		if ( !data )
-		{
+		if ( !data ) {
 			tp_data = NULL;
 			return tp_token;
 		}
-		if ( hasNewLines && !allowLineBreaks )
-		{
+		if ( hasNewLines && !allowLineBreaks ) {
 			tp_data = data;
 			return tp_token;
 		}
 
 		c = *data;
 
-		if ( c == '/' && data[1] == '/' )
-		{//skip double slash comments
+		if ( c == '/' && data[1] == '/' ) {//skip double slash comments
 			data += 2;
 			while ( *data && *data != '\n' )
 				data++;
 		}
 
-		else if ( c == '/' && data[1] == '*' ) 
-		{//skip block comments
+		else if ( c == '/' && data[1] == '*' ) {//skip block comments
 			data += 2;
-			while ( *data && (*data != '*' || data[1] != '/') ) 
+			while ( *data && (*data != '*' || data[1] != '/') )
 				data++;
-			if ( *data ) 
+			if ( *data )
 				data += 2;
 		}
 		else
 			break;
 	}
 
-	if (c == '\"' || c == '\'')
-	{// handle quoted strings (both " and ')
+	if ( c == '\"' || c == '\'' ) {// handle quoted strings (both " and ')
 		quotechar = c;
 		data++;
-		while ( 1 )
-		{
+		while ( 1 ) {
 			c = *data++;
-			if ( c == quotechar || !c || ( (c == '\r' || c == '\n') && !allowLineBreaks ) )
-			{
-				tp_token[len]	= 0;
-				tp_data			= (char *)data;
+			if ( c == quotechar || !c || ((c == '\r' || c == '\n') && !allowLineBreaks) ) {
+				tp_token[len] = 0;
+				tp_data = (char *)data;
 				return tp_token;
 			}
 
-			if ( len < MAX_TOKEN_LENGTH )
-			{
+			if ( len < MAX_TOKEN_LENGTH ) {
 				tp_token[len] = c;
 				len++;
 			}
@@ -120,10 +105,8 @@ static const char *TP_ParseExt( qboolean allowLineBreaks )
 	}
 
 	// parse a token
-	while ( c > 32 )
-	{
-		if ( len < MAX_TOKEN_LENGTH )
-		{
+	while ( c > 32 ) {
+		if ( len < MAX_TOKEN_LENGTH ) {
 			tp_token[len] = c;
 			len++;
 		}
@@ -141,13 +124,11 @@ static const char *TP_ParseExt( qboolean allowLineBreaks )
 }
 
 
-const char *TP_ParseToken( void )
-{
+const char *TP_ParseToken( void ) {
 	return TP_ParseExt( qtrue );
 }
 
-int TP_CurrentLine( void )
-{
+int TP_CurrentLine( void ) {
 	return tp_lines;
 }
 
@@ -170,14 +151,12 @@ void TP_SkipLine( void )
 }
 #endif
 
-qboolean TP_ParseString( const char **s )
-{
+qboolean TP_ParseString( const char **s ) {
 	*s = TP_ParseExt( qfalse );
-	return ( !s[0] );
+	return (!s[0]);
 }
 
-qboolean TP_ParseUInt( unsigned int *i )
-{
+qboolean TP_ParseUInt( unsigned int *i ) {
 	const char	*token;
 
 	token = TP_ParseExt( qfalse );
@@ -186,8 +165,7 @@ qboolean TP_ParseUInt( unsigned int *i )
 	return qfalse;
 }
 
-qboolean TP_ParseInt( int *i )
-{
+qboolean TP_ParseInt( int *i ) {
 	const char	*token = TP_ParseExt( qfalse );
 
 	if ( !token[0] )
@@ -197,8 +175,7 @@ qboolean TP_ParseInt( int *i )
 	return qfalse;
 }
 
-qboolean TP_ParseShort( short *i )
-{
+qboolean TP_ParseShort( short *i ) {
 	const char	*token = TP_ParseExt( qfalse );
 
 	if ( !token[0] )
@@ -209,58 +186,52 @@ qboolean TP_ParseShort( short *i )
 }
 
 
-qboolean TP_ParseFloat( float *f )
-{
+qboolean TP_ParseFloat( float *f ) {
 	const char	*token = TP_ParseExt( qfalse );
 
-	if ( !token[0] ) 
+	if ( !token[0] )
 		return qtrue;
 
 	*f = atoff( token );
 	return qfalse;
 }
 
-qboolean TP_ParseVec3( vector3 *vec )
-{
+qboolean TP_ParseVec3( vector3 *vec ) {
 	const char	*token;
 	int i;
 
-	for ( i=0; i<3; i++ )
-	{
+	for ( i = 0; i < 3; i++ ) {
 		token = TP_ParseExt( qfalse );
 
-		if ( !token[0] ) 
+		if ( !token[0] )
 			return qtrue;
-		
+
 		vec->data[i] = atoff( token );
 	}
 
 	return qfalse;
 }
 
-qboolean TP_ParseVec4( vector4 *vec )
-{
+qboolean TP_ParseVec4( vector4 *vec ) {
 	const char	*token;
 	int i;
 
-	for ( i=0; i<4; i++ )
-	{
+	for ( i = 0; i < 4; i++ ) {
 		token = TP_ParseExt( qfalse );
-		if ( !token[0] ) 
+		if ( !token[0] )
 			return qtrue;
-		
+
 		vec->data[i] = atoff( token );
 	}
 
 	return qfalse;
 }
 
-qboolean TP_ParseByte( byte *i ) 
-{
+qboolean TP_ParseByte( byte *i ) {
 	const char	*token;
 
 	token = TP_ParseExt( qfalse );
-	if ( !token[0] ) 
+	if ( !token[0] )
 		return qtrue;
 
 	*i = (byte)atoi( token );

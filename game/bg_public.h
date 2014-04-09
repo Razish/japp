@@ -35,8 +35,8 @@
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-40
-#define ARMOR_PROTECTION		0.50 // Shields only stop 50% of armor-piercing dmg
-#define ARMOR_REDUCTION_FACTOR	0.50 // Certain damage doesn't take off armor as efficiently
+#define ARMOR_PROTECTION		0.50f // Shields only stop 50% of armor-piercing dmg
+#define ARMOR_REDUCTION_FACTOR	0.50f // Certain damage doesn't take off armor as efficiently
 
 #define	JUMP_VELOCITY		225//270
 
@@ -124,7 +124,7 @@ Ghoul2 Insert Start
 Ghoul2 Insert End
 */
 #define CS_LOCATIONS			(CS_G2BONES+MAX_G2BONES)
-#define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS) 
+#define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS)
 #define CS_EFFECTS				(CS_PARTICLES+MAX_LOCATIONS)
 #define	CS_LIGHT_STYLES			(CS_EFFECTS + MAX_FX)
 
@@ -182,8 +182,7 @@ typedef enum {
 	HANDEXTEND_JEDITAUNT,
 } forceHandAnims_t;
 
-typedef enum
-{
+typedef enum {
 	BROKENLIMB_NONE = 0,
 	BROKENLIMB_LARM,
 	BROKENLIMB_RARM,
@@ -194,7 +193,7 @@ typedef enum
 #define TOSS_DEBOUNCE_TIME				5000
 
 typedef enum gametype_e {
-	GT_FFA=0,			// free for all
+	GT_FFA = 0,			// free for all
 	GT_HOLOCRON,		// holocron ffa
 	GT_JEDIMASTER,		// jedi master
 	GT_DUEL,			// one on one tournament
@@ -219,6 +218,7 @@ typedef enum gametype_e {
 #define GTB_NOTTEAM			(0x003Fu) // **SPECIAL: All of the above gametypes, i.e. not team-based
 #define GTB_TEAM			(0x0040u) // team deathmatch
 #define GTB_SIEGE			(0x0080u) // siege
+#define GTB_NOTFLAG			(0x00FFu) // **SPECIAL: All of the above gametypes, i.e. not flag-related
 #define GTB_CTF				(0x0100u) // capture the flag
 #define GTB_CTY				(0x0200u) // capture the ysalimiri
 #define GTB_ALL				(0x01FFu) // all
@@ -227,10 +227,9 @@ typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
 extern vector3 WP_MuzzlePoint[WP_NUM_WEAPONS];
 
-extern int forcePowerSorted[NUM_FORCE_POWERS];
+extern const int forcePowerSorted[NUM_FORCE_POWERS];
 
-typedef enum saberLock_e
-{
+typedef enum saberLock_e {
 	SABERLOCK_TOP,
 	SABERLOCK_SIDE,
 	SABERLOCK_LOCK,
@@ -240,8 +239,7 @@ typedef enum saberLock_e
 	SABERLOCK_LOSE
 } saberLock_t;
 
-typedef enum directions_e
-{
+typedef enum directions_e {
 	DIR_RIGHT,
 	DIR_LEFT,
 	DIR_FRONT,
@@ -276,8 +274,7 @@ extern animation_t		bgHumanoidAnimations[MAX_TOTALANIMATIONS];
 #define MAX_ANIM_FILES	16
 #define MAX_ANIM_EVENTS 300
 
-typedef enum
-{
+typedef enum {
 	FOOTSTEP_R,
 	FOOTSTEP_L,
 	FOOTSTEP_HEAVY_R,
@@ -285,8 +282,8 @@ typedef enum
 	NUM_FOOTSTEP_TYPES
 } footstepType_t;
 
-extern stringID_table_t animEventTypeTable[MAX_ANIM_EVENTS+1];
-extern stringID_table_t footstepTypeTable[NUM_FOOTSTEP_TYPES+1];
+extern stringID_table_t animEventTypeTable[MAX_ANIM_EVENTS + 1];
+extern stringID_table_t footstepTypeTable[NUM_FOOTSTEP_TYPES + 1];
 
 //size of Anim eventData array...
 #define MAX_RANDOM_ANIM_SOUNDS		4
@@ -320,41 +317,37 @@ extern stringID_table_t footstepTypeTable[NUM_FOOTSTEP_TYPES+1];
 //indices for AEV_SABER_SPIN data
 #define	AED_SABER_SPIN_SABERNUM		0
 #define	AED_SABER_SPIN_TYPE			1	//0 = saberspinoff, 1 = saberspin, 2-4 = saberspin1-saberspin3
-#define	AED_SABER_SPIN_PROBABILITY	2	
+#define	AED_SABER_SPIN_PROBABILITY	2
 
-typedef enum
-{//NOTENOTE:  Be sure to update animEventTypeTable and ParseAnimationEvtBlock(...) if you change this enum list!
+typedef enum {//NOTENOTE:  Be sure to update animEventTypeTable and ParseAnimationEvtBlock(...) if you change this enum list!
 	AEV_NONE,
 	AEV_SOUND,		//# animID AEV_SOUND framenum soundpath randomlow randomhi chancetoplay
 	AEV_FOOTSTEP,	//# animID AEV_FOOTSTEP framenum footstepType chancetoplay
 	AEV_EFFECT,		//# animID AEV_EFFECT framenum effectpath boltName chancetoplay
 	AEV_FIRE,		//# animID AEV_FIRE framenum altfire chancetofire
 	AEV_MOVE,		//# animID AEV_MOVE framenum forwardpush rightpush uppush
-	AEV_SOUNDCHAN,  //# animID AEV_SOUNDCHAN framenum CHANNEL soundpath randomlow randomhi chancetoplay 
-	AEV_SABER_SWING,  //# animID AEV_SABER_SWING framenum CHANNEL randomlow randomhi chancetoplay 
-	AEV_SABER_SPIN,  //# animID AEV_SABER_SPIN framenum CHANNEL chancetoplay 
+	AEV_SOUNDCHAN,  //# animID AEV_SOUNDCHAN framenum CHANNEL soundpath randomlow randomhi chancetoplay
+	AEV_SABER_SWING,  //# animID AEV_SABER_SWING framenum CHANNEL randomlow randomhi chancetoplay
+	AEV_SABER_SPIN,  //# animID AEV_SABER_SPIN framenum CHANNEL chancetoplay
 	AEV_NUM_AEV
 } animEventType_t;
 
-typedef struct animevent_s 
-{
+typedef struct animevent_s {
 	animEventType_t	eventType;
 	unsigned short	keyFrame;			//Frame to play event on
 	signed short	eventData[AED_ARRAY_SIZE];	//Unique IDs, can be soundIndex of sound file to play OR effect index or footstep type, etc.
 	char			*stringData;		//we allow storage of one string, temporarily (in case we have to look up an index later, then make sure to set stringData to NULL so we only do the look-up once)
 } animevent_t;
 
-typedef struct
-{
+typedef struct {
 	char			filename[MAX_QPATH];
 	animation_t		*anims;
-//	animsounds_t	torsoAnimSnds[MAX_ANIM_SOUNDS];
-//	animsounds_t	legsAnimSnds[MAX_ANIM_SOUNDS];
-//	qboolean		soundsCached;
+	//	animsounds_t	torsoAnimSnds[MAX_ANIM_SOUNDS];
+	//	animsounds_t	legsAnimSnds[MAX_ANIM_SOUNDS];
+	//	qboolean		soundsCached;
 } bgLoadedAnim_t;
 
-typedef struct
-{
+typedef struct {
 	char			filename[MAX_QPATH];
 	animevent_t		torsoAnimEvents[MAX_ANIM_EVENTS];
 	animevent_t		legsAnimEvents[MAX_ANIM_EVENTS];
@@ -389,7 +382,7 @@ typedef enum {
 } pmtype_t;
 
 typedef enum {
-	WEAPON_READY, 
+	WEAPON_READY,
 	WEAPON_RAISING,
 	WEAPON_DROPPING,
 	WEAPON_FIRING,
@@ -411,8 +404,8 @@ typedef enum forceMasteries_e {
 	NUM_FORCE_MASTERY_LEVELS
 } forceMasteries_t;
 
-extern char *forceMasteryLevels[NUM_FORCE_MASTERY_LEVELS];
-extern int forceMasteryPoints[NUM_FORCE_MASTERY_LEVELS];
+extern const char *forceMasteryLevels[NUM_FORCE_MASTERY_LEVELS];
+extern const int forceMasteryPoints[NUM_FORCE_MASTERY_LEVELS];
 
 extern int bgForcePowerCost[NUM_FORCE_POWERS][NUM_FORCE_POWER_LEVELS];
 
@@ -438,8 +431,7 @@ extern int bgForcePowerCost[NUM_FORCE_POWERS][NUM_FORCE_POWER_LEVELS];
 
 #define	MAXTOUCH	32
 
-typedef struct bgEntity_s
-{
+typedef struct bgEntity_s {
 	entityState_t	s;
 	playerState_t	*playerState;
 	Vehicle_t		*m_pVehicle; //vehicle data
@@ -449,9 +441,9 @@ typedef struct bgEntity_s
 
 	//Data type(s) must directly correspond to the head of the gentity and centity structures
 #if defined(__GCC__) || defined(MINGW32) || defined(MACOS_X)
-	} _bgEntity_t;
+} _bgEntity_t;
 #else
-	} bgEntity_t;
+} bgEntity_t;
 #endif
 
 typedef struct pmove_s {
@@ -504,8 +496,8 @@ typedef struct pmove_s {
 
 	// callbacks to test the world
 	// these will be different functions during game and cgame
-	void		(*trace)( trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentMask );
-	int			(*pointcontents)( const vector3 *point, int passEntityNum );
+	void( *trace )(trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentMask);
+	uint32_t( *pointcontents )(const vector3 *point, int passEntityNum);
 
 	int			checkDuelLoss;
 
@@ -536,7 +528,7 @@ extern	pmove_t		*pm;
 
 // if a full pmove isn't done on the client, you can just update the angles
 void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd );
-void Pmove (pmove_t *pmove);
+void Pmove( pmove_t *pmove );
 
 
 //===================================================================================
@@ -552,7 +544,7 @@ typedef enum {
 	//MAKE SURE STAT_WEAPONS REMAINS 4!!!!
 	//There is a hardcoded reference in msg.cpp to send it in 32 bits -rww
 	STAT_WEAPONS = 4,					// 16 bit fields
-	STAT_ARMOR,				
+	STAT_ARMOR,
 	STAT_DEAD_YAW,					// look this direction when dead (FIXME: get rid of?)
 	STAT_CLIENTS_READY,				// bit mask of clients wishing to exit the intermission (FIXME: configstring?)
 	STAT_MAX_HEALTH,				// health / armor limit, changable by handicap
@@ -590,20 +582,20 @@ typedef enum {
 #define EF_RADAROBJECT		(0x00000004u) // display on team radar
 #define EF_TELEPORT_BIT		(0x00000008u) // toggled every time the origin abruptly changes
 #define EF_SHADER_ANIM		(0x00000010u) // Animating shader (by s.frame)
-#define EF_PLAYER_EVENT		(0x00000020u) // 
+#define EF_PLAYER_EVENT		(0x00000020u) //
 #define EF_RAG				(0x00000040u) // ragdoll him even if he's alive
 #define EF_PERMANENT		(0x00000080u) // rww - I am claiming this. (for permanent entities)
 #define EF_NODRAW			(0x00000100u) // may have an event, but no model (unspawned items)
 #define EF_FIRING			(0x00000200u) // for lightning gun
 #define EF_ALT_FIRING		(0x00000400u) // for alt-fires, mostly for lightning guns though
 #define EF_JETPACK_ACTIVE	(0x00000800u) // jetpack is activated
-#define EF_NOT_USED_1		(0x00001000u) // 
+#define EF_NOT_USED_1		(0x00001000u) //
 #define EF_TALK				(0x00002000u) // draw a talk balloon
 #define EF_CONNECTION		(0x00004000u) // draw a connection trouble sprite
 #define EF_ALT_DIM			(0x00008000u) // Player is in the alternate dimension
 #define EF_GRAPPLE_SWING	(0x00010000u) // swinging on grapple hook
-#define EF_NOT_USED_2		(0x00020000u) // 
-#define EF_NOT_USED_3		(0x00040000u) // 
+#define EF_NOT_USED_2		(0x00020000u) //
+#define EF_NOT_USED_3		(0x00040000u) //
 #define EF_BODYPUSH			(0x00080000u) // rww - claiming this for fullbody push effect
 #define EF_DOUBLE_AMMO		(0x00100000u) // Hacky way to get around ammo max
 #define EF_SEEKERDRONE		(0x00200000u) // show seeker drone floating around head
@@ -616,7 +608,7 @@ typedef enum {
 #define EF_CLIENTSMOOTH		(0x10000000u) // standard lerporigin smooth override on client
 #define EF_JETPACK			(0x20000000u) // rww - wearing a jetpack
 #define EF_JETPACK_FLAMING	(0x40000000u) // rww - jetpack fire effect
-#define EF_NOT_USED_4		(0x80000000u) // 
+#define EF_NOT_USED_4		(0x80000000u) //
 
 //These new EF2_??? flags were added for NPCs, they really should not be used often.
 //NOTE: we only allow 10 of these!
@@ -690,8 +682,7 @@ typedef enum powerup_e {
 } powerup_t;
 
 typedef enum holdable_e {
-	HI_NONE,
-
+	HI_NONE = 0,
 	HI_SEEKER,
 	HI_SHIELD,
 	HI_MEDPAC,
@@ -699,12 +690,10 @@ typedef enum holdable_e {
 	HI_BINOCULARS,
 	HI_SENTRY_GUN,
 	HI_JETPACK,
-
 	HI_HEALTHDISP,
 	HI_AMMODISP,
 	HI_EWEB,
 	HI_CLOAK,
-
 	HI_NUM_HOLDABLE
 } holdable_t;
 
@@ -737,8 +726,7 @@ typedef enum ctfMsg_e {
 
 #define	EVENT_VALID_MSEC	300
 
-typedef enum
-{
+typedef enum {
 	PDSOUND_NONE,
 	PDSOUND_PROTECTHIT,
 	PDSOUND_PROTECT,
@@ -992,7 +980,7 @@ typedef enum {
 	EV_PUSHFAIL,
 
 	EV_SIEGESPEC,
-	
+
 } entity_event_t;			// There is a maximum of 256 events (8 bits transmission, 2 high bits for uniqueness)
 
 
@@ -1038,7 +1026,7 @@ typedef enum {
 //team task
 typedef enum {
 	TEAMTASK_NONE,
-	TEAMTASK_OFFENSE, 
+	TEAMTASK_OFFENSE,
 	TEAMTASK_DEFENSE,
 	TEAMTASK_PATROL,
 	TEAMTASK_FOLLOW,
@@ -1112,9 +1100,9 @@ typedef enum itemType_e {
 	IT_ARMOR,				// EFX: rotate + minlight
 	IT_HEALTH,				// EFX: static external sphere + rotating internal
 	IT_POWERUP,				// instant on, timer based
-							// EFX: rotate + external ring that rotates
+	// EFX: rotate + external ring that rotates
 	IT_HOLDABLE,			// single use, holdable item
-							// EFX: rotate + bob
+	// EFX: rotate + bob
 	IT_PERSISTANT_POWERUP,
 	IT_TEAM
 } itemType_t;
@@ -1141,6 +1129,7 @@ extern const size_t bg_numItems;
 float vectoyaw( const vector3 *vec );
 
 const gitem_t *BG_FindItem( const char *classname );
+const gitem_t *BG_FindItemForAmmo( ammo_t ammo );
 const gitem_t *BG_FindItemForWeapon( weapon_t wp );
 const gitem_t *BG_FindItemForPowerup( powerup_t pw );
 const gitem_t *BG_FindItemForHoldable( holdable_t hi );
@@ -1161,14 +1150,14 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #define	DF_NO_FALLING			(0x0008u)
 #define DF_FIXED_FOV			(0x0010u)
 #define	DF_NO_FOOTSTEPS			(0x0020u)
-#define DF_NO_DROWN				(0x0040u) //RAZTODO
+#define DF_NO_DROWN				(0x0040u)
 #define DF_FIXED_YAW			(0x0080u) //RAZTODO: Er, what do..
 #define DF_NO_FIXED_ANIMS		(0x0100u) //RAZTODO: Whut?
 #define DF_NO_REALISTIC_HOOK	(0x0200u) //RAZTODO: Whut?
 
 //rwwRMG - added in CONTENTS_TERRAIN
 // content masks
-#define	MASK_ALL				(-1)
+#define	MASK_ALL				(0xFFFFFFFFu)
 #define	MASK_SOLID				(CONTENTS_SOLID|CONTENTS_TERRAIN)
 #define	MASK_PLAYERSOLID		(CONTENTS_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_BODY|CONTENTS_TERRAIN)
 #define	MASK_NPCSOLID			(CONTENTS_SOLID|CONTENTS_MONSTERCLIP|CONTENTS_BODY|CONTENTS_TERRAIN)
@@ -1209,11 +1198,11 @@ typedef enum entityType_s {
 	ET_FX,
 
 	ET_EVENTS,				// any of the EV_* events can be added freestanding
-							// by setting eType to ET_EVENTS + eventNum
-							// this avoids having to set eFlags and eventNum
+	// by setting eType to ET_EVENTS + eventNum
+	// this avoids having to set eFlags and eventNum
 	ET_MAX
 } entityType_t;
-stringID_table_t eTypes[ET_MAX];
+extern const stringID_table_t eTypes[ET_MAX];
 
 
 
@@ -1225,7 +1214,7 @@ stringID_table_t eTypes[ET_MAX];
 #if defined(_GAME) || defined(_CGAME)
 
 typedef enum {
-	F_INT, 
+	F_INT,
 	F_FLOAT,
 	F_LSTRING,			// string on disk, pointer in memory, TAG_LEVEL
 	F_VECTOR,
@@ -1255,11 +1244,10 @@ typedef enum {
 
 
 
-typedef struct BG_field_s
-{
-	char	*name;
-	int		ofs;
-	fieldtype_t	type;
+typedef struct BG_field_s {
+	const char *name;
+	int ofs;
+	fieldtype_t type;
 } BG_field_t;
 
 
@@ -1282,9 +1270,9 @@ typedef struct BG_field_s
 
 typedef enum saberMoveName_e {
 	//totally invalid
-	LS_INVALID	= -1,
+	LS_INVALID = -1,
 	// Invalid, or saber not armed
-	LS_NONE		= 0,
+	LS_NONE = 0,
 
 	// General movements with saber
 	LS_READY,
@@ -1527,9 +1515,9 @@ typedef struct saberTrail_s {
 
 	// Marks stuff
 	qboolean	haveOldPos[2];
-	vector3		oldPos[2];		
+	vector3		oldPos[2];
 	vector3		oldNormal[2];	// store this in case we don't have a connect-the-dots situation
-								//	..then we'll need the normal to project a mark blob onto the impact point
+	//	..then we'll need the normal to project a mark blob onto the impact point
 } saberTrail_t;
 
 typedef struct bladeInfo_s {
@@ -1548,7 +1536,7 @@ typedef struct bladeInfo_s {
 #define MAX_BLADES 8
 
 typedef enum saber_styles_e {
-	SS_NONE=0,
+	SS_NONE = 0,
 	SS_FAST,
 	SS_MEDIUM,
 	SS_STRONG,
@@ -1632,14 +1620,14 @@ typedef struct saberInfo_s {
 	qhandle_t		swingSound[3];							// none - if set, plays one of these 3 sounds when swung during an attack - NOTE: must provide all 3!!!
 
 	//done in game (server-side code)
-	float			moveSpeedScale;							// 1.0 - you move faster/slower when using this saber
-	float			animSpeedScale;							// 1.0 - plays normal attack animations faster/slower
+	float			moveSpeedScale;							// 1.0f - you move faster/slower when using this saber
+	float			animSpeedScale;							// 1.0f - plays normal attack animations faster/slower
 
 	//done in both cgame and game (BG code)
-	int				kataMove;								// LS_INVALID - if set, player will execute this move when they press both attack buttons at the same time 
-	int				lungeAtkMove;							// LS_INVALID - if set, player will execute this move when they crouch+fwd+attack 
-	int				jumpAtkUpMove;							// LS_INVALID - if set, player will execute this move when they jump+attack 
-	int				jumpAtkFwdMove;							// LS_INVALID - if set, player will execute this move when they jump+fwd+attack 
+	int				kataMove;								// LS_INVALID - if set, player will execute this move when they press both attack buttons at the same time
+	int				lungeAtkMove;							// LS_INVALID - if set, player will execute this move when they crouch+fwd+attack
+	int				jumpAtkUpMove;							// LS_INVALID - if set, player will execute this move when they jump+attack
+	int				jumpAtkFwdMove;							// LS_INVALID - if set, player will execute this move when they jump+fwd+attack
 	int				jumpAtkBackMove;						// LS_INVALID - if set, player will execute this move when they jump+back+attack
 	int				jumpAtkRightMove;						// LS_INVALID - if set, player will execute this move when they jump+rightattack
 	int				jumpAtkLeftMove;						// LS_INVALID - if set, player will execute this move when they jump+left+attack
@@ -1656,7 +1644,7 @@ typedef struct saberInfo_s {
 	int				bladeStyle2Start;						// 0 - if set, blades from this number and higher use the following values (otherwise, they use the normal values already set)
 
 	//***The following can be different for the extra blades - not setting them individually defaults them to the value for the whole saber (and first blade)***
-	
+
 	//done in cgame (client-side code)
 	int				trailStyle, trailStyle2;				// 0 - default (0) is normal, 1 is a motion blur and 2 is no trail at all (good for real-sword type mods)
 	int				g2MarksShader, g2MarksShader2;			// none - if set, the game will use this shader for marks on enemies instead of the default "gfx/damage/saberglowmark"
@@ -1679,22 +1667,22 @@ typedef struct saberInfo_s {
 #define MAX_SABERS 2
 
 bgEntity_t *PM_BGEntForNum( int num );
-qboolean BG_KnockDownable(playerState_t *ps);
-qboolean BG_LegalizedForcePowers(char *powerOut, size_t powerOutSize, int maxRank, qboolean freeSaber, int teamForce, int gametype, int fpDisabled);
+qboolean BG_KnockDownable( playerState_t *ps );
+qboolean BG_LegalizedForcePowers( char *powerOut, size_t powerOutSize, int maxRank, qboolean freeSaber, int teamForce, int gametype, int fpDisabled );
 
 
 void BG_GiveMeVectorFromMatrix( mdxaBone_t *boltMatrix, uint32_t flags, vector3 *vec );
 
-void BG_IK_MoveArm(void *ghoul2, int lHandBolt, int time, entityState_t *ent, int basePose, vector3 *desiredPos, qboolean *ikInProgress,
-					 vector3 *origin, vector3 *angles, vector3 *scale, int blendTime, qboolean forceHalt);
+void BG_IK_MoveArm( void *ghoul2, int lHandBolt, int time, entityState_t *ent, int basePose, vector3 *desiredPos, qboolean *ikInProgress,
+	vector3 *origin, vector3 *angles, vector3 *scale, int blendTime, qboolean forceHalt );
 
-void BG_G2PlayerAngles(void *ghoul2, int motionBolt, entityState_t *cent, int time, vector3 *cent_lerpOrigin,
-					   vector3 *cent_lerpAngles, vector3 legs[3], vector3 *legsAngles, qboolean *tYawing,
-					   qboolean *tPitching, qboolean *lYawing, float *tYawAngle, float *tPitchAngle,
-					   float *lYawAngle, int frametime, vector3 *turAngles, vector3 *modelScale, int ciLegs,
-					   int ciTorso, int *corrTime, vector3 *lookAngles, vector3 *lastHeadAngles, int lookTime,
-					   entityState_t *emplaced, int *crazySmoothFactor);
-void BG_G2ATSTAngles(void *ghoul2, int time, vector3 *cent_lerpAngles );
+void BG_G2PlayerAngles( void *ghoul2, int motionBolt, entityState_t *cent, int time, vector3 *cent_lerpOrigin,
+	vector3 *cent_lerpAngles, vector3 legs[3], vector3 *legsAngles, qboolean *tYawing,
+	qboolean *tPitching, qboolean *lYawing, float *tYawAngle, float *tPitchAngle,
+	float *lYawAngle, int frametime, vector3 *turAngles, vector3 *modelScale, int ciLegs,
+	int ciTorso, int *corrTime, vector3 *lookAngles, vector3 *lastHeadAngles, int lookTime,
+	entityState_t *emplaced, int *crazySmoothFactor );
+void BG_G2ATSTAngles( void *ghoul2, int time, vector3 *cent_lerpAngles );
 
 //BG anim utility functions:
 
@@ -1713,14 +1701,16 @@ qboolean BG_KickMove( int move );
 qboolean BG_SaberInIdle( int move );
 qboolean BG_FlippingAnim( int anim );
 qboolean BG_SpinningSaberAnim( int anim );
+qboolean BG_SaberInTransitionAny( int move );
 qboolean BG_SaberInSpecialAttack( int anim );
 qboolean BG_SaberInKata( int saberMove );
-qboolean BG_InKataAnim(int anim);
+qboolean BG_InKataAnim( int anim );
 qboolean BG_KickingAnim( int anim );
-int BG_InGrappleMove(int anim);
+int BG_InGrappleMove( int anim );
 int BG_BrokenParryForAttack( int move );
 int BG_BrokenParryForParry( int move );
 int BG_KnockawayForParry( int move );
+qboolean BG_InKnockDown( int anim );
 qboolean BG_InRoll( playerState_t *ps, int anim );
 qboolean BG_InDeathAnim( int anim );
 qboolean BG_InSaberLockOld( int anim );
@@ -1742,50 +1732,50 @@ void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 
 qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 
-void	BG_InitAnimsets(void);
-void	BG_ClearAnimsets(void);
-int		BG_ParseAnimationFile(const char *filename, animation_t *animSet, qboolean isHumanoid);
+void	BG_InitAnimsets( void );
+void	BG_ClearAnimsets( void );
+int		BG_ParseAnimationFile( const char *filename, animation_t *animSet, qboolean isHumanoid );
 #ifndef _GAME
 int		BG_ParseAnimationEvtFile( const char *as_filename, int animFileIndex, int eventFileIndex );
 #endif
 
-qboolean BG_HasAnimation(int animIndex, int animation);
+qboolean BG_HasAnimation( int animIndex, int animation );
 int		BG_PickAnim( int animIndex, int minAnim, int maxAnim );
 
 int BG_GetItemIndexByTag( int tag, itemType_t type );
 
-qboolean BG_IsItemSelectable(playerState_t *ps, int item);
+qboolean BG_IsItemSelectable( playerState_t *ps, int item );
 
-qboolean BG_HasYsalamiri(int gametype, playerState_t *ps);
-qboolean BG_CanUseFPNow(int gametype, playerState_t *ps, int time, forcePowers_t power);
+qboolean BG_HasYsalamiri( int gametype, playerState_t *ps );
+qboolean BG_CanUseFPNow( int gametype, playerState_t *ps, int time, forcePowers_t power );
 
-void *BG_Alloc ( int size );
-void *BG_AllocUnaligned ( int size );
+void *BG_Alloc( int size );
+void *BG_AllocUnaligned( int size );
 void *BG_TempAlloc( int size );
 void BG_TempFree( int size );
-char *BG_StringAlloc ( const char *source );
-qboolean BG_OutOfMemory ( void );
+char *BG_StringAlloc( const char *source );
+qboolean BG_OutOfMemory( void );
 
-void BG_BLADE_ActivateTrail ( bladeInfo_t *blade, float duration );
-void BG_BLADE_DeactivateTrail ( bladeInfo_t *blade, float duration );
+void BG_BLADE_ActivateTrail( bladeInfo_t *blade, float duration );
+void BG_BLADE_DeactivateTrail( bladeInfo_t *blade, float duration );
 void BG_SI_Activate( saberInfo_t *saber );
 void BG_SI_Deactivate( saberInfo_t *saber );
 void BG_SI_BladeActivate( saberInfo_t *saber, int iBlade, qboolean bActive );
-qboolean BG_SI_Active(saberInfo_t *saber);
+qboolean BG_SI_Active( saberInfo_t *saber );
 void BG_SI_SetLength( saberInfo_t *saber, float length );
-void BG_SI_SetDesiredLength(saberInfo_t *saber, float len, int bladeNum);
+void BG_SI_SetDesiredLength( saberInfo_t *saber, float len, int bladeNum );
 void BG_SI_SetLengthGradual( saberInfo_t *saber, int time );
-float BG_SI_Length(saberInfo_t *saber);
-float BG_SI_LengthMax(saberInfo_t *saber);
-void BG_SI_ActivateTrail ( saberInfo_t *saber, float duration );
-void BG_SI_DeactivateTrail ( saberInfo_t *saber, float duration );
-extern void BG_AttachToRancor( void *ghoul2,float rancYaw, vector3 *rancOrigin,int time,qhandle_t *modelList, vector3 *modelScale,qboolean inMouth, vector3 *out_origin, vector3 *out_angles, vector3 out_axis[3] );
+float BG_SI_Length( saberInfo_t *saber );
+float BG_SI_LengthMax( saberInfo_t *saber );
+void BG_SI_ActivateTrail( saberInfo_t *saber, float duration );
+void BG_SI_DeactivateTrail( saberInfo_t *saber, float duration );
+void BG_AttachToRancor( void *ghoul2, float rancYaw, vector3 *rancOrigin, int time, qhandle_t *modelList, vector3 *modelScale, qboolean inMouth, vector3 *out_origin, vector3 *out_angles, vector3 out_axis[3] );
 void BG_ClearRocketLock( playerState_t *ps );
 
-extern int WeaponReadyAnim[WP_NUM_WEAPONS];
-extern int WeaponAttackAnim[WP_NUM_WEAPONS];
+extern const int WeaponReadyAnim[WP_NUM_WEAPONS];
+extern const int WeaponAttackAnim[WP_NUM_WEAPONS];
 
-extern int forcePowerDarkLight[NUM_FORCE_POWERS];
+extern const int forcePowerDarkLight[NUM_FORCE_POWERS];
 
 
 #define ARENAS_PER_TIER		4

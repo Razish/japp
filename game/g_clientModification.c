@@ -1,7 +1,7 @@
 #include "g_local.h"
 
 qboolean Client_Supports( const gentity_t *ent, uint32_t supportFlag ) {
-	return !!(ent->client->pers.CSF & supportFlag );
+	return !!(ent->client->pers.CSF & supportFlag);
 }
 
 const char *supportFlagNames[CSF_NUM] = {

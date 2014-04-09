@@ -17,11 +17,11 @@
 //gender of the bot
 #define CHARACTERISTIC_GENDER						1	//string ("male", "female", "it")
 //attack skill
-// >  0.0 && <  0.2 = don't move
-// >  0.3 && <  1.0 = aim at enemy during retreat
-// >  0.0 && <  0.4 = only move forward/backward
-// >= 0.4 && <  1.0 = circle strafing
-// >  0.7 && <  1.0 = random strafe direction change
+// >  0.0f && <  0.2f = don't move
+// >  0.3f && <  1.0f = aim at enemy during retreat
+// >  0.0f && <  0.4f = only move forward/backward
+// >= 0.4f && <  1.0f = circle strafing
+// >  0.7f && <  1.0f = random strafe direction change
 #define CHARACTERISTIC_ATTACK_SKILL					2	//float [0, 1]
 //weapon weight file
 #define CHARACTERISTIC_WEAPONWEIGHTS				3	//string
@@ -43,11 +43,11 @@
 #define CHARACTERISTIC_AIM_ACCURACY_RAILGUN			14
 #define CHARACTERISTIC_AIM_ACCURACY_BFG10K			15	//float [0, 1]
 //skill when aiming
-// >  0.0 && <  0.9 = aim is affected by enemy movement
-// >  0.4 && <= 0.8 = enemy linear leading
-// >  0.8 && <= 1.0 = enemy exact movement leading
-// >  0.5 && <= 1.0 = prediction shots when enemy is not visible
-// >  0.6 && <= 1.0 = splash damage by shooting nearby geometry
+// >  0.0f && <  0.9f = aim is affected by enemy movement
+// >  0.4f && <= 0.8f = enemy linear leading
+// >  0.8f && <= 1.0f = enemy exact movement leading
+// >  0.5f && <= 1.0f = prediction shots when enemy is not visible
+// >  0.6f && <= 1.0f = splash damage by shooting nearby geometry
 #define CHARACTERISTIC_AIM_SKILL					16	//float [0, 1]
 //weapon specific aim skill
 #define CHARACTERISTIC_AIM_SKILL_ROCKETLAUNCHER		17	//float [0, 1]

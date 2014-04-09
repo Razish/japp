@@ -1,7 +1,6 @@
 #include "b_local.h"
 #include "g_nav.h"
 
-extern gitem_t	*BG_FindItemForAmmo( ammo_t ammo );
 extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 
 #define MIN_DISTANCE		256
@@ -17,8 +16,7 @@ extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *so
 #define SENTRY_HOVER_HEIGHT		24
 
 //Local state enums
-enum
-{
+enum {
 	LSTATE_NONE = 0,
 	LSTATE_ASLEEP,
 	LSTATE_WAKEUP,
@@ -32,8 +30,7 @@ enum
 NPC_Sentry_Precache
 -------------------------
 */
-void NPC_Sentry_Precache(void)
-{
+void NPC_Sentry_Precache( void ) {
 	int i;
 
 	G_SoundIndex( "sound/chars/sentry/misc/sentry_explo" );
@@ -43,15 +40,14 @@ void NPC_Sentry_Precache(void)
 	G_SoundIndex( "sound/chars/sentry/misc/sentry_hover_1_lp" );
 	G_SoundIndex( "sound/chars/sentry/misc/sentry_hover_2_lp" );
 
-	for ( i = 1; i < 4; i++)
-	{
+	for ( i = 1; i < 4; i++ ) {
 		G_SoundIndex( va( "sound/chars/sentry/misc/talk%d", i ) );
 	}
 
-	G_EffectIndex( "bryar/muzzle_flash");
-	G_EffectIndex( "env/med_explode");
+	G_EffectIndex( "bryar/muzzle_flash" );
+	G_EffectIndex( "env/med_explode" );
 
-	RegisterItem( BG_FindItemForAmmo( AMMO_BLASTER ));
+	RegisterItem( BG_FindItemForAmmo( AMMO_BLASTER ) );
 }
 
 /*
@@ -59,13 +55,12 @@ void NPC_Sentry_Precache(void)
 sentry_use
 ================
 */
-void sentry_use( gentity_t *self, gentity_t *other, gentity_t *activator)
-{
-	G_ActivateBehavior(self,BSET_USE);
+void sentry_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
+	G_ActivateBehavior( self, BSET_USE );
 
 	self->flags &= ~FL_SHIELDED;
-	NPC_SetAnim( self, SETANIM_BOTH, BOTH_POWERUP1, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
-//	self->NPC->localState = LSTATE_WAKEUP;
+	NPC_SetAnim( self, SETANIM_BOTH, BOTH_POWERUP1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD );
+	//	self->NPC->localState = LSTATE_WAKEUP;
 	self->NPC->localState = LSTATE_ACTIVE;
 }
 
@@ -74,32 +69,30 @@ void sentry_use( gentity_t *self, gentity_t *other, gentity_t *activator)
 NPC_Sentry_Pain
 -------------------------
 */
-void NPC_Sentry_Pain(gentity_t *self, gentity_t *attacker, int damage)
-{		
+void NPC_Sentry_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	int mod = gPainMOD;
 
 	NPC_Pain( self, attacker, damage );
 
-	if ( mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT )
-	{
+	if ( mod == MOD_DEMP2 || mod == MOD_DEMP2_ALT ) {
 		self->NPC->burstCount = 0;
-		TIMER_Set( self, "attackDelay", Q_irand( 9000, 12000) );
+		TIMER_Set( self, "attackDelay", Q_irand( 9000, 12000 ) );
 		self->flags |= FL_SHIELDED;
-		NPC_SetAnim( self, SETANIM_BOTH, BOTH_FLY_SHIELDED, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
-		G_Sound( self, CHAN_AUTO, G_SoundIndex("sound/chars/sentry/misc/sentry_pain") );		
+		NPC_SetAnim( self, SETANIM_BOTH, BOTH_FLY_SHIELDED, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD );
+		G_Sound( self, CHAN_AUTO, G_SoundIndex( "sound/chars/sentry/misc/sentry_pain" ) );
 
 		self->NPC->localState = LSTATE_ACTIVE;
 	}
 
 	// You got hit, go after the enemy
-//	if (self->NPC->localState == LSTATE_ASLEEP)
-//	{
-//		G_Sound( self, G_SoundIndex("sound/chars/sentry/misc/shieldsopen.wav"));
-//
-//		self->flags &= ~FL_SHIELDED;
-//		NPC_SetAnim( self, SETANIM_BOTH, BOTH_POWERUP1, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
-//		self->NPC->localState = LSTATE_WAKEUP;
-//	}
+	//	if (self->NPC->localState == LSTATE_ASLEEP)
+	//	{
+	//		G_Sound( self, G_SoundIndex("sound/chars/sentry/misc/shieldsopen.wav"));
+	//
+	//		self->flags &= ~FL_SHIELDED;
+	//		NPC_SetAnim( self, SETANIM_BOTH, BOTH_POWERUP1, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
+	//		self->NPC->localState = LSTATE_WAKEUP;
+	//	}
 }
 
 /*
@@ -107,8 +100,7 @@ void NPC_Sentry_Pain(gentity_t *self, gentity_t *attacker, int damage)
 Sentry_Fire
 -------------------------
 */
-void Sentry_Fire (void)
-{
+void Sentry_Fire( void ) {
 	vector3	muzzle;
 	static	vector3	forward, vright, up;
 	gentity_t	*missile;
@@ -118,30 +110,25 @@ void Sentry_Fire (void)
 
 	NPC->flags &= ~FL_SHIELDED;
 
-	if ( NPCInfo->localState == LSTATE_POWERING_UP )
-	{
-		if ( TIMER_Done( NPC, "powerup" ))
-		{
+	if ( NPCInfo->localState == LSTATE_POWERING_UP ) {
+		if ( TIMER_Done( NPC, "powerup" ) ) {
 			NPCInfo->localState = LSTATE_ATTACKING;
-			NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_ATTACK1, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
+			NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_ATTACK1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD );
 		}
-		else
-		{
+		else {
 			// can't do anything right now
 			return;
 		}
 	}
-	else if ( NPCInfo->localState == LSTATE_ACTIVE )
-	{
+	else if ( NPCInfo->localState == LSTATE_ACTIVE ) {
 		NPCInfo->localState = LSTATE_POWERING_UP;
 
-		G_Sound( NPC, CHAN_AUTO, G_SoundIndex("sound/chars/sentry/misc/sentry_shield_open") );		
-		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_POWERUP1, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
+		G_Sound( NPC, CHAN_AUTO, G_SoundIndex( "sound/chars/sentry/misc/sentry_shield_open" ) );
+		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_POWERUP1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD );
 		TIMER_Set( NPC, "powerup", 250 );
 		return;
 	}
-	else if ( NPCInfo->localState != LSTATE_ATTACKING )
-	{
+	else if ( NPCInfo->localState != LSTATE_ATTACKING ) {
 		// bad because we are uninitialized
 		NPCInfo->localState = LSTATE_ACTIVE;
 		return;
@@ -149,30 +136,29 @@ void Sentry_Fire (void)
 
 	// Which muzzle to fire from?
 	which = NPCInfo->burstCount % 3;
-	switch( which )
-	{
+	switch ( which ) {
 	case 0:
-		bolt = trap->G2API_AddBolt(NPC->ghoul2, 0, "*flash1");
+		bolt = trap->G2API_AddBolt( NPC->ghoul2, 0, "*flash1" );
 		break;
 	case 1:
-		bolt = trap->G2API_AddBolt(NPC->ghoul2, 0, "*flash2");
+		bolt = trap->G2API_AddBolt( NPC->ghoul2, 0, "*flash2" );
 		break;
 	case 2:
 	default:
-		bolt = trap->G2API_AddBolt(NPC->ghoul2, 0, "*flash03");
+		bolt = trap->G2API_AddBolt( NPC->ghoul2, 0, "*flash03" );
 	}
 
-	trap->G2API_GetBoltMatrix( NPC->ghoul2, 0, 
-				bolt,
-				&boltMatrix, &NPC->r.currentAngles, &NPC->r.currentOrigin, level.time,
-				NULL, &NPC->modelScale );
+	trap->G2API_GetBoltMatrix( NPC->ghoul2, 0,
+		bolt,
+		&boltMatrix, &NPC->r.currentAngles, &NPC->r.currentOrigin, level.time,
+		NULL, &NPC->modelScale );
 
 	BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, &muzzle );
 
 	AngleVectors( &NPC->r.currentAngles, &forward, &vright, &up );
-//	G_Sound( NPC, G_SoundIndex("sound/chars/sentry/misc/shoot.wav"));
+	//	G_Sound( NPC, G_SoundIndex("sound/chars/sentry/misc/shoot.wav"));
 
-	G_PlayEffectID( G_EffectIndex("bryar/muzzle_flash"), &muzzle, &forward );
+	G_PlayEffectID( G_EffectIndex( "bryar/muzzle_flash" ), &muzzle, &forward );
 
 	missile = CreateMissile( &muzzle, &forward, 1600, 10000, NPC, qfalse );
 
@@ -188,13 +174,11 @@ void Sentry_Fire (void)
 	missile->damage = 5;
 
 	// now scale for difficulty
-	if ( g_spSkill.integer == 0 )
-	{
+	if ( g_spSkill.integer == 0 ) {
 		NPC->attackDebounceTime += 200;
 		missile->damage = 1;
 	}
-	else if ( g_spSkill.integer == 1 )
-	{
+	else if ( g_spSkill.integer == 1 ) {
 		NPC->attackDebounceTime += 100;
 		missile->damage = 3;
 	}
@@ -205,8 +189,7 @@ void Sentry_Fire (void)
 Sentry_MaintainHeight
 -------------------------
 */
-void Sentry_MaintainHeight( void )
-{	
+void Sentry_MaintainHeight( void ) {
 	float	dif;
 
 	NPC->s.loopSound = G_SoundIndex( "sound/chars/sentry/misc/sentry_hover_1_lp" );
@@ -215,85 +198,69 @@ void Sentry_MaintainHeight( void )
 	NPC_UpdateAngles( qtrue, qtrue );
 
 	// If we have an enemy, we should try to hover at about enemy eye level
-	if ( NPC->enemy )
-	{
+	if ( NPC->enemy ) {
 		// Find the height difference
-		dif = (NPC->enemy->r.currentOrigin.z+NPC->enemy->r.maxs.z) - NPC->r.currentOrigin.z; 
+		dif = (NPC->enemy->r.currentOrigin.z + NPC->enemy->r.maxs.z) - NPC->r.currentOrigin.z;
 
 		// cap to prevent dramatic height shifts
-		if ( fabs( dif ) > 8 )
-		{
-			if ( fabs( dif ) > SENTRY_HOVER_HEIGHT )
-			{
-				dif = ( dif < 0 ? -24 : 24 );
+		if ( fabsf( dif ) > 8 ) {
+			if ( fabsf( dif ) > SENTRY_HOVER_HEIGHT ) {
+				dif = (dif < 0 ? -24 : 24);
 			}
 
-			NPC->client->ps.velocity.z = (NPC->client->ps.velocity.z+dif)/2;
+			NPC->client->ps.velocity.z = (NPC->client->ps.velocity.z + dif) / 2;
 		}
 	}
-	else
-	{
+	else {
 		gentity_t *goal = NULL;
 
 		if ( NPCInfo->goalEntity )	// Is there a goal?
 		{
 			goal = NPCInfo->goalEntity;
 		}
-		else
-		{
+		else {
 			goal = NPCInfo->lastGoalEntity;
 		}
 
-		if (goal)
-		{
+		if ( goal ) {
 			dif = goal->r.currentOrigin.z - NPC->r.currentOrigin.z;
 
-			if ( fabs( dif ) > SENTRY_HOVER_HEIGHT )
-			{
-				ucmd.upmove = ( ucmd.upmove < 0 ? -4 : 4 );
+			if ( fabsf( dif ) > SENTRY_HOVER_HEIGHT ) {
+				ucmd.upmove = (ucmd.upmove < 0 ? -4 : 4);
 			}
-			else
-			{
-				if ( NPC->client->ps.velocity.z )
-				{
+			else {
+				if ( NPC->client->ps.velocity.z > 0.0f ) {
 					NPC->client->ps.velocity.z *= SENTRY_VELOCITY_DECAY;
 
-					if ( fabs( NPC->client->ps.velocity.z ) < 2 )
-					{
+					if ( fabsf( NPC->client->ps.velocity.z ) < 2 ) {
 						NPC->client->ps.velocity.z = 0;
 					}
 				}
 			}
 		}
 		// Apply friction to Z
-		else if ( NPC->client->ps.velocity.z )
-		{
+		else if ( NPC->client->ps.velocity.z > 0.0f ) {
 			NPC->client->ps.velocity.z *= SENTRY_VELOCITY_DECAY;
 
-			if ( fabs( NPC->client->ps.velocity.z ) < 1 )
-			{
+			if ( fabsf( NPC->client->ps.velocity.z ) < 1 ) {
 				NPC->client->ps.velocity.z = 0;
 			}
 		}
 	}
 
 	// Apply friction
-	if ( NPC->client->ps.velocity.x )
-	{
+	if ( NPC->client->ps.velocity.x > 0.0f ) {
 		NPC->client->ps.velocity.x *= SENTRY_VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.x ) < 1 )
-		{
+		if ( fabsf( NPC->client->ps.velocity.x ) < 1 ) {
 			NPC->client->ps.velocity.x = 0;
 		}
 	}
 
-	if ( NPC->client->ps.velocity.y )
-	{
+	if ( NPC->client->ps.velocity.y > 0.0f ) {
 		NPC->client->ps.velocity.y *= SENTRY_VELOCITY_DECAY;
 
-		if ( fabs( NPC->client->ps.velocity.y ) < 1 )
-		{
+		if ( fabsf( NPC->client->ps.velocity.y ) < 1 ) {
 			NPC->client->ps.velocity.y = 0;
 		}
 	}
@@ -306,22 +273,18 @@ void Sentry_MaintainHeight( void )
 Sentry_Idle
 -------------------------
 */
-void Sentry_Idle( void )
-{
+void Sentry_Idle( void ) {
 	Sentry_MaintainHeight();
 
 	// Is he waking up?
-	if (NPCInfo->localState == LSTATE_WAKEUP)
-	{
-		if (NPC->client->ps.torsoTimer<=0)
-		{
+	if ( NPCInfo->localState == LSTATE_WAKEUP ) {
+		if ( NPC->client->ps.torsoTimer <= 0 ) {
 			NPCInfo->scriptFlags |= SCF_LOOK_FOR_ENEMIES;
 			NPCInfo->burstCount = 0;
 		}
 	}
-	else
-	{
-		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_SLEEP1, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
+	else {
+		NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_SLEEP1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD );
 		NPC->flags |= FL_SHIELDED;
 
 		NPC_BSIdle();
@@ -333,8 +296,7 @@ void Sentry_Idle( void )
 Sentry_Strafe
 -------------------------
 */
-void Sentry_Strafe( void )
-{
+void Sentry_Strafe( void ) {
 	int		dir;
 	vector3	end, right;
 	trace_t	tr;
@@ -343,21 +305,20 @@ void Sentry_Strafe( void )
 
 	// Pick a random strafe direction, then check to see if doing a strafe would be
 	//	reasonable valid
-	dir = ( rand() & 1 ) ? -1 : 1;
+	dir = (rand() & 1) ? -1 : 1;
 	VectorMA( &NPC->r.currentOrigin, SENTRY_STRAFE_DIS * dir, &right, &end );
 
 	trap->Trace( &tr, &NPC->r.currentOrigin, NULL, NULL, &end, NPC->s.number, MASK_SOLID, qfalse, 0, 0 );
 
 	// Close enough
-	if ( tr.fraction > 0.9f )
-	{
+	if ( tr.fraction > 0.9f ) {
 		VectorMA( &NPC->client->ps.velocity, SENTRY_STRAFE_VEL * dir, &right, &NPC->client->ps.velocity );
 
 		// Add a slight upward push
 		NPC->client->ps.velocity.z += SENTRY_UPWARD_PUSH;
 
 		// Set the strafe start time so we can do a controlled roll
-	//	NPC->fx_time = level.time;
+		//	NPC->fx_time = level.time;
 		NPCInfo->standTime = level.time + 3000 + random() * 500;
 	}
 }
@@ -367,17 +328,14 @@ void Sentry_Strafe( void )
 Sentry_Hunt
 -------------------------
 */
-void Sentry_Hunt( qboolean visible, qboolean advance )
-{
+void Sentry_Hunt( qboolean visible, qboolean advance ) {
 	float	distance, speed;
 	vector3	forward;
 
 	//If we're not supposed to stand still, pursue the player
-	if ( NPCInfo->standTime < level.time )
-	{
+	if ( NPCInfo->standTime < level.time ) {
 		// Only strafe when we can see the player
-		if ( visible )
-		{
+		if ( visible ) {
 			Sentry_Strafe();
 			return;
 		}
@@ -388,8 +346,7 @@ void Sentry_Hunt( qboolean visible, qboolean advance )
 		return;
 
 	//Only try and navigate if the player is visible
-	if ( visible == qfalse )
-	{
+	if ( visible == qfalse ) {
 		// Move towards our goal
 		NPCInfo->goalEntity = NPC->enemy;
 		NPCInfo->goalRadius = 12;
@@ -398,8 +355,7 @@ void Sentry_Hunt( qboolean visible, qboolean advance )
 		if ( NPC_GetMoveDirection( &forward, &distance ) == qfalse )
 			return;
 	}
-	else
-	{
+	else {
 		VectorSubtract( &NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin, &forward );
 		VectorNormalize( &forward );
 	}
@@ -413,34 +369,28 @@ void Sentry_Hunt( qboolean visible, qboolean advance )
 Sentry_RangedAttack
 -------------------------
 */
-void Sentry_RangedAttack( qboolean visible, qboolean advance )
-{
+void Sentry_RangedAttack( qboolean visible, qboolean advance ) {
 	if ( TIMER_Done( NPC, "attackDelay" ) && NPC->attackDebounceTime < level.time && visible )	// Attack?
 	{
-		if ( NPCInfo->burstCount > 6 )
-		{
-			if ( !NPC->fly_sound_debounce_time )
-			{//delay closing down to give the player an opening
+		if ( NPCInfo->burstCount > 6 ) {
+			if ( !NPC->fly_sound_debounce_time ) {//delay closing down to give the player an opening
 				NPC->fly_sound_debounce_time = level.time + Q_irand( 500, 2000 );
 			}
-			else if ( NPC->fly_sound_debounce_time < level.time )
-			{
+			else if ( NPC->fly_sound_debounce_time < level.time ) {
 				NPCInfo->localState = LSTATE_ACTIVE;
 				NPC->fly_sound_debounce_time = NPCInfo->burstCount = 0;
-				TIMER_Set( NPC, "attackDelay", Q_irand( 2000, 3500) );
+				TIMER_Set( NPC, "attackDelay", Q_irand( 2000, 3500 ) );
 				NPC->flags |= FL_SHIELDED;
-				NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_FLY_SHIELDED, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
+				NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_FLY_SHIELDED, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD );
 				G_SoundOnEnt( NPC, CHAN_AUTO, "sound/chars/sentry/misc/sentry_shield_close" );
 			}
 		}
-		else
-		{
+		else {
 			Sentry_Fire();
 		}
 	}
 
-	if ( NPCInfo->scriptFlags & SCF_CHASE_ENEMIES )
-	{
+	if ( NPCInfo->scriptFlags & SCF_CHASE_ENEMIES ) {
 		Sentry_Hunt( visible, advance );
 	}
 }
@@ -450,9 +400,8 @@ void Sentry_RangedAttack( qboolean visible, qboolean advance )
 Sentry_AttackDecision
 -------------------------
 */
-void Sentry_AttackDecision( void )
-{
-	float		distance;	
+void Sentry_AttackDecision( void ) {
+	float		distance;
 	qboolean	visible;
 	qboolean	advance;
 
@@ -462,41 +411,35 @@ void Sentry_AttackDecision( void )
 	NPC->s.loopSound = G_SoundIndex( "sound/chars/sentry/misc/sentry_hover_2_lp" );
 
 	//randomly talk
-	if ( TIMER_Done(NPC,"patrolNoise") )
-	{
-		if (TIMER_Done(NPC,"angerNoise"))
-		{
-			G_SoundOnEnt( NPC, CHAN_AUTO, va("sound/chars/sentry/misc/talk%d", Q_irand(1, 3)) );
+	if ( TIMER_Done( NPC, "patrolNoise" ) ) {
+		if ( TIMER_Done( NPC, "angerNoise" ) ) {
+			G_SoundOnEnt( NPC, CHAN_AUTO, va( "sound/chars/sentry/misc/talk%d", Q_irand( 1, 3 ) ) );
 
 			TIMER_Set( NPC, "patrolNoise", Q_irand( 4000, 10000 ) );
 		}
 	}
 
 	// He's dead.
-	if (NPC->enemy->health<1)
-	{
+	if ( NPC->enemy->health < 1 ) {
 		NPC->enemy = NULL;
 		Sentry_Idle();
 		return;
 	}
 
 	// If we don't have an enemy, just idle
-	if ( NPC_CheckEnemyExt(qfalse) == qfalse )
-	{
+	if ( NPC_CheckEnemyExt( qfalse ) == qfalse ) {
 		Sentry_Idle();
 		return;
 	}
 
 	// Rate our distance to the target and visibilty
-	distance	= (int) DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );	
-	visible		= NPC_ClearLOS4( NPC->enemy );
-	advance		= (qboolean)(distance > MIN_DISTANCE_SQR);
+	distance = (int)DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
+	visible = NPC_ClearLOS4( NPC->enemy );
+	advance = (qboolean)(distance > MIN_DISTANCE_SQR);
 
 	// If we cannot see our target, move to see it
-	if ( visible == qfalse )
-	{
-		if ( NPCInfo->scriptFlags & SCF_CHASE_ENEMIES )
-		{
+	if ( visible == qfalse ) {
+		if ( NPCInfo->scriptFlags & SCF_CHASE_ENEMIES ) {
 			Sentry_Hunt( visible, advance );
 			return;
 		}
@@ -507,38 +450,31 @@ void Sentry_AttackDecision( void )
 	Sentry_RangedAttack( visible, advance );
 }
 
-qboolean NPC_CheckPlayerTeamStealth( void );
-
 /*
 -------------------------
 NPC_Sentry_Patrol
 -------------------------
 */
-void NPC_Sentry_Patrol( void )
-{
+void NPC_Sentry_Patrol( void ) {
 	Sentry_MaintainHeight();
 
 	//If we have somewhere to go, then do that
-	if (!NPC->enemy)
-	{
-		if ( NPC_CheckPlayerTeamStealth() )
-		{
+	if ( !NPC->enemy ) {
+		if ( NPC_CheckPlayerTeamStealth() ) {
 			//NPC_AngerSound();
 			NPC_UpdateAngles( qtrue, qtrue );
 			return;
 		}
 
-		if ( UpdateGoal() )
-		{
+		if ( UpdateGoal() ) {
 			//start loop sound once we move
 			ucmd.buttons |= BUTTON_WALKING;
 			NPC_MoveToGoal( qtrue );
 		}
 
 		//randomly talk
-		if (TIMER_Done(NPC,"patrolNoise"))
-		{
-			G_SoundOnEnt( NPC, CHAN_AUTO, va("sound/chars/sentry/misc/talk%d", Q_irand(1, 3)) );
+		if ( TIMER_Done( NPC, "patrolNoise" ) ) {
+			G_SoundOnEnt( NPC, CHAN_AUTO, va( "sound/chars/sentry/misc/talk%d", Q_irand( 1, 3 ) ) );
 
 			TIMER_Set( NPC, "patrolNoise", Q_irand( 2000, 4000 ) );
 		}
@@ -552,24 +488,19 @@ void NPC_Sentry_Patrol( void )
 NPC_BSSentry_Default
 -------------------------
 */
-void NPC_BSSentry_Default( void )
-{
-	if ( NPC->targetname )
-	{
+void NPC_BSSentry_Default( void ) {
+	if ( NPC->targetname ) {
 		NPC->use = sentry_use;
 	}
 
-	if (( NPC->enemy ) && (NPCInfo->localState != LSTATE_WAKEUP))
-	{
+	if ( (NPC->enemy) && (NPCInfo->localState != LSTATE_WAKEUP) ) {
 		// Don't attack if waking up or if no enemy
 		Sentry_AttackDecision();
 	}
-	else if ( NPCInfo->scriptFlags & SCF_LOOK_FOR_ENEMIES )
-	{
+	else if ( NPCInfo->scriptFlags & SCF_LOOK_FOR_ENEMIES ) {
 		NPC_Sentry_Patrol();
 	}
-	else
-	{
+	else {
 		Sentry_Idle();
 	}
 }

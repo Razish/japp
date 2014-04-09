@@ -4,6 +4,7 @@
 // this file holds commands that can be executed by the server console, but not remote clients
 
 #include "g_local.h"
+#include "bg_lua.h"
 
 //RAZFIXME: Use G_ClientFromString
 gclient_t *ClientForString( const char *s ) {
@@ -23,11 +24,11 @@ gclient_t *ClientForString( const char *s ) {
 	}
 
 	// check for a name match
-	for ( idnum=0,cl=level.clients ; idnum < level.maxclients ; idnum++,cl++ ) {
+	for ( idnum = 0, cl = level.clients; idnum < level.maxclients; idnum++, cl++ ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		Q_strncpyz(cleanName, cl->pers.netname, sizeof(cleanName));
+		Q_strncpyz( cleanName, cl->pers.netname, sizeof(cleanName) );
 		Q_CleanString( cleanName, STRIP_COLOUR );
 		if ( !Q_stricmp( cleanName, s ) ) {
 			return cl;
@@ -38,18 +39,17 @@ gclient_t *ClientForString( const char *s ) {
 	return NULL;
 }
 
-int QDECL G_SortPlayersByScoreRate( const void *a, const void *b )
-{
-	gclient_t	*cla = &level.clients[ *((int*)a) ],
-				*clb = &level.clients[ *((int*)b) ];
+int QDECL G_SortPlayersByScoreRate( const void *a, const void *b ) {
+	gclient_t	*cla = &level.clients[*((int*)a)],
+		*clb = &level.clients[*((int*)b)];
 	float arate, brate;
 
 	if ( cla->pers.connectTime <= 0 && clb->pers.connectTime <= 0 )	return 0;
 	if ( cla->pers.connectTime <= 0 )								return 1;
 	if ( clb->pers.connectTime <= 0 )								return -1;
 
-	arate = cla->ps.persistant[PERS_SCORE] / (level.time-cla->pers.connectTime);
-	brate = clb->ps.persistant[PERS_SCORE] / (level.time-clb->pers.connectTime);
+	arate = cla->ps.persistant[PERS_SCORE] / (level.time - cla->pers.connectTime);
+	brate = clb->ps.persistant[PERS_SCORE] / (level.time - clb->pers.connectTime);
 
 	if ( arate > brate )
 		return -1;
@@ -59,14 +59,12 @@ int QDECL G_SortPlayersByScoreRate( const void *a, const void *b )
 	return 0;
 }
 
-void G_ShuffleTeams(void)
-{
-	int i=0, idnum=0, cTeam=0, cnt=0;
+void G_ShuffleTeams( void ) {
+	int i = 0, idnum = 0, cTeam = 0, cnt = 0;
 	gentity_t *cl_ent = NULL;
 	int	sortClients[MAX_CLIENTS];
 
-	for ( i=0; i<level.numConnectedClients; i++ )
-	{
+	for ( i = 0; i < level.numConnectedClients; i++ ) {
 		idnum = level.sortedClients[i];
 		cl_ent = &g_entities[idnum];
 
@@ -76,17 +74,15 @@ void G_ShuffleTeams(void)
 		sortClients[cnt++] = level.sortedClients[i];
 	}
 
-	qsort( sortClients, cnt, sizeof( int ), G_SortPlayersByScoreRate );
+	qsort( sortClients, cnt, sizeof(int), G_SortPlayersByScoreRate );
 
-	for ( i=0; i<cnt; i++ )
-	{
+	for ( i = 0; i < cnt; i++ ) {
 		idnum = sortClients[i];
 		cl_ent = &g_entities[idnum];
 
 		cTeam = (i % 2) + TEAM_RED;
 
-		if ( cTeam != cl_ent->client->sess.sessionTeam )
-		{
+		if ( cTeam != cl_ent->client->sess.sessionTeam ) {
 			if ( cTeam == TEAM_RED )
 				SetTeam( cl_ent, "r", qtrue );
 			else if ( cTeam == TEAM_BLUE )
@@ -94,17 +90,9 @@ void G_ShuffleTeams(void)
 		}
 	}
 
-	trap->SendServerCommand( -1, "cp \""S_COLOR_RED"Teams have been shuffled!\n\"");
+	trap->SendServerCommand( -1, "cp \""S_COLOR_RED"Teams have been shuffled!\n\"" );
 }
 
-char *ConcatArgs( int start );
-
-/*
-=================
-ConsoleCommand
-
-=================
-*/
 const char *G_GetArenaInfoByMap( const char *map );
 
 static void SV_AddBot_f( void ) {
@@ -117,31 +105,31 @@ static void SV_AddBot_f( void ) {
 		return;
 
 	// name
-	trap->Argv( 1, name, sizeof( name ) );
+	trap->Argv( 1, name, sizeof(name) );
 	if ( !name[0] ) {
 		trap->Print( "Syntax: addbot <botname> [skill 1-5] [team] [msec delay] [altname]\n" );
 		return;
 	}
 
 	// skill
-	trap->Argv( 2, string, sizeof( string ) );
+	trap->Argv( 2, string, sizeof(string) );
 	if ( !string[0] )
 		skill = 4;
 	else
 		skill = atof( string );
 
 	// team
-	trap->Argv( 3, team, sizeof( team ) );
+	trap->Argv( 3, team, sizeof(team) );
 
 	// delay
-	trap->Argv( 4, string, sizeof( string ) );
+	trap->Argv( 4, string, sizeof(string) );
 	if ( !string[0] )
 		delay = 0;
 	else
 		delay = atoi( string );
 
 	// alternative name
-	trap->Argv( 5, altname, sizeof( altname ) );
+	trap->Argv( 5, altname, sizeof(altname) );
 
 	G_AddBot( name, skill, team, delay, altname );
 
@@ -152,34 +140,37 @@ static void SV_AddBot_f( void ) {
 }
 
 static void SV_AdminAdd_f( void ) {
-	char	argUser[MAX_TOKEN_CHARS] = {0},
-			argPass[MAX_TOKEN_CHARS] = {0},
-			argPrivs[MAX_TOKEN_CHARS] = {0},
-			*argMsg = NULL;
+	char	argUser[MAX_TOKEN_CHARS] = { 0 },
+		argPass[MAX_TOKEN_CHARS] = { 0 },
+		argPrivs[MAX_TOKEN_CHARS] = { 0 },
+		argRank[MAX_TOKEN_CHARS] = { 0 },
+		*argMsg = NULL;
+
 
 	if ( trap->Argc() < 5 ) {
-		trap->Print( "Syntax: adminadd <user> <pass> <privileges> <login message>\n" );
+		trap->Print( "Syntax: adminadd <user> <pass> <privileges> <rank> <login message>\n" );
 		return;
 	}
 
-	trap->Argv( 1,	argUser,	sizeof( argUser ) );
-	trap->Argv( 2,	argPass,	sizeof( argPass ) );
-	trap->Argv( 3,	argPrivs,	sizeof( argPrivs ) );
-	argMsg = ConcatArgs( 4 );
-	
-	AM_AddAdmin( argUser, argPass, atoi( argPrivs ), argMsg );
+	trap->Argv( 1, argUser, sizeof(argUser) );
+	trap->Argv( 2, argPass, sizeof(argPass) );
+	trap->Argv( 3, argPrivs, sizeof(argPrivs) );
+	trap->Argv( 4, argRank, sizeof(argRank) );
+	argMsg = ConcatArgs( 5 );
+
+	AM_AddAdmin( argUser, argPass, atoi( argPrivs ), atoi( argRank ), argMsg );
 	AM_SaveAdmins();
 }
 
 static void SV_AdminDel_f( void ) {
-	char argUser[MAX_TOKEN_CHARS] = {0};
+	char argUser[MAX_TOKEN_CHARS] = { 0 };
 
 	if ( trap->Argc() < 2 ) {
 		trap->Print( "Syntax: admindel <user>\n" );
 		return;
 	}
 
-	trap->Argv( 1, argUser, sizeof( argUser ) );
+	trap->Argv( 1, argUser, sizeof(argUser) );
 
 	AM_DeleteAdmin( argUser );
 	AM_SaveAdmins();
@@ -203,32 +194,32 @@ static void SV_AllReady_f( void ) {
 }
 
 static void SV_BanAdd_f( void ) {
-	char ip[NET_ADDRSTRMAXLEN] = {0}, duration[32] = {0}, *reason = NULL;
+	char ip[NET_ADDRSTRMAXLEN] = { 0 }, duration[32] = { 0 }, *reason = NULL;
 
 	if ( trap->Argc() < 2 ) {
 		trap->Print( "Syntax: banadd <ip> <duration> <reason>\n" );
 		return;
 	}
 
-	trap->Argv( 1, ip, sizeof( ip ) );
-	trap->Argv( 2, duration, sizeof( duration ) );
+	trap->Argv( 1, ip, sizeof(ip) );
+	trap->Argv( 2, duration, sizeof(duration) );
 	if ( trap->Argc() >= 4 )
 		reason = ConcatArgs( 3 );
-	JKG_Bans_AddBanString( ip, duration, reason );
+	JP_Bans_AddBanString( ip, duration, reason );
 }
 
 static void SV_BanDel_f( void ) {
-	char ip[NET_ADDRSTRMAXLEN] = {0};
+	char ip[NET_ADDRSTRMAXLEN] = { 0 };
 	byteAlias_t *bIP = NULL;
-	
+
 	if ( trap->Argc() < 2 ) {
 		trap->Print( "Syntax: bandel <ip>\n" );
 		return;
 	}
 
-	trap->Argv( 1, ip, sizeof( ip ) );
+	trap->Argv( 1, ip, sizeof(ip) );
 	bIP = BuildByteFromIP( ip );
-	if ( JKG_Bans_Remove( bIP->b ) )
+	if ( JP_Bans_Remove( bIP->b ) )
 		trap->Print( "Removing ban on %s\n", ip );
 	else
 		trap->Print( "No ban found for %s\n", ip );
@@ -236,12 +227,12 @@ static void SV_BanDel_f( void ) {
 
 static void SV_BanList_f( void ) {
 	trap->Print( "Listing bans\n" );
-	JKG_Bans_List();
+	JP_Bans_List();
 }
 
 static void SV_BanReload_f( void ) {
 	trap->Print( "Reloading bans\n" );
-	JKG_Bans_LoadBans();
+	JP_Bans_LoadBans();
 }
 
 static void SV_BotList_f( void ) {
@@ -249,18 +240,17 @@ static void SV_BotList_f( void ) {
 	char name[MAX_TOKEN_CHARS], funname[MAX_TOKEN_CHARS], model[MAX_TOKEN_CHARS], personality[MAX_TOKEN_CHARS];
 
 	trap->Print( "name             model            personality              funname\n" );
-	for ( i=0; i<level.bots.num; i++ )
-	{
-		Q_strncpyz( name, Info_ValueForKey( level.bots.infos[i], "name" ), sizeof( name ) );
+	for ( i = 0; i < level.bots.num; i++ ) {
+		Q_strncpyz( name, Info_ValueForKey( level.bots.infos[i], "name" ), sizeof(name) );
 		Q_CleanString( name, STRIP_COLOUR );
 
-		Q_strncpyz( funname, Info_ValueForKey( level.bots.infos[i], "funname" ), sizeof( funname ) );
+		Q_strncpyz( funname, Info_ValueForKey( level.bots.infos[i], "funname" ), sizeof(funname) );
 		Q_CleanString( funname, STRIP_COLOUR );
 
-		Q_strncpyz( model, Info_ValueForKey( level.bots.infos[i], "model" ), sizeof( model ) );
+		Q_strncpyz( model, Info_ValueForKey( level.bots.infos[i], "model" ), sizeof(model) );
 		Q_CleanString( model, STRIP_COLOUR );
 
-		Q_strncpyz( personality, Info_ValueForKey( level.bots.infos[i], "personality" ), sizeof( personality ) );
+		Q_strncpyz( personality, Info_ValueForKey( level.bots.infos[i], "personality" ), sizeof(personality) );
 		Q_CleanString( personality, STRIP_COLOUR );
 
 		trap->Print( "%-16s %-16s %-20s %-20s\n", name, model, personality, funname );
@@ -268,31 +258,30 @@ static void SV_BotList_f( void ) {
 }
 
 static void SV_Cointoss_f( void ) {
-	qboolean heads = !!(Q_irand( 0, QRAND_MAX-1 )&1);
+	qboolean heads = !!(Q_irand( 0, QRAND_MAX - 1 ) & 1);
 	trap->SendServerCommand( -1, va( "cp \"Cointoss result: %s\n\"", heads ? S_COLOR_GREEN"HEADS" : S_COLOR_YELLOW"TAILS" ) );
-	G_LogPrintf( "Cointoss result: %s\n", heads ? S_COLOR_GREEN"HEADS" : S_COLOR_YELLOW"TAILS" );
+	G_LogPrintf( level.log.console, "Cointoss result: %s\n", heads ? S_COLOR_GREEN"HEADS" : S_COLOR_YELLOW"TAILS" );
 }
 
 static void SV_EntityList_f( void ) {
 	int e = 0;
 	gentity_t *check = NULL;
 
-	for ( e=0, check=g_entities;
-		e<level.num_entities;
-		e++, check++ )
-	{
-		char buf[256] = {0};
+	for ( e = 0, check = g_entities;
+		e < level.num_entities;
+		e++, check++ ) {
+		char buf[256] = { 0 };
 
 		if ( !check->inuse )
 			continue;
 
 		if ( check->s.eType < 0 || check->s.eType >= ET_MAX )
-			Q_strcat( buf, sizeof( buf ), va( "%4i: %-3i                ", e, check->s.eType ) );
+			Q_strcat( buf, sizeof(buf), va( "%4i: %-3i                ", e, check->s.eType ) );
 		else
-			Q_strcat( buf, sizeof( buf ), va( "%4i: %-20s ", e, eTypes[check->s.eType] ) );
+			Q_strcat( buf, sizeof(buf), va( "%4i: %-20s ", e, eTypes[check->s.eType] ) );
 
 		if ( check->classname )
-			Q_strcat( buf, sizeof( buf ), va( "[%s]", check->classname ) );
+			Q_strcat( buf, sizeof(buf), va( "[%s]", check->classname ) );
 
 		trap->Print( "%s\n", buf );
 	}
@@ -303,13 +292,13 @@ static void SV_ForceTeam_f( void ) {
 	char		str[MAX_TOKEN_CHARS];
 
 	// find the player
-	trap->Argv( 1, str, sizeof( str ) );
+	trap->Argv( 1, str, sizeof(str) );
 	cl = ClientForString( str );
 	if ( !cl )
 		return;
 
 	// set the team
-	trap->Argv( 2, str, sizeof( str ) );
+	trap->Argv( 2, str, sizeof(str) );
 	SetTeam( &g_entities[cl - level.clients], str, qtrue );
 }
 
@@ -328,15 +317,14 @@ static void SV_ListMaps_f( void ) {
 	trap->Print( "  map                     longname                        types\n" );
 	trap->Print( "  --------                --------                        --------\n" );
 
-	for ( i=0; i<level.arenas.num; i++ )
-	{
-		Q_strncpyz( map, Info_ValueForKey( level.arenas.infos[i], "map" ), sizeof( map ) );
+	for ( i = 0; i < level.arenas.num; i++ ) {
+		Q_strncpyz( map, Info_ValueForKey( level.arenas.infos[i], "map" ), sizeof(map) );
 		Q_CleanString( map, STRIP_COLOUR );
 
-		Q_strncpyz( longname, Info_ValueForKey( level.arenas.infos[i], "longname" ), sizeof( longname ) );
+		Q_strncpyz( longname, Info_ValueForKey( level.arenas.infos[i], "longname" ), sizeof(longname) );
 		Q_CleanString( longname, STRIP_COLOUR );
 
-		Q_strncpyz( type, Info_ValueForKey( level.arenas.infos[i], "type" ), sizeof( type ) );
+		Q_strncpyz( type, Info_ValueForKey( level.arenas.infos[i], "type" ), sizeof(type) );
 		Q_CleanString( type, STRIP_COLOUR );
 
 		trap->Print( "  %-24s%-32s%-64s\n", map, longname, type );
@@ -367,11 +355,11 @@ static void SV_Pause_f( void ) {
 	//OSP: pause
 	if ( level.pause.state == PAUSE_NONE ) {
 		level.pause.state = PAUSE_PAUSED;
-		level.pause.time = level.time + japp_pauseTime.integer*1000;
+		level.pause.time = level.time + japp_pauseTime.integer * 1000;
 	}
 	else if ( level.pause.state == PAUSE_PAUSED ) {
 		level.pause.state = PAUSE_UNPAUSING;
-		level.pause.time = level.time + japp_unpauseTime.integer*1000;
+		level.pause.time = level.time + japp_unpauseTime.integer * 1000;
 	}
 }
 
@@ -388,34 +376,34 @@ static void SV_ShuffleTeams_f( void ) {
 
 typedef struct svCommand_s {
 	const char	*cmd;
-	void		(*func)( void );
+	void( *func )(void);
 	//TODO: help function/string
 } svCommand_t;
 
 static const svCommand_t svCommands[] = {
-	{ "addbot",						SV_AddBot_f },
-	{ "adminadd",					SV_AdminAdd_f },
-	{ "admindel",					SV_AdminDel_f },
-	{ "adminlist",					SV_AdminList_f },
-	{ "adminreload",				SV_AdminReload_f },
-	{ "allready",					SV_AllReady_f },
-	{ "banadd",						SV_BanAdd_f },
-	{ "bandel",						SV_BanDel_f },
-	{ "banlist",					SV_BanList_f },
-	{ "banreload",					SV_BanReload_f },
-	{ "botlist",					SV_BotList_f },
-	{ "cointoss",					SV_Cointoss_f },
-	{ "entitylist",					SV_EntityList_f },
-	{ "forceteam",					SV_ForceTeam_f },
-	{ "gametype",					SV_Gametype_f },
-	{ "game_memory",				SV_GameMemory_f },
-	{ "lsmaps",						SV_ListMaps_f },
-	{ "lua",						SV_Lua_f },
-	{ "lua_reload",					SV_LuaReload_f },
-	{ "pause",						SV_Pause_f },
-	{ "say",						SV_Say_f },
-	{ "shuffle",					SV_ShuffleTeams_f },
-	{ "toggleuserinfovalidation",	SV_ToggleUserinfoValidation_f },
+	{ "addbot", SV_AddBot_f },
+	{ "adminadd", SV_AdminAdd_f },
+	{ "admindel", SV_AdminDel_f },
+	{ "adminlist", SV_AdminList_f },
+	{ "adminreload", SV_AdminReload_f },
+	{ "allready", SV_AllReady_f },
+	{ "banadd", SV_BanAdd_f },
+	{ "bandel", SV_BanDel_f },
+	{ "banlist", SV_BanList_f },
+	{ "banreload", SV_BanReload_f },
+	{ "botlist", SV_BotList_f },
+	{ "cointoss", SV_Cointoss_f },
+	{ "entitylist", SV_EntityList_f },
+	{ "forceteam", SV_ForceTeam_f },
+	{ "gametype", SV_Gametype_f },
+	{ "game_memory", SV_GameMemory_f },
+	{ "lsmaps", SV_ListMaps_f },
+	{ "lua", SV_Lua_f },
+	{ "lua_reload", SV_LuaReload_f },
+	{ "pause", SV_Pause_f },
+	{ "say", SV_Say_f },
+	{ "shuffle", SV_ShuffleTeams_f },
+	{ "toggleuserinfovalidation", SV_ToggleUserinfoValidation_f },
 };
 static const int numSvCommands = ARRAY_LEN( svCommands );
 
@@ -425,14 +413,14 @@ static int cmdcmp( const void *a, const void *b ) {
 
 qboolean ConsoleCommand( void ) {
 	svCommand_t *command = NULL;
-	char cmd[MAX_TOKEN_CHARS] = {0};
+	char cmd[MAX_TOKEN_CHARS] = { 0 };
 
-	trap->Argv( 0, cmd, sizeof( cmd ) );
+	trap->Argv( 0, cmd, sizeof(cmd) );
 
 	if ( JPLua_Event_ServerCommand() )
 		return qtrue;
 
-	command = (svCommand_t *)bsearch( cmd, svCommands, numSvCommands, sizeof( svCommands[0] ), cmdcmp );
+	command = (svCommand_t *)bsearch( cmd, svCommands, numSvCommands, sizeof(svCommands[0]), cmdcmp );
 	if ( !command )
 		return qfalse;
 

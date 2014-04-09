@@ -2,12 +2,12 @@
 
 #ifdef JPLUA
 
-// Player instance userdata type
+// Serialiser instance userdata type
 typedef struct jplua_serialiser_s {
 	fileHandle_t fileHandle;
 	char fileName[MAX_QPATH];
-	cJSON *inRoot;
-	cJSON *outRoot;
+	cJSON *inRoot, *outRoot;
+	qboolean read, write;
 } jplua_serialiser_t;
 
 void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode );

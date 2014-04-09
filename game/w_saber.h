@@ -33,8 +33,7 @@
 #define FORCE_LIGHTNING_RADIUS 300
 #define MAX_DRAIN_DISTANCE 512
 
-typedef enum forceJump_e
-{
+typedef enum forceJump_e {
 	FJ_FORWARD,
 	FJ_BACKWARD,
 	FJ_RIGHT,
@@ -42,8 +41,7 @@ typedef enum forceJump_e
 	FJ_UP
 } forceJump_t;
 
-typedef enum
-{
+typedef enum {
 	EVASION_NONE = 0,
 	EVASION_PARRY,
 	EVASION_DUCK_PARRY,
@@ -65,7 +63,6 @@ typedef enum
 #define SABERMAXS_Z 3.0f//8.0f
 #define	SABER_MIN_THROW_DIST	80.0f
 
-extern int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS];
 extern float forceJumpHeight[NUM_FORCE_POWER_LEVELS];
 extern float forceJumpStrength[NUM_FORCE_POWER_LEVELS];
 extern float forcePushPullRadius[NUM_FORCE_POWER_LEVELS];

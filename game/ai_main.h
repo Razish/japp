@@ -79,8 +79,7 @@
 
 #define BOT_SABER_THROW_RANGE		800
 
-typedef enum
-{
+typedef enum {
 	CTFSTATE_NONE,
 	CTFSTATE_ATTACKER,
 	CTFSTATE_DEFENDER,
@@ -90,16 +89,14 @@ typedef enum
 	CTFSTATE_MAXCTFSTATES
 } bot_ctf_state_t;
 
-typedef enum
-{
+typedef enum {
 	SIEGESTATE_NONE,
 	SIEGESTATE_ATTACKER,
 	SIEGESTATE_DEFENDER,
 	SIEGESTATE_MAXSIEGESTATES
 } bot_siege_state_t;
 
-typedef enum
-{
+typedef enum {
 	TEAMPLAYSTATE_NONE,
 	TEAMPLAYSTATE_FOLLOWING,
 	TEAMPLAYSTATE_ASSISTING,
@@ -107,31 +104,27 @@ typedef enum
 	TEAMPLAYSTATE_MAXTPSTATES
 } bot_teamplay_state_t;
 
-typedef struct botattachment_s
-{
+typedef struct botattachment_s {
 	int level;
 	char name[MAX_ATTACHMENT_NAME];
 } botattachment_t;
 
-typedef struct nodeobject_s
-{
+typedef struct nodeobject_s {
 	vector3 origin;
-//	int index;
+	//	int index;
 	float weight;
 	uint32_t flags;
 	int neighbornum;
 	int inuse;
 } nodeobject_t;
 
-typedef struct boteventtracker_s
-{
+typedef struct boteventtracker_s {
 	int			eventSequence;
 	int			events[MAX_PS_EVENTS];
 	float		eventTime;
 } boteventtracker_t;
 
-typedef struct botskills_s
-{
+typedef struct botskills_s {
 	int					reflex;
 	float				accuracy;
 	float				turnspeed;
@@ -141,8 +134,7 @@ typedef struct botskills_s
 } botskills_t;
 
 //bot state
-typedef struct bot_state_s
-{
+typedef struct bot_state_s {
 	int inuse;										//true if this state is used by a bot client
 	int botthink_residual;							//residual for the bot thinks
 	int client;										//client number of the bot
@@ -337,27 +329,25 @@ typedef struct bot_state_s
 	//end rww
 } bot_state_t;
 
-void *B_TempAlloc(int size);
-void B_TempFree(int size);
+void *B_TempAlloc( int size );
+void B_TempFree( int size );
 
-void *B_Alloc(int size);
-void B_Free(void *ptr);
+void *B_Alloc( int size );
+void B_Free( void *ptr );
 
 //resets the whole bot state
-void BotResetState(bot_state_t *bs);
+void BotResetState( bot_state_t *bs );
 //returns the number of bots in the game
-int NumBots(void);
+int NumBots( void );
 
-void BotUtilizePersonality(bot_state_t *bs);
-int BotDoChat(bot_state_t *bs, char *section, int always);
-void StandardBotAI(bot_state_t *bs, float thinktime);
-void BotWaypointRender(void);
-int OrgVisibleBox(vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2, int ignore);
-int BotIsAChickenWuss(bot_state_t *bs);
-int GetNearestVisibleWP(vector3 *org, int ignore);
-int GetBestIdleGoal(bot_state_t *bs);
-
-char *ConcatArgs( int start );
+void BotUtilizePersonality( bot_state_t *bs );
+int BotDoChat( bot_state_t *bs, const char *section, int always );
+void StandardBotAI( bot_state_t *bs, float thinktime );
+void BotWaypointRender( void );
+int OrgVisibleBox( vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2, int ignore );
+int BotIsAChickenWuss( bot_state_t *bs );
+int GetNearestVisibleWP( vector3 *org, int ignore );
+int GetBestIdleGoal( bot_state_t *bs );
 
 extern vmCvar_t bot_forcepowers;
 extern vmCvar_t bot_forgimmick;

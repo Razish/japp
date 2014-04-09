@@ -52,7 +52,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>../;../cgame/;../game/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDLL;_CGAME;JK2AWARDS;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;_CGAME;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link />
@@ -66,7 +66,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>../;../cgame/;../game/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDLL;_CGAME;JK2AWARDS;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;_CGAME;JPLUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -87,14 +87,10 @@
     <ClCompile Include="..\cgame\cg_info.c" />
     <ClCompile Include="..\cgame\cg_light.c" />
     <ClCompile Include="..\cgame\cg_localents.c" />
-    <ClCompile Include="..\cgame\cg_lua.c" />
-    <ClCompile Include="..\cgame\cg_luacvar.c" />
-    <ClCompile Include="..\cgame\cg_luaevent.c" />
-    <ClCompile Include="..\cgame\cg_luaplayer.c" />
-    <ClCompile Include="..\cgame\cg_luaserialiser.c" />
     <ClCompile Include="..\cgame\cg_luaserver.c" />
     <ClCompile Include="..\cgame\cg_main.c" />
     <ClCompile Include="..\cgame\cg_marks.c" />
+    <ClCompile Include="..\cgame\cg_media.c" />
     <ClCompile Include="..\cgame\cg_newDraw.c" />
     <ClCompile Include="..\cgame\cg_newScoreboard.c" />
     <ClCompile Include="..\cgame\cg_players.c" />
@@ -123,6 +119,12 @@
     <ClCompile Include="..\cgame\fx_rocketlauncher.c" />
     <ClCompile Include="..\game\AnimalNPC.c" />
     <ClCompile Include="..\game\bg_g2_utils.c" />
+    <ClCompile Include="..\game\bg_lua.c" />
+    <ClCompile Include="..\game\bg_luacvar.c" />
+    <ClCompile Include="..\game\bg_luaevent.c" />
+    <ClCompile Include="..\game\bg_luaplayer.c" />
+    <ClCompile Include="..\game\bg_luaserialiser.c" />
+    <ClCompile Include="..\game\bg_luavector.c" />
     <ClCompile Include="..\game\bg_misc.c" />
     <ClCompile Include="..\game\bg_panimate.c" />
     <ClCompile Include="..\game\bg_pmove.c" />
@@ -135,7 +137,9 @@
     <ClCompile Include="..\game\FighterNPC.c" />
     <ClCompile Include="..\game\SpeederNPC.c" />
     <ClCompile Include="..\game\WalkerNPC.c" />
+    <ClCompile Include="..\JAPP\jp_crashExtra.c" />
     <ClCompile Include="..\JAPP\jp_promode.c" />
+    <ClCompile Include="..\JAPP\jp_stack.c" />
     <ClCompile Include="..\JAPP\jp_tokenparser.c" />
     <ClCompile Include="..\json\cJSON.c" />
     <ClCompile Include="..\ui\ui_shared.c" />

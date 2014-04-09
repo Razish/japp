@@ -21,6 +21,9 @@ do
 	"debug")
 		DEBUG=1
 		;;
+	"fastdebug")
+		DEBUG=2
+		;;
 	"clang")
 		COMPILER='clang'
 		;;

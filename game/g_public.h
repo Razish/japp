@@ -5,7 +5,7 @@
 
 // g_public.h -- game module information visible to server
 
-#define Q3_INFINITE			16777216 
+#define Q3_INFINITE			16777216
 
 #define	GAME_API_VERSION	1
 
@@ -14,8 +14,8 @@
 // in entityStates (level eType), so the game must explicitly flag
 // special server behaviors
 #define	SVF_NOCLIENT			(0x00000001u) // don't send entity to clients, even if it has effects
-#define SVF_UNUSED00000002		(0x00000002u) // 
-#define SVF_UNUSED00000004		(0x00000004u) // 
+#define SVF_UNUSED00000002		(0x00000002u) //
+#define SVF_UNUSED00000004		(0x00000004u) //
 #define SVF_BOT					(0x00000008u) // set if the entity is a bot
 #define SVF_PLAYER_USABLE		(0x00000010u) // player can use this with the use button
 #define	SVF_BROADCAST			(0x00000020u) // send to all connected clients
@@ -26,25 +26,25 @@
 #define SVF_CAPSULE				(0x00000400u) // use capsule for collision detection instead of bbox
 #define SVF_NOTSINGLECLIENT		(0x00000800u) // send entity to everyone but one client (entityShared_t->singleClient)
 #define SVF_OWNERNOTSHARED		(0x00001000u) // If it's owned by something and another thing owned by that something hits it, it will still touch
-#define SVF_UNUSED00002000		(0x00002000u) // 
-#define SVF_UNUSED00004000		(0x00004000u) // 
+#define SVF_UNUSED00002000		(0x00002000u) //
+#define SVF_UNUSED00004000		(0x00004000u) //
 #define	SVF_ICARUS_FREEZE		(0x00008000u) // NPCs are frozen, ents don't execute ICARUS commands
-#define SVF_UNUSED00010000		(0x00010000u) // 
-#define SVF_UNUSED00020000		(0x00020000u) // 
-#define SVF_UNUSED00040000		(0x00040000u) // 
-#define SVF_UNUSED00080000		(0x00000000u) // 
-#define SVF_UNUSED00100000		(0x00100000u) // 
-#define SVF_UNUSED00200000		(0x00200000u) // 
-#define SVF_UNUSED00400000		(0x00400000u) // 
-#define SVF_UNUSED00800000		(0x00800000u) // 
-#define SVF_UNUSED01000000		(0x01000000u) // 
-#define SVF_UNUSED02000000		(0x02000000u) // 
-#define SVF_UNUSED04000000		(0x04000000u) // 
+#define SVF_UNUSED00010000		(0x00010000u) //
+#define SVF_UNUSED00020000		(0x00020000u) //
+#define SVF_UNUSED00040000		(0x00040000u) //
+#define SVF_UNUSED00080000		(0x00000000u) //
+#define SVF_UNUSED00100000		(0x00100000u) //
+#define SVF_UNUSED00200000		(0x00200000u) //
+#define SVF_UNUSED00400000		(0x00400000u) //
+#define SVF_UNUSED00800000		(0x00800000u) //
+#define SVF_UNUSED01000000		(0x01000000u) //
+#define SVF_UNUSED02000000		(0x02000000u) //
+#define SVF_UNUSED04000000		(0x04000000u) //
 #define SVF_GLASS_BRUSH			(0x08000000u) // Ent is a glass brush
 #define SVF_NO_BASIC_SOUNDS		(0x10000000u) // No basic sounds
 #define SVF_NO_COMBAT_SOUNDS	(0x20000000u) // No combat sounds
 #define SVF_NO_EXTRA_SOUNDS		(0x40000000u) // No extra or jedi sounds
-#define SVF_UNUSED80000000		(0x80000000u) // 
+#define SVF_UNUSED80000000		(0x80000000u) //
 
 //rww - ghoul2 trace flags
 #define G2TRFLAG_DOGHOULTRACE	(0x00000001u) //do the ghoul2 trace
@@ -55,8 +55,7 @@
 //===============================================================
 
 //this structure is shared by gameside and in-engine NPC nav routines.
-typedef struct failedEdge_e
-{
+typedef struct failedEdge_e {
 	int	startID;
 	int	endID;
 	int checkTime;
@@ -71,10 +70,10 @@ typedef struct entityShared_s {
 	int			singleClient;		// only send to this client when SVF_SINGLECLIENT is set
 
 	qboolean	bmodel;				// if false, assume an explicit mins / maxs bounding box
-									// only set by trap_SetBrushModel
+	// only set by trap_SetBrushModel
 	vector3		mins, maxs;
-	int			contents;			// CONTENTS_TRIGGER, CONTENTS_SOLID, CONTENTS_BODY, etc
-									// a non-solid entity should set to 0
+	uint32_t	contents;			// CONTENTS_TRIGGER, CONTENTS_SOLID, CONTENTS_BODY, etc
+	// a non-solid entity should set to 0
 
 	vector3		absmin, absmax;		// derived from mins/maxs and origin + rotation
 
@@ -95,8 +94,7 @@ typedef struct entityShared_s {
 	// mask of clients that this entity should be broadcast too.  The first 32 clients
 	// are represented by the first array index and the latter 32 clients are represented
 	// by the second array index.
-	int			broadcastClients[2];
-
+	uint32_t	broadcastClients[2];
 } entityShared_t;
 
 //bstate.h
@@ -124,8 +122,7 @@ typedef enum //# bState_e
 	NUM_BSTATES
 } bState_t;
 
-enum
-{
+enum {
 	EDGE_NORMAL,
 	EDGE_PATH,
 	EDGE_BLOCKED,
@@ -133,8 +130,7 @@ enum
 	EDGE_MOVEDIR
 };
 
-enum
-{
+enum {
 	NODE_NORMAL,
 	NODE_START,
 	NODE_GOAL,
@@ -151,7 +147,7 @@ typedef enum //# taskID_e
 	TID_ANGLE_FACE,		// Turning to an angle or facing
 	TID_BSTATE,			// Waiting for a certain bState to finish
 	TID_LOCATION,		// Waiting for ent to enter a specific trigger_location
-//	TID_MISSIONSTATUS,	// Waiting for player to finish reading MISSION STATUS SCREEN
+	//	TID_MISSIONSTATUS,	// Waiting for player to finish reading MISSION STATUS SCREEN
 	TID_RESIZE,			// Waiting for clear bbox to inflate size
 	TID_SHOOT,			// Waiting for fire event
 	NUM_TIDS,			// for def of taskID array
@@ -184,7 +180,7 @@ typedef enum //# bSet_e
 
 #define	MAX_PARMS	16
 #define	MAX_PARM_STRING_LENGTH	MAX_QPATH//was 16, had to lengthen it so they could take a valid file path
-typedef struct parms_s {	
+typedef struct parms_s {
 	char	parm[MAX_PARMS][MAX_PARM_STRING_LENGTH];
 } parms_t;
 
@@ -199,8 +195,8 @@ typedef struct Vehicle_s Vehicle_t;
 typedef struct sharedEntity_s {
 	entityState_t	s;				// communicated by server to clients
 	playerState_t	*playerState;	//needs to be in the gentity for bg entity access
-									//if you want to actually see the contents I guess
-									//you will have to be sure to VMA it first.
+	//if you want to actually see the contents I guess
+	//you will have to be sure to VMA it first.
 #if (!defined(MACOS_X) && !defined(__GCC__) && !defined(__GNUC__))
 	Vehicle_t		*m_pVehicle; //vehicle data
 #else
@@ -268,7 +264,7 @@ typedef struct T_G_ICARUS_SET_s {
 
 typedef struct T_G_ICARUS_LERP2POS_s {
 	int taskID;
-	int entID; 
+	int entID;
 	vector3 origin;
 	vector3 angles;
 	float duration;
@@ -675,77 +671,77 @@ typedef enum gameImportLegacy_e {
 	/*
 Ghoul2 Insert Start
 */
-	G_R_REGISTERSKIN,
-	G_G2_LISTBONES,
-	G_G2_LISTSURFACES,
-	G_G2_HAVEWEGHOULMODELS,
-	G_G2_SETMODELS,
-	G_G2_GETBOLT,
-	G_G2_GETBOLT_NOREC,
-	G_G2_GETBOLT_NOREC_NOROT,
-	G_G2_INITGHOUL2MODEL,
-	G_G2_SETSKIN,
-	G_G2_SIZE,
-	G_G2_ADDBOLT,
-	G_G2_SETBOLTINFO,
-	G_G2_ANGLEOVERRIDE,
-	G_G2_PLAYANIM,
-	G_G2_GETBONEANIM,
-	G_G2_GETGLANAME,
-	G_G2_COPYGHOUL2INSTANCE,
-	G_G2_COPYSPECIFICGHOUL2MODEL,
-	G_G2_DUPLICATEGHOUL2INSTANCE,
-	G_G2_HASGHOUL2MODELONINDEX,
-	G_G2_REMOVEGHOUL2MODEL,
-	G_G2_REMOVEGHOUL2MODELS,
-	G_G2_CLEANMODELS,
-	G_G2_COLLISIONDETECT,
-	G_G2_COLLISIONDETECTCACHE,
+G_R_REGISTERSKIN,
+G_G2_LISTBONES,
+G_G2_LISTSURFACES,
+G_G2_HAVEWEGHOULMODELS,
+G_G2_SETMODELS,
+G_G2_GETBOLT,
+G_G2_GETBOLT_NOREC,
+G_G2_GETBOLT_NOREC_NOROT,
+G_G2_INITGHOUL2MODEL,
+G_G2_SETSKIN,
+G_G2_SIZE,
+G_G2_ADDBOLT,
+G_G2_SETBOLTINFO,
+G_G2_ANGLEOVERRIDE,
+G_G2_PLAYANIM,
+G_G2_GETBONEANIM,
+G_G2_GETGLANAME,
+G_G2_COPYGHOUL2INSTANCE,
+G_G2_COPYSPECIFICGHOUL2MODEL,
+G_G2_DUPLICATEGHOUL2INSTANCE,
+G_G2_HASGHOUL2MODELONINDEX,
+G_G2_REMOVEGHOUL2MODEL,
+G_G2_REMOVEGHOUL2MODELS,
+G_G2_CLEANMODELS,
+G_G2_COLLISIONDETECT,
+G_G2_COLLISIONDETECTCACHE,
 
-	G_G2_SETROOTSURFACE,
-	G_G2_SETSURFACEONOFF,
-	G_G2_SETNEWORIGIN,
-	G_G2_DOESBONEEXIST,
-	G_G2_GETSURFACERENDERSTATUS,
+G_G2_SETROOTSURFACE,
+G_G2_SETSURFACEONOFF,
+G_G2_SETNEWORIGIN,
+G_G2_DOESBONEEXIST,
+G_G2_GETSURFACERENDERSTATUS,
 
-	G_G2_ABSURDSMOOTHING,
+G_G2_ABSURDSMOOTHING,
 
 /*
 	//rww - RAGDOLL_BEGIN
-*/
+	*/
 	G_G2_SETRAGDOLL,
 	G_G2_ANIMATEG2MODELS,
-/*
-	//rww - RAGDOLL_END
-*/
-	//additional ragdoll options -rww
-	G_G2_RAGPCJCONSTRAINT,
-	G_G2_RAGPCJGRADIENTSPEED,
-	G_G2_RAGEFFECTORGOAL,
-	G_G2_GETRAGBONEPOS,
-	G_G2_RAGEFFECTORKICK,
-	G_G2_RAGFORCESOLVE,
+	/*
+		//rww - RAGDOLL_END
+		*/
+		//additional ragdoll options -rww
+		G_G2_RAGPCJCONSTRAINT,
+		G_G2_RAGPCJGRADIENTSPEED,
+		G_G2_RAGEFFECTORGOAL,
+		G_G2_GETRAGBONEPOS,
+		G_G2_RAGEFFECTORKICK,
+		G_G2_RAGFORCESOLVE,
 
-	//rww - ik move method, allows you to specify a bone and move it to a world point (within joint constraints)
-	//by using the majority of gil's existing bone angling stuff from the ragdoll code.
-	G_G2_SETBONEIKSTATE,
-	G_G2_IKMOVE,
+		//rww - ik move method, allows you to specify a bone and move it to a world point (within joint constraints)
+		//by using the majority of gil's existing bone angling stuff from the ragdoll code.
+		G_G2_SETBONEIKSTATE,
+		G_G2_IKMOVE,
 
-	G_G2_REMOVEBONE,
+		G_G2_REMOVEBONE,
 
-	G_G2_ATTACHINSTANCETOENTNUM,
-	G_G2_CLEARATTACHEDINSTANCE,
-	G_G2_CLEANENTATTACHMENTS,
-	G_G2_OVERRIDESERVER,
+		G_G2_ATTACHINSTANCETOENTNUM,
+		G_G2_CLEARATTACHEDINSTANCE,
+		G_G2_CLEANENTATTACHMENTS,
+		G_G2_OVERRIDESERVER,
 
-	G_G2_GETSURFACENAME,
+		G_G2_GETSURFACENAME,
 
-	G_SET_ACTIVE_SUBBSP,
-	G_CM_REGISTER_TERRAIN,
-	G_RMG_INIT,
+		G_SET_ACTIVE_SUBBSP,
+		G_CM_REGISTER_TERRAIN,
+		G_RMG_INIT,
 
-	G_BOT_UPDATEWAYPOINTS,
-	G_BOT_CALCULATEPATHS
+		G_BOT_UPDATEWAYPOINTS,
+		G_BOT_CALCULATEPATHS
 } gameImportLegacy_t;
 
 typedef enum gameExportLegacy_e {
@@ -788,390 +784,390 @@ typedef enum gameExportLegacy_e {
 	GAME_NAV_ENTISBREAKABLE,
 	GAME_NAV_ENTISREMOVABLEUSABLE,
 	GAME_NAV_FINDCOMBATPOINTWAYPOINTS,
-	
+
 	GAME_GETITEMINDEXBYTAG
 } gameExportLegacy_t;
 
 typedef struct gameImport_s {
 	// misc
-	void		(*Print)								( const char *msg, ... );
-	void		(*Error)								( int level, const char *error, ... );
-	int			(*Milliseconds)							( void );
-	void		(*PrecisionTimerStart)					( void **timer );
-	int			(*PrecisionTimerEnd)					( void *timer );
-	void		(*SV_RegisterSharedMemory)				( char *memory );
-	int			(*RealTime)								( qtime_t *qtime );
-	void		(*TrueMalloc)							( void **ptr, int size );
-	void		(*TrueFree)								( void **ptr );
-	void		(*SnapVector)							( float *v );
+	void( *Print )								(const char *msg, ...);
+	void( *Error )								(int level, const char *error, ...);
+	int( *Milliseconds )							(void);
+	void( *PrecisionTimerStart )					(void **timer);
+	int( *PrecisionTimerEnd )					(void *timer);
+	void( *SV_RegisterSharedMemory )				(char *memory);
+	int( *RealTime )								(qtime_t *qtime);
+	void( *TrueMalloc )							(void **ptr, int size);
+	void( *TrueFree )								(void **ptr);
+	void( *SnapVector )							(float *v);
 
 	// cvar
-	void		(*Cvar_Register)						( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, uint32_t flags );
-	void		(*Cvar_Set)								( const char *var_name, const char *value );
-	void		(*Cvar_Update)							( vmCvar_t *vmCvar );
-	int			(*Cvar_VariableIntegerValue)			( const char *var_name );
-	void		(*Cvar_VariableStringBuffer)			( const char *var_name, char *buffer, int bufsize );
+	void( *Cvar_Register )						(vmCvar_t *vmCvar, const char *varName, const char *defaultValue, uint32_t flags);
+	void( *Cvar_Set )								(const char *var_name, const char *value);
+	void( *Cvar_Update )							(vmCvar_t *vmCvar);
+	int( *Cvar_VariableIntegerValue )			(const char *var_name);
+	void( *Cvar_VariableStringBuffer )			(const char *var_name, char *buffer, int bufsize);
 
 	// cmd
-	int			(*Argc)									( void );
-	void		(*Argv)									( int n, char *buffer, int bufferLength );
+	int( *Argc )									(void);
+	void( *Argv )									(int n, char *buffer, int bufferLength);
 
 	// filesystem
-	void		(*FS_Close)								( fileHandle_t f );
-	int			(*FS_GetFileList)						( const char *path, const char *extension, char *listbuf, int bufsize );
-	int			(*FS_Open)								( const char *qpath, fileHandle_t *f, fsMode_t mode );
-	int			(*FS_Read)								( void *buffer, int len, fileHandle_t f );
-	int			(*FS_Write)								( const void *buffer, int len, fileHandle_t f );
+	void( *FS_Close )								(fileHandle_t f);
+	int( *FS_GetFileList )						(const char *path, const char *extension, char *listbuf, int bufsize);
+	int( *FS_Open )								(const char *qpath, fileHandle_t *f, fsMode_t mode);
+	int( *FS_Read )								(void *buffer, int len, fileHandle_t f);
+	int( *FS_Write )								(const void *buffer, int len, fileHandle_t f);
 
 	// server
-	void		(*AdjustAreaPortalState)				( sharedEntity_t *ent, qboolean open );
-	qboolean	(*AreasConnected)						( int area1, int area2 );
-	int			(*DebugPolygonCreate)					( int color, int numPoints, vector3 *points );
-	void		(*DebugPolygonDelete)					( int id );
-	void		(*DropClient)							( int clientNum, const char *reason );
-	int			(*EntitiesInBox)						( const vector3 *mins, const vector3 *maxs, int *list, int maxcount );
-	qboolean	(*EntityContact)						( const vector3 *mins, const vector3 *maxs, const sharedEntity_t *ent, int capsule );
-	void		(*GetConfigstring)						( int num, char *buffer, int bufferSize );
-	qboolean	(*GetEntityToken)						( char *buffer, int bufferSize );
-	void		(*GetServerinfo)						( char *buffer, int bufferSize );
-	void		(*GetUsercmd)							( int clientNum, usercmd_t *cmd );
-	void		(*GetUserinfo)							( int num, char *buffer, int bufferSize );
-	qboolean	(*InPVS)								( const vector3 *p1, const vector3 *p2 );
-	qboolean	(*InPVSIgnorePortals)					( const vector3 *p1, const vector3 *p2 );
-	void		(*LinkEntity)							( sharedEntity_t *ent );
-	void		(*LocateGameData)						( sharedEntity_t *gEnts, int numGEntities, int sizeofGEntity_t, playerState_t *clients, int sizeofGClient );
-	int			(*PointContents)						( const vector3 *point, int passEntityNum );
-	void		(*SendConsoleCommand)					( int exec_when, const char *text );
-	void		(*SendServerCommand)					( int clientNum, const char *text );
-	void		(*SetBrushModel)						( sharedEntity_t *ent, const char *name );
-	void		(*SetConfigstring)						( int num, const char *string );
-	void		(*SetServerCull)						( float cullDistance );
-	void		(*SetUserinfo)							( int num, const char *buffer );
-	void		(*SiegePersSet)							( siegePers_t *pers );
-	void		(*SiegePersGet)							( siegePers_t *pers );
-	void		(*Trace)								( trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentmask, int capsule, uint32_t traceFlags, int useLod );
-	void		(*UnlinkEntity)							( sharedEntity_t *ent );
+	void( *AdjustAreaPortalState )				(sharedEntity_t *ent, qboolean open);
+	qboolean( *AreasConnected )						(int area1, int area2);
+	int( *DebugPolygonCreate )					(int color, int numPoints, vector3 *points);
+	void( *DebugPolygonDelete )					(int id);
+	void( *DropClient )							(int clientNum, const char *reason);
+	int( *EntitiesInBox )						(const vector3 *mins, const vector3 *maxs, int *list, int maxcount);
+	qboolean( *EntityContact )						(const vector3 *mins, const vector3 *maxs, const sharedEntity_t *ent, int capsule);
+	void( *GetConfigstring )						(int num, char *buffer, int bufferSize);
+	qboolean( *GetEntityToken )						(char *buffer, int bufferSize);
+	void( *GetServerinfo )						(char *buffer, int bufferSize);
+	void( *GetUsercmd )							(int clientNum, usercmd_t *cmd);
+	void( *GetUserinfo )							(int num, char *buffer, int bufferSize);
+	qboolean( *InPVS )								(const vector3 *p1, const vector3 *p2);
+	qboolean( *InPVSIgnorePortals )					(const vector3 *p1, const vector3 *p2);
+	void( *LinkEntity )							(sharedEntity_t *ent);
+	void( *LocateGameData )						(sharedEntity_t *gEnts, int numGEntities, int sizeofGEntity_t, playerState_t *clients, int sizeofGClient);
+	uint32_t( *PointContents )						(const vector3 *point, int passEntityNum);
+	void( *SendConsoleCommand )					(int exec_when, const char *text);
+	void( *SendServerCommand )					(int clientNum, const char *text);
+	void( *SetBrushModel )						(sharedEntity_t *ent, const char *name);
+	void( *SetConfigstring )						(int num, const char *string);
+	void( *SetServerCull )						(float cullDistance);
+	void( *SetUserinfo )							(int num, const char *buffer);
+	void( *SiegePersSet )							(siegePers_t *pers);
+	void( *SiegePersGet )							(siegePers_t *pers);
+	void( *Trace )								(trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end, int passEntityNum, int contentmask, int capsule, uint32_t traceFlags, int useLod);
+	void( *UnlinkEntity )							(sharedEntity_t *ent);
 
 	// ROFF
-	qboolean	(*ROFF_Clean)							( void );
-	void		(*ROFF_UpdateEntities)					( void );
-	int			(*ROFF_Cache)							( char *file );
-	qboolean	(*ROFF_Play)							( int entID, int roffID, qboolean doTranslation );
-	qboolean	(*ROFF_Purge_Ent)						( int entID );
+	qboolean( *ROFF_Clean )							(void);
+	void( *ROFF_UpdateEntities )					(void);
+	int( *ROFF_Cache )							(char *file);
+	qboolean( *ROFF_Play )							(int entID, int roffID, qboolean doTranslation);
+	qboolean( *ROFF_Purge_Ent )						(int entID);
 
 	// ICARUS
-	int			(*ICARUS_RunScript)						( sharedEntity_t *ent, const char *name );
-	qboolean	(*ICARUS_RegisterScript)				( const char *name, qboolean bCalledDuringInterrogate );
-	void		(*ICARUS_Init)							( void );
-	qboolean	(*ICARUS_ValidEnt)						( sharedEntity_t *ent );
-	qboolean	(*ICARUS_IsInitialized)					( int entID );
-	qboolean	(*ICARUS_MaintainTaskManager)			( int entID );
-	qboolean	(*ICARUS_IsRunning)						( int entID );
-	qboolean	(*ICARUS_TaskIDPending)					( sharedEntity_t *ent, int taskID );
-	void		(*ICARUS_InitEnt)						( sharedEntity_t *ent );
-	void		(*ICARUS_FreeEnt)						( sharedEntity_t *ent );
-	void		(*ICARUS_AssociateEnt)					( sharedEntity_t *ent );
-	void		(*ICARUS_Shutdown)						( void );
-	void		(*ICARUS_TaskIDSet)						( sharedEntity_t *ent, int taskType, int taskID );
-	void		(*ICARUS_TaskIDComplete)				( sharedEntity_t *ent, int taskType );
-	void		(*ICARUS_SetVar)						( int taskID, int entID, const char *type_name, const char *data );
-	int			(*ICARUS_VariableDeclared)				( const char *type_name );
-	int			(*ICARUS_GetFloatVariable)				( const char *name, float *value );
-	int			(*ICARUS_GetStringVariable)				( const char *name, const char *value );
-	int			(*ICARUS_GetVectorVariable)				( const char *name, const vector3 *value );
+	int( *ICARUS_RunScript )						(sharedEntity_t *ent, const char *name);
+	qboolean( *ICARUS_RegisterScript )				(const char *name, qboolean bCalledDuringInterrogate);
+	void( *ICARUS_Init )							(void);
+	qboolean( *ICARUS_ValidEnt )						(sharedEntity_t *ent);
+	qboolean( *ICARUS_IsInitialized )					(int entID);
+	qboolean( *ICARUS_MaintainTaskManager )			(int entID);
+	qboolean( *ICARUS_IsRunning )						(int entID);
+	qboolean( *ICARUS_TaskIDPending )					(sharedEntity_t *ent, int taskID);
+	void( *ICARUS_InitEnt )						(sharedEntity_t *ent);
+	void( *ICARUS_FreeEnt )						(sharedEntity_t *ent);
+	void( *ICARUS_AssociateEnt )					(sharedEntity_t *ent);
+	void( *ICARUS_Shutdown )						(void);
+	void( *ICARUS_TaskIDSet )						(sharedEntity_t *ent, int taskType, int taskID);
+	void( *ICARUS_TaskIDComplete )				(sharedEntity_t *ent, int taskType);
+	void( *ICARUS_SetVar )						(int taskID, int entID, const char *type_name, const char *data);
+	int( *ICARUS_VariableDeclared )				(const char *type_name);
+	int( *ICARUS_GetFloatVariable )				(const char *name, float *value);
+	int( *ICARUS_GetStringVariable )				(const char *name, const char *value);
+	int( *ICARUS_GetVectorVariable )				(const char *name, const vector3 *value);
 
 	// navigation
-	void		(*Nav_Init)								( void );
-	void		(*Nav_Free)								( void );
-	qboolean	(*Nav_Load)								( const char *filename, int checksum );
-	qboolean	(*Nav_Save)								( const char *filename, int checksum );
-	int			(*Nav_AddRawPoint)						( vector3 *point, uint32_t flags, int radius );
-	void		(*Nav_CalculatePaths)					( qboolean recalc );
-	void		(*Nav_HardConnect)						( int first, int second );
-	void		(*Nav_ShowNodes)						( void );
-	void		(*Nav_ShowEdges)						( void );
-	void		(*Nav_ShowPath)							( int start, int end );
-	int			(*Nav_GetNearestNode)					( sharedEntity_t *ent, int lastID, uint32_t flags, int targetID );
-	int			(*Nav_GetBestNode)						( int startID, int endID, int rejectID );
-	int			(*Nav_GetNodePosition)					( int nodeID, vector3 *out );
-	int			(*Nav_GetNodeNumEdges)					( int nodeID );
-	int			(*Nav_GetNodeEdge)						( int nodeID, int edge );
-	int			(*Nav_GetNumNodes)						( void );
-	qboolean	(*Nav_Connected)						( int startID, int endID );
-	int			(*Nav_GetPathCost)						( int startID, int endID );
-	int			(*Nav_GetEdgeCost)						( int startID, int endID );
-	int			(*Nav_GetProjectedNode)					( vector3 *origin, int nodeID );
-	void		(*Nav_CheckFailedNodes)					( sharedEntity_t *ent );
-	void		(*Nav_AddFailedNode)					( sharedEntity_t *ent, int nodeID );
-	qboolean	(*Nav_NodeFailed)						( sharedEntity_t *ent, int nodeID );
-	qboolean	(*Nav_NodesAreNeighbors)				( int startID, int endID );
-	void		(*Nav_ClearFailedEdge)					( failedEdge_t *failedEdge );
-	void		(*Nav_ClearAllFailedEdges)				( void );
-	int			(*Nav_EdgeFailed)						( int startID, int endID );
-	void		(*Nav_AddFailedEdge)					( int entID, int startID, int endID );
-	qboolean	(*Nav_CheckFailedEdge)					( failedEdge_t *failedEdge );
-	void		(*Nav_CheckAllFailedEdges)				( void );
-	qboolean	(*Nav_RouteBlocked)						( int startID, int testEdgeID, int endID, int rejectRank );
-	int			(*Nav_GetBestNodeAltRoute)				( int startID, int endID, int *pathCost, int rejectID );
-	int			(*Nav_GetBestNodeAltRoute2)				( int startID, int endID, int rejectID );
-	int			(*Nav_GetBestPathBetweenEnts)			( sharedEntity_t *ent, sharedEntity_t *goal, uint32_t flags );
-	int			(*Nav_GetNodeRadius)					( int nodeID );
-	void		(*Nav_CheckBlockedEdges)				( void );
-	void		(*Nav_ClearCheckedNodes)				( void );
-	int			(*Nav_CheckedNode)						( int wayPoint, int ent );
-	void		(*Nav_SetCheckedNode)					( int wayPoint, int ent, int value );
-	void		(*Nav_FlagAllNodes)						( int newFlag );
-	qboolean	(*Nav_GetPathsCalculated)				( void );
-	void		(*Nav_SetPathsCalculated)				( qboolean newVal );
-	
+	void( *Nav_Init )								(void);
+	void( *Nav_Free )								(void);
+	qboolean( *Nav_Load )								(const char *filename, int checksum);
+	qboolean( *Nav_Save )								(const char *filename, int checksum);
+	int( *Nav_AddRawPoint )						(vector3 *point, uint32_t flags, int radius);
+	void( *Nav_CalculatePaths )					(qboolean recalc);
+	void( *Nav_HardConnect )						(int first, int second);
+	void( *Nav_ShowNodes )						(void);
+	void( *Nav_ShowEdges )						(void);
+	void( *Nav_ShowPath )							(int start, int end);
+	int( *Nav_GetNearestNode )					(sharedEntity_t *ent, int lastID, uint32_t flags, int targetID);
+	int( *Nav_GetBestNode )						(int startID, int endID, int rejectID);
+	int( *Nav_GetNodePosition )					(int nodeID, vector3 *out);
+	int( *Nav_GetNodeNumEdges )					(int nodeID);
+	int( *Nav_GetNodeEdge )						(int nodeID, int edge);
+	int( *Nav_GetNumNodes )						(void);
+	qboolean( *Nav_Connected )						(int startID, int endID);
+	int( *Nav_GetPathCost )						(int startID, int endID);
+	int( *Nav_GetEdgeCost )						(int startID, int endID);
+	int( *Nav_GetProjectedNode )					(vector3 *origin, int nodeID);
+	void( *Nav_CheckFailedNodes )					(sharedEntity_t *ent);
+	void( *Nav_AddFailedNode )					(sharedEntity_t *ent, int nodeID);
+	qboolean( *Nav_NodeFailed )						(sharedEntity_t *ent, int nodeID);
+	qboolean( *Nav_NodesAreNeighbors )				(int startID, int endID);
+	void( *Nav_ClearFailedEdge )					(failedEdge_t *failedEdge);
+	void( *Nav_ClearAllFailedEdges )				(void);
+	int( *Nav_EdgeFailed )						(int startID, int endID);
+	void( *Nav_AddFailedEdge )					(int entID, int startID, int endID);
+	qboolean( *Nav_CheckFailedEdge )					(failedEdge_t *failedEdge);
+	void( *Nav_CheckAllFailedEdges )				(void);
+	qboolean( *Nav_RouteBlocked )						(int startID, int testEdgeID, int endID, int rejectRank);
+	int( *Nav_GetBestNodeAltRoute )				(int startID, int endID, int *pathCost, int rejectID);
+	int( *Nav_GetBestNodeAltRoute2 )				(int startID, int endID, int rejectID);
+	int( *Nav_GetBestPathBetweenEnts )			(sharedEntity_t *ent, sharedEntity_t *goal, uint32_t flags);
+	int( *Nav_GetNodeRadius )					(int nodeID);
+	void( *Nav_CheckBlockedEdges )				(void);
+	void( *Nav_ClearCheckedNodes )				(void);
+	int( *Nav_CheckedNode )						(int wayPoint, int ent);
+	void( *Nav_SetCheckedNode )					(int wayPoint, int ent, int value);
+	void( *Nav_FlagAllNodes )						(int newFlag);
+	qboolean( *Nav_GetPathsCalculated )				(void);
+	void( *Nav_SetPathsCalculated )				(qboolean newVal);
+
 	// botlib
-	int			(*BotAllocateClient)					( void );
-	void		(*BotFreeClient)						( int clientNum );
-	int			(*BotLoadCharacter)						( char *charfile, float skill );
-	void		(*BotFreeCharacter)						( int character );
-	float		(*Characteristic_Float)					( int character, int index );
-	float		(*Characteristic_BFloat)				( int character, int index, float min, float max );
-	int			(*Characteristic_Integer)				( int character, int index );
-	int			(*Characteristic_BInteger)				( int character, int index, int min, int max );
-	void		(*Characteristic_String)				( int character, int index, char *buf, int size );
-	int			(*BotAllocChatState)					( void );
-	void		(*BotFreeChatState)						( int handle );
-	void		(*BotQueueConsoleMessage)				( int chatstate, int type, char *message );
-	void		(*BotRemoveConsoleMessage)				( int chatstate, int handle );
-	int			(*BotNextConsoleMessage)				( int chatstate, void *cm );
-	int			(*BotNumConsoleMessages)				( int chatstate );
-	void		(*BotInitialChat)						( int chatstate, char *type, int mcontext, char *var0, char *var1, char *var2, char *var3, char *var4, char *var5, char *var6, char *var7 );
-	int			(*BotReplyChat)							( int chatstate, char *message, int mcontext, int vcontext, char *var0, char *var1, char *var2, char *var3, char *var4, char *var5, char *var6, char *var7 );
-	int			(*BotChatLength)						( int chatstate );
-	void		(*BotEnterChat)							( int chatstate, int client, int sendto );
-	int			(*StringContains)						( char *str1, char *str2, int casesensitive );
-	int			(*BotFindMatch)							( char *str, void *match, unsigned long int context );
-	void		(*BotMatchVariable)						( void *match, int variable, char *buf, int size );
-	void		(*UnifyWhiteSpaces)						( char *string );
-	void		(*BotReplaceSynonyms)					( char *string, unsigned long int context );
-	int			(*BotLoadChatFile)						( int chatstate, char *chatfile, char *chatname );
-	void		(*BotSetChatGender)						( int chatstate, int gender );
-	void		(*BotSetChatName)						( int chatstate, char *name, int client );
-	void		(*BotResetGoalState)					( int goalstate );
-	void		(*BotResetAvoidGoals)					( int goalstate );
-	void		(*BotPushGoal)							( int goalstate, void *goal );
-	void		(*BotPopGoal)							( int goalstate );
-	void		(*BotEmptyGoalStack)					( int goalstate );
-	void		(*BotDumpAvoidGoals)					( int goalstate );
-	void		(*BotDumpGoalStack)						( int goalstate );
-	void		(*BotGoalName)							( int number, char *name, int size );
-	int			(*BotGetTopGoal)						( int goalstate, void *goal );
-	int			(*BotGetSecondGoal)						( int goalstate, void *goal );
-	int			(*BotChooseLTGItem)						( int goalstate, vector3 *origin, int *inventory, uint32_t travelflags );
-	int			(*BotChooseNBGItem)						( int goalstate, vector3 *origin, int *inventory, uint32_t travelflags, void *ltg, float maxtime );
-	int			(*BotTouchingGoal)						( vector3 *origin, void *goal );
-	int			(*BotItemGoalInVisButNotVisible)		( int viewer, vector3 *eye, vector3 *viewangles, void *goal );
-	int			(*BotGetLevelItemGoal)					( int index, char *classname, void *goal );
-	float		(*BotAvoidGoalTime)						( int goalstate, int number );
-	void		(*BotInitLevelItems)					( void );
-	void		(*BotUpdateEntityItems)					( void );
-	int			(*BotLoadItemWeights)					( int goalstate, char *filename );
-	void		(*BotFreeItemWeights)					( int goalstate );
-	void		(*BotSaveGoalFuzzyLogic)				( int goalstate, char *filename );
-	int			(*BotAllocGoalState)					( int state );
-	void		(*BotFreeGoalState)						( int handle );
-	void		(*BotResetMoveState)					( int movestate );
-	void		(*BotMoveToGoal)						( void *result, int movestate, void *goal, uint32_t travelflags );
-	int			(*BotMoveInDirection)					( int movestate, vector3 *dir, float speed, int type );
-	void		(*BotResetAvoidReach)					( int movestate );
-	void		(*BotResetLastAvoidReach)				( int movestate );
-	int			(*BotReachabilityArea)					( vector3 *origin, int testground );
-	int			(*BotMovementViewTarget)				( int movestate, void *goal, uint32_t travelflags, float lookahead, vector3 *target );
-	int			(*BotAllocMoveState)					( void );
-	void		(*BotFreeMoveState)						( int handle );
-	void		(*BotInitMoveState)						( int handle, void *initmove );
-	int			(*BotChooseBestFightWeapon)				( int weaponstate, int *inventory );
-	void		(*BotGetWeaponInfo)						( int weaponstate, int weapon, void *weaponinfo );
-	int			(*BotLoadWeaponWeights)					( int weaponstate, char *filename );
-	int			(*BotAllocWeaponState)					( void );
-	void		(*BotFreeWeaponState)					( int weaponstate );
-	void		(*BotResetWeaponState)					( int weaponstate );
-	int			(*GeneticParentsAndChildSelection)		( int numranks, float *ranks, int *parent1, int *parent2, int *child );
-	void		(*BotInterbreedGoalFuzzyLogic)			( int parent1, int parent2, int child );
-	void		(*BotMutateGoalFuzzyLogic)				( int goalstate, float range );
-	int			(*BotGetNextCampSpotGoal)				( int num, void *goal );
-	int			(*BotGetMapLocationGoal)				( char *name, void *goal );
-	int			(*BotNumInitialChats)					( int chatstate, char *type );
-	void		(*BotGetChatMessage)					( int chatstate, char *buf, int size );
-	void		(*BotRemoveFromAvoidGoals)				( int goalstate, int number );
-	int			(*BotPredictVisiblePosition)			( vector3 *origin, int areanum, void *goal, uint32_t travelflags, vector3 *target );
-	void		(*BotSetAvoidGoalTime)					( int goalstate, int number, float avoidtime );
-	void		(*BotAddAvoidSpot)						( int movestate, vector3 *origin, float radius, int type );
-	int			(*BotLibSetup)							( void );
-	int			(*BotLibShutdown)						( void );
-	int			(*BotLibVarSet)							( char *var_name, char *value );
-	int			(*BotLibVarGet)							( char *var_name, char *value, int size );
-	int			(*BotLibDefine)							( char *string );
-	int			(*BotLibStartFrame)						( float time );
-	int			(*BotLibLoadMap)						( const char *mapname );
-	int			(*BotLibUpdateEntity)					( int ent, void *bue );
-	int			(*BotLibTest)							( int parm0, char *parm1, vector3 *parm2, vector3 *parm3 );
-	int			(*BotGetSnapshotEntity)					( int clientNum, int sequence );
-	int			(*BotGetServerCommand)					( int clientNum, char *message, int size );
-	void		(*BotUserCommand)						( int clientNum, usercmd_t *ucmd );
-	void		(*BotUpdateWaypoints)					( int wpnum, wpobject_t **wps );
-	void		(*BotCalculatePaths)					( int rmg );
-	
+	int( *BotAllocateClient )					(void);
+	void( *BotFreeClient )						(int clientNum);
+	int( *BotLoadCharacter )						(char *charfile, float skill);
+	void( *BotFreeCharacter )						(int character);
+	float( *Characteristic_Float )					(int character, int index);
+	float( *Characteristic_BFloat )				(int character, int index, float min, float max);
+	int( *Characteristic_Integer )				(int character, int index);
+	int( *Characteristic_BInteger )				(int character, int index, int min, int max);
+	void( *Characteristic_String )				(int character, int index, char *buf, int size);
+	int( *BotAllocChatState )					(void);
+	void( *BotFreeChatState )						(int handle);
+	void( *BotQueueConsoleMessage )				(int chatstate, int type, char *message);
+	void( *BotRemoveConsoleMessage )				(int chatstate, int handle);
+	int( *BotNextConsoleMessage )				(int chatstate, void *cm);
+	int( *BotNumConsoleMessages )				(int chatstate);
+	void( *BotInitialChat )						(int chatstate, char *type, int mcontext, char *var0, char *var1, char *var2, char *var3, char *var4, char *var5, char *var6, char *var7);
+	int( *BotReplyChat )							(int chatstate, char *message, int mcontext, int vcontext, char *var0, char *var1, char *var2, char *var3, char *var4, char *var5, char *var6, char *var7);
+	int( *BotChatLength )						(int chatstate);
+	void( *BotEnterChat )							(int chatstate, int client, int sendto);
+	int( *StringContains )						(char *str1, char *str2, int casesensitive);
+	int( *BotFindMatch )							(char *str, void *match, unsigned long int context);
+	void( *BotMatchVariable )						(void *match, int variable, char *buf, int size);
+	void( *UnifyWhiteSpaces )						(char *string);
+	void( *BotReplaceSynonyms )					(char *string, unsigned long int context);
+	int( *BotLoadChatFile )						(int chatstate, char *chatfile, char *chatname);
+	void( *BotSetChatGender )						(int chatstate, int gender);
+	void( *BotSetChatName )						(int chatstate, char *name, int client);
+	void( *BotResetGoalState )					(int goalstate);
+	void( *BotResetAvoidGoals )					(int goalstate);
+	void( *BotPushGoal )							(int goalstate, void *goal);
+	void( *BotPopGoal )							(int goalstate);
+	void( *BotEmptyGoalStack )					(int goalstate);
+	void( *BotDumpAvoidGoals )					(int goalstate);
+	void( *BotDumpGoalStack )						(int goalstate);
+	void( *BotGoalName )							(int number, char *name, int size);
+	int( *BotGetTopGoal )						(int goalstate, void *goal);
+	int( *BotGetSecondGoal )						(int goalstate, void *goal);
+	int( *BotChooseLTGItem )						(int goalstate, vector3 *origin, int *inventory, uint32_t travelflags);
+	int( *BotChooseNBGItem )						(int goalstate, vector3 *origin, int *inventory, uint32_t travelflags, void *ltg, float maxtime);
+	int( *BotTouchingGoal )						(vector3 *origin, void *goal);
+	int( *BotItemGoalInVisButNotVisible )		(int viewer, vector3 *eye, vector3 *viewangles, void *goal);
+	int( *BotGetLevelItemGoal )					(int index, char *classname, void *goal);
+	float( *BotAvoidGoalTime )						(int goalstate, int number);
+	void( *BotInitLevelItems )					(void);
+	void( *BotUpdateEntityItems )					(void);
+	int( *BotLoadItemWeights )					(int goalstate, char *filename);
+	void( *BotFreeItemWeights )					(int goalstate);
+	void( *BotSaveGoalFuzzyLogic )				(int goalstate, char *filename);
+	int( *BotAllocGoalState )					(int state);
+	void( *BotFreeGoalState )						(int handle);
+	void( *BotResetMoveState )					(int movestate);
+	void( *BotMoveToGoal )						(void *result, int movestate, void *goal, uint32_t travelflags);
+	int( *BotMoveInDirection )					(int movestate, vector3 *dir, float speed, int type);
+	void( *BotResetAvoidReach )					(int movestate);
+	void( *BotResetLastAvoidReach )				(int movestate);
+	int( *BotReachabilityArea )					(vector3 *origin, int testground);
+	int( *BotMovementViewTarget )				(int movestate, void *goal, uint32_t travelflags, float lookahead, vector3 *target);
+	int( *BotAllocMoveState )					(void);
+	void( *BotFreeMoveState )						(int handle);
+	void( *BotInitMoveState )						(int handle, void *initmove);
+	int( *BotChooseBestFightWeapon )				(int weaponstate, int *inventory);
+	void( *BotGetWeaponInfo )						(int weaponstate, int weapon, void *weaponinfo);
+	int( *BotLoadWeaponWeights )					(int weaponstate, char *filename);
+	int( *BotAllocWeaponState )					(void);
+	void( *BotFreeWeaponState )					(int weaponstate);
+	void( *BotResetWeaponState )					(int weaponstate);
+	int( *GeneticParentsAndChildSelection )		(int numranks, float *ranks, int *parent1, int *parent2, int *child);
+	void( *BotInterbreedGoalFuzzyLogic )			(int parent1, int parent2, int child);
+	void( *BotMutateGoalFuzzyLogic )				(int goalstate, float range);
+	int( *BotGetNextCampSpotGoal )				(int num, void *goal);
+	int( *BotGetMapLocationGoal )				(char *name, void *goal);
+	int( *BotNumInitialChats )					(int chatstate, char *type);
+	void( *BotGetChatMessage )					(int chatstate, char *buf, int size);
+	void( *BotRemoveFromAvoidGoals )				(int goalstate, int number);
+	int( *BotPredictVisiblePosition )			(vector3 *origin, int areanum, void *goal, uint32_t travelflags, vector3 *target);
+	void( *BotSetAvoidGoalTime )					(int goalstate, int number, float avoidtime);
+	void( *BotAddAvoidSpot )						(int movestate, vector3 *origin, float radius, int type);
+	int( *BotLibSetup )							(void);
+	int( *BotLibShutdown )						(void);
+	int( *BotLibVarSet )							(char *var_name, char *value);
+	int( *BotLibVarGet )							(char *var_name, char *value, int size);
+	int( *BotLibDefine )							(char *string);
+	int( *BotLibStartFrame )						(float time);
+	int( *BotLibLoadMap )						(const char *mapname);
+	int( *BotLibUpdateEntity )					(int ent, void *bue);
+	int( *BotLibTest )							(int parm0, char *parm1, vector3 *parm2, vector3 *parm3);
+	int( *BotGetSnapshotEntity )					(int clientNum, int sequence);
+	int( *BotGetServerCommand )					(int clientNum, char *message, int size);
+	void( *BotUserCommand )						(int clientNum, usercmd_t *ucmd);
+	void( *BotUpdateWaypoints )					(int wpnum, wpobject_t **wps);
+	void( *BotCalculatePaths )					(int rmg);
+
 	// area awareness system
-	int			(*AAS_EnableRoutingArea)				( int areanum, int enable );
-	int			(*AAS_BBoxAreas)						( vector3 *absmins, vector3 *absmaxs, int *areas, int maxareas );
-	int			(*AAS_AreaInfo)							( int areanum, void *info );
-	void		(*AAS_EntityInfo)						( int entnum, void *info );
-	int			(*AAS_Initialized)						( void );
-	void		(*AAS_PresenceTypeBoundingBox)			( int presencetype, vector3 *mins, vector3 *maxs );
-	float		(*AAS_Time)								( void );
-	int			(*AAS_PointAreaNum)						( vector3 *point );
-	int			(*AAS_TraceAreas)						( vector3 *start, vector3 *end, int *areas, vector3 *points, int maxareas );
-	int			(*AAS_PointContents)					( vector3 *point );
-	int			(*AAS_NextBSPEntity)					( int ent );
-	int			(*AAS_ValueForBSPEpairKey)				( int ent, char *key, char *value, int size );
-	int			(*AAS_VectorForBSPEpairKey)				( int ent, char *key, vector3 *v );
-	int			(*AAS_FloatForBSPEpairKey)				( int ent, char *key, float *value );
-	int			(*AAS_IntForBSPEpairKey)				( int ent, char *key, int *value );
-	int			(*AAS_AreaReachability)					( int areanum );
-	int			(*AAS_AreaTravelTimeToGoalArea)			( int areanum, vector3 *origin, int goalareanum, uint32_t travelflags );
-	int			(*AAS_Swimming)							( vector3 *origin );
-	int			(*AAS_PredictClientMovement)			( void *move, int entnum, vector3 *origin, int presencetype, int onground, vector3 *velocity, vector3 *cmdmove, int cmdframes, int maxframes, float frametime, int stopevent, int stopareanum, int visualize );
-	int			(*AAS_AlternativeRouteGoals)			( vector3 *start, int startareanum, vector3 *goal, int goalareanum, uint32_t travelflags, void *altroutegoals, int maxaltroutegoals, int type );
-	int			(*AAS_PredictRoute)						( void *route, int areanum, vector3 *origin, int goalareanum, uint32_t travelflags, int maxareas, int maxtime, int stopevent, int stopcontents, int stoptfl, int stopareanum );
-	int			(*AAS_PointReachabilityAreaIndex)		( vector3 *point );
-	
+	int( *AAS_EnableRoutingArea )				(int areanum, int enable);
+	int( *AAS_BBoxAreas )						(vector3 *absmins, vector3 *absmaxs, int *areas, int maxareas);
+	int( *AAS_AreaInfo )							(int areanum, void *info);
+	void( *AAS_EntityInfo )						(int entnum, void *info);
+	int( *AAS_Initialized )						(void);
+	void( *AAS_PresenceTypeBoundingBox )			(int presencetype, vector3 *mins, vector3 *maxs);
+	float( *AAS_Time )								(void);
+	int( *AAS_PointAreaNum )						(vector3 *point);
+	int( *AAS_TraceAreas )						(vector3 *start, vector3 *end, int *areas, vector3 *points, int maxareas);
+	uint32_t( *AAS_PointContents )					(vector3 *point);
+	int( *AAS_NextBSPEntity )					(int ent);
+	int( *AAS_ValueForBSPEpairKey )				(int ent, char *key, char *value, int size);
+	int( *AAS_VectorForBSPEpairKey )				(int ent, char *key, vector3 *v);
+	int( *AAS_FloatForBSPEpairKey )				(int ent, char *key, float *value);
+	int( *AAS_IntForBSPEpairKey )				(int ent, char *key, int *value);
+	int( *AAS_AreaReachability )					(int areanum);
+	int( *AAS_AreaTravelTimeToGoalArea )			(int areanum, vector3 *origin, int goalareanum, uint32_t travelflags);
+	int( *AAS_Swimming )							(vector3 *origin);
+	int( *AAS_PredictClientMovement )			(void *move, int entnum, vector3 *origin, int presencetype, int onground, vector3 *velocity, vector3 *cmdmove, int cmdframes, int maxframes, float frametime, int stopevent, int stopareanum, int visualize);
+	int( *AAS_AlternativeRouteGoals )			(vector3 *start, int startareanum, vector3 *goal, int goalareanum, uint32_t travelflags, void *altroutegoals, int maxaltroutegoals, int type);
+	int( *AAS_PredictRoute )						(void *route, int areanum, vector3 *origin, int goalareanum, uint32_t travelflags, int maxareas, int maxtime, int stopevent, int stopcontents, int stoptfl, int stopareanum);
+	int( *AAS_PointReachabilityAreaIndex )		(vector3 *point);
+
 	// elementary action
-	void		(*EA_Say)								( int client, char *str );
-	void		(*EA_SayTeam)							( int client, char *str );
-	void		(*EA_Command)							( int client, char *command );
-	void		(*EA_Action)							( int client, int action );
-	void		(*EA_Gesture)							( int client );
-	void		(*EA_Talk)								( int client );
-	void		(*EA_Attack)							( int client );
-	void		(*EA_Alt_Attack)						( int client );
-	void		(*EA_ForcePower)						( int client );
-	void		(*EA_Use)								( int client );
-	void		(*EA_Respawn)							( int client );
-	void		(*EA_Crouch)							( int client );
-	void		(*EA_MoveUp)							( int client );
-	void		(*EA_MoveDown)							( int client );
-	void		(*EA_MoveForward)						( int client );
-	void		(*EA_MoveBack)							( int client );
-	void		(*EA_MoveLeft)							( int client );
-	void		(*EA_MoveRight)							( int client );
-	void		(*EA_SelectWeapon)						( int client, int weapon );
-	void		(*EA_Jump)								( int client );
-	void		(*EA_DelayedJump)						( int client );
-	void		(*EA_Move)								( int client, vector3 *dir, float speed );
-	void		(*EA_View)								( int client, vector3 *viewangles );
-	void		(*EA_EndRegular)						( int client, float thinktime );
-	void		(*EA_GetInput)							( int client, float thinktime, void *input );
-	void		(*EA_ResetInput)						( int client );
-	
+	void( *EA_Say )								(int client, char *str);
+	void( *EA_SayTeam )							(int client, const char *str);
+	void( *EA_Command )							(int client, char *command);
+	void( *EA_Action )							(int client, int action);
+	void( *EA_Gesture )							(int client);
+	void( *EA_Talk )								(int client);
+	void( *EA_Attack )							(int client);
+	void( *EA_Alt_Attack )						(int client);
+	void( *EA_ForcePower )						(int client);
+	void( *EA_Use )								(int client);
+	void( *EA_Respawn )							(int client);
+	void( *EA_Crouch )							(int client);
+	void( *EA_MoveUp )							(int client);
+	void( *EA_MoveDown )							(int client);
+	void( *EA_MoveForward )						(int client);
+	void( *EA_MoveBack )							(int client);
+	void( *EA_MoveLeft )							(int client);
+	void( *EA_MoveRight )							(int client);
+	void( *EA_SelectWeapon )						(int client, int weapon);
+	void( *EA_Jump )								(int client);
+	void( *EA_DelayedJump )						(int client);
+	void( *EA_Move )								(int client, vector3 *dir, float speed);
+	void( *EA_View )								(int client, vector3 *viewangles);
+	void( *EA_EndRegular )						(int client, float thinktime);
+	void( *EA_GetInput )							(int client, float thinktime, void *input);
+	void( *EA_ResetInput )						(int client);
+
 	// botlib preprocessor
-	int			(*PC_LoadSource)						( const char *filename );
-	int			(*PC_FreeSource)						( int handle );
-	int			(*PC_ReadToken)							( int handle, pc_token_t *pc_token );
-	int			(*PC_SourceFileAndLine)					( int handle, char *filename, int *line );
+	int( *PC_LoadSource )						(const char *filename);
+	int( *PC_FreeSource )						(int handle);
+	int( *PC_ReadToken )							(int handle, pc_token_t *pc_token);
+	int( *PC_SourceFileAndLine )					(int handle, char *filename, int *line);
 
 	// renderer, terrain
-	qhandle_t	(*R_RegisterSkin)						( const char *name );
-	const char *(*SetActiveSubBSP)						( int index );
-	int			(*CM_RegisterTerrain)					( const char *config );
-	void		(*RMG_Init)								( void );
+	qhandle_t( *R_RegisterSkin )						(const char *name);
+	const char *(*SetActiveSubBSP)						(int index);
+	int( *CM_RegisterTerrain )					(const char *config);
+	void( *RMG_Init )								(void);
 
-	void		(*G2API_ListModelBones)					( void *ghlInfo, int frame );
-	void		(*G2API_ListModelSurfaces)				( void *ghlInfo );
-	qboolean	(*G2API_HaveWeGhoul2Models)				( void *ghoul2 );
-	void		(*G2API_SetGhoul2ModelIndexes)			( void *ghoul2, qhandle_t *modelList, qhandle_t *skinList );
-	qboolean	(*G2API_GetBoltMatrix)					( void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale );
-	qboolean	(*G2API_GetBoltMatrix_NoReconstruct)	( void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale );
-	qboolean	(*G2API_GetBoltMatrix_NoRecNoRot)		( void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale );
-	int			(*G2API_InitGhoul2Model)				( void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, uint32_t modelFlags, int lodBias );
-	qboolean	(*G2API_SetSkin)						( void *ghoul2, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin );
-	int			(*G2API_Ghoul2Size)						( void *ghlInfo );
-	int			(*G2API_AddBolt)						( void *ghoul2, int modelIndex, const char *boneName );
-	void		(*G2API_SetBoltInfo)					( void *ghoul2, int modelIndex, int boltInfo );
-	qboolean	(*G2API_SetBoneAngles)					( void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const uint32_t flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime , int currentTime );
-	qboolean	(*G2API_SetBoneAnim)					( void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const uint32_t flags, const float animSpeed, const int currentTime, const float setFrame, const int blendTime );
-	qboolean	(*G2API_GetBoneAnim)					( void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, uint32_t *flags, float *animSpeed, int *modelList, const int modelIndex );
-	void		(*G2API_GetGLAName)						( void *ghoul2, int modelIndex, char *fillBuf );
-	int			(*G2API_CopyGhoul2Instance)				( void *g2From, void *g2To, int modelIndex );
-	void		(*G2API_CopySpecificGhoul2Model)		( void *g2From, int modelFrom, void *g2To, int modelTo );
-	void		(*G2API_DuplicateGhoul2Instance)		( void *g2From, void **g2To );
-	qboolean	(*G2API_HasGhoul2ModelOnIndex)			( void *ghlInfo, int modelIndex );
-	qboolean	(*G2API_RemoveGhoul2Model)				( void *ghlInfo, int modelIndex );
-	qboolean	(*G2API_RemoveGhoul2Models)				( void *ghlInfo );
-	void		(*G2API_CleanGhoul2Models)				( void **ghoul2Ptr );
-	void		(*G2API_CollisionDetect)				( CollisionRecord_t *collRecMap, void *ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius );
-	void		(*G2API_CollisionDetectCache)			( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius );
-	qboolean	(*G2API_SetRootSurface)					( void *ghoul2, const int modelIndex, const char *surfaceName );
-	qboolean	(*G2API_SetSurfaceOnOff)				( void *ghoul2, const char *surfaceName, const uint32_t flags );
-	qboolean	(*G2API_SetNewOrigin)					( void *ghoul2, const int boltIndex );
-	qboolean	(*G2API_DoesBoneExist)					( void *ghoul2, int modelIndex, const char *boneName );
-	int			(*G2API_GetSurfaceRenderStatus)			( void *ghoul2, const int modelIndex, const char *surfaceName );
-	void		(*G2API_AbsurdSmoothing)				( void *ghoul2, qboolean status );
-	void		(*G2API_SetRagDoll)						( void *ghoul2, sharedRagDollParams_t *params );
-	void		(*G2API_AnimateG2Models)				( void *ghoul2, int time, sharedRagDollUpdateParams_t *params );
-	qboolean	(*G2API_RagPCJConstraint)				( void *ghoul2, const char *boneName, vector3 *min, vector3 *max );
-	qboolean	(*G2API_RagPCJGradientSpeed)			( void *ghoul2, const char *boneName, const float speed );
-	qboolean	(*G2API_RagEffectorGoal)				( void *ghoul2, const char *boneName, vector3 *pos );
-	qboolean	(*G2API_GetRagBonePos)					( void *ghoul2, const char *boneName, vector3 *pos, vector3 *entAngles, vector3 *entPos, vector3 *entScale );
-	qboolean	(*G2API_RagEffectorKick)				( void *ghoul2, const char *boneName, vector3 *velocity );
-	qboolean	(*G2API_RagForceSolve)					( void *ghoul2, qboolean force );
-	qboolean	(*G2API_SetBoneIKState)					( void *ghoul2, int time, const char *boneName, int ikState, sharedSetBoneIKStateParams_t *params );
-	qboolean	(*G2API_IKMove)							( void *ghoul2, int time, sharedIKMoveParams_t *params );
-	qboolean	(*G2API_RemoveBone)						( void *ghoul2, const char *boneName, int modelIndex );
-	void		(*G2API_AttachInstanceToEntNum)			( void *ghoul2, int entityNum, qboolean server );
-	void		(*G2API_ClearAttachedInstance)			( int entityNum );
-	void		(*G2API_CleanEntAttachments)			( void );
-	qboolean	(*G2API_OverrideServer)					( void *serverInstance );
-	void		(*G2API_GetSurfaceName)					( void *ghoul2, int surfNumber, int modelIndex, char *fillBuf );
+	void( *G2API_ListModelBones )					(void *ghlInfo, int frame);
+	void( *G2API_ListModelSurfaces )				(void *ghlInfo);
+	qboolean( *G2API_HaveWeGhoul2Models )				(void *ghoul2);
+	void( *G2API_SetGhoul2ModelIndexes )			(void *ghoul2, qhandle_t *modelList, qhandle_t *skinList);
+	qboolean( *G2API_GetBoltMatrix )					(void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale);
+	qboolean( *G2API_GetBoltMatrix_NoReconstruct )	(void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale);
+	qboolean( *G2API_GetBoltMatrix_NoRecNoRot )		(void *ghoul2, const int modelIndex, const int boltIndex, mdxaBone_t *matrix, const vector3 *angles, const vector3 *position, const int frameNum, qhandle_t *modelList, vector3 *scale);
+	int( *G2API_InitGhoul2Model )				(void **ghoul2Ptr, const char *fileName, int modelIndex, qhandle_t customSkin, qhandle_t customShader, uint32_t modelFlags, int lodBias);
+	qboolean( *G2API_SetSkin )						(void *ghoul2, int modelIndex, qhandle_t customSkin, qhandle_t renderSkin);
+	int( *G2API_Ghoul2Size )						(void *ghlInfo);
+	int( *G2API_AddBolt )						(void *ghoul2, int modelIndex, const char *boneName);
+	void( *G2API_SetBoltInfo )					(void *ghoul2, int modelIndex, int boltInfo);
+	qboolean( *G2API_SetBoneAngles )					(void *ghoul2, int modelIndex, const char *boneName, const vector3 *angles, const uint32_t flags, const int up, const int right, const int forward, qhandle_t *modelList, int blendTime, int currentTime);
+	qboolean( *G2API_SetBoneAnim )					(void *ghoul2, const int modelIndex, const char *boneName, const int startFrame, const int endFrame, const uint32_t flags, const float animSpeed, const int currentTime, const float setFrame, const int blendTime);
+	qboolean( *G2API_GetBoneAnim )					(void *ghoul2, const char *boneName, const int currentTime, float *currentFrame, int *startFrame, int *endFrame, uint32_t *flags, float *animSpeed, int *modelList, const int modelIndex);
+	void( *G2API_GetGLAName )						(void *ghoul2, int modelIndex, char *fillBuf);
+	int( *G2API_CopyGhoul2Instance )				(void *g2From, void *g2To, int modelIndex);
+	void( *G2API_CopySpecificGhoul2Model )		(void *g2From, int modelFrom, void *g2To, int modelTo);
+	void( *G2API_DuplicateGhoul2Instance )		(void *g2From, void **g2To);
+	qboolean( *G2API_HasGhoul2ModelOnIndex )			(void *ghlInfo, int modelIndex);
+	qboolean( *G2API_RemoveGhoul2Model )				(void *ghlInfo, int modelIndex);
+	qboolean( *G2API_RemoveGhoul2Models )				(void *ghlInfo);
+	void( *G2API_CleanGhoul2Models )				(void **ghoul2Ptr);
+	void( *G2API_CollisionDetect )				(CollisionRecord_t *collRecMap, void *ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius);
+	void( *G2API_CollisionDetectCache )			(CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius);
+	qboolean( *G2API_SetRootSurface )					(void *ghoul2, const int modelIndex, const char *surfaceName);
+	qboolean( *G2API_SetSurfaceOnOff )				(void *ghoul2, const char *surfaceName, const uint32_t flags);
+	qboolean( *G2API_SetNewOrigin )					(void *ghoul2, const int boltIndex);
+	qboolean( *G2API_DoesBoneExist )					(void *ghoul2, int modelIndex, const char *boneName);
+	int( *G2API_GetSurfaceRenderStatus )			(void *ghoul2, const int modelIndex, const char *surfaceName);
+	void( *G2API_AbsurdSmoothing )				(void *ghoul2, qboolean status);
+	void( *G2API_SetRagDoll )						(void *ghoul2, sharedRagDollParams_t *params);
+	void( *G2API_AnimateG2Models )				(void *ghoul2, int time, sharedRagDollUpdateParams_t *params);
+	qboolean( *G2API_RagPCJConstraint )				(void *ghoul2, const char *boneName, vector3 *min, vector3 *max);
+	qboolean( *G2API_RagPCJGradientSpeed )			(void *ghoul2, const char *boneName, const float speed);
+	qboolean( *G2API_RagEffectorGoal )				(void *ghoul2, const char *boneName, vector3 *pos);
+	qboolean( *G2API_GetRagBonePos )					(void *ghoul2, const char *boneName, vector3 *pos, vector3 *entAngles, vector3 *entPos, vector3 *entScale);
+	qboolean( *G2API_RagEffectorKick )				(void *ghoul2, const char *boneName, vector3 *velocity);
+	qboolean( *G2API_RagForceSolve )					(void *ghoul2, qboolean force);
+	qboolean( *G2API_SetBoneIKState )					(void *ghoul2, int time, const char *boneName, int ikState, sharedSetBoneIKStateParams_t *params);
+	qboolean( *G2API_IKMove )							(void *ghoul2, int time, sharedIKMoveParams_t *params);
+	qboolean( *G2API_RemoveBone )						(void *ghoul2, const char *boneName, int modelIndex);
+	void( *G2API_AttachInstanceToEntNum )			(void *ghoul2, int entityNum, qboolean server);
+	void( *G2API_ClearAttachedInstance )			(int entityNum);
+	void( *G2API_CleanEntAttachments )			(void);
+	qboolean( *G2API_OverrideServer )					(void *serverInstance);
+	void( *G2API_GetSurfaceName )					(void *ghoul2, int surfNumber, int modelIndex, char *fillBuf);
 } gameImport_t;
 
 typedef struct gameExport_s {
-	void		(*InitGame)							( int levelTime, int randomSeed, int restart );
-	void		(*ShutdownGame)						( int restart );
-	const char *(*ClientConnect)					( int clientNum, qboolean firstTime, qboolean isBot );
-	void		(*ClientBegin)						( int clientNum, qboolean allowTeamReset );
-	qboolean	(*ClientUserinfoChanged)			( int clientNum );
-	void		(*ClientDisconnect)					( int clientNum );
-	void		(*ClientCommand)					( int clientNum );
-	void		(*ClientThink)						( int clientNum, usercmd_t *ucmd );
-	void		(*RunFrame)							( int levelTime );
-	qboolean	(*ConsoleCommand)					( void );
-	int			(*BotAIStartFrame)					( int time );
-	void		(*ROFF_NotetrackCallback)			( int entID, const char *notetrack );
-	void		(*SpawnRMGEntity)					( void );
-	int			(*ICARUS_PlaySound)					( void );
-	qboolean	(*ICARUS_Set)						( void );
-	void		(*ICARUS_Lerp2Pos)					( void );
-	void		(*ICARUS_Lerp2Origin)				( void );
-	void		(*ICARUS_Lerp2Angles)				( void );
-	int			(*ICARUS_GetTag)					( void );
-	void		(*ICARUS_Lerp2Start)				( void );
-	void		(*ICARUS_Lerp2End)					( void );
-	void		(*ICARUS_Use)						( void );
-	void		(*ICARUS_Kill)						( void );
-	void		(*ICARUS_Remove)					( void );
-	void		(*ICARUS_Play)						( void );
-	int			(*ICARUS_GetFloat)					( void );
-	int			(*ICARUS_GetVector)					( void );
-	int			(*ICARUS_GetString)					( void );
-	void		(*ICARUS_SoundIndex)				( void );
-	int			(*ICARUS_GetSetIDForString)			( void );
-	qboolean	(*NAV_ClearPathToPoint)				( int entID, vector3 *pmins, vector3 *pmaxs, vector3 *point, int clipmask, int okToHitEnt );
-	qboolean	(*NPC_ClearLOS2)					( int entID, const vector3 *end );
-	int			(*NAVNEW_ClearPathBetweenPoints)	( vector3 *start, vector3 *end, vector3 *mins, vector3 *maxs, int ignore, int clipmask );
-	qboolean	(*NAV_CheckNodeFailedForEnt)		( int entID, int nodeNum );
-	qboolean	(*NAV_EntIsUnlockedDoor)			( int entityNum );
-	qboolean	(*NAV_EntIsDoor)					( int entityNum );
-	qboolean	(*NAV_EntIsBreakable)				( int entityNum );
-	qboolean	(*NAV_EntIsRemovableUsable)			( int entNum );
-	void		(*NAV_FindCombatPointWaypoints)		( void );
-	int			(*BG_GetItemIndexByTag)				( int tag, itemType_t type );
+	void( *InitGame )							(int levelTime, int randomSeed, int restart);
+	void( *ShutdownGame )						(int restart);
+	const char *(*ClientConnect)					(int clientNum, qboolean firstTime, qboolean isBot);
+	void( *ClientBegin )						(int clientNum, qboolean allowTeamReset);
+	qboolean( *ClientUserinfoChanged )			(int clientNum);
+	void( *ClientDisconnect )					(int clientNum);
+	void( *ClientCommand )					(int clientNum);
+	void( *ClientThink )						(int clientNum, usercmd_t *ucmd);
+	void( *RunFrame )							(int levelTime);
+	qboolean( *ConsoleCommand )					(void);
+	int( *BotAIStartFrame )					(int time);
+	void( *ROFF_NotetrackCallback )			(int entID, const char *notetrack);
+	void( *SpawnRMGEntity )					(void);
+	int( *ICARUS_PlaySound )					(void);
+	qboolean( *ICARUS_Set )						(void);
+	void( *ICARUS_Lerp2Pos )					(void);
+	void( *ICARUS_Lerp2Origin )				(void);
+	void( *ICARUS_Lerp2Angles )				(void);
+	int( *ICARUS_GetTag )					(void);
+	void( *ICARUS_Lerp2Start )				(void);
+	void( *ICARUS_Lerp2End )					(void);
+	void( *ICARUS_Use )						(void);
+	void( *ICARUS_Kill )						(void);
+	void( *ICARUS_Remove )					(void);
+	void( *ICARUS_Play )						(void);
+	int( *ICARUS_GetFloat )					(void);
+	int( *ICARUS_GetVector )					(void);
+	int( *ICARUS_GetString )					(void);
+	void( *ICARUS_SoundIndex )				(void);
+	int( *ICARUS_GetSetIDForString )			(void);
+	qboolean( *NAV_ClearPathToPoint )				(int entID, vector3 *pmins, vector3 *pmaxs, vector3 *point, int clipmask, int okToHitEnt);
+	qboolean( *NPC_ClearLOS2 )					(int entID, const vector3 *end);
+	int( *NAVNEW_ClearPathBetweenPoints )	(vector3 *start, vector3 *end, vector3 *mins, vector3 *maxs, int ignore, int clipmask);
+	qboolean( *NAV_CheckNodeFailedForEnt )		(int entID, int nodeNum);
+	qboolean( *NAV_EntIsUnlockedDoor )			(int entityNum);
+	qboolean( *NAV_EntIsDoor )					(int entityNum);
+	qboolean( *NAV_EntIsBreakable )				(int entityNum);
+	qboolean( *NAV_EntIsRemovableUsable )			(int entNum);
+	void( *NAV_FindCombatPointWaypoints )		(void);
+	int( *BG_GetItemIndexByTag )				(int tag, itemType_t type);
 } gameExport_t;
 
 //linking of game library
-typedef gameExport_t* (QDECL *GetGameAPI_t)( int apiVersion, gameImport_t *import );
+typedef gameExport_t* (QDECL *GetGameAPI_t)(int apiVersion, gameImport_t *import);

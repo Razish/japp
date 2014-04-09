@@ -23,7 +23,7 @@ typedef enum //# setType_e
 	SET_PARM15,//## %s="" # Set entity parm15
 	SET_PARM16,//## %s="" # Set entity parm16
 
-	// NOTE!!! If you add any other SET_xxxxxxSCRIPT types, make sure you update the 'case' statements in 
+	// NOTE!!! If you add any other SET_xxxxxxSCRIPT types, make sure you update the 'case' statements in
 	//	ICARUS_InterrogateScript() (game/g_ICARUS.cpp), or the script-precacher won't find them.
 
 	//# #sep Scripts and other file paths
@@ -43,7 +43,7 @@ typedef enum //# setType_e
 	SET_FFDEATHSCRIPT,//## %s="NULL" !!"W:\game\base\scripts\!!#*.txt" # Script to run when player kills a teammate
 	SET_MINDTRICKSCRIPT,//## %s="NULL" !!"W:\game\base\scripts\!!#*.txt" # Script to run when player kills a teammate
 	SET_VIDEO_PLAY,//## %s="filename" !!"W:\game\base\video\!!#*.roq" # Play a video (inGame)
-	SET_CINEMATIC_SKIPSCRIPT, //## %s="filename" !!"W:\game\base\scripts\!!#*.txt" # Script to run when skipping the running cinematic 
+	SET_CINEMATIC_SKIPSCRIPT, //## %s="filename" !!"W:\game\base\scripts\!!#*.txt" # Script to run when skipping the running cinematic
 
 	//# #sep Standard strings
 	SET_ENEMY,//## %s="NULL" # Set enemy by targetname
@@ -85,7 +85,7 @@ typedef enum //# setType_e
 	SET_ORIGIN,//## %v="0.0 0.0 0.0" # Set origin explicitly or with TAG
 	SET_ANGLES,//## %v="0.0 0.0 0.0" # Set angles explicitly or with TAG
 	SET_TELEPORT_DEST,//## %v="0.0 0.0 0.0" # Set origin here as soon as the area is clear
-	
+
 	//# #sep floats
 	SET_XVELOCITY,//## %f="0.0" # Velocity along X axis
 	SET_YVELOCITY,//## %f="0.0" # Velocity along Y axis
@@ -93,11 +93,11 @@ typedef enum //# setType_e
 	SET_Z_OFFSET,//## %f="0.0" # Vertical offset from original origin... offset/ent's speed * 1000ms is duration
 	SET_DPITCH,//## %f="0.0" # Pitch for NPC to turn to
 	SET_DYAW,//## %f="0.0" # Yaw for NPC to turn to
-	SET_TIMESCALE,//## %f="0.0" # Speed-up slow down game (0 - 1.0)
+	SET_TIMESCALE,//## %f="0.0" # Speed-up slow down game (0 - 1.0f)
 	SET_CAMERA_GROUP_Z_OFS,//## %s="NULL" # when following an ent with the camera, apply this z ofs
 	SET_VISRANGE,//## %f="0.0" # How far away NPC can see
 	SET_EARSHOT,//## %f="0.0" # How far an NPC can hear
-	SET_VIGILANCE,//## %f="0.0" # How often to look for enemies (0 - 1.0)
+	SET_VIGILANCE,//## %f="0.0" # How often to look for enemies (0 - 1.0f)
 	SET_GRAVITY,//## %f="0.0" # Change this ent's gravity - 800 default
 	SET_FACEAUX,		//## %f="0.0" # Set face to Aux expression for number of seconds
 	SET_FACEBLINK,		//## %f="0.0" # Set face to Blink expression for number of seconds
@@ -239,20 +239,20 @@ typedef enum //# setType_e
 	SET_TACTICAL_SHOW,		//## %t="TACTICAL" # Show tactical info on mission objectives screen
 	SET_TACTICAL_HIDE,		//## %t="TACTICAL" # Hide tactical info on mission objectives screen
 	SET_OBJECTIVE_CLEARALL,	//## # Force all objectives to be hidden
-/*
-	SET_OBJECTIVEFOSTER,	
-*/
-	SET_MISSIONSTATUSTEXT,	//## %t="STATUSTEXT" # Text to appear in mission status screen
-	SET_MENU_SCREEN,//## %t="MENUSCREENS" # Brings up specified menu screen
+	/*
+		SET_OBJECTIVEFOSTER,
+		*/
+		SET_MISSIONSTATUSTEXT,	//## %t="STATUSTEXT" # Text to appear in mission status screen
+		SET_MENU_SCREEN,//## %t="MENUSCREENS" # Brings up specified menu screen
 
-	SET_CLOSINGCREDITS,		//## # Show closing credits
+		SET_CLOSINGCREDITS,		//## # Show closing credits
 
-	//in-bhc tables
-	SET_LEAN,//## %t="LEAN_TYPES" # Lean left, right or stop leaning
+		//in-bhc tables
+		SET_LEAN,//## %t="LEAN_TYPES" # Lean left, right or stop leaning
 
-	//# #eol
-	SET_
-} setType_t;	
+		//# #eol
+		SET_
+} setType_t;
 
 #ifdef __cplusplus
 

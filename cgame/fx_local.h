@@ -1,6 +1,4 @@
-//
-// fx_*.c
-//
+#pragma once
 
 // NOTENOTE This is not the best, DO NOT CHANGE THESE!
 #define	FX_ALPHA_LINEAR		(0x00000001u)
@@ -11,18 +9,8 @@
 
 
 // Bryar
-void FX_BryarProjectileThink(  centity_t *cent, const struct weaponInfo_s *weapon );
-void FX_BryarAltProjectileThink(  centity_t *cent, const struct weaponInfo_s *weapon );
-void FX_BryarHitWall( vector3 *origin, vector3 *normal );
-void FX_BryarAltHitWall( vector3 *origin, vector3 *normal, int power );
-void FX_BryarHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid );
-void FX_BryarAltHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid );
-
-// Blaster
-void FX_BlasterProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon );
-void FX_BlasterAltFireThink( centity_t *cent, const struct weaponInfo_s *weapon );
-void FX_BlasterWeaponHitWall( vector3 *origin, vector3 *normal );
-void FX_BlasterWeaponHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid );
+void FX_BryarProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon );
+void FX_BryarAltProjectileThink( centity_t *cent, const struct weaponInfo_s *weapon );
 
 // Disruptor
 void FX_DisruptorMainShot( vector3 *start, vector3 *end );

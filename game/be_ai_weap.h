@@ -1,19 +1,6 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 
-/*****************************************************************************
- * name:		be_ai_weap.h
- *
- * desc:		weapon AI
- *
- * $Archive: /source/code/botlib/be_ai_weap.h $
- * $Author: osman $ 
- * $Revision: 1.4 $
- * $Modtime: 10/05/99 3:32p $
- * $Date: 2003/03/15 23:44:00 $
- *
- *****************************************************************************/
-
 //projectile flags
 #define PFL_WINDOWDAMAGE			1		//projectile damages through window
 #define PFL_RETURN					2		//set when projectile returns to owner
@@ -24,8 +11,7 @@
 #define DAMAGETYPE_RADIAL			2		//radial damage
 #define DAMAGETYPE_VISIBLE			4		//damage to all entities visible to the projectile
 
-typedef struct projectileinfo_s
-{
+typedef struct projectileinfo_s {
 	char name[MAX_STRINGFIELD];
 	char model[MAX_STRINGFIELD];
 	uint32_t flags;
@@ -42,8 +28,7 @@ typedef struct projectileinfo_s
 	float bouncestop;
 } projectileinfo_t;
 
-typedef struct weaponinfo_s
-{
+typedef struct weaponinfo_s {
 	int valid;					//true if the weapon info is valid
 	int number;									//number of the weapon
 	char name[MAX_STRINGFIELD];
@@ -71,18 +56,18 @@ typedef struct weaponinfo_s
 } weaponinfo_t;
 
 //setup the weapon AI
-int BotSetupWeaponAI(void);
+int BotSetupWeaponAI( void );
 //shut down the weapon AI
-void BotShutdownWeaponAI(void);
+void BotShutdownWeaponAI( void );
 //returns the best weapon to fight with
-int BotChooseBestFightWeapon(int weaponstate, int *inventory);
+int BotChooseBestFightWeapon( int weaponstate, int *inventory );
 //returns the information of the current weapon
-void BotGetWeaponInfo(int weaponstate, int weapon, weaponinfo_t *weaponinfo);
+void BotGetWeaponInfo( int weaponstate, int weapon, weaponinfo_t *weaponinfo );
 //loads the weapon weights
-int BotLoadWeaponWeights(int weaponstate, char *filename);
+int BotLoadWeaponWeights( int weaponstate, char *filename );
 //returns a handle to a newly allocated weapon state
-int BotAllocWeaponState(void);
+int BotAllocWeaponState( void );
 //frees the weapon state
-void BotFreeWeaponState(int weaponstate);
+void BotFreeWeaponState( int weaponstate );
 //resets the whole weapon state
-void BotResetWeaponState(int weaponstate);
+void BotResetWeaponState( int weaponstate );
