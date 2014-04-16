@@ -1789,7 +1789,6 @@ void CG_PlayerAnimEventDo( centity_t *cent, animevent_t *animEvent ) {
 		break;
 
 	default:
-		return;
 		break;
 	}
 }
@@ -6405,7 +6404,7 @@ static int lastFlyBySound[MAX_GENTITIES] = { 0 };
 #define	FLYBYSOUNDTIME 2000
 int	cg_lastHyperSpaceEffectTime = 0;
 
-static QINLINE void CG_VehicleEffects( centity_t *cent ) {
+static void CG_VehicleEffects( centity_t *cent ) {
 	Vehicle_t *pVehNPC;
 
 	if ( cent->currentState.eType != ET_NPC || cent->currentState.NPC_class != CLASS_VEHICLE || !cent->m_pVehicle )
@@ -6502,10 +6501,14 @@ static QINLINE void CG_VehicleEffects( centity_t *cent ) {
 				VectorMA( &cent->lerpOrigin, -16, &up, &org );
 				VectorMA( &org, -42, &fwd, &org );
 
+#if 0
 				// Play damage effects.
-				if ( 0 ) // pVehNPC->m_iArmor <= 75 )
+				if ( pVehNPC->m_iArmor <= 75 )
 					trap->FX_PlayEffectID( media.efx.blackSmoke, &org, &fwd, -1, -1, qfalse );
 				else if ( pVehNPC->m_pVehicleInfo->iTrailFX )
+#else
+				if ( pVehNPC->m_pVehicleInfo->iTrailFX )
+#endif
 					trap->FX_PlayEffectID( pVehNPC->m_pVehicleInfo->iTrailFX, &org, &fwd, -1, -1, qfalse );
 
 				// do exhaust

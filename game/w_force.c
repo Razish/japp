@@ -629,7 +629,6 @@ qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower ) {
 			case FP_SABER_DEFENSE:
 			case FP_SABERTHROW:
 				return qfalse;
-				break;
 			default:
 				break;
 			}
@@ -647,7 +646,6 @@ qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower ) {
 				case FP_LIGHTNING:
 				case FP_DRAIN:
 					return qfalse;
-					break;
 				default:
 					break;
 				}
@@ -672,7 +670,6 @@ qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower ) {
 				case FP_LIGHTNING:
 				case FP_DRAIN:
 					return qfalse;
-					break;
 				default:
 					break;
 				}
@@ -4583,7 +4580,6 @@ qboolean Jedi_DodgeEvasion( gentity_t *self, gentity_t *shooter, trace_t *tr, in
 	switch ( hitLoc ) {
 	case HL_NONE:
 		return qfalse;
-		break;
 
 	case HL_FOOT_RT:
 	case HL_FOOT_LT:

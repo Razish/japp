@@ -1811,13 +1811,10 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		//self->owner = old;
 		}
 		*/
-		//if ( self->client->NPC_class == CLASS_BOBAFETT && self->client->moveType == MT_FLYSWIM )
-		if ( 0 ) {
+		if ( self->client->NPC_class == CLASS_BOBAFETT && self->client->ps.eFlags2 & EF2_FLYING )
 			Boba_FlyStop( self );
-		}
-		if ( self->s.NPC_class == CLASS_RANCOR ) {
+		if ( self->s.NPC_class == CLASS_RANCOR )
 			Rancor_DropVictim( self );
-		}
 	}
 	if ( attacker && attacker->NPC && attacker->NPC->group && attacker->NPC->group->enemy == self ) {
 		attacker->NPC->group->enemy = NULL;

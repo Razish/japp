@@ -339,7 +339,6 @@ if plat == 'Linux':
 	#	'-Wfloat-equal',
 		'-Winit-self',
 		'-Winline',
-		'-Wlogical-op',
 	#	'-Wlong-long',
 		'-Wmissing-include-dirs',
 		'-Woverlength-strings',
@@ -347,15 +346,19 @@ if plat == 'Linux':
 		'-Wredundant-decls',
 	#	'-Wshadow',
 	#	'-Wsign-conversion',
-		'-Wstack-usage=32768',
 	#	'-Wsuggest-attribute=const',
-		'-Wswitch-default',
+	#	'-Wswitch-default',
 		'-Wundef',
 		'-Wuninitialized',
-		'-Wunreachable-code',
+	#	'-Wunreachable-code',
 	#	'-Wunsuffixed-float-constants',
 		'-Wwrite-strings',
 		]
+	if compiler != 'clang':
+		env['CCFLAGS'] += [
+			'-Wlogical-op',
+			'-Wstack-usage=32768'
+			]
 	env['CXXFLAGS'] += [ '-std=c++11' ]
 	if analyse:
 		env['CC'] = 'clang'

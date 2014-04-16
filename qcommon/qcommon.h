@@ -900,7 +900,6 @@ typedef enum {
 } joystickAxis_t;
 
 typedef enum {
-	// bk001129 - make sure SE_NONE is zero
 	SE_NONE = 0,	// evTime is still valid
 	SE_KEY,		// evValue is a key code, evValue2 is the down flag
 	SE_CHAR,	// evValue is an ascii char

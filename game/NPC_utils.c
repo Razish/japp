@@ -141,7 +141,7 @@ void CalcEntitySpot( const gentity_t *ent, const spot_t spot, vector3 *point ) {
 		break;
 
 	default:
-		VectorCopy( &ent->r.currentOrigin, point );
+		assert( !"CalcEntitySpot: invalid spot" ); //VectorCopy( &ent->r.currentOrigin, point );
 		break;
 	}
 }
@@ -505,16 +505,6 @@ qboolean G_ActivateBehavior( gentity_t *self, int bset ) {
 		self->NPC->behaviorState = bSID;
 	}
 	else {
-		/*
-		char			newname[MAX_FILENAME_LENGTH];
-		sprintf((char *) &newname, "%s/%s", Q3_SCRIPT_DIR, bs_name );
-		*/
-
-		//FIXME: between here and actually getting into the ICARUS_RunScript function, the stack gets blown!
-		//if ( ( ICARUS_entFilter == -1 ) || ( ICARUS_entFilter == self->s.number ) )
-		if ( 0 ) {
-			G_DebugPrint( WL_VERBOSE, "%s attempting to run bSet %s (%s)\n", self->targetname, GetStringForID( BSETTable, bset ), bs_name );
-		}
 		trap->ICARUS_RunScript( (sharedEntity_t *)self, va( "%s/%s", Q3_SCRIPT_DIR, bs_name ) );
 	}
 	return qtrue;
@@ -979,13 +969,13 @@ NPC_FindEnemy
 qboolean NPC_FindEnemy( qboolean checkAlerts ) {
 	gentity_t *newenemy;
 
+#if 0
 	//We're ignoring all enemies for now
-	//if( NPC->svFlags & SVF_IGNORE_ENEMIES )
-	if ( 0 ) //rwwFIXMEFIXME: support for flag
-	{
+	if ( NPC->svFlags & SVF_IGNORE_ENEMIES ) {
 		G_ClearEnemy( NPC );
 		return qfalse;
 	}
+#endif
 
 	//we can't pick up any enemies for now
 	if ( NPCInfo->confusionTime > level.time ) {

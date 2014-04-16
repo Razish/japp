@@ -135,29 +135,22 @@ localEntity_t *CG_SmokePuff( const vector3 *p, const vector3 *vel,
 	return le;
 }
 
-int CGDEBUG_SaberColor( int saberColor ) {
-	switch ( (int)(saberColor) ) {
+uint32_t CGDEBUG_SaberColor( saber_colors_t saberColor ) {
+	switch ( saberColor ) {
 	case SABER_RED:
-		return 0x000000ff;
-		break;
+		return 0x000000ffu;
 	case SABER_ORANGE:
-		return 0x000088ff;
-		break;
+		return 0x000088ffu;
 	case SABER_YELLOW:
-		return 0x0000ffff;
-		break;
+		return 0x0000ffffu;
 	case SABER_GREEN:
-		return 0x0000ff00;
-		break;
+		return 0x0000ff00u;
 	case SABER_BLUE:
-		return 0x00ff0000;
-		break;
+		return 0x00ff0000u;
 	case SABER_PURPLE:
-		return 0x00ff00ff;
-		break;
+		return 0x00ff00ffu;
 	default:
-		return saberColor;
-		break;
+		return 0x00ffffffu; // white
 	}
 }
 
@@ -182,20 +175,13 @@ void CG_TestLine( vector3 *start, vector3 *end, int time, unsigned int color, in
 
 	re->shaderTexCoord.x = re->shaderTexCoord.y = 1.0f;
 
-	if ( 0/*color==0*/ ) {
-		re->shaderRGBA[0] = re->shaderRGBA[1] = re->shaderRGBA[2] = re->shaderRGBA[3] = 0xff;
-	}
-	else {
-		color = CGDEBUG_SaberColor( color );
-		re->shaderRGBA[0] = color & 0xff;
-		color >>= 8;
-		re->shaderRGBA[1] = color & 0xff;
-		color >>= 8;
-		re->shaderRGBA[2] = color & 0xff;
-		//		color >>= 8;
-		//		re->shaderRGBA[3] = color & 0xff;
-		re->shaderRGBA[3] = 0xff;
-	}
+	color = CGDEBUG_SaberColor( color );
+	re->shaderRGBA[0] = color & 0xff;
+	color >>= 8;
+	re->shaderRGBA[1] = color & 0xff;
+	color >>= 8;
+	re->shaderRGBA[2] = color & 0xff;
+	re->shaderRGBA[3] = 0xff;
 
 	le->color[3] = 1.0f;
 
@@ -966,15 +952,12 @@ void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3
 	case MAT_GLASS:
 		trap->S_StartSound( NULL, owner, CHAN_BODY, media.sounds.environment.glassChunk );
 		return;
-		break;
 	case MAT_GRATE1:
 		trap->S_StartSound( NULL, owner, CHAN_BODY, media.sounds.environment.grate );
 		return;
-		break;
 	case MAT_ELECTRICAL:// (sparks)
 		trap->S_StartSound( NULL, owner, CHAN_BODY, trap->S_RegisterSound( va( "sound/ambience/spark%d.wav", Q_irand( 1, 6 ) ) ) );
 		return;
-		break;
 	case MAT_DRK_STONE:
 	case MAT_LT_STONE:
 	case MAT_GREY_STONE:
@@ -1003,7 +986,6 @@ void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3
 	case MAT_ROPE:
 		//		trap->S_StartSound( NULL, owner, CHAN_BODY, cgi_S_RegisterSound( "" ));  FIXME:  needs a sound
 		return;
-		break;
 	}
 
 	if ( baseScale <= 0.0f ) {

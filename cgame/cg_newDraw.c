@@ -49,16 +49,13 @@ float CG_GetValue( int ownerDraw ) {
 	case CG_SELECTEDPLAYER_ARMOR:
 		ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
 		return ci->armor;
-		break;
 
 	case CG_SELECTEDPLAYER_HEALTH:
 		ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
 		return ci->health;
-		break;
 
 	case CG_PLAYER_ARMOR_VALUE:
 		return ps->stats[STAT_ARMOR];
-		break;
 
 	case CG_PLAYER_AMMO_VALUE:
 		if ( cent->currentState.weapon )
@@ -67,23 +64,18 @@ float CG_GetValue( int ownerDraw ) {
 
 	case CG_PLAYER_SCORE:
 		return cg.snap->ps.persistant[PERS_SCORE];
-		break;
 
 	case CG_PLAYER_HEALTH:
 		return ps->stats[STAT_HEALTH];
-		break;
 
 	case CG_RED_SCORE:
 		return cgs.scores1;
-		break;
 
 	case CG_BLUE_SCORE:
 		return cgs.scores2;
-		break;
 
 	case CG_PLAYER_FORCE_VALUE:
 		return ps->fd.forcePower;
-		break;
 
 	default:
 		break;

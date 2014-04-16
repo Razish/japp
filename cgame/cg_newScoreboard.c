@@ -786,7 +786,6 @@ static int ListPlayers_Team( float fade, float x, float y, float fontScale, int 
 
 	case GT_TEAM:
 		return ListPlayers_TDM( fade, x, y, fontScale, fontHandle, lineHeight, team );
-		break;
 
 	case GT_SIEGE:
 		break;
@@ -794,7 +793,6 @@ static int ListPlayers_Team( float fade, float x, float y, float fontScale, int 
 	case GT_CTF:
 	case GT_CTY:
 		return ListPlayers_CTF( fade, x, y, fontScale, fontHandle, lineHeight, team );
-		break;
 
 	default:
 		break;

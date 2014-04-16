@@ -1816,7 +1816,7 @@ static int cg_siegeClassIndex = -2;
 
 #include "ui/ui_shared.h"
 
-static QINLINE void normalizeToLength( vector3 *vec, float length ) {
+static void normalizeToLength( vector3 *vec, float length ) {
 	float len, ilen;
 	len = vec->x*vec->x + vec->y*vec->y + vec->z*vec->z;
 	len = sqrtf( len );
@@ -1829,7 +1829,7 @@ static QINLINE void normalizeToLength( vector3 *vec, float length ) {
 	}
 }
 
-static QINLINE float angleBetween( vector3 *vec1, vector3 *vec2 ) {
+static float angleBetween( vector3 *vec1, vector3 *vec2 ) {
 	float angle;
 
 	angle = DotProduct( vec1, vec2 );
@@ -2312,7 +2312,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	JPLua_Event_RunFrame();
 
 	// actually issue the rendering calls
-	CG_DrawActive( stereoView );
+	CG_DrawActive();
 
 	cg.currentRefdef = REFDEF_AUTOMAP;
 	CG_DrawAutoMap();

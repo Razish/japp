@@ -1849,7 +1849,6 @@ void ParseAnimationEvtBlock( const char *aeb_filename, animevent_t *animEvents, 
 		default:				//unknown?
 			SkipRestOfLine( text_p );
 			continue;
-			break;
 		}
 
 		if ( curAnimEvent == lastAnimEvent ) {

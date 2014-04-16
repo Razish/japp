@@ -887,6 +887,8 @@ void SP_PAS( gentity_t *base )
 
 	base->physicsObject = qtrue;
 
+	base->r.svFlags |= SVF_NONNPC_ENEMY;
+
 	G_Sound( base, CHAN_BODY, G_SoundIndex( "sound/chars/turret/startup.wav" ) );
 }
 

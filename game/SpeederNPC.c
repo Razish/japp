@@ -186,7 +186,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh ) {
 		}
 	}
 	else {
-		if ( !pVeh->m_pVehicleInfo->strafePerc || (0 && pVeh->m_pParentEntity->s.number < MAX_CLIENTS) ) {//if in a strafe-capable vehicle, clear strafing unless using alternate control scheme
+		if ( !pVeh->m_pVehicleInfo->strafePerc ) {//if in a strafe-capable vehicle, clear strafing unless using alternate control scheme
 			//pVeh->m_ucmd.rightmove = 0;
 		}
 	}
@@ -324,6 +324,7 @@ void AnimateRiders( Vehicle_t *pVeh ) {
 		return;
 	}
 
+	//RAZFIXME: AnimateRiders
 	if ( 1 )
 		return;
 

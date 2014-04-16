@@ -574,7 +574,7 @@ void ProjectPointOnPlane( vector3 *dst, const vector3 *p, const vector3 *normal 
 	float inv_denom;
 
 	inv_denom = DotProduct( normal, normal );
-	assert( Q_fabs( inv_denom ) != 0.0f ); // bk010122 - zero vectors get here
+	assert( Q_fabs( inv_denom ) != 0.0f );
 	inv_denom = 1.0f / inv_denom;
 
 	d = DotProduct( normal, p ) * inv_denom;
@@ -637,7 +637,7 @@ float Q_rsqrt( float number ) {
 	//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
 
 #ifdef __linux__
-	assert( !isnan( y ) ); // bk010122 - FPE?
+	assert( !isnan( y ) );
 #endif
 	return y;
 }

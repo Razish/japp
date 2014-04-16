@@ -153,14 +153,13 @@ float FloatSwap( const float *f );
 // buildstring will be incorporated into the version string
 #define ARCH_STRING "x86"
 
-#define QINLINE __inline
-//	#define USE_SSE
+//#define USE_SSE
 
-static QINLINE short BigShort( short l ) { return ShortSwap( l ); }
+static short BigShort( short l ) { return ShortSwap( l ); }
 #define LittleShort
-static QINLINE int BigLong( int l ) { return LongSwap( l ); }
+static int BigLong( int l ) { return LongSwap( l ); }
 #define LittleLong
-static QINLINE float BigFloat( const float *l ) { return FloatSwap( l ); }
+static float BigFloat( const float *l ) { return FloatSwap( l ); }
 #define LittleFloat
 
 #define	PATH_SEP "\\"
@@ -183,7 +182,6 @@ static QINLINE float BigFloat( const float *l ) { return FloatSwap( l ); }
 #define __cdecl
 #define __declspec(x)
 #define stricmp strcasecmp
-#define QINLINE /*inline*/
 
 #if defined(__ppc__)
 #define ARCH_STRING "ppc"
@@ -244,10 +242,7 @@ static inline float LittleFloat( const float l ) { return FloatSwap( &l ); }
 #include <sys/mman.h>
 #include <unistd.h>
 
-// bk001205 - from Makefile
 #define stricmp strcasecmp
-
-#define QINLINE inline
 
 #if defined(__i386__)
 #define ARCH_STRING "i386"
@@ -285,7 +280,6 @@ static inline float LittleFloat( const float l ) { return FloatSwap( &l ); }
 
 #define RAND_MAX 2147483647
 
-// bk001205 - try
 #ifdef Q3_STATIC
 #define	GAME_HARD_LINKED
 #define	CGAME_HARD_LINKED
@@ -322,8 +316,6 @@ inline static float LittleFloat( const float *l ) { return FloatSwap( l ); }
 
 #define stricmp strcasecmp
 
-#define QINLINE inline
-
 #if defined(__i386__)
 #define ARCH_STRING "i386"
 #elif defined(__amd64__)
@@ -335,8 +327,6 @@ inline static float LittleFloat( const float *l ) { return FloatSwap( l ); }
 
 #define	PATH_SEP "/"
 #define DLL_EXT ".so"
-
-// bk010116 - omitted Q3STATIC (see Linux above), broken target
 
 #if !idppc
 static short BigShort( short l ) { return ShortSwap( l ); }

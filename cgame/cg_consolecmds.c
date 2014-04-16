@@ -92,7 +92,7 @@ static void CG_TellAttacker_f( void ) {
 	trap->SendClientCommand( command );
 }
 
-void CG_SiegeBriefingDisplay( int team, int dontshow );
+void CG_SiegeBriefingDisplay( int team, qboolean dontShow );
 static void CG_SiegeBriefing_f( void ) {
 	int team;
 
@@ -103,7 +103,7 @@ static void CG_SiegeBriefing_f( void ) {
 	if ( team != SIEGETEAM_TEAM1 && team != SIEGETEAM_TEAM2 )
 		return;
 
-	CG_SiegeBriefingDisplay( team, 0 );
+	CG_SiegeBriefingDisplay( team, qfalse );
 }
 
 static void CG_SiegeCvarUpdate_f( void ) {
@@ -117,7 +117,7 @@ static void CG_SiegeCvarUpdate_f( void ) {
 	if ( team != SIEGETEAM_TEAM1 && team != SIEGETEAM_TEAM2 )
 		return;
 
-	CG_SiegeBriefingDisplay( team, 1 );
+	CG_SiegeBriefingDisplay( team, qtrue );
 }
 
 static void CG_SiegeCompleteCvarUpdate_f( void ) {
@@ -126,8 +126,8 @@ static void CG_SiegeCompleteCvarUpdate_f( void ) {
 	}
 
 	// Set up cvars for both teams
-	CG_SiegeBriefingDisplay( SIEGETEAM_TEAM1, 1 );
-	CG_SiegeBriefingDisplay( SIEGETEAM_TEAM2, 1 );
+	CG_SiegeBriefingDisplay( SIEGETEAM_TEAM1, qtrue );
+	CG_SiegeBriefingDisplay( SIEGETEAM_TEAM2, qtrue );
 }
 
 static void CG_CopyNames_f( void ) {

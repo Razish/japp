@@ -596,6 +596,8 @@ void SP_misc_turret( gentity_t *base )
 	G_SetOrigin( base, &base->s.origin );
 
 	base->r.contents = CONTENTS_BODY;
+	//RAZTODO: SVF_NO_TELEPORT|SVF_SELF_ANIMATING
+	base->r.svFlags |= SVF_NONNPC_ENEMY;//|SVF_NO_TELEPORT|SVF_SELF_ANIMATING;
 
 	VectorSet( &base->r.maxs, 32.0f, 32.0f, 128.0f );
 	VectorSet( &base->r.mins, -32.0f, -32.0f, 0.0f );

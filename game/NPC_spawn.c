@@ -533,7 +533,6 @@ int NPC_WeaponsForTeam( team_t team, int spawnflags, const char *NPC_type ) {
 		}
 		//Stormtroopers, etc.
 		return (1 << WP_BLASTER);
-		break;
 
 	case NPCTEAM_PLAYER:
 
@@ -564,7 +563,6 @@ int NPC_WeaponsForTeam( team_t team, int spawnflags, const char *NPC_type ) {
 
 		//rebel
 		return (1 << WP_BLASTER);
-		break;
 
 	case NPCTEAM_NEUTRAL:
 
@@ -619,7 +617,7 @@ NPC_SetWeapons
 void NPC_SetWeapons( gentity_t *ent ) {
 	int			bestWeap = WP_NONE;
 	int			curWeap;
-	int			weapons = NPC_WeaponsForTeam( ent->client->playerTeam, ent->spawnflags, ent->NPC_type );
+	int			weapons = NPC_WeaponsForTeam( (team_t)ent->client->playerTeam, ent->spawnflags, ent->NPC_type );
 
 	ent->client->ps.stats[STAT_WEAPONS] = 0;
 	for ( curWeap = WP_SABER; curWeap < WP_NUM_WEAPONS; curWeap++ ) {
@@ -1777,8 +1775,7 @@ void SP_NPC_spawner( gentity_t *self ) {
 	}
 	else {
 		//NOTE: auto-spawners never check for shy spawning
-		//if ( spawning )
-		if ( 1 ) //just gonna always do this I suppose.
+		if ( level.spawning )
 		{//in entity spawn stage - map starting up
 			self->think = NPC_Spawn_Go;
 			self->nextthink = level.time + START_TIME_REMOVE_ENTS + 50;
@@ -3519,11 +3516,11 @@ void NPC_Kill_f( void ) {
 			return;
 		}
 
-		if ( Q_stricmp( "nonally", name ) == 0 ) {
+		if ( !Q_stricmp( "nonally", name ) ) {
 			killNonSF = qtrue;
 		}
 		else {
-			killTeam = (team_t)GetIDForString( TeamTable, name );
+			killTeam = GetIDForString( TeamTable, name );
 
 			if ( killTeam == NPCTEAM_FREE ) {
 				Com_Printf( S_COLOR_RED"NPC_Kill Error: team '%s' not recognized\n", name );
