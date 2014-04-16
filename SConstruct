@@ -101,7 +101,8 @@ files['lua'] = [
 	'lua/lua.c',
 	'lua/lundump.c',
 	'lua/lvm.c',
-	'lua/lzio.c' ]
+	'lua/lzio.c'
+	]
 
 files['udis86'] = [
 	'libudis86/decode.c',
@@ -110,7 +111,8 @@ files['udis86'] = [
 	'libudis86/syn-att.c',
 	'libudis86/syn-intel.c',
 	'libudis86/syn.c',
-	'libudis86/udis86.c' ] if bits == 32 else []
+	'libudis86/udis86.c'
+	] if bits == 32 else []
 
 files['game'] = [
 	'qcommon/q_math.c',
@@ -215,7 +217,8 @@ files['game'] = [
 	'game/tri_coll_test.c',
 	'game/w_force.c',
 	'game/w_saber.c',
-	'game/WalkerNPC.c' ] + files['lua'] + files['udis86']
+	'game/WalkerNPC.c'
+	] + files['lua'] + files['udis86']
 
 files['cgame'] = [
 	'qcommon/q_math.c',
@@ -285,7 +288,8 @@ files['cgame'] = [
 	'cgame/fx_flechette.c',
 	'cgame/fx_force.c',
 	'cgame/fx_heavyrepeater.c',
-	'cgame/fx_rocketlauncher.c' ] + files['lua']
+	'cgame/fx_rocketlauncher.c'
+	] + files['lua']
 
 files['ui'] = [
 	'qcommon/q_math.c',
@@ -305,7 +309,8 @@ files['ui'] = [
 	'ui/ui_main.c',
 	'ui/ui_saber.c',
 	'ui/ui_shared.c',
-	'ui/ui_syscalls.c' ] + files['udis86']
+	'ui/ui_syscalls.c'
+	] + files['udis86']
 
 # set up libraries to link with
 if plat == 'Linux':
@@ -321,11 +326,12 @@ elif plat == 'Windows':
 if plat == 'Linux':
 	env['CC'] = compiler
 	env['CPPDEFINES'] = [ '__GCC__' ]
-	env['CFLAGS'] = [ '-Wdeclaration-after-statement',
+	env['CFLAGS'] = [
+		'-Wdeclaration-after-statement',
 		'-Wnested-externs',
 		'-Wold-style-definition',
 		'-Wstrict-prototypes',
-	]
+		]
 	env['CCFLAGS'] = [
 		'-Wall', '-Wextra',
 		'-Wno-missing-braces',
@@ -356,23 +362,59 @@ if plat == 'Linux':
 		]
 	if compiler != 'clang':
 		env['CCFLAGS'] += [
+			'-mfpmath=sse',
 			'-Wlogical-op',
 			'-Wstack-usage=32768'
 			]
-	env['CXXFLAGS'] += [ '-std=c++11' ]
+	env['CXXFLAGS'] += [ '-fvisibility-inlines-hidden', '-std=c++11' ]
 	if analyse:
 		env['CC'] = 'clang'
-		env['CCFLAGS'] += [ '--analyze -O3' ]
+		env['CCFLAGS'] += [ '--analyze' ]
 	if bits == 32:
 		env['CCFLAGS'] += [ '-m32' ]
 		env['LINKFLAGS'] += [ '-m32' ]
+	env['CCFLAGS'] += [
+		'-fvisibility=hidden',
+		'-msse2',
+		'-mstackrealign'
+		]
 elif plat == 'Windows':
 	# assume msvc
-	env['CCFLAGS'] = [ '/nologo', '/W4', '/WX-', '/GS', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/GF', '/TC', '/errorReport:prompt', '/EHs', '/EHc', '/Ot', '/Zi', '/MP' ]
+	env['CCFLAGS'] = [
+		'/nologo',
+		'/W4',
+		'/WX-',
+		'/GS',
+		'/fp:precise',
+		'/Zc:wchar_t',
+		'/Zc:forScope',
+		'/Gd',
+		'/GF',
+		'/TC',
+		'/errorReport:prompt',
+		'/EHs',
+		'/EHc',
+		'/Ot',
+		'/Zi',
+		'/MP'
+		]
 	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS', '/MACHINE:'+arch, '/LTCG' ]
-	env['CPPDEFINES'] = [ '_WINDLL', '_MSC_EXTENSIONS', '_INTEGRAL_MAX_BITS=64', '_WIN32', '_MT', '_DLL', '_M_FP_PRECISE' ]
+	env['CPPDEFINES'] = [
+		'_WINDLL',
+		'_MSC_EXTENSIONS',
+		'_INTEGRAL_MAX_BITS=64',
+		'_WIN32',
+		'_MT',
+		'_DLL',
+		'_M_FP_PRECISE'
+		]
 	if bits == 32:
-		env['CCFLAGS'] += [ '/analyze-', '/Zp8', '/Gs', '/Oy-' ]
+		env['CCFLAGS'] += [
+			'/analyze-',
+			'/Zp8',
+			'/Gs',
+			'/Oy-'
+			]
 		env['CPPDEFINES'] += [ '_M_IX86=600', '_M_IX86_FP=2' ]
 	elif bits == 64:
 		env['CCFLAGS'] += [ '/Zp16' ]
@@ -380,8 +422,8 @@ elif plat == 'Windows':
 
 # debug / release
 if not debug or debug == 2:
-	if plat == 'Linux' and not analyse:
-		env['CCFLAGS'] += [ '-O2' ] # analysis sets higher optimisation level
+	if plat == 'Linux':
+		env['CCFLAGS'] += [ '-O3' ]
 	elif plat == 'Windows':
 		env['CCFLAGS'] += [ '/GL', '/Gm-', '/MD', '/O2', '/Oi' ]
 		if bits == 64:
@@ -393,7 +435,15 @@ if debug:
 		env['CCFLAGS'] += [ '-g3' ]
 	elif plat == 'Windows':
 		env['CPPDEFINES'] += [ '__MSVC_RUNTIME_CHECKS' ]
-		env['CCFLAGS'] += [ '/Gm', '/FD', '/MDd', '/Od', '/RTC1', '/RTCs', '/RTCu' ]
+		env['CCFLAGS'] += [
+			'/Gm',
+			'/FD',
+			'/MDd',
+			'/Od',
+			'/RTC1',
+			'/RTCs',
+			'/RTCu'
+			]
 		if bits == 32:
 			env['CCFLAGS'] += [ '/FC', '/ZI' ]
 	env['CPPDEFINES'] += [ '_DEBUG' ]
