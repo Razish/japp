@@ -41,7 +41,7 @@ NPC_PainFunc
 */
 
 PAIN_FUNC *NPC_PainFunc( gentity_t *ent ) {
-	void( *func )(gentity_t *self, gentity_t *attacker, int damage);
+	PAIN_FUNC *func;
 
 	if ( ent->client->ps.weapon == WP_SABER ) {
 		func = NPC_Jedi_Pain;
