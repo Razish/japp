@@ -665,13 +665,11 @@ void Fade( uint32_t *flags, float *f, float clamp, int *nextTime, int offsetTime
 
 void Window_Paint( windowDef_t *w, float fadeAmount, float fadeClamp, float fadeCycle ) {
 	//float bordersize = 0;
-	vector4 color;
 	rectDef_t fillRect = w->rect;
-
+	vector4 color;
 
 	if ( debugMode ) {
-		color.r = color.g = color.b = color.a = 1;
-		DC->drawRect( w->rect.x, w->rect.y, w->rect.w, w->rect.h, 1, &color );
+		DC->drawRect( w->rect.x, w->rect.y, w->rect.w, w->rect.h, 1, &g_color_table[ColorIndex( COLOR_WHITE )] );
 	}
 
 	if ( w == NULL || (w->style == 0 && w->border == 0) ) {
@@ -684,6 +682,11 @@ void Window_Paint( windowDef_t *w, float fadeAmount, float fadeClamp, float fade
 		fillRect.w -= w->borderSize + 1;
 		fillRect.h -= w->borderSize + 1;
 	}
+
+	if ( DC->getTeamColor )
+		DC->getTeamColor( &color );
+	else
+		VectorCopy4( &g_color_table[ColorIndex( COLOR_WHITE )], &color );
 
 	if ( w->style == WINDOW_STYLE_FILLED ) {
 		// box, but possible a shader that needs filled
@@ -720,10 +723,7 @@ void Window_Paint( windowDef_t *w, float fadeAmount, float fadeClamp, float fade
 		DC->setColor( NULL );
 	}
 	else if ( w->style == WINDOW_STYLE_TEAMCOLOR ) {
-		if ( DC->getTeamColor ) {
-			DC->getTeamColor( &color );
-			DC->fillRect( fillRect.x, fillRect.y, fillRect.w, fillRect.h, &color );
-		}
+		DC->fillRect( fillRect.x, fillRect.y, fillRect.w, fillRect.h, &color );
 	}
 	else if ( w->style == WINDOW_STYLE_CINEMATIC ) {
 		if ( w->cinematic == -1 ) {
