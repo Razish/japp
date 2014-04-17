@@ -376,7 +376,7 @@ static void G_SpewEntList( void ) {
 	const char *str;
 
 	time( &rawtime );
-	strftime( buf, sizeof(buf), "%Y-%m-%d_%H-%M-%S", gmtime( &rawtime ) );
+	strftime( buf, sizeof(buf), "%Y-%m-%d_%H-%M-%S", localtime( &rawtime ) );
 	trap->FS_Open( va( "entspew_%s.txt", buf ), &fh, FS_WRITE );
 	trap->FS_Write( va( "================================\nEntspew triggered at: %s\n================================\n\n", buf ), sizeof(buf), fh );
 

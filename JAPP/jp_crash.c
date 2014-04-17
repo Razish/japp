@@ -266,7 +266,7 @@ static const char *JP_Crash_GetCrashlogName( void ) {
 	time_t rawtime;
 
 	time( &rawtime );
-	strftime( buf, sizeof(buf), "JAPP-Crashlog_%Y-%m-%d_%H-%M-%S.log", gmtime( &rawtime ) );
+	strftime( buf, sizeof(buf), "JAPP-Crashlog_%Y-%m-%d_%H-%M-%S.log", localtime( &rawtime ) );
 
 	return buf;
 }
