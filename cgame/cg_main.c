@@ -855,7 +855,7 @@ qboolean CG_Asset_Parse( int handle ) {
 		}
 
 		// smallFont
-		if ( !Q_stricmp( token.string, "smallFont" ) ) {
+		else if ( !Q_stricmp( token.string, "smallFont" ) ) {
 			int pointSize;
 			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
 				break;
@@ -863,7 +863,7 @@ qboolean CG_Asset_Parse( int handle ) {
 		}
 
 		// smallFont
-		if ( !Q_stricmp( token.string, "small2Font" ) ) {
+		else if ( !Q_stricmp( token.string, "small2Font" ) ) {
 			int pointSize;
 			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
 				break;
@@ -871,7 +871,7 @@ qboolean CG_Asset_Parse( int handle ) {
 		}
 
 		// font
-		if ( !Q_stricmp( token.string, "bigfont" ) ) {
+		else if ( !Q_stricmp( token.string, "bigfont" ) ) {
 			int pointSize;
 			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
 				break;
@@ -879,81 +879,83 @@ qboolean CG_Asset_Parse( int handle ) {
 		}
 
 		// font
-		if ( !Q_stricmp( token.string, "monoFont" ) ) {
+		else if ( !Q_stricmp( token.string, "monoFont" ) ) {
 			int pointSize;
 			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
 				break;
 			cgDC.Assets.japp.fontMono = cgDC.RegisterFont(token.string);
 		}
-#endif
 
 		// gradientbar
+		else if ( !Q_stricmp( token.string, "gradientbar" ) ) {
+#else
 		if ( !Q_stricmp( token.string, "gradientbar" ) ) {
+#endif
 			if ( !trap->PC_ReadToken( handle, &token ) )
 				break;
 			cgDC.Assets.gradientBar = trap->R_RegisterShaderNoMip( token.string );
 		}
 
 		// enterMenuSound
-		if ( !Q_stricmp( token.string, "menuEnterSound" ) ) {
+		else if ( !Q_stricmp( token.string, "menuEnterSound" ) ) {
 			if ( !trap->PC_ReadToken( handle, &token ) )
 				break;
 			cgDC.Assets.menuEnterSound = trap->S_RegisterSound( token.string );
 		}
 
 		// exitMenuSound
-		if ( !Q_stricmp( token.string, "menuExitSound" ) ) {
+		else if ( !Q_stricmp( token.string, "menuExitSound" ) ) {
 			if ( !trap->PC_ReadToken( handle, &token ) )
 				break;
 			cgDC.Assets.menuExitSound = trap->S_RegisterSound( token.string );
 		}
 
 		// itemFocusSound
-		if ( !Q_stricmp( token.string, "itemFocusSound" ) ) {
+		else if ( !Q_stricmp( token.string, "itemFocusSound" ) ) {
 			if ( !trap->PC_ReadToken( handle, &token ) )
 				break;
 			cgDC.Assets.itemFocusSound = trap->S_RegisterSound( token.string );
 		}
 
 		// menuBuzzSound
-		if ( !Q_stricmp( token.string, "menuBuzzSound" ) ) {
+		else if ( !Q_stricmp( token.string, "menuBuzzSound" ) ) {
 			if ( !trap->PC_ReadToken( handle, &token ) )
 				break;
 			cgDC.Assets.menuBuzzSound = trap->S_RegisterSound( token.string );
 		}
 
-		if ( !Q_stricmp( token.string, "cursor" ) ) {
+		else if ( !Q_stricmp( token.string, "cursor" ) ) {
 			if ( !PC_String_Parse( handle, &cgDC.Assets.cursorStr ) )
 				break;
 			cgDC.Assets.cursor = trap->R_RegisterShaderNoMip( cgDC.Assets.cursorStr );
 		}
 
-		if ( !Q_stricmp( token.string, "fadeClamp" ) ) {
+		else if ( !Q_stricmp( token.string, "fadeClamp" ) ) {
 			if ( !PC_Float_Parse( handle, &cgDC.Assets.fadeClamp ) )
 				break;
 		}
 
-		if ( !Q_stricmp( token.string, "fadeCycle" ) ) {
+		else if ( !Q_stricmp( token.string, "fadeCycle" ) ) {
 			if ( !PC_Int_Parse( handle, &cgDC.Assets.fadeCycle ) )
 				break;
 		}
 
-		if ( !Q_stricmp( token.string, "fadeAmount" ) ) {
+		else if ( !Q_stricmp( token.string, "fadeAmount" ) ) {
 			if ( !PC_Float_Parse( handle, &cgDC.Assets.fadeAmount ) )
 				break;
 		}
 
-		if ( !Q_stricmp( token.string, "shadowX" ) ) {
+		else if ( !Q_stricmp( token.string, "shadowX" ) ) {
 			if ( !PC_Float_Parse( handle, &cgDC.Assets.shadowX ) )
 				break;
 		}
 
-		if ( !Q_stricmp( token.string, "shadowY" ) ) {
+		else if ( !Q_stricmp( token.string, "shadowY" ) ) {
 			if ( !PC_Float_Parse( handle, &cgDC.Assets.shadowY ) )
 				break;
 		}
 
-		if ( !Q_stricmp( token.string, "shadowColor" ) ) {
+		else if ( !Q_stricmp( token.string, "shadowColor" ) ) {
 			if ( !PC_Color_Parse( handle, &cgDC.Assets.shadowColor ) )
 				break;
 			cgDC.Assets.shadowFadeClamp = cgDC.Assets.shadowColor.a;
