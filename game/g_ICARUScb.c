@@ -1318,6 +1318,7 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value ) {
 		return 0;
 	case SET_INVISIBLE://## %t="BOOL_TYPES" # Makes an NPC not solid and not visible
 		*value = (ent->s.eFlags&EF_NODRAW);
+		break;
 	case SET_VAMPIRE://## %t="BOOL_TYPES" # Makes an NPC not solid and not visible
 		return 0;
 	case SET_FORCE_INVINCIBLE://## %t="BOOL_TYPES" # Makes an NPC not solid and not visible
