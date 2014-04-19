@@ -7784,8 +7784,10 @@ qboolean ItemParse_cvarFloat( itemDef_t *item, int handle ) {
 	return qfalse;
 }
 
-char currLanguage[32][128];
+#ifndef _CGAME
+static char currLanguage[32][128];
 static const char languageString[32] = "@MENUS_MYLANGUAGE";
+#endif
 
 qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 	pc_token_t token;
