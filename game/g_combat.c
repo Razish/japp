@@ -3596,7 +3596,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			return;
 		if ( targ->client->pers.adminData.isGhost )
 			return;
-		if ( japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK) )
+		if ( japp_chatProtection.integer && !targ->client->ps.duelInProgress && (targ->client->ps.eFlags & EF_TALK) )
 			return;
 	}
 	if ( attacker && attacker->client ) {
@@ -3604,7 +3604,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			return;
 		if ( attacker->client->pers.adminData.isGhost )
 			return;
-		if ( japp_chatProtection.integer && (attacker->client->ps.eFlags & EF_TALK) )
+		if ( japp_chatProtection.integer && !attacker->client->ps.duelInProgress && (attacker->client->ps.eFlags & EF_TALK) )
 			return;
 	}
 
