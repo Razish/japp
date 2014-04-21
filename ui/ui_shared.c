@@ -588,14 +588,13 @@ qboolean PC_Script_Parse( int handle, const char **out ) {
 		}
 
 		if ( token.string[1] != '\0' ) {
-			Q_strcat( script, 2048, va( "\"%s\"", token.string ) );
+			Q_strcat( script, sizeof(script), va( "\"%s\"", token.string ) );
 		}
 		else {
-			Q_strcat( script, 2048, token.string );
+			Q_strcat( script, sizeof(script), token.string );
 		}
-		Q_strcat( script, 2048, " " );
+		Q_strcat( script, sizeof(script), " " );
 	}
-	return qfalse; 	// bk001105 - LCC   missing return value
 }
 
 // display, window, menu, item code
@@ -666,13 +665,11 @@ void Fade( uint32_t *flags, float *f, float clamp, int *nextTime, int offsetTime
 
 void Window_Paint( windowDef_t *w, float fadeAmount, float fadeClamp, float fadeCycle ) {
 	//float bordersize = 0;
-	vector4 color;
 	rectDef_t fillRect = w->rect;
-
+	vector4 color;
 
 	if ( debugMode ) {
-		color.r = color.g = color.b = color.a = 1;
-		DC->drawRect( w->rect.x, w->rect.y, w->rect.w, w->rect.h, 1, &color );
+		DC->drawRect( w->rect.x, w->rect.y, w->rect.w, w->rect.h, 1, &g_color_table[ColorIndex( COLOR_WHITE )] );
 	}
 
 	if ( w == NULL || (w->style == 0 && w->border == 0) ) {
@@ -685,6 +682,11 @@ void Window_Paint( windowDef_t *w, float fadeAmount, float fadeClamp, float fade
 		fillRect.w -= w->borderSize + 1;
 		fillRect.h -= w->borderSize + 1;
 	}
+
+	if ( DC->getTeamColor )
+		DC->getTeamColor( &color );
+	else
+		VectorCopy4( &g_color_table[ColorIndex( COLOR_WHITE )], &color );
 
 	if ( w->style == WINDOW_STYLE_FILLED ) {
 		// box, but possible a shader that needs filled
@@ -721,10 +723,7 @@ void Window_Paint( windowDef_t *w, float fadeAmount, float fadeClamp, float fade
 		DC->setColor( NULL );
 	}
 	else if ( w->style == WINDOW_STYLE_TEAMCOLOR ) {
-		if ( DC->getTeamColor ) {
-			DC->getTeamColor( &color );
-			DC->fillRect( fillRect.x, fillRect.y, fillRect.w, fillRect.h, &color );
-		}
+		DC->fillRect( fillRect.x, fillRect.y, fillRect.w, fillRect.h, &color );
 	}
 	else if ( w->style == WINDOW_STYLE_CINEMATIC ) {
 		if ( w->cinematic == -1 ) {
@@ -2083,13 +2082,13 @@ qboolean Item_EnableShowViaCvar( itemDef_t *item, int flag ) {
 
 			// enable it if any of the values are true
 			if ( item->cvarFlags & flag ) {
-				if ( Q_stricmp( buff, val ) == 0 ) {
-					return qtrue;
+				if ( !Q_stricmp( buff, val ) ) {
+					break;
 				}
 			}
 			else {
 				// disable it if any of the values are true
-				if ( Q_stricmp( buff, val ) == 0 ) {
+				if ( !Q_stricmp( buff, val ) ) {
 					return qfalse;
 				}
 			}
@@ -2122,13 +2121,13 @@ qboolean Item_EnableShowViaCvar2( itemDef_t *item, int flag ) {
 
 			// enable it if any of the values are true
 			if ( item->cvarFlags & flag ) {
-				if ( Q_stricmp( buff, val ) == 0 ) {
-					return qtrue;
+				if ( !Q_stricmp( buff, val ) ) {
+					break;
 				}
 			}
 			else {
 				// disable it if any of the values are true
-				if ( Q_stricmp( buff, val ) == 0 ) {
+				if ( !Q_stricmp( buff, val ) ) {
 					return qfalse;
 				}
 			}
@@ -2146,13 +2145,12 @@ qboolean Item_SetFocus( itemDef_t *item, float x, float y ) {
 	itemDef_t *oldFocus;
 	sfxHandle_t *sfx = &DC->Assets.itemFocusSound;
 	qboolean playSound = qfalse;
-	menuDef_t *parent; // bk001206: = (menuDef_t*)item->parent;
+	menuDef_t *parent;
 	// sanity check, non-null, not a decoration and does not already have the focus
 	if ( item == NULL || item->window.flags & WINDOW_DECORATION || item->window.flags & WINDOW_HASFOCUS || !(item->window.flags & WINDOW_VISIBLE) ) {
 		return qfalse;
 	}
 
-	// bk001206 - this can be NULL.
 	parent = (menuDef_t*)item->parent;
 
 	// items can be enabled and disabled
@@ -3763,12 +3761,8 @@ qboolean Item_HandleKey( itemDef_t *item, int key, qboolean down ) {
 		captureFunc = 0;
 		captureData = NULL;
 	}
-	else {
-		// bk001206 - parentheses
-		if ( down && (key == A_MOUSE1 || key == A_MOUSE2 || key == A_MOUSE3) ) {
-			Item_StartCapture( item, key );
-		}
-	}
+	else if ( down && (key == A_MOUSE1 || key == A_MOUSE2 || key == A_MOUSE3) )
+		Item_StartCapture( item, key );
 
 	if ( !down ) {
 		return qfalse;
@@ -3777,13 +3771,10 @@ qboolean Item_HandleKey( itemDef_t *item, int key, qboolean down ) {
 	switch ( item->type ) {
 	case ITEM_TYPE_BUTTON:
 		return qfalse;
-		break;
 	case ITEM_TYPE_RADIOBUTTON:
 		return qfalse;
-		break;
 	case ITEM_TYPE_CHECKBOX:
 		return qfalse;
-		break;
 	case ITEM_TYPE_EDITFIELD:
 	case ITEM_TYPE_NUMERICFIELD:
 		if ( key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER ) {
@@ -3796,37 +3787,24 @@ qboolean Item_HandleKey( itemDef_t *item, int key, qboolean down ) {
 			//return Item_TextField_HandleKey(item, key);
 		}
 		return qfalse;
-		break;
 	case ITEM_TYPE_COMBO:
 		return qfalse;
-		break;
 	case ITEM_TYPE_LISTBOX:
 		return Item_ListBox_HandleKey( item, key, down, qfalse );
-		break;
 	case ITEM_TYPE_TEXTSCROLL:
 		return Item_TextScroll_HandleKey( item, key, down, qfalse );
-		break;
 	case ITEM_TYPE_YESNO:
 		return Item_YesNo_HandleKey( item, key );
-		break;
 	case ITEM_TYPE_MULTI:
 		return Item_Multi_HandleKey( item, key );
-		break;
 	case ITEM_TYPE_OWNERDRAW:
 		return Item_OwnerDraw_HandleKey( item, key );
-		break;
 	case ITEM_TYPE_BIND:
 		return Item_Bind_HandleKey( item, key, down );
-		break;
 	case ITEM_TYPE_SLIDER:
 		return Item_Slider_HandleKey( item, key, down );
-		break;
-		//case ITEM_TYPE_IMAGE:
-		//  Item_Image_Paint(item);
-		//  break;
 	default:
 		return qfalse;
-		break;
 	}
 
 	//return qfalse;
@@ -4038,7 +4016,6 @@ void Menu_HandleKey( menuDef_t *menu, int key, qboolean down ) {
 	// see if the mouse is within the window bounds and if so is this a mouse click
 	if ( down && !(menu->window.flags & WINDOW_POPUP) && !Rect_ContainsPoint( &menu->window.rect, DC->cursorx, DC->cursory ) ) {
 		static qboolean inHandleKey = qfalse;
-		// bk001206 - parentheses
 		if ( !inHandleKey && (key == A_MOUSE1 || key == A_MOUSE2 || key == A_MOUSE3) ) {
 			inHandleKey = qtrue;
 			Menus_HandleOOBClick( menu, key, down );
@@ -5061,7 +5038,7 @@ extern void UI_SaberAttachToChar( itemDef_t *item );
 #endif
 
 void Item_Model_Paint( itemDef_t *item ) {
-	float x, y, w, h;
+	float x, y, w, h, len;
 	refdef_t refdef;
 	refEntity_t		ent;
 	vector3			mins, maxs, origin;
@@ -5173,14 +5150,10 @@ void Item_Model_Paint( itemDef_t *item ) {
 	origin.y = 0.5f * (mins.y + maxs.y);
 
 	// calculate distance so the model nearly fills the box
-	if ( qtrue ) {
-		float len = 0.5f * (maxs.z - mins.z);
-		origin.x = len / 0.268f;	// len / tanf( fov/2 )
-		//origin[0] = len / tanf(w/2);
-	}
-	else {
-		origin.x = item->textscale;
-	}
+	len = 0.5f * (maxs.z - mins.z);
+	origin.x = len / 0.268f; // len / tanf( fov/2 )
+
+	//RAZTODO: aspect correction
 	refdef.fov_x = (modelPtr->fov_x) ? modelPtr->fov_x : (int)((float)refdef.width / (float)SCREEN_WIDTH * 90.0f);
 	refdef.fov_y = (modelPtr->fov_y) ? modelPtr->fov_y : atan2f( refdef.height, refdef.width / tanf( refdef.fov_x / 360 * M_PI ) ) * (360 / M_PI);
 
@@ -5687,15 +5660,15 @@ void Item_OwnerDraw_Paint( itemDef_t *item ) {
 		}
 
 		if ( item->disabled ) {
-			memcpy( &color, &parent->disableColor, sizeof(vector4) ); // bk001207 - FIXME: Com_Memcpy
+			memcpy( &color, &parent->disableColor, sizeof(vector4) );
 		}
 
 		if ( item->cvarFlags & (CVAR_ENABLE | CVAR_DISABLE) && !Item_EnableShowViaCvar( item, CVAR_ENABLE ) ) {
-			memcpy( &color, &parent->disableColor, sizeof(vector4) ); // bk001207 - FIXME: Com_Memcpy
+			memcpy( &color, &parent->disableColor, sizeof(vector4) );
 		}
 		//Raz: Added but broken
 		if ( item->cvarFlags & (CVAR_ENABLE2 | CVAR_DISABLE2) && !Item_EnableShowViaCvar2( item, CVAR_ENABLE2 ) ) {
-			memcpy( &color, &parent->disableColor, sizeof(vector4) ); // bk001207 - FIXME: Com_Memcpy
+			memcpy( &color, &parent->disableColor, sizeof(vector4) );
 		}
 
 		if ( item->text ) {
@@ -7811,8 +7784,10 @@ qboolean ItemParse_cvarFloat( itemDef_t *item, int handle ) {
 	return qfalse;
 }
 
-char currLanguage[32][128];
+#ifndef _CGAME
+static char currLanguage[32][128];
 static const char languageString[32] = "@MENUS_MYLANGUAGE";
+#endif
 
 qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 	pc_token_t token;
@@ -7862,16 +7837,11 @@ qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 
 	pass = 0;
 	while ( 1 ) {
-		char* psString;
-
-		//		if (!trap->PC_ReadToken(handle, &token)) {
-		//			PC_SourceError(handle, "end of file inside menu item\n");
-		//			return qfalse;
-		//		}
+		char *psString;
 
 		if ( !PC_String_Parse( handle, (const char **)&psString ) ) {
 			PC_SourceError( handle, "end of file inside menu item\n" );
-			return qfalse;
+			break;
 		}
 
 		//a normal StringAlloc ptr
@@ -7894,12 +7864,12 @@ qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 			pass = 0;
 			multiPtr->count++;
 			if ( multiPtr->count >= MAX_MULTI_CVARS ) {
-				return qfalse;
+				break;
 			}
 		}
 
 	}
-	return qfalse; 	// bk001205 - LCC missing return value
+	return qfalse;
 }
 
 qboolean ItemParse_cvarFloatList( itemDef_t *item, int handle ) {
@@ -7928,7 +7898,7 @@ qboolean ItemParse_cvarFloatList( itemDef_t *item, int handle ) {
 
 		if ( !PC_String_Parse( handle, (const char **)&string ) ) {
 			PC_SourceError( handle, "end of file inside menu item\n" );
-			return qfalse;
+			break;
 		}
 
 		//a normal StringAlloc ptr
@@ -7944,16 +7914,16 @@ qboolean ItemParse_cvarFloatList( itemDef_t *item, int handle ) {
 
 		multiPtr->cvarList[multiPtr->count] = string;
 		if ( !PC_Float_Parse( handle, &multiPtr->cvarValue[multiPtr->count] ) ) {
-			return qfalse;
+			break;
 		}
 
 		multiPtr->count++;
 		if ( multiPtr->count >= MAX_MULTI_CVARS ) {
-			return qfalse;
+			break;
 		}
 
 	}
-	return qfalse; 	// bk001205 - LCC missing return value
+	return qfalse;
 }
 
 
@@ -8229,10 +8199,10 @@ qboolean Item_Parse( int handle, itemDef_t *item ) {
 		}
 		if ( !key->func( item, handle ) ) {
 			PC_SourceError( handle, "couldn't parse menu item keyword %s", token.string );
-			return qfalse;
+			break;
 		}
 	}
-	return qfalse; 	// bk001205 - LCC missing return value
+	return qfalse;
 }
 
 static void Item_TextScroll_BuildLines( itemDef_t* item ) {
@@ -8495,7 +8465,7 @@ qboolean MenuParse_name( itemDef_t *item, int handle ) {
 
 qboolean MenuParse_fullscreen( itemDef_t *item, int handle ) {
 	menuDef_t *menu = (menuDef_t*)item;
-	if ( !PC_Int_Parse( handle, (int*)&menu->fullScreen ) ) { // bk001206 - cast qboolean
+	if ( !PC_Int_Parse( handle, (int*)&menu->fullScreen ) ) {
 		return qfalse;
 	}
 	return qtrue;
@@ -8963,10 +8933,10 @@ qboolean Menu_Parse( int handle, menuDef_t *menu ) {
 		}
 		if ( !key->func( (itemDef_t*)menu, handle ) ) {
 			PC_SourceError( handle, "couldn't parse menu keyword %s", token.string );
-			return qfalse;
+			break;
 		}
 	}
-	return qfalse; 	// bk001205 - LCC missing return value
+	return qfalse;
 }
 
 /*

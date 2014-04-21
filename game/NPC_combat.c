@@ -1119,46 +1119,7 @@ Only makes you keep your weapon up after you fire
 
 */
 int NPC_AttackDebounceForWeapon( void ) {
-	switch ( NPC->client->ps.weapon ) {
-		/*
-			case WP_BLASTER://scav rifle
-			return 1000;
-			break;
-
-			case WP_BRYAR_PISTOL://prifle
-			return 3000;
-			break;
-
-			case WP_SABER:
-			return 100;
-			break;
-
-
-			case WP_TRICORDER:
-			return 0;//tricorder
-			break;
-			*/
-	case WP_SABER:
-		return 0;
-		break;
-
-		/*
-	case WP_BOT_LASER:
-
-	if ( g_spSkill.integer == 0 )
-	return 2000;
-
-	if ( g_spSkill.integer == 1 )
-	return 1500;
-
-	return 1000;
-	break;
-	*/
-		//rwwFIXMEFIXME: support
-	default:
-		return NPCInfo->burstSpacing;//was 100 by default
-		break;
-	}
+	return (NPC->client->ps.weapon == WP_SABER) ? 0 : NPCInfo->burstSpacing;
 }
 
 //FIXME: need a mindist for explosive weapons
@@ -1170,17 +1131,9 @@ float NPC_MaxDistSquaredForWeapon( void ) {
 	switch ( NPC->s.weapon ) {
 	case WP_BLASTER://scav rifle
 		return 1024 * 1024;//should be shorter?
-		break;
 
 	case WP_BRYAR_PISTOL://prifle
 		return 1024 * 1024;
-		break;
-
-		/*
-	case WP_BLASTER_PISTOL://prifle
-	return 1024 * 1024;
-	break;
-	*/
 
 	case WP_DISRUPTOR://disruptor
 		if ( NPCInfo->scriptFlags & SCF_ALT_FIRE ) {
@@ -1189,17 +1142,6 @@ float NPC_MaxDistSquaredForWeapon( void ) {
 		else {
 			return 1024 * 1024;
 		}
-		break;
-		/*
-			case WP_SABER:
-			return 1024 * 1024;
-			break;
-
-
-			case WP_TRICORDER:
-			return 0;//tricorder
-			break;
-			*/
 	case WP_SABER:
 		if ( NPC->client && NPC->client->saber[0].blade[0].lengthMax ) {//FIXME: account for whether enemy and I are heading towards each other!
 			return (NPC->client->saber[0].blade[0].lengthMax + NPC->r.maxs.x*1.5f)*(NPC->client->saber[0].blade[0].lengthMax + NPC->r.maxs.x*1.5f);
@@ -1207,11 +1149,9 @@ float NPC_MaxDistSquaredForWeapon( void ) {
 		else {
 			return 48 * 48;
 		}
-		break;
 
 	default:
 		return 1024 * 1024;//was 0
-		break;
 	}
 }
 
@@ -1647,14 +1587,14 @@ gentity_t *NPC_CheckEnemy( qboolean findNew, qboolean tooFarOk, qboolean setEnem
 		}
 	}
 
-	//if ( NPC->svFlags & SVF_IGNORE_ENEMIES )
-	if ( 0 ) //rwwFIXMEFIXME: support for this flag
-	{//We're ignoring all enemies for now
+#if 0
+	if ( NPC->svFlags & SVF_IGNORE_ENEMIES ) {//We're ignoring all enemies for now
 		if ( setEnemy ) {
 			G_ClearEnemy( NPC );
 		}
 		return NULL;
 	}
+#endif
 
 	//rwwFIXMEFIXME: support for this flag
 	/*

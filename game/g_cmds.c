@@ -2956,6 +2956,30 @@ static void Cmd_Origin_f( gentity_t *ent ) {
 		vtos( &targ->client->ps.viewangles ) ) );
 }
 
+static void G_ResetSaberStyle( gentity_t *ent ) {
+	// dual
+	if ( ent->client->saber[0].model[0] && ent->client->saber[1].model[0] )
+		ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_DUAL;
+	// staff
+	else if ( (ent->client->saber[0].saberFlags&SFL_TWO_HANDED) )
+		ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_STAFF;
+	else {
+		ent->client->sess.saberLevel = Q_clampi( SS_FAST, ent->client->sess.saberLevel, SS_STRONG );
+		ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel;
+
+		// limit our saber style to our force points allocated to saber offense
+		if ( level.gametype != GT_SIEGE && ent->client->ps.fd.saberAnimLevel > ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] )
+			ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel = ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE];
+	}
+	// let's just make sure the styles we chose are cool
+	if ( level.gametype != GT_SIEGE ) {
+		if ( !WP_SaberStyleValidForSaber( &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, ent->client->ps.fd.saberAnimLevel ) ) {
+			WP_UseFirstValidSaberStyle( &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, &ent->client->ps.fd.saberAnimLevel );
+			ent->client->ps.fd.saberAnimLevelBase = ent->client->saberCycleQueue = ent->client->ps.fd.saberAnimLevel;
+		}
+	}
+}
+
 static void Cmd_Saber_f( gentity_t *ent ) {
 	int argc = trap->Argc();
 	int numSabers = 1;
@@ -2966,8 +2990,10 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 	if ( argc == 1 ) {
 		if ( numSabers == 1 )
 			trap->SendServerCommand( ent - g_entities, va( "print \"Saber is %s\n\"", ent->client->pers.saber1 ) );
-		else
-			trap->SendServerCommand( ent - g_entities, va( "print \"Sabers are %s and %s\n\"", ent->client->pers.saber1, ent->client->pers.saber2 ) );
+		else {
+			trap->SendServerCommand( ent - g_entities, va( "print \"Sabers are %s and %s\n\"", ent->client->pers.saber1,
+				ent->client->pers.saber2 ) );
+		}
 	}
 	else if ( !(japp_allowSaberSwitch.integer & (1 << level.gametype)) ) {
 		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Not allowed to change saber\n\"" );
@@ -2976,62 +3002,57 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 	else {
 		char saber1[MAX_TOKEN_CHARS], saber2[MAX_TOKEN_CHARS], userinfo[MAX_INFO_STRING];
 		const char *saber, *key, *value;
+		saberInfo_t oldSabers[MAX_SABERS];
 		int i;
+		qboolean valid = qtrue;
+
+		// busy
+		if ( ent->client->ps.weaponTime > 0 || ent->client->ps.saberMove > LS_READY || ent->client->ps.fd.forcePowersActive
+			|| ent->client->ps.groundEntityNum == ENTITYNUM_NONE || ent->client->ps.duelInProgress
+			|| BG_InKnockDown( ent->client->ps.legsAnim ) || BG_InRoll( &ent->client->ps, ent->client->ps.legsAnim ) ) {
+			trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Not allowed to change saber when busy\n\"" );
+			return;
+		}
+
+		//HACK: should really find a way around this :D
+		if ( japp_antiUserinfoFlood.integer && ent->userinfoSpam >= 12 )
+			return;
 
 		// first saber
 		trap->Argv( 1, saber1, sizeof(saber1) );
-		trap->SendServerCommand( ent - g_entities, va( "print \"Setting first saber to %s\n\"", saber1 ) );
 
 		// second saber if specified
-		if ( argc == 3 ) {
+		if ( argc == 3 )
 			trap->Argv( 2, saber2, sizeof(saber2) );
-			trap->SendServerCommand( ent - g_entities, va( "print \"Setting second saber to %s\n\"", saber2 ) );
-		}
 		else
 			Q_strncpyz( saber2, "none", sizeof(saber2) );
 
-		trap->GetUserinfo( ent - g_entities, userinfo, sizeof(userinfo) );
-
-		G_SetSaber( ent, 0, saber1, qfalse );
-		G_SetSaber( ent, 1, saber2, qfalse );
-
-		if ( !ClientUserinfoChanged( ent - g_entities ) )
-			return;
+		memcpy( oldSabers, ent->client->saber, sizeof(saberInfo_t) * MAX_SABERS );
+		if ( !G_SetSaber( ent, 0, saber1, qfalse ) || !G_SetSaber( ent, 1, saber2, qfalse )
+			|| !ClientUserinfoChanged( ent - g_entities ) ) {
+			memcpy( ent->client->saber, oldSabers, sizeof(saberInfo_t) * MAX_SABERS );
+			G_SetSaber( ent, 0, oldSabers[0].name, qfalse );
+			G_SetSaber( ent, 1, oldSabers[1].name, qfalse );
+			valid = qfalse;
+		}
 
 		// make sure the saber models are updated
 		G_SaberModelSetup( ent );
 
-		for ( i = 0; i < MAX_SABERS; i++ ) {
-			saber = (i & 1) ? ent->client->pers.saber2 : ent->client->pers.saber1;
-			key = va( "saber%d", i + 1 );
-			value = Info_ValueForKey( userinfo, key );
-			if ( Q_stricmp( value, saber ) ) {// they don't match up, force the user info
-				Info_SetValueForKey( userinfo, key, saber );
-				trap->SetUserinfo( ent - g_entities, userinfo );
+		if ( valid ) {
+			trap->GetUserinfo( ent - g_entities, userinfo, sizeof(userinfo) );
+			for ( i = 0; i < MAX_SABERS; i++ ) {
+				saber = (i & 1) ? ent->client->pers.saber2 : ent->client->pers.saber1;
+				key = va( "saber%d", i + 1 );
+				value = Info_ValueForKey( userinfo, key );
+				if ( Q_stricmp( value, saber ) ) {// they don't match up, force the user info
+					Info_SetValueForKey( userinfo, key, saber );
+					trap->SetUserinfo( ent - g_entities, userinfo );
+				}
 			}
 		}
 
-		// dual
-		if ( ent->client->saber[0].model[0] && ent->client->saber[1].model[0] )
-			ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_DUAL;
-		// staff
-		else if ( (ent->client->saber[0].saberFlags&SFL_TWO_HANDED) )
-			ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_STAFF;
-		else {
-			ent->client->sess.saberLevel = Q_clampi( SS_FAST, ent->client->sess.saberLevel, SS_STRONG );
-			ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel;
-
-			// limit our saber style to our force points allocated to saber offense
-			if ( level.gametype != GT_SIEGE && ent->client->ps.fd.saberAnimLevel > ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] )
-				ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel = ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE];
-		}
-		// let's just make sure the styles we chose are cool
-		if ( level.gametype != GT_SIEGE ) {
-			if ( !WP_SaberStyleValidForSaber( &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, ent->client->ps.fd.saberAnimLevel ) ) {
-				WP_UseFirstValidSaberStyle( &ent->client->saber[0], &ent->client->saber[1], ent->client->ps.saberHolstered, &ent->client->ps.fd.saberAnimLevel );
-				ent->client->ps.fd.saberAnimLevelBase = ent->client->saberCycleQueue = ent->client->ps.fd.saberAnimLevel;
-			}
-		}
+		G_ResetSaberStyle( ent );
 	}
 }
 

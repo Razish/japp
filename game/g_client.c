@@ -2982,7 +2982,7 @@ void ClientSpawn( gentity_t *ent ) {
 	for ( i = 0; i < HL_MAX; i++ )
 		ent->locationDamage[i] = 0;
 
-	memset( client, 0, sizeof(*client) ); // bk FIXME: Com_Memset?
+	memset( client, 0, sizeof(*client) );
 	client->bodyGrabIndex = ENTITYNUM_NONE;
 
 	//Get the skin RGB based on his userinfo

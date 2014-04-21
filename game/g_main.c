@@ -1505,7 +1505,7 @@ void QDECL G_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	else {
 		time_t rawtime;
 		time( &rawtime );
-		strftime( string, sizeof(string), "[%Y-%m-%d] [%H:%M:%S] ", gmtime( &rawtime ) );
+		strftime( string, sizeof(string), "[%Y-%m-%d] [%H:%M:%S] ", localtime( &rawtime ) );
 	}
 
 	len = strlen( string );

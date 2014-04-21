@@ -359,41 +359,16 @@ void G_SiegeSetObjectiveComplete( int team, int objective, qboolean failIt ) {
 
 //Returns qtrue if objective complete currently, otherwise qfalse
 qboolean G_SiegeGetCompletionStatus( int team, int objective ) {
-	char *p = NULL;
 	int onObjective = 0;
+	char *p = strstr( gObjectiveCfgStr, (team == SIEGETEAM_TEAM1) ? "t1" : "t2" );
 
-	if ( team == SIEGETEAM_TEAM1 ) {
-		p = strstr( gObjectiveCfgStr, "t1" );
-	}
-	else if ( team == SIEGETEAM_TEAM2 ) {
-		p = strstr( gObjectiveCfgStr, "t2" );
-	}
-
-	if ( !p ) {
-		assert( 0 );
-		return qfalse;
-	}
-
-	//Parse from the beginning of this team's objectives until we get to the desired objective
-	//number.
+	//Parse from the beginning of this team's objectives until we get to the desired objective number.
 	while ( p && *p && *p != '|' ) {
-		if ( *p == '-' ) {
+		if ( *p == '-' )
 			onObjective++;
-		}
 
-		if ( onObjective == objective ) { //this is the one we want
-			//Move to the next char, the status of this objective
-			p++;
-
-			//return qtrue if it's '1', qfalse if it's anything else
-			if ( *p == '1' ) {
-				return qtrue;
-			}
-			else {
-				return qfalse;
-			}
-			break;
-		}
+		if ( onObjective == objective )
+			return (*(++p) == '1'); // Move to the next char, the status of this objective
 
 		p++;
 	}

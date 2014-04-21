@@ -3670,221 +3670,110 @@ static qboolean Jedi_AttackDecide( int enemy_dist ) {
 #define	JUMP_SPEED		200.0f
 
 static qboolean Jedi_Jump( vector3 *dest, int goalEntNum ) {//FIXME: if land on enemy, knock him down & jump off again
-	/*
-	if ( dest[2] - NPC->r.currentorigin.z < 64 && DistanceHorizontal( NPC->r.currentOrigin, dest ) > 256 )
-	{//a pretty horizontal jump, easy to fake:
-	vector3 enemy_diff;
+	float targetDist, shotSpeed = 300, travelTime, impactDist, bestImpactDist = Q3_INFINITE;
+	vector3 targetDir, shotVel, failCase, lastPos, testPos, bottom;
+	int elapsedTime, timeStep = 500, hitCount = 0, maxHits = 7;
+	trace_t trace;
+	trajectory_t tr;
+	qboolean blocked;
 
-	VectorSubtract( dest, NPC->r.currentOrigin, enemy_diff );
-	float enemy_z_diff = enemy_diff[2];
-	enemy_diff[2] = 0;
-	float enemy_xy_diff = VectorNormalize( enemy_diff );
+	while ( hitCount < maxHits ) {
+		VectorSubtract( dest, &NPC->r.currentOrigin, &targetDir );
+		targetDist = VectorNormalize( &targetDir );
 
-	VectorScale( enemy_diff, enemy_xy_diff*0.8f, NPC->client->ps.velocity );
-	if ( enemy_z_diff < 64 )
-	{
-	NPC->client->ps.velocity[2] = enemy_xy_diff;
-	}
-	else
-	{
-	NPC->client->ps.velocity[2] = enemy_z_diff*2+enemy_xy_diff/2;
-	}
-	}
-	else
-	*/
-	if ( 1 ) {
-		float	targetDist, shotSpeed = 300, travelTime, impactDist, bestImpactDist = Q3_INFINITE;//fireSpeed,
-		vector3	targetDir, shotVel, failCase;
-		trace_t	trace;
-		trajectory_t	tr;
-		qboolean	blocked;
-		int		elapsedTime, timeStep = 500, hitCount = 0, maxHits = 7;
-		vector3	lastPos, testPos, bottom;
+		VectorScale( &targetDir, shotSpeed, &shotVel );
+		travelTime = targetDist / shotSpeed;
+		shotVel.z += travelTime * 0.5f * NPC->client->ps.gravity;
 
-		while ( hitCount < maxHits ) {
-			VectorSubtract( dest, &NPC->r.currentOrigin, &targetDir );
-			targetDist = VectorNormalize( &targetDir );
+		if ( !hitCount ) {//save the first one as the worst case scenario
+			VectorCopy( &shotVel, &failCase );
+		}
 
-			VectorScale( &targetDir, shotSpeed, &shotVel );
-			travelTime = targetDist / shotSpeed;
-			shotVel.z += travelTime * 0.5f * NPC->client->ps.gravity;
+		blocked = qfalse;
 
-			if ( !hitCount ) {//save the first one as the worst case scenario
-				VectorCopy( &shotVel, &failCase );
+		VectorCopy( &NPC->r.currentOrigin, &tr.trBase );
+		VectorCopy( &shotVel, &tr.trDelta );
+		tr.trType = TR_GRAVITY;
+		tr.trTime = level.time;
+		travelTime *= 1000.0f;
+		VectorCopy( &NPC->r.currentOrigin, &lastPos );
+
+		//This may be kind of wasteful, especially on long throws... use larger steps?  Divide the travelTime into a certain hard number of slices?  Trace just to apex and down?
+		for ( elapsedTime = timeStep; elapsedTime < floor( travelTime ) + timeStep; elapsedTime += timeStep ) {
+			if ( (float)elapsedTime > travelTime ) {//cap it
+				elapsedTime = floor( travelTime );
+			}
+			BG_EvaluateTrajectory( &tr, level.time + elapsedTime, &testPos );
+			if ( testPos.z < lastPos.z ) {//going down, ignore botclip
+				trap->Trace( &trace, &lastPos, &NPC->r.mins, &NPC->r.maxs, &testPos, NPC->s.number, NPC->clipmask, qfalse, 0, 0 );
+			}
+			else {//going up, check for botclip
+				trap->Trace( &trace, &lastPos, &NPC->r.mins, &NPC->r.maxs, &testPos, NPC->s.number, NPC->clipmask | CONTENTS_BOTCLIP, qfalse, 0, 0 );
 			}
 
-			if ( 1 )//tracePath )
-			{//do a rough trace of the path
-				blocked = qfalse;
-
-				VectorCopy( &NPC->r.currentOrigin, &tr.trBase );
-				VectorCopy( &shotVel, &tr.trDelta );
-				tr.trType = TR_GRAVITY;
-				tr.trTime = level.time;
-				travelTime *= 1000.0f;
-				VectorCopy( &NPC->r.currentOrigin, &lastPos );
-
-				//This may be kind of wasteful, especially on long throws... use larger steps?  Divide the travelTime into a certain hard number of slices?  Trace just to apex and down?
-				for ( elapsedTime = timeStep; elapsedTime < floor( travelTime ) + timeStep; elapsedTime += timeStep ) {
-					if ( (float)elapsedTime > travelTime ) {//cap it
-						elapsedTime = floor( travelTime );
-					}
-					BG_EvaluateTrajectory( &tr, level.time + elapsedTime, &testPos );
-					if ( testPos.z < lastPos.z ) {//going down, ignore botclip
-						trap->Trace( &trace, &lastPos, &NPC->r.mins, &NPC->r.maxs, &testPos, NPC->s.number, NPC->clipmask, qfalse, 0, 0 );
-					}
-					else {//going up, check for botclip
-						trap->Trace( &trace, &lastPos, &NPC->r.mins, &NPC->r.maxs, &testPos, NPC->s.number, NPC->clipmask | CONTENTS_BOTCLIP, qfalse, 0, 0 );
-					}
-
-					if ( trace.allsolid || trace.startsolid ) {
+			if ( trace.allsolid || trace.startsolid ) {
+				blocked = qtrue;
+				break;
+			}
+			if ( trace.fraction < 1.0f ) {//hit something
+				if ( trace.entityNum == goalEntNum ) {//hit the enemy, that's perfect!
+					//Hmm, don't want to land on him, though...
+					break;
+				}
+				else {
+					if ( trace.contents & CONTENTS_BOTCLIP ) {//hit a do-not-enter brush
 						blocked = qtrue;
 						break;
 					}
-					if ( trace.fraction < 1.0f ) {//hit something
-						if ( trace.entityNum == goalEntNum ) {//hit the enemy, that's perfect!
-							//Hmm, don't want to land on him, though...
-							break;
-						}
-						else {
-							if ( trace.contents & CONTENTS_BOTCLIP ) {//hit a do-not-enter brush
-								blocked = qtrue;
-								break;
-							}
-							if ( trace.plane.normal.z > 0.7f && DistanceSquared( &trace.endpos, dest ) < 4096 )//hit within 64 of desired location, should be okay
-							{//close enough!
-								break;
-							}
-							else {//FIXME: maybe find the extents of this brush and go above or below it on next try somehow?
-								impactDist = DistanceSquared( &trace.endpos, dest );
-								if ( impactDist < bestImpactDist ) {
-									bestImpactDist = impactDist;
-									VectorCopy( &shotVel, &failCase );
-								}
-								blocked = qtrue;
-								break;
-							}
-						}
-					}
-					if ( elapsedTime == (int)floor( travelTime ) ) {//reached end, all clear
-						if ( trace.fraction >= 1.0f ) {//hmm, make sure we'll land on the ground...
-							//FIXME: do we care how far below ourselves or our dest we'll land?
-							VectorCopy( &trace.endpos, &bottom );
-							bottom.z -= 128;
-							trap->Trace( &trace, &trace.endpos, &NPC->r.mins, &NPC->r.maxs, &bottom, NPC->s.number, NPC->clipmask, qfalse, 0, 0 );
-							if ( trace.fraction >= 1.0f ) {//would fall too far
-								blocked = qtrue;
-							}
-						}
+					if ( trace.plane.normal.z > 0.7f && DistanceSquared( &trace.endpos, dest ) < 4096 )//hit within 64 of desired location, should be okay
+					{//close enough!
 						break;
 					}
-					else {
-						//all clear, try next slice
-						VectorCopy( &testPos, &lastPos );
+					else {//FIXME: maybe find the extents of this brush and go above or below it on next try somehow?
+						impactDist = DistanceSquared( &trace.endpos, dest );
+						if ( impactDist < bestImpactDist ) {
+							bestImpactDist = impactDist;
+							VectorCopy( &shotVel, &failCase );
+						}
+						blocked = qtrue;
+						break;
 					}
-				}
-				if ( blocked ) {//hit something, adjust speed (which will change arc)
-					hitCount++;
-					shotSpeed = 300 + ((hitCount - 2) * 100);//from 100 to 900 (skipping 300)
-					if ( hitCount >= 2 ) {//skip 300 since that was the first value we tested
-						shotSpeed += 100;
-					}
-				}
-				else {//made it!
-					break;
 				}
 			}
-			else {//no need to check the path, go with first calc
+			if ( elapsedTime == (int)floor( travelTime ) ) {//reached end, all clear
+				if ( trace.fraction >= 1.0f ) {//hmm, make sure we'll land on the ground...
+					//FIXME: do we care how far below ourselves or our dest we'll land?
+					VectorCopy( &trace.endpos, &bottom );
+					bottom.z -= 128;
+					trap->Trace( &trace, &trace.endpos, &NPC->r.mins, &NPC->r.maxs, &bottom, NPC->s.number, NPC->clipmask, qfalse, 0, 0 );
+					if ( trace.fraction >= 1.0f ) {//would fall too far
+						blocked = qtrue;
+					}
+				}
 				break;
 			}
+			else {
+				//all clear, try next slice
+				VectorCopy( &testPos, &lastPos );
+			}
 		}
-
-		if ( hitCount >= maxHits ) {//NOTE: worst case scenario, use the one that impacted closest to the target (or just use the first try...?)
-			//NOTE: or try failcase?
-			VectorCopy( &failCase, &NPC->client->ps.velocity );
+		if ( blocked ) {//hit something, adjust speed (which will change arc)
+			hitCount++;
+			shotSpeed = 300 + ((hitCount - 2) * 100);//from 100 to 900 (skipping 300)
+			if ( hitCount >= 2 ) {//skip 300 since that was the first value we tested
+				shotSpeed += 100;
+			}
 		}
-		VectorCopy( &shotVel, &NPC->client->ps.velocity );
+		else {//made it!
+			break;
+		}
 	}
-	else {//a more complicated jump
-		vector3		dir, p1, p2, apex;
-		float		time, height, forward, z, xy, dist, apexHeight;
 
-		if ( NPC->r.currentOrigin.z > dest->z )//NPCInfo->goalEntity->r.currentOrigin
-		{
-			VectorCopy( &NPC->r.currentOrigin, &p1 );
-			VectorCopy( dest, &p2 );//NPCInfo->goalEntity->r.currentOrigin
-		}
-		else if ( NPC->r.currentOrigin.z < dest->z )//NPCInfo->goalEntity->r.currentOrigin
-		{
-			VectorCopy( dest, &p1 );//NPCInfo->goalEntity->r.currentOrigin
-			VectorCopy( &NPC->r.currentOrigin, &p2 );
-		}
-		else {
-			VectorCopy( &NPC->r.currentOrigin, &p1 );
-			VectorCopy( dest, &p2 );//NPCInfo->goalEntity->r.currentOrigin
-		}
-
-		//z = xy*xy
-		VectorSubtract( &p2, &p1, &dir );
-		dir.z = 0;
-
-		//Get xy and z diffs
-		xy = VectorNormalize( &dir );
-		z = p1.z - p2.z;
-
-		apexHeight = APEX_HEIGHT / 2;
-
-		//Determine most desirable apex height
-		//FIXME: length of xy will change curve of parabola, need to account for this
-		//somewhere... PARA_WIDTH
-		/*
-		apexHeight = (APEX_HEIGHT * PARA_WIDTH/xy) + (APEX_HEIGHT * z/128);
-		if ( apexHeight < APEX_HEIGHT * 0.5f )
-		{
-		apexHeight = APEX_HEIGHT*0.5f;
-		}
-		else if ( apexHeight > APEX_HEIGHT * 2 )
-		{
-		apexHeight = APEX_HEIGHT*2;
-		}
-		*/
-
-		z = (sqrtf( apexHeight + z ) - sqrtf( apexHeight ));
-
-		assert( z >= 0 );
-
-		//		Com_Printf("apex is %4.2f percent from p1: ", (xy-z)*0.5/xy*100.0f);
-
-		xy -= z;
-		xy *= 0.5f;
-
-		assert( xy > 0 );
-
-		VectorMA( &p1, xy, &dir, &apex );
-		apex.z += apexHeight;
-
-		VectorCopy( &apex, &NPC->pos1 );
-
-		//Now we have the apex, aim for it
-		height = apex.z - NPC->r.currentOrigin.z;
-		time = sqrtf( height / (.5f * NPC->client->ps.gravity) );//was 0.5f, but didn't work well for very long jumps
-		if ( !(int)time ) {
-			//Com_Printf( S_COLOR_RED"ERROR: no time in jump\n" );
-			return qfalse;
-		}
-
-		VectorSubtract( &apex, &NPC->r.currentOrigin, &NPC->client->ps.velocity );
-		NPC->client->ps.velocity.z = 0;
-		dist = VectorNormalize( &NPC->client->ps.velocity );
-
-		forward = dist / time * 1.25f;//er... probably bad, but...
-		VectorScale( &NPC->client->ps.velocity, forward, &NPC->client->ps.velocity );
-
-		//FIXME:  Uh.... should we trace/EvaluateTrajectory this to make sure we have clearance and we land where we want?
-		NPC->client->ps.velocity.z = time * NPC->client->ps.gravity;
-
-		//Com_Printf("Jump Velocity: %4.2f, %4.2f, %4.2f\n", NPC->client->ps.velocity.x, NPC->client->ps.velocity.y, NPC->client->ps.velocity[2] );
+	if ( hitCount >= maxHits ) {//NOTE: worst case scenario, use the one that impacted closest to the target (or just use the first try...?)
+		//NOTE: or try failcase?
+		VectorCopy( &failCase, &NPC->client->ps.velocity );
 	}
+	VectorCopy( &shotVel, &NPC->client->ps.velocity );
 	return qtrue;
 }
 

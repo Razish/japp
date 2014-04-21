@@ -64,7 +64,7 @@ messageMode_t chatMode;
 static int chatTargetClient = -1;
 static qboolean chatActive;
 
-static QINLINE int CG_GetChatboxFont( void ) {
+static int CG_GetChatboxFont( void ) {
 	return Q_clampi( FONT_SMALL, cg_chatboxFont.integer, FONT_NUM_FONTS );
 }
 

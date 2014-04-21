@@ -1160,7 +1160,6 @@ qboolean G_StandingAnim( int anim ) {
 	case BOTH_STAND3:
 	case BOTH_STAND4:
 		return qtrue;
-		break;
 
 	default:
 		return qfalse;
@@ -2120,14 +2119,9 @@ void ClientThink_real( gentity_t *ent ) {
 					//rwwFIXMEFIXME: do this and also check for all real client
 					if ( 1 ) {
 						//Slow down on turns - don't orbit!!!
-						float turndelta = 0;
-						// if the NPC is locked into a Yaw, we want to check the lockedDesiredYaw...otherwise the NPC can't walk backwards, because it always thinks it trying to turn according to desiredYaw
-						//if( client->renderInfo.renderFlags & RF_LOCKEDANGLE ) // yeah I know the RF_ flag is a pretty ugly hack...
-						if ( 0 ) //rwwFIXMEFIXME: ...
-							turndelta = (180 - fabsf( AngleDelta( ent->r.currentAngles.yaw, ent->NPC->lockedDesiredYaw ) )) / 180;
-						else
-							turndelta = (180 - fabsf( AngleDelta( ent->r.currentAngles.yaw, ent->NPC->desiredYaw ) )) / 180;
-
+						float turndelta = (180 - fabsf( AngleDelta( ent->r.currentAngles.yaw, ent->NPC->desiredYaw ) )) / 180;
+						// if the NPC is locked into a Yaw, we want to check the lockedDesiredYaw...otherwise the NPC
+						//	can't walk backwards, because it always thinks it trying to turn according to desiredYaw
 						if ( turndelta < 0.75f )
 							client->ps.speed = 0;
 						else if ( ent->NPC->distToGoal < 100 && turndelta < 1.0f ) {//Turn is greater than 45 degrees or closer than 100 to goal
@@ -2366,21 +2360,6 @@ void ClientThink_real( gentity_t *ent ) {
 
 	if ( ent->client->ps.heldByClient )
 		ent->client->ps.heldByClient = 0;
-
-	// Will probably never need this again, since we have g2 properly serverside now.
-	/*
-	if ( client->ps.usingATST && ent->health > 0 ) {
-	// we have special shot clip boxes as an ATST
-	ent->r.contents |= CONTENTS_NOSHOT;
-	ATST_ManageDamageBoxes( ent );
-	}
-	else {
-	ent->r.contents &= ~CONTENTS_NOSHOT;
-	client->damageBoxHandle_Head = 0;
-	client->damageBoxHandle_RLeg = 0;
-	client->damageBoxHandle_LLeg = 0;
-	}
-	*/
 
 	// set up for pmove
 	oldEventSequence = client->ps.eventSequence;

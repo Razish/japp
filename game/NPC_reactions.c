@@ -554,8 +554,7 @@ void NPC_Touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	}
 	else {//FIXME: check for SVF_NONNPC_ENEMY flag here?
 		if ( other->health > 0 ) {
-			//if ( NPC->enemy == other && (other->svFlags&SVF_NONNPC_ENEMY) )
-			if ( 0 ) //rwwFIXMEFIXME: Can probably just check if num < MAX_CLIENTS for non-npc enemy stuff
+			if ( NPC->enemy == other && (other->r.svFlags & SVF_NONNPC_ENEMY) )
 			{
 				NPCInfo->touchedByPlayer = other;
 			}
@@ -675,18 +674,16 @@ void NPC_Respond( gentity_t *self, int userNum ) {
 		break;
 	case CLASS_JEDI:
 		if ( !self->enemy ) {
+#if 0
 			/*
-			if ( !(self->svFlags&SVF_IGNORE_ENEMIES)
-			&& (self->NPC->scriptFlags&SCF_LOOK_FOR_ENEMIES)
-			&& self->client->enemyTeam == TEAM_ENEMY )
+			if ( !(self->svFlags & SVF_IGNORE_ENEMIES) && (self->NPC->scriptFlags & SCF_LOOK_FOR_ENEMIES)
+				&& self->client->enemyTeam == TEAM_ENEMY )
 			*/
 			if ( 0 ) //rwwFIXMEFIXME: support flags!
-			{
 				event = Q_irand( EV_ANGER1, EV_ANGER3 );
-			}
-			else {
+			else
+#endif
 				event = Q_irand( EV_TAUNT1, EV_TAUNT2 );
-			}
 		}
 		break;
 	case CLASS_PRISONER:

@@ -465,8 +465,8 @@ void NPC_PrecacheAnimationCFG( const char *NPC_type ) {
 #endif
 }
 
-extern int NPC_WeaponsForTeam( team_t team, int spawnflags, const char *NPC_type );
-void NPC_PrecacheWeapons( team_t playerTeam, int spawnflags, const char *NPCtype ) {
+extern int NPC_WeaponsForTeam( npcteam_t team, int spawnflags, const char *NPC_type );
+void NPC_PrecacheWeapons( npcteam_t playerTeam, int spawnflags, const char *NPCtype ) {
 	int weapons = NPC_WeaponsForTeam( playerTeam, spawnflags, NPCtype );
 	int curWeap;
 
@@ -633,7 +633,7 @@ void NPC_Precache( gentity_t *spawner ) {
 			}
 			//playerTeam = TranslateTeamName(value);
 			Com_sprintf( tk, sizeof(tk), "NPC%s", token );
-			playerTeam = (team_t)GetIDForString( TeamTable, tk );
+			playerTeam = GetIDForString( TeamTable, tk );
 			continue;
 		}
 
@@ -1593,7 +1593,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 					continue;
 				}
 				Com_sprintf( tk, sizeof(tk), "NPC%s", token );
-				NPC->client->enemyTeam = (team_t)GetIDForString( TeamTable, tk );//TranslateTeamName(value);
+				NPC->client->enemyTeam = GetIDForString( TeamTable, tk );//TranslateTeamName(value);
 				continue;
 			}
 

@@ -1342,7 +1342,7 @@ void CG_DrawHUD( centity_t *cent ) {
 		//show current kills out of how many needed
 		scoreStr = va( "%s: %i/%i", CG_GetStringEdString( "MP_INGAME", "SCORE" ), cg.snap->ps.persistant[PERS_SCORE], cgs.fraglimit );
 	}
-	else if ( 0 && cgs.gametype < GT_TEAM ) {	// This is a teamless mode, draw the score bias.
+	else if ( cgs.gametype < GT_TEAM ) {	// This is a teamless mode, draw the score bias.
 		scoreBias = cg.snap->ps.persistant[PERS_SCORE] - cgs.scores1;
 		if ( scoreBias == 0 ) {	// We are the leader!
 			if ( cgs.scores2 <= 0 ) {	// Nobody to be ahead of yet.
@@ -3833,7 +3833,7 @@ static void CG_DrawDisconnect( void ) {
 	int			cmdNum;
 	usercmd_t	cmd;
 	const char	*s = NULL;
-	int			w;  // bk010215 - FIXME char message[1024];
+	int			w;
 
 	if ( CG_DrawMapChange() )
 		return;
@@ -3842,12 +3842,12 @@ static void CG_DrawDisconnect( void ) {
 	cmdNum = trap->GetCurrentCmdNumber() - CMD_BACKUP + 1;
 	trap->GetUserCmd( cmdNum, &cmd );
 	if ( cmd.serverTime <= cg.snap->ps.commandTime
-		|| cmd.serverTime > cg.time ) {	// special check for map_restart // bk 0102165 - FIXME
+		|| cmd.serverTime > cg.time ) {	// special check for map_restart
 		return;
 	}
 
 	// also add text in center of screen
-	s = CG_GetStringEdString( "MP_INGAME", "CONNECTION_INTERRUPTED" ); // s = "Connection Interrupted"; // bk 010215 - FIXME
+	s = CG_GetStringEdString( "MP_INGAME", "CONNECTION_INTERRUPTED" );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 	CG_DrawBigString( (SCREEN_WIDTH / 2) - w / 2, 100, s, 1.0F );
 
@@ -6645,7 +6645,7 @@ void CG_ChatBox_ArrayInsert( chatBoxItem_t **array, int insPoint, int maxNum, ch
 }
 
 //go through all the chat strings and draw them if they are not yet expired
-static QINLINE void CG_ChatBox_DrawStrings( void ) {
+static void CG_ChatBox_DrawStrings( void ) {
 	chatBoxItem_t *drawThese[MAX_CHATBOX_ITEMS];
 	int numToDraw = 0, linesToDraw = 0, i = 0, x = 30;
 	float y = cg.scoreBoardShowing ? 475.0f : cg_chatboxHeight.integer;
@@ -7106,13 +7106,13 @@ void CG_Draw2D( void ) {
 		// don't draw any status if dead or the scoreboard is being explicitly shown
 		if ( !cg.showScores && cg.snap->ps.stats[STAT_HEALTH] > 0 ) {
 
-			if ( /*cg_drawStatus.integer*/0 ) {
+#if 0
+			if ( cg_drawStatus.integer ) {
 				//Reenable if stats are drawn with menu system again
 				Menu_PaintAll();
 				CG_DrawTimedMenus();
 			}
-
-			//CG_DrawTemporaryStats();
+#endif
 
 			CG_DrawAmmoWarning();
 
@@ -7383,9 +7383,8 @@ CG_DrawActive
 Perform all drawing needed to completely fill the screen
 =====================
 */
-void CG_DrawActive( stereoFrame_t stereoView ) {
-	float		separation;
-	vector3		baseOrg;
+void CG_DrawActive( void ) {
+	vector3 baseOrg;
 	refdef_t *refdef = CG_GetRefdef();
 
 	// optionally draw the info screen instead
@@ -7416,40 +7415,15 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		return;
 	}
 
-	switch ( stereoView ) {
-	case STEREO_CENTER:
-		separation = 0;
-		break;
-	case STEREO_LEFT:
-		separation = -cg_stereoSeparation.value / 2;
-		break;
-	case STEREO_RIGHT:
-		separation = cg_stereoSeparation.value / 2;
-		break;
-	default:
-		separation = 0;
-		trap->Error( ERR_DROP, "CG_DrawActive: Undefined stereoView" );
-	}
-
-
 	// clear around the rendered view if sized down
 	CG_TileClear();
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( &refdef->vieworg, &baseOrg );
-	if ( separation != 0 ) {
-		VectorMA( &refdef->vieworg, -separation, &refdef->viewaxis[1], &refdef->vieworg );
-	}
-
 	refdef->rdflags |= RDF_DRAWSKYBOX;
 
 	// draw 3D view
 	trap->R_RenderScene( refdef );
-
-	// restore original viewpoint if running stereo
-	if ( separation != 0 ) {
-		VectorCopy( &baseOrg, &refdef->vieworg );
-	}
 
 	// draw status bar and other floating elements
 	CG_Draw2D();

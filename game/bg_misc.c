@@ -1224,7 +1224,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	case IT_BAD:
 		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );
 	default:
-#ifndef NDEBUG // bk0001204
+#ifdef _DEBUG
 		Com_Printf( "BG_CanItemBeGrabbed: unknown enum %d\n", item->giType );
 #endif
 		break;
@@ -1285,13 +1285,6 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vector3 *result 
 		VectorMA( &tr->trBase, deltaTime, &tr->trDelta, result );
 		result->data[2] -= 0.5f * DEFAULT_GRAVITY * deltaTime * deltaTime;		// FIXME: local gravity...
 		break;
-	default:
-#ifdef _GAME
-		Com_Error( ERR_DROP, "BG_EvaluateTrajectory: [GAME SIDE] unknown trType: %i", tr->trType );
-#else
-		Com_Error( ERR_DROP, "BG_EvaluateTrajectory: [CLIENTGAME SIDE] unknown trType: %i", tr->trType );
-#endif
-		break;
 	}
 }
 
@@ -1339,13 +1332,6 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vector3 *re
 		deltaTime = (atTime - tr->trTime) * 0.001f;	// milliseconds to seconds
 		VectorCopy( &tr->trDelta, result );
 		result->data[2] -= DEFAULT_GRAVITY * deltaTime;		// FIXME: local gravity...
-		break;
-	default:
-#ifdef _GAME
-		Com_Error( ERR_DROP, "BG_EvaluateTrajectoryDelta: [GAME SIDE] unknown trType: %i", tr->trType );
-#else
-		Com_Error( ERR_DROP, "BG_EvaluateTrajectoryDelta: [CLIENTGAME SIDE] unknown trType: %i", tr->trType );
-#endif
 		break;
 	}
 }

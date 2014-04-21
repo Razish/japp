@@ -18,7 +18,7 @@ extern void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded );
 
 void CG_DrawSiegeMessage( const char *str, int objectiveScreen );
 void CG_DrawSiegeMessageNonMenu( const char *str );
-void CG_SiegeBriefingDisplay( int team, int dontshow );
+void CG_SiegeBriefingDisplay( int team, qboolean dontShow );
 
 void CG_PrecacheSiegeObjectiveAssetsForTeam( int myTeam ) {
 	char teamstr[64], objstr[256];
@@ -317,7 +317,7 @@ failure:
 	siege_valid = 0;
 }
 
-QINLINE static char *CG_SiegeObjectiveBuffer( int team, int objective ) {
+static char *CG_SiegeObjectiveBuffer( int team, int objective ) {
 	static char buf[8192];
 	char teamstr[1024];
 
@@ -404,7 +404,7 @@ void CG_ParseSiegeObjectiveStatus( const char *str ) {
 	}
 
 	if ( cg.predictedPlayerState.persistant[PERS_TEAM] != TEAM_SPECTATOR )
-		CG_SiegeBriefingDisplay( cg.predictedPlayerState.persistant[PERS_TEAM], 1 );
+		CG_SiegeBriefingDisplay( cg.predictedPlayerState.persistant[PERS_TEAM], qtrue );
 }
 
 void CG_SiegeRoundOver( centity_t *ent, int won ) {
@@ -489,7 +489,7 @@ int CG_SiegeGetObjectiveFinal( int team, int objective ) {
 	return 0;
 }
 
-void CG_SiegeBriefingDisplay( int team, int dontshow ) {
+void CG_SiegeBriefingDisplay( int team, qboolean dontShow ) {
 	char teamstr[64], briefing[8192], properValue[1024], objectiveDesc[1024];
 	int i, useTeam = team;
 	qboolean primary = qfalse;
@@ -572,7 +572,6 @@ void CG_SiegeBriefingDisplay( int team, int dontshow ) {
 				trap->Cvar_Set( va( "siege_objective%i_desc", i ), objectiveDesc );
 				trap->Cvar_Set( va( "siege_objective%i_inuse", i ), "2" );
 				trap->Cvar_Set( va( "team%i_objective%i_inuse", useTeam, i ), "2" );
-
 			}
 		}
 		else {
@@ -590,7 +589,7 @@ void CG_SiegeBriefingDisplay( int team, int dontshow ) {
 		}
 	}
 
-	if ( dontshow )
+	if ( dontShow )
 		return;
 
 	if ( BG_SiegeGetValueGroup( siege_info, teamstr, cgParseObjectives ) ) {

@@ -529,7 +529,7 @@ void WP_SaberInitBladeData( gentity_t *ent ) {
 #define LOOK_DEFAULT_SPEED	0.15f
 #define LOOK_TALKING_SPEED	0.15f
 
-static QINLINE qboolean G_CheckLookTarget( gentity_t *ent, vector3 *lookAngles, float *lookingSpeed ) {
+static qboolean G_CheckLookTarget( gentity_t *ent, vector3 *lookAngles, float *lookingSpeed ) {
 	//FIXME: also clamp the lookAngles based on the clamp + the existing difference between
 	//		headAngles and torsoAngles?  But often the tag_torso is straight but the torso itself
 	//		is deformed to not face straight... sigh...
@@ -606,7 +606,7 @@ static QINLINE qboolean G_CheckLookTarget( gentity_t *ent, vector3 *lookAngles, 
 //This is primarily droid stuff I guess, I'm going to try to handle all humanoid
 //NPC stuff in with the actual player stuff if possible.
 void NPC_SetBoneAngles( gentity_t *ent, const char *bone, vector3 *angles );
-static QINLINE void G_G2NPCAngles( gentity_t *ent, vector3 legs[3], vector3 *angles ) {
+static void G_G2NPCAngles( gentity_t *ent, vector3 legs[3], vector3 *angles ) {
 	static const char *craniumBone = "cranium", *thoracicBone = "thoracic";
 	qboolean looking = qfalse;
 	vector3 viewAngles;
@@ -734,7 +734,7 @@ static QINLINE void G_G2NPCAngles( gentity_t *ent, vector3 legs[3], vector3 *ang
 	}
 }
 
-static QINLINE void G_G2PlayerAngles( gentity_t *ent, vector3 legs[3], vector3 *legsAngles ) {
+static void G_G2PlayerAngles( gentity_t *ent, vector3 legs[3], vector3 *legsAngles ) {
 	qboolean tPitching = qfalse,
 		tYawing = qfalse,
 		lYawing = qfalse;
@@ -1067,7 +1067,6 @@ static qboolean WP_SabersCheckLock2( gentity_t *attacker, gentity_t *defender, s
 			break;
 		default:
 			return qfalse;
-			break;
 		}
 	}
 	else {//use the new system
@@ -1156,7 +1155,6 @@ static qboolean WP_SabersCheckLock2( gentity_t *attacker, gentity_t *defender, s
 				break;
 			default:
 				return qfalse;
-				break;
 			}
 		}
 	}
@@ -1591,38 +1589,28 @@ qboolean WP_SabersCheckLock( gentity_t *ent1, gentity_t *ent2 ) {
 	return qfalse;
 }
 
-static QINLINE int G_GetParryForBlock( int block ) {
+static int G_GetParryForBlock( int block ) {
 	switch ( block ) {
 	case BLOCKED_UPPER_RIGHT:
 		return LS_PARRY_UR;
-		break;
 	case BLOCKED_UPPER_RIGHT_PROJ:
 		return LS_REFLECT_UR;
-		break;
 	case BLOCKED_UPPER_LEFT:
 		return LS_PARRY_UL;
-		break;
 	case BLOCKED_UPPER_LEFT_PROJ:
 		return LS_REFLECT_UL;
-		break;
 	case BLOCKED_LOWER_RIGHT:
 		return LS_PARRY_LR;
-		break;
 	case BLOCKED_LOWER_RIGHT_PROJ:
 		return LS_REFLECT_LR;
-		break;
 	case BLOCKED_LOWER_LEFT:
 		return LS_PARRY_LL;
-		break;
 	case BLOCKED_LOWER_LEFT_PROJ:
 		return LS_REFLECT_LL;
-		break;
 	case BLOCKED_TOP:
 		return LS_PARRY_UP;
-		break;
 	case BLOCKED_TOP_PROJ:
 		return LS_REFLECT_UP;
-		break;
 	default:
 		break;
 	}
@@ -1873,20 +1861,15 @@ int G_KnockawayForParry( int move ) {
 	switch ( move ) {
 	case LS_PARRY_UP:
 		return LS_K1_T_;//push up
-		break;
 	case LS_PARRY_UR:
 	default://case LS_READY:
 		return LS_K1_TR;//push up, slightly to right
-		break;
 	case LS_PARRY_UL:
 		return LS_K1_TL;//push up and to left
-		break;
 	case LS_PARRY_LR:
 		return LS_K1_BR;//push down and to left
-		break;
 	case LS_PARRY_LL:
 		return LS_K1_BL;//push down and to right
-		break;
 	}
 }
 
@@ -1946,7 +1929,7 @@ static float G_GetAnimPoint( gentity_t *self ) {
 	return animPercentage;
 }
 
-static QINLINE qboolean G_ClientIdleInWorld( gentity_t *ent ) {
+static qboolean G_ClientIdleInWorld( gentity_t *ent ) {
 	if ( ent->s.eType == ET_NPC ) {
 		return qfalse;
 	}
@@ -2043,7 +2026,7 @@ static qboolean G_G2TraceCollide( trace_t *tr, vector3 *lastValidStart, vector3 
 	return qfalse;
 }
 
-static QINLINE qboolean G_SaberInBackAttack( int move ) {
+static qboolean G_SaberInBackAttack( int move ) {
 	switch ( move ) {
 	case LS_A_BACK:
 	case LS_A_BACK_CR:
@@ -2064,7 +2047,7 @@ typedef struct saberFace_s {
 } saberFace_t;
 
 //build faces around blade for collision checking -rww
-static QINLINE void G_BuildSaberFaces( vector3 *base, vector3 *tip, float radius, vector3 *fwd,
+static void G_BuildSaberFaces( vector3 *base, vector3 *tip, float radius, vector3 *fwd,
 	vector3 *right, int *fNum, saberFace_t **fList ) {
 	static saberFace_t faces[12];
 	int i = 0;
@@ -2177,7 +2160,7 @@ static QINLINE void G_BuildSaberFaces( vector3 *base, vector3 *tip, float radius
 }
 
 //collision utility function -rww
-static QINLINE void G_SabCol_CalcPlaneEq( vector3 *x, vector3 *y, vector3 *z, float *planeEq ) {
+static void G_SabCol_CalcPlaneEq( vector3 *x, vector3 *y, vector3 *z, float *planeEq ) {
 	planeEq[0] = x->y*(y->z - z->z) + y->y*(z->z - x->z) + z->y*(x->z - y->z);
 	planeEq[1] = x->z*(y->x - z->x) + y->z*(z->x - x->x) + z->z*(x->x - y->x);
 	planeEq[2] = x->x*(y->y - z->y) + y->x*(z->y - x->y) + z->x*(x->y - y->y);
@@ -2188,7 +2171,7 @@ static QINLINE void G_SabCol_CalcPlaneEq( vector3 *x, vector3 *y, vector3 *z, fl
 }
 
 //collision utility function -rww
-static QINLINE int G_SabCol_PointRelativeToPlane( vector3 *pos, float *side, float *planeEq ) {
+static int G_SabCol_PointRelativeToPlane( vector3 *pos, float *side, float *planeEq ) {
 	*side = planeEq[0] * pos->x + planeEq[1] * pos->y + planeEq[2] * pos->z + planeEq[3];
 
 	if ( *side > 0.0f ) {
@@ -2202,7 +2185,7 @@ static QINLINE int G_SabCol_PointRelativeToPlane( vector3 *pos, float *side, flo
 }
 
 //do actual collision check using generated saber "faces"
-static QINLINE qboolean G_SaberFaceCollisionCheck( int fNum, saberFace_t *fList, vector3 *atkStart,
+static qboolean G_SaberFaceCollisionCheck( int fNum, saberFace_t *fList, vector3 *atkStart,
 	vector3 *atkEnd, vector3 *atkMins, vector3 *atkMaxs, vector3 *impactPoint ) {
 	static float planeEq[4];
 	static float side, side2, dist;
@@ -2392,29 +2375,22 @@ float WP_SaberLength( gentity_t *ent ) {//return largest length
 		return bestLen;
 	}
 }
-int WPDEBUG_SaberColor( saber_colors_t saberColor ) {
-	switch ( (int)(saberColor) ) {
+uint32_t WPDEBUG_SaberColor( saber_colors_t saberColor ) {
+	switch ( saberColor ) {
 	case SABER_RED:
-		return 0x000000ff;
-		break;
+		return 0x000000ffu;
 	case SABER_ORANGE:
-		return 0x000088ff;
-		break;
+		return 0x000088ffu;
 	case SABER_YELLOW:
-		return 0x0000ffff;
-		break;
+		return 0x0000ffffu;
 	case SABER_GREEN:
-		return 0x0000ff00;
-		break;
+		return 0x0000ff00u;
 	case SABER_BLUE:
-		return 0x00ff0000;
-		break;
+		return 0x00ff0000u;
 	case SABER_PURPLE:
-		return 0x00ff00ff;
-		break;
+		return 0x00ff00ffu;
 	default:
-		return 0x00ffffff;//white
-		break;
+		return 0x00ffffffu;//white
 	}
 }
 /*
@@ -2539,7 +2515,7 @@ qboolean WP_SabersIntersect( gentity_t *ent1, int ent1SaberNum, int ent1BladeNum
 	return qfalse;
 }
 
-static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qboolean mySaberHit ) {
+static int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qboolean mySaberHit ) {
 	if ( !ent || !ent->client || saberNum >= MAX_SABERS ) {
 		return FORCE_LEVEL_0;
 	}
@@ -2591,31 +2567,26 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_ATTACK_BACK:
 			if ( animTimer < 500 ) {//end of anim
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_CROUCHATTACKBACK1:
 			if ( animTimer < 800 ) {//end of anim
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_BUTTERFLY_LEFT:
 		case BOTH_BUTTERFLY_RIGHT:
 		case BOTH_BUTTERFLY_FL1:
 		case BOTH_BUTTERFLY_FR1:
 			//FIXME: break up?
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_FJSS_TR_BL:
 		case BOTH_FJSS_TL_BR:
 			//FIXME: break up?
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_K1_S1_T_:	//# knockaway saber top
 		case BOTH_K1_S1_TR:	//# knockaway saber top right
 		case BOTH_K1_S1_TL:	//# knockaway saber top left
@@ -2624,7 +2595,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 		case BOTH_K1_S1_BR:	//# knockaway saber bottom right
 			//FIXME: break up?
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_LUNGE2_B__T_:
 			if ( mySaberHit ) {//someone else hit my saber, not asking for damage level, but defense strength
 				return FORCE_LEVEL_1;
@@ -2636,7 +2606,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_FORCELEAP2_T__B_:
 			if ( animTimer < 400 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2645,13 +2614,11 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_VS_ATR_S:
 		case BOTH_VS_ATL_S:
 		case BOTH_VT_ATR_S:
 		case BOTH_VT_ATL_S:
 			return FORCE_LEVEL_3;//???
-			break;
 		case BOTH_JUMPFLIPSLASHDOWN1:
 			if ( animTimer <= 1000 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2660,7 +2627,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_JUMPFLIPSTABDOWN:
 			if ( animTimer <= 1300 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2669,7 +2635,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_JUMPATTACK6:
 			/*
 			if (pm->ps)
@@ -2690,7 +2655,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_3;
 			}
 			return FORCE_LEVEL_0;
-			break;
 		case BOTH_JUMPATTACK7:
 			if ( animTimer <= 1200 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2699,13 +2663,11 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_SPINATTACK6:
 			if ( animTimeElapsed <= 200 ) {//beginning of anim
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_2;//FORCE_LEVEL_3;
-			break;
 		case BOTH_SPINATTACK7:
 			if ( animTimer <= 500 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2714,7 +2676,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_2;//FORCE_LEVEL_3;
-			break;
 		case BOTH_FORCELONGLEAP_ATTACK:
 			if ( animTimeElapsed <= 200 ) {//1st four frames of anim
 				return FORCE_LEVEL_3;
@@ -2752,7 +2713,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_A7_SOULCAL:
 			if ( animTimer < 650 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2761,7 +2721,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_A1_SPECIAL:
 			if ( animTimer < 600 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2770,7 +2729,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_A2_SPECIAL:
 			if ( animTimer < 300 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2779,7 +2737,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_A3_SPECIAL:
 			if ( animTimer < 700 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2788,10 +2745,8 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_FLIP_ATTACK7:
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_PULL_IMPALE_STAB:
 			if ( mySaberHit ) {//someone else hit my saber, not asking for damage level, but defense strength
 				return FORCE_LEVEL_1;
@@ -2800,7 +2755,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_PULL_IMPALE_SWING:
 			if ( animTimer < 500 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2809,7 +2763,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_ALORA_SPIN_SLASH:
 			if ( animTimer < 900 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2818,7 +2771,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_A6_FB:
 			if ( mySaberHit ) {//someone else hit my saber, not asking for damage level, but defense strength
 				return FORCE_LEVEL_1;
@@ -2830,7 +2782,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_A6_LR:
 			if ( mySaberHit ) {//someone else hit my saber, not asking for damage level, but defense strength
 				return FORCE_LEVEL_1;
@@ -2842,23 +2793,19 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_3;
-			break;
 		case BOTH_A7_HILT:
 			return FORCE_LEVEL_0;
-			break;
 			//===SABERLOCK SUPERBREAKS START===========================================================================
 		case BOTH_LK_S_DL_T_SB_1_W:
 			if ( animTimer < 700 ) {//end of anim
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_S_ST_S_SB_1_W:
 			if ( animTimer < 300 ) {//end of anim
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_S_DL_S_SB_1_W:
 		case BOTH_LK_S_S_S_SB_1_W:
 			if ( animTimer < 700 ) {//end of anim
@@ -2868,7 +2815,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_S_ST_T_SB_1_W:
 		case BOTH_LK_S_S_T_SB_1_W:
 			if ( animTimer < 150 ) {//end of anim
@@ -2878,17 +2824,14 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_DL_DL_T_SB_1_W:
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_DL_DL_S_SB_1_W:
 		case BOTH_LK_DL_ST_S_SB_1_W:
 			if ( animTimeElapsed < 1000 ) {//beginning of anim
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_DL_ST_T_SB_1_W:
 			if ( animTimer < 950 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2897,7 +2840,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_DL_S_S_SB_1_W:
 			if ( saberNum != 0 ) {//only right hand saber does damage in this suberbreak
 				return FORCE_LEVEL_0;
@@ -2909,7 +2851,6 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_DL_S_T_SB_1_W:
 			if ( saberNum != 0 ) {//only right hand saber does damage in this suberbreak
 				return FORCE_LEVEL_0;
@@ -2921,14 +2862,11 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_ST_DL_S_SB_1_W:
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_ST_DL_T_SB_1_W:
 			//special suberbreak - doesn't kill, just kicks them backwards
 			return FORCE_LEVEL_0;
-			break;
 		case BOTH_LK_ST_ST_S_SB_1_W:
 		case BOTH_LK_ST_S_S_SB_1_W:
 			if ( animTimer < 800 ) {//end of anim
@@ -2938,35 +2876,22 @@ static QINLINE int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qbool
 				return FORCE_LEVEL_0;
 			}
 			return FORCE_LEVEL_5;
-			break;
 		case BOTH_LK_ST_ST_T_SB_1_W:
 		case BOTH_LK_ST_S_T_SB_1_W:
 			return FORCE_LEVEL_5;
-			break;
 			//===SABERLOCK SUPERBREAKS START===========================================================================
 		case BOTH_HANG_ATTACK:
 			//FIME: break up
 			if ( animTimer < 1000 ) {//end of anim
 				return FORCE_LEVEL_0;
 			}
-			else if ( animTimeElapsed < 250 ) {//beginning of anim
-				return FORCE_LEVEL_0;
-			}
-			else {//sweet spot
-				return FORCE_LEVEL_5;
-			}
-			break;
+			return (animTimeElapsed < 250) ? FORCE_LEVEL_0 : FORCE_LEVEL_5;
 		case BOTH_ROLL_STAB:
-			if ( mySaberHit ) {//someone else hit my saber, not asking for damage level, but defense strength
+			// someone else hit my saber, not asking for damage level, but defense strength
+			if ( mySaberHit )
 				return FORCE_LEVEL_1;
-			}
-			if ( animTimeElapsed > 400 ) {//end of anim
-				return FORCE_LEVEL_0;
-			}
-			else {
-				return FORCE_LEVEL_3;
-			}
-			break;
+			return (animTimeElapsed > 400) ? FORCE_LEVEL_0 : FORCE_LEVEL_3;
+
 		default:
 			break;
 		}
@@ -4122,37 +4047,17 @@ blockStuff:
 			otherOwner->client->ps.saberBlocked = 0;
 		}
 
-		if ( sabersClashed &&
-			dmg > SABER_NONATTACK_DAMAGE &&
-			selfSaberLevel < FORCE_LEVEL_3 &&
-			!PM_SaberInBounce( otherOwner->client->ps.saberMove ) &&
-			!PM_SaberInParry( self->client->ps.saberMove ) &&
-			!PM_SaberInBrokenParry( self->client->ps.saberMove ) &&
-			!BG_SaberInSpecial( self->client->ps.saberMove ) &&
-			!PM_SaberInBounce( self->client->ps.saberMove ) &&
-			!PM_SaberInDeflect( self->client->ps.saberMove ) &&
-			!PM_SaberInReflect( self->client->ps.saberMove ) &&
-			!unblockable ) {
-			//if (Q_irand(1, 10) <= 6)
-			if ( 1 ) //for now, just always try a deflect. (deflect func can cause bounces too)
-			{
-				if ( !WP_GetSaberDeflectionAngle( self, otherOwner, tr.fraction ) ) {
-					tryDeflectAgain = qtrue; //Failed the deflect, try it again if we can if the guy we're smashing goes into a parry and we don't break it
-				}
-				else {
-					self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-					didOffense = qtrue;
-				}
-			}
+		if ( sabersClashed && dmg > SABER_NONATTACK_DAMAGE && selfSaberLevel < FORCE_LEVEL_3
+			&& !PM_SaberInBounce( otherOwner->client->ps.saberMove ) && !PM_SaberInParry( self->client->ps.saberMove )
+			&& !PM_SaberInBrokenParry( self->client->ps.saberMove ) && !BG_SaberInSpecial( self->client->ps.saberMove )
+			&& !PM_SaberInBounce( self->client->ps.saberMove ) && !PM_SaberInDeflect( self->client->ps.saberMove )
+			&& !PM_SaberInReflect( self->client->ps.saberMove ) && !unblockable ) {
+			// Failed the deflect, try it again if we can if the guy we're smashing goes into a parry and we don't break it
+			if ( !WP_GetSaberDeflectionAngle( self, otherOwner, tr.fraction ) )
+				tryDeflectAgain = qtrue;
 			else {
-				self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
+				self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
 				didOffense = qtrue;
-
-#ifdef _DEBUG
-				if ( g_saberDebugPrint.integer ) {
-					Com_Printf( "Client %i clashed into client %i's saber, did BLOCKED_ATK_BOUNCE\n", self->s.number, otherOwner->s.number );
-				}
-#endif
 			}
 		}
 
@@ -4782,13 +4687,6 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 				goto blockStuff;
 			}
 			else {
-				/*
-				if (g_entities[tr.entityNum].client && g_entities[tr.entityNum].client->ps.usingATST)
-				{
-				dmg *= 0.1f;
-				}
-				*/
-
 				if ( g_entities[tr.entityNum].client && !g_entities[tr.entityNum].client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] ) { //not a "jedi", so make them suffer more
 					if ( dmg > SABER_NONATTACK_DAMAGE ) { //don't bother increasing just for idle touch damage
 						dmg *= 1.5f;
@@ -4897,35 +4795,17 @@ blockStuff:
 				otherOwner->client->ps.saberBlocked = 0;
 			}
 
-			if ( sabersClashed &&
-				dmg > SABER_NONATTACK_DAMAGE &&
-				self->client->ps.fd.saberAnimLevel < FORCE_LEVEL_3 &&
-				!PM_SaberInBounce( otherOwner->client->ps.saberMove ) &&
-				!PM_SaberInParry( self->client->ps.saberMove ) &&
-				!PM_SaberInBrokenParry( self->client->ps.saberMove ) &&
-				!BG_SaberInSpecial( self->client->ps.saberMove ) &&
-				!PM_SaberInBounce( self->client->ps.saberMove ) &&
-				!PM_SaberInDeflect( self->client->ps.saberMove ) &&
-				!PM_SaberInReflect( self->client->ps.saberMove ) &&
-				!unblockable ) {
-				//if (Q_irand(1, 10) <= 6)
-				if ( 1 ) //for now, just always try a deflect. (deflect func can cause bounces too)
-				{
-					if ( !WP_GetSaberDeflectionAngle( self, otherOwner, tr.fraction ) ) {
-						tryDeflectAgain = qtrue; //Failed the deflect, try it again if we can if the guy we're smashing goes into a parry and we don't break it
-					}
-					else {
-						self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-						didOffense = qtrue;
-					}
-				}
+			if ( sabersClashed && dmg > SABER_NONATTACK_DAMAGE && self->client->ps.fd.saberAnimLevel < FORCE_LEVEL_3
+				&& !PM_SaberInBounce( otherOwner->client->ps.saberMove ) && !PM_SaberInParry( self->client->ps.saberMove )
+				&& !PM_SaberInBrokenParry( self->client->ps.saberMove ) && !BG_SaberInSpecial( self->client->ps.saberMove )
+				&& !PM_SaberInBounce( self->client->ps.saberMove ) && !PM_SaberInDeflect( self->client->ps.saberMove )
+				&& !PM_SaberInReflect( self->client->ps.saberMove ) && !unblockable ) {
+				// Failed the deflect, try it again if we can if the guy we're smashing goes into a parry and we don't break it
+				if ( !WP_GetSaberDeflectionAngle( self, otherOwner, tr.fraction ) )
+					tryDeflectAgain = qtrue;
 				else {
-					self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
+					self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
 					didOffense = qtrue;
-
-					if ( g_saberDebugPrint.integer ) {
-						Com_Printf( "Client %i clashed into client %i's saber, did BLOCKED_ATK_BOUNCE\n", self->s.number, otherOwner->s.number );
-					}
 				}
 			}
 
@@ -5136,7 +5016,7 @@ blockStuff:
 		return didHit;
 }
 
-QINLINE int VectorCompare2( const vector3 *v1, const vector3 *v2 ) {
+int VectorCompare2( const vector3 *v1, const vector3 *v2 ) {
 	if ( v1->x > v2->x + 0.0001f ||
 		v1->x < v2->x - 0.0001f ||
 		v1->y > v2->y + 0.0001f ||
@@ -5529,9 +5409,8 @@ void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd ) {
 				continue;
 			}
 			else {
-				//if ( ent->s.pos.trType == TR_STATIONARY && (ent->s.eFlags&EF_MISSILE_STICK)
-				//	&& 	self->client->NPC_class != CLASS_BOBAFETT )
-				if ( 0 ) //Maybe handle this later?
+				if ( ent->s.pos.trType == TR_STATIONARY && (ent->s.eFlags & EF_MISSILE_STICK)
+					&& self->client->NPC_class != CLASS_BOBAFETT )
 				{//a placed explosive like a tripmine or detpack
 					if ( InFOV3( &ent->r.currentOrigin, &self->client->renderInfo.eyePoint, &self->client->ps.viewangles, 90, 90 ) ) {//in front of me
 						if ( G_ClearLOS4( self, ent ) ) {//can see it
@@ -5910,7 +5789,7 @@ static void saberCheckRadiusDamage( gentity_t *saberent, int returning ) { //we'
 
 #define THROWN_SABER_COMP
 
-static QINLINE void saberMoveBack( gentity_t *ent, qboolean goingBack ) {
+static void saberMoveBack( gentity_t *ent, qboolean goingBack ) {
 	vector3		origin, oldOrg;
 
 	ent->s.pos.trType = TR_LINEAR;
@@ -7527,7 +7406,7 @@ static void G_KickSomeMofos( gentity_t *ent ) {
 	}
 }
 
-static QINLINE qboolean G_PrettyCloseIGuess( float a, float b, float tolerance ) {
+static qboolean G_PrettyCloseIGuess( float a, float b, float tolerance ) {
 	if ( (a - b) < tolerance &&
 		(a - b) > -tolerance ) {
 		return qtrue;
@@ -8533,19 +8412,14 @@ int WP_MissileBlockForBlock( int saberBlock ) {
 	switch ( saberBlock ) {
 	case BLOCKED_UPPER_RIGHT:
 		return BLOCKED_UPPER_RIGHT_PROJ;
-		break;
 	case BLOCKED_UPPER_LEFT:
 		return BLOCKED_UPPER_LEFT_PROJ;
-		break;
 	case BLOCKED_LOWER_RIGHT:
 		return BLOCKED_LOWER_RIGHT_PROJ;
-		break;
 	case BLOCKED_LOWER_LEFT:
 		return BLOCKED_LOWER_LEFT_PROJ;
-		break;
 	case BLOCKED_TOP:
 		return BLOCKED_TOP_PROJ;
-		break;
 	default:
 		break;
 	}

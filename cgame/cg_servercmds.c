@@ -7,7 +7,7 @@
 #include "cg_media.h"
 #include "JAPP/jp_promode.h"
 
-static QINLINE int GetScoreOffset( void ) {
+static int GetScoreOffset( void ) {
 	return Server_Supports( SSF_SCOREBOARD_KD ) ? 15 : 14;
 }
 
@@ -1024,7 +1024,7 @@ static void CG_BodyQueueCopy( centity_t *cent, int clientNum, int knownWeapon ) 
 		CG_ReattachLimb( source );
 }
 
-void CG_SiegeBriefingDisplay( int team, int dontshow );
+void CG_SiegeBriefingDisplay( int team, qboolean dontShow );
 void CG_ParseSiegeExtendedData( void );
 extern void CG_ChatBox_AddString( char *chatStr );
 
@@ -1051,7 +1051,7 @@ static void CG_ServerCommand( void ) {
 
 	if ( !strcmp( cmd, "sb" ) ) {
 		// siege briefing display
-		CG_SiegeBriefingDisplay( atoi( CG_Argv( 1 ) ), 0 );
+		CG_SiegeBriefingDisplay( atoi( CG_Argv( 1 ) ), qfalse );
 		return;
 	}
 

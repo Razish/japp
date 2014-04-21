@@ -1952,7 +1952,6 @@ void G_VehicleSetDamageLocFlags( gentity_t *veh, int impactDir, int deathPoint )
 			break;
 		default:
 			return;
-			break;
 		}
 		if ( veh->m_pVehicle
 			&& veh->m_pVehicle->m_pVehicleInfo
@@ -2135,16 +2134,16 @@ void G_VehUpdateShields( gentity_t *targ ) {
 }
 
 // Set the parent entity of this Vehicle NPC.
-QINLINE void _SetParent( Vehicle_t *pVeh, bgEntity_t *pParentEntity ) { pVeh->m_pParentEntity = pParentEntity; }
+void _SetParent( Vehicle_t *pVeh, bgEntity_t *pParentEntity ) { pVeh->m_pParentEntity = pParentEntity; }
 
 // Add a pilot to the vehicle.
-QINLINE void SetPilot( Vehicle_t *pVeh, bgEntity_t *pPilot ) { pVeh->m_pPilot = pPilot; }
+void SetPilot( Vehicle_t *pVeh, bgEntity_t *pPilot ) { pVeh->m_pPilot = pPilot; }
 
 // Add a passenger to the vehicle (false if we're full).
-QINLINE qboolean AddPassenger( Vehicle_t *pVeh ) { return qfalse; }
+qboolean AddPassenger( Vehicle_t *pVeh ) { return qfalse; }
 
 // Whether this vehicle is currently inhabited (by anyone) or not.
-QINLINE qboolean Inhabited( Vehicle_t *pVeh ) { return (pVeh->m_pPilot || pVeh->m_iNumPassengers) ? qtrue : qfalse; }
+qboolean Inhabited( Vehicle_t *pVeh ) { return (pVeh->m_pPilot || pVeh->m_iNumPassengers) ? qtrue : qfalse; }
 
 
 // Setup the shared functions (one's that all vehicles would generally use).

@@ -12,7 +12,7 @@ static int cg_numTriggerEntities;
 static centity_t *cg_triggerEntities[MAX_ENTITIES_IN_SNAPSHOT];
 
 //is this client piloting this veh?
-static QINLINE qboolean CG_Piloting( int vehNum ) {
+static qboolean CG_Piloting( int vehNum ) {
 	centity_t *veh;
 
 	if ( !vehNum )
@@ -114,7 +114,7 @@ void CG_BuildSolidList( void ) {
 	}
 }
 
-static QINLINE qboolean CG_VehicleClipCheck( centity_t *ignored, trace_t *trace ) {
+static qboolean CG_VehicleClipCheck( centity_t *ignored, trace_t *trace ) {
 	if ( !trace || trace->entityNum < 0 || trace->entityNum >= ENTITYNUM_WORLD )
 		return qtrue;
 

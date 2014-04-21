@@ -1851,15 +1851,15 @@ saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
 					PM_AddEvent( EV_JUMP );
 					pm->ps->velocity.z = 300.0f;
 
+#if 0
 					//RAZTODO: SP cartwheel
-					//if ( !Q_irand( 0, 1 ) )
-					//if (PM_GroundDistance() >= 25.0f)
-					if ( 1 ) {
+					if ( PM_GroundDistance() >= 25.0f )
 						newmove = LS_JUMPATTACK_ARIAL_RIGHT;
-					}
-					else {
+					else
 						newmove = LS_JUMPATTACK_CART_RIGHT;
-					}
+#else
+					newmove = LS_JUMPATTACK_ARIAL_RIGHT;
+#endif
 				}
 			}
 		}
@@ -1903,14 +1903,15 @@ saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
 					PM_AddEvent( EV_JUMP );
 					pm->ps->velocity.z = 350.0f;
 
-					//if ( !Q_irand( 0, 1 ) )
-					//if (PM_GroundDistance() >= 25.0f)
-					if ( 1 ) {
+#if 0
+					//RAZTODO: SP cartwheel
+					if ( PM_GroundDistance() >= 25.0f )
 						newmove = LS_JUMPATTACK_ARIAL_LEFT;
-					}
-					else {
+					else
 						newmove = LS_JUMPATTACK_CART_LEFT;
-					}
+#else
+					newmove = LS_JUMPATTACK_ARIAL_LEFT;
+#endif
 				}
 			}
 		}
@@ -2131,27 +2132,30 @@ int PM_KickMoveForConditions( void ) {
 	else {
 		//if (pm->cmd.buttons & BUTTON_ATTACK)
 		//if (pm->ps->pm_flags & PMF_JUMP_HELD)
+		//RAZTODO: SP/JA+ multi-enemy kicks
+#if 0
 		if ( 0 ) { //ok, let's try some fancy kicks
-			//qboolean is actually of type int anyway, but just for safeness.
-			int front = (int)PM_CheckEnemyPresence( DIR_FRONT, 100.0f );
-			int back = (int)PM_CheckEnemyPresence( DIR_BACK, 100.0f );
-			int right = (int)PM_CheckEnemyPresence( DIR_RIGHT, 100.0f );
-			int left = (int)PM_CheckEnemyPresence( DIR_LEFT, 100.0f );
-			int numEnemy = front + back + right + left;
+			int i = 0;
+			qboolean kickDirs[NUM_DIRECTIONS];
+			for ( i = 0; i < NUM_DIRECTIONS; i++ )
+				kickDirs[i] = PM_CheckEnemyPresence( i, 100.0f );
+			int numEnemies = kickDirs[DIR_FRONT] + kickDirs[DIR_BACK] + kickDirs[DIR_RIGHT] + kickDirs[DIR_LEFT];
 
-			if ( numEnemy >= 3 ||
-				((!right || !left) && numEnemy >= 2) ) { //> 2 enemies near, or, >= 2 enemies near and they are not to the right and left.
+			if ( numEnemies >= 3 || ((!kickDirs[DIR_RIGHT] || !kickDirs[DIR_LEFT]) && numEnemies >= 2) ) {
+				// > 2 enemies near, or, >= 2 enemies near and they are not to the right and left.
 				kickMove = LS_KICK_S;
 			}
-			else if ( right && left ) { //enemies on both sides
+			else if ( kickDirs[DIR_RIGHT] && kickDirs[DIR_LEFT] ) {
+				// enemies on both sides
 				kickMove = LS_KICK_RL;
 			}
-			else { //oh well, just do a forward kick
+			// oh well, just do a forward kick
+			else
 				kickMove = LS_KICK_F;
-			}
 
 			pm->cmd.upmove = 0;
 		}
+#endif
 	}
 
 	return kickMove;

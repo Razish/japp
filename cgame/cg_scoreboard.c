@@ -101,7 +101,7 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 		}
 	}
 
-	else if ( ci->modelIcon && cg_scoreboardSkinIcons.integer )
+	else if ( ci->modelIcon && cg_oldScoreboardSkinIcons.integer )
 		CG_DrawPic( iconx, y, iconSize, iconSize, ci->modelIcon );
 
 
@@ -155,7 +155,11 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 			}
 		}
 
-		CG_Text_Paint( SB_PING_X, y, 1.0f * scale, &colorWhite, va( "%i", score->ping ), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+		if ( cgs.clientinfo[score->client].botSkill != -1 && cg_oldScoreboardShowBots.integer == 2 )
+			CG_Text_Paint( SB_PING_X, y, 1.0f * scale, &colorWhite, "-", 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+		else
+			CG_Text_Paint( SB_PING_X, y, 1.0f * scale, &colorWhite, va( "%i", score->ping ), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+
 		CG_Text_Paint( SB_TIME_X, y, 1.0f * scale, &colorWhite, va( "%i", score->time ), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
 	}
 	else {
@@ -165,12 +169,18 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 	}
 
 	// add the "ready" marker for intermission exiting
-	if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) )
-		CG_Text_Paint( cg_scoreboardSkinIcons.integer ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite, CG_GetStringEdString( "MP_INGAME", "READY" ), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
-	else if ( cgs.clientinfo[score->client].botSkill != -1 )
-		CG_Text_Paint( cg_scoreboardSkinIcons.integer ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite, "BOT", 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
-	else if ( score->team == TEAM_SPECTATOR )
-		CG_Text_Paint( cg_scoreboardSkinIcons.integer ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite, "SPEC", 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
+	if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
+		CG_Text_Paint( cg_oldScoreboardSkinIcons.integer ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite,
+			CG_GetStringEdString( "MP_INGAME", "READY" ), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
+	}
+	else if ( cgs.clientinfo[score->client].botSkill != -1 && cg_oldScoreboardShowBots.integer == 1 ) {
+		CG_Text_Paint( cg_oldScoreboardSkinIcons.integer ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite, "BOT",
+			0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
+	}
+	else if ( score->team == TEAM_SPECTATOR ) {
+		CG_Text_Paint( cg_oldScoreboardSkinIcons.integer ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite, "SPEC",
+			0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
+	}
 }
 
 static int CG_TeamScoreboard( int y, team_t team, float fade, int maxClients, int lineHeight, qboolean countOnly ) {
@@ -323,42 +333,18 @@ qboolean CG_DrawOldScoreboard( void ) {
 		y = 32;
 		CG_Text_Paint( x - CG_Text_Width( s, 1.0f, FONT_MEDIUM ) / 2, y, 1.0f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
 	}
-	else {
+	else if ( cgs.gametype == GT_SIEGE && (cg_siegeWinTeam == 1 || cg_siegeWinTeam == 2) ) {
+		if ( cg_siegeWinTeam == 1 )
+			s = va( "%s", CG_GetStringEdString( "MP_INGAME", "SIEGETEAM1WIN" ) );
+		else
+			s = va( "%s", CG_GetStringEdString( "MP_INGAME", "SIEGETEAM2WIN" ) );
+
 		x = (SCREEN_WIDTH) / 2;
-		y = SB_HEADER;
-		//	CG_DrawBigString( x, y, s, fade );
-		s = cgs.japp.serverName;
-		CG_Text_Paint( x - (CG_Text_Width( s, 0.75f, FONT_NONE ) / 2), y, 0.75f, &colorTable[CT_WHITE], s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_NONE );
+		y = 60;
 
-		if ( cgs.gametype >= GT_TEAM ) {
-			int redCount = 0, blueCount = 0, specCount = 0;
-			for ( i = 0; i < cg.numScores; i++ ) {
-				if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_RED )
-					redCount++;
-				else if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_BLUE )
-					blueCount++;
-				else if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_SPECTATOR )
-					specCount++;
-			}
-			s = va( "Players: "S_COLOR_GREEN"%i"S_COLOR_WHITE"/"S_COLOR_GREEN"%i "S_COLOR_WHITE"("S_COLOR_RED"%i"
-				S_COLOR_WHITE"/"S_COLOR_CYAN"%i"S_COLOR_WHITE") - %i spectators", cg.numScores, cgs.maxclients, redCount,
-				blueCount, specCount );
-		}
-		else {
-			int specCount = 0;
-			for ( i = 0; i < cg.numScores; i++ ) {
-				if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_SPECTATOR )
-					specCount++;
-			}
-			s = va( "Players: %i/%i - %i spectators", cg.numScores, cgs.maxclients, specCount );
-		}
-		CG_Text_Paint( x - (CG_Text_Width( s, 0.75f, FONT_NONE ) / 2), y + 15, 0.75f, &colorTable[CT_WHITE], s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_NONE );
-
-		s = va( "%s (%s)", (char *)CG_ConfigString( CS_MESSAGE ), cgs.mapname );
-		CG_Text_Paint( x - (CG_Text_Width( s, 0.75f, FONT_NONE ) / 2), y + 30, 0.75f, &colorTable[CT_WHITE], s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_NONE );
+		CG_Text_Paint( x - CG_Text_Width( s, 1.0f, FONT_MEDIUM ) / 2, y, 1.0f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
 	}
-
-	if ( cgs.gametype != GT_SIEGE ) {
+	else if ( cgs.gametype >= GT_TEAM ) {
 		if ( cg.teamScores[0] == cg.teamScores[1] )
 			s = va( "%s %i", CG_GetStringEdString( "MP_INGAME", "TIEDAT" ), cg.teamScores[0] );
 		else if ( cg.teamScores[0] >= cg.teamScores[1] )
@@ -371,17 +357,39 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 		CG_Text_Paint( x - CG_Text_Width( s, 1.0f, FONT_MEDIUM ) / 2, y, 1.0f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
 	}
-	else if ( cgs.gametype == GT_SIEGE && (cg_siegeWinTeam == 1 || cg_siegeWinTeam == 2) ) {
-		if ( cg_siegeWinTeam == 1 )
-			s = va( "%s", CG_GetStringEdString( "MP_INGAME", "SIEGETEAM1WIN" ) );
-		else
-			s = va( "%s", CG_GetStringEdString( "MP_INGAME", "SIEGETEAM2WIN" ) );
 
-		x = (SCREEN_WIDTH) / 2;
-		y = 60;
+	x = (SCREEN_WIDTH) / 2;
+	y = SB_HEADER;
+	//	CG_DrawBigString( x, y, s, fade );
+	s = cgs.japp.serverName;
+	CG_Text_Paint( x - (CG_Text_Width( s, 0.75f, FONT_NONE ) / 2), y, 0.75f, &colorTable[CT_WHITE], s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_NONE );
 
-		CG_Text_Paint( x - CG_Text_Width( s, 1.0f, FONT_MEDIUM ) / 2, y, 1.0f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
+	if ( cgs.gametype >= GT_TEAM ) {
+		int redCount = 0, blueCount = 0, specCount = 0;
+		for ( i = 0; i < cg.numScores; i++ ) {
+			if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_RED )
+				redCount++;
+			else if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_BLUE )
+				blueCount++;
+			else if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_SPECTATOR )
+				specCount++;
+		}
+		s = va( "Players: "S_COLOR_GREEN"%i"S_COLOR_WHITE"/"S_COLOR_GREEN"%i "S_COLOR_WHITE"("S_COLOR_RED"%i"
+			S_COLOR_WHITE"/"S_COLOR_CYAN"%i"S_COLOR_WHITE") - %i spectators", cg.numScores, cgs.maxclients, redCount,
+			blueCount, specCount );
 	}
+	else {
+		int specCount = 0;
+		for ( i = 0; i < cg.numScores; i++ ) {
+			if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_SPECTATOR )
+				specCount++;
+		}
+		s = va( "Players: %i/%i - %i spectators", cg.numScores, cgs.maxclients, specCount );
+	}
+	CG_Text_Paint( x - (CG_Text_Width( s, 0.75f, FONT_NONE ) / 2), y + 15, 0.75f, &colorTable[CT_WHITE], s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_NONE );
+
+	s = va( "%s (%s)", (char *)CG_ConfigString( CS_MESSAGE ), cgs.mapname );
+	CG_Text_Paint( x - (CG_Text_Width( s, 0.75f, FONT_NONE ) / 2), y + 30, 0.75f, &colorTable[CT_WHITE], s, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_NONE );
 
 	// scoreboard
 	y = SB_TOP - 24; //SB_HEADER

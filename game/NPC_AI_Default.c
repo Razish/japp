@@ -463,46 +463,25 @@ void NPC_BSPointShoot( qboolean shoot ) {//FIXME: doesn't check for clear shot..
 			goto finished;
 		}
 	}
-	//else if ( shoot && (NPC->svFlags & SVF_LOCKEDENEMY) )
-	if ( 0 ) {//shooting them till their dead, not aiming right at them yet...
-		/*
-		qboolean movingTarget = qfalse;
+#if 0
+	else if ( shoot && (NPC->svFlags & SVF_LOCKEDENEMY) )
+		float	dist = VectorLength( &dir );
+		float	yawMiss, yawMissAllow = NPC->enemy->r.maxs.x;
+		float	pitchMiss, pitchMissAllow = (NPC->enemy->r.maxs.z - NPC->enemy->r.mins.z) / 2;
 
-		if ( NPC->enemy->client )
-		{
-		if ( VectorLengthSquared( NPC->enemy->client->ps.velocity ) )
-		{
-		movingTarget = qtrue;
-		}
-		}
-		else if ( VectorLengthSquared( NPC->enemy->s.pos.trDelta ) )
-		{
-		movingTarget = qtrue;
-		}
+		if ( yawMissAllow < 8.0f )
+			yawMissAllow = 8.0f;
 
-		if (movingTarget )
-		*/
-		{
-			float	dist = VectorLength( &dir );
-			float	yawMiss, yawMissAllow = NPC->enemy->r.maxs.x;
-			float	pitchMiss, pitchMissAllow = (NPC->enemy->r.maxs.z - NPC->enemy->r.mins.z) / 2;
+		if ( pitchMissAllow < 8.0f )
+			pitchMissAllow = 8.0f;
 
-			if ( yawMissAllow < 8.0f ) {
-				yawMissAllow = 8.0f;
-			}
+		yawMiss = tanf( DEG2RAD( AngleDelta( NPC->client->ps.viewangles.yaw, NPCInfo->desiredYaw ) ) ) * dist;
+		pitchMiss = tanf( DEG2RAD( AngleDelta( NPC->client->ps.viewangles.pitch, NPCInfo->desiredPitch ) ) ) * dist;
 
-			if ( pitchMissAllow < 8.0f ) {
-				pitchMissAllow = 8.0f;
-			}
-
-			yawMiss = tanf( DEG2RAD( AngleDelta( NPC->client->ps.viewangles.yaw, NPCInfo->desiredYaw ) ) ) * dist;
-			pitchMiss = tanf( DEG2RAD( AngleDelta( NPC->client->ps.viewangles.pitch, NPCInfo->desiredPitch ) ) ) * dist;
-
-			if ( yawMissAllow >= yawMiss && pitchMissAllow > pitchMiss ) {
-				ucmd.buttons |= BUTTON_ATTACK;
-			}
-		}
+		if ( yawMissAllow >= yawMiss && pitchMissAllow > pitchMiss )
+			ucmd.buttons |= BUTTON_ATTACK;
 	}
+#endif
 
 	return;
 

@@ -38,7 +38,7 @@
 #define SVF_UNUSED00400000		(0x00400000u) //
 #define SVF_UNUSED00800000		(0x00800000u) //
 #define SVF_UNUSED01000000		(0x01000000u) //
-#define SVF_UNUSED02000000		(0x02000000u) //
+#define SVF_NONNPC_ENEMY		(0x02000000u) //
 #define SVF_UNUSED04000000		(0x04000000u) //
 #define SVF_GLASS_BRUSH			(0x08000000u) // Ent is a glass brush
 #define SVF_NO_BASIC_SOUNDS		(0x10000000u) // No basic sounds

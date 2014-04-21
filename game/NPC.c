@@ -366,9 +366,6 @@ void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope ) {
 		if ( trace.fraction >= 1.0f )
 			return;
 
-		if ( !(&trace.plane) )
-			return;
-
 		if ( VectorCompare( &vec3_origin, &trace.plane.normal ) )
 			return;
 
@@ -1598,11 +1595,8 @@ Main NPC AI - called once per frame
 #if	AI_TIMERS
 extern int AITime;
 #endif//	AI_TIMERS
-void NPC_Think( gentity_t *self )//, int msec )
-{
+void NPC_Think( gentity_t *self ) {
 	vector3	oldMoveDir;
-	int i = 0;
-	gentity_t *player;
 
 	self->nextthink = level.time + FRAMETIME;
 
@@ -1642,13 +1636,11 @@ void NPC_Think( gentity_t *self )//, int msec )
 	self->nextthink = level.time + FRAMETIME / 2;
 
 
-	while ( i < MAX_CLIENTS ) {
-		player = &g_entities[i];
-
+#if 0
+	for ( i = 0, player = g_entities; i < MAX_CLIENTS; i++, player++ ) {
 		if ( player->inuse && player->client && player->client->sess.sessionTeam != TEAM_SPECTATOR &&
 			!(player->client->ps.pm_flags & PMF_FOLLOW) ) {
-			//if ( player->client->ps.viewEntity == self->s.number )
-			if ( 0 ) //rwwFIXMEFIXME: Allow controlling ents
+			if ( player->client->ps.viewEntity == self->s.number )
 			{//being controlled by player
 				G_DroidSounds( self );
 				//FIXME: might want to at least make sounds or something?
@@ -1661,8 +1653,8 @@ void NPC_Think( gentity_t *self )//, int msec )
 				return;
 			}
 		}
-		i++;
 	}
+#endif
 
 	if ( self->client->NPC_class == CLASS_VEHICLE ) {
 		if ( self->client->ps.m_iVehicleNum ) {//we don't think on our own

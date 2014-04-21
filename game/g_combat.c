@@ -1811,13 +1811,10 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		//self->owner = old;
 		}
 		*/
-		//if ( self->client->NPC_class == CLASS_BOBAFETT && self->client->moveType == MT_FLYSWIM )
-		if ( 0 ) {
+		if ( self->client->NPC_class == CLASS_BOBAFETT && self->client->ps.eFlags2 & EF2_FLYING )
 			Boba_FlyStop( self );
-		}
-		if ( self->s.NPC_class == CLASS_RANCOR ) {
+		if ( self->s.NPC_class == CLASS_RANCOR )
 			Rancor_DropVictim( self );
-		}
 	}
 	if ( attacker && attacker->NPC && attacker->NPC->group && attacker->NPC->group->enemy == self ) {
 		attacker->NPC->group->enemy = NULL;
@@ -3599,7 +3596,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			return;
 		if ( targ->client->pers.adminData.isGhost )
 			return;
-		if ( japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK) )
+		if ( japp_chatProtection.integer && !targ->client->ps.duelInProgress && (targ->client->ps.eFlags & EF_TALK) )
 			return;
 	}
 	if ( attacker && attacker->client ) {
@@ -3607,7 +3604,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			return;
 		if ( attacker->client->pers.adminData.isGhost )
 			return;
-		if ( japp_chatProtection.integer && (attacker->client->ps.eFlags & EF_TALK) )
+		if ( japp_chatProtection.integer && !attacker->client->ps.duelInProgress && (attacker->client->ps.eFlags & EF_TALK) )
 			return;
 	}
 

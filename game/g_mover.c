@@ -572,8 +572,6 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 		}
 		//ent->s.eFlags &= ~EF_BLOCKED_MOVER;
 		break;
-	default:
-		break;
 	}
 	BG_EvaluateTrajectory( &ent->s.pos, level.time, &ent->r.currentOrigin );
 	trap->LinkEntity( (sharedEntity_t *)ent );

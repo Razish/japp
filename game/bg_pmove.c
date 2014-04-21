@@ -230,7 +230,7 @@ qboolean BG_KnockDownable( playerState_t *ps ) {
 }
 
 //hacky assumption check, assume any client non-humanoid is a rocket trooper
-QINLINE qboolean PM_IsRocketTrooper( void ) {
+qboolean PM_IsRocketTrooper( void ) {
 	/*
 	if (pm->ps->clientNum < MAX_CLIENTS &&
 	pm->gametype == GT_SIEGE &&
@@ -337,9 +337,6 @@ void PM_pitch_roll_for_slope( bgEntity_t *forwhom, vector3 *pass_slope, vector3 
 		//			forwhom.flags(-)FL_ONGROUND;
 
 		if ( trace.fraction >= 1.0f )
-			return;
-
-		if ( !(&trace.plane) )
 			return;
 
 		if ( VectorCompare( &vec3_origin, &trace.plane.normal ) )
@@ -1463,7 +1460,6 @@ qboolean PM_AdjustAngleForWallJump( playerState_t *ps, usercmd_t *ucmd, qboolean
 			//WTF???
 			pm->ps->pm_flags &= ~PMF_STUCK_TO_WALL;
 			return qfalse;
-			break;
 		}
 		if ( pm->debugMelee == 2 ) {//uber-skillz
 			if ( ucmd->upmove > 0 ) {//hold on until you let go manually
@@ -4820,7 +4816,6 @@ qboolean PM_AdjustStandAnimForSlope( void ) {
 	case BOTH_STAND6:
 	default:
 		return qfalse;
-		break;
 	}
 
 	//step 5: based on the chosen interval and the current legsAnim, pick the correct anim
@@ -4943,7 +4938,6 @@ qboolean PM_AdjustStandAnimForSlope( void ) {
 		case BOTH_STAND6:
 		default:
 			return qfalse;
-			break;
 		}
 	}
 	//step 7: set the anim
@@ -6159,43 +6153,47 @@ backAgain:
 			if ( BG_SabersOff( pm->ps ) ) { //saber holstered, normal idle
 				Anim = BOTH_VS_IDLE;
 			}
+#if 0
 			// In the Air.
-			//else if ( pVeh->m_ulFlags & VEH_FLYING )
-			else if ( 0 ) {
+			else if ( pVeh->m_ulFlags & VEH_FLYING )
 				iBlend = 800;
 				Anim = BOTH_VS_AIR_G;
 				iFlags = SETANIM_FLAG_OVERRIDE;
 			}
+#endif
+#if 0
 			// Crashing.
-			//else if ( pVeh->m_ulFlags & VEH_CRASHING )
-			else if ( 0 ) {
+			else if ( pVeh->m_ulFlags & VEH_CRASHING ) {
 				pVeh->m_ulFlags &= ~VEH_CRASHING;	// Remove the flag, we are doing the animation.
 				iBlend = 800;
 				Anim = BOTH_VS_LAND_SR;
 				iFlags = SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD;
 			}
+#endif
 			else {
 				Anim = BOTH_VS_IDLE_SR;
 			}
 			break;
 
 		case WP_BLASTER:
+#if 0
 			// In the Air.
-			//if ( pVeh->m_ulFlags & VEH_FLYING )
-			if ( 0 ) {
+			if ( pVeh->m_ulFlags & VEH_FLYING ) {
 				iBlend = 800;
 				Anim = BOTH_VS_AIR_G;
 				iFlags = SETANIM_FLAG_OVERRIDE;
 			}
+#endif
+#if 0
 			// Crashing.
-			//else if ( pVeh->m_ulFlags & VEH_CRASHING )
-			else if ( 0 ) {
+			else if ( pVeh->m_ulFlags & VEH_CRASHING ) {
 				pVeh->m_ulFlags &= ~VEH_CRASHING;	// Remove the flag, we are doing the animation.
 				iBlend = 800;
 				Anim = BOTH_VS_LAND_G;
 				iFlags = SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD;
 			}
-			else {
+#endif
+			/*else*/ {
 				Anim = BOTH_VS_IDLE_G;
 			}
 			break;
@@ -7122,12 +7120,15 @@ static void PM_Weapon( void ) {
 	}
 
 	if ( pm->cmd.buttons & BUTTON_ALT_ATTACK ) {
-		//if ( pm->ps->weapon == WP_BRYAR_PISTOL && pm->gametype != GT_SIEGE )
-		if ( 0 ) { //kind of a hack for now
+#if 0
+		if ( pm->ps->weapon == WP_BRYAR_PISTOL && pm->gametype != GT_SIEGE )
 			PM_AddEvent( EV_FIRE_WEAPON );
 			addTime = weaponData[pm->ps->weapon].fireTime;
 		}
 		else if ( pm->ps->weapon == WP_DISRUPTOR && pm->ps->zoomMode != 1 ) {
+#else
+		if ( pm->ps->weapon == WP_DISRUPTOR && pm->ps->zoomMode != 1 ) {
+#endif
 			PM_AddEvent( EV_FIRE_WEAPON );
 			addTime = weaponData[pm->ps->weapon].fireTime;
 		}
@@ -8694,7 +8695,7 @@ static qboolean PM_AdjustAnglesForDualJumpAttack( playerState_t *ps, usercmd_t *
 	return qtrue;
 }
 
-static QINLINE void PM_CmdForSaberMoves( usercmd_t *ucmd ) {
+static void PM_CmdForSaberMoves( usercmd_t *ucmd ) {
 	//DUAL FORWARD+JUMP+ATTACK
 	if ( (pm->ps->legsAnim == BOTH_JUMPATTACK6		&& pm->ps->saberMove == LS_JUMPATTACK_DUAL) ||
 		(pm->ps->legsAnim == BOTH_BUTTERFLY_FL1	&& pm->ps->saberMove == LS_JUMPATTACK_STAFF_LEFT) ||
@@ -8899,7 +8900,6 @@ qboolean PM_WeaponOkOnVehicle( int weapon ) {
 	case WP_BLASTER:
 		//	case WP_THERMAL:
 		return qtrue;
-		break;
 	default:
 		return qfalse;
 	}

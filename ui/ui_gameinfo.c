@@ -119,16 +119,17 @@ static void UI_LoadArenasFromFile( char *filename ) {
 UI_LoadArenas
 ===============
 */
+#define MAPSBUFSIZE (MAX_MAPS * 64)
 void UI_LoadArenas( void ) {
 	int numdirs, i, n, dirlen;
-	char filename[128], dirlist[1024], *dirptr;
+	char filename[MAX_QPATH], dirlist[MAPSBUFSIZE], *dirptr;
 	const char *type;
 
 	ui_numArenas = 0;
 	uiInfo.mapCount = 0;
 
 	// get all arenas from .arena files
-	numdirs = trap->FS_GetFileList( "scripts", ".arena", dirlist, 1024 );
+	numdirs = trap->FS_GetFileList( "scripts", ".arena", dirlist, ARRAY_LEN( dirlist ) );
 	dirptr = dirlist;
 	for ( i = 0; i < numdirs; i++, dirptr += dirlen + 1 ) {
 		dirlen = strlen( dirptr );

@@ -834,173 +834,134 @@ qboolean CG_Asset_Parse( int handle ) {
 
 	if ( !trap->PC_ReadToken( handle, &token ) )
 		return qfalse;
-	if ( Q_stricmp( token.string, "{" ) != 0 ) {
+	if ( Q_stricmp( token.string, "{" ) )
 		return qfalse;
-	}
 
 	while ( 1 ) {
 		if ( !trap->PC_ReadToken( handle, &token ) )
 			return qfalse;
 
-		if ( Q_stricmp( token.string, "}" ) == 0 ) {
+		if ( !Q_stricmp( token.string, "}" ) ) {
 			return qtrue;
 		}
 
 #if 0
 		// font
-		if (Q_stricmp(token.string, "font") == 0) {
+		if ( !Q_stricmp( token.string, "font" ) ) {
 			int pointSize;
-			if (!trap->PC_ReadToken(handle, &token) || !PC_Int_Parse(handle, &pointSize)) {
-				return qfalse;
-			}
-
-			//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.textFont);
-			cgDC.Assets.qhMediumFont = cgDC.RegisterFont(token.string);
-			continue;
+			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
+				break;
+			cgDC.Assets.qhMediumFont = cgDC.RegisterFont( token.string );
 		}
 
 		// smallFont
-		if (Q_stricmp(token.string, "smallFont") == 0) {
+		else if ( !Q_stricmp( token.string, "smallFont" ) ) {
 			int pointSize;
-			if (!trap->PC_ReadToken(handle, &token) || !PC_Int_Parse(handle, &pointSize)) {
-				return qfalse;
-			}
-			//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.smallFont);
-			cgDC.Assets.qhSmallFont = cgDC.RegisterFont(token.string);
-			continue;
+			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
+				break;
+			cgDC.Assets.qhSmallFont = cgDC.RegisterFont( token.string );
 		}
 
 		// smallFont
-		if (Q_stricmp(token.string, "small2Font") == 0) {
+		else if ( !Q_stricmp( token.string, "small2Font" ) ) {
 			int pointSize;
-			if (!trap->PC_ReadToken(handle, &token) || !PC_Int_Parse(handle, &pointSize)) {
-				return qfalse;
-			}
-			//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.smallFont);
-			cgDC.Assets.qhSmall2Font = cgDC.RegisterFont(token.string);
-			continue;
+			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
+				break;
+			cgDC.Assets.qhSmall2Font = cgDC.RegisterFont( token.string );
 		}
 
 		// font
-		if (Q_stricmp(token.string, "bigfont") == 0) {
+		else if ( !Q_stricmp( token.string, "bigfont" ) ) {
 			int pointSize;
-			if (!trap->PC_ReadToken(handle, &token) || !PC_Int_Parse(handle, &pointSize)) {
-				return qfalse;
-			}
-			//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.bigFont);
-			cgDC.Assets.qhBigFont = cgDC.RegisterFont(token.string);
-			continue;
+			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
+				break;
+			cgDC.Assets.qhBigFont = cgDC.RegisterFont( token.string );
 		}
 
 		// font
-		if (Q_stricmp(token.string, "monoFont") == 0) {
+		else if ( !Q_stricmp( token.string, "monoFont" ) ) {
 			int pointSize;
-			if (!trap->PC_ReadToken(handle, &token) || !PC_Int_Parse(handle, &pointSize)) {
-				return qfalse;
-			}
-			//			cgDC.registerFont(token.string, pointSize, &cgDC.Assets.bigFont);
+			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
+				break;
 			cgDC.Assets.japp.fontMono = cgDC.RegisterFont(token.string);
-			continue;
 		}
-#endif
 
 		// gradientbar
-		if ( Q_stricmp( token.string, "gradientbar" ) == 0 ) {
-			if ( !trap->PC_ReadToken( handle, &token ) ) {
-				return qfalse;
-			}
+		else if ( !Q_stricmp( token.string, "gradientbar" ) ) {
+#else
+		if ( !Q_stricmp( token.string, "gradientbar" ) ) {
+#endif
+			if ( !trap->PC_ReadToken( handle, &token ) )
+				break;
 			cgDC.Assets.gradientBar = trap->R_RegisterShaderNoMip( token.string );
-			continue;
 		}
 
 		// enterMenuSound
-		if ( Q_stricmp( token.string, "menuEnterSound" ) == 0 ) {
-			if ( !trap->PC_ReadToken( handle, &token ) ) {
-				return qfalse;
-			}
+		else if ( !Q_stricmp( token.string, "menuEnterSound" ) ) {
+			if ( !trap->PC_ReadToken( handle, &token ) )
+				break;
 			cgDC.Assets.menuEnterSound = trap->S_RegisterSound( token.string );
-			continue;
 		}
 
 		// exitMenuSound
-		if ( Q_stricmp( token.string, "menuExitSound" ) == 0 ) {
-			if ( !trap->PC_ReadToken( handle, &token ) ) {
-				return qfalse;
-			}
+		else if ( !Q_stricmp( token.string, "menuExitSound" ) ) {
+			if ( !trap->PC_ReadToken( handle, &token ) )
+				break;
 			cgDC.Assets.menuExitSound = trap->S_RegisterSound( token.string );
-			continue;
 		}
 
 		// itemFocusSound
-		if ( Q_stricmp( token.string, "itemFocusSound" ) == 0 ) {
-			if ( !trap->PC_ReadToken( handle, &token ) ) {
-				return qfalse;
-			}
+		else if ( !Q_stricmp( token.string, "itemFocusSound" ) ) {
+			if ( !trap->PC_ReadToken( handle, &token ) )
+				break;
 			cgDC.Assets.itemFocusSound = trap->S_RegisterSound( token.string );
-			continue;
 		}
 
 		// menuBuzzSound
-		if ( Q_stricmp( token.string, "menuBuzzSound" ) == 0 ) {
-			if ( !trap->PC_ReadToken( handle, &token ) ) {
-				return qfalse;
-			}
+		else if ( !Q_stricmp( token.string, "menuBuzzSound" ) ) {
+			if ( !trap->PC_ReadToken( handle, &token ) )
+				break;
 			cgDC.Assets.menuBuzzSound = trap->S_RegisterSound( token.string );
-			continue;
 		}
 
-		if ( Q_stricmp( token.string, "cursor" ) == 0 ) {
-			if ( !PC_String_Parse( handle, &cgDC.Assets.cursorStr ) ) {
-				return qfalse;
-			}
+		else if ( !Q_stricmp( token.string, "cursor" ) ) {
+			if ( !PC_String_Parse( handle, &cgDC.Assets.cursorStr ) )
+				break;
 			cgDC.Assets.cursor = trap->R_RegisterShaderNoMip( cgDC.Assets.cursorStr );
-			continue;
 		}
 
-		if ( Q_stricmp( token.string, "fadeClamp" ) == 0 ) {
-			if ( !PC_Float_Parse( handle, &cgDC.Assets.fadeClamp ) ) {
-				return qfalse;
-			}
-			continue;
+		else if ( !Q_stricmp( token.string, "fadeClamp" ) ) {
+			if ( !PC_Float_Parse( handle, &cgDC.Assets.fadeClamp ) )
+				break;
 		}
 
-		if ( Q_stricmp( token.string, "fadeCycle" ) == 0 ) {
-			if ( !PC_Int_Parse( handle, &cgDC.Assets.fadeCycle ) ) {
-				return qfalse;
-			}
-			continue;
+		else if ( !Q_stricmp( token.string, "fadeCycle" ) ) {
+			if ( !PC_Int_Parse( handle, &cgDC.Assets.fadeCycle ) )
+				break;
 		}
 
-		if ( Q_stricmp( token.string, "fadeAmount" ) == 0 ) {
-			if ( !PC_Float_Parse( handle, &cgDC.Assets.fadeAmount ) ) {
-				return qfalse;
-			}
-			continue;
+		else if ( !Q_stricmp( token.string, "fadeAmount" ) ) {
+			if ( !PC_Float_Parse( handle, &cgDC.Assets.fadeAmount ) )
+				break;
 		}
 
-		if ( Q_stricmp( token.string, "shadowX" ) == 0 ) {
-			if ( !PC_Float_Parse( handle, &cgDC.Assets.shadowX ) ) {
-				return qfalse;
-			}
-			continue;
+		else if ( !Q_stricmp( token.string, "shadowX" ) ) {
+			if ( !PC_Float_Parse( handle, &cgDC.Assets.shadowX ) )
+				break;
 		}
 
-		if ( Q_stricmp( token.string, "shadowY" ) == 0 ) {
-			if ( !PC_Float_Parse( handle, &cgDC.Assets.shadowY ) ) {
-				return qfalse;
-			}
-			continue;
+		else if ( !Q_stricmp( token.string, "shadowY" ) ) {
+			if ( !PC_Float_Parse( handle, &cgDC.Assets.shadowY ) )
+				break;
 		}
 
-		if ( Q_stricmp( token.string, "shadowColor" ) == 0 ) {
-			if ( !PC_Color_Parse( handle, &cgDC.Assets.shadowColor ) ) {
-				return qfalse;
-			}
+		else if ( !Q_stricmp( token.string, "shadowColor" ) ) {
+			if ( !PC_Color_Parse( handle, &cgDC.Assets.shadowColor ) )
+				break;
 			cgDC.Assets.shadowFadeClamp = cgDC.Assets.shadowColor.a;
-			continue;
 		}
 	}
-	return qfalse; // bk001204 - why not?
+	return qfalse;
 }
 
 void CG_ParseMenu( const char *menuFile ) {
@@ -1014,31 +975,17 @@ void CG_ParseMenu( const char *menuFile ) {
 		return;
 
 	while ( 1 ) {
-		if ( !trap->PC_ReadToken( handle, &token ) ) {
+		if ( !trap->PC_ReadToken( handle, &token ) )
 			break;
-		}
 
-		//if ( Q_stricmp( token, "{" ) ) {
-		//	Com_Printf( "Missing { in menu file\n" );
-		//	break;
-		//}
-
-		//if ( menuCount == MAX_MENUS ) {
-		//	Com_Printf( "Too many menus!\n" );
-		//	break;
-		//}
-
-		if ( token.string[0] == '}' ) {
+		if ( token.string[0] == '}' )
 			break;
-		}
 
 		if ( Q_stricmp( token.string, "assetGlobalDef" ) == 0 ) {
-			if ( CG_Asset_Parse( handle ) ) {
+			if ( CG_Asset_Parse( handle ) )
 				continue;
-			}
-			else {
+			else
 				break;
-			}
 		}
 
 
@@ -1070,7 +1017,7 @@ qboolean CG_Load_Menu( const char **p ) {
 		}
 
 		if ( !token || token[0] == 0 ) {
-			return qfalse;
+			break;
 		}
 
 		CG_ParseMenu( token );
@@ -1227,13 +1174,10 @@ static const char *CG_FeederItemText( int feederID, int index, int column, qhand
 			break;
 		case 3:
 			return info->name;
-			break;
 		case 4:
 			return va( "%i", info->score );
-			break;
 		case 5:
 			return va( "%4i", sp->time );
-			break;
 		case 6:
 			if ( sp->ping == -1 ) {
 				return "connecting";

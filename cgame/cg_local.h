@@ -174,7 +174,7 @@ typedef struct clientInfo_s {
 	char		name[MAX_QPATH];
 	team_t		team;
 	int			duelTeam;
-	int			botSkill; // 0 = not bot, 1-5 = bot
+	int			botSkill; // -1 = not bot, 0-5 = bot
 	int			frame;
 	vector3		color1, color2;
 	int			icolor1, icolor2;
@@ -908,7 +908,7 @@ qboolean		CG_DeferMenuScript( char **args );
 void			CG_DestroyNPCClient( clientInfo_t **ci );
 void			CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, void *ghoul2,
 	int g2radius, qhandle_t skin, vector3 *origin, vector3 *angles );
-void			CG_DrawActive( stereoFrame_t stereoView );
+void			CG_DrawActive( void );
 void			CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback );
 void			CG_DrawBigString( int x, int y, const char *s, float alpha );
 void			CG_DrawBigStringColor( int x, int y, const char *s, const vector4 *color );

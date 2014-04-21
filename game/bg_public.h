@@ -240,10 +240,11 @@ typedef enum saberLock_e {
 } saberLock_t;
 
 typedef enum directions_e {
-	DIR_RIGHT,
+	DIR_RIGHT = 0,
 	DIR_LEFT,
 	DIR_FRONT,
-	DIR_BACK
+	DIR_BACK,
+	NUM_DIRECTIONS
 } directions_t;
 
 /*

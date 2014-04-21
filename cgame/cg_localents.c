@@ -794,10 +794,6 @@ void CG_AddLocalEntities( void ) {
 			continue;
 		}
 		switch ( le->leType ) {
-		default:
-			trap->Error( ERR_DROP, "Bad leType: %i", le->leType );
-			break;
-
 		case LE_MARK:
 			break;
 

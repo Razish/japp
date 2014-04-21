@@ -887,11 +887,9 @@ int	Q3_GetTag( int entID, const char *name, int lookup, vector3 *info ) {
 	switch ( lookup ) {
 	case TYPE_ORIGIN:
 		return TAG_GetOrigin( ent->ownername, name, info );
-		break;
 
 	case TYPE_ANGLES:
 		return TAG_GetAngles( ent->ownername, name, info );
-		break;
 
 	default:
 		break;
@@ -1139,7 +1137,6 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value ) {
 
 	case SET_SKILL:
 		return 0;
-		break;
 
 	case SET_XVELOCITY://## %f="0.0" # Velocity along X axis
 		if ( ent->client == NULL ) {
@@ -1171,33 +1168,26 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value ) {
 
 	case SET_DPITCH://## %f="0.0" # Pitch for NPC to turn to
 		return 0;
-		break;
 
 	case SET_DYAW://## %f="0.0" # Yaw for NPC to turn to
 		return 0;
-		break;
 
 	case SET_WIDTH://## %f="0.0" # Width of NPC bounding box
 		*value = ent->r.mins.x;
 		break;
 	case SET_TIMESCALE://## %f="0.0" # Speed-up slow down game (0 - 1.0f)
 		return 0;
-		break;
 	case SET_CAMERA_GROUP_Z_OFS://## %s="NULL" # all ents with this cameraGroup will be focused on
 		return 0;
-		break;
 
 	case SET_VISRANGE://## %f="0.0" # How far away NPC can see
 		return 0;
-		break;
 
 	case SET_EARSHOT://## %f="0.0" # How far an NPC can hear
 		return 0;
-		break;
 
 	case SET_VIGILANCE://## %f="0.0" # How often to look for enemies (0 - 1.0f)
 		return 0;
-		break;
 
 	case SET_GRAVITY://## %f="0.0" # Change this ent's gravity - 800 default
 		*value = g_gravity.value;
@@ -1212,13 +1202,11 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value ) {
 	case SET_FACENORMAL:		//## %f="0.0" # Set face to Normal expression for number of seconds
 		G_DebugPrint( WL_WARNING, "Q3_GetFloat: SET_FACE___ not implemented\n" );
 		return 0;
-		break;
 	case SET_WAIT:		//## %f="0.0" # Change an entity's wait field
 		*value = ent->wait;
 		break;
 	case SET_FOLLOWDIST:		//## %f="0.0" # How far away to stay from leader in BS_FOLLOW_LEADER
 		return 0;
-		break;
 		//# #sep ints
 	case SET_ANIM_HOLDTIME_LOWER://## %d="0" # Hold lower anim for number of milliseconds
 		if ( ent->client == NULL ) {
@@ -1237,7 +1225,6 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value ) {
 	case SET_ANIM_HOLDTIME_BOTH://## %d="0" # Hold lower and upper anims for number of milliseconds
 		G_DebugPrint( WL_WARNING, "Q3_GetFloat: SET_ANIM_HOLDTIME_BOTH not implemented\n" );
 		return 0;
-		break;
 	case SET_ARMOR://## %d="0" # Change armor
 		if ( ent->client == NULL ) {
 			G_DebugPrint( WL_WARNING, "Q3_GetFloat: SET_ARMOR, %s not a client\n", ent->targetname );
@@ -1247,106 +1234,74 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value ) {
 		break;
 	case SET_WALKSPEED://## %d="0" # Change walkSpeed
 		return 0;
-		break;
 	case SET_RUNSPEED://## %d="0" # Change runSpeed
 		return 0;
-		break;
 	case SET_YAWSPEED://## %d="0" # Change yawSpeed
 		return 0;
-		break;
 	case SET_AGGRESSION://## %d="0" # Change aggression 1-5
 		return 0;
-		break;
 	case SET_AIM://## %d="0" # Change aim 1-5
 		return 0;
-		break;
 	case SET_FRICTION://## %d="0" # Change ent's friction - 6 default
 		return 0;
-		break;
 	case SET_SHOOTDIST://## %d="0" # How far the ent can shoot - 0 uses weapon
 		return 0;
-		break;
 	case SET_HFOV://## %d="0" # Horizontal field of view
 		return 0;
-		break;
 	case SET_VFOV://## %d="0" # Vertical field of view
 		return 0;
-		break;
 	case SET_DELAYSCRIPTTIME://## %d="0" # How many seconds to wait before running delayscript
 		return 0;
-		break;
 	case SET_FORWARDMOVE://## %d="0" # NPC move forward -127(back) to 127
 		return 0;
-		break;
 	case SET_RIGHTMOVE://## %d="0" # NPC move right -127(left) to 127
 		return 0;
-		break;
 	case SET_STARTFRAME:	//## %d="0" # frame to start animation sequence on
 		return 0;
-		break;
 	case SET_ENDFRAME:	//## %d="0" # frame to end animation sequence on
 		return 0;
-		break;
 	case SET_ANIMFRAME:	//## %d="0" # of current frame
 		return 0;
-		break;
 
 	case SET_SHOT_SPACING://## %d="1000" # Time between shots for an NPC - reset to defaults when changes weapon
 		return 0;
-		break;
 	case SET_MISSIONSTATUSTIME://## %d="0" # Amount of time until Mission Status should be shown after death
 		return 0;
-		break;
 		//# #sep booleans
 	case SET_IGNOREPAIN://## %t="BOOL_TYPES" # Do not react to pain
 		return 0;
-		break;
 	case SET_IGNOREENEMIES://## %t="BOOL_TYPES" # Do not acquire enemies
 		return 0;
-		break;
 	case SET_IGNOREALERTS://## Do not get enemy set by allies in area(ambush)
 		return 0;
-		break;
 	case SET_DONTSHOOT://## %t="BOOL_TYPES" # Others won't shoot you
 		return 0;
-		break;
 	case SET_NOTARGET://## %t="BOOL_TYPES" # Others won't pick you as enemy
 		*value = (ent->flags&FL_NOTARGET);
 		break;
 	case SET_DONTFIRE://## %t="BOOL_TYPES" # Don't fire your weapon
 		return 0;
-		break;
 
 	case SET_LOCKED_ENEMY://## %t="BOOL_TYPES" # Keep current enemy until dead
 		return 0;
-		break;
 	case SET_CROUCHED://## %t="BOOL_TYPES" # Force NPC to crouch
 		return 0;
-		break;
 	case SET_WALKING://## %t="BOOL_TYPES" # Force NPC to move at walkSpeed
 		return 0;
-		break;
 	case SET_RUNNING://## %t="BOOL_TYPES" # Force NPC to move at runSpeed
 		return 0;
-		break;
 	case SET_CHASE_ENEMIES://## %t="BOOL_TYPES" # NPC will chase after enemies
 		return 0;
-		break;
 	case SET_LOOK_FOR_ENEMIES://## %t="BOOL_TYPES" # NPC will be on the lookout for enemies
 		return 0;
-		break;
 	case SET_FACE_MOVE_DIR://## %t="BOOL_TYPES" # NPC will face in the direction it's moving
 		return 0;
-		break;
 	case SET_FORCED_MARCH://## %t="BOOL_TYPES" # Force NPC to move at runSpeed
 		return 0;
-		break;
 	case SET_UNDYING://## %t="BOOL_TYPES" # Can take damage down to 1 but not die
 		return 0;
-		break;
 	case SET_NOAVOID://## %t="BOOL_TYPES" # Will not avoid other NPCs or architecture
 		return 0;
-		break;
 
 	case SET_SOLID://## %t="BOOL_TYPES" # Make yourself notsolid or solid
 		*value = ent->r.contents;
@@ -1356,95 +1311,67 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value ) {
 		break;
 	case SET_LOOP_ANIM://## %t="BOOL_TYPES" # For non-NPCs: loop your animation sequence
 		return 0;
-		break;
 	case SET_INTERFACE://## %t="BOOL_TYPES" # Player interface on/off
 		G_DebugPrint( WL_WARNING, "Q3_GetFloat: SET_INTERFACE not implemented\n" );
 		return 0;
-		break;
 	case SET_SHIELDS://## %t="BOOL_TYPES" # NPC has no shields (Borg do not adapt)
 		return 0;
-		break;
 	case SET_INVISIBLE://## %t="BOOL_TYPES" # Makes an NPC not solid and not visible
 		*value = (ent->s.eFlags&EF_NODRAW);
 		break;
 	case SET_VAMPIRE://## %t="BOOL_TYPES" # Makes an NPC not solid and not visible
 		return 0;
-		break;
 	case SET_FORCE_INVINCIBLE://## %t="BOOL_TYPES" # Makes an NPC not solid and not visible
 		return 0;
-		break;
 	case SET_GREET_ALLIES://## %t="BOOL_TYPES" # Makes an NPC greet teammates
 		return 0;
-		break;
 	case SET_VIDEO_FADE_IN://## %t="BOOL_TYPES" # Makes video playback fade in
 		G_DebugPrint( WL_WARNING, "Q3_GetFloat: SET_VIDEO_FADE_IN not implemented\n" );
 		return 0;
-		break;
 	case SET_VIDEO_FADE_OUT://## %t="BOOL_TYPES" # Makes video playback fade out
 		G_DebugPrint( WL_WARNING, "Q3_GetFloat: SET_VIDEO_FADE_OUT not implemented\n" );
 		return 0;
-		break;
 	case SET_PLAYER_LOCKED://## %t="BOOL_TYPES" # Makes it so player cannot move
 		return 0;
-		break;
 	case SET_LOCK_PLAYER_WEAPONS://## %t="BOOL_TYPES" # Makes it so player cannot switch weapons
 		return 0;
-		break;
 	case SET_NO_IMPACT_DAMAGE://## %t="BOOL_TYPES" # Makes it so player cannot switch weapons
 		return 0;
-		break;
 	case SET_NO_KNOCKBACK://## %t="BOOL_TYPES" # Stops this ent from taking knockback from weapons
 		*value = (ent->flags&FL_NO_KNOCKBACK);
 		break;
 	case SET_ALT_FIRE://## %t="BOOL_TYPES" # Force NPC to use altfire when shooting
 		return 0;
-		break;
 	case SET_NO_RESPONSE://## %t="BOOL_TYPES" # NPCs will do generic responses when this is on (usescripts override generic responses as well)
 		return 0;
-		break;
 	case SET_INVINCIBLE://## %t="BOOL_TYPES" # Completely unkillable
 		*value = (ent->flags&FL_GODMODE);
-		break;
 	case SET_MISSIONSTATUSACTIVE:	//# Turns on Mission Status Screen
 		return 0;
-		break;
 	case SET_NO_COMBAT_TALK://## %t="BOOL_TYPES" # NPCs will not do their combat talking noises when this is on
 		return 0;
-		break;
 	case SET_NO_ALERT_TALK://## %t="BOOL_TYPES" # NPCs will not do their combat talking noises when this is on
 		return 0;
-		break;
 	case SET_USE_CP_NEAREST://## %t="BOOL_TYPES" # NPCs will use their closest combat points, not try and find ones next to the player, or flank player
 		return 0;
-		break;
 	case SET_DISMEMBERABLE://## %t="BOOL_TYPES" # NPC will not be affected by force powers
 		return 0;
-		break;
 	case SET_NO_FORCE:
 		return 0;
-		break;
 	case SET_NO_ACROBATICS:
 		return 0;
-		break;
 	case SET_USE_SUBTITLES:
 		return 0;
-		break;
 	case SET_NO_FALLTODEATH://## %t="BOOL_TYPES" # NPC will not be affected by force powers
 		return 0;
-		break;
 	case SET_MORELIGHT://## %t="BOOL_TYPES" # NPCs will use their closest combat points, not try and find ones next to the player, or flank player
 		return 0;
-		break;
 	case SET_TREASONED://## %t="BOOL_TYPES" # Player has turned on his own- scripts will stop: NPCs will turn on him and level changes load the brig
 		return 0;
-		break;
 	case SET_DISABLE_SHADER_ANIM:	//## %t="BOOL_TYPES" # Shaders won't animate
 		return 0;
-		break;
 	case SET_SHADER_ANIM:	//## %t="BOOL_TYPES" # Shader will be under frame control
 		return 0;
-		break;
-
 	default:
 		if ( trap->ICARUS_VariableDeclared( name ) != VTYPE_FLOAT )
 			return 0;
@@ -1509,7 +1436,6 @@ int Q3_GetVector( int entID, int type, const char *name, vector3 *value ) {
 	case SET_TELEPORT_DEST://## %v="0.0 0.0 0.0" # Set origin here as soon as the area is clear
 		G_DebugPrint( WL_WARNING, "Q3_GetVector: SET_TELEPORT_DEST not implemented\n" );
 		return 0;
-		break;
 
 	default:
 
@@ -1582,7 +1508,6 @@ int Q3_GetString( int entID, int type, const char *name, const char **value ) {
 
 	case SET_LOCATION:
 		return 0;
-		break;
 
 		//# #sep Scripts and other file paths
 	case SET_SPAWNSCRIPT://## %s="NULL" !!"W:\game\base\scripts\!!#*.txt" # Script to run when spawned //0 - do not change these, these are equal to BSET_SPAWN, etc
@@ -1631,102 +1556,77 @@ int Q3_GetString( int entID, int type, const char *name, const char **value ) {
 		//# #sep Standard strings
 	case SET_ENEMY://## %s="NULL" # Set enemy by targetname
 		return 0;
-		break;
 	case SET_LEADER://## %s="NULL" # Set for BS_FOLLOW_LEADER
 		return 0;
-		break;
 	case SET_CAPTURE://## %s="NULL" # Set captureGoal by targetname
 		return 0;
-		break;
 
 	case SET_TARGETNAME://## %s="NULL" # Set/change your targetname
 		*value = ent->targetname;
 		break;
 	case SET_PAINTARGET://## %s="NULL" # Set/change what to use when hit
 		return 0;
-		break;
 	case SET_CAMERA_GROUP://## %s="NULL" # all ents with this cameraGroup will be focused on
 		return 0;
-		break;
 	case SET_CAMERA_GROUP_TAG://## %s="NULL" # all ents with this cameraGroup will be focused on
 		return 0;
-		break;
 	case SET_LOOK_TARGET://## %s="NULL" # object for NPC to look at
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_LOOK_TARGET, NOT SUPPORTED IN MULTIPLAYER\n" );
 		break;
 	case SET_TARGET2://## %s="NULL" # Set/change your target2: on NPC's: this fires when they're knocked out by the red hypo
 		return 0;
-		break;
 
 	case SET_REMOVE_TARGET://## %s="NULL" # Target that is fired when someone completes the BS_REMOVE behaviorState
 		return 0;
-		break;
 	case SET_WEAPON:
 		return 0;
-		break;
 
 	case SET_ITEM:
 		return 0;
-		break;
 	case SET_MUSIC_STATE:
 		return 0;
-		break;
 		//The below cannot be gotten
 	case SET_NAVGOAL://## %s="NULL" # *Move to this navgoal then continue script
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_NAVGOAL not implemented\n" );
 		return 0;
-		break;
 	case SET_VIEWTARGET://## %s="NULL" # Set angles toward ent by targetname
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_VIEWTARGET not implemented\n" );
 		return 0;
-		break;
 	case SET_WATCHTARGET://## %s="NULL" # Set angles toward ent by targetname
 		return 0;
-		break;
 	case SET_VIEWENTITY:
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_VIEWENTITY not implemented\n" );
 		return 0;
-		break;
 	case SET_CAPTIONTEXTCOLOR:	//## %s=""  # Color of text RED:WHITE:BLUE: YELLOW
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_CAPTIONTEXTCOLOR not implemented\n" );
 		return 0;
-		break;
 	case SET_CENTERTEXTCOLOR:	//## %s=""  # Color of text RED:WHITE:BLUE: YELLOW
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_CENTERTEXTCOLOR not implemented\n" );
 		return 0;
-		break;
 	case SET_SCROLLTEXTCOLOR:	//## %s=""  # Color of text RED:WHITE:BLUE: YELLOW
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_SCROLLTEXTCOLOR not implemented\n" );
 		return 0;
-		break;
 	case SET_COPY_ORIGIN://## %s="targetname"  # Copy the origin of the ent with targetname to your origin
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_COPY_ORIGIN not implemented\n" );
 		return 0;
-		break;
 	case SET_DEFEND_TARGET://## %s="targetname"  # This NPC will attack the target NPC's enemies
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_COPY_ORIGIN not implemented\n" );
 		return 0;
-		break;
 	case SET_VIDEO_PLAY://## %s="filename" !!"W:\game\base\video\!!#*.roq" # Play a Video (inGame)
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_VIDEO_PLAY not implemented\n" );
 		return 0;
-		break;
 	case SET_LOADGAME://## %s="exitholodeck" # Load the savegame that was auto-saved when you started the holodeck
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_LOADGAME not implemented\n" );
 		return 0;
-		break;
 	case SET_LOCKYAW://## %s="off"  # Lock legs to a certain yaw angle (or "off" or "auto" uses current)
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_LOCKYAW not implemented\n" );
 		return 0;
-		break;
 	case SET_SCROLLTEXT:	//## %s="" # key of text string to print
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_SCROLLTEXT not implemented\n" );
 		return 0;
-		break;
 	case SET_LCARSTEXT:	//## %s="" # key of text string to print in LCARS frame
 		G_DebugPrint( WL_WARNING, "Q3_GetString: SET_LCARSTEXT not implemented\n" );
 		return 0;
-		break;
 
 	case SET_FULLNAME://## %s="NULL" # Set/change your targetname
 		*value = ent->fullName;
@@ -4703,8 +4603,8 @@ qboolean Q3_Set( int taskID, int entID, const char *type_name, const char *data 
 		if ( both ) {
 			return qfalse;	//Don't call it back
 		}
-	}
 		break;
+	}
 
 	case SET_ANIM_HOLDTIME_LOWER:
 		int_data = atoi( (char *)data );
@@ -4712,7 +4612,6 @@ qboolean Q3_Set( int taskID, int entID, const char *type_name, const char *data 
 		Q3_TaskIDClear( &ent->taskID[TID_ANIM_BOTH] );//We only want to wait for the bottom
 		trap->ICARUS_TaskIDSet( (sharedEntity_t *)ent, TID_ANIM_LOWER, taskID );
 		return qfalse;	//Don't call it back
-		break;
 
 	case SET_ANIM_HOLDTIME_UPPER:
 		int_data = atoi( (char *)data );
@@ -4720,7 +4619,6 @@ qboolean Q3_Set( int taskID, int entID, const char *type_name, const char *data 
 		Q3_TaskIDClear( &ent->taskID[TID_ANIM_BOTH] );//We only want to wait for the top
 		trap->ICARUS_TaskIDSet( (sharedEntity_t *)ent, TID_ANIM_UPPER, taskID );
 		return qfalse;	//Don't call it back
-		break;
 
 	case SET_ANIM_HOLDTIME_BOTH:
 		int_data = atoi( (char *)data );
@@ -4730,7 +4628,6 @@ qboolean Q3_Set( int taskID, int entID, const char *type_name, const char *data 
 		trap->ICARUS_TaskIDSet( (sharedEntity_t *)ent, TID_ANIM_UPPER, taskID );
 		trap->ICARUS_TaskIDSet( (sharedEntity_t *)ent, TID_ANIM_LOWER, taskID );
 		return qfalse;	//Don't call it back
-		break;
 
 	case SET_PLAYER_TEAM:
 		G_DebugPrint( WL_WARNING, "Q3_SetPlayerTeam: Not in MP ATM, let a programmer (ideally Rich) know if you need it\n" );
@@ -4777,14 +4674,12 @@ qboolean Q3_Set( int taskID, int entID, const char *type_name, const char *data 
 		Q3_SetDPitch( entID, float_data );
 		trap->ICARUS_TaskIDSet( (sharedEntity_t *)ent, TID_ANGLE_FACE, taskID );
 		return qfalse;
-		break;
 
 	case SET_DYAW:
 		float_data = atof( (char *)data );
 		Q3_SetDYaw( entID, float_data );
 		trap->ICARUS_TaskIDSet( (sharedEntity_t *)ent, TID_ANGLE_FACE, taskID );
 		return qfalse;
-		break;
 
 	case SET_EVENT:
 		Q3_SetEvent( entID, (char *)data );
@@ -4794,7 +4689,6 @@ qboolean Q3_Set( int taskID, int entID, const char *type_name, const char *data 
 		Q3_SetViewTarget( entID, (char *)data );
 		trap->ICARUS_TaskIDSet( (sharedEntity_t *)ent, TID_ANGLE_FACE, taskID );
 		return qfalse;
-		break;
 
 	case SET_WATCHTARGET:
 		Q3_SetWatchTarget( entID, (char *)data );
@@ -4835,7 +4729,6 @@ qboolean Q3_Set( int taskID, int entID, const char *type_name, const char *data 
 		int_data = atoi( (char *)data );
 		Q3_SetWidth( entID, int_data );
 		return qfalse;
-		break;
 
 	case SET_YAWSPEED:
 		float_data = atof( (char *)data );
@@ -5374,13 +5267,11 @@ qboolean Q3_Set( int taskID, int entID, const char *type_name, const char *data 
 
 		trap->ICARUS_TaskIDSet( (sharedEntity_t *)ent, TID_ANIM_BOTH, taskID );
 		return qfalse;
-		break;
 
 	case SET_ANIMFRAME:
 		int_data = atoi( (char *)data );
 		Q3_SetAnimFrame( entID, int_data );
 		return qfalse;
-		break;
 
 	case SET_LOOP_ANIM:
 		if ( !Q_stricmp( "true", ((char *)data) ) ) {

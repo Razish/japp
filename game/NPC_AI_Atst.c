@@ -162,15 +162,11 @@ ATST_Attack
 -------------------------
 */
 void ATST_Attack( void ) {
-	qboolean	altAttack = qfalse;
-	int			blasterTest, chargerTest, weapon;
-	float		distance;
-	distance_e	distRate;
-	qboolean	visible;
-	qboolean	advance;
+	qboolean altAttack = qfalse, visible = qfalse, advance = qfalse;
+	int blasterTest, chargerTest;
+	float distance;
 
-	if ( NPC_CheckEnemyExt( qfalse ) == qfalse )//!NPC->enemy )//
-	{
+	if ( !NPC_CheckEnemyExt( qfalse ) ) {
 		NPC->enemy = NULL;
 		return;
 	}
@@ -179,12 +175,11 @@ void ATST_Attack( void ) {
 
 	// Rate our distance to the target, and our visibilty
 	distance = (int)DistanceHorizontalSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
-	distRate = (distance > MIN_MELEE_RANGE_SQR) ? DIST_LONG : DIST_MELEE;
-	visible = NPC_ClearLOS4( NPC->enemy );
-	advance = (qboolean)(distance > MIN_DISTANCE_SQR);
+	visible = NPC_ClearLOS4( NPC->enemy ) ? qtrue : qfalse;
+	advance = (distance > MIN_DISTANCE_SQR) ? qtrue : qfalse;
 
 	// If we cannot see our target, move to see it
-	if ( visible == qfalse ) {
+	if ( !visible ) {
 		if ( NPCInfo->scriptFlags & SCF_CHASE_ENEMIES ) {
 			ATST_Hunt( visible, advance );
 			return;
@@ -192,13 +187,8 @@ void ATST_Attack( void ) {
 	}
 
 	// Decide what type of attack to do
-	switch ( distRate ) {
-	case DIST_MELEE:
-		//		NPC_ChangeWeapon( WP_ATST_MAIN );
-		break;
-
-	case DIST_LONG:
-
+	if ( distance > MIN_MELEE_RANGE_SQR ) {
+		// DIST_LONG
 		//		NPC_ChangeWeapon( WP_ATST_SIDE );
 		//rwwFIXMEFIXME: make atst weaps work.
 
@@ -207,41 +197,21 @@ void ATST_Attack( void ) {
 		chargerTest = trap->G2API_GetSurfaceRenderStatus( NPC->ghoul2, 0, "head_concussion_charger" );
 
 		// It has both side weapons
-		if ( blasterTest != -1
-			&& !(blasterTest&TURN_OFF)
-			&& chargerTest != -1
-			&& !(chargerTest&TURN_OFF) ) {
-			weapon = Q_irand( 0, 1 );	// 0 is blaster, 1 is charger (ALT SIDE)
-
-			if ( weapon )				// Fire charger
-			{
-				altAttack = qtrue;
-			}
-			else {
-				altAttack = qfalse;
-			}
-
-		}
-		else if ( blasterTest != -1
-			&& !(blasterTest & TURN_OFF) )	// Blaster is on
-		{
+		if ( blasterTest != -1 && !(blasterTest & TURN_OFF) && chargerTest != -1 && !(chargerTest & TURN_OFF) )
+			altAttack = Q_irand( 0, 1 ) ? qtrue : qfalse;
+		else if ( blasterTest != -1 && !(blasterTest & TURN_OFF) )
 			altAttack = qfalse;
-		}
-		else if ( chargerTest != -1
-			&& !(chargerTest & TURN_OFF) )	// Blaster is on
-		{
+		else if ( chargerTest != -1 && !(chargerTest & TURN_OFF) )
 			altAttack = qtrue;
-		}
-		else {
+		else
 			NPC_ChangeWeapon( WP_NONE );
-		}
-		break;
-	default:
-		break;
+	}
+	else {
+		// DIST_MELEE
+		//	NPC_ChangeWeapon( WP_ATST_MAIN );
 	}
 
 	NPC_FaceEnemy( qtrue );
-
 	ATST_Ranged( visible, advance, altAttack );
 }
 

@@ -208,19 +208,12 @@ static qboolean BG_ParseVehWeaponParm( vehWeaponInfo_t *vehWeapon, char *parmNam
 #endif
 				break;
 			default:
-				//Unknown type?
-				return qfalse;
 				break;
 			}
 			break;
 		}
 	}
-	if ( i == NUM_VWEAP_PARMS ) {
-		return qfalse;
-	}
-	else {
-		return qtrue;
-	}
+	return (i == NUM_VWEAP_PARMS) ? qfalse : qtrue;
 }
 
 int VEH_LoadVehWeapon( const char *vehWeaponName ) {//load up specified vehWeapon and save in array: g_vehWeaponInfo
@@ -811,10 +804,6 @@ static qboolean BG_ParseVehicleParm( vehicleInfo_t *vehicle, const char *parmNam
 #else
 				*(int *)(b + vehicleFields[i].ofs) = trap->S_RegisterSound( value );
 #endif
-				break;
-			default:
-				//Unknown type?
-				return qfalse;
 				break;
 			}
 			break;

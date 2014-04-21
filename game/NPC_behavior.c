@@ -358,8 +358,8 @@ void NPC_BSFollowLeader( void ) {
 				&& NPC->client->leader->enemy
 				&& NPC->client->leader->enemy != NPC
 				&& ((NPC->client->leader->enemy->client&&NPC->client->leader->enemy->client->playerTeam == NPC->client->enemyTeam)
-				|| (/*NPC->client->leader->enemy->r.svFlags&SVF_NONNPC_ENEMY*/0 && NPC->client->leader->enemy->alliedTeam == NPC->client->enemyTeam))
-				&& NPC->client->leader->enemy->health > 0 ) { //rwwFIXMEFIXME: use SVF_NONNPC_ENEMY?
+				|| (NPC->client->leader->enemy->r.svFlags&SVF_NONNPC_ENEMY && NPC->client->leader->enemy->alliedTeam == NPC->client->enemyTeam))
+				&& NPC->client->leader->enemy->health > 0 ) {
 				G_SetEnemy( NPC, NPC->client->leader->enemy );
 				NPCInfo->enemyCheckDebounceTime = level.time + Q_irand( 3000, 10000 );
 				NPCInfo->enemyLastSeenTime = level.time;
@@ -565,12 +565,10 @@ void NPC_BSJump( void ) {
 			xy -= z;
 			xy *= 0.5f;
 			assert( xy > 0 );
-
-			VectorMA( &p1, xy, &dir, &apex );
-			apex.z += apexHeight;
 		}
-		else
-			VectorSet( &apex, p1.x, p1.y, apexHeight );
+
+		VectorMA( &p1, xy, &dir, &apex );
+		apex.z += apexHeight;
 
 		VectorCopy( &apex, &NPC->pos1 );
 

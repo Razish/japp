@@ -611,9 +611,8 @@ void NPC_BSGM_Attack( void ) {
 	VectorClear( &impactPos4 );
 	enemyDist4 = DistanceSquared( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin );
 
-	//if ( NPC->client->ps.torsoAnim == BOTH_ATTACK4 ||
-	//	NPC->client->ps.torsoAnim == BOTH_ATTACK5 )
-	if ( 0 ) {
+#if 0
+	if ( NPC->client->ps.torsoAnim == BOTH_ATTACK4 || NPC->client->ps.torsoAnim == BOTH_ATTACK5 ) {
 		shoot4 = qfalse;
 		if ( TIMER_Done( NPC, "smackTime" ) && !NPCInfo->blockedDebounceTime ) {//time to smack
 			//recheck enemyDist4 and InFront
@@ -648,6 +647,9 @@ void NPC_BSGM_Attack( void ) {
 		}
 	}
 	else if ( NPC->lockCount ) //already shooting laser
+#else
+	if ( NPC->lockCount ) //already shooting laser
+#endif
 	{//sometimes use the laser beam attack, but only after he's taken down our generator
 		shoot4 = qfalse;
 		if ( NPC->lockCount == 1 ) {//charging up
@@ -1019,25 +1021,23 @@ void NPC_BSGM_Attack( void ) {
 	//also:
 	if ( NPC->enemy && NPC->enemy->s.weapon == WP_TURRET && !Q_stricmp( "PAS", NPC->enemy->classname ) ) {//crush turrets
 		if ( G_BoundsOverlap( &NPC->r.absmin, &NPC->r.absmax, &NPC->enemy->r.absmin, &NPC->enemy->r.absmax ) ) {//have to do this test because placed turrets are not solid to NPCs (so they don't obstruct navigation)
-			//if ( NPC->client->ps.powerups[PW_GALAK_SHIELD] > 0 )
-			if ( 0 ) {
+#if 0
+			if ( NPC->client->ps.powerups[PW_GALAK_SHIELD] > 0 )
 				NPC->client->ps.powerups[PW_BATTLESUIT] = level.time + ARMOR_EFFECT_TIME;
 				G_Damage( NPC->enemy, NPC, NPC, NULL, &NPC->r.currentOrigin, 100, DAMAGE_NO_KNOCKBACK, MOD_UNKNOWN );
 			}
-			else {
+			else
+#endif
 				G_Damage( NPC->enemy, NPC, NPC, NULL, &NPC->r.currentOrigin, 100, DAMAGE_NO_KNOCKBACK, MOD_CRUSH );
-			}
 		}
 	}
 	else if ( NPCInfo->touchedByPlayer != NULL && NPCInfo->touchedByPlayer == NPC->enemy ) {//touched enemy
-		//if ( NPC->client->ps.powerups[PW_GALAK_SHIELD] > 0 )
-		if ( 0 ) {//zap him!
+#if 0
+		if ( NPC->client->ps.powerups[PW_GALAK_SHIELD] > 0 ) {
 			vector3	smackDir;
 
 			//animate me
-#if 0
-			NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_ATTACK6, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
-#endif
+			//	NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_ATTACK6, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 			TIMER_Set( NPC, "attackDelay", NPC->client->ps.torsoTimer );
 			TIMER_Set( NPC, "standTime", NPC->client->ps.legsTimer );
 			//FIXME: debounce this?
@@ -1059,6 +1059,7 @@ void NPC_BSGM_Attack( void ) {
 			//stop any attacks
 			ucmd.buttons = 0;
 		}
+#endif
 	}
 
 	if ( NPCInfo->movementSpeech < 3 && NPCInfo->blockedSpeechDebounceTime <= level.time ) {

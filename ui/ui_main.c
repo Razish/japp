@@ -897,9 +897,6 @@ void UI_SetActiveMenu( uiMenuCommand_t menu ) {
 			Menus_CloseAll();
 			Menus_ActivateByName( "ingame_siegeclass" );
 			return;
-
-		default:
-			break;
 		}
 	}
 }
@@ -988,7 +985,7 @@ qboolean Asset_Parse( int handle ) {
 		memset( &token, 0, sizeof(pc_token_t) );
 
 		if ( !trap->PC_ReadToken( handle, &token ) )
-			return qfalse;
+			break;
 
 		if ( Q_stricmp( token.string, "}" ) == 0 ) {
 			return qtrue;
@@ -1250,17 +1247,14 @@ qboolean Load_Menu( int handle ) {
 	}
 
 	while ( 1 ) {
-
 		if ( !trap->PC_ReadToken( handle, &token ) )
+			break;
+
+		if ( token.string[0] == '\0' )
 			return qfalse;
 
-		if ( token.string[0] == 0 ) {
-			return qfalse;
-		}
-
-		if ( token.string[0] == '}' ) {
+		if ( token.string[0] == '}' )
 			return qtrue;
-		}
 
 		UI_ParseMenu( token.string );
 	}
@@ -1934,7 +1928,7 @@ void UpdateForceStatus( void ) {
 				Menu_ShowItemByName( menu, "playerforcespectate", qtrue );
 
 				// This is disabled, always show both sides from spectator.
-				if ( 0 && atoi( Info_ValueForKey( info, "g_forceBasedTeams" ) ) ) {	// Show red or blue based on what side is chosen.
+				if ( atoi( Info_ValueForKey( info, "g_forceBasedTeams" ) ) ) {	// Show red or blue based on what side is chosen.
 					if ( uiForceSide == FORCESIDE_LIGHT ) {
 						Menu_ShowItemByName( menu, "playerforcered", qfalse );
 						Menu_ShowItemByName( menu, "playerforceblue", qtrue );
@@ -3426,42 +3420,30 @@ static qboolean UI_OwnerDrawHandleKey( int ownerDraw, uint32_t flags, float *spe
 	switch ( ownerDraw ) {
 	case UI_HANDICAP:
 		return UI_Handicap_HandleKey( flags, special, key );
-		break;
 	case UI_SKIN_COLOR:
 		return UI_SkinColor_HandleKey( flags, special, key, uiSkinColor, TEAM_FREE, TEAM_BLUE, ownerDraw );
-		break;
 	case UI_FORCE_SIDE:
 		return UI_ForceSide_HandleKey( flags, special, key, uiForceSide, 1, 2, ownerDraw );
-		break;
 	case UI_JEDI_NONJEDI:
 		return UI_JediNonJedi_HandleKey( flags, special, key, uiJediNonJedi, 0, 1, ownerDraw );
-		break;
 	case UI_FORCE_MASTERY_SET:
 		return UI_ForceMaxRank_HandleKey( flags, special, key, uiForceRank, 1, MAX_FORCE_RANK, ownerDraw );
-		break;
 	case UI_FORCE_RANK:
 		break;
 	case UI_CHAT_MAIN:
 		return UI_Chat_Main_HandleKey( key );
-		break;
 	case UI_CHAT_ATTACK:
 		return UI_Chat_Attack_HandleKey( key );
-		break;
 	case UI_CHAT_DEFEND:
 		return UI_Chat_Defend_HandleKey( key );
-		break;
 	case UI_CHAT_REQUEST:
 		return UI_Chat_Request_HandleKey( key );
-		break;
 	case UI_CHAT_REPLY:
 		return UI_Chat_Reply_HandleKey( key );
-		break;
 	case UI_CHAT_SPOT:
 		return UI_Chat_Spot_HandleKey( key );
-		break;
 	case UI_CHAT_TACTICAL:
 		return UI_Chat_Tactical_HandleKey( key );
-		break;
 	case UI_FORCE_RANK_HEAL:
 	case UI_FORCE_RANK_LEVITATION:
 	case UI_FORCE_RANK_SPEED:
@@ -3483,30 +3465,22 @@ static qboolean UI_OwnerDrawHandleKey( int ownerDraw, uint32_t flags, float *spe
 		findex = (ownerDraw - UI_FORCE_RANK) - 1;
 		//this will give us the index as long as UI_FORCE_RANK is always one below the first force rank index
 		return UI_ForcePowerRank_HandleKey( flags, special, key, uiForcePowersRank[findex], 0, NUM_FORCE_POWER_LEVELS - 1, ownerDraw );
-		break;
 	case UI_EFFECTS:
 		break;
 	case UI_GAMETYPE:
 		return UI_GameType_HandleKey( flags, special, key, qtrue );
-		break;
 	case UI_NETGAMETYPE:
 		return UI_NetGameType_HandleKey( flags, special, key );
-		break;
 	case UI_AUTOSWITCHLIST:
 		return UI_AutoSwitch_HandleKey( flags, special, key );
-		break;
 	case UI_JOINGAMETYPE:
 		return UI_JoinGameType_HandleKey( flags, special, key );
-		break;
 	case UI_SKILL:
 		return UI_Skill_HandleKey( flags, special, key );
-		break;
 	case UI_BLUETEAMNAME:
 		return UI_TeamName_HandleKey( flags, special, key, qtrue );
-		break;
 	case UI_REDTEAMNAME:
 		return UI_TeamName_HandleKey( flags, special, key, qfalse );
-		break;
 	case UI_BLUETEAM1:
 	case UI_BLUETEAM2:
 	case UI_BLUETEAM3:
@@ -3546,10 +3520,8 @@ static qboolean UI_OwnerDrawHandleKey( int ownerDraw, uint32_t flags, float *spe
 		break;
 	case UI_BOTNAME:
 		return UI_BotName_HandleKey( flags, special, key );
-		break;
 	case UI_BOTSKILL:
 		return UI_BotSkill_HandleKey( flags, special, key );
-		break;
 	case UI_REDBLUE:
 		UI_RedBlue_HandleKey( flags, special, key );
 		break;
@@ -7792,12 +7764,12 @@ static qboolean GameType_Parse( char **p, qboolean join ) {
 			// two tokens per line, character name and sex
 			if ( join ) {
 				if ( !String_Parse( p, &uiInfo.joinGameTypes[uiInfo.numJoinGameTypes].gameType ) || !Int_Parse( p, &uiInfo.joinGameTypes[uiInfo.numJoinGameTypes].gtEnum ) ) {
-					return qfalse;
+					break;
 				}
 			}
 			else {
 				if ( !String_Parse( p, &uiInfo.gameTypes[uiInfo.numGameTypes].gameType ) || !Int_Parse( p, &uiInfo.gameTypes[uiInfo.numGameTypes].gtEnum ) ) {
-					return qfalse;
+					break;
 				}
 			}
 
@@ -7852,11 +7824,11 @@ static qboolean MapList_Parse( char **p ) {
 		if ( token[0] == '{' ) {
 			if ( !String_Parse( p, &uiInfo.mapList[uiInfo.mapCount].mapName ) || !String_Parse( p, &uiInfo.mapList[uiInfo.mapCount].mapLoadName )
 				|| !Int_Parse( p, &uiInfo.mapList[uiInfo.mapCount].teamMembers ) ) {
-				return qfalse;
+				break;
 			}
 
 			if ( !String_Parse( p, &uiInfo.mapList[uiInfo.mapCount].opponentName ) ) {
-				return qfalse;
+				break;
 			}
 
 			uiInfo.mapList[uiInfo.mapCount].typeBits = 0;

@@ -422,11 +422,11 @@ static void AnimateRiders( Vehicle_t *pVeh ) {
 	fSpeedPercToMax = parent->client->ps.speed / pVeh->m_pVehicleInfo->speedMax;
 
 	// Going in reverse...
-	if ( 0 ) {
+	/*if ( 0 ) {
 		Anim = BOTH_VT_WALK_REV;
 		iBlend = 600;
 	}
-	else {
+	else*/ {
 		qboolean		HasWeapon = ((pilotPS->weapon != WP_NONE) && (pilotPS->weapon != WP_MELEE));
 		qboolean		Attacking = (HasWeapon && !!(pVeh->m_ucmd.buttons&BUTTON_ATTACK));
 		qboolean		Right = (pVeh->m_ucmd.rightmove > 0);

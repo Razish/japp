@@ -1827,7 +1827,7 @@ void ST_Commander( void ) {
 
 					{//we're ready to move
 						if ( NPCInfo->combatPoint == -1 ) {//we're not on a combat point
-							if ( 1 )//!Q_irand( 0, 2 ) )
+							if ( !Q_irand( 0, 2 ) )
 							{//we should go for a combat point
 								cpFlags |= ST_GetCPFlags();
 							}
