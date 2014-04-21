@@ -2361,21 +2361,6 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( ent->client->ps.heldByClient )
 		ent->client->ps.heldByClient = 0;
 
-	// Will probably never need this again, since we have g2 properly serverside now.
-	/*
-	if ( client->ps.usingATST && ent->health > 0 ) {
-	// we have special shot clip boxes as an ATST
-	ent->r.contents |= CONTENTS_NOSHOT;
-	ATST_ManageDamageBoxes( ent );
-	}
-	else {
-	ent->r.contents &= ~CONTENTS_NOSHOT;
-	client->damageBoxHandle_Head = 0;
-	client->damageBoxHandle_RLeg = 0;
-	client->damageBoxHandle_LLeg = 0;
-	}
-	*/
-
 	// set up for pmove
 	oldEventSequence = client->ps.eventSequence;
 

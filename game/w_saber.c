@@ -4687,13 +4687,6 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 				goto blockStuff;
 			}
 			else {
-				/*
-				if (g_entities[tr.entityNum].client && g_entities[tr.entityNum].client->ps.usingATST)
-				{
-				dmg *= 0.1f;
-				}
-				*/
-
 				if ( g_entities[tr.entityNum].client && !g_entities[tr.entityNum].client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] ) { //not a "jedi", so make them suffer more
 					if ( dmg > SABER_NONATTACK_DAMAGE ) { //don't bother increasing just for idle touch damage
 						dmg *= 1.5f;
