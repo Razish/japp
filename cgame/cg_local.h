@@ -174,7 +174,7 @@ typedef struct clientInfo_s {
 	char		name[MAX_QPATH];
 	team_t		team;
 	int			duelTeam;
-	int			botSkill; // 0 = not bot, 1-5 = bot
+	int			botSkill; // -1 = not bot, 0-5 = bot
 	int			frame;
 	vector3		color1, color2;
 	int			icolor1, icolor2;
