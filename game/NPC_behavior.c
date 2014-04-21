@@ -565,12 +565,10 @@ void NPC_BSJump( void ) {
 			xy -= z;
 			xy *= 0.5f;
 			assert( xy > 0 );
-
-			VectorMA( &p1, xy, &dir, &apex );
-			apex.z += apexHeight;
 		}
-		else
-			VectorSet( &apex, p1.x, p1.y, apexHeight );
+
+		VectorMA( &p1, xy, &dir, &apex );
+		apex.z += apexHeight;
 
 		VectorCopy( &apex, &NPC->pos1 );
 
