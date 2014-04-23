@@ -2083,7 +2083,7 @@ qboolean Item_EnableShowViaCvar( itemDef_t *item, int flag ) {
 			// enable it if any of the values are true
 			if ( item->cvarFlags & flag ) {
 				if ( !Q_stricmp( buff, val ) ) {
-					break;
+					return qtrue;
 				}
 			}
 			else {

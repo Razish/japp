@@ -847,7 +847,7 @@ qboolean CG_Asset_Parse( int handle ) {
 
 #if 0
 		// font
-		if ( !Q_stricmp( token.string, "font" ) ) {
+		else if ( !Q_stricmp( token.string, "font" ) ) {
 			int pointSize;
 			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
 				break;
@@ -885,12 +885,10 @@ qboolean CG_Asset_Parse( int handle ) {
 				break;
 			cgDC.Assets.japp.fontMono = cgDC.RegisterFont(token.string);
 		}
+#endif
 
 		// gradientbar
 		else if ( !Q_stricmp( token.string, "gradientbar" ) ) {
-#else
-		if ( !Q_stricmp( token.string, "gradientbar" ) ) {
-#endif
 			if ( !trap->PC_ReadToken( handle, &token ) )
 				break;
 			cgDC.Assets.gradientBar = trap->R_RegisterShaderNoMip( token.string );
