@@ -435,17 +435,13 @@ extern int bgForcePowerCost[NUM_FORCE_POWERS][NUM_FORCE_POWER_LEVELS];
 typedef struct bgEntity_s {
 	entityState_t	s;
 	playerState_t	*playerState;
-	Vehicle_t		*m_pVehicle; //vehicle data
+	struct Vehicle_s *m_pVehicle; //vehicle data
 	void			*ghoul2; //g2 instance
 	int				localAnimIndex; //index locally (game/cgame) to anim data for this skel
 	vector3			modelScale; //needed for g2 collision
 
 	//Data type(s) must directly correspond to the head of the gentity and centity structures
-#if defined(__GCC__) || defined(MINGW32) || defined(MACOS_X)
-} _bgEntity_t;
-#else
 } bgEntity_t;
-#endif
 
 typedef struct pmove_s {
 	// state (in / out)

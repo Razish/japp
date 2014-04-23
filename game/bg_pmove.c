@@ -579,15 +579,6 @@ void BG_VehicleTurnRateForSpeed( Vehicle_t *pVeh, float speed, float *mPitchOver
 	}
 }
 
-
-// Following couple things don't belong in the DLL namespace!
-#ifdef _GAME
-#if !defined(MACOS_X) && !defined(__GCC__)
-typedef struct gentity_s gentity_t;
-#endif
-#endif
-
-
 static void PM_GroundTraceMissed( void );
 void PM_HoverTrace( void ) {
 	Vehicle_t *pVeh;

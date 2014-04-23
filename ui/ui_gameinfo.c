@@ -122,8 +122,11 @@ UI_LoadArenas
 #define MAPSBUFSIZE (MAX_MAPS * 64)
 void UI_LoadArenas( void ) {
 	int numdirs, i, n, dirlen;
-	char filename[MAX_QPATH], dirlist[MAPSBUFSIZE], *dirptr;
+	char filename[MAX_QPATH], *dirptr;
+	static char dirlist[MAPSBUFSIZE];
 	const char *type;
+
+	dirlist[0] = '\0';
 
 	ui_numArenas = 0;
 	uiInfo.mapCount = 0;

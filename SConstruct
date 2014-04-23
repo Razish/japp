@@ -325,7 +325,7 @@ elif plat == 'Windows':
 # compiler options
 if plat == 'Linux':
 	env['CC'] = compiler
-	env['CPPDEFINES'] = [ '__GCC__' ]
+	env['CPPDEFINES'] = []
 	env['CFLAGS'] = [
 		'-Wdeclaration-after-statement',
 		'-Wnested-externs',
