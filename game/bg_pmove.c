@@ -5829,7 +5829,10 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			}
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].altMaxCharge ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
-					pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].altChargeSub;
+#ifdef _GAME
+					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
+#endif
+						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].altChargeSub;
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].altChargeSubTime;
 				}
 			}
@@ -5860,7 +5863,10 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			}
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].maxCharge ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
-					pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].chargeSub;
+#ifdef _GAME
+					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
+#endif
+						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].chargeSub;
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].chargeSubTime;
 				}
 			}
@@ -7082,12 +7088,15 @@ static void PM_Weapon( void ) {
 		PM_StartTorsoAnim( WeaponAttackAnim[weapon] );
 	}
 
-	if ( pm->cmd.buttons & BUTTON_ALT_ATTACK ) {
+#ifdef _GAME
+	if ( ((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer )
+		amount = 0;
+	else
+#endif
+	if ( pm->cmd.buttons & BUTTON_ALT_ATTACK )
 		amount = weaponData[pm->ps->weapon].altEnergyPerShot;
-	}
-	else {
+	else
 		amount = weaponData[pm->ps->weapon].energyPerShot;
-	}
 
 	pm->ps->weaponstate = WEAPON_FIRING;
 
