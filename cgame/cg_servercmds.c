@@ -1061,8 +1061,10 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "spc" ) ) {
-		trap->Cvar_Set( "ui_myteam", "3" );
-		trap->OpenUIMenu( UIMENU_PLAYERCONFIG );
+		if ( !cg.demoPlayback ) {
+			trap->Cvar_Set( "ui_myteam", "3" );
+			trap->OpenUIMenu( UIMENU_PLAYERCONFIG );
+		}
 		return;
 	}
 
@@ -1085,7 +1087,7 @@ static void CG_ServerCommand( void ) {
 
 		trap->Cvar_Set( "ui_myteam", va( "%i", setTeam ) );
 
-		if ( !(trap->Key_GetCatcher() & KEYCATCH_UI) && doMenu )
+		if ( !(trap->Key_GetCatcher() & KEYCATCH_UI) && doMenu && !cg.demoPlayback )
 			trap->OpenUIMenu( UIMENU_PLAYERCONFIG );
 
 		return;
