@@ -276,6 +276,7 @@ files['cgame'] = [
 	'cgame/cg_snapshot.c',
 	'cgame/cg_syscalls.c',
 	'cgame/cg_teambinds.c',
+	'cgame/cg_trueview.c',
 	'cgame/cg_turret.c',
 	'cgame/cg_view.c',
 	'cgame/cg_weaponinit.c',

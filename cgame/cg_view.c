@@ -4,9 +4,7 @@
 #include "bg_luaevent.h"
 #include "cg_media.h"
 
-#define CAMERA_SIZE	4
-
-static int GetCameraClip( void ) {
+uint32_t CG_GetCameraClip( void ) {
 	return (cg.japp.isGhosted) ? (MASK_SOLID) : (MASK_SOLID | CONTENTS_PLAYERCLIP);
 }
 
@@ -284,12 +282,12 @@ static void CG_ResetThirdPersonViewDamp( int clientNum ) {
 	VectorCopy( &cameraIdealTarget[clientNum], &cameraCurTarget[clientNum] );
 
 	// First thing we do is trace from the first person viewpoint out to the new target location.
-	CG_Trace( &trace, &cameraFocusLoc[clientNum], &cameramins, &cameramaxs, &cameraCurTarget[clientNum], clientNum, GetCameraClip() );
+	CG_Trace( &trace, &cameraFocusLoc[clientNum], &cameramins, &cameramaxs, &cameraCurTarget[clientNum], clientNum, CG_GetCameraClip() );
 	if ( trace.fraction <= 1.0f )
 		VectorCopy( &trace.endpos, &cameraCurTarget[clientNum] );
 
 	// Now we trace from the new target location to the new view location, to make sure there is nothing in the way.
-	CG_Trace( &trace, &cameraCurTarget[clientNum], &cameramins, &cameramaxs, &cameraCurLoc[clientNum], clientNum, GetCameraClip() );
+	CG_Trace( &trace, &cameraCurTarget[clientNum], &cameramins, &cameramaxs, &cameraCurLoc[clientNum], clientNum, CG_GetCameraClip() );
 	if ( trace.fraction <= 1.0f )
 		VectorCopy( &trace.endpos, &cameraCurLoc[clientNum] );
 
@@ -335,7 +333,7 @@ static void CG_UpdateThirdPersonTargetDamp( int clientNum ) {
 	// Now we trace to see if the new location is cool or not.
 
 	// First thing we do is trace from the first person viewpoint out to the new target location.
-	CG_Trace( &trace, &cameraFocusLoc[clientNum], &cameramins, &cameramaxs, &cameraCurTarget[clientNum], clientNum, GetCameraClip() );
+	CG_Trace( &trace, &cameraFocusLoc[clientNum], &cameramins, &cameramaxs, &cameraCurTarget[clientNum], clientNum, CG_GetCameraClip() );
 	if ( trace.fraction < 1.0f )
 		VectorCopy( &trace.endpos, &cameraCurTarget[clientNum] );
 
@@ -403,7 +401,7 @@ static void CG_UpdateThirdPersonCameraDamp( int clientNum ) {
 	}
 
 	// Now we trace from the new target location to the new view location, to make sure there is nothing in the way.
-	CG_Trace( &trace, &cameraCurTarget[clientNum], &cameramins, &cameramaxs, &cameraCurLoc[clientNum], clientNum, GetCameraClip() );
+	CG_Trace( &trace, &cameraCurTarget[clientNum], &cameramins, &cameramaxs, &cameraCurLoc[clientNum], clientNum, CG_GetCameraClip() );
 
 	if ( trace.fraction < 1.0f ) {
 		if ( trace.entityNum < ENTITYNUM_WORLD &&
@@ -427,7 +425,7 @@ static void CG_UpdateThirdPersonCameraDamp( int clientNum ) {
 				VectorCopy( &mover->lerpOrigin, &mover->currentState.pos.trBase );
 
 				//retrace
-				CG_Trace( &trace, &cameraCurTarget[clientNum], &cameramins, &cameramaxs, &cameraCurLoc[clientNum], clientNum, GetCameraClip() );
+				CG_Trace( &trace, &cameraCurTarget[clientNum], &cameramins, &cameramaxs, &cameraCurLoc[clientNum], clientNum, CG_GetCameraClip() );
 
 				//copy old data back in
 				mover->currentState.pos.trType = (trType_t)curTr;
@@ -2343,15 +2341,4 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	if ( cg_stats.integer )
 		trap->Print( "cg.clientFrame:%i\n", cg.clientFrame );
 #endif
-}
-
-// Checks to see if the current camera position is valid based on the last known safe location.  If it's not safe, place
-//	the camera at the last position safe location
-void CheckCameraLocation( vector3 *OldeyeOrigin ) {
-	trace_t trace;
-	refdef_t *refdef = CG_GetRefdef();
-
-	CG_Trace( &trace, OldeyeOrigin, &cameramins, &cameramaxs, &refdef->vieworg, cg.snap->ps.clientNum, GetCameraClip() );
-	if ( trace.fraction <= 1.0f )
-		VectorCopy( &trace.endpos, &refdef->vieworg );
 }
