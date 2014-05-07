@@ -1678,7 +1678,7 @@ static userinfoValidate_t userinfoFields[] = {
 	UIF( char_color_blue, 1, 1 ),
 	UIF( cp_sbRGB1, 0, 1 ), // JA+
 	UIF( cp_sbRGB2, 0, 1 ), // JA+
-	UIF( teamtask, 1, 1 ),
+	UIF( teamtask, 0, 1 ),
 	UIF( password, 0, 1 ), // optional
 	UIF( cjp_client, 0, 1 ), // JA+
 	UIF( csf, 0, 1 ), // JA++
