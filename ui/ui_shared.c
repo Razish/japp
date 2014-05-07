@@ -3279,6 +3279,24 @@ void Leaving_EditField( itemDef_t *item ) {
 	}
 }
 
+#ifdef _UI
+qboolean Item_TextField_HandleKey( itemDef_t *item, int key );
+void Item_TextField_Paste( itemDef_t *item ) {
+	int pasteLen, i;
+	char buff[2048] = {0};
+
+	trap->GetClipboardData( buff, sizeof( buff ) );
+
+	if ( !*buff )
+		return;
+
+	// send as if typed, so insert / overstrike works properly
+	pasteLen = strlen( buff );
+	for ( i = 0; i < pasteLen; i++ )
+		Item_TextField_HandleKey( item, buff[i] | K_CHAR_FLAG );
+}
+#endif
+
 qboolean Item_TextField_HandleKey( itemDef_t *item, int key ) {
 	char buff[2048];
 	int len;
@@ -3296,8 +3314,15 @@ qboolean Item_TextField_HandleKey( itemDef_t *item, int key ) {
 		if ( key & K_CHAR_FLAG ) {
 			key &= ~K_CHAR_FLAG;
 
-
-			if ( key == 'h' - 'a' + 1 ) {	// ctrl-h is backspace
+#ifdef _UI
+			if ( key == 'v' - 'a' + 1 ) {
+				// ctrl-v is paste
+				Item_TextField_Paste( item );
+			}
+			else
+#endif
+			if ( key == 'h' - 'a' + 1 ) {
+				// ctrl-h is backspace
 				if ( item->cursorPos > 0 ) {
 					memmove( &buff[item->cursorPos - 1], &buff[item->cursorPos], len + 1 - item->cursorPos );
 					item->cursorPos--;
