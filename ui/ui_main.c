@@ -7761,7 +7761,6 @@ static qboolean GameType_Parse( char **p, qboolean join ) {
 		}
 
 		if ( token[0] == '{' ) {
-			// two tokens per line, character name and sex
 			if ( join ) {
 				if ( !String_Parse( p, &uiInfo.joinGameTypes[uiInfo.numJoinGameTypes].gameType ) || !Int_Parse( p, &uiInfo.joinGameTypes[uiInfo.numJoinGameTypes].gtEnum ) ) {
 					break;

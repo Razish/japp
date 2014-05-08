@@ -571,7 +571,7 @@ int CG_G2EvIndexForModel( void *g2, int animIndex ) {
 #define DEFAULT_NEUTER_SOUNDPATH "chars/mp_generic_male/misc"
 void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 	fileHandle_t f;
-	gender_t gender = GENDER_MALE;
+	gender_t gender = ci->gender;
 	int i = 0, fLen = 0;
 	const char *dir, *s;
 	char soundpath[MAX_QPATH], soundName[1024];
@@ -613,9 +613,9 @@ void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 		soundpath[i] = '\0';
 
 		trap->FS_Close( f );
-	}
 
-	ci->gender = gender;
+		ci->gender = gender;
+	}
 
 	trap->S_Shutup( qtrue );
 
@@ -1297,6 +1297,9 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 			CG_LoadClientInfo( &newInfo );
 	}
 
+	if ( clientNum == cg.clientNum )
+		trap->Cvar_Set( "sex", newInfo.gender == GENDER_FEMALE ? "female" : "male" );
+
 	// replace whatever was there with the new one
 	newInfo.infoValid = qtrue;
 	if ( ci->ghoul2Model && ci->ghoul2Model != newInfo.ghoul2Model && trap->G2_HaveWeGhoul2Models( ci->ghoul2Model ) ) {
@@ -1411,6 +1414,8 @@ void CG_ActualLoadDeferredPlayers( void ) {
 		if ( ci->infoValid && ci->deferred ) {
 			CG_LoadClientInfo( ci );
 		}
+		if ( i == cg.clientNum )
+			trap->Cvar_Set( "sex", ci->gender == GENDER_FEMALE ? "female" : "male" );
 	}
 }
 
