@@ -1210,7 +1210,7 @@ const vector4 colorTable[CT_MAX] = {
 #define NUM_TEMPVECS 8
 static vector3 tempVecs[NUM_TEMPVECS];
 vector3 *tv( float x, float y, float z ) {
-	static int index;
+	static int index = 0;
 	vector3 *v = &tempVecs[index++];
 	index &= NUM_TEMPVECS - 1;
 
@@ -1221,7 +1221,7 @@ vector3 *tv( float x, float y, float z ) {
 
 static char tempStrs[NUM_TEMPVECS][32];
 char *vtos( const vector3 *v ) {
-	static int index;
+	static int index = 0;
 	char *s = tempStrs[index++];
 	index &= NUM_TEMPVECS - 1;
 

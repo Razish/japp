@@ -83,6 +83,7 @@ XCVAR_DEF( g_jediVmerc, "0", NULL, CVAR_SERVERINFO | CVAR_LATCH | CVAR_ARCHIVE, 
 XCVAR_DEF( g_jplua, "1", NULL, CVAR_NONE, qfalse )
 XCVAR_DEF( g_knockback, "1000", NULL, CVAR_NONE, qtrue )
 XCVAR_DEF( g_locationBasedDamage, "1", NULL, CVAR_NONE, qtrue )
+XCVAR_DEF( g_logAdmin, "1", NULL, CVAR_NONE, qfalse )
 XCVAR_DEF( g_logClientInfo, "0", NULL, CVAR_ARCHIVE, qtrue )
 XCVAR_DEF( g_logConsole, "1", NULL, CVAR_NONE, qfalse )
 XCVAR_DEF( g_logFormat, "1", NULL, CVAR_ARCHIVE, qfalse )

@@ -1589,3 +1589,16 @@ trace_t *G_RealTrace( gentity_t *ent, float dist ) {
 
 	return &tr;
 }
+
+#define NUM_CLIENTINFOBUFFERS (4)
+const char *G_PrintClient( int clientNum ) {
+	static char buf[NUM_CLIENTINFOBUFFERS][MAX_STRING_CHARS];
+	static int index = 0;
+	char *out = buf[(index++)&(NUM_CLIENTINFOBUFFERS-1)];
+	gentity_t *ent = g_entities + clientNum;
+
+	Com_sprintf( out, MAX_STRING_CHARS, "\"%02i\" \"%s\" \"%s\"", clientNum, ent->client->pers.netname,
+		ent->client->sess.IP );
+
+	return out;
+}

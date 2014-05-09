@@ -333,6 +333,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	else							trap->Print( "Not logging console to disk.\n" );
 	if ( g_logSecurity.integer )	G_OpenLog( LOG_DIRECTORY "security.log", &level.log.security, g_logSecurity.integer == 2 );
 	else							trap->Print( "Not logging security events to disk.\n" );
+	if ( g_logAdmin.integer )		G_OpenLog( LOG_DIRECTORY "admin.log", &level.log.admin, g_logAdmin.integer == 2 );
+	else							trap->Print( "Not logging admin events to disk.\n" );
 
 	trap->GetServerinfo( cs, sizeof(cs) );
 	G_LogPrintf( level.log.console, "------------------------------------------------------------\n" );

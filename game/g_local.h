@@ -653,7 +653,7 @@ typedef struct level_locals_s {
 	qboolean			lockedTeams[TEAM_NUM_TEAMS];
 
 	struct {
-		fileHandle_t		console, security;
+		fileHandle_t		admin, console, security;
 	} log;
 
 	struct {
@@ -843,6 +843,7 @@ gentity_t *			G_PlayEffectID( const int fxID, vector3 *org, vector3 *ang );
 void				G_PowerDuelCount( int *loners, int *doubles, qboolean countSpec );
 void				G_PrecacheDispensers( void );
 gentity_t *			G_PreDefSound( vector3 *org, int pdSound );
+const char *		G_PrintClient( int clientNum );
 void				G_PrintCommands( gentity_t *ent );
 qboolean			G_RadiusDamage( vector3 *origin, gentity_t *attacker, float damage, float radius, gentity_t *ignore, gentity_t *missile, int mod );
 int					G_RadiusList( vector3 *origin, float radius, gentity_t *ignore, qboolean takeDamage, gentity_t *ent_list[MAX_GENTITIES] );
