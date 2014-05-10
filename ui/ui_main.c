@@ -504,6 +504,33 @@ static const char *GetMonthAbbrevString( int iMonth ) {
 	return p ? p : "Jan";	// sanity
 }
 
+#define UIAS_LOCAL		(0)
+#define UIAS_GLOBAL1	(1)
+#define UIAS_GLOBAL2	(2)
+#define UIAS_GLOBAL3	(3)
+#define UIAS_GLOBAL4	(4)
+#define UIAS_GLOBAL5	(5)
+#define UIAS_FAVORITES	(6)
+
+#define UI_MAX_MASTER_SERVERS	(5)
+
+// Convert ui's net source to AS_* used by trap calls.
+int UI_SourceForLAN( void ) {
+	switch ( ui_netSource.integer ) {
+	default:
+	case UIAS_LOCAL:
+		return AS_LOCAL;
+	case UIAS_GLOBAL1:
+	case UIAS_GLOBAL2:
+	case UIAS_GLOBAL3:
+	case UIAS_GLOBAL4:
+	case UIAS_GLOBAL5:
+		return AS_GLOBAL;
+	case UIAS_FAVORITES:
+		return AS_FAVORITES;
+	}
+}
+
 /*
 static const char *netSources[] = {
 "Local",
@@ -513,11 +540,15 @@ static const char *netSources[] = {
 };
 static const int numNetSources = ARRAY_LEN(netSources);
 */
-static const int numNetSources = 3;	// now hard-entered in StringEd file
+static const int numNetSources = 7;	// now hard-entered in StringEd file
 static const char *GetNetSourceString( int iSource ) {
-	const char *p = GetCRDelineatedString( "MP_INGAME", "NET_SOURCES", iSource );
+	static char result[256] = {0};
 
-	return p ? p : "??";
+	Q_strncpyz( result, GetCRDelineatedString( "MP_INGAME", "NET_SOURCES", UI_SourceForLAN() ), sizeof( result ) );
+	if ( iSource >= UIAS_GLOBAL1 && iSource <= UIAS_GLOBAL5 )
+		Q_strcat( result, sizeof( result ), va( " %d", iSource ) );
+
+	return result;
 }
 
 void AssetCache( void ) {
@@ -2332,11 +2363,11 @@ static void UI_DrawServerRefreshDate( rectDef_t *rect, float scale, const vector
 		LerpColor( color, &lowLight, &newColor, 0.5f + 0.5f*sin( (float)(uiInfo.uiDC.realTime / PULSE_DIVISOR) ) );
 
 		trap->SE_GetStringTextString( "MP_INGAME_GETTINGINFOFORSERVERS", holdSPString, sizeof(holdSPString) );
-		Text_Paint( rect->x, rect->y, scale, &newColor, va( (char *)holdSPString, trap->LAN_GetServerCount( ui_netSource.integer ) ), 0, 0, textStyle, iMenuFont );
+		Text_Paint( rect->x, rect->y, scale, &newColor, va( (char *)holdSPString, trap->LAN_GetServerCount( UI_SourceForLAN() ) ), 0, 0, textStyle, iMenuFont );
 	}
 	else {
 		char buff[64];
-		Q_strncpyz( buff, UI_Cvar_VariableString( va( "ui_lastServerRefresh_%i", ui_netSource.integer ) ), 64 );
+		Q_strncpyz( buff, UI_Cvar_VariableString( va( "ui_lastServerRefresh_%i", ui_netSource.integer ) ), sizeof( buff ) );
 		trap->SE_GetStringTextString( "MP_INGAME_SERVER_REFRESHTIME", holdSPString, sizeof(holdSPString) );
 
 		Text_Paint( rect->x, rect->y, scale, color, va( "%s: %s", holdSPString, buff ), 0, 0, textStyle, iMenuFont );
@@ -2689,14 +2720,14 @@ static qboolean UI_OwnerDrawVisible( uint32_t flags ) {
 		}
 		if ( flags & UI_SHOW_FAVORITESERVERS ) {
 			// this assumes you only put this type of display flag on something showing in the proper context
-			if ( ui_netSource.integer != AS_FAVORITES ) {
+			if ( ui_netSource.integer != UIAS_FAVORITES ) {
 				vis = qfalse;
 			}
 			flags &= ~UI_SHOW_FAVORITESERVERS;
 		}
 		if ( flags & UI_SHOW_NOTFAVORITESERVERS ) {
 			// this assumes you only put this type of display flag on something showing in the proper context
-			if ( ui_netSource.integer == AS_FAVORITES ) {
+			if ( ui_netSource.integer == UIAS_FAVORITES ) {
 				vis = qfalse;
 			}
 			flags &= ~UI_SHOW_NOTFAVORITESERVERS;
@@ -3274,6 +3305,22 @@ static qboolean UI_NetSource_HandleKey( uint32_t flags, float *special, int key 
 			value++;
 		}
 
+		if ( value >= UIAS_GLOBAL1 && value <= UIAS_GLOBAL5 ) {
+			char masterstr[2], cvarname[sizeof( "sv_master1" )];
+
+			while ( value >= UIAS_GLOBAL1 && value <= UIAS_GLOBAL5 ) {
+				Com_sprintf( cvarname, sizeof( cvarname ), "sv_master%d", value );
+				trap->Cvar_VariableStringBuffer( cvarname, masterstr, sizeof( masterstr ) );
+				if ( *masterstr )
+					break;
+
+				if ( key == A_MOUSE2 )
+					value--;
+				else
+					value++;
+			}
+		}
+
 		if ( value >= numNetSources ) {
 			value = 0;
 		}
@@ -3285,7 +3332,7 @@ static qboolean UI_NetSource_HandleKey( uint32_t flags, float *special, int key 
 		trap->Cvar_Update( &ui_netSource );
 
 		UI_BuildServerDisplayList( qtrue );
-		if ( ui_netSource.integer != AS_GLOBAL ) {
+		if ( !(ui_netSource.integer >= UIAS_GLOBAL1 && ui_netSource.integer <= UIAS_GLOBAL5) ) {
 			UI_StartServerRefresh( qtrue );
 		}
 		return qtrue;
@@ -3547,7 +3594,7 @@ UI_ServersQsortCompare
 =================
 */
 static int QDECL UI_ServersQsortCompare( const void *arg1, const void *arg2 ) {
-	return trap->LAN_CompareServers( ui_netSource.integer, uiInfo.serverStatus.sortKey, uiInfo.serverStatus.sortDir, *(int*)arg1, *(int*)arg2 );
+	return trap->LAN_CompareServers( UI_SourceForLAN(), uiInfo.serverStatus.sortKey, uiInfo.serverStatus.sortDir, *(int*)arg1, *(int*)arg2 );
 }
 
 /*
@@ -4736,7 +4783,7 @@ static qboolean UI_CheckPassword( void ) {
 		return qfalse;
 	}
 
-	trap->LAN_GetServerInfo( ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS );
+	trap->LAN_GetServerInfo( UI_SourceForLAN(), uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS );
 
 	if ( atoi( Info_ValueForKey( info, "needpass" ) ) ) {
 
@@ -4775,7 +4822,7 @@ static void UI_JoinServer( void ) {
 	trap->Cvar_Set( "cg_cameraOrbit", "0" );
 	trap->Cvar_Set( "ui_singlePlayerActive", "0" );
 	if ( uiInfo.serverStatus.currentServer >= 0 && uiInfo.serverStatus.currentServer < uiInfo.serverStatus.numDisplayServers ) {
-		trap->LAN_GetServerAddressString( ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, sizeof(buff) );
+		trap->LAN_GetServerAddressString( UI_SourceForLAN(), uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, sizeof(buff) );
 		trap->Cmd_ExecuteText( EXEC_APPEND, va( "connect %s\n", buff ) );
 	}
 
@@ -5168,7 +5215,7 @@ static void UI_RunMenuScript( char **args ) {
 		}
 		else if ( Q_stricmp( name, "UpdateFilter" ) == 0 ) {
 			trap->Cvar_Update( &ui_netSource );
-			if ( ui_netSource.integer == AS_LOCAL || !uiInfo.serverStatus.numDisplayServers ) {
+			if ( ui_netSource.integer == UIAS_LOCAL || !uiInfo.serverStatus.numDisplayServers ) {
 				UI_StartServerRefresh( qtrue );
 			}
 			UI_BuildServerDisplayList( qtrue );
@@ -5177,7 +5224,7 @@ static void UI_RunMenuScript( char **args ) {
 			UI_LoadMods();
 		}
 		else if ( Q_stricmp( name, "ServerStatus" ) == 0 ) {
-			trap->LAN_GetServerAddressString( ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], uiInfo.serverStatusAddress, sizeof(uiInfo.serverStatusAddress) );
+			trap->LAN_GetServerAddressString( UI_SourceForLAN(), uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], uiInfo.serverStatusAddress, sizeof(uiInfo.serverStatusAddress) );
 			UI_BuildServerStatus( qtrue );
 		}
 		else if ( Q_stricmp( name, "FoundPlayerServerStatus" ) == 0 ) {
@@ -5288,12 +5335,12 @@ static void UI_RunMenuScript( char **args ) {
 			}
 		}
 		else if ( Q_stricmp( name, "addFavorite" ) == 0 ) {
-			if ( ui_netSource.integer != AS_FAVORITES ) {
+			if ( ui_netSource.integer != UIAS_FAVORITES ) {
 				char name[MAX_HOSTNAMELENGTH];
 				char addr[MAX_ADDRESSLENGTH];
 				int res;
 
-				trap->LAN_GetServerInfo( ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, MAX_STRING_CHARS );
+				trap->LAN_GetServerInfo( UI_SourceForLAN(), uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, MAX_STRING_CHARS );
 				name[0] = addr[0] = '\0';
 				Q_strncpyz( name, Info_ValueForKey( buff, "hostname" ), sizeof(name) );
 				Q_strncpyz( addr, Info_ValueForKey( buff, "addr" ), sizeof(addr) );
@@ -5320,9 +5367,9 @@ static void UI_RunMenuScript( char **args ) {
 			}
 		}
 		else if ( Q_stricmp( name, "deleteFavorite" ) == 0 ) {
-			if ( ui_netSource.integer == AS_FAVORITES ) {
+			if ( ui_netSource.integer == UIAS_FAVORITES ) {
 				char addr[MAX_ADDRESSLENGTH];
-				trap->LAN_GetServerInfo( ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, MAX_STRING_CHARS );
+				trap->LAN_GetServerInfo( AS_FAVORITES, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, MAX_STRING_CHARS );
 				addr[0] = '\0';
 				Q_strncpyz( addr, Info_ValueForKey( buff, "addr" ), sizeof(addr) );
 				if ( strlen( addr ) > 0 ) {
@@ -5331,7 +5378,7 @@ static void UI_RunMenuScript( char **args ) {
 			}
 		}
 		else if ( Q_stricmp( name, "createFavorite" ) == 0 ) {
-			//	if (ui_netSource.integer == AS_FAVORITES)
+			//	if (ui_netSource.integer == UIAS_FAVORITES)
 			//rww - don't know why this check was here.. why would you want to only add new favorites when the filter was favorites?
 			{
 				char name[MAX_HOSTNAMELENGTH];
@@ -6242,7 +6289,7 @@ static void UI_BinaryServerInsertion( int num ) {
 	while ( mid > 0 ) {
 		mid = len >> 1;
 		//
-		res = trap->LAN_CompareServers( ui_netSource.integer, uiInfo.serverStatus.sortKey,
+		res = trap->LAN_CompareServers( UI_SourceForLAN(), uiInfo.serverStatus.sortKey,
 			uiInfo.serverStatus.sortDir, num, uiInfo.serverStatus.displayServers[offset + mid] );
 		// if equal
 		if ( res == 0 ) {
@@ -6275,6 +6322,7 @@ static void UI_BuildServerDisplayList( int force ) {
 	char info[MAX_STRING_CHARS];
 	//	qboolean startRefresh = qtrue; TTimo: unused
 	static int numinvisible;
+	int	lanSource;
 
 	if ( !(force || uiInfo.uiDC.realTime > uiInfo.serverStatus.nextDisplayRefresh) ) {
 		return;
@@ -6296,6 +6344,8 @@ static void UI_BuildServerDisplayList( int force ) {
 		uiInfo.serverStatus.motdWidth = -1;
 	}
 
+	lanSource = UI_SourceForLAN();
+
 	if ( force ) {
 		numinvisible = 0;
 		// clear number of displayed servers
@@ -6304,12 +6354,12 @@ static void UI_BuildServerDisplayList( int force ) {
 		// set list box index to zero
 		Menu_SetFeederSelection( NULL, FEEDER_SERVERS, 0, NULL );
 		// mark all servers as visible so we store ping updates for them
-		trap->LAN_MarkServerVisible( ui_netSource.integer, -1, qtrue );
+		trap->LAN_MarkServerVisible( lanSource, -1, qtrue );
 	}
 
 	// get the server count (comes from the master)
-	count = trap->LAN_GetServerCount( ui_netSource.integer );
-	if ( count == -1 || (ui_netSource.integer == AS_LOCAL && count == 0) ) {
+	count = trap->LAN_GetServerCount( lanSource );
+	if ( count == -1 || (ui_netSource.integer == UIAS_LOCAL && count == 0) ) {
 		// still waiting on a response from the master
 		uiInfo.serverStatus.numDisplayServers = 0;
 		uiInfo.serverStatus.numPlayersOnServers = 0;
@@ -6326,22 +6376,22 @@ static void UI_BuildServerDisplayList( int force ) {
 	//	visible = qfalse;
 	for ( i = 0; i < count; i++ ) {
 		// if we already got info for this server
-		if ( !trap->LAN_ServerIsVisible( ui_netSource.integer, i ) ) {
+		if ( !trap->LAN_ServerIsVisible( lanSource, i ) ) {
 			continue;
 		}
 		//		visible = qtrue;
 		// get the ping for this server
-		ping = trap->LAN_GetServerPing( ui_netSource.integer, i );
-		if ( ping > 0 || ui_netSource.integer == AS_FAVORITES ) {
+		ping = trap->LAN_GetServerPing( lanSource, i );
+		if ( ping > 0 || ui_netSource.integer == UIAS_FAVORITES ) {
 
-			trap->LAN_GetServerInfo( ui_netSource.integer, i, info, MAX_STRING_CHARS );
+			trap->LAN_GetServerInfo( lanSource, i, info, MAX_STRING_CHARS );
 
 			clients = atoi( Info_ValueForKey( info, "clients" ) );
 			uiInfo.serverStatus.numPlayersOnServers += clients;
 
 			if ( ui_browserShowEmpty.integer == 0 ) {
 				if ( clients == 0 ) {
-					trap->LAN_MarkServerVisible( ui_netSource.integer, i, qfalse );
+					trap->LAN_MarkServerVisible( lanSource, i, qfalse );
 					continue;
 				}
 			}
@@ -6349,7 +6399,7 @@ static void UI_BuildServerDisplayList( int force ) {
 			if ( ui_browserShowFull.integer == 0 ) {
 				maxClients = atoi( Info_ValueForKey( info, "sv_maxclients" ) );
 				if ( clients == maxClients ) {
-					trap->LAN_MarkServerVisible( ui_netSource.integer, i, qfalse );
+					trap->LAN_MarkServerVisible( lanSource, i, qfalse );
 					continue;
 				}
 			}
@@ -6357,7 +6407,7 @@ static void UI_BuildServerDisplayList( int force ) {
 			if ( ui_browserShowPasswordProtected.integer == 0 ) {
 				passw = atoi( Info_ValueForKey( info, "needpass" ) );
 				if ( passw && !ui_browserShowPasswordProtected.integer ) {
-					trap->LAN_MarkServerVisible( ui_netSource.integer, i, qfalse );
+					trap->LAN_MarkServerVisible( lanSource, i, qfalse );
 					continue;
 				}
 			}
@@ -6365,26 +6415,26 @@ static void UI_BuildServerDisplayList( int force ) {
 			if ( uiInfo.joinGameTypes[ui_joinGameType.integer].gtEnum != -1 ) {
 				game = atoi( Info_ValueForKey( info, "gametype" ) );
 				if ( game != uiInfo.joinGameTypes[ui_joinGameType.integer].gtEnum ) {
-					trap->LAN_MarkServerVisible( ui_netSource.integer, i, qfalse );
+					trap->LAN_MarkServerVisible( lanSource, i, qfalse );
 					continue;
 				}
 			}
 
 			if ( ui_serverFilterType.integer > 0 && ui_serverFilterType.integer <= uiInfo.modCount ) {
 				if ( Q_stricmp( Info_ValueForKey( info, "game" ), UI_FilterDir( ui_serverFilterType.integer ) ) != 0 ) {
-					trap->LAN_MarkServerVisible( ui_netSource.integer, i, qfalse );
+					trap->LAN_MarkServerVisible( lanSource, i, qfalse );
 					continue;
 				}
 			}
 			// make sure we never add a favorite server twice
-			if ( ui_netSource.integer == AS_FAVORITES ) {
+			if ( ui_netSource.integer == UIAS_FAVORITES ) {
 				UI_RemoveServerFromDisplayList( i );
 			}
 			// insert the server into the list
 			UI_BinaryServerInsertion( i );
 			// done with this server
 			if ( ping > 0 ) {
-				trap->LAN_MarkServerVisible( ui_netSource.integer, i, qfalse );
+				trap->LAN_MarkServerVisible( lanSource, i, qfalse );
 				numinvisible++;
 			}
 		}
@@ -6558,6 +6608,7 @@ static void UI_BuildFindPlayerList( qboolean force ) {
 	serverStatusInfo_t info;
 	char name[MAX_NAME_LENGTH + 2];
 	char infoString[MAX_STRING_CHARS];
+	int lanSource;
 
 	if ( !force ) {
 		if ( !uiInfo.nextFindPlayerRefresh || uiInfo.nextFindPlayerRefresh > uiInfo.uiDC.realTime ) {
@@ -6652,9 +6703,10 @@ static void UI_BuildFindPlayerList( qboolean force ) {
 			// if we didn't try to get the status of all servers in the main browser yet
 			if ( uiInfo.pendingServerStatus.num < uiInfo.serverStatus.numDisplayServers ) {
 				uiInfo.pendingServerStatus.server[i].startTime = uiInfo.uiDC.realTime;
-				trap->LAN_GetServerAddressString( ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.pendingServerStatus.num],
+				lanSource = UI_SourceForLAN();
+				trap->LAN_GetServerAddressString( lanSource, uiInfo.serverStatus.displayServers[uiInfo.pendingServerStatus.num],
 					uiInfo.pendingServerStatus.server[i].adrstr, sizeof(uiInfo.pendingServerStatus.server[i].adrstr) );
-				trap->LAN_GetServerInfo( ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.pendingServerStatus.num], infoString, sizeof(infoString) );
+				trap->LAN_GetServerInfo( lanSource, uiInfo.serverStatus.displayServers[uiInfo.pendingServerStatus.num], infoString, sizeof(infoString) );
 				Q_strncpyz( uiInfo.pendingServerStatus.server[i].name, Info_ValueForKey( infoString, "hostname" ), sizeof(uiInfo.pendingServerStatus.server[0].name) );
 				uiInfo.pendingServerStatus.server[i].valid = qtrue;
 				uiInfo.pendingServerStatus.num++;
@@ -6966,7 +7018,7 @@ static int UI_GetIndexFromSelection( int actual ) {
 }
 
 static void UI_UpdatePendingPings( void ) {
-	trap->LAN_ResetPings( ui_netSource.integer );
+	trap->LAN_ResetPings( UI_SourceForLAN() );
 	uiInfo.serverStatus.refreshActive = qtrue;
 	uiInfo.serverStatus.refreshtime = uiInfo.uiDC.realTime + 1000;
 }
@@ -7038,7 +7090,7 @@ static const char *UI_FeederItemText( int feederID, int index, int column, qhand
 		if ( index >= 0 && index < uiInfo.serverStatus.numDisplayServers ) {
 			int ping, game;
 			if ( lastColumn != column || lastTime > uiInfo.uiDC.realTime + 5000 ) {
-				trap->LAN_GetServerInfo( ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, sizeof(info) );
+				trap->LAN_GetServerInfo( UI_SourceForLAN(), uiInfo.serverStatus.displayServers[index], info, sizeof(info) );
 				lastColumn = column;
 				lastTime = uiInfo.uiDC.realTime;
 			}
@@ -7087,7 +7139,7 @@ static const char *UI_FeederItemText( int feederID, int index, int column, qhand
 								*handle1 = uiInfo.uiDC.Assets.trueJedi;
 						}
 					}
-					if ( ui_netSource.integer == AS_LOCAL ) {
+					if ( ui_netSource.integer == UIAS_LOCAL ) {
 						int nettype = atoi( Info_ValueForKey( info, "nettype" ) );
 
 						if ( nettype < 0 || nettype >= numNetNames )
@@ -7638,7 +7690,7 @@ qboolean UI_FeederSelection( int feederID, int index, itemDef_t *item ) {
 	else if ( feederID == FEEDER_SERVERS ) {
 		const char *mapName = NULL;
 		uiInfo.serverStatus.currentServer = index;
-		trap->LAN_GetServerInfo( ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS );
+		trap->LAN_GetServerInfo( UI_SourceForLAN(), uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS );
 		uiInfo.serverStatus.currentServerPreview = trap->R_RegisterShaderNoMip( va( "levelshots/%s", Info_ValueForKey( info, "mapname" ) ) );
 		if ( uiInfo.serverStatus.currentServerCinematic >= 0 ) {
 			trap->CIN_StopCinematic( uiInfo.serverStatus.currentServerCinematic );
@@ -9034,7 +9086,7 @@ static void UI_StopServerRefresh( void ) {
 	Com_Printf( "%d servers listed in browser with %d players.\n",
 		uiInfo.serverStatus.numDisplayServers,
 		uiInfo.serverStatus.numPlayersOnServers );
-	count = trap->LAN_GetServerCount( ui_netSource.integer );
+	count = trap->LAN_GetServerCount( UI_SourceForLAN() );
 	if ( count - uiInfo.serverStatus.numDisplayServers > 0 ) {
 		Com_Printf( "%d servers not listed due to filters, packet loss, or pings higher than %d\n",
 			count - uiInfo.serverStatus.numDisplayServers,
@@ -9053,14 +9105,14 @@ static void UI_DoServerRefresh( void ) {
 	if ( !uiInfo.serverStatus.refreshActive ) {
 		return;
 	}
-	if ( ui_netSource.integer != AS_FAVORITES ) {
-		if ( ui_netSource.integer == AS_LOCAL ) {
-			if ( !trap->LAN_GetServerCount( ui_netSource.integer ) ) {
+	if ( ui_netSource.integer != UIAS_FAVORITES ) {
+		if ( ui_netSource.integer == UIAS_LOCAL ) {
+			if ( !trap->LAN_GetServerCount( AS_LOCAL ) ) {
 				wait = qtrue;
 			}
 		}
 		else {
-			if ( trap->LAN_GetServerCount( ui_netSource.integer ) < 0 ) {
+			if ( trap->LAN_GetServerCount( AS_GLOBAL ) < 0 ) {
 				wait = qtrue;
 			}
 		}
@@ -9073,7 +9125,7 @@ static void UI_DoServerRefresh( void ) {
 	}
 
 	// if still trying to retrieve pings
-	if ( trap->LAN_UpdateVisiblePings( ui_netSource.integer ) ) {
+	if ( trap->LAN_UpdateVisiblePings( UI_SourceForLAN() ) ) {
 		uiInfo.serverStatus.refreshtime = uiInfo.uiDC.realTime + 1000;
 	}
 	else if ( !wait ) {
@@ -9093,6 +9145,7 @@ UI_StartServerRefresh
 */
 static void UI_StartServerRefresh( qboolean full ) {
 	char	*ptr;
+	int lanSource;
 
 	qtime_t q;
 	trap->RealTime( &q );
@@ -9108,25 +9161,26 @@ static void UI_StartServerRefresh( qboolean full ) {
 	// clear number of displayed servers
 	uiInfo.serverStatus.numDisplayServers = 0;
 	uiInfo.serverStatus.numPlayersOnServers = 0;
+	lanSource = UI_SourceForLAN();
 	// mark all servers as visible so we store ping updates for them
-	trap->LAN_MarkServerVisible( ui_netSource.integer, -1, qtrue );
+	trap->LAN_MarkServerVisible( lanSource, -1, qtrue );
 	// reset all the pings
-	trap->LAN_ResetPings( ui_netSource.integer );
+	trap->LAN_ResetPings( lanSource );
 	//
-	if ( ui_netSource.integer == AS_LOCAL ) {
+	if ( ui_netSource.integer == UIAS_LOCAL ) {
 		trap->Cmd_ExecuteText( EXEC_NOW, "localservers\n" );
 		uiInfo.serverStatus.refreshtime = uiInfo.uiDC.realTime + 1000;
 		return;
 	}
 
 	uiInfo.serverStatus.refreshtime = uiInfo.uiDC.realTime + 5000;
-	if ( ui_netSource.integer == AS_GLOBAL || ui_netSource.integer == AS_MPLAYER ) {
+	if ( ui_netSource.integer >= UIAS_GLOBAL1 && ui_netSource.integer <= UIAS_GLOBAL5 ) {
 		ptr = UI_Cvar_VariableString( "debug_protocol" );
 		if ( strlen( ptr ) ) {
-			trap->Cmd_ExecuteText( EXEC_NOW, va( "globalservers 0 %s\n", ptr ) );
+			trap->Cmd_ExecuteText( EXEC_NOW, va( "globalservers %d %s full empty\n", ui_netSource.integer-1, ptr ) );
 		}
 		else {
-			trap->Cmd_ExecuteText( EXEC_NOW, va( "globalservers 0 %d\n", (int)trap->Cvar_VariableValue( "protocol" ) ) );
+			trap->Cmd_ExecuteText( EXEC_NOW, va( "globalservers %d %d full empty\n", ui_netSource.integer-1, (int)trap->Cvar_VariableValue( "protocol" ) ) );
 		}
 	}
 }
