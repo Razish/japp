@@ -2262,7 +2262,8 @@ void Touch_Item( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 		return;
 	}
 
-	G_LogPrintf( level.log.console, "Item: %i %s %s\n", other->s.number, other->client ? other->client->pers.netname : "<null>", ent->item->classname );
+	if ( g_logItemPickup.integer )
+		G_LogPrintf( level.log.console, "Item: %i %s %s\n", other->s.number, other->client ? other->client->pers.netname : "<null>", ent->item->classname );
 
 	// play the normal pickup sound
 	if ( predict ) {
