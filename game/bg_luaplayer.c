@@ -850,6 +850,19 @@ static int JPLua_Player_SetFlag( lua_State *L ) {
 #endif
 
 #ifdef _GAME
+//Func: Player:SetForce( integer points )
+//Retn: N/A
+static int JPLua_Player_SetForce( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	int points = lua_tointeger( L, 2 );
+
+	g_entities[player->clientNum].client->ps.fd.forcePower = points;
+
+	return 0;
+}
+#endif
+
+#ifdef _GAME
 //Func: Player:SetHealth()
 //Retn: N/A
 static int JPLua_Player_SetHealth( lua_State *L ) {
@@ -1101,6 +1114,9 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "SetEFlag", JPLua_Player_SetEFlag },
 	{ "SetEFlag2", JPLua_Player_SetEFlag2 },
 	{ "SetFlag", JPLua_Player_SetFlag },
+#ifdef _GAME
+	{ "SetForce", JPLua_Player_SetForce },
+#endif
 	{ "SetHealth", JPLua_Player_SetHealth },
 	{ "SetName", JPLua_Player_SetName },
 	{ "SetScore", JPLua_Player_SetScore },
