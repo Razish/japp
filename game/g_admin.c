@@ -1796,9 +1796,9 @@ static void AM_Merc( gentity_t *ent ) {
 	targ->client->pers.adminData.merc = !targ->client->pers.adminData.merc;
 	// give everything between WP_NONE and LAST_USEABLE_WEAPON
 	if ( targ->client->pers.adminData.merc ) {
+		int i;
 		G_LogPrintf( level.log.admin, "\t%s gave weapons to %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
-		int i;
 		targ->client->ps.stats[STAT_WEAPONS] = ((1 << LAST_USEABLE_WEAPON) - 1) & ~1;
 		for ( i = 0; i < AMMO_MAX; i++ ) {
 			targ->client->ps.ammo[i] = ammoData[i].max;
@@ -1806,9 +1806,9 @@ static void AM_Merc( gentity_t *ent ) {
 	}
 	// back to spawn weapons, select first usable weapon
 	else {
+		int i = 0, newWeap = -1, wp = targ->client->ps.weapon;
 		G_LogPrintf( level.log.admin, "\t%s took weapons from %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
-		int i = 0, newWeap = -1, wp = targ->client->ps.weapon;
 
 		targ->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
 
