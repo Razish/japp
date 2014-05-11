@@ -17,7 +17,7 @@ static const char *pluginDir = "lua/sv/";
 static const char *pluginDir = "lua/cl/";
 #endif
 
-//Func: GetSerialiser( string fileName )
+//Func: GetSerialiser( string fileName, [FSMode mode] )
 //Retn: Serialiser object
 int JPLua_GetSerialiser( lua_State *L ) {
 	const char *path = NULL;
@@ -223,13 +223,13 @@ int JPLua_Serialiser_Close( lua_State *L ) {
 	}
 
 	trap->FS_Close( serialiser->fileHandle );
-	serialiser->fileHandle = 0;
+	serialiser->fileHandle = NULL_FILE;
 	serialiser->fileName[0] = '\0';
 
 	return 0;
 }
 
-// Push a Serialiser instance for a client number onto the stack
+// Push a Serialiser instance onto the stack
 void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode ) {
 	jplua_serialiser_t *serialiser = NULL;
 	int len = 0;

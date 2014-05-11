@@ -8,6 +8,7 @@
 #include "json/cJSON.h"
 
 #include "bg_lua.h"
+#include "bg_lualogger.h"
 #include "bg_luaserialiser.h"
 
 #ifdef JPLUA
@@ -952,6 +953,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
 	{ "GetKeyCatcher", JPLua_Export_GetKeyCatcher }, // integer GetKeyCatcher()
 #endif
+	{ "GetLogger", JPLua_GetLogger }, // Logger GetLogger( string filename )
 	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
 	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
 #ifdef _CGAME
@@ -1060,6 +1062,7 @@ void JPLua_Init( void ) {
 	JPLua_Register_Server( JPLua.state );
 #endif
 	JPLua_Register_Cvar( JPLua.state );
+	JPLua_Register_Logger( JPLua.state );
 	JPLua_Register_Serialiser( JPLua.state );
 	JPLua_Register_Vector( JPLua.state );
 
