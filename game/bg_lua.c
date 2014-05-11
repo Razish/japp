@@ -11,6 +11,8 @@
 #include "bg_lualogger.h"
 #include "bg_luaserialiser.h"
 
+#include <inttypes.h>
+
 #ifdef JPLUA
 
 #if defined(_MSC_VER) && !defined(SCONS_BUILD)
@@ -284,9 +286,15 @@ static int JPLua_RegisterPlugin( lua_State *L ) {
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	lua_pushstring( L, "name" );	lua_pushstring( L, JPLua.currentPlugin->longname );				lua_settable( L, top );
-	lua_pushstring( L, "version" );	lua_pushstring( L, JPLua.currentPlugin->version );				lua_settable( L, top );
-	lua_pushstring( L, "UID" );		lua_pushfstring( L, "%p", (void *)JPLua.currentPlugin->UID );	lua_settable( L, top );
+	lua_pushstring( L, "name" );
+		lua_pushstring( L, JPLua.currentPlugin->longname );
+		lua_settable( L, top );
+	lua_pushstring( L, "version" );
+		lua_pushstring( L, JPLua.currentPlugin->version );
+		lua_settable( L, top );
+	lua_pushstring( L, "UID" );
+		lua_pushstring( L, va( "0x%" PRIxPTR, (void *)JPLua.currentPlugin->UID ) );
+		lua_settable( L, top );
 
 	//save in the registry, but push on stack again straight away
 	JPLua.currentPlugin->handle = luaL_ref( L, LUA_REGISTRYINDEX );
@@ -321,8 +329,8 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 		JPLua.currentPlugin = nextPlugin;
 	}
 	else {
-		trap->Print( "%-15s%-32s%-8s%0p\n", "Loaded plugin:", JPLua.currentPlugin->longname, JPLua.currentPlugin->version,
-			(void*)JPLua.currentPlugin->UID );
+		trap->Print( "%-15s%-32s%-8s0x%" PRIxPTR "\n", "Loaded plugin:", JPLua.currentPlugin->longname,
+			JPLua.currentPlugin->version, (void*)JPLua.currentPlugin->UID );
 	}
 }
 
