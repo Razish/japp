@@ -903,7 +903,7 @@ int JPLua_Export_TestLine( lua_State *L ) {
 	vector3 start, end;
 	float radius;
 	int time;
-	unsigned int color;
+	uint32_t color;
 
 	lua_getfield( L, 1, "x" ); start.x = lua_tonumber( L, -1 );
 	lua_getfield( L, 1, "y" ); start.y = lua_tonumber( L, -1 );

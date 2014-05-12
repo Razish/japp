@@ -135,26 +135,7 @@ localEntity_t *CG_SmokePuff( const vector3 *p, const vector3 *vel,
 	return le;
 }
 
-uint32_t CGDEBUG_SaberColor( saber_colors_t saberColor ) {
-	switch ( saberColor ) {
-	case SABER_RED:
-		return 0x000000ffu;
-	case SABER_ORANGE:
-		return 0x000088ffu;
-	case SABER_YELLOW:
-		return 0x0000ffffu;
-	case SABER_GREEN:
-		return 0x0000ff00u;
-	case SABER_BLUE:
-		return 0x00ff0000u;
-	case SABER_PURPLE:
-		return 0x00ff00ffu;
-	default:
-		return 0x00ffffffu; // white
-	}
-}
-
-void CG_TestLine( vector3 *start, vector3 *end, int time, unsigned int color, int radius ) {
+void CG_TestLine( vector3 *start, vector3 *end, int time, uint32_t color, int radius ) {
 	localEntity_t	*le;
 	refEntity_t		*re;
 
@@ -175,12 +156,11 @@ void CG_TestLine( vector3 *start, vector3 *end, int time, unsigned int color, in
 
 	re->shaderTexCoord.x = re->shaderTexCoord.y = 1.0f;
 
-	color = CGDEBUG_SaberColor( color );
-	re->shaderRGBA[0] = color & 0xff;
+	re->shaderRGBA[2] = color & 0xff;
 	color >>= 8;
 	re->shaderRGBA[1] = color & 0xff;
 	color >>= 8;
-	re->shaderRGBA[2] = color & 0xff;
+	re->shaderRGBA[0] = color & 0xff;
 	re->shaderRGBA[3] = 0xff;
 
 	le->color[3] = 1.0f;
@@ -657,7 +637,7 @@ void CG_GlassShatter_Old( int entnum, vector3 *org, vector3 *mins, vector3 *maxs
 		if ( difx.z > dif.z )		shardorg.z += difx.z - (dif.z);
 		else					shardorg.z -= difx.z;
 
-		//CG_TestLine(org, shardorg, 5000, 0x0000ff, 3);
+		//CG_TestLine(org, shardorg, 5000, 0xFF0000u, 3);
 
 		CG_ThrowChunk( &shardorg, &velocity, trap->R_RegisterModel( chunkname ), 0, 254 );
 
@@ -775,7 +755,7 @@ void CG_CreateDebris( int entnum, vector3 *org, vector3 *mins, vector3 *maxs, in
 		if ( difx.z > dif.z )	shardorg.z += difx.z - (dif.z);
 		else					shardorg.z -= difx.z;
 
-		//CG_TestLine(org, shardorg, 5000, 0x0000ff, 3);
+		//CG_TestLine(org, shardorg, 5000, 0xFF0000u, 3);
 
 		CG_ThrowChunk( &shardorg, &velocity, debrismodel, debrissound, 0 );
 

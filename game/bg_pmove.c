@@ -9883,10 +9883,10 @@ void PmoveSingle( pmove_t *pmove ) {
 	{
 		vector3 blah;
 		VectorMA(pm->ps->origin, 128.0f, pm->ps->moveDir, blah);
-		CG_TestLine(pm->ps->origin, blah, 1, 0x0000ff, 1);
+		CG_TestLine(pm->ps->origin, blah, 1, 0xFF0000u, 1);
 
 		VectorMA(pm->ps->origin, 1.0f, pm->ps->velocity, blah);
-		CG_TestLine(pm->ps->origin, blah, 1, 0xff0000, 1);
+		CG_TestLine(pm->ps->origin, blah, 1, 0xFF0000u, 1);
 	}
 #endif
 #endif

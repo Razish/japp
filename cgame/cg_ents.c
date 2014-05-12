@@ -426,11 +426,11 @@ void CG_Special( centity_t *cent ) {
 	if ( s1->userInt1 ) {
 		VectorMA( &s1->origin, 64.0f, &s1->boneAngles1, &s1->angles );
 		trap->FX_PlayEffectID( s1->userInt2 ? media.efx.portal.orange : media.efx.portal.blue, &s1->origin, &s1->boneAngles1, -1, -1, qfalse );
-		//	CG_TestLine( s1->origin, s1->angles, 400, 4, 1 );
+		//	CG_TestLine( s1->origin, s1->angles, 400, 0x0000FFu, 1 );
 
 		//If the portal is linked, show it
 		//	if ( s1->health != -1 )
-		//		CG_TestLine( s1->origin, cg_entities[s1->health].currentState.origin, 400, 3, 1 );
+		//		CG_TestLine( s1->origin, cg_entities[s1->health].currentState.origin, 400, 0xFFFF00u, 1 );
 	}
 
 	// if set to invisible, skip
@@ -2123,7 +2123,7 @@ static void CG_Missile( centity_t *cent ) {
 
 			BG_EvaluateTrajectory( &s1->pos, cg.time, &pos );
 
-			CG_TestLine( &rHandPos, &pos, 1, 6, 1 );
+			CG_TestLine( &rHandPos, &pos, 1, 0x000000u, 1 );
 			return;
 		}
 	}

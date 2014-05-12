@@ -1090,7 +1090,7 @@ void			CG_Text_Paint( float x, float y, float scale, const vector4 *color, const
 void			CG_Text_PaintChar( float x, float y, float width, float height, float scale, float s,
 	float t, float s2, float t2, qhandle_t hShader );
 float			CG_Text_Width( const char *text, float scale, int iMenuFont );
-void			CG_TestLine( vector3 *start, vector3 *end, int time, unsigned int color, int radius );
+void			CG_TestLine( vector3 *start, vector3 *end, int time, uint32_t color, int radius );
 void			CG_TileClear( void );
 void			CG_Trace( trace_t *result, const vector3 *start, const vector3 *mins,
 	const vector3 *maxs, const vector3 *end, int skipNumber, int mask );

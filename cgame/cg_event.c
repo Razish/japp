@@ -934,7 +934,7 @@ void CG_G2MarkEvent( entityState_t *es ) {
 		CG_G2Trace( &tr, &es->origin, NULL, NULL, &es->origin2, ignore, MASK_PLAYERSOLID );
 
 		if ( tr.entityNum != es->otherEntityNum ) { //try again if we hit an ent but not the one we wanted.
-			//CG_TestLine(es->origin, es->origin2, 2000, 0x0000ff, 1);
+			//CG_TestLine(es->origin, es->origin2, 2000, 0xFF0000u, 1);
 			if ( tr.entityNum < ENTITYNUM_WORLD ) {
 				ignore = tr.entityNum;
 				CG_G2Trace( &tr, &es->origin, NULL, NULL, &es->origin2, ignore, MASK_PLAYERSOLID );
@@ -3179,6 +3179,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 
 	case EV_TESTLINE:
 		DEBUGNAME( "EV_TESTLINE" );
+		//RAZTODO: convert saber colour to uint32_t
 		CG_TestLine( &es->origin, &es->origin2, es->time2, es->weapon, 1 );
 		break;
 

@@ -2357,7 +2357,7 @@ void CG_TempTestFunction( centity_t *cent, vector3 *forcedAngles ) {
 
 	VectorMA( bOrg, 40, bDir, uOrg );
 
-	CG_TestLine( bOrg, uOrg, 50, 0x0000ff, 1 );
+	CG_TestLine( bOrg, uOrg, 50, 0xFF0000u, 1 );
 
 	cent->turAngles.yaw = forcedAngles.yaw;
 }
@@ -2731,7 +2731,7 @@ qboolean CG_RagDoll( centity_t *cent, vector3 *forcedAngles ) {
 
 								VectorMA( borg, 1.0f, dVel, vorg );
 
-								CG_TestLine( borg, vorg, 50, 0x0000ff, 1 );
+								CG_TestLine( borg, vorg, 50, 0xFF0000u, 1 );
 							}
 #endif
 						}
@@ -4019,7 +4019,7 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	VectorMA( origin, -1, dir, &saber.oldorigin );
 
 
-	//	CG_TestLine( saber.origin, saber.oldorigin, 50, 0x000000ff, 3 );
+	//	CG_TestLine( saber.origin, saber.oldorigin, 50, 0xFF0000u, 3 );
 	saber.customShader = blade;
 	saber.reType = RT_LINE;
 	radiusStart = radius / 3.0f;
