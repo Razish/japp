@@ -2627,36 +2627,29 @@ void PM_SetAnim( int setAnimParts, int anim, uint32_t setAnimFlags, int blendTim
 
 //Get the point in the animation and return a percentage of the current point in the anim between 0 and the total anim length (0.0f - 1.0f)
 //This function assumes that your animation timer is set to the exact length of the animation
-float BG_GetTorsoAnimPoint( playerState_t * ps, int AnimIndex ) {
+float BG_GetTorsoAnimPoint( playerState_t *ps, int AnimIndex ) {
 	float attackAnimLength = 0;
 	float currentPoint = 0;
 	float animSpeedFactor = 1.0f;
-	float animPercentage = 0;
 
 	//Be sure to scale by the proper anim speed just as if we were going to play the animation
 	BG_SaberStartTransAnim( ps->clientNum, ps->fd.saberAnimLevel, ps->weapon, ps->torsoAnim, &animSpeedFactor, ps->brokenLimbs );
 
 	if ( animSpeedFactor > 0 ) {
-		attackAnimLength = (bgAllAnims[AnimIndex].anims[ps->legsAnim].numFrames - 1) * fabsf( (float)(bgAllAnims[AnimIndex].anims[ps->legsAnim].frameLerp) ) * (1 / animSpeedFactor);
+		attackAnimLength = (bgAllAnims[AnimIndex].anims[ps->torsoAnim].numFrames - 1) * fabsf( (float)(bgAllAnims[AnimIndex].anims[ps->torsoAnim].frameLerp) ) * (1 / animSpeedFactor);
 		attackAnimLength--;
 	}
 
 	currentPoint = ps->torsoTimer;
 
-	animPercentage = currentPoint / attackAnimLength;
-
-
-	//Com_Printf("%f\n", animPercentage);
-
-	return animPercentage;
+	return currentPoint / attackAnimLength;
 }
 
 
-float BG_GetLegsAnimPoint( playerState_t * ps, int AnimIndex ) {
+float BG_GetLegsAnimPoint( playerState_t *ps, int AnimIndex ) {
 	float attackAnimLength = 0;
 	float currentPoint = 0;
 	float animSpeedFactor = 1.0f;
-	float animPercentage = 0;
 
 	//Be sure to scale by the proper anim speed just as if we were going to play the animation
 	BG_SaberStartTransAnim( ps->clientNum, ps->fd.saberAnimLevel, ps->weapon, ps->legsAnim, &animSpeedFactor, ps->brokenLimbs );
@@ -2668,9 +2661,5 @@ float BG_GetLegsAnimPoint( playerState_t * ps, int AnimIndex ) {
 
 	currentPoint = ps->legsTimer;
 
-	animPercentage = currentPoint / attackAnimLength;
-
-	//Com_Printf("%f\n", animPercentage);
-
-	return animPercentage;
+	return currentPoint / attackAnimLength;
 }
