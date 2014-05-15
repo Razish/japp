@@ -2922,20 +2922,21 @@ void ClientThink_real( gentity_t *ent ) {
 	//		client->fireHeld = qfalse;		// for grapple
 	//	}
 
-	if ( ent->s.eType != ET_NPC &&
-		ent->client &&
-		ent->client->pers.connected == CON_CONNECTED &&
-		!ent->client->ps.duelInProgress &&
-		!BG_SaberInAttack( ent->client->ps.saberMove ) &&
-		!!(japp_allowHook.integer & (1 << level.gametype)) ) {
-		if ( !ent->client->hook && (pm.cmd.buttons & BUTTON_GRAPPLE) && ent->client->ps.pm_type != PM_DEAD /*&& !ent->client->hookHasBeenFired*/ )
+	if ( ent->s.eType != ET_NPC && ent->client && ent->client->pers.connected == CON_CONNECTED
+		&& !ent->client->ps.duelInProgress && !!(japp_allowHook.integer & (1 << level.gametype)) )
+	{
+		if ( !ent->client->hook && (pm.cmd.buttons & BUTTON_GRAPPLE) && ent->client->ps.pm_type != PM_DEAD
+			&& !BG_SaberInAttack( ent->client->ps.saberMove ) )
+		{
 			Weapon_GrapplingHook_Fire( ent );
+		}
 
-		if ( ent->client->hook &&
-			(((pm.cmd.buttons & BUTTON_USE) && ent->client->hookHasBeenFired && !ent->client->fireHeld) ||
-			(!Client_Supports( ent, CSF_GRAPPLE_SWING ) && !(pm.cmd.buttons & BUTTON_GRAPPLE) && ent->client->hook) ||
-			(!(pm.cmd.buttons & BUTTON_GRAPPLE) && ent->client->fireHeld && ent->client->hookHasBeenFired)) )
+		if ( ent->client->hook
+			&& (((pm.cmd.buttons & BUTTON_USE) && ent->client->hookHasBeenFired && !ent->client->fireHeld)
+			|| (!Client_Supports( ent, CSF_GRAPPLE_SWING ) && !(pm.cmd.buttons & BUTTON_GRAPPLE) && ent->client->hook)
+			|| (!(pm.cmd.buttons & BUTTON_GRAPPLE) && ent->client->fireHeld && ent->client->hookHasBeenFired)) ) {
 			Weapon_HookFree( client->hook );
+		}
 
 		else if ( ent->client->hook &&
 			ent->client->hookHasBeenFired &&
