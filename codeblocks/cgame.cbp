@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="cgame" />
+		<Option pch_mode="2" />
+		<Option compiler="clang" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/cgamex86_64" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Debug/cgame/" />
+				<Option type="3" />
+				<Option compiler="clang" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-g3" />
+					<Add option="-D_DEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/cgamex86_64" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Release/cgame/" />
+				<Option type="3" />
+				<Option compiler="clang" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+			</Target>
+			<Environment>
+				<Variable name="JA" value="~/ja" />
+			</Environment>
+		</Build>
+		<Compiler>
+			<Add option="-Wextra" />
+			<Add option="-Wdeclaration-after-statement" />
+			<Add option="-Wnested-externs" />
+			<Add option="-Wold-style-definition" />
+			<Add option="-Wstrict-prototypes" />
+			<Add option="-Wno-missing-braces" />
+			<Add option="-Wno-missing-field-initializers" />
+			<Add option="-Wno-sign-compare" />
+			<Add option="-Wno-unused-parameter" />
+			<Add option="-Waggregate-return" />
+			<Add option="-Winit-self" />
+			<Add option="-Winline" />
+			<Add option="-Wmissing-include-dirs" />
+			<Add option="-Woverlength-strings" />
+			<Add option="-Wpointer-arith" />
+			<Add option="-Wredundant-decls" />
+			<Add option="-Wundef" />
+			<Add option="-Wuninitialized" />
+			<Add option="-Wwrite-strings" />
+			<Add option="-fvisibility=hidden" />
+			<Add option="-msse2" />
+			<Add option="-mstackrealign" />
+			<Add option="-fPIC" />
+			<Add option="-D_CGAME" />
+			<Add option="-DJPLUA" />
+			<Add option="-DLUA_USE_LINUX" />
+			<Add directory="../" />
+			<Add directory="../game" />
+			<Add directory="../cgame" />
+		</Compiler>
+		<Linker>
+			<Add library="readline" />
+		</Linker>
+		<ExtraCommands>
+			<Add after="cp $(TARGET_OUTPUT_FILE) $(JA)/japlus" />
+			<Mode after="always" />
+		</ExtraCommands>
+		<Unit filename="../JAPP/jp_crashExtra.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../JAPP/jp_promode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../JAPP/jp_stack.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../JAPP/jp_tokenparser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_chatbox.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_consolecmds.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_draw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_drawtools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_effects.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_ents.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_event.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_info.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_light.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_localents.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_luaserver.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_marks.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_media.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_newDraw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_newScoreboard.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_players.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_playerstate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_predict.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_saga.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_scoreboard.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_serverModification.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_servercmds.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_smartentities.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_snapshot.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_syscalls.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_teambinds.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_trueview.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_turret.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_view.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_weaponinit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/cg_weapons.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/fx_blaster.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/fx_bowcaster.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/fx_bryarpistol.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/fx_demp2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/fx_disruptor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/fx_flechette.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/fx_force.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/fx_heavyrepeater.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../cgame/fx_rocketlauncher.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/AnimalNPC.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/FighterNPC.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/SpeederNPC.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/WalkerNPC.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_g2_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_lua.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_luacvar.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_luaevent.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_lualogger.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_luaplayer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_luaserialiser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_luavector.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_misc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_panimate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_pmove.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_saber.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_saberLoad.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_saga.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_slidemove.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_vehicleLoad.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../game/bg_weapons.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../json/cJSON.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lapi.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lauxlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lbaselib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lbitlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lcode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lcorolib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lctype.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/ldblib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/ldebug.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/ldo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/ldump.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lfunc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lgc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/linit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/liolib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/llex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lmathlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lmem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/loadlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lobject.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lopcodes.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/loslib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lparser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lstate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lstring.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lstrlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/ltable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/ltablib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/ltm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lua.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lundump.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lvm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../lua/lzio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../qcommon/q_math.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../qcommon/q_shared.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../ui/ui_shared.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

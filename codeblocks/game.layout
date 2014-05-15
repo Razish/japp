@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="../game/NPC_AI_Jedi.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="61357" topLine="1683" />
+		</Cursor>
+	</File>
+	<File name="../game/g_active.c" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="91052" topLine="2926" />
+		</Cursor>
+	</File>
+	<File name="../game/g_missile.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="28740" topLine="845" />
+		</Cursor>
+	</File>
+	<File name="../game/bg_lua.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="29091" topLine="969" />
+		</Cursor>
+	</File>
+	<File name="../game/g_weapon.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="96266" topLine="3079" />
+		</Cursor>
+	</File>
+</CodeBlocks_layout_file>
