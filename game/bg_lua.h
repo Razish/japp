@@ -71,4 +71,6 @@ typedef struct jplua_s {
 } jplua_t;
 extern jplua_t JPLua;
 
+extern const uint32_t JPLUA_VERSION;
+
 #endif // JPLUA
