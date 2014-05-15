@@ -174,3 +174,7 @@ pip-log.txt
 
 # SCons
 .sconsign.dblite
+
+# Code::Blocks
+*.depend
+
