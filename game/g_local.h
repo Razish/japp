@@ -26,6 +26,7 @@ typedef struct gentity_s gentity_t;
 #undef XCVAR_PROTO
 
 #define	GAMEVERSION					"JA+ Mod v2.6 B1" //"JA++ 0.2 build 2"
+#define DEFAULT_NAME				"Padawan"
 #define BODY_QUEUE_SIZE				(8)
 #define	FRAMETIME					(100) // msec
 #define	CARNAGE_REWARD_TIME			(3000)
@@ -739,6 +740,7 @@ qboolean			CanDamage( gentity_t *targ, vector3 *origin );
 void				ClearRegisteredItems( void );
 void				ClientSpawn( gentity_t *ent );
 void				ClientCleanName( const char *in, char *out, int outSize );
+qboolean			CheckDuplicateName( int clientNum );
 const char *		ClientConnect( int clientNum, qboolean firstTime, qboolean isBot );
 qboolean			ClientUserinfoChanged( int clientNum );
 void				ClientDisconnect( int clientNum );

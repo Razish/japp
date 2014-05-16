@@ -901,6 +901,11 @@ static int JPLua_Player_SetName( lua_State *L ) {
 	Q_strncpyz( ent->client->pers.netnameClean, ent->client->pers.netname, sizeof(ent->client->pers.netnameClean) );
 	Q_CleanString( ent->client->pers.netnameClean, STRIP_COLOUR );
 
+	if ( CheckDuplicateName( player->clientNum ) ) {
+		Q_strncpyz( ent->client->pers.netnameClean, ent->client->pers.netname, sizeof(ent->client->pers.netnameClean) );
+		Q_CleanString( ent->client->pers.netnameClean, STRIP_COLOUR );
+	}
+
 	// update clientinfo
 	trap->GetConfigstring( CS_PLAYERS + player->clientNum, info, sizeof(info) );
 	Info_SetValueForKey( info, "n", name );

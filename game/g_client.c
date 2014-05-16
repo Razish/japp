@@ -1178,33 +1178,117 @@ team_t PickTeam( int ignoreClientNum ) {
 	return TEAM_BLUE;
 }
 
-/*
-===========
-ForceClientSkin
+static qboolean IsSuffixed( const char *cleanName, uint32_t *suffixNum ) {
+	char tmp[MAX_NETNAME], *s, *bracketL, *bracketR;
+	size_t len;
 
-Forces a client's skin (for teamplay)
-===========
-*/
-/*
-static void ForceClientSkin( gclient_t *client, char *model, const char *skin ) {
-char *p;
+	len = strlen( cleanName );
 
-if ((p = Q_strrchr(model, '/')) != 0) {
-*p = 0;
+	// no left bracket at all, can't be suffixed
+	if ( !(bracketL = strrchr( cleanName, '(' )) )
+		return qfalse;
+
+	//	0 1 2 3 4 5 6 7 8 9
+	//	h,e,l,l,o, ,(,0,2,)
+	//	            ^
+	//	strlen = 10
+	// the bracket is coming too early, it can't be a clientNum suffix
+	if ( cleanName - bracketL < len - 3 ) {
+#ifdef _DEBUG
+		trap->Print( "DuplicateNames: bracket came too early, not removing suffix. [cleanName - bracketL](%d) < "
+			"[len - 3]()\n", cleanName - bracketL, len - 3 );
+#endif
+		return qfalse;
+	}
+
+	// no right bracket, can't be a clientNum suffix
+	if ( !(bracketR = strchr( bracketL, ')' )) ) {
+		return qfalse;
+	}
+
+	// found the left bracket, let's get the number between here and the next bracket
+	for ( s = bracketL; s < bracketR; s++ ) {
+		// if it's not a number, discard it - the name is not suffixed
+		if ( !isdigit( *s ) )
+			return qfalse;
+
+		tmp[s-bracketL] = *s;
+	}
+
+	if ( suffixNum )
+		*suffixNum = atoi( tmp );
+
+	return qtrue;
 }
 
-Q_strcat(model, MAX_QPATH, "/");
-Q_strcat(model, MAX_QPATH, skin);
+// add the "(02)" suffix, truncating if needed
+static void AddSuffix( char *name, size_t nameLen, int clientNum ) {
+	size_t len = strlen( name );
+	const char *suffix = va( " ^7(^5%02i^7)", clientNum );
+	const size_t suffixLen = strlen( suffix );
+	if ( len + suffixLen < nameLen ) {
+		Q_strcat( name, nameLen, suffix );
+	}
+	else {
+		// not enough space, we'll have to truncate
+		char *s = &name[nameLen - suffixLen - 1];
+		Q_strncpyz( s, suffix, suffixLen+1 );
+	}
 }
-*/
 
-/*
-===========
-ClientCheckName
-============
-*/
+// check if the specified client is trying to use a name that is already in use and add a clientNum suffix if so
+qboolean CheckDuplicateName( int clientNum ) {
+	char *name = g_entities[clientNum].client->pers.netname;
+	const char *cleanName = g_entities[clientNum].client->pers.netnameClean;
+	gentity_t *ent;
+	int i;
+	uint32_t suffixNum;
+
+	// remove any potential suffix if it's not ours
+	while ( IsSuffixed( cleanName, &suffixNum ) ) {
+		// if the last suffix on our name is ours, everything is in order
+		if ( clientNum == suffixNum )
+			return qfalse;
+
+		// remove this suffix and continue
+		trap->Print( "Removing invalid name suffix on \"%s\"\n", G_PrintClient( clientNum ) );
+		char *s = strrchr( name, '(' );
+		if ( s-1 > name )
+			s--;
+		*s = '\0';
+#ifdef _DEBUG
+		trap->Print( "New name is \"%s\"\n", s );
+#endif
+	}
+
+	// empty name? fall back to "Padawan"
+	if ( strlen( name ) == 0u ) {
+		trap->Print( "Falling back to default name for \"%s\"\n", G_PrintClient( clientNum ) );
+		Q_strncpyz( name, DEFAULT_NAME, MAX_NETNAME );
+	}
+
+	// now check if someone else is using this name
+	for ( i = 0, ent = g_entities; i<level.maxclients; i++, ent++ ) {
+		if ( i == clientNum )
+			continue;
+
+		//TODO: perhaps do an advanced check replacing chars such as 'O' for '0'
+		//	we are, after all, checking for impersonation
+		if ( !Q_stricmp( ent->client->pers.netnameClean, cleanName ) ) {
+			// we attempted to use this person's name, so add a suffix to ours
+			trap->Print( "Adding suffix on name for \"%s\" because \"%s\" == \"%s\"\n", G_PrintClient( clientNum ),
+				ent->client->pers.netnameClean, cleanName );
+			AddSuffix( name, MAX_NETNAME, clientNum );
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
 void ClientCleanName( const char *in, char *out, int outSize ) {
 	int outpos = 0, colorlessLen = 0, spaces = 0, ats = 0;
+	size_t len;
 
 	// discard leading spaces
 	for ( ; *in == ' '; in++ );
@@ -1261,9 +1345,15 @@ void ClientCleanName( const char *in, char *out, int outSize ) {
 
 	out[outpos] = '\0';
 
+	// strip trailing space
+	len = strlen( out );
+	while ( out[len-1] == ' ' ) {
+		out[--len] = '\0';
+	}
+
 	// don't allow empty names
 	if ( *out == '\0' || colorlessLen == 0 )
-		Q_strncpyz( out, "Padawan", outSize );
+		Q_strncpyz( out, DEFAULT_NAME, outSize );
 }
 
 #ifdef _DEBUG
@@ -1869,8 +1959,14 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	Q_strncpyz( oldname, client->pers.netname, sizeof(oldname) );
 	s = Info_ValueForKey( userinfo, "name" );
 	ClientCleanName( s, client->pers.netname, sizeof(client->pers.netname) );
+
 	Q_strncpyz( client->pers.netnameClean, client->pers.netname, sizeof(client->pers.netnameClean) );
 	Q_CleanString( client->pers.netnameClean, STRIP_COLOUR );
+
+	if ( CheckDuplicateName( clientNum ) ) {
+		Q_strncpyz( client->pers.netnameClean, client->pers.netname, sizeof(client->pers.netnameClean) );
+		Q_CleanString( client->pers.netnameClean, STRIP_COLOUR );
+	}
 
 	if ( client->sess.sessionTeam == TEAM_SPECTATOR && client->sess.spectatorState == SPECTATOR_SCOREBOARD ) {
 		Q_strncpyz( client->pers.netname, "scoreboard", sizeof(client->pers.netname) );

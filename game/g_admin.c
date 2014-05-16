@@ -1871,6 +1871,11 @@ static void AM_Rename( gentity_t *ent ) {
 	Q_strncpyz( e->client->pers.netnameClean, e->client->pers.netname, sizeof(e->client->pers.netnameClean) );
 	Q_CleanString( e->client->pers.netnameClean, STRIP_COLOUR );
 
+	if ( CheckDuplicateName( targetClient ) ) {
+		Q_strncpyz( e->client->pers.netnameClean, e->client->pers.netname, sizeof(e->client->pers.netnameClean) );
+		Q_CleanString( e->client->pers.netnameClean, STRIP_COLOUR );
+	}
+
 	// update clientinfo
 	trap->GetConfigstring( CS_PLAYERS + targetClient, info, sizeof(info) );
 	Info_SetValueForKey( info, "n", e->client->pers.netname );
