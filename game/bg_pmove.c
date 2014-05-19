@@ -2544,12 +2544,10 @@ static qboolean PM_CheckJump( void ) {
 					//FIXME: have to be moving... make sure it's opposite the wall... or at least forward?
 					int wallWalkAnim = BOTH_WALL_FLIP_BACK1;
 					int parts = SETANIM_LEGS;
-					int contents = MASK_PLAYERSOLID;
-					qboolean kick = qtrue;
+					uint32_t contents = MASK_SOLID;
 					if ( pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_2 ) {
 						wallWalkAnim = BOTH_FORCEWALLRUNFLIP_START;
 						parts = SETANIM_BOTH;
-						kick = qfalse;
 					}
 					else {
 						if ( !pm->ps->weaponTime ) {
@@ -2577,7 +2575,9 @@ static qboolean PM_CheckJump( void ) {
 						traceEnt = PM_BGEntForNum( trace.entityNum );
 
 						if ( trace.fraction < 1.0f
-							&& ((trace.entityNum<ENTITYNUM_WORLD&&traceEnt&&traceEnt->s.solid != SOLID_BMODEL) || DotProduct( &trace.plane.normal, &idealNormal )>0.7f) ) {//there is a wall there
+							&& ((trace.entityNum < ENTITYNUM_WORLD && traceEnt && traceEnt->s.solid != SOLID_BMODEL)
+							|| DotProduct( &trace.plane.normal, &idealNormal ) > 0.7f) )
+						{//there is a wall there
 							pm->ps->velocity.x = pm->ps->velocity.y = 0;
 							if ( wallWalkAnim == BOTH_FORCEWALLRUNFLIP_START ) {
 								pm->ps->velocity.z = forceJumpStrength[FORCE_LEVEL_3] / 2.0f;
@@ -2597,10 +2597,6 @@ static qboolean PM_CheckJump( void ) {
 							pm->ps->fd.forceJumpSound = 1;
 							BG_ForcePowerDrain( pm->ps, FP_LEVITATION, 5 );
 
-							//kick if jumping off an ent
-							if ( GetCInfo( CINFO_FLIPKICK ) && kick && traceEnt && (traceEnt->s.eType == ET_PLAYER || traceEnt->s.eType == ET_NPC) ) { //kick that thang!
-								pm->ps->forceKickFlip = traceEnt->s.number + 1;
-							}
 							pm->cmd.rightmove = pm->cmd.forwardmove = 0;
 						}
 					}
