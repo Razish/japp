@@ -3146,6 +3146,20 @@ static void SetEmote( gentity_t *ent, const emote_t *emote ) {
 static void Cmd_EmoteAtEase_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_ATEASE] ); }
 static void Cmd_EmoteHarlem_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_HARLEM] ); }
 
+static void Cmd_Jetpack_f( gentity_t *ent ) {
+	const gitem_t *item = BG_FindItemForHoldable( HI_JETPACK );
+
+	if ( ent->client->ps.duelInProgress || !(japp_allowJetpack.integer & (1 << level.gametype)) ) {
+		return;
+	}
+
+	if ( ent->client->jetPackOn ) {
+		Jetpack_Off( ent );
+	}
+
+	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] ^= (1 << item->giTag);
+}
+
 #define CMDFLAG_NOINTERMISSION	(0x0001u)
 #define CMDFLAG_CHEAT			(0x0002u)
 #define CMDFLAG_ALIVE			(0x0004u)
@@ -3188,6 +3202,7 @@ static const command_t commands[] = {
 	{ "giveother", Cmd_GiveOther_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 	{ "god", Cmd_God_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 	{ "ignore", Cmd_Ignore_f, GTB_ALL, 0 },
+	{ "jetpack", Cmd_Jetpack_f, GTB_ALL & ~GTB_SIEGE, 0 },
 	{ "joinchan", Cmd_JoinChannel_f, GTB_ALL, 0 },
 	{ "kill", Cmd_Kill_f, GTB_ALL, CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 	{ "killother", Cmd_KillOther_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
