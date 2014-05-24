@@ -1730,10 +1730,9 @@ static void CG_Item( centity_t *cent ) {
 		ent.origin.z += 28 + (sinf( cg.time / 200.0f ) * 4);
 		ent.renderfx |= RF_FORCE_ENT_ALPHA;
 		//	VectorCopy( cent->currentState.angles, angs );
-		cent->currentState.apos.trType = TR_LINEAR;
-		VectorSet( &cent->currentState.apos.trDelta, 0.0f, 128.0f, 0.0f );
-		BG_EvaluateTrajectory( &cent->currentState.apos, cg.time, &angs );
-		angs.z = 0.0f;
+		angs.pitch = 0.0f;
+		angs.yaw = 360.0f * (fmod(cg.time * 0.001, 360.0 / 128.0)) / (360.0 / 128.0);
+		angs.roll = 0.0f;
 		AnglesToAxis( &angs, ent.axis );
 
 		// render it, flip it around, render it again
