@@ -138,6 +138,8 @@ void CG_Text_Paint( float x, float y, float scale, const vector4 *color, const c
 		!limit ? -1 : limit,		// iCharLimit (-1 = none)
 		scale	// const float scale = 1.0f
 		);
+
+	trap->R_SetColor( NULL );
 }
 
 /*
