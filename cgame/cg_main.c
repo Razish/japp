@@ -349,7 +349,7 @@ static void CVU_ForceColour( void ) {
 static void CVU_ForceModel( void ) {
 	int i;
 
-	for ( i = 0; i < MAX_CLIENTS; i++ ) {
+	for ( i = 0; i < cgs.maxclients; i++ ) {
 		const char *clientInfo;
 
 		clientInfo = CG_ConfigString( CS_PLAYERS + i );

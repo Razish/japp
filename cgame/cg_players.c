@@ -1135,6 +1135,7 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 		size_t len;
 
 		// ally model for teammates unless we're in a non-team game, i.e. FFA where everyone is on TEAM_FREE
+		// this also accounts for spectating a certain team
 		if ( cgs.gametype < GT_TEAM || newInfo.team != cgs.clientinfo[cg.snap ? cg.snap->ps.clientNum : cg.clientNum].team )
 			Q_strncpyz( modelStr, cg_forceEnemyModel.string, sizeof(modelStr) );
 		else
@@ -1281,8 +1282,11 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	JPLua_Event_ClientInfoUpdate( clientNum, ci, &newInfo );
 
 	// we won't force colors for siege.
-	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE && !cg_forceModel.integer )
+	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE
+		&& (!cg_forceModel.integer || clientNum == cg.clientNum) )
+	{
 		BG_ValidateSkinForTeam( newInfo.modelName, newInfo.skinName, newInfo.team, &newInfo.colorOverride );
+	}
 	else
 		newInfo.colorOverride.r = newInfo.colorOverride.g = newInfo.colorOverride.b = 0.0f;
 
@@ -8555,7 +8559,7 @@ stillDoSaber:
 		savedRGB[2] = legs.shaderRGBA[2];
 		savedRenderFX = legs.renderfx;
 
-		if ( cent->currentState.number != cg.snap->ps.clientNum && cg_forceModel.integer ) {
+		if ( cent->currentState.number != cg.clientNum && cg_forceModel.integer ) {
 			// force enemy/ally colours
 			if ( cgs.gametype < GT_TEAM || ci->team != cgs.clientinfo[cg.snap->ps.clientNum].team ) {
 				if ( cg_forceEnemyColour.string[0] ) {

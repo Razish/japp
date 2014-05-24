@@ -335,6 +335,18 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 }
 
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
+	// check if we should update forced enemy/ally models
+	if ( ps->persistant[PERS_TEAM] != ops->persistant[PERS_TEAM] || ps->clientNum != ops->clientNum ) {
+		int i;
+		for ( i = 0; i < cgs.maxclients; i++ ) {
+			const char *clientInfo = CG_ConfigString( CS_PLAYERS + i );
+			if ( !VALIDSTRING( clientInfo ) )
+				continue;
+
+			CG_NewClientInfo( i, qtrue );
+		}
+	}
+
 	// check for changing follow mode
 	if ( ps->clientNum != ops->clientNum ) {
 		cg.thisFrameTeleport = qtrue;
