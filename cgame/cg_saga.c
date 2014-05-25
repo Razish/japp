@@ -8,10 +8,6 @@ static char team1[512], team2[512];
 int team1Timed = 0, team2Timed = 0;
 int cgSiegeTeam1PlShader = 0, cgSiegeTeam2PlShader = 0;
 
-#define		MAX_TRUEVIEW_INFO_SIZE		4096
-char		true_view_info[MAX_TRUEVIEW_INFO_SIZE];
-int			true_view_valid;
-
 static char cgParseObjectives[MAX_SIEGE_INFO_SIZE];
 
 extern void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded );
@@ -739,45 +735,4 @@ void CG_SetSiegeTimerCvar( int msec ) {
 	secs -= tens * 10;
 
 	trap->Cvar_Set( "ui_siegeTimer", va( "%i:%i%i", mins, tens, secs ) );
-}
-
-void CG_TrueViewInit( void ) {
-	int len = 0;
-	fileHandle_t f;
-
-	len = trap->FS_Open( "trueview.cfg", &f, FS_READ );
-
-	if ( !f ) {
-		//	trap->Print("Error: File Not Found: trueview.cfg\n");
-		true_view_valid = 0;
-		return;
-	}
-
-	if ( len <= 0 || len >= MAX_TRUEVIEW_INFO_SIZE ) {
-		//	trap->Print("Error: trueview.cfg is over the filesize limit. (%i)\n", MAX_TRUEVIEW_INFO_SIZE);
-		trap->FS_Close( f );
-		true_view_valid = 0;
-		return;
-	}
-
-	trap->FS_Read( true_view_info, len, f );
-	true_view_valid = 1;
-	trap->FS_Close( f );
-}
-
-
-//Tries to adjust the eye position from the data in cfg file if possible.
-void CG_AdjustEyePos( const char *modelName ) {
-	char eyepos[MAX_QPATH];
-
-	if ( true_view_valid ) {
-		if ( BG_SiegeGetPairedValue( true_view_info, (char *)modelName, eyepos ) ) {
-			trap->Print( "True View Eye Adjust Loaded for %s.\n", modelName );
-			trap->Cvar_Set( "cg_trueEyePosition", eyepos );
-		}
-		else
-			trap->Cvar_Set( "cg_trueEyePosition", "0" );
-	}
-	else
-		trap->Cvar_Set( "cg_trueEyePosition", "0" );
 }

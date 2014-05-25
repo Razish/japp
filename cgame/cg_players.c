@@ -9,8 +9,6 @@
 #include "cg_media.h"
 #include "bg_vehicles.h"
 
-extern void CheckCameraLocation( vector3 *oldEyeOrigin );
-
 extern int cgSiegeTeam1PlShader;
 extern int cgSiegeTeam2PlShader;
 
@@ -18,10 +16,6 @@ extern void CG_AddRadarEnt( centity_t *cent );	//cg_ents.c
 extern void CG_AddBracketedEnt( centity_t *cent );	//cg_ents.c
 extern qboolean CG_InFighter( void );
 extern qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum );
-
-//for g2 surface routines
-#define TURN_ON		(0x00000000u)
-#define TURN_OFF	(0x00000100u)
 
 extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
 
@@ -322,9 +316,6 @@ qboolean CG_ParseSurfsFile( const char *modelName, const char *skinName, char *s
 	return qtrue;
 }
 
-// Warning flag for models that are incompatible with True View
-static qboolean trueviewwarning = qfalse;
-
 qboolean BG_IsValidCharacterModel( const char *modelName, const char *skinName );
 qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team, vector4 *colors );
 
@@ -335,8 +326,7 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	vector3	tempVec = { 0.0f, 0.0f, 0.0f };
 	qboolean badModel = qfalse;
 
-	//Warning flag for models that are incompatible with True View
-	trueviewwarning = qfalse;
+	cg.japp.trueviewWarning = qfalse;
 
 retryModel:
 	if ( badModel ) {
@@ -581,7 +571,7 @@ int CG_G2EvIndexForModel( void *g2, int animIndex ) {
 #define DEFAULT_NEUTER_SOUNDPATH "chars/mp_generic_male/misc"
 void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 	fileHandle_t f;
-	gender_t gender = GENDER_MALE;
+	gender_t gender = ci->gender;
 	int i = 0, fLen = 0;
 	const char *dir, *s;
 	char soundpath[MAX_QPATH], soundName[1024];
@@ -623,9 +613,9 @@ void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 		soundpath[i] = '\0';
 
 		trap->FS_Close( f );
-	}
 
-	ci->gender = gender;
+		ci->gender = gender;
+	}
 
 	trap->S_Shutup( qtrue );
 
@@ -1145,6 +1135,7 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 		size_t len;
 
 		// ally model for teammates unless we're in a non-team game, i.e. FFA where everyone is on TEAM_FREE
+		// this also accounts for spectating a certain team
 		if ( cgs.gametype < GT_TEAM || newInfo.team != cgs.clientinfo[cg.snap ? cg.snap->ps.clientNum : cg.clientNum].team )
 			Q_strncpyz( modelStr, cg_forceEnemyModel.string, sizeof(modelStr) );
 		else
@@ -1291,8 +1282,11 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	JPLua_Event_ClientInfoUpdate( clientNum, ci, &newInfo );
 
 	// we won't force colors for siege.
-	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE && !cg_forceModel.integer )
+	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE
+		&& (!cg_forceModel.integer || clientNum == cg.clientNum) )
+	{
 		BG_ValidateSkinForTeam( newInfo.modelName, newInfo.skinName, newInfo.team, &newInfo.colorOverride );
+	}
 	else
 		newInfo.colorOverride.r = newInfo.colorOverride.g = newInfo.colorOverride.b = 0.0f;
 
@@ -1306,6 +1300,9 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 		else
 			CG_LoadClientInfo( &newInfo );
 	}
+
+	if ( clientNum == cg.clientNum )
+		trap->Cvar_Set( "sex", newInfo.gender == GENDER_FEMALE ? "female" : "male" );
 
 	// replace whatever was there with the new one
 	newInfo.infoValid = qtrue;
@@ -1421,6 +1418,8 @@ void CG_ActualLoadDeferredPlayers( void ) {
 		if ( ci->infoValid && ci->deferred ) {
 			CG_LoadClientInfo( ci );
 		}
+		if ( i == cg.clientNum )
+			trap->Cvar_Set( "sex", ci->gender == GENDER_FEMALE ? "female" : "male" );
 	}
 }
 
@@ -1956,7 +1955,7 @@ void CG_TriggerAnimSounds( centity_t *cent ) {
 		CG_PlayerAnimEvents( cent->localAnimIndex, sFileIndex, qfalse, cent->pe.legs.frame, curFrame,
 			cent->currentState.number );
 	}
-	cent->pe.legs.oldFrame = cent->pe.torso.frame;
+	cent->pe.legs.oldFrame = cent->pe.legs.frame;
 	cent->pe.legs.frame = curFrame;
 
 	if ( cent->noLumbar ) {
@@ -2362,7 +2361,7 @@ void CG_TempTestFunction( centity_t *cent, vector3 *forcedAngles ) {
 
 	VectorMA( bOrg, 40, bDir, uOrg );
 
-	CG_TestLine( bOrg, uOrg, 50, 0x0000ff, 1 );
+	CG_TestLine( bOrg, uOrg, 50, 0xFF0000u, 1 );
 
 	cent->turAngles.yaw = forcedAngles.yaw;
 }
@@ -2736,7 +2735,7 @@ qboolean CG_RagDoll( centity_t *cent, vector3 *forcedAngles ) {
 
 								VectorMA( borg, 1.0f, dVel, vorg );
 
-								CG_TestLine( borg, vorg, 50, 0x0000ff, 1 );
+								CG_TestLine( borg, vorg, 50, 0xFF0000u, 1 );
 							}
 #endif
 						}
@@ -4024,7 +4023,7 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	VectorMA( origin, -1, dir, &saber.oldorigin );
 
 
-	//	CG_TestLine( saber.origin, saber.oldorigin, 50, 0x000000ff, 3 );
+	//	CG_TestLine( saber.origin, saber.oldorigin, 50, 0xFF0000u, 3 );
 	saber.customShader = blade;
 	saber.reType = RT_LINE;
 	radiusStart = radius / 3.0f;
@@ -6702,255 +6701,6 @@ void CG_CheckThirdPersonAlpha( centity_t *cent, refEntity_t *legs ) {
 	}
 }
 
-// Get the point in the leg animation and return a percentage of the current point in the anim between 0 and the total
-//	anim length (0.0f - 1.0f)
-float GetSelfLegAnimPoint( void ) {
-	return BG_GetLegsAnimPoint( &cg.predictedPlayerState, cg_entities[cg.predictedPlayerState.clientNum].localAnimIndex );
-}
-
-// Get the point in the torso animation and return a percentage of the current point in the anim between 0 and the total
-//	anim length (0.0f - 1.0f)
-float GetSelfTorsoAnimPoint( void ) {
-	return BG_GetTorsoAnimPoint( &cg.predictedPlayerState, cg_entities[cg.predictedPlayerState.clientNum].localAnimIndex );
-}
-
-// Uses the currently setup model-based First Person View to calculation the final viewangles.
-// Features the following:
-//	1. Simulates allowable eye movement by makes a deadzone around the inputed viewangles vs the desired viewangles of
-//		refdef->viewangles
-//	2. Prevents the sudden view flipping during moves where your camera is suppose to flip 360 on the pitch (x) pitch
-//		(x) axis.
-void SmoothTrueView( vector3 *eyeAngles ) {
-	float legAnimPoint = GetSelfLegAnimPoint();
-	float torsoAnimPoint = GetSelfTorsoAnimPoint();
-	int i;
-	float angDiff; //refdef->viewangles in relation to eyeAngles
-	qboolean eyeRange = qtrue, useRefDef = qfalse, didSpecial = qfalse;
-	refdef_t *refdef = CG_GetRefdef();
-
-	//RAFIXME: See if I can find a link this to the prediction stuff.  I think the snap is of just the last gamestate snap
-
-	// Rolls
-	if ( cg_trueRoll.integer ) {
-		if ( cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_LEFT
-			|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_RIGHT
-			|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_LEFT_STOP
-			|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_RIGHT_STOP
-			|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_LEFT_FLIP
-			|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_RIGHT_FLIP
-			|| cg.predictedPlayerState.legsAnim == BOTH_WALL_FLIP_LEFT
-			|| cg.predictedPlayerState.legsAnim == BOTH_WALL_FLIP_RIGHT ) {
-			// Roll moves that look good with eye range
-			eyeRange = qtrue;
-			didSpecial = qtrue;
-		}
-		else if ( cg_trueRoll.integer == 1 ) {
-			// Use simple roll for the more complicated rolls
-			if ( cg.predictedPlayerState.legsAnim == BOTH_FLIP_L || cg.predictedPlayerState.legsAnim == BOTH_ROLL_L ) {
-				// Left rolls
-				VectorCopy( &refdef->viewangles, eyeAngles );
-				eyeAngles->roll += AngleNormalize180( (360 * legAnimPoint) );
-				AngleNormalize180( eyeAngles->roll );
-				eyeRange = qfalse;
-				didSpecial = qtrue;
-			}
-			else if ( cg.predictedPlayerState.legsAnim == BOTH_FLIP_R || cg.predictedPlayerState.legsAnim == BOTH_ROLL_R ) {
-				// Right rolls
-				VectorCopy( &refdef->viewangles, eyeAngles );
-				eyeAngles->roll += AngleNormalize180( (360 - (360 * legAnimPoint)) );
-				AngleNormalize180( eyeAngles->roll );
-				eyeRange = qfalse;
-				didSpecial = qtrue;
-			}
-		}
-		else {
-			// You're here because you're using cg_trueRoll.integer == 2
-			if ( cg.predictedPlayerState.legsAnim == BOTH_FLIP_L || cg.predictedPlayerState.legsAnim == BOTH_ROLL_L
-				|| cg.predictedPlayerState.legsAnim == BOTH_FLIP_R || cg.predictedPlayerState.legsAnim == BOTH_ROLL_R ) {
-				// Roll animation, lock the eyemovement
-				eyeRange = qfalse;
-				didSpecial = qtrue;
-			}
-		}
-	}
-	else if ( cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_LEFT
-		|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_RIGHT
-		|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_LEFT_STOP
-		|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_RIGHT_STOP
-		|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_LEFT_FLIP
-		|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_RIGHT_FLIP
-		|| cg.predictedPlayerState.legsAnim == BOTH_WALL_FLIP_LEFT
-		|| cg.predictedPlayerState.legsAnim == BOTH_WALL_FLIP_RIGHT
-		|| cg.predictedPlayerState.legsAnim == BOTH_FLIP_L || cg.predictedPlayerState.legsAnim == BOTH_ROLL_L
-		|| cg.predictedPlayerState.legsAnim == BOTH_FLIP_R || cg.predictedPlayerState.legsAnim == BOTH_ROLL_R ) {
-		// you don't want rolling so use refdef->viewangles as the view
-		useRefDef = qtrue;
-	}
-
-	// Flips
-	if ( cg_trueFlip.integer ) {
-		if ( cg.predictedPlayerState.legsAnim == BOTH_WALL_FLIP_BACK1 ) {
-			// Flip moves that look good with the eyemovement locked
-			eyeRange = qfalse;
-			didSpecial = qtrue;
-		}
-		else if ( cg_trueFlip.integer == 1 ) {
-			// Use simple flip for the more complicated flips
-			if ( cg.predictedPlayerState.legsAnim == BOTH_FLIP_F || cg.predictedPlayerState.legsAnim == BOTH_ROLL_F ) {
-				// forward flips
-				VectorCopy( &refdef->viewangles, eyeAngles );
-				eyeAngles->pitch += AngleNormalize180( 360 - (360 * legAnimPoint) );
-				AngleNormalize180( eyeAngles->pitch );
-				eyeRange = qfalse;
-				didSpecial = qtrue;
-			}
-			else if ( cg.predictedPlayerState.legsAnim == BOTH_FLIP_B || cg.predictedPlayerState.legsAnim == BOTH_ROLL_B
-				|| cg.predictedPlayerState.legsAnim == BOTH_FLIP_BACK1 ) {
-				// back flips
-				VectorCopy( &refdef->viewangles, eyeAngles );
-				eyeAngles->pitch += AngleNormalize180( (360 * legAnimPoint) );
-				AngleNormalize180( eyeAngles->pitch );
-				eyeRange = qfalse;
-				didSpecial = qtrue;
-			}
-		}
-		else {
-			// You're here because you're using cg_trueFlip.integer = 2
-			if ( cg.predictedPlayerState.legsAnim == BOTH_FLIP_F || cg.predictedPlayerState.legsAnim == BOTH_ROLL_F
-				|| cg.predictedPlayerState.legsAnim == BOTH_FLIP_B || cg.predictedPlayerState.legsAnim == BOTH_ROLL_B
-				|| cg.predictedPlayerState.legsAnim == BOTH_FLIP_BACK1 ) {
-				// Flip animation and using cg_trueFlip.integer = 2, lock the eyemovement
-				eyeRange = qfalse;
-				didSpecial = qtrue;
-			}
-		}
-	}
-	else if ( cg.predictedPlayerState.legsAnim == BOTH_WALL_FLIP_BACK1 || cg.predictedPlayerState.legsAnim == BOTH_FLIP_F
-		|| cg.predictedPlayerState.legsAnim == BOTH_ROLL_F || cg.predictedPlayerState.legsAnim == BOTH_FLIP_B
-		|| cg.predictedPlayerState.legsAnim == BOTH_ROLL_B || cg.predictedPlayerState.legsAnim == BOTH_FLIP_BACK1 ) {
-		// you don't want flipping so use refdef->viewangles as the view
-		useRefDef = qtrue;
-	}
-
-	if ( cg_trueSpin.integer ) {
-		if ( cg_trueSpin.integer == 1 ) {
-			// Do a simulated Spin for the more complicated spins
-			if ( cg.predictedPlayerState.torsoAnim == BOTH_T1_TL_BR || cg.predictedPlayerState.torsoAnim == BOTH_T1__L_BR
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T1__L__R || cg.predictedPlayerState.torsoAnim == BOTH_T1_BL_BR
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T1_BL__R || cg.predictedPlayerState.torsoAnim == BOTH_T1_BL_TR
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T2__L_BR || cg.predictedPlayerState.torsoAnim == BOTH_T2_BL_BR
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T2_BL__R || cg.predictedPlayerState.torsoAnim == BOTH_T3__L_BR
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T3_BL_BR || cg.predictedPlayerState.torsoAnim == BOTH_T3_BL__R
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T4__L_BR || cg.predictedPlayerState.torsoAnim == BOTH_T4_BL_BR
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T4_BL__R || cg.predictedPlayerState.torsoAnim == BOTH_T5_TL_BR
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T5__L_BR || cg.predictedPlayerState.torsoAnim == BOTH_T5__L__R
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T5_BL_BR || cg.predictedPlayerState.torsoAnim == BOTH_T5_BL__R
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T5_BL_TR || cg.predictedPlayerState.torsoAnim == BOTH_ATTACK_BACK
-				|| cg.predictedPlayerState.torsoAnim == BOTH_CROUCHATTACKBACK1
-				|| cg.predictedPlayerState.torsoAnim == BOTH_BUTTERFLY_LEFT
-				|| cg.predictedPlayerState.legsAnim == BOTH_FJSS_TR_BL ) {
-				// Left Spins
-				VectorCopy( &refdef->viewangles, eyeAngles );
-				eyeAngles->yaw += AngleNormalize180( (360 - (360 * torsoAnimPoint)) );
-				AngleNormalize180( eyeAngles->yaw );
-				eyeRange = qfalse;
-				didSpecial = qtrue;
-			}
-			else if ( cg.predictedPlayerState.torsoAnim == BOTH_T1_BR_BL || cg.predictedPlayerState.torsoAnim == BOTH_T1__R__L
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T1__R_BL || cg.predictedPlayerState.torsoAnim == BOTH_T1_TR_BL
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T1_BR_TL || cg.predictedPlayerState.torsoAnim == BOTH_T1_BR__L
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T2_BR__L || cg.predictedPlayerState.torsoAnim == BOTH_T2_BR_BL
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T2__R_BL || cg.predictedPlayerState.torsoAnim == BOTH_T3_BR__L
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T3_BR_BL || cg.predictedPlayerState.torsoAnim == BOTH_T3__R_BL
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T4_BR__L || cg.predictedPlayerState.torsoAnim == BOTH_T4_BR_BL
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T4__R_BL || cg.predictedPlayerState.torsoAnim == BOTH_T5_BR_BL
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T5__R__L || cg.predictedPlayerState.torsoAnim == BOTH_T5__R_BL
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T5_TR_BL || cg.predictedPlayerState.torsoAnim == BOTH_T5_BR_TL
-				|| cg.predictedPlayerState.torsoAnim == BOTH_T5_BR__L || cg.predictedPlayerState.legsAnim == BOTH_BUTTERFLY_RIGHT
-				|| cg.predictedPlayerState.legsAnim == BOTH_FJSS_TL_BR ) {
-				// Right Spins
-				VectorCopy( &refdef->viewangles, eyeAngles );
-				eyeAngles->yaw += AngleNormalize180( (360 * torsoAnimPoint) );
-				AngleNormalize180( eyeAngles->yaw );
-				eyeRange = qfalse;
-				didSpecial = qtrue;
-			}
-		}
-		else {
-			// You're here because you're using cg_trueSpin.integer == 2
-			if ( BG_SpinningSaberAnim( cg.predictedPlayerState.torsoAnim )
-				&& cg.predictedPlayerState.torsoAnim != BOTH_JUMPFLIPSLASHDOWN1
-				&& cg.predictedPlayerState.torsoAnim != BOTH_JUMPFLIPSTABDOWN ) {
-				// Flip animation and using cg_trueFlip.integer = 2, lock the eyemovement
-				eyeRange = qfalse;
-				didSpecial = qtrue;
-			}
-		}
-	}
-	else if ( BG_SpinningSaberAnim( cg.predictedPlayerState.torsoAnim )
-		&& cg.predictedPlayerState.torsoAnim != BOTH_JUMPFLIPSLASHDOWN1
-		&& cg.predictedPlayerState.torsoAnim != BOTH_JUMPFLIPSTABDOWN ) {
-		// you don't want spinning so use refdef->viewangles as the view
-		useRefDef = qtrue;
-	}
-	else if ( cg.predictedPlayerState.legsAnim == BOTH_JUMPATTACK6 )
-		useRefDef = qtrue;
-
-	// Prevent camera flicker while landing.
-	if ( cg.predictedPlayerState.legsAnim == BOTH_LAND1 || cg.predictedPlayerState.legsAnim == BOTH_LAND2
-		|| cg.predictedPlayerState.legsAnim == BOTH_LANDBACK1 || cg.predictedPlayerState.legsAnim == BOTH_LANDLEFT1
-		|| cg.predictedPlayerState.legsAnim == BOTH_LANDRIGHT1 ) {
-		useRefDef = qtrue;
-	}
-
-	// Prevent the camera flicker while switching to the saber.
-	if ( cg.predictedPlayerState.torsoAnim == BOTH_STAND2TO1 || cg.predictedPlayerState.torsoAnim == BOTH_STAND1TO2 )
-		useRefDef = qtrue;
-
-	// special camera view for blue backstab
-	if ( cg.predictedPlayerState.torsoAnim == BOTH_A2_STABBACK1 ) {
-		eyeRange = qfalse;
-		didSpecial = qtrue;
-	}
-
-	if ( cg.predictedPlayerState.torsoAnim == BOTH_JUMPFLIPSLASHDOWN1
-		|| cg.predictedPlayerState.torsoAnim == BOTH_JUMPFLIPSTABDOWN ) {
-		eyeRange = qfalse;
-		didSpecial = qtrue;
-	}
-
-
-	if ( useRefDef )
-		VectorCopy( &refdef->viewangles, eyeAngles );
-	else {
-		// Movement Roll dampener
-		if ( !didSpecial ) {
-			if ( !cg_trueMoveRoll.integer )
-				eyeAngles->roll = refdef->viewangles.roll;
-			else if ( cg_trueMoveRoll.integer == 1 )
-				eyeAngles->roll *= 0.05f;
-		}
-
-		// eye movement
-		if ( eyeRange ) {
-			// allow eye motion
-			for ( i = 0; i<2; i++ ) {
-				float fov = cg_trueFOV.value ? cg_trueFOV.value : cg_fov.value;
-
-				angDiff = eyeAngles->data[i] - refdef->viewangles.data[i];
-				angDiff = AngleNormalize180( angDiff );
-				if ( fabsf( angDiff ) > fov ) {
-					if ( angDiff < 0 )	eyeAngles->data[i] += fov;
-					else				eyeAngles->data[i] -= fov;
-				}
-				else
-					eyeAngles->data[i] = refdef->viewangles.data[i];
-				AngleNormalize180( eyeAngles->data[i] );
-			}
-		}
-	}
-}
-
 void CG_AddMovementVectors( void );
 
 void CG_Player( centity_t *cent ) {
@@ -7580,130 +7330,7 @@ void CG_Player( centity_t *cent ) {
 		cgs.gameModels, &cent->modelScale );
 	gotLHandMatrix = qtrue;
 
-	// Restrict True View Model changes to the player and do the True View camera view work.
-	if ( cg.snap && cent->currentState.number == cg.snap->ps.clientNum ) {
-		if ( !cg.renderingThirdPerson && (cg_trueGuns.integer || cent->currentState.weapon == WP_SABER
-			|| cent->currentState.weapon == WP_MELEE) && !cg.predictedPlayerState.zoomMode && !cg.japp.fakeGun ) {
-			mdxaBone_t 		eyeMatrix;
-			vector3			eyeAngles, eyeAxis[3], oldEyeOrigin;
-			qhandle_t		eyesBolt;
-			qboolean		boneBased = qfalse;
-
-			// make the player's be based on the ghoul2 model
-
-			// grab the location data for the "*head_eyes" tag surface
-			eyesBolt = trap->G2API_AddBolt( cent->ghoul2, 0, "*head_eyes" );
-			if ( !trap->G2API_GetBoltMatrix( cent->ghoul2, 0, eyesBolt, &eyeMatrix, &cent->turAngles, &cent->lerpOrigin,
-				cg.time, cgs.gameModels, &cent->modelScale ) ) {
-				// Something prevented you from getting the "*head_eyes" information.  The model probably doesn't have a
-				//	*head_eyes tag surface.  Try using *head_front instead
-				eyesBolt = trap->G2API_AddBolt( cent->ghoul2, 0, "*head_front" );
-				if ( !trap->G2API_GetBoltMatrix( cent->ghoul2, 0, eyesBolt, &eyeMatrix, &cent->turAngles, &cent->lerpOrigin,
-					cg.time, cgs.gameModels, &cent->modelScale ) ) {
-					eyesBolt = trap->G2API_AddBolt( cent->ghoul2, 0, "reye" );
-					boneBased = qtrue;
-					if ( !trap->G2API_GetBoltMatrix( cent->ghoul2, 0, eyesBolt, &eyeMatrix, &cent->turAngles,
-						&cent->lerpOrigin, cg.time, cgs.gameModels, &cent->modelScale ) ) {
-						if ( !trueviewwarning ) {
-							// first failure.  Do a single warning then turn the warnings off.
-							trap->Print( "WARNING:  This Model seems to have missing the *head_eyes and *head_front tag "
-								"surfaces.  True View Disabled.\n" );
-							trueviewwarning = qtrue;
-						}
-
-						goto skipTrueView;
-					}
-				}
-			}
-
-			//Set the original eye Origin
-			VectorCopy( &refdef->vieworg, &oldEyeOrigin );
-
-			//set the player's view origin
-			BG_GiveMeVectorFromMatrix( &eyeMatrix, ORIGIN, &refdef->vieworg );
-
-			// Find the orientation of the eye tag surface I based this on coordsys.h that I found at
-			//	http://www.xs4all.nl/~hkuiper/cwmtx/html/coordsys_8h-source.html
-			// According to the file, Harry Kuiper, Will DeVore deserve credit for making that file that I based this on.
-
-			if ( boneBased ) {
-				// the eye bone has different default axis orientation than the tag surfaces.
-				eyeAxis[0].x = eyeMatrix.matrix[0][1];
-				eyeAxis[1].x = eyeMatrix.matrix[1][1];
-				eyeAxis[2].x = eyeMatrix.matrix[2][1];
-				eyeAxis[0].y = eyeMatrix.matrix[0][0];
-				eyeAxis[1].y = eyeMatrix.matrix[1][0];
-				eyeAxis[2].y = eyeMatrix.matrix[2][0];
-				eyeAxis[0].z = -eyeMatrix.matrix[0][2];
-				eyeAxis[1].z = -eyeMatrix.matrix[1][2];
-				eyeAxis[2].z = -eyeMatrix.matrix[2][2];
-			}
-			else {
-				eyeAxis[0].x = eyeMatrix.matrix[0][0];
-				eyeAxis[1].x = eyeMatrix.matrix[1][0];
-				eyeAxis[2].x = eyeMatrix.matrix[2][0];
-				eyeAxis[0].y = eyeMatrix.matrix[0][1];
-				eyeAxis[1].y = eyeMatrix.matrix[1][1];
-				eyeAxis[2].y = eyeMatrix.matrix[2][1];
-				eyeAxis[0].z = eyeMatrix.matrix[0][2];
-				eyeAxis[1].z = eyeMatrix.matrix[1][2];
-				eyeAxis[2].z = eyeMatrix.matrix[2][2];
-			}
-
-			eyeAngles.yaw = (atan2f( eyeAxis[1].x, eyeAxis[0].x ) * 180 / M_PI);
-
-			//I want asin but it's not setup in the libraries so I'm useing the statement asin x = (M_PI / 2) - acos x
-			eyeAngles.pitch = (((M_PI / 2) - acosf( -eyeAxis[2].x )) * 180 / M_PI);
-			eyeAngles.roll = (atan2f( eyeAxis[2].y, eyeAxis[2].z ) * 180 / M_PI);
-
-			AngleVectors( &eyeAngles, &eyeAxis[0], NULL, NULL );
-			VectorMA( &refdef->vieworg, cg_trueEyePosition.value, &eyeAxis[0], &refdef->vieworg );
-			if ( cg.snap->ps.emplacedIndex )
-				VectorMA( &refdef->vieworg, 10, &eyeAxis[2], &refdef->vieworg );
-
-			// Trace to see if the bolt eye origin is ok to move to.  If it's not, place it at the last safe position.
-			CheckCameraLocation( &oldEyeOrigin );
-
-			// Do all the Eye "movement" and simplified moves here.
-			SmoothTrueView( &eyeAngles );
-
-			//set the player view angles
-			VectorCopy( &eyeAngles, &refdef->viewangles );
-
-			//set the player view axis
-			AnglesToAxis( &refdef->viewangles, refdef->viewaxis );
-
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "head_eyes_mouth", TURN_OFF );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "heada_eyes_mouth", TURN_OFF );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "head", TURN_OFF );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "heada", TURN_OFF );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "heada_face", TURN_OFF );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "headb", TURN_OFF );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "headb_face", TURN_OFF );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "headb_eyes_mouth", TURN_OFF );
-		}
-		else {
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "head_eyes_mouth", TURN_ON );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "heada_eyes_mouth", TURN_ON );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "head", TURN_ON );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "heada", TURN_ON );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "heada_face", TURN_ON );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "headb", TURN_ON );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "headb_face", TURN_ON );
-			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "headb_eyes_mouth", TURN_ON );
-		}
-	}
-	else if ( !(cent->torsoBolt & (1 << (G2_MODELPART_HEAD - 10))) ) {
-		trap->G2API_SetSurfaceOnOff( cent->ghoul2, "head_eyes_mouth", TURN_ON );
-		trap->G2API_SetSurfaceOnOff( cent->ghoul2, "heada_eyes_mouth", TURN_ON );
-		trap->G2API_SetSurfaceOnOff( cent->ghoul2, "head", TURN_ON );
-		trap->G2API_SetSurfaceOnOff( cent->ghoul2, "heada", TURN_ON );
-		trap->G2API_SetSurfaceOnOff( cent->ghoul2, "heada_face", TURN_ON );
-		trap->G2API_SetSurfaceOnOff( cent->ghoul2, "headb", TURN_ON );
-		trap->G2API_SetSurfaceOnOff( cent->ghoul2, "headb_face", TURN_ON );
-		trap->G2API_SetSurfaceOnOff( cent->ghoul2, "headb_eyes_mouth", TURN_ON );
-	}
-skipTrueView:
+	CG_TrueView( cent );
 
 	ScaleModelAxis( &legs );
 
@@ -8932,7 +8559,7 @@ stillDoSaber:
 		savedRGB[2] = legs.shaderRGBA[2];
 		savedRenderFX = legs.renderfx;
 
-		if ( cent->currentState.number != cg.snap->ps.clientNum && cg_forceModel.integer ) {
+		if ( cent->currentState.number != cg.clientNum && cg_forceModel.integer ) {
 			// force enemy/ally colours
 			if ( cgs.gametype < GT_TEAM || ci->team != cgs.clientinfo[cg.snap->ps.clientNum].team ) {
 				if ( cg_forceEnemyColour.string[0] ) {

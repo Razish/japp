@@ -39,7 +39,7 @@ do
 	esac
 done
 
-if [ $GAME -eq 0 ] && [ $CGAME -eq 0 ] &&  [ $UI -eq 0 ]
+if [ $GAME -eq 0 ] && [ $CGAME -eq 0 ] && [ $UI -eq 0 ]
 then
 	GAME=1
 	CGAME=1
@@ -60,3 +60,6 @@ if [ $UI -eq 1 ]
 then
 	scons project=ui debug=$DEBUG force32=$FORCE32 -c >/dev/null
 fi
+
+# remove any lingering object files
+`find . -name '*.o' -print0 | xargs -0 rm`

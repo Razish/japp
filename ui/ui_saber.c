@@ -418,7 +418,6 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	VectorMA( origin, -1, dir, &saber.oldorigin );
 
 
-	//	CG_TestLine(saber.origin, saber.oldorigin, 50, 0x000000ff, 3);
 	saber.customShader = blade;
 	saber.reType = RT_LINE;
 	radiusStart = radius / 3.0f;

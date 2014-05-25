@@ -32,10 +32,10 @@ void WP_SaberRemoveG2Model( gentity_t *saberent );
 float RandFloat( float min, float max ) {
 	int randActual = rand();
 	float randMax = 32768.0f;
-#ifdef _WIN32
+#if defined(_WIN32)
 	if ( japp_randFix.integer == 2 )
 		randActual = (randActual << 16) | randActual;
-#elif defined(__GCC__)
+#elif defined(__linux__)
 	if ( japp_randFix.integer == 1 )
 		randMax = RAND_MAX;
 #endif

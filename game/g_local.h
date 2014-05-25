@@ -26,6 +26,7 @@ typedef struct gentity_s gentity_t;
 #undef XCVAR_PROTO
 
 #define	GAMEVERSION					"JA+ Mod v2.6 B1" //"JA++ 0.2 build 2"
+#define DEFAULT_NAME				"Padawan"
 #define BODY_QUEUE_SIZE				(8)
 #define	FRAMETIME					(100) // msec
 #define	CARNAGE_REWARD_TIME			(3000)
@@ -653,7 +654,7 @@ typedef struct level_locals_s {
 	qboolean			lockedTeams[TEAM_NUM_TEAMS];
 
 	struct {
-		fileHandle_t		console, security;
+		fileHandle_t		admin, console, security;
 	} log;
 
 	struct {
@@ -739,6 +740,7 @@ qboolean			CanDamage( gentity_t *targ, vector3 *origin );
 void				ClearRegisteredItems( void );
 void				ClientSpawn( gentity_t *ent );
 void				ClientCleanName( const char *in, char *out, int outSize );
+qboolean			CheckDuplicateName( int clientNum );
 const char *		ClientConnect( int clientNum, qboolean firstTime, qboolean isBot );
 qboolean			ClientUserinfoChanged( int clientNum );
 void				ClientDisconnect( int clientNum );
@@ -843,6 +845,7 @@ gentity_t *			G_PlayEffectID( const int fxID, vector3 *org, vector3 *ang );
 void				G_PowerDuelCount( int *loners, int *doubles, qboolean countSpec );
 void				G_PrecacheDispensers( void );
 gentity_t *			G_PreDefSound( vector3 *org, int pdSound );
+const char *		G_PrintClient( int clientNum );
 void				G_PrintCommands( gentity_t *ent );
 qboolean			G_RadiusDamage( vector3 *origin, gentity_t *attacker, float damage, float radius, gentity_t *ignore, gentity_t *missile, int mod );
 int					G_RadiusList( vector3 *origin, float radius, gentity_t *ignore, qboolean takeDamage, gentity_t *ent_list[MAX_GENTITIES] );

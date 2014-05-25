@@ -186,10 +186,6 @@ typedef struct parms_s {
 
 #define MAX_FAILED_NODES 8
 
-#if (!defined(MACOS_X) && !defined(__GCC__) && !defined(__GNUC__))
-typedef struct Vehicle_s Vehicle_t;
-#endif
-
 // the server looks at a sharedEntity, which is the start of the game's gentity_t structure
 //mod authors should not touch this struct
 typedef struct sharedEntity_s {
@@ -197,11 +193,7 @@ typedef struct sharedEntity_s {
 	playerState_t	*playerState;	//needs to be in the gentity for bg entity access
 	//if you want to actually see the contents I guess
 	//you will have to be sure to VMA it first.
-#if (!defined(MACOS_X) && !defined(__GCC__) && !defined(__GNUC__))
 	Vehicle_t		*m_pVehicle; //vehicle data
-#else
-	struct Vehicle_s		*m_pVehicle; //vehicle data
-#endif
 	void			*ghoul2; //g2 instance
 	int				localAnimIndex; //index locally (game/cgame) to anim data for this skel
 	vector3			modelScale; //needed for g2 collision

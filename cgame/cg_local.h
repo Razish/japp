@@ -78,6 +78,7 @@
 #define MAX_TICS						(14)
 #define NUM_CHUNK_MODELS				(4)
 #define MAX_CHATBOX_IDENTIFIER_SIZE		(32)
+#define CAMERA_SIZE						(4)
 
 #define NEWFX_DISINT			(0x0001u)
 #define NEWFX_RUPTOR			(0x0002u)
@@ -94,6 +95,9 @@
 #define LEF_TUMBLE				(0x0002u) // tumble over time, used for ejecting shells
 #define LEF_FADE_RGB			(0x0004u) // explicitly fade
 #define LEF_NO_RANDOM_ROTATE	(0x0008u) // MakeExplosion adds random rotate which could be bad in some cases
+
+#define TURN_ON					(0x0000u)
+#define TURN_OFF				(0x0100u)
 
 typedef enum footstep_e {
 	FOOTSTEP_STONEWALK,
@@ -659,6 +663,8 @@ typedef struct cg_s {
 		vector3			fixedVector;
 
 		qboolean		fakeGun;
+
+		qboolean		trueviewWarning;
 	} japp;
 
 	struct {
@@ -949,6 +955,7 @@ void			CG_G2Trace( trace_t *result, const vector3 *start, const vector3 *mins,
 qboolean		CG_G2TraceCollide( trace_t *tr, const vector3 *mins, const vector3 *maxs,
 	vector3 *lastValidStart, vector3 *lastValidEnd );
 void *			CG_G2WeaponInstance( centity_t *cent, int weapon );
+uint32_t		CG_GetCameraClip( void );
 int				CG_GetClassCount( team_t team, int siegeClass );
 void			CG_GetWeaponMuzzleBolt( int clIndex, vector3 *to );
 void			CG_GetColorForHealth( int health, int armor, vector4 *hcolor );
@@ -1059,14 +1066,12 @@ void			CG_Shutdown( void );
 void			CG_ShutDownG2Weapons( void );
 void			CG_SiegeRoundOver( centity_t *ent, int won );
 void			CG_SiegeObjectiveCompleted( centity_t *ent, int won, int objectivenum );
-localEntity_t *	CG_SmokePuff( const vector3 *p, const vector3 *vel, float radius, float r, float g,
-	float b, float a, float duration, int startTime, int fadeInTime,
-	uint32_t leFlags, qhandle_t hShader );
+localEntity_t *	CG_SmokePuff( const vector3 *p, const vector3 *vel, float radius, float r, float g, float b, float a,
+	float duration, int startTime, int fadeInTime, uint32_t leFlags, qhandle_t hShader );
 void			CG_Spark( vector3 *origin, vector3 *dir );
 void			CG_StartMusic( qboolean bForceStart );
 qhandle_t		CG_StatusHandle( int task );
-void			CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float shake_speed,
-	qboolean smoke );
+void			CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float shake_speed, qboolean smoke );
 vector4 *		CG_TeamColor( int team );
 void			CG_TestModel_f( void );
 void			CG_TestGun_f( void );
@@ -1085,12 +1090,13 @@ void			CG_Text_Paint( float x, float y, float scale, const vector4 *color, const
 void			CG_Text_PaintChar( float x, float y, float width, float height, float scale, float s,
 	float t, float s2, float t2, qhandle_t hShader );
 float			CG_Text_Width( const char *text, float scale, int iMenuFont );
-void			CG_TestLine( vector3 *start, vector3 *end, int time, unsigned int color, int radius );
+void			CG_TestLine( vector3 *start, vector3 *end, int time, uint32_t color, int radius );
 void			CG_TileClear( void );
 void			CG_Trace( trace_t *result, const vector3 *start, const vector3 *mins,
 	const vector3 *maxs, const vector3 *end, int skipNumber, int mask );
 void			CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 void			CG_TriggerAnimSounds( centity_t *cent );
+void			CG_TrueView( centity_t *cent );
 void			CG_TrueViewInit( void );
 void			CG_UpdateCvars( void );
 void			CG_Weapon_f( void );

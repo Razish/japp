@@ -138,6 +138,8 @@ void CG_Text_Paint( float x, float y, float scale, const vector4 *color, const c
 		!limit ? -1 : limit,		// iCharLimit (-1 = none)
 		scale	// const float scale = 1.0f
 		);
+
+	trap->R_SetColor( NULL );
 }
 
 /*
@@ -6709,7 +6711,7 @@ static void CG_Draw2DScreenTints( void ) {
 			VectorSet4( &hcolor, 0.7f, 0.0f, 0.0f, rageTime );
 
 			if ( !cg.renderingThirdPerson ) {
-				CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 
 			cgRageFadeTime = 0;
@@ -6752,7 +6754,7 @@ static void CG_Draw2DScreenTints( void ) {
 			}
 
 			if ( !cg.renderingThirdPerson && rageTime ) {
-				CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 			else {
 				if ( cg.snap->ps.fd.forceRageRecoveryTime > cg.time ) {
@@ -6760,7 +6762,7 @@ static void CG_Draw2DScreenTints( void ) {
 					hcolor.r = 0.2f;
 					hcolor.g = 0.2f;
 					hcolor.b = 0.2f;
-					CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+					CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 				}
 				cgRageTime = 0;
 			}
@@ -6785,7 +6787,7 @@ static void CG_Draw2DScreenTints( void ) {
 			hcolor.z = 0.2f;
 
 			if ( !cg.renderingThirdPerson ) {
-				CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 
 			cgRageRecFadeTime = 0;
@@ -6812,7 +6814,7 @@ static void CG_Draw2DScreenTints( void ) {
 			hcolor.b = 0.2f;
 
 			if ( !cg.renderingThirdPerson && rageRecTime ) {
-				CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 			else {
 				cgRageRecTime = 0;
@@ -6839,7 +6841,7 @@ static void CG_Draw2DScreenTints( void ) {
 			hcolor.b = 0.7f;
 
 			if ( !cg.renderingThirdPerson ) {
-				CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 
 			cgAbsorbFadeTime = 0;
@@ -6866,7 +6868,7 @@ static void CG_Draw2DScreenTints( void ) {
 			hcolor.b = 0.7f;
 
 			if ( !cg.renderingThirdPerson && absorbTime ) {
-				CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 			else {
 				cgAbsorbTime = 0;
@@ -6893,7 +6895,7 @@ static void CG_Draw2DScreenTints( void ) {
 			hcolor.b = 0;
 
 			if ( !cg.renderingThirdPerson ) {
-				CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 
 			cgProtectFadeTime = 0;
@@ -6920,7 +6922,7 @@ static void CG_Draw2DScreenTints( void ) {
 			hcolor.b = 0;
 
 			if ( !cg.renderingThirdPerson && protectTime ) {
-				CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 			else {
 				cgProtectTime = 0;
@@ -6947,7 +6949,7 @@ static void CG_Draw2DScreenTints( void ) {
 			hcolor.b = 0;
 
 			if ( !cg.renderingThirdPerson ) {
-				CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 
 			cgYsalFadeTime = 0;
@@ -6974,7 +6976,7 @@ static void CG_Draw2DScreenTints( void ) {
 			hcolor.b = 0;
 
 			if ( !cg.renderingThirdPerson && ysalTime )
-				CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			else
 				cgYsalTime = 0;
 		}
@@ -6987,7 +6989,7 @@ static void CG_Draw2DScreenTints( void ) {
 		hcolor.g = 0;
 		hcolor.b = 0;
 
-		CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+		CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 	}
 	else if ( (refdef->viewContents&CONTENTS_SLIME) ) {//tint screen green
 		float phase = cg.time / 1000.0f * WAVE_FREQUENCY * M_PI * 2;
@@ -6996,7 +6998,7 @@ static void CG_Draw2DScreenTints( void ) {
 		hcolor.g = 0.7f;
 		hcolor.b = 0;
 
-		CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+		CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 	}
 	else if ( (refdef->viewContents&CONTENTS_WATER) ) {//tint screen light blue -- FIXME: don't do this if CONTENTS_FOG? (in case someone *does* make a water shader with fog in it?)
 		float phase = cg.time / 1000.0f * WAVE_FREQUENCY * M_PI * 2;
@@ -7005,7 +7007,7 @@ static void CG_Draw2DScreenTints( void ) {
 		hcolor.g = 0.2f;
 		hcolor.b = 0.8f;
 
-		CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+		CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 	}
 }
 
@@ -7189,7 +7191,7 @@ void CG_Draw2D( void ) {
 		hcolor.g = 0;
 		hcolor.b = 0;
 
-		CG_DrawRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH*SCREEN_HEIGHT, &hcolor );
+		CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 
 		if ( !gCGHasFallVector ) {
 			VectorCopy( &cg.snap->ps.origin, &gCGFallVector );

@@ -104,7 +104,7 @@ static void C_G2Mark( void ) {
 		cg_entities[trace.entityNum].ghoul2 ) { //hit someone with a ghoul2 instance, let's project the decal on them then.
 		centity_t *cent = &cg_entities[trace.entityNum];
 
-		//CG_TestLine(tr.endpos, end, 2000, 0x0000ff, 1);
+		//CG_TestLine(tr.endpos, end, 2000, 0xFF0000u, 1);
 
 		CG_AddGhoul2Mark( td->shader, td->size, &trace.endpos, &end, trace.entityNum,
 			&cent->lerpOrigin, cent->lerpAngles.yaw, cent->ghoul2, &cent->modelScale,
@@ -127,51 +127,51 @@ static void CG_DebugBoxLines( vector3 *mins, vector3 *maxs, int duration ) {
 	vert.y = mins->y;
 	start.x = vert.x;
 	start.y = vert.y;
-	CG_TestLine( &start, &vert, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, &vert, duration, 0xFF0000u, 1 );
 
 	vert.x = mins->x;
 	vert.y = maxs->y;
 	start.x = vert.x;
 	start.y = vert.y;
-	CG_TestLine( &start, &vert, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, &vert, duration, 0xFF0000u, 1 );
 
 	vert.x = maxs->x;
 	vert.y = mins->y;
 	start.x = vert.x;
 	start.y = vert.y;
-	CG_TestLine( &start, &vert, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, &vert, duration, 0xFF0000u, 1 );
 
 	vert.x = maxs->x;
 	vert.y = maxs->y;
 	start.x = vert.x;
 	start.y = vert.y;
-	CG_TestLine( &start, &vert, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, &vert, duration, 0xFF0000u, 1 );
 
 	// top of box
 	VectorCopy( maxs, &start );
 	VectorCopy( maxs, &end );
 	start.x -= x;
-	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, &end, duration, 0xFF0000u, 1 );
 	end.x = start.x;
 	end.y -= y;
-	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, &end, duration, 0xFF0000u, 1 );
 	start.y = end.y;
 	start.x += x;
-	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
-	CG_TestLine( &start, maxs, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, &end, duration, 0xFF0000u, 1 );
+	CG_TestLine( &start, maxs, duration, 0xFF0000u, 1 );
 
 	// bottom of box
 	VectorCopy( mins, &start );
 	VectorCopy( mins, &end );
 	start.x += x;
-	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, &end, duration, 0xFF0000u, 1 );
 	end.x = start.x;
 	end.y += y;
-	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, &end, duration, 0xFF0000u, 1 );
 	start.y = end.y;
 	start.x -= x;
-	CG_TestLine( &start, &end, duration, 0x00000ff, 1 );
-	CG_TestLine( &start, mins, duration, 0x00000ff, 1 );
+	CG_TestLine( &start, &end, duration, 0xFF0000u, 1 );
+	CG_TestLine( &start, mins, duration, 0xFF0000u, 1 );
 }
 
 //handle ragdoll callbacks, for events and debugging -rww
@@ -349,7 +349,7 @@ static void CVU_ForceColour( void ) {
 static void CVU_ForceModel( void ) {
 	int i;
 
-	for ( i = 0; i < MAX_CLIENTS; i++ ) {
+	for ( i = 0; i < cgs.maxclients; i++ ) {
 		const char *clientInfo;
 
 		clientInfo = CG_ConfigString( CS_PLAYERS + i );
@@ -847,7 +847,7 @@ qboolean CG_Asset_Parse( int handle ) {
 
 #if 0
 		// font
-		if ( !Q_stricmp( token.string, "font" ) ) {
+		else if ( !Q_stricmp( token.string, "font" ) ) {
 			int pointSize;
 			if ( !trap->PC_ReadToken( handle, &token ) || !PC_Int_Parse( handle, &pointSize ) )
 				break;
@@ -885,12 +885,10 @@ qboolean CG_Asset_Parse( int handle ) {
 				break;
 			cgDC.Assets.japp.fontMono = cgDC.RegisterFont(token.string);
 		}
+#endif
 
 		// gradientbar
 		else if ( !Q_stricmp( token.string, "gradientbar" ) ) {
-#else
-		if ( !Q_stricmp( token.string, "gradientbar" ) ) {
-#endif
 			if ( !trap->PC_ReadToken( handle, &token ) )
 				break;
 			cgDC.Assets.gradientBar = trap->R_RegisterShaderNoMip( token.string );

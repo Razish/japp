@@ -130,6 +130,7 @@ files['game'] = [
 	'game/bg_lua.c',
 	'game/bg_luacvar.c',
 	'game/bg_luaevent.c',
+	'game/bg_lualogger.c',
 	'game/bg_luaplayer.c',
 	'game/bg_luaserialiser.c',
 	'game/bg_luavector.c',
@@ -228,6 +229,7 @@ files['cgame'] = [
 	'game/bg_lua.c',
 	'game/bg_luacvar.c',
 	'game/bg_luaevent.c',
+	'game/bg_lualogger.c',
 	'game/bg_luaplayer.c',
 	'game/bg_luaserialiser.c',
 	'game/bg_luavector.c',
@@ -276,6 +278,7 @@ files['cgame'] = [
 	'cgame/cg_snapshot.c',
 	'cgame/cg_syscalls.c',
 	'cgame/cg_teambinds.c',
+	'cgame/cg_trueview.c',
 	'cgame/cg_turret.c',
 	'cgame/cg_view.c',
 	'cgame/cg_weaponinit.c',
@@ -325,7 +328,7 @@ elif plat == 'Windows':
 # compiler options
 if plat == 'Linux':
 	env['CC'] = compiler
-	env['CPPDEFINES'] = [ '__GCC__' ]
+	env['CPPDEFINES'] = []
 	env['CFLAGS'] = [
 		'-Wdeclaration-after-statement',
 		'-Wnested-externs',

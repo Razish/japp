@@ -8,15 +8,16 @@
 #include "json/cJSON.h"
 
 #include "bg_lua.h"
+#include "bg_lualogger.h"
 #include "bg_luaserialiser.h"
+
+#include <inttypes.h>
 
 #ifdef JPLUA
 
 #if defined(_MSC_VER) && !defined(SCONS_BUILD)
 #pragma comment( lib, "lua" )
 #endif
-
-#define JPLUA_VERSION 7
 
 static const char *baseDir = "lua/";
 #if defined(_GAME)
@@ -283,9 +284,15 @@ static int JPLua_RegisterPlugin( lua_State *L ) {
 	lua_newtable( L );
 	top = lua_gettop( L );
 
-	lua_pushstring( L, "name" );	lua_pushstring( L, JPLua.currentPlugin->longname );				lua_settable( L, top );
-	lua_pushstring( L, "version" );	lua_pushstring( L, JPLua.currentPlugin->version );				lua_settable( L, top );
-	lua_pushstring( L, "UID" );		lua_pushfstring( L, "%p", (void *)JPLua.currentPlugin->UID );	lua_settable( L, top );
+	lua_pushstring( L, "name" );
+		lua_pushstring( L, JPLua.currentPlugin->longname );
+		lua_settable( L, top );
+	lua_pushstring( L, "version" );
+		lua_pushstring( L, JPLua.currentPlugin->version );
+		lua_settable( L, top );
+	lua_pushstring( L, "UID" );
+		lua_pushstring( L, va( "0x%" PRIxPTR, (void *)JPLua.currentPlugin->UID ) );
+		lua_settable( L, top );
 
 	//save in the registry, but push on stack again straight away
 	JPLua.currentPlugin->handle = luaL_ref( L, LUA_REGISTRYINDEX );
@@ -320,8 +327,8 @@ static void JPLua_LoadPlugin( const char *pluginName, const char *fileName ) {
 		JPLua.currentPlugin = nextPlugin;
 	}
 	else {
-		trap->Print( "%-15s%-32s%-8s%0p\n", "Loaded plugin:", JPLua.currentPlugin->longname, JPLua.currentPlugin->version,
-			(void*)JPLua.currentPlugin->UID );
+		trap->Print( "%-15s%-32s%-8s0x%" PRIxPTR "\n", "Loaded plugin:", JPLua.currentPlugin->longname,
+			JPLua.currentPlugin->version, (void*)JPLua.currentPlugin->UID );
 	}
 }
 
@@ -894,7 +901,7 @@ int JPLua_Export_TestLine( lua_State *L ) {
 	vector3 start, end;
 	float radius;
 	int time;
-	unsigned int color;
+	uint32_t color;
 
 	lua_getfield( L, 1, "x" ); start.x = lua_tonumber( L, -1 );
 	lua_getfield( L, 1, "y" ); start.y = lua_tonumber( L, -1 );
@@ -929,6 +936,7 @@ static int JPLua_Export_WorldCoordToScreenCoord( lua_State *L ) {
 }
 #endif
 
+const uint32_t JPLUA_VERSION = 8;
 static const jplua_cimport_table_t JPLua_CImports[] = {
 #ifdef _GAME
 	{ "AddClientCommand", JPLua_Export_AddClientCommand }, // AddClientCommand( string cmd )
@@ -952,6 +960,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
 	{ "GetKeyCatcher", JPLua_Export_GetKeyCatcher }, // integer GetKeyCatcher()
 #endif
+	{ "GetLogger", JPLua_GetLogger }, // Logger GetLogger( string filename )
 	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
 	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
 #ifdef _CGAME
@@ -1060,6 +1069,7 @@ void JPLua_Init( void ) {
 	JPLua_Register_Server( JPLua.state );
 #endif
 	JPLua_Register_Cvar( JPLua.state );
+	JPLua_Register_Logger( JPLua.state );
 	JPLua_Register_Serialiser( JPLua.state );
 	JPLua_Register_Vector( JPLua.state );
 

@@ -426,11 +426,11 @@ void CG_Special( centity_t *cent ) {
 	if ( s1->userInt1 ) {
 		VectorMA( &s1->origin, 64.0f, &s1->boneAngles1, &s1->angles );
 		trap->FX_PlayEffectID( s1->userInt2 ? media.efx.portal.orange : media.efx.portal.blue, &s1->origin, &s1->boneAngles1, -1, -1, qfalse );
-		//	CG_TestLine( s1->origin, s1->angles, 400, 4, 1 );
+		//	CG_TestLine( s1->origin, s1->angles, 400, 0x0000FFu, 1 );
 
 		//If the portal is linked, show it
 		//	if ( s1->health != -1 )
-		//		CG_TestLine( s1->origin, cg_entities[s1->health].currentState.origin, 400, 3, 1 );
+		//		CG_TestLine( s1->origin, cg_entities[s1->health].currentState.origin, 400, 0xFFFF00u, 1 );
 	}
 
 	// if set to invisible, skip
@@ -1730,10 +1730,9 @@ static void CG_Item( centity_t *cent ) {
 		ent.origin.z += 28 + (sinf( cg.time / 200.0f ) * 4);
 		ent.renderfx |= RF_FORCE_ENT_ALPHA;
 		//	VectorCopy( cent->currentState.angles, angs );
-		cent->currentState.apos.trType = TR_LINEAR;
-		VectorSet( &cent->currentState.apos.trDelta, 0.0f, 128.0f, 0.0f );
-		BG_EvaluateTrajectory( &cent->currentState.apos, cg.time, &angs );
-		angs.z = 0.0f;
+		angs.pitch = 0.0f;
+		angs.yaw = 360.0f * (fmod(cg.time * 0.001, 360.0 / 128.0)) / (360.0 / 128.0);
+		angs.roll = 0.0f;
 		AnglesToAxis( &angs, ent.axis );
 
 		// render it, flip it around, render it again
@@ -2123,7 +2122,7 @@ static void CG_Missile( centity_t *cent ) {
 
 			BG_EvaluateTrajectory( &s1->pos, cg.time, &pos );
 
-			CG_TestLine( &rHandPos, &pos, 1, 6, 1 );
+			CG_TestLine( &rHandPos, &pos, 1, 0x000000u, 1 );
 			return;
 		}
 	}

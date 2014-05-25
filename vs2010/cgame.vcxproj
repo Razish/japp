@@ -104,6 +104,7 @@
     <ClCompile Include="..\cgame\cg_snapshot.c" />
     <ClCompile Include="..\cgame\cg_syscalls.c" />
     <ClCompile Include="..\cgame\cg_teambinds.c" />
+    <ClCompile Include="..\cgame\cg_trueview.c" />
     <ClCompile Include="..\cgame\cg_turret.c" />
     <ClCompile Include="..\cgame\cg_view.c" />
     <ClCompile Include="..\cgame\cg_weaponinit.c" />
@@ -122,6 +123,7 @@
     <ClCompile Include="..\game\bg_lua.c" />
     <ClCompile Include="..\game\bg_luacvar.c" />
     <ClCompile Include="..\game\bg_luaevent.c" />
+    <ClCompile Include="..\game\bg_lualogger.c" />
     <ClCompile Include="..\game\bg_luaplayer.c" />
     <ClCompile Include="..\game\bg_luaserialiser.c" />
     <ClCompile Include="..\game\bg_luavector.c" />

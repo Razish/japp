@@ -579,15 +579,6 @@ void BG_VehicleTurnRateForSpeed( Vehicle_t *pVeh, float speed, float *mPitchOver
 	}
 }
 
-
-// Following couple things don't belong in the DLL namespace!
-#ifdef _GAME
-#if !defined(MACOS_X) && !defined(__GCC__)
-typedef struct gentity_s gentity_t;
-#endif
-#endif
-
-
 static void PM_GroundTraceMissed( void );
 void PM_HoverTrace( void ) {
 	Vehicle_t *pVeh;
@@ -2553,12 +2544,10 @@ static qboolean PM_CheckJump( void ) {
 					//FIXME: have to be moving... make sure it's opposite the wall... or at least forward?
 					int wallWalkAnim = BOTH_WALL_FLIP_BACK1;
 					int parts = SETANIM_LEGS;
-					int contents = MASK_PLAYERSOLID;
-					qboolean kick = qtrue;
+					uint32_t contents = MASK_SOLID;
 					if ( pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_2 ) {
 						wallWalkAnim = BOTH_FORCEWALLRUNFLIP_START;
 						parts = SETANIM_BOTH;
-						kick = qfalse;
 					}
 					else {
 						if ( !pm->ps->weaponTime ) {
@@ -2586,7 +2575,9 @@ static qboolean PM_CheckJump( void ) {
 						traceEnt = PM_BGEntForNum( trace.entityNum );
 
 						if ( trace.fraction < 1.0f
-							&& ((trace.entityNum<ENTITYNUM_WORLD&&traceEnt&&traceEnt->s.solid != SOLID_BMODEL) || DotProduct( &trace.plane.normal, &idealNormal )>0.7f) ) {//there is a wall there
+							&& ((trace.entityNum < ENTITYNUM_WORLD && traceEnt && traceEnt->s.solid != SOLID_BMODEL)
+							|| DotProduct( &trace.plane.normal, &idealNormal ) > 0.7f) )
+						{//there is a wall there
 							pm->ps->velocity.x = pm->ps->velocity.y = 0;
 							if ( wallWalkAnim == BOTH_FORCEWALLRUNFLIP_START ) {
 								pm->ps->velocity.z = forceJumpStrength[FORCE_LEVEL_3] / 2.0f;
@@ -2606,10 +2597,6 @@ static qboolean PM_CheckJump( void ) {
 							pm->ps->fd.forceJumpSound = 1;
 							BG_ForcePowerDrain( pm->ps, FP_LEVITATION, 5 );
 
-							//kick if jumping off an ent
-							if ( GetCInfo( CINFO_FLIPKICK ) && kick && traceEnt && (traceEnt->s.eType == ET_PLAYER || traceEnt->s.eType == ET_NPC) ) { //kick that thang!
-								pm->ps->forceKickFlip = traceEnt->s.number + 1;
-							}
 							pm->cmd.rightmove = pm->cmd.forwardmove = 0;
 						}
 					}
@@ -5838,7 +5825,10 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			}
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].altMaxCharge ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
-					pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].altChargeSub;
+#ifdef _GAME
+					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
+#endif
+						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].altChargeSub;
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].altChargeSubTime;
 				}
 			}
@@ -5869,7 +5859,10 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			}
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].maxCharge ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
-					pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].chargeSub;
+#ifdef _GAME
+					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
+#endif
+						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].chargeSub;
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].chargeSubTime;
 				}
 			}
@@ -7091,12 +7084,15 @@ static void PM_Weapon( void ) {
 		PM_StartTorsoAnim( WeaponAttackAnim[weapon] );
 	}
 
-	if ( pm->cmd.buttons & BUTTON_ALT_ATTACK ) {
+#ifdef _GAME
+	if ( ((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer )
+		amount = 0;
+	else
+#endif
+	if ( pm->cmd.buttons & BUTTON_ALT_ATTACK )
 		amount = weaponData[pm->ps->weapon].altEnergyPerShot;
-	}
-	else {
+	else
 		amount = weaponData[pm->ps->weapon].energyPerShot;
-	}
 
 	pm->ps->weaponstate = WEAPON_FIRING;
 
@@ -9883,10 +9879,10 @@ void PmoveSingle( pmove_t *pmove ) {
 	{
 		vector3 blah;
 		VectorMA(pm->ps->origin, 128.0f, pm->ps->moveDir, blah);
-		CG_TestLine(pm->ps->origin, blah, 1, 0x0000ff, 1);
+		CG_TestLine(pm->ps->origin, blah, 1, 0xFF0000u, 1);
 
 		VectorMA(pm->ps->origin, 1.0f, pm->ps->velocity, blah);
-		CG_TestLine(pm->ps->origin, blah, 1, 0xff0000, 1);
+		CG_TestLine(pm->ps->origin, blah, 1, 0xFF0000u, 1);
 	}
 #endif
 #endif
