@@ -1178,7 +1178,7 @@ team_t PickTeam( int ignoreClientNum ) {
 	return TEAM_BLUE;
 }
 
-static qboolean IsSuffixed( const char *cleanName, uint32_t *suffixNum ) {
+static qboolean IsSuffixed( const char *cleanName, int32_t *suffixNum ) {
 	char tmp[MAX_NETNAME], *s, *bracketL, *bracketR;
 	size_t len;
 
@@ -1193,7 +1193,7 @@ static qboolean IsSuffixed( const char *cleanName, uint32_t *suffixNum ) {
 	//	            ^
 	//	strlen = 10
 	// the bracket is coming too early, it can't be a clientNum suffix
-	if ( cleanName - bracketL < len - 3 ) {
+	if ( cleanName - bracketL < (ptrdiff_t)(len - 3) ) {
 #ifdef _DEBUG
 		trap->Print( "DuplicateNames: bracket came too early, not removing suffix. [cleanName - bracketL](%d) < "
 			"[len - 3]()\n", cleanName - bracketL, len - 3 );
@@ -1242,17 +1242,17 @@ qboolean CheckDuplicateName( int clientNum ) {
 	const char *cleanName = g_entities[clientNum].client->pers.netnameClean;
 	gentity_t *ent;
 	int i;
-	uint32_t suffixNum;
+	int32_t suffixNum;
 
 	// remove any potential suffix if it's not ours
 	while ( IsSuffixed( cleanName, &suffixNum ) ) {
+		char *s = strrchr( name, '(' );
 		// if the last suffix on our name is ours, everything is in order
 		if ( clientNum == suffixNum )
 			return qfalse;
 
 		// remove this suffix and continue
 		trap->Print( "Removing invalid name suffix on \"%s\"\n", G_PrintClient( clientNum ) );
-		char *s = strrchr( name, '(' );
 		if ( s-1 > name )
 			s--;
 		*s = '\0';
