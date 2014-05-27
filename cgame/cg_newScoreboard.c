@@ -388,8 +388,8 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 		teamBlue = { 0.4f, 0.4f, 0.7f, 1.0f };
 	const vector4 *teamBackground = &background;
 	int i, count = 0, column = 0;
-	const float endX = SCREEN_WIDTH / 2.0f, columnOffset[] = { /*name*/80.0f, /*score*/170.0f, /*capture*/195.0f,
-		/*defend*/220.f, /*assist*/245.f, /*ping*/270.0f, /*time*/295.0f };
+	const float endX = SCREEN_WIDTH / 2.0f, columnOffset[] = { /*name*/80.0f, /*score*/170.0f, /*net*/220.0f,
+		/*ping*/270.0f, /*time*/295.0f };
 	float savedY = 0.0f;
 	white.a = blue.a = fade;
 	background.a = teamRed.a = teamBlue.a = 0.6f * fade;
@@ -421,17 +421,7 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 		y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f, tmp, &white,
 		fontHandle | STYLE_DROPSHADOW, -1, fontScale );
 
-	tmp = "Cap";
-	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f,
-		y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f, tmp, &white,
-		fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-
-	tmp = "Def";
-	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f,
-		y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f, tmp, &white,
-		fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-
-	tmp = "Asst";
+	tmp = "Net";
 	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f,
 		y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f, tmp, &white,
 		fontHandle | STYLE_DROPSHADOW, -1, fontScale );
@@ -473,6 +463,7 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 		score_t *score = &cg.scores[i];
 		clientInfo_t *ci = &cgs.clientinfo[score->client];
 		if ( ci->team == team ) {
+			int tmpI;
 			vector4	pingColour = { 1.0f, 1.0f, 1.0f, 1.0f }, pingGood = { 0.0f, 1.0f, 0.0f, 1.0f },
 				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
 			pingColour.a = pingGood.a = pingBad.a = fade;
@@ -483,6 +474,13 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 			if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags & EF_CONNECTION) ) {
 				trap->R_SetColor( &white );
 				CG_DrawPic( x + 5.0f, y + 1.0f, lineHeight - 2.0f, lineHeight - 2.0f, media.gfx.interface.connection );
+				trap->R_SetColor( NULL );
+			}
+
+			else if ( cg.snap->ps.duelInProgress && (ci - cgs.clientinfo == cg.snap->ps.duelIndex
+				|| ci - cgs.clientinfo == cg.snap->ps.clientNum) ) {
+				trap->R_SetColor( &white );
+				CG_DrawPic( x + 5.0f, y + 1.0f, lineHeight - 2.0f, lineHeight - 2.0f, media.gfx.interface.powerduelAlly );
 				trap->R_SetColor( NULL );
 			}
 
@@ -505,25 +503,14 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 				tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
 
 			// Score
-			tmp = va( "%4i", score->score );
+			tmp = va( "%02i/%02i", score->score, score->deaths );
 			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
 				fontScale ) / 2.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f,
 				tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
 
-			// Capture
-			tmp = va( "%2i", score->captures );
-			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
-				fontScale ) / 2.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f,
-				tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-
-			// Defend
-			tmp = va( "%2i", score->defendCount );
-			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
-				fontScale ) / 2.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f,
-				tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-
-			// Assist
-			tmp = va( "%2i", score->assistCount );
+			// Net
+			tmpI = score->score - score->deaths;
+			tmp = va( "%c%i", (tmpI >= 0) ? '+' : '-', abs( tmpI ) );
 			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
 				fontScale ) / 2.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f,
 				tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );

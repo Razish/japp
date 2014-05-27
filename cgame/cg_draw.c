@@ -1367,7 +1367,8 @@ void CG_DrawHUD( centity_t *cent ) {
 		scoreStr = va( "%s: %i%s", CG_GetStringEdString( "MP_INGAME", "SCORE" ), cg.snap->ps.persistant[PERS_SCORE], scoreBiasStr );
 	}
 	else {	// Don't draw a bias.
-		scoreStr = va( "%s: %i", CG_GetStringEdString( "MP_INGAME", "SCORE" ), cg.snap->ps.persistant[PERS_SCORE] );
+		const int net = cg.snap->ps.persistant[PERS_SCORE] - cg.snap->ps.persistant[PERS_KILLED];
+		scoreStr = va( "Net: %c%i", (net >= 0) ? '+' : '-', abs( net ) );
 	}
 
 	menuHUD = Menus_FindByName( "righthud" );
@@ -2566,55 +2567,18 @@ qboolean CG_DrawVehicleHud( const centity_t *cent ) {
 
 }
 
-/*
-================
-CG_DrawStats
-
-================
-*/
 static void CG_DrawStats( void ) {
-	centity_t		*cent;
-	playerState_t	*ps;
-	qboolean		drawHUD = qtrue;
-	/*	playerState_t	*ps;
-		vector3			angles;
-		//	vector3		origin;
-
-		if ( cg_drawStatus.integer == 0 ) {
-		return;
-		}
-		*/
-	cent = &cg_entities[cg.snap->ps.clientNum];
-	/*	ps = &cg.snap->ps;
-
-		VectorClear( angles );
-
-		// Do start
-		if (!cg.interfaceStartupDone)
-		{
-		CG_InterfaceStartup();
-		}
-
-		cgi_UI_MenuPaintAll();*/
+	centity_t *cent = &cg_entities[cg.snap->ps.clientNum];
+	qboolean drawHUD = qtrue;
 
 	if ( cent ) {
-		ps = &cg.predictedPlayerState;
-
-		if ( (ps->m_iVehicleNum) )	// In a vehicle???
-		{
+		// vehicle HUD
+		if ( cg.predictedPlayerState.m_iVehicleNum )
 			drawHUD = CG_DrawVehicleHud( cent );
-		}
 	}
 
-	if ( drawHUD ) {
+	if ( drawHUD )
 		CG_DrawHUD( cent );
-	}
-
-	/*CG_DrawArmor(cent);
-	CG_DrawHealth(cent);
-	CG_DrawAmmo(cent);
-
-	CG_DrawTalk(cent);*/
 }
 
 /*
