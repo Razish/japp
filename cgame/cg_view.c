@@ -1158,7 +1158,7 @@ static int CG_CalcViewValues( int clientNum ) {
 		usercmd_t cmd;
 
 		trap->GetUserCmd( cmdNum, &cmd );
-		if ( !(cg.snap->ps.pm_flags & PMF_FOLLOW) && !cg.demoPlayback && cmd.serverTime <= cg.snap->ps.commandTime )
+		if ( !CG_IsSpectating() && !cg.demoPlayback && cmd.serverTime <= cg.snap->ps.commandTime )
 			VectorMA( &refdef->vieworg, (cg.time - ps->commandTime) * 0.001f, &ps->velocity, &refdef->vieworg );
 	}
 
@@ -1643,7 +1643,7 @@ void CG_DrawAutoMap( void ) {
 	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 )
 		return;
 
-	if ( (cg.predictedPlayerState.pm_flags & PMF_FOLLOW) || cg.predictedPlayerState.persistant[PERS_TEAM] == TEAM_SPECTATOR )
+	if ( CG_IsSpectating() )
 		return;
 
 	local = &cgs.clientinfo[cg.predictedPlayerState.clientNum];

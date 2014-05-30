@@ -851,7 +851,7 @@ void CG_DrawWeaponSelect( void ) {
 void CG_NextWeapon_f( void ) {
 	int i, original;
 
-	if ( !cg.snap || (cg.snap->ps.pm_flags & PMF_FOLLOW) || cg.predictedPlayerState.pm_type == PM_SPECTATOR )
+	if ( !cg.snap || CG_IsSpectating() )
 		return;
 
 	if ( cg.snap->ps.emplacedIndex )
@@ -885,7 +885,7 @@ void CG_NextWeapon_f( void ) {
 void CG_PrevWeapon_f( void ) {
 	int i, original;
 
-	if ( !cg.snap || (cg.snap->ps.pm_flags & PMF_FOLLOW) || cg.predictedPlayerState.pm_type == PM_SPECTATOR )
+	if ( !cg.snap || CG_IsSpectating() )
 		return;
 
 	if ( cg.snap->ps.emplacedIndex )
@@ -918,7 +918,7 @@ void CG_PrevWeapon_f( void ) {
 void CG_Weapon_f( void ) {
 	int num;
 
-	if ( !cg.snap || (cg.snap->ps.pm_flags & PMF_FOLLOW) || cg.snap->ps.emplacedIndex )
+	if ( !cg.snap || CG_IsSpectating() || cg.snap->ps.emplacedIndex )
 		return;
 
 	num = atoi( CG_Argv( 1 ) );
@@ -996,7 +996,7 @@ void CG_Weapon_f( void ) {
 void CG_WeaponClean_f( void ) {
 	int num;
 
-	if ( !cg.snap || (cg.snap->ps.pm_flags & PMF_FOLLOW) || cg.snap->ps.emplacedIndex )
+	if ( !cg.snap || CG_IsSpectating() || cg.snap->ps.emplacedIndex )
 		return;
 
 	num = atoi( CG_Argv( 1 ) );
@@ -1578,7 +1578,7 @@ void CG_CheckPlayerG2Weapons( playerState_t *ps, centity_t *cent ) {
 		return;
 	}
 
-	if ( ps->pm_flags & PMF_FOLLOW )
+	if ( CG_IsSpectating() )
 		return;
 
 	if ( cent->currentState.eType == ET_NPC ) {

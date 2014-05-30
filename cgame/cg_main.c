@@ -2011,7 +2011,7 @@ void CG_NextForcePower_f( void ) {
 		return;
 	}
 
-	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+	if ( CG_IsSpectating() ) {
 		return;
 	}
 
@@ -2051,7 +2051,7 @@ void CG_PrevForcePower_f( void ) {
 		return;
 	}
 
-	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+	if ( CG_IsSpectating() ) {
 		return;
 	}
 
@@ -2073,7 +2073,7 @@ void CG_NextInventory_f( void ) {
 		return;
 	}
 
-	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+	if ( CG_IsSpectating() ) {
 		return;
 	}
 
@@ -2097,7 +2097,7 @@ void CG_PrevInventory_f( void ) {
 		return;
 	}
 
-	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+	if ( CG_IsSpectating() ) {
 		return;
 	}
 
@@ -2114,6 +2114,18 @@ void CG_PrevInventory_f( void ) {
 		cg.itemSelect = bg_itemlist[cg.snap->ps.stats[STAT_HOLDABLE_ITEM]].giTag;
 		cg.invenSelectTime = cg.time;
 	}
+}
+
+qboolean CG_IsSpectating( void ) {
+	if ( !cg.snap )
+		return qfalse;
+
+	if ( (cg.snap->ps.pm_flags & PMF_FOLLOW)
+		|| cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR
+		|| cg.predictedPlayerState.pm_type == PM_SPECTATOR )
+		return qtrue;
+
+	return qfalse;
 }
 
 char *ConcatArgs( int start ) {

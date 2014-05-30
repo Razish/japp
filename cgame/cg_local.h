@@ -984,6 +984,7 @@ void			CG_InitMarkPolys( void );
 void			CG_InitSiegeMode( void );
 qboolean		CG_IsMindTricked( int trickIndex1, int trickIndex2, int trickIndex3, int trickIndex4,
 	int client );
+qboolean		CG_IsSpectating( void );
 void			CG_KeyEvent( int key, qboolean down );
 int				CG_LastAttacker( void );
 void			CG_LerpColour( const vector4 *start, const vector4 *end, vector4 *out, float point );

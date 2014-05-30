@@ -617,7 +617,7 @@ void CG_PredictPlayerState( void ) {
 	}
 
 	// demo playback just copies the moves
-	if ( cg.demoPlayback || (cg.snap->ps.pm_flags & PMF_FOLLOW) ) {
+	if ( cg.demoPlayback || CG_IsSpectating() ) {
 		CG_InterpolatePlayerState( qfalse );
 		if ( CG_Piloting( cg.predictedPlayerState.m_iVehicleNum ) )
 			CG_InterpolateVehiclePlayerState( qfalse );
@@ -641,7 +641,7 @@ void CG_PredictPlayerState( void ) {
 
 	if ( cg_pmove.ghoul2 != pEnt->ghoul2 ) {
 		// only update it if the g2 instance has changed
-		if ( cg.snap && pEnt->ghoul2 && !(cg.snap->ps.pm_flags & PMF_FOLLOW)
+		if ( cg.snap && pEnt->ghoul2 && !CG_IsSpectating()
 			&& cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 			cg_pmove.ghoul2 = pEnt->ghoul2;
 			cg_pmove.g2Bolts_LFoot = trap->G2API_AddBolt( pEnt->ghoul2, 0, "*l_leg_foot" );

@@ -2114,7 +2114,10 @@ static void CG_Missile( centity_t *cent ) {
 
 			cg_entities[clientNum].bolt1 = s1->number;
 
-			trap->G2API_GetBoltMatrix( cg_entities[clientNum].ghoul2, 0, cgs.clientinfo[clientNum].bolt_rhand, &boltMatrix, &cg_entities[clientNum].turAngles, &cg_entities[clientNum].lerpOrigin, cg.time, cgs.gameModels, &cg_entities[clientNum].modelScale );
+			assert( "Invalid bolt" && cgs.clientinfo[clientNum].bolt_rhand != -1 );
+
+			trap->G2API_GetBoltMatrix( cg_entities[clientNum].ghoul2, 0, cgs.clientinfo[clientNum].bolt_rhand, &boltMatrix,
+				&cg_entities[clientNum].turAngles, &cg_entities[clientNum].lerpOrigin, cg.time, cgs.gameModels, &cg_entities[clientNum].modelScale );
 
 			rHandPos.x = boltMatrix.matrix[0][3];
 			rHandPos.y = boltMatrix.matrix[1][3];
@@ -2697,7 +2700,7 @@ void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	if ( (cent->currentState.number != cg.clientNum
 		&& cent->currentState.number < MAX_CLIENTS
-		&& !(cg.snap->ps.pm_flags & PMF_FOLLOW))
+		&& !CG_IsSpectating())
 		|| cent->currentState.eType == ET_NPC ) {
 		doLerp = qtrue;
 	}

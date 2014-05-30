@@ -2922,7 +2922,7 @@ float CG_DrawRadar( float y ) {
 	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 )
 		return y;
 
-	if ( (cg.predictedPlayerState.pm_flags & PMF_FOLLOW) || cg.predictedPlayerState.persistant[PERS_TEAM] == TEAM_SPECTATOR )
+	if ( CG_IsSpectating() )
 		return y;
 
 	local = &cgs.clientinfo[cg.snap->ps.clientNum];
@@ -3423,7 +3423,7 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 		return y; // Not on any team
 	}
 
-	if ( !Server_Supports( SSF_SPECTINFO ) && (cg.snap->ps.pm_flags & PMF_FOLLOW) )
+	if ( !Server_Supports( SSF_SPECTINFO ) && CG_IsSpectating() )
 		return y; //Raz: following in spec, not valid info provided
 
 	plyrs = 0;
@@ -5481,9 +5481,11 @@ static void CG_DrawCrosshairNames( void ) {
 	// scan the known entities to see if the crosshair is sighted on one
 	CG_ScanForCrosshairEntity();
 
-	if ( !cg_drawCrosshairNames.integer ) {
+	if ( !cg_drawCrosshairNames.integer || (cg_drawSpectatorNames.integer
+		&& CG_IsSpectating()) ) {
 		return;
 	}
+
 	//rww - still do the trace, our dynamic crosshair depends on it
 
 	if ( cg.crosshairClientNum < ENTITYNUM_WORLD ) {
@@ -5881,7 +5883,7 @@ CG_DrawFollow
 static qboolean CG_DrawFollow( void ) {
 	const char	*s;
 
-	if ( !(cg.snap->ps.pm_flags & PMF_FOLLOW) || cg.scoreBoardShowing )
+	if ( !CG_IsSpectating() || cg.scoreBoardShowing )
 		return qfalse;
 
 	//	s = "following";
@@ -7065,6 +7067,7 @@ void CG_Draw2D( void ) {
 	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
 		CG_DrawSpectator();
 		CG_DrawCrosshair( NULL, qfalse );
+		CG_DrawCrosshairNames();
 		CG_DrawClientNames();
 		CG_SaberClashFlare();
 	}
@@ -7083,6 +7086,9 @@ void CG_Draw2D( void ) {
 			CG_DrawAmmoWarning();
 
 			CG_DrawCrosshairNames();
+			if ( CG_IsSpectating() ) {
+				CG_DrawClientNames();
+			}
 
 			if ( cg_drawStatus.integer ) {
 				CG_DrawIconBackground();
