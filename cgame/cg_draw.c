@@ -5883,7 +5883,7 @@ CG_DrawFollow
 static qboolean CG_DrawFollow( void ) {
 	const char	*s;
 
-	if ( !CG_IsSpectating() || cg.scoreBoardShowing )
+	if ( !CG_IsFollowing() || cg.scoreBoardShowing )
 		return qfalse;
 
 	//	s = "following";

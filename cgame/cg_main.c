@@ -2116,14 +2116,24 @@ void CG_PrevInventory_f( void ) {
 	}
 }
 
+qboolean CG_IsFollowing( void ) {
+	if ( !cg.snap )
+		return qfalse;
+
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW )
+		return qtrue;
+
+	return qfalse;
+}
+
 qboolean CG_IsSpectating( void ) {
 	if ( !cg.snap )
 		return qfalse;
 
-	if ( (cg.snap->ps.pm_flags & PMF_FOLLOW)
-		|| cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR
-		|| cg.predictedPlayerState.pm_type == PM_SPECTATOR )
+	if ( CG_IsFollowing() || cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR
+		|| cg.predictedPlayerState.pm_type == PM_SPECTATOR ) {
 		return qtrue;
+	}
 
 	return qfalse;
 }
