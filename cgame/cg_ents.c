@@ -2108,13 +2108,14 @@ static void CG_Missile( centity_t *cent ) {
 			mdxaBone_t	boltMatrix;
 			vector3 pos;
 
+			assert( "Invalid bolt" && cgs.clientinfo[clientNum].bolt_rhand != -1 );
+		//	assert( "Invalid G2 instance" && !cg_entities[clientNum].ghoul2 );
+
 			//Don't show grapple in duels
-			if ( cg.predictedPlayerState.duelInProgress )
+			if ( cg.predictedPlayerState.duelInProgress || !cg_entities[clientNum].ghoul2 )
 				return;
 
 			cg_entities[clientNum].bolt1 = s1->number;
-
-			assert( "Invalid bolt" && cgs.clientinfo[clientNum].bolt_rhand != -1 );
 
 			trap->G2API_GetBoltMatrix( cg_entities[clientNum].ghoul2, 0, cgs.clientinfo[clientNum].bolt_rhand, &boltMatrix,
 				&cg_entities[clientNum].turAngles, &cg_entities[clientNum].lerpOrigin, cg.time, cgs.gameModels, &cg_entities[clientNum].modelScale );
