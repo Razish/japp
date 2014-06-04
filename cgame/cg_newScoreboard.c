@@ -8,30 +8,31 @@ static int JP_GetScoreboardFont( void ) {
 	return Q_clampi( FONT_SMALL, cg_newScoreboardFont.integer, FONT_NUM_FONTS );
 }
 
-static void DrawServerInformation( float fade ) {
-	const qhandle_t fontHandle = MenuFontToHandle( FONT_JAPPLARGE );
-	const float fontScale = 0.5f, lineHeight = 14.0f;
+static void DrawServerInfo( float fade ) {
+	const qhandle_t fontLarge = MenuFontToHandle( FONT_JAPPLARGE ), fontSmall = MenuFontToHandle( FONT_JAPPMONO );
+	const float fontScale = 0.5f, lineHeightBig = 14.0f,
+		lineHeightSmall = trap->R_Font_HeightPixels( fontSmall, fontScale );
 	const char *tmp = NULL;
-	float y = 20.0f;
+	float y = SCREEN_HEIGHT - lineHeightSmall - 4.0f;
 	vector4 colour = { 1.0f, 1.0f, 1.0f, 1.0f };
 	colour.a = fade;
 
-	// server name
-	trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( cgs.japp.serverName, fontHandle, fontScale ) / 2.0f,
-		y, cgs.japp.serverName, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-	y += lineHeight;
-
 	// map name
 	tmp = va( "%s (%s)", (char *)CG_ConfigString( CS_MESSAGE ), cgs.mapname );
-	trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y, tmp,
-		&colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-	y += lineHeight;
+	trap->R_Font_DrawString( 0.0f, y, tmp, &colour, fontSmall | STYLE_DROPSHADOW, -1, fontScale );
+	y -= lineHeightSmall;
+
+	// server name
+	trap->R_Font_DrawString( 0.0f, y, cgs.japp.serverName, &colour, fontSmall | STYLE_DROPSHADOW, -1, fontScale );
+	y -= lineHeightSmall;
+
+	y = 42.0f;
 
 	// gametype
 	tmp = BG_GetGametypeString( cgs.gametype );
-	trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y, tmp,
-		&colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-	y += lineHeight;
+	trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
+		tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
+	y += lineHeightBig;
 
 	switch ( cgs.gametype ) {
 	case GT_FFA:
@@ -48,8 +49,8 @@ static void DrawServerInformation( float fade ) {
 		else
 			tmp = "Playing forever!";
 
-		trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y,
-			tmp, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+		trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
+			tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
 		break;
 
 	case GT_CTF:
@@ -70,39 +71,40 @@ static void DrawServerInformation( float fade ) {
 		else
 			tmp = "Playing forever!";
 
-		trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y,
-			tmp, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-		y += lineHeight * 2;
+		trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
+			tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
+		y += lineHeightBig * 2;
 		//FALL THROUGH TO GENERIC TEAM GAME INFO!
 
 	case GT_TEAM:
 		if ( cgs.scores1 == cgs.scores2 ) {
 			tmp = S_COLOR_YELLOW"Teams are tied";
-			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y,
-				tmp, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-			y += lineHeight;
+			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
+				tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
+			y += lineHeightBig;
 			tmp = va( S_COLOR_RED"%i "S_COLOR_WHITE"/ "S_COLOR_CYAN"%i", cgs.scores1, cgs.scores2 );
-			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f,
-				y, tmp, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f,
+				y, tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
 		}
 		else if ( cgs.scores1 > cgs.scores2 ) {
 			tmp = S_COLOR_RED"Red "S_COLOR_WHITE"leads";
-			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f,
-				y, tmp, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-			y += lineHeight;
+			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f,
+				y, tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
+			y += lineHeightBig;
 			tmp = va( S_COLOR_RED"%i "S_COLOR_WHITE"/ "S_COLOR_CYAN"%i", cgs.scores1, cgs.scores2 );
-			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y,
-				tmp, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
+				tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
 		}
 		else {
 			tmp = S_COLOR_CYAN"Blue "S_COLOR_WHITE"leads";
-			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y,
-				tmp, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-			y += lineHeight;
+			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
+				tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
+			y += lineHeightBig;
 			tmp = va( S_COLOR_CYAN"%i "S_COLOR_WHITE"/ "S_COLOR_RED"%i", cgs.scores2, cgs.scores1 );
-			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y,
-				tmp, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
+				tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
 		}
+		//TODO: playing until x/y
 		break;
 
 	default:
@@ -931,11 +933,10 @@ qboolean CG_DrawQ3PScoreboard( void ) {
 		fade = fadeWhite.a;
 	}
 
-	DrawServerInformation( fade );
-
 	DrawPlayerCount( fade );
 	DrawPlayers( fade );
 
+	DrawServerInfo( fade );
 	DrawClientInfo( fade );
 
 	CG_LoadDeferredPlayers();

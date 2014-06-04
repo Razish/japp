@@ -126,7 +126,7 @@ void CG_DrawInformation( void ) {
 
 	trap->Cvar_VariableStringBuffer( "cl_motdString", buf, sizeof(buf) );
 	if ( buf[0] )
-		UI_DrawProportionalString( (SCREEN_WIDTH / 2), 425, buf, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
+		UI_DrawProportionalString( (SCREEN_WIDTH / 2), 420 - iPropHeight, buf, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, &colorWhite );
 
 	// some extra space after hostname and motd
 	y += 10;
