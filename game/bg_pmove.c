@@ -6253,14 +6253,19 @@ backAgain:
 	}
 }
 
-/*
-==============
-PM_Weapon
+static qboolean BG_SPCartwheel( void ) {
+	int anim = pm->ps->legsAnim;
+	qboolean allowedSP = GetCPD( pm_entSelf, CPD_NOSPCARTWHEEL ) && !GetCInfo( CINFO_NOSPCARTWHEEL );
+	//TOOD: PM_InCartwheel
+	if ( allowedSP && (anim == BOTH_ARIAL_LEFT || anim == BOTH_ARIAL_RIGHT
+		|| anim == BOTH_CARTWHEEL_LEFT || anim == BOTH_CARTWHEEL_RIGHT) ) {
+		return qtrue;
+	}
+	return qfalse;
+}
 
-Generates weapon events and modifes the weapon counter
-==============
-*/
 extern int PM_KickMoveForConditions( void );
+// Generates weapon events and modifies the weapon counter
 static void PM_Weapon( void ) {
 	int		addTime;
 	int amount;
@@ -6532,9 +6537,8 @@ static void PM_Weapon( void ) {
 		return;
 	}
 
-	if ( BG_InSpecialJump( pm->ps->legsAnim ) ||
-		BG_InRoll( pm->ps, pm->ps->legsAnim ) ||
-		PM_InRollComplete( pm->ps, pm->ps->legsAnim ) ) {
+	if ( (BG_InSpecialJump( pm->ps->legsAnim ) && !BG_SPCartwheel()) ||
+		BG_InRoll( pm->ps, pm->ps->legsAnim ) || PM_InRollComplete( pm->ps, pm->ps->legsAnim ) ) {
 		/*
 		if (pm->cmd.weapon != WP_MELEE &&
 		pm->ps->weapon != WP_MELEE &&

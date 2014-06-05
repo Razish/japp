@@ -47,7 +47,7 @@
 #define CPD_LEDGEGRAB			(0x00000400u)
 #define CPD_NEWDFAPRIM			(0x00000800u) //RAZTODO
 #define CPD_NEWDFAALT			(0x00001000u) //RAZTODO
-#define CPD_NOSPCARTWHEEL		(0x00002000u) //RAZTODO
+#define CPD_NOSPCARTWHEEL		(0x00002000u) // don't allow SP cartwheel
 #define CPD_ALLOWLIBCURL		(0x00004000u) //RAZTODO
 #define CPD_NOKATA				(0x00008000u) // don't allow katas
 #define CPD_NOBUTTERFLY			(0x00010000u) // don't allow butterflies

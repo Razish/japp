@@ -133,6 +133,10 @@ static void CVU_Ledge( void ) {
 	SetCInfo( japp_allowLedgeGrab.integer, CINFO_LEDGEGRAB );
 }
 
+static void CVU_SPCartwheel( void ) {
+	SetCInfo( !japp_allowSPCartwheel.integer, CINFO_NOSPCARTWHEEL );
+}
+
 static void CVU_Stab( void ) {
 	SetCInfo( !japp_allowStab.integer, CINFO_NOSTAB );
 }

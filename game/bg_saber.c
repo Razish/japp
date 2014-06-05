@@ -7,7 +7,7 @@
 #include "g_local.h"
 #endif
 
-#define SP_CARTWHEEL 1
+//#define SP_CARTWHEEL
 
 extern qboolean BG_SabersOff( playerState_t *ps );
 saberInfo_t *BG_MySaber( int clientNum, int saberNum );
@@ -1853,7 +1853,7 @@ saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
 					PM_AddEvent( EV_JUMP );
 					pm->ps->velocity.z = 300.0f;
 
-#if SP_CARTWHEEL == 2
+#ifdef SP_CARTWHEEL
 					//RAZTODO: SP cartwheel
 					if ( PM_GroundDistance() >= 25.0f )
 						newmove = LS_JUMPATTACK_ARIAL_RIGHT;
@@ -1905,7 +1905,7 @@ saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
 					PM_AddEvent( EV_JUMP );
 					pm->ps->velocity.z = 350.0f;
 
-#if SP_CARTWHEEL == 2
+#ifdef SP_CARTWHEEL
 					//RAZTODO: SP cartwheel
 					if ( PM_GroundDistance() >= 25.0f )
 						newmove = LS_JUMPATTACK_ARIAL_LEFT;
