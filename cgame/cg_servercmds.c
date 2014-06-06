@@ -124,6 +124,15 @@ void CG_ParseServerinfo( void ) {
 		CG_LogPrintf( cg.log.security, "CG_ParseServerinfo: serverinfo 'ssf' was found, but invalid.\n" );
 	Com_Printf( "Server support hints: 0x%X\n", cg.japp.SSF );
 
+	tinfo = Info_ValueForKey( info, "jp_gripSpeedScale" );
+	if ( tinfo[0] ) {
+		cgs.japp.gripSpeed.scale = atof( tinfo );
+		cgs.japp.gripSpeed.set = qtrue;
+	}
+	else {
+		cgs.japp.gripSpeed.set = qfalse;
+	}
+
 	mapname = Info_ValueForKey( info, "mapname" );
 	Q_strncpyz( cgs.mapnameClean, mapname, sizeof(cgs.mapnameClean) );
 

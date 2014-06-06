@@ -503,6 +503,7 @@ typedef struct pmove_s {
 	int			entSize; //size of the struct (gentity_t or centity_t) so things can be dynamic
 
 	int			overbounce;
+	float		gripSpeedScale;
 } pmove_t;
 
 

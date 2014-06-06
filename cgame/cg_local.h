@@ -808,6 +808,10 @@ typedef struct cgs_s {
 		uint32_t		jp_cinfo;
 		char			serverName[MAX_HOSTNAMELENGTH];
 		int				overbounce;
+		struct {
+			float		scale;
+			qboolean	set;
+		} gripSpeed;
 	} japp;
 } cgs_t;
 

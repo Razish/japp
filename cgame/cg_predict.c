@@ -936,6 +936,8 @@ void CG_PredictPlayerState( void ) {
 			}
 		}
 
+		cg_pmove.gripSpeedScale = cgs.japp.gripSpeed.set ? cgs.japp.gripSpeed.scale : 0.4f;
+
 		Pmove( &cg_pmove );
 
 		for ( i = 0; i < MAX_CLIENTS; i++ ) {

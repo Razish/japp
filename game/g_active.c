@@ -2649,6 +2649,8 @@ void ClientThink_real( gentity_t *ent ) {
 			}
 		}
 
+		pm.gripSpeedScale = jp_gripSpeedScale.value;
+
 		Pmove( &pm );
 
 		for ( i = 0, other = g_entities; i < level.maxclients; i++, other++ ) {

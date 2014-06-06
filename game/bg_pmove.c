@@ -7661,7 +7661,7 @@ void BG_AdjustClientSpeed( playerState_t *ps, usercmd_t *cmd, int svTime ) {
 	}
 
 	if ( ps->fd.forcePowersActive & (1 << FP_GRIP) ) {
-		ps->speed *= 0.4f;
+		ps->speed *= pm->gripSpeedScale;
 	}
 
 	if ( ps->fd.forcePowersActive & (1 << FP_SPEED) ) {
