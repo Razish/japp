@@ -1637,23 +1637,48 @@ static void AM_Weather( gentity_t *ent ) {
 
 // spawn an entity
 static void AM_EntSpawn( gentity_t *ent ) {
-	gentity_t	*obj = G_Spawn();
-	char		buf[32] = { 0 };
-	trace_t		*tr = G_RealTrace( ent, 0.0f );
+	trace_t *tr = G_RealTrace( ent, 0.0f );
+	const char *delim = " ";
+	char buf[MAX_SPAWN_VARS_CHARS], *tok = NULL;
+	unsigned int index = 0;
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"AM_EntSpawn: syntax is 'amspawn entity' where 'entity' is "
-			"misc_model, info_player_start, etc\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"AM_EntSpawn: syntax is 'amspawn { key value key value }'\n\"" );
 		return;
 	}
-	trap->Argv( 1, buf, sizeof(buf) );
 
-	//TODO: spawnvars
-	G_LogPrintf( level.log.admin, "\t%s spawned \"%s\"\n", G_PrintClient( ent-g_entities ), buf );
-	obj->classname = buf;
-	VectorCopy( &tr->endpos, &obj->s.origin );
-	G_CallSpawn( obj );
-	obj->jpSpawned = qtrue;
+	Q_strncpyz( buf, va( "origin %.0f,%.0f,%.0f ", tr->endpos.x, tr->endpos.y, tr->endpos.z ), sizeof(buf) );
+	Q_strcat( buf, sizeof(buf), ConcatArgs( 1 ) );
+
+	G_LogPrintf( level.log.admin, "\t%s spawned \"%s\"\n", G_PrintClient( ent - g_entities ), buf );
+
+	level.manualSpawning = qtrue;
+	level.numSpawnVars = 0;
+	level.numSpawnVarChars = 0;
+
+	tok = strtok( buf, delim );
+	while ( tok != NULL ) {
+		char tmp[MAX_STRING_CHARS], *p = NULL;
+
+		Q_strncpyz( tmp, tok, sizeof(tmp) );
+
+		// replace ',' with ' ' temporarily
+		while ( (p = strchr( tmp, ',' )) )
+			*p = ' ';
+		level.spawnVars[level.numSpawnVars][index++] = G_AddSpawnVarToken( tmp );
+		while ( (p = strchr( tmp, ' ' )) )
+			*p = ',';
+
+		if ( index >= 2 ) {
+			index = 0u;
+			level.numSpawnVars++;
+		}
+		tok = strtok( NULL, delim );
+	}
+
+	G_SpawnGEntityFromSpawnVars( qfalse );
+
+	level.manualSpawning = qfalse;
 	return;
 }
 

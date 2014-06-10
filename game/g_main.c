@@ -30,7 +30,6 @@ void G_ROFF_NotetrackCallback( gentity_t *cent, const char *notetrack );
 extern stringID_table_t setTable[];
 
 qboolean G_ParseSpawnVars( qboolean inSubBSP );
-void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP );
 
 
 int NAVNEW_ClearPathBetweenPoints( vector3 *start, vector3 *end, vector3 *mins, vector3 *maxs, int ignore, int clipmask );

@@ -6,7 +6,7 @@
 qboolean	G_SpawnString( const char *key, const char *defaultString, char **out ) {
 	int		i;
 
-	if ( !level.spawning ) {
+	if ( !level.spawning && !level.manualSpawning ) {
 		*out = (char *)defaultString;
 		//		trap->Error( ERR_DROP, "G_SpawnString() called while not spawning" );
 	}
@@ -890,19 +890,8 @@ char *G_NewString( const char *string ) {
 	return newb;
 }
 
-
-
-
-
-/*
-===================
-G_SpawnGEntityFromSpawnVars
-
-Spawn an entity and fill in all of the level fields from
-level.spawnVars[], then call the class specfic spawn function
-===================
-*/
 void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent );
+// Spawn an entity and fill in all of the level fields from level.spawnVars[], then call the class specfic spawn function
 void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 	int i;
 	gentity_t *ent;
@@ -978,6 +967,9 @@ void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 			}
 		}
 	}
+
+	if ( level.manualSpawning )
+		ent->jpSpawned = qtrue;
 }
 
 

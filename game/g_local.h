@@ -620,6 +620,7 @@ typedef struct level_locals_s {
 	qboolean			votingGametype;
 	int					votingGametypeTo;
 	qboolean			spawning;				// the G_Spawn*() functions are valid
+	qboolean			manualSpawning;
 	int					numSpawnVars;
 	char				*spawnVars[MAX_SPAWN_VARS][2];	// key / value pairs
 	int					numSpawnVarChars;
@@ -778,6 +779,7 @@ qboolean			G_ActivateBehavior( gentity_t *self, int bset );
 void				G_AddBot( const char *name, float skill, const char *team, int delay, char *altname );
 void				G_AddEvent( gentity_t *ent, int event, int eventParm );
 void				G_AddPredictableEvent( gentity_t *ent, int event, int eventParm );
+char *				G_AddSpawnVarToken( const char *string );
 void *				G_Alloc( int size );
 void				G_AvoidBox( gentity_t *ent );
 int					G_BoneIndex( const char *name );
@@ -882,6 +884,7 @@ gentity_t *			G_Spawn( void );
 qboolean			G_SpawnBoolean( const char *key, const char *defaultString, qboolean *out );
 void				G_SpawnEntitiesFromString( qboolean inSubBSP );
 qboolean			G_SpawnFloat( const char *key, const char *defaultString, float *out );
+void				G_SpawnGEntityFromSpawnVars( qboolean inSubBSP );
 qboolean			G_SpawnInt( const char *key, const char *defaultString, int *out );
 void				G_SpawnItem( gentity_t *ent, const gitem_t *item );
 qboolean			G_SpawnString( const char *key, const char *defaultString, char **out );
