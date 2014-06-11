@@ -1366,7 +1366,10 @@ void CG_DrawHUD( centity_t *cent ) {
 		}
 		scoreStr = va( "%s: %i%s", CG_GetStringEdString( "MP_INGAME", "SCORE" ), cg.snap->ps.persistant[PERS_SCORE], scoreBiasStr );
 	}
-	else {	// Don't draw a bias.
+	else if ( cgs.gametype == GT_CTY || cgs.gametype == GT_CTF ) {
+		scoreStr = va( "%s: %i", CG_GetStringEdString( "MP_INGAME", "SCORE" ), cg.snap->ps.persistant[PERS_SCORE] );
+	}
+	else {
 		const int net = cg.snap->ps.persistant[PERS_SCORE] - cg.snap->ps.persistant[PERS_KILLED];
 		scoreStr = va( "Net: %c%i", (net >= 0) ? '+' : '-', abs( net ) );
 	}
