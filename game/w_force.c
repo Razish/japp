@@ -3212,6 +3212,9 @@ void DoGripAction( gentity_t *self, forcePowers_t forcePower ) {
 		return;
 	}
 
+	if ( japp_gripHolsterSaber.integer )
+		WP_DeactivateSaber( gripEnt, qtrue );
+
 	VectorSubtract( &gripEnt->client->ps.origin, &self->client->ps.origin, &a );
 
 	trap->Trace( &tr, &self->client->ps.origin, NULL, NULL, &gripEnt->client->ps.origin, self->s.number, MASK_PLAYERSOLID, qfalse, 0, 0 );
