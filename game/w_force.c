@@ -520,10 +520,8 @@ int ForcePowerUsableOn( gentity_t *attacker, gentity_t *other, forcePowers_t for
 		}
 	}
 
-	if ( other && other->client &&
-		(forcePower == FP_PUSH ||
-		forcePower == FP_PULL) ) {
-		if ( BG_InKnockDown( other->client->ps.legsAnim ) ) {
+	if ( other && other->client && (forcePower == FP_PUSH || forcePower == FP_PULL) ) {
+		if ( BG_InKnockDown( other->client->ps.legsAnim ) && !japp_allowPushPullKnockdown.integer ) {
 			return 0;
 		}
 	}
