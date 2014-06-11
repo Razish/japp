@@ -70,18 +70,26 @@
 			<Add after="cp $(TARGET_OUTPUT_FILE) $(JA)/japlus" />
 			<Mode after="always" />
 		</ExtraCommands>
+		<Unit filename="../Ghoul2/G2.h" />
+		<Unit filename="../JAPP/jp_cinfo.h" />
+		<Unit filename="../JAPP/jp_crash.h" />
 		<Unit filename="../JAPP/jp_crashExtra.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../JAPP/jp_csflags.h" />
 		<Unit filename="../JAPP/jp_promode.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../JAPP/jp_promode.h" />
+		<Unit filename="../JAPP/jp_ssflags.h" />
 		<Unit filename="../JAPP/jp_stack.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../JAPP/jp_stack.h" />
 		<Unit filename="../JAPP/jp_tokenparser.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../cgame/animtable.h" />
 		<Unit filename="../cgame/cg_chatbox.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -109,12 +117,15 @@
 		<Unit filename="../cgame/cg_light.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../cgame/cg_lights.h" />
+		<Unit filename="../cgame/cg_local.h" />
 		<Unit filename="../cgame/cg_localents.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../cgame/cg_luaserver.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../cgame/cg_luaserver.h" />
 		<Unit filename="../cgame/cg_main.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -124,6 +135,7 @@
 		<Unit filename="../cgame/cg_media.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../cgame/cg_media.h" />
 		<Unit filename="../cgame/cg_newDraw.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -139,6 +151,7 @@
 		<Unit filename="../cgame/cg_predict.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../cgame/cg_public.h" />
 		<Unit filename="../cgame/cg_saga.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -178,6 +191,7 @@
 		<Unit filename="../cgame/cg_weapons.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../cgame/cg_xcvar.h" />
 		<Unit filename="../cgame/fx_blaster.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -202,9 +216,11 @@
 		<Unit filename="../cgame/fx_heavyrepeater.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../cgame/fx_local.h" />
 		<Unit filename="../cgame/fx_rocketlauncher.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../cgame/tr_types.h" />
 		<Unit filename="../game/AnimalNPC.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -217,30 +233,40 @@
 		<Unit filename="../game/WalkerNPC.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/ai.h" />
+		<Unit filename="../game/anims.h" />
+		<Unit filename="../game/b_public.h" />
 		<Unit filename="../game/bg_g2_utils.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_local.h" />
 		<Unit filename="../game/bg_lua.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_lua.h" />
 		<Unit filename="../game/bg_luacvar.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_luacvar.h" />
 		<Unit filename="../game/bg_luaevent.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_luaevent.h" />
 		<Unit filename="../game/bg_lualogger.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../game/bg_luaplayer.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_luaplayer.h" />
 		<Unit filename="../game/bg_luaserialiser.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_luaserialiser.h" />
 		<Unit filename="../game/bg_luavector.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_luavector.h" />
 		<Unit filename="../game/bg_misc.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -250,6 +276,7 @@
 		<Unit filename="../game/bg_pmove.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_public.h" />
 		<Unit filename="../game/bg_saber.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -259,18 +286,24 @@
 		<Unit filename="../game/bg_saga.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_saga.h" />
 		<Unit filename="../game/bg_slidemove.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../game/bg_vehicleLoad.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_vehicles.h" />
 		<Unit filename="../game/bg_weapons.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_weapons.h" />
+		<Unit filename="../game/surfaceflags.h" />
+		<Unit filename="../game/teams.h" />
 		<Unit filename="../json/cJSON.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../json/cJSON.h" />
 		<Unit filename="../lua/lapi.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -370,15 +403,23 @@
 		<Unit filename="../lua/lzio.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../qcommon/disablewarnings.h" />
+		<Unit filename="../qcommon/q_asm.h" />
 		<Unit filename="../qcommon/q_math.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../qcommon/q_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../qcommon/q_shared.h" />
+		<Unit filename="../qcommon/qfiles.h" />
+		<Unit filename="../qcommon/tags.h" />
+		<Unit filename="../ui/keycodes.h" />
+		<Unit filename="../ui/menudef.h" />
 		<Unit filename="../ui/ui_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../ui/ui_shared.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

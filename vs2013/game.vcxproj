@@ -217,9 +217,9 @@
     <ClInclude Include="..\game\bg_saga.h" />
     <ClInclude Include="..\game\bg_vehicles.h" />
     <ClInclude Include="..\game\bg_weapons.h" />
-    <ClInclude Include="..\game\botlib.h" />
     <ClInclude Include="..\game\b_local.h" />
     <ClInclude Include="..\game\b_public.h" />
+    <ClInclude Include="..\game\botlib.h" />
     <ClInclude Include="..\game\chars.h" />
     <ClInclude Include="..\game\g_admin.h" />
     <ClInclude Include="..\game\g_headers.h" />
@@ -250,10 +250,8 @@
     <ClInclude Include="..\qcommon\q_shared.h" />
     <ClInclude Include="..\qcommon\tags.h" />
     <ClInclude Include="..\ui\keycodes.h" />
-    <ClInclude Include="..\ui\ui_local.h" />
     <ClInclude Include="..\ui\ui_public.h" />
     <ClInclude Include="..\ui\ui_shared.h" />
-    <ClInclude Include="..\ui\ui_xcvar.h" />
     <ClInclude Include="..\win32\AutoVersion.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -66,36 +66,61 @@
 			<Add after="cp $(TARGET_OUTPUT_FILE) $(JA)/japlus" />
 			<Mode after="always" />
 		</ExtraCommands>
+		<Unit filename="../Ghoul2/G2.h" />
+		<Unit filename="../JAPP/jp_cinfo.h" />
 		<Unit filename="../JAPP/jp_crash.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../JAPP/jp_crash.h" />
+		<Unit filename="../JAPP/jp_csflags.h" />
+		<Unit filename="../JAPP/jp_ssflags.h" />
 		<Unit filename="../JAPP/jp_tokenparser.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../JAPP/jp_tokenparser.h" />
+		<Unit filename="../cgame/animtable.h" />
+		<Unit filename="../cgame/tr_types.h" />
+		<Unit filename="../game/anims.h" />
+		<Unit filename="../game/b_public.h" />
+		<Unit filename="../game/bg_local.h" />
 		<Unit filename="../game/bg_misc.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_public.h" />
 		<Unit filename="../game/bg_saberLoad.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../game/bg_saga.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_saga.h" />
 		<Unit filename="../game/bg_vehicleLoad.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_vehicles.h" />
 		<Unit filename="../game/bg_weapons.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../game/bg_weapons.h" />
+		<Unit filename="../game/surfaceflags.h" />
+		<Unit filename="../game/teams.h" />
 		<Unit filename="../json/cJSON.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../qcommon/disablewarnings.h" />
+		<Unit filename="../qcommon/game_version.h" />
+		<Unit filename="../qcommon/q_asm.h" />
 		<Unit filename="../qcommon/q_math.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../qcommon/q_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../qcommon/q_shared.h" />
+		<Unit filename="../qcommon/qfiles.h" />
+		<Unit filename="../qcommon/tags.h" />
+		<Unit filename="../ui/keycodes.h" />
+		<Unit filename="../ui/menudef.h" />
 		<Unit filename="../ui/ui_atoms.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -105,21 +130,26 @@
 		<Unit filename="../ui/ui_force.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../ui/ui_force.h" />
 		<Unit filename="../ui/ui_gameinfo.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../ui/ui_local.h" />
 		<Unit filename="../ui/ui_main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../ui/ui_public.h" />
 		<Unit filename="../ui/ui_saber.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../ui/ui_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../ui/ui_shared.h" />
 		<Unit filename="../ui/ui_syscalls.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../ui/ui_xcvar.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
