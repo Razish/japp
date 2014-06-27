@@ -1032,7 +1032,6 @@ static void JP_DrawStats( void ) {
 
 void JP_DrawMovementKeys( void ) {
 	usercmd_t cmd = { 0 };
-	int moveDir = cg.snap->ps.movementDir;
 	char str1[32] = { 0 }, str2[32] = { 0 };
 	float w1 = 0.0f, w2 = 0.0f, height = 0.0f;
 	int fontIndex = FONT_JAPPMONO;
@@ -1043,6 +1042,7 @@ void JP_DrawMovementKeys( void ) {
 	if ( cg.clientNum == cg.predictedPlayerState.clientNum && !cg.demoPlayback )
 		trap->GetUserCmd( trap->GetCurrentCmdNumber(), &cmd );
 	else {
+		int moveDir = cg.snap->ps.movementDir;
 		float xyspeed = sqrtf( cg.snap->ps.velocity.x*cg.snap->ps.velocity.x + cg.snap->ps.velocity.y*cg.snap->ps.velocity.y );
 
 		if ( (cg.snap->ps.pm_flags & PMF_JUMP_HELD) )//zspeed > lastZSpeed || zspeed > 10 )
