@@ -279,7 +279,18 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 				lua_settable( JPLua.state, top );
 			}
 
-			JPLua_Call( JPLua.state, 2, 0 );
+			JPLua_Call( JPLua.state, 2, 1 );
+
+			if ( lua_type( JPLua.state, -1 ) == LUA_TNIL )
+				return qfalse;
+
+			if ( lua_type( JPLua.state, -1 ) == LUA_TNUMBER )
+				return qtrue;
+			else {
+				Com_Printf( "Invalid return value in %s (JPLUA_EVENT_CLIENTCOMMAND), expected nubmer or nil but got %s\n",
+					plugin->name, lua_typename( JPLua.state, -1 ) );
+				return qtrue;
+			}
 		}
 
 		while ( cmd ) {
@@ -304,18 +315,18 @@ qboolean JPLua_Event_ClientCommand( int clientNum ) {
 				}
 
 				JPLua_Call( JPLua.state, 2, 0 );
-				if ( !ret )
-					ret = qtrue;
+				return qfalse;
 			}
 
 			cmd = cmd->next;
 		}
 	}
+
+
 #endif // JPLUA
 	return ret;
 }
 #endif
-
 #if defined(_GAME)
 const char *JPLua_Event_ClientConnect( int clientNum, const char *userinfo, const char *IP, qboolean firstTime ) {
 #ifdef JPLUA
