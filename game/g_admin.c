@@ -1647,7 +1647,7 @@ static void AM_EntSpawn( gentity_t *ent ) {
 		return;
 	}
 
-	Q_strncpyz( buf, va( "origin %.0f,%.0f,%.0f ", tr->endpos.x, tr->endpos.y, tr->endpos.z ), sizeof(buf) );
+	Q_strncpyz( buf, va( "origin %.0f,%.0f,%.0f classname ", tr->endpos.x, tr->endpos.y, tr->endpos.z ), sizeof(buf) );
 	Q_strcat( buf, sizeof(buf), ConcatArgs( 1 ) );
 
 	G_LogPrintf( level.log.admin, "\t%s spawned \"%s\"\n", G_PrintClient( ent - g_entities ), buf );

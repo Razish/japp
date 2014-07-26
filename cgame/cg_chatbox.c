@@ -17,12 +17,12 @@ typedef struct field_s {
 #define MAX_CHATBOX_IDENTIFIER_SIZE (32)
 
 #define EXAMPLE_TIMESTAMP "[^800:00:00^8] "
-#define TIMESTAMP_LENGTH sizeof( EXAMPLE_TIMESTAMP )
+#define TIMESTAMP_LENGTH sizeof(EXAMPLE_TIMESTAMP)
 
 #define EXAMPLE_TIMESTAMP_CLEAN "[00:00:00] "
-#define TIMESTAMP_LENGTH_CLEAN sizeof( EXAMPLE_TIMESTAMP_CLEAN )
+#define TIMESTAMP_LENGTH_CLEAN sizeof(EXAMPLE_TIMESTAMP_CLEAN)
 
-#define CHAT_MESSAGE_LENGTH MAX_SAY_TEXT
+#define CHAT_MESSAGE_LENGTH (MAX_SAY_TEXT)
 
 //CHATBOX OBJECTS
 typedef struct chatEntry_s {
@@ -33,25 +33,25 @@ typedef struct chatEntry_s {
 } chatEntry_t;
 
 typedef struct chatBox_s {
-	chatEntry_t			chatBuffer[MAX_CHATBOX_ENTRIES]; // A logical message may be fragmented into multiple chatEntry_t structures, based on line width.
-	// This is to allow scrolling cleanly but has the down-side of line splitting only being computed once
+	// a logical message may be fragmented into multiple chatEntry_t structures, based on line width.
+	//	this is to allow scrolling cleanly but has the down-side of line splitting only being computed once
+	chatEntry_t			chatBuffer[MAX_CHATBOX_ENTRIES];
+
 	int					numActiveLines; // totaly amount of lines used
 	int					scrollAmount; // how many lines we've scrolled upwards
 	qboolean			notification; // flashes when qtrue
 
-	//For fetching the cb object
-	char				shortname[MAX_CHATBOX_IDENTIFIER_SIZE]; //May be channel name, or preset names
+	// for fetching the cb object
+	char				shortname[MAX_CHATBOX_IDENTIFIER_SIZE]; // may be channel name, or preset names
 	char				identifier[MAX_CHATBOX_IDENTIFIER_SIZE];
-	struct chatBox_s	*prev; // for scrolling
-	struct chatBox_s	*next;
+	struct chatBox_s	*prev, *next; // for scrolling
 } chatBox_t;
 static chatBox_t *chatboxList = NULL;
 static chatBox_t *currentChatbox = NULL;
 
 // chatbox history
 typedef struct chatHistory_s {
-	struct chatHistory_s *next;
-	struct chatHistory_s *prev;
+	struct chatHistory_s *next, *prev;
 
 	char message[MAX_EDIT_LINE];
 } chatHistory_t;
@@ -223,24 +223,29 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 	struct tm *timeinfo;
 	time_t tm;
 
-	accumLength = cg_chatboxTimeShow.integer ? CG_Text_Width( EXAMPLE_TIMESTAMP_CLEAN, cg.chatbox.size.scale, CG_GetChatboxFont() ) : 0.0f;
+	accumLength = cg_chatboxTimeShow.integer
+		? CG_Text_Width( EXAMPLE_TIMESTAMP_CLEAN, cg.chatbox.size.scale, CG_GetChatboxFont() )
+		: 0.0f;
 
 	cb->numActiveLines++;
 
-	if ( cb != currentChatbox )
+	if ( cb != currentChatbox ) {
 		cb->notification = qtrue;
+	}
 
 	// Stop scrolling up if we've already scrolled, similar to console behaviour
 	if ( cb->scrollAmount < 0 ) {
-		cb->scrollAmount = max( cb->scrollAmount - 1, cb->numActiveLines >= cg_chatboxLineCount.integer ?
-			((min( cb->numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer)*-1) : 0 ); //cb->scrollAmount--;
+		cb->scrollAmount = max( cb->scrollAmount - 1, cb->numActiveLines >= cg_chatboxLineCount.integer
+			? ( (min( cb->numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer) * -1 )
+			: 0 );
 	}
 
 	for ( i = 0, strLength = strlen( message ); i<strLength && i<CHAT_MESSAGE_LENGTH; i++ ) {
 		char *p = (char*)&message[i];
 		Com_sprintf( buf, sizeof(buf), "%c", *p );
-		if ( !Q_IsColorString( p ) && (i > 0 && !Q_IsColorString( p - 1 )) )
+		if ( !Q_IsColorString( p ) && (i > 0 && !Q_IsColorString( p - 1 )) ) {
 			accumLength += CG_Text_Width( buf, cg.chatbox.size.scale, CG_GetChatboxFont() );
+		}
 
 		if ( accumLength > max( cg.chatbox.size.width, 192.0f ) && (i > 0 && !Q_IsColorString( p - 1 )) ) {
 			char lastColor = COLOR_GREEN;
@@ -271,8 +276,9 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 					time( &tm );
 					timeinfo = localtime( &tm );
 
-					if ( !cg.japp.timestamp24Hour && timeinfo->tm_hour > 12 )
+					if ( !cg.japp.timestamp24Hour && timeinfo->tm_hour > 12 ) {
 						timeinfo->tm_hour -= 12;
+					}
 
 					Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i"S_COLOR_WHITE"] ",
 						*(char *)cg_chatboxTimeColour.string, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
@@ -346,16 +352,21 @@ static void CG_ChatboxDrawTabs( void ) {
 	float xOffset = 0.0f;
 
 	while ( cb ) {
-		char *name = cb->shortname;
+		const char *name = cb->shortname;
 		float textWidth = CG_Text_Width( name, cg.chatbox.size.scale, CG_GetChatboxFont() );
 		float textHeight = CG_Text_Height( name, cg.chatbox.size.scale, CG_GetChatboxFont() );
 
-		CG_FillRect( cg.chatbox.pos.x + xOffset, cg.chatbox.pos.y + (cg_chatboxLineHeight.value*cg_chatboxLineCount.integer)
-			+ (textHeight*0.25f), textWidth + 16.0f, cg_chatboxLineHeight.value, (cb == currentChatbox) ? &colorTable[CT_DKGREY] : &colorTable[CT_BLACK] );
+		CG_FillRect( cg.chatbox.pos.x + xOffset,
+			cg.chatbox.pos.y + (cg_chatboxLineHeight.value * cg_chatboxLineCount.integer) + (textHeight * 0.25f),
+			textWidth + 16.0f, cg_chatboxLineHeight.value,
+			(cb == currentChatbox) ? &colorTable[CT_DKGREY] : &colorTable[CT_BLACK] );
 
-		CG_Text_Paint( cg.chatbox.pos.x + xOffset + 8.0f, cg.chatbox.pos.y + (cg_chatboxLineHeight.value*cg_chatboxLineCount.integer),
-			cg.chatbox.size.scale, &colorWhite, va( "^%c%s", (cb == currentChatbox) ? COLOR_GREEN : (cb->notification && ((int)(trap->Milliseconds() >> 8) & 1))
-			? COLOR_RED : COLOR_WHITE, cb->shortname ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
+		CG_Text_Paint( cg.chatbox.pos.x + xOffset + 8.0f,
+			cg.chatbox.pos.y + (cg_chatboxLineHeight.value * cg_chatboxLineCount.integer),
+			cg.chatbox.size.scale, &colorWhite, va( "^%c%s", (cb == currentChatbox)
+			? COLOR_GREEN
+			: (cb->notification && ((int)(trap->Milliseconds() >> 8) & 1)) ? COLOR_RED : COLOR_WHITE, cb->shortname ),
+			0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
 
 		xOffset += textWidth + 16.0f;
 		cb = cb->next;
@@ -366,10 +377,14 @@ static const char *GetPreText( qboolean clean ) {
 	switch ( chatMode ) {
 	default:
 	case CHAT_ALL:
-		return clean ? "Say: " : "Say: %s";
+		return clean
+			? "Say: "
+			: "Say: %s";
 
 	case CHAT_TEAM:
-		return clean ? "Team: " : "Team: %s";
+		return clean
+			? "Team: "
+			: "Team: %s";
 
 	case CHAT_WHISPER:
 		if ( clean ) {
@@ -387,22 +402,28 @@ void CG_ChatboxDraw( void ) {
 	int numLines = 0, done = 0, j = 0;
 	//	chatEntry_t *last = NULL;
 
+	// draw the input line
 	if ( CG_ChatboxActive() ) {
 		const char *pre = GetPreText( qfalse );
 		const char *cleanPre = GetPreText( qtrue );
 		char msg[MAX_EDIT_LINE];
 		Com_sprintf( msg, sizeof(msg), pre, chatField.buffer );
 		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.value*cg_chatboxLineCount.integer),
-			cg.chatbox.size.scale, &g_color_table[ColorIndex( COLOR_WHITE )], msg, 0, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
+			cg.chatbox.size.scale, &g_color_table[ColorIndex( COLOR_WHITE )], msg, 0, 0, ITEM_TEXTSTYLE_OUTLINED,
+			CG_GetChatboxFont() );
 		if ( ((trap->Milliseconds() >> 8) & 1) ) {
-			float cursorOffset = 0.0f, cursorPre = CG_Text_Width( cleanPre, cg.chatbox.size.scale, CG_GetChatboxFont() );
+			const float cursorPre = CG_Text_Width( cleanPre, cg.chatbox.size.scale, CG_GetChatboxFont() );
+			float cursorOffset = 0.0f;
 
 			Q_CleanString( msg, STRIP_COLOUR );
-			for ( j = 0; j < chatField.cursor; j++ )
+			for ( j = 0; j < chatField.cursor; j++ ) {
 				cursorOffset += CG_Text_Width( va( "%c", msg[j] ), cg.chatbox.size.scale, CG_GetChatboxFont() );
+			}
 
-			CG_Text_Paint( cg.chatbox.pos.x + cursorPre + cursorOffset, cg.chatbox.pos.y + (cg_chatboxLineHeight.value*cg_chatboxLineCount.integer),
-				cg.chatbox.size.scale, &g_color_table[ColorIndex( COLOR_WHITE )], "_", 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
+			CG_Text_Paint( cg.chatbox.pos.x + cursorPre + cursorOffset,
+				cg.chatbox.pos.y + (cg_chatboxLineHeight.value * cg_chatboxLineCount.integer),
+				cg.chatbox.size.scale, &g_color_table[ColorIndex( COLOR_WHITE )], "_", 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED,
+				CG_GetChatboxFont() );
 		}
 	}
 
@@ -431,7 +452,8 @@ void CG_ChatboxDraw( void ) {
 		chatEntry_t *chat = &currentChatbox->chatBuffer[i];
 		if ( chat->isUsed && (chat->time >= cg.time - cg_chatbox.integer || currentChatbox->scrollAmount
 			/*|| cg_chatbox.integer == 1*/ || CG_ChatboxActive()) ) {
-			CG_FillRect( cg.chatbox.pos.x, cg.chatbox.pos.y + 1.75f, max( cg.chatbox.size.width, 192.0f ), cg_chatboxLineHeight.value*cg_chatboxLineCount.integer, &cg.chatbox.background );
+			CG_FillRect( cg.chatbox.pos.x, cg.chatbox.pos.y + 1.75f, max( cg.chatbox.size.width, 192.0f ),
+				cg_chatboxLineHeight.value * cg_chatboxLineCount.integer, &cg.chatbox.background );
 			break;
 		}
 	}
@@ -442,7 +464,9 @@ void CG_ChatboxDraw( void ) {
 			//	last = chat;
 			if ( chat->time >= cg.time - cg_chatbox.integer || (currentChatbox->scrollAmount && CG_ChatboxActive())
 				/*|| cg_chatbox.integer == 1*/ || CG_ChatboxActive() ) {
-				CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.value * numLines), cg.chatbox.size.scale, &colorWhite, va( "%s%s", (cg_chatboxTimeShow.integer ? chat->timeStamp : ""), chat->message ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
+				CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.value * numLines),
+					cg.chatbox.size.scale, &colorWhite, va( "%s%s", (cg_chatboxTimeShow.integer ? chat->timeStamp : ""),
+					chat->message ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
 				numLines++;
 			}
 		}
@@ -454,11 +478,15 @@ void CG_ChatboxScroll( int direction ) {
 	int numActiveLines = currentChatbox->numActiveLines;
 
 	// down
-	if ( direction == 0 )
+	if ( direction == 0 ) {
 		currentChatbox->scrollAmount = min( scrollAmount + 1, 0 );
+	}
 	// up
-	else
-		currentChatbox->scrollAmount = max( scrollAmount - 1, numActiveLines >= cg_chatboxLineCount.integer ? ((min( numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer)*-1) : 0 );
+	else {
+		currentChatbox->scrollAmount = max( scrollAmount - 1, numActiveLines >= cg_chatboxLineCount.integer
+			? ((min( numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer) * -1)
+			: 0 );
+	}
 }
 
 void CG_ChatboxTabComplete( void ) {
@@ -470,11 +498,13 @@ void CG_ChatboxTabComplete( void ) {
 
 		p = &chatField.buffer[chatField.cursor];
 		//find current word
-		while ( p > &chatField.buffer[0] && *(p - 1) != ' ' )
+		while ( p > &chatField.buffer[0] && *(p - 1) != ' ' ) {
 			p--;
+		}
 
-		if ( !*p )
+		if ( !*p ) {
 			return;
+		}
 
 		Q_strncpyz( currWord, p, sizeof(currWord) );
 		Q_CleanString( currWord, STRIP_COLOUR );
@@ -508,14 +538,16 @@ void CG_ChatboxTabComplete( void ) {
 			len = strlen( chatField.buffer );
 			if ( chatField.scroll + drawLen > len ) {
 				chatField.scroll = (int)(len - drawLen);
-				if ( chatField.scroll < 0 )
+				if ( chatField.scroll < 0 ) {
 					chatField.scroll = 0;
+				}
 			}
 		}
 		else if ( numMatches > 1 ) {
 			CG_ChatboxAddMessage( va( "Several matches found for '%s':", currWord ), qfalse, "normal" );
-			for ( i = 0; i </*min( 3, numMatches )*/numMatches; i++ )
+			for ( i = 0; i </*min( 3, numMatches )*/numMatches; i++ ) {
 				CG_ChatboxAddMessage( va( S_COLOR_GREEN"- "S_COLOR_WHITE"%s", matches[i] ), qfalse, "normal" );
+			}
 			//	if ( numMatches > 3 )
 			//		CG_ChatboxAddMessage( S_COLOR_GREEN"- "S_COLOR_WHITE"[...] truncated", qfalse, "normal" );
 			trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
@@ -524,19 +556,18 @@ void CG_ChatboxTabComplete( void ) {
 }
 
 void CG_ChatboxSelectTabNextNoKeys( void ) {
-	if ( currentChatbox->next )
-		currentChatbox = currentChatbox->next;
-	else
-		currentChatbox = chatboxList;
+	currentChatbox = currentChatbox->next ? currentChatbox->next : chatboxList;
 }
 
 void CG_ChatboxSelectTabPrevNoKeys( void ) {
-	if ( currentChatbox->prev )
+	if ( currentChatbox->prev ) {
 		currentChatbox = currentChatbox->prev;
+	}
 	else {
 		chatBox_t *cb = chatboxList;
-		while ( cb->next )
+		while ( cb->next ) {
 			cb = cb->next;
+		}
 		currentChatbox = cb;
 	}
 }
@@ -547,13 +578,16 @@ void CG_ChatboxSelect( char *cbName ) {
 
 void CG_ChatboxHistoryUp( void ) {
 	if ( currentHistory ) {
-		if ( currentHistory->next )
+		if ( currentHistory->next ) {
 			currentHistory = currentHistory->next;
+		}
 	}
-	else if ( chatHistory )
+	else if ( chatHistory ) {
 		currentHistory = chatHistory;
-	else
+	}
+	else {
 		return;
+	}
 
 	Q_strncpyz( chatField.buffer, currentHistory->message, sizeof(chatField.buffer) );
 	chatField.cursor = strlen( chatField.buffer );
@@ -566,19 +600,22 @@ static void Field_Clear( field_t *edit ) {
 }
 
 void CG_ChatboxHistoryDn( void ) {
-	if ( currentHistory )
+	if ( currentHistory ) {
 		currentHistory = currentHistory->prev;
+	}
 	if ( currentHistory ) {
 		Q_strncpyz( chatField.buffer, currentHistory->message, sizeof(chatField.buffer) );
 		chatField.cursor = strlen( chatField.buffer );
 	}
-	else
+	else {
 		Field_Clear( &chatField );
+	}
 }
 
 void CG_ChatboxClear( void ) {
-	if ( !trap->Key_IsDown( A_CTRL ) )
+	if ( !trap->Key_IsDown( A_CTRL ) ) {
 		return;
+	}
 
 	currentChatbox->numActiveLines = 0;
 	memset( currentChatbox->chatBuffer, 0, sizeof(currentChatbox->chatBuffer) );
@@ -588,18 +625,22 @@ void CG_ChatboxClear( void ) {
 }
 
 void CG_ChatboxOpen( int mode ) {
-	if ( chatActive )
+	if ( chatActive ) {
 		return;
+	}
 
 	switch ( mode ) {
 	case CHAT_ALL:
 	case CHAT_TEAM:
 		chatTargetClient = -1;
 		break;
+
 	case CHAT_WHISPER:
-		if ( (chatTargetClient = CG_CrosshairPlayer()) == -1 )
+		if ( (chatTargetClient = CG_CrosshairPlayer()) == -1 ) {
 			return;
+		}
 		break;
+
 	default:
 		break;
 	}
@@ -621,6 +662,7 @@ static void Field_CharEvent( field_t *edit, int key ) {
 	//	key = tolower( key );
 
 	// handle shortcuts
+	//RAZTODO: advanced text editing
 	if ( trap->Key_IsDown( A_CTRL ) ) {
 		switch ( key ) {
 		case 'a': // home
@@ -729,11 +771,14 @@ static void Field_CharEvent( field_t *edit, int key ) {
 		default:
 			break;
 		}
+
 		// Change scroll if cursor is no longer visible
-		if ( edit->cursor < edit->scroll )
+		if ( edit->cursor < edit->scroll ) {
 			edit->scroll = edit->cursor;
-		else if ( edit->cursor >= edit->scroll + edit->widthInChars && edit->cursor <= fieldLen )
+		}
+		else if ( edit->cursor >= edit->scroll + edit->widthInChars && edit->cursor <= fieldLen ) {
 			edit->scroll = edit->cursor - edit->widthInChars + 1;
+		}
 
 		return;
 	}
@@ -741,8 +786,9 @@ static void Field_CharEvent( field_t *edit, int key ) {
 	key &= ~K_CHAR_FLAG;
 
 	// ignore any other non printable chars
-	if ( key < 32 )
+	if ( key < 32 ) {
 		return;
+	}
 
 	//RAZTODO: chatbox overstrike mode
 	// - 2 to leave room for the leading slash and trailing \0
@@ -751,11 +797,13 @@ static void Field_CharEvent( field_t *edit, int key ) {
 	memmove( edit->buffer + edit->cursor + 1, edit->buffer + edit->cursor, fieldLen + 1 - edit->cursor );
 	edit->buffer[edit->cursor++] = key;
 
-	if ( edit->cursor >= edit->widthInChars )
+	if ( edit->cursor >= edit->widthInChars ) {
 		edit->scroll++;
+	}
 
-	if ( edit->cursor == fieldLen + 1 )
+	if ( edit->cursor == fieldLen + 1 ) {
 		edit->buffer[edit->cursor] = 0;
+	}
 }
 
 void CG_ChatboxChar( int key ) {
