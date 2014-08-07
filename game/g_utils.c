@@ -1576,16 +1576,17 @@ trace_t *G_RealTrace( gentity_t *ent, float dist ) {
 
 	//Get end
 	AngleVectors( &ent->client->ps.viewangles, &end, NULL, NULL );
-	VectorMA( &start, dist ? dist : 16384.0f, &end, &end );
+	VectorMA( &start, (dist > 0.0f) ? dist : 16384.0f, &end, &end );
 
 	trap->Trace( &tr, &start, NULL, NULL, &end, ent->s.number, MASK_OPAQUE | CONTENTS_BODY | CONTENTS_ITEM | CONTENTS_CORPSE, qfalse, 0, 0 );
 
-#ifdef _DEBUG
-	G_TestLine( &start, &tr.endpos, 0xFF, 7500 );
-#endif
+	if ( g_debugTrace.integer ) {
+		G_TestLine( &start, &tr.endpos, COLOR_MAGENTA, 2500 );
+	}
 
-	if ( japp_unlagged.integer )
+	if ( japp_unlagged.integer ) {
 		G_UnTimeShiftAllClients( ent );
+	}
 
 	return &tr;
 }
