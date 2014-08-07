@@ -4720,6 +4720,7 @@ void CG_SaberClashFlare( void ) {
 	color.r = 0.8f;
 	color.g = 0.8f;
 	color.b = 0.8f;
+	color.a = 1.0f;
 
 	trap->R_SetColor( &color );
 

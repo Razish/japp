@@ -36,7 +36,6 @@ int WP_MissileBlockForBlock( int saberBlock );
 qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hitLoc, vector3 *point, vector3 *dir, vector3 *bladeDir, int mod );
 qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower, int overrideAmt );
 qboolean WP_ForcePowerAvailable( gentity_t *self, forcePowers_t forcePower, int overrideAmt );
-void WP_DeactivateSaber( gentity_t *self, qboolean clearLength ); //clearLength = qfalse
 void WP_ActivateSaber( gentity_t *self );
 
 qboolean PM_SaberInStart( int move );

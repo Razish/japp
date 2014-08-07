@@ -19,168 +19,98 @@ int nodenum; //so we can connect broken trails
 uint32_t gLevelFlags = 0;
 
 char *GetFlagStr( uint32_t flags ) {
-	char *flagstr;
-	int i;
+	static char flagstr[128];
+	char *p = flagstr;
 
-	flagstr = (char *)B_TempAlloc( 128 );
-	i = 0;
+	memset( flagstr, '\0', sizeof(flagstr) );
 
 	if ( !flags ) {
-		strcpy( flagstr, "none\0" );
-		goto fend;
+		Q_strncpyz( flagstr, "none", sizeof(flagstr) );
+		return flagstr;
 	}
 
 	if ( flags & WPFLAG_JUMP ) {
-		flagstr[i] = 'j';
-		i++;
+		*p++ = 'j';
 	}
 
 	if ( flags & WPFLAG_DUCK ) {
-		flagstr[i] = 'd';
-		i++;
+		*p++ = 'd';
 	}
 
 	if ( flags & WPFLAG_SNIPEORCAMPSTAND ) {
-		flagstr[i] = 'c';
-		i++;
+		*p++ = 'c';
 	}
 
 	if ( flags & WPFLAG_WAITFORFUNC ) {
-		flagstr[i] = 'f';
-		i++;
+		*p++ = 'f';
 	}
 
 	if ( flags & WPFLAG_SNIPEORCAMP ) {
-		flagstr[i] = 's';
-		i++;
+		*p++ = 's';
 	}
 
 	if ( flags & WPFLAG_ONEWAY_FWD ) {
-		flagstr[i] = 'x';
-		i++;
+		*p++ = 'x';
 	}
 
 	if ( flags & WPFLAG_ONEWAY_BACK ) {
-		flagstr[i] = 'y';
-		i++;
+		*p++ = 'y';
 	}
 
 	if ( flags & WPFLAG_GOALPOINT ) {
-		flagstr[i] = 'g';
-		i++;
+		*p++ = 'g';
 	}
 
 	if ( flags & WPFLAG_NOVIS ) {
-		flagstr[i] = 'n';
-		i++;
+		*p++ = 'n';
 	}
 
 	if ( flags & WPFLAG_NOMOVEFUNC ) {
-		flagstr[i] = 'm';
-		i++;
+		*p++ = 'm';
 	}
 
 	if ( flags & WPFLAG_RED_FLAG ) {
-		if ( i ) {
-			flagstr[i] = ' ';
-			i++;
+		const char *tmp = "red flag";
+		if ( p > flagstr ) {
+			*p++ = ' ';
 		}
-		flagstr[i] = 'r';
-		i++;
-		flagstr[i] = 'e';
-		i++;
-		flagstr[i] = 'd';
-		i++;
-		flagstr[i] = ' ';
-		i++;
-		flagstr[i] = 'f';
-		i++;
-		flagstr[i] = 'l';
-		i++;
-		flagstr[i] = 'a';
-		i++;
-		flagstr[i] = 'g';
-		i++;
+		Q_strncpyz( p, tmp, sizeof(flagstr) - (p-flagstr) );
+		p += strlen( tmp );
 	}
 
 	if ( flags & WPFLAG_BLUE_FLAG ) {
-		if ( i ) {
-			flagstr[i] = ' ';
-			i++;
+		const char *tmp = "blue flag";
+		if ( p > flagstr ) {
+			*p++ = ' ';
 		}
-		flagstr[i] = 'b';
-		i++;
-		flagstr[i] = 'l';
-		i++;
-		flagstr[i] = 'u';
-		i++;
-		flagstr[i] = 'e';
-		i++;
-		flagstr[i] = ' ';
-		i++;
-		flagstr[i] = 'f';
-		i++;
-		flagstr[i] = 'l';
-		i++;
-		flagstr[i] = 'a';
-		i++;
-		flagstr[i] = 'g';
-		i++;
+		Q_strncpyz( p, tmp, sizeof(flagstr) - (p-flagstr) );
+		p += strlen( tmp );
 	}
 
 	if ( flags & WPFLAG_SIEGE_IMPERIALOBJ ) {
-		if ( i ) {
-			flagstr[i] = ' ';
-			i++;
+		const char *tmp = "saga-imp";
+		if ( p > flagstr ) {
+			*p++ = ' ';
 		}
-		flagstr[i] = 's';
-		i++;
-		flagstr[i] = 'a';
-		i++;
-		flagstr[i] = 'g';
-		i++;
-		flagstr[i] = 'a';
-		i++;
-		flagstr[i] = '_';
-		i++;
-		flagstr[i] = 'i';
-		i++;
-		flagstr[i] = 'm';
-		i++;
-		flagstr[i] = 'p';
-		i++;
+		Q_strncpyz( p, tmp, sizeof(flagstr) - (p-flagstr) );
+		p += strlen( tmp );
 	}
 
 	if ( flags & WPFLAG_SIEGE_REBELOBJ ) {
-		if ( i ) {
-			flagstr[i] = ' ';
-			i++;
+		const char *tmp = "saga-reb";
+		if ( p > flagstr ) {
+			*p++ = ' ';
 		}
-		flagstr[i] = 's';
-		i++;
-		flagstr[i] = 'a';
-		i++;
-		flagstr[i] = 'g';
-		i++;
-		flagstr[i] = 'a';
-		i++;
-		flagstr[i] = '_';
-		i++;
-		flagstr[i] = 'r';
-		i++;
-		flagstr[i] = 'e';
-		i++;
-		flagstr[i] = 'b';
-		i++;
+		Q_strncpyz( p, tmp, sizeof(flagstr) - (p-flagstr) );
+		p += strlen( tmp );
 	}
 
-	flagstr[i] = '\0';
+	*p = '\0';
 
-	if ( i == 0 ) {
-		strcpy( flagstr, "unknown\0" );
+	if ( p == flagstr ) {
+		Q_strncpyz( flagstr, "unknown", sizeof(flagstr) );
 	}
 
-fend:
 	return flagstr;
 }
 
@@ -209,7 +139,6 @@ void BotWaypointRender( void ) {
 	float checkdist;
 	gentity_t *plum;
 	gentity_t *viewent;
-	char *flagstr;
 	vector3 a;
 
 	if ( !gBotEdit ) {
@@ -227,18 +156,16 @@ void BotWaypointRender( void ) {
 	i = gWPRenderedFrame;
 	inc_checker = gWPRenderedFrame;
 
-	while ( i < gWPNum ) {
+	for ( i = gWPRenderedFrame; i < gWPNum; i++ ) {
 		if ( gWPArray[i] && gWPArray[i]->inuse ) {
 			plum = G_TempEntity( &gWPArray[i]->origin, EV_SCOREPLUM );
 			plum->r.svFlags |= SVF_BROADCAST;
 			plum->s.time = i;
 
-			n = 0;
-
-			while ( n < gWPArray[i]->neighbornum ) {
-				if ( gWPArray[i]->neighbors[n].forceJumpTo && gWPArray[gWPArray[i]->neighbors[n].num] )
+			for ( n = 0; n < gWPArray[i]->neighbornum; n++ ) {
+				if ( gWPArray[i]->neighbors[n].forceJumpTo && gWPArray[gWPArray[i]->neighbors[n].num] ) {
 					G_TestLine( &gWPArray[i]->origin, &gWPArray[gWPArray[i]->neighbors[n].num]->origin, 0x0000ff, 5000 );
-				n++;
+				}
 			}
 
 			gWPRenderedFrame++;
@@ -251,7 +178,6 @@ void BotWaypointRender( void ) {
 		if ( (i - inc_checker) > 4 ) {
 			break; //don't render too many at once
 		}
-		i++;
 	}
 
 	if ( i >= gWPNum ) {
@@ -274,9 +200,7 @@ checkprint:
 	bestdist = 256; //max distance for showing point info
 	gotbestindex = 0;
 
-	i = 0;
-
-	while ( i < gWPNum ) {
+	for ( i = 0; i < gWPNum; i++ ) {
 		if ( gWPArray[i] && gWPArray[i]->inuse ) {
 			VectorSubtract( &viewent->client->ps.origin, &gWPArray[i]->origin, &a );
 
@@ -288,15 +212,13 @@ checkprint:
 				gotbestindex = 1;
 			}
 		}
-		i++;
 	}
 
 	if ( gotbestindex && bestindex != gLastPrintedIndex ) {
-		flagstr = GetFlagStr( gWPArray[bestindex]->flags );
+		const char *flagstr = GetFlagStr( gWPArray[bestindex]->flags );
 		gLastPrintedIndex = bestindex;
-		trap->Print( S_COLOR_YELLOW "Waypoint %i\nFlags - %i (%s) (w%f)\nOrigin - (%i %i %i)\n", (int)(gWPArray[bestindex]->index), (int)(gWPArray[bestindex]->flags), flagstr, gWPArray[bestindex]->weight, (int)(gWPArray[bestindex]->origin.x), (int)(gWPArray[bestindex]->origin.y), (int)(gWPArray[bestindex]->origin.z) );
-		//GetFlagStr allocates 128 bytes for this, if it's changed then obviously this must be as well
-		B_TempFree( 128 ); //flagstr
+		trap->Print( S_COLOR_YELLOW "Waypoint %i\nFlags - %i (%s) (w%f)\nOrigin - %s\n", gWPArray[bestindex]->index,
+			gWPArray[bestindex]->flags, flagstr, gWPArray[bestindex]->weight, vtos( &gWPArray[bestindex]->origin ) );
 
 		plum = G_TempEntity( &gWPArray[bestindex]->origin, EV_SCOREPLUM );
 		plum->r.svFlags |= SVF_BROADCAST;

@@ -71,11 +71,10 @@ int JPLua_Logger_Close( lua_State *L ) {
 void JPLua_Logger_CreateRef( lua_State *L, const char *path ) {
 	const fsMode_t mode = FS_APPEND;
 	jplua_logger_t *logger = NULL;
-	int len = 0;
 
 	logger = (jplua_logger_t *)lua_newuserdata( L, sizeof(jplua_logger_t) );
 	Com_sprintf( logger->fileName, sizeof(logger->fileName), "%s%s/%s", pluginDir, JPLua.currentPlugin->name, path );
-	len = trap->FS_Open( logger->fileName, &logger->fileHandle, mode );
+	trap->FS_Open( logger->fileName, &logger->fileHandle, mode );
 
 	luaL_getmetatable( L, LOGGER_META );
 	lua_setmetatable( L, -2 );

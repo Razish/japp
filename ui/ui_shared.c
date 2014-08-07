@@ -1155,6 +1155,8 @@ qboolean Script_SetItemColorCvar( itemDef_t *item, char **args ) {
 	int i;
 	vector4 *out;
 
+	VectorSet4( &color, 0.0f, 0.0f, 0.0f, 1.0f );
+
 	// expecting type of color to set and 4 args for the color
 	if ( String_Parse( args, &itemname ) && String_Parse( args, &name ) ) {
 		itemDef_t	*item2;
