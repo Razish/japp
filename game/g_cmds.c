@@ -247,8 +247,13 @@ static void Cmd_LevelShot_f( gentity_t *ent ) {
 
 // commit suicide
 void Cmd_Kill_f( gentity_t *ent ) {
-	if ( ent->client->ps.fallingToDeath && !japp_allowFallSuicide.integer )
+	if ( ent->client->ps.fallingToDeath && !japp_allowFallSuicide.integer ) {
 		return;
+	}
+
+	if ( ent->client->pers.adminData.isFrozen ) {
+		return;
+	}
 
 	//OSP: pause
 	if ( level.pause.state != PAUSE_NONE )
