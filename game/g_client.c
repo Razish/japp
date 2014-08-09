@@ -1269,8 +1269,9 @@ qboolean CheckDuplicateName( int clientNum ) {
 
 	// now check if someone else is using this name
 	for ( i = 0, ent = g_entities; i<level.maxclients; i++, ent++ ) {
-		if ( i == clientNum )
+		if ( i == clientNum || !ent->inuse || ent->client->pers.connected == CON_DISCONNECTED ) {
 			continue;
+		}
 
 		//TODO: perhaps do an advanced check replacing chars such as 'O' for '0'
 		//	we are, after all, checking for impersonation
