@@ -3391,7 +3391,7 @@ static float CG_DrawTimer( float y ) {
 	secs %= 60;
 	//	msec %= 1000;
 
-	s = va( "%i:%02i", mins, secs );
+	s = va( "%i:%02i", mins, abs( secs ) );
 	w = CG_Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer );
 	CG_Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, timeColour, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED,
 		cg_topRightFont.integer );
