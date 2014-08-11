@@ -40,8 +40,8 @@
 
 #define SB_RATING_WIDTH	    0 // (6 * BIGCHAR_WIDTH)
 #define SB_NAME_X			(SB_SCORELINE_X)
-#define SB_SCORE_X			(SB_SCORELINE_X + .40f * SB_SCORELINE_WIDTH)
-#define SB_PING_X			(SB_SCORELINE_X + .60f * SB_SCORELINE_WIDTH)
+#define SB_SCORE_X			(SB_SCORELINE_X + .55f * SB_SCORELINE_WIDTH)
+#define SB_PING_X			(SB_SCORELINE_X + .70f * SB_SCORELINE_WIDTH)
 #define SB_TIME_X			(SB_SCORELINE_X + .85f * SB_SCORELINE_WIDTH)
 
 // The new and improved score board
