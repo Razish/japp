@@ -571,7 +571,7 @@ int CG_G2EvIndexForModel( void *g2, int animIndex ) {
 #define DEFAULT_NEUTER_SOUNDPATH "chars/mp_generic_male/misc"
 void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 	fileHandle_t f;
-	gender_t gender = ci->gender;
+	gender_t gender = GENDER_MALE;
 	int i = 0, fLen = 0;
 	const char *dir, *s;
 	char soundpath[MAX_QPATH], soundName[1024];
@@ -600,10 +600,12 @@ void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 				gender = GENDER_FEMALE;
 				soundpath[i] = '\0';
 			}
+#if 0
 			else if ( soundpath[i] == 'n' ) {
 				gender = GENDER_NEUTER;
 				soundpath[i] = '\0';
 			}
+#endif
 		}
 
 		for ( i = 0; soundpath[i] && soundpath[i] != '\r' && soundpath[i] != '\n'; i++ ) {
@@ -713,7 +715,7 @@ void CG_LoadClientInfo( clientInfo_t *ci ) {
 	const char *fallbackModel = DEFAULT_MODEL;
 
 	if ( ci->gender == GENDER_FEMALE )
-		fallbackModel = "jan";
+		fallbackModel = DEFAULT_MODEL_FEMALE;
 
 	clientNum = ci - cgs.clientinfo;
 
@@ -1111,12 +1113,21 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 
 	//Raz: Gender hints
 	if ( (v = Info_ValueForKey( configstring, "ds" )) ) {
+#if 0
 		if ( *v == 'm' )
 			newInfo.gender = GENDER_MALE;
 		else if ( *v == 'f' )
 			newInfo.gender = GENDER_FEMALE;
 		else
 			newInfo.gender = GENDER_NEUTER;
+#else
+		if ( *v == 'f' ) {
+			newInfo.gender = GENDER_FEMALE;
+		}
+		else {
+			newInfo.gender = GENDER_MALE;
+		}
+#endif // 0
 	}
 
 	// team task
