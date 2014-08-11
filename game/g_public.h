@@ -10,11 +10,10 @@
 #define	GAME_API_VERSION	1
 
 // entity->svFlags
-// the server does not know how to interpret most of the values
-// in entityStates (level eType), so the game must explicitly flag
-// special server behaviors
+// the server does not know how to interpret most of the values in entityStates (level eType), so the game must
+//	explicitly flag special server behaviors
 #define	SVF_NOCLIENT			(0x00000001u) // don't send entity to clients, even if it has effects
-#define SVF_UNUSED00000002		(0x00000002u) //
+#define SVF_BROADCASTCLIENTS	(0x00000002u) // only broadcast to clients specified in r.broadcastClients[clientNum/32]
 #define SVF_UNUSED00000004		(0x00000004u) //
 #define SVF_BOT					(0x00000008u) // set if the entity is a bot
 #define SVF_PLAYER_USABLE		(0x00000010u) // player can use this with the use button

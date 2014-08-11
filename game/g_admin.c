@@ -320,15 +320,32 @@ static void AM_ClearTelemarks( void ) {
 	telemarks = NULL;
 }
 
+static uint32_t GetAdminsBitflag( void ) {
+	int i;
+	gentity_t *ent;
+	uint32_t mask = 0u;
+
+	for ( i = 0, ent = g_entities; i < level.maxclients; i++, ent++ ) {
+		if ( ent->inuse && ent->client->pers.adminUser ) {
+			mask |= (1 << i);
+		}
+	}
+
+	return mask;
+}
+
+void G_BroadcastToAdminsOnly( gentity_t *ent ) {
+	ent->r.svFlags |= SVF_BROADCASTCLIENTS;
+	ent->r.broadcastClients[0] = GetAdminsBitflag();
+}
 
 void SP_fx_runner( gentity_t *ent );
 static void SpawnTelemark( telemark_t *tm, vector3 *position ) {
-	if ( telemarksVisible ) {
-		tm->ent = G_Spawn();
-		tm->ent->fullName = "env/fire_wall";
-		VectorCopy( position, &tm->ent->s.origin );
-		SP_fx_runner( tm->ent );
-	}
+	tm->ent = G_Spawn();
+	tm->ent->fullName = "env/btend";
+	VectorCopy( position, &tm->ent->s.origin );
+	SP_fx_runner( tm->ent );
+	G_BroadcastToAdminsOnly( tm->ent );
 }
 
 // add or update an existing telemark
@@ -353,7 +370,9 @@ static telemark_t *AM_AddTelemark( const char *name, vector3 *position ) {
 	// we're either overwriting a telemark, or adding a new one
 	Q_strncpyz( tm->name, name, sizeof(tm->name) );
 	VectorCopy( position, &tm->position );
-	SpawnTelemark( tm, position );
+	if ( telemarksVisible ) {
+		SpawnTelemark( tm, position );
+	}
 
 	return tm;
 }
@@ -975,10 +994,7 @@ static void AM_SeeTelemarks( gentity_t *ent ) {
 	}
 	else {
 		for ( tm = telemarks; tm; tm = tm->next ) {
-			tm->ent = G_Spawn();
-			tm->ent->fullName = "env/btend";
-			VectorCopy( &tm->position, &tm->ent->s.origin );
-			SP_fx_runner( tm->ent );
+			SpawnTelemark( tm, &tm->position );
 		}
 	}
 	telemarksVisible = !telemarksVisible;
