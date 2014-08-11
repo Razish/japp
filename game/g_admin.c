@@ -1215,6 +1215,8 @@ static void Slap( gentity_t *targ ) {
 
 	G_Knockdown( targ, NULL, &newDir, japp_slapDistance.value, qtrue );
 	G_Throw( targ, &newDir, japp_slapDistance.value );
+
+	trap->SendServerCommand( targ - g_entities, "cp \"You have been slapped\"" );
 }
 
 // slap the specified client
@@ -1231,11 +1233,13 @@ static void AM_Slap( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof(arg1) );
 	targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT );
 
-	if ( targetClient == -1 )
+	if ( targetClient == -1 ) {
 		return;
+	}
 
-	if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
+	if ( !AM_CanInflict( ent, &g_entities[targetClient] ) ) {
 		return;
+	}
 
 	G_LogPrintf( level.log.admin, "\t%s slapped %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( targetClient ) );
 	Slap( &g_entities[targetClient] );
