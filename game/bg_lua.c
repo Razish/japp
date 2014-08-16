@@ -647,6 +647,11 @@ static int JPLua_Export_GetKeyCatcher( lua_State *L ) {
 }
 #endif
 
+static int JPLua_Export_GetGameType( lua_State *L ) {
+	lua_pushinteger( L, level.gametype );
+	return 1;
+}
+
 static int JPLua_Export_GetMap( lua_State *L ) {
 #if defined(_GAME)
 
@@ -958,7 +963,10 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
 #ifdef _CGAME
 	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
+	{ "GetGameType", JPLua_Export_GetGameType }, // integer GetGameType()
 	{ "GetKeyCatcher", JPLua_Export_GetKeyCatcher }, // integer GetKeyCatcher()
+#elif _GAME
+	{ "GetGameType", JPLua_Export_GetGameType }, // integer GetGameType()
 #endif
 	{ "GetLogger", JPLua_GetLogger }, // Logger GetLogger( string filename )
 	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
