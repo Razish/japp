@@ -3584,6 +3584,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 	gclient_t	*client;
 	int			take, asave, knockback, max, subamt = 0;
 	float		famt = 0, hamt = 0, shieldAbsorbed = 0;
+	const qboolean nonClientDamage = mod == MOD_UNKNOWN || mod == MOD_TURBLAST || mod == MOD_SENTRY || mod == MOD_WATER
+		|| mod == MOD_SLIME || mod == MOD_LAVA || mod == MOD_CRUSH || mod == MOD_FALLING || mod == MOD_SUICIDE
+		|| mod == MOD_TARGET_LASER || mod == MOD_TRIGGER_HURT || mod == MOD_TEAM_CHANGE;
 
 	if ( targ && targ->damageRedirect ) {
 		G_Damage( &g_entities[targ->damageRedirectTo], inflictor, attacker, dir, point, damage, dflags, mod );
@@ -3691,7 +3694,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		}
 	}
 
-	if ( targ && targ->client && targ->client->ps.duelInProgress ) {
+	if ( targ && targ->client && targ->client->ps.duelInProgress && !nonClientDamage ) {
 		if ( attacker && attacker->client && attacker->s.number != targ->client->ps.duelIndex ) {
 			return;
 		}
@@ -3699,7 +3702,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			return;
 		}
 	}
-	if ( attacker && attacker->client && attacker->client->ps.duelInProgress ) {
+	if ( attacker && attacker->client && attacker->client->ps.duelInProgress && !nonClientDamage ) {
 		if ( targ && targ->client && targ->s.number != attacker->client->ps.duelIndex ) {
 			return;
 		}
