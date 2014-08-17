@@ -648,7 +648,15 @@ static int JPLua_Export_GetKeyCatcher( lua_State *L ) {
 #endif
 
 static int JPLua_Export_GetGameType( lua_State *L ) {
+#if defined(_GAME)
+
 	lua_pushinteger( L, level.gametype );
+
+#elif defined(_CGAME)
+
+	lua_pushinteger( L, cgs.gametype );
+
+#endif
 	return 1;
 }
 
