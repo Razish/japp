@@ -61,14 +61,6 @@ float	pm_spectatorfriction = 5.0f;
 
 int		c_pmove = 0;
 
-float forceSpeedLevels[4] =
-{
-	1, //rank 0?
-	1.25f,
-	1.5f,
-	1.75f
-};
-
 int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
 {
 	{ //nothing should be usable at rank 0..

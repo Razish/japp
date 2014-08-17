@@ -420,6 +420,15 @@ typedef struct renderInfo_s {
 	int			boltValidityTime;
 } renderInfo_t;
 
+#define EMF_NONE	(0x00u)
+#define EMF_FREEZE	(0x01u)
+#define EMF_HOLSTER	(0x08u)
+
+typedef struct emote_s {
+	animNumber_t animLoop, animLeave;
+	uint32_t flags;
+} emote_t;
+
 typedef struct gclient_s {
 	playerState_t		ps; // communicated by server to clients
 	clientPersistant_t	pers;
@@ -527,8 +536,7 @@ typedef struct gclient_s {
 	qboolean			scoresWaiting;
 	struct {
 		qboolean			freeze;
-		int					returnAnim;
-		uint32_t			animParts, animFlags;
+		animNumber_t		nextAnim;
 	} emote;
 	struct {
 		int					drain, lightning;

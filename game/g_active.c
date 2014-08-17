@@ -1976,7 +1976,7 @@ void ClientThink_real( gentity_t *ent ) {
 				client->ps.eFlags |= EF_JETPACK_ACTIVE;
 				killJetFlags = qfalse;
 			}
-			else if ( client->pers.adminData.isFrozen || client->emote.freeze )
+			else if ( client->pers.adminData.isFrozen )
 				client->ps.pm_type = PM_FREEZE;
 			else
 				client->ps.pm_type = PM_NORMAL;
@@ -2985,10 +2985,19 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	// leave emotes
-	if ( ent->client->emote.freeze && (ent->client->pers.cmd.upmove < 0 || ent->client->pers.cmd.buttons & BUTTON_USE) ) {
+	if ( ent->client->emote.freeze && (ent->client->pers.cmd.upmove != 0 || ent->client->pers.cmd.buttons & BUTTON_USE) ) {
 		ent->client->emote.freeze = qfalse;
-		G_SetAnim( ent, NULL, ent->client->emote.animParts, ent->client->emote.returnAnim, ent->client->emote.animFlags,
-			0 );
+		if ( !ent->client->emote.nextAnim ) {
+			ent->client->ps.forceHandExtend = HANDEXTEND_NONE;
+			ent->client->ps.forceHandExtendTime = level.time;
+			ent->client->ps.forceRestricted = qfalse;
+		}
+		else {
+			ent->client->ps.forceHandExtend = HANDEXTEND_DODGE;
+			ent->client->ps.forceHandExtendTime = level.time + BG_AnimLength( ent->localAnimIndex, ent->client->emote.nextAnim );
+			ent->client->ps.forceDodgeAnim = ent->client->emote.nextAnim;
+			ent->client->emote.nextAnim = 0;
+		}
 	}
 
 	// link entity now, after any personal teleporters have been used

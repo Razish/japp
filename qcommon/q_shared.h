@@ -485,8 +485,6 @@ typedef enum warningLevel_e {
 	WL_DEBUG
 } warningLevel_t;
 
-extern float forceSpeedLevels[4];
-
 // print levels from renderer (FIXME: set up for game / cgame?)
 typedef enum printParm_e {
 	PRINT_ALL,
