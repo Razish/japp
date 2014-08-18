@@ -1244,7 +1244,7 @@ typedef enum {
 
 typedef struct BG_field_s {
 	const char *name;
-	int ofs;
+	size_t ofs;
 	fieldtype_t type;
 } BG_field_t;
 
