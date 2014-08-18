@@ -3120,7 +3120,6 @@ static const emote_t emotes[NUM_EMOTES] = {
 };
 
 static void SetEmote( gentity_t *ent, const emote_t *emote ) {
-	uint32_t animParts = 0u, animFlags = 0u;
 	forceHandAnims_t handExtend = HANDEXTEND_TAUNT;
 	int emoteTime;
 
