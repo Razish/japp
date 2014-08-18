@@ -403,6 +403,7 @@ static const svCommand_t svCommands[] = {
 	{ "pause", SV_Pause_f },
 	{ "say", SV_Say_f },
 	{ "shuffle", SV_ShuffleTeams_f },
+	{ "toggleallowvote", SV_ToggleAllowVote_f },
 	{ "toggleuserinfovalidation", SV_ToggleUserinfoValidation_f },
 };
 static const int numSvCommands = ARRAY_LEN( svCommands );

@@ -1815,7 +1815,7 @@ void SV_ToggleUserinfoValidation_f( void ) {
 		index = atoi( arg );
 
 		if ( index > numUserinfoFields + USERINFO_VALIDATION_MAX - 1 ) {
-			Com_Printf( "ToggleUserinfoValidation: Invalid range: %i [0, %i]\n", index,
+			trap->Print( "ToggleUserinfoValidation: Invalid range: %i [0, %i]\n", index,
 				numUserinfoFields + USERINFO_VALIDATION_MAX - 1 );
 			return;
 		}
@@ -1824,11 +1824,11 @@ void SV_ToggleUserinfoValidation_f( void ) {
 		trap->Cvar_Update( &japp_userinfoValidate );
 
 		if ( index < numUserinfoFields ) {
-			Com_Printf( "%s %s\n", userinfoFields[index].fieldClean,
+			trap->Print( "%s %s\n", userinfoFields[index].fieldClean,
 				((japp_userinfoValidate.integer & (1 << index)) ? "Validated" : "Ignored") );
 		}
 		else {
-			Com_Printf( "%s %s\n", userinfoValidateExtra[index - numUserinfoFields],
+			trap->Print( "%s %s\n", userinfoValidateExtra[index - numUserinfoFields],
 				((japp_userinfoValidate.integer & (1 << index)) ? "Validated" : "Ignored") );
 		}
 	}

@@ -953,6 +953,7 @@ qboolean			SpotWouldTelefrag2( gentity_t *mover, vector3 *dest );
 qboolean			SpotWouldTelefrag3( vector3 *spot );
 void				StopFollowing( gentity_t *ent );
 void				SV_ToggleUserinfoValidation_f( void );
+void				SV_ToggleAllowVote_f( void );
 void				Svcmd_AddBot_f( void );
 void				Svcmd_BotList_f( void );
 void				Svcmd_MapList_f( void );
