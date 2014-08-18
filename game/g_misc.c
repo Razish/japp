@@ -2101,6 +2101,59 @@ void SP_fx_runner( gentity_t *ent ) {
 	trap->LinkEntity( (sharedEntity_t *)ent );
 }
 
+/*QUAKED fx_wind (0 .5 .8) (-16 -16 -16) (16 16 16) NORMAL CONSTANT GUSTING SWIRLING x  FOG LIGHT_FOG
+Generates global wind forces
+
+NORMAL    creates a random light global wind
+CONSTANT  forces all wind to go in a specified direction
+GUSTING   causes random gusts of wind
+SWIRLING  causes random swirls of wind
+
+"angles" the direction for constant wind
+"speed"  the speed for constant wind
+*/
+void SP_CreateWind( gentity_t *ent ) {
+	// normal wind
+	if ( ent->spawnflags & 1 ) {
+		G_EffectIndex( "*wind" );
+	}
+
+	// constant wind
+	if ( ent->spawnflags & 2 ) {
+		char tmp[256];
+		vector3 windDir;
+
+		AngleVectors( &ent->s.angles, &windDir, 0, 0 );
+		G_SpawnFloat( "speed", "500", &ent->speed );
+		VectorScale( &windDir, ent->speed, &windDir );
+
+		Com_sprintf( tmp, sizeof(tmp), "*constantwind ( %f %f %f )", windDir.x, windDir.y, windDir.z );
+		G_EffectIndex( tmp );
+	}
+
+	// gusting wind
+	if ( ent->spawnflags & 4 ) {
+		G_EffectIndex( "*gustingwind" );
+	}
+
+	/*
+	// swirling wind
+	if ( ent->spawnflags & 8 ) {
+		G_EffectIndex( "*swirlingwind" );
+	}
+	*/
+
+	// misty fog
+	if ( ent->spawnflags & 32 ) {
+		G_EffectIndex( "*fog" );
+	}
+
+	// misty fog
+	if ( ent->spawnflags & 64 ) {
+		G_EffectIndex( "*light_fog" );
+	}
+}
+
 /*QUAKED fx_spacedust (1 0 0) (-16 -16 -16) (16 16 16)
 This world effect will spawn space dust globally into the level.
 
@@ -2122,17 +2175,47 @@ This world effect will spawn snow globally into the level.
 void SP_CreateSnow( gentity_t *ent ) {
 	G_EffectIndex( "*snow" );
 	G_EffectIndex( "*fog" );
-	G_EffectIndex( "*constantwind (100 100 -100)" );
+	G_EffectIndex( "*constantwind ( 100 100 -100 )" );
 }
 
-/*QUAKED fx_rain (1 0 0) (-16 -16 -16) (16 16 16)
+/*QUAKED fx_rain (1 0 0) (-16 -16 -16) (16 16 16) LIGHT MEDIUM HEAVY ACID x MISTY_FOG
 This world effect will spawn rain globally into the level.
 
-"count" the number of rain particles (default of 500)
+LIGHT   create light drizzle
+MEDIUM  create average medium rain
+HEAVY   create heavy downpour (with fog)
+ACID    create acid rain
+
+MISTY_FOG      causes clouds of misty fog to float through the level
 */
 //----------------------------------------------------------
 void SP_CreateRain( gentity_t *ent ) {
-	G_EffectIndex( va( "*rain init %i", ent->count ) );
+	if ( ent->spawnflags == 0 ) {
+		G_EffectIndex( "*rain" );
+		return;
+	}
+
+	// different types of rain
+	if ( ent->spawnflags & 1 ) {
+		G_EffectIndex( "*lightrain" );
+	}
+	else if ( ent->spawnflags & 2 ) {
+		G_EffectIndex( "*rain" );
+	}
+	else if ( ent->spawnflags & 4 ) {
+		// heavy rain gets heavy fog
+		G_EffectIndex( "*heavyrain" );
+		G_EffectIndex( "*heavyrainfog" );
+	}
+	else if ( ent->spawnflags & 8 ) {
+		G_EffectIndex( "world/acid_fizz" );
+		G_EffectIndex( "*acidrain" );
+	}
+
+	// misty fog
+	if ( ent->spawnflags & 32 ) {
+		G_EffectIndex( "*fog" );
+	}
 }
 
 qboolean gEscaping = qfalse;
