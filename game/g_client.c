@@ -1788,32 +1788,49 @@ void SV_ToggleUserinfoValidation_f( void ) {
 	if ( trap->Argc() == 1 ) {
 		unsigned int i = 0;
 		for ( i = 0; i < numUserinfoFields; i++ ) {
-			if ( (japp_userinfoValidate.integer & (1 << i)) )	trap->Print( "%2d [X] %s\n", i, userinfoFields[i].fieldClean );
-			else											trap->Print( "%2d [ ] %s\n", i, userinfoFields[i].fieldClean );
+			if ( (japp_userinfoValidate.integer & (1 << i)) ) {
+				trap->Print( "%2d [X] %s\n", i, userinfoFields[i].fieldClean );
+			}
+			else {
+				trap->Print( "%2d [ ] %s\n", i, userinfoFields[i].fieldClean );
+			}
 		}
 		for ( ; i < numUserinfoFields + USERINFO_VALIDATION_MAX; i++ ) {
-			if ( (japp_userinfoValidate.integer & (1 << i)) )	trap->Print( "%2d [X] %s\n", i, userinfoValidateExtra[i - numUserinfoFields] );
-			else											trap->Print( "%2d [ ] %s\n", i, userinfoValidateExtra[i - numUserinfoFields] );
+			if ( (japp_userinfoValidate.integer & (1 << i)) ) {
+				trap->Print( "%2d [X] %s\n", i, userinfoValidateExtra[i - numUserinfoFields] );
+			}
+			else {
+				trap->Print( "%2d [ ] %s\n", i, userinfoValidateExtra[i - numUserinfoFields] );
+			}
 		}
+
 		return;
 	}
 	else {
 		char arg[8] = { 0 };
 		uint32_t index;
+		const uint32_t mask = (1 << (numUserinfoFields + USERINFO_VALIDATION_MAX)) - 1;
 
 		trap->Argv( 1, arg, sizeof(arg) );
 		index = atoi( arg );
 
 		if ( index > numUserinfoFields + USERINFO_VALIDATION_MAX - 1 ) {
-			Com_Printf( "ToggleUserinfoValidation: Invalid range: %i [0, %i]\n", index, numUserinfoFields + USERINFO_VALIDATION_MAX - 1 );
+			Com_Printf( "ToggleUserinfoValidation: Invalid range: %i [0, %i]\n", index,
+				numUserinfoFields + USERINFO_VALIDATION_MAX - 1 );
 			return;
 		}
 
-		trap->Cvar_Set( "japp_userinfoValidate", va( "%i", (1 << index) ^ japp_userinfoValidate.integer ) );
+		trap->Cvar_Set( "japp_userinfoValidate", va( "%i", (1 << index) ^ (japp_userinfoValidate.integer & mask) ) );
 		trap->Cvar_Update( &japp_userinfoValidate );
 
-		if ( index < numUserinfoFields )	Com_Printf( "%s %s\n", userinfoFields[index].fieldClean, ((japp_userinfoValidate.integer & (1 << index)) ? "Validated" : "Ignored") );
-		else								Com_Printf( "%s %s\n", userinfoValidateExtra[index - numUserinfoFields], ((japp_userinfoValidate.integer & (1 << index)) ? "Validated" : "Ignored") );
+		if ( index < numUserinfoFields ) {
+			Com_Printf( "%s %s\n", userinfoFields[index].fieldClean,
+				((japp_userinfoValidate.integer & (1 << index)) ? "Validated" : "Ignored") );
+		}
+		else {
+			Com_Printf( "%s %s\n", userinfoValidateExtra[index - numUserinfoFields],
+				((japp_userinfoValidate.integer & (1 << index)) ? "Validated" : "Ignored") );
+		}
 	}
 }
 
