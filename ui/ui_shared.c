@@ -2942,6 +2942,7 @@ qboolean Item_ListBox_HandleKey( itemDef_t *item, int key, qboolean down, qboole
 		}
 		// Vertical scroll
 		else {
+			const int count = trap->Key_IsDown( A_CTRL ) ? 5 : 1;
 
 			// Multiple rows and columns (since it's more than twice as wide as an element)
 			if ( (item->window.rect.w > (listPtr->elementWidth * 2)) && (listPtr->elementStyle == LISTBOX_IMAGE) ) {
@@ -3002,7 +3003,7 @@ qboolean Item_ListBox_HandleKey( itemDef_t *item, int key, qboolean down, qboole
 
 			//Raz: Added
 			if ( key == A_MWHEELUP ) {
-				listPtr->startPos -= (item->special.i == FEEDER_Q3HEADS) ? viewmax : 1;
+				listPtr->startPos -= (item->special.i == FEEDER_Q3HEADS) ? viewmax : count;
 				if ( listPtr->startPos < 0 ) {
 					listPtr->startPos = 0;
 					Display_MouseMove( NULL, DC->cursorx, DC->cursory );
@@ -3012,7 +3013,7 @@ qboolean Item_ListBox_HandleKey( itemDef_t *item, int key, qboolean down, qboole
 				return qtrue;
 			}
 			if ( key == A_MWHEELDOWN ) {
-				listPtr->startPos += (item->special.i == FEEDER_Q3HEADS) ? viewmax : 1;
+				listPtr->startPos += (item->special.i == FEEDER_Q3HEADS) ? viewmax : count;
 				if ( listPtr->startPos > max ) {
 					listPtr->startPos = max;
 					Display_MouseMove( NULL, DC->cursorx, DC->cursory );
