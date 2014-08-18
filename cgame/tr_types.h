@@ -37,6 +37,7 @@
 #define RDF_DRAWSKYBOX		(0x0010u) // the above marks a scene as being a 'portal sky'.  this flag says to draw it or not
 #define RDF_AUTOMAP			(0x0020u) // means this scene is to draw the automap -rww
 #define	RDF_NOFOG			(0x0040u) // no global fog in this scene (but still brush fog) -rww
+#define	RDF_FORCESIGHTON	(0x0080u) // using force sight
 
 extern int	skyboxportal;
 extern int	drawskyboxportal;

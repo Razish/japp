@@ -7396,6 +7396,11 @@ void CG_DrawActive( void ) {
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( &refdef->vieworg, &baseOrg );
+
+	if ( cg.snap->ps.fd.forcePowersActive & (1 << FP_SEE) ) {
+		refdef->rdflags |= RDF_FORCESIGHTON;
+	}
+
 	refdef->rdflags |= RDF_DRAWSKYBOX;
 
 	// draw 3D view
