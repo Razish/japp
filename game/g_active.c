@@ -2989,13 +2989,15 @@ void ClientThink_real( gentity_t *ent ) {
 		const qboolean infinite = ent->client->ps.forceHandExtendTime == Q3_INFINITE;
 		const qboolean frozen = ent->client->ps.forceHandExtend == HANDEXTEND_DODGE;
 
-		if ( animDone || frozen || wantsOut ) {
-			if ( ent->client->emote.nextAnim && ((infinite && wantsOut) || animDone) ) {
+		if ( animDone || (wantsOut && infinite) ) {
+			if ( ent->client->emote.nextAnim ) {
+				// chain to next animation
 				ent->client->ps.forceHandExtendTime = level.time + BG_AnimLength( ent->localAnimIndex, ent->client->emote.nextAnim );
 				ent->client->ps.forceDodgeAnim = ent->client->emote.nextAnim;
 				ent->client->emote.nextAnim = 0;
 			}
-			else if ( !ent->client->emote.nextAnim && (animDone || (wantsOut && infinite)) ) {
+			else {
+				// leave emote
 				ent->client->ps.forceHandExtend = HANDEXTEND_NONE;
 				ent->client->ps.forceHandExtendTime = level.time;
 				ent->client->ps.forceRestricted = qfalse;
