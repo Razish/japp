@@ -3100,6 +3100,7 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 static const emote_t emotes[] = {
 	{ "aimgun", BOTH_STAND5TOAIM, 0, EMF_HOLD | EMF_HOLSTER },
 	{ "atease", BOTH_STAND4, 0, EMF_STATIC | EMF_HOLSTER },
+	{ "breakdance", BOTH_FORCE_GETUP_B6, 0, EMF_NONE },
 	{ "cower", BOTH_COWER1_START, BOTH_COWER1, EMF_HOLSTER },
 	{ "dance1", BOTH_TURNSTAND1, 0, EMF_STATIC },
 	{ "dance2", BOTH_TURNSTAND4, 0, EMF_STATIC | EMF_HOLSTER },
@@ -3108,6 +3109,9 @@ static const emote_t emotes[] = {
 	{ "harlem", BOTH_FORCE_DRAIN_GRABBED, 0, EMF_STATIC },
 	{ "heal", BOTH_FORCEHEAL_START, BOTH_FORCEHEAL_STOP, EMF_STATIC | EMF_HOLSTER },
 	{ "hello", BOTH_SILENCEGESTURE1, 0, EMF_NONE },
+	{ "hips", BOTH_STAND5TOSTAND8, BOTH_STAND8TOSTAND5, EMF_STATIC | EMF_HOLSTER },
+	{ "kneel", BOTH_CROUCH3, BOTH_UNCROUCH3, EMF_STATIC | EMF_HOLSTER },
+	{ "neo", BOTH_FORCE_GETUP_B4, 0, EMF_NONE },
 	{ "nod", BOTH_HEADNOD, 0, EMF_NONE },
 	{ "radio", BOTH_TALKCOMM1START, BOTH_TALKCOMM1STOP, EMF_HOLD | EMF_HOLSTER },
 	{ "shake", BOTH_HEADSHAKE, 0, EMF_NONE },
@@ -3116,6 +3120,8 @@ static const emote_t emotes[] = {
 	{ "smack2", BOTH_TOSS1, 0, EMF_NONE },
 	{ "stepback", BOTH_FORCE_2HANDEDLIGHTNING, 0, EMF_NONE },
 	{ "suggest", BOTH_STAND1_TALK3, 0, EMF_NONE },
+	{ "surrender", TORSO_SURRENDER_START, TORSO_SURRENDER_STOP, EMF_HOLD | EMF_HOLSTER },
+	{ "wait", BOTH_STAND10, BOTH_STAND10TOSTAND1, EMF_STATIC | EMF_HOLSTER },
 };
 static const size_t numEmotes = ARRAY_LEN( emotes );
 
@@ -3124,6 +3130,7 @@ static void SetEmote( gentity_t *ent, const char *emoteName );
 #define EMOTE( x ) static void Cmd_Emote_##x( gentity_t *ent ) { SetEmote( ent, XSTRING(x) ); }
 EMOTE( aimgun )
 EMOTE( atease )
+EMOTE( breakdance )
 EMOTE( cower )
 EMOTE( dance1 )
 EMOTE( dance2 )
@@ -3132,6 +3139,9 @@ EMOTE( fabulous )
 EMOTE( harlem )
 EMOTE( heal )
 EMOTE( hello )
+EMOTE( hips )
+EMOTE( kneel )
+EMOTE( neo )
 EMOTE( nod )
 EMOTE( radio )
 EMOTE( shake )
@@ -3140,6 +3150,8 @@ EMOTE( smack1 )
 EMOTE( smack2 )
 EMOTE( stepback )
 EMOTE( suggest )
+EMOTE( surrender )
+EMOTE( wait )
 
 static int emotecmp( const void *a, const void *b ) {
 	return strcmp( (const char *)a, ((emote_t *)b)->name );
@@ -3246,6 +3258,7 @@ static int cmdcmp( const void *a, const void *b ) {
 static const command_t commands[] = {
 	{ "amaimgun", Cmd_Emote_aimgun, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amatease", Cmd_Emote_atease, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "ambreakdance", Cmd_Emote_breakdance, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amcower", Cmd_Emote_cower, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdance1", Cmd_Emote_dance1, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdance2", Cmd_Emote_dance2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
@@ -3254,7 +3267,10 @@ static const command_t commands[] = {
 	{ "amharlem", Cmd_Emote_harlem, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amheal", Cmd_Emote_heal, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amhello", Cmd_Emote_hello, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amhips", Cmd_Emote_hips, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "aminfo", Cmd_AMInfo_f, GTB_ALL, 0 },
+	{ "amkneel", Cmd_Emote_kneel, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amneo", Cmd_Emote_neo, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amnod", Cmd_Emote_nod, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amradio", Cmd_Emote_radio, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsay", Cmd_SayAdmin_f, GTB_ALL, 0 },
@@ -3264,6 +3280,8 @@ static const command_t commands[] = {
 	{ "amsmack2", Cmd_Emote_smack2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amstepback", Cmd_Emote_stepback, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsuggest", Cmd_Emote_suggest, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amsurrender", Cmd_Emote_surrender, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amwait", Cmd_Emote_wait, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "callvote", Cmd_CallVote_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "debugBMove_Back", Cmd_BotMoveBack_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
 	{ "debugBMove_Forward", Cmd_BotMoveForward_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
