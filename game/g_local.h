@@ -421,8 +421,9 @@ typedef struct renderInfo_s {
 } renderInfo_t;
 
 #define EMF_NONE	(0x00u)
-#define EMF_FREEZE	(0x01u)
-#define EMF_HOLSTER	(0x08u)
+#define EMF_STATIC	(0x01u) // hold animation on torso + legs, don't allow movement
+#define EMF_HOLD	(0x02u) // hold animation on torso
+#define EMF_HOLSTER	(0x08u) // forcibly deactivate saber
 
 typedef struct emote_s {
 	animNumber_t animLoop, animLeave;

@@ -3096,29 +3096,6 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 	}
 }
 
-typedef enum emotes_e {
-	EMOTE_ATEASE,
-	EMOTE_HARLEM,
-	EMOTE_HEAL,
-	EMOTE_HELLO,
-	EMOTE_NOD,
-	EMOTE_SHAKE,
-	EMOTE_SMACK,
-	EMOTE_STEPBACK,
-	NUM_EMOTES,
-} emotes_t;
-
-static const emote_t emotes[NUM_EMOTES] = {
-	{ BOTH_STAND4, 0, EMF_FREEZE | EMF_HOLSTER }, // EMOTE_ATEASE
-	{ BOTH_FORCE_DRAIN_GRABBED, 0, EMF_FREEZE }, // EMOTE_HARLEM
-	{ BOTH_FORCEHEAL_START, BOTH_FORCEHEAL_STOP, EMF_FREEZE | EMF_HOLSTER }, // EMOTE_HEAL
-	{ BOTH_SILENCEGESTURE1, 0, EMF_NONE }, // EMOTE_HELLO
-	{ BOTH_HEADNOD, 0, EMF_NONE }, // EMOTE_NOD
-	{ BOTH_HEADSHAKE, 0, EMF_NONE }, // EMOTE_SHAKE
-	{ BOTH_FORCEGRIP3THROW, 0, EMF_NONE }, // EMOTE_SMACK
-	{ BOTH_FORCE_2HANDEDLIGHTNING, 0, EMF_NONE }, // EMOTE_STEPBACK
-};
-
 static void SetEmote( gentity_t *ent, const emote_t *emote ) {
 	forceHandAnims_t handExtend = HANDEXTEND_TAUNT;
 	int emoteTime;
@@ -3131,18 +3108,24 @@ static void SetEmote( gentity_t *ent, const emote_t *emote ) {
 	// busy
 	if ( ent->client->ps.weaponTime > 0 || ent->client->ps.saberMove > LS_READY || ent->client->ps.fd.forcePowersActive
 		|| ent->client->ps.groundEntityNum == ENTITYNUM_NONE || ent->client->ps.duelInProgress
-		|| BG_InKnockDown( ent->client->ps.legsAnim ) || BG_InRoll( &ent->client->ps, ent->client->ps.legsAnim ) ) {
+		|| BG_InKnockDown( ent->client->ps.legsAnim ) || BG_InRoll( &ent->client->ps, ent->client->ps.legsAnim )
+		|| ent->client->ps.forceHandExtend != HANDEXTEND_NONE )
+	{
 		return;
 	}
 
-	// emotes that require you to be standing still - clear velocity, use HANDEXTEND_DODGE
-	if ( emote->flags & EMF_FREEZE ) {
+	if ( emote->flags & EMF_STATIC ) {
+		// emotes that require you to be standing still
 		VectorClear( &ent->client->ps.velocity );
 		handExtend = HANDEXTEND_DODGE;
 		emoteTime = Q3_INFINITE;
-		ent->client->emote.freeze = qtrue;
+	}
+	else if ( emote->flags & EMF_HOLD ) {
+		// hold animation on torso
+		emoteTime = Q3_INFINITE;
 	}
 	else {
+		// once off actions
 		emoteTime = level.time + BG_AnimLength( ent->localAnimIndex, emote->animLoop );
 	}
 
@@ -3166,16 +3149,70 @@ static void SetEmote( gentity_t *ent, const emote_t *emote ) {
 	if ( emote->animLeave ) {
 		ent->client->emote.nextAnim = emote->animLeave;
 	}
+	ent->client->emote.freeze = qtrue;
 }
 
+typedef enum emotes_e {
+	EMOTE_AIMGUN,
+	EMOTE_ATEASE,
+	EMOTE_COWER,
+	EMOTE_DANCE1,
+	EMOTE_DANCE2,
+	EMOTE_DANCE3,
+	EMOTE_FABULOUS,
+	EMOTE_HARLEM,
+	EMOTE_HEAL,
+	EMOTE_HELLO,
+	EMOTE_NOD,
+	EMOTE_RADIO,
+	EMOTE_SHAKE,
+	EMOTE_SHOVEL,
+	EMOTE_SMACK1,
+	EMOTE_SMACK2,
+	EMOTE_STEPBACK,
+	EMOTE_SUGGEST,
+	NUM_EMOTES,
+} emotes_t;
+
+static const emote_t emotes[NUM_EMOTES] = {
+	{ BOTH_STAND5TOAIM, 0, EMF_HOLD | EMF_HOLSTER }, // EMOTE_AIMGUN
+	{ BOTH_STAND4, 0, EMF_STATIC | EMF_HOLSTER }, // EMOTE_ATEASE
+	{ BOTH_COWER1_START, BOTH_COWER1, EMF_HOLSTER }, // EMOTE_COWER
+	{ BOTH_TURNSTAND1, 0, EMF_STATIC }, // EMOTE_DANCE1
+	{ BOTH_TURNSTAND4, 0, EMF_STATIC | EMF_HOLSTER }, // EMOTE_DANCE2
+	{ BOTH_TURNSTAND5, 0, EMF_STATIC }, // EMOTE_DANCE3
+	{ BOTH_K7_S7_TR, 0, EMF_HOLD }, // EMOTE_FABULOUS
+	{ BOTH_FORCE_DRAIN_GRABBED, 0, EMF_STATIC }, // EMOTE_HARLEM
+	{ BOTH_FORCEHEAL_START, BOTH_FORCEHEAL_STOP, EMF_STATIC | EMF_HOLSTER }, // EMOTE_HEAL
+	{ BOTH_SILENCEGESTURE1, 0, EMF_NONE }, // EMOTE_HELLO
+	{ BOTH_HEADNOD, 0, EMF_NONE }, // EMOTE_NOD
+	{ BOTH_TALKCOMM1START, BOTH_TALKCOMM1STOP, EMF_HOLD | EMF_HOLSTER }, // EMOTE_RADIO
+	{ BOTH_HEADSHAKE, 0, EMF_NONE }, // EMOTE_SHAKE
+	{ BOTH_TUSKENATTACK2, 0, EMF_NONE }, // EMOTE_SHOVEL
+	{ BOTH_FORCEGRIP3THROW, 0, EMF_NONE }, // EMOTE_SMACK1
+	{ BOTH_TOSS1, 0, EMF_NONE }, // EMOTE_SMACK2
+	{ BOTH_FORCE_2HANDEDLIGHTNING, 0, EMF_NONE }, // EMOTE_STEPBACK
+	{ BOTH_STAND1_TALK3, 0, EMF_NONE }, // EMOTE_SUGGEST
+};
+
+static void Cmd_EmoteAimGun_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_AIMGUN] ); }
 static void Cmd_EmoteAtEase_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_ATEASE] ); }
+static void Cmd_EmoteCower_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_COWER] ); }
+static void Cmd_EmoteDance1_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_DANCE1] ); }
+static void Cmd_EmoteDance2_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_DANCE2] ); }
+static void Cmd_EmoteDance3_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_DANCE3] ); }
+static void Cmd_EmoteFabulous_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_FABULOUS] ); }
 static void Cmd_EmoteHarlem_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_HARLEM] ); }
 static void Cmd_EmoteHeal_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_HEAL] ); }
 static void Cmd_EmoteHello_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_HELLO] ); }
 static void Cmd_EmoteNod_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_NOD] ); }
+static void Cmd_EmoteRadio_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_RADIO] ); }
 static void Cmd_EmoteShake_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_SHAKE] ); }
-static void Cmd_EmoteSmack_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_SMACK] ); }
+static void Cmd_EmoteShovel_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_SHOVEL] ); }
+static void Cmd_EmoteSmack1_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_SMACK1] ); }
+static void Cmd_EmoteSmack2_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_SMACK2] ); }
 static void Cmd_EmoteStepBack_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_STEPBACK] ); }
+static void Cmd_EmoteSuggest_f( gentity_t *ent ) { SetEmote( ent, &emotes[EMOTE_SUGGEST] ); }
 
 static void Cmd_Jetpack_f( gentity_t *ent ) {
 	const gitem_t *item = BG_FindItemForHoldable( HI_JETPACK );
@@ -3212,16 +3249,26 @@ static int cmdcmp( const void *a, const void *b ) {
 }
 
 static const command_t commands[] = {
+	{ "amaimgun", Cmd_EmoteAimGun_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amatease", Cmd_EmoteAtEase_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amcower", Cmd_EmoteCower_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amdance1", Cmd_EmoteDance1_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amdance2", Cmd_EmoteDance2_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amdance3", Cmd_EmoteDance3_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amfabulous", Cmd_EmoteFabulous_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amharlem", Cmd_EmoteHarlem_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amheal", Cmd_EmoteHeal_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amhello", Cmd_EmoteHello_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "aminfo", Cmd_AMInfo_f, GTB_ALL, 0 },
 	{ "amnod", Cmd_EmoteNod_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amradio", Cmd_EmoteRadio_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsay", Cmd_SayAdmin_f, GTB_ALL, 0 },
 	{ "amshake", Cmd_EmoteShake_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
-	{ "amsmack", Cmd_EmoteSmack_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amshovel", Cmd_EmoteShovel_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amsmack1", Cmd_EmoteSmack1_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amsmack2", Cmd_EmoteSmack2_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amstepback", Cmd_EmoteStepBack_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amsuggest", Cmd_EmoteSuggest_f, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "callvote", Cmd_CallVote_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "debugBMove_Back", Cmd_BotMoveBack_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
 	{ "debugBMove_Forward", Cmd_BotMoveForward_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },

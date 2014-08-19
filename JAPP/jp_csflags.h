@@ -53,3 +53,4 @@
 #define CPD_NOBUTTERFLY			(0x00010000u) // don't allow butterflies
 #define CPD_NOSTAB				(0x00020000u) // don't allow backstab/rollstab
 #define CPD_NODFA				(0x00040000u) // don't allow DFAs
+#define CPD_OLDGRAPPLE			(0X00080000u) // automatically release grapple

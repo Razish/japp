@@ -3,7 +3,7 @@
 
 #include "g_local.h"
 #include "bg_saga.h"
-
+#include "bg_local.h"
 extern void Jedi_Cloak( gentity_t *self );
 extern void Jedi_Decloak( gentity_t *self );
 
@@ -2922,36 +2922,34 @@ void ClientThink_real( gentity_t *ent ) {
 
 	SendPendingPredictableEvents( &ent->client->ps );
 
-	//	if ( !( ent->client->ps.eFlags & EF_FIRING ) ) {
-	//		client->fireHeld = qfalse;		// for grapple
-	//	}
-
 	if ( ent->s.eType != ET_NPC && ent->client && ent->client->pers.connected == CON_CONNECTED
 		&& !ent->client->ps.duelInProgress && !!(japp_allowHook.integer & (1 << level.gametype)) )
 	{
-		if ( !ent->client->hook && (pm.cmd.buttons & BUTTON_GRAPPLE) && ent->client->ps.pm_type != PM_DEAD
+		const qboolean oldGrapple = GetCPD( (bgEntity_t *)ent, CPD_OLDGRAPPLE ) || !Client_Supports( ent, CSF_GRAPPLE_SWING );
+		const qboolean pullGrapple = ent->client->pers.cmd.buttons & BUTTON_GRAPPLE;
+		const qboolean releaseGrapple = ent->client->pers.cmd.buttons & BUTTON_USE;
+		if ( !ent->client->hook && pullGrapple && ent->client->ps.pm_type != PM_DEAD
 			&& !BG_SaberInAttack( ent->client->ps.saberMove ) )
 		{
 			Weapon_GrapplingHook_Fire( ent );
 		}
 
-		if ( ent->client->hook
-			&& (((pm.cmd.buttons & BUTTON_USE) && ent->client->hookHasBeenFired && !ent->client->fireHeld)
-			|| (!Client_Supports( ent, CSF_GRAPPLE_SWING ) && !(pm.cmd.buttons & BUTTON_GRAPPLE) && ent->client->hook)
-			|| (!(pm.cmd.buttons & BUTTON_GRAPPLE) && ent->client->fireHeld && ent->client->hookHasBeenFired)) ) {
-			Weapon_HookFree( client->hook );
-		}
-
-		else if ( ent->client->hook &&
-			ent->client->hookHasBeenFired &&
-			!ent->client->fireHeld ) {
-			if ( !(pm.cmd.buttons & BUTTON_GRAPPLE) ) {
-				ent->client->ps.eFlags |= EF_GRAPPLE_SWING;
-				ent->client->ps.pm_flags &= ~PMF_GRAPPLE_PULL;
+		if ( ent->client->hook ) {
+			if ( (releaseGrapple && ent->client->hookHasBeenFired && !ent->client->fireHeld)
+				|| (oldGrapple && !pullGrapple && ent->client->hook)
+				|| (!pullGrapple && ent->client->fireHeld && ent->client->hookHasBeenFired) )
+			{
+				Weapon_HookFree( client->hook );
 			}
-			else {
-				ent->client->ps.pm_flags |= PMF_GRAPPLE_PULL;
-				ent->client->ps.eFlags &= ~EF_GRAPPLE_SWING;
+			else if ( ent->client->hookHasBeenFired && !ent->client->fireHeld ) {
+				if ( pullGrapple ) {
+					ent->client->ps.pm_flags |= PMF_GRAPPLE_PULL;
+					ent->client->ps.eFlags &= ~EF_GRAPPLE_SWING;
+				}
+				else {
+					ent->client->ps.eFlags |= EF_GRAPPLE_SWING;
+					ent->client->ps.pm_flags &= ~PMF_GRAPPLE_PULL;
+				}
 			}
 		}
 	}
@@ -2985,18 +2983,24 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	// leave emotes
-	if ( ent->client->emote.freeze && (ent->client->pers.cmd.upmove != 0 || ent->client->pers.cmd.buttons & BUTTON_USE) ) {
-		ent->client->emote.freeze = qfalse;
-		if ( !ent->client->emote.nextAnim ) {
-			ent->client->ps.forceHandExtend = HANDEXTEND_NONE;
-			ent->client->ps.forceHandExtendTime = level.time;
-			ent->client->ps.forceRestricted = qfalse;
-		}
-		else {
-			ent->client->ps.forceHandExtend = HANDEXTEND_DODGE;
-			ent->client->ps.forceHandExtendTime = level.time + BG_AnimLength( ent->localAnimIndex, ent->client->emote.nextAnim );
-			ent->client->ps.forceDodgeAnim = ent->client->emote.nextAnim;
-			ent->client->emote.nextAnim = 0;
+	if ( ent->client->emote.freeze ) {
+		const qboolean wantsOut = ent->client->pers.cmd.upmove != 0 || (ent->client->pers.cmd.buttons & BUTTON_USE);
+		const qboolean animDone = ent->client->ps.forceHandExtendTime <= level.time && ent->client->ps.forceHandExtendTime != Q3_INFINITE;
+		const qboolean infinite = ent->client->ps.forceHandExtendTime == Q3_INFINITE;
+		const qboolean frozen = ent->client->ps.forceHandExtend == HANDEXTEND_DODGE;
+
+		if ( animDone || frozen || wantsOut ) {
+			if ( ent->client->emote.nextAnim && ((infinite && wantsOut) || animDone) ) {
+				ent->client->ps.forceHandExtendTime = level.time + BG_AnimLength( ent->localAnimIndex, ent->client->emote.nextAnim );
+				ent->client->ps.forceDodgeAnim = ent->client->emote.nextAnim;
+				ent->client->emote.nextAnim = 0;
+			}
+			else if ( !ent->client->emote.nextAnim && (animDone || (wantsOut && infinite)) ) {
+				ent->client->ps.forceHandExtend = HANDEXTEND_NONE;
+				ent->client->ps.forceHandExtendTime = level.time;
+				ent->client->ps.forceRestricted = qfalse;
+				ent->client->emote.freeze = qfalse;
+			}
 		}
 	}
 

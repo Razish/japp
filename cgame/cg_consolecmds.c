@@ -197,7 +197,8 @@ static const char *pluginDisableStrings[] = {
 	"japp_NoKata",
 	"japp_NoButterfly",
 	"japp_NoStab",
-	"japp_NoDFA"
+	"japp_NoDFA",
+	"japp_OldGrapple",
 };
 static const size_t numPluginDisableOpts = ARRAY_LEN( pluginDisableStrings );
 
