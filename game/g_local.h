@@ -426,6 +426,7 @@ typedef struct renderInfo_s {
 #define EMF_HOLSTER	(0x08u) // forcibly deactivate saber
 
 typedef struct emote_s {
+	const char *name;
 	animNumber_t animLoop, animLeave;
 	uint32_t flags;
 } emote_t;
