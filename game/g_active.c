@@ -643,6 +643,7 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 
 		// perform a pmove
 		Pmove( &pm );
+
 		// save results of pmove
 		VectorCopy( &client->ps.origin, &ent->s.origin );
 

@@ -7071,15 +7071,24 @@ static gentity_t *G_KickTrace( gentity_t *ent, vector3 *kickDir, float kickDist,
 
 	//G_TestLine(traceOrg, traceEnd, 0x0000ff, 5000);
 	if ( trace.fraction < 1.0f && !trace.startsolid && !trace.allsolid ) {
+		hitEnt = &g_entities[trace.entityNum];
+
 		if ( ent->client->jediKickTime > level.time ) {
 			if ( trace.entityNum == ent->client->jediKickIndex ) { //we are hitting the same ent we last hit in this same anim, don't hit it again
 				return NULL;
 			}
 		}
+
+		// duel isolation
+		if ( (ent->client->ps.duelInProgress && trace.entityNum != ent->client->ps.duelIndex)
+			|| (!ent->client->ps.duelInProgress && hitEnt->client->ps.duelInProgress) )
+		{
+			return NULL;
+		}
+
 		ent->client->jediKickIndex = trace.entityNum;
 		ent->client->jediKickTime = level.time + ent->client->ps.legsTimer;
 
-		hitEnt = &g_entities[trace.entityNum];
 		//FIXME: regardless of what we hit, do kick hit sound and impact effect
 		//G_PlayEffect( "misc/kickHit", trace.endpos, trace.plane.normal );
 		if ( ent->client->ps.torsoAnim == BOTH_A7_HILT ) {
