@@ -4495,20 +4495,22 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 
 }
 
-
-/*
-============
-CanDamage
-
-Returns qtrue if the inflictor can directly damage the target.  Used for
-explosions and melee attacks.
-============
-*/
-qboolean CanDamage( gentity_t *targ, vector3 *origin ) {
+// returns qtrue if the inflictor can directly damage the target. Used for explosions and melee attacks.
+static qboolean CanDamage( gentity_t *targ, gentity_t *attacker, vector3 *origin ) {
 	vector3	dest;
 	trace_t	tr;
 	vector3	midpoint;
 
+	if ( targ && attacker ) {
+		if ( japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK) ) {
+			return qfalse;
+		}
+		if ( (attacker->client->ps.duelInProgress && attacker->client->ps.duelIndex != targ-g_entities)
+			|| (targ->client->ps.duelInProgress && targ->client->ps.duelIndex != attacker-g_entities) )
+		{
+			return qfalse;
+		}
+	}
 	// use the midpoint of the bounds instead of the origin, because
 	// bmodels may have their origin is 0,0,0
 	VectorAdd( &targ->r.absmin, &targ->r.absmax, &midpoint );
@@ -4626,7 +4628,7 @@ qboolean G_RadiusDamage( vector3 *origin, gentity_t *attacker, float damage, flo
 
 		points = damage * (1.0f - dist / radius);
 
-		if ( CanDamage( ent, origin ) ) {
+		if ( CanDamage( ent, attacker, origin ) ) {
 			if ( LogAccuracyHit( ent, attacker ) ) {
 				hitClient = qtrue;
 			}

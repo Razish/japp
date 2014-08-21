@@ -747,7 +747,6 @@ void				BotInterbreedEndMatch( void );
 void				BroadcastTeamChange( gclient_t *client, int oldTeam );
 void				CalcMuzzlePoint( const gentity_t *ent, vector3 *forward, vector3 *right, vector3 *up, vector3 *muzzlePoint );
 void				CalculateRanks( void );
-qboolean			CanDamage( gentity_t *targ, vector3 *origin );
 void				ClearRegisteredItems( void );
 void				ClientSpawn( gentity_t *ent );
 void				ClientCleanName( const char *in, char *out, int outSize );
