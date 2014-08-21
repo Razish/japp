@@ -6443,6 +6443,11 @@ static gentity_t *G_KickTrace( gentity_t *ent, vector3 *kickDir, float kickDist,
 			return NULL;
 		}
 
+		// chat protection
+		if ( japp_chatProtection.integer && (hitEnt->client->ps.eFlags & EF_TALK) ) {
+			return NULL;
+		}
+
 		ent->client->jediKickIndex = trace.entityNum;
 		ent->client->jediKickTime = level.time + ent->client->ps.legsTimer;
 
