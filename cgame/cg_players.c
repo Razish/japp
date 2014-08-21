@@ -1312,8 +1312,13 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 			CG_LoadClientInfo( &newInfo );
 	}
 
-	if ( clientNum == cg.clientNum )
-		trap->Cvar_Set( "sex", newInfo.gender == GENDER_FEMALE ? "female" : "male" );
+	if ( clientNum == cg.clientNum ) {
+		static int setTime = 0;
+		if ( setTime != cg.time ) {
+			setTime = cg.time;
+			trap->Cvar_Set( "sex", newInfo.gender == GENDER_FEMALE ? "female" : "male" );
+		}
+	}
 
 	// replace whatever was there with the new one
 	newInfo.infoValid = qtrue;
@@ -1429,8 +1434,13 @@ void CG_ActualLoadDeferredPlayers( void ) {
 		if ( ci->infoValid && ci->deferred ) {
 			CG_LoadClientInfo( ci );
 		}
-		if ( i == cg.clientNum )
-			trap->Cvar_Set( "sex", ci->gender == GENDER_FEMALE ? "female" : "male" );
+		if ( i == cg.clientNum ) {
+			static int setTime = 0;
+			if ( setTime != cg.time ) {
+				setTime = cg.time;
+				trap->Cvar_Set( "sex", ci->gender == GENDER_FEMALE ? "female" : "male" );
+			}
+		}
 	}
 }
 
