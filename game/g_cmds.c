@@ -1590,7 +1590,7 @@ static const int validVoteStringsSize = ARRAY_LEN( validVoteStrings );
 
 void SV_ToggleAllowVote_f( void ) {
 	if ( trap->Argc() == 1 ) {
-		unsigned int i = 0;
+		int i = 0;
 		for ( i = 0; i < validVoteStringsSize; i++ ) {
 			if ( (g_allowVote.integer & (1 << i)) ) {
 				trap->Print( "%2d [X] %s\n", i, validVoteStrings[i].string );
