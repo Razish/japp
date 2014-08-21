@@ -2904,18 +2904,37 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 		Q_strncpyz( buf, "Saber settings:\n", sizeof(buf) );
 
 		// SP/MP
-		if ( d_saberSPStyleDamage.integer )		Q_strcat( buf, sizeof(buf), "    SP style (default)" );
-		else									Q_strcat( buf, sizeof(buf), "    MP style" );
+		if ( d_saberSPStyleDamage.integer ) {
+			Q_strcat( buf, sizeof(buf), "    SP style (default)\n" );
+		}
+		else {
+			Q_strcat( buf, sizeof(buf), "    MP style\n" );
+		}
 
-		// tweaks
-		if ( japp_saberSystem.integer == SABERSYSTEM_JAPP )	Q_strcat( buf, sizeof(buf), " with JA++ tweaks\n" );
-		else if ( japp_saberSystem.integer == SABERSYSTEM_JK2 )		Q_strcat( buf, sizeof(buf), " with JK2 tweaks\n" );
-		else														Q_strcat( buf, sizeof(buf), " with no tweaks (default)\n" );
+		// JA++ tweaks
+		if ( japp_saberTweaks.integer ) {
+			const uint32_t tweaks = japp_saberTweaks.integer;
+			Q_strcat( buf, sizeof(buf), " JA++ tweaks:\n" );
+
+			Q_strcat( buf, sizeof(buf), va( "    %sInterpolation\n",
+				(tweaks & SABERTWEAK_INTERPOLATE) ? S_COLOR_GREEN : S_COLOR_RED ) );
+			Q_strcat( buf, sizeof(buf), va( "    %sProlonged swing damage\n",
+				(tweaks & SABERTWEAK_PROLONGDAMAGE) ? S_COLOR_GREEN : S_COLOR_RED ) );
+			Q_strcat( buf, sizeof(buf), va( "    %sDeflection\n",
+				(tweaks & SABERTWEAK_DEFLECTION) ? S_COLOR_GREEN : S_COLOR_RED ) );
+			Q_strcat( buf, sizeof(buf), va( "    %sSpecial moves\n",
+				(tweaks & SABERTWEAK_SPECIALMOVES) ? S_COLOR_GREEN : S_COLOR_RED ) );
+
+			Q_strcat( buf, sizeof(buf), S_COLOR_WHITE "\n" );
+		}
 
 		// damage scale
 		Q_strcat( buf, sizeof(buf), va( "    %.03f damage scale\n", g_saberDamageScale.value ) );
-		Q_strcat( buf, sizeof(buf), va( "    Idle damage %s\n", (japp_saberIdleDamage.integer || japp_saberSystem.integer == SABERSYSTEM_JK2)
+
+		// idle damage
+		Q_strcat( buf, sizeof(buf), va( "    Idle damage %s\n", japp_saberIdleDamage.integer
 			? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
+
 		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", buf ) );
 		buf[0] = '\0';
 	}

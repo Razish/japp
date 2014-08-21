@@ -1623,7 +1623,7 @@ int PM_SaberDeflectionForQuad( int quad );
 
 extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
 static qboolean WP_GetSaberDeflectionAngle( gentity_t *attacker, gentity_t *defender, float saberHitFraction ) {
-	qboolean animBasedDeflection = qtrue;
+	qboolean animBasedDeflection = !(japp_saberTweaks.integer & SABERTWEAK_DEFLECTION);
 	int attSaberLevel, defSaberLevel;
 
 	if ( !attacker || !attacker->client || !attacker->ghoul2 ) {
@@ -3183,15 +3183,14 @@ static float saberHitFraction = 1.0f;
 //This is a large function. I feel sort of bad inlining it. But it does get called tons of times per frame.
 qboolean BG_SuperBreakWinAnim( int anim );
 
-// JA version
-static qboolean CheckSaberDamageOriginal( gentity_t *self, int rSaberNum, int rBladeNum, vector3 *saberStart, vector3 *saberEnd, qboolean doInterpolate, int trMask, qboolean extrapolate ) {
+static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum, vector3 *saberStart, vector3 *saberEnd,
+	qboolean doInterpolate, int trMask, qboolean extrapolate )
+{
 	static trace_t tr;
 	static vector3 dir;
 	static vector3 saberTrMins, saberTrMaxs;
-	static vector3 lastValidStart;
-	static vector3 lastValidEnd;
-	static int selfSaberLevel;
-	static int otherSaberLevel;
+	static vector3 lastValidStart, lastValidEnd;
+	static int selfSaberLevel, otherSaberLevel;
 	int dmg = 0;
 	int attackStr = 0;
 	float saberBoxSize = d_saberBoxTraceSize.value;
@@ -3246,7 +3245,8 @@ static qboolean CheckSaberDamageOriginal( gentity_t *self, int rSaberNum, int rB
 	}
 
 	while ( !saberTraceDone ) {
-		if ( doInterpolate && !d_saberSPStyleDamage.integer && japp_saberSystem.integer != SABERSYSTEM_JAPP ) { //This didn't quite work out like I hoped. But it's better than nothing. Sort of.
+		if ( doInterpolate && !d_saberSPStyleDamage.integer && !(japp_saberTweaks.integer & SABERTWEAK_INTERPOLATE) ) {
+			//This didn't quite work out like I hoped. But it's better than nothing. Sort of.
 			vector3 oldSaberStart, oldSaberEnd, saberDif, oldSaberDif;
 			int traceTests = 0;
 			float trDif = 8;
@@ -3558,17 +3558,24 @@ static qboolean CheckSaberDamageOriginal( gentity_t *self, int rSaberNum, int rB
 		trMask &= ~CONTENTS_LIGHTSABER;
 
 		if ( d_saberSPStyleDamage.integer ) {
-			if ( BG_SaberInReturn( self->client->ps.saberMove ) || japp_saberIdleDamage.integer )
+			if ( BG_SaberInReturn( self->client->ps.saberMove ) || japp_saberIdleDamage.integer ) {
 				dmg = SABER_NONATTACK_DAMAGE;
-			else
+			}
+			else {
 				dmg = 0;
+			}
 		}
-		else if ( japp_saberSystem.integer == SABERSYSTEM_JAPP && BG_SaberInReturn( self->client->ps.saberMove ) )
+		else if ( (japp_saberTweaks.integer & SABERTWEAK_PROLONGDAMAGE)
+			&& BG_SaberInReturn( self->client->ps.saberMove ) )
+		{
 			dmg = 10 * g_saberDamageScale.value;
-		else if ( japp_saberIdleDamage.integer )
+		}
+		else if ( japp_saberIdleDamage.integer ) {
 			dmg = SABER_NONATTACK_DAMAGE;
-		else
+		}
+		else {
 			dmg = 0;
+		}
 		idleDamage = qtrue;
 	}
 	else {
@@ -3585,19 +3592,23 @@ static qboolean CheckSaberDamageOriginal( gentity_t *self, int rSaberNum, int rB
 		}
 		else if ( !inBackAttack ) {
 			//do extra damage for special unblockables
-			if ( self->client->ps.saberMove == LS_A_JUMP_T__B_ )
+			if ( self->client->ps.saberMove == LS_A_JUMP_T__B_ ) {
 				dmg += 5; //This is very tiny, because this move has a huge damage ramp
+			}
 
 			else if ( self->client->ps.saberMove == LS_A_FLIP_STAB || self->client->ps.saberMove == LS_A_FLIP_SLASH ) {//Raz: Yellow DFA
 				dmg += 5; //ditto
-				if ( japp_saberSystem.integer == SABERSYSTEM_JAPP ) {//Raz0r's system
-					//	if ( dmg <= 40 || G_GetAnimPoint( self ) <= 0.4f || G_GetAnimPoint( self ) >= 0.85f )
-					//		dmg = 2;
+				if ( japp_saberTweaks.integer & SABERTWEAK_SPECIALMOVES ) {
+					/*
+					if ( dmg <= 40 || G_GetAnimPoint( self ) <= 0.4f || G_GetAnimPoint( self ) >= 0.85f )
+						dmg = 2;
+					*/
 					dmg *= 0.5f;
 				}
-				else {//Base
-					if ( dmg <= 40 || G_GetAnimPoint( self ) <= 0.4f )
+				else {
+					if ( dmg <= 40 || G_GetAnimPoint( self ) <= 0.4f ) {
 						dmg = 2;//sort of a hack, don't want it doing big damage in the off points of the anim
+					}
 				}
 			}
 			else if ( self->client->ps.saberMove == LS_A_LUNGE ) {
@@ -4362,660 +4373,6 @@ blockStuff:
 	return didHit;
 }
 
-// JK2 version
-static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum, vector3 *saberStart, vector3 *saberEnd, qboolean doInterpolate, int trMask, qboolean extrapolate ) {
-	trace_t tr;
-	vector3 dir;
-	vector3 saberTrMins, saberTrMaxs;
-
-	vector3 lastValidStart;
-	vector3 lastValidEnd;
-
-	int dmg = 0;
-	int attackStr = 0;
-	float saberBoxSize = d_saberBoxTraceSize.value;
-	qboolean idleDamage = qfalse;
-	qboolean didHit = qfalse;
-	qboolean sabersClashed = qfalse;
-	qboolean unblockable = qfalse;
-	qboolean didDefense = qfalse;
-	qboolean didOffense = qfalse;
-	qboolean saberTraceDone = qfalse;
-	qboolean otherUnblockable = qfalse;
-	qboolean tryDeflectAgain = qfalse;
-
-	gentity_t *otherOwner;
-
-	if ( japp_saberSystem.integer != SABERSYSTEM_JK2 )
-		return CheckSaberDamageOriginal( self, rSaberNum, rBladeNum, saberStart, saberEnd, doInterpolate, trMask, extrapolate );
-
-	if ( self->client->ps.saberHolstered ) {
-		return qfalse;
-	}
-
-	memset( &tr, 0, sizeof(tr) ); //make the compiler happy
-
-	if ( d_saberGhoul2Collision.integer ) {
-		VectorSet( &saberTrMins, -saberBoxSize * 3, -saberBoxSize * 3, -saberBoxSize * 3 );
-		VectorSet( &saberTrMaxs, saberBoxSize * 3, saberBoxSize * 3, saberBoxSize * 3 );
-	}
-	else
-
-		if ( self->client->ps.fd.saberAnimLevel < FORCE_LEVEL_2 ) { //box trace for fast, because it doesn't get updated so often
-			VectorSet( &saberTrMins, -saberBoxSize, -saberBoxSize, -saberBoxSize );
-			VectorSet( &saberTrMaxs, saberBoxSize, saberBoxSize, saberBoxSize );
-		}
-		else if ( d_saberAlwaysBoxTrace.integer ) {
-			VectorSet( &saberTrMins, -saberBoxSize, -saberBoxSize, -saberBoxSize );
-			VectorSet( &saberTrMaxs, saberBoxSize, saberBoxSize, saberBoxSize );
-		}
-		else {
-			VectorClear( &saberTrMins );
-			VectorClear( &saberTrMaxs );
-		}
-
-		while ( !saberTraceDone ) {
-			if ( doInterpolate
-				&& !d_saberSPStyleDamage.integer ) { //This didn't quite work out like I hoped. But it's better than nothing. Sort of.
-				vector3 oldSaberStart, oldSaberEnd, saberDif, oldSaberDif;
-				int traceTests = 0;
-				float trDif = 8;
-
-				if ( (level.time - self->client->saber[rSaberNum].blade[rBladeNum].trail.lastTime) > 100 ) {//no valid last pos, use current
-					VectorCopy( saberStart, &oldSaberStart );
-					VectorCopy( saberEnd, &oldSaberEnd );
-				}
-				else {//trace from last pos
-					VectorCopy( &self->client->saber[rSaberNum].blade[rBladeNum].trail.base, &oldSaberStart );
-					VectorCopy( &self->client->saber[rSaberNum].blade[rBladeNum].trail.tip, &oldSaberEnd );
-				}
-
-				VectorSubtract( saberStart, saberEnd, &saberDif );
-				VectorSubtract( &oldSaberStart, &oldSaberEnd, &oldSaberDif );
-
-				VectorNormalize( &saberDif );
-				VectorNormalize( &oldSaberDif );
-
-				saberEnd->x = saberStart->x - (saberDif.x*trDif);
-				saberEnd->y = saberStart->y - (saberDif.y*trDif);
-				saberEnd->z = saberStart->z - (saberDif.z*trDif);
-
-				oldSaberEnd.x = oldSaberStart.x - (oldSaberDif.x*trDif);
-				oldSaberEnd.y = oldSaberStart.y - (oldSaberDif.y*trDif);
-				oldSaberEnd.z = oldSaberStart.z - (oldSaberDif.z*trDif);
-
-				trap->Trace( &tr, saberEnd, &saberTrMins, &saberTrMaxs, saberStart, self->s.number, trMask, qfalse, 0, 0 );
-
-				VectorCopy( saberEnd, &lastValidStart );
-				VectorCopy( saberStart, &lastValidEnd );
-				if ( tr.entityNum < MAX_CLIENTS ) {
-					G_G2TraceCollide( &tr, &lastValidStart, &lastValidEnd, &saberTrMins, &saberTrMaxs );
-				}
-
-
-				trDif++;
-
-				while ( tr.fraction == 1.0f && traceTests < 4 && tr.entityNum >= ENTITYNUM_NONE ) {
-					if ( (level.time - self->client->saber[rSaberNum].blade[rBladeNum].trail.lastTime) > 100 ) {//no valid last pos, use current
-						VectorCopy( saberStart, &oldSaberStart );
-						VectorCopy( saberEnd, &oldSaberEnd );
-					}
-					else {//trace from last pos
-						VectorCopy( &self->client->saber[rSaberNum].blade[rBladeNum].trail.base, &oldSaberStart );
-						VectorCopy( &self->client->saber[rSaberNum].blade[rBladeNum].trail.tip, &oldSaberEnd );
-					}
-
-					VectorSubtract( saberStart, saberEnd, &saberDif );
-					VectorSubtract( &oldSaberStart, &oldSaberEnd, &oldSaberDif );
-
-					VectorNormalize( &saberDif );
-					VectorNormalize( &oldSaberDif );
-
-					saberEnd->x = saberStart->x - (saberDif.x*trDif);
-					saberEnd->y = saberStart->y - (saberDif.y*trDif);
-					saberEnd->z = saberStart->z - (saberDif.z*trDif);
-
-					oldSaberEnd.x = oldSaberStart.x - (oldSaberDif.x*trDif);
-					oldSaberEnd.y = oldSaberStart.y - (oldSaberDif.y*trDif);
-					oldSaberEnd.z = oldSaberStart.z - (oldSaberDif.z*trDif);
-
-					trap->Trace( &tr, saberEnd, &saberTrMins, &saberTrMaxs, saberStart, self->s.number, trMask, qfalse, 0, 0 );
-
-					VectorCopy( saberEnd, &lastValidStart );
-					VectorCopy( saberStart, &lastValidEnd );
-					if ( tr.entityNum < MAX_CLIENTS ) {
-						G_G2TraceCollide( &tr, &lastValidStart, &lastValidEnd, &saberTrMins, &saberTrMaxs );
-					}
-					else if ( tr.entityNum < ENTITYNUM_WORLD ) {
-						gentity_t *trHit = &g_entities[tr.entityNum];
-
-						if ( trHit->inuse && trHit->ghoul2 ) { //hit a non-client entity with a g2 instance
-							G_G2TraceCollide( &tr, &lastValidStart, &lastValidEnd, &saberTrMins, &saberTrMaxs );
-						}
-					}
-
-					traceTests++;
-					trDif += 8;
-				}
-			}
-			else {
-				trap->Trace( &tr, saberStart, &saberTrMins, &saberTrMaxs, saberEnd, self->s.number, trMask, qfalse, 0, 0 );
-
-				VectorCopy( saberStart, &lastValidStart );
-				VectorCopy( saberEnd, &lastValidEnd );
-				if ( tr.entityNum < MAX_CLIENTS ) {
-					G_G2TraceCollide( &tr, &lastValidStart, &lastValidEnd, &saberTrMins, &saberTrMaxs );
-				}
-
-			}
-
-			saberTraceDone = qtrue;
-		}
-
-		//	if (SaberAttacking(self) &&
-		//		self->client->ps.saberAttackWound < level.time)
-		if ( self->client->ps.saberAttackWound < level.time
-			&& (SaberAttacking( self )
-			|| (WP_SaberBladeDoTransitionDamage( &self->client->saber[rSaberNum], rBladeNum ) && BG_SaberInTransitionAny( self->client->ps.saberMove ))) ) { //this animation is that of the last attack movement, and so it should do full damage
-			qboolean saberInSpecial = BG_SaberInSpecial( self->client->ps.saberMove );
-			qboolean inBackAttack = G_SaberInBackAttack( self->client->ps.saberMove );
-
-			dmg = SABER_HITDAMAGE;
-
-			if ( self->client->ps.fd.saberAnimLevel == 3 ) {
-				//new damage-ramping system
-				if ( !saberInSpecial && !inBackAttack ) {
-					dmg = G_GetAttackDamage( self, 2, 120, 0.5f );
-				}
-				else if ( saberInSpecial &&
-					(self->client->ps.saberMove == LS_A_JUMP_T__B_) ) {
-					dmg = G_GetAttackDamage( self, 2, 180, 0.65f );
-				}
-				else if ( inBackAttack ) {
-					dmg = G_GetAttackDamage( self, 2, 30, 0.5f ); //can hit multiple times (and almost always does), so..
-				}
-				else {
-					dmg = 100;
-				}
-			}
-			else if ( self->client->ps.fd.saberAnimLevel == 2 ) {
-				if ( saberInSpecial &&
-					(self->client->ps.saberMove == LS_A_FLIP_STAB || self->client->ps.saberMove == LS_A_FLIP_SLASH) ) { //a well-timed hit with this can do a full 85
-					dmg = G_GetAttackDamage( self, 2, 80, 0.5f );
-				}
-				else if ( inBackAttack ) {
-					dmg = G_GetAttackDamage( self, 2, 25, 0.5f );
-				}
-				else {
-					dmg = 60;
-				}
-			}
-			else if ( self->client->ps.fd.saberAnimLevel == 1 ) {
-				if ( saberInSpecial &&
-					(self->client->ps.saberMove == LS_A_LUNGE) ) {
-					dmg = G_GetAttackDamage( self, 2, SABER_HITDAMAGE - 5, 0.3f );
-				}
-				else if ( inBackAttack ) {
-					dmg = G_GetAttackDamage( self, 2, 30, 0.5f );
-				}
-				else {
-					dmg = SABER_HITDAMAGE;
-				}
-			}
-
-			attackStr = self->client->ps.fd.saberAnimLevel;
-		}
-		else if ( japp_saberIdleDamage.integer && self->client->ps.saberIdleWound < level.time ) { //just touching, do minimal damage and only check for it every 200ms (mainly to cut down on network traffic for hit events)
-			dmg = SABER_NONATTACK_DAMAGE;
-			idleDamage = qtrue;
-		}
-
-		if ( BG_SaberInSpecial( self->client->ps.saberMove ) ) {
-			qboolean inBackAttack = G_SaberInBackAttack( self->client->ps.saberMove );
-
-			unblockable = qtrue;
-			self->client->ps.saberBlocked = 0;
-
-			if ( !inBackAttack ) {
-				if ( self->client->ps.saberMove == LS_A_JUMP_T__B_ ) { //do extra damage for special unblockables
-					dmg += 5; //This is very tiny, because this move has a huge damage ramp
-				}
-				else if ( self->client->ps.saberMove == LS_A_FLIP_STAB || self->client->ps.saberMove == LS_A_FLIP_SLASH ) {
-					dmg += 5; //ditto
-					if ( dmg <= 40 || G_GetAnimPoint( self ) <= 0.4f ) { //sort of a hack, don't want it doing big damage in the off points of the anim
-						dmg = 2;
-					}
-				}
-				else if ( self->client->ps.saberMove == LS_A_LUNGE ) {
-					dmg += 2; //and ditto again
-					if ( G_GetAnimPoint( self ) <= 0.4f ) { //same as above
-						dmg = 2;
-					}
-				}
-				else {
-					dmg += 20;
-				}
-			}
-		}
-
-		if ( !dmg ) {
-			if ( tr.entityNum < MAX_CLIENTS ||
-				(g_entities[tr.entityNum].inuse && (g_entities[tr.entityNum].r.contents & CONTENTS_LIGHTSABER)) ) {
-				return qtrue;
-			}
-			return qfalse;
-		}
-
-		if ( dmg > SABER_NONATTACK_DAMAGE ) {
-			dmg *= g_saberDamageScale.value;
-		}
-
-		if ( dmg > SABER_NONATTACK_DAMAGE && self->client->ps.isJediMaster ) { //give the Jedi Master more saber attack power
-			dmg *= 2;
-		}
-
-		VectorSubtract( saberEnd, saberStart, &dir );
-		VectorNormalize( &dir );
-
-		//rww - I'm saying || tr.startsolid here, because otherwise your saber tends to skip positions and go through
-		//people, and the compensation traces start in their bbox too. Which results in the saber passing through people
-		//when you visually cut right through them. Which sucks.
-
-		if ( (tr.fraction != 1 || tr.startsolid) &&
-			g_entities[tr.entityNum].takedamage &&
-			(g_entities[tr.entityNum].health > 0 || !(g_entities[tr.entityNum].s.eFlags & EF_DISINTEGRATION)) &&
-			tr.entityNum != self->s.number &&
-			g_entities[tr.entityNum].inuse ) {
-			gentity_t *te;
-
-			if ( idleDamage &&
-				g_entities[tr.entityNum].client &&
-				OnSameTeam( self, &g_entities[tr.entityNum] ) &&
-				!g_friendlySaber.integer ) {
-				return qfalse;
-			}
-
-			if ( g_entities[tr.entityNum].inuse && g_entities[tr.entityNum].client &&
-				g_entities[tr.entityNum].client->ps.duelInProgress &&
-				g_entities[tr.entityNum].client->ps.duelIndex != self->s.number ) {
-				return qfalse;
-			}
-
-			if ( g_entities[tr.entityNum].inuse && g_entities[tr.entityNum].client &&
-				self->client->ps.duelInProgress &&
-				self->client->ps.duelIndex != g_entities[tr.entityNum].s.number ) {
-				return qfalse;
-			}
-
-			self->client->ps.saberIdleWound = level.time + g_saberDmgDelay_Idle.integer;
-
-			didHit = qtrue;
-
-			if ( g_entities[tr.entityNum].client && !unblockable && WP_SaberCanBlock( &g_entities[tr.entityNum], &tr.endpos, 0, MOD_SABER, qfalse, attackStr ) ) {
-				te = G_TempEntity( &tr.endpos, EV_SABER_BLOCK );
-				if ( dmg <= SABER_NONATTACK_DAMAGE ) {
-					self->client->ps.saberIdleWound = level.time + g_saberDmgDelay_Idle.integer;
-				}
-				VectorCopy( &tr.endpos, &te->s.origin );
-				VectorCopy( &tr.plane.normal, &te->s.angles );
-				te->s.eventParm = 1;
-
-				if ( dmg > SABER_NONATTACK_DAMAGE ) {
-					int lockFactor = g_saberLockFactor.integer;
-
-					if ( (g_entities[tr.entityNum].client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] - self->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE]) > 1 &&
-						Q_irand( 1, 10 ) < lockFactor * 2 ) { //Just got blocked by someone with a decently higher attack level, so enter into a lock (where they have the advantage due to a higher attack lev)
-						if ( !G_ClientIdleInWorld( &g_entities[tr.entityNum] ) ) {
-							if ( WP_SabersCheckLock( self, &g_entities[tr.entityNum] ) ) {
-								self->client->ps.saberBlocked = BLOCKED_NONE;
-								g_entities[tr.entityNum].client->ps.saberBlocked = BLOCKED_NONE;
-								return didHit;
-							}
-						}
-					}
-					else if ( Q_irand( 1, 20 ) < lockFactor ) {
-						if ( !G_ClientIdleInWorld( &g_entities[tr.entityNum] ) ) {
-							if ( WP_SabersCheckLock( self, &g_entities[tr.entityNum] ) ) {
-								self->client->ps.saberBlocked = BLOCKED_NONE;
-								g_entities[tr.entityNum].client->ps.saberBlocked = BLOCKED_NONE;
-								return didHit;
-							}
-						}
-					}
-				}
-				otherOwner = &g_entities[tr.entityNum];
-				goto blockStuff;
-			}
-			else {
-				if ( g_entities[tr.entityNum].client && !g_entities[tr.entityNum].client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] ) { //not a "jedi", so make them suffer more
-					if ( dmg > SABER_NONATTACK_DAMAGE ) { //don't bother increasing just for idle touch damage
-						dmg *= 1.5f;
-					}
-				}
-
-				if ( g_entities[tr.entityNum].client && g_entities[tr.entityNum].client->ps.weapon == WP_SABER ) { //for jedi using the saber, half the damage (this comes with the increased default dmg debounce time)
-					if ( dmg > SABER_NONATTACK_DAMAGE && !unblockable ) { //don't reduce damage if it's only 1, or if this is an unblockable attack
-						if ( dmg == SABER_HITDAMAGE ) { //level 1 attack
-							dmg *= 0.7f;
-						}
-						else {
-							dmg *= 0.5f;
-						}
-					}
-				}
-
-				G_Damage( &g_entities[tr.entityNum], self, self, &dir, &tr.endpos, dmg, 0, MOD_SABER );
-
-				te = G_TempEntity( &tr.endpos, EV_SABER_HIT );
-
-				VectorCopy( &tr.endpos, &te->s.origin );
-				VectorCopy( &tr.plane.normal, &te->s.angles );
-
-				if ( !te->s.angles.x && !te->s.angles.y && !te->s.angles.z ) { //don't let it play with no direction
-					te->s.angles.y = 1;
-				}
-
-				if ( g_entities[tr.entityNum].client ) {
-					te->s.eventParm = 1;
-				}
-				else {
-					te->s.eventParm = 0;
-				}
-
-				self->client->ps.saberAttackWound = level.time + 100;
-			}
-		}
-		else if ( (tr.fraction != 1 || tr.startsolid) &&
-			(g_entities[tr.entityNum].r.contents & CONTENTS_LIGHTSABER) &&
-			g_entities[tr.entityNum].r.contents != -1 ) { //saber clash
-			gentity_t *te;
-			otherOwner = &g_entities[g_entities[tr.entityNum].r.ownerNum];
-
-			if ( otherOwner &&
-				otherOwner->inuse &&
-				otherOwner->client &&
-				OnSameTeam( self, otherOwner ) &&
-				!g_friendlySaber.integer ) {
-				return qfalse;
-			}
-
-			if ( otherOwner && otherOwner->client &&
-				otherOwner->client->ps.duelInProgress &&
-				otherOwner->client->ps.duelIndex != self->s.number ) {
-				return qfalse;
-			}
-
-			if ( otherOwner && otherOwner->client &&
-				self->client->ps.duelInProgress &&
-				self->client->ps.duelIndex != otherOwner->s.number ) {
-				return qfalse;
-			}
-
-			didHit = qtrue;
-			self->client->ps.saberIdleWound = level.time + g_saberDmgDelay_Idle.integer;
-
-			te = G_TempEntity( &tr.endpos, EV_SABER_BLOCK );
-			if ( dmg <= SABER_NONATTACK_DAMAGE ) {
-				self->client->ps.saberIdleWound = level.time + g_saberDmgDelay_Idle.integer;
-			}
-
-			VectorCopy( &tr.endpos, &te->s.origin );
-			VectorCopy( &tr.plane.normal, &te->s.angles );
-			te->s.eventParm = 1;
-
-			sabersClashed = qtrue;
-
-blockStuff:
-			otherUnblockable = qfalse;
-
-			if ( otherOwner && otherOwner->client && otherOwner->client->ps.saberInFlight ) {
-				return qfalse;
-			}
-
-			if ( dmg > SABER_NONATTACK_DAMAGE && !unblockable && !otherUnblockable ) {
-				int lockFactor = g_saberLockFactor.integer;
-
-				if ( sabersClashed && Q_irand( 1, 20 ) <= lockFactor ) {
-					if ( !G_ClientIdleInWorld( otherOwner ) ) {
-						if ( WP_SabersCheckLock( self, otherOwner ) ) {
-							self->client->ps.saberBlocked = BLOCKED_NONE;
-							otherOwner->client->ps.saberBlocked = BLOCKED_NONE;
-							return didHit;
-						}
-					}
-				}
-			}
-
-			if ( !otherOwner || !otherOwner->client ) {
-				return didHit;
-			}
-
-			if ( BG_SaberInSpecial( otherOwner->client->ps.saberMove ) ) {
-				otherUnblockable = qtrue;
-				otherOwner->client->ps.saberBlocked = 0;
-			}
-
-			if ( sabersClashed && dmg > SABER_NONATTACK_DAMAGE && self->client->ps.fd.saberAnimLevel < FORCE_LEVEL_3
-				&& !PM_SaberInBounce( otherOwner->client->ps.saberMove ) && !PM_SaberInParry( self->client->ps.saberMove )
-				&& !PM_SaberInBrokenParry( self->client->ps.saberMove ) && !BG_SaberInSpecial( self->client->ps.saberMove )
-				&& !PM_SaberInBounce( self->client->ps.saberMove ) && !PM_SaberInDeflect( self->client->ps.saberMove )
-				&& !PM_SaberInReflect( self->client->ps.saberMove ) && !unblockable ) {
-				// Failed the deflect, try it again if we can if the guy we're smashing goes into a parry and we don't break it
-				if ( !WP_GetSaberDeflectionAngle( self, otherOwner, tr.fraction ) )
-					tryDeflectAgain = qtrue;
-				else {
-					self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-					didOffense = qtrue;
-				}
-			}
-
-			if ( ((self->client->ps.fd.saberAnimLevel < FORCE_LEVEL_3 && ((tryDeflectAgain && Q_irand( 1, 10 ) <= 3) || (!tryDeflectAgain && Q_irand( 1, 10 ) <= 7))) || (Q_irand( 1, 10 ) <= 1 && otherOwner->client->ps.fd.saberAnimLevel >= FORCE_LEVEL_3))
-				&& !PM_SaberInBounce( self->client->ps.saberMove )
-
-				&& !PM_SaberInBrokenParry( otherOwner->client->ps.saberMove )
-				&& !BG_SaberInSpecial( otherOwner->client->ps.saberMove )
-				&& !PM_SaberInBounce( otherOwner->client->ps.saberMove )
-				&& !PM_SaberInDeflect( otherOwner->client->ps.saberMove )
-				&& !PM_SaberInReflect( otherOwner->client->ps.saberMove )
-
-				&& (otherOwner->client->ps.fd.saberAnimLevel > FORCE_LEVEL_2 || (otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] >= 3 && Q_irand( 0, otherOwner->client->ps.fd.saberAnimLevel )))
-				&& !unblockable
-				&& !otherUnblockable
-				&& dmg > SABER_NONATTACK_DAMAGE
-				&& !didOffense ) //don't allow the person we're attacking to do this if we're making an unblockable attack
-			{//knockaways can make fast-attacker go into a broken parry anim if the ent is using fast or med. In MP, we also randomly decide this for level 3 attacks.
-				//Going to go ahead and let idle damage do simple knockaways. Looks sort of good that way.
-				//turn the parry into a knockaway
-				if ( !PM_SaberInParry( otherOwner->client->ps.saberMove ) ) {
-					WP_SaberBlockNonRandom( otherOwner, &tr.endpos, qfalse );
-					otherOwner->client->ps.saberMove = BG_KnockawayForParry( otherOwner->client->ps.saberBlocked );
-					otherOwner->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-				}
-				else {
-					otherOwner->client->ps.saberMove = G_KnockawayForParry( otherOwner->client->ps.saberMove ); //BG_KnockawayForParry( otherOwner->client->ps.saberBlocked );
-					otherOwner->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-				}
-
-				//make them (me) go into a broken parry
-				self->client->ps.saberMove = BG_BrokenParryForAttack( self->client->ps.saberMove );
-				self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-
-				if ( g_saberDebugPrint.integer ) {
-					Com_Printf( "Client %i sent client %i into a reflected attack with a knockaway\n", otherOwner->s.number, self->s.number );
-				}
-
-				didDefense = qtrue;
-			}
-			else if ( (self->client->ps.fd.saberAnimLevel > FORCE_LEVEL_2 || unblockable) && //if we're doing a special attack, we can send them into a broken parry too (MP only)
-				(otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] < self->client->ps.fd.saberAnimLevel || (otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == self->client->ps.fd.saberAnimLevel && (Q_irand( 1, 10 ) >= otherOwner->client->ps.fd.saberAnimLevel*1.5f || unblockable))) &&
-				PM_SaberInParry( otherOwner->client->ps.saberMove ) &&
-				!PM_SaberInBrokenParry( otherOwner->client->ps.saberMove ) &&
-				!PM_SaberInParry( self->client->ps.saberMove ) &&
-				!PM_SaberInBrokenParry( self->client->ps.saberMove ) &&
-				!PM_SaberInBounce( self->client->ps.saberMove ) &&
-				dmg > SABER_NONATTACK_DAMAGE &&
-				!didOffense &&
-				!otherUnblockable ) { //they are in a parry, and we are slamming down on them with a move of equal or greater force than their defense, so send them into a broken parry.. unless they are already in one.
-				if ( g_saberDebugPrint.integer ) {
-					Com_Printf( "Client %i sent client %i into a broken parry\n", self->s.number, otherOwner->s.number );
-				}
-
-				otherOwner->client->ps.saberMove = BG_BrokenParryForParry( otherOwner->client->ps.saberMove );
-				otherOwner->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
-
-				didDefense = qtrue;
-			}
-			else if ( (self->client->ps.fd.saberAnimLevel > FORCE_LEVEL_2) && //if we're doing a special attack, we can send them into a broken parry too (MP only)
-				//( otherOwner->client->ps.fd.forcePowerLevel[FP_SABERDEFEND] < self->client->ps.fd.saberAnimLevel || (otherOwner->client->ps.fd.forcePowerLevel[FP_SABERDEFEND] == self->client->ps.fd.saberAnimLevel && (Q_irand(1, 10) >= otherOwner->client->ps.fd.saberAnimLevel*3 || unblockable)) ) &&
-				otherOwner->client->ps.fd.saberAnimLevel >= FORCE_LEVEL_3 &&
-				PM_SaberInParry( otherOwner->client->ps.saberMove ) &&
-				!PM_SaberInBrokenParry( otherOwner->client->ps.saberMove ) &&
-				!PM_SaberInParry( self->client->ps.saberMove ) &&
-				!PM_SaberInBrokenParry( self->client->ps.saberMove ) &&
-				!PM_SaberInBounce( self->client->ps.saberMove ) &&
-				!PM_SaberInDeflect( self->client->ps.saberMove ) &&
-				!PM_SaberInReflect( self->client->ps.saberMove ) &&
-				dmg > SABER_NONATTACK_DAMAGE &&
-				!didOffense &&
-				!unblockable ) { //they are in a parry, and we are slamming down on them with a move of equal or greater force than their defense, so send them into a broken parry.. unless they are already in one.
-				if ( g_saberDebugPrint.integer ) {
-					Com_Printf( "Client %i bounced off of client %i's saber\n", self->s.number, otherOwner->s.number );
-				}
-
-				if ( !tryDeflectAgain ) {
-					if ( !WP_GetSaberDeflectionAngle( self, otherOwner, tr.fraction ) ) {
-						tryDeflectAgain = qtrue;
-					}
-				}
-
-				didOffense = qtrue;
-			}
-			else if ( SaberAttacking( otherOwner ) && dmg > SABER_NONATTACK_DAMAGE && !BG_SaberInSpecial( otherOwner->client->ps.saberMove ) && !didOffense && !otherUnblockable ) { //they were attacking and our saber hit their saber, make them bounce. But if they're in a special attack, leave them.
-				if ( !PM_SaberInBounce( self->client->ps.saberMove ) &&
-					!PM_SaberInBounce( otherOwner->client->ps.saberMove ) &&
-					!PM_SaberInDeflect( self->client->ps.saberMove ) &&
-					!PM_SaberInDeflect( otherOwner->client->ps.saberMove ) &&
-
-					!PM_SaberInReflect( self->client->ps.saberMove ) &&
-					!PM_SaberInReflect( otherOwner->client->ps.saberMove ) ) {
-					if ( g_saberDebugPrint.integer ) {
-						Com_Printf( "Client %i and client %i bounced off of each other's sabers\n", self->s.number, otherOwner->s.number );
-					}
-
-					self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
-					otherOwner->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
-
-					didOffense = qtrue;
-				}
-			}
-
-
-			if ( d_saberGhoul2Collision.integer && !didDefense && dmg <= SABER_NONATTACK_DAMAGE && !otherUnblockable ) //with perpoly, it looks pretty weird to have clash flares coming off the guy's face and whatnot
-			{
-				if ( !PM_SaberInParry( otherOwner->client->ps.saberMove ) &&
-					!PM_SaberInBrokenParry( otherOwner->client->ps.saberMove ) &&
-					!BG_SaberInSpecial( otherOwner->client->ps.saberMove ) &&
-					!PM_SaberInBounce( otherOwner->client->ps.saberMove ) &&
-					!PM_SaberInDeflect( otherOwner->client->ps.saberMove ) &&
-					!PM_SaberInReflect( otherOwner->client->ps.saberMove ) ) {
-					WP_SaberBlockNonRandom( otherOwner, &tr.endpos, qfalse );
-				}
-			}
-			else
-
-				if ( !didDefense && dmg > SABER_NONATTACK_DAMAGE && !otherUnblockable ) //if not more than idle damage, don't even bother blocking.
-				{ //block
-					if ( !PM_SaberInParry( otherOwner->client->ps.saberMove ) &&
-						!PM_SaberInBrokenParry( otherOwner->client->ps.saberMove ) &&
-						!BG_SaberInSpecial( otherOwner->client->ps.saberMove ) &&
-						!PM_SaberInBounce( otherOwner->client->ps.saberMove ) &&
-						!PM_SaberInDeflect( otherOwner->client->ps.saberMove ) &&
-						!PM_SaberInReflect( otherOwner->client->ps.saberMove ) ) {
-						qboolean crushTheParry = qfalse;
-
-						if ( unblockable ) { //It's unblockable. So send us into a broken parry immediately.
-							crushTheParry = qtrue;
-						}
-
-						if ( !SaberAttacking( otherOwner ) ) {
-							WP_SaberBlockNonRandom( otherOwner, &tr.endpos, qfalse );
-						}
-						else if ( self->client->ps.fd.saberAnimLevel > otherOwner->client->ps.fd.saberAnimLevel ||
-							(self->client->ps.fd.saberAnimLevel == otherOwner->client->ps.fd.saberAnimLevel && Q_irand( 1, 10 ) <= 2) ) { //they are attacking, and we managed to make them break
-							//Give them a parry, so we can later break it.
-							WP_SaberBlockNonRandom( otherOwner, &tr.endpos, qfalse );
-							crushTheParry = qtrue;
-
-							if ( g_saberDebugPrint.integer ) {
-								Com_Printf( "Client %i forced client %i into a broken parry with a stronger attack\n", self->s.number, otherOwner->s.number );
-							}
-						}
-						else { //They are attacking, so are we, and obviously they have an attack level higher than or equal to ours
-							if ( self->client->ps.fd.saberAnimLevel == otherOwner->client->ps.fd.saberAnimLevel ) { //equal level, try to bounce off each other's sabers
-								if ( !didOffense &&
-									!PM_SaberInParry( self->client->ps.saberMove ) &&
-									!PM_SaberInBrokenParry( self->client->ps.saberMove ) &&
-									!BG_SaberInSpecial( self->client->ps.saberMove ) &&
-									!PM_SaberInBounce( self->client->ps.saberMove ) &&
-									!PM_SaberInDeflect( self->client->ps.saberMove ) &&
-									!PM_SaberInReflect( self->client->ps.saberMove ) &&
-									!unblockable ) {
-									self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
-									didOffense = qtrue;
-								}
-								if ( !didDefense &&
-									!PM_SaberInParry( otherOwner->client->ps.saberMove ) &&
-									!PM_SaberInBrokenParry( otherOwner->client->ps.saberMove ) &&
-									!BG_SaberInSpecial( otherOwner->client->ps.saberMove ) &&
-									!PM_SaberInBounce( otherOwner->client->ps.saberMove ) &&
-									!PM_SaberInDeflect( otherOwner->client->ps.saberMove ) &&
-									!PM_SaberInReflect( otherOwner->client->ps.saberMove ) &&
-									!unblockable ) {
-									otherOwner->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
-								}
-								if ( g_saberDebugPrint.integer ) {
-									Com_Printf( "Equal attack level bounce/deflection for clients %i and %i\n", self->s.number, otherOwner->s.number );
-								}
-							}
-							else if ( (level.time - otherOwner->client->lastSaberStorageTime) < 500 && !unblockable ) //make sure the stored saber data is updated
-							{ //They are higher, this means they can actually smash us into a broken parry
-								//Using reflected anims instead now
-								self->client->ps.saberMove = BG_BrokenParryForAttack( self->client->ps.saberMove );
-								self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
-
-								if ( g_saberDebugPrint.integer ) {
-									Com_Printf( "Client %i hit client %i's stronger attack, was forced into a broken parry\n", self->s.number, otherOwner->s.number );
-								}
-
-								didOffense = qtrue;
-							}
-						}
-
-						if ( crushTheParry && PM_SaberInParry( G_GetParryForBlock( otherOwner->client->ps.saberBlocked ) ) ) { //This means that the attack actually hit our saber, and we went to block it.
-							//But, one of the above cases says we actually can't. So we will be smashed into a broken parry instead.
-							otherOwner->client->ps.saberMove = BG_BrokenParryForParry( G_GetParryForBlock( otherOwner->client->ps.saberBlocked ) );
-							otherOwner->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
-
-							if ( g_saberDebugPrint.integer ) {
-								Com_Printf( "Client %i broke through %i's parry with a special or stronger attack\n", self->s.number, otherOwner->s.number );
-							}
-						}
-						else if ( PM_SaberInParry( G_GetParryForBlock( otherOwner->client->ps.saberBlocked ) ) && !didOffense && tryDeflectAgain ) { //We want to try deflecting again because the other is in the parry and we haven't made any new moves
-							int preMove = otherOwner->client->ps.saberMove;
-
-							otherOwner->client->ps.saberMove = G_GetParryForBlock( otherOwner->client->ps.saberBlocked );
-							WP_GetSaberDeflectionAngle( self, otherOwner, tr.fraction );
-							otherOwner->client->ps.saberMove = preMove;
-						}
-					}
-				}
-
-			self->client->ps.saberAttackWound = level.time + g_saberDmgDelay_Wound.integer;
-		}
-
-		return didHit;
-}
-
 int VectorCompare2( const vector3 *v1, const vector3 *v2 ) {
 	if ( v1->x > v2->x + 0.0001f ||
 		v1->x < v2->x - 0.0001f ||
@@ -5076,7 +4433,7 @@ void G_SPSaberDamageTraceLerped( gentity_t *self, int saberNum, int bladeNum, ve
 			vector3 tmp_ma1, tmp_ma2;
 			vector3 *outma1, *outma2;
 
-			if ( japp_saberSystem.integer == SABERSYSTEM_JAPP ) {
+			if ( japp_saberTweaks.integer & SABERTWEAK_INTERPOLATE ) {
 				outma1 = &ma1;
 				outma2 = &ma2;
 			}
@@ -8368,14 +7725,11 @@ nextStep:
 						}
 					}
 				}
-				else if ( d_saberSPStyleDamage.integer ) {
+				else if ( d_saberSPStyleDamage.integer || (japp_saberTweaks.integer & SABERTWEAK_INTERPOLATE) ) {
 					G_SPSaberDamageTraceLerped( self, rSaberNum, rBladeNum, &boltOrigin, &end, (MASK_PLAYERSOLID | CONTENTS_LIGHTSABER | MASK_SHOT) );
 				}
 				else {
-					if ( japp_saberSystem.integer == SABERSYSTEM_JAPP )
-						G_SPSaberDamageTraceLerped( self, rSaberNum, rBladeNum, &boltOrigin, &end, (MASK_PLAYERSOLID | CONTENTS_LIGHTSABER | MASK_SHOT) );
-					else
-						CheckSaberDamage( self, rSaberNum, rBladeNum, &boltOrigin, &end, qfalse, (MASK_PLAYERSOLID | CONTENTS_LIGHTSABER | MASK_SHOT), qfalse );
+					CheckSaberDamage( self, rSaberNum, rBladeNum, &boltOrigin, &end, qfalse, (MASK_PLAYERSOLID | CONTENTS_LIGHTSABER | MASK_SHOT), qfalse );
 				}
 
 				VectorCopy( &boltOrigin, &self->client->saber[rSaberNum].blade[rBladeNum].trail.base );

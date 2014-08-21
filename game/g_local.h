@@ -699,11 +699,11 @@ typedef struct bot_settings_s {
 	char team[MAX_FILEPATH];
 } bot_settings_t;
 
-typedef enum saberSystems_e {//japp_saberSystem
-	SABERSYSTEM_BASE = 0,
-	SABERSYSTEM_JAPP,
-	SABERSYSTEM_JK2,
-} saberSystems_t;
+// japp_saberTweaks
+#define SABERTWEAK_INTERPOLATE		(0x0001u)
+#define SABERTWEAK_PROLONGDAMAGE	(0x0002u)
+#define SABERTWEAK_DEFLECTION		(0x0004u)
+#define SABERTWEAK_SPECIALMOVES		(0x0008u)
 
 typedef enum teleportBits_e {
 	JAPP_TPBIT_SILENT = 0,
