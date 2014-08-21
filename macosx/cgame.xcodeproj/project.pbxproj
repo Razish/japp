@@ -62,6 +62,7 @@
 		5694CB9415E4084800F4A3E0 /* cg_chatbox.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8615E4084800F4A3E0 /* cg_chatbox.c */; };
 		5694CB9C15E4084800F4A3E0 /* cg_serverModification.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8E15E4084800F4A3E0 /* cg_serverModification.c */; };
 		5694CB9D15E4084800F4A3E0 /* cg_smartentities.c in Sources */ = {isa = PBXBuildFile; fileRef = 5694CB8F15E4084800F4A3E0 /* cg_smartentities.c */; };
+		56A39D5119A62FA300199734 /* cg_trueview.c in Sources */ = {isa = PBXBuildFile; fileRef = 56A39D5019A62FA300199734 /* cg_trueview.c */; };
 		56E4CE2B121EFF36004E7206 /* Info-cgame__Upgraded_.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56E4CE2A121EFF36004E7206 /* Info-cgame__Upgraded_.plist */; };
 		56E4CE4F121EFF71004E7206 /* cg_consolecmds.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE2D121EFF71004E7206 /* cg_consolecmds.c */; };
 		56E4CE50121EFF71004E7206 /* cg_draw.c in Sources */ = {isa = PBXBuildFile; fileRef = 56E4CE2E121EFF71004E7206 /* cg_draw.c */; };
@@ -235,6 +236,7 @@
 		5694CB8D15E4084800F4A3E0 /* cg_luaserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_luaserver.c; path = ../cgame/cg_luaserver.c; sourceTree = SOURCE_ROOT; };
 		5694CB8E15E4084800F4A3E0 /* cg_serverModification.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_serverModification.c; path = ../cgame/cg_serverModification.c; sourceTree = SOURCE_ROOT; };
 		5694CB8F15E4084800F4A3E0 /* cg_smartentities.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_smartentities.c; path = ../cgame/cg_smartentities.c; sourceTree = SOURCE_ROOT; };
+		56A39D5019A62FA300199734 /* cg_trueview.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_trueview.c; path = ../cgame/cg_trueview.c; sourceTree = "<group>"; };
 		56E4CE2A121EFF36004E7206 /* Info-cgame__Upgraded_.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-cgame__Upgraded_.plist"; sourceTree = "<group>"; };
 		56E4CE2D121EFF71004E7206 /* cg_consolecmds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_consolecmds.c; path = ../cgame/cg_consolecmds.c; sourceTree = SOURCE_ROOT; };
 		56E4CE2E121EFF71004E7206 /* cg_draw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cg_draw.c; path = ../cgame/cg_draw.c; sourceTree = SOURCE_ROOT; };
@@ -344,6 +346,7 @@
 		08FB77AFFE84173DC02AAC07 /* cgame */ = {
 			isa = PBXGroup;
 			children = (
+				56A39D5019A62FA300199734 /* cg_trueview.c */,
 				568BB62918E0C0A000ED39A3 /* cg_media.c */,
 				5694CB8615E4084800F4A3E0 /* cg_chatbox.c */,
 				5638839D186C84C40085216A /* cg_newScoreboard.c */,
@@ -645,6 +648,7 @@
 				56E4CE83121EFFA3004E7206 /* AnimalNPC.c in Sources */,
 				568BB62A18E0C0A000ED39A3 /* cg_media.c in Sources */,
 				56E4CE84121EFFA3004E7206 /* bg_g2_utils.c in Sources */,
+				56A39D5119A62FA300199734 /* cg_trueview.c in Sources */,
 				56E4CE86121EFFA3004E7206 /* bg_misc.c in Sources */,
 				568BB63918E0C0FD00ED39A3 /* bg_luaevent.c in Sources */,
 				56E4CE87121EFFA3004E7206 /* bg_panimate.c in Sources */,
@@ -870,6 +874,7 @@
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
 				GCC_VERSION = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = "";
 				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
@@ -883,6 +888,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
 				GCC_VERSION = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = "";
 				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
@@ -895,6 +901,7 @@
 				GCC_CW_ASM_SYNTAX = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
 				GCC_VERSION = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = "";
 				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
@@ -956,6 +963,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = _CGAME;
 				GCC_VERSION = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = "";
 				USER_HEADER_SEARCH_PATHS = "..//** ../**";
 			};
