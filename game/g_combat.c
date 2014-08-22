@@ -4501,12 +4501,13 @@ static qboolean CanDamage( gentity_t *targ, gentity_t *attacker, vector3 *origin
 	trace_t	tr;
 	vector3	midpoint;
 
-	if ( targ && attacker ) {
+	if ( targ && attacker && targ->client ) {
 		if ( japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK) ) {
 			return qfalse;
 		}
-		if ( (attacker->client->ps.duelInProgress && attacker->client->ps.duelIndex != targ-g_entities)
-			|| (targ->client->ps.duelInProgress && targ->client->ps.duelIndex != attacker-g_entities) )
+		if ( (attacker->client && attacker->client->ps.duelInProgress
+			&& attacker->client->ps.duelIndex != targ-g_entities)
+			|| (targ->client && targ->client->ps.duelInProgress && targ->client->ps.duelIndex != attacker-g_entities) )
 		{
 			return qfalse;
 		}
