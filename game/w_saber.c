@@ -6438,7 +6438,7 @@ static gentity_t *G_KickTrace( gentity_t *ent, vector3 *kickDir, float kickDist,
 
 		// duel isolation
 		if ( (ent->client->ps.duelInProgress && trace.entityNum != ent->client->ps.duelIndex)
-			|| (!ent->client->ps.duelInProgress && hitEnt->client->ps.duelInProgress) )
+			|| (!ent->client->ps.duelInProgress && hitEnt->client && hitEnt->client->ps.duelInProgress) )
 		{
 			return NULL;
 		}

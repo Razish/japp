@@ -8,7 +8,6 @@ extern void Jedi_Cloak( gentity_t *self );
 extern void Jedi_Decloak( gentity_t *self );
 
 qboolean PM_SaberInTransition( int move );
-qboolean PM_SaberInStart( int move );
 qboolean PM_SaberInReturn( int move );
 qboolean WP_SaberStyleValidForSaber( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel );
 qboolean saberCheckKnockdown_DuelLoss( gentity_t *saberent, gentity_t *saberOwner, gentity_t *other );

@@ -971,10 +971,10 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
 #ifdef _CGAME
 	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
+#endif
 	{ "GetGameType", JPLua_Export_GetGameType }, // integer GetGameType()
+#ifdef _CGAME
 	{ "GetKeyCatcher", JPLua_Export_GetKeyCatcher }, // integer GetKeyCatcher()
-#elif _GAME
-	{ "GetGameType", JPLua_Export_GetGameType }, // integer GetGameType()
 #endif
 	{ "GetLogger", JPLua_GetLogger }, // Logger GetLogger( string filename )
 	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
