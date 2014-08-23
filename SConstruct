@@ -46,7 +46,8 @@ if bits == 32:
 	elif plat == 'Linux':
 		if platform.machine()[:3] == 'arm':
 			arch = 'arm'
-		arch = 'i386'
+		else:
+			arch = 'i386'
 	#TODO: Mac
 elif bits == 64:
 	arch = 'x86_64'
@@ -365,7 +366,7 @@ if plat == 'Linux':
 	#	'-Wunsuffixed-float-constants',
 		'-Wwrite-strings',
 		]
-	if compiler != 'clang':
+	if compiler != 'clang' and arch != 'arm':
 		env['CCFLAGS'] += [
 			'-mfpmath=sse',
 			'-Wlogical-op',
@@ -375,14 +376,14 @@ if plat == 'Linux':
 	if analyse:
 		env['CC'] = 'clang'
 		env['CCFLAGS'] += [ '--analyze' ]
-	if bits == 32:
-		env['CCFLAGS'] += [ '-m32' ]
-		env['LINKFLAGS'] += [ '-m32' ]
-	env['CCFLAGS'] += [
-		'-fvisibility=hidden',
-		'-msse2',
-		'-mstackrealign'
-		]
+	if arch == 'arm':
+		env['CCFLAGS'] += [ '-fsigned-char' ]
+	else:
+		env['CCFLAGS'] += [ '-msse2', '-mstackrealign' ]
+		if arch == 'i386':
+			env['CCFLAGS'] += [ '-m32' ]
+			env['LINKFLAGS'] += [ '-m32' ]
+	env['CCFLAGS'] += [ '-fvisibility=hidden' ]
 elif plat == 'Windows':
 	# assume msvc
 	env['CCFLAGS'] = [
