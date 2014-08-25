@@ -5,7 +5,7 @@
 
 // cgame helper
 
-#if QARCH == 64 || defined(MACOS_X)
+#if ARCH_WIDTH == 64 || defined(MACOS_X) || defined(QARCH_ARM)
 
 // wat do?
 
@@ -19,4 +19,4 @@ Q_EXPORT void QDECL CrashReport( int fileHandle ) {
 
 #endif
 
-#endif //QARCH == 32
+#endif //ARCH_WIDTH == 32

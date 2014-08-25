@@ -99,14 +99,18 @@ extern int g_G2AllocServer;
 #include <stdint.h>
 
 #if UINTPTR_MAX == 0xffffffff
-#define QARCH 32
+#define ARCH_WIDTH 32
 #elif UINTPTR_MAX == 0xffffffffffffffff
-#define QARCH 64
+#define ARCH_WIDTH 64
 #else
 #error "Could not determine architecture"
 #endif
 
-#define JAPP_VERSION_SMALL "JA++, " XSTRING( QARCH ) " bits, " __DATE__
+#if defined(__arm__) || defined(_M_ARM)
+	#define QARCH_ARM
+#endif
+
+#define JAPP_VERSION_SMALL "JA++, " XSTRING( ARCH_WIDTH ) " bits, " __DATE__
 #ifdef REVISION
 #define JAPP_VERSION JAPP_VERSION_SMALL ", " REVISION
 #else

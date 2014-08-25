@@ -1,7 +1,7 @@
 #include "qcommon/q_shared.h"
 #include "qcommon/game_version.h"
 
-#if QARCH == 64 || defined(MACOS_X)
+#if ARCH_WIDTH == 64 || defined(MACOS_X) || defined(QARCH_ARM)
 
 // wat do?
 
@@ -11,7 +11,7 @@ void ActivateCrashHandler( void ) {
 void DeactivateCrashHandler( void ) {
 }
 
-#elif QARCH == 32
+#elif ARCH_WIDTH == 32
 
 #ifdef _MSC_VER
 #pragma comment( lib, "DbgHelp" )
@@ -1561,4 +1561,4 @@ void DeactivateCrashHandler( void ) {
 
 #endif
 
-#endif //QARCH == 32
+#endif //ARCH_WIDTH == 32

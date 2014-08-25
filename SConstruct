@@ -44,6 +44,8 @@ if bits == 32:
 	if plat == 'Windows':
 		arch = 'x86'
 	elif plat == 'Linux':
+		if platform.machine()[:3] == 'arm':
+			arch = 'arm'
 		arch = 'i386'
 	#TODO: Mac
 elif bits == 64:
