@@ -2282,11 +2282,23 @@ void ClientThink_real( gentity_t *ent ) {
 				trap->SendServerCommand( -1, va( "cp \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELTIE" ) ) );
 			}
 
-			if( jp_duelStats.integer )
-				trap->SendServerCommand(-1, va("print \""S_COLOR_WHITE"Duration: "S_COLOR_YELLOW"%f "S_COLOR_WHITE"seconds.\"", ((float)level.time - ent->duelStartTick) / 1000));
-			trap->SendServerCommand(ent->s.number, va("cp \"%s"S_COLOR_WHITE" hit you "S_COLOR_YELLOW"%i"S_COLOR_WHITE" times.\n"S_COLOR_WHITE"You hit %s"S_COLOR_YELLOW" %d"S_COLOR_WHITE" times.\"", duelAgainst->client->pers.netname, duelAgainst->duelHitCount, duelAgainst->client->pers.netname, ent->duelHitCount));
-			trap->SendServerCommand(duelAgainst->s.number, va("cp \"%s"S_COLOR_WHITE" hit you "S_COLOR_YELLOW"%i"S_COLOR_WHITE" times.\n"S_COLOR_WHITE"You hit %s"S_COLOR_YELLOW" %d"S_COLOR_WHITE" times.\"", ent->client->pers.netname, ent->duelHitCount, ent->client->pers.netname, duelAgainst->duelHitCount));
-			
+			if (jp_duelStats.integer)
+			{
+				int msec = 0, secs = 0, mins = 0; //I love copypasta!
+				const char *s = NULL;
+
+				msec = level.time - ent->duelStartTick;
+				secs = msec / 1000;
+				mins = secs / 60;
+
+				secs %= 60;
+
+				s = va("%i:%02i", mins, abs(secs));
+
+				trap->SendServerCommand(-1, va("print \""S_COLOR_WHITE"Duration: "S_COLOR_YELLOW"%s\"", s));
+				trap->SendServerCommand(ent->s.number, va("cp \"%s"S_COLOR_WHITE" hit you "S_COLOR_YELLOW"%i"S_COLOR_WHITE" times.\n"S_COLOR_WHITE"You hit %s"S_COLOR_YELLOW" %d"S_COLOR_WHITE" times.\"", duelAgainst->client->pers.netname, duelAgainst->duelHitCount, duelAgainst->client->pers.netname, ent->duelHitCount));
+				trap->SendServerCommand(duelAgainst->s.number, va("cp \"%s"S_COLOR_WHITE" hit you "S_COLOR_YELLOW"%i"S_COLOR_WHITE" times.\n"S_COLOR_WHITE"You hit %s"S_COLOR_YELLOW" %d"S_COLOR_WHITE" times.\"", ent->client->pers.netname, ent->duelHitCount, ent->client->pers.netname, duelAgainst->duelHitCount));
+			}
 			ent->duelHitCount = 0;
 			ent->duelStartTick = 0;
 
