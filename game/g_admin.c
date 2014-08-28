@@ -1967,6 +1967,8 @@ static void AM_LockTeam( gentity_t *ent ) {
 		team = TEAM_BLUE;
 	else if ( !Q_stricmp( arg1, "spectator" ) || !Q_stricmp( arg1, "s" ) )
 		team = TEAM_SPECTATOR;
+	else if ( !Q_stricmp( arg1, "free" ) || !Q_stricmp( arg1, "f" ) )
+		team = TEAM_FREE;
 	else {
 		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Invalid team\n\"" );
 		return;
@@ -2013,6 +2015,8 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 		team = TEAM_BLUE;
 	else if ( !Q_stricmp( arg1, "spectator" ) || !Q_stricmp( arg1, "s" ) )
 		team = TEAM_SPECTATOR;
+	else if ( !Q_stricmp( arg1, "free" ) || !Q_stricmp( arg1, "f" ) )
+		team = TEAM_FREE;
 	else {
 		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Invalid team\n\"" );
 		return;

@@ -875,12 +875,15 @@ static qboolean SaberAttacking( gentity_t *self ) {
 		return qfalse;
 
 	//if we're firing and not blocking, then we're attacking.
-	if ( BG_SaberInAttack( self->client->ps.saberMove ) )
-		if ( self->client->ps.weaponstate == WEAPON_FIRING && self->client->ps.saberBlocked == BLOCKED_NONE )
+	if ( BG_SaberInAttack( self->client->ps.saberMove ) ) {
+		if ( self->client->ps.weaponstate == WEAPON_FIRING && self->client->ps.saberBlocked == BLOCKED_NONE ) {
 			return qtrue;
+		}
+	}
 
-	if ( BG_SaberInSpecial( self->client->ps.saberMove ) )
+	if ( BG_SaberInSpecial( self->client->ps.saberMove ) ) {
 		return qtrue;
+	}
 
 	return qfalse;
 }
@@ -3572,7 +3575,7 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 			}
 		}
 		else if ( (japp_saberTweaks.integer & SABERTWEAK_PROLONGDAMAGE)
-			&& BG_SaberInReturn( self->client->ps.saberMove ) )
+			&& (BG_SaberInReturn( self->client->ps.saberMove ) || PM_SaberInStart( self->client->ps.saberMove )) )
 		{
 			dmg = 10 * g_saberDamageScale.value;
 		}
