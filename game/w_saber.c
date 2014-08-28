@@ -2982,6 +2982,12 @@ void WP_SaberApplyDamage( gentity_t *self ) {
 		}
 		dflags |= saberKnockbackFlags[i];
 
+		//self, victim
+		if(self->client->ps.duelIndex == victim->s.clientNum && level.time > self->lastHit+300 /*300 since last hit*/) 
+		{
+			self->duelHitCount++; 
+			self->lastHit = level.time;
+		}
 		G_Damage( victim, self, self, &dmgDir[i], &dmgSpot[i], totalDmg[i], dflags, MOD_SABER );
 	}
 }
@@ -7748,6 +7754,8 @@ nextStep:
 				WP_SaberDoHit( self, rSaberNum, rBladeNum );
 				WP_SaberDoClash( self, rSaberNum, rBladeNum );
 
+
+
 				rBladeNum++;
 			}
 
@@ -7755,6 +7763,7 @@ nextStep:
 		}
 
 		WP_SaberApplyDamage( self );
+
 		//NOTE: doing one call like this after the 2 loops above is a bit cheaper, tempentity-wise... but won't use the correct saber and blade numbers...
 		//now actually go through and apply all the damage we did
 		//WP_SaberDoHit( self, 0, 0 );

@@ -289,6 +289,10 @@ struct gentity_s {
 	const gitem_t		*item;			// for bonus items
 	int					userinfoChanged;
 	int					userinfoSpam;
+	int					duelSwingCount; //Number of swings during the duel
+	int					duelHitCount; //Number of hits that damage the opponent
+	int					lastHit; 
+	int					duelStartTick; //level.time at the start of the duel, used later to determine the length
 	vector3				portal_matrix[3];
 	qboolean			jpSpawned;
 	uint32_t			savedContents;

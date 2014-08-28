@@ -2282,6 +2282,16 @@ void ClientThink_real( gentity_t *ent ) {
 				trap->SendServerCommand( -1, va( "cp \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELTIE" ) ) );
 			}
 
+			if( jp_duelStats.integer )
+				trap->SendServerCommand(-1, va("print \""S_COLOR_WHITE"Duration: "S_COLOR_YELLOW"%f "S_COLOR_WHITE"seconds.\"", ((float)level.time - ent->duelStartTick) / 1000));
+			trap->SendServerCommand(ent->s.number, va("cp \"%s"S_COLOR_WHITE" hit you "S_COLOR_YELLOW"%i"S_COLOR_WHITE" times.\n"S_COLOR_WHITE"You hit %s"S_COLOR_YELLOW" %d"S_COLOR_WHITE" times.\"", duelAgainst->client->pers.netname, duelAgainst->duelHitCount, duelAgainst->client->pers.netname, ent->duelHitCount));
+			trap->SendServerCommand(duelAgainst->s.number, va("cp \"%s"S_COLOR_WHITE" hit you "S_COLOR_YELLOW"%i"S_COLOR_WHITE" times.\n"S_COLOR_WHITE"You hit %s"S_COLOR_YELLOW" %d"S_COLOR_WHITE" times.\"", ent->client->pers.netname, ent->duelHitCount, ent->client->pers.netname, duelAgainst->duelHitCount));
+			
+			ent->duelHitCount = 0;
+			ent->duelStartTick = 0;
+
+			duelAgainst->duelHitCount = 0;
+			duelAgainst->duelStartTick = 0;
 			// respawn the players where they engaged the duel
 			if ( g_privateDuel.integer & PRIVDUEL_RESPAWN ) {
 				// winner

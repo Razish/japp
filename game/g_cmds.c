@@ -2219,6 +2219,11 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 			G_AddEvent( ent, EV_PRIVATE_DUEL, 1 );
 			G_AddEvent( challenged, EV_PRIVATE_DUEL, 1 );
 
+			ent->duelStartTick = level.time;
+			challenged->duelStartTick = level.time;
+			ent->duelHitCount = 0;
+			challenged->duelHitCount = 0;
+
 			if ( challenged->client->pers.duelWeapon == WP_SABER ) {
 				// Holster their sabers now, until the duel starts (then they'll get auto-turned on to look cool)
 				if ( !ent->client->ps.saberHolstered ) {
