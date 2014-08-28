@@ -3229,7 +3229,8 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 		VectorClear( &saberTrMaxs );
 	}
 	else if ( d_saberGhoul2Collision.integer ) {
-		if ( d_saberSPStyleDamage.integer ) {//SP-size saber damage traces
+		if ( d_saberSPStyleDamage.integer || japp_saberTweaks.integer & SABERTWEAK_TRACESIZE ) {
+			// SP-size saber damage traces
 			VectorSet( &saberTrMins, -2, -2, -2 );
 			VectorSet( &saberTrMaxs, 2, 2, 2 );
 		}
@@ -3388,8 +3389,8 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 		|| BG_SuperBreakWinAnim( self->client->ps.torsoAnim )
 		|| (d_saberSPStyleDamage.integer&&self->client->ps.saberInFlight&&rSaberNum == 0)
 		|| (WP_SaberBladeDoTransitionDamage( &self->client->saber[rSaberNum], rBladeNum ) && BG_SaberInTransitionAny( self->client->ps.saberMove ))
-		|| (self->client->ps.m_iVehicleNum && self->client->ps.saberMove > LS_READY))
-		) { //this animation is that of the last attack movement, and so it should do full damage
+		|| (self->client->ps.m_iVehicleNum && self->client->ps.saberMove > LS_READY)) )
+	{ //this animation is that of the last attack movement, and so it should do full damage
 		qboolean saberInSpecial = BG_SaberInSpecial( self->client->ps.saberMove );
 		qboolean inBackAttack = G_SaberInBackAttack( self->client->ps.saberMove );
 
@@ -3962,7 +3963,7 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 			&& otherOwner->client->ps.saberInFlight ) {//don't do extra collision checking vs sabers in air
 		}
 		else {//hit an in-hand saber, do extra collision check against it
-			if ( d_saberSPStyleDamage.integer ) {//use SP-style blade-collision test
+			if ( d_saberSPStyleDamage.integer || japp_saberTweaks.integer & SABERTWEAK_REDUCEBLOCKS ) {//use SP-style blade-collision test
 				if ( !WP_SabersIntersect( self, rSaberNum, rBladeNum, otherOwner, qfalse ) ) {//sabers did not actually intersect
 					return qfalse;
 				}
@@ -7906,6 +7907,24 @@ void WP_SaberBlock( gentity_t *playerent, vector3 *hitloc, qboolean missileBlock
 		playerent->client->ps.saberBlocked = WP_MissileBlockForBlock( playerent->client->ps.saberBlocked );
 }
 
+static int G_SaberLevelForStance( int stance ) {
+	switch ( stance ) {
+	case SS_FAST:
+		return 1;
+	case SS_MEDIUM:
+	case SS_STAFF:
+	case SS_DUAL:
+	case SS_TAVION:
+		return 2;
+	case SS_STRONG:
+	case SS_DESANN:
+		return 3;
+	default:
+		break;
+	}
+
+	return 0;
+}
 int WP_SaberCanBlock( gentity_t *self, vector3 *point, uint32_t dflags, int mod, qboolean projectile, int attackStr ) {
 	qboolean thrownSaber = qfalse;
 	float blockFactor = 0;
@@ -7963,47 +7982,15 @@ int WP_SaberCanBlock( gentity_t *self, vector3 *point, uint32_t dflags, int mod,
 
 	//Removed this for now, the new broken parry stuff should handle it. This is how
 	//blocks were decided before the 1.03 patch (as you can see, it was STUPID.. for the most part)
-	/*
-	if (attackStr == FORCE_LEVEL_3)
-	{
-	if (self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] >= FORCE_LEVEL_3)
-	{
-	if (Q_irand(1, 10) < 3)
-	{
-	return 0;
+	if ( japp_saberTweaks.integer & SABERTWEAK_REDUCEBLOCKS ) {
+		const int ourLevel = G_SaberLevelForStance( self->client->ps.fd.saberAnimLevel );
+		const int theirLevel = G_SaberLevelForStance( attackStr );
+		const int diff = theirLevel - ourLevel;
+		const float chance = Q_clamp( japp_saberBlockChanceMin.value, (3.0f - diff) / 3.0f, japp_saberBlockChanceMax.value );
+		if ( flrand( 0.0f, 1.0f ) > chance ) {
+			return 0;
+		}
 	}
-	}
-	else
-	{
-	return 0;
-	}
-	}
-
-	if (attackStr == FORCE_LEVEL_2 && Q_irand(1, 10) < 3)
-	{
-	if (self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] >= FORCE_LEVEL_3)
-	{
-	//do nothing for now
-	}
-	else if (self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] >= FORCE_LEVEL_2)
-	{
-	if (Q_irand(1, 10) < 5)
-	{
-	return 0;
-	}
-	}
-	else
-	{
-	return 0;
-	}
-	}
-
-	if (attackStr == FORCE_LEVEL_1 && !self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] &&
-	Q_irand(1, 40) < 3)
-	{ //if I have no defense level at all then I might be unable to block a level 1 attack (but very rarely)
-	return 0;
-	}
-	*/
 
 	if ( SaberAttacking( self ) ) { //attacking, can't block now
 		return 0;

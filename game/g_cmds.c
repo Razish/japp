@@ -2927,8 +2927,13 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 				(tweaks & SABERTWEAK_PROLONGDAMAGE) ? S_COLOR_GREEN : S_COLOR_RED ) );
 			Q_strcat( buf, sizeof(buf), va( "    %sDeflection\n",
 				(tweaks & SABERTWEAK_DEFLECTION) ? S_COLOR_GREEN : S_COLOR_RED ) );
-			Q_strcat( buf, sizeof(buf), va( "    %sSpecial moves\n",
+			Q_strcat( buf, sizeof( buf ), va( "    %sSpecial moves\n",
 				(tweaks & SABERTWEAK_SPECIALMOVES) ? S_COLOR_GREEN : S_COLOR_RED ) );
+			Q_strcat( buf, sizeof( buf ), va( "    %sTrace size\n",
+				(tweaks & SABERTWEAK_TRACESIZE) ? S_COLOR_GREEN : S_COLOR_RED ) );
+			Q_strcat( buf, sizeof( buf ), va( "    %sReduce blocks (%.02f - %.02f)\n",
+				(tweaks & SABERTWEAK_REDUCEBLOCKS) ? S_COLOR_GREEN : S_COLOR_RED,
+				japp_saberBlockChanceMin.value, japp_saberBlockChanceMax.value ) );
 
 			Q_strcat( buf, sizeof(buf), S_COLOR_WHITE "\n" );
 		}

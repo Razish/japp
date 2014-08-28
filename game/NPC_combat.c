@@ -1976,9 +1976,9 @@ qboolean NPC_CheckCanAttack( float attack_scale, qboolean stationary ) {
 			(!traceEnt || !traceEnt->client || !NPC->client->enemyTeam || NPC->client->enemyTeam != traceEnt->client->playerTeam) )
 			{//no, so shoot for somewhere between the head and torso
 			//NOTE: yes, I know this looks weird, but it works
-			enemy_org[0] += 0.3*Q_flrand(NPC->enemy->r.mins[0], NPC->enemy->r.maxs[0]);
-			enemy_org[1] += 0.3*Q_flrand(NPC->enemy->r.mins[1], NPC->enemy->r.maxs[1]);
-			enemy_org[2] -= NPC->enemy->r.maxs[2]*Q_flrand(0.0f, 1.0f);
+			enemy_org[0] += 0.3*flrand(NPC->enemy->r.mins[0], NPC->enemy->r.maxs[0]);
+			enemy_org[1] += 0.3*flrand(NPC->enemy->r.mins[1], NPC->enemy->r.maxs[1]);
+			enemy_org[2] -= NPC->enemy->r.maxs[2]*flrand(0.0f, 1.0f);
 
 			attack_scale *= 0.75f;
 			trap->Trace ( &tr, muzzle, NULL, NULL, enemy_org, NPC->s.number, MASK_SHOT, qfalse, 0, 0 );

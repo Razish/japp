@@ -1374,7 +1374,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh ) {
 	}
 	pVeh->m_ucmd.forwardmove = Q_irand( -32, 127 );
 	pVeh->m_ucmd.upmove = Q_irand( -127, 127 );
-	pVeh->m_vOrientation->yaw += Q_flrand( -10, 10 );
+	pVeh->m_vOrientation->yaw += flrand( -10, 10 );
 	pVeh->m_vOrientation->pitch += pVeh->m_fTimeModifier;
 	if ( pVeh->m_vOrientation->pitch > 60.0f )
 	{

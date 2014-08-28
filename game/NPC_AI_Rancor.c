@@ -241,7 +241,7 @@ void Rancor_Swing( qboolean tryGrab ) {
 				/*
 				//VectorSubtract( radiusEnt->r.currentOrigin, boltOrg, pushDir );
 				VectorSubtract( radiusEnt->r.currentOrigin, NPC->r.currentOrigin, pushDir );
-				pushDir[2] = Q_flrand( 100, 200 );
+				pushDir[2] = flrand( 100, 200 );
 				VectorNormalize( pushDir );
 				*/
 				VectorCopy( &NPC->client->ps.viewangles, &angs );

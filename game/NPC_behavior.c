@@ -786,7 +786,7 @@ void NPC_BSSearch( void ) {
 
 					//VectorSubtract( waypoints[nextWp].origin, NPCInfo->tempGoal->r.currentOrigin, lookDir );
 					//Look in that direction +- 45 degrees
-					//NPCInfo->desiredYaw = AngleNormalize360( vectoyaw( lookDir ) + Q_flrand( -45, 45 ) );
+					//NPCInfo->desiredYaw = AngleNormalize360( vectoyaw( lookDir ) + flrand( -45, 45 ) );
 				}
 			}
 			//Com_Printf(".");

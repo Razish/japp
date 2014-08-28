@@ -114,6 +114,19 @@ typedef struct gentity_s gentity_t;
 #define FL_DMG_BY_HEAVY_WEAP_ONLY	(0x00040000u) // only take dmg from explosives
 #define FL_BBRUSH					(0x00080000u) // i am a breakable brush
 
+#define EMF_NONE					(0x00u)
+#define EMF_STATIC					(0x01u) // hold animation on torso + legs, don't allow movement
+#define EMF_HOLD					(0x02u) // hold animation on torso
+#define EMF_HOLSTER					(0x08u) // forcibly deactivate saber
+
+#define SABERTWEAK_INTERPOLATE		(0x0001u)
+#define SABERTWEAK_PROLONGDAMAGE	(0x0002u)
+#define SABERTWEAK_DEFLECTION		(0x0004u)
+#define SABERTWEAK_SPECIALMOVES		(0x0008u)
+#define SABERTWEAK_TRACESIZE		(0x0010u)
+#define SABERTWEAK_REDUCEBLOCKS		(0x0020u)
+
+
 typedef enum moverState_e {
 	MOVER_POS1,
 	MOVER_POS2,
@@ -424,11 +437,6 @@ typedef struct renderInfo_s {
 	int			boltValidityTime;
 } renderInfo_t;
 
-#define EMF_NONE	(0x00u)
-#define EMF_STATIC	(0x01u) // hold animation on torso + legs, don't allow movement
-#define EMF_HOLD	(0x02u) // hold animation on torso
-#define EMF_HOLSTER	(0x08u) // forcibly deactivate saber
-
 typedef struct emote_s {
 	const char *name;
 	animNumber_t animLoop, animLeave;
@@ -702,12 +710,6 @@ typedef struct bot_settings_s {
 	float skill;
 	char team[MAX_FILEPATH];
 } bot_settings_t;
-
-// japp_saberTweaks
-#define SABERTWEAK_INTERPOLATE		(0x0001u)
-#define SABERTWEAK_PROLONGDAMAGE	(0x0002u)
-#define SABERTWEAK_DEFLECTION		(0x0004u)
-#define SABERTWEAK_SPECIALMOVES		(0x0008u)
 
 typedef enum teleportBits_e {
 	JAPP_TPBIT_SILENT = 0,

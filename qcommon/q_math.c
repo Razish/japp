@@ -1698,9 +1698,6 @@ float flrand( float min, float max ) {
 
 	return(result);
 }
-float Q_flrand( float min, float max ) {
-	return flrand( min, max );
-}
 
 // Returns an integer min <= x <= max (ie inclusive)
 
