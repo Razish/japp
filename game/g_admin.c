@@ -1229,6 +1229,10 @@ static void Slap( gentity_t *targ ) {
 	}
 	newDir.z = 1.0f;
 
+	if (targ->client->hook)
+	{
+		Weapon_HookFree(targ->client->hook);
+	}
 	G_Knockdown( targ, NULL, &newDir, japp_slapDistance.value, qtrue );
 	G_Throw( targ, &newDir, japp_slapDistance.value );
 
@@ -1276,6 +1280,10 @@ static void AM_GunSlap( gentity_t *ent ) {
 
 static void Freeze( gclient_t *cl ) {
 	cl->pers.adminData.isFrozen = qtrue;
+	if(cl->hook)
+	{
+		Weapon_HookFree(cl->hook);
+	}
 	VectorClear( &cl->ps.velocity );
 }
 
