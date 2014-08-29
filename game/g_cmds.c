@@ -544,13 +544,15 @@ void StopFollowing( gentity_t *ent ) {
 	ent->client->ps.weapon = WP_NONE;
 	//Raz: Bug fix with vehicles, from OJP code
 	G_LeaveVehicle( ent, qfalse ); // clears m_iVehicleNum as well
+	ent->client->ps.emplacedIndex = 0;
 	//ent->client->ps.m_iVehicleNum = 0;
 	ent->client->ps.viewangles.roll = 0.0f;
 	ent->client->ps.forceHandExtend = HANDEXTEND_NONE;
 	ent->client->ps.forceHandExtendTime = 0;
 	ent->client->ps.zoomMode = 0;
-	ent->client->ps.zoomLocked = 0;
+	ent->client->ps.zoomLocked = qfalse;
 	ent->client->ps.zoomLockTime = 0;
+	ent->client->ps.saberMove = LS_NONE;
 	ent->client->ps.legsAnim = 0;
 	ent->client->ps.legsTimer = 0;
 	ent->client->ps.torsoAnim = 0;
