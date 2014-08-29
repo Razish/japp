@@ -859,7 +859,6 @@ void			G_EntitySound( gentity_t *ent, int channel, int soundIndex );
 void			G_ExplodeMissile( gentity_t *ent );
 gentity_t *		G_Find( gentity_t *from, int fieldofs, const char *match );
 void			G_FreeEntity( gentity_t *e );
-gentity_t *		G_GetDuelWinner( gclient_t *client );
 char *			G_GetBotInfoByName( const char *name );
 const char *	G_GetStringEdString( const char *refSection, const char *refName );
 int				G_IconIndex( const char *name );

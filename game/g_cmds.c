@@ -275,18 +275,6 @@ void Cmd_Kill_f( gentity_t *ent ) {
 	player_die( ent, ent, ent, 100000, MOD_SUICIDE );
 }
 
-gentity_t *G_GetDuelWinner( gclient_t *client ) {
-	gclient_t *wCl;
-	int i;
-
-	for ( i = 0, wCl = level.clients; i < level.maxclients; i++, wCl++ ) {
-		if ( wCl != client && wCl->pers.connected == CON_CONNECTED && wCl->sess.sessionTeam != TEAM_SPECTATOR )
-			return &g_entities[wCl->ps.clientNum];
-	}
-
-	return NULL;
-}
-
 static int G_ClientNumFromNetname( char *name ) {
 	int i;
 	gentity_t *ent;
