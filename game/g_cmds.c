@@ -111,8 +111,9 @@ static void G_Give( gentity_t *ent, const char *name, const char *args, int argc
 	if ( give_all || !Q_stricmp( name, "ammo" ) ) {
 		int num = 999;
 		if ( argc == 3 )
+			num = Q_clampi( 0, atoi( args ), 999 );
 			num = atoi( args );
-		for ( i = 0; i < MAX_WEAPONS; i++ )
+		for ( i = AMMO_BLASTER; i < AMMO_MAX; i++ )
 			ent->client->ps.ammo[i] = num;
 		if ( !give_all )
 			return;
@@ -149,7 +150,11 @@ static void G_Give( gentity_t *ent, const char *name, const char *args, int argc
 		VectorCopy( &ent->r.currentOrigin, &it_ent->s.origin );
 		it_ent->classname = (char *)it->classname;
 		G_SpawnItem( it_ent, it );
+		if ( !it_ent || !it_ent->inuse )
+			return;
 		FinishSpawningItem( it_ent );
+		if ( !it_ent || !it_ent->inuse )
+			return;
 		memset( &trace, 0, sizeof(trace) );
 		Touch_Item( it_ent, ent, &trace );
 		if ( it_ent->inuse )
