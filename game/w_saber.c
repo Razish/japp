@@ -2985,12 +2985,14 @@ void WP_SaberApplyDamage( gentity_t *self ) {
 		}
 		dflags |= saberKnockbackFlags[i];
 
-		//self, victim
-		if(self->client->ps.duelIndex == victim->s.clientNum && level.time > self->lastHit+300 /*300 since last hit*/) 
+		// track the number of hits in a duel separately
+		if ( self->client->ps.duelInProgress && self->client->ps.duelIndex == victim->s.number
+			&& level.time > self->lastHit + 300 )
 		{
-			self->duelHitCount++; 
+			self->duelHitCount++;
 			self->lastHit = level.time;
 		}
+
 		G_Damage( victim, self, self, &dmgDir[i], &dmgSpot[i], totalDmg[i], dflags, MOD_SABER );
 	}
 }
@@ -7757,8 +7759,6 @@ nextStep:
 				//do hit effects
 				WP_SaberDoHit( self, rSaberNum, rBladeNum );
 				WP_SaberDoClash( self, rSaberNum, rBladeNum );
-
-
 
 				rBladeNum++;
 			}

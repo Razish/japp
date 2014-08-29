@@ -57,6 +57,10 @@ typedef struct gentity_s gentity_t;
 #define PRIVDUEL_TEAM				(0x0010u)
 #define PRIVDUEL_WEAP				(0x0020u)
 
+#define DUELSTATS_HEALTH			(0x0001u)
+#define DUELSTATS_TIME				(0x0002u)
+#define DUELSTATS_HITS				(0x0004u)
+
 #define FINDCL_SUBSTR				(0x0001u)
 #define FINDCL_FIRSTMATCH			(0x0002u)
 #define FINDCL_CASE					(0x0004u)
@@ -304,7 +308,7 @@ struct gentity_s {
 	int					userinfoSpam;
 	int					duelSwingCount; //Number of swings during the duel
 	int					duelHitCount; //Number of hits that damage the opponent
-	int					lastHit; 
+	int					lastHit;
 	int					duelStartTick; //level.time at the start of the duel, used later to determine the length
 	vector3				portal_matrix[3];
 	qboolean			jpSpawned;

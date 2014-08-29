@@ -2273,37 +2273,51 @@ void ClientThink_real( gentity_t *ent ) {
 			G_AddEvent( ent, EV_PRIVATE_DUEL, 0 );
 			G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, 0 );
 
-			//Private duel announcements are now made globally because we only want one duel at a time.
-			if ( ent->health > 0 && ent->client->ps.stats[STAT_HEALTH] > 0 )
-				trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"%s %s"S_COLOR_WHITE"! ("S_COLOR_RED"%i"S_COLOR_WHITE"/"S_COLOR_GREEN"%i"S_COLOR_WHITE")\n\"", ent->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELWINNER" ), duelAgainst->client->pers.netname, ent->client->ps.stats[STAT_HEALTH], ent->client->ps.stats[STAT_ARMOR] ) );
+			if ( ent->health > 0 && ent->client->ps.stats[STAT_HEALTH] > 0 ) {
+				char buf[MAX_STRING_CHARS - 64] = { 0 };
+				const char *defeated = G_GetStringEdString( "MP_SVGAME", "PLDUELWINNER" );
+				const char *winner = ent->client->pers.netname;
+				const char *loser = duelAgainst->client->pers.netname;
+
+				// x has defeated y
+				Com_sprintf( buf, sizeof(buf), "%s " S_COLOR_WHITE "%s %s", winner, defeated, loser );
+
+				// with h/a remaining
+				if ( japp_duelStats.integer & DUELSTATS_HEALTH ) {
+					const int health = ent->client->ps.stats[STAT_HEALTH];
+					const int armor = ent->client->ps.stats[STAT_ARMOR];
+
+					Q_strcat( buf, sizeof(buf), va( " " S_COLOR_WHITE "with " S_COLOR_RED "%i" S_COLOR_WHITE "/"
+						S_COLOR_GREEN "%i " S_COLOR_WHITE "remaining", health, armor ) );
+				}
+
+				// in xx:xx
+				if ( japp_duelStats.integer & DUELSTATS_TIME ) {
+					const int msec = level.time - ent->duelStartTick;
+					int secs = msec / 1000;
+					const int mins = secs / 60;
+
+					secs %= 60;
+
+					Q_strcat( buf, sizeof(buf), va( " " S_COLOR_WHITE "in " S_COLOR_CYAN "%i" S_COLOR_WHITE ":"
+						S_COLOR_CYAN "%02i", mins, secs ) );
+				}
+
+				// with y hits
+				if ( japp_duelStats.integer & DUELSTATS_HITS ) {
+					const int hits = ent->duelHitCount;
+					Q_strcat( buf, sizeof(buf), va( " " S_COLOR_WHITE "with " S_COLOR_YELLOW "%i" S_COLOR_WHITE " hits",
+						hits ) );
+				}
+
+				trap->SendServerCommand( -1, va( "print \"%s\n\"", buf ) );
+			}
 
 			else { //it was a draw, because we both managed to die in the same frame
 				trap->SendServerCommand( -1, va( "print \"%s: %s "S_COLOR_WHITE"vs %s! "S_COLOR_WHITE"("S_COLOR_RED"%i"S_COLOR_WHITE"/"S_COLOR_GREEN"%i"S_COLOR_WHITE")\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELTIE" ), ent->client->pers.netname, duelAgainst->client->pers.netname ) );
 				trap->SendServerCommand( -1, va( "cp \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELTIE" ) ) );
 			}
 
-			if (jp_duelStats.integer)
-			{
-				int msec = 0, secs = 0, mins = 0; //I love copypasta!
-				const char *s = NULL;
-
-				msec = level.time - ent->duelStartTick;
-				secs = msec / 1000;
-				mins = secs / 60;
-
-				secs %= 60;
-
-				s = va("%i:%02i", mins, abs(secs));
-
-				trap->SendServerCommand(-1, va("print \""S_COLOR_WHITE"Duration: "S_COLOR_YELLOW"%s\"", s));
-				trap->SendServerCommand(ent->s.number, va("cp \"%s"S_COLOR_WHITE" hit you "S_COLOR_YELLOW"%i"S_COLOR_WHITE" times.\n"S_COLOR_WHITE"You hit %s"S_COLOR_YELLOW" %d"S_COLOR_WHITE" times.\"", duelAgainst->client->pers.netname, duelAgainst->duelHitCount, duelAgainst->client->pers.netname, ent->duelHitCount));
-				trap->SendServerCommand(duelAgainst->s.number, va("cp \"%s"S_COLOR_WHITE" hit you "S_COLOR_YELLOW"%i"S_COLOR_WHITE" times.\n"S_COLOR_WHITE"You hit %s"S_COLOR_YELLOW" %d"S_COLOR_WHITE" times.\"", ent->client->pers.netname, ent->duelHitCount, ent->client->pers.netname, duelAgainst->duelHitCount));
-			}
-			ent->duelHitCount = 0;
-			ent->duelStartTick = 0;
-
-			duelAgainst->duelHitCount = 0;
-			duelAgainst->duelStartTick = 0;
 			// respawn the players where they engaged the duel
 			if ( g_privateDuel.integer & PRIVDUEL_RESPAWN ) {
 				// winner
