@@ -867,6 +867,11 @@ static void Cmd_Follow_f( gentity_t *ent ) {
 	int		i;
 	char	arg[MAX_TOKEN_CHARS];
 
+	if ( ent->client->sess.spectatorState == SPECTATOR_NOT && ent->client->switchTeamTime > level.time ) {
+		trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "NOSWITCH")) );
+		return;
+	}
+
 	if ( trap->Argc() != 2 ) {
 		if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW )
 			StopFollowing( ent );
@@ -898,6 +903,9 @@ static void Cmd_Follow_f( gentity_t *ent ) {
 	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		if ( !SetTeam( ent, "spectator", qfalse ) )
 			return;
+		// fix: update team switch time only if team change really happend
+		if (ent->client->sess.sessionTeam == TEAM_SPECTATOR)
+			ent->client->switchTeamTime = level.time + 5000;
 	}
 
 	ent->client->sess.spectatorState = SPECTATOR_FOLLOW;
@@ -908,6 +916,11 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 	int clientnum, original;
 	qboolean looped = qfalse;
 
+	if ( ent->client->sess.spectatorState == SPECTATOR_NOT && ent->client->switchTeamTime > level.time ) {
+		trap->SendServerCommand( ent-g_entities, va("print \"%s\n\"", G_GetStringEdString("MP_SVGAME", "NOSWITCH")) );
+		return;
+	}
+
 	// if they are playing a tournement game, count as a loss
 	if ( (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) && ent->client->sess.sessionTeam == TEAM_FREE )
 		ent->client->sess.losses++; //WTF???
@@ -916,6 +929,9 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 	if ( ent->client->sess.spectatorState == SPECTATOR_NOT ) {
 		if ( !SetTeam( ent, "spectator", qfalse ) )
 			return;
+		// fix: update team switch time only if team change really happend
+		if (ent->client->sess.sessionTeam == TEAM_SPECTATOR)
+			ent->client->switchTeamTime = level.time + 5000;
 	}
 
 	if ( dir != 1 && dir != -1 )
