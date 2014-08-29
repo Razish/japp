@@ -2699,23 +2699,23 @@ CG_CalcEntityLerpPositions
 void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	qboolean doLerp = qfalse;
 
-	if ( (cent->currentState.number != cg.clientNum
-		&& cent->currentState.number < MAX_CLIENTS
-		&& !CG_IsSpectating())
-		|| cent->currentState.eType == ET_NPC ) {
+	if ( cent->currentState.eType == ET_NPC
+		|| (cent->currentState.number < MAX_CLIENTS && cent->currentState.number != cg.clientNum) )
+	{
 		doLerp = qtrue;
 	}
 
 	// if this player does not want to see extrapolated players
-	if ( !cg_smoothClients.integer && doLerp ) {
+	if ( cg_smoothClients.integer && doLerp ) {
 		// make sure the clients use TR_INTERPOLATE
 		cent->currentState.pos.trType = TR_INTERPOLATE;
 		cent->nextState.pos.trType = TR_INTERPOLATE;
 	}
 
-	if ( cg.predictedPlayerState.m_iVehicleNum &&
-		cg.predictedPlayerState.m_iVehicleNum == cent->currentState.number &&
-		cent->currentState.eType == ET_NPC && cent->currentState.NPC_class == CLASS_VEHICLE ) {// special case for vehicle we are riding
+	// special case for vehicle we are riding
+	if ( cg.predictedPlayerState.m_iVehicleNum && cg.predictedPlayerState.m_iVehicleNum == cent->currentState.number
+		&& cent->currentState.eType == ET_NPC && cent->currentState.NPC_class == CLASS_VEHICLE )
+	{
 		centity_t *veh = &cg_entities[cg.predictedPlayerState.m_iVehicleNum];
 
 		if ( veh->currentState.owner == cg.predictedPlayerState.clientNum ) {
@@ -2733,13 +2733,13 @@ void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	//unlagged - timenudge extrapolation
 	// interpolating failed (probably no nextSnap), so extrapolate
-	/*
+#if 0
 	if ( cent->currentState.number < MAX_CLIENTS &&	cent->currentState.clientNum != cg.clientNum ) {
-	cent->currentState.pos.trType = TR_LINEAR_STOP;
-	cent->currentState.pos.trTime = cg.snap->serverTime;
+		cent->currentState.pos.trType = TR_LINEAR_STOP;
+		cent->currentState.pos.trTime = cg.snap->serverTime;
 	//	cent->currentState.pos.trDuration = 1000 / 30;//loda fix
 	}
-	*/
+#endif
 	//unlagged - timenudge extrapolation
 
 	// first see if we can interpolate between two snaps for
@@ -2755,8 +2755,10 @@ void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	}
 
 	// adjust for riding a mover if it wasn't rolled into the predicted player state
-	if ( cent->currentState.number != cg.predictedPlayerState.clientNum )
-		CG_AdjustPositionForMover( &cent->lerpOrigin, cent->currentState.groundEntityNum, cg.snap->serverTime, cg.time, &cent->lerpOrigin );
+	if ( cent->currentState.number != cg.predictedPlayerState.clientNum ) {
+		CG_AdjustPositionForMover( &cent->lerpOrigin, cent->currentState.groundEntityNum, cg.snap->serverTime, cg.time,
+			&cent->lerpOrigin );
+	}
 }
 
 void CG_G2Animated( centity_t *cent );
