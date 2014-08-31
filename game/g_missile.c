@@ -857,12 +857,13 @@ void G_RunMissile( gentity_t *ent ) {
 		}
 	}
 
-	if ( ent->parent &&
-		ent->parent->client &&
-		ent->parent->client->hook == ent &&
-		(ent->parent->client->ps.duelInProgress ||
-		BG_SaberInSpecial(ent->parent->client->ps.saberMove) ||
-		!(japp_allowHook.integer & (1 << level.gametype))) || ent->parent->client->pers.adminData.isFrozen ) {// not allowed to have hook out
+	if ( ent->parent && ent->parent->client && ent->parent->client->hook == ent
+		&& (ent->parent->client->ps.duelInProgress
+		|| BG_SaberInSpecial( ent->parent->client->ps.saberMove )
+		|| !(japp_allowHook.integer & (1 << level.gametype))
+		|| ent->parent->client->pers.adminData.isFrozen) )
+	{
+		// not allowed to have hook out
 		Weapon_HookFree( ent->parent->client->hook );
 	}
 
