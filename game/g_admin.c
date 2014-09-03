@@ -633,8 +633,7 @@ static void AM_Status( gentity_t *ent ) {
 
 // announce a message to all clients
 static void AM_Announce( gentity_t *ent ) {
-	char *msg, arg1[48];
-	int targetClient;
+	char *msg, arg1[MAX_NETNAME];
 
 	if ( trap->Argc() < 3 ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"Usage: \\ampsay <client> <message>\n\"" ) );
@@ -644,26 +643,20 @@ static void AM_Announce( gentity_t *ent ) {
 	msg = ConcatArgs( 2 );
 	Q_ConvertLinefeeds( msg );
 
-	//Grab the clientNum
 	trap->Argv( 1, arg1, sizeof(arg1) );
-	targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT );
-
-	//Check for purposely announcing to all. HACKHACKHACK
-	if ( arg1[0] == '-' && arg1[1] == '1' )
-		targetClient = -2;
-
-	// Invalid player
-	if ( targetClient == -1 )
-		return;
-
-	// print to everyone
-	else if ( targetClient == -2 ) {
+	if ( arg1[0] == '-' && arg1[1] == '1' ) {
+		// announce to everyone
 		G_LogPrintf( level.log.admin, "\t%s to <all clients>, %s\n", G_PrintClient( ent-g_entities ), msg );
 		trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
 	}
-
-	// valid client
 	else {
+		// announce to a certain client
+		const int targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT );
+
+		if ( targetClient == -1 ) {
+			return;
+		}
+
 		G_LogPrintf( level.log.admin, "\t%s to %s, %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ), msg );
 		trap->SendServerCommand( targetClient, va( "cp \"%s\"", msg ) );
