@@ -344,6 +344,12 @@ typedef enum playerTeamStateState_e {
 	TEAM_ACTIVE		// Now actively playing
 } playerTeamStateState_t;
 
+typedef enum sayTeamMethod_e {
+	STM_TEAM = 0,
+	STM_ADMIN,
+	STM_NUM_METHODS
+} sayTeamMethod_t;
+
 typedef struct playerTeamState_s {
 	playerTeamStateState_t	state;
 	int						location;
@@ -399,6 +405,7 @@ typedef struct clientPersistant_s {
 	vector3				duelStartPos; // respawn client to this position when duel ends
 	qboolean			ignore[MAX_CLIENTS];
 	int					speed;
+	sayTeamMethod_t		sayTeamMethod;
 } clientPersistant_t;
 
 typedef struct clientTrail_s {

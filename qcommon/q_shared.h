@@ -2423,10 +2423,12 @@ typedef enum flagStatus_e {
 #define MAX_PINGREQUESTS			32
 #define MAX_SERVERSTATUSREQUESTS	16
 
-#define SAY_ALL		0
-#define SAY_TEAM	1
-#define SAY_TELL	2
-#define SAY_ADMIN	3
+typedef enum chatType_e {
+	SAY_ALL = 0,
+	SAY_TEAM,
+	SAY_TELL,
+	SAY_ADMIN,
+} chatType_t;
 
 #define CDKEY_LEN 16
 #define CDCHKSUM_LEN 2

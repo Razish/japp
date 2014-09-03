@@ -990,35 +990,42 @@ static void Cmd_FollowPrev_f( gentity_t *ent ) {
 	Cmd_FollowCycle_f( ent, -1 );
 }
 
-static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message, char *locMsg ) {
+static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, char color, const char *name, const char *message, char *locMsg ) {
 	// valid client
-	if ( !other || !other->inuse || !other->client || other->client->pers.connected != CON_CONNECTED )
+	if ( !other || !other->inuse || !other->client || other->client->pers.connected != CON_CONNECTED ) {
 		return;
+	}
 
 	// only send team messages to those on your team
-	if ( mode == SAY_TEAM  && !OnSameTeam( ent, other ) )
+	if ( mode == SAY_TEAM  && !OnSameTeam( ent, other ) ) {
 		return;
+	}
 
-	// only send admin messages to other admins
-	if ( mode == SAY_ADMIN && !other->client->pers.adminUser )
+	// only send admin messages to other admins and yourself
+	if ( mode == SAY_ADMIN && !other->client->pers.adminUser && ent != other ) {
 		return;
+	}
 
 	// this client is ignoring us
-	if ( other->client->pers.ignore[ent - g_entities] )
+	if ( other->client->pers.ignore[ent - g_entities] ) {
 		return;
+	}
 
 	if ( level.gametype == GT_SIEGE && ent->client
 		&& (ent->client->tempSpectate >= level.time || ent->client->sess.sessionTeam == TEAM_SPECTATOR)
-		&& other->client->sess.sessionTeam != TEAM_SPECTATOR && other->client->tempSpectate < level.time ) {
-		//	siege temp spectators should not communicate to ingame players
+		&& other->client->sess.sessionTeam != TEAM_SPECTATOR && other->client->tempSpectate < level.time )
+	{
+		// siege temp spectators should not communicate to ingame players
 		return;
 	}
 
-	if ( locMsg ) {
+	if ( locMsg )
+	{
 		trap->SendServerCommand( other - g_entities, va( "%s \"%s\" \"%s\" \"%c\" \"%s\"",
 			(mode == SAY_TEAM) ? "ltchat" : "lchat", name, locMsg, color, message ) );
 	}
-	else {
+	else
+	{
 		trap->SendServerCommand( other - g_entities, va( "%s \"%s%c%c%s\"",
 			(mode == SAY_TEAM) ? "tchat" : "chat", name, Q_COLOR_ESCAPE, color, message ) );
 	}
@@ -1111,19 +1118,23 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 	}
 
 	// echo the text to the console
-	if ( dedicated.integer )
+	if ( dedicated.integer ) {
 		trap->Print( "%s%s\n", name, text );
+	}
 
 	// send it to all the apropriate clients
-	for ( i = 0, other = g_entities; i < level.maxclients; i++, other++ )
+	for ( i = 0, other = g_entities; i < level.maxclients; i++, other++ ) {
 		G_SayTo( ent, other, mode, color, name, text, locMsg );
+	}
 }
 
 static void Cmd_Say_f( gentity_t *ent ) {
 	char *p = NULL;
+	chatType_t type = SAY_ALL;
 
-	if ( trap->Argc() < 2 )
+	if ( trap->Argc() < 2 ) {
 		return;
+	}
 
 	p = ConcatArgs( 1 );
 
@@ -1133,14 +1144,16 @@ static void Cmd_Say_f( gentity_t *ent ) {
 		G_LogPrintf( level.log.security, "Cmd_Say_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
 
-	G_Say( ent, NULL, SAY_ALL, p );
+	G_Say( ent, NULL, type, p );
 }
 
 static void Cmd_SayAdmin_f( gentity_t *ent ) {
 	char *p = NULL;
+	chatType_t type = SAY_ADMIN;
 
-	if ( trap->Argc() < 2 )
+	if ( trap->Argc() < 2 ) {
 		return;
+	}
 
 	p = ConcatArgs( 1 );
 
@@ -1149,14 +1162,16 @@ static void Cmd_SayAdmin_f( gentity_t *ent ) {
 		G_LogPrintf( level.log.security, "Cmd_SayAdmin_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
 
-	G_Say( ent, NULL, SAY_ADMIN, p );
+	G_Say( ent, NULL, type, p );
 }
 
 static void Cmd_SayTeam_f( gentity_t *ent ) {
 	char *p = NULL;
+	chatType_t type = (level.gametype >= GT_TEAM) ? SAY_TEAM : SAY_ALL;
 
-	if ( trap->Argc() < 2 )
+	if ( trap->Argc() < 2 ) {
 		return;
+	}
 
 	p = ConcatArgs( 1 );
 
@@ -1166,7 +1181,38 @@ static void Cmd_SayTeam_f( gentity_t *ent ) {
 		G_LogPrintf( level.log.security, "Cmd_SayTeam_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
 
-	G_Say( ent, NULL, (level.gametype >= GT_TEAM) ? SAY_TEAM : SAY_ALL, p );
+	if ( ent->client->pers.sayTeamMethod == STM_ADMIN ) {
+		type = SAY_ADMIN;
+	}
+
+	G_Say( ent, NULL, type, p );
+}
+
+static const char *sayTeamMethods[STM_NUM_METHODS] = {
+	"team",
+	"admin"
+};
+
+static void Cmd_SayTeamMod_f( gentity_t *ent ) {
+	if ( trap->Argc() == 1 ) {
+		ent->client->pers.sayTeamMethod++;
+		ent->client->pers.sayTeamMethod %= STM_NUM_METHODS;
+	}
+
+	else {
+		char arg[64];
+		trap->Argv( 1, arg, sizeof(arg) );
+
+		if ( !Q_stricmp( arg, "admin" ) ) {
+			ent->client->pers.sayTeamMethod = STM_ADMIN;
+		}
+		else {
+			ent->client->pers.sayTeamMethod = STM_TEAM;
+		}
+	}
+
+	trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_CYAN "redirecting team messages to: %s\n\"",
+		sayTeamMethods[ent->client->pers.sayTeamMethod] ) );
 }
 
 static void Cmd_Tell_f( gentity_t *ent ) {
@@ -3367,6 +3413,7 @@ static const command_t commands[] = {
 	{ "sabercolor", Cmd_Sabercolor_f, GTB_ALL, 0 },
 	{ "say", Cmd_Say_f, GTB_ALL, 0 },
 	{ "say_team", Cmd_SayTeam_f, GTB_ALL, 0 },
+	{ "say_team_mod", Cmd_SayTeamMod_f, GTB_ALL, 0 },
 	{ "score", Cmd_Score_f, GTB_ALL, 0 },
 	{ "setviewpos", Cmd_SetViewpos_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_NOINTERMISSION },
 	{ "siegeclass", Cmd_SiegeClass_f, GTB_SIEGE, CMDFLAG_NOINTERMISSION },
