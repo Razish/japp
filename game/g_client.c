@@ -1067,6 +1067,7 @@ void respawn( gentity_t *ent ) {
 	MaintainBodyQueue( ent );
 
 	if ( ent->client->hook ) {//Raz: Make sure hook is removed, SHOULD BE DONE BEFORE THIS
+		assert( !"respawn(): grapple hook was not removed" );
 		Weapon_HookFree( ent->client->hook );
 	}
 
@@ -3502,6 +3503,8 @@ void ClientSpawn( gentity_t *ent ) {
 	SetClientViewAngle( ent, &spawn_angles );
 
 	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		const uint32_t animFlags = SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_HOLDLESS;
+
 		G_KillBox( ent );
 		trap->LinkEntity( (sharedEntity_t *)ent );
 
@@ -3515,10 +3518,16 @@ void ClientSpawn( gentity_t *ent ) {
 		client->ps.torsoTimer = client->ps.legsTimer = 0;
 
 		if ( client->ps.weapon == WP_SABER ) {
-			G_SetAnim( ent, NULL, SETANIM_BOTH, BOTH_STAND1TO2, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_HOLDLESS, 0 );
+			if ( japp_spawnActivateSaber.integer ) {
+				G_SetAnim( ent, NULL, SETANIM_BOTH, BOTH_STAND1TO2, animFlags, 0 );
+			}
+			else {
+				G_SetAnim( ent, NULL, SETANIM_BOTH, BOTH_STAND1, animFlags, 0 );
+				ent->client->ps.saberHolstered = 2;
+			}
 		}
 		else {
-			G_SetAnim( ent, NULL, SETANIM_TORSO, TORSO_RAISEWEAP1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_HOLDLESS, 0 );
+			G_SetAnim( ent, NULL, SETANIM_TORSO, TORSO_RAISEWEAP1, animFlags, 0 );
 			client->ps.legsAnim = WeaponReadyAnim[client->ps.weapon];
 		}
 		client->ps.weaponstate = WEAPON_RAISING;
