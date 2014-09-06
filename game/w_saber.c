@@ -6456,8 +6456,10 @@ static gentity_t *G_KickTrace( gentity_t *ent, vector3 *kickDir, float kickDist,
 		}
 
 		// chat protection
-		if ( japp_chatProtection.integer && (hitEnt->client->ps.eFlags & EF_TALK) ) {
-			return NULL;
+		if ( japp_chatProtection.integer ) {
+			if ( trace.entityNum < MAX_CLIENTS && hitEnt->client && (hitEnt->client->ps.eFlags & EF_TALK) ) {
+				return NULL;
+			}
 		}
 
 		ent->client->jediKickIndex = trace.entityNum;
