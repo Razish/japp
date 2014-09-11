@@ -3231,7 +3231,7 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 		VectorClear( &saberTrMaxs );
 	}
 	else if ( d_saberGhoul2Collision.integer ) {
-		if ( d_saberSPStyleDamage.integer || japp_saberTweaks.integer & SABERTWEAK_TRACESIZE ) {
+		if ( d_saberSPStyleDamage.integer || (japp_saberTweaks.integer & SABERTWEAK_TRACESIZE) ) {
 			// SP-size saber damage traces
 			VectorSet( &saberTrMins, -2, -2, -2 );
 			VectorSet( &saberTrMaxs, 2, 2, 2 );
@@ -6827,12 +6827,15 @@ static void G_GrabSomeMofos( gentity_t *self ) {
 		trace.entityNum < ENTITYNUM_WORLD ) {
 		gentity_t *grabbed = &g_entities[trace.entityNum];
 
-		if ( grabbed->inuse && (grabbed->s.eType == ET_PLAYER || grabbed->s.eType == ET_NPC) &&
-			grabbed->client && grabbed->health > 0 &&
-			G_CanBeEnemy( self, grabbed ) &&
-			G_PrettyCloseIGuess( grabbed->client->ps.origin.z, self->client->ps.origin.z, 4.0f ) &&
-			(!BG_InGrappleMove( grabbed->client->ps.torsoAnim ) || grabbed->client->ps.torsoAnim == BOTH_KYLE_GRAB) &&
-			(!BG_InGrappleMove( grabbed->client->ps.legsAnim ) || grabbed->client->ps.legsAnim == BOTH_KYLE_GRAB) ) { //grabbed an active player/npc
+		if ( grabbed->inuse && (grabbed->s.eType == ET_PLAYER || grabbed->s.eType == ET_NPC) && grabbed->client
+			&& grabbed->health > 0
+			&& (!grabbed->client->ps.duelInProgress || grabbed->client->ps.duelIndex == self->s.number)
+			&& (!self->client->ps.duelInProgress || self->client->ps.duelIndex == grabbed->s.number)
+			&& G_CanBeEnemy( self, grabbed )
+			&& G_PrettyCloseIGuess( grabbed->client->ps.origin.z, self->client->ps.origin.z, 4.0f )
+			&& (!BG_InGrappleMove( grabbed->client->ps.torsoAnim ) || grabbed->client->ps.torsoAnim == BOTH_KYLE_GRAB)
+			&& (!BG_InGrappleMove( grabbed->client->ps.legsAnim ) || grabbed->client->ps.legsAnim == BOTH_KYLE_GRAB) )
+		{ //grabbed an active player/npc
 			int tortureAnim = -1;
 			int correspondingAnim = -1;
 
