@@ -149,7 +149,7 @@ void JP_Bans_SaveBans( void ) {
 
 // Specify a NULL duration or a duration of '0' to make the ban permanent
 // * can be used as a wildcard to make range bans (ie 150.10.*.*)
-int JP_Bans_AddBanString( const char *ip, const char *duration, const char *reason ) {
+int JP_Bans_AddBanString( const char *ip, const char *duration, const char *reason, char *failedMsg, size_t msgLen ) {
 	byteAlias_t		m;
 	unsigned char	mask = 0u;
 	int				i, c;
@@ -177,24 +177,36 @@ int JP_Bans_AddBanString( const char *ip, const char *duration, const char *reas
 			}
 		}
 		// Check if we parsed any characters
-		if ( !c )
+		if ( !c ) {
+			if ( failedMsg ) {
+				Q_strncpyz( failedMsg, "Missing IP argument", msgLen );
+			}
 			return -1;
+		}
 
 		// Check if we've reached the end of the IP
 		if ( !*p || *p == ':' )
 			break;
 
 		// The next character MUST be a period
-		if ( *p != '.' )
+		if ( *p != '.' ) {
+			if ( failedMsg ) {
+				Q_strncpyz( failedMsg, "Invalid IP format", msgLen );
+			}
 			return -1;
+		}
 
 		i++;
 		p++;
 	}
 
 	// If i < 3, the parser ended prematurely, so abort
-	if ( i < 3 )
+	if ( i < 3 ) {
+		if ( failedMsg ) {
+			Q_strncpyz( failedMsg, "Incomplete IP", msgLen );
+		}
 		return -1;
+	}
 
 	// Parse expire date
 	if ( !duration || *duration == '0' )
@@ -243,16 +255,17 @@ int JP_Bans_AddBanString( const char *ip, const char *duration, const char *reas
 		}
 	}
 
-	//When in rome...
 	entry = (banentry_t *)malloc( sizeof(banentry_t) );
 	entry->id = nextBanId++;
 	entry->ip.ui = m.ui;
 	entry->expireTime = expire;
 	entry->mask = mask;
-	if ( reason )
+	if ( reason ) {
 		Q_strncpyz( entry->banreason, reason, sizeof(entry->banreason) );
-	else
+	}
+	else {
 		entry->banreason[0] = '\0';
+	}
 	//Fix the link
 	entry->next = banlist;
 	banlist = entry;

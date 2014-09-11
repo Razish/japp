@@ -1550,7 +1550,7 @@ static void AM_Kick( gentity_t *ent ) {
 }
 
 static void AM_Ban( gentity_t *ent ) {
-	char target[32] = { 0 }, duration[16] = { 0 }, string[960] = { 0 };
+	char target[32] = { 0 }, duration[16] = { 0 }, string[MAX_STRING_CHARS - 64] = { 0 };
 	const char *reason = "Not specified";
 	int targetClient;
 
@@ -1561,25 +1561,35 @@ static void AM_Ban( gentity_t *ent ) {
 
 	else {
 		//	clientNum / Partial name
+		char errorMsg[128];
+
 		trap->Argv( 1, target, sizeof(target) );
 		targetClient = G_ClientFromString( ent, target, FINDCL_SUBSTR | FINDCL_PRINT );
-		if ( targetClient == -1 )
+		if ( targetClient == -1 ) {
 			return;
+		}
 
-		if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
+		if ( !AM_CanInflict( ent, &g_entities[targetClient] ) ) {
 			return;
+		}
 
 		Q_strncpyz( target, g_entities[targetClient].client->sess.IP, sizeof(target) );
 
 		trap->Argv( 2, duration, sizeof(duration) );
-		if ( trap->Argc() >= 4 )
+		if ( trap->Argc() >= 4 ) {
 			reason = ConcatArgs( 3 );
+		}
 
-		JP_Bans_AddBanString( target, duration, reason );
-		G_LogPrintf( level.log.admin, "\t%s banned %s for \"%s\" until \"%s\"\n", G_PrintClient( ent-g_entities ),
-			target, reason, duration );
-		Com_sprintf( string, sizeof(string), "Banned!\nReason: %s", reason );
-		trap->DropClient( targetClient, string );
+		JP_Bans_AddBanString( target, duration, reason, errorMsg, sizeof(errorMsg) );
+		if ( errorMsg[0] ) {
+			trap->SendServerCommand( ent - g_entities, va( "print \"Failed to add ban: %s\n\"", errorMsg ) );
+		}
+		else {
+			G_LogPrintf( level.log.admin, "\t%s banned %s for \"%s\" until \"%s\"\n", G_PrintClient( ent-g_entities ),
+				target, reason, duration );
+			Com_sprintf( string, sizeof(string), "Banned!\nReason: %s", reason );
+			trap->DropClient( targetClient, string );
+		}
 	}
 
 	return;
@@ -1592,14 +1602,22 @@ static void AM_BanIP( gentity_t *ent ) {
 	if ( trap->Argc() < 2 )
 		trap->SendServerCommand( ent - g_entities, "print \"Syntax: \\ambanip <ip> <duration> <reason>\n\"" );
 	else {
-		trap->Argv( 1, ip, sizeof(ip) ); // IP
-		trap->Argv( 2, duration, sizeof(duration) ); // Duration
-		if ( trap->Argc() >= 4 )
-			reason = ConcatArgs( 3 ); // Reason
+		char errorMsg[128];
 
-		G_LogPrintf( level.log.admin, "\t%s banned IP \"%s\" for \"%s\" until \"%s\"\n", G_PrintClient( ent-g_entities ),
-			ip, reason, duration );
-		JP_Bans_AddBanString( ip, duration, reason );
+		trap->Argv( 1, ip, sizeof(ip) );
+		trap->Argv( 2, duration, sizeof(duration) );
+		if ( trap->Argc() >= 4 ) {
+			reason = ConcatArgs( 3 );
+		}
+
+		JP_Bans_AddBanString( ip, duration, reason, errorMsg, sizeof(errorMsg) );
+		if ( errorMsg[0] ) {
+			trap->SendServerCommand( ent - g_entities, va( "print \"Failed to add ban: %s\n\"", errorMsg ) );
+		}
+		else {
+			G_LogPrintf( level.log.admin, "\t%s banned IP \"%s\" for \"%s\" until \"%s\"\n",
+				G_PrintClient( ent-g_entities ), ip, reason, duration );
+		}
 	}
 
 	return;

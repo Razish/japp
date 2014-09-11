@@ -123,12 +123,12 @@ typedef struct gentity_s gentity_t;
 #define EMF_HOLD					(0x02u) // hold animation on torso
 #define EMF_HOLSTER					(0x08u) // forcibly deactivate saber
 
-#define SABERTWEAK_INTERPOLATE		(0x0001u)
-#define SABERTWEAK_PROLONGDAMAGE	(0x0002u)
-#define SABERTWEAK_DEFLECTION		(0x0004u)
-#define SABERTWEAK_SPECIALMOVES		(0x0008u)
-#define SABERTWEAK_TRACESIZE		(0x0010u)
-#define SABERTWEAK_REDUCEBLOCKS		(0x0020u)
+#define SABERTWEAK_INTERPOLATE		(0x0001u) // use SP style interpolation, also fix various small issues
+#define SABERTWEAK_PROLONGDAMAGE	(0x0002u) // allow damaging in wind-up and return animations
+#define SABERTWEAK_DEFLECTION		(0x0004u) // calculate deflection based on position rather than animation
+#define SABERTWEAK_SPECIALMOVES		(0x0008u) // tweak damages for special moves
+#define SABERTWEAK_TRACESIZE		(0x0010u) // use SP saber trace size or based off radius defined in .sab file
+#define SABERTWEAK_REDUCEBLOCKS		(0x0020u) // reduce chance of blocking based on saber stance
 
 
 typedef enum moverState_e {

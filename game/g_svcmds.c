@@ -194,7 +194,8 @@ static void SV_AllReady_f( void ) {
 }
 
 static void SV_BanAdd_f( void ) {
-	char ip[NET_ADDRSTRMAXLEN] = { 0 }, duration[32] = { 0 }, *reason = NULL;
+	char ip[NET_ADDRSTRMAXLEN] = { 0 }, duration[32] = { 0 }, errorMsg[128];
+	const char *reason = NULL;
 
 	if ( trap->Argc() < 2 ) {
 		trap->Print( "Syntax: banadd <ip> <duration> <reason>\n" );
@@ -203,9 +204,13 @@ static void SV_BanAdd_f( void ) {
 
 	trap->Argv( 1, ip, sizeof(ip) );
 	trap->Argv( 2, duration, sizeof(duration) );
-	if ( trap->Argc() >= 4 )
+	if ( trap->Argc() >= 4 ) {
 		reason = ConcatArgs( 3 );
-	JP_Bans_AddBanString( ip, duration, reason );
+	}
+	JP_Bans_AddBanString( ip, duration, reason, errorMsg, sizeof(errorMsg) );
+	if ( errorMsg[0] ) {
+		trap->Print( "Failed to add ban: %s\n", errorMsg );
+	}
 }
 
 static void SV_BanDel_f( void ) {

@@ -87,6 +87,6 @@ void		JP_Bans_Init( void );
 void		JP_Bans_SaveBans( void );
 void		JP_Bans_List( void );
 qboolean	JP_Bans_Remove( byte *ip );
-int			JP_Bans_AddBanString( const char *ip, const char *duration, const char *reason );
+int			JP_Bans_AddBanString( const char *ip, const char *duration, const char *reason, char *failedMsg, size_t msgLen );
 const char	*JP_Bans_IsBanned( byte *ip );
 byteAlias_t *BuildByteFromIP( const char *ip );
