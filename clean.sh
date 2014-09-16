@@ -62,4 +62,4 @@ then
 fi
 
 # remove any lingering object files
-`find . -name '*.o' -print0 | xargs -0 rm`
+find . -name '*.o' -print0 | xargs -0 rm

@@ -10,11 +10,9 @@
 # options:
 #	debug		generate debug information. value 2 also enables optimisations
 #	force32		force 32 bit target when on 64 bit machine
-#	compiler=?	use an alternate compiler
-#	analyse		run static analysis
 #
 # example:
-#	scons project=game debug=1 force32=1 compiler=clang
+#	scons project=game debug=1 force32=1
 #
 
 import platform
@@ -30,8 +28,6 @@ arch = None # platform-specific, set manually
 
 print( 'Configuring build environment...' )
 
-analyse = int( ARGUMENTS.get( 'analyse', 0 ) )
-compiler = ARGUMENTS.get( 'compiler', 'gcc' )
 debug = int( ARGUMENTS.get( 'debug', 0 ) )
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 project = ARGUMENTS.get( 'project', '' )
@@ -60,11 +56,12 @@ if not debug or debug == 2:
 	print( 'Optimisation enabled' )
 if force32:
 	print( 'Forcing 32 bit compile' )
-if analyse:
-	print( 'WARNING: Running static analysis mode. Will not produce binaries' )
 print( '' )
 
 env = Environment( TARGET_ARCH = arch )
+env['CC'] = os.getenv( 'CC' ) or env[ 'CC' ]
+env['CXX'] = os.getenv( 'CXX' ) or env[ 'CXX' ]
+env['ENV'].update( x for x in os.environ.items() if x[0].startswith( 'CCC_' ) )
 if plat != 'Windows':
 	env['ENV']['TERM'] = os.environ['TERM']
 
@@ -330,7 +327,6 @@ elif plat == 'Windows':
 
 # compiler options
 if plat == 'Linux':
-	env['CC'] = compiler
 	env['CPPDEFINES'] = []
 	env['CFLAGS'] = [
 		'-Wdeclaration-after-statement',
@@ -366,7 +362,7 @@ if plat == 'Linux':
 	#	'-Wunsuffixed-float-constants',
 		'-Wwrite-strings',
 		]
-	if compiler == 'gcc' and arch != 'arm':
+	if env['CC'] == 'gcc' and arch != 'arm':
 		env['CCFLAGS'] += [
 			'-mfpmath=sse',
 			'-Wlogical-op' ]
@@ -374,9 +370,6 @@ if plat == 'Linux':
 		if float(ver) >= 4.7:
 			env['CCFLAGS'] += [ '-Wstack-usage=32768' ]
 	env['CXXFLAGS'] += [ '-fvisibility-inlines-hidden', '-std=c++11' ]
-	if analyse:
-		env['CC'] = 'clang'
-		env['CCFLAGS'] += [ '--analyze' ]
 	if arch == 'arm':
 		env['CCFLAGS'] += [ '-fsigned-char' ]
 	else:

@@ -6,14 +6,14 @@ ARGSLEN=${#ARGS[@]}
 
 # options
 DEBUG=0
-ANALYSE=0
 FORCE32=0
-COMPILER='gcc'
 
 # targets
 GAME=0
 CGAME=0
 UI=0
+
+build='scons'
 
 for (( i=0; i<${ARGSLEN}; i++ ));
 do
@@ -24,11 +24,8 @@ do
 	"fastdebug")
 		DEBUG=2
 		;;
-	"clang")
-		COMPILER='clang'
-		;;
 	"analyse")
-		ANALYSE=1
+		build='scan-build scons'
 		;;
 	"force32")
 		FORCE32=1
@@ -60,15 +57,15 @@ fi
 
 if [ $GAME -eq 1 ]
 then
-	scons project=game debug=$DEBUG compiler=$COMPILER analyse=$ANALYSE force32=$FORCE32 >/dev/null
+	$build project=game debug=$DEBUG force32=$FORCE32 >/dev/null
 fi
 
 if [ $CGAME -eq 1 ]
 then
-	scons project=cgame debug=$DEBUG compiler=$COMPILER analyse=$ANALYSE force32=$FORCE32 >/dev/null
+	$build project=cgame debug=$DEBUG force32=$FORCE32 >/dev/null
 fi
 
 if [ $UI -eq 1 ]
 then
-	scons project=ui debug=$DEBUG compiler=$COMPILER analyse=$ANALYSE force32=$FORCE32 >/dev/null
+	$build project=ui debug=$DEBUG force32=$FORCE32 >/dev/null
 fi
