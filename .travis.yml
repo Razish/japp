@@ -4,7 +4,7 @@ compiler:
   - clang
 
 install:
-  - sudo apt-get install libreadline-dev
+  - sudo apt-get install libreadline-dev gcc-multilib clang
 
 script:
   - scons -Q project=game debug=0 compiler=gcc analyse=0 force32=0
