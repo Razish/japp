@@ -14,7 +14,7 @@ typedef struct telemark_s {
 
 // client admin data
 typedef struct adminData_s {
-	qboolean canTalk; // have they been silenced?
+	qboolean silenced; // have they been silenced?
 	qboolean isGhost; // are they a ghost?
 	qboolean isGhost2; // are they a ghost? RAZTEST
 	qboolean isFrozen; // are they frozen?

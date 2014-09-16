@@ -1,52 +1,32 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
 #include "g_local.h"
 
-
-/*
-=======================================================================
-
-SESSION DATA
-
-Session data is the only data that stays persistant across level loads
-and tournament restarts.
-=======================================================================
-*/
-
+// Session data is the only data that stays persistant across level loads and tournament restarts.
 //TODO: Replace with reading/writing to file(s)
 
-/*
-================
-G_WriteClientSessionData
-
-Called on game shutdown
-================
-*/
+// Called on game shutdown
 void G_WriteClientSessionData( gclient_t *client ) {
-	char		s[MAX_CVAR_VALUE_STRING] = { 0 },
-		siegeClass[64] = { 0 }, IP[NET_ADDRSTRMAXLEN] = { 0 };
-	const char	*var;
-	int			i = 0;
+	char s[MAX_CVAR_VALUE_STRING] = { 0 }, siegeClass[64] = { 0 }, IP[NET_ADDRSTRMAXLEN] = { 0 };
+	const char *var = NULL;
+	int i;
 
 	// for the strings, replace ' ' with 1
 
 	Q_strncpyz( siegeClass, client->sess.siegeClass, sizeof(siegeClass) );
 	for ( i = 0; siegeClass[i]; i++ ) {
-		if ( siegeClass[i] == ' ' )
+		if ( siegeClass[i] == ' ' ) {
 			siegeClass[i] = 1;
+		}
 	}
-	if ( !siegeClass[0] )
+	if ( !siegeClass[0] ) {
 		Q_strncpyz( siegeClass, "none", sizeof(siegeClass) );
+	}
 
 	Q_strncpyz( IP, client->sess.IP, sizeof(IP) );
 	for ( i = 0; IP[i]; i++ ) {
-		if ( IP[i] == ' ' )
+		if ( IP[i] == ' ' ) {
 			IP[i] = 1;
+		}
 	}
-#if 0
-	if ( !IP[0] )
-		Q_strncpyz( IP, "none", sizeof( IP ) );
-#endif
 
 	// Make sure there is no space on the last entry
 	Q_strcat( s, sizeof(s), va( "%i ", client->sess.sessionTeam ) );
@@ -68,18 +48,12 @@ void G_WriteClientSessionData( gclient_t *client ) {
 	trap->Cvar_Set( var, s );
 }
 
-/*
-================
-G_ReadSessionData
-
-Called on a reconnect
-================
-*/
+// Called on a reconnect
 void G_ReadSessionData( gclient_t *client ) {
-	char		s[MAX_CVAR_VALUE_STRING] = { 0 };
-	const char	*var;
-	int			i = 0;
-	int			tmp1, tmp2;
+	char s[MAX_CVAR_VALUE_STRING] = { 0 };
+	const char *var = NULL;
+	int i;
+	int tmp1, tmp2;
 
 	var = va( "session%i", client - level.clients );
 	trap->Cvar_VariableStringBuffer( var, s, sizeof(s) );
@@ -106,13 +80,15 @@ void G_ReadSessionData( gclient_t *client ) {
 
 	// convert back to spaces from unused chars, as session data is written that way.
 	for ( i = 0; client->sess.siegeClass[i]; i++ ) {
-		if ( client->sess.siegeClass[i] == 1 )
+		if ( client->sess.siegeClass[i] == 1 ) {
 			client->sess.siegeClass[i] = ' ';
+		}
 	}
 
 	for ( i = 0; client->sess.IP[i]; i++ ) {
-		if ( client->sess.IP[i] == 1 )
+		if ( client->sess.IP[i] == 1 ) {
 			client->sess.IP[i] = ' ';
+		}
 	}
 
 	client->ps.fd.saberAnimLevel = client->sess.saberLevel;
@@ -120,19 +96,10 @@ void G_ReadSessionData( gclient_t *client ) {
 	client->ps.fd.forcePowerSelected = client->sess.selectedFP;
 }
 
-
-/*
-================
-G_InitSessionData
-
-Called on a first-time connect
-================
-*/
+// Called on a first-time connect
 void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
-	clientSession_t	*sess;
-	const char		*value;
-
-	sess = &client->sess;
+	clientSession_t *sess = &client->sess;
+	const char *value;
 
 	client->sess.siegeDesiredTeam = TEAM_FREE;
 

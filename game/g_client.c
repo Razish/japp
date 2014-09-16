@@ -2044,24 +2044,22 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		}
 	}
 
-#if 0
 	// bots set their team a few frames later
-	if ( level.gametype >= GT_TEAM && g_entities[clientNum].r.svFlags & SVF_BOT )
-	{
+	if ( level.gametype >= GT_TEAM && (g_entities[clientNum].r.svFlags & SVF_BOT) ) {
 		s = Info_ValueForKey( userinfo, "team" );
-		if ( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) )
+		if ( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) ) {
 			team = TEAM_RED;
-		else if ( !Q_stricmp( s, "blue" ) || !Q_stricmp( s, "b" ) )
+		}
+		else if ( !Q_stricmp( s, "blue" ) || !Q_stricmp( s, "b" ) ) {
 			team = TEAM_BLUE;
-		else
+		}
+		else {
 			team = PickTeam( clientNum ); // pick the team with the least number of players
+		}
 	}
-	else
+	else {
 		team = client->sess.sessionTeam;
-#else
-	//Testing to see if this fixes the problem with a bot's team getting set incorrectly.
-	team = client->sess.sessionTeam;
-#endif
+	}
 
 	//Set the siege class
 	if ( level.gametype == GT_SIEGE ) {
@@ -2411,8 +2409,9 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 			G_GetStringEdString( "MP_SVGAME", "PLCONNECT" ) ) );
 	}
 
-	if ( level.gametype >= GT_TEAM && client->sess.sessionTeam != TEAM_SPECTATOR )
+	if ( level.gametype >= GT_TEAM && client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		BroadcastTeamChange( client, -1 );
+	}
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();
@@ -2590,9 +2589,6 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();
-
-	//Raz: Set admin data
-	client->pers.adminData.canTalk = qtrue;
 
 	JPLua_Event_ClientBegin( clientNum );
 
@@ -3548,18 +3544,6 @@ void ClientSpawn( gentity_t *ent ) {
 	else {
 		// fire the targets of the spawn point
 		G_UseTargets( spawnPoint, ent );
-
-		// select the highest weapon number available, after any
-		// spawn given items have fired
-		/*
-		client->ps.weapon = 1;
-		for ( i = WP_NUM_WEAPONS - 1 ; i > 0 ; i-- ) {
-		if ( client->ps.stats[STAT_WEAPONS] & ( 1 << i ) ) {
-		client->ps.weapon = i;
-		break;
-		}
-		}
-		*/
 	}
 
 	//set teams for NPCs to recognize

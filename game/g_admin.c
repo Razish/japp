@@ -1402,7 +1402,7 @@ static void AM_Silence( gentity_t *ent ) {
 			if ( !AM_CanInflict( ent, e ) )
 				continue;
 
-			level.clients[i].pers.adminData.canTalk = qfalse;
+			level.clients[i].pers.adminData.silenced = qtrue;
 		}
 		G_LogPrintf( level.log.admin, "\t%s silenced everyone\n", G_PrintClient( ent-g_entities ) );
 		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_CYAN"silenced\n\"" );
@@ -1416,7 +1416,7 @@ static void AM_Silence( gentity_t *ent ) {
 	if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
 		return;
 
-	level.clients[targetClient].pers.adminData.canTalk = qfalse;
+	level.clients[targetClient].pers.adminData.silenced = qtrue;
 	G_LogPrintf( level.log.admin, "\t%s silenced %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( targetClient ) );
 	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"silenced\n\"",
 		level.clients[targetClient].pers.netname ) );
@@ -1446,7 +1446,7 @@ static void AM_Unsilence( gentity_t *ent ) {
 			if ( !AM_CanInflict( ent, e ) )
 				continue;
 
-			level.clients[i].pers.adminData.canTalk = qtrue;
+			level.clients[i].pers.adminData.silenced = qfalse;
 		}
 		G_LogPrintf( level.log.admin, "\t%s unsilenced everyone\n", G_PrintClient( ent-g_entities ) );
 		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_CYAN"unsilenced\n\"" );
@@ -1460,7 +1460,7 @@ static void AM_Unsilence( gentity_t *ent ) {
 	if ( !AM_CanInflict( ent, &g_entities[targetClient] ) )
 		return;
 
-	level.clients[targetClient].pers.adminData.canTalk = qtrue;
+	level.clients[targetClient].pers.adminData.silenced = qfalse;
 	G_LogPrintf( level.log.admin, "\t%s unsilenced %s\n", G_PrintClient( ent-g_entities ),
 		G_PrintClient( targetClient ) );
 	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"un-silenced\n\"", level.clients[targetClient].pers.netname ) );

@@ -374,8 +374,9 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 	spectatorState_t	specState;
 
 	//Raz: this prevents rare creation of invalid players
-	if ( !ent->inuse )
+	if ( !ent->inuse ) {
 		return qfalse;
+	}
 
 	//
 	// see what change is requested
@@ -432,8 +433,9 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 		}
 	}
 	// force them to spectators if there aren't any spots free
-	else
-		team = TEAM_FREE;
+	else {
+		team = TEAM_SPECTATOR;
+	}
 
 	oldTeam = client->sess.sessionTeam;
 
@@ -508,7 +510,7 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 		G_ClearVote( ent );
 	}
 
-	client->sess.sessionTeam = team;
+	client->sess.sessionTeam = (team_t)team;
 	client->sess.spectatorState = specState;
 	client->sess.spectatorClient = specClient;
 
@@ -802,16 +804,19 @@ static void Cmd_SiegeClass_f( gentity_t *ent ) {
 
 static void Cmd_ForceChanged_f( gentity_t *ent ) {
 	// if it's a spec, just make the changes now
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR )
+	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		WP_InitForcePowers( ent );
+	}
 	else {
-		trap->SendServerCommand( ent - g_entities, va( "print \""S_COLOR_GREEN"%s\n\"", G_GetStringEdString( "MP_SVGAME", "FORCEPOWERCHANGED" ) ) );
+		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_GREEN "%s\n\"",
+			G_GetStringEdString( "MP_SVGAME", "FORCEPOWERCHANGED" ) ) );
 		ent->client->ps.fd.forceDoInit = 1;
 	}
 
 	// if this is duel, don't even bother changing team in relation to this.
-	if ( level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL )
+	if ( level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL ) {
 		return;
+	}
 
 	if ( trap->Argc() > 1 ) {
 		char arg[MAX_TOKEN_CHARS];
@@ -819,8 +824,9 @@ static void Cmd_ForceChanged_f( gentity_t *ent ) {
 		trap->Argv( 1, arg, sizeof(arg) );
 
 		// if there's an arg, assume it's a combo team command from the UI.
-		if ( arg[0] )
+		if ( arg[0] ) {
 			Cmd_Team_f( ent );
+		}
 	}
 }
 
@@ -1051,8 +1057,9 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 	if ( level.gametype < GT_TEAM && mode == SAY_TEAM )
 		mode = SAY_ALL;
 
-	if ( !ent->client->pers.adminData.canTalk )
+	if ( ent->client->pers.adminData.silenced ) {
 		return;
+	}
 
 	//RAZTODO: strip ext ascii/control chars
 	if ( strstr( ent->client->pers.netname, "<Admin>" ) || Q_strchrs( chatText, "\n\r\x0b" ) )

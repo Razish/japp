@@ -134,9 +134,10 @@ const int mindTrickTime[NUM_FORCE_POWER_LEVELS] =
 };
 
 void WP_InitForcePowers( gentity_t *ent ) {
-	int i, i_r, lastFPKnown = -1;
+	int i, lastFPKnown = -1;
 	qboolean warnClient = qfalse, warnClientLimit = qfalse, didEvent = qfalse;
-	char userinfo[MAX_INFO_STRING], forcePowers[DEFAULT_FORCEPOWERS_LEN + 1], readBuf[DEFAULT_FORCEPOWERS_LEN + 1];
+	char forcePowers[DEFAULT_FORCEPOWERS_LEN + 1] = { 0 };
+	const char *fpStringError = NULL;
 
 	// if server has no max rank, default to max (50)
 	if ( g_maxForceRank.integer <= 0 || g_maxForceRank.integer >= NUM_FORCE_MASTERY_LEVELS ) {
@@ -145,30 +146,39 @@ void WP_InitForcePowers( gentity_t *ent ) {
 		trap->Cvar_Update( &g_maxForceRank );
 	}
 
-	if ( !ent || !ent->client )
+	if ( !ent || !ent->client ) {
 		return;
+	}
 
 	ent->client->ps.fd.saberAnimLevel = ent->client->sess.saberLevel;
 
-	if ( ent->client->ps.fd.saberAnimLevel < FORCE_LEVEL_1 || ent->client->ps.fd.saberAnimLevel > FORCE_LEVEL_3 )
+	if ( ent->client->ps.fd.saberAnimLevel < FORCE_LEVEL_1 || ent->client->ps.fd.saberAnimLevel > FORCE_LEVEL_3 ) {
 		ent->client->ps.fd.saberAnimLevel = FORCE_LEVEL_1;
+	}
 
 	// so that the client configstring is already modified with this when we need it
-	if ( !speedLoopSound )
+	if ( !speedLoopSound ) {
 		speedLoopSound = G_SoundIndex( "sound/weapons/force/speedloop.wav" );
-	if ( !rageLoopSound )
+	}
+	if ( !rageLoopSound ) {
 		rageLoopSound = G_SoundIndex( "sound/weapons/force/rageloop.wav" );
-	if ( !absorbLoopSound )
+	}
+	if ( !absorbLoopSound ) {
 		absorbLoopSound = G_SoundIndex( "sound/weapons/force/absorbloop.wav" );
-	if ( !protectLoopSound )
+	}
+	if ( !protectLoopSound ) {
 		protectLoopSound = G_SoundIndex( "sound/weapons/force/protectloop.wav" );
-	if ( !seeLoopSound )
+	}
+	if ( !seeLoopSound ) {
 		seeLoopSound = G_SoundIndex( "sound/weapons/force/seeloop.wav" );
-	if ( !ysalamiriLoopSound )
+	}
+	if ( !ysalamiriLoopSound ) {
 		ysalamiriLoopSound = G_SoundIndex( "sound/player/nullifyloop.wav" );
+	}
 
-	if ( ent->s.eType == ET_NPC )
+	if ( ent->s.eType == ET_NPC ) {
 		return;
+	}
 
 	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
 		ent->client->ps.fd.forcePowerLevel[i] = 0;
@@ -189,122 +199,85 @@ void WP_InitForcePowers( gentity_t *ent ) {
 		}
 
 		// bring up the class selection menu
-		if ( !ent->client->sess.setForce )
+		if ( !ent->client->sess.setForce ) {
 			trap->SendServerCommand( ent - g_entities, "scl" );
+		}
 		ent->client->sess.setForce = qtrue;
 
 		return;
 	}
 
-	//rwwFIXMEFIXME: Temp
-	if ( ent->s.eType == ET_NPC && ent->s.number >= MAX_CLIENTS )
-		Q_strncpyz( userinfo, "forcepowers\\7-1-333003000313003120", sizeof(userinfo) );
-	else
-		trap->GetUserinfo( ent->s.number, userinfo, sizeof(userinfo) );
-
-	Q_strncpyz( forcePowers, Info_ValueForKey( userinfo, "forcepowers" ), sizeof(forcePowers) );
-
-	if ( strlen( forcePowers ) != DEFAULT_FORCEPOWERS_LEN ) {
-		Q_strncpyz( forcePowers, DEFAULT_FORCEPOWERS, sizeof(forcePowers) );
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_RED"Invalid forcepowers string, setting default\n\"" );
+	if ( ent->s.eType == ET_NPC && ent->s.number >= MAX_CLIENTS ) {
+		Q_strncpyz( forcePowers, "7-1-333003000313003120", sizeof(forcePowers) );
 	}
-
-	//if it's a bot just copy the info directly from its personality
-	if ( (ent->r.svFlags & SVF_BOT) && botstates[ent->s.number] )
+	else if ( (ent->r.svFlags & SVF_BOT) && botstates[ent->s.number] ) {
 		Q_strncpyz( forcePowers, botstates[ent->s.number]->forceinfo, sizeof(forcePowers) );
-
-	if ( g_forceBasedTeams.integer ) {
-		if ( ent->client->sess.sessionTeam == TEAM_RED )
-			warnClient = !(BG_LegalizedForcePowers( forcePowers, sizeof(forcePowers), g_maxForceRank.integer, HasSetSaberOnly(), FORCESIDE_DARK, level.gametype, g_forcePowerDisable.integer ));
-		else if ( ent->client->sess.sessionTeam == TEAM_BLUE )
-			warnClient = !(BG_LegalizedForcePowers( forcePowers, sizeof(forcePowers), g_maxForceRank.integer, HasSetSaberOnly(), FORCESIDE_LIGHT, level.gametype, g_forcePowerDisable.integer ));
-		else
-			warnClient = !(BG_LegalizedForcePowers( forcePowers, sizeof(forcePowers), g_maxForceRank.integer, HasSetSaberOnly(), 0, level.gametype, g_forcePowerDisable.integer ));
 	}
-	else
-		warnClient = !(BG_LegalizedForcePowers( forcePowers, sizeof(forcePowers), g_maxForceRank.integer, HasSetSaberOnly(), 0, level.gametype, g_forcePowerDisable.integer ));
-
-	//rww - parse through the string manually and eat out all the appropriate data
-	i = 0;
-	i_r = 0;
-	while ( forcePowers[i] && forcePowers[i] != '-' ) {
-		readBuf[i_r] = forcePowers[i];
-		i_r++;
-		i++;
+	else {
+		char userinfo[MAX_INFO_STRING];
+		trap->GetUserinfo( ent->s.number, userinfo, sizeof(userinfo) );
+		Q_strncpyz( forcePowers, Info_ValueForKey( userinfo, "forcepowers" ), sizeof(forcePowers) );
 	}
-	readBuf[i_r] = 0;
-	//THE RANK
-	ent->client->ps.fd.forceRank = atoi( readBuf );
-	i++;
 
-	i_r = 0;
-	while ( forcePowers[i] && forcePowers[i] != '-' ) {
-		readBuf[i_r] = forcePowers[i];
-		i_r++;
-		i++;
+	// validate the forcepowers string
+	if ( strlen( forcePowers ) != DEFAULT_FORCEPOWERS_LEN ) {
+		fpStringError = "Invalid size";
 	}
-	readBuf[i_r] = 0;
-	//THE SIDE
-	ent->client->ps.fd.forceSide = atoi( readBuf );
-	i++;
-
-	if ( level.gametype != GT_SIEGE && (ent->r.svFlags & SVF_BOT) && botstates[ent->s.number] ) {
-		// hmm..I'm going to cheat here.
-		int oldI = i;
-		i_r = 0;
-		while ( forcePowers[i] && forcePowers[i] != '\n' && i_r < NUM_FORCE_POWERS ) {
-			if ( ent->client->ps.fd.forceSide == FORCESIDE_LIGHT ) {
-				if ( i_r == FP_ABSORB )
-					forcePowers[i] = '3';
-				if ( botstates[ent->s.number]->settings.skill >= 4 ) {
-					// cheat and give them more stuff
-					if ( i_r == FP_HEAL )
-						forcePowers[i] = '3';
-					else if ( i_r == FP_PROTECT )
-						forcePowers[i] = '3';
-				}
+	else if ( forcePowers[0] < '0' || forcePowers[0] > ('0' + MAX_FORCE_RANK) ) {
+		fpStringError = "Rank out of range";
+	}
+	else if ( forcePowers[1] != '-' || forcePowers[3] != '-' ) {
+		fpStringError = "Separators not in correct place";
+	}
+	else if ( forcePowers[2] < '0' || forcePowers[2] > '1' ) {
+		fpStringError = "Alignment out of range";
+	}
+	else {
+		for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
+			if ( forcePowers[i + 4] < '0' || forcePowers[i + 4] > '3' ) {
+				fpStringError = "Force level out of range";
+				break;
 			}
-			else if ( ent->client->ps.fd.forceSide == FORCESIDE_DARK ) {
-				if ( botstates[ent->s.number]->settings.skill >= 4 ) {
-					if ( i_r == FP_GRIP )
-						forcePowers[i] = '3';
-					else if ( i_r == FP_LIGHTNING )
-						forcePowers[i] = '3';
-					else if ( i_r == FP_RAGE )
-						forcePowers[i] = '3';
-					else if ( i_r == FP_DRAIN )
-						forcePowers[i] = '3';
-				}
-			}
-
-			if ( i_r == FP_PUSH )
-				forcePowers[i] = '3';
-			else if ( i_r == FP_PULL )
-				forcePowers[i] = '3';
-
-			i++;
-			i_r++;
 		}
-		i = oldI;
 	}
 
-	i_r = 0;
-	while ( forcePowers[i] && forcePowers[i] != '\n' &&
-		i_r < NUM_FORCE_POWERS ) {
-		readBuf[0] = forcePowers[i];
-		readBuf[1] = 0;
+	if ( fpStringError ) {
+		Q_strncpyz( forcePowers, DEFAULT_FORCEPOWERS, sizeof(forcePowers) );
+		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_RED
+			"Invalid forcepowers string (%s), setting default\n\"", fpStringError ) );
+	}
 
-		ent->client->ps.fd.forcePowerLevel[i_r] = atoi( readBuf );
-		if ( ent->client->ps.fd.forcePowerLevel[i_r] ) {
-			ent->client->ps.fd.forcePowersKnown |= (1 << i_r);
+	// forcepowers string is valid, parse it out
+	ent->client->ps.fd.forceRank = forcePowers[0] - '0';
+	ent->client->ps.fd.forceSide = forcePowers[2] - '0';
+	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
+		ent->client->ps.fd.forcePowerLevel[i] = forcePowers[i + 4] - '0';
+		if ( ent->client->ps.fd.forcePowerLevel[i] ) {
+			ent->client->ps.fd.forcePowersKnown |= (1 << i);
 		}
 		else {
-			ent->client->ps.fd.forcePowersKnown &= ~(1 << i_r);
+			ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
 		}
-		i++;
-		i_r++;
 	}
-	//THE POWERS
+
+	if ( g_forceBasedTeams.integer ) {
+		if ( ent->client->sess.sessionTeam == TEAM_RED ) {
+			warnClient = !BG_LegalizedForcePowers( forcePowers, sizeof(forcePowers), g_maxForceRank.integer,
+				HasSetSaberOnly(), FORCESIDE_DARK, level.gametype, g_forcePowerDisable.integer );
+		}
+		else if ( ent->client->sess.sessionTeam == TEAM_BLUE ) {
+			warnClient = !BG_LegalizedForcePowers( forcePowers, sizeof(forcePowers), g_maxForceRank.integer,
+				HasSetSaberOnly(), FORCESIDE_LIGHT, level.gametype, g_forcePowerDisable.integer );
+		}
+		else {
+			warnClient = !BG_LegalizedForcePowers( forcePowers, sizeof(forcePowers), g_maxForceRank.integer,
+				HasSetSaberOnly(), FORCESIDE_NEUTRAL, level.gametype, g_forcePowerDisable.integer );
+		}
+	}
+	else {
+		warnClient = !BG_LegalizedForcePowers( forcePowers, sizeof(forcePowers), g_maxForceRank.integer,
+			HasSetSaberOnly(), FORCESIDE_NEUTRAL, level.gametype, g_forcePowerDisable.integer );
+	}
 
 	if ( ent->s.eType != ET_NPC ) {
 		if ( HasSetSaberOnly() ) {
@@ -330,8 +303,9 @@ void WP_InitForcePowers( gentity_t *ent ) {
 		}
 	}
 
-	if ( ent->s.eType == ET_NPC )
+	if ( ent->s.eType == ET_NPC ) {
 		ent->client->sess.setForce = qtrue;
+	}
 	else if ( level.gametype == GT_SIEGE ) {
 		if ( !ent->client->sess.setForce ) {
 			ent->client->sess.setForce = qtrue;
@@ -346,7 +320,7 @@ void WP_InitForcePowers( gentity_t *ent ) {
 				didEvent = qtrue;
 
 				if ( !(ent->r.svFlags & SVF_BOT) && ent->s.eType != ET_NPC ) {
-					if ( !g_teamAutoJoin.integer ) {
+					if ( level.gametype >= GT_TEAM && !g_teamAutoJoin.integer ) {
 						// make them a spectator so they can set their powerups up without being bothered.
 						ent->client->sess.sessionTeam = TEAM_SPECTATOR;
 						ent->client->sess.spectatorState = SPECTATOR_FREE;
