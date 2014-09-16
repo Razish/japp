@@ -1,0 +1,10 @@
+language: c
+compiler: gcc
+
+install:
+  - sudo apt-get install libreadline-dev
+
+script:
+  - ./build.sh all
+  - ./build.sh all force32
+  - ./build.sh all clang analyse
