@@ -371,7 +371,7 @@ if plat == 'Linux':
 			'-mfpmath=sse',
 			'-Wlogical-op' ]
 		status, ver = commands.getstatusoutput( 'gcc -dumpversion' )
-		if ver >= 4.7:
+		if float(ver) >= 4.7:
 			env['CCFLAGS'] += [ '-Wstack-usage=32768' ]
 	env['CXXFLAGS'] += [ '-fvisibility-inlines-hidden', '-std=c++11' ]
 	if analyse:
