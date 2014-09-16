@@ -366,12 +366,13 @@ if plat == 'Linux':
 	#	'-Wunsuffixed-float-constants',
 		'-Wwrite-strings',
 		]
-	if compiler != 'clang' and arch != 'arm':
+	if compiler == 'gcc' and arch != 'arm':
 		env['CCFLAGS'] += [
 			'-mfpmath=sse',
-			'-Wlogical-op',
-			'-Wstack-usage=32768'
-			]
+			'-Wlogical-op' ]
+		status, ver = commands.getstatusoutput( 'gcc -dumpversion' )
+		if ver >= 4.7:
+			env['CCFLAGS'] += [ '-Wstack-usage=32768' ]
 	env['CXXFLAGS'] += [ '-fvisibility-inlines-hidden', '-std=c++11' ]
 	if analyse:
 		env['CC'] = 'clang'

@@ -1,10 +1,18 @@
 language: c
-compiler: gcc
+compiler:
+  - gcc
+  - clang
 
 install:
   - sudo apt-get install libreadline-dev
 
 script:
-  - ./build.sh all
-  - ./build.sh all force32
-  - ./build.sh all clang analyse
+  - scons -Q project=game debug=0 compiler=gcc analyse=0 force32=0
+  - scons -Q project=cgame debug=0 compiler=gcc analyse=0 force32=0
+  - scons -Q project=ui debug=0 compiler=gcc analyse=0 force32=0
+  - scons -Q project=game debug=0 compiler=gcc analyse=0 force32=1
+  - scons -Q project=cgame debug=0 compiler=gcc analyse=0 force32=1
+  - scons -Q project=ui debug=0 compiler=gcc analyse=0 force32=1
+  - scons -Q project=game debug=0 compiler=clang analyse=1 force32=0
+  - scons -Q project=cgame debug=0 compiler=clang analyse=1 force32=0
+  - scons -Q project=ui debug=0 compiler=clang analyse=1 force32=0
