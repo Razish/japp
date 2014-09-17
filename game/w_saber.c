@@ -319,14 +319,14 @@ qboolean BG_SuperBreakLoseAnim( int anim );
 static void SetSaberBoxSize( gentity_t *saberent ) {
 	gentity_t *owner = NULL;
 	vector3 saberOrg, saberTip;
-	int i;
-	int j = 0;
-	int k = 0;
+	int i = 0, saberNum = 0, bladeNum = 0;
 	qboolean dualSabers = qfalse;
 	qboolean alwaysBlock[MAX_SABERS][MAX_BLADES];
 	qboolean forceBlock = qfalse;
 
 	assert( saberent && saberent->inuse );
+
+	memset( alwaysBlock, 0, sizeof(alwaysBlock) );
 
 	if ( saberent->r.ownerNum < MAX_CLIENTS && saberent->r.ownerNum >= 0 ) {
 		owner = &g_entities[saberent->r.ownerNum];
@@ -348,27 +348,30 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 
 	if ( PM_SaberInBrokenParry( owner->client->ps.saberMove )
 		|| BG_SuperBreakLoseAnim( owner->client->ps.torsoAnim ) ) { //let swings go right through when we're in this state
-		for ( i = 0; i < MAX_SABERS; i++ ) {
-			if ( i > 0 && !dualSabers ) {//not using a second saber, set it to not blocking
-				for ( j = 0; j < MAX_BLADES; j++ ) {
-					alwaysBlock[i][j] = qfalse;
+		for ( saberNum = 0; saberNum < MAX_SABERS; saberNum++ ) {
+			if ( saberNum > 0 && !dualSabers ) {//not using a second saber, set it to not blocking
+				for ( bladeNum = 0; bladeNum < MAX_BLADES; bladeNum++ ) {
+					alwaysBlock[saberNum][bladeNum] = qfalse;
 				}
 			}
 			else {
-				if ( (owner->client->saber[i].saberFlags2&SFL2_ALWAYS_BLOCK) ) {
-					for ( j = 0; j < owner->client->saber[i].numBlades; j++ ) {
-						alwaysBlock[i][j] = qtrue;
+				if ( (owner->client->saber[saberNum].saberFlags2 & SFL2_ALWAYS_BLOCK) ) {
+					for ( bladeNum = 0; bladeNum < owner->client->saber[saberNum].numBlades; bladeNum++ ) {
+						alwaysBlock[saberNum][bladeNum] = qtrue;
 						forceBlock = qtrue;
 					}
 				}
-				if ( owner->client->saber[i].bladeStyle2Start > 0 ) {
-					for ( j = owner->client->saber[i].bladeStyle2Start; j < owner->client->saber[i].numBlades; j++ ) {
-						if ( (owner->client->saber[i].saberFlags2&SFL2_ALWAYS_BLOCK2) ) {
-							alwaysBlock[i][j] = qtrue;
+				if ( owner->client->saber[saberNum].bladeStyle2Start > 0 ) {
+					for ( bladeNum = owner->client->saber[saberNum].bladeStyle2Start;
+						bladeNum < owner->client->saber[saberNum].numBlades;
+						bladeNum++ )
+					{
+						if ( (owner->client->saber[saberNum].saberFlags2 & SFL2_ALWAYS_BLOCK2) ) {
+							alwaysBlock[saberNum][bladeNum] = qtrue;
 							forceBlock = qtrue;
 						}
 						else {
-							alwaysBlock[i][j] = qfalse;
+							alwaysBlock[saberNum][bladeNum] = qfalse;
 						}
 					}
 				}
@@ -386,8 +389,11 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 		}
 	}
 
-	if ( (level.time - owner->client->lastSaberStorageTime) > 200 ||
-		(level.time - owner->client->saber[j].blade[k].storageTime) > 100 ) { //it's been too long since we got a reliable point storage, so use the defaults and leave.
+	assert( saberNum < MAX_SABERS );
+	assert( bladeNum < MAX_BLADES );
+
+	if ( level.time - owner->client->lastSaberStorageTime > 200 ) {
+		// it's been too long since we got a reliable point storage, so use the defaults and leave.
 		VectorSet( &saberent->r.mins, -SABER_BOX_SIZE, -SABER_BOX_SIZE, -SABER_BOX_SIZE );
 		VectorSet( &saberent->r.maxs, SABER_BOX_SIZE, SABER_BOX_SIZE, SABER_BOX_SIZE );
 		return;
@@ -416,20 +422,18 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 	VectorCopy( &saberent->r.currentOrigin, &saberent->r.maxs );
 
 	for ( i = 0; i < 3; i++ ) {
-		for ( j = 0; j < MAX_SABERS; j++ ) {
-			if ( !owner->client->saber[j].model[0] ) {
+		for ( saberNum = 0; saberNum < MAX_SABERS; saberNum++ ) {
+			if ( !owner->client->saber[saberNum].model[0] ) {
 				break;
 			}
-			if ( dualSabers
-				&& owner->client->ps.saberHolstered == 1
-				&& j == 1 ) { //this mother is holstered, get outta here.
-				j++;
+			if ( dualSabers && owner->client->ps.saberHolstered == 1 && saberNum == 1 ) { //this mother is holstered, get outta here.
+				saberNum++;
 				continue;
 			}
-			for ( k = 0; k < owner->client->saber[j].numBlades; k++ ) {
-				if ( k > 0 ) {//not the first blade
+			for ( bladeNum = 0; bladeNum < owner->client->saber[saberNum].numBlades; bladeNum++ ) {
+				if ( bladeNum > 0 ) {//not the first blade
 					if ( !dualSabers ) {//using a single saber
-						if ( owner->client->saber[j].numBlades > 1 ) {//with multiple blades
+						if ( owner->client->saber[saberNum].numBlades > 1 ) {//with multiple blades
 							if ( owner->client->ps.saberHolstered == 1 ) {//all blades after the first one are off
 								break;
 							}
@@ -437,13 +441,20 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 					}
 				}
 				if ( forceBlock ) {//only do blocking with blades that are marked to block
-					if ( !alwaysBlock[j][k] ) {//this blade shouldn't be blocking
+					if ( !alwaysBlock[saberNum][bladeNum] ) {//this blade shouldn't be blocking
 						continue;
 					}
 				}
-				//VectorMA(owner->client->saber[j].blade[k].muzzlePoint, owner->client->saber[j].blade[k].lengthMax*0.5f, owner->client->saber[j].blade[k].muzzleDir, saberOrg);
-				VectorCopy( &owner->client->saber[j].blade[k].muzzlePoint, &saberOrg );
-				VectorMA( &owner->client->saber[j].blade[k].muzzlePoint, owner->client->saber[j].blade[k].lengthMax, &owner->client->saber[j].blade[k].muzzleDir, &saberTip );
+
+				/*
+				VectorMA( owner->client->saber[saberNum].blade[bladeNum].muzzlePoint,
+					owner->client->saber[saberNum].blade[bladeNum].lengthMax * 0.5f,
+					&owner->client->saber[saberNum].blade[bladeNum].muzzleDir, saberOrg );
+				*/
+				VectorCopy( &owner->client->saber[saberNum].blade[bladeNum].muzzlePoint, &saberOrg );
+				VectorMA( &owner->client->saber[saberNum].blade[bladeNum].muzzlePoint,
+					owner->client->saber[saberNum].blade[bladeNum].lengthMax,
+					&owner->client->saber[saberNum].blade[bladeNum].muzzleDir, &saberTip );
 
 				if ( saberOrg.data[i] < saberent->r.mins.data[i] )	saberent->r.mins.data[i] = saberOrg.data[i];
 				if ( saberTip.data[i] < saberent->r.mins.data[i] )	saberent->r.mins.data[i] = saberTip.data[i];
