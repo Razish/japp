@@ -229,7 +229,7 @@ void WP_InitForcePowers( gentity_t *ent ) {
 	else if ( forcePowers[1] != '-' || forcePowers[3] != '-' ) {
 		fpStringError = "Separators not in correct place";
 	}
-	else if ( forcePowers[2] < '0' || forcePowers[2] > '1' ) {
+	else if ( forcePowers[2] < '1' || forcePowers[2] > '2' ) {
 		fpStringError = "Alignment out of range";
 	}
 	else {
