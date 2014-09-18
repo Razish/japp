@@ -339,36 +339,45 @@ void WP_InitForcePowers( gentity_t *ent ) {
 			ent->client->sess.setForce = qtrue;
 		}
 
-		if ( !didEvent )
-			trap->SendServerCommand( ent->s.number, va( "nfr %i %i %i", g_maxForceRank.integer, 0, ent->client->sess.sessionTeam ) );
+		if ( !didEvent ) {
+			trap->SendServerCommand( ent->s.number, va( "nfr %i %i %i", g_maxForceRank.integer, 0,
+				ent->client->sess.sessionTeam ) );
+		}
 
 		// the server has one or more force powers disabled and the client is using them in his config
-		if ( warnClientLimit )
-			trap->SendServerCommand( ent - g_entities, va( "print \"The server has one or more force powers that you have chosen disabled.\nYou will not be able to use the disable force power(s) while playing on this server.\n\"" ) );
+		if ( warnClientLimit ) {
+			trap->SendServerCommand( ent - g_entities, va( "print \"The server has one or more force powers that you "
+				"have chosen disabled.\nYou will not be able to use the disable force power(s) while playing on this "
+				"server.\n\"" ) );
+		}
 	}
 
 	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
-		if ( (ent->client->ps.fd.forcePowersKnown & (1 << i)) && !ent->client->ps.fd.forcePowerLevel[i] )
+		if ( (ent->client->ps.fd.forcePowersKnown & (1 << i)) && !ent->client->ps.fd.forcePowerLevel[i] ) {
 			ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
-		else if ( i != FP_LEVITATION && i != FP_SABER_OFFENSE && i != FP_SABER_DEFENSE && i != FP_SABERTHROW )
+		}
+		else if ( i != FP_LEVITATION && i != FP_SABER_OFFENSE && i != FP_SABER_DEFENSE && i != FP_SABERTHROW ) {
 			lastFPKnown = i;
+		}
 	}
 
-	if ( ent->client->ps.fd.forcePowersKnown & ent->client->sess.selectedFP )
+	if ( ent->client->ps.fd.forcePowersKnown & ent->client->sess.selectedFP ) {
 		ent->client->ps.fd.forcePowerSelected = ent->client->sess.selectedFP;
+	}
 
 	if ( !(ent->client->ps.fd.forcePowersKnown & (1 << ent->client->ps.fd.forcePowerSelected)) ) {
-		if ( lastFPKnown != -1 )
-			ent->client->ps.fd.forcePowerSelected = lastFPKnown;
-		else
-			ent->client->ps.fd.forcePowerSelected = 0;
+		if ( lastFPKnown == -1 ) {
+			lastFPKnown = FP_FIRST;
+		}
+		ent->client->ps.fd.forcePowerSelected = lastFPKnown;
 	}
 
-	for ( i = 0; i < NUM_FORCE_POWERS; i++ )
+	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
 		ent->client->ps.fd.forcePowerBaseLevel[i] = ent->client->ps.fd.forcePowerLevel[i];
+	}
 	ent->client->ps.fd.forceUsingAdded = 0;
 
-	//Raz: ...And if we're empowered, just overwrite the whole lot ='D
+	// if we're empowered, just overwrite the whole lot
 	if ( ent->client->pers.adminData.empowered ) {
 		ent->client->ps.eFlags |= EF_BODYPUSH;
 

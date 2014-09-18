@@ -373,14 +373,12 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 	gclient_t			*client;
 	spectatorState_t	specState;
 
-	//Raz: this prevents rare creation of invalid players
+	// this prevents rare creation of invalid players
 	if ( !ent->inuse ) {
 		return qfalse;
 	}
 
-	//
 	// see what change is requested
-	//
 	client = ent->client;
 
 	clientNum = client - level.clients;
@@ -434,7 +432,7 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 	}
 	// force them to spectators if there aren't any spots free
 	else {
-		team = TEAM_SPECTATOR;
+		team = TEAM_FREE;
 	}
 
 	oldTeam = client->sess.sessionTeam;
@@ -603,8 +601,9 @@ static void Cmd_Team_f( gentity_t *ent ) {
 		return;
 	}
 
-	if ( gEscaping )
+	if ( gEscaping ) {
 		return;
+	}
 
 	// if they are playing a tournement game, count as a loss
 	if ( level.gametype == GT_DUEL && ent->client->sess.sessionTeam == TEAM_FREE ) {
@@ -623,9 +622,10 @@ static void Cmd_Team_f( gentity_t *ent ) {
 
 	SetTeam( ent, s, qfalse );
 
-	//Raz: update team switch time only if team change really happened
-	if ( oldTeam != ent->client->sess.sessionTeam )
+	// update team switch time only if team change really happened
+	if ( oldTeam != ent->client->sess.sessionTeam ) {
 		ent->client->switchTeamTime = level.time + 5000;
+	}
 }
 
 static void Cmd_DuelTeam_f( gentity_t *ent ) {

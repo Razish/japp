@@ -434,41 +434,30 @@ void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, 
 
 #endif
 
-/*
-================
-BG_LegalizedForcePowers
-
-The magical function to end all functions.
-This will take the force power string in powerOut and parse through it, then legalize
-it based on the supposed rank and spit it into powerOut, returning true if it was legal
-to begin with and false if not.
-fpDisabled is actually only expected (needed) from the server, because the ui disables
-force power selection anyway when force powers are disabled on the server.
-================
-*/
+// This will take the force power string in powerOut and parse through it, then legalize it based on the supposed rank
+// and spit it into powerOut, returning true if it was legal to begin with and false if not.
+// fpDisabled is actually only expected (needed) from the server, because the ui disables force power selection anyway
+// when force powers are disabled on the server.
 qboolean BG_LegalizedForcePowers( char *powerOut, size_t powerOutSize, int maxRank, qboolean freeSaber, int teamForce, int gametype, int fpDisabled ) {
-	char powerBuf[128];
-	char readBuf[128];
+	char powerBuf[128], readBuf[128];
 	qboolean maintainsValidity = qtrue;
 	int powerLen = strlen( powerOut );
-	int i = 0;
-	int c = 0;
-	int allowedPoints = 0;
-	int usedPoints = 0;
-	int countDown = 0;
-
+	int i = 0, c = 0;
+	int allowedPoints = 0, usedPoints = 0, countDown = 0;
 	int final_Side;
 	int final_Powers[NUM_FORCE_POWERS] = { 0 };
 
-	if ( powerLen >= 128 ) { //This should not happen. If it does, this is obviously a bogus string.
-		//They can have this string. Because I said so.
+	if ( powerLen >= sizeof(powerBuf) ) {
+		trap->Print( "BG_LegalizedForcePowers: powerLen:%i >= sizeof(powerBuf):%i\n", powerLen, sizeof(powerBuf) );
+		// This should not happen. If it does, this is obviously a bogus string.
 		Q_strncpyz( powerBuf, DEFAULT_FORCEPOWERS, sizeof(powerBuf) );
 		maintainsValidity = qfalse;
 	}
-	else
+	else {
 		Q_strncpyz( powerBuf, powerOut, sizeof(powerBuf) ); //copy it as the original
+	}
 
-	//first of all, print the max rank into the string as the rank
+	// first of all, print the max rank into the string as the rank
 	Q_strncpyz( powerOut, va( "%i-", maxRank ), powerOutSize );
 
 	while ( i < sizeof(powerBuf) && powerBuf[i] && powerBuf[i] != '-' ) {
@@ -485,8 +474,9 @@ qboolean BG_LegalizedForcePowers( char *powerOut, size_t powerOutSize, int maxRa
 	//at this point, readBuf contains the intended side
 	final_Side = atoi( readBuf );
 
-	if ( final_Side != FORCESIDE_LIGHT &&
-		final_Side != FORCESIDE_DARK ) { //Not a valid side. You will be dark. Because I said so. (this is something that should never actually happen unless you purposely feed in an invalid config)
+	if ( final_Side != FORCESIDE_LIGHT && final_Side != FORCESIDE_DARK ) {
+		// Not a valid side. You will be dark.
+		trap->Print( "BG_LegalizedForcePowers: invalid alignment: %i\n", final_Side );
 		final_Side = FORCESIDE_DARK;
 		maintainsValidity = qfalse;
 	}
@@ -562,6 +552,8 @@ qboolean BG_LegalizedForcePowers( char *powerOut, size_t powerOutSize, int maxRa
 		int powerCycle = 2;
 		int minPow = 0;
 
+		trap->Print( "BG_LegalizedForcePowers: usedPoints:%i > allowedPoints%i\n", usedPoints, allowedPoints );
+
 		if ( freeSaber ) {
 			minPow = 1;
 		}
@@ -636,30 +628,37 @@ qboolean BG_LegalizedForcePowers( char *powerOut, size_t powerOutSize, int maxRa
 	}
 
 	if ( freeSaber ) {
-		if ( final_Powers[FP_SABER_OFFENSE] < 1 )
+		if ( final_Powers[FP_SABER_OFFENSE] < 1 ) {
 			final_Powers[FP_SABER_OFFENSE] = 1;
-		if ( final_Powers[FP_SABER_DEFENSE] < 1 )
+		}
+		if ( final_Powers[FP_SABER_DEFENSE] < 1 ) {
 			final_Powers[FP_SABER_DEFENSE] = 1;
+		}
 	}
-	if ( final_Powers[FP_LEVITATION] < 1 )
+	if ( final_Powers[FP_LEVITATION] < 1 ) {
 		final_Powers[FP_LEVITATION] = 1;
+	}
 
 	i = 0;
 	while ( i < NUM_FORCE_POWERS ) {
-		if ( final_Powers[i] > FORCE_LEVEL_3 )
+		if ( final_Powers[i] > FORCE_LEVEL_3 ) {
 			final_Powers[i] = FORCE_LEVEL_3;
+		}
 		i++;
 	}
 
 	if ( fpDisabled ) { //If we specifically have attack or def disabled, force them up to level 3. It's the way
 		//things work for the case of all powers disabled.
 		//If jump is disabled, down-cap it to level 1. Otherwise don't do a thing.
-		if ( fpDisabled & (1 << FP_LEVITATION) )
+		if ( fpDisabled & (1 << FP_LEVITATION) ) {
 			final_Powers[FP_LEVITATION] = 1;
-		if ( fpDisabled & (1 << FP_SABER_OFFENSE) )
+		}
+		if ( fpDisabled & (1 << FP_SABER_OFFENSE) ) {
 			final_Powers[FP_SABER_OFFENSE] = 3;
-		if ( fpDisabled & (1 << FP_SABER_DEFENSE) )
+		}
+		if ( fpDisabled & (1 << FP_SABER_DEFENSE) ) {
 			final_Powers[FP_SABER_DEFENSE] = 3;
+		}
 	}
 
 	if ( final_Powers[FP_SABER_OFFENSE] < 1 ) {
@@ -667,9 +666,9 @@ qboolean BG_LegalizedForcePowers( char *powerOut, size_t powerOutSize, int maxRa
 		final_Powers[FP_SABERTHROW] = 0;
 	}
 
-	//We finally have all the force powers legalized and stored locally.
-	//Put them all into the string and return the result. We already have
-	//the rank there, so print the side and the powers now.
+	// We finally have all the force powers legalized and stored locally.
+	// Put them all into the string and return the result.
+	// We already have the rank there, so print the side and the powers now.
 	Q_strcat( powerOut, powerOutSize, va( "%i-", final_Side ) );
 
 	i = strlen( powerOut );
@@ -742,30 +741,6 @@ const gitem_t bg_itemlist[] = {
 	{ NULL }
 };
 const size_t bg_numItems = ARRAY_LEN( bg_itemlist ) - 1;
-
-float vectoyaw( const vector3 *vec ) {
-	float	yaw;
-
-	if ( vec->yaw == 0 && vec->pitch == 0 ) {
-		yaw = 0;
-	}
-	else {
-		if ( vec->pitch ) {
-			yaw = (atan2f( vec->yaw, vec->pitch ) * 180 / M_PI);
-		}
-		else if ( vec->yaw > 0 ) {
-			yaw = 90;
-		}
-		else {
-			yaw = 270;
-		}
-		if ( yaw < 0 ) {
-			yaw += 360;
-		}
-	}
-
-	return yaw;
-}
 
 qboolean BG_HasYsalamiri( int gametype, playerState_t *ps ) {
 	if ( gametype == GT_CTY &&

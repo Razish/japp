@@ -1142,7 +1142,8 @@ float	Q_crandom( int *seed );
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0f * (random() - 0.5f))
 
-void vectoangles( const vector3 *value1, vector3 *angles );
+void vectoangles( const vector3 *vec, vector3 *angles );
+float vectoyaw( const vector3 *vec );
 void AnglesToAxis( const vector3 *angles, vector3 axis[3] );
 
 void AxisClear( vector3 axis[3] );

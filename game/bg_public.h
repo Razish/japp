@@ -1124,8 +1124,6 @@ typedef struct gitem_s {
 extern const gitem_t bg_itemlist[];
 extern const size_t bg_numItems;
 
-float vectoyaw( const vector3 *vec );
-
 const gitem_t *BG_FindItem( const char *classname );
 const gitem_t *BG_FindItemForAmmo( ammo_t ammo );
 const gitem_t *BG_FindItemForWeapon( weapon_t wp );

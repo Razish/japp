@@ -493,15 +493,12 @@ void RotateAroundDirection( vector3 axis[3], float yaw ) {
 	CrossProduct( &axis[0], &axis[1], &axis[2] );
 }
 
+void vectoangles( const vector3 *vec, vector3 *angles ) {
+	float forward, yaw, pitch;
 
-
-void vectoangles( const vector3 *value1, vector3 *angles ) {
-	float	forward;
-	float	yaw, pitch;
-
-	if ( value1->y == 0 && value1->x == 0 ) {
+	if ( vec->y == 0 && vec->x == 0 ) {
 		yaw = 0.0f;
-		if ( value1->z > 0.0f ) {
+		if ( vec->z > 0.0f ) {
 			pitch = 90.0f;
 		}
 		else {
@@ -509,10 +506,10 @@ void vectoangles( const vector3 *value1, vector3 *angles ) {
 		}
 	}
 	else {
-		if ( value1->x ) {
-			yaw = (atan2f( value1->y, value1->x ) * 180.0f / M_PI);
+		if ( vec->x ) {
+			yaw = atan2f( vec->y, vec->x ) * 180.0f / M_PI;
 		}
-		else if ( value1->y > 0.0f ) {
+		else if ( vec->y > 0.0f ) {
 			yaw = 90.0f;
 		}
 		else {
@@ -522,8 +519,8 @@ void vectoangles( const vector3 *value1, vector3 *angles ) {
 			yaw += 360.0f;
 		}
 
-		forward = sqrt( value1->x*value1->x + value1->y*value1->y );
-		pitch = (atan2f( value1->z, forward ) * 180.0f / M_PI);
+		forward = sqrtf( vec->x*vec->x + vec->y*vec->y );
+		pitch = atan2f( vec->z, forward ) * 180.0f / M_PI;
 		if ( pitch < 0 ) {
 			pitch += 360.0f;
 		}
@@ -534,6 +531,29 @@ void vectoangles( const vector3 *value1, vector3 *angles ) {
 	angles->roll = 0.0f;
 }
 
+float vectoyaw( const vector3 *vec ) {
+	float yaw;
+
+	if ( vec->yaw == 0 && vec->pitch == 0 ) {
+		yaw = 0;
+	}
+	else {
+		if ( vec->pitch ) {
+			yaw = atan2f( vec->yaw, vec->pitch ) * 180 / M_PI;
+		}
+		else if ( vec->yaw > 0 ) {
+			yaw = 90;
+		}
+		else {
+			yaw = 270;
+		}
+		if ( yaw < 0 ) {
+			yaw += 360;
+		}
+	}
+
+	return yaw;
+}
 
 /*
 =================
