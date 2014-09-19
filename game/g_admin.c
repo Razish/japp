@@ -1742,9 +1742,83 @@ static void AM_Remap( gentity_t *ent ) {
 }
 
 // weather manipulation
+static const char *weatherEffects[] = {
+	"acidrain",
+	"clear",
+	"constantwind",
+	"die",
+	"fog",
+	"freeze",
+	"gustingwind",
+	"heavyrain",
+	"heavyrainfog",
+	"light_fog",
+	"lightrain",
+	"outsidepain",
+	"outsideshake",
+	"rain",
+	"sand",
+	"snow",
+	"spacedust",
+	"wind",
+	"zone",
+};
+static const size_t numWeatherEffects = ARRAY_LEN( weatherEffects );
+
+static int weathercmp( const void *a, const void *b ) {
+	trap->Print( "Comparing %s and %s\n", (const char *)a, *(const char **)b );
+	return Q_stricmp( (const char *)a, *(const char **)b );
+}
+
+static void G_PrintWeatherOptions( gentity_t *ent ) {
+	const char **opt = NULL;
+	char buf[256] = { 0 };
+	int toggle = 0;
+	unsigned int count = 0;
+	const unsigned int limit = 72;
+	size_t i;
+
+	Q_strcat( buf, sizeof(buf), "Weather options:\n   " );
+
+	for ( i = 0, opt = weatherEffects; i < numWeatherEffects; i++, opt++ ) {
+		const char *tmpMsg = NULL;
+
+		tmpMsg = va( " ^%c%s", (++toggle & 1 ? COLOR_GREEN : COLOR_YELLOW), *opt );
+
+		//newline if we reach limit
+		if ( count >= limit ) {
+			tmpMsg = va( "\n   %s", tmpMsg );
+			count = 0;
+		}
+
+		if ( strlen( buf ) + strlen( tmpMsg ) >= sizeof(buf) ) {
+			trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", buf ) );
+			buf[0] = '\0';
+		}
+		count += strlen( tmpMsg );
+		Q_strcat( buf, sizeof(buf), tmpMsg );
+	}
+
+	trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\n\"", buf ) );
+}
+
 static void AM_Weather( gentity_t *ent ) {
-	//RAZTODO: amweather
-	trap->SendServerCommand( ent - g_entities, "print \"AM_Weather: not yet implemented\n\"" );
+	const char *cmd = NULL, *opt = NULL;
+
+	if ( trap->Argc() == 1 ) {
+		G_PrintWeatherOptions( ent );
+		return;
+	}
+
+	cmd = ConcatArgs( 1 );
+	trap->Print( "%s\n", cmd );
+	opt = (const char *)bsearch( cmd, weatherEffects, numWeatherEffects, sizeof(weatherEffects[0]), weathercmp );
+	if ( !opt ) {
+		G_PrintWeatherOptions( ent );
+		return;
+	}
+
+	G_EffectIndex( va( "*%s", cmd ) );
 }
 
 // spawn an entity

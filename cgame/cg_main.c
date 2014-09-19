@@ -640,9 +640,7 @@ int BG_GetTime( void ) {
 
 // a global weather effect (rain, snow, etc)
 void CG_ParseWeatherEffect( const char *str ) {
-	char *sptr = (char *)str;
-	sptr++; //pass the '*'
-	trap->R_WorldEffectCommand( sptr );
+	trap->R_WorldEffectCommand( str + 1 );
 }
 
 void CG_ParseSiegeState( const char *str ) {

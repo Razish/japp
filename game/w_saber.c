@@ -346,8 +346,9 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 		dualSabers = qtrue;
 	}
 
-	if ( PM_SaberInBrokenParry( owner->client->ps.saberMove )
-		|| BG_SuperBreakLoseAnim( owner->client->ps.torsoAnim ) ) { //let swings go right through when we're in this state
+	if ( PM_SaberInBrokenParry( owner->client->ps.saberMove ) || BG_SuperBreakLoseAnim( owner->client->ps.torsoAnim ) )
+	{
+		// let swings go right through when we're in this state
 		for ( saberNum = 0; saberNum < MAX_SABERS; saberNum++ ) {
 			if ( saberNum > 0 && !dualSabers ) {//not using a second saber, set it to not blocking
 				for ( bladeNum = 0; bladeNum < MAX_BLADES; bladeNum++ ) {
@@ -378,8 +379,8 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 			}
 		}
 		if ( !forceBlock ) {//no sabers/blades to FORCE to be on, so turn off blocking altogether
-			VectorSet( &saberent->r.mins, 0, 0, 0 );
-			VectorSet( &saberent->r.maxs, 0, 0, 0 );
+			VectorClear( &saberent->r.mins );
+			VectorClear( &saberent->r.maxs );
 #ifdef _DEBUG
 			if ( g_saberDebugPrint.integer > 1 ) {
 				Com_Printf( "Client %i in broken parry, saber box 0\n", owner->s.number );
@@ -395,29 +396,30 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 	if ( level.time - owner->client->lastSaberStorageTime > 200 ) {
 		// it's been too long since we got a reliable point storage, so use the defaults and leave.
 		VectorSet( &saberent->r.mins, -SABER_BOX_SIZE, -SABER_BOX_SIZE, -SABER_BOX_SIZE );
-		VectorSet( &saberent->r.maxs, SABER_BOX_SIZE, SABER_BOX_SIZE, SABER_BOX_SIZE );
+		VectorScale( &saberent->r.mins, -1.0f, &saberent->r.maxs );
 		return;
 	}
 
-	if ( dualSabers
-		|| owner->client->saber[0].numBlades > 1 ) {//dual sabers or multi-blade saber
-		if ( owner->client->ps.saberHolstered > 1 ) {//entirely off
-			//no blocking at all
-			VectorSet( &saberent->r.mins, 0, 0, 0 );
-			VectorSet( &saberent->r.maxs, 0, 0, 0 );
+	if ( dualSabers || owner->client->saber[0].numBlades > 1 ) {
+		// dual sabers or multi-blade saber
+		if ( owner->client->ps.saberHolstered > 1 ) {
+			// entirely off, no blocking at all
+			VectorClear( &saberent->r.mins );
+			VectorClear( &saberent->r.maxs );
 			return;
 		}
 	}
-	else {//single saber
-		if ( owner->client->ps.saberHolstered ) {//off
-			//no blocking at all
-			VectorSet( &saberent->r.mins, 0, 0, 0 );
-			VectorSet( &saberent->r.maxs, 0, 0, 0 );
+	else {
+		// single saber
+		if ( owner->client->ps.saberHolstered ) {
+			// off, no blocking at all
+			VectorClear( &saberent->r.mins );
+			VectorClear( &saberent->r.maxs );
 			return;
 		}
 	}
-	//Start out at the saber origin, then go through all the blades and push out the extents
-	//for each blade, then set the box relative to the origin.
+	// Start out at the saber origin, then go through all the blades and push out the extents for each blade, then set
+	// the box relative to the origin.
 	VectorCopy( &saberent->r.currentOrigin, &saberent->r.mins );
 	VectorCopy( &saberent->r.currentOrigin, &saberent->r.maxs );
 
