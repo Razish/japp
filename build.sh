@@ -13,7 +13,7 @@ GAME=0
 CGAME=0
 UI=0
 
-build='scons'
+build='scons -Q'
 
 for (( i=0; i<${ARGSLEN}; i++ ));
 do
@@ -25,7 +25,7 @@ do
 		DEBUG=2
 		;;
 	"analyse")
-		build='scan-build scons'
+		build='scan-build scons -Q'
 		;;
 	"force32")
 		FORCE32=1
@@ -57,15 +57,15 @@ fi
 
 if [ $GAME -eq 1 ]
 then
-	$build project=game debug=$DEBUG force32=$FORCE32 >/dev/null
+	$build project=game debug=$DEBUG force32=$FORCE32
 fi
 
 if [ $CGAME -eq 1 ]
 then
-	$build project=cgame debug=$DEBUG force32=$FORCE32 >/dev/null
+	$build project=cgame debug=$DEBUG force32=$FORCE32
 fi
 
 if [ $UI -eq 1 ]
 then
-	$build project=ui debug=$DEBUG force32=$FORCE32 >/dev/null
+	$build project=ui debug=$DEBUG force32=$FORCE32
 fi
