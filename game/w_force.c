@@ -247,19 +247,6 @@ void WP_InitForcePowers( gentity_t *ent ) {
 			"Invalid forcepowers string (%s), setting default\n\"", fpStringError ) );
 	}
 
-	// forcepowers string is valid, parse it out
-	ent->client->ps.fd.forceRank = forcePowers[0] - '0';
-	ent->client->ps.fd.forceSide = forcePowers[2] - '0';
-	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
-		ent->client->ps.fd.forcePowerLevel[i] = forcePowers[i + 4] - '0';
-		if ( ent->client->ps.fd.forcePowerLevel[i] ) {
-			ent->client->ps.fd.forcePowersKnown |= (1 << i);
-		}
-		else {
-			ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
-		}
-	}
-
 	if ( g_forceBasedTeams.integer ) {
 		if ( ent->client->sess.sessionTeam == TEAM_RED ) {
 			warnClient = !BG_LegalizedForcePowers( forcePowers, sizeof(forcePowers), g_maxForceRank.integer,
@@ -277,6 +264,19 @@ void WP_InitForcePowers( gentity_t *ent ) {
 	else {
 		warnClient = !BG_LegalizedForcePowers( forcePowers, sizeof(forcePowers), g_maxForceRank.integer,
 			HasSetSaberOnly(), FORCESIDE_NEUTRAL, level.gametype, g_forcePowerDisable.integer );
+	}
+
+	// forcepowers string is valid, parse it out
+	ent->client->ps.fd.forceRank = forcePowers[0] - '0';
+	ent->client->ps.fd.forceSide = forcePowers[2] - '0';
+	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
+		ent->client->ps.fd.forcePowerLevel[i] = forcePowers[i + 4] - '0';
+		if ( ent->client->ps.fd.forcePowerLevel[i] ) {
+			ent->client->ps.fd.forcePowersKnown |= (1 << i);
+		}
+		else {
+			ent->client->ps.fd.forcePowersKnown &= ~(1 << i);
+		}
 	}
 
 	if ( ent->s.eType != ET_NPC ) {
