@@ -476,7 +476,7 @@ void SetTeamNumbers( void ) {
 	}
 
 	for ( i = 0; i < TEAM_NUM_TEAMS; i++ ) {//Get the average health
-		teamStrength[i] = floor( ((float)(teamStrength[i])) / ((float)(teamNumbers[i])) );
+		teamStrength[i] = floorf( ((float)(teamStrength[i])) / ((float)(teamNumbers[i])) );
 	}
 }
 

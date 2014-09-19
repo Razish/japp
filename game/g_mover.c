@@ -743,7 +743,7 @@ void Use_BinaryMover_Go( gentity_t *ent ) {
 			fPartial = acosf( fPartial );
 			fPartial = RAD2DEG( fPartial );
 			fPartial = (90.0f - fPartial) / 90.0f*ent->s.pos.trDuration;
-			partial = total - floor( fPartial );
+			partial = total - floorf( fPartial );
 		}
 		else {
 			total = ent->s.pos.trDuration;
@@ -776,7 +776,7 @@ void Use_BinaryMover_Go( gentity_t *ent ) {
 			fPartial = acosf( fPartial );
 			fPartial = RAD2DEG( fPartial );
 			fPartial = (90.0f - fPartial) / 90.0f*ent->s.pos.trDuration;
-			partial = total - floor( fPartial );
+			partial = total - floorf( fPartial );
 		}
 		else {
 			total = ent->s.pos.trDuration;
@@ -2332,7 +2332,7 @@ void funcBBrushDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 
 	if ( self->delay ) {
 		self->think = funcBBrushDieGo;
-		self->nextthink = level.time + floor( self->delay * 1000.0f );
+		self->nextthink = level.time + floorf( self->delay * 1000.0f );
 		return;
 	}
 
@@ -2394,7 +2394,7 @@ void funcBBrushPain( gentity_t *self, gentity_t *attacker, int damage ) {
 		if ( self->radius > 0.0f ) {
 			// designer wants to scale number of chunks, helpful because the above scale code is far from perfect
 			//	I do this after the scale calculation because it seems that the chunk size generally seems to be very close, it's just the number of chunks is a bit weak
-			numChunks = ceil( numChunks*self->radius );
+			numChunks = ceilf( numChunks*self->radius );
 		}
 		G_Chunks( self->s.number, &org, &dir, &self->r.absmin, &self->r.absmax, 300, numChunks, self->material, 0, (scale*self->mass) );
 	}

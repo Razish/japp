@@ -2164,10 +2164,10 @@ int BG_ParseAnimationFile( const char *filename, animation_t *animset, qboolean 
 			fps = 1;//Don't allow divide by zero error
 		}
 		if ( fps < 0 ) {//backwards
-			animset[animNum].frameLerp = floor( 1000.0f / fps );
+			animset[animNum].frameLerp = floorf( 1000.0f / fps );
 		}
 		else {
-			animset[animNum].frameLerp = ceil( 1000.0f / fps );
+			animset[animNum].frameLerp = ceilf( 1000.0f / fps );
 		}
 	}
 	/*

@@ -1998,8 +1998,8 @@ void CG_TriggerAnimSounds( centity_t *cent ) {
 	cent->pe.torso.frame = curFrame;
 	cent->pe.torso.backlerp = 1.0f - (currentFrame - (float)curFrame);
 #else
-	cent->pe.torso.oldFrame = floor( currentFrame );
-	cent->pe.torso.frame = ceil( currentFrame );
+	cent->pe.torso.oldFrame = floorf( currentFrame );
+	cent->pe.torso.frame = ceilf( currentFrame );
 	cent->pe.torso.backlerp = 1.0f - (currentFrame - (float)curFrame);
 #endif
 }
@@ -8836,8 +8836,9 @@ stillDoSaber:
 			// fade out over the last 500 ms
 			int brightness = 255;
 
-			if ( dif < 500 )
-				brightness = floor( (dif - 500.0f) / 500.0f * 255.0f );
+			if ( dif < 500 ) {
+				brightness = floorf( (dif - 500.0f) / 500.0f * 255.0f );
+			}
 
 			legs.renderfx &= ~RF_FORCE_ENT_ALPHA;
 			legs.renderfx &= ~RF_MINLIGHT;

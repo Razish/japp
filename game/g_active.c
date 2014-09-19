@@ -1144,8 +1144,8 @@ void G_AddPushVecToUcmd( gentity_t *self, usercmd_t *ucmd ) {
 
 	fMove = 127.0f * DotProduct( &forward, &moveDir );
 	rMove = 127.0f * DotProduct( &right, &moveDir );
-	ucmd->forwardmove = floor( fMove );//If in the same dir , will be positive
-	ucmd->rightmove = floor( rMove );//If in the same dir , will be positive
+	ucmd->forwardmove = floorf( fMove );//If in the same dir , will be positive
+	ucmd->rightmove = floorf( rMove );//If in the same dir , will be positive
 
 	if ( self->client->pushVecTime < level.time ) {
 		VectorClear( &self->client->pushVec );
@@ -2068,7 +2068,7 @@ void ClientThink_real( gentity_t *ent ) {
 								if ( ent->NPC->desiredSpeed > MIN_NPC_SPEED ) {
 									float slowdownSpeed = ((float)ent->NPC->desiredSpeed) * ent->NPC->distToGoal / SLOWDOWN_DIST;
 
-									ent->NPC->desiredSpeed = ceil( slowdownSpeed );
+									ent->NPC->desiredSpeed = ceilf( slowdownSpeed );
 									if ( ent->NPC->desiredSpeed < MIN_NPC_SPEED ) {//don't slow down too much
 										ent->NPC->desiredSpeed = MIN_NPC_SPEED;
 									}
@@ -2125,7 +2125,7 @@ void ClientThink_real( gentity_t *ent ) {
 						if ( turndelta < 0.75f )
 							client->ps.speed = 0;
 						else if ( ent->NPC->distToGoal < 100 && turndelta < 1.0f ) {//Turn is greater than 45 degrees or closer than 100 to goal
-							client->ps.speed = floor( client->ps.speed * turndelta );
+							client->ps.speed = floorf( client->ps.speed * turndelta );
 						}
 					}
 				}

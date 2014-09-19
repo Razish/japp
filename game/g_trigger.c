@@ -1724,7 +1724,7 @@ void asteroid_field_think( gentity_t *self ) {
 
 				G_SetOrigin( newAsteroid, &startSpot );
 				dist = Distance( &endSpot, &startSpot );
-				time = ceil( dist / speed ) * 1000;
+				time = ceilf( dist / speed ) * 1000.0f;
 				Q3_Lerp2Origin( -1, newAsteroid->s.number, &endSpot, time );
 
 				//spin it

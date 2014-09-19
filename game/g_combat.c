@@ -2336,7 +2336,7 @@ int CheckArmor( gentity_t *ent, int damage, uint32_t dflags ) {
 	count = client->ps.stats[STAT_ARMOR];
 
 	if ( dflags & DAMAGE_HALF_ABSORB ) {	// Half the damage gets absorbed by the shields, rather than 100%
-		save = ceil( damage * ARMOR_PROTECTION );
+		save = ceilf( damage * ARMOR_PROTECTION );
 	}
 	else {	// All the damage gets absorbed by the shields.
 		save = damage;

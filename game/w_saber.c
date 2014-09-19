@@ -1734,7 +1734,7 @@ static qboolean WP_GetSaberDeflectionAngle( gentity_t *attacker, gentity_t *defe
 			else if ( quadDiff < -4 ) {
 				quadDiff = -4 + (quadDiff + 4);
 			}
-			newQuad = attQuadEnd + ceil( ((float)quadDiff) / 2.0f );
+			newQuad = attQuadEnd + ceilf( ((float)quadDiff) / 2.0f );
 			if ( newQuad < Q_BR ) {//less than zero wraps around
 				newQuad = Q_B + newQuad;
 			}
@@ -3132,7 +3132,7 @@ void WP_SaberRadiusDamage( gentity_t *ent, vector3 *point, float radius, int dam
 			dist = VectorNormalize( &entDir );
 			if ( dist <= radius ) {//in range
 				if ( damage > 0 ) {//do damage
-					int points = ceil( (float)damage*dist / radius );
+					int points = ceilf( (float)damage*dist / radius );
 					G_Damage( radiusEnt, ent, ent, &vec3_origin, &radiusEnt->r.currentOrigin, points, DAMAGE_NO_KNOCKBACK, MOD_MELEE );
 				}
 				if ( knockBack > 0 ) {//do knockback
@@ -3475,11 +3475,11 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 
 				//allsolid?
 				if ( tr.fraction >= 1.0f )
-					dmg = ceil( fDmg * traceLength * 0.1f * 0.33f );
+					dmg = ceilf( fDmg * traceLength * 0.1f * 0.33f );
 
 				//fractional hit, the sooner you hit in the trace, the more damage you did
 				else
-					dmg = ceil( fDmg * traceLength * (1.0f - tr.fraction) * 0.1f * 0.33f );//(1.0f-tr.fraction) isn't really accurate, but kind of simulates what we have in SP
+					dmg = ceilf( fDmg * traceLength * (1.0f - tr.fraction) * 0.1f * 0.33f );//(1.0f-tr.fraction) isn't really accurate, but kind of simulates what we have in SP
 
 #ifdef DEBUG_SABER_BOX
 				if ( g_saberDebugBox.integer == 3 || g_saberDebugBox.integer == 4 )
@@ -3674,11 +3674,11 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 		//see if this specific saber has a damagescale
 		if ( !WP_SaberBladeUseSecondBladeStyle( &self->client->saber[rSaberNum], rBladeNum )
 			&& self->client->saber[rSaberNum].damageScale != 1.0f ) {
-			dmg = ceil( (float)dmg*self->client->saber[rSaberNum].damageScale );
+			dmg = ceilf( (float)dmg*self->client->saber[rSaberNum].damageScale );
 		}
 		else if ( WP_SaberBladeUseSecondBladeStyle( &self->client->saber[rSaberNum], rBladeNum )
 			&& self->client->saber[rSaberNum].damageScale2 != 1.0f ) {
-			dmg = ceil( (float)dmg*self->client->saber[rSaberNum].damageScale2 );
+			dmg = ceilf( (float)dmg*self->client->saber[rSaberNum].damageScale2 );
 		}
 
 		if ( (self->client->ps.brokenLimbs & (1 << BROKENLIMB_RARM)) ||

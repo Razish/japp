@@ -624,7 +624,7 @@ void WP_DisruptorAltFire( gentity_t *ent )
 
 		count = (level.time - ent->client->ps.weaponChargeTime) / DISRUPTOR_CHARGE_UNIT;
 		if ( level.gametype == GT_SIEGE ) {//maybe a full alt-charge should be a *bit* more dangerous in Siege mode?
-			//maxCount = ceil((200.0f-(float)damage)/2.0f);//cap at 200 damage total
+			//maxCount = ceilf((200.0f-(float)damage)/2.0f);//cap at 200 damage total
 			maxCount = 200;//the previous line ALWAYS evaluated to 135 - was that on purpose?
 		}
 	}
@@ -1902,9 +1902,9 @@ qboolean WP_LobFire( gentity_t *self, vector3 *start, vector3 *target, vector3 *
 			VectorCopy( start, &lastPos );
 
 			//This may be kind of wasteful, especially on long throws... use larger steps?  Divide the travelTime into a certain hard number of slices?  Trace just to apex and down?
-			for ( elapsedTime = timeStep; elapsedTime < floor( travelTime ) + timeStep; elapsedTime += timeStep ) {
+			for ( elapsedTime = timeStep; elapsedTime < floorf( travelTime ) + timeStep; elapsedTime += timeStep ) {
 				if ( (float)elapsedTime > travelTime ) {//cap it
-					elapsedTime = floor( travelTime );
+					elapsedTime = floorf( travelTime );
 				}
 				BG_EvaluateTrajectory( &tr, level.time + elapsedTime, &testPos );
 				trap->Trace( &trace, &lastPos, mins, maxs, &testPos, ignoreEntNum, clipmask, qfalse, 0, 0 );
@@ -1939,7 +1939,7 @@ qboolean WP_LobFire( gentity_t *self, vector3 *start, vector3 *target, vector3 *
 						break;
 					}
 				}
-				if ( elapsedTime == floor( travelTime ) ) {//reached end, all clear
+				if ( elapsedTime == floorf( travelTime ) ) {//reached end, all clear
 					break;
 				}
 				else {

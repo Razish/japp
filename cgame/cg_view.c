@@ -887,7 +887,7 @@ static int CG_CalcFov( void ) {
 	refdef->viewContents = CG_PointContents( &refdef->vieworg, -1 );
 	if ( refdef->viewContents & (CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA) ) {
 		phase = cg.time / 1000.0f * WAVE_FREQUENCY * M_PI * 2;
-		v = WAVE_AMPLITUDE * sin( phase );
+		v = WAVE_AMPLITUDE * sinf( phase );
 		fov_x += v;
 		fov_y -= v;
 		inwater = qtrue;
@@ -1339,7 +1339,7 @@ void CG_DrawSkyBoxPortal( const char *cstr ) {
 	}
 
 	//RAZFIXME: skyportal FOV
-	x = refdef->width / tan( fov_x / 360 * M_PI );
+	x = refdef->width / tanf( fov_x / 360 * M_PI );
 	fov_y = atan2f( refdef->height, x );
 	fov_y = fov_y * 360 / M_PI;
 

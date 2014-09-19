@@ -106,7 +106,7 @@ qboolean InFOV3( vector3 *spot, vector3 *from, vector3 *fromAngles, int hFOV, in
 	deltaAngles.pitch = AngleDelta( fromAngles->pitch, angles.pitch );
 	deltaAngles.yaw = AngleDelta( fromAngles->yaw, angles.yaw );
 
-	if ( fabs( deltaAngles.pitch ) <= vFOV && fabs( deltaAngles.yaw ) <= hFOV )
+	if ( fabsf( deltaAngles.pitch ) <= vFOV && fabsf( deltaAngles.yaw ) <= hFOV )
 		return qtrue;
 
 	return qfalse;
@@ -157,7 +157,7 @@ qboolean InFOV( gentity_t *ent, gentity_t *from, int hFOV, int vFOV ) {
 	vectoangles( &deltaVector, &angles );
 	deltaAngles.pitch = AngleDelta( fromAngles.pitch, angles.pitch );
 	deltaAngles.yaw = AngleDelta( fromAngles.yaw, angles.yaw );
-	if ( fabs( deltaAngles.pitch ) <= vFOV && fabs( deltaAngles.yaw ) <= hFOV )
+	if ( fabsf( deltaAngles.pitch ) <= vFOV && fabsf( deltaAngles.yaw ) <= hFOV )
 		return qtrue;
 
 	CalcEntitySpot( ent, SPOT_HEAD, &spot );
@@ -165,7 +165,7 @@ qboolean InFOV( gentity_t *ent, gentity_t *from, int hFOV, int vFOV ) {
 	vectoangles( &deltaVector, &angles );
 	deltaAngles.pitch = AngleDelta( fromAngles.pitch, angles.pitch );
 	deltaAngles.yaw = AngleDelta( fromAngles.yaw, angles.yaw );
-	if ( fabs( deltaAngles.pitch ) <= vFOV && fabs( deltaAngles.yaw ) <= hFOV )
+	if ( fabsf( deltaAngles.pitch ) <= vFOV && fabsf( deltaAngles.yaw ) <= hFOV )
 		return qtrue;
 
 	CalcEntitySpot( ent, SPOT_LEGS, &spot );
@@ -173,7 +173,7 @@ qboolean InFOV( gentity_t *ent, gentity_t *from, int hFOV, int vFOV ) {
 	vectoangles( &deltaVector, &angles );
 	deltaAngles.pitch = AngleDelta( fromAngles.pitch, angles.pitch );
 	deltaAngles.yaw = AngleDelta( fromAngles.yaw, angles.yaw );
-	if ( fabs( deltaAngles.pitch ) <= vFOV && fabs( deltaAngles.yaw ) <= hFOV )
+	if ( fabsf( deltaAngles.pitch ) <= vFOV && fabsf( deltaAngles.yaw ) <= hFOV )
 		return qtrue;
 
 	return qfalse;

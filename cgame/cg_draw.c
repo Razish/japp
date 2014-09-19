@@ -3074,8 +3074,8 @@ float CG_DrawRadar( float y ) {
 					float  x;
 					float  ly;
 
-					x = (float)RADAR_X + (float)RADAR_RADIUS + (float)sin( angle ) * distance;
-					ly = y + (float)RADAR_RADIUS + (float)cos( angle ) * distance;
+					x = (float)RADAR_X + (float)RADAR_RADIUS + (float)sinf( angle ) * distance;
+					ly = y + (float)RADAR_RADIUS + (float)cosf( angle ) * distance;
 
 					arrowBaseScale = 9.0f;
 					zScale = 1.0f;
@@ -3161,8 +3161,8 @@ float CG_DrawRadar( float y ) {
 					}
 					distance = (actualDist / RADAR_ASTEROID_RANGE)*RADAR_RADIUS;
 
-					x = (float)RADAR_X + (float)RADAR_RADIUS + (float)sin( angle ) * distance;
-					ly = y + (float)RADAR_RADIUS + (float)cos( angle ) * distance;
+					x = (float)RADAR_X + (float)RADAR_RADIUS + (float)sinf( angle ) * distance;
+					ly = y + (float)RADAR_RADIUS + (float)cosf( angle ) * distance;
 
 					if ( asteroidScale > 3.0f )
 						asteroidScale = 3.0f;
@@ -3205,8 +3205,8 @@ float CG_DrawRadar( float y ) {
 				float  x;
 				float  ly;
 
-				x = (float)RADAR_X + (float)RADAR_RADIUS + (float)sin( angle ) * distance;
-				ly = y + (float)RADAR_RADIUS + (float)cos( angle ) * distance;
+				x = (float)RADAR_X + (float)RADAR_RADIUS + (float)sinf( angle ) * distance;
+				ly = y + (float)RADAR_RADIUS + (float)cosf( angle ) * distance;
 
 				arrowBaseScale = 3.0f;
 				if ( cg.predictedPlayerState.m_iVehicleNum ) {//I'm in a vehicle

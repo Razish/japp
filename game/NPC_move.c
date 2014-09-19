@@ -305,8 +305,8 @@ void G_UcmdMoveForDir( gentity_t *self, usercmd_t *cmd, vector3 *dir ) {
 	if ( fDot < -127.0f )	fDot = -127.0f;
 	if ( rDot >  127.0f )	rDot = 127.0f;
 	if ( rDot < -127.0f )	rDot = -127.0f;
-	cmd->forwardmove = floor( fDot );
-	cmd->rightmove = floor( rDot );
+	cmd->forwardmove = floorf( fDot );
+	cmd->rightmove = floorf( rDot );
 
 	/*
 	vector3	wishvel;

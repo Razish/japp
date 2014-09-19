@@ -532,9 +532,9 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 #if 1
 		// Sil's fix
 		trap->G2API_GetBoneFrame( cent->ghoul2, "lower_lumbar", cg.time, &currentFrame, cgs.gameModels, 0 );
-		hand.frame = CG_MapTorsoToWeaponFrame( ci, ceil( currentFrame ), cent->currentState.torsoAnim );
-		hand.oldframe = CG_MapTorsoToWeaponFrame( ci, floor( currentFrame ), cent->currentState.torsoAnim );
-		hand.backlerp = 1.0f - (currentFrame - floor( currentFrame ));
+		hand.frame = CG_MapTorsoToWeaponFrame( ci, ceilf( currentFrame ), cent->currentState.torsoAnim );
+		hand.oldframe = CG_MapTorsoToWeaponFrame( ci, floorf( currentFrame ), cent->currentState.torsoAnim );
+		hand.backlerp = 1.0f - (currentFrame - floorf( currentFrame ));
 #else
 		// basejka style
 		hand.frame = CG_MapTorsoToWeaponFrame( ci, cent->pe.torso.frame, cent->currentState.torsoAnim );

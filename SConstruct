@@ -16,6 +16,7 @@
 #
 # envvars:
 #	MORE_WARNINGS	enable additional warnings (gcc/clang only)
+#	NO_SSE			disable SSE floating point instructions, force x87 fpu
 #
 
 import platform
@@ -71,11 +72,12 @@ env['PRINT_CMD_LINE_FUNC'] = cc_output
 
 # Notify the user of the build configuration
 if not env.GetOption( 'clean' ):
-	msg = 'Building for ' + plat + ' ' + str(bits) + ' bits'
+	msg = 'Building for ' + plat + ' ' + str(bits) + ' bits (' + env['CC'] + ')'
 	if debug:
 		msg += ', debug symbols'
 	if not debug or debug == 2:
 		msg += ', optimised'
+	msg += ', x87 fpu' if 'NO_SSE' in os.environ else ', SSE'
 	if force32:
 		msg += ', forcing 32 bit build'
 	print( msg )
@@ -190,9 +192,9 @@ if plat == 'Linux':
 		'-Wshadow', '-Wsign-conversion', '-Wsuggest-attribute=const', '-Wswitch-default', '-Wunreachable-code',
 		'-Wunsuffixed-float-constants' ]
 
-	# gcc-specific flags
+	# gcc-specific warnings
 	if env['CC'] == 'gcc' and arch != 'arm':
-		env['CCFLAGS'] += [ '-mfpmath=sse', '-Wlogical-op' ]
+		env['CCFLAGS'] += [ '-Wlogical-op' ]
 		status, ver = commands.getstatusoutput( 'gcc -dumpversion' )
 		if float(ver) >= 4.7:
 			env['CCFLAGS'] += [ '-Wstack-usage=32768' ]
@@ -201,7 +203,11 @@ if plat == 'Linux':
 	if arch == 'arm':
 		env['CCFLAGS'] += [ '-fsigned-char' ]
 	else:
-		env['CCFLAGS'] += [ '-msse2', '-mstackrealign' ]
+		env['CCFLAGS'] += [ '-mstackrealign' ]
+		if 'NO_SSE' in os.environ:
+			env['CCFLAGS'] += [ '-mfpmath=387', '-mno-sse2', '-ffloat-store' ]
+		else:
+			env['CCFLAGS'] += [ '-mfpmath=sse', '-msse2' ]
 		if arch == 'i386':
 			env['CCFLAGS'] += [ '-m32' ]
 			env['LINKFLAGS'] += [ '-m32' ]
@@ -258,19 +264,19 @@ if project == 'game':
 	env['CPPDEFINES'] += [ '_GAME', 'JPLUA' ]
 	if plat == 'Linux':
 		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
-	env.SharedLibrary( 'jampgame'+arch, files[project] )
+	env.SharedLibrary( 'jampgame' + arch, files[project] )
 
 elif project == 'cgame':
 	env['CPPPATH'] += [ './cgame' ]
 	env['CPPDEFINES'] += [ '_CGAME', 'JPLUA' ]
 	if plat == 'Linux':
 		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
-	env.SharedLibrary( 'cgame'+arch, files[project] )
+	env.SharedLibrary( 'cgame' + arch, files[project] )
 
 elif project == 'ui':
 	env['CPPPATH'] += [ './ui' ]
 	env['CPPDEFINES'] += [ '_UI' ]
-	env.SharedLibrary( 'ui'+arch, files[project] )
+	env.SharedLibrary( 'ui' + arch, files[project] )
 
 else:
 	print( 'no project specified' )

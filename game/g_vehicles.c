@@ -1961,12 +1961,12 @@ void G_VehicleSetDamageLocFlags( gentity_t *veh, int impactDir, int deathPoint )
 			if ( perc > 0.99f ) {
 				perc = 0.99f;
 			}
-			lightDamagePoint = ceil( deathPoint*perc*0.25f );
-			heavyDamagePoint = ceil( deathPoint*perc );
+			lightDamagePoint = ceilf( deathPoint*perc*0.25f );
+			heavyDamagePoint = ceilf( deathPoint*perc );
 		}
 		else {
-			heavyDamagePoint = ceil( deathPoint*0.66f );
-			lightDamagePoint = ceil( deathPoint*0.14f );
+			heavyDamagePoint = ceilf( deathPoint*0.66f );
+			lightDamagePoint = ceilf( deathPoint*0.14f );
 		}
 
 		if ( veh->locationDamage[impactDir] >= deathPoint ) {//destroyed
@@ -2130,7 +2130,7 @@ void G_VehUpdateShields( gentity_t *targ ) {
 	if ( targ->m_pVehicle->m_pVehicleInfo->shields <= 0 ) {//doesn't have shields, so don't have to send it
 		return;
 	}
-	targ->client->ps.activeForcePass = floor( ((float)targ->m_pVehicle->m_iShields / (float)targ->m_pVehicle->m_pVehicleInfo->shields)*10.0f );
+	targ->client->ps.activeForcePass = floorf( ((float)targ->m_pVehicle->m_iShields / (float)targ->m_pVehicle->m_pVehicleInfo->shields)*10.0f );
 }
 
 // Set the parent entity of this Vehicle NPC.

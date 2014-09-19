@@ -3230,42 +3230,13 @@ static const emote_t emotes[] = {
 };
 static const size_t numEmotes = ARRAY_LEN( emotes );
 
-static void SetEmote( gentity_t *ent, const char *emoteName );
-
-#define EMOTE( x ) static void Cmd_Emote_##x( gentity_t *ent ) { SetEmote( ent, XSTRING(x) ); }
-EMOTE( aimgun )
-EMOTE( atease )
-EMOTE( breakdance )
-EMOTE( cower )
-EMOTE( dance1 )
-EMOTE( dance2 )
-EMOTE( dance3 )
-EMOTE( fabulous )
-EMOTE( harlem )
-EMOTE( heal )
-EMOTE( hello )
-EMOTE( hips )
-EMOTE( kneel )
-EMOTE( neo )
-EMOTE( nod )
-EMOTE( radio )
-EMOTE( shake )
-EMOTE( shovel )
-EMOTE( smack1 )
-EMOTE( smack2 )
-EMOTE( stepback )
-EMOTE( suggest )
-EMOTE( surrender )
-EMOTE( wait )
-
 static int emotecmp( const void *a, const void *b ) {
 	return strcmp( (const char *)a, ((emote_t *)b)->name );
 }
 
-static void SetEmote( gentity_t *ent, const char *emoteName ) {
+static void SetEmote( gentity_t *ent, const emote_t *emote ) {
 	forceHandAnims_t handExtend = HANDEXTEND_TAUNT;
 	int emoteTime;
-	const emote_t *emote = NULL;
 
 	if ( !(japp_allowEmotes.integer & (1 << level.gametype)) ) {
 		trap->SendServerCommand( ent - g_entities, "print \"Emotes are not allowed in this gametype\n\"" );
@@ -3278,13 +3249,6 @@ static void SetEmote( gentity_t *ent, const char *emoteName ) {
 		|| BG_InKnockDown( ent->client->ps.legsAnim ) || BG_InRoll( &ent->client->ps, ent->client->ps.legsAnim )
 		|| ent->client->ps.forceHandExtend != HANDEXTEND_NONE )
 	{
-		return;
-	}
-
-	emote = (emote_t *)bsearch( emoteName, emotes, numEmotes, sizeof(emote_t), emotecmp );
-
-	if ( !emote ) {
-		assert( !"Emote not found" );
 		return;
 	}
 
@@ -3324,6 +3288,85 @@ static void SetEmote( gentity_t *ent, const char *emoteName ) {
 		ent->client->emote.nextAnim = emote->animLeave;
 	}
 	ent->client->emote.freeze = qtrue;
+}
+
+static void RegularEmote( gentity_t *ent, const char *emoteName ) {
+	const emote_t *emote = (emote_t *)bsearch( emoteName, emotes, numEmotes, sizeof(emote_t), emotecmp );
+	if ( !emote ) {
+		assert( !"Emote not found" );
+		return;
+	}
+	SetEmote( ent, emote );
+}
+
+#define EMOTE( x ) static void Cmd_Emote_##x( gentity_t *ent ) { RegularEmote( ent, XSTRING(x) ); }
+EMOTE( aimgun )
+EMOTE( atease )
+EMOTE( breakdance )
+EMOTE( cower )
+EMOTE( dance1 )
+EMOTE( dance2 )
+EMOTE( dance3 )
+EMOTE( fabulous )
+EMOTE( harlem )
+EMOTE( heal )
+EMOTE( hello )
+EMOTE( hips )
+EMOTE( kneel )
+EMOTE( neo )
+EMOTE( nod )
+EMOTE( radio )
+EMOTE( shake )
+EMOTE( shovel )
+EMOTE( smack1 )
+EMOTE( smack2 )
+EMOTE( stepback )
+EMOTE( suggest )
+EMOTE( surrender )
+EMOTE( wait )
+
+static void Cmd_Emote_hug( gentity_t *ent ) {
+	static const emote_t emoteHugger = { "hugger", BOTH_HUGGER1, BOTH_HUGGERSTOP1, EMF_HOLSTER },
+		emoteHuggee = { "huggee", BOTH_HUGGEE1, BOTH_HUGGEESTOP1, EMF_HOLSTER };
+	trace_t *tr = G_RealTrace( ent, 40.0f );
+	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS ) {
+		gentity_t *other = g_entities + tr->entityNum;
+		vector3 entDir, otherDir, entAngles, otherAngles;
+
+		VectorSubtract( &other->client->ps.origin, &ent->client->ps.origin, &otherDir );
+		VectorCopy( &ent->client->ps.viewangles, &entAngles );
+		entAngles.yaw = vectoyaw( &otherDir );
+		SetClientViewAngle( ent, &entAngles );
+		SetEmote( ent, &emoteHugger );
+
+		VectorSubtract( &ent->client->ps.origin, &other->client->ps.origin, &entDir );
+		VectorCopy( &other->client->ps.viewangles, &otherAngles );
+		otherAngles.yaw = vectoyaw( &entDir );
+		SetClientViewAngle( other, &otherAngles );
+		SetEmote( other, &emoteHuggee );
+	}
+}
+
+static void Cmd_Emote_kiss( gentity_t *ent ) {
+	static const emote_t emoteKisser = { "kisser", BOTH_KISSER, BOTH_KISSER1STOP, EMF_STATIC | EMF_HOLSTER },
+		emoteKissee = { "kissee", BOTH_KISSEE, 0, EMF_HOLSTER };
+	trace_t *tr = G_RealTrace( ent, 40.0f );
+	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS ) {
+		gentity_t *other = g_entities + tr->entityNum;
+		vector3 entDir, otherDir, entAngles, otherAngles;
+
+		VectorSubtract( &other->client->ps.origin, &ent->client->ps.origin, &otherDir );
+		VectorCopy( &ent->client->ps.viewangles, &entAngles );
+		entAngles.yaw = vectoyaw( &otherDir );
+		SetClientViewAngle( ent, &entAngles );
+		SetEmote( ent, &emoteKisser );
+
+		VectorSubtract( &ent->client->ps.origin, &other->client->ps.origin, &entDir );
+		VectorCopy( &other->client->ps.viewangles, &otherAngles );
+		otherAngles.yaw = vectoyaw( &entDir );
+		SetClientViewAngle( other, &otherAngles );
+		SetEmote( other, &emoteKissee );
+	}
 }
 
 static void Cmd_Jetpack_f( gentity_t *ent ) {
@@ -3373,7 +3416,9 @@ static const command_t commands[] = {
 	{ "amheal", Cmd_Emote_heal, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amhello", Cmd_Emote_hello, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amhips", Cmd_Emote_hips, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amhug", Cmd_Emote_hug, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "aminfo", Cmd_AMInfo_f, GTB_ALL, 0 },
+	{ "amkiss", Cmd_Emote_kiss, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amkneel", Cmd_Emote_kneel, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amneo", Cmd_Emote_neo, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amnod", Cmd_Emote_nod, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },

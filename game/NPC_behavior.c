@@ -884,9 +884,9 @@ void NPC_BSNoClip( void ) {
 		rDot = DotProduct( &right, &dir ) * 127;
 		uDot = DotProduct( &up, &dir ) * 127;
 
-		ucmd.forwardmove = floor( fDot );
-		ucmd.rightmove = floor( rDot );
-		ucmd.upmove = floor( uDot );
+		ucmd.forwardmove = floorf( fDot );
+		ucmd.rightmove = floorf( rDot );
+		ucmd.upmove = floorf( uDot );
 	}
 	else {
 		//Cut velocity?

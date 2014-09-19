@@ -2145,7 +2145,7 @@ qboolean ForceTelepathyCheckDirectNPCTarget( gentity_t *self, trace_t *tr, qbool
 	/*
 	if ( self->client->ps.fd.forcePowersActive&(1<<FP_SPEED) )
 	{
-	self->client->ps.weaponTime = floor( self->client->ps.weaponTime * g_timescale->value );
+	self->client->ps.weaponTime = floorf( self->client->ps.weaponTime * g_timescale->value );
 	}
 	*/
 	return qtrue;

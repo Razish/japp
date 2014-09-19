@@ -297,10 +297,10 @@ void CreateShield( gentity_t *ent ) {
 	ent->s.time2 = paramData;
 
 	if ( level.gametype == GT_SIEGE ) {
-		ent->health = ceil( (float)(SHIELD_SIEGE_HEALTH * 1) );
+		ent->health = ceilf( (float)(SHIELD_SIEGE_HEALTH * 1) );
 	}
 	else {
-		ent->health = ceil( (float)(SHIELD_HEALTH * 1) );
+		ent->health = ceilf( (float)(SHIELD_HEALTH * 1) );
 	}
 
 	ent->s.time = ent->health;//???

@@ -192,7 +192,7 @@ void WP_ResistForcePush( gentity_t *self, gentity_t *pusher, qboolean noPenalty 
 			//FIXME: maybe push just a little (like, slide)?
 			self->client->ps.weaponTime = 1000;
 			if ( self->client->ps.fd.forcePowersActive&(1 << FP_SPEED) ) {
-				self->client->ps.weaponTime = floor( self->client->ps.weaponTime * tFVal );
+				self->client->ps.weaponTime = floorf( self->client->ps.weaponTime * tFVal );
 			}
 			self->client->ps.pm_time = self->client->ps.weaponTime;
 			self->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
@@ -203,7 +203,7 @@ void WP_ResistForcePush( gentity_t *self, gentity_t *pusher, qboolean noPenalty 
 		else {
 			self->client->ps.weaponTime = 600;
 			if ( self->client->ps.fd.forcePowersActive&(1 << FP_SPEED) ) {
-				self->client->ps.weaponTime = floor( self->client->ps.weaponTime * tFVal );
+				self->client->ps.weaponTime = floorf( self->client->ps.weaponTime * tFVal );
 			}
 		}
 	}
@@ -779,7 +779,7 @@ void NPC_Jedi_RateNewEnemy( gentity_t *self, gentity_t *enemy ) {
 		break;
 	}
 	//Average these with current aggression
-	newAggression = ceil( (healthAggression + weaponAggression + (float)self->NPC->stats.aggression) / 3.0f );
+	newAggression = ceilf( (healthAggression + weaponAggression + (float)self->NPC->stats.aggression) / 3.0f );
 	//Com_Printf( "(%d) new agg %d - new enemy\n", level.time, newAggression );
 	Jedi_Aggression( self, newAggression - self->NPC->stats.aggression );
 
@@ -1955,12 +1955,12 @@ int Jedi_ReCalcParryTime( gentity_t *self, evasionType_t evasionType ) {
 				}
 
 				if ( self->client->NPC_class == CLASS_TAVION ) {//Tavion is faster
-					baseTime = ceil( baseTime / 2.0f );
+					baseTime = ceilf( baseTime / 2.0f );
 				}
 				else if ( self->NPC->rank >= RANK_LT_JG ) {//fencers, bosses, shadowtroopers, luke, desann, et al use the norm
 					if ( !Q_irand( 0, 2 ) ) {
 						// occasional fast parry
-						baseTime = ceil( baseTime / 2.0f );
+						baseTime = ceilf( baseTime / 2.0f );
 					}
 				}
 				else if ( self->NPC->rank == RANK_CIVILIAN ) {//grunts are slowest
@@ -3698,9 +3698,9 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum ) {//FIXME: if land on 
 		VectorCopy( &NPC->r.currentOrigin, &lastPos );
 
 		//This may be kind of wasteful, especially on long throws... use larger steps?  Divide the travelTime into a certain hard number of slices?  Trace just to apex and down?
-		for ( elapsedTime = timeStep; elapsedTime < floor( travelTime ) + timeStep; elapsedTime += timeStep ) {
+		for ( elapsedTime = timeStep; elapsedTime < floorf( travelTime ) + timeStep; elapsedTime += timeStep ) {
 			if ( (float)elapsedTime > travelTime ) {//cap it
-				elapsedTime = floor( travelTime );
+				elapsedTime = floorf( travelTime );
 			}
 			BG_EvaluateTrajectory( &tr, level.time + elapsedTime, &testPos );
 			if ( testPos.z < lastPos.z ) {//going down, ignore botclip
@@ -3739,7 +3739,7 @@ static qboolean Jedi_Jump( vector3 *dest, int goalEntNum ) {//FIXME: if land on 
 					}
 				}
 			}
-			if ( elapsedTime == (int)floor( travelTime ) ) {//reached end, all clear
+			if ( elapsedTime == (int)floorf( travelTime ) ) {//reached end, all clear
 				if ( trace.fraction >= 1.0f ) {//hmm, make sure we'll land on the ground...
 					//FIXME: do we care how far below ourselves or our dest we'll land?
 					VectorCopy( &trace.endpos, &bottom );
@@ -3924,8 +3924,8 @@ static qboolean Jedi_Jumping( gentity_t *goal ) {
 			float fDot = DotProduct( forward, goal_dir ) * 127;
 			float rDot = DotProduct( right, goal_dir ) * 127;
 
-			ucmd.forwardmove = floor(fDot);
-			ucmd.rightmove = floor(rDot);
+			ucmd.forwardmove = floorf(fDot);
+			ucmd.rightmove = floorf(rDot);
 			ucmd.upmove = 0;//don't duck
 			//Cheat:
 			if ( goal_dist < 128 && goal->r.currentorigin.z > NPC->r.currentorigin.z && NPC->client->ps.velocity[2] <= 0 )
