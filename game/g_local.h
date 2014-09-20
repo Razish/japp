@@ -121,7 +121,7 @@ typedef struct gentity_s gentity_t;
 #define EMF_NONE					(0x00u)
 #define EMF_STATIC					(0x01u) // hold animation on torso + legs, don't allow movement
 #define EMF_HOLD					(0x02u) // hold animation on torso
-#define EMF_HOLSTER					(0x08u) // forcibly deactivate saber
+#define EMF_HOLSTER					(0x04u) // forcibly deactivate saber
 
 #define SABERTWEAK_INTERPOLATE		(0x0001u) // use SP style interpolation, also fix various small issues
 #define SABERTWEAK_PROLONGDAMAGE	(0x0002u) // allow damaging in wind-up and return animations

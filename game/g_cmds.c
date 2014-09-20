@@ -3204,18 +3204,18 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 // must be in alphabetical order
 static const emote_t emotes[] = {
 	{ "aimgun", BOTH_STAND5TOAIM, 0, EMF_HOLD | EMF_HOLSTER },
-	{ "atease", BOTH_STAND4, 0, EMF_STATIC | EMF_HOLSTER },
+	{ "atease", BOTH_STAND4, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "breakdance", BOTH_FORCE_GETUP_B6, 0, EMF_NONE },
 	{ "cower", BOTH_COWER1_START, BOTH_COWER1, EMF_HOLSTER },
-	{ "dance1", BOTH_TURNSTAND1, 0, EMF_STATIC },
-	{ "dance2", BOTH_TURNSTAND4, 0, EMF_STATIC | EMF_HOLSTER },
-	{ "dance3", BOTH_TURNSTAND5, 0, EMF_STATIC },
+	{ "dance1", BOTH_TURNSTAND1, 0, EMF_STATIC | EMF_HOLD },
+	{ "dance2", BOTH_TURNSTAND4, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "dance3", BOTH_TURNSTAND5, 0, EMF_STATIC | EMF_HOLD },
 	{ "fabulous", BOTH_K7_S7_TR, 0, EMF_HOLD },
-	{ "harlem", BOTH_FORCE_DRAIN_GRABBED, 0, EMF_STATIC },
-	{ "heal", BOTH_FORCEHEAL_START, BOTH_FORCEHEAL_STOP, EMF_STATIC | EMF_HOLSTER },
+	{ "harlem", BOTH_FORCE_DRAIN_GRABBED, 0, EMF_STATIC | EMF_HOLD },
+	{ "heal", BOTH_FORCEHEAL_START, BOTH_FORCEHEAL_STOP, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "hello", BOTH_SILENCEGESTURE1, 0, EMF_NONE },
-	{ "hips", BOTH_STAND5TOSTAND8, BOTH_STAND8TOSTAND5, EMF_STATIC | EMF_HOLSTER },
-	{ "kneel", BOTH_CROUCH3, BOTH_UNCROUCH3, EMF_STATIC | EMF_HOLSTER },
+	{ "hips", BOTH_STAND5TOSTAND8, BOTH_STAND8TOSTAND5, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "kneel", BOTH_CROUCH3, BOTH_UNCROUCH3, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "neo", BOTH_FORCE_GETUP_B4, 0, EMF_NONE },
 	{ "nod", BOTH_HEADNOD, 0, EMF_NONE },
 	{ "radio", BOTH_TALKCOMM1START, BOTH_TALKCOMM1STOP, EMF_HOLD | EMF_HOLSTER },
@@ -3226,7 +3226,7 @@ static const emote_t emotes[] = {
 	{ "stepback", BOTH_FORCE_2HANDEDLIGHTNING, 0, EMF_NONE },
 	{ "suggest", BOTH_STAND1_TALK3, 0, EMF_NONE },
 	{ "surrender", TORSO_SURRENDER_START, TORSO_SURRENDER_STOP, EMF_HOLD | EMF_HOLSTER },
-	{ "wait", BOTH_STAND10, BOTH_STAND10TOSTAND1, EMF_STATIC | EMF_HOLSTER },
+	{ "wait", BOTH_STAND10, BOTH_STAND10TOSTAND1, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 };
 static const size_t numEmotes = ARRAY_LEN( emotes );
 
@@ -3234,31 +3234,30 @@ static int emotecmp( const void *a, const void *b ) {
 	return strcmp( (const char *)a, ((emote_t *)b)->name );
 }
 
-static void SetEmote( gentity_t *ent, const emote_t *emote ) {
+static qboolean SetEmote( gentity_t *ent, const emote_t *emote ) {
 	forceHandAnims_t handExtend = HANDEXTEND_TAUNT;
 	int emoteTime;
 
 	if ( !(japp_allowEmotes.integer & (1 << level.gametype)) ) {
 		trap->SendServerCommand( ent - g_entities, "print \"Emotes are not allowed in this gametype\n\"" );
-		return;
+		return qfalse;
 	}
 
 	// busy
 	if ( ent->client->ps.weaponTime > 0 || ent->client->ps.saberMove > LS_READY || ent->client->ps.fd.forcePowersActive
 		|| ent->client->ps.groundEntityNum == ENTITYNUM_NONE || ent->client->ps.duelInProgress
 		|| BG_InKnockDown( ent->client->ps.legsAnim ) || BG_InRoll( &ent->client->ps, ent->client->ps.legsAnim )
-		|| ent->client->ps.forceHandExtend != HANDEXTEND_NONE )
+		|| ent->client->ps.forceHandExtend != HANDEXTEND_NONE || ent->client->emote.freeze )
 	{
-		return;
+		return qfalse;
 	}
 
 	if ( emote->flags & EMF_STATIC ) {
 		// emotes that require you to be standing still
 		VectorClear( &ent->client->ps.velocity );
 		handExtend = HANDEXTEND_DODGE;
-		emoteTime = Q3_INFINITE;
 	}
-	else if ( emote->flags & EMF_HOLD ) {
+	if ( emote->flags & EMF_HOLD ) {
 		// hold animation on torso
 		emoteTime = Q3_INFINITE;
 	}
@@ -3275,10 +3274,12 @@ static void SetEmote( gentity_t *ent, const emote_t *emote ) {
 		ent->client->ps.saberBlocked = 0;
 		ent->client->ps.saberBlocking = 0;
 		ent->client->ps.saberHolstered = 2;
-		if ( ent->client->saber[0].soundOff )
+		if ( ent->client->saber[0].soundOff ) {
 			G_Sound( ent, CHAN_AUTO, ent->client->saber[0].soundOff );
-		if ( ent->client->saber[1].model[0] && ent->client->saber[1].soundOff )
+		}
+		if ( ent->client->saber[1].model[0] && ent->client->saber[1].soundOff ) {
 			G_Sound( ent, CHAN_AUTO, ent->client->saber[1].soundOff );
+		}
 	}
 
 	ent->client->ps.forceHandExtend = handExtend;
@@ -3288,6 +3289,8 @@ static void SetEmote( gentity_t *ent, const emote_t *emote ) {
 		ent->client->emote.nextAnim = emote->animLeave;
 	}
 	ent->client->emote.freeze = qtrue;
+
+	return qtrue;
 }
 
 static void RegularEmote( gentity_t *ent, const char *emoteName ) {
@@ -3331,19 +3334,20 @@ static void Cmd_Emote_hug( gentity_t *ent ) {
 	trace_t *tr = G_RealTrace( ent, 40.0f );
 	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *other = g_entities + tr->entityNum;
-		vector3 entDir, otherDir, entAngles, otherAngles;
 
-		VectorSubtract( &other->client->ps.origin, &ent->client->ps.origin, &otherDir );
-		VectorCopy( &ent->client->ps.viewangles, &entAngles );
-		entAngles.yaw = vectoyaw( &otherDir );
-		SetClientViewAngle( ent, &entAngles );
-		SetEmote( ent, &emoteHugger );
+		if ( SetEmote( ent, &emoteHugger ) && SetEmote( other, &emoteHuggee ) ) {
+			vector3 entDir, otherDir, entAngles, otherAngles;
 
-		VectorSubtract( &ent->client->ps.origin, &other->client->ps.origin, &entDir );
-		VectorCopy( &other->client->ps.viewangles, &otherAngles );
-		otherAngles.yaw = vectoyaw( &entDir );
-		SetClientViewAngle( other, &otherAngles );
-		SetEmote( other, &emoteHuggee );
+			VectorSubtract( &other->client->ps.origin, &ent->client->ps.origin, &otherDir );
+			VectorCopy( &ent->client->ps.viewangles, &entAngles );
+			entAngles.yaw = vectoyaw( &otherDir );
+			SetClientViewAngle( ent, &entAngles );
+
+			VectorSubtract( &ent->client->ps.origin, &other->client->ps.origin, &entDir );
+			VectorCopy( &other->client->ps.viewangles, &otherAngles );
+			otherAngles.yaw = vectoyaw( &entDir );
+			SetClientViewAngle( other, &otherAngles );
+		}
 	}
 }
 

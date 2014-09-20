@@ -1829,7 +1829,7 @@ static void AM_EntSpawn( gentity_t *ent ) {
 	unsigned int index = 0;
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"AM_EntSpawn: syntax is 'amspawn { key value key value }'\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"AM_EntSpawn: syntax is 'amspawn <classname> key value key value'\n\"" );
 		return;
 	}
 
