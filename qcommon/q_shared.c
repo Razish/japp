@@ -12,6 +12,7 @@
 #include "ui_local.h"
 #endif
 
+
 int GetIDForString( const stringID_table_t *table, const char *string ) {
 	const stringID_table_t *t;
 
@@ -151,6 +152,54 @@ float FloatSwap( const float *f ) {
 
 float FloatNoSwap( const float *f ) {
 	return *f;
+}
+
+short BigShort( short l ) {
+#if defined(MACOS_X)
+	return l;
+#else
+	return ShortSwap( l );
+#endif
+}
+
+short LittleShort( short l ) {
+#if defined(MACOS_X)
+	return ShortSwap( l );
+#else
+	return l;
+#endif
+}
+
+int BigLong( int l ) {
+#if defined(MACOS_X)
+	return l;
+#else
+	return LongSwap( l );
+#endif
+}
+
+int LittleLong( int l ) {
+#if defined(MACOS_X)
+	return LongSwap( l );
+#else
+	return l;
+#endif
+}
+
+float BigFloat( const float *l ) {
+#if defined(MACOS_X)
+	return l;
+#else
+	return FloatSwap( l );
+#endif
+}
+
+float LittleFloat( const float l ) {
+#if defined(MACOS_X)
+	return FloatSwap( &l );
+#else
+	return l;
+#endif
 }
 
 static char com_token[MAX_TOKEN_CHARS];

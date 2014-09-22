@@ -176,6 +176,10 @@ if plat == 'Linux':
 	env['CCFLAGS'] = []
 	env['CXXFLAGS'] = []
 
+	# set job/thread count
+	status, res = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
+	env.SetOption( 'num_jobs', res if status == 0 else 1 )
+
 	# c warnings
 	env['CFLAGS'] += [ '-Wdeclaration-after-statement', '-Wnested-externs', '-Wold-style-definition',
 	'-Wstrict-prototypes', ]
@@ -206,12 +210,16 @@ if plat == 'Linux':
 		env['CCFLAGS'] += [ '-mstackrealign' ]
 		if 'NO_SSE' in os.environ:
 			env['CCFLAGS'] += [ '-mfpmath=387', '-mno-sse2', '-ffloat-store' ]
+			if env['CC'] == 'gcc':
+				env['CCFLAGS'] += [ '-fexcess-precision=standard' ]
 		else:
 			env['CCFLAGS'] += [ '-mfpmath=sse', '-msse2' ]
 		if arch == 'i386':
-			env['CCFLAGS'] += [ '-m32' ]
+			env['CCFLAGS'] += [ '-m32', '-march=i686' ]
 			env['LINKFLAGS'] += [ '-m32' ]
-	env['CCFLAGS'] += [ '-fvisibility=hidden' ]
+		elif arch == 'x86_64':
+			env['CCFLAGS'] += [ '-mtune=generic' ]
+	env['CCFLAGS'] += [ '-fvisibility=hidden', '-std=gnu99', '-fomit-frame-pointer' ]
 
 	# c++ flags
 	env['CXXFLAGS'] = [ '-fvisibility-inlines-hidden', '-std=c++11' ]
@@ -233,6 +241,7 @@ elif plat == 'Windows':
 if not debug or debug == 2:
 	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-O3' ]
+		env['LINKFLAGS'] += [ '-s' ]
 	elif plat == 'Windows':
 		env['CCFLAGS'] += [ '/GL', '/Gm-', '/MD', '/O2', '/Oi' ]
 		if bits == 64:

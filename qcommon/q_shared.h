@@ -133,9 +133,12 @@ extern int g_G2AllocServer;
 // for windows fastcall option
 #define	QDECL
 
-short ShortSwap( short l );
-int LongSwap( int l );
-float FloatSwap( const float *f );
+short BigShort( short l );
+short LittleShort( short l );
+int BigLong( int l );
+int LittleLong( int l );
+float BigFloat( const float *l );
+float LittleFloat( const float l );
 
 
 // ================================================================
@@ -158,13 +161,6 @@ float FloatSwap( const float *f );
 #define ARCH_STRING "x86"
 
 //#define USE_SSE
-
-static short BigShort( short l ) { return ShortSwap( l ); }
-#define LittleShort
-static int BigLong( int l ) { return LongSwap( l ); }
-#define LittleLong
-static float BigFloat( const float *l ) { return FloatSwap( l ); }
-#define LittleFloat
 
 #define	PATH_SEP "\\"
 #define DLL_EXT ".dll"
@@ -226,13 +222,6 @@ static inline float __fctiw(register float f) {
 	return fi;
 }
 
-#define BigShort
-static inline short LittleShort( short l ) { return ShortSwap( l ); }
-#define BigLong
-static inline int LittleLong( int l ) { return LongSwap( l ); }
-#define BigFloat
-static inline float LittleFloat( const float l ) { return FloatSwap( &l ); }
-
 #endif // MACOS_X
 
 
@@ -291,22 +280,6 @@ static inline float LittleFloat( const float l ) { return FloatSwap( &l ); }
 #define	BOTLIB_HARD_LINKED
 #endif
 
-#if !idppc
-inline static short BigShort( short l ) { return ShortSwap( l ); }
-#define LittleShort
-inline static int BigLong( int l ) { return LongSwap( l ); }
-#define LittleLong
-inline static float BigFloat( const float *l ) { return FloatSwap( l ); }
-#define LittleFloat
-#else // idppc
-#define BigShort
-inline static short LittleShort( short l ) { return ShortSwap( l ); }
-#define BigLong
-inline static int LittleLong( int l ) { return LongSwap( l ); }
-#define BigFloat
-inline static float LittleFloat( const float *l ) { return FloatSwap( l ); }
-#endif // idppc
-
 #endif // __linux__
 
 
@@ -331,22 +304,6 @@ inline static float LittleFloat( const float *l ) { return FloatSwap( l ); }
 
 #define	PATH_SEP "/"
 #define DLL_EXT ".so"
-
-#if !idppc
-static short BigShort( short l ) { return ShortSwap( l ); }
-#define LittleShort
-static int BigLong( int l ) { LongSwap( l ); }
-#define LittleLong
-static float BigFloat( const float *l ) { FloatSwap( l ); }
-#define LittleFloat
-#else // idppc
-#define BigShort
-static short LittleShort( short l ) { return ShortSwap( l ); }
-#define BigLong
-static int LittleLong( int l ) { return LongSwap( l ); }
-#define BigFloat
-static float LittleFloat( const float *l ) { return FloatSwap( l ); }
-#endif // idppc
 
 #endif // __FreeBSD__
 

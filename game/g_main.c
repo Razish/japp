@@ -112,6 +112,10 @@ static void CVU_Duel( void ) {
 	SetCInfo( (g_privateDuel.integer & PRIVDUEL_WEAP), CINFO_PRIVDUELWEAP );
 }
 
+static void CVU_Warmup( void ) {
+	level.warmupTime = -1;
+}
+
 static void CVU_BusyAttack( void ) {
 	SetCInfo( !japp_allowBusyAttack.integer, CINFO_NOBUSYATK );
 }
@@ -1109,28 +1113,6 @@ void CalculateRanks( void ) {
 		}
 	}
 
-	//Raz: Fix warmup
-	/*
-	if ( !g_warmup.integer || level.gametype == GT_SIEGE )
-	{
-	level.warmupTime = 0;
-	}
-	*/
-
-	/*
-	if (level.numNonSpectatorClients == 2 && preNumSpec < 2 && nonSpecIndex != -1 && level.gametype == GT_DUEL && !level.warmupTime)
-	{
-	gentity_t *currentWinner = G_GetDuelWinner(&level.clients[nonSpecIndex]);
-
-	if (currentWinner && currentWinner->client)
-	{
-	trap->SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " %s %s\n\"",
-	currentWinner->client->pers.netname, G_GetStringEdString("MP_SVGAME", "VERSUS"), level.clients[nonSpecIndex].pers.netname));
-	}
-	}
-	*/
-	//NOTE: for now not doing this either. May use later if appropriate.
-
 	qsort( level.sortedClients, level.numConnectedClients,
 		sizeof(level.sortedClients[0]), SortRanks );
 
@@ -2081,56 +2063,51 @@ void CheckTournament( void ) {
 			}
 		}
 
-		//rww - It seems we have decided there will be no warmup in duel.
-		//if (!g_warmup.integer)
-		{ //don't care about any of this stuff then, just add people and leave me alone
+		if ( !g_doWarmup.integer ) {
+			// don't care about any of this stuff then, just add people and leave me alone
 			level.warmupTime = 0;
 			return;
 		}
-#if 0
-		// if we don't have two players, go back to "waiting for players"
-		if ( level.numPlayingClients != 2 ) {
-			if ( level.warmupTime != -1 ) {
-				level.warmupTime = -1;
-				trap->SetConfigstring( CS_WARMUP, va( "%i", level.warmupTime ) );
-				G_LogPrintf( level.log.console, "Warmup:\n" );
-			}
-			return;
-		}
-
-		if ( level.warmupTime == 0 ) {
-			return;
-		}
-
-		// if the warmup is changed at the console, restart it
-		if ( g_warmup.modificationCount != level.warmupModificationCount ) {
-			level.warmupModificationCount = g_warmup.modificationCount;
-			level.warmupTime = -1;
-		}
-
-		// if all players have arrived, start the countdown
-		if ( level.warmupTime < 0 ) {
-			if ( level.numPlayingClients == 2 ) {
-				// fudge by -1 to account for extra delays
-				level.warmupTime = level.time + (g_warmup.integer - 1) * 1000;
-
-				if ( level.warmupTime < (level.time + 3000) ) { //rww - this is an unpleasent hack to keep the level from resetting completely on the client (this happens when two map_restarts are issued rapidly)
-					level.warmupTime = level.time + 3000;
+		else {
+			// if we don't have two players, go back to "waiting for players"
+			if ( level.numPlayingClients != 2 ) {
+				if ( level.warmupTime != -1 ) {
+					level.warmupTime = -1;
+					trap->SetConfigstring( CS_WARMUP, va( "%i", level.warmupTime ) );
+					G_LogPrintf( level.log.console, "Warmup:\n" );
 				}
-				trap->SetConfigstring( CS_WARMUP, va( "%i", level.warmupTime ) );
+				return;
 			}
-			return;
-		}
 
-		// if the warmup time has counted down, restart
-		if ( level.time > level.warmupTime ) {
-			level.warmupTime += 10000;
-			trap->Cvar_Set( "g_restarted", "1" );
-			trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
-			level.restarted = qtrue;
-			return;
+			if ( level.warmupTime == 0 ) {
+				return;
+			}
+
+			// if all players have arrived, start the countdown
+			if ( level.warmupTime < 0 ) {
+				if ( level.numPlayingClients == 2 ) {
+					// fudge by -1 to account for extra delays
+					level.warmupTime = level.time + (g_warmup.integer - 1) * 1000;
+
+					if ( level.warmupTime < level.time + 3000 ) {
+						// this is an unpleasant hack to keep the level from resetting completely on the client
+						// this happens when two map_restarts are issued rapidly
+						level.warmupTime = level.time + 3000;
+					}
+					trap->SetConfigstring( CS_WARMUP, va( "%i", level.warmupTime ) );
+				}
+				return;
+			}
+
+			// if the warmup time has counted down, restart
+			if ( level.time > level.warmupTime ) {
+				level.warmupTime += 10000;
+				trap->Cvar_Set( "g_restarted", "1" );
+				trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+				level.restarted = qtrue;
+				return;
+			}
 		}
-#endif
 	}
 	else if ( level.gametype == GT_POWERDUEL ) {
 		if ( level.numPlayingClients < 2 ) { //hmm, ok, pull more in.
@@ -2397,25 +2374,30 @@ void CheckReady( void ) {
 	gentity_t *ent = NULL;
 	uint16_t readyMask = 0u;
 
-	if ( !g_doWarmup.integer || level.warmupTime == 0 || !level.numPlayingClients || level.restarted || level.allReady )
+	if ( !g_doWarmup.integer || !level.warmupTime || !level.numPlayingClients || level.restarted || level.allReady ) {
 		return;
+	}
 
 	playerCount = level.numPlayingClients;
 	for ( i = 0, ent = g_entities; i < sv_maxclients.integer; i++, ent++ ) {
-		if ( !ent->inuse || ent->client->pers.connected == CON_DISCONNECTED )
+		if ( !ent->inuse || ent->client->pers.connected == CON_DISCONNECTED ) {
 			continue;
+		}
 		if ( ent->client->pers.ready ) {
 			readyCount++;
-			if ( i < 16 )
+			if ( i < 16 ) {
 				readyMask |= (1 << i);
+			}
 		}
-		if ( ent->r.svFlags & SVF_BOT )
+		if ( ent->r.svFlags & SVF_BOT ) {
 			playerCount--;
+		}
 	}
 
 	for ( i = 0, ent = g_entities; i < sv_maxclients.integer; i++, ent++ ) {
-		if ( !ent->inuse || ent->client->pers.connected == CON_DISCONNECTED )
+		if ( !ent->inuse || ent->client->pers.connected == CON_DISCONNECTED ) {
 			continue;
+		}
 		ent->client->ps.stats[STAT_CLIENTS_READY] = readyMask;
 	}
 

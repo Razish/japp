@@ -28,16 +28,15 @@
 					<Add option="-DNDEBUG" />
 				</Compiler>
 			</Target>
-			<Environment>
-				<Variable name="JA" value="~/ja" />
-			</Environment>
 		</Build>
 		<Compiler>
-			<Add option="-Wextra" />
+			<Add option="-fomit-frame-pointer" />
+			<Add option="-Wall" />
 			<Add option="-Wdeclaration-after-statement" />
 			<Add option="-Wnested-externs" />
 			<Add option="-Wold-style-definition" />
 			<Add option="-Wstrict-prototypes" />
+			<Add option="-Wextra" />
 			<Add option="-Wno-missing-braces" />
 			<Add option="-Wno-missing-field-initializers" />
 			<Add option="-Wno-sign-compare" />
@@ -52,9 +51,12 @@
 			<Add option="-Wundef" />
 			<Add option="-Wuninitialized" />
 			<Add option="-Wwrite-strings" />
-			<Add option="-fvisibility=hidden" />
-			<Add option="-msse2" />
 			<Add option="-mstackrealign" />
+			<Add option="-mfpmath=sse" />
+			<Add option="-msse2" />
+			<Add option="-mtune=generic" />
+			<Add option="-fvisibility=hidden" />
+			<Add option="-std=gnu99" />
 			<Add option="-fPIC" />
 			<Add option="-D_CGAME" />
 			<Add option="-DJPLUA" />
@@ -67,7 +69,7 @@
 			<Add library="readline" />
 		</Linker>
 		<ExtraCommands>
-			<Add after="cp $(TARGET_OUTPUT_FILE) $(JA)/japlus" />
+			<Add after="cp $(TARGET_OUTPUT_FILE) ../" />
 			<Mode after="always" />
 		</ExtraCommands>
 		<Unit filename="../Ghoul2/G2.h" />
