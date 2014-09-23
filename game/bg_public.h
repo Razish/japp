@@ -459,7 +459,6 @@ typedef struct pmove_s {
 	// command (in)
 	usercmd_t	cmd;
 	int			tracemask;			// collide against these types of surfaces
-	int			debugLevel;			// if set, diagnostic output will be printed
 	qboolean	noFootsteps;		// if the game is setup for no footsteps by the server
 	qboolean	gauntletHit;		// true if a gauntlet attack would actually hit something
 
@@ -504,6 +503,10 @@ typedef struct pmove_s {
 
 	int			overbounce;
 	float		gripSpeedScale;
+
+#ifdef _DEBUG
+	int			debugLevel; // if set, diagnostic output will be printed
+#endif
 } pmove_t;
 
 

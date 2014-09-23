@@ -1855,9 +1855,10 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	//Make sure the jetpack is turned off.
 	Jetpack_Off( self );
 
-	//Raz: Remove grapple
-	if ( self->client->hook )
+	// remove grapple
+	if ( self->client->hook ) {
 		Weapon_HookFree( self->client->hook );
+	}
 
 	if ( self - g_entities < MAX_CLIENTS ) {
 		if ( !(inflictor - g_entities < MAX_CLIENTS) )

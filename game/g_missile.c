@@ -857,7 +857,7 @@ void G_RunMissile( gentity_t *ent ) {
 		}
 	}
 
-	if ( ent->parent && ent->parent->client && ent->parent->client->hook == ent
+	if ( ent->parent && ent->parent->client && ent->parent->client->hook && ent->parent->client->hook == ent
 		&& (ent->parent->client->ps.duelInProgress
 		|| BG_SaberInSpecial( ent->parent->client->ps.saberMove )
 		|| !(japp_allowHook.integer & (1 << level.gametype))
@@ -873,8 +873,9 @@ void G_RunMissile( gentity_t *ent ) {
 			// If grapple, reset owner
 			//	if ( ent->parent && ent->parent->client && ent->parent->client->hook == ent )
 			//		ent->parent->client->hook = NULL;
-			if ( ent->parent && ent->parent->client && ent->parent->client->hook == ent )
+			if ( ent->parent && ent->parent->client && ent->parent->client->hook && ent->parent->client->hook == ent ) {
 				Weapon_HookFree( ent->parent->client->hook );
+			}
 
 			if ( (ent->s.weapon == WP_SABER && ent->isSaberEntity) || isKnockedSaber ) {
 				G_RunThink( ent );

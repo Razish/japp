@@ -759,8 +759,11 @@ void PM_StepSlideMove( qboolean gravity ) {
 	pm->trace( &trace, &start_o, &pm->mins, &pm->maxs, &up, pm->ps->clientNum, pm->tracemask );
 	if ( trace.allsolid ) {
 		// can't step up
-		if ( pm->debugLevel )
+#ifdef _DEBUG
+		if ( pm->debugLevel ) {
 			Com_Printf( "%i:bend can't step\n", c_pmove );
+		}
+#endif
 		return;
 	}
 
@@ -831,6 +834,9 @@ void PM_StepSlideMove( qboolean gravity ) {
 		else if ( delta < 15 )	PM_AddEvent( EV_STEP_12 );
 		else					PM_AddEvent( EV_STEP_16 );
 	}
-	if ( pm->debugLevel )
+#ifdef _DEBUG
+	if ( pm->debugLevel ) {
 		Com_Printf( "%i:stepped\n", c_pmove );
+	}
+#endif
 }

@@ -997,7 +997,9 @@ void CG_PredictPlayerState( void ) {
 					cg_vehPmove.trace = CG_Trace;
 					cg_vehPmove.pointcontents = CG_PointContents;
 					cg_vehPmove.tracemask = MASK_PLAYERSOLID;
+#ifdef _DEBUG
 					cg_vehPmove.debugLevel = 0;
+#endif
 					cg_vehPmove.g2Bolts_LFoot = -1;
 					cg_vehPmove.g2Bolts_RFoot = -1;
 

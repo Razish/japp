@@ -2256,11 +2256,13 @@ static void BG_StartLegsAnim( playerState_t *ps, int anim ) {
 #endif
 	ps->legsAnim = anim;
 
+#ifdef _DEBUG
 	/*
 	if ( pm->debugLevel ) {
-	Com_Printf("%d:  StartLegsAnim %d, on client#%d\n", pm->cmd.serverTime, anim, pm->ps->clientNum);
+		Com_Printf( "%d:  StartLegsAnim %d, on client#%d\n", pm->cmd.serverTime, anim, pm->ps->clientNum );
 	}
 	*/
+#endif
 }
 
 void PM_ContinueLegsAnim( int anim ) {

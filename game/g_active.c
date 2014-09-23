@@ -2477,7 +2477,9 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 	pm.trace = SV_PMTrace;
 	pm.pointcontents = trap->PointContents;
+#ifdef _DEBUG
 	pm.debugLevel = g_debugMove.integer;
+#endif
 	pm.noFootsteps = (dmflags.integer & DF_NO_FOOTSTEPS) > 0;
 
 	pm.pmove_fixed = pmove_fixed.integer;
@@ -2975,7 +2977,7 @@ void ClientThink_real( gentity_t *ent ) {
 				|| (oldGrapple && !pullGrapple && ent->client->hook)
 				|| (!pullGrapple && ent->client->fireHeld && ent->client->hookHasBeenFired) )
 			{
-				Weapon_HookFree( client->hook );
+				Weapon_HookFree( ent->client->hook );
 			}
 			else if ( ent->client->hookHasBeenFired && !ent->client->fireHeld ) {
 				if ( pullGrapple ) {

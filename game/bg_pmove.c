@@ -30,14 +30,12 @@ extern float PM_WalkableGroundDistance( void );
 extern qboolean PM_GroundSlideOkay( float zNormal );
 extern saberInfo_t *BG_MySaber( int clientNum, int saberNum );
 
-pmove_t		*pm;
-pml_t		pml;
+pmove_t *pm;
+pml_t pml;
 
-bgEntity_t *pm_entSelf = NULL;
-bgEntity_t *pm_entVeh = NULL;
+bgEntity_t *pm_entSelf = NULL, *pm_entVeh = NULL;
 
 qboolean gPMDoSlowFall = qfalse;
-
 qboolean pm_cancelOutZoom = qfalse;
 
 // movement parameters
@@ -45,21 +43,22 @@ float	pm_stopspeed = 100.0f;
 static float PM_DuckScale( void ) {
 	return GetCInfo( CINFO_VQ3PHYS ) ? 0.25f : 0.50f;
 }
-float	pm_swimScale = 0.50f;
-float	pm_wadeScale = 0.70f;
+float pm_swimScale = 0.50f;
+float pm_wadeScale = 0.70f;
 
-float	pm_vehicleaccelerate = 36.0f;
-float	pm_accelerate = 10.0f;
-float	pm_airaccelerate = 1.0f;
-float	pm_wateraccelerate = 4.0f;
-float	pm_flyaccelerate = 8.0f;
+float pm_vehicleaccelerate = 36.0f;
+float pm_accelerate = 10.0f;
+float pm_airaccelerate = 1.0f;
+float pm_wateraccelerate = 4.0f;
+float pm_flyaccelerate = 8.0f;
+float pm_friction = 6.0f;
+float pm_waterfriction = 1.0f;
+float pm_flightfriction = 3.0f;
+float pm_spectatorfriction = 5.0f;
 
-float	pm_friction = 6.0f;
-float	pm_waterfriction = 1.0f;
-float	pm_flightfriction = 3.0f;
-float	pm_spectatorfriction = 5.0f;
-
-int		c_pmove = 0;
+#ifdef _DEBUG
+int c_pmove = 0;
+#endif
 
 int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
 {
@@ -1031,35 +1030,34 @@ without getting a sqrtf(2) distortion in speed.
 ============
 */
 static float PM_CmdScale( usercmd_t *cmd ) {
-	int		max;
-	float	total, scale;
-	int		umove = GetCInfo( CINFO_VQ3PHYS ) ? cmd->upmove : 0;
+	int max;
+	float total, scale;
+	int umove = GetCInfo( CINFO_VQ3PHYS ) ? cmd->upmove : 0;
 
 	max = abs( cmd->forwardmove );
-	if ( abs( cmd->rightmove ) > max )	max = abs( cmd->rightmove );
-	if ( abs( umove ) > max )			max = abs( umove );
+	if ( abs( cmd->rightmove ) > max ) {
+		max = abs( cmd->rightmove );
+	}
+	if ( abs( umove ) > max ) {
+		max = abs( umove );
+	}
 
-	if ( !max )
+	if ( !max ) {
 		return 0;
+	}
 
-	if ( GetCInfo( CINFO_VQ3PHYS ) )
+	if ( GetCInfo( CINFO_VQ3PHYS ) ) {
 		total = sqrtf( cmd->forwardmove*cmd->forwardmove + cmd->rightmove*cmd->rightmove + umove*umove );
-	else
+	}
+	else {
 		total = sqrtf( (float)(cmd->forwardmove*cmd->forwardmove + cmd->rightmove*cmd->rightmove + umove*umove) );
+	}
 	scale = (float)pm->ps->speed * max / (127.0f * total);
 
 	return scale;
 }
 
-
-/*
-================
-PM_SetMovementDir
-
-Determine the rotation of the legs reletive
-to the facing dir
-================
-*/
+// Determine the rotation of the legs relative to the facing dir
 static void PM_SetMovementDir( void ) {
 	if ( pm->cmd.forwardmove || pm->cmd.rightmove ) {
 		if ( pm->cmd.rightmove == 0 && pm->cmd.forwardmove > 0 ) {
@@ -3060,14 +3058,6 @@ static void PM_FlyMove( void ) {
 	PM_StepSlideMove( qfalse );
 }
 
-
-/*
-===================
-PM_AirMove
-
-===================
-*/
-
 static void PM_AirMove( void ) {
 	vector3		wishVel, wishDir;
 	float		fmove, smove, wishSpeed, wishSpeed2;
@@ -3128,10 +3118,12 @@ static void PM_AirMove( void ) {
 
 		if ( pm->ps->pm_type == PM_JETPACK ) {
 			// if we are jetting then we have more control than usual
-			if ( pm->cmd.upmove <= 0 )
+			if ( pm->cmd.upmove <= 0 ) {
 				VectorScale( &wishVel, 0.8f, &wishVel );
-			else
+			}
+			else {
 				VectorScale( &wishVel, 2.0f, &wishVel );
+			}
 		}
 	}
 
@@ -3141,26 +3133,31 @@ static void PM_AirMove( void ) {
 	wishSpeed2 = wishSpeed;
 
 	if ( promode ) {
-		if ( DotProduct( &pm->ps->velocity, &wishDir ) < 0.0f )
+		if ( DotProduct( &pm->ps->velocity, &wishDir ) < 0.0f ) {
 			accelerate = cpm_pm_airstopaccelerate;
-		else
+		}
+		else {
 			accelerate = pm_airaccelerate;
+		}
 		if ( pm->ps->movementDir == 2 || pm->ps->movementDir == 6 ) {
-			if ( wishSpeed > cpm_pm_wishspeed )
+			if ( wishSpeed > cpm_pm_wishspeed ) {
 				wishSpeed = cpm_pm_wishspeed;
+			}
 			accelerate = cpm_pm_strafeaccelerate;
 		}
 	}
-	else
+	else {
 		accelerate = pm_airaccelerate;
+	}
 
 	// speeders have more control in air
 	if ( pVeh && pVeh->m_pVehicleInfo->type == VH_SPEEDER ) {
 		//in mid-air
 		accelerate = pVeh->m_pVehicleInfo->traction;
 		// on a slope of some kind, shouldn't have much control and should slide a lot
-		if ( pml.groundPlane )
+		if ( pml.groundPlane ) {
 			accelerate *= 0.5f;
+		}
 	}
 	// not on ground, so little effect on velocity
 	PM_Accelerate( &wishDir, wishSpeed, accelerate );
@@ -3513,8 +3510,9 @@ static void PM_NoclipMove( void ) {
 	fmove = pm->cmd.forwardmove;
 	smove = pm->cmd.rightmove;
 
-	for ( i = 0; i < 3; i++ )
+	for ( i = 0; i < 3; i++ ) {
 		wishvel.data[i] = pml.forward.data[i] * fmove + pml.right.data[i] * smove;
+	}
 	wishvel.z += pm->cmd.upmove;
 
 	VectorCopy( &wishvel, &wishdir );
@@ -3918,9 +3916,11 @@ static int PM_CorrectAllSolid( trace_t *trace ) {
 	int			i, j, k;
 	vector3		point;
 
+#ifdef _DEBUG
 	if ( pm->debugLevel ) {
 		Com_Printf( "%i:allsolid\n", c_pmove );
 	}
+#endif
 
 	// jitter around
 	for ( i = -1; i <= 1; i++ ) {
@@ -3980,9 +3980,11 @@ static void PM_GroundTraceMissed( void ) {
 	//If the anim is choke3, act like we just went into the air because we aren't in a float
 	else if ( pm->ps->groundEntityNum != ENTITYNUM_NONE || (pm->ps->legsAnim) == BOTH_CHOKE3 ) {
 		// we just transitioned into freefall
+#ifdef _DEBUG
 		if ( pm->debugLevel ) {
 			Com_Printf( "%i:lift\n", c_pmove );
 		}
+#endif
 
 		// if they aren't in a jumping animation and the ground is a ways away, force into it
 		// if we didn't do the trace, the player would be backflipping down staircases
@@ -4080,9 +4082,11 @@ static void PM_GroundTrace( void ) {
 
 	// check if getting thrown off the ground
 	if ( pm->ps->velocity.z > 0 && DotProduct( &pm->ps->velocity, &trace.plane.normal ) > 10 ) {
+#ifdef _DEBUG
 		if ( pm->debugLevel ) {
 			Com_Printf( "%i:kickoff\n", c_pmove );
 		}
+#endif
 		// go into jump animation
 		if ( pm->cmd.forwardmove >= 0 ) {
 			PM_ForceLegsAnim( BOTH_JUMP1 );
@@ -4101,9 +4105,11 @@ static void PM_GroundTrace( void ) {
 
 	// slopes that are too steep will not be considered onground
 	if ( trace.plane.normal.z < minNormal ) {
+#ifdef _DEBUG
 		if ( pm->debugLevel ) {
 			Com_Printf( "%i:steep\n", c_pmove );
 		}
+#endif
 		pm->ps->groundEntityNum = ENTITYNUM_NONE;
 		pml.groundPlane = qtrue;
 		pml.walking = qfalse;
@@ -4121,9 +4127,11 @@ static void PM_GroundTrace( void ) {
 
 	if ( pm->ps->groundEntityNum == ENTITYNUM_NONE ) {
 		// just hit the ground
+#ifdef _DEBUG
 		if ( pm->debugLevel ) {
 			Com_Printf( "%i:Land\n", c_pmove );
 		}
+#endif
 
 		PM_CrashLand();
 

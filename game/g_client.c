@@ -1066,7 +1066,8 @@ void SiegeRespawn( gentity_t *ent );
 void respawn( gentity_t *ent ) {
 	MaintainBodyQueue( ent );
 
-	if ( ent->client->hook ) {//Raz: Make sure hook is removed, SHOULD BE DONE BEFORE THIS
+	if ( ent->client->hook ) {
+		// make sure hook is removed, SHOULD BE DONE BEFORE THIS
 		assert( !"respawn(): grapple hook was not removed" );
 		Weapon_HookFree( ent->client->hook );
 	}
@@ -1966,8 +1967,9 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		G_LogPrintf( level.log.security, "ClientUserinfoChanged(): Client %i (%s) userinfo 'cp_pluginDisable' was found, but invalid. [IP: %s]\n", clientNum, client->pers.netname, client->sess.IP );
 
 	s = Info_ValueForKey( userinfo, "cjp_client" );
-	if ( s[0] )
+	if ( s[0] ) {
 		client->pers.CSF |= JAPLUS_CLIENT_FLAGS;
+	}
 
 	// check the item prediction
 	s = Info_ValueForKey( userinfo, "cg_predictItems" );
@@ -2388,8 +2390,9 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	}
 
 	// get and distribute relevent paramters
-	if ( !ClientUserinfoChanged( clientNum ) )
+	if ( !ClientUserinfoChanged( clientNum ) ) {
 		return "Failed userinfo validation";
+	}
 
 	if ( !isBot && firstTime ) {
 		if ( !tmpIP[0] ) {
@@ -3684,9 +3687,10 @@ void ClientDisconnect( int clientNum ) {
 		TossClientItems( ent );
 	}
 
-	//Raz: Kill grapple
-	if ( ent->client->hook )
+	// kill grapple
+	if ( ent->client->hook ) {
 		Weapon_HookFree( ent->client->hook );
+	}
 
 	// if we are playing in tourney mode, give a win to the other player and clear his frags for this round
 	if ( level.gametype == GT_DUEL && !level.intermissiontime && !level.warmupTime ) {

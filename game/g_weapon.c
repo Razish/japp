@@ -3087,13 +3087,28 @@ void Weapon_GrapplingHook_Fire( gentity_t *ent ) {
 	ent->client->hookHasBeenFired = qtrue;
 }
 
-void Weapon_HookFree( gentity_t *ent ) {
-	ent->parent->client->fireHeld = qfalse;
-	ent->parent->client->hookHasBeenFired = qfalse;
-	ent->parent->client->hook = NULL;
-	ent->parent->client->ps.pm_flags &= ~PMF_GRAPPLE_PULL;
-	ent->parent->client->ps.eFlags &= ~EF_GRAPPLE_SWING;
-	G_FreeEntity( ent );
+void Weapon_HookFree( gentity_t *hook ) {
+	if ( !hook ) {
+		assert( !"Weapon_HookFree: NULL hook" );
+		return;
+	}
+
+	if ( !hook->parent ) {
+		assert( !"Weapon_HookFree: NULL hook->parent" );
+		return;
+	}
+
+	if ( !hook->parent->client ) {
+		assert( !"Weapon_HookFree: NULL hook->parent->client" );
+		return;
+	}
+
+	hook->parent->client->fireHeld = qfalse;
+	hook->parent->client->hookHasBeenFired = qfalse;
+	hook->parent->client->hook = NULL;
+	hook->parent->client->ps.pm_flags &= ~PMF_GRAPPLE_PULL;
+	hook->parent->client->ps.eFlags &= ~EF_GRAPPLE_SWING;
+	G_FreeEntity( hook );
 }
 
 void Weapon_HookThink( gentity_t *ent ) {

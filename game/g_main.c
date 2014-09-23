@@ -1264,9 +1264,10 @@ void MoveClientToIntermission( gentity_t *ent ) {
 	ent->s.event = 0;
 	ent->r.contents = 0;
 
-	//Raz: Remove grapple
-	if ( ent->client->hook )
+	// remove grapple
+	if ( ent->client->hook ) {
 		Weapon_HookFree( ent->client->hook );
+	}
 }
 
 /*

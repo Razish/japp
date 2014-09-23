@@ -55,7 +55,9 @@ XCVAR_DEF( g_autoMapCycle, "0", NULL, CVAR_ARCHIVE | CVAR_NORESTART, qtrue )
 XCVAR_DEF( g_debugAlloc, "0", NULL, CVAR_NONE, qfalse )
 XCVAR_DEF( g_debugDamage, "0", NULL, CVAR_NONE, qfalse )
 XCVAR_DEF( g_debugMelee, "0", NULL, CVAR_SERVERINFO, qtrue )
+#ifdef _DEBUG
 XCVAR_DEF( g_debugMove, "0", NULL, CVAR_NONE, qfalse )
+#endif
 XCVAR_DEF( g_debugSaberLocks, "0", NULL, CVAR_CHEAT, qfalse )
 XCVAR_DEF( g_debugServerSkel, "0", NULL, CVAR_CHEAT, qfalse )
 XCVAR_DEF( g_debugTrace, "0", NULL, CVAR_NONE, qfalse )
