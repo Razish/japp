@@ -695,8 +695,6 @@ void Use_BinaryMover_Go( gentity_t *ent ) {
 
 	ent->activator = activator;
 
-	trap->Print( "Use_BinaryMover_Go\n" );
-
 	if ( ent->moverState == MOVER_POS1 ) {
 		vector3	doorcenter;
 
@@ -828,7 +826,6 @@ Use_BinaryMover
 ================
 */
 void Use_BinaryMover( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
-	trap->Print( "Use_BinaryMover\n" );
 	if ( !ent->use ) {//I cannot be used anymore, must be a door with a wait of -1 that's opened.
 		return;
 	}
