@@ -1879,7 +1879,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 		HKEY hkey;
 		unsigned long datalen = sizeof(registryValue);  // data field length(in), data returned length(out)
 		unsigned long datatype; // #defined in winnt.h (predefined types 0-11)
-		LSTATUS error;
+		LONG error;
 		if ( (error = RegOpenKeyExA( (HKEY)HKEY_CURRENT_USER, (LPCSTR)JP_TIMESTAMP_REGISTRY_KEY, (DWORD)0,
 			(REGSAM)KEY_QUERY_VALUE, &hkey )) == ERROR_SUCCESS ) {
 			if ( (error = RegQueryValueExA( (HKEY)hkey, (LPCSTR)JP_TIMESTAMP_REGISTRY_NAME, (LPDWORD)NULL,

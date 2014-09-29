@@ -9301,9 +9301,11 @@ void PmoveSingle( pmove_t *pmove ) {
 
 	gPMDoSlowFall = PM_DoSlowFall();
 
+#ifdef _DEBUG
 	// this counter lets us debug movement problems with a journal
 	// by setting a conditional breakpoint fot the previous frame
 	c_pmove++;
+#endif // _DEBUG
 
 	// clear results
 	pm->numtouch = 0;

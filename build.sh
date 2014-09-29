@@ -7,6 +7,7 @@ ARGSLEN=${#ARGS[@]}
 # options
 DEBUG=0
 FORCE32=0
+XCOMPILE=0
 
 # targets
 GAME=0
@@ -29,6 +30,21 @@ do
 		;;
 	"force32")
 		FORCE32=1
+		;;
+	"xcompile")
+		XCOMPILE=1
+		export CC=i586-mingw32msvc-gcc
+		export CXX=i586-mingw32msvc-c++
+		export LD=i586-mingw32msvc-ld
+		export AR=i586-mingw32msvc-ar
+		export AS=i586-mingw32msvc-as
+		export NM=i586-mingw32msvc-nm
+		export STRIP=i586-mingw32msvc-strip
+		export RANLIB=i586-mingw32msvc-ranlib
+		export DLLTOOL=i586-mingw32msvc-dlltool
+		export OBJDUMP=i586-mingw32msvc-objdump
+		export RESCOMP=i586-mingw32msvc-windres
+		export WINDRES=i586-mingw32msvc-windres
 		;;
 	"all")
 		GAME=1
@@ -57,15 +73,15 @@ fi
 
 if [ $GAME -eq 1 ]
 then
-	$build project=game debug=$DEBUG force32=$FORCE32
+	$build project=game debug=$DEBUG force32=$FORCE32 xcompile=$XCOMPILE
 fi
 
 if [ $CGAME -eq 1 ]
 then
-	$build project=cgame debug=$DEBUG force32=$FORCE32
+	$build project=cgame debug=$DEBUG force32=$FORCE32 xcompile=$XCOMPILE
 fi
 
 if [ $UI -eq 1 ]
 then
-	$build project=ui debug=$DEBUG force32=$FORCE32
+	$build project=ui debug=$DEBUG force32=$FORCE32 xcompile=$XCOMPILE
 fi

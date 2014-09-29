@@ -93,7 +93,6 @@ BG_field_t fields[] = {
 	{ "healingsound", FOFS( healingsound ), F_LSTRING },
 	{ "health", FOFS( health ), F_INT },
 	{ "idealclass", FOFS( idealclass ), F_LSTRING },//for siege spawnpoints
-	{ "light", 0, F_IGNORE },
 	{ "linear", FOFS( alt_fire ), F_INT },//for movers to use linear movement
 	{ "lostenemyscript", FOFS( behaviorSet[BSET_LOSTENEMY] ), F_LSTRING },//name of script to run
 	{ "message", FOFS( message ), F_LSTRING },
@@ -143,12 +142,12 @@ BG_field_t fields[] = {
 	{ "target5", FOFS( target5 ), F_LSTRING },
 	{ "target6", FOFS( target6 ), F_LSTRING },
 	{ "targetname", FOFS( targetname ), F_LSTRING },
+	{ "targetshadername", FOFS( targetShaderName ), F_LSTRING },
+	{ "targetshadernewname", FOFS( targetShaderNewName ), F_LSTRING },
 	{ "team", FOFS( team ), F_LSTRING },
 	{ "teamnodmg", FOFS( teamnodmg ), F_INT },
 	{ "teamowner", FOFS( s.teamowner ), F_INT },
 	{ "teamuser", FOFS( alliedTeam ), F_INT },
-	{ "targetshadername", FOFS( targetShaderName ), F_LSTRING },
-	{ "targetshadernewname", FOFS( targetShaderNewName ), F_LSTRING },
 	{ "usescript", FOFS( behaviorSet[BSET_USE] ), F_LSTRING },//name of script to run
 	{ "victoryscript", FOFS( behaviorSet[BSET_VICTORY] ), F_LSTRING },//name of script to run
 	{ "wait", FOFS( wait ), F_FLOAT },

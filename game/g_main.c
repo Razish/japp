@@ -40,44 +40,50 @@ qboolean G_EntIsBreakable( int entityNum );
 qboolean G_EntIsRemovableUsable( int entNum );
 void CP_FindCombatPointWaypoints( void );
 
-/*
-================
-G_FindTeams
+static qboolean G_IsTeamableEntity( const gentity_t *ent ) {
+	if ( !ent->inuse ) {
+		return qfalse;
+	}
 
-Chain together all entities with a matching team field.
-Entity teams are used for item groups and multi-entity mover groups.
+	if ( !ent->team ) {
+		return qfalse;
+	}
 
-All but the first will have the FL_TEAMSLAVE flag set and teammaster field set
-All but the last will have the teamchain field set to the next one
-================
-*/
-void G_FindTeams( void ) {
-	gentity_t	*e, *e2;
-	int		i, j;
-	int		c, c2;
+	if ( ent->flags & FL_TEAMSLAVE ) {
+		return qfalse;
+	}
+
+	if ( ent->r.contents == CONTENTS_TRIGGER ) {
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
+// Chain together all entities with a matching team field.
+// Entity teams are used for item groups and multi-entity mover groups.
+// All but the first will have the FL_TEAMSLAVE flag set and teammaster field set
+// All but the last will have the teamchain field set to the next one
+static void G_FindTeams( void ) {
+	gentity_t *e, *e2;
+	int i, j, c, c2;
 
 	c = 0;
 	c2 = 0;
-	for ( i = 1, e = g_entities + i; i < level.num_entities; i++, e++ ) {
-		if ( !e->inuse )
+	for ( i = MAX_CLIENTS, e = g_entities + i; i < level.num_entities; i++, e++ ) {
+		if ( !G_IsTeamableEntity( e ) ) {
 			continue;
-		if ( !e->team )
-			continue;
-		if ( e->flags & FL_TEAMSLAVE )
-			continue;
-		if ( e->r.contents == CONTENTS_TRIGGER )
-			continue;//triggers NEVER link up in teams!
+		}
+
 		e->teammaster = e;
 		c++;
 		c2++;
 		for ( j = i + 1, e2 = e + 1; j < level.num_entities; j++, e2++ ) {
-			if ( !e2->inuse )
+			if ( !G_IsTeamableEntity( e2 ) ) {
 				continue;
-			if ( !e2->team )
-				continue;
-			if ( e2->flags & FL_TEAMSLAVE )
-				continue;
-			if ( !strcmp( e->team, e2->team ) ) {
+			}
+
+			if ( !Q_stricmp( e->team, e2->team ) ) {
 				c2++;
 				e2->teamchain = e->teamchain;
 				e->teamchain = e2;
@@ -93,7 +99,9 @@ void G_FindTeams( void ) {
 		}
 	}
 
-	//	trap->Print ("%i teams with %i entities\n", c, c2);
+#ifdef _DEBUG
+	trap->Print( "G_FindTeams: %i teams with %i entities\n", c, c2 );
+#endif
 }
 
 #include "JAPP/jp_promode.h"

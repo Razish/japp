@@ -104,7 +104,7 @@ typedef struct miniRefEntity_s {
 
 } miniRefEntity_t;
 
-#if defined(_WIN32) && !defined(MINGW32)
+#ifdef _MSC_VER
 #pragma warning (disable : 4201 )
 #endif
 typedef struct refEntity_s {

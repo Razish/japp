@@ -11,7 +11,7 @@ If there's only one specific case, you may want to push the warning and pop	back
 #pragma warning( pop )	//revert anything changed in the pushed segment of the code
 */
 
-#if defined(_WIN32) && !defined(MINGW32)
+#ifdef _MSC_VER
 #pragma warning( error : 4013 ) // 'Func' undefined; assuming extern returning int
 #pragma warning( error : 4024 ) // different types for formal and actual parameter x
 #pragma warning( error : 4026 ) // function declared with formal parameter list
@@ -33,4 +33,4 @@ If there's only one specific case, you may want to push the warning and pop	back
 #pragma warning( disable	: 4131 )	// 'x' : uses old-style declarator
 #pragma warning( disable	: 4996 )	// This function or variable may be unsafe
 
-#endif //_WIN32 && !MINGW32
+#endif //_MSC_VER

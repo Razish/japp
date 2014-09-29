@@ -32,14 +32,16 @@ except( ValueError, TypeError ):
 arch = None # platform-specific, set manually
 
 debug = int( ARGUMENTS.get( 'debug', 0 ) )
-force32 = int( ARGUMENTS.get( 'force32', 0 ) )
+force32 = int( ARGUMENTS.get( 'force32', False ) )
 project = ARGUMENTS.get( 'project', None )
+xcompile = int( ARGUMENTS.get( 'xcompile', False ) )
 
 # architecture settings, needed for binary names, also passed as a preprocessor definition
 if force32:
 	bits = 32
+
 if bits == 32:
-	if plat == 'Windows':
+	if plat == 'Windows' or xcompile:
 		arch = 'x86'
 	elif plat == 'Linux':
 		if platform.machine()[:3] == 'arm':
@@ -93,7 +95,7 @@ files['lua'] = [ 'lua/lapi.c', 'lua/lauxlib.c', 'lua/lbaselib.c', 'lua/lbitlib.c
 'lua/lctype.c', 'lua/ldblib.c', 'lua/ldebug.c', 'lua/ldo.c', 'lua/ldump.c', 'lua/lfunc.c', 'lua/lgc.c', 'lua/linit.c',
 'lua/liolib.c', 'lua/llex.c', 'lua/lmathlib.c', 'lua/lmem.c', 'lua/loadlib.c', 'lua/lobject.c', 'lua/lopcodes.c',
 'lua/loslib.c', 'lua/lparser.c', 'lua/lstate.c', 'lua/lstring.c', 'lua/lstrlib.c', 'lua/ltable.c', 'lua/ltablib.c',
-'lua/ltm.c', 'lua/lua.c', 'lua/lundump.c', 'lua/lvm.c', 'lua/lzio.c' ]
+'lua/ltm.c', 'lua/lua.c', 'lua/lundump.c', 'lua/lvm.c', 'lua/lzio.c' ] if not xcompile else []
 
 # libudis86 files
 files['udis86'] = [ 'libudis86/decode.c', 'libudis86/input.c', 'libudis86/itab.c', 'libudis86/syn-att.c',
@@ -160,13 +162,13 @@ files['ui'] = [ 'game/bg_misc.c', 'game/bg_saberLoad.c', 'game/bg_saga.c', 'game
 	+ files['udis86']
 
 # linker inputs
-if plat == 'Linux':
+if plat == 'Linux' and not xcompile:
 	libs['game'] = [ 'm', 'readline' ]
 	libs['cgame'] = [ 'm', 'readline' ]
 	libs['ui'] = [ 'm' ]
-elif plat == 'Windows':
+elif plat == 'Windows' or xcompile:
 	libs['game'] = [ 'user32' ]
-	libs['cgame'] = [ 'user32', 'Advapi32' ]
+	libs['cgame'] = [ 'user32', 'advapi32' ]
 	libs['ui'] = [ 'user32' ]
 
 # compiler switches
@@ -179,6 +181,11 @@ if plat == 'Linux':
 	# set job/thread count
 	status, res = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
 	env.SetOption( 'num_jobs', res if status == 0 else 1 )
+
+	if xcompile:
+		env['CPPDEFINES'] += [ 'MINGW32', 'NO_CRASHHANDLER', 'WINVER=0x0400', '__WIN95__', '__GNUWIN32__', 'STRICT',
+		'HAVE_W32API_H', '__WXMSW__', '__WINDOWS__' ]
+		env['CCFLAGS'] += [ '-mwindows' ]
 
 	# c warnings
 	env['CFLAGS'] += [ '-Wdeclaration-after-statement', '-Wnested-externs', '-Wold-style-definition',
@@ -203,6 +210,9 @@ if plat == 'Linux':
 		if float(ver) >= 4.7:
 			env['CCFLAGS'] += [ '-Wstack-usage=32768' ]
 
+	# disable warnings
+	env['CCFLAGS'] += [ '-Wno-char-subscripts' ]
+
 	# c/cpp flags
 	if arch == 'arm':
 		env['CCFLAGS'] += [ '-fsigned-char' ]
@@ -219,10 +229,14 @@ if plat == 'Linux':
 			env['LINKFLAGS'] += [ '-m32' ]
 		elif arch == 'x86_64':
 			env['CCFLAGS'] += [ '-mtune=generic' ]
-	env['CCFLAGS'] += [ '-fvisibility=hidden', '-std=gnu99', '-fomit-frame-pointer' ]
+	env['CCFLAGS'] += [ '-fvisibility=hidden', '-fomit-frame-pointer' ]
+
+	# c flags
+	env['CFLAGS'] += [ '-std=gnu99' ]
 
 	# c++ flags
-	env['CXXFLAGS'] = [ '-fvisibility-inlines-hidden', '-std=c++11' ]
+	env['CXXFLAGS'] += [ '-fvisibility-inlines-hidden', '-std=c++11' ]
+
 elif plat == 'Windows':
 	# assume msvc
 	env['CCFLAGS'] = [ '/nologo', '/W4', '/WX-', '/GS', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/GF',
@@ -270,16 +284,20 @@ env['LIBS'] = libs[project]
 
 # targets
 if project == 'game':
-	env['CPPDEFINES'] += [ '_GAME', 'JPLUA' ]
-	if plat == 'Linux':
-		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
+	env['CPPDEFINES'] += [ '_GAME' ]
+	if not xcompile:
+		env['CPPDEFINES'] += [ 'JPLUA' ]
+		if plat == 'Linux':
+			env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
 	env.SharedLibrary( 'jampgame' + arch, files[project] )
 
 elif project == 'cgame':
 	env['CPPPATH'] += [ './cgame' ]
-	env['CPPDEFINES'] += [ '_CGAME', 'JPLUA' ]
-	if plat == 'Linux':
-		env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
+	env['CPPDEFINES'] += [ '_CGAME' ]
+	if not xcompile:
+		env['CPPDEFINES'] += [ 'JPLUA' ]
+		if plat == 'Linux':
+			env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
 	env.SharedLibrary( 'cgame' + arch, files[project] )
 
 elif project == 'ui':

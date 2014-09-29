@@ -1861,11 +1861,12 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	}
 
 	if ( self - g_entities < MAX_CLIENTS ) {
-		if ( !(inflictor - g_entities < MAX_CLIENTS) )
+		if ( inflictor - g_entities >= MAX_CLIENTS ) {
 			JPLua_Event_PlayerDeath( self->s.number, meansOfDeath, -1 );
-		else
+		}
+		else {
 			JPLua_Event_PlayerDeath( self->s.number, meansOfDeath, inflictor->s.number );
-
+		}
 	}
 
 	self->client->ps.heldByClient = 0;

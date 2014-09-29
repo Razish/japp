@@ -1,7 +1,7 @@
 #include "qcommon/q_shared.h"
 #include "qcommon/game_version.h"
 
-#if ARCH_WIDTH == 64 || defined(MACOS_X) || defined(QARCH_ARM)
+#if ARCH_WIDTH == 64 || defined(MACOS_X) || defined(QARCH_ARM) || defined(NO_CRASHHANDLER)
 
 // wat do?
 

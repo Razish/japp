@@ -47,7 +47,9 @@ extern	float	pm_friction;
 extern	float	pm_waterfriction;
 extern	float	pm_flightfriction;
 
+#ifdef _DEBUG
 extern	int		c_pmove;
+#endif // _DEBUG
 
 extern int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS];
 

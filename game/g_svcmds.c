@@ -403,8 +403,10 @@ static const svCommand_t svCommands[] = {
 	{ "gametype", SV_Gametype_f },
 	{ "game_memory", SV_GameMemory_f },
 	{ "lsmaps", SV_ListMaps_f },
+#ifdef JPLUA
 	{ "lua", SV_Lua_f },
 	{ "lua_reload", SV_LuaReload_f },
+#endif
 	{ "pause", SV_Pause_f },
 	{ "say", SV_Say_f },
 	{ "shuffle", SV_ShuffleTeams_f },
