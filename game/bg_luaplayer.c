@@ -470,6 +470,23 @@ static int JPLua_Player_GetScore( lua_State *L ) {
 }
 #endif
 
+//Func: Player:GetTeam()
+//Retn: integer of the player's team
+static int JPLua_Player_GetTeam( lua_State *L ) {
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+#if defined(_GAME)
+	lua_pushinteger( L, g_entities[player->clientNum].client->sess.sessionTeam );
+#elif defined(_CGAME)
+	if ( player->clientNum == cg.clientNum ) {
+		lua_pushinteger( L, cg.predictedPlayerState.persistant[PERS_TEAM] );
+	}
+	else {
+		lua_pushnil( L );
+	}
+#endif
+	return 1;
+}
+
 #ifdef _GAME
 //Func: Player:GetUserinfo()
 //Retn: Table of userinfo keys/values
@@ -1094,6 +1111,9 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "GetSaberStyle", JPLua_Player_GetSaberStyle },
 #ifdef _GAME
 	{ "GetScore", JPLua_Player_GetScore },
+#endif
+	{ "GetTeam", JPLua_Player_GetTeam },
+#ifdef _GAME
 	{ "GetUserinfo", JPLua_Player_GetUserinfo },
 #endif
 	{ "GetVelocity", JPLua_Player_GetVelocity },

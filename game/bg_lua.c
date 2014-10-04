@@ -19,6 +19,8 @@
 #pragma comment( lib, "lua" )
 #endif
 
+const uint32_t JPLUA_VERSION = 9;
+
 static const char *baseDir = "lua/";
 #if defined(_GAME)
 static const char *pluginDir = "lua/sv/";
@@ -949,7 +951,6 @@ static int JPLua_Export_WorldCoordToScreenCoord( lua_State *L ) {
 }
 #endif
 
-const uint32_t JPLUA_VERSION = 8;
 static const jplua_cimport_table_t JPLua_CImports[] = {
 #ifdef _GAME
 	{ "AddClientCommand", JPLua_Export_AddClientCommand }, // AddClientCommand( string cmd )
