@@ -3010,7 +3010,7 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 			Q_PrintBuffer( &pb, va( "    Prolonged swing damage %s" S_COLOR_WHITE "\n",
 				(tweaks & SABERTWEAK_PROLONGDAMAGE) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
 			Q_PrintBuffer( &pb, va( "    Deflection %s" S_COLOR_WHITE "\n",
-				(tweaks & SABERTWEAK_DEFLECTION) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
+				(tweaks & SABERTWEAK_POSDEFLECTION) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
 			Q_PrintBuffer( &pb, va( "    Special moves %s" S_COLOR_WHITE "\n",
 				(tweaks & SABERTWEAK_SPECIALMOVES) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
 			Q_PrintBuffer( &pb, va( "    Trace size %s" S_COLOR_WHITE "\n",

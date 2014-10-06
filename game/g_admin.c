@@ -392,12 +392,22 @@ static telemark_t *AM_AddTelemark( const char *name, vector3 *position ) {
 // delete a telemark
 static void AM_DeleteTelemark( gentity_t *ent, const char *name ) {
 	telemark_t *tm = NULL, *prev = NULL, *next = NULL;
+	qboolean numeric = qtrue;
+	const char *p = NULL;
+	int i = 0;
+
+	for ( p = name; *p; p++ ) {
+		if ( Q_isalpha( *p ) ) {
+			numeric = qfalse;
+			break;
+		}
+	}
 
 	for ( tm = telemarks; tm; tm = tm->next ) {
 		next = tm->next;
 
-		if ( !Q_stricmp( name, tm->name ) ) {
-			trap->SendServerCommand( ent - g_entities, va( "print \"Deleting telemark '%s'\n\"", name ) );
+		if ( (numeric && i == atoi( name )) || !Q_stricmp( name, tm->name ) ) {
+			trap->SendServerCommand( ent - g_entities, va( "print \"Deleting telemark '%s'\n\"", tm->name ) );
 
 			if ( telemarksVisible ) {
 				G_FreeEntity( tm->ent );
@@ -417,6 +427,7 @@ static void AM_DeleteTelemark( gentity_t *ent, const char *name ) {
 		}
 
 		prev = tm;
+		i++;
 	}
 
 	trap->SendServerCommand( ent - g_entities, va( "print \"No such telemark found (%s)\n\"", name ) );
@@ -1958,8 +1969,8 @@ static void AM_Map( gentity_t *ent ) {
 
 	if ( !japp_allowAnyGametype.integer ) {
 		if ( !G_DoesMapSupportGametype( map, gametype ) ) {
-			trap->SendServerCommand( ent - g_entities, va( "print \"Map: %s does not support gametype: %s, or the map doesn't"
-				"exist.\n\"", map, BG_GetGametypeString( gametype ) ) );
+			trap->SendServerCommand( ent - g_entities, va( "print \"Map: %s does not support gametype: %s, or the map "
+				"doesn't exist.\n\"", map, BG_GetGametypeString( gametype ) ) );
 			return;
 		}
 	}

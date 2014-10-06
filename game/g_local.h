@@ -25,110 +25,111 @@ typedef struct gentity_s gentity_t;
 #include "g_xcvar.h"
 #undef XCVAR_PROTO
 
-#define	GAMEVERSION					"JA+ Mod v2.6 B1" //"JA++ 0.2 build 2"
-#define DEFAULT_NAME				"Padawan"
-#define BODY_QUEUE_SIZE				(8)
-#define	FRAMETIME					(100) // msec
-#define	CARNAGE_REWARD_TIME			(3000)
-#define REWARD_SPRITE_TIME			(2000)
-#define	INTERMISSION_DELAY_TIME		(1000)
-#define	SP_INTERMISSION_DELAY_TIME	(5000)
-#define	START_TIME_LINK_ENTS		(FRAMETIME*1) // time-delay after map start at which all ents have been spawned, so can link them
-#define	START_TIME_FIND_LINKS		(FRAMETIME*2) // time-delay after map start at which you can find linked entities
-#define	START_TIME_MOVERS_SPAWNED	(FRAMETIME*3) // time-delay after map start at which all movers should be spawned
-#define	START_TIME_REMOVE_ENTS		(FRAMETIME*4) // time-delay after map start to remove temporary ents
-#define	START_TIME_NAV_CALC			(FRAMETIME*5) // time-delay after map start to connect waypoints and calc routes
-#define	START_TIME_FIND_WAYPOINT	(FRAMETIME*6) // time-delay after map start after which it's okay to try to find your best waypoint
-#define	MAX_G_SHARED_BUFFER_SIZE	(1024*8)
-#define	FOLLOW_ACTIVE1				(-1)
-#define	FOLLOW_ACTIVE2				(-2)
-#define	MAX_VOTE_COUNT				(3)
-#define NUM_CLIENT_TRAILS			(10)
-#define MAX_INTEREST_POINTS			(64)
-#define MAX_COMBAT_POINTS			(512)
-#define	MAX_ALERT_EVENTS			(32)
-#define MAX_REFNAME					(32)
-#define MAX_FILEPATH				(144)
+#define	GAMEVERSION						"JA+ Mod v2.6 B1" //"JA++ 0.2 build 2"
+#define DEFAULT_NAME					"Padawan"
+#define BODY_QUEUE_SIZE					(8)
+#define	FRAMETIME						(100) // msec
+#define	CARNAGE_REWARD_TIME				(3000)
+#define REWARD_SPRITE_TIME				(2000)
+#define	INTERMISSION_DELAY_TIME			(1000)
+#define	SP_INTERMISSION_DELAY_TIME		(5000)
+#define	START_TIME_LINK_ENTS			(FRAMETIME*1) // time-delay after map start at which all ents have been spawned, so can link them
+#define	START_TIME_FIND_LINKS			(FRAMETIME*2) // time-delay after map start at which you can find linked entities
+#define	START_TIME_MOVERS_SPAWNED		(FRAMETIME*3) // time-delay after map start at which all movers should be spawned
+#define	START_TIME_REMOVE_ENTS			(FRAMETIME*4) // time-delay after map start to remove temporary ents
+#define	START_TIME_NAV_CALC				(FRAMETIME*5) // time-delay after map start to connect waypoints and calc routes
+#define	START_TIME_FIND_WAYPOINT		(FRAMETIME*6) // time-delay after map start after which it's okay to try to find your best waypoint
+#define	MAX_G_SHARED_BUFFER_SIZE		(1024*8)
+#define	FOLLOW_ACTIVE1					(-1)
+#define	FOLLOW_ACTIVE2					(-2)
+#define	MAX_VOTE_COUNT					(3)
+#define NUM_CLIENT_TRAILS				(10)
+#define MAX_INTEREST_POINTS				(64)
+#define MAX_COMBAT_POINTS				(512)
+#define	MAX_ALERT_EVENTS				(32)
+#define MAX_REFNAME						(32)
+#define MAX_FILEPATH					(144)
 
-#define PRIVDUEL_ALLOW				(0x0001u)
-#define PRIVDUEL_MULTI				(0x0002u)
-#define PRIVDUEL_RESPAWN			(0x0004u)
-#define PRIVDUEL_NOSEVER			(0x0008u)
-#define PRIVDUEL_TEAM				(0x0010u)
-#define PRIVDUEL_WEAP				(0x0020u)
+#define PRIVDUEL_ALLOW					(0x0001u)
+#define PRIVDUEL_MULTI					(0x0002u)
+#define PRIVDUEL_RESPAWN				(0x0004u)
+#define PRIVDUEL_NOSEVER				(0x0008u)
+#define PRIVDUEL_TEAM					(0x0010u)
+#define PRIVDUEL_WEAP					(0x0020u)
 
-#define DUELSTATS_HEALTH			(0x0001u)
-#define DUELSTATS_TIME				(0x0002u)
-#define DUELSTATS_HITS				(0x0004u)
+#define DUELSTATS_HEALTH				(0x0001u)
+#define DUELSTATS_TIME					(0x0002u)
+#define DUELSTATS_HITS					(0x0004u)
 
-#define FINDCL_SUBSTR				(0x0001u)
-#define FINDCL_FIRSTMATCH			(0x0002u)
-#define FINDCL_CASE					(0x0004u)
-#define FINDCL_PRINT				(0x0008u)
+#define FINDCL_SUBSTR					(0x0001u)
+#define FINDCL_FIRSTMATCH				(0x0002u)
+#define FINDCL_CASE						(0x0004u)
+#define FINDCL_PRINT					(0x0008u)
 
 
-#define SPF_BUTTON_USABLE			(0x0001u)
-#define SPF_BUTTON_FPUSHABLE		(0x0002u)
+#define SPF_BUTTON_USABLE				(0x0001u)
+#define SPF_BUTTON_FPUSHABLE			(0x0002u)
 
-#define	RTF_NONE					(0x00000000u)
-#define	RTF_NAVGOAL					(0x00000001u)
+#define	RTF_NONE						(0x00000000u)
+#define	RTF_NAVGOAL						(0x00000001u)
 
-#define	PSG_VOTED					(0x0001u) // already cast a vote
+#define	PSG_VOTED						(0x0001u) // already cast a vote
 
-#define DAMAGE_NORMAL				(0x00000000u) // No flags set.
-#define DAMAGE_RADIUS				(0x00000001u) // damage was indirect
-#define DAMAGE_NO_ARMOR				(0x00000002u) // armour does not protect from this damage
-#define DAMAGE_NO_KNOCKBACK			(0x00000004u) // do not affect velocity, just view angles
-#define DAMAGE_NO_PROTECTION		(0x00000008u) // armor, shields, invulnerability, and godmode have no effect
-#define DAMAGE_NO_TEAM_PROTECTION	(0x00000010u) // armor, shields, invulnerability, and godmode have no effect
-#define DAMAGE_UNUSED00000020		(0x00000020u) //
-#define DAMAGE_EXTRA_KNOCKBACK		(0x00000040u) // add extra knockback to this damage
-#define DAMAGE_DEATH_KNOCKBACK		(0x00000080u) // only does knockback on death of target
-#define DAMAGE_IGNORE_TEAM			(0x00000100u) // damage is always done, regardless of teams
-#define DAMAGE_NO_DAMAGE			(0x00000200u) // do no actual damage but react as if damage was taken
-#define DAMAGE_HALF_ABSORB			(0x00000400u) // half shields, half health
-#define DAMAGE_HALF_ARMOR_REDUCTION	(0x00000800u) // This damage doesn't whittle down armor as efficiently.
-#define DAMAGE_HEAVY_WEAP_CLASS		(0x00001000u) // Heavy damage
-#define DAMAGE_NO_HIT_LOC			(0x00002000u) // No hit location
-#define DAMAGE_NO_SELF_PROTECTION	(0x00004000u) // Dont apply half damage to self attacks
-#define DAMAGE_NO_DISMEMBER			(0x00008000u) // Dont do dismemberment
-#define DAMAGE_SABER_KNOCKBACK1		(0x00010000u) // Check the attacker's first saber for a knockbackScale
-#define DAMAGE_SABER_KNOCKBACK2		(0x00020000u) // Check the attacker's second saber for a knockbackScale
-#define DAMAGE_SABER_KNOCKBACK1_B2	(0x00040000u) // Check the attacker's first saber for a knockbackScale2
-#define DAMAGE_SABER_KNOCKBACK2_B2	(0x00080000u) // Check the attacker's second saber for a knockbackScale2
+#define DAMAGE_NORMAL					(0x00000000u) // No flags set.
+#define DAMAGE_RADIUS					(0x00000001u) // damage was indirect
+#define DAMAGE_NO_ARMOR					(0x00000002u) // armour does not protect from this damage
+#define DAMAGE_NO_KNOCKBACK				(0x00000004u) // do not affect velocity, just view angles
+#define DAMAGE_NO_PROTECTION			(0x00000008u) // armor, shields, invulnerability, and godmode have no effect
+#define DAMAGE_NO_TEAM_PROTECTION		(0x00000010u) // armor, shields, invulnerability, and godmode have no effect
+#define DAMAGE_UNUSED00000020			(0x00000020u) //
+#define DAMAGE_EXTRA_KNOCKBACK			(0x00000040u) // add extra knockback to this damage
+#define DAMAGE_DEATH_KNOCKBACK			(0x00000080u) // only does knockback on death of target
+#define DAMAGE_IGNORE_TEAM				(0x00000100u) // damage is always done, regardless of teams
+#define DAMAGE_NO_DAMAGE				(0x00000200u) // do no actual damage but react as if damage was taken
+#define DAMAGE_HALF_ABSORB				(0x00000400u) // half shields, half health
+#define DAMAGE_HALF_ARMOR_REDUCTION		(0x00000800u) // This damage doesn't whittle down armor as efficiently.
+#define DAMAGE_HEAVY_WEAP_CLASS			(0x00001000u) // Heavy damage
+#define DAMAGE_NO_HIT_LOC				(0x00002000u) // No hit location
+#define DAMAGE_NO_SELF_PROTECTION		(0x00004000u) // Dont apply half damage to self attacks
+#define DAMAGE_NO_DISMEMBER				(0x00008000u) // Dont do dismemberment
+#define DAMAGE_SABER_KNOCKBACK1			(0x00010000u) // Check the attacker's first saber for a knockbackScale
+#define DAMAGE_SABER_KNOCKBACK2			(0x00020000u) // Check the attacker's second saber for a knockbackScale
+#define DAMAGE_SABER_KNOCKBACK1_B2		(0x00040000u) // Check the attacker's first saber for a knockbackScale2
+#define DAMAGE_SABER_KNOCKBACK2_B2		(0x00080000u) // Check the attacker's second saber for a knockbackScale2
 
-#define	FL_GODMODE					(0x00000001u) //
-#define	FL_NOTARGET					(0x00000002u) //
-#define	FL_TEAMSLAVE				(0x00000004u) // not the first on the team
-#define FL_NO_KNOCKBACK				(0x00000008u) //
-#define FL_DROPPED_ITEM				(0x00000010u) //
-#define FL_NO_BOTS					(0x00000020u) // spawn point not for bot use
-#define FL_NO_HUMANS				(0x00000040u) // spawn point just for bots
-#define FL_FORCE_GESTURE			(0x00000080u) // force gesture on client
-#define FL_INACTIVE					(0x00000100u) // inactive
-#define FL_NAVGOAL					(0x00000200u) // for npc nav stuff
-#define	FL_DONT_SHOOT				(0x00000400u) //
-#define FL_SHIELDED					(0x00000800u) //
-#define FL_UNDYING					(0x00001000u) // takes damage down to 1, but never dies
-#define	FL_BOUNCE					(0x00002000u) // for missiles
-#define	FL_BOUNCE_HALF				(0x00004000u) // for missiles
-#define	FL_BOUNCE_SHRAPNEL			(0x00008000u) // special shrapnel flag
-#define	FL_VEH_BOARDING				(0x00010000u) //
-#define FL_DMG_BY_SABER_ONLY		(0x00020000u) // only take dmg from saber
-#define FL_DMG_BY_HEAVY_WEAP_ONLY	(0x00040000u) // only take dmg from explosives
-#define FL_BBRUSH					(0x00080000u) // i am a breakable brush
+#define	FL_GODMODE						(0x00000001u) //
+#define	FL_NOTARGET						(0x00000002u) //
+#define	FL_TEAMSLAVE					(0x00000004u) // not the first on the team
+#define FL_NO_KNOCKBACK					(0x00000008u) //
+#define FL_DROPPED_ITEM					(0x00000010u) //
+#define FL_NO_BOTS						(0x00000020u) // spawn point not for bot use
+#define FL_NO_HUMANS					(0x00000040u) // spawn point just for bots
+#define FL_FORCE_GESTURE				(0x00000080u) // force gesture on client
+#define FL_INACTIVE						(0x00000100u) // inactive
+#define FL_NAVGOAL						(0x00000200u) // for npc nav stuff
+#define	FL_DONT_SHOOT					(0x00000400u) //
+#define FL_SHIELDED						(0x00000800u) //
+#define FL_UNDYING						(0x00001000u) // takes damage down to 1, but never dies
+#define	FL_BOUNCE						(0x00002000u) // for missiles
+#define	FL_BOUNCE_HALF					(0x00004000u) // for missiles
+#define	FL_BOUNCE_SHRAPNEL				(0x00008000u) // special shrapnel flag
+#define	FL_VEH_BOARDING					(0x00010000u) //
+#define FL_DMG_BY_SABER_ONLY			(0x00020000u) // only take dmg from saber
+#define FL_DMG_BY_HEAVY_WEAP_ONLY		(0x00040000u) // only take dmg from explosives
+#define FL_BBRUSH						(0x00080000u) // i am a breakable brush
 
-#define EMF_NONE					(0x00u)
-#define EMF_STATIC					(0x01u) // hold animation on torso + legs, don't allow movement
-#define EMF_HOLD					(0x02u) // hold animation on torso
-#define EMF_HOLSTER					(0x04u) // forcibly deactivate saber
+#define EMF_NONE						(0x00u)
+#define EMF_STATIC						(0x01u) // hold animation on torso + legs, don't allow movement
+#define EMF_HOLD						(0x02u) // hold animation on torso
+#define EMF_HOLSTER						(0x04u) // forcibly deactivate saber
 
-#define SABERTWEAK_INTERPOLATE		(0x0001u) // use SP style interpolation, also fix various small issues
-#define SABERTWEAK_PROLONGDAMAGE	(0x0002u) // allow damaging in wind-up and return animations
-#define SABERTWEAK_DEFLECTION		(0x0004u) // calculate deflection based on position rather than animation
-#define SABERTWEAK_SPECIALMOVES		(0x0008u) // tweak damages for special moves
-#define SABERTWEAK_TRACESIZE		(0x0010u) // use SP saber trace size or based off radius defined in .sab file
-#define SABERTWEAK_REDUCEBLOCKS		(0x0020u) // reduce chance of blocking based on saber stance
+#define SABERTWEAK_INTERPOLATE			(0x0001u) // use SP style interpolation, also fix various small issues
+#define SABERTWEAK_PROLONGDAMAGE		(0x0002u) // allow damaging in wind-up and return animations
+#define SABERTWEAK_POSDEFLECTION		(0x0004u) // calculate deflection based on position rather than animation
+#define SABERTWEAK_SPECIALMOVES			(0x0008u) // tweak damages for special moves
+#define SABERTWEAK_TRACESIZE			(0x0010u) // use SP saber trace size or based off radius defined in .sab file
+#define SABERTWEAK_REDUCEBLOCKS			(0x0020u) // reduce chance of blocking based on saber stance
+#define SABERTWEAK_TWOBLADEDEFLECTFIX	(0x0040u) // fix deflection bug when toggling second saber
 
 
 typedef enum moverState_e {

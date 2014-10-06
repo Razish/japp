@@ -1661,7 +1661,7 @@ int PM_SaberDeflectionForQuad( int quad );
 
 extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
 static qboolean WP_GetSaberDeflectionAngle( gentity_t *attacker, gentity_t *defender, float saberHitFraction ) {
-	qboolean animBasedDeflection = !(japp_saberTweaks.integer & SABERTWEAK_DEFLECTION);
+	qboolean animBasedDeflection = !(japp_saberTweaks.integer & SABERTWEAK_POSDEFLECTION);
 	int attSaberLevel, defSaberLevel;
 
 	if ( !attacker || !attacker->client || !attacker->ghoul2 ) {
@@ -7563,11 +7563,10 @@ nextStep:
 		WP_SaberClearDamage();
 		saberDoClashEffect = qfalse;
 
-
 		//Raz: Avoid saber collisions for ghosts and frozen players
-		if ( self->client->pers.adminData.isFrozen || self->client->pers.adminData.isGhost )
+		if ( self->client->pers.adminData.isFrozen || self->client->pers.adminData.isGhost ) {
 			return;
-
+		}
 
 		//Now cycle through each saber and each blade on the saber and do damage traces.
 		while ( rSaberNum < MAX_SABERS ) {
@@ -7586,13 +7585,14 @@ nextStep:
 			//for now I'm keeping a broken right arm swingable, it will just look and act damaged
 			//but still be useable
 
-			if ( rSaberNum == 1 && (self->client->ps.brokenLimbs & (1 << BROKENLIMB_LARM)) ) { //don't to saber 1 if the left arm is broken
+			if ( rSaberNum == 1 && (self->client->ps.brokenLimbs & (1 << BROKENLIMB_LARM)) ) {
+				// don't do saber 1 if the left arm is broken
 				break;
 			}
-			if ( rSaberNum > 0
-				&& self->client->saber[1].model
-				&& self->client->saber[1].model[0]
-				&& self->client->ps.saberHolstered == 1 ) { //don't to saber 2 if it's off
+			if ( !(japp_saberTweaks.integer & SABERTWEAK_TWOBLADEDEFLECTFIX) && rSaberNum > 0
+				&& self->client->saber[1].model[0] && self->client->ps.saberHolstered == 1 )
+			{
+				//don't do saber 2 if it's off
 				break;
 			}
 			rBladeNum = 0;
@@ -7601,10 +7601,11 @@ nextStep:
 				VectorCopy( &self->client->saber[rSaberNum].blade[rBladeNum].muzzlePoint, &self->client->saber[rSaberNum].blade[rBladeNum].muzzlePointOld );
 				VectorCopy( &self->client->saber[rSaberNum].blade[rBladeNum].muzzleDir, &self->client->saber[rSaberNum].blade[rBladeNum].muzzleDirOld );
 
-				if ( rBladeNum > 0 //more than one blade
-					&& (!self->client->saber[1].model || !self->client->saber[1].model[0])//not using dual blades
-					&& self->client->saber[rSaberNum].numBlades > 1//using a multi-bladed saber
-					&& self->client->ps.saberHolstered == 1 )//
+				if ( !(japp_saberTweaks.integer & SABERTWEAK_TWOBLADEDEFLECTFIX)
+					&& rBladeNum > 0 //more than one blade
+					&& !self->client->saber[1].model[0] //not using dual blades
+					&& self->client->saber[rSaberNum].numBlades > 1 //using a multi-bladed saber
+					&& self->client->ps.saberHolstered == 1 )
 				{ //don't to extra blades if they're off
 					break;
 				}
