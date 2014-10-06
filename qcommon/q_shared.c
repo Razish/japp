@@ -1298,3 +1298,38 @@ void Q_BinaryDump( const char *filename, const void *buffer, size_t len ) {
 	trap->FS_Close( f );
 	f = NULL_FILE;
 }
+
+void Q_NewPrintBuffer( printBufferSession_t *session, size_t length,
+	void (*callback)( const char *buffer, int clientNum ), int clientNum )
+{
+	memset( session, 0, sizeof(*session) );
+	session->buffer = malloc( length );
+	session->buffer[0] = '\0';
+	session->length = 0u;
+	session->maxLength = length;
+	session->callback = callback;
+	session->clientNum = clientNum;
+}
+
+void Q_PrintBuffer( printBufferSession_t *session, const char *append ) {
+	const size_t appendLen = strlen( append );
+	if ( session->length + appendLen >= session->maxLength ) {
+		if ( session->callback ) {
+			session->callback( session->buffer, session->clientNum );
+		}
+		session->length = 0u;
+		session->buffer[0] = '\0';
+	}
+	session->length += appendLen;
+	Q_strcat( session->buffer, session->maxLength, append );
+}
+
+void Q_DeletePrintBuffer( printBufferSession_t *session ) {
+	if ( session->callback ) {
+		session->callback( session->buffer, session->clientNum );
+	}
+	if ( session->buffer ) {
+		free( session->buffer );
+		session->buffer = NULL;
+	}
+}

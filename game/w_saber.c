@@ -8012,9 +8012,11 @@ int WP_SaberCanBlock( gentity_t *self, vector3 *point, uint32_t dflags, int mod,
 		const int ourLevel = G_SaberLevelForStance( self->client->ps.fd.saberAnimLevel );
 		const int theirLevel = G_SaberLevelForStance( attackStr );
 		const float diff = (float)(theirLevel - ourLevel); // range [0, 2]
-		const float disparity = japp_saberBlockStanceDisparity.value; // range [0, 3]
-		const float chanceMin = japp_saberBlockChanceMin.value, chanceMax = japp_saberBlockChanceMax.value;
-		const float chance = Q_clamp( chanceMin, 1.0f - (diff / disparity), chanceMax );
+		const float parity = japp_saberBlockStanceParity.value; // range [0, 3]
+		const float chanceMin = japp_saberBlockChanceMin.value;
+		const float chanceMax = japp_saberBlockChanceMax.value;
+		const float chanceScalar = japp_saberBlockChanceScale.value;
+		const float chance = Q_clamp( chanceMin, (1.0f - (diff / parity)) * chanceScalar, chanceMax );
 		if ( flrand( 0.0f, 1.0f ) > chance ) {
 			return 0;
 		}

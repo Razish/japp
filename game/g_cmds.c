@@ -2938,25 +2938,33 @@ static struct amInfoSetting_s {
 };
 static const size_t numAminfoSettings = ARRAY_LEN( aminfoSettings );
 
-static void Cmd_AMInfo_f( gentity_t *ent ) {
-	char buf[MAX_STRING_CHARS - 64] = { 0 };
-	int extendedInfo = 0;
+static void PB_Callback( const char *buffer, int clientNum ) {
+//	trap->Print( "Printing to %i at %i...\n%s\n", clientNum, level.time, buffer );
+	trap->SendServerCommand( clientNum, va( "print \"%s\"", buffer ) );
+}
 
-	trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"================================================================\n\n\"" );
+static void Cmd_AMInfo_f( gentity_t *ent ) {
+	int extendedInfo = 0;
+	printBufferSession_t pb;
+
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 2, PB_Callback, ent - g_entities );
+
+	Q_PrintBuffer( &pb, S_COLOR_YELLOW "================================================================"
+		S_COLOR_WHITE "\n\n" );
 
 	if ( trap->Argc() < 2 ) {
 		unsigned int i = 0;
-		Q_strcat( buf, sizeof(buf), "Try 'aminfo <category>' for more detailed information\nCategories: " );
+		Q_PrintBuffer( &pb, "Try 'aminfo <category>' for more detailed information\nCategories: " );
 
 		// print all categories
 		for ( i = 0; i < numAminfoSettings; i++ ) {
-			if ( i )
-				Q_strcat( buf, sizeof(buf), ", " );
-			Q_strcat( buf, sizeof(buf), aminfoSettings[i].str );
+			if ( i ) {
+				Q_PrintBuffer( &pb, ", " );
+			}
+			Q_PrintBuffer( &pb, aminfoSettings[i].str );
 		}
 
-		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\n\"", buf ) );
-		buf[0] = '\0';
+		Q_PrintBuffer( &pb, "\n\n" );
 	}
 	else {
 		char arg[8] = { 0 };
@@ -2977,88 +2985,123 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 	if ( !extendedInfo || extendedInfo == EXTINFO_ALL ) {
 		char version[256] = { 0 };
 		trap->Cvar_VariableStringBuffer( "version", version, sizeof(version) );
-		trap->SendServerCommand( ent - g_entities, va( "print \"Version:\n    Gamecode: "JAPP_VERSION"\n    Engine: %s\n\n\"", version ) );
+		Q_PrintBuffer( &pb, "Version:\n    Gamecode: " JAPP_VERSION "\n" );
+#ifdef _DEBUG
+		Q_PrintBuffer( &pb, "Debug build\n" );
+#endif
+		Q_PrintBuffer( &pb, va( "    Engine: %s\n\n", version ) );
 	}
 
 	if ( extendedInfo & EXTINFO_SABER ) {
 		// saber settings
-		Q_strncpyz( buf, "Saber settings:\n", sizeof(buf) );
+		Q_PrintBuffer( &pb, "Saber settings:\n" );
 
 		// SP/MP
-		Q_strcat( buf, sizeof(buf), va( "  %s" S_COLOR_WHITE "style\n",
+		Q_PrintBuffer( &pb, va( "  %s" S_COLOR_WHITE "style\n",
 			d_saberSPStyleDamage.integer ? S_COLOR_GREEN "SP " : S_COLOR_RED "MP ") );
 
 		// JA++ tweaks
 		if ( japp_saberTweaks.integer ) {
 			const uint32_t tweaks = japp_saberTweaks.integer;
-			Q_strcat( buf, sizeof(buf), "  JA++ tweaks:\n" );
+			Q_PrintBuffer( &pb, "  JA++ tweaks:\n" );
 
-			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Interpolation %s\n",
+			Q_PrintBuffer( &pb, va( "    Interpolation %s" S_COLOR_WHITE "\n",
 				(tweaks & SABERTWEAK_INTERPOLATE) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
-
-			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Prolonged swing damage %s\n",
+			Q_PrintBuffer( &pb, va( "    Prolonged swing damage %s" S_COLOR_WHITE "\n",
 				(tweaks & SABERTWEAK_PROLONGDAMAGE) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
-
-			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Deflection %s\n",
+			Q_PrintBuffer( &pb, va( "    Deflection %s" S_COLOR_WHITE "\n",
 				(tweaks & SABERTWEAK_DEFLECTION) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
-
-			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Special moves %s\n",
+			Q_PrintBuffer( &pb, va( "    Special moves %s" S_COLOR_WHITE "\n",
 				(tweaks & SABERTWEAK_SPECIALMOVES) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
-
-			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Trace size %s\n",
+			Q_PrintBuffer( &pb, va( "    Trace size %s" S_COLOR_WHITE "\n",
 				(tweaks & SABERTWEAK_TRACESIZE) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled") );
-
-			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Reduce blocks %s " S_COLOR_WHITE "(%s%.02f " S_COLOR_WHITE "- %s%.02f"
-				S_COLOR_WHITE ")\n", (tweaks & SABERTWEAK_REDUCEBLOCKS) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled",
+			Q_PrintBuffer( &pb, va( "    Reduce blocks %s " S_COLOR_WHITE "(%s%.02f " S_COLOR_WHITE "- %s%.02f"
+				S_COLOR_WHITE ") * %s%.02f" S_COLOR_WHITE "\n",
+				(tweaks & SABERTWEAK_REDUCEBLOCKS) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled",
 				(japp_saberBlockChanceMin.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceMin ) ))
 				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMin.value,
 				(japp_saberBlockChanceMax.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceMax ) ))
-				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMax.value) );
+				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMax.value,
+				(japp_saberBlockChanceScale.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceScale ) ))
+				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceScale.value ) );
 
-			Q_strcat( buf, sizeof(buf), va( "      %s%.03f " S_COLOR_WHITE "stance disparity\n",
-				(japp_saberBlockStanceDisparity.value
-				!= atoff( G_Cvar_DefaultString( &japp_saberBlockStanceDisparity ) )) ? S_COLOR_RED : S_COLOR_GREEN,
-				japp_saberBlockStanceDisparity.value ) );
-			Q_strcat( buf, sizeof(buf), S_COLOR_WHITE "\n" );
+#ifdef _DEBUG
+			if ( tweaks & SABERTWEAK_REDUCEBLOCKS ) {
+				int ourLevel, theirLevel;
+				for ( ourLevel = 1; ourLevel <= 3; ourLevel++ ) {
+					for ( theirLevel = 1; theirLevel <= 3; theirLevel++ ) {
+						const float diff = (float)(theirLevel - ourLevel); // range [0, 2]
+						const float parity = japp_saberBlockStanceParity.value; // range [0, 3]
+						const float chanceMin = japp_saberBlockChanceMin.value;
+						const float chanceMax = japp_saberBlockChanceMax.value;
+						const float chanceScalar = japp_saberBlockChanceScale.value;
+						const float chance = Q_clamp( chanceMin, (1.0f - (diff / parity)) * chanceScalar, chanceMax );
+						Q_PrintBuffer( &pb, va( "      %i blocking %i: %.03f\n", ourLevel, theirLevel, chance ) );
+					}
+				}
+			}
+#endif // _DEBUG
+
+			Q_PrintBuffer( &pb, va( "      %s%.03f " S_COLOR_WHITE "stance parity\n",
+				(japp_saberBlockStanceParity.value != atoff( G_Cvar_DefaultString( &japp_saberBlockStanceParity ) ))
+				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockStanceParity.value ) );
+
+			Q_PrintBuffer( &pb, S_COLOR_WHITE "\n" );
 		}
 
 		// damage scale
-		Q_strcat( buf, sizeof(buf), va( "    %.03f damage scale\n", g_saberDamageScale.value ) );
+		Q_PrintBuffer( &pb, va( "  %s%.03f " S_COLOR_WHITE "damage scale\n",
+			(g_saberDamageScale.value != atoff( G_Cvar_DefaultString( &g_saberDamageScale ) ))
+			? S_COLOR_RED : S_COLOR_GREEN, g_saberDamageScale.value ) );
 
 		// idle damage
-		Q_strcat( buf, sizeof(buf), va( "    Idle damage %s\n",
-			japp_saberIdleDamage.integer ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
+		Q_PrintBuffer( &pb, va( "  " S_COLOR_WHITE "Idle damage %s" S_COLOR_WHITE "\n",
+			(japp_saberIdleDamage.integer != atoff( G_Cvar_DefaultString( &japp_saberIdleDamage ) ))
+			? S_COLOR_RED : S_COLOR_GREEN,
+			japp_saberIdleDamage.integer ? "enabled" : "disabled" ) );
 
-		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", buf ) );
-		buf[0] = '\0';
+		Q_PrintBuffer( &pb, "\n" );
 	}
 
 	if ( !extendedInfo || (extendedInfo & EXTINFO_CMDS) ) {
 		// admin commands
-		AM_PrintCommands( ent );
+		AM_PrintCommands( ent, &pb );
 
 		// regular commands
-		G_PrintCommands( ent );
+		G_PrintCommands( ent, &pb );
 	}
 
 	if ( extendedInfo & EXTINFO_CLIENT ) {
 		// client support flags
 		int i = 0;
 
-		Q_strcat( buf, sizeof(buf), va( "Client support flags: 0x%X\n", ent->client->pers.CSF ) );
+		Q_PrintBuffer( &pb, va( "Client support flags: 0x%X\n", ent->client->pers.CSF ) );
 		for ( i = 0; i < CSF_NUM; i++ ) {
-			if ( ent->client->pers.CSF & (1 << i) )	Q_strcat( buf, sizeof(buf), " [X] " );
-			else									Q_strcat( buf, sizeof(buf), " [ ] " );
-			Q_strcat( buf, sizeof(buf), va( "%s\n", supportFlagNames[i] ) );
+			if ( ent->client->pers.CSF & (1 << i) ) {
+				Q_PrintBuffer( &pb, " [X] " );
+			}
+			else {
+				Q_PrintBuffer( &pb, " [ ] " );
+			}
+			Q_PrintBuffer( &pb, va( "%s\n", supportFlagNames[i] ) );
 		}
 
-		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", buf ) );
-		buf[0] = '\0';
-
 		//RAZTODO: cp_pluginDisable?
+		Q_PrintBuffer( &pb, va( "Client plugin disabled: %i\n", ent->client->pers.CPD ) );
+		for ( i = 0; i < CPD_NUM; i++ ) {
+			if ( ent->client->pers.CPD & (1 << i) ) {
+				Q_PrintBuffer( &pb, " [X] " );
+			}
+			else {
+				Q_PrintBuffer( &pb, " [ ] " );
+			}
+			Q_PrintBuffer( &pb, va( "%s\n", clientPluginDisableNames[i] ) );
+		}
 	}
 
-	trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"================================================================\n\"" );
+	Q_PrintBuffer( &pb, S_COLOR_YELLOW "================================================================\n" );
+
+	Q_DeletePrintBuffer( &pb );
 }
 
 static void Cmd_Ready_f( gentity_t *ent ) {
@@ -3572,22 +3615,22 @@ void ClientCommand( int clientNum ) {
 	}
 }
 
-void G_PrintCommands( gentity_t *ent ) {
+void G_PrintCommands( gentity_t *ent, printBufferSession_t *pb ) {
 	const command_t *command = NULL;
-	char buf[256] = { 0 };
 	int toggle = 0;
 	unsigned int count = 0;
 	const unsigned int limit = 72;
 	size_t i;
 
-	Q_strcat( buf, sizeof(buf), "Regular commands:\n   " );
+	Q_PrintBuffer( pb, "Regular commands:\n   " );
 
 	for ( i = 0, command = commands; i < numCommands; i++, command++ ) {
 		const char *tmpMsg = NULL;
 
 		// if it's not allowed to be executed at the moment, continue
-		if ( G_CmdValid( ent, command ) )
+		if ( G_CmdValid( ent, command ) ) {
 			continue;
+		}
 
 		tmpMsg = va( " ^%c%s", (++toggle & 1 ? COLOR_GREEN : COLOR_YELLOW), command->name );
 
@@ -3597,13 +3640,9 @@ void G_PrintCommands( gentity_t *ent ) {
 			count = 0;
 		}
 
-		if ( strlen( buf ) + strlen( tmpMsg ) >= sizeof(buf) ) {
-			trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", buf ) );
-			buf[0] = '\0';
-		}
 		count += strlen( tmpMsg );
-		Q_strcat( buf, sizeof(buf), tmpMsg );
+		Q_PrintBuffer( pb, tmpMsg );
 	}
 
-	trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\n\"", buf ) );
+	Q_PrintBuffer( pb, S_COLOR_WHITE "\n\n" );
 }

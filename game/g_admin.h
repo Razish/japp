@@ -76,7 +76,7 @@ void		AM_LoadTelemarks( void );
 void		AM_SaveTelemarks( void );
 
 qboolean	AM_HasPrivilege( const gentity_t *ent, uint32_t privilege );
-void		AM_PrintCommands( gentity_t *ent );
+void		AM_PrintCommands( gentity_t *ent, printBufferSession_t *pb );
 qboolean	AM_HandleCommands( gentity_t *ent, const char *cmd );
 void		G_BroadcastToAdminsOnly( gentity_t *ent );
 

@@ -2329,20 +2329,18 @@ qboolean AM_HandleCommands( gentity_t *ent, const char *cmd ) {
 	return qtrue;
 }
 
-void AM_PrintCommands( gentity_t *ent ) {
+void AM_PrintCommands( gentity_t *ent, printBufferSession_t *pb ) {
 	const adminCommand_t *command = NULL;
 	adminUser_t *user = ent->client->pers.adminUser;
-	char buf[256] = { 0 };
 	int toggle = 0;
 	unsigned int count = 0;
 	const unsigned int limit = 72;
 	size_t i;
 
-	Q_strcat( buf, sizeof(buf), "Admin commands:\n   " );
+	Q_PrintBuffer( pb, "Admin commands:\n   " );
 
 	if ( !user ) {
-		Q_strcat( buf, sizeof(buf), " "S_COLOR_RED"Unavailable" );
-		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", buf ) );
+		Q_PrintBuffer( pb, " " S_COLOR_RED "Unavailable " S_COLOR_WHITE "\n\n" );
 		return;
 	}
 
@@ -2356,14 +2354,10 @@ void AM_PrintCommands( gentity_t *ent ) {
 				count = 0;
 			}
 
-			if ( strlen( buf ) + strlen( tmpMsg ) >= sizeof(buf) ) {
-				trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", buf ) );
-				buf[0] = '\0';
-			}
 			count += strlen( tmpMsg );
-			Q_strcat( buf, sizeof(buf), tmpMsg );
+			Q_PrintBuffer( pb, tmpMsg );
 		}
 	}
 
-	trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\n\"", buf ) );
+	Q_PrintBuffer( pb, S_COLOR_WHITE "\n\n" );
 }

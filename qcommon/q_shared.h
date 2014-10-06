@@ -2509,3 +2509,13 @@ char *vtos( const vector3 *v );
 void Q_WriteJSONToFile( void *root, fileHandle_t f );
 void Q_BinaryDump( const char *filename, const void *buffer, size_t len );
 qboolean FloatCompare( float f1, float f2, float epsilon );
+
+typedef struct printBufferSession_s {
+	size_t length, maxLength;
+	char *buffer;
+	void (*callback)( const char *buffer, int clientNum );
+	int clientNum;
+} printBufferSession_t;
+void Q_NewPrintBuffer( printBufferSession_t *session, size_t length, void (*callback)( const char *buffer, int clientNum ), int clientNum );
+void Q_PrintBuffer( printBufferSession_t *session, const char *append );
+void Q_DeletePrintBuffer( printBufferSession_t *session );

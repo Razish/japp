@@ -2961,7 +2961,7 @@ void ClientThink_real( gentity_t *ent ) {
 	SendPendingPredictableEvents( &ent->client->ps );
 
 	if ( ent->s.eType != ET_NPC && ent->client && ent->client->pers.connected == CON_CONNECTED
-		&& !ent->client->ps.duelInProgress && !!(japp_allowHook.integer & (1 << level.gametype)) )
+		&& !!(japp_allowHook.integer & (1 << level.gametype)) )
 	{
 		const qboolean oldGrapple = GetCPD( (bgEntity_t *)ent, CPD_OLDGRAPPLE ) || !Client_Supports( ent, CSF_GRAPPLE_SWING );
 		const qboolean pullGrapple = ent->client->pers.cmd.buttons & BUTTON_GRAPPLE;
@@ -2975,7 +2975,9 @@ void ClientThink_real( gentity_t *ent ) {
 		if ( ent->client->hook ) {
 			if ( (releaseGrapple && ent->client->hookHasBeenFired && !ent->client->fireHeld)
 				|| (oldGrapple && !pullGrapple && ent->client->hook)
-				|| (!pullGrapple && ent->client->fireHeld && ent->client->hookHasBeenFired) )
+				|| (!pullGrapple && ent->client->fireHeld && ent->client->hookHasBeenFired)
+				|| ent->client->ps.duelInProgress
+				|| ent->client->ps.forceHandExtend != HANDEXTEND_NONE )
 			{
 				Weapon_HookFree( ent->client->hook );
 			}

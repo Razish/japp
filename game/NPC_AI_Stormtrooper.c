@@ -1672,7 +1672,7 @@ void ST_Commander( void ) {
 		}
 
 		//see if this member should start running (only if have no officer... FIXME: should always run from AEL_DANGER_GREAT?)
-		if ( !group->commander || group->commander->NPC->rank < RANK_ENSIGN ) {
+		if ( !group->commander || !group->commander->NPC || group->commander->NPC->rank < RANK_ENSIGN ) {
 			if ( NPC_CheckForDanger( NPC_CheckAlertEvents( qtrue, qtrue, -1, qfalse, AEL_DANGER ) ) ) {//going to run
 				ST_Speech( NPC, SPEECH_COVER, 0 );
 				continue;

@@ -2436,32 +2436,22 @@ void CheckReady( void ) {
 			Com_sprintf( msg, sizeof(msg), S_COLOR_GREEN"Waiting for players to ready up!\n%i more needed\n\nType /ready",
 				(int)ceilf( (float)(playerCount) * t ) );
 			trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
-			Com_Printf( "%s\n", msg );
 			lastPrint = level.time;
 		}
 	}
 }
 
-/*
-==================
-PrintTeam
-==================
-*/
 void PrintTeam( int team, char *message ) {
 	int i;
 
 	for ( i = 0; i < level.maxclients; i++ ) {
-		if ( level.clients[i].sess.sessionTeam != team )
+		if ( level.clients[i].sess.sessionTeam != team ) {
 			continue;
+		}
 		trap->SendServerCommand( i, message );
 	}
 }
 
-/*
-==================
-CheckCvars
-==================
-*/
 void CheckCvars( void ) {
 	static int lastMod = -1;
 
