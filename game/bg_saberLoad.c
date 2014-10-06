@@ -1991,11 +1991,13 @@ qboolean WP_SaberParseParms( const char *saberName, saberInfo_t *saber ) {
 	keywordHash_t *key;
 
 	// make sure the hash table has been setup
-	if ( !hashSetup )
+	if ( !hashSetup ) {
 		WP_SaberSetupKeywordHash();
+	}
 
-	if ( !saber )
+	if ( !saber ) {
 		return qfalse;
+	}
 
 	//Set defaults so that, if it fails, there's at least something there
 	WP_SaberSetDefaults( saber );
@@ -2004,8 +2006,9 @@ qboolean WP_SaberParseParms( const char *saberName, saberInfo_t *saber ) {
 		Q_strncpyz( useSaber, DEFAULT_SABER, sizeof(useSaber) );
 		triedDefault = qtrue;
 	}
-	else
+	else {
 		Q_strncpyz( useSaber, saberName, sizeof(useSaber) );
+	}
 
 	//try to parse it out
 	p = saberParms;
@@ -2022,25 +2025,29 @@ qboolean WP_SaberParseParms( const char *saberName, saberInfo_t *saber ) {
 				Q_strncpyz( useSaber, DEFAULT_SABER, sizeof(useSaber) );
 				triedDefault = qtrue;
 			}
-			else
+			else {
 				return qfalse;
+			}
 		}
 
-		if ( !Q_stricmp( token, useSaber ) )
+		if ( !Q_stricmp( token, useSaber ) ) {
 			break;
+		}
 
 		SkipBracedSection( &p );
 	}
 
 	// even the default saber isn't found?
-	if ( !p )
+	if ( !p ) {
 		return qfalse;
+	}
 
 	// got the name we're using for sure
 	Q_strncpyz( saber->name, useSaber, sizeof(saber->name) );
 
-	if ( BG_ParseLiteral( &p, "{" ) )
+	if ( BG_ParseLiteral( &p, "{" ) ) {
 		return qfalse;
+	}
 
 	// parse the saber info block
 	while ( 1 ) {
@@ -2050,8 +2057,9 @@ qboolean WP_SaberParseParms( const char *saberName, saberInfo_t *saber ) {
 			return qfalse;
 		}
 
-		if ( !Q_stricmp( token, "}" ) )
+		if ( !Q_stricmp( token, "}" ) ) {
 			break;
+		}
 
 		key = KeywordHash_Find( saberParseKeywordHash, token );
 		if ( key ) {

@@ -209,6 +209,19 @@ static cvarTable_t gameCvarTable[] = {
 };
 static int gameCvarTableSize = ARRAY_LEN( gameCvarTable );
 
+const char *G_Cvar_DefaultString( const vmCvar_t *vmCvar ) {
+	int i = 0;
+	const cvarTable_t *cv = NULL;
+
+	for ( i = 0, cv = gameCvarTable; i < gameCvarTableSize; i++, cv++ ) {
+		if ( cv->vmCvar == vmCvar ) {
+			return cv->defaultString;
+		}
+	}
+
+	return NULL;
+}
+
 /*
 =================
 G_RegisterCvars

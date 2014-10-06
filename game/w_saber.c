@@ -322,7 +322,7 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 	int i = 0, saberNum = 0, bladeNum = 0;
 	qboolean dualSabers = qfalse;
 	qboolean alwaysBlock[MAX_SABERS][MAX_BLADES];
-	qboolean forceBlock = qfalse;
+	qboolean forceBlock = qfalse, clear = qfalse;
 
 	assert( saberent && saberent->inuse );
 
@@ -341,8 +341,7 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 		return;
 	}
 
-	if ( owner->client->saber[1].model
-		&& owner->client->saber[1].model[0] ) {
+	if ( owner->client->saber[1].model[0] ) {
 		dualSabers = qtrue;
 	}
 
@@ -351,7 +350,7 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 		// let swings go right through when we're in this state
 		for ( saberNum = 0; saberNum < MAX_SABERS; saberNum++ ) {
 			if ( saberNum > 0 && !dualSabers ) {//not using a second saber, set it to not blocking
-				for ( bladeNum = 0; bladeNum < MAX_BLADES; bladeNum++ ) {
+				for ( bladeNum = 0; bladeNum < owner->client->saber[saberNum].numBlades; bladeNum++ ) {
 					alwaysBlock[saberNum][bladeNum] = qfalse;
 				}
 			}
@@ -393,7 +392,30 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 	assert( saberNum < MAX_SABERS );
 	assert( bladeNum < MAX_BLADES );
 
-	if ( level.time - owner->client->lastSaberStorageTime > 200 ) {
+	if ( owner->client->lastSaberStorageTime < level.time - 200 ) {
+		clear = qtrue;
+		if ( g_saberDebugPrint.integer ) {
+			trap->Print( "Clearing saber box for %s (saber: %i, blade: %i, lastSaberStorageTime: %i)\n",
+				owner->client->pers.netname, saberNum, bladeNum,
+				level.time - owner->client->lastSaberStorageTime );
+		}
+	}
+	else {
+		for ( saberNum = 0; saberNum < (dualSabers ? MAX_SABERS : 1); saberNum++ ) {
+			for ( bladeNum = 0; bladeNum < owner->client->saber[saberNum].numBlades; bladeNum++ ) {
+				if ( owner->client->saber[saberNum].blade[bladeNum].storageTime < level.time - 100 ) {
+					clear = qtrue;
+					if ( g_saberDebugPrint.integer ) {
+						trap->Print( "Clearing saber box for %s (saber: %i, blade: %i, storageTime_100: %i)\n",
+							owner->client->pers.netname, saberNum, bladeNum,
+							level.time - owner->client->saber[saberNum].blade[bladeNum].storageTime );
+					}
+				}
+			}
+		}
+	}
+
+	if ( clear ) {
 		// it's been too long since we got a reliable point storage, so use the defaults and leave.
 		VectorSet( &saberent->r.mins, -SABER_BOX_SIZE, -SABER_BOX_SIZE, -SABER_BOX_SIZE );
 		VectorScale( &saberent->r.mins, -1.0f, &saberent->r.maxs );
@@ -424,7 +446,7 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 	VectorCopy( &saberent->r.currentOrigin, &saberent->r.maxs );
 
 	for ( i = 0; i < 3; i++ ) {
-		for ( saberNum = 0; saberNum < MAX_SABERS; saberNum++ ) {
+		for ( saberNum = 0; saberNum < dualSabers ? MAX_SABERS : 1; saberNum++ ) {
 			if ( !owner->client->saber[saberNum].model[0] ) {
 				break;
 			}
@@ -7928,10 +7950,10 @@ void WP_SaberBlock( gentity_t *playerent, vector3 *hitloc, qboolean missileBlock
 static int G_SaberLevelForStance( int stance ) {
 	switch ( stance ) {
 	case SS_FAST:
-		return 1;
-	case SS_MEDIUM:
 	case SS_STAFF:
 	case SS_DUAL:
+		return 1;
+	case SS_MEDIUM:
 	case SS_TAVION:
 		return 2;
 	case SS_STRONG:
@@ -7945,51 +7967,39 @@ static int G_SaberLevelForStance( int stance ) {
 }
 int WP_SaberCanBlock( gentity_t *self, vector3 *point, uint32_t dflags, int mod, qboolean projectile, int attackStr ) {
 	qboolean thrownSaber = qfalse;
-	float blockFactor = 0;
+	float blockFactor = 0.0f;
 
-	if ( !self || !self->client || !point )
+	if ( !self || !self->client || !point ) {
 		return 0;
+	}
 
-	//Raz: Ghosts and frozen clients can't block sabers
-	if ( self->client->pers.adminData.isFrozen || self->client->pers.adminData.isGhost )
+	if ( self->client->pers.adminData.isFrozen || self->client->pers.adminData.isGhost
+		|| BG_SaberInAttack( self->client->ps.saberMove ) )
+	{
 		return 0;
+	}
 
 	if ( attackStr == 999 ) {
 		attackStr = 0;
 		thrownSaber = qtrue;
 	}
 
-	if ( BG_SaberInAttack( self->client->ps.saberMove ) )
-		return 0;
-
-	if ( PM_InSaberAnim( self->client->ps.torsoAnim ) && !self->client->ps.saberBlocked &&
-		self->client->ps.saberMove != LS_READY && self->client->ps.saberMove != LS_NONE ) {
+	if ( PM_InSaberAnim( self->client->ps.torsoAnim )
+		&& !self->client->ps.saberBlocked
+		&& self->client->ps.saberMove != LS_READY
+		&& self->client->ps.saberMove != LS_NONE )
+	{
 		if ( self->client->ps.saberMove < LS_PARRY_UP || self->client->ps.saberMove > LS_REFLECT_LL ) {
 			return 0;
 		}
 	}
 
-	if ( PM_SaberInBrokenParry( self->client->ps.saberMove ) ) {
-		return 0;
-	}
-
-	if ( !self->client->ps.saberEntityNum ) { //saber is knocked away
-		return 0;
-	}
-
-	if ( BG_SabersOff( &self->client->ps ) ) {
-		return 0;
-	}
-
-	if ( self->client->ps.weapon != WP_SABER ) {
-		return 0;
-	}
-
-	if ( self->client->ps.weaponstate == WEAPON_RAISING ) {
-		return 0;
-	}
-
-	if ( self->client->ps.saberInFlight ) {
+	if ( PM_SaberInBrokenParry( self->client->ps.saberMove )
+		|| !self->client->ps.saberEntityNum //saber is knocked away
+		|| BG_SabersOff( &self->client->ps )
+		|| self->client->ps.weapon != WP_SABER
+		|| self->client->ps.weaponstate == WEAPON_RAISING
+		|| self->client->ps.saberInFlight ) {
 		return 0;
 	}
 
@@ -7998,13 +8008,13 @@ int WP_SaberCanBlock( gentity_t *self, vector3 *point, uint32_t dflags, int mod,
 		return 0;
 	}
 
-	//Removed this for now, the new broken parry stuff should handle it. This is how
-	//blocks were decided before the 1.03 patch (as you can see, it was STUPID.. for the most part)
 	if ( japp_saberTweaks.integer & SABERTWEAK_REDUCEBLOCKS ) {
 		const int ourLevel = G_SaberLevelForStance( self->client->ps.fd.saberAnimLevel );
 		const int theirLevel = G_SaberLevelForStance( attackStr );
-		const int diff = theirLevel - ourLevel;
-		const float chance = Q_clamp( japp_saberBlockChanceMin.value, (3.0f - diff) / 3.0f, japp_saberBlockChanceMax.value );
+		const float diff = (float)(theirLevel - ourLevel); // range [0, 2]
+		const float disparity = japp_saberBlockStanceDisparity.value; // range [0, 3]
+		const float chanceMin = japp_saberBlockChanceMin.value, chanceMax = japp_saberBlockChanceMax.value;
+		const float chance = Q_clamp( chanceMin, 1.0f - (diff / disparity), chanceMax );
 		if ( flrand( 0.0f, 1.0f ) > chance ) {
 			return 0;
 		}

@@ -255,7 +255,8 @@ elif plat == 'Windows':
 if not debug or debug == 2:
 	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-O3' ]
-		env['LINKFLAGS'] += [ '-s' ]
+		if not debug:
+			env['LINKFLAGS'] += [ '-s' ]
 	elif plat == 'Windows':
 		env['CCFLAGS'] += [ '/GL', '/Gm-', '/MD', '/O2', '/Oi' ]
 		if bits == 64:

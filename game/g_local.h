@@ -830,6 +830,7 @@ qboolean			G_ClearLOS5( gentity_t *self, const vector3 *end );
 void				G_ClearVote( gentity_t *ent );
 int					G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags );
 void				G_CreateFakeClient( int entNum, gclient_t **cl );
+const char *		G_Cvar_DefaultString( const vmCvar_t *vmCvar );
 void				G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vector3 *dir, vector3 *point, int damage, uint32_t dflags, int mod );
 qboolean			G_DoesMapSupportGametype( const char *mapname, int gametype );
 int					G_EffectIndex( const char *name );

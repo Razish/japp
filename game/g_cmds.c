@@ -2985,32 +2985,40 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 		Q_strncpyz( buf, "Saber settings:\n", sizeof(buf) );
 
 		// SP/MP
-		if ( d_saberSPStyleDamage.integer ) {
-			Q_strcat( buf, sizeof(buf), "    SP style (default)\n" );
-		}
-		else {
-			Q_strcat( buf, sizeof(buf), "    MP style\n" );
-		}
+		Q_strcat( buf, sizeof(buf), va( "  %s" S_COLOR_WHITE "style\n",
+			d_saberSPStyleDamage.integer ? S_COLOR_GREEN "SP " : S_COLOR_RED "MP ") );
 
 		// JA++ tweaks
 		if ( japp_saberTweaks.integer ) {
 			const uint32_t tweaks = japp_saberTweaks.integer;
-			Q_strcat( buf, sizeof(buf), " JA++ tweaks:\n" );
+			Q_strcat( buf, sizeof(buf), "  JA++ tweaks:\n" );
 
-			Q_strcat( buf, sizeof(buf), va( "    %sInterpolation\n",
-				(tweaks & SABERTWEAK_INTERPOLATE) ? S_COLOR_GREEN : S_COLOR_RED ) );
-			Q_strcat( buf, sizeof(buf), va( "    %sProlonged swing damage\n",
-				(tweaks & SABERTWEAK_PROLONGDAMAGE) ? S_COLOR_GREEN : S_COLOR_RED ) );
-			Q_strcat( buf, sizeof(buf), va( "    %sDeflection\n",
-				(tweaks & SABERTWEAK_DEFLECTION) ? S_COLOR_GREEN : S_COLOR_RED ) );
-			Q_strcat( buf, sizeof( buf ), va( "    %sSpecial moves\n",
-				(tweaks & SABERTWEAK_SPECIALMOVES) ? S_COLOR_GREEN : S_COLOR_RED ) );
-			Q_strcat( buf, sizeof( buf ), va( "    %sTrace size\n",
-				(tweaks & SABERTWEAK_TRACESIZE) ? S_COLOR_GREEN : S_COLOR_RED ) );
-			Q_strcat( buf, sizeof( buf ), va( "    %sReduce blocks (%.02f - %.02f)\n",
-				(tweaks & SABERTWEAK_REDUCEBLOCKS) ? S_COLOR_GREEN : S_COLOR_RED,
-				japp_saberBlockChanceMin.value, japp_saberBlockChanceMax.value ) );
+			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Interpolation %s\n",
+				(tweaks & SABERTWEAK_INTERPOLATE) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
 
+			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Prolonged swing damage %s\n",
+				(tweaks & SABERTWEAK_PROLONGDAMAGE) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
+
+			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Deflection %s\n",
+				(tweaks & SABERTWEAK_DEFLECTION) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
+
+			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Special moves %s\n",
+				(tweaks & SABERTWEAK_SPECIALMOVES) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
+
+			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Trace size %s\n",
+				(tweaks & SABERTWEAK_TRACESIZE) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled") );
+
+			Q_strcat( buf, sizeof(buf), va( "    " S_COLOR_WHITE "Reduce blocks %s " S_COLOR_WHITE "(%s%.02f " S_COLOR_WHITE "- %s%.02f"
+				S_COLOR_WHITE ")\n", (tweaks & SABERTWEAK_REDUCEBLOCKS) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled",
+				(japp_saberBlockChanceMin.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceMin ) ))
+				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMin.value,
+				(japp_saberBlockChanceMax.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceMax ) ))
+				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMax.value) );
+
+			Q_strcat( buf, sizeof(buf), va( "      %s%.03f " S_COLOR_WHITE "stance disparity\n",
+				(japp_saberBlockStanceDisparity.value
+				!= atoff( G_Cvar_DefaultString( &japp_saberBlockStanceDisparity ) )) ? S_COLOR_RED : S_COLOR_GREEN,
+				japp_saberBlockStanceDisparity.value ) );
 			Q_strcat( buf, sizeof(buf), S_COLOR_WHITE "\n" );
 		}
 
@@ -3018,8 +3026,8 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 		Q_strcat( buf, sizeof(buf), va( "    %.03f damage scale\n", g_saberDamageScale.value ) );
 
 		// idle damage
-		Q_strcat( buf, sizeof(buf), va( "    Idle damage %s\n", japp_saberIdleDamage.integer
-			? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
+		Q_strcat( buf, sizeof(buf), va( "    Idle damage %s\n",
+			japp_saberIdleDamage.integer ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
 
 		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", buf ) );
 		buf[0] = '\0';
