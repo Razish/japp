@@ -1967,7 +1967,7 @@ static void AM_Map( gentity_t *ent ) {
 
 	trap->Argv( 2, map, sizeof(map) );
 
-	if ( !japp_allowAnyGametype.integer ) {
+	if ( !japp_ammapAnyGametype.integer ) {
 		if ( !G_DoesMapSupportGametype( map, gametype ) ) {
 			trap->SendServerCommand( ent - g_entities, va( "print \"Map: %s does not support gametype: %s, or the map "
 				"doesn't exist.\n\"", map, BG_GetGametypeString( gametype ) ) );

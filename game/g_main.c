@@ -322,8 +322,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	trap->Cvar_Register( &japp_crashHandler, "japp_crashHandler", "1", CVAR_ARCHIVE );
 
-	if ( japp_crashHandler.integer )
+	if ( japp_crashHandler.integer ) {
 		ActivateCrashHandler();
+	}
 
 	//Init RMG to 0, it will be autoset to 1 if there is terrain on the level.
 	trap->Cvar_Set( "RMG", "0" );

@@ -2225,8 +2225,9 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			G_DeathAlert( self, attacker );
 
 		// the body can still be gibbed
-		if ( !self->NPC )
+		if ( !self->NPC ) {
 			self->die = body_die;
+		}
 
 		//It won't gib, it will disintegrate (because this is Star Wars).
 		self->takedamage = qtrue;
