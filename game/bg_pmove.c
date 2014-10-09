@@ -4994,20 +4994,23 @@ int PM_LegsSlopeBackTransition( int desiredAnim ) {
 	}
 }
 
-static int JP_GetJPFixRoll( void ) {
-	int level = 0;
+static uint32_t JP_GetJPFixRoll( void ) {
+	uint32_t level = 0u;
 #ifdef _GAME
 	uint32_t cinfo = jp_cinfo.integer;
 #else
 	uint32_t cinfo = cgs.japp.jp_cinfo;
 #endif
 
-	if ( cinfo & CINFO_JK2ROLL1 )
-		level++;
-	if ( cinfo & CINFO_JK2ROLL2 )
-		level++;
-	if ( cinfo & CINFO_JK2ROLL3 )
-		level++;
+	if ( cinfo & CINFO_JK2ROLL1 ) {
+		level |= 1;
+	}
+	if ( cinfo & CINFO_JK2ROLL2 ) {
+		level |= 2;
+	}
+	if ( cinfo & CINFO_JK2ROLL3 ) {
+		level |= 4;
+	}
 
 	return level;
 }
@@ -5144,13 +5147,16 @@ static void PM_Footsteps( void ) {
 			&& !BG_InRoll(pm->ps, pm->ps->legsAnim) )
 #else
 		if ( PM_RunningAnim( pm->ps->legsAnim ) ) {
-			if ( ((JP_GetJPFixRoll() > 2) || VectorLengthSquared( &pm->ps->velocity ) >= 30000 || (JP_GetJPFixRoll() > 1 && !(pm->cmd.buttons & BUTTON_FORCEGRIP))) ) {
+			const qboolean gripRoll = !!(JP_GetJPFixRoll() & 1);
+			const qboolean continuousRoll = !!(JP_GetJPFixRoll() & 2);
+			const qboolean enoughSpeed = VectorLengthSquared( &pm->ps->velocity ) >= 30000;
+			if ( (enoughSpeed || continuousRoll) && (!(pm->cmd.buttons & BUTTON_FORCEGRIP) || gripRoll) ) {
 				if ( !BG_InRoll( pm->ps, pm->ps->legsAnim ) ) {
 					canRoll = qtrue;
 				}
 			}
 		}
-		//		if ( ( ((PM_RunningAnim( pm->ps->legsAnim ) && ((JP_GetJPFixRoll() >= 2) || (JP_GetJPFixRoll() >= 1 && !(pm->cmd.buttons & BUTTON_FORCEGRIP)) )) && VectorLengthSquared( pm->ps->velocity ) >= 30000/*200*200*/)
+		//		if ( ( ((PM_RunningAnim( pm->ps->legsAnim ) && ((JP_GetJPFixRoll() & 2) || (JP_GetJPFixRoll() & 1 && !(pm->cmd.buttons & BUTTON_FORCEGRIP)) )) && VectorLengthSquared( pm->ps->velocity ) >= 30000/*200*200*/)
 		//				|| PM_CanRollFromSoulCal( pm->ps ) )
 		//			 && !BG_InRoll(pm->ps, pm->ps->legsAnim) )
 		if ( canRoll )
@@ -7511,8 +7517,9 @@ void PM_AdjustAttackStates( pmove_t *pmove )
 void BG_CmdForRoll( playerState_t *ps, int anim, usercmd_t *pCmd ) {
 	switch ( anim ) {
 	case BOTH_ROLL_F:
-		if ( !(JP_GetJPFixRoll() == 3 && (pCmd->forwardmove < 0)) )
+		if ( !(JP_GetJPFixRoll() & 4 && (pCmd->forwardmove < 0)) ) {
 			pCmd->forwardmove = 127;
+		}
 		pCmd->rightmove = 0;
 		break;
 
@@ -7765,14 +7772,14 @@ void BG_AdjustClientSpeed( playerState_t *ps, usercmd_t *cmd, int svTime ) {
 #endif
 		if ( BG_InRoll( ps, ps->legsAnim ) && ps->speed > 50.0f ) { //can't roll unless you're able to move normally
 			if ( (ps->legsAnim) == BOTH_ROLL_B ) { //backwards roll is pretty fast, should also be slower
-				if ( ps->legsTimer > 800 || (JP_GetJPFixRoll() == 3 && ps->legsTimer > 100) )
+				if ( ps->legsTimer > 800 || (JP_GetJPFixRoll() & 4 && ps->legsTimer > 100) )
 					ps->speed = ps->legsTimer / 2.5f;
 				else
 					ps->speed = ps->legsTimer / 6.0f;//450;
 			}
 			else {
 				if ( ps->legsTimer <= 800 ) {
-					if ( JP_GetJPFixRoll() == 3 ) {
+					if ( JP_GetJPFixRoll() & 4 ) {
 						if ( ps->legsTimer <= 100 ) {
 							if ( (pm->cmd.forwardmove < 0) ) {
 								ps->speed = ps->legsTimer / 20.0f;
@@ -7797,8 +7804,9 @@ void BG_AdjustClientSpeed( playerState_t *ps, usercmd_t *cmd, int svTime ) {
 				}
 				//	ps->speed = ps->legsTimer/5.0f;
 			}
-			if ( JP_GetJPFixRoll() < 3 && ps->speed > 600.0f )
+			if ( JP_GetJPFixRoll() & 3 && ps->speed > 600.0f ) {
 				ps->speed = 600.0f;
+			}
 			//Automatically slow down as the roll ends.
 		}
 

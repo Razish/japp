@@ -156,6 +156,12 @@ static void CVU_ToggleAtk( void ) {
 	SetCInfo( japp_allowToggleSpecialAttacks.integer, CINFO_TOGGLESPECIALATK );
 }
 
+static void CVU_FixRoll( void ) {
+	SetCInfo( japp_fixRoll.integer & 1, CINFO_JK2ROLL1 );
+	SetCInfo( japp_fixRoll.integer & 2, CINFO_JK2ROLL2 );
+	SetCInfo( japp_fixRoll.integer & 4, CINFO_JK2ROLL3 );
+}
+
 static void CVU_Flipkick( void ) {
 	SetCInfo( japp_flipKick.integer, CINFO_FLIPKICK );
 }
