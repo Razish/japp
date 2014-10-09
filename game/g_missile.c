@@ -812,8 +812,9 @@ void G_RunMissile( gentity_t *ent ) {
 
 			//Raz: Portals!
 			if ( g2Hit->s.eType == ET_SPECIAL && g2Hit->s.userInt1 ) {
-				if ( g2Hit->touch )
+				if ( g2Hit->touch ) {
 					g2Hit->touch( g2Hit, ent, &tr );
+				}
 				goto passthrough;
 			}
 		}
@@ -861,7 +862,8 @@ void G_RunMissile( gentity_t *ent ) {
 		&& (ent->parent->client->ps.duelInProgress
 		|| BG_SaberInSpecial( ent->parent->client->ps.saberMove )
 		|| !(japp_allowHook.integer & (1 << level.gametype))
-		|| ent->parent->client->pers.adminData.isFrozen) )
+		|| ent->parent->client->pers.adminData.isFrozen
+		|| g_entities[tr.entityNum].client) )
 	{
 		// not allowed to have hook out
 		Weapon_HookFree( ent->parent->client->hook );

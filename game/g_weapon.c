@@ -3080,11 +3080,13 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire ) {
 void Weapon_GrapplingHook_Fire( gentity_t *ent ) {
 	AngleVectors( &ent->client->ps.viewangles, &forward, &vright, &up );
 	CalcMuzzlePoint( ent, &forward, &vright, &up, &muzzle );
-	if ( !ent->client->fireHeld && !ent->client->hook )
+	if ( !ent->client->fireHeld && !ent->client->hook ) {
 		fire_grapple( ent, &muzzle, &forward );
+	}
 
 	ent->client->fireHeld = qtrue;
 	ent->client->hookHasBeenFired = qtrue;
+	ent->client->lastHookTime = level.time;
 }
 
 void Weapon_HookFree( gentity_t *hook ) {
