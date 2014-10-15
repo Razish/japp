@@ -23,6 +23,12 @@ import platform
 import os
 import commands
 import sys
+import re
+
+def cmp_version( v1, v2 ):
+	def normalise( v ):
+		return [int(x) for x in re.sub( r'(\.0+)*$', '', v ).split( '.' )]
+	return cmp( normalise( v1 ), normalise( v2 ) )
 
 plat = platform.system() # Windows or Linux
 try:
@@ -72,9 +78,20 @@ def cc_output( s, target, src, env ):
 		sys.stdout.write( '  compiling %s\n' % (''.join([str(x) for x in src])) )
 env['PRINT_CMD_LINE_FUNC'] = cc_output
 
-# Notify the user of the build configuration
+# obtain the compiler version
+if plat == 'Windows':
+	ccversion = env['MSVS_VERSION']
+else:
+	status, ccrawversion = commands.getstatusoutput( env['CC'] + ' -dumpversion' )
+	ccversion = None if status else ccrawversion
+
+# git revision
+status, rawrevision = commands.getstatusoutput( 'git rev-parse HEAD' )
+revision = None if status else rawrevision
+
+# notify the user of the build configuration
 if not env.GetOption( 'clean' ):
-	msg = 'Building for ' + plat + ' ' + str(bits) + ' bits (' + env['CC'] + ')'
+	msg = 'Building for ' + plat + ' ' + str(bits) + ' bits (' + env['CC'] + ' ' + ccversion + ', python ' + platform.python_version() + ')'
 	if debug:
 		msg += ', debug symbols'
 	if not debug or debug == 2:
@@ -82,6 +99,8 @@ if not env.GetOption( 'clean' ):
 	msg += ', x87 fpu' if 'NO_SSE' in os.environ else ', SSE'
 	if force32:
 		msg += ', forcing 32 bit build'
+	if revision:
+		msg += '\ngit revision: ' + revision
 	print( msg )
 
 files = {}
@@ -208,9 +227,7 @@ if plat == 'Linux':
 		env['CCFLAGS'] += [ '-Wlogical-op' ]
 
 		# requires gcc 4.7 or above
-		status, rawversion = commands.getstatusoutput( env['CC'] + ' -dumpversion' )
-		versions = rawversion.split( '.' )
-		if versions[0] >= 4 and versions[1] >= 7:
+		if cmp_version( ccversion, '4.7' ) >= 0:
 			env['CCFLAGS'] += [ '-Wstack-usage=32768' ]
 
 	# disable warnings
@@ -276,10 +293,8 @@ if debug:
 			env['CCFLAGS'] += [ '/FC', '/ZI' ]
 	env['CPPDEFINES'] += [ '_DEBUG' ]
 
-# get git revision
-status, rev = commands.getstatusoutput( 'git rev-parse HEAD' )
-if status == 0:
-	env['CPPDEFINES'] += [ 'REVISION=\\"'+rev+'\\"' ]
+if revision:
+	env['CPPDEFINES'] += [ 'REVISION=\\"' + revision + '\\"' ]
 
 env['CPPDEFINES'] += [ 'SCONS_BUILD' ]
 env['LIBPREFIX'] = ''
