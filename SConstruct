@@ -206,8 +206,11 @@ if plat == 'Linux':
 	# gcc-specific warnings
 	if env['CC'] == 'gcc' and arch != 'arm':
 		env['CCFLAGS'] += [ '-Wlogical-op' ]
-		status, ver = commands.getstatusoutput( 'gcc -dumpversion' )
-		if float(ver) >= 4.7:
+
+		# requires gcc 4.7 or above
+		status, rawversion = commands.getstatusoutput( env['CC'] + ' -dumpversion' )
+		versions = rawversion.split( '.' )
+		if versions[0] >= 4 and versions[1] >= 7:
 			env['CCFLAGS'] += [ '-Wstack-usage=32768' ]
 
 	# disable warnings

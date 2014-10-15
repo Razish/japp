@@ -1046,7 +1046,7 @@ void cJSON_InsertItemInArray( cJSON *arry, cJSON *item, int before ) {
 
 void cJSON_AddItemToObject( cJSON *object, const char *string, cJSON *item ) {
 	long hash;
-	if ( !object->type == cJSON_Object ) {
+	if ( object->type != cJSON_Object ) {
 		return;
 	}
 	if ( item->linked ) {

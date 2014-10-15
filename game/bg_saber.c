@@ -7,8 +7,6 @@
 #include "g_local.h"
 #endif
 
-//#define SP_CARTWHEEL
-
 extern qboolean BG_SabersOff( playerState_t *ps );
 saberInfo_t *BG_MySaber( int clientNum, int saberNum );
 
