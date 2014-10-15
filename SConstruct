@@ -19,17 +19,18 @@
 #	NO_SSE			disable SSE floating point instructions, force x87 fpu
 #
 
-import platform
-import os
-import commands
-import sys
-import re
+debug = int( ARGUMENTS.get( 'debug', 0 ) )
+force32 = int( ARGUMENTS.get( 'force32', False ) )
+project = ARGUMENTS.get( 'project', None )
+xcompile = int( ARGUMENTS.get( 'xcompile', False ) )
 
 def cmp_version( v1, v2 ):
 	def normalise( v ):
+		import re
 		return [int(x) for x in re.sub( r'(\.0+)*$', '', v ).split( '.' )]
 	return cmp( normalise( v1 ), normalise( v2 ) )
 
+import platform
 plat = platform.system() # Windows or Linux
 try:
 	bits = int( platform.architecture()[0][:2] ) # 32 or 64
@@ -37,15 +38,9 @@ except( ValueError, TypeError ):
 	bits = None
 arch = None # platform-specific, set manually
 
-debug = int( ARGUMENTS.get( 'debug', 0 ) )
-force32 = int( ARGUMENTS.get( 'force32', False ) )
-project = ARGUMENTS.get( 'project', None )
-xcompile = int( ARGUMENTS.get( 'xcompile', False ) )
-
 # architecture settings, needed for binary names, also passed as a preprocessor definition
 if force32:
 	bits = 32
-
 if bits == 32:
 	if plat == 'Windows' or xcompile:
 		arch = 'x86'
@@ -54,10 +49,10 @@ if bits == 32:
 			arch = 'arm'
 		else:
 			arch = 'i386'
-	#TODO: Mac
 elif bits == 64:
 	arch = 'x86_64'
 
+# fatal error if the cpu architecture can't be detected
 if arch is None:
 	raise Exception( 'could not determine architecture' )
 if bits is None:
@@ -65,12 +60,17 @@ if bits is None:
 if project is None:
 	raise ValueError( 'please specify a project to build' )
 
+# create the build environment
+import os
 env = Environment( TARGET_ARCH = arch )
 env['CC'] = os.getenv( 'CC' ) or env[ 'CC' ]
 env['CXX'] = os.getenv( 'CXX' ) or env[ 'CXX' ]
 env['ENV'].update( x for x in os.environ.items() if x[0].startswith( 'CCC_' ) )
 if plat != 'Windows':
 	env['ENV']['TERM'] = os.environ['TERM']
+
+# prettify the compiler output
+import sys
 def cc_output( s, target, src, env ):
 	if len( src ) > 1:
 		sys.stdout.write( '  --> %s\n' % (''.join([str(x) for x in target])) )
@@ -79,6 +79,7 @@ def cc_output( s, target, src, env ):
 env['PRINT_CMD_LINE_FUNC'] = cc_output
 
 # obtain the compiler version
+import commands
 if plat == 'Windows':
 	ccversion = env['MSVS_VERSION']
 else:
@@ -300,6 +301,18 @@ env['CPPDEFINES'] += [ 'SCONS_BUILD' ]
 env['LIBPREFIX'] = ''
 env['CPPPATH'] = [ '.', './game' ]
 env['LIBS'] = libs[project]
+
+# set up the build directory
+if debug == 1:
+	configuration = 'debug'
+elif debug == 2:
+	configuration = 'optimised-debug'
+else:
+	configuration = 'release'
+build_dir = 'build' + '/' + configuration + '/' + env['CC'] + '/' + str(bits) + '/' + project + '/'
+env.VariantDir( build_dir, '.', duplicate = 0 )
+for c in files:
+	files[c] = [build_dir + f for f in files[c]]
 
 # targets
 if project == 'game':
