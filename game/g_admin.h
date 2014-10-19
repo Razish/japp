@@ -17,7 +17,7 @@ typedef struct adminData_s {
 	qboolean silenced; // have they been silenced?
 	qboolean isGhost; // are they a ghost?
 	qboolean isGhost2; // are they a ghost? RAZTEST
-	qboolean isFrozen; // are they frozen?
+	qboolean isSlept; // are they frozen?
 	telemark_t *telemark; // last marked location
 	qboolean empowered; // are they empowered?
 	qboolean merc; // are they merced?
@@ -51,7 +51,7 @@ typedef struct adminUser_s {
 #define PRIV_PROTECT	(0x00000200u)
 #define PRIV_EMPOWER	(0x00000400u)
 #define PRIV_SLAP		(0x00000800u)
-#define PRIV_FREEZE		(0x00001000u)
+#define PRIV_SLEEP		(0x00001000u)
 #define PRIV_SILENCE	(0x00002000u)
 #define PRIV_SLAY		(0x00004000u)
 #define PRIV_KICK		(0x00008000u)

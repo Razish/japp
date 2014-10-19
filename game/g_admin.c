@@ -1327,26 +1327,31 @@ static void AM_GunSlap( gentity_t *ent ) {
 	}
 }
 
-static void Freeze( gclient_t *cl ) {
-	cl->pers.adminData.isFrozen = qtrue;
+static void G_SleepClient( gclient_t *cl ) {
+	cl->pers.adminData.isSlept = qtrue;
 	if ( cl->hook ) {
 		Weapon_HookFree( cl->hook );
 	}
 	VectorClear( &cl->ps.velocity );
+	cl->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+	cl->ps.forceHandExtendTime = Q3_INFINITE;
+	cl->ps.forceDodgeAnim = 0;
 }
 
-static void Unfreeze( gclient_t *cl ) {
-	cl->pers.adminData.isFrozen = qfalse;
+static void G_WakeClient( gclient_t *cl ) {
+	const animNumber_t anim = BOTH_GETUP1;
+	cl->pers.adminData.isSlept = qfalse;
+	cl->ps.forceHandExtendTime = level.time + BG_AnimLength( g_entities[cl->ps.clientNum].localAnimIndex, anim );
+	cl->ps.forceDodgeAnim = anim;
 }
 
-// freeze specified client on the spot
-static void AM_Freeze( gentity_t *ent ) {
+// prevent the client from moving by knocking them to the ground permanently
+static void AM_Sleep( gentity_t *ent ) {
 	char arg1[64];
 	int clientNum;
-	gentity_t *e = NULL;
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Please specify a player to be frozen (Or -1 for all)\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"Please specify a player to be slept (or -1 for all)\n\"" );
 		return;
 	}
 
@@ -1354,24 +1359,31 @@ static void AM_Freeze( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof(arg1) );
 	clientNum = G_ClientFromString( ent, arg1, FINDCL_SUBSTR );
 
-	// check for purposely freezing all. HACKHACKHACK
-	if ( arg1[0] == '-' && arg1[1] == '1' )
+	// check for purposely sleeping all. HACKHACKHACK
+	if ( arg1[0] == '-' && arg1[1] == '1' ) {
 		clientNum = -2;
+	}
 
-	// freeze/unfreeze everyone
+	// sleep everyone
 	if ( clientNum == -2 ) {
-		qboolean allFrozen = qtrue;
+		qboolean allSlept = qtrue;
 		int i;
+		gentity_t *e;
 		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
 			if ( !e->inuse || e->client->pers.connected == CON_DISCONNECTED ) {
 				continue;
 			}
 
-			if ( !e->client->pers.adminData.isFrozen ) {
-				allFrozen = qfalse;
+			if ( !e->client->pers.adminData.isSlept ) {
+				allSlept = qfalse;
 				break;
 			}
 		}
+
+		if ( allSlept ) {
+			return;
+		}
+
 		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
 			if ( !e->inuse || e->client->pers.connected == CON_DISCONNECTED ) {
 				continue;
@@ -1381,69 +1393,138 @@ static void AM_Freeze( gentity_t *ent ) {
 				continue;
 			}
 
-			if ( allFrozen ) {
-				Unfreeze( e->client );
-			}
-			else {
-				Freeze( e->client );
-			}
+			G_SleepClient( e->client );
 		}
-		G_LogPrintf( level.log.admin, "\t%s %sfroze everyone\n", G_PrintClient( ent-g_entities ), allFrozen ? "un" : "" );
-		trap->SendServerCommand( -1, va( "cp \"You have all been "S_COLOR_CYAN"%sfrozen\n\"", allFrozen ? "un" : "" ) );
+		G_LogPrintf( level.log.admin, "\t%s slept everyone\n", G_PrintClient( ent - g_entities ) );
+		trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_CYAN "slept\n\"" );
 	}
-	// freeze specified clientNum
+	// sleep specified clientNum
 	else if ( clientNum != -1 ) {
-		const char *pre = "";
-		e = g_entities + clientNum;
-
-		if ( e->client->pers.adminData.isFrozen ) {
-			pre = "un";
-		}
+		gentity_t *e = g_entities + clientNum;
 
 		if ( !AM_CanInflict( ent, e ) ) {
 			return;
 		}
 
-		if ( e->client->pers.adminData.isFrozen ) {
-			Unfreeze( e->client );
-		}
-		else {
-			Freeze( e->client );
+		if ( e->client->pers.adminData.isSlept ) {
+			return;
 		}
 
-		G_LogPrintf( level.log.admin, "\t%s %sfroze %s\n", G_PrintClient( ent-g_entities ), pre,
-			G_PrintClient( clientNum ) );
-		trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"%sfrozen\n\"",
-			e->client->pers.netname, pre ) );
-		trap->SendServerCommand( clientNum, va( "cp \"You have been "S_COLOR_CYAN"%sfrozen\n\"", pre ) );
+		G_SleepClient( e->client );
+
+		G_LogPrintf( level.log.admin, "\t%s slept %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( clientNum ) );
+		trap->SendServerCommand( -1, va( "cp \"%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "slept\n\"",
+			e->client->pers.netname ) );
+		trap->SendServerCommand( clientNum, "cp \"You have been " S_COLOR_CYAN "slept\n\"" );
+	}
+}
+static void AM_Freeze( gentity_t *ent ) {
+	trap->SendServerCommand( ent - g_entities, "print \"This command has been deprecated. Use `amsleep <client>` instead\n\"" );
+	AM_Sleep( ent );
+}
+
+static void AM_Wake( gentity_t *ent ) {
+	char arg1[64];
+	int clientNum;
+
+	if ( trap->Argc() < 2 ) {
+		trap->SendServerCommand( ent - g_entities, "print \"Please specify a player to be woken (or -1 for all)\n\"" );
+		return;
+	}
+
+	// grab the clientNum
+	trap->Argv( 1, arg1, sizeof(arg1) );
+	clientNum = G_ClientFromString( ent, arg1, FINDCL_SUBSTR );
+
+	// check for purposely waking all. HACKHACKHACK
+	if ( arg1[0] == '-' && arg1[1] == '1' ) {
+		clientNum = -2;
+	}
+
+	// wake everyone
+	if ( clientNum == -2 ) {
+		qboolean allWoken = qtrue;
+		int i;
+		gentity_t *e;
+		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
+			if ( !e->inuse || e->client->pers.connected == CON_DISCONNECTED ) {
+				continue;
+			}
+
+			if ( e->client->pers.adminData.isSlept ) {
+				allWoken = qfalse;
+				break;
+			}
+		}
+
+		if ( allWoken ) {
+			return;
+		}
+
+		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
+			if ( !e->inuse || e->client->pers.connected == CON_DISCONNECTED ) {
+				continue;
+			}
+
+			if ( !AM_CanInflict( ent, e ) ) {
+				continue;
+			}
+
+			G_WakeClient( e->client );
+		}
+		G_LogPrintf( level.log.admin, "\t%s woke everyone\n", G_PrintClient( ent - g_entities ) );
+		trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_CYAN "woken\n\"" );
+	}
+	// sleep specified clientNum
+	else if ( clientNum != -1 ) {
+		gentity_t *e = g_entities + clientNum;
+
+		if ( !AM_CanInflict( ent, e ) ) {
+			return;
+		}
+
+		if ( !e->client->pers.adminData.isSlept ) {
+			return;
+		}
+
+		G_WakeClient( e->client );
+
+		G_LogPrintf( level.log.admin, "\t%s woke %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( clientNum ) );
+		trap->SendServerCommand( -1, va( "cp \"%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "woken\n\"",
+			e->client->pers.netname ) );
+		trap->SendServerCommand( clientNum, "cp \"You have been " S_COLOR_CYAN "woken\n\"" );
 	}
 }
 
-// toggle the 'frozen' state of targeted client
-static void AM_GunFreeze( gentity_t *ent ) {
+// toggle the 'slept' state of the targeted client
+static void AM_GunSleep( gentity_t *ent ) {
 	trace_t	*tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *e = g_entities + tr->entityNum;
-		const char *pre = e->client->pers.adminData.isFrozen ? "un" : "";
+		const char *action = e->client->pers.adminData.isSlept ? "woken" : "slept";
 
 		if ( !AM_CanInflict( ent, e ) ) {
 			return;
 		}
 
-		if ( e->client->pers.adminData.isFrozen ) {
-			Unfreeze( e->client );
+		if ( e->client->pers.adminData.isSlept ) {
+			G_WakeClient( e->client );
 		}
 		else {
-			Freeze( e->client );
+			G_SleepClient( e->client );
 		}
 
-		G_LogPrintf( level.log.admin, "\t%s %sfroze %s\n", G_PrintClient( ent-g_entities ), pre,
-			G_PrintClient( tr->entityNum ) );
-		trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"%sfrozen\n\"",
-			e->client->pers.netname, pre ) );
-		trap->SendServerCommand( tr->entityNum, va( "cp \"You have been "S_COLOR_CYAN"%sfrozen\n\"", pre ) );
+		G_LogPrintf( level.log.admin, "\t%s %s %s\n", G_PrintClient( ent-g_entities ),
+			e->client->pers.adminData.isSlept ? "slept" : "woke", G_PrintClient( tr->entityNum ) );
+		trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been " S_COLOR_CYAN "%s\n\"",
+			e->client->pers.netname, action ) );
+		trap->SendServerCommand( tr->entityNum, va( "cp \"You have been " S_COLOR_CYAN "%s\n\"", action ) );
 	}
+}
+static void AM_GunFreeze( gentity_t *ent ) {
+	trap->SendServerCommand( ent - g_entities, "print \"This command has been deprecated. Use `gunsleep <client>` instead\n\"" );
+	AM_GunSleep( ent );
 }
 
 // silence specified client
@@ -2236,20 +2317,20 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 }
 
 typedef struct adminCommand_s {
-	const char	*cmd;
-	uint32_t	privilege;
+	const char *cmd;
+	uint32_t privilege;
 	void( *func )(gentity_t *ent);
 } adminCommand_t;
 
 static const adminCommand_t adminCommands[] = {
 	// these must be in alphabetical order for the binary search to work
-	//	{ "amlogin",		-1,				AM_Login			}, // log in using user + pass (Handled explicitly!!!)
-	{ "amban", PRIV_BAN, AM_Ban }, // ban specified client (Client + duration + reason)
+	//	{ "amlogin", -1, AM_Login }, // log in using user + pass (handled explicitly!!!)
+	{ "amban", PRIV_BAN, AM_Ban }, // ban specified client (client + duration + reason)
 	{ "ambanip", PRIV_BAN, AM_BanIP }, // ban specified IP (IP/range-ban + duration + reason)
 	{ "amclip", PRIV_CLIP, AM_Clip }, // toggle noclip mode
 	{ "amempower", PRIV_EMPOWER, AM_Empower }, // empower the specified client
 	{ "amforceteam", PRIV_FORCETEAM, AM_ForceTeam }, // force the specified client to a specific team
-	{ "amfreeze", PRIV_FREEZE, AM_Freeze }, // freeze specified client on the spot
+	{ "amfreeze", PRIV_SLEEP, AM_Freeze }, // !DEPRECATED! freeze specified client on the spot
 	{ "amghost", PRIV_GHOST, AM_Ghost }, // ghost specified client (or self)
 	{ "amkick", PRIV_KICK, AM_Kick }, // kick specified client
 	{ "amkillvote", PRIV_KILLVOTE, AM_KillVote }, // kill the current vote
@@ -2260,35 +2341,39 @@ static const adminCommand_t adminCommands[] = {
 	{ "amluareload", PRIV_LUA, AM_ReloadLua }, // reload JPLua system
 	{ "ammap", PRIV_MAP, AM_Map }, // change map and gamemode
 	{ "ammerc", PRIV_MERC, AM_Merc }, // give all weapons
-	{ "amnpc", PRIV_NPCSPAWN, AM_NPCSpawn }, // spawn an NPC (Including vehicles)
+	{ "amnpc", PRIV_NPCSPAWN, AM_NPCSpawn }, // spawn an NPC (including vehicles)
 	{ "ampoll", PRIV_POLL, AM_Poll }, // call an arbitrary vote
 	{ "amprotect", PRIV_PROTECT, AM_Protect }, // protect the specified client
-	{ "ampsay", PRIV_ANNOUNCE, AM_Announce }, // announce a message to the specified client (Or all)
+	{ "ampsay", PRIV_ANNOUNCE, AM_Announce }, // announce a message to the specified client (or all)
 	{ "amremap", PRIV_REMAP, AM_Remap }, // shader remapping
 	{ "amremovetele", PRIV_TELEPORT, AM_RemoveTelemark }, // remove a telemark from the list
 	{ "amrename", PRIV_RENAME, AM_Rename }, // rename a client
-	{ "amsavetele", PRIV_TELEPORT, AM_SaveTelemarksCmd }, // save marked positions RAZFIXME: Temporary?
+	{ "amsavetele", PRIV_TELEPORT, AM_SaveTelemarksCmd }, // save marked positions RAZFIXME: temporary?
 	{ "amseetele", PRIV_TELEPORT, AM_SeeTelemarks }, // visualise all telemarks
 	{ "amsilence", PRIV_SILENCE, AM_Silence }, // silence specified client
 	{ "amslap", PRIV_SLAP, AM_Slap }, // slap the specified client
 	{ "amslay", PRIV_SLAY, AM_Slay }, // slay the specified client
+	{ "amsleep", PRIV_SLEEP, AM_Sleep }, // sleep the specified client
 	{ "amspawn", PRIV_ENTSPAWN, AM_EntSpawn }, // spawn an entity
 	{ "amstatus", PRIV_STATUS, AM_Status }, // display list of players + clientNum + IP + admin
-	{ "amtele", PRIV_TELEPORT, AM_Teleport }, // teleport (All variations of x to y)
+	{ "amtele", PRIV_TELEPORT, AM_Teleport }, // teleport (all variations of x to y)
 	{ "amtelemark", PRIV_TELEPORT, AM_Telemark }, // mark current location
 	{ "amunlockteam", PRIV_LOCKTEAM, AM_UnlockTeam }, // allow clients to join a team
 	{ "amunsilence", PRIV_SILENCE, AM_Unsilence }, // unsilence specified client
 	{ "amunspawn", PRIV_ENTSPAWN, AM_EntRemove }, // remove an entity
 	{ "amvstr", PRIV_VSTR, AM_Vstr }, // execute a variable string
+	{ "amwake", PRIV_SLEEP, AM_Wake }, // wake the specified client
 	{ "amweather", PRIV_WEATHER, AM_Weather }, // weather effects
 	{ "amwhois", PRIV_WHOIS, AM_WhoIs }, // display list of admins
-	{ "gunfreeze", PRIV_FREEZE, AM_GunFreeze }, // toggle the 'frozen' state of targeted client
+	{ "gunfreeze", PRIV_SLEEP, AM_GunFreeze }, // DEPRECATED: toggle the 'frozen' state of targeted client
 	{ "gunprotect", PRIV_PROTECT, AM_GunProtect }, // protect the targeted client
 	{ "gunslap", PRIV_SLAP, AM_GunSlap }, // slap the targeted client
+	{ "gunsleep", PRIV_SLEEP, AM_GunSleep }, // sleep/wake the targeted client
 	{ "gunspectate", PRIV_FORCETEAM, AM_GunSpectate }, // force the targeted client to spectator team
 	{ "guntele", PRIV_TELEPORT, AM_GunTeleport }, // teleport self to targeted position
 	{ "guntelemark", PRIV_TELEPORT, AM_GunTeleportMark }, // mark targeted location
 	{ "guntelerev", PRIV_TELEPORT, AM_GunTeleportRev }, // teleport targeted client to self
+	{ "gunwake", PRIV_SLEEP, AM_GunSleep }, // sleep/wake the targeted client
 };
 static const size_t numAdminCommands = ARRAY_LEN( adminCommands );
 

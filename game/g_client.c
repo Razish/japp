@@ -3008,27 +3008,22 @@ void ClientSpawn( gentity_t *ent ) {
 	// do it before setting health back up, so farthest
 	// ranging doesn't count this client
 	if ( client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		spawnPoint = SelectSpectatorSpawnPoint(
-			&spawn_origin, &spawn_angles );
+		spawnPoint = SelectSpectatorSpawnPoint( &spawn_origin, &spawn_angles );
 	}
 	else if ( level.gametype == GT_CTF || level.gametype == GT_CTY ) {
 		// all base oriented team games use the CTF spawn points
-		spawnPoint = SelectCTFSpawnPoint(
-			client->sess.sessionTeam,
-			client->pers.teamState.state,
-			&spawn_origin, &spawn_angles );
+		spawnPoint = SelectCTFSpawnPoint( client->sess.sessionTeam, client->pers.teamState.state, &spawn_origin,
+			&spawn_angles );
 	}
 	else if ( level.gametype == GT_SIEGE ) {
-		spawnPoint = SelectSiegeSpawnPoint(
-			client->siegeClass,
-			client->sess.sessionTeam,
-			client->pers.teamState.state,
+		spawnPoint = SelectSiegeSpawnPoint( client->siegeClass, client->sess.sessionTeam, client->pers.teamState.state,
 			&spawn_origin, &spawn_angles );
 	}
 	else {
 		do {
 			if ( level.gametype == GT_POWERDUEL ) {
-				spawnPoint = SelectDuelSpawnPoint( client->sess.duelTeam, &client->ps.origin, &spawn_origin, &spawn_angles );
+				spawnPoint = SelectDuelSpawnPoint( client->sess.duelTeam, &client->ps.origin, &spawn_origin,
+					&spawn_angles );
 			}
 			else if ( level.gametype == GT_DUEL ) {	// duel
 				spawnPoint = SelectDuelSpawnPoint( DUELTEAM_SINGLE, &client->ps.origin, &spawn_origin, &spawn_angles );
@@ -3041,24 +3036,20 @@ void ClientSpawn( gentity_t *ent ) {
 				}
 				else {
 					// don't spawn near existing origin if possible
-					spawnPoint = SelectSpawnPoint(
-						&client->ps.origin,
-						&spawn_origin, &spawn_angles, client->sess.sessionTeam );
+					spawnPoint = SelectSpawnPoint( &client->ps.origin, &spawn_origin, &spawn_angles,
+						client->sess.sessionTeam );
 				}
 			}
 
-			// Tim needs to prevent bots from spawning at the initial point
-			// on q3dm0...
 			if ( (spawnPoint->flags & FL_NO_BOTS) && (ent->r.svFlags & SVF_BOT) ) {
 				continue;	// try again
 			}
-			// just to be symetric, we have a nohumans option...
+			// just to be symmetric, we have a nohumans option...
 			if ( (spawnPoint->flags & FL_NO_HUMANS) && !(ent->r.svFlags & SVF_BOT) ) {
 				continue;	// try again
 			}
 
 			break;
-
 		} while ( 1 );
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
@@ -3105,8 +3096,11 @@ void ClientSpawn( gentity_t *ent ) {
 	client->ps.customRGBA[2] = (value = Info_ValueForKey( userinfo, "char_color_blue" )) ? Q_clampi( 0, atoi( value ), 255 ) : 255;
 
 	//Prevent skins being too dark
-	if ( japp_charRestrictRGB.integer && ((client->ps.customRGBA[0] + client->ps.customRGBA[1] + client->ps.customRGBA[2]) < 100) )
+	if ( japp_charRestrictRGB.integer
+		&& ((client->ps.customRGBA[0] + client->ps.customRGBA[1] + client->ps.customRGBA[2]) < 100) )
+	{
 		client->ps.customRGBA[0] = client->ps.customRGBA[1] = client->ps.customRGBA[2] = 255;
+	}
 
 	client->ps.customRGBA[3] = 255;
 
@@ -3152,8 +3146,9 @@ void ClientSpawn( gentity_t *ent ) {
 	client->accuracy_hits = accuracy_hits;
 	client->accuracy_shots = accuracy_shots;
 
-	for ( i = 0; i < MAX_PERSISTANT; i++ )
+	for ( i = 0; i < MAX_PERSISTANT; i++ ) {
 		client->ps.persistant[i] = persistant[i];
+	}
 
 	client->ps.eventSequence = eventSequence;
 	// increment the spawncount so the client will detect the respawn
@@ -3183,8 +3178,9 @@ void ClientSpawn( gentity_t *ent ) {
 	client->ps.eFlags = flags;
 
 	//Raz: Save empowered state
-	if ( client->pers.adminData.empowered )
+	if ( client->pers.adminData.empowered ) {
 		client->ps.eFlags |= EF_BODYPUSH;
+	}
 
 	client->mGameFlags = gameFlags;
 
@@ -3536,6 +3532,12 @@ void ClientSpawn( gentity_t *ent ) {
 	// don't allow full run speed for a bit
 	client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 	client->ps.pm_time = 100;
+
+	if ( client->pers.adminData.isSlept ) {
+		client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
+		client->ps.forceHandExtendTime = Q3_INFINITE;
+		client->ps.forceDodgeAnim = 0;
+	}
 
 	client->respawnTime = level.time;
 	client->inactivityTime = level.time + g_inactivity.integer * 1000;

@@ -862,11 +862,12 @@ void G_RunMissile( gentity_t *ent ) {
 		&& (ent->parent->client->ps.duelInProgress
 		|| BG_SaberInSpecial( ent->parent->client->ps.saberMove )
 		|| !(japp_allowHook.integer & (1 << level.gametype))
-		|| ent->parent->client->pers.adminData.isFrozen
+		|| ent->parent->client->pers.adminData.isSlept
 		|| g_entities[tr.entityNum].client) )
 	{
 		// not allowed to have hook out
-		Weapon_HookFree( ent->parent->client->hook );
+		Weapon_HookFree( ent );
+		return;
 	}
 
 	if ( tr.fraction != 1 ) {
@@ -974,8 +975,6 @@ gentity_t *fire_grapple( gentity_t *self, vector3 *start, vector3 *dir ) {
 	VectorScale( dir, 800, &hook->s.pos.trDelta );
 	VectorSnap( &hook->s.pos.trDelta );	//	Save net bandwidth
 	VectorCopy( start, &hook->r.currentOrigin );
-
-	self->client->hook = hook;
 
 	return hook;
 }

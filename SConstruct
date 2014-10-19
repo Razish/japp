@@ -95,7 +95,7 @@ if not env.GetOption( 'clean' ):
 	msg = 'Building for ' + plat + ' ' + str(bits) + ' bits (' + env['CC'] + ' ' + ccversion + ', python ' + platform.python_version() + ')'
 	if debug:
 		msg += ', debug symbols'
-	if not debug or debug == 2:
+	if debug == 0 or debug == 2:
 		msg += ', optimised'
 	msg += ', x87 fpu' if 'NO_SSE' in os.environ else ', SSE'
 	if force32:
@@ -273,16 +273,16 @@ elif plat == 'Windows':
 		env['CPPDEFINES'] += [ '_M_AMD64=100', '_M_X64=100', '_WIN64' ]
 
 # debug / release
-if not debug or debug == 2:
+if debug == 0 or debug == 2:
 	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-O3' ]
-		if not debug:
+		if debug == 0:
 			env['LINKFLAGS'] += [ '-s' ]
 	elif plat == 'Windows':
 		env['CCFLAGS'] += [ '/GL', '/Gm-', '/MD', '/O2', '/Oi' ]
 		if bits == 64:
 			env['CCFLAGS'] += [ '/Oy' ]
-	if not debug:
+	if debug == 0:
 		env['CPPDEFINES'] += [ 'NDEBUG' ]
 if debug:
 	if plat == 'Linux':
@@ -338,4 +338,4 @@ elif project == 'ui':
 	env.SharedLibrary( 'ui' + arch, files[project] )
 
 else:
-	print( 'no project specified' )
+	Exception( 'no project specified' )

@@ -3598,20 +3598,22 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 
 	//Raz: Avoid damage
 	if ( targ && targ->client ) {
-		if ( targ->client->pers.adminData.isFrozen )
+		if ( targ->client->pers.adminData.isSlept || targ->client->pers.adminData.isGhost ) {
 			return;
-		if ( targ->client->pers.adminData.isGhost )
+		}
+		if ( japp_chatProtection.integer && !targ->client->ps.duelInProgress && (targ->client->ps.eFlags & EF_TALK) ) {
 			return;
-		if ( japp_chatProtection.integer && !targ->client->ps.duelInProgress && (targ->client->ps.eFlags & EF_TALK) )
-			return;
+		}
 	}
 	if ( attacker && attacker->client ) {
-		if ( attacker->client->pers.adminData.isFrozen )
+		if ( attacker->client->pers.adminData.isSlept || attacker->client->pers.adminData.isGhost ) {
 			return;
-		if ( attacker->client->pers.adminData.isGhost )
+		}
+		if ( japp_chatProtection.integer && !attacker->client->ps.duelInProgress
+			&& (attacker->client->ps.eFlags & EF_TALK) )
+		{
 			return;
-		if ( japp_chatProtection.integer && !attacker->client->ps.duelInProgress && (attacker->client->ps.eFlags & EF_TALK) )
-			return;
+		}
 	}
 
 	if ( mod == MOD_DEMP2 && targ && targ->inuse && targ->client ) {

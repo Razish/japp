@@ -2323,8 +2323,8 @@ static qboolean G_SaberCollide( gentity_t *atk, gentity_t *def, vector3 *atkStar
 	}
 
 	//Raz: Avoid saber collisions for ghosts and frozen players
-	if ( atk->client->pers.adminData.isFrozen || atk->client->pers.adminData.isGhost ||
-		def->client->pers.adminData.isFrozen || def->client->pers.adminData.isGhost )
+	if ( atk->client->pers.adminData.isSlept || atk->client->pers.adminData.isGhost ||
+		def->client->pers.adminData.isSlept || def->client->pers.adminData.isGhost )
 		return qfalse;
 
 	i = 0;
@@ -3848,8 +3848,8 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 		}
 
 		//Raz: Ghosts and frozen clients can't be damaged
-		if ( g_entities[tr.entityNum].client && (g_entities[tr.entityNum].client->pers.adminData.isFrozen
-			|| g_entities[tr.entityNum].client->pers.adminData.isGhost || self->client->pers.adminData.isFrozen
+		if ( g_entities[tr.entityNum].client && (g_entities[tr.entityNum].client->pers.adminData.isSlept
+			|| g_entities[tr.entityNum].client->pers.adminData.isGhost || self->client->pers.adminData.isSlept
 			|| self->client->pers.adminData.isGhost) )
 		{
 			return qfalse;
@@ -7568,7 +7568,7 @@ nextStep:
 		saberDoClashEffect = qfalse;
 
 		//Raz: Avoid saber collisions for ghosts and frozen players
-		if ( self->client->pers.adminData.isFrozen || self->client->pers.adminData.isGhost ) {
+		if ( self->client->pers.adminData.isSlept || self->client->pers.adminData.isGhost ) {
 			return;
 		}
 
@@ -7978,7 +7978,7 @@ int WP_SaberCanBlock( gentity_t *self, vector3 *point, uint32_t dflags, int mod,
 		return 0;
 	}
 
-	if ( self->client->pers.adminData.isFrozen || self->client->pers.adminData.isGhost
+	if ( self->client->pers.adminData.isSlept || self->client->pers.adminData.isGhost
 		|| BG_SaberInAttack( self->client->ps.saberMove ) )
 	{
 		return 0;

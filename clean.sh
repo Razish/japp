@@ -31,4 +31,4 @@ $clean project=cgame debug=$DEBUG force32=$FORCE32 -c
 $clean project=ui debug=$DEBUG force32=$FORCE32 -c
 
 # remove any lingering object files
-#find . -name '*.o' -print0 | xargs -0 rm
+find . -type f -name "*.os" -delete

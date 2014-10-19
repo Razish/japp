@@ -256,7 +256,7 @@ void Cmd_Kill_f( gentity_t *ent ) {
 		return;
 	}
 
-	if ( ent->client->pers.adminData.isFrozen ) {
+	if ( ent->client->pers.adminData.isSlept ) {
 		return;
 	}
 
@@ -604,6 +604,11 @@ static void Cmd_Team_f( gentity_t *ent ) {
 	if ( gEscaping ) {
 		return;
 	}
+
+	if ( ent->client->pers.adminData.isSlept ) {
+		return;
+	}
+
 
 	// if they are playing a tournement game, count as a loss
 	if ( level.gametype == GT_DUEL && ent->client->sess.sessionTeam == TEAM_FREE ) {

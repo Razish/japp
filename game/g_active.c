@@ -1957,29 +1957,28 @@ void ClientThink_real( gentity_t *ent ) {
 		ucmd->forwardmove = ucmd->rightmove = ucmd->upmove = 0;
 		client->ps.pm_type = PM_FREEZE;
 	}
-
-	else if ( client->noclip )
+	else if ( client->noclip ) {
 		client->ps.pm_type = PM_NOCLIP;
-
-	else if ( client->ps.eFlags & EF_DISINTEGRATION )
+	}
+	else if ( client->ps.eFlags & EF_DISINTEGRATION ) {
 		client->ps.pm_type = PM_NOCLIP; //RAZFIXME: should be PM_FREEZE?
-
-	else if ( client->ps.stats[STAT_HEALTH] <= 0 )
+	}
+	else if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
 		client->ps.pm_type = PM_DEAD;
-
+	}
 	else {
-		if ( client->ps.forceGripChangeMovetype )
+		if ( client->ps.forceGripChangeMovetype ) {
 			client->ps.pm_type = client->ps.forceGripChangeMovetype;
+		}
 		else {
 			if ( client->jetPackOn ) {
 				client->ps.pm_type = PM_JETPACK;
 				client->ps.eFlags |= EF_JETPACK_ACTIVE;
 				killJetFlags = qfalse;
 			}
-			else if ( client->pers.adminData.isFrozen )
-				client->ps.pm_type = PM_FREEZE;
-			else
+			else {
 				client->ps.pm_type = PM_NORMAL;
+			}
 		}
 	}
 
@@ -2974,7 +2973,7 @@ void ClientThink_real( gentity_t *ent ) {
 			Weapon_GrapplingHook_Fire( ent );
 		}
 
-		if ( ent->client->hook ) {
+		if ( ent->client->hook && ent->client->hook->inuse ) {
 			if ( (releaseGrapple && ent->client->hookHasBeenFired && !ent->client->fireHeld)
 				|| (oldGrapple && !pullGrapple && ent->client->hook)
 				|| (!pullGrapple && ent->client->fireHeld && ent->client->hookHasBeenFired)
