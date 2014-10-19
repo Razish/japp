@@ -2251,6 +2251,7 @@ void ClientThink_real( gentity_t *ent ) {
 				duelAgainst->client->ps.duelTime = 0;
 			}
 
+			Jetpack_Off( ent );
 			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << HI_JETPACK);
 		}
 		else {
