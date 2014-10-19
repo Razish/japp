@@ -536,7 +536,7 @@ const vehField_t vehicleFields[] =
 	{ "turret2GunnerViewTag", VFOFS( turret[1].gunnerViewTag ), VF_LSTRING },
 	//===END TURRETS===========================================================================
 	//terminating entry
-	{ 0, 0xFFFFFFFFu, VF_INT }
+	{ 0, (size_t)-1, VF_INT }
 };
 
 stringID_table_t VehicleTable[VH_NUM_VEHICLES + 1] =
@@ -699,12 +699,12 @@ static qboolean BG_ParseVehicleParm( vehicleInfo_t *vehicle, const char *parmNam
 	byte	*b = (byte *)vehicle;
 	int		_iFieldsRead = 0;
 	vehicleType_t vehType;
-	char value[1024];
+	char value[MAX_STRING_CHARS];
 
 	Q_strncpyz( value, pValue, sizeof(value) );
 
 	// Loop through possible parameters
-	for ( i = 0; vehicleFields[i].ofs != -1; i++ ) {
+	for ( i = 0; vehicleFields[i].ofs != (size_t)-1; i++ ) {
 		if ( !Q_stricmp( vehicleFields[i].name, parmName ) ) {
 			// found it
 			switch ( vehicleFields[i].type ) {

@@ -530,7 +530,7 @@ static void PM_SetVehicleAngles( vector3 *normal ) {
 
 	//do it
 	for ( i = 0; i < 3; i++ ) {
-		if ( i == 2/*YAW*/ ) {//yawing done elsewhere
+		if ( i == 1/*YAW*/ ) {//yawing done elsewhere
 			continue;
 		}
 		//bank faster the higher the difference is
