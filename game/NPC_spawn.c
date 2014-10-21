@@ -1848,9 +1848,8 @@ qboolean NPC_VehiclePrecache( gentity_t *spawner ) {
 		}
 		trap->G2API_InitGhoul2Model( &tempG2, va( "models/players/%s/model.glm", pVehInfo->model ), 0, skin, 0, 0, 0 );
 		if ( tempG2 ) { //now, cache the anim config.
-			char GLAName[1024];
+			char GLAName[1024] = { '\0' };
 
-			GLAName[0] = 0;
 			trap->G2API_GetGLAName( tempG2, 0, GLAName );
 
 			if ( GLAName[0] ) {

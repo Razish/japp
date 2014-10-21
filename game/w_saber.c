@@ -3621,7 +3621,7 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 			}
 			else {
 				dmg = 35;
-				assert( !"Unhandled damage case!" );
+			//	assert( !"Unhandled damage case!" );
 			}
 
 			attackStr = self->client->ps.fd.saberAnimLevel;

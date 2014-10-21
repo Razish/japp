@@ -828,13 +828,12 @@ static void CG_InitG2SaberData( int saberNum, clientInfo_t *ci ) {
 					// guess this is an 0ldsk3wl saber
 					tagBolt = trap->G2API_AddBolt( ci->ghoul2Weapons[saberNum], 0, "*flash" );
 
-					if ( tagBolt == -1 )
-						assert( 0 );
-					break;
+					if ( tagBolt == -1 ) {
+						break;
+					}
 				}
 
 				if ( tagBolt == -1 ) {
-					assert( 0 );
 					break;
 				}
 			}
