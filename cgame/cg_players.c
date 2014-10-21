@@ -8579,7 +8579,9 @@ stillDoSaber:
 		savedRGB[2] = legs.shaderRGBA[2];
 		savedRenderFX = legs.renderfx;
 
-		if ( cent->currentState.number != cg.clientNum && cg_forceModel.integer ) {
+		if ( cg_forceModel.integer && cent->currentState.number != cg.clientNum
+			&& cent->currentState.eType == ET_PLAYER )
+		{
 			// force enemy/ally colours
 			if ( cgs.gametype < GT_TEAM || ci->team != cgs.clientinfo[cg.snap->ps.clientNum].team ) {
 				if ( cg_forceEnemyColour.string[0] ) {
