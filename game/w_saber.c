@@ -446,7 +446,7 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 	VectorCopy( &saberent->r.currentOrigin, &saberent->r.maxs );
 
 	for ( i = 0; i < 3; i++ ) {
-		for ( saberNum = 0; saberNum < dualSabers ? MAX_SABERS : 1; saberNum++ ) {
+		for ( saberNum = 0; saberNum < (dualSabers ? MAX_SABERS : 1); saberNum++ ) {
 			if ( !owner->client->saber[saberNum].model[0] ) {
 				break;
 			}
