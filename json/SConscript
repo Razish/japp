@@ -1,0 +1,16 @@
+Import( '*' )
+
+# environment
+env.VariantDir( build_dir, '#', duplicate = 0 )
+json_env = env.Clone()
+
+# sources
+files = [ 'json/cJSON.c' ]
+files = [build_dir + f for f in files]
+
+# project settings
+json_env['CCFLAGS'] += [ '-fPIC' ]
+
+# targets
+result = json_env.StaticLibrary( build_dir + 'libjson', files )
+Return( "result" )

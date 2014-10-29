@@ -1,0 +1,34 @@
+Import( '*' )
+
+# environment
+build_dir = 'build' + '/' + configuration + '/' + env['CC'] + '/' + str(bits) + '/ui/'
+env.VariantDir( build_dir, '#', duplicate = 0 )
+ui_env = env.Clone()
+
+# sources
+files = [ 'game/bg_misc.c', 'game/bg_saberLoad.c', 'game/bg_saga.c', 'game/bg_vehicleLoad.c', 'game/bg_weapons.c',
+	'JAPP/jp_crash.c', 'JAPP/jp_tokenparser.c', 'ui/ui_atoms.c', 'ui/ui_cvar.c', 'ui/ui_force.c', 'ui/ui_gameinfo.c',
+	'ui/ui_main.c', 'ui/ui_saber.c', 'ui/ui_shared.c', 'ui/ui_syscalls.c', 'qcommon/q_math.c', 'qcommon/q_shared.c'
+]
+files = [build_dir + f for f in files]
+
+# libraries
+libraries = [
+	'json'
+]
+if bits == 32:
+	libraries += [ 'libudis86' ]
+ui_env['LIBS'] = [
+	ui_env.SConscript(
+		'#/' + lib + '/SConscript',
+		exports = [ 'arch', 'bits', 'build_dir', 'configuration', 'env', 'plat' ]
+	) for lib in libraries
+]
+
+# project settings
+ui_env['CPPPATH'] += [ '#/ui' ]
+ui_env['CPPDEFINES'] += [ '_UI' ]
+ui_env['LIBPREFIX'] = ''
+
+# targets
+ui_env.SharedLibrary( '#ui' + arch, files )

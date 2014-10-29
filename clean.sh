@@ -26,9 +26,7 @@ do
 	esac
 done
 
-$clean project=game debug=$DEBUG force32=$FORCE32 -c
-$clean project=cgame debug=$DEBUG force32=$FORCE32 -c
-$clean project=ui debug=$DEBUG force32=$FORCE32 -c
+$clean debug=$DEBUG force32=$FORCE32 -c
 
 # remove any lingering object files
 find . -type f -name "*.os" -delete
