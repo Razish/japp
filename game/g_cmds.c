@@ -1547,17 +1547,19 @@ static qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const 
 	}
 	trap->FS_Close( fp );
 
-	if ( !G_DoesMapSupportGametype( arg2, level.gametype ) ) {
+	if ( !japp_voteMapAnyGT.integer && !G_DoesMapSupportGametype( arg2, level.gametype ) ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NOVOTE_MAPNOTSUPPORTEDBYGAME" ) ) );
 		return qfalse;
 	}
 
 	// preserve the map rotation
 	trap->Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
-	if ( *s )
+	if ( *s ) {
 		Com_sprintf( level.voteString, sizeof(level.voteString), "%s %s; set nextmap \"%s\"", arg1, arg2, s );
-	else
+	}
+	else {
 		Com_sprintf( level.voteString, sizeof(level.voteString), "%s %s", arg1, arg2 );
+	}
 
 	arenaInfo = G_GetArenaInfoByMap( arg2 );
 	if ( arenaInfo ) {
@@ -1565,11 +1567,13 @@ static qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const 
 		mapName2 = Info_ValueForKey( arenaInfo, "map" );
 	}
 
-	if ( !mapName || !mapName[0] )
+	if ( !mapName || !mapName[0] ) {
 		mapName = "ERROR";
+	}
 
-	if ( !mapName2 || !mapName2[0] )
+	if ( !mapName2 || !mapName2[0] ) {
 		mapName2 = "ERROR";
+	}
 
 	Com_sprintf( level.voteDisplayString, sizeof(level.voteDisplayString), "map %s (%s)", mapName, mapName2 );
 	Q_strncpyz( level.voteStringClean, level.voteString, sizeof(level.voteStringClean) );

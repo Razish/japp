@@ -2181,90 +2181,84 @@ static qboolean PM_CheckJump( void ) {
 		if ( trace.fraction <= 1.0f ) {
 			VectorMA( &pm->ps->velocity, JUMP_VELOCITY * 2, &forward, &pm->ps->velocity );
 			PM_SetAnim( SETANIM_LEGS, BOTH_FORCEJUMP1, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_RESTART, 150 );
-		}//else no surf close enough to push off of
+		}
 		pm->cmd.upmove = 0;
 	}
-	else if ( pm->cmd.upmove > 0 && pm->waterlevel < 2 &&
-		pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_0 &&
-		!(pm->ps->pm_flags&PMF_JUMP_HELD) &&
-		(pm->ps->weapon == WP_SABER || pm->ps->weapon == WP_MELEE) &&
-		!PM_IsRocketTrooper() &&
-		!BG_HasYsalamiri( pm->gametype, pm->ps ) &&
-		BG_CanUseFPNow( pm->gametype, pm->ps, pm->cmd.serverTime, FP_LEVITATION ) ) {
+	else if ( pm->cmd.upmove > 0 && pm->waterlevel < 2 && pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_0
+		&& !(pm->ps->pm_flags & PMF_JUMP_HELD) && (pm->ps->weapon == WP_SABER || pm->ps->weapon == WP_MELEE)
+		&& !PM_IsRocketTrooper() && !BG_HasYsalamiri( pm->gametype, pm->ps )
+		&& BG_CanUseFPNow( pm->gametype, pm->ps, pm->cmd.serverTime, FP_LEVITATION ) )
+	{
 		qboolean allowWallRuns = GetCInfo( CINFO_VQ3PHYS ) ? qfalse : qtrue;
 		qboolean allowWallFlips = GetCInfo( CINFO_VQ3PHYS ) ? qfalse : qtrue;
-		//	qboolean allowFlips = qtrue;
 		qboolean allowWallGrabs = GetCInfo( CINFO_VQ3PHYS ) ? qfalse : qtrue;
 		if ( pm->ps->weapon == WP_SABER ) {
 			saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
 			saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
-			if ( saber1
-				&& (saber1->saberFlags&SFL_NO_WALL_RUNS) ) {
+			if ( saber1 && (saber1->saberFlags & SFL_NO_WALL_RUNS) ) {
 				allowWallRuns = qfalse;
 			}
-			if ( saber2
-				&& (saber2->saberFlags&SFL_NO_WALL_RUNS) ) {
+			if ( saber2 && (saber2->saberFlags & SFL_NO_WALL_RUNS) ) {
 				allowWallRuns = qfalse;
 			}
-			if ( saber1
-				&& (saber1->saberFlags&SFL_NO_WALL_FLIPS) ) {
+			if ( saber1 && (saber1->saberFlags & SFL_NO_WALL_FLIPS) ) {
 				allowWallFlips = qfalse;
 			}
-			if ( saber2
-				&& (saber2->saberFlags&SFL_NO_WALL_FLIPS) ) {
+			if ( saber2 && (saber2->saberFlags & SFL_NO_WALL_FLIPS) ) {
 				allowWallFlips = qfalse;
 			}
-			if ( saber1
-				&& (saber1->saberFlags&SFL_NO_FLIPS) ) {
+			if ( saber1 && (saber1->saberFlags & SFL_NO_FLIPS) ) {
 				allowFlips = qfalse;
 			}
-			if ( saber2
-				&& (saber2->saberFlags&SFL_NO_FLIPS) ) {
+			if ( saber2 && (saber2->saberFlags & SFL_NO_FLIPS) ) {
 				allowFlips = qfalse;
 			}
-			if ( saber1
-				&& (saber1->saberFlags&SFL_NO_WALL_GRAB) ) {
+			if ( saber1 && (saber1->saberFlags & SFL_NO_WALL_GRAB) ) {
 				allowWallGrabs = qfalse;
 			}
-			if ( saber2
-				&& (saber2->saberFlags&SFL_NO_WALL_GRAB) ) {
+			if ( saber2 && (saber2->saberFlags & SFL_NO_WALL_GRAB) ) {
 				allowWallGrabs = qfalse;
 			}
 		}
 
-		if ( pm->ps->groundEntityNum != ENTITYNUM_NONE ) {//on the ground
-			//check for left-wall and right-wall special jumps
+		if ( pm->ps->groundEntityNum != ENTITYNUM_NONE ) {
+			// check for left-wall and right-wall special jumps
 			int anim = -1;
-			float	vertPush = 0;
-			if ( pm->cmd.rightmove > 0 && pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_1 ) {//strafing right
-				if ( pm->cmd.forwardmove > 0 ) {//wall-run
+			float vertPush = 0;
+			if ( pm->cmd.rightmove > 0 && pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_1 ) {
+				if ( pm->cmd.forwardmove > 0 ) {
+					// wall-run
 					if ( allowWallRuns ) {
 						vertPush = forceJumpStrength[FORCE_LEVEL_2] / 2.0f;
 						anim = BOTH_WALL_RUN_RIGHT;
 					}
 				}
-				else if ( pm->cmd.forwardmove == 0 ) {//wall-flip
+				else if ( pm->cmd.forwardmove == 0 ) {
+					// wall-flip
 					if ( allowWallFlips ) {
 						vertPush = forceJumpStrength[FORCE_LEVEL_2] / 2.25f;
 						anim = BOTH_WALL_FLIP_RIGHT;
 					}
 				}
 			}
-			else if ( pm->cmd.rightmove < 0 && pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_1 ) {//strafing left
-				if ( pm->cmd.forwardmove > 0 ) {//wall-run
+			else if ( pm->cmd.rightmove < 0 && pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_1 ) {
+				if ( pm->cmd.forwardmove > 0 ) {
+					// wall-run
 					if ( allowWallRuns ) {
 						vertPush = forceJumpStrength[FORCE_LEVEL_2] / 2.0f;
 						anim = BOTH_WALL_RUN_LEFT;
 					}
 				}
-				else if ( pm->cmd.forwardmove == 0 ) {//wall-flip
+				else if ( pm->cmd.forwardmove == 0 ) {
+					// wall-flip
 					if ( allowWallFlips ) {
 						vertPush = forceJumpStrength[FORCE_LEVEL_2] / 2.25f;
 						anim = BOTH_WALL_FLIP_LEFT;
 					}
 				}
 			}
-			else if ( pm->cmd.forwardmove < 0 && !(pm->cmd.buttons&BUTTON_ATTACK) ) {//backflip
+			else if ( pm->cmd.forwardmove < 0 && !(pm->cmd.buttons & BUTTON_ATTACK) ) {
+				// backflip
 				if ( allowFlips ) {
 					vertPush = JUMP_VELOCITY;
 					anim = BOTH_FLIP_BACK1;//BG_PickAnim( BOTH_FLIP_BACK1, BOTH_FLIP_BACK3 );
@@ -2318,11 +2312,15 @@ static qboolean PM_CheckJump( void ) {
 					VectorNormalize( &idealNormal );
 				}
 
-				if ( !doTrace || (trace.fraction < 1.0f && (trace.entityNum < MAX_CLIENTS || DotProduct( &wallNormal, &idealNormal ) > 0.7f)) ) {//there is a wall there.. or hit a client
-					if ( (anim != BOTH_WALL_RUN_LEFT
-						&& anim != BOTH_WALL_RUN_RIGHT
-						&& anim != BOTH_FORCEWALLRUNFLIP_START)
-						|| (wallNormal.z >= 0.0f&&wallNormal.z <= 0.4f/*MAX_WALL_RUN_Z_NORMAL*/) ) {//wall-runs can only run on perfectly flat walls, sorry.
+				if ( !doTrace
+					|| (trace.fraction < 1.0f
+						&& (trace.entityNum < MAX_CLIENTS || DotProduct( &wallNormal, &idealNormal ) > 0.7f)) )
+				{
+					// there is a wall there.. or hit a client
+					if ( (anim != BOTH_WALL_RUN_LEFT && anim != BOTH_WALL_RUN_RIGHT && anim != BOTH_FORCEWALLRUNFLIP_START)
+						|| (wallNormal.z >= 0.0f && wallNormal.z <= 0.4f) )
+					{
+						// wall-runs can only run on perfectly flat walls, sorry.
 						int parts;
 						//move me to side
 						if ( anim == BOTH_WALL_FLIP_LEFT ) {
@@ -2344,8 +2342,9 @@ static qboolean PM_CheckJump( void ) {
 						if ( GetCInfo( CINFO_FLIPKICK ) ) {
 							if ( doTrace && anim != BOTH_WALL_RUN_LEFT && anim != BOTH_WALL_RUN_RIGHT ) {
 								bgEntity_t *kickedEnt = PM_BGEntForNum( trace.entityNum );
-								if ( trace.entityNum < MAX_CLIENTS || kickedEnt->s.eType == ET_NPC )
-									pm->ps->forceKickFlip = trace.entityNum + 1; //let the server know that this person gets kicked by this client
+								if ( trace.entityNum < MAX_CLIENTS || kickedEnt->s.eType == ET_NPC ) {
+									pm->ps->forceKickFlip = trace.entityNum + 1;
+								}
 							}
 						}
 
@@ -2740,12 +2739,11 @@ static qboolean PM_CheckJump( void ) {
 
 		if ( GetCInfo( CINFO_CPMPHYSICS ) ) {
 			float dot = 0.0f, speed = 0.0f;
-			const float jumpVel = jumpVelocity;//270.0f;
 			vector3 dir;
 
 			// first the double jump
 			if ( pm->ps->stats[STAT_JUMPTIME] > 0 ) {
-				pm->ps->velocity.z = jumpVel*2.0f;
+				pm->ps->velocity.z = jumpVelocity + 100;
 				pm->ps->pm_flags &= ~PMF_JUMP_HELD;
 			}
 
@@ -2759,6 +2757,7 @@ static qboolean PM_CheckJump( void ) {
 			if ( pml.groundPlane && dot > 0.0f ) {
 				pm->ps->velocity.z += dot*speed;
 				pm->ps->pm_flags &= ~PMF_JUMP_HELD;
+				pm->cmd.upmove = 0;
 			}
 		}
 	}
@@ -10187,17 +10186,17 @@ Can be called by either the server or the client
 ================
 */
 void Pmove( pmove_t *pmove ) {
-	int			finalTime;
-
-	finalTime = pmove->cmd.serverTime;
+	int finalTime = pmove->cmd.serverTime;
 
 	if ( finalTime < pmove->ps->commandTime ) {
-		return;	// should not happen
+		// should not happen
+		return;
 	}
 
 	//Raz: Pmove smoothing
-	if ( pmove->pmove_fixed && finalTime < pmove->ps->commandTime + pmove->pmove_msec )
+	if ( pmove->pmove_fixed && finalTime < pmove->ps->commandTime + pmove->pmove_msec ) {
 		return;
+	}
 
 	if ( finalTime > pmove->ps->commandTime + 1000 ) {
 		pmove->ps->commandTime = finalTime - 1000;
@@ -10212,25 +10211,25 @@ void Pmove( pmove_t *pmove ) {
 
 	pmove->ps->pmove_framecount = (pmove->ps->pmove_framecount + 1) & ((1 << PS_PMOVEFRAMECOUNTBITS) - 1);
 
-	// chop the move up if it is too long, to prevent framerate
-	// dependent behavior
+	// chop the move up if it is too long, to prevent framerate dependent behavior
 	while ( pmove->ps->commandTime != finalTime ) {
-		int		msec = finalTime - pmove->ps->commandTime;
+		int msec = finalTime - pmove->ps->commandTime;
 
 		if ( pmove->pmove_fixed ) {
-			if ( msec > pmove->pmove_msec )
+			if ( msec > pmove->pmove_msec ) {
 				msec = pmove->pmove_msec;
+			}
 		}
-		else {
-			if ( msec > 66 )
-				msec = 66;
+		else if ( msec > 66 ) {
+			msec = 66;
 		}
 		pmove->cmd.serverTime = pmove->ps->commandTime + msec;
 
 		PmoveSingle( pmove );
 
-		if ( pmove->ps->pm_flags & PMF_JUMP_HELD )
+		if ( pmove->ps->pm_flags & PMF_JUMP_HELD ) {
 			pmove->cmd.upmove = 20;
+		}
 	}
 }
 

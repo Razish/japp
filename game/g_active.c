@@ -1889,11 +1889,13 @@ void ClientThink_real( gentity_t *ent ) {
 		msec = 200;
 	}
 
-	if ( pmove_msec.integer < 8 ) {
-		trap->Cvar_Set( "pmove_msec", "8" );
+	if ( pmove_msec.integer < 1 ) {
+		trap->Cvar_Set( "pmove_msec", "1" );
+		trap->Cvar_Update( &pmove_msec );
 	}
 	else if ( pmove_msec.integer > 33 ) {
 		trap->Cvar_Set( "pmove_msec", "33" );
+		trap->Cvar_Update( &pmove_msec );
 	}
 
 	if ( pmove_fixed.integer ) {
