@@ -103,8 +103,8 @@ if plat == 'Linux':
 	env['CXXFLAGS'] = []
 
 	# set job/thread count
-	status, res = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
-	env.SetOption( 'num_jobs', res * 2 if status == 0 else 1 )
+	#status, res = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
+	#env.SetOption( 'num_jobs', res * 2 if status == 0 else 1 )
 
 	# c warnings
 	env['CFLAGS'] += [ '-Wdeclaration-after-statement', '-Wnested-externs', '-Wold-style-definition',
