@@ -36,6 +36,9 @@ cgame_env['LIBS'] = [
 	) for lib in libraries
 ]
 
+if plat == 'Windows':
+	cgame_env['LIBS'] += [ 'user32', 'Advapi32' ]
+
 # project settings
 cgame_env['CPPPATH'] += [ '#/cgame' ]
 cgame_env['CPPDEFINES'] += [ '_CGAME', 'JPLUA' ]

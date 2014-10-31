@@ -14,8 +14,8 @@ files = [ 'lua/lapi.c', 'lua/lauxlib.c', 'lua/lbaselib.c', 'lua/lbitlib.c', 'lua
 files = [build_dir + f for f in files]
 
 # project settings
-lua_env['CCFLAGS'] += [ '-fPIC' ]
 if plat == 'Linux':
+	lua_env['CCFLAGS'] += [ '-fPIC' ]
 	lua_env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
 
 # targets

@@ -25,6 +25,9 @@ ui_env['LIBS'] = [
 	) for lib in libraries
 ]
 
+if plat == 'Windows' and bits == 32:
+	ui_env['LIBS'] += [ 'user32' ]
+
 # project settings
 ui_env['CPPPATH'] += [ '#/ui' ]
 ui_env['CPPDEFINES'] += [ '_UI' ]

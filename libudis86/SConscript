@@ -11,7 +11,8 @@ files = [ 'libudis86/decode.c', 'libudis86/input.c', 'libudis86/itab.c', 'libudi
 files = [build_dir + f for f in files]
 
 # project settings
-udis86_env['CCFLAGS'] += [ '-fPIC' ]
+if plat == 'Linux':
+	udis86_env['CCFLAGS'] += [ '-fPIC' ]
 
 # targets
 result = udis86_env.StaticLibrary( build_dir + 'libudis86', files )

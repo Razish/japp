@@ -9,7 +9,7 @@
 #include "qcommon/q_shared.h"
 #include "g_local.h"
 
-static const float epsilon = 0.000001;
+static const float epsilon = 0.000001f;
 
 // sort so that a <= b
 static void sort( float *a, float *b ) {

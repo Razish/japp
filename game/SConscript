@@ -44,6 +44,9 @@ game_env['LIBS'] = [
 	) for lib in libraries
 ]
 
+if plat == 'Windows' and bits == 32:
+	game_env['LIBS'] += [ 'user32' ]
+
 # project settings
 game_env['CPPPATH'] += [ '#/game' ]
 game_env['CPPDEFINES'] += [ '_GAME', 'JPLUA' ]

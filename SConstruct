@@ -72,7 +72,7 @@ env['PRINT_CMD_LINE_FUNC'] = cc_output
 # obtain the compiler version
 import commands
 if plat == 'Windows':
-	ccversion = env['MSVS_VERSION']
+	ccversion = env['MSVC_VERSION']
 else:
 	status, ccrawversion = commands.getstatusoutput( env['CC'] + ' -dumpversion' )
 	ccversion = None if status else ccrawversion
@@ -162,19 +162,32 @@ if plat == 'Linux':
 
 elif plat == 'Windows':
 	# assume msvc
-	env['CCFLAGS'] = [ '/nologo', '/W4', '/WX-', '/GS', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/GF',
-		'/TC', '/errorReport:prompt', '/EHs', '/EHc', '/Ot', '/Zi', '/MP'
+	env['CCFLAGS'] = [ '/nologo', '/WX-', '/GS', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/GF',
+		'/TC', '/errorReport:prompt', '/EHs', '/EHc', '/Ot', '/MP', '/c'
 	]
 	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS', '/MACHINE:'+arch, '/LTCG' ]
 	env['CPPDEFINES'] = [ '_WINDLL', '_MSC_EXTENSIONS', '_INTEGRAL_MAX_BITS=64', '_WIN32', '_MT', '_DLL',
 		'_M_FP_PRECISE'
 	]
 	if bits == 32:
-		env['CCFLAGS'] += [ '/analyze-', '/Zp8', '/Gs', '/Oy-' ]
-		env['CPPDEFINES'] += [ '_M_IX86=600', '_M_IX86_FP=2' ]
+		env['CCFLAGS'] += [ '/Zp8', '/Gs', '/Oy-' ]
+		env['CPPDEFINES'] += [ '_M_IX86=600' ]
+		if 'NO_SSE' in os.environ:
+			env['CPPDEFINES'] += [ '_M_IX86_FP=0' ]
+			if cmp_version( ccversion, '11.0' ) >= 0:
+				env['CCFLAGS'] += [ '/ARCH:IA32' ]
+		else:
+			env['CPPDEFINES'] += [ '_M_IX86_FP=2' ]
+			env['CCFLAGS'] += [ '/ARCH:SSE2' ]
 	elif bits == 64:
 		env['CCFLAGS'] += [ '/Zp16' ]
 		env['CPPDEFINES'] += [ '_M_AMD64=100', '_M_X64=100', '_WIN64' ]
+
+	# strict c/cpp warnings
+	if 'MORE_WARNINGS' in os.environ:
+		env['CPPDEFINES'] += [ '/W4', '/Wall' ]
+	else:
+		env['CPPDEFINES'] += [ '/W3', '/wd4996' ]
 
 # debug / release
 if debug == 0 or debug == 2:
