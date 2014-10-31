@@ -175,10 +175,10 @@ elif plat == 'Windows':
 		if 'NO_SSE' in os.environ:
 			env['CPPDEFINES'] += [ '_M_IX86_FP=0' ]
 			if cmp_version( ccversion, '11.0' ) >= 0:
-				env['CCFLAGS'] += [ '/ARCH:IA32' ]
+				env['CCFLAGS'] += [ '/arch:IA32' ]
 		else:
 			env['CPPDEFINES'] += [ '_M_IX86_FP=2' ]
-			env['CCFLAGS'] += [ '/ARCH:SSE2' ]
+			env['CCFLAGS'] += [ '/arch:SSE2' ]
 	elif bits == 64:
 		env['CCFLAGS'] += [ '/Zp16' ]
 		env['CPPDEFINES'] += [ '_M_AMD64=100', '_M_X64=100', '_WIN64' ]
