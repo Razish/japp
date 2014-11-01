@@ -1754,7 +1754,7 @@ static userinfoValidate_t userinfoFields[] = {
 	UIF( cl_punkbuster, 0, 0 ), // not allowed, q3fill protection
 	UIF( ip, 0, 1 ), // engine adds this at the end
 	UIF( cp_pluginDisable, 0, 1 ), // JA+
-	UIF( name, 1, 1 ),
+	UIF( name, 0, 1 ),
 	UIF( rate, 1, 1 ),
 	UIF( snaps, 1, 1 ),
 	UIF( model, 1, 1 ),
