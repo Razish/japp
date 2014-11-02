@@ -319,6 +319,130 @@ static void G_CloseLog( fileHandle_t *f ) {
 	*f = NULL_FILE;
 }
 
+static void G_AddSingleBox( vector3 *mins, vector3 *maxs ) {
+	gentity_t *ent = G_Spawn();
+	ent->r.contents = CONTENTS_SOLID;
+	VectorAverage( mins->data, maxs->data, ent->r.currentOrigin.data );
+	VectorSubtract( mins, &ent->r.currentOrigin, &ent->r.mins );
+	VectorSubtract( maxs, &ent->r.currentOrigin, &ent->r.maxs );
+	VectorCopy( &ent->r.currentOrigin, &ent->s.origin );
+	VectorCopy( &ent->s.origin, &ent->s.pos.trBase );
+	ent->s.pos.trType = TR_STATIONARY;
+	trap->LinkEntity( (sharedEntity_t *)ent );
+	// needs to be solid during link for solid calculation
+	ent->r.contents = CONTENTS_PLAYERCLIP;
+	{
+		int x, zd, zu;
+		vector3 bmins, bmaxs;
+		// encoded bbox
+		x = (ent->s.solid & 255);
+		zd = ((ent->s.solid>>8) & 255);
+		zu = ((ent->s.solid>>16) & 255) - 32;
+
+		bmins.data[0] = bmins.data[1] = -x;
+		bmaxs.data[0] = bmaxs.data[1] = x;
+		bmins.data[2] = -zd;
+		bmaxs.data[2] = zu;
+		
+		if ( developer.integer ) {
+			Com_Printf( "Loaded box entity %d\n", ent->s.number );
+			Com_Printf( "mins   %f %f %f\norigin %f %f %f\nmaxs   %f %f %f\nsolid: %d\nbmins   %f %f %f\nbmaxs   %f %f %f\n",
+				ent->r.mins.x, ent->r.mins.y, ent->r.mins.z,
+				ent->r.currentOrigin.x, ent->r.currentOrigin.y, ent->r.currentOrigin.z,
+				ent->r.maxs.x, ent->r.maxs.y, ent->r.maxs.z,
+				ent->s.solid,
+				bmins.x, bmins.y, bmins.z,
+				bmaxs.x, bmaxs.y, bmaxs.z );
+		}
+	}
+}
+
+static void G_AddBox( vector3 *mins, vector3 *maxs ) {
+	// restrictions on clientside prediction - x,y must be equal and symmetric, and must be <= 255
+	// z must be between -255 and 223 (corner case if all are at limit, so use 222 to avoid that issue)
+	vector3 singleMins, singleMaxs;
+	int xylen = min( min( 510, maxs->x - mins->x ), maxs->y - mins->y );
+	int zlen = min( 444, maxs->z - mins->z );
+	for ( singleMins.x = mins->x; ; singleMins.x += min( xylen, max( 0, maxs->x - xylen - singleMins.x ) ) ) {
+		singleMaxs.x = singleMins.x + xylen;
+		for ( singleMins.y = mins->y; ; singleMins.y += min( xylen, max( 0, maxs->y - xylen - singleMins.y ) ) ) {
+			singleMaxs.y = singleMins.y + xylen;
+			for ( singleMins.z = mins->z; ; singleMins.z += min( zlen, max( 0, maxs->z - zlen - singleMins.z ) ) ) {
+				singleMaxs.z = singleMins.z + zlen;
+				G_AddSingleBox( &singleMins, &singleMaxs );
+				if ( singleMins.z + zlen >= maxs->z ) {
+					break;
+				}
+			}
+			if ( singleMins.y + xylen >= maxs->y ) {
+				break;
+			}
+		}
+		if ( singleMins.x + xylen >= maxs->x ) {
+			break;
+		}
+	}
+}
+
+static void G_SpawnHoleFixes( void ) {
+	char mapname[MAX_QPATH], filename[MAX_QPATH];
+	int len;
+	fileHandle_t f;
+	Com_sprintf( mapname, sizeof(mapname), "%s", level.rawmapname );
+	// note: only / is replaced with _
+	Q_strstrip( mapname, "/\n\r;:.?*<>|\\\"", "_" );
+	Com_sprintf( filename, sizeof(filename), "%s_holes.cfg", mapname );
+	len = trap->FS_Open( filename, &f, FS_READ );
+	if ( len != -1 ) {
+		// read mins, maxs out of file
+		char **cursor;
+		char *text = (char *) calloc(len + 1, 1);
+		int i;
+		vector3 mins;
+		vector3 maxs;
+		qboolean ended = qfalse;
+		cursor = &text;
+		trap->FS_Read( text, len, f );
+		// read contents, parse out values
+		COM_BeginParseSession( filename );
+		while ( !ended ) {
+			for ( i = 0; i < 3; i++ ) {
+				char *token = COM_ParseExt( cursor, qtrue );
+				if (!token || !*token) {
+					ended = qtrue;
+					break;
+				}
+				mins.data[i] = atof( token );
+			}
+			for ( i = 0; i < 3; i++ ) {
+				char *token = COM_ParseExt( cursor, qtrue );
+				if ( !token || !*token ) {
+					ended = qtrue;
+					break;
+				}
+				maxs.data[i] = atof( token );
+			}
+			if ( !ended ) {
+				// fix so mins is actually mins and maxs is actually maxs
+				for (i = 0; i < 3; i++) {
+					number temp = max( mins.data[i], maxs.data[i] );
+					mins.data[i] = min( mins.data[i], maxs.data[i] );
+					maxs.data[i] = temp;
+				}
+				G_AddBox( &mins, &maxs );
+				Com_Printf( "Loaded box entity %f %f %f %f %f %f from file %s\n",
+					mins.x, mins.y, mins.z,
+					maxs.x, maxs.y, maxs.z,
+					filename );
+			}
+		}
+		free( text );
+		trap->FS_Close( f );
+	} else {
+		Com_Printf( "Failed to open file %s\n", filename );
+	}
+}
+
 void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int			i;
 	vmCvar_t	mapname;
@@ -439,6 +563,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString( qfalse );
+
+	//  add invisible boxes
+	G_SpawnHoleFixes();
 
 	// general initialization
 	G_FindTeams();
