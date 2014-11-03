@@ -42,11 +42,13 @@
     <TargetName>jamp$(ProjectName)x86</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)</OutDir>
     <TargetName>jamp$(ProjectName)x86</TargetName>
     <IntDir>build\$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
