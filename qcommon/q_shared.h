@@ -1065,17 +1065,12 @@ void		VectorInc( vector3 *vec );
 void		VectorDec( vector3 *vec );
 void		VectorRotate( vector3 *in, vector3 matrix[3], vector3 *out );
 void		VectorInverse( vector3 *vec );
+void		VectorAverage( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
 void		CrossProduct( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
 number		DotProduct( const vector3 *vec1, const vector3 *vec2 );
 qboolean	VectorCompare( const vector3 *vec1, const vector3 *vec2 );
 void		VectorSnap( vector3 *v );
 void		VectorSnapTowards( vector3 *v, vector3 *to );
-
-// TODO
-#define VectorInverseScaleVector(a,b,c)	((c)[0]=(a)[0]/(b)[0],(c)[1]=(a)[1]/(b)[1],(c)[2]=(a)[2]/(b)[2])
-#define VectorScaleVectorAdd(c,a,b,o)	((o)[0]=(c)[0]+((a)[0]*(b)[0]),(o)[1]=(c)[1]+((a)[1]*(b)[1]),(o)[2]=(c)[2]+((a)[2]*(b)[2]))
-#define VectorAdvance(a,s,b,c)			(((c)[0]=(a)[0] + s * ((b)[0] - (a)[0])),((c)[1]=(a)[1] + s * ((b)[1] - (a)[1])),((c)[2]=(a)[2] + s * ((b)[2] - (a)[2])))
-#define VectorAverage(a,b,c)			(((c)[0]=((a)[0]+(b)[0])*0.5f),((c)[1]=((a)[1]+(b)[1])*0.5f),((c)[2]=((a)[2]+(b)[2])*0.5f))
 
 unsigned ColorBytes3( float r, float g, float b );
 unsigned ColorBytes4( float r, float g, float b, float a );
@@ -1141,38 +1136,37 @@ int Q_capi( int value, int max );
 float Q_bump( float min, float value );
 int Q_bumpi( int min, int value );
 
-char	*COM_SkipPath( char *pathname );
-void	COM_StripExtension( const char *in, char *out, int destsize );
-void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
+char		*COM_SkipPath( char *pathname );
+void		COM_StripExtension( const char *in, char *out, int destsize );
+void		COM_DefaultExtension( char *path, int maxSize, const char *extension );
 
-void	COM_BeginParseSession( const char *name );
-int		COM_GetCurrentParseLine( void );
+void		COM_BeginParseSession( const char *name );
+uint32_t	COM_GetCurrentParseLine( void );
 const char	*SkipWhitespace( const char *data, qboolean *hasNewLines );
-char	*COM_Parse( const char **data_p );
-char	*COM_ParseExt( const char **data_p, qboolean allowLineBreak );
-int		COM_Compress( char *data_p );
-void	COM_ParseError( char *format, ... );
-void	COM_ParseWarning( char *format, ... );
-qboolean COM_ParseString( const char **data, const char **s );
-qboolean COM_ParseInt( const char **data, int *i );
-qboolean COM_ParseFloat( const char **data, float *f );
-qboolean COM_ParseVec4( const char **buffer, vector4 *c );
+char		*COM_Parse( const char **data_p );
+char		*COM_ParseExt( const char **data_p, qboolean allowLineBreak );
+ptrdiff_t	COM_Compress( char *data_p );
+void		COM_ParseError( char *format, ... );
+void		COM_ParseWarning( char *format, ... );
+qboolean	COM_ParseString( const char **data, const char **s );
+qboolean	COM_ParseInt( const char **data, int *i );
+qboolean	COM_ParseFloat( const char **data, float *f );
+qboolean	COM_ParseVector( const char **buffer, vector3 *c );
 //int		COM_ParseInfos( char *buf, int max, char infos[][MAX_INFO_STRING] );
 
-#define MAX_TOKENLENGTH		1024
+#define MAX_TOKENLENGTH (1024)
 
-#ifndef TT_STRING
-//token types
-#define TT_STRING					1			// string
-#define TT_LITERAL					2			// literal
-#define TT_NUMBER					3			// number
-#define TT_NAME						4			// name
-#define TT_PUNCTUATION				5			// punctuation
-#endif
+typedef enum tokenType_e {
+	TT_NONE = 0,
+	TT_STRING,
+	TT_LITERAL,
+	TT_NUMBER,
+	TT_NAME,
+	TT_PUNCTUATION
+} tokenType_t;
 
 typedef struct pc_token_s {
-	int type;
-	int subtype;
+	tokenType_t type, subtype;
 	int intvalue;
 	float floatvalue;
 	char string[MAX_TOKENLENGTH];
@@ -1191,14 +1185,14 @@ void Parse3DMatrix( const char **buf_p, int z, int y, int x, float *m );
 
 // mode parm for FS_FOpenFile
 typedef enum fsMode_e {
-	FS_READ,
+	FS_READ = 0,
 	FS_WRITE,
 	FS_APPEND,
 	FS_APPEND_SYNC
 } fsMode_t;
 
 typedef enum fsOrigin_e {
-	FS_SEEK_CUR,
+	FS_SEEK_CUR = 0,
 	FS_SEEK_END,
 	FS_SEEK_SET
 } fsOrigin_t;

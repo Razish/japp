@@ -204,14 +204,14 @@ float LittleFloat( const float l ) {
 
 static char com_token[MAX_TOKEN_CHARS];
 static char com_parsename[MAX_TOKEN_CHARS];
-static int com_lines;
+static uint32_t com_lines;
 
 void COM_BeginParseSession( const char *name ) {
-	com_lines = 0;
-	Com_sprintf( com_parsename, sizeof(com_parsename), "%s", name );
+	com_lines = 0u;
+	Q_strncpyz( com_parsename, name, sizeof(com_parsename) );
 }
 
-int COM_GetCurrentParseLine( void ) {
+uint32_t COM_GetCurrentParseLine( void ) {
 	return com_lines;
 }
 
@@ -241,15 +241,16 @@ void COM_ParseWarning( char *format, ... ) {
 	Com_Printf( "WARNING: %s, line %d: %s\n", com_parsename, com_lines, string );
 }
 
-// Parse a token out of a string
-//	Will never return NULL, just empty strings
-// If "allowLineBreaks" is qtrue then an empty string will be returned if the next token is a newline.
+// parse a token out of a string
+//	will never return NULL, just empty strings
+// if allowLineBreaks is qtrue then an empty string will be returned if the next token is a newline.
 const char *SkipWhitespace( const char *data, qboolean *hasNewLines ) {
-	int c;
+	char c;
 
 	while ( (c = *data) <= ' ' ) {
-		if ( !c )
+		if ( !c ) {
 			return NULL;
+		}
 
 		if ( c == '\n' ) {
 			com_lines++;
@@ -261,7 +262,7 @@ const char *SkipWhitespace( const char *data, qboolean *hasNewLines ) {
 	return data;
 }
 
-int COM_Compress( char *data_p ) {
+ptrdiff_t COM_Compress( char *data_p ) {
 	char *in, *out;
 	int c;
 	qboolean newline = qfalse, whitespace = qfalse;
@@ -270,19 +271,22 @@ int COM_Compress( char *data_p ) {
 
 	in = out = data_p;
 	if ( in ) {
-		while ( (c = *in) != 0 ) {
+		while ( (c = *in) != '\0' ) {
 			// skip double slash comments
 			if ( c == '/' && in[1] == '/' ) {
-				while ( *in && *in != '\n' )
+				while ( *in && *in != '\n' ) {
 					in++;
+				}
 			}
 
 			// skip /* */ comments
 			else if ( c == '/' && in[1] == '*' ) {
-				while ( *in && (*in != '*' || in[1] != '/') )
+				while ( *in && (*in != '*' || in[1] != '/') ) {
 					in++;
-				if ( *in )
+				}
+				if ( *in ) {
 					in += 2;
+				}
 			}
 
 			// record when we hit a newline
@@ -319,8 +323,9 @@ int COM_Compress( char *data_p ) {
 							*out++ = c;
 							in++;
 						}
-						else
+						else {
 							break;
+						}
 					}
 					if ( c == '"' ) {
 						*out++ = c;
@@ -335,18 +340,17 @@ int COM_Compress( char *data_p ) {
 			}
 		}
 	}
-	*out = 0;
+	*out = '\0';
 	return out - data_p;
 }
 
 char *COM_ParseExt( const char **data_p, qboolean allowLineBreaks ) {
-	int c = 0, len;
+	char c = '\0';
+	size_t len = 0u;
 	qboolean hasNewLines = qfalse;
-	const char *data;
+	const char *data = *data_p;
 
-	data = *data_p;
-	len = 0;
-	com_token[0] = 0;
+	com_token[0] = '\0';
 
 	// make sure incoming data is valid
 	if ( !data ) {
@@ -371,21 +375,25 @@ char *COM_ParseExt( const char **data_p, qboolean allowLineBreaks ) {
 		// skip double slash comments
 		if ( c == '/' && data[1] == '/' ) {
 			data += 2;
-			while ( *data && *data != '\n' )
+			while ( *data && *data != '\n' ) {
 				data++;
+			}
 		}
 
 		// skip /* */ comments
 		else if ( c == '/' && data[1] == '*' ) {
 			data += 2;
-			while ( *data && (*data != '*' || data[1] != '/') )
+			while ( *data && (*data != '*' || data[1] != '/') ) {
 				data++;
-			if ( *data )
+			}
+			if ( *data ) {
 				data += 2;
+			}
 		}
 
-		else
+		else {
 			break;
+		}
 	}
 
 	// handle quoted strings
@@ -394,7 +402,7 @@ char *COM_ParseExt( const char **data_p, qboolean allowLineBreaks ) {
 		while ( 1 ) {
 			c = *data++;
 			if ( c == '\"' || !c ) {
-				com_token[len] = 0;
+				com_token[len] = '\0';
 				*data_p = (char *)data;
 				return com_token;
 			}
@@ -406,17 +414,19 @@ char *COM_ParseExt( const char **data_p, qboolean allowLineBreaks ) {
 
 	// parse a regular word
 	do {
-		if ( len < MAX_TOKEN_CHARS )
+		if ( len < MAX_TOKEN_CHARS ) {
 			com_token[len++] = c;
+		}
 		data++;
 		c = *data;
-		if ( c == '\n' )
+		if ( c == '\n' ) {
 			com_lines++;
+		}
 	} while ( c > 32 );
 
 	if ( len == MAX_TOKEN_CHARS ) {
-		//		Com_Printf( "Token exceeded %i chars, discarded.\n", MAX_TOKEN_CHARS );
-		len = 0;
+		Com_Printf( "Token exceeded %i chars, discarded.\n", MAX_TOKEN_CHARS );
+		len = 0u;
 	}
 	com_token[len] = '\0';
 
@@ -427,6 +437,7 @@ char *COM_ParseExt( const char **data_p, qboolean allowLineBreaks ) {
 qboolean COM_ParseString( const char **data, const char **s ) {
 	*s = COM_ParseExt( data, qfalse );
 	if ( s[0] == '\0' ) {
+		assert( !"unexpected EOF" );
 		Com_Printf( "unexpected EOF\n" );
 		return qtrue;
 	}
@@ -435,10 +446,9 @@ qboolean COM_ParseString( const char **data, const char **s ) {
 }
 
 qboolean COM_ParseInt( const char **data, int *i ) {
-	const char *token;
-
-	token = COM_ParseExt( data, qfalse );
+	const char *token = COM_ParseExt( data, qfalse );
 	if ( token[0] == '\0' ) {
+		assert( !"unexpected EOF" );
 		Com_Printf( "unexpected EOF\n" );
 		return qtrue;
 	}
@@ -448,10 +458,9 @@ qboolean COM_ParseInt( const char **data, int *i ) {
 }
 
 qboolean COM_ParseFloat( const char **data, float *f ) {
-	const char *token;
-
-	token = COM_ParseExt( data, qfalse );
+	const char *token = COM_ParseExt( data, qfalse );
 	if ( token[0] == '\0' ) {
+		assert( !"unexpected EOF" );
 		Com_Printf( "unexpected EOF\n" );
 		return qtrue;
 	}
@@ -460,13 +469,14 @@ qboolean COM_ParseFloat( const char **data, float *f ) {
 	return qfalse;
 }
 
-qboolean COM_ParseVec4( const char **buffer, vector4 *c ) {
+qboolean COM_ParseVector( const char **buffer, vector3 *c ) {
 	int i;
 	float f;
 
-	for ( i = 0; i < 4; i++ ) {
-		if ( COM_ParseFloat( buffer, &f ) )
+	for ( i = 0; i < 3; i++ ) {
+		if ( COM_ParseFloat( buffer, &f ) ) {
 			return qtrue;
+		}
 		c->data[i] = f;
 	}
 
@@ -476,8 +486,9 @@ qboolean COM_ParseVec4( const char **buffer, vector4 *c ) {
 void COM_MatchToken( const char **buf_p, const char *match ) {
 	char *token = COM_Parse( buf_p );
 
-	if ( strcmp( token, match ) )
+	if ( strcmp( token, match ) ) {
 		Com_Error( ERR_DROP, "MatchToken: %s != %s", token, match );
+	}
 }
 
 // The next token should be an open brace.

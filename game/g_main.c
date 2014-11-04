@@ -319,10 +319,11 @@ static void G_CloseLog( fileHandle_t *f ) {
 	*f = NULL_FILE;
 }
 
-static void G_AddSingleBox( vector3 *mins, vector3 *maxs ) {
+static void G_AddSingleBox( const vector3 *mins, const vector3 *maxs ) {
 	gentity_t *ent = G_Spawn();
+
 	ent->r.contents = CONTENTS_SOLID;
-	VectorAverage( mins->data, maxs->data, ent->r.currentOrigin.data );
+	VectorAverage( mins, maxs, &ent->r.currentOrigin );
 	VectorSubtract( mins, &ent->r.currentOrigin, &ent->r.mins );
 	VectorSubtract( maxs, &ent->r.currentOrigin, &ent->r.maxs );
 	VectorCopy( &ent->r.currentOrigin, &ent->s.origin );
@@ -334,112 +335,119 @@ static void G_AddSingleBox( vector3 *mins, vector3 *maxs ) {
 	{
 		int x, zd, zu;
 		vector3 bmins, bmaxs;
+
 		// encoded bbox
 		x = (ent->s.solid & 255);
 		zd = ((ent->s.solid>>8) & 255);
 		zu = ((ent->s.solid>>16) & 255) - 32;
 
-		bmins.data[0] = bmins.data[1] = -x;
-		bmaxs.data[0] = bmaxs.data[1] = x;
-		bmins.data[2] = -zd;
-		bmaxs.data[2] = zu;
-		
+		bmins.x = bmins.y = -x;
+		bmaxs.x = bmaxs.y = x;
+		bmins.z = -zd;
+		bmaxs.z = zu;
+
 		if ( developer.integer ) {
-			Com_Printf( "Loaded box entity %d\n", ent->s.number );
-			Com_Printf( "mins   %f %f %f\norigin %f %f %f\nmaxs   %f %f %f\nsolid: %d\nbmins   %f %f %f\nbmaxs   %f %f %f\n",
-				ent->r.mins.x, ent->r.mins.y, ent->r.mins.z,
-				ent->r.currentOrigin.x, ent->r.currentOrigin.y, ent->r.currentOrigin.z,
-				ent->r.maxs.x, ent->r.maxs.y, ent->r.maxs.z,
-				ent->s.solid,
-				bmins.x, bmins.y, bmins.z,
-				bmaxs.x, bmaxs.y, bmaxs.z );
+			Com_Printf( "  placed box at %s\n", vtos( &ent->r.currentOrigin ) );
+			Com_Printf( "    mins   %s\n", vtos( &ent->r.mins ) );
+			Com_Printf( "    maxs   %s\n", vtos( &ent->r.maxs ) );
+			Com_Printf( "    solid  %d\n", ent->s.solid );
+			Com_Printf( "    bmins  %s\n", vtos( &bmins ) );
+			Com_Printf( "    bmaxs  %s\n", vtos( &bmaxs ) );
 		}
 	}
 }
 
-static void G_AddBox( vector3 *mins, vector3 *maxs ) {
+static int G_AddBox( const vector3 *mins, const vector3 *maxs ) {
 	// restrictions on clientside prediction - x,y must be equal and symmetric, and must be <= 255
 	// z must be between -255 and 223 (corner case if all are at limit, so use 222 to avoid that issue)
 	vector3 singleMins, singleMaxs;
 	int xylen = min( min( 510, maxs->x - mins->x ), maxs->y - mins->y );
 	int zlen = min( 444, maxs->z - mins->z );
-	for ( singleMins.x = mins->x; ; singleMins.x += min( xylen, max( 0, maxs->x - xylen - singleMins.x ) ) ) {
+	int count = 0;
+
+	singleMins.x = mins->x;
+	while ( 1 ) {
 		singleMaxs.x = singleMins.x + xylen;
-		for ( singleMins.y = mins->y; ; singleMins.y += min( xylen, max( 0, maxs->y - xylen - singleMins.y ) ) ) {
+		singleMins.y = mins->y;
+
+		while ( 1 ) {
 			singleMaxs.y = singleMins.y + xylen;
-			for ( singleMins.z = mins->z; ; singleMins.z += min( zlen, max( 0, maxs->z - zlen - singleMins.z ) ) ) {
+			singleMins.z = mins->z;
+
+			while ( 1 ) {
 				singleMaxs.z = singleMins.z + zlen;
+
 				G_AddSingleBox( &singleMins, &singleMaxs );
+				count++;
+
 				if ( singleMins.z + zlen >= maxs->z ) {
 					break;
 				}
+				singleMins.z += min( zlen, max( 0, maxs->z - zlen - singleMins.z ) );
 			}
+
 			if ( singleMins.y + xylen >= maxs->y ) {
 				break;
 			}
+			singleMins.y += min( xylen, max( 0, maxs->y - xylen - singleMins.y ) );
 		}
+
 		if ( singleMins.x + xylen >= maxs->x ) {
 			break;
 		}
+
+		singleMins.x += min( xylen, max( 0, maxs->x - xylen - singleMins.x ) );
 	}
+
+	return count;
 }
 
 static void G_SpawnHoleFixes( void ) {
 	char mapname[MAX_QPATH], filename[MAX_QPATH];
 	int len;
 	fileHandle_t f;
+
 	Com_sprintf( mapname, sizeof(mapname), "%s", level.rawmapname );
 	// note: only / is replaced with _
 	Q_strstrip( mapname, "/\n\r;:.?*<>|\\\"", "_" );
 	Com_sprintf( filename, sizeof(filename), "%s_holes.cfg", mapname );
+
 	len = trap->FS_Open( filename, &f, FS_READ );
 	if ( len != -1 ) {
 		// read mins, maxs out of file
-		char **cursor;
-		char *text = (char *) calloc(len + 1, 1);
+		char *text = (char *)calloc( len + 1, 1 );
+		const char *cursor = text;
+		vector3 mins, maxs;
 		int i;
-		vector3 mins;
-		vector3 maxs;
-		qboolean ended = qfalse;
-		cursor = &text;
+
+		Com_Printf( "Loading map holes (%s)\n", filename );
 		trap->FS_Read( text, len, f );
 		// read contents, parse out values
 		COM_BeginParseSession( filename );
-		while ( !ended ) {
+		while ( 1 ) {
+			int count = 0;
+			if ( !cursor[0] ) {
+				break;
+			}
+
+			if ( COM_ParseVector( &cursor, &mins ) || COM_ParseVector( &cursor, &maxs ) ) {
+				break;
+			}
+
+			// fix so mins is actually mins and maxs is actually maxs
 			for ( i = 0; i < 3; i++ ) {
-				char *token = COM_ParseExt( cursor, qtrue );
-				if (!token || !*token) {
-					ended = qtrue;
-					break;
-				}
-				mins.data[i] = atof( token );
+				number temp = max( mins.data[i], maxs.data[i] );
+				mins.data[i] = min( mins.data[i], maxs.data[i] );
+				maxs.data[i] = temp;
 			}
-			for ( i = 0; i < 3; i++ ) {
-				char *token = COM_ParseExt( cursor, qtrue );
-				if ( !token || !*token ) {
-					ended = qtrue;
-					break;
-				}
-				maxs.data[i] = atof( token );
-			}
-			if ( !ended ) {
-				// fix so mins is actually mins and maxs is actually maxs
-				for (i = 0; i < 3; i++) {
-					number temp = max( mins.data[i], maxs.data[i] );
-					mins.data[i] = min( mins.data[i], maxs.data[i] );
-					maxs.data[i] = temp;
-				}
-				G_AddBox( &mins, &maxs );
-				Com_Printf( "Loaded box entity %f %f %f %f %f %f from file %s\n",
-					mins.x, mins.y, mins.z,
-					maxs.x, maxs.y, maxs.z,
-					filename );
-			}
+
+			count = G_AddBox( &mins, &maxs );
+			Com_Printf( "  placed wall at %s, %s using %i entities\n", vtos( &mins ), vtos( &maxs ), count );
+
+			SkipRestOfLine( &cursor );
 		}
 		free( text );
 		trap->FS_Close( f );
-	} else {
-		Com_Printf( "Failed to open file %s\n", filename );
 	}
 }
 

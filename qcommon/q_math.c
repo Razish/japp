@@ -1457,6 +1457,12 @@ void VectorInverse( vector3 *vec ) {
 	vec->z = -vec->z;
 }
 
+void VectorAverage( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut ) {
+	vecOut->x = (vec1->x + vec2->x) * 0.5f;
+	vecOut->y = (vec1->y + vec2->y) * 0.5f;
+	vecOut->z = (vec1->z + vec2->z) * 0.5f;
+}
+
 void CrossProduct( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut ) {
 	vecOut->x = (vec1->y * vec2->z) - (vec1->z * vec2->y);
 	vecOut->y = (vec1->z * vec2->x) - (vec1->x * vec2->z);
