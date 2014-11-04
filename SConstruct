@@ -57,7 +57,7 @@ env = Environment( TARGET_ARCH = arch )
 env['CC'] = os.getenv( 'CC' ) or env[ 'CC' ]
 env['CXX'] = os.getenv( 'CXX' ) or env[ 'CXX' ]
 env['ENV'].update( x for x in os.environ.items() if x[0].startswith( 'CCC_' ) )
-if plat != 'Windows':
+if 'TERM' in os.environ:
 	env['ENV']['TERM'] = os.environ['TERM']
 
 # prettify the compiler output
@@ -103,8 +103,8 @@ if plat == 'Linux':
 	env['CXXFLAGS'] = []
 
 	# set job/thread count
-	#status, res = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
-	#env.SetOption( 'num_jobs', res * 2 if status == 0 else 1 )
+	status, res = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
+	env.SetOption( 'num_jobs', res * 3 if status == 0 else 1 )
 
 	# c warnings
 	env['CFLAGS'] += [ '-Wdeclaration-after-statement', '-Wnested-externs', '-Wold-style-definition',
