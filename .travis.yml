@@ -6,4 +6,4 @@ install:
   - sudo apt-get install libreadline-dev
 
 script:
-  - scons -Q debug=0 force32=0
+  - scons -Q -j1 debug=0 force32=0
