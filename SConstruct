@@ -81,6 +81,11 @@ else:
 status, rawrevision = commands.getstatusoutput( 'git rev-parse HEAD' )
 revision = None if status else rawrevision
 
+# set job/thread count
+if plat == 'Linux':
+	status, num_cores = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
+	env.SetOption( 'num_jobs', int(num_cores) * 3 if status == 0 else 1 )
+
 # notify the user of the build configuration
 if not env.GetOption( 'clean' ):
 	msg = 'Building for ' + plat + ' ' + str(bits) + ' bits (' + env['CC'] + ' ' + ccversion + ', python ' + platform.python_version() + ')'
@@ -91,6 +96,7 @@ if not env.GetOption( 'clean' ):
 	msg += ', x87 fpu' if 'NO_SSE' in os.environ else ', SSE'
 	if force32:
 		msg += ', forcing 32 bit build'
+	msg += ', ' + str(env.GetOption( 'num_jobs' )) + ' threads'
 	if revision:
 		msg += '\ngit revision: ' + revision
 	print( msg )
@@ -101,10 +107,6 @@ if plat == 'Linux':
 	env['CFLAGS'] = []
 	env['CCFLAGS'] = []
 	env['CXXFLAGS'] = []
-
-	# set job/thread count
-	status, res = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
-	env.SetOption( 'num_jobs', res * 3 if status == 0 else 1 )
 
 	# c warnings
 	env['CFLAGS'] += [ '-Wdeclaration-after-statement', '-Wnested-externs', '-Wold-style-definition',
