@@ -2478,6 +2478,46 @@ static qboolean PM_CheckJump( void ) {
 					BG_ForcePowerDrain( pm->ps, FP_LEVITATION, 5 );
 
 					pm->ps->forceKickFlip = trace.entityNum + 1; //let the server know that this person gets kicked by this client
+				} else if ( trace.fraction < 1.0f && allowWallRuns ) {
+					// this also needed
+					//FIXME: have to be moving... make sure it's opposite the wall... or at least forward?
+					int wallWalkAnim = BOTH_WALL_FLIP_BACK1;
+					int parts = SETANIM_LEGS;
+					uint32_t contents = MASK_SOLID;
+					if ( pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_2 ) {
+						wallWalkAnim = BOTH_FORCEWALLRUNFLIP_START;
+						parts = SETANIM_BOTH;
+					}
+					else {
+						if ( !pm->ps->weaponTime ) {
+							parts = SETANIM_BOTH;
+						}
+					}
+					//if ( PM_HasAnimation( pm->gent, wallWalkAnim ) )
+					if ( (trace.entityNum < ENTITYNUM_WORLD && kickedEnt && kickedEnt->s.solid != SOLID_BMODEL)
+							|| DotProduct( &trace.plane.normal, &idealNormal ) > 0.7f) //sure, we have it! Because I SAID SO.
+					{//there is a wall there
+						pm->ps->velocity.x = pm->ps->velocity.y = 0;
+						if ( wallWalkAnim == BOTH_FORCEWALLRUNFLIP_START ) {
+							pm->ps->velocity.z = forceJumpStrength[FORCE_LEVEL_3] / 2.0f;
+						}
+						else {
+							VectorMA( &pm->ps->velocity, -150, &fwd, &pm->ps->velocity );
+							pm->ps->velocity.z += 150.0f;
+						}
+						//animate me
+						PM_SetAnim( parts, wallWalkAnim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0 );
+						//						pm->ps->pm_flags |= PMF_JUMPING|PMF_SLOW_MO_FALL;
+						//again with the flags!
+						//G_SoundOnEnt( pm->gent, CHAN_BODY, "sound/weapons/force/jump.wav" );
+						//yucky!
+						PM_SetForceJumpZStart( pm->ps->origin.z );//so we don't take damage if we land at same height
+						pm->cmd.upmove = 0;
+						pm->ps->fd.forceJumpSound = 1;
+						BG_ForcePowerDrain( pm->ps, FP_LEVITATION, 5 );
+
+						pm->cmd.rightmove = pm->cmd.forwardmove = 0;
+					}
 				}
 			}
 			//NEW JKA
@@ -2529,6 +2569,7 @@ static qboolean PM_CheckJump( void ) {
 				&& PM_WalkableGroundDistance() <= 80 //unfortunately we do not have a happy ground timer like SP (this would use up more bandwidth if we wanted prediction workign right), so we'll just use the actual ground distance.
 				&& (pm->ps->legsAnim == BOTH_JUMP1 || pm->ps->legsAnim == BOTH_INAIR1) )//not in a flip or spin or anything
 			{//run up wall, flip backwards
+wallRun:
 				if ( allowWallRuns ) {
 					//FIXME: have to be moving... make sure it's opposite the wall... or at least forward?
 					int wallWalkAnim = BOTH_WALL_FLIP_BACK1;
