@@ -32,7 +32,6 @@ int			gSiegeBeginTime = Q3_INFINITE;
 int			g_preroundState = 0; //default to starting as spec (1 is starting ingame)
 
 void LogExit( const char *string );
-void SetTeamQuick( gentity_t *ent, int team, qboolean doBegin );
 
 static char gParseObjectives[MAX_SIEGE_INFO_SIZE];
 static char gObjectiveCfgStr[1024];

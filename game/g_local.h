@@ -131,6 +131,14 @@ typedef struct gentity_s gentity_t;
 #define SABERTWEAK_REDUCEBLOCKS			(0x0020u) // reduce chance of blocking based on saber stance
 #define SABERTWEAK_TWOBLADEDEFLECTFIX	(0x0040u) // fix deflection bug when toggling second saber
 
+#define MOVER_START_ON					(0x0001)
+#define MOVER_FORCE_ACTIVATE			(0x0002)
+#define MOVER_CRUSHER					(0x0004)
+#define MOVER_TOGGLE					(0x0008)
+#define MOVER_LOCKED					(0x0010)
+#define MOVER_GOODIE					(0x0020)
+#define MOVER_PLAYER_USE				(0x0040)
+#define MOVER_INACTIVE					(0x0080)
 
 typedef enum moverState_e {
 	MOVER_POS1,
@@ -756,6 +764,7 @@ void				AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertE
 void				B_InitAlloc( void );
 void				B_CleanupAlloc( void );
 void				BeginIntermission( void );
+void				Blocked_Mover( gentity_t *ent, gentity_t *other );
 void				BlowDetpacks( gentity_t *ent );
 void				body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath );
 int					BotAILoadMap( int restart );
@@ -929,6 +938,7 @@ void				G_TouchTriggers( gentity_t *ent );
 void				G_UpdateClientAnims( gentity_t *self, float animSpeedScale );
 void				G_UseTargets( gentity_t *ent, gentity_t *activator );
 void				G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *string );
+void				G_WriteClientSessionData( gclient_t *client );
 void				G_WriteSessionData( void );
 void				GetAnglesForDirection( const vector3 *p1, const vector3 *p2, vector3 *out );
 void				GlobalUse( gentity_t *self, gentity_t *other, gentity_t *activator );
@@ -953,6 +963,7 @@ void				Jetpack_On( gentity_t *ent );
 gentity_t *			LaunchItem_Throw( const gitem_t *item, vector3 *origin, vector3 *velocity );
 qboolean			LogAccuracyHit( gentity_t *target, gentity_t *attacker );
 void				MaintainBodyQueue( gentity_t *ent );
+void				MatchTeam( gentity_t *teamLeader, moverState_t moverState, int time );
 void				MoveClientToIntermission( gentity_t *client );
 float				NPC_GetHFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, float hFOV );
 float				NPC_GetVFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, float vFOV );
@@ -972,6 +983,7 @@ gentity_t *			SelectSpawnPoint( vector3 *avoidPoint, vector3 *origin, vector3 *a
 void				SendScoreboardMessageToAllClients( void );
 void				SetClientViewAngle( gentity_t *ent, vector3 *angle );
 qboolean			SetTeam( gentity_t *ent, const char *s, qboolean forced );
+void				SetTeamQuick( gentity_t *ent, int team, qboolean doBegin );
 void				SnapVectorTowards( vector3 *v, const vector3 *to );
 qboolean			SpotWouldTelefrag( gentity_t *spot );
 qboolean			SpotWouldTelefrag2( gentity_t *mover, vector3 *dest );
@@ -1006,6 +1018,7 @@ void				TossClientItems( gentity_t *self );
 void				TossClientWeapon( gentity_t *self, vector3 *direction, float speed );
 void				Touch_DoorTrigger( gentity_t *ent, gentity_t *other, trace_t *trace );
 void				Touch_Item( gentity_t *ent, gentity_t *other, trace_t *trace );
+void				Touch_Button( gentity_t *ent, gentity_t *other, trace_t *trace );
 void				TryUse( gentity_t *ent );
 void				UseHoldableItem( gentity_t *ent );
 void				Weapon_GrapplingHook_Fire( gentity_t *ent );
@@ -1029,6 +1042,9 @@ extern int				gPainMOD;
 extern int				gPainHitLoc;
 extern vector3			gPainPoint;
 extern char				gSharedBuffer[MAX_G_SHARED_BUFFER_SIZE];
+extern qboolean			gSiegeRoundBegun;
+extern qboolean			gSiegeRoundEnded;
+extern int				gSiegeRoundWinningTeam;
 extern void				*precachedKyle;
 extern void				*g2SaberInstance;
 extern qboolean			gEscaping;

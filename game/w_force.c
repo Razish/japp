@@ -2425,42 +2425,15 @@ void G_LetGoOfWall( gentity_t *ent ) {
 	}
 }
 
-float forcePushPullRadius[NUM_FORCE_POWER_LEVELS] =
-{
-	0,//none
-	384,//256,
-	448,//384,
-	512
-};
-//rwwFIXMEFIXME: incorporate this into the below function? Currently it's only being used by jedi AI
-
-extern void Touch_Button( gentity_t *ent, gentity_t *other, trace_t *trace );
+// shove things in front of you away
 void ForceThrow( gentity_t *self, qboolean pull ) {
-	//shove things in front of you away
-	float		dist;
-	gentity_t	*ent;
-	int			entityList[MAX_GENTITIES];
-	gentity_t	*push_list[MAX_GENTITIES];
-	int			numListedEntities;
-	vector3		mins, maxs;
-	vector3		v;
-	int			i, e;
-	int			ent_count = 0;
-	int			radius = 1024; //since it's view-based now. //350;
-	int			powerLevel;
-	int			visionArc;
-	int			pushPower;
-	int			pushPowerMod;
-	vector3		center, ent_org, size, forward, right, end, dir, fwdangles = { 0 };
-	float		dot1;
-	trace_t		tr;
-	int			x;
-	vector3		pushDir;
-	vector3		thispush_org;
-	vector3		tfrom, tto, fwd, a;
-	int			powerUse = 0;
-
-	visionArc = 0;
+	gentity_t *ent, *push_list[MAX_GENTITIES];
+	int entityList[MAX_GENTITIES], numListedEntities, ent_count = 0;
+	int i, e, radius = 1024, powerLevel, visionArc = 0, pushPower, pushPowerMod, x, powerUse = 0;
+	float dist, dot1;
+	trace_t tr;
+	vector3 mins, maxs, v, center, ent_org, size, forward, right, end, dir, fwdangles, pushDir, thispush_org, tfrom,
+		tto, fwd, a;
 
 	if ( self->client->ps.forceHandExtend != HANDEXTEND_NONE && (self->client->ps.forceHandExtend != HANDEXTEND_KNOCKDOWN || !G_InGetUpAnim( &self->client->ps )) ) {
 		return;
@@ -2569,14 +2542,13 @@ void ForceThrow( gentity_t *self, qboolean pull ) {
 		VectorCopy( &self->client->ps.origin, &tfrom );
 		tfrom.z += self->client->ps.viewheight;
 		AngleVectors( &self->client->ps.viewangles, &fwd, NULL, NULL );
-		tto.x = tfrom.x + fwd.x*radius / 2;
-		tto.y = tfrom.y + fwd.y*radius / 2;
-		tto.z = tfrom.z + fwd.z*radius / 2;
+		tto.x = tfrom.x + fwd.x * radius / 2;
+		tto.y = tfrom.y + fwd.y * radius / 2;
+		tto.z = tfrom.z + fwd.z * radius / 2;
 
 		trap->Trace( &tr, &tfrom, NULL, NULL, &tto, self->s.number, MASK_PLAYERSOLID, qfalse, 0, 0 );
 
-		if ( tr.fraction != 1.0f &&
-			tr.entityNum != ENTITYNUM_NONE ) {
+		if ( tr.fraction != 1.0f && tr.entityNum != ENTITYNUM_NONE ) {
 			if ( !g_entities[tr.entityNum].client && g_entities[tr.entityNum].s.eType == ET_NPC ) { //g2animent
 				if ( g_entities[tr.entityNum].s.genericenemyindex < level.time ) {
 					g_entities[tr.entityNum].s.genericenemyindex = level.time + 2000;
@@ -2606,9 +2578,7 @@ void ForceThrow( gentity_t *self, qboolean pull ) {
 	else {
 		numListedEntities = trap->EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
 
-		e = 0;
-
-		while ( e < numListedEntities ) {
+		for ( e = 0; e < numListedEntities; e++ ) {
 			ent = &g_entities[entityList[e]];
 
 			if ( !ent->client && ent->s.eType == ET_NPC ) { //g2animent
@@ -2649,7 +2619,6 @@ void ForceThrow( gentity_t *self, qboolean pull ) {
 					}
 				}
 			}
-			e++;
 		}
 	}
 
@@ -2663,15 +2632,10 @@ void ForceThrow( gentity_t *self, qboolean pull ) {
 			ent = NULL;
 		}
 
-		if ( !ent )
-			continue;
-		if ( ent == self )
-			continue;
-		if ( ent->client && OnSameTeam( ent, self ) ) {
+		if ( !ent || !ent->inuse || ent == self || (ent->client && OnSameTeam( ent, self )) ) {
 			continue;
 		}
-		if ( !(ent->inuse) )
-			continue;
+
 		if ( ent->s.eType != ET_MISSILE ) {
 			if ( japp_itemPush.integer || ent->s.eType != ET_ITEM ) {
 				//FIXME: need pushable objects
@@ -2700,9 +2664,10 @@ void ForceThrow( gentity_t *self, qboolean pull ) {
 							}
 						}
 					}
-					else if ( ent->client->NPC_class == CLASS_GALAKMECH
-						|| ent->client->NPC_class == CLASS_ATST
-						|| ent->client->NPC_class == CLASS_RANCOR ) {//can't push ATST or Galak or Rancor
+					else if ( ent->client->NPC_class == CLASS_GALAKMECH || ent->client->NPC_class == CLASS_ATST
+						|| ent->client->NPC_class == CLASS_RANCOR )
+					{
+						// can't push ATST or Galak or Rancor
 						continue;
 					}
 				}
@@ -2720,9 +2685,15 @@ void ForceThrow( gentity_t *self, qboolean pull ) {
 		//this is all to see if we need to start a saber attack, if it's in flight, this doesn't matter
 		// find the distance from the edge of the bounding box
 		for ( i = 0; i < 3; i++ ) {
-			if ( center.data[i] < ent->r.absmin.data[i] )	v.data[i] = ent->r.absmin.data[i] - center.data[i];
-			else if ( center.data[i] > ent->r.absmax.data[i] )	v.data[i] = center.data[i] - ent->r.absmax.data[i];
-			else												v.data[i] = 0;
+			if ( center.data[i] < ent->r.absmin.data[i] ) {
+				v.data[i] = ent->r.absmin.data[i] - center.data[i];
+			}
+			else if ( center.data[i] > ent->r.absmax.data[i] ) {
+				v.data[i] = center.data[i] - ent->r.absmax.data[i];
+			}
+			else {
+				v.data[i] = 0;
+			}
 		}
 
 		VectorSubtract( &ent->r.absmax, &ent->r.absmin, &size );
@@ -2730,8 +2701,9 @@ void ForceThrow( gentity_t *self, qboolean pull ) {
 
 		VectorSubtract( &ent_org, &center, &dir );
 		VectorNormalize( &dir );
-		if ( (dot1 = DotProduct( &dir, &forward )) < 0.6f )
+		if ( (dot1 = DotProduct( &dir, &forward )) < 0.6f ) {
 			continue;
+		}
 
 		dist = VectorLength( &v );
 

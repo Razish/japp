@@ -1187,8 +1187,9 @@ static qboolean IsSuffixed( const char *cleanName, int32_t *suffixNum ) {
 	len = strlen( cleanName );
 
 	// no left bracket at all, can't be suffixed
-	if ( !(bracketL = strrchr( cleanName, '(' )) )
+	if ( !(bracketL = strrchr( cleanName, '(' )) ) {
 		return qfalse;
+	}
 
 	//	0 1 2 3 4 5 6 7 8 9
 	//	h,e,l,l,o, ,(,0,2,)
@@ -1211,14 +1212,16 @@ static qboolean IsSuffixed( const char *cleanName, int32_t *suffixNum ) {
 	// found the left bracket, let's get the number between here and the next bracket
 	for ( s = bracketL; s < bracketR; s++ ) {
 		// if it's not a number, discard it - the name is not suffixed
-		if ( !isdigit( *s ) )
+		if ( !isdigit( *s ) ) {
 			return qfalse;
+		}
 
 		tmp[s-bracketL] = *s;
 	}
 
-	if ( suffixNum )
+	if ( suffixNum ) {
 		*suffixNum = atoi( tmp );
+	}
 
 	return qtrue;
 }
@@ -1250,13 +1253,15 @@ qboolean CheckDuplicateName( int clientNum ) {
 	while ( IsSuffixed( cleanName, &suffixNum ) ) {
 		char *s = strrchr( name, '(' );
 		// if the last suffix on our name is ours, everything is in order
-		if ( clientNum == suffixNum )
+		if ( clientNum == suffixNum ) {
 			return qfalse;
+		}
 
 		// remove this suffix and continue
 		trap->Print( "Removing invalid name suffix on \"%s\"\n", G_PrintClient( clientNum ) );
-		if ( s-1 > name )
+		if ( s-1 > name ) {
 			s--;
+		}
 		*s = '\0';
 #ifdef _DEBUG
 		trap->Print( "New name is \"%s\"\n", s );
@@ -1296,16 +1301,13 @@ void ClientCleanName( const char *in, char *out, int outSize ) {
 	// discard leading spaces
 	for ( ; *in == ' '; in++ );
 
-	// discard leading asterisk's (fail raven for using * as a skipnotify)
-	// apparently .* causes the issue too so... derp
-	//for(; *in == '*'; in++);
-
 	for ( ; *in && outpos < outSize - 1; in++ ) {
 		out[outpos] = *in;
 
 		if ( *in == ' ' ) {// don't allow too many consecutive spaces
-			if ( spaces > 2 )
+			if ( spaces > 2 ) {
 				continue;
+			}
 
 			spaces++;
 		}
@@ -1318,7 +1320,8 @@ void ClientCleanName( const char *in, char *out, int outSize ) {
 		}
 		else if ( (byte)*in < 0x20
 			|| (byte)*in == 0x81 || (byte)*in == 0x8D || (byte)*in == 0x8F || (byte)*in == 0x90 || (byte)*in == 0x9D
-			|| (byte)*in == 0xA0 || (byte)*in == 0xAD ) {
+			|| (byte)*in == 0xA0 || (byte)*in == 0xAD )
+		{
 			continue;
 		}
 		else if ( outpos > 0 && out[outpos - 1] == Q_COLOR_ESCAPE ) {
@@ -1326,8 +1329,9 @@ void ClientCleanName( const char *in, char *out, int outSize ) {
 				colorlessLen--;
 
 #if 0
-				if ( ColorIndex( *in ) == 0 )
-				{// Disallow color black in names to prevent players from getting advantage playing in front of black backgrounds
+				if ( ColorIndex( *in ) == 0 ) {
+					// disallow color black in names to prevent players from getting advantage playing in front of black
+					//	backgrounds
 					outpos--;
 					continue;
 				}
@@ -1355,8 +1359,9 @@ void ClientCleanName( const char *in, char *out, int outSize ) {
 	}
 
 	// don't allow empty names
-	if ( *out == '\0' || colorlessLen == 0 )
+	if ( *out == '\0' || colorlessLen == 0 ) {
 		Q_strncpyz( out, DEFAULT_NAME, outSize );
+	}
 }
 
 #ifdef _DEBUG
@@ -1932,15 +1937,17 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	trap->GetUserinfo( clientNum, userinfo, sizeof(userinfo) );
 
-	if ( JPLua_Event_ClientUserinfoChanged( clientNum, userinfo ) )
+	if ( JPLua_Event_ClientUserinfoChanged( clientNum, userinfo ) ) {
 		trap->SetUserinfo( clientNum, userinfo );
+	}
 
 	//Raz: Scooper's code for userinfo spamming
 	if ( japp_antiUserinfoFlood.integer && !(ent->r.svFlags & SVF_BOT) ) {
 		ent->userinfoChanged = level.time;
 
 		if ( ent->userinfoSpam > 12 ) {
-			trap->SendServerCommand( ent - g_entities, va( "print \""S_COLOR_YELLOW"Userinfo changing too fast. Ignored.\n\"" ) );
+			trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "Userinfo changing too fast. "
+				"Ignored.\n\"" ) );
 			return qfalse;
 		}
 		ent->userinfoSpam++;
@@ -1958,13 +1965,16 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	// check for local client
 	s = Info_ValueForKey( userinfo, "ip" );
-	if ( !strcmp( s, "localhost" ) && !(ent->r.svFlags & SVF_BOT) )
+	if ( !strcmp( s, "localhost" ) && !(ent->r.svFlags & SVF_BOT) ) {
 		client->pers.localClient = qtrue;
+	}
 
 	//Raz: cp_pluginDisable
 	s = Info_ValueForKey( userinfo, "cp_pluginDisable" );
-	if ( s[0] && sscanf( s, "%u", &client->pers.CPD ) != 1 )
-		G_LogPrintf( level.log.security, "ClientUserinfoChanged(): Client %i (%s) userinfo 'cp_pluginDisable' was found, but invalid. [IP: %s]\n", clientNum, client->pers.netname, client->sess.IP );
+	if ( s[0] && sscanf( s, "%u", &client->pers.CPD ) != 1 ) {
+		G_LogPrintf( level.log.security, "ClientUserinfoChanged(): Client %i (%s) userinfo 'cp_pluginDisable' was found"
+			", but invalid. [IP: %s]\n", clientNum, client->pers.netname, client->sess.IP );
+	}
 
 	s = Info_ValueForKey( userinfo, "cjp_client" );
 	if ( s[0] ) {
@@ -1972,9 +1982,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	}
 
 	// check the item prediction
-	s = Info_ValueForKey( userinfo, "cg_predictItems" );
-	if ( !atoi( s ) )	client->pers.predictItemPickup = qfalse;
-	else				client->pers.predictItemPickup = qtrue;
+	client->pers.predictItemPickup = !!atoi( Info_ValueForKey( userinfo, "cg_predictItems" ) );
 
 	// set name
 	Q_strncpyz( oldname, client->pers.netname, sizeof(oldname) );
@@ -2005,8 +2013,10 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 			Q_CleanString( client->pers.netnameClean, STRIP_COLOUR );
 		}
 		else {
-			trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldname, G_GetStringEdString( "MP_SVGAME", "PLRENAME" ), client->pers.netname ) );
-			G_LogPrintf( level.log.console, "ClientRename: %i [%s] \"%s^7\" -> \"%s^7\"\n", clientNum, ent->client->sess.IP, oldname, ent->client->pers.netname );
+			trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s %s\n\"", oldname,
+				G_GetStringEdString( "MP_SVGAME", "PLRENAME" ), client->pers.netname ) );
+			G_LogPrintf( level.log.console, "ClientRename: %i [%s] \"%s^7\" -> \"%s^7\"\n", clientNum,
+				ent->client->sess.IP, oldname, ent->client->pers.netname );
 			client->pers.netnameTime = level.time + 5000;
 		}
 	}
@@ -2019,30 +2029,34 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		modelChanged = qtrue;
 	}
 
-	client->ps.customRGBA[0] = (value = Info_ValueForKey( userinfo, "char_color_red" )) ? Q_clampi( 0, atoi( value ), 255 ) : 255;
-	client->ps.customRGBA[1] = (value = Info_ValueForKey( userinfo, "char_color_green" )) ? Q_clampi( 0, atoi( value ), 255 ) : 255;
-	client->ps.customRGBA[2] = (value = Info_ValueForKey( userinfo, "char_color_blue" )) ? Q_clampi( 0, atoi( value ), 255 ) : 255;
-
-	//Prevent skins being too dark
-	if ( japp_charRestrictRGB.integer && ((client->ps.customRGBA[0] + client->ps.customRGBA[1] + client->ps.customRGBA[2]) < 100) )
-		client->ps.customRGBA[0] = client->ps.customRGBA[1] = client->ps.customRGBA[2] = 255;
-
+	// custom skin RGB
+	value = Info_ValueForKey( userinfo, "char_color_red" );
+	client->ps.customRGBA[0] = value ? Q_clampi( 0, atoi( value ), 255 ) : 255;
+	value = Info_ValueForKey( userinfo, "char_color_green" );
+	client->ps.customRGBA[1] = value ? Q_clampi( 0, atoi( value ), 255 ) : 255;
+	value = Info_ValueForKey( userinfo, "char_color_blue" );
+	client->ps.customRGBA[2] = value ? Q_clampi( 0, atoi( value ), 255 ) : 255;
 	client->ps.customRGBA[3] = 255;
+	if ( japp_charRestrictRGB.integer
+		&& ((client->ps.customRGBA[0] + client->ps.customRGBA[1] + client->ps.customRGBA[2]) < 100) )
+	{
+		client->ps.customRGBA[0] = client->ps.customRGBA[1] = client->ps.customRGBA[2] = 255;
+	}
 
 	Q_strncpyz( forcePowers, Info_ValueForKey( userinfo, "forcepowers" ), sizeof(forcePowers) );
 
 	// update our customRGBA for team colors.
 	if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer ) {
 		char skin[MAX_QPATH] = { 0 };
-		vector3 colorOverride = { 0.0f };
+		vector3 colorOverride;
 
 		VectorClear( &colorOverride );
 
 		BG_ValidateSkinForTeam( model, skin, client->sess.sessionTeam, &colorOverride );
-		if ( colorOverride.r != 0.0f || colorOverride.g != 0.0f || colorOverride.b != 0.0f ) {
-			client->ps.customRGBA[0] = colorOverride.r*255.0f;
-			client->ps.customRGBA[1] = colorOverride.g*255.0f;
-			client->ps.customRGBA[2] = colorOverride.b*255.0f;
+		if ( colorOverride.r > 0.0f || colorOverride.g > 0.0f || colorOverride.b > 0.0f ) {
+			client->ps.customRGBA[0] = colorOverride.r * 255.0f;
+			client->ps.customRGBA[1] = colorOverride.g * 255.0f;
+			client->ps.customRGBA[2] = colorOverride.b * 255.0f;
 		}
 	}
 
@@ -2056,7 +2070,8 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 			team = TEAM_BLUE;
 		}
 		else {
-			team = PickTeam( clientNum ); // pick the team with the least number of players
+			// pick the team with the least number of players
+			team = PickTeam( clientNum );
 		}
 	}
 	else {
@@ -2101,11 +2116,12 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 			}
 		}
 	}
-	else
+	else {
 		Q_strncpyz( className, "none", sizeof(className) );
+	}
 
-	//Raz: only set the saber name on the first connect.
-	//		it will be read from userinfo on ClientSpawn and stored in client->pers.saber1/2
+	// only set the saber name on the first connect
+	// it will be read from userinfo on ClientSpawn and stored in client->pers.saber1/2
 	//RAZTODO: instantly switch optionally?
 	if ( !VALIDSTRING( client->pers.saber1 ) || !VALIDSTRING( client->pers.saber2 ) ) {
 		G_SetSaber( ent, 0, Info_ValueForKey( userinfo, "saber1" ), qfalse );
@@ -2116,31 +2132,34 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	if ( level.gametype == GT_SIEGE && client->siegeClass != -1 ) {
 		siegeClass_t *scl = &bgSiegeClasses[client->siegeClass];
 
-		if ( scl->maxhealth )
+		if ( scl->maxhealth ) {
 			maxHealth = scl->maxhealth;
+		}
 
 		health = maxHealth;
 	}
-	else
-		health = Q_clampi( 1, atoi( Info_ValueForKey( userinfo, "handicap" ) ), 100 );
-
-	client->pers.maxHealth = health;
-	if ( client->pers.maxHealth < 1 || client->pers.maxHealth > maxHealth )
-		client->pers.maxHealth = 100;
-	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
-
-	if ( level.gametype >= GT_TEAM )
-		client->pers.teamInfo = qtrue;
 	else {
-		s = Info_ValueForKey( userinfo, "teamoverlay" );
-		if ( !*s || atoi( s ) != 0 )
-			client->pers.teamInfo = qtrue;
-		else
-			client->pers.teamInfo = qfalse;
+		health = Q_clampi( 1, atoi( Info_ValueForKey( userinfo, "handicap" ) ), 100 );
 	}
 
-	// team task (0 = none, 1 = offence, 2 = defence)
-	//	teamTask = atoi( Info_ValueForKey( userinfo, "teamtask" ) );
+	client->pers.maxHealth = health;
+	if ( client->pers.maxHealth < 1 || client->pers.maxHealth > maxHealth ) {
+		client->pers.maxHealth = 100;
+	}
+	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
+
+	if ( level.gametype >= GT_TEAM ) {
+		client->pers.teamInfo = qtrue;
+	}
+	else {
+		s = Info_ValueForKey( userinfo, "teamoverlay" );
+		if ( !*s || atoi( s ) != 0 ) {
+			client->pers.teamInfo = qtrue;
+		}
+		else {
+			client->pers.teamInfo = qfalse;
+		}
+	}
 
 	// colors
 	Q_strncpyz( color1, Info_ValueForKey( userinfo, "color1" ), sizeof(color1) );
@@ -2150,16 +2169,21 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	//Raz: Gender hints
 	s = Info_ValueForKey( userinfo, "sex" );
-	if ( !Q_stricmp( s, "male" ) )
+	if ( !Q_stricmp( s, "male" ) ) {
 		gender = GENDER_MALE;
-	else if ( !Q_stricmp( s, "female" ) )
+	}
+	else if ( !Q_stricmp( s, "female" ) ) {
 		gender = GENDER_FEMALE;
-	else
+	}
+	else {
 		gender = GENDER_NEUTER;
+	}
 
 	s = Info_ValueForKey( userinfo, "snaps" );
-	if ( atoi( s ) < sv_fps.integer )
-		trap->SendServerCommand( clientNum, va( "print \""S_COLOR_YELLOW"Recommend setting /snaps %d or higher to match this server's sv_fps\n\"", sv_fps.integer ) );
+	if ( atoi( s ) < sv_fps.integer ) {
+		trap->SendServerCommand( clientNum, va( "print \"" S_COLOR_YELLOW "Recommend setting /snaps %d or higher to "
+			"match this server's sv_fps\n\"", sv_fps.integer ) );
+	}
 
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
@@ -2167,9 +2191,15 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	Q_strcat( buf, sizeof(buf), va( "n\\%s\\", client->pers.netname ) );
 	Q_strcat( buf, sizeof(buf), va( "t\\%i\\", client->sess.sessionTeam ) );
 	Q_strcat( buf, sizeof(buf), va( "model\\%s\\", model ) );
-	if ( gender == GENDER_MALE )	Q_strcat( buf, sizeof(buf), va( "ds\\%c\\", 'm' ) );
-	else if ( gender == GENDER_FEMALE )	Q_strcat( buf, sizeof(buf), va( "ds\\%c\\", 'f' ) );
-	else								Q_strcat( buf, sizeof(buf), va( "ds\\%c\\", 'n' ) );
+	if ( gender == GENDER_MALE ) {
+		Q_strcat( buf, sizeof(buf), va( "ds\\%c\\", 'm' ) );
+	}
+	else if ( gender == GENDER_FEMALE ) {
+		Q_strcat( buf, sizeof(buf), va( "ds\\%c\\", 'f' ) );
+	}
+	else {
+		Q_strcat( buf, sizeof(buf), va( "ds\\%c\\", 'n' ) );
+	}
 	Q_strcat( buf, sizeof(buf), va( "st\\%s\\", client->pers.saber1 ) );
 	Q_strcat( buf, sizeof(buf), va( "st2\\%s\\", client->pers.saber2 ) );
 	Q_strcat( buf, sizeof(buf), va( "c1\\%s\\", color1 ) );
@@ -2177,17 +2207,15 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	Q_strcat( buf, sizeof(buf), va( "c3\\%s\\", cp_sbRGB1 ) );
 	Q_strcat( buf, sizeof(buf), va( "c4\\%s\\", cp_sbRGB2 ) );
 	Q_strcat( buf, sizeof(buf), va( "hc\\%i\\", client->pers.maxHealth ) );
-	if ( ent->r.svFlags & SVF_BOT )
+	if ( ent->r.svFlags & SVF_BOT ) {
 		Q_strcat( buf, sizeof(buf), va( "skill\\%s\\", Info_ValueForKey( userinfo, "skill" ) ) );
+	}
 	if ( level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL ) {
 		Q_strcat( buf, sizeof(buf), va( "w\\%i\\", client->sess.wins ) );
 		Q_strcat( buf, sizeof(buf), va( "l\\%i\\", client->sess.losses ) );
 	}
-	if ( level.gametype == GT_POWERDUEL )
+	if ( level.gametype == GT_POWERDUEL ) {
 		Q_strcat( buf, sizeof(buf), va( "dt\\%i\\", client->sess.duelTeam ) );
-	if ( level.gametype >= GT_TEAM ) {
-		//	Q_strcat( buf, sizeof( buf ), va( "tt\\%d\\", teamTask ) );
-		//	Q_strcat( buf, sizeof( buf ), va( "tl\\%d\\", teamLeader ) );
 	}
 	if ( level.gametype == GT_SIEGE ) {
 		Q_strcat( buf, sizeof(buf), va( "siegeclass\\%s\\", className ) );
@@ -2205,58 +2233,47 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		SetupGameGhoul2Model( ent, modelname, NULL );
 		Info_SetValueForKey( userinfo, "model", modelname );
 
-		if ( ent->ghoul2 && ent->client )
+		if ( ent->ghoul2 && ent->client ) {
 			ent->client->renderInfo.lastG2 = NULL; //update the renderinfo bolts next update.
+		}
 
 		client->torsoAnimExecute = client->legsAnimExecute = -1;
 		client->torsoLastFlip = client->legsLastFlip = qfalse;
 	}
 
 	if ( g_logClientInfo.integer ) {
-		if ( strcmp( oldClientinfo, buf ) )
+		if ( strcmp( oldClientinfo, buf ) ) {
 			G_LogPrintf( level.log.console, "ClientUserinfoChanged: %i %s\n", clientNum, buf );
-		else
+		}
+		else {
 			G_LogPrintf( level.log.console, "ClientUserinfoChanged: %i <no change>\n", clientNum );
+		}
 	}
 
 	return qtrue;
 }
-
-
-/*
-===========
-ClientConnect
-
-Called when a player begins connecting to the server.
-Called again for every map change or tournement restart.
-
-The session information will be valid after exit.
-
-Return NULL if the client should be allowed, otherwise return
-a string with the reason for denial.
-
-Otherwise, the client will be sent the current gamestate
-and will eventually get to ClientBegin.
-
-firstTime will be qtrue the very first time a client connects
-to the server machine, but qfalse on map changes and tournement
-restarts.
-============
-*/
 
 static qboolean CompareIPString( const char *ip1, const char *ip2 ) {
 	while ( 1 ) {
-		if ( *ip1 != *ip2 )
+		if ( *ip1 != *ip2 ) {
 			return qfalse;
-		if ( !*ip1 || *ip1 == ':' )
+		}
+		if ( !*ip1 || *ip1 == ':' ) {
 			break;
-		ip1++;
-		ip2++;
+		}
+		ip1++, ip2++;
 	}
 
 	return qtrue;
 }
 
+// called when a player begins connecting to the server
+// called again for every map change or tournament restart
+// The session information will be valid after exit
+// Return NULL if the client should be allowed, otherwise return a string with the reason for denial
+// Otherwise, the client will be sent the current gamestate and will eventually get to ClientBegin
+// firstTime will be qtrue the very first time a client connects to the server machine, but qfalse on map changes and
+//	tournament restarts.
 const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	gentity_t *ent = g_entities + clientNum, *te = NULL;
 	gclient_t *client;
@@ -2269,82 +2286,94 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	trap->GetUserinfo( clientNum, userinfo, sizeof(userinfo) );
 
-	// check to see if they are on the banned IP list
+	// ban checks
 	value = Info_ValueForKey( userinfo, "ip" );
 	Q_strncpyz( tmpIP, isBot ? "Bot" : value, sizeof(tmpIP) );
 
 	if ( !isBot && firstTime && Q_stricmp( value, "localhost" ) ) {
-		//Raz: Check if they're banned
-		byteAlias_t *ba;
-		ba = BuildByteFromIP( value );
-		value = (char *)JP_Bans_IsBanned( ba->b );
-		if ( value )
-			return value;
+		byteAlias_t *ba = BuildByteFromIP( value );
+		const char *reason = JP_Bans_IsBanned( ba->b );
+		if ( reason ) {
+			return reason;
+		}
 	}
 
+	// password checks
 	if ( !isBot && g_needpass.integer ) {
 		// check for a password
 		value = Info_ValueForKey( userinfo, "password" );
-		if ( g_password.string[0] && Q_stricmp( g_password.string, "none" ) && strcmp( g_password.string, value ) )
+		if ( g_password.string[0] && Q_stricmp( g_password.string, "none" ) && strcmp( g_password.string, value ) ) {
 			return G_GetStringEdString( "MP_SVGAME", "INVALID_ESCAPE_TO_MAIN" );
+		}
 	}
 
+	// disallow multiple connections from same IP
 	if ( !isBot && firstTime ) {
 		if ( japp_antiFakePlayer.integer ) {
 			// check for > g_maxConnPerIP connections from same IP
 			int count = 0, i = 0;
 			for ( i = 0; i<sv_maxclients.integer; i++ ) {
-				if ( CompareIPString( tmpIP, level.clients[i].sess.IP ) )
+				if ( CompareIPString( tmpIP, level.clients[i].sess.IP ) ) {
 					count++;
+				}
 			}
 			if ( count > japp_maxConnPerIP.integer ) {
-				//	client->pers.connected = CON_DISCONNECTED;
 				return "Too many connections from the same IP";
 			}
 		}
 	}
 
 	if ( ent->inuse ) {
-		// if a player reconnects quickly after a disconnect, the client disconnect may never be called, thus flag can get lost in the ether
+		// if a player reconnects quickly after a disconnect, the client disconnect may never be called, thus flag can
+		//	get lost in the ether, so lets just fix up anything that should happen on a disconnect
 		G_LogPrintf( level.log.console, "Forcing disconnect on active client: %i\n", clientNum );
-		// so lets just fix up anything that should happen on a disconnect
 		ClientDisconnect( clientNum );
 	}
 
-	//Raz: userinfo check
+	// preliminary userinfo validation, client support detection
 	if ( !isBot ) {
 		char msg[2048] = { 0 };
+
+		// cjp_client
 		Q_strncpyz( tmp, Info_ValueForKey( userinfo, "cjp_client" ), sizeof(tmp) );
 		if ( Q_strchrs( tmp, "\n\r;\"" ) ) {
-			// Spoofed userinfo
-			G_LogPrintf( level.log.security, "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum, tmpIP );
+			// sent, but malicious
+			G_LogPrintf( level.log.security, "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum,
+				tmpIP );
 			return "Invalid userinfo detected";
 		}
 		Q_strcat( msg, sizeof(msg), va( "cjp_client: %s...", tmp[0] ? tmp : "basejka" ) );
 		if ( tmp[0] ) {
-			Q_CleanString( tmp, STRIP_COLOUR | STRIP_EXTASCII );
+			// sent, they must at-least have JA+ support flags
 			Q_strcat( msg, sizeof(msg), va( " assumed JA+ csf 0x%X...", JAPLUS_CLIENT_FLAGS ) );
 			finalCSF = JAPLUS_CLIENT_FLAGS;
 		}
-		else
+		else {
+			// not sent, assume base client
 			Q_strcat( msg, sizeof(msg), va( " assumed basejka csf 0x0..." ) );
+		}
 
-		//Raz: CLIENT SUPPORT HINTING
+		// client support hinting
 		value = Info_ValueForKey( userinfo, "csf" );
 		if ( Q_strchrs( value, "\n\r;\"" ) ) {
-			G_LogPrintf( level.log.security, "ClientConnect(%d): Spoofed userinfo 'csf'. [IP: %s]\n", clientNum, tmpIP );
+			// sent, but malicious
+			G_LogPrintf( level.log.security, "ClientConnect(%d): Spoofed userinfo 'csf'. [IP: %s]\n", clientNum,
+				tmpIP );
 			return "Invalid userinfo detected";
 		}
 
 		if ( value[0] && sscanf( value, "%X", &finalCSF ) != 1 ) {
-			G_LogPrintf( level.log.security, "ClientConnect(%d): userinfo 'csf' was found, but empty. [IP: %s]\n", clientNum, tmpIP );
+			// sent, but failed to parse. probably malicious
+			G_LogPrintf( level.log.security, "ClientConnect(%d): userinfo 'csf' was found, but empty. [IP: %s]\n",
+				clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 		Q_strcat( msg, sizeof(msg), va( " final csf 0x%X\n", finalCSF ) );
 
-		Com_Printf( msg ); // we build a string of client mod detection
+		G_LogPrintf( level.log.console, msg );
 	}
 
+	// JPLua plugins can deny connections
 	if ( (result = JPLua_Event_ClientConnect( clientNum, userinfo, tmpIP, firstTime )) ) {
 		Com_Printf( "Denied: %s\n", result );
 		return result;
@@ -2364,13 +2393,15 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->pers.CSF = finalCSF;
 
 	// read or initialize the session data
-	if ( firstTime || level.newSession )
+	if ( firstTime || level.newSession ) {
 		G_InitSessionData( client, userinfo, isBot );
+	}
 	G_ReadSessionData( client );
 
 	// if this is the first time then auto-assign a desired siege team and show briefing for that team
-	if ( level.gametype == GT_SIEGE && (firstTime || level.newSession) )
+	if ( level.gametype == GT_SIEGE && (firstTime || level.newSession) ) {
 		client->sess.siegeDesiredTeam = 0;
+	}
 
 	if ( level.gametype == GT_SIEGE && client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		if ( firstTime || level.newSession ) {
@@ -2379,17 +2410,18 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 			client->sess.sessionTeam = TEAM_SPECTATOR;
 		}
 	}
-	else if ( level.gametype == GT_POWERDUEL && client->sess.sessionTeam != TEAM_SPECTATOR )
+	else if ( level.gametype == GT_POWERDUEL && client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		client->sess.sessionTeam = TEAM_SPECTATOR;
+	}
 
 	if ( isBot ) {
 		ent->r.svFlags |= SVF_BOT;
 		ent->inuse = qtrue;
-		if ( !G_BotConnect( clientNum, !firstTime ) )
+		if ( !G_BotConnect( clientNum, !firstTime ) ) {
 			return "BotConnectfailed";
+		}
 	}
 
-	// get and distribute relevent paramters
 	if ( !ClientUserinfoChanged( clientNum ) ) {
 		return "Failed userinfo validation";
 	}
@@ -2398,7 +2430,8 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		if ( !tmpIP[0] ) {
 			// No IP sent when connecting, probably an unban hack attempt
 			client->pers.connected = CON_DISCONNECTED;
-			G_LogPrintf( level.log.security, "Client %i (%s) sent no IP when connecting.\n", clientNum, client->pers.netname );
+			G_LogPrintf( level.log.security, "Client %i (%s) sent no IP when connecting.\n", clientNum,
+				client->pers.netname );
 			return "Invalid userinfo detected";
 		}
 		Q_strncpyz( client->sess.IP, tmpIP, sizeof(client->sess.IP) );
@@ -2426,21 +2459,8 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	return NULL;
 }
 
-/*
-===========
-ClientBegin
-
-called when a client has finished connecting, and is ready
-to be placed into the level.  This will happen every level load,
-and on transition between teams, but doesn't happen on respawns
-============
-*/
-extern qboolean	gSiegeRoundBegun;
-extern qboolean	gSiegeRoundEnded;
-extern qboolean g_dontPenalizeTeam; //g_cmds.c
-void SetTeamQuick( gentity_t *ent, int team, qboolean doBegin );
-void G_WriteClientSessionData( gclient_t *client );
-void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *saberName );
+// called when a client has finished connecting, and is ready to be placed into the level
+// this will happen every level load, and on transition between teams, but doesn't happen on respawns
 void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	gentity_t *ent, *tent;
 	gclient_t *client;
@@ -2562,14 +2582,19 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	SetupGameGhoul2Model( ent, modelname, NULL );
 	Info_SetValueForKey( userinfo, "model", modelname );
 
-	if ( ent->ghoul2 && ent->client )
+	if ( ent->ghoul2 && ent->client ) {
 		ent->client->renderInfo.lastG2 = NULL; //update the renderinfo bolts next update.
+	}
 
-	if ( level.gametype == GT_POWERDUEL && client->sess.sessionTeam != TEAM_SPECTATOR && client->sess.duelTeam == DUELTEAM_FREE )
+	if ( level.gametype == GT_POWERDUEL && client->sess.sessionTeam != TEAM_SPECTATOR
+		&& client->sess.duelTeam == DUELTEAM_FREE )
+	{
 		SetTeam( ent, "s", qfalse );
+	}
 	else {
-		if ( level.gametype == GT_SIEGE && (!gSiegeRoundBegun || gSiegeRoundEnded) )
+		if ( level.gametype == GT_SIEGE && (!gSiegeRoundBegun || gSiegeRoundEnded) ) {
 			SetTeamQuick( ent, TEAM_SPECTATOR, qfalse );
+		}
 
 		// locate ent at a spawn point
 		ClientSpawn( ent );
@@ -2598,11 +2623,9 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	G_ClearClientLog( clientNum );
 }
 
-#if 1
 static qboolean AllForceDisabled( int force ) {
-	int i;
-
 	if ( force ) {
+		int i;
 		for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
 			if ( !(force & (1 << i)) )
 				return qfalse;
@@ -2613,9 +2636,8 @@ static qboolean AllForceDisabled( int force ) {
 
 	return qfalse;
 }
-#endif
 
-//Convenient interface to set all my limb breakage stuff up -rww
+// convenient interface to set all my limb breakage stuff up -rww
 void G_BreakArm( gentity_t *ent, int arm ) {
 	int anim = -1;
 

@@ -945,8 +945,6 @@ qboolean TryHeal( gentity_t *ent, gentity_t *target ) {
 }
 
 #define USE_DISTANCE (64.0f)
-extern void Touch_Button( gentity_t *ent, gentity_t *other, trace_t *trace );
-extern qboolean gSiegeRoundBegun;
 static vector3 playerMins = { -15, -15, DEFAULT_MINS_2 };
 static vector3 playerMaxs = { 15, 15, DEFAULT_MAXS_2 };
 // Try and use an entity in the world, directly ahead of us

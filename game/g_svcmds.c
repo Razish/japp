@@ -1,8 +1,3 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
-
-// this file holds commands that can be executed by the server console, but not remote clients
-
 #include "g_local.h"
 #include "bg_lua.h"
 
@@ -40,21 +35,29 @@ gclient_t *ClientForString( const char *s ) {
 }
 
 int QDECL G_SortPlayersByScoreRate( const void *a, const void *b ) {
-	gclient_t	*cla = &level.clients[*((int*)a)],
+	gclient_t *cla = &level.clients[*((int*)a)],
 		*clb = &level.clients[*((int*)b)];
 	float arate, brate;
 
-	if ( cla->pers.connectTime <= 0 && clb->pers.connectTime <= 0 )	return 0;
-	if ( cla->pers.connectTime <= 0 )								return 1;
-	if ( clb->pers.connectTime <= 0 )								return -1;
+	if ( cla->pers.connectTime <= 0 && clb->pers.connectTime <= 0 ) {
+		return 0;
+	}
+	if ( cla->pers.connectTime <= 0 ) {
+		return 1;
+	}
+	if ( clb->pers.connectTime <= 0 ) {
+		return -1;
+	}
 
 	arate = cla->ps.persistant[PERS_SCORE] / (level.time - cla->pers.connectTime);
 	brate = clb->ps.persistant[PERS_SCORE] / (level.time - clb->pers.connectTime);
 
-	if ( arate > brate )
+	if ( arate > brate ) {
 		return -1;
-	if ( brate > arate )
+	}
+	if ( brate > arate ) {
 		return 1;
+	}
 
 	return 0;
 }
@@ -62,14 +65,15 @@ int QDECL G_SortPlayersByScoreRate( const void *a, const void *b ) {
 void G_ShuffleTeams( void ) {
 	int i = 0, idnum = 0, cTeam = 0, cnt = 0;
 	gentity_t *cl_ent = NULL;
-	int	sortClients[MAX_CLIENTS];
+	int sortClients[MAX_CLIENTS];
 
 	for ( i = 0; i < level.numConnectedClients; i++ ) {
 		idnum = level.sortedClients[i];
 		cl_ent = &g_entities[idnum];
 
-		if ( cl_ent->client->sess.sessionTeam != TEAM_RED && cl_ent->client->sess.sessionTeam != TEAM_BLUE )
+		if ( cl_ent->client->sess.sessionTeam != TEAM_RED && cl_ent->client->sess.sessionTeam != TEAM_BLUE ) {
 			continue;
+		}
 
 		sortClients[cnt++] = level.sortedClients[i];
 	}
@@ -83,10 +87,12 @@ void G_ShuffleTeams( void ) {
 		cTeam = (i % 2) + TEAM_RED;
 
 		if ( cTeam != cl_ent->client->sess.sessionTeam ) {
-			if ( cTeam == TEAM_RED )
+			if ( cTeam == TEAM_RED ) {
 				SetTeam( cl_ent, "r", qtrue );
-			else if ( cTeam == TEAM_BLUE )
+			}
+			else if ( cTeam == TEAM_BLUE ) {
 				SetTeam( cl_ent, "b", qtrue );
+			}
 		}
 	}
 
@@ -101,8 +107,9 @@ static void SV_AddBot_f( void ) {
 	char name[MAX_TOKEN_CHARS], altname[MAX_TOKEN_CHARS], string[MAX_TOKEN_CHARS], team[MAX_TOKEN_CHARS];
 
 	// are bots enabled?
-	if ( !trap->Cvar_VariableIntegerValue( "bot_enable" ) )
+	if ( !trap->Cvar_VariableIntegerValue( "bot_enable" ) ) {
 		return;
+	}
 
 	// name
 	trap->Argv( 1, name, sizeof(name) );
@@ -113,20 +120,24 @@ static void SV_AddBot_f( void ) {
 
 	// skill
 	trap->Argv( 2, string, sizeof(string) );
-	if ( !string[0] )
+	if ( !string[0] ) {
 		skill = 4;
-	else
+	}
+	else {
 		skill = atof( string );
+	}
 
 	// team
 	trap->Argv( 3, team, sizeof(team) );
 
 	// delay
 	trap->Argv( 4, string, sizeof(string) );
-	if ( !string[0] )
+	if ( !string[0] ) {
 		delay = 0;
-	else
+	}
+	else {
 		delay = atoi( string );
+	}
 
 	// alternative name
 	trap->Argv( 5, altname, sizeof(altname) );
@@ -135,8 +146,9 @@ static void SV_AddBot_f( void ) {
 
 	// if this was issued during gameplay and we are playing locally,
 	// go ahead and load the bot's media immediately
-	if ( level.time - level.startTime > 1000 && trap->Cvar_VariableIntegerValue( "cl_running" ) )
+	if ( level.time - level.startTime > 1000 && trap->Cvar_VariableIntegerValue( "cl_running" ) ) {
 		trap->SendServerCommand( -1, "loaddefered\n" );	// FIXME: spelled wrong, but not changing for demo
+	}
 }
 
 static void SV_AdminAdd_f( void ) {
@@ -224,10 +236,12 @@ static void SV_BanDel_f( void ) {
 
 	trap->Argv( 1, ip, sizeof(ip) );
 	bIP = BuildByteFromIP( ip );
-	if ( JP_Bans_Remove( bIP->b ) )
+	if ( JP_Bans_Remove( bIP->b ) ) {
 		trap->Print( "Removing ban on %s\n", ip );
-	else
+	}
+	else {
 		trap->Print( "No ban found for %s\n", ip );
+	}
 }
 
 static void SV_BanList_f( void ) {
@@ -274,19 +288,24 @@ static void SV_EntityList_f( void ) {
 
 	for ( e = 0, check = g_entities;
 		e < level.num_entities;
-		e++, check++ ) {
+		e++, check++ )
+	{
 		char buf[256] = { 0 };
 
-		if ( !check->inuse )
+		if ( !check->inuse ) {
 			continue;
+		}
 
-		if ( check->s.eType < 0 || check->s.eType >= ET_MAX )
+		if ( check->s.eType < 0 || check->s.eType >= ET_MAX ) {
 			Q_strcat( buf, sizeof(buf), va( "%4i: %-3i                ", e, check->s.eType ) );
-		else
+		}
+		else {
 			Q_strcat( buf, sizeof(buf), va( "%4i: %-20s ", e, eTypes[check->s.eType] ) );
+		}
 
-		if ( check->classname )
+		if ( check->classname ) {
 			Q_strcat( buf, sizeof(buf), va( "[%s]", check->classname ) );
+		}
 
 		trap->Print( "%s\n", buf );
 	}
@@ -299,8 +318,9 @@ static void SV_ForceTeam_f( void ) {
 	// find the player
 	trap->Argv( 1, str, sizeof(str) );
 	cl = ClientForString( str );
-	if ( !cl )
+	if ( !cl ) {
 		return;
+	}
 
 	// set the team
 	trap->Argv( 2, str, sizeof(str) );
@@ -340,14 +360,16 @@ static void SV_ListMaps_f( void ) {
 static void SV_Lua_f( void ) {
 	char *args = NULL;
 
-	if ( trap->Argc() < 2 || !JPLua.state )
+	if ( trap->Argc() < 2 || !JPLua.state ) {
 		return;
+	}
 
 	args = ConcatArgs( 1 );
 
-	trap->Print( S_COLOR_CYAN"Executing Lua code: %s\n", args );
-	if ( luaL_dostring( JPLua.state, args ) != 0 )
-		trap->Print( S_COLOR_RED"Lua Error: %s\n", lua_tostring( JPLua.state, -1 ) );
+	trap->Print( S_COLOR_CYAN "Executing Lua code: %s\n", args );
+	if ( luaL_dostring( JPLua.state, args ) != 0 ) {
+		trap->Print( S_COLOR_RED "Lua Error: %s\n", lua_tostring( JPLua.state, -1 ) );
+	}
 }
 
 static void SV_LuaReload_f( void ) {
@@ -369,14 +391,16 @@ static void SV_Pause_f( void ) {
 }
 
 static void SV_Say_f( void ) {
-	if ( dedicated.integer )
+	if ( dedicated.integer ) {
 		trap->SendServerCommand( -1, va( "print \"server: %s\n\"", ConcatArgs( 1 ) ) );
+	}
 }
 
 static void SV_ShuffleTeams_f( void ) {
 	// gametype is already filtered in callvote, but filter it here as-well
-	if ( level.gametype >= GT_TEAM )
+	if ( level.gametype >= GT_TEAM ) {
 		G_ShuffleTeams();
+	}
 }
 
 typedef struct svCommand_s {
@@ -425,12 +449,14 @@ qboolean ConsoleCommand( void ) {
 
 	trap->Argv( 0, cmd, sizeof(cmd) );
 
-	if ( JPLua_Event_ServerCommand() )
+	if ( JPLua_Event_ServerCommand() ) {
 		return qtrue;
+	}
 
 	command = (svCommand_t *)bsearch( cmd, svCommands, numSvCommands, sizeof(svCommands[0]), cmdcmp );
-	if ( !command )
+	if ( !command ) {
 		return qfalse;
+	}
 
 	command->func();
 

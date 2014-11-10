@@ -551,17 +551,9 @@ void anglerCallback( gentity_t *ent ) {
 	trap->LinkEntity( (sharedEntity_t *)ent );
 }
 
-void MatchTeam( gentity_t *teamLeader, int moverState, int time );
-void Blocked_Mover( gentity_t *ent, gentity_t *other );
-
-/*
-=============
-moverCallback
-
-Utility function
-=============
-*/
-void moverCallback( gentity_t *ent ) {	//complete the task
+// utility function
+void moverCallback( gentity_t *ent ) {
+	// complete the task
 	trap->ICARUS_TaskIDComplete( (sharedEntity_t *)ent, TID_MOVE_NAV );
 
 	// play sound

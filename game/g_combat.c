@@ -3577,7 +3577,6 @@ DAMAGE_HALF_ABSORB		half shields, half health
 DAMAGE_HALF_ARMOR_REDUCTION		Any damage that shields incur is halved
 ============
 */
-extern qboolean gSiegeRoundBegun;
 
 int gPainMOD = 0;
 int gPainHitLoc = -1;

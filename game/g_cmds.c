@@ -14,7 +14,6 @@ int AcceptBotCommand( char *cmd, gentity_t *pl );
 void WP_SetSaber( int entNum, saberInfo_t *sabers, int saberNum, const char *saberName );
 
 void Cmd_NPC_f( gentity_t *ent );
-void SetTeamQuick( gentity_t *ent, int team, qboolean doBegin );
 
 void Cmd_Score_f( gentity_t *ent ) {
 	ent->client->scoresWaiting = qtrue;

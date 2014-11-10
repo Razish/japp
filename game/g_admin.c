@@ -1779,6 +1779,7 @@ static void AM_BanIP( gentity_t *ent ) {
 			trap->SendServerCommand( ent - g_entities, va( "print \"Failed to add ban: %s\n\"", errorMsg ) );
 		}
 		else {
+			trap->SendServerCommand( ent - g_entities, va( "print \"Banned IP \"%s\" for \"%s\" until \"%s\"\n\"", errorMsg ) );
 			G_LogPrintf( level.log.admin, "\t%s banned IP \"%s\" for \"%s\" until \"%s\"\n",
 				G_PrintClient( ent-g_entities ), ip, reason, duration );
 		}
@@ -1858,7 +1859,6 @@ static const char *weatherEffects[] = {
 static const size_t numWeatherEffects = ARRAY_LEN( weatherEffects );
 
 static int weathercmp( const void *a, const void *b ) {
-	trap->Print( "Comparing %s and %s\n", (const char *)a, *(const char **)b );
 	return Q_stricmp( (const char *)a, *(const char **)b );
 }
 

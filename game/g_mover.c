@@ -1,19 +1,4 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
-
 #include "g_local.h"
-
-
-
-/*
-===============================================================================
-
-PUSHMOVE
-
-===============================================================================
-*/
-
-void MatchTeam( gentity_t *teamLeader, int moverState, int time );
 
 typedef struct pushed_s {
 	gentity_t	*ent;
@@ -21,26 +6,7 @@ typedef struct pushed_s {
 	vector3	angles;
 	float	deltayaw;
 } pushed_t;
-pushed_t	pushed[MAX_GENTITIES], *pushed_p;
-
-#define MOVER_START_ON		1
-#define MOVER_FORCE_ACTIVATE	2
-#define MOVER_CRUSHER		4
-#define MOVER_TOGGLE		8
-#define MOVER_LOCKED		16
-#define MOVER_GOODIE		32
-#define MOVER_PLAYER_USE	64
-#define MOVER_INACTIVE		128
-
-int	BMS_START = 0;
-int	BMS_MID = 1;
-int	BMS_END = 2;
-
-/*
--------------------------
-G_PlayDoorLoopSound
--------------------------
-*/
+pushed_t pushed[MAX_GENTITIES], *pushed_p;
 
 void G_PlayDoorLoopSound( gentity_t *ent ) {
 	if ( !ent->soundSet || !ent->soundSet[0] ) {
@@ -579,19 +545,12 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 	trap->LinkEntity( (sharedEntity_t *)ent );
 }
 
-/*
-================
-MatchTeam
-
-All entities in a mover team will move from pos1 to pos2
-in the same amount of time
-================
-*/
-void MatchTeam( gentity_t *teamLeader, int moverState, int time ) {
-	gentity_t		*slave;
+// All entities in a mover team will move from pos1 to pos2 in the same amount of time
+void MatchTeam( gentity_t *teamLeader, moverState_t moverState, int time ) {
+	gentity_t *slave;
 
 	for ( slave = teamLeader; slave; slave = slave->teamchain ) {
-		SetMoverState( slave, (moverState_t)moverState, time );
+		SetMoverState( slave, moverState, time );
 	}
 }
 

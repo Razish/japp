@@ -1278,35 +1278,6 @@ static void Jedi_CombatDistance( int enemy_dist ) {//FIXME: for many of these ch
 			Jedi_Retreat();
 		}
 	}
-	/*
-	else if ( NPC->enemy->s.weapon == WP_TURRET
-	&& !Q_stricmp( "PAS", NPC->enemy->classname )
-	&& NPC->enemy->s.apos.trType == TR_STATIONARY )
-	{
-	int	testlevel;
-	if ( enemy_dist > forcePushPullRadius[FORCE_LEVEL_1] - 16 )
-	{
-	Jedi_Advance();
-	}
-	if ( NPC->client->ps.fd.forcePowerLevel[FP_PUSH] < FORCE_LEVEL_1 )
-	{//
-	testlevel = FORCE_LEVEL_1;
-	}
-	else
-	{
-	testlevel = NPC->client->ps.fd.forcePowerLevel[FP_PUSH];
-	}
-	if ( enemy_dist < forcePushPullRadius[testlevel] - 16 )
-	{//close enough to push
-	if ( InFront( NPC->enemy->r.currentOrigin, NPC->client->renderInfo.eyePoint, NPC->client->renderInfo.eyeAngles, 0.6f ) )
-	{//knock it down
-	WP_KnockdownTurret( NPC, NPC->enemy );
-	//do the forcethrow call just for effect
-	ForceThrow( NPC, qfalse );
-	}
-	}
-	}
-	*/
 	//rwwFIXMEFIXME: Give them the ability to do this again (turret needs to be fixed up to allow it)
 	else if ( enemy_dist <= 64
 		&& ((NPCInfo->scriptFlags&SCF_DONT_FIRE) || (!Q_stricmp( "Yoda", NPC->NPC_type ) && !Q_irand( 0, 10 ))) ) {//can't use saber and they're in striking range

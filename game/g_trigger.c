@@ -112,7 +112,6 @@ qboolean G_NameInTriggerClassList( char *list, char *str ) {
 	return qfalse;
 }
 
-extern qboolean gSiegeRoundBegun;
 void SiegeItemRemoveOwner( gentity_t *ent, gentity_t *carrier );
 void multi_trigger( gentity_t *ent, gentity_t *activator ) {
 	qboolean haltTrigger = qfalse;
