@@ -514,7 +514,8 @@ void SkipRestOfLine( const char **data ) {
 	int c;
 
 	p = *data;
-	while ( (c = *p++) != '\0' ) {
+	while ( (c = *p) != '\0' ) {
+		p++;
 		if ( c == '\n' ) {
 			com_lines++;
 			break;
