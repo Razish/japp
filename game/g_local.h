@@ -318,6 +318,8 @@ struct gentity_s {
 		int					percentStart, percentEnd;
 		int					timeStart, timeEnd;
 	} modelscale;
+	vector3				origOrigin;
+	qboolean			spawnedBefore;
 };
 
 typedef enum damageRedirect_e {
@@ -963,6 +965,8 @@ void				RegisterItem( const gitem_t *item );
 void				RemoveDetpacks( gentity_t *ent );
 void				respawn( gentity_t *ent );
 void				RespawnItem( gentity_t *ent );
+void				ResetItem( gentity_t *ent );
+qboolean			CheckPushItem( gentity_t *ent );
 void				SaveRegisteredItems( void );
 gentity_t *			SelectSpawnPoint( vector3 *avoidPoint, vector3 *origin, vector3 *angles, team_t team );
 void				SendScoreboardMessageToAllClients( void );
