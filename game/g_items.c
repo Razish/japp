@@ -2049,6 +2049,14 @@ void RespawnItem( gentity_t *ent ) {
 			;
 	}
 
+	if ( japp_itemPush.integer )
+	{
+		VectorCopy( &ent->origOrigin, &ent->s.origin );
+		VectorCopy( &ent->origOrigin, &ent->s.pos.trBase );
+		VectorCopy( &ent->origOrigin, &ent->s.apos.trBase );
+		VectorCopy( &ent->origOrigin, &ent->r.currentOrigin );
+	}
+
 	ent->r.contents = CONTENTS_TRIGGER;
 	//ent->s.eFlags &= ~EF_NODRAW;
 	ent->s.eFlags &= ~(EF_NODRAW | EF_ITEMPLACEHOLDER);
@@ -2074,6 +2082,42 @@ void RespawnItem( gentity_t *ent ) {
 	G_AddEvent( ent, EV_ITEM_RESPAWN, 0 );
 
 	ent->nextthink = 0;
+}
+
+void ResetItem( gentity_t *ent ) {
+	VectorCopy( &ent->origOrigin, &ent->s.origin);
+	VectorCopy( &ent->origOrigin, &ent->s.pos.trBase);
+	VectorCopy( &ent->origOrigin, &ent->s.apos.trBase);
+	VectorCopy( &ent->origOrigin, &ent->r.currentOrigin);
+
+	if ( g_gametype.integer == GT_CTF && ent->item && ent->item->giType == IT_TEAM )
+		Team_FreeEntity(ent);
+
+	trap->LinkEntity( (sharedEntity_t *) ent );
+}
+
+qboolean CheckPushItem( gentity_t *ent ) {
+	if ( !ent->item )
+		return qfalse;
+
+	if ( ent->item->giType == IT_AMMO ||
+		 ent->item->giType == IT_HEALTH ||
+		 ent->item->giType == IT_ARMOR ||
+		 ent->item->giType == IT_HOLDABLE ) {
+			return qtrue; // these don't have placeholders
+		}
+
+	if ( ent->item->giType == IT_WEAPON ||
+		( japp_itemPush.integer == 2 && ent->item->giType == IT_TEAM ) ||
+		 ent->item->giType == IT_POWERUP ) {
+			// check for if dropped item
+			if ( ent->r.svFlags & EF_DROPPEDWEAPON )
+				return qtrue; // these types can only if dropped
+			if ( ent->flags & FL_DROPPED_ITEM )
+				return qtrue; // these types can only if dropped
+		}
+
+	return qfalse;
 }
 
 qboolean CheckItemCanBePickedUpByNPC( gentity_t *item, gentity_t *pickerupper ) {
@@ -2571,6 +2615,7 @@ free fall from their spawn points
 void FinishSpawningItem( gentity_t *ent ) {
 	trace_t		tr;
 	vector3		dest;
+	vector3		endposhack={0.0f,0.0f,0.0f};
 	//	gitem_t		*item;
 
 	//	VectorSet( ent->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, -ITEM_RADIUS );
@@ -2709,6 +2754,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 		ent->s.groundEntityNum = tr.entityNum;
 
 		G_SetOrigin( ent, &tr.endpos );
+		VectorCopy( &tr.endpos, &endposhack );
 	}
 
 	// team slaves and targeted items aren't present at start
@@ -2731,6 +2777,16 @@ void FinishSpawningItem( gentity_t *ent ) {
 	return;
 	}
 	*/
+
+	if (!ent->spawnedBefore)
+	{
+		ent->spawnedBefore = qtrue;
+		if ( ent->spawnflags & ITMSF_SUSPEND ) {
+			VectorCopy( &ent->s.origin, &ent->origOrigin );
+		} else {
+			VectorCopy( &endposhack, &ent->origOrigin );
+		}
+	}
 
 	trap->LinkEntity( (sharedEntity_t *)ent );
 }
@@ -2874,6 +2930,10 @@ void G_SpawnItem( gentity_t *ent, const gitem_t *item ) {
 	RegisterItem( item );
 	if ( G_ItemDisabled( item ) )
 		return;
+
+	if (ent->spawnedBefore) {
+		VectorCopy( &ent->origOrigin, &ent->s.origin );
+	}
 
 	ent->item = item;
 	// some movers spawn on the second frame, so delay item
