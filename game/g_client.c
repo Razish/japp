@@ -4,6 +4,7 @@
 #include "Ghoul2/G2.h"
 #include "bg_saga.h"
 #include "bg_luaevent.h"
+#include "JAPP/jp_csflags.h"
 
 // g_client.c -- client functions that don't happen every frame
 
@@ -16,8 +17,6 @@ void WP_SaberAddG2Model( gentity_t *saberent, const char *saberModel, qhandle_t 
 void WP_SaberRemoveG2Model( gentity_t *saberent );
 extern qboolean WP_SaberStyleValidForSaber( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel );
 extern qboolean WP_UseFirstValidSaberStyle( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int *saberAnimLevel );
-
-//forcedata_t Client_Force[MAX_CLIENTS];
 
 /*QUAKED info_player_duel (1 0 1) (-16 -16 -24) (16 16 32) initial
 potential spawning position for duelists in duel.
@@ -3292,7 +3291,7 @@ void ClientSpawn( gentity_t *ent ) {
 			}
 			client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_SABER);
 			client->ps.stats[STAT_WEAPONS] |= (1 << WP_MELEE);
-			client->ps.ammo[AMMO_POWERCELL] = ammoData[AMMO_POWERCELL].max;
+			client->ps.ammo[AMMO_POWERCELL] = ammoMax[AMMO_POWERCELL];
 			client->ps.weapon = WP_BRYAR_PISTOL;
 		}
 	}
@@ -3302,7 +3301,7 @@ void ClientSpawn( gentity_t *ent ) {
 			int i = 0;
 			client->ps.stats[STAT_WEAPONS] = ((1 << LAST_USEABLE_WEAPON) - 1) & ~1;
 			for ( i = 0; i < AMMO_MAX; i++ ) {
-				client->ps.ammo[i] = ammoData[i].max;
+				client->ps.ammo[i] = ammoMax[i];
 			}
 		}
 		else {
@@ -3383,11 +3382,11 @@ void ClientSpawn( gentity_t *ent ) {
 						if ( level.gametype == GT_SIEGE
 							&& client->siegeClass != -1
 							&& (bgSiegeClasses[client->siegeClass].classflags & (1 << CFL_EXTRA_AMMO)) ) {//double ammo
-							client->ps.ammo[weaponData[m].ammoIndex] = ammoData[weaponData[m].ammoIndex].max * 2;
+							client->ps.ammo[weaponData[m].ammoIndex] = ammoMax[weaponData[m].ammoIndex] * 2;
 							client->ps.eFlags |= EF_DOUBLE_AMMO;
 						}
 						else {
-							client->ps.ammo[weaponData[m].ammoIndex] = ammoData[weaponData[m].ammoIndex].max;
+							client->ps.ammo[weaponData[m].ammoIndex] = ammoMax[weaponData[m].ammoIndex];
 						}
 					}
 				}
@@ -3428,32 +3427,19 @@ void ClientSpawn( gentity_t *ent ) {
 
 	// nmckenzie: DESERT_SIEGE... or well, siege generally.  This was over-writing the max value, which was NOT good for siege.
 	if ( inSiegeWithClass == qfalse ) {
-		client->ps.ammo[AMMO_BLASTER] = 100; //ammoData[AMMO_BLASTER].max; //100 seems fair.
+		client->ps.ammo[AMMO_BLASTER] = 100; //ammoMax[AMMO_BLASTER]; //100 seems fair.
 	}
-	//	client->ps.ammo[AMMO_POWERCELL] = ammoData[AMMO_POWERCELL].max;
-	//	client->ps.ammo[AMMO_FORCE] = ammoData[AMMO_FORCE].max;
-	//	client->ps.ammo[AMMO_METAL_BOLTS] = ammoData[AMMO_METAL_BOLTS].max;
-	//	client->ps.ammo[AMMO_ROCKETS] = ammoData[AMMO_ROCKETS].max;
-	/*
-		client->ps.stats[STAT_WEAPONS] = ( 1 << WP_BRYAR_PISTOL);
-		if ( level.gametype == GT_TEAM ) {
-		client->ps.ammo[WP_BRYAR_PISTOL] = 50;
-		} else {
-		client->ps.ammo[WP_BRYAR_PISTOL] = 100;
-		}
-		*/
+
 	client->ps.rocketLockIndex = ENTITYNUM_NONE;
 	client->ps.rocketLockTime = 0;
 
-	//rww - Set here to initialize the circling seeker drone to off.
-	//A quick note about this so I don't forget how it works again:
-	//ps.genericEnemyIndex is kept in sync between the server and client.
-	//When it gets set then an entitystate value of the same name gets
-	//set along with an entitystate flag in the shared bg code. Which
-	//is why a value needs to be both on the player state and entity state.
-	//(it doesn't seem to just carry over the entitystate value automatically
-	//because entity state value is derived from player state data or some
-	//such)
+	// rww - set here to initialize the circling seeker drone to off.
+	// a quick note about this so I don't forget how it works again:
+	// ps.genericEnemyIndex is kept in sync between the server and client.
+	// when it gets set then an entitystate value of the same name gets set along with an entitystate flag in the shared
+	//	bg code, which is why a value needs to be both on the player state and entity state.
+	// it doesn't seem to just carry over the entitystate value automatically because entity state value is derived
+	//	from player state data or some such)
 	client->ps.genericEnemyIndex = -1;
 
 	client->ps.isJediMaster = qfalse;

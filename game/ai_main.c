@@ -3911,7 +3911,7 @@ int ShouldSecondaryFire( bot_state_t *bs ) {
 
 	weap = bs->cur_ps.weapon;
 
-	if ( bs->cur_ps.ammo[weaponData[weap].ammoIndex] < weaponData[weap].altEnergyPerShot ) {
+	if ( bs->cur_ps.ammo[weaponData[weap].ammoIndex] < weaponData[weap].alt.shotCost ) {
 		return 0;
 	}
 
@@ -4120,7 +4120,7 @@ int BotTryAnotherWeapon( bot_state_t *bs ) { //out of ammo, resort to the first 
 	i = 1;
 
 	while ( i < WP_NUM_WEAPONS ) {
-		if ( bs->cur_ps.ammo[weaponData[i].ammoIndex] >= weaponData[i].energyPerShot &&
+		if ( bs->cur_ps.ammo[weaponData[i].ammoIndex] >= weaponData[i].shotCost &&
 			(bs->cur_ps.stats[STAT_WEAPONS] & (1 << i)) ) {
 			bs->virtualWeapon = i;
 			BotSelectWeapon( bs->client, i );
@@ -4149,7 +4149,7 @@ qboolean BotWeaponSelectable( bot_state_t *bs, int weapon ) {
 		return qfalse;
 	}
 
-	if ( bs->cur_ps.ammo[weaponData[weapon].ammoIndex] >= weaponData[weapon].energyPerShot &&
+	if ( bs->cur_ps.ammo[weaponData[weapon].ammoIndex] >= weaponData[weapon].shotCost &&
 		(bs->cur_ps.stats[STAT_WEAPONS] & (1 << weapon)) ) {
 		return qtrue;
 	}
@@ -4166,7 +4166,7 @@ int BotSelectIdealWeapon( bot_state_t *bs ) {
 	i = 0;
 
 	while ( i < WP_NUM_WEAPONS ) {
-		if ( bs->cur_ps.ammo[weaponData[i].ammoIndex] >= weaponData[i].energyPerShot &&
+		if ( bs->cur_ps.ammo[weaponData[i].ammoIndex] >= weaponData[i].shotCost &&
 			bs->botWeaponWeights[i] > bestweight &&
 			(bs->cur_ps.stats[STAT_WEAPONS] & (1 << i)) ) {
 			if ( i == WP_THERMAL ) { //special case..
@@ -4243,7 +4243,7 @@ int BotSelectChoiceWeapon( bot_state_t *bs, int weapon, int doselection ) { //if
 	i = 0;
 
 	while ( i < WP_NUM_WEAPONS ) {
-		if ( bs->cur_ps.ammo[weaponData[i].ammoIndex] > weaponData[i].energyPerShot &&
+		if ( bs->cur_ps.ammo[weaponData[i].ammoIndex] > weaponData[i].shotCost &&
 			i == weapon &&
 			(bs->cur_ps.stats[STAT_WEAPONS] & (1 << i)) ) {
 			hasit = 1;
@@ -5149,7 +5149,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 			trap->EA_Use( bs->client );
 	}
 
-	if ( bs->cur_ps.ammo[weaponData[bs->cur_ps.weapon].ammoIndex] < weaponData[bs->cur_ps.weapon].energyPerShot ) {
+	if ( bs->cur_ps.ammo[weaponData[bs->cur_ps.weapon].ammoIndex] < weaponData[bs->cur_ps.weapon].shotCost ) {
 		if ( BotTryAnotherWeapon( bs ) )
 			return;
 	}

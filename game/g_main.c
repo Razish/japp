@@ -7,6 +7,8 @@
 #include "bg_saga.h"
 #include "JAPP/jp_crash.h"
 #include "bg_lua.h"
+#include "JAPP/jp_cinfo.h"
+#include "JAPP/jp_ssflags.h"
 
 level_locals_t	level;
 
@@ -432,6 +434,9 @@ static void G_SpawnHoleFixes( void ) {
 			if ( !cursor[0] ) {
 				break;
 			}
+
+			VectorClear( &mins );
+			VectorClear( &maxs );
 
 			if ( COM_ParseVector( &cursor, &mins ) || COM_ParseVector( &cursor, &maxs ) ) {
 				break;

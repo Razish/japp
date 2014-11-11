@@ -410,7 +410,7 @@ static int JPLua_Player_GetMaxAmmo( lua_State *L ) {
 		lua_pushnil( L );
 #endif
 
-	lua_pushinteger( L, ammoData[weaponData[weapon].ammoIndex].max );
+	lua_pushinteger( L, ammoMax[weaponData[weapon].ammoIndex] );
 
 	return 1;
 }

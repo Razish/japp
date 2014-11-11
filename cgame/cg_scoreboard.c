@@ -4,6 +4,7 @@
 #include "cg_local.h"
 #include "ui/ui_shared.h"
 #include "bg_saga.h"
+#include "JAPP/jp_ssflags.h"
 
 #ifdef _WIN32
 #undef SB_TOP //Raz: FFS windows.h >_>
@@ -145,20 +146,28 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 
 	if ( score->ping != -1 ) {
 		if ( ci->team != TEAM_SPECTATOR || cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL ) {
-			if ( cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL )
-				CG_Text_Paint( SB_SCORE_X, y, 1.0f * scale, &colorWhite, va( "%i/%i", ci->wins, ci->losses ), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+			if ( cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL ) {
+				CG_Text_Paint( SB_SCORE_X, y, 1.0f * scale, &colorWhite, va( "%i/%i", ci->wins, ci->losses ), 0, 0,
+					ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+			}
 			else {
-				if ( Server_Supports( SSF_SCOREBOARD_KD ) )
-					CG_Text_Paint( SB_SCORE_X, y, 1.0f * scale, &colorWhite, va( "%i/%i", score->score, score->deaths ), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
-				else
-					CG_Text_Paint( SB_SCORE_X, y, 1.0f * scale, &colorWhite, va( "%i", score->score ), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+				if ( Server_Supports( SSF_SCOREBOARD_KD ) ) {
+					CG_Text_Paint( SB_SCORE_X, y, 1.0f * scale, &colorWhite, va( "%i/%i", score->score, score->deaths ),
+						0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+				}
+				else {
+					CG_Text_Paint( SB_SCORE_X, y, 1.0f * scale, &colorWhite, va( "%i", score->score ), 0, 0,
+						ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+				}
 			}
 		}
 
-		if ( cgs.clientinfo[score->client].botSkill != -1 && cg_oldScoreboardShowBots.integer == 2 )
+		if ( cgs.clientinfo[score->client].botSkill != -1 && cg_oldScoreboardShowBots.integer == 2 ) {
 			CG_Text_Paint( SB_PING_X, y, 1.0f * scale, &colorWhite, "-", 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
-		else
+		}
+		else {
 			CG_Text_Paint( SB_PING_X, y, 1.0f * scale, &colorWhite, va( "%i", score->ping ), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+		}
 
 		CG_Text_Paint( SB_TIME_X, y, 1.0f * scale, &colorWhite, va( "%i", score->time ), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
 	}

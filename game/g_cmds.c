@@ -6,6 +6,7 @@
 #include "ui/menudef.h" // for the voice chats
 #include "bg_luaevent.h"
 #include "bg_public.h"
+#include "JAPP/jp_csflags.h"
 
 //rww - for getting bot commands...
 int AcceptBotCommand( char *cmd, gentity_t *pl );
@@ -2231,8 +2232,9 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 	trace_t *tr;
 	int weapon = WP_SABER;
 
-	if ( !(g_privateDuel.integer & PRIVDUEL_ALLOW) )
+	if ( !(g_privateDuel.integer & PRIVDUEL_ALLOW) ) {
 		return;
+	}
 
 	// not allowed if you're not alive or not ingame
 	if ( ent->health <= 0 ||
@@ -2243,21 +2245,34 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 
 	// no private dueling in team modes
 	if ( !(g_privateDuel.integer & PRIVDUEL_TEAM) && level.gametype >= GT_TEAM ) {
-		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NODUEL_GAMETYPE" ) ) );
+		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"",
+			G_GetStringEdString( "MP_SVGAME", "NODUEL_GAMETYPE" ) ) );
 		return;
 	}
 
-	if ( ent->client->ps.duelTime >= level.time )
+	if ( ent->client->ps.duelTime >= level.time ) {
 		return;
+	}
 
-	if ( (g_privateDuel.integer & PRIVDUEL_WEAP) )
-		weapon = ent->client->ps.weapon;
+	if ( (g_privateDuel.integer & PRIVDUEL_WEAP) ) {
+		if ( !(ent->client->pers.CSF & CSF_WEAPONDUEL) || trap->Argc() == 1 ) {
+			weapon = ent->client->ps.weapon;
+		}
+		else {
+			weapon = BG_FindWeapon( ConcatArgs( 1 ) );
+			if ( weapon == WP_NONE ) {
+				weapon = ent->client->ps.weapon;
+			}
+		}
+	}
 
-	if ( ent->client->ps.saberInFlight )
+	if ( ent->client->ps.saberInFlight ) {
 		return;
+	}
 
-	if ( ent->client->ps.duelInProgress )
+	if ( ent->client->ps.duelInProgress ) {
 		return;
+	}
 
 	//New: Don't let a player duel if he just did and hasn't waited 10 seconds yet (note: If someone challenges him, his duel timer will reset so he can accept)
 	if ( !(g_privateDuel.integer & PRIVDUEL_MULTI) && ent->client->ps.fd.privateDuelTime > level.time ) {
@@ -2285,8 +2300,9 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 			return;
 		}
 
-		if ( level.gametype >= GT_TEAM && OnSameTeam( ent, challenged ) )
+		if ( level.gametype >= GT_TEAM && OnSameTeam( ent, challenged ) ) {
 			return;
+		}
 
 		if ( challenged->client->ps.duelIndex == ent->s.number && challenged->client->ps.duelTime >= level.time ) {
 			trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"%s %s "S_COLOR_WHITE"(%s)!\n\"",
@@ -2311,27 +2327,33 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 			if ( challenged->client->pers.duelWeapon == WP_SABER ) {
 				// Holster their sabers now, until the duel starts (then they'll get auto-turned on to look cool)
 				if ( !ent->client->ps.saberHolstered ) {
-					if ( ent->client->saber[0].soundOff )
+					if ( ent->client->saber[0].soundOff ) {
 						G_Sound( ent, CHAN_AUTO, ent->client->saber[0].soundOff );
-					if ( ent->client->saber[1].soundOff && ent->client->saber[1].model[0] )
+					}
+					if ( ent->client->saber[1].soundOff && ent->client->saber[1].model[0] ) {
 						G_Sound( ent, CHAN_AUTO, ent->client->saber[1].soundOff );
+					}
 
 					ent->client->ps.weaponTime = 400;
 					ent->client->ps.saberHolstered = 2;
 				}
 				if ( !challenged->client->ps.saberHolstered ) {
-					if ( challenged->client->saber[0].soundOff )
+					if ( challenged->client->saber[0].soundOff ) {
 						G_Sound( challenged, CHAN_AUTO, challenged->client->saber[0].soundOff );
-					if ( challenged->client->saber[1].soundOff && challenged->client->saber[1].model[0] )
+					}
+					if ( challenged->client->saber[1].soundOff && challenged->client->saber[1].model[0] ) {
 						G_Sound( challenged, CHAN_AUTO, challenged->client->saber[1].soundOff );
+					}
 
 					challenged->client->ps.weaponTime = 400;
 					challenged->client->ps.saberHolstered = 2;
 				}
 			}
 
-			else // reset their weapon times
+			else {
+				// reset their weapon times
 				ent->client->ps.weaponTime = challenged->client->ps.weaponTime = 1000;
+			}
 
 			ent->client->ps.weapon = challenged->client->ps.weapon = challenged->client->pers.duelWeapon;
 
@@ -2361,41 +2383,46 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 	}
 }
 
-void DismembermentTest( gentity_t *self );
-void Bot_SetForcedMovement( int bot, int forward, int right, int up );
 #ifdef _DEBUG
-extern void DismembermentByNum( gentity_t *self, int num );
-extern void G_SetVehDamageFlags( gentity_t *veh, int shipSurf, int damageLevel );
+void DismembermentByNum( gentity_t *self, int num );
+void G_SetVehDamageFlags( gentity_t *veh, int shipSurf, int damageLevel );
 #endif
+
 qboolean TryGrapple( gentity_t *ent ) {
 	// weapon busy
-	if ( ent->client->ps.weaponTime > 0 )
+	if ( ent->client->ps.weaponTime > 0 ) {
 		return qfalse;
+	}
 
 	// force power or knockdown or something
-	if ( ent->client->ps.forceHandExtend != HANDEXTEND_NONE )
+	if ( ent->client->ps.forceHandExtend != HANDEXTEND_NONE ) {
 		return qfalse;
+	}
 
 	// already grappling? but weapontime should be > 0 then..
-	if ( ent->client->grappleState )
+	if ( ent->client->grappleState ) {
 		return qfalse;
+	}
 
-	if ( ent->client->ps.weapon != WP_SABER && ent->client->ps.weapon != WP_MELEE )
+	if ( ent->client->ps.weapon != WP_SABER && ent->client->ps.weapon != WP_MELEE ) {
 		return qfalse;
+	}
 
 	if ( ent->client->ps.weapon == WP_SABER && !ent->client->ps.saberHolstered ) {
 		Cmd_ToggleSaber_f( ent );
 		// must have saber holstered
-		if ( !ent->client->ps.saberHolstered )
+		if ( !ent->client->ps.saberHolstered ) {
 			return qfalse;
+		}
 	}
 
 	G_SetAnim( ent, &ent->client->pers.cmd, SETANIM_BOTH, /*BOTH_KYLE_PA_1*/BOTH_KYLE_GRAB, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0 );
 	if ( ent->client->ps.torsoAnim == BOTH_KYLE_GRAB ) {
 		// providing the anim set succeeded..
 		ent->client->ps.torsoTimer += 500; //make the hand stick out a little longer than it normally would
-		if ( ent->client->ps.legsAnim == ent->client->ps.torsoAnim )
+		if ( ent->client->ps.legsAnim == ent->client->ps.torsoAnim ) {
 			ent->client->ps.legsTimer = ent->client->ps.torsoTimer;
+		}
 		ent->client->ps.weaponTime = ent->client->ps.torsoTimer;
 		return qtrue;
 	}
@@ -2406,15 +2433,25 @@ qboolean TryGrapple( gentity_t *ent ) {
 static void Cmd_TargetUse_f( gentity_t *ent ) {
 	if ( trap->Argc() > 1 ) {
 		char sArg[MAX_STRING_CHARS] = { 0 };
-		gentity_t *targ;
+		gentity_t *targ = NULL;
 
 		trap->Argv( 1, sArg, sizeof(sArg) );
 
 		do {
 			targ = G_Find( NULL, FOFS( targetname ), sArg );
-			if ( targ->use )
+			if ( targ->use ) {
 				targ->use( targ, ent, ent );
+			}
 		} while ( targ );
+	}
+	else {
+		trace_t *tr = G_RealTrace( ent, 0.0f );
+		if ( tr->fraction < 1.0f && tr->entityNum > MAX_CLIENTS && tr->entityNum < ENTITYNUM_MAX_NORMAL ) {
+			gentity_t *targ = g_entities + tr->entityNum;
+			if ( targ->use ) {
+				targ->use( targ, ent, ent );
+			}
+		}
 	}
 }
 

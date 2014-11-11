@@ -1,4 +1,6 @@
 
+#include "qcommon/q_shared.h"
+
 #ifdef _GAME //including game headers on cgame is FORBIDDEN ^_^
 #include "g_local.h"
 #endif

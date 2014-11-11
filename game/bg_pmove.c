@@ -17,6 +17,9 @@
 #endif
 
 #include "JAPP/jp_promode.h"
+#include "JAPP/jp_cinfo.h"
+#include "JAPP/jp_csflags.h"
+#include "JAPP/jp_ssflags.h"
 
 #define MAX_WEAPON_CHARGE_TIME 5000
 
@@ -1740,8 +1743,9 @@ void PM_GrabWallForJump( int anim ) {
 static qboolean LedgeTrace( trace_t *trace, vector3 *dir, float *lerpup, float *lerpfwd, float *lerpyaw ) {
 	vector3 traceTo, traceFrom, wallangles;
 
-	if ( GetCPD( pm_entSelf, CPD_LEDGEGRAB ) || !GetCInfo( CINFO_LEDGEGRAB ) )
+	if ( GetCPD( pm_entSelf, CPD_LEDGEGRAB ) || !GetCInfo( CINFO_LEDGEGRAB ) ) {
 		return qfalse;
+	}
 
 	VectorMA( &pm->ps->origin, LEDGEGRABDISTANCE, dir, &traceTo );
 	VectorCopy( &pm->ps->origin, &traceFrom );
@@ -5797,7 +5801,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 
 		case WP_ROCKET_LAUNCHER:
 			if ( (pm->cmd.buttons & BUTTON_ALT_ATTACK)
-				&& pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] >= weaponData[pm->ps->weapon].altEnergyPerShot ) {
+				&& pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] >= weaponData[pm->ps->weapon].alt.shotCost ) {
 				PM_RocketLock( 2048, qfalse );
 				charging = qtrue;
 				altFire = qtrue;
@@ -5853,7 +5857,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 				// charge isn't started, so do it now
 				pm->ps->weaponstate = WEAPON_CHARGING_ALT;
 				pm->ps->weaponChargeTime = pm->cmd.serverTime;
-				pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].altChargeSubTime;
+				pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].alt.chargeTime;
 				assert( pm->ps->weapon > WP_NONE );
 				BG_AddPredictableEventToPlayerstate( EV_WEAPON_CHARGE_ALT, pm->ps->weapon, pm->ps );
 			}
@@ -5864,18 +5868,18 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 					goto rest;
 				}
 			}
-			else if ( pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] < (weaponData[pm->ps->weapon].altChargeSub + weaponData[pm->ps->weapon].altEnergyPerShot) ) {
+			else if ( pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] < (weaponData[pm->ps->weapon].alt.charge + weaponData[pm->ps->weapon].alt.shotCost) ) {
 				pm->ps->weaponstate = WEAPON_CHARGING_ALT;
 
 				goto rest;
 			}
-			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].altMaxCharge ) {
+			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].alt.chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
 #ifdef _GAME
 					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
 #endif
-						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].altChargeSub;
-					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].altChargeSubTime;
+						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].alt.charge;
+					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].alt.chargeTime;
 				}
 			}
 		}
@@ -5884,7 +5888,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 				// charge isn't started, so do it now
 				pm->ps->weaponstate = WEAPON_CHARGING;
 				pm->ps->weaponChargeTime = pm->cmd.serverTime;
-				pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].chargeSubTime;
+				pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].chargeTime;
 
 #ifdef _DEBUG
 				//	Com_Printf("Starting charge\n");
@@ -5898,18 +5902,18 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 					goto rest;
 				}
 			}
-			else if ( pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] < (weaponData[pm->ps->weapon].chargeSub + weaponData[pm->ps->weapon].energyPerShot) ) {
+			else if ( pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] < (weaponData[pm->ps->weapon].charge + weaponData[pm->ps->weapon].shotCost) ) {
 				pm->ps->weaponstate = WEAPON_CHARGING;
 
 				goto rest;
 			}
-			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].maxCharge ) {
+			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
 #ifdef _GAME
 					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
 #endif
-						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].chargeSub;
-					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].chargeSubTime;
+						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].charge;
+					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].chargeTime;
 				}
 			}
 		}
@@ -6767,8 +6771,8 @@ static void PM_Weapon( void ) {
 		(pm->ps->weaponTime <= 0 || pm->ps->weaponstate != WEAPON_FIRING) ) {
 		if ( pm->ps->clientNum < MAX_CLIENTS && pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] != -1 ) {
 			// enough energy to fire this weapon?
-			if ( pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] < weaponData[pm->ps->weapon].energyPerShot &&
-				pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] < weaponData[pm->ps->weapon].altEnergyPerShot ) { //the weapon is out of ammo essentially because it cannot fire primary or secondary, so do the switch
+			if ( pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] < weaponData[pm->ps->weapon].shotCost &&
+				pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] < weaponData[pm->ps->weapon].alt.shotCost ) { //the weapon is out of ammo essentially because it cannot fire primary or secondary, so do the switch
 				//regardless of if the player is attacking or not
 				PM_AddEventWithParm( EV_NOAMMO, WP_NUM_WEAPONS + pm->ps->weapon );
 
@@ -7140,9 +7144,9 @@ static void PM_Weapon( void ) {
 	else
 #endif
 	if ( pm->cmd.buttons & BUTTON_ALT_ATTACK )
-		amount = weaponData[pm->ps->weapon].altEnergyPerShot;
+		amount = weaponData[pm->ps->weapon].alt.shotCost;
 	else
-		amount = weaponData[pm->ps->weapon].energyPerShot;
+		amount = weaponData[pm->ps->weapon].shotCost;
 
 	pm->ps->weaponstate = WEAPON_FIRING;
 
@@ -7183,7 +7187,7 @@ static void PM_Weapon( void ) {
 				!pm->ps->m_iVehicleNum ) { //do not fire melee events at all when on vehicle
 				PM_AddEvent( EV_ALT_FIRE );
 			}
-			addTime = weaponData[pm->ps->weapon].altFireTime;
+			addTime = weaponData[pm->ps->weapon].alt.fireTime;
 		}
 	}
 	else {
@@ -7422,10 +7426,10 @@ void PM_AdjustAttackStates( pmove_t *pmove )
 	}
 	// get ammo usage
 	if ( pmove->cmd.buttons & BUTTON_ALT_ATTACK ) {
-		amount = pmove->ps->ammo[weaponData[pmove->ps->weapon].ammoIndex] - weaponData[pmove->ps->weapon].altEnergyPerShot;
+		amount = pmove->ps->ammo[weaponData[pmove->ps->weapon].ammoIndex] - weaponData[pmove->ps->weapon].alt.shotCost;
 	}
 	else {
-		amount = pmove->ps->ammo[weaponData[pmove->ps->weapon].ammoIndex] - weaponData[pmove->ps->weapon].energyPerShot;
+		amount = pmove->ps->ammo[weaponData[pmove->ps->weapon].ammoIndex] - weaponData[pmove->ps->weapon].shotCost;
 	}
 
 	// disruptor alt-fire should toggle the zoom mode, but only bother doing this for the player?
@@ -7495,7 +7499,7 @@ void PM_AdjustAttackStates( pmove_t *pmove )
 			//	just use whatever ammo was selected from above
 			if ( pmove->ps->zoomMode ) {
 				amount = pmove->ps->ammo[weaponData[pmove->ps->weapon].ammoIndex] -
-					weaponData[pmove->ps->weapon].altEnergyPerShot;
+					weaponData[pmove->ps->weapon].alt.shotCost;
 			}
 		}
 		else {

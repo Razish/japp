@@ -1269,7 +1269,7 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 
 		if (ammoType != -1)
 		{
-		dif = ammoData[ammoType].max - activator->client->ps.ammo[ammoType];
+		dif = ammoMax[ammoType].max - activator->client->ps.ammo[ammoType];
 		}
 		else
 		{
@@ -1318,12 +1318,12 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 		self->fly_sound_debounce_time = level.time + 500;
 		self->activator = activator;
 		while ( i < AMMO_MAX ) {
-			add = ammoData[i].max*0.05f;
+			add = ammoMax[i]*0.05f;
 			if ( add < 1 ) {
 				add = 1;
 			}
-			if ( ((activator->client->ps.eFlags & EF_DOUBLE_AMMO) && (activator->client->ps.ammo[i] < ammoData[i].max * 2)) ||
-				(activator->client->ps.ammo[i] < ammoData[i].max) ) {
+			if ( ((activator->client->ps.eFlags & EF_DOUBLE_AMMO) && (activator->client->ps.ammo[i] < ammoMax[i] * 2)) ||
+				(activator->client->ps.ammo[i] < ammoMax[i]) ) {
 				gaveSome = qtrue;
 				if ( level.gametype == GT_SIEGE  && i == AMMO_ROCKETS && activator->client->ps.ammo[i] >= 10 ) { //this stuff is already a freaking mess, so..
 					gaveSome = qfalse;
@@ -1333,16 +1333,16 @@ void ammo_generic_power_converter_use( gentity_t *self, gentity_t *other, gentit
 					activator->client->ps.ammo[i] = 10;
 				}
 				else if ( activator->client->ps.eFlags & EF_DOUBLE_AMMO ) {
-					if ( activator->client->ps.ammo[i] >= ammoData[i].max * 2 ) {	// yuck.
-						activator->client->ps.ammo[i] = ammoData[i].max * 2;
+					if ( activator->client->ps.ammo[i] >= ammoMax[i] * 2 ) {	// yuck.
+						activator->client->ps.ammo[i] = ammoMax[i] * 2;
 					}
 					else {
 						stop = 0;
 					}
 				}
 				else {
-					if ( activator->client->ps.ammo[i] >= ammoData[i].max ) {
-						activator->client->ps.ammo[i] = ammoData[i].max;
+					if ( activator->client->ps.ammo[i] >= ammoMax[i] ) {
+						activator->client->ps.ammo[i] = ammoMax[i];
 					}
 					else {
 						stop = 0;
@@ -1638,14 +1638,14 @@ void ammo_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *act
 		{
 			int i = AMMO_BLASTER;
 			while ( i < AMMO_MAX ) {
-				add = ammoData[i].max*0.1f;
+				add = ammoMax[i] * 0.1f;
 				if ( add < 1 ) {
 					add = 1;
 				}
-				if ( activator->client->ps.ammo[i] < ammoData[i].max ) {
+				if ( activator->client->ps.ammo[i] < ammoMax[i] ) {
 					activator->client->ps.ammo[i] += add;
-					if ( activator->client->ps.ammo[i] > ammoData[i].max ) {
-						activator->client->ps.ammo[i] = ammoData[i].max;
+					if ( activator->client->ps.ammo[i] > ammoMax[i] ) {
+						activator->client->ps.ammo[i] = ammoMax[i];
 					}
 				}
 				i++;
@@ -1682,9 +1682,9 @@ void ammo_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *act
 			self->fly_sound_debounce_time = level.time + 500;
 			self->activator = activator;
 
-			difBlaster = activator->client->ps.ammo[AMMO_BLASTER] - ammoData[AMMO_BLASTER].max;
-			difPowerCell = activator->client->ps.ammo[AMMO_POWERCELL] - ammoData[AMMO_POWERCELL].max;
-			difMetalBolts = activator->client->ps.ammo[AMMO_METAL_BOLTS] - ammoData[AMMO_METAL_BOLTS].max;
+			difBlaster = activator->client->ps.ammo[AMMO_BLASTER] - ammoMax[AMMO_BLASTER];
+			difPowerCell = activator->client->ps.ammo[AMMO_POWERCELL] - ammoMax[AMMO_POWERCELL];
+			difMetalBolts = activator->client->ps.ammo[AMMO_METAL_BOLTS] - ammoMax[AMMO_METAL_BOLTS];
 
 			// Find the highest one
 			highest = difBlaster;
@@ -2509,7 +2509,7 @@ void SP_misc_faller( gentity_t *ent ) {
 
 //MAX_TAG_OWNERS is 16 for now in order to not use too much VM memory.
 //Each tag owner has preallocated space for tags up to MAX_TAGS.
-//As is this means 16*256 sizeof(reference_tag_t)'s in addition to name+inuse*16.
+//As is this means 16*256 sizeof(refTag_t)'s in addition to name+inuse*16.
 #define MAX_TAGS 256
 #define MAX_TAG_OWNERS 16
 
@@ -2518,7 +2518,7 @@ void SP_misc_faller( gentity_t *ent ) {
 
 typedef struct tagOwner_s {
 	char			name[MAX_REFNAME];
-	reference_tag_t	tags[MAX_TAGS];
+	refTag_t	tags[MAX_TAGS];
 	qboolean		inuse;
 } tagOwner_t;
 
@@ -2538,7 +2538,7 @@ tagOwner_t *FirstFreeTagOwner( void ) {
 	return NULL;
 }
 
-reference_tag_t *FirstFreeRefTag( tagOwner_t *tagOwner ) {
+refTag_t *FirstFreeRefTag( tagOwner_t *tagOwner ) {
 	int i = 0;
 
 	assert( tagOwner );
@@ -2599,7 +2599,7 @@ TAG_Find
 -------------------------
 */
 
-reference_tag_t	*TAG_Find( const char *owner, const char *name ) {
+refTag_t	*TAG_Find( const char *owner, const char *name ) {
 	tagOwner_t	*tagOwner = NULL;
 	int i = 0;
 
@@ -2650,8 +2650,8 @@ TAG_Add
 -------------------------
 */
 
-reference_tag_t	*TAG_Add( const char *name, const char *owner, vector3 *origin, vector3 *angles, int radius, uint32_t flags ) {
-	reference_tag_t	*tag = NULL;
+refTag_t	*TAG_Add( const char *name, const char *owner, vector3 *origin, vector3 *angles, int radius, uint32_t flags ) {
+	refTag_t	*tag = NULL;
 	tagOwner_t	*tagOwner = NULL;
 
 	//Make sure this tag's name isn't alread in use
@@ -2720,7 +2720,7 @@ TAG_GetOrigin
 */
 
 int	TAG_GetOrigin( const char *owner, const char *name, vector3 *origin ) {
-	reference_tag_t	*tag = TAG_Find( owner, name );
+	refTag_t	*tag = TAG_Find( owner, name );
 
 	if ( !tag ) {
 		VectorClear( origin );
@@ -2740,7 +2740,7 @@ Had to get rid of that damn assert for dev
 */
 
 int	TAG_GetOrigin2( const char *owner, const char *name, vector3 *origin ) {
-	reference_tag_t	*tag = TAG_Find( owner, name );
+	refTag_t	*tag = TAG_Find( owner, name );
 
 	if ( tag == NULL ) {
 		return 0;
@@ -2757,7 +2757,7 @@ TAG_GetAngles
 */
 
 int	TAG_GetAngles( const char *owner, const char *name, vector3 *angles ) {
-	reference_tag_t	*tag = TAG_Find( owner, name );
+	refTag_t	*tag = TAG_Find( owner, name );
 
 	if ( !tag ) {
 		assert( 0 );
@@ -2776,7 +2776,7 @@ TAG_GetRadius
 */
 
 int TAG_GetRadius( const char *owner, const char *name ) {
-	reference_tag_t	*tag = TAG_Find( owner, name );
+	refTag_t	*tag = TAG_Find( owner, name );
 
 	if ( !tag ) {
 		assert( 0 );
@@ -2793,7 +2793,7 @@ TAG_GetFlags
 */
 
 uint32_t TAG_GetFlags( const char *owner, const char *name ) {
-	reference_tag_t	*tag = TAG_Find( owner, name );
+	refTag_t	*tag = TAG_Find( owner, name );
 
 	if ( !tag ) {
 		assert( 0 );

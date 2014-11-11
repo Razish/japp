@@ -868,10 +868,10 @@ void G_UseDispenserOn( gentity_t *ent, int dispType, gentity_t *target ) {
 	else if ( dispType == HI_AMMODISP ) {
 		if ( ent->client->medSupplyDebounce < level.time ) {
 			//do the next increment based on the amount of ammo used per normal shot.
-			target->client->ps.ammo[weaponData[target->client->ps.weapon].ammoIndex] += weaponData[target->client->ps.weapon].energyPerShot;
+			target->client->ps.ammo[weaponData[target->client->ps.weapon].ammoIndex] += weaponData[target->client->ps.weapon].shotCost;
 
-			if ( target->client->ps.ammo[weaponData[target->client->ps.weapon].ammoIndex] > ammoData[weaponData[target->client->ps.weapon].ammoIndex].max )
-				target->client->ps.ammo[weaponData[target->client->ps.weapon].ammoIndex] = ammoData[weaponData[target->client->ps.weapon].ammoIndex].max;
+			if ( target->client->ps.ammo[weaponData[target->client->ps.weapon].ammoIndex] > ammoMax[weaponData[target->client->ps.weapon].ammoIndex] )
+				target->client->ps.ammo[weaponData[target->client->ps.weapon].ammoIndex] = ammoMax[weaponData[target->client->ps.weapon].ammoIndex];
 
 			// base the next supply time on how long the weapon takes to fire. Seems fair enough.
 			ent->client->medSupplyDebounce = level.time + weaponData[target->client->ps.weapon].fireTime;
@@ -893,11 +893,14 @@ int G_CanUseDispOn( gentity_t *ent, int dispType ) {
 		return 0;
 	}
 	else if ( dispType == HI_AMMODISP ) {
-		if ( ent->client->ps.weapon <= WP_NONE || ent->client->ps.weapon > LAST_USEABLE_WEAPON )
+		ammo_t ammoIndex = weaponData[ent->client->ps.weapon].ammoIndex;
+		if ( ent->client->ps.weapon <= WP_NONE || ent->client->ps.weapon > LAST_USEABLE_WEAPON ) {
 			return 0;
+		}
 
-		if ( ent->client->ps.ammo[weaponData[ent->client->ps.weapon].ammoIndex] < ammoData[weaponData[ent->client->ps.weapon].ammoIndex].max )
+		if ( ent->client->ps.ammo[ammoIndex] < ammoMax[ammoIndex] ) {
 			return 1;
+		}
 
 		// needs none
 		return 0;

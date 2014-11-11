@@ -12,6 +12,7 @@
 #elif defined( _CGAME )
 #include "cg_local.h"
 #endif
+#include "JAPP/jp_cinfo.h"
 
 #ifdef _GAME
 extern void Q3_SetParm( int entID, int parmNum, const char *parmValue );
@@ -1121,7 +1122,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		}
 		else if ( BG_AlwaysPickupWeapons() || (item->giTag == WP_THERMAL || item->giTag == WP_TRIP_MINE || item->giTag == WP_DET_PACK) ) { //check to see if full on ammo for this, if so, then..
 			int ammoIndex = weaponData[item->giTag].ammoIndex;
-			if ( ps->ammo[ammoIndex] >= ammoData[ammoIndex].max && (ps->stats[STAT_WEAPONS] & (1 << item->giTag)) ) { //don't need it
+			if ( ps->ammo[ammoIndex] >= ammoMax[ammoIndex] && (ps->stats[STAT_WEAPONS] & (1 << item->giTag)) ) { //don't need it
 				return qfalse;
 			}
 		}
@@ -1131,7 +1132,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		if ( item->giTag == -1 ) { //special case for "all ammo" packs
 			return qtrue;
 		}
-		if ( ps->ammo[item->giTag] >= ammoData[item->giTag].max ) {
+		if ( ps->ammo[item->giTag] >= ammoMax[item->giTag] ) {
 			return qfalse;		// can't hold any more
 		}
 		return qtrue;

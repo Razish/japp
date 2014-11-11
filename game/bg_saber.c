@@ -2,6 +2,8 @@
 #include "bg_public.h"
 #include "bg_local.h"
 #include "w_saber.h"
+#include "JAPP/jp_cinfo.h"
+#include "JAPP/jp_csflags.h"
 
 #ifdef _GAME
 #include "g_local.h"

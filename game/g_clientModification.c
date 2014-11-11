@@ -1,4 +1,5 @@
 #include "g_local.h"
+#include "JAPP/jp_csflags.h"
 
 qboolean Client_Supports( const gentity_t *ent, uint32_t supportFlag ) {
 	return !!(ent->client->pers.CSF & supportFlag);

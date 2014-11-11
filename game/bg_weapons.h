@@ -1,9 +1,5 @@
 #pragma once
 
-// Filename:-	bg_weapons.h
-//
-// This crosses both client and server.  It could all be crammed into bg_public, but isolation of this type of data is best.
-
 typedef enum weapon_e {
 	WP_NONE = 0,
 	WP_STUN_BATON,
@@ -26,10 +22,13 @@ typedef enum weapon_e {
 	WP_TURRET,
 	WP_NUM_WEAPONS
 } weapon_t;
+weapon_t BG_FindWeapon( const char *name );
 
 #define FIRST_WEAPON		(WP_BRYAR_PISTOL) // this is the first weapon for next and prev weapon switching
 #define LAST_USEABLE_WEAPON (WP_BRYAR_OLD) // anything > this will be considered not player useable
 #define MAX_PLAYER_WEAPONS	(WP_NUM_WEAPONS-1) // this is the max you can switch to and get with the give all.
+
+extern const vector3 WP_MuzzlePoint[WP_NUM_WEAPONS];
 
 typedef enum ammo_e {
 	AMMO_NONE = 0,
@@ -46,31 +45,21 @@ typedef enum ammo_e {
 } ammo_t;
 
 typedef struct weaponData_s {
-	char	longName[32];		// Spawning name
-
-	int		ammoIndex;			// Index to proper ammo slot
-	int		ammoLow;			// Count when ammo is low
-
-	int		energyPerShot;		// Amount of energy used per shot
-	int		fireTime;			// Amount of time between firings
-	int		range;				// Range of weapon
-
-	int		altEnergyPerShot;	// Amount of energy used for alt-fire
-	int		altFireTime;		// Amount of time between alt-firings
-	int		altRange;			// Range of alt-fire
-
-	int		chargeSubTime;		// ms interval for subtracting ammo during charge
-	int		altChargeSubTime;	// above for secondary
-
-	int		chargeSub;			// amount to subtract during charge on each interval
-	int		altChargeSub;		// above for secondary
-
-	int		maxCharge;			// stop subtracting once charged for this many ms
-	int		altMaxCharge;		// above for secondary
+	const char *longName; // spawning name
+	ammo_t ammoIndex; // index to proper ammo slot
+	int ammoLow; // count when ammo is low
+	int shotCost; // amount of energy used per shot
+	int fireTime; // amount of time between firings
+	int charge;
+	int chargeMax;
+	int chargeTime;
+	struct {
+		int shotCost;
+		int fireTime;
+		int charge;
+		int chargeMax;
+		int chargeTime;
+	} alt;
 } weaponData_t;
-extern weaponData_t weaponData[WP_NUM_WEAPONS];
-
-typedef struct ammoData_s {
-	int		max;				// Max amount player can hold of ammo
-} ammoData_t;
-extern ammoData_t ammoData[AMMO_MAX];
+extern const weaponData_t weaponData[WP_NUM_WEAPONS];
+extern const int ammoMax[AMMO_MAX];

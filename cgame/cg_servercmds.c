@@ -6,6 +6,8 @@
 #include "bg_luaevent.h"
 #include "cg_media.h"
 #include "JAPP/jp_promode.h"
+#include "JAPP/jp_ssflags.h"
+#include "JAPP/jp_cinfo.h"
 
 static int GetScoreOffset( void ) {
 	return Server_Supports( SSF_SCOREBOARD_KD ) ? 15 : 14;

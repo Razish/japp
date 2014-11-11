@@ -20,6 +20,7 @@ USER INTERFACE MAIN
 #include "JAPP/jp_tokenparser.h"
 #endif
 #include "JAPP/jp_crash.h"
+#include "JAPP/jp_csflags.h"
 
 extern void UI_SaberAttachToChar( itemDef_t *item );
 
@@ -8510,8 +8511,9 @@ void UI_Init( qboolean inGameLoad ) {
 	UI_RegisterCvars();
 	UI_InitMemory();
 
-	if ( japp_crashHandler.integer )
+	if ( japp_crashHandler.integer ) {
 		ActivateCrashHandler();
+	}
 
 	// Register identifier and support flags this way to ensure validity
 	trap->Cvar_Register( NULL, "csf", va( "%X", JAPP_CLIENT_FLAGS ), CVAR_USERINFO | CVAR_ROM );

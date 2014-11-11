@@ -4,6 +4,8 @@
 #include "g_local.h"
 #include "bg_saga.h"
 #include "bg_local.h"
+#include "JAPP/jp_csflags.h"
+
 extern void Jedi_Cloak( gentity_t *self );
 extern void Jedi_Decloak( gentity_t *self );
 
@@ -2772,8 +2774,9 @@ void ClientThink_real( gentity_t *ent ) {
 			Cmd_ToggleSaber_f( ent );
 			break;
 		case GENCMD_ENGAGE_DUEL:
-			if ( level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL )
+			if ( level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL ) {
 				Cmd_EngageDuel_f( ent );
+			}
 			break;
 		case GENCMD_FORCE_HEAL:
 			ForceHeal( ent );

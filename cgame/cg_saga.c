@@ -698,7 +698,7 @@ void CG_ParseSiegeExtendedDataEntry( const char *conStr ) {
 
 	cent = &cg_entities[clNum];
 
-	maxAmmo = ammoData[weaponData[cent->currentState.weapon].ammoIndex].max;
+	maxAmmo = ammoMax[weaponData[cent->currentState.weapon].ammoIndex];
 	if ( (cent->currentState.eFlags & EF_DOUBLE_AMMO) )
 		maxAmmo *= 2.0f;
 

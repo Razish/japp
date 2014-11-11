@@ -9,6 +9,7 @@
 #include "ui/ui_public.h"
 #include "bg_luaevent.h"
 #include "cg_media.h"
+#include "JAPP/jp_ssflags.h"
 
 extern float CG_RadiusForCent( centity_t *cent );
 qboolean CG_CalcMuzzlePoint( int entityNum, vector3 *muzzle );
@@ -293,10 +294,14 @@ static void CG_DrawZoomMask( void ) {
 		//max = ( cg_entities[0].gent->health / 100.0f );
 
 
-		if ( (cg.snap->ps.eFlags & EF_DOUBLE_AMMO) )
-			max = cg.snap->ps.ammo[weaponData[WP_DISRUPTOR].ammoIndex] / ((float)ammoData[weaponData[WP_DISRUPTOR].ammoIndex].max*2.0f);
-		else
-			max = cg.snap->ps.ammo[weaponData[WP_DISRUPTOR].ammoIndex] / (float)ammoData[weaponData[WP_DISRUPTOR].ammoIndex].max;
+		if ( (cg.snap->ps.eFlags & EF_DOUBLE_AMMO) ) {
+			ammo_t ammoIndex = weaponData[WP_DISRUPTOR].ammoIndex;
+			max = cg.snap->ps.ammo[ammoIndex] / ((float)ammoMax[ammoIndex] * 2.0f);
+		}
+		else {
+			ammo_t ammoIndex = weaponData[WP_DISRUPTOR].ammoIndex;
+			max = cg.snap->ps.ammo[ammoIndex] / (float)ammoMax[ammoIndex];
+		}
 		if ( max > 1.0f )
 			max = 1.0f;
 
@@ -792,39 +797,33 @@ static void CG_DrawAmmo( centity_t	*cent, menuDef_t *menuHUD ) {
 
 	trap->R_SetColor( &colorTable[CT_WHITE] );
 
-	if ( weaponData[cent->currentState.weapon].energyPerShot == 0 &&
-		weaponData[cent->currentState.weapon].altEnergyPerShot == 0 ) { //just draw "infinite"
+	if ( weaponData[cent->currentState.weapon].shotCost == 0 &&
+		weaponData[cent->currentState.weapon].alt.shotCost == 0 ) { //just draw "infinite"
 		inc = 8 / MAX_HUD_TICS;
 		value = 8;
 
 		focusItem = Menu_FindItemByName( menuHUD, "ammoinfinite" );
 		trap->R_SetColor( &colorTable[CT_WHITE] );
 		if ( focusItem ) {
-			UI_DrawProportionalString( focusItem->window.rect.x, focusItem->window.rect.y, "--", NUM_FONT_SMALL, &focusItem->window.foreColor );
+			UI_DrawProportionalString( focusItem->window.rect.x, focusItem->window.rect.y, "--", NUM_FONT_SMALL,
+				&focusItem->window.foreColor );
 		}
 	}
 	else {
 		focusItem = Menu_FindItemByName( menuHUD, "ammoamount" );
 		trap->R_SetColor( &colorTable[CT_WHITE] );
 		if ( focusItem ) {
-
+			ammo_t ammoIndex = weaponData[cent->currentState.weapon].ammoIndex;
 			if ( (cent->currentState.eFlags & EF_DOUBLE_AMMO) ) {
-				inc = (float)(ammoData[weaponData[cent->currentState.weapon].ammoIndex].max*2.0f) / MAX_HUD_TICS;
+				inc = (float)(ammoMax[ammoIndex] * 2.0f) / MAX_HUD_TICS;
 			}
 			else {
-				inc = (float)ammoData[weaponData[cent->currentState.weapon].ammoIndex].max / MAX_HUD_TICS;
+				inc = (float)ammoMax[ammoIndex] / MAX_HUD_TICS;
 			}
-			value = ps->ammo[weaponData[cent->currentState.weapon].ammoIndex];
+			value = ps->ammo[ammoIndex];
 
-			CG_DrawNumField(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				3,
-				value,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				NUM_FONT_SMALL,
-				qfalse );
+			CG_DrawNumField( focusItem->window.rect.x, focusItem->window.rect.y, 3, value, focusItem->window.rect.w,
+				focusItem->window.rect.h, NUM_FONT_SMALL, qfalse );
 		}
 	}
 
@@ -3426,8 +3425,9 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 		return y; // Not on any team
 	}
 
-	if ( !Server_Supports( SSF_SPECTINFO ) && CG_IsSpectating() )
+	if ( !Server_Supports( SSF_SPECTINFO ) && CG_IsSpectating() ) {
 		return y; //Raz: following in spec, not valid info provided
+	}
 
 	plyrs = 0;
 
@@ -4099,7 +4099,7 @@ void CG_DrawSiegeInfo( centity_t *cent, float chX, float chY, float chW, float c
 	float x;
 	float y;
 	float percent;
-	int ammoMax;
+	int maxAmmo;
 
 	assert( cent->currentState.number < MAX_CLIENTS );
 
@@ -4168,20 +4168,20 @@ void CG_DrawSiegeInfo( centity_t *cent, float chX, float chY, float chW, float c
 
 
 	//now draw his ammo
-	ammoMax = ammoData[weaponData[cent->currentState.weapon].ammoIndex].max;
+	maxAmmo = ammoMax[weaponData[cent->currentState.weapon].ammoIndex];
 	if ( (cent->currentState.eFlags & EF_DOUBLE_AMMO) ) {
-		ammoMax *= 2;
+		maxAmmo *= 2;
 	}
 
 	x = chX + ((chW / 2) - (HEALTH_WIDTH / 2));
 	y = (chY + chH) + HEALTH_HEIGHT + 10.0f;
 
-	if ( !weaponData[cent->currentState.weapon].energyPerShot &&
-		!weaponData[cent->currentState.weapon].altEnergyPerShot ) { //a weapon that takes no ammo, so show full
+	if ( !weaponData[cent->currentState.weapon].shotCost &&
+		!weaponData[cent->currentState.weapon].alt.shotCost ) { //a weapon that takes no ammo, so show full
 		percent = HEALTH_WIDTH;
 	}
 	else {
-		percent = ((float)se->ammo / (float)ammoMax)*HEALTH_WIDTH;
+		percent = ((float)se->ammo / (float)maxAmmo)*HEALTH_WIDTH;
 	}
 
 	//color of the bar

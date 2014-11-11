@@ -5,8 +5,8 @@
 #define CSF_SCOREBOARD_KD		(0x00000004u) // Can correctly parse scoreboard messages with extra K/D information
 #define CSF_CHAT_FILTERS		(0x00000008u) // Can correctly parse chat messages with proper delimiters
 #define CSF_FIXED_WEAPON_ANIMS	(0x00000010u) // Fixes the missing concussion rifle animations
-#define CSF_NUM					(5)
-#define CSF_UNUSED6				(0x00000020u)
+#define CSF_WEAPONDUEL			(0x00000020u)
+#define CSF_NUM					(6)
 #define CSF_UNUSED7				(0x00000040u)
 #define CSF_UNUSED8				(0x00000080u)
 #define CSF_UNUSED9				(0x00000100u)
@@ -33,6 +33,9 @@
 #define CSF_UNUSED30			(0x20000000u)
 #define CSF_UNUSED31			(0x40000000u)
 #define CSF_UNUSED32			(0x80000000u)
+
+#define JAPP_CLIENT_FLAGS		(CSF_GRAPPLE_SWING|CSF_SCOREBOARD_LARGE|CSF_SCOREBOARD_KD|CSF_CHAT_FILTERS|CSF_FIXED_WEAPON_ANIMS)
+#define JAPLUS_CLIENT_FLAGS 	(CSF_GRAPPLE_SWING|CSF_SCOREBOARD_KD)
 
 #define CPD_NEWDRAINEFX			(0x00000001u) //RAZTODO
 #define CPD_DUELSEEOTHERS		(0x00000002u)

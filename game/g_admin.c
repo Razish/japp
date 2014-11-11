@@ -2111,7 +2111,7 @@ static void AM_Merc( gentity_t *ent ) {
 			G_PrintClient( targetClient ) );
 		targ->client->ps.stats[STAT_WEAPONS] = ((1 << LAST_USEABLE_WEAPON) - 1) & ~1;
 		for ( i = 0; i < AMMO_MAX; i++ ) {
-			targ->client->ps.ammo[i] = ammoData[i].max;
+			targ->client->ps.ammo[i] = ammoMax[i];
 		}
 	}
 	// back to spawn weapons, select first usable weapon

@@ -172,9 +172,10 @@ static void CG_CopyNames_f( void ) {
 
 static void CG_ShowPlayerID_f( void ) {
 	int i;
-	for ( i = 0; i < MAX_CLIENTS; i++ ) {
-		if ( cgs.clientinfo[i].infoValid )
-			Com_Printf( S_COLOR_WHITE"("S_COLOR_CYAN"%i"S_COLOR_WHITE") %s\n", i, cgs.clientinfo[i].name );
+	for ( i = 0; i < cgs.maxclients; i++ ) {
+		if ( cgs.clientinfo[i].infoValid ) {
+			Com_Printf( S_COLOR_WHITE "(" S_COLOR_CYAN "%i" S_COLOR_WHITE ") %s\n", i, cgs.clientinfo[i].name );
+		}
 	}
 }
 

@@ -225,8 +225,6 @@ typedef enum gametype_e {
 
 typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
-extern vector3 WP_MuzzlePoint[WP_NUM_WEAPONS];
-
 extern const int forcePowerSorted[NUM_FORCE_POWERS];
 
 typedef enum saberLock_e {

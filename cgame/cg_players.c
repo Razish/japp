@@ -8,6 +8,8 @@
 #include "bg_luaevent.h"
 #include "cg_media.h"
 #include "bg_vehicles.h"
+#include "JAPP/jp_csflags.h"
+#include "JAPP/jp_ssflags.h"
 
 extern int cgSiegeTeam1PlShader;
 extern int cgSiegeTeam2PlShader;
@@ -3788,8 +3790,9 @@ void ParseRGBSaber( const char *str, vector3 *c ) {
 }
 
 static void CG_RGBForSaberColor( saber_colors_t color, vector3 *rgb, int cnum, int bnum ) {
-	if ( color == SABER_BLACK && (cp_pluginDisable.integer & CPD_BLACKSABERSDISABLE) )
+	if ( color == SABER_BLACK && (cp_pluginDisable.integer & CPD_BLACKSABERSDISABLE) ) {
 		color = SABER_ORANGE;
+	}
 	switch ( color ) {
 	case SABER_RED:
 		VectorSet( rgb, 1.0f, 0.2f, 0.2f );
