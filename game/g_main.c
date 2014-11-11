@@ -364,6 +364,9 @@ static int G_AddBox( const vector3 *mins, const vector3 *maxs ) {
 	int xylen = min( min( 510, maxs->x - mins->x ), maxs->y - mins->y );
 	int zlen = min( 444, maxs->z - mins->z );
 	int count = 0;
+	// only even numbers can be predicted correctly
+	xylen &= -2;
+	zlen &= -2;
 
 	singleMins.x = mins->x;
 	while ( 1 ) {
