@@ -2,24 +2,8 @@
 #include "b_local.h"
 #include "ICARUS/Q3_Interface.h"
 
-/*
-void NPC_AngerSound (void)
-{
-if(NPCInfo->investigateSoundDebounceTime)
-return;
+void G_SpeechEvent( gentity_t *self, int event );
 
-NPCInfo->investigateSoundDebounceTime = 1;
-
-//	switch((int)NPC->client->race)
-//	{
-//	case RACE_KLINGON:
-//G_Sound(NPC, G_SoundIndex(va("sound/mgtest/klingon/talk%d.wav",	Q_irand(1, 4))));
-//		break;
-//	}
-}
-*/
-
-extern void G_SpeechEvent( gentity_t *self, int event );
 void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime ) {
 	if ( !self->NPC ) {
 		return;

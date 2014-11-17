@@ -34,12 +34,6 @@ int WP_SetSaberModel( gclient_t *client, class_t npcClass ) {
 	return 1;
 }
 
-/*
--------------------------
-NPC_PainFunc
--------------------------
-*/
-
 PAIN_FUNC *NPC_PainFunc( gentity_t *ent ) {
 	PAIN_FUNC *func;
 
@@ -124,12 +118,6 @@ PAIN_FUNC *NPC_PainFunc( gentity_t *ent ) {
 	return func;
 }
 
-
-/*
--------------------------
-NPC_TouchFunc
--------------------------
-*/
 typedef void (TOUCH_FUNC)( gentity_t *self, gentity_t *other, trace_t *trace );
 
 TOUCH_FUNC *NPC_TouchFunc( gentity_t *ent ) {
@@ -140,13 +128,8 @@ TOUCH_FUNC *NPC_TouchFunc( gentity_t *ent ) {
 	return func;
 }
 
-/*
--------------------------
-NPC_SetMiscDefaultData
--------------------------
-*/
+void G_CreateG2AttachedWeaponModel( gentity_t *ent, const char *weaponModel, int boltNum, int weaponNum );
 
-extern void G_CreateG2AttachedWeaponModel( gentity_t *ent, const char *weaponModel, int boltNum, int weaponNum );
 void NPC_SetMiscDefaultData( gentity_t *ent ) {
 	if ( ent->spawnflags & SFB_CINEMATIC ) {//if a cinematic guy, default us to wait bState
 		ent->NPC->behaviorState = BS_CINEMATIC;
@@ -191,7 +174,6 @@ void NPC_SetMiscDefaultData( gentity_t *ent ) {
 	if ( !Q_stricmp( "emperor", ent->NPC_type ) ) {//FIXME: extern this into NPC.cfg?
 		ent->NPC->scriptFlags |= SCF_DONT_FIRE;//so he uses only force powers
 	}
-	//==================
 	//	if ( ent->client->ps.saber[0].type != SABER_NONE )
 	if ( ent->client->ps.weapon == WP_SABER ) //rwwFIXMEFIXME: is this going to work?
 	{//if I'm equipped with a saber, initialize it (them)
@@ -399,12 +381,6 @@ void NPC_SetMiscDefaultData( gentity_t *ent ) {
 	}
 }
 
-/*
--------------------------
-NPC_WeaponsForTeam
--------------------------
-*/
-
 int NPC_WeaponsForTeam( team_t team, int spawnflags, const char *NPC_type ) {
 	//*** not sure how to handle this, should I pass in class instead of team and go from there? - dmv
 	switch ( team ) {
@@ -606,13 +582,7 @@ int NPC_WeaponsForTeam( team_t team, int spawnflags, const char *NPC_type ) {
 	return WP_NONE;
 }
 
-extern void ChangeWeapon( gentity_t *ent, int newWeapon );
-
-/*
--------------------------
-NPC_SetWeapons
--------------------------
-*/
+void ChangeWeapon( gentity_t *ent, int newWeapon );
 
 void NPC_SetWeapons( gentity_t *ent ) {
 	int			bestWeap = WP_NONE;
@@ -647,35 +617,18 @@ void NPC_SetWeapons( gentity_t *ent ) {
 	ent->client->ps.weapon = bestWeap;
 }
 
-/*
--------------------------
-NPC_SpawnEffect
-
-NOTE:  Make sure any effects called here have their models, tga's and sounds precached in
-CG_RegisterNPCEffects in cg_player.cpp
--------------------------
-*/
-
+// NOTE: Make sure any effects called here have their models, tga's and sounds precached in CG_RegisterNPCEffects in
+//	cg_player.cpp
 void NPC_SpawnEffect( gentity_t *ent ) {
 }
 
-//--------------------------------------------------------------
-// NPC_SetFX_SpawnStates
-//
 // Set up any special parms for spawn effects
-//--------------------------------------------------------------
 void NPC_SetFX_SpawnStates( gentity_t *ent ) {
 	if ( !(ent->NPC->aiFlags&NPCAI_CUSTOM_GRAVITY) ) {
 		ent->client->ps.gravity = g_gravity.value;
 	}
 }
 
-/*
-================
-NPC_SpotWouldTelefrag
-
-================
-*/
 qboolean NPC_SpotWouldTelefrag( gentity_t *npc ) {
 	int			i, num;
 	int			touch[MAX_GENTITIES];
@@ -703,7 +656,6 @@ qboolean NPC_SpotWouldTelefrag( gentity_t *npc ) {
 	return qfalse;
 }
 
-//--------------------------------------------------------------
 void NPC_Begin( gentity_t *ent ) {
 	vector3	spawn_origin, spawn_angles;
 	gclient_t	*client;
@@ -1090,54 +1042,6 @@ gNPC_t *New_NPC_t( int entNum ) {
 	return ptr;
 }
 
-/*
--------------------------
-NPC_StasisSpawn_Go
--------------------------
-*/
-/*
-qboolean NPC_StasisSpawn_Go( gentity_t *ent )
-{
-//Setup an owner pointer if we need it
-if VALIDSTRING( ent->ownername )
-{
-ent->parent = G_Find( NULL, FOFS( targetname ), ent->ownername );
-
-if ( ( ent->parent ) && ( ent->parent->health <= 0 ) )
-{//our spawner thing is broken
-if ( ent->target2 && ent->target2[0] )
-{
-//Fire off our target2
-G_UseTargets2( ent, ent, ent->target2 );
-
-//Kill us
-ent->e_ThinkFunc = thinkF_G_FreeEntity;
-ent->nextthink = level.time + 100;
-}
-else
-{
-//Try to spawn again in one second
-ent->e_ThinkFunc = thinkF_NPC_Spawn_Go;
-ent->nextthink = level.time + 1000;
-}
-return qfalse;
-}
-}
-
-//Test for an entity blocking the spawn
-trace_t	tr;
-trap->Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, ent->s.number, MASK_NPCSOLID, qfalse, 0, 0 );
-
-//Can't have anything in the way
-if ( tr.allsolid || tr.startsolid )
-{
-ent->nextthink = level.time + 1000;
-return qfalse;
-}
-
-return qtrue;
-}
-*/
 void NPC_DefaultScriptFlags( gentity_t *ent ) {
 	if ( !ent || !ent->NPC ) {
 		return;
@@ -1145,15 +1049,11 @@ void NPC_DefaultScriptFlags( gentity_t *ent ) {
 	//Set up default script flags
 	ent->NPC->scriptFlags = (SCF_CHASE_ENEMIES | SCF_LOOK_FOR_ENEMIES);
 }
-/*
--------------------------
-NPC_Spawn_Go
--------------------------
-*/
-extern void G_CreateAnimalNPC( Vehicle_t **pVeh, const char *strAnimalType );
-extern void G_CreateSpeederNPC( Vehicle_t **pVeh, const char *strType );
-extern void G_CreateWalkerNPC( Vehicle_t **pVeh, const char *strAnimalType );
-extern void G_CreateFighterNPC( Vehicle_t **pVeh, const char *strType );
+
+void G_CreateAnimalNPC( Vehicle_t **pVeh, const char *strAnimalType );
+void G_CreateSpeederNPC( Vehicle_t **pVeh, const char *strType );
+void G_CreateWalkerNPC( Vehicle_t **pVeh, const char *strAnimalType );
+void G_CreateFighterNPC( Vehicle_t **pVeh, const char *strType );
 
 gentity_t *NPC_Spawn_Do( gentity_t *ent ) {
 	gentity_t	*newent = NULL;
@@ -1238,7 +1138,7 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent ) {
 	//Assign the pointer for bg entity access
 	newent->playerState = &newent->client->ps;
 
-	//==NPC_Connect( newent, net_name );===================================
+	//NPC_Connect( newent, net_name );
 
 	if ( ent->NPC_type == NULL ) {
 		ent->NPC_type = "random";
@@ -1384,7 +1284,6 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent ) {
 			//		newent->r.svFlags |= SVF_NOPUSH;
 		}
 	}
-	//=====================================================================
 	//set the info we want
 	if ( !newent->health ) {
 		newent->health = ent->health;
@@ -1422,7 +1321,6 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent ) {
 		newent->opentarget = ent->opentarget;
 	}
 
-	//==New stuff=====================================================================
 	newent->s.eType = ET_NPC;//ET_PLAYER;
 
 	//FIXME: Call CopyParms
@@ -1510,46 +1408,6 @@ void NPC_Spawn_Go( gentity_t *ent ) {
 	NPC_Spawn_Do( ent );
 }
 
-/*
--------------------------
-NPC_StasisSpawnEffect
--------------------------
-*/
-/*
-void NPC_StasisSpawnEffect( gentity_t *ent )
-{
-vector3		start, end, forward;
-qboolean	taper;
-
-//Floor or wall?
-if ( ent->spawnflags & 1 )
-{
-AngleVectors( ent->s.angles, forward, NULL, NULL );
-VectorMA( ent->r.currentOrigin,  24, forward, end );
-VectorMA( ent->r.currentOrigin, -20, forward, start );
-
-start[2] += 64;
-
-taper = qtrue;
-}
-else
-{
-VectorCopy( ent->r.currentOrigin, start );
-VectorCopy( start, end );
-end[2] += 48;
-taper = qfalse;
-}
-
-//Add the effect
-//	CG_ShimmeryThing_Spawner( start, end, 32, qtrue, 1000 );
-}
-*/
-/*
--------------------------
-NPC_ShySpawn
--------------------------
-*/
-
 #define SHY_THINK_TIME			1000
 #define SHY_SPAWN_DISTANCE		128
 #define SHY_SPAWN_DISTANCE_SQR	( SHY_SPAWN_DISTANCE * SHY_SPAWN_DISTANCE )
@@ -1571,12 +1429,6 @@ void NPC_ShySpawn( gentity_t *ent ) {
 
 	NPC_Spawn_Go( ent );
 }
-
-/*
--------------------------
-NPC_Spawn
--------------------------
-*/
 
 void NPC_Spawn( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	//delay before spawning NPC
@@ -1953,7 +1805,6 @@ void SP_NPC_Vehicle( gentity_t *self ) {
 
 //Characters
 
-//STAR WARS NPCs============================================================================
 /*QUAKED NPC_spawner (1 0 0) (-16 -16 -24) (16 16 32) x x x x DROPTOFLOOR CINEMATIC NOTSOLID STARTINSOLID SHY
 
 CINEMATIC - Will spawn with no default AI (BS_CINEMATIC)
@@ -2023,10 +1874,6 @@ crouch - 22: Crouch-walk toward their goals
 
 delay - after spawned or triggered, how many seconds to wait to spawn the NPC
 */
-
-//=============================================================================================
-//CHARACTERS
-//=============================================================================================
 
 /*QUAKED NPC_Kyle (1 0 0) (-16 -16 -24) (16 16 32) x RIFLEMAN PHASER TRICORDER DROPTOFLOOR CINEMATIC NOTSOLID STARTINSOLID SHY
 CINEMATIC - Will spawn with no default AI (BS_CINEMATIC)
@@ -2453,10 +2300,6 @@ void SP_NPC_MorganKatarn( gentity_t *self ) {
 	SP_NPC_spawner( self );
 }
 
-//=============================================================================================
-//ALLIES
-//=============================================================================================
-
 /*QUAKED NPC_Jedi(1 0 0) (-16 -16 -24) (16 16 40) TRAINER MASTER RANDOM x CEILING CINEMATIC NOTSOLID STARTINSOLID SHY
 TRAINER - Special Jedi- instructor
 MASTER - Special Jedi- master
@@ -2579,10 +2422,6 @@ void SP_NPC_Rebel( gentity_t *self ) {
 
 	SP_NPC_spawner( self );
 }
-
-//=============================================================================================
-//ENEMIES
-//=============================================================================================
 
 /*QUAKED NPC_Human_Merc(1 0 0) (-16 -16 -24) (16 16 40) BOWCASTER REPEATER FLECHETTE CONCUSSION DROPTOFLOOR CINEMATIC NOTSOLID STARTINSOLID SHY
 100 health, blaster rifle
@@ -3072,9 +2911,6 @@ void SP_NPC_ShadowTrooper( gentity_t *self ) {
 
 	SP_NPC_spawner( self );
 }
-//=============================================================================================
-//MONSTERS
-//=============================================================================================
 
 /*QUAKED NPC_Monster_Murjj (1 0 0) (-12 -12 -24) (12 12 40) x x x x DROPTOFLOOR CINEMATIC NOTSOLID STARTINSOLID SHY
 DROPTOFLOOR - NPC can be in air, but will spawn on the closest floor surface below it
@@ -3220,10 +3056,6 @@ void SP_NPC_Monster_Rancor( gentity_t *self ) {
 
 	SP_NPC_spawner( self );
 }
-
-//=============================================================================================
-//DROIDS
-//=============================================================================================
 
 /*QUAKED NPC_Droid_Interrogator (1 0 0) (-12 -12 -24) (12 12 0) x x x x DROPTOFLOOR CINEMATIC NOTSOLID STARTINSOLID SHY
 DROPTOFLOOR - NPC can be in air, but will spawn on the closest floor surface below it

@@ -575,7 +575,6 @@ int PM_SaberMoveQuadrantForMovement( usercmd_t *ucmd ) {
 	}
 }
 
-//===================================================================
 qboolean PM_SaberInBounce( int move ) {
 	if ( move >= LS_B1_BR && move <= LS_B1_BL ) {
 		return qtrue;
@@ -2274,21 +2273,18 @@ qboolean PM_CanDoRollStab( void ) {
 	}
 	return qtrue;
 }
-/*
-=================
-PM_WeaponLightsaber
 
-Consults a chart to choose what to do with the lightsaber.
-While this is a little different than the Quake 3 code, there is no clean way of using the Q3 code for this kind of thing.
-=================
-*/
-// Ultimate goal is to set the sabermove to the proper next location
-// Note that if the resultant animation is NONE, then the animation is essentially "idle", and is set in WP_TorsoAnim
 qboolean PM_WalkingAnim( int anim );
 qboolean PM_SwimmingAnim( int anim );
 int PM_SaberBounceForAttack( int move );
 qboolean BG_SuperBreakLoseAnim( int anim );
 qboolean BG_SuperBreakWinAnim( int anim );
+
+// Consults a chart to choose what to do with the lightsaber.
+// While this is a little different than the Quake 3 code, there is no clean way of using the Q3 code for this kind of
+//	thing.
+// Ultimate goal is to set the sabermove to the proper next location
+// Note that if the resultant animation is NONE, then the animation is essentially "idle", and is set in WP_TorsoAnim
 void PM_WeaponLightsaber( void ) {
 	int			addTime;
 	qboolean	delayed_fire = qfalse;

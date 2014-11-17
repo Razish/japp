@@ -5,13 +5,7 @@
 #include "qcommon/q_shared.h"
 #include "cg_media.h"
 
-/*
-================
-UI_DrawRect
-
-Coordinates are 640*480 virtual values
-=================
-*/
+// Coordinates are 640*480 virtual values
 void CG_DrawRect( float x, float y, float width, float height, float size, const vector4 *color ) {
 	trap->R_SetColor( color );
 
@@ -21,13 +15,6 @@ void CG_DrawRect( float x, float y, float width, float height, float size, const
 	trap->R_SetColor( NULL );
 }
 
-
-
-/*
-=================
-CG_GetColorForHealth
-=================
-*/
 void CG_GetColorForHealth( int health, int armor, vector4 *hcolor ) {
 	int		count;
 	int		max;
@@ -58,13 +45,7 @@ void CG_GetColorForHealth( int health, int armor, vector4 *hcolor ) {
 	else						hcolor->g = (health - 30) / 30.0f;
 }
 
-/*
-================
-CG_DrawSides
-
-Coords are virtual 640x480
-================
-*/
+// Coords are virtual 640x480
 void CG_DrawSides( float x, float y, float w, float h, float size ) {
 	size *= cgs.screenXScale;
 	trap->R_DrawStretchPic( x, y, size, h, 0, 0, 0, 0, media.gfx.world.whiteShader );
@@ -89,13 +70,7 @@ void CG_FillRect2( float x, float y, float width, float height, const vector4 *c
 	trap->R_SetColor( NULL );
 }
 
-/*
-================
-CG_FillRect
-
-Coordinates are 640*480 virtual values
-=================
-*/
+// Coordinates are 640*480 virtual values
 void CG_FillRect( float x, float y, float width, float height, const vector4 *color ) {
 	trap->R_SetColor( color );
 
@@ -104,54 +79,27 @@ void CG_FillRect( float x, float y, float width, float height, const vector4 *co
 	trap->R_SetColor( NULL );
 }
 
-
-/*
-================
-CG_DrawPic
-
-Coordinates are 640*480 virtual values
-A width of 0 will draw with the original image width
-=================
-*/
+// Coordinates are 640*480 virtual values
+// A width of 0 will draw with the original image width
 void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader ) {
-	//	x *= (4.0f/3.0f) / ((float)cgs.glconfig.vidWidth/(float)cgs.glconfig.vidHeight);
-	//	width *= (4.0f/3.0f) / ((float)cgs.glconfig.vidWidth/(float)cgs.glconfig.vidHeight);
 	trap->R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
-/*
-================
-CG_DrawRotatePic
-
-Coordinates are 640*480 virtual values
-A width of 0 will draw with the original image width
-rotates around the upper right corner of the passed in point
-=================
-*/
+// Coordinates are 640*480 virtual values
+// A width of 0 will draw with the original image width
+// rotates around the upper right corner of the passed in point
 void CG_DrawRotatePic( float x, float y, float width, float height, float angle, qhandle_t hShader ) {
 	trap->R_DrawRotatePic( x, y, width, height, 0, 0, 1, 1, angle, hShader );
 }
 
-/*
-================
-CG_DrawRotatePic2
-
-Coordinates are 640*480 virtual values
-A width of 0 will draw with the original image width
-Actually rotates around the center point of the passed in coordinates
-=================
-*/
+// Coordinates are 640*480 virtual values
+// A width of 0 will draw with the original image width
+// Actually rotates around the center point of the passed in coordinates
 void CG_DrawRotatePic2( float x, float y, float width, float height, float angle, qhandle_t hShader ) {
 	trap->R_DrawRotatePic2( x, y, width, height, 0, 0, 1, 1, angle, hShader );
 }
 
-/*
-===============
-CG_DrawChar
-
-Coordinates and size in 640*480 virtual screen size
-===============
-*/
+// Coordinates and size in 640*480 virtual screen size
 void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 	int row, col;
 	float frow, fcol;
@@ -182,17 +130,9 @@ void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 
 }
 
-/*
-==================
-CG_DrawStringExt
-
-Draws a multi-colored string with a drop shadow, optionally forcing
-to a fixed color.
-
-Coordinates are at 640 by 480 virtual resolution
-==================
-*/
 #include "ui/menudef.h"	// for "ITEM_TEXTSTYLE_SHADOWED"
+// Draws a multi-colored string with a drop shadow, optionally forcing to a fixed color.
+// Coordinates are at 640 by 480 virtual resolution
 void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor,
 	qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars ) {
 	if ( trap->R_Language_IsAsian() ) {
@@ -276,13 +216,7 @@ void CG_DrawSmallStringColor( int x, int y, const char *s, const vector4 *color 
 	CG_DrawStringExt( x, y, s, color, qtrue, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 }
 
-/*
-=================
-CG_DrawStrlen
-
-Returns character count, skiping color escape codes
-=================
-*/
+// Returns character count, skiping color escape codes
 int CG_DrawStrlen( const char *str ) {
 	const char *s = str;
 	int count = 0;
@@ -300,14 +234,7 @@ int CG_DrawStrlen( const char *str ) {
 	return count;
 }
 
-/*
-=============
-CG_TileClearBox
-
-This repeats a 64*64 tile graphic to fill the screen around a sized down
-refresh window.
-=============
-*/
+// This repeats a 64*64 tile graphic to fill the screen around a sized down refresh window.
 static void CG_TileClearBox( int x, int y, int w, int h, qhandle_t hShader ) {
 	float	s1, t1, s2, t2;
 
@@ -318,15 +245,7 @@ static void CG_TileClearBox( int x, int y, int w, int h, qhandle_t hShader ) {
 	trap->R_DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
 }
 
-
-
-/*
-==============
-CG_TileClear
-
-Clear around a sized down screen
-==============
-*/
+// Clear around a sized down screen
 void CG_TileClear( void ) {
 	int		top, bottom, left, right;
 	int		w, h;
@@ -358,13 +277,6 @@ void CG_TileClear( void ) {
 	CG_TileClearBox( right, top, w - right, bottom - top + 1, media.gfx.interface.backTile );
 }
 
-
-
-/*
-================
-CG_FadeColor
-================
-*/
 vector4 *CG_FadeColor( int startMsec, int totalMsec ) {
 	static vector4 color;
 	int			t;
@@ -415,11 +327,6 @@ void CG_LerpColour( const vector4 *start, const vector4 *end, vector4 *out, floa
 	out->b = start->b + point*(end->b - start->b);
 }
 
-/*
-=================
-CG_ColorForHealth
-=================
-*/
 void CG_ColorForGivenHealth( vector4 *hcolor, int health ) {
 	// set the color based on health
 	hcolor->r = 1.0f;
@@ -432,11 +339,6 @@ void CG_ColorForGivenHealth( vector4 *hcolor, int health ) {
 	else						hcolor->g = (health - 30) / 30.0f;
 }
 
-/*
-=================
-CG_ColorForHealth
-=================
-*/
 void CG_ColorForHealth( vector4 *hcolor ) {
 	int		health;
 	int		count;
@@ -462,14 +364,7 @@ void CG_ColorForHealth( vector4 *hcolor ) {
 	CG_ColorForGivenHealth( hcolor, health );
 }
 
-/*
-==============
-CG_DrawNumField
-
-Take x,y positions as if 640 x 480 and scales them to the proper resolution
-
-==============
-*/
+// Take x,y positions as if 640 x 480 and scales them to the proper resolution
 void CG_DrawNumField( int x, int y, int width, int value, int charWidth, int charHeight, int style, qboolean zeroFill ) {
 	char	num[16], *ptr;
 	int		l;

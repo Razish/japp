@@ -22,14 +22,12 @@ void Seeker_Strafe( void );
 
 #define SEEKER_SEEK_RADIUS			1024
 
-//------------------------------------
 void NPC_Seeker_Precache( void ) {
 	G_SoundIndex( "sound/chars/seeker/misc/fire.wav" );
 	G_SoundIndex( "sound/chars/seeker/misc/hiss.wav" );
 	G_EffectIndex( "env/small_explode" );
 }
 
-//------------------------------------
 void NPC_Seeker_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	if ( !(self->NPC->aiFlags&NPCAI_CUSTOM_GRAVITY) )
 		G_Damage( self, NULL, NULL, &vec3_origin, &vec3_origin, 999, 0, MOD_FALLING );
@@ -41,7 +39,6 @@ void NPC_Seeker_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	NPC_Pain( self, attacker, damage );
 }
 
-//------------------------------------
 void Seeker_MaintainHeight( void ) {
 	float	dif;
 
@@ -122,7 +119,6 @@ void Seeker_MaintainHeight( void ) {
 	}
 }
 
-//------------------------------------
 void Seeker_Strafe( void ) {
 	int		side;
 	vector3	end, right, dir;
@@ -203,7 +199,6 @@ void Seeker_Strafe( void ) {
 	}
 }
 
-//------------------------------------
 void Seeker_Hunt( qboolean visible, qboolean advance ) {
 	float	distance, speed;
 	vector3	forward;
@@ -244,7 +239,6 @@ void Seeker_Hunt( qboolean visible, qboolean advance ) {
 	VectorMA( &NPC->client->ps.velocity, speed, &forward, &NPC->client->ps.velocity );
 }
 
-//------------------------------------
 void Seeker_Fire( void ) {
 	vector3		dir, enemy_org, muzzle;
 	gentity_t	*missile;
@@ -272,7 +266,6 @@ void Seeker_Fire( void ) {
 	}
 }
 
-//------------------------------------
 void Seeker_Ranged( qboolean visible, qboolean advance ) {
 	if ( NPC->client->NPC_class != CLASS_BOBAFETT ) {
 		if ( NPC->count > 0 ) {
@@ -297,7 +290,6 @@ void Seeker_Ranged( qboolean visible, qboolean advance ) {
 	}
 }
 
-//------------------------------------
 void Seeker_Attack( void ) {
 	float		distance;
 	qboolean	visible;
@@ -326,7 +318,6 @@ void Seeker_Attack( void ) {
 	Seeker_Ranged( visible, advance );
 }
 
-//------------------------------------
 void Seeker_FindEnemy( void ) {
 	int			numFound;
 	float		dis, bestDis = SEEKER_SEEK_RADIUS * SEEKER_SEEK_RADIUS + 1;
@@ -376,7 +367,6 @@ void Seeker_FindEnemy( void ) {
 	}
 }
 
-//------------------------------------
 void Seeker_FollowOwner( void ) {
 	float	dis, minDistSqr;
 	vector3	pt, dir;
@@ -446,7 +436,6 @@ void Seeker_FollowOwner( void ) {
 	NPC_UpdateAngles( qtrue, qtrue );
 }
 
-//------------------------------------
 void NPC_BSSeeker_Default( void ) {
 	/*
 	if ( in_camera )

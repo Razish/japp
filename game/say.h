@@ -1,8 +1,6 @@
-#ifndef __SAY_H__
-#define __SAY_H__
+#pragma once
 
-typedef enum //# saying_e
-{
+typedef enum saying_e {
 	//Acknowledge command
 	SAY_ACKCOMM1,
 	SAY_ACKCOMM2,
@@ -26,5 +24,3 @@ typedef enum //# saying_e
 	//# #eol
 	NUM_SAYINGS
 } saying_t;
-
-#endif //#ifndef __SAY_H__

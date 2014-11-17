@@ -143,12 +143,6 @@ void CG_Text_Paint( float x, float y, float scale, const vector4 *color, const c
 	trap->R_SetColor( NULL );
 }
 
-/*
-================
-CG_DrawZoomMask
-
-================
-*/
 static void CG_DrawZoomMask( void ) {
 	vector4		color1;
 	float		level;
@@ -343,13 +337,6 @@ static void CG_DrawZoomMask( void ) {
 	}
 }
 
-
-/*
-================
-CG_Draw3DModel
-
-================
-*/
 void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, void *ghoul2, int g2radius, qhandle_t skin, vector3 *origin, vector3 *angles ) {
 	refdef_t		refdef;
 	refEntity_t		ent;
@@ -388,13 +375,7 @@ void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, void *
 	trap->R_RenderScene( &refdef );
 }
 
-/*
-================
-CG_DrawHead
-
-Used for both the status bar and the scoreboard
-================
-*/
+// Used for both the status bar and the scoreboard
 void CG_DrawHead( float x, float y, float w, float h, int clientNum, vector3 *headAngles ) {
 	clientInfo_t	*ci;
 
@@ -412,13 +393,7 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vector3 *he
 	}
 }
 
-/*
-================
-CG_DrawFlagModel
-
-Used for both the status bar and the scoreboard
-================
-*/
+// Used for both the status bar and the scoreboard
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D ) {
 	qhandle_t		cm;
 	float			len;
@@ -477,11 +452,6 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean fo
 	}
 }
 
-/*
-================
-CG_DrawHealth
-================
-*/
 void CG_DrawHealth( menuDef_t *menuHUD ) {
 	vector4			calcColor;
 	playerState_t	*ps;
@@ -560,11 +530,6 @@ void CG_DrawHealth( menuDef_t *menuHUD ) {
 
 }
 
-/*
-================
-CG_DrawArmor
-================
-*/
 void CG_DrawArmor( menuDef_t *menuHUD ) {
 	vector4			calcColor;
 	playerState_t	*ps;
@@ -680,14 +645,7 @@ void CG_DrawArmor( menuDef_t *menuHUD ) {
 
 }
 
-/*
-================
-CG_DrawSaberStyle
-
-If the weapon is a light saber (which needs no ammo) then draw a graphic showing
-the saber style (fast, medium, strong)
-================
-*/
+// If the weapon is a light saber (which needs no ammo) then draw a graphic showing the saber style
 static void CG_DrawSaberStyle( centity_t *cent, menuDef_t *menuHUD ) {
 	itemDef_t		*focusItem;
 
@@ -765,11 +723,6 @@ static void CG_DrawSaberStyle( centity_t *cent, menuDef_t *menuHUD ) {
 
 }
 
-/*
-================
-CG_DrawAmmo
-================
-*/
 static void CG_DrawAmmo( centity_t	*cent, menuDef_t *menuHUD ) {
 	playerState_t	*ps;
 	int				i;
@@ -862,11 +815,6 @@ static void CG_DrawAmmo( centity_t	*cent, menuDef_t *menuHUD ) {
 
 }
 
-/*
-================
-CG_DrawForcePower
-================
-*/
 void CG_DrawForcePower( menuDef_t *menuHUD ) {
 	int				i;
 	vector4			calcColor;
@@ -1447,11 +1395,6 @@ qboolean ForcePower_Valid( int i ) {
 	return qfalse;
 }
 
-/*
-===================
-CG_DrawForceSelect
-===================
-*/
 void CG_DrawForceSelect( void ) {
 	int		i;
 	int		count;
@@ -1582,11 +1525,6 @@ void CG_DrawForceSelect( void ) {
 	}
 }
 
-/*
-===================
-CG_DrawInventorySelect
-===================
-*/
 void CG_DrawInvenSelect( void ) {
 	int				i;
 	int				sideMax, holdCount, iconCnt;
@@ -2583,11 +2521,6 @@ static void CG_DrawStats( void ) {
 		CG_DrawHUD( cent );
 }
 
-/*
-===================
-CG_DrawPickupItem
-===================
-*/
 static void CG_DrawPickupItem( void ) {
 	int		value;
 	vector4 *fadeColor;
@@ -2604,12 +2537,6 @@ static void CG_DrawPickupItem( void ) {
 	}
 }
 
-/*
-================
-CG_DrawTeamBackground
-
-================
-*/
 void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team ) {
 	vector4 hcolor;
 
@@ -2635,19 +2562,8 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team ) 
 }
 
 
-/*
-===========================================================================================
+// UPPER RIGHT CORNER
 
-UPPER RIGHT CORNER
-
-===========================================================================================
-*/
-
-/*
-================
-CG_DrawMiniScoreboard
-================
-*/
 static float CG_DrawMiniScoreboard( float y ) {
 	char s[MAX_QPATH];
 
@@ -2670,11 +2586,6 @@ static float CG_DrawMiniScoreboard( float y ) {
 	return y;
 }
 
-/*
-================
-CG_DrawEnemyInfo
-================
-*/
 static float CG_DrawEnemyInfo( float y ) {
 	float		size;
 	int			clientNum;
@@ -2787,11 +2698,6 @@ static float CG_DrawEnemyInfo( float y ) {
 	return y + BIGCHAR_HEIGHT + 2;
 }
 
-/*
-==================
-CG_DrawSnapshot
-==================
-*/
 static float CG_DrawSnapshot( float y ) {
 	const char *s;
 	float w;
@@ -2803,11 +2709,6 @@ static float CG_DrawSnapshot( float y ) {
 	return y + BIGCHAR_HEIGHT + 4;
 }
 
-/*
-==================
-CG_DrawFPS
-==================
-*/
 #define IDEAL_FPS (60.0f)
 #define	FPS_FRAMES (16)
 static float CG_DrawFPS( float y ) {
@@ -2894,11 +2795,6 @@ void CG_DrawDuelistHealth( float x, float y, float w, float h, int duelist ) {
 	CG_DrawHealthBarRough( x, y, w, h, ratio, &duelHealthColor, &colorTable[CT_WHITE] );	// new art for this?  I'm not crazy about how this looks.
 }
 
-/*
-=====================
-CG_DrawRadar
-=====================
-*/
 float	cg_radarRange = 2500.0f;
 
 #define RADAR_RADIUS			60
@@ -3398,12 +3294,6 @@ static float CG_DrawTimer( float y ) {
 	return y + CG_Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer );
 }
 
-
-/*
-=================
-CG_DrawTeamOverlay
-=================
-*/
 static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 	int x, w, h, xx;
 	int i, j, len;
@@ -3628,13 +3518,6 @@ static void CG_DrawPowerupIcons( int y ) {
 	}
 }
 
-
-/*
-=====================
-CG_DrawUpperRight
-
-=====================
-*/
 static void CG_DrawUpperRight( void ) {
 	float y = 0;
 
@@ -3733,14 +3616,6 @@ qboolean CG_DrawMapChange( void ) {
 	return qfalse;
 }
 
-/*
-===============================================================================
-
-LAGOMETER
-
-===============================================================================
-*/
-
 #define	LAG_SAMPLES		128
 
 static struct lagometer_s {
@@ -3751,13 +3626,7 @@ static struct lagometer_s {
 	int		snapshotCount;
 } lagometer;
 
-/*
-==============
-CG_AddLagometerFrameInfo
-
-Adds the current interpolate / extrapolate bar for this frame
-==============
-*/
+// Adds the current interpolate / extrapolate bar for this frame
 void CG_AddLagometerFrameInfo( void ) {
 	int			offset;
 
@@ -3766,16 +3635,8 @@ void CG_AddLagometerFrameInfo( void ) {
 	lagometer.frameCount++;
 }
 
-/*
-==============
-CG_AddLagometerSnapshotInfo
-
-Each time a snapshot is received, log its ping time and
-the number of snapshots that were dropped before it.
-
-Pass NULL for a dropped packet.
-==============
-*/
+// Each time a snapshot is received, log its ping time and the number of snapshots that were dropped before it.
+// Pass NULL for a dropped packet.
 void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
 	// dropped packet
 	if ( !snap ) {
@@ -3790,13 +3651,7 @@ void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
 	lagometer.snapshotCount++;
 }
 
-/*
-==============
-CG_DrawDisconnect
-
-Should we draw something differnet for long lag vs no packets?
-==============
-*/
+// Should we draw something differnet for long lag vs no packets?
 static void CG_DrawDisconnect( void ) {
 	float		x, y, size = 48.0f;
 	int			cmdNum;
@@ -3835,11 +3690,6 @@ static void CG_DrawDisconnect( void ) {
 #define	MAX_LAGOMETER_PING	900
 #define	MAX_LAGOMETER_RANGE	300
 
-/*
-==============
-CG_DrawLagometer
-==============
-*/
 static void CG_DrawLagometer( void ) {
 	int		a, x, y, i;
 	float	v;
@@ -3969,23 +3819,7 @@ void CG_DrawSiegeMessageNonMenu( const char *str ) {
 	CG_CenterPrint( str, SCREEN_HEIGHT * 0.30f, BIGCHAR_WIDTH );
 }
 
-/*
-===============================================================================
-
-CENTER PRINTING
-
-===============================================================================
-*/
-
-
-/*
-==============
-CG_CenterPrint
-
-Called for important messages that should stay in the center of the screen
-for a few moments
-==============
-*/
+// Called for important messages that should stay in the center of the screen for a few moments
 void CG_CenterPrint( const char *str, int y, int charWidth ) {
 	char *s = NULL;
 	int i = 0;
@@ -4017,12 +3851,6 @@ void CG_CenterPrint( const char *str, int y, int charWidth ) {
 	}
 }
 
-
-/*
-===================
-CG_DrawCenterString
-===================
-*/
 static void CG_DrawCenterString( void ) {
 	char	*start;
 	int		l;
@@ -4075,16 +3903,6 @@ static void CG_DrawCenterString( void ) {
 
 	trap->R_SetColor( NULL );
 }
-
-
-
-/*
-================================================================================
-
-CROSSHAIR
-
-================================================================================
-*/
 
 #define HEALTH_WIDTH		50.0f
 #define HEALTH_HEIGHT		5.0f
@@ -4330,12 +4148,6 @@ void CG_DrawGenericTimerBar( void ) {
 	//then draw the other part greyed out
 	CG_FillRect( x + 1.0f, y + 1.0f, CGTIMERBAR_W - 2.0f, CGTIMERBAR_H - percent, &cColor );
 }
-
-/*
-=================
-CG_DrawCrosshair
-=================
-*/
 
 float cg_crosshairPrevPosX = 0;
 float cg_crosshairPrevPosY = 0;
@@ -4617,12 +4429,6 @@ static void CG_DrawCrosshair( vector3 *worldPoint, qboolean chEntValid ) {
 	trap->R_SetColor( NULL );
 }
 
-/*
-================
-CG_WorldToScreen
-================
-*/
-
 qboolean CG_WorldCoordToScreenCoordFloat( const vector3 *point, float *x, float *y ) {
 	vector3 trans;
 	float xc, yc;
@@ -4662,11 +4468,6 @@ qboolean CG_WorldCoordToScreenCoord( vector3 *worldCoord, int *x, int *y ) {
 	return qfalse;
 }
 
-/*
-====================
-CG_SaberClashFlare
-====================
-*/
 int cg_saberFlashTime = 0;
 vector3 cg_saberFlashPos = { 0, 0, 0 };
 void CG_SaberClashFlare( void ) {
@@ -5295,11 +5096,6 @@ void CG_CalcEWebMuzzlePoint( centity_t *cent, vector3 *start, vector3 *d_f, vect
 	}
 }
 
-/*
-=================
-CG_`Entity
-=================
-*/
 #define MAX_XHAIR_DIST_ACCURACY	20000.0f
 static void CG_ScanForCrosshairEntity( void ) {
 	trace_t trace;
@@ -5467,11 +5263,6 @@ traceAgain:
 	cg.crosshairClientTime = cg.time;
 }
 
-/*
-=====================
-CG_DrawCrosshairNames
-=====================
-*/
 static void CG_DrawCrosshairNames( void ) {
 	vector4		*color;
 	vector4		tcolor;
@@ -5581,14 +5372,6 @@ static void CG_DrawClientNames( void ) {
 	}
 }
 
-
-//==============================================================================
-
-/*
-=================
-CG_DrawSpectator
-=================
-*/
 static void CG_DrawSpectator( void ) {
 	const char *s = NULL, *s2 = NULL;
 	vector4 colour = { 1.0f, 1.0f, 1.0f, 0.33f };
@@ -5655,11 +5438,6 @@ static void CG_DrawSpectator( void ) {
 	CG_Text_Paint( (SCREEN_WIDTH / 2.0f) - (CG_Text_Width( s2, 0.5f, FONT_JAPPLARGE ) / 2.0f), 16/*440*/, 0.5f, &colorWhite, s2, 0, 0, 0, FONT_JAPPLARGE );
 }
 
-/*
-=================
-CG_DrawVote
-=================
-*/
 static void CG_DrawVote( void ) {
 	const char *s = NULL, *sParm = NULL;
 	int sec;
@@ -5723,11 +5501,6 @@ static void CG_DrawVote( void ) {
 	}
 }
 
-/*
-=================
-CG_DrawTeamVote
-=================
-*/
 static void CG_DrawTeamVote( void ) {
 	const char *s;
 	int sec, cs_offset;
@@ -5864,11 +5637,6 @@ static qboolean CG_DrawScoreboard( void ) {
 #endif
 }
 
-/*
-=================
-CG_DrawIntermission
-=================
-*/
 static void CG_DrawIntermission( void ) {
 	//	int key;
 	//if (cg_singlePlayer.integer) {
@@ -5879,11 +5647,6 @@ static void CG_DrawIntermission( void ) {
 	cg.scoreBoardShowing = CG_DrawScoreboard();
 }
 
-/*
-=================
-CG_DrawFollow
-=================
-*/
 static qboolean CG_DrawFollow( void ) {
 	const char	*s;
 
@@ -5927,13 +5690,6 @@ static void CG_DrawAmmoWarning( void ) {
 #endif
 }
 
-
-
-/*
-=================
-CG_DrawWarmup
-=================
-*/
 static void CG_DrawWarmup( void ) {
 	int			w;
 	int			sec;
@@ -6077,12 +5833,6 @@ static void CG_DrawWarmup( void ) {
 	CG_Text_Paint( (SCREEN_WIDTH / 2) - w / 2, 125, scale, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM );
 }
 
-//==================================================================================
-/*
-=================
-CG_DrawTimedMenus
-=================
-*/
 void CG_DrawTimedMenus( void ) {
 	if ( cg.voiceTime ) {
 		int t = cg.time - cg.voiceTime;
@@ -6341,36 +6091,17 @@ void CG_DrawCloakFuel( void ) {
 	CG_FillRect( x + 1.0f, y + 1.0f, CLFUELBAR_W - 1.0f, CLFUELBAR_H - percent, &cColor );
 }
 
-int cgRageTime = 0;
-int cgRageFadeTime = 0;
-float cgRageFadeVal = 0;
-
-int cgRageRecTime = 0;
-int cgRageRecFadeTime = 0;
-float cgRageRecFadeVal = 0;
-
-int cgAbsorbTime = 0;
-int cgAbsorbFadeTime = 0;
-float cgAbsorbFadeVal = 0;
-
-int cgProtectTime = 0;
-int cgProtectFadeTime = 0;
-float cgProtectFadeVal = 0;
-
-int cgYsalTime = 0;
-int cgYsalFadeTime = 0;
-float cgYsalFadeVal = 0;
+struct {
+	struct {
+		int time, fadeTime;
+		float fadeVal;
+	} rage, rageRec, absorb, protect, ysal;
+} powerupIcons;
 
 qboolean gCGHasFallVector = qfalse;
 vector3 gCGFallVector;
 
-/*
-=================
-CG_Draw2D
-=================
-*/
-extern int team1Timed;
-extern int team2Timed;
+extern int team1Timed, team2Timed;
 
 int cg_beatingSiegeTime = 0;
 
@@ -6528,9 +6259,6 @@ static void CG_DrawSiegeHUDItem( void ) {
 	cgSiegeEntityRender = 0; //reset for next frame
 }
 
-/*====================================
-chatbox functionality -rww
-====================================*/
 #define	CHATBOX_CUTOFF_LEN	550
 #define	CHATBOX_FONT_HEIGHT	20
 
@@ -6665,11 +6393,11 @@ static void CG_Draw2DScreenTints( void ) {
 
 	if ( cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR ) {
 		if ( cg.snap->ps.fd.forcePowersActive & (1 << FP_RAGE) ) {
-			if ( !cgRageTime ) {
-				cgRageTime = cg.time;
+			if ( !powerupIcons.rage.time ) {
+				powerupIcons.rage.time = cg.time;
 			}
 
-			rageTime = (float)(cg.time - cgRageTime);
+			rageTime = (float)(cg.time - powerupIcons.rage.time);
 
 			rageTime /= 9000;
 
@@ -6684,18 +6412,18 @@ static void CG_Draw2DScreenTints( void ) {
 				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 
-			cgRageFadeTime = 0;
-			cgRageFadeVal = 0;
+			powerupIcons.rage.fadeTime = 0;
+			powerupIcons.rage.fadeVal = 0;
 		}
-		else if ( cgRageTime ) {
-			if ( !cgRageFadeTime ) {
-				cgRageFadeTime = cg.time;
-				cgRageFadeVal = 0.15f;
+		else if ( powerupIcons.rage.time ) {
+			if ( !powerupIcons.rage.fadeTime ) {
+				powerupIcons.rage.fadeTime = cg.time;
+				powerupIcons.rage.fadeVal = 0.15f;
 			}
 
-			rageTime = cgRageFadeVal;
+			rageTime = powerupIcons.rage.fadeVal;
 
-			cgRageFadeVal -= (cg.time - cgRageFadeTime)*0.000005f;
+			powerupIcons.rage.fadeVal -= (cg.time - powerupIcons.rage.fadeTime)*0.000005f;
 
 			if ( rageTime < 0 )
 				rageTime = 0;
@@ -6734,15 +6462,15 @@ static void CG_Draw2DScreenTints( void ) {
 					hcolor.b = 0.2f;
 					CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 				}
-				cgRageTime = 0;
+				powerupIcons.rage.time = 0;
 			}
 		}
 		else if ( cg.snap->ps.fd.forceRageRecoveryTime > cg.time ) {
-			if ( !cgRageRecTime ) {
-				cgRageRecTime = cg.time;
+			if ( !powerupIcons.rageRec.time ) {
+				powerupIcons.rageRec.time = cg.time;
 			}
 
-			rageRecTime = (float)(cg.time - cgRageRecTime);
+			rageRecTime = (float)(cg.time - powerupIcons.rageRec.time);
 
 			rageRecTime /= 9000;
 
@@ -6760,18 +6488,18 @@ static void CG_Draw2DScreenTints( void ) {
 				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 
-			cgRageRecFadeTime = 0;
-			cgRageRecFadeVal = 0;
+			powerupIcons.rageRec.fadeTime = 0;
+			powerupIcons.rageRec.fadeVal = 0;
 		}
-		else if ( cgRageRecTime ) {
-			if ( !cgRageRecFadeTime ) {
-				cgRageRecFadeTime = cg.time;
-				cgRageRecFadeVal = 0.15f;
+		else if ( powerupIcons.rageRec.time ) {
+			if ( !powerupIcons.rageRec.fadeTime ) {
+				powerupIcons.rageRec.fadeTime = cg.time;
+				powerupIcons.rageRec.fadeVal = 0.15f;
 			}
 
-			rageRecTime = cgRageRecFadeVal;
+			rageRecTime = powerupIcons.rageRec.fadeVal;
 
-			cgRageRecFadeVal -= (cg.time - cgRageRecFadeTime)*0.000005f;
+			powerupIcons.rageRec.fadeVal -= (cg.time - powerupIcons.rageRec.fadeTime)*0.000005f;
 
 			if ( rageRecTime < 0 )
 				rageRecTime = 0;
@@ -6787,16 +6515,16 @@ static void CG_Draw2DScreenTints( void ) {
 				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 			else {
-				cgRageRecTime = 0;
+				powerupIcons.rageRec.time = 0;
 			}
 		}
 
 		if ( cg.snap->ps.fd.forcePowersActive & (1 << FP_ABSORB) ) {
-			if ( !cgAbsorbTime ) {
-				cgAbsorbTime = cg.time;
+			if ( !powerupIcons.absorb.time ) {
+				powerupIcons.absorb.time = cg.time;
 			}
 
-			absorbTime = (float)(cg.time - cgAbsorbTime);
+			absorbTime = (float)(cg.time - powerupIcons.absorb.time);
 
 			absorbTime /= 9000;
 
@@ -6814,18 +6542,18 @@ static void CG_Draw2DScreenTints( void ) {
 				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 
-			cgAbsorbFadeTime = 0;
-			cgAbsorbFadeVal = 0;
+			powerupIcons.absorb.fadeTime = 0;
+			powerupIcons.absorb.fadeVal = 0;
 		}
-		else if ( cgAbsorbTime ) {
-			if ( !cgAbsorbFadeTime ) {
-				cgAbsorbFadeTime = cg.time;
-				cgAbsorbFadeVal = 0.15f;
+		else if ( powerupIcons.absorb.time ) {
+			if ( !powerupIcons.absorb.fadeTime ) {
+				powerupIcons.absorb.fadeTime = cg.time;
+				powerupIcons.absorb.fadeVal = 0.15f;
 			}
 
-			absorbTime = cgAbsorbFadeVal;
+			absorbTime = powerupIcons.absorb.fadeVal;
 
-			cgAbsorbFadeVal -= (cg.time - cgAbsorbFadeTime)*0.000005f;
+			powerupIcons.absorb.fadeVal -= (cg.time - powerupIcons.absorb.fadeTime)*0.000005f;
 
 			if ( absorbTime < 0 )
 				absorbTime = 0;
@@ -6841,16 +6569,16 @@ static void CG_Draw2DScreenTints( void ) {
 				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 			else {
-				cgAbsorbTime = 0;
+				powerupIcons.absorb.time = 0;
 			}
 		}
 
 		if ( cg.snap->ps.fd.forcePowersActive & (1 << FP_PROTECT) ) {
-			if ( !cgProtectTime ) {
-				cgProtectTime = cg.time;
+			if ( !powerupIcons.protect.time ) {
+				powerupIcons.protect.time = cg.time;
 			}
 
-			protectTime = (float)(cg.time - cgProtectTime);
+			protectTime = (float)(cg.time - powerupIcons.protect.time);
 
 			protectTime /= 9000;
 
@@ -6868,18 +6596,18 @@ static void CG_Draw2DScreenTints( void ) {
 				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 
-			cgProtectFadeTime = 0;
-			cgProtectFadeVal = 0;
+			powerupIcons.protect.fadeTime = 0;
+			powerupIcons.protect.fadeVal = 0;
 		}
-		else if ( cgProtectTime ) {
-			if ( !cgProtectFadeTime ) {
-				cgProtectFadeTime = cg.time;
-				cgProtectFadeVal = 0.15f;
+		else if ( powerupIcons.protect.time ) {
+			if ( !powerupIcons.protect.fadeTime ) {
+				powerupIcons.protect.fadeTime = cg.time;
+				powerupIcons.protect.fadeVal = 0.15f;
 			}
 
-			protectTime = cgProtectFadeVal;
+			protectTime = powerupIcons.protect.fadeVal;
 
-			cgProtectFadeVal -= (cg.time - cgProtectFadeTime)*0.000005f;
+			powerupIcons.protect.fadeVal -= (cg.time - powerupIcons.protect.fadeTime)*0.000005f;
 
 			if ( protectTime < 0 )
 				protectTime = 0;
@@ -6895,16 +6623,16 @@ static void CG_Draw2DScreenTints( void ) {
 				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 			else {
-				cgProtectTime = 0;
+				powerupIcons.protect.time = 0;
 			}
 		}
 
 		if ( BG_HasYsalamiri( cgs.gametype, &cg.snap->ps ) ) {
-			if ( !cgYsalTime ) {
-				cgYsalTime = cg.time;
+			if ( !powerupIcons.ysal.time ) {
+				powerupIcons.ysal.time = cg.time;
 			}
 
-			ysalTime = (float)(cg.time - cgYsalTime);
+			ysalTime = (float)(cg.time - powerupIcons.ysal.time);
 
 			ysalTime /= 9000;
 
@@ -6922,18 +6650,18 @@ static void CG_Draw2DScreenTints( void ) {
 				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			}
 
-			cgYsalFadeTime = 0;
-			cgYsalFadeVal = 0;
+			powerupIcons.ysal.fadeTime = 0;
+			powerupIcons.ysal.fadeVal = 0;
 		}
-		else if ( cgYsalTime ) {
-			if ( !cgYsalFadeTime ) {
-				cgYsalFadeTime = cg.time;
-				cgYsalFadeVal = 0.15f;
+		else if ( powerupIcons.ysal.time ) {
+			if ( !powerupIcons.ysal.fadeTime ) {
+				powerupIcons.ysal.fadeTime = cg.time;
+				powerupIcons.ysal.fadeVal = 0.15f;
 			}
 
-			ysalTime = cgYsalFadeVal;
+			ysalTime = powerupIcons.ysal.fadeVal;
 
-			cgYsalFadeVal -= (cg.time - cgYsalFadeTime)*0.000005f;
+			powerupIcons.ysal.fadeVal -= (cg.time - powerupIcons.ysal.fadeTime)*0.000005f;
 
 			if ( ysalTime < 0 )
 				ysalTime = 0;
@@ -6948,7 +6676,7 @@ static void CG_Draw2DScreenTints( void ) {
 			if ( !cg.renderingThirdPerson && ysalTime )
 				CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, &hcolor );
 			else
-				cgYsalTime = 0;
+				powerupIcons.ysal.time = 0;
 		}
 	}
 
@@ -6993,25 +6721,25 @@ void CG_Draw2D( void ) {
 		return;
 
 	if ( cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR ) {
-		cgRageTime = 0;
-		cgRageFadeTime = 0;
-		cgRageFadeVal = 0;
+		powerupIcons.rage.time = 0;
+		powerupIcons.rage.fadeTime = 0;
+		powerupIcons.rage.fadeVal = 0;
 
-		cgRageRecTime = 0;
-		cgRageRecFadeTime = 0;
-		cgRageRecFadeVal = 0;
+		powerupIcons.rageRec.time = 0;
+		powerupIcons.rageRec.fadeTime = 0;
+		powerupIcons.rageRec.fadeVal = 0;
 
-		cgAbsorbTime = 0;
-		cgAbsorbFadeTime = 0;
-		cgAbsorbFadeVal = 0;
+		powerupIcons.absorb.time = 0;
+		powerupIcons.absorb.fadeTime = 0;
+		powerupIcons.absorb.fadeVal = 0;
 
-		cgProtectTime = 0;
-		cgProtectFadeTime = 0;
-		cgProtectFadeVal = 0;
+		powerupIcons.protect.time = 0;
+		powerupIcons.protect.fadeTime = 0;
+		powerupIcons.protect.fadeVal = 0;
 
-		cgYsalTime = 0;
-		cgYsalFadeTime = 0;
-		cgYsalFadeVal = 0;
+		powerupIcons.ysal.time = 0;
+		powerupIcons.ysal.fadeTime = 0;
+		powerupIcons.ysal.fadeVal = 0;
 	}
 
 	if ( cg_draw2D.integer == 0 ) {
@@ -7352,13 +7080,7 @@ void CG_Draw2D( void ) {
 		CG_ChatboxDraw();
 }
 
-/*
-=====================
-CG_DrawActive
-
-Perform all drawing needed to completely fill the screen
-=====================
-*/
+// Perform all drawing needed to completely fill the screen
 void CG_DrawActive( void ) {
 	vector3 baseOrg;
 	refdef_t *refdef = CG_GetRefdef();

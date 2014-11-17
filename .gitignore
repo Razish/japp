@@ -178,3 +178,7 @@ pip-log.txt
 # Code::Blocks
 *.depend
 *.layout
+
+# Codelite
+.codelite
+*.workspace

@@ -133,11 +133,7 @@ float BigFloat( const float *l );
 float LittleFloat( const float l );
 
 
-// ================================================================
-//
 // WIN32 DEFINES
-//
-// ================================================================
 
 #ifdef _WIN32
 
@@ -160,12 +156,7 @@ float LittleFloat( const float l );
 #endif // _WIN32
 
 
-// ================================================================
-//
 // MAC OS X DEFINES
-//
-// ================================================================
-
 #ifdef MACOS_X
 
 #include <sys/mman.h>
@@ -217,11 +208,7 @@ static inline float __fctiw(register float f) {
 #endif // MACOS_X
 
 
-// ================================================================
-//
 // LINUX DEFINES
-//
-// ================================================================
 
 #ifdef __linux__
 #include <sys/mman.h>
@@ -275,11 +262,7 @@ static inline float __fctiw(register float f) {
 #endif // __linux__
 
 
-// ================================================================
-//
 // FREEBSD DEFINES
-//
-// ================================================================
 
 #ifdef __FreeBSD__ // rb010123
 
@@ -302,10 +285,8 @@ static inline float __fctiw(register float f) {
 
 #include "qcommon/q_asm.h"
 
-// ================================================================
-// TYPE DEFINITIONS
-// ================================================================
 
+// TYPE DEFINITIONS
 typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned long ulong;
@@ -325,14 +306,10 @@ typedef union byteAlias_u {
 	char c[4];
 } byteAlias_t;
 
-typedef int32_t qhandle_t, thandle_t, fxHandle_t, sfxHandle_t, fileHandle_t, clipHandle_t;
+typedef int32_t qhandle_t, fxHandle_t, sfxHandle_t, fileHandle_t, clipHandle_t;
 
 #define NULL_HANDLE ((qhandle_t)0)
-#define NULL_SOUND ((sfxHandle_t)0)
-#define NULL_FX ((fxHandle_t)0)
-#define NULL_SFX ((sfxHandle_t)0)
 #define NULL_FILE ((fileHandle_t)0)
-#define NULL_CLIP ((clipHandle_t)0)
 
 //Raz: can't think of a better place to put this atm,
 //		should probably be in the platform specific definitions
@@ -515,14 +492,6 @@ void Com_Memcpy( void* dest, const void* src, const size_t count );
 #define	CIN_hold	4
 #define CIN_silent	8
 #define CIN_shader	16
-
-/*
-==============================================================
-
-MATHLIB
-
-==============================================================
-*/
 
 #define atoff (float)atof
 
@@ -1119,8 +1088,6 @@ void AngleVectors( const vector3 *angles, vector3 *forward, vector3 *right, vect
 void PerpendicularVector( vector3 *dst, const vector3 *src );
 void NormalToLatLong( const vector3 *normal, byte bytes[2] ); //rwwRMG - added
 
-//=============================================
-
 float Q_clamp( float min, float value, float max );
 int Q_clampi( int min, int value, int max );
 float Q_cap( float value, float max );
@@ -1189,8 +1156,6 @@ typedef enum fsOrigin_e {
 	FS_SEEK_SET
 } fsOrigin_t;
 
-//=============================================
-
 // string library
 qboolean Q_isprint( int c );
 qboolean Q_islower( int c );
@@ -1220,19 +1185,12 @@ void Q_ConvertLinefeeds( char *string );
 void Com_sprintf( char *dest, int size, const char *fmt, ... );
 const char *va( const char *format, ... );
 
-//=============================================
-
 // 64-bit integers for global rankings interface
 // implemented as a struct for qvm compatibility
 typedef struct qint64_s {
 	byte b0, b1, b2, b3, b4, b5, b6, b7;
 } qint64_t;
 
-//=============================================
-
-//
-// key / value info strings
-//
 const char *Info_ValueForKey( const char *s, const char *key );
 void Info_RemoveKey( char *s, const char *key );
 void Info_RemoveKey_Big( char *s, const char *key );
@@ -1250,17 +1208,8 @@ void QDECL Com_Printf( const char *msg, ... );
 #endif
 
 
-/*
-==========================================================
-
-CVARS (console variables)
-
-Many variables can be used for cheating purposes, so when
-cheats is zero, force all unspecified variables to their
-default values.
-==========================================================
-*/
-
+// Many variables can be used for cheating purposes, so when cheats is zero, force all unspecified variables to their
+//	default values.
 #define CVAR_NONE			0x00000000
 #define	CVAR_ARCHIVE		0x00000001		// set to cause it to be saved to vars.rc
 // used for system variables, not for player
@@ -1312,13 +1261,6 @@ typedef struct vmCvar_s {
 	char		string[MAX_CVAR_VALUE_STRING];
 } vmCvar_t;
 
-/*
-==============================================================
-
-COLLISION DETECTION
-
-==============================================================
-*/
 
 #include "surfaceflags.h"			// shared with the q3map utility
 
@@ -1329,13 +1271,7 @@ COLLISION DETECTION
 #define	PLANE_Z			2
 #define	PLANE_NON_AXIAL	3
 
-
-/*
-=================
-PlaneTypeForNormal
-=================
-*/
-
+//RAZTODO: Rewrite/expand
 #define PlaneTypeForNormal(x) (x[0] == 1.0f ? PLANE_X : (x[1] == 1.0f ? PLANE_Y : (x[2] == 1.0f ? PLANE_Z : PLANE_NON_AXIAL) ) )
 
 // plane_t structure
@@ -1410,9 +1346,6 @@ typedef struct orientation_s {
 	vector3		axis[3];
 } orientation_t;
 
-//=====================================================================
-
-
 // in order from highest priority to lowest
 // if none of the catchers are active, bound key strings will be executed
 #define KEYCATCH_CONSOLE	(0x0001u)
@@ -1440,15 +1373,6 @@ typedef enum soundChannel_e {
 	CHAN_VOICE_GLOBAL,  //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Causes mouth animation and is broadcast, like announcer
 	CHAN_MUSIC,	//## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #music played as a looping sound - added by BTO (VV)
 } soundChannel_t;
-
-
-/*
-========================================================================
-
-ELEMENTS COMMUNICATED ACROSS THE NET
-
-========================================================================
-*/
 
 #define	ANGLE2SHORT(x)	((int)((x)*65536/360) & 65535)
 #define	SHORT2ANGLE(x)	((x)*(360.0f/65536))
@@ -1522,9 +1446,6 @@ typedef struct gameState_s {
 	char		stringData[MAX_GAMESTATE_CHARS];
 	int			dataCount;
 } gameState_t;
-
-//=========================================================
-
 // all the different tracking "channels"
 typedef enum {
 	TRACK_CHANNEL_NONE = 50,
@@ -1913,13 +1834,7 @@ typedef struct siegePers_s {
 	int			lastTime;
 } siegePers_t;
 
-//====================================================================
-
-
-//
-// usercmd_t->button bits, many of which are generated by the client system,
-// so they aren't game/cgame only definitions
-//
+// usercmd_t->button bits, many of which are generated by the client system, so they aren't game/cgame only definitions
 #define	BUTTON_ATTACK			1
 #define	BUTTON_TALK				2			// displays talk balloon and disables actions
 #define	BUTTON_USE_HOLDABLE		4
@@ -2006,8 +1921,6 @@ typedef struct usercmd_s {
 	byte			generic_cmd;
 	signed char	forwardmove, rightmove, upmove;
 } usercmd_t;
-
-//===================================================================
 
 //rww - unsightly hack to allow us to make an FX call that takes a horrible amount of args
 typedef struct addpolyArgStruct_s {
@@ -2249,9 +2162,7 @@ typedef struct entityState_s {
 	int			maxhealth; //so I know how to draw the stupid health bar
 
 	//NPC-SPECIFIC FIELDS
-	//------------------------------------------------------------
-	int		npcSaber1;
-	int		npcSaber2;
+	int		npcSaber1, npcSaber2;
 
 	//index values for each type of sound, gets the folder the sounds
 	//are in. I wish there were a better way to do this,
@@ -2318,9 +2229,6 @@ typedef enum connstate_e {
 #define Square(x) ((x)*(x))
 
 // real time
-//=============================================
-
-
 typedef struct qtime_s {
 	int tm_sec;     /* seconds after the minute - [0,59] */
 	int tm_min;     /* minutes after the hour - [0,59] */
@@ -2449,13 +2357,6 @@ typedef struct SSkinGoreData_s {
 	qboolean		fadeRGB; //specify fade method to modify RGB (by default, the alpha is set instead)
 } SSkinGoreData;
 
-/*
-========================================================================
-
-String ID Tables
-
-========================================================================
-*/
 #define ENUM2STRING(arg)   {#arg,arg}
 typedef struct stringID_table_s {
 	const char *name;

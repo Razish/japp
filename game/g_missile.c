@@ -11,14 +11,9 @@ extern void Jedi_Decloak( gentity_t *self );
 
 extern qboolean FighterIsLanded( Vehicle_t *pVeh, playerState_t *parentPS );
 
-/*
-================
-G_ReflectMissile
-
-Reflect the missile roughly back at it's owner
-================
-*/
 float RandFloat( float min, float max );
+
+// Reflect the missile roughly back at it's owner
 void G_ReflectMissile( gentity_t *ent, gentity_t *missile, vector3 *forward ) {
 	vector3	bounce_dir;
 	int		i;
@@ -111,12 +106,6 @@ void G_DeflectMissile( gentity_t *ent, gentity_t *missile, vector3 *forward ) {
 	}
 }
 
-/*
-================
-G_BounceMissile
-
-================
-*/
 void G_BounceMissile( gentity_t *ent, trace_t *trace ) {
 	vector3	velocity;
 	float	dot;
@@ -169,14 +158,7 @@ void G_BounceMissile( gentity_t *ent, trace_t *trace ) {
 	}
 }
 
-
-/*
-================
-G_ExplodeMissile
-
-Explode a missile without an impact
-================
-*/
+// Explode a missile without an impact
 void G_ExplodeMissile( gentity_t *ent ) {
 	vector3		dir;
 	vector3		origin;
@@ -227,11 +209,6 @@ void G_RunStuckMissile( gentity_t *ent ) {
 	G_RunThink( ent );
 }
 
-/*
-================
-G_BounceProjectile
-================
-*/
 void G_BounceProjectile( vector3 *start, vector3 *impact, vector3 *dir, vector3 *endout ) {
 	vector3 v, newv;
 	float dot;
@@ -244,15 +221,8 @@ void G_BounceProjectile( vector3 *start, vector3 *impact, vector3 *dir, vector3 
 	VectorMA( impact, 8192, &newv, endout );
 }
 
-
-//-----------------------------------------------------------------------------
-gentity_t *CreateMissile( vector3 *org, vector3 *dir, float vel, int life,
-	gentity_t *owner, qboolean altFire )
-	//-----------------------------------------------------------------------------
-{
-	gentity_t	*missile;
-
-	missile = G_Spawn();
+gentity_t *CreateMissile( vector3 *org, vector3 *dir, float vel, int life, gentity_t *owner, qboolean altFire ) {
+	gentity_t *missile = G_Spawn();
 
 	missile->nextthink = level.time + life;
 	missile->think = G_FreeEntity;
@@ -309,11 +279,6 @@ void G_MissileBounceEffect( gentity_t *ent, vector3 *org, vector3 *dir ) {
 	}
 }
 
-/*
-================
-G_MissileImpact
-================
-*/
 void WP_SaberBlockNonRandom( gentity_t *self, vector3 *hitloc, qboolean missileBlock );
 void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	gentity_t		*other;
@@ -760,11 +725,6 @@ killProj:
 	trap->LinkEntity( (sharedEntity_t *)ent );
 }
 
-/*
-================
-G_RunMissile
-================
-*/
 void G_RunMissile( gentity_t *ent ) {
 	vector3		origin, groundSpot;
 	trace_t		tr;
@@ -940,9 +900,6 @@ passthrough:
 	// check think function after bouncing
 	G_RunThink( ent );
 }
-
-
-//=============================================================================
 
 gentity_t *fire_grapple( gentity_t *self, vector3 *start, vector3 *dir ) {
 	gentity_t	*hook;

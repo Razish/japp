@@ -109,12 +109,11 @@ static void( *cJSON_free )(void *ptr) = free;
 static long cJSON_GenerateHashValue( const char *name, const int size ) {
 	int		i;
 	long	hash;
-	char	letter;
 
 	hash = 0;
 	i = 0;
 	while ( name[i] != '\0' ) {
-		letter = (char)tolower( name[i] );
+		char letter = (char)tolower( name[i] );
 		hash += (long)(letter)*(i + 119);
 		i++;
 	}
@@ -469,9 +468,6 @@ static void serialize_string_ptr( const char *str, cJSON_StringBuilder *sb ) {
 		cJSON_SB_AddStringN( sb, "\"\"", 2 );	// Add "" and bail
 		return;
 	}
-
-	ptr = str;
-
 
 	ptr = str;
 	cJSON_SB_AddChar( sb, '\"' );
@@ -1296,7 +1292,7 @@ void cJSON_SwapItemsInArray( cJSON *arry, int item1, int item2 ) {
 // Duplicate items
 
 cJSON *cJSON_DuplicateItem( cJSON *item ) {
-	cJSON *c = 0, *n = 0;	// Current, New Used for copying child items
+	cJSON *c = 0;	// Current, New Used for copying child items
 	cJSON *newitem = cJSON_New_Item();
 
 	newitem->type = item->type;
@@ -1319,7 +1315,7 @@ cJSON *cJSON_DuplicateItem( cJSON *item ) {
 
 	if ( item->child ) {
 		for ( c = item->child; c; c = c->next ) {
-			n = cJSON_DuplicateItem( c );
+			cJSON *n = cJSON_DuplicateItem( c );
 
 			if ( item->type == cJSON_Object ) {
 				cJSON_AddItemToObject( newitem, c->string, n );
@@ -1402,10 +1398,10 @@ cJSON *cJSON_CreateObject( void ) {
 // Create Arrays:
 cJSON *cJSON_CreateIntArray( int *numbers, int count ) {
 	int i;
-	cJSON *n = 0, *a = cJSON_CreateArray();
+	cJSON *a = cJSON_CreateArray();
 
 	for ( i = 0; i < count; i++ ) {
-		n = cJSON_CreateNumber( numbers[i] );
+		cJSON *n = cJSON_CreateNumber( numbers[i] );
 		cJSON_AddItemToArray( a, n );
 	}
 	return a;
@@ -1413,10 +1409,10 @@ cJSON *cJSON_CreateIntArray( int *numbers, int count ) {
 
 cJSON *cJSON_CreateFloatArray( float *numbers, int count ) {
 	int i;
-	cJSON *n = 0, *a = cJSON_CreateArray();
+	cJSON *a = cJSON_CreateArray();
 
 	for ( i = 0; i < count; i++ ) {
-		n = cJSON_CreateNumber( numbers[i] );
+		cJSON *n = cJSON_CreateNumber( numbers[i] );
 		cJSON_AddItemToArray( a, n );
 	}
 	return a;
@@ -1424,10 +1420,10 @@ cJSON *cJSON_CreateFloatArray( float *numbers, int count ) {
 
 cJSON *cJSON_CreateDoubleArray( double *numbers, int count ) {
 	int i;
-	cJSON *n = 0, *a = cJSON_CreateArray();
+	cJSON *a = cJSON_CreateArray();
 
 	for ( i = 0; i < count; i++ ) {
-		n = cJSON_CreateNumber( numbers[i] );
+		cJSON *n = cJSON_CreateNumber( numbers[i] );
 		cJSON_AddItemToArray( a, n );
 	}
 	return a;

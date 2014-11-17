@@ -1,13 +1,3 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
-/*
-=======================================================================
-
-USER INTERFACE MAIN
-
-=======================================================================
-*/
-
 #include "Ghoul2/G2.h"
 #include "ui_local.h"
 #include "qcommon/qfiles.h"
@@ -16,9 +6,6 @@ USER INTERFACE MAIN
 #include "cgame/animtable.h" //we want this to be compiled into the module because we access it in the shared module.
 #include "game/bg_saga.h"
 #include "ui_shared.h"
-#ifdef FAV_SERVERS
-#include "JAPP/jp_tokenparser.h"
-#endif
 #include "JAPP/jp_crash.h"
 #include "JAPP/jp_csflags.h"
 
@@ -238,16 +225,10 @@ animation_t *UI_AnimsetAlloc( void ) {
 	return bgAllAnims[uiNumAllAnims].anims;
 }
 
-/*
-======================
-UI_ParseAnimationFile
-
-Read a configuration file containing animation coutns and rates
-models/players/visor/animation.cfg, etc
-
-======================
-*/
 static char UIPAFtext[60000];
+
+// Read a configuration file containing animation counts and rates
+// models/players/visor/animation.cfg, etc
 int UI_ParseAnimationFile( const char *filename, animation_t *animset, qboolean isHumanoid ) {
 	char		*text_p;
 	int			len;
@@ -599,13 +580,8 @@ void _UI_DrawTopBottom( float x, float y, float w, float h, float size ) {
 	trap->R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
 	trap->R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
 }
-/*
-================
-UI_DrawRect
 
-Coordinates are 640*480 virtual values
-=================
-*/
+// Coordinates are 640*480 virtual values
 void _UI_DrawRect( float x, float y, float width, float height, float size, const vector4 *color ) {
 	trap->R_SetColor( color );
 
@@ -773,11 +749,6 @@ void UI_LoadNonIngame( void ) {
 	uiInfo.inGameLoad = qfalse;
 }
 
-/*
-===============
-UI_BuildPlayerList
-===============
-*/
 static void UI_BuildPlayerList( void ) {
 	uiClientState_t	cs;
 	int		n, count, team, team2;
@@ -960,11 +931,6 @@ void UI_SetColor( const vector4 *rgba ) {
 	trap->R_SetColor( rgba );
 }
 
-/*
-=================
-_UI_Shutdown
-=================
-*/
 void UI_CleanupGhoul2( void );
 
 void UI_Shutdown( void ) {
@@ -2488,11 +2454,6 @@ static void UI_DrawGLInfo( rectDef_t *rect, float scale, const vector4 *color, i
 	}
 }
 
-/*
-=================
-UI_Version
-=================
-*/
 static void UI_Version( rectDef_t *rect, float scale, const vector4 *color, int iMenuFont ) {
 	int width;
 
@@ -2501,13 +2462,7 @@ static void UI_Version( rectDef_t *rect, float scale, const vector4 *color, int 
 	uiInfo.uiDC.drawText( rect->x - width, rect->y, scale, color, Q3_VERSION, 0, 0, 0, iMenuFont );
 }
 
-/*
-=================
-UI_OwnerDraw
-=================
-*/
-// FIXME: table drive
-//
+//FIXME: table drive
 static void UI_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle, int iMenuFont ) {
 	rectDef_t rect;
 	int findex;
@@ -3589,20 +3544,10 @@ static float UI_GetValue( int ownerDraw ) {
 	return 0;
 }
 
-/*
-=================
-UI_ServersQsortCompare
-=================
-*/
 static int QDECL UI_ServersQsortCompare( const void *arg1, const void *arg2 ) {
 	return trap->LAN_CompareServers( UI_SourceForLAN(), uiInfo.serverStatus.sortKey, uiInfo.serverStatus.sortDir, *(int*)arg1, *(int*)arg2 );
 }
 
-/*
-=================
-UI_ServersSort
-=================
-*/
 void UI_ServersSort( int column, qboolean force ) {
 	if ( !force ) {
 		if ( uiInfo.serverStatus.sortKey == column ) {
@@ -3616,11 +3561,6 @@ void UI_ServersSort( int column, qboolean force ) {
 
 #define MODSBUFSIZE (MAX_MODS * MAX_QPATH)
 
-/*
-===============
-UI_LoadMods
-===============
-*/
 static void UI_LoadMods( void ) {
 	int		numdirs;
 	char	dirlist[MODSBUFSIZE];
@@ -3657,12 +3597,6 @@ static void UI_LoadMods( void ) {
 		}
 	}
 }
-
-/*
-===============
-UI_LoadDemos
-===============
-*/
 
 #if 1
 
@@ -4037,13 +3971,7 @@ static void UI_Update( const char *name ) {
 
 int gUISelectedMap = 0;
 
-/*
-===============
-UI_DeferMenuScript
-
-Return true if the menu script should be deferred for later
-===============
-*/
+// Return true if the menu script should be deferred for later
 static qboolean UI_DeferMenuScript( char **args ) {
 	const char* name;
 
@@ -4085,15 +4013,8 @@ static qboolean UI_DeferMenuScript( char **args ) {
 	return qfalse;
 }
 
-/*
-=================
-UI_UpdateVideoSetup
-
-Copies the temporary user interface version of the video cvars into
-their real counterparts.  This is to create a interface which allows
-you to discard your changes if you did something you didnt want
-=================
-*/
+// Copies the temporary user interface version of the video cvars into their real counterparts.
+//	This is to create a interface which allows you to discard your changes if you did something you didn't want
 void UI_UpdateVideoSetup( void ) {
 	trap->Cvar_Set( "r_mode", UI_Cvar_VariableString( "ui_r_mode" ) );
 	trap->Cvar_Set( "r_fullscreen", UI_Cvar_VariableString( "ui_r_fullscreen" ) );
@@ -4117,14 +4038,7 @@ void UI_UpdateVideoSetup( void ) {
 	trap->Cmd_ExecuteText( EXEC_APPEND, "vid_restart;" );
 }
 
-/*
-=================
-UI_GetVideoSetup
-
-Retrieves the current actual video settings into the temporary user
-interface versions of the cvars.
-=================
-*/
+// Retrieves the current actual video settings into the temporary user interface versions of the cvars.
 void UI_GetVideoSetup( void ) {
 	// Make sure the cvars are registered as read only.
 	trap->Cvar_Register( NULL, "ui_r_glCustom", "4", CVAR_ROM | CVAR_INTERNAL | CVAR_ARCHIVE );
@@ -4745,11 +4659,6 @@ static void UI_UpdateCharacter( qboolean changedModel ) {
 	UI_UpdateCharacterSkin();
 }
 
-/*
-==================
-UI_CheckServerName
-==================
-*/
 static void UI_CheckServerName( void ) {
 	qboolean	changed = qfalse;
 
@@ -4771,11 +4680,6 @@ static void UI_CheckServerName( void ) {
 
 }
 
-/*
-==================
-UI_CheckPassword
-==================
-*/
 static qboolean UI_CheckPassword( void ) {
 	static char info[MAX_STRING_CHARS];
 
@@ -4811,11 +4715,6 @@ static qboolean UI_CheckPassword( void ) {
 	return qtrue;
 }
 
-/*
-==================
-UI_JoinServer
-==================
-*/
 static void UI_JoinServer( void ) {
 	char buff[1024] = { 0 };
 
@@ -6149,11 +6048,6 @@ static void UI_SiegeClassCnt( const int team ) {
 	trap->Cvar_Set( "ui_heavy_cnt", va( "%d", BG_SiegeCountBaseClass( team, 5 ) ) );
 }
 
-/*
-==================
-UI_MapCountByGameType
-==================
-*/
 static int UI_MapCountByGameType( qboolean singlePlayer ) {
 	int i, c, game;
 	c = 0;
@@ -6196,11 +6090,6 @@ qboolean UI_hasSkinForBase( const char *base, const char *team ) {
 	return qfalse;
 }
 
-/*
-==================
-UI_HeadCountByColor
-==================
-*/
 static int UI_HeadCountByColor( void ) {
 	int i, c;
 	const char *teamname;
@@ -6236,11 +6125,6 @@ static int UI_HeadCountByColor( void ) {
 	return c;
 }
 
-/*
-==================
-UI_InsertServerIntoDisplayList
-==================
-*/
 static void UI_InsertServerIntoDisplayList( int num, int position ) {
 	int i;
 
@@ -6255,11 +6139,6 @@ static void UI_InsertServerIntoDisplayList( int num, int position ) {
 	uiInfo.serverStatus.displayServers[position] = num;
 }
 
-/*
-==================
-UI_RemoveServerFromDisplayList
-==================
-*/
 static void UI_RemoveServerFromDisplayList( int num ) {
 	int i, j;
 
@@ -6274,11 +6153,6 @@ static void UI_RemoveServerFromDisplayList( int num ) {
 	}
 }
 
-/*
-==================
-UI_BinaryServerInsertion
-==================
-*/
 static void UI_BinaryServerInsertion( int num ) {
 	int mid, offset, res, len;
 
@@ -6313,11 +6187,6 @@ static void UI_BinaryServerInsertion( int num ) {
 	UI_InsertServerIntoDisplayList( num, offset );
 }
 
-/*
-==================
-UI_BuildServerDisplayList
-==================
-*/
 static void UI_BuildServerDisplayList( int force ) {
 	int i, count, clients, maxClients, ping, game, len, passw/*, visible*/;
 	char info[MAX_STRING_CHARS];
@@ -6463,11 +6332,6 @@ struct serverStatusCvar_s { const char *name, *altName; } serverStatusCvars[] = 
 	{ NULL, NULL }
 };
 
-/*
-==================
-UI_SortServerStatusInfo
-==================
-*/
 static void UI_SortServerStatusInfo( serverStatusInfo_t *info ) {
 	int i, j, index, numLines;
 	const char *tmp1, *tmp2;
@@ -6500,11 +6364,6 @@ static void UI_SortServerStatusInfo( serverStatusInfo_t *info ) {
 	}
 }
 
-/*
-==================
-UI_GetServerStatusInfo
-==================
-*/
 static int UI_GetServerStatusInfo( const char *serverAddress, serverStatusInfo_t *info ) {
 	char *p, *score, *ping, *name;
 	int i, len;
@@ -6598,11 +6457,6 @@ static int UI_GetServerStatusInfo( const char *serverAddress, serverStatusInfo_t
 	return qfalse;
 }
 
-/*
-==================
-UI_BuildFindPlayerList
-==================
-*/
 static void UI_BuildFindPlayerList( qboolean force ) {
 	static int numFound, numTimeOuts;
 	int i, j, resend;
@@ -6748,11 +6602,6 @@ static void UI_BuildFindPlayerList( qboolean force ) {
 	}
 }
 
-/*
-==================
-UI_BuildServerStatus
-==================
-*/
 static void UI_BuildServerStatus( qboolean force ) {
 
 	if ( uiInfo.nextFindPlayerRefresh ) {
@@ -6781,11 +6630,6 @@ static void UI_BuildServerStatus( qboolean force ) {
 	}
 }
 
-/*
-==================
-UI_FeederCount
-==================
-*/
 static int UI_FeederCount( int feederID ) {
 	int team, baseClass, count = 0, i;
 	static char info[MAX_STRING_CHARS];
@@ -6958,11 +6802,6 @@ static const char *UI_SelectedMap( int index, int *actual ) {
 	return "";
 }
 
-/*
-==================
-UI_HeadCountByColor
-==================
-*/
 static const char *UI_SelectedTeamHead( int index, int *actual ) {
 	const char *teamname;
 	int i, c = 0;
@@ -8016,12 +7855,7 @@ static void UI_RunCinematicFrame( int handle ) {
 }
 
 
-/*
-=================
-UI_LoadForceConfig_List
-=================
-Looks in the directory for force config files (.fcf) and loads the name in
-*/
+// Looks in the directory for force config files (.fcf) and loads the name in
 void UI_LoadForceConfig_List( void ) {
 	int			numfiles = 0;
 	char		filelist[2048];
@@ -8069,13 +7903,7 @@ nextSearch:
 	}
 }
 
-
-/*
-=================
-bIsImageFile
-builds path and scans for valid image extentions
-=================
-*/
+// builds path and scans for valid image extentions
 static qboolean bIsImageFile( const char* dirptr, const char* skinname ) {
 	char fpath[MAX_QPATH];
 	int f;
@@ -8127,12 +7955,6 @@ static qboolean bIsAnimFile( const char* dirptr ) {
 	return qfalse;
 }
 
-
-/*
-=================
-PlayerModel_BuildList
-=================
-*/
 static void UI_BuildQ3Model_List( void ) {
 	int		numdirs = 0;
 	int		numfiles = 0;
@@ -8305,12 +8127,6 @@ void UI_SiegeInit( void ) {
 	}
 }
 
-/*
-=================
-UI_ParseColorData
-=================
-*/
-//static qboolean UI_ParseColorData(char* buf, playerSpeciesInfo_t &species)
 static qboolean UI_ParseColorData( char* buf, playerSpeciesInfo_t *species, char*	file ) {
 	const char	*token;
 	const char	*p;
@@ -8347,11 +8163,6 @@ static qboolean UI_ParseColorData( char* buf, playerSpeciesInfo_t *species, char
 	return qtrue;//never get here
 }
 
-/*
-=================
-UI_BuildPlayerModel_List
-=================
-*/
 static void UI_BuildPlayerModel_List( qboolean inGameLoad ) {
 	int		numdirs;
 	char	dirlist[2048];
@@ -8487,11 +8298,6 @@ static qhandle_t UI_RegisterShaderNoMip( const char *name ) {
 	return trap->R_RegisterShaderNoMip( name );
 }
 
-/*
-=================
-UI_Init
-=================
-*/
 void UI_Init( qboolean inGameLoad ) {
 	const char *menuSet;
 	qhandle_t value;
@@ -8781,11 +8587,6 @@ void UI_Refresh( int realtime ) {
 	}
 }
 
-/*
-=================
-UI_KeyEvent
-=================
-*/
 void UI_KeyEvent( int key, qboolean down ) {
 	if ( Menu_Count() > 0 ) {
 		menuDef_t *menu = Menu_GetFocused();
@@ -8809,11 +8610,6 @@ void UI_KeyEvent( int key, qboolean down ) {
 	//}
 }
 
-/*
-=================
-UI_MouseEvent
-=================
-*/
 void UI_MouseEvent( int dx, int dy ) {
 	// update mouse screen position
 	uiInfo.uiDC.cursorx += dx;
@@ -8969,14 +8765,8 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 	}
 }
 
-/*
-========================
-UI_DrawConnectScreen
-
-This will also be overlaid on the cgame info screen during loading
-to prevent it from blinking away too rapidly on local or lan games.
-========================
-*/
+// This will also be overlaid on the cgame info screen during loading to prevent it from blinking away too rapidly on
+//	local or lan games.
 void UI_DrawConnectScreen( qboolean overlay ) {
 	const char *s;
 	uiClientState_t	cstate;
@@ -9072,11 +8862,6 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 	// password required / connection rejected information goes here
 }
 
-/*
-=================
-ArenaServers_StopRefresh
-=================
-*/
 static void UI_StopServerRefresh( void ) {
 	int count;
 
@@ -9096,11 +8881,6 @@ static void UI_StopServerRefresh( void ) {
 	}
 }
 
-/*
-=================
-UI_DoServerRefresh
-=================
-*/
 static void UI_DoServerRefresh( void ) {
 	qboolean wait = qfalse;
 
@@ -9140,11 +8920,6 @@ static void UI_DoServerRefresh( void ) {
 	UI_BuildServerDisplayList( qfalse );
 }
 
-/*
-=================
-UI_StartServerRefresh
-=================
-*/
 static void UI_StartServerRefresh( qboolean full ) {
 	char	*ptr;
 	int lanSource;
@@ -9309,12 +9084,6 @@ void JP_SaveFavServers( void )
 }
 #endif
 
-/*
-============
-GetModuleAPI
-============
-*/
-
 uiImport_t *trap = NULL;
 
 typedef int( *R_Font_StrLenPixels_t )(const char *text, const int iFontIndex, const float scale);
@@ -9365,12 +9134,6 @@ Q_EXPORT uiExport_t* QDECL GetModuleAPI( int apiVersion, uiImport_t *import ) {
 
 	return &uie;
 }
-
-/*
-============
-vmMain
-============
-*/
 
 Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t arg2, intptr_t arg3, intptr_t arg4,
 	intptr_t arg5, intptr_t arg6, intptr_t arg7, intptr_t arg8, intptr_t arg9, intptr_t arg10, intptr_t arg11 ) {

@@ -308,11 +308,6 @@ qboolean AI_ValidateGroupMember( AIGroupInfo_t *group, gentity_t *member ) {
 	return qtrue;
 }
 
-/*
--------------------------
-AI_GetGroup
--------------------------
-*/
 void AI_GetGroup( gentity_t *self ) {
 	int	i;
 	gentity_t	*member;//, *waiter;
@@ -784,36 +779,6 @@ qboolean AI_GroupContainsEntNum( AIGroupInfo_t *group, int entNum ) {
 	}
 	return qfalse;
 }
-//Overload
-
-/*
-void AI_GetGroup( AIGroupInfo_t &group, gentity_t *ent, int radius )
-{
-if ( ent->client == NULL )
-return;
-
-vector3	temp, angles;
-
-//FIXME: This is specialized code.. move?
-if ( ent->enemy )
-{
-VectorSubtract( ent->enemy->r.currentOrigin, ent->r.currentOrigin, temp );
-VectorNormalize( temp );	//FIXME: Needed?
-vectoangles( temp, angles );
-}
-else
-{
-VectorCopy( ent->currentAngles, angles );
-}
-
-AI_GetGroup( group, ent->r.currentOrigin, ent->currentAngles, DEFAULT_RADIUS, radius, ent->client->playerTeam, ent, ent->enemy );
-}
-*/
-/*
--------------------------
-AI_CheckEnemyCollision
--------------------------
-*/
 
 qboolean AI_CheckEnemyCollision( gentity_t *ent, qboolean takeEnemy ) {
 	navInfo_t	info;

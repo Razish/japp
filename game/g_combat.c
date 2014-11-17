@@ -171,12 +171,6 @@ void ExplodeDeath( gentity_t *self ) {
 	ObjectDie( self, self, self, 20, 0 );
 }
 
-
-/*
-============
-ScorePlum
-============
-*/
 void ScorePlum( gentity_t *ent, vector3 *origin, int score ) {
 	gentity_t *plum;
 
@@ -189,13 +183,7 @@ void ScorePlum( gentity_t *ent, vector3 *origin, int score ) {
 	plum->s.time = score;
 }
 
-/*
-============
-AddScore
-
-Adds score to both the client and his team
-============
-*/
+// Adds score to both the client and his team
 extern qboolean g_dontPenalizeTeam; //g_cmds.c
 void AddScore( gentity_t *ent, vector3 *origin, int score ) {
 	/*
@@ -224,13 +212,7 @@ void AddScore( gentity_t *ent, vector3 *origin, int score ) {
 	CalculateRanks();
 }
 
-/*
-=================
-TossClientItems
-
-rww - Toss the weapon away from the player in the specified direction
-=================
-*/
+// Toss the weapon away from the player in the specified direction
 void TossClientWeapon( gentity_t *self, vector3 *direction, float speed ) {
 	vector3 vel;
 	const gitem_t *item;
@@ -311,13 +293,7 @@ void TossClientWeapon( gentity_t *self, vector3 *direction, float speed ) {
 	}
 }
 
-/*
-=================
-TossClientItems
-
-Toss the weapon and powerups for the killed player
-=================
-*/
+// Toss the weapon and powerups for the killed player
 void TossClientItems( gentity_t *self ) {
 	const gitem_t	*item;
 	int				weapon;
@@ -393,12 +369,6 @@ void TossClientItems( gentity_t *self ) {
 	}
 }
 
-
-/*
-==================
-LookAtKiller
-==================
-*/
 void LookAtKiller( gentity_t *self, gentity_t *inflictor, gentity_t *attacker ) {
 	vector3		dir;
 
@@ -419,11 +389,6 @@ void BodyRid( gentity_t *ent ) {
 	ent->physicsObject = qfalse;
 }
 
-/*
-==================
-body_die
-==================
-*/
 void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
 	// NOTENOTE No gibbing right now, this is star wars.
 	qboolean doDisint = qfalse;
@@ -529,11 +494,6 @@ const char *modNames[MOD_MAX] = {
 };
 
 
-/*
-==================
-CheckAlmostCapture
-==================
-*/
 void CheckAlmostCapture( gentity_t *self, gentity_t *attacker ) {
 #if 1
 	gentity_t	*ent;
@@ -1304,12 +1264,6 @@ gentity_t *G_GetJediMaster( void ) {
 	return NULL;
 }
 
-/*
--------------------------
-G_AlertTeam
--------------------------
-*/
-
 void G_AlertTeam( gentity_t *victim, gentity_t *attacker, float radius, float soundDist ) {
 	int			radiusEnts[128];
 	gentity_t	*check;
@@ -1393,12 +1347,6 @@ void G_AlertTeam( gentity_t *victim, gentity_t *attacker, float radius, float so
 	}
 }
 
-/*
--------------------------
-G_DeathAlert
--------------------------
-*/
-
 #define	DEATH_ALERT_RADIUS			512
 #define	DEATH_ALERT_SOUND_RADIUS	512
 
@@ -1406,15 +1354,8 @@ void G_DeathAlert( gentity_t *victim, gentity_t *attacker ) {//FIXME: with all t
 	G_AlertTeam( victim, attacker, DEATH_ALERT_RADIUS, DEATH_ALERT_SOUND_RADIUS );
 }
 
-/*
-----------------------------------------
-DeathFX
-
-Applies appropriate special effects that occur while the entity is dying
-Not to be confused with NPC_RemoveBodyEffects (NPC.cpp), which only applies effect when removing the body
-----------------------------------------
-*/
-
+// Applies appropriate special effects that occur while the entity is dying
+// Not to be confused with NPC_RemoveBodyEffects (NPC.cpp), which only applies effect when removing the body
 void DeathFX( gentity_t *ent ) {
 	vector3		effectPos, right;
 	vector3		defaultDir;
@@ -1575,11 +1516,6 @@ void G_AddPowerDuelLoserScore( int team, int score ) {
 	}
 }
 
-/*
-==================
-player_die
-==================
-*/
 extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
 
 extern void AI_DeleteSelfFromGroup( gentity_t *self );
@@ -2308,12 +2244,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	}
 }
 
-
-/*
-================
-CheckArmor
-================
-*/
 int CheckArmor( gentity_t *ent, int damage, uint32_t dflags ) {
 	gclient_t	*client;
 	int			save;
@@ -2407,11 +2337,6 @@ void G_ApplyKnockback( gentity_t *targ, vector3 *newDir, float knockback ) {
 	}
 }
 
-/*
-================
-RaySphereIntersections
-================
-*/
 int RaySphereIntersections( vector3 *origin, float radius, vector3 *point, vector3 *dir, vector3 intersections[2] ) {
 	float b, c, d, t;
 
@@ -2448,13 +2373,7 @@ int RaySphereIntersections( vector3 *origin, float radius, vector3 *point, vecto
 	return 0;
 }
 
-/*
-===================================
-rww - beginning of the majority of the dismemberment and location based damage code.
-===================================
-*/
-const char *hitLocName[HL_MAX] =
-{
+const char *hitLocName[HL_MAX] = {
 	"none",	//HL_NONE = 0,
 	"right foot",	//HL_FOOT_RT,
 	"left foot",	//HL_FOOT_LT,
@@ -3520,11 +3439,6 @@ void G_LocationBasedDamageModifier( gentity_t *ent, vector3 *point, int mod, uin
 		break; //do nothing then
 	}
 }
-/*
-===================================
-rww - end dismemberment/lbd
-===================================
-*/
 
 qboolean G_ThereIsAMaster( void ) {
 	int i = 0;
@@ -3552,31 +3466,14 @@ void G_Knockdown( gentity_t *victim ) {
 	}
 }
 
-/*
-============
-T_Damage
-
-targ		entity that is being damaged
-inflictor	entity that is causing the damage
-attacker	entity that caused the inflictor to damage targ
-example: targ=monster, inflictor=rocket, attacker=player
-
-dir			direction of the attack for knockback
-point		point at which the damage is being inflicted, used for headshots
-damage		amount of damage being inflicted
-knockback	force to be applied against targ as a result of the damage
-
-inflictor, attacker, dir, and point can be NULL for environmental effects
-
-dflags		these flags are used to control how T_Damage works
-DAMAGE_RADIUS			damage was indirect (from a nearby explosion)
-DAMAGE_NO_ARMOR			armor does not protect from this damage
-DAMAGE_NO_KNOCKBACK		do not affect velocity, just view angles
-DAMAGE_NO_PROTECTION	kills godmode, armor, everything
-DAMAGE_HALF_ABSORB		half shields, half health
-DAMAGE_HALF_ARMOR_REDUCTION		Any damage that shields incur is halved
-============
-*/
+// targ			entity that is being damaged (e.g. monster)
+// inflictor	entity that is causing the damage (e.g. rocket)
+// attacker		entity that caused the inflictor to damage targ (e.g. player)
+// dir			direction of the attack for knockback
+// point		point at which the damage is being inflicted, used for headshots
+// damage		amount of damage being inflicted
+// knockback	force to be applied against targ as a result of the damage
+//	inflictor, attacker, dir, and point can be NULL for environmental effects
 
 int gPainMOD = 0;
 int gPainHitLoc = -1;
@@ -4560,12 +4457,6 @@ static qboolean CanDamage( gentity_t *targ, gentity_t *attacker, vector3 *origin
 	return qfalse;
 }
 
-
-/*
-============
-G_RadiusDamage
-============
-*/
 qboolean G_RadiusDamage( vector3 *origin, gentity_t *attacker, float damage, float radius,
 	gentity_t *ignore, gentity_t *missile, int mod ) {
 	float		points, dist;

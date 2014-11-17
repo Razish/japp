@@ -279,11 +279,6 @@ visibility_t NPC_CheckVisibility( gentity_t *ent, uint32_t flags ) {
 	return VIS_SHOOT;
 }
 
-/*
--------------------------
-NPC_CheckSoundEvents
--------------------------
-*/
 static int G_CheckSoundEvents( gentity_t *self, float maxHearDist, int ignoreAlert, qboolean mustHaveOwner, alertEventLevel_t minAlertLevel ) {
 	int	bestEvent = -1;
 	alertEventLevel_t bestAlert = AEL_NONE;
@@ -350,11 +345,7 @@ float G_GetLightLevel( vector3 *pos, vector3 *fromDir ) {
 
 	return lightLevel;
 }
-/*
--------------------------
-NPC_CheckSightEvents
--------------------------
-*/
+
 static int G_CheckSightEvents( gentity_t *self, int hFOV, int vFOV, float maxSeeDist, int ignoreAlert, qboolean mustHaveOwner, alertEventLevel_t minAlertLevel ) {
 	int	bestEvent = -1;
 	int bestAlert = -1;
@@ -415,14 +406,7 @@ static int G_CheckSightEvents( gentity_t *self, int hFOV, int vFOV, float maxSee
 	return bestEvent;
 }
 
-/*
--------------------------
-NPC_CheckAlertEvents
-
-NOTE: Should all NPCs create alertEvents too so they can detect each other?
--------------------------
-*/
-
+// NOTE: Should all NPCs create alertEvents too so they can detect each other?
 int G_CheckAlertEvents( gentity_t *self, qboolean checkSight, qboolean checkSound, float maxSeeDist, float maxHearDist, int ignoreAlert, qboolean mustHaveOwner, int minAlertLevel ) {
 	int bestSoundEvent = -1;
 	int bestSightEvent = -1;
@@ -501,12 +485,8 @@ qboolean NPC_CheckForDanger( int alertEvent ) {//FIXME: more bStates need to cal
 	return G_CheckForDanger( NPC, alertEvent );
 }
 
-/*
--------------------------
-AddSoundEvent
--------------------------
-*/
 qboolean RemoveOldestAlert( void );
+
 void AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, qboolean needLOS ) {
 	//FIXME: Handle this in another manner?
 	if ( level.numAlertEvents >= MAX_ALERT_EVENTS ) {
@@ -540,12 +520,6 @@ void AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertEven
 	level.numAlertEvents++;
 }
 
-/*
--------------------------
-AddSightEvent
--------------------------
-*/
-
 void AddSightEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, float addLight ) {
 	//FIXME: Handle this in another manner?
 	if ( level.numAlertEvents >= MAX_ALERT_EVENTS ) {
@@ -573,12 +547,6 @@ void AddSightEvent( gentity_t *owner, vector3 *position, float radius, alertEven
 
 	level.numAlertEvents++;
 }
-
-/*
--------------------------
-ClearPlayerAlertEvents
--------------------------
-*/
 
 void ClearPlayerAlertEvents( void ) {
 	int curNumAlerts = level.numAlertEvents;
@@ -637,12 +605,6 @@ qboolean RemoveOldestAlert( void ) {
 	//return true is have room for one now
 	return (level.numAlertEvents < MAX_ALERT_EVENTS);
 }
-
-/*
--------------------------
-G_ClearLOS
--------------------------
-*/
 
 // Position to position
 qboolean G_ClearLOS( gentity_t *self, const vector3 *start, const vector3 *end ) {
@@ -716,12 +678,6 @@ qboolean G_ClearLOS5( gentity_t *self, const vector3 *end ) {
 	return G_ClearLOS( self, &eyes, end );
 }
 
-/*
--------------------------
-NPC_GetFOVPercentage
--------------------------
-*/
-
 float NPC_GetHFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, float hFOV ) {
 	vector3	deltaVector, angles;
 	float	delta;
@@ -737,12 +693,6 @@ float NPC_GetHFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, floa
 
 	return ((hFOV - delta) / hFOV);
 }
-
-/*
--------------------------
-NPC_GetVFOVPercentage
--------------------------
-*/
 
 float NPC_GetVFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, float vFOV ) {
 	vector3	deltaVector, angles;
@@ -761,11 +711,6 @@ float NPC_GetVFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, floa
 }
 
 #define MAX_INTEREST_DIST	( 256 * 256 )
-/*
--------------------------
-NPC_FindLocalInterestPoint
--------------------------
-*/
 
 int G_FindLocalInterestPoint( gentity_t *self ) {
 	int		i, bestPoint = ENTITYNUM_NONE;

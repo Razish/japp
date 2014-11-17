@@ -147,10 +147,6 @@ stringID_table_t PowerupTable[] =
 	{ "", -1 }
 };
 
-
-//======================================
-//Parsing functions
-//======================================
 void BG_SiegeStripTabs( char *buf ) {
 	int i = 0;
 	int i_r = 0;
@@ -464,14 +460,7 @@ int BG_SiegeGetPairedValue( const char *buf, const char *key, char *outbuf ) {
 
 	return 0; //guess we never found it.
 }
-//======================================
-//End parsing functions
-//======================================
 
-
-//======================================
-//Class loading functions
-//======================================
 void BG_SiegeTranslateForcePowers( char *buf, siegeClass_t *siegeClass ) {
 	char checkPower[1024];
 	char checkLevel[256];
@@ -1006,14 +995,7 @@ void BG_SiegeLoadClasses( siegeClassDesc_t *descBuffer ) {
 		}
 	}
 }
-//======================================
-//End class loading functions
-//======================================
 
-
-//======================================
-//Team loading functions
-//======================================
 siegeClass_t *BG_SiegeFindClassByName( const char *classname ) {
 	int i = 0;
 
@@ -1116,14 +1098,7 @@ void BG_SiegeLoadTeams( void ) {
 		BG_SiegeParseTeamFile( filename );
 	}
 }
-//======================================
-//End team loading functions
-//======================================
 
-
-//======================================
-//Misc/utility functions
-//======================================
 siegeTeam_t *BG_SiegeFindThemeForTeam( int team ) {
 	if ( team == SIEGETEAM_TEAM1 ) {
 		return team1Theme;
@@ -1257,7 +1232,3 @@ int BG_SiegeFindClassIndexByName( const char *classname ) {
 
 	return -1;
 }
-//======================================
-//End misc/utility functions
-//======================================
-

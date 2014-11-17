@@ -436,7 +436,6 @@
 		<Unit filename="game/g_exphysics.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="game/g_headers.h" />
 		<Unit filename="game/g_items.c">
 			<Option compilerVar="CC" />
 		</Unit>

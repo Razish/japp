@@ -10,29 +10,12 @@
 #define LSTATE_CLEAR		0
 #define LSTATE_WAITING		1
 
-/*
--------------------------
-NPC_Howler_Precache
--------------------------
-*/
 void NPC_Howler_Precache( void ) {
 }
 
-
-/*
--------------------------
-Howler_Idle
--------------------------
-*/
 void Howler_Idle( void ) {
 }
 
-
-/*
--------------------------
-Howler_Patrol
--------------------------
-*/
 void Howler_Patrol( void ) {
 	vector3 dif;
 
@@ -62,11 +45,6 @@ void Howler_Patrol( void ) {
 	}
 }
 
-/*
--------------------------
-Howler_Move
--------------------------
-*/
 void Howler_Move( qboolean visible ) {
 	if ( NPCInfo->localState != LSTATE_WAITING ) {
 		NPCInfo->goalEntity = NPC->enemy;
@@ -75,7 +53,6 @@ void Howler_Move( qboolean visible ) {
 	}
 }
 
-//---------------------------------------------------------
 void Howler_TryDamage( gentity_t *enemy, int damage ) {
 	vector3	end, dir;
 	trace_t	tr;
@@ -95,7 +72,6 @@ void Howler_TryDamage( gentity_t *enemy, int damage ) {
 	}
 }
 
-//------------------------------
 void Howler_Attack( void ) {
 	if ( !TIMER_Exists( NPC, "attacking" ) ) {
 		// Going to do ATTACK1
@@ -114,7 +90,6 @@ void Howler_Attack( void ) {
 	TIMER_Done2( NPC, "attacking", qtrue );
 }
 
-//----------------------------------
 void Howler_Combat( void ) {
 	float distance;
 	qboolean advance;
@@ -149,11 +124,6 @@ void Howler_Combat( void ) {
 	}
 }
 
-/*
--------------------------
-NPC_Howler_Pain
--------------------------
-*/
 void NPC_Howler_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	if ( damage >= 10 ) {
 		TIMER_Remove( self, "attacking" );
@@ -169,12 +139,6 @@ void NPC_Howler_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	}
 }
 
-
-/*
--------------------------
-NPC_BSHowler_Default
--------------------------
-*/
 void NPC_BSHowler_Default( void ) {
 	if ( NPC->enemy ) {
 		Howler_Combat();

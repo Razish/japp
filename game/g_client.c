@@ -430,20 +430,6 @@ void SP_info_jedimaster_start( gentity_t *ent ) {
 	trap->LinkEntity( (sharedEntity_t *)ent );
 }
 
-/*
-=======================================================================
-
-SelectSpawnPoint
-
-=======================================================================
-*/
-
-/*
-================
-SpotWouldTelefrag
-
-================
-*/
 qboolean SpotWouldTelefrag( gentity_t *spot ) {
 	int			i;
 	int			num;
@@ -510,14 +496,9 @@ qboolean SpotWouldTelefrag3( vector3 *spot ) {
 	return qfalse;
 }
 
-/*
-================
-SelectNearestDeathmatchSpawnPoint
-
-Find the spot that we DON'T want to use
-================
-*/
 #define	MAX_SPAWN_POINTS	128
+
+// Find the spot that we DON'T want to use
 gentity_t *SelectNearestDeathmatchSpawnPoint( vector3 *from ) {
 	gentity_t	*spot = NULL;
 	vector3		delta;
@@ -539,15 +520,7 @@ gentity_t *SelectNearestDeathmatchSpawnPoint( vector3 *from ) {
 	return nearestSpot;
 }
 
-
-/*
-================
-SelectRandomDeathmatchSpawnPoint
-
-go to a random point that doesn't telefrag
-================
-*/
-#define	MAX_SPAWN_POINTS	128
+// go to a random point that doesn't telefrag
 gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
 	gentity_t	*spot = NULL;
 	int			count = 0;
@@ -569,13 +542,7 @@ gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
 	return spots[selection];
 }
 
-/*
-===========
-SelectRandomFurthestSpawnPoint
-
-Chooses a player start, deathmatch start, etc
-============
-*/
+// Chooses a player start, deathmatch start, etc
 gentity_t *SelectRandomFurthestSpawnPoint( vector3 *avoidPoint, vector3 *origin, vector3 *angles, team_t team ) {
 	gentity_t	*spot = NULL;
 	vector3		delta;
@@ -752,13 +719,7 @@ tryAgain:
 	return list_spot[rnd];
 }
 
-/*
-===========
-SelectSpawnPoint
-
-Chooses a player start, deathmatch start, etc
-============
-*/
+// Chooses a player start, deathmatch start, etc
 gentity_t *SelectSpawnPoint( vector3 *avoidPoint, vector3 *origin, vector3 *angles, team_t team ) {
 	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, team );
 
@@ -791,14 +752,7 @@ gentity_t *SelectSpawnPoint( vector3 *avoidPoint, vector3 *origin, vector3 *angl
 	*/
 }
 
-/*
-===========
-SelectInitialSpawnPoint
-
-Try to find a spawn point marked 'initial', otherwise
-use normal spawn selection.
-============
-*/
+// Try to find a spawn point marked 'initial', otherwise use normal spawn selection.
 gentity_t *SelectInitialSpawnPoint( vector3 *origin, vector3 *angles, team_t team ) {
 	gentity_t	*spot;
 
@@ -820,12 +774,6 @@ gentity_t *SelectInitialSpawnPoint( vector3 *origin, vector3 *angles, team_t tea
 	return spot;
 }
 
-/*
-===========
-SelectSpectatorSpawnPoint
-
-============
-*/
 gentity_t *SelectSpectatorSpawnPoint( vector3 *origin, vector3 *angles ) {
 	FindIntermissionPoint();
 
@@ -835,29 +783,8 @@ gentity_t *SelectSpectatorSpawnPoint( vector3 *origin, vector3 *angles ) {
 	return NULL;
 }
 
-/*
-=======================================================================
-
-BODYQUE
-
-=======================================================================
-*/
-
-/*
-=======================================================================
-
-BODYQUE
-
-=======================================================================
-*/
-
 #define BODY_SINK_TIME		30000//45000
 
-/*
-===============
-InitBodyQue
-===============
-*/
 void InitBodyQue( void ) {
 	int		i;
 	gentity_t	*ent;
@@ -871,13 +798,7 @@ void InitBodyQue( void ) {
 	}
 }
 
-/*
-=============
-BodySink
-
-After sitting around for five seconds, fall into the ground and dissapear
-=============
-*/
+// After sitting around for five seconds, fall into the ground and dissapear
 void BodySink( gentity_t *ent ) {
 	if ( level.time - ent->timestamp > BODY_SINK_TIME + 2500 ) {
 		// the body ques are never actually freed, they are just unlinked
@@ -893,14 +814,7 @@ void BodySink( gentity_t *ent ) {
 	ent->takedamage = qfalse;
 }
 
-/*
-=============
-CopyToBodyQue
-
-A player is respawning, so make an entity that looks
-just like the existing corpse to leave behind.
-=============
-*/
+// A player is respawning, so make an entity that looks just like the existing corpse to leave behind.
 static qboolean CopyToBodyQue( gentity_t *ent ) {
 	gentity_t	*body;
 	uint32_t	contents;
@@ -1008,15 +922,6 @@ static qboolean CopyToBodyQue( gentity_t *ent ) {
 	return qtrue;
 }
 
-//======================================================================
-
-
-/*
-==================
-SetClientViewAngle
-
-==================
-*/
 void SetClientViewAngle( gentity_t *ent, vector3 *angle ) {
 	int			i;
 
@@ -1056,12 +961,8 @@ void MaintainBodyQueue( gentity_t *ent ) { //do whatever should be done taking r
 	}
 }
 
-/*
-================
-respawn
-================
-*/
 void SiegeRespawn( gentity_t *ent );
+
 void respawn( gentity_t *ent ) {
 	MaintainBodyQueue( ent );
 
@@ -1124,13 +1025,7 @@ void respawn( gentity_t *ent ) {
 	}
 }
 
-/*
-================
-TeamCount
-
-Returns number of players on a team
-================
-*/
+// Returns number of players on a team
 int TeamCount( int ignoreClientNum, team_t team ) {
 	int		i;
 	int		count = 0;
@@ -1154,12 +1049,6 @@ int TeamCount( int ignoreClientNum, team_t team ) {
 	return count;
 }
 
-/*
-================
-PickTeam
-
-================
-*/
 team_t PickTeam( int ignoreClientNum ) {
 	int		counts[TEAM_NUM_TEAMS];
 
@@ -1438,21 +1327,16 @@ qboolean G_SaberModelSetup( gentity_t *ent ) {
 	return fallbackForSaber;
 }
 
-/*
-===========
-SetupGameGhoul2Model
-
-There are two ghoul2 model instances per player (actually three).  One is on the clientinfo (the base for the client side
-player, and copied for player spawns and for corpses).  One is attached to the centity itself, which is the model acutally
-animated and rendered by the system.  The final is the game ghoul2 model.  This is animated by pmove on the server, and
-is used for determining where the lightsaber should be, and for per-poly collision tests.
-===========
-*/
 void *g2SaberInstance = NULL;
 
 qboolean BG_IsValidCharacterModel( const char *modelName, const char *skinName );
 qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team, vector3 *colors );
 
+// There are two ghoul2 model instances per player (actually three).
+// One is on the clientinfo (the base for the client side player, and copied for player spawns and for corpses).
+// One is attached to the centity itself, which is the model actually animated and rendered by the system.
+// The final is the game ghoul2 model. This is animated by pmove on the server, and is used for determining where the
+//	lightsaber should be, and for per-poly collision tests.
 void SetupGameGhoul2Model( gentity_t *ent, char *modelname, char *skinName ) {
 	int handle;
 	char afilename[MAX_QPATH], GLAName[MAX_QPATH];
@@ -2923,17 +2807,10 @@ tryTorso:
 #endif
 }
 
-/*
-===========
-ClientSpawn
+qboolean WP_HasForcePowers( const playerState_t *ps );
 
-Called every time a client is placed fresh in the world:
-after the first ClientBegin, and after each respawn
-Initializes all non-persistant parts of playerState
-============
-*/
-
-extern qboolean WP_HasForcePowers( const playerState_t *ps );
+// Called every time a client is placed fresh in the world: after the first ClientBegin, and after each respawn
+// Initializes all non-persistant parts of playerState
 void ClientSpawn( gentity_t *ent ) {
 	int i, index = 0, saveSaberNum = ENTITYNUM_NONE, savedSiegeIndex = 0, maxHealth = 100, gameFlags, savedPing, accuracy_hits,
 		accuracy_shots, eventSequence, persistant[MAX_PERSISTANT];

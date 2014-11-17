@@ -706,11 +706,8 @@ void Jedi_CheckCloak( void ) {
 		}
 	}
 }
-/*
-==========================================================================================
-AGGRESSION
-==========================================================================================
-*/
+
+// AGGRESSION
 static void Jedi_Aggression( gentity_t *self, int change ) {
 	int	upper_threshold, lower_threshold;
 
@@ -806,12 +803,8 @@ void Jedi_RageStop( gentity_t *self ) {
 		Jedi_Aggression( self, Q_irand( -5, 0 ) );
 	}
 }
-/*
-==========================================================================================
-SPEAKING
-==========================================================================================
-*/
 
+// SPEAKING
 static qboolean Jedi_BattleTaunt( void ) {
 	if ( TIMER_Done( NPC, "chatter" )
 		&& !Q_irand( 0, 3 )
@@ -840,11 +833,7 @@ static qboolean Jedi_BattleTaunt( void ) {
 	return qfalse;
 }
 
-/*
-==========================================================================================
-MOVEMENT
-==========================================================================================
-*/
+// MOVEMENT
 static qboolean Jedi_ClearPathToSpot( vector3 *dest, int impactEntNum ) {
 	trace_t	trace;
 	vector3	mins, start, end, dir;
@@ -996,11 +985,6 @@ qboolean NPC_MoveDirClear( int forwardmove, int rightmove, qboolean reset ) {
 	}
 	return qfalse;
 }
-/*
--------------------------
-Jedi_HoldPosition
--------------------------
-*/
 
 static void Jedi_HoldPosition( void ) {
 	//NPCInfo->squadState = SQUAD_STAND_AND_SHOOT;
@@ -1013,12 +997,6 @@ static void Jedi_HoldPosition( void ) {
 	}
 	*/
 }
-
-/*
--------------------------
-Jedi_Move
--------------------------
-*/
 
 static void Jedi_Move( gentity_t *goal, qboolean retreat ) {
 	qboolean	moved;
@@ -1995,20 +1973,13 @@ qboolean Jedi_SaberBusy( gentity_t *self ) {
 	return qfalse;
 }
 
-/*
--------------------------
-Jedi_SaberBlock
+qboolean G_FindClosestPointOnLineSegment( const vector3 *start, const vector3 *end, const vector3 *from, vector3 *result );
 
-Pick proper block anim
-
-FIXME: Based on difficulty level/enemy saber combat skill, make this decision-making more/less effective
-
-NOTE: always blocking projectiles in this func!
-
--------------------------
-*/
-extern qboolean G_FindClosestPointOnLineSegment( const vector3 *start, const vector3 *end, const vector3 *from, vector3 *result );
-evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitloc, vector3 *phitDir, gentity_t *incoming, float dist ) //dist = 0.0f
+// Pick proper block anim
+//FIXME: Based on difficulty level/enemy saber combat skill, make this decision-making more/less effective
+//NOTE: always blocking projectiles in this func!
+evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitloc, vector3 *phitDir,
+	gentity_t *incoming, float dist )
 {
 	vector3 hitloc, hitdir, diff, fwdangles = { 0, 0, 0 }, right;
 	float rightdot;
@@ -2727,13 +2698,8 @@ static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bl
 	}
 	return qtrue;
 }
-/*
--------------------------
-Jedi_EvasionSaber
 
-defend if other is using saber and attacking me!
--------------------------
-*/
+// defend if other is using saber and attacking me!
 static void Jedi_EvasionSaber( vector3 *enemy_movedir, float enemy_dist, vector3 *enemy_dir ) {
 	vector3	dirEnemy2Me;
 	int		evasionChance = 30;//only step aside 30% if he's moving at me but not attacking
@@ -2969,25 +2935,8 @@ static void Jedi_EvasionSaber( vector3 *enemy_movedir, float enemy_dist, vector3
 		}
 	}
 }
-/*
--------------------------
-Jedi_Flee
--------------------------
-*/
-/*
 
-static qboolean Jedi_Flee( void )
-{
-return qfalse;
-}
-*/
-
-
-/*
-==========================================================================================
-INTERNAL AI ROUTINES
-==========================================================================================
-*/
+// INTERNAL AI ROUTINES
 gentity_t *Jedi_FindEnemyInCone( gentity_t *self, gentity_t *fallback, float minDot ) {
 	vector3 forward, mins, maxs, dir;
 	float	dist, bestDist = Q3_INFINITE;
@@ -4275,17 +4224,7 @@ static void Jedi_Combat( void ) {
 	}
 }
 
-/*
-==========================================================================================
-EXTERNALLY CALLED BEHAVIOR STATES
-==========================================================================================
-*/
-
-/*
--------------------------
-NPC_Jedi_Pain
--------------------------
-*/
+// EXTERNALLY CALLED BEHAVIOR STATES
 
 void NPC_Jedi_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	gentity_t *other = attacker;
@@ -4460,11 +4399,6 @@ qboolean Jedi_WaitingAmbush( gentity_t *self ) {
 	}
 	return qfalse;
 }
-/*
--------------------------
-Jedi_Patrol
--------------------------
-*/
 
 static void Jedi_Patrol( void ) {
 	NPC->client->ps.saberBlocked = BLOCKED_NONE;
@@ -4610,11 +4544,7 @@ qboolean Jedi_CanPullBackSaber( gentity_t *self ) {
 
 	return qtrue;
 }
-/*
--------------------------
-NPC_BSJedi_FollowLeader
--------------------------
-*/
+
 void NPC_BSJedi_FollowLeader( void ) {
 	NPC->client->ps.saberBlocked = BLOCKED_NONE;
 	if ( !NPC->enemy ) {
@@ -4680,13 +4610,6 @@ void NPC_BSJedi_FollowLeader( void ) {
 	//try normal movement
 	NPC_BSFollowLeader();
 }
-
-
-/*
--------------------------
-Jedi_Attack
--------------------------
-*/
 
 static void Jedi_Attack( void ) {
 	//Don't do anything if we're in a pain anim

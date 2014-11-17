@@ -18,7 +18,6 @@
 extern void Q3_SetParm( int entID, int parmNum, const char *parmValue );
 #endif
 
-
 const char *bgToggleableSurfaces[BG_NUM_TOGGLEABLE_SURFACES] = {
 	"l_arm_key",					//0
 	"torso_canister1",
@@ -344,19 +343,12 @@ char *CG_NewString( const char *string );
 #endif
 
 #ifndef _UI
-/*
-===============
-BG_ParseField
-
-Takes a key/value pair and sets the binary values
-in a gentity/centity/whatever the hell you want
-===============
-*/
 
 static int spawncmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((BG_field_t*)b)->name );
 }
 
+// Takes a key/value pair and sets the binary values in a gentity/centity/whatever the hell you want
 void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent ) {
 	const BG_field_t *f;
 	byte *b;
@@ -809,11 +801,6 @@ qboolean BG_CanUseFPNow( int gametype, playerState_t *ps, int time, forcePowers_
 	return qtrue;
 }
 
-/*
-==============
-BG_FindItemForPowerup
-==============
-*/
 const gitem_t *BG_FindItemForPowerup( powerup_t pw ) {
 	const gitem_t *it = NULL;
 
@@ -825,12 +812,6 @@ const gitem_t *BG_FindItemForPowerup( powerup_t pw ) {
 	return NULL;
 }
 
-
-/*
-==============
-BG_FindItemForHoldable
-==============
-*/
 const gitem_t *BG_FindItemForHoldable( holdable_t hi ) {
 	const gitem_t *it = NULL;
 
@@ -843,13 +824,6 @@ const gitem_t *BG_FindItemForHoldable( holdable_t hi ) {
 	return NULL;
 }
 
-
-/*
-===============
-BG_FindItemForWeapon
-
-===============
-*/
 const gitem_t *BG_FindItemForWeapon( weapon_t wp ) {
 	const gitem_t *it = NULL;
 
@@ -862,12 +836,6 @@ const gitem_t *BG_FindItemForWeapon( weapon_t wp ) {
 	return NULL;
 }
 
-/*
-===============
-BG_FindItemForAmmo
-
-===============
-*/
 const gitem_t *BG_FindItemForAmmo( ammo_t ammo ) {
 	const gitem_t *it = NULL;
 
@@ -880,12 +848,6 @@ const gitem_t *BG_FindItemForAmmo( ammo_t ammo ) {
 	return NULL;
 }
 
-/*
-===============
-BG_FindItem
-
-===============
-*/
 const gitem_t *BG_FindItem( const char *classname ) {
 	const gitem_t *it = NULL;
 
@@ -897,16 +859,9 @@ const gitem_t *BG_FindItem( const char *classname ) {
 	return NULL;
 }
 
-/*
-============
-BG_PlayerTouchesItem
-
-Items can be picked up without actually touching their physical bounds to make
-grabbing them easier
-============
-*/
-qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) {
-	vector3		origin;
+// Items can be picked up without actually touching their physical bounds to make grabbing them easier
+qboolean BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) {
+	vector3 origin;
 
 	BG_EvaluateTrajectory( &item->pos, atTime, &origin );
 
@@ -1051,14 +1006,6 @@ void BG_CycleInven( playerState_t *ps, int direction ) {
 	}
 }
 
-/*
-================
-BG_CanItemBeGrabbed
-
-Returns false if the item should not be picked up.
-This needs to be the same for client side prediction and server use.
-================
-*/
 static qboolean BG_AlwaysPickupWeapons( void ) {
 #ifdef _GAME
 	return !!((jp_cinfo.integer & CINFO_ALWAYSPICKUPWEAP));
@@ -1069,6 +1016,8 @@ static qboolean BG_AlwaysPickupWeapons( void ) {
 #endif
 }
 
+// Returns false if the item should not be picked up.
+// This needs to be the same for client side prediction and server use.
 qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps ) {
 	const gitem_t	*item;
 
@@ -1209,17 +1158,8 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	return qfalse;
 }
 
-//======================================================================
-
-/*
-================
-BG_EvaluateTrajectory
-
-================
-*/
 void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vector3 *result ) {
-	float		deltaTime;
-	float		phase;
+	float deltaTime, phase;
 
 	switch ( tr->trType ) {
 	case TR_STATIONARY:
@@ -1264,16 +1204,9 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vector3 *result 
 	}
 }
 
-/*
-================
-BG_EvaluateTrajectoryDelta
-
-For determining velocity at a given time
-================
-*/
+// For determining velocity at a given time
 void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vector3 *result ) {
-	float	deltaTime;
-	float	phase;
+	float deltaTime, phase;
 
 	switch ( tr->trType ) {
 	case TR_STATIONARY:
@@ -1516,47 +1449,34 @@ const char *eventnames[] = {
 	//fixme, added a bunch that aren't here!
 };
 
-/*
-===============
-BG_AddPredictableEventToPlayerstate
-
-Handles the sequence numbers
-===============
-*/
-
-//void	trap->Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
-
+// Handles the sequence numbers
 void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps ) {
 
 #ifdef _DEBUG
-	{
-		static vmCvar_t		showEvents;
-		static qboolean		isRegistered = qfalse;
+	static vmCvar_t showEvents;
+	static qboolean isRegistered = qfalse;
 
-		if ( !isRegistered ) {
-			trap->Cvar_Register( &showEvents, "showevents", "0", 0 );
-			isRegistered = qtrue;
-		}
-
-		if ( showEvents.integer != 0 ) {
-#ifdef _GAME
-			Com_Printf( " game event svt %5d -> %5d: num = %20s parm %d\n", ps->pmove_framecount/*ps->commandTime*/, ps->eventSequence, eventnames[newEvent], eventParm );
-#else
-			Com_Printf( "Cgame event svt %5d -> %5d: num = %20s parm %d\n", ps->pmove_framecount/*ps->commandTime*/, ps->eventSequence, eventnames[newEvent], eventParm );
-#endif
-		}
+	if ( !isRegistered ) {
+		trap->Cvar_Register( &showEvents, "showevents", "0", 0 );
+		isRegistered = qtrue;
 	}
+
+	if ( showEvents.integer ) {
+		Com_Printf( "%cgame event svt %5d -> %5d: num = %20s parm %d\n",
+#ifdef _GAME
+			' ',
+#else
+			'c',
 #endif
+			ps->pmove_framecount, ps->eventSequence, eventnames[newEvent], eventParm );
+	}
+#endif // _DEBUG
+
 	ps->events[ps->eventSequence & (MAX_PS_EVENTS - 1)] = newEvent;
 	ps->eventParms[ps->eventSequence & (MAX_PS_EVENTS - 1)] = eventParm;
 	ps->eventSequence++;
 }
 
-/*
-========================
-BG_TouchJumpPad
-========================
-*/
 void BG_TouchJumpPad( playerState_t *ps, entityState_t *jumppad ) {
 	// spectators don't use jump pads
 	if ( ps->pm_type != PM_NORMAL && ps->pm_type != PM_JETPACK && ps->pm_type != PM_FLOAT )
@@ -1572,13 +1492,7 @@ void BG_TouchJumpPad( playerState_t *ps, entityState_t *jumppad ) {
 	ps->fd.forcePowersActive &= ~(1 << FP_LEVITATION);
 }
 
-/*
-=================
-BG_EmplacedView
-
-Shared code for emplaced angle gun constriction
-=================
-*/
+// Shared code for emplaced angle gun constriction
 int BG_EmplacedView( vector3 *baseAngles, vector3 *angles, float *newYaw, float constraint ) {
 	float dif = AngleSubtract( baseAngles->yaw, angles->yaw );
 
@@ -1724,14 +1638,7 @@ qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team
 	return qtrue;
 }
 
-/*
-========================
-BG_PlayerStateToEntityState
-
-This is done after each set of usercmd_t on the server,
-and after local prediction on the client
-========================
-*/
+// This is done after each set of usercmd_t on the server, and after local prediction on the client
 void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean snap ) {
 	int		i;
 
@@ -1875,14 +1782,7 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 	s->m_iVehicleNum = ps->m_iVehicleNum;
 }
 
-/*
-========================
-BG_PlayerStateToEntityStateExtraPolate
-
-This is done after each set of usercmd_t on the server,
-and after local prediction on the client
-========================
-*/
+// This is done after each set of usercmd_t on the server, and after local prediction on the client
 void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap ) {
 	int		i;
 
@@ -2028,16 +1928,7 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 	s->m_iVehicleNum = ps->m_iVehicleNum;
 }
 
-/*
-=============================================================================
-
-PLAYER ANGLES
-
-=============================================================================
-*/
-
-//perform the appropriate model precache routine
-
+// perform the appropriate model precache routine
 int BG_ModelCache( const char *modelName, const char *skinName ) {
 #ifdef _GAME
 	void *g2 = NULL;

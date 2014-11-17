@@ -1,13 +1,3 @@
-//===========================================================================
-//
-// Name:			match.h
-// Function:		match template defines
-// Programmer:		Mr Elusive
-// Last update:
-// Tab Size:		4 (real tabs)
-//
-//===========================================================================
-
 // make sure this is the same character as we use in chats in g_cmd.c
 #define EC	"\x19"
 

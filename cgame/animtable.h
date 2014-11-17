@@ -5,9 +5,7 @@
 
 stringID_table_t animTable[MAX_ANIMATIONS + 1] =
 {
-	//=================================================
 	//HEAD ANIMS
-	//=================================================
 	//# #sep Head-only anims
 	ENUM2STRING( FACE_TALK0 ),			//# silent
 	ENUM2STRING( FACE_TALK1 ),			//# quiet
@@ -19,9 +17,7 @@ stringID_table_t animTable[MAX_ANIMATIONS + 1] =
 	ENUM2STRING( FACE_FROWN ),				//#
 	ENUM2STRING( FACE_DEAD ),				//#
 
-	//=================================================
 	//ANIMS IN WHICH UPPER AND LOWER OBJECTS ARE IN MD3
-	//=================================================
 	//# #sep ENUM2STRING(BOTH_ DEATHS
 	ENUM2STRING( BOTH_DEATH1 ),		//# First Death anim
 	ENUM2STRING( BOTH_DEATH2 ),			//# Second Death anim
@@ -827,7 +823,7 @@ stringID_table_t animTable[MAX_ANIMATIONS + 1] =
 	//Sabers locked anims
 	//* #sep BOTH_ SABER LOCKED ANIMS
 	//BOTH_(DL, S, ST)_(DL, S, ST)_(T, S)_(L, B, SB)_1(_W, _L)
-	//===Single locks==================================================================
+	// Single locks
 	//SINGLE vs. DUAL
 	//side locks - I'm using a single and they're using dual
 	ENUM2STRING( BOTH_LK_S_DL_S_B_1_L ),	//normal break I lost
@@ -867,7 +863,7 @@ stringID_table_t animTable[MAX_ANIMATIONS + 1] =
 	ENUM2STRING( BOTH_LK_S_S_T_L_1 ),		//lock if I'm using single vs. a single and I initiated
 	ENUM2STRING( BOTH_LK_S_S_T_SB_1_L ),	//super break I lost
 	ENUM2STRING( BOTH_LK_S_S_T_SB_1_W ),	//super break I won
-	//===Dual Saber locks==================================================================
+	// Dual Saber locks
 	//DUAL vs. DUAL
 	//side locks
 	ENUM2STRING( BOTH_LK_DL_DL_S_B_1_L ),	//normal break I lost
@@ -907,7 +903,7 @@ stringID_table_t animTable[MAX_ANIMATIONS + 1] =
 	ENUM2STRING( BOTH_LK_DL_S_T_L_1 ),		//lock if I'm using dual vs. a single
 	ENUM2STRING( BOTH_LK_DL_S_T_SB_1_L ),	//super break I lost
 	ENUM2STRING( BOTH_LK_DL_S_T_SB_1_W ),	//super break I won
-	//===Saber Staff locks==================================================================
+	// Saber Staff locks
 	//STAFF vs. DUAL
 	//side locks
 	ENUM2STRING( BOTH_LK_ST_DL_S_B_1_L ),	//normal break I lost
@@ -954,7 +950,7 @@ stringID_table_t animTable[MAX_ANIMATIONS + 1] =
 	ENUM2STRING( BOTH_LK_DL_DL_T_L_2 ),	//lock if I'm using dual vs. dual and other initiated
 	ENUM2STRING( BOTH_LK_ST_ST_S_L_2 ),	//lock if I'm using staff vs. a staff and other initiated
 	ENUM2STRING( BOTH_LK_ST_ST_T_L_2 ),	//lock if I'm using staff vs. a staff and other initiated
-	//===End Saber locks==================================================================
+	// End Saber locks
 	ENUM2STRING( BOTH_BF2RETURN ),	//#
 	ENUM2STRING( BOTH_BF2BREAK ),	//#
 	ENUM2STRING( BOTH_BF2LOCK ),	//#
@@ -1614,9 +1610,7 @@ stringID_table_t animTable[MAX_ANIMATIONS + 1] =
 
 	ENUM2STRING( BOTH_SIT6 ),
 	ENUM2STRING( BOTH_SIT7 ),
-	//=================================================
 	//ANIMS IN WHICH ONLY THE UPPER OBJECTS ARE IN MD3
-	//=================================================
 	//# #sep ENUM2STRING(TORSO_ WEAPON-RELATED
 	ENUM2STRING( TORSO_DROPWEAP1 ),		//# Put weapon away
 	ENUM2STRING( TORSO_DROPWEAP4 ),		//# Put weapon away
@@ -1645,9 +1639,7 @@ stringID_table_t animTable[MAX_ANIMATIONS + 1] =
 	ENUM2STRING( TORSO_HANDSIGNAL4 ),
 	ENUM2STRING( TORSO_HANDSIGNAL5 ),
 
-	//=================================================
 	//ANIMS IN WHICH ONLY THE LOWER OBJECTS ARE IN MD3
-	//=================================================
 	//# #sep Legs-only anims
 	ENUM2STRING( LEGS_TURN1 ),				//# What legs do when you turn your lower body to match your upper body facing
 	ENUM2STRING( LEGS_TURN2 ),				//# Leg turning from stand2
@@ -1772,17 +1764,10 @@ stringID_table_t animTable[MAX_ANIMATIONS + 1] =
 
 	ENUM2STRING( BOTH_JUMP_BACKFLIP_ATCK_MISSED ),
 
-
-
-	//--------------------------------
 	//JA++ new animations
-	//--------------------------------
 	ENUM2STRING( BOTH_WORM ),
 
-
-	//======================================================
 	//cinematic anims
-	//======================================================
 	//# #sep BOTH_ CINEMATIC-ONLY
 	ENUM2STRING( BOTH_CIN_1 ),		//# Level specific cinematic 1
 	ENUM2STRING( BOTH_CIN_2 ),		//# Level specific cinematic 2

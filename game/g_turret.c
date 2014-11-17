@@ -6,10 +6,7 @@
 qboolean turret_base_spawn_top( gentity_t *base );
 void ObjectDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath );
 
-//------------------------------------------------------------------------------------------------------------
-void TurretPain( gentity_t *self, gentity_t *attacker, int damage )
-//------------------------------------------------------------------------------------------------------------
-{
+void TurretPain( gentity_t *self, gentity_t *attacker, int damage ) {
 	if ( self->target_ent ) {
 		self->target_ent->health = self->health;
 		if ( self->target_ent->maxHealth ) {
@@ -26,10 +23,7 @@ void TurretPain( gentity_t *self, gentity_t *attacker, int damage )
 	}
 }
 
-//------------------------------------------------------------------------------------------------------------
-void TurretBasePain( gentity_t *self, gentity_t *attacker, int damage )
-//------------------------------------------------------------------------------------------------------------
-{
+void TurretBasePain( gentity_t *self, gentity_t *attacker, int damage ) {
 	if ( self->target_ent ) {
 		self->target_ent->health = self->health;
 		if ( self->target_ent->maxHealth ) {
@@ -40,10 +34,7 @@ void TurretBasePain( gentity_t *self, gentity_t *attacker, int damage )
 	}
 }
 
-//------------------------------------------------------------------------------------------------------------
-void auto_turret_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
-//------------------------------------------------------------------------------------------------------------
-{
+void auto_turret_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
 	vector3	forward = { 0, 0, 1 }, pos;
 
 	// Turn off the thinking of the base & use it's targets
@@ -96,10 +87,7 @@ void auto_turret_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker
 	}
 }
 
-//------------------------------------------------------------------------------------------------------------
-void bottom_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
-//------------------------------------------------------------------------------------------------------------
-{
+void bottom_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
 	if ( self->target_ent && self->target_ent->health > 0 ) {
 		self->target_ent->health = self->health;
 		if ( self->target_ent->maxHealth ) {
@@ -111,10 +99,7 @@ void bottom_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 #define START_DIS 15
 
-//----------------------------------------------------------------
-static void turret_fire( gentity_t *ent, vector3 *start, vector3 *dir )
-//----------------------------------------------------------------
-{
+static void turret_fire( gentity_t *ent, vector3 *start, vector3 *dir ) {
 	vector3		org;
 	gentity_t	*bolt;
 
@@ -161,10 +146,7 @@ static void turret_fire( gentity_t *ent, vector3 *start, vector3 *dir )
 	bolt->parent = ent;
 }
 
-//-----------------------------------------------------
-void turret_head_think( gentity_t *self )
-//-----------------------------------------------------
-{
+void turret_head_think( gentity_t *self ) {
 	gentity_t *top = &g_entities[self->r.ownerNum];
 	if ( !top ) {
 		return;
@@ -206,10 +188,7 @@ void turret_head_think( gentity_t *self )
 	}
 }
 
-//-----------------------------------------------------
-static void turret_aim( gentity_t *self )
-//-----------------------------------------------------
-{
+static void turret_aim( gentity_t *self ) {
 	vector3	enemyDir, org, org2;
 	vector3	desiredAngles, setAngle;
 	float	diffYaw = 0.0f, diffPitch = 0.0f, turnSpeed;
@@ -298,10 +277,7 @@ static void turret_aim( gentity_t *self )
 	}
 }
 
-//-----------------------------------------------------
-static void turret_turnoff( gentity_t *self )
-//-----------------------------------------------------
-{
+static void turret_turnoff( gentity_t *self ) {
 	gentity_t *top = &g_entities[self->r.ownerNum];
 	if ( top != NULL ) {//still have a top
 		//stop it from rotating
@@ -319,10 +295,7 @@ static void turret_turnoff( gentity_t *self )
 	self->enemy = NULL;
 }
 
-//-----------------------------------------------------
-static void turret_sleep( gentity_t *self )
-//-----------------------------------------------------
-{
+static void turret_sleep( gentity_t *self ) {
 	if ( self->enemy == NULL ) {
 		// we don't need to play sound
 		return;
@@ -335,10 +308,7 @@ static void turret_sleep( gentity_t *self )
 	self->enemy = NULL;
 }
 
-//-----------------------------------------------------
-static qboolean turret_find_enemies( gentity_t *self )
-//-----------------------------------------------------
-{
+static qboolean turret_find_enemies( gentity_t *self ) {
 	qboolean	found = qfalse;
 	int			i, count;
 	float		bestDist = self->radius * self->radius;
@@ -431,10 +401,7 @@ static qboolean turret_find_enemies( gentity_t *self )
 	return found;
 }
 
-//-----------------------------------------------------
-void turret_base_think( gentity_t *self )
-//-----------------------------------------------------
-{
+void turret_base_think( gentity_t *self ) {
 	qboolean	turnOff = qtrue;
 	float		enemyDist;
 	vector3		enemyDir, org, org2;
@@ -512,10 +479,7 @@ void turret_base_think( gentity_t *self )
 	turret_aim( self );
 }
 
-//-----------------------------------------------------------------------------
-void turret_base_use( gentity_t *self, gentity_t *other, gentity_t *activator )
-//-----------------------------------------------------------------------------
-{
+void turret_base_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	// Toggle on and off
 	self->spawnflags = (self->spawnflags ^ 1);
 
@@ -571,10 +535,7 @@ teamnodmg - team that turret does not take damage from
 
 "icon" - icon that represents the objective on the radar
 */
-//-----------------------------------------------------
-void SP_misc_turret( gentity_t *base )
-//-----------------------------------------------------
-{
+void SP_misc_turret( gentity_t *base ) {
 	char* s;
 
 	base->s.modelindex2 = G_ModelIndex( "models/map_objects/hoth/turret_bottom.md3" );
@@ -614,7 +575,6 @@ void SP_misc_turret( gentity_t *base )
 	}
 }
 
-//-----------------------------------------------------
 qboolean turret_base_spawn_top( gentity_t *base ) {
 	vector3		org;
 	int			t;

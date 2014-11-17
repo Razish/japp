@@ -11,12 +11,8 @@
 #define LEFT_ARM_HEALTH 40
 #define RIGHT_ARM_HEALTH 40
 
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
-/*
--------------------------
-NPC_ATST_Precache
--------------------------
-*/
+void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
+
 void NPC_ATST_Precache( void ) {
 	G_SoundIndex( "sound/chars/atst/atst_damaged1" );
 	G_SoundIndex( "sound/chars/atst/atst_damaged2" );
@@ -32,34 +28,7 @@ void NPC_ATST_Precache( void ) {
 	G_EffectIndex( "explosions/droidexplosion1" );
 }
 
-//-----------------------------------------------------------------
-#if 0
-static void ATST_PlayEffect( gentity_t *self, const int boltID, const char *fx ) {
-	if ( boltID >= 0 && fx && fx[0] ) {
-		mdxaBone_t	boltMatrix;
-		vector3		org, dir;
-
-		trap->G2API_GetBoltMatrix( self->ghoul2, 0,
-			boltID,
-			&boltMatrix, self->r.currentAngles, self->r.currentOrigin, level.time,
-			NULL, self->modelScale );
-
-		BG_GiveMeVectorFromMatrix( &boltMatrix, ORIGIN, org );
-		BG_GiveMeVectorFromMatrix( &boltMatrix, NEGATIVE_Y, dir );
-
-		G_PlayEffectID( G_EffectIndex( (char *)fx ), org, dir );
-	}
-}
-#endif
-
-/*
--------------------------
-G_ATSTCheckPain
-
-Called by NPC's and player in an ATST
--------------------------
-*/
-
+// Called by NPC's and player in an ATST
 void G_ATSTCheckPain( gentity_t *self, gentity_t *other, int damage ) {
 	//int newBolt;
 	//int hitLoc = gPainHitLoc;
@@ -105,21 +74,12 @@ void G_ATSTCheckPain( gentity_t *self, gentity_t *other, int damage ) {
 	}
 	*/
 }
-/*
--------------------------
-NPC_ATST_Pain
--------------------------
-*/
+
 void NPC_ATST_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	G_ATSTCheckPain( self, attacker, damage );
 	NPC_Pain( self, attacker, damage );
 }
 
-/*
--------------------------
-ATST_Hunt
--------------------------`
-*/
 void ATST_Hunt( qboolean visible, qboolean advance ) {
 
 	if ( NPCInfo->goalEntity == NULL ) {//hunt
@@ -132,11 +92,6 @@ void ATST_Hunt( qboolean visible, qboolean advance ) {
 
 }
 
-/*
--------------------------
-ATST_Ranged
--------------------------
-*/
 void ATST_Ranged( qboolean visible, qboolean advance, qboolean altAttack ) {
 
 	if ( TIMER_Done( NPC, "atkDelay" ) && visible )	// Attack?
@@ -156,11 +111,6 @@ void ATST_Ranged( qboolean visible, qboolean advance, qboolean altAttack ) {
 	}
 }
 
-/*
--------------------------
-ATST_Attack
--------------------------
-*/
 void ATST_Attack( void ) {
 	qboolean altAttack = qfalse, visible = qfalse, advance = qfalse;
 	int blasterTest, chargerTest;
@@ -215,11 +165,6 @@ void ATST_Attack( void ) {
 	ATST_Ranged( visible, advance, altAttack );
 }
 
-/*
--------------------------
-ATST_Patrol
--------------------------
-*/
 void ATST_Patrol( void ) {
 	if ( NPC_CheckPlayerTeamStealth() ) {
 		NPC_UpdateAngles( qtrue, qtrue );
@@ -237,11 +182,6 @@ void ATST_Patrol( void ) {
 
 }
 
-/*
--------------------------
-ATST_Idle
--------------------------
-*/
 void ATST_Idle( void ) {
 
 	NPC_BSIdle();
@@ -249,11 +189,6 @@ void ATST_Idle( void ) {
 	NPC_SetAnim( NPC, SETANIM_BOTH, BOTH_STAND1, SETANIM_FLAG_NORMAL );
 }
 
-/*
--------------------------
-NPC_BSDroid_Default
--------------------------
-*/
 void NPC_BSATST_Default( void ) {
 	if ( NPC->enemy ) {
 		if ( (NPCInfo->scriptFlags & SCF_CHASE_ENEMIES) ) {

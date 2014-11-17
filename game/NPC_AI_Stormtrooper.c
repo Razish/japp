@@ -222,11 +222,6 @@ void ST_StartFlee( gentity_t *self, gentity_t *enemy, vector3 *dangerPoint, int 
 		ST_Speech( self, SPEECH_COVER, 0 );//FIXME: flee sound?
 	}
 }
-/*
--------------------------
-NPC_ST_Pain
--------------------------
-*/
 
 void NPC_ST_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	self->NPC->localState = LSTATE_UNDERFIRE;
@@ -241,12 +236,6 @@ void NPC_ST_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 		G_AddVoiceEvent( self, Q_irand( EV_PUSHED1, EV_PUSHED3 ), 2000 );
 	}
 }
-
-/*
--------------------------
-ST_HoldPosition
--------------------------
-*/
 
 static void ST_HoldPosition( void ) {
 	if ( NPCInfo->squadState == SQUAD_RETREAT ) {
@@ -290,11 +279,7 @@ void NPC_ST_StoreMovementSpeech( int speech, float chance ) {
 	NPCInfo->movementSpeech = speech;
 	NPCInfo->movementSpeechChance = chance;
 }
-/*
--------------------------
-ST_Move
--------------------------
-*/
+
 void ST_TransferMoveGoal( gentity_t *self, gentity_t *other );
 static qboolean ST_Move( void ) {
 	qboolean	moved;
@@ -343,12 +328,6 @@ static qboolean ST_Move( void ) {
 }
 
 
-/*
--------------------------
-NPC_ST_SleepShuffle
--------------------------
-*/
-
 static void NPC_ST_SleepShuffle( void ) {
 	//Play an awake script if we have one
 	if ( G_ActivateBehavior( NPC, BSET_AWAKE ) ) {
@@ -386,12 +365,6 @@ static void NPC_ST_SleepShuffle( void ) {
 		TIMER_Set( NPC, "sleepTime", 2000 );
 	}
 }
-
-/*
--------------------------
-NPC_ST_Sleep
--------------------------
-*/
 
 void NPC_BSST_Sleep( void ) {
 	int alertEvent = NPC_CheckAlertEvents( qfalse, qtrue, -1, qfalse, AEL_MINOR );//only check sounds since we're alseep!
@@ -435,12 +408,6 @@ void NPC_BSST_Sleep( void ) {
 		return;
 	}
 }
-
-/*
--------------------------
-NPC_CheckEnemyStealth
--------------------------
-*/
 
 qboolean NPC_CheckEnemyStealth( gentity_t *target ) {
 	float		target_dist, minDist = 40;//any closer than 40 and we definitely notice
@@ -686,11 +653,6 @@ qboolean NPC_CheckPlayerTeamStealth( void ) {
 	}
 	return qfalse;
 }
-/*
--------------------------
-NPC_ST_InvestigateEvent
--------------------------
-*/
 
 #define	MAX_CHECK_THRESHOLD	1
 
@@ -825,12 +787,6 @@ static qboolean NPC_ST_InvestigateEvent( int eventID, qboolean extraSuspicious )
 	return qtrue;
 }
 
-/*
--------------------------
-ST_OffsetLook
--------------------------
-*/
-
 static void ST_OffsetLook( float offset, vector3 *out ) {
 	vector3	angles, forward, temp;
 
@@ -842,12 +798,6 @@ static void ST_OffsetLook( float offset, vector3 *out ) {
 	CalcEntitySpot( NPC, SPOT_HEAD, &temp );
 	out->z = temp.z;
 }
-
-/*
--------------------------
-ST_LookAround
--------------------------
-*/
 
 static void ST_LookAround( void ) {
 	vector3	lookPos;
@@ -872,12 +822,6 @@ static void ST_LookAround( void ) {
 
 	NPC_FacePosition( &lookPos, qtrue );
 }
-
-/*
--------------------------
-NPC_BSST_Investigate
--------------------------
-*/
 
 void NPC_BSST_Investigate( void ) {
 	//get group- mainly for group speech debouncing, but may use for group scouting/investigating AI, too
@@ -957,12 +901,6 @@ void NPC_BSST_Investigate( void ) {
 	//Look around
 	ST_LookAround();
 }
-
-/*
--------------------------
-NPC_BSST_Patrol
--------------------------
-*/
 
 void NPC_BSST_Patrol( void ) {//FIXME: pick up on bodies of dead buddies?
 
@@ -1050,35 +988,6 @@ void NPC_BSST_Patrol( void ) {//FIXME: pick up on bodies of dead buddies?
 		}
 	}
 }
-
-/*
--------------------------
-NPC_BSST_Idle
--------------------------
-*/
-/*
-void NPC_BSST_Idle( void )
-{
-int alertEvent = NPC_CheckAlertEvents( qtrue, qtrue );
-
-//There is an event to look at
-if ( alertEvent >= 0 )
-{
-NPC_ST_InvestigateEvent( alertEvent, qfalse );
-NPC_UpdateAngles( qtrue, qtrue );
-return;
-}
-
-TIMER_Set( NPC, "roamTime", 2000 + Q_irand( 1000, 2000 ) );
-
-NPC_UpdateAngles( qtrue, qtrue );
-}
-*/
-/*
--------------------------
-ST_CheckMoveState
--------------------------
-*/
 
 static void ST_CheckMoveState( void ) {
 	if ( trap->ICARUS_TaskIDPending( (sharedEntity_t *)NPC, TID_MOVE_NAV ) ) {//moving toward a goal that a script is waiting on, so don't stop for anything!
@@ -1240,12 +1149,6 @@ void ST_ResolveBlockedShot( int hit ) {
 	TIMER_Set( NPC, "duck", -1 );
 	TIMER_Set( NPC, "attakDelay", Q_irand( 1000, 3000 ) );
 }
-
-/*
--------------------------
-ST_CheckFireState
--------------------------
-*/
 
 static void ST_CheckFireState( void ) {
 	if ( enemyCS ) {//if have a clear shot, always try
@@ -1506,19 +1409,11 @@ uint32_t ST_GetCPFlags( void ) {
 	}
 	return cpFlags;
 }
-/*
--------------------------
-ST_Commander
-
-Make decisions about who should go where, etc.
-
-FIXME: leader (group-decision-making) AI?
-FIXME: need alternate routes!
-FIXME: more group voice interaction
-FIXME: work in pairs?
-
--------------------------
-*/
+// Make decisions about who should go where, etc.
+// FIXME: leader (group-decision-making) AI?
+// FIXME: need alternate routes!
+// FIXME: more group voice interaction
+// FIXME: work in pairs?
 void ST_Commander( void ) {
 	int		i, j;
 	int		cp, cpFlags_org, cpFlags;
@@ -2078,12 +1973,6 @@ void ST_Commander( void ) {
 	RestoreNPCGlobals();
 	return;
 }
-
-/*
--------------------------
-NPC_BSST_Attack
--------------------------
-*/
 
 void NPC_BSST_Attack( void ) {
 	vector3	enemyDir, shootDir;

@@ -8,18 +8,11 @@
 void G_Cylinder( vector3 *start, vector3 *end, float radius, vector3 *color );
 
 int NAV_Steer( gentity_t *self, vector3 *dir, float distance );
-extern int GetTime( int lastTime );
+int GetTime( int lastTime );
 
 navInfo_t	frameNavInfo;
-extern qboolean FlyingCreature( gentity_t *ent );
-
-extern qboolean PM_InKnockDown( playerState_t *ps );
-
-/*
--------------------------
-NPC_ClearPathToGoal
--------------------------
-*/
+qboolean FlyingCreature( gentity_t *ent );
+qboolean PM_InKnockDown( playerState_t *ps );
 
 qboolean NPC_ClearPathToGoal( vector3 *dir, gentity_t *goal ) {
 	trace_t	trace;
@@ -61,12 +54,6 @@ qboolean NPC_ClearPathToGoal( vector3 *dir, gentity_t *goal ) {
 	return qfalse;
 }
 
-/*
--------------------------
-NPC_CheckCombatMove
--------------------------
-*/
-
 qboolean NPC_CheckCombatMove( void ) {
 	//return NPCInfo->combatMove;
 	if ( (NPCInfo->goalEntity && NPC->enemy && NPCInfo->goalEntity == NPC->enemy) || (NPCInfo->combatMove) ) {
@@ -82,12 +69,6 @@ qboolean NPC_CheckCombatMove( void ) {
 	return qfalse;
 }
 
-/*
--------------------------
-NPC_LadderMove
--------------------------
-*/
-
 static void NPC_LadderMove( vector3 *dir ) {
 	//FIXME: this doesn't guarantee we're facing ladder
 	//ALSO: Need to be able to get off at top
@@ -102,12 +83,6 @@ static void NPC_LadderMove( vector3 *dir ) {
 		ucmd.forwardmove = ucmd.rightmove = 0;
 	}
 }
-
-/*
--------------------------
-NPC_GetMoveInformation
--------------------------
-*/
 
 qboolean NPC_GetMoveInformation( vector3 *dir, float *distance ) {
 	//NOTENOTE: Use path stacks!
@@ -125,21 +100,9 @@ qboolean NPC_GetMoveInformation( vector3 *dir, float *distance ) {
 	return qtrue;
 }
 
-/*
--------------------------
-NAV_GetLastMove
--------------------------
-*/
-
 void NAV_GetLastMove( navInfo_t *info ) {
 	*info = frameNavInfo;
 }
-
-/*
--------------------------
-NPC_GetMoveDirection
--------------------------
-*/
 
 qboolean NPC_GetMoveDirection( vector3 *out, float *distance ) {
 	vector3		angles;
@@ -206,13 +169,10 @@ qboolean NPC_GetMoveDirection( vector3 *out, float *distance ) {
 	return qtrue;
 }
 
-/*
--------------------------
-NPC_GetMoveDirectionAltRoute
--------------------------
-*/
-extern int	NAVNEW_MoveToGoal( gentity_t *self, navInfo_t *info );
-extern qboolean NAVNEW_AvoidCollision( gentity_t *self, gentity_t *goal, navInfo_t *info, qboolean setBlockedInfo, int blockedMovesLimit );
+int	NAVNEW_MoveToGoal( gentity_t *self, navInfo_t *info );
+qboolean NAVNEW_AvoidCollision( gentity_t *self, gentity_t *goal, navInfo_t *info, qboolean setBlockedInfo,
+	int blockedMovesLimit );
+
 qboolean NPC_GetMoveDirectionAltRoute( vector3 *out, float *distance, qboolean tryStraight ) {
 	vector3		angles;
 
@@ -322,16 +282,11 @@ void G_UcmdMoveForDir( gentity_t *self, usercmd_t *cmd, vector3 *dir ) {
 	*/
 }
 
-/*
--------------------------
-NPC_MoveToGoal
-
-Now assumes goal is goalEntity, was no reason for it to be otherwise
--------------------------
-*/
 #if	AI_TIMERS
 extern int navTime;
 #endif//	AI_TIMERS
+
+// Now assumes goal is goalEntity, was no reason for it to be otherwise
 qboolean NPC_MoveToGoal( qboolean tryStraight ) {
 	float	distance;
 	vector3	dir;
@@ -408,13 +363,7 @@ qboolean NPC_MoveToGoal( qboolean tryStraight ) {
 	return qtrue;
 }
 
-/*
--------------------------
-void NPC_SlideMoveToGoal( void )
-
-Now assumes goal is goalEntity, if want to use tempGoal, you set that before calling the func
--------------------------
-*/
+// Now assumes goal is goalEntity, if want to use tempGoal, you set that before calling the func
 qboolean NPC_SlideMoveToGoal( void ) {
 	float	saveYaw = NPC->client->ps.viewangles.yaw;
 	qboolean ret;
@@ -427,13 +376,6 @@ qboolean NPC_SlideMoveToGoal( void ) {
 
 	return ret;
 }
-
-
-/*
--------------------------
-NPC_ApplyRoff
--------------------------
-*/
 
 void NPC_ApplyRoff( void ) {
 	BG_PlayerStateToEntityState( &NPC->client->ps, &NPC->s, qfalse );

@@ -1351,7 +1351,6 @@ maintainSelfDuringBoarding:
 
 
 	// Shifting Sounds
-	//=====================================================================
 	if ( pVeh->m_iTurboTime<curTime &&
 		pVeh->m_iSoundDebounceTimer<curTime &&
 		((nextSpeed>prevSpeed && nextSpeed>halfMaxSpeed &&	prevSpeed<halfMaxSpeed) || (nextSpeed>halfMaxSpeed && !Q_irand( 0, 1000 )))
@@ -1369,8 +1368,6 @@ maintainSelfDuringBoarding:
 			// TODO: MP Shift Sound Playback
 		}
 	}
-	//=====================================================================
-
 
 	// Setup the move direction.
 	if ( pVeh->m_pVehicleInfo->type == VH_FIGHTER ) {

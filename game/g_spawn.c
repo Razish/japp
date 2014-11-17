@@ -804,18 +804,11 @@ spawn_t	spawns[] = {
 	{ "waypoint_small", SP_waypoint_small },
 };
 
-/*
-===============
-G_CallSpawn
-
-Finds the spawn function for the entity and calls it,
-returning qfalse if not found
-===============
-*/
 static int spawncmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((spawn_t*)b)->name );
 }
 
+// Finds the spawn function for the entity and calls it, returning qfalse if not found
 qboolean G_CallSpawn( gentity_t *ent ) {
 	spawn_t *s;
 	const gitem_t *item;
@@ -854,14 +847,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 	return qfalse;
 }
 
-/*
-=============
-G_NewString
-
-Builds a copy of the string, translating \n to real linefeeds
-so message texts can be multi-line
-=============
-*/
+// Builds a copy of the string, translating \n to real linefeeds so message texts can be multi-line
 char *G_NewString( const char *string ) {
 	char	*newb, *new_p;
 	int		i, len;
@@ -975,13 +961,6 @@ void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 		ent->jpSpawned = qtrue;
 }
 
-
-
-/*
-====================
-G_AddSpawnVarToken
-====================
-*/
 char *G_AddSpawnVarToken( const char *string ) {
 	int		l;
 	char	*dest;
@@ -1120,16 +1099,8 @@ static void HandleEntityAdjustment( void ) {
 	}
 }
 
-/*
-====================
-G_ParseSpawnVars
-
-Parses a brace bounded set of key / value pairs out of the
-level's entity strings into level.spawnVars[]
-
-This does not actually spawn an entity.
-====================
-*/
+// Parses a brace bounded set of key / value pairs out of the level's entity strings into level.spawnVars[]
+// This does not actually spawn an entity.
 qboolean G_ParseSpawnVars( qboolean inSubBSP ) {
 	char		keyname[MAX_TOKEN_CHARS];
 	char		com_token[MAX_TOKEN_CHARS];
@@ -1511,13 +1482,7 @@ void G_PrecacheSoundsets( void ) {
 	}
 }
 
-/*
-==============
-G_SpawnEntitiesFromString
-
-Parses textual entity definitions out of an entstring and spawns gentities.
-==============
-*/
+// Parses textual entity definitions out of an entstring and spawns gentities.
 void G_SpawnEntitiesFromString( qboolean inSubBSP ) {
 	// allow calls to G_Spawn*()
 	level.spawning = qtrue;

@@ -35,11 +35,6 @@ void NPC_Mark2_Precache( void ) {
 	RegisterItem( BG_FindItemForAmmo( AMMO_BLASTER ) );
 }
 
-/*
--------------------------
-NPC_Mark2_Part_Explode
--------------------------
-*/
 void NPC_Mark2_Part_Explode( gentity_t *self, int bolt ) {
 	if ( bolt >= 0 ) {
 		mdxaBone_t	boltMatrix;
@@ -62,12 +57,7 @@ void NPC_Mark2_Part_Explode( gentity_t *self, int bolt ) {
 	self->count++;	// Count of pods blown off
 }
 
-/*
--------------------------
-NPC_Mark2_Pain
-- look at what was hit and see if it should be removed from the model.
--------------------------
-*/
+// look at what was hit and see if it should be removed from the model.
 void NPC_Mark2_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	int newBolt, i;
 	int hitLoc = gPainHitLoc;
@@ -96,11 +86,6 @@ void NPC_Mark2_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	}
 }
 
-/*
--------------------------
-Mark2_Hunt
--------------------------
-*/
 void Mark2_Hunt( void ) {
 	if ( NPCInfo->goalEntity == NULL ) {
 		NPCInfo->goalEntity = NPC->enemy;
@@ -113,11 +98,6 @@ void Mark2_Hunt( void ) {
 	NPC_MoveToGoal( qtrue );
 }
 
-/*
--------------------------
-Mark2_FireBlaster
--------------------------
-*/
 void Mark2_FireBlaster( qboolean advance ) {
 	vector3	muzzle1, enemy_org1, delta1, angleToEnemy1;
 	static	vector3	forward, vright, up;
@@ -159,11 +139,6 @@ void Mark2_FireBlaster( qboolean advance ) {
 
 }
 
-/*
--------------------------
-Mark2_BlasterAttack
--------------------------
-*/
 void Mark2_BlasterAttack( qboolean advance ) {
 	if ( TIMER_Done( NPC, "attackDelay" ) )	// Attack?
 	{
@@ -182,11 +157,6 @@ void Mark2_BlasterAttack( qboolean advance ) {
 	}
 }
 
-/*
--------------------------
-Mark2_AttackDecision
--------------------------
-*/
 void Mark2_AttackDecision( void ) {
 	float		distance;
 	qboolean	visible;
@@ -261,12 +231,6 @@ void Mark2_AttackDecision( void ) {
 	}
 }
 
-
-/*
--------------------------
-Mark2_Patrol
--------------------------
-*/
 void Mark2_Patrol( void ) {
 	if ( NPC_CheckPlayerTeamStealth() ) {
 		//		G_Sound( NPC, G_SoundIndex("sound/chars/mark1/misc/anger.wav"));
@@ -291,20 +255,10 @@ void Mark2_Patrol( void ) {
 	}
 }
 
-/*
--------------------------
-Mark2_Idle
--------------------------
-*/
 void Mark2_Idle( void ) {
 	NPC_BSIdle();
 }
 
-/*
--------------------------
-NPC_BSMark2_Default
--------------------------
-*/
 void NPC_BSMark2_Default( void ) {
 	if ( NPC->enemy ) {
 		NPCInfo->goalEntity = NPC->enemy;

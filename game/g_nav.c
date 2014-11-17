@@ -24,14 +24,6 @@ void NAV_StoreWaypoint( gentity_t *ent );
 
 extern vector3 NPCDEBUG_RED;
 
-
-/*
--------------------------
-NPC_Blocked
--------------------------
-*/
-
-
 void NPC_Blocked( gentity_t *self, gentity_t *blocker ) {
 	if ( self->NPC == NULL )
 		return;
@@ -65,12 +57,6 @@ void NPC_Blocked( gentity_t *self, gentity_t *blocker ) {
 	self->NPC->blockedSpeechDebounceTime = level.time + MIN_BLOCKED_SPEECH_TIME + (random() * 4000);
 	self->NPC->blockingEntNum = blocker->s.number;
 }
-
-/*
--------------------------
-NPC_SetMoveGoal
--------------------------
-*/
 
 void NPC_SetMoveGoal( gentity_t *ent, vector3 *point, int radius, qboolean isNavGoal, int combatPoint, gentity_t *targetEnt ) {
 	//Must be an NPC
@@ -115,12 +101,6 @@ void NPC_SetMoveGoal( gentity_t *ent, vector3 *point, int radius, qboolean isNav
 	trap->LinkEntity( (sharedEntity_t *)ent->NPC->goalEntity );
 }
 
-/*
--------------------------
-NAV_HitNavGoal
--------------------------
-*/
-
 qboolean NAV_HitNavGoal( vector3 *point, vector3 *mins, vector3 *maxs, vector3 *dest, int radius, qboolean flying ) {
 	vector3	dmins, dmaxs, pmins, pmaxs;
 
@@ -163,12 +143,6 @@ qboolean NAV_HitNavGoal( vector3 *point, vector3 *mins, vector3 *maxs, vector3 *
 		return G_BoundsOverlap( &pmins, &pmaxs, &dmins, &dmaxs );
 	}
 }
-
-/*
--------------------------
-NAV_ClearPathToPoint
--------------------------
-*/
 
 qboolean NAV_ClearPathToPoint( gentity_t *self, vector3 *pmins, vector3 *pmaxs, vector3 *point, int clipmask, int okToHitEntNum ) {
 	//	trace_t	trace;
@@ -273,12 +247,6 @@ qboolean NAV_ClearPathToPoint( gentity_t *self, vector3 *pmins, vector3 *pmaxs, 
 	return qfalse;
 }
 
-/*
--------------------------
-NAV_FindClosestWaypointForEnt
--------------------------
-*/
-
 int NAV_FindClosestWaypointForEnt( gentity_t *ent, int targWp ) {
 	//FIXME: Take the target into account
 	return trap->Nav_GetNearestNode( (sharedEntity_t *)ent, ent->waypoint, NF_CLEAR_PATH, targWp );
@@ -332,33 +300,15 @@ int NAV_FindClosestWaypointForPoint2( vector3 *point ) {
 	return bestWP;
 }
 
-/*
--------------------------
-NAV_ClearBlockedInfo
--------------------------
-*/
-
 void NAV_ClearBlockedInfo( gentity_t *self ) {
 	self->NPC->aiFlags &= ~NPCAI_BLOCKED;
 	self->NPC->blockingEntNum = ENTITYNUM_WORLD;
 }
 
-/*
--------------------------
-NAV_SetBlockedInfo
--------------------------
-*/
-
 void NAV_SetBlockedInfo( gentity_t *self, int entId ) {
 	self->NPC->aiFlags |= NPCAI_BLOCKED;
 	self->NPC->blockingEntNum = entId;
 }
-
-/*
--------------------------
-NAV_Steer
--------------------------
-*/
 
 int NAV_Steer( gentity_t *self, vector3 *dir, float distance ) {
 	vector3	right_test, left_test;
@@ -405,12 +355,6 @@ int NAV_Steer( gentity_t *self, vector3 *dir, float distance ) {
 
 	return deviation.yaw;
 }
-
-/*
--------------------------
-NAV_CheckAhead
--------------------------
-*/
 
 qboolean NAV_CheckAhead( gentity_t *self, vector3 *end, trace_t *trace, int clipmask ) {
 	vector3	mins;
@@ -463,12 +407,6 @@ qboolean NAV_CheckAhead( gentity_t *self, vector3 *end, trace_t *trace, int clip
 	return qfalse;
 }
 
-/*
--------------------------
-NAV_TestBypass
--------------------------
-*/
-
 static qboolean NAV_TestBypass( gentity_t *self, float yaw, float blocked_dist, vector3 *movedir ) {
 	trace_t	tr;
 	vector3	avoidAngles;
@@ -493,12 +431,6 @@ static qboolean NAV_TestBypass( gentity_t *self, float yaw, float blocked_dist, 
 
 	return qfalse;
 }
-
-/*
--------------------------
-NAV_Bypass
--------------------------
-*/
 
 qboolean NAV_Bypass( gentity_t *self, gentity_t *blocker, vector3 *blocked_dir, float blocked_dist, vector3 *movedir ) {
 	float dot, yaw, avoidRadius, arcAngle;
@@ -569,12 +501,6 @@ qboolean NAV_Bypass( gentity_t *self, gentity_t *blocker, vector3 *blocked_dir, 
 	return qfalse;
 }
 
-/*
--------------------------
-NAV_MoveBlocker
--------------------------
-*/
-
 qboolean NAV_MoveBlocker( gentity_t *self, vector3 *shove_dir ) {
 	//FIXME: This is a temporary method for making blockers move
 
@@ -595,12 +521,6 @@ qboolean NAV_MoveBlocker( gentity_t *self, vector3 *shove_dir ) {
 	return qtrue;
 }
 
-/*
--------------------------
-NAV_ResolveBlock
--------------------------
-*/
-
 qboolean NAV_ResolveBlock( gentity_t *self, gentity_t *blocker, vector3 *blocked_dir ) {
 	//Stop double waiting
 	if ( (blocker->NPC) && (blocker->NPC->blockingEntNum == self->s.number) )
@@ -612,12 +532,6 @@ qboolean NAV_ResolveBlock( gentity_t *self, gentity_t *blocker, vector3 *blocked
 
 	return qfalse;
 }
-
-/*
--------------------------
-NAV_TrueCollision
--------------------------
-*/
 
 qboolean NAV_TrueCollision( gentity_t *self, gentity_t *blocker, vector3 *movedir, vector3 *blocked_dir ) {
 	vector3	velocityDir;
@@ -653,12 +567,6 @@ qboolean NAV_TrueCollision( gentity_t *self, gentity_t *blocker, vector3 *movedi
 
 	return qfalse;
 }
-
-/*
--------------------------
-NAV_StackedCanyon
--------------------------
-*/
 
 qboolean NAV_StackedCanyon( gentity_t *self, gentity_t *blocker, vector3 *pathDir ) {
 	vector3	perp, cross, test;
@@ -715,12 +623,6 @@ qboolean NAV_StackedCanyon( gentity_t *self, gentity_t *blocker, vector3 *pathDi
 	return qtrue;
 }
 
-/*
--------------------------
-NAV_ResolveEntityCollision
--------------------------
-*/
-
 qboolean NAV_ResolveEntityCollision( gentity_t *self, gentity_t *blocker, vector3 *movedir, vector3 *pathDir ) {
 	vector3	blocked_dir;
 	float blocked_dist;
@@ -761,12 +663,6 @@ qboolean NAV_ResolveEntityCollision( gentity_t *self, gentity_t *blocker, vector
 	return qfalse;
 }
 
-/*
--------------------------
-NAV_TestForBlocked
--------------------------
-*/
-
 qboolean NAV_TestForBlocked( gentity_t *self, gentity_t *goal, gentity_t *blocker, float distance, uint32_t *flags ) {
 	if ( goal == NULL )
 		return qfalse;
@@ -786,12 +682,6 @@ qboolean NAV_TestForBlocked( gentity_t *self, gentity_t *goal, gentity_t *blocke
 
 	return qfalse;
 }
-
-/*
--------------------------
-NAV_AvoidCollsion
--------------------------
-*/
 
 qboolean NAV_AvoidCollision( gentity_t *self, gentity_t *goal, navInfo_t *info ) {
 	vector3	movedir;
@@ -850,12 +740,6 @@ qboolean NAV_AvoidCollision( gentity_t *self, gentity_t *goal, navInfo_t *info )
 
 	return qtrue;
 }
-
-/*
--------------------------
-NAV_TestBestNode
--------------------------
-*/
 
 int NAV_TestBestNode( gentity_t *self, int startID, int endID, qboolean failEdge ) {//check only against architectrure
 	vector3	end;
@@ -944,21 +828,9 @@ int NAV_TestBestNode( gentity_t *self, int startID, int endID, qboolean failEdge
 	return startID;
 }
 
-/*
--------------------------
-NAV_GetNearestNode
--------------------------
-*/
-
 int NAV_GetNearestNode( gentity_t *self, int lastNode ) {
 	return trap->Nav_GetNearestNode( (sharedEntity_t *)self, lastNode, NF_CLEAR_PATH, WAYPOINT_NONE );
 }
-
-/*
--------------------------
-NAV_MicroError
--------------------------
-*/
 
 qboolean NAV_MicroError( vector3 *start, vector3 *end ) {
 	if ( VectorCompare( start, end ) ) {
@@ -969,12 +841,6 @@ qboolean NAV_MicroError( vector3 *start, vector3 *end ) {
 
 	return qfalse;
 }
-
-/*
--------------------------
-NAV_MoveToGoal
--------------------------
-*/
 
 int	NAV_MoveToGoal( gentity_t *self, navInfo_t *info ) {
 	int bestNode;
@@ -1069,12 +935,6 @@ int	NAV_MoveToGoal( gentity_t *self, navInfo_t *info ) {
 	return bestNode;
 }
 
-/*
--------------------------
-waypoint_testDirection
--------------------------
-*/
-
 unsigned int waypoint_testDirection( vector3 *origin, float yaw, unsigned int minDist ) {
 	vector3	trace_dir, test_pos;
 	vector3	maxs, mins;
@@ -1098,12 +958,6 @@ unsigned int waypoint_testDirection( vector3 *origin, float yaw, unsigned int mi
 	//return (unsigned int) ( (float) MAX_RADIUS_CHECK * tr.fraction );
 	return (unsigned int)((float)minDist * tr.fraction);
 }
-
-/*
--------------------------
-waypoint_getRadius
--------------------------
-*/
 
 unsigned int waypoint_getRadius( gentity_t *ent ) {
 	unsigned int	minDist = MAX_RADIUS_CHECK + 1; // (unsigned int) -1;
@@ -1346,12 +1200,6 @@ void SP_waypoint_navgoal_1( gentity_t *ent ) {
 	G_FreeEntity( ent );//can't do this, they need to be found later by some functions, though those could be fixed, maybe?
 }
 
-/*
--------------------------
-Svcmd_Nav_f
--------------------------
-*/
-
 void Svcmd_Nav_f( void ) {
 	char cmd[1024];
 	trap->Argv( 1, cmd, 1024 );
@@ -1428,11 +1276,6 @@ qboolean	NAVDEBUG_showNavGoals = qtrue;
 qboolean	NAVDEBUG_showCollision = qtrue;
 int		NAVDEBUG_curGoal = 0;
 
-/*
--------------------------
-NAV_CalculatePaths
--------------------------
-*/
 #ifdef _DEBUG
 int fatalErrors = 0;
 char *fatalErrorPointer = NULL;
@@ -1625,21 +1468,9 @@ void NAV_CalculatePaths( const char *filename, int checksum ) {
 #endif
 }
 
-/*
--------------------------
-NAV_Shutdown
--------------------------
-*/
-
 void NAV_Shutdown( void ) {
 	trap->Nav_Free();
 }
-
-/*
--------------------------
-NAV_ShowDebugInfo
--------------------------
-*/
 
 void NAV_ShowDebugInfo( void ) {
 	int i;
@@ -1681,12 +1512,6 @@ void NAV_ShowDebugInfo( void ) {
 		TAG_ShowTags( RTF_NAVGOAL );
 	}
 }
-
-/*
--------------------------
-NAV_FindPlayerWaypoint
--------------------------
-*/
 
 void NAV_FindPlayerWaypoint( int clNum ) {
 	g_entities[clNum].waypoint = trap->Nav_GetNearestNode( (sharedEntity_t *)&g_entities[clNum], g_entities[clNum].lastWaypoint, NF_CLEAR_PATH, WAYPOINT_NONE );

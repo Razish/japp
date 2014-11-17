@@ -37,8 +37,6 @@
 extern gentity_t *droppedRedFlag;
 extern gentity_t *droppedBlueFlag;
 
-
-//======================================================================
 #define MAX_MEDPACK_HEAL_AMOUNT		25
 #define MAX_MEDPACK_BIG_HEAL_AMOUNT	50
 #define MAX_SENTRY_DISTANCE			256
@@ -453,20 +451,13 @@ void ItemUse_Shield( gentity_t *ent ) {
 	PlaceShield( ent );
 }
 
-//--------------------------
-// PERSONAL ASSAULT SENTRY
-//--------------------------
-
 #define PAS_DAMAGE	2
 
 void SentryTouch( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	return;
 }
 
-//----------------------------------------------------------------
-void pas_fire( gentity_t *ent )
-//----------------------------------------------------------------
-{
+void pas_fire( gentity_t *ent ) {
 	vector3 fwd, myOrg, enOrg;
 
 	VectorCopy( &ent->r.currentOrigin, &myOrg );
@@ -489,10 +480,7 @@ void pas_fire( gentity_t *ent )
 
 #define TURRET_RADIUS 800
 
-//-----------------------------------------------------
-static qboolean pas_find_enemies( gentity_t *self )
-//-----------------------------------------------------
-{
+static qboolean pas_find_enemies( gentity_t *self ) {
 	qboolean	found = qfalse;
 	int			count, i;
 	float		bestDist = TURRET_RADIUS*TURRET_RADIUS;
@@ -572,10 +560,7 @@ static qboolean pas_find_enemies( gentity_t *self )
 	return found;
 }
 
-//---------------------------------
-void pas_adjust_enemy( gentity_t *ent )
-//---------------------------------
-{
+void pas_adjust_enemy( gentity_t *ent ) {
 	trace_t	tr;
 	qboolean keep = qtrue;
 
@@ -630,10 +615,7 @@ void sentryExpire( gentity_t *self ) {
 	turret_die( self, self, self, 1000, MOD_UNKNOWN );
 }
 
-//---------------------------------
-void pas_think( gentity_t *ent )
-//---------------------------------
-{
+void pas_think( gentity_t *ent ) {
 	qboolean	moved;
 	float		diffYaw, diffPitch;
 	vector3		enemyDir, org;
@@ -821,10 +803,7 @@ void pas_think( gentity_t *ent )
 	}
 }
 
-//------------------------------------------------------------------------------------------------------------
-void turret_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod )
-//------------------------------------------------------------------------------------------------------------
-{
+void turret_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod ) {
 	// Turn off the thinking of the base & use it's targets
 	self->think = 0;//NULL;
 	self->use = 0;//NULL;
@@ -856,10 +835,7 @@ void turret_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 #define TURRET_AMMO_COUNT 40
 
-//---------------------------------
-void SP_PAS( gentity_t *base )
-//---------------------------------
-{
+void SP_PAS( gentity_t *base ) {
 	if ( base->count == 0 ) {
 		// give ammo
 		base->count = TURRET_AMMO_COUNT;
@@ -892,13 +868,8 @@ void SP_PAS( gentity_t *base )
 	G_Sound( base, CHAN_BODY, G_SoundIndex( "sound/chars/turret/startup.wav" ) );
 }
 
-//------------------------------------------------------------------------
-void ItemUse_Sentry( gentity_t *ent )
-//------------------------------------------------------------------------
-{
-	vector3 fwd, fwdorg;
-	vector3 yawonly;
-	vector3 mins, maxs;
+void ItemUse_Sentry( gentity_t *ent ) {
+	vector3 fwd, fwdorg, yawonly, mins, maxs;
 	gentity_t *sentry;
 
 	if ( !ent || !ent->client ) {
@@ -1235,11 +1206,7 @@ void ItemUse_UseDisp( gentity_t *ent, int type ) {
 	}
 }
 
-
-//===============================================
-//Portable E-Web -rww
-//===============================================
-//put the e-web away/remove it from the owner
+// put the e-web away/remove it from the owner
 void EWebDisattach( gentity_t *owner, gentity_t *eweb ) {
 	owner->client->ewebIndex = 0;
 	owner->client->ps.emplacedIndex = 0;
@@ -1765,10 +1732,6 @@ void ItemUse_UseEWeb( gentity_t *ent ) {
 
 	ent->client->ewebTime = level.time + EWEB_USE_DEBOUNCE;
 }
-//===============================================
-//End E-Web
-//===============================================
-
 
 int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 	int			quantity;
@@ -1848,8 +1811,6 @@ int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 	return RESPAWN_POWERUP;
 }
 
-//======================================================================
-
 int Pickup_Holdable( gentity_t *ent, gentity_t *other ) {
 
 	other->client->ps.stats[STAT_HOLDABLE_ITEM] = ent->item - bg_itemlist;
@@ -1860,9 +1821,6 @@ int Pickup_Holdable( gentity_t *ent, gentity_t *other ) {
 
 	return adjustRespawnTime( RESPAWN_HOLDABLE, ent->item->giType, ent->item->giTag );
 }
-
-
-//======================================================================
 
 void Add_Ammo( gentity_t *ent, int weapon, int count ) {
 	int max = ammoMax[weapon];
@@ -1920,9 +1878,6 @@ int Pickup_Ammo( gentity_t *ent, gentity_t *other ) {
 	return adjustRespawnTime( RESPAWN_AMMO, ent->item->giType, ent->item->giTag );
 }
 
-//======================================================================
-
-
 int Pickup_Weapon( gentity_t *ent, gentity_t *other ) {
 	int		quantity;
 
@@ -1974,9 +1929,6 @@ int Pickup_Weapon( gentity_t *ent, gentity_t *other ) {
 	return adjustRespawnTime( g_weaponRespawn.integer, ent->item->giType, ent->item->giTag );
 }
 
-
-//======================================================================
-
 int Pickup_Health( gentity_t *ent, gentity_t *other ) {
 	int			max;
 	int			quantity;
@@ -2010,8 +1962,6 @@ int Pickup_Health( gentity_t *ent, gentity_t *other ) {
 	return adjustRespawnTime( RESPAWN_HEALTH, ent->item->giType, ent->item->giTag );
 }
 
-//======================================================================
-
 int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
 	other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
 	if ( other->client->ps.stats[STAT_ARMOR] > other->client->ps.stats[STAT_MAX_HEALTH] * ent->item->giTag ) {
@@ -2021,13 +1971,6 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
 	return adjustRespawnTime( RESPAWN_ARMOR, ent->item->giType, ent->item->giTag );
 }
 
-//======================================================================
-
-/*
-===============
-RespawnItem
-===============
-*/
 void RespawnItem( gentity_t *ent ) {
 	// randomly select from teamed entities
 	if ( ent->team ) {
@@ -2139,11 +2082,6 @@ qboolean CheckItemCanBePickedUpByNPC( gentity_t *item, gentity_t *pickerupper ) 
 	return qfalse;
 }
 
-/*
-===============
-Touch_Item
-===============
-*/
 void Touch_Item( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	int			respawn;
 	qboolean	predict;
@@ -2407,16 +2345,7 @@ void Touch_Item( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	trap->LinkEntity( (sharedEntity_t *)ent );
 }
 
-
-//======================================================================
-
-/*
-================
-LaunchItem_Throw
-
-Spawns an item and tosses it forward
-================
-*/
+// Spawns an item and tosses it forward
 gentity_t *LaunchItem_Throw( const gitem_t *item, vector3 *origin, vector3 *velocity ) {
 	gentity_t	*dropped;
 
@@ -2553,13 +2482,7 @@ gentity_t *LaunchItem_Drop( const gitem_t *item, vector3 *origin, vector3 *dir )
 	return dropped;
 }
 
-/*
-================
-Drop_Item
-
-Spawns an item and tosses it forward
-================
-*/
+// Spawns an item and tosses it forward
 gentity_t *Drop_Item( gentity_t *ent, const  gitem_t *item, float angle ) {
 	vector3	velocity;
 	vector3	angles;
@@ -2590,28 +2513,12 @@ gentity_t *Drop_Item( gentity_t *ent, const  gitem_t *item, float angle ) {
 		return LaunchItem_Drop( item, &newOrigin, &velocity );
 }
 
-
-/*
-================
-Use_Item
-
-Respawn the item
-================
-*/
+// Respawn the item
 void Use_Item( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	RespawnItem( ent );
 }
 
-//======================================================================
-
-/*
-================
-FinishSpawningItem
-
-Traces down to find where an item should rest, instead of letting them
-free fall from their spawn points
-================
-*/
+// Traces down to find where an item should rest, instead of letting them free fall from their spawn points
 void FinishSpawningItem( gentity_t *ent ) {
 	trace_t		tr;
 	vector3		dest;
@@ -2794,11 +2701,6 @@ void FinishSpawningItem( gentity_t *ent ) {
 
 qboolean	itemRegistered[MAX_ITEMS];
 
-/*
-==================
-G_CheckTeamItems
-==================
-*/
 void G_CheckTeamItems( void ) {
 
 	// Set up team stuff
@@ -2819,11 +2721,6 @@ void G_CheckTeamItems( void ) {
 	}
 }
 
-/*
-==============
-ClearRegisteredItems
-==============
-*/
 void ClearRegisteredItems( void ) {
 	memset( itemRegistered, 0, sizeof(itemRegistered) );
 
@@ -2838,13 +2735,7 @@ void ClearRegisteredItems( void ) {
 	}
 }
 
-/*
-===============
-RegisterItem
-
-The item will be added to the precache list
-===============
-*/
+// The item will be added to the precache list
 void RegisterItem( const gitem_t *item ) {
 	if ( !item ) {
 		trap->Error( ERR_DROP, "RegisterItem: NULL" );
@@ -2852,15 +2743,7 @@ void RegisterItem( const gitem_t *item ) {
 	itemRegistered[item - bg_itemlist] = qtrue;
 }
 
-
-/*
-===============
-SaveRegisteredItems
-
-Write the needed items to a config string
-so the client will know which ones to precache
-===============
-*/
+// Write the needed items to a config string so the client will know which ones to precache
 void SaveRegisteredItems( void ) {
 	char	string[MAX_ITEMS + 1];
 	size_t		i;
@@ -2882,11 +2765,6 @@ void SaveRegisteredItems( void ) {
 	trap->SetConfigstring( CS_ITEMS, string );
 }
 
-/*
-============
-G_ItemDisabled
-============
-*/
 int G_ItemDisabled( const gitem_t *item ) {
 
 	char name[128];
@@ -2895,16 +2773,8 @@ int G_ItemDisabled( const gitem_t *item ) {
 	return trap->Cvar_VariableIntegerValue( name );
 }
 
-/*
-============
-G_SpawnItem
-
-Sets the clipping size and plants the object on the floor.
-
-Items can't be immediately dropped to floor, because they might
-be on an entity that hasn't spawned yet.
-============
-*/
+// Sets the clipping size and plants the object on the floor.
+// Items can't be immediately dropped to floor, because they might be on an entity that hasn't spawned yet.
 void G_SpawnItem( gentity_t *ent, const gitem_t *item ) {
 	int wDisable = 0;
 
@@ -2949,13 +2819,6 @@ void G_SpawnItem( gentity_t *ent, const gitem_t *item ) {
 	}
 }
 
-
-/*
-================
-G_BounceItem
-
-================
-*/
 void G_BounceItem( gentity_t *ent, trace_t *trace ) {
 	vector3	velocity;
 	float	dot;
@@ -2998,13 +2861,6 @@ void G_BounceItem( gentity_t *ent, trace_t *trace ) {
 	}
 }
 
-
-/*
-================
-G_RunItem
-
-================
-*/
 void G_RunItem( gentity_t *ent ) {
 	vector3		origin;
 	trace_t		tr;

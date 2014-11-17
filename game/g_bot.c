@@ -21,12 +21,6 @@ float G_Cvar_VariableValue( const char *var_name ) {
 	return atof( buf );
 }
 
-
-/*
-===============
-G_ParseInfos
-===============
-*/
 int G_ParseInfos( char *buf, int max, char *infos[] ) {
 	char	*token;
 	int		count;
@@ -79,11 +73,6 @@ int G_ParseInfos( char *buf, int max, char *infos[] ) {
 	return count;
 }
 
-/*
-===============
-G_LoadArenasFromFile
-===============
-*/
 void G_LoadArenasFromFile( char *filename ) {
 	int				len;
 	fileHandle_t	f;
@@ -240,12 +229,6 @@ const char *G_RefreshNextMap( int gametype, qboolean forced ) {
 	return Info_ValueForKey( level.arenas.infos[desiredMap], "map" );
 }
 
-/*
-===============
-G_LoadArenas
-===============
-*/
-
 #define MAX_MAPS 256
 #define MAPSBUFSIZE (MAX_MAPS * 64)
 
@@ -279,12 +262,9 @@ void G_LoadArenas( void ) {
 
 #else // Ensiform's version
 
-	int			numFiles;
-	char		filelist[MAPSBUFSIZE];
-	char		filename[MAX_QPATH];
-	char*		fileptr;
-	int			i, n;
-	int			len;
+	int numFiles;
+	char filelist[MAPSBUFSIZE], filename[MAX_QPATH], *fileptr;
+	int i, n, len;
 
 	level.arenas.num = 0;
 
@@ -313,12 +293,6 @@ void G_LoadArenas( void ) {
 #endif
 }
 
-
-/*
-===============
-G_GetArenaInfoByNumber
-===============
-*/
 const char *G_GetArenaInfoByMap( const char *map ) {
 	int			n;
 
@@ -331,38 +305,6 @@ const char *G_GetArenaInfoByMap( const char *map ) {
 	return NULL;
 }
 
-#if 0
-/*
-=================
-PlayerIntroSound
-=================
-*/
-static void PlayerIntroSound( const char *modelAndSkin ) {
-	char	model[MAX_QPATH];
-	char	*skin;
-
-	Q_strncpyz( model, modelAndSkin, sizeof(model) );
-	skin = Q_strrchr( model, '/' );
-	if ( skin ) {
-		*skin++ = '\0';
-	}
-	else {
-		skin = model;
-	}
-
-	if( Q_stricmp( skin, "default" ) == 0 ) {
-		skin = model;
-	}
-
-	trap->SendConsoleCommand( EXEC_APPEND, va( "play sound/player/announce/%s.wav\n", skin ) );
-}
-#endif
-
-/*
-===============
-G_AddRandomBot
-===============
-*/
 void G_AddRandomBot( int team ) {
 	int		i, n, num;
 	float	skill;
@@ -442,11 +384,6 @@ void G_AddRandomBot( int team ) {
 	}
 }
 
-/*
-===============
-G_RemoveRandomBot
-===============
-*/
 int G_RemoveRandomBot( int team ) {
 	int i;
 	gclient_t	*cl;
@@ -473,11 +410,6 @@ int G_RemoveRandomBot( int team ) {
 	return qfalse;
 }
 
-/*
-===============
-G_CountHumanPlayers
-===============
-*/
 int G_CountHumanPlayers( int team ) {
 	int i, num;
 	gclient_t	*cl;
@@ -499,11 +431,6 @@ int G_CountHumanPlayers( int team ) {
 	return num;
 }
 
-/*
-===============
-G_CountBotPlayers
-===============
-*/
 int G_CountBotPlayers( int team ) {
 	int i, n, num;
 	gclient_t	*cl;
@@ -541,11 +468,6 @@ int G_CountBotPlayers( int team ) {
 	return num;
 }
 
-/*
-===============
-G_CheckMinimumPlayers
-===============
-*/
 void G_CheckMinimumPlayers( void ) {
 	int humanplayers, botplayers;
 	static int checkminimumplayers_time;
@@ -587,11 +509,6 @@ void G_CheckMinimumPlayers( void ) {
 	}
 }
 
-/*
-===============
-G_CheckBotSpawn
-===============
-*/
 void G_CheckBotSpawn( void ) {
 	int		n;
 
@@ -609,12 +526,6 @@ void G_CheckBotSpawn( void ) {
 	}
 }
 
-
-/*
-===============
-AddBotToSpawnQueue
-===============
-*/
 static void AddBotToSpawnQueue( int clientNum, int delay ) {
 	int		n;
 
@@ -630,15 +541,7 @@ static void AddBotToSpawnQueue( int clientNum, int delay ) {
 	ClientBegin( clientNum, qfalse );
 }
 
-
-/*
-===============
-G_RemoveQueuedBotBegin
-
-Called on client disconnect to make sure the delayed spawn
-doesn't happen on a freed index
-===============
-*/
+// Called on client disconnect to make sure the delayed spawn doesn't happen on a freed index
 void G_RemoveQueuedBotBegin( int clientNum ) {
 	int		n;
 
@@ -650,12 +553,6 @@ void G_RemoveQueuedBotBegin( int clientNum ) {
 	}
 }
 
-
-/*
-===============
-G_BotConnect
-===============
-*/
 qboolean G_BotConnect( int clientNum, qboolean restart ) {
 	bot_settings_t	settings;
 	char			userinfo[MAX_INFO_STRING];
@@ -674,11 +571,6 @@ qboolean G_BotConnect( int clientNum, qboolean restart ) {
 	return qtrue;
 }
 
-/*
-===============
-G_AddBot
-===============
-*/
 void G_AddBot( const char *name, float skill, const char *team, int delay, char *altname ) {
 	gentity_t *bot = NULL;
 	int clientNum, preTeam = TEAM_FREE;
@@ -887,11 +779,6 @@ void G_AddBot( const char *name, float skill, const char *team, int delay, char 
 	}
 }
 
-/*
-===============
-G_LoadBotsFromFile
-===============
-*/
 static void G_LoadBotsFromFile( const char *filename ) {
 	int				len;
 	fileHandle_t	f;
@@ -915,11 +802,6 @@ static void G_LoadBotsFromFile( const char *filename ) {
 	level.bots.num += G_ParseInfos( buf, MAX_BOTS - level.bots.num, &level.bots.infos[level.bots.num] );
 }
 
-/*
-===============
-G_LoadBots
-===============
-*/
 static void G_LoadBots( void ) {
 	vmCvar_t	botsFile;
 	int			numdirs;
@@ -956,13 +838,6 @@ static void G_LoadBots( void ) {
 	//	trap->Print( "%i bots parsed\n", level.bots.num );
 }
 
-
-
-/*
-===============
-G_GetBotInfoByNumber
-===============
-*/
 char *G_GetBotInfoByNumber( int num ) {
 	if ( num < 0 || num >= level.bots.num ) {
 		trap->Print( S_COLOR_RED "Invalid bot number: %i\n", num );
@@ -971,12 +846,6 @@ char *G_GetBotInfoByNumber( int num ) {
 	return level.bots.infos[num];
 }
 
-
-/*
-===============
-G_GetBotInfoByName
-===============
-*/
 char *G_GetBotInfoByName( const char *name ) {
 	int		n;
 	const char *value;
@@ -995,11 +864,6 @@ char *G_GetBotInfoByName( const char *name ) {
 void LoadPath_ThisLevel( void );
 //end rww
 
-/*
-===============
-G_InitBots
-===============
-*/
 void G_InitBots( qboolean restart ) {
 	G_LoadBots();
 	G_LoadArenas();

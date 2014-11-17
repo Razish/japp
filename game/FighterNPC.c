@@ -514,7 +514,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh ) {
 	}
 
 #if 1//This is working now, but there are some transitional jitters... Rich?
-	//STRAFING==============================================================================
+	// STRAFING
 	if ( (int)pVeh->m_pVehicleInfo->strafePerc
 #ifdef _GAME//only do this check on game side, because if it's cgame, it's being predicted, and it's only predicted if the local client is the driver
 		&& pVeh->m_pVehicleInfo->Inhabited( pVeh )//has to have a driver in order to be capable of landing
@@ -575,7 +575,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh ) {
 			}
 		}
 	}
-	//STRAFING==============================================================================
+	// STRAFING
 #endif
 
 	if ( parentPS->speed > speedMax ) {

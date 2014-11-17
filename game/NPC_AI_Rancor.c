@@ -1,7 +1,3 @@
-// leave this line at the top of all AI_xxxx.cpp files for PCH reasons...
-#include "g_headers.h"
-
-
 #include "b_local.h"
 
 extern void G_GetBoltPosition( gentity_t *self, int boltIndex, vector3 *pos, int modelIndex );
@@ -26,11 +22,6 @@ void Rancor_SetBolts( gentity_t *self ) {
 	}
 }
 
-/*
--------------------------
-NPC_Rancor_Precache
--------------------------
-*/
 void NPC_Rancor_Precache( void ) {
 	int i;
 	for ( i = 1; i < 3; i++ ) {
@@ -40,12 +31,6 @@ void NPC_Rancor_Precache( void ) {
 	G_SoundIndex( "sound/chars/rancor/chomp.wav" );
 }
 
-
-/*
--------------------------
-Rancor_Idle
--------------------------
-*/
 void Rancor_Idle( void ) {
 	NPCInfo->localState = LSTATE_CLEAR;
 
@@ -67,11 +52,7 @@ qboolean Rancor_CheckRoar( gentity_t *self ) {
 	}
 	return qfalse;
 }
-/*
--------------------------
-Rancor_Patrol
--------------------------
-*/
+
 void Rancor_Patrol( void ) {
 	NPCInfo->localState = LSTATE_CLEAR;
 
@@ -94,11 +75,6 @@ void Rancor_Patrol( void ) {
 	TIMER_Set( NPC, "lookForNewEnemy", Q_irand( 5000, 15000 ) );
 }
 
-/*
--------------------------
-Rancor_Move
--------------------------
-*/
 void Rancor_Move( qboolean visible ) {
 	if ( NPCInfo->localState != LSTATE_WAITING ) {
 		NPCInfo->goalEntity = NPC->enemy;
@@ -112,11 +88,10 @@ void Rancor_Move( qboolean visible ) {
 	}
 }
 
-//---------------------------------------------------------
-extern void G_Knockdown( gentity_t *victim );
-extern void G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType, float limbRollBase, float limbPitchBase, int deathAnim, qboolean postDeath );
-extern float NPC_EntRangeFromBolt( gentity_t *targEnt, int boltIndex );
-extern int NPC_GetEntsNearBolt( int *radiusEnts, float radius, int boltIndex, vector3 *boltOrg );
+void G_Knockdown( gentity_t *victim );
+void G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType, float limbRollBase, float limbPitchBase, int deathAnim, qboolean postDeath );
+float NPC_EntRangeFromBolt( gentity_t *targEnt, int boltIndex );
+int NPC_GetEntsNearBolt( int *radiusEnts, float radius, int boltIndex, vector3 *boltOrg );
 
 void Rancor_DropVictim( gentity_t *self ) {
 	//FIXME: if Rancor dies, it should drop its victim.
@@ -361,7 +336,7 @@ void Rancor_Bite( void ) {
 		}
 	}
 }
-//------------------------------
+
 void Rancor_Attack( float distance, qboolean doCharge ) {
 	if ( !TIMER_Exists( NPC, "attacking" ) ) {
 		if ( NPC->count == 2 && NPC->activator ) {
@@ -523,7 +498,6 @@ void Rancor_Attack( float distance, qboolean doCharge ) {
 	TIMER_Done2( NPC, "attacking", qtrue );
 }
 
-//----------------------------------
 void Rancor_Combat( void ) {
 	if ( NPC->count ) {//holding my enemy
 		if ( TIMER_Done2( NPC, "takingPain", qtrue ) ) {
@@ -592,11 +566,6 @@ void Rancor_Combat( void ) {
 	}
 }
 
-/*
--------------------------
-NPC_Rancor_Pain
--------------------------
-*/
 void NPC_Rancor_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	qboolean hitByRancor = qfalse;
 	if ( attacker&&attacker->client&&attacker->client->NPC_class == CLASS_RANCOR ) {
@@ -699,11 +668,6 @@ void Rancor_Crush( void ) {
 	}
 }
 
-/*
--------------------------
-NPC_BSRancor_Default
--------------------------
-*/
 void NPC_BSRancor_Default( void ) {
 	AddSightEvent( NPC, &NPC->r.currentOrigin, 1024, AEL_DANGER_GREAT, 50 );
 

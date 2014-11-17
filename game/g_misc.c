@@ -157,15 +157,6 @@ void SP_light( gentity_t *self ) {
 	misc_lightstyle_set( self );
 }
 
-
-/*
-=================================================================================
-
-TELEPORTERS
-
-=================================================================================
-*/
-
 void TeleportPlayer( gentity_t *player, vector3 *origin, vector3 *angles ) {
 	gentity_t	*tent = NULL;
 	qboolean	isNPC = qfalse;
@@ -238,8 +229,6 @@ void SP_misc_teleporter_dest( gentity_t *ent ) {
 }
 
 
-//===========================================================
-
 /*QUAKED misc_model (1 0 0) (-16 -16 -16) (16 16 16)
 "model"		arbitrary .md3 or .ase file to display
 turns into map triangles - not solid
@@ -296,8 +285,6 @@ void SP_misc_G2model( gentity_t *ent ) {
 	G_FreeEntity( ent );
 #endif
 }
-
-//===========================================================
 
 void locateCamera( gentity_t *ent ) {
 	vector3		dir;
@@ -679,10 +666,10 @@ will explode.
 */
 void SP_misc_skyportal( gentity_t *ent ) {
 	char	*fov;
-	vector3	fogv;	//----(SA)
-	int		fogn;	//----(SA)
-	int		fogf;	//----(SA)
-	int		isfog = 0;	// (SA)
+	vector3	fogv;
+	int		fogn;
+	int		fogf;
+	int		isfog = 0;
 
 	float	fov_x;
 
@@ -1019,14 +1006,6 @@ void SP_misc_holocron( gentity_t *ent ) {
 	ent->nextthink = level.time + 50;
 }
 
-/*
-======================================================================
-
-SHOOTERS
-
-======================================================================
-*/
-
 void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	vector3		dir;
 	float		deg;
@@ -1126,11 +1105,6 @@ void check_recharge( gentity_t *ent ) {
 	ent->nextthink = level.time;
 }
 
-/*
-================
-EnergyShieldStationSettings
-================
-*/
 void EnergyShieldStationSettings( gentity_t *ent ) {
 	G_SpawnInt( "count", "200", &ent->count );
 
@@ -1141,11 +1115,6 @@ void EnergyShieldStationSettings( gentity_t *ent ) {
 	}
 }
 
-/*
-================
-shield_power_converter_use
-================
-*/
 void shield_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	int dif, add;
 	int stop = 1;
@@ -1564,7 +1533,6 @@ Gives shield energy when used.
 
 "count" - the amount of ammo given when used (default 200)
 */
-//------------------------------------------------------------
 void SP_misc_model_shield_power_converter( gentity_t *ent ) {
 	if ( !ent->health ) {
 		ent->health = 60;
@@ -1603,21 +1571,10 @@ void SP_misc_model_shield_power_converter( gentity_t *ent ) {
 	ent->s.modelindex2 = G_ModelIndex( "/models/items/psd_big.md3" );	// Precache model
 }
 
-
-/*
-================
-EnergyAmmoShieldStationSettings
-================
-*/
 void EnergyAmmoStationSettings( gentity_t *ent ) {
 	G_SpawnInt( "count", "200", &ent->count );
 }
 
-/*
-================
-ammo_power_converter_use
-================
-*/
 void ammo_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	int			add = 0.0f;//,highest;
 	//	int			difBlaster,difPowerCell,difMetalBolts;
@@ -1715,7 +1672,7 @@ Gives ammo energy when used.
 "count" - the amount of ammo given when used (default 200)
 "nodrain" - don't drain power from me
 */
-//------------------------------------------------------------
+
 void SP_misc_model_ammo_power_converter( gentity_t *ent ) {
 	if ( !ent->health ) {
 		ent->health = 60;
@@ -1755,20 +1712,10 @@ void SP_misc_model_ammo_power_converter( gentity_t *ent ) {
 	//G_SoundIndex("sound/movers/objects/useshieldstation.wav");
 }
 
-/*
-================
-EnergyHealthStationSettings
-================
-*/
 void EnergyHealthStationSettings( gentity_t *ent ) {
 	G_SpawnInt( "count", "200", &ent->count );
 }
 
-/*
-================
-health_power_converter_use
-================
-*/
 void health_power_converter_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	int dif, add;
 	int stop = 1;
@@ -1821,7 +1768,6 @@ Gives ammo energy when used.
 
 "count" - the amount of ammo given when used (default 200)
 */
-//------------------------------------------------------------
 void SP_misc_model_health_power_converter( gentity_t *ent ) {
 	if ( !ent->health ) {
 		ent->health = 60;
@@ -1866,8 +1812,6 @@ void SP_misc_model_health_power_converter( gentity_t *ent ) {
 	}
 }
 
-//----------------------------------------------------------
-
 /*QUAKED fx_runner (0 0 1) (-8 -8 -8) (8 8 8) STARTOFF ONESHOT DAMAGE
 Runs the specified effect, can also be targeted at an info_notnull to orient the effect
 
@@ -1886,7 +1830,6 @@ DAMAGE - does radius damage around effect every "delay" milliseonds
 */
 #define FX_RUNNER_RESERVED 0x800000
 #define FX_ENT_RADIUS 32
-//----------------------------------------------------------
 void fx_runner_think( gentity_t *ent ) {
 	BG_EvaluateTrajectory( &ent->s.pos, level.time, &ent->r.currentOrigin );
 	BG_EvaluateTrajectory( &ent->s.apos, level.time, &ent->r.currentAngles );
@@ -1928,7 +1871,6 @@ void fx_runner_think( gentity_t *ent ) {
 
 }
 
-//----------------------------------------------------------
 void fx_runner_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	if ( self->s.isPortalEnt ) { //rww - mark it as broadcast upon first use if it's within the area of a skyportal
 		self->r.svFlags |= SVF_BROADCAST;
@@ -1992,7 +1934,6 @@ void fx_runner_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	}
 }
 
-//----------------------------------------------------------
 void fx_runner_link( gentity_t *ent ) {
 	vector3	dir;
 
@@ -2052,7 +1993,6 @@ void fx_runner_link( gentity_t *ent ) {
 	}
 }
 
-//----------------------------------------------------------
 void SP_fx_runner( gentity_t *ent ) {
 	const char *fxFile;
 
@@ -2159,7 +2099,6 @@ This world effect will spawn space dust globally into the level.
 
 "count" the number of snow particles (default of 1000)
 */
-//----------------------------------------------------------
 void SP_CreateSpaceDust( gentity_t *ent ) {
 	G_EffectIndex( va( "*spacedust %i", ent->count ) );
 	//G_EffectIndex("*constantwind ( 10 -10 0 )");
@@ -2171,7 +2110,6 @@ This world effect will spawn snow globally into the level.
 
 "count" the number of snow particles (default of 1000)
 */
-//----------------------------------------------------------
 void SP_CreateSnow( gentity_t *ent ) {
 	G_EffectIndex( "*snow" );
 	G_EffectIndex( "*fog" );
@@ -2188,7 +2126,6 @@ ACID    create acid rain
 
 MISTY_FOG      causes clouds of misty fog to float through the level
 */
-//----------------------------------------------------------
 void SP_CreateRain( gentity_t *ent ) {
 	if ( ent->spawnflags == 0 ) {
 		G_EffectIndex( "*rain" );
@@ -2554,12 +2491,6 @@ refTag_t *FirstFreeRefTag( tagOwner_t *tagOwner ) {
 	return NULL;
 }
 
-/*
--------------------------
-TAG_Init
--------------------------
-*/
-
 void TAG_Init( void ) {
 	int i = 0;
 	int x = 0;
@@ -2574,12 +2505,6 @@ void TAG_Init( void ) {
 	}
 }
 
-/*
--------------------------
-TAG_FindOwner
--------------------------
-*/
-
 tagOwner_t	*TAG_FindOwner( const char *owner ) {
 	int i = 0;
 
@@ -2592,12 +2517,6 @@ tagOwner_t	*TAG_FindOwner( const char *owner ) {
 
 	return NULL;
 }
-
-/*
--------------------------
-TAG_Find
--------------------------
-*/
 
 refTag_t	*TAG_Find( const char *owner, const char *name ) {
 	tagOwner_t	*tagOwner = NULL;
@@ -2643,12 +2562,6 @@ refTag_t	*TAG_Find( const char *owner, const char *name ) {
 
 	return NULL;
 }
-
-/*
--------------------------
-TAG_Add
--------------------------
-*/
 
 refTag_t	*TAG_Add( const char *name, const char *owner, vector3 *origin, vector3 *angles, int radius, uint32_t flags ) {
 	refTag_t	*tag = NULL;
@@ -2713,12 +2626,6 @@ refTag_t	*TAG_Add( const char *name, const char *owner, vector3 *origin, vector3
 	return tag;
 }
 
-/*
--------------------------
-TAG_GetOrigin
--------------------------
-*/
-
 int	TAG_GetOrigin( const char *owner, const char *name, vector3 *origin ) {
 	refTag_t	*tag = TAG_Find( owner, name );
 
@@ -2732,13 +2639,7 @@ int	TAG_GetOrigin( const char *owner, const char *name, vector3 *origin ) {
 	return 1;
 }
 
-/*
--------------------------
-TAG_GetOrigin2
-Had to get rid of that damn assert for dev
--------------------------
-*/
-
+// does not clear origin if it fails
 int	TAG_GetOrigin2( const char *owner, const char *name, vector3 *origin ) {
 	refTag_t	*tag = TAG_Find( owner, name );
 
@@ -2750,11 +2651,6 @@ int	TAG_GetOrigin2( const char *owner, const char *name, vector3 *origin ) {
 
 	return 1;
 }
-/*
--------------------------
-TAG_GetAngles
--------------------------
-*/
 
 int	TAG_GetAngles( const char *owner, const char *name, vector3 *angles ) {
 	refTag_t	*tag = TAG_Find( owner, name );
@@ -2769,12 +2665,6 @@ int	TAG_GetAngles( const char *owner, const char *name, vector3 *angles ) {
 	return 1;
 }
 
-/*
--------------------------
-TAG_GetRadius
--------------------------
-*/
-
 int TAG_GetRadius( const char *owner, const char *name ) {
 	refTag_t	*tag = TAG_Find( owner, name );
 
@@ -2786,12 +2676,6 @@ int TAG_GetRadius( const char *owner, const char *name ) {
 	return tag->radius;
 }
 
-/*
--------------------------
-TAG_GetFlags
--------------------------
-*/
-
 uint32_t TAG_GetFlags( const char *owner, const char *name ) {
 	refTag_t	*tag = TAG_Find( owner, name );
 
@@ -2802,14 +2686,6 @@ uint32_t TAG_GetFlags( const char *owner, const char *name ) {
 
 	return tag->flags;
 }
-
-/*
-==============================================================================
-
-Spawn functions
-
-==============================================================================
-*/
 
 /*QUAKED ref_tag_huge (0.5 0.5 1) (-128 -128 -128) (128 128 128)
 SAME AS ref_tag, JUST BIGGER SO YOU CAN SEE THEM IN EDITOR ON HUGE MAPS!

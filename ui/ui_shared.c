@@ -140,11 +140,6 @@ const char *types[] = {
 	NULL
 };
 
-/*
-===============
-UI_Alloc
-===============
-*/
 void *UI_Alloc( int size ) {
 	char	*p;
 
@@ -164,11 +159,6 @@ void *UI_Alloc( int size ) {
 	return p;
 }
 
-/*
-===============
-UI_InitMemory
-===============
-*/
 void UI_InitMemory( void ) {
 	allocPoint = 0;
 	outOfMemory = qfalse;
@@ -178,25 +168,17 @@ qboolean UI_OutOfMemory( void ) {
 	return outOfMemory;
 }
 
-
-
-
-
 #define HASH_TABLE_SIZE 2048
-/*
-================
-return a hash value for the string
-================
-*/
+
+// return a hash value for the string
 static long hashForString( const char *str ) {
 	int		i;
 	long	hash;
-	char	letter;
 
 	hash = 0;
 	i = 0;
 	while ( str[i] != '\0' ) {
-		letter = tolower( (unsigned char)str[i] );
+		char letter = tolower( (unsigned char)str[i] );
 		hash += (long)(letter)*(i + 119);
 		i++;
 	}
@@ -220,14 +202,13 @@ const char *String_Alloc( const char *p ) {
 	int len;
 	long hash;
 	stringDef_t *str, *last;
-	static const char *staticNULL = "";
 
 	if ( p == NULL ) {
 		return NULL;
 	}
 
 	if ( *p == 0 ) {
-		return staticNULL;
+		return "";
 	}
 
 	hash = hashForString( p );
@@ -283,11 +264,6 @@ void String_Report( void ) {
 	Com_Printf( "Memory Pool is %.1f%% full, %i bytes out of %i used.\n", f, allocPoint, MEM_POOL_SIZE );
 }
 
-/*
-=================
-String_Init
-=================
-*/
 void String_Init( void ) {
 	int i;
 	for ( i = 0; i < HASH_TABLE_SIZE; i++ ) {
@@ -305,11 +281,6 @@ void String_Init( void ) {
 	}
 }
 
-/*
-=================
-PC_SourceWarning
-=================
-*/
 void PC_SourceWarning( int handle, char *format, ... ) {
 	int line;
 	char filename[128];
@@ -327,11 +298,6 @@ void PC_SourceWarning( int handle, char *format, ... ) {
 	Com_Printf( S_COLOR_YELLOW "WARNING: %s, line %d: %s\n", filename, line, string );
 }
 
-/*
-=================
-PC_SourceError
-=================
-*/
 void PC_SourceError( int handle, const char *format, ... ) {
 	int line;
 	char filename[128];
@@ -362,11 +328,6 @@ void LerpColor( const vector4 *a, vector4 *b, vector4 *c, float t ) {
 	}
 }
 
-/*
-=================
-Float_Parse
-=================
-*/
 qboolean Float_Parse( char **p, float *f ) {
 	char	*token;
 	token = COM_ParseExt( (const char **)p, qfalse );
@@ -379,11 +340,6 @@ qboolean Float_Parse( char **p, float *f ) {
 	}
 }
 
-/*
-=================
-PC_Float_Parse
-=================
-*/
 qboolean PC_Float_Parse( int handle, float *f ) {
 	pc_token_t token;
 	int negative = qfalse;
@@ -406,11 +362,6 @@ qboolean PC_Float_Parse( int handle, float *f ) {
 	return qtrue;
 }
 
-/*
-=================
-Color_Parse
-=================
-*/
 qboolean Color_Parse( char **p, vector4 *c ) {
 	int i;
 	float f;
@@ -424,11 +375,6 @@ qboolean Color_Parse( char **p, vector4 *c ) {
 	return qtrue;
 }
 
-/*
-=================
-PC_Color_Parse
-=================
-*/
 qboolean PC_Color_Parse( int handle, vector4 *c ) {
 	int i;
 	float f;
@@ -442,11 +388,6 @@ qboolean PC_Color_Parse( int handle, vector4 *c ) {
 	return qtrue;
 }
 
-/*
-=================
-Int_Parse
-=================
-*/
 qboolean Int_Parse( char **p, int *i ) {
 	char	*token;
 	token = COM_ParseExt( (const char **)p, qfalse );
@@ -460,11 +401,6 @@ qboolean Int_Parse( char **p, int *i ) {
 	}
 }
 
-/*
-=================
-PC_Int_Parse
-=================
-*/
 qboolean PC_Int_Parse( int handle, int *i ) {
 	pc_token_t token;
 	int negative = qfalse;
@@ -486,11 +422,6 @@ qboolean PC_Int_Parse( int handle, int *i ) {
 	return qtrue;
 }
 
-/*
-=================
-Rect_Parse
-=================
-*/
 qboolean Rect_Parse( char **p, rectDef_t *r ) {
 	if ( Float_Parse( p, &r->x ) ) {
 		if ( Float_Parse( p, &r->y ) ) {
@@ -504,11 +435,6 @@ qboolean Rect_Parse( char **p, rectDef_t *r ) {
 	return qfalse;
 }
 
-/*
-=================
-PC_Rect_Parse
-=================
-*/
 qboolean PC_Rect_Parse( int handle, rectDef_t *r ) {
 	if ( PC_Float_Parse( handle, &r->x ) ) {
 		if ( PC_Float_Parse( handle, &r->y ) ) {
@@ -522,11 +448,6 @@ qboolean PC_Rect_Parse( int handle, rectDef_t *r ) {
 	return qfalse;
 }
 
-/*
-=================
-String_Parse
-=================
-*/
 qboolean String_Parse( char **p, const char **out ) {
 	char *token;
 
@@ -538,11 +459,6 @@ qboolean String_Parse( char **p, const char **out ) {
 	return qfalse;
 }
 
-/*
-=================
-PC_String_Parse
-=================
-*/
 qboolean PC_String_Parse( int handle, const char **out ) {
 	static const char *squiggy = "}";
 	pc_token_t token;
@@ -559,11 +475,6 @@ qboolean PC_String_Parse( int handle, const char **out ) {
 	return qtrue;
 }
 
-/*
-=================
-PC_Script_Parse
-=================
-*/
 qboolean PC_Script_Parse( int handle, const char **out ) {
 	char script[2048];
 	pc_token_t token;
@@ -600,13 +511,7 @@ qboolean PC_Script_Parse( int handle, const char **out ) {
 // display, window, menu, item code
 //
 
-/*
-==================
-Init_Display
-
-Initializes the display with a structure to all the drawing routines
-==================
-*/
+// Initializes the display with a structure to all the drawing routines
 void Init_Display( displayContextDef_t *dc ) {
 	DC = dc;
 }
@@ -623,14 +528,7 @@ void GradientBar_Paint( rectDef_t *rect, vector4 *color ) {
 }
 
 
-/*
-==================
-Window_Init
-
-Initializes a window structure ( windowDef_t ) with defaults
-
-==================
-*/
+// Initializes a window structure ( windowDef_t ) with defaults
 void Window_Init( windowDef_t *w ) {
 	memset( w, 0, sizeof(windowDef_t) );
 	w->borderSize = 1;
@@ -941,13 +839,12 @@ itemDef_t *Menu_GetMatchingItemByNumber( menuDef_t *menu, int index, const char 
 
 qboolean Script_SetColor( itemDef_t *item, char **args ) {
 	const char *name;
-	int i;
 	float f;
-	vector4 *out;
+
 
 	// expecting type of color to set and 4 args for the color
 	if ( String_Parse( args, &name ) ) {
-		out = NULL;
+		vector4 *out = NULL;
 		if ( Q_stricmp( name, "backcolor" ) == 0 ) {
 			out = &item->window.backColor;
 			item->window.flags |= WINDOW_BACKCOLORSET;
@@ -961,6 +858,7 @@ qboolean Script_SetColor( itemDef_t *item, char **args ) {
 		}
 
 		if ( out ) {
+			int i;
 			for ( i = 0; i < 4; i++ ) {
 				if ( !Float_Parse( args, &f ) ) {
 					return qtrue;
@@ -1000,7 +898,6 @@ qboolean Script_SetItemRectCvar( itemDef_t *item, char **args ) {
 	const char	*holdVal;
 	char		*holdBuf;
 	itemDef_t	*item2 = 0;
-	menuDef_t	*menu;
 
 	// expecting item group and cvar to get value from
 	if ( String_Parse( args, &itemName ) && String_Parse( args, &cvarName ) ) {
@@ -1012,7 +909,7 @@ qboolean Script_SetItemRectCvar( itemDef_t *item, char **args ) {
 
 			holdBuf = cvarBuf;
 			if ( String_Parse( &holdBuf, &holdVal ) ) {
-				menu = (menuDef_t *)item->parent;
+				menuDef_t *menu = (menuDef_t *)item->parent;
 
 				item2->window.rectClient.x = atof( holdVal ) + menu->window.rect.x;
 				if ( String_Parse( &holdBuf, &holdVal ) ) {
@@ -1096,9 +993,7 @@ qboolean Script_SetTeamColor( itemDef_t *item, char **args ) {
 qboolean Script_SetItemColor( itemDef_t *item, char **args ) {
 	const char *itemname;
 	const char *name;
-	vector4 color;
-	int i;
-	vector4 *out;
+	vector4 color, *out;
 
 	// expecting type of color to set and 4 args for the color
 	if ( String_Parse( args, &itemname ) && String_Parse( args, &name ) ) {
@@ -1135,9 +1030,7 @@ qboolean Script_SetItemColor( itemDef_t *item, char **args ) {
 				}
 
 				if ( out ) {
-					for ( i = 0; i < 4; i++ ) {
-						out->data[i] = color.data[i];
-					}
+					VectorCopy4( &color, out );
 				}
 			}
 		}
@@ -1472,11 +1365,6 @@ void Menu_TransitionItemByName( menuDef_t *menu, const char *p, const rectDef_t 
 	}
 }
 
-/*
-=================
-Menu_Transition3ItemByName
-=================
-*/
 #define _TRANS3
 #ifdef _TRANS3
 void Menu_Transition3ItemByName( menuDef_t *menu, const char *p, const float minx, const float miny, const float minz,
@@ -1538,14 +1426,8 @@ void Menu_Transition3ItemByName( menuDef_t *menu, const char *p, const float min
 char		ui_deferredScript[MAX_DEFERRED_SCRIPT];
 itemDef_t*	ui_deferredScriptItem = NULL;
 
-/*
-=================
-Script_Defer
-
-Defers the rest of the script based on the defer condition.  The deferred
-portion of the script can later be run with the "rundeferred"
-=================
-*/
+// Defers the rest of the script based on the defer condition.
+// The deferred portion of the script can later be run with the "rundeferred"
 qboolean Script_Defer( itemDef_t* item, char **args ) {
 	// Should the script be deferred?
 	if ( DC->deferScript( (char**)args ) ) {
@@ -1563,14 +1445,7 @@ qboolean Script_Defer( itemDef_t* item, char **args ) {
 	return qtrue;
 }
 
-/*
-=================
-Script_RunDeferred
-
-Runs the last deferred script, there can only be one script deferred at a
-time so be careful of recursion
-=================
-*/
+// Runs the last deferred script, there can only be one script deferred at a time so be careful of recursion
 qboolean Script_RunDeferred( itemDef_t* item, char **args ) {
 	// Make sure there is something to run.
 	if ( !ui_deferredScript[0] || !ui_deferredScriptItem ) {
@@ -1744,11 +1619,6 @@ qboolean Script_SetPlayerModel( itemDef_t *item, char **args ) {
 	return qtrue;
 }
 
-/*
-=================
-ParseRect
-=================
-*/
 qboolean ParseRect( const char **p, rectDef_t *r ) {
 	if ( !COM_ParseFloat( p, &r->x ) ) {
 		if ( !COM_ParseFloat( p, &r->y ) ) {
@@ -1761,14 +1631,8 @@ qboolean ParseRect( const char **p, rectDef_t *r ) {
 	}
 	return qfalse;
 }
-/*
-=================
-Script_Transition2
-uses current origin instead of specifing a starting origin
-
-transition2		lfvscr		25 0 202 264  20 25
-=================
-*/
+// uses current origin instead of specifing a starting origin
+// transition2		lfvscr		25 0 202 264  20 25
 qboolean Script_Transition2( itemDef_t *item, char **args ) {
 	const char *name;
 	rectDef_t rectTo;
@@ -1788,17 +1652,10 @@ qboolean Script_Transition2( itemDef_t *item, char **args ) {
 }
 
 #ifdef _TRANS3
-/*
-=================
-Script_Transition3
 
-used exclusively with model views
-uses current origin instead of specifing a starting origin
-
-
-transition3		lfvscr		(min extent) (max extent) (fovx,y)  20 25
-=================
-*/
+// used exclusively with model views
+// uses current origin instead of specifing a starting origin
+// transition3		lfvscr		(min extent) (max extent) (fovx,y)  20 25
 qboolean Script_Transition3( itemDef_t *item, char **args ) {
 	const char *name = "unknown";
 	const char *value;
@@ -2540,8 +2397,6 @@ float Item_Slider_ThumbDefaultPosition( itemDef_t *item ) {
 	if ( editDef == NULL && item->cvar ) {
 		return x;
 	}
-
-	value = DC->getCVarValue( item->cvar );
 
 	value = editDef->defVal;
 	if ( value < editDef->minVal )
@@ -3838,13 +3693,7 @@ qboolean Item_HandleKey( itemDef_t *item, int key, qboolean down ) {
 	//return qfalse;
 }
 
-
-/*
------------------------------------------
-Item_HandleAccept
-If Item has an accept script, run it.
--------------------------------------------
-*/
+// If Item has an accept script, run it.
 qboolean Item_HandleAccept( itemDef_t * item ) {
 	if ( item->accept ) {
 		Item_RunScript( item, item->accept );
@@ -4720,11 +4569,6 @@ static bind_t g_bindings[] = {
 };
 static const size_t g_bindCount = ARRAY_LEN( g_bindings );
 
-/*
-=================
-Controls_GetKeyAssignment
-=================
-*/
 static void Controls_GetKeyAssignment( const char *command, int *twokeys ) {
 	int count, j;
 	char b[256];
@@ -4747,11 +4591,6 @@ static void Controls_GetKeyAssignment( const char *command, int *twokeys ) {
 	}
 }
 
-/*
-=================
-Controls_GetConfig
-=================
-*/
 void Controls_GetConfig( void ) {
 	size_t i;
 	int twokeys[2];
@@ -4764,11 +4603,6 @@ void Controls_GetConfig( void ) {
 	}
 }
 
-/*
-=================
-Controls_SetConfig
-=================
-*/
 void Controls_SetConfig( qboolean restart ) {
 	size_t i;
 
@@ -6465,11 +6299,6 @@ void Menu_Paint( menuDef_t *menu, qboolean forcePaint ) {
 	}
 }
 
-/*
-===============
-Item_ValidateTypeData
-===============
-*/
 void Item_ValidateTypeData( itemDef_t *item ) {
 	if ( item->typeData ) {
 		return;
@@ -6499,12 +6328,6 @@ void Item_ValidateTypeData( itemDef_t *item ) {
 		item->typeData = UI_Alloc( sizeof(textScrollDef_t) );
 	}
 }
-
-/*
-===============
-Keyword Hash
-===============
-*/
 
 #define KEYWORDHASH_SIZE	512
 
@@ -6553,12 +6376,6 @@ static keywordHash_t *KeywordHash_Find( keywordHash_t *table[], char *keyword ) 
 	return NULL;
 }
 
-/*
-===============
-Item Keyword Parse functions
-===============
-*/
-
 // name <string>
 qboolean ItemParse_name( itemDef_t *item, int handle ) {
 	if ( !PC_String_Parse( handle, &item->window.name ) ) {
@@ -6586,12 +6403,6 @@ qboolean ItemParse_text( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-===============
-ItemParse_descText
-text <string>
-===============
-*/
 qboolean ItemParse_descText( itemDef_t *item, int handle ) {
 
 	if ( !PC_String_Parse( handle, &item->descText ) ) {
@@ -6603,12 +6414,6 @@ qboolean ItemParse_descText( itemDef_t *item, int handle ) {
 }
 
 
-/*
-===============
-ItemParse_text
-text <string>
-===============
-*/
 qboolean ItemParse_text2( itemDef_t *item, int handle ) {
 
 	if ( !PC_String_Parse( handle, &item->text2 ) ) {
@@ -6619,11 +6424,6 @@ qboolean ItemParse_text2( itemDef_t *item, int handle ) {
 
 }
 
-/*
-===============
-ItemParse_text2alignx
-===============
-*/
 qboolean ItemParse_text2alignx( itemDef_t *item, int handle ) {
 	if ( !PC_Float_Parse( handle, &item->text2alignx ) ) {
 		return qfalse;
@@ -6631,11 +6431,6 @@ qboolean ItemParse_text2alignx( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-===============
-ItemParse_text2aligny
-===============
-*/
 qboolean ItemParse_text2aligny( itemDef_t *item, int handle ) {
 	if ( !PC_Float_Parse( handle, &item->text2aligny ) ) {
 		return qfalse;
@@ -6717,12 +6512,6 @@ void UI_CleanupGhoul2( void ) {
 // asset_model <string>
 int UI_ParseAnimationFile( const char *filename, animation_t *animset, qboolean isHumanoid );
 
-/*
-===============
-ItemParse_asset_model
-asset_model <string>
-===============
-*/
 qboolean ItemParse_asset_model_go( itemDef_t *item, const char *name, int *runTimeLength ) {
 #ifndef _CGAME
 	int g2Model;
@@ -7201,12 +6990,6 @@ qboolean ItemParse_slider( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-===============
-ItemParse_flag
-style <integer>
-===============
-*/
 qboolean ItemParse_flag( itemDef_t *item, int handle ) {
 	int		i;
 	pc_token_t token;
@@ -7231,12 +7014,6 @@ qboolean ItemParse_flag( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-===============
-ItemParse_style
-style <integer>
-===============
-*/
 qboolean ItemParse_style( itemDef_t *item, int handle ) {
 	if ( !PC_Int_Parse( handle, &item->window.style ) ) {
 		Com_Printf( S_COLOR_YELLOW "Unknown item style value" );
@@ -7264,12 +7041,6 @@ qboolean ItemParse_notselectable( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-===============
-ItemParse_scrollhidden
-scrollhidden
-===============
-*/
 qboolean ItemParse_scrollhidden( itemDef_t *item, int handle ) {
 	listBoxDef_t *listPtr;
 	Item_ValidateTypeData( item );
@@ -7304,12 +7075,6 @@ qboolean ItemParse_horizontalscroll( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-===============
-ItemParse_type
-type <integer>
-===============
-*/
 qboolean ItemParse_type( itemDef_t *item, int handle ) {
 	//	int		i,holdInt;
 
@@ -7443,13 +7208,7 @@ qboolean ItemParse_align( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-===============
-ItemParse_isCharacter
-
-Sets item flag showing this is a character
-===============
-*/
+// Sets item flag showing this is a character
 qboolean ItemParse_isCharacter( itemDef_t *item, int handle ) {
 	int flag;
 
@@ -7465,12 +7224,6 @@ qboolean ItemParse_isCharacter( itemDef_t *item, int handle ) {
 	return qfalse;
 }
 
-
-/*
-===============
-ItemParse_textalign
-===============
-*/
 qboolean ItemParse_textalign( itemDef_t *item, int handle ) {
 	if ( !PC_Int_Parse( handle, &item->textalignment ) ) {
 		Com_Printf( S_COLOR_YELLOW "Unknown text alignment value" );
@@ -7509,11 +7262,6 @@ qboolean ItemParse_textstyle( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-===============
-ItemParse_invertyesno
-===============
-*/
 qboolean ItemParse_invertyesno( itemDef_t *item, int handle ) {
 	if ( !PC_Int_Parse( handle, &item->invertYesNo ) ) {
 		return qfalse;
@@ -7521,11 +7269,7 @@ qboolean ItemParse_invertyesno( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-===============
-ItemParse_xoffset (used for yes/no and multi)
-===============
-*/
+// used for yes/no and multi
 qboolean ItemParse_xoffset( itemDef_t *item, int handle ) {
 	if ( PC_Int_Parse( handle, &item->xoffset ) ) {
 		return qfalse;
@@ -8021,11 +7765,6 @@ qboolean ItemParse_hideCvar2( itemDef_t *item, int handle ) {
 	return qfalse;
 }
 
-/*
-===============
-ItemParse_align
-===============
-*/
 qboolean ItemParse_Appearance_slot( itemDef_t *item, int handle ) {
 	if ( !PC_Int_Parse( handle, &item->appearanceSlot ) ) {
 		return qfalse;
@@ -8181,11 +7920,6 @@ static keywordHash_t itemParseKeywords[] = {
 
 keywordHash_t *itemParseKeywordHash[KEYWORDHASH_SIZE];
 
-/*
-===============
-Item_SetupKeywordHash
-===============
-*/
 void Item_SetupKeywordHash( void ) {
 	int i;
 
@@ -8195,11 +7929,6 @@ void Item_SetupKeywordHash( void ) {
 	}
 }
 
-/*
-===============
-Item_Parse
-===============
-*/
 qboolean Item_Parse( int handle, itemDef_t *item ) {
 	pc_token_t token;
 	keywordHash_t *key;
@@ -8460,12 +8189,6 @@ void Item_InitControls( itemDef_t *item ) {
 	}
 }
 
-/*
-===============
-Menu Keyword Parse functions
-===============
-*/
-
 qboolean MenuParse_font( itemDef_t *item, int handle ) {
 	menuDef_t *menu = (menuDef_t*)item;
 	if ( !PC_String_Parse( handle, &menu->font ) ) {
@@ -8507,11 +8230,6 @@ qboolean MenuParse_rect( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-=================
-MenuParse_style
-=================
-*/
 qboolean MenuParse_style( itemDef_t *item, int handle ) {
 	menuDef_t *menu = (menuDef_t*)item;
 
@@ -8552,11 +8270,6 @@ qboolean MenuParse_onClose( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-=================
-MenuParse_onAccept
-=================
-*/
 qboolean MenuParse_onAccept( itemDef_t *item, int handle ) {
 	menuDef_t *menu = (menuDef_t*)item;
 
@@ -8606,11 +8319,6 @@ qboolean MenuParse_backcolor( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-=================
-MenuParse_descAlignment
-=================
-*/
 qboolean MenuParse_descAlignment( itemDef_t *item, int handle ) {
 	menuDef_t *menu = (menuDef_t*)item;
 
@@ -8622,11 +8330,6 @@ qboolean MenuParse_descAlignment( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-=================
-MenuParse_descX
-=================
-*/
 qboolean MenuParse_descX( itemDef_t *item, int handle ) {
 	menuDef_t *menu = (menuDef_t*)item;
 
@@ -8636,11 +8339,6 @@ qboolean MenuParse_descX( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-=================
-MenuParse_descY
-=================
-*/
 qboolean MenuParse_descY( itemDef_t *item, int handle ) {
 	menuDef_t *menu = (menuDef_t*)item;
 
@@ -8650,11 +8348,6 @@ qboolean MenuParse_descY( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-=================
-MenuParse_descScale
-=================
-*/
 qboolean MenuParse_descScale( itemDef_t *item, int handle ) {
 	menuDef_t *menu = (menuDef_t*)item;
 
@@ -8664,11 +8357,6 @@ qboolean MenuParse_descScale( itemDef_t *item, int handle ) {
 	return qtrue;
 }
 
-/*
-=================
-MenuParse_descColor
-=================
-*/
 qboolean MenuParse_descColor( itemDef_t *item, int handle ) {
 	int i;
 	float f;
@@ -8859,11 +8547,7 @@ qboolean MenuParse_itemDef( itemDef_t *item, int handle ) {
 	}
 	return qtrue;
 }
-/*
-=================
-MenuParse_focuscolor
-=================
-*/
+
 qboolean MenuParse_appearanceIncrement( itemDef_t *item, int handle ) {
 	menuDef_t *menu = (menuDef_t*)item;
 
@@ -8915,11 +8599,6 @@ keywordHash_t menuParseKeywords[] = {
 
 keywordHash_t *menuParseKeywordHash[KEYWORDHASH_SIZE];
 
-/*
-===============
-Menu_SetupKeywordHash
-===============
-*/
 void Menu_SetupKeywordHash( void ) {
 	int i;
 
@@ -8929,11 +8608,6 @@ void Menu_SetupKeywordHash( void ) {
 	}
 }
 
-/*
-===============
-Menu_Parse
-===============
-*/
 qboolean Menu_Parse( int handle, menuDef_t *menu ) {
 	pc_token_t token;
 	keywordHash_t *key;
@@ -8967,11 +8641,6 @@ qboolean Menu_Parse( int handle, menuDef_t *menu ) {
 	return qfalse;
 }
 
-/*
-===============
-Menu_New
-===============
-*/
 void Menu_New( int handle ) {
 	menuDef_t *menu = &Menus[menuCount];
 

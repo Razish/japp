@@ -6,14 +6,12 @@
 
 #define METROID_JUMP 1
 
-//NEEDED FOR MIND-TRICK on NPCS=========================================================
-extern void NPC_PlayConfusionSound( gentity_t *self );
-extern void NPC_Jedi_PlayConfusionSound( gentity_t *self );
-extern void NPC_UseResponse( gentity_t *self, gentity_t *user, qboolean useWhenDone );
-//NEEDED FOR MIND-TRICK on NPCS=========================================================
-extern void Jedi_Decloak( gentity_t *self );
+void NPC_PlayConfusionSound( gentity_t *self );
+void NPC_Jedi_PlayConfusionSound( gentity_t *self );
+void NPC_UseResponse( gentity_t *self, gentity_t *user, qboolean useWhenDone );
+void Jedi_Decloak( gentity_t *self );
 
-extern qboolean BG_FullBodyTauntAnim( int anim );
+qboolean BG_FullBodyTauntAnim( int anim );
 
 extern bot_state_t *botstates[MAX_CLIENTS];
 

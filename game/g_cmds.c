@@ -2972,7 +2972,6 @@ static struct amInfoSetting_s {
 static const size_t numAminfoSettings = ARRAY_LEN( aminfoSettings );
 
 static void PB_Callback( const char *buffer, int clientNum ) {
-//	trap->Print( "Printing to %i at %i...\n%s\n", clientNum, level.time, buffer );
 	trap->SendServerCommand( clientNum, va( "print \"%s\"", buffer ) );
 }
 

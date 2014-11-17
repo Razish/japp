@@ -23,11 +23,7 @@ qboolean NAV_CheckNodeFailedForEnt( gentity_t *ent, int nodeNum ) {
 	}
 	return qfalse;
 }
-/*
--------------------------
-NPC_UnBlocked
--------------------------
-*/
+
 void NPC_ClearBlocked( gentity_t *self ) {
 	if ( self->NPC == NULL )
 		return;
@@ -45,11 +41,6 @@ void NPC_SetBlocked( gentity_t *self, gentity_t *blocker ) {
 	self->NPC->blockingEntNum = blocker->s.number;
 }
 
-/*
--------------------------
-NAVNEW_ClearPathBetweenPoints
--------------------------
-*/
 int NAVNEW_ClearPathBetweenPoints( vector3 *start, vector3 *end, vector3 *mins, vector3 *maxs, int ignore, int clipmask ) {
 	trace_t	trace;
 
@@ -69,11 +60,6 @@ int NAVNEW_ClearPathBetweenPoints( vector3 *start, vector3 *end, vector3 *mins, 
 	//return ENTITYNUM_NONE;
 }
 
-/*
--------------------------
-NAVNEW_PushBlocker
--------------------------
-*/
 void NAVNEW_PushBlocker( gentity_t *self, gentity_t *blocker, vector3 *right, qboolean setBlockedInfo ) {//try pushing blocker to one side
 	trace_t	tr;
 	vector3	mins, end;
@@ -147,11 +133,6 @@ void NAVNEW_PushBlocker( gentity_t *self, gentity_t *blocker, vector3 *right, qb
 	}
 }
 
-/*
--------------------------
-NAVNEW_DanceWithBlocker
--------------------------
-*/
 qboolean NAVNEW_DanceWithBlocker( gentity_t *self, gentity_t *blocker, vector3 *movedir, vector3 *right ) {//sees if blocker has any lateral movement
 	if ( blocker->client && !VectorCompare( &blocker->client->ps.velocity, &vec3_origin ) ) {
 		vector3 blocker_movedir;
@@ -187,11 +168,6 @@ qboolean NAVNEW_DanceWithBlocker( gentity_t *self, gentity_t *blocker, vector3 *
 	return qfalse;
 }
 
-/*
--------------------------
-NAVNEW_SidestepBlocker
--------------------------
-*/
 qboolean NAVNEW_SidestepBlocker( gentity_t *self, gentity_t *blocker, vector3 *blocked_dir, float blocked_dist, vector3 *movedir, vector3 *right ) {//trace to sides of blocker and see if either is clear
 	trace_t	tr;
 	vector3	avoidAngles;
@@ -300,11 +276,6 @@ qboolean NAVNEW_SidestepBlocker( gentity_t *self, gentity_t *blocker, vector3 *b
 	return qfalse;
 }
 
-/*
--------------------------
-NAVNEW_Bypass
--------------------------
-*/
 qboolean NAVNEW_Bypass( gentity_t *self, gentity_t *blocker, vector3 *blocked_dir, float blocked_dist, vector3 *movedir, qboolean setBlockedInfo ) {
 	vector3	moveangles, right;
 
@@ -333,11 +304,6 @@ qboolean NAVNEW_Bypass( gentity_t *self, gentity_t *blocker, vector3 *blocked_di
 	return qfalse;
 }
 
-/*
--------------------------
-NAVNEW_CheckDoubleBlock
--------------------------
-*/
 qboolean NAVNEW_CheckDoubleBlock( gentity_t *self, gentity_t *blocker, vector3 *blocked_dir ) {
 	//Stop double waiting
 	if ( (blocker->NPC) && (blocker->NPC->blockingEntNum == self->s.number) )
@@ -346,11 +312,6 @@ qboolean NAVNEW_CheckDoubleBlock( gentity_t *self, gentity_t *blocker, vector3 *
 	return qfalse;
 }
 
-/*
--------------------------
-NAVNEW_ResolveEntityCollision
--------------------------
-*/
 extern void CalcTeamDoorCenter( gentity_t *ent, vector3 *center );
 qboolean NAVNEW_ResolveEntityCollision( gentity_t *self, gentity_t *blocker, vector3 *movedir, vector3 *pathDir, qboolean setBlockedInfo ) {
 	vector3	blocked_dir;
@@ -387,11 +348,6 @@ qboolean NAVNEW_ResolveEntityCollision( gentity_t *self, gentity_t *blocker, vec
 	return qfalse;
 }
 
-/*
--------------------------
-NAVNEW_AvoidCollision
--------------------------
-*/
 qboolean NAVNEW_AvoidCollision( gentity_t *self, gentity_t *goal, navInfo_t *info, qboolean setBlockedInfo, int blockedMovesLimit ) {
 	vector3	movedir;
 	vector3	movepos;
@@ -506,11 +462,7 @@ qboolean NAVNEW_TestNodeConnectionBlocked( int wp1, int wp2, gentity_t *ignoreEn
 	//hit something we weren't supposed to
 	return qtrue;
 }
-/*
--------------------------
-NAVNEW_MoveToGoal
--------------------------
-*/
+
 int	NAVNEW_MoveToGoal( gentity_t *self, navInfo_t *info ) {
 	int			bestNode = WAYPOINT_NONE;
 	qboolean	foundClearPath = qfalse;

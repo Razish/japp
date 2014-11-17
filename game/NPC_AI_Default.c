@@ -4,12 +4,7 @@
 
 extern qboolean NPC_SomeoneLookingAtMe( gentity_t *ent );
 
-/*
-void NPC_LostEnemyDecideChase(void)
-
-We lost our enemy and want to drop him but see if we should chase him if we are in the proper bState
-*/
-
+// We lost our enemy and want to drop him but see if we should chase him if we are in the proper bState
 void NPC_LostEnemyDecideChase( void ) {
 	switch ( NPCInfo->behaviorState ) {
 	case BS_HUNT_AND_KILL:
@@ -25,11 +20,6 @@ void NPC_LostEnemyDecideChase( void ) {
 	}
 	G_ClearEnemy( NPC );
 }
-/*
--------------------------
-NPC_StandIdle
--------------------------
-*/
 
 void NPC_StandIdle( void ) {
 	/*
@@ -171,12 +161,6 @@ void NPC_BSStandGuard( void ) {
 
 	NPC_UpdateAngles( qtrue, qtrue );
 }
-
-/*
--------------------------
-NPC_BSHuntAndKill
--------------------------
-*/
 
 void NPC_BSHuntAndKill( void ) {
 	qboolean	turned = qfalse;

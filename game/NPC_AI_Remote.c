@@ -19,11 +19,6 @@ void NPC_Remote_Precache( void ) {
 	G_EffectIndex( "env/small_explode" );
 }
 
-/*
--------------------------
-NPC_Remote_Pain
--------------------------
-*/
 void NPC_Remote_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	SaveNPCGlobals();
 	SetNPCGlobals( self );
@@ -33,11 +28,6 @@ void NPC_Remote_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	NPC_Pain( self, attacker, damage );
 }
 
-/*
--------------------------
-Remote_MaintainHeight
--------------------------
-*/
 void Remote_MaintainHeight( void ) {
 	float	dif;
 
@@ -113,11 +103,6 @@ void Remote_MaintainHeight( void ) {
 #define REMOTE_STRAFE_DIS	200
 #define REMOTE_UPWARD_PUSH	32
 
-/*
--------------------------
-Remote_Strafe
--------------------------
-*/
 void Remote_Strafe( void ) {
 	int		dir;
 	vector3	end, right;
@@ -150,11 +135,6 @@ void Remote_Strafe( void ) {
 #define REMOTE_FORWARD_BASE_SPEED	10
 #define REMOTE_FORWARD_MULTIPLIER	5
 
-/*
--------------------------
-Remote_Hunt
--------------------------
-*/
 void Remote_Hunt( qboolean visible, qboolean advance, qboolean retreat ) {
 	float	distance, speed;
 	vector3	forward;
@@ -195,11 +175,6 @@ void Remote_Hunt( qboolean visible, qboolean advance, qboolean retreat ) {
 }
 
 
-/*
--------------------------
-Remote_Fire
--------------------------
-*/
 void Remote_Fire( void ) {
 	vector3	delta1, enemy_org1, muzzle1;
 	vector3	angleToEnemy1;
@@ -229,11 +204,6 @@ void Remote_Fire( void ) {
 
 }
 
-/*
--------------------------
-Remote_Ranged
--------------------------
-*/
 void Remote_Ranged( qboolean visible, qboolean advance, qboolean retreat ) {
 
 	if ( TIMER_Done( NPC, "attackDelay" ) )	// Attack?
@@ -253,11 +223,6 @@ void Remote_Ranged( qboolean visible, qboolean advance, qboolean retreat ) {
 #define MIN_DISTANCE		80
 #define MIN_DISTANCE_SQR	( MIN_DISTANCE * MIN_DISTANCE )
 
-/*
--------------------------
-Remote_Attack
--------------------------
-*/
 void Remote_Attack( void ) {
 	float		distance;
 	qboolean	visible;
@@ -297,22 +262,12 @@ void Remote_Attack( void ) {
 
 }
 
-/*
--------------------------
-Remote_Idle
--------------------------
-*/
 void Remote_Idle( void ) {
 	Remote_MaintainHeight();
 
 	NPC_BSIdle();
 }
 
-/*
--------------------------
-Remote_Patrol
--------------------------
-*/
 void Remote_Patrol( void ) {
 	Remote_MaintainHeight();
 
@@ -328,12 +283,6 @@ void Remote_Patrol( void ) {
 	NPC_UpdateAngles( qtrue, qtrue );
 }
 
-
-/*
--------------------------
-NPC_BSRemote_Default
--------------------------
-*/
 void NPC_BSRemote_Default( void ) {
 	if ( NPC->enemy ) {
 		Remote_Attack();

@@ -1,26 +1,16 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
-//
-// g_mem.c
-//
-
-
 #include "g_local.h"
 
-
-#define POOLSIZE	(256 * 1024)
-
-static char		memoryPool[POOLSIZE];
-static int		allocPoint;
+static char memoryPool[256 * 1024];
+static int allocPoint;
 
 void *G_Alloc( int size ) {
-	char	*p;
+	char *p = NULL;
 
 	if ( g_debugAlloc.integer ) {
-		trap->Print( "G_Alloc of %i bytes (%i left)\n", size, POOLSIZE - allocPoint - ((size + 31) & ~31) );
+		trap->Print( "G_Alloc of %i bytes (%i left)\n", size, sizeof(memoryPool) - allocPoint - ((size + 31) & ~31) );
 	}
 
-	if ( allocPoint + size > POOLSIZE ) {
+	if ( allocPoint + size > sizeof(memoryPool) ) {
 		trap->Error( ERR_DROP, "G_Alloc: failed on allocation of %i bytes\n", size );
 		return NULL;
 	}
@@ -37,5 +27,5 @@ void G_InitMemory( void ) {
 }
 
 void G_ShowGameMem( void ) {
-	trap->Print( "Game memory status: %i out of %i bytes allocated\n", allocPoint, POOLSIZE );
+	trap->Print( "Game memory status: %i out of %i bytes allocated\n", allocPoint, sizeof(memoryPool) );
 }

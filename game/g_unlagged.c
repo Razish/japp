@@ -3,14 +3,7 @@
 #include "g_local.h"
 #include "g_unlagged.h"
 
-/*
-============
-G_ResetTrail
-
-Clear out the given client's origin trails (should be called from ClientBegin and when
-the teleport bit is toggled)
-============
-*/
+// Clear out the given client's origin trails (should be called from ClientBegin and when the teleport bit is toggled)
 void G_ResetTrail( gentity_t *ent ) {
 	int		i, time;
 
@@ -27,14 +20,7 @@ void G_ResetTrail( gentity_t *ent ) {
 	}
 }
 
-
-/*
-============
-G_StoreTrail
-
-Keep track of where the client's been (usually called every ClientThink)
-============
-*/
+// Keep track of where the client's been (usually called every ClientThink)
 void G_StoreTrail( gentity_t *ent ) {
 	int		head, newtime;
 
@@ -81,15 +67,8 @@ void G_StoreTrail( gentity_t *ent ) {
 	//	Com_Printf("level.previousTime: %d, level.time: %d, newtime: %d\n", level.previousTime, level.time, newtime);
 }
 
-
-/*
-=============
-TimeShiftLerp
-
-Used below to interpolate between two previous vectors
-Returns a vector "frac" times the distance between "start" and "end"
-=============
-*/
+// Used below to interpolate between two previous vectors
+// Returns a vector "frac" times the distance between "start" and "end"
 static void TimeShiftLerp( float frac, vector3 *start, vector3 *end, vector3 *result ) {
 	float	comp = 1.0f - frac;
 
@@ -98,14 +77,7 @@ static void TimeShiftLerp( float frac, vector3 *start, vector3 *end, vector3 *re
 	result->z = frac * start->z + comp * end->z;
 }
 
-
-/*
-=================
-G_TimeShiftClient
-
-Move a client back to where he was at the specified "time"
-=================
-*/
+// Move a client back to where he was at the specified "time"
 void G_TimeShiftClient( gentity_t *ent, int time ) {
 	int		j, k;
 
@@ -172,14 +144,8 @@ void G_TimeShiftClient( gentity_t *ent, int time ) {
 }
 
 static qboolean shifted = qfalse;
-/*
-=====================
-G_TimeShiftAllClients
 
-Move ALL clients back to where they were at the specified "time",
-except for "skip"
-=====================
-*/
+// Move ALL clients back to where they were at the specified "time", except for "skip"
 void G_TimeShiftAllClients( int time, gentity_t *skip ) {
 	int i = 0;
 	gentity_t *ent = NULL;
@@ -205,14 +171,7 @@ void G_TimeShiftAllClients( int time, gentity_t *skip ) {
 	shifted = qtrue;
 }
 
-
-/*
-===================
-G_UnTimeShiftClient
-
-Move a client back to where he was before the time shift
-===================
-*/
+// Move a client back to where he was before the time shift
 void G_UnTimeShiftClient( gentity_t *ent ) {
 	// if it was saved
 	if ( ent->client->saved.leveltime == level.time ) {
@@ -228,14 +187,7 @@ void G_UnTimeShiftClient( gentity_t *ent ) {
 	}
 }
 
-/*
-=======================
-G_UnTimeShiftAllClients
-
-Move ALL the clients back to where they were before the time shift,
-except for "skip"
-=======================
-*/
+// Move ALL the clients back to where they were before the time shift, except for "skip"
 void G_UnTimeShiftAllClients( gentity_t *skip ) {
 	int i = 0;
 	gentity_t *ent = NULL;

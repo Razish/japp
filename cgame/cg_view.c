@@ -152,11 +152,6 @@ static void CG_CalcVrect( void ) {
 	refdef->y = (cgs.glconfig.vidHeight - refdef->height) / 2;
 }
 
-//==============================================================================
-
-//==============================================================================
-//==============================================================================
-// this causes a compiler bug on mac MrC compiler
 static void CG_StepOffset( void ) {
 	int		timeDelta;
 	refdef_t *refdef = CG_GetRefdef();

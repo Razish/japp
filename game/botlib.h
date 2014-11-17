@@ -173,54 +173,30 @@ typedef struct botlib_import_s {
 } botlib_import_t;
 
 typedef struct aas_export_s {
-	//-----------------------------------
-	// be_aas_entity.h
-	//-----------------------------------
 	void( *AAS_EntityInfo )(int entnum, struct aas_entityinfo_s *info);
-	//-----------------------------------
-	// be_aas_main.h
-	//-----------------------------------
 	int( *AAS_Initialized )(void);
 	void( *AAS_PresenceTypeBoundingBox )(int presencetype, vector3 *mins, vector3 *maxs);
 	float( *AAS_Time )(void);
-	//--------------------------------------------
-	// be_aas_sample.c
-	//--------------------------------------------
 	int( *AAS_PointAreaNum )(vector3 *point);
 	int( *AAS_PointReachabilityAreaIndex )(vector3 *point);
 	int( *AAS_TraceAreas )(vector3 *start, vector3 *end, int *areas, vector3 *points, int maxareas);
 	int( *AAS_BBoxAreas )(vector3 *absmins, vector3 *absmaxs, int *areas, int maxareas);
 	int( *AAS_AreaInfo )(int areanum, struct aas_areainfo_s *info);
-	//--------------------------------------------
-	// be_aas_bspq3.c
-	//--------------------------------------------
 	uint32_t( *AAS_PointContents )(vector3 *point);
 	int( *AAS_NextBSPEntity )(int ent);
 	int( *AAS_ValueForBSPEpairKey )(int ent, char *key, char *value, int size);
 	int( *AAS_VectorForBSPEpairKey )(int ent, char *key, vector3 *v);
 	int( *AAS_FloatForBSPEpairKey )(int ent, char *key, float *value);
 	int( *AAS_IntForBSPEpairKey )(int ent, char *key, int *value);
-	//--------------------------------------------
-	// be_aas_reach.c
-	//--------------------------------------------
 	int( *AAS_AreaReachability )(int areanum);
-	//--------------------------------------------
-	// be_aas_route.c
-	//--------------------------------------------
 	int( *AAS_AreaTravelTimeToGoalArea )(int areanum, vector3 *origin, int goalareanum, uint32_t travelflags);
 	int( *AAS_EnableRoutingArea )(int areanum, int enable);
 	int( *AAS_PredictRoute )(struct aas_predictroute_s *route, int areanum, vector3 *origin,
 		int goalareanum, uint32_t travelflags, int maxareas, int maxtime,
 		int stopevent, int stopcontents, int stoptfl, int stopareanum);
-	//--------------------------------------------
-	// be_aas_altroute.c
-	//--------------------------------------------
 	int( *AAS_AlternativeRouteGoals )(vector3 *start, int startareanum, vector3 *goal, int goalareanum, uint32_t travelflags,
 	struct aas_altroutegoal_s *altroutegoals, int maxaltroutegoals,
 		int type);
-	//--------------------------------------------
-	// be_aas_move.c
-	//--------------------------------------------
 	int( *AAS_Swimming )(vector3 *origin);
 	int( *AAS_PredictClientMovement )(struct aas_clientmove_s *move,
 		int entnum, vector3 *origin,
@@ -265,9 +241,6 @@ typedef struct ea_export_s {
 } ea_export_t;
 
 typedef struct ai_export_s {
-	//-----------------------------------
-	// be_ai_char.h
-	//-----------------------------------
 	int( *BotLoadCharacter )(char *charfile, float skill);
 	void( *BotFreeCharacter )(int character);
 	float( *Characteristic_Float )(int character, int index);
@@ -275,9 +248,6 @@ typedef struct ai_export_s {
 	int( *Characteristic_Integer )(int character, int index);
 	int( *Characteristic_BInteger )(int character, int index, int min, int max);
 	void( *Characteristic_String )(int character, int index, char *buf, int size);
-	//-----------------------------------
-	// be_ai_chat.h
-	//-----------------------------------
 	int( *BotAllocChatState )(void);
 	void( *BotFreeChatState )(int handle);
 	void( *BotQueueConsoleMessage )(int chatstate, int type, char *message);
@@ -298,9 +268,6 @@ typedef struct ai_export_s {
 	int( *BotLoadChatFile )(int chatstate, char *chatfile, char *chatname);
 	void( *BotSetChatGender )(int chatstate, int gender);
 	void( *BotSetChatName )(int chatstate, char *name, int client);
-	//-----------------------------------
-	// be_ai_goal.h
-	//-----------------------------------
 	void( *BotResetGoalState )(int goalstate);
 	void( *BotResetAvoidGoals )(int goalstate);
 	void( *BotRemoveFromAvoidGoals )(int goalstate, int number);
@@ -331,9 +298,6 @@ typedef struct ai_export_s {
 	void( *BotMutateGoalFuzzyLogic )(int goalstate, float range);
 	int( *BotAllocGoalState )(int client);
 	void( *BotFreeGoalState )(int handle);
-	//-----------------------------------
-	// be_ai_move.h
-	//-----------------------------------
 	void( *BotResetMoveState )(int movestate);
 	void( *BotMoveToGoal )(struct bot_moveresult_s *result, int movestate, struct bot_goal_s *goal, uint32_t travelflags);
 	int( *BotMoveInDirection )(int movestate, vector3 *dir, float speed, int type);
@@ -346,18 +310,12 @@ typedef struct ai_export_s {
 	void( *BotFreeMoveState )(int handle);
 	void( *BotInitMoveState )(int handle, struct bot_initmove_s *initmove);
 	void( *BotAddAvoidSpot )(int movestate, vector3 *origin, float radius, int type);
-	//-----------------------------------
-	// be_ai_weap.h
-	//-----------------------------------
 	int( *BotChooseBestFightWeapon )(int weaponstate, int *inventory);
 	void( *BotGetWeaponInfo )(int weaponstate, int weapon, struct weaponinfo_s *weaponinfo);
 	int( *BotLoadWeaponWeights )(int weaponstate, char *filename);
 	int( *BotAllocWeaponState )(void);
 	void( *BotFreeWeaponState )(int weaponstate);
 	void( *BotResetWeaponState )(int weaponstate);
-	//-----------------------------------
-	// be_ai_gen.h
-	//-----------------------------------
 	int( *GeneticParentsAndChildSelection )(int numranks, float *ranks, int *parent1, int *parent2, int *child);
 } ai_export_t;
 

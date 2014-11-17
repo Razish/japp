@@ -6,13 +6,7 @@
 #include "cg_local.h"
 #include "cg_media.h"
 
-/*
-==================
-CG_BubbleTrail
-
-Bullets shot underwater
-==================
-*/
+// Bullets shot underwater
 void CG_BubbleTrail( vector3 *start, vector3 *end, float spacing ) {
 	vector3		move;
 	vector3		vec;
@@ -71,13 +65,7 @@ void CG_BubbleTrail( vector3 *start, vector3 *end, float spacing ) {
 	}
 }
 
-/*
-=====================
-CG_SmokePuff
-
-Adds a smoke puff or blood trail localEntity.
-=====================
-*/
+// Adds a smoke puff or blood trail localEntity.
 localEntity_t *CG_SmokePuff( const vector3 *p, const vector3 *vel,
 	float radius,
 	float r, float g, float b, float a,
@@ -168,11 +156,6 @@ void CG_TestLine( vector3 *start, vector3 *end, int time, uint32_t color, int ra
 	//re->renderfx |= RF_DEPTHHACK;
 }
 
-/*
-==================
-CG_ThrowChunk
-==================
-*/
 void CG_ThrowChunk( vector3 *origin, vector3 *velocity, qhandle_t hModel, int optionalSound, int startalpha ) {
 	localEntity_t	*le;
 	refEntity_t		*re;
@@ -356,7 +339,7 @@ static void CG_CalcBiLerp( vector3 verts[4], vector3 subVerts[4], vector2 uv[4] 
 	VectorMA( &temp, uv[3].y, &subVerts[3], &subVerts[3] );
 }
 // bilinear
-//f(p',q') = (1 - y) × {[(1 - x) × f(p,q)] + [x × f(p,q+1)]} + y × {[(1 - x) × f(p+1,q)] + [x × f(p+1,q+1)]}.
+//f(p',q') = (1 - y) Ã— {[(1 - x) Ã— f(p,q)] + [x Ã— f(p,q+1)]} + y Ã— {[(1 - x) Ã— f(p+1,q)] + [x Ã— f(p+1,q+1)]}.
 
 
 static void CG_CalcHeightWidth( vector3 verts[4], float *height, float *width ) {
@@ -573,12 +556,7 @@ void CG_DoGlass( vector3 verts[4], vector3 *normal, vector3 *dmgPt, vector3 *dmg
 	}
 }
 
-/*
-==================
-CG_GlassShatter
-Break glass with fancy method
-==================
-*/
+// Break glass with fancy method
 void CG_GlassShatter( int entnum, vector3 *dmgPt, vector3 *dmgDir, float dmgRadius, int maxShards ) {
 	vector3 verts[4], normal;
 
@@ -589,12 +567,7 @@ void CG_GlassShatter( int entnum, vector3 *dmgPt, vector3 *dmgDir, float dmgRadi
 	//otherwise something awful has happened.
 }
 
-/*
-==================
-CG_GlassShatter_Old
-Throws glass shards from within a given bounding box in the world
-==================
-*/
+// Throws glass shards from within a given bounding box in the world
 void CG_GlassShatter_Old( int entnum, vector3 *org, vector3 *mins, vector3 *maxs ) {
 	vector3 velocity, a, shardorg, dif, difx;
 	float windowmass;
@@ -645,12 +618,6 @@ void CG_GlassShatter_Old( int entnum, vector3 *org, vector3 *mins, vector3 *maxs
 	}
 }
 
-/*
-==================
-CG_CreateDebris
-Throws specified debris from within a given bounding box in the world
-==================
-*/
 #define DEBRIS_SPECIALCASE_ROCK			-1
 #define DEBRIS_SPECIALCASE_CHUNKS		-2
 #define DEBRIS_SPECIALCASE_WOOD			-3
@@ -666,6 +633,7 @@ int dbModels_Wood[NUM_DEBRIS_MODELS_WOOD];
 int dbModels_Chunks[NUM_DEBRIS_MODELS_CHUNKS];
 int dbModels_Rocks[NUM_DEBRIS_MODELS_ROCKS];
 
+// Throws specified debris from within a given bounding box in the world
 void CG_CreateDebris( int entnum, vector3 *org, vector3 *mins, vector3 *maxs, int debrissound, int debrismodel ) {
 	vector3 velocity, a, shardorg, dif, difx;
 	float windowmass;
@@ -763,19 +731,8 @@ void CG_CreateDebris( int entnum, vector3 *org, vector3 *mins, vector3 *maxs, in
 	}
 }
 
-//==========================================================
-//SP-style chunks
-//==========================================================
-
-/*
--------------------------
-CG_ExplosionEffects
-
-Used to find the player and shake the camera if close enough
-intensity ranges from 1 (minor tremble) to 16 (major quake)
--------------------------
-*/
-
+// Used to find the player and shake the camera if close enough
+// intensity ranges from 1 (minor tremble) to 16 (major quake)
 void CG_ExplosionEffects( vector3 *origin, float intensity, int radius, int time ) {
 	//FIXME: When exactly is the vieworg calculated in relation to the rest of the frame?s
 
@@ -1087,11 +1044,6 @@ void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3
 	}
 }
 
-/*
-==================
-CG_ScorePlum
-==================
-*/
 void CG_ScorePlum( int client, vector3 *org, int score ) {
 	localEntity_t	*le;
 	refEntity_t		*re;
@@ -1132,11 +1084,6 @@ void CG_ScorePlum( int client, vector3 *org, int score ) {
 	AnglesToAxis( &angles, re->axis );
 }
 
-/*
-====================
-CG_MakeExplosion
-====================
-*/
 localEntity_t *CG_MakeExplosion( vector3 *origin, vector3 *dir,
 	qhandle_t hModel, int numFrames, qhandle_t shader,
 	int msec, qboolean isSprite, float scale, uint32_t flags ) {
@@ -1271,21 +1218,9 @@ void CG_SurfaceExplosion( vector3 *origin, vector3 *normal, float radius, float 
 	}
 }
 
-/*
-=================
-CG_Bleed
-
-This is the spurt of blood when a character gets hit
-=================
-*/
+// This is the spurt of blood when a character gets hit
 void CG_Bleed( vector3 *origin, int entityNum ) {
 	localEntity_t	*ex;
-
-#if 0
-	if ( !cg_blood.integer ) {
-		return;
-	}
-#endif
 
 	ex = CG_AllocLocalEntity();
 	ex->leType = LE_EXPLOSION;
@@ -1306,13 +1241,6 @@ void CG_Bleed( vector3 *origin, int entityNum ) {
 	}
 }
 
-
-
-/*
-==================
-CG_LaunchGib
-==================
-*/
 void CG_LaunchGib( vector3 *origin, vector3 *velocity, qhandle_t hModel ) {
 	localEntity_t	*le;
 	refEntity_t		*re;

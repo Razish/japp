@@ -23,12 +23,6 @@ void G_PlayDoorLoopSound( gentity_t *ent ) {
 	*/
 }
 
-/*
--------------------------
-G_PlayDoorSound
--------------------------
-*/
-
 void G_PlayDoorSound( gentity_t *ent, int type ) {
 	if ( !ent->soundSet || !ent->soundSet[0] ) {
 		return;
@@ -39,13 +33,7 @@ void G_PlayDoorSound( gentity_t *ent, int type ) {
 	G_AddEvent( ent, EV_PLAYDOORSOUND, type );
 }
 
-/*
-============
-G_TestEntityPosition
-
-============
-*/
-gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
+gentity_t *G_TestEntityPosition( gentity_t *ent ) {
 	trace_t	tr;
 	int		mask;
 
@@ -72,21 +60,11 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 	return NULL;
 }
 
-/*
-================
-G_CreateRotationMatrix
-================
-*/
 void G_CreateRotationMatrix( vector3 *angles, vector3 matrix[3] ) {
 	AngleVectors( angles, &matrix[0], &matrix[1], &matrix[2] );
 	VectorInverse( &matrix[1] );
 }
 
-/*
-================
-G_TransposeMatrix
-================
-*/
 void G_TransposeMatrix( vector3 matrix[3], vector3 transpose[3] ) {
 	int i, j;
 	for ( i = 0; i < 3; i++ ) {
@@ -96,11 +74,6 @@ void G_TransposeMatrix( vector3 matrix[3], vector3 transpose[3] ) {
 	}
 }
 
-/*
-================
-G_RotatePoint
-================
-*/
 void G_RotatePoint( vector3 *point, vector3 matrix[3] ) {
 	vector3 tvec;
 
@@ -110,13 +83,7 @@ void G_RotatePoint( vector3 *point, vector3 matrix[3] ) {
 	point->z = DotProduct( &matrix[2], &tvec );
 }
 
-/*
-==================
-G_TryPushingEntity
-
-Returns qfalse if the move is blocked
-==================
-*/
+// Returns qfalse if the move is blocked
 qboolean	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vector3 *move, vector3 *amove ) {
 	vector3		matrix[3], transpose[3];
 	vector3		org, org2, move2;
@@ -365,12 +332,6 @@ qboolean G_MoverPush( gentity_t *pusher, vector3 *move, vector3 *amove, gentity_
 	return qtrue;
 }
 
-
-/*
-=================
-G_MoverTeam
-=================
-*/
 void G_MoverTeam( gentity_t *ent ) {
 	vector3		move, amove;
 	gentity_t	*part, *obstacle;
@@ -427,12 +388,6 @@ void G_MoverTeam( gentity_t *ent ) {
 	}
 }
 
-/*
-================
-G_RunMover
-
-================
-*/
 void G_RunMover( gentity_t *ent ) {
 	// if not a team captain, don't do anything, because
 	// the captain will handle everything
@@ -455,22 +410,10 @@ void G_RunMover( gentity_t *ent ) {
 	G_RunThink( ent );
 }
 
-/*
-============================================================================
+// Doors, plats, and buttons are all binary (two position) movers
+// Pos1 is "at rest", pos2 is "activated"
 
-GENERAL MOVERS
-
-Doors, plats, and buttons are all binary (two position) movers
-Pos1 is "at rest", pos2 is "activated"
-============================================================================
-*/
-
-/*
-CalcTeamDoorCenter
-
-Finds all the doors of a team and returns their center position
-*/
-
+// Finds all the doors of a team and returns their center position
 void CalcTeamDoorCenter( gentity_t *ent, vector3 *center ) {
 	vector3		slavecenter;
 	gentity_t	*slave;
@@ -488,11 +431,6 @@ void CalcTeamDoorCenter( gentity_t *ent, vector3 *center ) {
 	}
 }
 
-/*
-===============
-SetMoverState
-===============
-*/
 void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 	vector3			delta;
 	float			f;
@@ -554,13 +492,6 @@ void MatchTeam( gentity_t *teamLeader, moverState_t moverState, int time ) {
 	}
 }
 
-
-
-/*
-================
-ReturnToPos1
-================
-*/
 void ReturnToPos1( gentity_t *ent ) {
 	ent->think = 0;
 	ent->nextthink = 0;
@@ -572,13 +503,6 @@ void ReturnToPos1( gentity_t *ent ) {
 	G_PlayDoorLoopSound( ent );
 	G_PlayDoorSound( ent, BMS_START );	//??
 }
-
-
-/*
-================
-Reached_BinaryMover
-================
-*/
 
 void Reached_BinaryMover( gentity_t *ent ) {
 	// stop the looping sound
@@ -640,12 +564,6 @@ void Reached_BinaryMover( gentity_t *ent ) {
 	}
 }
 
-
-/*
-================
-Use_BinaryMover_Go
-================
-*/
 void Use_BinaryMover_Go( gentity_t *ent ) {
 	int		total;
 	int		partial;
@@ -779,11 +697,7 @@ void LockDoors( gentity_t *const ent ) {
 		slave = slave->teamchain;
 	} while ( slave );
 }
-/*
-================
-Use_BinaryMover
-================
-*/
+
 void Use_BinaryMover( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	if ( !ent->use ) {//I cannot be used anymore, must be a door with a wait of -1 that's opened.
 		return;
@@ -817,16 +731,7 @@ void Use_BinaryMover( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	}
 }
 
-
-
-/*
-================
-InitMover
-
-"pos1", "pos2", and "speed" should be set before calling,
-so the movement delta can be calculated
-================
-*/
+// "pos1", "pos2", and "speed" should be set before calling, so the movement delta can be calculated
 void InitMoverTrData( gentity_t *ent ) {
 	vector3		move;
 	float		distance;
@@ -906,23 +811,8 @@ void InitMover( gentity_t *ent ) {
 	InitMoverTrData( ent );
 }
 
+// A use can be triggered either by a touch function, by being shot, or by being targeted by another entity.
 
-/*
-===============================================================================
-
-DOOR
-
-A use can be triggered either by a touch function, by being shot, or by being
-targeted by another entity.
-
-===============================================================================
-*/
-
-/*
-================
-Blocked_Door
-================
-*/
 void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 	//determines if we need to relock after moving or not.
 	qboolean relock = (ent->spawnflags & MOVER_LOCKED) ? qtrue : qfalse;
@@ -941,12 +831,6 @@ void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 	}
 }
 
-
-/*
-================
-Touch_DoorTriggerSpectator
-================
-*/
 static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	int i, axis;
 	trace_t tr;
@@ -982,11 +866,6 @@ static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other, trace_
 	}
 }
 
-/*
-================
-Touch_DoorTrigger
-================
-*/
 void Touch_DoorTrigger( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	gentity_t *relockEnt = NULL;
 
@@ -1055,14 +934,7 @@ void Touch_DoorTrigger( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	*/
 }
 
-/*
-======================
-Think_SpawnNewDoorTrigger
-
-All of the parts of a door have been spawned, so create
-a trigger that encloses all of them
-======================
-*/
+// All of the parts of a door have been spawned, so create a trigger that encloses all of them
 void Think_SpawnNewDoorTrigger( gentity_t *ent ) {
 	gentity_t		*other;
 	vector3		mins, maxs;
@@ -1331,21 +1203,7 @@ void SP_func_door( gentity_t *ent ) {
 	}
 }
 
-/*
-===============================================================================
-
-PLAT
-
-===============================================================================
-*/
-
-/*
-==============
-Touch_Plat
-
-Don't allow decent if a living player is on it
-===============
-*/
+// Don't allow decent if a living player is on it
 void Touch_Plat( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	if ( !other->client || other->client->ps.stats[STAT_HEALTH] <= 0 ) {
 		return;
@@ -1357,13 +1215,7 @@ void Touch_Plat( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	}
 }
 
-/*
-==============
-Touch_PlatCenterTrigger
-
-If the plat is at the bottom position, start it going up
-===============
-*/
+// If the plat is at the bottom position, start it going up
 void Touch_PlatCenterTrigger( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	if ( !other->client ) {
 		return;
@@ -1374,16 +1226,8 @@ void Touch_PlatCenterTrigger( gentity_t *ent, gentity_t *other, trace_t *trace )
 	}
 }
 
-
-/*
-================
-SpawnPlatTrigger
-
-Spawn a trigger in the middle of the plat's low position
-Elevator cars require that the trigger extend through the entire low position,
-not just sit on top of it.
-================
-*/
+// Spawn a trigger in the middle of the plat's low position
+// Elevator cars require that the trigger extend through the entire low position, not just sit on top of it.
 void SpawnPlatTrigger( gentity_t *ent ) {
 	gentity_t	*trigger;
 	vector3	tmin, tmax;
@@ -1476,20 +1320,6 @@ void SP_func_plat( gentity_t *ent ) {
 	}
 }
 
-/*
-===============================================================================
-
-BUTTON
-
-===============================================================================
-*/
-
-/*
-==============
-Touch_Button
-
-===============
-*/
 void Touch_Button( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	if ( !other->client ) {
 		return;
@@ -1562,29 +1392,11 @@ void SP_func_button( gentity_t *ent ) {
 	InitMover( ent );
 }
 
-
-
-
-/*
-===============================================================================
-
-TRAIN
-
-===============================================================================
-*/
-
-
 #define TRAIN_START_ON		1
 #define TRAIN_TOGGLE		2
 #define TRAIN_BLOCK_STOPS	4
 
-/*
-===============
-Think_BeginMoving
-
-The wait time at a corner has completed, so start moving again
-===============
-*/
+// The wait time at a corner has completed, so start moving again
 void Think_BeginMoving( gentity_t *ent ) {
 	G_PlayDoorSound( ent, BMS_START );
 	G_PlayDoorLoopSound( ent );
@@ -1592,11 +1404,6 @@ void Think_BeginMoving( gentity_t *ent ) {
 	ent->s.pos.trType = TR_LINEAR_STOP;
 }
 
-/*
-===============
-Reached_Train
-===============
-*/
 void Reached_Train( gentity_t *ent ) {
 	gentity_t		*next;
 	float			speed;
@@ -1653,13 +1460,7 @@ void Reached_Train( gentity_t *ent ) {
 	}
 }
 
-/*
-===============
-Think_SetupTrainTargets
-
-Link all the corners together
-===============
-*/
+// Link all the corners together
 void Think_SetupTrainTargets( gentity_t *ent ) {
 	gentity_t		*path, *next, *start;
 
@@ -1784,14 +1585,6 @@ void SP_func_train( gentity_t *self ) {
 	self->think = Think_SetupTrainTargets;
 }
 
-/*
-===============================================================================
-
-STATIC
-
-===============================================================================
-*/
-
 void func_static_use( gentity_t *self, gentity_t *other, gentity_t *activator );
 /*QUAKED func_static (0 .5 .8) ? F_PUSH F_PULL SWITCH_SHADER CRUSHER IMPACT x PLAYER_USE INACTIVE BROADCAST
 F_PUSH		Will be used when you Force-Push it
@@ -1866,14 +1659,6 @@ void func_static_use( gentity_t *self, gentity_t *other, gentity_t *activator ) 
 	G_UseTargets( self, activator );
 }
 
-/*
-===============================================================================
-
-ROTATING
-
-===============================================================================
-*/
-
 void func_rotating_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	if ( self->s.apos.trType == TR_LINEAR ) {
 		self->s.apos.trType = TR_STATIONARY;
@@ -1913,7 +1698,6 @@ check either the X_AXIS or Y_AXIS box to change that.
 "light"			constantLight radius
 "spinangles"	instead of using "speed", you can set use this to set rotation on all 3 axes (pitch yaw and roll)
 
-==================================================
 "health"	default is 0
 
 If health is set, the following key/values are available:
@@ -2016,16 +1800,6 @@ void SP_func_rotating( gentity_t *ent ) {
 	}
 }
 
-
-/*
-===============================================================================
-
-BOBBING
-
-===============================================================================
-*/
-
-
 /*QUAKED func_bobbing (0 .5 .8) ? X_AXIS Y_AXIS x x x x PLAYER_USE INACTIVE
 Normally bobs on the Z axis
 "model2"	.md3 model to also draw
@@ -2060,15 +1834,6 @@ void SP_func_bobbing( gentity_t *ent ) {
 	else if ( ent->spawnflags & 2 )		ent->s.pos.trDelta.y = height;
 	else								ent->s.pos.trDelta.z = height;
 }
-
-/*
-===============================================================================
-
-PENDULUM
-
-===============================================================================
-*/
-
 
 /*QUAKED func_pendulum (0 .5 .8) ? x x x x x x PLAYER_USE INACTIVE
 You need to have an origin brush as part of this entity.
@@ -2115,14 +1880,6 @@ void SP_func_pendulum( gentity_t *ent ) {
 	ent->s.apos.trDelta.z = speed;
 }
 
-/*
-===============================================================================
-
-BREAKABLE BRUSH
-
-===============================================================================
-*/
-//---------------------------------------------------
 static void CacheChunkEffects( material_t material ) {
 	switch ( material ) {
 	default:
@@ -2194,7 +1951,6 @@ void G_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3 
 	te->s.apos.trBase.x = baseScale;
 }
 
-//--------------------------------------
 void funcBBrushDieGo( gentity_t *self ) {
 	vector3		org, dir, up;
 	gentity_t	*attacker = self->enemy;
@@ -2616,13 +2372,6 @@ qboolean G_EntIsBreakable( int entityNum ) {
 	return qfalse;
 }
 
-/*
-===============================================================================
-
-GLASS
-
-===============================================================================
-*/
 void GlassDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod ) {
 	gentity_t *te;
 	vector3 dif;
@@ -2916,14 +2665,6 @@ void SP_func_usable( gentity_t *self ) {
 	trap->LinkEntity( (sharedEntity_t *)self );
 }
 
-
-/*
-===============================================================================
-
-WALL
-
-===============================================================================
-*/
 
 //static -slc
 void use_wall( gentity_t *ent, gentity_t *other, gentity_t *activator ) {

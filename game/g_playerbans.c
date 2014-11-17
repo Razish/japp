@@ -203,7 +203,7 @@ int JP_Bans_AddBanString( const char *ip, const char *duration, const char *reas
 	// If i < 3, the parser ended prematurely, so abort
 	if ( i < 3 ) {
 		if ( failedMsg ) {
-			Q_strncpyz( failedMsg, "Incomplete IP", msgLen );
+			Com_sprintf( failedMsg, msgLen, "Incomplete IP: %s", ip );
 		}
 		return -1;
 	}

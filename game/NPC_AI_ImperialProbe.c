@@ -32,11 +32,6 @@ void NPC_Probe_Precache( void ) {
 	RegisterItem( BG_FindItemForAmmo( AMMO_BLASTER ) );
 	RegisterItem( BG_FindItemForWeapon( WP_BRYAR_PISTOL ) );
 }
-/*
--------------------------
-Hunter_MaintainHeight
--------------------------
-*/
 
 #define VELOCITY_DECAY	0.85f
 
@@ -146,12 +141,6 @@ void ImperialProbe_MaintainHeight( void ) {
 	}
 }
 
-/*
--------------------------
-ImperialProbe_Strafe
--------------------------
-*/
-
 #define HUNTER_STRAFE_VEL	256
 #define HUNTER_STRAFE_DIS	200
 #define HUNTER_UPWARD_PUSH	32
@@ -182,12 +171,6 @@ void ImperialProbe_Strafe( void ) {
 		NPCInfo->standTime = level.time + 3000 + random() * 500;
 	}
 }
-
-/*
--------------------------
-ImperialProbe_Hunt
--------------------------`
-*/
 
 #define HUNTER_FORWARD_BASE_SPEED	10
 #define HUNTER_FORWARD_MULTIPLIER	5
@@ -230,11 +213,6 @@ void ImperialProbe_Hunt( qboolean visible, qboolean advance ) {
 	VectorMA( &NPC->client->ps.velocity, speed, &forward, &NPC->client->ps.velocity );
 }
 
-/*
--------------------------
-ImperialProbe_FireBlaster
--------------------------
-*/
 void ImperialProbe_FireBlaster( void ) {
 	vector3	muzzle1, enemy_org1, delta1, angleToEnemy1;
 	static	vector3	forward, vright, up;
@@ -288,11 +266,6 @@ void ImperialProbe_FireBlaster( void ) {
 
 }
 
-/*
--------------------------
-ImperialProbe_Ranged
--------------------------
-*/
 void ImperialProbe_Ranged( qboolean visible, qboolean advance ) {
 	int	delay_min, delay_max;
 
@@ -321,12 +294,6 @@ void ImperialProbe_Ranged( qboolean visible, qboolean advance ) {
 		ImperialProbe_Hunt( visible, advance );
 	}
 }
-
-/*
--------------------------
-ImperialProbe_AttackDecision
--------------------------
-*/
 
 #define	MIN_MELEE_RANGE		320
 #define	MIN_MELEE_RANGE_SQR	( MIN_MELEE_RANGE * MIN_MELEE_RANGE )
@@ -379,11 +346,6 @@ void ImperialProbe_AttackDecision( void ) {
 	ImperialProbe_Ranged( visible, advance );
 }
 
-/*
--------------------------
-NPC_BSDroid_Pain
--------------------------
-*/
 void NPC_Probe_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	float	pain_chance;
 	gentity_t *other = attacker;
@@ -448,23 +410,12 @@ void NPC_Probe_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	NPC_Pain( self, attacker, damage );
 }
 
-/*
--------------------------
-ImperialProbe_Idle
--------------------------
-*/
-
 void ImperialProbe_Idle( void ) {
 	ImperialProbe_MaintainHeight();
 
 	NPC_BSIdle();
 }
 
-/*
--------------------------
-NPC_BSImperialProbe_Patrol
--------------------------
-*/
 void ImperialProbe_Patrol( void ) {
 	ImperialProbe_MaintainHeight();
 
@@ -500,11 +451,6 @@ void ImperialProbe_Patrol( void ) {
 	NPC_UpdateAngles( qtrue, qtrue );
 }
 
-/*
--------------------------
-ImperialProbe_Wait
--------------------------
-*/
 void ImperialProbe_Wait( void ) {
 	if ( NPCInfo->localState == LSTATE_DROP ) {
 		vector3 endPos;
@@ -523,11 +469,6 @@ void ImperialProbe_Wait( void ) {
 	NPC_UpdateAngles( qtrue, qtrue );
 }
 
-/*
--------------------------
-NPC_BSImperialProbe_Default
--------------------------
-*/
 void NPC_BSImperialProbe_Default( void ) {
 
 	if ( NPC->enemy ) {

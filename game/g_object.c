@@ -4,12 +4,6 @@ extern void G_MoverTouchPushTriggers( gentity_t *ent, vector3 *oldOrg );
 void G_StopObjectMoving( gentity_t *object );
 void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope );
 
-/*
-================
-G_BounceObject
-
-================
-*/
 void G_BounceObject( gentity_t *ent, trace_t *trace ) {
 	vector3	velocity;
 	float	dot, bounceFactor;
@@ -54,16 +48,10 @@ void G_BounceObject( gentity_t *ent, trace_t *trace ) {
 	VectorCopy( &trace->plane.normal, &ent->pos1 );//???
 }
 
-
-/*
-================
-G_RunObject
-
-TODO:  When transition to 0 grav, push away from surface you were resting on
-TODO:  When free-floating in air, apply some friction to your trDelta (based on mass?)
-================
-*/
 void DoImpact( gentity_t *self, gentity_t *other, qboolean damageSelf );
+
+//TODO:  When transition to 0 grav, push away from surface you were resting on
+//TODO:  When free-floating in air, apply some friction to your trDelta (based on mass?)
 void G_RunObject( gentity_t *ent ) {
 	vector3		origin, oldOrg;
 	trace_t		tr;

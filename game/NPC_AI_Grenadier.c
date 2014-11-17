@@ -72,12 +72,6 @@ void NPC_Grenadier_PlayConfusionSound( gentity_t *self ) {//FIXME: make this a c
 }
 
 
-/*
--------------------------
-NPC_ST_Pain
--------------------------
-*/
-
 void NPC_Grenadier_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	self->NPC->localState = LSTATE_UNDERFIRE;
 
@@ -91,12 +85,6 @@ void NPC_Grenadier_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	}
 }
 
-/*
--------------------------
-ST_HoldPosition
--------------------------
-*/
-
 static void Grenadier_HoldPosition( void ) {
 	NPC_FreeCombatPoint( NPCInfo->combatPoint, qtrue );
 	NPCInfo->goalEntity = NULL;
@@ -107,12 +95,6 @@ static void Grenadier_HoldPosition( void ) {
 	}
 	*/
 }
-
-/*
--------------------------
-ST_Move
--------------------------
-*/
 
 static qboolean Grenadier_Move( void ) {
 	qboolean	moved;
@@ -160,12 +142,6 @@ static qboolean Grenadier_Move( void ) {
 
 	return moved;
 }
-
-/*
--------------------------
-NPC_BSGrenadier_Patrol
--------------------------
-*/
 
 void NPC_BSGrenadier_Patrol( void ) {//FIXME: pick up on bodies of dead buddies?
 	if ( NPCInfo->confusionTime < level.time ) {
@@ -242,34 +218,6 @@ void NPC_BSGrenadier_Patrol( void ) {//FIXME: pick up on bodies of dead buddies?
 	NPC_UpdateAngles( qtrue, qtrue );
 }
 
-/*
--------------------------
-NPC_BSGrenadier_Idle
--------------------------
-*/
-/*
-void NPC_BSGrenadier_Idle( void )
-{
-//FIXME: check for other alert events?
-
-//Is there danger nearby?
-if ( NPC_CheckForDanger( NPC_CheckAlertEvents( qtrue, qtrue, -1, qfalse, AEL_DANGER ) ) )
-{
-NPC_UpdateAngles( qtrue, qtrue );
-return;
-}
-
-TIMER_Set( NPC, "roamTime", 2000 + Q_irand( 1000, 2000 ) );
-
-NPC_UpdateAngles( qtrue, qtrue );
-}
-*/
-/*
--------------------------
-ST_CheckMoveState
--------------------------
-*/
-
 static void Grenadier_CheckMoveState( void ) {
 	//See if we're a scout
 	if ( !(NPCInfo->scriptFlags & SCF_CHASE_ENEMIES) )//behaviorState == BS_STAND_AND_SHOOT )
@@ -343,12 +291,6 @@ static void Grenadier_CheckMoveState( void ) {
 	}
 }
 
-/*
--------------------------
-ST_CheckFireState
--------------------------
-*/
-
 static void Grenadier_CheckFireState( void ) {
 	if ( enemyCS3 ) {//if have a clear shot, always try
 		return;
@@ -397,12 +339,6 @@ qboolean Grenadier_EvaluateShot( int hit ) {
 	}
 	return qfalse;
 }
-
-/*
--------------------------
-NPC_BSGrenadier_Attack
--------------------------
-*/
 
 void NPC_BSGrenadier_Attack( void ) {
 	//Don't do anything if we're hurt

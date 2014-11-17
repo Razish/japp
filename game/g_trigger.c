@@ -627,12 +627,7 @@ void SP_trigger_once( gentity_t *ent ) {
 	trap->LinkEntity( (sharedEntity_t *)ent );
 }
 
-/*
-======================================================================
-trigger_lightningstrike -rww
-======================================================================
-*/
-//lightning strike trigger lightning strike event
+// lightning strike trigger lightning strike event
 void Do_Strike( gentity_t *ent ) {
 	trace_t localTrace;
 	vector3 strikeFrom;
@@ -743,14 +738,6 @@ void SP_trigger_lightningstrike( gentity_t *ent ) {
 }
 
 
-/*
-==============================================================================
-
-trigger_always
-
-==============================================================================
-*/
-
 void trigger_always_think( gentity_t *ent ) {
 	G_UseTargets( ent, ent );
 	G_FreeEntity( ent );
@@ -766,13 +753,6 @@ void SP_trigger_always( gentity_t *ent ) {
 }
 
 
-/*
-==============================================================================
-
-trigger_push
-
-==============================================================================
-*/
 //trigger_push
 #define PUSH_LINEAR		4
 #define PUSH_RELATIVE	16
@@ -901,13 +881,7 @@ void trigger_push_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 }
 
 
-/*
-=================
-AimAtTarget
-
-Calculate origin2 so the target apogee will be hit
-=================
-*/
+// Calculate origin2 so the target apogee will be hit
 void AimAtTarget( gentity_t *self ) {
 	gentity_t	*ent;
 	vector3		origin;
@@ -1051,14 +1025,6 @@ void SP_target_push( gentity_t *self ) {
 	self->use = Use_target_push;
 }
 
-/*
-==============================================================================
-
-trigger_teleport
-
-==============================================================================
-*/
-
 void trigger_teleporter_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	gentity_t	*dest;
 
@@ -1117,15 +1083,6 @@ void SP_trigger_teleport( gentity_t *self ) {
 
 	trap->LinkEntity( (sharedEntity_t *)self );
 }
-
-
-/*
-==============================================================================
-
-trigger_hurt
-
-==============================================================================
-*/
 
 /*QUAKED trigger_hurt (.5 .5 .5) ? START_OFF CAN_TARGET SILENT NO_PROTECTION SLOW
 Any entity that touches this will be hurt.
@@ -1552,14 +1509,6 @@ void SP_trigger_hyperspace( gentity_t *self ) {
 	//self->think = trigger_hyperspace_find_targets;
 	//self->nextthink = level.time + FRAMETIME;
 }
-/*
-==============================================================================
-
-timer
-
-==============================================================================
-*/
-
 
 /*QUAKED func_timer (0.3 0.1 0.6) (-8 -8 -8) (8 8 8) START_ON
 This should be renamed trigger_timer...

@@ -51,11 +51,7 @@
 #define CURSOR_ARROW				(0x0002u)
 #define CURSOR_SIZER				(0x0004u)
 
-#ifdef _CGAME
-#define STRING_POOL_SIZE 128*1024
-#else
-#define STRING_POOL_SIZE 384*1024
-#endif
+#define STRING_POOL_SIZE (512*1024)
 
 #define MAX_STRING_HANDLES 4096
 #define MAX_SCRIPT_ARGS 12

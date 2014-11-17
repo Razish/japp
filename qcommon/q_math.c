@@ -199,8 +199,6 @@ const vector3 bytedirs[NUMVERTEXNORMALS] = {
 	{ -0.688191f, -0.587785f, -0.425325f }
 };
 
-//==============================================================
-
 int		Q_rand( int *seed ) {
 	*seed = (69069 * *seed + 1);
 	return *seed;
@@ -293,8 +291,6 @@ void CrossProductA( float *v1, float *v2, float *cross ) {
 #endif
 }
 #endif
-
-//=======================================================
 
 signed char ClampChar( int i ) {
 	if ( i < -128 ) {
@@ -391,15 +387,8 @@ float NormalizeColor( const vector3 *in, vector3 *out ) {
 	return max;
 }
 
-
-/*
-=====================
-PlaneFromPoints
-
-Returns false if the triangle is degenrate.
-The normal will point out of the clock for clockwise ordered points
-=====================
-*/
+// Returns false if the triangle is degenerate.
+// The normal will point out of the clock for clockwise ordered points
 qboolean PlaneFromPoints( vector4 *plane, const vector3 *a, const vector3 *b, const vector3 *c ) {
 	vector3	d1, d2;
 
@@ -414,13 +403,7 @@ qboolean PlaneFromPoints( vector4 *plane, const vector3 *a, const vector3 *b, co
 	return qtrue;
 }
 
-/*
-===============
-RotatePointAroundVector
-
-This is not implemented very well...
-===============
-*/
+// This is not implemented very well...
 void RotatePointAroundVector( vector3 *dst, const vector3 *dir, const vector3 *point, float degrees ) {
 	vector3 m[3], im[3], zrot[3], tmpmat[3], rot[3];
 	vector3 vr, vup, vf;
@@ -459,23 +442,19 @@ void RotatePointAroundVector( vector3 *dst, const vector3 *dir, const vector3 *p
 	zrot[0].x = zrot[1].y = zrot[2].z = 1.0f;
 
 	rad = DEG2RAD( degrees );
-	zrot[0].x = cosf( rad );
-	zrot[0].y = sinf( rad );
+	zrot[0].x =  cosf( rad );
+	zrot[0].y =  sinf( rad );
 	zrot[1].x = -sinf( rad );
-	zrot[1].y = cosf( rad );
+	zrot[1].y =  cosf( rad );
 
 	MatrixMultiply( m, zrot, tmpmat );
 	MatrixMultiply( tmpmat, im, rot );
 
-	for ( i = 0; i < 3; i++ )
-		dst->data[i] = rot[i].x * point->x + rot[i].y * point->y + rot[i].z * point->z;
+	for ( i = 0; i < 3; i++ ) {
+		dst->data[i] = DotProduct( &rot[i], point );
+	}
 }
 
-/*
-===============
-RotateAroundDirection
-===============
-*/
 void RotateAroundDirection( vector3 axis[3], float yaw ) {
 
 	// create an arbitrary axis[1]
@@ -555,11 +534,6 @@ float vectoyaw( const vector3 *vec ) {
 	return yaw;
 }
 
-/*
-=================
-AnglesToAxis
-=================
-*/
 void AnglesToAxis( const vector3 *angles, vector3 axis[3] ) {
 	vector3	right;
 
@@ -608,14 +582,7 @@ void ProjectPointOnPlane( vector3 *dst, const vector3 *p, const vector3 *normal 
 	dst->z = p->z - d * n.z;
 }
 
-/*
-================
-MakeNormalVectors
-
-Given a normalized forward vector, create two
-other perpendicular vectors
-================
-*/
+// Given a normalized forward vector, create two other perpendicular vectors
 void MakeNormalVectors( const vector3 *forward, vector3 *right, vector3 *up ) {
 	float		d;
 
@@ -637,8 +604,6 @@ void VectorRotate( vector3 *in, vector3 matrix[3], vector3 *out ) {
 	out->y = DotProduct( in, &matrix[1] );
 	out->z = DotProduct( in, &matrix[2] );
 }
-
-//============================================================================
 
 #if !idppc
 /*
@@ -670,14 +635,6 @@ float Q_fabs( float f ) {
 }
 #endif
 
-//============================================================
-
-/*
-===============
-LerpAngle
-
-===============
-*/
 float LerpAngle( float from, float to, float frac ) {
 	float	a;
 
@@ -693,14 +650,8 @@ float LerpAngle( float from, float to, float frac ) {
 }
 
 
-/*
-=================
-AngleSubtract
-
-Always returns a value from -180 to 180
-=================
-*/
-float	AngleSubtract( float a1, float a2 ) {
+// Always returns a value from -180 to 180
+float AngleSubtract( float a1, float a2 ) {
 	float	a;
 
 	a = a1 - a2;
@@ -727,26 +678,12 @@ float AngleMod( float a ) {
 	return a;
 }
 
-
-/*
-=================
-AngleNormalize360
-
-returns angle normalized to the range [0 <= angle < 360]
-=================
-*/
+// returns angle normalized to the range [0 <= angle < 360]
 float AngleNormalize360( float angle ) {
 	return (360.0f / 65536) * ((int)(angle * (65536 / 360.0f)) & 65535);
 }
 
-
-/*
-=================
-AngleNormalize180
-
-returns angle normalized to the range [-180 < angle <= 180]
-=================
-*/
+// returns angle normalized to the range [-180 < angle <= 180]
 float AngleNormalize180( float angle ) {
 	angle = AngleNormalize360( angle );
 	if ( angle > 180.0f ) {
@@ -755,27 +692,11 @@ float AngleNormalize180( float angle ) {
 	return angle;
 }
 
-
-/*
-=================
-AngleDelta
-
-returns the normalized delta from angle1 to angle2
-=================
-*/
+// returns the normalized delta from angle1 to angle2
 float AngleDelta( float angle1, float angle2 ) {
 	return AngleNormalize180( angle1 - angle2 );
 }
 
-
-//============================================================
-
-
-/*
-=================
-SetPlaneSignbits
-=================
-*/
 void SetPlaneSignbits( cplane_t *out ) {
 	int	bits, j;
 
@@ -790,46 +711,6 @@ void SetPlaneSignbits( cplane_t *out ) {
 }
 
 
-/*
-==================
-BoxOnPlaneSide
-
-Returns 1, 2, or 1 + 2
-
-// this is the slow, general version
-int BoxOnPlaneSide2 (vector3 *emins, vector3 *emaxs, struct cplane_s *p)
-{
-int		i;
-float	dist1, dist2;
-int		sides;
-vector3	corners[2];
-
-for (i=0 ; i<3 ; i++)
-{
-if (p->normal[i] < 0)
-{
-corners[0][i] = emins[i];
-corners[1][i] = emaxs[i];
-}
-else
-{
-corners[1][i] = emins[i];
-corners[0][i] = emaxs[i];
-}
-}
-dist1 = DotProduct (p->normal, corners[0]) - p->dist;
-dist2 = DotProduct (p->normal, corners[1]) - p->dist;
-sides = 0;
-if (dist1 >= 0)
-sides = 1;
-if (dist2 < 0)
-sides |= 2;
-
-return sides;
-}
-
-==================
-*/
 #if !( (defined MACOS_X || defined __linux__ || __FreeBSD__) && (defined __i386__) && (!defined C_ONLY)) // rb010123
 
 #if defined __LCC__ || defined C_ONLY || !id386 || defined(MINGW32)
@@ -840,10 +721,12 @@ int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
 
 	// fast axial cases
 	if ( p->type < 3 ) {
-		if ( p->dist <= emins->data[p->type] )
+		if ( p->dist <= emins->data[p->type] ) {
 			return 1;
-		if ( p->dist >= emaxs->data[p->type] )
+		}
+		if ( p->dist >= emaxs->data[p->type] ) {
 			return 2;
+		}
 		return 3;
 	}
 
@@ -1130,11 +1013,6 @@ Lerror :
 #endif
 #endif
 
-/*
-=================
-RadiusFromBounds
-=================
-*/
 float RadiusFromBounds( const vector3 *mins, const vector3 *maxs ) {
 	int		i;
 	vector3	corner;
@@ -1502,10 +1380,9 @@ number DotProduct( const vector3 *vec1, const vector3 *vec2 ) {
 }
 
 qboolean VectorCompare( const vector3 *vec1, const vector3 *vec2 ) {
-	if ( vec1->x == vec2->x &&
-		vec1->y == vec2->y &&
-		vec1->z == vec2->z )
+	if ( vec1->x == vec2->x && vec1->y == vec2->y && vec1->z == vec2->z ) {
 		return qtrue;
+	}
 	return qfalse;
 }
 
@@ -1524,13 +1401,7 @@ static float roundfloat( float n ) {
 
 #endif
 
-/*
-======================
-VectorSnap
-
-Round a vector to integers for more efficient network transmission
-======================
-*/
+// Round a vector to integers for more efficient network transmission
 void VectorSnap( vector3 *v ) {
 #ifdef _MSC_VER
 	unsigned int oldcontrol, newcontrol;
@@ -1555,15 +1426,9 @@ void VectorSnap( vector3 *v ) {
 #endif
 }
 
-/*
-======================
-VectorSnapTowards
-
-Round a vector to integers for more efficient network transmission,
-but make sure that it rounds towards a given point rather than blindly truncating.
-This prevents it from truncating into a wall.
-======================
-*/
+// Round a vector to integers for more efficient network transmission, but make sure that it rounds towards a given
+//	point rather than blindly truncating.
+// This prevents it from truncating into a wall.
 void VectorSnapTowards( vector3 *v, vector3 *to ) {
 	int i;
 
@@ -1585,11 +1450,6 @@ int Q_log2( int val ) {
 	return answer;
 }
 
-/*
-================
-MatrixMultiply
-================
-*/
 void MatrixMultiply( const vector3 in1[3], const vector3 in2[3], vector3 out[3] ) {
 	out[0].x = in1[0].x*in2[0].x + in1[0].y*in2[1].x + in1[0].z*in2[2].x;
 	out[0].y = in1[0].x*in2[0].y + in1[0].y*in2[1].y + in1[0].z*in2[2].y;
@@ -1750,12 +1610,6 @@ float Q_powf( float x, int y ) {
 	return r;
 }
 
-/*
--------------------------
-DotProductNormalize
--------------------------
-*/
-
 float DotProductNormalize( const vector3 *inVec1, const vector3 *inVec2 ) {
 	vector3	v1, v2;
 
@@ -1764,12 +1618,6 @@ float DotProductNormalize( const vector3 *inVec1, const vector3 *inVec2 ) {
 
 	return DotProduct( &v1, &v2 );
 }
-
-/*
--------------------------
-G_FindClosestPointOnLineSegment
--------------------------
-*/
 
 qboolean G_FindClosestPointOnLineSegment( const vector3 *start, const vector3 *end, const vector3 *from, vector3 *result ) {
 	vector3	vecStart2From, vecStart2End, vecEnd2Start, vecEnd2From;

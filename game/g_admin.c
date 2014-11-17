@@ -31,7 +31,8 @@ static void AM_ClearAccounts( void ) {
 
 		for ( i = 0, ent = g_entities; i < level.maxclients; i++, ent++ ) {
 			if ( ent->client->pers.adminUser && ent->client->pers.adminUser == user ) {
-				trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"You have been forcefully logged out of admin.\n\"" );
+				trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "You have been forcefully logged "
+					"out of admin.\n\"" );
 				ent->client->pers.adminUser = NULL;
 			}
 		}
@@ -50,8 +51,8 @@ void AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const
 	for ( admin = adminUsers; admin; admin = admin->next ) {
 		if ( !strcmp( user, admin->user ) ) {
 			G_LogPrintf( level.log.admin, "[ADD] Overwriting user \"%s\"\n", user );
-			trap->Print( "Overwriting existing admin: %s/%s:%d (%d) %s\n", admin->user, admin->password, admin->rank, admin->privileges,
-				admin->loginMsg );
+			trap->Print( "Overwriting existing admin: %s/%s:%d (%d) %s\n", admin->user, admin->password, admin->rank,
+				admin->privileges, admin->loginMsg );
 			break;
 		}
 	}
@@ -85,7 +86,8 @@ void AM_DeleteAdmin( const char *user ) {
 			int i = 0;
 			for ( i = 0, ent = g_entities; i < level.maxclients; i++, ent++ ) {
 				if ( ent->client->pers.adminUser && ent->client->pers.adminUser == admin ) {
-					trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_RED"Your admin account has been deleted.\n\"" );
+					trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_RED"Your admin account has been "
+						"deleted.\n\"" );
 					ent->client->pers.adminUser = NULL;
 				}
 			}
@@ -121,7 +123,8 @@ void AM_ListAdmins( void ) {
 	for ( admin = adminUsers; admin; admin = admin->next ) {
 		gentity_t *ent = NULL;
 
-		trap->Print( " %3d: %s/%s:%d (%d) %s\n", ++count, admin->user, admin->password, admin->rank, admin->privileges, admin->loginMsg );
+		trap->Print( " %3d: %s/%s:%d (%d) %s\n", ++count, admin->user, admin->password, admin->rank, admin->privileges,
+			admin->loginMsg );
 
 		for ( ent = g_entities; ent - g_entities < level.maxclients; ent++ ) {
 			//TODO: build string like "user1, user2"
@@ -283,22 +286,22 @@ qboolean AM_CanInflict( gentity_t *entInflicter, gentity_t *entVictim ) {
 			return qtrue;
 		}
 		else {
-			trap->SendServerCommand( entInflicter->s.number, "print \""S_COLOR_RED"Can not use admin commands on those of"
-				"an equal rank: (japp_passRankConflicts)\n\"" );
+			trap->SendServerCommand( entInflicter->s.number, "print \"" S_COLOR_RED "Can not use admin commands on "
+				"those of an equal rank: (japp_passRankConflicts)\n\"" );
 			return qfalse;
 		}
 	}
 
 	if ( inflicter->rank > victim->rank ) {
 		// inflicter is of a higher rank and so he/she can freely abuse those lesser.
-		G_LogPrintf( level.log.console, "%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s (User: %s)"
-			"(Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank, entVictim->client->pers.netname,
-			victim->user, victim->rank );
+		G_LogPrintf( level.log.console, "%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s (User:"
+			" %s) (Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank,
+			entVictim->client->pers.netname, victim->user, victim->rank );
 		return qtrue;
 	}
 	else {
-		trap->SendServerCommand( entInflicter->s.number, "print \""S_COLOR_RED"Can not use admin commands on those of a"
-			"higher rank.\n\"" );
+		trap->SendServerCommand( entInflicter->s.number, "print \"" S_COLOR_RED "Can not use admin commands on those "
+			"of a higher rank.\n\"" );
 		return qfalse;
 	}
 }
@@ -606,7 +609,8 @@ static void AM_WhoIs( gentity_t *ent ) {
 	char msg[1024 - 128] = { 0 };
 	gentity_t *e = NULL;
 
-	Q_strcat( msg, sizeof(msg), S_COLOR_WHITE"Name                                Admin User                      Rank\n" );
+	Q_strcat( msg, sizeof(msg), S_COLOR_WHITE "Name                                Admin User                      "
+		"Rank\n" );
 
 	// if the client is an admin, append their name and 'user' to the string
 	for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
@@ -615,7 +619,8 @@ static void AM_WhoIs( gentity_t *ent ) {
 
 			Q_strncpyz( strName, e->client->pers.netname, sizeof(strName) );
 			Q_CleanString( strName, STRIP_COLOUR );
-			Q_strncpyz( strAdmin, (e->client->pers.adminUser) ? e->client->pers.adminUser->user : "", sizeof(strAdmin) );
+			Q_strncpyz( strAdmin, (e->client->pers.adminUser) ? e->client->pers.adminUser->user : "",
+				sizeof(strAdmin) );
 			Q_CleanString( strAdmin, STRIP_COLOUR );
 			Q_strncpyz( strRank, va( "%d", e->client->pers.adminUser->rank ), sizeof(strRank) );
 
@@ -632,7 +637,8 @@ static void AM_Status( gentity_t *ent ) {
 	char msg[1024 - 128] = { 0 };
 	gentity_t *e;
 
-	Q_strcat( msg, sizeof(msg), S_COLOR_WHITE"clientNum   Name                                IP                      Admin User\n" );
+	Q_strcat( msg, sizeof(msg), S_COLOR_WHITE "clientNum   Name                                IP                      "
+		"Admin User\n" );
 
 	// build a list of clients
 	for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
@@ -644,7 +650,8 @@ static void AM_Status( gentity_t *ent ) {
 			Q_strncpyz( strNum, va( "(%i)", i ), sizeof(strNum) );
 			Q_strncpyz( strName, e->client->pers.netnameClean, sizeof(strName) );
 			Q_strncpyz( strIP, e->client->sess.IP, sizeof(strIP) );
-			Q_strncpyz( strAdmin, (e->client->pers.adminUser) ? e->client->pers.adminUser->user : "", sizeof(strAdmin) );
+			Q_strncpyz( strAdmin, (e->client->pers.adminUser) ? e->client->pers.adminUser->user : "",
+				sizeof(strAdmin) );
 			Q_CleanString( strAdmin, STRIP_COLOUR );
 
 			tmpMsg = va( "%-12s%-36s%-24s%-32s\n", strNum, strName, strIP, strAdmin );
@@ -720,8 +727,10 @@ static void AM_Ghost( gentity_t *ent ) {
 		targ->client->pers.adminData.isGhost = qfalse;
 		targ->r.contents = CONTENTS_SOLID;
 		targ->clipmask = CONTENTS_SOLID | CONTENTS_BODY;
-		targ->s.trickedentindex = 0; targ->s.trickedentindex2 = 0; //This is entirely for client-side prediction. Please fix me.
-		trap->SendServerCommand( targetClient, "cp \""S_COLOR_CYAN"Unghosted\n\"" );
+		// this is entirely for client-side prediction. Please fix me.
+		targ->s.trickedentindex = 0;
+		targ->s.trickedentindex2 = 0;
+		trap->SendServerCommand( targetClient, "cp \"" S_COLOR_CYAN "Unghosted\n\"" );
 	}
 	else {
 		G_LogPrintf( level.log.admin, "\t%s ghosting %s\n", G_PrintClient( ent-g_entities ),
@@ -743,7 +752,8 @@ static void AM_Clip( gentity_t *ent ) {
 	ent->client->noclip = !ent->client->noclip;
 	G_LogPrintf( level.log.admin, "\tturning %s for %s\n", ent->client->noclip ? "on" : "off",
 		G_PrintClient( ent-g_entities ) );
-	trap->SendServerCommand( ent - g_entities, va( "print \"Noclip %s\n\"", ent->client->noclip ? S_COLOR_GREEN"on" : S_COLOR_RED"off" ) );
+	trap->SendServerCommand( ent - g_entities, va( "print \"Noclip %s\n\"",
+		ent->client->noclip ? S_COLOR_GREEN "on" : S_COLOR_RED "off" ) );
 }
 
 // teleport (all variations of x to y)
@@ -778,7 +788,8 @@ static void AM_Teleport( gentity_t *ent ) {
 				return;
 			}
 
-			trap->SendServerCommand( ent - g_entities, "print \"AM_Teleport: Assumed telemark but found no matching telemark\n\"" );
+			trap->SendServerCommand( ent - g_entities, "print \"AM_Teleport: Assumed telemark but found no matching "
+				"telemark\n\"" );
 		}
 		// must be teleporting self -> client
 		else if ( g_entities[targetClient].inuse ) {
@@ -835,7 +846,8 @@ static void AM_Teleport( gentity_t *ent ) {
 					return;
 				}
 
-				trap->SendServerCommand( ent - g_entities, "print \"AM_Teleport: Assumed telemark but found no matching telemark\n\"" );
+				trap->SendServerCommand( ent - g_entities, "print \"AM_Teleport: Assumed telemark but found no matching"
+					" telemark\n\"" );
 			}
 
 			// must be teleporting client -> client
@@ -980,8 +992,8 @@ static void AM_GunTeleportMark( gentity_t *ent ) {
 	tent = G_PlayEffect( EFFECT_EXPLOSION, &tr->endpos, &tr->plane.normal );
 	tent->r.svFlags |= SVF_SINGLECLIENT;
 	tent->r.singleClient = ent->s.number;
-	trap->SendServerCommand( ent - g_entities, va( "print \""S_COLOR_CYAN"Teleport mark created at "S_COLOR_YELLOW"%s\n\"",
-		vtos( &telePos ) ) );
+	trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_CYAN "Teleport mark created at " S_COLOR_YELLOW
+		"%s\n\"", vtos( &telePos ) ) );
 }
 
 // remove a telemark from the list
@@ -996,7 +1008,8 @@ static void AM_RemoveTelemark( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof(arg1) );
 	Q_CleanString( arg1, STRIP_COLOUR );
 
-	G_LogPrintf( level.log.admin, "\t%s attempting to remove telemark \"%s\" (may not succeed)\n", G_PrintClient( ent-g_entities ), arg1 );
+	G_LogPrintf( level.log.admin, "\t%s attempting to remove telemark \"%s\" (may not succeed)\n",
+		G_PrintClient( ent-g_entities ), arg1 );
 	AM_DeleteTelemark( ent, arg1 );
 }
 
@@ -1046,12 +1059,12 @@ static void AM_Poll( gentity_t *ent ) {
 	char arg1[MAX_TOKEN_CHARS] = { 0 }, arg2[MAX_TOKEN_CHARS] = { 0 };
 
 	if ( level.voteExecuteTime ) {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Vote already in progress.\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Vote already in progress.\n\"" );
 		return;
 	}
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Please specify a poll.\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Please specify a poll.\n\"" );
 		return;
 	}
 
@@ -1068,8 +1081,8 @@ static void AM_Poll( gentity_t *ent ) {
 	Q_strncpyz( level.voteStringClean, level.voteString, sizeof(level.voteStringClean) );
 	Q_strstrip( level.voteStringClean, "\"\n\r", NULL );
 
-	trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s\n\"", ent->client->pers.netname, G_GetStringEdString(
-		"MP_SVGAME", "PLCALLEDVOTE" ) ) );
+	trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s\n\"", ent->client->pers.netname,
+		G_GetStringEdString( "MP_SVGAME", "PLCALLEDVOTE" ) ) );
 
 	// still a vote waiting to be executed
 	if ( level.voteExecuteTime ) {
@@ -1113,7 +1126,7 @@ static void AM_KillVote( gentity_t *ent ) {
 	trap->SetConfigstring( CS_VOTE_YES, "" );
 	trap->SetConfigstring( CS_VOTE_NO, "" );
 
-	trap->SendServerCommand( -1, "print \""S_COLOR_RED"Vote has been killed!\n\"" );
+	trap->SendServerCommand( -1, "print \"" S_COLOR_RED "Vote has been killed!\n\"" );
 
 	G_LogPrintf( level.log.admin, "\t%s killed a vote\n", G_PrintClient( ent-g_entities ) );
 }
@@ -1190,8 +1203,8 @@ static void AM_Protect( gentity_t *ent ) {
 	targ->client->invulnerableTimer = !!(targ->client->ps.eFlags & EF_INVULNERABLE) ? 0x7FFFFFFF : level.time;
 
 	G_LogPrintf( level.log.admin, "\t%s %sprotected %s\n", G_PrintClient( ent-g_entities ),
-		!!(targ->client->ps.eFlags&EF_INVULNERABLE) ? "" : "un", G_PrintClient( targetClient ) );
-	trap->SendServerCommand( ent - g_entities, va( "print \"%s "S_COLOR_WHITE"has been %sprotected\n\"",
+		!!(targ->client->ps.eFlags & EF_INVULNERABLE) ? "" : "un", G_PrintClient( targetClient ) );
+	trap->SendServerCommand( ent - g_entities, va( "print \"%s " S_COLOR_WHITE "has been %sprotected\n\"",
 		targ->client->pers.netname, !!(targ->client->ps.eFlags&EF_INVULNERABLE) ? S_COLOR_GREEN : S_COLOR_RED"un" ) );
 }
 
@@ -1262,7 +1275,8 @@ static void AM_Empower( gentity_t *ent ) {
 	}
 }
 
-extern void G_Knockdown( gentity_t *self, gentity_t *attacker, const vector3 *pushDir, float strength, qboolean breakSaberLock );
+void G_Knockdown( gentity_t *self, gentity_t *attacker, const vector3 *pushDir, float strength,
+	qboolean breakSaberLock );
 static void Slap( gentity_t *targ ) {
 	vector3 newDir = { 0.0f, 0.0f, 0.0f };
 	int i;
@@ -1419,7 +1433,8 @@ static void AM_Sleep( gentity_t *ent ) {
 	}
 }
 static void AM_Freeze( gentity_t *ent ) {
-	trap->SendServerCommand( ent - g_entities, "print \"This command has been deprecated. Use `amsleep <client>` instead\n\"" );
+	trap->SendServerCommand( ent - g_entities, "print \"This command has been deprecated. Use `amsleep <client>` "
+		"instead\n\"" );
 	AM_Sleep( ent );
 }
 
@@ -1523,7 +1538,8 @@ static void AM_GunSleep( gentity_t *ent ) {
 	}
 }
 static void AM_GunFreeze( gentity_t *ent ) {
-	trap->SendServerCommand( ent - g_entities, "print \"This command has been deprecated. Use `gunsleep <client>` instead\n\"" );
+	trap->SendServerCommand( ent - g_entities, "print \"This command has been deprecated. Use `gunsleep <client>` "
+		"instead\n\"" );
 	AM_GunSleep( ent );
 }
 
@@ -1555,7 +1571,7 @@ static void AM_Silence( gentity_t *ent ) {
 			level.clients[i].pers.adminData.silenced = qtrue;
 		}
 		G_LogPrintf( level.log.admin, "\t%s silenced everyone\n", G_PrintClient( ent-g_entities ) );
-		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_CYAN"silenced\n\"" );
+		trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_CYAN "silenced\n\"" );
 		return;
 	}
 
@@ -1570,9 +1586,9 @@ static void AM_Silence( gentity_t *ent ) {
 
 	level.clients[targetClient].pers.adminData.silenced = qtrue;
 	G_LogPrintf( level.log.admin, "\t%s silenced %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( targetClient ) );
-	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"silenced\n\"",
+	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been " S_COLOR_CYAN "silenced\n\"",
 		level.clients[targetClient].pers.netname ) );
-	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_CYAN"silenced\n\"" );
+	trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_CYAN "silenced\n\"" );
 }
 
 // unsilence specified client
@@ -1603,7 +1619,7 @@ static void AM_Unsilence( gentity_t *ent ) {
 			level.clients[i].pers.adminData.silenced = qfalse;
 		}
 		G_LogPrintf( level.log.admin, "\t%s unsilenced everyone\n", G_PrintClient( ent-g_entities ) );
-		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_CYAN"unsilenced\n\"" );
+		trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_CYAN "unsilenced\n\"" );
 		return;
 	}
 
@@ -1619,8 +1635,9 @@ static void AM_Unsilence( gentity_t *ent ) {
 	level.clients[targetClient].pers.adminData.silenced = qfalse;
 	G_LogPrintf( level.log.admin, "\t%s unsilenced %s\n", G_PrintClient( ent-g_entities ),
 		G_PrintClient( targetClient ) );
-	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_CYAN"un-silenced\n\"", level.clients[targetClient].pers.netname ) );
-	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_CYAN"un-silenced\n\"" );
+	trap->SendServerCommand( -1, va( "cp \"%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "un-silenced\n\"",
+		level.clients[targetClient].pers.netname ) );
+	trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_CYAN "un-silenced\n\"" );
 }
 
 void Cmd_Kill_f( gentity_t *ent );
@@ -1654,7 +1671,7 @@ static void AM_Slay( gentity_t *ent ) {
 			Cmd_Kill_f( e );
 		}
 		G_LogPrintf( level.log.admin, "\t%s slayed everyone\n", G_PrintClient( ent-g_entities ) );
-		trap->SendServerCommand( -1, "cp \"You have all been "S_COLOR_RED"slain\n\"" );
+		trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_RED "slain\n\"" );
 		return;
 	}
 
@@ -1665,7 +1682,9 @@ static void AM_Slay( gentity_t *ent ) {
 
 	targetEnt = g_entities + targetClient;
 
-	if ( targetEnt->client->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR || targetEnt->client->tempSpectate >= level.time ) {
+	if ( targetEnt->client->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR
+		|| targetEnt->client->tempSpectate >= level.time )
+	{
 		return;
 	}
 
@@ -1675,9 +1694,9 @@ static void AM_Slay( gentity_t *ent ) {
 
 	Cmd_Kill_f( targetEnt );
 	G_LogPrintf( level.log.admin, "\t%s slayed %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( targetClient ) );
-	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been "S_COLOR_RED"slain\n\"",
+	trap->SendServerCommand( -1, va( "cp \"%s\n" S_COLOR_WHITE "has been " S_COLOR_RED "slain\n\"",
 		targetEnt->client->pers.netname ) );
-	trap->SendServerCommand( targetClient, "cp \"You have been "S_COLOR_RED"slain\n\"" );
+	trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_RED "slain\n\"" );
 }
 
 // kick specified client
@@ -1724,12 +1743,17 @@ static void AM_Ban( gentity_t *ent ) {
 
 	else {
 		//	clientNum / Partial name
-		char errorMsg[128];
+		char errorMsg[128] = { '\0' };
 
 		trap->Argv( 1, target, sizeof(target) );
 		targetClient = G_ClientFromString( ent, target, FINDCL_SUBSTR | FINDCL_PRINT );
 		if ( targetClient == -1 ) {
 			return;
+		}
+
+		if ( g_entities[targetClient].r.svFlags & SVF_BOT ) {
+		//	tran->SendServerCommand( ent - g_entities, "print \"Can't ban bots\n\"" );
+		//	return;
 		}
 
 		if ( !AM_CanInflict( ent, &g_entities[targetClient] ) ) {
@@ -1758,15 +1782,19 @@ static void AM_Ban( gentity_t *ent ) {
 	return;
 }
 
+static void PB_Callback( const char *buffer, int clientNum ) {
+	trap->SendServerCommand( clientNum, va( "print \"%s\"", buffer ) );
+}
+
 static void AM_BanIP( gentity_t *ent ) {
 	char ip[32] = { 0 }, duration[16] = { 0 };
 	const char *reason = "Not specified";
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Syntax: \\ambanip <ip> <duration> <reason>\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"Syntax: \\ambanip <ip> [duration] [reason]\n\"" );
 	}
 	else {
-		char errorMsg[128];
+		char errorMsg[128] = { '\0' };
 
 		trap->Argv( 1, ip, sizeof(ip) );
 		trap->Argv( 2, duration, sizeof(duration) );
@@ -1779,9 +1807,21 @@ static void AM_BanIP( gentity_t *ent ) {
 			trap->SendServerCommand( ent - g_entities, va( "print \"Failed to add ban: %s\n\"", errorMsg ) );
 		}
 		else {
-			trap->SendServerCommand( ent - g_entities, va( "print \"Banned IP \"%s\" for \"%s\" until \"%s\"\n\"", errorMsg ) );
+			printBufferSession_t pb;
+
+			Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5f, PB_Callback, ent - g_entities );
+			Q_PrintBuffer( &pb, va( "Banned IP '%s'", ip ) );
+			if ( reason ) {
+				Q_PrintBuffer( &pb, va( " for '%s'", reason ) );
+			}
+			if ( duration[0] ) {
+				Q_PrintBuffer( &pb, va( " until '%s'", duration ) );
+			}
+			Q_PrintBuffer( &pb, "\n" );
+			Q_DeletePrintBuffer( &pb );
+
 			G_LogPrintf( level.log.admin, "\t%s banned IP \"%s\" for \"%s\" until \"%s\"\n",
-				G_PrintClient( ent-g_entities ), ip, reason, duration );
+				G_PrintClient( ent - g_entities ), ip, reason, duration );
 		}
 	}
 
@@ -1921,7 +1961,8 @@ static void AM_EntSpawn( gentity_t *ent ) {
 	unsigned int index = 0;
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"AM_EntSpawn: syntax is 'amspawn <classname> key value key value'\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"AM_EntSpawn: syntax is 'amspawn <classname> key value key"
+			" value'\n\"" );
 		return;
 	}
 
@@ -2004,7 +2045,8 @@ static void AM_Lua( gentity_t *ent ) {
 
 	G_LogPrintf( level.log.admin, "\t%s executed lua code \"%s\"\n", G_PrintClient( ent-g_entities ), args );
 	if ( luaL_dostring( JPLua.state, args ) != 0 )
-		trap->SendServerCommand( ent - g_entities, va( "print \""S_COLOR_RED"Lua Error: %s\n\"", lua_tostring( JPLua.state, -1 ) ) );
+		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_RED "Lua Error: %s\n\"",
+			lua_tostring( JPLua.state, -1 ) ) );
 #else
 	trap->SendServerCommand( ent - g_entities, "print \"Lua is not supported on this server\n\"" );
 #endif
@@ -2040,8 +2082,8 @@ static void AM_Map( gentity_t *ent ) {
 			gametype = i;
 		}
 		else {
-			trap->SendServerCommand( ent - g_entities, va( "print \"AM_Map: argument 1 must be a valid gametype or gametype"
-				"number identifier\n\"", map, BG_GetGametypeString( gametype ) ) );
+			trap->SendServerCommand( ent - g_entities, va( "print \"AM_Map: argument 1 must be a valid gametype or "
+				"gametype number identifier\n\"", map, BG_GetGametypeString( gametype ) ) );
 			return;
 		}
 	}
@@ -2248,7 +2290,7 @@ static void AM_LockTeam( gentity_t *ent ) {
 		team = TEAM_FREE;
 	}
 	else {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Invalid team\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Invalid team\n\"" );
 		return;
 	}
 
@@ -2259,7 +2301,7 @@ static void AM_LockTeam( gentity_t *ent ) {
 
 	level.lockedTeams[team] = qtrue;
 	G_LogPrintf( level.log.admin, "\t%s locked \"%s\" team\n", G_PrintClient( ent-g_entities ), arg1 );
-	trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"team has been locked\n\"", TeamName( team ) ) );
+	trap->SendServerCommand( -1, va( "print \"%s " S_COLOR_WHITE "team has been locked\n\"", TeamName( team ) ) );
 }
 
 static void AM_UnlockTeam( gentity_t *ent ) {
@@ -2267,7 +2309,7 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 	team_t team;
 
 	if ( trap->Argc() != 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\amunlockteam <team, -1>\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\amunlockteam <team, -1>\n\"" );
 		return;
 	}
 
@@ -2284,7 +2326,7 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 		}
 		if ( unlockedAny ) {
 			G_LogPrintf( level.log.admin, "\t%s unlocked all teams\n", G_PrintClient( ent-g_entities ) );
-			trap->SendServerCommand( -1, "print \""S_COLOR_CYAN"All teams are unlocked\n\"" );
+			trap->SendServerCommand( -1, "print \"" S_COLOR_CYAN "All teams are unlocked\n\"" );
 		}
 		return;
 	}
@@ -2302,7 +2344,7 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 		team = TEAM_FREE;
 	}
 	else {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Invalid team\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Invalid team\n\"" );
 		return;
 	}
 
@@ -2313,7 +2355,7 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 
 	level.lockedTeams[team] = qfalse;
 	G_LogPrintf( level.log.admin, "\t%s unlocked \"%s\" team\n", G_PrintClient( ent-g_entities ), arg1 );
-	trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"team has been unlocked\n\"", TeamName( team ) ) );
+	trap->SendServerCommand( -1, va( "print \"%s " S_COLOR_WHITE "team has been unlocked\n\"", TeamName( team ) ) );
 }
 
 typedef struct adminCommand_s {

@@ -11,11 +11,6 @@ enum {
 	LSTATE_BLADEDOWN,
 };
 
-/*
--------------------------
-NPC_Interrogator_Precache
--------------------------
-*/
 void NPC_Interrogator_Precache( void ) {
 	G_SoundIndex( "sound/chars/interrogator/misc/torture_droid_lp" );
 	G_SoundIndex( "sound/chars/mark1/misc/anger.wav" );
@@ -24,11 +19,7 @@ void NPC_Interrogator_Precache( void ) {
 	G_SoundIndex( "sound/chars/interrogator/misc/int_droid_explo" );
 	G_EffectIndex( "explosions/droidexplosion1" );
 }
-/*
--------------------------
-Interrogator_die
--------------------------
-*/
+
 void Interrogator_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod, int dFlags, int hitLoc ) {
 	self->client->ps.velocity.z = -100;
 	/*
@@ -53,11 +44,7 @@ void Interrogator_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 	return;
 }
 
-/*
--------------------------
-Interrogator_PartsMove
--------------------------
-*/
+
 void Interrogator_PartsMove( void ) {
 	// Syringe
 	if ( TIMER_Done( NPC, "syringeDelay" ) ) {
@@ -118,11 +105,6 @@ void Interrogator_PartsMove( void ) {
 #define VELOCITY_DECAY	0.85f
 #define HUNTER_UPWARD_PUSH	2
 
-/*
--------------------------
-Interrogator_MaintainHeight
--------------------------
-*/
 void Interrogator_MaintainHeight( void ) {
 	float	dif;
 	//	vector3	endPos;
@@ -202,11 +184,7 @@ void Interrogator_MaintainHeight( void ) {
 
 #define HUNTER_STRAFE_VEL	32
 #define HUNTER_STRAFE_DIS	200
-/*
--------------------------
-Interrogator_Strafe
--------------------------
-*/
+
 void Interrogator_Strafe( void ) {
 	int		dir;
 	vector3	end, right;
@@ -245,12 +223,6 @@ void Interrogator_Strafe( void ) {
 		NPCInfo->standTime = level.time + 3000 + random() * 500;
 	}
 }
-
-/*
--------------------------
-Interrogator_Hunt
--------------------------`
-*/
 
 #define HUNTER_FORWARD_BASE_SPEED	10
 #define HUNTER_FORWARD_MULTIPLIER	2
@@ -299,11 +271,6 @@ void Interrogator_Hunt( qboolean visible, qboolean advance ) {
 
 #define MIN_DISTANCE		64
 
-/*
--------------------------
-Interrogator_Melee
--------------------------
-*/
 void Interrogator_Melee( qboolean visible, qboolean advance ) {
 	if ( TIMER_Done( NPC, "attackDelay" ) )	// Attack?
 	{
@@ -332,11 +299,6 @@ void Interrogator_Melee( qboolean visible, qboolean advance ) {
 	}
 }
 
-/*
--------------------------
-Interrogator_Attack
--------------------------
-*/
 void Interrogator_Attack( void ) {
 	float		distance;
 	qboolean	visible;
@@ -379,11 +341,6 @@ void Interrogator_Attack( void ) {
 	}
 }
 
-/*
--------------------------
-Interrogator_Idle
--------------------------
-*/
 void Interrogator_Idle( void ) {
 	if ( NPC_CheckPlayerTeamStealth() ) {
 		G_SoundOnEnt( NPC, CHAN_AUTO, "sound/chars/mark1/misc/anger.wav" );
@@ -396,11 +353,6 @@ void Interrogator_Idle( void ) {
 	NPC_BSIdle();
 }
 
-/*
--------------------------
-NPC_BSInterrogator_Default
--------------------------
-*/
 void NPC_BSInterrogator_Default( void ) {
 	//NPC->e_DieFunc = dieF_Interrogator_die;
 

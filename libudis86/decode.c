@@ -37,7 +37,6 @@ const char * ud_lookup_mnemonic( enum ud_mnemonic_code c ) {
 static int get_prefixes( struct ud* u ) {
 	unsigned int have_pfx = 1;
 	unsigned int i;
-	uint8_t curr;
 
 	/* if in error state, bail out */
 	if ( u->error )
@@ -45,7 +44,7 @@ static int get_prefixes( struct ud* u ) {
 
 	/* keep going as long as there are prefixes available */
 	for ( i = 0; have_pfx; ++i ) {
-
+		uint8_t curr;
 		/* Get next byte. */
 		inp_next( u );
 		if ( u->error )

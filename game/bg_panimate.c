@@ -12,16 +12,11 @@
 #endif
 
 extern saberInfo_t *BG_MySaber( int clientNum, int saberNum );
-/*
-==============================================================================
-BEGIN: Animation utility functions (sequence checking)
-==============================================================================
-*/
-//Called regardless of pm validity:
 
-// VVFIXME - Most of these functions are totally stateless and stupid. Don't
-// need multiple copies of this, but it's much easier (and less likely to
-// break in the future) if I keep separate namespace versions now.
+//Called regardless of pm validity:
+// VVFIXME - Most of these functions are totally stateless and stupid.
+// Don't need multiple copies of this, but it's much easier (and less likely to break in the future) if I keep separate
+//	namespace versions now.
 
 qboolean BG_SaberStanceAnim( int anim ) {
 	switch ( anim ) {
@@ -1359,16 +1354,9 @@ qboolean BG_FullBodyTauntAnim( int anim ) {
 	}
 }
 
-
-/*
-=============
-BG_AnimLength
-
-Get the "length" of an anim given the local anim index (which skeleton)
-and anim number. Obviously does not take things like the length of the
-anim while force speeding (as an example) and whatnot into account.
-=============
-*/
+// Get the "length" of an anim given the local anim index (which skeleton) and anim number.
+// Obviously does not take things like the length of the anim while force speeding (as an example) and whatnot into
+//	account.
 int BG_AnimLength( int index, animNumber_t anim ) {
 	if ( anim >= MAX_ANIMATIONS ) {
 		return -1;
@@ -1414,12 +1402,6 @@ qboolean BG_SaberInTransitionAny( int move ) {
 	}
 	return qfalse;
 }
-
-/*
-==============================================================================
-END: Animation utility functions (sequence checking)
-==============================================================================
-*/
 
 void BG_FlipPart( playerState_t *ps, int part ) {
 	if ( part == SETANIM_TORSO ) {
@@ -1857,20 +1839,13 @@ void ParseAnimationEvtBlock( const char *aeb_filename, animevent_t *animEvents, 
 	}
 }
 
-/*
-======================
-BG_ParseAnimationEvtFile
-
-Read a configuration file containing animation events
-models/players/kyle/animevents.cfg, etc
-
-This file's presence is not required
-
-======================
-*/
 bgLoadedEvents_t bgAllEvents[MAX_ANIM_FILES];
 int bgNumAnimEvents = 1;
 static int bg_animParseIncluding = 0;
+
+// Read a configuration file containing animation events
+// models/players/kyle/animevents.cfg, etc
+// This file's presence is not required
 int BG_ParseAnimationEvtFile( const char *as_filename, int animFileIndex, int eventFileIndex ) {
 	const char	*text_p;
 	int			len;
@@ -2012,15 +1987,8 @@ fin:
 }
 #endif
 
-/*
-======================
-BG_ParseAnimationFile
-
-Read a configuration file containing animation coutns and rates
-models/players/visor/animation.cfg, etc
-
-======================
-*/
+// Read a configuration file containing animation coutns and rates
+// models/players/visor/animation.cfg, etc
 int BG_ParseAnimationFile( const char *filename, animation_t *animset, qboolean isHumanoid ) {
 	char		*text_p;
 	int			len;
@@ -2225,12 +2193,7 @@ int BG_ParseAnimationFile( const char *filename, animation_t *animset, qboolean 
 	return usedIndex;
 }
 
-/*
-===================
-LEGS Animations
-Base animation for overall body
-===================
-*/
+// Base animation for overall body
 static void BG_StartLegsAnim( playerState_t *ps, int anim ) {
 	if ( ps->pm_type >= PM_DEAD ) {
 	//	assert( !BG_InDeathAnim( anim ) );
@@ -2295,14 +2258,7 @@ void PM_ForceLegsAnim( int anim ) {
 	BG_StartLegsAnim( pm->ps, anim );
 }
 
-
-
-/*
-===================
-TORSO Animations
-Override animations for upper body
-===================
-*/
+// Override animations for upper body
 void BG_StartTorsoAnim( playerState_t *ps, int anim ) {
 	if ( !ps || !pm ) {
 		return;
@@ -2330,12 +2286,6 @@ void PM_StartTorsoAnim( int anim ) {
 	BG_StartTorsoAnim( pm->ps, anim );
 }
 
-
-/*
--------------------------
-PM_SetLegsAnimTimer
--------------------------
-*/
 void BG_SetLegsAnimTimer( playerState_t *ps, int time ) {
 	ps->legsTimer = time;
 
@@ -2348,11 +2298,6 @@ void PM_SetLegsAnimTimer( int time ) {
 	BG_SetLegsAnimTimer( pm->ps, time );
 }
 
-/*
--------------------------
-PM_SetTorsoAnimTimer
--------------------------
-*/
 void BG_SetTorsoAnimTimer( playerState_t *ps, int time ) {
 	ps->torsoTimer = time;
 
@@ -2411,11 +2356,6 @@ void BG_SaberStartTransAnim( int clientNum, int saberAnimLevel, int weapon, int 
 	}
 }
 
-/*
--------------------------
-PM_SetAnimFinal
--------------------------
-*/
 qboolean PM_RunningAnim( int anim );
 qboolean PM_WalkingAnim( int anim );
 

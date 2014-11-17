@@ -9,8 +9,6 @@
 
 //#define		USE_CD_KEY
 
-//============================================================================
-
 //
 // msg.c
 //
@@ -85,15 +83,7 @@ void MSG_ReadDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct pl
 
 void MSG_ReportChangeVectors_f( void );
 
-//============================================================================
-
-/*
-==============================================================
-
-NET
-
-==============================================================
-*/
+// NET
 
 #define	PACKET_BACKUP	32	// number of old messages that must be kept on client and
 // server for delta comrpession and ping estimation
@@ -194,14 +184,7 @@ void Netchan_TransmitNextFragment( netchan_t *chan );
 qboolean Netchan_Process( netchan_t *chan, msg_t *msg );
 
 
-/*
-==============================================================
-
-PROTOCOL
-
-==============================================================
-*/
-
+// PROTOCOL
 #define	PROTOCOL_VERSION	26
 
 #define	UPDATE_SERVER_NAME		"updatejk3.ravensoft.com"
@@ -247,13 +230,7 @@ enum clc_ops_e {
 	clc_EOF
 };
 
-/*
-==============================================================
-
-VIRTUAL MACHINE
-
-==============================================================
-*/
+// VIRTUAL MACHINE
 
 typedef struct vm_s vm_t;
 
@@ -303,23 +280,9 @@ void	VM_Shifted_Free( void **ptr );
 void	*VM_ArgPtr( int intValue );
 void	*VM_ExplicitArgPtr( vm_t *vm, int intValue );
 
-/*
-==============================================================
-
-CMD
-
-Command text buffering and command execution
-
-==============================================================
-*/
-
-/*
-
-Any number of commands can be added in a frame, from several different sources.
-Most commands come from either keybindings or console line input, but entire text
-files can be execed.
-
-*/
+// Command text buffering and command execution
+// Any number of commands can be added in a frame, from several different sources.
+// Most commands come from either keybindings or console line input, but entire text files can be execed.
 
 void Cbuf_Init( void );
 // allocates an initial text buffer that will grow as needed
@@ -336,14 +299,8 @@ void Cbuf_Execute( void );
 // Normally called once per frame, but may be explicitly invoked.
 // Do not call inside a command function, or current args will be destroyed.
 
-//===========================================================================
-
-/*
-
-Command execution takes a null terminated string, breaks it into tokens,
-then searches for a command or variable that matches the first token.
-
-*/
+// Command execution takes a null terminated string, breaks it into tokens, then searches for a command or variable
+//	that matches the first token.
 
 typedef void( *xcommand_t ) (void);
 
@@ -380,36 +337,20 @@ void	Cmd_ExecuteString( const char *text );
 // as if it was typed at the console
 
 
-/*
-==============================================================
+// cvar_t variables are used to hold scalar or string variables that can be changed or displayed at the console or prog
+//	code as well as accessed directly in C code.
 
-CVAR
+// The user can access cvars from the console in three ways:
+// r_draworder			prints the current value
+// r_draworder 0		sets the current value to 0
+// set r_draworder 0	as above, but creates the cvar if not present
 
-==============================================================
-*/
-
-/*
-
-cvar_t variables are used to hold scalar or string variables that can be changed
-or displayed at the console or prog code as well as accessed directly
-in C code.
-
-The user can access cvars from the console in three ways:
-r_draworder			prints the current value
-r_draworder 0		sets the current value to 0
-set r_draworder 0	as above, but creates the cvar if not present
-
-Cvars are restricted from having the same names as commands to keep this
-interface from being ambiguous.
-
-The are also occasionally used to communicated information between different
-modules of the program.
-
-*/
+// Cvars are restricted from having the same names as commands to keep this interface from being ambiguous.
+// The are also occasionally used to communicated information between different modules of the program.
 
 cvar_t *Cvar_Get( const char *var_name, const char *value, uint32_t flags );
-// creates the variable if it doesn't exist, or returns the existing one
-// if it exists, the value will not be changed, but flags will be ORed in
+// creates the variable if it doesn't exist, or returns the existing one if it exists, the value will not be changed,
+//	but flags will be ORed in
 // that allows variables to be unarchived without needing bitflags
 // if value is "", the value will not override a previously set value.
 
@@ -469,16 +410,9 @@ extern uint32_t cvar_modifiedFlags;
 // etc, variables have been modified since the last check.  The bit
 // can then be cleared to allow another change detection.
 
-/*
-==============================================================
-
-FILESYSTEM
-
-No stdio calls should be used by any part of the game, because
-we need to deal with all sorts of directory and seperator char
-issues.
-==============================================================
-*/
+// FILESYSTEM
+// No stdio calls should be used by any part of the game, because we need to deal with all sorts of directory and
+//	seperator char issues.
 
 // referenced flags
 // these are in loop specific order so don't change the order
@@ -607,35 +541,7 @@ qboolean FS_idPak( char *pak, char *base );
 qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring );
 void FS_Rename( const char *from, const char *to );
 
-/*
-==============================================================
-
-MISC
-
-==============================================================
-*/
-
-// NOTE NOTE NOTE!!!!!!!!!!!!!
-//
-// Any CPUID_XXXX defined as higher than CPUID_INTEL_MMX *must* have MMX support (eg like CPUID_AMD_3DNOW (0x30) has),
-//	this allows convenient MMX capability checking. If you for some reason want to support some new processor that does
-//	*NOT* have MMX (yeah, right), then define it as a lower number. -slc
-//
-// ( These values are returned by Sys_GetProcessorId )
-//
-#define CPUID_GENERIC			0			// any unrecognized processor
-
-#define CPUID_AXP				0x10
-
-#define CPUID_INTEL_UNSUPPORTED	0x20			// Intel 386/486
-#define CPUID_INTEL_PENTIUM		0x21			// Intel Pentium or PPro
-#define CPUID_INTEL_MMX			0x22			// Intel Pentium/MMX or P2/MMX
-#define CPUID_INTEL_KATMAI		0x23			// Intel Katmai
-#define CPUID_INTEL_WILLIAMETTE	0x24			// Intel Williamette
-
-#define CPUID_AMD_3DNOW			0x30			// AMD K6 3DNOW!
-//
-//==========================================================
+// MISC
 
 #define RoundUp(N, M) ((N) + ((unsigned int)(M)) - (((unsigned int)(N)) % ((unsigned int)(M))))
 #define RoundDown(N, M) ((N) - (((unsigned int)(N)) % ((unsigned int)(M))))
@@ -803,14 +709,6 @@ void Com_Shutdown( void );
 //void Com_ParseTextFileDestroy(class CGenericParser2 &parser);
 
 
-/*
-==============================================================
-
-CLIENT / SERVER SYSTEMS
-
-==============================================================
-*/
-
 //
 // client interface
 //
@@ -881,13 +779,7 @@ qboolean SV_GameCommand( void );
 qboolean UI_GameCommand( void );
 qboolean UI_usesUniqueCDKey();
 
-/*
-==============================================================
-
-NON-PORTABLE SYSTEM SERVICES
-
-==============================================================
-*/
+// NON-PORTABLE SYSTEM SERVICES
 
 typedef enum {
 	AXIS_SIDE,

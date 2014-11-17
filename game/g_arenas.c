@@ -6,11 +6,6 @@
 
 #include "g_local.h"
 
-/*
-==================
-UpdateTournamentInfo
-==================
-*/
 void UpdateTournamentInfo( void ) {
 	int			i;
 	gentity_t	*player;

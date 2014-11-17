@@ -405,7 +405,7 @@ void WP_SaberSetDefaults( saberInfo_t *saber ) {
 	saber->disarmBonus2 = 0;
 	saber->singleBladeStyle = SS_NONE;		// makes it so that you use a different style if you only have the first blade active
 
-	//===NEW========================================================================================
+	// NEW
 	//done in cgame (client-side code)
 	saber->saberFlags = 0;			// see all the SFL_ flags
 	saber->saberFlags2 = 0;			// see all the SFL2_ flags
@@ -440,7 +440,7 @@ void WP_SaberSetDefaults( saberInfo_t *saber ) {
 
 	//***The following can be different for the extra blades - not setting them individually defaults them to the value for the whole saber (and first blade)***
 
-	//===PRIMARY BLADES=====================
+	// PRIMARY BLADES
 	//done in cgame (client-side code)
 	saber->trailStyle = 0;			// 0 - default (0) is normal, 1 is a motion blur and 2 is no trail at all (good for real-sword type mods)
 	saber->g2MarksShader = 0;			// none - if set, the game will use this shader for marks on enemies instead of the default "gfx/damage/saberglowmark"
@@ -466,7 +466,7 @@ void WP_SaberSetDefaults( saberInfo_t *saber ) {
 	saber->splashDamage = 0;			// 0 - amount of splashDamage, 100% at a distance of 0, 0% at a distance = splashRadius
 	saber->splashKnockback = 0.0f;			// 0 - amount of splashKnockback, 100% at a distance of 0, 0% at a distance = splashRadius
 
-	//===SECONDARY BLADES===================
+	// SECONDARY BLADES
 	//done in cgame (client-side code)
 	saber->trailStyle2 = 0;			// 0 - default (0) is normal, 1 is a motion blur and 2 is no trail at all (good for real-sword type mods)
 	saber->g2MarksShader2 = 0;			// none - if set, the game will use this shader for marks on enemies instead of the default "gfx/damage/saberglowmark"
@@ -491,7 +491,6 @@ void WP_SaberSetDefaults( saberInfo_t *saber ) {
 	saber->splashRadius2 = 0.0f;			// 0 - radius of splashDamage
 	saber->splashDamage2 = 0;			// 0 - amount of splashDamage, 100% at a distance of 0, 0% at a distance = splashRadius
 	saber->splashKnockback2 = 0.0f;			// 0 - amount of splashKnockback, 100% at a distance of 0, 0% at a distance = splashRadius
-	//=========================================================================================================================================
 }
 
 static void Saber_ParseName( saberInfo_t *saber, const char **p ) {
@@ -1770,13 +1769,6 @@ static void Saber_ParseNoClashFlare2( saberInfo_t *saber, const char **p ) {
 		saber->saberFlags2 |= SFL2_NO_CLASH_FLARE2;
 }
 
-
-/*
-===============
-Keyword Hash
-===============
-*/
-
 #define KEYWORDHASH_SIZE (512)
 
 typedef struct keywordHash_s {
@@ -2344,7 +2336,6 @@ easier on myself. SI indicates it was under saberinfo,
 and BLADE indicates it was under bladeinfo.
 */
 
-//---------------------------------------
 void BG_BLADE_ActivateTrail( bladeInfo_t *blade, float duration ) {
 	blade->trail.inAction = qtrue;
 	blade->trail.duration = duration;
@@ -2354,7 +2345,7 @@ void BG_BLADE_DeactivateTrail( bladeInfo_t *blade, float duration ) {
 	blade->trail.inAction = qfalse;
 	blade->trail.duration = duration;
 }
-//---------------------------------------
+
 void BG_SI_Activate( saberInfo_t *saber ) {
 	int i;
 

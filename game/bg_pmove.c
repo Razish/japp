@@ -298,21 +298,9 @@ qboolean PM_DoSlowFall( void ) {
 	return qfalse;
 }
 
-//begin vehicle functions crudely ported from sp -rww
-/*
-====================================================================
-void pitch_roll_for_slope (edict_t *forwhom, vector3 *slope, vector3 *storeAngles )
-
-MG
-
-This will adjust the pitch and roll of a monster to match
-a given slope - if a non-'0 0 0' slope is passed, it will
-use that value, otherwise it will use the ground underneath
-the monster.  If it doesn't find a surface, it does nothinh\g
-and returns.
-====================================================================
-*/
-
+// This will adjust the pitch and roll of a monster to match a given slope - if a non-'0 0 0' slope is passed, it will
+//	use that value, otherwise it will use the ground underneath the monster.
+//	If it doesn't find a surface, it does nothing and returns.
 void PM_pitch_roll_for_slope( bgEntity_t *forwhom, vector3 *pass_slope, vector3 *storeAngles ) {
 	vector3	slope;
 	vector3	nvf, ovf, ovr, startspot, endspot, new_angles = { 0, 0, 0 };
@@ -723,14 +711,7 @@ void PM_HoverTrace( void ) {
 	}
 	PM_GroundTraceMissed();
 }
-//end vehicle functions crudely ported from sp -rww
 
-/*
-===============
-PM_AddEvent
-
-===============
-*/
 void PM_AddEvent( int newEvent ) {
 	BG_AddPredictableEventToPlayerstate( newEvent, 0, pm->ps );
 }
@@ -739,11 +720,6 @@ void PM_AddEventWithParm( int newEvent, int parm ) {
 	BG_AddPredictableEventToPlayerstate( newEvent, parm, pm->ps );
 }
 
-/*
-===============
-PM_AddTouchEnt
-===============
-*/
 void PM_AddTouchEnt( int entityNum ) {
 	int i;
 
@@ -794,14 +770,7 @@ void PM_AddTouchEnt( int entityNum ) {
 	pm->numtouch++;
 }
 
-
-/*
-==================
-PM_ClipVelocity
-
-Slide off of the impacting surface
-==================
-*/
+// Slide off of the impacting surface
 void PM_ClipVelocity( vector3 *in, vector3 *normal, vector3 *out, float overbounce ) {
 	float	backoff;
 	float	change;
@@ -837,14 +806,7 @@ void PM_ClipVelocity( vector3 *in, vector3 *normal, vector3 *out, float overboun
 	}
 }
 
-
-/*
-==================
-PM_Friction
-
-Handles both ground friction and water friction
-==================
-*/
+// Handles both ground friction and water friction
 static void PM_Friction( void ) {
 	vector3	vec, *vel;
 	float	speed, newspeed, control;
@@ -958,14 +920,7 @@ static void PM_Friction( void ) {
 	VectorScale( vel, newspeed, vel );
 }
 
-
-/*
-==============
-PM_Accelerate
-
-Handles user intended acceleration
-==============
-*/
+// Handles user intended acceleration
 static void PM_Accelerate( vector3 *wishdir, float wishspeed, float accel ) {
 	if ( pm->gametype != GT_SIEGE
 		|| pm->ps->m_iVehicleNum
@@ -1021,17 +976,9 @@ static void PM_Accelerate( vector3 *wishdir, float wishspeed, float accel ) {
 	}
 }
 
-
-
-/*
-============
-PM_CmdScale
-
-Returns the scale factor to apply to cmd movements
-This allows the clients to use axial -127 to 127 values for all directions
-without getting a sqrtf(2) distortion in speed.
-============
-*/
+// Returns the scale factor to apply to cmd movements
+// This allows the clients to use axial -127 to 127 values for all directions without getting a sqrtf(2) distortion in
+//	speed.
 static float PM_CmdScale( usercmd_t *cmd ) {
 	int max;
 	float total, scale;
@@ -1905,12 +1852,6 @@ qboolean PM_CheckGrab( void ) {
 	return qtrue;
 }
 
-
-/*
-=============
-PM_CheckJump
-=============
-*/
 static qboolean PM_CheckJump( void ) {
 	qboolean allowFlips = qtrue;
 
@@ -2822,12 +2763,6 @@ static qboolean PM_CheckJump( void ) {
 	return qtrue;
 }
 
-
-/*
-=============
-PM_CheckWaterJump
-=============
-*/
 static qboolean	PM_CheckWaterJump( void ) {
 	vector3	spot;
 	int		cont;
@@ -2870,16 +2805,7 @@ static qboolean	PM_CheckWaterJump( void ) {
 	return qtrue;
 }
 
-//============================================================================
-
-
-/*
-===================
-PM_WaterJumpMove
-
-Flying out of the water
-===================
-*/
+// Flying out of the water
 static void PM_WaterJumpMove( void ) {
 	// waterjump has no control, but falls
 
@@ -2893,12 +2819,6 @@ static void PM_WaterJumpMove( void ) {
 	}
 }
 
-/*
-===================
-PM_WaterMove
-
-===================
-*/
 static void PM_WaterMove( void ) {
 	vector3	wishvel;
 	float	wishspeed;
@@ -2968,12 +2888,6 @@ static void PM_WaterMove( void ) {
 	PM_SlideMove( qfalse );
 }
 
-/*
-===================
-PM_FlyVehicleMove
-
-===================
-*/
 static void PM_FlyVehicleMove( void ) {
 	int		i;
 	vector3	wishvel;
@@ -3004,11 +2918,9 @@ static void PM_FlyVehicleMove( void ) {
 	scale = PM_CmdScale( &pm->cmd );
 
 	// Get The WishVel And WishSpeed
-	//-------------------------------
 	if ( pm->ps->clientNum >= MAX_CLIENTS ) {//NPC
 
 		// If The UCmds Were Set, But Never Converted Into A MoveDir, Then Make The WishDir From UCmds
-		//--------------------------------------------------------------------------------------------
 		if ( (fmove != 0.0f || smove != 0.0f) && VectorCompare( &pm->ps->moveDir, &vec3_origin ) ) {
 			//gi.Printf("Generating MoveDir\n");
 			for ( i = 0; i < 3; i++ ) {
@@ -3020,7 +2932,6 @@ static void PM_FlyVehicleMove( void ) {
 			wishspeed *= scale;
 		}
 		// Otherwise, Use The Move Dir
-		//-----------------------------
 		else {
 			wishspeed = pm->ps->speed;
 			VectorScale( &pm->ps->moveDir, pm->ps->speed, &wishvel );
@@ -3053,13 +2964,7 @@ static void PM_FlyVehicleMove( void ) {
 	PM_StepSlideMove( qtrue );
 }
 
-/*
-===================
-PM_FlyMove
-
-Only with the flight powerup
-===================
-*/
+// Only with the flight powerup
 static void PM_FlyMove( void ) {
 	vector3	wishvel;
 	float	wishspeed;
@@ -3299,12 +3204,6 @@ void PM_GrappleSwing( void ) {
 }
 #endif
 
-/*
-===================
-PM_WalkMove
-
-===================
-*/
 static void PM_WalkMove( void ) {
 	int			i;
 	vector3		wishvel;
@@ -3360,13 +3259,11 @@ static void PM_WalkMove( void ) {
 	VectorNormalize( &pml.right );
 
 	// Get The WishVel And WishSpeed
-	//-------------------------------
 	if ( pm->ps->clientNum >= MAX_CLIENTS && !VectorCompare( &pm->ps->moveDir, &vec3_origin ) ) {//NPC
 		bgEntity_t *pEnt = pm_entSelf;
 
 		if ( pEnt && pEnt->s.NPC_class == CLASS_VEHICLE ) {
 			// If The UCmds Were Set, But Never Converted Into A MoveDir, Then Make The WishDir From UCmds
-			//--------------------------------------------------------------------------------------------
 			if ( (fmove != 0.0f || smove != 0.0f) && VectorCompare( &pm->ps->moveDir, &vec3_origin ) ) {
 				//gi.Printf("Generating MoveDir\n");
 				for ( i = 0; i < 3; i++ ) {
@@ -3378,7 +3275,6 @@ static void PM_WalkMove( void ) {
 				wishspeed *= scale;
 			}
 			// Otherwise, Use The Move Dir
-			//-----------------------------
 			else {
 				//wishspeed = pm->ps->speed;
 				VectorScale( &pm->ps->moveDir, pm->ps->speed, &wishvel );
@@ -3475,12 +3371,6 @@ static void PM_WalkMove( void ) {
 	//Com_Printf("velocity2 = %1.1f\n", VectorLength(pm->ps->velocity));
 }
 
-
-/*
-==============
-PM_DeadMove
-==============
-*/
 static void PM_DeadMove( void ) {
 	float	forward;
 
@@ -3501,12 +3391,6 @@ static void PM_DeadMove( void ) {
 	}
 }
 
-
-/*
-===============
-PM_NoclipMove
-===============
-*/
 static void PM_NoclipMove( void ) {
 	float	speed, drop, friction, control, newspeed;
 	int			i;
@@ -3567,15 +3451,7 @@ static void PM_NoclipMove( void ) {
 	VectorMA( &pm->ps->origin, pml.frametime, &pm->ps->velocity, &pm->ps->origin );
 }
 
-//============================================================================
-
-/*
-================
-PM_FootstepForSurface
-
-Returns an event number apropriate for the groundsurface
-================
-*/
+// Returns an event number apropriate for the groundsurface
 static int PM_FootstepForSurface( void ) {
 	if ( pml.groundTrace.surfaceFlags & SURF_NOSTEPS ) {
 		return 0;
@@ -3700,13 +3576,8 @@ static void PM_CrashLandEffect( void ) {
 	}
 }
 #endif
-/*
-=================
-PM_CrashLand
 
-Check for hard landings that generate sound events
-=================
-*/
+// Check for hard landings that generate sound events
 static void PM_CrashLand( void ) {
 	float		delta;
 	float		dist;
@@ -3949,11 +3820,6 @@ static void PM_CrashLand( void ) {
 	}
 }
 
-/*
-=============
-PM_CorrectAllSolid
-=============
-*/
 static int PM_CorrectAllSolid( trace_t *trace ) {
 	int			i, j, k;
 	vector3		point;
@@ -3993,13 +3859,7 @@ static int PM_CorrectAllSolid( trace_t *trace ) {
 	return qfalse;
 }
 
-/*
-=============
-PM_GroundTraceMissed
-
-The ground trace didn't hit a surface, so we are in freefall
-=============
-*/
+// The ground trace didn't hit a surface, so we are in freefall
 static void PM_GroundTraceMissed( void ) {
 	trace_t		trace;
 	vector3		point;
@@ -4075,12 +3935,6 @@ static void PM_GroundTraceMissed( void ) {
 	pml.walking = qfalse;
 }
 
-
-/*
-=============
-PM_GroundTrace
-=============
-*/
 static void PM_GroundTrace( void ) {
 	vector3		point;
 	trace_t		trace;
@@ -4218,12 +4072,6 @@ static void PM_GroundTrace( void ) {
 	PM_AddTouchEnt( trace.entityNum );
 }
 
-
-/*
-=============
-PM_SetWaterLevel
-=============
-*/
 static void PM_SetWaterLevel( void ) {
 	vector3		point;
 	int			sample1;
@@ -4357,13 +4205,7 @@ static qboolean PM_CanStand( void ) {
 	return canStand;
 }
 
-/*
-==============
-PM_CheckDuck
-
-Sets mins, maxs, and pm->ps->viewheight
-==============
-*/
+// Sets mins, maxs, and pm->ps->viewheight
 static void PM_CheckDuck( void ) {
 	if ( pm->ps->m_iVehicleNum > 0 && pm->ps->m_iVehicleNum < ENTITYNUM_NONE ) {//riding a vehicle or are a vehicle
 		//no ducking or rolling when on a vehicle
@@ -4476,21 +4318,9 @@ static void PM_CheckDuck( void ) {
 	}
 }
 
-
-
-//===================================================================
-
-
-
-/*
-==============
-PM_Use
-
-Generates a use event
-==============
-*/
 #define USE_DELAY 2000
 
+// Generates a use event
 void PM_Use( void ) {
 	if ( pm->ps->useTime > 0 )
 		pm->ps->useTime -= 100;//pm->cmd.msec;
@@ -5057,11 +4887,6 @@ static uint32_t JP_GetJPFixRoll( void ) {
 	return level;
 }
 
-/*
-===============
-PM_Footsteps
-===============
-*/
 static void PM_Footsteps( void ) {
 	float		bobmove;
 	int			old;
@@ -5473,13 +5298,7 @@ static void PM_Footsteps( void ) {
 	}
 }
 
-/*
-==============
-PM_WaterEvents
-
-Generate sound events for entering and leaving water
-==============
-*/
+// Generate sound events for entering and leaving water
 static void PM_WaterEvents( void ) {		// FIXME?
 #ifdef _GAME
 	qboolean impact_splash = qfalse;
@@ -5554,11 +5373,6 @@ void BG_ClearRocketLock( playerState_t *ps ) {
 	}
 }
 
-/*
-===============
-PM_BeginWeaponChange
-===============
-*/
 void PM_BeginWeaponChange( int weapon ) {
 	if ( weapon <= WP_NONE || weapon >= WP_NUM_WEAPONS ) {
 		return;
@@ -5587,12 +5401,6 @@ void PM_BeginWeaponChange( int weapon ) {
 	BG_ClearRocketLock( pm->ps );
 }
 
-
-/*
-===============
-PM_FinishWeaponChange
-===============
-*/
 void PM_FinishWeaponChange( void ) {
 	int		weapon;
 
@@ -5742,12 +5550,8 @@ void PM_RocketLock( float lockDist, qboolean vehicleLock ) {
 	}
 }
 
-//---------------------------------------
-static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh )
-//---------------------------------------
-{
-	qboolean	charging = qfalse,
-		altFire = qfalse;
+static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh ) {
+	qboolean charging = qfalse, altFire = qfalse;
 
 	if ( vehicleRocketLock ) {
 		if ( (pm->cmd.buttons&(BUTTON_ATTACK | BUTTON_ALT_ATTACK)) ) {//actually charging
@@ -7215,12 +7019,6 @@ static void PM_Weapon( void ) {
 	pm->ps->weaponTime += addTime;
 }
 
-/*
-================
-PM_Animate
-================
-*/
-
 static void PM_Animate( void ) {
 	if ( pm->cmd.buttons & BUTTON_GESTURE ) {
 		if ( pm->ps->m_iVehicleNum ) { //eh, fine, clear it
@@ -7281,12 +7079,6 @@ static void PM_Animate( void ) {
 	}
 }
 
-
-/*
-================
-PM_DropTimers
-================
-*/
 static void PM_DropTimers( void ) {
 	// drop misc timing counter
 	if ( pm->ps->pm_time ) {
@@ -7407,10 +7199,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 	}
 }
 
-//-------------------------------------------
-void PM_AdjustAttackStates( pmove_t *pmove )
-//-------------------------------------------
-{
+void PM_AdjustAttackStates( pmove_t *pmove ) {
 	int amount;
 
 	if ( pm_entSelf->s.NPC_class != CLASS_VEHICLE
@@ -8311,11 +8100,6 @@ static void BG_G2ClientSpineAngles( void *ghoul2, int motionBolt, vector3 *cent_
 	llAngles->roll = viewAngles->roll*0.45f;
 }
 
-/*
-==================
-CG_SwingAngles
-==================
-*/
 static float BG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
 	float speed, float *angle, qboolean *swinging, int frametime ) {
 	float	swing;
@@ -8448,7 +8232,7 @@ void BG_G2PlayerAngles( void *ghoul2, int motionBolt, entityState_t *cent, int t
 	headAngles.yaw = AngleMod( headAngles.yaw );
 	VectorClear( legsAngles );
 	VectorClear( &torsoAngles );
-	// --------- yaw -------------
+	// yaw
 
 	// allow yaw to drift a bit
 	if ( ((cent->legsAnim) != BOTH_STAND1) ||
@@ -8479,7 +8263,7 @@ void BG_G2PlayerAngles( void *ghoul2, int motionBolt, entityState_t *cent, int t
 	//for now, turn torso instantly and let the legs swing to follow
 	*tYawAngle = torsoAngles.yaw;
 
-	// --------- pitch -------------
+	// pitch
 
 	VectorCopy( &cent->pos.trDelta, &velocity );
 
@@ -8513,7 +8297,7 @@ void BG_G2PlayerAngles( void *ghoul2, int motionBolt, entityState_t *cent, int t
 	}
 	torsoAngles.pitch = *tPitchAngle;
 
-	// --------- roll -------------
+	// roll
 
 	if ( speed ) {
 		vector3	axis[3];
@@ -9229,12 +9013,7 @@ void BG_VehicleAdjustBBoxForOrientation( Vehicle_t *veh, vector3 *origin, vector
 		//FIXME: make it as close as possible?  Or actually prevent the change in m_vOrientation?  Or push away from anything we hit?
 	}
 }
-/*
-================
-PmoveSingle
 
-================
-*/
 extern int BG_EmplacedView( vector3 *baseAngles, vector3 *angles, float *newYaw, float constraint );
 extern qboolean BG_FighterUpdate( Vehicle_t *pVeh, const usercmd_t *pUcmd, vector3 *trMins, vector3 *trMaxs, float gravity,
 	void( *traceFunc )(trace_t *results, const vector3 *start, const vector3 *lmins, const vector3 *lmaxs, const vector3 *end, int passEntityNum, int contentMask) ); //FighterNPC.c
@@ -10220,14 +9999,7 @@ void PmoveSingle( pmove_t *pmove ) {
 	}
 }
 
-
-/*
-================
-Pmove
-
-Can be called by either the server or the client
-================
-*/
+// Can be called by either the server or the client
 void Pmove( pmove_t *pmove ) {
 	int finalTime = pmove->cmd.serverTime;
 

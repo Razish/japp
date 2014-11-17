@@ -11,8 +11,6 @@
 #include "game/g_public.h"
 #include "game/bg_public.h"
 
-//=============================================================================
-
 #define	PERS_SCORE				0		// !!! MUST NOT CHANGE, SERVER AND
 // GAME BOTH REFERENCE !!!
 
@@ -156,9 +154,6 @@ typedef struct client_s {
 	int				lastUserInfoCount; //allow a certain number of changes within a certain time period -rww
 } client_t;
 
-//=============================================================================
-
-
 // MAX_CHALLENGES is made large to prevent a denial
 // of service attack that could cycle all of them
 // out before legitimate users connected
@@ -198,8 +193,6 @@ typedef struct serverStatic_s {
 	netadr_t	authorizeAddress;			// for rcon return messages
 } serverStatic_t;
 
-//=============================================================================
-
 extern	serverStatic_t	svs;				// persistant server info across maps
 extern	server_t		sv;					// cleared each map
 extern	vm_t			*gvm;				// game virtual machine
@@ -234,8 +227,6 @@ extern	cvar_t	*sv_needpass;
 #ifdef USE_CD_KEY
 extern	cvar_t	*sv_allowAnonymous;
 #endif
-
-//===========================================================
 
 //
 // sv_main.c
@@ -338,10 +329,7 @@ void Bot_FreeMemoryGame( void *ptr );
 int BotImport_DebugPolygonCreate( int color, int numPoints, vector3 *points );
 void BotImport_DebugPolygonDelete( int id );
 
-//============================================================
-//
 // high level object sorting to reduce interaction tests
-//
 
 void SV_ClearWorld( void );
 // called after the world model has been loaded, before linking any entities

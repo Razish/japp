@@ -284,11 +284,6 @@ int IsTeamplay( void ) {
 	return 1;
 }
 
-/*
-==================
-BotAI_GetClientState
-==================
-*/
 int BotAI_GetClientState( int clientNum, playerState_t *state ) {
 	gentity_t	*ent;
 
@@ -304,11 +299,6 @@ int BotAI_GetClientState( int clientNum, playerState_t *state ) {
 	return qtrue;
 }
 
-/*
-==================
-BotAI_GetEntityState
-==================
-*/
 int BotAI_GetEntityState( int entityNum, entityState_t *state ) {
 	gentity_t	*ent;
 
@@ -321,11 +311,6 @@ int BotAI_GetEntityState( int entityNum, entityState_t *state ) {
 	return qtrue;
 }
 
-/*
-==================
-BotAI_GetSnapshotEntity
-==================
-*/
 int BotAI_GetSnapshotEntity( int clientNum, int sequence, entityState_t *state ) {
 	int		entNum;
 
@@ -340,29 +325,14 @@ int BotAI_GetSnapshotEntity( int clientNum, int sequence, entityState_t *state )
 	return sequence + 1;
 }
 
-/*
-==============
-BotEntityInfo
-==============
-*/
 void BotEntityInfo( int entnum, aas_entityinfo_t *info ) {
 	trap->AAS_EntityInfo( entnum, info );
 }
 
-/*
-==============
-NumBots
-==============
-*/
 int NumBots( void ) {
 	return numbots;
 }
 
-/*
-==============
-AngleDifference
-==============
-*/
 float AngleDifference( float ang1, float ang2 ) {
 	float diff;
 
@@ -376,11 +346,6 @@ float AngleDifference( float ang1, float ang2 ) {
 	return diff;
 }
 
-/*
-==============
-BotChangeViewAngle
-==============
-*/
 float BotChangeViewAngle( float angle, float ideal_angle, float speed ) {
 	float move;
 
@@ -403,11 +368,6 @@ float BotChangeViewAngle( float angle, float ideal_angle, float speed ) {
 	return AngleMod( angle + move );
 }
 
-/*
-==============
-BotChangeViewAngles
-==============
-*/
 void BotChangeViewAngles( bot_state_t *bs, float thinktime ) {
 	float diff, factor, maxchange, anglespeed, disired_speed;
 	int i;
@@ -451,11 +411,6 @@ void BotChangeViewAngles( bot_state_t *bs, float thinktime ) {
 	trap->EA_View( bs->client, &bs->viewangles );
 }
 
-/*
-==============
-BotInputToUserCommand
-==============
-*/
 void BotInputToUserCommand( bot_input_t *bi, usercmd_t *ucmd, ivector3 *delta_angles, int time, int useTime ) {
 	vector3 angles, forward, right;
 	short temp;
@@ -545,11 +500,6 @@ void BotInputToUserCommand( bot_input_t *bi, usercmd_t *ucmd, ivector3 *delta_an
 	//Com_Printf("ucmd->serverTime = %d\n", ucmd->serverTime);
 }
 
-/*
-==============
-BotUpdateInput
-==============
-*/
 void BotUpdateInput( bot_state_t *bs, int time, int elapsed_time ) {
 	bot_input_t bi;
 	int j;
@@ -574,11 +524,6 @@ void BotUpdateInput( bot_state_t *bs, int time, int elapsed_time ) {
 	}
 }
 
-/*
-==============
-BotAIRegularUpdate
-==============
-*/
 void BotAIRegularUpdate( void ) {
 	if ( regularupdate_time < FloatTime() ) {
 		trap->BotUpdateEntityItems();
@@ -586,11 +531,6 @@ void BotAIRegularUpdate( void ) {
 	}
 }
 
-/*
-==============
-RemoveColorEscapeSequences
-==============
-*/
 void RemoveColorEscapeSequences( char *text ) {
 	int i, l;
 
@@ -607,12 +547,6 @@ void RemoveColorEscapeSequences( char *text ) {
 	text[l] = '\0';
 }
 
-
-/*
-==============
-BotAI
-==============
-*/
 int BotAI( int client, float thinktime ) {
 	bot_state_t *bs;
 	char buf[1024], *args;
@@ -689,11 +623,6 @@ int BotAI( int client, float thinktime ) {
 	return qtrue;
 }
 
-/*
-==================
-BotScheduleBotThink
-==================
-*/
 void BotScheduleBotThink( void ) {
 	int i, botnum;
 
@@ -727,11 +656,6 @@ int PlayersInGame( void ) {
 	return pl;
 }
 
-/*
-==============
-BotAISetupClient
-==============
-*/
 int BotAISetupClient( int client, struct bot_settings_s *settings, qboolean restart ) {
 	bot_state_t *bs;
 
@@ -802,11 +726,6 @@ int BotAISetupClient( int client, struct bot_settings_s *settings, qboolean rest
 	return qtrue;
 }
 
-/*
-==============
-BotAIShutdownClient
-==============
-*/
 int BotAIShutdownClient( int client, qboolean restart ) {
 	bot_state_t *bs;
 
@@ -832,14 +751,7 @@ int BotAIShutdownClient( int client, qboolean restart ) {
 	return qtrue;
 }
 
-/*
-==============
-BotResetState
-
-called when a bot enters the intermission or observer mode and
-when the level is changed
-==============
-*/
+// called when a bot enters the intermission or observer mode and when the level is changed
 void BotResetState( bot_state_t *bs ) {
 	int client, entitynum, inuse;
 	int movestate, goalstate, weaponstate;
@@ -877,11 +789,6 @@ void BotResetState( bot_state_t *bs ) {
 	if ( bs->ms ) trap->BotResetAvoidReach( bs->ms );
 }
 
-/*
-==============
-BotAILoadMap
-==============
-*/
 int BotAILoadMap( int restart ) {
 	int			i;
 
@@ -6048,11 +5955,6 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 
 int gUpdateVars = 0;
 
-/*
-==================
-BotAIStartFrame
-==================
-*/
 int BotAIStartFrame( int time ) {
 	int i;
 	int elapsed_time, thinktime;
@@ -6129,11 +6031,6 @@ int BotAIStartFrame( int time ) {
 	return qtrue;
 }
 
-/*
-==============
-BotAISetup
-==============
-*/
 int BotAISetup( int restart ) {
 	//rww - new bot cvars..
 	trap->Cvar_Register( &bot_forcepowers, "bot_forcepowers", "1", 0 );
@@ -6174,13 +6071,7 @@ int BotAISetup( int restart ) {
 	return qtrue;
 }
 
-/*
-==============
-BotAIShutdown
-==============
-*/
 int BotAIShutdown( int restart ) {
-
 	int i;
 
 	//if the game is restarted for a tournament

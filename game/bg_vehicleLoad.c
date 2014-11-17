@@ -490,7 +490,7 @@ const vehField_t vehicleFields[] =
 	{ "cameraFOV", VFOFS( cameraFOV ), VF_FLOAT },			//third person camera FOV, default is 80
 	{ "cameraAlpha", VFOFS( cameraAlpha ), VF_FLOAT },		//fade out the vehicle to this alpha (0.1f-1.0f) if it's in the way of the crosshair
 	{ "cameraPitchDependantVertOffset", VFOFS( cameraPitchDependantVertOffset ), VF_BOOL },		//use the hacky AT-ST pitch dependant vertical offset
-	//===TURRETS===========================================================================
+	// TURRETS
 	//Turret 1
 	{ "turret1Weap", VFOFS( turret[0].iWeapon ), VF_WEAPON },
 	{ "turret1Delay", VFOFS( turret[0].iDelay ), VF_INT },
@@ -534,7 +534,7 @@ const vehField_t vehicleFields[] =
 	{ "turret2AIRange", VFOFS( turret[1].fAIRange ), VF_FLOAT },
 	{ "turret2PassengerNum", VFOFS( turret[1].passengerNum ), VF_INT },//which number passenger can control this turret
 	{ "turret2GunnerViewTag", VFOFS( turret[1].gunnerViewTag ), VF_LSTRING },
-	//===END TURRETS===========================================================================
+
 	//terminating entry
 	{ 0, (size_t)-1, VF_INT }
 };

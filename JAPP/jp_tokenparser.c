@@ -1,13 +1,6 @@
-//	--------------------------------------------
-//				Token Parser
-//
-//	This baby parses through a file for specific tokens/keywords
-//	and assigns it to whatever you specify based on common types (string/int/float/vec)
-//	E.g. Storing a bunch of weapon information.
-//
-//		Created by BobaFett (Based on Q3's token parser)
-//		Modified by Raz0r
-//	--------------------------------------------
+// this baby parses through a file for specific tokens/keywords and assigns it to whatever you specify based on common
+//	types (string/int/float/vec)
+// e.g. storing a bunch of weapon information.
 
 #include "qcommon/q_shared.h"
 

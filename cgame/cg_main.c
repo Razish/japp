@@ -568,11 +568,6 @@ static cvarTable_t cvarTable[] = {
 
 static int cvarTableSize = ARRAY_LEN( cvarTable );
 
-/*
-=================
-CG_RegisterCvars
-=================
-*/
 void CG_RegisterCvars( void ) {
 	int			i;
 	cvarTable_t	*cv;
@@ -711,12 +706,6 @@ void CG_SiegeCountCvars( void ) {
 
 }
 
-/*
-=======================
-CG_BuildSpectatorString
-
-=======================
-*/
 void CG_BuildSpectatorString( void ) {
 #if 0
 	int i;
@@ -822,11 +811,6 @@ char *CG_GetMenuBuffer( const char *filename ) {
 	return buf;
 }
 
-//
-// ==============================
-// new hud stuff ( mission pack )
-// ==============================
-//
 qboolean CG_Asset_Parse( int handle ) {
 	pc_token_t token;
 
@@ -1256,12 +1240,6 @@ static void CG_RunCinematicFrame( int handle ) {
 	trap->CIN_RunCinematic( handle );
 }
 
-/*
-=================
-CG_LoadMenus();
-
-=================
-*/
 void CG_LoadMenus( const char *menuFile ) {
 	const char *token, *p;
 	int len;
@@ -1618,14 +1596,7 @@ char *CG_AddSpawnVarToken( const char *string ) {
 	return dest;
 }
 
-/*
-====================
-CG_ParseSpawnVars
-
-cgame version of G_ParseSpawnVars, for ents that don't really
-need to take up an entity slot (e.g. static models) -rww
-====================
-*/
+// cgame version of G_ParseSpawnVars, for ents that don't really need to take up an entity slot (e.g. static models)
 qboolean CG_ParseSpawnVars( void ) {
 	char		keyname[MAX_TOKEN_CHARS];
 	char		com_token[MAX_TOKEN_CHARS];
@@ -1673,17 +1644,12 @@ qboolean CG_ParseSpawnVars( void ) {
 	return qtrue;
 }
 
-/*
-==============
-CG_SpawnCGameEntFromVars
-
-See if we should do something for this ent cgame-side -rww
-==============
-*/
 void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent );
 
 extern float cg_linearFogOverride; //cg_view.c
 extern float cg_radarRange;//cg_draw.c
+
+// See if we should do something for this ent cgame-side
 void CG_SpawnCGameEntFromVars( void ) {
 	int i;
 	cgSpawnEnt_t ent;
@@ -1722,14 +1688,7 @@ void CG_SpawnCGameEntFromVars( void ) {
 	CG_StrPool_Reset();
 }
 
-/*
-==============
-CG_SpawnCGameOnlyEnts
-
-Parses entity string data for cgame-only entities, that we can throw away on
-the server and never even bother sending. -rww
-==============
-*/
+// Parses entity string data for cgame-only entities, that we can throw away on the server and never even bother sending
 void CG_SpawnCGameOnlyEnts( void ) {
 	//make sure it is reset
 	trap->R_GetEntityToken( NULL, -1 );
@@ -1948,13 +1907,7 @@ void CG_DestroyAllGhoul2( void ) {
 	CG_CleanJetpackGhoul2();
 }
 
-/*
-=================
-CG_Shutdown
-
-Called before every level change or subsystem restart
-=================
-*/
+// Called before every level change or subsystem restart
 void CG_Shutdown( void ) {
 	BG_ClearAnimsets(); //free all dynamic allocations made through the engine
 
@@ -1986,11 +1939,6 @@ void CG_Shutdown( void ) {
 	CG_CloseLog( &cg.log.security );
 }
 
-/*
-===============
-CG_NextForcePower_f
-===============
-*/
 void CG_NextForcePower_f( void ) {
 	int current;
 	usercmd_t cmd;
@@ -2026,11 +1974,6 @@ void CG_NextForcePower_f( void ) {
 	}
 }
 
-/*
-===============
-CG_PrevForcePower_f
-===============
-*/
 void CG_PrevForcePower_f( void ) {
 	int current;
 	usercmd_t cmd;
@@ -2161,14 +2104,7 @@ char *ConcatArgs( int start ) {
 	return line;
 }
 
-/*
-=================
-CG_LogPrintf
-
-Print to the logfile with a time stamp if it is open
-=================
-*/
-
+// Print to the logfile with a time stamp if it is open
 void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	va_list argptr;
 	char string[1024] = { 0 };
@@ -2278,12 +2214,6 @@ static void CG_FX_CameraShake( void ) {
 	CG_DoCameraShake( &data->mOrigin, data->mIntensity, data->mRadius, data->mTime );
 }
 
-/*
-============
-GetModuleAPI
-============
-*/
-
 cgameImport_t *trap = NULL;
 
 typedef int( *R_Font_StrLenPixels_t )(const char *text, const int iFontIndex, const float scale);
@@ -2353,14 +2283,8 @@ Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *impor
 	return &cge;
 }
 
-/*
-================
-vmMain
-
-This is the only way control passes into the module.
-This must be the very first function compiled into the .q3vm file
-================
-*/
+// This is the only way control passes into the module.
+// This must be the very first function compiled into the .q3vm file
 Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t arg2, intptr_t arg3, intptr_t arg4,
 	intptr_t arg5, intptr_t arg6, intptr_t arg7, intptr_t arg8, intptr_t arg9, intptr_t arg10, intptr_t arg11 ) {
 	switch ( command ) {

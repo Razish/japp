@@ -146,18 +146,8 @@ void CalcEntitySpot( const gentity_t *ent, const spot_t spot, vector3 *point ) {
 	}
 }
 
-
-//===================================================================================
-
-/*
-qboolean NPC_UpdateAngles ( qboolean doPitch, qboolean doYaw )
-
-Added: option to do just pitch or just yaw
-
-Does not include "aim" in it's calculations
-
-FIXME: stop compressing angles into shorts!!!!
-*/
+// Does not include "aim" in it's calculations
+//FIXME: stop compressing angles into shorts
 qboolean NPC_UpdateAngles( qboolean doPitch, qboolean doYaw ) {
 	float		error;
 	float		decay;
@@ -385,14 +375,8 @@ qboolean NPC_UpdateFiringAngles( qboolean doPitch, qboolean doYaw ) {
 
 	return exact;
 }
-//===================================================================================
 
-/*
-static void NPC_UpdateShootAngles (vector3 *angles, qboolean doPitch, qboolean doYaw )
-
-Does update angles on shootAngles
-*/
-
+// Does update angles on shootAngles
 void NPC_UpdateShootAngles( vector3 *angles, qboolean doPitch, qboolean doYaw ) {//FIXME: shoot angles either not set right or not used!
 	float		error;
 	float		decay;
@@ -510,16 +494,7 @@ qboolean G_ActivateBehavior( gentity_t *self, int bset ) {
 	return qtrue;
 }
 
-
-/*
-=============================================================================
-
-Extended Functions
-
-=============================================================================
-*/
-
-//rww - special system for sync'ing bone angles between client and server.
+// special system for sync'ing bone angles between client and server.
 void NPC_SetBoneAngles( gentity_t *ent, const char *bone, vector3 *angles ) {
 	int *thebone = &ent->s.boneIndex1;
 	int *firstFree = NULL;
@@ -672,12 +647,6 @@ qboolean NPC_ClearLOS2( gentity_t *ent, const vector3 *end ) {
 	return G_ClearLOS2( NPC, ent, end );
 }
 
-/*
--------------------------
-NPC_ValidEnemy
--------------------------
-*/
-
 qboolean NPC_ValidEnemy( gentity_t *ent ) {
 	int entTeam = TEAM_FREE;
 	//Must be a valid pointer
@@ -759,12 +728,6 @@ qboolean NPC_ValidEnemy( gentity_t *ent ) {
 	return qfalse;
 }
 
-/*
--------------------------
-NPC_TargetVisible
--------------------------
-*/
-
 qboolean NPC_TargetVisible( gentity_t *ent ) {
 	//Make sure we're in a valid range
 	if ( DistanceSquared( &ent->r.currentOrigin, &NPC->r.currentOrigin ) > (NPCInfo->stats.visrange * NPCInfo->stats.visrange) )
@@ -780,37 +743,6 @@ qboolean NPC_TargetVisible( gentity_t *ent ) {
 
 	return qtrue;
 }
-
-/*
--------------------------
-NPC_GetCheckDelta
--------------------------
-*/
-
-/*
-#define	CHECK_TIME_BASE				250
-#define CHECK_TIME_BASE_SQUARED		( CHECK_TIME_BASE * CHECK_TIME_BASE )
-
-static int NPC_GetCheckDelta( void )
-{
-if ( NPC_ValidEnemy( NPC->enemy ) == qfalse )
-{
-int distance = DistanceSquared( NPC->r.currentOrigin, g_entities[0].currentOrigin );
-
-distance /= CHECK_TIME_BASE_SQUARED;
-
-return ( CHECK_TIME_BASE * distance );
-}
-
-return 0;
-}
-*/
-
-/*
--------------------------
-NPC_FindNearestEnemy
--------------------------
-*/
 
 #define	MAX_RADIUS_ENTS			256	//NOTE: This can cause entities to be lost
 #define NEAR_DEFAULT_RADIUS		256
@@ -861,12 +793,6 @@ int NPC_FindNearestEnemy( gentity_t *ent ) {
 	return nearestEntID;
 }
 
-/*
--------------------------
-NPC_PickEnemyExt
--------------------------
-*/
-
 gentity_t *NPC_PickEnemyExt( qboolean checkAlerts ) {
 	//Check for Hazard Team status and remove this check
 	/*
@@ -911,21 +837,9 @@ gentity_t *NPC_PickEnemyExt( qboolean checkAlerts ) {
 	return NULL;
 }
 
-/*
--------------------------
-NPC_FindPlayer
--------------------------
-*/
-
 qboolean NPC_FindPlayer( void ) {
 	return NPC_TargetVisible( &g_entities[0] );
 }
-
-/*
--------------------------
-NPC_CheckPlayerDistance
--------------------------
-*/
 
 static qboolean NPC_CheckPlayerDistance( void ) {
 	return qfalse;//MOOT in MP
@@ -959,12 +873,6 @@ static qboolean NPC_CheckPlayerDistance( void ) {
 	return qfalse;
 	*/
 }
-
-/*
--------------------------
-NPC_FindEnemy
--------------------------
-*/
 
 qboolean NPC_FindEnemy( qboolean checkAlerts ) {
 	gentity_t *newenemy;
@@ -1017,12 +925,6 @@ qboolean NPC_FindEnemy( qboolean checkAlerts ) {
 	return qfalse;
 }
 
-/*
--------------------------
-NPC_CheckEnemyExt
--------------------------
-*/
-
 qboolean NPC_CheckEnemyExt( qboolean checkAlerts ) {
 	//Make sure we're ready to think again
 	/*
@@ -1037,12 +939,6 @@ qboolean NPC_CheckEnemyExt( qboolean checkAlerts ) {
 		*/
 	return NPC_FindEnemy( checkAlerts );
 }
-
-/*
--------------------------
-NPC_FacePosition
--------------------------
-*/
 
 qboolean NPC_FacePosition( vector3 *position, qboolean doPitch ) {
 	vector3		muzzle;
@@ -1097,12 +993,6 @@ qboolean NPC_FacePosition( vector3 *position, qboolean doPitch ) {
 	return facing;
 }
 
-/*
--------------------------
-NPC_FaceEntity
--------------------------
-*/
-
 qboolean NPC_FaceEntity( gentity_t *ent, qboolean doPitch ) {
 	vector3		entPos;
 
@@ -1111,12 +1001,6 @@ qboolean NPC_FaceEntity( gentity_t *ent, qboolean doPitch ) {
 
 	return NPC_FacePosition( &entPos, doPitch );
 }
-
-/*
--------------------------
-NPC_FaceEnemy
--------------------------
-*/
 
 qboolean NPC_FaceEnemy( qboolean doPitch ) {
 	if ( NPC == NULL )
@@ -1127,12 +1011,6 @@ qboolean NPC_FaceEnemy( qboolean doPitch ) {
 
 	return NPC_FaceEntity( NPC->enemy, doPitch );
 }
-
-/*
--------------------------
-NPC_CheckCanAttackExt
--------------------------
-*/
 
 qboolean NPC_CheckCanAttackExt( void ) {
 	//We don't want them to shoot
@@ -1150,12 +1028,6 @@ qboolean NPC_CheckCanAttackExt( void ) {
 	return qtrue;
 }
 
-/*
--------------------------
-NPC_ClearLookTarget
--------------------------
-*/
-
 void NPC_ClearLookTarget( gentity_t *self ) {
 	if ( !self->client ) {
 		return;
@@ -1169,11 +1041,6 @@ void NPC_ClearLookTarget( gentity_t *self ) {
 	self->client->renderInfo.lookTargetClearTime = 0;
 }
 
-/*
--------------------------
-NPC_SetLookTarget
--------------------------
-*/
 void NPC_SetLookTarget( gentity_t *self, int entNum, int clearTime ) {
 	if ( !self->client ) {
 		return;
@@ -1187,11 +1054,6 @@ void NPC_SetLookTarget( gentity_t *self, int entNum, int clearTime ) {
 	self->client->renderInfo.lookTargetClearTime = clearTime;
 }
 
-/*
--------------------------
-NPC_CheckLookTarget
--------------------------
-*/
 qboolean NPC_CheckLookTarget( gentity_t *self ) {
 	if ( self->client ) {
 		if ( self->client->renderInfo.lookTarget >= 0 && self->client->renderInfo.lookTarget < ENTITYNUM_WORLD ) {//within valid range
@@ -1213,12 +1075,8 @@ qboolean NPC_CheckLookTarget( gentity_t *self ) {
 	return qfalse;
 }
 
-/*
--------------------------
-NPC_CheckCharmed
--------------------------
-*/
-extern void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
+void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
+
 void NPC_CheckCharmed( void ) {
 	if ( NPCInfo->charmedTime && NPCInfo->charmedTime < level.time && NPC->client ) {//we were charmed, set us back!
 		NPC->client->playerTeam = NPC->genericValue1;

@@ -385,7 +385,6 @@ static void AnimateVehicle( Vehicle_t *pVeh ) {
 
 
 		// Remove Crashing Flag
-		//----------------------
 		pVeh->m_ulFlags &= ~VEH_CRASHING;
 
 		if ( Turbo ) {// Kicked In Turbo
@@ -440,21 +439,17 @@ static void AnimateRiders( Vehicle_t *pVeh ) {
 
 
 		// Remove Crashing Flag
-		//----------------------
 		pVeh->m_ulFlags &= ~VEH_CRASHING;
 
 
 		// Put Away Saber When It Is Not Active
-		//--------------------------------------
 
 		// Don't Interrupt Attack Anims
-		//------------------------------
 		if ( pilotPS->weaponTime > 0 ) {
 			return;
 		}
 
 		// Compute The Weapon Pose
-		//--------------------------
 		if ( pilotPS->weapon == WP_BLASTER ) {
 			WeaponPose = WPOSE_BLASTER;
 		}
@@ -479,7 +474,6 @@ static void AnimateRiders( Vehicle_t *pVeh ) {
 			}
 
 			// Auto Aiming
-			//===============================================
 			if ( !Left && !Right )		// Allow player strafe keys to override
 			{
 				if ( pilotPS->weapon == WP_SABER && !Left && !Right ) {

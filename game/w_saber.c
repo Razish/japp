@@ -2832,7 +2832,7 @@ static int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qboolean mySa
 			return FORCE_LEVEL_3;
 		case BOTH_A7_HILT:
 			return FORCE_LEVEL_0;
-			//===SABERLOCK SUPERBREAKS START===========================================================================
+			// SABERLOCK SUPERBREAKS START
 		case BOTH_LK_S_DL_T_SB_1_W:
 			if ( animTimer < 700 ) {//end of anim
 				return FORCE_LEVEL_0;
@@ -2916,7 +2916,7 @@ static int G_PowerLevelForSaberAnim( gentity_t *ent, int saberNum, qboolean mySa
 		case BOTH_LK_ST_ST_T_SB_1_W:
 		case BOTH_LK_ST_S_T_SB_1_W:
 			return FORCE_LEVEL_5;
-			//===SABERLOCK SUPERBREAKS START===========================================================================
+			// SABERLOCK SUPERBREAKS START
 		case BOTH_HANG_ATTACK:
 			//FIME: break up
 			if ( animTimer < 1000 ) {//end of anim

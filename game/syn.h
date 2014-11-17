@@ -1,13 +1,3 @@
-//===========================================================================
-//
-// Name:			syn.h
-// Function:		synonyms
-// Programmer:		Mr Elusive
-// Last update:		-
-// Tab Size:		4 (real tabs)
-// Notes:			-
-//===========================================================================
-
 //#define CONTEXT_ALL				(0xFFFFu)
 #define CONTEXT_NORMAL				(0x0001u)
 #define CONTEXT_NEARBYITEM			(0x0002u)

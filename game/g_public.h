@@ -51,8 +51,6 @@
 #define G2TRFLAG_GETSURFINDEX	(0x00000004u) //will replace surfaceFlags with the ghoul2 surface index that was hit, if any.
 #define G2TRFLAG_THICK			(0x00000008u) //assures that the trace radius will be significantly large regardless of the trace box size.
 
-//===============================================================
-
 //this structure is shared by gameside and in-engine NPC nav routines.
 typedef struct failedEdge_e {
 	int	startID;

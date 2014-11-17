@@ -4,9 +4,6 @@
 #include "b_local.h"
 #include "qcommon/q_shared.h"
 
-/*
-Debug_Printf
-*/
 void Debug_Printf( vmCvar_t *cv, int debugLevel, const char *fmt, ... ) {
 	const char *color;
 	va_list argptr;
@@ -31,10 +28,6 @@ void Debug_Printf( vmCvar_t *cv, int debugLevel, const char *fmt, ... ) {
 	Com_Printf( "%s%5i:%s", color, level.time, msg );
 }
 
-
-/*
-Debug_NPCPrintf
-*/
 void Debug_NPCPrintf( gentity_t *printNPC, vmCvar_t *cv, int debugLevel, const char *fmt, ... ) {
 	const char *color;
 	va_list argptr;
@@ -43,11 +36,6 @@ void Debug_NPCPrintf( gentity_t *printNPC, vmCvar_t *cv, int debugLevel, const c
 	if ( cv->value < debugLevel ) {
 		return;
 	}
-
-	//	if ( debugNPCName.string[0] && Q_stricmp( debugNPCName.string, printNPC->targetname) != 0 )
-	//	{
-	//		return;
-	//	}
 
 	if ( debugLevel == DEBUG_LEVEL_DETAIL )
 		color = S_COLOR_WHITE;

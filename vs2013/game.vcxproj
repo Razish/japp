@@ -222,7 +222,6 @@
     <ClInclude Include="..\game\botlib.h" />
     <ClInclude Include="..\game\chars.h" />
     <ClInclude Include="..\game\g_admin.h" />
-    <ClInclude Include="..\game\g_headers.h" />
     <ClInclude Include="..\game\g_ICARUScb.h" />
     <ClInclude Include="..\game\g_local.h" />
     <ClInclude Include="..\game\g_nav.h" />

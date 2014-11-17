@@ -835,12 +835,6 @@ void NPC_BSSearch( void ) {
 	NPC_UpdateAngles( qtrue, qtrue );
 }
 
-/*
--------------------------
-NPC_BSSearchStart
--------------------------
-*/
-
 void NPC_BSSearchStart( int homeWp, bState_t bState ) {
 	//FIXME: Reimplement
 	if ( homeWp == WAYPOINT_NONE ) {
@@ -858,14 +852,7 @@ void NPC_BSSearchStart( int homeWp, bState_t bState ) {
 	//Com_Printf("\nHeading for wp %d...\n", NPCInfo->homeWp);
 }
 
-/*
--------------------------
-NPC_BSNoClip
-
-Use in extreme circumstances only
--------------------------
-*/
-
+// Use in extreme circumstances only
 void NPC_BSNoClip( void ) {
 	if ( UpdateGoal() ) {
 		vector3	dir, forward, right, angles, up = { 0, 0, 1 };
@@ -976,15 +963,12 @@ void NPC_BSWander( void ) {//FIXME: don't actually go all the way to the next wa
 	NPC_UpdateAngles( qtrue, qtrue );
 }
 
-/*
--------------------------
-NPC_BSFlee
--------------------------
-*/
-extern void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
-extern void WP_DropWeapon( gentity_t *dropper, vector3 *velocity );
-extern void ChangeWeapon( gentity_t *ent, int newWeapon );
-void NPC_Surrender( void ) {//FIXME: say "don't shoot!" if we weren't already surrendering
+void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
+void WP_DropWeapon( gentity_t *dropper, vector3 *velocity );
+void ChangeWeapon( gentity_t *ent, int newWeapon );
+
+//FIXME: say "don't shoot!" if we weren't already surrendering
+void NPC_Surrender( void ) {
 	if ( NPC->client->ps.weaponTime || PM_InKnockDown( &NPC->client->ps ) ) {
 		return;
 	}

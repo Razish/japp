@@ -10,11 +10,6 @@
 #define LSTATE_CLEAR		0
 #define LSTATE_WAITING		1
 
-/*
--------------------------
-NPC_MineMonster_Precache
--------------------------
-*/
 void NPC_MineMonster_Precache( void ) {
 	int i;
 
@@ -24,12 +19,6 @@ void NPC_MineMonster_Precache( void ) {
 	}
 }
 
-
-/*
--------------------------
-MineMonster_Idle
--------------------------
-*/
 void MineMonster_Idle( void ) {
 	if ( UpdateGoal() ) {
 		ucmd.buttons &= ~BUTTON_WALKING;
@@ -37,12 +26,6 @@ void MineMonster_Idle( void ) {
 	}
 }
 
-
-/*
--------------------------
-MineMonster_Patrol
--------------------------
-*/
 void MineMonster_Patrol( void ) {
 	vector3 dif;
 
@@ -72,11 +55,6 @@ void MineMonster_Patrol( void ) {
 	}
 }
 
-/*
--------------------------
-MineMonster_Move
--------------------------
-*/
 void MineMonster_Move( qboolean visible ) {
 	if ( NPCInfo->localState != LSTATE_WAITING ) {
 		NPCInfo->goalEntity = NPC->enemy;
@@ -85,7 +63,6 @@ void MineMonster_Move( qboolean visible ) {
 	}
 }
 
-//---------------------------------------------------------
 void MineMonster_TryDamage( gentity_t *enemy, int damage ) {
 	vector3	end, dir;
 	trace_t	tr;
@@ -109,7 +86,6 @@ void MineMonster_TryDamage( gentity_t *enemy, int damage ) {
 	}
 }
 
-//------------------------------
 void MineMonster_Attack( void ) {
 	if ( !TIMER_Exists( NPC, "attacking" ) ) {
 		// usually try and play a jump attack if the player somehow got above them....or just really rarely
@@ -159,7 +135,6 @@ void MineMonster_Attack( void ) {
 	TIMER_Done2( NPC, "attacking", qtrue );
 }
 
-//----------------------------------
 void MineMonster_Combat( void ) {
 	float distance;
 	qboolean advance;
@@ -195,11 +170,6 @@ void MineMonster_Combat( void ) {
 	}
 }
 
-/*
--------------------------
-NPC_MineMonster_Pain
--------------------------
-*/
 void NPC_MineMonster_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	G_AddEvent( self, EV_PAIN, floorf( (float)self->health / self->client->pers.maxHealth*100.0f ) );
 
@@ -219,12 +189,6 @@ void NPC_MineMonster_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	}
 }
 
-
-/*
--------------------------
-NPC_BSMineMonster_Default
--------------------------
-*/
 void NPC_BSMineMonster_Default( void ) {
 	if ( NPC->enemy ) {
 		MineMonster_Combat();

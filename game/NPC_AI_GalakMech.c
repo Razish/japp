@@ -87,9 +87,7 @@ void NPC_GalakMech_Init( gentity_t *ent ) {
 
 }
 
-//-----------------------------------------------------------------
-static void GM_CreateExplosion( gentity_t *self, const int boltID, qboolean doSmall ) //doSmall = qfalse
-{
+static void GM_CreateExplosion( gentity_t *self, const int boltID, qboolean doSmall ) {
 	if ( boltID >= 0 ) {
 		mdxaBone_t	boltMatrix;
 		vector3		org, dir;
@@ -110,12 +108,6 @@ static void GM_CreateExplosion( gentity_t *self, const int boltID, qboolean doSm
 		}
 	}
 }
-
-/*
--------------------------
-GM_Dying
--------------------------
-*/
 
 void GM_Dying( gentity_t *self ) {
 	if ( level.time - self->s.time < 4000 ) {//FIXME: need a real effect
@@ -206,13 +198,7 @@ void GM_Dying( gentity_t *self ) {
 	}
 }
 
-/*
--------------------------
-NPC_GM_Pain
--------------------------
-*/
-
-extern void NPC_SetPainEvent( gentity_t *self );
+void NPC_SetPainEvent( gentity_t *self );
 void NPC_GM_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	vector3 point;
 	gentity_t *inflictor = attacker;
@@ -319,12 +305,6 @@ void NPC_GM_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	}
 }
 
-/*
--------------------------
-GM_HoldPosition
--------------------------
-*/
-
 static void GM_HoldPosition( void ) {
 	NPC_FreeCombatPoint( NPCInfo->combatPoint, qtrue );
 	if ( !trap->ICARUS_TaskIDPending( (sharedEntity_t *)NPC, TID_MOVE_NAV ) ) {//don't have a script waiting for me to get to my point, okay to stop trying and stand
@@ -332,11 +312,6 @@ static void GM_HoldPosition( void ) {
 	}
 }
 
-/*
--------------------------
-GM_Move
--------------------------
-*/
 static qboolean GM_Move( void ) {
 	qboolean moved;
 	navInfo_t info;
@@ -366,12 +341,6 @@ static qboolean GM_Move( void ) {
 	return moved;
 }
 
-/*
--------------------------
-NPC_BSGM_Patrol
--------------------------
-*/
-
 void NPC_BSGM_Patrol( void ) {
 	if ( NPC_CheckPlayerTeamStealth() ) {
 		NPC_UpdateAngles( qtrue, qtrue );
@@ -386,12 +355,6 @@ void NPC_BSGM_Patrol( void ) {
 
 	NPC_UpdateAngles( qtrue, qtrue );
 }
-
-/*
--------------------------
-GM_CheckMoveState
--------------------------
-*/
 
 static void GM_CheckMoveState( void ) {
 	if ( trap->ICARUS_TaskIDPending( (sharedEntity_t *)NPC, TID_MOVE_NAV ) ) {//moving toward a goal that a script is waiting on, so don't stop for anything!
@@ -410,12 +373,6 @@ static void GM_CheckMoveState( void ) {
 		}
 	}
 }
-
-/*
--------------------------
-GM_CheckFireState
--------------------------
-*/
 
 static void GM_CheckFireState( void ) {
 	if ( enemyCS4 ) {//if have a clear shot, always try
@@ -519,11 +476,6 @@ void GM_StartGloat( void ) {
 	NPC->client->ps.legsTimer += 500;
 	NPC->client->ps.torsoTimer += 500;
 }
-/*
--------------------------
-NPC_BSGM_Attack
--------------------------
-*/
 
 void NPC_BSGM_Attack( void ) {
 	//Don't do anything if we're hurt

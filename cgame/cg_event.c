@@ -25,22 +25,8 @@ extern int cg_siegeDeathDelay;
 extern int cg_vehicleAmmoWarning;
 extern int cg_vehicleAmmoWarningTime;
 
-//I know, not siege, but...
-typedef enum {
-	TAUNT_TAUNT = 0,
-	TAUNT_BOW,
-	TAUNT_MEDITATE,
-	TAUNT_FLOURISH,
-	TAUNT_GLOAT
-} tauntTypes_t;
-/*
-===================
-CG_PlaceString
-
-Also called by scoreboard drawing
-===================
-*/
-const char	*CG_PlaceString( int rank ) {
+// Also called by scoreboard drawing
+const char *CG_PlaceString( int rank ) {
 	static char str[64];
 	const char *s, *t;
 	// number extenstions, eg 1st, 2nd, 3rd, 4th etc.
@@ -79,11 +65,6 @@ const char	*CG_PlaceString( int rank ) {
 
 qboolean CG_ThereIsAMaster( void );
 
-/*
-=============
-CG_Obituary
-=============
-*/
 static void CG_Obituary( entityState_t *ent ) {
 	int				mod, target, attacker;
 	const char		*message, *targetInfo, *attackerInfo;
@@ -412,8 +393,6 @@ clientkilled:
 	trap->Print( "%s %s\n", targetName, (char *)CG_GetStringEdString( "MP_INGAME", "DIED_GENERIC" ) );
 }
 
-//==========================================================================
-
 void CG_ToggleBinoculars( centity_t *cent, int forceZoom ) {
 	if ( cent->currentState.number != cg.snap->ps.clientNum ) {
 		return;
@@ -461,11 +440,6 @@ void CG_LocalTimingBar( int startTime, int duration ) {
 	cg_genericTimerColor.a = 1.0f;
 }
 
-/*
-===============
-CG_UseItem
-===============
-*/
 static void CG_UseItem( centity_t *cent ) {
 	clientInfo_t *ci;
 	int			itemNum, clientNum;
@@ -530,13 +504,7 @@ static void CG_UseItem( centity_t *cent ) {
 }
 
 
-/*
-================
-CG_ItemPickup
-
-A new item was picked up this frame
-================
-*/
+// A new item was picked up this frame
 static void CG_ItemPickup( int itemNum ) {
 	cg.itemPickup = itemNum;
 	cg.itemPickupTime = cg.time;
@@ -609,14 +577,7 @@ static void CG_ItemPickup( int itemNum ) {
 	}
 }
 
-
-/*
-================
-CG_PainEvent
-
-Also called by playerstate transition
-================
-*/
+// Also called by playerstate transition
 void CG_PainEvent( centity_t *cent, int health ) {
 	const char *snd;
 
@@ -1138,18 +1099,12 @@ const char *CG_GetStringForVoiceSound( const char *s ) {
 	return "voice chat";
 }
 
-/*
-==============
-CG_EntityEvent
-
-An entity has an event value
-also called by CG_CheckPlayerstateEvents
-==============
-*/
 #define	DEBUGNAME(x) if(cg_debugEvents.integer){trap->Print(x"\n");}
 
 extern void CG_ChatBox_AddString( char *chatStr ); //cg_draw.c
 
+// An entity has an event value
+// also called by CG_CheckPlayerstateEvents
 void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 	entityState_t	*es;
 	int				event;
@@ -2491,11 +2446,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		}
 		break;
 
-		//=================================================================
-
-		//
 		// other events
-		//
 	case EV_PLAYER_TELEPORT_IN:
 		DEBUGNAME( "EV_PLAYER_TELEPORT_IN" );
 		{
@@ -2937,7 +2888,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		if ( es->saberEntityNum == TRACK_CHANNEL_2 || es->saberEntityNum == TRACK_CHANNEL_3 ||
 			es->saberEntityNum == TRACK_CHANNEL_5 ) { //channels 2 and 3 are for speed and rage, 5 for sight
 			if ( cgs.gameSounds[es->eventParm] ) {
-				CG_S_AddRealLoopingSound( es->number, &es->pos.trBase, &vec3_origin, cgs.gameSounds[es->eventParm] );
+				CG_S_AddLoopingSound( es->number, &es->pos.trBase, &vec3_origin, cgs.gameSounds[es->eventParm] );
 			}
 		}
 		else {
@@ -3136,7 +3087,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			isnd = CG_CustomSound( es->number, s );
 		}
 
-		CG_S_AddRealLoopingSound( es->number, &es->pos.trBase, &vec3_origin, isnd );
+		CG_S_AddLoopingSound( es->number, &es->pos.trBase, &vec3_origin, isnd );
 		es->loopSound = isnd;
 		break;
 
@@ -3190,13 +3141,6 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 
 }
 
-
-/*
-==============
-CG_CheckEvents
-
-==============
-*/
 void CG_CheckEvents( centity_t *cent ) {
 	// check for event-only entities
 	if ( cent->currentState.eType > ET_EVENTS ) {

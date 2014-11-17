@@ -2,8 +2,6 @@
 //
 #include "g_local.h"
 
-//==========================================================
-
 /*QUAKED target_give (1 0 0) (-8 -8 -8) (8 8 8)
 Gives the activator all the items pointed to.
 */
@@ -38,8 +36,6 @@ void SP_target_give( gentity_t *ent ) {
 }
 
 
-//==========================================================
-
 /*QUAKED target_remove_powerups (1 0 0) (-8 -8 -8) (8 8 8)
 takes away all the activators powerups.
 Used to drop flight powerups into death puts.
@@ -65,9 +61,6 @@ void Use_target_remove_powerups( gentity_t *ent, gentity_t *other, gentity_t *ac
 void SP_target_remove_powerups( gentity_t *ent ) {
 	ent->use = Use_target_remove_powerups;
 }
-
-
-//==========================================================
 
 /*QUAKED target_delay (1 0 0) (-8 -8 -8) (8 8 8) NO_RETRIGGER
 
@@ -103,9 +96,6 @@ void SP_target_delay( gentity_t *ent ) {
 	ent->use = Use_Target_Delay;
 }
 
-
-//==========================================================
-
 /*QUAKED target_score (1 0 0) (-8 -8 -8) (8 8 8)
 "count" number of points to add, default 1
 
@@ -121,9 +111,6 @@ void SP_target_score( gentity_t *ent ) {
 	}
 	ent->use = Use_Target_Score;
 }
-
-
-//==========================================================
 
 /*QUAKED target_print (1 0 0) (-8 -8 -8) (8 8 8) redteam blueteam private
 "message"	text to print
@@ -221,10 +208,6 @@ void SP_target_print( gentity_t *ent ) {
 	ent->use = Use_Target_Print;
 }
 
-
-//==========================================================
-
-
 /*QUAKED target_speaker (1 0 0) (-8 -8 -8) (8 8 8) looped-on looped-off global activator
 "noise"		wav file to play
 
@@ -320,10 +303,6 @@ void SP_target_speaker( gentity_t *ent ) {
 	trap->LinkEntity( (sharedEntity_t *)ent );
 }
 
-
-
-//==========================================================
-
 /*QUAKED target_laser (0 .5 .8) (-8 -8 -8) (8 8 8) START_ON
 When triggered, fires a laser.  You can either set a target or a direction.
 */
@@ -411,9 +390,6 @@ void SP_target_laser( gentity_t *self ) {
 	self->nextthink = level.time + FRAMETIME;
 }
 
-
-//==========================================================
-
 void target_teleporter_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	gentity_t	*dest;
 
@@ -440,9 +416,6 @@ void SP_target_teleporter( gentity_t *self ) {
 
 	self->use = target_teleporter_use;
 }
-
-//==========================================================
-
 
 /*QUAKED target_relay (.5 .5 .5) (-8 -8 -8) (8 8 8) RED_ONLY BLUE_ONLY RANDOM x x x x INACTIVE
 This doesn't perform any actions except fire its targets.
@@ -496,9 +469,6 @@ void SP_target_relay( gentity_t *self ) {
 		self->flags |= FL_INACTIVE;
 	}
 }
-
-
-//==========================================================
 
 /*QUAKED target_kill (.5 .5 .5) (-8 -8 -8) (8 8 8)
 Kills the activator.

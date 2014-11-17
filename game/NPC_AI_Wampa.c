@@ -33,33 +33,10 @@ void Wampa_SetBolts( gentity_t *self ) {
 	}
 }
 
-/*
--------------------------
-NPC_Wampa_Precache
--------------------------
-*/
 void NPC_Wampa_Precache( void ) {
-	/*
-	int i;
-	for ( i = 1; i < 4; i ++ )
-	{
-	G_SoundIndex( va("sound/chars/wampa/growl%d.wav", i) );
-	}
-	for ( i = 1; i < 3; i ++ )
-	{
-	G_SoundIndex( va("sound/chars/wampa/snort%d.wav", i) );
-	}
-	*/
 	G_SoundIndex( "sound/chars/rancor/swipehit.wav" );
-	//G_SoundIndex( "sound/chars/wampa/chomp.wav" );
 }
 
-
-/*
--------------------------
-Wampa_Idle
--------------------------
-*/
 void Wampa_Idle( void ) {
 	NPCInfo->localState = LSTATE_CLEAR;
 
@@ -79,11 +56,7 @@ qboolean Wampa_CheckRoar( gentity_t *self ) {
 	}
 	return qfalse;
 }
-/*
--------------------------
-Wampa_Patrol
--------------------------
-*/
+
 void Wampa_Patrol( void ) {
 	NPCInfo->localState = LSTATE_CLEAR;
 
@@ -106,11 +79,6 @@ void Wampa_Patrol( void ) {
 	TIMER_Set( NPC, "lookForNewEnemy", Q_irand( 5000, 15000 ) );
 }
 
-/*
--------------------------
-Wampa_Move
--------------------------
-*/
 void Wampa_Move( qboolean visible ) {
 	if ( NPCInfo->localState != LSTATE_WAITING ) {
 		NPCInfo->goalEntity = NPC->enemy;
@@ -147,10 +115,9 @@ void Wampa_Move( qboolean visible ) {
 	}
 }
 
-//---------------------------------------------------------
-extern void G_Knockdown( gentity_t *victim );
-extern void G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType, float limbRollBase, float limbPitchBase, int deathAnim, qboolean postDeath );
-extern int NPC_GetEntsNearBolt( int *radiusEnts, float radius, int boltIndex, vector3 *boltOrg );
+void G_Knockdown( gentity_t *victim );
+void G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType, float limbRollBase, float limbPitchBase, int deathAnim, qboolean postDeath );
+int NPC_GetEntsNearBolt( int *radiusEnts, float radius, int boltIndex, vector3 *boltOrg );
 
 void Wampa_Slash( int boltIndex, qboolean backhand ) {
 	int			radiusEntNums[128];
@@ -227,7 +194,6 @@ void Wampa_Slash( int boltIndex, qboolean backhand ) {
 	}
 }
 
-//------------------------------
 void Wampa_Attack( float distance, qboolean doCharge ) {
 	if ( !TIMER_Exists( NPC, "attacking" ) ) {
 		if ( Q_irand( 0, 2 ) && !doCharge ) {//double slash
@@ -298,7 +264,6 @@ void Wampa_Attack( float distance, qboolean doCharge ) {
 	}
 }
 
-//----------------------------------
 void Wampa_Combat( void ) {
 	// If we cannot see our target or we have somewhere to go, then do that
 	if ( !NPC_ClearLOS( &NPC->r.currentOrigin, &NPC->enemy->r.currentOrigin ) ) {
@@ -368,11 +333,6 @@ void Wampa_Combat( void ) {
 	}
 }
 
-/*
--------------------------
-NPC_Wampa_Pain
--------------------------
-*/
 void NPC_Wampa_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	qboolean hitByWampa = qfalse;
 	if ( attacker&&attacker->client&&attacker->client->NPC_class == CLASS_WAMPA ) {
@@ -429,11 +389,6 @@ void NPC_Wampa_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	}
 }
 
-/*
--------------------------
-NPC_BSWampa_Default
--------------------------
-*/
 void NPC_BSWampa_Default( void ) {
 	NPC->client->ps.eFlags2 &= ~EF2_USE_ALT_ANIM;
 	//NORMAL ANIMS

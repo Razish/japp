@@ -69,13 +69,6 @@ void NPC_Sniper_PlayConfusionSound( gentity_t *self ) {//FIXME: make this a cust
 	self->NPC->investigateCount = 0;
 }
 
-
-/*
--------------------------
-NPC_ST_Pain
--------------------------
-*/
-
 void NPC_Sniper_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	self->NPC->localState = LSTATE_UNDERFIRE;
 
@@ -89,12 +82,6 @@ void NPC_Sniper_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	}
 }
 
-/*
--------------------------
-ST_HoldPosition
--------------------------
-*/
-
 static void Sniper_HoldPosition( void ) {
 	NPC_FreeCombatPoint( NPCInfo->combatPoint, qtrue );
 	NPCInfo->goalEntity = NULL;
@@ -105,12 +92,6 @@ static void Sniper_HoldPosition( void ) {
 	}
 	*/
 }
-
-/*
--------------------------
-ST_Move
--------------------------
-*/
 
 static qboolean Sniper_Move( void ) {
 	qboolean	moved;
@@ -158,12 +139,6 @@ static qboolean Sniper_Move( void ) {
 
 	return moved;
 }
-
-/*
--------------------------
-NPC_BSSniper_Patrol
--------------------------
-*/
 
 void NPC_BSSniper_Patrol( void ) {//FIXME: pick up on bodies of dead buddies?
 	NPC->count = 0;
@@ -242,37 +217,6 @@ void NPC_BSSniper_Patrol( void ) {//FIXME: pick up on bodies of dead buddies?
 
 	NPC_UpdateAngles( qtrue, qtrue );
 }
-
-/*
--------------------------
-NPC_BSSniper_Idle
--------------------------
-*/
-/*
-void NPC_BSSniper_Idle( void )
-{
-//reset our shotcount
-NPC->count = 0;
-
-//FIXME: check for other alert events?
-
-//Is there danger nearby?
-if ( NPC_CheckForDanger( NPC_CheckAlertEvents( qtrue, qtrue ) ) )
-{
-NPC_UpdateAngles( qtrue, qtrue );
-return;
-}
-
-TIMER_Set( NPC, "roamTime", 2000 + Q_irand( 1000, 2000 ) );
-
-NPC_UpdateAngles( qtrue, qtrue );
-}
-*/
-/*
--------------------------
-ST_CheckMoveState
--------------------------
-*/
 
 static void Sniper_CheckMoveState( void ) {
 	//See if we're a scout
@@ -381,12 +325,6 @@ static void Sniper_ResolveBlockedShot( void ) {
 	TIMER_Set( NPC, "attackDelay", Q_irand( 1000, 3000 ) );
 	*/
 }
-
-/*
--------------------------
-ST_CheckFireState
--------------------------
-*/
 
 static void Sniper_CheckFireState( void ) {
 	if ( enemyCS2 ) {//if have a clear shot, always try
@@ -540,12 +478,6 @@ void Sniper_UpdateEnemyPos( void ) {
 		}
 	}
 }
-
-/*
--------------------------
-NPC_BSSniper_Attack
--------------------------
-*/
 
 void Sniper_StartHide( void ) {
 	int duckTime = Q_irand( 2000, 5000 );

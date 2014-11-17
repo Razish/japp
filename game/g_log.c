@@ -96,11 +96,6 @@ extern char	*modNames[];
 
 #endif //LOGGING_WEAPONS
 
-/*
-=================
-G_LogWeaponInit
-=================
-*/
 void G_LogWeaponInit( void ) {
 #ifdef LOGGING_WEAPONS
 	memset( G_WeaponLogPickups, 0, sizeof(G_WeaponLogPickups) );
@@ -813,10 +808,9 @@ qboolean CalculateUntouchable( gentity_t *ent ) {
 	if ( level.gametype == GT_JEDIMASTER && ent->client->ps.isJediMaster ) {//Jedi Master (was Borg queen) can only be killed once anyway
 		return qfalse;
 	}
-	//------------------------------------------------------ MUST HAVE ACHIEVED 2 KILLS PER MINUTE
+	// MUST HAVE ACHIEVED 2 KILLS PER MINUTE
 	if ( ((float)ent->client->ps.persistant[PERS_SCORE]) / ((float)(playTime)) < 2.0f || playTime == 0 )
 		return qfalse;
-	//------------------------------------------------------ MUST HAVE ACHIEVED 2 KILLS PER MINUTE
 
 
 	// if this guy was never killed...  Award Away!!!
@@ -890,18 +884,17 @@ qboolean CalculateTactician( gentity_t *ent, int *kills ) {
 	if ( level.gametype == GT_JEDIMASTER && ent->client->ps.isJediMaster ) {//Jedi Master (was Borg queen) has only 1 weapon
 		return qfalse;
 	}
-	//------------------------------------------------------ MUST HAVE ACHIEVED 2 KILLS PER MINUTE
+	// MUST HAVE ACHIEVED 2 KILLS PER MINUTE
 	if ( playTime < 0.3f )
 		return qfalse;
 
 	if ( ((float)ent->client->ps.persistant[PERS_SCORE]) / ((float)(playTime)) < 2.0f )
 		return qfalse;
-	//------------------------------------------------------ MUST HAVE ACHIEVED 2 KILLS PER MINUTE
 
 
 
 
-	//------------------------------------------------------ FOR EVERY WEAPON, ADD UP TOTAL PICKUPS
+	// FOR EVERY WEAPON, ADD UP TOTAL PICKUPS
 	for ( weapon = 0; weapon < WP_NUM_WEAPONS; weapon++ )
 		wasPickedUpBySomeone[weapon] = 0;				// CLEAR
 
@@ -911,12 +904,8 @@ qboolean CalculateTactician( gentity_t *ent, int *kills ) {
 				wasPickedUpBySomeone[weapon]++;
 		}
 	}
-	//------------------------------------------------------ FOR EVERY WEAPON, ADD UP TOTAL PICKUPS
 
-
-
-
-	//------------------------------------------------------ FOR EVERY PERSON, CHECK FOR CANDIDATE
+	// FOR EVERY PERSON, CHECK FOR CANDIDATE
 	for ( person = 0; person < sv_maxclients.integer; person++ ) {
 		player = g_entities + person;
 		if ( !player->inuse )			continue;
@@ -949,7 +938,6 @@ qboolean CalculateTactician( gentity_t *ent, int *kills ) {
 			nBestPlayer = person;
 		}
 	}
-	//------------------------------------------------------ FOR EVERY PERSON, CHECK FOR CANDIDATE
 
 	//Now, if we are the best player, return true and the number of kills we got
 	if ( nBestPlayer == ent->s.number ) {
@@ -1459,9 +1447,7 @@ int GetFavoriteWeaponForClient( int nClient ) {
 	int	killsWithWeapon[WP_NUM_WEAPONS];
 
 
-	// First thing we need to do is cycle through all the MOD types and convert
-	// number of kills to a single weapon.
-	//----------------------------------------------------------------
+	// First thing we need to do is cycle through all the MOD types and convert number of kills to a single weapon.
 	for ( weapon = 0; weapon < WP_NUM_WEAPONS; weapon++ )
 		killsWithWeapon[weapon] = 0;					// CLEAR
 
@@ -1474,7 +1460,6 @@ int GetFavoriteWeaponForClient( int nClient ) {
 	}
 
 	// now look through our list of kills per weapon and pick the biggest
-	//----------------------------------------------------------------
 	nMostKills = 0;
 	for ( weapon = WP_STUN_BATON; weapon<WP_NUM_WEAPONS; weapon++ ) {
 		if ( killsWithWeapon[weapon]>nMostKills ) {

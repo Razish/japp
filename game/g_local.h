@@ -279,9 +279,7 @@ struct gentity_s {
 	int					failedWaypoints[MAX_FAILED_NODES];
 	int					failedWaypointCheckTime;
 	int					next_roff_time;
-	// DO NOT MODIFY ANYTHING ABOVE THIS, THE SERVER
-	// EXPECTS THE FIELDS IN THAT ORDER!
-	//================================
+	// DO NOT MODIFY ANYTHING ABOVE THIS, THE SERVER EXPECTS THE FIELDS IN THAT ORDER!
 
 	struct gclient_s	*client;			// NULL if not a client
 	gNPC_t				*NPC;//Only allocated if the entity becomes an NPC

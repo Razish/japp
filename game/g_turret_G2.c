@@ -181,10 +181,7 @@ void turretG2_set_models( gentity_t *self, qboolean dying ) {
 	}
 }
 
-//------------------------------------------------------------------------------------------------------------
-void TurretG2Pain( gentity_t *self, gentity_t *attacker, int damage )
-//------------------------------------------------------------------------------------------------------------
-{
+void TurretG2Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	if ( self->paintarget && self->paintarget[0] ) {
 		if ( self->genericValue8 < level.time ) {
 			G_UseTargets2( self, self, self->paintarget );
@@ -203,10 +200,7 @@ void TurretG2Pain( gentity_t *self, gentity_t *attacker, int damage )
 	//mmm..yes..bad.
 }
 
-//------------------------------------------------------------------------------------------------------------
-void turretG2_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
-//------------------------------------------------------------------------------------------------------------
-{
+void turretG2_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
 	vector3	forward = { 0, 0, -1 }, pos;
 
 	// Turn off the thinking of the base & use it's targets
@@ -291,11 +285,9 @@ void TurboLaser_SetBoneAnim( gentity_t *eweb, int startFrame, int endFrame ) {
 		(BONE_ANIM_OVERRIDE_FREEZE | BONE_ANIM_BLEND), 1.0f, level.time, -1, 100 );
 }
 
-extern void WP_FireTurboLaserMissile( gentity_t *ent, vector3 *start, vector3 *dir );
-//----------------------------------------------------------------
-static void turretG2_fire( gentity_t *ent, vector3 *start, vector3 *dir )
-//----------------------------------------------------------------
-{
+void WP_FireTurboLaserMissile( gentity_t *ent, vector3 *start, vector3 *dir );
+
+static void turretG2_fire( gentity_t *ent, vector3 *start, vector3 *dir ) {
 	vector3		org, ang;
 	gentity_t	*bolt;
 
@@ -377,10 +369,7 @@ void turretG2_respawn( gentity_t *self ) {
 	self->genericValue5 = 0;//clear this now
 }
 
-//-----------------------------------------------------
-void turretG2_head_think( gentity_t *self )
-//-----------------------------------------------------
-{
+void turretG2_head_think( gentity_t *self ) {
 	// if it's time to fire and we have an enemy, then gun 'em down!  pushDebounce time controls next fire time
 	if ( self->enemy
 		&& self->setTime < level.time
@@ -421,10 +410,7 @@ void turretG2_head_think( gentity_t *self )
 	}
 }
 
-//-----------------------------------------------------
-static void turretG2_aim( gentity_t *self )
-//-----------------------------------------------------
-{
+static void turretG2_aim( gentity_t *self ) {
 	vector3	enemyDir, org, org2;
 	vector3	desiredAngles, setAngle;
 	float	diffYaw = 0.0f, diffPitch = 0.0f;
@@ -537,10 +523,7 @@ static void turretG2_aim( gentity_t *self )
 		self->s.loopSound = 0;
 }
 
-//-----------------------------------------------------
-static void turretG2_turnoff( gentity_t *self )
-//-----------------------------------------------------
-{
+static void turretG2_turnoff( gentity_t *self ) {
 	if ( self->enemy == NULL ) {
 		// we don't need to turnoff
 		return;
@@ -560,10 +543,7 @@ static void turretG2_turnoff( gentity_t *self )
 	self->enemy = NULL;
 }
 
-//-----------------------------------------------------
-static qboolean turretG2_find_enemies( gentity_t *self )
-//-----------------------------------------------------
-{
+static qboolean turretG2_find_enemies( gentity_t *self ) {
 	qboolean	found = qfalse;
 	int			i, count;
 	float		bestDist = self->radius * self->radius;
@@ -685,10 +665,7 @@ static qboolean turretG2_find_enemies( gentity_t *self )
 	return found;
 }
 
-//-----------------------------------------------------
-void turretG2_base_think( gentity_t *self )
-//-----------------------------------------------------
-{
+void turretG2_base_think( gentity_t *self ) {
 	qboolean	turnOff = qtrue;
 	float		enemyDist;
 	vector3		enemyDir, org, org2;
@@ -789,10 +766,7 @@ void turretG2_base_think( gentity_t *self )
 	}
 }
 
-//-----------------------------------------------------------------------------
-void turretG2_base_use( gentity_t *self, gentity_t *other, gentity_t *activator )
-//-----------------------------------------------------------------------------
-{
+void turretG2_base_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	// Toggle on and off
 	self->spawnflags = (self->spawnflags ^ 1);
 
@@ -858,10 +832,8 @@ customscale - custom scaling size. 100 is normal size, 1024 is the max scaling. 
 
 "icon" - icon that represents the objective on the radar
 */
-//-----------------------------------------------------
-void SP_misc_turretG2( gentity_t *base )
-//-----------------------------------------------------
-{
+
+void SP_misc_turretG2( gentity_t *base ) {
 	int customscaleVal;
 	char* s;
 
@@ -907,7 +879,6 @@ void SP_misc_turretG2( gentity_t *base )
 #undef name3
 }
 
-//-----------------------------------------------------
 void finish_spawning_turretG2( gentity_t *base ) {
 	vector3		fwd;
 	int			t;

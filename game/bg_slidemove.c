@@ -497,14 +497,9 @@ qboolean PM_ClientImpact( trace_t *trace ) {
 	return qfalse;
 }
 
-/*
-==================
-PM_SlideMove
-
-Returns qtrue if the velocity was clipped in some way
-==================
-*/
 #define	MAX_CLIP_PLANES	5
+
+// Returns qtrue if the velocity was clipped in some way
 qboolean PM_SlideMove( qboolean gravity ) {
 	int bumpcount, numbumps;
 	vector3 dir;

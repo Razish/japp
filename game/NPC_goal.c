@@ -2,10 +2,7 @@
 #include "b_local.h"
 #include "ICARUS/Q3_Interface.h"
 
-extern qboolean FlyingCreature( gentity_t *ent );
-/*
-SetGoal
-*/
+qboolean FlyingCreature( gentity_t *ent );
 
 void SetGoal( gentity_t *goal, float rating ) {
 	NPCInfo->goalEntity = goal;
@@ -19,11 +16,6 @@ void SetGoal( gentity_t *goal, float rating ) {
 		//		Debug_NPCPrintf( NPC, d_npcai, DEBUG_LEVEL_INFO, "NPC_SetGoal: NONE\n" );
 	}
 }
-
-
-/*
-NPC_SetGoal
-*/
 
 void NPC_SetGoal( gentity_t *goal, float rating ) {
 	if ( goal == NPCInfo->goalEntity ) {
@@ -49,11 +41,6 @@ void NPC_SetGoal( gentity_t *goal, float rating ) {
 	SetGoal( goal, rating );
 }
 
-
-/*
-NPC_ClearGoal
-*/
-
 void NPC_ClearGoal( void ) {
 	gentity_t	*goal;
 
@@ -73,12 +60,6 @@ void NPC_ClearGoal( void ) {
 
 	SetGoal( NULL, 0.0f );
 }
-
-/*
--------------------------
-G_BoundsOverlap
--------------------------
-*/
 
 qboolean G_BoundsOverlap( const vector3 *mins1, const vector3 *maxs1, const vector3 *mins2, const vector3 *maxs2 ) {//NOTE: flush up against counts as overlapping
 	if ( mins1->x > maxs2->x ||

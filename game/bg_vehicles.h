@@ -21,9 +21,6 @@ typedef enum {
 
 extern stringID_table_t VehicleTable[VH_NUM_VEHICLES + 1];
 
-//===========================================================================================================
-//START VEHICLE WEAPONS
-//===========================================================================================================
 typedef struct vehWeaponInfo_s {
 	//*** IMPORTANT!!! *** the number of variables in the vehWeaponStats_t struct (including all elements of arrays) must be reflected by NUM_VWEAP_PARMS!!!
 	//*** IMPORTANT!!! *** vWeapFields table correponds to this structure!
@@ -64,10 +61,6 @@ typedef struct vehWeaponInfo_s {
 
 extern vehWeaponInfo_t g_vehWeaponInfo[MAX_VEH_WEAPONS];
 extern int	numVehicleWeapons;
-
-//===========================================================================================================
-//END VEHICLE WEAPONS
-//===========================================================================================================
 
 #define		MAX_VEHICLE_MUZZLES			12
 #define		MAX_VEHICLE_EXHAUSTS		12
@@ -434,7 +427,6 @@ typedef struct vehicleInfo_s {
 
 	//NOTE: some info on what vehicle weapon to use?  Like ATST or TIE bomber or TIE fighter or X-Wing...?
 
-	//===VEH_PARM_MAX========================================================================
 	//*** IMPORTANT!!! *** vehFields table correponds to this structure!
 
 	//THE FOLLOWING FIELDS are not in the vehFields table because they are internal variables, not read in from the .veh file

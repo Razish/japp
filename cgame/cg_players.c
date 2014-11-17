@@ -6581,10 +6581,8 @@ static void CG_VehicleEffects( centity_t *cent ) {
 						}
 					}
 				}
-				//=====================================================================
-				//WING TRAIL FX
-				//=====================================================================
-				//do trail
+				// WING TRAIL FX
+				// do trail
 				//FIXME: not in space!!!
 				if ( pVehNPC->m_pVehicleInfo->iTrailFX != 0 && cent->ghoul2 ) {
 					int i;

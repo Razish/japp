@@ -28,12 +28,6 @@ extern int killPlayerTimer;
 //int g_crosshairEntNum = ENTITYNUM_NONE;
 //int g_crosshairEntTime = 0;
 
-/*
--------------------------
-NPC_CheckAttacker
--------------------------
-*/
-
 static void NPC_CheckAttacker( gentity_t *other, int mod ) {
 	//FIXME: I don't see anything in here that would stop teammates from taking a teammate
 	//			as an enemy.  Ideally, there would be code before this to prevent that from
@@ -128,12 +122,6 @@ void NPC_SetPainEvent( gentity_t *self ) {
 	}
 }
 
-/*
--------------------------
-NPC_GetPainChance
--------------------------
-*/
-
 float NPC_GetPainChance( gentity_t *self, int damage ) {
 	float pain_chance;
 	if ( !self->enemy ) {//surprised, always take pain
@@ -169,12 +157,6 @@ float NPC_GetPainChance( gentity_t *self, int damage ) {
 	//Com_Printf( "%s: %4.2f\n", self->NPC_type, pain_chance );
 	return pain_chance;
 }
-
-/*
--------------------------
-NPC_ChoosePainAnimation
--------------------------
-*/
 
 #define	MIN_PAIN_TIME	200
 
@@ -306,11 +288,6 @@ void NPC_ChoosePainAnimation( gentity_t *self, gentity_t *other, vector3 *point,
 	}
 }
 
-/*
-===============
-NPC_Pain
-===============
-*/
 void NPC_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	npcteam_t otherTeam = NPCTEAM_FREE;
 	int		voiceEvent = -1;
@@ -456,12 +433,8 @@ void NPC_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	RestoreNPCGlobals();
 }
 
-/*
--------------------------
-NPC_Touch
--------------------------
-*/
-extern qboolean INV_SecurityKeyGive( gentity_t *target, const char *keyname );
+qboolean INV_SecurityKeyGive( gentity_t *target, const char *keyname );
+
 void NPC_Touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	if ( !self->NPC )
 		return;
@@ -564,12 +537,6 @@ void NPC_Touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 
 	RestoreNPCGlobals();
 }
-
-/*
--------------------------
-NPC_TempLookTarget
--------------------------
-*/
 
 void NPC_TempLookTarget( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime ) {
 	if ( !self->client ) {
@@ -796,12 +763,6 @@ void NPC_Respond( gentity_t *self, int userNum ) {
 	}
 }
 
-/*
--------------------------
-NPC_UseResponse
--------------------------
-*/
-
 void NPC_UseResponse( gentity_t *self, gentity_t *user, qboolean useWhenDone ) {
 	if ( !self->NPC || !self->client ) {
 		return;
@@ -844,12 +805,7 @@ void NPC_UseResponse( gentity_t *self, gentity_t *user, qboolean useWhenDone ) {
 	}
 }
 
-/*
--------------------------
-NPC_Use
--------------------------
-*/
-extern void Add_Batteries( gentity_t *ent, int *count );
+void Add_Batteries( gentity_t *ent, int *count );
 
 void NPC_Use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	if ( self->client->ps.pm_type == PM_DEAD ) {//or just remove ->pain in player_die?

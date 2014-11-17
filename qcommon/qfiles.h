@@ -14,13 +14,7 @@
 // the maximum size of game relative pathnames
 #define	MAX_QPATH		64
 
-/*
-========================================================================
-
-QVM files
-
-========================================================================
-*/
+// QVM files
 
 #define	VM_MAGIC	0x12721444
 typedef struct vmHeader_s {
@@ -38,13 +32,7 @@ typedef struct vmHeader_s {
 } vmHeader_t;
 
 
-/*
-========================================================================
-
-PCX files are used for 8 bit images
-
-========================================================================
-*/
+// PCX files are used for 8 bit images
 
 typedef struct pcx_s {
 	char	manufacturer;
@@ -63,13 +51,7 @@ typedef struct pcx_s {
 } pcx_t;
 
 
-/*
-========================================================================
-
-TGA files are used for 24/32 bit images
-
-========================================================================
-*/
+// TGA files are used for 24/32 bit images
 
 typedef struct _TargaHeader {
 	unsigned char 	id_length, colormap_type, image_type;
@@ -79,15 +61,7 @@ typedef struct _TargaHeader {
 	unsigned char	pixel_size, attributes;
 } TargaHeader;
 
-
-
-/*
-========================================================================
-
-.MD3 triangle model file format
-
-========================================================================
-*/
+// .MD3 triangle model file format
 
 #define MD3_IDENT			(('3'<<24)+('P'<<16)+('D'<<8)+'I')
 #define MD3_VERSION			15
@@ -187,15 +161,7 @@ typedef struct md3Header_s {
 	int			ofsEnd;				// end of file
 } md3Header_t;
 
-
-/*
-==============================================================================
-
-.BSP file format
-
-==============================================================================
-*/
-
+// .BSP file format
 
 // little-endian "RBSP"
 #define BSP_IDENT				(('P'<<24)+('S'<<16)+('B'<<8)+'R')
@@ -240,8 +206,6 @@ typedef struct md3Header_s {
 
 #define	LIGHTMAP_WIDTH		128
 #define	LIGHTMAP_HEIGHT		128
-
-//=============================================================================
 
 typedef struct lump_s {
 	int		fileofs, filelen;

@@ -1,13 +1,12 @@
-#include "g_headers.h"
 #include "bg_vehicles.h"
 #include "b_local.h"
 #include "Ghoul2/G2.h"
 
 void WP_CalcVehMuzzle( gentity_t *ent, int muzzleNum );
-gentity_t *WP_FireVehicleWeapon( gentity_t *ent, vector3 *start, vector3 *dir, vehWeaponInfo_t *vehWeapon, qboolean alt_fire, qboolean isTurretWeap );
+gentity_t *WP_FireVehicleWeapon( gentity_t *ent, vector3 *start, vector3 *dir, vehWeaponInfo_t *vehWeapon,
+	qboolean alt_fire, qboolean isTurretWeap );
+void G_VehMuzzleFireFX( gentity_t *ent, gentity_t *broadcaster, int muzzlesFired );
 
-extern void G_VehMuzzleFireFX( gentity_t *ent, gentity_t *broadcaster, int muzzlesFired );
-//-----------------------------------------------------
 void VEH_TurretCheckFire( Vehicle_t *pVeh,
 	gentity_t *parent,
 	//gentity_t *turretEnemy,
@@ -75,14 +74,8 @@ void VEH_TurretAnglesToEnemy( Vehicle_t *pVeh, int curMuzzle, float fSpeed, gent
 	vectoangles( &enemyDir, desiredAngles );
 }
 
-//-----------------------------------------------------
-qboolean VEH_TurretAim( Vehicle_t *pVeh,
-	gentity_t *parent,
-	gentity_t *turretEnemy,
-	turretStats_t *turretStats,
-	vehWeaponInfo_t *vehWeapon,
-	int turretNum, int curMuzzle, vector3 *desiredAngles )
-	//-----------------------------------------------------
+qboolean VEH_TurretAim( Vehicle_t *pVeh, gentity_t *parent, gentity_t *turretEnemy, turretStats_t *turretStats,
+	vehWeaponInfo_t *vehWeapon, int turretNum, int curMuzzle, vector3 *desiredAngles )
 {
 	vector3	curAngles, addAngles, newAngles, yawAngles, pitchAngles;
 	float	aimCorrect = qfalse;
@@ -168,12 +161,8 @@ qboolean VEH_TurretAim( Vehicle_t *pVeh,
 	return aimCorrect;
 }
 
-//-----------------------------------------------------
-static qboolean VEH_TurretFindEnemies( Vehicle_t *pVeh,
-	gentity_t *parent,
-	turretStats_t *turretStats,
-	int turretNum, int curMuzzle )
-	//-----------------------------------------------------
+static qboolean VEH_TurretFindEnemies( Vehicle_t *pVeh, gentity_t *parent, turretStats_t *turretStats, int turretNum,
+	int curMuzzle )
 {
 	qboolean	found = qfalse;
 	int			i, count;
@@ -282,9 +271,7 @@ void VEH_TurretObeyPassengerControl( Vehicle_t *pVeh, gentity_t *parent, int tur
 	}
 }
 
-void VEH_TurretThink( Vehicle_t *pVeh, gentity_t *parent, int turretNum )
-//-----------------------------------------------------
-{
+void VEH_TurretThink( Vehicle_t *pVeh, gentity_t *parent, int turretNum ) {
 	qboolean	doAim = qfalse;
 	float		enemyDist, rangeSq;
 	vector3		enemyDir;

@@ -56,7 +56,6 @@ float NPC_GetPainChance( gentity_t *self, int damage );
 void Debug_Printf( vmCvar_t *cv, int level, const char *fmt, ... );
 void Debug_NPCPrintf( gentity_t *printNPC, vmCvar_t *cv, int debugLevel, const char *fmt, ... );
 
-//MCG - Begin============================================================
 //NPC_ai variables - shared by NPC.cpp andf the following modules
 extern gentity_t	*NPC;
 extern gNPC_t		*NPCInfo;
@@ -202,13 +201,9 @@ float IdealDistance( gentity_t *self );
 //g_squad
 void NPC_SetSayState( gentity_t *self, gentity_t *to, int saying );
 
-//MCG - End============================================================
-
 // NPC.cpp
 void NPC_SetAnim( gentity_t *ent, int type, int anim, uint32_t setAnimFlags );
 qboolean NPC_EnemyTooFar( gentity_t *enemy, float dist, qboolean toShoot );
-
-// ==================================================================
 
 //rww - special system for sync'ing bone angles between client and server.
 void NPC_SetBoneAngles( gentity_t *ent, const char *bone, vector3 *angles );
@@ -292,12 +287,6 @@ qboolean NPC_FaceEnemy( qboolean doPitch ); //doPitch = qtrue
 #define	NIF_MACRO_NAV	(0x0002u)	//using macro navigation
 #define	NIF_COLLISION	(0x0004u)	//resolving collision with an entity
 #define NIF_BLOCKED		(0x0008u)	//blocked from moving
-
-/*
--------------------------
-struct navInfo_s
--------------------------
-*/
 
 typedef struct navInfo_s {
 	gentity_t	*blocker;

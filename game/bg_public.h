@@ -245,17 +245,8 @@ typedef enum directions_e {
 	NUM_DIRECTIONS
 } directions_t;
 
-/*
-===================================================================================
-
-PMOVE MODULE
-
-The pmove code takes a player_state_t and a usercmd_t and generates a new player_state_t
-and some other output data.  Used for local prediction on the client game and true
-movement on the server game.
-===================================================================================
-*/
-
+// The pmove code takes a player_state_t and a usercmd_t and generates a new player_state_t and some other output data.
+//	Used for local prediction on the client game and true movement on the server game.
 
 #pragma pack(push, 1)
 typedef struct animation_s {
@@ -528,9 +519,6 @@ extern	pmove_t		*pm;
 // if a full pmove isn't done on the client, you can just update the angles
 void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd );
 void Pmove( pmove_t *pmove );
-
-
-//===================================================================================
 
 
 // player_state->stats[] indexes
@@ -1088,9 +1076,6 @@ typedef enum {
 	MOD_MAX
 } meansOfDeath_t;
 
-
-//---------------------------------------------------------
-
 // gitem_t->type
 typedef enum itemType_e {
 	IT_BAD,
@@ -1251,8 +1236,13 @@ typedef struct BG_field_s {
 
 #endif
 
-
-
+typedef enum tauntTypes_e {
+	TAUNT_TAUNT = 0,
+	TAUNT_BOW,
+	TAUNT_MEDITATE,
+	TAUNT_FLOURISH,
+	TAUNT_GLOAT
+} tauntTypes_t;
 
 // Okay, here lies the much-dreaded Pat-created FSM movement chart...  Heretic II strikes again!
 // Why am I inflicting this on you?  Well, it's better than hardcoded states.

@@ -6,11 +6,10 @@
 
 extern qboolean NPCsPrecached;
 
-extern qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber );
-extern void WP_RemoveSaber( saberInfo_t *sabers, int saberNum );
+qboolean WP_SaberParseParms( const char *SaberName, saberInfo_t *saber );
+void WP_RemoveSaber( saberInfo_t *sabers, int saberNum );
 
-stringID_table_t TeamTable[] =
-{
+const stringID_table_t TeamTable[] = {
 	ENUM2STRING( NPCTEAM_FREE ),			// caution, some code checks a team_t via "if (!team_t_varname)" so I guess this should stay as entry 0, great or what? -slc
 	ENUM2STRING( NPCTEAM_PLAYER ),
 	ENUM2STRING( NPCTEAM_ENEMY ),
@@ -19,8 +18,7 @@ stringID_table_t TeamTable[] =
 };
 
 // this list was made using the model directories, this MUST be in the same order as the CLASS_ enum in teams.h
-stringID_table_t ClassTable[] =
-{
+const stringID_table_t ClassTable[] = {
 	ENUM2STRING( CLASS_NONE ),				// hopefully this will never be used by an npc), just covering all bases
 	ENUM2STRING( CLASS_ATST ),				// technically droid...
 	ENUM2STRING( CLASS_BARTENDER ),
@@ -1016,7 +1014,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 			if ( !Q_stricmp( token, "}" ) ) {
 				break;
 			}
-			//===MODEL PROPERTIES===========================================================
+			// MODEL PROPERTIES
 			// custom color
 			if ( !Q_stricmp( token, "customRGBA" ) ) {
 				if ( COM_ParseString( &p, &value ) ) {
@@ -1328,7 +1326,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 				continue;
 			}
 
-			//===AI STATS=====================================================================
+			// AI STATS
 			if ( !parsingPlayer ) {
 				// aggression
 				if ( !Q_stricmp( token, "aggression" ) ) {
@@ -1698,7 +1696,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 				continue;
 			}
 
-			//===MOVEMENT STATS============================================================
+			// MOVEMENT STATS
 
 			if ( !Q_stricmp( token, "width" ) ) {
 				if ( COM_ParseInt( &p, &n ) ) {
@@ -1838,7 +1836,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 					SkipRestOfLine( &p );
 					continue;
 				}
-				//===MISC===============================================================================
+				// MISC
 				// default behavior
 				if ( !Q_stricmp( token, "behavior" ) ) {
 					if ( COM_ParseInt( &p, &n ) ) {

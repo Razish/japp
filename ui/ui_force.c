@@ -1,13 +1,3 @@
-//
-/*
-=======================================================================
-
-FORCE INTERFACE
-
-=======================================================================
-*/
-
-// use this to get a demo build without an explicit demo build, i.e. to get the demo ui files to build
 #include "ui_local.h"
 #include "qcommon/qfiles.h"
 #include "ui_force.h"
@@ -961,11 +951,6 @@ int gCustPowersRank[NUM_FORCE_POWERS] = {
 	0//FP_SABERTHROW,
 };
 
-/*
-=================
-UI_ForceConfigHandle
-=================
-*/
 void UI_ForceConfigHandle( int oldindex, int newindex ) {
 	fileHandle_t f;
 	int len = 0;

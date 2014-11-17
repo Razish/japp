@@ -25,11 +25,6 @@ enum {
 	LSTATE_ATTACKING,
 };
 
-/*
--------------------------
-NPC_Sentry_Precache
--------------------------
-*/
 void NPC_Sentry_Precache( void ) {
 	int i;
 
@@ -50,11 +45,6 @@ void NPC_Sentry_Precache( void ) {
 	RegisterItem( BG_FindItemForAmmo( AMMO_BLASTER ) );
 }
 
-/*
-================
-sentry_use
-================
-*/
 void sentry_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	G_ActivateBehavior( self, BSET_USE );
 
@@ -64,11 +54,6 @@ void sentry_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	self->NPC->localState = LSTATE_ACTIVE;
 }
 
-/*
--------------------------
-NPC_Sentry_Pain
--------------------------
-*/
 void NPC_Sentry_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	int mod = gPainMOD;
 
@@ -95,11 +80,6 @@ void NPC_Sentry_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	//	}
 }
 
-/*
--------------------------
-Sentry_Fire
--------------------------
-*/
 void Sentry_Fire( void ) {
 	vector3	muzzle;
 	static	vector3	forward, vright, up;
@@ -184,11 +164,6 @@ void Sentry_Fire( void ) {
 	}
 }
 
-/*
--------------------------
-Sentry_MaintainHeight
--------------------------
-*/
 void Sentry_MaintainHeight( void ) {
 	float	dif;
 
@@ -268,11 +243,6 @@ void Sentry_MaintainHeight( void ) {
 	NPC_FaceEnemy( qtrue );
 }
 
-/*
--------------------------
-Sentry_Idle
--------------------------
-*/
 void Sentry_Idle( void ) {
 	Sentry_MaintainHeight();
 
@@ -291,11 +261,6 @@ void Sentry_Idle( void ) {
 	}
 }
 
-/*
--------------------------
-Sentry_Strafe
--------------------------
-*/
 void Sentry_Strafe( void ) {
 	int		dir;
 	vector3	end, right;
@@ -323,11 +288,6 @@ void Sentry_Strafe( void ) {
 	}
 }
 
-/*
--------------------------
-Sentry_Hunt
--------------------------
-*/
 void Sentry_Hunt( qboolean visible, qboolean advance ) {
 	float	distance, speed;
 	vector3	forward;
@@ -364,11 +324,6 @@ void Sentry_Hunt( qboolean visible, qboolean advance ) {
 	VectorMA( &NPC->client->ps.velocity, speed, &forward, &NPC->client->ps.velocity );
 }
 
-/*
--------------------------
-Sentry_RangedAttack
--------------------------
-*/
 void Sentry_RangedAttack( qboolean visible, qboolean advance ) {
 	if ( TIMER_Done( NPC, "attackDelay" ) && NPC->attackDebounceTime < level.time && visible )	// Attack?
 	{
@@ -395,11 +350,6 @@ void Sentry_RangedAttack( qboolean visible, qboolean advance ) {
 	}
 }
 
-/*
--------------------------
-Sentry_AttackDecision
--------------------------
-*/
 void Sentry_AttackDecision( void ) {
 	float		distance;
 	qboolean	visible;
@@ -450,11 +400,6 @@ void Sentry_AttackDecision( void ) {
 	Sentry_RangedAttack( visible, advance );
 }
 
-/*
--------------------------
-NPC_Sentry_Patrol
--------------------------
-*/
 void NPC_Sentry_Patrol( void ) {
 	Sentry_MaintainHeight();
 
@@ -483,11 +428,6 @@ void NPC_Sentry_Patrol( void ) {
 	NPC_UpdateAngles( qtrue, qtrue );
 }
 
-/*
--------------------------
-NPC_BSSentry_Default
--------------------------
-*/
 void NPC_BSSentry_Default( void ) {
 	if ( NPC->targetname ) {
 		NPC->use = sentry_use;

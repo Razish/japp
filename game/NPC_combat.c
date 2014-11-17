@@ -29,12 +29,6 @@ void G_ClearEnemy( gentity_t *self ) {
 	self->enemy = NULL;
 }
 
-/*
--------------------------
-NPC_AngerAlert
--------------------------
-*/
-
 #define	ANGER_ALERT_RADIUS			512
 #define	ANGER_ALERT_SOUND_RADIUS	256
 
@@ -48,12 +42,6 @@ void G_AngerAlert( gentity_t *self ) {
 	//FIXME: hmm.... with all the other new alerts now, is this still neccesary or even a good idea...?
 	G_AlertTeam( self, self->enemy, ANGER_ALERT_RADIUS, ANGER_ALERT_SOUND_RADIUS );
 }
-
-/*
--------------------------
-G_TeamEnemy
--------------------------
-*/
 
 qboolean G_TeamEnemy( gentity_t *self ) {//FIXME: Probably a better way to do this, is a linked list of your teammates already available?
 	int	i;
@@ -237,12 +225,6 @@ void G_ForceSaberOn( gentity_t *ent ) {
 	}
 }
 
-
-/*
--------------------------
-G_SetEnemy
--------------------------
-*/
 void G_AimSet( gentity_t *self, int aim );
 void G_SetEnemy( gentity_t *self, gentity_t *enemy ) {
 	int	event = 0;
@@ -792,11 +774,6 @@ void NPC_ApplyWeaponFireDelay( void ) {
 	}
 }
 
-/*
--------------------------
-ShootThink
--------------------------
-*/
 void ShootThink( void ) {
 	int			delay;
 
@@ -1106,18 +1083,7 @@ void NPC_CheckPossibleEnemy( gentity_t *other, visibility_t vis ) {
 	}
 }
 
-
-//==========================================
-//MCG Added functions:
-//==========================================
-
-/*
-int NPC_AttackDebounceForWeapon (void)
-
-DOES NOT control how fast you can fire
-Only makes you keep your weapon up after you fire
-
-*/
+// DOES NOT control how fast you can fire, only makes you keep your weapon up after you fire
 int NPC_AttackDebounceForWeapon( void ) {
 	return (NPC->client->ps.weapon == WP_SABER) ? 0 : NPCInfo->burstSpacing;
 }
@@ -1154,12 +1120,6 @@ float NPC_MaxDistSquaredForWeapon( void ) {
 		return 1024 * 1024;//was 0
 	}
 }
-
-/*
--------------------------
-ValidEnemy
--------------------------
-*/
 
 qboolean ValidEnemy( gentity_t *ent ) {
 	if ( ent == NULL )
@@ -1740,12 +1700,6 @@ gentity_t *NPC_CheckEnemy( qboolean findNew, qboolean tooFarOk, qboolean setEnem
 	return newEnemy;
 }
 
-/*
--------------------------
-NPC_ClearShot
--------------------------
-*/
-
 qboolean NPC_ClearShot( gentity_t *ent ) {
 	vector3	muzzle;
 	trace_t	tr;
@@ -1778,12 +1732,6 @@ qboolean NPC_ClearShot( gentity_t *ent ) {
 
 	return qfalse;
 }
-
-/*
--------------------------
-NPC_ShotEntity
--------------------------
-*/
 
 int NPC_ShotEntity( gentity_t *ent, vector3 *impactPos ) {
 	vector3	muzzle;
@@ -2052,15 +2000,8 @@ qboolean NPC_CheckCanAttack( float attack_scale, qboolean stationary ) {
 
 	return attack_ok;
 }
-//========================================================================================
-//OLD id-style hunt and kill
-//========================================================================================
-/*
-IdealDistance
 
-determines what the NPC's ideal distance from it's enemy should
-be in the current situation
-*/
+// determines what the NPC's ideal distance from it's enemy should be in the current situation
 float IdealDistance( gentity_t *self ) {
 	float	ideal;
 
@@ -2142,12 +2083,6 @@ void CP_FindCombatPointWaypoints( void ) {
 	}
 }
 
-
-/*
--------------------------
-NPC_CollectCombatPoints
--------------------------
-*/
 typedef struct combatPt_s {
 	float dist;
 	int index;
@@ -2211,12 +2146,6 @@ static int NPC_CollectCombatPoints( const vector3 *origin, const float radius, c
 
 	return numPoints;//bestPoint;
 }
-
-/*
--------------------------
-NPC_FindCombatPoint
--------------------------
-*/
 
 #define	MIN_AVOID_DOT				0.75f
 #define MIN_AVOID_DISTANCE			128
@@ -2411,12 +2340,6 @@ int NPC_FindCombatPoint( const vector3 *position, const vector3 *avoidPosition, 
 	return best;
 }
 
-/*
--------------------------
-NPC_FindSquadPoint
--------------------------
-*/
-
 int NPC_FindSquadPoint( vector3 *position ) {
 	float	dist, nearestDist = (float)WORLD_SIZE*(float)WORLD_SIZE;
 	int		nearestPoint = -1;
@@ -2449,12 +2372,6 @@ int NPC_FindSquadPoint( vector3 *position ) {
 	return nearestPoint;
 }
 
-/*
--------------------------
-NPC_ReserveCombatPoint
--------------------------
-*/
-
 qboolean NPC_ReserveCombatPoint( int combatPointID ) {
 	//Make sure it's valid
 	if ( combatPointID > level.numCombatPoints )
@@ -2469,12 +2386,6 @@ qboolean NPC_ReserveCombatPoint( int combatPointID ) {
 
 	return qtrue;
 }
-
-/*
--------------------------
-NPC_FreeCombatPoint
--------------------------
-*/
 
 qboolean NPC_FreeCombatPoint( int combatPointID, qboolean failed ) {
 	if ( failed ) {//remember that this one failed for us
@@ -2493,12 +2404,6 @@ qboolean NPC_FreeCombatPoint( int combatPointID, qboolean failed ) {
 
 	return qtrue;
 }
-
-/*
--------------------------
-NPC_SetCombatPoint
--------------------------
-*/
 
 qboolean NPC_SetCombatPoint( int combatPointID ) {
 	//Free a combat point if we already have one

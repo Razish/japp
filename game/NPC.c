@@ -77,16 +77,10 @@ void CorpsePhysics( gentity_t *self ) {
 	}
 }
 
-/*
-----------------------------------------
-NPC_RemoveBody
-
-Determines when it's ok to ditch the corpse
-----------------------------------------
-*/
 #define REMOVE_DISTANCE		128
 #define REMOVE_DISTANCE_SQR (REMOVE_DISTANCE * REMOVE_DISTANCE)
 
+// Determines when it's ok to ditch the corpse
 void NPC_RemoveBody( gentity_t *self ) {
 	CorpsePhysics( self );
 
@@ -180,14 +174,7 @@ void NPC_RemoveBody( gentity_t *self ) {
 	}
 }
 
-/*
-----------------------------------------
-NPC_RemoveBody
-
-Determines when it's ok to ditch the corpse
-----------------------------------------
-*/
-
+// Determines when it's ok to ditch the corpse
 int BodyRemovalPadTime( gentity_t *ent ) {
 	int	time;
 
@@ -267,15 +254,7 @@ int BodyRemovalPadTime( gentity_t *ent ) {
 	return time;
 }
 
-
-/*
-----------------------------------------
-NPC_RemoveBodyEffect
-
-Effect to be applied when ditching the corpse
-----------------------------------------
-*/
-
+// Effect to be applied when ditching the corpse
 static void NPC_RemoveBodyEffect( void ) {
 	//	vector3		org;
 	//	gentity_t	*tent;
@@ -327,25 +306,11 @@ static void NPC_RemoveBodyEffect( void ) {
 	default:
 		break;
 	}
-
-
 }
 
-
-/*
-====================================================================
-void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope )
-
-MG
-
-This will adjust the pitch and roll of a monster to match
-a given slope - if a non-'0 0 0' slope is passed, it will
-use that value, otherwise it will use the ground underneath
-the monster.  If it doesn't find a surface, it does nothinh\g
-and returns.
-====================================================================
-*/
-
+// this will adjust the pitch and roll of a monster to match a given slope - if a non-'0 0 0' slope is passed, it will
+//	use that value, otherwise it will use the ground underneath the monster.
+// if it doesn't find a surface, it does nothing and returns.
 void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope ) {
 	vector3	slope;
 	vector3	nvf, ovf, ovr, startspot, endspot, new_angles = { 0, 0, 0 };
@@ -414,12 +379,6 @@ void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope ) {
 	}
 }
 
-
-/*
-----------------------------------------
-DeadThink
-----------------------------------------
-*/
 static void DeadThink( void ) {
 	trace_t	trace;
 
@@ -536,14 +495,7 @@ static void DeadThink( void ) {
 	CorpsePhysics( NPC );
 }
 
-
-/*
-===============
-SetNPCGlobals
-
-local function to set globals used throughout the AI code
-===============
-*/
+// local function to set globals used throughout the AI code
 void SetNPCGlobals( gentity_t *ent ) {
 	NPC = ent;
 	NPCInfo = ent->NPC;
@@ -576,7 +528,6 @@ void ClearNPCGlobals( void ) {
 	NPCInfo = NULL;
 	client = NULL;
 }
-//===============
 
 extern	qboolean	showBBoxes;
 vector3 NPCDEBUG_RED = { 1.0f, 0.0f, 0.0f };
@@ -818,12 +769,6 @@ void NPC_KeepCurrentFacing( void ) {
 		ucmd.angles.pitch = ANGLE2SHORT( client->ps.viewangles.pitch ) - client->ps.delta_angles.pitch;
 }
 
-/*
--------------------------
-NPC_BehaviorSet_Charmed
--------------------------
-*/
-
 void NPC_BehaviorSet_Charmed( int bState ) {
 	switch ( bState ) {
 	case BS_FOLLOW_LEADER://# 40: Follow your leader and shoot any enemies you come across
@@ -847,11 +792,6 @@ void NPC_BehaviorSet_Charmed( int bState ) {
 		break;
 	}
 }
-/*
--------------------------
-NPC_BehaviorSet_Default
--------------------------
-*/
 
 void NPC_BehaviorSet_Default( int bState ) {
 	switch ( bState ) {
@@ -895,11 +835,6 @@ void NPC_BehaviorSet_Default( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_BehaviorSet_Interrogator
--------------------------
-*/
 void NPC_BehaviorSet_Interrogator( int bState ) {
 	switch ( bState ) {
 	case BS_STAND_GUARD:
@@ -919,11 +854,6 @@ void NPC_BSImperialProbe_Attack( void );
 void NPC_BSImperialProbe_Patrol( void );
 void NPC_BSImperialProbe_Wait( void );
 
-/*
--------------------------
-NPC_BehaviorSet_ImperialProbe
--------------------------
-*/
 void NPC_BehaviorSet_ImperialProbe( int bState ) {
 	switch ( bState ) {
 	case BS_STAND_GUARD:
@@ -942,11 +872,6 @@ void NPC_BehaviorSet_ImperialProbe( int bState ) {
 
 void NPC_BSSeeker_Default( void );
 
-/*
--------------------------
-NPC_BehaviorSet_Seeker
--------------------------
-*/
 void NPC_BehaviorSet_Seeker( int bState ) {
 	switch ( bState ) {
 	case BS_STAND_GUARD:
@@ -964,22 +889,12 @@ void NPC_BehaviorSet_Seeker( int bState ) {
 
 void NPC_BSRemote_Default( void );
 
-/*
--------------------------
-NPC_BehaviorSet_Remote
--------------------------
-*/
 void NPC_BehaviorSet_Remote( int bState ) {
 	NPC_BSRemote_Default();
 }
 
 void NPC_BSSentry_Default( void );
 
-/*
--------------------------
-NPC_BehaviorSet_Sentry
--------------------------
-*/
 void NPC_BehaviorSet_Sentry( int bState ) {
 	switch ( bState ) {
 	case BS_STAND_GUARD:
@@ -995,11 +910,6 @@ void NPC_BehaviorSet_Sentry( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_BehaviorSet_Grenadier
--------------------------
-*/
 void NPC_BehaviorSet_Grenadier( int bState ) {
 	switch ( bState ) {
 	case BS_STAND_GUARD:
@@ -1015,11 +925,7 @@ void NPC_BehaviorSet_Grenadier( int bState ) {
 		break;
 	}
 }
-/*
--------------------------
-NPC_BehaviorSet_Sniper
--------------------------
-*/
+
 void NPC_BehaviorSet_Sniper( int bState ) {
 	switch ( bState ) {
 	case BS_STAND_GUARD:
@@ -1035,11 +941,6 @@ void NPC_BehaviorSet_Sniper( int bState ) {
 		break;
 	}
 }
-/*
--------------------------
-NPC_BehaviorSet_Stormtrooper
--------------------------
-*/
 
 void NPC_BehaviorSet_Stormtrooper( int bState ) {
 	switch ( bState ) {
@@ -1065,12 +966,6 @@ void NPC_BehaviorSet_Stormtrooper( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_BehaviorSet_Jedi
--------------------------
-*/
-
 void NPC_BehaviorSet_Jedi( int bState ) {
 	switch ( bState ) {
 	case BS_STAND_GUARD:
@@ -1091,11 +986,6 @@ void NPC_BehaviorSet_Jedi( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_BehaviorSet_Droid
--------------------------
-*/
 void NPC_BehaviorSet_Droid( int bState ) {
 	switch ( bState ) {
 	case BS_DEFAULT:
@@ -1109,11 +999,6 @@ void NPC_BehaviorSet_Droid( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_BehaviorSet_Mark1
--------------------------
-*/
 void NPC_BehaviorSet_Mark1( int bState ) {
 	switch ( bState ) {
 	case BS_DEFAULT:
@@ -1127,11 +1012,6 @@ void NPC_BehaviorSet_Mark1( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_BehaviorSet_Mark2
--------------------------
-*/
 void NPC_BehaviorSet_Mark2( int bState ) {
 	switch ( bState ) {
 	case BS_DEFAULT:
@@ -1146,11 +1026,6 @@ void NPC_BehaviorSet_Mark2( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_BehaviorSet_ATST
--------------------------
-*/
 void NPC_BehaviorSet_ATST( int bState ) {
 	switch ( bState ) {
 	case BS_DEFAULT:
@@ -1165,11 +1040,6 @@ void NPC_BehaviorSet_ATST( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_BehaviorSet_MineMonster
--------------------------
-*/
 void NPC_BehaviorSet_MineMonster( int bState ) {
 	switch ( bState ) {
 	case BS_STAND_GUARD:
@@ -1185,11 +1055,6 @@ void NPC_BehaviorSet_MineMonster( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_BehaviorSet_Howler
--------------------------
-*/
 void NPC_BehaviorSet_Howler( int bState ) {
 	switch ( bState ) {
 	case BS_STAND_GUARD:
@@ -1205,11 +1070,6 @@ void NPC_BehaviorSet_Howler( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_BehaviorSet_Rancor
--------------------------
-*/
 void NPC_BehaviorSet_Rancor( int bState ) {
 	switch ( bState ) {
 	case BS_STAND_GUARD:
@@ -1225,15 +1085,11 @@ void NPC_BehaviorSet_Rancor( int bState ) {
 	}
 }
 
-/*
--------------------------
-NPC_RunBehavior
--------------------------
-*/
-extern void NPC_BSEmplaced( void );
-extern qboolean NPC_CheckSurrender( void );
-extern void Boba_FlyStop( gentity_t *self );
-extern void NPC_BSWampa_Default( void );
+void NPC_BSEmplaced( void );
+qboolean NPC_CheckSurrender( void );
+void Boba_FlyStop( gentity_t *self );
+void NPC_BSWampa_Default( void );
+
 void NPC_RunBehavior( int team, int bState ) {
 	if ( NPC->s.NPC_class == CLASS_VEHICLE &&
 		NPC->m_pVehicle ) { //vehicles don't do AI!
@@ -1362,16 +1218,7 @@ void NPC_RunBehavior( int team, int bState ) {
 	}
 }
 
-/*
-===============
-NPC_ExecuteBState
-
-MCG
-
-NPC Behavior state thinking
-
-===============
-*/
+// NPC Behavior state thinking
 void NPC_ExecuteBState( gentity_t *self )//, int msec )
 {
 	bState_t	bState;
@@ -1487,13 +1334,12 @@ void NPC_ExecuteBState( gentity_t *self )//, int msec )
 	NPC_AvoidWallsAndCliffs();
 
 	// run the bot through the server like it was a real client
-	//=== Save the ucmd for the second no-think Pmove ============================
+	// Save the ucmd for the second no-think Pmove
 	ucmd.serverTime = level.time - 50;
 	memcpy( &NPCInfo->last_ucmd, &ucmd, sizeof(usercmd_t) );
 	if ( !NPCInfo->attackHoldTime ) {
 		NPCInfo->last_ucmd.buttons &= ~(BUTTON_ATTACK | BUTTON_ALT_ATTACK);//so we don't fire twice in one think
 	}
-	//============================================================================
 	NPC_CheckAttackScript();
 	NPC_KeepCurrentFacing();
 
@@ -1585,16 +1431,11 @@ void G_DroidSounds( gentity_t *self ) {
 	}
 }
 
-/*
-===============
-NPC_Think
-
-Main NPC AI - called once per frame
-===============
-*/
 #if	AI_TIMERS
 extern int AITime;
-#endif//	AI_TIMERS
+#endif // AI_TIMERS
+
+// Main NPC AI - called once per frame
 void NPC_Think( gentity_t *self ) {
 	vector3	oldMoveDir;
 
@@ -1729,36 +1570,6 @@ void NPC_Think( gentity_t *self ) {
 
 void NPC_InitAI( void ) {
 }
-
-/*
-==================================
-void NPC_InitAnimTable( void )
-
-Need to initialize this table.
-If someone tried to play an anim
-before table is filled in with
-values, causes tasks that wait for
-anim completion to never finish.
-(frameLerp of 0 * numFrames of 0 = 0)
-==================================
-*/
-/*
-void NPC_InitAnimTable( void )
-{
-int i;
-
-for ( i = 0; i < MAX_ANIM_FILES; i++ )
-{
-for ( int j = 0; j < MAX_ANIMATIONS; j++ )
-{
-level.knownAnimFileSets[i].animations[j].firstFrame = 0;
-level.knownAnimFileSets[i].animations[j].frameLerp = 100;
-level.knownAnimFileSets[i].animations[j].initialLerp = 100;
-level.knownAnimFileSets[i].animations[j].numFrames = 0;
-}
-}
-}
-*/
 
 void NPC_InitGame( void ) {
 	//	globals.NPCs = (gNPC_t *) gi.TagMalloc(game.maxclients * sizeof(game.bots[0]), TAG_GAME);

@@ -19,16 +19,9 @@ void P_SetTwitchInfo( gclient_t	*client ) {
 	client->ps.painDirection ^= 1;
 }
 
-/*
-===============
-G_DamageFeedback
-
-Called just before a snapshot is sent to the given player.
-Totals up all damage and generates both the player_state_t
-damage values to that client for pain blends and kicks, and
-global pain sound events for all clients.
-===============
-*/
+// Called just before a snapshot is sent to the given player.
+// Totals up all damage and generates both the player_state_t damage values to that client for pain blends and kicks,
+//	and global pain sound events for all clients.
 void P_DamageFeedback( gentity_t *player ) {
 	gclient_t	*client;
 	float	count;
@@ -104,15 +97,7 @@ void P_DamageFeedback( gentity_t *player ) {
 	client->damage_armor = 0;
 }
 
-
-
-/*
-=============
-P_WorldEffects
-
-Check for lava / slime contents and drowning
-=============
-*/
+// Check for lava / slime contents and drowning
 void P_WorldEffects( gentity_t *ent ) {
 	qboolean	envirosuit;
 	int			waterlevel;
@@ -195,11 +180,6 @@ void P_WorldEffects( gentity_t *ent ) {
 	}
 }
 
-
-
-
-
-//==============================================================
 extern void G_ApplyKnockback( gentity_t *targ, vector3 *newDir, float knockback );
 void DoImpact( gentity_t *self, gentity_t *other, qboolean damageSelf ) {
 	float magnitude, my_mass;
@@ -378,12 +358,6 @@ void Client_CheckImpactBBrush( gentity_t *self, gentity_t *other ) {
 	}
 }
 
-
-/*
-===============
-G_SetClientSound
-===============
-*/
 void G_SetClientSound( gentity_t *ent ) {
 	if ( ent->client && ent->client->isHacking ) { //loop hacking sound
 		ent->client->ps.loopSound = level.snd_hack;
@@ -407,15 +381,6 @@ void G_SetClientSound( gentity_t *ent ) {
 	}
 }
 
-
-
-//==============================================================
-
-/*
-==============
-ClientImpacts
-==============
-*/
 void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 	int		i, j;
 	trace_t	trace;
@@ -446,15 +411,9 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 
 }
 
-/*
-============
-G_TouchTriggers
-
-Find all trigger entities that ent's current position touches.
-Spectators will only interact with teleporters.
-============
-*/
-void	G_TouchTriggers( gentity_t *ent ) {
+// Find all trigger entities that ent's current position touches.
+// Spectators will only interact with teleporters.
+void G_TouchTriggers( gentity_t *ent ) {
 	int			i, num;
 	int			touch[MAX_GENTITIES];
 	gentity_t	*hit;
@@ -527,15 +486,8 @@ void	G_TouchTriggers( gentity_t *ent ) {
 	}
 }
 
-
-/*
-============
-G_MoverTouchTriggers
-
-Find all trigger entities that ent's current position touches.
-Spectators will only interact with teleporters.
-============
-*/
+// Find all trigger entities that ent's current position touches.
+// Spectators will only interact with teleporters.
 void G_MoverTouchPushTriggers( gentity_t *ent, vector3 *oldOrg ) {
 	int			i, num;
 	float		step, stepSize, dist;
@@ -598,11 +550,6 @@ static void SV_PMTrace( trace_t *results, const vector3 *start, const vector3 *m
 	trap->Trace( results, start, mins, maxs, end, passEntityNum, contentMask, qfalse, 0, 0 );
 }
 
-/*
-=================
-SpectatorThink
-=================
-*/
 void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 	pmove_t	pm;
 	gclient_t	*client;
@@ -671,15 +618,7 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 	}
 }
 
-
-
-/*
-=================
-ClientInactivityTimer
-
-Returns qfalse if the client is dropped
-=================
-*/
+// Returns qfalse if the client is dropped
 qboolean ClientInactivityTimer( gclient_t *client ) {
 	if ( !g_inactivity.integer ) {
 		// give everyone some time, so if the operator sets g_inactivity during
@@ -707,13 +646,7 @@ qboolean ClientInactivityTimer( gclient_t *client ) {
 	return qtrue;
 }
 
-/*
-==================
-ClientTimerActions
-
-Actions that happen once a second
-==================
-*/
+// Actions that happen once a second
 void ClientTimerActions( gentity_t *ent, int msec ) {
 	gclient_t	*client;
 
@@ -735,11 +668,6 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 	}
 }
 
-/*
-====================
-ClientIntermissionThink
-====================
-*/
 void ClientIntermissionThink( gclient_t *client ) {
 	client->ps.eFlags &= ~EF_TALK;
 	client->ps.eFlags &= ~EF_FIRING;
@@ -823,16 +751,9 @@ void G_CheapWeaponFire( int entNum, int ev ) {
 	}
 }
 
-/*
-================
-ClientEvents
-
-Events will be passed on to the clients for presentation,
-but any server game effects are handled here
-================
-*/
 qboolean BG_InKnockDownOnly( int anim );
 
+// Events will be passed on to the clients for presentation, but any server game effects are handled here
 void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 	int		i;//, j;
 	int		event;
@@ -966,11 +887,6 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 }
 
-/*
-==============
-SendPendingPredictableEvents
-==============
-*/
 void SendPendingPredictableEvents( playerState_t *ps ) {
 	gentity_t *t;
 	int event, seq;
@@ -1001,20 +917,14 @@ void SendPendingPredictableEvents( playerState_t *ps ) {
 	}
 }
 
-/*
-==================
-G_UpdateClientBroadcasts
-
-Determines whether this client should be broadcast to any other clients.
-A client is broadcast when another client is using force sight or is
-==================
-*/
 #define MAX_JEDIMASTER_DISTANCE	2500
 #define MAX_JEDIMASTER_FOV		100
 
 #define MAX_SIGHT_DISTANCE		1500
 #define MAX_SIGHT_FOV			100
 
+// Determines whether this client should be broadcast to any other clients.
+// A client is broadcast when another client is using force sight or is
 static void G_UpdateForceSightBroadcasts( gentity_t *self ) {
 	int i;
 
@@ -1348,12 +1258,6 @@ void NPC_Accelerate( gentity_t *ent, qboolean fullWalkAcc, qboolean fullRunAcc )
 	}
 }
 
-/*
--------------------------
-NPC_GetWalkSpeed
--------------------------
-*/
-
 static int NPC_GetWalkSpeed( gentity_t *ent ) {
 	int	walkSpeed = 0;
 
@@ -1370,11 +1274,6 @@ static int NPC_GetWalkSpeed( gentity_t *ent ) {
 	return walkSpeed;
 }
 
-/*
--------------------------
-NPC_GetRunSpeed
--------------------------
-*/
 static int NPC_GetRunSpeed( gentity_t *ent ) {
 	int	runSpeed = 0;
 
@@ -1501,14 +1400,6 @@ void G_HeldByMonster( gentity_t *ent, usercmd_t *ucmd ) {
 	ucmd->rightmove = 0;
 	ucmd->upmove = 0;
 }
-
-typedef enum tauntTypes_e {
-	TAUNT_TAUNT = 0,
-	TAUNT_BOW,
-	TAUNT_MEDITATE,
-	TAUNT_FLOURISH,
-	TAUNT_GLOAT
-} tauntTypes_t;
 
 void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 	if ( ent->client->pers.cmd.upmove ||
@@ -1743,17 +1634,10 @@ void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 	}
 }
 
-/*
-==============
-ClientThink
-
-This will be called once for each client frame, which will
-usually be a couple times for each server frame on fast clients.
-
-If "g_synchronousClients 1" is set, this will be called exactly
-once for each server frame, which makes for smooth demo recording.
-==============
-*/
+// This will be called once for each client frame, which will usually be a couple times for each server frame on fast
+//	clients.
+// If "g_synchronousClients 1" is set, this will be called exactly once for each server frame, which makes for smooth
+//	demo recording.
 void ClientThink_real( gentity_t *ent ) {
 	gclient_t	*client;
 	pmove_t		pm;
@@ -3208,13 +3092,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 }
 
-/*
-==================
-G_CheckClientTimeouts
-
-Checks whether a client has exceded any timeouts and act accordingly
-==================
-*/
+// Checks whether a client has exceded any timeouts and act accordingly
 void G_CheckClientTimeouts( gentity_t *ent ) {
 	// Only timeout supported right now is the timeout to spectator mode
 	if ( !g_timeOutToSpec.integer )
@@ -3231,13 +3109,7 @@ void G_CheckClientTimeouts( gentity_t *ent ) {
 	}
 }
 
-/*
-==================
-ClientThink
-
-A new command has arrived from the client
-==================
-*/
+// A new command has arrived from the client
 void ClientThink( int clientNum, usercmd_t *ucmd ) {
 	gentity_t *ent;
 
@@ -3333,13 +3205,6 @@ void G_RunClient( gentity_t *ent ) {
 	ClientThink_real( ent );
 }
 
-
-/*
-==================
-SpectatorClientEndFrame
-
-==================
-*/
 void SpectatorClientEndFrame( gentity_t *ent ) {
 	gclient_t	*cl;
 
@@ -3476,15 +3341,9 @@ static void G_SendScoreboardUpdate( gentity_t *ent ) {
 		string ) );
 }
 
-/*
-==============
-ClientEndFrame
-
-Called at the end of each server frame for each connected client
-A fast client will have multiple ClientThink for each ClientEdFrame,
-while a slow client may have multiple ClientEndFrame between ClientThink.
-==============
-*/
+// Called at the end of each server frame for each connected client
+// A fast client will have multiple ClientThink for each ClientEndFrame, while a slow client may have multiple
+//	ClientEndFrame between ClientThink.
 void ClientEndFrame( gentity_t *ent ) {
 	int			i;
 	qboolean isNPC = qfalse;
