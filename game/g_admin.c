@@ -2151,6 +2151,7 @@ static void AM_Merc( gentity_t *ent ) {
 		int i;
 		G_LogPrintf( level.log.admin, "\t%s gave weapons to %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
+		trap->SendServerCommand( targetClient, "cp \"You become a super merc!\n\"" );
 		targ->client->ps.stats[STAT_WEAPONS] = ((1 << LAST_USEABLE_WEAPON) - 1) & ~1;
 		for ( i = 0; i < AMMO_MAX; i++ ) {
 			targ->client->ps.ammo[i] = ammoMax[i];
@@ -2161,6 +2162,7 @@ static void AM_Merc( gentity_t *ent ) {
 		int i = 0, newWeap = -1, wp = targ->client->ps.weapon;
 		G_LogPrintf( level.log.admin, "\t%s took weapons from %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
+		trap->SendServerCommand( targetClient, "cp \"You lost weapons.\n\"" );
 
 		targ->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
 
