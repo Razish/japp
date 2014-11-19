@@ -1,5 +1,4 @@
 #include "qcommon/q_shared.h"
-#include "qcommon/game_version.h"
 
 #if ARCH_WIDTH == 64 || defined(MACOS_X) || defined(QARCH_ARM) || defined(NO_CRASHHANDLER)
 
@@ -23,7 +22,6 @@ int bCrashing = 0;
 #include "libudis86/udis86.h"
 
 #include <time.h>
-#include "qcommon/disablewarnings.h"
 #include "JAPP/jp_crash.h"
 #if defined(_GAME)
 #include "g_local.h"

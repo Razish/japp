@@ -1,0 +1,377 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".travis.yml" />
+    <None Include="cgame\SConscript" />
+    <None Include="game\SConscript" />
+    <None Include="json\SConscript" />
+    <None Include="libudis86\SConscript" />
+    <None Include="lua\SConscript" />
+    <None Include="package.lua" />
+    <None Include="README.md" />
+    <None Include="SConstruct" />
+    <None Include="ui\SConscript" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cgame\animtable.h" />
+    <ClInclude Include="cgame\cg_lights.h" />
+    <ClInclude Include="cgame\cg_local.h" />
+    <ClInclude Include="cgame\cg_luaserver.h" />
+    <ClInclude Include="cgame\cg_media.h" />
+    <ClInclude Include="cgame\cg_public.h" />
+    <ClInclude Include="cgame\cg_xcvar.h" />
+    <ClInclude Include="cgame\fx_local.h" />
+    <ClInclude Include="cgame\tr_types.h" />
+    <ClInclude Include="game\ai.h" />
+    <ClInclude Include="game\ai_main.h" />
+    <ClInclude Include="game\anims.h" />
+    <ClInclude Include="game\animtable.h" />
+    <ClInclude Include="game\be_aas.h" />
+    <ClInclude Include="game\be_ai_char.h" />
+    <ClInclude Include="game\be_ai_chat.h" />
+    <ClInclude Include="game\be_ai_gen.h" />
+    <ClInclude Include="game\be_ai_goal.h" />
+    <ClInclude Include="game\be_ai_move.h" />
+    <ClInclude Include="game\be_ai_weap.h" />
+    <ClInclude Include="game\be_ea.h" />
+    <ClInclude Include="game\bg_local.h" />
+    <ClInclude Include="game\bg_lua.h" />
+    <ClInclude Include="game\bg_luacvar.h" />
+    <ClInclude Include="game\bg_luaevent.h" />
+    <ClInclude Include="game\bg_lualogger.h" />
+    <ClInclude Include="game\bg_luaplayer.h" />
+    <ClInclude Include="game\bg_luaserialiser.h" />
+    <ClInclude Include="game\bg_luavector.h" />
+    <ClInclude Include="game\bg_public.h" />
+    <ClInclude Include="game\bg_saga.h" />
+    <ClInclude Include="game\bg_vehicles.h" />
+    <ClInclude Include="game\bg_weapons.h" />
+    <ClInclude Include="game\botlib.h" />
+    <ClInclude Include="game\b_local.h" />
+    <ClInclude Include="game\b_public.h" />
+    <ClInclude Include="game\chars.h" />
+    <ClInclude Include="game\g_admin.h" />
+    <ClInclude Include="game\g_chatFilters.h" />
+    <ClInclude Include="game\g_ICARUScb.h" />
+    <ClInclude Include="game\g_local.h" />
+    <ClInclude Include="game\g_nav.h" />
+    <ClInclude Include="game\g_public.h" />
+    <ClInclude Include="game\g_team.h" />
+    <ClInclude Include="game\g_unlagged.h" />
+    <ClInclude Include="game\g_xcvar.h" />
+    <ClInclude Include="game\inv.h" />
+    <ClInclude Include="game\match.h" />
+    <ClInclude Include="game\npc_headers.h" />
+    <ClInclude Include="game\say.h" />
+    <ClInclude Include="game\surfaceflags.h" />
+    <ClInclude Include="game\syn.h" />
+    <ClInclude Include="game\teams.h" />
+    <ClInclude Include="game\w_saber.h" />
+    <ClInclude Include="Ghoul2\G2.h" />
+    <ClInclude Include="ICARUS\interpreter.h" />
+    <ClInclude Include="ICARUS\Q3_Interface.h" />
+    <ClInclude Include="ICARUS\Q3_Registers.h" />
+    <ClInclude Include="JAPP\jp_cinfo.h" />
+    <ClInclude Include="JAPP\jp_crash.h" />
+    <ClInclude Include="JAPP\jp_csflags.h" />
+    <ClInclude Include="JAPP\jp_promode.h" />
+    <ClInclude Include="JAPP\jp_ssflags.h" />
+    <ClInclude Include="JAPP\jp_stack.h" />
+    <ClInclude Include="JAPP\jp_tokenparser.h" />
+    <ClInclude Include="json\cJSON.h" />
+    <ClInclude Include="libudis86\decode.h" />
+    <ClInclude Include="libudis86\extern.h" />
+    <ClInclude Include="libudis86\input.h" />
+    <ClInclude Include="libudis86\itab.h" />
+    <ClInclude Include="libudis86\syn.h" />
+    <ClInclude Include="libudis86\types.h" />
+    <ClInclude Include="libudis86\udis86.h" />
+    <ClInclude Include="lua\lapi.h" />
+    <ClInclude Include="lua\lauxlib.h" />
+    <ClInclude Include="lua\lcode.h" />
+    <ClInclude Include="lua\lctype.h" />
+    <ClInclude Include="lua\ldebug.h" />
+    <ClInclude Include="lua\ldo.h" />
+    <ClInclude Include="lua\lfunc.h" />
+    <ClInclude Include="lua\lgc.h" />
+    <ClInclude Include="lua\llex.h" />
+    <ClInclude Include="lua\llimits.h" />
+    <ClInclude Include="lua\lmem.h" />
+    <ClInclude Include="lua\lobject.h" />
+    <ClInclude Include="lua\lopcodes.h" />
+    <ClInclude Include="lua\lparser.h" />
+    <ClInclude Include="lua\lstate.h" />
+    <ClInclude Include="lua\lstring.h" />
+    <ClInclude Include="lua\ltable.h" />
+    <ClInclude Include="lua\ltm.h" />
+    <ClInclude Include="lua\lua.h" />
+    <ClInclude Include="lua\luaconf.h" />
+    <ClInclude Include="lua\lualib.h" />
+    <ClInclude Include="lua\lundump.h" />
+    <ClInclude Include="lua\lvm.h" />
+    <ClInclude Include="lua\lzio.h" />
+    <ClInclude Include="qcommon\cm_public.h" />
+    <ClInclude Include="qcommon\qcommon.h" />
+    <ClInclude Include="qcommon\qfiles.h" />
+    <ClInclude Include="qcommon\q_asm.h" />
+    <ClInclude Include="qcommon\q_shared.h" />
+    <ClInclude Include="qcommon\tags.h" />
+    <ClInclude Include="server\server.h" />
+    <ClInclude Include="ui\keycodes.h" />
+    <ClInclude Include="ui\menudef.h" />
+    <ClInclude Include="ui\ui_force.h" />
+    <ClInclude Include="ui\ui_local.h" />
+    <ClInclude Include="ui\ui_public.h" />
+    <ClInclude Include="ui\ui_shared.h" />
+    <ClInclude Include="ui\ui_xcvar.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cgame\cg_chatbox.c" />
+    <ClCompile Include="cgame\cg_consolecmds.c" />
+    <ClCompile Include="cgame\cg_draw.c" />
+    <ClCompile Include="cgame\cg_drawtools.c" />
+    <ClCompile Include="cgame\cg_effects.c" />
+    <ClCompile Include="cgame\cg_ents.c" />
+    <ClCompile Include="cgame\cg_event.c" />
+    <ClCompile Include="cgame\cg_info.c" />
+    <ClCompile Include="cgame\cg_light.c" />
+    <ClCompile Include="cgame\cg_localents.c" />
+    <ClCompile Include="cgame\cg_luaserver.c" />
+    <ClCompile Include="cgame\cg_main.c" />
+    <ClCompile Include="cgame\cg_marks.c" />
+    <ClCompile Include="cgame\cg_media.c" />
+    <ClCompile Include="cgame\cg_newDraw.c" />
+    <ClCompile Include="cgame\cg_newScoreboard.c" />
+    <ClCompile Include="cgame\cg_players.c" />
+    <ClCompile Include="cgame\cg_playerstate.c" />
+    <ClCompile Include="cgame\cg_predict.c" />
+    <ClCompile Include="cgame\cg_saga.c" />
+    <ClCompile Include="cgame\cg_scoreboard.c" />
+    <ClCompile Include="cgame\cg_servercmds.c" />
+    <ClCompile Include="cgame\cg_serverModification.c" />
+    <ClCompile Include="cgame\cg_smartentities.c" />
+    <ClCompile Include="cgame\cg_snapshot.c" />
+    <ClCompile Include="cgame\cg_syscalls.c" />
+    <ClCompile Include="cgame\cg_teambinds.c" />
+    <ClCompile Include="cgame\cg_trueview.c" />
+    <ClCompile Include="cgame\cg_turret.c" />
+    <ClCompile Include="cgame\cg_view.c" />
+    <ClCompile Include="cgame\cg_weaponinit.c" />
+    <ClCompile Include="cgame\cg_weapons.c" />
+    <ClCompile Include="cgame\fx_blaster.c" />
+    <ClCompile Include="cgame\fx_bowcaster.c" />
+    <ClCompile Include="cgame\fx_bryarpistol.c" />
+    <ClCompile Include="cgame\fx_demp2.c" />
+    <ClCompile Include="cgame\fx_disruptor.c" />
+    <ClCompile Include="cgame\fx_flechette.c" />
+    <ClCompile Include="cgame\fx_force.c" />
+    <ClCompile Include="cgame\fx_heavyrepeater.c" />
+    <ClCompile Include="cgame\fx_rocketlauncher.c" />
+    <ClCompile Include="game\ai_main.c" />
+    <ClCompile Include="game\ai_util.c" />
+    <ClCompile Include="game\ai_wpnav.c" />
+    <ClCompile Include="game\AnimalNPC.c" />
+    <ClCompile Include="game\bg_g2_utils.c" />
+    <ClCompile Include="game\bg_lua.c" />
+    <ClCompile Include="game\bg_luacvar.c" />
+    <ClCompile Include="game\bg_luaevent.c" />
+    <ClCompile Include="game\bg_lualogger.c" />
+    <ClCompile Include="game\bg_luaplayer.c" />
+    <ClCompile Include="game\bg_luaserialiser.c" />
+    <ClCompile Include="game\bg_luavector.c" />
+    <ClCompile Include="game\bg_misc.c" />
+    <ClCompile Include="game\bg_panimate.c" />
+    <ClCompile Include="game\bg_pmove.c" />
+    <ClCompile Include="game\bg_saber.c" />
+    <ClCompile Include="game\bg_saberLoad.c" />
+    <ClCompile Include="game\bg_saga.c" />
+    <ClCompile Include="game\bg_slidemove.c" />
+    <ClCompile Include="game\bg_vehicleLoad.c" />
+    <ClCompile Include="game\bg_weapons.c" />
+    <ClCompile Include="game\FighterNPC.c" />
+    <ClCompile Include="game\g_active.c" />
+    <ClCompile Include="game\g_admin.c" />
+    <ClCompile Include="game\g_arenas.c" />
+    <ClCompile Include="game\g_bot.c" />
+    <ClCompile Include="game\g_chatFilters.c" />
+    <ClCompile Include="game\g_client.c" />
+    <ClCompile Include="game\g_clientModification.c" />
+    <ClCompile Include="game\g_cmds.c" />
+    <ClCompile Include="game\g_combat.c" />
+    <ClCompile Include="game\g_exphysics.c" />
+    <ClCompile Include="game\g_ICARUScb.c" />
+    <ClCompile Include="game\g_items.c" />
+    <ClCompile Include="game\g_log.c" />
+    <ClCompile Include="game\g_main.c" />
+    <ClCompile Include="game\g_mem.c" />
+    <ClCompile Include="game\g_misc.c" />
+    <ClCompile Include="game\g_missile.c" />
+    <ClCompile Include="game\g_mover.c" />
+    <ClCompile Include="game\g_nav.c" />
+    <ClCompile Include="game\g_navnew.c" />
+    <ClCompile Include="game\g_object.c" />
+    <ClCompile Include="game\g_playerbans.c" />
+    <ClCompile Include="game\g_saga.c" />
+    <ClCompile Include="game\g_session.c" />
+    <ClCompile Include="game\g_spawn.c" />
+    <ClCompile Include="game\g_svcmds.c" />
+    <ClCompile Include="game\g_syscalls.c" />
+    <ClCompile Include="game\g_target.c" />
+    <ClCompile Include="game\g_team.c" />
+    <ClCompile Include="game\g_timer.c" />
+    <ClCompile Include="game\g_trigger.c" />
+    <ClCompile Include="game\g_turret.c" />
+    <ClCompile Include="game\g_turret_G2.c" />
+    <ClCompile Include="game\g_unlagged.c" />
+    <ClCompile Include="game\g_utils.c" />
+    <ClCompile Include="game\g_vehicles.c" />
+    <ClCompile Include="game\g_vehicleTurret.c" />
+    <ClCompile Include="game\g_weapon.c" />
+    <ClCompile Include="game\NPC.c" />
+    <ClCompile Include="game\NPC_AI_Atst.c" />
+    <ClCompile Include="game\NPC_AI_Default.c" />
+    <ClCompile Include="game\NPC_AI_Droid.c" />
+    <ClCompile Include="game\NPC_AI_GalakMech.c" />
+    <ClCompile Include="game\NPC_AI_Grenadier.c" />
+    <ClCompile Include="game\NPC_AI_Howler.c" />
+    <ClCompile Include="game\NPC_AI_ImperialProbe.c" />
+    <ClCompile Include="game\NPC_AI_Interrogator.c" />
+    <ClCompile Include="game\NPC_AI_Jedi.c" />
+    <ClCompile Include="game\NPC_AI_Mark1.c" />
+    <ClCompile Include="game\NPC_AI_Mark2.c" />
+    <ClCompile Include="game\NPC_AI_MineMonster.c" />
+    <ClCompile Include="game\NPC_AI_Rancor.c" />
+    <ClCompile Include="game\NPC_AI_Remote.c" />
+    <ClCompile Include="game\NPC_AI_Seeker.c" />
+    <ClCompile Include="game\NPC_AI_Sentry.c" />
+    <ClCompile Include="game\NPC_AI_Sniper.c" />
+    <ClCompile Include="game\NPC_AI_Stormtrooper.c" />
+    <ClCompile Include="game\NPC_AI_Utils.c" />
+    <ClCompile Include="game\NPC_AI_Wampa.c" />
+    <ClCompile Include="game\NPC_behavior.c" />
+    <ClCompile Include="game\NPC_combat.c" />
+    <ClCompile Include="game\NPC_goal.c" />
+    <ClCompile Include="game\NPC_misc.c" />
+    <ClCompile Include="game\NPC_move.c" />
+    <ClCompile Include="game\NPC_reactions.c" />
+    <ClCompile Include="game\NPC_senses.c" />
+    <ClCompile Include="game\NPC_sounds.c" />
+    <ClCompile Include="game\NPC_spawn.c" />
+    <ClCompile Include="game\NPC_stats.c" />
+    <ClCompile Include="game\NPC_utils.c" />
+    <ClCompile Include="game\SpeederNPC.c" />
+    <ClCompile Include="game\tri_coll_test.c" />
+    <ClCompile Include="game\WalkerNPC.c" />
+    <ClCompile Include="game\w_force.c" />
+    <ClCompile Include="game\w_saber.c" />
+    <ClCompile Include="JAPP\jp_crash.c" />
+    <ClCompile Include="JAPP\jp_crashExtra.c" />
+    <ClCompile Include="JAPP\jp_promode.c" />
+    <ClCompile Include="JAPP\jp_stack.c" />
+    <ClCompile Include="JAPP\jp_tokenparser.c" />
+    <ClCompile Include="json\cJSON.c" />
+    <ClCompile Include="libudis86\decode.c" />
+    <ClCompile Include="libudis86\input.c" />
+    <ClCompile Include="libudis86\itab.c" />
+    <ClCompile Include="libudis86\syn-att.c" />
+    <ClCompile Include="libudis86\syn-intel.c" />
+    <ClCompile Include="libudis86\syn.c" />
+    <ClCompile Include="libudis86\udis86.c" />
+    <ClCompile Include="lua\lapi.c" />
+    <ClCompile Include="lua\lauxlib.c" />
+    <ClCompile Include="lua\lbaselib.c" />
+    <ClCompile Include="lua\lbitlib.c" />
+    <ClCompile Include="lua\lcode.c" />
+    <ClCompile Include="lua\lcorolib.c" />
+    <ClCompile Include="lua\lctype.c" />
+    <ClCompile Include="lua\ldblib.c" />
+    <ClCompile Include="lua\ldebug.c" />
+    <ClCompile Include="lua\ldo.c" />
+    <ClCompile Include="lua\ldump.c" />
+    <ClCompile Include="lua\lfunc.c" />
+    <ClCompile Include="lua\lgc.c" />
+    <ClCompile Include="lua\linit.c" />
+    <ClCompile Include="lua\liolib.c" />
+    <ClCompile Include="lua\llex.c" />
+    <ClCompile Include="lua\lmathlib.c" />
+    <ClCompile Include="lua\lmem.c" />
+    <ClCompile Include="lua\loadlib.c" />
+    <ClCompile Include="lua\lobject.c" />
+    <ClCompile Include="lua\lopcodes.c" />
+    <ClCompile Include="lua\loslib.c" />
+    <ClCompile Include="lua\lparser.c" />
+    <ClCompile Include="lua\lstate.c" />
+    <ClCompile Include="lua\lstring.c" />
+    <ClCompile Include="lua\lstrlib.c" />
+    <ClCompile Include="lua\ltable.c" />
+    <ClCompile Include="lua\ltablib.c" />
+    <ClCompile Include="lua\ltm.c" />
+    <ClCompile Include="lua\lua.c" />
+    <ClCompile Include="lua\lundump.c" />
+    <ClCompile Include="lua\lvm.c" />
+    <ClCompile Include="lua\lzio.c" />
+    <ClCompile Include="qcommon\q_math.c" />
+    <ClCompile Include="qcommon\q_shared.c" />
+    <ClCompile Include="ui\ui_atoms.c" />
+    <ClCompile Include="ui\ui_cvar.c" />
+    <ClCompile Include="ui\ui_force.c" />
+    <ClCompile Include="ui\ui_gameinfo.c" />
+    <ClCompile Include="ui\ui_main.c" />
+    <ClCompile Include="ui\ui_saber.c" />
+    <ClCompile Include="ui\ui_shared.c" />
+    <ClCompile Include="ui\ui_syscalls.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AE0284A2-4DE8-4F87-AE0C-30B4B556660E}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>scons.bat -Q</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.bat -Q -c</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeBuildCommandLine>scons.bat -Q</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.bat -Q -c</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

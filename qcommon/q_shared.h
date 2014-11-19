@@ -23,8 +23,6 @@
 //	#define FAV_SERVERS // jappeng adds this to engine
 #endif
 
-#include "qcommon/disablewarnings.h"
-
 #include "teams.h" //npc team stuff
 
 #define MAX_WORLD_COORD		( 64 * 1024 )

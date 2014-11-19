@@ -186,10 +186,11 @@ elif plat == 'Windows':
 		env['CPPDEFINES'] += [ '_M_AMD64=100', '_M_X64=100', '_WIN64' ]
 
 	# strict c/cpp warnings
-	if 'MORE_WARNINGS' in os.environ:
-		env['CPPDEFINES'] += [ '/W4', '/Wall' ]
-	else:
-		env['CPPDEFINES'] += [ '/W3', '/wd4996' ]
+	env['CPPDEFINES'] += [ '/W4', '/Wall', '/we 4013', '/we 4024', '/we 4026', '/we 4028', '/we 4029', '/we 4033',
+		'/we 4047', '/we 4053', '/we 4087', '/we 4098', '/we 4245', '/we 4305', '/we 4700'
+	]
+	if 'MORE_WARNINGS' not in os.environ:
+		env['CPPDEFINES'] += [ '/wd 4100', '/wd 4127', '/wd 4244', '/wd 4706', '/wd 4131', '/wd 4996' ]
 
 # debug / release
 if debug == 0 or debug == 2:

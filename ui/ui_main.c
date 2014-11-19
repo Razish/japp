@@ -1,7 +1,6 @@
 #include "Ghoul2/G2.h"
 #include "ui_local.h"
 #include "qcommon/qfiles.h"
-#include "qcommon/game_version.h"
 #include "ui_force.h"
 #include "cgame/animtable.h" //we want this to be compiled into the module because we access it in the shared module.
 #include "game/bg_saga.h"
@@ -2455,11 +2454,9 @@ static void UI_DrawGLInfo( rectDef_t *rect, float scale, const vector4 *color, i
 }
 
 static void UI_Version( rectDef_t *rect, float scale, const vector4 *color, int iMenuFont ) {
-	int width;
+	int width = uiInfo.uiDC.textWidth( JAPP_VERSION, scale, iMenuFont );
 
-	width = uiInfo.uiDC.textWidth( Q3_VERSION, scale, iMenuFont );
-
-	uiInfo.uiDC.drawText( rect->x - width, rect->y, scale, color, Q3_VERSION, 0, 0, 0, iMenuFont );
+	uiInfo.uiDC.drawText( rect->x - width, rect->y, scale, color, JAPP_VERSION, 0, 0, 0, iMenuFont );
 }
 
 //FIXME: table drive
