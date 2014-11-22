@@ -21,6 +21,7 @@ typedef struct adminData_s {
 	telemark_t *telemark; // last marked location
 	qboolean empowered; // are they empowered?
 	qboolean merc; // are they merced?
+	int renamedTime; // level.time they were renamed
 
 	// saving these for amempower
 	int forcePowersKnown;

@@ -1215,15 +1215,6 @@ void ClientCleanName( const char *in, char *out, int outSize ) {
 		else if ( outpos > 0 && out[outpos - 1] == Q_COLOR_ESCAPE ) {
 			if ( Q_IsColorString( &out[outpos - 1] ) ) {
 				colorlessLen--;
-
-#if 0
-				if ( ColorIndex( *in ) == 0 ) {
-					// disallow color black in names to prevent players from getting advantage playing in front of black
-					//	backgrounds
-					outpos--;
-					continue;
-				}
-#endif
 			}
 			else {
 				spaces = ats = 0;
@@ -1887,13 +1878,22 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	if ( client->pers.connected == CON_CONNECTED && strcmp( oldname, client->pers.netname ) ) {
 		if ( client->pers.netnameTime > level.time ) {
-			trap->SendServerCommand( clientNum, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NONAMECHANGE" ) ) );
+			trap->SendServerCommand( clientNum, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME",
+				"NONAMECHANGE" ) ) );
 
 			Info_SetValueForKey( userinfo, "name", oldname );
 			trap->SetUserinfo( clientNum, userinfo );
 			Q_strncpyz( client->pers.netname, oldname, sizeof(client->pers.netname) );
 			Q_strncpyz( client->pers.netnameClean, oldname, sizeof(client->pers.netnameClean) );
 			Q_CleanString( client->pers.netnameClean, STRIP_COLOUR );
+		}
+		else if ( client->pers.adminData.renamedTime != 0
+			&& client->pers.adminData.renamedTime > level.time - (japp_amrenameTime.value * 60.0f) * 1000 )
+		{
+			float remaining = japp_amrenameTime.value * 60.0f;
+			remaining -= (level.time - client->pers.adminData.renamedTime) / 1000.0f;
+			trap->SendServerCommand( clientNum, va( "print \"You are not allowed to change name for another "
+				S_COLOR_CYAN "%.1f " S_COLOR_WHITE "seconds\n\"", remaining ) );
 		}
 		else {
 			trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s %s\n\"", oldname,

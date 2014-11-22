@@ -2289,6 +2289,8 @@ static void AM_Rename( gentity_t *ent ) {
 	trap->SetUserinfo( targetClient, info );
 	trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldName, G_GetStringEdString( "MP_SVGAME",
 		"PLRENAME" ), e->client->pers.netname ) );
+
+	e->client->pers.adminData.renamedTime = level.time;
 }
 
 static void AM_LockTeam( gentity_t *ent ) {
