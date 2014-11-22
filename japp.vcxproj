@@ -360,8 +360,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeBuildCommandLine>scons.bat -Q</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>scons.bat -Q -c</NMakeCleanCommandLine>
+    <NMakeBuildCommandLine>scons.bat -Q debug=1</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.bat -Q -c  debug=1</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

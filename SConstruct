@@ -85,6 +85,9 @@ revision = None if status else rawrevision
 if plat == 'Linux':
 	status, num_cores = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
 	env.SetOption( 'num_jobs', int(num_cores) * 3 if status == 0 else 1 )
+elif plat == 'Windows':
+	num_cores = int( os.environ['NUMBER_OF_PROCESSORS'] )
+	env.SetOption( 'num_jobs', num_cores * 3 )
 
 # notify the user of the build configuration
 if not env.GetOption( 'clean' ):
@@ -164,33 +167,73 @@ if plat == 'Linux':
 
 elif plat == 'Windows':
 	# assume msvc
-	env['CCFLAGS'] = [ '/nologo', '/WX-', '/GS', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/GF',
-		'/TC', '/errorReport:prompt', '/EHs', '/EHc', '/Ot', '/MP', '/c'
+	env['CCFLAGS'] = [
+		'/EHcs',				# exception handling
+		'/errorReport:none',	# don't send error reports for internal compiler errors
+		'/Gd',					# use cdecl calling convention
+		'/GS',					# buffer security check
+		'/nologo',				# remove watermark
+		'/TC',					# compile as c
 	]
-	env['LINKFLAGS'] = [ '/SUBSYSTEM:WINDOWS', '/MACHINE:'+arch, '/LTCG' ]
-	env['CPPDEFINES'] = [ '_WINDLL', '_MSC_EXTENSIONS', '_INTEGRAL_MAX_BITS=64', '_WIN32', '_MT', '_DLL',
-		'_M_FP_PRECISE'
+
+	env['LINKFLAGS'] = [
+		'/ERRORREPORT:none',	# don't send error reports for internal linker errors
+		'/MACHINE:' + arch,		# set the linker architecture
+		'/NOLOGO',				# remove watermark
+		'/SUBSYSTEM:WINDOWS',	# graphical application
 	]
-	if bits == 32:
-		env['CCFLAGS'] += [ '/Zp8', '/Gs', '/Oy-' ]
-		env['CPPDEFINES'] += [ '_M_IX86=600' ]
-		if 'NO_SSE' in os.environ:
-			env['CPPDEFINES'] += [ '_M_IX86_FP=0' ]
-			if cmp_version( ccversion, '11.0' ) >= 0:
-				env['CCFLAGS'] += [ '/arch:IA32' ]
-		else:
-			env['CPPDEFINES'] += [ '_M_IX86_FP=2' ]
-			env['CCFLAGS'] += [ '/arch:SSE2' ]
-	elif bits == 64:
-		env['CCFLAGS'] += [ '/Zp16' ]
-		env['CPPDEFINES'] += [ '_M_AMD64=100', '_M_X64=100', '_WIN64' ]
+
+	env['CPPDEFINES'] = [ '_WIN32' ]
+	if bits == 64:
+		env['CPPDEFINES'] += [ '_WIN64' ]
+
+	# multi-processor compilation
+	if num_cores > 1:
+		env['CCFLAGS'] += [
+			'/FS',							# force synchronous writes to PDB file
+			'/cgthreads' + str(num_cores),	# compiler threads to use for optimisation and code generation
+		]
+		env['LINKFLAGS'] += [
+			'/CGTHREADS:' + str(num_cores),	# linker threads to use for optimisations and code generation
+		]
+
+	# fpu control
+	if 'NO_SSE' in os.environ:
+		env['CCFLAGS'] += [ '/fp:precise' ] # precise FP
+		if bits == 32:
+			env['CCFLAGS'] += [ '/arch:IA32' ] # no sse, x87 fpu
+	else:
+		env['CCFLAGS'] += [ '/fp:strict' ] # strict FP
+		if bits == 32:
+			env['CCFLAGS'] += [ '/arch:SSE2' ] # sse2
 
 	# strict c/cpp warnings
-	env['CPPDEFINES'] += [ '/W4', '/Wall', '/we 4013', '/we 4024', '/we 4026', '/we 4028', '/we 4029', '/we 4033',
-		'/we 4047', '/we 4053', '/we 4087', '/we 4098', '/we 4245', '/we 4305', '/we 4700'
+	env['CPPDEFINES'] += [
+		'/W4',
+		'/Wall',
+		'/we 4013',
+		'/we 4024',
+		'/we 4026',
+		'/we 4028',
+		'/we 4029',
+		'/we 4033',
+		'/we 4047',
+		'/we 4053',
+		'/we 4087',
+		'/we 4098',
+		'/we 4245',
+		'/we 4305',
+		'/we 4700'
 	]
 	if 'MORE_WARNINGS' not in os.environ:
-		env['CPPDEFINES'] += [ '/wd 4100', '/wd 4127', '/wd 4244', '/wd 4706', '/wd 4131', '/wd 4996' ]
+		env['CPPDEFINES'] += [
+			'/wd 4100',
+			'/wd 4127',
+			'/wd 4244',
+			'/wd 4706',
+			'/wd 4131',
+			'/wd 4996'
+		]
 
 # debug / release
 if debug == 0 or debug == 2:
@@ -199,19 +242,41 @@ if debug == 0 or debug == 2:
 		if debug == 0:
 			env['LINKFLAGS'] += [ '-s' ]
 	elif plat == 'Windows':
-		env['CCFLAGS'] += [ '/GL', '/Gm-', '/MD', '/O2', '/Oi' ]
-		if bits == 64:
-			env['CCFLAGS'] += [ '/Oy' ]
+		env['CCFLAGS'] += [
+		#	'/c',	# compile without linking
+		#	'/GL',	# whole program optimisation
+			'/Gw',	# optimise global data
+			'/MP',	# multiple process compilation
+			'/O2',	# maximise speed
+		]
+		env['LINKFLAGS'] += [
+			'/INCREMENTAL:NO',	# don't incrementally link
+		#	'/LTCG',			# link-time code generation
+			'/OPT:REF',			# remove unreferenced functions/data
+			'/STACK:32768',		# stack size
+		]
+
 	if debug == 0:
 		env['CPPDEFINES'] += [ 'NDEBUG' ]
+
 if debug:
 	if plat == 'Linux':
 		env['CCFLAGS'] += [ '-g3' ]
 	elif plat == 'Windows':
-		env['CPPDEFINES'] += [ '__MSVC_RUNTIME_CHECKS' ]
-		env['CCFLAGS'] += [ '/Gm', '/FD', '/MDd', '/Od', '/RTC1', '/RTCs', '/RTCu' ]
-		if bits == 32:
-			env['CCFLAGS'] += [ '/FC', '/ZI' ]
+		env['CCFLAGS'] += [
+			'/GF',		# string pooling
+			'/Gy',		# function level linking
+			'/MD',		# multi-threaded debug DLL
+			'/Od',		# disable optimisations
+			'/Oy-',		# disable frame pointer omission
+			'/RTC1',	# runtime checks
+			'/ZI',		# PDB with edit & continue capability
+		]
+		env['LINKFLAGS'] += [
+			'/DEBUG',		# generate debug info
+			'/INCREMENTAL',	# incrementally link
+		]
+
 	env['CPPDEFINES'] += [ '_DEBUG' ]
 
 if revision:
