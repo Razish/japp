@@ -26,7 +26,7 @@ files = [ 'game/ai_main.c', 'game/ai_util.c', 'game/ai_wpnav.c', 'game/AnimalNPC
 	'game/NPC_move.c', 'game/NPC_reactions.c', 'game/NPC_senses.c', 'game/NPC_sounds.c', 'game/NPC_spawn.c',
 	'game/NPC_stats.c', 'game/NPC_utils.c', 'game/SpeederNPC.c', 'game/tri_coll_test.c', 'game/w_force.c',
 	'game/w_saber.c', 'game/WalkerNPC.c', 'JAPP/jp_crash.c', 'JAPP/jp_promode.c', 'JAPP/jp_stack.c',
-	'JAPP/jp_tokenparser.c', 'qcommon/q_math.c', 'qcommon/q_shared.c'
+	'JAPP/jp_tokenparser.c', 'qcommon/md5.c', 'qcommon/q_math.c', 'qcommon/q_shared.c'
 ]
 files = [build_dir + f for f in files]
 

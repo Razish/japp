@@ -1,103 +1,114 @@
 #include "g_local.h"
+#include "json/cJSON.h"
+#include "qcommon/md5.h"
 
-// Session data is the only data that stays persistant across level loads and tournament restarts.
-//TODO: Replace with reading/writing to file(s)
+// session data is the only data that stays persistant across level loads and tournament restarts.
 
-// Called on game shutdown
-void G_WriteClientSessionData( gclient_t *client ) {
-	char s[MAX_CVAR_VALUE_STRING] = { 0 }, siegeClass[64] = { 0 }, IP[NET_ADDRSTRMAXLEN] = { 0 };
-	const char *var = NULL;
-	int i;
+// called on game shutdown
+void G_WriteClientSessionData( const gclient_t *client ) {
+	const clientSession_t *sess = &client->sess;
+	fileHandle_t f;
+	char fileName[MAX_QPATH] = { '\0' };
+	cJSON *root = cJSON_CreateObject();
 
-	// for the strings, replace ' ' with 1
-
-	Q_strncpyz( siegeClass, client->sess.siegeClass, sizeof(siegeClass) );
-	for ( i = 0; siegeClass[i]; i++ ) {
-		if ( siegeClass[i] == ' ' ) {
-			siegeClass[i] = 1;
-		}
+	cJSON_AddIntegerToObject( root, "sessionTeam", sess->sessionTeam );
+	cJSON_AddIntegerToObject( root, "spectatorTime", sess->spectatorTime );
+	cJSON_AddIntegerToObject( root, "spectatorState", sess->spectatorState );
+	cJSON_AddIntegerToObject( root, "spectatorClient", sess->spectatorClient );
+	cJSON_AddIntegerToObject( root, "wins", sess->wins );
+	cJSON_AddIntegerToObject( root, "losses", sess->losses );
+	cJSON_AddIntegerToObject( root, "setForce", sess->setForce );
+	cJSON_AddIntegerToObject( root, "saberLevel", sess->saberLevel );
+	cJSON_AddIntegerToObject( root, "selectedFP", sess->selectedFP );
+	cJSON_AddIntegerToObject( root, "duelTeam", sess->duelTeam );
+	cJSON_AddIntegerToObject( root, "siegeDesiredTeam", sess->siegeDesiredTeam );
+	cJSON_AddStringToObject( root, "siegeClass", *sess->siegeClass ? sess->siegeClass : "none" );
+	cJSON_AddStringToObject( root, "IP", sess->IP );
+	if ( client->pers.adminUser ) {
+		char checksum[16];
+		char combined[MAX_STRING_CHARS];
+		Com_sprintf( combined, sizeof(combined), "%s%s",
+			client->pers.adminUser->user, client->pers.adminUser->password );
+		Q_ChecksumMD5( combined, strlen( combined ), checksum );
+		trap->Print( "\nstoring %s as %s\n", combined, checksum );
+		cJSON_AddStringToObject( root, "admin", checksum );
 	}
-	if ( !siegeClass[0] ) {
-		Q_strncpyz( siegeClass, "none", sizeof(siegeClass) );
-	}
 
-	Q_strncpyz( IP, client->sess.IP, sizeof(IP) );
-	for ( i = 0; IP[i]; i++ ) {
-		if ( IP[i] == ' ' ) {
-			IP[i] = 1;
-		}
-	}
+	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", client - level.clients );
+	trap->FS_Open( fileName, &f, FS_WRITE );
+	//Com_Printf( "Writing session file %s\n", fileName );
 
-	// Make sure there is no space on the last entry
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.sessionTeam ) );
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.spectatorTime ) );
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.spectatorState ) );
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.spectatorClient ) );
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.wins ) );
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.losses ) );
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.setForce ) );
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.saberLevel ) );
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.selectedFP ) );
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.duelTeam ) );
-	Q_strcat( s, sizeof(s), va( "%i ", client->sess.siegeDesiredTeam ) );
-	Q_strcat( s, sizeof(s), va( "%s ", siegeClass ) );
-	Q_strcat( s, sizeof(s), va( "%s", IP ) );
-
-	var = va( "session%i", client - level.clients );
-
-	trap->Cvar_Set( var, s );
+	Q_WriteJSONToFile( root, f );
 }
 
-// Called on a reconnect
-void G_ReadSessionData( gclient_t *client ) {
-	char s[MAX_CVAR_VALUE_STRING] = { 0 };
-	const char *var = NULL;
-	int i;
-	int tmp1, tmp2;
+// called on a reconnect
+void G_ReadClientSessionData( gclient_t *client ) {
+	clientSession_t *sess = &client->sess;
+	cJSON *root;
+	char fileName[MAX_QPATH] = { '\0' };
+	char *buffer = NULL;
+	fileHandle_t f = NULL_FILE;
+	unsigned int len;
+	const char *tmp = NULL;
 
-	var = va( "session%i", client - level.clients );
-	trap->Cvar_VariableStringBuffer( var, s, sizeof(s) );
+	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", client - level.clients );
+	len = trap->FS_Open( fileName, &f, FS_READ );
 
-	//RAZTODO: sscanf validation
-	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %s %s",
-		&tmp1,
-		&client->sess.spectatorTime,
-		&tmp2,
-		&client->sess.spectatorClient,
-		&client->sess.wins,
-		&client->sess.losses,
-		&client->sess.setForce,
-		&client->sess.saberLevel,
-		&client->sess.selectedFP,
-		&client->sess.duelTeam,
-		&client->sess.siegeDesiredTeam,
-		client->sess.siegeClass,
-		client->sess.IP
-		);
-
-	client->sess.sessionTeam = tmp1;
-	client->sess.spectatorState = tmp2;
-
-	// convert back to spaces from unused chars, as session data is written that way.
-	for ( i = 0; client->sess.siegeClass[i]; i++ ) {
-		if ( client->sess.siegeClass[i] == 1 ) {
-			client->sess.siegeClass[i] = ' ';
-		}
+	// no file
+	if ( !f || !len || len == -1 ) {
+		trap->FS_Close( f );
+		return;
 	}
 
-	for ( i = 0; client->sess.IP[i]; i++ ) {
-		if ( client->sess.IP[i] == 1 ) {
-			client->sess.IP[i] = ' ';
-		}
+	buffer = (char *)malloc( len + 1 );
+	if ( !buffer ) {
+		return;
 	}
 
-	client->ps.fd.saberAnimLevel = client->sess.saberLevel;
-	client->ps.fd.saberDrawAnimLevel = client->sess.saberLevel;
-	client->ps.fd.forcePowerSelected = client->sess.selectedFP;
+	trap->FS_Read( buffer, len, f );
+	trap->FS_Close( f );
+	buffer[len] = '\0';
+
+	// read buffer
+	root = cJSON_Parse( buffer );
+	free( buffer );
+
+	if ( !root ) {
+		Com_Printf( "G_ReadSessionData(%02i): could not parse session data\n", client - level.clients );
+		return;
+	}
+
+	sess->sessionTeam = cJSON_ToInteger( cJSON_GetObjectItem( root, "sessionTeam" ) );
+	sess->spectatorTime = cJSON_ToInteger( cJSON_GetObjectItem( root, "spectatorTime" ) );
+	sess->spectatorState = cJSON_ToInteger( cJSON_GetObjectItem( root, "spectatorState" ) );
+	sess->spectatorClient = cJSON_ToInteger( cJSON_GetObjectItem( root, "spectatorClient" ) );
+	sess->wins = cJSON_ToInteger( cJSON_GetObjectItem( root, "wins" ) );
+	sess->losses = cJSON_ToInteger( cJSON_GetObjectItem( root, "losses" ) );
+	sess->setForce = cJSON_ToInteger( cJSON_GetObjectItem( root, "setForce" ) );
+	sess->saberLevel = cJSON_ToInteger( cJSON_GetObjectItem( root, "saberLevel" ) );
+	sess->selectedFP = cJSON_ToInteger( cJSON_GetObjectItem( root, "selectedFP" ) );
+	sess->duelTeam = cJSON_ToInteger( cJSON_GetObjectItem( root, "duelTeam" ) );
+	sess->siegeDesiredTeam = cJSON_ToInteger( cJSON_GetObjectItem( root, "siegeDesiredTeam" ) );
+	if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( root, "siegeClass" ) )) ) {
+		Q_strncpyz( sess->siegeClass, tmp, sizeof(sess->siegeClass) );
+	}
+	if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( root, "IP" ) )) ) {
+		Q_strncpyz( sess->IP, tmp, sizeof(sess->IP) );
+	}
+	if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( root, "admin" ) )) ) {
+		client->pers.adminUser = AM_ChecksumLogin( tmp );
+	}
+
+	client->ps.fd.saberAnimLevel = sess->saberLevel;
+	client->ps.fd.saberDrawAnimLevel = sess->saberLevel;
+	client->ps.fd.forcePowerSelected = sess->selectedFP;
+
+	cJSON_Delete( root );
+	root = NULL;
 }
 
-// Called on a first-time connect
-void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
+// called on a first-time connect
+void G_InitClientSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
 	clientSession_t *sess = &client->sess;
 	const char *value;
 
@@ -114,7 +125,8 @@ void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
 			if ( !isBot ) {
 				sess->sessionTeam = TEAM_SPECTATOR;
 			}
-			else { //Bots choose their team on creation
+			else {
+				// bots choose their team on creation
 				value = Info_ValueForKey( userinfo, "team" );
 				if ( value[0] == 'r' || value[0] == 'R' ) {
 					sess->sessionTeam = TEAM_RED;
@@ -142,12 +154,14 @@ void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
 			case GT_HOLOCRON:
 			case GT_JEDIMASTER:
 			case GT_SINGLE_PLAYER:
-				if ( g_maxGameClients.integer > 0 &&
-					level.numNonSpectatorClients >= g_maxGameClients.integer ) {
+				if ( g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer ) {
 					sess->sessionTeam = TEAM_SPECTATOR;
 				}
-				else {
+				else if ( g_teamAutoJoin.integer == 2 ) {
 					sess->sessionTeam = TEAM_FREE;
+				}
+				else {
+					sess->sessionTeam = TEAM_SPECTATOR;
 				}
 				break;
 			case GT_DUEL:
@@ -160,21 +174,19 @@ void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
 				}
 				break;
 			case GT_POWERDUEL:
-				//sess->duelTeam = DUELTEAM_LONE; //default
-			{
-				int loners = 0;
-				int doubles = 0;
+				{
+					int loners = 0, doubles = 0;
 
-				G_PowerDuelCount( &loners, &doubles, qtrue );
+					G_PowerDuelCount( &loners, &doubles, qtrue );
 
-				if ( !doubles || loners > (doubles / 2) ) {
-					sess->duelTeam = DUELTEAM_DOUBLE;
+					if ( !doubles || loners > (doubles / 2) ) {
+						sess->duelTeam = DUELTEAM_DOUBLE;
+					}
+					else {
+						sess->duelTeam = DUELTEAM_LONE;
+					}
+					sess->sessionTeam = TEAM_SPECTATOR;
 				}
-				else {
-					sess->duelTeam = DUELTEAM_LONE;
-				}
-			}
-				sess->sessionTeam = TEAM_SPECTATOR;
 				break;
 			}
 		}
@@ -183,34 +195,73 @@ void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
 	sess->spectatorState = SPECTATOR_FREE;
 	sess->spectatorTime = level.time;
 
-	sess->siegeClass[0] = 0;
+	sess->siegeClass[0] = '\0';
 
 	G_WriteClientSessionData( client );
 }
 
-void G_InitWorldSession( void ) {
-	char	s[MAX_STRING_CHARS];
-	int			gt;
+static const char *metaFileName = "session/meta.json";
 
-	trap->Cvar_VariableStringBuffer( "session", s, sizeof(s) );
-	gt = atoi( s );
+void G_ReadSessionData( void ) {
+	char *buffer = NULL;
+	fileHandle_t f = NULL_FILE;
+	unsigned int len = 0u;
+	cJSON *root;
 
-	// if the gametype changed since the last session, don't use any
-	// client sessions
-	if ( level.gametype != gt ) {
+	trap->Print( "G_ReadSessionData: reading %s...", metaFileName );
+	len = trap->FS_Open( metaFileName, &f, FS_READ );
+
+	// no file
+	if ( !f || !len || len == -1 ) {
+		trap->Print( "failed to open file, clearing session data...\n" );
 		level.newSession = qtrue;
-		trap->Print( "Gametype changed, clearing session data.\n" );
+		return;
 	}
+
+	buffer = (char *)malloc( len + 1 );
+	if ( !buffer ) {
+		trap->Print( "failed to allocate buffer, clearing session data...\n" );
+		level.newSession = qtrue;
+		return;
+	}
+
+	trap->FS_Read( buffer, len, f );
+	trap->FS_Close( f );
+	buffer[len] = '\0';
+
+	// read buffer
+	root = cJSON_Parse( buffer );
+
+	// if the gametype changed since the last session, don't use any client sessions
+	if ( level.gametype != cJSON_ToInteger( cJSON_GetObjectItem( root, "gametype" ) ) ) {
+		level.newSession = qtrue;
+		trap->Print( "gametype changed, clearing session data..." );
+	}
+
+	free( buffer );
+	cJSON_Delete( root );
+	root = NULL;
+	trap->Print( "done\n" );
 }
 
 void G_WriteSessionData( void ) {
-	int		i;
+	int i;
+	fileHandle_t f;
+	const gclient_t *client = NULL;
+	cJSON *root = cJSON_CreateObject();
 
-	trap->Cvar_Set( "session", va( "%i", level.gametype ) );
+	cJSON_AddIntegerToObject( root, "gametype", level.gametype );
 
-	for ( i = 0; i < level.maxclients; i++ ) {
-		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
-			G_WriteClientSessionData( &level.clients[i] );
+	trap->Print( "G_WriteSessionData: writing %s...", metaFileName );
+	trap->FS_Open( metaFileName, &f, FS_WRITE );
+
+	Q_WriteJSONToFile( root, f );
+
+	for ( i = 0, client = level.clients; i < level.maxclients; i++, client++ ) {
+		if ( client->pers.connected == CON_CONNECTED ) {
+			G_WriteClientSessionData( client );
 		}
 	}
+
+	trap->Print( "done\n" );
 }

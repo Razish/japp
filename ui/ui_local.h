@@ -157,11 +157,6 @@ typedef struct teamInfo_s {
 	int cinematic;
 } teamInfo_t;
 
-typedef struct gameTypeInfo_s {
-	const char *gameType;
-	int gtEnum;
-} gameTypeInfo_t;
-
 typedef struct mapInfo_s {
 	const char *mapName;
 	const char *mapLoadName;
@@ -272,12 +267,6 @@ typedef struct uiInfo_s {
 	int						teamCount;
 	teamInfo_t				teamList[MAX_TEAMS];
 
-	int						numGameTypes;
-	gameTypeInfo_t			gameTypes[MAX_GAMETYPES];
-
-	int						numJoinGameTypes;
-	gameTypeInfo_t			joinGameTypes[MAX_GAMETYPES];
-
 	int						redBlue;
 	int						playerCount;
 	int						myTeamCount;
@@ -293,7 +282,6 @@ typedef struct uiInfo_s {
 
 	int						mapCount;
 	mapInfo_t				mapList[MAX_MAPS];
-
 
 	int						tierCount;
 	tierInfo_t				tierList[MAX_TIERS];

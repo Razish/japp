@@ -521,7 +521,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	Q_strncpyz( level.rawmapname, Info_ValueForKey( cs, "mapname" ), sizeof(level.rawmapname) );
 
-	G_InitWorldSession();
+	G_ReadSessionData();
 
 	// initialize all entities for this game
 	memset( g_entities, 0, MAX_GENTITIES * sizeof(g_entities[0]) );
@@ -533,16 +533,17 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.clients = g_clients;
 
 	// set client fields on player ents
-	for ( i = 0; i < level.maxclients; i++ )
+	for ( i = 0; i < level.maxclients; i++ ) {
 		g_entities[i].client = level.clients + i;
+	}
 
-	// always leave room for the max number of clients,
-	// even if they aren't all used, so numbers inside that
-	// range are NEVER anything but clients
+	// always leave room for the max number of clients, even if they aren't all used, so numbers inside that range are
+	//	NEVER anything but clients
 	level.num_entities = MAX_CLIENTS;
 
 	// let the server system know where the entites are
-	trap->LocateGameData( (sharedEntity_t *)level.gentities, level.num_entities, sizeof(gentity_t), &level.clients[0].ps, sizeof(level.clients[0]) );
+	trap->LocateGameData( (sharedEntity_t *)level.gentities, level.num_entities, sizeof(gentity_t),
+		&level.clients[0].ps, sizeof(level.clients[0]) );
 
 	//Load sabers.cfg data
 	WP_SaberLoadParms();
@@ -577,15 +578,19 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_FindTeams();
 
 	// make sure we have flags for CTF, etc
-	if ( level.gametype >= GT_TEAM )
+	if ( level.gametype >= GT_TEAM ) {
 		G_CheckTeamItems();
-	else if ( level.gametype == GT_JEDIMASTER )
+	}
+	else if ( level.gametype == GT_JEDIMASTER ) {
 		trap->SetConfigstring( CS_CLIENT_JEDIMASTER, "-1" );
+	}
 
-	if ( level.gametype == GT_POWERDUEL )
+	if ( level.gametype == GT_POWERDUEL ) {
 		trap->SetConfigstring( CS_CLIENT_DUELISTS, va( "-1|-1|-1" ) );
-	else
+	}
+	else {
 		trap->SetConfigstring( CS_CLIENT_DUELISTS, va( "-1|-1" ) );
+	}
 
 	// nmckenzie: DUEL_HEALTH: Default.
 	trap->SetConfigstring( CS_CLIENT_DUELHEALTHS, va( "-1|-1|!" ) );
@@ -617,8 +622,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		G_LogPrintf( level.log.console, "Duel Tournament Begun: kill limit %d, win limit: %d\n", fraglimit.integer, duel_fraglimit.integer );
 
 	//not loaded - need to calc paths
-	if ( navCalculatePaths )
+	if ( navCalculatePaths ) {
 		navCalcPathTime = level.time + START_TIME_NAV_CALC;//make sure all ents are in and linked
+	}
 	else {//loaded
 		//FIXME: if this is from a loadgame, it needs to be sure to write this
 		//out whenever you do a savegame since the edges and routes are dynamic...
@@ -630,13 +636,11 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		navCalcPathTime = 0;
 	}
 
-	//	if ( level.gametype == GT_SIEGE )
-	{//just get these configstrings registered now...
-		for ( i = 0; i < MAX_CUSTOM_SIEGE_SOUNDS; i++ ) {
-			if ( !bg_customSiegeSoundNames[i] )
-				break;
-			G_SoundIndex( bg_customSiegeSoundNames[i] );
+	for ( i = 0; i < MAX_CUSTOM_SIEGE_SOUNDS; i++ ) {
+		if ( !bg_customSiegeSoundNames[i] ) {
+			break;
 		}
+		G_SoundIndex( bg_customSiegeSoundNames[i] );
 	}
 
 	//Raz: JK2 gametypes

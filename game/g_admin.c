@@ -15,6 +15,7 @@
 #include "g_admin.h"
 #include "json/cJSON.h"
 #include "bg_lua.h"
+#include "qcommon/md5.h"
 
 static adminUser_t *adminUsers = NULL;
 static telemark_t *telemarks = NULL;
@@ -182,6 +183,8 @@ static void AM_ReadAccounts( const char *jsonText ) {
 			Q_strncpyz( user->loginMsg, tmp, sizeof(user->loginMsg) );
 		}
 	}
+
+	cJSON_Delete( root );
 }
 
 // create json object for admin accounts and write to file
@@ -216,7 +219,7 @@ void AM_LoadAdmins( void ) {
 	AM_ClearAccounts();
 
 	len = trap->FS_Open( ADMIN_FILE, &f, FS_READ );
-	Com_Printf( "Loading admin accounts (" ADMIN_FILE ")\n" );
+	trap->Print( "Loading admin accounts (" ADMIN_FILE ")\n" );
 
 	// no file
 	if ( !f ) {
@@ -475,6 +478,8 @@ static void AM_ReadTelemarks( const char *jsonText ) {
 		tmpInt = cJSON_ToInteger( cJSON_GetObjectItem( item, "z" ) );
 		tm->position.z = tmpInt;
 	}
+
+	cJSON_Delete( root );
 }
 
 // create json object for telemarks and write to file
@@ -603,12 +608,49 @@ static void AM_Logout( gentity_t *ent ) {
 	trap->SendServerCommand( ent - g_entities, "print \"You have logged out\n\"" );
 }
 
+// login via checksum, e.g. across sessions
+adminUser_t *AM_ChecksumLogin( const char *checksum ) {
+	int count = 0;
+	adminUser_t *user = NULL, *result = NULL;
+
+	for ( user = adminUsers; user; user = user->next ) {
+		char thisChecksum[16];
+		char combined[MAX_STRING_CHARS];
+
+		// insert non-transmittable character so a user/pass of x/yz won't match xy/z
+		Com_sprintf( combined, sizeof(combined), "%s%s", user->user, user->password );
+		Q_ChecksumMD5( combined, strlen( combined ), thisChecksum );
+		trap->Print( "comparing %s:%s and %s\n", combined, thisChecksum, checksum );
+		if ( !strcmp( thisChecksum, checksum ) ) {
+#ifdef _DEBUG
+			trap->Print( "AM_ChecksumLogin: logged in as %s\n", user->user );
+#endif // _DEBUG
+			result = user;
+			count++;
+		}
+	}
+
+	if ( count > 1 ) {
+		trap->Print( "AM_ChecksumLogin: checksum collision\n" );
+		return NULL;
+	}
+
+#ifdef _DEBUG
+	if ( !result ) {
+		trap->Print( "AM_CheckLogin: no matches\n" );
+	}
+#endif // _DEBUG
+
+	return result;
+}
+
 // display list of admins
 static void AM_WhoIs( gentity_t *ent ) {
 	int i;
 	char msg[1024 - 128] = { 0 };
 	gentity_t *e = NULL;
 
+	//TODO: optimal spacing
 	Q_strcat( msg, sizeof(msg), S_COLOR_WHITE "Name                                Admin User                      "
 		"Rank\n" );
 

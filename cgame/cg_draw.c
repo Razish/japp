@@ -983,22 +983,29 @@ void JP_DrawMovementKeys( void ) {
 	float w1 = 0.0f, w2 = 0.0f, height = 0.0f;
 	int fontIndex = FONT_JAPPMONO;
 
-	if ( !cg_movementKeys.integer || !cg.snap ) //RAZTODO: works with demo playback??
+	//RAZTODO: works with demo playback??
+	if ( !cg_movementKeys.integer || !cg.snap ) {
 		return;
+	}
 
-	if ( cg.clientNum == cg.predictedPlayerState.clientNum && !cg.demoPlayback )
+	if ( cg.clientNum == cg.predictedPlayerState.clientNum && !cg.demoPlayback ) {
 		trap->GetUserCmd( trap->GetCurrentCmdNumber(), &cmd );
+	}
 	else {
 		int moveDir = cg.snap->ps.movementDir;
 		float xyspeed = sqrtf( cg.snap->ps.velocity.x*cg.snap->ps.velocity.x + cg.snap->ps.velocity.y*cg.snap->ps.velocity.y );
 
-		if ( (cg.snap->ps.pm_flags & PMF_JUMP_HELD) )//zspeed > lastZSpeed || zspeed > 10 )
+		if ( cg.snap->ps.pm_flags & PMF_JUMP_HELD ) {
+			// zspeed > lastZSpeed || zspeed > 10
 			cmd.upmove = 1;
-		else if ( (cg.snap->ps.pm_flags & PMF_DUCKED) )
+		}
+		else if ( cg.snap->ps.pm_flags & PMF_DUCKED ) {
 			cmd.upmove = -1;
+		}
 
-		if ( xyspeed < 10 )
+		if ( xyspeed < 10 ) {
 			moveDir = -1;
+		}
 
 		switch ( moveDir ) {
 		case 0: // W

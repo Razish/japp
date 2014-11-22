@@ -67,26 +67,26 @@ typedef struct adminUser_s {
 #define PRIV_RENAME		(0x02000000u)
 #define PRIV_LOCKTEAM	(0x04000000u)
 
-void		AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const int rank, const char *loginMsg );
-void		AM_DeleteAdmin( const char *user );
-void		AM_ListAdmins( void );
-void		AM_LoadAdmins( void );
-void		AM_SaveAdmins( void );
-void		AM_LoadTelemarks( void );
-void		AM_SaveTelemarks( void );
-
-qboolean	AM_HasPrivilege( const gentity_t *ent, uint32_t privilege );
-void		AM_PrintCommands( gentity_t *ent, printBufferSession_t *pb );
-qboolean	AM_HandleCommands( gentity_t *ent, const char *cmd );
-void		G_BroadcastToAdminsOnly( gentity_t *ent );
+void		 AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const int rank, const char *loginMsg );
+void		 AM_DeleteAdmin( const char *user );
+void		 AM_ListAdmins( void );
+void		 AM_LoadAdmins( void );
+void		 AM_SaveAdmins( void );
+void		 AM_LoadTelemarks( void );
+void		 AM_SaveTelemarks( void );
+adminUser_t	*AM_ChecksumLogin( const char *checksum );
+qboolean	 AM_HasPrivilege( const gentity_t *ent, uint32_t privilege );
+void		 AM_PrintCommands( gentity_t *ent, printBufferSession_t *pb );
+qboolean	 AM_HandleCommands( gentity_t *ent, const char *cmd );
+void		 G_BroadcastToAdminsOnly( gentity_t *ent );
 
 // bans
-void		JP_Bans_Clear( void );
-void		JP_Bans_LoadBans( void );
-void		JP_Bans_Init( void );
-void		JP_Bans_SaveBans( void );
-void		JP_Bans_List( void );
-qboolean	JP_Bans_Remove( byte *ip );
-int			JP_Bans_AddBanString( const char *ip, const char *duration, const char *reason, char *failedMsg, size_t msgLen );
+void		 JP_Bans_Clear( void );
+void		 JP_Bans_LoadBans( void );
+void		 JP_Bans_Init( void );
+void		 JP_Bans_SaveBans( void );
+void		 JP_Bans_List( void );
+qboolean	 JP_Bans_Remove( byte *ip );
+int			 JP_Bans_AddBanString( const char *ip, const char *duration, const char *reason, char *failedMsg, size_t msgLen );
 const char	*JP_Bans_IsBanned( byte *ip );
 byteAlias_t *BuildByteFromIP( const char *ip );

@@ -1,8 +1,6 @@
 #include "ui_local.h"
 
-//
 // Cvar callbacks
-//
 
 /*
 static void CVU_Derpity( void ) {
@@ -10,16 +8,13 @@ static void CVU_Derpity( void ) {
 }
 */
 
-
-//
 // Cvar table
-//
 
 typedef struct cvarTable_s {
-	vmCvar_t	*vmCvar;
-	const char	*cvarName, *defaultString;
+	vmCvar_t *vmCvar;
+	const char *cvarName, *defaultString;
 	void( *update )(void);
-	int			cvarFlags;
+	uint32_t cvarFlags;
 } cvarTable_t;
 
 #define XCVAR_DECL

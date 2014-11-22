@@ -744,7 +744,7 @@ void G_AddBot( const char *name, float skill, const char *team, int delay, char 
 
 		bot->client->ps.persistant[PERS_TEAM] = bot->client->sess.sessionTeam;
 
-		G_ReadSessionData( bot->client );
+		G_ReadClientSessionData( bot->client );
 		if ( !ClientUserinfoChanged( clientNum ) ) {
 			trap->BotFreeClient( clientNum );
 			return;

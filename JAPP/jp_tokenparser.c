@@ -17,11 +17,12 @@ void TP_NewParseSession( const char *data ) {
 }
 
 static const char *TP_SkipWhitespace( const char *data, qboolean *hasNewLines ) {
-	int c;
+	char c;
 
 	while ( (c = *data) <= ' ' ) {
-		if ( !c )
+		if ( !c ) {
 			return NULL;
+		}
 
 		if ( c == '\n' ) {
 			tp_lines++;
@@ -38,11 +39,12 @@ static const char *TP_ParseExt( qboolean allowLineBreaks ) {
 	qboolean	hasNewLines = qfalse;
 	const char	*data = tp_data;
 	char		quotechar;
-	char		c = 0;
+	char		c = '\0';
 
-	tp_token[0] = 0;
+	tp_token[0] = '\0';
 
-	if ( !data ) {// make sure incoming data is valid
+	if ( !data ) {
+		// make sure incoming data is valid
 		tp_data = NULL;
 		return tp_token;
 	}
@@ -62,37 +64,43 @@ static const char *TP_ParseExt( qboolean allowLineBreaks ) {
 
 		c = *data;
 
-		if ( c == '/' && data[1] == '/' ) {//skip double slash comments
+		if ( c == '/' && data[1] == '/' ) {
+			// skip double slash comments
 			data += 2;
-			while ( *data && *data != '\n' )
+			while ( *data && *data != '\n' ) {
 				data++;
+			}
 		}
 
-		else if ( c == '/' && data[1] == '*' ) {//skip block comments
+		else if ( c == '/' && data[1] == '*' ) {
+			// skip block comments
 			data += 2;
-			while ( *data && (*data != '*' || data[1] != '/') )
+			while ( *data && (*data != '*' || data[1] != '/') ) {
 				data++;
-			if ( *data )
+			}
+			if ( *data ) {
 				data += 2;
+			}
 		}
-		else
+		else {
 			break;
+		}
 	}
 
-	if ( c == '\"' || c == '\'' ) {// handle quoted strings (both " and ')
+	if ( c == '\"' || c == '\'' ) {
+		// handle quoted strings (both " and ')
 		quotechar = c;
 		data++;
 		while ( 1 ) {
 			c = *data++;
 			if ( c == quotechar || !c || ((c == '\r' || c == '\n') && !allowLineBreaks) ) {
-				tp_token[len] = 0;
-				tp_data = (char *)data;
+				tp_token[len] = '\0';
+				tp_data = data;
 				return tp_token;
 			}
 
 			if ( len < MAX_TOKEN_LENGTH ) {
-				tp_token[len] = c;
-				len++;
+				tp_token[len++] = c;
 			}
 		}
 	}
@@ -100,19 +108,19 @@ static const char *TP_ParseExt( qboolean allowLineBreaks ) {
 	// parse a token
 	while ( c > 32 ) {
 		if ( len < MAX_TOKEN_LENGTH ) {
-			tp_token[len] = c;
-			len++;
+			tp_token[len++] = c;
 		}
 		data++;
 
 		c = *data;
-		if ( c == '\n' )
+		if ( c == '\n' ) {
 			tp_lines++;
+		}
 	};
 
-	tp_token[len] = 0;
+	tp_token[len] = '\0';
 
-	tp_data = (char *)data;
+	tp_data = data;
 	return tp_token;
 }
 
@@ -125,79 +133,60 @@ int TP_CurrentLine( void ) {
 	return tp_lines;
 }
 
-#if 0
-qboolean TP_DataRemaining( void )
-{
-	return !!(tp_data);
-}
-
-void TP_SkipLine( void )
-{
-	while ( *tp_data && *tp_data != '\n' )
-		tp_data++;
-
-	if ( *tp_data == '\n' )
-		tp_data++;
-
-	else if ( !*tp_data )
-		tp_data = NULL;
-}
-#endif
-
 qboolean TP_ParseString( const char **s ) {
 	*s = TP_ParseExt( qfalse );
-	return (!s[0]);
+	return (*s == NULL) ? qtrue : qfalse;
 }
 
 qboolean TP_ParseUInt( unsigned int *i ) {
-	const char	*token;
-
-	token = TP_ParseExt( qfalse );
+	const char *token = TP_ParseExt( qfalse );
 
 	*i = strtoul( token, NULL, 0 );
 	return qfalse;
 }
 
 qboolean TP_ParseInt( int *i ) {
-	const char	*token = TP_ParseExt( qfalse );
+	const char *token = TP_ParseExt( qfalse );
 
-	if ( !token[0] )
+	if ( *token == '\0' ) {
 		return qtrue;
+	}
 
 	*i = atoi( token );
 	return qfalse;
 }
 
 qboolean TP_ParseShort( short *i ) {
-	const char	*token = TP_ParseExt( qfalse );
+	const char *token = TP_ParseExt( qfalse );
 
-	if ( !token[0] )
+	if ( *token == '\0' ) {
 		return qtrue;
+	}
 
 	*i = (short)atoi( token );
 	return qfalse;
 }
 
-
 qboolean TP_ParseFloat( float *f ) {
-	const char	*token = TP_ParseExt( qfalse );
+	const char *token = TP_ParseExt( qfalse );
 
-	if ( !token[0] )
+	if ( *token == '\0' ) {
 		return qtrue;
+	}
 
 	*f = atoff( token );
 	return qfalse;
 }
 
 qboolean TP_ParseVec3( vector3 *vec ) {
-	const char	*token;
 	int i;
 
 	for ( i = 0; i < 3; i++ ) {
-		token = TP_ParseExt( qfalse );
+		const char *token = TP_ParseExt( qfalse );
 
-		if ( !token[0] )
+		if ( *token == '\0' ) {
 			return qtrue;
+		}
 
 		vec->data[i] = atoff( token );
 	}
@@ -206,13 +195,13 @@ qboolean TP_ParseVec3( vector3 *vec ) {
 }
 
 qboolean TP_ParseVec4( vector4 *vec ) {
-	const char	*token;
 	int i;
 
 	for ( i = 0; i < 4; i++ ) {
-		token = TP_ParseExt( qfalse );
-		if ( !token[0] )
+		const char *token = TP_ParseExt( qfalse );
+		if ( *token == '\0' ) {
 			return qtrue;
+		}
 
 		vec->data[i] = atoff( token );
 	}
@@ -221,11 +210,11 @@ qboolean TP_ParseVec4( vector4 *vec ) {
 }
 
 qboolean TP_ParseByte( byte *i ) {
-	const char	*token;
+	const char *token = TP_ParseExt( qfalse );
 
-	token = TP_ParseExt( qfalse );
-	if ( !token[0] )
+	if ( *token == '\0' ) {
 		return qtrue;
+	}
 
 	*i = (byte)atoi( token );
 	return qfalse;
