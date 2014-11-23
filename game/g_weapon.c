@@ -2131,7 +2131,7 @@ void WP_PlaceLaserTrap( gentity_t *ent, qboolean alt_fire ) {
 
 	laserTrap = G_Spawn();
 
-	if ( japp_removeOldMines.integer ) {
+	if ( japp_removeOldExplosives.integer ) {
 		// limit to 10 placed at any one time
 		//	see how many there are now
 		while ( (found = G_Find( found, FOFS( classname ), "laserTrap" )) != NULL ) {
@@ -2458,58 +2458,57 @@ qboolean CheatsOn( void ) {
 }
 
 void WP_DropDetPack( gentity_t *ent, qboolean alt_fire ) {
-	gentity_t	*found = NULL;
-	int			trapcount = 0;
-	int			foundDetPacks[MAX_GENTITIES] = { ENTITYNUM_NONE };
-	int			trapcount_org;
-	int			lowestTimeStamp;
-	int			removeMe;
-	int			i;
+	int i;
 
 	if ( !ent || !ent->client ) {
 		return;
 	}
 
-	//limit to 10 placed at any one time
-	//see how many there are now
-	while ( (found = G_Find( found, FOFS( classname ), "detpack" )) != NULL ) {
-		if ( found->parent != ent ) {
-			continue;
-		}
-		foundDetPacks[trapcount++] = found->s.number;
-	}
-	//now remove first ones we find until there are only 9 left
-	found = NULL;
-	trapcount_org = trapcount;
-	lowestTimeStamp = level.time;
-	while ( trapcount > 9 ) {
-		removeMe = -1;
-		for ( i = 0; i < trapcount_org; i++ ) {
-			if ( foundDetPacks[i] == ENTITYNUM_NONE ) {
+	if ( japp_removeOldExplosives.integer && !CheatsOn() ) {
+		// limit to 10 placed at any one time
+		gentity_t *found = NULL;
+		int trapcount = 0, trapcount_org;
+		int foundDetPacks[MAX_GENTITIES] = { ENTITYNUM_NONE };
+		int lowestTimeStamp, removeMe;
+
+		// see how many there are now
+		while ( (found = G_Find( found, FOFS( classname ), "detpack" )) != NULL ) {
+			if ( found->parent != ent ) {
 				continue;
 			}
-			found = &g_entities[foundDetPacks[i]];
-			if ( found->setTime < lowestTimeStamp ) {
-				removeMe = i;
-				lowestTimeStamp = found->setTime;
-			}
+			foundDetPacks[trapcount++] = found->s.number;
 		}
-		if ( removeMe != -1 ) {
-			// remove it... or blow it?
-			if ( &g_entities[foundDetPacks[removeMe]] == NULL ) {
-				break;
-			}
-			else {
-				if ( !CheatsOn() ) {
-					// Let them have unlimited if cheats are enabled
-					G_FreeEntity( &g_entities[foundDetPacks[removeMe]] );
+
+		// now remove first ones we find until there are only 9 left
+		found = NULL;
+		trapcount_org = trapcount;
+		lowestTimeStamp = level.time;
+		while ( trapcount > 9 ) {
+			removeMe = -1;
+			for ( i = 0; i < trapcount_org; i++ ) {
+				if ( foundDetPacks[i] == ENTITYNUM_NONE ) {
+					continue;
+				}
+				found = &g_entities[foundDetPacks[i]];
+				if ( found->setTime < lowestTimeStamp ) {
+					removeMe = i;
+					lowestTimeStamp = found->setTime;
 				}
 			}
-			foundDetPacks[removeMe] = ENTITYNUM_NONE;
-			trapcount--;
-		}
-		else {
-			break;
+			if ( removeMe != -1 ) {
+				// remove it... or blow it?
+				if ( &g_entities[foundDetPacks[removeMe]] == NULL ) {
+					break;
+				}
+				else {
+					G_FreeEntity( &g_entities[foundDetPacks[removeMe]] );
+				}
+				foundDetPacks[removeMe] = ENTITYNUM_NONE;
+				trapcount--;
+			}
+			else {
+				break;
+			}
 		}
 	}
 
