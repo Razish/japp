@@ -957,8 +957,9 @@ void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 		}
 	}
 
-	if ( level.manualSpawning )
+	if ( level.manualSpawning ) {
 		ent->jpSpawned = qtrue;
+	}
 }
 
 char *G_AddSpawnVarToken( const char *string ) {

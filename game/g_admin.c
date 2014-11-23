@@ -2020,8 +2020,8 @@ static void AM_EntSpawn( gentity_t *ent ) {
 	unsigned int index = 0;
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"AM_EntSpawn: syntax is 'amspawn <classname> key value key"
-			" value'\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"AM_EntSpawn: syntax is 'amentspawn <classname> key value "
+			"key value'\n\"" );
 		return;
 	}
 
@@ -2062,15 +2062,71 @@ static void AM_EntSpawn( gentity_t *ent ) {
 	return;
 }
 
+// lists all spawned entities
+static void AM_EntList( gentity_t *ent ) {
+	gentity_t *e = NULL;
+	int i;
+	printBufferSession_t pb;
+
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent - g_entities );
+
+	Q_PrintBuffer( &pb, "Listing entities...\n" );
+	for ( i = MAX_CLIENTS, e = g_entities + MAX_CLIENTS; i < ENTITYNUM_WORLD; i++, e++ ) {
+		if ( !e->inuse || !e->jpSpawned ) {
+			continue;
+		}
+		else {
+			const float distance = Distance( &ent->s.origin, &e->s.origin );
+			const char *classname = (e->classname && e->classname[0]) ? e->classname : "Unknown";
+			Q_PrintBuffer( &pb, va( "%4i: %s, type: %i, distance: %.0f\n", i, classname, e->s.eType, distance ) );
+		}
+	}
+	Q_PrintBuffer( &pb, "\n" );
+
+	Q_DeletePrintBuffer( &pb );
+}
+
 // remove an entity
 static void AM_EntRemove( gentity_t *ent ) {
-	trace_t *tr = G_RealTrace( ent, 0.0f );
+	gentity_t *target = NULL;
 
-	if ( tr->entityNum >= MAX_CLIENTS && tr->entityNum < ENTITYNUM_WORLD ) {
-		if ( g_entities[tr->entityNum].jpSpawned ) {
-			G_LogPrintf( level.log.admin, "\t%s removed \"%s\" entity\n", G_PrintClient( ent-g_entities ),
-				g_entities[tr->entityNum].classname );
-			G_FreeEntity( g_entities + tr->entityNum );
+	if ( trap->Argc() > 1 ) {
+		char arg[MAX_STRING_CHARS] = { '\0' };
+		trap->Argv( 1, arg, sizeof(arg) );
+		if ( Q_StringIsInteger( arg ) ) {
+			const int id = atoi( arg );
+			if ( id > MAX_CLIENTS && id < ENTITYNUM_WORLD ) {
+				target = g_entities + id;
+			}
+			else {
+				trap->SendServerCommand( ent - g_entities, va( "print \"AM_EntRemove: Argument must be between %i and "
+					"%i\n\"", MAX_CLIENTS, ENTITYNUM_WORLD ) );
+				return;
+			}
+		}
+		else {
+			trap->SendServerCommand( ent - g_entities, "print \"AM_EntRemove: Argument must be a number\n\"" );
+			return;
+		}
+	}
+	else {
+		trace_t *tr = G_RealTrace( ent, 0.0f );
+
+		if ( tr->entityNum >= MAX_CLIENTS && tr->entityNum < ENTITYNUM_WORLD ) {
+			target = g_entities + tr->entityNum;
+		}
+		else {
+			trap->SendServerCommand( ent - g_entities, "print \"AM_EntRemove: Can't unspawn this entity\n\"" );
+			return;
+		}
+	}
+
+	if ( target ) {
+		if ( target->jpSpawned ) {
+			const char *classname = (target->classname && target->classname[0]) ? target->classname : "Unknown";
+			G_LogPrintf( level.log.admin, "\t%s removed \"%s\" entity\n", G_PrintClient( ent - g_entities ),
+				classname );
+			G_FreeEntity( target );
 		}
 		else {
 			trap->SendServerCommand( ent - g_entities, "print \"AM_EntRemove: Tried to remove entity that was not "
@@ -2441,6 +2497,9 @@ static const adminCommand_t adminCommands[] = {
 	{ "ambanip", PRIV_BAN, AM_BanIP }, // ban specified IP (IP/range-ban + duration + reason)
 	{ "amclip", PRIV_CLIP, AM_Clip }, // toggle noclip mode
 	{ "amempower", PRIV_EMPOWER, AM_Empower }, // empower the specified client
+	{ "amentlist", PRIV_ENTSPAWN, AM_EntList}, // lists all spawned entities
+	{ "amentremove", PRIV_ENTSPAWN, AM_EntRemove }, // remove an entity
+	{ "amentspawn", PRIV_ENTSPAWN, AM_EntSpawn }, // spawn an entity
 	{ "amforceteam", PRIV_FORCETEAM, AM_ForceTeam }, // force the specified client to a specific team
 	{ "amfreeze", PRIV_SLEEP, AM_Freeze }, // !DEPRECATED! freeze specified client on the spot
 	{ "amghost", PRIV_GHOST, AM_Ghost }, // ghost specified client (or self)
@@ -2466,13 +2525,11 @@ static const adminCommand_t adminCommands[] = {
 	{ "amslap", PRIV_SLAP, AM_Slap }, // slap the specified client
 	{ "amslay", PRIV_SLAY, AM_Slay }, // slay the specified client
 	{ "amsleep", PRIV_SLEEP, AM_Sleep }, // sleep the specified client
-	{ "amspawn", PRIV_ENTSPAWN, AM_EntSpawn }, // spawn an entity
 	{ "amstatus", PRIV_STATUS, AM_Status }, // display list of players + clientNum + IP + admin
 	{ "amtele", PRIV_TELEPORT, AM_Teleport }, // teleport (all variations of x to y)
 	{ "amtelemark", PRIV_TELEPORT, AM_Telemark }, // mark current location
 	{ "amunlockteam", PRIV_LOCKTEAM, AM_UnlockTeam }, // allow clients to join a team
 	{ "amunsilence", PRIV_SILENCE, AM_Unsilence }, // unsilence specified client
-	{ "amunspawn", PRIV_ENTSPAWN, AM_EntRemove }, // remove an entity
 	{ "amvstr", PRIV_VSTR, AM_Vstr }, // execute a variable string
 	{ "amwake", PRIV_SLEEP, AM_Wake }, // wake the specified client
 	{ "amweather", PRIV_WEATHER, AM_Weather }, // weather effects
