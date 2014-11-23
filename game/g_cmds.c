@@ -200,25 +200,36 @@ static void Cmd_GiveOther_f( gentity_t *ent ) {
 // Sets client to godmode
 static void Cmd_God_f( gentity_t *ent ) {
 	ent->flags ^= FL_GODMODE;
-	trap->SendServerCommand( ent - g_entities, va( "print \"godmode %s\n\"", (ent->flags & FL_GODMODE) ? "ON" : "OFF" ) );
+	trap->SendServerCommand( ent - g_entities, va( "print \"godmode %s\n\"",
+		(ent->flags & FL_GODMODE) ? "ON" : "OFF" ) );
 }
 
 static void Cmd_Ignore_f( gentity_t *ent ) {
-	char name[MAX_NETNAME];
+	char arg[MAX_NETNAME];
 	int clientNum;
+
 	if ( trap->Argc() != 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\ignore <client>\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\ignore <client>\n\"" );
 		return;
 	}
 
-	trap->Argv( 1, name, sizeof(name) );
-	clientNum = G_ClientFromString( ent, name, FINDCL_SUBSTR | FINDCL_PRINT );
-	if ( clientNum == -1 )
-		return;
+	trap->Argv( 1, arg, sizeof(arg) );
 
-	ent->client->pers.ignore[clientNum] = !ent->client->pers.ignore[clientNum];
-	trap->SendServerCommand( ent - g_entities, va( "print \"%s "S_COLOR_WHITE"%s\n\"", ent->client->pers.ignore[clientNum]
-		? S_COLOR_YELLOW"Ignoring" : S_COLOR_GREEN"Unignoring", g_entities[clientNum].client->pers.netname ) );
+	if ( atoi( arg ) == -1 ) {
+		ent->client->pers.ignore = 0xFFFFFFFFu ^ (1 << (ent - g_entities));
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Ignoring " S_COLOR_WHITE "everyone\n\"" );
+	}
+	else {
+		clientNum = G_ClientFromString( ent, arg, FINDCL_SUBSTR | FINDCL_PRINT );
+		if ( clientNum == -1 ) {
+			return;
+		}
+
+		ent->client->pers.ignore ^= (1 << clientNum);
+		trap->SendServerCommand( ent - g_entities, va( "print \"%s %s\n\"",
+			(ent->client->pers.ignore & (1 << clientNum)) ? S_COLOR_YELLOW "Ignoring" : S_COLOR_GREEN "Unignoring",
+			g_entities[clientNum].client->pers.netname ) );
+	}
 }
 
 // Sets client to notarget
@@ -1006,7 +1017,7 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, char color, con
 	}
 
 	// this client is ignoring us
-	if ( other->client->pers.ignore[ent - g_entities] ) {
+	if ( other->client->pers.ignore & (1 << (ent - g_entities)) ) {
 		return;
 	}
 

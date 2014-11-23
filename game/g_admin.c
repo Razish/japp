@@ -1817,8 +1817,8 @@ static void AM_Ban( gentity_t *ent ) {
 		}
 
 		if ( g_entities[targetClient].r.svFlags & SVF_BOT ) {
-		//	tran->SendServerCommand( ent - g_entities, "print \"Can't ban bots\n\"" );
-		//	return;
+			trap->SendServerCommand( ent - g_entities, "print \"Can't ban bots\n\"" );
+			return;
 		}
 
 		if ( !AM_CanInflict( ent, &g_entities[targetClient] ) ) {

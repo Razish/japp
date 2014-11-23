@@ -455,7 +455,7 @@ typedef struct clientPersistant_s {
 	channel_t			*channels, *activeChannel; // linked list of channels. activeChannel only used for legacy clients that don't support inline chat filters/tabs
 	int					duelWeapon; // for weapon-specific duels - pistols etc
 	vector3				duelStartPos; // respawn client to this position when duel ends
-	qboolean			ignore[MAX_CLIENTS];
+	uint32_t			ignore;
 	int					speed;
 	sayTeamMethod_t		sayTeamMethod;
 } clientPersistant_t;
