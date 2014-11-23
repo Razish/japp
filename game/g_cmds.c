@@ -3344,7 +3344,7 @@ static qboolean SetEmote( gentity_t *ent, const emote_t *emote ) {
 	}
 	if ( emote->flags & EMF_HOLD ) {
 		// hold animation on torso
-		emoteTime = Q3_INFINITE;
+		emoteTime = INT32_MAX;
 	}
 	else {
 		// once off actions

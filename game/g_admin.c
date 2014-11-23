@@ -1055,21 +1055,27 @@ static void AM_RemoveTelemark( gentity_t *ent ) {
 	AM_DeleteTelemark( ent, arg1 );
 }
 
+static void PB_Callback( const char *buffer, int clientNum ) {
+	trap->SendServerCommand( clientNum, va( "print \"%s\"", buffer ) );
+}
+
 // list all marked positions
 static void AM_ListTelemarks( gentity_t *ent ) {
-	char msg[3096] = { 0 };
 	telemark_t *tm = NULL;
-	int i = 0;
+	int i;
+	printBufferSession_t pb;
+
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent - g_entities );
 
 	// append each mark to the end of the string
-	Q_strcat( msg, sizeof(msg), "- Named telemarks\n" );
-	Q_strcat( msg, sizeof(msg), va( "ID %-32s Location\n", "Name" ) );
+	Q_PrintBuffer( &pb, "Listing telemarks...\n" );
+	Q_PrintBuffer( &pb, va( "  ID %-32s Location\n", "Name" ) );
 	for ( tm = telemarks, i = 0; tm; tm = tm->next, i++ ) {
-		Q_strcat( msg, sizeof(msg), va( "%2i %-32s %s\n", i, tm->name, vtos( &tm->position ) ) );
+		Q_PrintBuffer( &pb, va( "  %2i %-32s %s\n", i, tm->name, vtos( &tm->position ) ) );
 	}
+	Q_PrintBuffer( &pb, "\n" );
 
-	// send in one big chunk
-	trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
+	Q_DeletePrintBuffer( &pb );
 }
 
 // visualise all telemarks
@@ -1403,7 +1409,7 @@ static void G_SleepClient( gclient_t *cl ) {
 	}
 	VectorClear( &cl->ps.velocity );
 	cl->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-	cl->ps.forceHandExtendTime = Q3_INFINITE;
+	cl->ps.forceHandExtendTime = INT32_MAX;
 	cl->ps.forceDodgeAnim = 0;
 }
 
@@ -1839,10 +1845,6 @@ static void AM_Ban( gentity_t *ent ) {
 	}
 
 	return;
-}
-
-static void PB_Callback( const char *buffer, int clientNum ) {
-	trap->SendServerCommand( clientNum, va( "print \"%s\"", buffer ) );
 }
 
 static void AM_BanIP( gentity_t *ent ) {

@@ -2916,8 +2916,9 @@ void ClientThink_real( gentity_t *ent ) {
 	// leave emotes
 	if ( ent->client->emote.freeze ) {
 		const qboolean wantsOut = ent->client->pers.cmd.upmove != 0 || (ent->client->pers.cmd.buttons & BUTTON_USE);
-		const qboolean animDone = ent->client->ps.forceHandExtendTime <= level.time && ent->client->ps.forceHandExtendTime != Q3_INFINITE;
-		const qboolean infinite = ent->client->ps.forceHandExtendTime == Q3_INFINITE;
+		const qboolean animDone = ent->client->ps.forceHandExtendTime <= level.time
+			&& ent->client->ps.forceHandExtendTime != INT32_MAX;
+		const qboolean infinite = ent->client->ps.forceHandExtendTime == INT32_MAX;
 
 		if ( animDone || (wantsOut && infinite) ) {
 			if ( ent->client->emote.nextAnim ) {

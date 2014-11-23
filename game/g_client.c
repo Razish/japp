@@ -3424,7 +3424,7 @@ void ClientSpawn( gentity_t *ent ) {
 
 	if ( client->pers.adminData.isSlept ) {
 		client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
-		client->ps.forceHandExtendTime = Q3_INFINITE;
+		client->ps.forceHandExtendTime = INT32_MAX;
 		client->ps.forceDodgeAnim = 0;
 	}
 
