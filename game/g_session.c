@@ -33,6 +33,10 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 		trap->Print( "\nstoring %s as %s\n", combined, checksum );
 		cJSON_AddStringToObject( root, "admin", checksum );
 	}
+	cJSON_AddBooleanToObject( root, "empowered", !!client->pers.adminData.empowered );
+	cJSON_AddBooleanToObject( root, "merc", !!client->pers.adminData.merc );
+	cJSON_AddBooleanToObject( root, "silenced", !!client->pers.adminData.silenced );
+	cJSON_AddBooleanToObject( root, "slept", !!client->pers.adminData.isSlept );
 
 	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", client - level.clients );
 	trap->FS_Open( fileName, &f, FS_WRITE );
@@ -44,11 +48,11 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 // called on a reconnect
 void G_ReadClientSessionData( gclient_t *client ) {
 	clientSession_t *sess = &client->sess;
-	cJSON *root;
+	cJSON *root = NULL, *object = NULL;
 	char fileName[MAX_QPATH] = { '\0' };
 	char *buffer = NULL;
 	fileHandle_t f = NULL_FILE;
-	unsigned int len;
+	unsigned int len = 0;
 	const char *tmp = NULL;
 
 	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", client - level.clients );
@@ -78,25 +82,67 @@ void G_ReadClientSessionData( gclient_t *client ) {
 		return;
 	}
 
-	sess->sessionTeam = cJSON_ToInteger( cJSON_GetObjectItem( root, "sessionTeam" ) );
-	sess->spectatorTime = cJSON_ToInteger( cJSON_GetObjectItem( root, "spectatorTime" ) );
-	sess->spectatorState = cJSON_ToInteger( cJSON_GetObjectItem( root, "spectatorState" ) );
-	sess->spectatorClient = cJSON_ToInteger( cJSON_GetObjectItem( root, "spectatorClient" ) );
-	sess->wins = cJSON_ToInteger( cJSON_GetObjectItem( root, "wins" ) );
-	sess->losses = cJSON_ToInteger( cJSON_GetObjectItem( root, "losses" ) );
-	sess->setForce = cJSON_ToInteger( cJSON_GetObjectItem( root, "setForce" ) );
-	sess->saberLevel = cJSON_ToInteger( cJSON_GetObjectItem( root, "saberLevel" ) );
-	sess->selectedFP = cJSON_ToInteger( cJSON_GetObjectItem( root, "selectedFP" ) );
-	sess->duelTeam = cJSON_ToInteger( cJSON_GetObjectItem( root, "duelTeam" ) );
-	sess->siegeDesiredTeam = cJSON_ToInteger( cJSON_GetObjectItem( root, "siegeDesiredTeam" ) );
-	if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( root, "siegeClass" ) )) ) {
-		Q_strncpyz( sess->siegeClass, tmp, sizeof(sess->siegeClass) );
+	if ( (object = cJSON_GetObjectItem( root, "sessionTeam" )) ) {
+		sess->sessionTeam = cJSON_ToInteger( object );
 	}
-	if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( root, "IP" ) )) ) {
-		Q_strncpyz( sess->IP, tmp, sizeof(sess->IP) );
+	if ( (object = cJSON_GetObjectItem( root, "spectatorTime" )) ) {
+		sess->spectatorTime = cJSON_ToInteger( object );
 	}
-	if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( root, "admin" ) )) ) {
-		client->pers.adminUser = AM_ChecksumLogin( tmp );
+	if ( (object = cJSON_GetObjectItem( root, "spectatorState" )) ) {
+		sess->spectatorState = cJSON_ToInteger( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "spectatorClient" )) ) {
+		sess->spectatorClient = cJSON_ToInteger( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "wins" )) ) {
+		sess->wins = cJSON_ToInteger( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "losses" )) ) {
+		sess->losses = cJSON_ToInteger( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "setForce" )) ) {
+		sess->setForce = cJSON_ToInteger( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "saberLevel" )) ) {
+		sess->saberLevel = cJSON_ToInteger( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "selectedFP" )) ) {
+		sess->selectedFP = cJSON_ToInteger( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "duelTeam" )) ) {
+		sess->duelTeam = cJSON_ToInteger( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "siegeDesiredTeam" )) ) {
+		sess->siegeDesiredTeam = cJSON_ToInteger( object );
+	}
+
+	if ( (object = cJSON_GetObjectItem( root, "siegeClass" )) ) {
+		if ( (tmp = cJSON_ToString( object )) ) {
+			Q_strncpyz( sess->siegeClass, tmp, sizeof(sess->siegeClass) );
+		}
+	}
+	if ( (object = cJSON_GetObjectItem( root, "IP" )) ) {
+		if ( (tmp = cJSON_ToString( object )) ) {
+			Q_strncpyz( sess->IP, tmp, sizeof(sess->IP) );
+		}
+	}
+	if ( (object = cJSON_GetObjectItem( root, "admin" )) ) {
+		if ( (tmp = cJSON_ToString( object )) ) {
+			client->pers.adminUser = AM_ChecksumLogin( tmp );
+		}
+	}
+
+	if ( (object = cJSON_GetObjectItem( root, "empowered" )) ) {
+		client->pers.adminData.empowered = cJSON_ToBoolean( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "merc" )) ) {
+		client->pers.adminData.merc = cJSON_ToBoolean( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "silenced" )) ) {
+		client->pers.adminData.silenced = cJSON_ToBoolean( object );
+	}
+	if ( (object = cJSON_GetObjectItem( root, "slept" )) ) {
+		client->pers.adminData.isSlept = cJSON_ToBoolean( object );
 	}
 
 	client->ps.fd.saberAnimLevel = sess->saberLevel;

@@ -2497,6 +2497,9 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 			trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s\n\"", client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLENTER" ) ) );
 		}
 	}
+
+	AM_ApplySessionTransition( ent );
+
 	G_LogPrintf( level.log.console, "ClientBegin: %i\n", clientNum );
 
 	// count current clients and rank for scoreboard

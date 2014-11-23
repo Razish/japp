@@ -76,6 +76,7 @@ void		 AM_SaveAdmins( void );
 void		 AM_LoadTelemarks( void );
 void		 AM_SaveTelemarks( void );
 adminUser_t	*AM_ChecksumLogin( const char *checksum );
+void		 AM_ApplySessionTransition( gentity_t *ent );
 qboolean	 AM_HasPrivilege( const gentity_t *ent, uint32_t privilege );
 void		 AM_PrintCommands( gentity_t *ent, printBufferSession_t *pb );
 qboolean	 AM_HandleCommands( gentity_t *ent, const char *cmd );

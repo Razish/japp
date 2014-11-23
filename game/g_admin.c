@@ -1268,9 +1268,39 @@ static void AM_GunProtect( gentity_t *ent ) {
 	}
 }
 
+static void Empower_On( gentity_t *ent ) {
+	int i;
+
+	ent->client->ps.fd.forcePowerSelected = 0; // HACK: What the actual fuck
+	ent->client->ps.eFlags |= EF_BODYPUSH;
+
+	ent->client->pers.adminData.forcePowersKnown = ent->client->ps.fd.forcePowersKnown;
+
+	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
+		ent->client->pers.adminData.forcePowerBaseLevel[i] = ent->client->ps.fd.forcePowerBaseLevel[i];
+		ent->client->ps.fd.forcePowerBaseLevel[i] = 3;
+		ent->client->pers.adminData.forcePowerLevel[i] = ent->client->ps.fd.forcePowerLevel[i];
+		ent->client->ps.fd.forcePowerLevel[i] = 3;
+		ent->client->ps.fd.forcePowersKnown |= (1 << i);
+	}
+}
+
+static void Empower_Off( gentity_t *ent ) {
+	int i;
+
+	ent->client->ps.fd.forcePowerSelected = 0; // HACK: What the actual fuck
+	ent->client->ps.eFlags &= ~EF_BODYPUSH;
+
+	ent->client->ps.fd.forcePowersKnown = ent->client->pers.adminData.forcePowersKnown;
+	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
+		ent->client->ps.fd.forcePowerBaseLevel[i] = ent->client->pers.adminData.forcePowerBaseLevel[i];
+		ent->client->ps.fd.forcePowerLevel[i] = ent->client->pers.adminData.forcePowerLevel[i];
+	}
+}
+
 static void AM_Empower( gentity_t *ent ) {
 	char arg1[64] = { 0 };
-	int i, targetClient;
+	int targetClient;
 	gentity_t *targ;
 
 	// can empower: self, partial name, clientNum
@@ -1288,30 +1318,13 @@ static void AM_Empower( gentity_t *ent ) {
 	}
 
 	targ->client->pers.adminData.empowered = !targ->client->pers.adminData.empowered;
-	targ->client->ps.fd.forcePowerSelected = 0; // HACK: What the actual fuck
 	if ( targ->client->pers.adminData.empowered ) {
-		targ->client->ps.eFlags |= EF_BODYPUSH;
-
-		targ->client->pers.adminData.forcePowersKnown = targ->client->ps.fd.forcePowersKnown;
-
-		for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
-			targ->client->pers.adminData.forcePowerBaseLevel[i] = targ->client->ps.fd.forcePowerBaseLevel[i];
-			targ->client->ps.fd.forcePowerBaseLevel[i] = 3;
-			targ->client->pers.adminData.forcePowerLevel[i] = targ->client->ps.fd.forcePowerLevel[i];
-			targ->client->ps.fd.forcePowerLevel[i] = 3;
-			targ->client->ps.fd.forcePowersKnown |= (1 << i);
-		}
+		Empower_On( targ );
 		G_LogPrintf( level.log.admin, "\t%s empowered %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
 	}
 	else {
-		targ->client->ps.eFlags &= ~EF_BODYPUSH;
-
-		targ->client->ps.fd.forcePowersKnown = targ->client->pers.adminData.forcePowersKnown;
-		for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
-			targ->client->ps.fd.forcePowerBaseLevel[i] = targ->client->pers.adminData.forcePowerBaseLevel[i];
-			targ->client->ps.fd.forcePowerLevel[i] = targ->client->pers.adminData.forcePowerLevel[i];
-		}
+		Empower_Off( targ );
 		G_LogPrintf( level.log.admin, "\t%s unempowered %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
 	}
@@ -1600,9 +1613,13 @@ static void AM_Silence( gentity_t *ent ) {
 	// silence everyone
 	if ( atoi( arg1 ) == -1 ) {
 		int i;
-		gentity_t *e;
-		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
-			if ( !e->inuse || ent->client->pers.connected == CON_DISCONNECTED ) {
+		gentity_t *e = NULL;
+		gclient_t *cl = NULL;
+		for ( i = 0, e = g_entities, cl = level.clients;
+			i < level.maxclients;
+			i++, e++, cl++ )
+		{
+			if ( !e->inuse || cl->pers.connected == CON_DISCONNECTED ) {
 				continue;
 			}
 
@@ -1610,7 +1627,7 @@ static void AM_Silence( gentity_t *ent ) {
 				continue;
 			}
 
-			level.clients[i].pers.adminData.silenced = qtrue;
+			cl->pers.adminData.silenced = qtrue;
 		}
 		G_LogPrintf( level.log.admin, "\t%s silenced everyone\n", G_PrintClient( ent-g_entities ) );
 		trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_CYAN "silenced\n\"" );
@@ -2168,6 +2185,49 @@ static void AM_Vstr( gentity_t *ent ) {
 	trap->SendConsoleCommand( EXEC_APPEND, va( "vstr %s\n", args ) );
 }
 
+static void Merc_On( gentity_t *ent ) {
+	int i;
+	ent->client->ps.stats[STAT_WEAPONS] = ((1 << LAST_USEABLE_WEAPON) - 1) & ~1;
+	for ( i = 0; i < AMMO_MAX; i++ ) {
+		ent->client->ps.ammo[i] = ammoMax[i];
+	}
+}
+
+static void Merc_Off( gentity_t *ent ) {
+	int i;
+	weapon_t newWeap = -1, wp = ent->client->ps.weapon;
+
+	ent->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
+
+	for ( i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
+		if ( (ent->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
+			newWeap = i;
+			break;
+		}
+	}
+
+	if ( newWeap == WP_NUM_WEAPONS ) {
+		for ( i = WP_STUN_BATON; i < WP_SABER; i++ ) {
+			if ( (ent->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
+				newWeap = i;
+				break;
+			}
+		}
+		if ( newWeap == WP_SABER ) {
+			newWeap = WP_NONE;
+		}
+	}
+
+	if ( newWeap != -1 ) {
+		ent->client->ps.weapon = newWeap;
+	}
+	else {
+		ent->client->ps.weapon = 0;
+	}
+
+	G_AddEvent( ent, EV_NOAMMO, wp );
+}
+
 static void AM_Merc( gentity_t *ent ) {
 	char		arg1[64] = { 0 };
 	int			targetClient;
@@ -2190,49 +2250,15 @@ static void AM_Merc( gentity_t *ent ) {
 	targ->client->pers.adminData.merc = !targ->client->pers.adminData.merc;
 	// give everything between WP_NONE and LAST_USEABLE_WEAPON
 	if ( targ->client->pers.adminData.merc ) {
-		int i;
+		Merc_On( targ );
 		G_LogPrintf( level.log.admin, "\t%s gave weapons to %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
-		targ->client->ps.stats[STAT_WEAPONS] = ((1 << LAST_USEABLE_WEAPON) - 1) & ~1;
-		for ( i = 0; i < AMMO_MAX; i++ ) {
-			targ->client->ps.ammo[i] = ammoMax[i];
-		}
 	}
 	// back to spawn weapons, select first usable weapon
 	else {
-		int i = 0, newWeap = -1, wp = targ->client->ps.weapon;
+		Merc_Off( targ );
 		G_LogPrintf( level.log.admin, "\t%s took weapons from %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
-
-		targ->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
-
-		for ( i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
-			if ( (targ->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
-				newWeap = i;
-				break;
-			}
-		}
-
-		if ( newWeap == WP_NUM_WEAPONS ) {
-			for ( i = WP_STUN_BATON; i < WP_SABER; i++ ) {
-				if ( (targ->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
-					newWeap = i;
-					break;
-				}
-			}
-			if ( newWeap == WP_SABER ) {
-				newWeap = WP_NONE;
-			}
-		}
-
-		if ( newWeap != -1 ) {
-			targ->client->ps.weapon = newWeap;
-		}
-		else {
-			targ->client->ps.weapon = 0;
-		}
-
-		G_AddEvent( ent, EV_NOAMMO, wp );
 	}
 }
 
@@ -2542,4 +2568,17 @@ void AM_PrintCommands( gentity_t *ent, printBufferSession_t *pb ) {
 	}
 
 	Q_PrintBuffer( pb, S_COLOR_WHITE "\n\n" );
+}
+
+void AM_ApplySessionTransition( gentity_t *ent ) {
+	const adminData_t *data = &ent->client->pers.adminData;
+	if ( data->empowered ) {
+		Empower_On( ent );
+	}
+	if ( data->merc ) {
+		Merc_On( ent );
+	}
+	if ( data->isSlept ) {
+		G_SleepClient( ent->client );
+	}
 }
