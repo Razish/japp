@@ -158,10 +158,15 @@ void G_InitClientSessionData( gclient_t *client, char *userinfo, qboolean isBot 
 					sess->sessionTeam = TEAM_SPECTATOR;
 				}
 				else if ( g_teamAutoJoin.integer == 2 ) {
+					// force joining in all gametypes
 					sess->sessionTeam = TEAM_FREE;
 				}
-				else {
+				else if ( !isBot ) {
 					sess->sessionTeam = TEAM_SPECTATOR;
+				}
+				else {
+					// bots automatically join the game
+					sess->sessionTeam = TEAM_FREE;
 				}
 				break;
 			case GT_DUEL:
@@ -192,9 +197,14 @@ void G_InitClientSessionData( gclient_t *client, char *userinfo, qboolean isBot 
 		}
 	}
 
-	sess->spectatorState = SPECTATOR_FREE;
-	sess->spectatorTime = level.time;
+	if ( sess->sessionTeam == TEAM_SPECTATOR ) {
+		sess->spectatorState = SPECTATOR_FREE;
+	}
+	else {
+		sess->spectatorState = SPECTATOR_NOT;
+	}
 
+	sess->spectatorTime = level.time;
 	sess->siegeClass[0] = '\0';
 
 	G_WriteClientSessionData( client );

@@ -1801,7 +1801,8 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 qboolean ClientUserinfoChanged( int clientNum ) {
 	gentity_t *ent = g_entities + clientNum;
 	gclient_t *client = ent->client;
-	int team = TEAM_FREE, health = 100, maxHealth = 100;
+	team_t team = TEAM_FREE;
+	int health = 100, maxHealth = 100;
 	const char *s = NULL, *value = NULL;
 	char userinfo[MAX_INFO_STRING], buf[MAX_INFO_STRING], oldClientinfo[MAX_INFO_STRING], model[MAX_QPATH],
 		forcePowers[DEFAULT_FORCEPOWERS_LEN], oldname[MAX_NETNAME], className[MAX_QPATH], color1[16], color2[16],
