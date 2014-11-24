@@ -1322,8 +1322,6 @@ void SendScoreboardMessageToAllClients( void ) {
 	}
 }
 
-extern void G_LeaveVehicle( gentity_t *ent, qboolean ConCheck );
-
 // When the intermission starts, this will be called for all players.
 // If a new client connects, this will be called after the spawn function.
 void MoveClientToIntermission( gentity_t *ent ) {

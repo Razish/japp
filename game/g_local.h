@@ -867,6 +867,7 @@ void			G_InitClientSessionData( gclient_t *client, char *userinfo, qboolean isBo
 int				G_ItemUsable( playerState_t *ps, int forcedUse );
 void			G_KillBox( gentity_t *ent );
 void			G_KillG2Queue( int entNum );
+void			G_LeaveVehicle( gentity_t *ent, qboolean ConCheck );
 void			G_LoadArenas( void );
 void			G_LogExit( const char *string );
 void			G_LogPrintf( fileHandle_t filehandle, const char *fmt, ... );

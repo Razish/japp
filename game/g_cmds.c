@@ -261,8 +261,29 @@ static void Cmd_LevelShot_f( gentity_t *ent ) {
 	trap->SendServerCommand( ent - g_entities, "clientLevelShot" );
 }
 
+static gentity_t *G_AttackerCheck( gentity_t *ent ) {
+	qboolean otherKiller = qfalse;
+	gentity_t *attacker = NULL;
+
+	if ( ent->client->ps.otherKiller >= 0 && ent->client->ps.otherKiller < MAX_CLIENTS ) {
+		attacker = &g_entities[ent->client->ps.otherKiller];
+	}
+
+	if ( attacker && attacker->client && ent->client->ps.otherKillerTime > level.time
+		&& attacker->client->sess.sessionTeam != TEAM_SPECTATOR && attacker->client->tempSpectate < level.time
+		&& (attacker->client->sess.sessionTeam != ent->client->sess.sessionTeam
+		|| (g_gametype.integer < GT_TEAM && attacker->client->sess.sessionTeam == TEAM_FREE)) && attacker->health > 0 )
+	{
+		otherKiller = qtrue;
+	}
+
+	return otherKiller ? attacker : NULL;
+}
+
 // commit suicide
 void Cmd_Kill_f( gentity_t *ent ) {
+	gentity_t *attacker = NULL;
+
 	if ( ent->client->ps.fallingToDeath && !japp_allowFallSuicide.integer ) {
 		return;
 	}
@@ -272,8 +293,9 @@ void Cmd_Kill_f( gentity_t *ent ) {
 	}
 
 	//OSP: pause
-	if ( level.pause.state != PAUSE_NONE )
+	if ( level.pause.state != PAUSE_NONE ) {
 		return;
+	}
 
 	if ( (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) && level.numPlayingClients > 1 && !level.warmupTime
 		&& !g_allowDuelSuicide.integer ) {
@@ -281,9 +303,16 @@ void Cmd_Kill_f( gentity_t *ent ) {
 		return;
 	}
 
+	G_LeaveVehicle( ent, qfalse );
 	ent->flags &= ~FL_GODMODE;
 	ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;
-	player_die( ent, ent, ent, 100000, MOD_SUICIDE );
+	attacker = G_AttackerCheck( ent );
+	if ( attacker ) {
+		player_die( ent, attacker, attacker, 100000, MOD_SUICIDE );
+	}
+	else {
+		player_die( ent, ent, ent, 100000, MOD_SUICIDE );
+	}
 }
 
 static int G_ClientNumFromNetname( char *name ) {
@@ -531,7 +560,6 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 }
 
 // If the client being followed leaves the game, or you just want to drop to free floating spectator mode
-extern void G_LeaveVehicle( gentity_t *ent, qboolean ConCheck );
 void StopFollowing( gentity_t *ent ) {
 	int i = 0;
 	ent->client->ps.persistant[PERS_TEAM] = TEAM_SPECTATOR;

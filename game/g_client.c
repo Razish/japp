@@ -3517,8 +3517,6 @@ void G_ClearVote( gentity_t *ent ) {
 	ent->client->pers.vote = 0;
 }
 
-extern void G_LeaveVehicle( gentity_t *ent, qboolean ConCheck );
-
 // Called when a player drops from the server.
 // Will not be called between levels.
 // This should NOT be called directly by any game logic. Call trap->DropClient() which will call this and do server
