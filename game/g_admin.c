@@ -2272,6 +2272,7 @@ static void AM_EntList( gentity_t *ent ) {
 // remove an entity
 static void AM_EntRemove( gentity_t *ent ) {
 	gentity_t *target = NULL;
+	qboolean removeAll = qfalse;
 
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
@@ -2286,9 +2287,12 @@ static void AM_EntRemove( gentity_t *ent ) {
 			if ( id > MAX_CLIENTS && id < ENTITYNUM_WORLD ) {
 				target = g_entities + id;
 			}
+			else if ( id == -1 ) {
+				removeAll = qtrue;
+			}
 			else {
-				AM_ConsolePrint( ent, va( "AM_EntRemove: Argument must be between %i and %i\n", MAX_CLIENTS,
-					ENTITYNUM_WORLD ) );
+				AM_ConsolePrint( ent, va( "AM_EntRemove: Argument must be between %i and %i, or -1 for all\n",
+					MAX_CLIENTS, ENTITYNUM_WORLD ) );
 				return;
 			}
 		}
@@ -2309,6 +2313,19 @@ static void AM_EntRemove( gentity_t *ent ) {
 		}
 	}
 
+	if ( removeAll ) {
+		int i;
+		gentity_t *e;
+		AM_ConsolePrint( ent, "Removing all spawned entities...\n" );
+		for ( i = MAX_CLIENTS, e = g_entities + MAX_CLIENTS; i < ENTITYNUM_WORLD; i++, e++ ) {
+			if ( !e->inuse || !e->jpSpawned ) {
+				continue;
+			}
+			else {
+				G_FreeEntity( e );
+			}
+		}
+	}
 	if ( target ) {
 		if ( target->jpSpawned ) {
 			const char *classname = (target->classname && target->classname[0]) ? target->classname : "Unknown";

@@ -599,8 +599,12 @@ qboolean Q_StringIsInteger( const char *s ) {
 	qboolean foundDigit = qfalse;
 
 	for ( i = 0, len = strlen( s ); i < len; i++ ) {
-		if ( !isdigit( s[i] ) )
+		if ( i == 0 && s[i] == '-' ) {
+			continue;
+		}
+		if ( !isdigit( s[i] ) ) {
 			return qfalse;
+		}
 
 		foundDigit = qtrue;
 	}
