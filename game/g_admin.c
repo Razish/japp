@@ -21,6 +21,24 @@ static adminUser_t *adminUsers = NULL;
 static telemark_t *telemarks = NULL;
 static qboolean telemarksVisible = qfalse;
 
+static void AM_ConsolePrint( const gentity_t *ent, const char *msg ) {
+	if ( ent ) {
+		trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
+	}
+	else {
+		trap->Print( msg );
+	}
+}
+
+static void PB_Callback( const char *buffer, int clientNum ) {
+	if ( clientNum == -1 ) {
+		trap->Print( buffer );
+	}
+	else {
+		trap->SendServerCommand( clientNum, va( "print \"%s\"", buffer ) );
+	}
+}
+
 // clear all admin accounts and logout all users
 static void AM_ClearAccounts( void ) {
 	adminUser_t *user = adminUsers;
@@ -259,8 +277,8 @@ void AM_SaveAdmins( void ) {
 
 // returns qtrue if inflicter is higher on the rank hierarchy, and qtrue on equal if japp_passRankConflicts is 1.
 //	otherwise, returns qfalse and prints a message to the inflicter to warn them.
-qboolean AM_CanInflict( gentity_t *entInflicter, gentity_t *entVictim ) {
-	adminUser_t *inflicter, *victim;
+static qboolean AM_CanInflict( const gentity_t *entInflicter, const gentity_t *entVictim ) {
+	const adminUser_t *inflicter, *victim;
 
 	// if they're not valid, pretend we can inflict divine punishment on them
 	if ( !entInflicter || !entInflicter->inuse || !entInflicter->client
@@ -505,7 +523,7 @@ static void AM_WriteTelemarks( fileHandle_t f ) {
 
 // load telemarks from disk
 void AM_LoadTelemarks( void ) {
-	char *buf = NULL, loadPath[MAX_QPATH] = { 0 };
+	char *buf = NULL, loadPath[MAX_QPATH] = { '\0' };
 	unsigned int len = 0;
 	fileHandle_t f = 0;
 
@@ -543,7 +561,7 @@ void AM_LoadTelemarks( void ) {
 
 // save telemarks to disk
 void AM_SaveTelemarks( void ) {
-	char loadPath[MAX_QPATH] = { 0 };
+	char loadPath[MAX_QPATH] = { '\0' };
 	fileHandle_t f;
 
 	Com_sprintf( loadPath, sizeof(loadPath), "telemarks" PATH_SEP "%s.json", level.rawmapname );
@@ -555,7 +573,7 @@ void AM_SaveTelemarks( void ) {
 
 // log in using user + pass
 static void AM_Login( gentity_t *ent ) {
-	char argUser[64] = { 0 }, argPass[64] = { 0 };
+	char argUser[64] = { '\0' }, argPass[64] = { '\0' };
 	adminUser_t *user = NULL, *current = NULL;
 
 	if ( trap->Argc() < 3 ) {
@@ -647,74 +665,76 @@ adminUser_t *AM_ChecksumLogin( const char *checksum ) {
 // display list of admins
 static void AM_WhoIs( gentity_t *ent ) {
 	int i;
-	char msg[1024 - 128] = { 0 };
 	gentity_t *e = NULL;
+	printBufferSession_t pb;
+
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent ? (ent - g_entities) : -1 );
 
 	//TODO: optimal spacing
-	Q_strcat( msg, sizeof(msg), S_COLOR_WHITE "Name                                Admin User                      "
-		"Rank\n" );
-
-	// if the client is an admin, append their name and 'user' to the string
+	Q_PrintBuffer( &pb, "Listing admins...\n" );
+	Q_PrintBuffer( &pb, "Name                                Admin User                      Rank\n" );
 	for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
 		if ( e->client->pers.adminUser ) {
 			char strName[MAX_NETNAME], strAdmin[32], strRank[12];
 
 			Q_strncpyz( strName, e->client->pers.netname, sizeof(strName) );
 			Q_CleanString( strName, STRIP_COLOUR );
-			Q_strncpyz( strAdmin, (e->client->pers.adminUser) ? e->client->pers.adminUser->user : "",
-				sizeof(strAdmin) );
+			Q_strncpyz( strAdmin, e->client->pers.adminUser ? e->client->pers.adminUser->user : "", sizeof(strAdmin) );
 			Q_CleanString( strAdmin, STRIP_COLOUR );
-			Q_strncpyz( strRank, va( "%d", e->client->pers.adminUser->rank ), sizeof(strRank) );
+			Com_sprintf( strRank, sizeof(strRank), "%d", e->client->pers.adminUser->rank );
 
-			Q_strcat( msg, sizeof(msg), va( "%-36s%-32s%-12s\n", strName, strAdmin, strRank ) );
+			Q_PrintBuffer( &pb, va( "%-36s%-32s%-12s\n", strName, strAdmin, strRank ) );
 		}
 	}
 
-	trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
+	Q_DeletePrintBuffer( &pb );
 }
 
 // display list of players + clientNum + IP + admin
 static void AM_Status( gentity_t *ent ) {
 	int i;
-	char msg[1024 - 128] = { 0 };
 	gentity_t *e;
+	printBufferSession_t pb;
 
-	Q_strcat( msg, sizeof(msg), S_COLOR_WHITE "clientNum   Name                                IP                      "
-		"Admin User\n" );
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
 
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent ? (ent - g_entities) : -1 );
+
+	Q_PrintBuffer( &pb, "Listing users...\n" );
+	Q_PrintBuffer( &pb, "clientNum   Name                                IP                      Admin User\n" );
 	// build a list of clients
 	for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
-		const char *tmpMsg = NULL;
-
 		if ( e->inuse && ent->client->pers.connected != CON_DISCONNECTED ) {
 			char strNum[12], strName[MAX_NETNAME], strIP[NET_ADDRSTRMAXLEN], strAdmin[32];
 
-			Q_strncpyz( strNum, va( "(%i)", i ), sizeof(strNum) );
+			Com_sprintf( strNum, sizeof(strNum), "(%i)", i );
 			Q_strncpyz( strName, e->client->pers.netnameClean, sizeof(strName) );
 			Q_strncpyz( strIP, e->client->sess.IP, sizeof(strIP) );
-			Q_strncpyz( strAdmin, (e->client->pers.adminUser) ? e->client->pers.adminUser->user : "",
-				sizeof(strAdmin) );
+			Q_strncpyz( strAdmin, e->client->pers.adminUser ? e->client->pers.adminUser->user : "", sizeof(strAdmin) );
 			Q_CleanString( strAdmin, STRIP_COLOUR );
 
-			tmpMsg = va( "%-12s%-36s%-24s%-32s\n", strNum, strName, strIP, strAdmin );
-
-			if ( strlen( msg ) + strlen( tmpMsg ) >= sizeof(msg) ) {
-				trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
-				msg[0] = '\0';
-			}
-			Q_strcat( msg, sizeof(msg), tmpMsg );
+			Q_PrintBuffer( &pb, va( "%-12s%-36s%-24s%-32s\n", strNum, strName, strIP, strAdmin ) );
 		}
 	}
+	Q_PrintBuffer( &pb, "\n" );
 
-	trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
+	Q_DeletePrintBuffer( &pb );
 }
 
 // announce a message to all clients
 static void AM_Announce( gentity_t *ent ) {
 	char *msg, arg1[MAX_NETNAME];
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() < 3 ) {
-		trap->SendServerCommand( ent - g_entities, va( "print \"Usage: \\ampsay <client> <message>\n\"" ) );
+		AM_ConsolePrint( ent, "Usage: \\ampsay <client> <message>\n" );
 		return;
 	}
 
@@ -748,6 +768,11 @@ static void AM_Ghost( gentity_t *ent ) {
 	char arg1[64];
 	int targetClient;
 	gentity_t *targ;
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
 
 	//Self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof(arg1) );
@@ -791,15 +816,24 @@ static void AM_Ghost( gentity_t *ent ) {
 
 // toggle noclip mode
 static void AM_Clip( gentity_t *ent ) {
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	ent->client->noclip = !ent->client->noclip;
 	G_LogPrintf( level.log.admin, "\tturning %s for %s\n", ent->client->noclip ? "on" : "off",
 		G_PrintClient( ent-g_entities ) );
-	trap->SendServerCommand( ent - g_entities, va( "print \"Noclip %s\n\"",
-		ent->client->noclip ? S_COLOR_GREEN "on" : S_COLOR_RED "off" ) );
+	AM_ConsolePrint( ent, va( "Noclip %s\n", ent->client->noclip ? S_COLOR_GREEN "on" : S_COLOR_RED "off" ) );
 }
 
 // teleport (all variations of x to y)
 static void AM_Teleport( gentity_t *ent ) {
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	//No args means we teleport ourself to our last marked coordinates
 	if ( trap->Argc() == 1 && ent->client->pers.adminData.telemark ) {
 		G_LogPrintf( level.log.admin, "\t%s teleporting self to last telemark\n", G_PrintClient( ent-g_entities ) );
@@ -830,8 +864,7 @@ static void AM_Teleport( gentity_t *ent ) {
 				return;
 			}
 
-			trap->SendServerCommand( ent - g_entities, "print \"AM_Teleport: Assumed telemark but found no matching "
-				"telemark\n\"" );
+			AM_ConsolePrint( ent, "AM_Teleport: Assumed telemark but found no matching telemark\n" );
 		}
 		// must be teleporting self -> client
 		else if ( g_entities[targetClient].inuse ) {
@@ -888,8 +921,7 @@ static void AM_Teleport( gentity_t *ent ) {
 					return;
 				}
 
-				trap->SendServerCommand( ent - g_entities, "print \"AM_Teleport: Assumed telemark but found no matching"
-					" telemark\n\"" );
+				AM_ConsolePrint( ent, "AM_Teleport: Assumed telemark but found no matching telemark\n" );
 			}
 
 			// must be teleporting client -> client
@@ -947,7 +979,7 @@ static void AM_Teleport( gentity_t *ent ) {
 
 		if ( targetClient != -1 ) {
 			vector3	telePos;
-			char argX[16] = { 0 }, argY[16] = { 0 }, argZ[16] = { 0 };
+			char argX[16] = { '\0' }, argY[16] = { '\0' }, argZ[16] = { '\0' };
 
 			if ( !AM_CanInflict( ent, &g_entities[targetClient] ) ) {
 				return;
@@ -980,9 +1012,15 @@ static void AM_Teleport( gentity_t *ent ) {
 
 // teleport self to targeted position
 static void AM_GunTeleport( gentity_t *ent ) {
-	trace_t *tr = G_RealTrace( ent, 0.0f );
+	trace_t *tr;
 	vector3 telepos;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	tr = G_RealTrace( ent, 0.0f );
 	// don't get stuck in walls
 	VectorMA( &tr->endpos, 48.0f, &tr->plane.normal, &telepos );
 	TeleportPlayer( ent, &telepos, &ent->client->ps.viewangles );
@@ -990,8 +1028,15 @@ static void AM_GunTeleport( gentity_t *ent ) {
 
 // teleport targeted client to self
 static void AM_GunTeleportRev( gentity_t *ent ) {
-	trace_t	*tr = G_RealTrace( ent, 0.0f );
+	trace_t	*tr;
 	vector3	angles, telepos;
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
 		AngleVectors( &ent->client->ps.viewangles, &angles, NULL, NULL );
@@ -1011,6 +1056,11 @@ static void AM_GunTeleportRev( gentity_t *ent ) {
 static void AM_Telemark( gentity_t *ent ) {
 	char name[MAX_TELEMARK_NAME_LEN];
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() > 1 ) {
 		Q_strncpyz( name, ConcatArgs( 1 ), sizeof(name) );
 	}
@@ -1024,9 +1074,16 @@ static void AM_Telemark( gentity_t *ent ) {
 
 // mark targeted location
 static void AM_GunTeleportMark( gentity_t *ent ) {
-	trace_t *tr = G_RealTrace( ent, 0.0f );
+	trace_t *tr;
 	vector3 telePos;
 	gentity_t *tent;
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	tr = G_RealTrace( ent, 0.0f );
 
 	VectorMA( &tr->endpos, 48.0f, &tr->plane.normal, &telePos );
 
@@ -1042,8 +1099,13 @@ static void AM_GunTeleportMark( gentity_t *ent ) {
 static void AM_RemoveTelemark( gentity_t *ent ) {
 	char arg1[MAX_TELEMARK_NAME_LEN];
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() == 1 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Usage: \\amremovetele <name>\n\"" );
+		AM_ConsolePrint( ent, "Usage: \\amremovetele <name>\n" );
 		return;
 	}
 
@@ -1055,17 +1117,13 @@ static void AM_RemoveTelemark( gentity_t *ent ) {
 	AM_DeleteTelemark( ent, arg1 );
 }
 
-static void PB_Callback( const char *buffer, int clientNum ) {
-	trap->SendServerCommand( clientNum, va( "print \"%s\"", buffer ) );
-}
-
 // list all marked positions
 static void AM_ListTelemarks( gentity_t *ent ) {
 	telemark_t *tm = NULL;
 	int i;
 	printBufferSession_t pb;
 
-	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent - g_entities );
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent ? (ent - g_entities) : -1 );
 
 	// append each mark to the end of the string
 	Q_PrintBuffer( &pb, "Listing telemarks...\n" );
@@ -1082,6 +1140,11 @@ static void AM_ListTelemarks( gentity_t *ent ) {
 static void AM_SeeTelemarks( gentity_t *ent ) {
 	telemark_t *tm = NULL;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	// assume all telemarks have valid ent ptr's
 	if ( telemarksVisible ) {
 		for ( tm = telemarks; tm; tm = tm->next ) {
@@ -1097,6 +1160,7 @@ static void AM_SeeTelemarks( gentity_t *ent ) {
 	telemarksVisible = !telemarksVisible;
 }
 
+// save telemarks to file immediately
 static void AM_SaveTelemarksCmd( gentity_t *ent ) {
 	AM_SaveTelemarks();
 }
@@ -1104,15 +1168,20 @@ static void AM_SaveTelemarksCmd( gentity_t *ent ) {
 // call an arbitrary vote
 static void AM_Poll( gentity_t *ent ) {
 	int i = 0;
-	char arg1[MAX_TOKEN_CHARS] = { 0 }, arg2[MAX_TOKEN_CHARS] = { 0 };
+	char arg1[MAX_TOKEN_CHARS] = { '\0' }, arg2[MAX_TOKEN_CHARS] = { '\0' };
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
 
 	if ( level.voteExecuteTime ) {
-		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Vote already in progress.\n\"" );
+		AM_ConsolePrint( ent, "Vote already in progress.\n" );
 		return;
 	}
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Please specify a poll.\n\"" );
+		AM_ConsolePrint( ent, "Please specify a poll.\n" );
 		return;
 	}
 
@@ -1129,7 +1198,7 @@ static void AM_Poll( gentity_t *ent ) {
 	Q_strncpyz( level.voteStringClean, level.voteString, sizeof(level.voteStringClean) );
 	Q_strstrip( level.voteStringClean, "\"\n\r", NULL );
 
-	trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s\n\"", ent->client->pers.netname,
+	trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s\n\"", ent->client->pers.netname,
 		G_GetStringEdString( "MP_SVGAME", "PLCALLEDVOTE" ) ) );
 
 	// still a vote waiting to be executed
@@ -1176,17 +1245,24 @@ static void AM_KillVote( gentity_t *ent ) {
 
 	trap->SendServerCommand( -1, "print \"" S_COLOR_RED "Vote has been killed!\n\"" );
 
-	G_LogPrintf( level.log.admin, "\t%s killed a vote\n", G_PrintClient( ent-g_entities ) );
+	if ( ent ) {
+		G_LogPrintf( level.log.admin, "\t%s killed a vote\n", G_PrintClient( ent - g_entities ) );
+	}
 }
 
 // force the specified client to a specific team
 static void AM_ForceTeam( gentity_t *ent ) {
-	char arg1[64] = { 0 }, arg2[64] = { 0 };
+	char arg1[64] = { '\0' }, arg2[64] = { '\0' };
 	int targetClient;
 	gentity_t *targ;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() != 3 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Syntax: \\amforceteam <client> <team>\n\"" );
+		AM_ConsolePrint( ent, "Syntax: \\amforceteam <client> <team>\n" );
 		return;
 	}
 
@@ -1215,7 +1291,14 @@ static void AM_ForceTeam( gentity_t *ent ) {
 
 // force the targeted client to spectator team
 static void AM_GunSpectate( gentity_t *ent ) {
-	trace_t *tr = G_RealTrace( ent, 0.0f );
+	trace_t *tr;
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum < MAX_CLIENTS ) {
 		if ( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) ) {
@@ -1232,6 +1315,11 @@ static void AM_Protect( gentity_t *ent ) {
 	char arg1[64];
 	int targetClient;
 	gentity_t *targ;
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
 
 	// can protect: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof(arg1) );
@@ -1258,7 +1346,14 @@ static void AM_Protect( gentity_t *ent ) {
 
 // protect/unprotect the targeted client
 static void AM_GunProtect( gentity_t *ent ) {
-	trace_t *tr = G_RealTrace( ent, 0.0f );
+	trace_t *tr = NULL;
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *e = g_entities + tr->entityNum;
@@ -1305,9 +1400,14 @@ static void Empower_Off( gentity_t *ent ) {
 }
 
 static void AM_Empower( gentity_t *ent ) {
-	char arg1[64] = { 0 };
+	char arg1[64] = { '\0' };
 	int targetClient;
 	gentity_t *targ;
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
 
 	// can empower: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof(arg1) );
@@ -1364,11 +1464,16 @@ static void Slap( gentity_t *targ ) {
 
 // slap the specified client
 static void AM_Slap( gentity_t *ent ) {
-	char arg1[64] = { 0 };
+	char arg1[64] = { '\0' };
 	int targetClient;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() != 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"usage: amslap <client>\n\"" );
+		AM_ConsolePrint( ent, "Syntax: \\amslap <client>\n" );
 		return;
 	}
 
@@ -1390,7 +1495,14 @@ static void AM_Slap( gentity_t *ent ) {
 
 // slap the targeted client
 static void AM_GunSlap( gentity_t *ent ) {
-	trace_t *tr = G_RealTrace( ent, 0.0f );
+	trace_t *tr;
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum < MAX_CLIENTS ) {
 		if ( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) ) {
@@ -1425,8 +1537,13 @@ static void AM_Sleep( gentity_t *ent ) {
 	char arg1[64];
 	int clientNum;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Please specify a player to be slept (or -1 for all)\n\"" );
+		AM_ConsolePrint( ent, "Please specify a player to be slept (or -1 for all)\n" );
 		return;
 	}
 
@@ -1494,8 +1611,12 @@ static void AM_Sleep( gentity_t *ent ) {
 	}
 }
 static void AM_Freeze( gentity_t *ent ) {
-	trap->SendServerCommand( ent - g_entities, "print \"This command has been deprecated. Use `amsleep <client>` "
-		"instead\n\"" );
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	AM_ConsolePrint( ent, "This command has been deprecated. Use `amsleep <client>` instead\n" );
 	AM_Sleep( ent );
 }
 
@@ -1503,8 +1624,13 @@ static void AM_Wake( gentity_t *ent ) {
 	char arg1[64];
 	int clientNum;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Please specify a player to be woken (or -1 for all)\n\"" );
+		AM_ConsolePrint( ent, "Please specify a player to be woken (or -1 for all)\n" );
 		return;
 	}
 
@@ -1574,7 +1700,14 @@ static void AM_Wake( gentity_t *ent ) {
 
 // toggle the 'slept' state of the targeted client
 static void AM_GunSleep( gentity_t *ent ) {
-	trace_t	*tr = G_RealTrace( ent, 0.0f );
+	trace_t	*tr;
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	tr = G_RealTrace( ent, 0.0f );
 
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *e = g_entities + tr->entityNum;
@@ -1599,8 +1732,12 @@ static void AM_GunSleep( gentity_t *ent ) {
 	}
 }
 static void AM_GunFreeze( gentity_t *ent ) {
-	trap->SendServerCommand( ent - g_entities, "print \"This command has been deprecated. Use `gunsleep <client>` "
-		"instead\n\"" );
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	AM_ConsolePrint( ent, "This command has been deprecated. Use `gunsleep <client>` instead\n" );
 	AM_GunSleep( ent );
 }
 
@@ -1609,8 +1746,13 @@ static void AM_Silence( gentity_t *ent ) {
 	char arg1[64];
 	int targetClient;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Please specify a player to be silenced\n\"" );
+		AM_ConsolePrint( ent, "Please specify a player to be silenced\n" );
 		return;
 	}
 
@@ -1658,11 +1800,16 @@ static void AM_Silence( gentity_t *ent ) {
 
 // unsilence specified client
 static void AM_Unsilence( gentity_t *ent ) {
-	char arg1[64] = { 0 };
+	char arg1[64] = { '\0' };
 	int targetClient;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Please specify a player to be un-silenced\n\"" );
+		AM_ConsolePrint( ent, "Please specify a player to be un-silenced\n" );
 		return;
 	}
 
@@ -1708,12 +1855,17 @@ static void AM_Unsilence( gentity_t *ent ) {
 void Cmd_Kill_f( gentity_t *ent );
 // slay the specified client
 static void AM_Slay( gentity_t *ent ) {
-	char arg1[64] = { 0 };
+	char arg1[64] = { '\0' };
 	int targetClient;
 	gentity_t *targetEnt = NULL;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Please specify a player to be slain\n\"" );
+		AM_ConsolePrint( ent, "Please specify a player to be slain\n" );
 		return;
 	}
 
@@ -1770,8 +1922,13 @@ static void AM_Kick( gentity_t *ent ) {
 	const char *reason = "Not specified";
 	int clientNum;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() == 1 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Syntax: \\amkick <client> <reason>\n\"" );
+		AM_ConsolePrint( ent, "Syntax: \\amkick <client> <reason>\n" );
 		return;
 	}
 
@@ -1797,12 +1954,17 @@ static void AM_Kick( gentity_t *ent ) {
 }
 
 static void AM_Ban( gentity_t *ent ) {
-	char target[32] = { 0 }, duration[16] = { 0 }, string[MAX_STRING_CHARS - 64] = { 0 };
+	char target[32] = { '\0' }, duration[16] = { '\0' }, string[MAX_STRING_CHARS - 64] = { '\0' };
 	const char *reason = "Not specified";
 	int targetClient;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Syntax: \\amban <client> <duration> <reason>\n\"" );
+		AM_ConsolePrint( ent, "Syntax: \\amban <client> <duration> <reason>\n" );
 		return;
 	}
 
@@ -1817,7 +1979,7 @@ static void AM_Ban( gentity_t *ent ) {
 		}
 
 		if ( g_entities[targetClient].r.svFlags & SVF_BOT ) {
-			trap->SendServerCommand( ent - g_entities, "print \"Can't ban bots\n\"" );
+			AM_ConsolePrint( ent, "Can't ban bots\n" );
 			return;
 		}
 
@@ -1834,7 +1996,7 @@ static void AM_Ban( gentity_t *ent ) {
 
 		JP_Bans_AddBanString( target, duration, reason, errorMsg, sizeof(errorMsg) );
 		if ( errorMsg[0] ) {
-			trap->SendServerCommand( ent - g_entities, va( "print \"Failed to add ban: %s\n\"", errorMsg ) );
+			AM_ConsolePrint( ent, va( "Failed to add ban: %s\n", errorMsg ) );
 		}
 		else {
 			G_LogPrintf( level.log.admin, "\t%s banned %s for \"%s\" until \"%s\"\n", G_PrintClient( ent-g_entities ),
@@ -1848,13 +2010,17 @@ static void AM_Ban( gentity_t *ent ) {
 }
 
 static void AM_BanIP( gentity_t *ent ) {
-	char ip[32] = { 0 }, duration[16] = { 0 };
-	const char *reason = "Not specified";
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Syntax: \\ambanip <ip> [duration] [reason]\n\"" );
+		AM_ConsolePrint( ent, "Syntax: \\ambanip <ip> [duration] [reason]\n" );
 	}
 	else {
+		char ip[32] = { '\0' }, duration[16] = { '\0' };
+		const char *reason = "Not specified";
 		char errorMsg[128] = { '\0' };
 
 		trap->Argv( 1, ip, sizeof(ip) );
@@ -1865,12 +2031,12 @@ static void AM_BanIP( gentity_t *ent ) {
 
 		JP_Bans_AddBanString( ip, duration, reason, errorMsg, sizeof(errorMsg) );
 		if ( errorMsg[0] ) {
-			trap->SendServerCommand( ent - g_entities, va( "print \"Failed to add ban: %s\n\"", errorMsg ) );
+			AM_ConsolePrint( ent, va( "Failed to add ban: %s\n", errorMsg ) );
 		}
 		else {
 			printBufferSession_t pb;
 
-			Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5f, PB_Callback, ent - g_entities );
+			Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5f, PB_Callback, ent ? (ent - g_entities) : -1 );
 			Q_PrintBuffer( &pb, va( "Banned IP '%s'", ip ) );
 			if ( reason ) {
 				Q_PrintBuffer( &pb, va( " for '%s'", reason ) );
@@ -1885,8 +2051,6 @@ static void AM_BanIP( gentity_t *ent ) {
 				G_PrintClient( ent - g_entities ), ip, reason, duration );
 		}
 	}
-
-	return;
 }
 
 #if 0
@@ -1931,8 +2095,13 @@ static void AM_Portal( gentity_t *ent ) {
 
 // shader remapping
 static void AM_Remap( gentity_t *ent ) {
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	//RAZTODO: amremap
-	trap->SendServerCommand( ent - g_entities, "print \"AM_Remap: not yet implemented\n\"" );
+	AM_ConsolePrint( ent, "AM_Remap: not yet implemented\n" );
 }
 
 // weather manipulation
@@ -1965,7 +2134,7 @@ static int weathercmp( const void *a, const void *b ) {
 
 static void G_PrintWeatherOptions( gentity_t *ent ) {
 	const char **opt = NULL;
-	char buf[256] = { 0 };
+	char buf[256] = { '\0' };
 	int toggle = 0;
 	unsigned int count = 0;
 	const unsigned int limit = 72;
@@ -1998,6 +2167,11 @@ static void G_PrintWeatherOptions( gentity_t *ent ) {
 static void AM_Weather( gentity_t *ent ) {
 	const char *cmd = NULL, *opt = NULL;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() == 1 ) {
 		G_PrintWeatherOptions( ent );
 		return;
@@ -2016,21 +2190,29 @@ static void AM_Weather( gentity_t *ent ) {
 
 // spawn an entity
 static void AM_EntSpawn( gentity_t *ent ) {
-	trace_t *tr = G_RealTrace( ent, 0.0f );
 	const char *delim = " ";
 	char buf[MAX_SPAWN_VARS_CHARS], *tok = NULL;
 	unsigned int index = 0;
 
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"AM_EntSpawn: syntax is 'amentspawn <classname> key value "
-			"key value'\n\"" );
+		AM_ConsolePrint( ent, "Syntax: \\amentspawn <classname> key value key value\n" );
 		return;
 	}
 
-	Q_strncpyz( buf, va( "origin %.0f,%.0f,%.0f classname ", tr->endpos.x, tr->endpos.y, tr->endpos.z ), sizeof(buf) );
+	// build the key/value pairs
+	if ( ent ) {
+		trace_t *tr = G_RealTrace( ent, 0.0f );
+		Q_strncpyz( buf, va( "origin %.0f,%.0f,%.0f classname ", tr->endpos.x, tr->endpos.y, tr->endpos.z ),
+			sizeof(buf) );
+	}
+	else {
+		Q_strncpyz( buf, "classname ", sizeof(buf) );
+	}
 	Q_strcat( buf, sizeof(buf), ConcatArgs( 1 ) );
 
-	G_LogPrintf( level.log.admin, "\t%s spawned \"%s\"\n", G_PrintClient( ent - g_entities ), buf );
+	if ( ent ) {
+		G_LogPrintf( level.log.admin, "\t%s spawned \"%s\"\n", G_PrintClient( ent - g_entities ), buf );
+	}
 
 	level.manualSpawning = qtrue;
 	level.numSpawnVars = 0;
@@ -2061,7 +2243,6 @@ static void AM_EntSpawn( gentity_t *ent ) {
 	G_SpawnGEntityFromSpawnVars( qfalse );
 
 	level.manualSpawning = qfalse;
-	return;
 }
 
 // lists all spawned entities
@@ -2070,7 +2251,7 @@ static void AM_EntList( gentity_t *ent ) {
 	int i;
 	printBufferSession_t pb;
 
-	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent - g_entities );
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent ? (ent - g_entities) : -1 );
 
 	Q_PrintBuffer( &pb, "Listing entities...\n" );
 	for ( i = MAX_CLIENTS, e = g_entities + MAX_CLIENTS; i < ENTITYNUM_WORLD; i++, e++ ) {
@@ -2078,7 +2259,7 @@ static void AM_EntList( gentity_t *ent ) {
 			continue;
 		}
 		else {
-			const float distance = Distance( &ent->s.origin, &e->s.origin );
+			const float distance = ent ? Distance( &ent->s.origin, &e->s.origin ) : 1337.0f;
 			const char *classname = (e->classname && e->classname[0]) ? e->classname : "Unknown";
 			Q_PrintBuffer( &pb, va( "%4i: %s, type: %i, distance: %.0f\n", i, classname, e->s.eType, distance ) );
 		}
@@ -2092,6 +2273,11 @@ static void AM_EntList( gentity_t *ent ) {
 static void AM_EntRemove( gentity_t *ent ) {
 	gentity_t *target = NULL;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() > 1 ) {
 		char arg[MAX_STRING_CHARS] = { '\0' };
 		trap->Argv( 1, arg, sizeof(arg) );
@@ -2101,13 +2287,13 @@ static void AM_EntRemove( gentity_t *ent ) {
 				target = g_entities + id;
 			}
 			else {
-				trap->SendServerCommand( ent - g_entities, va( "print \"AM_EntRemove: Argument must be between %i and "
-					"%i\n\"", MAX_CLIENTS, ENTITYNUM_WORLD ) );
+				AM_ConsolePrint( ent, va( "AM_EntRemove: Argument must be between %i and %i\n", MAX_CLIENTS,
+					ENTITYNUM_WORLD ) );
 				return;
 			}
 		}
 		else {
-			trap->SendServerCommand( ent - g_entities, "print \"AM_EntRemove: Argument must be a number\n\"" );
+			AM_ConsolePrint( ent, "AM_EntRemove: Argument must be a number\n" );
 			return;
 		}
 	}
@@ -2118,7 +2304,7 @@ static void AM_EntRemove( gentity_t *ent ) {
 			target = g_entities + tr->entityNum;
 		}
 		else {
-			trap->SendServerCommand( ent - g_entities, "print \"AM_EntRemove: Can't unspawn this entity\n\"" );
+			AM_ConsolePrint( ent, "AM_EntRemove: Can't unspawn this entity\n" );
 			return;
 		}
 	}
@@ -2131,8 +2317,7 @@ static void AM_EntRemove( gentity_t *ent ) {
 			G_FreeEntity( target );
 		}
 		else {
-			trap->SendServerCommand( ent - g_entities, "print \"AM_EntRemove: Tried to remove entity that was not "
-				"manually spawned\n\"" );
+			AM_ConsolePrint( ent, "AM_EntRemove: Tried to remove entity that was not manually spawned\n" );
 		}
 	}
 }
@@ -2140,6 +2325,11 @@ static void AM_EntRemove( gentity_t *ent ) {
 void Cmd_NPC_f( gentity_t *ent );
 // spawn an NPC
 static void AM_NPCSpawn( gentity_t *ent ) {
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	Cmd_NPC_f( ent );
 	G_LogPrintf( level.log.admin, "\t%s spawned \"%s\"\n", G_PrintClient( ent-g_entities ), ConcatArgs( 1 ) );
 }
@@ -2149,12 +2339,17 @@ static void AM_Lua( gentity_t *ent ) {
 	char *args = NULL;
 	int argc = trap->Argc();
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( argc < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Nothing to execute\n\"" );
+		AM_ConsolePrint( ent, "Nothing to execute\n" );
 		return;
 	}
 	if ( !JPLua.state ) {
-		trap->SendServerCommand( ent - g_entities, "print \"Lua is not initialised\n\"" );
+		AM_ConsolePrint( ent, "Lua is not initialised\n" );
 		return;
 	}
 
@@ -2171,22 +2366,34 @@ static void AM_Lua( gentity_t *ent ) {
 
 static void AM_ReloadLua( gentity_t *ent ) {
 #ifdef JPLUA
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	G_LogPrintf( level.log.admin, "\t%s reloaded JPLua\n", G_PrintClient( ent-g_entities ) );
 	JPLua_Shutdown();
 	JPLua_Init();
 #else
-	trap->SendServerCommand( ent - g_entities, "print \"Lua is not supported on this server\n\"" );
+	AM_ConsolePrint( ent, "Lua is not supported on this server\n" );
 #endif
 }
 
 // change map and gamemode
 static void AM_Map( gentity_t *ent ) {
-	char gametypeStr[32], map[MAX_QPATH], *args = ConcatArgs( 1 );
+	char gametypeStr[32], map[MAX_QPATH], *args = NULL;
 	const char *filter = NULL;
 	int gametype = 0, i = 0;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	args = ConcatArgs( 1 );
+
 	if ( trap->Argc() < 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"AM_Map: syntax is 'ammap gamemode map'\n\"" );
+		AM_ConsolePrint( ent, "Syntax: \\ammap <gamemode> <map>\n" );
 		return;
 	}
 
@@ -2199,8 +2406,8 @@ static void AM_Map( gentity_t *ent ) {
 			gametype = i;
 		}
 		else {
-			trap->SendServerCommand( ent - g_entities, va( "print \"AM_Map: argument 1 must be a valid gametype or "
-				"gametype number identifier\n\"", map, BG_GetGametypeString( gametype ) ) );
+			AM_ConsolePrint( ent, va( "AM_Map: argument 1 must be a valid gametype or gametype number identifier\n",
+				map, BG_GetGametypeString( gametype ) ) );
 			return;
 		}
 	}
@@ -2209,8 +2416,8 @@ static void AM_Map( gentity_t *ent ) {
 
 	if ( !japp_ammapAnyGametype.integer ) {
 		if ( !G_DoesMapSupportGametype( map, gametype ) ) {
-			trap->SendServerCommand( ent - g_entities, va( "print \"Map: %s does not support gametype: %s, or the map "
-				"doesn't exist.\n\"", map, BG_GetGametypeString( gametype ) ) );
+			AM_ConsolePrint( ent, va( "Map: %s does not support gametype: %s, or the map doesn't exist.\n",
+				map, BG_GetGametypeString( gametype ) ) );
 			return;
 		}
 	}
@@ -2230,8 +2437,15 @@ static void AM_Map( gentity_t *ent ) {
 }
 
 static void AM_Vstr( gentity_t *ent ) {
-	char *args = ConcatArgs( 1 );
+	char *args = NULL;
 	const char *filter = NULL;
+
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	args = ConcatArgs( 1 );
 
 	if ( (filter = Q_strchrs( args, ";\n" )) != NULL ) {
 		args[filter - args] = '\0';
@@ -2287,11 +2501,16 @@ static void Merc_Off( gentity_t *ent ) {
 }
 
 static void AM_Merc( gentity_t *ent ) {
-	char		arg1[64] = { 0 };
+	char		arg1[64] = { '\0' };
 	int			targetClient;
 	gentity_t	*targ;
 
-	//Can merc: self, partial name, clientNum
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
+	// can merc self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof(arg1) );
 	targetClient = (trap->Argc() > 1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT ) : ent - g_entities;
 
@@ -2326,8 +2545,13 @@ static void AM_Rename( gentity_t *ent ) {
 	int targetClient;
 	gentity_t *e = NULL;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() != 3 ) {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\amrename <client> <name>\n\"" );
+		AM_ConsolePrint( ent, "Syntax: \\amrename <client> <name>\n" );
 		return;
 	}
 
@@ -2381,8 +2605,13 @@ static void AM_LockTeam( gentity_t *ent ) {
 	char arg1[16];
 	team_t team;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() != 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\amlockteam <team, -1>\n\"" );
+		AM_ConsolePrint( ent, "Syntax: \\amlockteam <team, -1>\n" );
 		return;
 	}
 
@@ -2436,8 +2665,13 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 	char arg1[16];
 	team_t team;
 
+	if ( !ent ) {
+		trap->Print( "This command is not available for server console use yet\n" );
+		return;
+	}
+
 	if ( trap->Argc() != 2 ) {
-		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\amunlockteam <team, -1>\n\"" );
+		AM_ConsolePrint( ent, "Syntax: \\amunlockteam <team, -1>\n" );
 		return;
 	}
 
@@ -2472,7 +2706,7 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 		team = TEAM_FREE;
 	}
 	else {
-		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Invalid team\n\"" );
+		AM_ConsolePrint( ent, "Invalid team\n" );
 		return;
 	}
 
