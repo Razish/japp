@@ -1029,6 +1029,7 @@ void			UseHoldableItem( gentity_t *ent );
 void			Weapon_GrapplingHook_Fire( gentity_t *ent );
 void			Weapon_HookFree( gentity_t *ent );
 void			Weapon_HookThink( gentity_t *ent );
+qboolean		WP_SaberCanTurnOffSomeBlades( saberInfo_t *saber );
 void			WP_DeactivateSaber( gentity_t *self, qboolean clearLength );
 void			WP_FireBlasterMissile( gentity_t *ent, vector3 *start, vector3 *dir, qboolean altFire );
 void			WP_FireGenericBlasterMissile( gentity_t *ent, vector3 *start, vector3 *dir, qboolean altFire, int damage, int velocity, int mod );
