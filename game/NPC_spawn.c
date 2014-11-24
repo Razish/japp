@@ -22,7 +22,6 @@ void ST_ClearTimers( gentity_t *ent );
 void Jedi_ClearTimers( gentity_t *ent );
 void NPC_GalakMech_Init( gentity_t *ent );
 void Boba_Precache( void );
-gentity_t *NPC_SpawnType( gentity_t *ent, const char *npc_type, const char *targetname, qboolean isVehicle, vector3 *origin );
 
 void Rancor_SetBolts( gentity_t *self );
 void Wampa_SetBolts( gentity_t *self );
@@ -3285,7 +3284,9 @@ void SP_NPC_Droid_Protocol( gentity_t *self ) {
 NPC_Spawn_f
 */
 
-gentity_t *NPC_SpawnType( gentity_t *ent, const char *npc_type, const char *targetname, qboolean isVehicle, vector3 *origin ) {
+gentity_t *NPC_SpawnType( gentity_t *ent, const char *npc_type, const char *targetname, qboolean isVehicle,
+	vector3 *origin )
+{
 	gentity_t *NPCspawner = G_Spawn();
 	vector3 forward, end;
 	trace_t trace;
@@ -3359,30 +3360,26 @@ gentity_t *NPC_SpawnType( gentity_t *ent, const char *npc_type, const char *targ
 }
 
 void NPC_Spawn_f( gentity_t *ent ) {
-	char npc_type[1024], targetname[1024];
+	char npc_type[MAX_STRING_CHARS], targetname[MAX_STRING_CHARS];
 	qboolean isVehicle = qfalse;
 	int positionArg = 0;
 
 	trap->Argv( 2, npc_type, sizeof(npc_type) );
 	if ( !Q_stricmp( "vehicle", npc_type ) ) {
 		isVehicle = qtrue;
-		trap->Argv( 3, npc_type, sizeof(npc_type) );
 		if ( trap->Argc() == 8 ) {
-			// npc spawn vehicle npcname x y z targetname
-			positionArg = 4;
-			trap->Argv( 7, targetname, sizeof(targetname) );
+			// npc spawn vehicle npcname targetname x y z
+			positionArg = 5;
 		}
-		else {
-			// npc spawn vehicle npcname targetname
-			trap->Argv( 4, targetname, sizeof(targetname) );
-		}
+		trap->Argv( 3, npc_type, sizeof(npc_type) );
+		trap->Argv( 4, targetname, sizeof(targetname) );
 	}
 	else {
-		if ( trap->Argc() == 6 ) {
-			// npc spawn npcname
-			positionArg = 3;
-			trap->Argv( 6, targetname, sizeof(targetname) );
+		if ( trap->Argc() == 7 ) {
+			// npc spawn npcname targetname x y z
+			positionArg = 4;
 		}
+		trap->Argv( 3, targetname, sizeof(targetname) );
 	}
 
 	if ( positionArg ) {
@@ -3394,11 +3391,11 @@ void NPC_Spawn_f( gentity_t *ent ) {
 		trap->Argv( positionArg + 2, argZ, sizeof(argZ) );
 
 		VectorCopy( tv( atoi( argX ), atoi( argY ), atoi( argZ ) ), &origin );
-
 		NPC_SpawnType( ent, npc_type, targetname, isVehicle, &origin );
 	}
-	else
+	else {
 		NPC_SpawnType( ent, npc_type, targetname, isVehicle, NULL );
+	}
 }
 
 /*
@@ -3499,14 +3496,6 @@ void NPC_Kill_f( void ) {
 				}
 			}
 		}
-		/*
-		else if ( player && (player->r.svFlags&SVF_NPC_PRECACHE) )
-		{//a spawner
-		Com_Printf( S_COLOR_GREEN"Removing NPC spawner %s named %s\n", player->NPC_type, player->targetname );
-		G_FreeEntity( player );
-		}
-		*/
-		//rwwFIXMEFIXME: should really do something here.
 	}
 }
 

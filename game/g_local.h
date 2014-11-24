@@ -972,6 +972,8 @@ void			MatchTeam( gentity_t *teamLeader, moverState_t moverState, int time );
 void			MoveClientToIntermission( gentity_t *client );
 float			NPC_GetHFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, float hFOV );
 float			NPC_GetVFOVPercentage( vector3 *spot, vector3 *from, vector3 *facing, float vFOV );
+gentity_t *		NPC_SpawnType( gentity_t *ent, const char *npc_type, const char *targetname, qboolean isVehicle,
+	vector3 *origin );
 qboolean		OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
 int				OrgVisible( vector3 *org1, vector3 *org2, int ignore );
 team_t			PickTeam( int ignoreClientNum );
