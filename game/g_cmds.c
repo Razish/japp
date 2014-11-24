@@ -1522,7 +1522,7 @@ static void Cmd_MapList_f( gentity_t *ent ) {
 }
 
 static qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	char s[MAX_CVAR_VALUE_STRING] = { 0 }, bspName[MAX_QPATH] = { 0 };
+	char bspName[MAX_QPATH] = { '\0' };
 	const char *mapName = NULL, *mapName2 = NULL, *arenaInfo = NULL;
 	fileHandle_t fp = NULL_FILE;
 
@@ -1552,9 +1552,9 @@ static qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const 
 	}
 
 	// preserve the map rotation
-	trap->Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
-	if ( *s ) {
-		Com_sprintf( level.voteString, sizeof(level.voteString), "%s %s; set nextmap \"%s\"", arg1, arg2, s );
+	if ( nextmap.string[0] ) {
+		Com_sprintf( level.voteString, sizeof(level.voteString), "%s %s; set nextmap \"%s\"", arg1, arg2,
+			nextmap.string );
 	}
 	else {
 		Com_sprintf( level.voteString, sizeof(level.voteString), "%s %s", arg1, arg2 );
@@ -1590,10 +1590,7 @@ static qboolean G_VoteMapRestart( gentity_t *ent, int numArgs, const char *arg1,
 }
 
 static qboolean G_VoteNextmap( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	char s[MAX_CVAR_VALUE_STRING];
-
-	trap->Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
-	if ( !*s ) {
+	if ( !nextmap.string[0] ) {
 		trap->SendServerCommand( ent - g_entities, "print \"nextmap not set.\n\"" );
 		return qfalse;
 	}

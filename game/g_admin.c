@@ -2448,7 +2448,12 @@ static void AM_Map( gentity_t *ent ) {
 	G_LogPrintf( level.log.admin, "\t%s changed map to \"%s\" with gametype \"%s\"\n", G_PrintClient( ent-g_entities ),
 		map, BG_GetGametypeString( gametype ) );
 	trap->SendConsoleCommand( EXEC_APPEND, va( "g_gametype %d\n", gametype ) );
-	trap->SendConsoleCommand( EXEC_APPEND, va( "map %s\n", map ) );
+	if ( nextmap.string[0] ) {
+		trap->SendConsoleCommand( EXEC_APPEND, va( "map %s; set nextmap \"%s\"\n", map, nextmap.string ) );
+	}
+	else {
+		trap->SendConsoleCommand( EXEC_APPEND, va( "map %s\n", map ) );
+	}
 
 	return;
 }
