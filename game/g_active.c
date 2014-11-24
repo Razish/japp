@@ -2162,13 +2162,15 @@ void ClientThink_real( gentity_t *ent ) {
 			G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, 0 );
 
 			if ( ent->health > 0 && ent->client->ps.stats[STAT_HEALTH] > 0 ) {
-				char buf[MAX_STRING_CHARS - 64] = { 0 };
+				char pre1[(MAX_NETNAME * 2) + 64] = { '\0' }, pre2[(MAX_NETNAME * 2) + 64] = { '\0' };
+				char buf[MAX_STRING_CHARS - sizeof(pre1)] = { '\0' };
 				const char *defeated = G_GetStringEdString( "MP_SVGAME", "PLDUELWINNER" );
 				const char *winner = ent->client->pers.netname;
 				const char *loser = duelAgainst->client->pers.netname;
 
 				// x has defeated y
-				Com_sprintf( buf, sizeof(buf), "%s " S_COLOR_WHITE "%s %s", winner, defeated, loser );
+				Com_sprintf( pre1, sizeof(pre1), "%s " S_COLOR_WHITE "%s %s", winner, defeated, loser );
+				Com_sprintf( pre2, sizeof(pre2), "You %s %s", winner, defeated, loser );
 
 				// with h/a remaining
 				if ( japp_duelStats.integer & DUELSTATS_HEALTH ) {
@@ -2198,11 +2200,15 @@ void ClientThink_real( gentity_t *ent ) {
 						hits ) );
 				}
 
-				trap->SendServerCommand( -1, va( "print \"%s\n\"", buf ) );
-			}
+				trap->SendServerCommand( -1, va( "print \"%s%s\n\"", pre1, buf ) );
+				trap->SendServerCommand( ent - g_entities, va( "cp \"%s%s\n\"", pre2, buf ) );
+				}
 
-			else { //it was a draw, because we both managed to die in the same frame
-				trap->SendServerCommand( -1, va( "print \"%s: %s "S_COLOR_WHITE"vs %s! "S_COLOR_WHITE"("S_COLOR_RED"%i"S_COLOR_WHITE"/"S_COLOR_GREEN"%i"S_COLOR_WHITE")\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELTIE" ), ent->client->pers.netname, duelAgainst->client->pers.netname ) );
+			else {
+				// it was a draw, because we both managed to die in the same frame
+				trap->SendServerCommand( -1, va( "print \"%s: %s " S_COLOR_WHITE "vs %s! " S_COLOR_WHITE "(" S_COLOR_RED
+					"%i" S_COLOR_WHITE "/" S_COLOR_GREEN "%i" S_COLOR_WHITE ")\n\"", G_GetStringEdString( "MP_SVGAME",
+					"PLDUELTIE" ), ent->client->pers.netname, duelAgainst->client->pers.netname ) );
 				trap->SendServerCommand( -1, va( "cp \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELTIE" ) ) );
 			}
 
