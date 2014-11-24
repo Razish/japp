@@ -746,6 +746,7 @@ static void AM_Announce( gentity_t *ent ) {
 		// announce to everyone
 		G_LogPrintf( level.log.admin, "\t%s to <all clients>, %s\n", G_PrintClient( ent-g_entities ), msg );
 		trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
+		trap->SendServerCommand( -1, va( "print \"%s\"", msg ) );
 	}
 	else {
 		// announce to a certain client
@@ -758,7 +759,9 @@ static void AM_Announce( gentity_t *ent ) {
 		G_LogPrintf( level.log.admin, "\t%s to %s, %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ), msg );
 		trap->SendServerCommand( targetClient, va( "cp \"%s\"", msg ) );
-		trap->SendServerCommand( ent - g_entities, va( "cp \"Relay:\n%s\"", msg ) );
+		trap->SendServerCommand( targetClient, va( "print \"%s\"", msg ) );
+		trap->SendServerCommand( ent - g_entities, va( "cp\"Relay:\n%s\"", msg ) );
+		trap->SendServerCommand( ent - g_entities, va( "print \"Relay:\n%s\"", msg ) );
 	}
 }
 
