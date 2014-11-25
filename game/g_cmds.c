@@ -216,8 +216,16 @@ static void Cmd_Ignore_f( gentity_t *ent ) {
 	trap->Argv( 1, arg, sizeof(arg) );
 
 	if ( atoi( arg ) == -1 ) {
-		ent->client->pers.ignore = 0xFFFFFFFFu ^ (1 << (ent - g_entities));
-		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Ignoring " S_COLOR_WHITE "everyone\n\"" );
+		if ( ent->client->pers.ignore == (0xFFFFFFFFu & ~(1 << (ent - g_entities) )) ) {
+			ent->client->pers.ignore = 0u;
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Unignoring " S_COLOR_WHITE
+				"everyone\n\"" );
+		}
+		else {
+			ent->client->pers.ignore = 0xFFFFFFFFu & ~(1 << (ent - g_entities));
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Ignoring " S_COLOR_WHITE
+				"everyone\n\"" );
+		}
 	}
 	else {
 		clientNum = G_ClientFromString( ent, arg, FINDCL_SUBSTR | FINDCL_PRINT );
@@ -356,20 +364,20 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam ) {
 		return;
 
 	if ( client->sess.sessionTeam == TEAM_RED ) {
-		trap->SendServerCommand( -1, va( "cp \"%s"S_COLOR_WHITE" %s\n\"", client->pers.netname,
+		G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname,
 			G_GetStringEdString( "MP_SVGAME", "JOINEDTHEREDTEAM" ) ) );
 	}
 	else if ( client->sess.sessionTeam == TEAM_BLUE ) {
-		trap->SendServerCommand( -1, va( "cp \"%s"S_COLOR_WHITE" %s\n\"", client->pers.netname,
+		G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname,
 			G_GetStringEdString( "MP_SVGAME", "JOINEDTHEBLUETEAM" ) ) );
 	}
 	else if ( client->sess.sessionTeam == TEAM_SPECTATOR && oldTeam != TEAM_SPECTATOR ) {
-		trap->SendServerCommand( -1, va( "cp \"%s"S_COLOR_WHITE" %s\n\"", client->pers.netname,
+		G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname,
 			G_GetStringEdString( "MP_SVGAME", "JOINEDTHESPECTATORS" ) ) );
 	}
 	else if ( client->sess.sessionTeam == TEAM_FREE ) {
 		if ( level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL ) {
-			trap->SendServerCommand( -1, va( "cp \"%s"S_COLOR_WHITE" %s\n\"", client->pers.netname,
+			G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname,
 				G_GetStringEdString( "MP_SVGAME", "JOINEDTHEBATTLE" ) ) );
 		}
 	}
@@ -1086,16 +1094,18 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 	qboolean	isMeCmd = qfalse;
 	qboolean	returnToSender = qfalse;
 
-	if ( level.gametype < GT_TEAM && mode == SAY_TEAM )
+	if ( level.gametype < GT_TEAM && mode == SAY_TEAM ) {
 		mode = SAY_ALL;
+	}
 
 	if ( ent->client->pers.adminData.silenced ) {
 		return;
 	}
 
 	//RAZTODO: strip ext ascii/control chars
-	if ( strstr( ent->client->pers.netname, "<Admin>" ) || Q_strchrs( chatText, "\n\r\x0b" ) )
+	if ( strstr( ent->client->pers.netname, "<Admin>" ) || Q_strchrs( chatText, "\n\r\x0b" ) ) {
 		returnToSender = qtrue;
+	}
 
 	switch ( mode ) {
 	default:
@@ -1223,13 +1233,24 @@ static void Cmd_SayTeam_f( gentity_t *ent ) {
 	if ( ent->client->pers.sayTeamMethod == STM_ADMIN ) {
 		type = SAY_ADMIN;
 	}
+	else if ( ent->client->pers.sayTeamMethod == STM_CENTERPRINT ) {
+		if ( ent->client->pers.adminUser && AM_HasPrivilege( ent, PRIV_ANNOUNCE ) ) {
+			Q_ConvertLinefeeds( p );
+			G_Announce( p );
+		}
+		else {
+			trap->SendServerCommand( ent - g_entities, "print \"You are not allowed to execute that command.\n\"" );
+		}
+		return;
+	}
 
 	G_Say( ent, NULL, type, p );
 }
 
 static const char *sayTeamMethods[STM_NUM_METHODS] = {
 	"team",
-	"admin"
+	"admin",
+	"centerprint"
 };
 
 static void Cmd_SayTeamMod_f( gentity_t *ent ) {
@@ -1240,18 +1261,22 @@ static void Cmd_SayTeamMod_f( gentity_t *ent ) {
 
 	else {
 		char arg[64];
-		trap->Argv( 1, arg, sizeof(arg) );
+		int i;
 
-		if ( !Q_stricmp( arg, "admin" ) ) {
-			ent->client->pers.sayTeamMethod = STM_ADMIN;
+		trap->Argv( 1, arg, sizeof(arg) );
+		for ( i = 0; i < STM_NUM_METHODS; i++ ) {
+			if ( !Q_stricmp( arg, sayTeamMethods[i] ) ) {
+				ent->client->pers.sayTeamMethod = i;
+				break;
+			}
 		}
-		else {
+		if ( i == STM_NUM_METHODS ) {
 			ent->client->pers.sayTeamMethod = STM_TEAM;
 		}
 	}
 
-	trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_CYAN "redirecting team messages to: %s\n\"",
-		sayTeamMethods[ent->client->pers.sayTeamMethod] ) );
+	trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_CYAN "redirecting team messages to: "
+		S_COLOR_YELLOW "%s\n\"", sayTeamMethods[ent->client->pers.sayTeamMethod] ) );
 }
 
 static void Cmd_Tell_f( gentity_t *ent ) {

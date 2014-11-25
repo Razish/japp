@@ -1609,3 +1609,7 @@ const char *G_PrintClient( int clientNum ) {
 
 	return out;
 }
+
+void G_Announce( const char *msg ) {
+	trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
+}

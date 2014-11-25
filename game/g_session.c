@@ -7,10 +7,14 @@
 // called on game shutdown
 void G_WriteClientSessionData( const gclient_t *client ) {
 	const clientSession_t *sess = &client->sess;
+	cJSON *root;
 	fileHandle_t f;
 	char fileName[MAX_QPATH] = { '\0' };
-	cJSON *root = cJSON_CreateObject();
 
+	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", client - level.clients );
+	Com_Printf( "Writing session file %s\n", fileName );
+
+	root = cJSON_CreateObject();
 	cJSON_AddIntegerToObject( root, "sessionTeam", sess->sessionTeam );
 	cJSON_AddIntegerToObject( root, "spectatorTime", sess->spectatorTime );
 	cJSON_AddIntegerToObject( root, "spectatorState", sess->spectatorState );
@@ -25,12 +29,11 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 	cJSON_AddStringToObject( root, "siegeClass", *sess->siegeClass ? sess->siegeClass : "none" );
 	cJSON_AddStringToObject( root, "IP", sess->IP );
 	if ( client->pers.adminUser ) {
-		char checksum[16];
-		char combined[MAX_STRING_CHARS];
+		char checksum[16] = { '\0' };
+		char combined[MAX_STRING_CHARS] = { '\0' };
 		Com_sprintf( combined, sizeof(combined), "%s%s",
 			client->pers.adminUser->user, client->pers.adminUser->password );
 		Q_ChecksumMD5( combined, strlen( combined ), checksum );
-		trap->Print( "\nstoring %s as %s\n", combined, checksum );
 		cJSON_AddStringToObject( root, "admin", checksum );
 	}
 	cJSON_AddBooleanToObject( root, "empowered", !!client->pers.adminData.empowered );
@@ -38,9 +41,7 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 	cJSON_AddBooleanToObject( root, "silenced", !!client->pers.adminData.silenced );
 	cJSON_AddBooleanToObject( root, "slept", !!client->pers.adminData.isSlept );
 
-	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", client - level.clients );
 	trap->FS_Open( fileName, &f, FS_WRITE );
-	//Com_Printf( "Writing session file %s\n", fileName );
 
 	Q_WriteJSONToFile( root, f );
 }

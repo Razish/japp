@@ -632,17 +632,13 @@ adminUser_t *AM_ChecksumLogin( const char *checksum ) {
 	adminUser_t *user = NULL, *result = NULL;
 
 	for ( user = adminUsers; user; user = user->next ) {
-		char thisChecksum[16];
-		char combined[MAX_STRING_CHARS];
+		char thisChecksum[16] = { '\0' };
+		char combined[MAX_STRING_CHARS] = { '\0' };
 
 		// insert non-transmittable character so a user/pass of x/yz won't match xy/z
 		Com_sprintf( combined, sizeof(combined), "%s%s", user->user, user->password );
 		Q_ChecksumMD5( combined, strlen( combined ), thisChecksum );
-		trap->Print( "comparing %s:%s and %s\n", combined, thisChecksum, checksum );
 		if ( !strcmp( thisChecksum, checksum ) ) {
-#ifdef _DEBUG
-			trap->Print( "AM_ChecksumLogin: logged in as %s\n", user->user );
-#endif // _DEBUG
 			result = user;
 			count++;
 		}
@@ -745,7 +741,7 @@ static void AM_Announce( gentity_t *ent ) {
 	if ( arg1[0] == '-' && arg1[1] == '1' ) {
 		// announce to everyone
 		G_LogPrintf( level.log.admin, "\t%s to <all clients>, %s\n", G_PrintClient( ent-g_entities ), msg );
-		trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
+		G_Announce( msg );
 		trap->SendServerCommand( -1, va( "print \"%s\n\"", msg ) );
 	}
 	else {
@@ -1191,6 +1187,7 @@ static void AM_Poll( gentity_t *ent ) {
 	trap->Argv( 0, arg1, sizeof(arg1) );
 	Q_strncpyz( level.voteStringPoll, ConcatArgs( 1 ), sizeof(level.voteStringPoll) );
 	Q_strncpyz( level.voteStringPollCreator, ent->client->pers.netnameClean, sizeof(level.voteStringPollCreator) );
+	Q_ConvertLinefeeds( level.voteStringPoll );
 
 	Q_strncpyz( arg2, ent->client->pers.netname, sizeof(arg2) );
 	Q_CleanString( arg2, STRIP_COLOUR );
@@ -1608,8 +1605,7 @@ static void AM_Sleep( gentity_t *ent ) {
 		G_SleepClient( e->client );
 
 		G_LogPrintf( level.log.admin, "\t%s slept %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( clientNum ) );
-		trap->SendServerCommand( -1, va( "cp \"%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "slept\n\"",
-			e->client->pers.netname ) );
+		G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "slept", e->client->pers.netname ) );
 		trap->SendServerCommand( clientNum, "cp \"You have been " S_COLOR_CYAN "slept\n\"" );
 	}
 }
@@ -1695,8 +1691,7 @@ static void AM_Wake( gentity_t *ent ) {
 		G_WakeClient( e->client );
 
 		G_LogPrintf( level.log.admin, "\t%s woke %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( clientNum ) );
-		trap->SendServerCommand( -1, va( "cp \"%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "woken\n\"",
-			e->client->pers.netname ) );
+		G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "woken", e->client->pers.netname ) );
 		trap->SendServerCommand( clientNum, "cp \"You have been " S_COLOR_CYAN "woken\n\"" );
 	}
 }
@@ -1729,8 +1724,7 @@ static void AM_GunSleep( gentity_t *ent ) {
 
 		G_LogPrintf( level.log.admin, "\t%s %s %s\n", G_PrintClient( ent-g_entities ),
 			e->client->pers.adminData.isSlept ? "slept" : "woke", G_PrintClient( tr->entityNum ) );
-		trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been " S_COLOR_CYAN "%s\n\"",
-			e->client->pers.netname, action ) );
+		G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "%s", e->client->pers.netname, action ) );
 		trap->SendServerCommand( tr->entityNum, va( "cp \"You have been " S_COLOR_CYAN "%s\n\"", action ) );
 	}
 }
@@ -1796,7 +1790,7 @@ static void AM_Silence( gentity_t *ent ) {
 
 	level.clients[targetClient].pers.adminData.silenced = qtrue;
 	G_LogPrintf( level.log.admin, "\t%s silenced %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( targetClient ) );
-	trap->SendServerCommand( -1, va( "cp \"%s\n"S_COLOR_WHITE"has been " S_COLOR_CYAN "silenced\n\"",
+	G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "silenced",
 		level.clients[targetClient].pers.netname ) );
 	trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_CYAN "silenced\n\"" );
 }
@@ -1850,7 +1844,7 @@ static void AM_Unsilence( gentity_t *ent ) {
 	level.clients[targetClient].pers.adminData.silenced = qfalse;
 	G_LogPrintf( level.log.admin, "\t%s unsilenced %s\n", G_PrintClient( ent-g_entities ),
 		G_PrintClient( targetClient ) );
-	trap->SendServerCommand( -1, va( "cp \"%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "un-silenced\n\"",
+	G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "un-silenced",
 		level.clients[targetClient].pers.netname ) );
 	trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_CYAN "un-silenced\n\"" );
 }
@@ -1914,8 +1908,7 @@ static void AM_Slay( gentity_t *ent ) {
 
 	Cmd_Kill_f( targetEnt );
 	G_LogPrintf( level.log.admin, "\t%s slayed %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( targetClient ) );
-	trap->SendServerCommand( -1, va( "cp \"%s\n" S_COLOR_WHITE "has been " S_COLOR_RED "slain\n\"",
-		targetEnt->client->pers.netname ) );
+	G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_RED "slain", targetEnt->client->pers.netname ) );
 	trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_RED "slain\n\"" );
 }
 
@@ -2264,7 +2257,8 @@ static void AM_EntList( gentity_t *ent ) {
 		else {
 			const float distance = ent ? Distance( &ent->s.origin, &e->s.origin ) : 1337.0f;
 			const char *classname = (e->classname && e->classname[0]) ? e->classname : "Unknown";
-			Q_PrintBuffer( &pb, va( "%4i: %s, type: %i, distance: %.0f\n", i, classname, e->s.eType, distance ) );
+			Q_PrintBuffer( &pb, va( "%4i: %s, type: %i, distance: %.0f, coords: %s\n", i, classname, e->s.eType,
+				distance, vtos( &e->s.origin ) ) );
 		}
 	}
 	Q_PrintBuffer( &pb, "\n" );

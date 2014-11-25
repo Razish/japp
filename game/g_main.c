@@ -2208,10 +2208,10 @@ void CheckTournament( void ) {
 
 					G_PowerDuelCount( &lone, &dbl, qtrue );
 					if ( lone < 1 ) {
-						trap->SendServerCommand( -1, va( "cp \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "DUELMORESINGLE" ) ) );
+						G_Announce( G_GetStringEdString( "MP_SVGAME", "DUELMORESINGLE" ) );
 					}
 					else {
-						trap->SendServerCommand( -1, va( "cp \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "DUELMOREPAIRED" ) ) );
+						G_Announce( G_GetStringEdString( "MP_SVGAME", "DUELMOREPAIRED" ) );
 					}
 					g_duelPrintTimer = level.time + 10000;
 				}
@@ -2397,8 +2397,8 @@ void CheckVote( void ) {
 				char msg[MAX_STRING_CHARS - 128];
 				Com_sprintf( msg, sizeof(msg), va( "%s\ncalled a poll\n\n%s", level.voteStringPollCreator,
 					level.voteStringPoll ) );
-				trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
-				Com_Printf( "%s\n", msg );
+				G_Announce( msg );
+				trap->Print( "%s\n", msg );
 				lastPrint = level.time;
 			}
 			return;
@@ -2455,7 +2455,7 @@ void CheckReady( void ) {
 			char msg[MAX_STRING_CHARS / 2] = { 0 };
 			Com_sprintf( msg, sizeof(msg), S_COLOR_GREEN"Waiting for players to ready up!\n%i more needed\n\nType /ready",
 				(int)ceilf( (float)(playerCount) * t ) );
-			trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
+			G_Announce( msg );
 			lastPrint = level.time;
 		}
 	}
@@ -2714,7 +2714,8 @@ void G_RunFrame( int levelTime ) {
 	}
 	if ( level.pause.state == PAUSE_PAUSED ) {
 		if ( lastMsgTime < level.time - 500 ) {
-			trap->SendServerCommand( -1, va( "cp \"Match has been paused.\n%.0f seconds remaining\n\"", ceilf( (level.pause.time - level.time) / 1000.0f ) ) );
+			G_Announce( va( "Match has been paused.\n%.0f seconds remaining",
+				ceilf( (level.pause.time - level.time) / 1000.0f ) ) );
 			lastMsgTime = level.time;
 		}
 
@@ -2723,7 +2724,7 @@ void G_RunFrame( int levelTime ) {
 	}
 	if ( level.pause.state == PAUSE_UNPAUSING ) {
 		if ( lastMsgTime < level.time - 500 ) {
-			trap->SendServerCommand( -1, va( "cp \"MATCH IS UNPAUSING\nin %.0f...\n\"", ceilf( (level.pause.time - level.time) / 1000.0f ) ) );
+			G_Announce( va( "MATCH IS UNPAUSING\nin %.0f...", ceilf( (level.pause.time - level.time) / 1000.0f ) ) );
 			lastMsgTime = level.time;
 		}
 
