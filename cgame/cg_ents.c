@@ -115,23 +115,20 @@ void CG_S_StopLoopingSound( int entityNum, sfxHandle_t sfx ) {
 	else { //otherwise, clear only the specified looping sound
 		int i = 0;
 
-		while ( i < cent->numLoopingSounds ) {
+		for ( i = 0; i < cent->numLoopingSounds; i++ ) {
 			cSound = &cent->loopingSound[i];
 
-			if ( cSound->sfx == sfx ) { //remove it then
-				int x = i + 1;
+			if ( cSound->sfx == sfx ) {
+				// remove it then
+				int x;
 
-				while ( x < cent->numLoopingSounds ) {
+				for ( x = i + 1; x < cent->numLoopingSounds; x++ ) {
 					memcpy( &cent->loopingSound[x - 1], &cent->loopingSound[x], sizeof(cent->loopingSound[x]) );
-					x++;
 				}
 				cent->numLoopingSounds--;
 			}
-
-			i++;
 		}
 	}
-	//trap->S_StopLoopingSound(entityNum);
 }
 
 // Update any existing looping sounds on the entity.
@@ -163,21 +160,21 @@ void CG_S_UpdateLoopingSounds( int entityNum ) {
 		Sil: even if he is not there anymore
 		*/
 	if ( (cent->currentState.eFlags & EF_SOUNDTRACKER)
-		&& (!cg.snap || (signed)cent->currentState.trickedentindex != cg.snap->ps.clientNum) ) {//keep sound for this entity updated in accordance with its attached entity at all times
-		//entity out of range
-		if ( !cg_entities[cent->currentState.trickedentindex].currentValid )
+		&& (!cg.snap || (signed)cent->currentState.trickedEntIndex[0] != cg.snap->ps.clientNum) )
+	{
+		// keep sound for this entity updated in accordance with its attached entity at all times
+		if ( !cg_entities[cent->currentState.trickedEntIndex[0]].currentValid ) {
+			// entity out of range
 			return;
+		}
 
-		VectorCopy( &cg_entities[cent->currentState.trickedentindex].lerpOrigin, &lerpOrg );
+		VectorCopy( &cg_entities[cent->currentState.trickedEntIndex[0]].lerpOrigin, &lerpOrg );
 	}
 
-	while ( i < cent->numLoopingSounds ) {
+	for ( i = 0; i < cent->numLoopingSounds; i++ ) {
 		cSound = &cent->loopingSound[i];
 
-		//trap->S_AddLoopingSound(entityNum, cSound->origin, cSound->velocity, cSound->sfx);
-		//I guess just keep using lerpOrigin for now,
 		trap->S_AddLoopingSound( entityNum, &lerpOrg, &cSound->velocity, cSound->sfx );
-		i++;
 	}
 }
 
@@ -336,10 +333,12 @@ void FX_DrawPortableShield( centity_t *cent ) {
 	start.z += height / 2;
 	end.z += height / 2;
 
-	if ( cent->currentState.trickedentindex )
+	if ( cent->currentState.trickedEntIndex[0] ) {
 		shader = trap->R_RegisterShader( (team == TEAM_RED) ? "gfx/misc/red_dmgshield" : "gfx/misc/blue_dmgshield" );
-	else
+	}
+	else {
 		shader = trap->R_RegisterShader( (team == TEAM_RED) ? "gfx/misc/red_portashield" : "gfx/misc/blue_portashield" );
+	}
 
 	FX_AddOrientedLine( &start, &end, &normal, 1.0f, height, 0.0f, 1.0f, 1.0f, 50.0f, shader );
 }
@@ -723,35 +722,33 @@ static void CG_General( centity_t *cent ) {
 
 	if ( cent->currentState.boltToPlayer ) { //Shove it into the player's left hand then.
 		centity_t *pl = &cg_entities[cent->currentState.boltToPlayer - 1];
-		if ( CG_IsMindTricked( pl->currentState.trickedentindex,
-			pl->currentState.trickedentindex2,
-			pl->currentState.trickedentindex3,
-			pl->currentState.trickedentindex4,
-			cg.predictedPlayerState.clientNum ) ) { //don't show if this guy is mindtricking
+		if ( CG_IsMindTricked( pl->currentState.trickedEntIndex, cg.predictedPlayerState.clientNum ) ) {
+			// don't show if this guy is mindtricking
 			return;
 		}
-		if ( !CG_RenderTimeEntBolt( cent ) ) { //If this function returns qfalse we shouldn't render this ent at all.
-			if ( cent->currentState.boltToPlayer > 0 &&
-				cent->currentState.boltToPlayer <= MAX_CLIENTS ) {
+		if ( !CG_RenderTimeEntBolt( cent ) ) {
+			// if this function returns qfalse we shouldn't render this ent at all.
+			if ( cent->currentState.boltToPlayer > 0 && cent->currentState.boltToPlayer <= MAX_CLIENTS ) {
 				VectorCopy( &pl->lerpOrigin, &cent->lerpOrigin );
 
-				if ( cent->currentState.eFlags & EF_CLIENTSMOOTH ) { //if it's set to smooth keep the smoothed lerp origin updated, as we don't want to smooth while bolted.
+				if ( cent->currentState.eFlags & EF_CLIENTSMOOTH ) {
+					// if it's set to smooth keep the smoothed lerp origin updated, as we don't want to smooth while
+					//	bolted.
 					VectorCopy( &cent->lerpOrigin, &cent->turAngles );
 				}
 			}
 			return;
 		}
 
-		if ( cent->currentState.eFlags & EF_CLIENTSMOOTH ) { //if it's set to smooth keep the smoothed lerp origin updated, as we don't want to smooth while bolted.
+		if ( cent->currentState.eFlags & EF_CLIENTSMOOTH ) {
+			// if it's set to smooth keep the smoothed lerp origin updated, as we don't want to smooth while bolted.
 			VectorCopy( &cent->lerpOrigin, &cent->turAngles );
 		}
 
-		/* disabled for now
-				if (pl->currentState.number != cg.predictedPlayerState.clientNum)
-				{ //don't render thing above head to self
-				CG_SiegeEntRenderAboveHead(cent);
-				}
-				*/
+		if ( pl->currentState.number != cg.predictedPlayerState.clientNum ) {
+			// don't render thing above head to self
+			//CG_SiegeEntRenderAboveHead( cent );
+		}
 	}
 	else if ( cent->currentState.eFlags & EF_CLIENTSMOOTH ) {
 		if ( cent->currentState.groundEntityNum >= ENTITYNUM_WORLD ) {
@@ -1388,7 +1385,7 @@ static void CG_General( centity_t *cent ) {
 			trap->FX_AddSprite( &fxSArgs );
 		}
 	}
-	else if ( cent->currentState.trickedentindex3 ) { //holocron special effects
+	else if ( cent->currentState.trickedEntIndex[2] ) { //holocron special effects
 		vector3 org;
 		float wv;
 		addspriteArgStruct_t fxSArgs;
@@ -1399,12 +1396,12 @@ static void CG_General( centity_t *cent ) {
 		ent.renderfx = RF_RGB_TINT;
 		wv = sinf( cg.time * 0.005f ) * 0.08f + 0.1f; //* 0.08f + 0.1f;
 
-		if ( cent->currentState.trickedentindex3 == 1 ) { //dark
+		if ( cent->currentState.trickedEntIndex[2] == 1 ) { //dark
 			ent.shaderRGBA[0] = wv * 255;
 			ent.shaderRGBA[1] = 0;
 			ent.shaderRGBA[2] = 0;
 		}
-		else if ( cent->currentState.trickedentindex3 == 2 ) { //light
+		else if ( cent->currentState.trickedEntIndex[2] == 2 ) { //light
 			ent.shaderRGBA[0] = wv * 255;
 			ent.shaderRGBA[1] = wv * 255;
 			ent.shaderRGBA[2] = wv * 255;
@@ -1452,13 +1449,13 @@ static void CG_General( centity_t *cent ) {
 
 		fxSArgs.flags = 0x08000000 | 0x00000001;
 
-		if ( cent->currentState.trickedentindex3 == 1 ) { //dark
+		if ( cent->currentState.trickedEntIndex[2] == 1 ) { //dark
 			fxSArgs.sAlpha *= 3;
 			fxSArgs.eAlpha *= 3;
 			fxSArgs.shader = media.gfx.world.saber.red.glow;
 			trap->FX_AddSprite( &fxSArgs );
 		}
-		else if ( cent->currentState.trickedentindex3 == 2 ) { //light
+		else if ( cent->currentState.trickedEntIndex[2] == 2 ) { //light
 			fxSArgs.sAlpha *= 1.5f;
 			fxSArgs.eAlpha *= 1.5f;
 			fxSArgs.shader = media.gfx.world.saber.red.glow;
@@ -1527,12 +1524,13 @@ static void CG_General( centity_t *cent ) {
 
 // Speaker entities can automatically play sounds
 static void CG_Speaker( centity_t *cent ) {
-	if ( cent->currentState.trickedentindex ) {
+	if ( cent->currentState.trickedEntIndex[0] ) {
 		CG_S_StopLoopingSound( cent->currentState.number, -1 );
 	}
 
-	if ( !cent->currentState.clientNum ) {	// FIXME: use something other than clientNum...
-		return;		// not auto triggering
+	if ( !cent->currentState.clientNum ) {
+		//FIXME: use something other than clientNum...
+		return; // not auto triggering
 	}
 
 	if ( cg.time < cent->miscTime ) {

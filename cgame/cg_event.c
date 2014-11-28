@@ -760,8 +760,8 @@ doPrint:
 }
 
 void CG_GetCTFMessageEvent( entityState_t *es ) {
-	int clIndex = es->trickedentindex;
-	int teamIndex = es->trickedentindex2;
+	int clIndex = es->trickedEntIndex[0];
+	int teamIndex = es->trickedEntIndex[1];
 	clientInfo_t *ci = NULL;
 	const char *teamName = NULL;
 
@@ -828,33 +828,6 @@ void DoFall( centity_t *cent, entityState_t *es, int clientNum ) {
 		}
 		cg.landTime = cg.time;
 	}
-}
-
-int CG_InClientBitflags( entityState_t *ent, int client ) {
-	int checkIn;
-	int sub = 0;
-
-	if ( client > 47 ) {
-		checkIn = ent->trickedentindex4;
-		sub = 48;
-	}
-	else if ( client > 31 ) {
-		checkIn = ent->trickedentindex3;
-		sub = 32;
-	}
-	else if ( client > 15 ) {
-		checkIn = ent->trickedentindex2;
-		sub = 16;
-	}
-	else {
-		checkIn = ent->trickedentindex;
-	}
-
-	if ( checkIn & (1 << (client - sub)) ) {
-		return 1;
-	}
-
-	return 0;
 }
 
 void CG_PlayDoorLoopSound( centity_t *cent );
@@ -1025,7 +998,7 @@ void CG_VehMuzzleFireFX( centity_t *veh, entityState_t *broadcaster ) {
 
 	for ( curMuz = 0; curMuz < MAX_VEHICLE_MUZZLES; curMuz++ ) {//go through all muzzles and
 		if ( pVeh->m_iMuzzleTag[curMuz] != -1//valid muzzle bolt
-			&& (broadcaster->trickedentindex&(1 << curMuz)) )//fired
+			&& (broadcaster->trickedEntIndex[0] & (1 << curMuz)) )//fired
 		{//this muzzle fired
 			muzFX = 0;
 			if ( pVeh->m_pVehicleInfo->weapMuzzle[curMuz] == 0 ) {//no weaopon for this muzzle?  check turrets
@@ -1671,7 +1644,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			index = cg_entities[es->eventParm].currentState.modelindex;		// player predicted
 
 			if ( index < 1 && cg_entities[es->eventParm].currentState.isJediMaster ) { //a holocron most likely
-				unsigned int fpIndex = cg_entities[es->eventParm].currentState.trickedentindex4;
+				unsigned int fpIndex = cg_entities[es->eventParm].currentState.trickedEntIndex[3];
 				trap->S_StartSound( NULL, es->number, CHAN_AUTO, media.sounds.interface.holocronPickup );
 
 				if ( es->number == cg.snap->ps.clientNum && showPowersName[fpIndex] ) {
@@ -2294,8 +2267,8 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 				break;
 			case PDSOUND_ABSORBHIT:
 				sID = trap->S_RegisterSound( "sound/weapons/force/absorbhit.mp3" );
-				if ( es->trickedentindex < MAX_CLIENTS ) {
-					int clnum = es->trickedentindex;
+				if ( es->trickedEntIndex[0] < MAX_CLIENTS ) {
+					int clnum = es->trickedEntIndex[0];
 
 					cg_entities[clnum].teamPowerEffectTime = cg.time + 1000;
 					cg_entities[clnum].teamPowerType = 3;
@@ -2323,22 +2296,23 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 	case EV_TEAM_POWER:
 		DEBUGNAME( "EV_TEAM_POWER" );
 		{
-			int clnum = 0;
+			int clnum;
 
-			while ( clnum < MAX_CLIENTS ) {
-				if ( CG_InClientBitflags( es, clnum ) ) {
-					if ( es->eventParm == 1 ) { //eventParm 1 is heal
+			for ( clnum = 0; clnum < MAX_CLIENTS; clnum++ ) {
+				if ( Q_InBitflags( es->trickedEntIndex, clnum, 16 ) ) {
+					if ( es->eventParm == 1 ) {
+						// eventParm 1 is heal
 						trap->S_StartSound( NULL, clnum, CHAN_AUTO, media.sounds.force.teamHeal );
 						cg_entities[clnum].teamPowerEffectTime = cg.time + 1000;
 						cg_entities[clnum].teamPowerType = 1;
 					}
-					else { //eventParm 2 is force regen
+					else {
+						// eventParm 2 is force regen
 						trap->S_StartSound( NULL, clnum, CHAN_AUTO, media.sounds.force.teamRegen );
 						cg_entities[clnum].teamPowerEffectTime = cg.time + 1000;
 						cg_entities[clnum].teamPowerType = 0;
 					}
 				}
-				clnum++;
 			}
 		}
 		break;
@@ -2547,7 +2521,8 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		break;
 	case EV_SIEGE_OBJECTIVECOMPLETE:
 		DEBUGNAME( "EV_SIEGE_OBJECTIVECOMPLETE" );
-		CG_SiegeObjectiveCompleted( &cg_entities[cent->currentState.weapon], cent->currentState.eventParm, cent->currentState.trickedentindex );
+		CG_SiegeObjectiveCompleted( &cg_entities[cent->currentState.weapon], cent->currentState.eventParm,
+			cent->currentState.trickedEntIndex[0] );
 		break;
 
 	case EV_DESTROY_GHOUL2_INSTANCE:
@@ -2573,7 +2548,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 
 	case EV_GIVE_NEW_RANK:
 		DEBUGNAME( "EV_GIVE_NEW_RANK" );
-		if ( (signed)es->trickedentindex == cg.snap->ps.clientNum ) {
+		if ( (signed)es->trickedEntIndex[0] == cg.snap->ps.clientNum ) {
 			trap->Cvar_Set( "ui_rankChange", va( "%i", es->eventParm ) );
 
 			trap->Cvar_Set( "ui_myteam", va( "%i", es->bolt2 ) );
@@ -2641,8 +2616,8 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			CG_MissileHitPlayer( es->weapon, position, &dir, es->otherEntityNum, qfalse );
 		}
 
-		if ( cg_ghoul2Marks.integer &&
-			es->trickedentindex ) { //flag to place a ghoul2 mark
+		if ( cg_ghoul2Marks.integer && es->trickedEntIndex[0] ) {
+			// flag to place a ghoul2 mark
 			CG_G2MarkEvent( es );
 		}
 		break;
@@ -2662,8 +2637,8 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			CG_MissileHitWall( es->weapon, 0, position, &dir, IMPACTSOUND_DEFAULT, qfalse, 0 );
 		}
 
-		if ( cg_ghoul2Marks.integer &&
-			es->trickedentindex ) { //flag to place a ghoul2 mark
+		if ( cg_ghoul2Marks.integer && es->trickedEntIndex[0] ) {
+			// flag to place a ghoul2 mark
 			CG_G2MarkEvent( es );
 		}
 		break;
@@ -2833,11 +2808,11 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 
 	case EV_MUTE_SOUND:
 		DEBUGNAME( "EV_MUTE_SOUND" );
-		if ( cg_entities[es->trickedentindex2].currentState.eFlags & EF_SOUNDTRACKER ) {
-			cg_entities[es->trickedentindex2].currentState.eFlags -= EF_SOUNDTRACKER;
+		if ( cg_entities[es->trickedEntIndex[1]].currentState.eFlags & EF_SOUNDTRACKER ) {
+			cg_entities[es->trickedEntIndex[1]].currentState.eFlags -= EF_SOUNDTRACKER;
 		}
-		trap->S_MuteSound( es->trickedentindex2, es->trickedentindex );
-		CG_S_StopLoopingSound( es->trickedentindex2, -1 );
+		trap->S_MuteSound( es->trickedEntIndex[1], es->trickedEntIndex[0] );
+		CG_S_StopLoopingSound( es->trickedEntIndex[1], -1 );
 		break;
 
 	case EV_VOICECMD_SOUND:
@@ -2984,28 +2959,28 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		DEBUGNAME( "EV_ENTITY_SOUND" );
 		//somewhat of a hack - weapon is the caller entity's index, trickedentindex is the proper sound channel
 		if ( cgs.gameSounds[es->eventParm] ) {
-			trap->S_StartSound( NULL, es->clientNum, es->trickedentindex, cgs.gameSounds[es->eventParm] );
+			trap->S_StartSound( NULL, es->clientNum, es->trickedEntIndex[0], cgs.gameSounds[es->eventParm] );
 		}
 		else {
 			s = CG_ConfigString( CS_SOUNDS + es->eventParm );
-			trap->S_StartSound( NULL, es->clientNum, es->trickedentindex, CG_CustomSound( es->clientNum, s ) );
+			trap->S_StartSound( NULL, es->clientNum, es->trickedEntIndex[0], CG_CustomSound( es->clientNum, s ) );
 		}
 		break;
 
 	case EV_PLAY_ROFF:
 		DEBUGNAME( "EV_PLAY_ROFF" );
-		trap->ROFF_Play( es->weapon, es->eventParm, es->trickedentindex );
+		trap->ROFF_Play( es->weapon, es->eventParm, es->trickedEntIndex[0] );
 		break;
 
 	case EV_GLASS_SHATTER:
 		DEBUGNAME( "EV_GLASS_SHATTER" );
-		CG_GlassShatter( es->genericenemyindex, &es->origin, &es->angles, es->trickedentindex, es->pos.trTime );
+		CG_GlassShatter( es->genericenemyindex, &es->origin, &es->angles, es->trickedEntIndex[0], es->pos.trTime );
 		break;
 
 	case EV_DEBRIS:
 		DEBUGNAME( "EV_DEBRIS" );
-		CG_Chunks( es->owner, &es->origin, &es->angles, &es->origin2, &es->angles2, es->speed,
-			es->eventParm, es->trickedentindex, es->modelindex, es->apos.trBase.x );
+		CG_Chunks( es->owner, &es->origin, &es->angles, &es->origin2, &es->angles2, es->speed, es->eventParm,
+			es->trickedEntIndex[0], es->modelindex, es->apos.trBase.x );
 		break;
 
 	case EV_MISC_MODEL_EXP:
@@ -3173,4 +3148,3 @@ void CG_CheckEvents( centity_t *cent ) {
 
 	CG_EntityEvent( cent, &cent->lerpOrigin );
 }
-

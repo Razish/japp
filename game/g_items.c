@@ -109,7 +109,7 @@ void ShieldRemove( gentity_t *self ) {
 
 // Count down the health of the shield.
 void ShieldThink( gentity_t *self ) {
-	self->s.trickedentindex = 0;
+	self->s.trickedEntIndex[0] = 0;
 
 	if ( level.gametype == GT_SIEGE ) {
 		self->health -= SHIELD_SIEGE_HEALTH_DEC;
@@ -143,7 +143,7 @@ void ShieldPain( gentity_t *self, gentity_t *attacker, int damage ) {
 	// Play damaging sound...
 	G_AddEvent( self, EV_GENERAL_SOUND, shieldDamageSound );
 
-	self->s.trickedentindex = 1;
+	self->s.trickedEntIndex[0] = 1;
 
 	return;
 }

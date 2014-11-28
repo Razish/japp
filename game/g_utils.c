@@ -581,7 +581,7 @@ void G_FreeEntity( gentity_t *ed ) {
 		}
 
 		// make sure clientside loop sounds are killed on the tracker and client
-		trap->SendServerCommand( -1, va( "kls %i %i", ed->s.trickedentindex, ed->s.number ) );
+		trap->SendServerCommand( -1, va( "kls %i %i", ed->s.trickedEntIndex[0], ed->s.number ) );
 	}
 
 	memset( ed, 0, sizeof(*ed) );
@@ -776,14 +776,16 @@ gentity_t *G_ScreenShake( vector3 *org, gentity_t *target, float intensity, int 
 void G_MuteSound( int entnum, int channel ) {
 	gentity_t *te, *e;
 
+	assert( entnum > 0 && entnum < MAX_GENTITIES );
+
 	te = G_TempEntity( &vec3_origin, EV_MUTE_SOUND );
 	te->r.svFlags = SVF_BROADCAST;
-	te->s.trickedentindex2 = entnum;
-	te->s.trickedentindex = channel;
+	te->s.trickedEntIndex[1] = entnum;
+	te->s.trickedEntIndex[0] = channel;
 
 	e = &g_entities[entnum];
 
-	if ( e && (e->s.eFlags & EF_SOUNDTRACKER) ) {
+	if ( e->s.eFlags & EF_SOUNDTRACKER ) {
 		G_FreeEntity( e );
 		e->s.eFlags = 0;
 	}
@@ -809,7 +811,7 @@ void G_Sound( gentity_t *ent, int channel, int soundIndex ) {
 		}
 
 		ent->client->ps.fd.killSoundEntIndex[channel - 50] = te->s.number;
-		te->s.trickedentindex = ent->s.number;
+		te->s.trickedEntIndex[0] = ent->s.number;
 		te->s.eFlags = EF_SOUNDTRACKER;
 		//Raz: Looping sound fixed so all players get information about it, which can be needed later
 		te->r.svFlags |= SVF_BROADCAST;
@@ -827,7 +829,7 @@ void G_EntitySound( gentity_t *ent, int channel, int soundIndex ) {
 	gentity_t *te = G_TempEntity( &ent->r.currentOrigin, EV_ENTITY_SOUND );
 	te->s.eventParm = soundIndex;
 	te->s.clientNum = ent->s.number;
-	te->s.trickedentindex = channel;
+	te->s.trickedEntIndex[0] = channel;
 }
 
 // To make porting from SP easier.
@@ -835,7 +837,7 @@ void G_SoundOnEnt( gentity_t *ent, int channel, const char *soundPath ) {
 	gentity_t *te = G_TempEntity( &ent->r.currentOrigin, EV_ENTITY_SOUND );
 	te->s.eventParm = G_SoundIndex( soundPath );
 	te->s.clientNum = ent->s.number;
-	te->s.trickedentindex = channel;
+	te->s.trickedEntIndex[0] = channel;
 }
 
 // Returns whether or not the targeted entity is useable

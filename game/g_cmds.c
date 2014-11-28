@@ -3241,8 +3241,9 @@ static void Cmd_Origin_f( gentity_t *ent ) {
 	targ = &g_entities[targetClient];
 
 	// can't see ghosted clients, let's just send their own coords =]
-	if ( targ->client->pers.adminData.isGhost && !AM_HasPrivilege( ent, PRIV_GHOST ) )
+	if ( targ->client->pers.adminData.isGhost && !AM_HasPrivilege( ent, PRIV_GHOST ) ) {
 		targ = ent;
+	}
 
 	trap->SendServerCommand( ent - g_entities, va( "print \"Origin: %s\nAngles: %s\n\"", vtos( &targ->client->ps.origin ),
 		vtos( &targ->client->ps.viewangles ) ) );

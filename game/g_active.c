@@ -917,118 +917,81 @@ void SendPendingPredictableEvents( playerState_t *ps ) {
 	}
 }
 
-#define MAX_JEDIMASTER_DISTANCE	2500
-#define MAX_JEDIMASTER_FOV		100
-
-#define MAX_SIGHT_DISTANCE		1500
-#define MAX_SIGHT_FOV			100
-
-// Determines whether this client should be broadcast to any other clients.
-// A client is broadcast when another client is using force sight or is
-static void G_UpdateForceSightBroadcasts( gentity_t *self ) {
-	int i;
-
-	// Any clients with force sight on should see this client
-	for ( i = 0; i < level.numConnectedClients; i++ ) {
-		gentity_t *ent = &g_entities[level.sortedClients[i]];
-		float	  dist;
-		vector3	  angles;
-
-		if ( ent == self ) {
-			continue;
-		}
-
-		// Not using force sight so we shouldnt broadcast to this one
-		if ( !(ent->client->ps.fd.forcePowersActive & (1 << FP_SEE)) ) {
-			continue;
-		}
-
-		VectorSubtract( &self->client->ps.origin, &ent->client->ps.origin, &angles );
-		dist = VectorLengthSquared( &angles );
-		vectoangles( &angles, &angles );
-
-		// Too far away then just forget it
-		if ( dist > MAX_SIGHT_DISTANCE * MAX_SIGHT_DISTANCE ) {
-			continue;
-		}
-
-		// If not within the field of view then forget it
-		if ( !InFieldOfVision( &ent->client->ps.viewangles, MAX_SIGHT_FOV, &angles ) ) {
-			break;
-		}
-
-		//	Ghosts are handled later
-		if ( ent->client->pers.adminData.isGhost )
-			continue;
-
-		// Turn on the broadcast bit for the master and since there is only one
-		// master we are done
-		self->r.broadcastClients[ent->s.clientNum / 32] |= (1 << (ent->s.clientNum % 32));
-
-		break;
-	}
-}
-
-static void G_UpdateJediMasterBroadcasts( gentity_t *self ) {
-	int i;
-
-	// Not jedi master mode then nothing to do
-	if ( level.gametype != GT_JEDIMASTER ) {
-		return;
-	}
-
-	// This client isnt the jedi master so it shouldnt broadcast
-	if ( !self->client->ps.isJediMaster ) {
-		return;
-	}
-
-	// Broadcast ourself to all clients within range
-	for ( i = 0; i < level.numConnectedClients; i++ ) {
-		gentity_t *ent = &g_entities[level.sortedClients[i]];
-		float	  dist;
-		vector3	  angles;
-
-		if ( ent == self ) {
-			continue;
-		}
-
-		VectorSubtract( &self->client->ps.origin, &ent->client->ps.origin, &angles );
-		dist = VectorLengthSquared( &angles );
-		vectoangles( &angles, &angles );
-
-		// Too far away then just forget it
-		if ( dist > MAX_JEDIMASTER_DISTANCE * MAX_JEDIMASTER_DISTANCE ) {
-			continue;
-		}
-
-		// If not within the field of view then forget it
-		if ( !InFieldOfVision( &ent->client->ps.viewangles, MAX_JEDIMASTER_FOV, &angles ) ) {
-			continue;
-		}
-
-		// Turn on the broadcast bit for the master and since there is only one
-		// master we are done
-		self->r.broadcastClients[ent->s.clientNum / 32] |= (1 << (ent->s.clientNum % 32));
-	}
-}
+static const float maxJediMasterDistance = 2500.0f * 2500.0f; // x^2, optimisation
+static const float maxJediMasterFOV = 100.0f;
+static const float maxForceSightDistance = Square( 1500.0f ) * 1500.0f; // x^2, optimisation
+static const float maxForceSightFOV = 100.0f;
 
 void G_UpdateClientBroadcasts( gentity_t *self ) {
-	// Clear all the broadcast bits for this client
-	memset( self->r.broadcastClients, 0, sizeof (self->r.broadcastClients) );
+	int i;
+	gentity_t *other;
 
-	// The jedi master is broadcast to everyone in range
-	G_UpdateJediMasterBroadcasts( self );
+	// we are always sent to ourselves
+	// we are always sent to other clients if we are in their PVS
+	// if we are not in their PVS, we must set the broadcastClients bit field
+	// if we do not wish to be sent to any particular entity, we must set the broadcastClients bit field and the
+	//	SVF_BROADCASTCLIENTS bit flag
+	self->r.broadcastClients[0] = 0u;
+	self->r.broadcastClients[1] = 0u;
 
-	// Anyone with force sight on should see this client
-	G_UpdateForceSightBroadcasts( self );
-
-	//Raz: Handle ghosts
 	if ( self->client->pers.adminData.isGhost ) {
-		self->r.svFlags |= SVF_SINGLECLIENT;
-		self->r.singleClient = self->s.number;
+		self->r.svFlags |= SVF_BROADCASTCLIENTS;
 	}
-	else
-		self->r.svFlags &= ~SVF_SINGLECLIENT;
+	else {
+		self->r.svFlags &= ~SVF_BROADCASTCLIENTS;
+	}
+
+	for ( i = 0, other = g_entities; i < MAX_CLIENTS; i++, other++ ) {
+		qboolean send = qfalse;
+		float dist;
+		vector3 angles;
+
+		if ( !other->inuse || other->client->pers.connected != CON_CONNECTED ) {
+			// no need to compute visibility for non-connected clients
+			continue;
+		}
+
+		if ( other == self ) {
+			// we are always sent to ourselves anyway, this is purely an optimisation
+			continue;
+		}
+
+		if ( self->client->pers.adminData.isGhost ) {
+			if ( other->client->pers.adminUser /*&& AM_HasPrivilege( other, PRIV_GHOST )*/ ) {
+				send = qtrue;
+			}
+			else {
+				// do not send if we are a ghost and they can't see us
+				continue;
+			}
+		}
+
+		VectorSubtract( &self->client->ps.origin, &other->client->ps.origin, &angles );
+		dist = VectorLengthSquared( &angles );
+		vectoangles( &angles, &angles );
+
+		// broadcast jedi master to everyone if we are in distance/field of view
+		if ( level.gametype == GT_JEDIMASTER && self->client->ps.isJediMaster ) {
+			if ( dist < maxJediMasterDistance
+				&& InFieldOfVision( &other->client->ps.viewangles, maxJediMasterFOV, &angles ) )
+			{
+				send = qtrue;
+			}
+		}
+
+		// broadcast this client to everyone using force sight if we are in distance/field of view
+		if ( (other->client->ps.fd.forcePowersActive & (1 << FP_SEE)) ) {
+			if ( dist < maxForceSightDistance
+				&& InFieldOfVision( &other->client->ps.viewangles, maxForceSightFOV, &angles ) )
+			{
+				send = qtrue;
+			}
+		}
+
+		if ( send ) {
+			self->r.broadcastClients[i / 32] |= (1 << (i % 32));
+		}
+	}
 
 	trap->LinkEntity( (sharedEntity_t *)self );
 }

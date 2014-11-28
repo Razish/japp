@@ -236,9 +236,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 		CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_weapon" );
 
-		if ( !CG_IsMindTricked( cent->currentState.trickedentindex, cent->currentState.trickedentindex2,
-			cent->currentState.trickedentindex3, cent->currentState.trickedentindex4, cg.snap->ps.clientNum ) ) {
-			CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups ); //don't draw the weapon if the player is invisible
+		if ( !CG_IsMindTricked( cent->currentState.trickedEntIndex, cg.snap->ps.clientNum ) ) {
+			// don't draw the weapon if the player is invisible
+			CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
 		}
 
 		if ( weaponNum == WP_STUN_BATON ) {
@@ -250,18 +250,30 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 				barrel.shadowPlane = parent->shadowPlane;
 				barrel.renderfx = parent->renderfx;
 
-				if ( i == 0 )	barrel.hModel = trap->R_RegisterModel( "models/weapons2/stun_baton/baton_barrel.md3" );
-				else if ( i == 1 )	barrel.hModel = trap->R_RegisterModel( "models/weapons2/stun_baton/baton_barrel2.md3" );
-				else				barrel.hModel = trap->R_RegisterModel( "models/weapons2/stun_baton/baton_barrel3.md3" );
+				if ( i == 0 ) {
+					barrel.hModel = trap->R_RegisterModel( "models/weapons2/stun_baton/baton_barrel.md3" );
+				}
+				else if ( i == 1 ) {
+					barrel.hModel = trap->R_RegisterModel( "models/weapons2/stun_baton/baton_barrel2.md3" );
+				}
+				else {
+					barrel.hModel = trap->R_RegisterModel( "models/weapons2/stun_baton/baton_barrel3.md3" );
+				}
 				angles.yaw = 0;
 				angles.pitch = 0;
 				angles.roll = 0;
 
 				AnglesToAxis( &angles, barrel.axis );
 
-				if ( i == 0 )	CG_PositionRotatedEntityOnTag( &barrel, parent, weapon->handsModel, "tag_barrel" );
-				else if ( i == 1 )	CG_PositionRotatedEntityOnTag( &barrel, parent, weapon->handsModel, "tag_barrel2" );
-				else				CG_PositionRotatedEntityOnTag( &barrel, parent, weapon->handsModel, "tag_barrel3" );
+				if ( i == 0 ) {
+					CG_PositionRotatedEntityOnTag( &barrel, parent, weapon->handsModel, "tag_barrel" );
+				}
+				else if ( i == 1 ) {
+					CG_PositionRotatedEntityOnTag( &barrel, parent, weapon->handsModel, "tag_barrel2" );
+				}
+				else {
+					CG_PositionRotatedEntityOnTag( &barrel, parent, weapon->handsModel, "tag_barrel3" );
+				}
 				CG_AddWeaponWithPowerups( &barrel, cent->currentState.powerups );
 			}
 		}

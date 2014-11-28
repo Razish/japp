@@ -5213,8 +5213,7 @@ traceAgain:
 
 	if ( trace.entityNum < MAX_CLIENTS ) {
 		entityState_t *es = &cg_entities[trace.entityNum].currentState;
-		if ( CG_IsMindTricked( es->trickedentindex, es->trickedentindex2, es->trickedentindex3, es->trickedentindex4,
-			cg.snap->ps.clientNum ) ) {
+		if ( CG_IsMindTricked( es->trickedEntIndex, cg.snap->ps.clientNum ) ) {
 			if ( cg.crosshairClientNum == trace.entityNum ) {
 				cg.crosshairClientNum = ENTITYNUM_NONE;
 				cg.crosshairClientTime = 0;
@@ -5230,10 +5229,12 @@ traceAgain:
 			ignore = trace.entityNum;
 			VectorCopy( &trace.endpos, &start );
 			traces++;
-			if ( traces < 10 )
+			if ( traces < 10 ) {
 				goto traceAgain;
-			else
+			}
+			else {
 				return;
+			}
 		}
 	}
 

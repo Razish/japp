@@ -863,8 +863,9 @@ void G_RunMissile( gentity_t *ent ) {
 
 		G_MissileImpact( ent, &tr );
 
-		if ( tr.entityNum == ent->s.otherEntityNum ) { //if the impact event other and the trace ent match then it's ok to do the g2 mark
-			ent->s.trickedentindex = 1;
+		if ( tr.entityNum == ent->s.otherEntityNum ) {
+			// if the impact event other and the trace ent match then it's ok to do the g2 mark
+			ent->s.trickedEntIndex[0] = 1;
 		}
 
 		if ( ent->s.eType != ET_MISSILE && ent->s.weapon != G2_MODEL_PART ) {
@@ -873,7 +874,8 @@ void G_RunMissile( gentity_t *ent ) {
 	}
 
 passthrough:
-	if ( ent->s.pos.trType == TR_STATIONARY && (ent->s.eFlags&EF_MISSILE_STICK) ) {//stuck missiles should check some special stuff
+	if ( ent->s.pos.trType == TR_STATIONARY && (ent->s.eFlags & EF_MISSILE_STICK) ) {
+		// stuck missiles should check some special stuff
 		G_RunStuckMissile( ent );
 		return;
 	}

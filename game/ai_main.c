@@ -241,28 +241,7 @@ int BotMindTricked( int botClient, int enemyClient ) {
 		return 0;
 	}
 
-	if ( botClient > 47 ) {
-		if ( fd->forceMindtrickTargetIndex4 & (1 << (botClient - 48)) ) {
-			return 1;
-		}
-	}
-	else if ( botClient > 31 ) {
-		if ( fd->forceMindtrickTargetIndex3 & (1 << (botClient - 32)) ) {
-			return 1;
-		}
-	}
-	else if ( botClient > 15 ) {
-		if ( fd->forceMindtrickTargetIndex2 & (1 << (botClient - 16)) ) {
-			return 1;
-		}
-	}
-	else {
-		if ( fd->forceMindtrickTargetIndex & (1 << botClient) ) {
-			return 1;
-		}
-	}
-
-	return 0;
+	return !!( fd->forceMindtrickTargetIndex[botClient / 16] & (1 << (botClient % 16)) );
 }
 
 int BotGetWeaponRange( bot_state_t *bs );

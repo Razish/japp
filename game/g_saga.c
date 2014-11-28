@@ -421,7 +421,7 @@ void SiegeBroadcast_OBJECTIVECOMPLETE( int team, int client, int objective ) {
 	te->r.svFlags |= SVF_BROADCAST;
 	te->s.eventParm = team;
 	te->s.weapon = client;
-	te->s.trickedentindex = objective;
+	te->s.trickedEntIndex[0] = objective;
 }
 
 void SiegeBroadcast_ROUNDOVER( int winningteam, int winningclient ) {

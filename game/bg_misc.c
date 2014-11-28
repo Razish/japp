@@ -1668,10 +1668,10 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 		VectorSnap( &s->apos.trBase );
 	}
 
-	s->trickedentindex = ps->fd.forceMindtrickTargetIndex;
-	s->trickedentindex2 = ps->fd.forceMindtrickTargetIndex2;
-	s->trickedentindex3 = ps->fd.forceMindtrickTargetIndex3;
-	s->trickedentindex4 = ps->fd.forceMindtrickTargetIndex4;
+	s->trickedEntIndex[0] = ps->fd.forceMindtrickTargetIndex[0];
+	s->trickedEntIndex[1] = ps->fd.forceMindtrickTargetIndex[1];
+	s->trickedEntIndex[2] = ps->fd.forceMindtrickTargetIndex[2];
+	s->trickedEntIndex[3] = ps->fd.forceMindtrickTargetIndex[3];
 
 	s->forceFrame = ps->saberLockFrame;
 
@@ -1816,10 +1816,10 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 		VectorSnap( &s->apos.trBase );
 	}
 
-	s->trickedentindex = ps->fd.forceMindtrickTargetIndex;
-	s->trickedentindex2 = ps->fd.forceMindtrickTargetIndex2;
-	s->trickedentindex3 = ps->fd.forceMindtrickTargetIndex3;
-	s->trickedentindex4 = ps->fd.forceMindtrickTargetIndex4;
+	s->trickedEntIndex[0] = ps->fd.forceMindtrickTargetIndex[0];
+	s->trickedEntIndex[1] = ps->fd.forceMindtrickTargetIndex[1];
+	s->trickedEntIndex[2] = ps->fd.forceMindtrickTargetIndex[2];
+	s->trickedEntIndex[3] = ps->fd.forceMindtrickTargetIndex[3];
 
 	s->forceFrame = ps->saberLockFrame;
 

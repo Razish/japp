@@ -985,14 +985,14 @@ void SP_misc_holocron( gentity_t *ent ) {
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->clipmask = MASK_SOLID;
 
-	ent->s.trickedentindex4 = ent->count;
+	ent->s.trickedEntIndex[3] = ent->count;
 
 	if ( forcePowerDarkLight[ent->count] == FORCESIDE_DARK )
-		ent->s.trickedentindex3 = 1;
+		ent->s.trickedEntIndex[2] = 1;
 	else if ( forcePowerDarkLight[ent->count] == FORCESIDE_LIGHT )
-		ent->s.trickedentindex3 = 2;
+		ent->s.trickedEntIndex[2] = 2;
 	else
-		ent->s.trickedentindex3 = 3;
+		ent->s.trickedEntIndex[2] = 3;
 
 	ent->physicsObject = qtrue;
 

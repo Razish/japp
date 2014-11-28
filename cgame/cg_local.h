@@ -981,7 +981,7 @@ void			CG_InitJetpackGhoul2( void );
 void			CG_InitLocalEntities( void );
 void			CG_InitMarkPolys( void );
 void			CG_InitSiegeMode( void );
-qboolean		CG_IsMindTricked( int trickIndex1, int trickIndex2, int trickIndex3, int trickIndex4, int client );
+qboolean		CG_IsMindTricked( const uint32_t trickIndex[4], int client );
 qboolean		CG_IsSpectating( void );
 qboolean		CG_IsFollowing( void );
 void			CG_KeyEvent( int key, qboolean down );

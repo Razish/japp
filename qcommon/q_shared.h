@@ -994,6 +994,8 @@ void ByteToDir( int b, vector3 *dir );
 #define max maximum
 #endif
 
+#define Square(x) ((x)*(x))
+
 #define DEG2RAD( a ) ( ( (a) * M_PI ) / 180.0F )
 #define RAD2DEG( a ) ( ( (a) * 180.0f ) / M_PI )
 
@@ -1460,6 +1462,7 @@ typedef enum {
 typedef struct forcedata_s {
 	int				forcePowerDebounce[NUM_FORCE_POWERS];	//for effects that must have an interval
 	uint32_t		forcePowersKnown;
+	// 19th bit onward are used for JA++ badness
 	int				forcePowersActive;
 	unsigned int	forcePowerSelected;
 	int				forceButtonNeedRelease;
@@ -1484,11 +1487,12 @@ typedef struct forcedata_s {
 	int				forceHealTime;
 	int				forceHealAmount;
 
-	//This hurts me somewhat to do, but there's no other real way to allow completely "dynamic" mindtricking.
-	uint32_t		forceMindtrickTargetIndex; //0-15
-	uint32_t		forceMindtrickTargetIndex2; //16-32
-	uint32_t		forceMindtrickTargetIndex3; //33-48
-	uint32_t		forceMindtrickTargetIndex4; //49-64
+	// 16 bits for clients, 16 bits padding. repeat 4 times
+	// bits [  1,  16] --> clients  0-15
+	// bits [ 33,  49] --> clients 16-32
+	// bits [ 65,  81] --> clients 33-48
+	// bits [ 97, 113] --> clients 49-64
+	uint32_t forceMindtrickTargetIndex[4]; // this marks the other clients that we have mind-tricked
 
 	int				forceRageRecoveryTime;
 	int				forceDrainEntNum;
@@ -2072,10 +2076,12 @@ typedef struct entityState_s {
 	int		bolt2;
 
 	//rww - this is necessary for determining player visibility during a jedi mindtrick
-	uint32_t	trickedentindex; //0-15
-	uint32_t	trickedentindex2; //16-32
-	uint32_t	trickedentindex3; //33-48
-	uint32_t	trickedentindex4; //49-64
+	// 16 bits for clients, 16 bits padding. repeat 4 times
+	// bits [  1,  16] --> clients  0-15
+	// bits [ 33,  49] --> clients 16-32
+	// bits [ 65,  81] --> clients 33-48
+	// bits [ 97, 113] --> clients 49-64
+	uint32_t trickedEntIndex[4];
 
 	float	speed;
 
@@ -2223,9 +2229,6 @@ typedef enum connstate_e {
 	CA_CINEMATIC		// playing a cinematic or a static pic, not connected to a server
 } connstate_t;
 
-
-#define Square(x) ((x)*(x))
-
 // real time
 typedef struct qtime_s {
 	int tm_sec;     /* seconds after the minute - [0,59] */
@@ -2265,8 +2268,6 @@ typedef enum flagStatus_e {
 	FLAG_TAKEN_BLUE,	// One Flag CTF
 	FLAG_DROPPED
 } flagStatus_t;
-
-
 
 #define	MAX_GLOBAL_SERVERS			2048
 #define	MAX_OTHER_SERVERS			128
@@ -2401,6 +2402,11 @@ typedef struct printBufferSession_s {
 	void (*callback)( const char *buffer, int clientNum );
 	int clientNum;
 } printBufferSession_t;
-void Q_NewPrintBuffer( printBufferSession_t *session, size_t length, void (*callback)( const char *buffer, int clientNum ), int clientNum );
+void Q_NewPrintBuffer( printBufferSession_t *session, size_t length,
+	void (*callback)( const char *buffer, int clientNum ), int clientNum );
 void Q_PrintBuffer( printBufferSession_t *session, const char *append );
 void Q_DeletePrintBuffer( printBufferSession_t *session );
+
+qboolean Q_InBitflags( const uint32_t *bits, int index, uint32_t bitsPerByte );
+void Q_AddToBitflags( uint32_t *bits, int index, uint32_t bitsPerByte );
+void Q_RemoveFromBitflags( uint32_t *bits, int index, uint32_t bitsPerByte );

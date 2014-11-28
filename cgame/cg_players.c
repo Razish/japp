@@ -3272,8 +3272,7 @@ static void CG_PlayerFloatSprite( centity_t *cent, qhandle_t shader, uint32_t re
 
 // Float sprites over the player's head
 static void CG_PlayerSprites( centity_t *cent ) {
-	if ( cg.snap && CG_IsMindTricked( cent->currentState.trickedentindex, cent->currentState.trickedentindex2,
-		cent->currentState.trickedentindex3, cent->currentState.trickedentindex4, cg.snap->ps.clientNum ) ) {
+	if ( cg.snap && CG_IsMindTricked( cent->currentState.trickedEntIndex, cg.snap->ps.clientNum ) ) {
 		return; //this entity is mind-tricking the current client, so don't render it
 	}
 
@@ -3311,8 +3310,7 @@ static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane ) {
 	if ( cent->currentState.eFlags & EF_DEAD )
 		return qfalse;
 
-	if ( CG_IsMindTricked( cent->currentState.trickedentindex, cent->currentState.trickedentindex2,
-		cent->currentState.trickedentindex3, cent->currentState.trickedentindex4, cg.snap->ps.clientNum ) ) {
+	if ( CG_IsMindTricked( cent->currentState.trickedEntIndex, cg.snap->ps.clientNum ) ) {
 		return qfalse; //this entity is mind-tricking the current client, so don't render it
 	}
 
@@ -3581,8 +3579,7 @@ static void CG_ForcePushBodyBlur( centity_t *cent ) {
 	if ( cent->localAnimIndex > 1 )
 		return;
 
-	if ( cg.snap && CG_IsMindTricked( cent->currentState.trickedentindex, cent->currentState.trickedentindex2,
-		cent->currentState.trickedentindex3, cent->currentState.trickedentindex4, cg.snap->ps.clientNum ) ) {
+	if ( cg.snap && CG_IsMindTricked( cent->currentState.trickedEntIndex, cg.snap->ps.clientNum ) ) {
 		return; //this entity is mind-tricking the current client, so don't render it
 	}
 
@@ -3651,8 +3648,7 @@ static void CG_ForceGripEffect( vector3 *org ) {
 //	Also called by CG_Missile for quad rockets, but nobody can tell...
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team ) {
 
-	if ( CG_IsMindTricked( state->trickedentindex, state->trickedentindex2, state->trickedentindex3, state->trickedentindex4,
-		cg.snap->ps.clientNum ) ) {
+	if ( CG_IsMindTricked( state->trickedEntIndex, cg.snap->ps.clientNum ) ) {
 		return; //this entity is mind-tricking the current client, so don't render it
 	}
 
@@ -5524,29 +5520,14 @@ JustDoIt:
 	}
 }
 
-qboolean CG_IsMindTricked( int trickIndex1, int trickIndex2, int trickIndex3, int trickIndex4, int client ) {
-	int checkIn, sub = 0;
-
-	if ( cg_entities[client].currentState.forcePowersActive & (1 << FP_SEE) )
+qboolean CG_IsMindTricked( const uint32_t trickIndex[4], int client ) {
+	if ( cg_entities[client].currentState.forcePowersActive & (1 << FP_SEE) ) {
 		return qfalse;
+	}
 
-	if ( client > 47 ) {
-		checkIn = trickIndex4;
-		sub = 48;
-	}
-	else if ( client > 31 ) {
-		checkIn = trickIndex3;
-		sub = 32;
-	}
-	else if ( client > 15 ) {
-		checkIn = trickIndex2;
-		sub = 16;
-	}
-	else
-		checkIn = trickIndex1;
-
-	if ( checkIn & (1 << (client - sub)) )
+	if ( trickIndex[client / 16] & (1 << (client % 16)) ) {
 		return qtrue;
+	}
 
 	return qfalse;
 }
@@ -7049,8 +7030,7 @@ void CG_Player( centity_t *cent ) {
 	}
 
 	//If this client has tricked you.
-	if ( CG_IsMindTricked( cent->currentState.trickedentindex, cent->currentState.trickedentindex2,
-		cent->currentState.trickedentindex3, cent->currentState.trickedentindex4, cg.snap->ps.clientNum ) ) {
+	if ( CG_IsMindTricked( cent->currentState.trickedEntIndex, cg.snap->ps.clientNum ) ) {
 		if ( cent->trickAlpha > 1 ) {
 			cent->trickAlpha -= (cg.time - cent->trickAlphaTime)*0.5f;
 			cent->trickAlphaTime = cg.time;
@@ -7808,8 +7788,7 @@ skipTrail:
 	}
 
 	//If you've tricked this client.
-	if ( CG_IsMindTricked( cg.snap->ps.fd.forceMindtrickTargetIndex, cg.snap->ps.fd.forceMindtrickTargetIndex2,
-		cg.snap->ps.fd.forceMindtrickTargetIndex3, cg.snap->ps.fd.forceMindtrickTargetIndex4, cent->currentState.number ) ) {
+	if ( CG_IsMindTricked( cg.snap->ps.fd.forceMindtrickTargetIndex, cent->currentState.number ) ) {
 		if ( cent->ghoul2 ) {
 			vector3 efOrg, tAng, fxAng, axis[3];
 

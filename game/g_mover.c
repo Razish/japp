@@ -1946,7 +1946,7 @@ void G_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3 
 	VectorCopy( mins, &te->s.angles2 );
 	te->s.speed = speed;
 	te->s.eventParm = numChunks;
-	te->s.trickedentindex = chunkType;
+	te->s.trickedEntIndex[0] = chunkType;
 	te->s.modelindex = customChunk;
 	te->s.apos.trBase.x = baseScale;
 }
@@ -2394,7 +2394,7 @@ void GlassDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 	te->s.genericenemyindex = self->s.number;
 	VectorCopy( &self->pos1, &te->s.origin );
 	VectorCopy( &self->pos2, &te->s.angles );
-	te->s.trickedentindex = (int)self->splashRadius;
+	te->s.trickedEntIndex[0] = (int)self->splashRadius;
 	te->s.pos.trTime = (int)self->genericValue3;
 
 	G_FreeEntity( self );

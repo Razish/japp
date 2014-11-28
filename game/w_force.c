@@ -404,10 +404,10 @@ void WP_SpawnInitForcePowers( gentity_t *ent ) {
 	ent->client->ps.fd.forcePower = ent->client->ps.fd.forcePowerMax = FORCE_POWER_MAX;
 	ent->client->ps.fd.forcePowerRegenDebounceTime = level.time;
 	ent->client->ps.fd.forceGripEntityNum = ENTITYNUM_NONE;
-	ent->client->ps.fd.forceMindtrickTargetIndex = 0;
-	ent->client->ps.fd.forceMindtrickTargetIndex2 = 0;
-	ent->client->ps.fd.forceMindtrickTargetIndex3 = 0;
-	ent->client->ps.fd.forceMindtrickTargetIndex4 = 0;
+	ent->client->ps.fd.forceMindtrickTargetIndex[0] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[1] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[2] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[3] = 0u;
 
 	ent->client->ps.holocronBits = 0;
 
@@ -489,7 +489,7 @@ int ForcePowerUsableOn( gentity_t *attacker, gentity_t *other, forcePowers_t for
 			//play sound indicating that attack was absorbed
 			if ( other->client->forcePowerSoundDebounce < level.time ) {
 				gentity_t *abSound = G_PreDefSound( &other->client->ps.origin, PDSOUND_ABSORBHIT );
-				abSound->s.trickedentindex = other->s.number;
+				abSound->s.trickedEntIndex[0] = other->s.number;
 				other->client->forcePowerSoundDebounce = level.time + 400;
 			}
 			return 0;
@@ -704,7 +704,7 @@ int WP_AbsorbConversion( gentity_t *attacked, int atdAbsLevel, gentity_t *attack
 	//play sound indicating that attack was absorbed
 	if ( attacked->client->forcePowerSoundDebounce < level.time ) {
 		abSound = G_PreDefSound( &attacked->client->ps.origin, PDSOUND_ABSORBHIT );
-		abSound->s.trickedentindex = attacked->s.number;
+		abSound->s.trickedEntIndex[0] = attacked->s.number;
 
 		attacked->client->forcePowerSoundDebounce = level.time + 400;
 	}
@@ -969,34 +969,11 @@ void ForceHeal( gentity_t *self ) {
 	G_Sound( self, CHAN_ITEM, G_SoundIndex( "sound/weapons/force/heal.wav" ) );
 }
 
-void WP_AddToClientBitflags( gentity_t *ent, int entNum ) {
-	if ( !ent ) {
-		return;
-	}
-
-	if ( entNum > 47 ) {
-		ent->s.trickedentindex4 |= (1 << (entNum - 48));
-	}
-	else if ( entNum > 31 ) {
-		ent->s.trickedentindex3 |= (1 << (entNum - 32));
-	}
-	else if ( entNum > 15 ) {
-		ent->s.trickedentindex2 |= (1 << (entNum - 16));
-	}
-	else {
-		ent->s.trickedentindex |= (1 << entNum);
-	}
-}
-
 void ForceTeamHeal( gentity_t *self ) {
-	float radius = 256;
-	int i = 0;
-	gentity_t *ent;
+	float radius = 256.0f;
+	gentity_t *ent = NULL, *te = NULL, *pl[MAX_CLIENTS] = { NULL };
 	vector3 a;
-	int numpl = 0;
-	int pl[MAX_CLIENTS];
-	int healthadd = 0;
-	gentity_t *te = NULL;
+	int i, numpl = 0, healthadd;
 
 	if ( self->health <= 0 ) {
 		return;
@@ -1017,74 +994,57 @@ void ForceTeamHeal( gentity_t *self ) {
 		radius *= 2;
 	}
 
-	while ( i < MAX_CLIENTS ) {
-		ent = &g_entities[i];
-
-		if ( ent && ent->client && self != ent && OnSameTeam( self, ent ) && ent->client->ps.stats[STAT_HEALTH] < ent->client->ps.stats[STAT_MAX_HEALTH] && ent->client->ps.stats[STAT_HEALTH] > 0 && ForcePowerUsableOn( self, ent, FP_TEAM_HEAL ) &&
-			trap->InPVS( &self->client->ps.origin, &ent->client->ps.origin ) ) {
+	for ( i = 0, ent = g_entities; i < level.maxclients; i++, ent++ ) {
+		if ( ent && ent->client && self != ent && OnSameTeam( self, ent )
+			&& ent->client->ps.stats[STAT_HEALTH] < ent->client->ps.stats[STAT_MAX_HEALTH]
+			&& ent->client->ps.stats[STAT_HEALTH] > 0 && ForcePowerUsableOn( self, ent, FP_TEAM_HEAL )
+			&& trap->InPVS( &self->client->ps.origin, &ent->client->ps.origin ) )
+		{
 			VectorSubtract( &self->client->ps.origin, &ent->client->ps.origin, &a );
 
 			if ( VectorLength( &a ) <= radius ) {
-				pl[numpl] = i;
-				numpl++;
+				pl[numpl++] = ent;
 			}
 		}
-
-		i++;
 	}
 
 	if ( numpl < 1 ) {
 		return;
 	}
 
-	if ( numpl == 1 ) {
-		healthadd = 50;
-	}
-	else if ( numpl == 2 ) {
-		healthadd = 33;
-	}
-	else {
-		healthadd = 25;
-	}
+	healthadd = Q_clampi( 25, 100 / (numpl + 1), 100 );
 
 	self->client->ps.fd.forcePowerDebounce[FP_TEAM_HEAL] = level.time + 2000;
-	i = 0;
 
-	while ( i < numpl ) {
-		if ( g_entities[pl[i]].client->ps.stats[STAT_HEALTH] > 0 &&
-			g_entities[pl[i]].health > 0 ) {
-			g_entities[pl[i]].client->ps.stats[STAT_HEALTH] += healthadd;
-			if ( g_entities[pl[i]].client->ps.stats[STAT_HEALTH] > g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH] ) {
-				g_entities[pl[i]].client->ps.stats[STAT_HEALTH] = g_entities[pl[i]].client->ps.stats[STAT_MAX_HEALTH];
+	BG_ForcePowerDrain( &self->client->ps, FP_TEAM_HEAL,
+		forcePowerNeeded[self->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL]][FP_TEAM_HEAL] );
+
+	for ( i = 0; i < numpl; i++ ) {
+		ent = pl[i];
+		if ( ent->client->ps.stats[STAT_HEALTH] > 0 && ent->health > 0 ) {
+			ent->client->ps.stats[STAT_HEALTH] += healthadd;
+			if ( ent->client->ps.stats[STAT_HEALTH] > ent->client->ps.stats[STAT_MAX_HEALTH] ) {
+				ent->client->ps.stats[STAT_HEALTH] = ent->client->ps.stats[STAT_MAX_HEALTH];
 			}
 
-			g_entities[pl[i]].health = g_entities[pl[i]].client->ps.stats[STAT_HEALTH];
+			ent->health = ent->client->ps.stats[STAT_HEALTH];
 
-			//At this point we know we got one, so add him into the collective event client bitflag
+			// at this point we know we got one, so add him into the collective event client bitflag
 			if ( !te ) {
 				te = G_TempEntity( &self->client->ps.origin, EV_TEAM_POWER );
 				te->s.eventParm = 1; //eventParm 1 is heal, eventParm 2 is force regen
-
-				//since we had an extra check above, do the drain now because we got at least one guy
-				BG_ForcePowerDrain( &self->client->ps, FP_TEAM_HEAL, forcePowerNeeded[self->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL]][FP_TEAM_HEAL] );
 			}
 
-			WP_AddToClientBitflags( te, pl[i] );
-			//Now cramming it all into one event.. doing this many g_sound events at once was a Bad Thing.
+			Q_AddToBitflags( te->s.trickedEntIndex, pl[i]->s.number, 16 );
 		}
-		i++;
 	}
 }
 
 void ForceTeamForceReplenish( gentity_t *self ) {
-	float radius = 256;
-	int i = 0;
-	gentity_t *ent;
+	float radius = 256.0f;
+	gentity_t *ent, *te = NULL, *pl[MAX_CLIENTS] = { NULL };
 	vector3 a;
-	int numpl = 0;
-	int pl[MAX_CLIENTS];
-	int poweradd = 0;
-	gentity_t *te = NULL;
+	int i, numpl = 0, poweradd;
 
 	if ( self->health <= 0 ) {
 		return;
@@ -1101,61 +1061,48 @@ void ForceTeamForceReplenish( gentity_t *self ) {
 	if ( self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] == FORCE_LEVEL_2 ) {
 		radius *= 1.5f;
 	}
-	if ( self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] == FORCE_LEVEL_3 ) {
+	else if ( self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] == FORCE_LEVEL_3 ) {
 		radius *= 2;
 	}
 
-	while ( i < MAX_CLIENTS ) {
-		ent = &g_entities[i];
-
-		if ( ent && ent->client && self != ent && OnSameTeam( self, ent ) && ent->client->ps.fd.forcePower < 100 && ForcePowerUsableOn( self, ent, FP_TEAM_FORCE ) &&
-			trap->InPVS( &self->client->ps.origin, &ent->client->ps.origin ) ) {
+	for ( i = 0, ent = g_entities; i < MAX_CLIENTS; i++, ent++ ) {
+		if ( ent && ent->client && self != ent && OnSameTeam( self, ent ) && ent->client->ps.fd.forcePower < 100
+			&& ForcePowerUsableOn( self, ent, FP_TEAM_FORCE )
+			&& trap->InPVS( &self->client->ps.origin, &ent->client->ps.origin ) )
+		{
 			VectorSubtract( &self->client->ps.origin, &ent->client->ps.origin, &a );
 
 			if ( VectorLength( &a ) <= radius ) {
-				pl[numpl] = i;
-				numpl++;
+				pl[numpl++] = ent;
 			}
 		}
-
-		i++;
 	}
 
 	if ( numpl < 1 ) {
 		return;
 	}
 
-	if ( numpl == 1 ) {
-		poweradd = 50;
-	}
-	else if ( numpl == 2 ) {
-		poweradd = 33;
-	}
-	else {
-		poweradd = 25;
-	}
+	poweradd = Q_clampi( 25, 100 / (numpl + 1), 100 );
+
 	self->client->ps.fd.forcePowerDebounce[FP_TEAM_FORCE] = level.time + 2000;
 
-	BG_ForcePowerDrain( &self->client->ps, FP_TEAM_FORCE, forcePowerNeeded[self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE]][FP_TEAM_FORCE] );
+	BG_ForcePowerDrain( &self->client->ps, FP_TEAM_FORCE,
+		forcePowerNeeded[self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE]][FP_TEAM_FORCE] );
 
-	i = 0;
-
-	while ( i < numpl ) {
-		g_entities[pl[i]].client->ps.fd.forcePower += poweradd;
-		if ( g_entities[pl[i]].client->ps.fd.forcePower > 100 ) {
-			g_entities[pl[i]].client->ps.fd.forcePower = 100;
+	for ( i = 0; i < numpl; i++ ) {
+		ent = pl[i];
+		ent->client->ps.fd.forcePower += poweradd;
+		if ( ent->client->ps.fd.forcePower > 100 ) {
+			ent->client->ps.fd.forcePower = 100;
 		}
 
-		//At this point we know we got one, so add him into the collective event client bitflag
+		// at this point we know we got one, so add him into the collective event client bitflag
 		if ( !te ) {
 			te = G_TempEntity( &self->client->ps.origin, EV_TEAM_POWER );
 			te->s.eventParm = 2; //eventParm 1 is heal, eventParm 2 is force regen
 		}
 
-		WP_AddToClientBitflags( te, pl[i] );
-		//Now cramming it all into one event.. doing this many g_sound events at once was a Bad Thing.
-
-		i++;
+		Q_AddToBitflags( te->s.trickedEntIndex, pl[i]->s.number, 16 );
 	}
 }
 
@@ -1965,20 +1912,6 @@ void ForceJump( gentity_t *self, usercmd_t *ucmd ) {
 	self->client->ps.groundEntityNum = ENTITYNUM_NONE;
 }
 
-void WP_AddAsMindtricked( forcedata_t *fd, int entNum ) {
-	if ( !fd )
-		return;
-
-	if ( entNum > 47 )
-		fd->forceMindtrickTargetIndex4 |= (1 << (entNum - 48));
-	else if ( entNum > 31 )
-		fd->forceMindtrickTargetIndex3 |= (1 << (entNum - 32));
-	else if ( entNum > 15 )
-		fd->forceMindtrickTargetIndex2 |= (1 << (entNum - 16));
-	else
-		fd->forceMindtrickTargetIndex |= (1 << entNum);
-}
-
 qboolean ForceTelepathyCheckDirectNPCTarget( gentity_t *self, trace_t *tr, qboolean *tookPower ) {
 	gentity_t	*traceEnt;
 	qboolean	targetLive = qfalse;
@@ -2220,7 +2153,7 @@ void ForceTelepathy( gentity_t *self ) {
 			g_entities[tr.entityNum].client &&
 			g_entities[tr.entityNum].client->pers.connected &&
 			g_entities[tr.entityNum].client->sess.sessionTeam != TEAM_SPECTATOR ) {
-			WP_AddAsMindtricked( &self->client->ps.fd, tr.entityNum );
+			Q_AddToBitflags( self->client->ps.fd.forceMindtrickTargetIndex, tr.entityNum, 16 );
 			if ( !tookPower ) {
 				WP_ForcePowerStart( self, FP_TELEPATHY, 0 );
 			}
@@ -2277,7 +2210,7 @@ void ForceTelepathy( gentity_t *self ) {
 			ent = &g_entities[entityList[e]];
 			if ( ent && ent != self && ent->client ) {
 				gotatleastone = qtrue;
-				WP_AddAsMindtricked( &self->client->ps.fd, ent->s.number );
+				Q_AddToBitflags( self->client->ps.fd.forceMindtrickTargetIndex, ent->s.number, 16 );
 			}
 			e++;
 		}
@@ -3095,10 +3028,10 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower ) {
 		if ( wasActive & (1 << FP_TELEPATHY) ) {
 			G_Sound( self, CHAN_AUTO, G_SoundIndex( "sound/weapons/force/distractstop.wav" ) );
 		}
-		self->client->ps.fd.forceMindtrickTargetIndex = 0;
-		self->client->ps.fd.forceMindtrickTargetIndex2 = 0;
-		self->client->ps.fd.forceMindtrickTargetIndex3 = 0;
-		self->client->ps.fd.forceMindtrickTargetIndex4 = 0;
+		self->client->ps.fd.forceMindtrickTargetIndex[0] = 0u;
+		self->client->ps.fd.forceMindtrickTargetIndex[1] = 0u;
+		self->client->ps.fd.forceMindtrickTargetIndex[2] = 0u;
+		self->client->ps.fd.forceMindtrickTargetIndex[3] = 0u;
 		break;
 	case FP_SEE:
 		if ( wasActive & (1 << FP_SEE) ) {
@@ -3365,98 +3298,41 @@ void DoGripAction( gentity_t *self, forcePowers_t forcePower ) {
 	}
 }
 
-qboolean G_IsMindTricked( forcedata_t *fd, int client ) {
-	int checkIn;
-	int trickIndex1, trickIndex2, trickIndex3, trickIndex4;
-	int sub = 0;
-
-	if ( !fd ) {
-		return qfalse;
-	}
-
-	trickIndex1 = fd->forceMindtrickTargetIndex;
-	trickIndex2 = fd->forceMindtrickTargetIndex2;
-	trickIndex3 = fd->forceMindtrickTargetIndex3;
-	trickIndex4 = fd->forceMindtrickTargetIndex4;
-
-	if ( client > 47 ) {
-		checkIn = trickIndex4;
-		sub = 48;
-	}
-	else if ( client > 31 ) {
-		checkIn = trickIndex3;
-		sub = 32;
-	}
-	else if ( client > 15 ) {
-		checkIn = trickIndex2;
-		sub = 16;
-	}
-	else {
-		checkIn = trickIndex1;
-	}
-
-	if ( checkIn & (1 << (client - sub)) ) {
-		return qtrue;
-	}
-
-	return qfalse;
-}
-
-static void RemoveTrickedEnt( forcedata_t *fd, int client ) {
-	if ( !fd ) {
-		return;
-	}
-
-	if ( client > 47 ) {
-		fd->forceMindtrickTargetIndex4 &= ~(1 << (client - 48));
-	}
-	else if ( client > 31 ) {
-		fd->forceMindtrickTargetIndex3 &= ~(1 << (client - 32));
-	}
-	else if ( client > 15 ) {
-		fd->forceMindtrickTargetIndex2 &= ~(1 << (client - 16));
-	}
-	else {
-		fd->forceMindtrickTargetIndex &= ~(1 << client);
-	}
-}
-
 extern int g_LastFrameTime;
 extern int g_TimeSinceLastFrame;
 
 static void WP_UpdateMindtrickEnts( gentity_t *self ) {
+	gentity_t *ent = NULL;
 	int i = 0;
 
-	while ( i < MAX_CLIENTS ) {
-		if ( G_IsMindTricked( &self->client->ps.fd, i ) ) {
-			gentity_t *ent = &g_entities[i];
-
-			if ( !ent || !ent->client || !ent->inuse || ent->health < 1 ||
-				(ent->client->ps.fd.forcePowersActive & (1 << FP_SEE)) ) {
-				RemoveTrickedEnt( &self->client->ps.fd, i );
+	for ( i = 0, ent = g_entities; i < level.maxclients; i++, ent++ ) {
+		if ( Q_InBitflags( self->client->ps.fd.forceMindtrickTargetIndex, i, 16 ) ) {
+			if ( !ent || !ent->client || !ent->inuse || ent->health < 1
+				|| (ent->client->ps.fd.forcePowersActive & (1 << FP_SEE)) )
+			{
+				Q_RemoveFromBitflags( self->client->ps.fd.forceMindtrickTargetIndex, i, 16 );
 			}
-			else if ( (level.time - self->client->dangerTime) < g_TimeSinceLastFrame * 4 ) { //Untrick this entity if the tricker (self) fires while in his fov
-				if ( trap->InPVS( &ent->client->ps.origin, &self->client->ps.origin ) &&
-					OrgVisible( &ent->client->ps.origin, &self->client->ps.origin, ent->s.number ) ) {
-					RemoveTrickedEnt( &self->client->ps.fd, i );
+			else if ( (level.time - self->client->dangerTime) < g_TimeSinceLastFrame * 4 ) {
+				// untrick this entity if the tricker (self) fires while in his fov
+				if ( trap->InPVS( &ent->client->ps.origin, &self->client->ps.origin )
+					&& OrgVisible( &ent->client->ps.origin, &self->client->ps.origin, ent->s.number ) )
+				{
+					Q_RemoveFromBitflags( self->client->ps.fd.forceMindtrickTargetIndex, i, 16 );
 				}
 			}
 			else if ( BG_HasYsalamiri( level.gametype, &ent->client->ps ) ) {
-				RemoveTrickedEnt( &self->client->ps.fd, i );
+				Q_RemoveFromBitflags( self->client->ps.fd.forceMindtrickTargetIndex, i, 16 );
 			}
 		}
-
-		i++;
 	}
 
-	if ( !self->client->ps.fd.forceMindtrickTargetIndex &&
-		!self->client->ps.fd.forceMindtrickTargetIndex2 &&
-		!self->client->ps.fd.forceMindtrickTargetIndex3 &&
-		!self->client->ps.fd.forceMindtrickTargetIndex4 ) { //everyone who we had tricked is no longer tricked, so stop the power
+	if ( !self->client->ps.fd.forceMindtrickTargetIndex[0] && !self->client->ps.fd.forceMindtrickTargetIndex[1]
+		&& !self->client->ps.fd.forceMindtrickTargetIndex[2] && !self->client->ps.fd.forceMindtrickTargetIndex[3] )
+	{
+		// everyone who we had tricked is no longer tricked, so stop the power
 		WP_ForcePowerStop( self, FP_TELEPATHY );
 	}
-	else if ( self->client->ps.powerups[PW_REDFLAG] ||
-		self->client->ps.powerups[PW_BLUEFLAG] ) {
+	else if ( self->client->ps.powerups[PW_REDFLAG] || self->client->ps.powerups[PW_BLUEFLAG] ) {
 		WP_ForcePowerStop( self, FP_TELEPATHY );
 	}
 }
@@ -4314,39 +4190,38 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd ) {
 		}
 	}
 	else if ( self->client->ps.fd.forceUsingAdded ) { //we don't have enlightenment but we're still using enlightened powers, so clear them back to how they should be.
-		i = 0;
-
-		while ( i < NUM_FORCE_POWERS ) {
+		for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
 			self->client->ps.fd.forcePowerLevel[i] = self->client->ps.fd.forcePowerBaseLevel[i];
 			if ( !self->client->ps.fd.forcePowerLevel[i] ) {
-				if ( self->client->ps.fd.forcePowersActive & (1 << i) )
+				if ( self->client->ps.fd.forcePowersActive & (1 << i) ) {
 					WP_ForcePowerStop( self, i );
+				}
 				self->client->ps.fd.forcePowersKnown &= ~(1 << i);
 			}
-
-			i++;
 		}
 
 		self->client->ps.fd.forceUsingAdded = 0;
 	}
 
-	//Raz: Don't unset the tricked ents if they're a ghost, they're used for prediction in the JA++ client
-	if ( !self->client->pers.adminData.isGhost && !(self->client->ps.fd.forcePowersActive & (1 << FP_TELEPATHY)) ) { //clear the mindtrick index values
-		self->client->ps.fd.forceMindtrickTargetIndex = 0;
-		self->client->ps.fd.forceMindtrickTargetIndex2 = 0;
-		self->client->ps.fd.forceMindtrickTargetIndex3 = 0;
-		self->client->ps.fd.forceMindtrickTargetIndex4 = 0;
+	if ( !(self->client->ps.fd.forcePowersActive & (1 << FP_TELEPATHY)) ) {
+		// clear the mindtrick index values
+		self->client->ps.fd.forceMindtrickTargetIndex[0] = 0u;
+		self->client->ps.fd.forceMindtrickTargetIndex[1] = 0u;
+		self->client->ps.fd.forceMindtrickTargetIndex[2] = 0u;
+		self->client->ps.fd.forceMindtrickTargetIndex[3] = 0u;
 	}
 
-	if ( self->health < 1 )
+	if ( self->health < 1 ) {
 		self->client->ps.fd.forceGripBeingGripped = 0;
+	}
 
 	if ( self->client->ps.fd.forceGripBeingGripped > level.time ) {
 		self->client->ps.fd.forceGripCripple = 1;
 
 		//keep the saber off during this period
-		if ( self->client->ps.weapon == WP_SABER && !self->client->ps.saberHolstered )
+		if ( self->client->ps.weapon == WP_SABER && !self->client->ps.saberHolstered ) {
 			Cmd_ToggleSaber_f( self );
+		}
 	}
 	else
 		self->client->ps.fd.forceGripCripple = 0;

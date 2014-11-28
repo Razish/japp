@@ -793,9 +793,7 @@ static void AM_Ghost( gentity_t *ent ) {
 		targ->client->pers.adminData.isGhost = qfalse;
 		targ->r.contents = CONTENTS_SOLID;
 		targ->clipmask = CONTENTS_SOLID | CONTENTS_BODY;
-		// this is entirely for client-side prediction. Please fix me.
-		targ->s.trickedentindex = 0;
-		targ->s.trickedentindex2 = 0;
+		targ->client->ps.fd.forcePowersKnown &= ~(1 << NUM_FORCE_POWERS); // JA++ client prediction
 		trap->SendServerCommand( targetClient, "cp \"" S_COLOR_CYAN "Unghosted\n\"" );
 	}
 	else {
@@ -804,13 +802,11 @@ static void AM_Ghost( gentity_t *ent ) {
 		targ->client->pers.adminData.isGhost = qtrue;
 		targ->r.contents = CONTENTS_BODY;
 		targ->clipmask = 267009/*CONTENTS_SOLID*/;
+		targ->client->ps.fd.forcePowersKnown |= (1 << NUM_FORCE_POWERS); // JA++ client prediction
 
-		//This is *entirely* for client-side prediction. Do not rely on it. Please fix me.
-		targ->client->ps.fd.forceMindtrickTargetIndex = ~(1 << targetClient);
-		targ->client->ps.fd.forceMindtrickTargetIndex2 = ~(1 << targetClient);
-
-		trap->SendServerCommand( targetClient, "cp \"You are now a "S_COLOR_CYAN"ghost\n\"" );
+		trap->SendServerCommand( targetClient, "cp \"You are now a " S_COLOR_CYAN "ghost\n\"" );
 	}
+	trap->LinkEntity( (sharedEntity_t *)targ );
 }
 
 // toggle noclip mode

@@ -62,8 +62,8 @@ typedef struct vehWeaponInfo_s {
 extern vehWeaponInfo_t g_vehWeaponInfo[MAX_VEH_WEAPONS];
 extern int	numVehicleWeapons;
 
-#define		MAX_VEHICLE_MUZZLES			12
-#define		MAX_VEHICLE_EXHAUSTS		12
+#define		MAX_VEHICLE_MUZZLES			12 // must be <= 16 (or 32?)
+#define		MAX_VEHICLE_EXHAUSTS		12 // must be <= 16 (or 32?)
 #define		MAX_VEHICLE_WEAPONS			2
 #define		MAX_VEHICLE_TURRETS			2
 #define		MAX_VEHICLE_TURRET_MUZZLES	2

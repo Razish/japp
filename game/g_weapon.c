@@ -3328,7 +3328,7 @@ void G_VehMuzzleFireFX( gentity_t *ent, gentity_t *broadcaster, int muzzlesFired
 
 	//this is the bitfield of all muzzles fired this time
 	//NOTE: just need MAX_VEHICLE_MUZZLES bits for this... should be cool since it's currently 12 and we're sending it in 16 bits
-	b->s.trickedentindex = muzzlesFired;
+	b->s.trickedEntIndex[0] = muzzlesFired;
 
 	if ( broadcaster ) { //add the event
 		G_AddEvent( b, EV_VEH_FIRE, 0 );

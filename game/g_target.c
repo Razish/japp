@@ -227,12 +227,12 @@ void Use_Target_Speaker( gentity_t *ent, gentity_t *other, gentity_t *activator 
 		if ( ent->s.loopSound ) {
 			ent->s.loopSound = 0;	// turn it off
 			ent->s.loopIsSoundset = qfalse;
-			ent->s.trickedentindex = 1;
+			ent->s.trickedEntIndex[0] = 1;
 		}
 		else {
 			ent->s.loopSound = ent->noise_index;	// start it
 			ent->s.loopIsSoundset = qfalse;
-			ent->s.trickedentindex = 0;
+			ent->s.trickedEntIndex[0] = 0;
 		}
 	}
 	else {	// normal sound

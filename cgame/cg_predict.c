@@ -887,14 +887,7 @@ void CG_PredictPlayerState( void ) {
 		//		- Anybody we're not dueling, if we are dueling
 		//		- People who we've mind-tricked if we don't know mind-trick (aka ghosted)
 		//		- People not in the same dimension as us
-		cg.japp.isGhosted = qfalse;
-		for ( i = 0; i < MAX_CLIENTS; i++ ) {
-			es = &cg_entities[i].currentState;
-			if ( CG_IsMindTricked( ps->fd.forceMindtrickTargetIndex, ps->fd.forceMindtrickTargetIndex2, ps->fd.forceMindtrickTargetIndex3, ps->fd.forceMindtrickTargetIndex4, es->number )
-				&& !(ps->fd.forcePowersKnown&(1 << FP_TELEPATHY)) && cg_attemptGhostPredict.integer ) {
-				cg.japp.isGhosted = qtrue;
-			}
-		}
+		cg.japp.isGhosted = !!(ps->fd.forcePowersKnown & (1 << NUM_FORCE_POWERS));
 
 		for ( i = 0; i < MAX_CLIENTS; i++ ) {
 			es = &cg_entities[i].currentState;

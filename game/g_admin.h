@@ -16,7 +16,6 @@ typedef struct telemark_s {
 typedef struct adminData_s {
 	qboolean silenced; // have they been silenced?
 	qboolean isGhost; // are they a ghost?
-	qboolean isGhost2; // are they a ghost? RAZTEST
 	qboolean isSlept; // are they frozen?
 	telemark_t *telemark; // last marked location
 	qboolean empowered; // are they empowered?
