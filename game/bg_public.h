@@ -447,7 +447,7 @@ typedef struct pmove_s {
 
 	// command (in)
 	usercmd_t	cmd;
-	int			tracemask;			// collide against these types of surfaces
+	uint32_t	tracemask;			// collide against these types of surfaces
 	qboolean	noFootsteps;		// if the game is setup for no footsteps by the server
 	qboolean	gauntletHit;		// true if a gauntlet attack would actually hit something
 

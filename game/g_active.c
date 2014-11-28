@@ -2329,8 +2329,9 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 	else {
 		pm.tracemask = MASK_PLAYERSOLID;
-		if ( ent->client->pers.adminData.isGhost )
+		if ( ent->client->pers.adminData.isGhost ) {
 			pm.tracemask = 267009/*MASK_DEADSOLID*/;
+		}
 	}
 	pm.trace = SV_PMTrace;
 	pm.pointcontents = trap->PointContents;
@@ -2520,12 +2521,12 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	{
-		int savedMask = pm.tracemask;
+		uint32_t savedMask = pm.tracemask;
 		int i;
 		gentity_t *other = NULL;
 		if ( ent->client->pers.adminData.isGhost ) {
 			pm.tracemask = CONTENTS_SOLID;
-			ent->r.contents = 0;
+			ent->r.contents = 0u;
 		}
 
 		for ( i = 0, other = g_entities; i < level.maxclients; i++, other++ ) {
@@ -2908,8 +2909,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// link entity now, after any personal teleporters have been used
 	trap->LinkEntity( (sharedEntity_t *)ent );
-	//Raz: Nor for ghosts
-	if ( !ent->client->noclip && !ent->client->pers.adminData.isGhost ) {
+	if ( !ent->client->noclip && (!ent->client->pers.adminData.isGhost || japp_ghostTouchTriggers.integer) ) {
 		G_TouchTriggers( ent );
 	}
 
