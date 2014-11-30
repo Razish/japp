@@ -248,6 +248,7 @@
     <File Name="game/g_utils.c"/>
     <File Name="game/ai_main.c"/>
     <File Name="game/NPC_AI_Howler.c"/>
+    <File Name="game/g_smartentities.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="json">
     <File Name="json/cJSON.c"/>

@@ -934,7 +934,7 @@ void G_UpdateClientBroadcasts( gentity_t *self ) {
 	self->r.broadcastClients[0] = 0u;
 	self->r.broadcastClients[1] = 0u;
 
-	if ( self->client->pers.adminData.isGhost ) {
+	if ( self->client->pers.adminData.isGhost || japp_antiWallhack.integer ) {
 		self->r.svFlags |= SVF_BROADCASTCLIENTS;
 	}
 	else {
@@ -966,6 +966,15 @@ void G_UpdateClientBroadcasts( gentity_t *self ) {
 			}
 		}
 
+		if ( japp_antiWallhack.integer ) {
+			if ( G_EntityOccluded( self, other ) ) {
+				continue;
+			}
+			else {
+				send = qtrue;
+			}
+		}
+
 		VectorSubtract( &self->client->ps.origin, &other->client->ps.origin, &angles );
 		dist = VectorLengthSquared( &angles );
 		vectoangles( &angles, &angles );
@@ -989,7 +998,7 @@ void G_UpdateClientBroadcasts( gentity_t *self ) {
 		}
 
 		if ( send ) {
-			self->r.broadcastClients[i / 32] |= (1 << (i % 32));
+			Q_AddToBitflags( self->r.broadcastClients, i, 32 );
 		}
 	}
 
