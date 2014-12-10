@@ -917,9 +917,9 @@ void SendPendingPredictableEvents( playerState_t *ps ) {
 	}
 }
 
-static const float maxJediMasterDistance = 2500.0f * 2500.0f; // x^2, optimisation
+static const float maxJediMasterDistance = 6250000.0f; // Replaced the x^2, optimisation
 static const float maxJediMasterFOV = 100.0f;
-static const float maxForceSightDistance = Square( 1500.0f ) * 1500.0f; // x^2, optimisation
+static const float maxForceSightDistance = 3375000000.0f; // Replaced the x^2, optimisation
 static const float maxForceSightFOV = 100.0f;
 
 void G_UpdateClientBroadcasts( gentity_t *self ) {
