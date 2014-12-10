@@ -3304,7 +3304,7 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 		// busy
 		if ( ent->client->ps.weaponTime > 0
 			|| ent->client->ps.saberMove > LS_READY
-			|| ent->client->ps.fd.forcePowersActive
+		//	|| ent->client->ps.fd.forcePowersActive
 		//	|| ent->client->ps.groundEntityNum == ENTITYNUM_NONE
 			|| ent->client->ps.duelInProgress
 			|| BG_InKnockDown( ent->client->ps.legsAnim )
