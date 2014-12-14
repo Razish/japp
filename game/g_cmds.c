@@ -2287,9 +2287,14 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 	}
 
 	// not allowed if you're not alive or not ingame
-	if ( ent->health <= 0 ||
-		ent->client->tempSpectate >= level.time ||
-		ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+	if ( ent->health <= 0
+		|| ent->client->tempSpectate >= level.time
+		|| ent->client->sess.sessionTeam == TEAM_SPECTATOR )
+	{
+		return;
+	}
+
+	if ( ent->client->pers.adminData.isSlept ) {
 		return;
 	}
 
@@ -2300,27 +2305,11 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 		return;
 	}
 
-	if ( ent->client->ps.duelTime >= level.time ) {
+	if ( ent->client->ps.duelInProgress || ent->client->ps.duelTime >= level.time ) {
 		return;
-	}
-
-	if ( (g_privateDuel.integer & PRIVDUEL_WEAP) ) {
-		if ( !(ent->client->pers.CSF & CSF_WEAPONDUEL) || trap->Argc() == 1 ) {
-			weapon = ent->client->ps.weapon;
-		}
-		else {
-			weapon = BG_FindWeapon( ConcatArgs( 1 ) );
-			if ( weapon == WP_NONE ) {
-				weapon = ent->client->ps.weapon;
-			}
-		}
 	}
 
 	if ( ent->client->ps.saberInFlight ) {
-		return;
-	}
-
-	if ( ent->client->ps.duelInProgress ) {
 		return;
 	}
 
@@ -2336,7 +2325,18 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 		return;
 	}
 
-	// unlagged!
+	if ( (g_privateDuel.integer & PRIVDUEL_WEAP) ) {
+		if ( !(ent->client->pers.CSF & CSF_WEAPONDUEL) || trap->Argc() == 1 ) {
+			weapon = ent->client->ps.weapon;
+		}
+		else {
+			weapon = BG_FindWeapon( ConcatArgs( 1 ) );
+			if ( weapon == WP_NONE ) {
+				weapon = ent->client->ps.weapon;
+			}
+		}
+	}
+
 	tr = G_RealTrace( ent, 256.0f );
 
 	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS ) {
@@ -2351,6 +2351,10 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 		}
 
 		if ( level.gametype >= GT_TEAM && OnSameTeam( ent, challenged ) ) {
+			return;
+		}
+
+		if ( challenged->client->pers.adminData.isSlept ) {
 			return;
 		}
 
