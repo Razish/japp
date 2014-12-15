@@ -180,8 +180,12 @@ elif plat == 'Windows':
 		'/ERRORREPORT:none',	# don't send error reports for internal linker errors
 		'/MACHINE:' + arch,		# set the linker architecture
 		'/NOLOGO',				# remove watermark
-		'/SUBSYSTEM:WINDOWS',	# graphical application
 	]
+	if bits == 64:
+		env['LINKFLAGS'] += [ '/SUBSYSTEM:WINDOWS' ]	# graphical application
+	else:
+		env['LINKFLAGS'] += [ '/SUBSYSTEM:WINDOWS,5.1' ]	# graphical application
+
 
 	env['CPPDEFINES'] = [ '_WIN32' ]
 	if bits == 64:
@@ -270,7 +274,7 @@ if debug:
 			'/Od',		# disable optimisations
 			'/Oy-',		# disable frame pointer omission
 			'/RTC1',	# runtime checks
-			'/ZI',		# PDB with edit & continue capability
+			'/Z7',		# PDB with edit & continue capability
 		]
 		env['LINKFLAGS'] += [
 			'/DEBUG',		# generate debug info
