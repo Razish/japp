@@ -3395,7 +3395,7 @@ static const emote_t emotes[] = {
 	{ "shovel", BOTH_TUSKENATTACK2, 0, EMF_NONE },
 	{ "smack1", BOTH_FORCEGRIP3THROW, 0, EMF_NONE },
 	{ "smack2", BOTH_TOSS1, 0, EMF_NONE },
-	{ "stand", BOTH_STAND8, 0,EMF_STATIC | EMF_HOLD }
+	{ "stand", BOTH_STAND8, 0,EMF_STATIC | EMF_HOLD },
 	{ "stepback", BOTH_FORCE_2HANDEDLIGHTNING, 0, EMF_NONE },
 	{ "suggest", BOTH_STAND1_TALK3, 0, EMF_NONE },
 	{ "surrender", TORSO_SURRENDER_START, TORSO_SURRENDER_STOP, EMF_HOLD | EMF_HOLSTER },
