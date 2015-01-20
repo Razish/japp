@@ -480,10 +480,10 @@ static void SetSaberBoxSize( gentity_t *saberent ) {
 					owner->client->saber[saberNum].blade[bladeNum].lengthMax,
 					&owner->client->saber[saberNum].blade[bladeNum].muzzleDir, &saberTip );
 
-				if ( saberOrg.data[i] < saberent->r.mins.data[i] )	saberent->r.mins.data[i] = saberOrg.data[i];
-				if ( saberTip.data[i] < saberent->r.mins.data[i] )	saberent->r.mins.data[i] = saberTip.data[i];
-				if ( saberOrg.data[i] > saberent->r.maxs.data[i] )	saberent->r.maxs.data[i] = saberOrg.data[i];
-				if ( saberTip.data[i] > saberent->r.maxs.data[i] )	saberent->r.maxs.data[i] = saberTip.data[i];
+				if ( saberOrg.raw[i] < saberent->r.mins.raw[i] )	saberent->r.mins.raw[i] = saberOrg.raw[i];
+				if ( saberTip.raw[i] < saberent->r.mins.raw[i] )	saberent->r.mins.raw[i] = saberTip.raw[i];
+				if ( saberOrg.raw[i] > saberent->r.maxs.raw[i] )	saberent->r.maxs.raw[i] = saberOrg.raw[i];
+				if ( saberTip.raw[i] > saberent->r.maxs.raw[i] )	saberent->r.maxs.raw[i] = saberTip.raw[i];
 
 				//G_TestLine(saberOrg, saberTip, 0x0000ff, 50);
 			}
@@ -625,8 +625,8 @@ static qboolean G_CheckLookTarget( gentity_t *ent, vector3 *lookAngles, float *l
 		vectoangles( &lookDir, lookAngles );
 
 		for ( i = 0; i < 3; i++ ) {
-			lookAngles->data[i] = AngleNormalize180( lookAngles->data[i] );
-			ent->client->renderInfo.eyeAngles.data[i] = AngleNormalize180( ent->client->renderInfo.eyeAngles.data[i] );
+			lookAngles->raw[i] = AngleNormalize180( lookAngles->raw[i] );
+			ent->client->renderInfo.eyeAngles.raw[i] = AngleNormalize180( ent->client->renderInfo.eyeAngles.raw[i] );
 		}
 		AnglesSubtract( lookAngles, &ent->client->renderInfo.eyeAngles, lookAngles );
 		return qtrue;
@@ -3122,8 +3122,8 @@ void WP_SaberRadiusDamage( gentity_t *ent, vector3 *point, float radius, int dam
 
 		//Setup the bbox to search in
 		for ( i = 0; i < 3; i++ ) {
-			mins.data[i] = point->data[i] - radius;
-			maxs.data[i] = point->data[i] + radius;
+			mins.raw[i] = point->raw[i] - radius;
+			maxs.raw[i] = point->raw[i] + radius;
 		}
 
 		//Get the number of entities in a given space
@@ -4496,7 +4496,7 @@ void G_SPSaberDamageTraceLerped( gentity_t *self, int saberNum, int bladeNum, ve
 			vectoangles( &md1, outma1 );
 			vectoangles( &md2, outma2 );
 			for ( xx = 0; xx < 3; xx++ ) {
-				md2ang.data[xx] = LerpAngle( outma1->data[xx], outma2->data[xx], saberHitFraction );
+				md2ang.raw[xx] = LerpAngle( outma1->raw[xx], outma2->raw[xx], saberHitFraction );
 			}
 			AngleVectors( &md2ang, &md2, NULL, NULL );
 			//shorten the base pos
@@ -4543,7 +4543,7 @@ void G_SPSaberDamageTraceLerped( gentity_t *self, int saberNum, int bladeNum, ve
 			}
 			else {
 				for ( xx = 0; xx < 3; xx++ ) {
-					md2ang.data[xx] = LerpAngle( ma1.data[xx], ma2.data[xx], curDirFrac );
+					md2ang.raw[xx] = LerpAngle( ma1.raw[xx], ma2.raw[xx], curDirFrac );
 				}
 				AngleVectors( &md2ang, &curMD2, NULL, NULL );
 				//VectorMA( md1, curDirFrac, mdDiff, curMD2 );
@@ -4580,7 +4580,7 @@ void G_SPSaberDamageTraceLerped( gentity_t *self, int saberNum, int bladeNum, ve
 					vectoangles( &curMD1, &curMA1 );
 					vectoangles( &curMD2, &curMA2 );
 					for ( xx = 0; xx < 3; xx++ ) {
-						md2ang.data[xx] = LerpAngle( curMA1.data[xx], curMA2.data[xx], saberHitFraction );
+						md2ang.raw[xx] = LerpAngle( curMA1.raw[xx], curMA2.raw[xx], saberHitFraction );
 					}
 					AngleVectors( &md2ang, &curMD2, NULL, NULL );
 					saberHitSaber = qtrue;
@@ -4706,8 +4706,8 @@ void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd ) {
 	AngleVectors( &fwdangles, &forward, NULL, NULL );
 
 	for ( i = 0; i < 3; i++ ) {
-		mins.data[i] = self->r.currentOrigin.data[i] - radius;
-		maxs.data[i] = self->r.currentOrigin.data[i] + radius;
+		mins.raw[i] = self->r.currentOrigin.raw[i] - radius;
+		maxs.raw[i] = self->r.currentOrigin.raw[i] + radius;
 	}
 
 	numListedEntities = trap->EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );

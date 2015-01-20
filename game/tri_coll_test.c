@@ -55,12 +55,12 @@ static qboolean coplanar_tri_tri( vector3 *N,
 	// edge_against_tri_edges
 	{
 		float Ax, Ay, Bx, By, Cx, Cy, e, d, f;
-		Ax = V1->data[i0] - V0->data[i0];
-		Ay = V1->data[i1] - V0->data[i1];
-		Bx = U0->data[i0] - U1->data[i0];
-		By = U0->data[i1] - U1->data[i1];
-		Cx = V0->data[i0] - U0->data[i0];
-		Cy = V0->data[i1] - U0->data[i1];
+		Ax = V1->raw[i0] - V0->raw[i0];
+		Ay = V1->raw[i1] - V0->raw[i1];
+		Bx = U0->raw[i0] - U1->raw[i0];
+		By = U0->raw[i1] - U1->raw[i1];
+		Cx = V0->raw[i0] - U0->raw[i0];
+		Cy = V0->raw[i1] - U0->raw[i1];
 		f = Ay * Bx - Ax * By;
 		d = By * Cx - Bx * Cy;
 		if ( (f > 0 && d >= 0 && d <= f) || (f < 0 && d <= 0 && d >= f) ) {
@@ -76,10 +76,10 @@ static qboolean coplanar_tri_tri( vector3 *N,
 				}
 			}
 		}
-		Bx = U1->data[i0] - U2->data[i0];
-		By = U1->data[i1] - U2->data[i1];
-		Cx = V0->data[i0] - U1->data[i0];
-		Cy = V0->data[i1] - U1->data[i1];
+		Bx = U1->raw[i0] - U2->raw[i0];
+		By = U1->raw[i1] - U2->raw[i1];
+		Cx = V0->raw[i0] - U1->raw[i0];
+		Cy = V0->raw[i1] - U1->raw[i1];
 		f = Ay * Bx - Ax * By;
 		d = By * Cx - Bx * Cy;
 		if ( (f > 0 && d >= 0 && d <= f) || (f < 0 && d <= 0 && d >= f) ) {
@@ -95,10 +95,10 @@ static qboolean coplanar_tri_tri( vector3 *N,
 				}
 			}
 		}
-		Bx = U2->data[i0] - U0->data[i0];
-		By = U2->data[i1] - U0->data[i1];
-		Cx = V0->data[i0] - U2->data[i0];
-		Cy = V0->data[i1] - U2->data[i1];
+		Bx = U2->raw[i0] - U0->raw[i0];
+		By = U2->raw[i1] - U0->raw[i1];
+		Cx = V0->raw[i0] - U2->raw[i0];
+		Cy = V0->raw[i1] - U2->raw[i1];
 		f = Ay * Bx - Ax * By;
 		d = By * Cx - Bx * Cy;
 		if ( (f > 0 && d >= 0 && d <= f) || (f < 0 && d <= 0 && d >= f) ) {
@@ -118,12 +118,12 @@ static qboolean coplanar_tri_tri( vector3 *N,
 	// edge_against_tri_edges
 	{
 		float Ax, Ay, Bx, By, Cx, Cy, e, d, f;
-		Ax = V2->data[i0] - V1->data[i0];
-		Ay = V2->data[i1] - V1->data[i1];
-		Bx = U0->data[i0] - U1->data[i0];
-		By = U0->data[i1] - U1->data[i1];
-		Cx = V1->data[i0] - U0->data[i0];
-		Cy = V1->data[i1] - U0->data[i1];
+		Ax = V2->raw[i0] - V1->raw[i0];
+		Ay = V2->raw[i1] - V1->raw[i1];
+		Bx = U0->raw[i0] - U1->raw[i0];
+		By = U0->raw[i1] - U1->raw[i1];
+		Cx = V1->raw[i0] - U0->raw[i0];
+		Cy = V1->raw[i1] - U0->raw[i1];
 		f = Ay * Bx - Ax * By;
 		d = By * Cx - Bx * Cy;
 		if ( (f > 0 && d >= 0 && d <= f) || (f < 0 && d <= 0 && d >= f) ) {
@@ -139,10 +139,10 @@ static qboolean coplanar_tri_tri( vector3 *N,
 				}
 			}
 		}
-		Bx = U1->data[i0] - U2->data[i0];
-		By = U1->data[i1] - U2->data[i1];
-		Cx = V1->data[i0] - U1->data[i0];
-		Cy = V1->data[i1] - U1->data[i1];
+		Bx = U1->raw[i0] - U2->raw[i0];
+		By = U1->raw[i1] - U2->raw[i1];
+		Cx = V1->raw[i0] - U1->raw[i0];
+		Cy = V1->raw[i1] - U1->raw[i1];
 		f = Ay * Bx - Ax * By;
 		d = By * Cx - Bx * Cy;
 		if ( (f > 0 && d >= 0 && d <= f) || (f < 0 && d <= 0 && d >= f) ) {
@@ -158,10 +158,10 @@ static qboolean coplanar_tri_tri( vector3 *N,
 				}
 			}
 		}
-		Bx = U2->data[i0] - U0->data[i0];
-		By = U2->data[i1] - U0->data[i1];
-		Cx = V1->data[i0] - U2->data[i0];
-		Cy = V1->data[i1] - U2->data[i1];
+		Bx = U2->raw[i0] - U0->raw[i0];
+		By = U2->raw[i1] - U0->raw[i1];
+		Cx = V1->raw[i0] - U2->raw[i0];
+		Cy = V1->raw[i1] - U2->raw[i1];
 		f = Ay * Bx - Ax * By;
 		d = By * Cx - Bx * Cy;
 		if ( (f > 0 && d >= 0 && d <= f) || (f < 0 && d <= 0 && d >= f) ) {
@@ -181,12 +181,12 @@ static qboolean coplanar_tri_tri( vector3 *N,
 	// edge_against_tri_edges
 	{
 		float Ax,Ay,Bx,By,Cx,Cy,e,d,f;
-		Ax = V0->data[i0] - V2->data[i0];
-		Ay = V0->data[i1] - V2->data[i1];
-		Bx = U0->data[i0] - U1->data[i0];
-		By = U0->data[i1] - U1->data[i1];
-		Cx = V2->data[i0] - U0->data[i0];
-		Cy = V2->data[i1] - U0->data[i1];
+		Ax = V0->raw[i0] - V2->raw[i0];
+		Ay = V0->raw[i1] - V2->raw[i1];
+		Bx = U0->raw[i0] - U1->raw[i0];
+		By = U0->raw[i1] - U1->raw[i1];
+		Cx = V2->raw[i0] - U0->raw[i0];
+		Cy = V2->raw[i1] - U0->raw[i1];
 		f = Ay * Bx - Ax * By;
 		d = By * Cx - Bx * Cy;
 		if ( (f > 0 && d >= 0 && d <= f) || (f < 0 && d <= 0 && d >= f) ) {
@@ -202,10 +202,10 @@ static qboolean coplanar_tri_tri( vector3 *N,
 				}
 			}
 		}
-		Bx = U1->data[i0] - U2->data[i0];
-		By = U1->data[i1] - U2->data[i1];
-		Cx = V2->data[i0] - U1->data[i0];
-		Cy = V2->data[i1] - U1->data[i1];
+		Bx = U1->raw[i0] - U2->raw[i0];
+		By = U1->raw[i1] - U2->raw[i1];
+		Cx = V2->raw[i0] - U1->raw[i0];
+		Cy = V2->raw[i1] - U1->raw[i1];
 		f = Ay * Bx - Ax * By;
 		d = By * Cx - Bx * Cy;
 		if ( (f > 0 && d >= 0 && d <= f) || (f < 0 && d <= 0 && d >= f) ) {
@@ -221,10 +221,10 @@ static qboolean coplanar_tri_tri( vector3 *N,
 				}
 			}
 		}
-		Bx = U2->data[i0] - U0->data[i0];
-		By = U2->data[i1] - U0->data[i1];
-		Cx = V2->data[i0] - U2->data[i0];
-		Cy = V2->data[i1] - U2->data[i1];
+		Bx = U2->raw[i0] - U0->raw[i0];
+		By = U2->raw[i1] - U0->raw[i1];
+		Cx = V2->raw[i0] - U2->raw[i0];
+		Cy = V2->raw[i1] - U2->raw[i1];
 		f = Ay * Bx - Ax * By;
 		d = By * Cx - Bx * Cy;
 		if ( (f > 0 && d >= 0 && d <= f) || (f < 0 && d <= 0 && d >= f) ) {
@@ -245,18 +245,18 @@ static qboolean coplanar_tri_tri( vector3 *N,
 	// point_in_tri
 	{
 		float a, b, c, d0, d1, d2;
-		a = U1->data[i1] - U0->data[i1];
-		b = -(U1->data[i0] - U0->data[i0]);
-		c = -a * U0->data[i0] - b * U0->data[i1];
-		d0 = a * V0->data[i0] + b * V0->data[i1] + c;
-		a = U2->data[i1] - U1->data[i1];
-		b = -(U2->data[i0] - U1->data[i0]);
-		c = -a * U1->data[i0] - b * U1->data[i1];
-		d1 = a * V0->data[i0] + b * V0->data[i1] + c;
-		a = U0->data[i1] - U2->data[i1];
-		b = -(U0->data[i0] - U2->data[i0]);
-		c = -a * U2->data[i0] - b * U2->data[i1];
-		d2 = a * V0->data[i0] + b * V0->data[i1] + c;
+		a = U1->raw[i1] - U0->raw[i1];
+		b = -(U1->raw[i0] - U0->raw[i0]);
+		c = -a * U0->raw[i0] - b * U0->raw[i1];
+		d0 = a * V0->raw[i0] + b * V0->raw[i1] + c;
+		a = U2->raw[i1] - U1->raw[i1];
+		b = -(U2->raw[i0] - U1->raw[i0]);
+		c = -a * U1->raw[i0] - b * U1->raw[i1];
+		d1 = a * V0->raw[i0] + b * V0->raw[i1] + c;
+		a = U0->raw[i1] - U2->raw[i1];
+		b = -(U0->raw[i0] - U2->raw[i0]);
+		c = -a * U2->raw[i0] - b * U2->raw[i1];
+		d2 = a * V0->raw[i0] + b * V0->raw[i1] + c;
 		if ( d0 * d1 > 0.0f ) {
 			if ( d0 * d2 > 0.0f ) {
 				return qtrue;
@@ -267,18 +267,18 @@ static qboolean coplanar_tri_tri( vector3 *N,
 	// point_in_tri
 	{
 		float a, b, c, d0, d1, d2;
-		a = V1->data[i1] - V0->data[i1];
-		b = -(V1->data[i0] - V0->data[i0]);
-		c = -a * V0->data[i0] - b * V0->data[i1];
-		d0 = a * U0->data[i0] + b * U0->data[i1] + c;
-		a = V2->data[i1] - V1->data[i1];
-		b = -(V2->data[i0] - V1->data[i0]);
-		c = -a * V1->data[i0] - b * V1->data[i1];
-		d1 = a * U0->data[i0] + b * U0->data[i1] + c;
-		a = V0->data[i1] - V2->data[i1];
-		b = -(V0->data[i0] - V2->data[i0]);
-		c = -a * V2->data[i0] - b * V2->data[i1];
-		d2 = a * U0->data[i0] + b * U0->data[i1] + c;
+		a = V1->raw[i1] - V0->raw[i1];
+		b = -(V1->raw[i0] - V0->raw[i0]);
+		c = -a * V0->raw[i0] - b * V0->raw[i1];
+		d0 = a * U0->raw[i0] + b * U0->raw[i1] + c;
+		a = V2->raw[i1] - V1->raw[i1];
+		b = -(V2->raw[i0] - V1->raw[i0]);
+		c = -a * V1->raw[i0] - b * V1->raw[i1];
+		d1 = a * U0->raw[i0] + b * U0->raw[i1] + c;
+		a = V0->raw[i1] - V2->raw[i1];
+		b = -(V0->raw[i0] - V2->raw[i0]);
+		c = -a * V2->raw[i0] - b * V2->raw[i1];
+		d2 = a * U0->raw[i0] + b * U0->raw[i1] + c;
 		if ( d0 * d1 > 0.0f ) {
 			if ( d0 * d2 > 0.0f ) {
 				return qtrue;
@@ -379,13 +379,13 @@ qboolean tri_tri_intersect( vector3 *V0, vector3 *V1, vector3 *V2, vector3 *U0, 
 	}
 
 	// this is the simplified projection onto L
-	vp0 = V0->data[index];
-	vp1 = V1->data[index];
-	vp2 = V2->data[index];
+	vp0 = V0->raw[index];
+	vp1 = V1->raw[index];
+	vp2 = V2->raw[index];
 
-	up0 = U0->data[index];
-	up1 = U1->data[index];
-	up2 = U2->data[index];
+	up0 = U0->raw[index];
+	up1 = U1->raw[index];
+	up2 = U2->raw[index];
 
 	// compute_intervals
 	if ( dv0dv1 > 0.0f ) {

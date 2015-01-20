@@ -605,9 +605,9 @@ typedef struct cgameImport_s {
 	// cinematics
 	void( *CIN_DrawCinematic )					(int handle);
 	int( *CIN_PlayCinematic )					(const char *arg, int x, int y, int w, int h, int systemBits);
-	e_status( *CIN_RunCinematic )						(int handle);
+	cinState_t( *CIN_RunCinematic )						(int handle);
 	void( *CIN_SetExtents )						(int handle, int x, int y, int w, int h);
-	e_status( *CIN_StopCinematic )					(int handle);
+	cinState_t( *CIN_StopCinematic )					(int handle);
 
 	// FX
 	void( *FX_AddLine )							(vector3 *start, vector3 *end, float size1, float size2, float sizeParm, float alpha1, float alpha2, float alphaParm, const vector3 *sRGB, const vector3 *eRGB, float rgbParm, int killTime, qhandle_t shader, uint32_t flags);

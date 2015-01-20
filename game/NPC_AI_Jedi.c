@@ -2953,8 +2953,8 @@ gentity_t *Jedi_FindEnemyInCone( gentity_t *self, gentity_t *fallback, float min
 	AngleVectors( &self->client->ps.viewangles, &forward, NULL, NULL );
 
 	for ( e = 0; e < 3; e++ ) {
-		mins.data[e] = self->r.currentOrigin.data[e] - 1024;
-		maxs.data[e] = self->r.currentOrigin.data[e] + 1024;
+		mins.raw[e] = self->r.currentOrigin.raw[e] - 1024;
+		maxs.raw[e] = self->r.currentOrigin.raw[e] + 1024;
 	}
 	numListedEntities = trap->EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
 

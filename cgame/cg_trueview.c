@@ -282,15 +282,15 @@ static void CG_SmoothTrueView( vector3 *eyeAngles ) {
 			for ( i = 0; i<2; i++ ) {
 				float fov = cg_trueFOV.value ? cg_trueFOV.value : cg_fov.value;
 
-				angDiff = eyeAngles->data[i] - refdef->viewangles.data[i];
+				angDiff = eyeAngles->raw[i] - refdef->viewangles.raw[i];
 				angDiff = AngleNormalize180( angDiff );
 				if ( fabsf( angDiff ) > fov ) {
-					if ( angDiff < 0 )	eyeAngles->data[i] += fov;
-					else				eyeAngles->data[i] -= fov;
+					if ( angDiff < 0 )	eyeAngles->raw[i] += fov;
+					else				eyeAngles->raw[i] -= fov;
 				}
 				else
-					eyeAngles->data[i] = refdef->viewangles.data[i];
-				AngleNormalize180( eyeAngles->data[i] );
+					eyeAngles->raw[i] = refdef->viewangles.raw[i];
+				AngleNormalize180( eyeAngles->raw[i] );
 			}
 		}
 	}

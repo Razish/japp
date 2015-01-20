@@ -153,8 +153,8 @@ int G_RadiusList( vector3 *origin, float radius, gentity_t *ignore, qboolean tak
 		radius = 1;
 
 	for ( i = 0; i < 3; i++ ) {
-		mins.data[i] = origin->data[i] - radius;
-		maxs.data[i] = origin->data[i] + radius;
+		mins.raw[i] = origin->raw[i] - radius;
+		maxs.raw[i] = origin->raw[i] + radius;
 	}
 
 	numListedEntities = trap->EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
@@ -167,9 +167,9 @@ int G_RadiusList( vector3 *origin, float radius, gentity_t *ignore, qboolean tak
 
 		// find the distance from the edge of the bounding box
 		for ( i = 0; i < 3; i++ ) {
-			if ( origin->data[i] < ent->r.absmin.data[i] )	v.data[i] = ent->r.absmin.data[i] - origin->data[i];
-			else if ( origin->data[i] > ent->r.absmax.data[i] )	v.data[i] = origin->data[i] - ent->r.absmax.data[i];
-			else												v.data[i] = 0;
+			if ( origin->raw[i] < ent->r.absmin.raw[i] )	v.raw[i] = ent->r.absmin.raw[i] - origin->raw[i];
+			else if ( origin->raw[i] > ent->r.absmax.raw[i] )	v.raw[i] = origin->raw[i] - ent->r.absmax.raw[i];
+			else												v.raw[i] = 0;
 		}
 
 		if ( VectorLength( &v ) >= radius )
@@ -1132,8 +1132,8 @@ qboolean G_PointInBounds( vector3 *point, vector3 *mins, vector3 *maxs ) {
 	int i;
 
 	for ( i = 0; i < 3; i++ ) {
-		if ( point->data[i] < mins->data[i] )	return qfalse;
-		if ( point->data[i] > maxs->data[i] )	return qfalse;
+		if ( point->raw[i] < mins->raw[i] )	return qfalse;
+		if ( point->raw[i] > maxs->raw[i] )	return qfalse;
 	}
 
 	return qtrue;
@@ -1295,13 +1295,13 @@ qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3
 
 	for ( i = 0; i < 3; i++ ) {
 		VectorCopy( &start, &end );
-		end.data[i] += mins->data[i];
+		end.raw[i] += mins->raw[i];
 		trap->Trace( &tr, &start, &vec3_origin, &vec3_origin, &end, ignore, clipmask, qfalse, 0, 0 );
 		if ( tr.allsolid || tr.startsolid )
 			return qfalse;
 		if ( tr.fraction < 1.0f ) {
 			VectorCopy( &start, &end );
-			end.data[i] += maxs->data[i] - (mins->data[i] * tr.fraction);
+			end.raw[i] += maxs->raw[i] - (mins->raw[i] * tr.fraction);
 
 			trap->Trace( &tr, &start, &vec3_origin, &vec3_origin, &end, ignore, clipmask, qfalse, 0, 0 );
 

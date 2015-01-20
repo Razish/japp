@@ -320,11 +320,11 @@ void LerpColor( const vector4 *a, vector4 *b, vector4 *c, float t ) {
 
 	// lerp and clamp each component
 	for ( i = 0; i < 4; i++ ) {
-		c->data[i] = a->data[i] + t*(b->data[i] - a->data[i]);
-		if ( c->data[i] < 0 )
-			c->data[i] = 0;
-		else if ( c->data[i] > 1.0f )
-			c->data[i] = 1.0f;
+		c->raw[i] = a->raw[i] + t*(b->raw[i] - a->raw[i]);
+		if ( c->raw[i] < 0 )
+			c->raw[i] = 0;
+		else if ( c->raw[i] > 1.0f )
+			c->raw[i] = 1.0f;
 	}
 }
 
@@ -370,7 +370,7 @@ qboolean Color_Parse( char **p, vector4 *c ) {
 		if ( !Float_Parse( p, &f ) ) {
 			return qfalse;
 		}
-		c->data[i] = f;
+		c->raw[i] = f;
 	}
 	return qtrue;
 }
@@ -383,7 +383,7 @@ qboolean PC_Color_Parse( int handle, vector4 *c ) {
 		if ( !PC_Float_Parse( handle, &f ) ) {
 			return qfalse;
 		}
-		c->data[i] = f;
+		c->raw[i] = f;
 	}
 	return qtrue;
 }
@@ -863,7 +863,7 @@ qboolean Script_SetColor( itemDef_t *item, char **args ) {
 				if ( !Float_Parse( args, &f ) ) {
 					return qtrue;
 				}
-				out->data[i] = f;
+				out->raw[i] = f;
 			}
 		}
 	}
@@ -1104,7 +1104,7 @@ qboolean Script_SetItemColorCvar( itemDef_t *item, char **args ) {
 
 				if ( out ) {
 					for ( i = 0; i < 4; i++ ) {
-						out->data[i] = color.data[i];
+						out->raw[i] = color.raw[i];
 					}
 				}
 			}
@@ -7286,7 +7286,7 @@ qboolean ItemParse_backcolor( itemDef_t *item, int handle ) {
 		if ( !PC_Float_Parse( handle, &f ) ) {
 			return qfalse;
 		}
-		item->window.backColor.data[i] = f;
+		item->window.backColor.raw[i] = f;
 	}
 	return qtrue;
 }
@@ -7305,7 +7305,7 @@ qboolean ItemParse_forecolor( itemDef_t *item, int handle ) {
 			return qtrue;
 		}
 
-		item->window.foreColor.data[i] = f;
+		item->window.foreColor.raw[i] = f;
 		item->window.flags |= WINDOW_FORECOLORSET;
 	}
 	return qtrue;
@@ -7319,7 +7319,7 @@ qboolean ItemParse_bordercolor( itemDef_t *item, int handle ) {
 		if ( !PC_Float_Parse( handle, &f ) ) {
 			return qfalse;
 		}
-		item->window.borderColor.data[i] = f;
+		item->window.borderColor.raw[i] = f;
 	}
 	return qtrue;
 }
@@ -8314,7 +8314,7 @@ qboolean MenuParse_backcolor( itemDef_t *item, int handle ) {
 		if ( !PC_Float_Parse( handle, &f ) ) {
 			return qfalse;
 		}
-		menu->window.backColor.data[i] = f;
+		menu->window.backColor.raw[i] = f;
 	}
 	return qtrue;
 }
@@ -8366,7 +8366,7 @@ qboolean MenuParse_descColor( itemDef_t *item, int handle ) {
 		if ( !PC_Float_Parse( handle, &f ) ) {
 			return qfalse;
 		}
-		menu->descColor.data[i] = f;
+		menu->descColor.raw[i] = f;
 	}
 	return qtrue;
 }
@@ -8384,7 +8384,7 @@ qboolean MenuParse_forecolor( itemDef_t *item, int handle ) {
 			menu->window.flags |= WINDOW_PLAYERCOLOR;
 			return qtrue;
 		}
-		menu->window.foreColor.data[i] = f;
+		menu->window.foreColor.raw[i] = f;
 		menu->window.flags |= WINDOW_FORECOLORSET;
 	}
 	return qtrue;
@@ -8399,7 +8399,7 @@ qboolean MenuParse_bordercolor( itemDef_t *item, int handle ) {
 		if ( !PC_Float_Parse( handle, &f ) ) {
 			return qfalse;
 		}
-		menu->window.borderColor.data[i] = f;
+		menu->window.borderColor.raw[i] = f;
 	}
 	return qtrue;
 }
@@ -8413,7 +8413,7 @@ qboolean MenuParse_focuscolor( itemDef_t *item, int handle ) {
 		if ( !PC_Float_Parse( handle, &f ) ) {
 			return qfalse;
 		}
-		menu->focusColor.data[i] = f;
+		menu->focusColor.raw[i] = f;
 	}
 	return qtrue;
 }
@@ -8426,7 +8426,7 @@ qboolean MenuParse_disablecolor( itemDef_t *item, int handle ) {
 		if ( !PC_Float_Parse( handle, &f ) ) {
 			return qfalse;
 		}
-		menu->disableColor.data[i] = f;
+		menu->disableColor.raw[i] = f;
 	}
 	return qtrue;
 }

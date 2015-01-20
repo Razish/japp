@@ -1008,7 +1008,7 @@ void BG_CycleInven( playerState_t *ps, int direction ) {
 
 static qboolean BG_AlwaysPickupWeapons( void ) {
 #ifdef _GAME
-	return !!((jp_cinfo.integer & CINFO_ALWAYSPICKUPWEAP));
+	return !!((jp_cinfo.bits & CINFO_ALWAYSPICKUPWEAP));
 #elif defined( _CGAME )
 	return !!((cgs.japp.jp_cinfo & CINFO_ALWAYSPICKUPWEAP));
 #else
@@ -1199,7 +1199,7 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vector3 *result 
 	case TR_GRAVITY:
 		deltaTime = (atTime - tr->trTime) * 0.001f;	// milliseconds to seconds
 		VectorMA( &tr->trBase, deltaTime, &tr->trDelta, result );
-		result->data[2] -= 0.5f * DEFAULT_GRAVITY * deltaTime * deltaTime;		// FIXME: local gravity...
+		result->raw[2] -= 0.5f * DEFAULT_GRAVITY * deltaTime * deltaTime;		// FIXME: local gravity...
 		break;
 	}
 }
@@ -1240,7 +1240,7 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vector3 *re
 	case TR_GRAVITY:
 		deltaTime = (atTime - tr->trTime) * 0.001f;	// milliseconds to seconds
 		VectorCopy( &tr->trDelta, result );
-		result->data[2] -= DEFAULT_GRAVITY * deltaTime;		// FIXME: local gravity...
+		result->raw[2] -= DEFAULT_GRAVITY * deltaTime;		// FIXME: local gravity...
 		break;
 	}
 }

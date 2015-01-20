@@ -114,10 +114,10 @@ void CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *
 
 	// create the full polygon
 	for ( i = 0; i < 3; i++ ) {
-		originalPoints[0].data[i] = origin->data[i] - radius * axis[1].data[i] - radius * axis[2].data[i];
-		originalPoints[1].data[i] = origin->data[i] + radius * axis[1].data[i] - radius * axis[2].data[i];
-		originalPoints[2].data[i] = origin->data[i] + radius * axis[1].data[i] + radius * axis[2].data[i];
-		originalPoints[3].data[i] = origin->data[i] - radius * axis[1].data[i] + radius * axis[2].data[i];
+		originalPoints[0].raw[i] = origin->raw[i] - radius * axis[1].raw[i] - radius * axis[2].raw[i];
+		originalPoints[1].raw[i] = origin->raw[i] + radius * axis[1].raw[i] - radius * axis[2].raw[i];
+		originalPoints[2].raw[i] = origin->raw[i] + radius * axis[1].raw[i] + radius * axis[2].raw[i];
+		originalPoints[3].raw[i] = origin->raw[i] - radius * axis[1].raw[i] + radius * axis[2].raw[i];
 	}
 
 	// get the fragments

@@ -119,7 +119,7 @@ static void SetCInfo( int check, uint32_t bit ) {
 }
 
 static void CVU_Duel( void ) {
-	SetCInfo( (g_privateDuel.integer & PRIVDUEL_WEAP), CINFO_PRIVDUELWEAP );
+	SetCInfo( (g_privateDuel.bits & PRIVDUEL_WEAP), CINFO_PRIVDUELWEAP );
 }
 
 static void CVU_Warmup( void ) {
@@ -159,9 +159,9 @@ static void CVU_ToggleAtk( void ) {
 }
 
 static void CVU_FixRoll( void ) {
-	SetCInfo( japp_fixRoll.integer & 1, CINFO_JK2ROLL1 );
-	SetCInfo( japp_fixRoll.integer & 2, CINFO_JK2ROLL2 );
-	SetCInfo( japp_fixRoll.integer & 4, CINFO_JK2ROLL3 );
+	SetCInfo( japp_fixRoll.bits & 1, CINFO_JK2ROLL1 );
+	SetCInfo( japp_fixRoll.bits & 2, CINFO_JK2ROLL2 );
+	SetCInfo( japp_fixRoll.bits & 4, CINFO_JK2ROLL3 );
 }
 
 static void CVU_Flipkick( void ) {
@@ -174,7 +174,7 @@ static void CVU_YellowDFA( void ) {
 
 static void CVU_Promode( void ) {
 	SetCInfo( japp_promode.integer, CINFO_CPMPHYSICS );
-	CPM_UpdateSettings( !!(jp_cinfo.integer & CINFO_CPMPHYSICS) );
+	CPM_UpdateSettings( !!(jp_cinfo.bits & CINFO_CPMPHYSICS) );
 }
 
 static void CVU_HeadSlide( void ) {
@@ -194,7 +194,7 @@ static void CVU_WeaponRoll( void ) {
 }
 
 static void CVU_CInfo( void ) {
-	CPM_UpdateSettings( !!(jp_cinfo.integer & CINFO_CPMPHYSICS) );
+	CPM_UpdateSettings( !!(jp_cinfo.bits & CINFO_CPMPHYSICS) );
 }
 
 
@@ -434,9 +434,9 @@ static void G_SpawnHoleFixes( void ) {
 
 			// fix so mins is actually mins and maxs is actually maxs
 			for ( i = 0; i < 3; i++ ) {
-				number temp = max( mins.data[i], maxs.data[i] );
-				mins.data[i] = min( mins.data[i], maxs.data[i] );
-				maxs.data[i] = temp;
+				float temp = max( mins.raw[i], maxs.raw[i] );
+				mins.raw[i] = min( mins.raw[i], maxs.raw[i] );
+				maxs.raw[i] = temp;
 			}
 
 			count = G_AddBox( &mins, &maxs );

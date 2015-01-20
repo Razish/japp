@@ -1237,10 +1237,10 @@ void ForceProtect( gentity_t *self ) {
 	}
 
 	// Make sure to turn off Force Rage and Force Absorb.
-	if ( self->client->ps.fd.forcePowersActive & (1 << FP_RAGE) && !(japp_allowForceCombo.integer & 2) ) {
+	if ( self->client->ps.fd.forcePowersActive & (1 << FP_RAGE) && !(japp_allowForceCombo.bits & 2) ) {
 		WP_ForcePowerStop( self, FP_RAGE );
 	}
-	if ( self->client->ps.fd.forcePowersActive & (1 << FP_ABSORB) && !(japp_allowForceCombo.integer & 1) ) {
+	if ( self->client->ps.fd.forcePowersActive & (1 << FP_ABSORB) && !(japp_allowForceCombo.bits & 1) ) {
 		WP_ForcePowerStop( self, FP_ABSORB );
 	}
 
@@ -1443,8 +1443,8 @@ void ForceShootLightning( gentity_t *self ) {
 
 		VectorCopy( &self->client->ps.origin, &center );
 		for ( i = 0; i < 3; i++ ) {
-			mins.data[i] = center.data[i] - radius;
-			maxs.data[i] = center.data[i] + radius;
+			mins.raw[i] = center.raw[i] - radius;
+			maxs.raw[i] = center.raw[i] + radius;
 		}
 		numListedEntities = trap->EntitiesInBox( &mins, &maxs, iEntityList, MAX_GENTITIES );
 
@@ -1475,9 +1475,9 @@ void ForceShootLightning( gentity_t *self ) {
 			//this is all to see if we need to start a saber attack, if it's in flight, this doesn't matter
 			// find the distance from the edge of the bounding box
 			for ( i = 0; i < 3; i++ ) {
-				if ( center.data[i] < traceEnt->r.absmin.data[i] )	v.data[i] = traceEnt->r.absmin.data[i] - center.data[i];
-				else if ( center.data[i] > traceEnt->r.absmax.data[i] )	v.data[i] = center.data[i] - traceEnt->r.absmax.data[i];
-				else													v.data[i] = 0;
+				if ( center.raw[i] < traceEnt->r.absmin.raw[i] )	v.raw[i] = traceEnt->r.absmin.raw[i] - center.raw[i];
+				else if ( center.raw[i] > traceEnt->r.absmax.raw[i] )	v.raw[i] = center.raw[i] - traceEnt->r.absmax.raw[i];
+				else													v.raw[i] = 0;
 			}
 
 			VectorSubtract( &traceEnt->r.absmax, &traceEnt->r.absmin, &size );
@@ -1682,8 +1682,8 @@ int ForceShootDrain( gentity_t *self ) {
 
 		VectorCopy( &self->client->ps.origin, &center );
 		for ( i = 0; i < 3; i++ ) {
-			mins.data[i] = center.data[i] - radius;
-			maxs.data[i] = center.data[i] + radius;
+			mins.raw[i] = center.raw[i] - radius;
+			maxs.raw[i] = center.raw[i] + radius;
 		}
 		numListedEntities = trap->EntitiesInBox( &mins, &maxs, iEntityList, MAX_GENTITIES );
 
@@ -1716,9 +1716,9 @@ int ForceShootDrain( gentity_t *self ) {
 			//this is all to see if we need to start a saber attack, if it's in flight, this doesn't matter
 			// find the distance from the edge of the bounding box
 			for ( i = 0; i < 3; i++ ) {
-				if ( center.data[i] < traceEnt->r.absmin.data[i] )	v.data[i] = traceEnt->r.absmin.data[i] - center.data[i];
-				else if ( center.data[i] > traceEnt->r.absmax.data[i] )	v.data[i] = center.data[i] - traceEnt->r.absmax.data[i];
-				else													v.data[i] = 0;
+				if ( center.raw[i] < traceEnt->r.absmin.raw[i] )	v.raw[i] = traceEnt->r.absmin.raw[i] - center.raw[i];
+				else if ( center.raw[i] > traceEnt->r.absmax.raw[i] )	v.raw[i] = center.raw[i] - traceEnt->r.absmax.raw[i];
+				else													v.raw[i] = 0;
 			}
 
 			VectorSubtract( &traceEnt->r.absmax, &traceEnt->r.absmin, &size );
@@ -2142,8 +2142,8 @@ void ForceTelepathy( gentity_t *self ) {
 	VectorCopy( &self->client->ps.origin, &center );
 
 	for ( i = 0; i < 3; i++ ) {
-		mins.data[i] = center.data[i] - radius;
-		maxs.data[i] = center.data[i] + radius;
+		mins.raw[i] = center.raw[i] - radius;
+		maxs.raw[i] = center.raw[i] + radius;
 	}
 
 	if ( self->client->ps.fd.forcePowerLevel[FP_TELEPATHY] == FORCE_LEVEL_1 ) {
@@ -2446,8 +2446,8 @@ void ForceThrow( gentity_t *self, qboolean pull ) {
 	VectorCopy( &self->client->ps.origin, &center );
 
 	for ( i = 0; i < 3; i++ ) {
-		mins.data[i] = center.data[i] - radius;
-		maxs.data[i] = center.data[i] + radius;
+		mins.raw[i] = center.raw[i] - radius;
+		maxs.raw[i] = center.raw[i] + radius;
 	}
 
 
@@ -2616,14 +2616,14 @@ void ForceThrow( gentity_t *self, qboolean pull ) {
 		//this is all to see if we need to start a saber attack, if it's in flight, this doesn't matter
 		// find the distance from the edge of the bounding box
 		for ( i = 0; i < 3; i++ ) {
-			if ( center.data[i] < ent->r.absmin.data[i] ) {
-				v.data[i] = ent->r.absmin.data[i] - center.data[i];
+			if ( center.raw[i] < ent->r.absmin.raw[i] ) {
+				v.raw[i] = ent->r.absmin.raw[i] - center.raw[i];
 			}
-			else if ( center.data[i] > ent->r.absmax.data[i] ) {
-				v.data[i] = center.data[i] - ent->r.absmax.data[i];
+			else if ( center.raw[i] > ent->r.absmax.raw[i] ) {
+				v.raw[i] = center.raw[i] - ent->r.absmax.raw[i];
 			}
 			else {
-				v.data[i] = 0;
+				v.raw[i] = 0;
 			}
 		}
 

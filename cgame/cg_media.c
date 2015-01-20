@@ -911,7 +911,7 @@ static void CG_RegisterModels( void ) {
 
 		trap->R_ModelBounds( cgs.inlineDrawModel[i], &mins, &maxs );
 		for ( j = 0; j < 3; j++ )
-			cgs.inlineModelMidpoints[i].data[j] = mins.data[j] + 0.5f * (maxs.data[j] - mins.data[j]);
+			cgs.inlineModelMidpoints[i].raw[j] = mins.raw[j] + 0.5f * (maxs.raw[j] - mins.raw[j]);
 	}
 
 	CG_LoadingString( "Server models" );
@@ -953,7 +953,7 @@ static void CG_RegisterModels( void ) {
 		cgs.inlineDrawModel[breakPoint] = trap->R_RegisterModel( bspName );
 		trap->R_ModelBounds( cgs.inlineDrawModel[breakPoint], &mins, &maxs );
 		for ( j = 0; j < 3; j++ )
-			cgs.inlineModelMidpoints[breakPoint].data[j] = mins.data[j] + 0.5f * (maxs.data[j] - mins.data[j]);
+			cgs.inlineModelMidpoints[breakPoint].raw[j] = mins.raw[j] + 0.5f * (maxs.raw[j] - mins.raw[j]);
 
 		breakPoint++;
 		for ( sub = 1; sub < MAX_MODELS; sub++ ) {
@@ -964,7 +964,7 @@ static void CG_RegisterModels( void ) {
 
 			trap->R_ModelBounds( cgs.inlineDrawModel[breakPoint], &mins, &maxs );
 			for ( j = 0; j < 3; j++ )
-				cgs.inlineModelMidpoints[breakPoint].data[j] = mins.data[j] + 0.5f * (maxs.data[j] - mins.data[j]);
+				cgs.inlineModelMidpoints[breakPoint].raw[j] = mins.raw[j] + 0.5f * (maxs.raw[j] - mins.raw[j]);
 			breakPoint++;
 		}
 	}

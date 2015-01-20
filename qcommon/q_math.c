@@ -451,7 +451,7 @@ void RotatePointAroundVector( vector3 *dst, const vector3 *dir, const vector3 *p
 	MatrixMultiply( tmpmat, im, rot );
 
 	for ( i = 0; i < 3; i++ ) {
-		dst->data[i] = DotProduct( &rot[i], point );
+		dst->raw[i] = DotProduct( &rot[i], point );
 	}
 }
 
@@ -703,7 +703,7 @@ void SetPlaneSignbits( cplane_t *out ) {
 	// for fast box on planeside test
 	bits = 0;
 	for ( j = 0; j < 3; j++ ) {
-		if ( out->normal.data[j] < 0 ) {
+		if ( out->normal.raw[j] < 0 ) {
 			bits |= 1 << j;
 		}
 	}
@@ -721,10 +721,10 @@ int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
 
 	// fast axial cases
 	if ( p->type < 3 ) {
-		if ( p->dist <= emins->data[p->type] ) {
+		if ( p->dist <= emins->raw[p->type] ) {
 			return 1;
 		}
-		if ( p->dist >= emaxs->data[p->type] ) {
+		if ( p->dist >= emaxs->raw[p->type] ) {
 			return 2;
 		}
 		return 3;
@@ -1019,9 +1019,9 @@ float RadiusFromBounds( const vector3 *mins, const vector3 *maxs ) {
 	float	a, b;
 
 	for ( i = 0; i<3; i++ ) {
-		a = Q_fabs( mins->data[i] );
-		b = Q_fabs( maxs->data[i] );
-		corner.data[i] = a > b ? a : b;
+		a = Q_fabs( mins->raw[i] );
+		b = Q_fabs( maxs->raw[i] );
+		corner.raw[i] = a > b ? a : b;
 	}
 
 	return VectorLength( &corner );
@@ -1033,14 +1033,14 @@ void ClearBounds( vector3 *mins, vector3 *maxs ) {
 	maxs->x = maxs->y = maxs->z = -99999;
 }
 
-number DistanceHorizontal( const vector3 *p1, const vector3 *p2 ) {
+float DistanceHorizontal( const vector3 *p1, const vector3 *p2 ) {
 	vector3	v;
 
 	VectorSubtract( p2, p1, &v );
 	return sqrtf( v.x*v.x + v.y*v.y );	//Leave off the z component
 }
 
-number DistanceHorizontalSquared( const vector3 *p1, const vector3 *p2 ) {
+float DistanceHorizontalSquared( const vector3 *p1, const vector3 *p2 ) {
 	vector3	v;
 
 	VectorSubtract( p2, p1, &v );
@@ -1112,7 +1112,7 @@ void VectorNegate( const vector3 *vecIn, vector3 *vecOut ) {
 	vecOut->z = -vecIn->z;
 }
 
-void VectorScale( const vector3 *vecIn, number scale, vector3 *vecOut ) {
+void VectorScale( const vector3 *vecIn, float scale, vector3 *vecOut ) {
 #ifdef USE_SSE
 	__asm {
 		movss xmm0, scale
@@ -1135,7 +1135,7 @@ void VectorScale( const vector3 *vecIn, number scale, vector3 *vecOut ) {
 #endif
 }
 
-void VectorScale4( const vector4 *vecIn, number scale, vector4 *vecOut ) {
+void VectorScale4( const vector4 *vecIn, float scale, vector4 *vecOut ) {
 	vecOut->x = vecIn->x * scale;
 	vecOut->y = vecIn->y * scale;
 	vecOut->z = vecIn->z * scale;
@@ -1148,26 +1148,26 @@ void VectorScaleVector( const vector3 *vecIn, const vector3 *vecScale, vector3 *
 	vecOut->z = vecIn->z * vecScale->z;
 }
 
-void VectorMA( const vector3 *vec1, number scale, const vector3 *vec2, vector3 *vecOut ) {
+void VectorMA( const vector3 *vec1, float scale, const vector3 *vec2, vector3 *vecOut ) {
 	vecOut->x = vec1->x + vec2->x*scale;
 	vecOut->y = vec1->y + vec2->y*scale;
 	vecOut->z = vec1->z + vec2->z*scale;
 }
 
-void VectorLerp( const vector3 *vec1, number frac, const vector3 *vec2, vector3 *vecOut ) {
+void VectorLerp( const vector3 *vec1, float frac, const vector3 *vec2, vector3 *vecOut ) {
 	vecOut->x = vec1->x + (vec2->x - vec1->x)*frac;
 	vecOut->y = vec1->y + (vec2->y - vec1->y)*frac;
 	vecOut->z = vec1->z + (vec2->z - vec1->z)*frac;
 }
 
-void VectorLerp4( const vector4 *vec1, number frac, const vector4 *vec2, vector4 *vecOut ) {
+void VectorLerp4( const vector4 *vec1, float frac, const vector4 *vec2, vector4 *vecOut ) {
 	vecOut->x = vec1->x + (vec2->x - vec1->x)*frac;
 	vecOut->y = vec1->y + (vec2->y - vec1->y)*frac;
 	vecOut->z = vec1->z + (vec2->z - vec1->z)*frac;
 	vecOut->w = vec1->w + (vec2->w - vec1->w)*frac;
 }
 
-number VectorLength( const vector3 *vec ) {
+float VectorLength( const vector3 *vec ) {
 #ifdef USE_SSE
 	float res;
 
@@ -1198,7 +1198,7 @@ number VectorLength( const vector3 *vec ) {
 #endif
 }
 
-number VectorLengthSquared( const vector3 *vec ) {
+float VectorLengthSquared( const vector3 *vec ) {
 #ifdef USE_SSE
 	float res;
 
@@ -1228,14 +1228,14 @@ number VectorLengthSquared( const vector3 *vec ) {
 #endif
 }
 
-number Distance( const vector3 *p1, const vector3 *p2 ) {
+float Distance( const vector3 *p1, const vector3 *p2 ) {
 	vector3	v;
 
 	VectorSubtract( p2, p1, &v );
 	return VectorLength( &v );
 }
 
-number DistanceSquared( const vector3 *p1, const vector3 *p2 ) {
+float DistanceSquared( const vector3 *p1, const vector3 *p2 ) {
 	vector3	v;
 
 	VectorSubtract( p2, p1, &v );
@@ -1252,7 +1252,7 @@ void VectorNormalizeFast( vector3 *vec ) {
 	vec->z *= ilength;
 }
 
-number VectorNormalize( vector3 *vec ) {
+float VectorNormalize( vector3 *vec ) {
 	float length = DotProduct( vec, vec );
 
 	if ( length ) {
@@ -1264,7 +1264,7 @@ number VectorNormalize( vector3 *vec ) {
 	return length;
 }
 
-number VectorNormalize2( const vector3 *vec, vector3 *vecOut ) {
+float VectorNormalize2( const vector3 *vec, vector3 *vecOut ) {
 	float length = DotProduct( vec, vec );
 
 	if ( length ) {
@@ -1296,13 +1296,13 @@ void VectorCopy4( const vector4 *vecIn, vector4 *vecOut ) {
 	vecOut->w = vecIn->w;
 }
 
-void VectorSet( vector3 *vec, number x, number y, number z ) {
+void VectorSet( vector3 *vec, float x, float y, float z ) {
 	vec->x = x;
 	vec->y = y;
 	vec->z = z;
 }
 
-void VectorSet4( vector4 *vec, number x, number y, number z, number w ) {
+void VectorSet4( vector4 *vec, float x, float y, float z, float w ) {
 	vec->x = x;
 	vec->y = y;
 	vec->z = z;
@@ -1347,7 +1347,7 @@ void CrossProduct( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut ) {
 	vecOut->z = (vec1->x * vec2->y) - (vec1->y * vec2->x);
 }
 
-number DotProduct( const vector3 *vec1, const vector3 *vec2 ) {
+float DotProduct( const vector3 *vec1, const vector3 *vec2 ) {
 #ifdef USE_SSE
 	float res;
 
@@ -1433,10 +1433,10 @@ void VectorSnapTowards( vector3 *v, vector3 *to ) {
 	int i;
 
 	for ( i = 0; i < 3; i++ ) {
-		if ( to->data[i] <= v->data[i] )
-			v->data[i] = floorf( v->data[i] );
+		if ( to->raw[i] <= v->raw[i] )
+			v->raw[i] = floorf( v->raw[i] );
 		else
-			v->data[i] = ceilf( v->data[i] );
+			v->raw[i] = ceilf( v->raw[i] );
 	}
 }
 
@@ -1506,13 +1506,13 @@ void PerpendicularVector( vector3 *dst, const vector3 *src ) {
 	** find the smallest magnitude axially aligned vector
 	*/
 	for ( pos = 0, i = 0; i < 3; i++ ) {
-		if ( Q_fabs( src->data[i] ) < minelem ) {
+		if ( Q_fabs( src->raw[i] ) < minelem ) {
 			pos = i;
-			minelem = Q_fabs( src->data[i] );
+			minelem = Q_fabs( src->raw[i] );
 		}
 	}
 	tempvec.x = tempvec.y = tempvec.z = 0.0f;
-	tempvec.data[pos] = 1.0f;
+	tempvec.raw[pos] = 1.0f;
 
 	/*
 	** project the point onto the plane defined by src
@@ -1549,10 +1549,10 @@ void NormalToLatLong( const vector3 *normal, byte bytes[2] ) {
 	else {
 		int	a, b;
 
-		a = (int)(RAD2DEG( (number)atan2f( normal->y, normal->x ) ) * (255.0f / 360.0f));
+		a = (int)(RAD2DEG( (float)atan2f( normal->y, normal->x ) ) * (255.0f / 360.0f));
 		a &= 0xff;
 
-		b = (int)(RAD2DEG( (number)acosf( normal->z ) ) * (255.0f / 360.0f));
+		b = (int)(RAD2DEG( (float)acosf( normal->z ) ) * (255.0f / 360.0f));
 		b &= 0xff;
 
 		bytes[0] = b;	// longitude

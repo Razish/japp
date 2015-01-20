@@ -1442,12 +1442,12 @@ static void Slap( gentity_t *targ ) {
 	int i;
 
 	for ( i = 0; i<2; i++ ) {
-		newDir.data[i] = crandom();
-		if ( newDir.data[i] > 0.0f ) {
-			newDir.data[i] = ceilf( newDir.data[i] );
+		newDir.raw[i] = crandom();
+		if ( newDir.raw[i] > 0.0f ) {
+			newDir.raw[i] = ceilf( newDir.raw[i] );
 		}
 		else {
-			newDir.data[i] = floorf( newDir.data[i] );
+			newDir.raw[i] = floorf( newDir.raw[i] );
 		}
 	}
 	newDir.z = 1.0f;

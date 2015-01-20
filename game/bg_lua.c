@@ -563,7 +563,7 @@ static int JPLua_Export_DrawPic( lua_State *L ) {
 	y = lua_tointeger( L, 2 );
 	w = lua_tointeger( L, 3 );
 	h = lua_tointeger( L, 4 );
-	JPLua_ReadFloats( colour.data, 4, L, 5 );
+	JPLua_ReadFloats( colour.raw, 4, L, 5 );
 	shader = lua_tointeger( L, 6 );
 
 	trap->R_SetColor( &colour );
@@ -578,7 +578,7 @@ static int JPLua_Export_DrawPic( lua_State *L ) {
 static int JPLua_Export_DrawRect( lua_State *L ) {
 	vector4 colour = { 1.0f };
 
-	JPLua_ReadFloats( colour.data, 4, L, 5 );
+	JPLua_ReadFloats( colour.raw, 4, L, 5 );
 
 	CG_FillRect( (float)lua_tonumber( L, 1 ), (float)lua_tonumber( L, 2 ), (float)lua_tonumber( L, 3 ),
 		(float)lua_tonumber( L, 4 ), &colour );
@@ -597,7 +597,7 @@ static int JPLua_Export_DrawRotatedPic( lua_State *L ) {
 	w = lua_tointeger( L, 3 );
 	h = lua_tointeger( L, 4 );
 	angle = lua_tonumber( L, 5 );
-	JPLua_ReadFloats( colour.data, 4, L, 6 );
+	JPLua_ReadFloats( colour.raw, 4, L, 6 );
 	shader = lua_tointeger( L, 7 );
 
 	trap->R_SetColor( &colour );
@@ -612,7 +612,7 @@ static int JPLua_Export_DrawRotatedPic( lua_State *L ) {
 static int JPLua_Export_DrawText( lua_State *L ) {
 	vector4 colour = { 1.0f };
 
-	JPLua_ReadFloats( colour.data, 4, L, 4 );
+	JPLua_ReadFloats( colour.raw, 4, L, 4 );
 
 	CG_Text_Paint( (float)lua_tonumber( L, 1 ), (float)lua_tonumber( L, 2 ), (float)lua_tonumber( L, 5 ), &colour,
 		lua_tostring( L, 3 ), 0.0f, 0, lua_tointeger( L, 6 ), lua_tointeger( L, 7 ) );
@@ -697,7 +697,7 @@ static int JPLua_Export_GetMapTime( lua_State *L ) {
 	secs = msec / 1000;
 	mins = secs / 60;
 
-	if ( cgs.timelimit && (cg_drawTimer.integer & DRAWTIMER_COUNTDOWN) ) {// count down
+	if ( cgs.timelimit && (cg_drawTimer.bits & DRAWTIMER_COUNTDOWN) ) {// count down
 		msec = limitSec * 1000 - (msec);
 		secs = msec / 1000;
 		mins = secs / 60;

@@ -51,7 +51,7 @@ void G_ReflectMissile( gentity_t *ent, gentity_t *missile, vector3 *forward ) {
 		VectorNormalize( &bounce_dir );
 	}
 	for ( i = 0; i < 3; i++ ) {
-		bounce_dir.data[i] += RandFloat( -0.2f, 0.2f );
+		bounce_dir.raw[i] += RandFloat( -0.2f, 0.2f );
 	}
 
 	VectorNormalize( &bounce_dir );
@@ -90,7 +90,7 @@ void G_DeflectMissile( gentity_t *ent, gentity_t *missile, vector3 *forward ) {
 	}
 
 	for ( i = 0; i < 3; i++ ) {
-		bounce_dir.data[i] += RandFloat( -1.0f, 1.0f );
+		bounce_dir.raw[i] += RandFloat( -1.0f, 1.0f );
 	}
 
 	VectorNormalize( &bounce_dir );
@@ -646,7 +646,7 @@ killProj:
 			ent->enemy = other;
 
 			for ( i = 0; i < 3; i++ )
-				v.data[i] = other->r.currentOrigin.data[i] + (other->r.mins.data[i] + other->r.maxs.data[i]) * 0.5f;
+				v.raw[i] = other->r.currentOrigin.raw[i] + (other->r.mins.raw[i] + other->r.maxs.raw[i]) * 0.5f;
 			SnapVectorTowards( &v, &ent->s.pos.trBase );	//	Save net bandwidth
 		}
 		else {

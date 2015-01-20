@@ -366,10 +366,10 @@ static void CG_InterpolatePlayerState( qboolean grabAngles ) {
 	out->bobCycle = prev->ps.bobCycle + f * (i - prev->ps.bobCycle);
 
 	for ( i = 0; i < 3; i++ ) {
-		out->origin.data[i] = prev->ps.origin.data[i] + f*(next->ps.origin.data[i] - prev->ps.origin.data[i]);
+		out->origin.raw[i] = prev->ps.origin.raw[i] + f*(next->ps.origin.raw[i] - prev->ps.origin.raw[i]);
 		if ( !grabAngles )
-			out->viewangles.data[i] = LerpAngle( prev->ps.viewangles.data[i], next->ps.viewangles.data[i], f );
-		out->velocity.data[i] = prev->ps.velocity.data[i] + f*(next->ps.velocity.data[i] - prev->ps.velocity.data[i]);
+			out->viewangles.raw[i] = LerpAngle( prev->ps.viewangles.raw[i], next->ps.viewangles.raw[i], f );
+		out->velocity.raw[i] = prev->ps.velocity.raw[i] + f*(next->ps.velocity.raw[i] - prev->ps.velocity.raw[i]);
 	}
 }
 
@@ -409,10 +409,10 @@ static void CG_InterpolateVehiclePlayerState( qboolean grabAngles ) {
 	out->bobCycle = prev->vps.bobCycle + f * (i - prev->vps.bobCycle);
 
 	for ( i = 0; i < 3; i++ ) {
-		out->origin.data[i] = prev->vps.origin.data[i] + f * (next->vps.origin.data[i] - prev->vps.origin.data[i]);
+		out->origin.raw[i] = prev->vps.origin.raw[i] + f * (next->vps.origin.raw[i] - prev->vps.origin.raw[i]);
 		if ( !grabAngles )
-			out->viewangles.data[i] = LerpAngle( prev->vps.viewangles.data[i], next->vps.viewangles.data[i], f );
-		out->velocity.data[i] = prev->vps.velocity.data[i] + f*(next->vps.velocity.data[i] - prev->vps.velocity.data[i]);
+			out->viewangles.raw[i] = LerpAngle( prev->vps.viewangles.raw[i], next->vps.viewangles.raw[i], f );
+		out->velocity.raw[i] = prev->vps.velocity.raw[i] + f*(next->vps.velocity.raw[i] - prev->vps.velocity.raw[i]);
 	}
 }
 

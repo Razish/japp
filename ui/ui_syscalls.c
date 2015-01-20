@@ -289,13 +289,13 @@ void trap_S_StartBackgroundTrack( const char *intro, const char *loop, qboolean 
 int trap_RealTime( qtime_t *qtime ) {
 	return Q_syscall( UI_REAL_TIME, qtime );
 }
-int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits ) {
+int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, uint32_t bits ) {
 	return Q_syscall( UI_CIN_PLAYCINEMATIC, arg0, xpos, ypos, width, height, bits );
 }
-e_status trap_CIN_StopCinematic( int handle ) {
+cinState_t trap_CIN_StopCinematic( int handle ) {
 	return Q_syscall( UI_CIN_STOPCINEMATIC, handle );
 }
-e_status trap_CIN_RunCinematic( int handle ) {
+cinState_t trap_CIN_RunCinematic( int handle ) {
 	return Q_syscall( UI_CIN_RUNCINEMATIC, handle );
 }
 void trap_CIN_DrawCinematic( int handle ) {

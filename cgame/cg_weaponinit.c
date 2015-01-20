@@ -40,7 +40,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 	// calc midpoint for rotation
 	trap->R_ModelBounds( weaponInfo->weaponModel, &mins, &maxs );
 	for ( i = 0; i < 3; i++ )
-		weaponInfo->weaponMidpoint.data[i] = mins.data[i] + 0.5f * (maxs.data[i] - mins.data[i]);
+		weaponInfo->weaponMidpoint.raw[i] = mins.raw[i] + 0.5f * (maxs.raw[i] - mins.raw[i]);
 
 	weaponInfo->weaponIcon = trap->R_RegisterShaderNoMip( item->icon );
 	weaponInfo->ammoIcon = trap->R_RegisterShaderNoMip( item->icon );

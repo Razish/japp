@@ -227,7 +227,7 @@ void RGB_LerpColor( vector3 *from, vector3 *to, float frac, vector3 *out ) {
 	VectorCopy( from, out );
 
 	for ( i = 0; i < 3; i++ )
-		out->data[i] += diff.data[i] * frac;
+		out->raw[i] += diff.raw[i] * frac;
 
 }
 
@@ -242,7 +242,7 @@ void ParseRGBSaber( char *str, vector3 *c ) {
 	int i;
 
 	for ( i = 0; i < 3; i++ ) {
-		c->data[i] = (float)getint( &p );
+		c->raw[i] = (float)getint( &p );
 		p++;
 	}
 }
@@ -284,7 +284,7 @@ static void UI_RGBForSaberColor( saber_colors_t color, vector3 *rgb, int bnum ) 
 			rgb->b = atoi( UI_Cvar_VariableString( "ui_sab2_b" ) );
 		}
 		for ( i = 0; i < 3; i++ )
-			rgb->data[i] /= 255;
+			rgb->raw[i] /= 255;
 		break;
 	}
 }
@@ -377,7 +377,7 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 		radiusmult = 1.0f;
 
 	for ( i = 0; i < 3; i++ )
-		rgb.data[i] *= 255;
+		rgb.raw[i] *= 255;
 	radiusRange = radius * 0.075f;
 	radiusStart = radius - radiusRange;
 
@@ -393,7 +393,7 @@ void UI_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 		saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 	else {
 		for ( i = 0; i < 3; i++ )
-			saber.shaderRGBA[i] = rgb.data[i];
+			saber.shaderRGBA[i] = rgb.raw[i];
 		saber.shaderRGBA[3] = 0xff;
 	}
 	//	saber.renderfx = rfx;
@@ -527,7 +527,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 
 	UI_RGBForSaberColor( color, &rgb, bnum );
 	for ( i = 0; i<3; i++ )
-		rgb.data[i] *= 255;
+		rgb.raw[i] *= 255;
 	{
 		saber.renderfx = rfx;
 		if ( blade_len - ((effectradius*1.0f) / 2) > 0 ) {
@@ -541,7 +541,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 				saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * 1.0f;
 			else {
 				for ( i = 0; i < 3; i++ )
-					saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
+					saber.shaderRGBA[i] = rgb.raw[i] * effectalpha;
 				saber.shaderRGBA[3] = 255 * effectalpha;
 			}
 
@@ -562,7 +562,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 		else {
 			for ( i = 0; i < 3; i++ )
-				saber.shaderRGBA[i] = rgb.data[i];
+				saber.shaderRGBA[i] = rgb.raw[i];
 		}
 		sbak = saber;
 		SE_R_AddRefEntityToScene( &saber, cnum );
@@ -591,7 +591,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 				saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * effectalpha;
 			else {
 				for ( i = 0; i < 3; i++ )
-					saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
+					saber.shaderRGBA[i] = rgb.raw[i] * effectalpha;
 				saber.shaderRGBA[3] = 255 * effectalpha;
 			}
 
@@ -612,7 +612,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 		else {
 			for ( i = 0; i < 3; i++ )
-				saber.shaderRGBA[i] = rgb.data[i];
+				saber.shaderRGBA[i] = rgb.raw[i];
 			saber.shaderRGBA[3] = 255;
 		}
 		sbak = saber;
@@ -645,7 +645,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 				saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * effectalpha;
 			else {
 				for ( i = 0; i < 3; i++ )
-					saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
+					saber.shaderRGBA[i] = rgb.raw[i] * effectalpha;
 				saber.shaderRGBA[3] = 255 * effectalpha;
 			}
 			SE_R_AddRefEntityToScene( &saber, cnum );
@@ -666,7 +666,7 @@ void UI_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 		else {
 			for ( i = 0; i < 3; i++ )
-				saber.shaderRGBA[i] = rgb.data[i];
+				saber.shaderRGBA[i] = rgb.raw[i];
 			saber.shaderRGBA[3] = 255;
 		}
 		sbak = saber;

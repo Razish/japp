@@ -111,9 +111,9 @@ static void CG_AddTestModel( void ) {
 
 		// allow the position to be adjusted
 		for ( i = 0; i < 3; i++ ) {
-			cg.testModelEntity.origin.data[i] += refdef->viewaxis[0].data[i] * cg.gunAlign.x;
-			cg.testModelEntity.origin.data[i] += refdef->viewaxis[1].data[i] * cg.gunAlign.y;
-			cg.testModelEntity.origin.data[i] += refdef->viewaxis[2].data[i] * cg.gunAlign.z;
+			cg.testModelEntity.origin.raw[i] += refdef->viewaxis[0].raw[i] * cg.gunAlign.x;
+			cg.testModelEntity.origin.raw[i] += refdef->viewaxis[1].raw[i] * cg.gunAlign.y;
+			cg.testModelEntity.origin.raw[i] += refdef->viewaxis[2].raw[i] * cg.gunAlign.z;
 		}
 	}
 
@@ -1004,8 +1004,8 @@ static qboolean CG_ThirdPersonActionCam( int clientNum ) {
 	if ( VectorLength( &v ) > 64.0f ) {
 		// don't bother moving yet if not far from the last pos
 		for ( i = 0; i < 3; i++ ) {
-			cg_actionCamLastPos[clientNum].data[i] = (cg_actionCamLastPos[clientNum].data[i] + (v.data[i] * smoothFactor));
-			refdef->vieworg.data[i] = cg_actionCamLastPos[clientNum].data[i];
+			cg_actionCamLastPos[clientNum].raw[i] = (cg_actionCamLastPos[clientNum].raw[i] + (v.raw[i] * smoothFactor));
+			refdef->vieworg.raw[i] = cg_actionCamLastPos[clientNum].raw[i];
 		}
 	}
 	else
@@ -1451,13 +1451,13 @@ void CG_SE_UpdateShake( vector3 *origin, vector3 *angles ) {
 	intensity = cgScreenEffects.shake_intensity * intensity_scale;
 
 	for ( i = 0; i < 3; i++ )
-		moveDir.data[i] = (crandom() * intensity);
+		moveDir.raw[i] = (crandom() * intensity);
 
 	//Move the camera
 	VectorAdd( origin, &moveDir, origin );
 
 	for ( i = 0; i < 2; i++ ) // Don't do ROLL
-		moveDir.data[i] = (crandom() * intensity);
+		moveDir.raw[i] = (crandom() * intensity);
 
 	//Move the angles
 	VectorAdd( angles, &moveDir, angles );

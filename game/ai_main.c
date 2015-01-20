@@ -372,19 +372,19 @@ void BotChangeViewAngles( bot_state_t *bs, float thinktime ) {
 	//if (maxchange < 240) maxchange = 240;
 	maxchange *= thinktime;
 	for ( i = 0; i < 2; i++ ) {
-		bs->viewangles.data[i] = AngleMod( bs->viewangles.data[i] );
-		bs->ideal_viewangles.data[i] = AngleMod( bs->ideal_viewangles.data[i] );
-		diff = AngleDifference( bs->viewangles.data[i], bs->ideal_viewangles.data[i] );
+		bs->viewangles.raw[i] = AngleMod( bs->viewangles.raw[i] );
+		bs->ideal_viewangles.raw[i] = AngleMod( bs->ideal_viewangles.raw[i] );
+		diff = AngleDifference( bs->viewangles.raw[i], bs->ideal_viewangles.raw[i] );
 		disired_speed = diff * factor;
-		bs->viewanglespeed.data[i] += (bs->viewanglespeed.data[i] - disired_speed);
-		if ( bs->viewanglespeed.data[i] > 180 ) bs->viewanglespeed.data[i] = maxchange;
-		if ( bs->viewanglespeed.data[i] < -180 ) bs->viewanglespeed.data[i] = -maxchange;
-		anglespeed = bs->viewanglespeed.data[i];
+		bs->viewanglespeed.raw[i] += (bs->viewanglespeed.raw[i] - disired_speed);
+		if ( bs->viewanglespeed.raw[i] > 180 ) bs->viewanglespeed.raw[i] = maxchange;
+		if ( bs->viewanglespeed.raw[i] < -180 ) bs->viewanglespeed.raw[i] = -maxchange;
+		anglespeed = bs->viewanglespeed.raw[i];
 		if ( anglespeed > maxchange ) anglespeed = maxchange;
 		if ( anglespeed < -maxchange ) anglespeed = -maxchange;
-		bs->viewangles.data[i] += anglespeed;
-		bs->viewangles.data[i] = AngleMod( bs->viewangles.data[i] );
-		bs->viewanglespeed.data[i] *= 0.45f * (1 - factor);
+		bs->viewangles.raw[i] += anglespeed;
+		bs->viewangles.raw[i] = AngleMod( bs->viewangles.raw[i] );
+		bs->viewanglespeed.raw[i] *= 0.45f * (1 - factor);
 	}
 	if ( bs->viewangles.pitch > 180 ) bs->viewangles.pitch -= 360;
 	trap->EA_View( bs->client, &bs->viewangles );
@@ -448,8 +448,8 @@ void BotInputToUserCommand( bot_input_t *bi, usercmd_t *ucmd, ivector3 *delta_an
 	ucmd->angles.roll = ANGLE2SHORT( bi->viewangles.roll );
 	//subtract the delta angles
 	for ( j = 0; j < 3; j++ ) {
-		temp = ucmd->angles.data[j] - delta_angles->data[j];
-		ucmd->angles.data[j] = temp;
+		temp = ucmd->angles.raw[j] - delta_angles->raw[j];
+		ucmd->angles.raw[j] = temp;
 	}
 	//NOTE: movement is relative to the REAL view angles
 	//get the horizontal forward and right vector
@@ -485,7 +485,7 @@ void BotUpdateInput( bot_state_t *bs, int time, int elapsed_time ) {
 
 	//add the delta angles to the bot's current view angles
 	for ( j = 0; j < 3; j++ ) {
-		bs->viewangles.data[j] = AngleMod( bs->viewangles.data[j] + SHORT2ANGLE( bs->cur_ps.delta_angles.data[j] ) );
+		bs->viewangles.raw[j] = AngleMod( bs->viewangles.raw[j] + SHORT2ANGLE( bs->cur_ps.delta_angles.raw[j] ) );
 	}
 	//change the bot view angles
 	BotChangeViewAngles( bs, (float)elapsed_time / 1000 );
@@ -499,7 +499,7 @@ void BotUpdateInput( bot_state_t *bs, int time, int elapsed_time ) {
 	BotInputToUserCommand( &bi, &bs->lastucmd, &bs->cur_ps.delta_angles, time, bs->noUseTime );
 	//subtract the delta angles
 	for ( j = 0; j < 3; j++ ) {
-		bs->viewangles.data[j] = AngleMod( bs->viewangles.data[j] - SHORT2ANGLE( bs->cur_ps.delta_angles.data[j] ) );
+		bs->viewangles.raw[j] = AngleMod( bs->viewangles.raw[j] - SHORT2ANGLE( bs->cur_ps.delta_angles.raw[j] ) );
 	}
 }
 
@@ -567,7 +567,7 @@ int BotAI( int client, float thinktime ) {
 	}
 	//add the delta angles to the bot's current view angles
 	for ( j = 0; j < 3; j++ ) {
-		bs->viewangles.data[j] = AngleMod( bs->viewangles.data[j] + SHORT2ANGLE( bs->cur_ps.delta_angles.data[j] ) );
+		bs->viewangles.raw[j] = AngleMod( bs->viewangles.raw[j] + SHORT2ANGLE( bs->cur_ps.delta_angles.raw[j] ) );
 	}
 	//increase the local time of the bot
 	bs->ltime += thinktime;
@@ -596,7 +596,7 @@ int BotAI( int client, float thinktime ) {
 
 	//subtract the delta angles
 	for ( j = 0; j < 3; j++ ) {
-		bs->viewangles.data[j] = AngleMod( bs->viewangles.data[j] - SHORT2ANGLE( bs->cur_ps.delta_angles.data[j] ) );
+		bs->viewangles.raw[j] = AngleMod( bs->viewangles.raw[j] - SHORT2ANGLE( bs->cur_ps.delta_angles.raw[j] ) );
 	}
 	//everything was ok
 	return qtrue;
@@ -1660,10 +1660,10 @@ int InFieldOfVision( vector3 *viewangles, float fov, vector3 *angles ) {
 	float diff, angle;
 
 	for ( i = 0; i < 2; i++ ) {
-		angle = AngleMod( viewangles->data[i] );
-		angles->data[i] = AngleMod( angles->data[i] );
-		diff = angles->data[i] - angle;
-		if ( angles->data[i] > angle ) {
+		angle = AngleMod( viewangles->raw[i] );
+		angles->raw[i] = AngleMod( angles->raw[i] );
+		diff = angles->raw[i] - angle;
+		if ( angles->raw[i] > angle ) {
 			if ( diff > 180.0f )
 				diff -= 360.0f;
 		}
@@ -3723,11 +3723,11 @@ void BotAimOffsetGoalAngles( bot_state_t *bs ) {
 			bs->goalAngles.pitch += bs->aimOffsetAmtPitch;
 
 		while ( i <= 2 ) {
-			if ( bs->goalAngles.data[i] > 360 )
-				bs->goalAngles.data[i] -= 360;
+			if ( bs->goalAngles.raw[i] > 360 )
+				bs->goalAngles.raw[i] -= 360;
 
-			if ( bs->goalAngles.data[i] < 0 )
-				bs->goalAngles.data[i] += 360;
+			if ( bs->goalAngles.raw[i] < 0 )
+				bs->goalAngles.raw[i] += 360;
 
 			i++;
 		}

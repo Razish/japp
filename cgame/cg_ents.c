@@ -22,7 +22,7 @@ void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qha
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( &parent->origin, &entity->origin );
 	for ( i = 0; i < 3; i++ )
-		VectorMA( &entity->origin, lerped.origin.data[i], &parent->axis[i], &entity->origin );
+		VectorMA( &entity->origin, lerped.origin.raw[i], &parent->axis[i], &entity->origin );
 
 	// had to cast away the const to avoid compiler problems...
 	MatrixMultiply( lerped.axis, parent->axis, entity->axis );
@@ -42,7 +42,7 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( &parent->origin, &entity->origin );
 	for ( i = 0; i < 3; i++ )
-		VectorMA( &entity->origin, lerped.origin.data[i], &parent->axis[i], &entity->origin );
+		VectorMA( &entity->origin, lerped.origin.raw[i], &parent->axis[i], &entity->origin );
 
 	// had to cast away the const to avoid compiler problems...
 	MatrixMultiply( entity->axis, lerped.axis, tempAxis );
@@ -764,8 +764,8 @@ static void CG_General( centity_t *cent ) {
 			VectorSubtract( &cent->lerpOrigin, &cent->turAngles, &posDif );
 
 			for ( k = 0; k < 3; k++ ) {
-				cent->turAngles.data[k] = (cent->turAngles.data[k] + posDif.data[k] * smoothFactor);
-				cent->lerpOrigin.data[k] = cent->turAngles.data[k];
+				cent->turAngles.raw[k] = (cent->turAngles.raw[k] + posDif.raw[k] * smoothFactor);
+				cent->lerpOrigin.raw[k] = cent->turAngles.raw[k];
 			}
 		}
 		else { //if we're sitting on an entity like a moving plat then we don't want to smooth either
@@ -1046,8 +1046,8 @@ static void CG_General( centity_t *cent ) {
 		VectorSubtract( &cent->lerpOrigin, &cent->turAngles, &posDif );
 
 		for ( k = 0; k < 3; k++ ) {
-			cent->turAngles.data[k] = (cent->turAngles.data[k] + posDif.data[k] * smoothFactor);
-			cent->lerpOrigin.data[k] = cent->turAngles.data[k];
+			cent->turAngles.raw[k] = (cent->turAngles.raw[k] + posDif.raw[k] * smoothFactor);
+			cent->lerpOrigin.raw[k] = cent->turAngles.raw[k];
 		}
 
 		if ( cent->ghoul2 && cent->bolt4 != -1 && cent->trailTime < cg.time ) {
@@ -2968,7 +2968,7 @@ void CG_ROFF_NotetrackCallback( centity_t *cent, const char *notetrack ) {
 				i = 0;
 				goto defaultoffsetposition;
 			}
-			parsedOffset.data[posoffsetGathered] = atof( t );
+			parsedOffset.raw[posoffsetGathered] = atof( t );
 			posoffsetGathered++;
 		}
 
@@ -3005,7 +3005,7 @@ defaultoffsetposition:
 						break;
 					}
 
-					parsedAngles.data[anglesGathered] = atof( t );
+					parsedAngles.raw[anglesGathered] = atof( t );
 					anglesGathered++;
 				}
 
@@ -3080,17 +3080,17 @@ void CG_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha ) {
 				vec[i] = 0;
 		}
 
-		apArgs.p[0].data[vec[1]] = mins->data[vec[1]];
-		apArgs.p[0].data[vec[2]] = mins->data[vec[2]];
-		apArgs.p[1].data[vec[1]] = mins->data[vec[1]];
-		apArgs.p[1].data[vec[2]] = maxs->data[vec[2]];
-		apArgs.p[2].data[vec[1]] = maxs->data[vec[1]];
-		apArgs.p[2].data[vec[2]] = maxs->data[vec[2]];
-		apArgs.p[3].data[vec[1]] = maxs->data[vec[1]];
-		apArgs.p[3].data[vec[2]] = mins->data[vec[2]];
+		apArgs.p[0].raw[vec[1]] = mins->raw[vec[1]];
+		apArgs.p[0].raw[vec[2]] = mins->raw[vec[2]];
+		apArgs.p[1].raw[vec[1]] = mins->raw[vec[1]];
+		apArgs.p[1].raw[vec[2]] = maxs->raw[vec[2]];
+		apArgs.p[2].raw[vec[1]] = maxs->raw[vec[1]];
+		apArgs.p[2].raw[vec[2]] = maxs->raw[vec[2]];
+		apArgs.p[3].raw[vec[1]] = maxs->raw[vec[1]];
+		apArgs.p[3].raw[vec[2]] = mins->raw[vec[2]];
 
 		//- face
-		apArgs.p[0].data[vec[0]] = apArgs.p[1].data[vec[0]] = apArgs.p[2].data[vec[0]] = apArgs.p[3].data[vec[0]] = mins->data[vec[0]];
+		apArgs.p[0].raw[vec[0]] = apArgs.p[1].raw[vec[0]] = apArgs.p[2].raw[vec[0]] = apArgs.p[3].raw[vec[0]] = mins->raw[vec[0]];
 
 		apArgs.numVerts = 4;
 		apArgs.alpha1 = apArgs.alpha2 = alpha;
@@ -3103,7 +3103,7 @@ void CG_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha ) {
 		trap->FX_AddPoly( &apArgs );
 
 		//+ face
-		apArgs.p[0].data[vec[0]] = apArgs.p[1].data[vec[0]] = apArgs.p[2].data[vec[0]] = apArgs.p[3].data[vec[0]] = maxs->data[vec[0]];
+		apArgs.p[0].raw[vec[0]] = apArgs.p[1].raw[vec[0]] = apArgs.p[2].raw[vec[0]] = apArgs.p[3].raw[vec[0]] = maxs->raw[vec[0]];
 
 		trap->FX_AddPoly( &apArgs );
 	}

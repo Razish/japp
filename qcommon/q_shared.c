@@ -477,7 +477,7 @@ qboolean COM_ParseVector( const char **buffer, vector3 *c ) {
 		if ( COM_ParseFloat( buffer, &f ) ) {
 			return qtrue;
 		}
-		c->data[i] = f;
+		c->raw[i] = f;
 	}
 
 	return qfalse;

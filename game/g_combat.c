@@ -1277,8 +1277,8 @@ void G_AlertTeam( gentity_t *victim, gentity_t *attacker, float radius, float so
 
 	//Setup the bbox to search in
 	for ( i = 0; i < 3; i++ ) {
-		mins.data[i] = victim->r.currentOrigin.data[i] - radius;
-		maxs.data[i] = victim->r.currentOrigin.data[i] + radius;
+		mins.raw[i] = victim->r.currentOrigin.raw[i] - radius;
+		maxs.raw[i] = victim->r.currentOrigin.raw[i] + radius;
 	}
 
 	//Get the number of entities in a given space
@@ -4496,8 +4496,8 @@ qboolean G_RadiusDamage( vector3 *origin, gentity_t *attacker, float damage, flo
 	}
 
 	for ( i = 0; i < 3; i++ ) {
-		mins.data[i] = origin->data[i] - radius;
-		maxs.data[i] = origin->data[i] + radius;
+		mins.raw[i] = origin->raw[i] - radius;
+		maxs.raw[i] = origin->raw[i] + radius;
 	}
 
 	numListedEntities = trap->EntitiesInBox( &mins, &maxs, entityList, MAX_GENTITIES );
@@ -4512,9 +4512,9 @@ qboolean G_RadiusDamage( vector3 *origin, gentity_t *attacker, float damage, flo
 
 		// find the distance from the edge of the bounding box
 		for ( i = 0; i < 3; i++ ) {
-			if ( origin->data[i] < ent->r.absmin.data[i] )		v.data[i] = ent->r.absmin.data[i] - origin->data[i];
-			else if ( origin->data[i] > ent->r.absmax.data[i] )		v.data[i] = origin->data[i] - ent->r.absmax.data[i];
-			else													v.data[i] = 0;
+			if ( origin->raw[i] < ent->r.absmin.raw[i] )		v.raw[i] = ent->r.absmin.raw[i] - origin->raw[i];
+			else if ( origin->raw[i] > ent->r.absmax.raw[i] )		v.raw[i] = origin->raw[i] - ent->r.absmax.raw[i];
+			else													v.raw[i] = 0;
 		}
 
 		dist = VectorLength( &v );

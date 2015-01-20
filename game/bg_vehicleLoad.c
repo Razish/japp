@@ -680,8 +680,12 @@ void BG_VehicleClampData( vehicleInfo_t *vehicle ) {//sanity check and clamp the
 	int		i;
 
 	for ( i = 0; i<3; i++ ) {
-		if ( vehicle->centerOfGravity.data[i] >  1.0f )	vehicle->centerOfGravity.data[i] = 1.0f;
-		else if ( vehicle->centerOfGravity.data[i] < -1.0f )	vehicle->centerOfGravity.data[i] = -1.0f;
+		if ( vehicle->centerOfGravity.raw[i] >  1.0f ) {
+			vehicle->centerOfGravity.raw[i] = 1.0f;
+		}
+		else if ( vehicle->centerOfGravity.raw[i] < -1.0f ) {
+			vehicle->centerOfGravity.raw[i] = -1.0f;
+		}
 	}
 
 	// Validate passenger max.

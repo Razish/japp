@@ -1190,23 +1190,23 @@ static void ProcessOrientCommands( Vehicle_t *pVeh ) {
 		FighterWingMalfunctionCheck( pVeh, parentPS );
 
 		while ( m < 3 ) {
-			aVelDif = pVeh->m_vFullAngleVelocity.data[m];
+			aVelDif = pVeh->m_vFullAngleVelocity.raw[m];
 
 			if ( (int)aVelDif ) {
 				dForVel = (aVelDif*0.1f)*pVeh->m_fTimeModifier;
 				if ( dForVel > 1.0f || dForVel < -1.0f ) {
-					pVeh->m_vOrientation->data[m] += dForVel;
-					pVeh->m_vOrientation->data[m] = AngleNormalize180( pVeh->m_vOrientation->data[m] );
+					pVeh->m_vOrientation->raw[m] += dForVel;
+					pVeh->m_vOrientation->raw[m] = AngleNormalize180( pVeh->m_vOrientation->raw[m] );
 					if ( m == 0/*PITCH*/ ) { //don't pitch downward into ground even more.
-						if ( pVeh->m_vOrientation->data[m] > 90.0f && (pVeh->m_vOrientation->data[m] - dForVel) < 90.0f ) {
-							pVeh->m_vOrientation->data[m] = 90.0f;
-							pVeh->m_vFullAngleVelocity.data[m] = -pVeh->m_vFullAngleVelocity.data[m];
+						if ( pVeh->m_vOrientation->raw[m] > 90.0f && (pVeh->m_vOrientation->raw[m] - dForVel) < 90.0f ) {
+							pVeh->m_vOrientation->raw[m] = 90.0f;
+							pVeh->m_vFullAngleVelocity.raw[m] = -pVeh->m_vFullAngleVelocity.raw[m];
 						}
 					}
-					pVeh->m_vFullAngleVelocity.data[m] -= dForVel;
+					pVeh->m_vFullAngleVelocity.raw[m] -= dForVel;
 				}
 				else {
-					pVeh->m_vFullAngleVelocity.data[m] = 0.0f;
+					pVeh->m_vFullAngleVelocity.raw[m] = 0.0f;
 				}
 			}
 

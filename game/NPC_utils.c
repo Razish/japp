@@ -759,8 +759,8 @@ int NPC_FindNearestEnemy( gentity_t *ent ) {
 
 	//Setup the bbox to search in
 	for ( i = 0; i < 3; i++ ) {
-		mins.data[i] = ent->r.currentOrigin.data[i] - NPCInfo->stats.visrange;
-		maxs.data[i] = ent->r.currentOrigin.data[i] + NPCInfo->stats.visrange;
+		mins.raw[i] = ent->r.currentOrigin.raw[i] - NPCInfo->stats.visrange;
+		maxs.raw[i] = ent->r.currentOrigin.raw[i] + NPCInfo->stats.visrange;
 	}
 
 	//Get a number of entities in a given space
@@ -1151,8 +1151,8 @@ int NPC_GetEntsNearBolt( int *radiusEnts, float radius, int boltIndex, vector3 *
 
 	//Setup the bbox to search in
 	for ( i = 0; i < 3; i++ ) {
-		mins.data[i] = boltOrg->data[i] - radius;
-		maxs.data[i] = boltOrg->data[i] + radius;
+		mins.raw[i] = boltOrg->raw[i] - radius;
+		maxs.raw[i] = boltOrg->raw[i] + radius;
 	}
 
 	//Get the number of entities in a given space

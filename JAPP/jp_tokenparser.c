@@ -188,7 +188,7 @@ qboolean TP_ParseVec3( vector3 *vec ) {
 			return qtrue;
 		}
 
-		vec->data[i] = atoff( token );
+		vec->raw[i] = atoff( token );
 	}
 
 	return qfalse;
@@ -203,7 +203,7 @@ qboolean TP_ParseVec4( vector4 *vec ) {
 			return qtrue;
 		}
 
-		vec->data[i] = atoff( token );
+		vec->raw[i] = atoff( token );
 	}
 
 	return qfalse;

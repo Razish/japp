@@ -69,7 +69,7 @@ void G_TransposeMatrix( vector3 matrix[3], vector3 transpose[3] ) {
 	int i, j;
 	for ( i = 0; i < 3; i++ ) {
 		for ( j = 0; j < 3; j++ ) {
-			transpose[i].data[j] = matrix[j].data[i];
+			transpose[i].raw[j] = matrix[j].raw[i];
 		}
 	}
 }
@@ -211,23 +211,23 @@ qboolean G_MoverPush( gentity_t *pusher, vector3 *move, vector3 *amove, gentity_
 
 		radius = RadiusFromBounds( &pusher->r.mins, &pusher->r.maxs );
 		for ( i = 0; i < 3; i++ ) {
-			mins.data[i] = pusher->r.currentOrigin.data[i] + move->data[i] - radius;
-			maxs.data[i] = pusher->r.currentOrigin.data[i] + move->data[i] + radius;
-			totalMins.data[i] = mins.data[i] - move->data[i];
-			totalMaxs.data[i] = maxs.data[i] - move->data[i];
+			mins.raw[i] = pusher->r.currentOrigin.raw[i] + move->raw[i] - radius;
+			maxs.raw[i] = pusher->r.currentOrigin.raw[i] + move->raw[i] + radius;
+			totalMins.raw[i] = mins.raw[i] - move->raw[i];
+			totalMaxs.raw[i] = maxs.raw[i] - move->raw[i];
 		}
 	}
 	else {
 		for ( i = 0; i < 3; i++ ) {
-			mins.data[i] = pusher->r.absmin.data[i] + move->data[i];
-			maxs.data[i] = pusher->r.absmax.data[i] + move->data[i];
+			mins.raw[i] = pusher->r.absmin.raw[i] + move->raw[i];
+			maxs.raw[i] = pusher->r.absmax.raw[i] + move->raw[i];
 		}
 
 		VectorCopy( &pusher->r.absmin, &totalMins );
 		VectorCopy( &pusher->r.absmax, &totalMaxs );
 		for ( i = 0; i<3; i++ ) {
-			if ( move->data[i] > 0 )	totalMaxs.data[i] += move->data[i];
-			else						totalMins.data[i] += move->data[i];
+			if ( move->raw[i] > 0 )	totalMaxs.raw[i] += move->raw[i];
+			else						totalMins.raw[i] += move->raw[i];
 		}
 	}
 
@@ -839,18 +839,18 @@ static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other, trace_
 
 	axis = ent->count;
 	VectorClear( &dir );
-	if ( fabsf( other->s.origin.data[axis] - ent->r.absmax.data[axis] ) <
-		fabsf( other->s.origin.data[axis] - ent->r.absmin.data[axis] ) ) {
-		origin.data[axis] = ent->r.absmin.data[axis] - 25; //Raz: was 10
-		dir.data[axis] = -1;
+	if ( fabsf( other->s.origin.raw[axis] - ent->r.absmax.raw[axis] ) <
+		fabsf( other->s.origin.raw[axis] - ent->r.absmin.raw[axis] ) ) {
+		origin.raw[axis] = ent->r.absmin.raw[axis] - 25; //Raz: was 10
+		dir.raw[axis] = -1;
 	}
 	else {
-		origin.data[axis] = ent->r.absmax.data[axis] + 25; //Raz: ^^^
-		dir.data[axis] = 1;
+		origin.raw[axis] = ent->r.absmax.raw[axis] + 25; //Raz: ^^^
+		dir.raw[axis] = 1;
 	}
 	for ( i = 0; i < 3; i++ ) {
 		if ( i == axis ) continue;
-		origin.data[i] = (ent->r.absmin.data[i] + ent->r.absmax.data[i]) * 0.5f;
+		origin.raw[i] = (ent->r.absmin.raw[i] + ent->r.absmax.raw[i]) * 0.5f;
 	}
 
 	vectoangles( &dir, &angles );
@@ -959,12 +959,12 @@ void Think_SpawnNewDoorTrigger( gentity_t *ent ) {
 	// find the thinnest axis, which will be the one we expand
 	best = 0;
 	for ( i = 1; i < 3; i++ ) {
-		if ( maxs.data[i] - mins.data[i] < maxs.data[best] - mins.data[best] ) {
+		if ( maxs.raw[i] - mins.raw[i] < maxs.raw[best] - mins.raw[best] ) {
 			best = i;
 		}
 	}
-	maxs.data[best] += 120;
-	mins.data[best] -= 120;
+	maxs.raw[best] += 120;
+	mins.raw[best] -= 120;
 
 	// create a trigger with this size
 	other = G_Spawn();

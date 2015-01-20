@@ -102,7 +102,7 @@ void P_WorldEffects( gentity_t *ent ) {
 	qboolean	envirosuit;
 	int			waterlevel;
 
-	if ( ent->client->noclip || (dmflags.integer & DF_NO_DROWN) ) {
+	if ( ent->client->noclip || (dmflags.bits & DF_NO_DROWN) ) {
 		ent->client->airOutTime = level.time + 12000;	// don't need air
 		return;
 	}
@@ -788,7 +788,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				break;		// not in the player model
 			}
 
-			if ( dmflags.integer & DF_NO_FALLING ) {
+			if ( dmflags.bits & DF_NO_FALLING ) {
 				break;
 			}
 
@@ -2071,7 +2071,7 @@ void ClientThink_real( gentity_t *ent ) {
 		//Keep the time updated, so once this duel ends this player can't engage in a duel for another
 		//10 seconds. This will give other people a chance to engage in duels in case this player wants
 		//to engage again right after he's done fighting and someone else is waiting.
-		if ( !(g_privateDuel.integer & PRIVDUEL_MULTI) )
+		if ( !(g_privateDuel.bits & PRIVDUEL_MULTI) )
 			ent->client->ps.fd.privateDuelTime = level.time + 10000;
 
 		if ( ent->client->ps.duelTime < level.time ) {
@@ -2145,7 +2145,7 @@ void ClientThink_real( gentity_t *ent ) {
 				Com_sprintf( pre2, sizeof(pre2), "You %s %s", winner, defeated, loser );
 
 				// with h/a remaining
-				if ( japp_duelStats.integer & DUELSTATS_HEALTH ) {
+				if ( japp_duelStats.bits & DUELSTATS_HEALTH ) {
 					const int health = ent->client->ps.stats[STAT_HEALTH];
 					const int armor = ent->client->ps.stats[STAT_ARMOR];
 
@@ -2154,7 +2154,7 @@ void ClientThink_real( gentity_t *ent ) {
 				}
 
 				// in xx:xx
-				if ( japp_duelStats.integer & DUELSTATS_TIME ) {
+				if ( japp_duelStats.bits & DUELSTATS_TIME ) {
 					const int msec = level.time - ent->duelStartTick;
 					int secs = msec / 1000;
 					const int mins = secs / 60;
@@ -2166,7 +2166,7 @@ void ClientThink_real( gentity_t *ent ) {
 				}
 
 				// with y hits
-				if ( japp_duelStats.integer & DUELSTATS_HITS ) {
+				if ( japp_duelStats.bits & DUELSTATS_HITS ) {
 					const int hits = ent->duelHitCount;
 					Q_strcat( buf, sizeof(buf), va( " " S_COLOR_WHITE "with " S_COLOR_YELLOW "%i" S_COLOR_WHITE " hits",
 						hits ) );
@@ -2185,7 +2185,7 @@ void ClientThink_real( gentity_t *ent ) {
 			}
 
 			// respawn the players where they engaged the duel
-			if ( g_privateDuel.integer & PRIVDUEL_RESPAWN ) {
+			if ( g_privateDuel.bits & PRIVDUEL_RESPAWN ) {
 				// winner
 				if ( SpotWouldTelefrag3( &ent->client->pers.duelStartPos ) ) {
 					respawn( ent );
@@ -2243,7 +2243,7 @@ void ClientThink_real( gentity_t *ent ) {
 			}
 
 		}
-		else if ( !(g_privateDuel.integer & PRIVDUEL_NOSEVER) ) {
+		else if ( !(g_privateDuel.bits & PRIVDUEL_NOSEVER) ) {
 			vector3 vSub;
 			float subLen = 0;
 
@@ -2347,7 +2347,7 @@ void ClientThink_real( gentity_t *ent ) {
 #ifdef _DEBUG
 	pm.debugLevel = g_debugMove.integer;
 #endif
-	pm.noFootsteps = (dmflags.integer & DF_NO_FOOTSTEPS) > 0;
+	pm.noFootsteps = (dmflags.bits & DF_NO_FOOTSTEPS) > 0;
 
 	pm.pmove_fixed = pmove_fixed.integer;
 	pm.pmove_msec = pmove_msec.integer;
@@ -2829,7 +2829,7 @@ void ClientThink_real( gentity_t *ent ) {
 	SendPendingPredictableEvents( &ent->client->ps );
 
 	if ( ent->s.eType != ET_NPC && ent->client && ent->client->pers.connected == CON_CONNECTED
-		&& !!(japp_allowHook.integer & (1 << level.gametype)) )
+		&& !!(japp_allowHook.bits & (1 << level.gametype)) )
 	{
 		const qboolean oldGrapple = GetCPD( (bgEntity_t *)ent, CPD_OLDGRAPPLE )
 			|| !Client_Supports( ent, CSF_GRAPPLE_SWING );

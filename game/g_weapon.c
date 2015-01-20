@@ -1008,8 +1008,8 @@ void DEMP2_AltRadiusDamage( gentity_t *ent ) {
 	radius *= fact;
 
 	for ( i = 0; i < 3; i++ ) {
-		mins.data[i] = ent->r.currentOrigin.data[i] - radius;
-		maxs.data[i] = ent->r.currentOrigin.data[i] + radius;
+		mins.raw[i] = ent->r.currentOrigin.raw[i] - radius;
+		maxs.raw[i] = ent->r.currentOrigin.raw[i] + radius;
 	}
 
 	numListedEntities = trap->EntitiesInBox( &mins, &maxs, iEntityList, MAX_GENTITIES );
@@ -1027,14 +1027,14 @@ void DEMP2_AltRadiusDamage( gentity_t *ent ) {
 
 		// find the distance from the edge of the bounding box
 		for ( i = 0; i < 3; i++ ) {
-			if ( ent->r.currentOrigin.data[i] < gent->r.absmin.data[i] ) {
-				v.data[i] = gent->r.absmin.data[i] - ent->r.currentOrigin.data[i];
+			if ( ent->r.currentOrigin.raw[i] < gent->r.absmin.raw[i] ) {
+				v.raw[i] = gent->r.absmin.raw[i] - ent->r.currentOrigin.raw[i];
 			}
-			else if ( ent->r.currentOrigin.data[i] > gent->r.absmax.data[i] ) {
-				v.data[i] = ent->r.currentOrigin.data[i] - gent->r.absmax.data[i];
+			else if ( ent->r.currentOrigin.raw[i] > gent->r.absmax.raw[i] ) {
+				v.raw[i] = ent->r.currentOrigin.raw[i] - gent->r.absmax.raw[i];
 			}
 			else {
-				v.data[i] = 0;
+				v.raw[i] = 0;
 			}
 		}
 
@@ -1462,7 +1462,7 @@ void rocketThink( gentity_t *ent ) {
 
 		// add crazy drunkenness
 		for ( i = 0; i < 3; i++ ) {
-			newdir.data[i] += crandom() * ent->random * 0.25f;
+			newdir.raw[i] += crandom() * ent->random * 0.25f;
 		}
 
 		// decay the randomness
@@ -2972,7 +2972,7 @@ void Weapon_HookThink( gentity_t *ent ) {
 		VectorCopy( &ent->r.currentOrigin, &oldorigin );
 
 		for ( i = 0; i < 3; i++ ) {
-			v.data[i] = ent->enemy->r.currentOrigin.data[i] + (ent->enemy->r.mins.data[i] + ent->enemy->r.maxs.data[i]) * 0.5f;
+			v.raw[i] = ent->enemy->r.currentOrigin.raw[i] + (ent->enemy->r.mins.raw[i] + ent->enemy->r.maxs.raw[i]) * 0.5f;
 		}
 		SnapVectorTowards( &v, &oldorigin ); // Save net bandwidth
 
@@ -2989,11 +2989,11 @@ void SnapVectorTowards( vector3 *v, const vector3 *to ) {
 	int i;
 
 	for ( i = 0; i < 3; i++ ) {
-		if ( to->data[i] <= v->data[i] ) {
-			v->data[i] = floorf( v->data[i] );
+		if ( to->raw[i] <= v->raw[i] ) {
+			v->raw[i] = floorf( v->raw[i] );
 		}
 		else {
-			v->data[i] = ceilf( v->data[i] );
+			v->raw[i] = ceilf( v->raw[i] );
 		}
 	}
 }

@@ -259,7 +259,7 @@ static void CG_DoGlassQuad( vector3 p[4], vector2 uv[4], qboolean stick, int tim
 
 	while ( i < 4 ) {
 		while ( i_2 < 3 ) {
-			apArgs.p[i].data[i_2] = p[i].data[i_2];
+			apArgs.p[i].raw[i_2] = p[i].raw[i_2];
 
 			i_2++;
 		}
@@ -273,7 +273,7 @@ static void CG_DoGlassQuad( vector3 p[4], vector2 uv[4], qboolean stick, int tim
 
 	while ( i < 4 ) {
 		while ( i_2 < 2 ) {
-			apArgs.ev[i].data[i_2] = uv[i].data[i_2];
+			apArgs.ev[i].raw[i_2] = uv[i].raw[i_2];
 
 			i_2++;
 		}
@@ -844,7 +844,7 @@ void CG_MiscModelExplosion( vector3 *mins, vector3 *maxs, int size, material_t c
 		int j;
 		for ( j = 0; j < 3; j++ ) {
 			r = random() * 0.8f + 0.1f;
-			org.data[j] = (r * mins->data[j] + (1 - r) * maxs->data[j]);
+			org.raw[j] = (r * mins->raw[j] + (1 - r) * maxs->raw[j]);
 		}
 
 		// shoot effect away from center
@@ -1001,7 +1001,7 @@ void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3
 			// spawn chunk roughly in the bbox of the thing...bias towards center in case thing blowing up doesn't complete fill its bbox.
 			for ( j = 0; j < 3; j++ ) {
 				r = random() * 0.8f + 0.1f;
-				re->origin.data[j] = (r * mins->data[j] + (1 - r) * maxs->data[j]);
+				re->origin.raw[j] = (r * mins->raw[j] + (1 - r) * maxs->raw[j]);
 			}
 			VectorCopy( &re->origin, &le->pos.trBase );
 
@@ -1032,7 +1032,7 @@ void CG_Chunks( int owner, vector3 *origin, const vector3 *normal, const vector3
 			re->nonNormalizedAxes = qtrue;
 			AxisCopy( axisDefault, re->axis ); // could do an angles to axis, but this is cheaper and works ok
 			for ( k = 0; k < 3; k++ )
-				re->modelScale.data[k] = le->radius;
+				re->modelScale.raw[k] = le->radius;
 			ScaleModelAxis( re );
 			/*
 			for( k = 0; k < 3; k++ )

@@ -3771,7 +3771,7 @@ void RGB_LerpColor( vector3 *from, vector3 *to, float frac, vector3 *out ) {
 	VectorCopy( from, out );
 
 	for ( i = 0; i < 3; i++ )
-		out->data[i] += diff.data[i] * frac;
+		out->raw[i] += diff.raw[i] * frac;
 }
 
 int getint( const char **buf ) {
@@ -3782,7 +3782,7 @@ void ParseRGBSaber( const char *str, vector3 *c ) {
 	int i;
 
 	for ( i = 0; i < 3; i++, str++ )
-		c->data[i] = getint( &str );
+		c->raw[i] = getint( &str );
 }
 
 static void CG_RGBForSaberColor( saber_colors_t color, vector3 *rgb, int cnum, int bnum ) {
@@ -3830,7 +3830,7 @@ static void CG_RGBForSaberColor( saber_colors_t color, vector3 *rgb, int cnum, i
 			else
 				VectorCopy( &ci->rgb2, rgb );
 			for ( i = 0; i < 3; i++ )
-				rgb->data[i] /= 255;
+				rgb->raw[i] /= 255;
 		}
 		else
 			VectorSet( rgb, 0.2f, 0.4f, 1.0f );
@@ -4009,7 +4009,7 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 		radiusmult = 1.0f;
 
 	for ( i = 0; i < 3; i++ )
-		rgb.data[i] *= 255;
+		rgb.raw[i] *= 255;
 
 	radiusRange = radius * 0.075f;
 	radiusStart = radius - radiusRange;
@@ -4026,7 +4026,7 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 		saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 	else {
 		for ( i = 0; i < 3; i++ )
-			saber.shaderRGBA[i] = rgb.data[i];
+			saber.shaderRGBA[i] = rgb.raw[i];
 		saber.shaderRGBA[3] = 0xff;
 	}
 	//	saber.renderfx = rfx;
@@ -4263,7 +4263,7 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * effectalpha;
 		else {
 			for ( i = 0; i < 3; i++ )
-				saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
+				saber.shaderRGBA[i] = rgb.raw[i] * effectalpha;
 			saber.shaderRGBA[3] = 255 * effectalpha;
 		}
 
@@ -4284,7 +4284,7 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 		saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 	else {
 		for ( i = 0; i < 3; i++ )
-			saber.shaderRGBA[i] = rgb.data[i];
+			saber.shaderRGBA[i] = rgb.raw[i];
 	}
 	sbak = saber;
 	SE_R_AddRefEntityToScene( &saber, cnum );
@@ -4311,7 +4311,7 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * effectalpha;
 		else {
 			for ( i = 0; i < 3; i++ )
-				saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
+				saber.shaderRGBA[i] = rgb.raw[i] * effectalpha;
 			saber.shaderRGBA[3] = 255 * effectalpha;
 		}
 
@@ -4332,7 +4332,7 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 		saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 	else {
 		for ( i = 0; i < 3; i++ )
-			saber.shaderRGBA[i] = rgb.data[i];
+			saber.shaderRGBA[i] = rgb.raw[i];
 		saber.shaderRGBA[3] = 255;
 	}
 	sbak = saber;
@@ -4364,7 +4364,7 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 				saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * effectalpha;
 			else {
 				for ( i = 0; i < 3; i++ )
-					saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
+					saber.shaderRGBA[i] = rgb.raw[i] * effectalpha;
 				saber.shaderRGBA[3] = 255 * effectalpha;
 			}
 			SE_R_AddRefEntityToScene( &saber, cnum );
@@ -4385,7 +4385,7 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 		else {
 			for ( i = 0; i < 3; i++ )
-				saber.shaderRGBA[i] = rgb.data[i];
+				saber.shaderRGBA[i] = rgb.raw[i];
 			saber.shaderRGBA[3] = 255;
 		}
 		sbak = saber;
@@ -4438,7 +4438,7 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff * effectalpha;
 		else {
 			for ( i = 0; i < 3; i++ )
-				saber.shaderRGBA[i] = rgb.data[i] * effectalpha;
+				saber.shaderRGBA[i] = rgb.raw[i] * effectalpha;
 			saber.shaderRGBA[3] = 255 * effectalpha;
 		}
 		SE_R_AddRefEntityToScene( &saber, cnum );
@@ -4471,7 +4471,7 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 		saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 	else {
 		for ( i = 0; i < 3; i++ )
-			saber.shaderRGBA[i] = rgb.data[i];
+			saber.shaderRGBA[i] = rgb.raw[i];
 		saber.shaderRGBA[3] = 255;
 	}
 	sbak = saber;
@@ -4498,7 +4498,7 @@ void CG_GetTagWorldPosition( refEntity_t *model, const char *tag, vector3 *pos, 
 
 	VectorCopy( &model->origin, pos );
 	for ( i = 0; i < 3; i++ )
-		VectorMA( pos, orientation.origin.data[i], &model->axis[i], pos );
+		VectorMA( pos, orientation.origin.raw[i], &model->axis[i], pos );
 
 	if ( axis )
 		MatrixMultiply( orientation.axis, model->axis, axis );
@@ -4530,10 +4530,10 @@ void CG_CreateSaberMarks( vector3 *start, vector3 *end, vector3 *normal ) {
 	for ( i = 0; i < 3; i++ ) {
 		// stretch a bit more in the direction that we are traveling in...  debateable as to whether this makes things
 		//	better or worse
-		originalPoints[0].data[i] = start->data[i] - radius * axis[1].data[i] - radius * axis[2].data[i];
-		originalPoints[1].data[i] = end->data[i] + radius * axis[1].data[i] - radius * axis[2].data[i];
-		originalPoints[2].data[i] = end->data[i] + radius * axis[1].data[i] + radius * axis[2].data[i];
-		originalPoints[3].data[i] = start->data[i] - radius * axis[1].data[i] + radius * axis[2].data[i];
+		originalPoints[0].raw[i] = start->raw[i] - radius * axis[1].raw[i] - radius * axis[2].raw[i];
+		originalPoints[1].raw[i] = end->raw[i] + radius * axis[1].raw[i] - radius * axis[2].raw[i];
+		originalPoints[2].raw[i] = end->raw[i] + radius * axis[1].raw[i] + radius * axis[2].raw[i];
+		originalPoints[3].raw[i] = start->raw[i] - radius * axis[1].raw[i] + radius * axis[2].raw[i];
 	}
 
 	VectorScale( normal, -1, &projection );
@@ -4569,12 +4569,12 @@ void CG_CreateSaberMarks( vector3 *start, vector3 *end, vector3 *normal ) {
 
 			for ( k = 0; k < 4; k++ ) {
 				for ( l = 0; l < 3; l++ )
-					apArgs.p[k].data[l] = verts[k].xyz.data[l];
+					apArgs.p[k].raw[l] = verts[k].xyz.raw[l];
 			}
 
 			for ( k = 0; k < 4; k++ ) {
 				for ( l = 0; l<2; l++ )
-					apArgs.ev[k].data[l] = verts[k].st[l];
+					apArgs.ev[k].raw[l] = verts[k].st[l];
 			}
 
 			// When using addpoly, having a situation like this tends to cause bad results. (I assume it doesn't like
@@ -6765,8 +6765,8 @@ void CG_Player( centity_t *cent ) {
 		VectorSubtract( &cent->lerpOrigin, &cent->beamEnd, &posDif );
 
 		for ( k = 0; k < 3; k++ ) {
-			cent->beamEnd.data[k] = (cent->beamEnd.data[k] + posDif.data[k] * smoothFactor);
-			cent->lerpOrigin.data[k] = cent->beamEnd.data[k];
+			cent->beamEnd.raw[k] = (cent->beamEnd.raw[k] + posDif.raw[k] * smoothFactor);
+			cent->lerpOrigin.raw[k] = cent->beamEnd.raw[k];
 		}
 	}
 	else

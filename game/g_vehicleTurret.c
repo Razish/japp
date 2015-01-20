@@ -146,13 +146,13 @@ qboolean VEH_TurretAim( Vehicle_t *pVeh, gentity_t *parent, gentity_t *turretEne
 	//set yaw
 	if ( turretStats->yawBone ) {
 		VectorClear( &yawAngles );
-		yawAngles.data[turretStats->yawAxis] = newAngles.yaw;
+		yawAngles.raw[turretStats->yawAxis] = newAngles.yaw;
 		NPC_SetBoneAngles( parent, turretStats->yawBone, &yawAngles );
 	}
 	//set pitch
 	if ( turretStats->pitchBone ) {
 		VectorClear( &pitchAngles );
-		pitchAngles.data[turretStats->pitchAxis] = newAngles.pitch;
+		pitchAngles.raw[turretStats->pitchAxis] = newAngles.pitch;
 		NPC_SetBoneAngles( parent, turretStats->pitchBone, &pitchAngles );
 	}
 	//force muzzle to recalc next check

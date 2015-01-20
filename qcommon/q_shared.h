@@ -286,8 +286,6 @@ static inline float __fctiw(register float f) {
 
 // TYPE DEFINITIONS
 typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned long ulong;
 
 enum qboolean_e {
 	qfalse = 0,
@@ -493,58 +491,53 @@ void Com_Memcpy( void* dest, const void* src, const size_t count );
 
 #define atoff (float)atof
 
-typedef float number;
-typedef signed int integer;
-
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4201 )
 #endif
 
 typedef union vector2_u {
-	struct { number x, y; };
-	struct { number w, h; };
+	struct { float x, y; };
+	struct { float w, h; };
 	// s, t?
-	number data[2];
+	float raw[2];
 } vector2;
 typedef union ivector2_u {
-	struct { integer x, y; };
-	struct { integer w, h; };
+	struct { int32_t x, y; };
+	struct { int32_t w, h; };
 	// s, t?
-	integer data[2];
+	int32_t raw[2];
 } ivector2;
 
 typedef union vector3_u {
-	struct { number x, y, z; };
-	struct { number r, g, b; }; // red, green, blue?
-	struct { number pitch, yaw, roll; };
-	number data[3];
+	struct { float x, y, z; };
+	struct { float r, g, b; }; // red, green, blue?
+	struct { float pitch, yaw, roll; };
+	float raw[3];
 } vector3;
 typedef union ivector3_u {
-	struct { integer x, y, z; };
-	struct { integer r, g, b; }; // red, green, blue?
-	struct { integer pitch, yaw, roll; };
-	integer data[3];
+	struct { int32_t x, y, z; };
+	struct { int32_t r, g, b; }; // red, green, blue?
+	struct { int32_t pitch, yaw, roll; };
+	int32_t raw[3];
 } ivector3;
 
 typedef union vector4_u {
-	struct { number x, y, z, w; };
-	struct { number r, g, b, a; };
+	struct { float x, y, z, w; };
+	struct { float r, g, b, a; };
 	// red, green, blue, alpha?
-	number data[4];
+	float raw[4];
 } vector4;
 typedef union ivector4_u {
-	struct { integer x, y, z, w; };
-	struct { integer r, g, b, a; };
+	struct { int32_t x, y, z, w; };
+	struct { int32_t r, g, b, a; };
 	// red, green, blue, alpha?
-	integer data[4];
+	int32_t raw[4];
 } ivector4;
 
 #ifdef _MSC_VER
 #pragma warning( pop )
 #endif
-
-typedef	signed int fixed4_t, fixed8_t, fixed16_t;
 
 #undef M_PI
 #define M_PI 3.14159265358979323846f // matches value in gcc v2 math.h
@@ -1002,24 +995,24 @@ void ByteToDir( int b, vector3 *dir );
 void		VectorAdd( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
 void		VectorSubtract( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
 void		VectorNegate( const vector3 *vecIn, vector3 *vecOut );
-void		VectorScale( const vector3 *vecIn, number scale, vector3 *vecOut );
-void		VectorScale4( const vector4 *vecIn, number scale, vector4 *vecOut );
+void		VectorScale( const vector3 *vecIn, float scale, vector3 *vecOut );
+void		VectorScale4( const vector4 *vecIn, float scale, vector4 *vecOut );
 void		VectorScaleVector( const vector3 *vecIn, const vector3 *vecScale, vector3 *vecOut );
-void		VectorMA( const vector3 *vec1, number scale, const vector3 *vec2, vector3 *vecOut );
-void		VectorLerp( const vector3 *vec1, number frac, const vector3 *vec2, vector3 *vecOut );
-void		VectorLerp4( const vector4 *vec1, number frac, const vector4 *vec2, vector4 *vecOut );
-number		VectorLength( const vector3 *vec );
-number		VectorLengthSquared( const vector3 *vec );
-number		Distance( const vector3 *p1, const vector3 *p2 );
-number		DistanceSquared( const vector3 *p1, const vector3 *p2 );
+void		VectorMA( const vector3 *vec1, float scale, const vector3 *vec2, vector3 *vecOut );
+void		VectorLerp( const vector3 *vec1, float frac, const vector3 *vec2, vector3 *vecOut );
+void		VectorLerp4( const vector4 *vec1, float frac, const vector4 *vec2, vector4 *vecOut );
+float		VectorLength( const vector3 *vec );
+float		VectorLengthSquared( const vector3 *vec );
+float		Distance( const vector3 *p1, const vector3 *p2 );
+float		DistanceSquared( const vector3 *p1, const vector3 *p2 );
 void		VectorNormalizeFast( vector3 *vec );
-number		VectorNormalize( vector3 *vec );
-number		VectorNormalize2( const vector3 *vec, vector3 *vecOut );
+float		VectorNormalize( vector3 *vec );
+float		VectorNormalize2( const vector3 *vec, vector3 *vecOut );
 void		VectorCopy( const vector3 *vecIn, vector3 *vecOut );
 void		IVectorCopy( const ivector3 *vecIn, ivector3 *vecOut );
 void		VectorCopy4( const vector4 *vecIn, vector4 *vecOut );
-void		VectorSet( vector3 *vec, number x, number y, number z );
-void		VectorSet4( vector4 *vec, number x, number y, number z, number w );
+void		VectorSet( vector3 *vec, float x, float y, float z );
+void		VectorSet4( vector4 *vec, float x, float y, float z, float w );
 void		VectorClear( vector3 *vec );
 void		VectorClear4( vector4 *vec );
 void		VectorInc( vector3 *vec );
@@ -1028,7 +1021,7 @@ void		VectorRotate( vector3 *in, vector3 matrix[3], vector3 *out );
 void		VectorInverse( vector3 *vec );
 void		VectorAverage( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
 void		CrossProduct( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
-number		DotProduct( const vector3 *vec1, const vector3 *vec2 );
+float		DotProduct( const vector3 *vec1, const vector3 *vec2 );
 qboolean	VectorCompare( const vector3 *vec1, const vector3 *vec2 );
 void		VectorSnap( vector3 *v );
 void		VectorSnapTowards( vector3 *v, vector3 *to );
@@ -1040,8 +1033,8 @@ float NormalizeColor( const vector3 *in, vector3 *out );
 
 float RadiusFromBounds( const vector3 *mins, const vector3 *maxs );
 void ClearBounds( vector3 *mins, vector3 *maxs );
-number DistanceHorizontal( const vector3 *p1, const vector3 *p2 );
-number DistanceHorizontalSquared( const vector3 *p1, const vector3 *p2 );
+float DistanceHorizontal( const vector3 *p1, const vector3 *p2 );
+float DistanceHorizontalSquared( const vector3 *p1, const vector3 *p2 );
 void AddPointToBounds( const vector3 *v, vector3 *mins, vector3 *maxs );
 int Q_log2( int val );
 
@@ -1210,57 +1203,61 @@ void QDECL Com_Printf( const char *msg, ... );
 
 // Many variables can be used for cheating purposes, so when cheats is zero, force all unspecified variables to their
 //	default values.
-#define CVAR_NONE			0x00000000
-#define	CVAR_ARCHIVE		0x00000001		// set to cause it to be saved to vars.rc
+#define CVAR_NONE			0x00000000u
+#define	CVAR_ARCHIVE		0x00000001u		// set to cause it to be saved to vars.rc
 // used for system variables, not for player
 // specific configurations
-#define	CVAR_USERINFO		0x00000002		// sent to server on connect or change
-#define	CVAR_SERVERINFO		0x00000004		// sent in response to front end requests
-#define	CVAR_SYSTEMINFO		0x00000008		// these cvars will be duplicated on all clients
-#define	CVAR_INIT			0x00000010		// don't allow change from console at all,
-// but can be set from the command line
-#define	CVAR_LATCH			0x00000020		// will only change when C code next does
-// a Cvar_Get(), so it can't be changed
-// without proper initialization.  modified
-// will be set, even though the value hasn't
-// changed yet
-#define	CVAR_ROM			0x00000040		// display only, cannot be set by user at all (can be set by code)
-#define	CVAR_USER_CREATED	0x00000080		// created by a set command
-#define	CVAR_TEMP			0x00000100		// can be set even when cheats are disabled, but is not archived
-#define CVAR_CHEAT			0x00000200		// can not be changed if cheats are disabled
-#define CVAR_NORESTART		0x00000400		// do not clear when a cvar_restart is issued
-#define CVAR_INTERNAL		0x00000800		// cvar won't be displayed, ever (for passwords and such)
-#define	CVAR_PARENTAL		0x00001000		// lets cvar system know that parental stuff needs to be updated
+#define	CVAR_USERINFO		0x00000002u		// sent to server on connect or change
+#define	CVAR_SERVERINFO		0x00000004u		// sent in response to front end requests
+#define	CVAR_SYSTEMINFO		0x00000008u		// these cvars will be duplicated on all clients
+#define	CVAR_INIT			0x00000010u		// don't allow change from console at all, but can be set from the command line
+#define	CVAR_LATCH			0x00000020u		// will only change when C code next does
+// a Cvar_Get(), so it can't be changed without proper initialization
+// modified will be set, even though the value hasn't changed yet
+#define	CVAR_ROM			0x00000040u		// display only, cannot be set by user at all (can be set by code)
+#define	CVAR_USER_CREATED	0x00000080u		// created by a set command
+#define	CVAR_TEMP			0x00000100u		// can be set even when cheats are disabled, but is not archived
+#define CVAR_CHEAT			0x00000200u		// can not be changed if cheats are disabled
+#define CVAR_NORESTART		0x00000400u		// do not clear when a cvar_restart is issued
+#define CVAR_INTERNAL		0x00000800u		// cvar won't be displayed, ever (for passwords and such)
+#define	CVAR_PARENTAL		0x00001000u		// lets cvar system know that parental stuff needs to be updated
 
 // nothing outside the Cvar_*() functions should modify these fields!
 typedef struct cvar_s {
 	char		*name;
 	char		*string;
-	char		*resetString;		// cvar_restart will reset to this value
-	char		*latchedString;		// for CVAR_LATCH vars
+	char		*resetString;
+	char		*latchedString;
 	uint32_t	flags;
-	qboolean	modified;			// set each time the cvar is changed
-	int			modificationCount;	// incremented each time the cvar is changed
-	float		value;				// atof( string )
-	int			integer;			// atoi( string )
+	qboolean	modified;
+	int32_t		modificationCount;
+	float		value;
+
+	union {
+		int32_t		integer;
+		uint32_t	bits;
+	};
+
 	struct cvar_s *next;
 	struct cvar_s *hashNext;
 } cvar_t;
 
-#define	MAX_CVAR_VALUE_STRING	256
+#define	MAX_CVAR_VALUE_STRING (256)
 
-typedef int	cvarHandle_t;
+typedef int32_t		cvarHandle_t;
 
-// the modules that run in the virtual machine can't access the cvar_t directly,
-// so they must ask for structured updates
+// the modules that run in the virtual machine can't access the cvar_t directly, so they must ask for structured updates
 typedef struct vmCvar_s {
 	cvarHandle_t	handle;
-	int			modificationCount;
-	float		value;
-	int			integer;
-	char		string[MAX_CVAR_VALUE_STRING];
-} vmCvar_t;
+	int				modificationCount;
 
+	char			string[MAX_CVAR_VALUE_STRING];
+	float			value;
+	union {
+		int32_t			integer;
+		uint32_t		bits;
+	};
+} vmCvar_t;
 
 #include "surfaceflags.h"			// shared with the q3map utility
 
@@ -1447,7 +1444,7 @@ typedef struct gameState_s {
 	int			dataCount;
 } gameState_t;
 // all the different tracking "channels"
-typedef enum {
+typedef enum trackchan_e {
 	TRACK_CHANNEL_NONE = 50,
 	TRACK_CHANNEL_1,
 	TRACK_CHANNEL_2,
@@ -2251,7 +2248,7 @@ typedef struct qtime_s {
 #define AS_MPLAYER			3 // (Obsolete)
 
 // cinematic states
-typedef enum {
+typedef enum cinState_e {
 	FMV_IDLE,
 	FMV_PLAY,		// play
 	FMV_EOF,		// all other conditions, i.e. stop/EOF/abort
@@ -2259,7 +2256,7 @@ typedef enum {
 	FMV_ID_IDLE,
 	FMV_LOOPED,
 	FMV_ID_WAIT
-} e_status;
+} cinState_t;
 
 typedef enum flagStatus_e {
 	FLAG_ATBASE = 0,
@@ -2315,10 +2312,9 @@ Ghoul2 Insert End
 // define the new memory tags for the zone, used by all modules now
 //
 #define TAGDEF(blah) TAG_ ## blah
-typedef enum {
+typedef enum tags_e {
 #include "qcommon/tags.h"
 } tags_t;
-typedef char memtag_t;
 
 //rww - conveniently toggle "gore" code, for model decals and stuff.
 #define _G2_GORE

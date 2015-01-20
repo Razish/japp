@@ -929,8 +929,8 @@ void SetClientViewAngle( gentity_t *ent, vector3 *angle ) {
 	for ( i = 0; i < 3; i++ ) {
 		int		cmdAngle;
 
-		cmdAngle = ANGLE2SHORT( angle->data[i] );
-		ent->client->ps.delta_angles.data[i] = cmdAngle - ent->client->pers.cmd.angles.data[i];
+		cmdAngle = ANGLE2SHORT( angle->raw[i] );
+		ent->client->ps.delta_angles.raw[i] = cmdAngle - ent->client->pers.cmd.angles.raw[i];
 	}
 	VectorCopy( angle, &ent->s.angles );
 	VectorCopy( &ent->s.angles, &ent->client->ps.viewangles );
@@ -1669,7 +1669,7 @@ void SV_ToggleUserinfoValidation_f( void ) {
 	if ( trap->Argc() == 1 ) {
 		unsigned int i = 0;
 		for ( i = 0; i < numUserinfoFields; i++ ) {
-			if ( (japp_userinfoValidate.integer & (1 << i)) ) {
+			if ( (japp_userinfoValidate.bits & (1 << i)) ) {
 				trap->Print( "%2d [X] %s\n", i, userinfoFields[i].fieldClean );
 			}
 			else {
@@ -1677,7 +1677,7 @@ void SV_ToggleUserinfoValidation_f( void ) {
 			}
 		}
 		for ( ; i < numUserinfoFields + USERINFO_VALIDATION_MAX; i++ ) {
-			if ( (japp_userinfoValidate.integer & (1 << i)) ) {
+			if ( (japp_userinfoValidate.bits & (1 << i)) ) {
 				trap->Print( "%2d [X] %s\n", i, userinfoValidateExtra[i - numUserinfoFields] );
 			}
 			else {
@@ -1701,16 +1701,16 @@ void SV_ToggleUserinfoValidation_f( void ) {
 			return;
 		}
 
-		trap->Cvar_Set( "japp_userinfoValidate", va( "%i", (1 << index) ^ (japp_userinfoValidate.integer & mask) ) );
+		trap->Cvar_Set( "japp_userinfoValidate", va( "%i", (1 << index) ^ (japp_userinfoValidate.bits & mask) ) );
 		trap->Cvar_Update( &japp_userinfoValidate );
 
 		if ( index < numUserinfoFields ) {
 			trap->Print( "%s %s\n", userinfoFields[index].fieldClean,
-				((japp_userinfoValidate.integer & (1 << index)) ? "Validated" : "Ignored") );
+				((japp_userinfoValidate.bits & (1 << index)) ? "Validated" : "Ignored") );
 		}
 		else {
 			trap->Print( "%s %s\n", userinfoValidateExtra[index - numUserinfoFields],
-				((japp_userinfoValidate.integer & (1 << index)) ? "Validated" : "Ignored") );
+				((japp_userinfoValidate.bits & (1 << index)) ? "Validated" : "Ignored") );
 		}
 	}
 }
@@ -1726,7 +1726,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	memset( fieldCount, 0, sizeof(fieldCount) );
 
 	// size checks
-	if ( japp_userinfoValidate.integer & (1 << (numUserinfoFields + USERINFO_VALIDATION_SIZE)) ) {
+	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_SIZE)) ) {
 		if ( length < 1 )
 			return "Userinfo too short";
 		else if ( length >= MAX_INFO_STRING )
@@ -1734,7 +1734,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	}
 
 	// slash checks
-	if ( japp_userinfoValidate.integer & (1 << (numUserinfoFields + USERINFO_VALIDATION_SLASH)) ) {
+	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_SLASH)) ) {
 		// there must be a leading slash
 		if ( userinfo[0] != '\\' )
 			return "Missing leading slash";
@@ -1754,7 +1754,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	}
 
 	// extended characters are impossible to type, may want to disable
-	if ( japp_userinfoValidate.integer & (1 << (numUserinfoFields + USERINFO_VALIDATION_EXTASCII)) ) {
+	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_EXTASCII)) ) {
 		for ( i = 0, count = 0; i < length; i++ ) {
 			if ( userinfo[i] < 0 )
 				count++;
@@ -1764,7 +1764,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	}
 
 	// disallow \n \r ; and \"
-	if ( japp_userinfoValidate.integer & (1 << (numUserinfoFields + USERINFO_VALIDATION_CONTROLCHARS)) ) {
+	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_CONTROLCHARS)) ) {
 		if ( Q_strchrs( userinfo, "\n\r;\"" ) )
 			return "Invalid characters found";
 	}
@@ -1784,7 +1784,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 
 	// count the number of fields
 	for ( i = 0, info = userinfoFields; i<numUserinfoFields; i++, info++ ) {
-		if ( japp_userinfoValidate.integer & (1 << i) ) {
+		if ( japp_userinfoValidate.bits & (1 << i) ) {
 			if ( info->minCount && !fieldCount[i] )
 				return va( "%s field not found", info->fieldClean );
 			else if ( fieldCount[i] > info->maxCount )
@@ -3192,7 +3192,7 @@ void ClientSpawn( gentity_t *ent ) {
 
 			// give ammo for all available weapons
 			for ( i = WP_BRYAR_PISTOL; i <= LAST_USEABLE_WEAPON; i++ ) {
-				if ( japp_spawnWeaps.integer & (1 << i) ) {
+				if ( japp_spawnWeaps.bits & (1 << i) ) {
 					ammo_t ammo = weaponData[i].ammoIndex;
 					const gitem_t *it = BG_FindItemForAmmo( ammo );
 					if ( it )

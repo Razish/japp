@@ -712,8 +712,8 @@ void Q3_Lerp2Pos( int taskID, int entID, vector3 *origin, vector3 *angles, float
 		// Rotation
 
 		for ( i = 0; i < 3; i++ ) {
-			ang.data[i] = AngleDelta( angles->data[i], ent->r.currentAngles.data[i] );
-			ent->s.apos.trDelta.data[i] = (ang.data[i] / (duration * 0.001f));
+			ang.raw[i] = AngleDelta( angles->raw[i], ent->r.currentAngles.raw[i] );
+			ent->s.apos.trDelta.raw[i] = (ang.raw[i] / (duration * 0.001f));
 		}
 
 		VectorCopy( &ent->r.currentAngles, &ent->s.apos.trBase );
@@ -766,8 +766,8 @@ void Q3_Lerp2Angles( int taskID, int entID, vector3 *angles, float duration ) {
 	ent->s.apos.trDuration = (duration > 0) ? duration : 1;
 
 	for ( i = 0; i < 3; i++ ) {
-		ang.data[i] = AngleSubtract( angles->data[i], ent->r.currentAngles.data[i] );
-		ent->s.apos.trDelta.data[i] = (ang.data[i] / (ent->s.apos.trDuration * 0.001f));
+		ang.raw[i] = AngleSubtract( angles->raw[i], ent->r.currentAngles.raw[i] );
+		ent->s.apos.trDelta.raw[i] = (ang.raw[i] / (ent->s.apos.trDuration * 0.001f));
 	}
 
 	VectorCopy( &ent->r.currentAngles, &ent->s.apos.trBase );
@@ -1580,7 +1580,7 @@ static void Q3_SetVelocity( int entID, int axis, float speed ) {
 	}
 
 	//FIXME: add or set?
-	found->client->ps.velocity.data[axis] += speed;
+	found->client->ps.velocity.raw[axis] += speed;
 
 	found->client->ps.pm_time = 500;
 	found->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
@@ -1677,7 +1677,7 @@ static void Q3_SetOriginOffset( int entID, int axis, float offset ) {
 	}
 
 	VectorCopy( &ent->s.origin, &origin );
-	origin.data[axis] += offset;
+	origin.raw[axis] += offset;
 	duration = 0;
 	if ( ent->speed ) {
 		duration = fabsf( offset ) / fabsf( ent->speed )*1000.0f;

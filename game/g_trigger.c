@@ -1658,17 +1658,17 @@ void asteroid_field_think( gentity_t *self ) {
 				for ( axis = 0; axis < 3; axis++ ) {
 					if ( axis == capAxis ) {
 						if ( Q_irand( 0, 1 ) ) {
-							startSpot.data[axis] = self->r.mins.data[axis];
-							endSpot.data[axis] = self->r.maxs.data[axis];
+							startSpot.raw[axis] = self->r.mins.raw[axis];
+							endSpot.raw[axis] = self->r.maxs.raw[axis];
 						}
 						else {
-							startSpot.data[axis] = self->r.maxs.data[axis];
-							endSpot.data[axis] = self->r.mins.data[axis];
+							startSpot.raw[axis] = self->r.maxs.raw[axis];
+							endSpot.raw[axis] = self->r.mins.raw[axis];
 						}
 					}
 					else {
-						startSpot.data[axis] = self->r.mins.data[axis] + (flrand( 0, 1.0f )*(self->r.maxs.data[axis] - self->r.mins.data[axis]));
-						endSpot.data[axis] = self->r.mins.data[axis] + (flrand( 0, 1.0f )*(self->r.maxs.data[axis] - self->r.mins.data[axis]));
+						startSpot.raw[axis] = self->r.mins.raw[axis] + (flrand( 0, 1.0f )*(self->r.maxs.raw[axis] - self->r.mins.raw[axis]));
+						endSpot.raw[axis] = self->r.mins.raw[axis] + (flrand( 0, 1.0f )*(self->r.maxs.raw[axis] - self->r.mins.raw[axis]));
 					}
 				}
 				//FIXME: maybe trace from start to end to make sure nothing is in the way?  How big of a trace?

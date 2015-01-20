@@ -686,8 +686,8 @@ typedef struct cg_s {
 	struct {
 		ivector2		pos;
 		struct {
-			number			scale;
-			integer			width;
+			float			scale;
+			int32_t			width;
 		} size;
 		vector4			background;
 	} chatbox;
@@ -699,11 +699,11 @@ typedef struct cg_s {
 
 	struct {
 		vector3			amount;
-		number			speed;
+		float			speed;
 	} gunIdleDrift;
 
 	struct {
-		number			pitch, roll, up;
+		float			pitch, roll, up;
 		qboolean		fall;
 	} viewBob;
 

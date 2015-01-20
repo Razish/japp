@@ -452,7 +452,7 @@ static void PM_SetVehicleAngles( vector3 *normal ) {
 	else {
 		//FIXME: gravity does not matter in SPACE!!!
 		//center of gravity affects pitch in air/water (FIXME: what about roll?)
-		pitchBias = 90.0f*pVeh->m_pVehicleInfo->centerOfGravity.data[0];//if centerOfGravity is all the way back (-1.0f), vehicle pitches up 90 degrees when in air
+		pitchBias = 90.0f*pVeh->m_pVehicleInfo->centerOfGravity.raw[0];//if centerOfGravity is all the way back (-1.0f), vehicle pitches up 90 degrees when in air
 	}
 
 	VectorClear( &vAngles );
@@ -482,7 +482,7 @@ static void PM_SetVehicleAngles( vector3 *normal ) {
 		vector3	velocity;
 		float	speed;
 		VectorCopy( &pm->ps->velocity, &velocity );
-		velocity.data[2] = 0.0f;
+		velocity.raw[2] = 0.0f;
 		speed = VectorNormalize( &velocity );
 		if ( speed > 32.0f || speed < -32.0f ) {
 			vector3	rt, tempVAngles;
@@ -534,9 +534,9 @@ static void PM_SetVehicleAngles( vector3 *normal ) {
 		if ( curVehicleBankingSpeed )
 #endif
 		{
-			if ( pVeh->m_vOrientation->data[i] >= vAngles.data[i] + vehicleBankingSpeed )	pVeh->m_vOrientation->data[i] -= vehicleBankingSpeed;
-			else if ( pVeh->m_vOrientation->data[i] <= vAngles.data[i] - vehicleBankingSpeed )	pVeh->m_vOrientation->data[i] += vehicleBankingSpeed;
-			else																				pVeh->m_vOrientation->data[i] = vAngles.data[i];
+			if ( pVeh->m_vOrientation->raw[i] >= vAngles.raw[i] + vehicleBankingSpeed )	pVeh->m_vOrientation->raw[i] -= vehicleBankingSpeed;
+			else if ( pVeh->m_vOrientation->raw[i] <= vAngles.raw[i] - vehicleBankingSpeed )	pVeh->m_vOrientation->raw[i] += vehicleBankingSpeed;
+			else																				pVeh->m_vOrientation->raw[i] = vAngles.raw[i];
 		}
 	}
 }
@@ -793,8 +793,8 @@ void PM_ClipVelocity( vector3 *in, vector3 *normal, vector3 *out, float overboun
 	}
 
 	for ( i = 0; i < 3; i++ ) {
-		change = normal->data[i] * backoff;
-		out->data[i] = in->data[i] - change;
+		change = normal->raw[i] * backoff;
+		out->raw[i] = in->raw[i] - change;
 	}
 	if ( pm->stepSlideFix ) {
 		if ( pm->ps->clientNum < MAX_CLIENTS//normal player
@@ -954,7 +954,7 @@ static void PM_Accelerate( vector3 *wishdir, float wishspeed, float accel ) {
 		}
 
 		for ( i = 0; i < 3; i++ ) {
-			pm->ps->velocity.data[i] += accelspeed * wishdir->data[i];
+			pm->ps->velocity.raw[i] += accelspeed * wishdir->raw[i];
 		}
 	}
 	else { //use the proper way for siege
@@ -1118,8 +1118,8 @@ void PM_SetPMViewAngle( playerState_t *ps, vector3 *angle, usercmd_t *ucmd ) {
 	for ( i = 0; i < 3; i++ ) { // set the delta angle
 		int		cmdAngle;
 
-		cmdAngle = ANGLE2SHORT( angle->data[i] );
-		ps->delta_angles.data[i] = cmdAngle - ucmd->angles.data[i];
+		cmdAngle = ANGLE2SHORT( angle->raw[i] );
+		ps->delta_angles.raw[i] = cmdAngle - ucmd->angles.raw[i];
 	}
 	VectorCopy( angle, &ps->viewangles );
 }
@@ -2924,7 +2924,7 @@ static void PM_FlyVehicleMove( void ) {
 		if ( (fmove != 0.0f || smove != 0.0f) && VectorCompare( &pm->ps->moveDir, &vec3_origin ) ) {
 			//gi.Printf("Generating MoveDir\n");
 			for ( i = 0; i < 3; i++ ) {
-				wishvel.data[i] = pml.forward.data[i] * fmove + pml.right.data[i] * smove;
+				wishvel.raw[i] = pml.forward.raw[i] * fmove + pml.right.raw[i] * smove;
 			}
 
 			VectorCopy( &wishvel, &wishdir );
@@ -2940,7 +2940,7 @@ static void PM_FlyVehicleMove( void ) {
 	}
 	else {
 		for ( i = 0; i < 3; i++ ) {
-			wishvel.data[i] = pml.forward.data[i] * fmove + pml.right.data[i] * smove;
+			wishvel.raw[i] = pml.forward.raw[i] * fmove + pml.right.raw[i] * smove;
 		}
 		// when going up or down slopes the wish velocity should Not be zero
 		//	wishvel[2] = 0;
@@ -3267,7 +3267,7 @@ static void PM_WalkMove( void ) {
 			if ( (fmove != 0.0f || smove != 0.0f) && VectorCompare( &pm->ps->moveDir, &vec3_origin ) ) {
 				//gi.Printf("Generating MoveDir\n");
 				for ( i = 0; i < 3; i++ ) {
-					wishvel.data[i] = pml.forward.data[i] * fmove + pml.right.data[i] * smove;
+					wishvel.raw[i] = pml.forward.raw[i] * fmove + pml.right.raw[i] * smove;
 				}
 
 				VectorCopy( &wishvel, &wishdir );
@@ -3288,7 +3288,7 @@ static void PM_WalkMove( void ) {
 
 	if ( !npcMovement ) {
 		for ( i = 0; i < 3; i++ ) {
-			wishvel.data[i] = pml.forward.data[i] * fmove + pml.right.data[i] * smove;
+			wishvel.raw[i] = pml.forward.raw[i] * fmove + pml.right.raw[i] * smove;
 		}
 		// when going up or down slopes the wish velocity should Not be zero
 
@@ -3437,7 +3437,7 @@ static void PM_NoclipMove( void ) {
 	smove = pm->cmd.rightmove;
 
 	for ( i = 0; i < 3; i++ ) {
-		wishvel.data[i] = pml.forward.data[i] * fmove + pml.right.data[i] * smove;
+		wishvel.raw[i] = pml.forward.raw[i] * fmove + pml.right.raw[i] * smove;
 	}
 	wishvel.z += pm->cmd.upmove;
 
@@ -7139,7 +7139,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 
 	// circularly clamp the angles with deltas
 	for ( i = 0; i < 3; i++ ) {
-		temp = cmd->angles.data[i] + ps->delta_angles.data[i];
+		temp = cmd->angles.raw[i] + ps->delta_angles.raw[i];
 #ifdef VEH_CONTROL_SCHEME_4
 		if ( pm_entVeh && pm_entVeh->m_pVehicle && pm_entVeh->m_pVehicle->m_pVehicleInfo
 			&& pm_entVeh->m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER
@@ -7149,11 +7149,11 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 				int pitchClamp = ANGLE2SHORT( AngleNormalize180( pm_entVeh->m_pVehicle->m_vPrevRiderViewAngles.pitch+10.0f ) );
 				// don't let the player look up or down more than 22.5f degrees
 				if ( temp > pitchClamp ) {
-					ps->delta_angles.data[i] = pitchClamp - cmd->angles.data[i];
+					ps->delta_angles.raw[i] = pitchClamp - cmd->angles.raw[i];
 					temp = pitchClamp;
 				}
 				else if ( temp < -pitchClamp ) {
-					ps->delta_angles.data[i] = -pitchClamp - cmd->angles.data[i];
+					ps->delta_angles.raw[i] = -pitchClamp - cmd->angles.raw[i];
 					temp = -pitchClamp;
 				}
 			}
@@ -7161,11 +7161,11 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 				int yawClamp = ANGLE2SHORT( AngleNormalize180( pm_entVeh->m_pVehicle->m_vPrevRiderViewAngles.yaw+10.0f ) );
 				// don't let the player look left or right more than 22.5f degrees
 				if ( temp > yawClamp ) {
-					ps->delta_angles.data[i] = yawClamp - cmd->angles.data[i];
+					ps->delta_angles.raw[i] = yawClamp - cmd->angles.raw[i];
 					temp = yawClamp;
 				}
 				else if ( temp < -yawClamp ) {
-					ps->delta_angles.data[i] = -yawClamp - cmd->angles.data[i];
+					ps->delta_angles.raw[i] = -yawClamp - cmd->angles.raw[i];
 					temp = -yawClamp;
 				}
 			}
@@ -7186,16 +7186,16 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 			if ( i == 0/*PITCH*/ ) {
 				// don't let the player look up or down more than 90 degrees
 				if ( temp > 16000 ) {
-					ps->delta_angles.data[i] = 16000 - cmd->angles.data[i];
+					ps->delta_angles.raw[i] = 16000 - cmd->angles.raw[i];
 					temp = 16000;
 				}
 				else if ( temp < -16000 ) {
-					ps->delta_angles.data[i] = -16000 - cmd->angles.data[i];
+					ps->delta_angles.raw[i] = -16000 - cmd->angles.raw[i];
 					temp = -16000;
 				}
 			}
 		}
-		ps->viewangles.data[i] = SHORT2ANGLE( temp );
+		ps->viewangles.raw[i] = SHORT2ANGLE( temp );
 	}
 }
 
@@ -7579,7 +7579,7 @@ void BG_AdjustClientSpeed( playerState_t *ps, usercmd_t *cmd, int svTime ) {
 	//Raz: JK2 rolls
 #if 0
 #ifdef _GAME
-	if ( 0 )//( dmflags.integer & DF_JK2_ROLL )
+	if ( 0 )//( dmflags.bits & DF_JK2_ROLL )
 #else
 	if ( 0 )//( cgs.dmflags & DF_JK2_ROLL )
 #endif
@@ -7885,7 +7885,7 @@ void BG_UpdateLookAngles( int lookingDebounceTime, vector3 *lastHeadAngles, int 
 		VectorSubtract( lookAngles, &oldLookAngles, &lookAnglesDiff );
 
 		for ( ang = 0; ang < 3; ang++ ) {
-			lookAnglesDiff.data[ang] = AngleNormalize180( lookAnglesDiff.data[ang] );
+			lookAnglesDiff.raw[ang] = AngleNormalize180( lookAnglesDiff.raw[ang] );
 		}
 
 		if ( VectorLengthSquared( &lookAnglesDiff ) ) {
@@ -8074,7 +8074,7 @@ static void BG_G2ClientSpineAngles( void *ghoul2, int motionBolt, vector3 *cent_
 		motionAngles.roll = -tempAng.pitch;
 
 		for ( ang = 0; ang < 3; ang++ ) {
-			viewAngles->data[ang] = AngleNormalize180( viewAngles->data[ang] - AngleNormalize180( motionAngles.data[ang] ) );
+			viewAngles->raw[ang] = AngleNormalize180( viewAngles->raw[ang] - AngleNormalize180( motionAngles.raw[ang] ) );
 		}
 	}
 
@@ -8490,8 +8490,8 @@ void BG_G2PlayerAngles( void *ghoul2, int motionBolt, entityState_t *cent, int t
 	VectorCopy( cent_lerpAngles, &eyeAngles );
 
 	for ( i = 0; i < 3; i++ ) {
-		lookAngles->data[i] = AngleNormalize180( lookAngles->data[i] );
-		eyeAngles.data[i] = AngleNormalize180( eyeAngles.data[i] );
+		lookAngles->raw[i] = AngleNormalize180( lookAngles->raw[i] );
+		eyeAngles.raw[i] = AngleNormalize180( eyeAngles.raw[i] );
 	}
 	AnglesSubtract( lookAngles, &eyeAngles, lookAngles );
 
@@ -8708,16 +8708,16 @@ void PM_VehicleViewAngles( playerState_t *ps, bgEntity_t *veh, usercmd_t *ucmd )
 	}
 	if ( setAngles ) {
 		for ( i = 0; i < 3; i++ ) {//clamp viewangles
-			if ( clampMin.data[i] == -1 || clampMax.data[i] == -1 ) {//no clamp
+			if ( clampMin.raw[i] == -1 || clampMax.raw[i] == -1 ) {//no clamp
 			}
-			else if ( !clampMin.data[i] && !clampMax.data[i] ) {//no allowance
-				//ps->viewangles.data[i] = veh->playerState->viewangles.data[i];
+			else if ( !clampMin.raw[i] && !clampMax.raw[i] ) {//no allowance
+				//ps->viewangles.raw[i] = veh->playerState->viewangles.raw[i];
 			}
 			else {//allowance
-				if ( ps->viewangles.data[i] > clampMax.data[i] )
-					ps->viewangles.data[i] = clampMax.data[i];
-				else if ( ps->viewangles.data[i] < clampMin.data[i] )
-					ps->viewangles.data[i] = clampMin.data[i];
+				if ( ps->viewangles.raw[i] > clampMax.raw[i] )
+					ps->viewangles.raw[i] = clampMax.raw[i];
+				else if ( ps->viewangles.raw[i] < clampMin.raw[i] )
+					ps->viewangles.raw[i] = clampMin.raw[i];
 			}
 		}
 
@@ -8825,39 +8825,39 @@ void PM_VehFaceHyperspacePoint(bgEntity_t *veh)
 		turnRate = (90.0f*pml.frametime);
 		for ( i = 0; i < 3; i++ )
 		{
-			aDelta = AngleSubtract(veh->playerState->hyperSpaceangles.data[i], veh->m_pVehicle->m_vOrientation[i]);
+			aDelta = AngleSubtract(veh->playerState->hyperSpaceangles.raw[i], veh->m_pVehicle->m_vOrientation[i]);
 			if ( fabsf( aDelta ) < turnRate )
 			{//all is good
-				veh->playerState->viewangles.data[i] = veh->playerState->hyperSpaceangles.data[i];
+				veh->playerState->viewangles.raw[i] = veh->playerState->hyperSpaceangles.raw[i];
 				matchedAxes++;
 			}
 			else
 			{
-				aDelta = AngleSubtract(veh->playerState->hyperSpaceangles.data[i], veh->playerState->viewangles.data[i]);
+				aDelta = AngleSubtract(veh->playerState->hyperSpaceangles.raw[i], veh->playerState->viewangles.raw[i]);
 				if ( fabsf( aDelta ) < turnRate )
 				{
-					veh->playerState->viewangles.data[i] = veh->playerState->hyperSpaceangles.data[i];
+					veh->playerState->viewangles.raw[i] = veh->playerState->hyperSpaceangles.raw[i];
 				}
 				else if ( aDelta > 0 )
 				{
 					if ( i == YAW )
 					{
-						veh->playerState->viewangles.data[i] = AngleNormalize360( veh->playerState->viewangles.data[i]+turnRate );
+						veh->playerState->viewangles.raw[i] = AngleNormalize360( veh->playerState->viewangles.raw[i]+turnRate );
 					}
 					else
 					{
-						veh->playerState->viewangles.data[i] = AngleNormalize180( veh->playerState->viewangles.data[i]+turnRate );
+						veh->playerState->viewangles.raw[i] = AngleNormalize180( veh->playerState->viewangles.raw[i]+turnRate );
 					}
 				}
 				else
 				{
 					if ( i == YAW )
 					{
-						veh->playerState->viewangles.data[i] = AngleNormalize360( veh->playerState->viewangles.data[i]-turnRate );
+						veh->playerState->viewangles.raw[i] = AngleNormalize360( veh->playerState->viewangles.raw[i]-turnRate );
 					}
 					else
 					{
-						veh->playerState->viewangles.data[i] = AngleNormalize180( veh->playerState->viewangles.data[i]-turnRate );
+						veh->playerState->viewangles.raw[i] = AngleNormalize180( veh->playerState->viewangles.raw[i]-turnRate );
 					}
 				}
 			}
@@ -8904,23 +8904,23 @@ void PM_VehFaceHyperspacePoint( bgEntity_t *veh ) {
 
 		turnRate = (90.0f*pml.frametime);
 		for ( i = 0; i < 3; i++ ) {
-			aDelta = AngleSubtract( veh->playerState->hyperSpaceAngles.data[i], veh->m_pVehicle->m_vOrientation->data[i] );
+			aDelta = AngleSubtract( veh->playerState->hyperSpaceAngles.raw[i], veh->m_pVehicle->m_vOrientation->raw[i] );
 			if ( fabsf( aDelta ) < turnRate ) {//all is good
-				pm->ps->viewangles.data[i] = veh->playerState->hyperSpaceAngles.data[i];
+				pm->ps->viewangles.raw[i] = veh->playerState->hyperSpaceAngles.raw[i];
 				matchedAxes++;
 			}
 			else {
-				aDelta = AngleSubtract( veh->playerState->hyperSpaceAngles.data[i], pm->ps->viewangles.data[i] );
+				aDelta = AngleSubtract( veh->playerState->hyperSpaceAngles.raw[i], pm->ps->viewangles.raw[i] );
 				if ( fabsf( aDelta ) < turnRate ) {
-					pm->ps->viewangles.data[i] = veh->playerState->hyperSpaceAngles.data[i];
+					pm->ps->viewangles.raw[i] = veh->playerState->hyperSpaceAngles.raw[i];
 				}
 				else if ( aDelta > 0 ) {
-					if ( i == 1/*YAW*/ )	pm->ps->viewangles.data[i] = AngleNormalize360( pm->ps->viewangles.data[i] + turnRate );
-					else					pm->ps->viewangles.data[i] = AngleNormalize180( pm->ps->viewangles.data[i] + turnRate );
+					if ( i == 1/*YAW*/ )	pm->ps->viewangles.raw[i] = AngleNormalize360( pm->ps->viewangles.raw[i] + turnRate );
+					else					pm->ps->viewangles.raw[i] = AngleNormalize180( pm->ps->viewangles.raw[i] + turnRate );
 				}
 				else {
-					if ( i == 1/*YAW*/ )	pm->ps->viewangles.data[i] = AngleNormalize360( pm->ps->viewangles.data[i] - turnRate );
-					else					pm->ps->viewangles.data[i] = AngleNormalize180( pm->ps->viewangles.data[i] - turnRate );
+					if ( i == 1/*YAW*/ )	pm->ps->viewangles.raw[i] = AngleNormalize360( pm->ps->viewangles.raw[i] - turnRate );
+					else					pm->ps->viewangles.raw[i] = AngleNormalize180( pm->ps->viewangles.raw[i] - turnRate );
 				}
 			}
 		}
@@ -8990,10 +8990,10 @@ void BG_VehicleAdjustBBoxForOrientation( Vehicle_t *veh, vector3 *origin, vector
 		VectorCopy( origin, &newMaxs );
 		for ( curAxis = 0; curAxis < 3; curAxis++ ) {
 			for ( i = 0; i<8; i++ ) {
-				if ( point[i].data[curAxis] > newMaxs.data[curAxis] )
-					newMaxs.data[curAxis] = point[i].data[curAxis];
-				else if ( point[i].data[curAxis] < newMins.data[curAxis] )
-					newMins.data[curAxis] = point[i].data[curAxis];
+				if ( point[i].raw[curAxis] > newMaxs.raw[curAxis] )
+					newMaxs.raw[curAxis] = point[i].raw[curAxis];
+				else if ( point[i].raw[curAxis] < newMins.raw[curAxis] )
+					newMins.raw[curAxis] = point[i].raw[curAxis];
 			}
 		}
 		VectorSubtract( &newMins, origin, &newMins );
