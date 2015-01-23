@@ -1859,8 +1859,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 
 	// post-init stuff
 	trap->Cvar_VariableStringBuffer( "rate", buf, sizeof(buf) );
-	if ( atoi( buf ) == 4000 )
-		trap->Print( S_COLOR_YELLOW"WARNING: Default /rate value detected. Suggest typing /rate 25000 for a smoother connection!\n" );
+	if ( atoi( buf ) == 4000 ) {
+		trap->Print( S_COLOR_YELLOW "WARNING: Default /rate value detected. Suggest typing /rate 25000 for a smoother "
+			"connection!\n" );
+	}
 }
 
 //makes sure returned string is in localized format

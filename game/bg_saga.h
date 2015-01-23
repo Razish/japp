@@ -107,4 +107,4 @@ siegeClass_t *BG_GetClassOnBaseClass( const int team, const short classIndex, co
 int BG_SiegeCountBaseClass( const int team, const short classIndex );
 
 extern char	siege_info[MAX_SIEGE_INFO_SIZE];
-extern int	siege_valid;
+extern qboolean siege_valid;

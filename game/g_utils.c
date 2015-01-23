@@ -776,7 +776,7 @@ gentity_t *G_ScreenShake( vector3 *org, gentity_t *target, float intensity, int 
 void G_MuteSound( int entnum, int channel ) {
 	gentity_t *te, *e;
 
-	assert( entnum > 0 && entnum < MAX_GENTITIES );
+	assert( entnum >= 0 && entnum < MAX_GENTITIES );
 
 	te = G_TempEntity( &vec3_origin, EV_MUTE_SOUND );
 	te->r.svFlags = SVF_BROADCAST;

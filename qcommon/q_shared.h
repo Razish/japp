@@ -1250,13 +1250,12 @@ typedef int32_t		cvarHandle_t;
 typedef struct vmCvar_s {
 	cvarHandle_t	handle;
 	int				modificationCount;
-
-	char			string[MAX_CVAR_VALUE_STRING];
 	float			value;
 	union {
 		int32_t			integer;
 		uint32_t		bits;
 	};
+	char			string[MAX_CVAR_VALUE_STRING];
 } vmCvar_t;
 
 #include "surfaceflags.h"			// shared with the q3map utility

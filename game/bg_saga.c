@@ -16,7 +16,7 @@
 //Could use strap stuff but I don't particularly care at the moment anyway.
 
 char		siege_info[MAX_SIEGE_INFO_SIZE];
-int			siege_valid = 0;
+qboolean	siege_valid = qfalse;
 
 siegeTeam_t *team1Theme = NULL;
 siegeTeam_t *team2Theme = NULL;

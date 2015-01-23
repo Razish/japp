@@ -2142,7 +2142,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 				// x has defeated y
 				Com_sprintf( pre1, sizeof(pre1), "%s " S_COLOR_WHITE "%s %s", winner, defeated, loser );
-				Com_sprintf( pre2, sizeof(pre2), "You %s %s", winner, defeated, loser );
+				Com_sprintf( pre2, sizeof(pre2), "You %s %s", defeated, loser );
 
 				// with h/a remaining
 				if ( japp_duelStats.bits & DUELSTATS_HEALTH ) {

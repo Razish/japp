@@ -545,7 +545,7 @@ qboolean BG_LegalizedForcePowers( char *powerOut, size_t powerOutSize, int maxRa
 		int powerCycle = 2;
 		int minPow = 0;
 
-		trap->Print( "BG_LegalizedForcePowers: usedPoints:%i > allowedPoints%i\n", usedPoints, allowedPoints );
+		trap->Print( "BG_LegalizedForcePowers: usedPoints:%i > allowedPoints:%i\n", usedPoints, allowedPoints );
 
 		if ( freeSaber ) {
 			minPow = 1;
