@@ -203,6 +203,7 @@ typedef enum sayTeamMethod_e {
 	STM_TEAM = 0,
 	STM_ADMIN,
 	STM_CENTERPRINT,
+	STM_CLAN,
 	STM_NUM_METHODS
 } sayTeamMethod_t;
 
@@ -448,6 +449,7 @@ typedef struct clientPersistant_s {
 	qboolean			teamInfo; // send team overlay updates?
 	adminUser_t			*adminUser;
 	adminData_t			adminData;
+	qboolean			clanMember;
 	qboolean			ready;
 	int					vote; // 0 = none, 1 = yes, 2 = no
 	int					connectTime;
