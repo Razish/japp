@@ -2893,13 +2893,3 @@ void AM_ApplySessionTransition( gentity_t *ent ) {
 		G_SleepClient( ent->client );
 	}
 }
-
-void ClanMember(gentity_t *ent)
-{
-	ent->client->pers.clanMember = qtrue;
-}
-
-void ClanMember_No(gentity_t *ent)
-{
-	ent->client->pers.clanMember = qfalse;
-}

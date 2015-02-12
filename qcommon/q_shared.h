@@ -2275,7 +2275,6 @@ typedef enum chatType_e {
 	SAY_TEAM,
 	SAY_TELL,
 	SAY_ADMIN,
-	SAY_CLAN,
 } chatType_t;
 
 #define CDKEY_LEN 16

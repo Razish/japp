@@ -612,21 +612,6 @@ static int JPLua_Player_IsBot( lua_State *L ) {
 	return 1;
 }
 
-#ifdef _GAME
-//Func: Player:IsMember()
-//Retn: boolean expressing whether the Player is a member
-static int JPLua_Player_IsMember( lua_State *L ) {
-	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	gclient_t *cl = g_entities[player->clientNum].client;
-	qboolean member = qfalse;
-	if(cl->pers.clanMember)
-		member = qtrue;
-
-	lua_pushboolean( L, member ? 1 : 0 );
-	return 1;
-}
-#endif
-
 //Func: Player:IsUnderwater()
 //Retn: boolean expressing if the player is underwater
 static int JPLua_Player_IsUnderwater( lua_State *L ) {
@@ -912,25 +897,6 @@ static int JPLua_Player_SetHealth( lua_State *L ) {
 #endif
 
 #ifdef _GAME
-extern void ClanMember(gentity_t *ent);
-extern void ClanMember_No(gentity_t *ent);
-//Func: Player:SetMember()
-//Retn: N/A
-static int JPLua_Player_SetMember( lua_State *L ) {
-	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	int status = lua_tointeger( L, 2 );
-	gentity_t *ent = &g_entities[player->clientNum];
-
-	if ( status == 1 )
-		ClanMember(ent);
-	if ( status == 0)
-		ClanMember_No(ent);
-
-	return 0;
-}
-#endif
-
-#ifdef _GAME
 //Func: Player:SetName( string name, [boolean announce] )
 //Retn: N/A
 static int JPLua_Player_SetName( lua_State *L ) {
@@ -1155,7 +1121,6 @@ static const struct luaL_Reg jplua_player_meta[] = {
 #ifdef _GAME
 	{ "GiveWeapon", JPLua_Player_GiveWeapon },
 	{ "IsAdmin", JPLua_Player_IsAdmin },
-	{ "IsMember", JPLua_Player_IsMember},
 #endif
 	{ "IsAlive", JPLua_Player_IsAlive },
 	{ "IsBot", JPLua_Player_IsBot },
@@ -1174,7 +1139,6 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "SetEFlag", JPLua_Player_SetEFlag },
 	{ "SetEFlag2", JPLua_Player_SetEFlag2 },
 	{ "SetFlag", JPLua_Player_SetFlag },
-	{ "SetMember", JPLua_Player_SetMember },
 #ifdef _GAME
 	{ "SetForce", JPLua_Player_SetForce },
 #endif
