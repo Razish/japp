@@ -20,6 +20,7 @@
 static adminUser_t *adminUsers = NULL;
 static telemark_t *telemarks = NULL;
 static qboolean telemarksVisible = qfalse;
+static int effectid = 0;
 
 static void AM_ConsolePrint( const gentity_t *ent, const char *msg ) {
 	if ( ent ) {
@@ -2159,6 +2160,7 @@ static void G_PrintWeatherOptions( gentity_t *ent ) {
 	trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\n\"", buf ) );
 }
 
+
 static void AM_Weather( gentity_t *ent ) {
 	const char *cmd = NULL, *opt = NULL;
 
@@ -2179,8 +2181,12 @@ static void AM_Weather( gentity_t *ent ) {
 		G_PrintWeatherOptions( ent );
 		return;
 	}
-
-	G_EffectIndex( va( "*%s", cmd ) );
+	if (effectid != 0){
+		effectid = G_EffectIndex(va("*%s", cmd));
+	}
+	else{
+		trap->SetConfigstring(CS_EFFECTS + effectid, va("*%s", cmd));
+	}
 }
 
 // spawn an entity
