@@ -2181,7 +2181,7 @@ static void AM_Weather( gentity_t *ent ) {
 		G_PrintWeatherOptions( ent );
 		return;
 	}
-	if (effectid != 0){
+	if (effectid == 0){
 		effectid = G_EffectIndex(va("*%s", cmd));
 	}
 	else{
