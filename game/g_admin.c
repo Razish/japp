@@ -2184,9 +2184,7 @@ static void AM_Weather( gentity_t *ent ) {
 	if (effectid == 0){
 		effectid = G_EffectIndex(va("*%s", cmd));
 	}
-	else{
-		trap->SetConfigstring(CS_EFFECTS + effectid, va("*%s", cmd));
-	}
+        trap->SetConfigstring(CS_EFFECTS + effectid, va("*%s", cmd));
 }
 
 // spawn an entity
