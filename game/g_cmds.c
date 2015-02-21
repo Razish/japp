@@ -1179,6 +1179,7 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 
 static void Cmd_Say_f( gentity_t *ent ) {
 	char *p = NULL;
+	char *res = NULL;
 	chatType_t type = SAY_ALL;
 
 	if ( trap->Argc() < 2 ) {
@@ -1192,12 +1193,17 @@ static void Cmd_Say_f( gentity_t *ent ) {
 		p[MAX_SAY_TEXT - 1] = '\0';
 		G_LogPrintf( level.log.security, "Cmd_Say_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
-
-	G_Say( ent, NULL, type, p );
+	if ((res = JPLua_Event_ChatMessageRecieved(ent->s.number, p, type))){
+		G_Say(ent, NULL, type, res);
+	}
+	else{
+		G_Say(ent, NULL, type, p);
+	}
 }
 
 static void Cmd_SayAdmin_f( gentity_t *ent ) {
 	char *p = NULL;
+	char *res = NULL;
 	chatType_t type = SAY_ADMIN;
 
 	if ( trap->Argc() < 2 ) {
@@ -1210,12 +1216,17 @@ static void Cmd_SayAdmin_f( gentity_t *ent ) {
 		p[MAX_SAY_TEXT - 1] = '\0';
 		G_LogPrintf( level.log.security, "Cmd_SayAdmin_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
-
-	G_Say( ent, NULL, type, p );
+	if ((res = JPLua_Event_ChatMessageRecieved(ent->s.number, p, type))){
+		G_Say(ent, NULL, type, res);
+	}
+	else{
+		G_Say(ent, NULL, type, p);
+	}
 }
 
 static void Cmd_SayTeam_f( gentity_t *ent ) {
 	char *p = NULL;
+	char *res = NULL;
 	chatType_t type = (level.gametype >= GT_TEAM) ? SAY_TEAM : SAY_ALL;
 
 	if ( trap->Argc() < 2 ) {
@@ -1229,7 +1240,9 @@ static void Cmd_SayTeam_f( gentity_t *ent ) {
 		p[MAX_SAY_TEXT - 1] = '\0';
 		G_LogPrintf( level.log.security, "Cmd_SayTeam_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
-
+	if ((res = JPLua_Event_ChatMessageRecieved(ent->s.number, p, type))){
+		Q_strncpyz(p, res, sizeof(p));
+	}
 	if ( ent->client->pers.sayTeamMethod == STM_ADMIN ) {
 		type = SAY_ADMIN;
 	}
@@ -1243,7 +1256,6 @@ static void Cmd_SayTeam_f( gentity_t *ent ) {
 		}
 		return;
 	}
-
 	G_Say( ent, NULL, type, p );
 }
 

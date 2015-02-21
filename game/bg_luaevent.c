@@ -164,8 +164,11 @@ void JPLua_Event_RunFrame( void ) {
 #endif // JPLUA
 }
 
-#ifdef _CGAME
+#if defined(_CGAME)
 char *JPLua_Event_ChatMessageRecieved( const char *msg ) {
+#elif defined(_GAME)
+char *JPLua_Event_ChatMessageRecieved(int clientNum, const char *msg, int type ) {
+#endif
 	static char tmpMsg[MAX_SAY_TEXT] = { 0 }; // although a chat message can only be MAX_SAY_TEXT long..-name?
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -178,8 +181,15 @@ char *JPLua_Event_ChatMessageRecieved( const char *msg ) {
 		if ( plugin->eventListeners[JPLUA_EVENT_CHATMSGRECV] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_CHATMSGRECV] );
 
+#if defined(_CGAME)
 			lua_pushstring( JPLua.state, tmpMsg );
 			JPLua_Call( JPLua.state, 1, 1 );
+#elif defined(_GAME)
+			JPLua_Player_CreateRef( JPLua.state, clientNum );
+			lua_pushstring( JPLua.state, tmpMsg );
+			lua_pushinteger(JPLua.state, type);
+			JPLua_Call( JPLua.state, 3, 1 );
+#endif
 
 			// returned nil, no use passing it to other plugins
 			if ( lua_type( JPLua.state, -1 ) == LUA_TNIL )
@@ -196,7 +206,6 @@ char *JPLua_Event_ChatMessageRecieved( const char *msg ) {
 
 	return tmpMsg;
 }
-#endif
 
 #ifdef _CGAME
 char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targetClient ) {

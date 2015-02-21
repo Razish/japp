@@ -33,8 +33,12 @@ int JPLua_Event_RemoveListener( lua_State *L );
 void JPLua_Event_Shutdown( void );
 void JPLua_Event_RunFrame( void );
 
+#if defined(_CGAME)
+char *JPLua_Event_ChatMessageRecieved(const char *msg);
+#elif defined(_GAME)
+char *JPLua_Event_ChatMessageRecieved(int clientNum, const char *msg, int type );
+#endif
 #ifdef _CGAME
-char *JPLua_Event_ChatMessageRecieved( const char *msg );
 char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targetClient );
 #endif
 
