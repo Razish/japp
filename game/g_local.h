@@ -448,6 +448,7 @@ typedef struct clientPersistant_s {
 	qboolean			teamInfo; // send team overlay updates?
 	adminUser_t			*adminUser;
 	adminData_t			adminData;
+	uint32_t            tempprivs;
 	qboolean			ready;
 	int					vote; // 0 = none, 1 = yes, 2 = no
 	int					connectTime;
@@ -763,6 +764,7 @@ typedef struct bot_settings_s {
 } bot_settings_t;
 
 void			Add_Ammo( gentity_t *ent, int weapon, int count );
+void            AddRemap(const char *oldShader, const char *newShader, float timeOffset);
 void			AddScore( gentity_t *ent, vector3 *origin, int score );
 void			AddSightEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, float addLight );
 void			AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, qboolean needLOS );
@@ -780,6 +782,7 @@ int				BotAIShutdownClient( int client, qboolean restart );
 int				BotAISetupClient( int client, struct bot_settings_s *settings, qboolean restart );
 int				BotAIStartFrame( int time );
 void			BotInterbreedEndMatch( void );
+const char     *BuildShaderStateConfig(void);
 void			BroadcastTeamChange( gclient_t *client, int oldTeam );
 void			CalcMuzzlePoint( const gentity_t *ent, vector3 *forward, vector3 *right, vector3 *up, vector3 *muzzlePoint );
 void			CalculateRanks( void );

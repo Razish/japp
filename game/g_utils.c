@@ -16,7 +16,7 @@ typedef struct shaderRemap_s {
 static int remapCount = 0;
 static shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
 
-static void AddRemap( const char *oldShader, const char *newShader, float timeOffset ) {
+void AddRemap( const char *oldShader, const char *newShader, float timeOffset ) {
 	int i;
 
 	for ( i = 0; i < remapCount; i++ ) {
@@ -35,7 +35,7 @@ static void AddRemap( const char *oldShader, const char *newShader, float timeOf
 	}
 }
 
-static const char *BuildShaderStateConfig( void ) {
+const char *BuildShaderStateConfig( void ) {
 	static char buf[MAX_STRING_CHARS * 4];
 	char out[(MAX_QPATH * 2) + 5];
 	int i;
