@@ -66,6 +66,7 @@ typedef struct adminUser_s {
 #define PRIV_MAP		(0x01000000u)
 #define PRIV_RENAME		(0x02000000u)
 #define PRIV_LOCKTEAM	(0x04000000u)
+#define PRIV_GRANT      (0x08000000u)
 
 void		 AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const int rank, const char *loginMsg );
 void		 AM_DeleteAdmin( const char *user );
