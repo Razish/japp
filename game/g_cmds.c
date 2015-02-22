@@ -2584,11 +2584,24 @@ static void Cmd_BotMoveUp_f( gentity_t *ent ) {
 
 static void Cmd_Sabercolor_f( gentity_t *ent ) {
 	int saberNum, red, green, blue, client = ent->client - level.clients;
+	byte r = 0, g = 0, b = 0;
+	const char *temp;
 	char sNum[8] = { 0 }, sRed[8] = { 0 }, sGreen[8] = { 0 }, sBlue[8] = { 0 };
 	char userinfo[MAX_INFO_STRING];
+	trap->GetUserinfo(client, userinfo, sizeof(userinfo));
+	temp = Info_ValueForKey(userinfo, "cp_sbRGB1");
+	b = (atoi(temp) >> 16) & 0xf;
+	g = (atoi(temp) >> 8) & 0xf;
+	r = atoi(temp) & 0xf;
 
 	if ( trap->Argc() < 5 ) {
 		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\sabercolor "S_COLOR_WHITE"<"S_COLOR_YELLOW"1-2"S_COLOR_WHITE"> <"S_COLOR_RED"0-255"S_COLOR_WHITE"> <"S_COLOR_GREEN"0-255"S_COLOR_WHITE"> <"S_COLOR_CYAN"0-255"S_COLOR_WHITE">\n\"" );
+		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"Current: Saber 1:\<"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\""), r, g, b);
+		temp = Info_ValueForKey(userinfo, "cp_sbRGB2");
+		b = (atoi(temp) >> 16) & 0xf;
+		g = (atoi(temp) >> 8) & 0xf;
+		r = atoi(temp) & 0xf;
+		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"         Saber 2:\<"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\""), r, g, b);
 		return;
 	}
 
@@ -2602,11 +2615,41 @@ static void Cmd_Sabercolor_f( gentity_t *ent ) {
 	green = Q_clampi( 0, atoi( sGreen ), 255 );
 	blue = Q_clampi( 0, atoi( sBlue ), 255 );
 
-	trap->GetUserinfo( client, userinfo, sizeof(userinfo) );
 	Info_SetValueForKey( userinfo, (saberNum == 1) ? "cp_sbRGB1" : "cp_sbRGB2", va( "%i", red | ((green | (blue << 8)) << 8) ) );
 	Info_SetValueForKey( userinfo, (saberNum == 1) ? "color1" : "color2", va( "%i", SABER_RGB ) );
 	trap->SetUserinfo( client, userinfo );
 	ClientUserinfoChanged( client );
+
+	return;
+}
+
+static void Cmd_Playertint_f(gentity_t *ent) {
+	int red, green, blue, client = ent->client - level.clients;
+	byte r = 0, g = 0, b = 0;
+	char sRed[8] = { 0 }, sGreen[8] = { 0 }, sBlue[8] = { 0 };
+	char userinfo[MAX_INFO_STRING];
+	trap->GetUserinfo(client, userinfo, sizeof(userinfo));
+	r = ent->client->ps.customRGBA[0];
+	g = ent->client->ps.customRGBA[1];
+	b = ent->client->ps.customRGBA[2];
+
+	if (trap->Argc() < 4) {
+		trap->SendServerCommand(ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\playertint "S_COLOR_WHITE"<"S_COLOR_YELLOW"1-2"S_COLOR_WHITE"> <"S_COLOR_RED"0-255"S_COLOR_WHITE"> <"S_COLOR_GREEN"0-255"S_COLOR_WHITE"> <"S_COLOR_CYAN"0-255"S_COLOR_WHITE">\n\"");
+		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"Current: \<"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\""), r, g, b);
+		return;
+	}
+
+	trap->Argv(1, sRed, sizeof(sRed));
+	trap->Argv(2, sGreen, sizeof(sGreen));
+	trap->Argv(3, sBlue, sizeof(sBlue));
+
+	red = Q_clampi(0, atoi(sRed), 255);
+	green = Q_clampi(0, atoi(sGreen), 255);
+	blue = Q_clampi(0, atoi(sBlue), 255);
+
+	ent->client->ps.customRGBA[0] = red;
+	ent->client->ps.customRGBA[1] = green;
+	ent->client->ps.customRGBA[2] = blue;
 
 	return;
 }
@@ -3665,6 +3708,7 @@ static const command_t commands[] = {
 	{ "notarget", Cmd_Notarget_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 	{ "npc", Cmd_NPC_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
 	{ "origin", Cmd_Origin_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
+	{ "playertint", Cmd_Playertint_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "ready", Cmd_Ready_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "saber", Cmd_Saber_f, GTB_ALL, 0 },
 	{ "sabercolor", Cmd_Sabercolor_f, GTB_ALL, 0 },
