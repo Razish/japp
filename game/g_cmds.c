@@ -2596,12 +2596,12 @@ static void Cmd_Sabercolor_f( gentity_t *ent ) {
 
 	if ( trap->Argc() < 5 ) {
 		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\sabercolor "S_COLOR_WHITE"<"S_COLOR_YELLOW"1-2"S_COLOR_WHITE"> <"S_COLOR_RED"0-255"S_COLOR_WHITE"> <"S_COLOR_GREEN"0-255"S_COLOR_WHITE"> <"S_COLOR_CYAN"0-255"S_COLOR_WHITE">\n\"" );
-		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"Current: Saber 1:\<"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\"", r, g, b));
+		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"Current: Saber 1:<"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\"", r, g, b));
 		temp = Info_ValueForKey(userinfo, "cp_sbRGB2");
 		b = (atoi(temp) >> 16) & 0xf;
 		g = (atoi(temp) >> 8) & 0xf;
 		r = atoi(temp) & 0xf;
-		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"         Saber 2:\<"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\"", r, g, b));
+		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"         Saber 2:<"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\"", r, g, b));
 		return;
 	}
 
@@ -2635,7 +2635,7 @@ static void Cmd_Playertint_f(gentity_t *ent) {
 
 	if (trap->Argc() < 4) {
 		trap->SendServerCommand(ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\playertint "S_COLOR_WHITE"<"S_COLOR_YELLOW"1-2"S_COLOR_WHITE"> <"S_COLOR_RED"0-255"S_COLOR_WHITE"> <"S_COLOR_GREEN"0-255"S_COLOR_WHITE"> <"S_COLOR_CYAN"0-255"S_COLOR_WHITE">\n\"");
-		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"Current: \<"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\"", r, g, b));
+		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"Current: <"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\"", r, g, b));
 		return;
 	}
 
