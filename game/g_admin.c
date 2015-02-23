@@ -1369,7 +1369,7 @@ static void AM_GunProtect( gentity_t *ent ) {
 	}
 }
 
-static void Empower_On( gentity_t *ent ) {
+void Empower_On( gentity_t *ent ) {
 	int i;
 
 	ent->client->ps.fd.forcePowerSelected = 0; // HACK: What the actual fuck
@@ -1386,7 +1386,7 @@ static void Empower_On( gentity_t *ent ) {
 	}
 }
 
-static void Empower_Off( gentity_t *ent ) {
+void Empower_Off( gentity_t *ent ) {
 	int i;
 
 	ent->client->ps.fd.forcePowerSelected = 0; // HACK: What the actual fuck
@@ -1438,7 +1438,7 @@ static void AM_Empower( gentity_t *ent ) {
 
 void G_Knockdown( gentity_t *self, gentity_t *attacker, const vector3 *pushDir, float strength,
 	qboolean breakSaberLock );
-static void Slap( gentity_t *targ ) {
+void Slap( gentity_t *targ ) {
 	vector3 newDir = { 0.0f, 0.0f, 0.0f };
 	int i;
 
@@ -1514,7 +1514,7 @@ static void AM_GunSlap( gentity_t *ent ) {
 	}
 }
 
-static void G_SleepClient( gclient_t *cl ) {
+void G_SleepClient( gclient_t *cl ) {
 	cl->pers.adminData.isSlept = qtrue;
 	if ( cl->hook ) {
 		Weapon_HookFree( cl->hook );
@@ -1525,7 +1525,7 @@ static void G_SleepClient( gclient_t *cl ) {
 	cl->ps.forceDodgeAnim = 0;
 }
 
-static void G_WakeClient( gclient_t *cl ) {
+void G_WakeClient( gclient_t *cl ) {
 	const animNumber_t anim = BOTH_GETUP1;
 	cl->pers.adminData.isSlept = qfalse;
 	cl->ps.forceHandExtendTime = level.time + BG_AnimLength( g_entities[cl->ps.clientNum].localAnimIndex, anim );
@@ -2488,7 +2488,7 @@ static void AM_Vstr( gentity_t *ent ) {
 	trap->SendConsoleCommand( EXEC_APPEND, va( "vstr %s\n", args ) );
 }
 
-static void Merc_On( gentity_t *ent ) {
+void Merc_On( gentity_t *ent ) {
 	int i;
 	ent->client->ps.stats[STAT_WEAPONS] = ((1 << LAST_USEABLE_WEAPON) - 1) & ~1;
 	for ( i = 0; i < AMMO_MAX; i++ ) {
@@ -2496,7 +2496,7 @@ static void Merc_On( gentity_t *ent ) {
 	}
 }
 
-static void Merc_Off( gentity_t *ent ) {
+void Merc_Off( gentity_t *ent ) {
 	int i;
 	weapon_t newWeap = -1, wp = ent->client->ps.weapon;
 
