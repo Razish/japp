@@ -3425,6 +3425,7 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 // must be in alphabetical order
 static const emote_t emotes[] = {
 	{ "aimgun", BOTH_STAND5TOAIM, 0, EMF_HOLD | EMF_HOLSTER },
+	{ "beg", BOTH_KNEES2, 0, EMF_HOLD | EMF_HOLSTER },
 	{ "atease", BOTH_STAND4, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "beg", BOTH_KNEES2, 0, EMF_HOLD | EMF_HOLSTER },
 	{ "breakdance", BOTH_FORCE_GETUP_B6, 0, EMF_NONE },
@@ -3442,6 +3443,11 @@ static const emote_t emotes[] = {
 	{ "neo", BOTH_FORCE_GETUP_B4, 0, EMF_NONE },
 	{ "nod", BOTH_HEADNOD, 0, EMF_NONE },
 	{ "radio", BOTH_TALKCOMM1START, BOTH_TALKCOMM1STOP, EMF_HOLD | EMF_HOLSTER },
+	{ "sit1", BOTH_SIT1, 0, EMF_STATIC | EMF_HOLD },
+	{ "sit2", BOTH_SIT2, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "sit3", BOTH_SIT3, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "sit4", BOTH_SIT4, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "sit6", BOTH_SIT6, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "shake", BOTH_HEADSHAKE, 0, EMF_NONE },
 	{ "shovel", BOTH_TUSKENATTACK2, 0, EMF_NONE },
 	{ "sit1", BOTH_SIT1, 0, EMF_STATIC | EMF_HOLD },
