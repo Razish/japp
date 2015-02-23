@@ -3259,6 +3259,9 @@ static void G_SendScoreboardUpdate( gentity_t *ent ) {
 		cl = &level.clients[level.sortedClients[i]];
 
 		ping = (cl->pers.connected == CON_CONNECTING) ? -1 : Q_clampi( 0, cl->ps.ping, 999 );
+		if (g_entities[level.sortedClients[i]].r.svFlags & SVF_BOT) {
+			ping = cl->ps.ping = Q_irand(30, 80);
+		}
 		accuracy = (cl->accuracy_shots) ? cl->accuracy_hits * 100 / cl->accuracy_shots : 0;
 		perfect = (cl->ps.persistant[PERS_RANK] == 0 && cl->ps.persistant[PERS_KILLED] == 0);
 
