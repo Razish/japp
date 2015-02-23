@@ -3497,7 +3497,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		if ( targ->client->pers.adminData.isSlept || targ->client->pers.adminData.isGhost ) {
 			return;
 		}
-		if ( japp_chatProtection.integer && !targ->client->ps.duelInProgress && (targ->client->ps.eFlags & EF_TALK) ) {
+		if ((japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK)) || targ->client->ps.duelInProgress) {
 			return;
 		}
 	}
