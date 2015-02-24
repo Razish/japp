@@ -21,6 +21,7 @@ typedef struct adminData_s {
 	qboolean empowered; // are they empowered?
 	qboolean merc; // are they merced?
 	int renamedTime; // level.time they were renamed
+	int logineffect;
 
 	// saving these for amempower
 	int forcePowersKnown;

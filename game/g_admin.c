@@ -572,6 +572,25 @@ void AM_SaveTelemarks( void ) {
 	AM_WriteTelemarks( f );
 }
 
+
+static void AM_SetLoginEffect(gentity_t *ent){
+	switch (japp_adminEffectType.integer){
+	case 1: /// Dark Force
+		ent->client->pers.adminData.logineffect = PW_FORCE_ENLIGHTENED_DARK;
+		break;
+	case 2:
+		ent->client->pers.adminData.logineffect = PW_FORCE_ENLIGHTENED_LIGHT;
+		break;
+	case 3:
+		ent->client->pers.adminData.logineffect = PW_SHIELDHIT;
+		break;
+	default:
+		ent->client->pers.adminData.logineffect = PW_FORCE_ENLIGHTENED_LIGHT;
+		break;
+	}
+	ent->client->ps.powerups[ent->client->pers.adminData.logineffect] = level.time + (japp_adminEffectDuration.integer * 1000);
+}
+
 // log in using user + pass
 static void AM_Login( gentity_t *ent ) {
 	char argUser[64] = { '\0' }, argPass[64] = { '\0' };
@@ -601,12 +620,12 @@ static void AM_Login( gentity_t *ent ) {
 		const char *loginMsg = ent->client->pers.adminUser->loginMsg;
 		char *sendMsg = NULL;
 
+		AM_SetLoginEffect(ent);
 		G_LogPrintf( level.log.admin, "[LOGIN] \"%s\", %s\n", argUser, G_PrintClient( ent-g_entities ) );
-		if ( !VALIDSTRING( loginMsg ) ) {
-			trap->SendServerCommand( ent - g_entities, "print \"You have logged in\n\"" );
+		if (!VALIDSTRING(loginMsg)) {
+			trap->SendServerCommand(ent - g_entities, "print \"You have logged in\n\"");
 			return;
 		}
-
 		sendMsg = Q_strrep( ent->client->pers.adminUser->loginMsg, "$name", ent->client->pers.netname );
 		Q_ConvertLinefeeds( sendMsg );
 		trap->SendServerCommand( -1, va( "print \"%s\n\"", sendMsg ) );
