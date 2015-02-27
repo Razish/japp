@@ -363,6 +363,7 @@
     <NMakeBuildCommandLine>scons.bat -Q debug=1</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>scons.bat -Q -c  debug=1</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>.;game;cgame;ui</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>scons.bat -Q</NMakeBuildCommandLine>
