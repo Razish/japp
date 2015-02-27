@@ -166,7 +166,7 @@ XCVAR_DEF( japp_allowToggleSpecialAttacks, "0", CVU_ToggleAtk, CVAR_NONE, qtrue 
 XCVAR_DEF( japp_allowVoiceChat, "960", NULL, CVAR_NONE, qfalse )
 XCVAR_DEF( japp_allowWeaponDrop, "0", NULL, CVAR_NONE, qtrue )
 XCVAR_DEF( japp_allowWeaponPull, "1", NULL, CVAR_NONE, qtrue )
-XCVAR_DEF( japp_allowWeaponWallRun, "1", NULL, CVAR_NONE, qtrue)
+XCVAR_DEF( japp_allowWeaponWallRun, "0", NULL, CVAR_NONE, qtrue )
 XCVAR_DEF( japp_alwaysSpawnPowerups, "0", NULL, CVAR_NONE, qfalse )
 XCVAR_DEF( japp_ammapAnyGametype, "0", NULL, CVAR_NONE, qfalse )
 XCVAR_DEF( japp_amrenameTime, "0.5", NULL, CVAR_NONE, qfalse )
