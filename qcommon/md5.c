@@ -254,6 +254,6 @@ void Q_ChecksumMD5( const char *in, size_t inLen, char out[16] ) {
 
 	out[0] = '\0';
 	for ( i = 0; i < 16; i++ ) {
-		Q_strcat( out, sizeof(out), va( "%02X", digest[i] ) );
+		Q_strcat( out, sizeof(*out), va( "%02X", digest[i] ) );
 	}
 }

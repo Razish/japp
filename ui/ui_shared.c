@@ -6620,7 +6620,7 @@ qboolean ItemParse_asset_model( itemDef_t *item, int handle ) {
 		temp = modelPath;
 	}
 
-	if ( !stricmp( token.string, "ui_char_model" ) ) {
+	if ( !Q_stricmp( token.string, "ui_char_model" ) ) {
 		char modelPath[MAX_QPATH];
 		char ui_char_model[MAX_QPATH];
 		trap->Cvar_VariableStringBuffer( "ui_char_model", ui_char_model, sizeof(ui_char_model) );

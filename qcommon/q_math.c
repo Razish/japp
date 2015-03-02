@@ -711,7 +711,7 @@ void SetPlaneSignbits( cplane_t *out ) {
 }
 
 
-#if !( (defined MACOS_X || defined __linux__ || __FreeBSD__) && (defined __i386__) && (!defined C_ONLY)) // rb010123
+#if !( (defined MACOS_X || defined __linux__ || defined __FreeBSD__) && (defined __i386__) && (!defined C_ONLY)) // rb010123
 
 #if defined __LCC__ || defined C_ONLY || !id386 || defined(MINGW32)
 

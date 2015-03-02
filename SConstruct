@@ -10,18 +10,22 @@
 #	scons -Q debug=1 force32=1
 #
 # envvars:
-#	MORE_WARNINGS	enable additional warnings (gcc/clang only)
+#	MORE_WARNINGS	enable additional warnings
 #	NO_SSE			disable SSE floating point instructions, force x87 fpu
 #
 
 debug = int( ARGUMENTS.get( 'debug', 0 ) )
-force32 = int( ARGUMENTS.get( 'force32', False ) )
+force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 
 def cmp_version( v1, v2 ):
 	def normalise( v ):
 		import re
 		return [int(x) for x in re.sub( r'(\.0+)*$', '', v ).split( '.' )]
-	return cmp( normalise( v1 ), normalise( v2 ) )
+
+	return cmp(
+		normalise( v1 ),
+		normalise( v2 )
+	)
 
 import platform
 plat = platform.system() # Windows or Linux
@@ -42,8 +46,12 @@ if bits == 32:
 			arch = 'arm'
 		else:
 			arch = 'i386'
+	elif plat == 'Darwin':
+		arch = 'i386'
 elif bits == 64:
 	arch = 'x86_64'
+
+clangHack = plat == 'Darwin'
 
 # fatal error if the cpu architecture can't be detected
 if arch is None:
@@ -62,12 +70,28 @@ if 'TERM' in os.environ:
 
 # prettify the compiler output
 import sys
-def cc_output( s, target, src, env ):
-	if len( src ) > 1:
-		sys.stdout.write( '  --> %s\n' % (''.join([str(x) for x in target])) )
-	else:
-		sys.stdout.write( '  compiling %s\n' % (''.join([str(x) for x in src])) )
-env['PRINT_CMD_LINE_FUNC'] = cc_output
+colours = {}
+colours['white'] = '\033[1;97m'
+colours['cyan'] = '\033[96m'
+colours['orange'] = '\033[33m'
+colours['green'] = '\033[92m'
+colours['end']  = '\033[0m'
+
+# if the output is not a terminal, remove the colours
+if not sys.stdout.isatty():
+	for key in colours.keys():
+		colours[key] = ''
+
+env['SHCCCOMSTR'] = env['SHCXXCOMSTR'] = env['CCCOMSTR'] = env['CXXCOMSTR'] = \
+	'%s compiling: %s$SOURCE%s' % (colours['cyan'], colours['white'], colours['end'])
+env['ARCOMSTR'] = \
+	'%s archiving: %s$TARGET%s' % (colours['orange'], colours['white'], colours['end'])
+env['RANLIBCOMSTR'] = \
+	'%s  indexing: %s$TARGET%s' % (colours['orange'], colours['white'], colours['end'])
+env['ASCOMSTR'] = \
+	'%sassembling: %s$TARGET%s' % (colours['orange'], colours['white'], colours['end'])
+env['SHLINKCOMSTR'] = env['LINKCOMSTR'] = \
+	'%s   linking: %s$TARGET%s' % (colours['green'], colours['white'], colours['end'])
 
 # obtain the compiler version
 import commands
@@ -78,12 +102,16 @@ else:
 	ccversion = None if status else ccrawversion
 
 # git revision
-status, rawrevision = commands.getstatusoutput( 'git rev-parse HEAD' )
+status, rawrevision = commands.getstatusoutput( 'git rev-parse --short HEAD' )
 revision = None if status else rawrevision
 
 # set job/thread count
-if plat == 'Linux':
-	status, num_cores = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
+if plat == 'Linux' or plat == 'Darwin':
+	# works on recent mac/linux
+	status, num_cores = commands.getstatusoutput( 'getconf _NPROCESSORS_ONLN' )
+	if status != 0:
+		# only works on linux
+		status, num_cores = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
 	env.SetOption( 'num_jobs', int(num_cores) * 3 if status == 0 else 1 )
 elif plat == 'Windows':
 	num_cores = int( os.environ['NUMBER_OF_PROCESSORS'] )
@@ -105,7 +133,7 @@ if not env.GetOption( 'clean' ):
 	print( msg )
 
 # compiler switches
-if plat == 'Linux':
+if plat == 'Linux' or plat == 'Darwin':
 	env['CPPDEFINES'] = []
 	env['CFLAGS'] = []
 	env['CCFLAGS'] = []
@@ -118,20 +146,32 @@ if plat == 'Linux':
 
 	# c/cpp warnings
 	env['CCFLAGS'] += [ '-Wall', '-Wextra', '-Wno-missing-braces', '-Wno-missing-field-initializers',
-		'-Wno-sign-compare', '-Wno-unused-parameter', '-Waggregate-return', '-Winit-self', '-Winline',
-		'-Wmissing-include-dirs', '-Woverlength-strings', '-Wpointer-arith', '-Wredundant-decls', '-Wundef',
-		'-Wuninitialized', '-Wwrite-strings'
+		'-Wno-sign-compare', '-Wno-unused-parameter', '-Winit-self', '-Winline', '-Wmissing-include-dirs',
+		'-Woverlength-strings', '-Wpointer-arith', '-Wredundant-decls', '-Wundef', '-Wuninitialized', '-Wwrite-strings'
 	]
 
 	# strict c/cpp warnings
 	if 'MORE_WARNINGS' in os.environ:
-		env['CCFLAGS'] += [ '-Wbad-function-cast', '-Wcast-qual', '-Wdouble-promotion', '-Wfloat-equal', '-Wlong-long',
-			'-Wshadow', '-Wsign-conversion', '-Wsuggest-attribute=const', '-Wswitch-default', '-Wunreachable-code',
-			'-Wunsuffixed-float-constants'
+		env['CCFLAGS'] += [
+			'-Waggregate-return',
+			'-Wbad-function-cast',
+			'-Wcast-qual',
+			'-Wfloat-equal',
+			'-Wlong-long',
+			'-Wshadow',
+			'-Wsign-conversion',
+			'-Wswitch-default',
+			'-Wunreachable-code'
 		]
+		if not clangHack:
+			env['CCFLAGS'] += [
+				'-Wdouble-promotion',
+				'-Wsuggest-attribute=const',
+				'-Wunsuffixed-float-constants'
+			]
 
 	# gcc-specific warnings
-	if env['CC'] == 'gcc' and arch != 'arm':
+	if env['CC'] == 'gcc' and arch != 'arm' and not clangHack:
 		env['CCFLAGS'] += [ '-Wlogical-op' ]
 
 		# requires gcc 4.7 or above
@@ -167,25 +207,25 @@ if plat == 'Linux':
 
 elif plat == 'Windows':
 	# assume msvc
+	env['CFLAGS'] = [ '/TC' ] # compile as c
 	env['CCFLAGS'] = [
-		'/EHcs',				# exception handling
-		'/errorReport:none',	# don't send error reports for internal compiler errors
-		'/Gd',					# use cdecl calling convention
-		'/GS',					# buffer security check
+		'/EHsc',				# exception handling
+	#	'/errorReport:none',	# don't send error reports for internal compiler errors
+	#	'/FC',					# display full path of source code in error messages
+	#	'/Gd',					# use cdecl calling convention
+	#	'/GS',					# buffer security check
 		'/nologo',				# remove watermark
-		'/TC',					# compile as c
 	]
 
 	env['LINKFLAGS'] = [
 		'/ERRORREPORT:none',	# don't send error reports for internal linker errors
-		'/MACHINE:' + arch,		# set the linker architecture
+	#	'/MACHINE:' + arch,		# set the linker architecture
 		'/NOLOGO',				# remove watermark
 	]
 	if bits == 64:
 		env['LINKFLAGS'] += [ '/SUBSYSTEM:WINDOWS' ]	# graphical application
 	else:
 		env['LINKFLAGS'] += [ '/SUBSYSTEM:WINDOWS,5.1' ]	# graphical application
-
 
 	env['CPPDEFINES'] = [ '_WIN32' ]
 	if bits == 64:
@@ -194,11 +234,11 @@ elif plat == 'Windows':
 	# multi-processor compilation
 	if num_cores > 1:
 		env['CCFLAGS'] += [
-			'/FS',							# force synchronous writes to PDB file
-			'/cgthreads' + str(num_cores),	# compiler threads to use for optimisation and code generation
+		#	'/FS',							# force synchronous writes to PDB file
+		#	'/cgthreads' + str(num_cores),	# compiler threads to use for optimisation and code generation
 		]
 		env['LINKFLAGS'] += [
-			'/CGTHREADS:' + str(num_cores),	# linker threads to use for optimisations and code generation
+		#	'/CGTHREADS:' + str(num_cores),	# linker threads to use for optimisations and code generation
 		]
 
 	# fpu control
@@ -212,23 +252,26 @@ elif plat == 'Windows':
 			env['CCFLAGS'] += [ '/arch:SSE2' ] # sse2
 
 	# strict c/cpp warnings
-	env['CPPDEFINES'] += [
-		'/W4',
-		'/Wall',
-		'/we 4013',
-		'/we 4024',
-		'/we 4026',
-		'/we 4028',
-		'/we 4029',
-		'/we 4033',
-		'/we 4047',
-		'/we 4053',
-		'/we 4087',
-		'/we 4098',
-		'/we 4245',
-		'/we 4305',
-		'/we 4700'
-	]
+	if 'LESS_WARNINGS' in os.environ:
+		env['CPPDEFINES'] += [ '/W2' ]
+	else:
+		env['CPPDEFINES'] += [
+			'/W4',
+			'/Wall',
+			'/we 4013',
+			'/we 4024',
+			'/we 4026',
+			'/we 4028',
+			'/we 4029',
+			'/we 4033',
+			'/we 4047',
+			'/we 4053',
+			'/we 4087',
+			'/we 4098',
+			'/we 4245',
+			'/we 4305',
+			'/we 4700'
+		]
 	if 'MORE_WARNINGS' not in os.environ:
 		env['CPPDEFINES'] += [
 			'/wd 4100',
@@ -239,22 +282,25 @@ elif plat == 'Windows':
 			'/wd 4996'
 		]
 
+if plat == 'Darwin':
+	env['CPPDEFINES'] += [ 'MACOS_X' ]
+
 # debug / release
 if debug == 0 or debug == 2:
-	if plat == 'Linux':
+	if plat == 'Linux' or plat == 'Darwin':
 		env['CCFLAGS'] += [ '-O3' ]
-		if debug == 0:
+		if debug == 0 and not clangHack:
 			env['LINKFLAGS'] += [ '-s' ]
 	elif plat == 'Windows':
 		env['CCFLAGS'] += [
 		#	'/c',	# compile without linking
 		#	'/GL',	# whole program optimisation
-			'/Gw',	# optimise global data
-			'/MP',	# multiple process compilation
+		#	'/Gw',	# optimise global data
+		#	'/MP',	# multiple process compilation
 			'/O2',	# maximise speed
 		]
 		env['LINKFLAGS'] += [
-			'/INCREMENTAL:NO',	# don't incrementally link
+		#	'/INCREMENTAL:NO',	# don't incrementally link
 		#	'/LTCG',			# link-time code generation
 			'/OPT:REF',			# remove unreferenced functions/data
 			'/STACK:32768',		# stack size
@@ -264,21 +310,20 @@ if debug == 0 or debug == 2:
 		env['CPPDEFINES'] += [ 'NDEBUG' ]
 
 if debug:
-	if plat == 'Linux':
+	if plat == 'Linux' or plat == 'Darwin':
 		env['CCFLAGS'] += [ '-g3' ]
 	elif plat == 'Windows':
 		env['CCFLAGS'] += [
-			'/GF',		# string pooling
-			'/Gy',		# function level linking
-			'/MD',		# multi-threaded debug DLL
+		#	'/GF',		# string pooling
+		#	'/Gy',		# function level linking
 			'/Od',		# disable optimisations
-			'/Oy-',		# disable frame pointer omission
-			'/RTC1',	# runtime checks
-			'/Z7',		# PDB with edit & continue capability
+		#	'/Oy-',		# disable frame pointer omission
+		#	'/RTC1',	# runtime checks
+			'/Z7',		# emit debug information
 		]
 		env['LINKFLAGS'] += [
 			'/DEBUG',		# generate debug info
-			'/INCREMENTAL',	# incrementally link
+		#	'/INCREMENTAL',	# incrementally link
 		]
 
 	env['CPPDEFINES'] += [ '_DEBUG' ]

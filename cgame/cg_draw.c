@@ -5476,7 +5476,7 @@ static void CG_DrawVote( void ) {
 	else if ( !strncmp( cgs.voteString, "g_gametype", 10 ) ) {
 		trap->SE_GetStringTextString( "MENUS_GAME_TYPE", sCmd, sizeof(sCmd) );
 
-		if ( !stricmp( cgs.voteString + 11, "Free For All" ) )			sParm = CG_GetStringEdString( "MENUS", "FREE_FOR_ALL" );
+		if ( !Q_stricmp( cgs.voteString + 11, "Free For All" ) )			sParm = CG_GetStringEdString( "MENUS", "FREE_FOR_ALL" );
 		else if ( !stricmp( cgs.voteString + 11, "Duel" ) )					sParm = CG_GetStringEdString( "MENUS", "DUEL" );
 		else if ( !stricmp( cgs.voteString + 11, "Holocron FFA" ) )			sParm = CG_GetStringEdString( "MENUS", "HOLOCRON_FFA" );
 		else if ( !stricmp( cgs.voteString + 11, "Power Duel" ) )				sParm = CG_GetStringEdString( "MENUS", "POWERDUEL" );

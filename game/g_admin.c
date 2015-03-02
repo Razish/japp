@@ -2540,7 +2540,7 @@ void Merc_On( gentity_t *ent ) {
 
 void Merc_Off( gentity_t *ent ) {
 	int i;
-	weapon_t newWeap = -1, wp = ent->client->ps.weapon;
+	weapon_t newWeap = WP_NONE, wp = ent->client->ps.weapon;
 
 	ent->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
 
@@ -2563,7 +2563,7 @@ void Merc_Off( gentity_t *ent ) {
 		}
 	}
 
-	if ( newWeap != -1 ) {
+	if ( newWeap != WP_NONE ) {
 		ent->client->ps.weapon = newWeap;
 	}
 	else {

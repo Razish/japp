@@ -188,7 +188,7 @@ int LittleLong( int l ) {
 
 float BigFloat( const float *l ) {
 #if defined(MACOS_X)
-	return l;
+	return *l;
 #else
 	return FloatSwap( l );
 #endif

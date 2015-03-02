@@ -1,19 +1,19 @@
 #include "qcommon/q_shared.h"
 #include "jp_stack.h"
 
-void Stack_Push( stack_t **s, void *p ) {
-	stack_t *next;
+void Stack_Push( jpStack_t **s, void *p ) {
+	jpStack_t *next;
 
-	next = *s ? *s : (stack_t *)malloc( sizeof(stack_t) );
+	next = *s ? *s : (jpStack_t *)malloc( sizeof(jpStack_t) );
 
-	*s = (stack_t *)malloc( sizeof(stack_t) );
-	memset( *s, 0, sizeof(stack_t) );
+	*s = (jpStack_t *)malloc( sizeof(jpStack_t) );
+	memset( *s, 0, sizeof(jpStack_t) );
 	(*s)->next = next;
 	(*s)->data = p;
 }
 
-void Stack_Pop( stack_t **s ) {
-	stack_t *next;
+void Stack_Pop( jpStack_t **s ) {
+	jpStack_t *next;
 
 	// nothing more to pop?
 	if ( !*s )
@@ -28,6 +28,6 @@ void Stack_Pop( stack_t **s ) {
 	(*s) = next;
 }
 
-void *Stack_GetTop( const stack_t **s ) {
+void *Stack_GetTop( const jpStack_t **s ) {
 	return *s ? ( *s )->data : NULL;
 }
