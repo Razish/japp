@@ -2980,6 +2980,10 @@ void G_RunFrame( int levelTime ) {
 					ent->client->cloakDebRecharge = level.time + CLOAK_REFUEL_RATE;
 				}
 			}
+			////Admin login checks
+			if (ent->client->pers.adminData.logineffect && ent->client->ps.powerups[ent->client->pers.adminData.logineffect] <= level.time){
+				ent->client->pers.adminData.logineffect = 0;
+			}
 
 			if ( level.gametype == GT_SIEGE &&
 				ent->client->siegeClass != -1 &&

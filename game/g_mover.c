@@ -357,21 +357,25 @@ void G_MoverTeam( gentity_t *ent ) {
 		}
 	}
 
-	if ( part ) {
+	if (part) {
 		// go back to the previous position
-		for ( part = ent; part; part = part->teamchain ) {
-			part->s.pos.trTime += level.time - level.previousTime;
-			part->s.apos.trTime += level.time - level.previousTime;
-			BG_EvaluateTrajectory( &part->s.pos, level.time, &part->r.currentOrigin );
-			BG_EvaluateTrajectory( &part->s.apos, level.time, &part->r.currentAngles );
-			trap->LinkEntity( (sharedEntity_t *)part );
+		if (!(obstacle->client && obstacle->client->ps.duelInProgress)){
+
+			for (part = ent; part; part = part->teamchain) {
+				part->s.pos.trTime += level.time - level.previousTime;
+				part->s.apos.trTime += level.time - level.previousTime;
+				BG_EvaluateTrajectory(&part->s.pos, level.time, &part->r.currentOrigin);
+				BG_EvaluateTrajectory(&part->s.apos, level.time, &part->r.currentAngles);
+				trap->LinkEntity((sharedEntity_t *)part);
+			}
+
+			// if the pusher has a "blocked" function, call it
+			if (ent->blocked) {
+				ent->blocked(ent, obstacle);
+			}
+			return;
 		}
 
-		// if the pusher has a "blocked" function, call it
-		if ( ent->blocked ) {
-			ent->blocked( ent, obstacle );
-		}
-		return;
 	}
 
 	// the move succeeded
@@ -816,6 +820,10 @@ void InitMover( gentity_t *ent ) {
 void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 	//determines if we need to relock after moving or not.
 	qboolean relock = (ent->spawnflags & MOVER_LOCKED) ? qtrue : qfalse;
+
+	if (other->client && other->client->ps.duelInProgress){
+		return;
+	}
 
 	if ( ent->damage ) {
 		G_Damage( other, ent, ent, NULL, NULL, ent->damage, 0, MOD_CRUSH );

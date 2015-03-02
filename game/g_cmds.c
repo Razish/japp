@@ -844,7 +844,7 @@ static void Cmd_SiegeClass_f( gentity_t *ent ) {
 
 static void Cmd_ForceChanged_f( gentity_t *ent ) {
 	// if it's a spec, just make the changes now
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR || japp_instantForceSwitch.integer) {
 		WP_InitForcePowers( ent );
 	}
 	else {
@@ -1241,7 +1241,7 @@ static void Cmd_SayTeam_f( gentity_t *ent ) {
 		G_LogPrintf( level.log.security, "Cmd_SayTeam_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
 	if ((res = JPLua_Event_ChatMessageRecieved(ent->s.number, p, type))){
-		Q_strncpyz(p, res, sizeof(p));
+		Q_strncpyz(p, res, MAX_SAY_TEXT);
 	}
 	if ( ent->client->pers.sayTeamMethod == STM_ADMIN ) {
 		type = SAY_ADMIN;
@@ -2306,6 +2306,7 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 		return;
 	}
 
+
 	if ( ent->client->pers.adminData.isSlept ) {
 		return;
 	}
@@ -2362,6 +2363,7 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 			return;
 		}
 
+
 		if ( level.gametype >= GT_TEAM && OnSameTeam( ent, challenged ) ) {
 			return;
 		}
@@ -2374,6 +2376,9 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 			trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"%s %s "S_COLOR_WHITE"(%s)!\n\"",
 				challenged->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELACCEPT" ),
 				ent->client->pers.netname, weaponData[challenged->client->pers.duelWeapon].longName ) );
+
+
+
 
 			ent->client->ps.duelInProgress = challenged->client->ps.duelInProgress = qtrue;
 			ent->client->ps.duelTime = challenged->client->ps.duelTime = level.time + 2000;
@@ -2426,6 +2431,7 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 			// set health etc
 			ent->health = challenged->health = ent->client->ps.stats[STAT_HEALTH] = challenged->client->ps.stats[STAT_HEALTH] = g_privateDuelHealth.integer;
 			ent->client->ps.stats[STAT_ARMOR] = challenged->client->ps.stats[STAT_ARMOR] = g_privateDuelShield.integer;
+
 		}
 		else {
 			// Print the message that a player has been challenged in private, only announce the actual duel initiation in private
@@ -3072,8 +3078,33 @@ static void Cmd_Drop_f( gentity_t *ent ) {
 		drop->genericValue2 |= level.time << 6;
 	}
 	else if ( !Q_stricmp( arg, "powerup" ) ) {
-		//RAZTODO: /drop powerup
-		return;
+		gentity_t *drop = NULL;
+		vector3 angs = { 0.0f, 0.0f, 0.0f };
+		powerup_t powerup;
+
+		if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] >= level.time && ent->client->pers.adminData.logineffect != PW_FORCE_ENLIGHTENED_DARK) {
+			powerup = PW_FORCE_ENLIGHTENED_DARK;
+		}
+		else if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_LIGHT] >= level.time && ent->client->pers.adminData.logineffect != PW_FORCE_ENLIGHTENED_LIGHT){
+			powerup = PW_FORCE_ENLIGHTENED_LIGHT;
+		}
+		else if (ent->client->ps.powerups[PW_FORCE_BOON] >= level.time && ent->client->pers.adminData.logineffect != PW_FORCE_BOON){
+			powerup = PW_FORCE_BOON;
+		}
+		else{
+			return;
+		}
+			gitem_t *item = BG_FindItemForPowerup(powerup);
+
+			AngleVectors(&ent->client->ps.viewangles, &angs, NULL, NULL);
+
+			drop = Drop_Item(ent, item, angs.yaw);
+			drop->count = (ent->client->ps.powerups[powerup] - level.time) / 1000;
+			if (drop->count < 1) {
+				drop->count = 1;
+			}
+			ent->client->ps.powerups[powerup] = 0;
+			return;
 	}
 }
 
