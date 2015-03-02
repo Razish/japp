@@ -156,11 +156,12 @@ static void SV_AdminAdd_f( void ) {
 		argPass[MAX_TOKEN_CHARS] = { 0 },
 		argPrivs[MAX_TOKEN_CHARS] = { 0 },
 		argRank[MAX_TOKEN_CHARS] = { 0 },
+		argEffect[MAX_TOKEN_CHARS] = { 0 },
 		*argMsg = NULL;
 
 
 	if ( trap->Argc() < 5 ) {
-		trap->Print( "Syntax: adminadd <user> <pass> <privileges> <rank> <login message>\n" );
+		trap->Print( "Syntax: adminadd <user> <pass> <privileges> <rank> <logineffect> <login message>\n" );
 		return;
 	}
 
@@ -168,9 +169,10 @@ static void SV_AdminAdd_f( void ) {
 	trap->Argv( 2, argPass, sizeof(argPass) );
 	trap->Argv( 3, argPrivs, sizeof(argPrivs) );
 	trap->Argv( 4, argRank, sizeof(argRank) );
-	argMsg = ConcatArgs( 5 );
+	trap->Argv( 5, argEffect, sizeof(argEffect));
+	argMsg = ConcatArgs( 6 );
 
-	AM_AddAdmin( argUser, argPass, atoi( argPrivs ), atoi( argRank ), argMsg );
+	AM_AddAdmin( argUser, argPass, atoi( argPrivs ), atoi( argRank ), argMsg, atoi(argEffect));
 	AM_SaveAdmins();
 }
 

@@ -1176,6 +1176,21 @@ static int JPLua_Player_Protect(lua_State *L){
 	return 0;
 }
 
+static int JPLua_Player_GetAdminPrivs(lua_State *L){
+	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
+	gentity_t *ent = &g_entities[player->clientNum];
+	adminUser_t *user = ent->client->pers.adminUser;
+
+	if (user){
+		lua_pushinteger(L, user->privileges);
+	}else if (ent->client->pers.tempprivs){
+		lua_pushinteger(L, ent->client->pers.tempprivs);
+	}else{
+		lua_pushinteger(L, 0);
+	}
+	return 1;
+}
+
 #endif
 
 // Push a Player instance for a client number onto the stack
@@ -1216,6 +1231,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "__tostring", JPLua_Player_ToString },
 #ifdef _GAME
 	{ "Empower", JPLua_Player_Empower},
+	{ "GetAdminPrivs", JPLua_Player_GetAdminPrivs},
 #endif
 	{ "GetAmmo", JPLua_Player_GetAmmo },
 	{ "GetAngles", JPLua_Player_GetAngles },

@@ -65,7 +65,7 @@ static void AM_ClearAccounts( void ) {
 }
 
 // add or update an existing admin account (user, pass, privileges, login mesage)
-void AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const int rank, const char *loginMsg ) {
+void AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const int rank, const char *loginMsg, int effect ) {
 	adminUser_t	*admin = NULL;
 
 	for ( admin = adminUsers; admin; admin = admin->next ) {
@@ -92,6 +92,7 @@ void AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const
 	admin->privileges = privileges;
 	admin->rank = rank;
 	Q_strncpyz( admin->loginMsg, loginMsg, sizeof(admin->loginMsg) );
+	admin->logineffect = effect;
 }
 
 // delete an admin account and forcefully log out any users
@@ -201,6 +202,9 @@ static void AM_ReadAccounts( const char *jsonText ) {
 		if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( item, "message" ) )) ) {
 			Q_strncpyz( user->loginMsg, tmp, sizeof(user->loginMsg) );
 		}
+
+		// login effect
+		user->logineffect = cJSON_ToInteger(cJSON_GetObjectItem(item, "effect"));
 	}
 
 	cJSON_Delete( root );
@@ -220,6 +224,7 @@ static void AM_WriteAccounts( fileHandle_t f ) {
 		cJSON_AddIntegerToObject( item, "privs", admin->privileges );
 		cJSON_AddIntegerToObject( item, "rank", admin->rank );
 		cJSON_AddStringToObject( item, "message", admin->loginMsg );
+		cJSON_AddIntegerToObject(item, "effect", admin->logineffect);
 
 		cJSON_AddItemToArray( admins, item );
 	}
@@ -572,6 +577,29 @@ void AM_SaveTelemarks( void ) {
 	AM_WriteTelemarks( f );
 }
 
+
+static void AM_SetLoginEffect(gentity_t *ent){
+	if (!ent->client->pers.adminUser) return;
+	switch (ent->client->pers.adminUser->logineffect){
+	case 1:
+		ent->client->pers.adminData.logineffect = PW_FORCE_ENLIGHTENED_DARK;
+		break;
+	case 2:
+		ent->client->pers.adminData.logineffect = PW_FORCE_ENLIGHTENED_LIGHT;
+		break;
+	case 3:
+		ent->client->pers.adminData.logineffect = PW_SHIELDHIT;
+		break;
+	case 4:
+		ent->client->pers.adminData.logineffect = PW_FORCE_BOON;
+		break;
+	default:
+		ent->client->pers.adminData.logineffect = 0;
+		return;
+	}
+	ent->client->ps.powerups[ent->client->pers.adminData.logineffect] = level.time + (japp_adminEffectDuration.integer * 1000);
+}
+
 // log in using user + pass
 static void AM_Login( gentity_t *ent ) {
 	char argUser[64] = { '\0' }, argPass[64] = { '\0' };
@@ -601,12 +629,12 @@ static void AM_Login( gentity_t *ent ) {
 		const char *loginMsg = ent->client->pers.adminUser->loginMsg;
 		char *sendMsg = NULL;
 
+		AM_SetLoginEffect(ent);
 		G_LogPrintf( level.log.admin, "[LOGIN] \"%s\", %s\n", argUser, G_PrintClient( ent-g_entities ) );
-		if ( !VALIDSTRING( loginMsg ) ) {
-			trap->SendServerCommand( ent - g_entities, "print \"You have logged in\n\"" );
+		if (!VALIDSTRING(loginMsg)) {
+			trap->SendServerCommand(ent - g_entities, "print \"You have logged in\n\"");
 			return;
 		}
-
 		sendMsg = Q_strrep( ent->client->pers.adminUser->loginMsg, "$name", ent->client->pers.netname );
 		Q_ConvertLinefeeds( sendMsg );
 		trap->SendServerCommand( -1, va( "print \"%s\n\"", sendMsg ) );
@@ -1849,6 +1877,18 @@ static void AM_Unsilence( gentity_t *ent ) {
 	trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_CYAN "un-silenced\n\"" );
 }
 
+
+static void AM_Dismember(gentity_t *ent){
+	vector3 boltPoint;
+	int i;
+	for (i = G2_MODELPART_HEAD; i <= G2_MODELPART_RLEG; i++){
+		if (i == G2_MODELPART_WAIST) continue;
+		G_GetDismemberBolt(ent, &boltPoint, i);
+		G_Dismember(ent, NULL, &boltPoint, i, 90, 0, ent->client->ps.legsAnim, qfalse);
+	}
+}
+
+
 void Cmd_Kill_f( gentity_t *ent );
 // slay the specified client
 static void AM_Slay( gentity_t *ent ) {
@@ -1905,8 +1945,10 @@ static void AM_Slay( gentity_t *ent ) {
 	if ( !AM_CanInflict( ent, targetEnt ) ) {
 		return;
 	}
-
-	Cmd_Kill_f( targetEnt );
+	Cmd_Kill_f(targetEnt);
+	if (japp_slaydismember.integer){
+		AM_Dismember(targetEnt);
+	}
 	G_LogPrintf( level.log.admin, "\t%s slayed %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( targetClient ) );
 	G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_RED "slain", targetEnt->client->pers.netname ) );
 	trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_RED "slain\n\"" );

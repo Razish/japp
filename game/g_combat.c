@@ -351,6 +351,10 @@ void TossClientItems( gentity_t *self ) {
 					continue;
 				}
 
+				if ((self->client->pers.adminData.logineffect == PW_FORCE_ENLIGHTENED_DARK || self->client->pers.adminData.logineffect == PW_FORCE_ENLIGHTENED_LIGHT || self->client->pers.adminData.logineffect == PW_FORCE_BOON) && self->client->pers.adminData.logineffect == i){
+					continue;
+				}
+
 				drop = Drop_Item( self, item, angle );
 				// decide how many seconds it has left
 				drop->count = (self->client->ps.powerups[i] - level.time) / 1000;
@@ -3497,9 +3501,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		if ( targ->client->pers.adminData.isSlept || targ->client->pers.adminData.isGhost ) {
 			return;
 		}
-		if ((japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK)) || targ->client->ps.duelInProgress) {
+
+		if ((japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK)) && !targ->client->ps.duelInProgress) { 
 			return;
-		}
+	    }
+
 	}
 	if ( attacker && attacker->client ) {
 		if ( attacker->client->pers.adminData.isSlept || attacker->client->pers.adminData.isGhost ) {
