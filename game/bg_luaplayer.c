@@ -1110,7 +1110,6 @@ static int JPLua_Player_Sleep(lua_State *L){
 	}else{
 		G_WakeClient(ent->client);
 	}
-#endif
 	return 0;
 }
 
