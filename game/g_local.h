@@ -16,6 +16,7 @@
 #include "g_public.h"
 
 typedef struct gentity_s gentity_t;
+typedef struct gclient_s gclient_t;
 
 #include "g_admin.h"
 #include "b_public.h"
@@ -508,7 +509,7 @@ typedef struct emote_s {
 	uint32_t flags;
 } emote_t;
 
-typedef struct gclient_s {
+struct gclient_s {
 	playerState_t		ps; // communicated by server to clients
 	clientPersistant_t	pers;
 	clientSession_t		sess;
@@ -621,7 +622,7 @@ typedef struct gclient_s {
 	struct {
 		int					drain, lightning;
 	} forceDebounce;
-} gclient_t;
+};
 
 typedef struct interestPoint_s {
 	vector3		origin;
@@ -766,8 +767,10 @@ typedef struct bot_settings_s {
 void			Add_Ammo( gentity_t *ent, int weapon, int count );
 void            AddRemap(const char *oldShader, const char *newShader, float timeOffset);
 void			AddScore( gentity_t *ent, vector3 *origin, int score );
-void			AddSightEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, float addLight );
-void			AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, qboolean needLOS );
+void			AddSightEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel,
+					float addLight );
+void			AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel,
+					qboolean needLOS );
 void			B_InitAlloc( void );
 void			B_CleanupAlloc( void );
 void			BeginIntermission( void );
@@ -784,7 +787,8 @@ int				BotAIStartFrame( int time );
 void			BotInterbreedEndMatch( void );
 const char     *BuildShaderStateConfig(void);
 void			BroadcastTeamChange( gclient_t *client, int oldTeam );
-void			CalcMuzzlePoint( const gentity_t *ent, vector3 *forward, vector3 *right, vector3 *up, vector3 *muzzlePoint );
+void			CalcMuzzlePoint( const gentity_t *ent, vector3 *forward, vector3 *right, vector3 *up,
+					vector3 *muzzlePoint );
 void			CalculateRanks( void );
 void			ClearRegisteredItems( void );
 void			ClientSpawn( gentity_t *ent );
@@ -838,11 +842,14 @@ void			G_BounceProjectile( vector3 *start, vector3 *impact, vector3 *dir, vector
 void			G_BreakArm( gentity_t *ent, int arm );
 int				G_BSPIndex( const char *name );
 qboolean		G_CallSpawn( gentity_t *ent );
-int				G_CheckAlertEvents( gentity_t *self, qboolean checkSight, qboolean checkSound, float maxSeeDist, float maxHearDist, int ignoreAlert, qboolean mustHaveOwner, int minAlertLevel ); //ignoreAlert = -1, mustHaveOwner = qfalse, minAlertLevel = AEL_MINOR
+int				G_CheckAlertEvents( gentity_t *self, qboolean checkSight, qboolean checkSound, float maxSeeDist,
+					float maxHearDist, int ignoreAlert /*= -1*/, qboolean mustHaveOwner /*= qfalse*/,
+					int minAlertLevel /*= AEL_MINOR*/ );
 void			G_CheckBotSpawn( void );
 void			G_CheckClientTimeouts( gentity_t *ent );
 qboolean		G_CheckForDanger( gentity_t *self, int alertEvent );
-void			G_CheckForDismemberment( gentity_t *ent, gentity_t *enemy, vector3 *point, int damage, int deathAnim, qboolean postDeath );
+void			G_CheckForDismemberment( gentity_t *ent, gentity_t *enemy, vector3 *point, int damage, int deathAnim,
+					qboolean postDeath );
 qboolean		G_CheckInSolid( gentity_t *self, qboolean fix );
 void			G_CheckTeamItems( void );
 void			G_ClearClientLog( int client );
@@ -855,7 +862,10 @@ void			G_ClearVote( gentity_t *ent );
 int				G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags );
 void			G_CreateFakeClient( int entNum, gclient_t **cl );
 const char *	G_Cvar_DefaultString( const vmCvar_t *vmCvar );
-void			G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vector3 *dir, vector3 *point, int damage, uint32_t dflags, int mod );
+void			G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vector3 *dir, vector3 *point,
+					int damage, uint32_t dflags, int mod );
+void			G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType, float limbRollBase,
+					float limbPitchBase, int deathAnim, qboolean postDeath );
 qboolean		G_DoesMapSupportGametype( const char *mapname, int gametype );
 int				G_EffectIndex( const char *name );
 qboolean		G_EntityOccluded( const gentity_t *self, const gentity_t *other );
@@ -864,6 +874,7 @@ void			G_ExplodeMissile( gentity_t *ent );
 gentity_t *		G_Find( gentity_t *from, int fieldofs, const char *match );
 void			G_FreeEntity( gentity_t *e );
 char *			G_GetBotInfoByName( const char *name );
+void			G_GetDismemberBolt( gentity_t *self, vector3 *boltPoint, int limbType );
 const char *	G_GetStringEdString( const char *refSection, const char *refName );
 int				G_IconIndex( const char *name );
 void			G_InitBots( qboolean restart );
@@ -900,8 +911,10 @@ void			G_PrecacheDispensers( void );
 gentity_t *		G_PreDefSound( vector3 *org, int pdSound );
 const char *	G_PrintClient( int clientNum );
 void			G_PrintCommands( gentity_t *ent, printBufferSession_t *pb );
-qboolean		G_RadiusDamage( vector3 *origin, gentity_t *attacker, float damage, float radius, gentity_t *ignore, gentity_t *missile, int mod );
-int				G_RadiusList( vector3 *origin, float radius, gentity_t *ignore, qboolean takeDamage, gentity_t *ent_list[MAX_GENTITIES] );
+qboolean		G_RadiusDamage( vector3 *origin, gentity_t *attacker, float damage, float radius, gentity_t *ignore,
+					gentity_t *missile, int mod );
+int				G_RadiusList( vector3 *origin, float radius, gentity_t *ignore, qboolean takeDamage,
+					gentity_t *ent_list[MAX_GENTITIES] );
 void			G_ReadClientSessionData( gclient_t *client );
 void			G_ReadSessionData( void );
 trace_t *		G_RealTrace( gentity_t *ent, float dist );
@@ -909,7 +922,8 @@ void			G_ReflectMissile( gentity_t *ent, gentity_t *missile, vector3 *forward );
 const char *	G_RefreshNextMap( int gametype, qboolean forced );
 void			G_RemoveQueuedBotBegin( int clientNum );
 void			G_RunClient( gentity_t *ent );
-void			G_RunExPhys( gentity_t *ent, float gravity, float mass, float bounce, qboolean autoKill, int *g2Bolts, int numG2Bolts );
+void			G_RunExPhys( gentity_t *ent, float gravity, float mass, float bounce, qboolean autoKill, int *g2Bolts,
+					int numG2Bolts );
 void			G_RunItem( gentity_t *ent );
 void			G_RunMissile( gentity_t *ent );
 void			G_RunMover( gentity_t *ent );
@@ -921,7 +935,8 @@ gentity_t *		G_ScreenShake( vector3 *org, gentity_t *target, float intensity, in
 void			G_SendG2KillQueue( void );
 qboolean		G_SetSaber( gentity_t *ent, int saberNum, const char *saberName, qboolean siegeOverride );
 void			G_SetAngles( gentity_t *ent, vector3 *angles );
-void			G_SetAnim( gentity_t *ent, usercmd_t *ucmd, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime );
+void			G_SetAnim( gentity_t *ent, usercmd_t *ucmd, int setAnimParts, int anim, uint32_t setAnimFlags,
+					int blendTime );
 void			G_SetEnemy( gentity_t *self, gentity_t *enemy );
 void			G_SetMovedir( vector3 *angles, vector3 *movedir );
 void			G_SetOrigin( gentity_t *ent, vector3 *origin );
@@ -1010,7 +1025,8 @@ void			Svcmd_BotList_f( void );
 void			Svcmd_MapList_f( void );
 void			TAG_Init( void );
 refTag_t *		TAG_Find( const char *owner, const char *name );
-refTag_t *		TAG_Add( const char *name, const char *owner, vector3 *origin, vector3 *angles, int radius, uint32_t flags );
+refTag_t *		TAG_Add( const char *name, const char *owner, vector3 *origin, vector3 *angles, int radius,
+					uint32_t flags );
 int				TAG_GetOrigin( const char *owner, const char *name, vector3 *origin );
 int				TAG_GetOrigin2( const char *owner, const char *name, vector3 *origin );
 int				TAG_GetAngles( const char *owner, const char *name, vector3 *angles );
@@ -1041,12 +1057,15 @@ void			Weapon_HookThink( gentity_t *ent );
 qboolean		WP_SaberCanTurnOffSomeBlades( saberInfo_t *saber );
 void			WP_DeactivateSaber( gentity_t *self, qboolean clearLength );
 void			WP_FireBlasterMissile( gentity_t *ent, vector3 *start, vector3 *dir, qboolean altFire );
-void			WP_FireGenericBlasterMissile( gentity_t *ent, vector3 *start, vector3 *dir, qboolean altFire, int damage, int velocity, int mod );
-void			WP_FireTurretMissile( gentity_t *ent, vector3 *start, vector3 *dir, qboolean altFire, int damage, int velocity, int mod, gentity_t *ignore );
+void			WP_FireGenericBlasterMissile( gentity_t *ent, vector3 *start, vector3 *dir, qboolean altFire,
+					int damage, int velocity, int mod );
+void			WP_FireTurretMissile( gentity_t *ent, vector3 *start, vector3 *dir, qboolean altFire, int damage,
+					int velocity, int mod, gentity_t *ignore );
 void			WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower );
 void			WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd );
 void			WP_InitForcePowers( gentity_t *ent );
-int				WP_SaberCanBlock( gentity_t *self, vector3 *point, uint32_t dflags, int mod, qboolean projectile, int attackStr );
+int				WP_SaberCanBlock( gentity_t *self, vector3 *point, uint32_t dflags, int mod, qboolean projectile,
+					int attackStr );
 void			WP_SaberInitBladeData( gentity_t *ent );
 void			WP_SpawnInitForcePowers( gentity_t *ent );
 void			WP_SaberPositionUpdate( gentity_t *self, usercmd_t *ucmd );

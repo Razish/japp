@@ -3080,7 +3080,8 @@ static void Cmd_Drop_f( gentity_t *ent ) {
 	else if ( !Q_stricmp( arg, "powerup" ) ) {
 		gentity_t *drop = NULL;
 		vector3 angs = { 0.0f, 0.0f, 0.0f };
-		powerup_t powerup;
+		powerup_t powerup = PW_NONE;
+		const gitem_t *item = NULL;
 
 		if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] >= level.time && ent->client->pers.adminData.logineffect != PW_FORCE_ENLIGHTENED_DARK) {
 			powerup = PW_FORCE_ENLIGHTENED_DARK;
@@ -3094,17 +3095,17 @@ static void Cmd_Drop_f( gentity_t *ent ) {
 		else{
 			return;
 		}
-			gitem_t *item = BG_FindItemForPowerup(powerup);
 
-			AngleVectors(&ent->client->ps.viewangles, &angs, NULL, NULL);
+		item = BG_FindItemForPowerup(powerup);
+		AngleVectors(&ent->client->ps.viewangles, &angs, NULL, NULL);
 
-			drop = Drop_Item(ent, item, angs.yaw);
-			drop->count = (ent->client->ps.powerups[powerup] - level.time) / 1000;
-			if (drop->count < 1) {
-				drop->count = 1;
-			}
-			ent->client->ps.powerups[powerup] = 0;
-			return;
+		drop = Drop_Item(ent, item, angs.yaw);
+		drop->count = (ent->client->ps.powerups[powerup] - level.time) / 1000;
+		if (drop->count < 1) {
+			drop->count = 1;
+		}
+		ent->client->ps.powerups[powerup] = 0;
+		return;
 	}
 }
 

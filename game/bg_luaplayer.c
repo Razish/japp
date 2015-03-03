@@ -1,5 +1,6 @@
 #if defined(_GAME)
 #include "g_local.h"
+#include "g_admin.h"
 #elif defined(_CGAME)
 #include "cg_local.h"
 #endif

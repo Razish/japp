@@ -96,14 +96,10 @@ const char	*JP_Bans_IsBanned( byte *ip );
 byteAlias_t *BuildByteFromIP( const char *ip );
 
 //Utils
-/*
-void G_SleepClient(gclient_t *cl);
-void G_WakeClient(gclient_t *cl);
-void Empower_On(gentity_t *ent);
-void Empower_Off(gentity_t *ent);
-void Merc_On(gentity_t *ent);
-void Merc_Off(gentity_t *ent);
-void Slap(gentity_t *targ);
-*/
-
-
+void G_SleepClient( gclient_t *cl );
+void G_WakeClient( gclient_t *cl );
+void Empower_On( gentity_t *ent );
+void Empower_Off( gentity_t *ent );
+void Merc_On( gentity_t *ent );
+void Merc_Off( gentity_t *ent );
+void Slap( gentity_t *targ );
