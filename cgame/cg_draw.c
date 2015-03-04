@@ -2520,18 +2520,19 @@ static void CG_DrawStats( void ) {
 
 	if ( cent ) {
 		// vehicle HUD
-		if ( cg.predictedPlayerState.m_iVehicleNum )
-		if (JPLua_Event_VehicleHUD()){
-			drawHUD = qtrue;
+		if ( cg.predictedPlayerState.m_iVehicleNum ) {
+			if ( JPLua_Event_VehicleHUD() ) {
+				drawHUD = qtrue;
+			}
+			else {
+				drawHUD = CG_DrawVehicleHud( cent );
+			}
 		}
-		else{
-			drawHUD = CG_DrawVehicleHud(cent);
-		}
-
 	}
 
-	if ( drawHUD )
+	if ( drawHUD ) {
 		CG_DrawHUD( cent );
+	}
 }
 
 static void CG_DrawPickupItem( void ) {
