@@ -19,7 +19,7 @@
 #pragma comment( lib, "lua" )
 #endif
 
-const uint32_t JPLUA_VERSION = 9;
+const uint32_t JPLUA_VERSION = 10;
 
 static const char *baseDir = "lua/";
 #if defined(_GAME)
