@@ -16,7 +16,7 @@ files = [ 'cgame/cg_chatbox.c', 'cgame/cg_consolecmds.c', 'cgame/cg_draw.c', 'cg
 	'cgame/cg_weapons.c', 'cgame/fx_blaster.c', 'cgame/fx_bowcaster.c', 'cgame/fx_bryarpistol.c', 'cgame/fx_demp2.c',
 	'cgame/fx_disruptor.c', 'cgame/fx_flechette.c', 'cgame/fx_force.c', 'cgame/fx_heavyrepeater.c',
 	'cgame/fx_rocketlauncher.c', 'game/AnimalNPC.c', 'game/bg_g2_utils.c', 'game/bg_lua.c', 'game/bg_luacvar.c',
-	'game/bg_luaevent.c', 'game/bg_lualogger.c', 'game/bg_luaplayer.c', 'game/bg_luaserialiser.c',
+	'game/bg_luaevent.c', 'game/bg_luafs.c', 'game/bg_lualogger.c', 'game/bg_luaplayer.c', 'game/bg_luaserialiser.c',
 	'game/bg_luavector.c', 'game/bg_misc.c', 'game/bg_panimate.c', 'game/bg_pmove.c', 'game/bg_saber.c',
 	'game/bg_saberLoad.c', 'game/bg_saga.c', 'game/bg_slidemove.c', 'game/bg_vehicleLoad.c', 'game/bg_weapons.c',
 	'game/FighterNPC.c', 'game/SpeederNPC.c', 'game/WalkerNPC.c', 'JAPP/jp_crashExtra.c', 'JAPP/jp_promode.c',

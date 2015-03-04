@@ -7,7 +7,7 @@ game_env = env.Clone()
 
 # sources
 files = [ 'game/ai_main.c', 'game/ai_util.c', 'game/ai_wpnav.c', 'game/AnimalNPC.c', 'game/bg_g2_utils.c',
-	'game/bg_lua.c', 'game/bg_luacvar.c', 'game/bg_luaevent.c', 'game/bg_lualogger.c', 'game/bg_luaplayer.c',
+	'game/bg_lua.c', 'game/bg_luacvar.c', 'game/bg_luaevent.c', 'game/bg_luafs.c', 'game/bg_lualogger.c', 'game/bg_luaplayer.c',
 	'game/bg_luaserialiser.c', 'game/bg_luavector.c', 'game/bg_misc.c', 'game/bg_panimate.c', 'game/bg_pmove.c',
 	'game/bg_saber.c', 'game/bg_saberLoad.c', 'game/bg_saga.c', 'game/bg_slidemove.c', 'game/bg_vehicleLoad.c',
 	'game/bg_weapons.c', 'game/FighterNPC.c', 'game/g_active.c', 'game/g_admin.c', 'game/g_arenas.c', 'game/g_bot.c',
