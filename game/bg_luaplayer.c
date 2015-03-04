@@ -116,19 +116,25 @@ static int JPLua_Player_GetAmmo( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
 	gentity_t *ent = g_entities + player->clientNum;
-	int weapon = ent->client->ps.weapon;
-#elif defined(_CGAME)
-	int weapon = cg.predictedPlayerState.weapon;
 #endif
 
-	if ( lua_gettop( L ) == 2 )
-		weapon = lua_tointeger( L, 2 );
-
+	int top, i;
 #if defined(_GAME)
-	lua_pushinteger( L, ent->client->ps.ammo[weaponData[weapon].ammoIndex] );
+	lua_newtable( L );
+	top = lua_gettop( L );
+	for (i = 1;i < WP_NUM_WEAPONS; i++){
+		lua_pushinteger( L, i); lua_pushinteger( L, ent->client->ps.ammo[weaponData[i].ammoIndex] ); lua_settable( L, top );
+	}
 #elif defined(_CGAME)
-	if ( player->clientNum == cg.clientNum )
-		lua_pushinteger( L, cg.predictedPlayerState.ammo[weaponData[weapon].ammoIndex] );
+	if ( player->clientNum == cg.clientNum ){
+		lua_newtable( L );
+		top = lua_gettop( L );
+		for (i = 1;i < WP_NUM_WEAPONS; i++){
+			lua_pushinteger( L, i); lua_pushinteger( L, cg.predictedPlayerState.ammo[weaponData[i].ammoIndex] ); lua_settable( L, top );
+		}
+	}else{
+		lua_pushnil(L);
+	}
 #endif
 	return 1;
 }
@@ -397,20 +403,27 @@ static int JPLua_Player_GetLocation( lua_State *L ) {
 static int JPLua_Player_GetMaxAmmo( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 #if defined(_GAME)
-	int weapon = g_entities[player->clientNum].client->ps.weapon;
+	gentity_t *ent = g_entities + player->clientNum;
+#endif
+
+	int top, i;
+#if defined(_GAME)
+	lua_newtable( L );
+	top = lua_gettop( L );
+	for (i = 1;i < WP_NUM_WEAPONS; i++){
+		lua_pushinteger( L, i); lua_pushinteger( L, ammoMax[i] ); lua_settable( L, top );
+	}
 #elif defined(_CGAME)
-	int weapon = cg.predictedPlayerState.weapon;
+	if ( player->clientNum == cg.clientNum ){
+		lua_newtable( L );
+		top = lua_gettop( L );
+		for (i = 1;i < WP_NUM_WEAPONS; i++){
+			lua_pushinteger( L, i); lua_pushinteger( L, ammoMax[weaponData[i].ammoIndex] ); lua_settable( L, top );
+		}
+	}else{
+		lua_pushnil(L);
+	}
 #endif
-
-	if ( lua_gettop( L ) == 2 )
-		weapon = lua_tointeger( L, 2 );
-
-#ifdef _CGAME
-	if ( player->clientNum != cg.clientNum )
-		lua_pushnil( L );
-#endif
-
-	lua_pushinteger( L, ammoMax[weaponData[weapon].ammoIndex] );
 
 	return 1;
 }
@@ -532,16 +545,54 @@ static int JPLua_Player_GetWeapon( lua_State *L ) {
 }
 
 #ifdef _GAME
-//Func: Player:GiveWeapon( integer weaponID )
+//Func: Player:Give( char type, int id, int amount )
 //Retn: N/A
-static int JPLua_Player_GiveWeapon( lua_State *L ) {
+static int JPLua_Player_Give( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	int wp = luaL_checkinteger( L, 2 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	const char *type = luaL_checkstring(L,2);
+	int id = luaL_checkinteger( L, 3 );
+	int value = lua_tointeger(L, 4);
 
-	if ( wp <= WP_NONE || wp >= WP_NUM_WEAPONS )
-		return 0;
+	if (!Q_stricmp( type, "weapon" )){
+		if (id == -1){
+			ent->client->ps.stats[STAT_WEAPONS] = ((1 << LAST_USEABLE_WEAPON) - 1) & ~1;
+		}
+		if ( id <= WP_NONE ||id >= WP_NUM_WEAPONS ){
+			return 0;
+		}
 
-	g_entities[player->clientNum].client->ps.stats[STAT_WEAPONS] |= (1 << wp);
+		ent->client->ps.stats[STAT_WEAPONS] |= (1 << id);
+	}else if (!Q_stricmp( type, "powerup" )){
+		if ( id <= PW_NONE ||id >= PW_NUM_POWERUPS ){
+			return 0;
+		}
+
+		ent->client->ps.powerups[id] = level.time + value;
+	}else if (!Q_stricmp( type, "item" )){
+		if (id == -1){
+			for (int i = 0; i < HI_NUM_HOLDABLE; i++ ){
+				ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << i);
+			}
+		}
+		if ( id <= HI_NONE ||id >= HI_NUM_HOLDABLE ){
+			return 0;
+		}
+
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << id);
+	
+	}else if (!Q_stricmp( type, "ammo" )){
+		if (id == -1){
+			for (int i = 0; i < AMMO_MAX; i++ ) {
+				ent->client->ps.ammo[i] = ammoMax[i];
+			}
+		}
+		if ( id <= 0 ||id >= AMMO_MAX ){
+			return 0;
+		}
+
+		ent->client->ps.ammo[id] = value;
+	}
 
 	return 0;
 }
@@ -556,16 +607,12 @@ static int JPLua_Player_IsAdmin( lua_State *L ) {
 
 	if ( cl->pers.adminUser ) {
 		lua_pushboolean( L, 1 );
-		lua_pushstring( L, cl->pers.adminUser->user );
-		lua_pushinteger( L, cl->pers.adminUser->privileges );
 	}
 	else {
 		lua_pushboolean( L, 0 );
-		lua_pushnil( L );
-		lua_pushnil( L );
 	}
 
-	return 3;
+	return 1;
 }
 #endif
 
@@ -711,7 +758,7 @@ static int JPLua_Player_OnSameTeam( lua_State *L ) {
 //Retn: string errorMsg if it failed, otherwise nothing
 static int JPLua_Player_RemoveEFlag( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	uint32_t bit = lua_tointeger( L, 2 );
+	uint32_t bit = luaL_checkinteger( L, 2 );
 	int i, found = 0;
 
 	for ( i = 0; i<32; i++ ) {
@@ -735,7 +782,7 @@ static int JPLua_Player_RemoveEFlag( lua_State *L ) {
 //Retn: string errorMsg if it failed, otherwise nothing
 static int JPLua_Player_RemoveEFlag2( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	uint32_t bit = lua_tointeger( L, 2 );
+	uint32_t bit = luaL_checkinteger( L, 2 );
 	int i, found = 0;
 
 	for ( i = 0; i<32; i++ ) {
@@ -759,7 +806,7 @@ static int JPLua_Player_RemoveEFlag2( lua_State *L ) {
 //Retn: string errorMsg if it failed, otherwise nothing
 static int JPLua_Player_RemoveFlag( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	uint32_t bit = lua_tointeger( L, 2 );
+	uint32_t bit = luaL_checkinteger( L, 2 );
 	int i, found = 0;
 
 	for ( i = 0; i<32; i++ ) {
@@ -778,28 +825,28 @@ static int JPLua_Player_RemoveFlag( lua_State *L ) {
 }
 #endif
 
-#ifdef _GAME
 //Func: Player:SetArmor()
 //Retn: N/A
 static int JPLua_Player_SetArmor( lua_State *L ) {
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	int armour = lua_tointeger( L, 2 );
+	int armour = luaL_checkinteger( L, 3 );
 
 	if ( armour < 0 )
 		armour = 0;
 
 	g_entities[player->clientNum].client->ps.stats[STAT_ARMOR] = armour;
-
+#endif
 	return 0;
 }
-#endif
 
-#ifdef _GAME
+
 //Func: Player:SetEFlag( integer bit )
 //Retn: string errorMsg if it failed, otherwise nothing
 static int JPLua_Player_SetEFlag( lua_State *L ) {
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	uint32_t bit = lua_tointeger( L, 2 );
+	uint32_t bit = luaL_checkinteger( L, 3 );
 	int i, found = 0;
 
 	for ( i = 0; i<32; i++ ) {
@@ -813,17 +860,16 @@ static int JPLua_Player_SetEFlag( lua_State *L ) {
 	}
 
 	g_entities[player->clientNum].client->ps.eFlags |= bit;
-
+#endif
 	return 0;
 }
-#endif
 
-#ifdef _GAME
 //Func: Player:SetEFlag2( integer bit )
 //Retn: string errorMsg if it failed, otherwise nothing
 static int JPLua_Player_SetEFlag2( lua_State *L ) {
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	uint32_t bit = lua_tointeger( L, 2 );
+	uint32_t bit = luaL_checkinteger( L, 3 );
 	int i, found = 0;
 
 	for ( i = 0; i<32; i++ ) {
@@ -837,17 +883,16 @@ static int JPLua_Player_SetEFlag2( lua_State *L ) {
 	}
 
 	g_entities[player->clientNum].client->ps.eFlags2 |= bit;
-
+#endif
 	return 0;
 }
-#endif
 
 #ifdef _GAME
 //Func: Player:SetFlag( integer bit )
 //Retn: string errorMsg if it failed, otherwise nothing
 static int JPLua_Player_SetFlag( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	uint32_t bit = lua_tointeger( L, 2 );
+	uint32_t bit = luaL_checkinteger( L, 3 );
 	int i, found = 0;
 
 	for ( i = 0; i<32; i++ ) {
@@ -866,42 +911,40 @@ static int JPLua_Player_SetFlag( lua_State *L ) {
 }
 #endif
 
-#ifdef _GAME
 //Func: Player:SetForce( integer points )
 //Retn: N/A
 static int JPLua_Player_SetForce( lua_State *L ) {
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	int points = lua_tointeger( L, 2 );
+	int points = luaL_checkinteger( L, 3 );
 
 	g_entities[player->clientNum].client->ps.fd.forcePower = points;
-
+#endif
 	return 0;
 }
-#endif
 
-#ifdef _GAME
 //Func: Player:SetHealth()
 //Retn: N/A
 static int JPLua_Player_SetHealth( lua_State *L ) {
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	int hp = lua_tointeger( L, 2 );
+	int hp = luaL_checkinteger( L, 3 );
 	gentity_t *ent = &g_entities[player->clientNum];
 
 	if ( hp < 1 )
 		return 0;
 
 	ent->health = ent->client->ps.stats[STAT_HEALTH] = hp;
-
+#endif
 	return 0;
 }
-#endif
 
-#ifdef _GAME
-//Func: Player:SetName( string name, [boolean announce] )
+//Func: Player:SetName( string name )
 //Retn: N/A
 static int JPLua_Player_SetName( lua_State *L ) {
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	const char *name = lua_tostring( L, 2 );
+	const char *name = luaL_checkstring( L, 3 );
 	char info[MAX_INFO_STRING], oldName[MAX_NETNAME];
 	gentity_t *ent = &g_entities[player->clientNum];
 
@@ -938,10 +981,9 @@ static int JPLua_Player_SetName( lua_State *L ) {
 		trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldName, G_GetStringEdString( "MP_SVGAME",
 			"PLRENAME" ), ent->client->pers.netname ) );
 	}
-
+#endif
 	return 0;
 }
-#endif
 
 #ifdef _GAME
 //Func: Player:SetScore()
@@ -949,8 +991,7 @@ static int JPLua_Player_SetName( lua_State *L ) {
 static int JPLua_Player_SetScore( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 
-	g_entities[player->clientNum].client->ps.persistant[PERS_SCORE] = lua_tointeger( L, 2 );
-
+	g_entities[player->clientNum].client->ps.persistant[PERS_SCORE] = luaL_checkinteger( L, 3 );
 	return 0;
 }
 #endif
@@ -962,80 +1003,89 @@ static int JPLua_Player_SetSpeed( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	gentity_t *ent = &g_entities[player->clientNum];
 
-	ent->client->pers.speed = luaL_checkinteger( L, 2 );
-
+	ent->client->pers.speed = luaL_checkinteger( L, 3 );
 	return 0;
 }
 #endif
 
-#ifdef _GAME
 //Func: Player:SetTeam( string team )
 //Retn: N/A
 static int JPLua_Player_SetTeam( lua_State *L ) {
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	const char *team = luaL_checkstring( L, 2 );
+	const char *team = luaL_checkstring( L, 3 );
 
 	SetTeam( &g_entities[player->clientNum], team, qtrue );
-
+#endif
 	return 0;
 }
-#endif
 
-#ifdef _GAME
 //Func: Player:SetVelocity( Vector3 velocity )
 //Retn: N/A
 static int JPLua_Player_SetVelocity( lua_State *L ) {
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-	vector3 *v = JPLua_CheckVector( L, 2 );
+	vector3 *v = JPLua_CheckVector( L, 3 );
 	gentity_t *ent = &g_entities[player->clientNum];
 
 	VectorCopy( v, &ent->client->ps.velocity );
-
+#endif
 	return 0;
 }
-#endif
 
 #ifdef _GAME
-//Func: Player:TakeWeapon( integer weaponID )
+//Func: Player:Take( integer weaponID )
 //Retn: N/A
-static int JPLua_Player_TakeWeapon( lua_State *L ) {
+static int JPLua_Player_Take( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	gentity_t *ent = &g_entities[player->clientNum];
-	int wp = luaL_checkinteger( L, 2 );
+	const char *type = luaL_checkstring( L, 2 );
+	int id = luaL_checkinteger( L, 3 );
 	int i, newWeapon = -1, selectedWeapon = ent->client->ps.weapon;
 
-	if ( wp <= WP_NONE || wp >= WP_NUM_WEAPONS )
-		return 0;
+	if (Q_stricmp(type, "weapon")){
 
-	ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << wp);
+		if ( id <= WP_NONE || id >= WP_NUM_WEAPONS )
+			return 0;
 
-	for ( i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
-		if ( ent->client->ps.stats[STAT_WEAPONS] & (1 << i) ) {
-			newWeapon = i;
-			break;
-		}
-	}
+		ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << id);
 
-	if ( newWeapon == WP_NUM_WEAPONS ) {
-		for ( i = WP_STUN_BATON; i < WP_SABER; i++ ) {
+		for ( i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
 			if ( ent->client->ps.stats[STAT_WEAPONS] & (1 << i) ) {
 				newWeapon = i;
 				break;
 			}
 		}
-		if ( newWeapon == WP_SABER )
-			newWeapon = WP_NONE;
+
+		if ( newWeapon == WP_NUM_WEAPONS ) {
+			for ( i = WP_STUN_BATON; i < WP_SABER; i++ ) {
+				if ( ent->client->ps.stats[STAT_WEAPONS] & (1 << i) ) {
+					newWeapon = i;
+					break;
+				}
+			}
+			if ( newWeapon == WP_SABER )
+				newWeapon = WP_NONE;
+		}
+
+		ent->client->ps.weapon = (newWeapon == -1) ? 0 : newWeapon;
+
+		G_AddEvent( ent, EV_NOAMMO, selectedWeapon );
+	}else if (Q_stricmp(type, "powerup")){
+		if ( id <= PW_NONE ||id >= PW_NUM_POWERUPS ){
+			return 0;
+		}
+
+		ent->client->ps.powerups[id] = 0;
+	}else if (Q_stricmp(type, "item")){
+		if ( id <= HI_NONE ||id >= HI_NUM_HOLDABLE ){
+			return 0;
+		}
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] &= ~(1 << id);
 	}
-
-	ent->client->ps.weapon = (newWeapon == -1) ? 0 : newWeapon;
-
-	G_AddEvent( ent, EV_NOAMMO, selectedWeapon );
-
 	return 0;
 }
-#endif
 
-#ifdef _GAME
 //Func: Player:Teleport( table position{x, y, z}, table angles{pitch, yaw, roll} )
 //Retn: N/A
 static int JPLua_Player_Teleport( lua_State *L ) {
@@ -1044,34 +1094,30 @@ static int JPLua_Player_Teleport( lua_State *L ) {
 	vector3 *pos = JPLua_CheckVector( L, 2 ), *angles = JPLua_CheckVector( L, 3 );
 
 	TeleportPlayer( ent, pos, angles );
-
 	return 0;
 }
+#endif
+
 
 static int JPLua_Player_Sleep(lua_State *L){
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
 	gentity_t *ent = &g_entities[player->clientNum];
-	qboolean value = lua_toboolean(L,2);
-	if (lua_type( L, 2 ) == LUA_TNIL){
-		lua_pushboolean(L, ent->client->pers.adminData.isSlept);
-		return 1;
-	}
+	qboolean value = lua_toboolean(L,3);
 	if (value){
 		G_SleepClient(ent->client);
 	}else{
 		G_WakeClient(ent->client);
 	}
+#endif
 	return 0;
 }
 
 static int JPLua_Player_Ghost(lua_State *L){
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
 	gentity_t *ent = &g_entities[player->clientNum];
-	qboolean value = lua_toboolean(L, 2);
-	if (lua_type( L, 2 ) == LUA_TNIL){
-		lua_pushboolean(L, ent->client->pers.adminData.isGhost);
-		return 1;
-	}
+	qboolean value = lua_toboolean(L, 3);
 	if (value){
 		ent->client->pers.adminData.isGhost = qtrue;
 		ent->r.contents = CONTENTS_BODY;
@@ -1084,99 +1130,93 @@ static int JPLua_Player_Ghost(lua_State *L){
 		ent->client->ps.fd.forcePowersKnown &= ~(1 << NUM_FORCE_POWERS); // JA++ client prediction
 	}
 	trap->LinkEntity( (sharedEntity_t *)ent );
+#endif
 	return 0;
 }
 
 static int JPLua_Player_Grant(lua_State *L){
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
 	gentity_t *ent = &g_entities[player->clientNum];
-	int value = lua_tointeger(L, 2);
-	if (lua_type( L, 2 ) == LUA_TNIL){
-		lua_pushboolean(L, ent->client->pers.tempprivs);
-		return 1;
-	}
+	int value = luaL_checkinteger(L, 3);
 	ent->client->pers.tempprivs = value;
+#endif
 	return 0;
 }
 
 static int JPLua_Player_Empower(lua_State *L){
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
 	gentity_t *ent = &g_entities[player->clientNum];
-	if (lua_type( L, 2 ) == LUA_TNIL){
-		lua_pushboolean(L, ent->client->pers.adminData.empowered);
-		return 1;
-	}
-	qboolean value = lua_toboolean(L, 2);
+	qboolean value = lua_toboolean(L, 3);
 	if (value){
+		ent->client->pers.adminData.empowered = qtrue;
 		Empower_On(ent);
 	}else{
+		ent->client->pers.adminData.empowered = qfalse;
 		Empower_Off(ent);
 	}
+#endif
 	return 0;
 }
 
 static int JPLua_Player_Merc(lua_State *L){
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
 	gentity_t *ent = &g_entities[player->clientNum];
-	qboolean value = lua_toboolean(L, 2);
-	if (lua_type( L, 2 ) == LUA_TNIL){
-		lua_pushboolean(L, ent->client->pers.adminData.merc);
-		return 1;
-	}
+	qboolean value = lua_toboolean(L, 3);
 	if (value){
+		ent->client->pers.adminData.merc = qtrue;
 		Merc_On(ent);
 	}else{
+		ent->client->pers.adminData.merc = qfalse;
 		Merc_Off(ent);
 	}
+#endif
 	return 0;
 }
 
 static int JPLua_Player_Slap(lua_State *L){
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
 	gentity_t *ent = &g_entities[player->clientNum];
 	Slap(ent);
+#endif
 	return 0;
 }
 
 static int JPLua_Player_Silence(lua_State *L){
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
 	gentity_t *ent = &g_entities[player->clientNum];
-	qboolean value = lua_toboolean(L, 2);
-	if (lua_type( L, 2 ) == LUA_TNIL){
-		lua_pushboolean(L, ent->client->pers.adminData.silenced);
-		return 1;
-	}
+	qboolean value = lua_toboolean(L, 3);
 	if (value){
 		ent->client->pers.adminData.silenced = qtrue;
 	}else{
 		ent->client->pers.adminData.silenced = qfalse;
 	}
+#endif
 	return 0;
 }
 
 static int JPLua_Player_Protect(lua_State *L){
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
 	gentity_t *ent = &g_entities[player->clientNum];
-	qboolean value = lua_toboolean(L, 2);
-	int time = lua_tointeger(L,3);
-	if (lua_type( L, 2 ) == LUA_TNIL){
-		lua_pushboolean(L, (!!ent->client->ps.eFlags & EF_INVULNERABLE));
-		return 1;
-	}
-	if (lua_type( L, 3 ) == LUA_TNIL){
-		time = 0x7FFFFFFF;
-	}
-	if (value){
+	int value = lua_toboolean(L, 3);
+	if (value >= 1){
 		ent->client->ps.eFlags ^= EF_INVULNERABLE;
-		ent->client->invulnerableTimer = time;
+		ent->client->invulnerableTimer = value;
 	}else{
 		ent->client->ps.eFlags &= ~EF_INVULNERABLE;
 		ent->client->invulnerableTimer = 0;
 	}
+#endif
 	return 0;
 }
 
 static int JPLua_Player_GetAdminPrivs(lua_State *L){
+#ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
 	gentity_t *ent = &g_entities[player->clientNum];
 	adminUser_t *user = ent->client->pers.adminUser;
@@ -1189,9 +1229,153 @@ static int JPLua_Player_GetAdminPrivs(lua_State *L){
 		lua_pushinteger(L, 0);
 	}
 	return 1;
+#else
+	return 0;
+#endif
 }
 
+static int JPLua_Player_SetPosition(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	vector3 *pos = JPLua_CheckVector( L, 3 );
+	TeleportPlayer( ent, pos, &ent->client->ps.viewangles );
 #endif
+	return 0;
+}
+
+static int JPLua_Player_IsSleep(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
+	gentity_t *ent = &g_entities[player->clientNum];
+	lua_pushboolean(L, ent->client->pers.adminData.isSlept);
+	return 1;
+#else
+	return 0;
+#endif
+}
+
+static int JPLua_Player_GetSpeed(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	lua_pushinteger(L,ent->client->pers.speed);
+	return 1;
+#else
+	return 0;
+#endif
+}
+
+static int JPLua_Player_IsSilenced(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	lua_pushboolean(L, ent->client->pers.adminData.silenced);
+	return 1;
+#else
+	return 0;
+#endif
+}
+
+static int JPLua_Player_IsMerced(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	lua_pushboolean(L, ent->client->pers.adminData.merc);
+	return 1;
+#else
+	return 0;
+#endif
+}
+
+static int JPLua_Player_IsProtected(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	if ((ent->client->ps.eFlags & EF_INVULNERABLE) && ent->client->invulnerableTimer >= 1 ){
+		lua_pushboolean(L, qtrue);
+	}else{
+		lua_pushboolean(L, qfalse);
+	}
+	return 1;
+#else
+	return 0;
+#endif
+}
+
+static int JPLua_Player_IsEmpowered(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	lua_pushboolean(L, ent->client->pers.adminData.empowered);
+	return 1;
+#else
+	return 0;
+#endif
+}
+
+static int JPLua_Player_IsGhost(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	lua_pushboolean(L, ent->client->pers.adminData.isGhost);
+	return 1;
+#else
+	return 0;
+#endif
+}
+
+static int JPLua_Player_SetWeapon(lua_State *L){
+#ifdef _GAME
+	 jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	 int id = luaL_checkinteger(L,3);
+	 g_entities[player->clientNum].client->ps.weapon = id;
+#endif
+	 return 0;
+}
+
+static int JPLua_Player_SetAngles(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	vector3 *vec = JPLua_CheckVector(L,3);
+	VectorCopy(vec, &g_entities[player->clientNum].client->ps.viewangles); 
+#endif
+	return 0;
+}
+
+static int JPLua_Player_IsDueling(lua_State *L){
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+#if defined(_GAME)
+	playerState_t *ps = &g_entities[player->clientNum].client->ps;
+	lua_pushboolean(L, ps->duelInProgress);
+#elif defined(_CGAME)
+	if ( !cg_entities[player->clientNum].currentState.bolt1 || player->clientNum != cg.clientNum )
+		lua_pushboolean(L, qfalse);
+	else
+		lua_pushboolean(L, qtrue);
+#endif
+	return 1;
+}
+
+#ifdef _GAME
+static int JPLua_Player_GetAdminData(lua_State *L){
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	int top, i;
+
+	lua_newtable( L );
+	top = lua_gettop( L );
+	lua_pushstring( L, "login"); lua_pushstring( L, ent->client->pers.adminUser->user ); lua_settable( L, top );
+	lua_pushstring(L, "password"); lua_pushstring(L, ent->client->pers.adminUser->password); lua_settable(L, top);
+	lua_pushstring(L, "privileges"); lua_pushinteger(L, ent->client->pers.adminUser->privileges); lua_settable(L, top);
+	lua_pushstring(L, "loginmsg"); lua_pushstring(L, ent->client->pers.adminUser->loginMsg); lua_settable(L, top);
+	lua_pushstring(L, "rank"); lua_pushinteger(L, ent->client->pers.adminUser->rank); lua_settable(L, top);
+	lua_pushstring(L, "logineffect"); lua_pushinteger(L, ent->client->pers.adminUser->logineffect); lua_settable(L, top);
+	return 1;
+}
+#endif
+
+
 
 // Push a Player instance for a client number onto the stack
 void JPLua_Player_CreateRef( lua_State *L, int num ) {
@@ -1226,84 +1410,117 @@ int JPLua_Player_GetMetaTable( lua_State *L ) {
 	return 1;
 }
 
+
+static const struct jplua_player_func_s funcs [] = { 
+	{ "alive", JPLua_Player_IsAlive, NULL },
+	{ "anim", JPLua_Player_GetAnimations, NULL },
+	{ "angles", JPLua_Player_GetAngles, JPLua_Player_SetAngles },
+	{ "ammo", JPLua_Player_GetAmmo, NULL},
+	{ "armor", JPLua_Player_GetArmor, JPLua_Player_SetArmor },
+	{ "bot", JPLua_Player_IsBot, NULL },
+	{ "duelpartner", JPLua_Player_GetDuelingPartner, NULL},
+	{ "eflags", JPLua_Player_GetEFlags, JPLua_Player_SetEFlag },
+	{ "eflags2", JPLua_Player_GetEFlags2, JPLua_Player_SetEFlag2 },
+#ifdef _GAME
+	{ "empower", JPLua_Player_IsEmpowered, JPLua_Player_Empower },
+	{ "flags", JPLua_Player_GetFlags, JPLua_Player_SetFlag },
+#endif
+	{ "force", JPLua_Player_GetForce, JPLua_Player_SetForce },
+#ifdef _GAME
+	{ "ghost", JPLua_Player_IsGhost, JPLua_Player_Ghost },
+#endif
+	{ "health", JPLua_Player_GetHealth, JPLua_Player_SetHealth },
+	{ "id", JPLua_Player_GetID, NULL },
+#ifdef _GAME
+	{ "isadmin", JPLua_Player_IsAdmin, NULL },
+#endif
+	{ "isdueling", JPLua_Player_IsDueling, NULL},
+	{ "isholstered", JPLua_Player_IsWeaponHolstered, NULL},
+#ifdef _CGAME
+	{ "lastpickup", JPLua_Player_GetLastPickup, NULL},
+#endif
+	{ "location", JPLua_Player_GetLocation, NULL },
+	{ "maxammo", JPLua_Player_GetMaxAmmo, NULL},
+#ifdef _GAME
+	{ "merc", JPLua_Player_IsMerced, JPLua_Player_Merc },
+#endif
+	{ "name", JPLua_Player_GetName, JPLua_Player_SetName },
+	{ "position", JPLua_Player_GetPosition, JPLua_Player_SetPosition },
+#ifdef _GAME
+	{ "privileges", JPLua_Player_GetAdminPrivs, JPLua_Player_Grant },
+	{ "protect", JPLua_Player_IsProtected, JPLua_Player_Protect },
+#endif
+	{ "saberstyle", JPLua_Player_GetSaberStyle, NULL },
+#ifdef _GAME
+	{ "score", JPLua_Player_GetScore, JPLua_Player_SetScore },
+	{ "silence", JPLua_Player_IsSilenced, JPLua_Player_Silence },
+	{ "sleep", JPLua_Player_IsSleep, JPLua_Player_Sleep },
+	{ "speed", JPLua_Player_GetSpeed, JPLua_Player_SetSpeed },
+#endif
+	{ "team", JPLua_Player_GetTeam, JPLua_Player_SetTeam },
+	{ "underwater", JPLua_Player_IsUnderwater, NULL },
+	{ "velocity", JPLua_Player_GetVelocity, JPLua_Player_SetVelocity},
+	{ "weapon", JPLua_Player_GetWeapon, JPLua_Player_SetWeapon },
+};
+static const size_t numMetaMethods = ARRAY_LEN( funcs );
+
+static int metacmp( const void *a, const void *b ) {
+	return Q_stricmp( (const char *)a, ((jplua_player_func_t*)b)->name );
+}
+
+static int JPLua_Player_Index( lua_State *L ) {
+	jplua_player_func_t *method = NULL;
+	const char *key = lua_tostring( L, 2 );
+	int ret;
+
+	lua_getmetatable( L, 1 );
+	lua_getfield( L, -1, key );
+	if ( !lua_isnil( L, -1 ) )
+		return 1;
+
+	method = (jplua_player_func_t *)bsearch( key, funcs, numMetaMethods, sizeof(funcs[0]), metacmp );
+	if (!method) {
+		return 0;
+	}
+	ret = method->getfunc(L);
+	return ret;
+
+}
+
+static int JPLua_Player_NewIndex( lua_State *L ) {
+	jplua_player_func_t *method = NULL;
+	const char *key = lua_tostring( L, 2 );
+	int ret;
+
+	method = (jplua_player_func_t *)bsearch( key, funcs, numMetaMethods, sizeof(funcs[0]), metacmp );
+	if (!method) {
+		return 0;
+	}
+	ret = method->setfunc(L);
+	return ret;
+
+}
+
 static const struct luaL_Reg jplua_player_meta[] = {
+	{ "__index", JPLua_Player_Index},
+	{ "__newindex", JPLua_Player_NewIndex},
 	{ "__eq", JPLua_Player_Equals },
 	{ "__tostring", JPLua_Player_ToString },
-#ifdef _GAME
-	{ "Empower", JPLua_Player_Empower},
-	{ "GetAdminPrivs", JPLua_Player_GetAdminPrivs},
-#endif
-	{ "GetAmmo", JPLua_Player_GetAmmo },
-	{ "GetAngles", JPLua_Player_GetAngles },
-	{ "GetAnimations", JPLua_Player_GetAnimations },
-	{ "GetArmor", JPLua_Player_GetArmor },
 #ifdef _CGAME
 	{ "GetClientInfo", JPLua_Player_GetClientInfo },
 #endif
-	{ "GetDuelingPartner", JPLua_Player_GetDuelingPartner },
-	{ "GetEFlags", JPLua_Player_GetEFlags },
-	{ "GetEFlags2", JPLua_Player_GetEFlags2 },
 #ifdef _GAME
-	{ "GetFlags", JPLua_Player_GetFlags },
-#endif
-	{ "GetForce", JPLua_Player_GetForce },
-	{ "GetHealth", JPLua_Player_GetHealth },
-	{ "GetID", JPLua_Player_GetID },
-#ifdef _CGAME
-	{ "GetLastPickup", JPLua_Player_GetLastPickup },
-#endif
-	{ "GetLocation", JPLua_Player_GetLocation },
-	{ "GetMaxAmmo", JPLua_Player_GetMaxAmmo },
-	{ "GetName", JPLua_Player_GetName },
-	{ "GetPosition", JPLua_Player_GetPosition },
-	{ "GetSaberStyle", JPLua_Player_GetSaberStyle },
-#ifdef _GAME
-	{ "GetScore", JPLua_Player_GetScore },
-#endif
-	{ "GetTeam", JPLua_Player_GetTeam },
-#ifdef _GAME
+	{ "GetAdminData", JPLua_Player_GetAdminData},
 	{ "GetUserinfo", JPLua_Player_GetUserinfo },
-#endif
-	{ "GetVelocity", JPLua_Player_GetVelocity },
-	{ "GetWeapon", JPLua_Player_GetWeapon },
-#ifdef _GAME
 	{ "Ghost", JPLua_Player_Ghost},
-	{ "GiveWeapon", JPLua_Player_GiveWeapon },
-	{ "Grant", JPLua_Player_Grant},
-	{ "IsAdmin", JPLua_Player_IsAdmin },
-#endif
-	{ "IsAlive", JPLua_Player_IsAlive },
-	{ "IsBot", JPLua_Player_IsBot },
-	{ "IsUnderwater", JPLua_Player_IsUnderwater },
-	{ "IsWeaponHolstered", JPLua_Player_IsWeaponHolstered },
-#ifdef _GAME
+	{ "Give", JPLua_Player_Give },
 	{ "Kick", JPLua_Player_Kick },
 	{ "Kill", JPLua_Player_Kill },
-	{ "Merc", JPLua_Player_Merc},
-#endif
-	{ "OnSameTeam", JPLua_Player_OnSameTeam },
-#ifdef _GAME
-	{ "Protect", JPLua_Player_Protect},
 	{ "RemoveEFlag", JPLua_Player_RemoveEFlag },
 	{ "RemoveEFlag2", JPLua_Player_RemoveEFlag2 },
 	{ "RemoveFlag", JPLua_Player_RemoveFlag },
-	{ "SetArmor", JPLua_Player_SetArmor },
-	{ "SetEFlag", JPLua_Player_SetEFlag },
-	{ "SetEFlag2", JPLua_Player_SetEFlag2 },
-	{ "SetFlag", JPLua_Player_SetFlag },
-#ifdef _GAME
-	{ "SetForce", JPLua_Player_SetForce },
-#endif
-	{ "SetHealth", JPLua_Player_SetHealth },
-	{ "SetName", JPLua_Player_SetName },
-	{ "SetScore", JPLua_Player_SetScore },
-	{ "SetSpeed", JPLua_Player_SetSpeed },
-	{ "SetTeam", JPLua_Player_SetTeam },
-	{ "SetVelocity", JPLua_Player_SetVelocity },
-	{ "Silence", JPLua_Player_Silence},
 	{ "Slap", JPLua_Player_Slap},
-	{ "Sleep", JPLua_Player_Sleep},
-	{ "TakeWeapon", JPLua_Player_TakeWeapon },
+	{ "Take", JPLua_Player_Take },
 	{ "Teleport", JPLua_Player_Teleport },
 #endif
 	{ NULL, NULL }
