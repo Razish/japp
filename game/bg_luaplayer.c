@@ -403,11 +403,8 @@ static int JPLua_Player_GetLocation( lua_State *L ) {
 //		on client, nil if Player:GetID() != self:GetID() due to lack of reliable information
 static int JPLua_Player_GetMaxAmmo( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
-#if defined(_GAME)
-	gentity_t *ent = g_entities + player->clientNum;
-#endif
-
 	int top, i;
+
 #if defined(_GAME)
 	lua_newtable( L );
 	top = lua_gettop( L );

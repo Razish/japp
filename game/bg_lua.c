@@ -970,6 +970,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "Font_StringLengthPixels", JPLua_Export_Font_StringLengthPixels }, // integer Font_StringLengthPixels( string str, integer fontHandle, float scale )
 #endif
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
+	{ "GetFileList", JPLua_File_GetFileList},
 #ifdef _CGAME
 	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
 #endif
@@ -994,6 +995,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "GetServer", JPLua_GetServer }, // Server GetServer()
 #endif
 	{ "GetTime", JPLua_Export_GetTime }, // integer GetTime()
+	{ "OpenFile", JPLua_File_Open},
 	{ "RayTrace", JPLua_Export_Trace }, // traceResult Trace( stuff )
 	{ "RegisterPlugin", JPLua_RegisterPlugin }, // plugin RegisterPlugin( string name, string version )
 #ifdef _CGAME
@@ -1089,6 +1091,7 @@ void JPLua_Init( void ) {
 	JPLua_Register_Logger( JPLua.state );
 	JPLua_Register_Serialiser( JPLua.state );
 	JPLua_Register_Vector( JPLua.state );
+	JPLua_Register_File( JPLua.state );
 
 	// -- FRAMEWORK INITIALISATION begin
 	lua_getglobal( JPLua.state, "tostring" );	JPLua_Framework[JPLUA_FRAMEWORK_TOSTRING] = luaL_ref( JPLua.state, LUA_REGISTRYINDEX );
