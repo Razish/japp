@@ -2,11 +2,10 @@
 #include "g_nav.h"
 #include "anims.h"
 
-extern void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
-extern void NPC_TempLookTarget( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
-extern qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3 *maxs, int ignore, int clipmask );
-extern qboolean FlyingCreature( gentity_t *ent );
+void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
+void NPC_TempLookTarget( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
+qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3 *maxs, int ignore, int clipmask );
+qboolean FlyingCreature( gentity_t *ent );
 
 #define	SPF_NO_HIDE			2
 

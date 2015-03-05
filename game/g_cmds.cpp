@@ -515,7 +515,7 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 
 	// check if the team is locked
 	if ( !forced && team != oldTeam && level.lockedTeams[team] ) {
-		trap->SendServerCommand( clientNum, "print \""S_COLOR_YELLOW"This team is locked\n\"" );
+		trap->SendServerCommand( clientNum, "print \"" S_COLOR_YELLOW "This team is locked\n\"" );
 		return qfalse;
 	}
 
@@ -870,8 +870,8 @@ static void Cmd_ForceChanged_f( gentity_t *ent ) {
 	}
 }
 
-extern qboolean WP_SaberStyleValidForSaber( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel );
-extern qboolean WP_UseFirstValidSaberStyle( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int *saberAnimLevel );
+qboolean WP_SaberStyleValidForSaber( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel );
+qboolean WP_UseFirstValidSaberStyle( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int *saberAnimLevel );
 qboolean G_SetSaber( gentity_t *ent, int saberNum, const char *saberName, qboolean siegeOverride ) {
 	char truncSaberName[MAX_QPATH] = { 0 };
 
@@ -1111,7 +1111,9 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 	default:
 	case SAY_ADMIN:
 		G_LogPrintf( level.log.console, "amsay: %s: %s\n", ent->client->pers.netname, chatText );
-		Com_sprintf( name, sizeof(name), S_COLOR_YELLOW"<Admin>"S_COLOR_WHITE"%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+		Com_sprintf( name, sizeof(name), S_COLOR_YELLOW"<Admin>" S_COLOR_WHITE "%s%c%c" EC ": ",
+			ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE
+		);
 		color = COLOR_YELLOW;
 		break;
 	case SAY_ALL:
@@ -1122,32 +1124,37 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 		}
 		G_LogPrintf( level.log.console, "say: %s: %s\n", ent->client->pers.netname, chatText );
 		if ( isMeCmd ) {
-			Com_sprintf( name, sizeof(name), S_COLOR_WHITE"* %s"S_COLOR_WHITE""EC" ", ent->client->pers.netname );
+			Com_sprintf( name, sizeof(name), S_COLOR_WHITE "* %s" S_COLOR_WHITE EC " ", ent->client->pers.netname );
 			color = COLOR_WHITE;
 		}
 		else {
-			Com_sprintf( name, sizeof(name), "%s"S_COLOR_WHITE EC": ", ent->client->pers.netname );
+			Com_sprintf( name, sizeof(name), "%s" S_COLOR_WHITE EC ": ", ent->client->pers.netname );
 			color = COLOR_GREEN;
 		}
 		break;
 	case SAY_TEAM:
 		G_LogPrintf( level.log.console, "sayteam: %s: %s\n", ent->client->pers.netname, chatText );
 		if ( Team_GetLocationMsg( ent, location, sizeof(location) ) ) {
-			Com_sprintf( name, sizeof(name), EC"(%s%c%c"EC")"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+			Com_sprintf( name, sizeof(name), EC "(%s%c%c" EC ")" EC ": ", ent->client->pers.netname, Q_COLOR_ESCAPE,
+				COLOR_WHITE
+			);
 			locMsg = location;
 		}
-		else
-			Com_sprintf( name, sizeof(name), EC"(%s%c%c"EC")"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+		else {
+			Com_sprintf( name, sizeof(name), EC "(%s%c%c" EC ")" EC ": ", ent->client->pers.netname, Q_COLOR_ESCAPE,
+				COLOR_WHITE
+			);
+		}
 		color = COLOR_CYAN;
 		break;
 	case SAY_TELL:
 		if ( target && level.gametype >= GT_TEAM && target->client->sess.sessionTeam == ent->client->sess.sessionTeam &&
 			Team_GetLocationMsg( ent, location, sizeof(location) ) ) {
-			Com_sprintf( name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+			Com_sprintf( name, sizeof(name), EC "[%s%c%c" EC "]" EC ": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 			locMsg = location;
 		}
 		else
-			Com_sprintf( name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+			Com_sprintf( name, sizeof(name), EC "[%s%c%c" EC "]" EC ": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_MAGENTA;
 		break;
 	}
@@ -1267,8 +1274,10 @@ static const char *sayTeamMethods[STM_NUM_METHODS] = {
 
 static void Cmd_SayTeamMod_f( gentity_t *ent ) {
 	if ( trap->Argc() == 1 ) {
-		ent->client->pers.sayTeamMethod++;
-		ent->client->pers.sayTeamMethod %= STM_NUM_METHODS;
+		int i = ent->client->pers.sayTeamMethod;
+		i++;
+		i %= STM_NUM_METHODS;
+		ent->client->pers.sayTeamMethod = (sayTeamMethod_t)i;
 	}
 
 	else {
@@ -1278,7 +1287,7 @@ static void Cmd_SayTeamMod_f( gentity_t *ent ) {
 		trap->Argv( 1, arg, sizeof(arg) );
 		for ( i = 0; i < STM_NUM_METHODS; i++ ) {
 			if ( !Q_stricmp( arg, sayTeamMethods[i] ) ) {
-				ent->client->pers.sayTeamMethod = i;
+				ent->client->pers.sayTeamMethod = (sayTeamMethod_t)i;
 				break;
 			}
 		}
@@ -1389,7 +1398,9 @@ static void Cmd_GameCommand_f( gentity_t *ent ) {
 	char		arg[MAX_TOKEN_CHARS] = { 0 };
 
 	if ( trap->Argc() != 3 ) {
-		trap->SendServerCommand( ent - g_entities, va( "print \""S_COLOR_YELLOW"Usage: \\gc <player id> <order 0-%d>\n\"", numgc_orders - 1 ) );
+		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "Usage: \\gc <player id> <order 0-%d>"
+			"\n\"", numgc_orders - 1 )
+		);
 		return;
 	}
 
@@ -1425,7 +1436,7 @@ static void Cmd_Where_f( gentity_t *ent ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", vtos( &ent->s.origin ) ) );
 }
 
-extern void SiegeClearSwitchData( void ); //g_saga.c
+void SiegeClearSwitchData( void ); //g_saga.c
 static qboolean G_VoteAllready( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
 	if ( !level.warmupTime ) {
 		trap->SendServerCommand( ent - g_entities, "print \"allready is only available during warmup.\n\"" );
@@ -1889,7 +1900,9 @@ validVote:
 	}
 	Q_strstrip( level.voteStringClean, "\"\n\r", NULL );
 
-	trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s (%s)\n\"", ent->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLCALLEDVOTE" ), level.voteStringClean ) );
+	trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s (%s)\n\"", ent->client->pers.netname,
+		G_GetStringEdString( "MP_SVGAME", "PLCALLEDVOTE" ), level.voteStringClean )
+	);
 
 	// start the voting, the caller automatically votes yes
 	level.voteTime = level.time;
@@ -1955,7 +1968,7 @@ static void Cmd_SetViewpos_f( gentity_t *ent ) {
 	int			i;
 
 	if ( trap->Argc() != 5 ) {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\setviewpos x y z yaw\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\setviewpos x y z yaw\n\"" );
 		return;
 	}
 
@@ -2373,7 +2386,7 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 		}
 
 		if ( challenged->client->ps.duelIndex == ent->s.number && challenged->client->ps.duelTime >= level.time ) {
-			trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_WHITE"%s %s "S_COLOR_WHITE"(%s)!\n\"",
+			trap->SendServerCommand( -1, va( "print \"%s " S_COLOR_WHITE "%s %s " S_COLOR_WHITE "(%s)!\n\"",
 				challenged->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELACCEPT" ),
 				ent->client->pers.netname, weaponData[challenged->client->pers.duelWeapon].longName ) );
 
@@ -2429,8 +2442,15 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 			ent->client->ps.weapon = challenged->client->ps.weapon = challenged->client->pers.duelWeapon;
 
 			// set health etc
-			ent->health = challenged->health = ent->client->ps.stats[STAT_HEALTH] = challenged->client->ps.stats[STAT_HEALTH] = g_privateDuelHealth.integer;
-			ent->client->ps.stats[STAT_ARMOR] = challenged->client->ps.stats[STAT_ARMOR] = g_privateDuelShield.integer;
+			ent->health
+				= challenged->health
+				= ent->client->ps.stats[STAT_HEALTH]
+				= challenged->client->ps.stats[STAT_HEALTH]
+				= g_privateDuelHealth.integer;
+
+			ent->client->ps.stats[STAT_ARMOR]
+				= challenged->client->ps.stats[STAT_ARMOR]
+				= g_privateDuelShield.integer;
 
 		}
 		else {
@@ -2438,11 +2458,14 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 			// set their desired dueling weapon.
 			ent->client->pers.duelWeapon = weapon;
 
-			trap->SendServerCommand( challenged - g_entities, va( "cp \"%s "S_COLOR_WHITE"%s\n"S_COLOR_YELLOW"Weapon: "
-				S_COLOR_WHITE"%s\n\"", ent->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELCHALLENGE" ),
-				weaponData[weapon].longName ) );
-			trap->SendServerCommand( ent - g_entities, va( "cp \"%s %s\n"S_COLOR_YELLOW"Weapon: "S_COLOR_WHITE"%s\n\"",
-				G_GetStringEdString( "MP_SVGAME", "PLDUELCHALLENGED" ), challenged->client->pers.netname, weaponData[weapon].longName ) );
+			trap->SendServerCommand( challenged - g_entities, va( "cp \"%s " S_COLOR_WHITE "%s\n" S_COLOR_YELLOW
+				"Weapon: " S_COLOR_WHITE "%s\n\"", ent->client->pers.netname,
+				G_GetStringEdString( "MP_SVGAME", "PLDUELCHALLENGE" ), weaponData[weapon].longName )
+			);
+			trap->SendServerCommand( ent - g_entities, va( "cp \"%s %s\n" S_COLOR_YELLOW "Weapon: " S_COLOR_WHITE "%s"
+				"\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELCHALLENGED" ), challenged->client->pers.netname,
+				weaponData[weapon].longName )
+			);
 		}
 
 		challenged->client->ps.fd.privateDuelTime = 0; //reset the timer in case this player just got out of a duel. He should still be able to accept the challenge.
@@ -2592,22 +2615,36 @@ static void Cmd_Sabercolor_f( gentity_t *ent ) {
 	int saberNum, red, green, blue, client = ent->client - level.clients;
 	byte r = 0, g = 0, b = 0;
 	const char *temp;
-	char sNum[8] = { 0 }, sRed[8] = { 0 }, sGreen[8] = { 0 }, sBlue[8] = { 0 };
-	char userinfo[MAX_INFO_STRING];
-	trap->GetUserinfo(client, userinfo, sizeof(userinfo));
-	temp = Info_ValueForKey(userinfo, "cp_sbRGB1");
+	char sNum[8] = {}, sRed[8] = {}, sGreen[8] = {}, sBlue[8] = {}, userinfo[MAX_INFO_STRING] = {};
+
+	trap->GetUserinfo( client, userinfo, sizeof(userinfo) );
+	temp = Info_ValueForKey( userinfo, "cp_sbRGB1" );
 	b = (atoi(temp) >> 16) & 0xf;
 	g = (atoi(temp) >> 8) & 0xf;
 	r = atoi(temp) & 0xf;
 
 	if (trap->Argc() < 5) {
-		trap->SendServerCommand(ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\sabercolor "S_COLOR_WHITE"<"S_COLOR_YELLOW"1-2"S_COLOR_WHITE"> <"S_COLOR_RED"0-255"S_COLOR_WHITE"> <"S_COLOR_GREEN"0-255"S_COLOR_WHITE"> <"S_COLOR_CYAN"0-255"S_COLOR_WHITE">\n\"");
-		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"Current: Saber 1:<"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\"", r, g, b));
-		temp = Info_ValueForKey(userinfo, "cp_sbRGB2");
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\sabercolor " S_COLOR_WHITE
+			"<" S_COLOR_YELLOW "1-2" S_COLOR_WHITE "> "
+			"<" S_COLOR_RED "0-255" S_COLOR_WHITE "> "
+			"<" S_COLOR_GREEN "0-255" S_COLOR_WHITE "> "
+			"<" S_COLOR_CYAN "0-255" S_COLOR_WHITE ">\n\""
+		);
+		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_WHITE "Current: Saber 1: "
+			"<" S_COLOR_RED "%i" S_COLOR_WHITE "> "
+			"<" S_COLOR_GREEN "%i" S_COLOR_WHITE "> "
+			"<" S_COLOR_CYAN "%i" S_COLOR_WHITE ">\n\"", r, g, b )
+		);
+		temp = Info_ValueForKey( userinfo, "cp_sbRGB2" );
 		b = (atoi(temp) >> 16) & 0xf;
 		g = (atoi(temp) >> 8) & 0xf;
 		r = atoi(temp) & 0xf;
-		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"         Saber 2:<"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\"", r, g, b));
+		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_WHITE "Current: Saber 2: "
+			"<" S_COLOR_RED "%i" S_COLOR_WHITE "> "
+			"<" S_COLOR_GREEN "%i" S_COLOR_WHITE "> "
+			"<" S_COLOR_CYAN "%i" S_COLOR_WHITE ">\n\"", r, g, b )
+		);
+
 		return;
 	}
 
@@ -2639,9 +2676,18 @@ static void Cmd_Playertint_f( gentity_t *ent ) {
 	g = ent->client->ps.customRGBA[1];
 	b = ent->client->ps.customRGBA[2];
 
-	if (trap->Argc() < 4) {
-		trap->SendServerCommand(ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\playertint "S_COLOR_WHITE"<"S_COLOR_YELLOW"1-2"S_COLOR_WHITE"> <"S_COLOR_RED"0-255"S_COLOR_WHITE"> <"S_COLOR_GREEN"0-255"S_COLOR_WHITE"> <"S_COLOR_CYAN"0-255"S_COLOR_WHITE">\n\"");
-		trap->SendServerCommand(ent - g_entities, va("print \""S_COLOR_WHITE"Current: <"S_COLOR_RED"%i"S_COLOR_WHITE"> <"S_COLOR_GREEN"%i"S_COLOR_WHITE"> <"S_COLOR_CYAN"%i"S_COLOR_WHITE">\n\"", r, g, b));
+	if ( trap->Argc() < 4 ) {
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\playertint " S_COLOR_WHITE
+			"<" S_COLOR_YELLOW "1-2" S_COLOR_WHITE "> "
+			"<" S_COLOR_RED "0-255" S_COLOR_WHITE "> "
+			"<" S_COLOR_GREEN "0-255" S_COLOR_WHITE "> "
+			"<" S_COLOR_CYAN "0-255" S_COLOR_WHITE ">\n\""
+		);
+		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_WHITE "Current: "
+			"<" S_COLOR_RED "%i" S_COLOR_WHITE "> "
+			"<" S_COLOR_GREEN "%i" S_COLOR_WHITE "> "
+			"<" S_COLOR_CYAN "%i" S_COLOR_WHITE ">\n\"", r, g, b )
+		);
 		return;
 	}
 
@@ -2653,11 +2699,10 @@ static void Cmd_Playertint_f( gentity_t *ent ) {
 	green = Q_clampi(0, atoi(sGreen), 255);
 	blue = Q_clampi(0, atoi(sBlue), 255);
 
+	//TODO: force a lower bound
 	ent->client->ps.customRGBA[0] = red;
 	ent->client->ps.customRGBA[1] = green;
 	ent->client->ps.customRGBA[2] = blue;
-
-	return;
 }
 
 
@@ -2717,10 +2762,21 @@ static void JP_ListChannels( gentity_t *ent ) {
 	char msg[960] = { 0 };
 
 	while ( channel ) {
-		Q_strcat( msg, sizeof(msg), (legacyClient && channel == ent->client->pers.activeChannel)
-			? va( S_COLOR_WHITE"- "S_COLOR_YELLOW"%s "S_COLOR_WHITE"["S_COLOR_GREEN"%s"S_COLOR_WHITE"]\n", channel->identifier,
-			channel->shortname ) : legacyClient ? va( S_COLOR_WHITE"- %s "S_COLOR_WHITE"["S_COLOR_GREEN"%s"S_COLOR_WHITE"]\n",
-			channel->identifier, channel->shortname ) : va( S_COLOR_WHITE"- %s\n", channel->identifier ) );
+		if ( legacyClient ) {
+			if ( channel == ent->client->pers.activeChannel ) {
+				Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- " S_COLOR_YELLOW "%s " S_COLOR_WHITE "[" S_COLOR_GREEN
+					"%s" S_COLOR_WHITE "]\n", channel->identifier, channel->shortname )
+				);
+			}
+			else {
+				Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- %s " S_COLOR_WHITE "[" S_COLOR_GREEN "%s"
+					S_COLOR_WHITE "]\n", channel->identifier, channel->shortname )
+				);
+			}
+		}
+		else {
+			Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE"- %s\n", channel->identifier ) );
+		}
 		channel = channel->next;
 	}
 	trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
@@ -2733,10 +2789,16 @@ static void Cmd_JoinChannel_f( gentity_t *ent ) {
 	channel_t *channel = NULL, *prev = NULL;
 
 	if ( trap->Argc() < 2 ) {
-		if ( legacyClient )
-			trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\joinchan <identifier/password> [short-name]>\n\"" );
-		else
-			trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\joinchan <identifier/password>\n\"" );
+		if ( legacyClient ) {
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW
+				"Usage: \\joinchan <identifier/password> [short-name]>\n\""
+			);
+		}
+		else {
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW
+				"Usage: \\joinchan <identifier/password>\n\""
+			);
+		}
 		return;
 	}
 
@@ -2751,7 +2813,9 @@ static void Cmd_JoinChannel_f( gentity_t *ent ) {
 	while ( channel ) {
 		if ( !strcmp( arg1_ident, channel->identifier ) ) {
 			// Already joined, return
-			trap->SendServerCommand( ent - g_entities, va( "print \""S_COLOR_YELLOW"You are already in channel '%s'\n\"", arg1_ident ) );
+			trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "You are already in channel '%s'"
+				"\n\"", arg1_ident )
+			);
 			//TODO: update short-name?
 			//		for legacy clients
 			return;
@@ -2775,8 +2839,10 @@ static void Cmd_JoinChannel_f( gentity_t *ent ) {
 		Q_strncpyz( channel->shortname, arg2_shortname, sizeof(channel->shortname) );
 
 	//Notify about the successful join
-	trap->SendServerCommand( ent - g_entities, legacyClient ? va( "print \"Successfully joined channel '%s' (shortname: '%s')\n\"", arg1_ident, arg2_shortname ) :
-		va( "print \"Successfully joined channel '%s'\n\"", arg1_ident ) );
+	trap->SendServerCommand( ent - g_entities, legacyClient
+		? va( "print \"Successfully joined channel '%s' (shortname: '%s')\n\"", arg1_ident, arg2_shortname )
+		: va( "print \"Successfully joined channel '%s'\n\"", arg1_ident )
+	);
 
 	return;
 }
@@ -2813,7 +2879,7 @@ static void Cmd_WhoisChannel_f( gentity_t *ent ) {
 				chan = other->client->pers.channels;
 				while ( chan ) {
 					if ( !strcmp( chan->identifier, arg1_ident ) )
-						Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE"- %s\n", other->client->pers.netname ) );
+						Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- %s\n", other->client->pers.netname ) );
 					chan = chan->next;
 				}
 			}
@@ -2838,7 +2904,7 @@ static void Cmd_WhoisChannel_f( gentity_t *ent ) {
 				channel_t *chan = other->client->pers.channels;
 				while ( chan ) {
 					if ( chan == ent->client->pers.activeChannel )
-						Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE"- %s\n", other->client->pers.netname ) );
+						Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- %s\n", other->client->pers.netname ) );
 					chan = chan->next;
 				}
 			}
@@ -2846,7 +2912,7 @@ static void Cmd_WhoisChannel_f( gentity_t *ent ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"Players in channel '%s':\n%s\"", arg1_ident, msg ) );
 	}
 	else
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\whoischan <identifier/password>\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\whoischan <identifier/password>\n\"" );
 
 	return;
 }
@@ -2880,7 +2946,9 @@ static void Cmd_LeaveChannel_f( gentity_t *ent ) {
 			prev = channel;
 			channel = channel->next;
 		}
-		trap->SendServerCommand( ent - g_entities, va( "print \""S_COLOR_YELLOW"Error leaving channel '%s'. You were not in the channel.\n\"", arg1_ident ) );
+		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "Error leaving channel '%s'. You "
+			"were not in the channel.\n\"", arg1_ident )
+		);
 		if ( ent->client->pers.channels ) {
 			trap->SendServerCommand( ent - g_entities, "print \"You are currently in these channels:\n\"" );
 			JP_ListChannels( ent );
@@ -2932,7 +3000,9 @@ static void Cmd_MessageChannel_f( gentity_t *ent ) {
 			return;
 		}
 
-		Com_sprintf( name, sizeof(name), "%s"S_COLOR_WHITE CHANNEL_EC"%s"CHANNEL_EC": ", ent->client->pers.netname, chan->identifier );
+		Com_sprintf( name, sizeof(name), "%s" S_COLOR_WHITE CHANNEL_EC "%s" CHANNEL_EC ": ", ent->client->pers.netname,
+			chan->identifier
+		);
 
 		for ( i = 0, other = g_entities; i < MAX_CLIENTS; i++, other++ ) {
 			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED ) {
@@ -2958,7 +3028,9 @@ static void Cmd_MessageChannel_f( gentity_t *ent ) {
 			return;
 		}
 
-		Com_sprintf( name, sizeof(name), "%s"S_COLOR_WHITE CHANNEL_EC"%s"CHANNEL_EC": ", ent->client->pers.netname, ent->client->pers.activeChannel->identifier );
+		Com_sprintf( name, sizeof(name), "%s" S_COLOR_WHITE CHANNEL_EC "%s" CHANNEL_EC ": ", ent->client->pers.netname,
+			ent->client->pers.activeChannel->identifier
+		);
 
 		for ( i = 0, other = g_entities; i < MAX_CLIENTS; i++, other++ ) {
 			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED ) {
@@ -2971,8 +3043,11 @@ static void Cmd_MessageChannel_f( gentity_t *ent ) {
 			}
 		}
 	}
-	else
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Usage: \\msgchan <identifier/password> <message>\n\"" );
+	else {
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW
+			"Usage: \\msgchan <identifier/password> <message>\n\""
+		);
+	}
 
 	return;
 }
@@ -2981,7 +3056,7 @@ static void Cmd_Drop_f( gentity_t *ent ) {
 	char arg[128] = { 0 };
 
 	if ( ent->client->ps.pm_type == PM_DEAD || ent->client->ps.pm_type == PM_SPECTATOR ) {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"You must be alive to drop items\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "You must be alive to drop items\n\"" );
 		return;
 	}
 
@@ -2991,12 +3066,12 @@ static void Cmd_Drop_f( gentity_t *ent ) {
 		powerup_t powerup = (ent->client->ps.persistant[PERS_TEAM] == TEAM_RED) ? PW_BLUEFLAG : PW_REDFLAG;
 
 		if ( !japp_allowFlagDrop.integer ) {
-			trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Not allowed to drop the flag\n\"" );
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Not allowed to drop the flag\n\"" );
 			return;
 		}
 
 		if ( level.gametype != GT_CTF || (ent->client->ps.powerups[powerup] <= level.time) ) {
-			trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"No flag to drop\n\"" );
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "No flag to drop\n\"" );
 			return;
 		}
 
@@ -3025,27 +3100,32 @@ static void Cmd_Drop_f( gentity_t *ent ) {
 		int ammo, i = 0;
 
 		if ( !japp_allowWeaponDrop.integer ) {
-			trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Not allowed to drop weapons\n\"" );
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Not allowed to drop weapons\n\"" );
 			return;
 		}
 
 		if ( !(ent->client->ps.stats[STAT_WEAPONS] & (1 << wp)) || !ent->client->ps.ammo[weaponData[wp].ammoIndex]
 			|| wp == WP_SABER || wp == WP_MELEE || wp == WP_EMPLACED_GUN || wp == WP_TURRET
-			|| wp <= WP_NONE || wp > WP_NUM_WEAPONS ) {// We don't have this weapon or ammo for it, or it's a 'weapon' that can't be dropped
-			trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Can't drop this weapon\n\"" );
+			|| wp <= WP_NONE || wp > WP_NUM_WEAPONS )
+		{
+			// we don't have this weapon or ammo for it, or it's a 'weapon' that can't be dropped
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Can't drop this weapon\n\"" );
 			return;
 		}
 
 		item = BG_FindItemForWeapon( wp );
 
 		if ( !ent->client->ps.ammo[weaponData[wp].ammoIndex] ) {
-			trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"No ammo for this weapon\n\"" );
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "No ammo for this weapon\n\"" );
 			return;
 		}
-		else if ( ent->client->ps.ammo[weaponData[wp].ammoIndex] > item->quantity )//bg_itemlist[BG_GetItemIndexByTag( wp, IT_WEAPON )].quantity )
+		//FIXME: use bg_itemlist[BG_GetItemIndexByTag( wp, IT_WEAPON )].quantity?
+		else if ( ent->client->ps.ammo[weaponData[wp].ammoIndex] > item->quantity ) {
 			ammo = item->quantity;
-		else
+		}
+		else {
 			ammo = ent->client->ps.ammo[weaponData[wp].ammoIndex];
+		}
 
 		AngleVectors( &ent->client->ps.viewangles, &angs, NULL, NULL );
 
@@ -3302,12 +3382,12 @@ static void Cmd_Ready_f( gentity_t *ent ) {
 	ent->client->pers.ready = !ent->client->pers.ready;
 
 	if ( ent->client->pers.ready ) {
-		publicMsg = va( "cp \"%s\n"S_COLOR_WHITE"is ready\"", ent->client->pers.netname );
-		trap->SendServerCommand( ent - g_entities, va( "cp \""S_COLOR_GREEN"You are ready\"" ) );
+		publicMsg = va( "cp \"%s\n" S_COLOR_WHITE "is ready\"", ent->client->pers.netname );
+		trap->SendServerCommand( ent - g_entities, va( "cp \"" S_COLOR_GREEN "You are ready\"" ) );
 	}
 	else {
-		publicMsg = va( "cp \"%s\n"S_COLOR_YELLOW"is NOT ready\"", ent->client->pers.netname );
-		trap->SendServerCommand( ent - g_entities, va( "cp \""S_COLOR_YELLOW"You are NOT ready\"" ) );
+		publicMsg = va( "cp \"%s\n" S_COLOR_YELLOW "is NOT ready\"", ent->client->pers.netname );
+		trap->SendServerCommand( ent - g_entities, va( "cp \"" S_COLOR_YELLOW "You are NOT ready\"" ) );
 	}
 
 	// send public message to everyone BUT this client, so they see their own message
@@ -3383,7 +3463,7 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 		}
 	}
 	else if ( !(japp_allowSaberSwitch.bits & (1 << level.gametype)) ) {
-		trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_YELLOW"Not allowed to change saber\n\"" );
+		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Not allowed to change saber\n\"" );
 		return;
 	}
 	else {
@@ -3456,36 +3536,36 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 
 // must be in alphabetical order
 static const emote_t emotes[] = {
-	{ "aimgun", BOTH_STAND5TOAIM, 0, EMF_HOLD | EMF_HOLSTER },
-	{ "atease", BOTH_STAND4, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
-	{ "beg", BOTH_KNEES2, 0, EMF_HOLD | EMF_HOLSTER },
-	{ "breakdance", BOTH_FORCE_GETUP_B6, 0, EMF_NONE },
+	{ "aimgun", BOTH_STAND5TOAIM, MAX_ANIMATIONS, EMF_HOLD | EMF_HOLSTER },
+	{ "atease", BOTH_STAND4, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "beg", BOTH_KNEES2, MAX_ANIMATIONS, EMF_HOLD | EMF_HOLSTER },
+	{ "breakdance", BOTH_FORCE_GETUP_B6, MAX_ANIMATIONS, EMF_NONE },
 	{ "cower", BOTH_COWER1_START, BOTH_COWER1, EMF_HOLSTER },
-	{ "dance1", BOTH_TURNSTAND1, 0, EMF_STATIC | EMF_HOLD },
-	{ "dance2", BOTH_TURNSTAND4, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
-	{ "dance3", BOTH_TURNSTAND5, 0, EMF_STATIC | EMF_HOLD },
-	{ "fabulous", BOTH_K7_S7_TR, 0, EMF_HOLD },
-	{ "harlem", BOTH_FORCE_DRAIN_GRABBED, 0, EMF_STATIC | EMF_HOLD },
+	{ "dance1", BOTH_TURNSTAND1, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD },
+	{ "dance2", BOTH_TURNSTAND4, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "dance3", BOTH_TURNSTAND5, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD },
+	{ "fabulous", BOTH_K7_S7_TR, MAX_ANIMATIONS, EMF_HOLD },
+	{ "harlem", BOTH_FORCE_DRAIN_GRABBED, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD },
 	{ "heal", BOTH_FORCEHEAL_START, BOTH_FORCEHEAL_STOP, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
-	{ "hello", BOTH_SILENCEGESTURE1, 0, EMF_NONE },
+	{ "hello", BOTH_SILENCEGESTURE1, MAX_ANIMATIONS, EMF_NONE },
 	{ "hips", BOTH_STAND5TOSTAND8, BOTH_STAND8TOSTAND5, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "kneel", BOTH_CROUCH3, BOTH_UNCROUCH3, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "kneel2", BOTH_ROSH_PAIN, BOTH_UNCROUCH3, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
-	{ "neo", BOTH_FORCE_GETUP_B4, 0, EMF_NONE },
-	{ "nod", BOTH_HEADNOD, 0, EMF_NONE },
+	{ "neo", BOTH_FORCE_GETUP_B4, MAX_ANIMATIONS, EMF_NONE },
+	{ "nod", BOTH_HEADNOD, MAX_ANIMATIONS, EMF_NONE },
 	{ "radio", BOTH_TALKCOMM1START, BOTH_TALKCOMM1STOP, EMF_HOLD | EMF_HOLSTER },
-	{ "shake", BOTH_HEADSHAKE, 0, EMF_NONE },
-	{ "shovel", BOTH_TUSKENATTACK2, 0, EMF_NONE },
-	{ "sit1", BOTH_SIT1, 0, EMF_STATIC | EMF_HOLD },
-	{ "sit2", BOTH_SIT2, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
-	{ "sit3", BOTH_SIT3, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
-	{ "sit4", BOTH_SIT4, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
-	{ "sit6", BOTH_SIT6, 0, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
-	{ "smack1", BOTH_FORCEGRIP3THROW, 0, EMF_NONE },
-	{ "smack2", BOTH_TOSS1, 0, EMF_NONE },
-	{ "stand", BOTH_STAND8, 0,EMF_STATIC | EMF_HOLD },
-	{ "stepback", BOTH_FORCE_2HANDEDLIGHTNING, 0, EMF_NONE },
-	{ "suggest", BOTH_STAND1_TALK3, 0, EMF_NONE },
+	{ "shake", BOTH_HEADSHAKE, MAX_ANIMATIONS, EMF_NONE },
+	{ "shovel", BOTH_TUSKENATTACK2, MAX_ANIMATIONS, EMF_NONE },
+	{ "sit1", BOTH_SIT1, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD },
+	{ "sit2", BOTH_SIT2, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "sit3", BOTH_SIT3, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "sit4", BOTH_SIT4, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "sit6", BOTH_SIT6, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "smack1", BOTH_FORCEGRIP3THROW, MAX_ANIMATIONS, EMF_NONE },
+	{ "smack2", BOTH_TOSS1, MAX_ANIMATIONS, EMF_NONE },
+	{ "stand", BOTH_STAND8, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD },
+	{ "stepback", BOTH_FORCE_2HANDEDLIGHTNING, MAX_ANIMATIONS, EMF_NONE },
+	{ "suggest", BOTH_STAND1_TALK3, MAX_ANIMATIONS, EMF_NONE },
 	{ "surrender", TORSO_SURRENDER_START, TORSO_SURRENDER_STOP, EMF_HOLD | EMF_HOLSTER },
 	{ "wait", BOTH_STAND10, BOTH_STAND10TOSTAND1, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 };
@@ -3546,9 +3626,7 @@ static qboolean SetEmote( gentity_t *ent, const emote_t *emote ) {
 	ent->client->ps.forceHandExtend = handExtend;
 	ent->client->ps.forceHandExtendTime = emoteTime;
 	ent->client->ps.forceDodgeAnim = emote->animLoop;
-	if ( emote->animLeave ) {
-		ent->client->emote.nextAnim = emote->animLeave;
-	}
+	ent->client->emote.nextAnim = emote->animLeave;
 	ent->client->emote.freeze = qtrue;
 
 	return qtrue;
@@ -3622,7 +3700,7 @@ static void Cmd_Emote_hug( gentity_t *ent ) {
 
 static void Cmd_Emote_kiss( gentity_t *ent ) {
 	static const emote_t emoteKisser = { "kisser", BOTH_KISSER, BOTH_KISSER1STOP, EMF_STATIC | EMF_HOLSTER },
-		emoteKissee = { "kissee", BOTH_KISSEE, 0, EMF_HOLSTER };
+		emoteKissee = { "kissee", BOTH_KISSEE, MAX_ANIMATIONS, EMF_HOLSTER };
 	trace_t *tr = G_RealTrace( ent, 40.0f );
 	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *other = g_entities + tr->entityNum;

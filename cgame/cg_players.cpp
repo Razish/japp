@@ -14,10 +14,10 @@
 extern int cgSiegeTeam1PlShader;
 extern int cgSiegeTeam2PlShader;
 
-extern void CG_AddRadarEnt( centity_t *cent );	//cg_ents.c
-extern void CG_AddBracketedEnt( centity_t *cent );	//cg_ents.c
-extern qboolean CG_InFighter( void );
-extern qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum );
+void CG_AddRadarEnt( centity_t *cent );	//cg_ents.c
+void CG_AddBracketedEnt( centity_t *cent );	//cg_ents.c
+qboolean CG_InFighter( void );
+qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum );
 
 extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
 
@@ -319,7 +319,7 @@ qboolean CG_ParseSurfsFile( const char *modelName, const char *skinName, char *s
 }
 
 qboolean BG_IsValidCharacterModel( const char *modelName, const char *skinName );
-qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team, vector4 *colors );
+qboolean BG_ValidateSkinForTeam( const char *modelName, char *skinName, int team, vector3 *colors );
 
 static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelName, const char *skinName, const char *teamName, int clientNum ) {
 	int handle, checkSkin;
@@ -351,7 +351,7 @@ retryModel:
 	}
 
 	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE && !cg_forceModel.integer ) {
-		BG_ValidateSkinForTeam( ci->modelName, ci->skinName, ci->team, &ci->colorOverride );
+		BG_ValidateSkinForTeam( ci->modelName, ci->skinName, ci->team, reinterpret_cast<vector3 *>( &ci->colorOverride ) );
 		skinName = ci->skinName;
 	}
 	else
@@ -1082,7 +1082,7 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 
 	// team
 	v = Info_ValueForKey( configstring, "t" );
-	newInfo.team = atoi( v );
+	newInfo.team = (team_t)atoi( v );
 
 	// copy team info out to menu
 	if ( clientNum == cg.clientNum )
@@ -1297,7 +1297,9 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE
 		&& (!cg_forceModel.integer || clientNum == cg.clientNum) )
 	{
-		BG_ValidateSkinForTeam( newInfo.modelName, newInfo.skinName, newInfo.team, &newInfo.colorOverride );
+		BG_ValidateSkinForTeam( newInfo.modelName, newInfo.skinName, newInfo.team,
+			reinterpret_cast<vector3 *>( &newInfo.colorOverride )
+		);
 	}
 	else
 		newInfo.colorOverride.r = newInfo.colorOverride.g = newInfo.colorOverride.b = 0.0f;
@@ -4506,7 +4508,7 @@ void CG_GetTagWorldPosition( refEntity_t *model, const char *tag, vector3 *pos, 
 
 #define	MAX_MARK_FRAGMENTS (128)
 #define	MAX_MARK_POINTS (384)
-extern markPoly_t *CG_AllocMark( void );
+markPoly_t *CG_AllocMark( void );
 
 void CG_CreateSaberMarks( vector3 *start, vector3 *end, vector3 *normal ) {
 	int i, j, numFragments;
@@ -5456,14 +5458,17 @@ JustDoIt:
 
 	if ( sfxSabers ) {
 		CG_DoSFXSaber( &fx.mVerts[0].origin, &fx.mVerts[1].origin, &fx.mVerts[2].origin, &fx.mVerts[3].origin,
-			(client->saber[saberNum].blade[bladeNum].lengthMax), (client->saber[saberNum].blade[bladeNum].radius), scolor,
-			renderfx, (qboolean)(client->saber[saberNum].numBlades < 3 && !(client->saber[saberNum].saberFlags2 & SFL2_NO_DLIGHT)),
+			(client->saber[saberNum].blade[bladeNum].lengthMax), (client->saber[saberNum].blade[bladeNum].radius),
+			(saber_colors_t)scolor, renderfx, (qboolean)(client->saber[saberNum].numBlades < 3
+				&& !(client->saber[saberNum].saberFlags2 & SFL2_NO_DLIGHT)),
 			(qboolean)(cg_saberTrail.integer > 0), cent->currentState.clientNum, saberNum );
 	}
 	else {
 		CG_DoSaber( &org, &axis[0], saberLen, client->saber[saberNum].blade[bladeNum].lengthMax,
-			client->saber[saberNum].blade[bladeNum].radius, scolor, renderfx, (client->saber[saberNum].numBlades < 3
-			&& !(client->saber[saberNum].saberFlags2 & SFL2_NO_DLIGHT)), cent->currentState.clientNum, saberNum );
+			client->saber[saberNum].blade[bladeNum].radius, (saber_colors_t)scolor, renderfx,
+			(client->saber[saberNum].numBlades < 3 && !(client->saber[saberNum].saberFlags2 & SFL2_NO_DLIGHT)),
+			cent->currentState.clientNum, saberNum
+		);
 	}
 
 	if ( sfxSabers && (saberTrail && cg.time > saberTrail->inAction) ) {
@@ -5838,11 +5843,11 @@ void CG_CacheG2AnimInfo( char *modelName ) {
 	}
 }
 
-extern void CG_HandleNPCSounds( centity_t *cent );
-extern void G_CreateAnimalNPC( Vehicle_t **pVeh, const char *strAnimalType );
-extern void G_CreateSpeederNPC( Vehicle_t **pVeh, const char *strType );
-extern void G_CreateWalkerNPC( Vehicle_t **pVeh, const char *strAnimalType );
-extern void G_CreateFighterNPC( Vehicle_t **pVeh, const char *strType );
+void CG_HandleNPCSounds( centity_t *cent );
+void G_CreateAnimalNPC( Vehicle_t **pVeh, const char *strAnimalType );
+void G_CreateSpeederNPC( Vehicle_t **pVeh, const char *strType );
+void G_CreateWalkerNPC( Vehicle_t **pVeh, const char *strAnimalType );
+void G_CreateFighterNPC( Vehicle_t **pVeh, const char *strType );
 
 extern playerState_t *cgSendPS[MAX_GENTITIES];
 

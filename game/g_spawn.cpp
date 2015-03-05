@@ -1339,7 +1339,7 @@ BSP Options
 "fogstart"		override fog start distance and force linear
 "radarrange" for Siege/Vehicle radar - default range is 2500
 */
-extern void EWebPrecache( void ); //g_items.c
+void EWebPrecache( void ); //g_items.c
 float g_cullDistance;
 void SP_worldspawn( void ) {
 	char		*text, temp[32];

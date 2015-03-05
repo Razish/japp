@@ -234,7 +234,7 @@ void TossClientWeapon( gentity_t *self, vector3 *direction, float speed ) {
 	}
 
 	// find the item type for this weapon
-	item = BG_FindItemForWeapon( weapon );
+	item = BG_FindItemForWeapon( (weapon_t)weapon );
 
 	ammoSub = (self->client->ps.ammo[weaponData[weapon].ammoIndex] - bg_itemlist[BG_GetItemIndexByTag( weapon, IT_WEAPON )].quantity);
 
@@ -330,7 +330,7 @@ void TossClientItems( gentity_t *self ) {
 		gentity_t *te;
 
 		// find the item type for this weapon
-		item = BG_FindItemForWeapon( weapon );
+		item = BG_FindItemForWeapon( (weapon_t)weapon );
 
 		// tell all clients to remove the weapon model on this guy until he respawns
 		te = G_TempEntity( &vec3_origin, EV_DESTROY_WEAPON_MODEL );
@@ -346,7 +346,7 @@ void TossClientItems( gentity_t *self ) {
 		angle = 45;
 		for ( i = 1; i < PW_NUM_POWERUPS; i++ ) {
 			if ( self->client->ps.powerups[i] > level.time ) {
-				item = BG_FindItemForPowerup( i );
+				item = BG_FindItemForPowerup( (powerup_t)i );
 				if ( !item ) {
 					continue;
 				}
@@ -1522,17 +1522,17 @@ void G_AddPowerDuelLoserScore( int team, int score ) {
 
 extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
 
-extern void AI_DeleteSelfFromGroup( gentity_t *self );
-extern void AI_GroupMemberKilled( gentity_t *self );
-extern void Boba_FlyStop( gentity_t *self );
-extern qboolean Jedi_WaitingAmbush( gentity_t *self );
+void AI_DeleteSelfFromGroup( gentity_t *self );
+void AI_GroupMemberKilled( gentity_t *self );
+void Boba_FlyStop( gentity_t *self );
+qboolean Jedi_WaitingAmbush( gentity_t *self );
 void CheckExitRules( void );
-extern void Rancor_DropVictim( gentity_t *self );
+void Rancor_DropVictim( gentity_t *self );
 
 extern qboolean g_dontFrickinCheck;
 extern qboolean g_endPDuel;
-extern void saberReactivate( gentity_t *saberent, gentity_t *saberOwner );
-extern void saberBackToOwner( gentity_t *saberent );
+void saberReactivate( gentity_t *saberent, gentity_t *saberOwner );
+void saberBackToOwner( gentity_t *saberent );
 extern qboolean g_noPDuelCheck;
 void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
 	gentity_t	*ent;
@@ -2613,7 +2613,7 @@ void LimbThink( gentity_t *ent ) {
 	ent->nextthink = level.time;
 }
 
-extern qboolean BG_GetRootSurfNameWithVariant( void *ghoul2, const char *rootSurfName, char *returnSurfName, int returnSize );
+qboolean BG_GetRootSurfNameWithVariant( void *ghoul2, const char *rootSurfName, char *returnSurfName, int returnSize );
 
 void G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType, float limbRollBase, float limbPitchBase, int deathAnim, qboolean postDeath ) {
 	vector3	newPoint, dir, vel;
@@ -3502,7 +3502,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			return;
 		}
 
-		if ((japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK)) && !targ->client->ps.duelInProgress) { 
+		if ((japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK)) && !targ->client->ps.duelInProgress) {
 			return;
 	    }
 
@@ -3972,8 +3972,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 	}
 
 	if ( japp_damageNotifications.integer ) {
-		trap->SendServerCommand( attacker - g_entities, va( "chat \""S_COLOR_WHITE"* Damage given: "S_COLOR_RED"%i"
-			S_COLOR_WHITE"/"S_COLOR_GREEN"%i "S_COLOR_WHITE" (%i)\"", take, asave, take + asave ) );
+		trap->SendServerCommand( attacker - g_entities, va( "chat \"" S_COLOR_WHITE "* Damage given: " S_COLOR_RED "%i"
+			S_COLOR_WHITE "/" S_COLOR_GREEN "%i " S_COLOR_WHITE " (%i)\"", take, asave, take + asave )
+		);
 	}
 
 	JPLua_Event_Pain( targ - g_entities, inflictor - g_entities, attacker - g_entities, take, asave, dflags, mod );

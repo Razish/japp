@@ -1612,8 +1612,8 @@ int asteroid_count_num_asteroids( gentity_t *self ) {
 	return count;
 }
 
-extern void SP_func_rotating( gentity_t *ent );
-extern void Q3_Lerp2Origin( int taskID, int entID, vector3 *origin, float duration );
+void SP_func_rotating( gentity_t *ent );
+void Q3_Lerp2Origin( int taskID, int entID, vector3 *origin, float duration );
 void asteroid_field_think( gentity_t *self ) {
 	int numAsteroids = asteroid_count_num_asteroids( self );
 

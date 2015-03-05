@@ -231,7 +231,9 @@ static void CG_PluginDisable_f( void ) {
 		Com_Printf( "Usage: /pluginDisable <ID>\n" );
 		for ( i = 0; i < numPluginDisableOpts; i++ ) {
 			qboolean allowed = !(atoi( buf ) & (1 << i));
-			Com_Printf( S_COLOR_WHITE"("S_COLOR_CYAN"%i"S_COLOR_WHITE") ^%c%s\n", i, (allowed ? COLOR_GREEN : COLOR_RED), pluginDisableStrings[i] );
+			Com_Printf( S_COLOR_WHITE "(" S_COLOR_CYAN "%i" S_COLOR_WHITE ") ^%c%s\n", i,
+				(allowed ? COLOR_GREEN : COLOR_RED), pluginDisableStrings[i]
+			);
 		}
 	}
 }

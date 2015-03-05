@@ -280,7 +280,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 						timeinfo->tm_hour -= 12;
 					}
 
-					Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i"S_COLOR_WHITE"] ",
+					Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i" S_COLOR_WHITE "] ",
 						*(char *)cg_chatboxTimeColour.string, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
 				}
 				// server time
@@ -291,7 +291,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 					mins = seconds / 60;					seconds -= mins * 60;
 					hours = mins / 60;					mins -= hours * 60;
 
-					Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i"S_COLOR_WHITE"] ",
+					Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i" S_COLOR_WHITE "] ",
 						*(char *)cg_chatboxTimeColour.string, hours, mins, seconds );
 				}
 			}
@@ -328,7 +328,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 			if ( !cg.japp.timestamp24Hour && timeinfo->tm_hour > 12 )
 				timeinfo->tm_hour -= 12;
 
-			Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i"S_COLOR_WHITE"] ",
+			Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i" S_COLOR_WHITE "] ",
 				*(char *)cg_chatboxTimeColour.string, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
 		}
 		// server time
@@ -339,7 +339,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 			mins = seconds / 60;					seconds -= mins * 60;
 			hours = mins / 60;					mins -= hours * 60;
 
-			Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i"S_COLOR_WHITE"] ",
+			Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i" S_COLOR_WHITE "] ",
 				*(char *)cg_chatboxTimeColour.string, hours, mins, seconds );
 		}
 	}
@@ -443,8 +443,9 @@ void CG_ChatboxDraw( void ) {
 
 	if ( currentChatbox->scrollAmount < 0 && CG_ChatboxActive() ) {
 		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y - cg_chatboxLineHeight.value, cg.chatbox.size.scale,
-			&colorWhite, va( S_COLOR_YELLOW"Scrolled lines: "S_COLOR_CYAN"%i\n", currentChatbox->scrollAmount*-1 ), 0.0f,
-			0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
+			&colorWhite, va( S_COLOR_YELLOW "Scrolled lines: " S_COLOR_CYAN "%i\n", currentChatbox->scrollAmount * -1 ),
+			0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont()
+		);
 	}
 
 	// Check to see if background should be drawn
@@ -527,7 +528,7 @@ void CG_ChatboxTabComplete( void ) {
 		if ( numMatches == 1 ) {
 			size_t oldCursor = chatField.cursor;
 			ptrdiff_t delta = &chatField.buffer[oldCursor] - p;
-			const char *str = va( "%s "S_COLOR_GREEN, cgs.clientinfo[match].name );
+			const char *str = va( "%s " S_COLOR_GREEN, cgs.clientinfo[match].name );
 			size_t drawLen, len;
 
 			Q_strncpyz( p, str, sizeof(chatField.buffer) - (p - &chatField.buffer[0]) );
@@ -546,7 +547,7 @@ void CG_ChatboxTabComplete( void ) {
 		else if ( numMatches > 1 ) {
 			CG_ChatboxAddMessage( va( "Several matches found for '%s':", currWord ), qfalse, "normal" );
 			for ( i = 0; i </*min( 3, numMatches )*/numMatches; i++ ) {
-				CG_ChatboxAddMessage( va( S_COLOR_GREEN"- "S_COLOR_WHITE"%s", matches[i] ), qfalse, "normal" );
+				CG_ChatboxAddMessage( va( S_COLOR_GREEN "- " S_COLOR_WHITE "%s", matches[i] ), qfalse, "normal" );
 			}
 			//	if ( numMatches > 3 )
 			//		CG_ChatboxAddMessage( S_COLOR_GREEN"- "S_COLOR_WHITE"[...] truncated", qfalse, "normal" );
@@ -624,7 +625,7 @@ void CG_ChatboxClear( void ) {
 	//TODO: Clear chat history?
 }
 
-void CG_ChatboxOpen( int mode ) {
+void CG_ChatboxOpen( messageMode_t mode ) {
 	if ( chatActive ) {
 		return;
 	}

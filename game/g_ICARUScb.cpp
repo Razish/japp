@@ -2274,7 +2274,7 @@ void Q3_SetViewEntity( int entID, const char *name ) {
 	G_DebugPrint( WL_WARNING, "Q3_SetViewEntity currently unsupported in MP, ask if you need it.\n" );
 }
 
-extern void ChangeWeapon( gentity_t *ent, int newWeapon );
+void ChangeWeapon( gentity_t *ent, int newWeapon );
 static void Q3_SetWeapon( int entID, const char *wp_name ) {
 	gentity_t *ent = &g_entities[entID];
 	weapon_t wp = (weapon_t)GetIDForString( WPTable, wp_name );

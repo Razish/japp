@@ -12,13 +12,13 @@ we need it...
 
 extern	qboolean	showBBoxes;
 extern vector3 NPCDEBUG_BLUE;
-//extern void G_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha );
-extern void NPC_CheckGetNewWeapon( void );
+//void G_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha );
+void NPC_CheckGetNewWeapon( void );
 
-extern qboolean PM_InKnockDown( playerState_t *ps );
+qboolean PM_InKnockDown( playerState_t *ps );
 
-extern void NPC_AimAdjust( int change );
-extern qboolean NPC_SomeoneLookingAtMe( gentity_t *ent );
+void NPC_AimAdjust( int change );
+qboolean NPC_SomeoneLookingAtMe( gentity_t *ent );
 /*
  void NPC_BSAdvanceFight (void)
 
@@ -178,7 +178,8 @@ void BeamOut( gentity_t *self ) {
 	//fixme: doesn't actually go away!
 	self->nextthink = level.time + 1500;
 	self->think = Disappear;
-	self->client->playerTeam = self->s.teamowner = TEAM_FREE;
+	self->s.teamowner = TEAM_FREE;
+	self->client->playerTeam = (npcteam_t)self->s.teamowner;
 	//self->r.svFlags |= SVF_BEAMING; //this appears unused in SP as well
 }
 
@@ -310,7 +311,7 @@ void NPC_BSSleep( void ) {
 	*/
 }
 
-extern qboolean NPC_MoveDirClear( int forwardmove, int rightmove, qboolean reset );
+qboolean NPC_MoveDirClear( int forwardmove, int rightmove, qboolean reset );
 void NPC_BSFollowLeader( void ) {
 	vector3		vec;
 	float		leaderDist;

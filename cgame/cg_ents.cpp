@@ -8,7 +8,7 @@
 #include "cg_media.h"
 
 
-extern qboolean CG_InFighter( void );
+qboolean CG_InFighter( void );
 static void CG_Missile( centity_t *cent );
 
 // Modifies the entities position and axis by the given tag location

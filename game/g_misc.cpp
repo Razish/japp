@@ -1055,7 +1055,7 @@ void InitShooter( gentity_t *ent, int weapon ) {
 	ent->use = Use_Shooter;
 	ent->s.weapon = weapon;
 
-	RegisterItem( BG_FindItemForWeapon( weapon ) );
+	RegisterItem( BG_FindItemForWeapon( (weapon_t)weapon ) );
 
 	G_SetMovedir( &ent->s.angles, &ent->movedir );
 

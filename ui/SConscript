@@ -7,23 +7,23 @@ ui_env = env.Clone()
 
 # sources
 files = [
-	'game/bg_misc.c',
-	'game/bg_saberLoad.c',
-	'game/bg_saga.c',
-	'game/bg_vehicleLoad.c',
-	'game/bg_weapons.c',
-	'JAPP/jp_crash.c',
-	'JAPP/jp_tokenparser.c',
-	'ui/ui_atoms.c',
-	'ui/ui_cvar.c',
-	'ui/ui_force.c',
-	'ui/ui_gameinfo.c',
-	'ui/ui_main.c',
-	'ui/ui_saber.c',
-	'ui/ui_shared.c',
-	'ui/ui_syscalls.c',
-	'qcommon/q_math.c',
-	'qcommon/q_shared.c'
+	'game/bg_misc.cpp',
+	'game/bg_saberLoad.cpp',
+	'game/bg_saga.cpp',
+	'game/bg_vehicleLoad.cpp',
+	'game/bg_weapons.cpp',
+	'JAPP/jp_crash.cpp',
+	'JAPP/jp_tokenparser.cpp',
+	'ui/ui_atoms.cpp',
+	'ui/ui_cvar.cpp',
+	'ui/ui_force.cpp',
+	'ui/ui_gameinfo.cpp',
+	'ui/ui_main.cpp',
+	'ui/ui_saber.cpp',
+	'ui/ui_shared.cpp',
+	'ui/ui_syscalls.cpp',
+	'qcommon/q_math.cpp',
+	'qcommon/q_shared.cpp'
 ]
 files = [build_dir + f for f in files]
 

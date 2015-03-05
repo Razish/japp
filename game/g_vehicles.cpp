@@ -3,20 +3,20 @@
 
 #include "bg_vehicles.h"
 
-extern gentity_t *NPC_Spawn_Do( gentity_t *ent );
-extern void NPC_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags );
+gentity_t *NPC_Spawn_Do( gentity_t *ent );
+void NPC_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags );
 
-extern void BG_SetAnim( playerState_t *ps, animation_t *animations, int setAnimParts, int anim, int setAnimFlags, int blendTime );
-extern void BG_SetLegsAnimTimer( playerState_t *ps, int time );
-extern void BG_SetTorsoAnimTimer( playerState_t *ps, int time );
+void BG_SetAnim( playerState_t *ps, animation_t *animations, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime );
+void BG_SetLegsAnimTimer( playerState_t *ps, int time );
+void BG_SetTorsoAnimTimer( playerState_t *ps, int time );
 void G_VehUpdateShields( gentity_t *targ );
 #ifdef _GAME
-extern void VEH_TurretThink( Vehicle_t *pVeh, gentity_t *parent, int turretNum );
+void VEH_TurretThink( Vehicle_t *pVeh, gentity_t *parent, int turretNum );
 #endif
 
-extern qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh );
+qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh );
 
-void Vehicle_SetAnim( gentity_t *ent, int setAnimParts, int anim, int setAnimFlags, int iBlend ) {
+void Vehicle_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags, int iBlend ) {
 	assert( ent->client );
 	BG_SetAnim( &ent->client->ps, bgAllAnims[ent->localAnimIndex].anims, setAnimParts, anim, setAnimFlags, iBlend );
 	ent->s.legsAnim = ent->client->ps.legsAnim;
@@ -922,7 +922,7 @@ static void DeathUpdate( Vehicle_t *pVeh ) {
 void RegisterAssets( Vehicle_t *pVeh ) {
 }
 
-extern void ChangeWeapon( gentity_t *ent, int newWeapon );
+void ChangeWeapon( gentity_t *ent, int newWeapon );
 
 // Initialize the vehicle.
 qboolean Initialize( Vehicle_t *pVeh ) {
@@ -1570,7 +1570,7 @@ static qboolean UpdateRider( Vehicle_t *pVeh, bgEntity_t *pRider, usercmd_t *pUm
 }
 
 //generic vehicle function we care about over there
-extern void AttachRidersGeneric( Vehicle_t *pVeh );
+void AttachRidersGeneric( Vehicle_t *pVeh );
 
 // Attachs all the riders of this vehicle to their appropriate tag (*driver, *pass1, *pass2, whatever...).
 static void AttachRiders( Vehicle_t *pVeh ) {
@@ -1830,7 +1830,7 @@ int G_FlyVehicleImpactDir( gentity_t *veh, trace_t *trace ) {
 //try to break surfaces off the ship on impact
 #define TURN_ON				0x00000000
 #define TURN_OFF			0x00000100
-extern void NPC_SetSurfaceOnOff( gentity_t *ent, const char *surfaceName, int surfaceFlags ); //NPC_utils.c
+void NPC_SetSurfaceOnOff( gentity_t *ent, const char *surfaceName, uint32_t surfaceFlags ); //NPC_utils.c
 int G_ShipSurfaceForSurfName( const char *surfaceName ) {
 	if ( !surfaceName ) {
 		return -1;

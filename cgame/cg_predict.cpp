@@ -156,7 +156,7 @@ static qboolean CG_VehicleClipCheck( centity_t *ignored, trace_t *trace ) {
 	return qtrue;
 }
 
-extern void BG_VehicleAdjustBBoxForOrientation( Vehicle_t *veh, vector3 *origin, vector3 *mins, vector3 *maxs, int clientNum,
+void BG_VehicleAdjustBBoxForOrientation( Vehicle_t *veh, vector3 *origin, vector3 *mins, vector3 *maxs, int clientNum,
 	int tracemask, void( *localTrace )(trace_t *results, const vector3 *start, const vector3 *mins, const vector3 *maxs,
 	const vector3 *end, int passEntityNum, int contentMask) );
 static void CG_ClipMoveToEntities( const vector3 *start, const vector3 *mins, const vector3 *maxs, const vector3 *end,
@@ -583,7 +583,7 @@ qboolean CG_UsingEWeb( void ) {
 		cg_entities[cg.predictedPlayerState.emplacedIndex].currentState.weapon == WP_NONE);
 }
 
-extern void CG_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha );
+void CG_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha );
 pmove_t cg_vehPmove;
 qboolean cg_vehPmoveSet = qfalse;
 

@@ -6,8 +6,8 @@
 #include "bg_local.h"
 #include "JAPP/jp_csflags.h"
 
-extern void Jedi_Cloak( gentity_t *self );
-extern void Jedi_Decloak( gentity_t *self );
+void Jedi_Cloak( gentity_t *self );
+void Jedi_Decloak( gentity_t *self );
 
 qboolean PM_SaberInTransition( int move );
 qboolean PM_SaberInReturn( int move );
@@ -180,7 +180,7 @@ void P_WorldEffects( gentity_t *ent ) {
 	}
 }
 
-extern void G_ApplyKnockback( gentity_t *targ, vector3 *newDir, float knockback );
+void G_ApplyKnockback( gentity_t *targ, vector3 *newDir, float knockback );
 void DoImpact( gentity_t *self, gentity_t *other, qboolean damageSelf ) {
 	float magnitude, my_mass;
 	vector3	velocity;
@@ -683,7 +683,7 @@ void ClientIntermissionThink( gclient_t *client ) {
 	}
 }
 
-extern void NPC_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags );
+void NPC_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags );
 void G_VehicleAttachDroidUnit( gentity_t *vehEnt ) {
 	if ( vehEnt && vehEnt->m_pVehicle && vehEnt->m_pVehicle->m_pDroidUnit != NULL ) {
 		gentity_t *droidEnt = (gentity_t *)vehEnt->m_pVehicle->m_pDroidUnit;
@@ -711,7 +711,7 @@ void G_VehicleAttachDroidUnit( gentity_t *vehEnt ) {
 }
 
 //called gameside only from pmove code (convenience)
-extern qboolean BG_SabersOff( playerState_t *ps );
+qboolean BG_SabersOff( playerState_t *ps );
 void G_CheapWeaponFire( int entNum, int ev ) {
 	gentity_t *ent = &g_entities[entNum];
 
@@ -1303,7 +1303,7 @@ static int NPC_GetRunSpeed( gentity_t *ent ) {
 }
 
 //Seems like a slightly less than ideal method for this, could it be done on the client?
-extern qboolean FlyingCreature( gentity_t *ent );
+qboolean FlyingCreature( gentity_t *ent );
 void G_CheckMovingLoopingSounds( gentity_t *ent, usercmd_t *ucmd ) {
 	if ( ent->client ) {
 		if ( (ent->NPC&&!VectorCompare( &vec3_origin, &ent->client->ps.moveDir ))//moving using moveDir
@@ -2900,11 +2900,11 @@ void ClientThink_real( gentity_t *ent ) {
 		const qboolean infinite = ent->client->ps.forceHandExtendTime == INT32_MAX;
 
 		if ( animDone || (wantsOut && infinite) ) {
-			if ( ent->client->emote.nextAnim ) {
+			if ( ent->client->emote.nextAnim != MAX_ANIMATIONS ) {
 				// chain to next animation
 				ent->client->ps.forceHandExtendTime = level.time + BG_AnimLength( ent->localAnimIndex, ent->client->emote.nextAnim );
 				ent->client->ps.forceDodgeAnim = ent->client->emote.nextAnim;
-				ent->client->emote.nextAnim = 0;
+				ent->client->emote.nextAnim = MAX_ANIMATIONS;
 			}
 			else {
 				// leave emote

@@ -9,16 +9,15 @@
 
 #ifdef _GAME //we only want a few of these functions for BG
 
-extern float DotToSpot( vector3 *spot, vector3 *from, vector3 *fromAngles );
+float DotToSpot( vector3 *spot, vector3 *from, vector3 *fromAngles );
 extern vector3 playerMins;
 extern vector3 playerMaxs;
 
-extern void PM_SetAnim( pmove_t	*pm, int setAnimParts, int anim, int setAnimFlags, int blendTime );
-extern int PM_AnimLength( int index, animNumber_t anim );
+void PM_SetAnim( pmove_t	*pm, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime );
+int PM_AnimLength( int index, animNumber_t anim );
 
-extern void Vehicle_SetAnim( gentity_t *ent, int setAnimParts, int anim, int setAnimFlags, int iBlend );
-extern void G_Knockdown( gentity_t *self, gentity_t *attacker, const vector3 *pushDir, float strength, qboolean breakSaberLock );
-extern void G_VehicleTrace( trace_t *results, const vector3 *start, const vector3 *tMins, const vector3 *tMaxs, const vector3 *end, int passEntityNum, int contentmask );
+void Vehicle_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags, int iBlend );
+void G_VehicleTrace( trace_t *results, const vector3 *start, const vector3 *tMins, const vector3 *tMaxs, const vector3 *end, int passEntityNum, int contentmask );
 
 // Update death sequence.
 static void DeathUpdate( Vehicle_t *pVeh ) {
@@ -578,7 +577,7 @@ void G_SetAnimalVehicleFunctions( vehicleInfo_t *pVehInfo ) {
 }
 
 #ifdef _GAME
-extern void G_AllocateVehicleObject( Vehicle_t **pVeh );
+void G_AllocateVehicleObject( Vehicle_t **pVeh );
 #endif
 
 // Create/Allocate a new Animal Vehicle (initializing it as well).

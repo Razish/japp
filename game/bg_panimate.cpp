@@ -11,7 +11,7 @@
 #include "cgame/cg_local.h"
 #endif
 
-extern saberInfo_t *BG_MySaber( int clientNum, int saberNum );
+saberInfo_t *BG_MySaber( int clientNum, int saberNum );
 
 //Called regardless of pm validity:
 // VVFIXME - Most of these functions are totally stateless and stupid.

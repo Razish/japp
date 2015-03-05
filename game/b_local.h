@@ -41,10 +41,32 @@ void NPC_Think( gentity_t *self );
 
 //NPC_reactions.cpp
 typedef void (PAIN_FUNC)( gentity_t *self, gentity_t *attacker, int damage );
-extern PAIN_FUNC funcBBrushPain, misc_model_breakable_pain, NPC_Pain, station_pain, func_usable_pain, NPC_ATST_Pain,
-NPC_ST_Pain, NPC_Jedi_Pain, NPC_Droid_Pain, NPC_Probe_Pain, NPC_MineMonster_Pain, NPC_Howler_Pain, NPC_Seeker_Pain,
-NPC_Remote_Pain, emplaced_gun_pain, NPC_Mark1_Pain, NPC_GM_Pain, NPC_Sentry_Pain, NPC_Mark2_Pain, PlayerPain, GasBurst,
-CrystalCratePain, TurretPain, NPC_Wampa_Pain, NPC_Rancor_Pain;
+PAIN_FUNC
+			CrystalCratePain,
+			emplaced_gun_pain,
+			func_usable_pain,
+			funcBBrushPain,
+			GasBurst,
+			misc_model_breakable_pain,
+			NPC_ATST_Pain,
+			NPC_Droid_Pain,
+			NPC_GM_Pain,
+			NPC_Howler_Pain,
+			NPC_Jedi_Pain,
+			NPC_Mark1_Pain,
+			NPC_Mark2_Pain,
+			NPC_MineMonster_Pain,
+			NPC_Pain,
+			NPC_Probe_Pain,
+			NPC_Rancor_Pain,
+			NPC_Remote_Pain,
+			NPC_Seeker_Pain,
+			NPC_Sentry_Pain,
+			NPC_ST_Pain,
+			NPC_Wampa_Pain,
+			PlayerPain,
+			station_pain,
+			TurretPain;
 
 void NPC_Touch( gentity_t *self, gentity_t *other, trace_t *trace );
 void NPC_Use( gentity_t *self, gentity_t *other, gentity_t *activator );

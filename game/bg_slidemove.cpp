@@ -24,21 +24,21 @@ output: origin, velocity, impacts, stairup boolean
 //do vehicle impact stuff
 // slight rearrangement by BTO (VV) so that we only have one namespace include
 #ifdef _GAME
-extern void G_FlyVehicleSurfaceDestruction( gentity_t *veh, trace_t *trace, int magnitude, qboolean force ); //g_vehicle.c
-extern qboolean G_CanBeEnemy( gentity_t *self, gentity_t *enemy ); //w_saber.c
+void G_FlyVehicleSurfaceDestruction( gentity_t *veh, trace_t *trace, int magnitude, qboolean force ); //g_vehicle.c
+qboolean G_CanBeEnemy( gentity_t *self, gentity_t *enemy ); //w_saber.c
 #endif
 
-extern qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh );
+qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh );
 
 extern bgEntity_t *pm_entSelf;
 extern bgEntity_t *pm_entVeh;
 
 //vehicle impact stuff continued...
 #ifdef _GAME
-extern qboolean FighterIsLanded( Vehicle_t *pVeh, playerState_t *parentPS );
+qboolean FighterIsLanded( Vehicle_t *pVeh, playerState_t *parentPS );
 #endif
 
-extern void PM_SetPMViewAngle( playerState_t *ps, vector3 *angle, usercmd_t *ucmd );
+void PM_SetPMViewAngle( playerState_t *ps, vector3 *angle, usercmd_t *ucmd );
 
 #define MAX_IMPACT_TURN_ANGLE 45.0f
 void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
@@ -436,7 +436,7 @@ qboolean PM_GroundSlideOkay( float zNormal ) {
 }
 
 #ifdef _GAME
-extern void Client_CheckImpactBBrush( gentity_t *self, gentity_t *other );
+void Client_CheckImpactBBrush( gentity_t *self, gentity_t *other );
 #endif
 
 // returns qtrue if the entity should be collided against

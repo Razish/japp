@@ -440,7 +440,7 @@ static void CG_UpdateThirdPersonCameraDamp( int clientNum ) {
 	//	full volume traces each frame is a bit scary to think about.
 }
 
-extern qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh );
+qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh );
 
 static void CG_OffsetThirdPersonView( int clientNum ) {
 	vector3 diff;
@@ -1802,11 +1802,11 @@ void CG_DrawAltView( int clientNum ) {
 static qboolean cg_rangedFogging = qfalse; //so we know if we should go back to normal fog
 float cg_linearFogOverride = 0.0f; //designer-specified override for linear fogging style
 
-extern void BG_VehicleTurnRateForSpeed( Vehicle_t *pVeh, float speed, float *mPitchOverride, float *mYawOverride );
-extern qboolean PM_InKnockDown( playerState_t *ps );
+void BG_VehicleTurnRateForSpeed( Vehicle_t *pVeh, float speed, float *mPitchOverride, float *mYawOverride );
+qboolean PM_InKnockDown( playerState_t *ps );
 
 extern qboolean cgQueueLoad;
-extern void CG_ActualLoadDeferredPlayers( void );
+void CG_ActualLoadDeferredPlayers( void );
 
 static int cg_siegeClassIndex = -2;
 

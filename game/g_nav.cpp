@@ -1,11 +1,11 @@
 #include "b_local.h"
 #include "g_nav.h"
 
-extern qboolean G_EntIsUnlockedDoor( int entityNum );
-extern qboolean G_EntIsDoor( int entityNum );
-extern qboolean G_EntIsBreakable( int entityNum );
-extern qboolean G_EntIsRemovableUsable( int entNum );
-extern qboolean G_FindClosestPointOnLineSegment( const vector3 *start, const vector3 *end, const vector3 *from, vector3 *result );
+qboolean G_EntIsUnlockedDoor( int entityNum );
+qboolean G_EntIsDoor( int entityNum );
+qboolean G_EntIsBreakable( int entityNum );
+qboolean G_EntIsRemovableUsable( int entNum );
+qboolean G_FindClosestPointOnLineSegment( const vector3 *start, const vector3 *end, const vector3 *from, vector3 *result );
 
 void G_DrawNode( vector3 *origin, int type ) {
 }

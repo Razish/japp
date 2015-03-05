@@ -1,8 +1,6 @@
 #include "b_local.h"
 #include "g_nav.h"
 
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
-
 //Local state enums
 enum {
 	LSTATE_NONE = 0,

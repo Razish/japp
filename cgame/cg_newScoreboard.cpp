@@ -82,25 +82,25 @@ static void DrawServerInfo( float fade ) {
 			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
 				tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeightBig;
-			tmp = va( S_COLOR_RED"%i "S_COLOR_WHITE"/ "S_COLOR_CYAN"%i", cgs.scores1, cgs.scores2 );
+			tmp = va( S_COLOR_RED "%i " S_COLOR_WHITE "/ " S_COLOR_CYAN "%i", cgs.scores1, cgs.scores2 );
 			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f,
 				y, tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
 		}
 		else if ( cgs.scores1 > cgs.scores2 ) {
-			tmp = S_COLOR_RED"Red "S_COLOR_WHITE"leads";
+			tmp = S_COLOR_RED "Red " S_COLOR_WHITE "leads";
 			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f,
 				y, tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeightBig;
-			tmp = va( S_COLOR_RED"%i "S_COLOR_WHITE"/ "S_COLOR_CYAN"%i", cgs.scores1, cgs.scores2 );
+			tmp = va( S_COLOR_RED "%i " S_COLOR_WHITE "/ " S_COLOR_CYAN "%i", cgs.scores1, cgs.scores2 );
 			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
 				tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
 		}
 		else {
-			tmp = S_COLOR_CYAN"Blue "S_COLOR_WHITE"leads";
+			tmp = S_COLOR_CYAN "Blue " S_COLOR_WHITE "leads";
 			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
 				tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
 			y += lineHeightBig;
-			tmp = va( S_COLOR_CYAN"%i "S_COLOR_WHITE"/ "S_COLOR_RED"%i", cgs.scores2, cgs.scores1 );
+			tmp = va( S_COLOR_CYAN "%i " S_COLOR_WHITE "/ " S_COLOR_RED "%i", cgs.scores2, cgs.scores1 );
 			trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
 				tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
 		}

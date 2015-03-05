@@ -3051,7 +3051,7 @@ void CalcMuzzlePointOrigin( gentity_t *ent, vector3 *origin, vector3 *forward, v
 	}
 }
 
-extern void G_MissileImpact( gentity_t *ent, trace_t *trace );
+void G_MissileImpact( gentity_t *ent, trace_t *trace );
 void WP_TouchVehMissile( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 	trace_t	myTrace;
 	memcpy( (void *)&myTrace, (void *)trace, sizeof(myTrace) );

@@ -5,7 +5,6 @@
 
 qboolean G_CheckForStrongAttackMomentum( gentity_t *self );
 void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
-void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 void cgi_S_StartSound( vector3 *origin, int entityNum, int entchannel, sfxHandle_t sfx );
 qboolean Q3_TaskIDPending( gentity_t *ent, taskID_t taskType );
 qboolean NPC_CheckLookTarget( gentity_t *self );
@@ -160,7 +159,7 @@ float NPC_GetPainChance( gentity_t *self, int damage ) {
 
 #define	MIN_PAIN_TIME	200
 
-extern int G_PickPainAnim( gentity_t *self, vector3 *point, int damage, int hitLoc );
+int G_PickPainAnim( gentity_t *self, vector3 *point, int damage, int hitLoc );
 void NPC_ChoosePainAnimation( gentity_t *self, gentity_t *other, vector3 *point, int damage, int mod, int hitLoc, int voiceEvent ) {
 	int		pain_anim = -1;
 	float	pain_chance;

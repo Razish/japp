@@ -15,8 +15,8 @@ extern int g_siegeRespawnCheck;
 
 void WP_SaberAddG2Model( gentity_t *saberent, const char *saberModel, qhandle_t saberSkin );
 void WP_SaberRemoveG2Model( gentity_t *saberent );
-extern qboolean WP_SaberStyleValidForSaber( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel );
-extern qboolean WP_UseFirstValidSaberStyle( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int *saberAnimLevel );
+qboolean WP_SaberStyleValidForSaber( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel );
+qboolean WP_UseFirstValidSaberStyle( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int *saberAnimLevel );
 
 /*QUAKED info_player_duel (1 0 1) (-16 -16 -24) (16 16 32) initial
 potential spawning position for duelists in duel.
@@ -2383,7 +2383,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 
 			preSess = ent->client->sess.sessionTeam;
 			G_ReadClientSessionData( ent->client );
-			ent->client->sess.sessionTeam = preSess;
+			ent->client->sess.sessionTeam = (team_t)preSess;
 			G_WriteClientSessionData( ent->client );
 			if ( !ClientUserinfoChanged( clientNum ) )
 				return;
@@ -2434,7 +2434,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 
 	while ( i < NUM_FORCE_POWERS ) {
 		if ( ent->client->ps.fd.forcePowersActive & (1 << i) ) {
-			WP_ForcePowerStop( ent, i );
+			WP_ForcePowerStop( ent, (forcePowers_t)i );
 		}
 		i++;
 	}
@@ -2581,15 +2581,12 @@ qboolean BG_SaberStanceAnim( int anim );
 qboolean PM_RunningAnim( int anim );
 void G_UpdateClientAnims( gentity_t *self, float animSpeedScale ) {
 	static int f;
-	static int torsoAnim;
-	static animNumber_t legsAnim;
 	static int firstFrame, lastFrame;
 	static int aFlags;
 	static float animSpeed, lAnimSpeedScale;
 	qboolean setTorso = qfalse;
-
-	torsoAnim = (self->client->ps.torsoAnim);
-	legsAnim = (self->client->ps.legsAnim);
+	animNumber_t torsoAnim = (animNumber_t)self->client->ps.torsoAnim;
+	animNumber_t legsAnim = (animNumber_t)self->client->ps.legsAnim;
 
 	if ( self->client->ps.saberLockFrame ) {
 		trap->G2API_SetBoneAnim( self->ghoul2, 0, "model_root", self->client->ps.saberLockFrame, self->client->ps.saberLockFrame + 1, BONE_ANIM_OVERRIDE_FREEZE | BONE_ANIM_BLEND, animSpeedScale, level.time, -1, 150 );
@@ -3443,16 +3440,19 @@ void ClientSpawn( gentity_t *ent ) {
 	//set teams for NPCs to recognize
 	if ( level.gametype == GT_SIEGE ) { //Imperial (team1) team is allied with "enemy" NPCs in this mode
 		if ( client->sess.sessionTeam == SIEGETEAM_TEAM1 ) {
-			client->playerTeam = ent->s.teamowner = NPCTEAM_ENEMY;
+			ent->s.teamowner = NPCTEAM_ENEMY;
+			client->playerTeam = (npcteam_t)ent->s.teamowner;
 			client->enemyTeam = NPCTEAM_PLAYER;
 		}
 		else {
-			client->playerTeam = ent->s.teamowner = NPCTEAM_PLAYER;
+			ent->s.teamowner = NPCTEAM_PLAYER;
+			client->playerTeam = (npcteam_t)ent->s.teamowner;
 			client->enemyTeam = NPCTEAM_ENEMY;
 		}
 	}
 	else {
-		client->playerTeam = ent->s.teamowner = NPCTEAM_PLAYER;
+		ent->s.teamowner = NPCTEAM_PLAYER;
+		client->playerTeam = (npcteam_t)ent->s.teamowner;
 		client->enemyTeam = NPCTEAM_ENEMY;
 	}
 
@@ -3540,7 +3540,7 @@ void ClientDisconnect( int clientNum ) {
 
 	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
 		if ( ent->client->ps.fd.forcePowersActive & (1 << i) )
-			WP_ForcePowerStop( ent, i );
+			WP_ForcePowerStop( ent, (forcePowers_t)i );
 	}
 
 	for ( i = TRACK_CHANNEL_1; i < NUM_TRACK_CHANNELS; i++ ) {

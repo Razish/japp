@@ -79,7 +79,7 @@ void AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const
 
 	if ( !admin ) {
 		// a new admin, insert it to the start of the linked list, user->next will be the old root
-		admin = malloc( sizeof(adminUser_t) );
+		admin = (adminUser_t *)malloc( sizeof(adminUser_t) );
 		memset( admin, 0, sizeof(adminUser_t) );
 		admin->next = adminUsers;
 		adminUsers = admin;
@@ -107,7 +107,7 @@ void AM_DeleteAdmin( const char *user ) {
 			int i = 0;
 			for ( i = 0, ent = g_entities; i < level.maxclients; i++, ent++ ) {
 				if ( ent->client->pers.adminUser && ent->client->pers.adminUser == admin ) {
-					trap->SendServerCommand( ent - g_entities, "print \""S_COLOR_RED"Your admin account has been "
+					trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_RED "Your admin account has been "
 						"deleted.\n\"" );
 					ent->client->pers.adminUser = NULL;
 				}
@@ -403,7 +403,7 @@ static telemark_t *AM_AddTelemark( const char *name, vector3 *position ) {
 
 	if ( !tm ) {
 		// a new telemark, insert it to the start of the linked list, tm->next will be the old root
-		tm = malloc( sizeof(telemark_t) );
+		tm = (telemark_t *)malloc( sizeof(telemark_t) );
 		memset( tm, 0, sizeof(telemark_t) );
 		tm->next = telemarks;
 		telemarks = tm;
@@ -791,7 +791,7 @@ static void AM_Announce( gentity_t *ent ) {
 	}
 }
 
-extern void WP_AddToClientBitflags( gentity_t *ent, int entNum );
+void WP_AddToClientBitflags( gentity_t *ent, int entNum );
 // ghost specified client (or self)
 static void AM_Ghost( gentity_t *ent ) {
 	char arg1[64] = { '\0' };
@@ -1464,8 +1464,6 @@ static void AM_Empower( gentity_t *ent ) {
 	}
 }
 
-void G_Knockdown( gentity_t *self, gentity_t *attacker, const vector3 *pushDir, float strength,
-	qboolean breakSaberLock );
 void Slap( gentity_t *targ ) {
 	vector3 newDir = { 0.0f, 0.0f, 0.0f };
 	int i;
@@ -1484,7 +1482,7 @@ void Slap( gentity_t *targ ) {
 	if ( targ->client->hook ) {
 		Weapon_HookFree( targ->client->hook );
 	}
-	G_Knockdown( targ, NULL, &newDir, japp_slapDistance.value, qtrue );
+	G_Knockdown( targ );
 	G_Throw( targ, &newDir, japp_slapDistance.value );
 
 	trap->SendServerCommand( targ - g_entities, "cp \"You have been slapped\"" );
@@ -2540,13 +2538,13 @@ void Merc_On( gentity_t *ent ) {
 
 void Merc_Off( gentity_t *ent ) {
 	int i;
-	weapon_t newWeap = WP_NONE, wp = ent->client->ps.weapon;
+	weapon_t newWeap = WP_NONE, wp = (weapon_t)ent->client->ps.weapon;
 
 	ent->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
 
 	for ( i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
 		if ( (ent->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
-			newWeap = i;
+			newWeap = (weapon_t)i;
 			break;
 		}
 	}
@@ -2554,7 +2552,7 @@ void Merc_Off( gentity_t *ent ) {
 	if ( newWeap == WP_NUM_WEAPONS ) {
 		for ( i = WP_STUN_BATON; i < WP_SABER; i++ ) {
 			if ( (ent->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
-				newWeap = i;
+				newWeap = (weapon_t)i;
 				break;
 			}
 		}
@@ -2668,8 +2666,9 @@ static void AM_Rename( gentity_t *ent ) {
 	trap->GetUserinfo( targetClient, info, sizeof(info) );
 	Info_SetValueForKey( info, "name", e->client->pers.netname );
 	trap->SetUserinfo( targetClient, info );
-	trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldName, G_GetStringEdString( "MP_SVGAME",
-		"PLRENAME" ), e->client->pers.netname ) );
+	trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s %s\n\"", oldName,
+		G_GetStringEdString( "MP_SVGAME", "PLRENAME" ), e->client->pers.netname )
+	);
 
 	e->client->pers.adminData.renamedTime = level.time;
 }
@@ -2702,7 +2701,7 @@ static void AM_LockTeam( gentity_t *ent ) {
 		// force all to spectator? unlock spectator?
 		if ( lockedAny ) {
 			G_LogPrintf( level.log.admin, "\t%s locked all teams\n", G_PrintClient( ent-g_entities ) );
-			trap->SendServerCommand( -1, "print \""S_COLOR_YELLOW"All teams are locked\n\"" );
+			trap->SendServerCommand( -1, "print \"" S_COLOR_YELLOW "All teams are locked\n\"" );
 		}
 		return;
 	}

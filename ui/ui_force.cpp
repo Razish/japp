@@ -10,10 +10,9 @@ int uiMaxPoints = 20;
 int	uiForceUsed = 0;
 int uiForceAvailable = 0;
 
-extern const char *UI_TeamName( int team );
+const char *UI_TeamName( int team );
 
 qboolean gTouchedForce = qfalse;
-vmCvar_t	ui_freeSaber, ui_forcePowerDisable;
 
 void Menu_ShowItemByName( menuDef_t *menu, const char *p, qboolean bShow );
 
@@ -260,7 +259,7 @@ void UI_SaveForceTemplate( void ) {
 
 
 //
-extern qboolean UI_TrueJediEnabled( void );
+qboolean UI_TrueJediEnabled( void );
 void UpdateForceUsed( void ) {
 	int curpower, currank;
 	menuDef_t *menu;

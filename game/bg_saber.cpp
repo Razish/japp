@@ -9,7 +9,7 @@
 #include "g_local.h"
 #endif
 
-extern qboolean BG_SabersOff( playerState_t *ps );
+qboolean BG_SabersOff( playerState_t *ps );
 saberInfo_t *BG_MySaber( int clientNum, int saberNum );
 
 int PM_irand_timesync( int val1, int val2 ) {
@@ -772,7 +772,7 @@ int PM_SaberLockWinAnim( qboolean victory, qboolean superBreak ) {
 // Need to avoid nesting namespaces!
 #ifdef _GAME
 #include "g_local.h"
-extern void NPC_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags );
+void NPC_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags );
 #elif defined _CGAME
 #include "cg_local.h"
 #endif
@@ -1115,7 +1115,7 @@ qboolean BG_CheckIncrementLockAnim( int anim, int winOrLose ) {
 	return increment;
 }
 
-extern qboolean ValidAnimFileIndex( int index );
+qboolean ValidAnimFileIndex( int index );
 void PM_SaberLocked( void ) {
 	int	remaining = 0;
 	playerState_t *genemy;
@@ -1696,7 +1696,7 @@ static qboolean PM_CheckEnemyPresence( int dir, float radius ) { //anyone in thi
 #define SABER_ALT_ATTACK_POWER_LR	10//30?
 #define SABER_ALT_ATTACK_POWER_FB	25//30/50?
 
-extern qboolean PM_SaberInReturn( int move ); //bg_panimate.c
+qboolean PM_SaberInReturn( int move ); //bg_panimate.c
 saberMoveName_t PM_CheckPullAttack( void ) {
 #if 0 //disabling these for MP, they aren't useful
 	if (!(pm->cmd.buttons & BUTTON_ATTACK))
@@ -2032,7 +2032,7 @@ saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
 				pm->ps->weaponTime <= 0 &&
 				pm->ps->forceHandExtend == HANDEXTEND_NONE &&
 				(pm->cmd.buttons & BUTTON_ATTACK) ) { //BACKFLIP ATTACK
-				newmove = PM_SaberBackflipAttackMove();
+				newmove = (saberMoveName_t)PM_SaberBackflipAttackMove();
 			}
 			// backstab
 			else if ( !PM_StabDisabled() && PM_CanBackstab() && !BG_SaberInSpecialAttack( pm->ps->torsoAnim ) ) { //BACKSTAB (attack varies by level)
@@ -3017,7 +3017,7 @@ weapChecks:
 					newmove = saberMoveData[curmove].chain_idle;
 					}
 					else */
-					newmove = PM_SaberAttackForMovement( curmove );
+					newmove = PM_SaberAttackForMovement( (saberMoveName_t)curmove );
 					if ( (PM_SaberInBounce( curmove ) || PM_SaberInBrokenParry( curmove ))
 						&& saberMoveData[newmove].startQuad == saberMoveData[curmove].endQuad ) {//this attack would be a repeat of the last (which was blocked), so don't actually use it, use the default chain attack for this bounce
 						newmove = saberMoveData[curmove].chain_attack;

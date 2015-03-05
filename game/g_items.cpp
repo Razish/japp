@@ -1048,8 +1048,8 @@ void ItemUse_Jetpack( gentity_t *ent ) {
 }
 
 #define CLOAK_TOGGLE_TIME			1000
-extern void Jedi_Cloak( gentity_t *self );
-extern void Jedi_Decloak( gentity_t *self );
+void Jedi_Decloak( gentity_t *self );
+void Jedi_Cloak( gentity_t *self );
 void ItemUse_UseCloak( gentity_t *ent ) {
 	assert( ent && ent->client );
 
@@ -1230,7 +1230,7 @@ void EWebPrecache( void ) {
 #define EWEB_DEATH_RADIUS		128
 #define EWEB_DEATH_DMG			90
 
-extern void BG_CycleInven( playerState_t *ps, int direction ); //bg_misc.c
+void BG_CycleInven( playerState_t *ps, int direction ); //bg_misc.c
 
 void EWebDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod ) {
 	vector3 fxDir;
@@ -1511,7 +1511,7 @@ void EWebUpdateBoneAngles( gentity_t *owner, gentity_t *eweb ) {
 }
 
 //keep it updated
-extern int BG_EmplacedView( vector3 *baseAngles, vector3 *angles, float *newYaw, float constraint ); //bg_misc.c
+int BG_EmplacedView( vector3 *baseAngles, vector3 *angles, float *newYaw, float constraint ); //bg_misc.c
 
 void EWebThink( gentity_t *self ) {
 	qboolean killMe = qfalse;

@@ -100,7 +100,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 
 }
 
-extern qboolean CG_UsingEWeb( void );
+qboolean CG_UsingEWeb( void );
 
 // The transition point from snap to nextSnap has passed
 static void CG_TransitionSnapshot( void ) {

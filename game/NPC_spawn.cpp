@@ -7,7 +7,7 @@
 #include "bg_vehicles.h"
 #include "g_nav.h"
 
-extern void G_DebugPrint( int level, const char *format, ... );
+void G_DebugPrint( int level, const char *format, ... );
 
 void Jedi_Cloak( gentity_t *self );
 
@@ -1274,7 +1274,8 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent ) {
 			for ( n = 0; n < 1; n++ ) {
 				if ( g_entities[n].s.eType != ET_NPC && g_entities[n].client ) {
 					VectorCopy( &g_entities[n].s.origin, &newent->s.origin );
-					newent->client->playerTeam = newent->s.teamowner = g_entities[n].client->playerTeam;
+					newent->s.teamowner = g_entities[n].client->playerTeam;
+					newent->client->playerTeam = (npcteam_t)newent->s.teamowner;
 					break;
 				}
 			}
@@ -1365,16 +1366,16 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent ) {
 	newent->alliedTeam = ent->alliedTeam;
 	newent->teamnodmg = ent->teamnodmg;
 	if ( ent->team && ent->team[0] ) {//specified team directly?
-		newent->client->sess.sessionTeam = atoi( ent->team );
+		newent->client->sess.sessionTeam = (team_t)atoi( ent->team );
 	}
 	else if ( newent->s.teamowner != TEAM_FREE ) {
-		newent->client->sess.sessionTeam = newent->s.teamowner;
+		newent->client->sess.sessionTeam = (team_t)newent->s.teamowner;
 	}
 	else if ( newent->alliedTeam != TEAM_FREE ) {
-		newent->client->sess.sessionTeam = newent->alliedTeam;
+		newent->client->sess.sessionTeam = (team_t)newent->alliedTeam;
 	}
 	else if ( newent->teamnodmg != TEAM_FREE ) {
-		newent->client->sess.sessionTeam = newent->teamnodmg;
+		newent->client->sess.sessionTeam = (team_t)newent->teamnodmg;
 	}
 	else {
 		newent->client->sess.sessionTeam = TEAM_FREE;
@@ -1543,7 +1544,7 @@ teamnodmg - team that NPC does not take damage from (turrets and other auto-defe
 "noCombatSounds" - set to 1 to prevent loading and usage of combat sounds (anger, victory, etc.)
 "noExtraSounds" - set to 1 to prevent loading and usage of "extra" sounds (chasing the enemy - detecting them, flanking them... also jedi combat sounds)
 */
-extern void NPC_PrecacheAnimationCFG( const char *NPC_type );
+void NPC_PrecacheAnimationCFG( const char *NPC_type );
 void NPC_Precache( gentity_t *spawner );
 void NPC_PrecacheByClassName( const char *NPC_type );
 void Precache_Key( void );
@@ -1646,7 +1647,7 @@ void SP_NPC_spawner( gentity_t *self ) {
 	//Or just don't include NPC_spawners in cameraGroupings
 }
 
-extern void G_VehicleSpawn( gentity_t *self );
+void G_VehicleSpawn( gentity_t *self );
 /*QUAKED NPC_Vehicle (1 0 0) (-16 -16 -24) (16 16 32) NO_PILOT_DIE SUSPENDED x x DROPTOFLOOR CINEMATIC NOTSOLID STARTINSOLID SHY
 NO_PILOT_DIE - die after certain amount of time of not having a pilot
 SUSPENDED - Fighters: Don't drop until someone gets in it (this only works as long as no-nw has *ever* ridden the vehicle, to simulate ships that are suspended-docked) - note: ships inside trigger_spaces do not drop when unoccupied
@@ -3304,7 +3305,9 @@ gentity_t *NPC_SpawnType( gentity_t *ent, const char *npc_type, const char *targ
 	}
 
 	if ( !npc_type[0] ) {
-		Com_Printf( S_COLOR_RED"Error, expected one of:\n"S_COLOR_WHITE" NPC spawn [NPC type (from ext_data/NPCs)]\n NPC spawn vehicle [VEH type (from ext_data/vehicles)]\n" );
+		Com_Printf( S_COLOR_RED "Error, expected one of:\n" S_COLOR_WHITE " NPC spawn [NPC type (from ext_data/NPCs)]"
+			"\n NPC spawn vehicle [VEH type (from ext_data/vehicles)]\n"
+		);
 		return NULL;
 	}
 
@@ -3401,7 +3404,6 @@ void NPC_Spawn_f( gentity_t *ent ) {
 /*
 NPC_Kill_f
 */
-extern stringID_table_t TeamTable[];
 void NPC_Kill_f( void ) {
 	int			n;
 	gentity_t	*player;
@@ -3412,12 +3414,12 @@ void NPC_Kill_f( void ) {
 	trap->Argv( 2, name, 1024 );
 
 	if ( !name[0] ) {
-		Com_Printf( S_COLOR_RED"Error, Expected:\n" );
-		Com_Printf( S_COLOR_RED"NPC kill '[NPC targetname]' - kills NPCs with certain targetname\n" );
-		Com_Printf( S_COLOR_RED"or\n" );
-		Com_Printf( S_COLOR_RED"NPC kill 'all' - kills all NPCs\n" );
-		Com_Printf( S_COLOR_RED"or\n" );
-		Com_Printf( S_COLOR_RED"NPC team '[teamname]' - kills all NPCs of a certain team ('nonally' is all but your allies)\n" );
+		Com_Printf( S_COLOR_RED "Error, Expected:\n" );
+		Com_Printf( S_COLOR_RED "NPC kill '[NPC targetname]' - kills NPCs with certain targetname\n" );
+		Com_Printf( S_COLOR_RED "or\n" );
+		Com_Printf( S_COLOR_RED "NPC kill 'all' - kills all NPCs\n" );
+		Com_Printf( S_COLOR_RED "or\n" );
+		Com_Printf( S_COLOR_RED "NPC team '[teamname]' - kills all NPCs of a certain team ('nonally' is all but your allies)\n" );
 		return;
 	}
 
@@ -3438,7 +3440,7 @@ void NPC_Kill_f( void ) {
 			killNonSF = qtrue;
 		}
 		else {
-			killTeam = GetIDForString( TeamTable, name );
+			killTeam = (npcteam_t)GetIDForString( TeamTable, name );
 
 			if ( killTeam == NPCTEAM_FREE ) {
 				Com_Printf( S_COLOR_RED"NPC_Kill Error: team '%s' not recognized\n", name );

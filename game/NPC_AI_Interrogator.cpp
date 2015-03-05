@@ -3,7 +3,6 @@
 
 void Interrogator_Idle( void );
 void DeathFX( gentity_t *ent );
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 
 enum {
 	LSTATE_BLADESTOP = 0,

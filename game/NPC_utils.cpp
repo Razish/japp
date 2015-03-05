@@ -9,7 +9,7 @@ int	teamStrength[TEAM_NUM_TEAMS];
 int	teamCounter[TEAM_NUM_TEAMS];
 
 #define	VALID_ATTACK_CONE	2.0f	//Degrees
-extern void G_DebugPrint( int level, const char *format, ... );
+void G_DebugPrint( int level, const char *format, ... );
 
 /*
 void CalcEntitySpot ( gentity_t *ent, spot_t spot, vector3 *point )
@@ -1079,8 +1079,8 @@ void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
 
 void NPC_CheckCharmed( void ) {
 	if ( NPCInfo->charmedTime && NPCInfo->charmedTime < level.time && NPC->client ) {//we were charmed, set us back!
-		NPC->client->playerTeam = NPC->genericValue1;
-		NPC->client->enemyTeam = NPC->genericValue2;
+		NPC->client->playerTeam = (npcteam_t)NPC->genericValue1;
+		NPC->client->enemyTeam = (npcteam_t)NPC->genericValue2;
 		NPC->s.teamowner = NPC->genericValue3;
 
 		NPC->client->leader = NULL;

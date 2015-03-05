@@ -8,18 +8,18 @@
 #include "bg_public.h"
 #include "bg_vehicles.h"
 
-extern float DotToSpot( vector3 *spot, vector3 *from, vector3 *fromAngles );
+float DotToSpot( vector3 *spot, vector3 *from, vector3 *fromAngles );
 #ifdef _GAME //SP or gameside MP
 extern vector3 playerMins;
 extern vector3 playerMaxs;
-extern void ChangeWeapon( gentity_t *ent, int newWeapon );
-extern void PM_SetAnim( pmove_t	*pm, int setAnimParts, int anim, int setAnimFlags, int blendTime );
-extern int PM_AnimLength( int index, animNumber_t anim );
+void ChangeWeapon( gentity_t *ent, int newWeapon );
+void PM_SetAnim( pmove_t	*pm, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime );
+int PM_AnimLength( int index, animNumber_t anim );
 #endif
 
-extern void BG_SetAnim( playerState_t *ps, animation_t *animations, int setAnimParts, int anim, int setAnimFlags, int blendTime );
-extern int BG_GetTime( void );
-extern qboolean BG_SabersOff( playerState_t *ps );
+void BG_SetAnim( playerState_t *ps, animation_t *animations, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime );
+int BG_GetTime( void );
+qboolean BG_SabersOff( playerState_t *ps );
 
 //Alright, actually, most of this file is shared between game and cgame for MP.
 //I would like to keep it this way, so when modifying for SP please keep in
@@ -220,7 +220,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh ) {
 //"!s.number", this is a universal check that will work for both SP
 //and MP. -rww
 // ProcessOrientCommands the Vehicle.
-extern void AnimalProcessOri( Vehicle_t *pVeh );
+void AnimalProcessOri( Vehicle_t *pVeh );
 void ProcessOrientCommands( Vehicle_t *pVeh ) {
 	/********************************************************************************/
 	/*	BEGIN	Here is where make sure the vehicle is properly oriented.	BEGIN	*/
@@ -551,7 +551,7 @@ void G_SetSpeederVehicleFunctions( vehicleInfo_t *pVehInfo ) {
 // Following is only in game, not in namespace
 
 #ifdef _GAME
-extern void G_AllocateVehicleObject( Vehicle_t **pVeh );
+void G_AllocateVehicleObject( Vehicle_t **pVeh );
 #endif
 
 

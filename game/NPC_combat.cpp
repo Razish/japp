@@ -2419,7 +2419,7 @@ qboolean NPC_SetCombatPoint( int combatPointID ) {
 	return qtrue;
 }
 
-extern qboolean CheckItemCanBePickedUpByNPC( gentity_t *item, gentity_t *pickerupper );
+qboolean CheckItemCanBePickedUpByNPC( gentity_t *item, gentity_t *pickerupper );
 gentity_t *NPC_SearchForWeapons( void ) {
 	gentity_t *found = g_entities, *bestFound = NULL;
 	float		dist, bestDist = Q3_INFINITE;

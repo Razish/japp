@@ -197,7 +197,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	weaponInfo_t *weapon;
 	centity_t *nonPredictedCent;
 
-	weaponNum = cent->currentState.weapon;
+	weaponNum = (weapon_t)cent->currentState.weapon;
 
 	if ( cent->currentState.weapon == WP_EMPLACED_GUN )
 		return;

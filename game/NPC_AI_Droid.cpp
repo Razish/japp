@@ -1,7 +1,5 @@
 #include "b_local.h"
 
-void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
-
 #define TURN_OFF   0x00000100
 
 //Local state enums

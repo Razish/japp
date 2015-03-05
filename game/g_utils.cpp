@@ -833,11 +833,11 @@ void G_EntitySound( gentity_t *ent, int channel, int soundIndex ) {
 }
 
 // To make porting from SP easier.
-void G_SoundOnEnt( gentity_t *ent, int channel, const char *soundPath ) {
+void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath ) {
 	gentity_t *te = G_TempEntity( &ent->r.currentOrigin, EV_ENTITY_SOUND );
 	te->s.eventParm = G_SoundIndex( soundPath );
 	te->s.clientNum = ent->s.number;
-	te->s.trickedEntIndex[0] = channel;
+	te->s.trickedEntIndex[0] = (int32_t)channel;
 }
 
 // Returns whether or not the targeted entity is useable
@@ -1323,7 +1323,7 @@ qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3
 	return qtrue;
 }
 
-extern qboolean G_FindClosestPointOnLineSegment( const vector3 *start, const vector3 *end, const vector3 *from, vector3 *result );
+qboolean G_FindClosestPointOnLineSegment( const vector3 *start, const vector3 *end, const vector3 *from, vector3 *result );
 float ShortestLineSegBewteen2LineSegs( vector3 *start1, vector3 *end1, vector3 *start2, vector3 *end2, vector3 *close_pnt1, vector3 *close_pnt2 ) {
 	float current_dist, new_dist;
 	vector3 new_pnt;
@@ -1556,8 +1556,9 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 			char msg[MAX_TOKEN_CHARS];
 			Com_sprintf( msg, sizeof(msg), "Found %d matches:\n", numMatches );
 			for ( i = 0; i < numMatches; i++ ) {
-				Q_strcat( msg, sizeof(msg), va( "  "S_COLOR_WHITE"("S_COLOR_CYAN"%02i"S_COLOR_WHITE") %s\n", matches[i],
-					g_entities[matches[i]].client->pers.netname ) );
+				Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "  (" S_COLOR_CYAN "%02i" S_COLOR_WHITE ") %s\n",
+					matches[i], g_entities[matches[i]].client->pers.netname )
+				);
 			}
 			trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
 			return -1;
@@ -1565,8 +1566,9 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 	}
 
 	//Failed, target client does not exist
-	if ( print )
+	if ( print ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"Client %s does not exist\n\"", cleanedMatch ) );
+	}
 	return -1;
 }
 

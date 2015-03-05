@@ -2,7 +2,7 @@
 #include "g_nav.h"
 #include "ICARUS/Q3_Interface.h"
 
-extern qboolean NPC_SomeoneLookingAtMe( gentity_t *ent );
+qboolean NPC_SomeoneLookingAtMe( gentity_t *ent );
 
 // We lost our enemy and want to drop him but see if we should chase him if we are in the proper bState
 void NPC_LostEnemyDecideChase( void ) {
@@ -563,8 +563,8 @@ void NPC_BSPatrol( void ) {
 void NPC_BSDefault(void)
 uses various scriptflags to determine how an npc should behave
 */
-extern void NPC_CheckGetNewWeapon( void );
-extern void NPC_BSST_Attack( void );
+void NPC_CheckGetNewWeapon( void );
+void NPC_BSST_Attack( void );
 
 void NPC_BSDefault( void ) {
 	//	vector3		enemyDir;

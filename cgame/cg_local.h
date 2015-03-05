@@ -887,7 +887,7 @@ void			CG_ChatboxDraw( void );
 void			CG_ChatboxHistoryDn( void );
 void			CG_ChatboxHistoryUp( void );
 void			CG_ChatboxInit( void );
-void			CG_ChatboxOpen( int mode );
+void			CG_ChatboxOpen( messageMode_t mode );
 void			CG_ChatboxOutgoing( void );
 void			CG_ChatboxScroll( int direction );
 void			CG_ChatboxSelect( char *cbName );

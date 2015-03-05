@@ -29,7 +29,6 @@ void NPC_ClearLookTarget( gentity_t *self );
 void NPC_TempLookTarget( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
 qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3 *maxs, int ignore, int clipmask );
 qboolean NPC_CheckEnemyStealth( void );
-void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 
 void ForceLightning( gentity_t *self );
 int WP_MissileBlockForBlock( int saberBlock );
@@ -144,8 +143,8 @@ void Boba_Precache( void ) {
 	G_EffectIndex( "boba/fthrw" );
 }
 
-extern void G_CreateG2AttachedWeaponModel( gentity_t *ent, const char *weaponModel, int boltNum, int weaponNum );
-extern void ChangeWeapon( gentity_t *ent, int newWeapon );
+void G_CreateG2AttachedWeaponModel( gentity_t *ent, const char *weaponModel, int boltNum, int weaponNum );
+void ChangeWeapon( gentity_t *ent, int newWeapon );
 void Boba_ChangeWeapon( int wp ) {
 	if ( NPC->s.weapon == wp ) {
 		return;
@@ -2486,8 +2485,8 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 	return evasionType;
 }
 
-extern float ShortestLineSegBewteen2LineSegs( vector3 *start1, vector3 *end1, vector3 *start2, vector3 *end2, vector3 *close_pnt1, vector3 *close_pnt2 );
-extern int WPDEBUG_SaberColor( saber_colors_t saberColor );
+float ShortestLineSegBewteen2LineSegs( vector3 *start1, vector3 *end1, vector3 *start2, vector3 *end2, vector3 *close_pnt1, vector3 *close_pnt2 );
+int WPDEBUG_SaberColor( saber_colors_t saberColor );
 static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bladeNum = 0
 {
 	vector3 hitloc, saberTipOld, saberTip, top, bottom, axisPoint, saberPoint, dir;//saberBase,
@@ -3032,7 +3031,7 @@ static void Jedi_SetEnemyInfo( vector3 *enemy_dest, vector3 *enemy_dir, float *e
 	}
 }
 
-extern float WP_SpeedOfMissileForWeapon( int wp, qboolean alt_fire );
+float WP_SpeedOfMissileForWeapon( int wp, qboolean alt_fire );
 static void Jedi_FaceEnemy( qboolean doPitch ) {
 	vector3	enemy_eyes, eyes, angles;
 
@@ -3859,7 +3858,7 @@ static qboolean Jedi_Jumping( gentity_t *goal ) {
 	return qfalse;
 }
 
-extern void G_UcmdMoveForDir( gentity_t *self, usercmd_t *cmd, vector3 *dir );
+void G_UcmdMoveForDir( gentity_t *self, usercmd_t *cmd, vector3 *dir );
 static void Jedi_CheckEnemyMovement( float enemy_dist ) {
 	if ( !NPC->enemy || !NPC->enemy->client ) {
 		return;
@@ -4886,7 +4885,7 @@ static void Jedi_Attack( void ) {
 	}
 }
 
-extern void NPC_BSST_Patrol( void );
+void NPC_BSST_Patrol( void );
 void NPC_BSJedi_Default( void ) {
 
 	Jedi_CheckCloak();

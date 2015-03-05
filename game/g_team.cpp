@@ -27,9 +27,9 @@ void Team_InitGame( void ) {
 	switch ( level.gametype ) {
 	case GT_CTF:
 	case GT_CTY:
-		teamgame.redStatus = -1; // Invalid to force update
+		teamgame.redStatus = (flagStatus_t)-1; // Invalid to force update
 		Team_SetFlagStatus( TEAM_RED, FLAG_ATBASE );
-		teamgame.blueStatus = -1;
+		teamgame.blueStatus = (flagStatus_t)-1;
 		Team_SetFlagStatus( TEAM_BLUE, FLAG_ATBASE );
 		teamgame.bestCapTime = -1;
 		break;
@@ -739,30 +739,55 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 	if ( japp_speedCaps.integer ) {//Raz: speed caps
 		capTime = trap->Milliseconds() - cl->pers.teamState.flagsince;
 		if ( teamgame.bestCapTime == -1 ) {
-			trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_GREEN"captured the %s flag in "S_COLOR_CYAN"%.3f "S_COLOR_GREEN"seconds, setting the record\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime / 1000.0f ) );
+			trap->SendServerCommand( -1, va( "print \"%s " S_COLOR_GREEN "captured the %s flag in " S_COLOR_CYAN
+				"%.3f " S_COLOR_GREEN "seconds, setting the record\n\"", cl->pers.netname,
+				TeamName( OtherTeam( team ) ), capTime / 1000.0f )
+			);
 			teamgame.bestCapTime = capTime;
 			Q_strncpyz( teamgame.bestCapName, cl->pers.netname, sizeof(teamgame.bestCapName) );
 		}
 		else if ( capTime < teamgame.bestCapTime ) {
 			if ( !Q_stricmp( teamgame.bestCapName, cl->pers.netname ) )
-				trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_GREEN"captured the %s flag in "S_COLOR_CYAN"%.3f "S_COLOR_GREEN"seconds, breaking their record of "S_COLOR_CYAN"%.3f "S_COLOR_GREEN"seconds ("S_COLOR_YELLOW"+%.3f"S_COLOR_GREEN")\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime / 1000.0f, teamgame.bestCapTime / 1000.0f, (teamgame.bestCapTime - capTime) / 1000.0f ) );
-			else
-				trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_GREEN"captured the %s flag in "S_COLOR_CYAN"%.3f "S_COLOR_GREEN"seconds, breaking %s"S_COLOR_GREEN"'s record of "S_COLOR_CYAN"%.3f "S_COLOR_GREEN"seconds ("S_COLOR_YELLOW"+%.3f"S_COLOR_GREEN")\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime / 1000.0f, teamgame.bestCapName, teamgame.bestCapTime / 1000.0f, (teamgame.bestCapTime - capTime) / 1000.0f ) );
+				trap->SendServerCommand( -1, va( "print \"%s " S_COLOR_GREEN "captured the %s flag in " S_COLOR_CYAN
+					"%.3f " S_COLOR_GREEN "seconds, breaking their record of " S_COLOR_CYAN "%.3f " S_COLOR_GREEN
+					"seconds (" S_COLOR_YELLOW "+%.3f" S_COLOR_GREEN ")\n\"", cl->pers.netname,
+					TeamName( OtherTeam( team ) ), capTime / 1000.0f, teamgame.bestCapTime / 1000.0f,
+					(teamgame.bestCapTime - capTime) / 1000.0f )
+				);
+			else {
+				trap->SendServerCommand( -1, va( "print \"%s " S_COLOR_GREEN "captured the %s flag in " S_COLOR_CYAN
+					"%.3f " S_COLOR_GREEN "seconds, breaking %s" S_COLOR_GREEN "'s record of " S_COLOR_CYAN "%.3f "
+					S_COLOR_GREEN "seconds (" S_COLOR_YELLOW "+%.3f" S_COLOR_GREEN ")\n\"", cl->pers.netname,
+					TeamName( OtherTeam( team ) ), capTime / 1000.0f, teamgame.bestCapName,
+					teamgame.bestCapTime / 1000.0f, (teamgame.bestCapTime - capTime) / 1000.0f )
+				);
+			}
 			teamgame.bestCapTime = capTime;
 			Q_strncpyz( teamgame.bestCapName, cl->pers.netname, sizeof(teamgame.bestCapName) );
 		}
 		else {
-			if ( !Q_stricmp( teamgame.bestCapName, cl->pers.netname ) )
-				trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_GREEN"captured the %s flag in "S_COLOR_CYAN"%.3f "S_COLOR_GREEN"seconds, failing to break their record of "S_COLOR_CYAN"%.3f "S_COLOR_GREEN"seconds ("S_COLOR_RED"%.3f"S_COLOR_GREEN")\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime / 1000.0f, teamgame.bestCapTime / 1000.0f, (teamgame.bestCapTime - capTime) / 1000.0f ) );
-			else
-				trap->SendServerCommand( -1, va( "print \"%s "S_COLOR_GREEN"captured the %s flag in "S_COLOR_CYAN"%.3f "S_COLOR_GREEN"seconds, failing to break %s"S_COLOR_GREEN"'s record of "S_COLOR_CYAN"%.3f "S_COLOR_GREEN"seconds ("S_COLOR_RED"%.3f"S_COLOR_GREEN")\n\"", cl->pers.netname, TeamName( OtherTeam( team ) ), capTime / 1000.0f, teamgame.bestCapName, teamgame.bestCapTime / 1000.0f, (teamgame.bestCapTime - capTime) / 1000.0f ) );
+			if ( !Q_stricmp( teamgame.bestCapName, cl->pers.netname ) ) {
+				trap->SendServerCommand( -1, va( "print \"%s " S_COLOR_GREEN "captured the %s flag in " S_COLOR_CYAN
+					"%.3f " S_COLOR_GREEN "seconds, failing to break their record of " S_COLOR_CYAN "%.3f "
+					S_COLOR_GREEN "seconds (" S_COLOR_RED "%.3f" S_COLOR_GREEN ")\n\"", cl->pers.netname,
+					TeamName( OtherTeam( team ) ), capTime / 1000.0f, teamgame.bestCapTime / 1000.0f,
+					(teamgame.bestCapTime - capTime) / 1000.0f )
+				);
+			}
+			else {
+				trap->SendServerCommand( -1, va( "print \"%s " S_COLOR_GREEN "captured the %s flag in " S_COLOR_CYAN
+					"%.3f " S_COLOR_GREEN "seconds, failing to break %s" S_COLOR_GREEN "'s record of " S_COLOR_CYAN
+					"%.3f " S_COLOR_GREEN "seconds (" S_COLOR_RED "%.3f" S_COLOR_GREEN ")\n\"", cl->pers.netname,
+					TeamName( OtherTeam( team ) ), capTime / 1000.0f, teamgame.bestCapName,
+					teamgame.bestCapTime / 1000.0f, (teamgame.bestCapTime - capTime) / 1000.0f )
+				);
+			}
 		}
 	}
 	else {
 		//PrintMsg( NULL, "%s" S_COLOR_WHITE " captured the %s flag!\n", cl->pers.netname, TeamName(OtherTeam(team)));
 		PrintCTFMessage( other->s.number, team, CTFMESSAGE_PLAYER_CAPTURED_FLAG );
 	}
-
 
 	cl->ps.powerups[enemy_flag] = 0;
 

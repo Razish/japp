@@ -10,7 +10,7 @@ int cgSiegeTeam1PlShader = 0, cgSiegeTeam2PlShader = 0;
 
 static char cgParseObjectives[MAX_SIEGE_INFO_SIZE];
 
-extern void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded );
+void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded );
 
 void CG_DrawSiegeMessage( const char *str, int objectiveScreen );
 void CG_DrawSiegeMessageNonMenu( const char *str );

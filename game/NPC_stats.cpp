@@ -205,7 +205,7 @@ int NPC_ReactionTime( void ) {
 // parse support routines
 //
 
-extern qboolean BG_ParseLiteral( const char **data, const char *string );
+qboolean BG_ParseLiteral( const char **data, const char *string );
 
 //
 // NPC parameters file : scripts/NPCs.cfg
@@ -250,7 +250,7 @@ static rank_t TranslateRankName( const char *name ) {
 	return RANK_CIVILIAN;
 }
 
-extern saber_colors_t TranslateSaberColor( const char *name );
+saber_colors_t TranslateSaberColor( const char *name );
 
 /* static int MethodNameToNumber( const char *name ) {
 	if ( !Q_stricmp( name, "EXPONENTIAL" ) ) {
@@ -463,9 +463,9 @@ void NPC_PrecacheAnimationCFG( const char *NPC_type ) {
 #endif
 }
 
-extern int NPC_WeaponsForTeam( npcteam_t team, int spawnflags, const char *NPC_type );
+int NPC_WeaponsForTeam( team_t team, int spawnflags, const char *NPC_type );
 void NPC_PrecacheWeapons( npcteam_t playerTeam, int spawnflags, const char *NPCtype ) {
-	int weapons = NPC_WeaponsForTeam( playerTeam, spawnflags, NPCtype );
+	int weapons = NPC_WeaponsForTeam( (team_t)playerTeam, spawnflags, NPCtype );
 	int curWeap;
 
 	for ( curWeap = WP_SABER; curWeap < WP_NUM_WEAPONS; curWeap++ ) {
@@ -631,7 +631,7 @@ void NPC_Precache( gentity_t *spawner ) {
 			}
 			//playerTeam = TranslateTeamName(value);
 			Com_sprintf( tk, sizeof(tk), "NPC%s", token );
-			playerTeam = GetIDForString( TeamTable, tk );
+			playerTeam = (npcteam_t)GetIDForString( TeamTable, tk );
 			continue;
 		}
 
@@ -845,7 +845,7 @@ void NPC_BuildRandom( gentity_t *NPC )
 }
 #endif
 
-extern void SetupGameGhoul2Model( gentity_t *ent, char *modelname, char *skinName );
+void SetupGameGhoul2Model( gentity_t *ent, char *modelname, char *skinName );
 qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 	const char	*token;
 	const char	*value;
@@ -1579,7 +1579,8 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 					continue;
 				}
 				Com_sprintf( tk, sizeof(tk), "NPC%s", token );
-				NPC->client->playerTeam = NPC->s.teamowner = (team_t)GetIDForString( TeamTable, tk );//TranslateTeamName(value);
+				NPC->s.teamowner = GetIDForString( TeamTable, tk );//TranslateTeamName(value);
+				NPC->client->playerTeam = (npcteam_t)NPC->s.teamowner;
 				continue;
 			}
 
@@ -1591,7 +1592,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 					continue;
 				}
 				Com_sprintf( tk, sizeof(tk), "NPC%s", token );
-				NPC->client->enemyTeam = GetIDForString( TeamTable, tk );//TranslateTeamName(value);
+				NPC->client->enemyTeam = (npcteam_t)GetIDForString( TeamTable, tk );//TranslateTeamName(value);
 				continue;
 			}
 

@@ -182,22 +182,22 @@ float LittleFloat( const float l );
 #define __rlwimi(out, in, shift, maskBegin, maskEnd) asm("rlwimi %0,%1,%2,%3,%4" : "=r" (out) : "r" (in), "i" (shift), "i" (maskBegin), "i" (maskEnd))
 #define __dcbt(addr, offset) asm("dcbt %0,%1" : : "b" (addr), "r" (offset))
 
-static inline unsigned int __lwbrx(register void *addr, register int offset) {
-	register unsigned int word;
+static inline unsigned int __lwbrx(void *addr, int offset) {
+	unsigned int word;
 
 	asm("lwbrx %0,%2,%1" : "=r" (word) : "r" (addr), "b" (offset));
 	return word;
 }
 
-static inline unsigned short __lhbrx(register void *addr, register int offset) {
-	register unsigned short halfword;
+static inline unsigned short __lhbrx(void *addr, int offset) {
+	unsigned short halfword;
 
 	asm("lhbrx %0,%2,%1" : "=r" (halfword) : "r" (addr), "b" (offset));
 	return halfword;
 }
 
-static inline float __fctiw(register float f) {
-	register float fi;
+static inline float __fctiw(float f) {
+	float fi;
 
 	asm("fctiw %0,%1" : "=f" (fi) : "f" (f));
 	return fi;
@@ -627,7 +627,7 @@ typedef enum sharedERagPhase_e {
 	RP_DISABLE_EFFECTORS  // this removes effectors given by the effectorsToTurnOff member
 } sharedERagPhase_t;
 
-enum sharedERagEffector_e {
+enum sharedERagEffector_t {
 	RE_MODEL_ROOT = 0x00000001, //"model_root"
 	RE_PELVIS = 0x00000002, //"pelvis"
 	RE_LOWER_LUMBAR = 0x00000004, //"lower_lumbar"
@@ -653,7 +653,7 @@ enum sharedERagEffector_e {
 	RE_RFEMURX = 0x00400000, //"rfemurX"
 	RE_LFEMURX = 0x00800000, //"lfemurX"
 	RE_CEYEBROW = 0x01000000 //"ceyebrow"
-} sharedERagEffector_t;
+};
 
 typedef struct sharedRagDollParams_s {
 	vector3 angles;
@@ -715,10 +715,10 @@ typedef struct sharedSetBoneIKStateParams_s {
 	qboolean forceAnimOnBone; //normally if the bone has specified start/end frames already it will leave it alone.. if this is true, then the animation will be restarted on the bone with the specified frames anyway.
 } sharedSetBoneIKStateParams_t;
 
-enum sharedEIKMoveState_e {
+enum sharedEIKMoveState_t {
 	IKS_NONE = 0,
 	IKS_DYNAMIC
-} sharedEIKMoveState_t;
+};
 
 //material stuff needs to be shared
 typedef enum material_e {
@@ -1193,8 +1193,8 @@ void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
 #if defined( _GAME ) || defined( _CGAME ) || defined( _UI )
-void( *Com_Error )(int level, const char *error, ...);
-void( *Com_Printf )(const char *msg, ...);
+extern void( *Com_Error )(int level, const char *error, ...);
+extern void( *Com_Printf )(const char *msg, ...);
 #else
 void QDECL Com_Error( int level, const char *error, ... );
 void QDECL Com_Printf( const char *msg, ... );

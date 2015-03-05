@@ -9,7 +9,6 @@
 extern vector3 playerMins;
 extern vector3 playerMaxs;
 
-void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 void PM_SetTorsoAnimTimer( gentity_t *ent, int *torsoAnimTimer, int time );
 void PM_SetLegsAnimTimer( gentity_t *ent, int *legsAnimTimer, int time );
 void NPC_BSNoClip( void );
@@ -534,9 +533,9 @@ vector3 NPCDEBUG_RED = { 1.0f, 0.0f, 0.0f };
 vector3 NPCDEBUG_GREEN = { 0.0f, 1.0f, 0.0f };
 vector3 NPCDEBUG_BLUE = { 0.0f, 0.0f, 1.0f };
 vector3 NPCDEBUG_LIGHT_BLUE = { 0.3f, 0.7f, 1.0f };
-//extern void G_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha );
-extern void G_Line( vector3 *start, vector3 *end, vector3 *color, float alpha );
-extern void G_Cylinder( vector3 *start, vector3 *end, float radius, vector3 *color );
+//void G_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha );
+void G_Line( vector3 *start, vector3 *end, vector3 *color, float alpha );
+void G_Cylinder( vector3 *start, vector3 *end, float radius, vector3 *color );
 
 void NPC_ShowDebugInfo( void ) {
 	if ( showBBoxes ) {

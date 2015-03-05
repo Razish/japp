@@ -15,7 +15,7 @@
 #include "JAPP/jp_cinfo.h"
 
 #ifdef _GAME
-extern void Q3_SetParm( int entID, int parmNum, const char *parmValue );
+void Q3_SetParm( int entID, int parmNum, const char *parmValue );
 #endif
 
 const char *bgToggleableSurfaces[BG_NUM_TOGGLEABLE_SURFACES] = {
@@ -249,8 +249,7 @@ const int WeaponReadyAnim[WP_NUM_WEAPONS] =
 	TORSO_WEAPONREADY1//WP_TURRET,
 };
 
-const int WeaponReadyLegsAnim[WP_NUM_WEAPONS] =
-{
+const int WeaponReadyLegsAnim[WP_NUM_WEAPONS] = {
 	BOTH_STAND1,//WP_NONE,
 
 	BOTH_STAND1,//WP_STUN_BATON,
@@ -275,8 +274,7 @@ const int WeaponReadyLegsAnim[WP_NUM_WEAPONS] =
 	BOTH_STAND1//WP_TURRET,
 };
 
-const int WeaponAttackAnim[WP_NUM_WEAPONS] =
-{
+const int WeaponAttackAnim[WP_NUM_WEAPONS] = {
 	BOTH_ATTACK1,//WP_NONE, //(shouldn't happen)
 
 	BOTH_ATTACK3,//WP_STUN_BATON,

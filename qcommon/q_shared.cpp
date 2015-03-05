@@ -12,6 +12,10 @@
 #include "ui_local.h"
 #endif
 
+#if defined( _GAME ) || defined( _CGAME ) || defined( _UI )
+void( *Com_Error )(int level, const char *error, ...);
+void( *Com_Printf )(const char *msg, ...);
+#endif
 
 int GetIDForString( const stringID_table_t *table, const char *string ) {
 	const stringID_table_t *t;
@@ -436,7 +440,7 @@ char *COM_ParseExt( const char **data_p, qboolean allowLineBreaks ) {
 
 qboolean COM_ParseString( const char **data, const char **s ) {
 	*s = COM_ParseExt( data, qfalse );
-	if ( s[0] == '\0' ) {
+	if ( s[0] == 0 ) {
 		assert( !"unexpected EOF" );
 		Com_Printf( "unexpected EOF\n" );
 		return qtrue;
@@ -447,7 +451,7 @@ qboolean COM_ParseString( const char **data, const char **s ) {
 
 qboolean COM_ParseInt( const char **data, int *i ) {
 	const char *token = COM_ParseExt( data, qfalse );
-	if ( token[0] == '\0' ) {
+	if ( token[0] == 0 ) {
 		assert( !"unexpected EOF" );
 		Com_Printf( "unexpected EOF\n" );
 		return qtrue;
@@ -459,7 +463,7 @@ qboolean COM_ParseInt( const char **data, int *i ) {
 
 qboolean COM_ParseFloat( const char **data, float *f ) {
 	const char *token = COM_ParseExt( data, qfalse );
-	if ( token[0] == '\0' ) {
+	if ( token[0] == 0 ) {
 		assert( !"unexpected EOF" );
 		Com_Printf( "unexpected EOF\n" );
 		return qtrue;
@@ -1319,7 +1323,7 @@ void Q_NewPrintBuffer( printBufferSession_t *session, size_t length,
 	void (*callback)( const char *buffer, int clientNum ), int clientNum )
 {
 	memset( session, 0, sizeof(*session) );
-	session->buffer = malloc( length );
+	session->buffer = (char *)malloc( length );
 	session->buffer[0] = '\0';
 	session->length = 0u;
 	session->maxLength = length;

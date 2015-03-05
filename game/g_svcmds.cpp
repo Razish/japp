@@ -96,7 +96,7 @@ void G_ShuffleTeams( void ) {
 		}
 	}
 
-	trap->SendServerCommand( -1, "cp \""S_COLOR_RED"Teams have been shuffled!\n\"" );
+	trap->SendServerCommand( -1, "cp \"" S_COLOR_RED "Teams have been shuffled!\n\"" );
 }
 
 const char *G_GetArenaInfoByMap( const char *map );

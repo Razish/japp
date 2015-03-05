@@ -1,7 +1,7 @@
 #include "b_local.h"
 #include "g_nav.h"
 
-extern void Boba_FireDecide( void );
+void Boba_FireDecide( void );
 
 void Seeker_Strafe( void );
 

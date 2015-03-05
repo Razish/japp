@@ -75,7 +75,7 @@ static int JPLuaI_Error( lua_State *L ) {
 
 qboolean JPLua_Call( lua_State *L, int argCount, int resCount ) {
 	if ( lua_pcall( L, argCount, resCount, 0 ) ) {
-		trap->Print( S_COLOR_GREEN"JPLua: "S_COLOR_RED"Error: %s\n", lua_tostring( L, -1 ) );
+		trap->Print( S_COLOR_GREEN "JPLua: " S_COLOR_RED "Error: %s\n", lua_tostring( L, -1 ) );
 		lua_pop( L, 1 );
 		return qfalse;
 	}
@@ -421,7 +421,7 @@ static void JPLua_LoadPluginDir( qboolean inPK3 ) {
 					skipLenFile = strlen( ++s ) + 1;
 				}
 				fileLen = strlen( fileName ) + 1;
-				if ( !Q_stricmp( fileName, "plugin"JPLUA_EXTENSION ) ) {
+				if ( !Q_stricmp( fileName, "plugin" JPLUA_EXTENSION ) ) {
 					JPLua_LoadPlugin( folderName, fileName );
 					break;
 				}
@@ -434,13 +434,13 @@ static void JPLua_LoadPluginDir( qboolean inPK3 ) {
 
 static void JPLua_PostInit( lua_State *L ) {
 #if defined(_GAME)
-	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_YELLOW"JA++ Lua (SV) is initialising "S_COLOR_CYAN"****************\n" );
+	trap->Print( S_COLOR_CYAN "**************** " S_COLOR_YELLOW "JA++ Lua (SV) is initialising " S_COLOR_CYAN "****************\n" );
 #elif defined(_CGAME)
-	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_YELLOW"JA++ Lua (CL) is initialising "S_COLOR_CYAN"****************\n" );
+	trap->Print( S_COLOR_CYAN "**************** " S_COLOR_YELLOW "JA++ Lua (CL) is initialising " S_COLOR_CYAN "****************\n" );
 #endif
 
 	JPLua_Register_System( L );
-	JPLua_LoadFile( L, va( "%sinit"JPLUA_EXTENSION, baseDir ) );
+	JPLua_LoadFile( L, va( "%sinit" JPLUA_EXTENSION, baseDir ) );
 	JPLua.initialised = qtrue;
 
 	trap->Print( "%-15s%-32s%-8s%s\n", "               ", "Name", "Version", "Unique ID" );
@@ -449,9 +449,9 @@ static void JPLua_PostInit( lua_State *L ) {
 	JPLua_LoadPluginDir( qfalse );
 
 #if defined(_GAME)
-	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_GREEN"JA++ Lua (SV) is initialised "S_COLOR_GREEN"****************\n" );
+	trap->Print( S_COLOR_CYAN "**************** " S_COLOR_GREEN "JA++ Lua (SV) is initialised " S_COLOR_GREEN "****************\n" );
 #elif defined(_CGAME)
-	trap->Print( S_COLOR_CYAN"**************** "S_COLOR_GREEN"JA++ Lua (CL) is initialised "S_COLOR_GREEN"****************\n" );
+	trap->Print( S_COLOR_CYAN "**************** " S_COLOR_GREEN "JA++ Lua (CL) is initialised " S_COLOR_GREEN "****************\n" );
 #endif
 }
 
@@ -847,7 +847,7 @@ static int JPLua_Export_RemapShader( lua_State *L ) {
 #endif
 
 #ifdef _CGAME
-extern void CG_ChatBox_AddString( char *chatStr ); //cg_draw.c
+void CG_ChatBox_AddString( char *chatStr ); //cg_draw.c
 static int JPLua_Export_SendChatText( lua_State *L ) {
 	char text[MAX_SAY_TEXT] = { 0 };
 

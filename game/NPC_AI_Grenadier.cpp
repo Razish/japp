@@ -2,15 +2,14 @@
 #include "g_nav.h"
 #include "anims.h"
 
-extern qboolean BG_SabersOff( playerState_t *ps );
+qboolean BG_SabersOff( playerState_t *ps );
 
-extern void CG_DrawAlert( vector3 *origin, float rating );
-extern void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
-extern void NPC_TempLookTarget( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
-extern qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3 *maxs, int ignore, int clipmask );
-extern void NPC_AimAdjust( int change );
-extern qboolean FlyingCreature( gentity_t *ent );
+void CG_DrawAlert( vector3 *origin, float rating );
+void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
+void NPC_TempLookTarget( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
+qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3 *maxs, int ignore, int clipmask );
+void NPC_AimAdjust( int change );
+qboolean FlyingCreature( gentity_t *ent );
 
 #define	MAX_VIEW_DIST		1024
 #define MAX_VIEW_SPEED		250

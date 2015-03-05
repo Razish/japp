@@ -1,8 +1,10 @@
 #pragma once
 
-#include "../lua/lua.h"
-#include "../lua/lualib.h"
-#include "../lua/lauxlib.h"
+extern "C" {
+	#include "../lua/lua.h"
+	#include "../lua/lualib.h"
+	#include "../lua/lauxlib.h"
+}
 
 #include "bg_luacvar.h"
 #include "bg_luaevent.h"

@@ -254,44 +254,4 @@ typedef enum //# setType_e
 		SET_
 } setType_t;
 
-#ifdef __cplusplus
-
-// this enum isn't used directly by the game, it's mainly for BehavEd to scan for...
-//
-typedef enum //# playType_e
-{
-	//# #sep Types of file to play
-	PLAY_ROFF = 0,//## %s="filename" !!"W:\game\base\scripts\!!#*.rof" # Play a ROFF file
-
-	//# #eol
-	PLAY_NUMBEROF
-
-} playType_t;
-
-
-const	int	Q3_TIME_SCALE	= 1;	//MILLISECONDS
-
-extern char	cinematicSkipScript[1024];
-
-//General
-extern	void		Q3_TaskIDClear( int *taskID );
-extern	qboolean	Q3_TaskIDPending( sharedEntity_t *ent, taskID_t taskType );
-extern	void		Q3_TaskIDComplete( sharedEntity_t *ent, taskID_t taskType );
-extern	void		Q3_DPrintf( const char *, ... );
-
-extern	void		Q3_CameraRoll( float angle, float duration );
-extern  void		Q3_CameraFollow( const char *name, float speed, float initLerp );
-extern  void		Q3_CameraTrack( const char *name, float speed, float initLerp );
-extern  void		Q3_CameraDistance( float distance, float initLerp );
-
-//Not referenced directly as script function - all are called through Q3_Set
-extern	void		Q3_SetAnimBoth( int entID, const char *anim_name );
-extern	void		Q3_SetVelocity( int entID, vector3 *angles );
-
-extern	void		Q3_DeclareVariable ( int type, const char *name );
-extern	void		Q3_FreeVariable( const char *name );
-
-extern	void		Q3_DebugPrint( int level, const char *format, ... );
-#endif //__cplusplus
-
 #endif	//__Q3_INTERFACE__

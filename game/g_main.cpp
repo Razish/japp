@@ -289,10 +289,10 @@ char gSharedBuffer[MAX_G_SHARED_BUFFER_SIZE];
 
 void WP_SaberLoadParms( void );
 void BG_VehicleLoadParms( void );
-extern void RemoveAllWP( void );
-extern void BG_ClearVehicleParseParms( void );
-extern gentity_t *SelectRandomDeathmatchSpawnPoint( void );
-extern void SP_info_jedimaster_start( gentity_t *ent );
+void RemoveAllWP( void );
+void BG_ClearVehicleParseParms( void );
+gentity_t *SelectRandomDeathmatchSpawnPoint( void );
+void SP_info_jedimaster_start( gentity_t *ent );
 
 #define LOG_DIRECTORY "logs/sv/"
 static void G_OpenLog( const char *filename, fileHandle_t *f, qboolean sync ) {
@@ -2585,7 +2585,7 @@ void ClearNPCGlobals( void );
 void AI_UpdateGroups( void );
 void SiegeCheckTimers( void );
 void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd );
-extern void Jedi_Decloak( gentity_t *self );
+void Jedi_Decloak( gentity_t *self );
 qboolean G_PointInBounds( vector3 *point, vector3 *mins, vector3 *maxs );
 
 int g_siegeRespawnCheck = 0;
@@ -3204,8 +3204,8 @@ static int G_ICARUS_GetVector( void ) {
 }
 static int G_ICARUS_GetString( void ) {
 	T_G_ICARUS_GETSTRING *sharedMem = (T_G_ICARUS_GETSTRING *)gSharedBuffer;
-	char *crap = NULL; //I am sorry for this -rww
-	char **morecrap = &crap; //and this
+	const char *crap = NULL; //I am sorry for this -rww
+	const char **morecrap = &crap; //and this
 	int r = Q3_GetString( sharedMem->entID, sharedMem->type, sharedMem->name, morecrap );
 
 	if ( crap )
@@ -3435,7 +3435,7 @@ Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t ar
 		return 0;
 
 	case GAME_GETITEMINDEXBYTAG:
-		return BG_GetItemIndexByTag( arg0, arg1 );
+		return BG_GetItemIndexByTag( arg0, (itemType_t)arg1 );
 
 	default:
 		break;

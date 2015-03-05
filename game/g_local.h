@@ -884,6 +884,7 @@ void			G_InitClientSessionData( gclient_t *client, char *userinfo, qboolean isBo
 int				G_ItemUsable( playerState_t *ps, int forcedUse );
 void			G_KillBox( gentity_t *ent );
 void			G_KillG2Queue( int entNum );
+void			G_Knockdown( gentity_t *self );
 void			G_LeaveVehicle( gentity_t *ent, qboolean ConCheck );
 void			G_LoadArenas( void );
 void			G_LogExit( const char *string );
@@ -946,6 +947,7 @@ void			G_SiegeClientExData( gentity_t *msgTarg );
 void			G_Sound( gentity_t *ent, int channel, int soundIndex );
 void			G_SoundAtLoc( vector3 *loc, int channel, int soundIndex );
 int				G_SoundIndex( const char *name );
+void			G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
 int				G_SoundSetIndex( const char *name );
 gentity_t *		G_Spawn( void );
 qboolean		G_SpawnBoolean( const char *key, const char *defaultString, qboolean *out );
@@ -1090,3 +1092,5 @@ extern int				gSlowMoDuelTime;
 extern const char		*supportFlagNames[];
 extern const char		*clientPluginDisableNames[];
 extern gameImport_t		*trap;
+
+extern const stringID_table_t TeamTable[];

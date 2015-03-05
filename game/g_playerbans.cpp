@@ -57,7 +57,7 @@ void JP_Bans_LoadBans( void ) {
 	if ( !len || len == -1 )
 		return;
 
-	buffer = malloc( len + 1 );
+	buffer = (char *)malloc( len + 1 );
 	trap->FS_Read( buffer, len, f );
 	trap->FS_Close( f );
 

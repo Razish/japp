@@ -223,20 +223,6 @@ typedef struct sharedEntity_s {
 	int				next_roff_time; //rww - npc's need to know when they're getting roff'd
 } sharedEntity_t;
 
-#ifdef __cplusplus
-class CSequencer;
-class CTaskManager;
-
-//I suppose this could be in another in-engine header or something. But we never want to
-//include an icarus file before sharedentity_t is declared.
-extern CSequencer	*gSequencers[MAX_GENTITIES];
-extern CTaskManager	*gTaskManagers[MAX_GENTITIES];
-
-#include "icarus/icarus.h"
-#include "icarus/sequencer.h"
-#include "icarus/taskmanager.h"
-#endif
-
 typedef struct T_G_ICARUS_PLAYSOUND_s {
 	int taskID;
 	int entID;

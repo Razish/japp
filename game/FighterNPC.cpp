@@ -10,20 +10,20 @@
 #include "cgame/cg_local.h"
 #endif
 
-extern float DotToSpot( vector3 *spot, vector3 *from, vector3 *fromAngles );
+float DotToSpot( vector3 *spot, vector3 *from, vector3 *fromAngles );
 #ifdef _GAME //SP or gameside MP
 extern vmCvar_t	cg_thirdPersonAlpha;
 extern vector3 playerMins;
 extern vector3 playerMaxs;
-extern void ChangeWeapon( gentity_t *ent, int newWeapon );
-extern void PM_SetAnim( pmove_t	*pm, int setAnimParts, int anim, int setAnimFlags, int blendTime );
-extern int PM_AnimLength( int index, animNumber_t anim );
-extern void G_VehicleTrace( trace_t *results, const vector3 *start, const vector3 *tMins, const vector3 *tMaxs, const vector3 *end, int passEntityNum, int contentmask );
+void ChangeWeapon( gentity_t *ent, int newWeapon );
+void PM_SetAnim( pmove_t	*pm, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime );
+int PM_AnimLength( int index, animNumber_t anim );
+void G_VehicleTrace( trace_t *results, const vector3 *start, const vector3 *tMins, const vector3 *tMaxs, const vector3 *end, int passEntityNum, int contentmask );
 #endif
 
-extern qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh );
-extern void BG_SetAnim( playerState_t *ps, animation_t *animations, int setAnimParts, int anim, int setAnimFlags, int blendTime );
-extern int BG_GetTime( void );
+qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh );
+void BG_SetAnim( playerState_t *ps, animation_t *animations, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime );
+int BG_GetTime( void );
 
 //this stuff has got to be predicted, so..
 qboolean BG_FighterUpdate( Vehicle_t *pVeh, const usercmd_t *pUcmd, vector3 *trMins, vector3 *trMaxs, float gravity, void( *traceFunc )(trace_t *results, const vector3 *start, const vector3 *lmins, const vector3 *lmaxs, const vector3 *end, int passEntityNum, int contentMask) ) {
@@ -645,7 +645,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh ) {
 	/********************************************************************************/
 }
 
-extern void BG_VehicleTurnRateForSpeed( Vehicle_t *pVeh, float speed, float *mPitchOverride, float *mYawOverride );
+void BG_VehicleTurnRateForSpeed( Vehicle_t *pVeh, float speed, float *mPitchOverride, float *mYawOverride );
 static void FighterWingMalfunctionCheck( Vehicle_t *pVeh, playerState_t *parentPS ) {
 	float mPitchOverride = 1.0f;
 	float mYawOverride = 1.0f;
@@ -1558,7 +1558,7 @@ void G_SetFighterVehicleFunctions( vehicleInfo_t *pVehInfo ) {
 
 // Following is only in game, not in namespace
 #ifdef _GAME
-extern void G_AllocateVehicleObject( Vehicle_t **pVeh );
+void G_AllocateVehicleObject( Vehicle_t **pVeh );
 #endif
 
 // Create/Allocate a new Animal Vehicle (initializing it as well).

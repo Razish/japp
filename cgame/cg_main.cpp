@@ -1432,7 +1432,7 @@ char *CG_NewString( const char *string ) {
 	l = strlen( string ) + 1;
 
 	//	newb = CG_StrPool_Alloc( l );
-	newb = malloc( l );
+	newb = (char *)malloc( l );
 
 	new_p = newb;
 
@@ -1789,7 +1789,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	trap->GetGameState( &cgs.gameState );
 	s = CG_ConfigString( CS_GAME_VERSION );
 	if ( strcmp( s, GAME_VERSION ) ) {
-		trap->Error( ERR_DROP, "Client/Server game mismatch: "GAME_VERSION"/%s", s );
+		trap->Error( ERR_DROP, "Client/Server game mismatch: " GAME_VERSION "/%s", s );
 		return;
 	}
 
@@ -2303,7 +2303,7 @@ Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t ar
 		return CG_ConsoleCommand();
 
 	case CG_DRAW_ACTIVE_FRAME:
-		CG_DrawActiveFrame( arg0, arg1, arg2 );
+		CG_DrawActiveFrame( arg0, (stereoFrame_t)arg1, (qboolean)arg2 );
 		return 0;
 
 	case CG_CROSSHAIR_PLAYER:

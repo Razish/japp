@@ -95,7 +95,7 @@ void CG_ParseServerinfo( void ) {
 	cgs.dmflags = atoi( Info_ValueForKey( info, "dmflags" ) );
 	cgs.duel_fraglimit = atoi( Info_ValueForKey( info, "duel_fraglimit" ) );
 	cgs.capturelimit = atoi( Info_ValueForKey( info, "capturelimit" ) );
-	cgs.gametype = atoi( Info_ValueForKey( info, "g_gametype" ) );
+	cgs.gametype = (gametype_t)atoi( Info_ValueForKey( info, "g_gametype" ) );
 	cgs.japp.jp_cinfo = atoi( Info_ValueForKey( info, "jp_cinfo" ) );
 	cgs.japp.overbounce = atoi( Info_ValueForKey( info, "pmove_overbounce" ) );
 	fraglimit = atoi( Info_ValueForKey( info, "fraglimit" ) );
@@ -1037,7 +1037,7 @@ static void CG_BodyQueueCopy( centity_t *cent, int clientNum, int knownWeapon ) 
 
 void CG_SiegeBriefingDisplay( int team, qboolean dontShow );
 void CG_ParseSiegeExtendedData( void );
-extern void CG_ChatBox_AddString( char *chatStr );
+void CG_ChatBox_AddString( char *chatStr );
 
 // The string has been tokenized and can be retrieved with Cmd_Argc() / Cmd_Argv()
 static void CG_ServerCommand( void ) {
@@ -1321,7 +1321,7 @@ static void CG_ServerCommand( void ) {
 
 			trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 			//	Q_strncpyz( text, CG_Argv( 1 ), MAX_SAY_TEXT );
-			Com_sprintf( text, sizeof(text), "%s"S_COLOR_WHITE"<%s> ^%s%s", name, loc, color, message );
+			Com_sprintf( text, sizeof(text), "%s" S_COLOR_WHITE "<%s> ^%s%s", name, loc, color, message );
 			CG_RemoveChatEscapeChar( text );
 			//Raz: Siege chat now uses the fancy new chatbox
 			if ( cg_newChatbox.integer )
@@ -1350,7 +1350,7 @@ static void CG_ServerCommand( void ) {
 
 		trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 		//	Q_strncpyz( text, CG_Argv( 1 ), MAX_SAY_TEXT );
-		Com_sprintf( text, sizeof(text), "%s"S_COLOR_WHITE"<%s> ^%s%s", name, loc, color, message );
+		Com_sprintf( text, sizeof(text), "%s" S_COLOR_WHITE "<%s> ^%s%s", name, loc, color, message );
 		CG_RemoveChatEscapeChar( text );
 		if ( cg_newChatbox.integer )
 			CG_ChatboxAddMessage( text, qfalse, "team" );

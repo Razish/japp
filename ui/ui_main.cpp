@@ -8,7 +8,7 @@
 #include "JAPP/jp_crash.h"
 #include "JAPP/jp_csflags.h"
 
-extern void UI_SaberAttachToChar( itemDef_t *item );
+void UI_SaberAttachToChar( itemDef_t *item );
 
 const char *HolocronIcons[NUM_FORCE_POWERS] = {
 	"gfx/mp/f_icon_lt_heal", //FP_HEAL,
@@ -2722,7 +2722,7 @@ static qboolean UI_Handicap_HandleKey( uint32_t flags, float *special, int key )
 	return qfalse;
 }
 
-extern void	Item_RunScript( itemDef_t *item, const char *s );		//from ui_shared;
+void	Item_RunScript( itemDef_t *item, const char *s );		//from ui_shared;
 
 // For hot keys on the chat main menu.
 static qboolean UI_Chat_Main_HandleKey( int key ) {
@@ -4375,9 +4375,9 @@ static void UI_SetSaberBoxesandHilts( void ) {
 	}
 }
 
-extern qboolean UI_SaberSkinForSaber( const char *saberName, char *saberSkin );
-extern qboolean ItemParse_asset_model_go( itemDef_t *item, const char *name, int *runTimeLength );
-extern qboolean ItemParse_model_g2skin_go( itemDef_t *item, const char *skinName );
+qboolean UI_SaberSkinForSaber( const char *saberName, char *saberSkin );
+qboolean ItemParse_asset_model_go( itemDef_t *item, const char *name, int *runTimeLength );
+qboolean ItemParse_model_g2skin_go( itemDef_t *item, const char *skinName );
 
 static void UI_UpdateSaberType( void ) {
 	char sType[MAX_QPATH];
@@ -4466,7 +4466,7 @@ static void UI_GetSaberCvars( void ) {
 	return;
 }
 
-extern qboolean ItemParse_model_g2anim_go( itemDef_t *item, const char *animName );
+qboolean ItemParse_model_g2anim_go( itemDef_t *item, const char *animName );
 void UI_UpdateCharacterSkin( void ) {
 	menuDef_t *menu;
 	itemDef_t *item;
@@ -4736,7 +4736,7 @@ void UI_SiegeSetCvarsForClass( siegeClass_t *scl ) {
 				trap->Cvar_Set( va( "ui_class_weapondesc%i", count ), " " );	// Blank it out to start with
 			}
 			else {
-				const gitem_t *item = BG_FindItemForWeapon( i );
+				const gitem_t *item = BG_FindItemForWeapon( (weapon_t)i );
 				trap->Cvar_Set( va( "ui_class_weapon%i", count ), item->icon );
 				trap->Cvar_Set( va( "ui_class_weapondesc%i", count ), item->description );
 				count++;
@@ -4753,7 +4753,7 @@ void UI_SiegeSetCvarsForClass( siegeClass_t *scl ) {
 
 	while ( i < HI_NUM_HOLDABLE ) {
 		if ( scl->invenItems & (1 << i) ) {
-			const gitem_t *item = BG_FindItemForHoldable( i );
+			const gitem_t *item = BG_FindItemForHoldable( (holdable_t)i );
 			trap->Cvar_Set( va( "ui_class_item%i", count ), item->icon );
 			trap->Cvar_Set( va( "ui_class_itemdesc%i", count ), item->description );
 			count++;
@@ -8790,7 +8790,7 @@ Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t ar
 		return Menus_AnyFullScreenVisible();
 
 	case UI_SET_ACTIVE_MENU:
-		UI_SetActiveMenu( arg0 );
+		UI_SetActiveMenu( (uiMenuCommand_t)arg0 );
 		return 0;
 
 	case UI_CONSOLE_COMMAND:

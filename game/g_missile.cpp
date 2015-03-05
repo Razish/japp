@@ -6,10 +6,10 @@
 
 #define	MISSILE_PRESTEP_TIME	50
 
-extern void laserTrapStick( gentity_t *ent, vector3 *endpos, vector3 *normal );
-extern void Jedi_Decloak( gentity_t *self );
+void laserTrapStick( gentity_t *ent, vector3 *endpos, vector3 *normal );
+void Jedi_Decloak( gentity_t *self );
 
-extern qboolean FighterIsLanded( Vehicle_t *pVeh, playerState_t *parentPS );
+qboolean FighterIsLanded( Vehicle_t *pVeh, playerState_t *parentPS );
 
 float RandFloat( float min, float max );
 

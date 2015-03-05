@@ -3,14 +3,14 @@
 #include "anims.h"
 #include "w_saber.h"
 
-extern void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
-extern void NPC_AimAdjust( int change );
-extern qboolean WP_LobFire( gentity_t *self, vector3 *start, vector3 *target, vector3 *mins, vector3 *maxs, int clipmask,
-	vector3 *velocity, qboolean tracePath, int ignoreEntNum, int enemyNum,
-	float minSpeed, float maxSpeed, float idealSpeed, qboolean mustHit );
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
+void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
+void NPC_AimAdjust( int change );
+qboolean WP_LobFire( gentity_t *self, vector3 *start, vector3 *target, vector3 *mins, vector3 *maxs, int clipmask,
+	vector3 *velocity, qboolean tracePath, int ignoreEntNum, int enemyNum, float minSpeed, float maxSpeed,
+	float idealSpeed, qboolean mustHit
+);
 
-extern qboolean BG_CrouchAnim( int anim );
+qboolean BG_CrouchAnim( int anim );
 
 #define MELEE_DIST_SQUARED 6400//80*80
 #define MIN_LOB_DIST_SQUARED 65536//256*256

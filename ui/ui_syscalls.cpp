@@ -293,10 +293,10 @@ int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int
 	return Q_syscall( UI_CIN_PLAYCINEMATIC, arg0, xpos, ypos, width, height, bits );
 }
 cinState_t trap_CIN_StopCinematic( int handle ) {
-	return Q_syscall( UI_CIN_STOPCINEMATIC, handle );
+	return (cinState_t)Q_syscall( UI_CIN_STOPCINEMATIC, handle );
 }
 cinState_t trap_CIN_RunCinematic( int handle ) {
-	return Q_syscall( UI_CIN_RUNCINEMATIC, handle );
+	return (cinState_t)Q_syscall( UI_CIN_RUNCINEMATIC, handle );
 }
 void trap_CIN_DrawCinematic( int handle ) {
 	Q_syscall( UI_CIN_DRAWCINEMATIC, handle );

@@ -581,7 +581,7 @@ static int JPLua_Player_Give( lua_State *L ) {
 		}
 
 		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << id);
-	
+
 	}else if (!Q_stricmp( type, "ammo" )){
 		if (id == -1){
 			for (int i = 0; i < AMMO_MAX; i++ ) {
@@ -979,8 +979,8 @@ static int JPLua_Player_SetName( lua_State *L ) {
 
 	// announce if requested
 	if ( lua_toboolean( L, 3 ) == 1 ) {
-		trap->SendServerCommand( -1, va( "print \"%s"S_COLOR_WHITE" %s %s\n\"", oldName, G_GetStringEdString( "MP_SVGAME",
-			"PLRENAME" ), ent->client->pers.netname ) );
+		trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s %s\n\"", oldName,
+			G_GetStringEdString( "MP_SVGAME", "PLRENAME" ), ent->client->pers.netname ) );
 	}
 #endif
 	return 0;
@@ -1110,6 +1110,7 @@ static int JPLua_Player_Sleep(lua_State *L){
 	}else{
 		G_WakeClient(ent->client);
 	}
+#endif
 	return 0;
 }
 
@@ -1338,7 +1339,7 @@ static int JPLua_Player_SetAngles(lua_State *L){
 #ifdef _GAME
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	vector3 *vec = JPLua_CheckVector(L,3);
-	VectorCopy(vec, &g_entities[player->clientNum].client->ps.viewangles); 
+	VectorCopy(vec, &g_entities[player->clientNum].client->ps.viewangles);
 #endif
 	return 0;
 }
@@ -1411,7 +1412,7 @@ int JPLua_Player_GetMetaTable( lua_State *L ) {
 }
 
 
-static const struct jplua_player_func_s funcs [] = { 
+static const struct jplua_player_func_s funcs [] = {
 	{ "alive", JPLua_Player_IsAlive, NULL },
 	{ "anim", JPLua_Player_GetAnimations, NULL },
 	{ "angles", JPLua_Player_GetAngles, JPLua_Player_SetAngles },

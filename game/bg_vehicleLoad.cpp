@@ -31,10 +31,10 @@ void BG_ClearVehicleParseParms( void ) {
 
 #if defined(_GAME) || defined(_CGAME)
 //These funcs are actually shared in both projects
-extern void G_SetAnimalVehicleFunctions( vehicleInfo_t *pVehInfo );
-extern void G_SetSpeederVehicleFunctions( vehicleInfo_t *pVehInfo );
-extern void G_SetWalkerVehicleFunctions( vehicleInfo_t *pVehInfo );
-extern void G_SetFighterVehicleFunctions( vehicleInfo_t *pVehInfo );
+void G_SetAnimalVehicleFunctions( vehicleInfo_t *pVehInfo );
+void G_SetSpeederVehicleFunctions( vehicleInfo_t *pVehInfo );
+void G_SetWalkerVehicleFunctions( vehicleInfo_t *pVehInfo );
+void G_SetFighterVehicleFunctions( vehicleInfo_t *pVehInfo );
 #endif
 
 vehWeaponInfo_t g_vehWeaponInfo[MAX_VEH_WEAPONS];
@@ -1306,7 +1306,7 @@ const char *BG_GetVehicleSkinName( const char *skinname ) {
 #if defined(_GAME) || defined(_CGAME)
 //so cgame can assign the function pointer for the vehicle attachment without having to
 //bother with all the other funcs that don't really exist cgame-side.
-extern int BG_GetTime( void );
+int BG_GetTime( void );
 void AttachRidersGeneric( Vehicle_t *pVeh ) {
 	// If we have a pilot, attach him to the driver tag.
 	if ( pVeh->m_pPilot ) {

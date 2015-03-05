@@ -187,7 +187,7 @@ qboolean UI_SaberProperNameForSaber( const char *saberName, char *saberProperNam
 	if ( ret && stringedSaberName[0] == '@' )
 		trap->SE_GetStringTextString( &stringedSaberName[1], saberProperName, destsize );
 	else if ( !stringedSaberName[0] )
-		Q_strncpyz( saberProperName, va( S_COLOR_RED"<%s"S_COLOR_RED">", saberName ), destsize );
+		Q_strncpyz( saberProperName, va( S_COLOR_RED "<%s" S_COLOR_RED ">", saberName ), destsize );
 	else // no stringed so just use it as it
 		Q_strncpyz( saberProperName, stringedSaberName, destsize );
 

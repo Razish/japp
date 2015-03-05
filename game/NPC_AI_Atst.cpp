@@ -11,8 +11,6 @@
 #define LEFT_ARM_HEALTH 40
 #define RIGHT_ARM_HEALTH 40
 
-void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
-
 void NPC_ATST_Precache( void ) {
 	G_SoundIndex( "sound/chars/atst/atst_damaged1" );
 	G_SoundIndex( "sound/chars/atst/atst_damaged2" );

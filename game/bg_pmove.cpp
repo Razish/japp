@@ -24,14 +24,14 @@
 #define MAX_WEAPON_CHARGE_TIME 5000
 
 #ifdef _GAME
-extern void G_CheapWeaponFire( int entNum, int ev );
-extern qboolean TryGrapple( gentity_t *ent ); //g_cmds.c
+void G_CheapWeaponFire( int entNum, int ev );
+qboolean TryGrapple( gentity_t *ent ); //g_cmds.c
 #endif
 
-extern qboolean BG_FullBodyTauntAnim( int anim );
-extern float PM_WalkableGroundDistance( void );
-extern qboolean PM_GroundSlideOkay( float zNormal );
-extern saberInfo_t *BG_MySaber( int clientNum, int saberNum );
+qboolean BG_FullBodyTauntAnim( int anim );
+float PM_WalkableGroundDistance( void );
+qboolean PM_GroundSlideOkay( float zNormal );
+saberInfo_t *BG_MySaber( int clientNum, int saberNum );
 
 pmove_t *pm;
 pml_t pml;
@@ -2326,7 +2326,7 @@ static qboolean PM_CheckJump( void ) {
 			}
 		}
 		else {//in the air
-			animNumber_t legsAnim = pm->ps->legsAnim;
+			animNumber_t legsAnim = (animNumber_t)pm->ps->legsAnim;
 
 			if ( legsAnim == BOTH_WALL_RUN_LEFT || legsAnim == BOTH_WALL_RUN_RIGHT ) {//running on a wall
 				vector3 right, traceto, mins, maxs, fwdAngles;
@@ -3464,7 +3464,7 @@ static int PM_FootstepForSurface( void ) {
 	return (pml.groundTrace.surfaceFlags & MATERIAL_MASK);
 }
 
-extern qboolean PM_CanRollFromSoulCal( playerState_t *ps );
+qboolean PM_CanRollFromSoulCal( playerState_t *ps );
 static int PM_TryRoll( void ) {
 	trace_t	trace;
 	int		anim = -1;
@@ -4811,8 +4811,6 @@ qboolean PM_AdjustStandAnimForSlope( void ) {
 	return qtrue;
 }
 
-extern int WeaponReadyLegsAnim[WP_NUM_WEAPONS];
-
 //rww - slowly back out of slope leg anims, to prevent skipping between slope anims and general jittering
 int PM_LegsSlopeBackTransition( int desiredAnim ) {
 	int anim = pm->ps->legsAnim;
@@ -5431,9 +5429,9 @@ void PM_FinishWeaponChange( void ) {
 }
 
 #ifdef _GAME
-extern void WP_GetVehicleCamPos( gentity_t *ent, gentity_t *pilot, vector3 *camPos );
+void WP_GetVehicleCamPos( gentity_t *ent, gentity_t *pilot, vector3 *camPos );
 #else
-extern void CG_GetVehicleCamPos( vector3 *camPos );
+void CG_GetVehicleCamPos( vector3 *camPos );
 #endif
 #define MAX_XHAIR_DIST_ACCURACY	20000.0f
 int BG_VehTraceFromCamPos( trace_t *camTrace, bgEntity_t *bgEnt, const vector3 *entOrg, const vector3 *shotStart, const vector3 *end, vector3 *newEnd, vector3 *shotDir, float bestDist ) {
@@ -5883,7 +5881,7 @@ qboolean PM_CanSetWeaponAnims( void ) {
 }
 
 //perform player anim overrides while on vehicle.
-extern int PM_irand_timesync( int val1, int val2 );
+int PM_irand_timesync( int val1, int val2 );
 void PM_VehicleWeaponAnimate( void ) {
 	bgEntity_t *veh = pm_entVeh;
 	Vehicle_t *pVeh;
@@ -6121,7 +6119,7 @@ static qboolean BG_SPCartwheel( void ) {
 	return qfalse;
 }
 
-extern int PM_KickMoveForConditions( void );
+int PM_KickMoveForConditions( void );
 // Generates weapon events and modifies the weapon counter
 static void PM_Weapon( void ) {
 	int		addTime;
@@ -8191,7 +8189,7 @@ qboolean BG_InRoll2( entityState_t *es ) {
 }
 
 
-extern qboolean BG_SaberLockBreakAnim( int anim ); //bg_panimate.c
+qboolean BG_SaberLockBreakAnim( int anim ); //bg_panimate.c
 void BG_G2PlayerAngles( void *ghoul2, int motionBolt, entityState_t *cent, int time, vector3 *cent_lerpOrigin,
 	vector3 *cent_lerpAngles, vector3 legs[3], vector3 *legsAngles, qboolean *tYawing, qboolean *tPitching,
 	qboolean *lYawing, float *tYawAngle, float *tPitchAngle, float *lYawAngle, int frametime, vector3 *turAngles,
@@ -9019,8 +9017,8 @@ void BG_VehicleAdjustBBoxForOrientation( Vehicle_t *veh, vector3 *origin, vector
 	}
 }
 
-extern int BG_EmplacedView( vector3 *baseAngles, vector3 *angles, float *newYaw, float constraint );
-extern qboolean BG_FighterUpdate( Vehicle_t *pVeh, const usercmd_t *pUcmd, vector3 *trMins, vector3 *trMaxs, float gravity,
+int BG_EmplacedView( vector3 *baseAngles, vector3 *angles, float *newYaw, float constraint );
+qboolean BG_FighterUpdate( Vehicle_t *pVeh, const usercmd_t *pUcmd, vector3 *trMins, vector3 *trMaxs, float gravity,
 	void( *traceFunc )(trace_t *results, const vector3 *start, const vector3 *lmins, const vector3 *lmaxs, const vector3 *end, int passEntityNum, int contentMask) ); //FighterNPC.c
 
 #define JETPACK_HOVER_HEIGHT	64
@@ -10052,4 +10050,3 @@ void Pmove( pmove_t *pmove ) {
 		}
 	}
 }
-

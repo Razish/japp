@@ -312,7 +312,7 @@ qboolean NAVNEW_CheckDoubleBlock( gentity_t *self, gentity_t *blocker, vector3 *
 	return qfalse;
 }
 
-extern void CalcTeamDoorCenter( gentity_t *ent, vector3 *center );
+void CalcTeamDoorCenter( gentity_t *ent, vector3 *center );
 qboolean NAVNEW_ResolveEntityCollision( gentity_t *self, gentity_t *blocker, vector3 *movedir, vector3 *pathDir, qboolean setBlockedInfo ) {
 	vector3	blocked_dir;
 	float blocked_dist;

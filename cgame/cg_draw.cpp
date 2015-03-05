@@ -11,7 +11,7 @@
 #include "cg_media.h"
 #include "JAPP/jp_ssflags.h"
 
-extern float CG_RadiusForCent( centity_t *cent );
+float CG_RadiusForCent( centity_t *cent );
 qboolean CG_CalcMuzzlePoint( int entityNum, vector3 *muzzle );
 static void CG_DrawSiegeTimer( int timeRemaining, qboolean isMyTeam );
 static void CG_DrawSiegeDeathTimer( int timeRemaining );
@@ -3459,7 +3459,7 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 			for ( j = 0; j <= PW_NUM_POWERUPS; j++ ) {
 				if ( ci->powerups & (1 << j) ) {
 
-					item = BG_FindItemForPowerup( j );
+					item = BG_FindItemForPowerup( (powerup_t)j );
 
 					if ( item ) {
 						CG_DrawPic( xx + xOffset, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
@@ -3502,7 +3502,7 @@ static void CG_DrawPowerupIcons( int y ) {
 		if ( cg.snap->ps.powerups[j] > cg.time ) {
 			int secondsleft = (cg.snap->ps.powerups[j] - cg.time) / 1000;
 
-			item = BG_FindItemForPowerup( j );
+			item = BG_FindItemForPowerup( (powerup_t)j );
 
 			if ( item ) {
 				int icoShader = 0;
@@ -5018,7 +5018,7 @@ static void CG_DrawRocketLocking( int lockEntNum, int lockTime )
 	}
 }
 
-extern void CG_CalcVehMuzzle( Vehicle_t *pVeh, centity_t *ent, int muzzleNum );
+void CG_CalcVehMuzzle( Vehicle_t *pVeh, centity_t *ent, int muzzleNum );
 qboolean CG_CalcVehicleMuzzlePoint( int entityNum, vector3 *start, vector3 *d_f, vector3 *d_rt, vector3 *d_up ) {
 	centity_t *vehCent = &cg_entities[entityNum];
 	if ( vehCent->m_pVehicle && vehCent->m_pVehicle->m_pVehicleInfo->type == VH_WALKER ) {//draw from barrels
@@ -5402,10 +5402,16 @@ static void CG_DrawSpectator( void ) {
 		int size = 64;
 
 		if ( cgs.gametype == GT_POWERDUEL && cgs.duelist3 != -1 ) {
-			Com_sprintf( text, sizeof(text), "%s"S_COLOR_WHITE" %s %s"S_COLOR_WHITE" %s %s", cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString( "MP_INGAME", "SPECHUD_VERSUS" ), cgs.clientinfo[cgs.duelist2].name, CG_GetStringEdString( "MP_INGAME", "AND" ), cgs.clientinfo[cgs.duelist3].name );
+			Com_sprintf( text, sizeof(text), "%s" S_COLOR_WHITE " %s %s" S_COLOR_WHITE " %s %s",
+				cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString( "MP_INGAME", "SPECHUD_VERSUS" ),
+				cgs.clientinfo[cgs.duelist2].name, CG_GetStringEdString( "MP_INGAME", "AND" ),
+				cgs.clientinfo[cgs.duelist3].name
+			);
 		}
 		else {
-			Com_sprintf( text, sizeof(text), "%s"S_COLOR_WHITE" %s %s", cgs.clientinfo[cgs.duelist1].name, CG_GetStringEdString( "MP_INGAME", "SPECHUD_VERSUS" ), cgs.clientinfo[cgs.duelist2].name );
+			Com_sprintf( text, sizeof(text), "%s" S_COLOR_WHITE " %s %s", cgs.clientinfo[cgs.duelist1].name,
+				CG_GetStringEdString( "MP_INGAME", "SPECHUD_VERSUS" ), cgs.clientinfo[cgs.duelist2].name
+			);
 		}
 		CG_Text_Paint( (SCREEN_WIDTH / 2) - CG_Text_Width( text, 1.0f, 3 ) / 2, 420, 1.0f, &colorWhite, text, 0, 0, 0, 3 );
 

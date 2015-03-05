@@ -12,4 +12,4 @@ void Q3_Remove( int entID, const char *name );
 void Q3_Play( int taskID, int entID, const char *type, const char *name );
 int Q3_GetFloat( int entID, int type, const char *name, float *value );
 int Q3_GetVector( int entID, int type, const char *name, vector3 *value );
-int Q3_GetString( int entID, int type, const char *name, char **value );
+int Q3_GetString( int entID, int type, const char *name, const char **value );

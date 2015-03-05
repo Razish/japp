@@ -12,10 +12,10 @@
 #include "Ghoul2/G2.h"
 #include "cg_media.h"
 
-extern qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum );
-extern qboolean CG_VehicleWeaponImpact( centity_t *cent );
-extern qboolean CG_InFighter( void );
-extern qboolean CG_InATST( void );
+qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum );
+qboolean CG_VehicleWeaponImpact( centity_t *cent );
+qboolean CG_InFighter( void );
+qboolean CG_InATST( void );
 extern int cg_saberFlashTime;
 extern vector3 cg_saberFlashPos;
 extern char *showPowersName[];
@@ -597,7 +597,7 @@ void CG_PainEvent( centity_t *cent, int health ) {
 	cent->pe.painDirection ^= 1;
 }
 
-extern qboolean BG_GetRootSurfNameWithVariant( void *ghoul2, const char *rootSurfName, char *returnSurfName, int returnSize );
+qboolean BG_GetRootSurfNameWithVariant( void *ghoul2, const char *rootSurfName, char *returnSurfName, int returnSize );
 void CG_ReattachLimb( centity_t *source ) {
 	clientInfo_t *ci = NULL;
 
@@ -720,7 +720,7 @@ void CG_PrintCTFMessage( clientInfo_t *ci, const char *teamName, int ctfMessage 
 
 			if ( ci ) {
 				//Raz: Fix colour bleeding in CTF messages
-				Com_sprintf( printMsg, sizeof(printMsg), "%s"S_COLOR_WHITE" ", ci->name );
+				Com_sprintf( printMsg, sizeof(printMsg), "%s" S_COLOR_WHITE " ", ci->name );
 				strLen = strlen( printMsg );
 			}
 
@@ -749,7 +749,7 @@ void CG_PrintCTFMessage( clientInfo_t *ci, const char *teamName, int ctfMessage 
 
 	if ( ci ) {
 		//Raz: Fix colour bleeding in CTF messages
-		Com_sprintf( printMsg, sizeof(printMsg), "%s"S_COLOR_WHITE" %s", ci->name, psStringEDString );
+		Com_sprintf( printMsg, sizeof(printMsg), "%s" S_COLOR_WHITE " %s", ci->name, psStringEDString );
 	}
 	else {
 		Com_sprintf( printMsg, sizeof(printMsg), "%s", psStringEDString );
@@ -1074,7 +1074,7 @@ const char *CG_GetStringForVoiceSound( const char *s ) {
 
 #define	DEBUGNAME(x) if(cg_debugEvents.integer){trap->Print(x"\n");}
 
-extern void CG_ChatBox_AddString( char *chatStr ); //cg_draw.c
+void CG_ChatBox_AddString( char *chatStr ); //cg_draw.c
 
 // An entity has an event value
 // also called by CG_CheckPlayerstateEvents
@@ -2980,12 +2980,12 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 	case EV_DEBRIS:
 		DEBUGNAME( "EV_DEBRIS" );
 		CG_Chunks( es->owner, &es->origin, &es->angles, &es->origin2, &es->angles2, es->speed, es->eventParm,
-			es->trickedEntIndex[0], es->modelindex, es->apos.trBase.x );
+			(material_t)es->trickedEntIndex[0], es->modelindex, es->apos.trBase.x );
 		break;
 
 	case EV_MISC_MODEL_EXP:
 		DEBUGNAME( "EV_MISC_MODEL_EXP" );
-		CG_MiscModelExplosion( &es->origin2, &es->angles2, es->time, es->eventParm );
+		CG_MiscModelExplosion( &es->origin2, &es->angles2, es->time, (material_t)es->eventParm );
 		break;
 
 	case EV_PAIN:

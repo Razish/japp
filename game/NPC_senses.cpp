@@ -419,7 +419,9 @@ int G_CheckAlertEvents( gentity_t *self, qboolean checkSight, qboolean checkSoun
 	}
 
 	//get sound event
-	bestSoundEvent = G_CheckSoundEvents( self, maxHearDist, ignoreAlert, mustHaveOwner, minAlertLevel );
+	bestSoundEvent = G_CheckSoundEvents( self, maxHearDist, ignoreAlert, mustHaveOwner,
+		(alertEventLevel_t)minAlertLevel
+	);
 	//get sound event alert level
 	if ( bestSoundEvent >= 0 ) {
 		bestSoundAlert = level.alertEvents[bestSoundEvent].level;
@@ -427,10 +429,15 @@ int G_CheckAlertEvents( gentity_t *self, qboolean checkSight, qboolean checkSoun
 
 	//get sight event
 	if ( self->NPC ) {
-		bestSightEvent = G_CheckSightEvents( self, self->NPC->stats.hfov, self->NPC->stats.vfov, maxSeeDist, ignoreAlert, mustHaveOwner, minAlertLevel );
+		bestSightEvent = G_CheckSightEvents( self, self->NPC->stats.hfov, self->NPC->stats.vfov, maxSeeDist,
+			ignoreAlert, mustHaveOwner, (alertEventLevel_t)minAlertLevel
+		);
 	}
 	else {
-		bestSightEvent = G_CheckSightEvents( self, 80, 80, maxSeeDist, ignoreAlert, mustHaveOwner, minAlertLevel );//FIXME: look at cg_view to get more accurate numbers?
+		//FIXME: look at cg_view to get more accurate numbers?
+		bestSightEvent = G_CheckSightEvents( self, 80, 80, maxSeeDist, ignoreAlert, mustHaveOwner,
+			(alertEventLevel_t)minAlertLevel
+		);
 	}
 	//get sight event alert level
 	if ( bestSightEvent >= 0 ) {

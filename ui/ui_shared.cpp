@@ -12,7 +12,7 @@
 #include "anims.h"
 #include "Ghoul2/G2.h"
 extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
-extern void UI_UpdateCharacterSkin( void );
+void UI_UpdateCharacterSkin( void );
 
 #define SCROLL_TIME_START					500
 #define SCROLL_TIME_ADJUST					150
@@ -34,11 +34,11 @@ typedef struct scrollInfo_s {
 
 // Some extern functions hoisted from the middle of this file to get all the non-cgame,
 // non-namespace stuff together
-extern void UI_SaberDrawBlades( itemDef_t *item, vector3 *origin, vector3 *angles );
+void UI_SaberDrawBlades( itemDef_t *item, vector3 *origin, vector3 *angles );
 
-extern void UI_SaberLoadParms( void );
+void UI_SaberLoadParms( void );
 extern qboolean ui_saber_parms_parsed;
-extern void UI_CacheSaberGlowGraphics( void );
+void UI_CacheSaberGlowGraphics( void );
 
 #endif //
 
@@ -79,8 +79,8 @@ itemDef_t *Menu_SetNextCursorItem( menuDef_t *menu );
 static qboolean Menu_OverActiveItem( menuDef_t *menu, float x, float y );
 static void Item_TextScroll_BuildLines( itemDef_t* item );
 void Menu_SetItemText( const menuDef_t *menu, const char *itemName, const char *text );
-extern qboolean ItemParse_asset_model_go( itemDef_t *item, const char *name, int *runTimeLength );
-extern qboolean ItemParse_model_g2anim_go( itemDef_t *item, const char *animName );
+qboolean ItemParse_asset_model_go( itemDef_t *item, const char *name, int *runTimeLength );
+qboolean ItemParse_model_g2anim_go( itemDef_t *item, const char *animName );
 
 
 #ifdef _CGAME
@@ -4896,7 +4896,7 @@ void UI_ScaleModelAxis( refEntity_t	*ent ) {		// scale the model should we need 
 }
 
 #ifndef _CGAME
-extern void UI_SaberAttachToChar( itemDef_t *item );
+void UI_SaberAttachToChar( itemDef_t *item );
 #endif
 
 void Item_Model_Paint( itemDef_t *item ) {
@@ -6338,7 +6338,7 @@ typedef struct keywordHash_s {
 } keywordHash_t;
 
 static int KeywordHash_Key( const char *keyword ) {
-	register int hash, i;
+	int hash, i;
 
 	hash = 0;
 	for ( i = 0; keyword[i] != '\0'; i++ ) {

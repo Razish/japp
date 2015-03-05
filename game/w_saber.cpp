@@ -1038,7 +1038,7 @@ int G_SaberLockAnim( int attackerSaberStyle, int defenderSaberStyle, int topOrSi
 	return baseAnim;
 }
 
-extern qboolean BG_CheckIncrementLockAnim( int anim, int winOrLose ); //bg_saber.c
+qboolean BG_CheckIncrementLockAnim( int anim, int winOrLose ); //bg_saber.c
 #define LOCK_IDEAL_DIST_JKA 46.0f//all of the new saberlocks are 46.08f from each other because Richard Lico is da MAN
 
 static qboolean WP_SabersCheckLock2( gentity_t *attacker, gentity_t *defender, sabersLockMode_t lockMode ) {
@@ -2438,7 +2438,7 @@ Breaks the two saber paths into 2 tris each and tests each tri for the first sab
 FIXME: subdivide the arc into a consistant increment
 FIXME: test the intersection to see if the sabers really did intersect (weren't going in the same direction and/or passed through same point at different times)?
 */
-extern qboolean tri_tri_intersect( vector3 *V0, vector3 *V1, vector3 *V2, vector3 *U0, vector3 *U1, vector3 *U2 );
+qboolean tri_tri_intersect( vector3 *V0, vector3 *V1, vector3 *V2, vector3 *U0, vector3 *U1, vector3 *U2 );
 #define SABER_EXTRAPOLATE_DIST 16.0f
 qboolean WP_SabersIntersect( gentity_t *ent1, int ent1SaberNum, int ent1BladeNum, gentity_t *ent2, qboolean checkDir ) {
 	vector3	saberBase1, saberTip1, saberBaseNext1, saberTipNext1;
@@ -3104,8 +3104,7 @@ void WP_SaberDoHit( gentity_t *self, int saberNum, int bladeNum ) {
 	}
 }
 
-extern qboolean G_EntIsBreakable( int entityNum );
-extern void G_Knockdown( gentity_t *victim );
+qboolean G_EntIsBreakable( int entityNum );
 void WP_SaberRadiusDamage( gentity_t *ent, vector3 *point, float radius, int damage, float knockBack ) {
 	if ( !ent || !ent->client ) {
 		return;
@@ -6409,7 +6408,7 @@ void UpdateClientRenderinfo( gentity_t *self, vector3 *renderOrigin, vector3 *re
 }
 
 #define STAFF_KICK_RANGE 16
-extern void G_GetBoltPosition( gentity_t *self, int boltIndex, vector3 *pos, int modelIndex ); //NPC_utils.c
+void G_GetBoltPosition( gentity_t *self, int boltIndex, vector3 *pos, int modelIndex ); //NPC_utils.c
 
 static qboolean G_KickDownable( gentity_t *ent ) {
 	if ( !d_saberKickTweak.integer ) {

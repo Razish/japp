@@ -1,6 +1,6 @@
 #include "g_local.h"
 
-extern void G_MoverTouchPushTriggers( gentity_t *ent, vector3 *oldOrg );
+void G_MoverTouchPushTriggers( gentity_t *ent, vector3 *oldOrg );
 void G_StopObjectMoving( gentity_t *object );
 void pitch_roll_for_slope( gentity_t *forwhom, vector3 *pass_slope );
 

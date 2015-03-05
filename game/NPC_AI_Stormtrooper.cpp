@@ -2,18 +2,18 @@
 #include "g_nav.h"
 #include "anims.h"
 
-extern void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
-extern void AI_GroupUpdateSquadstates( AIGroupInfo_t *group, gentity_t *member, int newSquadState );
-extern qboolean AI_GroupContainsEntNum( AIGroupInfo_t *group, int entNum );
-extern void AI_GroupUpdateEnemyLastSeen( AIGroupInfo_t *group, vector3 *spot );
-extern void AI_GroupUpdateClearShotTime( AIGroupInfo_t *group );
-extern void NPC_TempLookTarget( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
-extern qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3 *maxs, int ignore, int clipmask );
-extern void ChangeWeapon( gentity_t *ent, int newWeapon );
-extern void NPC_CheckGetNewWeapon( void );
-extern int GetTime( int lastTime );
-extern void NPC_AimAdjust( int change );
-extern qboolean FlyingCreature( gentity_t *ent );
+void G_AddVoiceEvent( gentity_t *self, int event, int speakDebounceTime );
+void AI_GroupUpdateSquadstates( AIGroupInfo_t *group, gentity_t *member, int newSquadState );
+qboolean AI_GroupContainsEntNum( AIGroupInfo_t *group, int entNum );
+void AI_GroupUpdateEnemyLastSeen( AIGroupInfo_t *group, vector3 *spot );
+void AI_GroupUpdateClearShotTime( AIGroupInfo_t *group );
+void NPC_TempLookTarget( gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime );
+qboolean G_ExpandPointToBBox( vector3 *point, const vector3 *mins, const vector3 *maxs, int ignore, int clipmask );
+void ChangeWeapon( gentity_t *ent, int newWeapon );
+void NPC_CheckGetNewWeapon( void );
+int GetTime( int lastTime );
+void NPC_AimAdjust( int change );
+qboolean FlyingCreature( gentity_t *ent );
 
 #define	MAX_VIEW_DIST		1024
 #define MAX_VIEW_SPEED		250

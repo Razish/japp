@@ -1,8 +1,6 @@
 #include "b_local.h"
 #include "g_nav.h"
 
-extern void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath );
-
 #define MIN_DISTANCE		256
 #define MIN_DISTANCE_SQR	( MIN_DISTANCE * MIN_DISTANCE )
 

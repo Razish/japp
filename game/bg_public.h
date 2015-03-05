@@ -1760,6 +1760,7 @@ void BG_AttachToRancor( void *ghoul2, float rancYaw, vector3 *rancOrigin, int ti
 void BG_ClearRocketLock( playerState_t *ps );
 
 extern const int WeaponReadyAnim[WP_NUM_WEAPONS];
+extern const int WeaponReadyLegsAnim[WP_NUM_WEAPONS];
 extern const int WeaponAttackAnim[WP_NUM_WEAPONS];
 
 extern const int forcePowerDarkLight[NUM_FORCE_POWERS];
