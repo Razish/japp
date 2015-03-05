@@ -1069,7 +1069,8 @@ team_t PickTeam( int ignoreClientNum ) {
 }
 
 static qboolean IsSuffixed( const char *cleanName, int32_t *suffixNum ) {
-	char tmp[MAX_NETNAME], *s, *bracketL, *bracketR;
+	char tmp[MAX_NETNAME], *s;
+	const char *bracketL, *bracketR;
 	size_t len;
 
 	len = strlen( cleanName );
@@ -1098,13 +1099,13 @@ static qboolean IsSuffixed( const char *cleanName, int32_t *suffixNum ) {
 	}
 
 	// found the left bracket, let's get the number between here and the next bracket
-	for ( s = bracketL; s < bracketR; s++ ) {
+	for ( s = (char *)bracketL; s < bracketR; s++ ) {
 		// if it's not a number, discard it - the name is not suffixed
 		if ( !isdigit( *s ) ) {
 			return qfalse;
 		}
 
-		tmp[s-bracketL] = *s;
+		tmp[s - bracketL] = *s;
 	}
 
 	if ( suffixNum ) {

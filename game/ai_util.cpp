@@ -152,7 +152,7 @@ void B_CleanupAlloc( void ) {
 }
 
 int GetValueGroup( const char *buf, const char *group, char *outbuf ) {
-	char *place, *placesecond;
+	const char *place, *placesecond;
 	int failure;
 	int i;
 	int startpoint, startletter;

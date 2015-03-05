@@ -260,10 +260,9 @@ void CG_SetConfigValues( void ) {
 }
 
 void CG_ShaderStateChanged( void ) {
-	char *n, *t, originalShader[MAX_QPATH], newShader[MAX_QPATH], timeOffset[16];
-	const char *o;
-
-	o = CG_ConfigString( CS_SHADERSTATE );
+	char originalShader[MAX_QPATH], newShader[MAX_QPATH], timeOffset[16];
+	const char *n, *t;
+	const char *o = CG_ConfigString( CS_SHADERSTATE );
 	while ( o && *o ) {
 		n = strstr( o, "=" );
 		if ( n && *n ) {

@@ -8725,6 +8725,7 @@ float UI_Font_HeightPixels( const int iFontIndex, const float scale ) {
 	return (height / 4.0f) * scale;
 }
 
+extern "C" {
 Q_EXPORT uiExport_t* QDECL GetModuleAPI( int apiVersion, uiImport_t *import ) {
 	static uiExport_t uie = { 0 };
 
@@ -8809,4 +8810,5 @@ Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t ar
 	}
 
 	return -1;
+}
 }

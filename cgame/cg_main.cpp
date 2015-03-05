@@ -2232,6 +2232,7 @@ float CG_Font_HeightPixels( const int iFontIndex, const float scale ) {
 	return (height / 4.0f) * scale;
 }
 
+extern "C" {
 Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *import ) {
 	static cgameExport_t cge = { 0 };
 
@@ -2412,4 +2413,5 @@ Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t ar
 		break;
 	}
 	return -1;
+}
 }

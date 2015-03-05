@@ -287,10 +287,8 @@ static inline float __fctiw(float f) {
 // TYPE DEFINITIONS
 typedef unsigned char byte;
 
-enum qboolean_e {
-	qfalse = 0,
-	qtrue
-};
+static constexpr uint32_t qfalse = 0;
+static constexpr uint32_t qtrue = 1;
 typedef uint32_t qboolean;
 
 // 32 bit field aliasing

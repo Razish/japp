@@ -3232,6 +3232,7 @@ static qboolean	G_NAV_CheckNodeFailedForEnt( int entID, int nodeNum ) {
 }
 
 gameImport_t *trap = NULL;
+extern "C" {
 Q_EXPORT gameExport_t* QDECL GetModuleAPI( int apiVersion, gameImport_t *import ) {
 	static gameExport_t ge = { 0 };
 
@@ -3442,4 +3443,5 @@ Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t ar
 	}
 
 	return -1;
+}
 }

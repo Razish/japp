@@ -88,7 +88,6 @@ void Rancor_Move( qboolean visible ) {
 	}
 }
 
-void G_Dismember( gentity_t *ent, gentity_t *enemy, vector3 *point, int limbType, float limbRollBase, float limbPitchBase, int deathAnim, qboolean postDeath );
 float NPC_EntRangeFromBolt( gentity_t *targEnt, int boltIndex );
 int NPC_GetEntsNearBolt( int *radiusEnts, float radius, int boltIndex, vector3 *boltOrg );
 
