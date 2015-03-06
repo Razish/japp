@@ -847,7 +847,6 @@ extern siegeExtended_t	cg_siegeExtendedData[MAX_CLIENTS];
 extern int				cg_siegeWinTeam;
 extern weaponInfo_t		cg_weapons[MAX_WEAPONS];
 extern forceTicPos_t	forceTicPos[];
-extern const char		*modNames[];
 extern int				numSortedTeamPlayers;
 extern int				sortedTeamPlayers[TEAM_MAXOVERLAY];
 extern char				systemChat[256];

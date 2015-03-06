@@ -346,6 +346,7 @@
     <File Name="qcommon/q_shared.h"/>
     <File Name="qcommon/qfiles.h"/>
     <File Name="qcommon/md5.cpp"/>
+    <File Name="qcommon/md5.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="server">
     <File Name="server/server.h"/>

@@ -666,7 +666,7 @@ adminUser_t *AM_ChecksumLogin( const char *checksum ) {
 
 		// insert non-transmittable character so a user/pass of x/yz won't match xy/z
 		Com_sprintf( combined, sizeof(combined), "%s%s", user->user, user->password );
-		Q_ChecksumMD5( combined, strlen( combined ), thisChecksum );
+		Crypto::ChecksumMD5( combined, strlen( combined ), thisChecksum );
 		if ( !strcmp( thisChecksum, checksum ) ) {
 			result = user;
 			count++;

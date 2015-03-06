@@ -305,31 +305,12 @@ typedef int32_t qhandle_t, fxHandle_t, sfxHandle_t, fileHandle_t, clipHandle_t;
 #define NULL_HANDLE ((qhandle_t)0)
 #define NULL_FILE ((fileHandle_t)0)
 
-//Raz: can't think of a better place to put this atm,
-//		should probably be in the platform specific definitions
-#if defined (_MSC_VER) && (_MSC_VER >= 1600)
-
-// vsnprintf is ISO/IEC 9899:1999
-// abstracting this to make it portable
-int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
-
-#elif defined (_MSC_VER)
+//FIXME: can't think of a better place to put this atm, should probably be in the platform specific definitions
+#if defined (_MSC_VER) && (_MSC_VER < 1600)
 
 #include <io.h>
 
-typedef signed __int64 int64_t;
-typedef signed __int32 int32_t;
-typedef signed __int16 int16_t;
-typedef signed __int8  int8_t;
-typedef unsigned __int64 uint64_t;
-typedef unsigned __int32 uint32_t;
-typedef unsigned __int16 uint16_t;
-typedef unsigned __int8  uint8_t;
-
-// vsnprintf is ISO/IEC 9899:1999
-// abstracting this to make it portable
-int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
-#else // not using MSVC
+#else // _MSC_VER
 
 #define Q_vsnprintf vsnprintf
 

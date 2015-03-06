@@ -13,7 +13,7 @@ void Jedi_Cloak( gentity_t *self );
 
 void Q3_SetParm( int entID, int parmNum, const char *parmValue );
 team_t TranslateTeamName( const char *name );
-extern char	*TeamNames[TEAM_NUM_TEAMS];
+extern const char h*TeamNames[TEAM_NUM_TEAMS];
 
 void PM_SetTorsoAnimTimer( gentity_t *ent, int *torsoAnimTimer, int time );
 void PM_SetLegsAnimTimer( gentity_t *ent, int *legsAnimTimer, int time );

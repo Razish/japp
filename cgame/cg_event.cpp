@@ -18,7 +18,7 @@ qboolean CG_InFighter( void );
 qboolean CG_InATST( void );
 extern int cg_saberFlashTime;
 extern vector3 cg_saberFlashPos;
-extern char *showPowersName[];
+extern const char *showPowersName[];
 
 extern int cg_siegeDeathTime;
 extern int cg_siegeDeathDelay;

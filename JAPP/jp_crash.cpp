@@ -705,7 +705,7 @@ static void JP_Crash_DisAsm( struct _EXCEPTION_POINTERS *EI, fileHandle_t f ) {
 	int showsource = 0;
 	unsigned int lastsourceaddr = 0;
 	char modname[260];
-	PIMAGEHLP_SYMBOL sym = malloc( 1024 );
+	PIMAGEHLP_SYMBOL sym = (PIMAGEHLP_SYMBOL)malloc( 1024 );
 	IMAGEHLP_LINE line;
 	MEMORY_BASIC_INFORMATION mem = { 0 };
 	memset( sym, 0, 1024 );
@@ -854,7 +854,7 @@ void JP_Crash_HandleStackFrame( STACKFRAME *sf ) {
 static void JP_Crash_BackTrace( struct _EXCEPTION_POINTERS *EI, fileHandle_t f ) {
 	HANDLE proc, thread;
 	int frameok;
-	PIMAGEHLP_SYMBOL sym = malloc( 1024 );
+	PIMAGEHLP_SYMBOL sym = (PIMAGEHLP_SYMBOL)malloc( 1024 );
 	IMAGEHLP_LINE line;
 	STACKFRAME sf;
 	char ModName[260];

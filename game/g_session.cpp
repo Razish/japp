@@ -33,7 +33,7 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 		char combined[MAX_STRING_CHARS] = { '\0' };
 		Com_sprintf( combined, sizeof(combined), "%s%s",
 			client->pers.adminUser->user, client->pers.adminUser->password );
-		Q_ChecksumMD5( combined, strlen( combined ), checksum );
+		Crypto::ChecksumMD5( combined, strlen( combined ), checksum );
 		cJSON_AddStringToObject( root, "admin", checksum );
 	}
 	cJSON_AddBooleanToObject( root, "empowered", !!client->pers.adminData.empowered );

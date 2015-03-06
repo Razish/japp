@@ -364,7 +364,7 @@ static void WP_FireBlaster( gentity_t *ent, qboolean altFire ) {
 
 
 
-int G_GetHitLocation( gentity_t *target, vector3 *ppoint );
+hitLocation_t G_GetHitLocation( gentity_t *target, vector3 *ppoint );
 
 static void WP_DisruptorMainFire( gentity_t *ent ) {
 	int			damage = DISRUPTOR_MAIN_DAMAGE;
