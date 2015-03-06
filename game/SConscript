@@ -15,6 +15,7 @@ files = [
 	'game/bg_lua.cpp',
 	'game/bg_luacvar.cpp',
 	'game/bg_luaevent.cpp',
+	'game/bg_luafs.cpp',
 	'game/bg_lualogger.cpp',
 	'game/bg_luaplayer.cpp',
 	'game/bg_luaserialiser.cpp',

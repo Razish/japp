@@ -13,6 +13,7 @@ extern "C" {
 #include "cg_luaserver.h"
 #endif
 #include "bg_luavector.h"
+#include "bg_luafs.h"
 
 #ifdef JPLUA
 
