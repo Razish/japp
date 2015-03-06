@@ -249,6 +249,8 @@
     <File Name="game/ai_main.cpp"/>
     <File Name="game/NPC_AI_Howler.cpp"/>
     <File Name="game/g_smartentities.cpp"/>
+    <File Name="game/bg_luafs.cpp"/>
+    <File Name="game/bg_luafs.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="json">
     <File Name="json/cJSON.c"/>
