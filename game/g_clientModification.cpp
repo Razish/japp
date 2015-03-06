@@ -11,6 +11,7 @@ const char *supportFlagNames[CSF_NUM] = {
 	"CSF_SCOREBOARD_KD",		// Can correctly parse scoreboard messages with extra K/D information
 	"CSF_CHAT_FILTERS",			// Can correctly parse chat messages with proper delimiters
 	"CSF_FIXED_WEAPON_ANIMS",	// Fixes the missing concussion rifle animations
+	"CSF_WEAPONDUEL"			// Allow using any weapon in a duel
 };
 
 const char *clientPluginDisableNames[CPD_NUM] = {
