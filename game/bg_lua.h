@@ -14,6 +14,9 @@ extern "C" {
 #endif
 #include "bg_luavector.h"
 #include "bg_luafs.h"
+#ifdef _GAME
+#include "g_luasql.h"
+#endif
 
 #ifdef JPLUA
 

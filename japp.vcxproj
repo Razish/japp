@@ -68,6 +68,7 @@
     <ClInclude Include="game\g_chatFilters.h" />
     <ClInclude Include="game\g_ICARUScb.h" />
     <ClInclude Include="game\g_local.h" />
+    <ClInclude Include="game\g_luasql.h" />
     <ClInclude Include="game\g_nav.h" />
     <ClInclude Include="game\g_public.h" />
     <ClInclude Include="game\g_team.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="game\g_ICARUScb.cpp" />
     <ClCompile Include="game\g_items.cpp" />
     <ClCompile Include="game\g_log.cpp" />
+    <ClCompile Include="game\g_luamysql.cpp" />
     <ClCompile Include="game\g_main.cpp" />
     <ClCompile Include="game\g_mem.cpp" />
     <ClCompile Include="game\g_misc.cpp" />
@@ -365,7 +367,7 @@
     <NMakeBuildCommandLine>scons.bat -Q debug=1</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>scons.bat -Q -c  debug=1</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>.;game;cgame;ui</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>.;game;cgame;ui;mysql;</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>scons.bat -Q</NMakeBuildCommandLine>

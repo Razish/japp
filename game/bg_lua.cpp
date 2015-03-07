@@ -961,6 +961,9 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "AddListener", JPLua_Event_AddListener }, // AddListener( string name, function listener )
 	{ "AddServerCommand", JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
 	{ "CreateCvar", JPLua_CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
+#ifdef _GAME
+	{ "ConnectToDB", JPLua_MySQL_Open},
+#endif
 #ifdef _CGAME
 	{ "DrawPic", JPLua_Export_DrawPic }, // DrawPic( float x, float y, float width, float height, table { float r, float g, float b, float a }, integer shaderHandle )
 	{ "DrawRect", JPLua_Export_DrawRect }, // DrawRect( float x, float y, float width, float height, table { float r, float g, float b, float a } )
@@ -1092,6 +1095,9 @@ void JPLua_Init( void ) {
 	JPLua_Register_Serialiser( JPLua.state );
 	JPLua_Register_Vector( JPLua.state );
 	JPLua_Register_File( JPLua.state );
+#ifdef _GAME
+	JPLua_Register_MySQL(JPLua.state);
+#endif
 
 	// -- FRAMEWORK INITIALISATION begin
 	lua_getglobal( JPLua.state, "tostring" );	JPLua_Framework[JPLUA_FRAMEWORK_TOSTRING] = luaL_ref( JPLua.state, LUA_REGISTRYINDEX );

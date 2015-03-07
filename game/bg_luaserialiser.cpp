@@ -275,6 +275,7 @@ jplua_serialiser_t *JPLua_CheckSerialiser( lua_State *L, int idx ) {
 
 static const struct luaL_Reg jplua_serialiser_meta[] = {
 	{ "__tostring", JPLua_Serialiser_ToString },
+	{ "__gc", JPLua_Serialiser_Close },
 	{ "AddTable", JPLua_Serialiser_AddTable },
 	{ "ReadTable", JPLua_Serialiser_GetTable },
 	{ "Close", JPLua_Serialiser_Close },

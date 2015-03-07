@@ -6,6 +6,14 @@
 #include "bg_lua.h"
 
 #ifdef JPLUA
+
+static const char *fsmodes[FS_APPEND_SYNC + 1] = {
+	"Read",
+	"Write",
+	"Append",
+	"Append(Sync)"
+};
+
 static const char FILE_META[] = "File.meta";
 
 jplua_file_t *JPLua_CheckFile( lua_State *L, int idx ) {
@@ -120,14 +128,25 @@ static int JPLua_File_Close( lua_State *L ) {
 
 static int JPLua_File_Length( lua_State *L ) {
 	jplua_file_t *file = JPLua_CheckFile( L, 1 );
-	if ( !file->handle ) {
+	if (!file->handle) {
 		return 0;
 	}
 	lua_pushinteger( L, file->length );
 	return 1;
 }
 
+static int JPLua_File_ToString(lua_State *L){
+	jplua_file_t *file = JPLua_CheckFile(L, 1);
+	if (!file->handle) {
+		return 0;
+	}
+	lua_pushfstring(L, "File ( Path: %s || Mode: %s )", file->name, fsmodes[file->mode]);
+	return 1;
+}
+
 static const struct luaL_Reg jplua_file_meta[] = {
+	{ "__gc", JPLua_File_Close },
+	{ "__tostring", JPLua_File_ToString },
 	{ "Read", JPLua_File_Read },
 	{ "Write", JPLua_File_Write },
 	{ "Close", JPLua_File_Close },

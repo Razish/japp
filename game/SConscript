@@ -43,6 +43,7 @@ files = [
 	'game/g_ICARUScb.cpp',
 	'game/g_items.cpp',
 	'game/g_log.cpp',
+	'game/g_luamysql.cpp',
 	'game/g_main.cpp',
 	'game/g_mem.cpp',
 	'game/g_misc.cpp',
@@ -129,12 +130,15 @@ game_env['LIBS'] = [
 		exports = [ 'arch', 'bits', 'build_dir', 'configuration', 'env', 'plat' ]
 	) for lib in libraries
 ]
+game_env['LIBS'] += [ 'advapi32' ]
+game_env['LIBS'] += [ 'mysql/mysqlclient' ]
 
 if plat == 'Windows' and bits == 32:
 	game_env['LIBS'] += [ 'user32' ]
 
 # project settings
 game_env['CPPPATH'] += [ '#/game' ]
+game_env['CPPPATH'] += [ '#/mysql' ]
 game_env['CPPDEFINES'] += [ '_GAME', 'JPLUA' ]
 if plat == 'Linux':
 	game_env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
