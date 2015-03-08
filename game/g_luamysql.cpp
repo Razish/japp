@@ -54,11 +54,11 @@ static int JPLua_MySQLResult_ToString(lua_State *L){
 int JPLua_MySQL_Open(lua_State *L)
 {
 	MYSQL *conn;
-	const char *host = luaL_checkstring(L,1);
-	const char *user = luaL_checkstring(L,2);
-	const char *db = luaL_checkstring(L,3);
-	const char *password = luaL_checkstring(L,4);
-	int port = luaL_checkinteger(L,5);
+	const char *host = luaL_checkstring(L,2);
+	const char *user = luaL_checkstring(L,3);
+	const char *db = luaL_checkstring(L,4);
+	const char *password = luaL_checkstring(L,5);
+	int port = luaL_checkinteger(L,6);
 
 	conn = (MYSQL *)lua_newuserdata(L, sizeof(MYSQL));
 

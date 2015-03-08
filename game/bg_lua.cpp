@@ -951,6 +951,22 @@ static int JPLua_Export_WorldCoordToScreenCoord( lua_State *L ) {
 }
 #endif
 
+#ifdef _GAME
+static int JPLua_ConnectToDB(lua_State *L){
+	int type = luaL_checkinteger(L, 1);
+	switch (type){
+	case 1: ///MySQL
+		return JPLua_MySQL_Open(L);
+	case 2: ///SQLite
+		return JPLua_SQLite_Open(L);
+	default:
+		lua_pushnil(L);
+		return 1;
+	}
+}
+
+#endif
+
 static const jplua_cimport_table_t JPLua_CImports[] = {
 #ifdef _GAME
 	{ "AddClientCommand", JPLua_Export_AddClientCommand }, // AddClientCommand( string cmd )
@@ -962,7 +978,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "AddServerCommand", JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
 	{ "CreateCvar", JPLua_CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
 #ifdef _GAME
-	{ "ConnectToDB", JPLua_MySQL_Open},
+	{ "ConnectToDB", JPLua_ConnectToDB}, // ConnectToDB ( int type(1 - MySQL , 2 - SQLite), ...) // SQLite (type, string path) || MySQL ( type, string host, string user, string db, string password, int port )
 #endif
 #ifdef _CGAME
 	{ "DrawPic", JPLua_Export_DrawPic }, // DrawPic( float x, float y, float width, float height, table { float r, float g, float b, float a }, integer shaderHandle )
@@ -1097,6 +1113,7 @@ void JPLua_Init( void ) {
 	JPLua_Register_File( JPLua.state );
 #ifdef _GAME
 	JPLua_Register_MySQL(JPLua.state);
+	JPLua_Register_SQLite(JPLua.state);
 #endif
 
 	// -- FRAMEWORK INITIALISATION begin

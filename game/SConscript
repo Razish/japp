@@ -44,6 +44,8 @@ files = [
 	'game/g_items.cpp',
 	'game/g_log.cpp',
 	'game/g_luamysql.cpp',
+	'sqlite/sqlite3.c',
+	'game/g_luasqlite.cpp',
 	'game/g_main.cpp',
 	'game/g_mem.cpp',
 	'game/g_misc.cpp',
@@ -139,6 +141,7 @@ if plat == 'Windows' and bits == 32:
 # project settings
 game_env['CPPPATH'] += [ '#/game' ]
 game_env['CPPPATH'] += [ '#/mysql' ]
+game_env['CPPPATH'] += [ '#/sqlite' ]
 game_env['CPPDEFINES'] += [ '_GAME', 'JPLUA' ]
 if plat == 'Linux':
 	game_env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]

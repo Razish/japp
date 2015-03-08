@@ -219,6 +219,7 @@
     <ClCompile Include="game\g_items.cpp" />
     <ClCompile Include="game\g_log.cpp" />
     <ClCompile Include="game\g_luamysql.cpp" />
+    <ClCompile Include="game\g_luasqlite.cpp" />
     <ClCompile Include="game\g_main.cpp" />
     <ClCompile Include="game\g_mem.cpp" />
     <ClCompile Include="game\g_misc.cpp" />
@@ -329,6 +330,7 @@
     <ClCompile Include="lua\lzio.c" />
     <ClCompile Include="qcommon\q_math.cpp" />
     <ClCompile Include="qcommon\q_shared.cpp" />
+    <ClCompile Include="sqlite\sqlite3.c" />
     <ClCompile Include="ui\ui_atoms.cpp" />
     <ClCompile Include="ui\ui_cvar.cpp" />
     <ClCompile Include="ui\ui_force.cpp" />
@@ -367,7 +369,7 @@
     <NMakeBuildCommandLine>scons.bat -Q debug=1</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>scons.bat -Q -c  debug=1</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>.;game;cgame;ui;mysql;</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>.;game;cgame;ui;mysql;sqlite;</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>scons.bat -Q</NMakeBuildCommandLine>
