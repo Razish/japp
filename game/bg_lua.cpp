@@ -203,12 +203,21 @@ void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize ) {
 	return;
 }
 
+extern int lastluaid;
 static int JPLua_Export_Print( lua_State *L ) {
 	char buf[16384] = { 0 };
 
 	JPLua_Util_ArgAsString( L, buf, sizeof(buf) );
-	trap->Print( "%s\n", buf );
-
+#ifdef _GAME
+	if (lastluaid == -1){
+#endif
+		trap->Print("%s\n", buf);
+#ifdef _GAME
+	}
+	else{
+		trap->SendServerCommand(lastluaid,va("print \"%s\n\"", buf));
+	}
+#endif
 	return 0;
 }
 

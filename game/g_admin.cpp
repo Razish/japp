@@ -21,6 +21,7 @@ static adminUser_t *adminUsers = NULL;
 static telemark_t *telemarks = NULL;
 static qboolean telemarksVisible = qfalse;
 static int effectid = 0;
+int lastluaid = -1;
 
 static void AM_ConsolePrint( const gentity_t *ent, const char *msg ) {
 	if ( ent ) {
@@ -2422,12 +2423,14 @@ static void AM_Lua( gentity_t *ent ) {
 	args = ConcatArgs( 1 );
 
 	G_LogPrintf( level.log.admin, "\t%s executed lua code \"%s\"\n", G_PrintClient( ent-g_entities ), args );
+	lastluaid = ent->s.number;
 	if ( luaL_dostring( JPLua.state, args ) != 0 )
 		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_RED "Lua Error: %s\n\"",
 			lua_tostring( JPLua.state, -1 ) ) );
 #else
 	trap->SendServerCommand( ent - g_entities, "print \"Lua is not supported on this server\n\"" );
 #endif
+	lastluaid = -1;
 }
 
 static void AM_ReloadLua( gentity_t *ent ) {
