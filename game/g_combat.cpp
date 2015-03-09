@@ -3465,7 +3465,9 @@ void G_Knockdown( gentity_t *victim ) {
 	if ( victim && victim->client && BG_KnockDownable( &victim->client->ps ) ) {
 		victim->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
 		victim->client->ps.forceDodgeAnim = 0;
-		victim->client->ps.forceHandExtendTime = level.time + 1100;
+		if (!victim->client->pers.adminData.isSlept){
+			victim->client->ps.forceHandExtendTime = level.time + 1100;
+		}
 		victim->client->ps.quickerGetup = qfalse;
 	}
 }
