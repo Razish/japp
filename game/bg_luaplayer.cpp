@@ -1374,6 +1374,80 @@ static int JPLua_Player_GetAdminData(lua_State *L){
 #endif
 
 
+static int JPLua_Player_GetJetpackFuel(lua_State *L){
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+#ifdef _GAME
+	gentity_t *ent = &g_entities[player->clientNum];
+	lua_pushinteger(L, ent->client->ps.jetpackFuel);
+#elif defined (_CGAME)
+	lua_pushinteger(L, cg.predictedPlayerState.jetpackFuel);
+#endif
+	return 1;
+}
+
+static int JPLua_Player_SetJetpackFuel(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	ent->client->ps.jetpackFuel = luaL_checkinteger(L,3);
+#endif
+	return 0;
+}
+
+static int JPLua_Player_GetCloakFuel(lua_State *L){
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+#ifdef _GAME
+	gentity_t *ent = &g_entities[player->clientNum];
+	lua_pushinteger(L, ent->client->ps.cloakFuel);
+#elif defined (_CGAME)
+	lua_pushinteger(L, cg.predictedPlayerState.cloakFuel);
+#endif
+	return 1;
+}
+
+static int JPLua_Player_SetCloakFuel(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	ent->client->ps.cloakFuel = luaL_checkinteger(L,3);
+#endif
+	return 0;
+}
+
+static int JPLua_Player_IsCloaked( lua_State *L){
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+#ifdef _GAME
+	gentity_t *ent = &g_entities[player->clientNum];
+	if ( ent->client->ps.powerups[PW_CLOAKED] ){
+#elif defined (_CGAME)
+	if (cg.predictedPlayerState.powerups[PW_CLOAKED]){
+#endif
+		lua_pushboolean(L, qtrue);
+	}else{
+		lua_pushboolean(L, qfalse);
+	}
+	return 1;
+}
+
+#ifdef _GAME
+void Jedi_Cloak(gentity_t *self);
+void Jedi_Decloak(gentity_t *self);
+#endif
+
+static int JPLua_Player_SetCloak(lua_State *L){
+#ifdef _GAME
+	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
+	gentity_t *ent = &g_entities[player->clientNum];
+	qboolean value = lua_toboolean(L,3);
+
+	if (value && !ent->client->ps.powerups[PW_CLOAKED]){
+		Jedi_Cloak( ent );
+	}else{
+		Jedi_Decloak( ent );
+	}
+#endif
+	return 0;
+}
 
 // Push a Player instance for a client number onto the stack
 void JPLua_Player_CreateRef( lua_State *L, int num ) {
@@ -1416,6 +1490,8 @@ static const struct jplua_player_func_s funcs [] = {
 	{ "ammo", JPLua_Player_GetAmmo, NULL},
 	{ "armor", JPLua_Player_GetArmor, JPLua_Player_SetArmor },
 	{ "bot", JPLua_Player_IsBot, NULL },
+	{ "cloaked", JPLua_Player_IsCloaked, JPLua_Player_SetCloak},
+	{ "cloakfuel", JPLua_Player_GetCloakFuel, JPLua_Player_SetCloakFuel},
 	{ "duelpartner", JPLua_Player_GetDuelingPartner, NULL},
 	{ "eflags", JPLua_Player_GetEFlags, JPLua_Player_SetEFlag },
 	{ "eflags2", JPLua_Player_GetEFlags2, JPLua_Player_SetEFlag2 },
@@ -1434,6 +1510,7 @@ static const struct jplua_player_func_s funcs [] = {
 #endif
 	{ "isdueling", JPLua_Player_IsDueling, NULL},
 	{ "isholstered", JPLua_Player_IsWeaponHolstered, NULL},
+	{ "jetpackfuel", JPLua_Player_GetJetpackFuel, JPLua_Player_SetJetpackFuel},
 #ifdef _CGAME
 	{ "lastpickup", JPLua_Player_GetLastPickup, NULL},
 #endif
