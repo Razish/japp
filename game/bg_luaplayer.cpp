@@ -585,7 +585,7 @@ static int JPLua_Player_Give( lua_State *L ) {
 				ent->client->ps.ammo[i] = ammoMax[i];
 			}
 		}
-		if ( id <= 0 ||id >= AMMO_MAX ){
+		if ( id <= AMMO_NONE ||id >= AMMO_MAX ){
 			return 0;
 		}
 
