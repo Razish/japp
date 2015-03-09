@@ -3,6 +3,7 @@
 #include "cg_local.h"
 #include "ui/ui_shared.h"
 #include "cg_media.h"
+#include "bg_luaevent.h"
 
 #define MAX_LOADING_PLAYER_ICONS	16
 #define MAX_LOADING_ITEM_ICONS		26
@@ -74,8 +75,12 @@ void CG_DrawInformation( void ) {
 	char buf[MAX_STRING_CHARS];
 	int iPropHeight = 18;
 
+	if (JPLua_Event_ConnectScreen())
+		return;
+
 	info = CG_ConfigString( CS_SERVERINFO );
 	sysInfo = CG_ConfigString( CS_SYSTEMINFO );
+
 
 	s = Info_ValueForKey( info, "mapname" );
 	levelshot = trap->R_RegisterShaderNoMip( va( "levelshots/%s", s ) );

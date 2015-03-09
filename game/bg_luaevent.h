@@ -19,6 +19,7 @@ typedef enum jplua_event_e {
 	JPLUA_EVENT_CLIENTUSERINFOCHANGED,
 	JPLUA_EVENT_HUD,
 	JPLUA_EVENT_VEHICLEHUD,
+	JPLUA_EVENT_CONNECTSCREEN,
 	JPLUA_EVENT_PAIN,
 	JPLUA_EVENT_PLAYERDEATH,
 	JPLUA_EVENT_SABERTOUCH,
@@ -73,6 +74,10 @@ qboolean JPLua_Event_HUD( void );
 
 #ifdef _CGAME
 qboolean JPLua_Event_VehicleHUD( void );
+#endif
+
+#ifdef _CGAME
+qboolean JPLua_Event_ConnectScreen( void );
 #endif
 
 #if defined(_GAME)

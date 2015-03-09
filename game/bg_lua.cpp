@@ -964,8 +964,60 @@ static int JPLua_ConnectToDB(lua_State *L){
 		return 1;
 	}
 }
-
 #endif
+static int JPLua_GetConfigString(lua_State *L){
+	int type = luaL_checkinteger(L, 1);
+#ifdef _CGAME
+	const char *info = CG_ConfigString(type);
+#elif defined (_GAME)
+	char info[MAX_INFO_STRING] = { '\0' };
+	trap->GetConfigstring(type, info, sizeof(info));
+#endif
+	if (!info[0]){
+		lua_pushnil(L);
+		return 1;
+	}
+	JPLua_PushInfostring(L, info);
+	return 1;
+}
+
+#ifdef _GAME
+static int JPLua_SetConfigString(lua_State *L){
+	int type = luaL_checkinteger(L, 1);
+	const char *value = luaL_checkstring(L, 2);
+	trap->SetConfigstring(type, value);
+	return 0;
+}
+#endif
+
+#ifdef _CGAME
+static int JPLua_GetGLConfig(lua_State *L){
+	glconfig_t config;
+	int top;
+
+	trap->GetGlconfig(&config);
+
+	lua_newtable(L);
+	top = lua_gettop(L);
+	lua_pushstring(L, "renderer"); lua_pushstring(L, config.renderer_string); lua_settable(L, top);
+	lua_pushstring(L, "vendor"); lua_pushstring(L, config.vendor_string); lua_settable(L, top);
+	lua_pushstring(L, "version"); lua_pushstring(L, config.version_string); lua_settable(L, top);
+	lua_pushstring(L, "extensions"); lua_pushstring(L, config.extensions_string); lua_settable(L, top);
+
+	lua_pushstring(L, "colorbits"); lua_pushinteger(L, config.colorBits); lua_settable(L, top);
+	lua_pushstring(L, "depthbits"); lua_pushinteger(L, config.depthBits); lua_settable(L, top);
+	lua_pushstring(L, "stencilBits"); lua_pushinteger(L, config.stencilBits); lua_settable(L, top);
+
+	lua_pushstring(L, "width"); lua_pushinteger(L, config.vidWidth); lua_settable(L, top);
+	lua_pushstring(L, "height"); lua_pushinteger(L, config.vidHeight); lua_settable(L, top);
+	lua_pushstring(L, "frequency"); lua_pushinteger(L, config.displayFrequency); lua_settable(L, top);
+
+	lua_pushstring(L, "fullscreen"); lua_pushboolean(L, config.isFullscreen); lua_settable(L, top);
+
+	return 1;
+}
+#endif
+
 
 static const jplua_cimport_table_t JPLua_CImports[] = {
 #ifdef _GAME
@@ -988,13 +1040,15 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "Font_StringHeightPixels", JPLua_Export_Font_StringHeightPixels }, // integer Font_StringHeightPixels( integer fontHandle, float scale )
 	{ "Font_StringLengthPixels", JPLua_Export_Font_StringLengthPixels }, // integer Font_StringLengthPixels( string str, integer fontHandle, float scale )
 #endif
+	{ "GetConfigString", JPLua_GetConfigString }, // table GetConfigString()
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
-	{ "GetFileList", JPLua_File_GetFileList},
+	{ "GetFileList", JPLua_File_GetFileList}, // table GetFileList(string path, string extension)
 #ifdef _CGAME
 	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
 #endif
 	{ "GetGameType", JPLua_Export_GetGameType }, // integer GetGameType()
 #ifdef _CGAME
+	{ "GetGLConfig", JPLua_GetGLConfig }, // table GetGLConfig()
 	{ "GetKeyCatcher", JPLua_Export_GetKeyCatcher }, // integer GetKeyCatcher()
 #endif
 	{ "GetLogger", JPLua_GetLogger }, // Logger GetLogger( string filename )
@@ -1029,6 +1083,9 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "SendConsoleCommand", JPLua_Export_SendConsoleCommand }, // SendConsoleCommand( string command )
 #ifdef _GAME
 	{ "SendReliableCommand", JPLua_Export_SendReliableCommand }, // SendReliableCommand( integer clientNum, string cmd )
+#endif
+#ifdef _GAME
+	{ "SetConfigString", JPLua_SetConfigString}, // SetConfigString(integer type ( CS_SYSTEMINFO + i ) , value)
 #endif
 #ifdef _CGAME
 	{ "SendServerCommand", JPLua_Export_SendServerCommand }, // SendServerCommand( string command )

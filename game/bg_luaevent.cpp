@@ -21,6 +21,7 @@ static const stringID_table_t jplua_events[JPLUA_EVENT_MAX] = {
 	ENUM2STRING( JPLUA_EVENT_CLIENTUSERINFOCHANGED ),
 	ENUM2STRING( JPLUA_EVENT_HUD ),
 	ENUM2STRING( JPLUA_EVENT_VEHICLEHUD),
+	ENUM2STRING( JPLUA_EVENT_CONNECTSCREEN),
 	ENUM2STRING( JPLUA_EVENT_PAIN ),
 	ENUM2STRING( JPLUA_EVENT_PLAYERDEATH ),
 	ENUM2STRING( JPLUA_EVENT_SABERTOUCH ),
@@ -534,6 +535,26 @@ qboolean JPLua_Event_VehicleHUD( void ) {
 	while ( JPLua_IteratePlugins( &plugin ) ) {
 		if ( plugin->eventListeners[JPLUA_EVENT_VEHICLEHUD] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_VEHICLEHUD] );
+			JPLua_Call( JPLua.state, 0, 1 );
+			if ( !ret )
+				ret = !!lua_tointeger( JPLua.state, -1 );
+		}
+	}
+#endif //JPLUA
+
+	return ret;
+}
+#endif
+
+#ifdef _CGAME
+qboolean JPLua_Event_ConnectScreen( void ) {
+	qboolean ret = qfalse;
+
+#ifdef JPLUA
+	jplua_plugin_t *plugin = NULL;
+	while ( JPLua_IteratePlugins( &plugin ) ) {
+		if ( plugin->eventListeners[JPLUA_EVENT_CONNECTSCREEN] ) {
+			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_CONNECTSCREEN] );
 			JPLua_Call( JPLua.state, 0, 1 );
 			if ( !ret )
 				ret = !!lua_tointeger( JPLua.state, -1 );
