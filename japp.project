@@ -456,4 +456,75 @@
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="sqlite">
+    <File Name="sqlite/sqlite3.h"/>
+    <File Name="sqlite/sqlite3.c"/>
+    <File Name="sqlite/SConscript"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="mysql">
+    <File Name="mysql/my_config.h"/>
+    <File Name="mysql/my_net.h"/>
+    <File Name="mysql/sslopt-case.h"/>
+    <File Name="mysql/little_endian.h"/>
+    <File Name="mysql/my_getopt.h"/>
+    <File Name="mysql/my_sys.h"/>
+    <File Name="mysql/decimal.h"/>
+    <File Name="mysql/mysqld_error.h"/>
+    <File Name="mysql/mysql_embed.h"/>
+    <File Name="mysql/my_pthread.h"/>
+    <File Name="mysql/mysql_com_server.h"/>
+    <File Name="mysql/mysql.h"/>
+    <File Name="mysql/sql_state.h"/>
+    <File Name="mysql/mysql_com.h"/>
+    <File Name="mysql/errmsg.h"/>
+    <File Name="mysql/sslopt-vars.h"/>
+    <File Name="mysql/sql_common.h"/>
+    <File Name="mysql/m_string.h"/>
+    <File Name="mysql/my_dir.h"/>
+    <File Name="mysql/my_alloc.h"/>
+    <File Name="mysql/typelib.h"/>
+    <File Name="mysql/byte_order_generic.h"/>
+    <File Name="mysql/mysql_time.h"/>
+    <File Name="mysql/my_compiler.h"/>
+    <File Name="mysql/my_byteorder.h"/>
+    <File Name="mysql/my_global.h"/>
+    <File Name="mysql/sslopt-longopts.h"/>
+    <File Name="mysql/byte_order_generic_x86.h"/>
+    <File Name="mysql/my_list.h"/>
+    <File Name="mysql/m_ctype.h"/>
+    <File Name="mysql/mysql_version.h"/>
+    <File Name="mysql/my_xml.h"/>
+    <File Name="mysql/my_dbug.h"/>
+    <File Name="mysql/mysqld_ername.h"/>
+    <File Name="mysql/big_endian.h"/>
+    <File Name="mysql/keycache.h"/>
+    <VirtualDirectory Name="mysql">
+      <File Name="mysql/mysql/get_password.h"/>
+      <File Name="mysql/mysql/plugin_auth_common.h"/>
+      <File Name="mysql/mysql/plugin_trace.h"/>
+      <File Name="mysql/mysql/client_plugin.h"/>
+      <File Name="mysql/mysql/client_authentication.h"/>
+      <File Name="mysql/mysql/service_mysql_alloc.h"/>
+      <VirtualDirectory Name="psi">
+        <File Name="mysql/mysql/psi/psi_memory.h"/>
+        <File Name="mysql/mysql/psi/mysql_mdl.h"/>
+        <File Name="mysql/mysql/psi/psi_base.h"/>
+        <File Name="mysql/mysql/psi/mysql_ps.h"/>
+        <File Name="mysql/mysql/psi/mysql_stage.h"/>
+        <File Name="mysql/mysql/psi/mysql_statement.h"/>
+        <File Name="mysql/mysql/psi/mysql_table.h"/>
+        <File Name="mysql/mysql/psi/psi.h"/>
+        <File Name="mysql/mysql/psi/mysql_socket.h"/>
+        <File Name="mysql/mysql/psi/mysql_memory.h"/>
+        <File Name="mysql/mysql/psi/mysql_transaction.h"/>
+        <File Name="mysql/mysql/psi/mysql_file.h"/>
+        <File Name="mysql/mysql/psi/mysql_idle.h"/>
+        <File Name="mysql/mysql/psi/mysql_thread.h"/>
+        <File Name="mysql/mysql/psi/mysql_sp.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+  </VirtualDirectory>
+  <VirtualDirectory Name="japp">
+    <File Name="SConstruct"/>
+  </VirtualDirectory>
 </CodeLite_Project>

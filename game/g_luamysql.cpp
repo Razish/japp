@@ -186,7 +186,7 @@ static int JPLua_MySQLResult_Get(lua_State *L){
 
 	lua_newtable(L);
 	top = lua_gettop(L);
-	while (row = mysql_fetch_row(*result)){
+	while ( (row = mysql_fetch_row( *result )) ) {
 		lua_pushinteger(L, count);
 		lua_newtable(L);
 		temptop = lua_gettop(L);

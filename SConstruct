@@ -49,7 +49,10 @@ if bits == 32:
 	elif plat == 'Darwin':
 		arch = 'i386'
 elif bits == 64:
-	arch = 'x86_64'
+	if plat == 'Windows':
+		arch = 'x64'
+	else:
+		arch = 'x86_64'
 
 clangHack = plat == 'Darwin'
 
@@ -333,6 +336,7 @@ if revision:
 
 env['CPPDEFINES'] += [ 'SCONS_BUILD' ]
 env['CPPPATH'] = [ '#', '../game' ]
+env['LIBPATH'] = [ '#/libs/' + plat + '/' + str(bits) + '/' ]
 
 if debug == 1:
 	configuration = 'debug'

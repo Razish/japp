@@ -1,6 +1,6 @@
 #pragma once
-#include "mysql.h"
-#include "sqlite3.h"
+#include "mysql/mysql.h"
+#include "sqlite/sqlite3.h"
 
 #ifdef JPLUA
 
