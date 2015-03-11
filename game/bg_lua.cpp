@@ -1169,6 +1169,23 @@ void JPLua_Shutdown( void ) {
 			JPLua.currentPlugin = nextPlugin;
 		}
 
+#ifdef _GAME
+		for (auto& row : jplua_client_commands){
+			luaL_unref(JPLua.state, LUA_REGISTRYINDEX, row.second);
+		}
+		jplua_client_commands.clear();
+#elif defined _CGAME
+		for (auto& row : jplua_console_commands){
+			luaL_unref(JPLua.state, LUA_REGISTRYINDEX, row.second);
+		}
+		jplua_console_commands.clear();
+#endif
+		for (auto& row : jplua_server_commands){
+			luaL_unref(JPLua.state, LUA_REGISTRYINDEX, row.second);
+		}
+		jplua_server_commands.clear();
+
+
 		JPLua.plugins = JPLua.currentPlugin = NULL;
 
 		lua_close( JPLua.state );

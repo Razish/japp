@@ -110,58 +110,16 @@ int JPLua_Event_RemoveListener( lua_State *L ) {
 void JPLua_Event_Shutdown( void ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
-	while ( JPLua_IteratePlugins( &plugin ) ) {
-#if defined(_GAME)
-		jplua_plugin_command_t *clientCmd = plugin->clientCmds, *nextClientCmd = clientCmd;
-#elif defined(_CGAME)
-		jplua_plugin_command_t *consoleCmd = plugin->consoleCmds, *nextConsoleCmd = consoleCmd;
-#endif
-		jplua_plugin_command_t *serverCmd = plugin->serverCmds, *nextServerCmd = serverCmd;
-
+	while (JPLua_IteratePlugins(&plugin)) {
 		// fire the unload event
-		if ( plugin->eventListeners[JPLUA_EVENT_UNLOAD] ) {
-			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_UNLOAD] );
-			JPLua_Call( JPLua.state, 0, 0 );
+		if (plugin->eventListeners[JPLUA_EVENT_UNLOAD]) {
+			lua_rawgeti(JPLua.state, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_UNLOAD]);
+			JPLua_Call(JPLua.state, 0, 0);
 		}
-
-		//RAZTODO: Refcount because multiple plugins can register the same command
-		// remove all console commands
-#if defined(_GAME)
-		while ( nextClientCmd ) {
-			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, clientCmd->handle );
-			nextClientCmd = clientCmd->next;
-
-			free( clientCmd );
-			clientCmd = nextClientCmd;
-		}
-#elif defined(_CGAME)
-		while ( nextConsoleCmd ) {
-			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, consoleCmd->handle );
-			nextConsoleCmd = consoleCmd->next;
-
-			free( consoleCmd );
-			consoleCmd = nextConsoleCmd;
-		}
-#endif
-
-		// remove all server commands
-		while ( nextServerCmd ) {
-			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, serverCmd->handle );
-			nextServerCmd = serverCmd->next;
-
-			free( serverCmd );
-			serverCmd = nextServerCmd;
-		}
-
-#if defined(_GAME)
-		plugin->clientCmds = NULL;
-#elif defined(_CGAME)
-		plugin->consoleCmds = NULL;
-#endif
-		plugin->serverCmds = NULL;
 	}
-#endif // JPLUA
+#endif
 }
+
 
 void JPLua_Event_RunFrame( void ) {
 #ifdef JPLUA
@@ -312,6 +270,7 @@ qboolean JPLua_Event_ClientCommand(int clientNum){
 	}
 	int handle = jplua_client_commands[cmd];
 	if (handle){
+		ret = qtrue;
 		lua_rawgeti(JPLua.state, LUA_REGISTRYINDEX, handle);
 
 		JPLua_Player_CreateRef(JPLua.state, clientNum);

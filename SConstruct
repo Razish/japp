@@ -329,6 +329,7 @@ if debug:
 			'/DEBUG',		# generate debug info
 		#	'/INCREMENTAL',	# incrementally link
 		    '/NODEFAULTLIB:LIBCMTD',
+			'/NODEFAULTLIB:MSVCRT',
 		]
 
 	env['CPPDEFINES'] += [ '_DEBUG' ]
