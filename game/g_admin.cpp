@@ -793,6 +793,20 @@ static void AM_Announce( gentity_t *ent ) {
 }
 
 void WP_AddToClientBitflags( gentity_t *ent, int entNum );
+
+void Ghost_On( gentity_t *ent ) {
+	ent->client->pers.adminData.isGhost = qtrue;
+	ent->r.contents = CONTENTS_BODY;
+	ent->clipmask = 267009/*CONTENTS_SOLID*/;
+	ent->client->ps.fd.forcePowersKnown |= (1 << NUM_FORCE_POWERS); // JA++ client prediction
+}
+void Ghost_Off( gentity_t *ent ) {
+	ent->client->pers.adminData.isGhost = qfalse;
+	ent->r.contents = CONTENTS_SOLID;
+	ent->clipmask = CONTENTS_SOLID | CONTENTS_BODY;
+	ent->client->ps.fd.forcePowersKnown &= ~(1 << NUM_FORCE_POWERS); // JA++ client prediction
+}
+
 // ghost specified client (or self)
 static void AM_Ghost( gentity_t *ent ) {
 	char arg1[64] = { '\0' };
@@ -821,19 +835,16 @@ static void AM_Ghost( gentity_t *ent ) {
 	if ( targ->client->pers.adminData.isGhost ) {
 		G_LogPrintf( level.log.admin, "\t%s unghosting %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
-		targ->client->pers.adminData.isGhost = qfalse;
-		targ->r.contents = CONTENTS_SOLID;
-		targ->clipmask = CONTENTS_SOLID | CONTENTS_BODY;
-		targ->client->ps.fd.forcePowersKnown &= ~(1 << NUM_FORCE_POWERS); // JA++ client prediction
+
+		Ghost_Off( ent );
+
 		trap->SendServerCommand( targetClient, "cp \"" S_COLOR_CYAN "Unghosted\n\"" );
 	}
 	else {
 		G_LogPrintf( level.log.admin, "\t%s ghosting %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
-		targ->client->pers.adminData.isGhost = qtrue;
-		targ->r.contents = CONTENTS_BODY;
-		targ->clipmask = 267009/*CONTENTS_SOLID*/;
-		targ->client->ps.fd.forcePowersKnown |= (1 << NUM_FORCE_POWERS); // JA++ client prediction
+
+		Ghost_On( ent );
 
 		trap->SendServerCommand( targetClient, "cp \"You are now a " S_COLOR_CYAN "ghost\n\"" );
 	}

@@ -36,7 +36,7 @@ typedef struct adminUser_s {
 	uint32_t	privileges;		// 32 privs
 	char		loginMsg[128];	// login message
 	int			rank;			// rank
-	int         logineffect;    // login effect 
+	int         logineffect;    // login effect
 
 	struct adminUser_s *next;
 } adminUser_t;
@@ -103,4 +103,6 @@ void Empower_On( gentity_t *ent );
 void Empower_Off( gentity_t *ent );
 void Merc_On( gentity_t *ent );
 void Merc_Off( gentity_t *ent );
+void Ghost_On( gentity_t *ent );
+void Ghost_Off( gentity_t *ent );
 void Slap( gentity_t *targ );

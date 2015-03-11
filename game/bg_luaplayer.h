@@ -2,16 +2,10 @@
 
 #ifdef JPLUA
 
-// Player instance userdata type 
-typedef struct jplua_player_s {
+// Player instance userdata type
+struct jplua_player_t {
 	int clientNum;
-} jplua_player_t;
-
-typedef struct jplua_player_func_s {
-	const char *name;
-	lua_CFunction getfunc;
-	lua_CFunction setfunc;
-}jplua_player_func_t;
+};
 
 void JPLua_Player_CreateRef( lua_State *L, int num );
 int JPLua_GetPlayer( lua_State *L );

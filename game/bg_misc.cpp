@@ -676,7 +676,7 @@ qboolean BG_LegalizedForcePowers( char *powerOut, size_t powerOutSize, int maxRa
 }
 
 const gitem_t bg_itemlist[] = {
-	// classname					pickup_sound						icon								quantity	type			tag							view_model												world_model																																precache sounds description
+	// classname	pickup_sound	icon	quantity	type	tag		view_model	world_model		precache	sounds	description
 	{ NULL, NULL, NULL, 0, IT_BAD, 0, NULL, { NULL, NULL, NULL }, "", "", "" }, // leave index 0 alone
 	{ "item_shield_sm_instant", "sound/player/pickupshield.wav", "gfx/mp/small_shield", 25, IT_ARMOR, 1, NULL, { "models/map_objects/mp/psd_sm.md3", NULL, NULL }, "", "", "" },
 	{ "item_shield_lrg_instant", "sound/player/pickupshield.wav", "gfx/mp/large_shield", 100, IT_ARMOR, 2, NULL, { "models/map_objects/mp/psd.md3", NULL, NULL }, "", "", "" },
