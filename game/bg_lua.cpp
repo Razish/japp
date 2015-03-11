@@ -12,7 +12,7 @@
 #include "bg_luaserialiser.h"
 
 #include <inttypes.h>
-
+#include <unordered_map>
 #ifdef JPLUA
 
 #if defined(_MSC_VER) && !defined(SCONS_BUILD)
@@ -30,6 +30,14 @@ static const char *pluginDir = "lua/cl/";
 #define JPLUA_EXTENSION ".lua"
 
 jplua_t JPLua;
+
+#ifdef _GAME
+std::unordered_map<std::string, int> jplua_client_commands;
+std::unordered_map<std::string, int> jplua_server_commands;
+#elif defined _CGAME
+std::unordered_map<std::string, int> jplua_console_commands;
+std::unordered_map<std::string, int> jplua_server_commands;
+#endif
 
 qboolean JPLua_IteratePlugins( jplua_plugin_t **plugin ) {
 	if ( !*plugin )
@@ -466,100 +474,48 @@ static void JPLua_PostInit( lua_State *L ) {
 
 #ifdef _GAME
 static int JPLua_Export_AddClientCommand( lua_State *L ) {
-	jplua_plugin_command_t *cmd = JPLua.currentPlugin->clientCmds;
-
-	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
-		G_LogPrintf( level.log.console, "JPLua: AddClientCommand failed, function signature invalid registering %s"
-			"(plugin: %s) - Is it up to date?\n", lua_tostring( L, 1 ), JPLua.currentPlugin->name );
+	const char *name = luaL_checkstring(L, 1);
+	int &handle = jplua_client_commands[name];
+	if (lua_type(L, 1) != LUA_TSTRING || lua_type(L, 2) != LUA_TFUNCTION){
+		trap->Print("JPLua: AddClientCommand failed, function signature invalid registering %s - Is it up to date?\n", name);
 		return 0;
 	}
-
-	while ( cmd && cmd->next )
-		cmd = cmd->next;
-
-	if ( cmd ) {
-		cmd->next = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
-		memset( cmd->next, 0, sizeof(jplua_plugin_command_t) );
-		cmd = cmd->next;
+	if (handle){
+		trap->Print("JPlua: AddClientCommand failed, command already exist\n");
 	}
-	else {
-		JPLua.currentPlugin->clientCmds = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
-		memset( JPLua.currentPlugin->clientCmds, 0, sizeof(jplua_plugin_command_t) );
-		cmd = JPLua.currentPlugin->clientCmds;
-	}
-
-	Q_strncpyz( cmd->command, lua_tostring( L, 1 ), sizeof(cmd->command) );
-	cmd->handle = luaL_ref( L, LUA_REGISTRYINDEX );
-
+	handle = luaL_ref(L, LUA_REGISTRYINDEX);
 	return 0;
 }
+
 #endif
 
 #ifdef _CGAME
 static int JPLua_Export_AddConsoleCommand( lua_State *L ) {
-	jplua_plugin_command_t *cmd = JPLua.currentPlugin->consoleCmds;
-	int funcType = lua_type( L, 2 );
-
-	if ( lua_type( L, 1 ) != LUA_TSTRING || (funcType != LUA_TFUNCTION && funcType != LUA_TNIL) ) {
-		trap->Print( "JPLua: AddConsoleCommand failed, function signature invalid registering %s (plugin: %s) - Is it up"
-			" to date?\n", lua_tostring( L, 1 ), JPLua.currentPlugin->longname );
+	const char *name = luaL_checkstring(L, 1);
+	int &handle = jplua_console_commands[name];
+	if (lua_type(L, 1) != LUA_TSTRING || lua_type(L, 2) != LUA_TFUNCTION){
+		trap->Print("JPLua: AddConsoleCommand failed, function signature invalid registering %s - Is it up to date?\n", name);
 		return 0;
 	}
-
-	while ( cmd && cmd->next )
-		cmd = cmd->next;
-
-	if ( cmd ) {
-		cmd->next = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
-		memset( cmd->next, 0, sizeof(jplua_plugin_command_t) );
-		cmd = cmd->next;
+	if (handle){
+		trap->Print("JPlua: AddConsoleCommand failed, command already exist\n");
 	}
-	else {
-		JPLua.currentPlugin->consoleCmds = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
-		memset( JPLua.currentPlugin->consoleCmds, 0, sizeof(jplua_plugin_command_t) );
-		cmd = JPLua.currentPlugin->consoleCmds;
-	}
-
-	Q_strncpyz( cmd->command, lua_tostring( L, 1 ), sizeof(cmd->command) );
-	if ( funcType != LUA_TNIL )
-		cmd->handle = luaL_ref( L, LUA_REGISTRYINDEX );
-
-	trap->AddCommand( cmd->command );
+	handle = luaL_ref(L, LUA_REGISTRYINDEX);
 	return 0;
 }
 #endif
 
-static int JPLua_Export_AddServerCommand( lua_State *L ) {
-	jplua_plugin_command_t *cmd = JPLua.currentPlugin->serverCmds;
-
-	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
-#if defined(_GAME)
-		G_LogPrintf( level.log.console, "JPLua: AddServerCommand failed, function signature invalid registering %s"
-			"(plugin: %s) - Is it up to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->name );
-#elif defined(_CGAME)
-		trap->Print( "JPLua: AddServerCommand failed, function signature invalid registering %s (plugin: %s) - Is it up"
-			" to date?\n", lua_tostring( L, -1 ), JPLua.currentPlugin->longname );
-#endif
+static int JPLua_Export_AddServerCommand(lua_State *L){
+	const char *name = luaL_checkstring(L, 1);
+	int &handle = jplua_server_commands[name];
+	if (lua_type(L, 1) != LUA_TSTRING || lua_type(L, 2) != LUA_TFUNCTION){
+		trap->Print("JPLua: AddServerCommand failed, function signature invalid registering %s - Is it up to date?\n", name);
 		return 0;
 	}
-
-	while ( cmd && cmd->next )
-		cmd = cmd->next;
-
-	if ( cmd ) {
-		cmd->next = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
-		memset( cmd->next, 0, sizeof(jplua_plugin_command_t) );
-		cmd = cmd->next;
+	if (handle){
+		trap->Print("JPlua: AddServerCommand failed, command already exist\n");
 	}
-	else {
-		JPLua.currentPlugin->serverCmds = (jplua_plugin_command_t *)malloc( sizeof(jplua_plugin_command_t) );
-		memset( JPLua.currentPlugin->serverCmds, 0, sizeof(jplua_plugin_command_t) );
-		cmd = JPLua.currentPlugin->serverCmds;
-	}
-
-	Q_strncpyz( cmd->command, lua_tostring( L, -2 ), sizeof(cmd->command) );
-	cmd->handle = luaL_ref( L, LUA_REGISTRYINDEX );
-
+	handle = luaL_ref(L, LUA_REGISTRYINDEX);
 	return 0;
 }
 

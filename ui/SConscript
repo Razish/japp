@@ -49,4 +49,4 @@ ui_env['CPPDEFINES'] += [ '_UI' ]
 ui_env['LIBPREFIX'] = ''
 
 # targets
-ui_env.SharedLibrary( '#ui' + arch, files )
+ui_env.SharedLibrary( '#' + configuration + '/ui' + arch, files )

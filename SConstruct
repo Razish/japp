@@ -323,10 +323,12 @@ if debug:
 		#	'/Oy-',		# disable frame pointer omission
 		#	'/RTC1',	# runtime checks
 			'/Z7',		# emit debug information
+		    '/MDd',
 		]
 		env['LINKFLAGS'] += [
 			'/DEBUG',		# generate debug info
 		#	'/INCREMENTAL',	# incrementally link
+		    '/NODEFAULTLIB:LIBCMTD',
 		]
 
 	env['CPPDEFINES'] += [ '_DEBUG' ]

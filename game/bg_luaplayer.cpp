@@ -727,6 +727,67 @@ static void JPLua_Player_SetWeapon( lua_State *L, jpluaEntity_t *ent ) {
 }
 #endif
 
+static int JPLua_Player_GetJetpackFuel( lua_State *L, jpluaEntity_t *ent ){
+#ifdef _GAME
+	lua_pushinteger(L, ent->client->ps.jetpackFuel);
+#elif defined (_CGAME)
+	lua_pushinteger(L, cg.predictedPlayerState.jetpackFuel);
+#endif
+	return 1;
+}
+
+static void JPLua_Player_SetJetpackFuel( lua_State *L, jpluaEntity_t *ent ){
+#ifdef _GAME
+	ent->client->ps.jetpackFuel = luaL_checkinteger(L,3);
+#endif
+}
+
+static int JPLua_Player_GetCloakFuel( lua_State *L, jpluaEntity_t *ent ){
+#ifdef _GAME
+	lua_pushinteger(L, ent->client->ps.cloakFuel);
+#elif defined (_CGAME)
+	lua_pushinteger(L, cg.predictedPlayerState.cloakFuel);
+#endif
+	return 1;
+}
+
+static void JPLua_Player_SetCloakFuel( lua_State *L, jpluaEntity_t *ent ){
+#ifdef _GAME
+	ent->client->ps.cloakFuel = luaL_checkinteger(L,3);
+#endif
+}
+
+static int JPLua_Player_IsCloaked( lua_State *L, jpluaEntity_t *ent ){
+#ifdef _GAME
+	if ( ent->client->ps.powerups[PW_CLOAKED] ){
+#elif defined (_CGAME)
+	if (cg.predictedPlayerState.powerups[PW_CLOAKED]){
+#endif
+		lua_pushboolean(L, qtrue);
+	}else{
+		lua_pushboolean(L, qfalse);
+	}
+	return 1;
+}
+
+#ifdef _GAME
+void Jedi_Cloak(gentity_t *self);
+void Jedi_Decloak(gentity_t *self);
+#endif
+
+static int JPLua_Player_SetCloak( lua_State *L, jpluaEntity_t *ent ){
+#ifdef _GAME
+	qboolean value = lua_toboolean(L,3);
+
+	if (value && !ent->client->ps.powerups[PW_CLOAKED]){
+		Jedi_Cloak( ent );
+	}else{
+		Jedi_Decloak( ent );
+	}
+#endif
+	return 0;
+}
+
 typedef int (*getFunc_t)( lua_State *L, jpluaEntity_t *ent );
 typedef void (*setFunc_t)( lua_State *L, jpluaEntity_t *ent );
 
@@ -766,6 +827,11 @@ static const playerProperty_t playerProperties [] = {
 #elif defined(_CGAME)
 		nullptr
 #endif
+	},
+	{
+		"cloakfuel",
+		JPLua_Player_GetCloakFuel,
+		JPLua_Player_SetCloakFuel,
 	},
 	{
 		"duelPartner",
@@ -839,6 +905,11 @@ static const playerProperty_t playerProperties [] = {
 		NULL
 	},
 	{
+		"isCloaked",
+		JPLua_Player_IsCloaked,
+		NULL
+	},
+	{
 		"isDueling",
 		JPLua_Player_GetDueling,
 		NULL
@@ -900,6 +971,10 @@ static const playerProperty_t playerProperties [] = {
 		"isUnderwater",
 		JPLua_Player_GetUnderwater,
 		NULL
+	},
+	{   "jetpackfuel",
+		JPLua_Player_GetJetpackFuel,
+		JPLua_Player_SetJetpackFuel,
 	},
 	{
 		"lastPickup",
