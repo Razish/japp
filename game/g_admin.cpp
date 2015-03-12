@@ -2435,13 +2435,16 @@ static void AM_Lua( gentity_t *ent ) {
 
 	G_LogPrintf( level.log.admin, "\t%s executed lua code \"%s\"\n", G_PrintClient( ent-g_entities ), args );
 	lastluaid = ent->s.number;
-	if ( luaL_dostring( JPLua.state, args ) != 0 )
-		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_RED "Lua Error: %s\n\"",
-			lua_tostring( JPLua.state, -1 ) ) );
+	if ( luaL_dostring( JPLua.state, args ) != 0 ) {
+		char errorMsg[MAX_STRING_CHARS] = {};
+		Q_strncpyz( errorMsg, lua_tostring( JPLua.state, -1 ), sizeof(errorMsg) );
+		Q_strstrip( errorMsg, "\"", "'" );
+		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_RED "Lua Error: %s\n\"", errorMsg ) );
+	}
+	lastluaid = -1;
 #else
 	trap->SendServerCommand( ent - g_entities, "print \"Lua is not supported on this server\n\"" );
 #endif
-	lastluaid = -1;
 }
 
 static void AM_ReloadLua( gentity_t *ent ) {
@@ -2969,7 +2972,6 @@ static const adminCommand_t adminCommands[] = {
 	{ "amghost", PRIV_GHOST, AM_Ghost }, // ghost specified client (or self)
 	{ "amgive", PRIV_GIVE, AM_Give }, // give weapon/force/ammo to player
 	{ "amgrant", PRIV_GRANT, AM_Grant }, // Grant admin permission to player...
-	{ "amungrant", PRIV_GRANT, AM_UnGrant }, // bye
 	{ "amkick", PRIV_KICK, AM_Kick }, // kick specified client
 	{ "amkillvote", PRIV_KILLVOTE, AM_KillVote }, // kill the current vote
 	{ "amlisttele", PRIV_TELEPORT, AM_ListTelemarks }, // list all marked positions
@@ -2995,6 +2997,7 @@ static const adminCommand_t adminCommands[] = {
 	{ "amstatus", PRIV_STATUS, AM_Status }, // display list of players + clientNum + IP + admin
 	{ "amtele", PRIV_TELEPORT, AM_Teleport }, // teleport (all variations of x to y)
 	{ "amtelemark", PRIV_TELEPORT, AM_Telemark }, // mark current location
+	{ "amungrant", PRIV_GRANT, AM_UnGrant }, // bye
 	{ "amunlockteam", PRIV_LOCKTEAM, AM_UnlockTeam }, // allow clients to join a team
 	{ "amunsilence", PRIV_SILENCE, AM_Unsilence }, // unsilence specified client
 	{ "amvstr", PRIV_VSTR, AM_Vstr }, // execute a variable string
