@@ -4,7 +4,6 @@
 #include "cg_local.h"
 #endif
 #include "bg_lua.h"
-#include <unordered_map>
 
 #ifdef JPLUA
 

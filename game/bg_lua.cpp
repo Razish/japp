@@ -12,7 +12,6 @@
 #include "bg_luaserialiser.h"
 
 #include <inttypes.h>
-#include <unordered_map>
 #ifdef JPLUA
 
 #if defined(_MSC_VER) && !defined(SCONS_BUILD)
@@ -1162,6 +1161,11 @@ void JPLua_Shutdown( void ) {
 
 		JPLua.currentPlugin = JPLua.plugins;
 		while ( nextPlugin ) {
+			for (int i = JPLUA_EVENT_UNLOAD; i < JPLUA_EVENT_MAX; i++){
+				if (JPLua.currentPlugin->eventListeners[i]) {
+					luaL_unref(JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[i]);
+				}
+			}
 			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->handle );
 			nextPlugin = JPLua.currentPlugin->next;
 

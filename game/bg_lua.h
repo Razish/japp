@@ -19,6 +19,7 @@ extern "C" {
 #endif
 
 #ifdef JPLUA
+#include <unordered_map>
 
 void JPLua_Init( void );
 void JPLua_Shutdown( void );
@@ -42,12 +43,6 @@ typedef struct jplua_cimport_table_s {
 	lua_CFunction function;
 } jplua_cimport_table_t;
 
-typedef struct jplua_plugin_command_s {
-	char command[64];
-	int handle;
-	struct jplua_plugin_command_s *next;
-} jplua_plugin_command_t;
-
 typedef struct jplua_plugin_s {
 	char name[32], longname[32];
 	char version[8];
@@ -56,14 +51,6 @@ typedef struct jplua_plugin_s {
 	int handle;
 
 	int eventListeners[JPLUA_EVENT_MAX]; // references to listener functions in lua stored in the registry
-
-#ifdef _CGAME
-	jplua_plugin_command_t *consoleCmds; //Linked list of console commands
-	jplua_plugin_command_t *serverCmds; //Linked list of server commands
-#else
-	jplua_plugin_command_t *clientCmds; // linked list of client commands
-	jplua_plugin_command_t *serverCmds; // linked list of server commands
-#endif
 
 	struct jplua_plugin_s *next;
 } jplua_plugin_t;

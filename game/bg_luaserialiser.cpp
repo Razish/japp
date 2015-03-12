@@ -235,7 +235,12 @@ void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode )
 	int len = 0;
 
 	serialiser = (jplua_serialiser_t *)lua_newuserdata( L, sizeof(jplua_serialiser_t) );
-	Com_sprintf( serialiser->fileName, sizeof(serialiser->fileName), "%s%s/%s", pluginDir, JPLua.currentPlugin->name, path );
+	if (JPLua.currentPlugin){
+		Com_sprintf(serialiser->fileName, sizeof(serialiser->fileName), "%s%s/%s", pluginDir, JPLua.currentPlugin->name, path);
+	}
+	else{
+		Com_sprintf(serialiser->fileName, sizeof(serialiser->fileName), "%s%s", pluginDir, path);
+	}
 	len = trap->FS_Open( serialiser->fileName, &serialiser->fileHandle, mode );
 
 	if ( mode == FS_WRITE ) {
