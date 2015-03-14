@@ -1317,11 +1317,17 @@ static int JPLua_Player_GetAdminData( lua_State *L ) {
 static int JPLua_Player_GetUserinfo( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	char userinfo[MAX_INFO_STRING];
-
+	const char *info;
+	const char *name = lua_tostring(L, 2);
+	if (lua_isnil(L, 2) || !Q_stricmp(name, "") || !Q_stricmp(name, "-1") || !name ) {
+		trap->GetUserinfo(player->clientNum, userinfo, sizeof(userinfo));
+		JPLua_PushInfostring(L, userinfo);
+		return 1;
+	}
 	trap->GetUserinfo( player->clientNum, userinfo, sizeof(userinfo) );
+	info = Info_ValueForKey(userinfo, name);
 
-	JPLua_PushInfostring( L, userinfo );
-
+	lua_pushstring(L, info);
 	return 1;
 }
 #endif
