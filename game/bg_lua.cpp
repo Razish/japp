@@ -431,7 +431,7 @@ static void JPLua_LoadPluginDir( qboolean inPK3 ) {
 			numFiles = trap->FS_GetFileList( va( "%s%s", pluginDir, folderName ), JPLUA_EXTENSION, fileList, sizeof(fileList) );
 
 			for ( j = 0; j < numFiles; j++ ) {
-				size_t skipLenFile = 1, fileLen = 0;
+				size_t skipLenFile = inPK3 ? 1 : 0, fileLen = 0;
 				if ( (s = (char *)Q_strchrs( fileName, "/\\" )) ) {
 					*s = '\0';
 					skipLenFile = strlen( ++s ) + 1;
