@@ -353,8 +353,13 @@ static int G_AddBox( const vector3 *mins, const vector3 *maxs ) {
 	// restrictions on clientside prediction - x,y must be equal and symmetric, and must be <= 255
 	// z must be between -255 and 223 (corner case if all are at limit, so use 222 to avoid that issue)
 	vector3 singleMins, singleMaxs;
-	int xylen = min( min( 510, maxs->x - mins->x ), maxs->y - mins->y );
-	int zlen = min( 444, maxs->z - mins->z );
+	int xylen = std::min(
+		std::min(
+			510.0f, maxs->x - mins->x
+		),
+		maxs->y - mins->y
+	);
+	int zlen = std::min( 444.0f, maxs->z - mins->z );
 	int count = 0;
 	// only even numbers can be predicted correctly
 	xylen &= -2;
@@ -378,20 +383,20 @@ static int G_AddBox( const vector3 *mins, const vector3 *maxs ) {
 				if ( singleMins.z + zlen >= maxs->z ) {
 					break;
 				}
-				singleMins.z += min( zlen, max( 0, maxs->z - zlen - singleMins.z ) );
+				singleMins.z += std::min( static_cast<float>( zlen ), std::max( 0.0f, maxs->z - zlen - singleMins.z ) );
 			}
 
 			if ( singleMins.y + xylen >= maxs->y ) {
 				break;
 			}
-			singleMins.y += min( xylen, max( 0, maxs->y - xylen - singleMins.y ) );
+			singleMins.y += std::min( static_cast<float>( xylen ), std::max( 0.0f, maxs->y - xylen - singleMins.y ) );
 		}
 
 		if ( singleMins.x + xylen >= maxs->x ) {
 			break;
 		}
 
-		singleMins.x += min( xylen, max( 0, maxs->x - xylen - singleMins.x ) );
+		singleMins.x += std::min( static_cast<float>( xylen ), std::max( 0.0f, maxs->x - xylen - singleMins.x ) );
 	}
 
 	return count;
@@ -434,8 +439,8 @@ static void G_SpawnHoleFixes( void ) {
 
 			// fix so mins is actually mins and maxs is actually maxs
 			for ( i = 0; i < 3; i++ ) {
-				float temp = max( mins.raw[i], maxs.raw[i] );
-				mins.raw[i] = min( mins.raw[i], maxs.raw[i] );
+				float temp = std::max( mins.raw[i], maxs.raw[i] );
+				mins.raw[i] = std::min( mins.raw[i], maxs.raw[i] );
 				maxs.raw[i] = temp;
 			}
 
