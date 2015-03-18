@@ -64,8 +64,24 @@ static int JPLua_Player_GetAdminPrivs( lua_State *L, jpluaEntity_t *ent ) {
 #endif
 
 static int JPLua_Player_GetAmmo( lua_State *L, jpluaEntity_t *ent ) {
+#if defined(_GAME)
 	//TODO: GetAmmo
-	return 0;
+	lua_pushnil( L );
+#elif defined(_CGAME)
+	if ( (int)(ent - ents) == cg.clientNum ) {
+		lua_newtable( L );
+		int top = lua_gettop( L );
+		for ( int i = 1; i < WP_NUM_WEAPONS; i++ ) {
+			lua_pushinteger( L, i );
+			lua_pushinteger( L, cg.predictedPlayerState.ammo[i] );
+			lua_settable( L, top );
+		}
+	}
+	else {
+		lua_pushnil( L );
+	}
+#endif
+	return 1;
 }
 
 static int JPLua_Player_GetAngles( lua_State *L, jpluaEntity_t *ent ) {
@@ -98,15 +114,27 @@ static int JPLua_Player_GetArmor( lua_State *L, jpluaEntity_t *ent ) {
 
 static int JPLua_Player_GetDuelingPartner( lua_State *L, jpluaEntity_t *ent ) {
 #if defined(_GAME)
-	if ( ent->client->ps.duelInProgress ) {
-		JPLua_Player_CreateRef( L, ent->client->ps.duelIndex );
+	const playerState_t *ps = &ent->client->ps;
+#elif defined(_CGAME)
+	const playerState_t *ps = (int)(ent - ents) == cg.clientNum ? &cg.predictedPlayerState : nullptr;
+#endif
+
+#if defined(_CGAME)
+	if ( (int)(ent - ents) == cg.clientNum ) {
+#endif
+		if ( ps->duelInProgress ) {
+			JPLua_Player_CreateRef( L, ps->duelIndex );
+		}
+		else {
+			lua_pushnil( L );
+		}
+#if defined(_CGAME)
 	}
 	else {
 		lua_pushnil( L );
 	}
-#elif defined(_CGAME)
-	//TODO: GetDuelingPartner
 #endif
+
 	return 1;
 }
 
@@ -570,7 +598,7 @@ static void JPLua_Player_SetHealth( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(_GAME)
 static void JPLua_Player_SetEmpowered( lua_State *L, jpluaEntity_t *ent ) {
-	bool doEmpower = luaL_checkinteger( L, 3 ) ? true : false;
+	bool doEmpower = lua_toboolean( L, 3 ) ? true : false;
 	if ( doEmpower ) {
 		if ( !ent->client->pers.adminData.empowered ) {
 			Empower_On( ent );
@@ -586,7 +614,7 @@ static void JPLua_Player_SetEmpowered( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(_GAME)
 static void JPLua_Player_SetGhost( lua_State *L, jpluaEntity_t *ent ) {
-	bool doGhost = luaL_checkinteger( L, 3 ) ? true : false;
+	bool doGhost = lua_toboolean( L, 3 ) ? true : false;
 	if ( doGhost ) {
 		if ( !ent->client->pers.adminData.isGhost ) {
 			Ghost_On( ent );
@@ -608,7 +636,7 @@ static void JPLua_Player_SetHolstered( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(_GAME)
 static void JPLua_Player_SetMerced( lua_State *L, jpluaEntity_t *ent ) {
-	bool doMerc = luaL_checkinteger( L, 3 ) ? true : false;
+	bool doMerc = lua_toboolean( L, 3 ) ? true : false;
 	if ( doMerc ) {
 		if ( !ent->client->pers.adminData.merc ) {
 			Merc_On( ent );
@@ -625,7 +653,7 @@ static void JPLua_Player_SetMerced( lua_State *L, jpluaEntity_t *ent ) {
 #if defined(_GAME)
 static void JPLua_Player_SetProtected( lua_State *L, jpluaEntity_t *ent ) {
 	const bool isProtected = (ent->client->ps.eFlags & EF_INVULNERABLE);
-	bool doProtect = luaL_checkinteger( L, 3 );
+	bool doProtect = lua_toboolean( L, 3 );
 	if ( doProtect ) {
 		if ( !isProtected ) {
 			ent->client->ps.eFlags |= EF_INVULNERABLE;
@@ -643,7 +671,7 @@ static void JPLua_Player_SetProtected( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(_GAME)
 static void JPLua_Player_SetSilenced( lua_State *L, jpluaEntity_t *ent ) {
-	bool doSilence = luaL_checkinteger( L, 3 ) ? true : false;
+	bool doSilence = lua_toboolean( L, 3 ) ? true : false;
 	if ( doSilence ) {
 		if ( !ent->client->pers.adminData.silenced ) {
 			ent->client->pers.adminData.silenced = true;
@@ -659,7 +687,7 @@ static void JPLua_Player_SetSilenced( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(_GAME)
 static void JPLua_Player_SetSlept( lua_State *L, jpluaEntity_t *ent ) {
-	bool doSleep = luaL_checkinteger( L, 3 ) ? true : false;
+	bool doSleep = lua_toboolean( L, 3 ) ? true : false;
 	if ( doSleep ) {
 		if ( !ent->client->pers.adminData.isSlept ) {
 			G_SleepClient( ent->client );
