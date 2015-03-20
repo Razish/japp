@@ -520,7 +520,7 @@ static void JPLua_Player_SetAdminPrivs( lua_State *L, jpluaEntity_t *ent ) {
 		// ...
 	}
 	else {
-		ent->client->pers.tempprivs = luaL_checkinteger( L, 2 );
+		ent->client->pers.tempprivs = luaL_checkinteger( L, 3 );
 	}
 }
 #endif
@@ -534,43 +534,43 @@ static void JPLua_Player_SetAngles( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(_GAME)
 static void JPLua_Player_SetArmor( lua_State *L, jpluaEntity_t *ent ) {
-	ent->client->ps.stats[STAT_ARMOR] = luaL_checkinteger( L, 2 );
+	ent->client->ps.stats[STAT_ARMOR] = luaL_checkinteger( L, 3 );
 }
 #endif
 
 #if defined(_GAME)
 static void JPLua_Player_SetEFlags( lua_State *L, jpluaEntity_t *ent ) {
-	ent->client->ps.eFlags = luaL_checkinteger( L, 2 );
+	ent->client->ps.eFlags = luaL_checkinteger( L, 3 );
 }
 #endif
 
 #if defined(_GAME)
 static void JPLua_Player_SetEFlags2( lua_State *L, jpluaEntity_t *ent ) {
-	ent->client->ps.eFlags2 = luaL_checkinteger( L, 2 );
+	ent->client->ps.eFlags2 = luaL_checkinteger( L, 3 );
 }
 #endif
 
 #if defined(_GAME)
 static void JPLua_Player_SetFlags( lua_State *L, jpluaEntity_t *ent ) {
-	ent->flags = luaL_checkinteger( L, 2 );
+	ent->flags = luaL_checkinteger( L, 3 );
 }
 #endif
 
 #if defined(_GAME)
 static void JPLua_Player_SetForce( lua_State *L, jpluaEntity_t *ent ) {
-	ent->client->ps.fd.forcePower = luaL_checkinteger( L, 2 );
+	ent->client->ps.fd.forcePower = luaL_checkinteger( L, 3 );
 }
 #endif
 
 #if defined(_GAME)
 static void JPLua_Player_SetHealth( lua_State *L, jpluaEntity_t *ent ) {
-	ent->health = ent->client->ps.stats[STAT_HEALTH] = luaL_checkinteger( L, 2 );
+	ent->health = ent->client->ps.stats[STAT_HEALTH] = luaL_checkinteger( L, 3 );
 }
 #endif
 
 #if defined(_GAME)
 static void JPLua_Player_SetEmpowered( lua_State *L, jpluaEntity_t *ent ) {
-	bool doEmpower = luaL_checkinteger( L, 2 ) ? true : false;
+	bool doEmpower = luaL_checkinteger( L, 3 ) ? true : false;
 	if ( doEmpower ) {
 		if ( !ent->client->pers.adminData.empowered ) {
 			Empower_On( ent );
@@ -586,7 +586,7 @@ static void JPLua_Player_SetEmpowered( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(_GAME)
 static void JPLua_Player_SetGhost( lua_State *L, jpluaEntity_t *ent ) {
-	bool doGhost = luaL_checkinteger( L, 2 ) ? true : false;
+	bool doGhost = luaL_checkinteger( L, 3 ) ? true : false;
 	if ( doGhost ) {
 		if ( !ent->client->pers.adminData.isGhost ) {
 			Ghost_On( ent );
@@ -602,13 +602,13 @@ static void JPLua_Player_SetGhost( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(_GAME)
 static void JPLua_Player_SetHolstered( lua_State *L, jpluaEntity_t *ent ) {
-	ent->client->ps.saberHolstered = luaL_checkinteger( L, 2 );
+	ent->client->ps.saberHolstered = luaL_checkinteger( L, 3 );
 }
 #endif
 
 #if defined(_GAME)
 static void JPLua_Player_SetMerced( lua_State *L, jpluaEntity_t *ent ) {
-	bool doMerc = luaL_checkinteger( L, 2 ) ? true : false;
+	bool doMerc = luaL_checkinteger( L, 3 ) ? true : false;
 	if ( doMerc ) {
 		if ( !ent->client->pers.adminData.merc ) {
 			Merc_On( ent );
@@ -625,7 +625,7 @@ static void JPLua_Player_SetMerced( lua_State *L, jpluaEntity_t *ent ) {
 #if defined(_GAME)
 static void JPLua_Player_SetProtected( lua_State *L, jpluaEntity_t *ent ) {
 	const bool isProtected = (ent->client->ps.eFlags & EF_INVULNERABLE);
-	bool doProtect = luaL_checkinteger( L, 2 );
+	bool doProtect = luaL_checkinteger( L, 3 );
 	if ( doProtect ) {
 		if ( !isProtected ) {
 			ent->client->ps.eFlags |= EF_INVULNERABLE;
@@ -643,7 +643,7 @@ static void JPLua_Player_SetProtected( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(_GAME)
 static void JPLua_Player_SetSilenced( lua_State *L, jpluaEntity_t *ent ) {
-	bool doSilence = luaL_checkinteger( L, 2 ) ? true : false;
+	bool doSilence = luaL_checkinteger( L, 3 ) ? true : false;
 	if ( doSilence ) {
 		if ( !ent->client->pers.adminData.silenced ) {
 			ent->client->pers.adminData.silenced = true;
@@ -659,7 +659,7 @@ static void JPLua_Player_SetSilenced( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(_GAME)
 static void JPLua_Player_SetSlept( lua_State *L, jpluaEntity_t *ent ) {
-	bool doSleep = luaL_checkinteger( L, 2 ) ? true : false;
+	bool doSleep = luaL_checkinteger( L, 3 ) ? true : false;
 	if ( doSleep ) {
 		if ( !ent->client->pers.adminData.isSlept ) {
 			G_SleepClient( ent->client );
