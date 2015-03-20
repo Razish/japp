@@ -146,7 +146,7 @@ char *CG_RemoveChannelEscapeChar( char *text ) {
 	int identSize = (identEnd - identPos) + 1;
 	int endLen = strlen( identEnd );
 
-	Q_strncpyz( buf, identPos, min( identSize, MAX_CHATBOX_IDENTIFIER_SIZE ) );
+	Q_strncpyz( buf, identPos, std::min( identSize, MAX_CHATBOX_IDENTIFIER_SIZE ) );
 	Q_strncpyz( identPos - 1, identEnd + 1, endLen );
 
 	return buf;
@@ -235,8 +235,8 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 
 	// Stop scrolling up if we've already scrolled, similar to console behaviour
 	if ( cb->scrollAmount < 0 ) {
-		cb->scrollAmount = max( cb->scrollAmount - 1, cb->numActiveLines >= cg_chatboxLineCount.integer
-			? ( (min( cb->numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer) * -1 )
+		cb->scrollAmount = std::max( cb->scrollAmount - 1, cb->numActiveLines >= cg_chatboxLineCount.integer
+			? ( (std::min( cb->numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer) * -1 )
 			: 0 );
 	}
 
@@ -247,7 +247,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 			accumLength += CG_Text_Width( buf, cg.chatbox.size.scale, CG_GetChatboxFont() );
 		}
 
-		if ( accumLength > max( cg.chatbox.size.width, 192.0f ) && (i > 0 && !Q_IsColorString( p - 1 )) ) {
+		if ( accumLength > std::max( cg.chatbox.size.width, 192 ) && (i > 0 && !Q_IsColorString( p - 1 )) ) {
 			char lastColor = COLOR_GREEN;
 			int j = i;
 			int savedOffset = i;
@@ -398,7 +398,7 @@ static const char *GetPreText( qboolean clean ) {
 }
 
 void CG_ChatboxDraw( void ) {
-	int i = MAX_CHATBOX_ENTRIES - min( cg_chatboxLineCount.integer, currentChatbox->numActiveLines );
+	int i = MAX_CHATBOX_ENTRIES - std::min( cg_chatboxLineCount.integer, currentChatbox->numActiveLines );
 	int numLines = 0, done = 0, j = 0;
 	//	chatEntry_t *last = NULL;
 
@@ -453,7 +453,7 @@ void CG_ChatboxDraw( void ) {
 		chatEntry_t *chat = &currentChatbox->chatBuffer[i];
 		if ( chat->isUsed && (chat->time >= cg.time - cg_chatbox.integer || currentChatbox->scrollAmount
 			/*|| cg_chatbox.integer == 1*/ || CG_ChatboxActive()) ) {
-			CG_FillRect( cg.chatbox.pos.x, cg.chatbox.pos.y + 1.75f, max( cg.chatbox.size.width, 192.0f ),
+			CG_FillRect( cg.chatbox.pos.x, cg.chatbox.pos.y + 1.75f, std::max( cg.chatbox.size.width, 192 ),
 				cg_chatboxLineHeight.value * cg_chatboxLineCount.integer, &cg.chatbox.background );
 			break;
 		}
@@ -480,12 +480,12 @@ void CG_ChatboxScroll( int direction ) {
 
 	// down
 	if ( direction == 0 ) {
-		currentChatbox->scrollAmount = min( scrollAmount + 1, 0 );
+		currentChatbox->scrollAmount = std::min( scrollAmount + 1, 0 );
 	}
 	// up
 	else {
-		currentChatbox->scrollAmount = max( scrollAmount - 1, numActiveLines >= cg_chatboxLineCount.integer
-			? ((min( numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer) * -1)
+		currentChatbox->scrollAmount = std::max( scrollAmount - 1, numActiveLines >= cg_chatboxLineCount.integer
+			? ((std::min( numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer) * -1)
 			: 0 );
 	}
 }

@@ -1,14 +1,14 @@
 
 #include "qcommon/q_shared.h"
 
-#ifdef _GAME //including game headers on cgame is FORBIDDEN ^_^
+#ifdef PROJECT_GAME //including game headers on cgame is FORBIDDEN ^_^
 #include "g_local.h"
 #endif
 
 #include "bg_public.h"
 #include "bg_vehicles.h"
 
-#ifdef _GAME //we only want a few of these functions for BG
+#ifdef PROJECT_GAME //we only want a few of these functions for BG
 
 float DotToSpot( vector3 *spot, vector3 *from, vector3 *fromAngles );
 vector3 playerMins;
@@ -44,7 +44,7 @@ static qboolean Board( Vehicle_t *pVeh, bgEntity_t *pEnt ) {
 
 	return qtrue;
 }
-#endif //_GAME
+#endif //PROJECT_GAME
 
 
 //MP RULE - ALL PROCESSMOVECOMMANDS FUNCTIONS MUST BE BG-COMPATIBLE!!!
@@ -263,7 +263,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh ) {
 	/********************************************************************************/
 }
 
-#ifdef _GAME //back to our game-only functions
+#ifdef PROJECT_GAME //back to our game-only functions
 // This function makes sure that the vehicle is properly animated.
 static void AnimateVehicle( Vehicle_t *pVeh ) {
 	animNumber_t Anim = BOTH_STAND1;
@@ -374,15 +374,15 @@ static void AnimateVehicle( Vehicle_t *pVeh ) {
 
 //rwwFIXMEFIXME: This is all going to have to be predicted I think, or it will feel awful
 //and lagged
-#endif //_GAME
+#endif //PROJECT_GAME
 
-#ifndef _GAME
+#ifndef PROJECT_GAME
 void AttachRidersGeneric( Vehicle_t *pVeh );
 #endif
 
 //on the client this function will only set up the process command funcs
 void G_SetWalkerVehicleFunctions( vehicleInfo_t *pVehInfo ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	pVehInfo->AnimateVehicle = AnimateVehicle;
 	//	pVehInfo->AnimateRiders				=		AnimateRiders;
 	//	pVehInfo->ValidateBoard				=		ValidateBoard;
@@ -399,11 +399,11 @@ void G_SetWalkerVehicleFunctions( vehicleInfo_t *pVehInfo ) {
 	//	pVehInfo->Initialize				=		Initialize;
 	//	pVehInfo->Update					=		Update;
 	//	pVehInfo->UpdateRider				=		UpdateRider;
-#endif //_GAME
+#endif //PROJECT_GAME
 	pVehInfo->ProcessMoveCommands = ProcessMoveCommands;
 	pVehInfo->ProcessOrientCommands = ProcessOrientCommands;
 
-#ifndef _GAME //cgame prediction attachment func
+#ifndef PROJECT_GAME //cgame prediction attachment func
 	pVehInfo->AttachRiders = AttachRidersGeneric;
 #endif
 	//	pVehInfo->AttachRiders				=		AttachRiders;
@@ -414,7 +414,7 @@ void G_SetWalkerVehicleFunctions( vehicleInfo_t *pVehInfo ) {
 
 // Following is only in game, not in namespace
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void G_AllocateVehicleObject( Vehicle_t **pVeh );
 #endif
 
@@ -423,7 +423,7 @@ void G_AllocateVehicleObject( Vehicle_t **pVeh );
 //this is a BG function too in MP so don't un-bg-compatibilify it -rww
 void G_CreateWalkerNPC( Vehicle_t **pVeh, const char *strAnimalType ) {
 	// Allocate the Vehicle.
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	//these will remain on entities on the client once allocated because the pointer is
 	//never stomped. on the server, however, when an ent is freed, the entity struct is
 	//memset to 0, so this memory would be lost..

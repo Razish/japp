@@ -1050,9 +1050,9 @@ void JP_DrawMovementKeys( void ) {
 	Com_sprintf( str2, sizeof(str2), va( "^%cA ^%cS ^%cD", (cmd.rightmove < 0) ? COLOR_RED : COLOR_WHITE,
 		(cmd.forwardmove < 0) ? COLOR_RED : COLOR_WHITE, (cmd.rightmove > 0) ? COLOR_RED : COLOR_WHITE ) );
 
-	CG_Text_Paint( cg.moveKeysPos.x - max( w1, w2 ) / 2.0f, cg.moveKeysPos.y, cg_movementKeysScale.value, &colorWhite,
+	CG_Text_Paint( cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y, cg_movementKeysScale.value, &colorWhite,
 		str1, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex );
-	CG_Text_Paint( cg.moveKeysPos.x - max( w1, w2 ) / 2.0f, cg.moveKeysPos.y + height, cg_movementKeysScale.value,
+	CG_Text_Paint( cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y + height, cg_movementKeysScale.value,
 		&colorWhite, str2, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex );
 }
 
@@ -2753,7 +2753,13 @@ static float CG_DrawFPS( float y ) {
 
 	if ( cg_drawFPS.integer ) {
 		vector4 fpsColour = { 1.0f, 1.0f, 1.0f, 1.0f }, fpsGood = { 0.0f, 1.0f, 0.0f, 1.0f }, fpsBad = { 1.0f, 0.0f, 0.0f, 1.0f };
-		CG_LerpColour( &fpsBad, &fpsGood, &fpsColour, min( max( 0.0f, fps ) / max( IDEAL_FPS, maxFPS ), 1.0f ) );
+		CG_LerpColour(
+			&fpsBad, &fpsGood, &fpsColour,
+			std::min(
+				std::max( 0.0f, static_cast<float>( fps ) ) / std::max( IDEAL_FPS, static_cast<float>( maxFPS ) ),
+				1.0f
+			)
+		);
 
 		s = va( "%ifps", fps );
 		w = CG_Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer );

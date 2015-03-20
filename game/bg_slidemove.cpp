@@ -6,9 +6,9 @@
 #include "bg_public.h"
 #include "bg_local.h"
 
-#if defined( _GAME )
+#if defined( PROJECT_GAME )
 #include "g_local.h"
-#elif defined( _CGAME )
+#elif defined( PROJECT_CGAME )
 #include "cgame/cg_local.h"
 #endif
 
@@ -23,7 +23,7 @@ output: origin, velocity, impacts, stairup boolean
 
 //do vehicle impact stuff
 // slight rearrangement by BTO (VV) so that we only have one namespace include
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void G_FlyVehicleSurfaceDestruction( gentity_t *veh, trace_t *trace, int magnitude, qboolean force ); //g_vehicle.c
 qboolean G_CanBeEnemy( gentity_t *self, gentity_t *enemy ); //w_saber.c
 #endif
@@ -34,7 +34,7 @@ extern bgEntity_t *pm_entSelf;
 extern bgEntity_t *pm_entVeh;
 
 //vehicle impact stuff continued...
-#ifdef _GAME
+#ifdef PROJECT_GAME
 qboolean FighterIsLanded( Vehicle_t *pVeh, playerState_t *parentPS );
 #endif
 
@@ -46,7 +46,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 	Vehicle_t *pSelfVeh = pEnt->m_pVehicle;
 	float magnitude = VectorLength( &pm->ps->velocity ) * pSelfVeh->m_pVehicleInfo->mass / 50.0f;
 	qboolean forceSurfDestruction = qfalse;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	gentity_t *hitEnt = trace ? &g_entities[trace->entityNum] : NULL;
 
 	if ( !hitEnt || (pSelfVeh && pSelfVeh->m_pPilot && hitEnt && hitEnt->s.eType == ET_MISSILE && hitEnt->inuse
@@ -109,7 +109,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 	{// we're landing, we're cool
 		// this was annoying me -rww
 		//FIXME: this shouldn't even be getting called when the vehicle is at rest!
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		if ( hitEnt && (hitEnt->s.eType == ET_PLAYER || hitEnt->s.eType == ET_NPC) && pSelfVeh->m_pVehicleInfo->type == VH_FIGHTER ) {
 		}
 		else
@@ -123,7 +123,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 			//FIXME: impact sound and effect should be gotten from g_vehicleInfo...?
 			//FIXME: should pass in trace.endpos and trace.plane.normal
 			vector3	vehUp;
-#ifndef _GAME
+#ifndef PROJECT_GAME
 			bgEntity_t *hitEnt;
 #endif
 
@@ -131,7 +131,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 				qboolean turnFromImpact = qfalse, turnHitEnt = qfalse;
 				float l = pm->ps->speed*0.5f;
 				vector3	bounceDir;
-#ifndef _GAME
+#ifndef PROJECT_GAME
 				hitEnt = PM_BGEntForNum( trace->entityNum );
 #endif
 				if ( (trace->entityNum == ENTITYNUM_WORLD || hitEnt->s.solid == SOLID_BMODEL)
@@ -153,14 +153,14 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 				}
 				else if ( pSelfVeh->m_pVehicleInfo->type == VH_FIGHTER ) {
 					// check for impact with another fighter
-#ifndef _GAME
+#ifndef PROJECT_GAME
 					hitEnt = PM_BGEntForNum( trace->entityNum );
 #endif
 					if ( hitEnt->s.NPC_class == CLASS_VEHICLE && hitEnt->m_pVehicle && hitEnt->m_pVehicle->m_pVehicleInfo
 						&& hitEnt->m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER ) {// two vehicles hit each other, turn away from the impact
 						turnFromImpact = qtrue;
 						turnHitEnt = qtrue;
-#ifndef _GAME
+#ifndef PROJECT_GAME
 						VectorSubtract( &pm->ps->origin, &hitEnt->s.origin, &bounceDir );
 #else
 						VectorSubtract( &pm->ps->origin, &hitEnt->r.currentOrigin, &bounceDir );
@@ -179,7 +179,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 					if ( !turnHitEnt )
 						VectorScale( &bounceDir, (pm->ps->speed*0.25f / pSelfVeh->m_pVehicleInfo->mass), &pushDir );
 					else {//hit another fighter
-#ifdef _GAME
+#ifdef PROJECT_GAME
 						if ( hitEnt->client )
 							VectorScale( &bounceDir, (pm->ps->speed + hitEnt->client->ps.speed)*0.5f, &pushDir );
 						else
@@ -251,7 +251,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 					}
 					}
 					*/
-#ifdef _GAME//server-side, turn the guy we hit away from us, too
+#ifdef PROJECT_GAME//server-side, turn the guy we hit away from us, too
 					if ( turnHitEnt && hitEnt->client && !FighterIsLanded( hitEnt->m_pVehicle, &hitEnt->client->ps )
 						&& !(hitEnt->spawnflags & 2) /*SUSPENDED*/ ) {
 						l = hitEnt->client->ps.speed;
@@ -316,7 +316,7 @@ void PM_VehicleImpact( bgEntity_t *pEnt, trace_t *trace ) {
 				}
 			}
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 			if ( !hitEnt )
 				return;
 
@@ -435,14 +435,14 @@ qboolean PM_GroundSlideOkay( float zNormal ) {
 	return qtrue;
 }
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void Client_CheckImpactBBrush( gentity_t *self, gentity_t *other );
 #endif
 
 // returns qtrue if the entity should be collided against
 qboolean PM_ClientImpact( trace_t *trace ) {
 	//don't try to predict this
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	gentity_t *traceEnt;
 #endif
 	int entityNum = trace->entityNum;
@@ -453,7 +453,7 @@ qboolean PM_ClientImpact( trace_t *trace ) {
 	if ( entityNum >= ENTITYNUM_WORLD )
 		return qfalse;
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	traceEnt = &g_entities[entityNum];
 	if ( VectorLength( &pm->ps->velocity ) >= 100 && pm_entSelf->s.NPC_class != CLASS_VEHICLE
 		&& pm->ps->lastOnGround + 100 < level.time
@@ -466,7 +466,7 @@ qboolean PM_ClientImpact( trace_t *trace ) {
 		return qtrue;
 #endif
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	//Raz: Ghosts
 	if ( ((gentity_t *)pm_entSelf)->client->pers.adminData.isGhost )
 		return qtrue;
@@ -476,11 +476,11 @@ qboolean PM_ClientImpact( trace_t *trace ) {
 		qboolean selfDueling = pm->ps->duelInProgress;
 		int selfDuelist = pm->ps->duelIndex;
 		int selfNum = pm_entSelf->s.number;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		gentity_t *other = &g_entities[entityNum];
 		qboolean themDueling = other->client->ps.duelInProgress;
 		int themDuelist = other->client->ps.duelIndex;
-#else // _CGAME
+#else // PROJECT_CGAME
 		qboolean themDueling = cg_entities[entityNum].currentState.bolt1;
 		int themDuelist = 9001; // pretend they're never dueling with us
 #endif

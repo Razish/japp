@@ -203,7 +203,7 @@ qboolean UI_SaberValidForPlayerInMP( const char *saberName ) {
 		return qtrue;
 	}
 	else {//return value
-#ifndef _GAME
+#ifndef PROJECT_GAME
 		return qtrue;
 #else
 		return ((qboolean)(atoi(allowed)==0));

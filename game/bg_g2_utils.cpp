@@ -5,11 +5,11 @@
 #include "qcommon/q_shared.h"
 #include "bg_public.h"
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 #include "g_local.h"
-#elif defined(_UI)
+#elif defined(PROJECT_UI)
 #include "ui_local.h"
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 #include "cg_local.h"
 #endif
 

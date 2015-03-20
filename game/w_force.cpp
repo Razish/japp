@@ -4292,26 +4292,26 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd ) {
 				{
 					// if this is siege and our player class has the fast force regen ability, then recharge with 1/5th
 					//	the usual delay
-					self->client->ps.fd.forcePowerRegenDebounceTime += max( g_forceRegenTime.integer*0.2f, 1 );
+					self->client->ps.fd.forcePowerRegenDebounceTime += std::max( g_forceRegenTime.integer*0.2f, 1.0f );
 				}
 				else {
-					self->client->ps.fd.forcePowerRegenDebounceTime += max( g_forceRegenTime.integer, 1 );
+					self->client->ps.fd.forcePowerRegenDebounceTime += std::max( g_forceRegenTime.integer, 1 );
 				}
 			}
 			else {
 				if ( level.gametype == GT_POWERDUEL && self->client->sess.duelTeam == DUELTEAM_LONE ) {
 					if ( duel_fraglimit.integer ) {
 						self->client->ps.fd.forcePowerRegenDebounceTime
-							+= max( g_forceRegenTime.integer
-								* (0.6f + (0.3f * (float)self->client->sess.wins / (float)duel_fraglimit.integer)), 1 );
+							+= std::max( g_forceRegenTime.integer
+								* (0.6f + (0.3f * (float)self->client->sess.wins / (float)duel_fraglimit.integer)), 1.0f );
 					}
 					else {
-						self->client->ps.fd.forcePowerRegenDebounceTime += max( g_forceRegenTime.integer * 0.7f, 1 );
+						self->client->ps.fd.forcePowerRegenDebounceTime += std::max( g_forceRegenTime.integer * 0.7f, 1.0f );
 					}
 				}
 				else {
 					int regen = self->client->ps.duelInProgress ? g_forceRegenTimeDuel.integer : g_forceRegenTime.integer;
-					self->client->ps.fd.forcePowerRegenDebounceTime += max( regen, 1 );
+					self->client->ps.fd.forcePowerRegenDebounceTime += std::max( regen, 1 );
 				}
 			}
 		}

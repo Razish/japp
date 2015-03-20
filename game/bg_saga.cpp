@@ -5,11 +5,11 @@
 #include "bg_saga.h"
 #include "bg_weapons.h"
 
-#if defined( _GAME )
+#if defined( PROJECT_GAME )
 #include "g_local.h"
-#elif defined( _CGAME )
+#elif defined( PROJECT_CGAME )
 #include "cgame/cg_local.h"
-#elif defined( _UI )
+#elif defined( PROJECT_UI )
 #include "ui/ui_local.h"
 #endif
 
@@ -796,10 +796,10 @@ void BG_SiegeParseClassFile( const char *filename, siegeClassDesc_t *descBuffer 
 
 	//Parse shader for ui to use
 	if ( BG_SiegeGetPairedValue( classInfo, "uishader", parseBuf ) ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		bgSiegeClasses[bgNumSiegeClasses].uiPortraitShader = 0;
 		memset( bgSiegeClasses[bgNumSiegeClasses].uiPortrait, 0, sizeof(bgSiegeClasses[bgNumSiegeClasses].uiPortrait) );
-#elif defined _CGAME
+#elif defined PROJECT_CGAME
 		bgSiegeClasses[bgNumSiegeClasses].uiPortraitShader = 0;
 		memset( bgSiegeClasses[bgNumSiegeClasses].uiPortrait, 0, sizeof(bgSiegeClasses[bgNumSiegeClasses].uiPortrait) );
 #else //ui
@@ -813,7 +813,7 @@ void BG_SiegeParseClassFile( const char *filename, siegeClassDesc_t *descBuffer 
 
 	//Parse shader for ui to use
 	if ( BG_SiegeGetPairedValue( classInfo, "class_shader", parseBuf ) ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		bgSiegeClasses[bgNumSiegeClasses].classShader = 0;
 #else //cgame, ui
 		bgSiegeClasses[bgNumSiegeClasses].classShader = trap->R_RegisterShaderNoMip( parseBuf );
@@ -1038,7 +1038,7 @@ void BG_SiegeParseTeamFile( const char *filename ) {
 	}
 
 	//I don't entirely like doing things this way but it's the easiest way.
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	if ( BG_SiegeGetPairedValue( teamInfo, "FriendlyShader", parseBuf ) ) {
 		bgSiegeTeams[bgNumSiegeTeams].friendlyShader = trap->R_RegisterShaderNoMip( parseBuf );
 	}
@@ -1110,7 +1110,7 @@ siegeTeam_t *BG_SiegeFindThemeForTeam( int team ) {
 	return NULL;
 }
 
-#if defined(_GAME) || defined(_CGAME) //only for game/cgame
+#if defined(PROJECT_GAME) || defined(PROJECT_CGAME) //only for game/cgame
 //precache all the sabers for the active classes for the team
 qboolean WP_SaberParseParms( const char *saberName, saberInfo_t *saber ); //bg_saberLoad.cpp
 int BG_ModelCache( const char *modelName, const char *skinName ); //bg_misc.c

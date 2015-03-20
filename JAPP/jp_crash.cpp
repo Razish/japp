@@ -23,9 +23,9 @@ int bCrashing = 0;
 
 #include <time.h>
 #include "JAPP/jp_crash.h"
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 #include "g_local.h"
-#elif defined(_UI)
+#elif defined(PROJECT_UI)
 #include "ui_local.h"
 #endif
 
@@ -132,7 +132,7 @@ void *Q_LoadLibrary( const char *name, void (QDECL **func)(int) ) {
 }
 
 void JP_ExtCrashInfo( int fileHandle ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	char cs[1024];
 	// In case of a crash, the auxiliary library will write a report
 	// If jampgame is still loaded when the crash occours (and this is usually the case)
@@ -270,7 +270,7 @@ static const char *JP_Crash_GetCrashlogName( void ) {
 }
 
 static void JP_ForceQuit( void ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	trap->Error( ERR_DROP, "Server crash\n" );
 #else
 	trap->Error( ERR_DROP, "Client crash\n" );
@@ -980,7 +980,7 @@ static LONG WINAPI UnhandledExceptionHandler( struct _EXCEPTION_POINTERS *EI /*E
 	InitSymbolPath( SymPath, NULL );
 	SymInitialize( GetCurrentProcess(), SymPath, TRUE );
 	Com_Printf( "------------------------------------------------------------\n" );
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	Com_Printf( "Server crashed. Creating crash log %s...\n", filename );
 #else
 	Com_Printf( "Client crashed. Creating crash log %s...\n", filename );
@@ -992,7 +992,7 @@ static LONG WINAPI UnhandledExceptionHandler( struct _EXCEPTION_POINTERS *EI /*E
 		"             JA++ Crash Log\n"
 		"========================================\n", f );
 	JP_FS_WriteString( "Version: "JAPP_VERSION" (Windows)\n", f );
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	JP_FS_WriteString("Side: Server-side\n", f);
 #else
 	JP_FS_WriteString( "Side: Client-side\n", f );
@@ -1463,7 +1463,7 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 
 	bCrashing = 1;
 	Com_Printf("------------------------------------------------------------\n");
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	Com_Printf( "Server crashed. Creating crash log %s...\n", filename );
 #else
 	Com_Printf( "Client crashed. Creating crash log %s...\n", filename );
@@ -1473,7 +1473,7 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 		"             JA++ Crash Log\n"
 		"========================================\n", f);
 	JP_FS_WriteString("Version: "JAPP_VERSION" (Linux)\n", f);
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	JP_FS_WriteString("Side: Server-side\n", f);
 #else
 	JP_FS_WriteString("Side: Client-side\n", f);

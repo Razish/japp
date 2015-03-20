@@ -1,9 +1,9 @@
 //
 // string allocation/managment
 
-#if defined( _UI )
+#if defined( PROJECT_UI )
 #include "ui_local.h"
-#elif defined( _CGAME )
+#elif defined( PROJECT_CGAME )
 #include "cgame/cg_local.h"
 #endif
 
@@ -30,7 +30,7 @@ typedef struct scrollInfo_s {
 	qboolean scrollDir;
 } scrollInfo_t;
 
-#ifndef _CGAME	// Defined in ui_main.c, not in the namespace
+#ifndef PROJECT_CGAME	// Defined in ui_main.c, not in the namespace
 
 // Some extern functions hoisted from the middle of this file to get all the non-cgame,
 // non-namespace stuff together
@@ -83,7 +83,7 @@ qboolean ItemParse_asset_model_go( itemDef_t *item, const char *name, int *runTi
 qboolean ItemParse_model_g2anim_go( itemDef_t *item, const char *animName );
 
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 #define MEM_POOL_SIZE 128 * 1024 // 128kb
 #define UI_ALLOCATION_TAG TAG_CG_UI_ALLOC
 #else
@@ -603,7 +603,7 @@ void Window_Paint( windowDef_t *w, float fadeAmount, float fadeClamp, float fade
 		// gradient bar
 	}
 	else if ( w->style == WINDOW_STYLE_SHADER ) {
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 		if ( w->flags & WINDOW_PLAYERCOLOR ) {
 			vector4	tcolor;
 			tcolor.r = ui_char_color_red.integer / 255.0f;
@@ -3137,7 +3137,7 @@ void Leaving_EditField( itemDef_t *item ) {
 	}
 }
 
-#ifdef _UI
+#ifdef PROJECT_UI
 qboolean Item_TextField_HandleKey( itemDef_t *item, int key );
 void Item_TextField_Paste( itemDef_t *item ) {
 	int pasteLen, i;
@@ -3172,7 +3172,7 @@ qboolean Item_TextField_HandleKey( itemDef_t *item, int key ) {
 		if ( key & K_CHAR_FLAG ) {
 			key &= ~K_CHAR_FLAG;
 
-#ifdef _UI
+#ifdef PROJECT_UI
 			if ( key == 'v' - 'a' + 1 ) {
 				// ctrl-v is paste
 				Item_TextField_Paste( item );
@@ -4056,7 +4056,7 @@ void Item_SetTextExtents( itemDef_t *item, int *width, int *height, const char *
 
 	// keeps us from computing the widths and heights more than once
 	if ( *width == 0 || (item->type == ITEM_TYPE_OWNERDRAW && item->textalignment == ITEM_ALIGN_CENTER)
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 		|| (item->text && item->text[0] == '@' && item->asset != se_language.modificationCount)	//string package language changed
 #endif
 		) {
@@ -4086,7 +4086,7 @@ void Item_SetTextExtents( itemDef_t *item, int *width, int *height, const char *
 		}
 
 		ToWindowCoords( &item->textRect.x, &item->textRect.y, &item->window );
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 		if ( item->text && item->text[0] == '@' )//string package
 		{//mark language
 			item->asset = se_language.modificationCount;
@@ -4895,7 +4895,7 @@ void UI_ScaleModelAxis( refEntity_t	*ent ) {		// scale the model should we need 
 	}
 }
 
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 void UI_SaberAttachToChar( itemDef_t *item );
 #endif
 
@@ -4912,7 +4912,7 @@ void Item_Model_Paint( itemDef_t *item ) {
 	}
 
 	// a moves datapad anim is playing
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 	if ( uiInfo.moveAnimTime && (uiInfo.moveAnimTime < uiInfo.uiDC.realTime) ) {
 		modelDef_t *modelPtr;
 		modelPtr = (modelDef_t*)item->typeData;
@@ -5056,7 +5056,7 @@ void Item_Model_Paint( itemDef_t *item ) {
 
 		VectorCopy( &modelPtr->g2scale, &ent.modelScale );
 		UI_ScaleModelAxis( &ent );
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 		if ( item->flags & ITF_ISCHARACTER ) {
 			char modelPath[MAX_QPATH] = { 0 }, skinpath[MAX_QPATH] = { 0 };
 			char *skinPtr = NULL, *finalSkin = NULL;
@@ -5244,7 +5244,7 @@ void Item_ListBox_Paint( itemDef_t *item ) {
 				// which may overdraw the box if it is too small for the element
 				image = DC->feederItemImage( item->special.i, i );
 				if ( image ) {
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 					if ( item->window.flags & WINDOW_PLAYERCOLOR ) {
 						vector4	color;
 
@@ -5330,7 +5330,7 @@ void Item_ListBox_Paint( itemDef_t *item ) {
 						image = DC->feederItemImage( item->special.i, i );
 						//	if (image)
 						{
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 							if ( item->window.flags & WINDOW_PLAYERCOLOR ) {
 								vector4	color;
 
@@ -6513,7 +6513,7 @@ void UI_CleanupGhoul2( void ) {
 int UI_ParseAnimationFile( const char *filename, animation_t *animset, qboolean isHumanoid );
 
 qboolean ItemParse_asset_model_go( itemDef_t *item, const char *name, int *runTimeLength ) {
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 	int g2Model;
 	modelDef_t *modelPtr;
 	Item_ValidateTypeData( item );
@@ -6605,7 +6605,7 @@ qboolean ItemParse_asset_model( itemDef_t *item, int handle ) {
 	}
 	temp = token.string;
 
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 	//Raz: Added
 	if ( !Q_stricmp( token.string, "model" ) ) {
 		char modelPath[MAX_QPATH];
@@ -6804,7 +6804,7 @@ qboolean ItemParse_model_g2scale( itemDef_t *item, int handle ) {
 }
 
 // model_g2skin <string>
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 extern displayContextDef_t cgDC;
 #endif
 
@@ -6829,7 +6829,7 @@ qboolean ItemParse_model_g2skin( itemDef_t *item, int handle ) {
 
 	//Raz: Added
 	if ( !Q_stricmp( token.string, "model" ) ) {
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 		cgDC.getCVarString( "model", skinpath, sizeof(skinpath) );
 #else
 		uiInfo.uiDC.getCVarString( "model", skinpath, sizeof(skinpath) );
@@ -7556,7 +7556,7 @@ qboolean ItemParse_cvarFloat( itemDef_t *item, int handle ) {
 	return qfalse;
 }
 
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 static char currLanguage[32][128];
 static const char languageString[32] = "@MENUS_MYLANGUAGE";
 #endif
@@ -7578,7 +7578,7 @@ qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 	}
 
 	if ( !Q_stricmp( token.string, "feeder" ) && item->special.i == FEEDER_PLAYER_SPECIES ) {
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 		for ( ; multiPtr->count < uiInfo.playerSpeciesCount; multiPtr->count++ ) {
 			const char *p = String_Alloc( va( "@MENUS_%s", uiInfo.playerSpecies[multiPtr->count].Name ) ); // look up translation
 			Q_strupr( (char *)p );
@@ -7590,7 +7590,7 @@ qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 	}
 	// languages
 	if ( !Q_stricmp( token.string, "feeder" ) && item->special.i == FEEDER_LANGUAGES ) {
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 		for ( ; multiPtr->count < uiInfo.languageCount; multiPtr->count++ ) {
 			// The displayed text
 			trap->SE_GetLanguageName( (const int)multiPtr->count, (char *)currLanguage[multiPtr->count] );	// eg "English"
@@ -7773,7 +7773,7 @@ qboolean ItemParse_Appearance_slot( itemDef_t *item, int handle ) {
 }
 
 qboolean ItemParse_isSaber( itemDef_t *item, int handle ) {
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 
 	int	i;
 
@@ -7796,7 +7796,7 @@ qboolean ItemParse_isSaber( itemDef_t *item, int handle ) {
 }
 
 qboolean ItemParse_isSaber2( itemDef_t *item, int handle ) {
-#ifndef _CGAME
+#ifndef PROJECT_CGAME
 	int	i;
 	if ( PC_Int_Parse( handle, &i ) ) {
 		if ( i ) {

@@ -1,16 +1,16 @@
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 #include "g_local.h"
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 #include "cg_local.h"
 #endif
 #include "bg_lua.h"
 
 #ifdef JPLUA
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 extern std::unordered_map<std::string, int> jplua_client_commands;
 extern std::unordered_map<std::string, int> jplua_server_commands;
-#elif defined _CGAME
+#elif defined PROJECT_CGAME
 extern std::unordered_map<std::string, int> jplua_console_commands;
 extern std::unordered_map<std::string, int> jplua_server_commands;
 #endif
@@ -41,10 +41,10 @@ int JPLua_Event_AddListener( lua_State *L ) {
 	const char *listenerArg = lua_tostring( L, 1 );
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 		G_LogPrintf( level.log.console, "JPLua: AddListener failed, function signature invalid registering %s (plugin: "
 			"%s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 		trap->Print( "JPLua: AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up to "
 			"date?\n", listenerArg, JPLua.currentPlugin->name );
 #endif
@@ -58,10 +58,10 @@ int JPLua_Event_AddListener( lua_State *L ) {
 		}
 	}
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	G_LogPrintf( level.log.console, "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n",
 		listenerArg, JPLua.currentPlugin->name );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	trap->Print( "JPLua: AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n",
 		listenerArg, JPLua.currentPlugin->name );
 #endif
@@ -75,10 +75,10 @@ int JPLua_Event_RemoveListener( lua_State *L ) {
 	const char *listenerArg = lua_tostring( L, 1 );
 
 	if ( lua_type( L, 1 ) != LUA_TSTRING ) {
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 		G_LogPrintf( level.log.console, "JPLua: RemoveListener failed, function signature invalid registering %s (plugin:"
 			" %s) - Is it up to date?\n", listenerArg, JPLua.currentPlugin->name );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 		trap->Print( "JPLua: RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it up to"
 			" date?\n", listenerArg, JPLua.currentPlugin->name );
 #endif
@@ -93,10 +93,10 @@ int JPLua_Event_RemoveListener( lua_State *L ) {
 		}
 	}
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	G_LogPrintf( level.log.console, "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to "
 		"date?\n", listenerArg, JPLua.currentPlugin->name );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	trap->Print( "JPLua: RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n",
 		listenerArg, JPLua.currentPlugin->name );
 #endif
@@ -132,9 +132,9 @@ void JPLua_Event_RunFrame( void ) {
 #endif // JPLUA
 }
 
-#if defined(_CGAME)
+#if defined(PROJECT_CGAME)
 char *JPLua_Event_ChatMessageRecieved( const char *msg ) {
-#elif defined(_GAME)
+#elif defined(PROJECT_GAME)
 char *JPLua_Event_ChatMessageRecieved(int clientNum, const char *msg, int type ) {
 #endif
 	static char tmpMsg[MAX_SAY_TEXT] = { 0 }; // although a chat message can only be MAX_SAY_TEXT long..-name?
@@ -149,10 +149,10 @@ char *JPLua_Event_ChatMessageRecieved(int clientNum, const char *msg, int type )
 		if ( plugin->eventListeners[JPLUA_EVENT_CHATMSGRECV] ) {
 			lua_rawgeti( JPLua.state, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_CHATMSGRECV] );
 
-#if defined(_CGAME)
+#if defined(PROJECT_CGAME)
 			lua_pushstring( JPLua.state, tmpMsg );
 			JPLua_Call( JPLua.state, 1, 1 );
-#elif defined(_GAME)
+#elif defined(PROJECT_GAME)
 			JPLua_Player_CreateRef( JPLua.state, clientNum );
 			lua_pushstring( JPLua.state, tmpMsg );
 			lua_pushinteger(JPLua.state, type);
@@ -175,7 +175,7 @@ char *JPLua_Event_ChatMessageRecieved(int clientNum, const char *msg, int type )
 	return tmpMsg;
 }
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targetClient ) {
 	static char tmpMsg[MAX_STRING_CHARS] = { 0 }; // although a chat message can only be MAX_SAY_TEXT long..-name?
 #ifdef JPLUA
@@ -212,7 +212,7 @@ char *JPLua_Event_ChatMessageSent( const char *msg, messageMode_t mode, int targ
 }
 #endif
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void JPLua_Event_ClientBegin( int clientNum ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -229,7 +229,7 @@ void JPLua_Event_ClientBegin( int clientNum ) {
 }
 #endif
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 qboolean JPLua_Event_ClientCommand(int clientNum){
 	qboolean ret = qfalse;
 #ifdef JPLUA
@@ -291,7 +291,7 @@ qboolean JPLua_Event_ClientCommand(int clientNum){
 
 #endif
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 const char *JPLua_Event_ClientConnect( int clientNum, const char *userinfo, const char *IP, qboolean firstTime ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -323,7 +323,7 @@ const char *JPLua_Event_ClientConnect( int clientNum, const char *userinfo, cons
 #endif
 	return NULL;
 }
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 void JPLua_Event_ClientConnect( int clientNum ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -340,7 +340,7 @@ void JPLua_Event_ClientConnect( int clientNum ) {
 }
 #endif
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void JPLua_Event_ClientDisconnect( int clientNum ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -357,7 +357,7 @@ void JPLua_Event_ClientDisconnect( int clientNum ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientInfo_t *newInfo ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -423,7 +423,7 @@ void JPLua_Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientI
 }
 #endif
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void JPLua_Event_ClientSpawn( int clientNum, qboolean firstSpawn ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -440,7 +440,7 @@ void JPLua_Event_ClientSpawn( int clientNum, qboolean firstSpawn ) {
 }
 #endif
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 qboolean JPLua_Event_ClientUserinfoChanged( int clientNum, char *userinfo ) {
 	qboolean ret = qfalse;
 #ifdef JPLUA
@@ -470,7 +470,7 @@ qboolean JPLua_Event_ClientUserinfoChanged( int clientNum, char *userinfo ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 qboolean JPLua_Event_HUD( void ) {
 	qboolean ret = qfalse;
 
@@ -490,7 +490,7 @@ qboolean JPLua_Event_HUD( void ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 qboolean JPLua_Event_VehicleHUD( void ) {
 	qboolean ret = qfalse;
 
@@ -510,7 +510,7 @@ qboolean JPLua_Event_VehicleHUD( void ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 qboolean JPLua_Event_ConnectScreen( void ) {
 	qboolean ret = qfalse;
 
@@ -530,7 +530,7 @@ qboolean JPLua_Event_ConnectScreen( void ) {
 }
 #endif
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 void JPLua_Event_Pain( int target, int inflictor, int attacker, int health, int armor, uint32_t dflags, int mod ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -551,7 +551,7 @@ void JPLua_Event_Pain( int target, int inflictor, int attacker, int health, int 
 	}
 #endif // JPLUA
 }
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 void JPLua_Event_Pain( int clientNum, int health ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -569,7 +569,7 @@ void JPLua_Event_Pain( int clientNum, int health ) {
 }
 #endif
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void JPLua_Event_PlayerDeath( int clientNum, int mod, int inflictor ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -595,7 +595,7 @@ void JPLua_Event_PlayerDeath( int clientNum, int mod, int inflictor ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 void JPLua_Event_SaberTouch( int victim, int attacker ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
@@ -613,7 +613,7 @@ void JPLua_Event_SaberTouch( int victim, int attacker ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 qboolean JPLua_Event_ConsoleCommand( void ){
 	qboolean ret = qfalse;
 #ifdef JPLUA
@@ -643,7 +643,7 @@ qboolean JPLua_Event_ConsoleCommand( void ){
 
 #endif
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 qboolean JPLua_Event_ServerCommand( void ) {
 	qboolean ret = qfalse;
 #ifdef JPLUA
@@ -669,7 +669,7 @@ qboolean JPLua_Event_ServerCommand( void ) {
 #endif // JPLUA
 	return qfalse;
 }
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 qboolean JPLua_Event_ServerCommand( void ) {
 	qboolean ret = qfalse;
 #ifdef JPLUA

@@ -9,12 +9,12 @@ extern "C" {
 #include "bg_luacvar.h"
 #include "bg_luaevent.h"
 #include "bg_luaplayer.h"
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 #include "cg_luaserver.h"
 #endif
 #include "bg_luavector.h"
 #include "bg_luafs.h"
-#ifdef _GAME
+#ifdef PROJECT_GAME
 #include "g_luasql.h"
 #endif
 

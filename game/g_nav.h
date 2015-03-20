@@ -22,7 +22,7 @@
 
 // Engine has its own copy of these (navigator.h)
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 //rww - Rest of defines here are also shared in exe, do not modify.
 #define	__NEWCOLLECT	1
 

@@ -1,5 +1,5 @@
 #include "qcommon/q_shared.h"
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 #include "cg_local.h"
 #endif
 
@@ -11,7 +11,7 @@
 
 #else
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 Q_EXPORT void QDECL CrashReport( int fileHandle ) {
 	//	char text[] = "Test from cgame\n";
 	//	trap->FS_Write( text, strlen( text ), fileHandle );

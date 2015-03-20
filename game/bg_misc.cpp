@@ -5,16 +5,16 @@
 #include "qcommon/q_shared.h"
 #include "bg_public.h"
 
-#if defined( _GAME )
+#if defined( PROJECT_GAME )
 #include "g_local.h"
-#elif defined( _UI )
+#elif defined( PROJECT_UI )
 #include "ui_local.h"
-#elif defined( _CGAME )
+#elif defined( PROJECT_CGAME )
 #include "cg_local.h"
 #endif
 #include "JAPP/jp_cinfo.h"
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void Q3_SetParm( int entID, int parmNum, const char *parmValue );
 #endif
 
@@ -336,11 +336,11 @@ qboolean BG_FileExists( const char *fileName ) {
 	return qfalse;
 }
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 char *CG_NewString( const char *string );
 #endif
 
-#ifndef _UI
+#ifndef PROJECT_UI
 
 static int spawncmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((BG_field_t*)b)->name );
@@ -359,7 +359,7 @@ void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, 
 
 		switch ( f->type ) {
 		case F_LSTRING:
-#ifdef _GAME
+#ifdef PROJECT_GAME
 			*(char **)(b + f->ofs) = G_NewString( value );
 #else
 			*(char **)(b + f->ofs) = CG_NewString( value );
@@ -395,7 +395,7 @@ void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, 
 			((float *)(b + f->ofs))[1] = v;
 			((float *)(b + f->ofs))[2] = 0;
 			break;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		case F_PARM1:
 		case F_PARM2:
 		case F_PARM3:
@@ -1005,9 +1005,9 @@ void BG_CycleInven( playerState_t *ps, int direction ) {
 }
 
 static qboolean BG_AlwaysPickupWeapons( void ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	return !!((jp_cinfo.bits & CINFO_ALWAYSPICKUPWEAP));
-#elif defined( _CGAME )
+#elif defined( PROJECT_CGAME )
 	return !!((cgs.japp.jp_cinfo & CINFO_ALWAYSPICKUPWEAP));
 #else
 	return qfalse;
@@ -1461,7 +1461,7 @@ void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerSta
 
 	if ( showEvents.integer ) {
 		Com_Printf( "%cgame event svt %5d -> %5d: num = %20s parm %d\n",
-#ifdef _GAME
+#ifdef PROJECT_GAME
 			' ',
 #else
 			'c',
@@ -1928,7 +1928,7 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 
 // perform the appropriate model precache routine
 int BG_ModelCache( const char *modelName, const char *skinName ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	void *g2 = NULL;
 
 	if ( skinName && skinName[0] ) {
@@ -1949,10 +1949,10 @@ int BG_ModelCache( const char *modelName, const char *skinName ) {
 #endif
 }
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 #define MAX_POOL_SIZE	(12*1024*1024) // 12mB, was 3mB
 #define BGALLOCSTR "S"
-#elif defined _CGAME
+#elif defined PROJECT_CGAME
 #define MAX_POOL_SIZE	(8*1024*1024) // 8mB, was 2mB
 #define BGALLOCSTR "CG"
 #else
@@ -2098,9 +2098,9 @@ int BG_GetGametypeForString( const char *gametype ) {
 }
 
 qboolean GetCInfo( uint32_t bit ) {
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	uint32_t cinfo = (unsigned)jp_cinfo.integer;
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	uint32_t cinfo = cgs.japp.jp_cinfo;
 #else
 	uint32_t cinfo = 0u;
@@ -2109,9 +2109,9 @@ qboolean GetCInfo( uint32_t bit ) {
 }
 
 qboolean GetCPD( bgEntity_t *self, uint32_t bit ) {
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	uint32_t cpd = ((gentity_t *)self)->client->pers.CPD;
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	uint32_t cpd = (unsigned)cp_pluginDisable.integer;
 #else
 	uint32_t cpd = 0u;

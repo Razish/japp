@@ -10,7 +10,7 @@ void BG_SetAnim( playerState_t *ps, animation_t *animations, int setAnimParts, i
 void BG_SetLegsAnimTimer( playerState_t *ps, int time );
 void BG_SetTorsoAnimTimer( playerState_t *ps, int time );
 void G_VehUpdateShields( gentity_t *targ );
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void VEH_TurretThink( Vehicle_t *pVeh, gentity_t *parent, int turretNum );
 #endif
 
@@ -271,7 +271,7 @@ qboolean Board( Vehicle_t *pVeh, bgEntity_t *pEnt ) {
 			for ( i = 0; i < pVeh->m_pVehicleInfo->maxPassengers; i++ ) {
 				if ( pVeh->m_ppPassengers[i] == NULL ) {
 					pVeh->m_ppPassengers[i] = (bgEntity_t *)ent;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 					//Server just needs to tell client which passengernum he is
 					if ( ent->client ) {
 						ent->client->ps.generic1 = i + 1;
@@ -295,7 +295,7 @@ qboolean Board( Vehicle_t *pVeh, bgEntity_t *pEnt ) {
 			parent->s.owner = parent->r.ownerNum; //for prediction
 		}
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		{
 			gentity_t *gParent = (gentity_t *)parent;
 			if ( (gParent->spawnflags & 2) ) {//was being suspended
@@ -344,7 +344,7 @@ qboolean Board( Vehicle_t *pVeh, bgEntity_t *pEnt ) {
 			for ( i = 0; i < pVeh->m_pVehicleInfo->maxPassengers; i++ ) {
 				if ( pVeh->m_ppPassengers[i] == NULL ) {
 					pVeh->m_ppPassengers[i] = (bgEntity_t *)ent;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 					//Server just needs to tell client which passengernum he is
 					if ( ent->client ) {
 						ent->client->ps.generic1 = i + 1;
@@ -502,7 +502,7 @@ void G_EjectDroidUnit( Vehicle_t *pVeh, qboolean kill ) {
 	pVeh->m_pDroidUnit->s.m_iVehicleNum = ENTITYNUM_NONE;
 	pVeh->m_pDroidUnit->s.owner = ENTITYNUM_NONE;
 	//	pVeh->m_pDroidUnit->s.otherEntityNum2 = ENTITYNUM_NONE;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	{
 		gentity_t *droidEnt = (gentity_t *)pVeh->m_pDroidUnit;
 		droidEnt->flags &= ~FL_UNDYING;
@@ -620,7 +620,7 @@ getItOutOfMe:
 				parent->client->ps.m_iVehicleNum = pVeh->m_ppPassengers[j]->s.number + 1;
 
 				//rearrange the passenger slots now..
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				//Server just needs to tell client he's not a passenger anymore
 				if ( ((gentity_t *)pVeh->m_ppPassengers[j])->client ) {
 					((gentity_t *)pVeh->m_ppPassengers[j])->client->ps.generic1 = 0;
@@ -631,7 +631,7 @@ getItOutOfMe:
 					if ( !pVeh->m_ppPassengers[k - 1] ) { //move down
 						pVeh->m_ppPassengers[k - 1] = pVeh->m_ppPassengers[k];
 						pVeh->m_ppPassengers[k] = NULL;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 						//Server just needs to tell client which passenger he is
 						if ( pVeh->m_ppPassengers[k - 1] && ((gentity_t *)pVeh->m_ppPassengers[k - 1])->client ) {
 							((gentity_t *)pVeh->m_ppPassengers[k - 1])->client->ps.generic1 = k;
@@ -656,7 +656,7 @@ getItOutOfMe:
 		for ( i = 0; i < pVeh->m_pVehicleInfo->maxPassengers; i++ ) {
 			// If we found him...
 			if ( (gentity_t *)pVeh->m_ppPassengers[i] == ent ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				//Server just needs to tell client he's not a passenger anymore
 				if ( ((gentity_t *)pVeh->m_ppPassengers[i])->client ) {
 					((gentity_t *)pVeh->m_ppPassengers[i])->client->ps.generic1 = 0;
@@ -781,11 +781,11 @@ qboolean EjectAll( Vehicle_t *pVeh ) {
 
 	// Throw them off.
 	if ( pVeh->m_pPilot ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		gentity_t *pilot = (gentity_t*)pVeh->m_pPilot;
 #endif
 		pVeh->m_pVehicleInfo->Eject( pVeh, pVeh->m_pPilot, qtrue );
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		if ( pVeh->m_pVehicleInfo->killRiderOnDeath && pilot ) {//Kill them, too
 			//FIXME: proper origin, MOD and attacker (for credit/death message)?  Get from vehicle?
 			G_MuteSound( pilot->s.number, CHAN_VOICE );
@@ -794,11 +794,11 @@ qboolean EjectAll( Vehicle_t *pVeh ) {
 #endif
 	}
 	if ( pVeh->m_pOldPilot ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		gentity_t *pilot = (gentity_t*)pVeh->m_pOldPilot;
 #endif
 		pVeh->m_pVehicleInfo->Eject( pVeh, pVeh->m_pOldPilot, qtrue );
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		if ( pVeh->m_pVehicleInfo->killRiderOnDeath && pilot ) {//Kill them, too
 			//FIXME: proper origin, MOD and attacker (for credit/death message)?  Get from vehicle?
 			G_MuteSound( pilot->s.number, CHAN_VOICE );
@@ -811,11 +811,11 @@ qboolean EjectAll( Vehicle_t *pVeh ) {
 
 		for ( i = 0; i < pVeh->m_pVehicleInfo->maxPassengers; i++ ) {
 			if ( pVeh->m_ppPassengers[i] ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				gentity_t *rider = (gentity_t*)pVeh->m_ppPassengers[i];
 #endif
 				pVeh->m_pVehicleInfo->Eject( pVeh, pVeh->m_ppPassengers[i], qtrue );
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				if ( pVeh->m_pVehicleInfo->killRiderOnDeath && rider ) {//Kill them, too
 					//FIXME: proper origin, MOD and attacker (for credit/death message)?  Get from vehicle?
 					G_MuteSound( rider->s.number, CHAN_VOICE );
@@ -1043,9 +1043,9 @@ static qboolean Update( Vehicle_t *pVeh, const usercmd_t *pUmcd ) {
 
 	parentPS = pVeh->m_pParentEntity->playerState;
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	curTime = level.time;
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	//FIXME: pass in ucmd?  Not sure if this is reliable...
 	curTime = pm->cmd.serverTime;
 #endif
@@ -1157,7 +1157,7 @@ static qboolean Update( Vehicle_t *pVeh, const usercmd_t *pUmcd ) {
 		return qfalse;
 	}
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	if ( parent->spawnflags & 1 ) {
 		if ( pVeh->m_pPilot || !pVeh->m_bHasHadPilot ) {
 			if ( pVeh->m_pPilot && !pVeh->m_bHasHadPilot ) {
@@ -1301,7 +1301,7 @@ static qboolean Update( Vehicle_t *pVeh, const usercmd_t *pUmcd ) {
 		}
 	}
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	for ( i = 0; i < MAX_VEHICLE_TURRETS; i++ ) {//HMM... can't get a seperate command for each weapon, so do them all...?
 		VEH_TurretThink( pVeh, parent, i );
 	}

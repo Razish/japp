@@ -5,11 +5,11 @@
 #include "bg_vehicles.h"
 #include "bg_weapons.h"
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 #include "g_local.h"
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 #include "cgame/cg_local.h"
-#elif defined(_UI)
+#elif defined(PROJECT_UI)
 #include "ui/ui_local.h"
 #endif
 
@@ -29,7 +29,7 @@ void BG_ClearVehicleParseParms( void ) {
 	VehicleParms[0] = 0;
 }
 
-#if defined(_GAME) || defined(_CGAME)
+#if defined(PROJECT_GAME) || defined(PROJECT_CGAME)
 //These funcs are actually shared in both projects
 void G_SetAnimalVehicleFunctions( vehicleInfo_t *pVehInfo );
 void G_SetSpeederVehicleFunctions( vehicleInfo_t *pVehInfo );
@@ -154,54 +154,54 @@ static qboolean BG_ParseVehWeaponParm( vehWeaponInfo_t *vehWeapon, char *parmNam
 				//*(int *)(b+vehWeaponFields[i].ofs) = VEH_VehWeaponIndexForName( value );
 				break;
 			case VF_MODEL:// take the string, get the G_ModelIndex
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				*(int *)(b+vehWeaponFields[i].ofs) = G_ModelIndex( value );
 #else
 				*(int *)(b + vehWeaponFields[i].ofs) = trap->R_RegisterModel( value );
 #endif
 				break;
 			case VF_MODEL_CLIENT:	// (MP cgame only) take the string, get the G_ModelIndex
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				*(int *)(b+vehWeaponFields[i].ofs) = G_ModelIndex( value );
 #else
 				*(int *)(b + vehWeaponFields[i].ofs) = trap->R_RegisterModel( value );
 #endif
 				break;
 			case VF_EFFECT:	// take the string, get the G_EffectIndex
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				//	*(int *)(b+vehWeaponFields[i].ofs) = G_EffectIndex( value );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 				*(int *)(b + vehWeaponFields[i].ofs) = trap->FX_RegisterEffect( value );
 #endif
 				break;
 			case VF_EFFECT_CLIENT:	// (MP cgame only) take the string, get the index
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				//*(int *)(b+vehWeaponFields[i].ofs) = G_EffectIndex( value );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 				*(int *)(b + vehWeaponFields[i].ofs) = trap->FX_RegisterEffect( value );
 #endif
 				break;
 			case VF_SHADER:	// (cgame only) take the string, call trap->R_RegisterShader
-#ifdef _UI
+#ifdef PROJECT_UI
 				*(int *)(b + vehWeaponFields[i].ofs) = trap->R_RegisterShaderNoMip( value );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 				*(int *)(b + vehWeaponFields[i].ofs) = trap->R_RegisterShader( value );
 #endif
 				break;
 			case VF_SHADER_NOMIP:// (cgame only) take the string, call trap->R_RegisterShaderNoMip
-#if defined(_CGAME) || defined(_UI)
+#if defined(PROJECT_CGAME) || defined(PROJECT_UI)
 				*(int *)(b + vehWeaponFields[i].ofs) = trap->R_RegisterShaderNoMip( value );
 #endif
 				break;
 			case VF_SOUND:	// take the string, get the G_SoundIndex
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				*(int *)(b+vehWeaponFields[i].ofs) = G_SoundIndex( value );
 #else
 				*(int *)(b + vehWeaponFields[i].ofs) = trap->S_RegisterSound( value );
 #endif
 				break;
 			case VF_SOUND_CLIENT:	// (MP cgame only) take the string, get the index
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				//*(int *)(b+vehWeaponFields[i].ofs) = G_SoundIndex( value );
 #else
 				*(int *)(b + vehWeaponFields[i].ofs) = trap->S_RegisterSound( value );
@@ -281,7 +281,7 @@ int VEH_LoadVehWeapon( const char *vehWeaponName ) {//load up specified vehWeapo
 		}
 	}
 	if ( vehWeapon->fHoming ) {//all lock-on weapons use these 2 sounds
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		//Hmm, no need fo have server register this, is there?
 		//G_SoundIndex( "sound/weapons/torpedo/tick.wav" );
 		//G_SoundIndex( "sound/weapons/torpedo/lock.wav" );
@@ -553,12 +553,12 @@ stringID_table_t VehicleTable[VH_NUM_VEHICLES + 1] =
 // Setup the shared functions (one's that all vehicles would generally use).
 extern void G_SetSharedVehicleFunctions( vehicleInfo_t *pVehInfo );
 void BG_SetSharedVehicleFunctions( vehicleInfo_t *pVehInfo ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	//only do the whole thing if we're on game
 	G_SetSharedVehicleFunctions(pVehInfo);
 #endif
 
-#if defined(_GAME) || defined(_CGAME)
+#if defined(PROJECT_GAME) || defined(PROJECT_CGAME)
 	switch ( pVehInfo->type ) {
 	case VH_SPEEDER:
 		G_SetSpeederVehicleFunctions( pVehInfo );
@@ -754,56 +754,56 @@ static qboolean BG_ParseVehicleParm( vehicleInfo_t *vehicle, const char *parmNam
 				*(int *)(b + vehicleFields[i].ofs) = VEH_VehWeaponIndexForName( value );
 				break;
 			case VF_MODEL:	// take the string, get the G_ModelIndex
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				*(int *)(b+vehicleFields[i].ofs) = G_ModelIndex( value );
 #else
 				*(int *)(b + vehicleFields[i].ofs) = trap->R_RegisterModel( value );
 #endif
 				break;
 			case VF_MODEL_CLIENT:	// (MP cgame only) take the string, get the G_ModelIndex
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				//*(int *)(b+vehicleFields[i].ofs) = G_ModelIndex( value );
 #else
 				*(int *)(b + vehicleFields[i].ofs) = trap->R_RegisterModel( value );
 #endif
 				break;
 			case VF_EFFECT:	// take the string, get the G_EffectIndex
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				*(int *)(b+vehicleFields[i].ofs) = G_EffectIndex( value );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 				*(int *)(b + vehicleFields[i].ofs) = trap->FX_RegisterEffect( value );
 #endif
 				break;
 			case VF_EFFECT_CLIENT:	// (MP cgame only) take the string, get the G_EffectIndex
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				//*(int *)(b+vehicleFields[i].ofs) = G_EffectIndex( value );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 				*(int *)(b + vehicleFields[i].ofs) = trap->FX_RegisterEffect( value );
 #endif
 				break;
 			case VF_SHADER:	// (cgame only) take the string, call trap->R_RegisterShader
-#ifdef _UI
+#ifdef PROJECT_UI
 				*(int *)(b + vehicleFields[i].ofs) = trap->R_RegisterShaderNoMip( value );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 				*(int *)(b + vehicleFields[i].ofs) = trap->R_RegisterShader( value );
 #endif
 				break;
 			case VF_SHADER_NOMIP:// (cgame only) take the string, call trap->R_RegisterShaderNoMip
-#if defined(_CGAME)
+#if defined(PROJECT_CGAME)
 				*(int *)(b + vehicleFields[i].ofs) = trap->R_RegisterShaderNoMip( value );
-#elif defined(_UI)
+#elif defined(PROJECT_UI)
 				*(int *)(b + vehicleFields[i].ofs) = trap->R_RegisterShaderNoMip( value );
 #endif
 				break;
 			case VF_SOUND:	// take the string, get the G_SoundIndex
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				*(int *)(b+vehicleFields[i].ofs) = G_SoundIndex( value );
 #else
 				*(int *)(b + vehicleFields[i].ofs) = trap->S_RegisterSound( value );
 #endif
 				break;
 			case VF_SOUND_CLIENT:	// (MP cgame only) take the string, get the G_SoundIndex
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				//*(int *)(b+vehicleFields[i].ofs) = G_SoundIndex( value );
 #else
 				*(int *)(b + vehicleFields[i].ofs) = trap->S_RegisterSound( value );
@@ -1041,14 +1041,14 @@ int VEH_LoadVehicle( const char *vehicleName ) {//load up specified vehicle and 
 	}
 
 	if ( vehicle->model ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		vehicle->modelIndex = G_ModelIndex( va( "models/players/%s/model.glm", vehicle->model ) );
 #else
 		vehicle->modelIndex = trap->R_RegisterModel( va( "models/players/%s/model.glm", vehicle->model ) );
 #endif
 	}
 
-#if defined(_CGAME) || defined(_UI)
+#if defined(PROJECT_CGAME) || defined(PROJECT_UI)
 	if ( VALIDSTRING( vehicle->skin ) )
 		trap->R_RegisterSkin( va( "models/players/%s/model_%s.skin", vehicle->model, vehicle->skin ) );
 #endif
@@ -1059,14 +1059,14 @@ int VEH_LoadVehicle( const char *vehicleName ) {//load up specified vehicle and 
 	BG_SetSharedVehicleFunctions( vehicle );
 	//misc effects... FIXME: not even used in MP, are they?
 	if ( vehicle->explosionDamage ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		G_EffectIndex( "ships/ship_explosion_mark" );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 		trap->FX_RegisterEffect( "ships/ship_explosion_mark" );
 #endif
 	}
 	if ( vehicle->flammable ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		G_SoundIndex( "sound/vehicles/common/fire_lp.wav" );
 #else
 		trap->S_RegisterSound( "sound/vehicles/common/fire_lp.wav" );
@@ -1074,18 +1074,18 @@ int VEH_LoadVehicle( const char *vehicleName ) {//load up specified vehicle and 
 	}
 
 	if ( vehicle->hoverHeight > 0 ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		G_EffectIndex( "ships/swoop_dust" );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 		trap->FX_RegisterEffect( "ships/swoop_dust" );
 #endif
 	}
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	G_EffectIndex( "volumetric/black_smoke" );
 	G_EffectIndex( "ships/fire" );
 	G_SoundIndex( "sound/vehicles/common/release.wav" );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	trap->R_RegisterShader( "gfx/menus/radar/bracket" );
 	trap->R_RegisterShader( "gfx/menus/radar/lead" );
 	trap->R_RegisterShaderNoMip( "gfx/menus/radar/asteroid" );
@@ -1303,7 +1303,7 @@ const char *BG_GetVehicleSkinName( const char *skinname ) {
 		return g_vehicleInfo[vIndex].skin;
 }
 
-#if defined(_GAME) || defined(_CGAME)
+#if defined(PROJECT_GAME) || defined(PROJECT_CGAME)
 //so cgame can assign the function pointer for the vehicle attachment without having to
 //bother with all the other funcs that don't really exist cgame-side.
 int BG_GetTime( void );

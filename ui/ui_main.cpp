@@ -670,9 +670,9 @@ void Text_PaintWithCursor( float x, float y, float scale, const vector4 *color, 
 	//
 	{
 		char sTemp[1024];
-		int iCopyCount = limit ? min( (signed)strlen( text ), limit ) : (signed)strlen( text );
-		iCopyCount = min( iCopyCount, cursorPos );
-		iCopyCount = min( iCopyCount, sizeof(sTemp) );
+		int iCopyCount = limit ? std::min( (signed)strlen( text ), limit ) : (signed)strlen( text );
+		iCopyCount = std::min( iCopyCount, cursorPos );
+		iCopyCount = std::min( static_cast<size_t>( iCopyCount ), sizeof(sTemp) );
 
 		// copy text into temp buffer for pixel measure...
 		//
@@ -2290,7 +2290,7 @@ static void UI_DrawCrosshair( rectDef_t *rect, float scale, const vector4 *color
 	if ( uiInfo.currentCrosshair < 0 || uiInfo.currentCrosshair >= NUM_CROSSHAIRS )
 		uiInfo.currentCrosshair = 0;
 
-	size = min( rect->w, rect->h );
+	size = std::min( rect->w, rect->h );
 
 	UI_DrawHandlePic( rect->x, rect->y, size, size, uiInfo.uiDC.Assets.crosshairShader[uiInfo.currentCrosshair] );
 	trap->R_SetColor( NULL );

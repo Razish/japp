@@ -14,9 +14,9 @@
 
 #define JAPLUS_CLIENT_VERSION	"1.4B4"
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 // ...
-#elif defined(_CGAME) || defined(_UI)
+#elif defined(PROJECT_CGAME) || defined(PROJECT_UI)
 //	#define JPLUA_DEBUG
 #define RAZTEST //Vehicles? First person stuff?
 #define IMPROVED_RAGDOLL
@@ -75,18 +75,21 @@ extern int g_G2AllocServer;
 #define Q_EXPORT
 #endif
 
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <ctype.h>
-#include <limits.h>
-#include <stddef.h>
-#include <errno.h>
-#include <stdint.h>
+#include <cassert>
+#include <cmath>
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
+#include <cstdlib>
+#include <ctime>
+#include <cctype>
+#include <climits>
+#include <cstddef>
+#include <cerrno>
+#include <cstdint>
+
+#include <algorithm>
+#include <string>
 
 #if UINTPTR_MAX == 0xffffffff
 #define ARCH_WIDTH 32
@@ -138,6 +141,7 @@ float LittleFloat( const float l );
 //Raz: added
 #define WIN32_LEAN_AND_MEAN
 #define NOSCROLL
+#define NOMINMAX
 #include <windows.h>
 
 #undef QDECL
@@ -959,12 +963,6 @@ void ByteToDir( int b, vector3 *dir );
 //rwwRMG - added math defines
 #define minimum( x, y ) ((x) < (y) ? (x) : (y))
 #define maximum( x, y ) ((x) > (y) ? (x) : (y))
-#ifndef min
-#define min minimum
-#endif
-#ifndef max
-#define max maximum
-#endif
 
 #define Square(x) ((x)*(x))
 
@@ -1171,7 +1169,7 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
-#if defined( _GAME ) || defined( _CGAME ) || defined( _UI )
+#if defined( PROJECT_GAME ) || defined( PROJECT_CGAME ) || defined( PROJECT_UI )
 extern void( *Com_Error )(int level, const char *error, ...);
 extern void( *Com_Printf )(const char *msg, ...);
 #else

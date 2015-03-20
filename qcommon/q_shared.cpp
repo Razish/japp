@@ -4,15 +4,15 @@
 #include "qcommon/q_shared.h"
 #include "json/cJSON.h"
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 #include "g_local.h"
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 #include "cg_local.h"
-#elif defined(_UI)
+#elif defined(PROJECT_UI)
 #include "ui_local.h"
 #endif
 
-#if defined( _GAME ) || defined( _CGAME ) || defined( _UI )
+#if defined( PROJECT_GAME ) || defined( PROJECT_CGAME ) || defined( PROJECT_UI )
 void( *Com_Error )(int level, const char *error, ...);
 void( *Com_Printf )(const char *msg, ...);
 #endif

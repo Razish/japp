@@ -57,7 +57,7 @@ static void DrawServerInfo( float fade ) {
 	case GT_CTY:
 		if ( cgs.timelimit && cgs.capturelimit ) {
 			tmp = va( "Until " S_COLOR_YELLOW "%i" S_COLOR_WHITE "/" S_COLOR_YELLOW "%i " S_COLOR_WHITE "captures or "
-				S_COLOR_YELLOW "%i" S_COLOR_WHITE "/" S_COLOR_YELLOW "%i minutes", max( cgs.scores1, cgs.scores2 ),
+				S_COLOR_YELLOW "%i" S_COLOR_WHITE "/" S_COLOR_YELLOW "%i minutes", std::max( cgs.scores1, cgs.scores2 ),
 				cgs.capturelimit, (cg.time - cgs.levelStartTime) / 60000, cgs.timelimit );
 		}
 		else if ( cgs.timelimit ) {
@@ -66,7 +66,7 @@ static void DrawServerInfo( float fade ) {
 		}
 		else if ( cgs.capturelimit ) {
 			tmp = va( "Until " S_COLOR_YELLOW "%i" S_COLOR_WHITE "/" S_COLOR_YELLOW "%i " S_COLOR_WHITE "captures",
-				max( cgs.scores1, cgs.scores2 ), cgs.capturelimit );
+				std::max( cgs.scores1, cgs.scores2 ), cgs.capturelimit );
 		}
 		else
 			tmp = "Playing forever!";
@@ -305,7 +305,7 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
 			pingColour.a = pingGood.a = pingBad.a = fade;
 
-			CG_LerpColour( &pingGood, &pingBad, &pingColour, min( score->ping / 300.0f, 1.0f ) );
+			CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score->ping / 300.0f, 1.0f ) );
 
 			column = 0;
 
@@ -469,7 +469,7 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 			vector4	pingColour = { 1.0f, 1.0f, 1.0f, 1.0f }, pingGood = { 0.0f, 1.0f, 0.0f, 1.0f },
 				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
 			pingColour.a = pingGood.a = pingBad.a = fade;
-			CG_LerpColour( &pingGood, &pingBad, &pingColour, min( score->ping / 300.0f, 1.0f ) );
+			CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score->ping / 300.0f, 1.0f ) );
 
 			column = 0;
 
@@ -644,7 +644,7 @@ static int ListPlayers_CTF( float fade, float x, float y, float fontScale, int f
 			vector4 pingColour = { 1.0f, 1.0f, 1.0f, 1.0f }, pingGood = { 0.0f, 1.0f, 0.0f, 1.0f },
 				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
 			pingColour.a = pingGood.a = pingBad.a = fade;
-			CG_LerpColour( &pingGood, &pingBad, &pingColour, min( score->ping / 300.0f, 1.0f ) );
+			CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score->ping / 300.0f, 1.0f ) );
 
 			column = 0;
 

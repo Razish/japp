@@ -986,6 +986,8 @@ void			InitBodyQue( void );
 void			InitSiegeMode( void );
 qboolean		InFront( vector3 *spot, vector3 *from, vector3 *fromAngles, float threshHold );
 int				InFieldOfVision( vector3 *viewangles, float fov, vector3 *angles );
+void			Jedi_Cloak( gentity_t *self );
+void			Jedi_Decloak( gentity_t *self );
 qboolean		Jedi_DodgeEvasion( gentity_t *self, gentity_t *shooter, trace_t *tr, int hitLoc );
 void			Jetpack_Off( gentity_t *ent );
 void			Jetpack_On( gentity_t *ent );

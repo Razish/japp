@@ -97,7 +97,7 @@ if plat == 'Windows':
 
 # project settings
 cgame_env['CPPPATH'] += [ '#/cgame' ]
-cgame_env['CPPDEFINES'] += [ '_CGAME', 'JPLUA' ]
+cgame_env['CPPDEFINES'] += [ 'PROJECT_CGAME', 'JPLUA' ]
 if plat == 'Linux':
 	cgame_env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
 cgame_env['LIBPREFIX'] = ''

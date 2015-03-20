@@ -5,7 +5,7 @@
 #include "JAPP/jp_cinfo.h"
 #include "JAPP/jp_csflags.h"
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 #include "g_local.h"
 #endif
 
@@ -30,7 +30,7 @@ void BG_ForcePowerDrain( playerState_t *ps, forcePowers_t forcePower, int overri
 	//take away the power
 	int	drain = overrideAmt;
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	if ( g_entities[ps->clientNum].client->pers.adminData.empowered && !japp_empowerDrain.integer )
 		return;
 #endif
@@ -770,10 +770,10 @@ int PM_SaberLockWinAnim( qboolean victory, qboolean superBreak ) {
 }
 
 // Need to avoid nesting namespaces!
-#ifdef _GAME
+#ifdef PROJECT_GAME
 #include "g_local.h"
 void NPC_SetAnim( gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags );
-#elif defined _CGAME
+#elif defined PROJECT_CGAME
 #include "cg_local.h"
 #endif
 
@@ -868,7 +868,7 @@ int PM_SaberLockLoseAnim( playerState_t *genemy, qboolean victory, qboolean supe
 		break;
 	}
 	if ( loseAnim != -1 ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		NPC_SetAnim( &g_entities[genemy->clientNum], SETANIM_BOTH, loseAnim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD );
 		genemy->weaponTime = genemy->torsoTimer;// + 250;
 #endif
@@ -918,7 +918,7 @@ int PM_SaberLockResultAnim( playerState_t *duelist, qboolean superBreak, qboolea
 	}
 
 	//play the anim and hold it
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	//server-side: set it on the other guy, too
 	if ( duelist->clientNum == pm->ps->clientNum ) {//me
 		PM_SetAnim( SETANIM_BOTH, baseAnim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0 );
@@ -943,7 +943,7 @@ int PM_SaberLockResultAnim( playerState_t *duelist, qboolean superBreak, qboolea
 		G_SetOrigin(saberent, duelist->currentOrigin);
 		}
 		*/
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		if ( 1 )
 #else
 		if ( duelist->clientNum == pm->ps->clientNum )
@@ -956,7 +956,7 @@ int PM_SaberLockResultAnim( playerState_t *duelist, qboolean superBreak, qboolea
 		}
 	}
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	if ( 1 )
 #else
 	if ( duelist->clientNum == pm->ps->clientNum )
@@ -3361,7 +3361,7 @@ void PM_SetSaberMove( short newMove ) {
 
 saberInfo_t *BG_MySaber( int clientNum, int saberNum ) {
 	//returns a pointer to the requested saberNum
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	gentity_t *ent = &g_entities[clientNum];
 	if ( ent->inuse && ent->client ) {
 		if ( !ent->client->saber[saberNum].model
@@ -3370,7 +3370,7 @@ saberInfo_t *BG_MySaber( int clientNum, int saberNum ) {
 		}
 		return &ent->client->saber[saberNum];
 	}
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	clientInfo_t *ci = NULL;
 	if ( clientNum < MAX_CLIENTS ) {
 		ci = &cgs.clientinfo[clientNum];

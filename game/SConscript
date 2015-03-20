@@ -141,10 +141,10 @@ if plat == 'Windows':
 	game_env['LIBS'] += [ 'advapi32' ]
 	if bits == 32:
 		game_env['LIBS'] += [ 'user32' ]
-	
+
 # project settings
 game_env['CPPPATH'] += [ '#/game' ]
-game_env['CPPDEFINES'] += [ '_GAME', 'JPLUA' ]
+game_env['CPPDEFINES'] += [ 'PROJECT_GAME', 'JPLUA' ]
 if plat == 'Linux':
 	game_env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
 game_env['LIBPREFIX'] = ''

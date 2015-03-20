@@ -1,6 +1,6 @@
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 #include "g_local.h"
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 #include "cg_local.h"
 #endif
 
@@ -21,19 +21,19 @@
 const uint32_t JPLUA_VERSION = 10;
 
 static const char *baseDir = "lua/";
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 static const char *pluginDir = "lua/sv/";
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 static const char *pluginDir = "lua/cl/";
 #endif
 #define JPLUA_EXTENSION ".lua"
 
 jplua_t JPLua;
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 std::unordered_map<std::string, int> jplua_client_commands;
 std::unordered_map<std::string, int> jplua_server_commands;
-#elif defined _CGAME
+#elif defined PROJECT_CGAME
 std::unordered_map<std::string, int> jplua_console_commands;
 std::unordered_map<std::string, int> jplua_server_commands;
 #endif
@@ -215,11 +215,11 @@ static int JPLua_Export_Print( lua_State *L ) {
 	char buf[16384] = { 0 };
 
 	JPLua_Util_ArgAsString( L, buf, sizeof(buf) );
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	if (lastluaid == -1){
 #endif
 		trap->Print("%s\n", buf);
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	}
 	else{
 		trap->SendServerCommand(lastluaid,va("print \"%s\n\"", buf));
@@ -449,9 +449,9 @@ static void JPLua_LoadPluginDir( qboolean inPK3 ) {
 }
 
 static void JPLua_PostInit( lua_State *L ) {
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	trap->Print( S_COLOR_CYAN "**************** " S_COLOR_YELLOW "JA++ Lua (SV) is initialising " S_COLOR_CYAN "****************\n" );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	trap->Print( S_COLOR_CYAN "**************** " S_COLOR_YELLOW "JA++ Lua (CL) is initialising " S_COLOR_CYAN "****************\n" );
 #endif
 
@@ -464,14 +464,14 @@ static void JPLua_PostInit( lua_State *L ) {
 	JPLua_LoadPluginDir( qtrue );
 	JPLua_LoadPluginDir( qfalse );
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	trap->Print( S_COLOR_CYAN "**************** " S_COLOR_GREEN "JA++ Lua (SV) is initialised " S_COLOR_GREEN "****************\n" );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	trap->Print( S_COLOR_CYAN "**************** " S_COLOR_GREEN "JA++ Lua (CL) is initialised " S_COLOR_GREEN "****************\n" );
 #endif
 }
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 static int JPLua_Export_AddClientCommand( lua_State *L ) {
 	const char *name = luaL_checkstring(L, 1);
 	int &handle = jplua_client_commands[name];
@@ -488,7 +488,7 @@ static int JPLua_Export_AddClientCommand( lua_State *L ) {
 
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_AddConsoleCommand( lua_State *L ) {
 	const char *name = luaL_checkstring(L, 1);
 	int &handle = jplua_console_commands[name];
@@ -518,7 +518,7 @@ static int JPLua_Export_AddServerCommand(lua_State *L){
 	return 0;
 }
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_DrawPic( lua_State *L ) {
 	vector4 colour;
 	int x, y, w, h, shader;
@@ -538,7 +538,7 @@ static int JPLua_Export_DrawPic( lua_State *L ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_DrawRect( lua_State *L ) {
 	vector4 colour = { 1.0f };
 
@@ -550,7 +550,7 @@ static int JPLua_Export_DrawRect( lua_State *L ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_DrawRotatedPic( lua_State *L ) {
 	vector4 colour;
 	int x, y, w, h, shader;
@@ -572,7 +572,7 @@ static int JPLua_Export_DrawRotatedPic( lua_State *L ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_DrawText( lua_State *L ) {
 	vector4 colour = { 1.0f };
 
@@ -585,28 +585,28 @@ static int JPLua_Export_DrawText( lua_State *L ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_Font_StringHeightPixels( lua_State *L ) {
 	lua_pushnumber( L, CG_Text_Height( lua_tostring( L, 1 ), (float)lua_tonumber( L, 2 ), lua_tointeger( L, 3 ) ) );
 	return 1;
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_Font_StringLengthPixels( lua_State *L ) {
 	lua_pushnumber( L, CG_Text_Width( lua_tostring( L, 1 ), (float)lua_tonumber( L, 2 ), lua_tointeger( L, 3 ) ) );
 	return 1;
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_GetFPS( lua_State *L ) {
 	lua_pushinteger( L, cg.japp.fps );
 	return 1;
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_GetKeyCatcher( lua_State *L ) {
 	lua_pushinteger( L, trap->Key_GetCatcher() );
 	return 1;
@@ -614,11 +614,11 @@ static int JPLua_Export_GetKeyCatcher( lua_State *L ) {
 #endif
 
 static int JPLua_Export_GetGameType( lua_State *L ) {
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 
 	lua_pushinteger( L, level.gametype );
 
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 
 	lua_pushinteger( L, cgs.gametype );
 
@@ -627,13 +627,13 @@ static int JPLua_Export_GetGameType( lua_State *L ) {
 }
 
 static int JPLua_Export_GetMap( lua_State *L ) {
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 
 	char mapname[MAX_CVAR_VALUE_STRING];
 	COM_StripExtension( level.rawmapname, mapname, sizeof(mapname) );
 	lua_pushstring( L, mapname );
 
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 
 	lua_pushstring( L, cgs.mapnameClean );
 
@@ -643,7 +643,7 @@ static int JPLua_Export_GetMap( lua_State *L ) {
 }
 
 static int JPLua_Export_GetMapTime( lua_State *L ) {
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 
 	int msec = level.time - level.startTime;
 	int seconds = msec / 1000;
@@ -653,7 +653,7 @@ static int JPLua_Export_GetMapTime( lua_State *L ) {
 	lua_pushstring( L, va( "%02i:%02i", mins, seconds ) );
 	return 1;
 
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 
 	int msec = 0, secs = 0, mins = 0, limitSec = cgs.timelimit * 60;
 
@@ -678,7 +678,7 @@ static int JPLua_Export_GetMapTime( lua_State *L ) {
 #endif
 }
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_GetMousePos( lua_State *L ) {
 	if ( trap->Key_GetCatcher() & KEYCATCH_CGAME ) {
 		int top;
@@ -694,7 +694,7 @@ static int JPLua_Export_GetMousePos( lua_State *L ) {
 }
 #endif
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 //TODO: client-side version of this
 static int JPLua_Export_GetPlayers( lua_State *L ) {
 	int top, i = 1, clNum;
@@ -721,9 +721,9 @@ static int JPLua_Export_GetRealTime( lua_State *L ) {
 }
 
 static int JPLua_Export_GetTime( lua_State *L ) {
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	lua_pushinteger( L, level.time );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	lua_pushinteger( L, cg.time );
 #endif
 	return 1;
@@ -751,9 +751,9 @@ int JPLua_Export_Trace( lua_State *L ) {
 	skipNumber = lua_tointeger( L, 4 );
 	mask = lua_tointeger( L, 5 );
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	trap->Trace( &tr, &start, &mins, &maxs, &end, skipNumber, mask, qfalse, 0, 0 );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	CG_Trace( &tr, &start, &mins, &maxs, &end, skipNumber, mask );
 #endif
 
@@ -789,28 +789,28 @@ int JPLua_Export_Trace( lua_State *L ) {
 	return 1;
 }
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_RegisterShader( lua_State *L ) {
 	lua_pushinteger( L, trap->R_RegisterShader( lua_tostring( L, 1 ) ) );
 	return 1;
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_RegisterSound( lua_State *L ) {
 	lua_pushinteger( L, trap->S_RegisterSound( lua_tostring( L, 1 ) ) );
 	return 1;
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_RemapShader( lua_State *L ) {
 	trap->R_RemapShader( lua_tostring( L, 1 ), lua_tostring( L, 2 ), lua_tostring( L, 3 ) );
 	return 0;
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 void CG_ChatBox_AddString( char *chatStr ); //cg_draw.c
 static int JPLua_Export_SendChatText( lua_State *L ) {
 	char text[MAX_SAY_TEXT] = { 0 };
@@ -830,29 +830,29 @@ static int JPLua_Export_SendChatText( lua_State *L ) {
 #endif
 
 static int JPLua_Export_SendConsoleCommand( lua_State *L ) {
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	trap->SendConsoleCommand( lua_tointeger( L, 1 ), va( "%s\n", lua_tostring( L, 2 ) ) );
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	trap->SendConsoleCommand( lua_tostring( L, 1 ) );
 #endif
 	return 0;
 }
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 static int JPLua_Export_SendReliableCommand( lua_State *L ) {
 	trap->SendServerCommand( lua_tointeger( L, 1 ), lua_tostring( L, 2 ) );
 	return 0;
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_SendServerCommand( lua_State *L ) {
 	trap->SendClientCommand( lua_tostring( L, 1 ) );
 	return 0;
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_SetKeyCatcher( lua_State *L ) {
 	uint32_t catcherMask = (uint32_t)lua_tointeger( L, 1 );
 	trap->Key_SetCatcher( catcherMask );
@@ -860,7 +860,7 @@ static int JPLua_Export_SetKeyCatcher( lua_State *L ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_SetMousePos( lua_State *L ) {
 	cgs.cursorX = lua_tointeger( L, 1 );
 	cgs.cursorY = lua_tointeger( L, 2 );
@@ -868,14 +868,14 @@ static int JPLua_Export_SetMousePos( lua_State *L ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_StartLocalSound( lua_State *L ) {
 	trap->S_StartLocalSound( lua_tonumber( L, 1 ), lua_tonumber( L, 2 ) );
 	return 0;
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 int JPLua_Export_TestLine( lua_State *L ) {
 	vector3 start, end;
 	float radius;
@@ -899,7 +899,7 @@ int JPLua_Export_TestLine( lua_State *L ) {
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_Export_WorldCoordToScreenCoord( lua_State *L ) {
 	vector3 *v = JPLua_CheckVector( L, 1 );
 	float x, y;
@@ -915,7 +915,7 @@ static int JPLua_Export_WorldCoordToScreenCoord( lua_State *L ) {
 }
 #endif
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 static int JPLua_ConnectToDB(lua_State *L){
 	int type = luaL_checkinteger(L, 1);
 	switch (type){
@@ -931,9 +931,9 @@ static int JPLua_ConnectToDB(lua_State *L){
 #endif
 static int JPLua_GetConfigString(lua_State *L){
 	int type = luaL_checkinteger(L, 1);
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	const char *info = CG_ConfigString(type);
-#elif defined (_GAME)
+#elif defined (PROJECT_GAME)
 	char info[MAX_INFO_STRING] = { '\0' };
 	trap->GetConfigstring(type, info, sizeof(info));
 #endif
@@ -945,7 +945,7 @@ static int JPLua_GetConfigString(lua_State *L){
 	return 1;
 }
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 static int JPLua_SetConfigString(lua_State *L){
 	int type = luaL_checkinteger(L, 1);
 	const char *value = luaL_checkstring(L, 2);
@@ -954,7 +954,7 @@ static int JPLua_SetConfigString(lua_State *L){
 }
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 static int JPLua_GetGLConfig(lua_State *L){
 	glconfig_t config;
 	int top;
@@ -984,19 +984,19 @@ static int JPLua_GetGLConfig(lua_State *L){
 
 
 static const jplua_cimport_table_t JPLua_CImports[] = {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	{ "AddClientCommand", JPLua_Export_AddClientCommand }, // AddClientCommand( string cmd )
 #endif
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "AddConsoleCommand", JPLua_Export_AddConsoleCommand }, // AddConsoleCommand( string cmd )
 #endif
 	{ "AddListener", JPLua_Event_AddListener }, // AddListener( string name, function listener )
 	{ "AddServerCommand", JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
 	{ "CreateCvar", JPLua_CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	{ "ConnectToDB", JPLua_ConnectToDB}, // ConnectToDB ( int type(1 - MySQL , 2 - SQLite), ...) // SQLite (type, string path) || MySQL ( type, string host, string user, string db, string password, int port )
 #endif
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "DrawPic", JPLua_Export_DrawPic }, // DrawPic( float x, float y, float width, float height, table { float r, float g, float b, float a }, integer shaderHandle )
 	{ "DrawRect", JPLua_Export_DrawRect }, // DrawRect( float x, float y, float width, float height, table { float r, float g, float b, float a } )
 	{ "DrawRotatedPic", JPLua_Export_DrawRotatedPic }, // DrawPic( float x, float y, float width, float height, float angle, table { float r, float g, float b, float a }, integer shaderHandle )
@@ -1007,62 +1007,62 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "GetConfigString", JPLua_GetConfigString }, // table GetConfigString()
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
 	{ "GetFileList", JPLua_File_GetFileList}, // table GetFileList(string path, string extension)
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
 #endif
 	{ "GetGameType", JPLua_Export_GetGameType }, // integer GetGameType()
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "GetGLConfig", JPLua_GetGLConfig }, // table GetGLConfig()
 	{ "GetKeyCatcher", JPLua_Export_GetKeyCatcher }, // integer GetKeyCatcher()
 #endif
 	{ "GetLogger", JPLua_GetLogger }, // Logger GetLogger( string filename )
 	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
 	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "GetMousePos", JPLua_Export_GetMousePos }, // [{x,y}, nil] GetMousePos
 #endif
 	{ "GetPlayer", JPLua_GetPlayer }, // Player GetPlayer( integer clientNum )
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	{ "GetPlayers", JPLua_Export_GetPlayers }, // {Player,...} GetPlayers()
 #endif
 	{ "GetPlayerTable", JPLua_Player_GetMetaTable }, // Player.meta GetPlayerTable()
 	{ "GetRealTime", JPLua_Export_GetRealTime }, // integer GetRealTime()
 	{ "GetSerialiser", JPLua_GetSerialiser }, // Serialiser GetSerialiser( string fileName )
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "GetServer", JPLua_GetServer }, // Server GetServer()
 #endif
 	{ "GetTime", JPLua_Export_GetTime }, // integer GetTime()
 	{ "OpenFile", JPLua_File_Open},
 	{ "RayTrace", JPLua_Export_Trace }, // traceResult Trace( stuff )
 	{ "RegisterPlugin", JPLua_RegisterPlugin }, // plugin RegisterPlugin( string name, string version )
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "RegisterShader", JPLua_Export_RegisterShader }, // integer RegisterShader( string path )
 	{ "RegisterSound", JPLua_Export_RegisterSound }, // integer RegisterSound( string path )
 	{ "RemapShader", JPLua_Export_RemapShader }, // RemapShader( string oldshader, string newshader, string timeoffset )
 #endif
 	{ "RemoveListener", JPLua_Event_RemoveListener }, // RemoveListener( string name )
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "SendChatText", JPLua_Export_SendChatText }, // SendChatText( string text )
 #endif
 	{ "SendConsoleCommand", JPLua_Export_SendConsoleCommand }, // SendConsoleCommand( string command )
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	{ "SendReliableCommand", JPLua_Export_SendReliableCommand }, // SendReliableCommand( integer clientNum, string cmd )
 #endif
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	{ "SetConfigString", JPLua_SetConfigString}, // SetConfigString(integer type ( CS_SYSTEMINFO + i ) , value)
 #endif
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "SendServerCommand", JPLua_Export_SendServerCommand }, // SendServerCommand( string command )
 	{ "SetKeyCatcher", JPLua_Export_SetKeyCatcher }, // SetKeyCatcher( integer catcherMask )
 	{ "SetMousePos", JPLua_Export_SetMousePos }, // SetMousePos( integer x, integer y )
 #endif
 	{ "StackDump", JPLua_StackDump },
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "StartLocalSound", JPLua_Export_StartLocalSound }, // StartLocalSound( integer soundHandle, integer channelNum )
 	{ "TestLine", JPLua_Export_TestLine }, // traceResult Trace( stuff )
 #endif
 	{ "Vector3", JPLua_GetVector3 }, // Vector Vector3( [float x, float y, float z] )
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	{ "WorldCoordToScreenCoord", JPLua_Export_WorldCoordToScreenCoord }, // { float x, float y } WorldCoordToScreenCoord( Vector3 pos )
 #endif
 };
@@ -1075,9 +1075,9 @@ void JPLua_Init( void ) {
 #ifdef JPLUA
 	size_t i = 0;
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	if ( !g_jplua.integer ) {
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	if ( !cg_jplua.integer ) {
 #endif
 		return;
@@ -1124,7 +1124,7 @@ void JPLua_Init( void ) {
 
 	// Register our classes
 	JPLua_Register_Player( JPLua.state );
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	JPLua_Register_Server( JPLua.state );
 #endif
 	JPLua_Register_Cvar( JPLua.state );
@@ -1132,7 +1132,7 @@ void JPLua_Init( void ) {
 	JPLua_Register_Serialiser( JPLua.state );
 	JPLua_Register_Vector( JPLua.state );
 	JPLua_Register_File( JPLua.state );
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	JPLua_Register_MySQL(JPLua.state);
 	JPLua_Register_SQLite(JPLua.state);
 #endif
@@ -1173,12 +1173,12 @@ void JPLua_Shutdown( void ) {
 			JPLua.currentPlugin = nextPlugin;
 		}
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		for (auto& row : jplua_client_commands){
 			luaL_unref(JPLua.state, LUA_REGISTRYINDEX, row.second);
 		}
 		jplua_client_commands.clear();
-#elif defined _CGAME
+#elif defined PROJECT_CGAME
 		for (auto& row : jplua_console_commands){
 			luaL_unref(JPLua.state, LUA_REGISTRYINDEX, row.second);
 		}

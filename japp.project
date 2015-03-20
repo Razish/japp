@@ -251,6 +251,9 @@
     <File Name="game/g_smartentities.cpp"/>
     <File Name="game/bg_luafs.cpp"/>
     <File Name="game/bg_luafs.h"/>
+    <File Name="game/g_luamysql.cpp"/>
+    <File Name="game/g_luasql.h"/>
+    <File Name="game/g_luasqlite.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="json">
     <File Name="json/cJSON.c"/>
@@ -526,5 +529,14 @@
   </VirtualDirectory>
   <VirtualDirectory Name="japp">
     <File Name="SConstruct"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="macosx">
+    <File Name="macosx/MacPrefix_cgame.h"/>
+    <File Name="macosx/MacPrefix_cgameF.h"/>
+    <File Name="macosx/MacPrefix_game.h"/>
+    <File Name="macosx/MacPrefix_gameF.h"/>
+    <File Name="macosx/MacPrefix_UI.h"/>
+    <File Name="macosx/MacPrefix_UIF.h"/>
+    <File Name="macosx/MacPrefixCommon.h"/>
   </VirtualDirectory>
 </CodeLite_Project>

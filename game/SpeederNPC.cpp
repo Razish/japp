@@ -1,7 +1,7 @@
 
 #include "qcommon/q_shared.h"
 
-#ifdef _GAME //including game headers on cgame is FORBIDDEN ^_^
+#ifdef PROJECT_GAME //including game headers on cgame is FORBIDDEN ^_^
 #include "g_local.h"
 #endif
 
@@ -9,7 +9,7 @@
 #include "bg_vehicles.h"
 
 float DotToSpot( vector3 *spot, vector3 *from, vector3 *fromAngles );
-#ifdef _GAME //SP or gameside MP
+#ifdef PROJECT_GAME //SP or gameside MP
 extern vector3 playerMins;
 extern vector3 playerMaxs;
 void ChangeWeapon( gentity_t *ent, int newWeapon );
@@ -32,7 +32,7 @@ qboolean VEH_StartStrafeRam( Vehicle_t *pVeh, qboolean Right, int Duration ) {
 	return qfalse;
 }
 
-#ifdef _GAME //game-only.. for now
+#ifdef PROJECT_GAME //game-only.. for now
 // Like a think or move command, this updates various vehicle properties.
 qboolean Update( Vehicle_t *pVeh, const usercmd_t *pUcmd ) {
 	if ( !g_vehicleInfo[VEHICLE_BASE].Update( pVeh, pUcmd ) ) {
@@ -48,7 +48,7 @@ qboolean Update( Vehicle_t *pVeh, const usercmd_t *pUcmd ) {
 
 	return qtrue;
 }
-#endif //_GAME
+#endif //PROJECT_GAME
 
 //MP RULE - ALL PROCESSMOVECOMMANDS FUNCTIONS MUST BE BG-COMPATIBLE!!!
 //If you really need to violate this rule for SP, then use ifdefs.
@@ -82,9 +82,9 @@ static void ProcessMoveCommands( Vehicle_t *pVeh ) {
 	}
 	speedIdleDec = pVeh->m_pVehicleInfo->decelIdle * pVeh->m_fTimeModifier;
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	curTime = level.time;
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	//FIXME: pass in ucmd?  Not sure if this is reliable...
 	curTime = pm->cmd.serverTime;
 #endif
@@ -105,7 +105,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh ) {
 				if ( pVeh->m_pVehicleInfo->iTurboStartFX ) {
 					int i;
 					for ( i = 0; (i < MAX_VEHICLE_EXHAUSTS && pVeh->m_iExhaustTag[i] != -1); i++ ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 						if ( pVeh->m_pParentEntity &&
 							pVeh->m_pParentEntity->ghoul2 &&
 							pVeh->m_pParentEntity->playerState ) { //fine, I'll use a tempent for this, but only because it's played only once at the start of a turbo.
@@ -265,13 +265,13 @@ void ProcessOrientCommands( Vehicle_t *pVeh ) {
 	/********************************************************************************/
 }
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 
 // This function makes sure that the vehicle is properly animated.
 void AnimateVehicle( Vehicle_t *pVeh ) {
 }
 
-#endif //_GAME
+#endif //PROJECT_GAME
 
 //rest of file is shared
 
@@ -332,9 +332,9 @@ void AnimateRiders( Vehicle_t *pVeh ) {
 
 	pilotPS = pVeh->m_pPilot->playerState;
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 	curTime = level.time;
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 	//FIXME: pass in ucmd?  Not sure if this is reliable...
 	curTime = pm->cmd.serverTime;
 #endif
@@ -511,12 +511,12 @@ void AnimateRiders( Vehicle_t *pVeh ) {
 		SETANIM_BOTH, Anim, iFlags | SETANIM_FLAG_HOLD, iBlend );
 }
 
-#ifndef _GAME
+#ifndef PROJECT_GAME
 void AttachRidersGeneric( Vehicle_t *pVeh );
 #endif
 
 void G_SetSpeederVehicleFunctions( vehicleInfo_t *pVehInfo ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	pVehInfo->AnimateVehicle = AnimateVehicle;
 	pVehInfo->AnimateRiders = AnimateRiders;
 	//	pVehInfo->ValidateBoard				=		ValidateBoard;
@@ -539,7 +539,7 @@ void G_SetSpeederVehicleFunctions( vehicleInfo_t *pVehInfo ) {
 	pVehInfo->ProcessMoveCommands = ProcessMoveCommands;
 	pVehInfo->ProcessOrientCommands = ProcessOrientCommands;
 
-#ifndef _GAME //cgame prediction attachment func
+#ifndef PROJECT_GAME //cgame prediction attachment func
 	pVehInfo->AttachRiders = AttachRidersGeneric;
 #endif
 	//	pVehInfo->AttachRiders				=		AttachRiders;
@@ -550,14 +550,14 @@ void G_SetSpeederVehicleFunctions( vehicleInfo_t *pVehInfo ) {
 
 // Following is only in game, not in namespace
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void G_AllocateVehicleObject( Vehicle_t **pVeh );
 #endif
 
 
 // Create/Allocate a new Animal Vehicle (initializing it as well).
 void G_CreateSpeederNPC( Vehicle_t **pVeh, const char *strType ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	//these will remain on entities on the client once allocated because the pointer is
 	//never stomped. on the server, however, when an ent is freed, the entity struct is
 	//memset to 0, so this memory would be lost..

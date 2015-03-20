@@ -1159,7 +1159,7 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 			skin = "default";
 		len = strlen( skin ) + 1;
 
-		Q_strncpyz( newInfo.skinName, skin, min( len, sizeof(newInfo.skinName) ) );
+		Q_strncpyz( newInfo.skinName, skin, std::min( len, sizeof(newInfo.skinName) ) );
 		Q_strncpyz( newInfo.modelName, modelStr, sizeof(newInfo.modelName) );
 
 	}
@@ -7424,7 +7424,7 @@ void CG_Player( centity_t *cent ) {
 		VectorCopy( &cent->currentState.pos.trDelta, &tDir );
 		speed = speed - cg.strafeTrailWeights.x;
 		//	distVelBase = (speed)*(VectorNormalize( tDir ));
-		distVelBase = min( (speed) / (cg.strafeTrailWeights.y - cg.strafeTrailWeights.x), 1.0f );
+		distVelBase = std::min( (speed) / (cg.strafeTrailWeights.y - cg.strafeTrailWeights.x), 1.0f );
 
 		stColor.r = stColorYellow.r + distVelBase*(stColorRed.r - stColorYellow.r);
 		stColor.g = stColorYellow.g + distVelBase*(stColorRed.g - stColorYellow.g);
@@ -7524,11 +7524,11 @@ void CG_Player( centity_t *cent ) {
 			//Glow
 			leGlow->leType = LE_FADE_RGB;
 			leGlow->startTime = cg.time;
-			leGlow->endTime = cg.time + min( speed2 * 2, cg.strafeTrailWeights.y );
+			leGlow->endTime = cg.time + std::min( speed2 * 2, static_cast<float>( cg.strafeTrailWeights.y ) );
 			leGlow->lifeRate = 1.0f / (leGlow->endTime - leGlow->startTime);
-			reGlow->shaderTime = cg.time / min( speed2 * 2, cg.strafeTrailWeights.y );
+			reGlow->shaderTime = cg.time / std::min( speed2 * 2, static_cast<float>( cg.strafeTrailWeights.y ) );
 			reGlow->reType = RT_LINE;
-			reGlow->radius = min( speed2 / cg.strafeTrailWeights.y, 1.0f )*7.0f;
+			reGlow->radius = std::min( speed2 / cg.strafeTrailWeights.y, 1.0f )*7.0f;
 			reGlow->customShader = media.gfx.world.strafeTrail;
 			VectorCopy( &start, &reGlow->origin );
 			VectorCopy( &end, &reGlow->oldorigin );
@@ -7544,11 +7544,11 @@ void CG_Player( centity_t *cent ) {
 			//Core
 			leCore->leType = LE_FADE_RGB;
 			leCore->startTime = cg.time;
-			leCore->endTime = cg.time + min( speed2 * 2, cg.strafeTrailWeights.y );
+			leCore->endTime = cg.time + std::min( speed2 * 2, static_cast<float>( cg.strafeTrailWeights.y ) );
 			leCore->lifeRate = 1.0f / (leCore->endTime - leCore->startTime);
-			reCore->shaderTime = cg.time / min( speed2 * 2, cg.strafeTrailWeights.y );
+			reCore->shaderTime = cg.time / std::min( speed2 * 2, static_cast<float>( cg.strafeTrailWeights.y ) );
 			reCore->reType = RT_LINE;
-			reCore->radius = min( speed2 / cg.strafeTrailWeights.y, 1.0f )*4.0f;
+			reCore->radius = std::min( speed2 / cg.strafeTrailWeights.y, 1.0f )*4.0f;
 			reCore->customShader = media.gfx.world.strafeTrail;
 			VectorCopy( &start, &reCore->origin );
 			VectorCopy( &end, &reCore->oldorigin );

@@ -8,11 +8,11 @@
 #include "bg_local.h"
 #include "Ghoul2/G2.h"
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 #include "g_local.h" //ahahahahhahahaha@$!$!
 #endif
 
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 #include "cg_local.h"
 #endif
 
@@ -23,7 +23,7 @@
 
 #define MAX_WEAPON_CHARGE_TIME 5000
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void G_CheapWeaponFire( int entNum, int ev );
 qboolean TryGrapple( gentity_t *ent ); //g_cmds.c
 #endif
@@ -608,7 +608,7 @@ void PM_HoverTrace( void ) {
 					else {
 						wakeOrg.z = pm->ps->origin.z;
 					}
-#ifdef _GAME //yeah, this is kind of crappy and makes no use of prediction whatsoever
+#ifdef PROJECT_GAME //yeah, this is kind of crappy and makes no use of prediction whatsoever
 					if ( pVeh->m_pVehicleInfo->iWakeFX ) {
 						//G_PlayEffectID( pVeh->m_pVehicleInfo->iWakeFX, wakeOrg, fxAxis[0] );
 						//tempent use bad!
@@ -661,7 +661,7 @@ void PM_HoverTrace( void ) {
 							vAng.pitch = vAng.roll = 0;
 							vAng.yaw = pVeh->m_vOrientation->yaw;
 							AngleVectors( &vAng, &fxAxis[2], &fxAxis[1], &fxAxis[0] );
-#ifdef _GAME
+#ifdef PROJECT_GAME
 							if ( pVeh->m_pVehicleInfo->iWakeFX ) {
 								G_PlayEffectID( pVeh->m_pVehicleInfo->iWakeFX, &trace->endpos, &fxAxis[0] );
 							}
@@ -729,7 +729,7 @@ void PM_AddTouchEnt( int entityNum ) {
 	if ( pm->numtouch >= MAXTOUCH )
 		return;
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	if ( ((gentity_t *)pm_entSelf)->client->pers.adminData.isGhost )
 		return;
 #endif
@@ -740,11 +740,11 @@ void PM_AddTouchEnt( int entityNum ) {
 		qboolean selfDueling = pm->ps->duelInProgress;
 		int selfDuelist = pm->ps->duelIndex;
 		int selfNum = pm_entSelf->s.number;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		gentity_t *other = &g_entities[entityNum];
 		qboolean themDueling = other->client->ps.duelInProgress;
 		int themDuelist = other->client->ps.duelIndex;
-#else // _CGAME
+#else // PROJECT_CGAME
 		qboolean themDueling = cg_entities[entityNum].currentState.bolt1;
 		int themDuelist = 9001; // pretend they're never dueling with us
 #endif
@@ -2131,7 +2131,7 @@ static qboolean PM_CheckJump( void ) {
 	}
 	else if ( pm->cmd.upmove > 0 && pm->waterlevel < 2 && pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_0
 		&& !(pm->ps->pm_flags & PMF_JUMP_HELD)
-#if defined (_GAME)
+#if defined (PROJECT_GAME)
 		&& (japp_allowWeaponWallRun.integer || (pm->ps->weapon == WP_SABER || pm->ps->weapon == WP_MELEE))
 #else
 		&& (pm->ps->weapon == WP_SABER || pm->ps->weapon == WP_MELEE)
@@ -3161,7 +3161,7 @@ static void PM_GrappleSwing( void )
 	vector3	grapplePos	= { 0.0f };
 	vector3	grappleDir	= { 0.0f };
 	float	dist		= 0.0f;
-#ifdef _CGAME
+#ifdef PROJECT_CGAME
 	VectorCopy( cg_entities[cg_entities[pm_entSelf->s.number].bolt1].currentState.pos.trBase, grapplePos );
 #else
 	VectorCopy( g_entities[pm_entSelf->s.number].client->hook->s.pos.trBase, grapplePos );
@@ -3342,7 +3342,7 @@ static void PM_WalkMove( void ) {
 	/*
 	if (pm->ps->clientNum >= MAX_CLIENTS)
 	{
-	#ifdef _GAME
+	#ifdef PROJECT_GAME
 	Com_Printf(S_COLOR_RED"S: %f, %f\n", wishspeed, pm->ps->speed);
 	#else
 	Com_Printf(S_COLOR_GREEN"C: %f, %f\n", wishspeed, pm->ps->speed);
@@ -3537,7 +3537,7 @@ static int PM_TryRoll( void ) {
 	return 0;
 }
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 static void PM_CrashLandEffect( void ) {
 	float delta;
 	if ( pm->waterlevel ) {
@@ -3610,7 +3610,7 @@ static void PM_CrashLand( void ) {
 	delta = vel + t * acc;
 	delta = delta*delta * 0.0001f;
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	PM_CrashLandEffect();
 #endif
 	// ducking while falling doubles damage
@@ -4036,7 +4036,7 @@ static void PM_GroundTrace( void ) {
 
 		PM_CrashLand();
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		if ( pm->ps->clientNum < MAX_CLIENTS &&
 			!pm->ps->m_iVehicleNum &&
 			trace.entityNum < ENTITYNUM_WORLD &&
@@ -4242,7 +4242,7 @@ static void PM_CheckDuck( void ) {
 			if ( solidTr.startsolid || solidTr.allsolid || solidTr.fraction != 1.0f ) { //whoops, can't fit here. Down to 0!
 				VectorClear( &pm->mins );
 				VectorClear( &pm->maxs );
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				{
 					gentity_t *me = &g_entities[pm->ps->clientNum];
 					if ( me->inuse && me->client ) { //yeah, this is a really terrible hack.
@@ -4871,7 +4871,7 @@ int PM_LegsSlopeBackTransition( int desiredAnim ) {
 
 static uint32_t JP_GetJPFixRoll( void ) {
 	uint32_t level = 0u;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	uint32_t cinfo = jp_cinfo.integer;
 #else
 	uint32_t cinfo = cgs.japp.jp_cinfo;
@@ -5303,14 +5303,14 @@ static void PM_Footsteps( void ) {
 
 // Generate sound events for entering and leaving water
 static void PM_WaterEvents( void ) {		// FIXME?
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	qboolean impact_splash = qfalse;
 #endif
 	//
 	// if just entered a water volume, play a sound
 	//
 	if ( !pml.previous_waterlevel && pm->waterlevel ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		if ( VectorLengthSquared( &pm->ps->velocity ) > 40000 )
 			impact_splash = qtrue;
 #endif
@@ -5321,14 +5321,14 @@ static void PM_WaterEvents( void ) {		// FIXME?
 	// if just completely exited a water volume, play a sound
 	//
 	if ( pml.previous_waterlevel && !pm->waterlevel ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		if ( VectorLengthSquared( &pm->ps->velocity ) > 40000 )
 			impact_splash = qtrue;
 #endif
 		PM_AddEvent( EV_WATER_LEAVE );
 	}
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	if ( impact_splash ) {
 		//play the splash effect
 		trace_t	tr;
@@ -5428,7 +5428,7 @@ void PM_FinishWeaponChange( void ) {
 	pm->ps->weaponTime += 250;
 }
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 void WP_GetVehicleCamPos( gentity_t *ent, gentity_t *pilot, vector3 *camPos );
 #else
 void CG_GetVehicleCamPos( vector3 *camPos );
@@ -5439,7 +5439,7 @@ int BG_VehTraceFromCamPos( trace_t *camTrace, bgEntity_t *bgEnt, const vector3 *
 	vector3	viewDir2End, extraEnd, camPos;
 	float	minAutoAimDist;
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	WP_GetVehicleCamPos( (gentity_t *)bgEnt, (gentity_t *)bgEnt->m_pVehicle->m_pPilot, &camPos );
 #else
 	CG_GetVehicleCamPos( &camPos );
@@ -5680,7 +5680,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			}
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].alt.chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
 #endif
 						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].alt.charge;
@@ -5714,7 +5714,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			}
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
-#ifdef _GAME
+#ifdef PROJECT_GAME
 					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
 #endif
 						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].charge;
@@ -6128,7 +6128,7 @@ static void PM_Weapon( void ) {
 	bgEntity_t *veh = NULL;
 	qboolean vehicleRocketLock = qfalse;
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	if ( pm->ps->clientNum >= MAX_CLIENTS &&
 		pm->ps->weapon == WP_NONE &&
 		pm->cmd.weapon == WP_NONE &&
@@ -6169,7 +6169,7 @@ static void PM_Weapon( void ) {
 		if ( veh && veh->m_pVehicle && (veh->m_pVehicle->m_pVehicleInfo->type == VH_WALKER || veh->m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER) ) {//riding a walker/fighter
 			//keep saber off, do no weapon stuff at all!
 			pm->ps->saberHolstered = 2;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 			pm->cmd.buttons &= ~(BUTTON_ATTACK | BUTTON_ALT_ATTACK);
 #else
 			if ( g_vehWeaponInfo[veh->m_pVehicle->m_pVehicleInfo->weapon[0].ID].fHoming
@@ -6769,7 +6769,7 @@ static void PM_Weapon( void ) {
 		&& pm_entSelf->s.NPC_class == CLASS_VEHICLE ) { //a vehicle NPC that has a pilot
 		pm->ps->weaponstate = WEAPON_FIRING;
 		pm->ps->weaponTime += 100;
-#ifdef _GAME //hack, only do it game-side. vehicle weapons don't really need predicting I suppose.
+#ifdef PROJECT_GAME //hack, only do it game-side. vehicle weapons don't really need predicting I suppose.
 		if ( (pm->cmd.buttons & BUTTON_ALT_ATTACK) ) {
 			G_CheapWeaponFire( pm->ps->clientNum, EV_ALT_FIRE );
 		}
@@ -6844,7 +6844,7 @@ static void PM_Weapon( void ) {
 					}
 				}
 #else
-#ifdef _GAME
+#ifdef PROJECT_GAME
 				if ( pm_entSelf ) {
 					if ( TryGrapple( (gentity_t *)pm_entSelf ) ) {
 						return;
@@ -6934,7 +6934,7 @@ static void PM_Weapon( void ) {
 	else {
 		//Raz: Hacky fix here
 		int weapon = pm->ps->weapon;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		if ( !Client_Supports( (gentity_t *)pm_entSelf, CSF_FIXED_WEAPON_ANIMS ) && (weapon == WP_CONCUSSION || weapon == WP_BRYAR_OLD) )
 #else
 		if ( !Server_Supports( SSF_FIXED_WEAP_ANIMS ) && (weapon == WP_CONCUSSION || weapon == WP_BRYAR_OLD) )
@@ -6943,7 +6943,7 @@ static void PM_Weapon( void ) {
 		PM_StartTorsoAnim( WeaponAttackAnim[weapon] );
 	}
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	if ( ((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer )
 		amount = 0;
 	else
@@ -7581,7 +7581,7 @@ void BG_AdjustClientSpeed( playerState_t *ps, usercmd_t *cmd, int svTime ) {
 
 	//Raz: JK2 rolls
 #if 0
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	if ( 0 )//( dmflags.bits & DF_JK2_ROLL )
 #else
 	if ( 0 )//( cgs.dmflags & DF_JK2_ROLL )
@@ -9097,7 +9097,7 @@ void PmoveSingle( pmove_t *pmove ) {
 
 	pm = pmove;
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	if ( japp_fixWeaponCharge.integer ) {
 		if ( pm->cmd.buttons & BUTTON_ATTACK && pm->cmd.buttons & BUTTON_USE_HOLDABLE ) {
 			pm->cmd.buttons &= ~BUTTON_ATTACK;
@@ -9451,7 +9451,7 @@ void PmoveSingle( pmove_t *pmove ) {
 	/*
 	if (pm->ps->clientNum >= MAX_CLIENTS)
 	{
-	#ifdef _GAME
+	#ifdef PROJECT_GAME
 	Com_Printf( S_C0LOR_RED" SERVER N%i msec %d\n", pm->ps->clientNum, pml.msec );
 	#else
 	Com_Printf( S_COLOR_GREEN" CLIENT N%i msec %d\n", pm->ps->clientNum, pml.msec );
@@ -9713,7 +9713,7 @@ void PmoveSingle( pmove_t *pmove ) {
 	PM_DropTimers();
 
 #ifdef _TESTING_VEH_PREDICTION
-#ifndef _GAME
+#ifndef PROJECT_GAME
 	{
 		vector3 blah;
 		VectorMA(pm->ps->origin, 128.0f, pm->ps->moveDir, blah);
@@ -9752,7 +9752,7 @@ void PmoveSingle( pmove_t *pmove ) {
 				pm->cmd.upmove = 127;
 			}
 		}
-#ifdef _GAME
+#ifdef PROJECT_GAME
 		else if ( !pm->ps->zoomMode &&
 			pm_entSelf //I exist
 			&& pEnt->m_pVehicle )//ent has a vehicle
@@ -9781,14 +9781,14 @@ void PmoveSingle( pmove_t *pmove ) {
 		}
 
 		if ( !pm->ps->m_iVehicleNum ) { //no one is driving, just update and get out
-#ifdef _GAME
+#ifdef PROJECT_GAME
 			veh->m_pVehicle->m_pVehicleInfo->Update( veh->m_pVehicle, &pm->cmd );
 			veh->m_pVehicle->m_pVehicleInfo->Animate( veh->m_pVehicle );
 #endif
 		}
 		else {
 			bgEntity_t *self = pm_entVeh;
-#ifdef _GAME
+#ifdef PROJECT_GAME
 			int i = 0;
 #endif
 
@@ -9803,7 +9803,7 @@ void PmoveSingle( pmove_t *pmove ) {
 				PM_VehicleViewAngles( self->playerState, veh, &veh->m_pVehicle->m_ucmd );
 			}
 
-#ifdef _GAME
+#ifdef PROJECT_GAME
 			veh->m_pVehicle->m_pVehicleInfo->Update( veh->m_pVehicle, &veh->m_pVehicle->m_ucmd );
 			veh->m_pVehicle->m_pVehicleInfo->Animate( veh->m_pVehicle );
 

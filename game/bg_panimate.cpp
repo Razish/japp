@@ -5,9 +5,9 @@
 #include "bg_local.h"
 #include "anims.h"
 #include "cgame/animtable.h"
-#if defined( _GAME )
+#if defined( PROJECT_GAME )
 #include "g_local.h"
-#elif defined( _CGAME )
+#elif defined( PROJECT_CGAME )
 #include "cgame/cg_local.h"
 #endif
 
@@ -1503,7 +1503,7 @@ void BG_AnimsetFree( animation_t *animset ) {
 	*/
 }
 
-#ifndef _GAME //none of this is actually needed serverside. Could just be moved to cgame code but it's here since it
+#ifndef PROJECT_GAME //none of this is actually needed serverside. Could just be moved to cgame code but it's here since it
 //used to tie in a lot with the anim loading stuff.
 stringID_table_t animEventTypeTable[MAX_ANIM_EVENTS + 1] =
 {
@@ -2211,7 +2211,7 @@ static void BG_StartLegsAnim( playerState_t *ps, int anim ) {
 	if ( ps->legsAnim == anim ) {
 		BG_FlipPart( ps, SETANIM_LEGS );
 	}
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	else if ( g_entities[ps->clientNum].s.legsAnim == anim ) { //toggled anim to one anim then back to the one we were at previously in
 		//one frame, indicating that anim should be restarted.
 		BG_FlipPart( ps, SETANIM_LEGS );
@@ -2273,7 +2273,7 @@ void BG_StartTorsoAnim( playerState_t *ps, int anim ) {
 	if ( ps->torsoAnim == anim ) {
 		BG_FlipPart( ps, SETANIM_TORSO );
 	}
-#ifdef _GAME
+#ifdef PROJECT_GAME
 	else if ( g_entities[ps->clientNum].s.torsoAnim == anim ) { //toggled anim to one anim then back to the one we were at previously in
 		//one frame, indicating that anim should be restarted.
 		BG_FlipPart( ps, SETANIM_TORSO );

@@ -1,6 +1,6 @@
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 #include "g_local.h"
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 #include "cg_local.h"
 #endif
 #include "bg_lua.h"
@@ -11,9 +11,9 @@
 
 static const char SERIALISER_META[] = "Serialiser.meta";
 
-#if defined(_GAME)
+#if defined(PROJECT_GAME)
 static const char *pluginDir = "lua/sv/";
-#elif defined(_CGAME)
+#elif defined(PROJECT_CGAME)
 static const char *pluginDir = "lua/cl/";
 #endif
 

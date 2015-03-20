@@ -45,7 +45,7 @@ if plat == 'Windows' and bits == 32:
 
 # project settings
 ui_env['CPPPATH'] += [ '#/ui' ]
-ui_env['CPPDEFINES'] += [ '_UI' ]
+ui_env['CPPDEFINES'] += [ 'PROJECT_UI' ]
 ui_env['LIBPREFIX'] = ''
 
 # targets
