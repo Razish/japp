@@ -1,5 +1,5 @@
-language: c
-compiler: gcc
+language: cpp
+compiler: g++
 env: MORE_WARNINGS=1
 
 install:
