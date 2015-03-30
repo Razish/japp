@@ -741,9 +741,9 @@ void G_ShutdownGame( int restart ) {
 
 	G_LogPrintf( level.log.console, "ShutdownGame:\n" );
 	G_LogPrintf( level.log.console, "------------------------------------------------------------\n" );
-
 	G_CloseLog( &level.log.console );
 	G_CloseLog( &level.log.security );
+	G_CloseLog( &level.log.admin );
 
 	// write all the client session data so we can get it back
 	G_WriteSessionData();
