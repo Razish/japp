@@ -421,6 +421,36 @@ static void G_SpewEntList( void ) {
 	}
 }
 
+static void G_InitReservedEntity( gentity_t *ent ) {
+	ent->classname = "reservedent";
+	//ent->neverFree = qtrue;
+}
+
+gentity_t *G_SpawnReservedEntity( void ) {
+	static size_t index = 0u;
+	if ( level.reservedEnts.size() ) {
+		gentity_t *e = level.reservedEnts[index++];
+		index %= level.reservedEnts.size();
+
+		G_FreeEntity( e );
+		//TODO: return flags etc..? :/
+		G_InitReservedEntity( e );
+
+		return e;
+	}
+	else {
+		return G_Spawn();
+	}
+}
+
+void InitReservedEntities( void ) {
+	for ( int i = level.num_entities; i < japp_reserveEntitySlots.integer; i++ ) {
+		gentity_t *ent = G_Spawn();
+		G_InitReservedEntity( ent );
+		level.reservedEnts.push_back( ent );
+	}
+}
+
 // Either finds a free entity, or allocates a new one.
 //	The slots from 0 to MAX_CLIENTS-1 are always reserved for clients, and will never be used by anything else.
 // Try to avoid reusing an entity that was recently freed, because it can cause the client to think the entity morphed
@@ -432,21 +462,24 @@ gentity_t *G_Spawn( void ) {
 	for ( force = 0; force < 2; force++ ) {
 		// if we go through all entities and can't find one to free, override the normal minimum times before use
 		for ( i = MAX_CLIENTS, e = &g_entities[MAX_CLIENTS]; i<level.num_entities; i++, e++ ) {
-			if ( e->inuse )
+			if ( e->inuse ) {
 				continue;
+			}
 
 			// the first couple seconds of server time can involve a lot of freeing and allocating, so relax the
 			//	replacement policy
-			if ( !force && e->freetime > level.startTime + 2000 && level.time - e->freetime < 1000 )
+			if ( !force && e->freetime > level.startTime + 2000 && level.time - e->freetime < 1000 ) {
 				continue;
+			}
 
 			// reuse this slot
 			G_InitGentity( e );
 			return e;
 		}
 
-		if ( i != MAX_GENTITIES )
+		if ( i != MAX_GENTITIES ) {
 			break;
+		}
 	}
 	if ( i == ENTITYNUM_MAX_NORMAL ) {
 		G_SpewEntList();

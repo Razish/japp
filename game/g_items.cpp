@@ -2348,7 +2348,7 @@ void Touch_Item( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 gentity_t *LaunchItem_Throw( const gitem_t *item, vector3 *origin, vector3 *velocity ) {
 	gentity_t	*dropped;
 
-	dropped = G_Spawn();
+	dropped = G_SpawnReservedEntity();
 
 	dropped->s.eType = ET_ITEM;
 	dropped->s.modelindex = item - bg_itemlist;	// store item number in modelindex
@@ -2420,7 +2420,7 @@ gentity_t *LaunchItem_Throw( const gitem_t *item, vector3 *origin, vector3 *velo
 gentity_t *LaunchItem_Drop( const gitem_t *item, vector3 *origin, vector3 *dir ) {
 	gentity_t	*dropped;
 
-	dropped = G_Spawn();
+	dropped = G_SpawnReservedEntity();
 
 	dropped->s.eType = ET_ITEM;
 	dropped->s.modelindex = item - bg_itemlist; // store item number in modelindex

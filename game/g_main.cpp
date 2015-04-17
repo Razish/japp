@@ -563,6 +563,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// reserve some spots for dead player bodies
 	InitBodyQue();
 
+	// reserve some spots for entities that must have indices < 255
+	InitReservedEntities();
+
 	ClearRegisteredItems();
 
 	//make sure saber data is loaded before this! (so we can precache the appropriate hilts)

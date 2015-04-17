@@ -851,8 +851,9 @@ static qboolean CopyToBodyQue( gentity_t *ent ) {
 	body->s.eType = ET_BODY;
 	body->s.eFlags = EF_DEAD;		// clear EF_TALK, etc
 
-	if ( ent->client && (ent->client->ps.eFlags & EF_DISINTEGRATION) )
+	if ( ent->client && (ent->client->ps.eFlags & EF_DISINTEGRATION) ) {
 		body->s.eFlags |= EF_DISINTEGRATION;
+	}
 
 	VectorCopy( &ent->client->ps.lastHitLoc, &body->s.origin2 );
 

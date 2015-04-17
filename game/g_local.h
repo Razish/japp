@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <vector>
+
 #ifdef _DEBUG
 #define DEBUG_SABER_BOX
 #endif
@@ -29,6 +31,7 @@ typedef struct gclient_s gclient_t;
 #define	GAMEVERSION						"JA+ Mod v2.6 B1" //"JA++ 0.2 build 2"
 #define DEFAULT_NAME					"Padawan"
 #define BODY_QUEUE_SIZE					(8)
+#define NUM_RESERVED_ENTITIES			(16)
 #define	FRAMETIME						(100) // msec
 #define	CARNAGE_REWARD_TIME				(3000)
 #define REWARD_SPRITE_TIME				(2000)
@@ -729,6 +732,8 @@ typedef struct level_locals_s {
 	qboolean			allReady;
 	qboolean			lockedTeams[TEAM_NUM_TEAMS];
 
+	std::vector<gentity_t *>	reservedEnts;
+
 	struct {
 		fileHandle_t		admin, console, security;
 	} log;
@@ -956,6 +961,7 @@ qboolean		G_SpawnFloat( const char *key, const char *defaultString, float *out )
 void			G_SpawnGEntityFromSpawnVars( qboolean inSubBSP );
 qboolean		G_SpawnInt( const char *key, const char *defaultString, int *out );
 void			G_SpawnItem( gentity_t *ent, const gitem_t *item );
+gentity_t		*G_SpawnReservedEntity( void );
 qboolean		G_SpawnString( const char *key, const char *defaultString, char **out );
 qboolean		G_SpawnVector( const char *key, const char *defaultString, vector3 *out );
 void			G_TeamCommand( team_t team, const char *cmd );
@@ -983,6 +989,7 @@ void			ItemUse_UseCloak( gentity_t *ent );
 void			ItemUse_UseDisp( gentity_t *ent, int type );
 void			ItemUse_UseEWeb( gentity_t *ent );
 void			InitBodyQue( void );
+void			InitReservedEntities( void );
 void			InitSiegeMode( void );
 qboolean		InFront( vector3 *spot, vector3 *from, vector3 *fromAngles, float threshHold );
 int				InFieldOfVision( vector3 *viewangles, float fov, vector3 *angles );
