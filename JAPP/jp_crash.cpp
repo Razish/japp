@@ -35,7 +35,9 @@ int bCrashing = 0;
 #ifdef _WIN32
 #include <windows.h>
 #else
-#define __USE_GNU
+#ifndef __USE_GNU
+	#define __USE_GNU
+#endif
 #include <signal.h>
 #include <unistd.h>
 #include <execinfo.h>
@@ -50,7 +52,9 @@ int bCrashing = 0;
 #undef REG_EBP
 #include <sys/utsname.h>
 #include <link.h>
-#define __USE_GNU
+#ifndef __USE_GNU
+	#define __USE_GNU
+#endif
 #include <sys/ucontext.h>
 #include <features.h>
 #endif
@@ -160,7 +164,7 @@ void JP_ExtCrashInfo( int fileHandle ) {
 #else
 	void( *func )(int);
 	void *dllHandle;
-	char libName[MAX_OSPATH] = "cgame"ARCH_STRING DLL_EXT;
+	char libName[MAX_OSPATH] = "cgame" ARCH_STRING DLL_EXT;
 
 	if ( (dllHandle = Q_LoadLibrary( libName, &func )) ) {
 		func( fileHandle );
@@ -1077,7 +1081,8 @@ void DeactivateCrashHandler( void ) {
 int oldactsset = 0;
 struct sigaction oldact[NSIG];
 
-void (*OldHandler)(int signal, siginfo_t *siginfo, ucontext_t *ctx);
+typedef void (*handler_t)(int, siginfo_t *, void *);
+handler_t OldHandler;
 
 static int m_crashloop=0;
 
@@ -1148,7 +1153,7 @@ static void JP_Enum_MemoryMap( void ) {
 	if (!f) {
 		return;
 	}
-	mb = malloc(sizeof(memblock_t));
+	mb = (memblock_t *)malloc(sizeof(memblock_t));
 	while ((line = fgets(buffer, 1024, f)) != 0) {
 		if (strlen(line) < 5) {
 			// Sanity check, if its less than this, the line probably aint good :P
@@ -1189,7 +1194,7 @@ static void JP_Enum_MemoryMap( void ) {
 		// If we get here, the parsing went properly, so lets put it in the list
 		mb->next = memblocks;
 		memblocks = mb;
-		mb = malloc(sizeof(memblock_t));
+		mb = (memblock_t *)malloc(sizeof(memblock_t));
 	}
 	free(mb);
 	fclose(f);
@@ -1281,7 +1286,7 @@ static void JP_Crash_ListModules(fileHandle_t f) {
 
 	for (dyn = (ElfW(Dyn) *)phdr->p_vaddr; dyn->d_tag != DT_NULL; dyn++) {
 		if (dyn->d_tag == DT_DEBUG) {
-			rdebug = (void *)dyn->d_un.d_ptr;
+			rdebug = (r_debug *)dyn->d_un.d_ptr;
 			break;
 		}
 	}
@@ -1472,13 +1477,13 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 	JP_FS_WriteString("========================================\n"
 		"             JA++ Crash Log\n"
 		"========================================\n", f);
-	JP_FS_WriteString("Version: "JAPP_VERSION" (Linux)\n", f);
+	JP_FS_WriteString("Version: " JAPP_VERSION " (Linux)\n", f);
 #ifdef PROJECT_GAME
 	JP_FS_WriteString("Side: Server-side\n", f);
 #else
 	JP_FS_WriteString("Side: Client-side\n", f);
 #endif
-	JP_FS_WriteString("Build Date/Time: "__DATE__" "__TIME__"\n", f);
+	JP_FS_WriteString("Build Date/Time: " __DATE__ " " __TIME__ "\n", f);
 	JP_Crash_AddOSData(f);
 	JP_Enum_MemoryMap();
 	JP_FS_WriteString("Crash type: Exception\n\n"
@@ -1519,7 +1524,7 @@ static void CrashHandler(int signal, siginfo_t *siginfo, ucontext_t *ctx) {
 		JP_ForceQuit();	// This will shutdown the engine as well
 	}
 	// We'll never get here, but just in case, forward the call to the old crash handler if we DO get here
-	OldHandler = (void *)oldact[signal].sa_sigaction;
+	OldHandler = (handler_t)oldact[signal].sa_sigaction;
 	(*OldHandler)(signal, siginfo, ctx);
 }
 
@@ -1534,7 +1539,7 @@ void ActivateCrashHandler( void ) {
 	struct sigaction act;
 	memset(&act, 0, sizeof(act));
 	memset(&oldact, 0, sizeof(oldact));
-	act.sa_sigaction = (void *)CrashHandler;
+	act.sa_sigaction = (handler_t)CrashHandler;
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = SA_SIGINFO;
 
@@ -1544,7 +1549,7 @@ void ActivateCrashHandler( void ) {
 	sigaction(SIGBUS, &act, &oldact[SIGBUS]);
 
 	oldactsset = 1;
-	signal(SIGINT, (void *)CTRLCHandler);
+	signal(SIGINT, (__sighandler_t)CTRLCHandler);
 }
 
 void DeactivateCrashHandler( void ) {
