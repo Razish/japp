@@ -662,8 +662,8 @@ adminUser_t *AM_ChecksumLogin( const char *checksum ) {
 	adminUser_t *user = NULL, *result = NULL;
 
 	for ( user = adminUsers; user; user = user->next ) {
-		char thisChecksum[16] = { '\0' };
-		char combined[MAX_STRING_CHARS] = { '\0' };
+		char thisChecksum[33] = {};
+		char combined[MAX_STRING_CHARS] = {};
 
 		// insert non-transmittable character so a user/pass of x/yz won't match xy/z
 		Com_sprintf( combined, sizeof(combined), "%s%s", user->user, user->password );

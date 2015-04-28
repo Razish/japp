@@ -134,6 +134,7 @@ typedef struct gclient_s gclient_t;
 #define SABERTWEAK_TRACESIZE			(0x0010u) // use SP saber trace size or based off radius defined in .sab file
 #define SABERTWEAK_REDUCEBLOCKS			(0x0020u) // reduce chance of blocking based on saber stance
 #define SABERTWEAK_TWOBLADEDEFLECTFIX	(0x0040u) // fix deflection bug when toggling second saber
+#define SABERTWEAK_NERFDMG				(0x0080u) // nerf moves like roll-stab
 
 #define MOVER_START_ON					(0x0001)
 #define MOVER_FORCE_ACTIVATE			(0x0002)

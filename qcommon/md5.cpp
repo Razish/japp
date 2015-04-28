@@ -237,7 +237,7 @@ namespace Crypto {
 		memset( ctx, 0, sizeof(*ctx) );
 	}
 
-	void ChecksumMD5( const char *in, size_t inLen, char out[16] ) {
+	void ChecksumMD5( const char *in, size_t inLen, char out[33] ) {
 		MD5Context md5 = {};
 		uint8_t digest[16] = {};
 
@@ -247,7 +247,7 @@ namespace Crypto {
 
 		out[0] = '\0';
 		for ( uint32_t i = 0; i < 16u; i++ ) {
-			Q_strcat( out, sizeof(*out), va( "%02X", digest[i] ) );
+			Q_strcat( out, 33, va( "%02X", digest[i] ) );
 		}
 	}
 

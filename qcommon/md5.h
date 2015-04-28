@@ -6,7 +6,7 @@ namespace Crypto {
 	void ChecksumMD5(
 		const char *in,
 		size_t inLen,
-		char out[16]
+		char out[33]
 	);
 
 } // namespace Crypto

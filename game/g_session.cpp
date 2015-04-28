@@ -29,7 +29,7 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 	cJSON_AddStringToObject( root, "siegeClass", *sess->siegeClass ? sess->siegeClass : "none" );
 	cJSON_AddStringToObject( root, "IP", sess->IP );
 	if ( client->pers.adminUser ) {
-		char checksum[16] = { '\0' };
+		char checksum[33] = {};
 		char combined[MAX_STRING_CHARS] = { '\0' };
 		Com_sprintf( combined, sizeof(combined), "%s%s",
 			client->pers.adminUser->user, client->pers.adminUser->password );
