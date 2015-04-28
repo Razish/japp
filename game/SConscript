@@ -150,4 +150,4 @@ if plat == 'Linux':
 game_env['LIBPREFIX'] = ''
 
 # targets
-game_env.SharedLibrary( '#' +  configuration +'/jampgame' + arch, files )
+game_env.SharedLibrary( '#' + '/jampgame' + arch, files )

@@ -285,6 +285,11 @@ elif plat == 'Windows':
 			'/wd 4996'
 		]
 
+	env['LINKFLAGS'] += [
+		'/NODEFAULTLIB:LIBCMTD',
+		'/NODEFAULTLIB:MSVCRT',
+	]
+
 if plat == 'Darwin':
 	env['CPPDEFINES'] += [ 'MACOS_X' ]
 
@@ -328,8 +333,6 @@ if debug:
 		env['LINKFLAGS'] += [
 			'/DEBUG',		# generate debug info
 		#	'/INCREMENTAL',	# incrementally link
-		    '/NODEFAULTLIB:LIBCMTD',
-			'/NODEFAULTLIB:MSVCRT',
 		]
 
 	env['CPPDEFINES'] += [ '_DEBUG' ]

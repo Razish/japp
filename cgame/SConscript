@@ -103,4 +103,4 @@ if plat == 'Linux':
 cgame_env['LIBPREFIX'] = ''
 
 # targets
-cgame_env.SharedLibrary( '#' + configuration + '/cgame' + arch, files )
+cgame_env.SharedLibrary( '#' + '/cgame' + arch, files )
