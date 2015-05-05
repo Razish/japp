@@ -5,6 +5,10 @@ qboolean Client_Supports( const gentity_t *ent, uint32_t supportFlag ) {
 	return !!(ent->client->pers.CSF & supportFlag);
 }
 
+qboolean Client_Disabled( const gentity_t *self, uint32_t pluginDisable ) {
+	return !!(self->client->pers.CPD & pluginDisable);
+}
+
 const char *supportFlagNames[CSF_NUM] = {
 	"CSF_GRAPPLE_SWING",		// Can correctly predict movement when using the grapple hook
 	"CSF_SCOREBOARD_LARGE",		// Can correctly parse scoreboard messages with information for 32 clients
@@ -35,4 +39,5 @@ const char *clientPluginDisableNames[CPD_NUM] = {
 	"CPD_NOSTAB",				// don't allow backstab/rollstab
 	"CPD_NODFA",				// don't allow DFAs
 	"CPD_OLDGRAPPLE",			// automatically release grapple
+	"CPD_ANNOYINGEMOTES",		// disable annoying emotes
 };

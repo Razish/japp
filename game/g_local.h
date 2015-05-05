@@ -807,6 +807,7 @@ void			ClientBegin( int clientNum, qboolean allowTeamReset );
 void			ClientCommand( int clientNum );
 void			ClientThink( int clientNum, usercmd_t *ucmd );
 void			ClientEndFrame( gentity_t *ent );
+qboolean		Client_Disabled( const gentity_t *self, uint32_t pluginDisable );
 qboolean		Client_Supports( const gentity_t *ent, uint32_t supportFlag );
 void			Cmd_EngageDuel_f( gentity_t *ent );
 void			Cmd_FollowCycle_f( gentity_t *ent, int dir );

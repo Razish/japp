@@ -3682,6 +3682,10 @@ static void Cmd_Emote_hug( gentity_t *ent ) {
 	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *other = g_entities + tr->entityNum;
 
+		if ( Client_Disabled( other, CPD_ANNOYINGEMOTES ) ) {
+			return;
+		}
+
 		if ( SetEmote( ent, &emoteHugger ) && SetEmote( other, &emoteHuggee ) ) {
 			vector3 entDir, otherDir, entAngles, otherAngles;
 
@@ -3704,6 +3708,11 @@ static void Cmd_Emote_kiss( gentity_t *ent ) {
 	trace_t *tr = G_RealTrace( ent, 40.0f );
 	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *other = g_entities + tr->entityNum;
+
+		if ( Client_Disabled( other, CPD_ANNOYINGEMOTES ) ) {
+			return;
+		}
+
 		vector3 entDir, otherDir, entAngles, otherAngles;
 
 		VectorSubtract( &other->client->ps.origin, &ent->client->ps.origin, &otherDir );

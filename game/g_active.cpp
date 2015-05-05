@@ -2076,9 +2076,9 @@ void ClientThink_real( gentity_t *ent ) {
 
 		if ( ent->client->ps.duelTime < level.time ) {
 			//Bring out the sabers
-			if ( ent->client->ps.weapon == WP_SABER
-				&& ent->client->ps.saberHolstered
-				&& ent->client->ps.duelTime ) {
+			if ( japp_duelActivateSaber.integer && ent->client->ps.weapon == WP_SABER && ent->client->ps.saberHolstered
+				&& ent->client->ps.duelTime )
+			{
 				ent->client->ps.saberHolstered = 0;
 
 				if ( ent->client->saber[0].soundOn )
@@ -2091,12 +2091,10 @@ void ClientThink_real( gentity_t *ent ) {
 				ent->client->ps.duelTime = 0;
 			}
 
-			if ( duelAgainst
-				&& duelAgainst->client
-				&& duelAgainst->inuse
-				&& duelAgainst->client->ps.weapon == WP_SABER
-				&& duelAgainst->client->ps.saberHolstered
-				&& duelAgainst->client->ps.duelTime ) {
+			if ( japp_duelActivateSaber.integer && duelAgainst && duelAgainst->client && duelAgainst->inuse
+				&& duelAgainst->client->ps.weapon == WP_SABER && duelAgainst->client->ps.saberHolstered
+				&& duelAgainst->client->ps.duelTime )
+			{
 				duelAgainst->client->ps.saberHolstered = 0;
 
 				if ( duelAgainst->client->saber[0].soundOn ) {
