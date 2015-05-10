@@ -9,6 +9,7 @@ extern "C" {
 #include "bg_luacvar.h"
 #include "bg_luaevent.h"
 #include "bg_luaplayer.h"
+#include "bg_luaentity.h"
 #ifdef PROJECT_CGAME
 #include "cg_luaserver.h"
 #endif
@@ -64,6 +65,16 @@ typedef struct jplua_s {
 } jplua_t;
 extern jplua_t JPLua;
 
+typedef int(*getFunc_t)(lua_State *L, jpluaEntity_t *ent);
+typedef void(*setFunc_t)(lua_State *L, jpluaEntity_t *ent);
+
+struct luaProperty_t {
+	const char		*name;
+	getFunc_t		Get;
+	setFunc_t		Set;
+};
+
 extern const uint32_t JPLUA_VERSION;
+int propertycmp(const void *a, const void *b);
 
 #endif // JPLUA

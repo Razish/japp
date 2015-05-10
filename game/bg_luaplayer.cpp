@@ -11,11 +11,9 @@
 static const char PLAYER_META[] = "Player.meta";
 
 #if defined(PROJECT_GAME)
-	typedef gentity_t jpluaEntity_t;
-	jpluaEntity_t *ents = g_entities;
+static jpluaEntity_t *ents = g_entities;
 #elif defined(PROJECT_CGAME)
-	typedef centity_t jpluaEntity_t;
-	jpluaEntity_t *ents = cg_entities;
+static jpluaEntity_t *ents = cg_entities;
 #endif
 
 static playerState_t *GetPlayerstate( jpluaEntity_t *ent ) {
@@ -791,6 +789,11 @@ static void JPLua_Player_SetCloakFuel( lua_State *L, jpluaEntity_t *ent ) {
 }
 #endif
 
+static int JPLua_Player_ToEntity(lua_State *L, jpluaEntity_t *ent){
+	JPLua_Entity_CreateRef(L, ent);
+	return 1;
+}
+
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetCloaked( lua_State *L, jpluaEntity_t *ent ) {
 	bool doCloak = lua_toboolean( L, 3 ) ? true : false;
@@ -807,16 +810,7 @@ static void JPLua_Player_SetCloaked( lua_State *L, jpluaEntity_t *ent ) {
 }
 #endif
 
-typedef int (*getFunc_t)( lua_State *L, jpluaEntity_t *ent );
-typedef void (*setFunc_t)( lua_State *L, jpluaEntity_t *ent );
-
-struct playerProperty_t {
-	const char		*name;
-	getFunc_t		Get;
-	setFunc_t		Set;
-};
-
-static const playerProperty_t playerProperties [] = {
+static const luaProperty_t playerProperties [] = {
 #if defined(PROJECT_GAME)
 	{
 		"adminPrivileges",
@@ -878,6 +872,11 @@ static const playerProperty_t playerProperties [] = {
 #elif defined(PROJECT_CGAME)
 		nullptr
 #endif
+	},
+	{
+			"entity",
+			JPLua_Player_ToEntity,
+			nullptr
 	},
 #if defined(PROJECT_GAME)
 	//TODO: move to entity object
@@ -1110,10 +1109,6 @@ static const playerProperty_t playerProperties [] = {
 };
 static const size_t numPlayerProperties = ARRAY_LEN( playerProperties );
 
-static int propertycmp( const void *a, const void *b ) {
-	return strcmp( (const char *)a, ((playerProperty_t *)b)->name );
-}
-
 static int JPLua_Player_Index( lua_State *L ) {
 	jplua_player_t *player = JPLua_CheckPlayer( L, 1 );
 	const char *key = lua_tostring( L, 2 );
@@ -1126,8 +1121,8 @@ static int JPLua_Player_Index( lua_State *L ) {
 	}
 
 	// assume it's a field
-	const playerProperty_t *property = (playerProperty_t *)bsearch( key, playerProperties, numPlayerProperties,
-		sizeof( playerProperty_t ), propertycmp
+	const luaProperty_t *property = (luaProperty_t *)bsearch( key, playerProperties, numPlayerProperties,
+		sizeof( luaProperty_t ), propertycmp
 	);
 	if ( property ) {
 		if ( property->Get ) {
@@ -1154,8 +1149,8 @@ static int JPLua_Player_NewIndex( lua_State *L ) {
 	}
 
 	// assume it's a field
-	const playerProperty_t *property = (playerProperty_t *)bsearch( key, playerProperties, numPlayerProperties,
-		sizeof( playerProperty_t ), propertycmp
+	const luaProperty_t *property = (luaProperty_t *)bsearch(key, playerProperties, numPlayerProperties,
+		sizeof(luaProperty_t), propertycmp
 	);
 	if ( property ) {
 		if ( property->Set ) {
@@ -1522,6 +1517,13 @@ static int JPLua_Player_Teleport( lua_State *L ) {
 }
 #endif
 
+static int JPLua_Player_ToEntity(lua_State *L){
+	jplua_player_t *player = JPLua_CheckPlayer(L, 1);
+	jpluaEntity_t *ent = &ents[player->clientNum];
+	JPLua_Entity_CreateRef(L, ent);
+	return 1;
+}
+
 static const struct luaL_Reg jplua_player_meta[] = {
 	{ "__index", JPLua_Player_Index},
 	{ "__newindex", JPLua_Player_NewIndex},
@@ -1539,6 +1541,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "Take", JPLua_Player_Take },
 	{ "Teleport", JPLua_Player_Teleport },
 #endif
+	{ "ToEntity", JPLua_Player_ToEntity },
 	{ NULL, NULL }
 };
 

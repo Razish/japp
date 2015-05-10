@@ -216,6 +216,7 @@ typedef struct refEntity_s {
 	/*
 	Ghoul2 Insert End
 	*/
+	int id;
 } refEntity_t;
 
 

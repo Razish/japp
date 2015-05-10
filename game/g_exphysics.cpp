@@ -1,6 +1,7 @@
 // Copyright (C) 2000-2002 Raven Software, Inc.
 //
 #include "g_local.h"
+#include "bg_lua.h"
 
 #define MAX_GRAVITY_PULL 512
 
@@ -51,6 +52,7 @@ void G_RunExPhys( gentity_t *ent, float gravity, float mass, float bounce, qbool
 				ent->touch( ent, &g_entities[tr.entityNum], &tr );
 			}
 		}
+		JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, &g_entities[tr.entityNum], &tr);
 		return;
 	}
 
@@ -175,8 +177,10 @@ void G_RunExPhys( gentity_t *ent, float gravity, float mass, float bounce, qbool
 		}
 
 		//call touch first so we can check velocity upon impact if we want
-		if ( tr.entityNum != ENTITYNUM_NONE && ent->touch ) { //then call the touch function
-			ent->touch( ent, &g_entities[tr.entityNum], &tr );
+		if (tr.entityNum != ENTITYNUM_NONE){
+			JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, &g_entities[tr.entityNum], &tr);
+			if (ent->touch) //then call the touch function
+				ent->touch(ent, &g_entities[tr.entityNum], &tr);
 		}
 
 		VectorAdd( &ent->epVelocity, &vNorm, &ent->epVelocity ); //add it into the existing velocity.

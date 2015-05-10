@@ -14,11 +14,11 @@ void UI_CleanupGhoul2( void );
 
 #define MAX_MISC_ENTS	4000
 
-static refEntity_t	MiscEnts[MAX_MISC_ENTS]; //statically allocated for now.
-static float		Radius[MAX_MISC_ENTS];
-static float		zOffset[MAX_MISC_ENTS]; //some models need a z offset for culling, because of stupid wrong model origins
+refEntity_t	MiscEnts[MAX_MISC_ENTS]; //statically allocated for now.
+float		Radius[MAX_MISC_ENTS];
+float		zOffset[MAX_MISC_ENTS]; //some models need a z offset for culling, because of stupid wrong model origins
 
-static int			NumMiscEnts = 0;
+int			NumMiscEnts = 0;
 
 void CG_MiscEnt( void );
 void CG_DoCameraShake( vector3 *origin, float intensity, int radius, int time );

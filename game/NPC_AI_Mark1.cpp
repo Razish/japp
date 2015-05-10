@@ -1,5 +1,6 @@
 #include "b_local.h"
 #include "g_nav.h"
+#include "bg_lua.h"
 
 #define	MIN_MELEE_RANGE				320
 #define	MIN_MELEE_RANGE_SQR			( MIN_MELEE_RANGE * MIN_MELEE_RANGE )
@@ -557,6 +558,7 @@ void Mark1_AttackDecision( void ) {
 		if ( NPC->die ) {
 			NPC->die( NPC, NPC, NPC, 100, MOD_UNKNOWN );
 		}
+		JPLua_Entity_CallFunction(NPC, JPLUA_ENTITY_DIE, NPC, NPC, (void *)100, (void *)MOD_UNKNOWN);
 	}
 
 	// We can see enemy so shoot him if timers let you.

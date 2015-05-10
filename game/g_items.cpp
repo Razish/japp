@@ -3,6 +3,7 @@
 #include "g_local.h"
 #include "Ghoul2/G2.h"
 #include "qcommon/q_shared.h"
+#include "bg_lua.h"
 
 /*
 
@@ -2835,8 +2836,9 @@ void G_BounceItem( gentity_t *ent, trace_t *trace ) {
 	if ( (ent->s.weapon == WP_DET_PACK && ent->s.eType == ET_GENERAL && ent->physicsObject) ) { //detpacks only
 		if ( ent->touch ) {
 			ent->touch( ent, &g_entities[trace->entityNum], trace );
-			return;
 		}
+		JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, &g_entities[trace->entityNum], &trace);
+		return;
 	}
 
 	// check for stop
@@ -2857,6 +2859,7 @@ void G_BounceItem( gentity_t *ent, trace_t *trace ) {
 		if ( ent->touch ) {
 			ent->touch( ent, &g_entities[trace->entityNum], trace );
 		}
+		JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, &g_entities[trace->entityNum], &trace);
 	}
 }
 

@@ -5,6 +5,7 @@
 #include "bg_saga.h"
 #include "bg_luaevent.h"
 #include "JAPP/jp_csflags.h"
+#include "bg_lua.h"
 
 // g_client.c -- client functions that don't happen every frame
 
@@ -3630,8 +3631,12 @@ void ClientDisconnect( int clientNum ) {
 		// carrying a siege objective item - make sure it updates and removes itself from us now in case this is an instant death-respawn situation
 		gentity_t *objectiveItem = &g_entities[ent->client->holdingObjectiveItem];
 
-		if ( objectiveItem->inuse && objectiveItem->think )
-			objectiveItem->think( objectiveItem );
+		if (objectiveItem->inuse){
+			if (objectiveItem->think)
+				objectiveItem->think(objectiveItem);
+
+			JPLua_Entity_CallFunction(objectiveItem, JPLUA_ENTITY_THINK);
+		}
 	}
 
 	trap->SetConfigstring( CS_PLAYERS + clientNum, "" );

@@ -6,6 +6,7 @@
 #include "bg_saga.h"
 #include "bg_vehicles.h"
 #include "g_nav.h"
+#include "bg_lua.h"
 
 void G_DebugPrint( int level, const char *format, ... );
 
@@ -3466,8 +3467,10 @@ void NPC_Kill_f( void ) {
 						Com_Printf( S_COLOR_GREEN"Killing NPC %s named %s\n", player->NPC_type, player->targetname );
 						player->health = 0;
 
-						if ( player->die && player->client ) {
-							player->die( player, player, player, player->client->pers.maxHealth, MOD_UNKNOWN );
+						if (player->client){
+							if (player->die)
+								player->die(player, player, player, player->client->pers.maxHealth, MOD_UNKNOWN);
+							JPLua_Entity_CallFunction(player, JPLUA_ENTITY_DIE, player, player, (void *)player->client->pers.maxHealth, (void *)MOD_UNKNOWN);
 						}
 					}
 				}
@@ -3486,6 +3489,7 @@ void NPC_Kill_f( void ) {
 					if ( player->die ) {
 						player->die( player, player, player, player->client->pers.maxHealth, MOD_UNKNOWN );
 					}
+					JPLua_Entity_CallFunction(player, JPLUA_ENTITY_DIE, player, player, (void *)player->client->pers.maxHealth, (void *)MOD_UNKNOWN);
 				}
 			}
 			else if ( (player->targetname && Q_stricmp( name, player->targetname ) == 0)
@@ -3496,6 +3500,7 @@ void NPC_Kill_f( void ) {
 				if ( player->die ) {
 					player->die( player, player, player, 100, MOD_UNKNOWN );
 				}
+				JPLua_Entity_CallFunction(player, JPLUA_ENTITY_DIE, player, player, (void *)player->client->pers.maxHealth, (void *)MOD_UNKNOWN);
 			}
 		}
 	}

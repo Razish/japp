@@ -5,6 +5,7 @@
 #include "bg_saga.h"
 #include "bg_local.h"
 #include "JAPP/jp_csflags.h"
+#include "bg_lua.h"
 
 void Jedi_Cloak( gentity_t *self );
 void Jedi_Decloak( gentity_t *self );
@@ -398,15 +399,17 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 		}
 		other = &g_entities[pm->touchents[i]];
 
-		if ( (ent->r.svFlags & SVF_BOT) && (ent->touch) ) {
-			ent->touch( ent, other, &trace );
+		if (ent->r.svFlags & SVF_BOT){
+			JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, other, &trace);
+			if (ent->touch){
+				ent->touch(ent, other, &trace);
+			}
 		}
 
-		if ( !other->touch ) {
-			continue;
+		if ( other->touch  ) {
+			other->touch(other, ent, &trace);
 		}
-
-		other->touch( other, ent, &trace );
+		JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, other, &trace);
 	}
 
 }
@@ -474,9 +477,14 @@ void G_TouchTriggers( gentity_t *ent ) {
 
 		if ( hit->touch )
 			hit->touch( hit, ent, &trace );
+		JPLua_Entity_CallFunction(hit, JPLUA_ENTITY_TOUCH, ent, &trace);
 
-		if ( (ent->r.svFlags & SVF_BOT) && (ent->touch) )
-			ent->touch( ent, hit, &trace );
+		if (ent->r.svFlags & SVF_BOT){
+			JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, hit, &trace);
+			if (ent->touch){
+				ent->touch(ent, hit, &trace);
+			}
+		}
 	}
 
 	// if we didn't touch a jump pad this pmove frame
@@ -542,6 +550,7 @@ void G_MoverTouchPushTriggers( gentity_t *ent, vector3 *oldOrg ) {
 
 			if ( hit->touch != NULL )
 				hit->touch( hit, ent, &trace );
+			JPLua_Entity_CallFunction(hit, JPLUA_ENTITY_TOUCH, ent, &trace);
 		}
 	}
 }

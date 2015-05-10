@@ -3,6 +3,7 @@
 #include "g_local.h"
 #include "w_saber.h"
 #include "qcommon/q_shared.h"
+#include "bg_lua.h"
 
 #define	MISSILE_PRESTEP_TIME	50
 
@@ -555,6 +556,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 				ent->s.weapon == WP_ROCKET_LAUNCHER ) {
 				if ( ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) ) {
 					ent->think( ent );
+					JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_THINK);
 				}
 				else {
 					G_Damage( other, ent, &g_entities[ent->r.ownerNum], &velocity,
@@ -775,6 +777,7 @@ void G_RunMissile( gentity_t *ent ) {
 				if ( g2Hit->touch ) {
 					g2Hit->touch( g2Hit, ent, &tr );
 				}
+				JPLua_Entity_CallFunction(g2Hit, JPLUA_ENTITY_TOUCH, ent, &tr);
 				goto passthrough;
 			}
 		}

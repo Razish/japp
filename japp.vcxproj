@@ -50,6 +50,7 @@
     <ClInclude Include="game\bg_local.h" />
     <ClInclude Include="game\bg_lua.h" />
     <ClInclude Include="game\bg_luacvar.h" />
+    <ClInclude Include="game\bg_luaentity.h" />
     <ClInclude Include="game\bg_luaevent.h" />
     <ClInclude Include="game\bg_luafs.h" />
     <ClInclude Include="game\bg_lualogger.h" />
@@ -189,6 +190,7 @@
     <ClCompile Include="game\bg_g2_utils.cpp" />
     <ClCompile Include="game\bg_lua.cpp" />
     <ClCompile Include="game\bg_luacvar.cpp" />
+    <ClCompile Include="game\bg_luaentity.cpp" />
     <ClCompile Include="game\bg_luaevent.cpp" />
     <ClCompile Include="game\bg_luafs.cpp" />
     <ClCompile Include="game\bg_lualogger.cpp" />

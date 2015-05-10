@@ -2533,6 +2533,7 @@ void G_RunThink( gentity_t *ent ) {
 	}
 
 	ent->nextthink = 0;
+	JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_THINK);
 	if ( !ent->think ) {
 		//trap->Error( ERR_DROP, "NULL ent->think");
 		goto runicarus;

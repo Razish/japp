@@ -348,13 +348,24 @@ struct gentity_s {
 	float				mass;
 	int					setTime;
 	int					nextthink;
+
 	void( *think )(gentity_t *self);
+	int					lua_think;
 	void( *reached )(gentity_t *self); // movers call this when hitting endpoint
+	int					lua_reached;
 	void( *blocked )(gentity_t *self, gentity_t *other);
+	int					lua_blocked;
 	void( *touch )(gentity_t *self, gentity_t *other, trace_t *trace);
+	int					lua_touch;
 	void( *use )(gentity_t *self, gentity_t *other, gentity_t *activator);
+	int					lua_use;
 	void( *pain )(gentity_t *self, gentity_t *attacker, int damage);
+	int					lua_pain;
 	void( *die )(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
+	int					lua_die;
+
+	qboolean			uselua;
+
 	int					pain_debounce_time;
 	int					fly_sound_debounce_time;	// wind tunnel
 	int					last_move_time;
@@ -406,6 +417,7 @@ struct gentity_s {
 	} modelscale;
 	vector3				origOrigin;
 	qboolean			spawnedBefore;
+	int					ID;
 };
 
 typedef struct playerTeamState_s {

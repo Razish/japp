@@ -4,7 +4,7 @@
 #include "bg_saga.h"
 #include "g_admin.h"
 #include "ui/menudef.h" // for the voice chats
-#include "bg_luaevent.h"
+#include "bg_lua.h"
 #include "bg_public.h"
 #include "JAPP/jp_csflags.h"
 
@@ -2537,6 +2537,7 @@ static void Cmd_TargetUse_f( gentity_t *ent ) {
 			if ( targ->use ) {
 				targ->use( targ, ent, ent );
 			}
+			JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_USE, ent, ent);
 		} while ( targ );
 	}
 	else {
@@ -2546,6 +2547,7 @@ static void Cmd_TargetUse_f( gentity_t *ent ) {
 			if ( targ->use ) {
 				targ->use( targ, ent, ent );
 			}
+			JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_USE, ent, ent);
 		}
 	}
 }

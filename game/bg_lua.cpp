@@ -210,6 +210,10 @@ void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize ) {
 	return;
 }
 
+int propertycmp(const void *a, const void *b) {
+	return strcmp((const char *)a, ((luaProperty_t *)b)->name);
+}
+
 extern int lastluaid;
 static int JPLua_Export_Print( lua_State *L ) {
 	char buf[16384] = { 0 };
@@ -980,6 +984,7 @@ static int JPLua_GetGLConfig(lua_State *L){
 
 	return 1;
 }
+
 #endif
 
 
@@ -994,6 +999,12 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "AddServerCommand", JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
 	{ "CreateCvar", JPLua_CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
 #ifdef PROJECT_GAME
+	{ "CreateEntity", JPLua_Entity_Create },
+#endif
+#ifdef PROJECT_CGAME
+	{ "CreateRefEntity", JPLua_Entity_CreateRefEntity },
+#endif
+#ifdef PROJECT_GAME
 	{ "ConnectToDB", JPLua_ConnectToDB}, // ConnectToDB ( int type(1 - MySQL , 2 - SQLite), ...) // SQLite (type, string path) || MySQL ( type, string host, string user, string db, string password, int port )
 #endif
 #ifdef PROJECT_CGAME
@@ -1006,6 +1017,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 #endif
 	{ "GetConfigString", JPLua_GetConfigString }, // table GetConfigString()
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
+	{ "GetEntity", JPLua_Entity_Get }, // GetEntity(num) or GetEntity() for full list
 	{ "GetFileList", JPLua_File_GetFileList}, // table GetFileList(string path, string extension)
 #ifdef PROJECT_CGAME
 	{ "GetFPS", JPLua_Export_GetFPS }, // integer GetFPS()
@@ -1124,6 +1136,7 @@ void JPLua_Init( void ) {
 
 	// Register our classes
 	JPLua_Register_Player( JPLua.state );
+	JPLua_Register_Entity(JPLua.state);
 #ifdef PROJECT_CGAME
 	JPLua_Register_Server( JPLua.state );
 #endif

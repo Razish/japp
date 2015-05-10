@@ -5,6 +5,7 @@
 #include "g_local.h"
 #include "bg_saga.h"
 #include "qcommon/q_shared.h"
+#include "bg_lua.h"
 
 typedef struct shaderRemap_s {
 	char oldShader[MAX_QPATH], newShader[MAX_QPATH];
@@ -15,6 +16,7 @@ typedef struct shaderRemap_s {
 
 static int remapCount = 0;
 static shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
+static int entitycount = 0;
 
 void AddRemap( const char *oldShader, const char *newShader, float timeOffset ) {
 	int i;
@@ -298,6 +300,7 @@ void GlobalUse( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	if ( self->use ) {
 		self->use( self, other, activator );
 	}
+	JPLua_Entity_CallFunction(self, JPLUA_ENTITY_USE, other, activator);
 }
 
 void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *string ) {
@@ -474,6 +477,7 @@ gentity_t *G_Spawn( void ) {
 
 			// reuse this slot
 			G_InitGentity( e );
+			e->ID = entitycount++;
 			return e;
 		}
 
@@ -493,6 +497,7 @@ gentity_t *G_Spawn( void ) {
 	trap->LocateGameData( (sharedEntity_t *)level.gentities, level.num_entities, sizeof(gentity_t), &level.clients[0].ps, sizeof(level.clients[0]) );
 
 	G_InitGentity( e );
+	e->ID = entitycount++;
 	return e;
 }
 

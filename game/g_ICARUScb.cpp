@@ -6,6 +6,7 @@
 #include "ICARUS/Q3_Interface.h"
 #include "ICARUS/Q3_Registers.h"
 #include "g_nav.h"
+#include "bg_lua.h"
 
 qboolean BG_SabersOff( playerState_t *ps );
 extern stringID_table_t WPTable[];
@@ -865,6 +866,7 @@ void Q3_Kill( int entID, const char *name ) {
 		//GEntity_DieFunc( victim, NULL, NULL, o_health, MOD_UNKNOWN );
 		victim->die( victim, victim, victim, o_health, MOD_UNKNOWN );
 	}
+	JPLua_Entity_CallFunction(victim, JPLUA_ENTITY_DIE, victim, victim, (void *)o_health, (void *)MOD_UNKNOWN);
 }
 
 void Q3_RemoveEnt( gentity_t *victim ) {

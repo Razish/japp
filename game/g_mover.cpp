@@ -1,4 +1,5 @@
 #include "g_local.h"
+#include "bg_lua.h"
 
 typedef struct pushed_s {
 	gentity_t	*ent;
@@ -372,6 +373,7 @@ void G_MoverTeam( gentity_t *ent ) {
 			// if the pusher has a "blocked" function, call it
 			if (ent->blocked) {
 				ent->blocked(ent, obstacle);
+				JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_BLOCKED, obstacle);
 			}
 			return;
 		}
@@ -386,6 +388,7 @@ void G_MoverTeam( gentity_t *ent ) {
 			if ( level.time >= part->s.pos.trTime + part->s.pos.trDuration ) {
 				if ( part->reached ) {
 					part->reached( part );
+					JPLua_Entity_CallFunction(part, JPLUA_ENTITY_REACHED);
 				}
 			}
 		}
@@ -1888,7 +1891,7 @@ void SP_func_pendulum( gentity_t *ent ) {
 	ent->s.apos.trDelta.z = speed;
 }
 
-static void CacheChunkEffects( material_t material ) {
+void CacheChunkEffects( material_t material ) {
 	switch ( material ) {
 	default:
 	case MAT_GLASS:

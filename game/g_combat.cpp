@@ -4,7 +4,7 @@
 
 #include "b_local.h"
 #include "bg_saga.h"
-#include "bg_luaevent.h"
+#include "bg_lua.h"
 
 int G_ShipSurfaceForSurfName( const char *surfaceName );
 qboolean G_FlyVehicleDestroySurface( gentity_t *veh, int surface );
@@ -1669,8 +1669,11 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if ( self->client->holdingObjectiveItem > 0 ) { //carrying a siege objective item - make sure it updates and removes itself from us now in case this is an instant death-respawn situation
 		gentity_t *objectiveItem = &g_entities[self->client->holdingObjectiveItem];
 
-		if ( objectiveItem->inuse && objectiveItem->think ) {
-			objectiveItem->think( objectiveItem );
+		if ( objectiveItem->inuse){
+			if (objectiveItem->think) {
+				objectiveItem->think(objectiveItem);
+			}
+			JPLua_Entity_CallFunction(objectiveItem, JPLUA_ENTITY_THINK);
 		}
 	}
 
@@ -4377,6 +4380,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 
 			targ->enemy = attacker;
 			targ->die( targ, inflictor, attacker, take, mod );
+			JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_DIE, inflictor, attacker, (void *)take, (void *)mod);
 			G_ActivateBehavior( targ, BSET_DEATH );
 			return;
 		}
@@ -4386,7 +4390,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 					G_LetGoOfWall( targ );
 				}
 			}
-			if ( targ->pain ) {
 				if ( targ->s.eType != ET_NPC || mod != MOD_SABER || take > 1 ) { //don't even notify NPCs of pain if it's just idle saber damage
 					gPainMOD = mod;
 					if ( point ) {
@@ -4395,8 +4398,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 					else {
 						VectorCopy( &targ->r.currentOrigin, &gPainPoint );
 					}
-					targ->pain( targ, attacker, take );
-				}
+					if (targ->pain) {
+						targ->pain(targ, attacker, take);
+					}
+					JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_PAIN, attacker, (void*)take);
 			}
 		}
 

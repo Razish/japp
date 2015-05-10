@@ -1,4 +1,5 @@
 #include "b_local.h"
+#include "bg_lua.h"
 
 void G_GetBoltPosition( gentity_t *self, int boltIndex, vector3 *pos, int modelIndex );
 
@@ -165,7 +166,7 @@ void Rancor_Swing( qboolean tryGrab ) {
 		}
 
 		if ( DistanceSquared( &radiusEnt->r.currentOrigin, &boltOrg ) <= radiusSquared ) {
-			if ( tryGrab
+			if (tryGrab
 				&& NPC->count != 1 //don't have one in hand or in mouth already - FIXME: allow one in hand and any number in mouth!
 				&& radiusEnt->client->NPC_class != CLASS_RANCOR
 				&& radiusEnt->client->NPC_class != CLASS_GALAKMECH
@@ -181,10 +182,10 @@ void Rancor_Swing( qboolean tryGrab ) {
 				&& radiusEnt->client->NPC_class != CLASS_REMOTE
 				&& radiusEnt->client->NPC_class != CLASS_SENTRY
 				&& radiusEnt->client->NPC_class != CLASS_INTERROGATOR
-				&& radiusEnt->client->NPC_class != CLASS_VEHICLE ) {//grab
-				if ( NPC->count == 2 ) {//have one in my mouth, remove him
-					TIMER_Remove( NPC, "clearGrabbed" );
-					Rancor_DropVictim( NPC );
+				&& radiusEnt->client->NPC_class != CLASS_VEHICLE) {//grab
+				if (NPC->count == 2) {//have one in my mouth, remove him
+					TIMER_Remove(NPC, "clearGrabbed");
+					Rancor_DropVictim(NPC);
 				}
 				NPC->enemy = radiusEnt;//make him my new best friend
 				radiusEnt->client->ps.eFlags2 |= EF2_HELD_BY_MONSTER;
@@ -194,9 +195,11 @@ void Rancor_Swing( qboolean tryGrab ) {
 				NPC->activator = radiusEnt;//remember him
 				NPC->count = 1;//in my hand
 				//wait to attack
-				TIMER_Set( NPC, "attacking", NPC->client->ps.legsTimer + Q_irand( 500, 2500 ) );
-				if ( radiusEnt->health > 0 && radiusEnt->pain ) {//do pain on enemy
-					radiusEnt->pain( radiusEnt, NPC, 100 );
+				TIMER_Set(NPC, "attacking", NPC->client->ps.legsTimer + Q_irand(500, 2500));
+				if (radiusEnt->health > 0){//do pain on enemy
+					if(radiusEnt->pain)
+						radiusEnt->pain( radiusEnt, NPC, 100 );
+					JPLua_Entity_CallFunction(radiusEnt, JPLUA_ENTITY_PAIN, NPC, (void *)100);
 					//GEntity_PainFunc( radiusEnt, NPC, NPC, radiusEnt->r.currentOrigin, 0, MOD_CRUSH );
 				}
 				else if ( radiusEnt->client ) {
