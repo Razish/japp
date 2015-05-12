@@ -1515,6 +1515,21 @@ static int JPLua_Player_Teleport( lua_State *L ) {
 
 	return 0;
 }
+
+extern qboolean SetEmote( gentity_t *ent, const emote_t *emote );
+static int JPLua_Player_SetAnim(lua_State *L){
+	gentity_t *ent = &g_entities[JPLua_CheckPlayer( L, 1 )->clientNum];
+
+	int animLoop = luaL_checkinteger(L,2), animLeave = luaL_checkinteger(L,3), flags = luaL_checkinteger(L,4);
+	emote_t emote;
+	emote.name = "jplua emote";
+	emote.animLoop = (animNumber_t)animLoop;
+	emote.animLeave = (animNumber_t)animLeave;
+	emote.flags = flags;
+
+	SetEmote(ent, &emote);
+	return 0;
+}
 #endif
 
 static int JPLua_Player_ToEntity(lua_State *L){
@@ -1540,6 +1555,7 @@ static const struct luaL_Reg jplua_player_meta[] = {
 	{ "Slap", JPLua_Player_Slap},
 	{ "Take", JPLua_Player_Take },
 	{ "Teleport", JPLua_Player_Teleport },
+	{ "SetAnim", JPLua_Player_SetAnim },
 #endif
 	{ "ToEntity", JPLua_Player_ToEntity },
 	{ NULL, NULL }

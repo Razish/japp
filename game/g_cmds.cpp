@@ -3577,7 +3577,7 @@ static int emotecmp( const void *a, const void *b ) {
 	return strcmp( (const char *)a, ((const emote_t *)b)->name );
 }
 
-static qboolean SetEmote( gentity_t *ent, const emote_t *emote ) {
+qboolean SetEmote( gentity_t *ent, const emote_t *emote ) {
 	forceHandAnims_t handExtend = HANDEXTEND_TAUNT;
 	int emoteTime;
 

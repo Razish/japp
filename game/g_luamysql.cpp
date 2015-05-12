@@ -45,7 +45,7 @@ static int JPLua_MySQL_ToString(lua_State *L){
 
 static int JPLua_MySQLResult_ToString(lua_State *L){
 	MYSQL_RES **data = JPLua_CheckMySQLResult(L,1);
-	lua_pushfstring( L, "MySQL Result (Rows: %s )", mysql_num_rows(*data));
+	lua_pushfstring( L, "MySQL Result (Rows: %d )", mysql_num_rows(*data));
 
 	return 1;
 }
