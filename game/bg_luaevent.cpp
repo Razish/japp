@@ -667,7 +667,7 @@ qboolean JPLua_Event_ServerCommand( void ) {
 		ret = qtrue;
 	}
 #endif // JPLUA
-	return qfalse;
+	return ret;
 }
 #elif defined(PROJECT_CGAME)
 qboolean JPLua_Event_ServerCommand( void ) {
@@ -689,6 +689,6 @@ qboolean JPLua_Event_ServerCommand( void ) {
 		ret = qtrue;
 	}
 #endif // JPLUA
-	return qfalse;
+	return ret;
 }
 #endif

@@ -4380,7 +4380,14 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 
 			targ->enemy = attacker;
 			targ->die( targ, inflictor, attacker, take, mod );
-			JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_DIE, inflictor, attacker, (void *)take, (void *)mod);
+			JPLua_Entity_CallFunction(
+				targ,
+				JPLUA_ENTITY_DIE,
+				(intptr_t)inflictor,
+				(intptr_t)attacker,
+				(intptr_t)take,
+				(intptr_t)mod
+			);
 			G_ActivateBehavior( targ, BSET_DEATH );
 			return;
 		}
@@ -4401,7 +4408,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 					if (targ->pain) {
 						targ->pain(targ, attacker, take);
 					}
-					JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_PAIN, attacker, (void*)take);
+					JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_PAIN, (intptr_t)attacker, (intptr_t)take);
 			}
 		}
 

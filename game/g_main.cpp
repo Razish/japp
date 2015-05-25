@@ -2594,7 +2594,6 @@ void ClearNPCGlobals( void );
 void AI_UpdateGroups( void );
 void SiegeCheckTimers( void );
 void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd );
-void Jedi_Decloak( gentity_t *self );
 qboolean G_PointInBounds( vector3 *point, vector3 *mins, vector3 *maxs );
 
 int g_siegeRespawnCheck = 0;

@@ -10,8 +10,6 @@
 
 void G_DebugPrint( int level, const char *format, ... );
 
-void Jedi_Cloak( gentity_t *self );
-
 void Q3_SetParm( int entID, int parmNum, const char *parmValue );
 team_t TranslateTeamName( const char *name );
 extern const char *TeamNames[TEAM_NUM_TEAMS];
@@ -3470,7 +3468,14 @@ void NPC_Kill_f( void ) {
 						if (player->client){
 							if (player->die)
 								player->die(player, player, player, player->client->pers.maxHealth, MOD_UNKNOWN);
-							JPLua_Entity_CallFunction(player, JPLUA_ENTITY_DIE, player, player, (void *)player->client->pers.maxHealth, (void *)MOD_UNKNOWN);
+							JPLua_Entity_CallFunction(
+								player,
+								JPLUA_ENTITY_DIE,
+								(intptr_t)player,
+								(intptr_t)player,
+								(intptr_t)player->client->pers.maxHealth,
+								(intptr_t)MOD_UNKNOWN
+							);
 						}
 					}
 				}
@@ -3489,7 +3494,14 @@ void NPC_Kill_f( void ) {
 					if ( player->die ) {
 						player->die( player, player, player, player->client->pers.maxHealth, MOD_UNKNOWN );
 					}
-					JPLua_Entity_CallFunction(player, JPLUA_ENTITY_DIE, player, player, (void *)player->client->pers.maxHealth, (void *)MOD_UNKNOWN);
+					JPLua_Entity_CallFunction(
+						player,
+						JPLUA_ENTITY_DIE,
+						(intptr_t)player,
+						(intptr_t)player,
+						(intptr_t)player->client->pers.maxHealth,
+						(intptr_t)MOD_UNKNOWN
+					);
 				}
 			}
 			else if ( (player->targetname && Q_stricmp( name, player->targetname ) == 0)
@@ -3500,7 +3512,14 @@ void NPC_Kill_f( void ) {
 				if ( player->die ) {
 					player->die( player, player, player, 100, MOD_UNKNOWN );
 				}
-				JPLua_Entity_CallFunction(player, JPLUA_ENTITY_DIE, player, player, (void *)player->client->pers.maxHealth, (void *)MOD_UNKNOWN);
+				JPLua_Entity_CallFunction(
+					player,
+					JPLUA_ENTITY_DIE,
+					(intptr_t)player,
+					(intptr_t)player,
+					(intptr_t)player->client->pers.maxHealth,
+					(intptr_t)MOD_UNKNOWN
+				);
 			}
 		}
 	}

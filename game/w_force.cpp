@@ -9,7 +9,6 @@
 void NPC_PlayConfusionSound( gentity_t *self );
 void NPC_Jedi_PlayConfusionSound( gentity_t *self );
 void NPC_UseResponse( gentity_t *self, gentity_t *user, qboolean useWhenDone );
-void Jedi_Decloak( gentity_t *self );
 
 qboolean BG_FullBodyTauntAnim( int anim );
 

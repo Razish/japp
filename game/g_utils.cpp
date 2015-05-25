@@ -300,7 +300,7 @@ void GlobalUse( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	if ( self->use ) {
 		self->use( self, other, activator );
 	}
-	JPLua_Entity_CallFunction(self, JPLUA_ENTITY_USE, other, activator);
+	JPLua_Entity_CallFunction(self, JPLUA_ENTITY_USE, (intptr_t)other, (intptr_t)activator);
 }
 
 void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *string ) {

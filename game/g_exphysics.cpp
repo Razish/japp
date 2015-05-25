@@ -52,7 +52,7 @@ void G_RunExPhys( gentity_t *ent, float gravity, float mass, float bounce, qbool
 				ent->touch( ent, &g_entities[tr.entityNum], &tr );
 			}
 		}
-		JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, &g_entities[tr.entityNum], &tr);
+		JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, (intptr_t)&g_entities[tr.entityNum], (intptr_t)&tr);
 		return;
 	}
 
@@ -178,7 +178,7 @@ void G_RunExPhys( gentity_t *ent, float gravity, float mass, float bounce, qbool
 
 		//call touch first so we can check velocity upon impact if we want
 		if (tr.entityNum != ENTITYNUM_NONE){
-			JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, &g_entities[tr.entityNum], &tr);
+			JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, (intptr_t)&g_entities[tr.entityNum], (intptr_t)&tr);
 			if (ent->touch) //then call the touch function
 				ent->touch(ent, &g_entities[tr.entityNum], &tr);
 		}

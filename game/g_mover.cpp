@@ -373,7 +373,7 @@ void G_MoverTeam( gentity_t *ent ) {
 			// if the pusher has a "blocked" function, call it
 			if (ent->blocked) {
 				ent->blocked(ent, obstacle);
-				JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_BLOCKED, obstacle);
+				JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_BLOCKED, (intptr_t)obstacle);
 			}
 			return;
 		}

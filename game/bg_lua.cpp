@@ -1001,9 +1001,6 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 #ifdef PROJECT_GAME
 	{ "CreateEntity", JPLua_Entity_Create },
 #endif
-#ifdef PROJECT_CGAME
-	{ "CreateRefEntity", JPLua_Entity_CreateRefEntity },
-#endif
 #ifdef PROJECT_GAME
 	{ "ConnectToDB", JPLua_ConnectToDB}, // ConnectToDB ( int type(1 - MySQL , 2 - SQLite), ...) // SQLite (type, string path) || MySQL ( type, string host, string user, string db, string password, int port )
 #endif

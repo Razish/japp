@@ -2537,7 +2537,7 @@ static void Cmd_TargetUse_f( gentity_t *ent ) {
 			if ( targ->use ) {
 				targ->use( targ, ent, ent );
 			}
-			JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_USE, ent, ent);
+			JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_USE, (intptr_t)ent, (intptr_t)ent);
 		} while ( targ );
 	}
 	else {
@@ -2547,7 +2547,7 @@ static void Cmd_TargetUse_f( gentity_t *ent ) {
 			if ( targ->use ) {
 				targ->use( targ, ent, ent );
 			}
-			JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_USE, ent, ent);
+			JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_USE, (intptr_t)ent, (intptr_t)ent);
 		}
 	}
 }

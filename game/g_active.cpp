@@ -7,9 +7,6 @@
 #include "JAPP/jp_csflags.h"
 #include "bg_lua.h"
 
-void Jedi_Cloak( gentity_t *self );
-void Jedi_Decloak( gentity_t *self );
-
 qboolean PM_SaberInTransition( int move );
 qboolean PM_SaberInReturn( int move );
 qboolean WP_SaberStyleValidForSaber( saberInfo_t *saber1, saberInfo_t *saber2, int saberHolstered, int saberAnimLevel );
@@ -400,7 +397,7 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 		other = &g_entities[pm->touchents[i]];
 
 		if (ent->r.svFlags & SVF_BOT){
-			JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, other, &trace);
+			JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, (intptr_t)other, (intptr_t)&trace);
 			if (ent->touch){
 				ent->touch(ent, other, &trace);
 			}
@@ -409,7 +406,7 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 		if ( other->touch  ) {
 			other->touch(other, ent, &trace);
 		}
-		JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, other, &trace);
+		JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, (intptr_t)other, (intptr_t)&trace);
 	}
 
 }
@@ -477,10 +474,10 @@ void G_TouchTriggers( gentity_t *ent ) {
 
 		if ( hit->touch )
 			hit->touch( hit, ent, &trace );
-		JPLua_Entity_CallFunction(hit, JPLUA_ENTITY_TOUCH, ent, &trace);
+		JPLua_Entity_CallFunction(hit, JPLUA_ENTITY_TOUCH, (intptr_t)ent, (intptr_t)&trace);
 
 		if (ent->r.svFlags & SVF_BOT){
-			JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, hit, &trace);
+			JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, (intptr_t)hit, (intptr_t)&trace);
 			if (ent->touch){
 				ent->touch(ent, hit, &trace);
 			}
@@ -550,7 +547,7 @@ void G_MoverTouchPushTriggers( gentity_t *ent, vector3 *oldOrg ) {
 
 			if ( hit->touch != NULL )
 				hit->touch( hit, ent, &trace );
-			JPLua_Entity_CallFunction(hit, JPLUA_ENTITY_TOUCH, ent, &trace);
+			JPLua_Entity_CallFunction(hit, JPLUA_ENTITY_TOUCH, (intptr_t)ent, (intptr_t)&trace);
 		}
 	}
 }

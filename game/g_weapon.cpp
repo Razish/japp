@@ -138,7 +138,6 @@ static vector3 muzzle;
 
 qboolean G_BoxInBounds( vector3 *point, vector3 *mins, vector3 *maxs, vector3 *boundsMins, vector3 *boundsMaxs );
 qboolean G_HeavyMelee( gentity_t *attacker );
-void Jedi_Decloak( gentity_t *self );
 static void WP_FireEmplaced( gentity_t *ent, qboolean altFire );
 void laserTrapStick( gentity_t *ent, vector3 *endpos, vector3 *normal );
 

@@ -199,7 +199,7 @@ void Rancor_Swing( qboolean tryGrab ) {
 				if (radiusEnt->health > 0){//do pain on enemy
 					if(radiusEnt->pain)
 						radiusEnt->pain( radiusEnt, NPC, 100 );
-					JPLua_Entity_CallFunction(radiusEnt, JPLUA_ENTITY_PAIN, NPC, (void *)100);
+					JPLua_Entity_CallFunction(radiusEnt, JPLUA_ENTITY_PAIN, (intptr_t)NPC, (intptr_t)100);
 					//GEntity_PainFunc( radiusEnt, NPC, NPC, radiusEnt->r.currentOrigin, 0, MOD_CRUSH );
 				}
 				else if ( radiusEnt->client ) {

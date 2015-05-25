@@ -866,7 +866,14 @@ void Q3_Kill( int entID, const char *name ) {
 		//GEntity_DieFunc( victim, NULL, NULL, o_health, MOD_UNKNOWN );
 		victim->die( victim, victim, victim, o_health, MOD_UNKNOWN );
 	}
-	JPLua_Entity_CallFunction(victim, JPLUA_ENTITY_DIE, victim, victim, (void *)o_health, (void *)MOD_UNKNOWN);
+	JPLua_Entity_CallFunction(
+		victim,
+		JPLUA_ENTITY_DIE,
+		(intptr_t)victim,
+		(intptr_t)victim,
+		(intptr_t)o_health,
+		(intptr_t)MOD_UNKNOWN
+	);
 }
 
 void Q3_RemoveEnt( gentity_t *victim ) {

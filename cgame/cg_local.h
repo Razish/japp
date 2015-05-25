@@ -79,6 +79,7 @@
 #define NUM_CHUNK_MODELS				(4)
 #define MAX_CHATBOX_IDENTIFIER_SIZE		(32)
 #define CAMERA_SIZE						(4)
+#define MAX_MISC_ENTS					(4000)
 
 #define NEWFX_DISINT			(0x0001u)
 #define NEWFX_RUPTOR			(0x0002u)
@@ -847,9 +848,13 @@ extern siegeExtended_t	cg_siegeExtendedData[MAX_CLIENTS];
 extern int				cg_siegeWinTeam;
 extern weaponInfo_t		cg_weapons[MAX_WEAPONS];
 extern forceTicPos_t	forceTicPos[];
+extern refEntity_t		MiscEnts[MAX_MISC_ENTS];
+extern int				NumMiscEnts;
 extern int				numSortedTeamPlayers;
+extern float			Radius[MAX_MISC_ENTS];
 extern int				sortedTeamPlayers[TEAM_MAXOVERLAY];
 extern char				systemChat[256];
+extern float			zOffset[MAX_MISC_ENTS];
 extern cgameImport_t	*trap;
 
 int				BG_ProperForceIndex( int power );

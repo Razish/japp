@@ -805,6 +805,7 @@ int				BotAIStartFrame( int time );
 void			BotInterbreedEndMatch( void );
 const char     *BuildShaderStateConfig(void);
 void			BroadcastTeamChange( gclient_t *client, int oldTeam );
+void			CacheChunkEffects( material_t material );
 void			CalcMuzzlePoint( const gentity_t *ent, vector3 *forward, vector3 *right, vector3 *up,
 					vector3 *muzzlePoint );
 void			CalculateRanks( void );

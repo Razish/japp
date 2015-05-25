@@ -8,7 +8,6 @@
 #define	MISSILE_PRESTEP_TIME	50
 
 void laserTrapStick( gentity_t *ent, vector3 *endpos, vector3 *normal );
-void Jedi_Decloak( gentity_t *self );
 
 qboolean FighterIsLanded( Vehicle_t *pVeh, playerState_t *parentPS );
 
@@ -777,7 +776,7 @@ void G_RunMissile( gentity_t *ent ) {
 				if ( g2Hit->touch ) {
 					g2Hit->touch( g2Hit, ent, &tr );
 				}
-				JPLua_Entity_CallFunction(g2Hit, JPLUA_ENTITY_TOUCH, ent, &tr);
+				JPLua_Entity_CallFunction(g2Hit, JPLUA_ENTITY_TOUCH, (intptr_t)ent, (intptr_t)&tr);
 				goto passthrough;
 			}
 		}
