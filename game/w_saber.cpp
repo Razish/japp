@@ -3626,7 +3626,6 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 			if ( (japp_saberTweaks.integer & SABERTWEAK_NERFDMG) ) {
 				if ( self->client->ps.saberMove == LS_ROLL_STAB ) {
 					dmg = G_GetAttackDamage( self, 1, 25, 0.333f );
-					trap->Print( "rollstab dmg: %i\n", dmg );
 				}
 			}
 
