@@ -1598,7 +1598,7 @@ static void Cmd_MapList_f( gentity_t *ent ) {
 }
 
 static qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	char bspName[MAX_QPATH] = { '\0' };
+	char bspName[MAX_QPATH] = {};
 	const char *mapName = NULL, *mapName2 = NULL, *arenaInfo = NULL;
 	fileHandle_t fp = NULL_FILE;
 

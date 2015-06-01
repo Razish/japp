@@ -3640,7 +3640,7 @@ static qboolean UI_SetNextMap( int actual, int index ) {
 static void UI_StartSkirmish( qboolean next ) {
 	int i, k, delay, temp;
 	float skill;
-	char buff[MAX_STRING_CHARS] = { '\0' };
+	char buff[MAX_STRING_CHARS] = {};
 
 	if ( next ) {
 		int actual, index = trap->Cvar_VariableValue( "ui_mapIndex" );

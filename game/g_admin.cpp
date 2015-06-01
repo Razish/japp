@@ -753,7 +753,7 @@ static void AM_WriteTelemarks( fileHandle_t f ) {
 
 // load telemarks from disk
 void AM_LoadTelemarks( void ) {
-	char *buf = NULL, loadPath[MAX_QPATH] = { '\0' };
+	char *buf = NULL, loadPath[MAX_QPATH] = {};
 	unsigned int len = 0;
 	fileHandle_t f = 0;
 
@@ -791,7 +791,7 @@ void AM_LoadTelemarks( void ) {
 
 // save telemarks to disk
 void AM_SaveTelemarks( void ) {
-	char loadPath[MAX_QPATH] = { '\0' };
+	char loadPath[MAX_QPATH] = {};
 	fileHandle_t f;
 
 	Com_sprintf( loadPath, sizeof(loadPath), "telemarks" PATH_SEP "%s.json", level.rawmapname );
@@ -826,7 +826,7 @@ static void AM_SetLoginEffect(gentity_t *ent){
 
 // log in using user + pass
 static void AM_Login( gentity_t *ent ) {
-	char argUser[64] = { '\0' }, argPass[64] = { '\0' };
+	char argUser[64] = {}, argPass[64] = {};
 	adminUser_t *user = NULL, *current = NULL;
 
 	if ( trap->Argc() < 3 ) {
@@ -924,7 +924,7 @@ static void AM_WhoIs( gentity_t *ent ) {
 	Q_PrintBuffer( &pb, "Name                                Admin User                      Rank\n" );
 	for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
 		if ( e->client->pers.adminUser ) {
-			char strName[MAX_NETNAME] = { '\0' }, strAdmin[32] = { '\0' }, strRank[12] = { '\0' };
+			char strName[MAX_NETNAME] = {}, strAdmin[32] = {}, strRank[12] = {};
 
 			Q_strncpyz( strName, e->client->pers.netname, sizeof(strName) );
 			Q_CleanString( strName, STRIP_COLOUR );
@@ -957,8 +957,8 @@ static void AM_Status( gentity_t *ent ) {
 	// build a list of clients
 	for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
 		if ( e->inuse && ent->client->pers.connected != CON_DISCONNECTED ) {
-			char strNum[12] = { '\0' }, strName[MAX_NETNAME] = { '\0' }, strIP[NET_ADDRSTRMAXLEN] = { '\0' },
-				strAdmin[32] = { '\0' };
+			char strNum[12] = {}, strName[MAX_NETNAME] = {}, strIP[NET_ADDRSTRMAXLEN] = {},
+				strAdmin[32] = {};
 
 			Com_sprintf( strNum, sizeof(strNum), "(%i)", i );
 			Q_strncpyz( strName, e->client->pers.netnameClean, sizeof(strName) );
@@ -976,7 +976,7 @@ static void AM_Status( gentity_t *ent ) {
 
 // announce a message to all clients
 static void AM_Announce( gentity_t *ent ) {
-	char *msg, arg1[MAX_NETNAME] = { '\0' };
+	char *msg, arg1[MAX_NETNAME] = {};
 
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
@@ -1032,7 +1032,7 @@ void Ghost_Off( gentity_t *ent ) {
 
 // ghost specified client (or self)
 static void AM_Ghost( gentity_t *ent ) {
-	char arg1[64] = { '\0' };
+	char arg1[64] = {};
 	int targetClient;
 	gentity_t *targ;
 
@@ -1104,7 +1104,7 @@ static void AM_Teleport( gentity_t *ent ) {
 
 	// 1 arg means we're teleporting ourself to x (self -> client, self -> namedTelePos)
 	else if ( trap->Argc() == 2 ) {
-		char arg1[64] = { '\0' };
+		char arg1[64] = {};
 		int targetClient;
 
 		trap->Argv( 1, arg1, sizeof(arg1) );
@@ -1157,7 +1157,7 @@ static void AM_Teleport( gentity_t *ent ) {
 
 	// 2 args mean we're teleporting x to y (client -> client, client -> telemark)
 	else if ( trap->Argc() == 3 ) {
-		char arg1[64] = { '\0' }, arg2[64] = { '\0' };
+		char arg1[64] = {}, arg2[64] = {};
 		int targetClient1, targetClient2;
 
 		trap->Argv( 1, arg1, sizeof(arg1) );
@@ -1169,7 +1169,7 @@ static void AM_Teleport( gentity_t *ent ) {
 		if ( targetClient1 != -1 ) {
 			// no client with this name - check for telemark
 			if ( targetClient2 == -1 ) {
-				char cleanedInput[MAX_TELEMARK_NAME_LEN] = { '\0' };
+				char cleanedInput[MAX_TELEMARK_NAME_LEN] = {};
 				telemark_t *tm = NULL;
 
 				if ( !AM_CanInflict( ent, &g_entities[targetClient1] ) ) {
@@ -1224,7 +1224,7 @@ static void AM_Teleport( gentity_t *ent ) {
 
 	// amtele x y z - tele ourself to x y z
 	else if ( trap->Argc() == 4 ) {
-		char argX[8] = { '\0' }, argY[8] = { '\0' }, argZ[8] = { '\0' };
+		char argX[8] = {}, argY[8] = {}, argZ[8] = {};
 		vector3 telePos;
 
 		trap->Argv( 1, argX, sizeof( argX ) );
@@ -1240,7 +1240,7 @@ static void AM_Teleport( gentity_t *ent ) {
 	// amtele c x y z - tele c to x y z
 	// amtele c x y z r - tele c to x y z with r
 	else if ( trap->Argc() > 4 ) {
-		char argC[64] = { '\0' };
+		char argC[64] = {};
 		int targetClient;
 
 		trap->Argv( 1, argC, sizeof(argC) );
@@ -1248,7 +1248,7 @@ static void AM_Teleport( gentity_t *ent ) {
 
 		if ( targetClient != -1 ) {
 			vector3	telePos;
-			char argX[16] = { '\0' }, argY[16] = { '\0' }, argZ[16] = { '\0' };
+			char argX[16] = {}, argY[16] = {}, argZ[16] = {};
 
 			if ( !AM_CanInflict( ent, &g_entities[targetClient] ) ) {
 				return;
@@ -1265,7 +1265,7 @@ static void AM_Teleport( gentity_t *ent ) {
 			// amtele c x y z r
 			if ( trap->Argc() == 6 ) {
 				vector3 angles = { 0.0f };
-				char argR[8] = { '\0' };
+				char argR[8] = {};
 
 				trap->Argv( 5, argR, sizeof(argR) );
 				angles.yaw = atoi( argR );
@@ -1327,7 +1327,7 @@ static void AM_GunTeleportRev( gentity_t *ent ) {
 
 // mark current location
 static void AM_Telemark( gentity_t *ent ) {
-	char name[MAX_TELEMARK_NAME_LEN] = { '\0' };
+	char name[MAX_TELEMARK_NAME_LEN] = {};
 
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
@@ -1370,7 +1370,7 @@ static void AM_GunTeleportMark( gentity_t *ent ) {
 
 // remove a telemark from the list
 static void AM_RemoveTelemark( gentity_t *ent ) {
-	char arg1[MAX_TELEMARK_NAME_LEN] = { '\0' };
+	char arg1[MAX_TELEMARK_NAME_LEN] = {};
 
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
@@ -1441,7 +1441,7 @@ static void AM_SaveTelemarksCmd( gentity_t *ent ) {
 // call an arbitrary vote
 static void AM_Poll( gentity_t *ent ) {
 	int i = 0;
-	char arg1[MAX_TOKEN_CHARS] = { '\0' }, arg2[MAX_TOKEN_CHARS] = { '\0' };
+	char arg1[MAX_TOKEN_CHARS] = {}, arg2[MAX_TOKEN_CHARS] = {};
 
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
@@ -1526,7 +1526,7 @@ static void AM_KillVote( gentity_t *ent ) {
 
 // force the specified client to a specific team
 static void AM_ForceTeam( gentity_t *ent ) {
-	char arg1[64] = { '\0' }, arg2[64] = { '\0' };
+	char arg1[64] = {}, arg2[64] = {};
 	int targetClient;
 	gentity_t *targ;
 
@@ -1586,7 +1586,7 @@ static void AM_GunSpectate( gentity_t *ent ) {
 
 // protect/unprotect the specified client
 static void AM_Protect( gentity_t *ent ) {
-	char arg1[64] = { '\0' };
+	char arg1[64] = {};
 	int targetClient;
 	gentity_t *targ;
 
@@ -1684,7 +1684,7 @@ void Empower_Off( gentity_t *ent ) {
 }
 
 static void AM_Empower( gentity_t *ent ) {
-	char arg1[64] = { '\0' };
+	char arg1[64] = {};
 	int targetClient;
 	gentity_t *targ;
 
@@ -1749,7 +1749,7 @@ void Slap( gentity_t *targ ) {
 
 // slap the specified client
 static void AM_Slap( gentity_t *ent ) {
-	char arg1[64] = { '\0' };
+	char arg1[64] = {};
 	int targetClient;
 
 	if ( !ent ) {
@@ -1819,7 +1819,7 @@ void G_WakeClient( gclient_t *cl ) {
 
 // prevent the client from moving by knocking them to the ground permanently
 static void AM_Sleep( gentity_t *ent ) {
-	char arg1[64] = { '\0' };
+	char arg1[64] = {};
 	int clientNum;
 
 	if ( !ent ) {
@@ -1907,7 +1907,7 @@ static void AM_Freeze( gentity_t *ent ) {
 }
 
 static void AM_Wake( gentity_t *ent ) {
-	char arg1[MAX_NETNAME] = { '\0' };
+	char arg1[MAX_NETNAME] = {};
 	int clientNum;
 
 	if ( !ent ) {
@@ -2030,7 +2030,7 @@ static void AM_GunFreeze( gentity_t *ent ) {
 
 // silence specified client
 static void AM_Silence( gentity_t *ent ) {
-	char arg1[64] = { '\0' };
+	char arg1[64] = {};
 	int targetClient;
 
 	if ( !ent ) {
@@ -2089,7 +2089,7 @@ static void AM_Silence( gentity_t *ent ) {
 
 // unsilence specified client
 static void AM_Unsilence( gentity_t *ent ) {
-	char arg1[64] = { '\0' };
+	char arg1[64] = {};
 	int targetClient;
 
 	if ( !ent ) {
@@ -2158,7 +2158,7 @@ static void AM_Dismember(gentity_t *ent){
 void Cmd_Kill_f( gentity_t *ent );
 // slay the specified client
 static void AM_Slay( gentity_t *ent ) {
-	char arg1[64] = { '\0' };
+	char arg1[64] = {};
 	int targetClient;
 	gentity_t *targetEnt = NULL;
 
@@ -2224,7 +2224,7 @@ static void AM_Slay( gentity_t *ent ) {
 
 // kick specified client
 static void AM_Kick( gentity_t *ent ) {
-	char arg1[64] = { '\0' }, string[960] = { '\0' };
+	char arg1[64] = {}, string[960] = {};
 	const char *reason = "Not specified";
 	int clientNum;
 
@@ -2260,7 +2260,7 @@ static void AM_Kick( gentity_t *ent ) {
 }
 
 static void AM_Ban( gentity_t *ent ) {
-	char target[32] = { '\0' }, duration[16] = { '\0' }, string[MAX_STRING_CHARS - 64] = { '\0' };
+	char target[32] = {}, duration[16] = {}, string[MAX_STRING_CHARS - 64] = {};
 	const char *reason = "Not specified";
 	int targetClient;
 
@@ -2276,7 +2276,7 @@ static void AM_Ban( gentity_t *ent ) {
 
 	else {
 		//	clientNum / Partial name
-		char errorMsg[128] = { '\0' };
+		char errorMsg[128] = {};
 
 		trap->Argv( 1, target, sizeof(target) );
 		targetClient = G_ClientFromString( ent, target, FINDCL_SUBSTR | FINDCL_PRINT );
@@ -2325,9 +2325,9 @@ static void AM_BanIP( gentity_t *ent ) {
 		AM_ConsolePrint( ent, "Syntax: \\ambanip <ip> [duration] [reason]\n" );
 	}
 	else {
-		char ip[32] = { '\0' }, duration[16] = { '\0' };
+		char ip[32] = {}, duration[16] = {};
 		const char *reason = "Not specified";
-		char errorMsg[128] = { '\0' };
+		char errorMsg[128] = {};
 
 		trap->Argv( 1, ip, sizeof(ip) );
 		trap->Argv( 2, duration, sizeof(duration) );
@@ -2401,8 +2401,8 @@ static void AM_Portal( gentity_t *ent ) {
 
 // shader remapping
 static void AM_Remap( gentity_t *ent ) {
-	char arg1[128] = { '\0' };
-	char arg2[128] = { '\0' };
+	char arg1[128] = {};
+	char arg2[128] = {};
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
 		return;
@@ -2448,7 +2448,7 @@ static int weathercmp( const void *a, const void *b ) {
 
 static void G_PrintWeatherOptions( gentity_t *ent ) {
 	const char **opt = NULL;
-	char buf[256] = { '\0' };
+	char buf[256] = {};
 	int toggle = 0;
 	unsigned int count = 0;
 	const unsigned int limit = 72;
@@ -2510,7 +2510,7 @@ static void AM_Weather( gentity_t *ent ) {
 // spawn an entity
 static void AM_EntSpawn( gentity_t *ent ) {
 	const char *delim = " ";
-	char buf[MAX_SPAWN_VARS_CHARS] = { '\0' }, *tok = NULL;
+	char buf[MAX_SPAWN_VARS_CHARS] = {}, *tok = NULL;
 	unsigned int index = 0;
 
 	if ( trap->Argc() < 2 ) {
@@ -2539,7 +2539,7 @@ static void AM_EntSpawn( gentity_t *ent ) {
 
 	tok = strtok( buf, delim );
 	while ( tok != NULL ) {
-		char tmp[MAX_STRING_CHARS] = { '\0' }, *p = NULL;
+		char tmp[MAX_STRING_CHARS] = {}, *p = NULL;
 
 		Q_strncpyz( tmp, tok, sizeof(tmp) );
 
@@ -2600,7 +2600,7 @@ static void AM_EntRemove( gentity_t *ent ) {
 	}
 
 	if ( trap->Argc() > 1 ) {
-		char arg[MAX_STRING_CHARS] = { '\0' };
+		char arg[MAX_STRING_CHARS] = {};
 		trap->Argv( 1, arg, sizeof(arg) );
 		if ( Q_StringIsInteger( arg ) ) {
 			const int id = atoi( arg );
@@ -2724,7 +2724,7 @@ static void AM_ReloadLua( gentity_t *ent ) {
 // change map and gamemode
 // TODO: Admin message
 static void AM_Map( gentity_t *ent ) {
-	char gametypeStr[32] = { '\0' }, map[MAX_QPATH] = { '\0' }, *args = NULL;
+	char gametypeStr[32] = {}, map[MAX_QPATH] = {}, *args = NULL;
 	const char *filter = NULL;
 	int gametype = 0, i = 0;
 
@@ -2849,7 +2849,7 @@ void Merc_Off( gentity_t *ent ) {
 }
 
 static void AM_Merc( gentity_t *ent ) {
-	char arg1[64] = { '\0' };
+	char arg1[64] = {};
 	int targetClient;
 	gentity_t *targ = NULL;
 
@@ -2890,8 +2890,8 @@ static void AM_Merc( gentity_t *ent ) {
 }
 
 static void AM_Rename( gentity_t *ent ) {
-	char arg1[MAX_NETNAME] = { '\0' }, arg2[MAX_NETNAME] = { '\0' }, oldName[MAX_NETNAME] = { '\0' };
-	char info[MAX_INFO_STRING] = { '\0' };
+	char arg1[MAX_NETNAME] = {}, arg2[MAX_NETNAME] = {}, oldName[MAX_NETNAME] = {};
+	char info[MAX_INFO_STRING] = {};
 	int targetClient;
 	gentity_t *e = NULL;
 
@@ -2954,7 +2954,7 @@ static void AM_Rename( gentity_t *ent ) {
 }
 
 static void AM_LockTeam( gentity_t *ent ) {
-	char arg1[16] = { '\0' };
+	char arg1[16] = {};
 	team_t team;
 
 	if ( !ent ) {
@@ -3014,7 +3014,7 @@ static void AM_LockTeam( gentity_t *ent ) {
 }
 
 static void AM_UnlockTeam( gentity_t *ent ) {
-	char arg1[16] = { '\0' };
+	char arg1[16] = {};
 	team_t team;
 
 	if ( !ent ) {
@@ -3075,8 +3075,8 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 static void AM_Grant(gentity_t *ent){
 	int client;
 	gentity_t *target = NULL;
-	char arg1[64] = { '\0' };
-	char arg2[16] = { '\0' };
+	char arg1[64] = {};
+	char arg2[16] = {};
 	uint32_t priv = 0;
 	if (!ent) {
 		trap->Print("This command is not available for server console use yet\n");
@@ -3105,7 +3105,7 @@ static void AM_Grant(gentity_t *ent){
 static void AM_UnGrant(gentity_t *ent){
 	int client;
 	gentity_t *target = NULL;
-	char arg1[64] = { '\0' };
+	char arg1[64] = {};
 
 	if (!ent) {
 		trap->Print("This command is not available for server console use yet\n");
@@ -3131,10 +3131,10 @@ static void AM_UnGrant(gentity_t *ent){
 static void AM_Give(gentity_t *ent){
 	int client;
 	gentity_t *target = NULL;
-	char arg1[64] = { '\0' };
-	char arg2[64] = { '\0' };
-	char arg3[64] = { '\0' };
-	char arg4[64] = { '\0' };
+	char arg1[64] = {};
+	char arg2[64] = {};
+	char arg3[64] = {};
+	char arg4[64] = {};
 	qboolean shift = 0;
 
 	if (!ent) {

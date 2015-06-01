@@ -76,12 +76,12 @@ void SiegeSetCompleteData( int team ) {
 
 void InitSiegeMode( void ) {
 	vmCvar_t		mapname;
-	char			levelname[512] = { '\0' };
-	char			teamIcon[128] = { '\0' };
-	char			goalreq[64] = { '\0' };
-	char			teams[2048] = { '\0' };
-	char			objective[MAX_SIEGE_INFO_SIZE] = { '\0' };
-	char			objecStr[8192] = { '\0' };
+	char			levelname[512] = {};
+	char			teamIcon[128] = {};
+	char			goalreq[64] = {};
+	char			teams[2048] = {};
+	char			objective[MAX_SIEGE_INFO_SIZE] = {};
+	char			objecStr[8192] = {};
 	int				len = 0;
 	int				i = 0;
 	int				objectiveNumTeam1 = 0;

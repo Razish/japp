@@ -235,7 +235,7 @@ qboolean JPLua_Event_ClientCommand(int clientNum){
 	qboolean ret = qfalse;
 #ifdef JPLUA
 	int top, i, numArgs = trap->Argc();
-	char cmd[MAX_TOKEN_CHARS] = { '\0' };
+	char cmd[MAX_TOKEN_CHARS] = {};
 	trap->Argv(0, cmd, sizeof(cmd));
 	jplua_plugin_t *plugin = NULL;
 	while (JPLua_IteratePlugins(&plugin)) {

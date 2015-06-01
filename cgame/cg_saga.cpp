@@ -19,8 +19,6 @@ void CG_SiegeBriefingDisplay( int team, qboolean dontShow );
 void CG_PrecacheSiegeObjectiveAssetsForTeam( int myTeam ) {
 	char teamstr[64], objstr[256];
 	static char foundobjective[MAX_SIEGE_INFO_SIZE];
-
-	//Raz: moved to heap
 	foundobjective[0] = '\0';
 
 	if ( !siege_valid ) {
@@ -94,19 +92,15 @@ void CG_PrecachePlayersForSiegeTeam( int team ) {
 }
 
 void CG_InitSiegeMode( void ) {
-	char levelname[MAX_QPATH] = { '\0' };
-	char btime[1024] = { '\0' };
-	char teams[2048] = { '\0' };
-	char teamIcon[MAX_QPATH] = { '\0' };
+	char levelname[MAX_QPATH] = {};
+	char btime[1024] = {};
+	char teams[2048] = {};
+	char teamIcon[MAX_QPATH] = {};
 	const char *s;
-	static char teamInfo[MAX_SIEGE_INFO_SIZE] = { 0 };
 	int len = 0, i = 0, j = 0;
 	siegeClass_t *cl;
 	siegeTeam_t *sTeam;
 	fileHandle_t f;
-
-	//Raz: moved to the heap
-	teamInfo[0] = '\0';
 
 	s = CG_ConfigString( CS_SIEGE_STATE );
 	if ( s[0] ) {
@@ -186,6 +180,8 @@ void CG_InitSiegeMode( void ) {
 		trap->Error( ERR_DROP, "Siege teams not defined" );
 	}
 
+	static char teamInfo[MAX_SIEGE_INFO_SIZE] = {};
+	teamInfo[0] = '\0';
 	if ( BG_SiegeGetValueGroup( siege_info, team1, teamInfo ) ) {
 		if ( BG_SiegeGetPairedValue( teamInfo, "TeamIcon", teamIcon ) )
 			trap->Cvar_Set( "team1_icon", teamIcon );
@@ -502,10 +498,10 @@ int CG_SiegeGetObjectiveFinal( int team, int objective ) {
 }
 
 void CG_SiegeBriefingDisplay( int team, qboolean dontShow ) {
-	char teamstr[64] = { '\0' };
-	char briefing[8192] = { '\0' };
-	char properValue[1024] = { '\0' };
-	char objectiveDesc[1024] = { '\0' };
+	char teamstr[64] = {};
+	char briefing[8192] = {};
+	char properValue[1024] = {};
+	char objectiveDesc[1024] = {};
 	int i, useTeam = team;
 	qboolean primary = qfalse;
 

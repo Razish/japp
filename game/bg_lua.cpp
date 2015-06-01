@@ -954,7 +954,7 @@ static int JPLua_GetConfigString(lua_State *L){
 #ifdef PROJECT_CGAME
 	const char *info = CG_ConfigString(type);
 #elif defined (PROJECT_GAME)
-	char info[MAX_INFO_STRING] = { '\0' };
+	char info[MAX_INFO_STRING] = {};
 	trap->GetConfigstring(type, info, sizeof(info));
 #endif
 	if (!info[0]){

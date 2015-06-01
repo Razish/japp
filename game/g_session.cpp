@@ -9,7 +9,7 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 	const clientSession_t *sess = &client->sess;
 	cJSON *root;
 	fileHandle_t f;
-	char fileName[MAX_QPATH] = { '\0' };
+	char fileName[MAX_QPATH] = {};
 
 	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", client - level.clients );
 	Com_Printf( "Writing session file %s\n", fileName );
@@ -30,7 +30,7 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 	cJSON_AddStringToObject( root, "IP", sess->IP );
 	if ( client->pers.adminUser ) {
 		char checksum[33] = {};
-		char combined[MAX_STRING_CHARS] = { '\0' };
+		char combined[MAX_STRING_CHARS] = {};
 		Com_sprintf( combined, sizeof(combined), "%s%s",
 			client->pers.adminUser->user, client->pers.adminUser->password );
 		Crypto::ChecksumMD5( combined, strlen( combined ), checksum );
@@ -51,7 +51,7 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 void G_ReadClientSessionData( gclient_t *client ) {
 	clientSession_t *sess = &client->sess;
 	cJSON *root = NULL, *object = NULL;
-	char fileName[MAX_QPATH] = { '\0' };
+	char fileName[MAX_QPATH] = {};
 	char *buffer = NULL;
 	fileHandle_t f = NULL_FILE;
 	unsigned int len = 0;

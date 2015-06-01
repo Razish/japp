@@ -2127,10 +2127,11 @@ void ClientThink_real( gentity_t *ent ) {
 			G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, 0 );
 
 			if ( ent->health > 0 && ent->client->ps.stats[STAT_HEALTH] > 0 ) {
-				char pre1[(MAX_NETNAME * 2) + 64] = { '\0' }, pre2[(MAX_NETNAME * 2) + 64] = { '\0' };
-				char buf[MAX_STRING_CHARS - sizeof(pre1)] = { '\0' };
-				const char *defeated = G_GetStringEdString( "MP_SVGAME", "PLDUELWINNER" );
+				char pre1[(MAX_NETNAME * 2) + 64] = {};
+				char pre2[(MAX_NETNAME * 2) + 64] = {};
+				char buf[MAX_STRING_CHARS - sizeof(pre1)] = {};
 				const char *winner = ent->client->pers.netname;
+				const char *defeated = G_GetStringEdString( "MP_SVGAME", "PLDUELWINNER" );
 				const char *loser = duelAgainst->client->pers.netname;
 
 				// x has defeated y
