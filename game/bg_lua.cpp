@@ -583,7 +583,7 @@ static int JPLua_Export_DrawText( lua_State *L ) {
 	JPLua_ReadFloats( colour.raw, 4, L, 4 );
 
 	CG_Text_Paint( (float)lua_tonumber( L, 1 ), (float)lua_tonumber( L, 2 ), (float)lua_tonumber( L, 5 ), &colour,
-		lua_tostring( L, 3 ), 0.0f, 0, lua_tointeger( L, 6 ), lua_tointeger( L, 7 ) );
+		lua_tostring( L, 3 ), 0.0f, 0, lua_tointeger( L, 6 ), lua_tointeger( L, 7 ), lua_toboolean(L, 8) );
 
 	return 0;
 }
@@ -591,14 +591,30 @@ static int JPLua_Export_DrawText( lua_State *L ) {
 
 #ifdef PROJECT_CGAME
 static int JPLua_Export_Font_StringHeightPixels( lua_State *L ) {
-	lua_pushnumber( L, CG_Text_Height( lua_tostring( L, 1 ), (float)lua_tonumber( L, 2 ), lua_tointeger( L, 3 ) ) );
+	const char *text = lua_tostring(L, 1);
+	float scale = lua_tonumber(L, 2);
+	qhandle_t font = lua_tointeger(L, 3);
+	qboolean customfont = lua_toboolean(L, 4);
+
+	if (customfont)
+		trap->R_Font_HeightPixels(font, scale);
+	else
+		lua_pushnumber( L, CG_Text_Height( text, scale, font ) );
 	return 1;
 }
 #endif
 
 #ifdef PROJECT_CGAME
 static int JPLua_Export_Font_StringLengthPixels( lua_State *L ) {
-	lua_pushnumber( L, CG_Text_Width( lua_tostring( L, 1 ), (float)lua_tonumber( L, 2 ), lua_tointeger( L, 3 ) ) );
+	const char *text = lua_tostring(L, 1);
+	float scale = lua_tonumber(L, 2);
+	qhandle_t font = lua_tointeger(L, 3);
+	qboolean customfont = lua_toboolean(L, 4);
+
+	if (customfont)
+		trap->R_Font_StrLenPixels(text, font, scale);
+	else
+		lua_pushnumber(L, CG_Text_Width(text, scale, font));
 	return 1;
 }
 #endif
@@ -985,6 +1001,10 @@ static int JPLua_GetGLConfig(lua_State *L){
 	return 1;
 }
 
+static int JPLua_Export_RegisterFont(lua_State *L){
+	lua_pushinteger(L, trap->R_RegisterFont(luaL_checkstring(L, 1)));
+	return 1;
+}
 #endif
 
 
@@ -1045,6 +1065,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "RayTrace", JPLua_Export_Trace }, // traceResult Trace( stuff )
 	{ "RegisterPlugin", JPLua_RegisterPlugin }, // plugin RegisterPlugin( string name, string version )
 #ifdef PROJECT_CGAME
+	{ "RegisterFont", JPLua_Export_RegisterFont }, // RegisterFont( string name)
 	{ "RegisterShader", JPLua_Export_RegisterShader }, // integer RegisterShader( string path )
 	{ "RegisterSound", JPLua_Export_RegisterSound }, // integer RegisterSound( string path )
 	{ "RemapShader", JPLua_Export_RemapShader }, // RemapShader( string oldshader, string newshader, string timeoffset )

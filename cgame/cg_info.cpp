@@ -61,7 +61,7 @@ static void CG_LoadBar( void ) {
 
 		Com_sprintf( text, sizeof(text), "%3i%%", (int)(floorf( cg.loadFrac * 100.0f )) );
 		textWidth = CG_Text_Width( text, 1.0f, FONT_JAPPMONO );
-		CG_Text_Paint( (SCREEN_WIDTH / 2.0f) - (textWidth / 2.0f), SCREEN_HEIGHT - 64.0f, 1.0f, &colorWhite, text, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_JAPPMONO );
+		CG_Text_Paint((SCREEN_WIDTH / 2.0f) - (textWidth / 2.0f), SCREEN_HEIGHT - 64.0f, 1.0f, &colorWhite, text, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_JAPPMONO, qfalse);
 	}
 }
 

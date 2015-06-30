@@ -146,7 +146,8 @@ void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor
 			0.0f,		// float adjust,
 			0,			// int limit,
 			shadow ? ITEM_TEXTSTYLE_SHADOWED : 0,	// int style,
-			FONT_MEDIUM		// iMenuFont
+			FONT_MEDIUM, // iMenuFont
+			qfalse
 			);
 	}
 	else {
@@ -498,7 +499,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, const 
 	else if ( style & (UI_BLINK | UI_PULSE) )
 		iStyle = ITEM_TEXTSTYLE_BLINK;
 
-	CG_Text_Paint( x, y, 1.0f, color, str, 0, 0, iStyle, iMenuFont );
+	CG_Text_Paint(x, y, 1.0f, color, str, 0, 0, iStyle, iMenuFont, qfalse);
 }
 
 void UI_DrawScaledProportionalString( int x, int y, const char* str, int style, const vector4 *color, float scale ) {
@@ -527,7 +528,7 @@ void UI_DrawScaledProportionalString( int x, int y, const char* str, int style, 
 	else if ( style & (UI_BLINK | UI_PULSE) )
 		iStyle = ITEM_TEXTSTYLE_BLINK;
 
-	CG_Text_Paint( x, y, scale, color, str, 0, 0, iStyle, FONT_MEDIUM );
+	CG_Text_Paint(x, y, scale, color, str, 0, 0, iStyle, FONT_MEDIUM, qfalse);
 }
 
 

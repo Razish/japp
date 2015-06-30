@@ -809,7 +809,7 @@ static void DrawSpectators( float fade ) {
 			cg.scoreboard.spectatorResetTime = cg.time;
 		}
 		CG_Text_Paint( cg.scoreboard.spectatorX, (y + lineHeight * 20) - 3, fontScale, &white, cg.scoreboard.spectatorList,
-			0, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle );
+			0, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, qfalse);
 	}
 }
 

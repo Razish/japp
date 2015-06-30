@@ -2441,7 +2441,7 @@ static void UI_DrawGLInfo( rectDef_t *rect, float scale, const vector4 *color, i
 static void UI_Version( rectDef_t *rect, float scale, const vector4 *color, int iMenuFont ) {
 	int width = uiInfo.uiDC.textWidth( JAPP_VERSION, scale, iMenuFont );
 
-	uiInfo.uiDC.drawText( rect->x - width, rect->y, scale, color, JAPP_VERSION, 0, 0, 0, iMenuFont );
+	uiInfo.uiDC.drawText(rect->x - width, rect->y, scale, color, JAPP_VERSION, 0, 0, 0, iMenuFont);
 }
 
 //FIXME: table drive

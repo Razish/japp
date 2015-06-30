@@ -1200,7 +1200,7 @@ float CG_Cvar_Get( const char *cvar ) {
 }
 
 void CG_Text_PaintWithCursor( float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont ) {
-	CG_Text_Paint( x, y, scale, color, text, 0, limit, style, iMenuFont );
+	CG_Text_Paint(x, y, scale, color, text, 0, limit, style, iMenuFont, qfalse);
 }
 
 static int CG_OwnerDrawWidth( int ownerDraw, float scale ) {

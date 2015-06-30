@@ -273,12 +273,12 @@ void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vect
 		*psOutLastGood = '\0';
 
 		*maxX = 0; // feedback
-		CG_Text_Paint( x, y, scale, color, sTemp, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont );
+		CG_Text_Paint(x, y, scale, color, sTemp, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont, qfalse);
 	}
 	else {
 		// whole text fits fine, so print it all...
 		*maxX = x + iPixelLen;	// feedback the next position, as the caller expects
-		CG_Text_Paint( x, y, scale, color, text, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont );
+		CG_Text_Paint(x, y, scale, color, text, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont, qfalse);
 	}
 }
 
@@ -501,7 +501,7 @@ void CG_DrawMedal( int ownerDraw, rectDef_t *rect, float scale, const vector4 *c
 	if ( text ) {
 		newColour.a = 1.0f;
 		value = CG_Text_Width( text, scale, 0 );
-		CG_Text_Paint( rect->x + (rect->w - value) / 2, rect->y + rect->h + 10, scale, &newColour, text, 0, 0, 0, FONT_MEDIUM );
+		CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h + 10, scale, &newColour, text, 0, 0, 0, FONT_MEDIUM, qfalse);
 	}
 
 	trap->R_SetColor( NULL );

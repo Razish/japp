@@ -385,7 +385,11 @@ typedef struct displayContextDef_s {
 	void( *setColor )							(const vector4 *v);
 	void( *drawHandlePic )					(float x, float y, float w, float h, qhandle_t asset);
 	void( *drawStretchPic )					(float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader);
-	void( *drawText )							(float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont);
+#ifdef PROJECT_CGAME
+	void( *drawText )							(float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont, qboolean customfont);
+#else
+	void(*drawText)							(float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont);
+#endif
 	float( *textWidth )						(const char *text, float scale, int iMenuFont);
 	float( *textHeight )						(const char *text, float scale, int iMenuFont);
 	qhandle_t( *registerModel )					(const char *p);

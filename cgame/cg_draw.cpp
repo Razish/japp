@@ -115,9 +115,13 @@ float CG_Text_Height( const char *text, float scale, int iMenuFont ) {
 }
 
 #include "qcommon/qfiles.h"	// for STYLE_BLINK etc
-void CG_Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont ) {
+void CG_Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont, qboolean customfont ) {
 	int iStyleOR = 0;
-	qhandle_t iFontIndex = MenuFontToHandle( iMenuFont );
+	qhandle_t iFontIndex;
+	if (customfont)
+		iFontIndex = iMenuFont;
+	else
+		iFontIndex = MenuFontToHandle( iMenuFont );
 
 	switch ( style ) {
 	case  ITEM_TEXTSTYLE_NORMAL:			iStyleOR = 0; break;					// JK2 normal text
@@ -973,7 +977,7 @@ static void JP_DrawStats( void ) {
 			"Map Time", mapTimeStr,
 			"Speed", speedStr );
 
-		CG_Text_Paint( cg.statsPos.x, cg.statsPos.y, cg_hudStatsScale.value, &colorWhite, statStr, 0.0f, 0, ITEM_ALIGN_RIGHT | ITEM_TEXTSTYLE_OUTLINED, FONT_JAPPMONO );
+		CG_Text_Paint(cg.statsPos.x, cg.statsPos.y, cg_hudStatsScale.value, &colorWhite, statStr, 0.0f, 0, ITEM_ALIGN_RIGHT | ITEM_TEXTSTYLE_OUTLINED, FONT_JAPPMONO, qfalse);
 	}
 }
 
@@ -1051,9 +1055,9 @@ void JP_DrawMovementKeys( void ) {
 		(cmd.forwardmove < 0) ? COLOR_RED : COLOR_WHITE, (cmd.rightmove > 0) ? COLOR_RED : COLOR_WHITE ) );
 
 	CG_Text_Paint( cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y, cg_movementKeysScale.value, &colorWhite,
-		str1, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex );
+		str1, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex, qfalse);
 	CG_Text_Paint( cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y + height, cg_movementKeysScale.value,
-		&colorWhite, str2, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex );
+		&colorWhite, str2, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex, qfalse);
 }
 
 #define NUM_ACCEL_SAMPLES (8)
@@ -1199,7 +1203,7 @@ void CG_DrawHUD( centity_t *cent ) {
 			ps->groundEntityNum );
 		//	x = ( 54 - (trap->R_Font_StrLenPixels( str, 1, 0.8f ) / 2) );
 		//	trap->R_Font_DrawString( x+16, y-280, str, colorTable[CT_VLTBLUE1], 1, -1, 0.8f );
-		CG_Text_Paint( 16, y - 380, 0.5f, &colorTable[CT_WHITE], str, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+		CG_Text_Paint(16, y - 380, 0.5f, &colorTable[CT_WHITE], str, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL, qfalse);
 	}
 #endif
 
@@ -2593,7 +2597,7 @@ static float CG_DrawMiniScoreboard( float y ) {
 
 		w = CG_Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer );
 		CG_Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &g_color_table[ColorIndex( COLOR_WHITE )], s, 0, 0,
-			ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer );
+			ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer, qfalse);
 		return y + CG_Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer );
 	}
 
@@ -2635,7 +2639,7 @@ static float CG_DrawEnemyInfo( float y ) {
 			y += 15;
 			*/
 
-			CG_Text_Paint( 630 - CG_Text_Width( title, 0.7f, FONT_MEDIUM ) + xOffset, y, 0.7f, &colorWhite, title, 0, 0, 0, FONT_MEDIUM );
+			CG_Text_Paint(630 - CG_Text_Width(title, 0.7f, FONT_MEDIUM) + xOffset, y, 0.7f, &colorWhite, title, 0, 0, 0, FONT_MEDIUM, qfalse);
 
 			return y + BIGCHAR_HEIGHT + 2;
 		}
@@ -2685,17 +2689,17 @@ static float CG_DrawEnemyInfo( float y ) {
 	y += size;
 
 	//	CG_Text_Paint( 630 - CG_Text_Width ( ci->name, 0.7f, FONT_MEDIUM ) + xOffset, y, 0.7f, &colorWhite, ci->name, 0, 0, 0, FONT_MEDIUM );
-	CG_Text_Paint( 630 - CG_Text_Width( ci->name, 1.0f, FONT_SMALL2 ) + xOffset, y, 1.0f, &colorWhite, ci->name, 0, 0, 0, FONT_SMALL2 );
+	CG_Text_Paint(630 - CG_Text_Width(ci->name, 1.0f, FONT_SMALL2) + xOffset, y, 1.0f, &colorWhite, ci->name, 0, 0, 0, FONT_SMALL2, qfalse);
 
 	y += 15;
 	//	CG_Text_Paint( 630 - CG_Text_Width ( title, 0.7f, FONT_MEDIUM ) + xOffset, y, 0.7f, &colorWhite, title, 0, 0, 0, FONT_MEDIUM );
-	CG_Text_Paint( 630 - CG_Text_Width( title, 1.0f, FONT_SMALL2 ) + xOffset, y, 1.0f, &colorWhite, title, 0, 0, 0, FONT_SMALL2 );
+	CG_Text_Paint(630 - CG_Text_Width(title, 1.0f, FONT_SMALL2) + xOffset, y, 1.0f, &colorWhite, title, 0, 0, 0, FONT_SMALL2, qfalse);
 
 	if ( (cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL) && cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR ) {//also print their score
 		char text[1024];
 		y += 15;
 		Com_sprintf( text, sizeof(text), "%i/%i", cgs.clientinfo[clientNum].score, cgs.fraglimit );
-		CG_Text_Paint( 630 - CG_Text_Width( text, 0.7f, FONT_MEDIUM ) + xOffset, y, 0.7f, &colorWhite, text, 0, 0, 0, FONT_MEDIUM );
+		CG_Text_Paint(630 - CG_Text_Width(text, 0.7f, FONT_MEDIUM) + xOffset, y, 0.7f, &colorWhite, text, 0, 0, 0, FONT_MEDIUM, qfalse);
 	}
 
 	// nmckenzie: DUEL_HEALTH - fixme - need checks and such here.  And this is coded to duelist 1 right now, which is wrongly.
@@ -2764,7 +2768,7 @@ static float CG_DrawFPS( float y ) {
 		s = va( "%ifps", fps );
 		w = CG_Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer );
 		CG_Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &fpsColour, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED,
-			cg_topRightFont.integer );
+			cg_topRightFont.integer, qfalse);
 		y += CG_Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer );
 	}
 	if ( cg_drawFPS.integer == 2 ) {
@@ -2772,7 +2776,7 @@ static float CG_DrawFPS( float y ) {
 
 		w = CG_Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer );
 		CG_Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &g_color_table[ColorIndex( COLOR_GREY )], s, 0, 0,
-			ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer );
+			ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer, qfalse);
 
 		y += CG_Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer );
 	}
@@ -3309,7 +3313,7 @@ static float CG_DrawTimer( float y ) {
 	s = va( "%i:%02i", mins, abs( secs ) );
 	w = CG_Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer );
 	CG_Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, timeColour, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED,
-		cg_topRightFont.integer );
+		cg_topRightFont.integer, qfalse);
 
 	return y + CG_Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer );
 }
@@ -3909,7 +3913,7 @@ static void CG_DrawCenterString( void ) {
 		w = CG_Text_Width( linebuffer, scale, FONT_MEDIUM );
 		h = CG_Text_Height( linebuffer, scale, FONT_MEDIUM );
 		x = (SCREEN_WIDTH - w) / 2;
-		CG_Text_Paint( x, y + h, scale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM );
+		CG_Text_Paint(x, y + h, scale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, qfalse);
 		y += h + 6;
 
 		while ( *start && (*start != '\n') ) {
@@ -5419,7 +5423,7 @@ static void CG_DrawSpectator( void ) {
 				CG_GetStringEdString( "MP_INGAME", "SPECHUD_VERSUS" ), cgs.clientinfo[cgs.duelist2].name
 			);
 		}
-		CG_Text_Paint( (SCREEN_WIDTH / 2) - CG_Text_Width( text, 1.0f, 3 ) / 2, 420, 1.0f, &colorWhite, text, 0, 0, 0, 3 );
+		CG_Text_Paint((SCREEN_WIDTH / 2) - CG_Text_Width(text, 1.0f, 3) / 2, 420, 1.0f, &colorWhite, text, 0, 0, 0, 3, qfalse);
 
 		trap->R_SetColor( &colorTable[CT_WHITE] );
 		if ( cgs.clientinfo[cgs.duelist1].modelIcon ) {
@@ -5439,10 +5443,10 @@ static void CG_DrawSpectator( void ) {
 
 		if ( cgs.gametype != GT_POWERDUEL ) {
 			Com_sprintf( text, sizeof(text), "%i/%i", cgs.clientinfo[cgs.duelist1].score, cgs.fraglimit );
-			CG_Text_Paint( 42 - CG_Text_Width( text, 1.0f, 2 ) / 2, SCREEN_HEIGHT - (size*1.5f) + 64, 1.0f, &colorWhite, text, 0, 0, 0, 2 );
+			CG_Text_Paint(42 - CG_Text_Width(text, 1.0f, 2) / 2, SCREEN_HEIGHT - (size*1.5f) + 64, 1.0f, &colorWhite, text, 0, 0, 0, 2, qfalse);
 
 			Com_sprintf( text, sizeof(text), "%i/%i", cgs.clientinfo[cgs.duelist2].score, cgs.fraglimit );
-			CG_Text_Paint( SCREEN_WIDTH - size + 22 - CG_Text_Width( text, 1.0f, 2 ) / 2, SCREEN_HEIGHT - (size*1.5f) + 64, 1.0f, &colorWhite, text, 0, 0, 0, 2 );
+			CG_Text_Paint(SCREEN_WIDTH - size + 22 - CG_Text_Width(text, 1.0f, 2) / 2, SCREEN_HEIGHT - (size*1.5f) + 64, 1.0f, &colorWhite, text, 0, 0, 0, 2, qfalse);
 		}
 
 		if ( cgs.gametype == GT_POWERDUEL && cgs.duelist3 != -1 ) {
@@ -5461,8 +5465,8 @@ static void CG_DrawSpectator( void ) {
 	CG_DrawPic( (SCREEN_WIDTH / 3.0f) - ((SCREEN_WIDTH / 3.0f) / 2.0f), 0, (SCREEN_WIDTH / 3.0f)*2.0f, 60.0f, media.gfx.interface.forceIconBackground );
 	trap->R_SetColor( NULL );
 
-	CG_Text_Paint( (SCREEN_WIDTH / 2.0f) - (CG_Text_Width( s, 0.5f, FONT_JAPPLARGE ) / 2.0f), 0/*420*/, 0.5f, &colorWhite, s, 0, 0, 0, FONT_JAPPLARGE );
-	CG_Text_Paint( (SCREEN_WIDTH / 2.0f) - (CG_Text_Width( s2, 0.5f, FONT_JAPPLARGE ) / 2.0f), 16/*440*/, 0.5f, &colorWhite, s2, 0, 0, 0, FONT_JAPPLARGE );
+	CG_Text_Paint((SCREEN_WIDTH / 2.0f) - (CG_Text_Width(s, 0.5f, FONT_JAPPLARGE) / 2.0f), 0/*420*/, 0.5f, &colorWhite, s, 0, 0, 0, FONT_JAPPLARGE, qfalse);
+	CG_Text_Paint((SCREEN_WIDTH / 2.0f) - (CG_Text_Width(s2, 0.5f, FONT_JAPPLARGE) / 2.0f), 16/*440*/, 0.5f, &colorWhite, s2, 0, 0, 0, FONT_JAPPLARGE, qfalse);
 }
 
 static void CG_DrawVote( void ) {
@@ -5692,10 +5696,10 @@ static qboolean CG_DrawFollow( void ) {
 		s = CG_GetStringEdString( "MP_INGAME", "FOLLOWING" );
 	}
 
-	CG_Text_Paint( (SCREEN_WIDTH / 2) - CG_Text_Width( s, 0.875f, FONT_JAPPLARGE ) / 2, 72, 0.875f, &colorWhite, s, 0, 0, 0, FONT_JAPPLARGE );
+	CG_Text_Paint((SCREEN_WIDTH / 2) - CG_Text_Width(s, 0.875f, FONT_JAPPLARGE) / 2, 72, 0.875f, &colorWhite, s, 0, 0, 0, FONT_JAPPLARGE, qfalse);
 
 	s = cgs.clientinfo[cg.snap->ps.clientNum].name;
-	CG_Text_Paint( (SCREEN_WIDTH / 2) - CG_Text_Width( s, 0.875f, FONT_JAPPLARGE ) / 2, 96, 0.875f, &colorWhite, s, 0, 0, 0, FONT_JAPPLARGE );
+	CG_Text_Paint((SCREEN_WIDTH / 2) - CG_Text_Width(s, 0.875f, FONT_JAPPLARGE) / 2, 96, 0.875f, &colorWhite, s, 0, 0, 0, FONT_JAPPLARGE, qfalse);
 
 	return qtrue;
 }
@@ -5777,7 +5781,7 @@ static void CG_DrawWarmup( void ) {
 				s = va( "%s vs %s", ci1->name, ci2->name );
 			}
 			w = CG_Text_Width( s, 0.6f, FONT_MEDIUM );
-			CG_Text_Paint( (SCREEN_WIDTH / 2) - w / 2, 60, 0.6f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM );
+			CG_Text_Paint((SCREEN_WIDTH / 2) - w / 2, 60, 0.6f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, qfalse);
 		}
 	}
 	else {
@@ -5812,7 +5816,7 @@ static void CG_DrawWarmup( void ) {
 			s = "Unknown";
 		}
 		w = CG_Text_Width( s, 1.5f, FONT_MEDIUM );
-		CG_Text_Paint( (SCREEN_WIDTH / 2) - w / 2, 90, 1.5f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM );
+		CG_Text_Paint((SCREEN_WIDTH / 2) - w / 2, 90, 1.5f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, qfalse);
 	}
 
 	sec = (sec - cg.time) / 1000;
@@ -5857,7 +5861,7 @@ static void CG_DrawWarmup( void ) {
 	}
 
 	w = CG_Text_Width( s, scale, FONT_MEDIUM );
-	CG_Text_Paint( (SCREEN_WIDTH / 2) - w / 2, 125, scale, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM );
+	CG_Text_Paint((SCREEN_WIDTH / 2) - w / 2, 125, scale, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, qfalse);
 }
 
 void CG_DrawTimedMenus( void ) {
@@ -6405,7 +6409,7 @@ static void CG_ChatBox_DrawStrings( void ) {
 
 	//we have the items we want to draw, just quickly loop through them now
 	for ( i = 0; i < numToDraw; i++ ) {
-		CG_Text_Paint( x, y, fontScale, &colorWhite, drawThese[i]->string, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+		CG_Text_Paint(x, y, fontScale, &colorWhite, drawThese[i]->string, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL, qfalse);
 		y += ((CHATBOX_FONT_HEIGHT*fontScale)*drawThese[i]->lines);
 	}
 }

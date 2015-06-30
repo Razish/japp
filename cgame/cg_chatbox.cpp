@@ -366,7 +366,7 @@ static void CG_ChatboxDrawTabs( void ) {
 			cg.chatbox.size.scale, &colorWhite, va( "^%c%s", (cb == currentChatbox)
 			? COLOR_GREEN
 			: (cb->notification && ((int)(trap->Milliseconds() >> 8) & 1)) ? COLOR_RED : COLOR_WHITE, cb->shortname ),
-			0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
+			0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(), qfalse );
 
 		xOffset += textWidth + 16.0f;
 		cb = cb->next;
@@ -410,7 +410,7 @@ void CG_ChatboxDraw( void ) {
 		Com_sprintf( msg, sizeof(msg), pre, chatField.buffer );
 		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.value*cg_chatboxLineCount.integer),
 			cg.chatbox.size.scale, &g_color_table[ColorIndex( COLOR_WHITE )], msg, 0, 0, ITEM_TEXTSTYLE_OUTLINED,
-			CG_GetChatboxFont() );
+			CG_GetChatboxFont(), qfalse);
 		if ( ((trap->Milliseconds() >> 8) & 1) ) {
 			const float cursorPre = CG_Text_Width( cleanPre, cg.chatbox.size.scale, CG_GetChatboxFont() );
 			float cursorOffset = 0.0f;
@@ -423,7 +423,7 @@ void CG_ChatboxDraw( void ) {
 			CG_Text_Paint( cg.chatbox.pos.x + cursorPre + cursorOffset,
 				cg.chatbox.pos.y + (cg_chatboxLineHeight.value * cg_chatboxLineCount.integer),
 				cg.chatbox.size.scale, &g_color_table[ColorIndex( COLOR_WHITE )], "_", 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED,
-				CG_GetChatboxFont() );
+				CG_GetChatboxFont(), qfalse);
 		}
 	}
 
@@ -444,7 +444,7 @@ void CG_ChatboxDraw( void ) {
 	if ( currentChatbox->scrollAmount < 0 && CG_ChatboxActive() ) {
 		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y - cg_chatboxLineHeight.value, cg.chatbox.size.scale,
 			&colorWhite, va( S_COLOR_YELLOW "Scrolled lines: " S_COLOR_CYAN "%i\n", currentChatbox->scrollAmount * -1 ),
-			0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont()
+			0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(), qfalse
 		);
 	}
 
@@ -467,7 +467,7 @@ void CG_ChatboxDraw( void ) {
 				/*|| cg_chatbox.integer == 1*/ || CG_ChatboxActive() ) {
 				CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.value * numLines),
 					cg.chatbox.size.scale, &colorWhite, va( "%s%s", (cg_chatboxTimeShow.integer ? chat->timeStamp : ""),
-					chat->message ), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont() );
+					chat->message), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(), qfalse);
 				numLines++;
 			}
 		}
