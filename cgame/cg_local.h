@@ -568,11 +568,6 @@ typedef struct cg_s {
 	int				spectatorPaintX2;					// current paint x
 	int				spectatorOffset;					// current offset from start
 	int				spectatorPaintLen; 					// current offset from start
-	int				centerPrintTime;
-	int				centerPrintCharWidth;
-	int				centerPrintY;
-	char			centerPrint[1024];
-	int				centerPrintLines;
 	int				lowAmmoWarning;		// 1 = low, 2 = empty
 	int				lastKillTime;
 	int				crosshairClientNum;

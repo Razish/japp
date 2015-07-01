@@ -2,7 +2,7 @@
 //
 // cg_draw.c -- draw all of the graphical elements during
 // active (after loading) gameplay
-
+#include <queue>
 #include "cg_local.h"
 #include "bg_saga.h"
 #include "ui/ui_shared.h"
@@ -41,6 +41,16 @@ const char *armorTicName[MAX_HUD_TICS] = { "armor_tic1", "armor_tic2", "armor_ti
 const char *healthTicName[MAX_HUD_TICS] = { "health_tic1", "health_tic2", "health_tic3", "health_tic4", };
 const char *forceTicName[MAX_HUD_TICS] = { "force_tic1", "force_tic2", "force_tic3", "force_tic4", };
 const char *ammoTicName[MAX_HUD_TICS] = { "ammo_tic1", "ammo_tic2", "ammo_tic3", "ammo_tic4", };
+
+typedef struct cp_string_s{
+	char string[1024];
+	int numLines;
+	int y;
+	int width;
+	int starttime;
+}cp_string_t;
+
+std::queue<cp_string_t*> centerprint_queue;
 
 typedef struct saberStyleItem_s {
 	const char *name;
@@ -3847,40 +3857,93 @@ void CG_DrawSiegeMessageNonMenu( const char *str ) {
 void CG_CenterPrint( const char *str, int y, int charWidth ) {
 	char *s = NULL;
 	int i = 0;
+	cp_string_t *data = (cp_string_t*)malloc(sizeof(cp_string_t));
 
-	Q_strncpyz( cg.centerPrint, str, sizeof(cg.centerPrint) );
-
-	cg.centerPrintTime = cg.time;
-	cg.centerPrintY = y;
-	cg.centerPrintCharWidth = charWidth;
+	Q_strncpyz(data->string, str, sizeof(data->string));
+	data->y = y;
+	data->width = charWidth;
+	data->numLines = 1;
+	data->starttime = 0;
 
 	// count the number of lines for centering
-	cg.centerPrintLines = 1;
-	s = cg.centerPrint;
+	s = data->string;
 	while ( *s ) {
-		/*
-		if (*s == '\n')
-		cg.centerPrintLines++;
-		s++;
-		*/
 		i++;
-		if ( i >= 50 ) {//maxed out a line of text, this will make the line spill over onto another line.
+		if (i >= 50) {//maxed out a line of text, this will make the line spill over onto another line.
 			i = 0;
-			cg.centerPrintLines++;
+			data->numLines++;
 		}
-		else if ( *s == '\n' )
-			cg.centerPrintLines++;
+		else if (*s == '\n')
+			data->numLines++;
 		s++;
-
 	}
+	centerprint_queue.push(data);
 }
 
+static void CG_DrawCenterString(void){
+	int		x, y, w, h;
+	vector4 *color;
+	cp_string_t *data;
+	char	*start;
+	int		l;
+	const float scale = 1.0f; //0.5f
+
+	if (centerprint_queue.size() == 0) return;
+	data = centerprint_queue.front();
+
+	if (data->starttime == 0) data->starttime = cg.time;
+
+	color = CG_FadeColor(data->starttime , 1000 * cg_centerTime.value);
+	if (!color) {
+		free(data->string);
+		centerprint_queue.pop();
+		return;
+	}
+
+	trap->R_SetColor(color);
+
+
+	y = data->y - data->numLines * BIGCHAR_HEIGHT / 2;
+	start = data->string;
+
+	while (1) {
+		char linebuffer[1024];
+
+		for (l = 0; l < 50; l++) {
+			if (!start[l] || start[l] == '\n') {
+				break;
+			}
+			linebuffer[l] = start[l];
+		}
+		linebuffer[l] = 0;
+
+		w = CG_Text_Width(linebuffer, scale, FONT_MEDIUM);
+		h = CG_Text_Height(linebuffer, scale, FONT_MEDIUM);
+		x = (SCREEN_WIDTH - w) / 2;
+		CG_Text_Paint(x, y + h, scale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, qfalse);
+		y += h + 6;
+
+		while (*start && (*start != '\n')) {
+			start++;
+		}
+		if (!*start) {
+			break;
+		}
+		start++;
+	}
+
+	trap->R_SetColor(NULL);
+
+}
+
+/*
 static void CG_DrawCenterString( void ) {
 	char	*start;
 	int		l;
 	int		x, y, w;
 	int h;
 	vector4 *color;
+	cp_string_t *data;
 	const float scale = 1.0f; //0.5f
 
 
@@ -3894,6 +3957,7 @@ static void CG_DrawCenterString( void ) {
 	}
 
 	trap->R_SetColor( color );
+
 
 	start = cg.centerPrint;
 
@@ -3927,6 +3991,7 @@ static void CG_DrawCenterString( void ) {
 
 	trap->R_SetColor( NULL );
 }
+*/
 
 #define HEALTH_WIDTH		50.0f
 #define HEALTH_HEIGHT		5.0f
