@@ -973,7 +973,7 @@ gentity_t *		G_Spawn( void );
 qboolean		G_SpawnBoolean( const char *key, const char *defaultString, qboolean *out );
 void			G_SpawnEntitiesFromString( qboolean inSubBSP );
 qboolean		G_SpawnFloat( const char *key, const char *defaultString, float *out );
-void			G_SpawnGEntityFromSpawnVars( qboolean inSubBSP );
+gentity_t		*G_SpawnGEntityFromSpawnVars( qboolean inSubBSP );
 qboolean		G_SpawnInt( const char *key, const char *defaultString, int *out );
 void			G_SpawnItem( gentity_t *ent, const gitem_t *item );
 gentity_t		*G_SpawnReservedEntity( void );

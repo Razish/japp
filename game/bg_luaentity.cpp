@@ -100,9 +100,72 @@ int JPLua_Entity_Get( lua_State *L ) {
 
 #ifdef PROJECT_GAME
 int JPLua_Entity_Create( lua_State *L ) {
-	//JAPPTODO: graft over admin spawning code, regarding spawnvars and default spawn funcs
-	lua_pushnil( L );
-	return 0;
+	gentity_t *ent;
+
+	if (lua_type(L, 1) != LUA_TTABLE) {
+		trap->Print("JPLua_Entity_Create failed, not a table\n");
+		return 0;
+	}
+
+	level.manualSpawning = qtrue;
+	level.numSpawnVars = 0;
+	level.numSpawnVarChars = 0;
+
+	lua_pushnil(L);
+	const char *value, *key;
+	for (int i = 0; lua_next(L, 1); i++){
+		if (lua_type(L, -2) != LUA_TSTRING) continue; // key can be only string 
+		switch (lua_type(L, -1)){
+		case LUA_TNONE:
+		case LUA_TNIL:
+		case LUA_TBOOLEAN:
+			continue;
+		case LUA_TNUMBER:
+			key = luaL_checkstring(L, -2);
+			value = luaL_checkstring(L, -1);
+			break;
+		case LUA_TSTRING:
+			key = luaL_checkstring(L, -2);
+			value = luaL_checkstring(L, -1);
+			break;
+		case LUA_TTABLE:
+		case LUA_TFUNCTION:
+		case LUA_TUSERDATA: /// Vector...Player...Entity...etc
+			key = lua_tostring(L, -2);
+
+			if (lua_getmetatable(L, -1)){ // Get Userdata metatable
+				luaL_getmetatable(L, "Vector.meta"); // Get metatable for comparing
+				JPLua_StackDump(L);
+				if (lua_rawequal(L, -1, -2)){
+					vector3 *vector = JPLua_CheckVector(L, -3);
+					value = va("%.0f %.0f %.0f", vector->x, vector->y, vector->z);
+					lua_pop(L, 2);
+					break;
+				}
+				lua_pop(L, 2); // Pop metatables from stack
+			}
+		case LUA_TTHREAD:
+		default:
+			lua_pop(L, 1);
+			continue;
+		}
+
+		level.spawnVars[level.numSpawnVars][0] = G_AddSpawnVarToken(key);
+		level.spawnVars[level.numSpawnVars][1] = G_AddSpawnVarToken(value);
+
+		level.numSpawnVars++;
+		lua_pop(L, 1);
+	}
+	ent = G_SpawnGEntityFromSpawnVars(qfalse);
+
+	level.manualSpawning = qfalse;
+
+	if (!ent){
+		lua_pushnil(L);
+		return 1;
+	}
+	JPLua_Entity_CreateRef(L, ent);
+	return 1;
 }
 #endif
 
@@ -141,7 +204,6 @@ static int JPLua_Entity_ToPlayer( lua_State *L, jpluaEntity_t *ent ) {
 #ifdef PROJECT_GAME
 static int JPLua_Entity_GetLinked( lua_State *L, jpluaEntity_t *ent ) {
 	lua_pushboolean( L, ent->r.linked );
-
 	return 1;
 }
 #endif
@@ -465,8 +527,10 @@ static void JPLua_Entity_SetBounds( lua_State *L, jpluaEntity_t *ent ) {
 	vector3 *maxs = JPLua_CheckVector( L, -1 );
 
 	//JAPPFIXME: is this all that's required? no re-linking?
+	trap->UnlinkEntity((sharedEntity_t*)ent);
 	VectorCopy( mins, &ent->r.mins );
 	VectorCopy( maxs, &ent->r.maxs );
+	trap->LinkEntity((sharedEntity_t*)ent);
 }
 #endif
 
@@ -982,7 +1046,8 @@ static int JPLua_Entity_Free( lua_State *L ) {
 
 #if defined(PROJECT_GAME)
 static int JPLua_Entity_Use( lua_State *L ) {
-	//JAPPTODO: JPLua_Entity_Use
+	gentity_t *ent = JPLua_CheckEntity(L, 1);
+	GlobalUse(ent, ent, ent);
 	return 0;
 }
 #endif
@@ -993,7 +1058,6 @@ static int JPLua_Entity_PlaySound( lua_State *L ) {
 	if ( ent ) {
 		G_EntitySound( ent, lua_tointeger( L, 2 ), lua_tointeger( L, 3 ) );
 	}
-
 	return 0;
 }
 #endif

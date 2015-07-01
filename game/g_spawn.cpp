@@ -881,7 +881,7 @@ char *G_NewString( const char *string ) {
 
 void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent );
 // Spawn an entity and fill in all of the level fields from level.spawnVars[], then call the class specfic spawn function
-void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
+gentity_t *G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 	int i;
 	gentity_t *ent;
 	char *s, *value;
@@ -900,7 +900,7 @@ void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 		G_SpawnInt( "notsingle", "0", &i );
 		if ( i ) {
 			G_FreeEntity( ent );
-			return;
+			return NULL;
 		}
 	}
 	// check for "notteam" flag (GT_FFA, GT_DUEL, GT_SINGLE_PLAYER)
@@ -908,21 +908,21 @@ void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 		G_SpawnInt( "notteam", "0", &i );
 		if ( i ) {
 			G_FreeEntity( ent );
-			return;
+			return NULL;
 		}
 	}
 	else {
 		G_SpawnInt( "notfree", "0", &i );
 		if ( i ) {
 			G_FreeEntity( ent );
-			return;
+			return NULL;
 		}
 	}
 
 	G_SpawnInt( "notta", "0", &i );
 	if ( i ) {
 		G_FreeEntity( ent );
-		return;
+		return NULL;
 	}
 
 	if ( G_SpawnString( "gametype", NULL, &value ) ) {
@@ -932,7 +932,7 @@ void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 			s = strstr( value, gametypeName );
 			if ( !s ) {
 				G_FreeEntity( ent );
-				return;
+				return NULL;
 			}
 		}
 	}
@@ -944,6 +944,7 @@ void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 	// if we didn't get a classname, don't bother spawning anything
 	if ( !G_CallSpawn( ent ) ) {
 		G_FreeEntity( ent );
+		return NULL;
 	}
 
 	//Tag on the ICARUS scripting information only to valid recipients
@@ -960,6 +961,7 @@ void G_SpawnGEntityFromSpawnVars( qboolean inSubBSP ) {
 	if ( level.manualSpawning ) {
 		ent->jpSpawned = qtrue;
 	}
+	return ent;
 }
 
 char *G_AddSpawnVarToken( const char *string ) {
