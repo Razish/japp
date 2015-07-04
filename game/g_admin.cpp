@@ -97,6 +97,7 @@ static void AM_ParseString(const char *data){
 		string_list[i].clear();
 		string_list[i].append(cJSON_ToString(temp));
 	}
+	cJSON_Delete(root);
 }
 
 static void AM_FillStrings(fileHandle_t handle){
@@ -106,6 +107,7 @@ static void AM_FillStrings(fileHandle_t handle){
 	}
 	const char *buffer = cJSON_Serialize(root, 1);
 	trap->FS_Write(buffer, strlen(buffer), handle);
+	cJSON_Delete(root);
 }
 static void AM_DrawString(int type, gentity_t *ent = NULL, const char *arg = NULL, char *arg2 = NULL);
 static void AM_DrawString(int type, gentity_t *ent, const char *arg, char *arg2){

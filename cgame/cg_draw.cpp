@@ -3895,7 +3895,7 @@ static void CG_DrawCenterString(void){
 
 	color = CG_FadeColor(data->starttime , 1000 * cg_centerTime.value);
 	if (!color) {
-		free(data->string);
+		free(data);
 		centerprint_queue.pop();
 		return;
 	}
