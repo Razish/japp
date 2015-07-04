@@ -680,6 +680,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	//Raz: Load admins + telemarks
 	AM_LoadAdmins();
+	AM_LoadStrings();
 	AM_LoadTelemarks();
 	JP_Bans_Init();
 

@@ -196,6 +196,7 @@ static void SV_AdminList_f( void ) {
 
 static void SV_AdminReload_f( void ) {
 	AM_LoadAdmins();
+	AM_LoadStrings();
 }
 
 static void SV_AllReady_f( void ) {
