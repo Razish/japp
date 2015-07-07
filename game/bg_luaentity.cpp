@@ -795,7 +795,7 @@ static const luaProperty_t entityProperties[] = {
 
 #if defined(PROJECT_GAME)
 	{
-		"useable",
+		"usable",
 		JPLua_Entity_GetUseable,
 		JPLua_Entity_SetUseable
 	},
