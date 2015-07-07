@@ -58,7 +58,11 @@ int JPLua_MySQL_Open(lua_State *L)
 	const char *user = luaL_checkstring(L,3);
 	const char *db = luaL_checkstring(L,4);
 	const char *password = luaL_checkstring(L,5);
-	int port = luaL_checkinteger(L,6);
+	int port;
+	if ( !lua_isnil( L, 6 ) )
+		port = 3306;
+	else
+		port = lua_tointeger(L,6);
 
 	conn = (MYSQL *)lua_newuserdata(L, sizeof(MYSQL));
 

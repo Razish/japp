@@ -895,6 +895,7 @@ gentity_t *		G_Find( gentity_t *from, int fieldofs, const char *match );
 void			G_FreeEntity( gentity_t *e );
 char *			G_GetBotInfoByName( const char *name );
 void			G_GetDismemberBolt( gentity_t *self, vector3 *boltPoint, int limbType );
+void			G_GetModelBounds(const char *name, vector3 *mins, vector3 *maxs);
 const char *	G_GetStringEdString( const char *refSection, const char *refName );
 int				G_IconIndex( const char *name );
 void			G_InitBots( qboolean restart );

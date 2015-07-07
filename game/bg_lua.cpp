@@ -1006,6 +1006,16 @@ static int JPLua_Export_RegisterFont(lua_State *L){
 	return 1;
 }
 #endif
+#ifdef PROJECT_GAME
+static int JPLua_GetModelBounds(lua_State *L){
+	vector3 mins, maxs;
+	const char *name = luaL_checkstring(L, 1);
+	G_GetModelBounds(name, &mins, &maxs);
+	JPLua_Vector_CreateRef(L, mins.x, mins.y, mins.z);
+	JPLua_Vector_CreateRef(L, maxs.x, maxs.y, maxs.z);
+	return 2;
+}
+#endif
 
 
 static const jplua_cimport_table_t JPLua_CImports[] = {
@@ -1052,6 +1062,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 #endif
 	{ "GetPlayer", JPLua_GetPlayer }, // Player GetPlayer( integer clientNum )
 #ifdef PROJECT_GAME
+	{ "GetModelBounds", JPLua_GetModelBounds },
 	{ "GetPlayers", JPLua_Export_GetPlayers }, // {Player,...} GetPlayers()
 #endif
 	{ "GetPlayerTable", JPLua_Player_GetMetaTable }, // Player.meta GetPlayerTable()
@@ -1112,7 +1123,6 @@ void JPLua_Init( void ) {
 #endif
 		return;
 	}
-
 	//Initialise and load base libraries
 	memset( JPLua_Framework, -1, sizeof(JPLua_Framework) );
 	JPLua.state = luaL_newstate();
@@ -1121,9 +1131,9 @@ void JPLua_Init( void ) {
 		return;
 	}
 
-	lua_atpanic( JPLua.state, JPLuaI_Error ); // Set the function called in a Lua error
-	luaL_openlibs( JPLua.state );
-	luaopen_string( JPLua.state );
+	lua_atpanic(JPLua.state, JPLuaI_Error); // Set the function called in a Lua error
+	luaL_openlibs(JPLua.state);
+	luaopen_string(JPLua.state);
 
 	// Get rid of libraries we don't need
 	lua_pushnil( JPLua.state );	lua_setglobal( JPLua.state, LUA_LOADLIBNAME ); // No need for the package library

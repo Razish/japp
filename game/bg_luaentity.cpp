@@ -405,6 +405,9 @@ static void JPLua_Entity_SetModel( lua_State *L, jpluaEntity_t *ent ) {
 
 	case ET_GENERAL: {
 		ent->s.modelindex = G_ModelIndex( model );
+		G_GetModelBounds(model, &ent->r.mins, &ent->r.maxs);
+		ent->r.contents |= CONTENTS_SOLID;
+		ent->clipmask |= MASK_SOLID;
 	} break;
 
 	case ET_MOVER:

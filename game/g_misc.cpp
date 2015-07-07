@@ -235,14 +235,17 @@ turns into map triangles - not solid
 */
 void SP_misc_model( gentity_t *ent ) {
 
-#if 0
+#if 1
 	ent->s.modelindex = G_ModelIndex( ent->model );
-	VectorSet (ent->r.mins, -16, -16, -16);
-	VectorSet (ent->r.maxs, 16, 16, 16);
+
+	G_GetModelBounds(ent->model, &ent->r.mins, &ent->r.maxs);//
+	ent->r.contents |= CONTENTS_SOLID; //
+	ent->clipmask |= MASK_SOLID; //make dis shiet solid
+
 	trap->LinkEntity ((sharedEntity_t *)ent);
 
-	G_SetOrigin( ent, ent->s.origin );
-	VectorCopy( ent->s.angles, ent->s.apos.trBase );
+	G_SetOrigin( ent, &ent->s.origin );
+	VectorCopy( &ent->s.angles, &ent->s.apos.trBase );
 #else
 	G_FreeEntity( ent );
 #endif
