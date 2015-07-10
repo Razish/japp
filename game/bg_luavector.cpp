@@ -255,6 +255,14 @@ void JPLua_Vector_CreateRef( lua_State *L, float x, float y, float z ) {
 	lua_setmetatable( L, -2 );
 }
 
+void JPLua_Vector_CreateRef(lua_State *L, vector3 *vec){
+	vector3 *v = NULL;
+	v = (vector3 *)lua_newuserdata(L, sizeof(*v));
+	VectorSet(v, vec->x, vec->y, vec->z);
+	luaL_getmetatable(L, VECTOR_META);
+	lua_setmetatable(L, -2);
+}
+
 // Ensure the value at the specified index is a valid Vector instance,
 // Return the instance if it is, otherwise return NULL.
 vector3 *JPLua_CheckVector( lua_State *L, int idx ) {

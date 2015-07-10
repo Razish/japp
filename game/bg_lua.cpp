@@ -751,30 +751,26 @@ static int JPLua_Export_GetTime( lua_State *L ) {
 
 int JPLua_Export_Trace( lua_State *L ) {
 	trace_t tr;
-	vector3 start, end, mins, maxs;
+	vector3 *start, *end, mins, maxs;
 	float size;
 	int skipNumber, mask;
 	int top, top2, top3;
 
-	lua_getfield( L, 1, "x" ); start.x = lua_tonumber( L, -1 );
-	lua_getfield( L, 1, "y" ); start.y = lua_tonumber( L, -1 );
-	lua_getfield( L, 1, "z" ); start.z = lua_tonumber( L, -1 );
+	start = JPLua_CheckVector(L, 1);
 
 	size = lua_tonumber( L, 2 ) / 2.0f;
 	VectorSet( &mins, size, size, size );
 	VectorScale( &mins, -1.0f, &maxs );
 
-	lua_getfield( L, 3, "x" ); end.x = lua_tonumber( L, -1 );
-	lua_getfield( L, 3, "y" ); end.y = lua_tonumber( L, -1 );
-	lua_getfield( L, 3, "z" ); end.z = lua_tonumber( L, -1 );
+	end = JPLua_CheckVector(L, 3);
 
 	skipNumber = lua_tointeger( L, 4 );
 	mask = lua_tointeger( L, 5 );
 
 #if defined(PROJECT_GAME)
-	trap->Trace( &tr, &start, &mins, &maxs, &end, skipNumber, mask, qfalse, 0, 0 );
+	trap->Trace( &tr, start, &mins, &maxs, end, skipNumber, mask, qfalse, 0, 0 );
 #elif defined(PROJECT_CGAME)
-	CG_Trace( &tr, &start, &mins, &maxs, &end, skipNumber, mask );
+	CG_Trace( &tr, start, &mins, &maxs, end, skipNumber, mask );
 #endif
 
 	lua_newtable( L );

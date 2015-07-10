@@ -1064,6 +1064,26 @@ static int JPLua_Entity_PlaySound( lua_State *L ) {
 	return 0;
 }
 #endif
+#if defined(PROJECT_GAME)
+static int JPLua_Entity_GetBoneVector(lua_State *L){
+	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
+	const char *bone = luaL_checkstring(L, 3);
+	mdxaBone_t	boltMatrix;
+	vector3     origin, angle;
+	if (ent){
+		int bolt = trap->G2API_AddBolt(ent->ghoul2, 0, bone);
+		if (bolt == -1) {
+			trap->Print("^2JPLua:^1Bone %s not found\n", bone);
+		}
+		VectorSet(&angle, 0, ent->client->ps.viewangles.yaw, 0);
+		trap->G2API_GetBoltMatrix(ent->ghoul2, 0, bolt, &boltMatrix, &angle, &ent->r.currentOrigin, level.time, NULL, &ent->modelScale);
+		BG_GiveMeVectorFromMatrix(&boltMatrix, ORIGIN, &origin);
+		JPLua_Vector_CreateRef(L, &origin);
+		return 1;
+	}
+	return 0;
+}
+#endif
 
 static const struct luaL_Reg jplua_entity_meta[] = {
 	{ "__index", JPLua_Entity_Index },
@@ -1081,6 +1101,7 @@ static const struct luaL_Reg jplua_entity_meta[] = {
 	{ "Free", JPLua_Entity_Free },
 	{ "Use", JPLua_Entity_Use },
 	{ "PlaySound", JPLua_Entity_PlaySound },
+	{ "GetBoneVector", JPLua_Entity_GetBoneVector },
 #endif
 	{ NULL, NULL }
 };
