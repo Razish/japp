@@ -1084,6 +1084,21 @@ static int JPLua_Entity_GetBoneVector(lua_State *L){
 	return 0;
 }
 #endif
+#if defined(PROJECT_GAME)
+static int JPLua_Entity_Scale(lua_State *L){
+	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
+	vector3 *vec = JPLua_CheckVector(L, 2), newmins, newmaxs;
+	if (!ent) return 0;
+	VectorCopy(vec, &ent->modelScale);
+	for (int i = 0; i < 3; i++){
+		newmins.raw[i] = ent->r.mins.raw[i] * vec->raw[i];
+		newmaxs.raw[i] = ent->r.maxs.raw[i] * vec->raw[i];
+	}
+	VectorCopy(&newmins, &ent->r.mins);
+	VectorCopy(&newmaxs, &ent->r.maxs);
+	return 0;
+}
+#endif
 
 static const struct luaL_Reg jplua_entity_meta[] = {
 	{ "__index", JPLua_Entity_Index },
@@ -1102,6 +1117,7 @@ static const struct luaL_Reg jplua_entity_meta[] = {
 	{ "Use", JPLua_Entity_Use },
 	{ "PlaySound", JPLua_Entity_PlaySound },
 	{ "GetBoneVector", JPLua_Entity_GetBoneVector },
+	{ "Scale", JPLua_Entity_Scale },
 #endif
 	{ NULL, NULL }
 };
