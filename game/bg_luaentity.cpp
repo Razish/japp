@@ -1067,7 +1067,7 @@ static int JPLua_Entity_PlaySound( lua_State *L ) {
 #if defined(PROJECT_GAME)
 static int JPLua_Entity_GetBoneVector(lua_State *L){
 	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
-	const char *bone = luaL_checkstring(L, 3);
+	const char *bone = luaL_checkstring(L, 2);
 	mdxaBone_t	boltMatrix;
 	vector3     origin, angle;
 	if (ent){
@@ -1089,6 +1089,7 @@ static int JPLua_Entity_Scale(lua_State *L){
 	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
 	vector3 *vec = JPLua_CheckVector(L, 2), newmins, newmaxs;
 	if (!ent) return 0;
+	trap->UnlinkEntity((sharedEntity_t *)ent);
 	VectorCopy(vec, &ent->modelScale);
 	for (int i = 0; i < 3; i++){
 		newmins.raw[i] = ent->r.mins.raw[i] * vec->raw[i];
@@ -1096,6 +1097,7 @@ static int JPLua_Entity_Scale(lua_State *L){
 	}
 	VectorCopy(&newmins, &ent->r.mins);
 	VectorCopy(&newmaxs, &ent->r.maxs);
+	trap->LinkEntity((sharedEntity_t *)ent);
 	return 0;
 }
 #endif

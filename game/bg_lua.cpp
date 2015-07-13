@@ -1002,6 +1002,7 @@ static int JPLua_Export_RegisterFont(lua_State *L){
 	return 1;
 }
 #endif
+
 #ifdef PROJECT_GAME
 static int JPLua_GetModelBounds(lua_State *L){
 	vector3 mins, maxs;
@@ -1010,6 +1011,54 @@ static int JPLua_GetModelBounds(lua_State *L){
 	JPLua_Vector_CreateRef(L, mins.x, mins.y, mins.z);
 	JPLua_Vector_CreateRef(L, maxs.x, maxs.y, maxs.z);
 	return 2;
+}
+
+static int JPLua_EntitiesInRadius(lua_State *L){
+	vector3 *origin = JPLua_CheckVector(L, 1);
+	float radius = luaL_checknumber(L, 2);
+	gentity_t	*entity_list[MAX_GENTITIES];
+	int count;
+
+	count =	G_RadiusList(origin, radius, NULL, qtrue, entity_list);
+
+	lua_newtable(L);
+	int top = lua_gettop(L);
+
+	for (int i = 0; i < count; i++) {
+		lua_pushinteger(L, i + 1);
+		JPLua_Entity_CreateRef(L, entity_list[i]);
+		lua_settable(L, top);
+	}
+	return 1;
+}
+
+static int JPLua_EntitiesInBox(lua_State *L){
+	vector3 *mins = JPLua_CheckVector(L, 1);
+	vector3 *maxs = JPLua_CheckVector(L, 2);
+	int entityList[MAX_GENTITIES], numListedEntities;
+	gentity_t *ent;
+	numListedEntities = trap->EntitiesInBox(mins, maxs, entityList, MAX_GENTITIES);
+
+	lua_newtable(L);
+	int top = lua_gettop(L);
+
+	for (int i = 0; i < numListedEntities; i++) {
+		ent = &g_entities[entityList[i]];
+		lua_pushinteger(L, i + 1);
+		JPLua_Entity_CreateRef(L, ent);
+		lua_settable(L, top);
+	}
+	return 1;
+}
+
+static int JPLua_ScreenShake(lua_State *L){
+	vector3 *origin = JPLua_CheckVector(L, 1);
+	float intense = luaL_checknumber(L, 2);
+	int duration = luaL_checkinteger(L, 3);
+	qboolean global = lua_toboolean(L, 4);
+
+	G_ScreenShake(origin, NULL, intense, duration, global);
+	return 0;
 }
 #endif
 
@@ -1037,6 +1086,10 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "DrawText", JPLua_Export_DrawText }, // DrawText( float x, float y, string text, table { float r, float g, float b, float a }, float scale, integer fontStyle, integer fontIndex )
 	{ "Font_StringHeightPixels", JPLua_Export_Font_StringHeightPixels }, // integer Font_StringHeightPixels( integer fontHandle, float scale )
 	{ "Font_StringLengthPixels", JPLua_Export_Font_StringLengthPixels }, // integer Font_StringLengthPixels( string str, integer fontHandle, float scale )
+#endif
+#ifdef PROJECT_GAME
+	{ "EntitiesInBox", JPLua_EntitiesInBox },
+	{ "EntitiesInRadius", JPLua_EntitiesInRadius },
 #endif
 	{ "GetConfigString", JPLua_GetConfigString }, // table GetConfigString()
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )
@@ -1080,6 +1133,9 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "RemoveListener", JPLua_Event_RemoveListener }, // RemoveListener( string name )
 #ifdef PROJECT_CGAME
 	{ "SendChatText", JPLua_Export_SendChatText }, // SendChatText( string text )
+#endif
+#ifdef PROJECT_GAME
+	{ "ScreenShake", JPLua_ScreenShake },
 #endif
 	{ "SendConsoleCommand", JPLua_Export_SendConsoleCommand }, // SendConsoleCommand( string command )
 #ifdef PROJECT_GAME
