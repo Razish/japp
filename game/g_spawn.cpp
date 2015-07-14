@@ -67,49 +67,51 @@ qboolean	G_SpawnBoolean( const char *key, const char *defaultString, qboolean *o
 
 
 BG_field_t fields[] = {
-	{ "alliedteam", FOFS( alliedTeam ), F_INT },//for misc_turrets
-	{ "angerscript", FOFS( behaviorSet[BSET_ANGER] ), F_LSTRING },//name of script to run
-	{ "angle", FOFS( s.angles ), F_ANGLEHACK },
-	{ "angles", FOFS( s.angles ), F_VECTOR },
-	{ "attackscript", FOFS( behaviorSet[BSET_ATTACK] ), F_LSTRING },//name of script to run
-	{ "awakescript", FOFS( behaviorSet[BSET_AWAKE] ), F_LSTRING },//name of script to run
-	{ "blockedscript", FOFS( behaviorSet[BSET_BLOCKED] ), F_LSTRING },//name of script to run
-	{ "chunksize", FOFS( mass ), F_FLOAT },//for func_breakables
-	{ "classname", FOFS( classname ), F_LSTRING },
-	{ "closetarget", FOFS( closetarget ), F_LSTRING },//for doors
-	{ "count", FOFS( count ), F_INT },
-	{ "deathscript", FOFS( behaviorSet[BSET_DEATH] ), F_LSTRING },//name of script to run
-	{ "delay", FOFS( delay ), F_INT },
-	{ "delayscript", FOFS( behaviorSet[BSET_DELAYED] ), F_LSTRING },//name of script to run
-	{ "delayscripttime", FOFS( delayScriptTime ), F_INT },//name of script to run
-	{ "dmg", FOFS( damage ), F_INT },
-	{ "ffdeathscript", FOFS( behaviorSet[BSET_FFDEATH] ), F_LSTRING },//name of script to run
-	{ "ffirescript", FOFS( behaviorSet[BSET_FFIRE] ), F_LSTRING },//name of script to run
-	{ "fleescript", FOFS( behaviorSet[BSET_FLEE] ), F_LSTRING },//name of script to run
-	{ "fullname", FOFS( fullName ), F_LSTRING },
-	{ "goaltarget", FOFS( goaltarget ), F_LSTRING },//for siege
-	{ "healingclass", FOFS( healingclass ), F_LSTRING },
-	{ "healingrate", FOFS( healingrate ), F_INT },
-	{ "healingsound", FOFS( healingsound ), F_LSTRING },
-	{ "health", FOFS( health ), F_INT },
-	{ "idealclass", FOFS( idealclass ), F_LSTRING },//for siege spawnpoints
-	{ "linear", FOFS( alt_fire ), F_INT },//for movers to use linear movement
-	{ "lostenemyscript", FOFS( behaviorSet[BSET_LOSTENEMY] ), F_LSTRING },//name of script to run
-	{ "message", FOFS( message ), F_LSTRING },
-	{ "mindtrickscript", FOFS( behaviorSet[BSET_MINDTRICK] ), F_LSTRING },//name of script to run
-	{ "model", FOFS( model ), F_LSTRING },
-	{ "model2", FOFS( model2 ), F_LSTRING },
-	{ "npc_target", FOFS( NPC_target ), F_LSTRING },
-	{ "npc_target2", FOFS( target2 ), F_LSTRING },//NPC_spawner only
-	{ "npc_target4", FOFS( target4 ), F_LSTRING },//NPC_spawner only
-	{ "npc_targetname", FOFS( NPC_targetname ), F_LSTRING },
-	{ "npc_type", FOFS( NPC_type ), F_LSTRING },
-	{ "numchunks", FOFS( radius ), F_FLOAT },//for func_breakables
-	{ "opentarget", FOFS( opentarget ), F_LSTRING },//for doors
-	{ "origin", FOFS( s.origin ), F_VECTOR },
-	{ "ownername", FOFS( ownername ), F_LSTRING },
-	{ "painscript", FOFS( behaviorSet[BSET_PAIN] ), F_LSTRING },//name of script to run
-	{ "paintarget", FOFS( paintarget ), F_LSTRING },//for doors
+	{ "alliedteam", FOFS(alliedTeam), F_INT },//for misc_turrets
+	{ "angerscript", FOFS(behaviorSet[BSET_ANGER]), F_LSTRING },//name of script to run
+	{ "angle", FOFS(s.angles), F_ANGLEHACK },
+	{ "angles", FOFS(s.angles), F_VECTOR },
+	{ "attackscript", FOFS(behaviorSet[BSET_ATTACK]), F_LSTRING },//name of script to run
+	{ "awakescript", FOFS(behaviorSet[BSET_AWAKE]), F_LSTRING },//name of script to run
+	{ "blockedscript", FOFS(behaviorSet[BSET_BLOCKED]), F_LSTRING },//name of script to run
+	{ "bounceCount", FOFS(bounceCount), F_INT },
+	{ "chunksize", FOFS(mass), F_FLOAT },//for func_breakables
+	{ "classname", FOFS(classname), F_LSTRING },
+	{ "closetarget", FOFS(closetarget), F_LSTRING },//for doors
+	{ "count", FOFS(count), F_INT },
+	{ "deathscript", FOFS(behaviorSet[BSET_DEATH]), F_LSTRING },//name of script to run
+	{ "delay", FOFS(delay), F_INT },
+	{ "delayscript", FOFS(behaviorSet[BSET_DELAYED]), F_LSTRING },//name of script to run
+	{ "delayscripttime", FOFS(delayScriptTime), F_INT },//name of script to run
+	{ "dmg", FOFS(damage), F_INT },
+	{ "ffdeathscript", FOFS(behaviorSet[BSET_FFDEATH]), F_LSTRING },//name of script to run
+	{ "ffirescript", FOFS(behaviorSet[BSET_FFIRE]), F_LSTRING },//name of script to run
+	{ "fleescript", FOFS(behaviorSet[BSET_FLEE]), F_LSTRING },//name of script to run
+	{ "fly_sound_debounce_time", FOFS(fly_sound_debounce_time), F_INT },
+	{ "fullname", FOFS(fullName), F_LSTRING },
+	{ "goaltarget", FOFS(goaltarget), F_LSTRING },//for siege
+	{ "healingclass", FOFS(healingclass), F_LSTRING },
+	{ "healingrate", FOFS(healingrate), F_INT },
+	{ "healingsound", FOFS(healingsound), F_LSTRING },
+	{ "health", FOFS(health), F_INT },
+	{ "idealclass", FOFS(idealclass), F_LSTRING },//for siege spawnpoints
+	{ "linear", FOFS(alt_fire), F_INT },//for movers to use linear movement
+	{ "lostenemyscript", FOFS(behaviorSet[BSET_LOSTENEMY]), F_LSTRING },//name of script to run
+	{ "message", FOFS(message), F_LSTRING },
+	{ "mindtrickscript", FOFS(behaviorSet[BSET_MINDTRICK]), F_LSTRING },//name of script to run
+	{ "model", FOFS(model), F_LSTRING },
+	{ "model2", FOFS(model2), F_LSTRING },
+	{ "npc_target", FOFS(NPC_target), F_LSTRING },
+	{ "npc_target2", FOFS(target2), F_LSTRING },//NPC_spawner only
+	{ "npc_target4", FOFS(target4), F_LSTRING },//NPC_spawner only
+	{ "npc_targetname", FOFS(NPC_targetname), F_LSTRING },
+	{ "npc_type", FOFS(NPC_type), F_LSTRING },
+	{ "numchunks", FOFS(radius), F_FLOAT },//for func_breakables
+	{ "opentarget", FOFS(opentarget), F_LSTRING },//for doors
+	{ "origin", FOFS(s.origin), F_VECTOR },
+	{ "ownername", FOFS(ownername), F_LSTRING },
+	{ "painscript", FOFS(behaviorSet[BSET_PAIN]), F_LSTRING },//name of script to run
+	{ "paintarget", FOFS(paintarget), F_LSTRING },//for doors
 	{ "parm1", 0, F_PARM1 },
 	{ "parm10", 0, F_PARM10 },
 	{ "parm11", 0, F_PARM11 },
@@ -126,15 +128,17 @@ BG_field_t fields[] = {
 	{ "parm7", 0, F_PARM7 },
 	{ "parm8", 0, F_PARM8 },
 	{ "parm9", 0, F_PARM9 },
-	{ "radius", FOFS( radius ), F_FLOAT },
-	{ "random", FOFS( random ), F_FLOAT },
-	{ "roffname", FOFS( roffname ), F_LSTRING },
-	{ "rofftarget", FOFS( rofftarget ), F_LSTRING },
-	{ "script_targetname", FOFS( script_targetname ), F_LSTRING },//scripts look for this when "affecting"
-	{ "soundset", FOFS( soundSet ), F_LSTRING },
-	{ "spawnflags", FOFS( spawnflags ), F_INT },
-	{ "spawnscript", FOFS( behaviorSet[BSET_SPAWN] ), F_LSTRING },//name of script to run
-	{ "speed", FOFS( speed ), F_FLOAT },
+	{ "radius", FOFS(radius), F_FLOAT },
+	{ "random", FOFS(random), F_FLOAT },
+	{ "roffname", FOFS(roffname), F_LSTRING },
+	{ "rofftarget", FOFS(rofftarget), F_LSTRING },
+	{ "script_targetname", FOFS(script_targetname), F_LSTRING },//scripts look for this when "affecting"
+	{ "soundset", FOFS(soundSet), F_LSTRING },
+	{ "spawnflags", FOFS(spawnflags), F_INT },
+	{ "spawnscript", FOFS(behaviorSet[BSET_SPAWN]), F_LSTRING },//name of script to run
+	{ "speed", FOFS(speed), F_FLOAT },
+	{ "splashDamage", FOFS(splashDamage), F_INT },
+	{ "splashRadius", FOFS(splashRadius), F_INT },
 	{ "target", FOFS( target ), F_LSTRING },
 	{ "target2", FOFS( target2 ), F_LSTRING },
 	{ "target3", FOFS( target3 ), F_LSTRING },

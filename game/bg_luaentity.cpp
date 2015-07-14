@@ -1103,7 +1103,7 @@ static int JPLua_Entity_Scale(lua_State *L){
 }
 
 void BG_ParseField(const BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent);
-extern BG_field_t fields[84];
+extern BG_field_t fields[88];
 static int JPLua_Entity_SetVar(lua_State *L){
 	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
 	const char *key = luaL_checkstring(L, 2);
