@@ -4379,7 +4379,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			}
 
 			targ->enemy = attacker;
-			targ->die( targ, inflictor, attacker, take, mod );
+			if (targ->die)
+				targ->die( targ, inflictor, attacker, take, mod );
 			JPLua_Entity_CallFunction(
 				targ,
 				JPLUA_ENTITY_DIE,
