@@ -1319,13 +1319,16 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			if ( es->eventParm == 2 ) {
 				CG_CenterPrint( CG_GetStringEdString( "MP_SVGAME", "BEGIN_DUEL" ), 120, GIANTCHAR_WIDTH * 2 );
 				trap->S_StartLocalSound( media.sounds.warning.countFight, CHAN_ANNOUNCER );
+				cg.duelInProgress = qtrue;
 			}
 			else {
 				trap->S_StartBackgroundTrack( "music/mp/duel.mp3", "music/mp/duel.mp3", qfalse );
+				cg.duelInProgress = qtrue;
 			}
 		}
 		else { //ending the duel
 			CG_StartMusic( qtrue );
+			cg.duelInProgress = qfalse;
 		}
 
 		break;

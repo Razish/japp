@@ -70,11 +70,29 @@ static int JPLua_Player_GetAdminPrivs( lua_State *L, jpluaEntity_t *ent ) {
 	return 1;
 }
 #endif
+static const stringID_table_t ammo_strings[AMMO_MAX] = {
+	ENUM2STRING(AMMO_NONE),
+	ENUM2STRING(AMMO_FORCE),
+	ENUM2STRING(AMMO_BLASTER),
+	ENUM2STRING(AMMO_POWERCELL),
+	ENUM2STRING(AMMO_METAL_BOLTS),
+	ENUM2STRING(AMMO_ROCKETS),
+	ENUM2STRING(AMMO_EMPLACED),
+	ENUM2STRING(AMMO_THERMAL),
+	ENUM2STRING(AMMO_TRIPMINE),
+	ENUM2STRING(AMMO_DETPACK),
+};
+
 
 static int JPLua_Player_GetAmmo( lua_State *L, jpluaEntity_t *ent ) {
 #if defined(PROJECT_GAME)
-	//TODO: GetAmmo
-	lua_pushnil( L );
+	lua_newtable(L);
+	int top = lua_gettop(L);
+	for (int i = 1; i < WP_NUM_WEAPONS; i++) {
+		lua_pushinteger(L, i);
+		lua_pushinteger(L, ent->playerState->ammo[i]);
+		lua_settable(L, top);
+	}
 #elif defined(PROJECT_CGAME)
 	if ( (int)(ent - ents) == cg.clientNum ) {
 		lua_newtable( L );
@@ -264,7 +282,7 @@ static int JPLua_Player_GetDueling( lua_State *L, jpluaEntity_t *ent ) {
 #if defined(PROJECT_GAME)
 	lua_pushboolean( L, ent->client->ps.duelInProgress ? 1 : 0 );
 #else
-	//TODO: GetDueling
+	lua_pushboolean(L, cg.duelInProgress);
 #endif
 	return 1;
 }
@@ -312,7 +330,7 @@ static int JPLua_Player_GetProtected( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(PROJECT_GAME)
 static int JPLua_Player_GetSilenced( lua_State *L, jpluaEntity_t *ent ) {
-	//TODO: GetSilenced
+	lua_pushboolean(L, ent->client->pers.adminData.silenced ? 1 : 0);
 	return 0;
 }
 #endif
@@ -567,7 +585,9 @@ static int JPLua_Player_GetCloaked( lua_State *L, jpluaEntity_t *ent ){
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetAdminPrivs( lua_State *L, jpluaEntity_t *ent ) {
 	if ( ent->client->pers.adminUser ) {
-		//TODO: warning
+		uint32_t old = ent->client->pers.adminUser->privileges;
+		trap->Print("^2JPLua: ^3Warning you've changed privileges of logged in player [OLD: %u]", old);
+		ent->client->pers.adminUser->privileges = luaL_checkinteger(L, 3);
 	}
 	else {
 		ent->client->pers.tempprivs = luaL_checkinteger( L, 3 );
@@ -725,55 +745,93 @@ static void JPLua_Player_SetSlept( lua_State *L, jpluaEntity_t *ent ) {
 
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetLegsAnim( lua_State *L, jpluaEntity_t *ent ) {
-	//TODO: SetLegsAnim
+	int value = luaL_checkinteger(L, 3);
+	if (FACE_TALK0 < value < MAX_ANIMATIONS)
+		ent->client->ps.legsAnim = value;
 }
 #endif
 
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetName( lua_State *L, jpluaEntity_t *ent ) {
-	//TODO: SetName
+	const char *name = luaL_checkstring(L, 3);
+	char info[MAX_INFO_STRING], oldName[MAX_NETNAME];
+
+	if (!name || !*name || strlen(name) >= MAX_NETNAME)
+		return;
+
+	Q_strncpyz(oldName, ent->client->pers.netname, sizeof(oldName));
+
+	ClientCleanName(name, ent->client->pers.netname, sizeof(ent->client->pers.netname));
+
+	if (!strcmp(oldName, ent->client->pers.netname))
+		return;
+
+	Q_strncpyz(ent->client->pers.netnameClean, ent->client->pers.netname, sizeof(ent->client->pers.netnameClean));
+	Q_CleanString(ent->client->pers.netnameClean, STRIP_COLOUR);
+
+	if (CheckDuplicateName(ent->s.number)) {
+		Q_strncpyz(ent->client->pers.netnameClean, ent->client->pers.netname, sizeof(ent->client->pers.netnameClean));
+		Q_CleanString(ent->client->pers.netnameClean, STRIP_COLOUR);
+	}
+
+	// update clientinfo
+	trap->GetConfigstring(CS_PLAYERS + ent->s.number, info, sizeof(info));
+	Info_SetValueForKey(info, "n", name);
+	trap->SetConfigstring(CS_PLAYERS + ent->s.number, info);
+
+	// update userinfo (in engine)
+	trap->GetUserinfo(ent->s.number, info, sizeof(info));
+	Info_SetValueForKey(info, "name", name);
+	trap->SetUserinfo(ent->s.number, info);
 }
 #endif
 
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetPosition( lua_State *L, jpluaEntity_t *ent ) {
-	//TODO: SetPosition
+	vector3 *origin = JPLua_CheckVector(L, 3);
+	VectorCopy(origin, &ent->client->ps.origin);
 }
 #endif
 
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetSaberStyle( lua_State *L, jpluaEntity_t *ent ) {
-	//TODO: SetSaberStyle
+	int value = luaL_checkinteger(L, 3);
+	if (SS_NONE < value < SS_NUM_SABER_STYLES)
+		ent->client->ps.fd.saberDrawAnimLevel = value;
 }
 #endif
 
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetScore( lua_State *L, jpluaEntity_t *ent ) {
-	//TODO: SetScore
+	ent->client->ps.persistant[PERS_SCORE] = luaL_checkinteger(L, 3);
 }
 #endif
 
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetTeam( lua_State *L, jpluaEntity_t *ent ) {
-	//TODO: SetTeam
+	SetTeam(ent, luaL_checkstring(L, 3), qtrue);
 }
 #endif
 
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetTorsoAnim( lua_State *L, jpluaEntity_t *ent ) {
-	//TODO: SetTorsoAnim
+	int value = luaL_checkinteger(L, 3);
+	if (FACE_TALK0 < value < MAX_ANIMATIONS)
+		ent->client->ps.torsoAnim = value;
 }
 #endif
 
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetVelocity( lua_State *L, jpluaEntity_t *ent ) {
-	//TODO: SetVelocity
+	VectorCopy(JPLua_CheckVector(L, 3), &ent->client->ps.velocity);
 }
 #endif
 
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetWeapon( lua_State *L, jpluaEntity_t *ent ) {
-	//TODO: SetWeapon
+	int value = luaL_checkinteger(L, 3);
+	if (WP_NONE < value < WP_NUM_WEAPONS)
+		ent->client->ps.weapon = value;
 }
 #endif
 

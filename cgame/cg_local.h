@@ -645,6 +645,7 @@ typedef struct cg_s {
 	float			distanceCull;
 	chatBoxItem_t	chatItems[MAX_CHATBOX_ITEMS];
 	int				chatItemActive;
+	qboolean		duelInProgress;
 
 	struct {
 		uint32_t		SSF;
