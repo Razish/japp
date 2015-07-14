@@ -1045,17 +1045,13 @@ static int JPLua_Entity_Free( lua_State *L ) {
 
 	return 0;
 }
-#endif
 
-#if defined(PROJECT_GAME)
 static int JPLua_Entity_Use( lua_State *L ) {
 	gentity_t *ent = JPLua_CheckEntity(L, 1);
 	GlobalUse(ent, ent, ent);
 	return 0;
 }
-#endif
 
-#if defined(PROJECT_GAME)
 static int JPLua_Entity_PlaySound( lua_State *L ) {
 	gentity_t *ent = JPLua_CheckEntity( L, 1 );
 	if ( ent ) {
@@ -1064,7 +1060,6 @@ static int JPLua_Entity_PlaySound( lua_State *L ) {
 	return 0;
 }
 #endif
-#if defined(PROJECT_GAME)
 static int JPLua_Entity_GetBoneVector(lua_State *L){
 	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
 	const char *bone = luaL_checkstring(L, 2);
@@ -1075,16 +1070,22 @@ static int JPLua_Entity_GetBoneVector(lua_State *L){
 		if (bolt == -1) {
 			trap->Print("^2JPLua:^1Bone %s not found\n", bone);
 		}
+#ifdef PROJECT_GAME
 		VectorSet(&angle, 0, ent->client->ps.viewangles.yaw, 0);
 		trap->G2API_GetBoltMatrix(ent->ghoul2, 0, bolt, &boltMatrix, &angle, &ent->r.currentOrigin, level.time, NULL, &ent->modelScale);
+#else
+		VectorSet(&angle, 0,((int)(ent - ents) == cg.clientNum)
+			? cg.predictedPlayerState.viewangles.yaw
+			: ent->lerpAngles.yaw, 0);
+		trap->G2API_GetBoltMatrix(ent->ghoul2, 0, bolt, &boltMatrix, &angle, &ent->lerpOrigin, cg.time, cgs.gameModels, &ent->modelScale);
+#endif
 		BG_GiveMeVectorFromMatrix(&boltMatrix, ORIGIN, &origin);
 		JPLua_Vector_CreateRef(L, &origin);
 		return 1;
 	}
 	return 0;
 }
-#endif
-#if defined(PROJECT_GAME)
+#ifdef PROJECT_GAME
 static int JPLua_Entity_Scale(lua_State *L){
 	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
 	vector3 *vec = JPLua_CheckVector(L, 2), newmins, newmaxs;
@@ -1098,6 +1099,16 @@ static int JPLua_Entity_Scale(lua_State *L){
 	VectorCopy(&newmins, &ent->r.mins);
 	VectorCopy(&newmaxs, &ent->r.maxs);
 	trap->LinkEntity((sharedEntity_t *)ent);
+	return 0;
+}
+
+void BG_ParseField(const BG_field_t *l_fields, int numFields, const char *key, const char *value, byte *ent);
+extern BG_field_t fields[84];
+static int JPLua_Entity_SetVar(lua_State *L){
+	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
+	const char *key = luaL_checkstring(L, 2);
+	const char *value = luaL_checkstring(L, 3);
+	BG_ParseField(fields, ARRAY_LEN(fields), key, value, (byte *)ent);
 	return 0;
 }
 #endif
@@ -1120,6 +1131,7 @@ static const struct luaL_Reg jplua_entity_meta[] = {
 	{ "PlaySound", JPLua_Entity_PlaySound },
 	{ "GetBoneVector", JPLua_Entity_GetBoneVector },
 	{ "Scale", JPLua_Entity_Scale },
+	{ "SetVar", JPLua_Entity_SetVar },
 #endif
 	{ NULL, NULL }
 };
