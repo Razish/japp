@@ -1088,17 +1088,20 @@ static int JPLua_Entity_GetBoneVector(lua_State *L){
 #ifdef PROJECT_GAME
 static int JPLua_Entity_Scale(lua_State *L){
 	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
-	vector3 *vec = JPLua_CheckVector(L, 2), newmins, newmaxs;
+	int value = luaL_checkinteger(L, 2);
+	vector3 newmins, newmaxs;
 	if (!ent) return 0;
-	trap->UnlinkEntity((sharedEntity_t *)ent);
-	VectorCopy(vec, &ent->modelScale);
-	for (int i = 0; i < 3; i++){
-		newmins.raw[i] = ent->r.mins.raw[i] * vec->raw[i];
-		newmaxs.raw[i] = ent->r.maxs.raw[i] * vec->raw[i];
-	}
-	VectorCopy(&newmins, &ent->r.mins);
-	VectorCopy(&newmaxs, &ent->r.maxs);
+
+	ent->s.iModelScale = Q_clampi(0, value, 1023);
+	ent->client->ps.iModelScale = ent->s.iModelScale;
+
+	float fScale = ent->s.iModelScale / 100.0f;
+	ent->modelScale.x = ent->modelScale.y = ent->modelScale.z = fScale;
+	VectorScale(&ent->r.mins, fScale, &ent->r.mins);
+	VectorScale(&ent->r.maxs, fScale, &ent->r.maxs);
+
 	trap->LinkEntity((sharedEntity_t *)ent);
+	G_CheckInSolid(ent, qtrue); // check
 	return 0;
 }
 
