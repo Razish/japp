@@ -376,7 +376,7 @@ static void SV_Lua_f( void ) {
 }
 
 static void SV_LuaReload_f( void ) {
-	JPLua_Shutdown();
+	JPLua_Shutdown(qtrue);
 	JPLua_Init();
 }
 #endif

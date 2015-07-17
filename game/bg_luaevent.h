@@ -32,7 +32,7 @@ int JPLua_Event_RemoveListener( lua_State *L );
 
 #endif // JPLUA
 
-void JPLua_Event_Shutdown( void );
+void JPLua_Event_Shutdown(qboolean restart);
 void JPLua_Event_RunFrame( void );
 
 #if defined(PROJECT_CGAME)

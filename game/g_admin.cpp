@@ -2714,7 +2714,7 @@ static void AM_ReloadLua( gentity_t *ent ) {
 	}
 
 	G_LogPrintf( level.log.admin, "\t%s reloaded JPLua\n", G_PrintClient( ent-g_entities ) );
-	JPLua_Shutdown();
+	JPLua_Shutdown(qtrue);
 	JPLua_Init();
 #else
 	AM_ConsolePrint( ent, "Lua is not supported on this server\n" );

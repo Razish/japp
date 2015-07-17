@@ -29,8 +29,10 @@ void JPLua_File_CreateRef( lua_State *L, const char *path, fsMode_t mode ){
 	file->mode = mode;
 	file->length = trap->FS_Open( file->name, &file->handle, file->mode );
 
-	if ( !file->handle || (file->length <= 0 && file->mode == 0) ) {
+	if ( !file->handle || (file->length < 0 && file->mode == 0) ) {
 		trap->Print( "JPLua_File_Open: Failed to load %s, file doesn't exist\n", file->name );
+		lua_pushnil(L);
+		return;
 	}
 
 	luaL_getmetatable( L, FILE_META );

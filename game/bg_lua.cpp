@@ -1246,12 +1246,12 @@ void JPLua_Init( void ) {
 #endif
 }
 
-void JPLua_Shutdown( void ) {
+void JPLua_Shutdown( qboolean restart) {
 #ifdef JPLUA
 	if ( JPLua.state ) {
 		jplua_plugin_t *nextPlugin = JPLua.plugins;
 
-		JPLua_Event_Shutdown();
+		JPLua_Event_Shutdown(restart);
 
 		JPLua.currentPlugin = JPLua.plugins;
 		while ( nextPlugin ) {

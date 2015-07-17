@@ -1928,7 +1928,7 @@ void CG_Shutdown( void ) {
 
 #ifdef JPLUA
 	//Raz: Lua!
-	JPLua_Shutdown();
+	JPLua_Shutdown(qfalse);
 #endif // JPLUA
 
 	// close log files

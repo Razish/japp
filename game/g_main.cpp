@@ -740,7 +740,7 @@ void G_ShutdownGame( int restart ) {
 
 #ifdef JPLUA
 	//Raz: Shutdown JPLua, triggers events etc
-	JPLua_Shutdown();
+	JPLua_Shutdown(restart);
 #endif // JPLUA
 
 	G_LogPrintf( level.log.console, "ShutdownGame:\n" );

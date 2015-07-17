@@ -106,14 +106,15 @@ int JPLua_Event_RemoveListener( lua_State *L ) {
 
 #endif // JPLUA
 
-void JPLua_Event_Shutdown( void ) {
+void JPLua_Event_Shutdown( qboolean restart ) {
 #ifdef JPLUA
 	jplua_plugin_t *plugin = NULL;
 	while (JPLua_IteratePlugins(&plugin)) {
 		// fire the unload event
 		if (plugin->eventListeners[JPLUA_EVENT_UNLOAD]) {
 			lua_rawgeti(JPLua.state, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_UNLOAD]);
-			JPLua_Call(JPLua.state, 0, 0);
+			lua_pushboolean(JPLua.state, restart);
+			JPLua_Call(JPLua.state, 1, 0);
 		}
 	}
 #endif

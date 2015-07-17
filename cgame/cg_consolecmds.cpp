@@ -289,7 +289,7 @@ void CG_LuaDoString_f( void ) {
 
 void CG_LuaReload_f( void ) {
 	trap->Print( S_COLOR_CYAN"Reloading JPLua...\n" );
-	JPLua_Shutdown();
+	JPLua_Shutdown(qtrue);
 	JPLua_Init();
 }
 #endif // JPLUA

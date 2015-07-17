@@ -262,8 +262,13 @@ void JPLua_Serialiser_CreateRef( lua_State *L, const char *path, fsMode_t mode )
 			free( contents );
 			contents = NULL;
 		}
-		else
+		else if (len < 0){
+			lua_pop(L, 1); //pop userdata
+			lua_pushnil(L); // push nil
+		}
+		else{
 			serialiser->inRoot = NULL;
+		}
 	}
 
 	luaL_getmetatable( L, SERIALISER_META );

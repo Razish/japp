@@ -23,7 +23,7 @@ extern "C" {
 #include <unordered_map>
 
 void JPLua_Init( void );
-void JPLua_Shutdown( void );
+void JPLua_Shutdown(qboolean restart);
 int JPLua_StackDump( lua_State *L );
 
 int JPLua_Push_ToString( lua_State *L );
