@@ -1090,6 +1090,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 #ifdef PROJECT_GAME
 	{ "EntitiesInBox", JPLua_EntitiesInBox },
 	{ "EntitiesInRadius", JPLua_EntitiesInRadius },
+	{ "FindEntityByClassname", JPLua_FindEntityByClassName },
 #endif
 	{ "GetConfigString", JPLua_GetConfigString }, // table GetConfigString()
 	{ "GetCvar", JPLua_GetCvar }, // Cvar GetCvar( string name )

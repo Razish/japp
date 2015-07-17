@@ -16,6 +16,7 @@ typedef struct jplua_entity_s {
 void JPLua_Register_Entity( lua_State *L );
 void JPLua_Entity_CreateRef( lua_State *L, jpluaEntity_t *ent );
 int JPLua_Entity_Get( lua_State *L );
+int JPLua_FindEntityByClassName(lua_State *L);
 
 jpluaEntity_t *JPLua_CheckEntity( lua_State *L, int idx );
 

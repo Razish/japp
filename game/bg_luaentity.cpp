@@ -712,7 +712,6 @@ static const luaProperty_t entityProperties[] = {
 		JPLua_Entity_SetContents
 	},
 #endif
-
 	{
 		"health",
 		JPLua_Entity_GetHealth,
@@ -1069,6 +1068,7 @@ static int JPLua_Entity_GetBoneVector(lua_State *L){
 		int bolt = trap->G2API_AddBolt(ent->ghoul2, 0, bone);
 		if (bolt == -1) {
 			trap->Print("^2JPLua:^1Bone %s not found\n", bone);
+			return 0;
 		}
 #ifdef PROJECT_GAME
 		VectorSet(&angle, 0, ent->client->ps.viewangles.yaw, 0);
@@ -1112,6 +1112,29 @@ static int JPLua_Entity_SetVar(lua_State *L){
 	const char *key = luaL_checkstring(L, 2);
 	const char *value = luaL_checkstring(L, 3);
 	BG_ParseField(fields, ARRAY_LEN(fields), key, value, (byte *)ent);
+	return 0;
+}
+
+int JPLua_FindEntityByClassName(lua_State *L){
+	const char *match = luaL_checkstring(L, 1);
+	gentity_t *list[MAX_GENTITIES], *found, *ent;
+	int count = 0;
+	if (!lua_isnil(L, 2)){
+		ent = JPLua_CheckEntity(L, 2);
+	}
+	while ((found = G_Find(ent ? ent : NULL, FOFS(classname), match)) != NULL) {
+		list[count++] = found;
+	}
+	if (count != 0){
+		lua_newtable(L);
+		int top = lua_gettop(L);
+		for (int i = 0; i < count; i++){
+			lua_pushinteger(L, i + 1);
+			JPLua_Entity_CreateRef(L, list[count]);
+			lua_settable(L, top);
+		}
+		return 1;
+	}
 	return 0;
 }
 #endif
