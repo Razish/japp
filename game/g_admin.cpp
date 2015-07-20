@@ -171,7 +171,7 @@ static void AM_DrawString(int type, gentity_t *ent, const char *arg, char *arg2)
 			else if (announce == ADMIN_STRING_RENAME){
 				anon.replace(anon.find_first_of("$2"), 2, arg2);
 				anon.replace(anon.find_first_of("$3"), 2, arg2);
-				trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", anon));
+				trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", anon.c_str()));
 			}
 			G_Announce(anon.c_str());
 		}
