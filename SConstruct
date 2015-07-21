@@ -200,7 +200,7 @@ if plat == 'Linux' or plat == 'Darwin':
 			env['LINKFLAGS'] += [ '-m32' ]
 		elif arch == 'x86_64':
 			env['CCFLAGS'] += [ '-mtune=generic' ]
-	env['CCFLAGS'] += [ '-fvisibility=default', '-fomit-frame-pointer' ]
+	env['CCFLAGS'] += [ '-fvisibility=hidden', '-fomit-frame-pointer' ]
 
 	# c flags
 	env['CFLAGS'] += [ '-std=gnu99' ]
