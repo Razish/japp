@@ -315,6 +315,9 @@ static int JPLua_RegisterPlugin( lua_State *L ) {
 	lua_pushstring( L, "UID" );
 		lua_pushstring( L, va( "0x%" PRIxPTR, (void *)JPLua.currentPlugin->UID ) );
 		lua_settable( L, top );
+	lua_pushstring(L, "dirname");
+		lua_pushstring(L, JPLua.currentPlugin->name);
+		lua_settable(L, top);
 
 	//save in the registry, but push on stack again straight away
 	JPLua.currentPlugin->handle = luaL_ref( L, LUA_REGISTRYINDEX );
