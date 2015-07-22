@@ -46,6 +46,7 @@ files = [
 	'game/g_log.cpp',
 	'game/g_luamysql.cpp',
 	'game/g_luasqlite.cpp',
+	'game/g_luaweapon.cpp',
 	'game/g_main.cpp',
 	'game/g_mem.cpp',
 	'game/g_misc.cpp',

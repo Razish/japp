@@ -17,6 +17,7 @@ extern "C" {
 #include "bg_luafs.h"
 #ifdef PROJECT_GAME
 #include "g_luasql.h"
+#include "g_luaweapon.h"
 #endif
 
 #ifdef JPLUA
@@ -73,6 +74,11 @@ struct luaProperty_t {
 	getFunc_t		Get;
 	setFunc_t		Set;
 };
+
+typedef struct lua_weapon_s {
+	int fire;
+	int altFire;
+} lua_weapon;
 
 extern const uint32_t JPLUA_VERSION;
 int propertycmp(const void *a, const void *b);

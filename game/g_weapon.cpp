@@ -5,6 +5,7 @@
 #include "bg_saga.h"
 #include "Ghoul2/G2.h"
 #include "qcommon/q_shared.h"
+#include "bg_lua.h"
 
 static vector3 forward, vright, up;
 static vector3 muzzle;
@@ -3862,6 +3863,8 @@ void FireWeapon( gentity_t *ent, qboolean altFire ) {
 		CalcMuzzlePoint( ent, &forward, &vright, &up, &muzzle );
 
 		// fire the specific weapon
+		if (JPLua_Weapon_CallFunction(ent,(weapon_t)ent->s.weapon, altFire)) //jplua override
+			return;
 		switch ( ent->s.weapon ) {
 		case WP_STUN_BATON:
 			WP_FireStunBaton( ent, altFire );

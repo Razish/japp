@@ -1146,7 +1146,9 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "SendReliableCommand", JPLua_Export_SendReliableCommand }, // SendReliableCommand( integer clientNum, string cmd )
 #endif
 #ifdef PROJECT_GAME
-	{ "SetConfigString", JPLua_SetConfigString}, // SetConfigString(integer type ( CS_SYSTEMINFO + i ) , value)
+	{ "SetConfigString", JPLua_SetConfigString}, // SetConfigString(integer type ( CS_SYSTEMINFO + i ) , value
+	{ "SetWeaponFireFunc", JPLua_Weapon_SetFireFunction },
+	{ "SetWeaponAltFireFunc", JPLua_Weapon_SetAltFireFunction },
 #endif
 #ifdef PROJECT_CGAME
 	{ "SendServerCommand", JPLua_Export_SendServerCommand }, // SendServerCommand( string command )
@@ -1249,6 +1251,7 @@ void JPLua_Init( void ) {
 #endif
 }
 
+extern std::unordered_map<weapon_t, lua_weapon> weapon_func_list;
 void JPLua_Shutdown( qboolean restart) {
 #ifdef JPLUA
 	if ( JPLua.state ) {
@@ -1275,6 +1278,7 @@ void JPLua_Shutdown( qboolean restart) {
 			luaL_unref(JPLua.state, LUA_REGISTRYINDEX, row.second);
 		}
 		jplua_client_commands.clear();
+		weapon_func_list.clear();
 #elif defined PROJECT_CGAME
 		for (auto& row : jplua_console_commands){
 			luaL_unref(JPLua.state, LUA_REGISTRYINDEX, row.second);
