@@ -11,14 +11,14 @@ qboolean JPLua_Weapon_CallFunction(gentity_t *ent,weapon_t type, qboolean altFir
 #ifdef JPLUA
 	lua_weapon *handle = &weapon_func_list[type];
 	if (altFire){
-		if (handle->altFire != 0 || handle->altFire != -1) {
+		if (handle->altFire != 0 && handle->altFire != -1) {
 			lua_rawgeti(JPLua.state, LUA_REGISTRYINDEX, weapon_func_list[type].altFire);
 			JPLua_Entity_CreateRef(JPLua.state, ent);
 			JPLua_Call(JPLua.state, 1, 0);
 			return qtrue;
 		}
 	}
-	if (handle->fire != 0 || handle->fire != -1) {
+	if (handle->fire != 0 && handle->fire != -1) {
 		lua_rawgeti(JPLua.state, LUA_REGISTRYINDEX, weapon_func_list[type].fire);
 		JPLua_Entity_CreateRef(JPLua.state, ent);
 		JPLua_Call(JPLua.state, 1, 0);
