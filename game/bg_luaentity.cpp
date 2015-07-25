@@ -1093,6 +1093,8 @@ static int JPLua_Entity_Scale(lua_State *L){
 	if (!ent) return 0;
 
 	ent->s.iModelScale = Q_clampi(0, value, 1023);
+
+	if (ent->client)
 	ent->client->ps.iModelScale = ent->s.iModelScale;
 
 	float fScale = ent->s.iModelScale / 100.0f;
