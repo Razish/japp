@@ -14,13 +14,14 @@ qboolean JPLua_Weapon_CallFunction(gentity_t *ent,weapon_t type, qboolean altFir
 		if (handle->altFire != 0) {
 			lua_rawgeti(JPLua.state, LUA_REGISTRYINDEX, weapon_func_list[type].altFire);
 			JPLua_Entity_CreateRef(JPLua.state, ent);
-			JPLua_Call(JPLua.state, 0, 0);
+			JPLua_Call(JPLua.state, 1, 0);
 			return qtrue;
 		}
 	}
 	if (handle->fire != 0) {
 		lua_rawgeti(JPLua.state, LUA_REGISTRYINDEX, weapon_func_list[type].fire);
-		JPLua_Call(JPLua.state, 0, 0);
+		JPLua_Entity_CreateRef(JPLua.state, ent);
+		JPLua_Call(JPLua.state, 1, 0);
 		return qtrue;
 	}
 #endif
