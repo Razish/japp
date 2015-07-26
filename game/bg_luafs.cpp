@@ -89,10 +89,9 @@ int JPLua_File_GetFileList( lua_State *L ) {
 	int num, i, top,folderLen = 0;
 	const char *path = luaL_checkstring( L, 1 );
 	const char *ext = luaL_checkstring( L, 2 );
-	size_t skipLenFolder = 0;
 
+	memset(list, 0, sizeof(list));
     num = trap->FS_GetFileList( path, ext, list, sizeof(list) );
-
 	lua_newtable( L );
 	top = lua_gettop( L );
 
@@ -102,18 +101,11 @@ int JPLua_File_GetFileList( lua_State *L ) {
 		if ( folderName[0] == '.' ){
 			skip = qtrue;
 		}
-		if ( (s = (char *)Q_strchrs( folderName, "/\\" )) ) {
-			if ( !s[1] ) {
-				skip = qtrue;
-			}
-			*s = '\0';
-			skipLenFolder = strlen( ++s ) + 1;
-		}
 		folderLen = strlen( folderName ) + 1;
 		if ( !skip ) {
-			lua_pushinteger( L, i ); lua_pushstring( L, folderName ); lua_settable( L, top );
+			lua_pushinteger( L, i + 1 ); lua_pushstring( L, folderName ); lua_settable( L, top );
 		}
-		folderName += folderLen + skipLenFolder;
+		folderName += folderLen;
 	}
 
 	return 1;
