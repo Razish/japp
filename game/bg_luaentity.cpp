@@ -660,6 +660,52 @@ static int JPLua_Entity_SetDieFunction( lua_State *L ) {
 }
 #endif
 
+#if defined (PROJECT_GAME)
+static int JPLua_Entity_GetLight(lua_State *L, jpluaEntity_t *ent){
+	int light = ent->s.constantLight;
+	int r, g, b, i;
+	r = light & 255;
+	g = (light >> 8) & 255;
+	b = (light >> 16) & 255;
+	i = ((light >> 24) & 255) * 4;
+	
+	lua_newtable(L);
+	int top = lua_gettop(L);
+
+	lua_pushstring(L, "r"); lua_pushnumber(L, r); lua_settable(L, top);
+	lua_pushstring(L, "g"); lua_pushnumber(L, g); lua_settable(L, top);
+	lua_pushstring(L, "b"); lua_pushnumber(L, b); lua_settable(L, top);
+	lua_pushstring(L, "intensity"); lua_pushnumber(L, i); lua_settable(L, top);
+	return 1;
+}
+
+static void JPLua_Entity_SetLight(lua_State *L, jpluaEntity_t *ent){
+	float rgbi[4];
+	int		r, g, b, i;
+	JPLua_ReadColour(rgbi, 4, L, 3);
+
+	r = rgbi[0] * 255;
+	if (r > 255) {
+		r = 255;
+	}
+	g = rgbi[1] * 255;
+	if (g > 255) {
+		g = 255;
+	}
+	b = rgbi[2] * 255;
+	if (b > 255) {
+		b = 255;
+	}
+	i = rgbi[3] / 4;
+	if (i > 255) {
+		i = 255;
+	}
+	ent->s.constantLight = r | (g << 8) | (b << 16) | (i << 24);
+	trap->LinkEntity((sharedEntity_t *)ent);
+}
+
+#endif
+
 static const luaProperty_t entityProperties[] = {
 	{
 		"angles",
@@ -735,6 +781,11 @@ static const luaProperty_t entityProperties[] = {
 	},
 
 #if defined(PROJECT_GAME)
+	{
+		"light",
+		JPLua_Entity_GetLight,
+		JPLua_Entity_SetLight,
+	},
 	{
 		"linked",
 		JPLua_Entity_GetLinked,
