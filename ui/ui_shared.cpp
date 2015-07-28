@@ -8607,6 +8607,7 @@ qboolean MenuParse_itemDef( itemDef_t *item, int handle ) {
 			return qfalse;
 		}
 		Item_InitControls( menu->items[menu->itemCount] );
+		menu->items[menu->itemCount]->id = menu->itemCount;
 		menu->items[menu->itemCount++]->parent = menu;
 	}
 	return qtrue;
@@ -8712,6 +8713,7 @@ void Menu_New( int handle ) {
 		Menu_Init( menu );
 		if ( Menu_Parse( handle, menu ) ) {
 			Menu_PostParse( menu );
+			menu->id = menuCount;
 			menuCount++;
 		}
 	}

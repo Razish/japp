@@ -12,6 +12,7 @@ extern "C" {
 #include "bg_luaentity.h"
 #ifdef PROJECT_CGAME
 #include "cg_luaserver.h"
+#include "cg_luainterface.h"
 #endif
 #include "bg_luavector.h"
 #include "bg_luafs.h"
@@ -19,12 +20,12 @@ extern "C" {
 #include "g_luasql.h"
 #include "g_luaweapon.h"
 #endif
+#include <unordered_map>
+void JPLua_Init(void);
+void JPLua_Shutdown(qboolean restart);
 
 #ifdef JPLUA
-#include <unordered_map>
 
-void JPLua_Init( void );
-void JPLua_Shutdown(qboolean restart);
 int JPLua_StackDump( lua_State *L );
 
 int JPLua_Push_ToString( lua_State *L );

@@ -29,6 +29,7 @@ static const char *pluginDir = "lua/cl/";
 #define JPLUA_EXTENSION ".lua"
 
 jplua_t JPLua;
+extern std::unordered_map<weapon_t, lua_weapon> weapon_func_list;
 
 #ifdef PROJECT_GAME
 std::unordered_map<std::string, int> jplua_client_commands;
@@ -1047,7 +1048,7 @@ static int JPLua_EntitiesInBox(lua_State *L){
 
 	for (int i = 0; i < numListedEntities; i++) {
 		ent = &g_entities[entityList[i]];
-		lua_pushinteger(L, i + 1);
+			lua_pushinteger(L, i + 1);
 		JPLua_Entity_CreateRef(L, ent);
 		lua_settable(L, top);
 	}
@@ -1076,6 +1077,9 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "AddListener", JPLua_Event_AddListener }, // AddListener( string name, function listener )
 	{ "AddServerCommand", JPLua_Export_AddServerCommand }, // AddServerCommand( string cmd )
 	{ "CreateCvar", JPLua_CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
+#ifdef PROJECT_CGAME
+	{ "CreateMenu", JPLua_Interface_CreateMenu },
+#endif
 #ifdef PROJECT_GAME
 	{ "CreateEntity", JPLua_Entity_Create },
 #endif
@@ -1111,6 +1115,7 @@ static const jplua_cimport_table_t JPLua_CImports[] = {
 	{ "GetMap", JPLua_Export_GetMap }, // string GetMap()
 	{ "GetMapTime", JPLua_Export_GetMapTime }, // string GetMapTime()
 #ifdef PROJECT_CGAME
+	{ "GetMenu", JPLua_Interface_GetMenu },
 	{ "GetMousePos", JPLua_Export_GetMousePos }, // [{x,y}, nil] GetMousePos
 #endif
 	{ "GetPlayer", JPLua_GetPlayer }, // Player GetPlayer( integer clientNum )
@@ -1225,6 +1230,8 @@ void JPLua_Init( void ) {
 	JPLua_Register_Entity(JPLua.state);
 #ifdef PROJECT_CGAME
 	JPLua_Register_Server( JPLua.state );
+	JPLua_Register_Menu(JPLua.state);
+	JPLua_Register_Item(JPLua.state);
 #endif
 	JPLua_Register_Cvar( JPLua.state );
 	JPLua_Register_Logger( JPLua.state );
@@ -1250,8 +1257,6 @@ void JPLua_Init( void ) {
 	JPLua_PostInit( JPLua.state );
 #endif
 }
-
-extern std::unordered_map<weapon_t, lua_weapon> weapon_func_list;
 void JPLua_Shutdown( qboolean restart) {
 #ifdef JPLUA
 	if ( JPLua.state ) {

@@ -917,173 +917,6 @@ static int JPLua_Entity_NewIndex( lua_State *L ) {
 	return 0;
 }
 
-#ifdef PROJECT_GAME
-void JPLua_Entity_CallFunction( gentity_t *ent, jplua_entityFunc_t funcID, intptr_t arg1, intptr_t arg2, intptr_t arg3,
-	intptr_t arg4 )
-{
-	if ( ent->uselua ) {
-		lua_State *L = JPLua.state;
-		switch ( funcID ) {
-
-		case JPLUA_ENTITY_THINK: {
-			if ( ent->lua_think ) {
-				lua_rawgeti( L, LUA_REGISTRYINDEX, ent->lua_think );
-				JPLua_Entity_CreateRef( L, ent );
-				JPLua_Call( L, 1, 0 );
-			}
-		} break;
-
-		case JPLUA_ENTITY_REACHED: {
-			if ( ent->lua_reached ) {
-				lua_rawgeti( L, LUA_REGISTRYINDEX, ent->lua_reached );
-				JPLua_Entity_CreateRef( L, ent );
-				JPLua_Call( L, 1, 0 );
-			}
-		} break;
-
-		case JPLUA_ENTITY_BLOCKED: {
-			if ( ent->lua_blocked ) {
-				lua_rawgeti( L, LUA_REGISTRYINDEX, ent->lua_blocked );
-				JPLua_Entity_CreateRef( L, ent );
-				JPLua_Entity_CreateRef( L, (gentity_t *)arg1 );
-				JPLua_Call( L, 2, 0 );
-				break;
-			}
-		} break;
-
-		case JPLUA_ENTITY_TOUCH: {
-			if ( ent->lua_touch ) {
-				lua_rawgeti( L, LUA_REGISTRYINDEX, ent->lua_touch );
-				JPLua_Entity_CreateRef( L, ent );
-				JPLua_Entity_CreateRef( L, (gentity_t *)arg1 );
-				trace_t *tr = (trace_t *)arg2;
-
-				lua_newtable( L );
-				int top = lua_gettop( L );
-
-				lua_pushstring( L, "allsolid" );
-					lua_pushboolean( L, !!tr->allsolid );
-				lua_settable( L, top );
-
-				lua_pushstring( L, "startsolid" );
-					lua_pushboolean( L, !!tr->startsolid );
-				lua_settable( L, top );
-
-				lua_pushstring( L, "entityNum" );
-					lua_pushinteger( L, tr->entityNum );
-				lua_settable( L, top );
-
-				lua_pushstring( L, "fraction" );
-					lua_pushnumber( L, tr->fraction );
-				lua_settable( L, top );
-
-				lua_pushstring( L, "endpos" );
-					lua_newtable( L );
-					int top2 = lua_gettop( L );
-
-					lua_pushstring( L, "x" );
-						lua_pushnumber( L, tr->endpos.x );
-					lua_settable( L, top2 );
-
-					lua_pushstring( L, "y" );
-						lua_pushnumber( L, tr->endpos.y );
-					lua_settable( L, top2 );
-
-					lua_pushstring( L, "z" );
-						lua_pushnumber( L, tr->endpos.z );
-					lua_settable( L, top2 );
-				lua_settable( L, top );
-
-				lua_pushstring( L, "plane" );
-					lua_newtable( L );
-					top2 = lua_gettop( L );
-
-					lua_pushstring( L, "normal" );
-						lua_newtable( L );
-						int top3 = lua_gettop( L );
-
-						lua_pushstring( L, "x" );
-							lua_pushnumber( L, tr->plane.normal.x );
-						lua_settable( L, top3 );
-
-						lua_pushstring( L, "y" );
-							lua_pushnumber( L, tr->plane.normal.y );
-						lua_settable( L, top3 );
-
-						lua_pushstring( L, "z" );
-							lua_pushnumber( L, tr->plane.normal.z );
-						lua_settable( L, top3 );
-					lua_settable( L, top2 );
-
-					lua_pushstring( L, "dist" );
-						lua_pushnumber( L, tr->plane.dist );
-					lua_settable( L, top2 );
-
-					lua_pushstring( L, "type" );
-						lua_pushinteger( L, tr->plane.type );
-					lua_settable( L, top2 );
-
-					lua_pushstring( L, "signbits" );
-						lua_pushinteger( L, tr->plane.signbits );
-					lua_settable( L, top2 );
-				lua_settable( L, top );
-
-				lua_pushstring( L, "surfaceFlags" );
-					lua_pushinteger( L, tr->surfaceFlags );
-				lua_settable( L, top );
-
-				lua_pushstring( L, "contents" );
-					lua_pushinteger( L, tr->contents );
-				lua_settable( L, top );
-
-				JPLua_Call( L, 3, 0 );
-				break;
-			}
-		} break;
-
-		case JPLUA_ENTITY_USE: {
-			if ( ent->lua_use ) {
-				lua_rawgeti( L, LUA_REGISTRYINDEX, ent->lua_use );
-				JPLua_Entity_CreateRef( L, ent );
-				JPLua_Entity_CreateRef( L, (gentity_t *)arg1 );
-				JPLua_Entity_CreateRef( L, (gentity_t *)arg2 );
-				JPLua_Call( L, 3, 0 );
-				break;
-			}
-		} break;
-
-		case JPLUA_ENTITY_PAIN: {
-			if ( ent->lua_pain ) {
-				lua_rawgeti( L, LUA_REGISTRYINDEX, ent->lua_pain );
-				JPLua_Entity_CreateRef( L, ent );
-				JPLua_Entity_CreateRef( L, (gentity_t *)arg1 );
-				lua_pushinteger( L, (int)arg2 );
-				JPLua_Call( L, 3, 0 );
-				break;
-			}
-		} break;
-
-		case JPLUA_ENTITY_DIE: {
-			if ( ent->lua_die ) {
-				lua_rawgeti( L, LUA_REGISTRYINDEX, ent->lua_die );
-				JPLua_Entity_CreateRef( L, ent );
-				JPLua_Entity_CreateRef( L, (gentity_t *)arg1 );
-				JPLua_Entity_CreateRef( L, (gentity_t *)arg2 );
-				lua_pushinteger( L, (int)arg3 );
-				lua_pushinteger( L, (int)arg4 );
-				JPLua_Call( L, 5, 0 );
-				break;
-			}
-		} break;
-
-		default: {
-			// ...
-		} break;
-		}
-	}
-}
-
-#endif
 
 #if defined(PROJECT_GAME)
 static int JPLua_Entity_Free( lua_State *L ) {
@@ -1232,3 +1065,172 @@ void JPLua_Register_Entity( lua_State *L ) {
 }
 
 #endif //JPLUA
+
+#ifdef PROJECT_GAME
+void JPLua_Entity_CallFunction(gentity_t *ent, jplua_entityFunc_t funcID, intptr_t arg1, intptr_t arg2, intptr_t arg3,
+	intptr_t arg4)
+{
+#ifdef JPLUA
+	if (ent->uselua) {
+		lua_State *L = JPLua.state;
+		switch (funcID) {
+
+		case JPLUA_ENTITY_THINK: {
+			if (ent->lua_think) {
+				lua_rawgeti(L, LUA_REGISTRYINDEX, ent->lua_think);
+				JPLua_Entity_CreateRef(L, ent);
+				JPLua_Call(L, 1, 0);
+			}
+		} break;
+
+		case JPLUA_ENTITY_REACHED: {
+			if (ent->lua_reached) {
+				lua_rawgeti(L, LUA_REGISTRYINDEX, ent->lua_reached);
+				JPLua_Entity_CreateRef(L, ent);
+				JPLua_Call(L, 1, 0);
+			}
+		} break;
+
+		case JPLUA_ENTITY_BLOCKED: {
+			if (ent->lua_blocked) {
+				lua_rawgeti(L, LUA_REGISTRYINDEX, ent->lua_blocked);
+				JPLua_Entity_CreateRef(L, ent);
+				JPLua_Entity_CreateRef(L, (gentity_t *)arg1);
+				JPLua_Call(L, 2, 0);
+				break;
+			}
+		} break;
+
+		case JPLUA_ENTITY_TOUCH: {
+			if (ent->lua_touch) {
+				lua_rawgeti(L, LUA_REGISTRYINDEX, ent->lua_touch);
+				JPLua_Entity_CreateRef(L, ent);
+				JPLua_Entity_CreateRef(L, (gentity_t *)arg1);
+				trace_t *tr = (trace_t *)arg2;
+
+				lua_newtable(L);
+				int top = lua_gettop(L);
+
+				lua_pushstring(L, "allsolid");
+				lua_pushboolean(L, !!tr->allsolid);
+				lua_settable(L, top);
+
+				lua_pushstring(L, "startsolid");
+				lua_pushboolean(L, !!tr->startsolid);
+				lua_settable(L, top);
+
+				lua_pushstring(L, "entityNum");
+				lua_pushinteger(L, tr->entityNum);
+				lua_settable(L, top);
+
+				lua_pushstring(L, "fraction");
+				lua_pushnumber(L, tr->fraction);
+				lua_settable(L, top);
+
+				lua_pushstring(L, "endpos");
+				lua_newtable(L);
+				int top2 = lua_gettop(L);
+
+				lua_pushstring(L, "x");
+				lua_pushnumber(L, tr->endpos.x);
+				lua_settable(L, top2);
+
+				lua_pushstring(L, "y");
+				lua_pushnumber(L, tr->endpos.y);
+				lua_settable(L, top2);
+
+				lua_pushstring(L, "z");
+				lua_pushnumber(L, tr->endpos.z);
+				lua_settable(L, top2);
+				lua_settable(L, top);
+
+				lua_pushstring(L, "plane");
+				lua_newtable(L);
+				top2 = lua_gettop(L);
+
+				lua_pushstring(L, "normal");
+				lua_newtable(L);
+				int top3 = lua_gettop(L);
+
+				lua_pushstring(L, "x");
+				lua_pushnumber(L, tr->plane.normal.x);
+				lua_settable(L, top3);
+
+				lua_pushstring(L, "y");
+				lua_pushnumber(L, tr->plane.normal.y);
+				lua_settable(L, top3);
+
+				lua_pushstring(L, "z");
+				lua_pushnumber(L, tr->plane.normal.z);
+				lua_settable(L, top3);
+				lua_settable(L, top2);
+
+				lua_pushstring(L, "dist");
+				lua_pushnumber(L, tr->plane.dist);
+				lua_settable(L, top2);
+
+				lua_pushstring(L, "type");
+				lua_pushinteger(L, tr->plane.type);
+				lua_settable(L, top2);
+
+				lua_pushstring(L, "signbits");
+				lua_pushinteger(L, tr->plane.signbits);
+				lua_settable(L, top2);
+				lua_settable(L, top);
+
+				lua_pushstring(L, "surfaceFlags");
+				lua_pushinteger(L, tr->surfaceFlags);
+				lua_settable(L, top);
+
+				lua_pushstring(L, "contents");
+				lua_pushinteger(L, tr->contents);
+				lua_settable(L, top);
+
+				JPLua_Call(L, 3, 0);
+				break;
+			}
+		} break;
+
+		case JPLUA_ENTITY_USE: {
+			if (ent->lua_use) {
+				lua_rawgeti(L, LUA_REGISTRYINDEX, ent->lua_use);
+				JPLua_Entity_CreateRef(L, ent);
+				JPLua_Entity_CreateRef(L, (gentity_t *)arg1);
+				JPLua_Entity_CreateRef(L, (gentity_t *)arg2);
+				JPLua_Call(L, 3, 0);
+				break;
+			}
+		} break;
+
+		case JPLUA_ENTITY_PAIN: {
+			if (ent->lua_pain) {
+				lua_rawgeti(L, LUA_REGISTRYINDEX, ent->lua_pain);
+				JPLua_Entity_CreateRef(L, ent);
+				JPLua_Entity_CreateRef(L, (gentity_t *)arg1);
+				lua_pushinteger(L, (int)arg2);
+				JPLua_Call(L, 3, 0);
+				break;
+			}
+		} break;
+
+		case JPLUA_ENTITY_DIE: {
+			if (ent->lua_die) {
+				lua_rawgeti(L, LUA_REGISTRYINDEX, ent->lua_die);
+				JPLua_Entity_CreateRef(L, ent);
+				JPLua_Entity_CreateRef(L, (gentity_t *)arg1);
+				JPLua_Entity_CreateRef(L, (gentity_t *)arg2);
+				lua_pushinteger(L, (int)arg3);
+				lua_pushinteger(L, (int)arg4);
+				JPLua_Call(L, 5, 0);
+				break;
+			}
+		} break;
+
+		default: {
+			// ...
+		} break;
+		}
+	}
+#endif
+}
+#endif

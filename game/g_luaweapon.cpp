@@ -5,8 +5,9 @@
 #endif
 
 #include "bg_lua.h"
-
+#ifdef JPLUA
 std::unordered_map<weapon_t, lua_weapon> weapon_func_list;
+#endif
 qboolean JPLua_Weapon_CallFunction(gentity_t *ent,weapon_t type, qboolean altFire){
 #ifdef JPLUA
 	lua_weapon *handle = &weapon_func_list[type];

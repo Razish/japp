@@ -6906,10 +6906,10 @@ void CG_Draw2D( void ) {
 #if 0
 			if ( cg_drawStatus.integer ) {
 				//Reenable if stats are drawn with menu system again
-				Menu_PaintAll();
 				CG_DrawTimedMenus();
 			}
 #endif
+			Menu_PaintAll();
 
 			CG_DrawAmmoWarning();
 

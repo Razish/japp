@@ -17,6 +17,8 @@ files = [
 	'cgame/cg_info.cpp',
 	'cgame/cg_light.cpp',
 	'cgame/cg_localents.cpp',
+	'cgame/cg_luamenu.cpp',
+	'cgame/cg_luaitem.cpp',
 	'cgame/cg_luaserver.cpp',
 	'cgame/cg_main.cpp',
 	'cgame/cg_marks.cpp',

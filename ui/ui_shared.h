@@ -157,6 +157,8 @@ typedef struct listBoxDef_s {
 	qboolean notselectable;
 	//JLF MPMOVED
 	qboolean	scrollhidden;
+	qboolean	uselua;
+	int			lua_DoubleClick;
 } listBoxDef_t;
 
 typedef struct editFieldDef_s {
@@ -286,6 +288,16 @@ typedef struct itemDef_s {
 
 	//Raz: custom slider size
 	rectDef_t	slider;
+	qboolean	uselua;
+	int			id;
+	int			lua_onFocus;
+	int			lua_leaveFocus;
+	int			lua_action;
+	int			lua_accept;
+	int			lua_mouseEnter;
+	int			lua_mouseEnterText;
+	int			lua_mouseLeave;
+	int			lua_mouseLeaveText;
 } itemDef_t;
 
 typedef struct menuDef_s {
@@ -316,6 +328,13 @@ typedef struct menuDef_s {
 	float		appearanceTime;				//	when next item should appear
 	int			appearanceCnt;				//	current item displayed
 	float		appearanceIncrement;		//
+	int			id;
+
+	qboolean	uselua;
+	int			lua_onOpen;
+	int			lua_onClose;
+	int			lua_onAccept;
+	int			lua_onESC;
 } menuDef_t;
 
 typedef struct cachedAssets_s {
