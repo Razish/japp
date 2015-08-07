@@ -1001,6 +1001,40 @@ static int JPLua_Entity_SetVar(lua_State *L){
 	return 0;
 }
 
+static int spawncmp( const void *a, const void *b ) {
+	return Q_stricmp( (const char *)a, ((BG_field_t*)b)->name );
+}
+
+
+static int JPLua_Entity_GetVar(lua_State *L){
+	byte *ent = (byte *)JPLua_CheckEntity(L, 1);
+	const char *key = luaL_checkstring(L,2);
+
+	const BG_field_t *f = f = (BG_field_t *)bsearch( key, fields, ARRAY_LEN(fields), sizeof(BG_field_t), spawncmp );
+
+	if ( f ) {
+		switch ( f->type ) {
+		case F_LSTRING:
+			lua_pushstring(L, *(char **)(ent + f->ofs));
+			break;
+		case F_VECTOR:
+			JPLua_Vector_CreateRef(L, ((float *)(ent + f->ofs))[0], ((float *)(ent + f->ofs))[1], ((float *)(ent + f->ofs))[2]);
+			break;
+		case F_INT:
+			lua_pushinteger(L, *(int *)(ent + f->ofs));
+			break;
+		case F_FLOAT:
+			lua_pushnumber(L, *(float *)(ent + f->ofs));
+			break;
+		case F_IGNORE:
+		default:
+			return 0;
+		}
+		return 1;
+	}
+	return 0;
+}
+
 int JPLua_FindEntityByClassName(lua_State *L){
 	const char *match = luaL_checkstring(L, 1);
 	gentity_t *list[MAX_GENTITIES], *found, *ent;
@@ -1044,6 +1078,7 @@ static const struct luaL_Reg jplua_entity_meta[] = {
 	{ "GetBoneVector", JPLua_Entity_GetBoneVector },
 	{ "Scale", JPLua_Entity_Scale },
 	{ "SetVar", JPLua_Entity_SetVar },
+	{ "GetVar", JPLua_Entity_GetVar },
 #endif
 	{ NULL, NULL }
 };
