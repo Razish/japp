@@ -3539,14 +3539,20 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 // must be in alphabetical order
 static const emote_t emotes[] = {
 	{ "aimgun", BOTH_STAND5TOAIM, MAX_ANIMATIONS, EMF_HOLD | EMF_HOLSTER },
+	{ "amhiltthrow1", BOTH_SABERTHROW1START, BOTH_SABERTHROW1STOP, EMF_NONE },
+	{ "amhiltthrow2", BOTH_SABERTHROW2START, BOTH_SABERTHROW2STOP, EMF_NONE },
 	{ "atease", BOTH_STAND4, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "beg", BOTH_KNEES2, MAX_ANIMATIONS, EMF_HOLD | EMF_HOLSTER },
-	{ "breakdance", BOTH_FORCE_GETUP_B6, MAX_ANIMATIONS, EMF_NONE },
+	{ "breakdance", BOTH_FORCE_GETUP_B4, MAX_ANIMATIONS, EMF_NONE },
+	{ "breakdance2", BOTH_FORCE_GETUP_B6, MAX_ANIMATIONS, EMF_NONE },
 	{ "cower", BOTH_COWER1_START, BOTH_COWER1, EMF_HOLSTER },
 	{ "dance1", BOTH_TURNSTAND1, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD },
 	{ "dance2", BOTH_TURNSTAND4, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "dance3", BOTH_TURNSTAND5, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD },
+	{ "die", BOTH_HIT1, BOTH_FORCE_GETUP_F2, EMF_STATIC | EMF_HOLD },
+	{ "die2", BOTH_DEATH15, BOTH_FORCE_GETUP_F2, EMF_STATIC | EMF_HOLD },
 	{ "fabulous", BOTH_K7_S7_TR, MAX_ANIMATIONS, EMF_HOLD },
+	{ "finishinghim", BOTH_SABERKILLER1, MAX_ANIMATIONS, EMF_STATIC },
 	{ "harlem", BOTH_FORCE_DRAIN_GRABBED, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD },
 	{ "heal", BOTH_FORCEHEAL_START, BOTH_FORCEHEAL_STOP, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "hello", BOTH_SILENCEGESTURE1, MAX_ANIMATIONS, EMF_NONE },
@@ -3555,6 +3561,8 @@ static const emote_t emotes[] = {
 	{ "kneel2", BOTH_ROSH_PAIN, BOTH_UNCROUCH3, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "neo", BOTH_FORCE_GETUP_B4, MAX_ANIMATIONS, EMF_NONE },
 	{ "nod", BOTH_HEADNOD, MAX_ANIMATIONS, EMF_NONE },
+	{ "noisy", BOTH_SONICPAIN_HOLD, BOTH_SONICPAIN_END, EMF_HOLD },
+	{ "power", BOTH_FORCE_GETUP_F2, MAX_ANIMATIONS, EMF_NONE },
 	{ "radio", BOTH_TALKCOMM1START, BOTH_TALKCOMM1STOP, EMF_HOLD | EMF_HOLSTER },
 	{ "shake", BOTH_HEADSHAKE, MAX_ANIMATIONS, EMF_NONE },
 	{ "shovel", BOTH_TUSKENATTACK2, MAX_ANIMATIONS, EMF_NONE },
@@ -3563,13 +3571,16 @@ static const emote_t emotes[] = {
 	{ "sit3", BOTH_SIT3, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "sit4", BOTH_SIT4, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
 	{ "sit6", BOTH_SIT6, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "sleep", BOTH_SLEEP1, BOTH_SLEEP1GETUP, EMF_HOLD | EMF_HOLSTER | EMF_STATIC },
 	{ "smack1", BOTH_FORCEGRIP3THROW, MAX_ANIMATIONS, EMF_NONE },
 	{ "smack2", BOTH_TOSS1, MAX_ANIMATIONS, EMF_NONE },
 	{ "stand", BOTH_STAND8, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD },
 	{ "stepback", BOTH_FORCE_2HANDEDLIGHTNING, MAX_ANIMATIONS, EMF_NONE },
 	{ "suggest", BOTH_STAND1_TALK3, MAX_ANIMATIONS, EMF_NONE },
 	{ "surrender", TORSO_SURRENDER_START, TORSO_SURRENDER_STOP, EMF_HOLD | EMF_HOLSTER },
+	{ "victory", BOTH_TAVION_SCEPTERGROUND, MAX_ANIMATIONS, EMF_NONE },
 	{ "wait", BOTH_STAND10, BOTH_STAND10TOSTAND1, EMF_STATIC | EMF_HOLD | EMF_HOLSTER },
+	{ "won", TORSO_HANDSIGNAL1, MAX_ANIMATIONS, EMF_NONE },
 };
 static const size_t numEmotes = ARRAY_LEN( emotes );
 
@@ -3645,14 +3656,20 @@ static void RegularEmote( gentity_t *ent, const char *emoteName ) {
 
 #define EMOTE( x ) static void Cmd_Emote_##x( gentity_t *ent ) { RegularEmote( ent, XSTRING(x) ); }
 EMOTE( aimgun )
+EMOTE( amhiltthrow1 )
+EMOTE( amhiltthrow2 )
 EMOTE( atease )
 EMOTE( beg )
 EMOTE( breakdance )
+EMOTE( breakdance2 )
 EMOTE( cower )
 EMOTE( dance1 )
 EMOTE( dance2 )
 EMOTE( dance3 )
+EMOTE( die1 )
+EMOTE( die2 )
 EMOTE( fabulous )
+EMOTE( finishinghim )
 EMOTE( harlem )
 EMOTE( heal )
 EMOTE( hello )
@@ -3661,6 +3678,8 @@ EMOTE( kneel )
 EMOTE( kneel2 )
 EMOTE( neo )
 EMOTE( nod )
+EMOTE( noisy )
+EMOTE( power )
 EMOTE( radio )
 EMOTE( shake )
 EMOTE( shovel )
@@ -3669,13 +3688,28 @@ EMOTE( sit2 )
 EMOTE( sit3 )
 EMOTE( sit4 )
 EMOTE( sit6 )
+EMOTE( sleep )
 EMOTE( smack1 )
 EMOTE( smack2 )
 EMOTE( stand )
 EMOTE( stepback )
 EMOTE( suggest )
+EMOTE( victory )
 EMOTE( surrender )
 EMOTE( wait )
+EMOTE( won )
+
+static void Cmd_Emote_Knockdown(gentity_t *ent){
+	G_Knockdown(ent);
+}
+
+extern void MakeDeadSaber(gentity_t *ent);
+static void Cmd_Emote_Dropsaber(gentity_t *ent){
+	gentity_t *saber = &g_entities[ent->client->ps.saberEntityNum];
+	if (saber){
+		MakeDeadSaber(saber);
+	}
+}
 
 static void Cmd_Emote_hug( gentity_t *ent ) {
 	static const emote_t emoteHugger = { "hugger", BOTH_HUGGER1, BOTH_HUGGERSTOP1, EMF_HOLSTER },
@@ -3706,7 +3740,7 @@ static void Cmd_Emote_hug( gentity_t *ent ) {
 
 static void Cmd_Emote_kiss( gentity_t *ent ) {
 	static const emote_t emoteKisser = { "kisser", BOTH_KISSER, BOTH_KISSER1STOP, EMF_STATIC | EMF_HOLSTER },
-		emoteKissee = { "kissee", BOTH_KISSEE, MAX_ANIMATIONS, EMF_HOLSTER };
+		emoteKissee = { "kissee", BOTH_KISSEE, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLSTER };
 	trace_t *tr = G_RealTrace( ent, 40.0f );
 	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *other = g_entities + tr->entityNum;
@@ -3767,14 +3801,21 @@ static int cmdcmp( const void *a, const void *b ) {
 
 static const command_t commands[] = {
 	{ "amaimgun", Cmd_Emote_aimgun, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amhiltthrow1", Cmd_Emote_amhiltthrow1, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amhiltthrow2", Cmd_Emote_amhiltthrow2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amatease", Cmd_Emote_atease, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "ambeg", Cmd_Emote_beg, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "ambreakdance", Cmd_Emote_breakdance, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "ambreakdance2", Cmd_Emote_breakdance2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amcower", Cmd_Emote_cower, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdance1", Cmd_Emote_dance1, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdance2", Cmd_Emote_dance2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdance3", Cmd_Emote_dance3, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amdie", Cmd_Emote_die1, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amdie2", Cmd_Emote_die2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amdropsaber", Cmd_Emote_Dropsaber, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amfabulous", Cmd_Emote_fabulous, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amfinishinghim", Cmd_Emote_finishinghim, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amharlem", Cmd_Emote_harlem, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amheal", Cmd_Emote_heal, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amhello", Cmd_Emote_hello, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
@@ -3784,8 +3825,11 @@ static const command_t commands[] = {
 	{ "amkiss", Cmd_Emote_kiss, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amkneel", Cmd_Emote_kneel, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amkneel2", Cmd_Emote_kneel2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amknockmedown", Cmd_Emote_Knockdown, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amneo", Cmd_Emote_neo, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amnod", Cmd_Emote_nod, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amnoisy", Cmd_Emote_noisy, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "ampower", Cmd_Emote_power, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amradio", Cmd_Emote_radio, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsay", Cmd_SayAdmin_f, GTB_ALL, 0 },
 	{ "amshake", Cmd_Emote_shake, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
@@ -3795,13 +3839,16 @@ static const command_t commands[] = {
 	{ "amsit3", Cmd_Emote_sit3, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsit4", Cmd_Emote_sit4, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsit6", Cmd_Emote_sit6, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amsleep", Cmd_Emote_sleep, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsmack1", Cmd_Emote_smack1, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsmack2", Cmd_Emote_smack2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amstand", Cmd_Emote_stand, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amstepback", Cmd_Emote_stepback, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsuggest", Cmd_Emote_suggest, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amvictory", Cmd_Emote_victory, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsurrender", Cmd_Emote_surrender, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amwait", Cmd_Emote_wait, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amwon", Cmd_Emote_won, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "callvote", Cmd_CallVote_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "debugBMove_Back", Cmd_BotMoveBack_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
 	{ "debugBMove_Forward", Cmd_BotMoveForward_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
