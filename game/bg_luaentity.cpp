@@ -114,7 +114,7 @@ int JPLua_Entity_Create( lua_State *L ) {
 	lua_pushnil(L);
 	const char *value, *key;
 	for (int i = 0; lua_next(L, 1); i++){
-		if (lua_type(L, -2) != LUA_TSTRING) continue; // key can be only string 
+		if (lua_type(L, -2) != LUA_TSTRING) continue; // key can be only string
 		switch (lua_type(L, -1)){
 		case LUA_TNONE:
 		case LUA_TNIL:
@@ -668,7 +668,7 @@ static int JPLua_Entity_GetLight(lua_State *L, jpluaEntity_t *ent){
 	g = (light >> 8) & 255;
 	b = (light >> 16) & 255;
 	i = ((light >> 24) & 255) * 4;
-	
+
 	lua_newtable(L);
 	int top = lua_gettop(L);
 

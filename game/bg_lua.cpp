@@ -29,7 +29,7 @@ static const char *pluginDir = "lua/cl/";
 #define JPLUA_EXTENSION ".lua"
 
 jplua_t JPLua;
-extern std::unordered_map<weapon_t, lua_weapon> weapon_func_list;
+extern std::unordered_map<int, lua_weapon> weapon_func_list;
 
 #ifdef PROJECT_GAME
 std::unordered_map<std::string, int> jplua_client_commands;

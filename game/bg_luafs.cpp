@@ -97,7 +97,6 @@ int JPLua_File_GetFileList( lua_State *L ) {
 
 	for ( i = 0; i < num; i++ ) {
 		qboolean skip = qfalse;
-		char *s;
 		if ( folderName[0] == '.' ){
 			skip = qtrue;
 		}

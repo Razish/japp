@@ -65,7 +65,7 @@ void JPLua_Interface_CallMenuFunc(int type, menuDef_t *menu){
 	lua_State *L = JPLua.state;
 
 	switch (type){
-		
+
 	case 1:             ///onOpen
 		if (menu->lua_onOpen != 0){
 			lua_rawgeti(L, LUA_REGISTRYINDEX, menu->lua_onOpen);
@@ -86,7 +86,7 @@ void JPLua_Interface_CallMenuFunc(int type, menuDef_t *menu){
 			JPLua_Call(L, 0, 0);
 			break;
 		}
-		
+
 	case 4:             ///onEsc
 		if (menu->lua_onESC != 0){
 			lua_rawgeti(L, LUA_REGISTRYINDEX, menu->lua_onESC);
@@ -102,6 +102,7 @@ void JPLua_Interface_CallMenuFunc(int type, menuDef_t *menu){
 
 }
 
+#if 0
 static int JPLua_Menu_SetOpenFunc(lua_State *L){
 	menuDef_t *menu = JPLua_CheckMenu(L, 1);
 
@@ -114,7 +115,9 @@ static int JPLua_Menu_SetOpenFunc(lua_State *L){
 
 	return 0;
 }
+#endif
 
+#if 0
 static int JPLua_Menu_SetCloseFunc(lua_State *L){
     menuDef_t *menu = JPLua_CheckMenu(L, 1);
 
@@ -126,7 +129,9 @@ static int JPLua_Menu_SetCloseFunc(lua_State *L){
 	}
 	return 0;
 }
+#endif
 
+#if 0
 static int JPLua_Menu_SetAcceptFunc(lua_State *L){
 	menuDef_t *menu = JPLua_CheckMenu(L, 1);
 
@@ -138,7 +143,9 @@ static int JPLua_Menu_SetAcceptFunc(lua_State *L){
 	}
 	return 0;
 }
+#endif
 
+#if 0
 static int JPLua_Menu_SetEscFunc(lua_State *L){
 	menuDef_t *menu = JPLua_CheckMenu(L, 1);
 
@@ -150,8 +157,7 @@ static int JPLua_Menu_SetEscFunc(lua_State *L){
 	}
 	return 0;
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#endif
 
 menuDef_t *Menus_GetByID(int id){
 	int i;
@@ -161,7 +167,7 @@ menuDef_t *Menus_GetByID(int id){
 		}
 	}
 	return NULL;
-	
+
 }
 
 int JPLua_Interface_CreateMenu(lua_State *L){
@@ -201,8 +207,6 @@ int JPLua_Interface_GetMenu(lua_State *L){
 		return 1;
 	}
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static int JPLua_Menu_Equals(lua_State *L) {
 	menuDef_t *m1 = JPLua_CheckMenu(L, 1), *m2 = JPLua_CheckMenu(L, 2);
@@ -380,10 +384,11 @@ static int JPLua_Menu_OutlineColor(lua_State *L){
 	return 0;
 }
 
+#if 0
 static int JPLua_Menu_OutOfBoundClick(lua_State *L){
 	menuDef_t *menu = JPLua_CheckMenu(L, 1);
 	qboolean value = lua_toboolean(L, 2);
-	
+
 	if (value){
 		menu->window.flags |= WINDOW_OOB_CLICK;
 	}
@@ -392,6 +397,7 @@ static int JPLua_Menu_OutOfBoundClick(lua_State *L){
 	}
 	return 0;
 }
+#endif
 
 static int JPLua_Menu_OwnerDraw(lua_State *L){
 	menuDef_t *menu = JPLua_CheckMenu(L, 1);
@@ -402,7 +408,7 @@ static int JPLua_Menu_OwnerDraw(lua_State *L){
 
 static int JPLua_Menu_OwnerDrawFlag(lua_State *L){
 	menuDef_t *menu = JPLua_CheckMenu(L, 1);
-   
+
 	uint32_t bit = luaL_checkinteger(L, 2);
 	int i, found = 0;
 
@@ -529,24 +535,22 @@ static const struct luaL_Reg jplua_menu_meta[] = {
 
 };
 
-void JPLua_Register_Menu(lua_State *L) {
-	const luaL_Reg *r;
+void JPLua_Register_Menu( lua_State *L ) {
+	luaL_newmetatable( L, MENU_META );
 
-	luaL_newmetatable(L, MENU_META);
+	lua_pushstring( L, "__index" );
+	lua_pushvalue( L, -2 );
+	lua_settable( L, -3 );
 
-	lua_pushstring(L, "__index");
-	lua_pushvalue(L, -2);
-	lua_settable(L, -3); 
-
-	for (r = jplua_menu_meta; r->name; r++) {
-		lua_pushcfunction(L, r->func);
-		lua_setfield(L, -2, r->name);
+	for ( const luaL_Reg *r = jplua_menu_meta; r->name; r++ ) {
+		lua_pushcfunction( L, r->func );
+		lua_setfield( L, -2, r->name );
 	}
 
-	luaL_newlib(L, jplua_interface);
-	lua_setglobal(L, "ui");
+	luaL_newlib( L, jplua_interface );
+	lua_setglobal( L, "ui" );
 
-	lua_pop(L, -1);
+	lua_pop( L, -1 );
 }
 
 #endif

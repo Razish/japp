@@ -3364,8 +3364,7 @@ saberInfo_t *BG_MySaber( int clientNum, int saberNum ) {
 #ifdef PROJECT_GAME
 	gentity_t *ent = &g_entities[clientNum];
 	if ( ent->inuse && ent->client ) {
-		if ( !ent->client->saber[saberNum].model
-			|| !ent->client->saber[saberNum].model[0] ) { //don't have saber anymore!
+		if ( !ent->client->saber[saberNum].model[0] ) { //don't have saber anymore!
 			return NULL;
 		}
 		return &ent->client->saber[saberNum];
@@ -3383,8 +3382,7 @@ saberInfo_t *BG_MySaber( int clientNum, int saberNum ) {
 	}
 	if ( ci
 		&& ci->infoValid ) {
-		if ( !ci->saber[saberNum].model
-			|| !ci->saber[saberNum].model[0] ) { //don't have sabers anymore!
+		if ( !ci->saber[saberNum].model[0] ) { //don't have sabers anymore!
 			return NULL;
 		}
 		return &ci->saber[saberNum];

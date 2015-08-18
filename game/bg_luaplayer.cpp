@@ -70,6 +70,8 @@ static int JPLua_Player_GetAdminPrivs( lua_State *L, jpluaEntity_t *ent ) {
 	return 1;
 }
 #endif
+
+#if 0
 static const stringID_table_t ammo_strings[AMMO_MAX] = {
 	ENUM2STRING(AMMO_NONE),
 	ENUM2STRING(AMMO_FORCE),
@@ -82,7 +84,7 @@ static const stringID_table_t ammo_strings[AMMO_MAX] = {
 	ENUM2STRING(AMMO_TRIPMINE),
 	ENUM2STRING(AMMO_DETPACK),
 };
-
+#endif
 
 static int JPLua_Player_GetAmmo( lua_State *L, jpluaEntity_t *ent ) {
 #if defined(PROJECT_GAME)

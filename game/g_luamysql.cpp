@@ -214,10 +214,12 @@ static int JPLua_MySQLResult_gc(lua_State* L)
 	return 0;
 }
 
+#if 0
 static const struct luaL_Reg mysqlclient_f[] = {
 	{ "connect", JPLua_MySQL_Open },
 	{ NULL, NULL },
 };
+#endif
 
 static const struct luaL_Reg mysqlclient_m[] = {
 	{ "__gc", JPLua_MySQL_gc },

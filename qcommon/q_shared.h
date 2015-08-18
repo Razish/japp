@@ -183,30 +183,6 @@ float LittleFloat( const float l );
 #define	PATH_SEP "/"
 #define DLL_EXT ".dylib"
 
-#define __rlwimi(out, in, shift, maskBegin, maskEnd) asm("rlwimi %0,%1,%2,%3,%4" : "=r" (out) : "r" (in), "i" (shift), "i" (maskBegin), "i" (maskEnd))
-#define __dcbt(addr, offset) asm("dcbt %0,%1" : : "b" (addr), "r" (offset))
-
-static inline unsigned int __lwbrx(void *addr, int offset) {
-	unsigned int word;
-
-	asm("lwbrx %0,%2,%1" : "=r" (word) : "r" (addr), "b" (offset));
-	return word;
-}
-
-static inline unsigned short __lhbrx(void *addr, int offset) {
-	unsigned short halfword;
-
-	asm("lhbrx %0,%2,%1" : "=r" (halfword) : "r" (addr), "b" (offset));
-	return halfword;
-}
-
-static inline float __fctiw(float f) {
-	float fi;
-
-	asm("fctiw %0,%1" : "=f" (fi) : "f" (f));
-	return fi;
-}
-
 #endif // MACOS_X
 
 

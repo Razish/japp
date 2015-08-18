@@ -166,7 +166,7 @@ static void AM_DrawString(int type, gentity_t *ent, const char *arg, char *arg2)
 		if (string.length() != 0){
 			anon.replace(anon.find_first_of("$1"), 2, ent->client->pers.netname);
 			if (announce == ADMIN_STRING_GIVE_ANNOUNCE){
-				anon.replace(anon.find_first_of("$2"), 2, arg); // e.g (player) got weapon(force, ammo) 
+				anon.replace(anon.find_first_of("$2"), 2, arg); // e.g (player) got weapon(force, ammo)
 			}
 			else if (announce == ADMIN_STRING_RENAME){
 				anon.replace(anon.find_first_of("$2"), 2, arg2);
@@ -190,7 +190,7 @@ void AM_LoadStrings(void){
 	fileHandle_t f;
 	char *buf = NULL;
 	unsigned int len = 0;
-	
+
 
 	//setup defaults
 	string_list[ADMIN_STRING_BAN].append("You have been banned");
@@ -1998,7 +1998,7 @@ static void AM_GunSleep( gentity_t *ent ) {
 
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *e = g_entities + tr->entityNum;
-		const char *action = e->client->pers.adminData.isSlept ? "woken" : "slept";
+		//const char *action = e->client->pers.adminData.isSlept ? "woken" : "slept";
 
 		if ( !AM_CanInflict( ent, e ) ) {
 			return;

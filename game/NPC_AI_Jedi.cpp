@@ -1647,23 +1647,19 @@ evasionType_t Jedi_CheckFlipEvasions( gentity_t *self, float rightdot, float zdi
 		qboolean allowWallFlips = qtrue;
 
 		if ( self->client->ps.weapon == WP_SABER ) {
-			if ( self->client->saber[0].model
-				&& self->client->saber[0].model[0]
+			if ( self->client->saber[0].model[0]
 				&& (self->client->saber[0].saberFlags&SFL_NO_CARTWHEELS) ) {
 				allowCartWheels = qfalse;
 			}
-			else if ( self->client->saber[1].model
-				&& self->client->saber[1].model[0]
+			else if ( self->client->saber[1].model[0]
 				&& (self->client->saber[1].saberFlags&SFL_NO_CARTWHEELS) ) {
 				allowCartWheels = qfalse;
 			}
-			if ( self->client->saber[0].model
-				&& self->client->saber[0].model[0]
+			if ( self->client->saber[0].model[0]
 				&& (self->client->saber[0].saberFlags&SFL_NO_WALL_FLIPS) ) {
 				allowWallFlips = qfalse;
 			}
-			else if ( self->client->saber[1].model
-				&& self->client->saber[1].model[0]
+			else if ( self->client->saber[1].model[0]
 				&& (self->client->saber[1].saberFlags&SFL_NO_WALL_FLIPS) ) {
 				allowWallFlips = qfalse;
 			}
@@ -1803,13 +1799,11 @@ evasionType_t Jedi_CheckFlipEvasions( gentity_t *self, float rightdot, float zdi
 				if ( (int)bestCheckDist ) {//one of the walls was close enough to wall-run on
 					qboolean allowWallRuns = qtrue;
 					if ( self->client->ps.weapon == WP_SABER ) {
-						if ( self->client->saber[0].model
-							&& self->client->saber[0].model[0]
+						if ( self->client->saber[0].model[0]
 							&& (self->client->saber[0].saberFlags&SFL_NO_WALL_RUNS) ) {
 							allowWallRuns = qfalse;
 						}
-						else if ( self->client->saber[1].model
-							&& self->client->saber[1].model[0]
+						else if ( self->client->saber[1].model[0]
 							&& (self->client->saber[1].saberFlags&SFL_NO_WALL_RUNS) ) {
 							allowWallRuns = qfalse;
 						}

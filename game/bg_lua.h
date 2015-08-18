@@ -6,6 +6,8 @@ extern "C" {
 	#include "../lua/lauxlib.h"
 }
 
+#include <unordered_map>
+
 #include "bg_luacvar.h"
 #include "bg_luaevent.h"
 #include "bg_luaplayer.h"
@@ -20,7 +22,7 @@ extern "C" {
 #include "g_luasql.h"
 #include "g_luaweapon.h"
 #endif
-#include <unordered_map>
+
 void JPLua_Init(void);
 void JPLua_Shutdown(qboolean restart);
 

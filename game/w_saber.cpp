@@ -1343,14 +1343,12 @@ qboolean WP_SabersCheckLock( gentity_t *ent1, gentity_t *ent2 ) {
 		|| (ent2->client->saber[0].saberFlags&SFL_NOT_LOCKABLE) ) {
 		return qfalse;
 	}
-	if ( ent1->client->saber[1].model
-		&& ent1->client->saber[1].model[0]
+	if ( ent1->client->saber[1].model[0]
 		&& !ent1->client->ps.saberHolstered
 		&& (ent1->client->saber[1].saberFlags&SFL_NOT_LOCKABLE) ) {
 		return qfalse;
 	}
-	if ( ent2->client->saber[1].model
-		&& ent2->client->saber[1].model[0]
+	if ( ent2->client->saber[1].model[0]
 		&& !ent2->client->ps.saberHolstered
 		&& (ent2->client->saber[1].saberFlags&SFL_NOT_LOCKABLE) ) {
 		return qfalse;
@@ -2330,7 +2328,7 @@ static qboolean G_SaberCollide( gentity_t *atk, gentity_t *def, vector3 *atkStar
 	i = 0;
 	while ( i < MAX_SABERS ) {
 		j = 0;
-		if ( def->client->saber[i].model && def->client->saber[i].model[0] ) { //valid saber on the defender
+		if ( def->client->saber[i].model[0] ) { //valid saber on the defender
 			bladeInfo_t *blade;
 			vector3 v, fwd, right, base, tip;
 			int fNum;
@@ -4241,8 +4239,7 @@ blockStuff:
 					defendStr++;
 				}
 				defendStr += Q_irand( 0, otherOwner->client->saber[0].parryBonus );
-				if ( otherOwner->client->saber[1].model
-					&& otherOwner->client->saber[1].model[0]
+				if ( otherOwner->client->saber[1].model[0]
 					&& !otherOwner->client->ps.saberHolstered ) {
 					defendStr += Q_irand( 0, otherOwner->client->saber[1].parryBonus );
 				}
@@ -4254,8 +4251,7 @@ blockStuff:
 #endif
 
 				attackBonus = Q_irand( 0, self->client->saber[0].breakParryBonus );
-				if ( self->client->saber[1].model
-					&& self->client->saber[1].model[0]
+				if ( self->client->saber[1].model[0]
 					&& !self->client->ps.saberHolstered ) {
 					attackBonus += Q_irand( 0, self->client->saber[1].breakParryBonus );
 				}
@@ -5765,8 +5761,7 @@ qboolean saberCheckKnockdown_DuelLoss( gentity_t *saberent, gentity_t *saberOwne
 
 	if ( other && other->client ) {
 		disarmChance += other->client->saber[0].disarmBonus;
-		if ( other->client->saber[1].model
-			&& other->client->saber[1].model[0]
+		if ( other->client->saber[1].model[0]
 			&& !other->client->ps.saberHolstered ) {
 			disarmChance += other->client->saber[1].disarmBonus;
 		}
@@ -5836,8 +5831,7 @@ qboolean saberCheckKnockdown_BrokenParry( gentity_t *saberent, gentity_t *saberO
 
 		if ( other && other->client ) {
 			disarmChance += other->client->saber[0].disarmBonus;
-			if ( other->client->saber[1].model
-				&& other->client->saber[1].model[0]
+			if ( other->client->saber[1].model[0]
 				&& !other->client->ps.saberHolstered ) {
 				disarmChance += other->client->saber[1].disarmBonus;
 			}

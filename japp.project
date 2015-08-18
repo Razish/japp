@@ -254,6 +254,8 @@
     <File Name="game/g_luamysql.cpp"/>
     <File Name="game/g_luasql.h"/>
     <File Name="game/g_luasqlite.cpp"/>
+    <File Name="game/g_luaweapon.cpp"/>
+    <File Name="game/g_luaweapon.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="json">
     <File Name="json/cJSON.c"/>
@@ -493,7 +495,7 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no">
+      <Completion EnableCpp11="no" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
@@ -531,7 +533,7 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no">
+      <Completion EnableCpp11="no" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
@@ -569,7 +571,7 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no">
+      <Completion EnableCpp11="no" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
@@ -607,7 +609,7 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no">
+      <Completion EnableCpp11="no" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>

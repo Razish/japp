@@ -580,7 +580,7 @@ void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 
 	dir = ci->modelName;
 
-	if ( !ci->skinName || !Q_stricmp( "default", ci->skinName ) ) {
+	if ( !ci->skinName[0] || !Q_stricmp( "default", ci->skinName ) ) {
 		fLen = trap->FS_Open( va( "models/players/%s/sounds.cfg", dir ), &f, FS_READ );
 		if ( !f )
 			fLen = trap->FS_Open( va( "models/players/%s/sounds_default.cfg", dir ), &f, FS_READ );
@@ -8198,7 +8198,7 @@ stillDoSaber:
 				}
 				else
 					BG_SI_SetDesiredLength( &ci->saber[0], -1, -1 );
-				if ( ci->saber[1].model && cent->currentState.saberHolstered == 1 )
+				if ( ci->saber[1].model[0] && cent->currentState.saberHolstered == 1 )
 					BG_SI_SetDesiredLength( &ci->saber[1], 0, -1 );
 				else
 					BG_SI_SetDesiredLength( &ci->saber[1], -1, -1 );
@@ -8256,7 +8256,7 @@ stillDoSaber:
 			}
 			else
 				BG_SI_SetDesiredLength( &ci->saber[0], -1, -1 );
-			if ( ci->saber[1].model && cent->currentState.saberHolstered == 1 )
+			if ( ci->saber[1].model[0] && cent->currentState.saberHolstered == 1 )
 				BG_SI_SetDesiredLength( &ci->saber[1], 0, -1 );
 			else
 				BG_SI_SetDesiredLength( &ci->saber[1], -1, -1 );

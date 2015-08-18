@@ -1193,15 +1193,11 @@ qboolean BG_SiegeCheckClassLegality( int team, char *classname ) {
 }
 
 siegeTeam_t *BG_SiegeFindTeamForTheme( char *themeName ) {
-	int i = 0;
-
-	while ( i < bgNumSiegeTeams ) {
-		if ( bgSiegeTeams[i].name &&
+	for ( int i = 0; i < bgNumSiegeTeams; i++ ) {
+		if ( bgSiegeTeams[i].name[0] &&
 			!Q_stricmp( bgSiegeTeams[i].name, themeName ) ) { //this is what we're looking for
 			return &bgSiegeTeams[i];
 		}
-
-		i++;
 	}
 
 	return NULL;

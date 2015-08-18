@@ -543,14 +543,14 @@ qboolean WP_ForcePowerUsable( gentity_t *self, forcePowers_t forcePower ) {
 		}
 
 		if ( (self->client->saber[0].saberFlags&SFL_TWO_HANDED)
-			|| (self->client->saber[0].model && self->client->saber[0].model[0]) ) {//this saber requires the use of two hands OR our other hand is using an active saber too
+			|| self->client->saber[0].model[0] ) {//this saber requires the use of two hands OR our other hand is using an active saber too
 			if ( (self->client->saber[0].forceRestrictions&(1 << forcePower)) ) {//this power is verboten when using this saber
 				return qfalse;
 			}
 		}
 
-		if ( self->client->saber[0].model
-			&& self->client->saber[0].model[0] ) {//both sabers on
+		//RAZFIXME: should this be saber[1]? looks like bad copypasta
+		if ( self->client->saber[0].model[0] ) {//both sabers on
 			if ( g_saberRestrictForce.integer ) {
 				switch ( forcePower ) {
 				case FP_PUSH:
