@@ -943,6 +943,7 @@ static int JPLua_Entity_PlaySound( lua_State *L ) {
 	return 0;
 }
 #endif
+
 static int JPLua_Entity_GetBoneVector(lua_State *L){
 	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
 	const char *bone = luaL_checkstring(L, 2);
@@ -969,11 +970,11 @@ static int JPLua_Entity_GetBoneVector(lua_State *L){
 	}
 	return 0;
 }
+
 #ifdef PROJECT_GAME
 static int JPLua_Entity_Scale(lua_State *L){
 	jpluaEntity_t *ent = JPLua_CheckEntity(L, 1);
 	int value = luaL_checkinteger(L, 2);
-	vector3 newmins, newmaxs;
 	if (!ent) return 0;
 
 	ent->s.iModelScale = Q_clampi(0, value, 1023);
@@ -1010,7 +1011,7 @@ static int JPLua_Entity_GetVar(lua_State *L){
 	byte *ent = (byte *)JPLua_CheckEntity(L, 1);
 	const char *key = luaL_checkstring(L,2);
 
-	const BG_field_t *f = f = (BG_field_t *)bsearch( key, fields, ARRAY_LEN(fields), sizeof(BG_field_t), spawncmp );
+	const BG_field_t *f = (BG_field_t *)bsearch( key, fields, ARRAY_LEN(fields), sizeof(BG_field_t), spawncmp );
 
 	if ( f ) {
 		switch ( f->type ) {
@@ -1064,7 +1065,7 @@ static const struct luaL_Reg jplua_entity_meta[] = {
 	{ "__newindex", JPLua_Entity_NewIndex },
 	{ "__eq", JPLua_Entity_Equals },
 	{ "__tostring", JPLua_Entity_ToString },
-#ifdef PROJECT_GAME
+#if defined(PROJECT_GAME)
 	{ "SetThinkFunction", JPLua_Entity_SetThinkFunction },
 	{ "SetReachedFunction", JPLua_Entity_SetReachedFunction },
 	{ "SetBlockedFunction", JPLua_Entity_SetBlockedFunction },
@@ -1075,7 +1076,9 @@ static const struct luaL_Reg jplua_entity_meta[] = {
 	{ "Free", JPLua_Entity_Free },
 	{ "Use", JPLua_Entity_Use },
 	{ "PlaySound", JPLua_Entity_PlaySound },
+#endif
 	{ "GetBoneVector", JPLua_Entity_GetBoneVector },
+#if defined(PROJECT_GAME)
 	{ "Scale", JPLua_Entity_Scale },
 	{ "SetVar", JPLua_Entity_SetVar },
 	{ "GetVar", JPLua_Entity_GetVar },

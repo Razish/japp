@@ -748,8 +748,9 @@ static void JPLua_Player_SetSlept( lua_State *L, jpluaEntity_t *ent ) {
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetLegsAnim( lua_State *L, jpluaEntity_t *ent ) {
 	int value = luaL_checkinteger(L, 3);
-	if (FACE_TALK0 < value < MAX_ANIMATIONS)
+	if ( value >= FACE_TALK0 && value < MAX_ANIMATIONS ) {
 		ent->client->ps.legsAnim = value;
+	}
 }
 #endif
 
@@ -798,8 +799,9 @@ static void JPLua_Player_SetPosition( lua_State *L, jpluaEntity_t *ent ) {
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetSaberStyle( lua_State *L, jpluaEntity_t *ent ) {
 	int value = luaL_checkinteger(L, 3);
-	if (SS_NONE < value < SS_NUM_SABER_STYLES)
+	if ( value > SS_NONE && value < SS_NUM_SABER_STYLES ) {
 		ent->client->ps.fd.saberDrawAnimLevel = value;
+	}
 }
 #endif
 
@@ -818,8 +820,9 @@ static void JPLua_Player_SetTeam( lua_State *L, jpluaEntity_t *ent ) {
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetTorsoAnim( lua_State *L, jpluaEntity_t *ent ) {
 	int value = luaL_checkinteger(L, 3);
-	if (FACE_TALK0 < value < MAX_ANIMATIONS)
+	if ( value >= FACE_TALK0 && value < MAX_ANIMATIONS ) {
 		ent->client->ps.torsoAnim = value;
+	}
 }
 #endif
 
@@ -832,8 +835,9 @@ static void JPLua_Player_SetVelocity( lua_State *L, jpluaEntity_t *ent ) {
 #if defined(PROJECT_GAME)
 static void JPLua_Player_SetWeapon( lua_State *L, jpluaEntity_t *ent ) {
 	int value = luaL_checkinteger(L, 3);
-	if (WP_NONE < value < WP_NUM_WEAPONS)
+	if ( value > WP_NONE && value < WP_NUM_WEAPONS ) {
 		ent->client->ps.weapon = value;
+	}
 }
 #endif
 

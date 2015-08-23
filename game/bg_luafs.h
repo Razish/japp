@@ -5,7 +5,7 @@ typedef struct jplua_file_s {
 	char name[MAX_QPATH];
 	fileHandle_t handle;
 	fsMode_t mode;
-	size_t length;
+	int length;
 } jplua_file_t;
 
 void JPLua_File_CreateRef( lua_State *L, const char *path, fsMode_t mode );
