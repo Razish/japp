@@ -286,15 +286,7 @@ typedef int32_t qhandle_t, fxHandle_t, sfxHandle_t, fileHandle_t, clipHandle_t;
 #define NULL_FILE ((fileHandle_t)0)
 
 //FIXME: can't think of a better place to put this atm, should probably be in the platform specific definitions
-#if defined (_MSC_VER) && (_MSC_VER < 1600)
-
-#include <io.h>
-
-#else // _MSC_VER
-
-#define Q_vsnprintf vsnprintf
-
-#endif
+int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
 
 #ifndef NULL
 #define NULL ((void *)0)

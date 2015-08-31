@@ -316,9 +316,9 @@ static int JPLua_RegisterPlugin( lua_State *L ) {
 	lua_pushstring( L, "UID" );
 		lua_pushstring( L, va( "0x%" PRIxPTR, (void *)JPLua.currentPlugin->UID ) );
 		lua_settable( L, top );
-	lua_pushstring(L, "dirname");
-		lua_pushstring(L, JPLua.currentPlugin->name);
-		lua_settable(L, top);
+	lua_pushstring( L, "dirname" );
+		lua_pushstring( L, JPLua.currentPlugin->name );
+		lua_settable( L, top );
 
 	//save in the registry, but push on stack again straight away
 	JPLua.currentPlugin->handle = luaL_ref( L, LUA_REGISTRYINDEX );
@@ -481,16 +481,32 @@ static void JPLua_PostInit( lua_State *L ) {
 
 #ifdef PROJECT_GAME
 static int JPLua_Export_AddClientCommand( lua_State *L ) {
-	const char *name = luaL_checkstring(L, 1);
+	const char *name = luaL_checkstring( L, 1 );
 	int &handle = jplua_client_commands[name];
-	if (lua_type(L, 1) != LUA_TSTRING || lua_type(L, 2) != LUA_TFUNCTION){
-		trap->Print("JPLua: AddClientCommand failed, function signature invalid registering %s - Is it up to date?\n", name);
+
+	if ( handle ) {
+		// already exists
+		trap->Print( "JPlua: AddClientCommand(%s) failed, command already exists. Remove command first\n", name );
 		return 0;
 	}
-	if (handle){
-		trap->Print("JPlua: AddClientCommand failed, command already exist\n");
+
+	const int top = lua_gettop( L );
+	int typeArg2 = lua_type( L, 2 );
+
+	if ( top == 2 ) {
+		if ( typeArg2 == LUA_TFUNCTION ) {
+			handle = luaL_ref( L, LUA_REGISTRYINDEX );
+		}
+		else {
+			trap->Print( "JPLua: AddClientCommand(%s) failed, function signature invalid. Is it up to date?\n", name );
+			return 0;
+		}
 	}
-	handle = luaL_ref(L, LUA_REGISTRYINDEX);
+	else {
+		trap->Print( "JPLua: AddClientCommand(%s) failed, too many arguments\n", name );
+		return 0;
+	}
+
 	return 0;
 }
 
@@ -498,31 +514,54 @@ static int JPLua_Export_AddClientCommand( lua_State *L ) {
 
 #ifdef PROJECT_CGAME
 static int JPLua_Export_AddConsoleCommand( lua_State *L ) {
-	const char *name = luaL_checkstring(L, 1);
+	const char *name = luaL_checkstring( L, 1 );
 	int &handle = jplua_console_commands[name];
-	if (lua_type(L, 1) != LUA_TSTRING || lua_type(L, 2) != LUA_TFUNCTION){
-		trap->Print("JPLua: AddConsoleCommand failed, function signature invalid registering %s - Is it up to date?\n", name);
+	if ( handle ) {
+		// already exists
+		trap->Print( "JPlua: AddConsoleCommand(%s) failed, command already exists. Remove command first\n", name );
 		return 0;
 	}
-	if (handle){
-		trap->Print("JPlua: AddConsoleCommand failed, command already exist\n");
+
+	const int top = lua_gettop( L );
+	int typeArg2 = lua_type( L, 2 );
+	if ( top == 1 || (top == 2 && typeArg2 == LUA_TNIL) ) {
+		// add to autocomplete list
+		trap->AddCommand( name );
 	}
-	handle = luaL_ref(L, LUA_REGISTRYINDEX);
+	else if ( top == 2 ) {
+		if ( typeArg2 == LUA_TFUNCTION ) {
+			trap->AddCommand( name );
+			handle = luaL_ref( L, LUA_REGISTRYINDEX );
+		}
+		else {
+			trap->Print( "JPLua: AddConsoleCommand(%s) failed, function signature invalid. Is it up to date?\n", name );
+			return 0;
+		}
+	}
+	else {
+		trap->Print( "JPLua: AddConsoleCommand(%s) failed, too many arguments\n", name );
+		return 0;
+	}
+
 	return 0;
 }
 #endif
 
-static int JPLua_Export_AddServerCommand(lua_State *L){
-	const char *name = luaL_checkstring(L, 1);
+static int JPLua_Export_AddServerCommand( lua_State *L ) {
+	const char *name = luaL_checkstring( L, 1 );
 	int &handle = jplua_server_commands[name];
-	if (lua_type(L, 1) != LUA_TSTRING || lua_type(L, 2) != LUA_TFUNCTION){
-		trap->Print("JPLua: AddServerCommand failed, function signature invalid registering %s - Is it up to date?\n", name);
+	if ( handle ) {
+		// already exists
+		trap->Print( "JPlua: AddServerCommand(%s) failed, command already exists. Remove command first\n", name );
+	}
+
+	if ( lua_type( L, 2 ) != LUA_TFUNCTION ) {
+		trap->Print( "JPLua: AddServerCommand(%s) failed, function signature invalid. Is it up to date?\n", name );
 		return 0;
 	}
-	if (handle){
-		trap->Print("JPlua: AddServerCommand failed, command already exist\n");
-	}
-	handle = luaL_ref(L, LUA_REGISTRYINDEX);
+
+	handle = luaL_ref( L, LUA_REGISTRYINDEX );
+
 	return 0;
 }
 
@@ -1257,18 +1296,18 @@ void JPLua_Init( void ) {
 	JPLua_PostInit( JPLua.state );
 #endif
 }
-void JPLua_Shutdown( qboolean restart) {
+void JPLua_Shutdown( qboolean restart ) {
 #ifdef JPLUA
 	if ( JPLua.state ) {
 		jplua_plugin_t *nextPlugin = JPLua.plugins;
 
-		JPLua_Event_Shutdown(restart);
+		JPLua_Event_Shutdown( restart );
 
 		JPLua.currentPlugin = JPLua.plugins;
 		while ( nextPlugin ) {
-			for (int i = JPLUA_EVENT_UNLOAD; i < JPLUA_EVENT_MAX; i++){
-				if (JPLua.currentPlugin->eventListeners[i]) {
-					luaL_unref(JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[i]);
+			for ( int i = JPLUA_EVENT_UNLOAD; i < JPLUA_EVENT_MAX; i++ ) {
+				if ( JPLua.currentPlugin->eventListeners[i] ) {
+					luaL_unref( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->eventListeners[i] );
 				}
 			}
 			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, JPLua.currentPlugin->handle );
@@ -1279,22 +1318,21 @@ void JPLua_Shutdown( qboolean restart) {
 		}
 
 #ifdef PROJECT_GAME
-		for (auto& row : jplua_client_commands){
-			luaL_unref(JPLua.state, LUA_REGISTRYINDEX, row.second);
+		for ( auto &row : jplua_client_commands ) {
+			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, row.second );
 		}
 		jplua_client_commands.clear();
 		weapon_func_list.clear();
 #elif defined PROJECT_CGAME
-		for (auto& row : jplua_console_commands){
-			luaL_unref(JPLua.state, LUA_REGISTRYINDEX, row.second);
+		for ( auto& row : jplua_console_commands ) {
+			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, row.second );
 		}
 		jplua_console_commands.clear();
 #endif
-		for (auto& row : jplua_server_commands){
-			luaL_unref(JPLua.state, LUA_REGISTRYINDEX, row.second);
+		for ( auto &row : jplua_server_commands ) {
+			luaL_unref( JPLua.state, LUA_REGISTRYINDEX, row.second );
 		}
 		jplua_server_commands.clear();
-
 
 		JPLua.plugins = JPLua.currentPlugin = NULL;
 

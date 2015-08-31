@@ -84,184 +84,272 @@ static void PB_Callback( const char *buffer, int clientNum ) {
 	}
 }
 
-static void AM_ParseString(const char *data){
+static void AM_ParseString( const char *data ) {
 	cJSON *root, *temp;
 
-	root = cJSON_Parse(data);
-	if (!root) {
-		Com_Printf("ERROR: Could not parse strings\n");
+	root = cJSON_Parse( data );
+	if ( !root ) {
+		trap->Print( "ERROR: Could not parse strings\n" );
 		return;
 	}
-	for (int i = 0; i < ADMIN_STRING_MAX; i++){
-		temp = cJSON_GetObjectItem(root, admin_strings[i].name);
+	for ( int i = 0; i < ADMIN_STRING_MAX; i++ ) {
+		temp = cJSON_GetObjectItem( root, admin_strings[i].name );
 		string_list[i].clear();
-		string_list[i].append(cJSON_ToString(temp));
+		string_list[i].append( cJSON_ToString( temp ) );
 	}
-	cJSON_Delete(root);
+	cJSON_Delete( root );
 }
 
-static void AM_FillStrings(fileHandle_t handle){
+static void AM_FillStrings( fileHandle_t handle ) {
 	cJSON *root = cJSON_CreateObject();
-	for (int i = 0; i < ADMIN_STRING_MAX; i++){
-		cJSON_AddStringToObject(root, admin_strings[i].name, string_list[i].c_str());
+	for ( int i = 0; i < ADMIN_STRING_MAX; i++ ) {
+		cJSON_AddStringToObject( root, admin_strings[i].name, string_list[i].c_str() );
 	}
-	const char *buffer = cJSON_Serialize(root, 1);
-	trap->FS_Write(buffer, strlen(buffer), handle);
-	cJSON_Delete(root);
+	const char *buffer = cJSON_Serialize( root, 1 );
+	trap->FS_Write( buffer, strlen( buffer ), handle );
+	cJSON_Delete( root );
 }
-static void AM_DrawString(int type, gentity_t *ent = NULL, const char *arg = NULL, char *arg2 = NULL);
-static void AM_DrawString(int type, gentity_t *ent, const char *arg, char *arg2){
+
+//NOTE: arg2 is expected to be at-least 128 bytes long
+static void AM_DrawString( int type, gentity_t *ent = NULL, const char *arg = NULL, char *arg2 = NULL );
+static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2 ) {
 	std::string string = string_list[type];
 	int announce = 0;
-	switch (type){
+
+	switch ( type ) {
 	case ADMIN_STRING_KICK:
-	case ADMIN_STRING_BAN:
-		if (arg){
-			if (strlen(arg) == 0)
-				string.replace(string.find_first_of("$1"), 2, arg); // reason
-			else
-				string.replace(string.find_first_of("$1"), 2, "null");
-			Q_strncpyz(arg2, string.c_str(), 128);
+	case ADMIN_STRING_BAN: {
+		if ( arg ) {
+			if ( strlen( arg ) == 0 ) {
+				string.replace( string.find_first_of( "$1" ), 2, arg ); // reason
+			}
+			else {
+				string.replace( string.find_first_of( "$1" ), 2, "null" );
+			}
+			Q_strncpyz( arg2, string.c_str(), 128 ); //FIXME: make sure 128 is the right size
 		}
-		break;
-	case ADMIN_STRING_EMPOWER:
+	} break;
+
+	case ADMIN_STRING_EMPOWER: {
 		announce = ADMIN_STRING_EMPOWER_ANNOUNCE;
-		break;
-	case ADMIN_STRING_GHOST:
+	} break;
+
+	case ADMIN_STRING_GHOST: {
 		announce = ADMIN_STRING_GHOST_ANNOUNCE;
-		break;
-	case ADMIN_STRING_GIVE:
+	} break;
+
+	case ADMIN_STRING_GIVE: {
 		announce = ADMIN_STRING_GIVE_ANNOUNCE;
-		string.replace(string.find_first_of("$1"), 2, arg); // what received)
-		break;
-	case ADMIN_STRING_MERC:
+		string.replace( string.find_first_of( "$1" ), 2, arg ); // what received)
+	} break;
+
+	case ADMIN_STRING_MERC: {
 		announce = ADMIN_STRING_MERC_ANNOUNCE;
-		break;
-	case ADMIN_STRING_PROTECT:
+	} break;
+
+	case ADMIN_STRING_PROTECT: {
 		announce = ADMIN_STRING_PROTECT_ANNOUNCE;
-		break;
-	case ADMIN_STRING_SILENCE:
+	} break;
+
+	case ADMIN_STRING_SILENCE: {
 		announce = ADMIN_STRING_SILENCE_ANNOUNCE;
-		break;
-	case ADMIN_STRING_SLAY:
+	} break;
+
+	case ADMIN_STRING_SLAY: {
 		announce = ADMIN_STRING_SLAY_ANNOUNCE;
-		break;
-	case ADMIN_STRING_SLEEP:
+	} break;
+
+	case ADMIN_STRING_SLEEP: {
 		announce = ADMIN_STRING_SLEEP_ANNOUNCE;
-		break;
-	case ADMIN_STRING_TELE:
+	} break;
+
+	case ADMIN_STRING_TELE: {
 		announce = ADMIN_STRING_TELE_ANNOUNCE;
-		break;
-	case ADMIN_STRING_WAKE:
+	} break;
+
+	case ADMIN_STRING_WAKE: {
 		announce = ADMIN_STRING_WAKE_ANNOUNCE;
-		break;
-	case ADMIN_STRING_WEATHER:
-		string.replace(string.find_first_of("$1"), 2, ent->client->pers.netname); // what received)
-		string.replace(string.find_first_of("$2"), 2, arg);
-		break;
+	} break;
+
+	case ADMIN_STRING_WEATHER: {
+		string.replace( string.find_first_of( "$1" ), 2, ent->client->pers.netname ); // what received)
+		string.replace( string.find_first_of( "$2" ), 2, arg );
+	} break;
 
 	}
-	if (announce){
+
+	if ( announce ) {
 		std::string anon = string_list[announce];
-		if (string.length() != 0){
-			anon.replace(anon.find_first_of("$1"), 2, ent->client->pers.netname);
-			if (announce == ADMIN_STRING_GIVE_ANNOUNCE){
-				anon.replace(anon.find_first_of("$2"), 2, arg); // e.g (player) got weapon(force, ammo)
+		if ( !string.empty() ){
+			anon.replace( anon.find_first_of( "$1" ), 2, ent->client->pers.netname );
+			if ( announce == ADMIN_STRING_GIVE_ANNOUNCE ) {
+				anon.replace( anon.find_first_of( "$2" ), 2, arg ); // e.g (player) got weapon(force, ammo)
 			}
-			else if (announce == ADMIN_STRING_RENAME){
-				anon.replace(anon.find_first_of("$2"), 2, arg2);
-				anon.replace(anon.find_first_of("$3"), 2, arg2);
-				trap->SendServerCommand(ent->s.number, va("print \"%s\n\"", anon.c_str()));
+			else if ( announce == ADMIN_STRING_RENAME ) {
+				anon.replace( anon.find_first_of( "$2" ), 2, arg2 );
+				anon.replace( anon.find_first_of( "$3" ), 2, arg2 );
+				trap->SendServerCommand( ent->s.number, va( "print \"%s\n\"", anon.c_str() ) );
 			}
-			G_Announce(anon.c_str());
+			G_Announce( anon.c_str() );
 		}
 	}
-	if (string.length() != 0){
-		if (std::string(admin_strings[type].name).find("ALL")){
-			G_Announce(string.c_str());
+	if ( !string.empty() ) {
+		if ( std::string( admin_strings[type].name ).find( "ALL" ) ) {
+			G_Announce( string.c_str() );
 		}
-		else{
-			trap->SendServerCommand(ent->s.number, va("cp \"%s\n\"", string.c_str()));
+		else {
+			trap->SendServerCommand( ent->s.number, va( "cp \"%s\n\"", string.c_str() ) );
 		}
 	}
 }
 
-void AM_LoadStrings(void){
-	fileHandle_t f;
-	char *buf = NULL;
-	unsigned int len = 0;
-
-
+void AM_LoadStrings( void ) {
 	//setup defaults
-	string_list[ADMIN_STRING_BAN].append("You have been banned");
-	string_list[ADMIN_STRING_EMPOWER].append("The Gods gave you power");
-	string_list[ADMIN_STRING_EMPOWER_ANNOUNCE].append("$1 has been empowered");
-	string_list[ADMIN_STRING_UNEMPOWER].append("You have lost your powers");
-	string_list[ADMIN_STRING_FREEZE].append("Don't move!");
-	string_list[ADMIN_STRING_UNFREEZED].append("You may go now");
-	string_list[ADMIN_STRING_GHOST].append("No one sees you");
-	string_list[ADMIN_STRING_GHOST_ANNOUNCE].append("$1 is a ghost");
-	string_list[ADMIN_STRING_UNGHOSTED].append("You are visible again");
-	string_list[ADMIN_STRING_GIVE].append("You received $1");
-	string_list[ADMIN_STRING_GIVE_ANNOUNCE].append("$1 received $2");
-	string_list[ADMIN_STRING_KICK].append("You have been kicked (Reason: $1)");
-	string_list[ADMIN_STRING_MAP].append("");
-	string_list[ADMIN_STRING_MERC].append("Look at all the guns you've got");
-	string_list[ADMIN_STRING_MERC_ANNOUNCE].append("$1 has got a lot of guns, run away");
-	string_list[ADMIN_STRING_UNMERCED].append("You have lost your guns");
-	string_list[ADMIN_STRING_PROTECT].append("You are protected");
-	string_list[ADMIN_STRING_PROTECT_ANNOUNCE].append("$1 is untouchabl");
-	string_list[ADMIN_STRING_UNPROTECTED].append("You've lost your protection");
-	string_list[ADMIN_STRING_SILENCE].append("Stop talking!");
-	string_list[ADMIN_STRING_SILENCE_ANNOUNCE].append("$1 has been silenced");
-	string_list[ADMIN_STRING_SILENCE_ALL].append("You all have been silenced");
-	string_list[ADMIN_STRING_UNSILENCED].append("You may talk now");
-	string_list[ADMIN_STRING_UNSILENCED_ALL].append("You all have been unsilenced");
-	string_list[ADMIN_STRING_SLAP].append("You have been slapped");
-	string_list[ADMIN_STRING_SLAY].append("You have been slayed");
-	string_list[ADMIN_STRING_SLAY_ANNOUNCE].append("$1 has been slayed");
-	string_list[ADMIN_STRING_SLAY_ALL].append("You all have been slayed");
-	string_list[ADMIN_STRING_SLEEP].append("Sweet dreams");
-	string_list[ADMIN_STRING_SLEEP_ANNOUNCE].append("$1 fall asleep");
-	string_list[ADMIN_STRING_SLEEP_ALL].append("It's time to sleep, everyone");
-	string_list[ADMIN_STRING_TELE].append("You've been teleported");
-	string_list[ADMIN_STRING_TELE_ANNOUNCE].append("$1 has been abducted by the aliens");
-	string_list[ADMIN_STRING_WAKE].append("Wakey-wakey, sunshine!");
-	string_list[ADMIN_STRING_WAKE_ANNOUNCE].append("$1 woke up");
-	string_list[ADMIN_STRING_WAKE_ALL].append("Rise and shine, everyone");
-	string_list[ADMIN_STRING_WEATHER].append("$1 set weather to $2");
-	string_list[ADMIN_STRING_RENAME].append("$1 renamed $2 to $3");
+	string_list[ADMIN_STRING_BAN].append(
+		"You have been banned"
+	);
+	string_list[ADMIN_STRING_EMPOWER].append(
+		"The Gods gave you power"
+	);
+	string_list[ADMIN_STRING_EMPOWER_ANNOUNCE].append(
+		"$1 has been empowered"
+	);
+	string_list[ADMIN_STRING_UNEMPOWER].append(
+		"You have lost your powers"
+	);
+	string_list[ADMIN_STRING_FREEZE].append(
+		"Don't move!"
+	);
+	string_list[ADMIN_STRING_UNFREEZED].append(
+		"You may go now"
+	);
+	string_list[ADMIN_STRING_GHOST].append(
+		"No one sees you"
+	);
+	string_list[ADMIN_STRING_GHOST_ANNOUNCE].append(
+		"$1 is a ghost"
+	);
+	string_list[ADMIN_STRING_UNGHOSTED].append(
+		"You are visible again"
+	);
+	string_list[ADMIN_STRING_GIVE].append(
+		"You received $1"
+	);
+	string_list[ADMIN_STRING_GIVE_ANNOUNCE].append(
+		"$1 received $2"
+	);
+	string_list[ADMIN_STRING_KICK].append(
+		"You have been kicked (Reason: $1)"
+	);
+	string_list[ADMIN_STRING_MAP].append(
+		""
+	);
+	string_list[ADMIN_STRING_MERC].append(
+		"Look at all the guns you've got"
+	);
+	string_list[ADMIN_STRING_MERC_ANNOUNCE].append(
+		"$1 has got a lot of guns, run away"
+	);
+	string_list[ADMIN_STRING_UNMERCED].append(
+		"You have lost your guns"
+	);
+	string_list[ADMIN_STRING_PROTECT].append(
+		"You are protected"
+	);
+	string_list[ADMIN_STRING_PROTECT_ANNOUNCE].append(
+		"$1 is untouchable"
+	);
+	string_list[ADMIN_STRING_UNPROTECTED].append(
+		"You've lost your protection"
+	);
+	string_list[ADMIN_STRING_SILENCE].append(
+		"Stop talking!"
+	);
+	string_list[ADMIN_STRING_SILENCE_ANNOUNCE].append(
+		"$1 has been silenced"
+	);
+	string_list[ADMIN_STRING_SILENCE_ALL].append(
+		"You all have been silenced"
+	);
+	string_list[ADMIN_STRING_UNSILENCED].append(
+		"You may talk now"
+	);
+	string_list[ADMIN_STRING_UNSILENCED_ALL].append(
+		"You all have been unsilenced"
+	);
+	string_list[ADMIN_STRING_SLAP].append(
+		"You have been slapped"
+	);
+	string_list[ADMIN_STRING_SLAY].append(
+		"You have been slain"
+	);
+	string_list[ADMIN_STRING_SLAY_ANNOUNCE].append(
+		"$1 has been slain"
+	);
+	string_list[ADMIN_STRING_SLAY_ALL].append(
+		"You all have been slain"
+	);
+	string_list[ADMIN_STRING_SLEEP].append(
+		"Sweet dreams"
+	);
+	string_list[ADMIN_STRING_SLEEP_ANNOUNCE].append(
+		"$1 fell asleep"
+	);
+	string_list[ADMIN_STRING_SLEEP_ALL].append(
+		"It's time to sleep, everyone"
+	);
+	string_list[ADMIN_STRING_TELE].append(
+		"You've been teleported"
+	);
+	string_list[ADMIN_STRING_TELE_ANNOUNCE].append(
+		"$1 has been abducted by the aliens"
+	);
+	string_list[ADMIN_STRING_WAKE].append(
+		"Wakey-wakey, sunshine!"
+	);
+	string_list[ADMIN_STRING_WAKE_ANNOUNCE].append(
+		"$1 woke up"
+	);
+	string_list[ADMIN_STRING_WAKE_ALL].append(
+		"Rise and shine, everyone"
+	);
+	string_list[ADMIN_STRING_WEATHER].append(
+		"$1 set weather to $2"
+	);
+	string_list[ADMIN_STRING_RENAME].append(
+		"$1 renamed $2 to $3"
+	);
 
-
-	len = trap->FS_Open("strings.json", &f, FS_READ);
-	trap->Print("Loading admin strings (strings.json)\n");
+	fileHandle_t f = NULL_FILE;
+	unsigned int len = trap->FS_Open( "admin_strings.json", &f, FS_READ );
+	trap->Print( "Loading admin strings\n" );
 
 	// no file
-	if (!f) { // Create file
-		trap->FS_Open("strings.json", &f, FS_WRITE);
-		AM_FillStrings(f);
-		trap->FS_Close(f);
+	if ( !f ) { // Create file
+		trap->FS_Open( "admin_strings.json", &f, FS_WRITE );
+		AM_FillStrings( f );
+		trap->FS_Close( f );
 		return;
 	}
 
 	// empty file
-	if (!len || len == -1) {
-		trap->FS_Close(f);
+	if ( !len || len == -1 ) {
+		trap->FS_Close( f );
 		return;
 	}
 
-	if (!(buf = (char*)malloc(len + 1))) {
+	char *buf = NULL;
+	if ( !(buf = (char *)malloc( len + 1 )) ) {
 		return;
 	}
 
-	trap->FS_Read(buf, len, f);
-	trap->FS_Close(f);
-	buf[len] = 0;
+	trap->FS_Read( buf, len, f );
+	trap->FS_Close( f );
+	buf[len] = '\0';
 
-	AM_ParseString(buf);
+	AM_ParseString( buf );
 
-	free(buf);
-
+	free( buf );
 }
 
 // clear all admin accounts and logout all users
