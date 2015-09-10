@@ -144,6 +144,25 @@ static int JPLua_Cvar_Set( lua_State *L ) {
 	return 0;
 }
 
+static std::unordered_map <std::string, int> update_list;
+
+static int JPLua_Cvar_SetCallback(lua_State *L){
+	jplua_cvar_t *luaCvar = JPLua_CheckCvar(L, 1);
+
+	if (luaCvar && lua_type(L,2) == LUA_TFUNCTION)
+		update_list[luaCvar->name] = luaL_ref(L, LUA_REGISTRYINDEX);
+	return 0;
+}
+
+void JPLua_Cvar_Update(const char *name){
+	if (!name) return;
+	int handle = update_list[name];
+	if (handle != 0){
+		lua_rawgeti(JPLua.state, LUA_REGISTRYINDEX, handle);
+		JPLua_Call(JPLua.state, 0, 0);
+	}
+}
+
 // Push a Cvar instance for a client number onto the stack
 void JPLua_Cvar_CreateRef( lua_State *L, const char *name ) {
 	jplua_cvar_t *luaCvar = NULL;
@@ -183,6 +202,7 @@ static const struct luaL_Reg jplua_cvar_meta[] = {
 
 	{ "Reset", JPLua_Cvar_Reset },
 	{ "Set", JPLua_Cvar_Set },
+	{ "SetUpdateCallback", JPLua_Cvar_SetCallback },
 	{ NULL, NULL }
 };
 

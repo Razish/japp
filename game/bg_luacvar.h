@@ -14,5 +14,6 @@ int JPLua_GetCvar( lua_State *L );
 
 jplua_cvar_t *JPLua_CheckCvar( lua_State *L, int idx );
 void JPLua_Register_Cvar( lua_State *L );
+void JPLua_Cvar_Update(const char *name);
 
 #endif // JPLUA

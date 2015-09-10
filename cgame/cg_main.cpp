@@ -588,6 +588,7 @@ void CG_UpdateCvars( void ) {
 			if ( cv->vmCvar->modificationCount > modCount ) {
 				if ( cv->update )
 					cv->update();
+				JPLua_Cvar_Update(cv->cvarName);
 			}
 		}
 	}

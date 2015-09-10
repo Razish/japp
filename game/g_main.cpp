@@ -278,6 +278,8 @@ void G_UpdateCvars( void ) {
 				if ( cv->update )
 					cv->update();
 
+				JPLua_Cvar_Update(cv->cvarName);
+
 				if ( cv->trackChange )
 					trap->SendServerCommand( -1, va( "print \"Server: %s changed to %s\n\"", cv->cvarName, cv->vmCvar->string ) );
 			}
