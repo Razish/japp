@@ -810,6 +810,7 @@ typedef struct cgs_s {
 			qboolean	set;
 		} gripSpeed;
 	} japp;
+	float widthRatioCoef;	//to make 2Ds be not stretched
 } cgs_t;
 
 typedef struct siegeExtended_s {

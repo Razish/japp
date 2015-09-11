@@ -7966,7 +7966,8 @@ void UI_Init( qboolean inGameLoad ) {
 	// for 640x480 virtualized screen
 	uiInfo.uiDC.yscale = uiInfo.uiDC.glconfig.vidHeight * (1.0f / (float)SCREEN_HEIGHT);
 	uiInfo.uiDC.xscale = uiInfo.uiDC.glconfig.vidWidth * (1.0f / (float)SCREEN_WIDTH);
-
+	extern void UI_Set2DRatio(void);
+	UI_Set2DRatio();
 	// wide screen
 	if ( uiInfo.uiDC.glconfig.vidWidth * SCREEN_HEIGHT > uiInfo.uiDC.glconfig.vidHeight * SCREEN_WIDTH )
 		uiInfo.uiDC.bias = 0.5f * (uiInfo.uiDC.glconfig.vidWidth - (uiInfo.uiDC.glconfig.vidHeight * ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT)));
@@ -8162,7 +8163,7 @@ void UI_Refresh( int realtime ) {
 	// draw cursor
 	UI_SetColor( NULL );
 	if ( Menu_Count() > 0 && (trap->Key_GetCatcher() & KEYCATCH_UI) ) {
-		UI_DrawHandlePic( (float)uiInfo.uiDC.cursorx, (float)uiInfo.uiDC.cursory, 40.0f, 40.0f, uiInfo.uiDC.Assets.cursor );
+		UI_DrawHandlePic((float)uiInfo.uiDC.cursorx, (float)uiInfo.uiDC.cursory, 40.0f * uiInfo.uiDC.widthRatioCoef, 40.0f, uiInfo.uiDC.Assets.cursor);
 	}
 
 	if ( ui_rankChange.integer ) {
@@ -8239,7 +8240,7 @@ void UI_KeyEvent( int key, qboolean down ) {
 
 void UI_MouseEvent( int dx, int dy ) {
 	// update mouse screen position
-	uiInfo.uiDC.cursorx += dx;
+	uiInfo.uiDC.cursorx += dx * uiInfo.uiDC.widthRatioCoef;
 	if ( uiInfo.uiDC.cursorx < 0 )
 		uiInfo.uiDC.cursorx = 0;
 	else if ( uiInfo.uiDC.cursorx > SCREEN_WIDTH )

@@ -476,6 +476,7 @@ typedef struct displayContextDef_s {
 	qhandle_t		gradientImage;
 	qhandle_t		cursor;
 	float			FPS;
+	float widthRatioCoef;	//to make 2Ds be not stretched
 } displayContextDef_t;
 
 

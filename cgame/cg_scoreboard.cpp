@@ -76,16 +76,16 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 	// draw the handicap or bot skill marker (unless player has flag)
 	if ( ci->powerups & (1 << PW_NEUTRALFLAG) ) {
 		if ( largeFormat )
-			CG_DrawFlagModel( iconx, y - (32 - BIGCHAR_HEIGHT) / 2, iconSize, iconSize, TEAM_FREE, qfalse );
+			CG_DrawFlagModel(iconx, y - (32 - BIGCHAR_HEIGHT) / 2, iconSize * cgs.widthRatioCoef, iconSize, TEAM_FREE, qfalse);
 		else
 			CG_DrawFlagModel( iconx, y, iconSize, iconSize, TEAM_FREE, qfalse );
 	}
 
 	else if ( ci->powerups & (1 << PW_REDFLAG) )
-		CG_DrawFlagModel( iconx, y, iconSize, iconSize, TEAM_RED, qfalse );
+		CG_DrawFlagModel(iconx, y, iconSize * cgs.widthRatioCoef, iconSize, TEAM_RED, qfalse);
 
 	else if ( ci->powerups & (1 << PW_BLUEFLAG) )
-		CG_DrawFlagModel( iconx, y, iconSize, iconSize, TEAM_BLUE, qfalse );
+		CG_DrawFlagModel(iconx, y, iconSize * cgs.widthRatioCoef, iconSize, TEAM_BLUE, qfalse);
 
 	else if ( cgs.gametype == GT_POWERDUEL && (ci->duelTeam == DUELTEAM_LONE || ci->duelTeam == DUELTEAM_DOUBLE) ) {
 		CG_DrawPic( iconx, y, iconSize, iconSize, trap->R_RegisterShaderNoMip(
@@ -98,12 +98,12 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 			siegeClass_t *scl = &bgSiegeClasses[ci->siegeIndex];
 
 			if ( scl->classShader )
-				CG_DrawPic( iconx, y, largeFormat ? 24 : 12, largeFormat ? 24 : 12, scl->classShader );
+				CG_DrawPic(iconx, y, (largeFormat ? 24 : 12) * cgs.widthRatioCoef, largeFormat ? 24 : 12, scl->classShader);
 		}
 	}
 
 	else if ( ci->modelIcon && cg_oldScoreboardSkinIcons.integer )
-		CG_DrawPic( iconx, y, iconSize, iconSize, ci->modelIcon );
+		CG_DrawPic(iconx, y, iconSize * cgs.widthRatioCoef, iconSize, ci->modelIcon);
 
 
 	// highlight your position

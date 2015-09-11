@@ -558,6 +558,13 @@ typedef struct cvarTable_s {
 #include "cg_xcvar.h"
 #undef XCVAR_DECL
 
+void CG_Set2DRatio(void) {
+	if (japp_ratioFix.integer)
+		cgs.widthRatioCoef = (float)(SCREEN_WIDTH * cgs.glconfig.vidHeight) / (float)(SCREEN_HEIGHT * cgs.glconfig.vidWidth);
+	else
+		cgs.widthRatioCoef = 1.0f;
+}
+
 static cvarTable_t cvarTable[] = {
 #define XCVAR_LIST
 #include "cg_xcvar.h"
@@ -1784,6 +1791,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	trap->GetGlconfig( &cgs.glconfig );
 	cgs.screenXScale = cgs.glconfig.vidWidth / SCREEN_WIDTH;
 	cgs.screenYScale = cgs.glconfig.vidHeight / SCREEN_HEIGHT;
+	CG_Set2DRatio();
 
 	trap->GetGameState( &cgs.gameState );
 	s = CG_ConfigString( CS_GAME_VERSION );

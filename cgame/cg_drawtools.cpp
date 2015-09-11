@@ -167,7 +167,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor
 					s += 2;
 					continue;
 				}
-				CG_DrawChar( xx + 2, y + 2, charWidth, charHeight, *s );
+				CG_DrawChar(xx + 2 * cgs.widthRatioCoef, y + 2, charWidth, charHeight, *s);
 				xx += charWidth;
 				s++;
 			}
@@ -199,22 +199,22 @@ void CG_DrawBigString( int x, int y, const char *s, float alpha ) {
 	vector4 color;
 
 	VectorSet4( &color, 1.0f, 1.0f, 1.0f, alpha );
-	CG_DrawStringExt( x, y, s, &color, qfalse, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+	CG_DrawStringExt(x, y, s, &color, qfalse, qtrue, BIGCHAR_WIDTH * cgs.widthRatioCoef, BIGCHAR_HEIGHT, 0);
 }
 
 void CG_DrawBigStringColor( int x, int y, const char *s, const vector4 *color ) {
-	CG_DrawStringExt( x, y, s, color, qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+	CG_DrawStringExt(x, y, s, color, qtrue, qtrue, BIGCHAR_WIDTH * cgs.widthRatioCoef, BIGCHAR_HEIGHT, 0);
 }
 
 void CG_DrawSmallString( int x, int y, const char *s, float alpha ) {
 	vector4 color;
 
 	VectorSet4( &color, 1.0f, 1.0f, 1.0f, alpha );
-	CG_DrawStringExt( x, y, s, &color, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
+	CG_DrawStringExt(x, y, s, &color, qfalse, qfalse, SMALLCHAR_WIDTH * cgs.widthRatioCoef, SMALLCHAR_HEIGHT, 0);
 }
 
 void CG_DrawSmallStringColor( int x, int y, const char *s, const vector4 *color ) {
-	CG_DrawStringExt( x, y, s, color, qtrue, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
+	CG_DrawStringExt(x, y, s, color, qtrue, qfalse, SMALLCHAR_WIDTH * cgs.widthRatioCoef, SMALLCHAR_HEIGHT, 0);
 }
 
 // Returns character count, skiping color escape codes
