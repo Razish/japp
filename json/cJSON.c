@@ -36,7 +36,8 @@
 // Sprintf security fix
 // All instances of sprintf are change to snprintf to avoid buffer overflows
 // On windows, it's called sprintf_s instead of snprintf, so we'll do a little define here
-#if defined(_WIN32) && !defined(MINGW32)
+//Raz: also, VS2015's stdio.h does not allow macro redefinition of standard library functions
+#if defined(_WIN32) && !defined(MINGW32) && _MSC_VER < 1900
 #define snprintf sprintf_s
 #define _CRT_SECURE_NO_WARNINGS
 #endif

@@ -995,13 +995,13 @@ static LONG WINAPI UnhandledExceptionHandler( struct _EXCEPTION_POINTERS *EI /*E
 	JP_FS_WriteString( "========================================\n"
 		"             JA++ Crash Log\n"
 		"========================================\n", f );
-	JP_FS_WriteString( "Version: "JAPP_VERSION" (Windows)\n", f );
+	JP_FS_WriteString( "Version: " JAPP_VERSION " (Windows)\n", f );
 #ifdef PROJECT_GAME
 	JP_FS_WriteString("Side: Server-side\n", f);
 #else
 	JP_FS_WriteString( "Side: Client-side\n", f );
 #endif
-	JP_FS_WriteString( "Build Date/Time: "__DATE__" "__TIME__"\n", f );
+ 	JP_FS_WriteString( "Build Date/Time: " __DATE__ " " __TIME__ "\n", f );
 
 	JP_Crash_AddOSData( f );
 	JP_FS_WriteString( "Crash type: Exception\n\n"

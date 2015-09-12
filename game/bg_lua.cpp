@@ -975,17 +975,22 @@ static int JPLua_Export_WorldCoordToScreenCoord( lua_State *L ) {
 #endif
 
 #ifdef PROJECT_GAME
-static int JPLua_ConnectToDB(lua_State *L){
-	int type = luaL_checkinteger(L, 1);
-	switch (type){
+static int JPLua_ConnectToDB( lua_State *L ) {
+#if defined(NO_SQL)
+	lua_pushnil( L );
+	return 1;
+#else
+	int type = luaL_checkinteger( L, 1 );
+	switch ( type ) {
 	case 1: ///MySQL
-		return JPLua_MySQL_Open(L);
+		return JPLua_MySQL_Open( L );
 	case 2: ///SQLite
-		return JPLua_SQLite_Open(L);
+		return JPLua_SQLite_Open( L );
 	default:
 		lua_pushnil(L);
 		return 1;
 	}
+#endif
 }
 #endif
 static int JPLua_GetConfigString(lua_State *L){
@@ -1278,8 +1283,10 @@ void JPLua_Init( void ) {
 	JPLua_Register_Vector( JPLua.state );
 	JPLua_Register_File( JPLua.state );
 #ifdef PROJECT_GAME
-	JPLua_Register_MySQL(JPLua.state);
-	JPLua_Register_SQLite(JPLua.state);
+	#if !defined(NO_SQL)
+		JPLua_Register_MySQL(JPLua.state);
+		JPLua_Register_SQLite(JPLua.state);
+	#endif
 #endif
 
 	// -- FRAMEWORK INITIALISATION begin

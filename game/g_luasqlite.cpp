@@ -8,6 +8,7 @@
 
 #ifdef JPLUA
 
+#if !defined(NO_SQL)
 static const char* SQLite = "sqlite.meta";
 
 jplua_sqlite_t *JPLua_CheckSQLite(lua_State *L, int idx){
@@ -139,5 +140,7 @@ void JPLua_Register_SQLite(lua_State *L){
 	lua_pop(L, -1);
 
 }
+
+#endif // !NO_SQL
 
 #endif

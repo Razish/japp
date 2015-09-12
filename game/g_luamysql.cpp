@@ -8,13 +8,10 @@
 
 #ifdef JPLUA
 
+#if !defined(NO_SQL)
 
-#if defined(_MSC_VER) && !defined(SCONS_BUILD)
-#pragma comment( lib, "mysqlclient" )
-#endif
-
-	static const char* MySQLLib = "mysql.meta";
-	static const char* MySQLResult = "mysqlres.meta";
+static const char* MySQLLib = "mysql.meta";
+static const char* MySQLResult = "mysqlres.meta";
 
 MYSQL *JPLua_CheckMySQL(lua_State *L, int idx) {
 	void *ud = luaL_checkudata(L, idx, MySQLLib);
@@ -270,5 +267,6 @@ void JPLua_Register_MySQL(lua_State* L){
 
 }
 
+#endif // !NO_SQL
 
 #endif

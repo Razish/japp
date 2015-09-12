@@ -1855,10 +1855,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 				RegCloseKey( hkey );
 			}
 			else
-				Com_Printf( S_COLOR_RED"Error, couldn't query registry string "JP_TIMESTAMP_REGISTRY_NAME", error code %i\n", error );
+				Com_Printf( S_COLOR_RED "Error, couldn't query registry string " JP_TIMESTAMP_REGISTRY_NAME ", error code %i\n", error );
 		}
 		else
-			Com_Printf( S_COLOR_RED"Error, couldn't open registry key "JP_TIMESTAMP_REGISTRY_KEY", error code %i\n", error );
+			Com_Printf( S_COLOR_RED "Error, couldn't open registry key " JP_TIMESTAMP_REGISTRY_KEY ", error code %i\n", error );
 	}
 #endif
 

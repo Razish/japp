@@ -123,9 +123,10 @@ files = [build_dir + f for f in files]
 # libraries
 libraries = [
 	'json',
-	'lua',
-	'sqlite'
+	'lua'
 ]
+if no_sql == 0:
+	libraries += [ 'sqlite' ]
 if bits == 32:
 	libraries += [ 'libudis86' ]
 game_env['LIBS'] = [
@@ -134,10 +135,11 @@ game_env['LIBS'] = [
 		exports = [ 'arch', 'bits', 'build_dir', 'configuration', 'env', 'plat' ]
 	) for lib in libraries
 ]
-if plat == 'Windows':
-    game_env['LIBS'] += [ 'mysqlclient_' + configuration]
-else:
-	game_env['LIBS'] += [ 'mysqlclient']
+if no_sql == 0:
+	if plat == 'Windows':
+	    game_env['LIBS'] += [ 'mysqlclient_' + configuration]
+	else:
+		game_env['LIBS'] += [ 'mysqlclient']
 
 if plat == 'Windows':
 	game_env['LIBS'] += [ 'advapi32' ]

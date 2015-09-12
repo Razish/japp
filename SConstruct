@@ -5,6 +5,7 @@
 # options:
 #	debug		generate debug information. value 2 also enables optimisations
 #	force32		force 32 bit target when on 64 bit machine
+#	no_sql		don't include any SQL dependencies
 #
 # example:
 #	scons -Q debug=1 force32=1
@@ -16,6 +17,7 @@
 
 debug = int( ARGUMENTS.get( 'debug', 0 ) )
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
+no_sql = int( ARGUMENTS.get( 'no_sql', 0 ) )
 
 def cmp_version( v1, v2 ):
 	def normalise( v ):
@@ -251,7 +253,7 @@ elif plat == 'Windows':
 			env['CCFLAGS'] += [ '/arch:IA32' ] # no sse, x87 fpu
 	else:
 		env['CCFLAGS'] += [ '/fp:strict' ] # strict FP
-		if bits == 32:
+		if bits == 32 and cmp_version( ccversion, '14.0' ) < 0:
 			env['CCFLAGS'] += [ '/arch:SSE2' ] # sse2
 
 	# strict c/cpp warnings
@@ -341,6 +343,8 @@ if revision:
 	env['CPPDEFINES'] += [ 'REVISION=\\"' + revision + '\\"' ]
 
 env['CPPDEFINES'] += [ 'SCONS_BUILD' ]
+if no_sql:
+	env['CPPDEFINES'] += [ 'NO_SQL' ]
 env['CPPPATH'] = [ '#', '../game' ]
 env['LIBPATH'] = [ '#/libs/' + plat + '/' + str(bits) + '/' ]
 
@@ -360,5 +364,12 @@ projects = [
 for project in projects:
 	env.SConscript(
 		os.path.join( project, 'SConscript' ),
-		exports = [ 'arch', 'bits', 'configuration', 'env', 'plat' ]
+		exports = [
+			'arch',
+			'bits',
+			'configuration',
+			'env',
+			'no_sql',
+			'plat'
+		]
 	)
