@@ -466,7 +466,7 @@ typedef struct displayContextDef_s {
 	float			bias;
 	int				realTime;
 	int				frameTime;
-	int				cursorx, cursory;
+	float			cursorx, cursory;
 	qboolean		debug;
 
 	cachedAssets_t	Assets;
