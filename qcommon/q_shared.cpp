@@ -925,7 +925,7 @@ void Q_ConvertLinefeeds( char *string ) {
 // Q_vsnprintf: always appends a trailing '\0', returns number of characters written (not including terminal \0) or returns
 //	-1 on failure or if the buffer would be overflowed.
 int Q_vsnprintf( char *str, size_t size, const char *format, va_list args ) {
-	int ret = _vsnprintf( str, size, format, args );
+	int ret = vsnprintf( str, size, format, args );
 
 	if ( ret < 0 || ret == (int)size ) {
 		str[size - 1] = '\0';
