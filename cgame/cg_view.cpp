@@ -2330,7 +2330,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	if ( (trap->Key_GetCatcher() & KEYCATCH_CGAME) && !CG_ChatboxActive() ) {
 		displayContextDef_t *dc = Display_GetContext();
-		CG_DrawPic( (float)dc->cursorx, (float)dc->cursory, 40.0f, 40.0f, media.gfx.interface.cursor );
+		CG_DrawPic( dc->cursorx, dc->cursory, 40.0f, 40.0f, media.gfx.interface.cursor );
 	}
 
 	trap->R_SetColor( NULL );

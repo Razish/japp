@@ -797,7 +797,7 @@ typedef struct cgs_s {
 	qhandle_t		inlineDrawModel[MAX_MODELS];
 	vector3			inlineModelMidpoints[MAX_MODELS];
 	clientInfo_t	clientinfo[MAX_CLIENTS];
-	int				cursorX, cursorY;
+	float			cursorX, cursorY;
 	void			*capturedItem;
 	qhandle_t		activeCursor;
 

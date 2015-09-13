@@ -8737,10 +8737,10 @@ void Menu_PaintAll( void ) {
 		vector4 v = { 1, 1, 1, 1 };
 #ifdef PROJECT_CGAME
 		DC->drawText( 5, 25, .75f, &v, va( "fps: %f", DC->FPS ), 0, 0, 0, 0, qfalse );
-		DC->drawText( 5, 45, .75f, &v, va( "x: %d  y:%d", DC->cursorx, DC->cursory ), 0, 0, 0, 0, qfalse );
+		DC->drawText( 5, 45, .75f, &v, va( "x: %.0f  y:%.0f", DC->cursorx, DC->cursory ), 0, 0, 0, 0, qfalse );
 #else
 		DC->drawText( 5, 25, .75f, &v, va( "fps: %f", DC->FPS ), 0, 0, 0, 0);
-		DC->drawText(5, 45, .75f, &v, va("x: %d  y:%d", DC->cursorx, DC->cursory), 0, 0, 0, 0);
+		DC->drawText( 5, 45, .75f, &v, va( "x: %.0f  y:%.0f", DC->cursorx, DC->cursory ), 0, 0, 0, 0 );
 #endif
 	}
 }

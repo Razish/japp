@@ -8163,7 +8163,7 @@ void UI_Refresh( int realtime ) {
 	// draw cursor
 	UI_SetColor( NULL );
 	if ( Menu_Count() > 0 && (trap->Key_GetCatcher() & KEYCATCH_UI) ) {
-		UI_DrawHandlePic((float)uiInfo.uiDC.cursorx, (float)uiInfo.uiDC.cursory, 40.0f * uiInfo.uiDC.widthRatioCoef, 40.0f, uiInfo.uiDC.Assets.cursor);
+		UI_DrawHandlePic(uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory, 40.0f * uiInfo.uiDC.widthRatioCoef, 40.0f, uiInfo.uiDC.Assets.cursor);
 	}
 
 	if ( ui_rankChange.integer ) {
@@ -8240,7 +8240,7 @@ void UI_KeyEvent( int key, qboolean down ) {
 
 void UI_MouseEvent( int dx, int dy ) {
 	// update mouse screen position
-	uiInfo.uiDC.cursorx += dx * uiInfo.uiDC.widthRatioCoef;
+	uiInfo.uiDC.cursorx += dx;
 	if ( uiInfo.uiDC.cursorx < 0 )
 		uiInfo.uiDC.cursorx = 0;
 	else if ( uiInfo.uiDC.cursorx > SCREEN_WIDTH )

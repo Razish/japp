@@ -3919,7 +3919,14 @@ void CG_CenterPrint( const char *str, int y, int charWidth ) {
 			data->numLines++;
 		s++;
 	}
-	centerprint_queue.push(data);
+
+	if ( !cg_queueCenterprint.integer ) {
+		while ( !centerprint_queue.empty() ) {
+			free( centerprint_queue.front() );
+			centerprint_queue.pop();
+		}
+	}
+	centerprint_queue.push( data );
 }
 
 static void CG_DrawCenterString(void){
