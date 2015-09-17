@@ -313,6 +313,16 @@ static int JPLua_Player_GetHolstered( lua_State *L, jpluaEntity_t *ent ) {
 	return 1;
 }
 
+static int JPLua_Player_GetInAir( lua_State *L, jpluaEntity_t *ent ) {
+#if defined(PROJECT_GAME)
+	entityState_t *es = &ent->s;
+#elif defined(PROJECT_CGAME)
+	entityState_t *es = &ent->currentState;
+#endif
+	lua_pushboolean( L, es->groundEntityNum == ENTITYNUM_NONE );
+	return 1;
+}
+
 #if defined(PROJECT_GAME)
 static int JPLua_Player_GetMerced( lua_State *L, jpluaEntity_t *ent ) {
 	lua_pushboolean( L, ent->client->pers.adminData.merc ? 1 : 0 );
@@ -938,9 +948,9 @@ static const luaProperty_t playerProperties [] = {
 #endif
 	},
 	{
-			"entity",
-			JPLua_Player_ToEntity,
-			nullptr
+		"entity",
+		JPLua_Player_ToEntity,
+		nullptr
 	},
 #if defined(PROJECT_GAME)
 	//TODO: move to entity object
@@ -1026,6 +1036,11 @@ static const luaProperty_t playerProperties [] = {
 #elif defined(PROJECT_CGAME)
 		nullptr
 #endif
+	},
+	{
+		"isInAir",
+		JPLua_Player_GetInAir,
+		nullptr
 	},
 #if defined(PROJECT_GAME)
 	{
