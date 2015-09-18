@@ -11,6 +11,7 @@
 #include "bg_lualogger.h"
 #include "bg_luaserialiser.h"
 
+#define __STDC_FORMAT_MACROS // older compilers need this
 #include <inttypes.h>
 #ifdef JPLUA
 
