@@ -15,10 +15,6 @@
 #include <inttypes.h>
 #ifdef JPLUA
 
-#if defined(_MSC_VER) && !defined(SCONS_BUILD)
-#pragma comment( lib, "lua" )
-#endif
-
 const uint32_t JPLUA_VERSION = 12;
 
 static const char *baseDir = "lua/";
