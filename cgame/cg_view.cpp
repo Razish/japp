@@ -1153,8 +1153,9 @@ static int CG_CalcViewValues( int clientNum ) {
 		usercmd_t cmd;
 
 		trap->GetUserCmd( cmdNum, &cmd );
-		if ( !CG_IsSpectating() && !cg.demoPlayback && cmd.serverTime <= cg.snap->ps.commandTime )
+		if ( !CG_IsSpectating() && !cg.demoPlayback && cmd.serverTime <= cg.snap->ps.commandTime ) {
 			VectorMA( &refdef->vieworg, (cg.time - ps->commandTime) * 0.001f, &ps->velocity, &refdef->vieworg );
+		}
 	}
 
 	// add error decay

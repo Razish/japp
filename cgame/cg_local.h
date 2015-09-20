@@ -304,6 +304,7 @@ typedef struct centity_s {
 	uint32_t		savedSolid;
 	int				savedeType;
 	vector3			lastOrigin; // for strafe trail
+	bool			doLerp; // for entity position smoothing
 } centity_t;
 
 // local entities are created as a result of events or predicted actions, and live independently from all server

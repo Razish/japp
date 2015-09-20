@@ -2543,16 +2543,18 @@ static void CG_InterpolateEntityPosition( centity_t *cent ) {
 }
 
 void CG_CalcEntityLerpPositions( centity_t *cent ) {
-	qboolean doLerp = qfalse;
-
-	if ( cent->currentState.eType == ET_NPC
-		|| (cent->currentState.number < MAX_CLIENTS && cent->currentState.number != cg.clientNum) )
-	{
-		doLerp = qtrue;
+	if ( cent->currentState.eType == ET_NPC ) {
+		cent->doLerp = true;
+	}
+	else if ( cent->currentState.number < MAX_CLIENTS && cent->currentState.number != cg.clientNum ) {
+		cent->doLerp = true;
+	}
+	else {
+		cent->doLerp = false;
 	}
 
 	// if this player does not want to see extrapolated players
-	if ( cg_smoothClients.integer && doLerp ) {
+	if ( cg_smoothClients.integer && cent->doLerp ) {
 		// make sure the clients use TR_INTERPOLATE
 		cent->currentState.pos.trType = TR_INTERPOLATE;
 		cent->nextState.pos.trType = TR_INTERPOLATE;
@@ -2590,7 +2592,7 @@ void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	// first see if we can interpolate between two snaps for
 	// linear extrapolated clients
-	if ( cent->interpolate && cent->currentState.pos.trType == TR_LINEAR_STOP && doLerp ) {
+	if ( cent->interpolate && cent->currentState.pos.trType == TR_LINEAR_STOP && cent->doLerp ) {
 		CG_InterpolateEntityPosition( cent );
 		return;
 	}
@@ -2602,8 +2604,13 @@ void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	// adjust for riding a mover if it wasn't rolled into the predicted player state
 	if ( cent->currentState.number != cg.predictedPlayerState.clientNum ) {
-		CG_AdjustPositionForMover( &cent->lerpOrigin, cent->currentState.groundEntityNum, cg.snap->serverTime, cg.time,
-			&cent->lerpOrigin );
+		CG_AdjustPositionForMover(
+			&cent->lerpOrigin,
+			cent->currentState.groundEntityNum,
+			cg.snap->serverTime,
+			cg.time,
+			&cent->lerpOrigin
+		);
 	}
 }
 

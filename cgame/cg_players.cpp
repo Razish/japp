@@ -6744,7 +6744,7 @@ void CG_Player( centity_t *cent ) {
 	else
 		VectorClear( &cent->modelScale );
 
-	if ( (cg_smoothClients.integer || cent->currentState.heldByClient)
+	if ( (cent->doLerp || cent->currentState.heldByClient)
 		&& (cent->currentState.groundEntityNum >= ENTITYNUM_WORLD || cent->currentState.eType == ET_TERRAIN) &&
 		!(cent->currentState.eFlags2 & EF2_HYPERSPACE) && cg.predictedPlayerState.m_iVehicleNum != cent->currentState.number ) { //always smooth when being thrown
 		vector3 posDif;
