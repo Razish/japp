@@ -1221,8 +1221,9 @@ void CG_DrawHUD( centity_t *cent ) {
 	JP_DrawMovementKeys();
 	JP_DrawAccel();
 
-	if ( JPLua_Event_HUD() )
+	if ( JPLua_Event_HUD() ) {
 		return;
+	}
 
 	if ( cg_hudFiles.integer == 1 ) {
 		int x = 0;
@@ -1312,25 +1313,32 @@ void CG_DrawHUD( centity_t *cent ) {
 		//show current kills out of how many needed
 		scoreStr = va( "%s: %i/%i", CG_GetStringEdString( "MP_INGAME", "SCORE" ), cg.snap->ps.persistant[PERS_SCORE], cgs.fraglimit );
 	}
-	else if ( cgs.gametype < GT_TEAM ) {	// This is a teamless mode, draw the score bias.
-		scoreBias = cg.snap->ps.persistant[PERS_SCORE] - cgs.scores1;
-		if ( scoreBias == 0 ) {	// We are the leader!
-			if ( cgs.scores2 <= 0 ) {	// Nobody to be ahead of yet.
-				Com_sprintf( scoreBiasStr, sizeof(scoreBiasStr), "" );
-			}
-			else {
-				scoreBias = cg.snap->ps.persistant[PERS_SCORE] - cgs.scores2;
-				if ( scoreBias == 0 ) {
-					Com_sprintf( scoreBiasStr, sizeof(scoreBiasStr), " (Tie)" );
+	else if ( cgs.gametype < GT_TEAM ) {
+		// This is a teamless mode, draw the score bias.
+		if ( cg_drawScoresNet.integer ) {
+			const int net = cg.snap->ps.persistant[PERS_SCORE] - cg.snap->ps.persistant[PERS_KILLED];
+			Com_sprintf( scoreBiasStr, sizeof(scoreBiasStr), " Net: %c%i", (net >= 0) ? '+' : '-', abs( net ) );
+		}
+		else {
+			scoreBias = cg.snap->ps.persistant[PERS_SCORE] - cgs.scores1;
+			if ( scoreBias == 0 ) {	// We are the leader!
+				if ( cgs.scores2 <= 0 ) {	// Nobody to be ahead of yet.
+					Com_sprintf( scoreBiasStr, sizeof(scoreBiasStr), "" );
 				}
 				else {
-					Com_sprintf( scoreBiasStr, sizeof(scoreBiasStr), " (+%d)", scoreBias );
+					scoreBias = cg.snap->ps.persistant[PERS_SCORE] - cgs.scores2;
+					if ( scoreBias == 0 ) {
+						Com_sprintf( scoreBiasStr, sizeof(scoreBiasStr), " (Tie)" );
+					}
+					else {
+						Com_sprintf( scoreBiasStr, sizeof(scoreBiasStr), " (+%d)", scoreBias );
+					}
 				}
 			}
-		}
-		else // if (scoreBias < 0)
-		{	// We are behind!
-			Com_sprintf( scoreBiasStr, sizeof(scoreBiasStr), " (%d)", scoreBias );
+			else // if (scoreBias < 0)
+			{	// We are behind!
+				Com_sprintf( scoreBiasStr, sizeof(scoreBiasStr), " (%d)", scoreBias );
+			}
 		}
 		scoreStr = va( "%s: %i%s", CG_GetStringEdString( "MP_INGAME", "SCORE" ), cg.snap->ps.persistant[PERS_SCORE], scoreBiasStr );
 	}
