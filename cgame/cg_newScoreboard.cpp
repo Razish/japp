@@ -341,12 +341,21 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 				tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
 
 			//Score
-			if ( score->ping == -1 )
+			if ( score->ping == -1 ) {
 				tmp = "Connecting";
-			//	else if ( team == TEAM_SPECTATOR )
-			//		tmp = "Spectating"; //TODO: Name of client they're spectating? possible?
-			else
+			}
+			/*
+			else if ( team == TEAM_SPECTATOR ) {
+				tmp = "Spectating"; //TODO: Name of client they're spectating? possible?
+			}
+			*/
+			else if ( cg_drawScoresNet.integer ) {
+				const int net = score->score - score->deaths;
+				tmp = va( "%02i/%02i (%c%i)", score->score, score->deaths, (net >= 0) ? '+' : '-', abs( net ) );
+			}
+			else {
 				tmp = va( "%02i/%02i", score->score, score->deaths );
+			}
 
 			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
 				fontScale ) / 2.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f,
