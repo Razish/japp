@@ -1044,7 +1044,7 @@ static void CG_ServerCommand( void ) {
 	char		text[MAX_SAY_TEXT];
 	qboolean	IRCG = qfalse;
 
-	if ( JPLua_Event_ServerCommand() )
+	if ( JPLua::Event_ServerCommand() )
 		return;
 
 	cmd = CG_Argv( 0 );
@@ -1258,9 +1258,9 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "chat" ) ) {
-		char *msg = JPLua_Event_ChatMessageRecieved( CG_Argv( 1 ) );
+		char *msg = JPLua::Event_ChatMessageRecieved( CG_Argv( 1 ) );
 
-		//If a JPLua plugin cancelled it, bail
+		//If a ls.plugin cancelled it, bail
 		if ( !msg )
 			return;
 

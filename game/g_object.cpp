@@ -200,7 +200,7 @@ void G_RunObject( gentity_t *ent ) {
 
 	//call touch func
 	ent->touch( ent, &g_entities[tr.entityNum], &tr );
-	JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, (intptr_t)&g_entities[tr.entityNum], (intptr_t)&tr);
+	JPLua::Entity_CallFunction( ent, JPLua::JPLUA_ENTITY_TOUCH, (intptr_t)&g_entities[tr.entityNum], (intptr_t)&tr );
 }
 
 

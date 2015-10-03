@@ -2305,8 +2305,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 			trap->Cvar_Set( "timescale", va( "%f", timescale.value ) );
 	}
 
-	//Raz: JPLua!
-	JPLua_Event_RunFrame();
+	//Raz: ls.
+	JPLua::Event_RunFrame();
 
 	// actually issue the rendering calls
 	CG_DrawActive();

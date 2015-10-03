@@ -558,8 +558,9 @@ void Mark1_AttackDecision( void ) {
 		if ( NPC->die ) {
 			NPC->die( NPC, NPC, NPC, 100, MOD_UNKNOWN );
 		}
-		JPLua_Entity_CallFunction( NPC, JPLUA_ENTITY_DIE, (intptr_t)NPC, (intptr_t)NPC, (intptr_t)100,
-			(intptr_t)MOD_UNKNOWN );
+		JPLua::Entity_CallFunction( NPC, JPLua::JPLUA_ENTITY_DIE, (intptr_t)NPC, (intptr_t)NPC, (intptr_t)100,
+			(intptr_t)MOD_UNKNOWN
+		);
 	}
 
 	// We can see enemy so shoot him if timers let you.

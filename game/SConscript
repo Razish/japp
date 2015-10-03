@@ -122,8 +122,9 @@ files = [build_dir + f for f in files]
 
 # libraries
 libraries = [
-	'json',
-	'lua'
+	'cJSON',
+	'lua',
+	'semver',
 ]
 if no_sql == 0:
 	libraries += [ 'sqlite' ]

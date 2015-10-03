@@ -1,5 +1,5 @@
 #include "g_local.h"
-#include "json/cJSON.h"
+#include "cJSON/cJSON.h"
 #include "qcommon/md5.h"
 
 // session data is the only data that stays persistant across level loads and tournament restarts.

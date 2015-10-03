@@ -13,7 +13,7 @@
 
 #include "g_local.h"
 #include "g_admin.h"
-#include "json/cJSON.h"
+#include "cJSON/cJSON.h"
 #include "bg_lua.h"
 #include "qcommon/md5.h"
 #include <array>
@@ -2773,7 +2773,7 @@ static void AM_Lua( gentity_t *ent ) {
 		AM_ConsolePrint( ent, "Nothing to execute\n" );
 		return;
 	}
-	if ( !JPLua.state ) {
+	if ( !JPLua::IsInitialised() ) {
 		AM_ConsolePrint( ent, "Lua is not initialised\n" );
 		return;
 	}
@@ -2782,9 +2782,10 @@ static void AM_Lua( gentity_t *ent ) {
 
 	G_LogPrintf( level.log.admin, "\t%s executed lua code \"%s\"\n", G_PrintClient( ent-g_entities ), args );
 	lastluaid = ent->s.number;
-	if ( luaL_dostring( JPLua.state, args ) != 0 ) {
+	const char *status = JPLua::DoString( args );
+	if ( status ) {
 		char errorMsg[MAX_STRING_CHARS] = {};
-		Q_strncpyz( errorMsg, lua_tostring( JPLua.state, -1 ), sizeof(errorMsg) );
+		Q_strncpyz( errorMsg, status, sizeof(errorMsg) );
 		Q_strstrip( errorMsg, "\"", "'" );
 		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_RED "Lua Error: %s\n\"", errorMsg ) );
 	}
@@ -2802,8 +2803,8 @@ static void AM_ReloadLua( gentity_t *ent ) {
 	}
 
 	G_LogPrintf( level.log.admin, "\t%s reloaded JPLua\n", G_PrintClient( ent-g_entities ) );
-	JPLua_Shutdown(qtrue);
-	JPLua_Init();
+	JPLua::Shutdown( qtrue );
+	JPLua::Init();
 #else
 	AM_ConsolePrint( ent, "Lua is not supported on this server\n" );
 #endif

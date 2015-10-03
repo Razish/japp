@@ -2835,7 +2835,9 @@ void G_BounceItem( gentity_t *ent, trace_t *trace ) {
 		if ( ent->touch ) {
 			ent->touch( ent, &g_entities[trace->entityNum], trace );
 		}
-		JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, (intptr_t)&g_entities[trace->entityNum], (intptr_t)&trace);
+		JPLua::Entity_CallFunction( ent, JPLua::JPLUA_ENTITY_TOUCH,
+			(intptr_t)&g_entities[trace->entityNum], (intptr_t)&trace
+		);
 		return;
 	}
 
@@ -2857,7 +2859,9 @@ void G_BounceItem( gentity_t *ent, trace_t *trace ) {
 		if ( ent->touch ) {
 			ent->touch( ent, &g_entities[trace->entityNum], trace );
 		}
-		JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_TOUCH, (intptr_t)&g_entities[trace->entityNum], (intptr_t)&trace);
+		JPLua::Entity_CallFunction( ent, JPLua::JPLUA_ENTITY_TOUCH,
+			(intptr_t)&g_entities[trace->entityNum], (intptr_t)&trace
+		);
 	}
 }
 

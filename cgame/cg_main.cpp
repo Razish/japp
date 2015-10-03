@@ -593,9 +593,10 @@ void CG_UpdateCvars( void ) {
 			int modCount = cv->vmCvar->modificationCount;
 			trap->Cvar_Update( cv->vmCvar );
 			if ( cv->vmCvar->modificationCount > modCount ) {
-				if ( cv->update )
+				if ( cv->update ) {
 					cv->update();
-				JPLua_Cvar_Update(cv->cvarName);
+				}
+				JPLua::Cvar_Update( cv->cvarName );
 			}
 		}
 	}
@@ -1825,7 +1826,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	CG_LoadingString( "Marks" );
 	CG_InitMarkPolys();
 	CG_LoadingString( "JPLua" );
-	JPLua_Init();
+	JPLua::Init();
 	CG_LoadingString( "Chatbox" );
 	CG_ChatboxInit();
 
@@ -1937,7 +1938,7 @@ void CG_Shutdown( void ) {
 
 #ifdef JPLUA
 	//Raz: Lua!
-	JPLua_Shutdown(qfalse);
+	JPLua::Shutdown( qfalse );
 #endif // JPLUA
 
 	// close log files

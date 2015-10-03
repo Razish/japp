@@ -1,15 +1,23 @@
 #pragma once
 
+#ifdef JPLUA
+
 #if defined(PROJECT_GAME)
 	#include "g_local.h"
-	typedef gentity_t jpluaEntity_t;
 #elif defined(PROJECT_CGAME)
 	#include "cg_local.h"
+#endif
+
+namespace JPLua {
+
+#if defined(PROJECT_GAME)
+	typedef gentity_t jpluaEntity_t;
+#elif defined(PROJECT_CGAME)
 	typedef centity_t jpluaEntity_t;
 #endif
-#if defined PROJECT_GAME
-	int JPLua_Entity_Create(lua_State *L);
-	typedef enum jplua_entityFunc_e {
+
+#if defined(PROJECT_GAME)
+	enum entityFunc_t {
 		JPLUA_ENTITY_THINK = 0,
 
 		JPLUA_ENTITY_REACHED,
@@ -19,28 +27,46 @@
 		JPLUA_ENTITY_PAIN,
 		JPLUA_ENTITY_DIE,
 		JPLUA_ENTITY_MAX
-	} jplua_entityFunc_t;
+	};
 
-	void JPLua_Entity_CallFunction(
+	void Entity_CallFunction(
 		gentity_t *ent,
-		jplua_entityFunc_t funcID,
+		entityFunc_t funcID,
 		intptr_t arg1 = 0,
 		intptr_t arg2 = 0,
 		intptr_t arg3 = 0,
 		intptr_t arg4 = 0
-		);
+	);
+
+#ifdef JPLUA_INTERNALS
+	int Entity_Create( lua_State *L );
+#endif // JPLUA_INTERNALS
+
+#endif // PROJECT_GAME
+
+	struct luaEntity_t {
+		int id;
+	};
+
+#ifdef JPLUA_INTERNALS
+	typedef int(*getFunc_t)( lua_State *L, jpluaEntity_t *ent );
+	typedef void(*setFunc_t)( lua_State *L, jpluaEntity_t *ent );
+	struct property_t {
+		const char		*name;
+		getFunc_t		Get;
+		setFunc_t		Set;
+	};
+	int propertycmp( const void *a, const void *b );
+
+	void Register_Entity( lua_State *L );
+	void Entity_CreateRef( lua_State *L, jpluaEntity_t *ent );
+	int Entity_Get( lua_State *L );
+#if defined(PROJECT_GAME)
+	int FindEntityByClassName( lua_State *L );
 #endif
+	jpluaEntity_t *CheckEntity( lua_State *L, int idx );
+#endif // JPLUA_INTERNALS
 
-#ifdef JPLUA
-typedef struct jplua_entity_s {
-	int id;
-} jplua_entity_t;
-
-void JPLua_Register_Entity( lua_State *L );
-void JPLua_Entity_CreateRef( lua_State *L, jpluaEntity_t *ent );
-int JPLua_Entity_Get( lua_State *L );
-int JPLua_FindEntityByClassName(lua_State *L);
-
-jpluaEntity_t *JPLua_CheckEntity( lua_State *L, int idx );
+} // namespace JPLua
 
 #endif // JPLUA

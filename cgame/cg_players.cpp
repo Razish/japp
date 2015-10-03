@@ -1291,7 +1291,7 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	v = Info_ValueForKey( configstring, "forcepowers" );
 	Q_strncpyz( newInfo.forcePowers, v, sizeof(newInfo.forcePowers) );
 
-	JPLua_Event_ClientInfoUpdate( clientNum, ci, &newInfo );
+	JPLua::Event_ClientInfoUpdate( clientNum, ci, &newInfo );
 
 	// we won't force colors for siege.
 	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE

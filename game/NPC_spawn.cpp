@@ -3468,13 +3468,8 @@ void NPC_Kill_f( void ) {
 						if (player->client){
 							if (player->die)
 								player->die(player, player, player, player->client->pers.maxHealth, MOD_UNKNOWN);
-							JPLua_Entity_CallFunction(
-								player,
-								JPLUA_ENTITY_DIE,
-								(intptr_t)player,
-								(intptr_t)player,
-								(intptr_t)player->client->pers.maxHealth,
-								(intptr_t)MOD_UNKNOWN
+							JPLua::Entity_CallFunction( player, JPLua::JPLUA_ENTITY_DIE, (intptr_t)player,
+								(intptr_t)player, (intptr_t)player->client->pers.maxHealth, (intptr_t)MOD_UNKNOWN
 							);
 						}
 					}
@@ -3494,13 +3489,8 @@ void NPC_Kill_f( void ) {
 					if ( player->die ) {
 						player->die( player, player, player, player->client->pers.maxHealth, MOD_UNKNOWN );
 					}
-					JPLua_Entity_CallFunction(
-						player,
-						JPLUA_ENTITY_DIE,
-						(intptr_t)player,
-						(intptr_t)player,
-						(intptr_t)player->client->pers.maxHealth,
-						(intptr_t)MOD_UNKNOWN
+					JPLua::Entity_CallFunction( player, JPLua::JPLUA_ENTITY_DIE, (intptr_t)player, (intptr_t)player,
+						(intptr_t)player->client->pers.maxHealth, (intptr_t)MOD_UNKNOWN
 					);
 				}
 			}
@@ -3512,13 +3502,8 @@ void NPC_Kill_f( void ) {
 				if ( player->die ) {
 					player->die( player, player, player, 100, MOD_UNKNOWN );
 				}
-				JPLua_Entity_CallFunction(
-					player,
-					JPLUA_ENTITY_DIE,
-					(intptr_t)player,
-					(intptr_t)player,
-					(intptr_t)player->client->pers.maxHealth,
-					(intptr_t)MOD_UNKNOWN
+				JPLua::Entity_CallFunction( player, JPLua::JPLUA_ENTITY_DIE, (intptr_t)player, (intptr_t)player,
+					(intptr_t)player->client->pers.maxHealth, (intptr_t)MOD_UNKNOWN
 				);
 			}
 		}

@@ -1200,7 +1200,7 @@ static void Cmd_Say_f( gentity_t *ent ) {
 		p[MAX_SAY_TEXT - 1] = '\0';
 		G_LogPrintf( level.log.security, "Cmd_Say_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
-	if ((res = JPLua_Event_ChatMessageRecieved(ent->s.number, p, type))){
+	if ((res = JPLua::Event_ChatMessageRecieved(ent->s.number, p, type))){
 		G_Say(ent, NULL, type, res);
 	}
 	else{
@@ -1223,7 +1223,7 @@ static void Cmd_SayAdmin_f( gentity_t *ent ) {
 		p[MAX_SAY_TEXT - 1] = '\0';
 		G_LogPrintf( level.log.security, "Cmd_SayAdmin_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
-	if ((res = JPLua_Event_ChatMessageRecieved(ent->s.number, p, type))){
+	if ((res = JPLua::Event_ChatMessageRecieved(ent->s.number, p, type))){
 		G_Say(ent, NULL, type, res);
 	}
 	else{
@@ -1247,7 +1247,7 @@ static void Cmd_SayTeam_f( gentity_t *ent ) {
 		p[MAX_SAY_TEXT - 1] = '\0';
 		G_LogPrintf( level.log.security, "Cmd_SayTeam_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
-	if ((res = JPLua_Event_ChatMessageRecieved(ent->s.number, p, type))){
+	if ((res = JPLua::Event_ChatMessageRecieved(ent->s.number, p, type))){
 		Q_strncpyz(p, res, MAX_SAY_TEXT);
 	}
 	if ( ent->client->pers.sayTeamMethod == STM_ADMIN ) {
@@ -2537,7 +2537,7 @@ static void Cmd_TargetUse_f( gentity_t *ent ) {
 			if ( targ->use ) {
 				targ->use( targ, ent, ent );
 			}
-			JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_USE, (intptr_t)ent, (intptr_t)ent);
+			JPLua::Entity_CallFunction(targ, JPLua::JPLUA_ENTITY_USE, (intptr_t)ent, (intptr_t)ent);
 		} while ( targ );
 	}
 	else {
@@ -2547,7 +2547,7 @@ static void Cmd_TargetUse_f( gentity_t *ent ) {
 			if ( targ->use ) {
 				targ->use( targ, ent, ent );
 			}
-			JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_USE, (intptr_t)ent, (intptr_t)ent);
+			JPLua::Entity_CallFunction(targ, JPLua::JPLUA_ENTITY_USE, (intptr_t)ent, (intptr_t)ent);
 		}
 	}
 }
@@ -3941,7 +3941,7 @@ void ClientCommand( int clientNum ) {
 		return;
 
 	//Raz: JPLua
-	if ( JPLua_Event_ClientCommand( clientNum ) )
+	if ( JPLua::Event_ClientCommand( clientNum ) )
 		return;
 
 	command = (command_t *)bsearch( cmd, commands, numCommands, sizeof(commands[0]), cmdcmp );

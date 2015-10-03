@@ -1,89 +1,53 @@
 #pragma once
 
-extern "C" {
-	#include "../lua/lua.h"
-	#include "../lua/lualib.h"
-	#include "../lua/lauxlib.h"
-}
-
-#include <unordered_map>
-
-#include "bg_luacvar.h"
-#include "bg_luaevent.h"
-#include "bg_luaplayer.h"
-#include "bg_luaentity.h"
-#ifdef PROJECT_CGAME
-#include "cg_luaserver.h"
-#include "cg_luainterface.h"
-#endif
-#include "bg_luavector.h"
-#include "bg_luafs.h"
-#ifdef PROJECT_GAME
-#include "g_luasql.h"
-#include "g_luaweapon.h"
-#endif
-
-void JPLua_Init(void);
-void JPLua_Shutdown(qboolean restart);
-
 #ifdef JPLUA
+#include "bg_luacvar.h"
+#include "bg_luaentity.h"
+#include "bg_luaevent.h"
+#include "bg_luafs.h"
+#include "bg_lualogger.h"
+#include "bg_luaplayer.h"
+#include "bg_luaserialiser.h"
+#include "bg_luavector.h"
 
-int JPLua_StackDump( lua_State *L );
+#if defined(PROJECT_GAME)
+	#include "g_luasql.h"
+	#include "g_luaweapon.h"
+#elif defined(PROJECT_CGAME)
+	#include "cg_luaserver.h"
+	#include "cg_luainterface.h"
+#endif
 
-int JPLua_Push_ToString( lua_State *L );
-int JPLua_Push_Pairs( lua_State *L );
+#include "semver/semver.h"
 
-void JPLua_Util_ArgAsString( lua_State *L, char *out, int bufsize );
-void JPLua_ReadVector( float *out, int numComponents, lua_State *L, int idx );
-void JPLua_ReadColour( float *out, int numComponents, lua_State *L, int idx );
-void JPLua_ReadFloats( float *out, int numComponents, lua_State *L, int idx );
-void JPLua_DPrintf( const char *msg, ... );
-qboolean JPLua_Call( lua_State *L, int argCount, int resCount );
+namespace JPLua {
 
-void JPLua_PushInfostring( lua_State *L, const char *info );
-void JPLua_PopInfostring( lua_State *L, char *info );
+	struct plugin_t {
+		bool enabled;
 
-typedef struct jplua_cimport_table_s {
-	const char *name;
-	lua_CFunction function;
-} jplua_cimport_table_t;
+		char name[32], longname[32];
+		semver_t version, requiredJPLuaVersion;
 
-typedef struct jplua_plugin_s {
-	char name[32], longname[32];
-	char version[8];
-	unsigned int requiredJPLuaVersion;
-	intptr_t UID;
-	int handle;
+		// lua handles, internal
+		int handle;
+		int eventListeners[JPLUA_EVENT_MAX]; // references to listener functions in lua stored in the registry
 
-	int eventListeners[JPLUA_EVENT_MAX]; // references to listener functions in lua stored in the registry
+		plugin_t *next;
+	};
 
-	struct jplua_plugin_s *next;
-} jplua_plugin_t;
+	// public API, no references to JPLua or Lua internals/types
+	void Init( void );
+	bool IsInitialised( void );
+	void Shutdown( qboolean restart );
+	qboolean IteratePlugins( plugin_t **plugin, bool ifActive = true ); // FIXME: hide type of plugin_t?
+	qboolean IteratePluginsTemp( plugin_t **plugin, bool ifActive = true ); // FIXME: hide type of plugin_t?
+	void ListPlugins( void );
+	bool EnablePlugin( plugin_t *plugin );
+	void DisablePlugin( plugin_t *plugin );
+	plugin_t *FindPlugin( const char * const pluginName );
+	void UpdateAutoload( void );
+	const char *DoString( const char *str );
 
-qboolean JPLua_IteratePlugins( jplua_plugin_t **plugin );
-
-typedef struct jplua_s {
-	lua_State *state;
-	jplua_plugin_t *plugins, *currentPlugin;
-	qboolean initialised;
-} jplua_t;
-extern jplua_t JPLua;
-
-typedef int(*getFunc_t)(lua_State *L, jpluaEntity_t *ent);
-typedef void(*setFunc_t)(lua_State *L, jpluaEntity_t *ent);
-
-struct luaProperty_t {
-	const char		*name;
-	getFunc_t		Get;
-	setFunc_t		Set;
-};
-
-typedef struct lua_weapon_s {
-	int fire;
-	int altFire;
-} lua_weapon;
-
-extern const uint32_t JPLUA_VERSION;
-int propertycmp(const void *a, const void *b);
+} // namespace JPLua
 
 #endif // JPLUA

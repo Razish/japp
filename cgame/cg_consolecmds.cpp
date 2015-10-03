@@ -6,6 +6,10 @@
 #include "cg_local.h"
 #include "bg_saga.h"
 #include "bg_lua.h"
+#include "ui/ui_shared.h"
+
+#define __STDC_FORMAT_MACROS // older compilers need this
+#include <inttypes.h>
 
 void CG_TargetCommand_f( void ) {
 	int		targetNum;
@@ -273,7 +277,7 @@ void CG_LuaDoString_f( void ) {
 	int i = 0;
 	int argc = trap->Cmd_Argc();
 
-	if ( argc < 2 || !JPLua.state )
+	if ( argc < 2 || !JPLua::IsInitialised() )
 		return;
 
 	for ( i = 1; i < argc; i++ ) {
@@ -281,20 +285,67 @@ void CG_LuaDoString_f( void ) {
 		Q_strcat( buf, sizeof(buf), va( "%s ", arg ) );
 	}
 
-	if ( trap->Key_GetCatcher() & KEYCATCH_CONSOLE )
+	if ( trap->Key_GetCatcher() & KEYCATCH_CONSOLE ) {
 		trap->Print( S_COLOR_CYAN"Executing Lua code...\n" );
-	if ( luaL_dostring( JPLua.state, buf ) != 0 )
-		trap->Print( S_COLOR_RED"Lua Error: %s\n", lua_tostring( JPLua.state, -1 ) );
+	}
+	JPLua::DoString( buf );
+}
+
+void CG_LuaList_f( void ) {
+	JPLua::ListPlugins();
+}
+
+void CG_LuaLoad_f( void ) {
+	if ( trap->Cmd_Argc() != 2 ) {
+		trap->Print( "You must specify the plugin's name\n" );
+		return;
+	}
+	//TODO: lua_load plugin1 plugin2
+
+	char pluginName[32];
+	trap->Cmd_Argv( 1, pluginName, sizeof(pluginName) );
+	JPLua::plugin_t *plugin = JPLua::FindPlugin( pluginName );
+	if ( plugin ) {
+		JPLua::EnablePlugin( plugin );
+	}
 }
 
 void CG_LuaReload_f( void ) {
-	trap->Print( S_COLOR_CYAN"Reloading JPLua...\n" );
-	JPLua_Shutdown(qtrue);
-	JPLua_Init();
-}
-#endif // JPLUA
+	if ( trap->Cmd_Argc() == 1 ) {
+		// just reload everything
+		trap->Print( S_COLOR_CYAN "Reloading JPLua...\n" );
+		JPLua::Shutdown( qtrue );
+		JPLua::Init();
+		return;
+	}
 
-//cg_consolecmds.c
+	char *args = ConcatArgs( 1 );
+	const char *delim = " ";
+	//FIXME: p is getting corrupted somehow, and then tries to load a plugin with that corrupted name
+	for ( char *p = strtok( args, delim ); p; p = strtok( NULL, delim ) ) {
+		JPLua::plugin_t *plugin = JPLua::FindPlugin( p );
+		if ( plugin ) {
+			JPLua::DisablePlugin( plugin );
+			JPLua::EnablePlugin( plugin );
+		}
+	}
+}
+
+void CG_LuaUnload_f( void ) {
+	if ( trap->Cmd_Argc() != 2 ) {
+		trap->Print( "You must specify the plugin's name\n" );
+		return;
+	}
+
+	char pluginName[32];
+	trap->Cmd_Argv( 1, pluginName, sizeof(pluginName) );
+	JPLua::plugin_t *plugin = JPLua::FindPlugin( pluginName );
+	if ( plugin ) {
+		JPLua::DisablePlugin( plugin );
+	}
+}
+
+#endif // JPLUA
 
 void CG_FixDirection( void ) {
 	if ( cg.japp.isfixedVector ) {
@@ -327,16 +378,14 @@ void CG_SayTeam_f( void ) {
 	trap->SendClientCommand( va( "say_team %s", buf ) );
 }
 
-#include "ui/ui_shared.h"
 static void CG_HudReload_f( void ) {
-	const char *hudSet = NULL;
-
 	String_Init();
 	Menu_Reset();
 
-	hudSet = cg_hudFiles.string;
-	if ( hudSet[0] == '\0' )
+	const char *hudSet = cg_hudFiles.string;
+	if ( hudSet[0] == '\0' ) {
 		hudSet = "ui/jahud.txt";
+	}
 
 	CG_LoadMenus( hudSet );
 }
@@ -399,7 +448,10 @@ static const command_t commands[] = {
 	{ "loaddeferred", CG_LoadDeferredPlayers },
 #ifdef JPLUA
 	{ "lua", CG_LuaDoString_f },
+	{ "lua_list", CG_LuaList_f },
+	{ "lua_load", CG_LuaLoad_f },
 	{ "lua_reload", CG_LuaReload_f },
+	{ "lua_unload", CG_LuaUnload_f },
 #endif // JPLUA
 	{ "messagemodeAll", CG_MessageModeAll_f },
 	{ "messagemodeTeam", CG_MessageModeTeam_f },
@@ -461,8 +513,9 @@ qboolean CG_ConsoleCommand( void ) {
 	const char *cmd = NULL;
 	const command_t *command = NULL;
 
-	if ( JPLua_Event_ConsoleCommand() )
+	if ( JPLua::Event_ConsoleCommand() ) {
 		return qtrue;
+	}
 
 	cmd = CG_Argv( 0 );
 

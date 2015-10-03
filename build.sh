@@ -7,6 +7,8 @@ ARGSLEN=${#ARGS[@]}
 # options
 DEBUG=0
 FORCE32=0
+NOSQL=0
+
 build='scons -Q'
 
 for (( i=0; i<${ARGSLEN}; i++ ));
@@ -19,14 +21,17 @@ do
 		DEBUG=2
 		;;
 	"analyse")
-		build='scan-build scons -Q'
+		build='scan-build $build'
 		;;
 	"force32")
 		FORCE32=1
+		;;
+	"nosql")
+		NOSQL=1
 		;;
 	*)
 		;;
 	esac
 done
 
-$build debug=$DEBUG force32=$FORCE32
+$build debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL

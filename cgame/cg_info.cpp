@@ -75,8 +75,9 @@ void CG_DrawInformation( void ) {
 	char buf[MAX_STRING_CHARS];
 	int iPropHeight = 18;
 
-	if (JPLua_Event_ConnectScreen())
+	if ( JPLua::Event_ConnectScreen() ) {
 		return;
+	}
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	sysInfo = CG_ConfigString( CS_SYSTEMINFO );

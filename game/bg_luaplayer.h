@@ -2,15 +2,21 @@
 
 #ifdef JPLUA
 
-// Player instance userdata type
-struct jplua_player_t {
-	int clientNum;
-};
+namespace JPLua {
 
-void JPLua_Player_CreateRef( lua_State *L, int num );
-int JPLua_GetPlayer( lua_State *L );
-jplua_player_t *JPLua_CheckPlayer( lua_State *L, int idx );
-int JPLua_Player_GetMetaTable( lua_State *L );
-void JPLua_Register_Player( lua_State *L );
+	// Player instance userdata type
+	struct luaPlayer_t {
+		int clientNum;
+	};
+
+#ifdef JPLUA_INTERNALS
+	void Player_CreateRef( lua_State *L, int num );
+	int GetPlayer( lua_State *L );
+	luaPlayer_t *CheckPlayer( lua_State *L, int idx );
+	int Player_GetMetaTable( lua_State *L );
+	void Register_Player( lua_State *L );
+#endif // JPLUA_INTERNALS
+
+} // namespace JPLua
 
 #endif // JPLUA

@@ -1815,7 +1815,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 	trap->GetUserinfo( clientNum, userinfo, sizeof(userinfo) );
 
-	if ( JPLua_Event_ClientUserinfoChanged( clientNum, userinfo ) ) {
+	if ( JPLua::Event_ClientUserinfoChanged( clientNum, userinfo ) ) {
 		trap->SetUserinfo( clientNum, userinfo );
 	}
 
@@ -2261,7 +2261,7 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	}
 
 	// JPLua plugins can deny connections
-	if ( (result = JPLua_Event_ClientConnect( clientNum, userinfo, tmpIP, firstTime )) ) {
+	if ( (result = JPLua::Event_ClientConnect( clientNum, userinfo, tmpIP, firstTime )) ) {
 		Com_Printf( "Denied: %s\n", result );
 		return result;
 	}
@@ -2508,7 +2508,7 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	// count current clients and rank for scoreboard
 	CalculateRanks();
 
-	JPLua_Event_ClientBegin( clientNum );
+	JPLua::Event_ClientBegin( clientNum );
 
 	G_ClearClientLog( clientNum );
 }
@@ -3470,7 +3470,7 @@ void ClientSpawn( gentity_t *ent ) {
 	*/
 	//Disabled. At least for now. Not sure if I'll want to do it or not eventually.
 
-	JPLua_Event_ClientSpawn( ent - g_entities, (client->ps.persistant[PERS_SPAWN_COUNT] == 1) ? qtrue : qfalse );
+	JPLua::Event_ClientSpawn( ent - g_entities, (client->ps.persistant[PERS_SPAWN_COUNT] == 1) ? qtrue : qfalse );
 
 	// run a client frame to drop exactly to the floor,
 	// initialize animations and other things
@@ -3539,7 +3539,7 @@ void ClientDisconnect( int clientNum ) {
 
 	G_LogPrintf( level.log.console, "ClientDisconnect: %i\n", clientNum );
 
-	JPLua_Event_ClientDisconnect( clientNum );
+	JPLua::Event_ClientDisconnect( clientNum );
 
 	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
 		if ( ent->client->ps.fd.forcePowersActive & (1 << i) )
@@ -3631,11 +3631,12 @@ void ClientDisconnect( int clientNum ) {
 		// carrying a siege objective item - make sure it updates and removes itself from us now in case this is an instant death-respawn situation
 		gentity_t *objectiveItem = &g_entities[ent->client->holdingObjectiveItem];
 
-		if (objectiveItem->inuse){
-			if (objectiveItem->think)
-				objectiveItem->think(objectiveItem);
+		if ( objectiveItem->inuse ) {
+			if ( objectiveItem->think ) {
+				objectiveItem->think( objectiveItem );
+			}
 
-			JPLua_Entity_CallFunction(objectiveItem, JPLUA_ENTITY_THINK);
+			JPLua::Entity_CallFunction( objectiveItem, JPLua::JPLUA_ENTITY_THINK );
 		}
 	}
 

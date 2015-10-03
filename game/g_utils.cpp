@@ -8,6 +8,8 @@
 #include "qcommon/qfiles.h"
 #include "bg_lua.h"
 
+#include <unordered_map>
+
 typedef struct shaderRemap_s {
 	char oldShader[MAX_QPATH], newShader[MAX_QPATH];
 	float timeOffset;
@@ -301,7 +303,7 @@ void GlobalUse( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	if ( self->use ) {
 		self->use( self, other, activator );
 	}
-	JPLua_Entity_CallFunction(self, JPLUA_ENTITY_USE, (intptr_t)other, (intptr_t)activator);
+	JPLua::Entity_CallFunction( self, JPLua::JPLUA_ENTITY_USE, (intptr_t)other, (intptr_t)activator );
 }
 
 void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *string ) {
@@ -1656,67 +1658,66 @@ const char *G_PrintClient( int clientNum ) {
 void G_Announce(const char *msg) {
 	trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
 }
-typedef struct modelbounds_s{
+
+struct modelBounds_t {
 	vector3 mins, maxs;
-}modelbounds_t;
+};
 
-static std::unordered_map<std::string, modelbounds_t> modelboundslist; //speed optimisation
+static std::unordered_map<std::string, modelBounds_t> modelBoundsList; //speed optimisation
 
-void G_GetModelBounds(const char *name, vector3 *mins, vector3 *maxs){
-	fileHandle_t f;
-	void *buf = NULL;
-	unsigned int len = 0;
-	md3Header_t		*model;
-	const md3Frame_t	*frame;
-	modelbounds_t *p, s;
-	std::string names(name);
+void G_GetModelBounds( const char *name, vector3 *mins, vector3 *maxs ) {
+	modelBounds_t *p;
+	std::string names( name );
 
-	if (modelboundslist.count(names) > 0){
-		p = &modelboundslist[names];
-		VectorCopy(&p->mins, mins);
-		VectorCopy(&p->maxs, maxs);
+	if ( modelBoundsList.count( names ) > 0 ) {
+		p = &modelBoundsList[names];
+		VectorCopy( &p->mins, mins );
+		VectorCopy( &p->maxs, maxs );
 		return;
 	}
 
-	len = trap->FS_Open(name, &f, FS_READ);
-
+	fileHandle_t f;
+	unsigned int len = trap->FS_Open( name, &f, FS_READ );
 	// no file
-	if (!f) {
+	if ( !f ) {
 		return;
 	}
 
 	// empty file
-	if (!len || len == -1) {
-		trap->FS_Close(f);
+	if ( !len || len == -1 ) {
+		trap->FS_Close( f );
 		return;
 	}
 
-	if (!(buf = (char*)malloc(len + 1))) {
+	void *buf = malloc( len + 1 );
+	if ( !buf ) {
+		trap->FS_Close( f );
 		return;
 	}
 
-	trap->FS_Read(buf, len, f);
-	trap->FS_Close(f);
-	////////////////
-	model = (md3Header_t*)buf;
-	LittleLong(model->ident);
-	LittleLong(model->version);
-	LittleLong(model->numFrames);
-	LittleLong(model->numTags);
-	LittleLong(model->numSurfaces);
-	LittleLong(model->ofsFrames);
-	LittleLong(model->ofsTags);
-	LittleLong(model->ofsSurfaces);
-	LittleLong(model->ofsEnd);
+	trap->FS_Read( buf, len, f );
+	trap->FS_Close( f );
 
-	frame = (md3Frame_t *)((byte *)model + model->ofsFrames);
+	md3Header_t *model = (md3Header_t *)buf;
+	LittleLong( model->ident );
+	LittleLong( model->version );
+	LittleLong( model->numFrames );
+	LittleLong( model->numTags );
+	LittleLong( model->numSurfaces );
+	LittleLong( model->ofsFrames );
+	LittleLong( model->ofsTags );
+	LittleLong( model->ofsSurfaces );
+	LittleLong( model->ofsEnd );
 
-	VectorCopy(&frame->bounds[0], &s.mins);
-	VectorCopy(&frame->bounds[1], &s.maxs);
-	modelboundslist[std::string(name)] = s;
+	const md3Frame_t *frame = (md3Frame_t *)((byte *)model + model->ofsFrames);
 
-	VectorCopy(&frame->bounds[0], mins);
-	VectorCopy(&frame->bounds[1], maxs);
+	modelBounds_t s;
+	VectorCopy( &frame->bounds[0], &s.mins );
+	VectorCopy( &frame->bounds[1], &s.maxs );
+	modelBoundsList[std::string( name )] = s;
 
-	free(buf);
+	VectorCopy( &frame->bounds[0], mins );
+	VectorCopy( &frame->bounds[1], maxs );
+
+	free( buf );
 }

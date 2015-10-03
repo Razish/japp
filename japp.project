@@ -103,6 +103,9 @@
     <File Name="cgame/cg_smartentities.cpp"/>
     <File Name="cgame/cg_trueview.cpp"/>
     <File Name="cgame/cg_info.cpp"/>
+    <File Name="cgame/cg_luaitem.cpp"/>
+    <File Name="cgame/cg_luainterface.h"/>
+    <File Name="cgame/cg_luamenu.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="game">
     <File Name="game/g_log.cpp"/>
@@ -256,11 +259,14 @@
     <File Name="game/g_luasqlite.cpp"/>
     <File Name="game/g_luaweapon.cpp"/>
     <File Name="game/g_luaweapon.h"/>
+    <File Name="game/bg_luaentity.cpp"/>
+    <File Name="game/bg_luaentity.h"/>
+    <File Name="game/bg_luainternal.h"/>
   </VirtualDirectory>
-  <VirtualDirectory Name="json">
-    <File Name="json/cJSON.c"/>
-    <File Name="json/SConscript"/>
-    <File Name="json/cJSON.h"/>
+  <VirtualDirectory Name="cJSON">
+    <File Name="cJSON/cJSON.c"/>
+    <File Name="cJSON/SConscript"/>
+    <File Name="cJSON/cJSON.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="libudis86">
     <File Name="libudis86/decode.c"/>
@@ -453,6 +459,11 @@
     <File Name="macosx/MacPrefix_UI.h"/>
     <File Name="macosx/MacPrefix_UIF.h"/>
     <File Name="macosx/MacPrefixCommon.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="semver">
+    <File Name="semver/semver.c"/>
+    <File Name="semver/semver.h"/>
+    <File Name="semver/SConscript"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>

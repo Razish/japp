@@ -2,15 +2,21 @@
 
 #ifdef JPLUA
 
-// Logger instance userdata type
-typedef struct jplua_logger_s {
-	fileHandle_t fileHandle;
-	char fileName[MAX_QPATH];
-} jplua_logger_t;
+namespace JPLua {
 
-void JPLua_Logger_CreateRef( lua_State *L, const char *path );
-int JPLua_GetLogger( lua_State *L );
-jplua_logger_t *JPLua_CheckLogger( lua_State *L, int idx );
-void JPLua_Register_Logger( lua_State *L );
+	// Logger instance userdata type
+	struct logger_t {
+		fileHandle_t fileHandle;
+		char fileName[MAX_QPATH];
+	};
+
+#ifdef JPLUA_INTERNALS
+	void Logger_CreateRef( lua_State *L, const char *path );
+	int GetLogger( lua_State *L );
+	logger_t *CheckLogger( lua_State *L, int idx );
+	void Register_Logger( lua_State *L );
+#endif // JPLUA_INTERNALS
+
+} // namespace JPLua
 
 #endif // JPLUA

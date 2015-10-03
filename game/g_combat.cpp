@@ -1669,11 +1669,11 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if ( self->client->holdingObjectiveItem > 0 ) { //carrying a siege objective item - make sure it updates and removes itself from us now in case this is an instant death-respawn situation
 		gentity_t *objectiveItem = &g_entities[self->client->holdingObjectiveItem];
 
-		if ( objectiveItem->inuse){
-			if (objectiveItem->think) {
-				objectiveItem->think(objectiveItem);
+		if ( objectiveItem->inuse ) {
+			if ( objectiveItem->think ) {
+				objectiveItem->think( objectiveItem );
 			}
-			JPLua_Entity_CallFunction(objectiveItem, JPLUA_ENTITY_THINK);
+			JPLua::Entity_CallFunction( objectiveItem, JPLua::JPLUA_ENTITY_THINK );
 		}
 	}
 
@@ -1805,10 +1805,10 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	if ( self - g_entities < MAX_CLIENTS ) {
 		if ( attacker - g_entities >= MAX_CLIENTS ) {
-			JPLua_Event_PlayerDeath( self->s.number, meansOfDeath, -1 );
+			JPLua::Event_PlayerDeath( self->s.number, meansOfDeath, -1 );
 		}
 		else {
-			JPLua_Event_PlayerDeath(self->s.number, meansOfDeath, attacker->s.number);
+			JPLua::Event_PlayerDeath(self->s.number, meansOfDeath, attacker->s.number);
 		}
 	}
 
@@ -3982,7 +3982,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		);
 	}
 
-	JPLua_Event_Pain( targ - g_entities, inflictor - g_entities, attacker - g_entities, take, asave, dflags, mod );
+	JPLua::Event_Pain( targ - g_entities, inflictor - g_entities, attacker - g_entities, take, asave, dflags, mod );
 
 	if ( targ->client ) {//update vehicle shields and armor, check for explode
 		if ( targ->client->NPC_class == CLASS_VEHICLE &&
@@ -4379,15 +4379,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			}
 
 			targ->enemy = attacker;
-			if (targ->die)
+			if ( targ->die ) {
 				targ->die( targ, inflictor, attacker, take, mod );
-			JPLua_Entity_CallFunction(
-				targ,
-				JPLUA_ENTITY_DIE,
-				(intptr_t)inflictor,
-				(intptr_t)attacker,
-				(intptr_t)take,
-				(intptr_t)mod
+			}
+			JPLua::Entity_CallFunction( targ, JPLua::JPLUA_ENTITY_DIE,
+				(intptr_t)inflictor, (intptr_t)attacker, (intptr_t)take, (intptr_t)mod
 			);
 			G_ActivateBehavior( targ, BSET_DEATH );
 			return;
@@ -4406,10 +4402,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 					else {
 						VectorCopy( &targ->r.currentOrigin, &gPainPoint );
 					}
-					if (targ->pain) {
-						targ->pain(targ, attacker, take);
+					if ( targ->pain ) {
+						targ->pain( targ, attacker, take );
 					}
-					JPLua_Entity_CallFunction(targ, JPLUA_ENTITY_PAIN, (intptr_t)attacker, (intptr_t)take);
+					JPLua::Entity_CallFunction( targ, JPLua::JPLUA_ENTITY_PAIN, (intptr_t)attacker, (intptr_t)take );
 			}
 		}
 

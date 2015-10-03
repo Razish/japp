@@ -479,7 +479,6 @@ typedef struct displayContextDef_s {
 	float widthRatioCoef;	//to make 2Ds be not stretched
 } displayContextDef_t;
 
-
 const char *String_Alloc( const char *p );
 void String_Init( void );
 void String_Report( void );
@@ -487,6 +486,8 @@ void Init_Display( displayContextDef_t *dc );
 void Display_ExpandMacros( char * buff );
 void Menu_Init( menuDef_t *menu );
 void Item_Init( itemDef_t *item );
+void Item_InitControls( itemDef_t *item );
+void Item_ValidateTypeData( itemDef_t *item );
 void Menu_PostParse( menuDef_t *menu );
 menuDef_t *Menu_GetFocused( void );
 void Menu_HandleKey( menuDef_t *menu, int key, qboolean down );

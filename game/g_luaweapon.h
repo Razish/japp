@@ -1,7 +1,20 @@
 #pragma once
 
-qboolean JPLua_Weapon_CallFunction(gentity_t *ent, weapon_t type, qboolean altFire);
+namespace JPLua {
+
 #ifdef JPLUA
-int JPLua_Weapon_SetFireFunction(lua_State *L);
-int JPLua_Weapon_SetAltFireFunction(lua_State *L);
-#endif
+
+	struct luaWeapon_t {
+		int fire, altFire; // lua registry handles
+	};
+
+#ifdef JPLUA_INTERNALS
+	int Weapon_SetFireFunction( lua_State *L );
+	int Weapon_SetAltFireFunction( lua_State *L );
+#endif // JPLUA_INTERNALS
+
+#endif // JPLUA
+
+	qboolean Weapon_CallFunction( gentity_t *ent, weapon_t type, qboolean altFire );
+
+} // namespace JPLua

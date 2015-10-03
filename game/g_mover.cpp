@@ -371,9 +371,9 @@ void G_MoverTeam( gentity_t *ent ) {
 			}
 
 			// if the pusher has a "blocked" function, call it
-			if (ent->blocked) {
-				ent->blocked(ent, obstacle);
-				JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_BLOCKED, (intptr_t)obstacle);
+			if ( ent->blocked ) {
+				ent->blocked( ent, obstacle );
+				JPLua::Entity_CallFunction( ent, JPLua::JPLUA_ENTITY_BLOCKED, (intptr_t)obstacle );
 			}
 			return;
 		}
@@ -388,7 +388,7 @@ void G_MoverTeam( gentity_t *ent ) {
 			if ( level.time >= part->s.pos.trTime + part->s.pos.trDuration ) {
 				if ( part->reached ) {
 					part->reached( part );
-					JPLua_Entity_CallFunction(part, JPLUA_ENTITY_REACHED);
+					JPLua::Entity_CallFunction( part, JPLua::JPLUA_ENTITY_REACHED );
 				}
 			}
 		}

@@ -192,7 +192,7 @@ void CG_ChatboxOutgoing( void ) {
 	// commit the current line to history
 	CG_GetNewChatHistory( chatField.buffer );
 
-	msg = JPLua_Event_ChatMessageSent( msg, chatMode, chatTargetClient );
+	msg = JPLua::Event_ChatMessageSent( msg, chatMode, chatTargetClient );
 
 	// lua event ate it
 	if ( !msg || !msg[0] )

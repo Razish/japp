@@ -15,7 +15,7 @@
 //	}
 
 #include "g_local.h"
-#include "json/cJSON.h"
+#include "cJSON/cJSON.h"
 
 #define BANFILE "bans.json"
 

@@ -1162,7 +1162,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			cl_ent->numLoopingSounds = 0;
 			//cl_ent->localAnimIndex = 0;
 		}
-		JPLua_Event_ClientConnect( es->eventParm );
+		JPLua::Event_ClientConnect( es->eventParm );
 		break;
 
 	case EV_FOOTSTEP:
@@ -1911,7 +1911,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			int hitOtherFxID = media.efx.saberCut;
 			int hitSound = trap->S_RegisterSound( va( "sound/weapons/saber/saberhit%i.wav", Q_irand( 1, 3 ) ) );
 
-			JPLua_Event_SaberTouch( es->otherEntityNum, es->otherEntityNum2 );
+			JPLua::Event_SaberTouch( es->otherEntityNum, es->otherEntityNum2 );
 
 			//Raz: Duel isolation
 			//	Com_Printf( "\n\ncg.snap->ps.duelInProgress: %i\ncg.snap->ps.duelIndex: %i\nes->otherEntityNum2: %i\ncg.snap->ps.clientNum: %i\n", cg.snap->ps.duelInProgress, cg.snap->ps.duelIndex, es->otherEntityNum2, cg.snap->ps.clientNum );
@@ -2999,7 +2999,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		if ( !cg_oldPainSounds.integer || (cent->currentState.number != cg.snap->ps.clientNum) ) {
 			CG_PainEvent( cent, es->eventParm );
 		}
-		JPLua_Event_Pain( cent->currentState.number, es->eventParm );
+		JPLua::Event_Pain( cent->currentState.number, es->eventParm );
 		break;
 
 	case EV_DEATH1:

@@ -275,13 +275,17 @@ void G_UpdateCvars( void ) {
 			int modCount = cv->vmCvar->modificationCount;
 			trap->Cvar_Update( cv->vmCvar );
 			if ( cv->vmCvar->modificationCount != modCount ) {
-				if ( cv->update )
+				if ( cv->update ) {
 					cv->update();
+				}
 
-				JPLua_Cvar_Update(cv->cvarName);
+				JPLua::Cvar_Update( cv->cvarName );
 
-				if ( cv->trackChange )
-					trap->SendServerCommand( -1, va( "print \"Server: %s changed to %s\n\"", cv->cvarName, cv->vmCvar->string ) );
+				if ( cv->trackChange ) {
+					trap->SendServerCommand( -1, va( "print \"Server: %s changed to %s\n\"",
+						cv->cvarName, cv->vmCvar->string )
+					);
+				}
 			}
 		}
 	}
@@ -687,8 +691,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	JP_Bans_Init();
 
 #ifdef JPLUA
-	//As: BEGIN THE LUAS
-	JPLua_Init();
+	JPLua::Init();
 #endif // JPLUA
 }
 
@@ -741,8 +744,8 @@ void G_ShutdownGame( int restart ) {
 	G_LogWeaponOutput();
 
 #ifdef JPLUA
-	//Raz: Shutdown JPLua, triggers events etc
-	JPLua_Shutdown(restart);
+	//Raz: Shutdown JPLua triggers events etc
+	JPLua::Shutdown( restart );
 #endif // JPLUA
 
 	G_LogPrintf( level.log.console, "ShutdownGame:\n" );
@@ -2536,7 +2539,7 @@ void G_RunThink( gentity_t *ent ) {
 	}
 
 	ent->nextthink = 0;
-	JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_THINK);
+	JPLua::Entity_CallFunction( ent, JPLua::JPLUA_ENTITY_THINK );
 	if ( !ent->think ) {
 		//trap->Error( ERR_DROP, "NULL ent->think");
 		goto runicarus;
@@ -3121,7 +3124,7 @@ void G_RunFrame( int levelTime ) {
 #endif
 
 
-	JPLua_Event_RunFrame();
+	JPLua::Event_RunFrame();
 
 
 #ifdef _G_FRAME_PERFANAL

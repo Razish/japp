@@ -1221,7 +1221,7 @@ void CG_DrawHUD( centity_t *cent ) {
 	JP_DrawMovementKeys();
 	JP_DrawAccel();
 
-	if ( JPLua_Event_HUD() ) {
+	if ( JPLua::Event_HUD() ) {
 		return;
 	}
 
@@ -2584,7 +2584,7 @@ static void CG_DrawStats( void ) {
 	if ( cent ) {
 		// vehicle HUD
 		if ( cg.predictedPlayerState.m_iVehicleNum ) {
-			if ( JPLua_Event_VehicleHUD() ) {
+			if ( JPLua::Event_VehicleHUD() ) {
 				drawHUD = qtrue;
 			}
 			else {

@@ -29,7 +29,7 @@ files = [build_dir + f for f in files]
 
 # libraries
 libraries = [
-	'json'
+	'cJSON'
 ]
 if bits == 32:
 	libraries += [ 'libudis86' ]

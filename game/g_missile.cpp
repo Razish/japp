@@ -555,7 +555,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 				ent->s.weapon == WP_ROCKET_LAUNCHER ) {
 				if ( ent->s.weapon == WP_FLECHETTE && (ent->s.eFlags & EF_ALT_FIRING) ) {
 					ent->think( ent );
-					JPLua_Entity_CallFunction(ent, JPLUA_ENTITY_THINK);
+					JPLua::Entity_CallFunction( ent, JPLua::JPLUA_ENTITY_THINK );
 				}
 				else {
 					G_Damage( other, ent, &g_entities[ent->r.ownerNum], &velocity,
@@ -776,7 +776,7 @@ void G_RunMissile( gentity_t *ent ) {
 				if ( g2Hit->touch ) {
 					g2Hit->touch( g2Hit, ent, &tr );
 				}
-				JPLua_Entity_CallFunction(g2Hit, JPLUA_ENTITY_TOUCH, (intptr_t)ent, (intptr_t)&tr);
+				JPLua::Entity_CallFunction( g2Hit, JPLua::JPLUA_ENTITY_TOUCH, (intptr_t)ent, (intptr_t)&tr );
 				goto passthrough;
 			}
 		}

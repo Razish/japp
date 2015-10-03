@@ -85,8 +85,9 @@ files = [build_dir + f for f in files]
 
 # libraries
 libraries = [
-	'json',
-	'lua'
+	'cJSON',
+	'lua',
+	'semver',
 ]
 cgame_env['LIBS'] = [
 	cgame_env.SConscript(

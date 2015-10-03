@@ -3863,8 +3863,10 @@ void FireWeapon( gentity_t *ent, qboolean altFire ) {
 		CalcMuzzlePoint( ent, &forward, &vright, &up, &muzzle );
 
 		// fire the specific weapon
-		if (JPLua_Weapon_CallFunction(ent,(weapon_t)ent->s.weapon, altFire)) //jplua override
+		if ( JPLua::Weapon_CallFunction( ent, (weapon_t)ent->s.weapon, altFire ) ) {
+			//jplua override
 			return;
+		}
 		switch ( ent->s.weapon ) {
 		case WP_STUN_BATON:
 			WP_FireStunBaton( ent, altFire );

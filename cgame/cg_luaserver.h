@@ -2,7 +2,13 @@
 
 #ifdef JPLUA
 
-int JPLua_GetServer( lua_State *L );
-void JPLua_Register_Server( lua_State *L );
+namespace JPLua {
 
-#endif
+#ifdef JPLUA_INTERNALS
+	int GetServer( lua_State *L );
+	void Register_Server( lua_State *L );
+#endif // JPLUA_INTERNALS
+
+} // namespace JPLUA
+
+#endif // JPLUA

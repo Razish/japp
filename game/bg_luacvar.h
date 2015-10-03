@@ -2,18 +2,24 @@
 
 #ifdef JPLUA
 
-// Cvar instance userdata type
-typedef struct jplua_cvar_s {
-	char name[MAX_CVAR_VALUE_STRING];
-} jplua_cvar_t;
+namespace JPLua {
 
-void JPLua_Cvar_CreateRef( lua_State *L, const char *name );
+	// Cvar instance userdata type
+	struct luaCvar_t {
+		char name[MAX_CVAR_VALUE_STRING];
+	};
 
-int JPLua_CreateCvar( lua_State *L );
-int JPLua_GetCvar( lua_State *L );
+	// public
+	void Cvar_Update( const char *name );
 
-jplua_cvar_t *JPLua_CheckCvar( lua_State *L, int idx );
-void JPLua_Register_Cvar( lua_State *L );
-void JPLua_Cvar_Update(const char *name);
+#ifdef JPLUA_INTERNALS
+	void Cvar_CreateRef( lua_State *L, const char *name );
+	int CreateCvar( lua_State *L );
+	int GetCvar( lua_State *L );
+	luaCvar_t *CheckCvar( lua_State *L, int idx );
+	void Register_Cvar( lua_State *L );
+#endif // JPLUA_INTERNALS
+
+} // namespace JPLua
 
 #endif // JPLUA

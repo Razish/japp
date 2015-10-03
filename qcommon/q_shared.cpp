@@ -2,7 +2,7 @@
 //
 // q_shared.c -- stateless support routines that are included in each code dll
 #include "qcommon/q_shared.h"
-#include "json/cJSON.h"
+#include "cJSON/cJSON.h"
 
 #ifdef PROJECT_GAME
 #include "g_local.h"

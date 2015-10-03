@@ -363,21 +363,20 @@ static void SV_ListMaps_f( void ) {
 static void SV_Lua_f( void ) {
 	char *args = NULL;
 
-	if ( trap->Argc() < 2 || !JPLua.state ) {
+	if ( trap->Argc() < 2 || !JPLua::IsInitialised() ) {
 		return;
 	}
 
 	args = ConcatArgs( 1 );
 
 	trap->Print( S_COLOR_CYAN "Executing Lua code: %s\n", args );
-	if ( luaL_dostring( JPLua.state, args ) != 0 ) {
-		trap->Print( S_COLOR_RED "Lua Error: %s\n", lua_tostring( JPLua.state, -1 ) );
-	}
+	JPLua::DoString( args );
 }
 
 static void SV_LuaReload_f( void ) {
-	JPLua_Shutdown(qtrue);
-	JPLua_Init();
+	//FIXME: reload per plugin
+	JPLua::Shutdown( qtrue );
+	JPLua::Init();
 }
 #endif
 
@@ -452,7 +451,7 @@ qboolean ConsoleCommand( void ) {
 
 	trap->Argv( 0, cmd, sizeof(cmd) );
 
-	if ( JPLua_Event_ServerCommand() ) {
+	if ( JPLua::Event_ServerCommand() ) {
 		return qtrue;
 	}
 
