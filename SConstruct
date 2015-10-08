@@ -145,8 +145,10 @@ if plat == 'Linux' or plat == 'Darwin':
 	env['CXXFLAGS'] = []
 
 	# c warnings
-	env['CFLAGS'] += [ '-Wdeclaration-after-statement', '-Wnested-externs', '-Wold-style-definition',
-		'-Wstrict-prototypes'
+	env['CFLAGS'] += [
+		'-Wnested-externs',
+		'-Wold-style-definition',
+		'-Wstrict-prototypes',
 	]
 
 	# c/cpp warnings

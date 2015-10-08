@@ -8,7 +8,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(_MSC_VER)
 #include <malloc.h>
+#elif defined(__clang__) || defined(__GNUC__)
+#include <alloca.h>
+#endif
 #include "semver.h"
 
 #define SLICE_SIZE   50
@@ -107,7 +111,7 @@ parse_slice (char *buf, int len, char sep) {
   int plen = strlen(pr);
   int size = sizeof(*pr) * plen;
 
-  char * cache = (char *) malloc(size);
+  char * cache = (char *) alloca(size);
   strcpy(cache, buf);
   strcut(cache, 0, strlen(buf) - plen + 1);
 
@@ -115,7 +119,6 @@ parse_slice (char *buf, int len, char sep) {
   char * part = malloc(size);
   if (part == NULL) return NULL;
   strcpy(part, (char *) cache);
-  free(cache);
 
   // Remove chars from original buffer
   int offset = strlen(buf) - strlen(pr);
@@ -139,15 +142,13 @@ semver_parse (const char *str, semver_t *ver) {
   if (!valid) return -1;
 
   int len = strlen(str);
-  char * buf = (char *) malloc(len);
+  char * buf = (char *) alloca(len);
   strcpy(buf, str);
 
   ver->metadata = parse_slice(buf, len, MT_DELIMITER[0]);
   ver->prerelease = parse_slice(buf, len, PR_DELIMITER[0]);
 
-  int status = semver_parse_version(buf, ver);
-  free(buf);
-  return status;
+  return semver_parse_version(buf, ver);
 }
 
 /**
@@ -309,9 +310,10 @@ compare_build_slice (struct metadata_s xm, struct metadata_s ym) {
   int res = 0;
 
   // Compare metadata strings by length
-  (  (res = compare_metadata_string(xm, ym)) == 0
-  // Compare versions per number range
-  && (res = compare_metadata_versions(xm, ym)));
+  if ((res = compare_metadata_string(xm, ym)) == 0) {
+    // Compare versions per number range
+    res = compare_metadata_versions(xm, ym);
+  }
 
   return res;
 }
@@ -363,9 +365,11 @@ int
 semver_compare_version (semver_t x, semver_t y) {
   int res = 0;
 
-  (  (res = binary_comparison(x.major, y.major)) == 0
-  && (res = binary_comparison(x.minor, y.minor)) == 0
-  && (res = binary_comparison(x.patch, y.patch)));
+  if ((res = binary_comparison(x.major, y.major)) == 0) {
+    if ((res = binary_comparison(x.minor, y.minor)) == 0) {
+      res = binary_comparison(x.patch, y.patch);
+    }
+  }
 
   return res;
 }
@@ -383,8 +387,9 @@ int
 semver_compare (semver_t x, semver_t y) {
   int res = 0;
 
-  (  (res = semver_compare_version(x, y)) == 0
-  && (res = semver_compare_metadata(x, y)));
+  if ((res = semver_compare_version(x, y)) == 0) {
+    res = semver_compare_metadata(x, y);
+  }
 
   return res;
 }
@@ -564,7 +569,7 @@ semver_free (semver_t *x) {
  */
 
 static void
-concat_num (char * str, int x, char * sep) {
+concat_num (char * str, int x, const char * sep) {
   char buf[SLICE_SIZE] = {0};
   if (sep == NULL) sprintf(buf, "%d", x);
   else sprintf(buf, "%s%d", sep, x);
@@ -572,7 +577,7 @@ concat_num (char * str, int x, char * sep) {
 }
 
 static void
-concat_char (char * str, char * x, char * sep) {
+concat_char (char * str, char * x, const char * sep) {
   char buf[SLICE_SIZE] = {0};
   sprintf(buf, "%s%s", sep, x);
   strcat(str, buf);

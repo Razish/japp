@@ -1074,8 +1074,6 @@ const char *CG_GetStringForVoiceSound( const char *s ) {
 
 #define	DEBUGNAME(x) if(cg_debugEvents.integer){trap->Print(x"\n");}
 
-void CG_ChatBox_AddString( char *chatStr ); //cg_draw.c
-
 // An entity has an event value
 // also called by CG_CheckPlayerstateEvents
 void CG_EntityEvent( centity_t *cent, vector3 *position ) {

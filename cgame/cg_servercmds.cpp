@@ -1036,7 +1036,6 @@ static void CG_BodyQueueCopy( centity_t *cent, int clientNum, int knownWeapon ) 
 
 void CG_SiegeBriefingDisplay( int team, qboolean dontShow );
 void CG_ParseSiegeExtendedData( void );
-void CG_ChatBox_AddString( char *chatStr );
 
 // The string has been tokenized and can be retrieved with Cmd_Argc() / Cmd_Argv()
 static void CG_ServerCommand( void ) {
