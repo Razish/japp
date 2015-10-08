@@ -107,7 +107,7 @@ parse_slice (char *buf, int len, char sep) {
   int plen = strlen(pr);
   int size = sizeof(*pr) * plen;
 
-  char * cache = (char *) alloca(size);
+  char * cache = (char *) malloc(size);
   strcpy(cache, buf);
   strcut(cache, 0, strlen(buf) - plen + 1);
 
@@ -115,6 +115,7 @@ parse_slice (char *buf, int len, char sep) {
   char * part = malloc(size);
   if (part == NULL) return NULL;
   strcpy(part, (char *) cache);
+  free(cache);
 
   // Remove chars from original buffer
   int offset = strlen(buf) - strlen(pr);
@@ -138,13 +139,15 @@ semver_parse (const char *str, semver_t *ver) {
   if (!valid) return -1;
 
   int len = strlen(str);
-  char * buf = (char *) alloca(len);
+  char * buf = (char *) malloc(len);
   strcpy(buf, str);
 
   ver->metadata = parse_slice(buf, len, MT_DELIMITER[0]);
   ver->prerelease = parse_slice(buf, len, PR_DELIMITER[0]);
 
-  return semver_parse_version(buf, ver);
+  int status = semver_parse_version(buf, ver);
+  free(buf);
+  return status;
 }
 
 /**
