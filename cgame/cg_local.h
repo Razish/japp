@@ -420,6 +420,7 @@ typedef struct localEntity_s {
 	} data;
 
 	refEntity_t		refEntity;
+	int				id;
 } localEntity_t;
 
 typedef struct score_s {

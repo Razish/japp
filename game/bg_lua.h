@@ -16,6 +16,8 @@
 #elif defined(PROJECT_CGAME)
 	#include "cg_luaserver.h"
 	#include "cg_luainterface.h"
+	#include "cg_luarefentity.h"
+	#include "cg_lualocalentity.h"
 #endif
 
 #include "semver/semver.h"

@@ -1314,6 +1314,8 @@ namespace JPLua {
 		{ "CreateCvar", CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
 	#ifdef PROJECT_CGAME
 		{ "CreateMenu", Interface_CreateMenu },
+		{ "CreateLocalEntity", LocalEntity_Create },
+		{ "CreateRefEntity", RefEntity_Create },
 	#endif
 	#ifdef PROJECT_GAME
 		{ "CreateEntity", Entity_Create },
@@ -1494,6 +1496,8 @@ namespace JPLua {
 		Register_Server( ls.L );
 		Register_Menu( ls.L );
 		Register_Item( ls.L );
+		Register_RefEntity( ls.L );
+		Register_LocalEntity( ls.L );
 	#endif
 		Register_Cvar( ls.L );
 		Register_Logger( ls.L );

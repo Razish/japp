@@ -29,6 +29,9 @@
     <ClInclude Include="cgame\animtable.h" />
     <ClInclude Include="cgame\cg_lights.h" />
     <ClInclude Include="cgame\cg_local.h" />
+    <ClInclude Include="cgame\cg_luainterface.h" />
+    <ClInclude Include="cgame\cg_lualocalentity.h" />
+    <ClInclude Include="cgame\cg_luarefentity.h" />
     <ClInclude Include="cgame\cg_luaserver.h" />
     <ClInclude Include="cgame\cg_media.h" />
     <ClInclude Include="cgame\cg_public.h" />
@@ -152,6 +155,10 @@
     <ClCompile Include="cgame\cg_info.cpp" />
     <ClCompile Include="cgame\cg_light.cpp" />
     <ClCompile Include="cgame\cg_localents.cpp" />
+    <ClCompile Include="cgame\cg_luaitem.cpp" />
+    <ClCompile Include="cgame\cg_lualocalentity.cpp" />
+    <ClCompile Include="cgame\cg_luamenu.cpp" />
+    <ClCompile Include="cgame\cg_luarefentity.cpp" />
     <ClCompile Include="cgame\cg_luaserver.cpp" />
     <ClCompile Include="cgame\cg_main.cpp" />
     <ClCompile Include="cgame\cg_marks.cpp" />

@@ -6,61 +6,43 @@
 
 #include "cg_local.h"
 #include "cg_media.h"
+#include <deque>
 
 #define	MAX_LOCAL_ENTITIES	2048
-localEntity_t	cg_localEntities[MAX_LOCAL_ENTITIES];
-localEntity_t	cg_activeLocalEntities;		// double linked list
-localEntity_t	*cg_freeLocalEntities;		// single linked list
+std::deque<localEntity_t*> cg_localEntities;
 
 // This is called at startup and for tournament restarts
-void CG_InitLocalEntities( void ) {
-	int i;
+void CG_InitLocalEntities(void){
+	cg_localEntities.clear();
+}
 
-	memset( cg_localEntities, 0, sizeof(cg_localEntities) );
-	cg_activeLocalEntities.next = &cg_activeLocalEntities;
-	cg_activeLocalEntities.prev = &cg_activeLocalEntities;
-	cg_freeLocalEntities = cg_localEntities;
-	for ( i = 0; i < MAX_LOCAL_ENTITIES - 1; i++ ) {
-		cg_localEntities[i].next = &cg_localEntities[i + 1];
+void CG_FreeLocalEntity(localEntity_t *le){
+	localEntity_t *ent = NULL;
+	for (auto it = cg_localEntities.begin(); it != cg_localEntities.end(); it++){
+		localEntity_t *ent = *it;
+		if (ent->id == le->id){
+			cg_localEntities.erase(it);
+			free(ent);
+		}
 	}
 }
 
-void CG_FreeLocalEntity( localEntity_t *le ) {
-	if ( !le->prev ) {
-		trap->Error( ERR_DROP, "CG_FreeLocalEntity: not active" );
-		return;
-	}
-
-	// remove from the doubly linked active list
-	le->prev->next = le->next;
-	le->next->prev = le->prev;
-
-	// the free list is only singly linked
-	le->next = cg_freeLocalEntities;
-	cg_freeLocalEntities = le;
-}
-
-// Will allways succeed, even if it requires freeing an old active entity
-localEntity_t *CG_AllocLocalEntity( void ) {
+localEntity_t *CG_AllocLocalEntity(void) {
 	localEntity_t *le;
 
-	if ( !cg_freeLocalEntities ) {
-		// no free entities, so free the one at the end of the chain
-		// remove the oldest active entity
-		CG_FreeLocalEntity( cg_activeLocalEntities.prev );
+	if (cg_localEntities.size() == MAX_LOCAL_ENTITIES){
+		CG_FreeLocalEntity(cg_localEntities[0]);
 	}
 
-	le = cg_freeLocalEntities;
-	cg_freeLocalEntities = cg_freeLocalEntities->next;
-
-	memset( le, 0, sizeof(*le) );
-
-	// link into the active list
-	le->next = cg_activeLocalEntities.next;
-	le->prev = &cg_activeLocalEntities;
-	cg_activeLocalEntities.next->prev = le;
-	cg_activeLocalEntities.next = le;
-	return le;
+	le = (localEntity_t*)malloc(sizeof(localEntity_t));
+	if (!le){
+		trap->Error(ERR_DROP, "CG_AllocLocalEntity: failed to allocate");
+		return NULL;
+	}
+	memset(le, 0, sizeof(localEntity_t));
+	
+	le->id = cg_localEntities.size() + 1;
+	cg_localEntities.push_back(le);
 }
 
 // A fragment localentity interacts with the environment in some way (hitting walls), or generates more localentities
@@ -646,15 +628,12 @@ void CG_AddLine( localEntity_t *le ) {
 }
 
 void CG_AddLocalEntities( void ) {
-	localEntity_t	*le, *next;
+	localEntity_t	*le;
 
 	// walk the list backwards, so any new local entities generated
 	// (trails, marks, etc) will be present this frame
-	le = cg_activeLocalEntities.prev;
-	for ( ; le != &cg_activeLocalEntities; le = next ) {
-		// grab next now, so if the local entity is freed we
-		// still have it
-		next = le->prev;
+	for (auto it = cg_localEntities.begin(); it != cg_localEntities.end(); it++){
+		le = *it;
 
 		if ( cg.time >= le->endTime ) {
 			CG_FreeLocalEntity( le );
