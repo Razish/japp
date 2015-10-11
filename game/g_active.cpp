@@ -1832,7 +1832,10 @@ void ClientThink_real( gentity_t *ent ) {
 				killJetFlags = qfalse;
 			}
 			else {
-				client->ps.pm_type = PM_NORMAL;
+				if (client->pers.adminData.isFrozen)
+					client->ps.pm_type = PM_FREEZE;
+				else
+					client->ps.pm_type = PM_NORMAL;
 			}
 		}
 	}

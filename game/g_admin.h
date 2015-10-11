@@ -17,6 +17,7 @@ typedef struct adminData_s {
 	qboolean silenced; // have they been silenced?
 	qboolean isGhost; // are they a ghost?
 	qboolean isSlept; // are they frozen?
+	qboolean isFrozen; // are they frozen?
 	telemark_t *telemark; // last marked location
 	qboolean empowered; // are they empowered?
 	qboolean merc; // are they merced?

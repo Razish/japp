@@ -890,7 +890,22 @@ namespace JPLua {
 			}
 		}
 	}
+
+	static void Player_SetFreeze(lua_State *L, jpluaEntity_t *ent){
+		bool doFreeze = lua_toboolean( L, 3 ) ? true : false;
+		if (doFreeze)
+			ent->client->pers.adminData.isFrozen = qtrue;
+		else
+			ent->client->pers.adminData.isFrozen = qfalse;
+	}
+
+	//TODO: Client-side?
+	static int Player_GetFreeze(lua_State *L, jpluaEntity_t *ent){ 
+		lua_pushboolean(L, ent->client->pers.adminData.isFrozen);
+		return 1;
+	}
 	#endif
+
 
 	static const property_t playerProperties [] = {
 	#if defined(PROJECT_GAME)
@@ -977,6 +992,13 @@ namespace JPLua {
 			nullptr
 	#endif
 		},
+#if defined(PROJECT_GAME)
+		{
+			"frozen",
+			Player_GetFreeze,
+			Player_SetFreeze,
+		},
+#endif
 		{
 			"health",
 			Player_GetHealth,
