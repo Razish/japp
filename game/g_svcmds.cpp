@@ -378,6 +378,39 @@ static void SV_LuaReload_f( void ) {
 	JPLua::Shutdown( qtrue );
 	JPLua::Init();
 }
+
+static void SV_LuaListPlugins_f( void ){
+	if (JPLua::IsInitialised()){
+		return;
+	}
+	JPLua::ListPlugins();
+}
+
+static void SV_LuaEnablePlugin( void ){
+	char name[32];
+	if (trap->Argc() < 1 || !JPLua::IsInitialised()){
+		return;
+	}
+	trap->Argv(1, name, sizeof(name));
+	if (!name[0]) return;
+	JPLua::plugin_t *plg = JPLua::FindPlugin(name);
+	if (plg){
+		JPLua::EnablePlugin(plg);
+	}
+}
+
+static void SV_LuaDisablePlugin( void ){
+	char name[32];
+	if (trap->Argc() < 1 || !JPLua::IsInitialised()){
+		return;
+	}
+	trap->Argv(1, name, sizeof(name));
+	if (!name[0]) return;
+	JPLua::plugin_t *plg = JPLua::FindPlugin(name);
+	if (plg){
+		JPLua::DisablePlugin(plg);
+	}
+}
 #endif
 
 static void SV_Pause_f( void ) {
@@ -431,6 +464,9 @@ static const svCommand_t svCommands[] = {
 	{ "lsmaps", SV_ListMaps_f },
 #ifdef JPLUA
 	{ "lua", SV_Lua_f },
+	{ "lua_disable", SV_LuaDisablePlugin },
+	{ "lua_enable", SV_LuaEnablePlugin },
+	{ "lua_list", SV_LuaListPlugins_f},
 	{ "lua_reload", SV_LuaReload_f },
 #endif
 	{ "pause", SV_Pause_f },

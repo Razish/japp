@@ -29,11 +29,11 @@ namespace JPLua {
 
 	#if defined(PROJECT_GAME)
 		extern std::unordered_map<int, luaWeapon_t> weaponCallbacks;
-		std::unordered_map<std::string, int> clientCommands;
+		std::unordered_map<std::string, command_t> clientCommands;
 	#elif defined(PROJECT_CGAME)
-		std::unordered_map<std::string, int> consoleCommands;
+		std::unordered_map<std::string, command_t> consoleCommands;
 	#endif
-	std::unordered_map<std::string, int> serverCommands;
+	std::unordered_map<std::string, command_t> serverCommands;
 
 	// parsed out from cvar setting
 	static struct autoload_t {
@@ -197,28 +197,33 @@ namespace JPLua {
 	}
 
 	// Loads a file using JA's FS functions, only use THIS to load files into lua!
-	int LoadFile( lua_State *L, const char *file ) {
+	char* LoadFile( lua_State *L, const char *file ) {
 		fileHandle_t f = 0;
 		int len = trap->FS_Open( file, &f, FS_READ );
 		gfd_t gfd;
 		int status;
+		static char err[128];
 
 		// file doesn't exist
 		if ( !f || len <= 0 ) {
-			trap->Print( "LoadFile: Failed to load %s, file doesn't exist\n", file );
-			return 1;
+			//trap->Print( "LoadFile: Failed to load %s, file doesn't exist\n", file );
+			Q_strncpyz(err, va("LoadFile: Failed to load %s, file doesn't exist\n", file), sizeof(err));
+			return err;
 		}
 		gfd.f = f;
 		gfd.dataRemaining = len;
 
 		status = (lua_load( L, LoadFile_Reader, &gfd, va( "@%s", file ), NULL ) || lua_pcall( L, 0, 0, 0 ));
 		if ( status ) {
-			trap->Print( "LoadFile: Failed to load %s: %s\n", file, lua_tostring( L, -1 ) );
+			//trap->Print( "LoadFile: Failed to load %s: %s\n", file, lua_tostring( L, -1 ) );
+			Q_strncpyz(err, lua_tostring(L, -1), sizeof(err));
 			lua_pop( L, 1 );
+			trap->FS_Close(f);
+			return err;
 		}
 
 		trap->FS_Close( f );
-		return status;
+		return NULL;
 	}
 
 	int StackDump( lua_State *L ) {
@@ -362,7 +367,11 @@ namespace JPLua {
 
 	static int Export_Require( lua_State *L ) {
 		const char *path = va( "%s%s", ls.initialised ? pluginDir : baseDir, lua_tostring( L, 1 ) );
-		LoadFile( L, path );
+		const char *err = NULL;
+		if ((err = LoadFile(L, path))){
+			trap->Print(va(S_COLOR_GREEN "JPLua:" S_COLOR_RED " Failed to load: %s\n"), lua_tostring(L, 1));
+			trap->Print(va("   %s\n", err));
+		}
 		return 0;
 	}
 
@@ -426,7 +435,15 @@ namespace JPLua {
 		// save the current plugin
 		plugin_t *current = ls.currentPlugin;
 		ls.currentPlugin = plugin;
-		LoadFile( ls.L, va( "%s%s/%s", pluginDir, plugin->name, "plugin" JPLUA_EXTENSION ) );
+		const char *err;
+		if ( (err = LoadFile(ls.L, va("%s%s/%s", pluginDir, plugin->name, "plugin" JPLUA_EXTENSION) )) ){
+			trap->Print(S_COLOR_RED "  failed %s " S_COLOR_GREEN "v%i.%i.%i " S_COLOR_WHITE " (%s):\n", plugin->longname,
+				plugin->version.major, plugin->version.minor, plugin->version.patch, plugin->name
+				);
+			trap->Print(va("   %s\n",err));
+			ls.currentPlugin = current;
+			return false;
+		}
 		ls.currentPlugin = current;
 
 		if ( semver_lt( plugin->requiredJPLuaVersion, jpluaVersion ) ) {
@@ -460,6 +477,46 @@ namespace JPLua {
 			Call( ls.L, 1, 0 );
 			ls.currentPlugin = current;
 		}
+		std::vector<std::string> todelete; // TODO: Find another safe way to remove commands?
+#ifdef PROJECT_GAME
+		for (auto row : clientCommands){
+			command_t* cmd = &row.second;
+			if (cmd->owner == plugin){
+				luaL_unref(ls.L, LUA_REGISTRYINDEX, cmd->handle);
+				todelete.push_back(row.first);
+				continue;
+			}
+		}
+		for (auto row : todelete){ //messy
+			clientCommands.erase(row);
+		}
+		todelete.clear();
+#else
+		for (auto row : consoleCommands){
+			command_t* cmd = &row.second;
+			if (cmd->owner == plugin){
+				luaL_unref(ls.L, LUA_REGISTRYINDEX, cmd->handle);
+				todelete.push_back(row.first);
+				continue;
+			}
+		}
+		for(auto row : todelete){ //messy
+			consoleCommands.erase(row);
+		}
+		todelete.clear();
+#endif
+		for (auto row : serverCommands){
+			command_t* cmd = &row.second;
+			if (cmd->owner == plugin){
+				luaL_unref(ls.L, LUA_REGISTRYINDEX, cmd->handle);
+				todelete.push_back(row.first);
+				continue;
+			}
+		}
+		for (auto row : todelete){ //messy
+			serverCommands.erase(row);
+		}
+		todelete.clear();
 
 		luaL_unref( ls.L, LUA_REGISTRYINDEX, plugin->handle );
 		trap->Print( S_COLOR_CYAN "  unloaded %s " S_COLOR_GREEN "v%i.%i.%i " S_COLOR_WHITE " (%s)\n", plugin->longname,
@@ -651,8 +708,14 @@ namespace JPLua {
 	}
 
 	static void PostInit( lua_State *L ) {
+		const char *err = NULL;
 		Register_System( L );
-		LoadFile( L, va( "%sinit" JPLUA_EXTENSION, baseDir ) );
+		if ((err = LoadFile(L, va("%sinit" JPLUA_EXTENSION, baseDir)))){
+			trap->Print(S_COLOR_GREEN "JPLua:" S_COLOR_RED " Failed to load main scripts: %s\n");
+			trap->Print(va("   %s\n", err));
+			Shutdown(qfalse);
+			return;
+		}
 		ls.initialised = qtrue;
 
 		//TODO: handle duplicates, i.e. one in pk3, one out of pk3
@@ -661,6 +724,10 @@ namespace JPLua {
 
 		plugin_t *plugin = nullptr;
 		while ( IteratePlugins( &plugin, false ) ) {
+			if (autoload.all){
+				EnablePlugin( plugin );
+				continue;
+			}
 			if ( autoload.plugins[plugin->name] ) {
 				EnablePlugin( plugin );
 			}
@@ -670,9 +737,9 @@ namespace JPLua {
 	#ifdef PROJECT_GAME
 	static int Export_AddClientCommand( lua_State *L ) {
 		const char *name = luaL_checkstring( L, 1 );
-		int &handle = clientCommands[name];
+		command_t &cmd = clientCommands[name];
 
-		if ( handle ) {
+		if ( cmd.handle ) {
 			// already exists
 			trap->Print( "JPlua: AddClientCommand(%s) failed, command already exists. Remove command first\n", name );
 			return 0;
@@ -683,7 +750,8 @@ namespace JPLua {
 
 		if ( top == 2 ) {
 			if ( typeArg2 == LUA_TFUNCTION ) {
-				handle = luaL_ref( L, LUA_REGISTRYINDEX );
+				cmd.handle = luaL_ref( L, LUA_REGISTRYINDEX );
+				cmd.owner = ls.currentPlugin;
 			}
 			else {
 				trap->Print( "JPLua AddClientCommand(%s) failed, function signature invalid. Is it up to date?\n", name );
@@ -703,8 +771,8 @@ namespace JPLua {
 	#ifdef PROJECT_CGAME
 	static int Export_AddConsoleCommand( lua_State *L ) {
 		const char *name = luaL_checkstring( L, 1 );
-		int &handle = consoleCommands[name];
-		if ( handle ) {
+		command_t &cmd = consoleCommands[name];
+		if ( cmd.handle ) {
 			// already exists
 			trap->Print( "JPlua: AddConsoleCommand(%s) failed, command already exists. Remove command first\n", name );
 			return 0;
@@ -719,7 +787,8 @@ namespace JPLua {
 		else if ( top == 2 ) {
 			if ( typeArg2 == LUA_TFUNCTION ) {
 				trap->AddCommand( name );
-				handle = luaL_ref( L, LUA_REGISTRYINDEX );
+				cmd.handle = luaL_ref( L, LUA_REGISTRYINDEX );
+				cmd.owner = ls.currentPlugin;
 			}
 			else {
 				trap->Print( "JPLua AddConsoleCommand(%s) failed, function signature invalid. Is it up to date?\n", name );
@@ -737,8 +806,8 @@ namespace JPLua {
 
 	static int Export_AddServerCommand( lua_State *L ) {
 		const char *name = luaL_checkstring( L, 1 );
-		int &handle = serverCommands[name];
-		if ( handle ) {
+		command_t &cmd = serverCommands[name];
+		if ( cmd.handle ) {
 			// already exists
 			trap->Print( "JPlua: AddServerCommand(%s) failed, command already exists. Remove command first\n", name );
 		}
@@ -748,7 +817,8 @@ namespace JPLua {
 			return 0;
 		}
 
-		handle = luaL_ref( L, LUA_REGISTRYINDEX );
+		cmd.handle = luaL_ref( L, LUA_REGISTRYINDEX );
+		cmd.owner = ls.currentPlugin;
 
 		return 0;
 	}
@@ -1555,18 +1625,18 @@ namespace JPLua {
 
 	#ifdef PROJECT_GAME
 			for ( auto &row : clientCommands ) {
-				luaL_unref( ls.L, LUA_REGISTRYINDEX, row.second );
+				luaL_unref( ls.L, LUA_REGISTRYINDEX, row.second.handle );
 			}
 			clientCommands.clear();
 			weaponCallbacks.clear();
 	#elif defined PROJECT_CGAME
 			for ( auto& row : consoleCommands ) {
-				luaL_unref( ls.L, LUA_REGISTRYINDEX, row.second );
+				luaL_unref( ls.L, LUA_REGISTRYINDEX, row.second.handle );
 			}
 			consoleCommands.clear();
 	#endif
 			for ( auto &row : serverCommands ) {
-				luaL_unref( ls.L, LUA_REGISTRYINDEX, row.second );
+				luaL_unref( ls.L, LUA_REGISTRYINDEX, row.second.handle );
 			}
 			serverCommands.clear();
 

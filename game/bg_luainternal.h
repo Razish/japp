@@ -42,6 +42,12 @@ namespace JPLua {
 		lua_CFunction function;
 	};
 
+	typedef struct command_s {
+		int handle;
+		plugin_t *owner;
+	}command_t;
+
+
 } // namespace JPLua
 
 #endif // JPLUA

@@ -11,11 +11,11 @@
 namespace JPLua {
 
 #ifdef PROJECT_GAME
-	extern std::unordered_map<std::string, int> clientCommands;
+	extern std::unordered_map<std::string, command_t> clientCommands;
 #elif defined PROJECT_CGAME
-	extern std::unordered_map<std::string, int> consoleCommands;
+	extern std::unordered_map<std::string, command_t> consoleCommands;
 #endif
-	extern std::unordered_map<std::string, int> serverCommands;
+	extern std::unordered_map<std::string, command_t> serverCommands;
 
 	static const stringID_table_t events[JPLUA_EVENT_MAX] = {
 		ENUM2STRING( JPLUA_EVENT_UNLOAD ),
@@ -283,11 +283,10 @@ namespace JPLua {
 				}
 			}
 		}
-		int handle = clientCommands[cmd];
-		if ( handle ) {
+		command_t &comm = clientCommands[cmd];
+		if ( comm.handle ) {
 			ret = qtrue;
-			lua_rawgeti( ls.L, LUA_REGISTRYINDEX, handle );
-
+			lua_rawgeti(ls.L, LUA_REGISTRYINDEX, comm.handle );
 			Player_CreateRef( ls.L, clientNum );
 			//Push table of arguments
 			lua_newtable( ls.L );
@@ -697,10 +696,10 @@ namespace JPLua {
 		qboolean ret = qfalse;
 #ifdef JPLUA
 		int top, i;
-		int handle = consoleCommands[CG_Argv( 0 )];
-		if (handle){
+		command_t &cmd = consoleCommands[CG_Argv( 0 )];
+		if (cmd.handle){
 
-			lua_rawgeti(ls.L, LUA_REGISTRYINDEX, handle);
+			lua_rawgeti(ls.L, LUA_REGISTRYINDEX, cmd.handle);
 
 			lua_pushstring( ls.L, CG_Argv( 0 ) );
 			//Push table of arguments
@@ -729,9 +728,9 @@ namespace JPLua {
 		int top, i, numArgs = trap->Argc();
 		char arg1[MAX_TOKEN_CHARS];
 		trap->Argv( 0, arg1, sizeof(arg1) );
-		int handle = serverCommands[arg1];
-		if (handle){
-			lua_rawgeti(ls.L, LUA_REGISTRYINDEX, handle);
+		command_t &cmd = serverCommands[arg1];
+		if (cmd.handle){
+			lua_rawgeti(ls.L, LUA_REGISTRYINDEX, cmd.handle);
 			//Push table of arguments
 			lua_newtable(ls.L);
 			top = lua_gettop(ls.L);
@@ -753,9 +752,9 @@ namespace JPLua {
 		qboolean ret = qfalse;
 #ifdef JPLUA
 		int top, i;
-		int handle = serverCommands[CG_Argv( 0 )];
-		if (handle){
-			lua_rawgeti(ls.L, LUA_REGISTRYINDEX, handle);
+		command_t &cmd = serverCommands[CG_Argv( 0 )];
+		if ( cmd.handle ){
+			lua_rawgeti(ls.L, LUA_REGISTRYINDEX, cmd.handle);
 			//Push table of arguments
 			lua_newtable(ls.L);
 			top = lua_gettop(ls.L);
