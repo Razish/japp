@@ -380,7 +380,7 @@ static void SV_LuaReload_f( void ) {
 }
 
 static void SV_LuaListPlugins_f( void ){
-	if (JPLua::IsInitialised()){
+	if (!JPLua::IsInitialised()){
 		return;
 	}
 	JPLua::ListPlugins();
