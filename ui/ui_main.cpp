@@ -491,6 +491,7 @@ static const char *GetMonthAbbrevString( int iMonth ) {
 #define UIAS_GLOBAL4	(4)
 #define UIAS_GLOBAL5	(5)
 #define UIAS_FAVORITES	(6)
+#define UIAS_HISTORY	(7)
 
 #define UI_MAX_MASTER_SERVERS	(5)
 
@@ -508,6 +509,8 @@ int UI_SourceForLAN( void ) {
 		return AS_GLOBAL;
 	case UIAS_FAVORITES:
 		return AS_FAVORITES;
+	case UIAS_HISTORY:
+		return AS_HISTORY;
 	}
 }
 
@@ -4657,7 +4660,6 @@ static void UI_JoinServer( void ) {
 		trap->LAN_GetServerAddressString( UI_SourceForLAN(), uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, sizeof(buff) );
 		trap->Cmd_ExecuteText( EXEC_APPEND, va( "connect %s\n", buff ) );
 	}
-
 }
 
 int UI_SiegeClassNum( siegeClass_t *scl ) {
@@ -6067,7 +6069,7 @@ static void UI_BuildServerDisplayList( int force ) {
 		//		visible = qtrue;
 		// get the ping for this server
 		ping = trap->LAN_GetServerPing( lanSource, i );
-		if ( ping > 0 || ui_netSource.integer == UIAS_FAVORITES ) {
+		if ( ping > 0 || ui_netSource.integer == UIAS_FAVORITES || ui_netSource.integer == UIAS_HISTORY ) {
 
 			trap->LAN_GetServerInfo( lanSource, i, info, MAX_STRING_CHARS );
 
@@ -7969,11 +7971,12 @@ void UI_Init( qboolean inGameLoad ) {
 	extern void UI_Set2DRatio(void);
 	UI_Set2DRatio();
 	// wide screen
-	if ( uiInfo.uiDC.glconfig.vidWidth * SCREEN_HEIGHT > uiInfo.uiDC.glconfig.vidHeight * SCREEN_WIDTH )
+	if ( uiInfo.uiDC.glconfig.vidWidth * SCREEN_HEIGHT > uiInfo.uiDC.glconfig.vidHeight * SCREEN_WIDTH ) {
 		uiInfo.uiDC.bias = 0.5f * (uiInfo.uiDC.glconfig.vidWidth - (uiInfo.uiDC.glconfig.vidHeight * ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT)));
-	else
+	}
+	else {
 		uiInfo.uiDC.bias = 0;
-
+	}
 
 	//	UI_Load();
 	uiInfo.uiDC.registerShaderNoMip = &UI_RegisterShaderNoMip;
@@ -8515,7 +8518,7 @@ static void UI_DoServerRefresh( void ) {
 	if ( !uiInfo.serverStatus.refreshActive ) {
 		return;
 	}
-	if ( ui_netSource.integer != UIAS_FAVORITES ) {
+	if ( ui_netSource.integer != UIAS_FAVORITES && ui_netSource.integer != UIAS_HISTORY ) {
 		if ( ui_netSource.integer == UIAS_LOCAL ) {
 			if ( !trap->LAN_GetServerCount( AS_LOCAL ) ) {
 				wait = qtrue;

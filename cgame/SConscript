@@ -33,6 +33,7 @@ files = [
 	'cgame/cg_saga.cpp',
 	'cgame/cg_scoreboard.cpp',
 	'cgame/cg_servercmds.cpp',
+	'cgame/cg_serverHistory.cpp',
 	'cgame/cg_serverModification.cpp',
 	'cgame/cg_smartentities.cpp',
 	'cgame/cg_snapshot.cpp',

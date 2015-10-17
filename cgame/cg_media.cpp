@@ -710,7 +710,7 @@ static size_t numLoadedResources = 0;
 static qboolean loadedMap = qfalse;
 static void CG_UpdateLoadBar( void ) {
 	const size_t numResources = numSounds + numGraphics + numEffects + numModels;
-	const float mapPercent = 0.25f;
+	const float mapPercent = 0.25f; // let's say maps take 25% of load times
 
 	numLoadedResources++;
 
@@ -733,10 +733,12 @@ static void CG_LoadResource( const resource_t *resource, qhandle_t( *registerFun
 
 	handle = registerFunc( resource->location );
 
-	if ( !handle )
+	if ( !handle ) {
 		CG_LogPrintf( cg.log.debug, "Missing resource: %s\n", resource->location );
-	if ( resource->handle )
+	}
+	if ( resource->handle ) {
 		*(qhandle_t *)resource->handle = handle;
+	}
 }
 
 // the server says this item is used on this level
@@ -746,18 +748,21 @@ static void CG_RegisterItemSounds( int itemNum ) {
 	const char *s, *start;
 	int len;
 
-	if ( item->pickup_sound )
+	if ( item->pickup_sound ) {
 		trap->S_RegisterSound( item->pickup_sound );
+	}
 
 	// parse the space seperated precache string for other media
 	s = item->sounds;
-	if ( !s || !s[0] )
+	if ( !s || !s[0] ) {
 		return;
+	}
 
 	while ( *s ) {
 		start = s;
-		while ( *s && *s != ' ' )
+		while ( *s && *s != ' ' ) {
 			s++;
+		}
 
 		len = s - start;
 		if ( len >= MAX_QPATH || len < 5 ) {
@@ -766,8 +771,9 @@ static void CG_RegisterItemSounds( int itemNum ) {
 		}
 		memcpy( data, start, len );
 		data[len] = '\0';
-		if ( *s )
+		if ( *s ) {
 			s++;
+		}
 
 		trap->S_RegisterSound( data );
 	}
@@ -779,8 +785,9 @@ static void CG_RegisterItemSounds( int itemNum ) {
 
 	while ( *s ) {
 		start = s;
-		while ( *s && *s != ' ' )
+		while ( *s && *s != ' ' ) {
 			s++;
+		}
 
 		len = s - start;
 		if ( len >= MAX_QPATH || len < 5 ) {
@@ -802,19 +809,22 @@ static void CG_RegisterSounds( void ) {
 	size_t i;
 	const char *soundName = NULL;
 
-	for ( i = 0, resource = sounds; i < numSounds; i++, resource++ )
+	for ( i = 0, resource = sounds; i < numSounds; i++, resource++ ) {
 		CG_LoadResource( resource, trap->S_RegisterSound );
+	}
 
 	for ( i = 1; i < MAX_SOUNDS; i++ ) {
 		soundName = CG_ConfigString( CS_SOUNDS + i );
 
-		if ( !soundName[0] )
+		if ( !soundName[0] ) {
 			break;
+		}
 
 		// custom sounds
 		if ( soundName[0] == '*' ) {
-			if ( soundName[1] == '$' )
+			if ( soundName[1] == '$' ) {
 				CG_PrecacheNPCSounds( soundName );
+			}
 			continue;
 		}
 		cgs.gameSounds[i] = trap->S_RegisterSound( soundName );
@@ -842,22 +852,25 @@ static void CG_RegisterEffects( void ) {
 	size_t i;
 	const char *effectName = NULL;
 
-	for ( i = 0, resource = efx; i < numEffects; i++, resource++ )
+	for ( i = 0, resource = efx; i < numEffects; i++, resource++ ) {
 		CG_LoadResource( resource, trap->FX_RegisterEffect );
+	}
 
 	for ( i = 1; i < MAX_FX; i++ ) {
 		effectName = CG_ConfigString( CS_EFFECTS + i );
 
-		if ( !effectName[0] )
+		if ( !effectName[0] ) {
 			break;
+		}
 
 		if ( effectName[0] == '*' ) {
 			// it's a special global weather effect
 			CG_ParseWeatherEffect( effectName );
 			cgs.gameEffects[i] = 0;
 		}
-		else
+		else {
 			cgs.gameEffects[i] = trap->FX_RegisterEffect( effectName );
+		}
 	}
 
 	CG_InitGlass();
@@ -866,20 +879,22 @@ static void CG_RegisterEffects( void ) {
 static void CG_RegisterGraphics( void ) {
 	const resource_t *resource = NULL;
 	size_t i;
-	const char *iconName = NULL;
 
 	for ( i = 0, resource = gfx; i < numGraphics; i++, resource++ ) {
-		if ( resource->flags & RFL_NOMIP )
+		if ( resource->flags & RFL_NOMIP ) {
 			CG_LoadResource( resource, trap->R_RegisterShaderNoMip );
-		else
+		}
+		else {
 			CG_LoadResource( resource, trap->R_RegisterShader );
+		}
 	}
 
 	for ( i = 1; i < MAX_ICONS; i++ ) {
-		iconName = CG_ConfigString( CS_ICONS + i );
+		const char *iconName = CG_ConfigString( CS_ICONS + i );
 
-		if ( !iconName[0] )
+		if ( !iconName[0] ) {
 			break;
+		}
 
 		cgs.gameIcons[i] = trap->R_RegisterShaderNoMip( iconName );
 	}
@@ -939,21 +954,33 @@ static void CG_RegisterModels( void ) {
 	}
 
 	CG_LoadingString( "BSP instances" );
+	size_t numBSPInstances = 1;
 	for ( i = 1; i < MAX_SUB_BSP; i++ ) {
+		const char *bspName = CG_ConfigString( CS_BSP_MODELS + i );
+		if ( bspName[0] ) {
+			numBSPInstances++;
+		}
+	}
+	for ( i = 1; i < numBSPInstances; i++ ) {
+		//TODO: test validity
+		char loadingStr[1024];
+		Com_sprintf( loadingStr, sizeof(loadingStr), "Loading BSP instances (%i/%i)", i, numBSPInstances );
 		const char *bspName = NULL;
 		vector3 mins, maxs;
 		int j, sub = 0;
 		char temp[MAX_QPATH];
 
 		bspName = CG_ConfigString( CS_BSP_MODELS + i );
-		if ( !bspName[0] )
+		if ( !bspName[0] ) {
 			break;
+		}
 
 		trap->CM_LoadMap( bspName, qtrue );
 		cgs.inlineDrawModel[breakPoint] = trap->R_RegisterModel( bspName );
 		trap->R_ModelBounds( cgs.inlineDrawModel[breakPoint], &mins, &maxs );
-		for ( j = 0; j < 3; j++ )
+		for ( j = 0; j < 3; j++ ) {
 			cgs.inlineModelMidpoints[breakPoint].raw[j] = mins.raw[j] + 0.5f * (maxs.raw[j] - mins.raw[j]);
+		}
 
 		breakPoint++;
 		for ( sub = 1; sub < MAX_MODELS; sub++ ) {

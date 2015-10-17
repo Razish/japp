@@ -954,7 +954,9 @@ void			CG_ExecuteNewServerCommands( int latestSequence );
 vector4 *		CG_FadeColor( int startMsec, int totalMsec );
 qboolean		CG_FadeColor2( vector4 *color, int startMsec, int totalMsec );
 void			CG_FillRect( float x, float y, float width, float height, const vector4 *color );
+localEntity_t *	CG_FindLocalEntity( uint32_t id );
 void			CG_FireWeapon( centity_t *cent, qboolean alt_fire );
+void			CG_FreeLocalEntity( localEntity_t *le );
 void			CG_G2Trace( trace_t *result, const vector3 *start, const vector3 *mins, const vector3 *maxs,
 					const vector3 *end, int skipNumber, int mask );
 qboolean		CG_G2TraceCollide( trace_t *tr, const vector3 *mins, const vector3 *maxs, vector3 *lastValidStart,

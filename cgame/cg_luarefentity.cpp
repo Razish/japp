@@ -31,7 +31,6 @@ namespace JPLua{
 	}
 
 	static int RefEntity_ToString(lua_State *L) {
-		const refEntity_t *entity = CheckRefEntity(L, 1);
 		lua_pushstring(L, "RefEntity");
 		return 1;
 	}

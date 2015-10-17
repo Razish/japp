@@ -44,8 +44,9 @@ const char *CG_PlaceString( int rank ) {
 		rank &= ~RANK_TIED_FLAG;
 		t = sTiedFor;
 	}
-	else
+	else {
 		t = "";
+	}
 
 	if ( rank == 1 )		s = va( "1%s", sST );
 	else if ( rank == 2 )		s = va( "2%s", sND );
@@ -72,10 +73,15 @@ static void CG_Obituary( entityState_t *ent ) {
 	gender_t		gender;
 	clientInfo_t	*ci;
 
-
 	target = ent->otherEntityNum;
 	attacker = ent->otherEntityNum2;
 	mod = ent->eventParm;
+
+	if ( JPLua::Event_PlayerDeath( target, mod, attacker ) ) {
+		//TODO: try and not break the centerprint that occurs for local player?
+		//	and make sure we expose things like cg.killerName
+		return;
+	}
 
 	if ( target < 0 || target >= MAX_CLIENTS ) {
 		trap->Error( ERR_DROP, "CG_Obituary: target out of range" );

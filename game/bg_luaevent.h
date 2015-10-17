@@ -41,12 +41,16 @@ namespace JPLua {
 #elif defined(PROJECT_GAME)
 	char *Event_ChatMessageRecieved( int clientNum, const char *msg, int type );
 #endif
+
 #ifdef PROJECT_CGAME
 	char *Event_ChatMessageSent( const char *msg, messageMode_t mode, int targetClient );
 #endif
 
 #ifdef PROJECT_GAME
 	void Event_ClientBegin( int clientNum );
+#endif
+
+#ifdef PROJECT_GAME
 	qboolean Event_ClientCommand( int clientNum );
 #endif
 
@@ -66,6 +70,9 @@ namespace JPLua {
 
 #ifdef PROJECT_GAME
 	void Event_ClientSpawn( int clientNum, qboolean firstSpawn );
+#endif
+
+#ifdef PROJECT_GAME
 	qboolean Event_ClientUserinfoChanged( int clientNum, char *userinfo );
 #endif
 
@@ -87,8 +94,10 @@ namespace JPLua {
 	void Event_Pain( int clientNum, int health );
 #endif
 
-#ifdef PROJECT_GAME
+#if defined(PROJECT_GAME)
 	void Event_PlayerDeath( int clientNum, int mod, int inflictor );
+#elif defined(PROJECT_CGAME)
+	bool Event_PlayerDeath( int clientNum, int mod, int inflictor );
 #endif
 
 #ifdef PROJECT_CGAME

@@ -7,6 +7,7 @@
 #include "ui/ui_shared.h"
 #include "cg_lights.h"
 #include "cg_media.h"
+#include "cg_serverHistory.h"
 
 displayContextDef_t cgDC;
 
@@ -1871,6 +1872,8 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 		trap->Print( S_COLOR_YELLOW "WARNING: Default /rate value detected. Suggest typing /rate 25000 for a smoother "
 			"connection!\n" );
 	}
+
+	CG_UpdateServerHistory();
 }
 
 //makes sure returned string is in localized format

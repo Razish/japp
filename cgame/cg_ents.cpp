@@ -1096,7 +1096,7 @@ static void CG_General( centity_t *cent ) {
 	s1 = &cent->currentState;
 
 	// if set to invisible, skip
-	if ( (!s1->modelindex) && !(trap->G2_HaveWeGhoul2Models( cent->ghoul2 )) ) {
+	if ( !s1->modelindex && (!cent->ghoul2 || !trap->G2_HaveWeGhoul2Models( cent->ghoul2 )) ) {
 		return;
 	}
 

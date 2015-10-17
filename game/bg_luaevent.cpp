@@ -286,7 +286,7 @@ namespace JPLua {
 		command_t &comm = clientCommands[cmd];
 		if ( comm.handle ) {
 			ret = qtrue;
-			lua_rawgeti(ls.L, LUA_REGISTRYINDEX, comm.handle );
+			lua_rawgeti( ls.L, LUA_REGISTRYINDEX, comm.handle );
 			Player_CreateRef( ls.L, clientNum );
 			//Push table of arguments
 			lua_newtable( ls.L );
@@ -647,9 +647,15 @@ namespace JPLua {
 	}
 #endif
 
-#ifdef PROJECT_GAME
+#if defined(PROJECT_GAME)
 	void Event_PlayerDeath( int clientNum, int mod, int inflictor ) {
+#elif defined(PROJECT_CGAME)
+	bool Event_PlayerDeath( int clientNum, int mod, int inflictor ) {
+#endif
 #ifdef JPLUA
+#ifdef PROJECT_CGAME
+		bool ret = false;
+#endif
 		plugin_t *plugin = NULL;
 		while ( IteratePlugins( &plugin ) ) {
 			if ( plugin->eventListeners[JPLUA_EVENT_PLAYERDEATH] ) {
@@ -666,12 +672,22 @@ namespace JPLua {
 					Player_CreateRef( ls.L, inflictor );
 				}
 
+#if defined(PROJECT_GAME)
 				Call( ls.L, 3, 0 );
+#elif defined(PROJECT_CGAME)
+				Call( ls.L, 3, 1 );
+
+				if ( !ret ) {
+					ret = !!lua_toboolean( ls.L, -1 );
+				}
+#endif
 			}
 		}
+#ifdef PROJECT_CGAME
+		return ret;
+#endif
 #endif // JPLUA
 	}
-#endif
 
 #ifdef PROJECT_CGAME
 	void Event_SaberTouch( int victim, int attacker ) {
@@ -692,31 +708,29 @@ namespace JPLua {
 #endif
 
 #ifdef PROJECT_CGAME
-	qboolean Event_ConsoleCommand( void ){
+	qboolean Event_ConsoleCommand( void ) {
 		qboolean ret = qfalse;
 #ifdef JPLUA
-		int top, i;
 		command_t &cmd = consoleCommands[CG_Argv( 0 )];
-		if (cmd.handle){
+		if ( cmd.handle ) {
 
-			lua_rawgeti(ls.L, LUA_REGISTRYINDEX, cmd.handle);
+			lua_rawgeti( ls.L, LUA_REGISTRYINDEX, cmd.handle );
 
 			lua_pushstring( ls.L, CG_Argv( 0 ) );
 			//Push table of arguments
-			lua_newtable(ls.L);
-			top = lua_gettop(ls.L);
-			for (i = 1; i < trap->Cmd_Argc(); i++) {
-				lua_pushnumber(ls.L, i);
-				lua_pushstring(ls.L, CG_Argv( i ));
-				lua_settable(ls.L, top);
+			lua_newtable( ls.L );
+			int top = lua_gettop( ls.L );
+			for ( int i = 1; i < trap->Cmd_Argc(); i++ ) {
+				lua_pushnumber( ls.L, i );
+				lua_pushstring( ls.L, CG_Argv( i ) );
+				lua_settable( ls.L, top );
 			}
 			lua_pushstring( ls.L, ConcatArgs( 0 ) );
-			Call(ls.L, 3, 0);
+			Call( ls.L, 3, 0 );
 			ret = qtrue;
 		}
 #endif
 		return ret;
-
 	}
 
 #endif

@@ -106,6 +106,9 @@
     <File Name="cgame/cg_luaitem.cpp"/>
     <File Name="cgame/cg_luainterface.h"/>
     <File Name="cgame/cg_luamenu.cpp"/>
+    <File Name="cgame/cg_serverHistory.cpp"/>
+    <File Name="cgame/cg_lualocalentity.cpp"/>
+    <File Name="cgame/cg_luarefentity.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="game">
     <File Name="game/g_log.cpp"/>
@@ -481,7 +484,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="ja" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -519,7 +522,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="ja" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -557,7 +560,7 @@
       </Compiler>
       <Linker Options="-O2" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Release" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="" IntermediateDirectory="./Release" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="ja" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -595,7 +598,7 @@
       </Compiler>
       <Linker Options="-O2" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Release" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="" IntermediateDirectory="./Release" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="ja" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>

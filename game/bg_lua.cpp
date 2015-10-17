@@ -11,6 +11,7 @@
 #define __STDC_FORMAT_MACROS // older compilers need this
 #include <inttypes.h>
 #include <unordered_map>
+#include <vector>
 #include "cJSON/cJSON.h"
 
 extern int lastluaid;
@@ -553,8 +554,8 @@ namespace JPLua {
 					//NOTE: this is necessary, for unusual reasons
 					// a lua event may trigger the unload event of this plugin
 					//	utility functions may then wish to know the currently-executing plugin
-					// after the other plugin triggers the unload, any functions it executes afterward must still know the
-					//	currently executing plugin, so we must preserve it during the unload event
+					// after the other plugin triggers the unload, any functions it executes afterward must still know
+					//	the currently executing plugin, so we must preserve it during the unload event
 					// the other reason to switch it back is that this plugin no longer exists
 					// there is no concern in the case of no currently executing plugin
 					plugin_t *oldPlugin = ls.currentPlugin;

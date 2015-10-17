@@ -1352,6 +1352,7 @@ void Q_DeletePrintBuffer( printBufferSession_t *session ) {
 	}
 }
 
+// useful if your bit-flags are spread across multiple variables (i.e. mindtrick index)
 qboolean Q_InBitflags( const uint32_t *bits, int index, uint32_t bitsPerByte ) {
 	return !!( bits[index / bitsPerByte] & (1 << (index % bitsPerByte)) );
 }
@@ -1362,4 +1363,36 @@ void Q_AddToBitflags( uint32_t *bits, int index, uint32_t bitsPerByte ) {
 
 void Q_RemoveFromBitflags( uint32_t *bits, int index, uint32_t bitsPerByte ) {
 	bits[index / bitsPerByte] &= ~(1 << (index % bitsPerByte));
+}
+
+// can be used for sorting
+// returns 0 on match
+int Q_CompareNetAddress( const netadr_t *a1, const netadr_t *a2 ) {
+	if ( !a1 && a2 ) {
+		return 1;
+	}
+	else if ( a1 && !a2 ) {
+		return -1;
+	}
+	else {
+		return 0;
+	}
+
+	for ( int i = 0; i < 4; i++ ) {
+		if ( a1->ip[i] < a2->ip[i] ) {
+			return -1;
+		}
+		else if ( a1->ip[i] > a2->ip[i] ) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+const char *Q_PrintNetAddress( const netadr_t *adr ) {
+	if ( !adr ) {
+		return "";
+	}
+	return va( "%i.%i.%i.%i", adr->ip[0], adr->ip[1], adr->ip[2], adr->ip[3] );
 }

@@ -2183,13 +2183,14 @@ typedef struct qtime_s {
 	int tm_isdst;   /* daylight savings time flag */
 } qtime_t;
 
-
+typedef enum serverSource_e {
 // server browser sources
-#define AS_LOCAL			0
-#define AS_GLOBAL			1
-#define AS_FAVORITES		2
-
-#define AS_MPLAYER			3 // (Obsolete)
+	AS_LOCAL = 0,
+	AS_GLOBAL,
+	AS_FAVORITES,
+//	AS_MPLAYER,
+	AS_HISTORY,
+} serverSource_t;
 
 // cinematic states
 typedef enum cinState_e {
@@ -2330,6 +2331,20 @@ enum {
 	FONT_NUM_FONTS
 };
 
+typedef enum netadrtype_s {
+	NA_BAD = 0,
+	NA_BOT,
+	NA_LOOPBACK,
+	NA_BROADCAST,
+	NA_IP
+} netadrtype_t;
+
+typedef struct netadr_s {
+	netadrtype_t	type;
+	uint8_t			ip[4];
+	uint16_t		port;
+} netadr_t;
+
 vector3 *tv( float x, float y, float z );
 char *vtos( const vector3 *v );
 void Q_WriteJSONToFile( void *root, fileHandle_t f );
@@ -2350,3 +2365,6 @@ void Q_DeletePrintBuffer( printBufferSession_t *session );
 qboolean Q_InBitflags( const uint32_t *bits, int index, uint32_t bitsPerByte );
 void Q_AddToBitflags( uint32_t *bits, int index, uint32_t bitsPerByte );
 void Q_RemoveFromBitflags( uint32_t *bits, int index, uint32_t bitsPerByte );
+
+int Q_CompareNetAddress( const netadr_t *a1, const netadr_t *a2 );
+const char *Q_PrintNetAddress( const netadr_t *adr );

@@ -21,11 +21,14 @@ typedef struct cvarTable_s {
 #include "ui_xcvar.h"
 #undef XCVAR_DECL
 
-void UI_Set2DRatio(void) {
-	if (japp_ratioFix.integer)
-		uiInfo.uiDC.widthRatioCoef = (float)(SCREEN_WIDTH * uiInfo.uiDC.glconfig.vidHeight) / (float)(SCREEN_HEIGHT * uiInfo.uiDC.glconfig.vidWidth);
-	else
+void UI_Set2DRatio( void ) {
+	if ( japp_ratioFix.integer ) {
+		uiInfo.uiDC.widthRatioCoef = (float)(SCREEN_WIDTH * uiInfo.uiDC.glconfig.vidHeight)
+								/ (float)(SCREEN_HEIGHT * uiInfo.uiDC.glconfig.vidWidth);
+	}
+	else {
 		uiInfo.uiDC.widthRatioCoef = 1.0f;
+	}
 }
 
 static const cvarTable_t uiCvarTable[] = {
