@@ -43,6 +43,7 @@ localEntity_t *CG_AllocLocalEntity(void) {
 	
 	le->id = cg_localEntities.size() + 1;
 	cg_localEntities.push_back(le);
+	return le;
 }
 
 // A fragment localentity interacts with the environment in some way (hitting walls), or generates more localentities
