@@ -375,7 +375,6 @@ namespace JPLua {
 		}
 		return 0;
 	}
-
 	static int RegisterPlugin( lua_State *L ) {
 		Q_strncpyz( ls.currentPlugin->longname, lua_tostring( L, 1 ), sizeof(ls.currentPlugin->longname) );
 		Q_CleanString( ls.currentPlugin->longname, STRIP_COLOUR );
@@ -420,6 +419,14 @@ namespace JPLua {
 			lua_pushstring( L, ls.currentPlugin->name );
 			lua_settable( L, top );
 
+		if (semver_lt(ls.currentPlugin->requiredJPLuaVersion, jpluaVersion)) {
+			luaO_pushfstring(L, S_COLOR_RED " %s requires ls.v%d.%d.%d\n", ls.currentPlugin->name,
+				ls.currentPlugin->requiredJPLuaVersion.major, ls.currentPlugin->requiredJPLuaVersion.minor,
+				ls.currentPlugin->requiredJPLuaVersion.patch
+				);
+			luaD_throw(L, LUA_ERRRUN);
+			return 0;
+		}
 		//save in the registry, but push on stack again straight away
 		ls.currentPlugin->handle = luaL_ref( L, LUA_REGISTRYINDEX );
 		lua_rawgeti( L, LUA_REGISTRYINDEX, ls.currentPlugin->handle );
@@ -446,15 +453,6 @@ namespace JPLua {
 			return false;
 		}
 		ls.currentPlugin = current;
-
-		if ( semver_lt( plugin->requiredJPLuaVersion, jpluaVersion ) ) {
-			trap->Print( S_COLOR_RED "  %s requires ls.v%i.%i.%i\n", plugin->name,
-				plugin->requiredJPLuaVersion.major, plugin->requiredJPLuaVersion.minor,
-				plugin->requiredJPLuaVersion.patch
-			);
-			luaL_unref( ls.L, LUA_REGISTRYINDEX, plugin->handle );
-			return false;
-		}
 		trap->Print( S_COLOR_CYAN "  loaded %s " S_COLOR_GREEN "v%i.%i.%i " S_COLOR_WHITE " (%s)\n", plugin->longname,
 			plugin->version.major, plugin->version.minor, plugin->version.patch, plugin->name
 		);
