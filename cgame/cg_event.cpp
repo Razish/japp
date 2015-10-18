@@ -2851,7 +2851,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 					// hear it in the world spot.
 					char vchatstr[1024];
 					Q_strncpyz( vchatstr, va( "<%s" S_COLOR_WHITE "> %s\n", ci->name, descr ), sizeof(vchatstr) );
-					trap->Print( vchatstr );
+					trap->Print( "*%s", vchatstr );
 					if ( !cg_newChatbox.integer )
 						CG_ChatBox_AddString( vchatstr );
 					else
