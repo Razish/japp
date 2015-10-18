@@ -1,4 +1,5 @@
 #include "cg_local.h"
+#include "bg_xcvar.h"
 #include "bg_saga.h"
 #include "cg_lights.h"
 #include "bg_luaevent.h"
@@ -130,16 +131,16 @@ static void CG_CalcVrect( void ) {
 		size = 100;
 	else {
 		// bound normal viewsize
-		if ( cg_viewSize.integer < 30 ) {
-			trap->Cvar_Set( "cg_viewSize", "30" );
+		if ( cg_viewSize.getInt() < 30 ) {
+			cg_viewSize.setInt( 30 );
 			size = 30;
 		}
-		else if ( cg_viewSize.integer > 100 ) {
-			trap->Cvar_Set( "cg_viewSize", "100" );
+		else if ( cg_viewSize.getInt() > 100 ) {
+			cg_viewSize.setInt( 100 );
 			size = 100;
 		}
 		else
-			size = cg_viewSize.integer;
+			size = cg_viewSize.getInt();
 
 	}
 	refdef->width = cgs.glconfig.vidWidth*size / 100;
@@ -187,7 +188,7 @@ extern vector3 gCGFallVector;
 
 static void CG_CalcIdealThirdPersonViewTarget( int clientNum ) {
 	refdef_t *refdef = CG_GetRefdef();
-	float vertOffset = cg_thirdPersonVertOffset.value;
+	float vertOffset = cg_thirdPersonVertOffset.getFloat();
 
 	// Initialize IdealTarget
 	if ( gCGHasFallVector )
@@ -234,7 +235,7 @@ static void CG_CalcIdealThirdPersonViewTarget( int clientNum ) {
 }
 
 static void CG_CalcIdealThirdPersonViewLocation( int clientNum ) {
-	float thirdPersonRange = cg_thirdPersonRange.value;
+	float thirdPersonRange = cg_thirdPersonRange.getFloat();
 
 	if ( cg.snap && cg.snap->ps.m_iVehicleNum ) {
 		centity_t *veh = &cg_entities[cg.snap->ps.m_iVehicleNum];
@@ -304,22 +305,22 @@ static void CG_UpdateThirdPersonTargetDamp( int clientNum ) {
 	// hyperspacing, no damp
 	if ( cg.predictedVehicleState.hyperSpaceTime && (cg.time - cg.predictedVehicleState.hyperSpaceTime) < HYPERSPACE_TIME )
 		VectorCopy( &cameraIdealTarget[clientNum], &cameraCurTarget[clientNum] );
-	else if ( cg_thirdPersonTargetDamp.value >= 1.0f || cg.thisFrameTeleport || cg.predictedPlayerState.m_iVehicleNum )
+	else if ( cg_thirdPersonTargetDamp.getFloat() >= 1.0f || cg.thisFrameTeleport || cg.predictedPlayerState.m_iVehicleNum )
 		VectorCopy( &cameraIdealTarget[clientNum], &cameraCurTarget[clientNum] );
-	else if ( cg_thirdPersonTargetDamp.value >= 0.0f ) {
+	else if ( cg_thirdPersonTargetDamp.getFloat() >= 0.0f ) {
 		// Calculate the difference from the current position to the new one.
 		VectorSubtract( &cameraIdealTarget[clientNum], &cameraCurTarget[clientNum], &targetdiff );
 
 		// Now we calculate how much of the difference we cover in the time allotted.
 		// The equation is (Damp)^(time)
 		// We must exponent the amount LEFT rather than the amount bled off
-		dampfactor = 1.0f - cg_thirdPersonTargetDamp.value;
+		dampfactor = 1.0f - cg_thirdPersonTargetDamp.getFloat();
 		// Our dampfactor is geared towards a time interval equal to "1".
 		dtime = (float)(cg.time - cameraLastFrame[clientNum]) * (1.0f / (float)CAMERA_DAMP_INTERVAL);
 
 		// Note that since there are a finite number of "practical" delta millisecond values possible, the ratio should
 		//	be initialized into a chart ultimately.
-		ratio = cg_smoothCamera.integer ? powf( dampfactor, dtime ) : Q_powf( dampfactor, dtime );
+		ratio = cg_smoothCamera.getInt() ? powf( dampfactor, dtime ) : Q_powf( dampfactor, dtime );
 
 		// This value is how much distance is "left" from the ideal.
 		VectorMA( &cameraIdealTarget[clientNum], -ratio, &targetdiff, &cameraCurTarget[clientNum] );
@@ -353,11 +354,11 @@ static void CG_UpdateThirdPersonCameraDamp( int clientNum ) {
 	// hyperspacing - don't damp camera
 	if ( cg.predictedVehicleState.hyperSpaceTime && (cg.time - cg.predictedVehicleState.hyperSpaceTime) < HYPERSPACE_TIME )
 		dampfactor = 1.0f;
-	else if ( cg_thirdPersonCameraDamp.value != 0.0f ) {
+	else if ( cg_thirdPersonCameraDamp.getFloat() != 0.0f ) {
 		float pitch, dFactor;
 
 		if ( !cg.predictedPlayerState.m_iVehicleNum )
-			dFactor = cg_thirdPersonCameraDamp.value;
+			dFactor = cg_thirdPersonCameraDamp.getFloat();
 		else
 			dFactor = 1.0f;
 
@@ -389,7 +390,7 @@ static void CG_UpdateThirdPersonCameraDamp( int clientNum ) {
 
 		// Note that since there are a finite number of "practical" delta millisecond values possible,
 		// the ratio should be initialized into a chart ultimately.
-		ratio = cg_smoothCamera.integer ? powf( dampfactor, dtime ) : Q_powf( dampfactor, dtime );
+		ratio = cg_smoothCamera.getInt() ? powf( dampfactor, dtime ) : Q_powf( dampfactor, dtime );
 
 		// This value is how much distance is "left" from the ideal.
 		VectorMA( &cameraIdealLoc[clientNum], -ratio, &locdiff, &cameraCurLoc[clientNum] );
@@ -444,7 +445,7 @@ qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh );
 
 static void CG_OffsetThirdPersonView( int clientNum ) {
 	vector3 diff;
-	float thirdPersonHorzOffset = cg_thirdPersonHorzOffset.value;
+	float thirdPersonHorzOffset = cg_thirdPersonHorzOffset.getFloat();
 	float deltayaw;
 	refdef_t *refdef = CG_GetRefdef();
 
@@ -472,9 +473,9 @@ static void CG_OffsetThirdPersonView( int clientNum ) {
 	else if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 )
 		cameraFocusAngles[clientNum].yaw = cg.snap->ps.stats[STAT_DEAD_YAW];
 	else {
-		float pitchOffset = cg_thirdPersonPitchOffset.value;
+		float pitchOffset = cg_thirdPersonPitchOffset.getFloat();
 		// Add in the third Person Angle.
-		cameraFocusAngles[clientNum].yaw += cg_thirdPersonAngle.value;
+		cameraFocusAngles[clientNum].yaw += cg_thirdPersonAngle.getFloat();
 		if ( cg.snap && cg.snap->ps.m_iVehicleNum ) {
 			centity_t *veh = &cg_entities[cg.snap->ps.m_iVehicleNum];
 			if ( veh->m_pVehicle && veh->m_pVehicle->m_pVehicleInfo->cameraOverride ) {
@@ -624,7 +625,7 @@ static void CG_OffsetFirstPersonView( void ) {
 	}
 
 	// add angles based on damage kick
-	if ( cg.damageTime && cg_viewKickDamage.integer ) {
+	if ( cg.damageTime && cg_viewKickDamage.getInt() ) {
 		ratio = cg.time - cg.damageTime;
 		if ( ratio < DAMAGE_DEFLECT_TIME ) {
 			ratio /= DAMAGE_DEFLECT_TIME;
@@ -652,10 +653,10 @@ static void CG_OffsetFirstPersonView( void ) {
 	VectorCopy( &cg.predictedPlayerState.velocity, &predictedVelocity );
 
 	delta = DotProduct( &predictedVelocity, &refdef->viewaxis[0] );
-	angles->pitch += delta * cg_runPitch.value;
+	angles->pitch += delta * cg_runPitch.getFloat();
 
 	delta = DotProduct( &predictedVelocity, &refdef->viewaxis[1] );
-	angles->roll -= delta * cg_runRoll.value;
+	angles->roll -= delta * cg_runRoll.getFloat();
 
 	// add angles based on bob
 
@@ -743,7 +744,7 @@ qboolean CG_CalcFOVFromX( float fov_x ) {
 	qboolean inwater;
 	refdef_t *refdef = CG_GetRefdef();
 
-	if ( cg_fovAspectAdjust.integer ) {
+	if ( cg_fovAspectAdjust.getInt() ) {
 		// Based on LordHavoc's code for Darkplaces
 		// http://www.quakeworld.nu/forum/topic/53/what-does-your-qw-look-like/page/30
 		const float baseAspect = 0.75f; // 3/4
@@ -794,12 +795,12 @@ static int CG_CalcFov( void ) {
 	refdef_t *refdef = CG_GetRefdef();
 
 	if ( !cg.renderingThirdPerson
-		&& (cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
-		&& cg_trueFOV.value && cg.predictedPlayerState.pm_type != PM_SPECTATOR && cg.predictedPlayerState.pm_type != PM_INTERMISSION ) {
-		cgFov = cg_trueFOV.value;
+		&& (cg_trueGuns.getInt() || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
+		&& cg_trueFOV.getFloat() && cg.predictedPlayerState.pm_type != PM_SPECTATOR && cg.predictedPlayerState.pm_type != PM_INTERMISSION ) {
+		cgFov = cg_trueFOV.getFloat();
 	}
 	else
-		cgFov = cg_fov.value;
+		cgFov = cg_fov.getFloat();
 
 	if ( cgFov < 1 )
 		cgFov = 1;
@@ -864,7 +865,7 @@ static int CG_CalcFov( void ) {
 		}
 	}
 
-	if ( cg_fovAspectAdjust.integer ) {
+	if ( cg_fovAspectAdjust.getInt() ) {
 		// Based on LordHavoc's code for Darkplaces
 		// http://www.quakeworld.nu/forum/topic/53/what-does-your-qw-look-like/page/30
 		const float baseAspect = 0.75f; // 3/4
@@ -962,7 +963,7 @@ static qboolean CG_ThirdPersonActionCam( int clientNum ) {
 	centity_t *cent = &cg_entities[clientNum];
 	clientInfo_t *ci = &cgs.clientinfo[clientNum];
 	vector3 positionDir, desiredAngles, desiredPos, v;
-	const float smoothFactor = 0.1f*timescale.value;
+	const float smoothFactor = 0.1f*timescale.getFloat();
 	refdef_t *refdef = CG_GetRefdef();
 	int i;
 	trace_t tr;
@@ -983,7 +984,7 @@ static qboolean CG_ThirdPersonActionCam( int clientNum ) {
 	VectorNormalize( &positionDir );
 
 	//position the cam based on the direction and saber position
-	VectorMA( &cent->lerpOrigin, cg_thirdPersonRange.value * 2, &positionDir, &desiredPos );
+	VectorMA( &cent->lerpOrigin, cg_thirdPersonRange.getFloat() * 2, &positionDir, &desiredPos );
 
 	// trace to the desired pos to see how far that way we can actually go before we hit something
 	//	the endpos will be valid for our desiredpos no matter what
@@ -1140,15 +1141,15 @@ static int CG_CalcViewValues( int clientNum ) {
 	}
 	VectorCopy( &refdef->viewangles, &cg_lastTurretViewAngles );
 
-	if ( cg_cameraOrbit.integer ) {
+	if ( cg_cameraOrbit.getInt() ) {
 		if ( cg.time > cg.nextOrbitTime ) {
-			cg.nextOrbitTime = cg.time + cg_cameraOrbitDelay.integer;
-			cg_thirdPersonAngle.value += cg_cameraOrbit.value;
+			cg.nextOrbitTime = cg.time + cg_cameraOrbitDelay.getInt();
+			cg_thirdPersonAngle += cg_cameraOrbit.getFloat();
 		}
 	}
 
 	//Raz: Pmove smoothing
-	if ( cg_smoothClients.integer == 2 ) {
+	if ( cg_smoothClients.getInt() == 2 ) {
 		int cmdNum = trap->GetCurrentCmdNumber() - CMD_BACKUP + 1;
 		usercmd_t cmd;
 
@@ -1159,12 +1160,12 @@ static int CG_CalcViewValues( int clientNum ) {
 	}
 
 	// add error decay
-	if ( cg_errorDecay.value > 0 ) {
+	if ( cg_errorDecay.getFloat() > 0 ) {
 		int		t;
 		float	f;
 
 		t = cg.time - cg.predictedErrorTime;
-		f = (cg_errorDecay.value - t) / cg_errorDecay.value;
+		f = (cg_errorDecay.getFloat() - t) / cg_errorDecay.getFloat();
 		if ( f > 0 && f < 1 )
 			VectorMA( &refdef->vieworg, f, &cg.predictedError, &refdef->vieworg );
 		else
@@ -1187,7 +1188,7 @@ static int CG_CalcViewValues( int clientNum ) {
 		if ( cg.renderingThirdPerson ) {
 #endif
 			// back away from character
-			if ( cg_thirdPersonSpecialCam.integer && BG_SaberInSpecial( cg.predictedPlayerState.saberMove ) ) {
+			if ( cg_thirdPersonSpecialCam.getInt() && BG_SaberInSpecial( cg.predictedPlayerState.saberMove ) ) {
 				// the action cam
 				//couldn't do it for whatever reason, resort back to third person then
 				if ( !CG_ThirdPersonActionCam( clientNum ) )
@@ -1293,22 +1294,22 @@ void CG_DrawSkyBoxPortal( const char *cstr ) {
 	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		// if in intermission, use a fixed value
 		if ( !cg.renderingThirdPerson &&
-			(cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
-			&& cg_trueFOV.value ) {
-			fov_x = cg_trueFOV.value;
+			(cg_trueGuns.getInt() || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
+			&& cg_trueFOV.getFloat() ) {
+			fov_x = cg_trueFOV.getFloat();
 		}
 		else
-			fov_x = cg_fov.value;
+			fov_x = cg_fov.getFloat();
 	}
 	else {
 		if ( !cg.renderingThirdPerson &&
-			(cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
-			&& cg_trueFOV.value && cg.predictedPlayerState.pm_type != PM_SPECTATOR
+			(cg_trueGuns.getInt() || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
+			&& cg_trueFOV.getFloat() && cg.predictedPlayerState.pm_type != PM_SPECTATOR
 			&& cg.predictedPlayerState.pm_type != PM_INTERMISSION ) {
-			fov_x = cg_trueFOV.value;
+			fov_x = cg_trueFOV.getFloat();
 		}
 		else
-			fov_x = cg_fov.value;
+			fov_x = cg_fov.getFloat();
 		if ( fov_x < 1 )
 			fov_x = 1;
 		else if ( fov_x > 160 )
@@ -1503,7 +1504,7 @@ void CG_SE_UpdateMusic( void ) {
 // Currently just for screen shaking (and music volume management)
 void CG_CalcScreenEffects( void ) {
 	refdef_t *refdef = CG_GetRefdef();
-	if ( cg_viewShake.integer )
+	if ( cg_viewShake.getInt() )
 		CG_SE_UpdateShake( &refdef->vieworg, &refdef->viewangles );
 	CG_SE_UpdateMusic();
 }
@@ -1636,7 +1637,7 @@ void CG_DrawAutoMap( void ) {
 	int				vWidth, vHeight;
 	float			hScale, vScale, x, y, w, h;
 
-	if ( !r_autoMap.integer )
+	if ( !r_autoMap.getInt() )
 		return;
 
 	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 )
@@ -1658,12 +1659,12 @@ void CG_DrawAutoMap( void ) {
 
 	//scale out in the direction of the view angles base on the zoom factor
 	AngleVectors( &refdef.viewangles, &fwd, 0, 0 );
-	VectorMA( &refdef.vieworg, -r_autoMapZoom.value, &fwd, &refdef.vieworg );
+	VectorMA( &refdef.vieworg, -r_autoMapZoom.getFloat(), &fwd, &refdef.vieworg );
 
 	AnglesToAxis( &refdef.viewangles, refdef.viewaxis );
 
-	refdef.fov_x = r_autoMapFov.value;
-	refdef.fov_y = r_autoMapFov.value;
+	refdef.fov_x = r_autoMapFov.getFloat();
+	refdef.fov_y = r_autoMapFov.getFloat();
 
 	//guess this doesn't need to be done every frame, but eh
 	trap->R_GetRealRes( &vWidth, &vHeight );
@@ -1672,10 +1673,10 @@ void CG_DrawAutoMap( void ) {
 	hScale = vWidth / SCREEN_WIDTH;
 	vScale = vHeight / SCREEN_HEIGHT;
 
-	x = r_autoMapX.value;
-	y = r_autoMapY.value;
-	w = r_autoMapW.value;
-	h = r_autoMapH.value;
+	x = r_autoMapX.getFloat();
+	y = r_autoMapY.getFloat();
+	w = r_autoMapW.getFloat();
+	h = r_autoMapH.getFloat();
 
 	refdef.x = x*hScale;
 	refdef.y = y*vScale;
@@ -1697,7 +1698,7 @@ void CG_DrawAutoMap( void ) {
 		cg_entities[cg.predictedPlayerState.m_iVehicleNum].currentState.NPC_class == CLASS_VEHICLE &&
 		cg_entities[cg.predictedPlayerState.m_iVehicleNum].m_pVehicle &&
 		cg_entities[cg.predictedPlayerState.m_iVehicleNum].m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER)
-		|| r_autoMapAdjustHeight.integer ) { //constantly adjust to current height
+		|| r_autoMapAdjustHeight.getInt() ) { //constantly adjust to current height
 		trap->R_AutomapElevationAdjustment( cg.predictedPlayerState.origin.z );
 	}
 	else {
@@ -1754,8 +1755,8 @@ void CG_DrawAltView( int clientNum ) {
 
 		AnglesToAxis( &refdef->viewangles, refdef->viewaxis );
 
-		refdef->fov_x = cg_fov.value;
-		refdef->fov_y = cg_fov.value;
+		refdef->fov_x = cg_fov.getFloat();
+		refdef->fov_y = cg_fov.getFloat();
 
 		//guess this doesn't need to be done every frame, but eh
 		trap->R_GetRealRes( &vWidth, &vHeight );
@@ -1856,7 +1857,7 @@ static void addVelocityVector( void ) {
 	VectorCopy( &cg.predictedPlayerState.velocity, &velocity );
 	velocity.z = 0;
 	VectorScale( &velocity, 0.1f, &velocity );
-	normalizeToLength( &velocity, cg_strafeHelperLength.value );
+	normalizeToLength( &velocity, cg_strafeHelperLength.getFloat() );
 	VectorAdd( &ref->origin, &velocity, &ref->oldorigin );
 
 	SE_R_AddRefEntityToScene( ref, MAX_CLIENTS );
@@ -1904,9 +1905,9 @@ static qboolean addIdealVectors( void ) {
 
 
 	//for inverted strafe we need to subtract Pi/4 more and get absolute value
-	if ( cg_strafeHelper.integer == 2 )
+	if ( cg_strafeHelper.getInt() == 2 )
 		idealAngleToLeft = idealAngleToRight = M_PI / 2 - idealAngle;
-	else if ( cg_strafeHelper.integer == 4 ) {
+	else if ( cg_strafeHelper.getInt() == 4 ) {
 		idealAngleToLeft = idealAngle + M_PI / 2;
 		idealAngleToRight = idealAngle - M_PI / 2;
 	}
@@ -1941,8 +1942,8 @@ static qboolean addIdealVectors( void ) {
 	right->oldorigin.x = vel->x*cosRightAngle + vel->y*sinRightAngle;
 	right->oldorigin.y = -vel->x*sinRightAngle + vel->y*cosRightAngle;
 
-	normalizeToLength( &left->oldorigin, cg_strafeHelperLength.integer );
-	normalizeToLength( &right->oldorigin, cg_strafeHelperLength.integer );
+	normalizeToLength( &left->oldorigin, cg_strafeHelperLength.getInt() );
+	normalizeToLength( &right->oldorigin, cg_strafeHelperLength.getInt() );
 
 	if ( cg.japp.isfixedVector ) {
 		//compute angle between fixed direction and left ideal direction
@@ -1966,7 +1967,7 @@ static qboolean addIdealVectors( void ) {
 			//trap->Print("DEBUG: angleToLeft=%.3f angleToRight=%.3f delta=%.3f angleFromLeft2Fixed=%.3f\n",
 			//	angleToLeft,angleToRight,delta,angle);
 
-			if ( angle < cg_strafeHelperAngle.value*M_PI / 180.0f ) {
+			if ( angle < cg_strafeHelperAngle.getFloat()*M_PI / 180.0f ) {
 				drawLeft = qtrue;
 				drawRight = qfalse;
 			}
@@ -1983,7 +1984,7 @@ static qboolean addIdealVectors( void ) {
 			//trap->Print("DEBUG: angleToLeft=%.3f angleToRight=%.3f delta=%.3f angleFromRight2Fixed=%.3f\n",
 			//	angleToLeft,angleToRight,delta,angle);
 
-			if ( angle < cg_strafeHelperAngle.value*M_PI / 180.0f ) {
+			if ( angle < cg_strafeHelperAngle.getFloat()*M_PI / 180.0f ) {
 				drawLeft = qfalse;
 				drawRight = qtrue;
 			}
@@ -2016,16 +2017,10 @@ static qboolean addIdealVectors( void ) {
 }
 
 void CG_AddMovementVectors( void ) {
-	static int modCount = 0;
-	if ( modCount != cg_strafeHelperRadius.modificationCount ) {
-		cg.japp.leftIdeal.radius = cg.japp.rightIdeal.radius = cg.japp.velocityVect.radius = cg_strafeHelperRadius.value;
-		modCount = cg_strafeHelperRadius.modificationCount;
-	}
-
 	cg.japp.leftIdeal.reType = cg.japp.rightIdeal.reType = cg.japp.velocityVect.reType = RT_LINE;
 	cg.japp.leftIdeal.customShader = cg.japp.rightIdeal.customShader = cg.japp.velocityVect.customShader = media.gfx.world.saber.rgb.core;
 
-	if ( addIdealVectors() && cg_strafeHelperVelocity.integer )
+	if ( addIdealVectors() && cg_strafeHelperVelocity.getInt() )
 		addVelocityVector();
 }
 
@@ -2059,8 +2054,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	cg.time = serverTime;
 	cg.demoPlayback = demoPlayback;
 
-	if ( cg.snap && ui_myteam.integer != cg.snap->ps.persistant[PERS_TEAM] )
-		trap->Cvar_Set( "ui_myteam", va( "%i", cg.snap->ps.persistant[PERS_TEAM] ) );
+	if ( cg.snap && ui_myteam.getInt() != cg.snap->ps.persistant[PERS_TEAM] )
+		ui_myteam.setInt( cg.snap->ps.persistant[PERS_TEAM] );
 
 	if ( cgs.gametype == GT_SIEGE && cg.snap && cg_siegeClassIndex != cgs.clientinfo[cg.snap->ps.clientNum].siegeIndex ) {
 		cg_siegeClassIndex = cgs.clientinfo[cg.snap->ps.clientNum].siegeIndex;
@@ -2071,7 +2066,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	}
 
 	// update cvars
-	CG_UpdateCvars();
+	XCVAR_UpdateXCvars();
 
 	// if we are only updating the screen as a loading
 	// pacifier, don't even try to read snapshots
@@ -2132,7 +2127,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 			veh = &cg_entities[cg.predictedPlayerState.m_iVehicleNum];
 
 		if ( veh && veh->currentState.eType == ET_NPC && veh->currentState.NPC_class == CLASS_VEHICLE && veh->m_pVehicle
-			&& veh->m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER && bg_fighterAltControl.integer ) {
+			&& veh->m_pVehicle->m_pVehicleInfo->type == VH_FIGHTER && bg_fighterAltControl.getInt() ) {
 			trap->SetUserCmdValue( cg.weaponSelect, mSensitivity, mPitchOverride, mYawOverride, 0.0f, cg.forceSelect,
 				cg.itemSelect, qtrue );
 			veh = NULL; //this is done because I don't want an extra assign each frame because I am so perfect and super efficient.
@@ -2163,17 +2158,17 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	//			cg_entities[i].currentState.solid = savedSolid[i];
 
 	// decide on third person view
-	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
+	cg.renderingThirdPerson = cg_thirdPerson.getInt() || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
 
 	if ( cg.snap->ps.stats[STAT_HEALTH] > 0 ) {
 #ifdef FP_EWEB
 		// force third person for e-web and emplaced use
 		if ( cg.predictedPlayerState.weapon == WP_EMPLACED_GUN && cg.predictedPlayerState.emplacedIndex )
 			cg.renderingThirdPerson = 1;
-		else if ( cg_trueInvertSaber.integer == 2 && (cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) )
+		else if ( cg_trueInvertSaber.getInt() == 2 && (cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) )
 #else
 		// force thirdperson for sabers/melee if in cg_trueInvertSaber.integer == 2
-		if ( cg_trueInvertSaber.integer == 2 && (cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) )
+		if ( cg_trueInvertSaber.getInt() == 2 && (cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) )
 #endif
 			cg.renderingThirdPerson = qtrue;
 #ifdef RAZTEST
@@ -2181,11 +2176,11 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #else
 		else if ( cg.predictedPlayerState.fallingToDeath || cg.predictedPlayerState.m_iVehicleNum
 #endif
-			|| (cg_trueInvertSaber.integer == 1 && !cg_thirdPerson.integer && (cg.predictedPlayerState.weapon == WP_SABER
+			|| (cg_trueInvertSaber.getInt() == 1 && !cg_thirdPerson.getInt() && (cg.predictedPlayerState.weapon == WP_SABER
 			|| cg.predictedPlayerState.weapon == WP_MELEE)) ) {
 			cg.renderingThirdPerson = qtrue;
 		}
-		else if ( cg_trueInvertSaber.integer == 1 && cg_thirdPerson.integer
+		else if ( cg_trueInvertSaber.getInt() == 1 && cg_thirdPerson.getInt()
 			&& (cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) ) {
 			cg.renderingThirdPerson = qfalse;
 		}
@@ -2249,7 +2244,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		CG_AddTestModel();
 
 	//SMod - draws movement vectors
-	if ( cg_strafeHelper.integer && cg.predictedPlayerState.stats[STAT_HEALTH] > 0
+	if ( cg_strafeHelper.getInt() && cg.predictedPlayerState.stats[STAT_HEALTH] > 0
 		&& cg.predictedPlayerState.pm_type != PM_SPECTATOR && cg.predictedPlayerState.pm_type != PM_INTERMISSION ) {
 		CG_AddMovementVectors();
 	}
@@ -2290,19 +2285,19 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		cg.oldTime = cg.time;
 		CG_AddLagometerFrameInfo();
 	}
-	if ( timescale.value != cg_timescaleFadeEnd.value ) {
-		if ( timescale.value < cg_timescaleFadeEnd.value ) {
-			timescale.value += cg_timescaleFadeSpeed.value * ((float)cg.frametime) / 1000;
-			if ( timescale.value > cg_timescaleFadeEnd.value )
-				timescale.value = cg_timescaleFadeEnd.value;
+	if ( timescale.getFloat() != cg_timescaleFadeEnd.getFloat() ) {
+		if ( timescale.getFloat() < cg_timescaleFadeEnd.getFloat() ) {
+			timescale += cg_timescaleFadeSpeed.getFloat() * ((float)cg.frametime) / 1000;
+			if ( timescale.getFloat() > cg_timescaleFadeEnd.getFloat() )
+				timescale.setFloat(cg_timescaleFadeEnd.getFloat());
 		}
 		else {
-			timescale.value -= cg_timescaleFadeSpeed.value * ((float)cg.frametime) / 1000;
-			if ( timescale.value < cg_timescaleFadeEnd.value )
-				timescale.value = cg_timescaleFadeEnd.value;
+			timescale -= cg_timescaleFadeSpeed.getFloat() * ((float)cg.frametime) / 1000;
+			if ( timescale.getFloat() < cg_timescaleFadeEnd.getFloat() )
+				timescale.setFloat(cg_timescaleFadeEnd.getFloat());
 		}
-		if ( cg_timescaleFadeSpeed.value )
-			trap->Cvar_Set( "timescale", va( "%f", timescale.value ) );
+		if ( cg_timescaleFadeSpeed.getFloat() )
+			timescale.setFloat( timescale.getFloat() );
 	}
 
 	//Raz: ls.
@@ -2337,7 +2332,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	trap->R_SetColor( NULL );
 
 #ifdef _DEBUG
-	if ( cg_stats.integer )
+	if ( cg_stats.getInt() )
 		trap->Print( "cg.clientFrame:%i\n", cg.clientFrame );
 #endif
 }

@@ -12,6 +12,7 @@ files = [
 	'game/bg_saga.cpp',
 	'game/bg_vehicleLoad.cpp',
 	'game/bg_weapons.cpp',
+	'game/bg_xcvar.cpp',
 	'JAPP/jp_crash.cpp',
 	'JAPP/jp_tokenparser.cpp',
 	'ui/ui_atoms.cpp',

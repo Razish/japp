@@ -1,15 +1,17 @@
 
+class xcvar;
+
 #ifdef XCVAR_PROTO
-#define XCVAR_DEF( name, defVal, update, flags ) extern vmCvar_t name;
+#define XCVAR_DEF( name, defVal, update, flags ) extern xcvar name;
 #endif
 
 #ifdef XCVAR_DECL
-#define XCVAR_DEF( name, defVal, update, flags ) vmCvar_t name;
+#define XCVAR_DEF( name, defVal, update, flags ) xcvar name( #name, defVal, flags, update );
 #endif
 
-#ifdef XCVAR_LIST
+/*#ifdef XCVAR_LIST
 #define XCVAR_DEF( name, defVal, update, flags ) { & name , #name , defVal , update , flags },
-#endif
+#endif*/
 
 XCVAR_DEF( capturelimit, "0", NULL, CVAR_ARCHIVE | CVAR_NORESTART | CVAR_SERVERINFO ) // fixme init'd to 8 in game module
 XCVAR_DEF( cg_drawCrosshair, "1", NULL, CVAR_ARCHIVE )

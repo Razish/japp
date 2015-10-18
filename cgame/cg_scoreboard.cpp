@@ -102,7 +102,7 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 		}
 	}
 
-	else if ( ci->modelIcon && cg_oldScoreboardSkinIcons.integer )
+	else if ( ci->modelIcon && cg_oldScoreboardSkinIcons.getInt() )
 		CG_DrawPic(iconx, y, iconSize * cgs.widthRatioCoef, iconSize, ci->modelIcon);
 
 
@@ -162,7 +162,7 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 			}
 		}
 
-		if ( cgs.clientinfo[score->client].botSkill != -1 && cg_oldScoreboardShowBots.integer == 2 ) {
+		if ( cgs.clientinfo[score->client].botSkill != -1 && cg_oldScoreboardShowBots.getInt() == 2 ) {
 			CG_Text_Paint(SB_PING_X, y, 1.0f * scale, &colorWhite, "-", 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL, qfalse);
 		}
 		else {
@@ -179,15 +179,15 @@ static void CG_DrawClientScore( int y, score_t *score, const vector4 *color, flo
 
 	// add the "ready" marker for intermission exiting
 	if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
-		CG_Text_Paint( cg_oldScoreboardSkinIcons.integer ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite,
+		CG_Text_Paint( cg_oldScoreboardSkinIcons.getInt() ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite,
 			CG_GetStringEdString("MP_INGAME", "READY"), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM, qfalse);
 	}
-	else if ( cgs.clientinfo[score->client].botSkill != -1 && cg_oldScoreboardShowBots.integer == 1 ) {
-		CG_Text_Paint( cg_oldScoreboardSkinIcons.integer ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite, "BOT",
+	else if ( cgs.clientinfo[score->client].botSkill != -1 && cg_oldScoreboardShowBots.getInt() == 1 ) {
+		CG_Text_Paint( cg_oldScoreboardSkinIcons.getInt() ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite, "BOT",
 			0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM, qfalse);
 	}
 	else if ( score->team == TEAM_SPECTATOR ) {
-		CG_Text_Paint( cg_oldScoreboardSkinIcons.integer ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite, "SPEC",
+		CG_Text_Paint( cg_oldScoreboardSkinIcons.getInt() ? 4 : SB_NAME_X - 48, y + 2, 0.7f * scale, &colorWhite, "SPEC",
 			0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM, qfalse);
 	}
 }

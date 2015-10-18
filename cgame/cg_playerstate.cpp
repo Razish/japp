@@ -205,7 +205,7 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps ) {
 
 				cg.predictableEvents[i & (MAX_PREDICTED_EVENTS - 1)] = event;
 
-				if ( cg_showMiss.integer )
+				if ( cg_showMiss.getInt() )
 					trap->Print( "WARNING: changed predicted event\n" );
 			}
 		}
@@ -254,7 +254,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 #endif
 
 	// health changes of more than -3 should make pain sounds
-	if ( cg_oldPainSounds.integer ) {
+	if ( cg_oldPainSounds.getInt() ) {
 		if ( ps->stats[STAT_HEALTH] < (ops->stats[STAT_HEALTH] - 3) ) {
 			if ( ps->stats[STAT_HEALTH] > 0 )
 				CG_PainEvent( &cg_entities[cg.predictedPlayerState.clientNum], ps->stats[STAT_HEALTH] );
@@ -379,7 +379,7 @@ void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 	// smooth the ducking viewheight change
 	if ( ps->viewheight != ops->viewheight ) {
 		cg.duckChange = ps->viewheight - ops->viewheight;
-		if ( cg_instantDuck.integer )
+		if ( cg_instantDuck.getInt() )
 			cg.duckTime = cg.time - DUCK_TIME;
 		else
 			cg.duckTime = cg.time;

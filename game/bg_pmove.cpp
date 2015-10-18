@@ -7121,7 +7121,11 @@ static void PM_DropTimers( void ) {
 qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh ) {
 	//FIXME: specify per vehicle instead of assuming true for all fighters
 	//FIXME: map/server setting?
+#ifdef PROJECT_CGAME
+	if ( bg_fighterAltControl.getInt() && ps->clientNum < MAX_CLIENTS && ps->m_iVehicleNum && pVeh && pVeh->m_pVehicleInfo
+#else
 	if ( bg_fighterAltControl.integer && ps->clientNum < MAX_CLIENTS && ps->m_iVehicleNum && pVeh && pVeh->m_pVehicleInfo
+#endif
 		&& pVeh->m_pVehicleInfo->type == VH_FIGHTER ) {
 		// can roll and pitch without limitation!
 		return qtrue;

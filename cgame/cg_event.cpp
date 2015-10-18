@@ -259,7 +259,7 @@ clientkilled:
 					CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
 					sPlaceWith,
 					cg.snap->ps.persistant[PERS_SCORE] );
-				if ( cg_scorePlums.integer == 2 )
+				if ( cg_scorePlums.getInt() == 2 )
 					CG_ScorePlum( cg.predictedPlayerState.clientNum, &cg_entities[target].lerpOrigin, 1 );
 			}
 		}
@@ -523,10 +523,10 @@ static void CG_ItemPickup( int itemNum ) {
 		// 2 == automatically switch to best weapon, safe or otherwise
 		// 3 == if not saber, automatically switch to best weapon, safe or otherwise
 
-		if ( 0 == cg_autoSwitch.integer ) {
+		if ( 0 == cg_autoSwitch.getInt() ) {
 			// don't switch
 		}
-		else if ( cg_autoSwitch.integer == 1 ) { //only autoselect if not explosive ("safe")
+		else if ( cg_autoSwitch.getInt() == 1 ) { //only autoselect if not explosive ("safe")
 			if ( bg_itemlist[itemNum].giTag != WP_TRIP_MINE &&
 				bg_itemlist[itemNum].giTag != WP_DET_PACK &&
 				bg_itemlist[itemNum].giTag != WP_THERMAL &&
@@ -539,7 +539,7 @@ static void CG_ItemPickup( int itemNum ) {
 				cg.weaponSelect = bg_itemlist[itemNum].giTag;
 			}
 		}
-		else if ( cg_autoSwitch.integer == 2 ) { //autoselect if better
+		else if ( cg_autoSwitch.getInt() == 2 ) { //autoselect if better
 			if ( bg_itemlist[itemNum].giTag > cg.snap->ps.weapon &&
 				cg.snap->ps.weapon != WP_SABER ) {
 				if ( !cg.snap->ps.emplacedIndex ) {
@@ -1078,7 +1078,7 @@ const char *CG_GetStringForVoiceSound( const char *s ) {
 	return "voice chat";
 }
 
-#define	DEBUGNAME(x) if(cg_debugEvents.integer){trap->Print(x"\n");}
+#define	DEBUGNAME(x) if(cg_debugEvents.getInt()){trap->Print(x"\n");}
 
 // An entity has an event value
 // also called by CG_CheckPlayerstateEvents
@@ -1097,7 +1097,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 	es = &cent->currentState;
 	event = es->event & ~EV_EVENT_BITS;
 
-	if ( cg_debugEvents.integer ) {
+	if ( cg_debugEvents.getInt() ) {
 		trap->Print( "ent:%3i  event:%3i ", es->number, event );
 	}
 
@@ -1171,7 +1171,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 
 	case EV_FOOTSTEP:
 		DEBUGNAME( "EV_FOOTSTEP" );
-		if ( cg_footsteps.integer ) {
+		if ( cg_footsteps.getInt() ) {
 			footstep_t	soundType;
 			switch ( es->eventParm ) {
 			case MATERIAL_MUD:
@@ -1221,25 +1221,25 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		break;
 	case EV_FOOTSTEP_METAL:
 		DEBUGNAME( "EV_FOOTSTEP_METAL" );
-		if ( cg_footsteps.integer ) {
+		if ( cg_footsteps.getInt() ) {
 			trap->S_StartSound( NULL, es->number, CHAN_BODY, media.sounds.environment.footsteps[FOOTSTEP_METALWALK][rand() & 3] );
 		}
 		break;
 	case EV_FOOTSPLASH:
 		DEBUGNAME( "EV_FOOTSPLASH" );
-		if ( cg_footsteps.integer ) {
+		if ( cg_footsteps.getInt() ) {
 			trap->S_StartSound( NULL, es->number, CHAN_BODY, media.sounds.environment.footsteps[FOOTSTEP_SPLASH][rand() & 3] );
 		}
 		break;
 	case EV_FOOTWADE:
 		DEBUGNAME( "EV_FOOTWADE" );
-		if ( cg_footsteps.integer ) {
+		if ( cg_footsteps.getInt() ) {
 			trap->S_StartSound( NULL, es->number, CHAN_BODY, media.sounds.environment.footsteps[FOOTSTEP_SPLASH][rand() & 3] );
 		}
 		break;
 	case EV_SWIM:
 		DEBUGNAME( "EV_SWIM" );
-		if ( cg_footsteps.integer ) {
+		if ( cg_footsteps.getInt() ) {
 			trap->S_StartSound( NULL, es->number, CHAN_BODY, media.sounds.environment.footsteps[FOOTSTEP_SPLASH][rand() & 3] );
 		}
 		break;
@@ -1266,7 +1266,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 				break;
 			}
 			// if we are interpolating, we don't need to smooth steps
-			if ( cg.demoPlayback || CG_IsSpectating() || cg_noPredict.integer || g_synchronousClients.integer ) {
+			if ( cg.demoPlayback || CG_IsSpectating() || cg_noPredict.getInt() || g_synchronousClients.getInt() ) {
 				break;
 			}
 			// check for stepping up before a previous step is completed
@@ -1295,7 +1295,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 	case EV_GHOUL2_MARK:
 		DEBUGNAME( "EV_GHOUL2_MARK" );
 
-		if ( cg_ghoul2Marks.integer ) { //Can we put a burn mark on him?
+		if ( cg_ghoul2Marks.getInt() ) { //Can we put a burn mark on him?
 			CG_G2MarkEvent( es );
 		}
 		break;
@@ -1339,7 +1339,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 
 	case EV_JUMP:
 		DEBUGNAME( "EV_JUMP" );
-		if ( cg_jumpSounds.integer && (!cg.predictedPlayerState.duelInProgress || (cg.predictedPlayerState.duelIndex == es->clientNum || cg.predictedPlayerState.clientNum == es->clientNum)) ) {//Raz: duel isolation
+		if ( cg_jumpSounds.getInt() && (!cg.predictedPlayerState.duelInProgress || (cg.predictedPlayerState.duelIndex == es->clientNum || cg.predictedPlayerState.clientNum == es->clientNum)) ) {//Raz: duel isolation
 			trap->S_StartSound( NULL, es->number, CHAN_VOICE, CG_CustomSound( es->number, "*jump1.wav" ) );
 		}
 		break;
@@ -1372,7 +1372,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			if ( cg.predictedPlayerState.duelInProgress && (cg.predictedPlayerState.clientNum != es->clientNum && cg.predictedPlayerState.duelIndex != es->clientNum) )
 				break;
 
-			if ( cg_noTaunt.integer )
+			if ( cg_noTaunt.getInt() )
 				break;
 
 			//Raz: Removed
@@ -2201,7 +2201,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 	case EV_DISRUPTOR_MAIN_SHOT:
 		DEBUGNAME( "EV_DISRUPTOR_MAIN_SHOT" );
 		if ( cent->currentState.eventParm != cg.snap->ps.clientNum ||
-			cg.renderingThirdPerson || cg_trueGuns.integer
+			cg.renderingThirdPerson || cg_trueGuns.getInt()
 			|| cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE ) { //h4q3ry
 			CG_GetWeaponMuzzleBolt( cent->currentState.eventParm, &cent->currentState.origin2 );
 		}
@@ -2210,7 +2210,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 				VectorCopy( &cg.lastFPFlashPoint, &cent->currentState.origin2 );
 			}
 		}
-		if ( (cg_newFX.integer & NEWFX_RUPTOR) )
+		if ( (cg_newFX.getBits() & NEWFX_RUPTOR) )
 			CG_RailTrail( &cgs.clientinfo[cent->currentState.eventParm], &cent->currentState.origin2, &cent->lerpOrigin );
 		else
 			FX_DisruptorMainShot( &cent->currentState.origin2, &cent->lerpOrigin );
@@ -2227,7 +2227,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 				VectorCopy( &cg.lastFPFlashPoint, &cent->currentState.origin2 );
 			}
 		}
-		if ( (cg_newFX.integer & NEWFX_RUPTOR) )
+		if ( (cg_newFX.getBits() & NEWFX_RUPTOR) )
 			CG_RailTrail( &cgs.clientinfo[cent->currentState.eventParm], &cent->currentState.origin2, &cent->lerpOrigin );
 		else
 			FX_DisruptorAltShot( &cent->currentState.origin2, &cent->lerpOrigin, cent->currentState.shouldtarget );
@@ -2558,7 +2558,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		if ( (signed)es->trickedEntIndex[0] == cg.snap->ps.clientNum ) {
 			trap->Cvar_Set( "ui_rankChange", va( "%i", es->eventParm ) );
 
-			trap->Cvar_Set( "ui_myteam", va( "%i", es->bolt2 ) );
+			ui_myteam.setInt( es->bolt2 );
 
 			if ( !(trap->Key_GetCatcher() & KEYCATCH_UI) && !es->bolt1 && !cg.demoPlayback ) {
 				trap->OpenUIMenu( UIMENU_PLAYERCONFIG );
@@ -2623,7 +2623,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			CG_MissileHitPlayer( es->weapon, position, &dir, es->otherEntityNum, qfalse );
 		}
 
-		if ( cg_ghoul2Marks.integer && es->trickedEntIndex[0] ) {
+		if ( cg_ghoul2Marks.getInt() && es->trickedEntIndex[0] ) {
 			// flag to place a ghoul2 mark
 			CG_G2MarkEvent( es );
 		}
@@ -2644,7 +2644,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			CG_MissileHitWall( es->weapon, 0, position, &dir, IMPACTSOUND_DEFAULT, qfalse, 0 );
 		}
 
-		if ( cg_ghoul2Marks.integer && es->trickedEntIndex[0] ) {
+		if ( cg_ghoul2Marks.getInt() && es->trickedEntIndex[0] ) {
 			// flag to place a ghoul2 mark
 			CG_G2MarkEvent( es );
 		}
@@ -2852,7 +2852,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 					char vchatstr[1024];
 					Q_strncpyz( vchatstr, va( "<%s" S_COLOR_WHITE "> %s\n", ci->name, descr ), sizeof(vchatstr) );
 					trap->Print( "*%s", vchatstr );
-					if ( !cg_newChatbox.integer )
+					if ( !cg_newChatbox.getInt() )
 						CG_ChatBox_AddString( vchatstr );
 					else
 						CG_ChatboxAddMessage( vchatstr, qfalse, "team" );
@@ -3000,7 +3000,7 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		// so ignore events on the player
 		DEBUGNAME( "EV_PAIN" );
 
-		if ( !cg_oldPainSounds.integer || (cent->currentState.number != cg.snap->ps.clientNum) ) {
+		if ( !cg_oldPainSounds.getInt() || (cent->currentState.number != cg.snap->ps.clientNum) ) {
 			CG_PainEvent( cent, es->eventParm );
 		}
 		JPLua::Event_Pain( cent->currentState.number, es->eventParm );

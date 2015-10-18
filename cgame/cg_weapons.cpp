@@ -139,7 +139,7 @@ static void CG_CalculateWeaponPosition( vector3 *origin, vector3 *angles ) {
 		scale = cg.xyspeed;
 
 	// gun angles from bobbing
-	if ( cg_gunBobEnable.integer ) {
+	if ( cg_gunBobEnable.getInt() ) {
 		angles->pitch += cg.xyspeed	* cg.bobfracsin * cg.gunBob.pitch;
 		angles->yaw += scale		* cg.bobfracsin * cg.gunBob.yaw;
 		angles->roll += scale		* cg.bobfracsin * cg.gunBob.roll;
@@ -162,7 +162,7 @@ static void CG_CalculateWeaponPosition( vector3 *origin, vector3 *angles ) {
 	}
 
 	// idle drift
-	if ( cg_gunIdleDriftEnable.integer ) {
+	if ( cg_gunIdleDriftEnable.getInt() ) {
 		scale = cg.xyspeed + 40;
 		fracsin = sinf( cg.time * cg.gunIdleDrift.speed );
 		angles->pitch += scale * fracsin * cg.gunIdleDrift.amount.pitch;
@@ -306,7 +306,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	// Do special charge bits
 	// Make the guns do their charging visual in True View.
-	if ( (ps || cg.renderingThirdPerson || cg.predictedPlayerState.clientNum != cent->currentState.number || cg_trueGuns.integer) &&
+	if ( (ps || cg.renderingThirdPerson || cg.predictedPlayerState.clientNum != cent->currentState.number || cg_trueGuns.getInt()) &&
 		((cent->currentState.modelindex2 == WEAPON_CHARGING_ALT && cent->currentState.weapon == WP_BRYAR_PISTOL) ||
 		(cent->currentState.modelindex2 == WEAPON_CHARGING_ALT && cent->currentState.weapon == WP_BRYAR_OLD) ||
 		(cent->currentState.weapon == WP_BOWCASTER && cent->currentState.modelindex2 == WEAPON_CHARGING) ||
@@ -397,7 +397,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			return;
 	}
 
-	if ( ps || cg.renderingThirdPerson || cg_trueGuns.integer
+	if ( ps || cg.renderingThirdPerson || cg_trueGuns.getInt()
 		|| cent->currentState.number != cg.predictedPlayerState.clientNum ) {
 		// Make sure we don't do the thirdperson model effects for the local player if we're in first person
 		vector3 flashorigin, flashdir;
@@ -469,19 +469,19 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 		return;
 
 	if ( !cg.renderingThirdPerson
-		&& (cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
-		&& cg_trueFOV.value
+		&& (cg_trueGuns.getInt() || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
+		&& cg_trueFOV.getFloat()
 		&& cg.predictedPlayerState.pm_type != PM_SPECTATOR
 		&& cg.predictedPlayerState.pm_type != PM_INTERMISSION ) {
-		desiredFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_trueFOV.value;
+		desiredFov = cg_fovViewmodel.getInt() ? cg_fovViewmodel.getFloat() : cg_trueFOV.getFloat();
 	}
 	else
-		desiredFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_fov.value;
+		desiredFov = cg_fovViewmodel.getInt() ? cg_fovViewmodel.getFloat() : cg_fov.getFloat();
 
 	desiredFov = Q_clampi( 1, desiredFov, 180 );
 
 	// allow the gun to be completely removed
-	if ( !cg.japp.fakeGun && (!cg_drawGun.integer || cg.predictedPlayerState.zoomMode || cg_trueGuns.integer
+	if ( !cg.japp.fakeGun && (!cg_drawGun.getInt() || cg.predictedPlayerState.zoomMode || cg_trueGuns.getInt()
 		|| cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) ) {
 		return;
 	}
@@ -505,10 +505,10 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 
 	AnglesToAxis( &angles, hand.axis );
 
-	if ( cg_fovViewmodel.integer ) {
+	if ( cg_fovViewmodel.getInt() ) {
 		float fracDistFOV, fracWeapFOV;
 		float fov = desiredFov;
-		if ( cg_fovAspectAdjust.integer ) {
+		if ( cg_fovAspectAdjust.getInt() ) {
 			// Based on LordHavoc's code for Darkplaces
 			// http://www.quakeworld.nu/forum/topic/53/what-does-your-qw-look-like/page/30
 			const float baseAspect = 0.75f; // 3/4
@@ -522,9 +522,9 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	}
 
 	// map torso animations to weapon animations
-	if ( cg_debugGunFrame.integer ) {
+	if ( cg_debugGunFrame.getInt() ) {
 		// development tool
-		hand.frame = hand.oldframe = cg_debugGunFrame.integer;
+		hand.frame = hand.oldframe = cg_debugGunFrame.getInt();
 		hand.backlerp = 0;
 	}
 	else {
@@ -587,7 +587,7 @@ void CG_DrawIconBackground( void ) {
 		return;
 
 	// simple hud
-	if ( cg_hudFiles.integer )
+	if ( cg_hudFiles.getInt() )
 		return;
 
 	if ( inTime > wpTime )
@@ -1088,7 +1088,7 @@ void CG_OutOfAmmoChange( int oldWeapon ) {
 		// We don't want the emplaced or turret
 		if ( CG_WeaponSelectable( i ) ) {
 			//rww - Don't we want to make sure i != one of these if autoswitch is 1 (safe)?
-			if ( cg_autoSwitch.integer != 1 || (i != WP_TRIP_MINE && i != WP_DET_PACK && i != WP_THERMAL && i != WP_ROCKET_LAUNCHER) ) {
+			if ( cg_autoSwitch.getInt() != 1 || (i != WP_TRIP_MINE && i != WP_DET_PACK && i != WP_THERMAL && i != WP_ROCKET_LAUNCHER) ) {
 				if ( i != oldWeapon ) {
 					// don't even do anything if we're just selecting the weapon we already have/had
 					cg.weaponSelect = i;

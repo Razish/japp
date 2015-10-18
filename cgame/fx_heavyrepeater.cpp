@@ -77,7 +77,7 @@ static void CG_DistortionOrb( centity_t *cent ) {
 	float vLen;
 	refdef_t *refdef = CG_GetRefdef();
 
-	if ( !cg_renderToTextureFX.integer )
+	if ( !cg_renderToTextureFX.getInt() )
 		return;
 
 	memset( &ent, 0, sizeof(ent) );
@@ -131,12 +131,12 @@ void FX_RepeaterAltProjectileThink( centity_t *cent, const struct weaponInfo_s *
 	if ( VectorNormalize2( &cent->currentState.pos.trDelta, &forward ) == 0.0f )
 		forward.z = 1.0f;
 
-	if ( (cg_newFX.integer & NEWFX_REPEATER_ALT) ) {
+	if ( (cg_newFX.getBits() & NEWFX_REPEATER_ALT) ) {
 		FX_Mortar_Missile( cent, weapon );
 		return;
 	}
 
-	if ( cg_repeaterOrb.integer )
+	if ( cg_repeaterOrb.getInt() )
 		CG_DistortionOrb( cent );
 
 	trap->FX_PlayEffectID( media.efx.repeater.altProjectile, &cent->lerpOrigin, &forward, -1, -1, qfalse );

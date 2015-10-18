@@ -1,15 +1,17 @@
 
+class xcvar;
+
 #ifdef XCVAR_PROTO
-#define XCVAR_DEF( name, defVal, update, flags ) extern vmCvar_t name;
+#define XCVAR_DEF( name, defVal, update, flags ) extern xcvar name;
 #endif
 
 #ifdef XCVAR_DECL
-#define XCVAR_DEF( name, defVal, update, flags ) vmCvar_t name;
+#define XCVAR_DEF( name, defVal, update, flags ) xcvar name( #name, defVal, flags, update );
 #endif
 
-#ifdef XCVAR_LIST
+/*#ifdef XCVAR_LIST
 #define XCVAR_DEF( name, defVal, update, flags ) { & name , #name , defVal , update , flags },
-#endif
+#endif*/
 
 XCVAR_DEF( bg_fighterAltControl, "0", NULL, CVAR_SERVERINFO )
 XCVAR_DEF( broadsword, "0", NULL, CVAR_ARCHIVE )
@@ -84,9 +86,9 @@ XCVAR_DEF( cg_dynamicCrosshair, "1", NULL, CVAR_ARCHIVE )
 XCVAR_DEF( cg_dynamicCrosshairPrecision, "1", NULL, CVAR_ARCHIVE )
 XCVAR_DEF( cg_errorDecay, "100", NULL, CVAR_NONE )
 XCVAR_DEF( cg_footsteps, "3", NULL, CVAR_ARCHIVE )
-XCVAR_DEF( cg_forceAllyColour, "64 192 255", CVU_ForceColour, CVAR_ARCHIVE )
+XCVAR_DEF( cg_forceAllyColour, "64 192 255", CVU_ForceAllyColour, CVAR_ARCHIVE )
 XCVAR_DEF( cg_forceAllyModel, "rebel/default", CVU_ForceModel, CVAR_ARCHIVE )
-XCVAR_DEF( cg_forceEnemyColour, "0 255 0", CVU_ForceColour, CVAR_ARCHIVE )
+XCVAR_DEF( cg_forceEnemyColour, "0 255 0", CVU_ForceEnemyColour, CVAR_ARCHIVE )
 XCVAR_DEF( cg_forceEnemyModel, "stormtrooper/default", CVU_ForceModel, CVAR_ARCHIVE )
 XCVAR_DEF( cg_forceEnemySaber, "", NULL, CVAR_ARCHIVE )
 XCVAR_DEF( cg_forceModel, "0", CVU_ForceModel, CVAR_ARCHIVE )
@@ -172,7 +174,7 @@ XCVAR_DEF( cg_strafeHelper, "0", NULL, CVAR_ARCHIVE )
 XCVAR_DEF( cg_strafeHelperAngle, "20.0", NULL, CVAR_ARCHIVE )
 XCVAR_DEF( cg_strafeHelperColor, "0 255 255 255", CVU_StrafeHelpColour, CVAR_ARCHIVE )
 XCVAR_DEF( cg_strafeHelperLength, "100", NULL, CVAR_ARCHIVE )
-XCVAR_DEF( cg_strafeHelperRadius, "1", NULL, CVAR_ARCHIVE )
+XCVAR_DEF( cg_strafeHelperRadius, "1", CVU_StrafeHelpRadius, CVAR_ARCHIVE )
 XCVAR_DEF( cg_strafeHelperVelocity, "1", NULL, CVAR_ARCHIVE )
 XCVAR_DEF( cg_strafeTrail, "0", NULL, CVAR_ARCHIVE )
 XCVAR_DEF( cg_strafeTrailWeights, "300 1500", CVU_StrafeTrailWeights, CVAR_ARCHIVE )
@@ -256,6 +258,6 @@ XCVAR_DEF( ui_tm2_c5_cnt, "0", NULL, CVAR_ROM | CVAR_INTERNAL )
 XCVAR_DEF( ui_tm2_cnt, "0", NULL, CVAR_ROM | CVAR_INTERNAL )
 XCVAR_DEF( ui_tm3_cnt, "0", NULL, CVAR_ROM | CVAR_INTERNAL )
 
-XCVAR_DEF(japp_ratioFix, "1", CG_Set2DRatio, CVAR_ARCHIVE)
+XCVAR_DEF(japp_ratioFix, "0", CG_Set2DRatio, CVAR_ARCHIVE)
 
 #undef XCVAR_DEF

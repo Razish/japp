@@ -26,11 +26,11 @@ void CG_TargetCommand_f( void ) {
 }
 
 static void CG_SizeUp_f( void ) {
-	trap->Cvar_Set( "cg_viewSize", va( "%i", (int)(cg_viewSize.integer + 10) ) );
+	cg_viewSize += 10;
 }
 
 static void CG_SizeDown_f( void ) {
-	trap->Cvar_Set( "cg_viewSize", va( "%i", (int)(cg_viewSize.integer - 10) ) );
+	cg_viewSize -= 10;
 }
 
 static void CG_Viewpos_f( void ) {
@@ -382,7 +382,7 @@ static void CG_HudReload_f( void ) {
 	String_Init();
 	Menu_Reset();
 
-	const char *hudSet = cg_hudFiles.string;
+	const char *hudSet = cg_hudFiles.getStr();
 	if ( hudSet[0] == '\0' ) {
 		hudSet = "ui/jahud.txt";
 	}

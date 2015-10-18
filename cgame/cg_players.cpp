@@ -350,7 +350,7 @@ retryModel:
 		skinName = "default";
 	}
 
-	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE && !cg_forceModel.integer ) {
+	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE && !cg_forceModel.getInt() ) {
 		BG_ValidateSkinForTeam( ci->modelName, ci->skinName, ci->team, reinterpret_cast<vector3 *>( &ci->colorOverride ) );
 		skinName = ci->skinName;
 	}
@@ -1141,7 +1141,7 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 
 	// model
 	v = Info_ValueForKey( configstring, "model" );
-	if ( cg_forceModel.integer && clientNum != cg.clientNum ) {
+	if ( cg_forceModel.getInt() && clientNum != cg.clientNum ) {
 		char modelStr[MAX_QPATH];
 		const char *skin = NULL;
 		size_t len;
@@ -1149,9 +1149,9 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 		// ally model for teammates unless we're in a non-team game, i.e. FFA where everyone is on TEAM_FREE
 		// this also accounts for spectating a certain team
 		if ( cgs.gametype < GT_TEAM || newInfo.team != cgs.clientinfo[cg.snap ? cg.snap->ps.clientNum : cg.clientNum].team )
-			Q_strncpyz( modelStr, cg_forceEnemyModel.string, sizeof(modelStr) );
+			Q_strncpyz( modelStr, cg_forceEnemyModel.getStr(), sizeof(modelStr) );
 		else
-			Q_strncpyz( modelStr, cg_forceAllyModel.string, sizeof(modelStr) );
+			Q_strncpyz( modelStr, cg_forceAllyModel.getStr(), sizeof(modelStr) );
 
 		if ( (skin = strchr( modelStr, '/' )) )
 			modelStr[skin++ - modelStr] = '\0';
@@ -1218,7 +1218,7 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 
 	//saber being used
 	v = Info_ValueForKey( configstring, "st" );
-	yo = (clientNum == cg.clientNum) ? cg_forceOwnSaber.string : cg_forceEnemySaber.string;
+	yo = (clientNum == cg.clientNum) ? cg_forceOwnSaber.getStr() : cg_forceEnemySaber.getStr();
 	if ( v && Q_stricmp( v, ci->saberName ) ) {
 		if ( yo[0] )
 			Q_strncpyz( newInfo.saberName, yo, sizeof(newInfo.saberName) );
@@ -1295,7 +1295,7 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 
 	// we won't force colors for siege.
 	if ( cgs.gametype >= GT_TEAM && !cgs.jediVmerc && cgs.gametype != GT_SIEGE
-		&& (!cg_forceModel.integer || clientNum == cg.clientNum) )
+		&& (!cg_forceModel.getInt() || clientNum == cg.clientNum) )
 	{
 		BG_ValidateSkinForTeam( newInfo.modelName, newInfo.skinName, newInfo.team,
 			reinterpret_cast<vector3 *>( &newInfo.colorOverride )
@@ -1309,7 +1309,7 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 		// if we are defering loads, just have it pick the first valid
 		if ( cg.snap && cg.snap->ps.clientNum == clientNum )
 			CG_LoadClientInfo( &newInfo );
-		else if ( cg_deferPlayers.integer && cgs.gametype != GT_SIEGE && !cg.loading )
+		else if ( cg_deferPlayers.getInt() && cgs.gametype != GT_SIEGE && !cg.loading )
 			CG_SetDeferredClientInfo( &newInfo );
 		else
 			CG_LoadClientInfo( &newInfo );
@@ -1585,14 +1585,14 @@ static void _PlayerFootStep( const vector3 *origin, const float orientation, con
 	if ( soundType < FOOTSTEP_TOTAL )
 		trap->S_StartSound( NULL, cent->currentState.clientNum, CHAN_BODY, media.sounds.environment.footsteps[soundType][rand() & 3] );
 
-	if ( cg_footsteps.integer < 2 )	//1 for sounds, 2 for effects, 3 for marks
+	if ( cg_footsteps.getInt() < 2 )	//1 for sounds, 2 for effects, 3 for marks
 		return;
 
 	if ( effectID != -1 )
 		trap->FX_PlayEffectID( effectID, &trace.endpos, &trace.plane.normal, -1, -1, qfalse );
 
-	if ( cg_footsteps.integer < 4 ) {
-		if ( !bMark || cg_footsteps.integer < 3 )	//1 for sounds, 2 for effects, 3 for marks
+	if ( cg_footsteps.getInt() < 4 ) {
+		if ( !bMark || cg_footsteps.getInt() < 3 )	//1 for sounds, 2 for effects, 3 for marks
 			return;
 	}
 
@@ -1624,7 +1624,7 @@ static void _PlayerFootStep( const vector3 *origin, const float orientation, con
 }
 
 static void CG_PlayerFootsteps( centity_t *cent, footstepType_t footStepType ) {
-	if ( !cg_footsteps.integer )
+	if ( !cg_footsteps.getInt() )
 		return;
 
 	//FIXME: make this a feature of NPCs in the NPCs.cfg? Specify a footstep shader, if any?
@@ -2075,7 +2075,7 @@ static void CG_SetLerpFrameAnimation( centity_t *cent, clientInfo_t *ci, lerpFra
 	if ( cent->localAnimIndex > 1 && anim->firstFrame == 0 && anim->numFrames == 0 )
 		return;
 
-	if ( cg_debugAnim.integer && (cg_debugAnim.integer < 0 || cg_debugAnim.integer == cent->currentState.clientNum) ) {
+	if ( cg_debugAnim.getInt() && (cg_debugAnim.getInt() < 0 || cg_debugAnim.getInt() == cent->currentState.clientNum) ) {
 		if ( lf == &cent->pe.legs ) {
 			trap->Print( "%d: %d TORSO Anim: %i, '%s'\n", cg.time, cent->currentState.clientNum, newAnimation,
 				GetStringForID( animTable, newAnimation ) );
@@ -2103,7 +2103,7 @@ static void CG_SetLerpFrameAnimation( centity_t *cent, clientInfo_t *ci, lerpFra
 			lastFrame = anim->firstFrame + anim->numFrames;
 		}
 
-		if ( cg_animBlend.integer )
+		if ( cg_animBlend.getInt() )
 			flags |= BONE_ANIM_BLEND;
 
 		if ( BG_InDeathAnim( newAnimation ) )
@@ -2232,7 +2232,7 @@ static qboolean CG_FirstAnimFrame( lerpFrame_t *lf, qboolean torsoOnly, float sp
 static void CG_RunLerpFrame( centity_t *cent, clientInfo_t *ci, lerpFrame_t *lf, qboolean flipState, int newAnimation,
 	float speedScale, qboolean torsoOnly ) {
 	// debugging tool to get no animations
-	if ( cg_animSpeed.integer == 0 ) {
+	if ( cg_animSpeed.getInt() == 0 ) {
 		lf->oldFrame = lf->frame = lf->backlerp = 0;
 		return;
 	}
@@ -2309,7 +2309,7 @@ static void CG_PlayerAnimation( centity_t *cent, int *legsOld, int *legs, float 
 
 	clientNum = cent->currentState.clientNum;
 
-	if ( cg_noPlayerAnims.integer ) {
+	if ( cg_noPlayerAnims.getInt() ) {
 		*legsOld = *legs = *torsoOld = *torso = 0;
 		return;
 	}
@@ -2437,7 +2437,7 @@ qboolean CG_RagDoll( centity_t *cent, vector3 *forcedAngles ) {
 	qboolean inSomething = qfalse;
 	int ragAnim;//BOTH_DEAD1; //BOTH_DEATH1;
 
-	if ( !broadsword.integer )
+	if ( !broadsword.getInt() )
 		return qfalse;
 
 	if ( cent->localAnimIndex )
@@ -2466,7 +2466,7 @@ qboolean CG_RagDoll( centity_t *cent, vector3 *forcedAngles ) {
 			}
 		}
 
-		if ( broadsword.integer > 1 )
+		if ( broadsword.getInt() > 1 )
 			inSomething = qtrue;
 
 		if ( !inSomething ) {
@@ -2581,7 +2581,7 @@ qboolean CG_RagDoll( centity_t *cent, vector3 *forcedAngles ) {
 			if ( bgAllAnims[cent->localAnimIndex].anims[ragAnim].loopFrames != -1 )
 				flags = BONE_ANIM_OVERRIDE_LOOP;
 
-			if ( cg_animBlend.integer )
+			if ( cg_animBlend.getInt() )
 				flags |= BONE_ANIM_BLEND;
 
 			animSpeed = 50.0f / bgAllAnims[cent->localAnimIndex].anims[ragAnim].frameLerp;
@@ -2881,7 +2881,7 @@ static void CG_G2SetHeadAnim( centity_t *cent, int anim ) {
 	const animation_t *animations = bgAllAnims[cent->localAnimIndex].anims;
 	uint32_t animFlags = BONE_ANIM_OVERRIDE;//| BONE_ANIM_BLEND;
 	// animSpeed is 1.0f if the frameLerp (ms/frame) is 50 (20 fps).
-	const float timeScaleMod = (timescale.value > 0.0001f) ? (1.0f / timescale.value) : 1.0f;
+	const float timeScaleMod = (timescale.getFloat() > 0.0001f) ? (1.0f / timescale.getFloat()) : 1.0f;
 	float animSpeed = 50.0f / animations[anim].frameLerp * timeScaleMod;
 	int	firstFrame, lastFrame;
 
@@ -3137,7 +3137,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hModel ) {
 	mdxaBone_t		boltMatrix;
 	clientInfo_t	*ci;
 
-	if ( cent->currentState.number == cg.snap->ps.clientNum && !cg.renderingThirdPerson && !cg_trueGuns.integer
+	if ( cent->currentState.number == cg.snap->ps.clientNum && !cg.renderingThirdPerson && !cg_trueGuns.getInt()
 		&& cg.snap->ps.weapon != WP_SABER ) {
 		return;
 	}
@@ -3180,7 +3180,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hModel ) {
 	angles.roll += 20;
 	AnglesToAxis( &angles, ent.axis );
 
-	if ( cg_newFX.integer & NEWFX_SIMPLEFLAG ) {
+	if ( cg_newFX.getBits() & NEWFX_SIMPLEFLAG ) {
 		const gitem_t *item = NULL;
 
 		if ( cent->currentState.powerups & (1 << PW_REDFLAG) )	item = BG_FindItemForPowerup( PW_REDFLAG );
@@ -3211,7 +3211,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hModel ) {
 	ScaleModelAxis( &ent );
 
 	// render the flag on our back transparently
-	if ( cg_newFX.integer & NEWFX_TRANSFLAG ) {
+	if ( cg_newFX.getBits() & NEWFX_TRANSFLAG ) {
 		ent.renderfx |= RF_FORCE_ENT_ALPHA;
 		ent.shaderRGBA[3] = 100;
 	}
@@ -3302,7 +3302,7 @@ static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane ) {
 
 	*shadowPlane = 0.0f;
 
-	if ( !cg_shadows.integer )
+	if ( !cg_shadows.getInt() )
 		return qfalse;
 
 	// no shadows when cloaked
@@ -3317,7 +3317,7 @@ static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane ) {
 	}
 
 	// drop shadow
-	if ( cg_shadows.integer == 1 ) {
+	if ( cg_shadows.getInt() == 1 ) {
 		if ( cent->currentState.m_iVehicleNum && cent->currentState.NPC_class != CLASS_VEHICLE )
 			return qfalse;
 	}
@@ -3326,7 +3326,7 @@ static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane ) {
 	VectorCopy( &cent->lerpOrigin, &end );
 
 	// stencil
-	if ( cg_shadows.integer == 2 ) {
+	if ( cg_shadows.getInt() == 2 ) {
 		end.z -= 4096.0f;
 
 		trap->CM_Trace( &trace, &cent->lerpOrigin, &end, &mins, &maxs, 0, MASK_PLAYERSOLID, qfalse );
@@ -3345,13 +3345,13 @@ static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane ) {
 	}
 
 	//stencil shadows need plane to be on ground
-	if ( cg_shadows.integer == 2 )
+	if ( cg_shadows.getInt() == 2 )
 		*shadowPlane = trace.endpos.z;
 	else
 		*shadowPlane = trace.endpos.z + 1;
 
 	// no mark for stencil or projection shadows
-	if ( cg_shadows.integer != 1 ) {
+	if ( cg_shadows.getInt() != 1 ) {
 		return qtrue;
 	}
 
@@ -3376,7 +3376,7 @@ static void CG_PlayerSplash( centity_t *cent ) {
 	uint32_t contents;
 	polyVert_t verts[4];
 
-	if ( !cg_shadows.integer )
+	if ( !cg_shadows.getInt() )
 		return;
 
 	VectorCopy( &cent->lerpOrigin, &end );
@@ -3449,7 +3449,7 @@ static void CG_PlayerSplash( centity_t *cent ) {
 #define REFRACT_EFFECT_DURATION (500)
 static void CG_ForcePushBlur( vector3 *org, centity_t *cent ) {
 	refdef_t *refdef = CG_GetRefdef();
-	if ( !cent || !cg_renderToTextureFX.integer ) {
+	if ( !cent || !cg_renderToTextureFX.getInt() ) {
 		localEntity_t *ex;
 
 		ex = CG_AllocLocalEntity();
@@ -3688,7 +3688,7 @@ void CG_DrawPlayerShield( centity_t *cent, vector3 *origin ) {
 	float scale;
 
 	// Don't draw the shield when the player is dead.
-	if ( cent->currentState.eFlags & EF_DEAD || cg_shieldStyle.integer != -1 || (!cg.renderingThirdPerson
+	if ( cent->currentState.eFlags & EF_DEAD || cg_shieldStyle.getInt() != -1 || (!cg.renderingThirdPerson
 		&& cent->currentState.number == cg.clientNum) ) {
 		cent->shieldHit = qfalse;
 		return;
@@ -3788,7 +3788,7 @@ void ParseRGBSaber( const char *str, vector3 *c ) {
 }
 
 static void CG_RGBForSaberColor( saber_colors_t color, vector3 *rgb, int cnum, int bnum ) {
-	if ( color == SABER_BLACK && (cp_pluginDisable.integer & CPD_BLACKSABERSDISABLE) ) {
+	if ( color == SABER_BLACK && (cp_pluginDisable.getBits() & CPD_BLACKSABERSDISABLE) ) {
 		color = SABER_ORANGE;
 	}
 	switch ( color ) {
@@ -3846,7 +3846,7 @@ static void CG_DoSaberLight( saberInfo_t *saber, int cnum, int bnum ) {
 	int i, j;
 
 	//RGB combine all the colors of the sabers you're using into one averaged color!
-	if ( !saber || (saber->blade[bnum].color == SABER_BLACK && !(cp_pluginDisable.integer & CPD_BLACKSABERSDISABLE)) )
+	if ( !saber || (saber->blade[bnum].color == SABER_BLACK && !(cp_pluginDisable.getBits() & CPD_BLACKSABERSDISABLE)) )
 		return;
 
 	if ( (saber->saberFlags2 & SFL2_NO_DLIGHT) )
@@ -3921,7 +3921,7 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	if ( length < 0.5f )
 		return;
 
-	if ( color == SABER_BLACK && (cp_pluginDisable.integer & CPD_BLACKSABERSDISABLE) )
+	if ( color == SABER_BLACK && (cp_pluginDisable.getBits() & CPD_BLACKSABERSDISABLE) )
 		color = SABER_ORANGE;
 
 	// Find the midpoint of the saber for lighting purposes
@@ -4087,7 +4087,7 @@ void CG_DoSaber( vector3 *origin, vector3 *dir, float length, float lengthMax, f
 	sbak.shaderRGBA[0] = sbak.shaderRGBA[1] = sbak.shaderRGBA[2] = sbak.shaderRGBA[3] = 0xff;
 
 	pulse = Q_fabs( sinf( (float)cg.time / 400.0f ) ) * 0.1f;
-	sbak.radius = pulse + cg_saberWidth.value;
+	sbak.radius = pulse + cg_saberWidth.getFloat();
 
 	SE_R_AddRefEntityToScene( &sbak, MAX_CLIENTS );
 }
@@ -4120,7 +4120,7 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 	VectorNormalize( &end_dir );
 	VectorNormalize( &base_dir );
 
-	if ( color == SABER_BLACK && (cp_pluginDisable.integer & CPD_BLACKSABERSDISABLE) )
+	if ( color == SABER_BLACK && (cp_pluginDisable.getBits() & CPD_BLACKSABERSDISABLE) )
 		color = SABER_ORANGE;
 
 	switch ( color ) {
@@ -4245,10 +4245,10 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 
 	effectradius = ((radius * 1.6f * v1) + crandom() * 0.1f)*radiusmult;
 	coreradius = ((radius * 0.4f * v2) + crandom() * 0.1f)*radiusmult;
-	effectradius *= cg_saberBladeGlowMulti.value;
-	coreradius *= cg_saberBladeCoreMulti.value;
+	effectradius *= cg_saberBladeGlowMulti.getFloat();
+	coreradius *= cg_saberBladeCoreMulti.getFloat();
 
-	if ( cg_saberTrail.integer == 2 && cg_shadows.integer != 2 && cgs.glconfig.stencilBits >= 4 )
+	if ( cg_saberTrail.getInt() == 2 && cg_shadows.getInt() != 2 && cgs.glconfig.stencilBits >= 4 )
 		rfx |= RF_FORCEPOST;
 
 	VectorScale( &rgb, 255.0f, &rgb );
@@ -4518,7 +4518,7 @@ void CG_CreateSaberMarks( vector3 *start, vector3 *end, vector3 *normal ) {
 	markFragment_t markFragments[MAX_MARK_FRAGMENTS], *mf;
 	const float radius = 0.65f;
 
-	if ( !cg_marks.integer )
+	if ( !cg_marks.getInt() )
 		return;
 
 	VectorSubtract( end, start, &axis[1] );
@@ -4562,7 +4562,7 @@ void CG_CreateSaberMarks( vector3 *start, vector3 *end, vector3 *normal ) {
 			v->st[1] = 0.5f + DotProduct( &delta, &axis[2] ) * (0.15f + random() * 0.05f);
 		}
 
-		if ( cg_saberDynamicMarks.integer ) {
+		if ( cg_saberDynamicMarks.getInt() ) {
 			int k, l;
 			addpolyArgStruct_t apArgs;
 			vector3 x;
@@ -4600,7 +4600,7 @@ void CG_CreateSaberMarks( vector3 *start, vector3 *end, vector3 *normal ) {
 
 			apArgs.bounce = 0;
 			apArgs.motionDelay = 0;
-			apArgs.killTime = cg_saberDynamicMarkTime.integer;
+			apArgs.killTime = cg_saberDynamicMarkTime.getInt();
 			apArgs.shader = media.gfx.world.rivetMark;
 			apArgs.flags = 0x08000000 | 0x00000004; // wut
 
@@ -4664,15 +4664,15 @@ qboolean CG_G2TraceCollide( trace_t *tr, const vector3 *mins, const vector3 *max
 		angles.roll = angles.pitch = 0;
 		angles.yaw = g2Hit->lerpAngles.yaw;
 
-		if ( com_optvehtrace.integer && g2Hit->currentState.eType == ET_NPC
+		if ( com_optvehtrace.getInt() && g2Hit->currentState.eType == ET_NPC
 			&& g2Hit->currentState.NPC_class == CLASS_VEHICLE && g2Hit->m_pVehicle ) {
 			trap->G2API_CollisionDetectCache( G2Trace, g2Hit->ghoul2, &angles, &g2Hit->lerpOrigin, cg.time,
-				g2Hit->currentState.number, lastValidStart, lastValidEnd, &g2Hit->modelScale, 0, cg_g2TraceLod.integer,
+				g2Hit->currentState.number, lastValidStart, lastValidEnd, &g2Hit->modelScale, 0, cg_g2TraceLod.getInt(),
 				fRadius );
 		}
 		else {
 			trap->G2API_CollisionDetect( G2Trace, g2Hit->ghoul2, &angles, &g2Hit->lerpOrigin, cg.time,
-				g2Hit->currentState.number, lastValidStart, lastValidEnd, &g2Hit->modelScale, 0, cg_g2TraceLod.integer,
+				g2Hit->currentState.number, lastValidStart, lastValidEnd, &g2Hit->modelScale, 0, cg_g2TraceLod.getInt(),
 				fRadius );
 		}
 
@@ -4736,7 +4736,7 @@ void CG_AddGhoul2Mark( int shader, float size, vector3 *start, vector3 *end, int
 
 	memset( &goreSkin, 0, sizeof(goreSkin) );
 
-	if ( trap->G2API_GetNumGoreMarks( ghoul2, 0 ) >= cg_ghoul2Marks.integer )
+	if ( trap->G2API_GetNumGoreMarks( ghoul2, 0 ) >= cg_ghoul2Marks.getInt() )
 		return;
 
 	goreSkin.growDuration = -1; // default expandy time
@@ -4805,7 +4805,7 @@ void CG_SaberCompWork( vector3 *start, vector3 *end, centity_t *owner, int saber
 					// it succeeded with the ghoul2 trace
 					doEffect = qtrue;
 
-					if ( cg_ghoul2Marks.integer ) {
+					if ( cg_ghoul2Marks.getInt() ) {
 						vector3 ePos;
 						centity_t *trEnt = &cg_entities[trace.entityNum];
 
@@ -4910,7 +4910,7 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 	saberTrail_t *saberTrail = NULL;
 	mdxaBone_t	boltMatrix;
 	effectTrailArgStruct_t fx;
-	qboolean sfxSabers = !!(cg_newFX.integer & NEWFX_SFXSABERS);
+	qboolean sfxSabers = !!(cg_newFX.getBits() & NEWFX_SFXSABERS);
 
 	if ( cent->currentState.eType == ET_NPC ) {
 		client = cent->npcClient;
@@ -4922,12 +4922,12 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 	if ( cg.snap->ps.duelInProgress ) {
 		if ( cent->currentState.number != cg.snap->ps.duelIndex && cent->currentState.number != cg.snap->ps.clientNum ) {
 			// everyone not involved in the duel is drawn very dark
-			if ( !(cp_pluginDisable.integer & CPD_DUELSEEOTHERS) )
+			if ( !(cp_pluginDisable.getBits() & CPD_DUELSEEOTHERS) )
 				return;
 		}
 	}
 
-	if ( !cg_showDuelSabers.integer ) {
+	if ( !cg_showDuelSabers.getInt() ) {
 		if ( !cg.snap->ps.duelInProgress && cent->currentState.bolt1 )
 			return;
 	}
@@ -4984,7 +4984,7 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 			scolor = client->icolor2;
 	}
 
-	if ( (cg_teamSabersRGB.integer < 1 || (cg_teamSabersRGB.integer == 1 && cg.snap
+	if ( (cg_teamSabersRGB.getInt() < 1 || (cg_teamSabersRGB.getInt() == 1 && cg.snap
 		&& cg.snap->ps.clientNum != cent->currentState.number)) && cgs.gametype >= GT_TEAM && cgs.gametype != GT_SIEGE
 		&& !cgs.jediVmerc && cent->currentState.eType != ET_NPC ) {
 		if ( client->team == TEAM_RED )
@@ -4997,13 +4997,13 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 	if ( scolor == SABER_FLAME1 || scolor == SABER_ELEC1 || scolor == SABER_FLAME2 || scolor == SABER_ELEC2 || scolor == SABER_BLACK )
 		sfxSabers = qfalse;
 
-	if ( !cg_saberContact.integer )
+	if ( !cg_saberContact.getInt() )
 		goto CheckTrail;
 
 	if ( !dontDraw ) {
-		if ( cg_saberModelTraceEffect.integer )
+		if ( cg_saberModelTraceEffect.getInt() )
 			CG_G2SaberEffects( &org, &end, cent );
-		else if ( cg_saberClientVisualCompensation.integer ) {
+		else if ( cg_saberClientVisualCompensation.getInt() ) {
 			CG_Trace( &trace, &org, NULL, NULL, &end, ENTITYNUM_NONE, MASK_SOLID );
 
 			if ( trace.fraction != 1 ) {
@@ -5107,7 +5107,7 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 	}
 CheckTrail:
 
-	if ( !cg_saberTrail.integer && !sfxSabers )
+	if ( !cg_saberTrail.getInt() && !sfxSabers )
 		goto JustDoIt;
 
 	if ( (!WP_SaberBladeUseSecondBladeStyle( &client->saber[saberNum], bladeNum ) && client->saber[saberNum].trailStyle > 1)
@@ -5121,7 +5121,7 @@ CheckTrail:
 	if ( !sfxSabers ) {
 		float stDur = saberMoveData[cent->currentState.saberMove].trailLength;
 
-		stDur = (stDur / 5.0f)*cg_saberTrailLength.value;
+		stDur = (stDur / 5.0f)*cg_saberTrailLength.getFloat();
 
 		//Raz: Saber trail length scalars
 		if ( cent->currentState.saberInFlight )
@@ -5131,17 +5131,17 @@ CheckTrail:
 
 		// if we happen to be timescaled or running in a high framerate situation, we don't want to flood
 		//	the system with very small trail slices...but perhaps doing it by distance would yield better results?
-		if ( cg.time > saberTrail->lastTime + 2 || cg_saberTrail.integer == 2 ) {
+		if ( cg.time > saberTrail->lastTime + 2 || cg_saberTrail.getInt() == 2 ) {
 			if ( !dontDraw ) {
-				if ( (cg_saberTrail.integer == 3 && cg.time < saberTrail->lastTime + 2000)
+				if ( (cg_saberTrail.getInt() == 3 && cg.time < saberTrail->lastTime + 2000)
 					|| ((BG_SuperBreakWinAnim( cent->currentState.torsoAnim )
 					|| saberMoveData[cent->currentState.saberMove].trailLength > 0 || ((cent->currentState.powerups & (1 << PW_SPEED)
-					&& cg_speedTrail.integer)) || (cent->currentState.saberInFlight && saberNum == 0))
+					&& cg_speedTrail.getInt())) || (cent->currentState.saberInFlight && saberNum == 0))
 					&& cg.time < saberTrail->lastTime + 2000) ) {
 					vector3	rgb1;
 					qhandle_t trailShader;
 
-					if ( scolor == SABER_BLACK && (cp_pluginDisable.integer & CPD_BLACKSABERSDISABLE) )
+					if ( scolor == SABER_BLACK && (cp_pluginDisable.getBits() & CPD_BLACKSABERSDISABLE) )
 						scolor = SABER_ORANGE;
 
 					switch ( scolor ) {
@@ -5248,7 +5248,7 @@ CheckTrail:
 					if ( diff <= 10000 ) {
 						float oldAlpha = 1.0f - (diff / trailDur);
 
-						if ( cg_saberTrail.integer == 2 && cg_shadows.integer != 2 && cgs.glconfig.stencilBits >= 4 ) {
+						if ( cg_saberTrail.getInt() == 2 && cg_shadows.getInt() != 2 && cgs.glconfig.stencilBits >= 4 ) {
 							// does other stuff below
 						}
 						else {
@@ -5303,7 +5303,7 @@ CheckTrail:
 						fx.mVerts[3].destST[0] = 1.0f + fx.mVerts[2].ST[0];
 						fx.mVerts[3].destST[1] = 1.0f;
 
-						if ( cg_saberTrail.integer == 2 && cg_shadows.integer != 2 && cgs.glconfig.stencilBits >= 4 ) {
+						if ( cg_saberTrail.getInt() == 2 && cg_shadows.getInt() != 2 && cgs.glconfig.stencilBits >= 4 ) {
 							// don't need to do this every frame.. but..
 							trap->R_SetRefractionProperties( 1.0f, 0.0f, qtrue, qtrue );
 
@@ -5330,7 +5330,7 @@ CheckTrail:
 	}
 	else {
 		// Use the supremely hacky SFX Sabers.
-		saberTrail->duration = cg_saberTrailLength.value;
+		saberTrail->duration = cg_saberTrailLength.getFloat();
 
 		if ( !saberTrail->lastTime || !saberTrail->inAction ) {
 			VectorCopy( &org, &saberTrail->base );
@@ -5461,7 +5461,7 @@ JustDoIt:
 			(client->saber[saberNum].blade[bladeNum].lengthMax), (client->saber[saberNum].blade[bladeNum].radius),
 			(saber_colors_t)scolor, renderfx, (qboolean)(client->saber[saberNum].numBlades < 3
 				&& !(client->saber[saberNum].saberFlags2 & SFL2_NO_DLIGHT)),
-			(qboolean)(cg_saberTrail.integer > 0), cent->currentState.clientNum, saberNum );
+			(qboolean)(cg_saberTrail.getInt() > 0), cent->currentState.clientNum, saberNum );
 	}
 	else {
 		CG_DoSaber( &org, &axis[0], saberLen, client->saber[saberNum].blade[bladeNum].lengthMax,
@@ -5590,7 +5590,7 @@ void CG_DrawPlayerSphere( centity_t *cent, vector3 *origin, float scale, int sha
 
 	if ( !cg.renderingThirdPerson && cent->currentState.number == cg.predictedPlayerState.clientNum )
 		return;
-	if ( !cg_renderToTextureFX.integer )
+	if ( !cg_renderToTextureFX.getInt() )
 		return;
 
 	ang.pitch -= 180.0f;
@@ -6692,14 +6692,14 @@ void CG_CheckThirdPersonAlpha( centity_t *cent, refEntity_t *legs ) {
 			}
 			else {
 				cg_vehThirdPersonAlpha = 1.0f;
-				alpha = cg_thirdPersonAlpha.value;
+				alpha = cg_thirdPersonAlpha.getFloat();
 			}
 		}
 	}
 	else if ( cg.predictedPlayerState.clientNum == cent->currentState.clientNum ) {
 		cg_vehThirdPersonAlpha = 1.0f;
 		setFlags = RF_FORCE_ENT_ALPHA;
-		alpha = cg_thirdPersonAlpha.value;
+		alpha = cg_thirdPersonAlpha.getFloat();
 	}
 
 	if ( alpha < 1.0f ) {
@@ -6878,7 +6878,7 @@ void CG_Player( centity_t *cent ) {
 
 	if ( cg.snap->ps.duelInProgress ) {
 		if ( cent->currentState.number != cg.snap->ps.duelIndex && cent->currentState.number != cg.snap->ps.clientNum ) {
-			if ( !(cp_pluginDisable.integer & CPD_DUELSEEOTHERS) )
+			if ( !(cp_pluginDisable.getBits() & CPD_DUELSEEOTHERS) )
 				return;
 		}
 	}
@@ -7072,14 +7072,14 @@ void CG_Player( centity_t *cent ) {
 	renderfx = 0;
 	if ( cent->currentState.number == cg.snap->ps.clientNum ) {
 		if ( !cg.renderingThirdPerson ) {
-			if ( (!cg_trueGuns.integer && cg.predictedPlayerState.weapon != WP_SABER
+			if ( (!cg_trueGuns.getInt() && cg.predictedPlayerState.weapon != WP_SABER
 				&& cg.predictedPlayerState.weapon != WP_MELEE) || (cg.predictedPlayerState.weapon == WP_SABER
-				&& cg_trueSaberOnly.integer) || cg.predictedPlayerState.zoomMode || cg.japp.fakeGun ) {
+				&& cg_trueSaberOnly.getInt()) || cg.predictedPlayerState.zoomMode || cg.japp.fakeGun ) {
 				renderfx = RF_THIRD_PERSON; // only draw in mirrors
 			}
 		}
 		// NOTENOTE Temporary
-		else if ( com_cameraMode.integer )
+		else if ( com_cameraMode.getInt() )
 			return;
 	}
 
@@ -7165,7 +7165,7 @@ void CG_Player( centity_t *cent ) {
 
 	team = ci->team;
 
-	if ( cgs.gametype >= GT_TEAM && cg_drawFriend.integer && cent->currentState.number != cg.snap->ps.clientNum
+	if ( cgs.gametype >= GT_TEAM && cg_drawFriend.getInt() && cent->currentState.number != cg.snap->ps.clientNum
 		&& cent->currentState.eType != ET_NPC ) {
 		// If the view is either a spectator or on the same team as this character, show a symbol above their head.
 		if ( (cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR || cg.snap->ps.persistant[PERS_TEAM] == team)
@@ -7193,7 +7193,7 @@ void CG_Player( centity_t *cent ) {
 			}
 		}
 	}
-	else if ( cgs.gametype == GT_POWERDUEL && cg_drawFriend.integer && cent->currentState.number != cg.snap->ps.clientNum ) {
+	else if ( cgs.gametype == GT_POWERDUEL && cg_drawFriend.getInt() && cent->currentState.number != cg.snap->ps.clientNum ) {
 		if ( cg.predictedPlayerState.persistant[PERS_TEAM] != TEAM_SPECTATOR && cent->currentState.number < MAX_CLIENTS
 			&& !(cent->currentState.eFlags & EF_DEAD) && ci && cgs.clientinfo[cg.snap->ps.clientNum].duelTeam == ci->duelTeam ) {
 			// ally in powerduel, so draw the icon
@@ -7205,7 +7205,7 @@ void CG_Player( centity_t *cent ) {
 		}
 	}
 
-	if ( cgs.gametype == GT_JEDIMASTER && cg_drawFriend.integer && cent->currentState.number != cg.snap->ps.clientNum ) {
+	if ( cgs.gametype == GT_JEDIMASTER && cg_drawFriend.getInt() && cent->currentState.number != cg.snap->ps.clientNum ) {
 		// Don't show a sprite above a player's own head in 3rd person.
 		// If the view is either a spectator or on the same team as this character, show a symbol above their head.
 		if ( (cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR || cg.snap->ps.persistant[PERS_TEAM] == team)
@@ -7287,7 +7287,7 @@ void CG_Player( centity_t *cent ) {
 	// add a water splash if partially in and out of water
 	CG_PlayerSplash( cent );
 
-	if ( (cg_shadows.integer == 3 || cg_shadows.integer == 2) && shadow )
+	if ( (cg_shadows.getInt() == 3 || cg_shadows.getInt() == 2) && shadow )
 		renderfx |= RF_SHADOW_PLANE;
 	renderfx |= RF_LIGHTING_ORIGIN;			// use the same origin for all
 
@@ -7299,7 +7299,7 @@ void CG_Player( centity_t *cent ) {
 	VectorCopy( &cent->lerpOrigin, &legs.lightingOrigin );
 	legs.shadowPlane = shadowPlane;
 	legs.renderfx = renderfx;
-	if ( cg_shadows.integer == 2 && (renderfx & RF_THIRD_PERSON) )
+	if ( cg_shadows.getInt() == 2 && (renderfx & RF_THIRD_PERSON) )
 		legs.renderfx |= RF_SHADOW_ONLY;
 	VectorCopy( &legs.origin, &legs.oldorigin ); // don't positionally lerp at all
 
@@ -7343,7 +7343,7 @@ void CG_Player( centity_t *cent ) {
 	memset( &torso, 0, sizeof(torso) );
 
 	//rww - force speed "trail" effect
-	if ( !(cent->currentState.powerups & (1 << PW_SPEED)) || doAlpha || !cg_speedTrail.integer ) {
+	if ( !(cent->currentState.powerups & (1 << PW_SPEED)) || doAlpha || !cg_speedTrail.getInt() ) {
 		cent->frame_minus1_refreshed = 0;
 		cent->frame_minus2_refreshed = 0;
 	}
@@ -7402,7 +7402,7 @@ void CG_Player( centity_t *cent ) {
 	}
 
 	//Raz: BEGIN strafe trails
-	if ( cg_strafeTrail.integer != 1 || VectorLength( &cent->currentState.pos.trDelta ) < cg.strafeTrailWeights.x ) {
+	if ( cg_strafeTrail.getInt() != 1 || VectorLength( &cent->currentState.pos.trDelta ) < cg.strafeTrailWeights.x ) {
 		cent->frame_minus1_refreshed2 = 0;
 		cent->frame_minus2_refreshed2 = 0;
 	}
@@ -7481,7 +7481,7 @@ void CG_Player( centity_t *cent ) {
 			SE_R_AddRefEntityToScene( &reframe_minus2, cent->currentState.number );
 		}
 	}
-	else if ( cg_strafeTrail.integer == 2 ) {
+	else if ( cg_strafeTrail.getInt() == 2 ) {
 		vector3 vel;
 		float speed;
 		if ( cent->currentState.number == cg.snap->ps.clientNum )
@@ -7710,7 +7710,7 @@ skipTrail:
 
 		//Do the Grip visual when you're using true view.
 		if ( (cent->currentState.forcePowersActive & (1 << FP_GRIP)) && (cg.renderingThirdPerson
-			|| cent->currentState.number != cg.snap->ps.clientNum || cg_trueGuns.integer
+			|| cent->currentState.number != cg.snap->ps.clientNum || cg_trueGuns.getInt()
 			|| cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) ) {
 			vector3 boltDir, origBolt;
 			VectorCopy( &efOrg, &origBolt );
@@ -7822,7 +7822,7 @@ skipTrail:
 		}
 	}
 
-	if ( cgs.gametype == GT_HOLOCRON && cent->currentState.time2 && ((cg.renderingThirdPerson || cg_trueGuns.integer
+	if ( cgs.gametype == GT_HOLOCRON && cent->currentState.time2 && ((cg.renderingThirdPerson || cg_trueGuns.getInt()
 		|| cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
 		|| cg.snap->ps.clientNum != cent->currentState.number) ) {
 		int i, renderedHolos = 0;
@@ -8372,8 +8372,8 @@ stillDoSaber:
 		legs.renderfx |= RF_MINLIGHT;
 	}
 
-	if ( ((cent->shieldHit || (cg_shieldTest.integer && cent->currentState.number == cg.clientNum))
-		&& cg_shieldStyle.integer != -1 && !(cent->playerState->eFlags & EF_DEAD)
+	if ( ((cent->shieldHit || (cg_shieldTest.getInt() && cent->currentState.number == cg.clientNum))
+		&& cg_shieldStyle.getInt() != -1 && !(cent->playerState->eFlags & EF_DEAD)
 		&& (cent->currentState.number != cg.clientNum || (cg.predictedPlayerState.zoomMode == 0
 		&& cg.renderingThirdPerson))) ) {
 		uint32_t rfx = legs.renderfx;
@@ -8389,16 +8389,16 @@ stillDoSaber:
 		if ( cg.shieldColour.forceAlpha == 1 )
 			legs.renderfx |= RF_FORCE_ENT_ALPHA;
 
-		if ( cg_shieldStyle.integer == 1 )	legs.customShader = media.gfx.world.protect;
-		else if ( cg_shieldStyle.integer == 2 )	legs.customShader = media.gfx.world.forceSightBubble;
-		else if ( cg_shieldStyle.integer == 3 )	legs.customShader = media.gfx.world.forceShell;
-		else if ( cg_shieldStyle.integer == 4 )	legs.customShader = media.gfx.world.sightShell;
-		else if ( cg_shieldStyle.integer == 5 )	legs.customShader = media.gfx.world.halfShield;
-		else if ( cg_shieldStyle.integer == 6 )	legs.customShader = media.gfx.world.cloaked;
+		if ( cg_shieldStyle.getInt() == 1 )	legs.customShader = media.gfx.world.protect;
+		else if ( cg_shieldStyle.getInt() == 2 )	legs.customShader = media.gfx.world.forceSightBubble;
+		else if ( cg_shieldStyle.getInt() == 3 )	legs.customShader = media.gfx.world.forceShell;
+		else if ( cg_shieldStyle.getInt() == 4 )	legs.customShader = media.gfx.world.sightShell;
+		else if ( cg_shieldStyle.getInt() == 5 )	legs.customShader = media.gfx.world.halfShield;
+		else if ( cg_shieldStyle.getInt() == 6 )	legs.customShader = media.gfx.world.cloaked;
 		else									legs.customShader = media.gfx.world.playerShieldDamage;
 
 		//Render it as many times for the weaker shaders - performance hit
-		for ( i = 0; i < cg_shieldLayers.integer; i++ )
+		for ( i = 0; i < cg_shieldLayers.getInt(); i++ )
 			SE_R_AddRefEntityToScene( &legs, cent->currentState.number );
 
 		//Revert the changes
@@ -8412,7 +8412,7 @@ stillDoSaber:
 
 	if ( cg.snap->ps.duelInProgress && cent->currentState.number != cg.snap->ps.clientNum ) {
 		if ( cent->currentState.number != cg.snap->ps.duelIndex && cent->currentState.number != cg.snap->ps.clientNum
-			&& (cp_pluginDisable.integer & CPD_DUELSEEOTHERS) ) {
+			&& (cp_pluginDisable.getInt() & CPD_DUELSEEOTHERS) ) {
 			// everyone not involved in the duel is drawn very dark
 			legs.shaderRGBA[0] /= 5.0f;
 			legs.shaderRGBA[1] /= 5.0f;
@@ -8422,7 +8422,7 @@ stillDoSaber:
 	}
 	else if ( (cent->currentState.bolt1 && !(cent->currentState.eFlags & EF_DEAD)
 		&& cent->currentState.number != cg.snap->ps.clientNum && (!cg.snap->ps.duelInProgress
-		|| cg.snap->ps.duelIndex != cent->currentState.number)) || cg_duelShaderTest.integer ) {
+		|| cg.snap->ps.duelIndex != cent->currentState.number)) || cg_duelShaderTest.getInt() ) {
 		legs.shaderRGBA[0] = cg.duelColour.rgba.r;
 		legs.shaderRGBA[1] = cg.duelColour.rgba.g;
 		legs.shaderRGBA[2] = cg.duelColour.rgba.b;
@@ -8432,14 +8432,14 @@ stillDoSaber:
 		if ( cg.duelColour.forceAlpha == 1 )
 			legs.renderfx |= RF_FORCE_ENT_ALPHA;
 
-		if ( !Q_stricmp( cg_duelShaderStyle.string, "none" ) )
+		if ( !Q_stricmp( cg_duelShaderStyle.getStr(), "none" ) )
 			legs.customShader = 0;
-		else if ( cg_duelShaderStyle.integer == 1 )	legs.customShader = media.gfx.world.protect;
-		else if ( cg_duelShaderStyle.integer == 2 )	legs.customShader = media.gfx.world.playerShieldDamage;
-		else if ( cg_duelShaderStyle.integer == 3 )	legs.customShader = media.gfx.world.forceShell;
-		else if ( cg_duelShaderStyle.integer == 4 )	legs.customShader = media.gfx.world.sightShell;
-		else if ( cg_duelShaderStyle.integer == 5 )	legs.customShader = media.gfx.world.halfShield;
-		else if ( cg_duelShaderStyle.integer == 6 )	legs.customShader = media.gfx.world.cloaked;
+		else if ( cg_duelShaderStyle.getInt() == 1 )	legs.customShader = media.gfx.world.protect;
+		else if ( cg_duelShaderStyle.getInt() == 2 )	legs.customShader = media.gfx.world.playerShieldDamage;
+		else if ( cg_duelShaderStyle.getInt() == 3 )	legs.customShader = media.gfx.world.forceShell;
+		else if ( cg_duelShaderStyle.getInt() == 4 )	legs.customShader = media.gfx.world.sightShell;
+		else if ( cg_duelShaderStyle.getInt() == 5 )	legs.customShader = media.gfx.world.halfShield;
+		else if ( cg_duelShaderStyle.getInt() == 6 )	legs.customShader = media.gfx.world.cloaked;
 		else										legs.customShader = media.gfx.world.forceSightBubble;
 
 		SE_R_AddRefEntityToScene( &legs, cent->currentState.number );
@@ -8449,10 +8449,10 @@ stillDoSaber:
 	//Raz: JA+ alt-dim
 	if ( cent->currentState.eType == ET_PLAYER
 		&& (cent->currentState.eFlags & EF_ALT_DIM) != (cg.predictedPlayerState.eFlags & EF_ALT_DIM) ) {
-		legs.shaderRGBA[0] = cg_altDimA.value;
-		legs.shaderRGBA[1] = cg_altDimA.value;
-		legs.shaderRGBA[2] = cg_altDimA.value;
-		legs.shaderRGBA[3] = cg_altDimA.value;
+		legs.shaderRGBA[0] = cg_altDimA.getFloat();
+		legs.shaderRGBA[1] = cg_altDimA.getFloat();
+		legs.shaderRGBA[2] = cg_altDimA.getFloat();
+		legs.shaderRGBA[3] = cg_altDimA.getFloat();
 		legs.renderfx = RF_FORCE_ENT_ALPHA;
 		SE_R_AddRefEntityToScene( &legs, cent->currentState.number );
 		return;
@@ -8534,7 +8534,7 @@ stillDoSaber:
 			SE_R_AddRefEntityToScene( &legs, cent->currentState.number );
 		else {
 			if ( cg.renderingThirdPerson || cent->currentState.number != cg.predictedPlayerState.clientNum ) {
-				if ( cg_shadows.integer != 2 && cgs.glconfig.stencilBits >= 4 && cg_renderToTextureFX.integer ) {
+				if ( cg_shadows.getInt() != 2 && cgs.glconfig.stencilBits >= 4 && cg_renderToTextureFX.getInt() ) {
 					trap->R_SetRefractionProperties( 1.0f, 0.0f, qfalse, qfalse ); //don't need to do this every frame.. but..
 					legs.customShader = 2; //crazy "refractive" shader
 					SE_R_AddRefEntityToScene( &legs, cent->currentState.number );
@@ -8564,19 +8564,19 @@ stillDoSaber:
 		savedRGB[2] = legs.shaderRGBA[2];
 		savedRenderFX = legs.renderfx;
 
-		if ( cg_forceModel.integer && cent->currentState.number != cg.clientNum
+		if ( cg_forceModel.getInt() && cent->currentState.number != cg.clientNum
 			&& cent->currentState.eType == ET_PLAYER )
 		{
 			// force enemy/ally colours
 			if ( cgs.gametype < GT_TEAM || ci->team != cgs.clientinfo[cg.snap->ps.clientNum].team ) {
-				if ( cg_forceEnemyColour.string[0] ) {
+				if ( cg_forceEnemyColour.stringlen() ) {
 					legs.shaderRGBA[0] = cg.enemyColour.r;
 					legs.shaderRGBA[1] = cg.enemyColour.g;
 					legs.shaderRGBA[2] = cg.enemyColour.b;
 					legs.renderfx |= RF_RGB_TINT;
 				}
 			}
-			else if ( cg_forceAllyColour.string[0] ) {
+			else if ( cg_forceAllyColour.stringlen() ) {
 				legs.shaderRGBA[0] = cg.allyColour.r;
 				legs.shaderRGBA[1] = cg.allyColour.g;
 				legs.shaderRGBA[2] = cg.allyColour.b;
@@ -8653,7 +8653,7 @@ stillDoSaber:
 	CG_PlayerPowerups( cent, &legs );
 
 	if ( (cent->currentState.forcePowersActive & (1 << FP_RAGE)) && (cg.renderingThirdPerson
-		|| cent->currentState.number != cg.snap->ps.clientNum || cg_trueGuns.integer
+		|| cent->currentState.number != cg.snap->ps.clientNum || cg_trueGuns.getInt()
 		|| cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) ) {
 		//	legs.customShader = media.gfx.world.rage;
 		legs.renderfx &= ~RF_FORCE_ENT_ALPHA;
@@ -8743,7 +8743,7 @@ stillDoSaber:
 	}
 
 	if ( (cg.snap->ps.fd.forcePowersActive & (1 << FP_SEE)) && cg.snap->ps.clientNum != cent->currentState.number
-		&& cg_auraShell.integer ) {
+		&& cg_auraShell.getInt() ) {
 		if ( cgs.gametype == GT_SIEGE ) {
 			if ( ci->team == TEAM_SPECTATOR || ci->team == TEAM_FREE ) {
 				// yellow
@@ -8974,6 +8974,6 @@ void CG_ResetPlayerEntity( centity_t *cent ) {
 		}
 	}
 
-	if ( cg_debugPosition.integer )
+	if ( cg_debugPosition.getInt() )
 		trap->Print( "%i ResetPlayerEntity yaw=%.2f\n", cent->currentState.number, cent->pe.torso.yawAngle );
 }

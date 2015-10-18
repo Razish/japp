@@ -528,7 +528,7 @@ void CG_Disintegration( centity_t *cent, refEntity_t *ent ) {
 
 	ent->endTime = cent->dustTrailTime;
 
-	if ( (cg_newFX.integer & NEWFX_DISINT) ) {
+	if ( (cg_newFX.getBits() & NEWFX_DISINT) ) {
 		ent->renderfx = RF_DISINTEGRATE2;
 		ent->customShader = media.gfx.world.saber.orange.glow;
 		SE_R_AddRefEntityToScene( ent, cent->currentState.number );
@@ -544,7 +544,7 @@ void CG_Disintegration( centity_t *cent, refEntity_t *ent ) {
 		SE_R_AddRefEntityToScene( ent, cent->currentState.number );
 	}
 
-	if ( cg.time - ent->endTime < 1000 && (timescale.value * timescale.value * random()) > 0.05f ) {
+	if ( cg.time - ent->endTime < 1000 && (timescale.getFloat() * timescale.getFloat() * random()) > 0.05f ) {
 		vector3 fxOrg, fxDir;
 		mdxaBone_t	boltMatrix;
 		int torsoBolt = trap->G2API_AddBolt( cent->ghoul2, 0, "lower_lumbar" );
@@ -557,7 +557,7 @@ void CG_Disintegration( centity_t *cent, refEntity_t *ent ) {
 
 		VectorMA( &fxOrg, -18, &refdef->viewaxis[0], &fxOrg );
 
-		if ( (cg_newFX.integer & NEWFX_DISINT) ) {
+		if ( (cg_newFX.getBits() & NEWFX_DISINT) ) {
 			VectorSet( &fxDir, 0, 0, 1 );
 			fxOrg.z += crandom() * 2;
 			if ( random() > 0.82f )
@@ -752,7 +752,7 @@ static void CG_General( centity_t *cent ) {
 	}
 	else if ( cent->currentState.eFlags & EF_CLIENTSMOOTH ) {
 		if ( cent->currentState.groundEntityNum >= ENTITYNUM_WORLD ) {
-			float smoothFactor = 0.5f*timescale.value;
+			float smoothFactor = 0.5f*timescale.getFloat();
 			int k = 0;
 			vector3 posDif;
 
@@ -827,7 +827,7 @@ static void CG_General( centity_t *cent ) {
 		/*cent->currentState.modelindex < MAX_CLIENTS &&*/
 		cent->currentState.weapon == G2_MODEL_PART ) { //special case for client limbs
 		centity_t *clEnt;
-		float smoothFactor = 0.5f*timescale.value;
+		float smoothFactor = 0.5f*timescale.getFloat();
 		int k = 0;
 		vector3 posDif;
 
@@ -838,11 +838,11 @@ static void CG_General( centity_t *cent ) {
 		else
 			clEnt = &cg_entities[cent->currentState.otherEntityNum2];
 
-		if ( !cg_dismember.integer ) { //This client does not wish to see dismemberment.
+		if ( !cg_dismember.getInt() ) { //This client does not wish to see dismemberment.
 			return;
 		}
 
-		if ( cg_dismember.integer < 2 && (cent->currentState.modelGhoul2 == G2_MODELPART_HEAD || cent->currentState.modelGhoul2 == G2_MODELPART_WAIST) ) { //dismember settings are not high enough to display decaps and torso slashes
+		if ( cg_dismember.getInt() < 2 && (cent->currentState.modelGhoul2 == G2_MODELPART_HEAD || cent->currentState.modelGhoul2 == G2_MODELPART_WAIST) ) { //dismember settings are not high enough to display decaps and torso slashes
 			return;
 		}
 
@@ -1514,7 +1514,7 @@ static void CG_General( centity_t *cent ) {
 	Ghoul2 Insert Start
 	*/
 
-	if ( debugBB.integer ) {
+	if ( debugBB.getInt() ) {
 		CG_CreateBBRefEnts( s1, &cent->lerpOrigin );
 	}
 	/*
@@ -1591,7 +1591,7 @@ static void CG_Item( centity_t *cent ) {
 
 	if ( (item->giType == IT_WEAPON || item->giType == IT_POWERUP) &&
 		!(cent->currentState.eFlags & EF_DROPPEDWEAPON) &&
-		!(cg_simpleItems.value > 0.0f) ) {
+		!(cg_simpleItems.getFloat() > 0.0f) ) {
 		vector3 uNorm;
 		qboolean doGrey;
 
@@ -1632,7 +1632,7 @@ static void CG_Item( centity_t *cent ) {
 	Ghoul2 Insert End
 	*/
 
-	if ( item->giType == IT_TEAM && (cg_newFX.integer & NEWFX_SIMPLEFLAG) ) {
+	if ( item->giType == IT_TEAM && (cg_newFX.getBits() & NEWFX_SIMPLEFLAG) ) {
 		vector3 angs;
 		memset( &ent, 0, sizeof(ent) );
 		ent.reType = RT_ORIENTED_QUAD;
@@ -1656,11 +1656,11 @@ static void CG_Item( centity_t *cent ) {
 		return;
 	}
 
-	if ( cg_simpleItems.value > 0.0f && item->giType != IT_TEAM ) {
+	if ( cg_simpleItems.getFloat() > 0.0f && item->giType != IT_TEAM ) {
 		memset( &ent, 0, sizeof(ent) );
 		ent.reType = RT_SPRITE;
 		VectorCopy( &cent->lerpOrigin, &ent.origin );
-		ent.radius = 14 * cg_simpleItems.value;
+		ent.radius = 14 * cg_simpleItems.getFloat();
 		ent.customShader = cg_items[es->modelindex].icon;
 		ent.shaderRGBA[0] = ent.shaderRGBA[1] = ent.shaderRGBA[2] = 255;
 
@@ -1899,7 +1899,7 @@ static void CG_Item( centity_t *cent ) {
 	}
 
 	// accompanying rings / spheres for powerups
-	if ( !(cg_simpleItems.value > 0.0f) ) {
+	if ( !(cg_simpleItems.getFloat() > 0.0f) ) {
 		vector3 spinAngles;
 
 		VectorClear( &spinAngles );
@@ -1924,7 +1924,7 @@ void CG_CreateDistortionTrailPart( centity_t *cent, float scale, vector3 *pos ) 
 	float vLen;
 	refdef_t *refdef = CG_GetRefdef();
 
-	if ( !cg_renderToTextureFX.integer ) {
+	if ( !cg_renderToTextureFX.getInt() ) {
 		return;
 	}
 	memset( &ent, 0, sizeof(ent) );
@@ -2554,7 +2554,7 @@ void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	}
 
 	// if this player does not want to see extrapolated players
-	if ( cg_smoothClients.integer && cent->doLerp ) {
+	if ( cg_smoothClients.getInt() && cent->doLerp ) {
 		// make sure the clients use TR_INTERPOLATE
 		cent->currentState.pos.trType = TR_INTERPOLATE;
 		cent->nextState.pos.trType = TR_INTERPOLATE;

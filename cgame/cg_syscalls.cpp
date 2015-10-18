@@ -762,7 +762,7 @@ void QDECL CG_Printf( const char *msg, ... ) {
 }
 
 void SE_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity ) {
-	if ( cg_smartEntities.integer && !SE_RenderThisEntity( &cg_entities[gameEntity].lerpOrigin, gameEntity ) )
+	if ( cg_smartEntities.getInt() && !SE_RenderThisEntity( &cg_entities[gameEntity].lerpOrigin, gameEntity ) )
 		return;
 	trap->R_AddRefEntityToScene( re );
 }

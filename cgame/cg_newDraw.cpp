@@ -5,10 +5,10 @@
 extern displayContextDef_t cgDC;
 
 int CG_GetSelectedPlayer( void ) {
-	if ( cg_currentSelectedPlayer.integer < 0 || cg_currentSelectedPlayer.integer >= numSortedTeamPlayers )
-		cg_currentSelectedPlayer.integer = 0;
+	if ( cg_currentSelectedPlayer.getInt() < 0 || cg_currentSelectedPlayer.getInt() >= numSortedTeamPlayers )
+		cg_currentSelectedPlayer.setInt(0);
 
-	return cg_currentSelectedPlayer.integer;
+	return cg_currentSelectedPlayer.getInt();
 }
 
 qhandle_t CG_StatusHandle( int task ) {
@@ -140,10 +140,10 @@ qboolean CG_YourTeamDroppedFlag( void ) {
 // FIXME: should these be exclusive or inclusive..
 qboolean CG_OwnerDrawVisible( uint32_t flags ) {
 	if ( flags & CG_SHOW_TEAMINFO )
-		return (cg_currentSelectedPlayer.integer == numSortedTeamPlayers);
+		return (cg_currentSelectedPlayer.getInt() == numSortedTeamPlayers);
 
 	if ( flags & CG_SHOW_NOTEAMINFO )
-		return !(cg_currentSelectedPlayer.integer == numSortedTeamPlayers);
+		return !(cg_currentSelectedPlayer.getInt() == numSortedTeamPlayers);
 
 	if ( flags & CG_SHOW_OTHERTEAMHASFLAG )
 		return CG_OtherTeamHasFlag();

@@ -103,7 +103,7 @@ void CG_ParseServerinfo( void ) {
 
 	trap->Cvar_Set( "g_gametype", va( "%i", cgs.gametype ) );
 
-	trap->Cvar_Set( "bg_fighterAltControl", Info_ValueForKey( info, "bg_fighterAltControl" ) );
+	bg_fighterAltControl.setString( Info_ValueForKey( info, "bg_fighterAltControl" ) );
 
 	// reset fraglimit warnings
 	if ( cgs.fraglimit < fraglimit )
@@ -857,7 +857,7 @@ void CG_KillCEntityInstances( void ) {
 // The server has issued a map_restart, so the next snapshot is completely new and should not be interpolated to.
 // A tournament restart will clear everything, but doesn't require a reload of all the media
 static void CG_MapRestart( void ) {
-	if ( cg_showMiss.integer )
+	if ( cg_showMiss.getInt() )
 		trap->Print( "CG_MapRestart\n" );
 
 	trap->R_ClearDecals();
@@ -1071,7 +1071,7 @@ static void CG_ServerCommand( void ) {
 
 	if ( !strcmp( cmd, "spc" ) ) {
 		if ( !cg.demoPlayback ) {
-			trap->Cvar_Set( "ui_myteam", "3" );
+			ui_myteam.setInt( 3 );
 			trap->OpenUIMenu( UIMENU_PLAYERCONFIG );
 		}
 		return;
@@ -1094,7 +1094,7 @@ static void CG_ServerCommand( void ) {
 
 		trap->Cvar_Set( "ui_rankChange", va( "%i", newRank ) );
 
-		trap->Cvar_Set( "ui_myteam", va( "%i", setTeam ) );
+		ui_myteam.setInt( setTeam );
 
 		if ( !(trap->Key_GetCatcher() & KEYCATCH_UI) && doMenu && !cg.demoPlayback )
 			trap->OpenUIMenu( UIMENU_PLAYERCONFIG );
@@ -1263,7 +1263,7 @@ static void CG_ServerCommand( void ) {
 		if ( !msg )
 			return;
 
-		if ( !cg_teamChatsOnly.integer ) {
+		if ( !cg_teamChatsOnly.getInt() ) {
 			char cbName[MAX_CHATBOX_IDENTIFIER_SIZE] = "normal";
 			trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 			Q_strncpyz( text, msg, MAX_SAY_TEXT );
@@ -1273,7 +1273,7 @@ static void CG_ServerCommand( void ) {
 
 			CG_RemoveChatEscapeChar( text );
 			CG_LogPrintf( cg.log.console, va( "%s\n", text ) );
-			if ( cg_newChatbox.integer )
+			if ( cg_newChatbox.getInt() )
 				CG_ChatboxAddMessage( text, qfalse, cbName );
 			else
 				CG_ChatBox_AddString( text );
@@ -1290,7 +1290,7 @@ static void CG_ServerCommand( void ) {
 		Q_strncpyz( text, CG_Argv( 1 ), MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
 		CG_LogPrintf( cg.log.console, va( "%s\n", text ) );
-		if ( cg_newChatbox.integer )
+		if ( cg_newChatbox.getInt() )
 			CG_ChatboxAddMessage( text, qfalse, "team" );
 		else
 			CG_ChatBox_AddString( text );
@@ -1303,7 +1303,7 @@ static void CG_ServerCommand( void ) {
 
 	//chat with location, possibly localized.
 	if ( !strcmp( cmd, "lchat" ) ) {
-		if ( !cg_teamChatsOnly.integer ) {
+		if ( !cg_teamChatsOnly.getInt() ) {
 			char name[MAX_STRING_CHARS], loc[MAX_STRING_CHARS], color[8], message[MAX_STRING_CHARS];
 
 			if ( trap->Cmd_Argc() < 4 )
@@ -1322,7 +1322,7 @@ static void CG_ServerCommand( void ) {
 			Com_sprintf( text, sizeof(text), "%s" S_COLOR_WHITE "<%s> ^%s%s", name, loc, color, message );
 			CG_RemoveChatEscapeChar( text );
 			//Raz: Siege chat now uses the fancy new chatbox
-			if ( cg_newChatbox.integer )
+			if ( cg_newChatbox.getInt() )
 				CG_ChatboxAddMessage( text, qfalse, "normal" );
 			else
 				CG_ChatBox_AddString( text );
@@ -1350,7 +1350,7 @@ static void CG_ServerCommand( void ) {
 		//	Q_strncpyz( text, CG_Argv( 1 ), MAX_SAY_TEXT );
 		Com_sprintf( text, sizeof(text), "%s" S_COLOR_WHITE "<%s> ^%s%s", name, loc, color, message );
 		CG_RemoveChatEscapeChar( text );
-		if ( cg_newChatbox.integer )
+		if ( cg_newChatbox.getInt() )
 			CG_ChatboxAddMessage( text, qfalse, "team" );
 		else
 			CG_ChatBox_AddString( text );

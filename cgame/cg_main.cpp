@@ -4,6 +4,7 @@
 #include "cg_local.h"
 #include "bg_lua.h"
 #include "bg_local.h"
+#include "bg_xcvar.h"
 #include "ui/ui_shared.h"
 #include "cg_lights.h"
 #include "cg_media.h"
@@ -325,27 +326,29 @@ int					cg_numpermanents = 0;
 weaponInfo_t		cg_weapons[MAX_WEAPONS];
 itemInfo_t			cg_items[MAX_ITEMS];
 
-static void CVU_SVRunning( void ) {
-	cgs.localServer = sv_running.integer;
+static void CVU_SVRunning( const xcvar *cv ) {
+	cgs.localServer = cv->getInt();
 }
 
-static void CVU_ForceColour( void ) {
+static void CVU_ForceEnemyColour( const xcvar *cv ) {
 	ivector3 *v = &cg.enemyColour;
-	if ( sscanf( cg_forceEnemyColour.string, "%i %i %i", &v->r, &v->g, &v->b ) != 3 ) {
-		v->r = 255;
-		v->g = 255;
-		v->b = 255;
-	}
-
-	v = &cg.allyColour;
-	if ( sscanf( cg_forceAllyColour.string, "%i %i %i", &v->r, &v->g, &v->b ) != 3 ) {
+	if ( sscanf( cv->getStr(), "%i %i %i", &v->r, &v->g, &v->b ) != 3 ) {
 		v->r = 255;
 		v->g = 255;
 		v->b = 255;
 	}
 }
 
-static void CVU_ForceModel( void ) {
+static void CVU_ForceAllyColour( const xcvar *cv ) {
+	ivector3 *v = &cg.allyColour;
+	if ( sscanf( cv->getStr(), "%i %i %i", &v->r, &v->g, &v->b ) != 3 ) {
+		v->r = 255;
+		v->g = 255;
+		v->b = 255;
+	}
+}
+
+static void CVU_ForceModel( const xcvar *cv ) {
 	int i;
 
 	for ( i = 0; i < cgs.maxclients; i++ ) {
@@ -359,18 +362,18 @@ static void CVU_ForceModel( void ) {
 	}
 }
 
-static void CVU_TeamOverlay( void ) {
+static void CVU_TeamOverlay( const xcvar *cv ) {
 	// If team overlay is on, ask for updates from the server.  If its off,
 	// let the server know so we don't receive it
-	if ( cg_drawTeamOverlay.integer > 0 && cgs.gametype >= GT_SINGLE_PLAYER )
-		trap->Cvar_Set( "teamoverlay", "1" );
+	if ( cv->getInt() > 0 && cgs.gametype >= GT_SINGLE_PLAYER )
+		teamoverlay.setBool( true );
 	else
-		trap->Cvar_Set( "teamoverlay", "0" );
+		teamoverlay.setBool( false );
 }
 
-static void CVU_BubbleColour( void ) {
+static void CVU_BubbleColour( const xcvar *cv ) {
 	ivector4 *v = &cg.bubbleColour;
-	if ( sscanf( cg_bubbleColour.string, "%i %i %i %i", &v->r, &v->g, &v->b, &v->a ) != 4 ) {
+	if ( sscanf( cv->getStr(), "%i %i %i %i", &v->r, &v->g, &v->b, &v->a ) != 4 ) {
 		v->r = 0;
 		v->g = 255;
 		v->b = 0;
@@ -378,24 +381,24 @@ static void CVU_BubbleColour( void ) {
 	}
 }
 
-static void CVU_ChatboxPos( void ) {
+static void CVU_ChatboxPos( const xcvar *cv ) {
 	ivector2 *v = &cg.chatbox.pos;
-	if ( sscanf( cg_chatboxPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
+	if ( sscanf( cv->getStr(), "%i %i", &v->x, &v->y ) != 2 ) {
 		v->x = 128;
 		v->y = 395;
 	}
 }
 
-static void CVU_ChatboxSize( void ) {
-	if ( sscanf( cg_chatboxSize.string, "%f %i", &cg.chatbox.size.scale, &cg.chatbox.size.width ) != 2 ) {
+static void CVU_ChatboxSize( const xcvar *cv ) {
+	if ( sscanf( cv->getStr(), "%f %i", &cg.chatbox.size.scale, &cg.chatbox.size.width ) != 2 ) {
 		cg.chatbox.size.scale = 0.5f;
 		cg.chatbox.size.width = 497;
 	}
 }
 
-static void CVU_CrosshairColour( void ) {
+static void CVU_CrosshairColour( const xcvar *cv ) {
 	ivector4 *v = &cg.crosshair.colour;
-	if ( sscanf( cg_crosshairColour.string, "%i %i %i %i", &v->r, &v->g, &v->b, &v->a ) != 4 ) {
+	if ( sscanf( cv->getStr(), "%i %i %i %i", &v->r, &v->g, &v->b, &v->a ) != 4 ) {
 		v->r = 255;
 		v->g = 255;
 		v->b = 255;
@@ -403,9 +406,9 @@ static void CVU_CrosshairColour( void ) {
 	}
 }
 
-static void CVU_ChatboxBG( void ) {
+static void CVU_ChatboxBG( const xcvar *cv ) {
 	vector4 *v = &cg.chatbox.background;
-	if ( sscanf( cg_chatboxBackground.string, "%f %f %f %f", &v->r, &v->g, &v->b, &v->a ) != 4 ) {
+	if ( sscanf( cv->getStr(), "%f %f %f %f", &v->r, &v->g, &v->b, &v->a ) != 4 ) {
 		v->r = 0.0f;
 		v->g = 0.0f;
 		v->b = 0.0f;
@@ -413,10 +416,10 @@ static void CVU_ChatboxBG( void ) {
 	}
 }
 
-static void CVU_DuelColour( void ) {
+static void CVU_DuelColour( const xcvar *cv ) {
 	ivector4 *v = &cg.duelColour.rgba;
 	int tmp;
-	if ( sscanf( cg_duelColour.string, "%i %i %i %i %i", &v->r, &v->g, &v->b, &v->a, &tmp ) != 5 ) {
+	if ( sscanf( cv->getStr(), "%i %i %i %i %i", &v->r, &v->g, &v->b, &v->a, &tmp ) != 5 ) {
 		v->r = 75;
 		v->g = 75;
 		v->b = 224;
@@ -427,27 +430,27 @@ static void CVU_DuelColour( void ) {
 		cg.duelColour.forceAlpha = tmp;
 }
 
-static void CVU_GunAlign( void ) {
+static void CVU_GunAlign( const xcvar *cv ) {
 	vector3 *v = &cg.gunAlign;
-	if ( sscanf( cg_gunAlign.string, "%f %f %f", &v->x, &v->y, &v->z ) != 3 ) {
+	if ( sscanf( cv->getStr(), "%f %f %f", &v->x, &v->y, &v->z ) != 3 ) {
 		v->x = 0.0f;
 		v->y = 0.0f;
 		v->z = 0.0f;
 	}
 }
 
-static void CVU_GunBob( void ) {
+static void CVU_GunBob( const xcvar *cv ) {
 	vector3 *v = &cg.gunBob;
-	if ( sscanf( cg_gunBob.string, "%f %f %f", &v->pitch, &v->yaw, &v->roll ) != 3 ) {
+	if ( sscanf( cv->getStr(), "%f %f %f", &v->pitch, &v->yaw, &v->roll ) != 3 ) {
 		v->pitch = 0.005f;
 		v->yaw = 0.01f;
 		v->roll = 0.005f;
 	}
 }
 
-static void CVU_GunDrift( void ) {
+static void CVU_GunDrift( const xcvar *cv ) {
 	vector3 *v = &cg.gunIdleDrift.amount;
-	if ( sscanf( cg_gunIdleDrift.string, "%f %f %f %f", &v->pitch, &v->yaw, &v->roll, &cg.gunIdleDrift.speed ) != 4 ) {
+	if ( sscanf( cv->getStr(), "%f %f %f %f", &v->pitch, &v->yaw, &v->roll, &cg.gunIdleDrift.speed ) != 4 ) {
 		v->pitch = 0.01f;
 		v->yaw = 0.01f;
 		v->roll = 0.01f;
@@ -455,34 +458,34 @@ static void CVU_GunDrift( void ) {
 	}
 }
 
-static void CVU_LagPos( void ) {
+static void CVU_LagPos( const xcvar *cv ) {
 	ivector2 *v = &cg.lagometerPos;
-	if ( sscanf( cg_lagometerPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
+	if ( sscanf( cv->getStr(), "%i %i", &v->x, &v->y ) != 2 ) {
 		v->x = 48;
 		v->y = 160;
 	}
 }
 
-static void CVU_MoveKeysPos( void ) {
+static void CVU_MoveKeysPos( const xcvar *cv ) {
 	ivector2 *v = &cg.moveKeysPos;
-	if ( sscanf( cg_movementKeysPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
+	if ( sscanf( cv->getStr(), "%i %i", &v->x, &v->y ) != 2 ) {
 		v->x = (SCREEN_WIDTH / 2);
 		v->y = (SCREEN_HEIGHT / 2);
 	}
 }
 
-static void CVU_StatsPos( void ) {
+static void CVU_StatsPos( const xcvar *cv ) {
 	ivector2 *v = &cg.statsPos;
-	if ( sscanf( cg_hudStatsPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
+	if ( sscanf( cv->getStr(), "%i %i", &v->x, &v->y ) != 2 ) {
 		v->x = 2;
 		v->y = (SCREEN_HEIGHT / 2);
 	}
 }
 
-static void CVU_ShieldColour( void ) {
+static void CVU_ShieldColour( const xcvar *cv ) {
 	ivector4 *v = &cg.shieldColour.rgba;
 	int tmp;
-	if ( sscanf( cg_shieldColour.string, "%i %i %i %i %i", &v->r, &v->g, &v->b, &v->a, &tmp ) != 5 ) {
+	if ( sscanf( cv->getStr(), "%i %i %i %i %i", &v->r, &v->g, &v->b, &v->a, &tmp ) != 5 ) {
 		v->r = 75;
 		v->g = 128;
 		v->b = 224;
@@ -493,9 +496,9 @@ static void CVU_ShieldColour( void ) {
 		cg.shieldColour.forceAlpha = tmp;
 }
 
-static void CVU_StrafeHelpColour( void ) {
+static void CVU_StrafeHelpColour( const xcvar *cv ) {
 	ivector4 *v = &cg.strafeHelperColour;
-	if ( sscanf( cg_strafeHelperColor.string, "%i %i %i %i", &v->r, &v->g, &v->b, &v->a ) != 4 ) {
+	if ( sscanf( cv->getStr(), "%i %i %i %i", &v->r, &v->g, &v->b, &v->a ) != 4 ) {
 		v->r = 0;
 		v->g = 255;
 		v->b = 255;
@@ -503,17 +506,21 @@ static void CVU_StrafeHelpColour( void ) {
 	}
 }
 
-static void CVU_StrafeTrailWeights( void ) {
+static void CVU_StrafeHelpRadius( const xcvar *cv ) {
+	cg.japp.leftIdeal.radius = cg.japp.rightIdeal.radius = cg.japp.velocityVect.radius = cg_strafeHelperRadius.getFloat();
+}
+
+static void CVU_StrafeTrailWeights( const xcvar *cv ) {
 	ivector2 *v = &cg.strafeTrailWeights;
-	if ( sscanf( cg_strafeTrailWeights.string, "%i %i", &v->x, &v->y ) != 2 ) {
+	if ( sscanf( cv->getStr(), "%i %i", &v->x, &v->y ) != 2 ) {
 		v->x = 300;
 		v->y = 1500;
 	}
 }
 
-static void CVU_ViewBob( void ) {
+static void CVU_ViewBob( const xcvar *cv ) {
 	int tmp;
-	if ( sscanf( cg_viewBob.string, "%f %f %f %i", &cg.viewBob.pitch, &cg.viewBob.roll, &cg.viewBob.up, &tmp ) != 4 ) {
+	if ( sscanf( cv->getStr(), "%f %f %f %i", &cg.viewBob.pitch, &cg.viewBob.roll, &cg.viewBob.up, &tmp ) != 4 ) {
 		cg.viewBob.pitch = 0.002f;
 		cg.viewBob.roll = 0.002f;
 		cg.viewBob.up = 0.005f;
@@ -523,85 +530,41 @@ static void CVU_ViewBob( void ) {
 		cg.viewBob.fall = tmp;
 }
 
-static void CVU_AutomapAngle( void ) {
+static void CVU_AutomapAngle( const xcvar *cv ) {
 	vector3 *v = &cg.automapAngle;
-	if ( sscanf( r_autoMapAngle.string, "%f %f %f", &v->pitch, &v->yaw, &v->roll ) != 3 ) {
+	if ( sscanf( cv->getStr(), "%f %f %f", &v->pitch, &v->yaw, &v->roll ) != 3 ) {
 		v->pitch = 90.0f;
 		v->yaw = 0.0f;
 		v->roll = 0.0f;
 	}
 }
 
-static void CVU_AccelPos( void ) {
+static void CVU_AccelPos( const xcvar *cv ) {
 	ivector2 *v = &cg.accelerometer.position;
-	if ( sscanf( cg_accelerometerPos.string, "%i %i", &v->x, &v->y ) != 2 ) {
+	if ( sscanf( cv->getStr(), "%i %i", &v->x, &v->y ) != 2 ) {
 		v->x = (SCREEN_WIDTH / 2);
 		v->y = 360;
 	}
 }
 
-static void CVU_AccelSize( void ) {
+static void CVU_AccelSize( const xcvar *cv ) {
 	ivector2 *v = &cg.accelerometer.size;
-	if ( sscanf( cg_accelerometerSize.string, "%i %i", &v->x, &v->y ) != 2 ) {
+	if ( sscanf( cv->getStr(), "%i %i", &v->x, &v->y ) != 2 ) {
 		v->x = 128;
 		v->y = 20;
 	}
 }
 
-typedef struct cvarTable_s {
-	vmCvar_t	*vmCvar;
-	const char	*cvarName, *defaultString;
-	void( *update )(void);
-	uint32_t	cvarFlags;
-} cvarTable_t;
-
-#define XCVAR_DECL
-#include "cg_xcvar.h"
-#undef XCVAR_DECL
-
-void CG_Set2DRatio(void) {
-	if (japp_ratioFix.integer)
+void CG_Set2DRatio( const xcvar *cv ) {
+	if (cv->getInt())
 		cgs.widthRatioCoef = (float)(SCREEN_WIDTH * cgs.glconfig.vidHeight) / (float)(SCREEN_HEIGHT * cgs.glconfig.vidWidth);
 	else
 		cgs.widthRatioCoef = 1.0f;
 }
 
-static cvarTable_t cvarTable[] = {
-#define XCVAR_LIST
+#define XCVAR_DECL
 #include "cg_xcvar.h"
-#undef XCVAR_LIST
-};
-
-static int cvarTableSize = ARRAY_LEN( cvarTable );
-
-void CG_RegisterCvars( void ) {
-	int			i;
-	cvarTable_t	*cv;
-
-	for ( i = 0, cv = cvarTable; i < cvarTableSize; i++, cv++ ) {
-		trap->Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
-		if ( cv->update )
-			cv->update();
-	}
-}
-
-void CG_UpdateCvars( void ) {
-	int			i;
-	cvarTable_t	*cv;
-
-	for ( i = 0, cv = cvarTable; i<cvarTableSize; i++, cv++ ) {
-		if ( cv->vmCvar ) {
-			int modCount = cv->vmCvar->modificationCount;
-			trap->Cvar_Update( cv->vmCvar );
-			if ( cv->vmCvar->modificationCount > modCount ) {
-				if ( cv->update ) {
-					cv->update();
-				}
-				JPLua::Cvar_Update( cv->cvarName );
-			}
-		}
-	}
-}
+#undef XCVAR_DECL
 
 int CG_CrosshairPlayer( void ) {
 	if ( cg.time > (cg.crosshairClientTime + 1000) )
@@ -1358,7 +1321,7 @@ void CG_LoadHudMenu( void ) {
 
 	Menu_Reset();
 
-	hudSet = cg_hudFiles.string;
+	hudSet = cg_hudFiles.getStr();
 	if ( hudSet[0] == '\0' ) {
 		hudSet = "ui/jahud.txt";
 	}
@@ -1755,17 +1718,17 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 
 	trap->RegisterSharedMemory( cg.sharedBuffer );
 
-	CG_RegisterCvars();
+	XCVAR_RegisterXCvars();
 	CG_InitConsoleCommands();
 
 	// logging
-	if ( cg_logConsole.integer )	CG_OpenLog( LOG_DIRECTORY "console.log", &cg.log.console, cg_logConsole.integer == 2 );
+	if ( cg_logConsole.getInt() )	CG_OpenLog( LOG_DIRECTORY "console.log", &cg.log.console, cg_logConsole.getInt() == 2 );
 	else							trap->Print( "Not logging console to disk.\n" );
-	if ( cg_logChat.integer )		CG_OpenLog( LOG_DIRECTORY "chat.log", &cg.log.chat, cg_logChat.integer == 2 );
+	if ( cg_logChat.getInt() )		CG_OpenLog( LOG_DIRECTORY "chat.log", &cg.log.chat, cg_logChat.getInt() == 2 );
 	else							trap->Print( "Not logging chat to disk.\n" );
-	if ( cg_logDebug.integer )		CG_OpenLog( LOG_DIRECTORY "debug.log", &cg.log.debug, cg_logDebug.integer == 2 );
+	if ( cg_logDebug.getInt() )		CG_OpenLog( LOG_DIRECTORY "debug.log", &cg.log.debug, cg_logDebug.getInt() == 2 );
 	else							trap->Print( "Not logging debug messages to disk.\n" );
-	if ( cg_logSecurity.integer )	CG_OpenLog( LOG_DIRECTORY "security.log", &cg.log.security, cg_logSecurity.integer == 2 );
+	if ( cg_logSecurity.getInt() )	CG_OpenLog( LOG_DIRECTORY "security.log", &cg.log.security, cg_logSecurity.getInt() == 2 );
 	else							trap->Print( "Not logging security events to disk.\n" );
 
 	// load some permanent stuff
@@ -1784,7 +1747,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	cg.forceHUDActive = qtrue;
 	cg.forceHUDTotalFlashTime = 0;
 	cg.forceHUDNextFlashTime = 0;
-	cg.renderingThirdPerson = cg_thirdPerson.integer;
+	cg.renderingThirdPerson = cg_thirdPerson.getInt();
 	cg.weaponSelect = WP_BRYAR_PISTOL;
 	cgs.redflag = cgs.blueflag = -1;
 	cg.demoPlayback = demoPlayback;
@@ -1793,7 +1756,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	trap->GetGlconfig( &cgs.glconfig );
 	cgs.screenXScale = cgs.glconfig.vidWidth / SCREEN_WIDTH;
 	cgs.screenYScale = cgs.glconfig.vidHeight / SCREEN_HEIGHT;
-	CG_Set2DRatio();
+	CG_Set2DRatio( &japp_ratioFix );
 
 	trap->GetGameState( &cgs.gameState );
 	s = CG_ConfigString( CS_GAME_VERSION );
@@ -2123,7 +2086,7 @@ void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	char string[1024] = { 0 };
 	size_t len;
 
-	if ( cg_logFormat.integer == 0 ) {
+	if ( cg_logFormat.getInt() == 0 ) {
 		int msec = cg.time - cgs.levelStartTime;
 		int secs = msec / 1000;
 		int mins = secs / 60;

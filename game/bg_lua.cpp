@@ -12,6 +12,7 @@
 #include <inttypes.h>
 #include <unordered_map>
 #include <vector>
+#include <sstream>
 #include "cJSON/cJSON.h"
 
 extern int lastluaid;
@@ -42,11 +43,34 @@ namespace JPLua {
 		std::unordered_map<std::string, bool> plugins;
 	} autoload;
 
+	#if defined( PROJECT_CGAME )
+	void UpdateAutoload( const xcvar *cv ) {
+		autoload.plugins.clear();
+
+		if ( !strcmp( cv->getStr(), "1" ) ) {
+			autoload.all = true;
+			return;
+		}
+		else if ( !strcmp( cv->getStr(), "0" ) ) {
+			autoload.all = false;
+			return;
+		}
+		autoload.all = false;
+
+		std::istringstream stream( cv->getStr() );
+		std::string p;
+
+		while ( std::getline( stream, p, ' ' ) )
+		{
+			autoload.plugins[p] = true;
+		}
+	}
+	#else
 	void UpdateAutoload( void ) {
 	#if defined(PROJECT_GAME)
 		char *autoloadStr = g_jpluaAutoload.string;
-	#elif defined(PROJECT_CGAME)
-		char *autoloadStr = cg_jpluaAutoload.string;
+	#else
+		//char *autoloadStr = g_jpluaAutoload.string;
 	#endif
 
 		autoload.plugins.clear();
@@ -65,6 +89,7 @@ namespace JPLua {
 			autoload.plugins[p] = true;
 		}
 	}
+	#endif
 
 	void ListPlugins( void ) {
 		plugin_t *plugin = nullptr;
@@ -981,7 +1006,7 @@ namespace JPLua {
 		secs = msec / 1000;
 		mins = secs / 60;
 
-		if ( cgs.timelimit && (cg_drawTimer.bits & DRAWTIMER_COUNTDOWN) ) {// count down
+		if ( cgs.timelimit && (cg_drawTimer.getBits() & DRAWTIMER_COUNTDOWN) ) {// count down
 			msec = limitSec * 1000 - (msec);
 			secs = msec / 1000;
 			mins = secs / 60;
@@ -1130,11 +1155,11 @@ namespace JPLua {
 	static int Export_SendChatText( lua_State *L ) {
 		char text[MAX_SAY_TEXT] = { 0 };
 
-		if ( !cg_teamChatsOnly.integer ) {
+		if ( !cg_teamChatsOnly.getInt() ) {
 			Q_strncpyz( text, lua_tostring( L, -1 ), MAX_SAY_TEXT );
 			lua_pop( L, 1 );
 			CG_LogPrintf( cg.log.console, va( "%s\n", text ) );
-			if ( cg_newChatbox.integer )
+			if ( cg_newChatbox.getInt() )
 				CG_ChatboxAddMessage( text, qfalse, "normal" );
 			else
 				CG_ChatBox_AddString( text );
@@ -1486,7 +1511,7 @@ namespace JPLua {
 	#if defined(PROJECT_GAME)
 		if ( !g_jplua.integer ) {
 	#elif defined(PROJECT_CGAME)
-		if ( !cg_jplua.integer ) {
+		if ( !cg_jplua.getInt() ) {
 	#endif
 			return;
 		}

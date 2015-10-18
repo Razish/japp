@@ -2112,7 +2112,7 @@ qboolean GetCPD( bgEntity_t *self, uint32_t bit ) {
 #if defined(PROJECT_GAME)
 	uint32_t cpd = ((gentity_t *)self)->client->pers.CPD;
 #elif defined(PROJECT_CGAME)
-	uint32_t cpd = (unsigned)cp_pluginDisable.integer;
+	uint32_t cpd = (unsigned)cp_pluginDisable.getInt();
 #else
 	uint32_t cpd = 0u;
 #endif

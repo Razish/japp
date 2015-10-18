@@ -14,6 +14,7 @@
 	#include "g_luasql.h"
 	#include "g_luaweapon.h"
 #elif defined(PROJECT_CGAME)
+	#include "bg_xcvar.h"
 	#include "cg_luaserver.h"
 	#include "cg_luainterface.h"
 	#include "cg_luarefentity.h"
@@ -47,7 +48,11 @@ namespace JPLua {
 	bool EnablePlugin( plugin_t *plugin );
 	void DisablePlugin( plugin_t *plugin );
 	plugin_t *FindPlugin( const char * const pluginName );
-	void UpdateAutoload( void );
+#	if defined( PROJECT_CGAME )
+		void UpdateAutoload( const xcvar *cv );
+	#else
+		void UpdateAutoload( void );
+	#endif
 	const char *DoString( const char *str );
 
 } // namespace JPLua

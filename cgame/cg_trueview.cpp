@@ -38,13 +38,13 @@ void CG_AdjustEyePos( const char *modelName ) {
 	if ( true_view_valid ) {
 		if ( BG_SiegeGetPairedValue( true_view_info, (char *)modelName, eyepos ) ) {
 			trap->Print( "True View Eye Adjust Loaded for %s.\n", modelName );
-			trap->Cvar_Set( "cg_trueEyePosition", eyepos );
+			cg_trueEyePosition.setString( eyepos );
 		}
 		else
-			trap->Cvar_Set( "cg_trueEyePosition", "0" );
+			cg_trueEyePosition.setFloat( 0 );
 	}
 	else
-		trap->Cvar_Set( "cg_trueEyePosition", "0" );
+		cg_trueEyePosition.setFloat( 0 );
 }
 
 // Get the point in the leg animation and return a percentage of the current point in the anim between 0 and the total
@@ -76,7 +76,7 @@ static void CG_SmoothTrueView( vector3 *eyeAngles ) {
 	//RAFIXME: See if I can find a link this to the prediction stuff.  I think the snap is of just the last gamestate snap
 
 	// Rolls
-	if ( cg_trueRoll.integer ) {
+	if ( cg_trueRoll.getInt() ) {
 		if ( cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_LEFT
 			|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_RIGHT
 			|| cg.predictedPlayerState.legsAnim == BOTH_WALL_RUN_LEFT_STOP
@@ -89,7 +89,7 @@ static void CG_SmoothTrueView( vector3 *eyeAngles ) {
 			eyeRange = qtrue;
 			didSpecial = qtrue;
 		}
-		else if ( cg_trueRoll.integer == 1 ) {
+		else if ( cg_trueRoll.getInt() == 1 ) {
 			// Use simple roll for the more complicated rolls
 			if ( cg.predictedPlayerState.legsAnim == BOTH_FLIP_L || cg.predictedPlayerState.legsAnim == BOTH_ROLL_L ) {
 				// Left rolls
@@ -133,13 +133,13 @@ static void CG_SmoothTrueView( vector3 *eyeAngles ) {
 	}
 
 	// Flips
-	if ( cg_trueFlip.integer ) {
+	if ( cg_trueFlip.getInt() ) {
 		if ( cg.predictedPlayerState.legsAnim == BOTH_WALL_FLIP_BACK1 ) {
 			// Flip moves that look good with the eyemovement locked
 			eyeRange = qfalse;
 			didSpecial = qtrue;
 		}
-		else if ( cg_trueFlip.integer == 1 ) {
+		else if ( cg_trueFlip.getInt() == 1 ) {
 			// Use simple flip for the more complicated flips
 			if ( cg.predictedPlayerState.legsAnim == BOTH_FLIP_F || cg.predictedPlayerState.legsAnim == BOTH_ROLL_F ) {
 				// forward flips
@@ -177,8 +177,8 @@ static void CG_SmoothTrueView( vector3 *eyeAngles ) {
 		useRefDef = qtrue;
 	}
 
-	if ( cg_trueSpin.integer ) {
-		if ( cg_trueSpin.integer == 1 ) {
+	if ( cg_trueSpin.getInt() ) {
+		if ( cg_trueSpin.getInt() == 1 ) {
 			// Do a simulated Spin for the more complicated spins
 			if ( cg.predictedPlayerState.torsoAnim == BOTH_T1_TL_BR || cg.predictedPlayerState.torsoAnim == BOTH_T1__L_BR
 				|| cg.predictedPlayerState.torsoAnim == BOTH_T1__L__R || cg.predictedPlayerState.torsoAnim == BOTH_T1_BL_BR
@@ -270,9 +270,9 @@ static void CG_SmoothTrueView( vector3 *eyeAngles ) {
 	else {
 		// Movement Roll dampener
 		if ( !didSpecial ) {
-			if ( !cg_trueMoveRoll.integer )
+			if ( !cg_trueMoveRoll.getInt() )
 				eyeAngles->roll = refdef->viewangles.roll;
-			else if ( cg_trueMoveRoll.integer == 1 )
+			else if ( cg_trueMoveRoll.getInt() == 1 )
 				eyeAngles->roll *= 0.05f;
 		}
 
@@ -280,7 +280,7 @@ static void CG_SmoothTrueView( vector3 *eyeAngles ) {
 		if ( eyeRange ) {
 			// allow eye motion
 			for ( i = 0; i<2; i++ ) {
-				float fov = cg_trueFOV.value ? cg_trueFOV.value : cg_fov.value;
+				float fov = cg_trueFOV.getFloat() ? cg_trueFOV.getFloat() : cg_fov.getFloat();
 
 				angDiff = eyeAngles->raw[i] - refdef->viewangles.raw[i];
 				angDiff = AngleNormalize180( angDiff );
@@ -315,7 +315,7 @@ void CG_TrueView( centity_t *cent ) {
 
 	// Restrict True View Model changes to the player and do the True View camera view work.
 	if ( cg.snap && cent->currentState.number == cg.snap->ps.clientNum ) {
-		if ( !cg.renderingThirdPerson && (cg_trueGuns.integer || cent->currentState.weapon == WP_SABER
+		if ( !cg.renderingThirdPerson && (cg_trueGuns.getInt() || cent->currentState.weapon == WP_SABER
 			|| cent->currentState.weapon == WP_MELEE) && !cg.predictedPlayerState.zoomMode && !cg.japp.fakeGun ) {
 			mdxaBone_t 		eyeMatrix;
 			vector3			eyeAngles, eyeAxis[3], oldEyeOrigin;
@@ -390,7 +390,7 @@ void CG_TrueView( centity_t *cent ) {
 			eyeAngles.roll = (atan2f( eyeAxis[2].y, eyeAxis[2].z ) * 180 / M_PI);
 
 			AngleVectors( &eyeAngles, &eyeAxis[0], NULL, NULL );
-			VectorMA( &refdef->vieworg, cg_trueEyePosition.value, &eyeAxis[0], &refdef->vieworg );
+			VectorMA( &refdef->vieworg, cg_trueEyePosition.getFloat(), &eyeAxis[0], &refdef->vieworg );
 			if ( cg.snap->ps.emplacedIndex )
 				VectorMA( &refdef->vieworg, 10, &eyeAxis[2], &refdef->vieworg );
 

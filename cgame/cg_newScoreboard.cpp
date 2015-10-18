@@ -5,7 +5,7 @@
 #include "cg_media.h"
 
 static int JP_GetScoreboardFont( void ) {
-	return Q_clampi( FONT_SMALL, cg_newScoreboardFont.integer, FONT_NUM_FONTS );
+	return Q_clampi( FONT_SMALL, cg_newScoreboardFont.getInt(), FONT_NUM_FONTS );
 }
 
 static void DrawServerInfo( float fade ) {
@@ -349,7 +349,7 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 				tmp = "Spectating"; //TODO: Name of client they're spectating? possible?
 			}
 			*/
-			else if ( cg_drawScoresNet.integer ) {
+			else if ( cg_drawScoresNet.getInt() ) {
 				const int net = score->score - score->deaths;
 				tmp = va( "%02i/%02i (%c%i)", score->score, score->deaths, (net >= 0) ? '+' : '-', abs( net ) );
 			}

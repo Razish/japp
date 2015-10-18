@@ -65,7 +65,7 @@ static int chatTargetClient = -1;
 static qboolean chatActive;
 
 static int CG_GetChatboxFont( void ) {
-	return Q_clampi( FONT_SMALL, cg_chatboxFont.integer, FONT_NUM_FONTS );
+	return Q_clampi( FONT_SMALL, cg_chatboxFont.getInt(), FONT_NUM_FONTS );
 }
 
 //CHATBOX OBJECT API
@@ -86,7 +86,7 @@ static chatBox_t *CG_GetChatboxByName( const char *cbName ) {
 		prev = cb = chatboxList = CG_CreateChatboxObject( "normal" );
 
 	// just return the default tab if we don't want multiple tabs
-	if ( !cg_chatboxTabs.integer )
+	if ( !cg_chatboxTabs.getInt() )
 		return cb;
 
 	while ( cb ) {
@@ -223,7 +223,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 	struct tm *timeinfo;
 	time_t tm;
 
-	accumLength = cg_chatboxTimeShow.integer
+	accumLength = cg_chatboxTimeShow.getInt()
 		? CG_Text_Width( EXAMPLE_TIMESTAMP_CLEAN, cg.chatbox.size.scale, CG_GetChatboxFont() )
 		: 0.0f;
 
@@ -235,8 +235,8 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 
 	// Stop scrolling up if we've already scrolled, similar to console behaviour
 	if ( cb->scrollAmount < 0 ) {
-		cb->scrollAmount = std::max( cb->scrollAmount - 1, cb->numActiveLines >= cg_chatboxLineCount.integer
-			? ( (std::min( cb->numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer) * -1 )
+		cb->scrollAmount = std::max( cb->scrollAmount - 1, cb->numActiveLines >= cg_chatboxLineCount.getInt()
+			? ( (std::min( cb->numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.getInt()) * -1 )
 			: 0 );
 	}
 
@@ -267,12 +267,12 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 			memmove( &cb->chatBuffer[0], &cb->chatBuffer[1], sizeof(cb->chatBuffer) - sizeof(chatEntry_t) );
 			memset( chat, 0, sizeof(chatEntry_t) ); //Clear the last element, ready for writing
 			Q_strncpyz( chat->message, message, i + 1 );
-			chat->time = cg.time + cg_chatbox.integer;
+			chat->time = cg.time + cg_chatbox.getInt();
 
 			// Insert time-stamp, only for entries on the first line
 			if ( !multiLine ) {
 				// local time
-				if ( cg_chatboxTimeShow.integer == 1 ) {
+				if ( cg_chatboxTimeShow.getInt() == 1 ) {
 					time( &tm );
 					timeinfo = localtime( &tm );
 
@@ -281,10 +281,10 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 					}
 
 					Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i" S_COLOR_WHITE "] ",
-						*(char *)cg_chatboxTimeColour.string, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+						*(char *)cg_chatboxTimeColour.getStr(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
 				}
 				// server time
-				else if ( cg_chatboxTimeShow.integer == 2 ) {
+				else if ( cg_chatboxTimeShow.getInt() == 2 ) {
 					int msec, seconds, mins, hours;
 
 					msec = cg.time - cgs.levelStartTime;	seconds = msec / 1000;
@@ -292,7 +292,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 					hours = mins / 60;					mins -= hours * 60;
 
 					Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i" S_COLOR_WHITE "] ",
-						*(char *)cg_chatboxTimeColour.string, hours, mins, seconds );
+						*(char *)cg_chatboxTimeColour.getStr(), hours, mins, seconds );
 				}
 			}
 
@@ -316,12 +316,12 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 	memset( chat, 0, sizeof(chatEntry_t) ); //Clear the last element, ready for writing
 	Q_strncpyz( chat->message, message, i + 1 );
 
-	chat->time = cg.time + cg_chatbox.integer;
+	chat->time = cg.time + cg_chatbox.getInt();
 
 	// Insert time-stamp, only for entries on the first line
 	if ( !multiLine ) {
 		// local time
-		if ( cg_chatboxTimeShow.integer == 1 ) {
+		if ( cg_chatboxTimeShow.getInt() == 1 ) {
 			time( &tm );
 			timeinfo = localtime( &tm );
 
@@ -329,10 +329,10 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 				timeinfo->tm_hour -= 12;
 
 			Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i" S_COLOR_WHITE "] ",
-				*(char *)cg_chatboxTimeColour.string, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+				*(char *)cg_chatboxTimeColour.getStr(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
 		}
 		// server time
-		else if ( cg_chatboxTimeShow.integer == 2 ) {
+		else if ( cg_chatboxTimeShow.getInt() == 2 ) {
 			int msec, seconds, mins, hours;
 
 			msec = cg.time - cgs.levelStartTime;	seconds = msec / 1000;
@@ -340,7 +340,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 			hours = mins / 60;					mins -= hours * 60;
 
 			Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i" S_COLOR_WHITE "] ",
-				*(char *)cg_chatboxTimeColour.string, hours, mins, seconds );
+				*(char *)cg_chatboxTimeColour.getStr(), hours, mins, seconds );
 		}
 	}
 
@@ -357,12 +357,12 @@ static void CG_ChatboxDrawTabs( void ) {
 		float textHeight = CG_Text_Height( name, cg.chatbox.size.scale, CG_GetChatboxFont() );
 
 		CG_FillRect( cg.chatbox.pos.x + xOffset,
-			cg.chatbox.pos.y + (cg_chatboxLineHeight.value * cg_chatboxLineCount.integer) + (textHeight * 0.25f),
-			textWidth + 16.0f, cg_chatboxLineHeight.value,
+			cg.chatbox.pos.y + (cg_chatboxLineHeight.getFloat() * cg_chatboxLineCount.getInt()) + (textHeight * 0.25f),
+			textWidth + 16.0f, cg_chatboxLineHeight.getFloat(),
 			(cb == currentChatbox) ? &colorTable[CT_DKGREY] : &colorTable[CT_BLACK] );
 
 		CG_Text_Paint( cg.chatbox.pos.x + xOffset + 8.0f,
-			cg.chatbox.pos.y + (cg_chatboxLineHeight.value * cg_chatboxLineCount.integer),
+			cg.chatbox.pos.y + (cg_chatboxLineHeight.getFloat() * cg_chatboxLineCount.getInt()),
 			cg.chatbox.size.scale, &colorWhite, va( "^%c%s", (cb == currentChatbox)
 			? COLOR_GREEN
 			: (cb->notification && ((int)(trap->Milliseconds() >> 8) & 1)) ? COLOR_RED : COLOR_WHITE, cb->shortname ),
@@ -398,7 +398,7 @@ static const char *GetPreText( qboolean clean ) {
 }
 
 void CG_ChatboxDraw( void ) {
-	int i = MAX_CHATBOX_ENTRIES - std::min( cg_chatboxLineCount.integer, currentChatbox->numActiveLines );
+	int i = MAX_CHATBOX_ENTRIES - std::min( cg_chatboxLineCount.getInt(), currentChatbox->numActiveLines );
 	int numLines = 0, done = 0, j = 0;
 	//	chatEntry_t *last = NULL;
 
@@ -408,7 +408,7 @@ void CG_ChatboxDraw( void ) {
 		const char *cleanPre = GetPreText( qtrue );
 		char msg[MAX_EDIT_LINE];
 		Com_sprintf( msg, sizeof(msg), pre, chatField.buffer );
-		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.value*cg_chatboxLineCount.integer),
+		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.getFloat()*cg_chatboxLineCount.getInt()),
 			cg.chatbox.size.scale, &g_color_table[ColorIndex( COLOR_WHITE )], msg, 0, 0, ITEM_TEXTSTYLE_OUTLINED,
 			CG_GetChatboxFont(), qfalse);
 		if ( ((trap->Milliseconds() >> 8) & 1) ) {
@@ -421,7 +421,7 @@ void CG_ChatboxDraw( void ) {
 			}
 
 			CG_Text_Paint( cg.chatbox.pos.x + cursorPre + cursorOffset,
-				cg.chatbox.pos.y + (cg_chatboxLineHeight.value * cg_chatboxLineCount.integer),
+				cg.chatbox.pos.y + (cg_chatboxLineHeight.getFloat() * cg_chatboxLineCount.getInt()),
 				cg.chatbox.size.scale, &g_color_table[ColorIndex( COLOR_WHITE )], "_", 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED,
 				CG_GetChatboxFont(), qfalse);
 		}
@@ -435,38 +435,38 @@ void CG_ChatboxDraw( void ) {
 
 	currentChatbox->notification = qfalse;
 
-	if ( cg_chatboxTabs.integer )
+	if ( cg_chatboxTabs.getInt() )
 		CG_ChatboxDrawTabs();
 
 	if ( currentChatbox->numActiveLines == 0 )
 		return;
 
 	if ( currentChatbox->scrollAmount < 0 && CG_ChatboxActive() ) {
-		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y - cg_chatboxLineHeight.value, cg.chatbox.size.scale,
+		CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y - cg_chatboxLineHeight.getFloat(), cg.chatbox.size.scale,
 			&colorWhite, va( S_COLOR_YELLOW "Scrolled lines: " S_COLOR_CYAN "%i\n", currentChatbox->scrollAmount * -1 ),
 			0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(), qfalse
 		);
 	}
 
 	// Check to see if background should be drawn
-	for ( done = 0; done < cg_chatboxLineCount.integer && i < MAX_CHATBOX_ENTRIES; i++, done++ ) {
+	for ( done = 0; done < cg_chatboxLineCount.getInt() && i < MAX_CHATBOX_ENTRIES; i++, done++ ) {
 		chatEntry_t *chat = &currentChatbox->chatBuffer[i];
-		if ( chat->isUsed && (chat->time >= cg.time - cg_chatbox.integer || currentChatbox->scrollAmount
+		if ( chat->isUsed && (chat->time >= cg.time - cg_chatbox.getInt() || currentChatbox->scrollAmount
 			/*|| cg_chatbox.integer == 1*/ || CG_ChatboxActive()) ) {
 			CG_FillRect( cg.chatbox.pos.x, cg.chatbox.pos.y + 1.75f, std::max( cg.chatbox.size.width, 192 ),
-				cg_chatboxLineHeight.value * cg_chatboxLineCount.integer, &cg.chatbox.background );
+				cg_chatboxLineHeight.getFloat() * cg_chatboxLineCount.getInt(), &cg.chatbox.background );
 			break;
 		}
 	}
 
-	for ( done = 0; done < cg_chatboxLineCount.integer && i < MAX_CHATBOX_ENTRIES; i++, done++ ) {
+	for ( done = 0; done < cg_chatboxLineCount.getInt() && i < MAX_CHATBOX_ENTRIES; i++, done++ ) {
 		chatEntry_t *chat = &currentChatbox->chatBuffer[i];
 		if ( chat->isUsed ) {
 			//	last = chat;
-			if ( chat->time >= cg.time - cg_chatbox.integer || (currentChatbox->scrollAmount && CG_ChatboxActive())
+			if ( chat->time >= cg.time - cg_chatbox.getInt() || (currentChatbox->scrollAmount && CG_ChatboxActive())
 				/*|| cg_chatbox.integer == 1*/ || CG_ChatboxActive() ) {
-				CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.value * numLines),
-					cg.chatbox.size.scale, &colorWhite, va( "%s%s", (cg_chatboxTimeShow.integer ? chat->timeStamp : ""),
+				CG_Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + (cg_chatboxLineHeight.getFloat() * numLines),
+					cg.chatbox.size.scale, &colorWhite, va( "%s%s", (cg_chatboxTimeShow.getInt() ? chat->timeStamp : ""),
 					chat->message), 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(), qfalse);
 				numLines++;
 			}
@@ -484,14 +484,14 @@ void CG_ChatboxScroll( int direction ) {
 	}
 	// up
 	else {
-		currentChatbox->scrollAmount = std::max( scrollAmount - 1, numActiveLines >= cg_chatboxLineCount.integer
-			? ((std::min( numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer) * -1)
+		currentChatbox->scrollAmount = std::max( scrollAmount - 1, numActiveLines >= cg_chatboxLineCount.getInt()
+			? ((std::min( numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.getInt()) * -1)
 			: 0 );
 	}
 }
 
 void CG_ChatboxTabComplete( void ) {
-	if ( cg_chatboxCompletion.integer ) {
+	if ( cg_chatboxCompletion.getInt() ) {
 		int i = 0, match = -1, numMatches = 0;
 		char currWord[MAX_INFO_STRING] = { 0 };
 		char matches[MAX_CLIENTS][MAX_NETNAME] = { { 0 } }; // because cgs.clientinfo[i].name uses MAX_QPATH...wtf...

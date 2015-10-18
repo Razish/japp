@@ -82,7 +82,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	}
 
 	// auto record demo
-	if ( cg_autoRecordDemo.integer & (1 << cgs.gametype) && cg.warmup <= 0 && !cg.demoPlayback ) {
+	if ( cg_autoRecordDemo.getInt() & (1 << cgs.gametype) && cg.warmup <= 0 && !cg.demoPlayback ) {
 		time_t rawtime;
 		char buf[256] = { 0 }, timeStr[64] = { 0 }, mapName[MAX_QPATH] = { 0 };
 
@@ -158,7 +158,7 @@ static void CG_TransitionSnapshot( void ) {
 
 		// if we are not doing client side movement prediction for any
 		// reason, then the client events and view changes will be issued now
-		if ( cg.demoPlayback || CG_IsSpectating() || cg_noPredict.integer || g_synchronousClients.integer
+		if ( cg.demoPlayback || CG_IsSpectating() || cg_noPredict.getInt() || g_synchronousClients.getInt()
 			|| CG_UsingEWeb() ) {
 			CG_TransitionPlayerState( ps, ops );
 		}

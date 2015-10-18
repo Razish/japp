@@ -5,6 +5,7 @@
 #include "qcommon/q_shared.h"
 #include "tr_types.h"
 #include "bg_public.h"
+#include "bg_xcvar.h"
 #include "cg_public.h"
 
 //Raz: Added
