@@ -12,7 +12,7 @@ class xcvar
 	float		value;
 	union
 	{
-		int32_t			getInt()integer;
+		int32_t			integer;
 		uint32_t		bits;
 	};
 	uint32_t	flags;
