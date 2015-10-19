@@ -2132,8 +2132,9 @@ static qboolean PM_CheckJump( void ) {
 	else if ( pm->cmd.upmove > 0 && pm->waterlevel < 2 && pm->ps->fd.forcePowerLevel[FP_LEVITATION] > FORCE_LEVEL_0
 		&& !(pm->ps->pm_flags & PMF_JUMP_HELD)
 #if defined (PROJECT_GAME)
-		&& (japp_allowWeaponWallRun.integer || (pm->ps->weapon == WP_SABER || pm->ps->weapon == WP_MELEE))
+		&& (japp_allowWeaponWallRun.getInt() || (pm->ps->weapon == WP_SABER || pm->ps->weapon == WP_MELEE))
 #else
+		// FIXME CHECK the flag for above cvar from cinfo etc?
 		&& (pm->ps->weapon == WP_SABER || pm->ps->weapon == WP_MELEE)
 #endif
 		&& !PM_IsRocketTrooper() && !BG_HasYsalamiri( pm->gametype, pm->ps )
@@ -4872,7 +4873,7 @@ int PM_LegsSlopeBackTransition( int desiredAnim ) {
 static uint32_t JP_GetJPFixRoll( void ) {
 	uint32_t level = 0u;
 #ifdef PROJECT_GAME
-	uint32_t cinfo = jp_cinfo.integer;
+	uint32_t cinfo = jp_cinfo.getInt();
 #else
 	uint32_t cinfo = cgs.japp.jp_cinfo;
 #endif
@@ -5681,7 +5682,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].alt.chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
 #ifdef PROJECT_GAME
-					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
+					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.getInt() )
 #endif
 						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].alt.charge;
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].alt.chargeTime;
@@ -5715,7 +5716,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
 #ifdef PROJECT_GAME
-					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
+					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.getInt() )
 #endif
 						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].charge;
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].chargeTime;
@@ -6944,7 +6945,7 @@ static void PM_Weapon( void ) {
 	}
 
 #ifdef PROJECT_GAME
-	if ( ((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer )
+	if ( ((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.getInt() )
 		amount = 0;
 	else
 #endif
@@ -7121,11 +7122,7 @@ static void PM_DropTimers( void ) {
 qboolean BG_UnrestrainedPitchRoll( playerState_t *ps, Vehicle_t *pVeh ) {
 	//FIXME: specify per vehicle instead of assuming true for all fighters
 	//FIXME: map/server setting?
-#ifdef PROJECT_CGAME
 	if ( bg_fighterAltControl.getInt() && ps->clientNum < MAX_CLIENTS && ps->m_iVehicleNum && pVeh && pVeh->m_pVehicleInfo
-#else
-	if ( bg_fighterAltControl.integer && ps->clientNum < MAX_CLIENTS && ps->m_iVehicleNum && pVeh && pVeh->m_pVehicleInfo
-#endif
 		&& pVeh->m_pVehicleInfo->type == VH_FIGHTER ) {
 		// can roll and pitch without limitation!
 		return qtrue;
@@ -9102,7 +9099,7 @@ void PmoveSingle( pmove_t *pmove ) {
 	pm = pmove;
 
 #ifdef PROJECT_GAME
-	if ( japp_fixWeaponCharge.integer ) {
+	if ( japp_fixWeaponCharge.getInt() ) {
 		if ( pm->cmd.buttons & BUTTON_ATTACK && pm->cmd.buttons & BUTTON_USE_HOLDABLE ) {
 			pm->cmd.buttons &= ~BUTTON_ATTACK;
 			pm->cmd.buttons &= ~BUTTON_USE_HOLDABLE;

@@ -827,7 +827,7 @@ int WPOrgVisible( gentity_t *bot, vector3 *org1, vector3 *org2, int ignore ) {
 int OrgVisibleBox( vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2, int ignore ) {
 	trace_t tr;
 
-	if ( RMG.integer ) {
+	if ( RMG.getInt() ) {
 		trap->Trace( &tr, org1, NULL, NULL, org2, ignore, MASK_SOLID, qfalse, 0, 0 );
 	}
 	else {
@@ -871,7 +871,7 @@ int CheckForFunc( vector3 *org, int ignore ) {
 
 //perform pvs check based on rmg or not
 qboolean BotPVSCheck( const vector3 *p1, const vector3 *p2 ) {
-	if ( RMG.integer && bot_pvstype.integer ) {
+	if ( RMG.getInt() && bot_pvstype.integer ) {
 		vector3 subPoint;
 		VectorSubtract( p1, p2, &subPoint );
 
@@ -892,7 +892,7 @@ int GetNearestVisibleWP( vector3 *org, int ignore ) {
 	vector3 a, mins, maxs;
 
 	i = 0;
-	if ( RMG.integer ) {
+	if ( RMG.getInt() ) {
 		bestdist = 300;
 	}
 	else {
@@ -909,7 +909,7 @@ int GetNearestVisibleWP( vector3 *org, int ignore ) {
 			VectorSubtract( org, &gWPArray[i]->origin, &a );
 			flLen = VectorLength( &a );
 
-			if ( flLen < bestdist && (RMG.integer || BotPVSCheck( org, &gWPArray[i]->origin )) && OrgVisibleBox( org, &mins, &maxs, &gWPArray[i]->origin, ignore ) ) {
+			if ( flLen < bestdist && (RMG.getInt() || BotPVSCheck( org, &gWPArray[i]->origin )) && OrgVisibleBox( org, &mins, &maxs, &gWPArray[i]->origin, ignore ) ) {
 				bestdist = flLen;
 				bestindex = i;
 			}
@@ -932,7 +932,7 @@ int PassWayCheck( bot_state_t *bs, int windex ) {
 		return 0;
 	}
 
-	if ( RMG.integer ) {
+	if ( RMG.getInt() ) {
 		if ( (gWPArray[windex]->flags & WPFLAG_RED_FLAG) ||
 			(gWPArray[windex]->flags & WPFLAG_BLUE_FLAG) ) { //red or blue flag, we'd like to get here
 			return 1;
@@ -977,7 +977,7 @@ float TotalTrailDistance( int start, int end, bot_state_t *bs ) {
 			return -1;
 		}
 
-		if ( !RMG.integer ) {
+		if ( !RMG.getInt() ) {
 			if ( (end > start && gWPArray[beginat]->flags & WPFLAG_ONEWAY_BACK) ||
 				(start > end && gWPArray[beginat]->flags & WPFLAG_ONEWAY_FWD) ) { //a one-way point, this means this path cannot be travelled to the final point
 				return -1;
@@ -1490,7 +1490,7 @@ int PassStandardEnemyChecks( bot_state_t *bs, gentity_t *en ) {
 		vector3 vs;
 		float vLen = 0;
 
-		if ( !g_friendlyFire.integer ) { //can't harm non-JM in JM mode if FF is off
+		if ( !g_friendlyFire.getInt() ) { //can't harm non-JM in JM mode if FF is off
 			return 0;
 		}
 
@@ -1752,7 +1752,7 @@ int ScanForEnemies( bot_state_t *bs ) {
 
 	if ( level.gametype == GT_JEDIMASTER ) {
 		if ( G_ThereIsAMaster() && !bs->cur_ps.isJediMaster ) { //if friendly fire is on in jedi master we can attack people that bug us
-			if ( !g_friendlyFire.integer ) {
+			if ( !g_friendlyFire.getInt() ) {
 				noAttackNonJM = qtrue;
 			}
 			else {
@@ -5122,7 +5122,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 	if ( bot_honorableduelacceptance.integer ) {
 		if ( bs->currentEnemy && bs->currentEnemy->client &&
 			bs->cur_ps.weapon == WP_SABER &&
-			g_privateDuel.integer &&
+			g_privateDuel.getInt() &&
 			bs->frame_Enemy_Vis &&
 			bs->frame_Enemy_Len < 400 &&
 			bs->currentEnemy->client->ps.weapon == WP_SABER &&
@@ -5186,7 +5186,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 
 	//ESTABLISH VISIBILITIES AND DISTANCES FOR THE WHOLE FRAME HERE
 	if ( bs->wpCurrent ) {
-		if ( RMG.integer ) { //this is somewhat hacky, but in RMG we don't really care about vertical placement because points are scattered across only the terrain.
+		if ( RMG.getInt() ) { //this is somewhat hacky, but in RMG we don't really care about vertical placement because points are scattered across only the terrain.
 			vector3 vecB, vecC;
 
 			vecB.x = bs->origin.x;
@@ -5272,7 +5272,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 		}
 
 		if ( bs->frame_Waypoint_Vis || (bs->wpCurrent->flags & WPFLAG_NOVIS) ) {
-			if ( RMG.integer )
+			if ( RMG.getInt() )
 				bs->wpSeenTime = level.time + 5000; //if we lose sight of the point, we have 1.5f seconds to regain it before we drop it
 			else
 				bs->wpSeenTime = level.time + 1500; //if we lose sight of the point, we have 1.5f seconds to regain it before we drop it
@@ -5322,7 +5322,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 			}
 		}
 
-		if ( RMG.integer ) {
+		if ( RMG.getInt() ) {
 			if ( bs->frame_Waypoint_Vis ) {
 				if ( bs->wpCurrent && !bs->wpCurrent->flags ) {
 					wpTouchDist *= 3;
@@ -5330,7 +5330,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 			}
 		}
 
-		if ( bs->frame_Waypoint_Len < wpTouchDist || (RMG.integer && bs->frame_Waypoint_Len < wpTouchDist * 2) ) {
+		if ( bs->frame_Waypoint_Len < wpTouchDist || (RMG.getInt() && bs->frame_Waypoint_Len < wpTouchDist * 2) ) {
 			WPTouchRoutine( bs );
 
 			if ( !bs->wpDirection ) {
@@ -5379,7 +5379,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 		doingFallback = BotFallbackNavigation( bs );
 	}
 
-	if ( RMG.integer ) { //for RMG if the bot sticks around an area too long, jump around randomly some to spread to a new area (horrible hacky method)
+	if ( RMG.getInt() ) { //for RMG if the bot sticks around an area too long, jump around randomly some to spread to a new area (horrible hacky method)
 		vector3 vSubDif;
 
 		VectorSubtract( &bs->origin, &bs->lastSignificantAreaChange, &vSubDif );
@@ -5403,7 +5403,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 		bs->lastSignificantChangeTime = level.time + 25000;
 	}
 
-	if ( bs->wpCurrent && RMG.integer ) {
+	if ( bs->wpCurrent && RMG.getInt() ) {
 		qboolean doJ = qfalse;
 
 		if ( bs->wpCurrent->origin.z - 192 > bs->origin.z )
@@ -5923,7 +5923,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 		}
 		else {
 #endif
-			if ( bot_forcepowers.integer && !g_forcePowerDisable.integer ) {
+			if ( bot_forcepowers.integer && !g_forcePowerDisable.getInt() ) {
 				trap->EA_ForcePower( bs->client );
 			}
 #ifndef FORCEJUMP_INSTANTMETHOD

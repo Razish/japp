@@ -678,7 +678,7 @@ void NPC_HandleAIFlags( void ) {
 			NPCInfo->ffireFadeDebounce = level.time + 3000;
 		}
 	}
-	if ( d_patched.integer ) {//use patch-style navigation
+	if ( d_patched.getInt() ) {//use patch-style navigation
 		if ( NPCInfo->consecutiveBlockedMoves > 20 ) {//been stuck for a while, try again?
 			NPCInfo->consecutiveBlockedMoves = 0;
 		}
@@ -1465,7 +1465,7 @@ void NPC_Think( gentity_t *self ) {
 	}
 
 	// see if NPC ai is frozen
-	if ( d_npcfreeze.integer || (NPC->r.svFlags&SVF_ICARUS_FREEZE) ) {
+	if ( d_npcfreeze.getInt() || (NPC->r.svFlags&SVF_ICARUS_FREEZE) ) {
 		NPC_UpdateAngles( qtrue, qtrue );
 		ClientThink( self->s.number, &ucmd );
 		//VectorCopy(self->s.origin, self->s.origin2 );
@@ -1525,7 +1525,7 @@ void NPC_Think( gentity_t *self ) {
 			return;
 		}
 
-		if ( NPC->s.weapon == WP_SABER && g_spSkill.integer >= 2 && NPCInfo->rank > RANK_LT_JG ) {//Jedi think faster on hard difficulty, except low-rank (reborn)
+		if ( NPC->s.weapon == WP_SABER && g_spSkill.getInt() >= 2 && NPCInfo->rank > RANK_LT_JG ) {//Jedi think faster on hard difficulty, except low-rank (reborn)
 			NPCInfo->nextBStateThink = level.time + FRAMETIME / 2;
 		}
 		else {//Maybe even 200 ms?

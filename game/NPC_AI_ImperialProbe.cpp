@@ -207,7 +207,7 @@ void ImperialProbe_Hunt( qboolean visible, qboolean advance ) {
 		VectorNormalize( &forward );
 	}
 
-	speed = HUNTER_FORWARD_BASE_SPEED + HUNTER_FORWARD_MULTIPLIER * g_spSkill.integer;
+	speed = HUNTER_FORWARD_BASE_SPEED + HUNTER_FORWARD_MULTIPLIER * g_spSkill.getInt();
 	VectorMA( &NPC->client->ps.velocity, speed, &forward, &NPC->client->ps.velocity );
 }
 
@@ -250,7 +250,7 @@ void ImperialProbe_FireBlaster( void ) {
 	missile->classname = "bryar_proj";
 	missile->s.weapon = WP_BRYAR_PISTOL;
 
-	if ( g_spSkill.integer <= 1 ) {
+	if ( g_spSkill.getInt() <= 1 ) {
 		missile->damage = 5;
 	}
 	else {
@@ -270,11 +270,11 @@ void ImperialProbe_Ranged( qboolean visible, qboolean advance ) {
 	if ( TIMER_Done( NPC, "attackDelay" ) )	// Attack?
 	{
 
-		if ( g_spSkill.integer == 0 ) {
+		if ( g_spSkill.getInt() == 0 ) {
 			delay_min = 500;
 			delay_max = 3000;
 		}
-		else if ( g_spSkill.integer > 1 ) {
+		else if ( g_spSkill.getInt() > 1 ) {
 			delay_min = 500;
 			delay_max = 2000;
 		}

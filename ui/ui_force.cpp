@@ -836,7 +836,7 @@ qboolean UI_ForceMaxRank_HandleKey( uint32_t flags, float *special, int key, int
 		num = i;
 
 		uiMaxRank = num;
-
+		
 		trap->Cvar_Set( "g_maxForceRank", va( "%i", num ) );
 
 		// The update force used will remove overallocated powers automatically.

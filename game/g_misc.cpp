@@ -165,7 +165,7 @@ void TeleportPlayer( gentity_t *player, vector3 *origin, vector3 *angles ) {
 
 	// use temp events at source and destination to prevent the effect
 	// from getting dropped by a second player event
-	if ( !(japp_teleportBits.integer & (1 << JAPP_TPBIT_SILENT)) && player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+	if ( !(japp_teleportBits.getBits() & (1 << JAPP_TPBIT_SILENT)) && player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		tent = G_TempEntity( &player->client->ps.origin, EV_PLAYER_TELEPORT_OUT );
 		tent->s.clientNum = player->s.clientNum;
 
@@ -181,12 +181,12 @@ void TeleportPlayer( gentity_t *player, vector3 *origin, vector3 *angles ) {
 
 	// spit the player out
 
-	if ( !(japp_teleportBits.integer & (1 << JAPP_TPBIT_KEEPVELOCITY)) ) {// set velocity
+	if ( !(japp_teleportBits.getBits() & (1 << JAPP_TPBIT_KEEPVELOCITY)) ) {// set velocity
 		AngleVectors( angles, &player->client->ps.velocity, NULL, NULL );
 		VectorScale( &player->client->ps.velocity, 400, &player->client->ps.velocity );
 	}
 
-	if ( !(japp_teleportBits.integer & (1 << JAPP_TPBIT_NOSLICK)) ) {//set slick
+	if ( !(japp_teleportBits.getBits() & (1 << JAPP_TPBIT_NOSLICK)) ) {//set slick
 		player->client->ps.pm_time = 160;		// hold time
 		player->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 	}
@@ -195,13 +195,13 @@ void TeleportPlayer( gentity_t *player, vector3 *origin, vector3 *angles ) {
 	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
 
 	// set viewangles
-	if ( !(japp_teleportBits.integer & (1 << JAPP_TPBIT_KEEPANGLES)) ) {
+	if ( !(japp_teleportBits.getBits() & (1 << JAPP_TPBIT_KEEPANGLES)) ) {
 		SetClientViewAngle( player, angles );
 	}
 
 	// kill anything at the destination
 	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-		if ( !(japp_teleportBits.integer & (1 << JAPP_TPBIT_NOTELEFRAG)) )
+		if ( !(japp_teleportBits.getBits() & (1 << JAPP_TPBIT_NOTELEFRAG)) )
 			G_KillBox( player );
 		else
 			G_AvoidBox( player );
@@ -479,8 +479,7 @@ void SP_terrain( gentity_t *ent ) {
 	int					terrainID;
 
 	//Force it to 1 when there is terrain on the level.
-	trap->Cvar_Set( "RMG", "1" );
-	RMG.integer = 1;
+	RMG.setInt( 1 );
 
 	VectorClear( &ent->s.angles );
 	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
@@ -489,7 +488,7 @@ void SP_terrain( gentity_t *ent ) {
 	//	shaderNum = gi.CM_GetShaderNum(s.modelindex);
 	shaderNum = 0;
 
-	if ( RMG.integer ) {
+	if ( RMG.getInt() ) {
 		/*
 		// Grab the default terrain file from the RMG cvar
 		trap->Cvar_VariableStringBuffer("RMG_terrain", temp, MAX_QPATH);
@@ -586,7 +585,7 @@ void SP_terrain( gentity_t *ent ) {
 	trap->LinkEntity( (sharedEntity_t *)ent );
 
 	// If running RMG then initialize the terrain and handle team skins
-	if ( RMG.integer ) {
+	if ( RMG.getInt() ) {
 		trap->RMG_Init(/*terrainID*/ );
 
 		/*
@@ -794,7 +793,7 @@ void HolocronTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 		}
 	}
 
-	if ( g_maxHolocronCarry.integer && othercarrying >= g_maxHolocronCarry.integer ) { //make the oldest holocron carried by the player pop out to make room for this one
+	if ( g_maxHolocronCarry.getInt() && othercarrying >= g_maxHolocronCarry.getInt() ) { //make the oldest holocron carried by the player pop out to make room for this one
 		other->client->ps.holocronsCarried[index_lowest] = 0;
 
 		/*

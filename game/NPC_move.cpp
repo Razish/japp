@@ -213,7 +213,7 @@ qboolean NPC_GetMoveDirectionAltRoute( vector3 *out, float *distance, qboolean t
 	}
 	else {//we have no architectural problems, see if there are ents inthe way and try to go around them
 		//not blocked
-		if ( d_altRoutes.integer ) {//try macro nav
+		if ( d_altRoutes.getInt() ) {//try macro nav
 			navInfo_t	tempInfo;
 			memcpy( &tempInfo, &frameNavInfo, sizeof(tempInfo) );
 			if ( NAVNEW_AvoidCollision( NPC, NPCInfo->goalEntity, &tempInfo, qtrue, 5 ) == qfalse ) {//revert to macro nav

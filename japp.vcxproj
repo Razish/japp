@@ -64,6 +64,7 @@
     <ClInclude Include="game\bg_saga.h" />
     <ClInclude Include="game\bg_vehicles.h" />
     <ClInclude Include="game\bg_weapons.h" />
+    <ClInclude Include="game\bg_xcvar.h" />
     <ClInclude Include="game\botlib.h" />
     <ClInclude Include="game\b_local.h" />
     <ClInclude Include="game\b_public.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="game\bg_slidemove.cpp" />
     <ClCompile Include="game\bg_vehicleLoad.cpp" />
     <ClCompile Include="game\bg_weapons.cpp" />
+    <ClCompile Include="game\bg_xcvar.cpp" />
     <ClCompile Include="game\FighterNPC.cpp" />
     <ClCompile Include="game\g_active.cpp" />
     <ClCompile Include="game\g_admin.cpp" />

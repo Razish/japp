@@ -623,7 +623,7 @@ void NPC_SpawnEffect( gentity_t *ent ) {
 // Set up any special parms for spawn effects
 void NPC_SetFX_SpawnStates( gentity_t *ent ) {
 	if ( !(ent->NPC->aiFlags&NPCAI_CUSTOM_GRAVITY) ) {
-		ent->client->ps.gravity = g_gravity.value;
+		ent->client->ps.gravity = g_gravity.getFloat();
 	}
 }
 
@@ -710,7 +710,7 @@ void NPC_Begin( gentity_t *ent ) {
 			//&& ent->client->NPC_class != CLASS_TAVION
 			//&& ent->client->NPC_class != CLASS_DESANN
 			&& ent->client->NPC_class != CLASS_JEDI ) {// up everyone except jedi
-			ent->NPC->stats.health += ent->NPC->stats.health / 4 * g_spSkill.integer; // 100% on easy, 125% on medium, 150% on hard
+			ent->NPC->stats.health += ent->NPC->stats.health / 4 * g_spSkill.getInt(); // 100% on easy, 125% on medium, 150% on hard
 		}
 
 		client->pers.maxHealth = client->ps.stats[STAT_MAX_HEALTH] = ent->NPC->stats.health;
@@ -721,7 +721,7 @@ void NPC_Begin( gentity_t *ent ) {
 
 	if ( !Q_stricmp( "rodian", ent->NPC_type ) ) {//sniper
 		//NOTE: this will get overridden by any aim settings in their spawnscripts
-		switch ( g_spSkill.integer ) {
+		switch ( g_spSkill.getInt() ) {
 		case 0:
 			ent->NPC->stats.aim = 1;
 			break;
@@ -739,7 +739,7 @@ void NPC_Begin( gentity_t *ent ) {
 		|| ent->client->NPC_class == CLASS_SWAMPTROOPER
 		|| ent->client->NPC_class == CLASS_IMPWORKER
 		|| !Q_stricmp( "rodian2", ent->NPC_type ) ) {//tweak yawspeed for these NPCs based on difficulty
-		switch ( g_spSkill.integer ) {
+		switch ( g_spSkill.getInt() ) {
 		case 0:
 			ent->NPC->stats.yawSpeed *= 0.75f;
 			if ( ent->client->NPC_class == CLASS_IMPWORKER ) {
@@ -763,7 +763,7 @@ void NPC_Begin( gentity_t *ent ) {
 	}
 	else if ( ent->client->NPC_class == CLASS_REBORN
 		|| ent->client->NPC_class == CLASS_SHADOWTROOPER ) {
-		switch ( g_spSkill.integer ) {
+		switch ( g_spSkill.getInt() ) {
 		case 1:
 			ent->NPC->stats.yawSpeed *= 1.25f;
 			break;
@@ -857,7 +857,7 @@ void NPC_Begin( gentity_t *ent ) {
 	client->ps.pm_time = 100;
 
 	client->respawnTime = level.time;
-	client->inactivityTime = level.time + g_inactivity.value * 1000;
+	client->inactivityTime = level.time + g_inactivity.getFloat() * 1000;
 	client->latched_buttons = 0;
 	if ( ent->s.m_iVehicleNum ) {//I'm an NPC in a vehicle (or a vehicle), I already have owner set
 	}
@@ -1560,7 +1560,7 @@ void NPC_PrecacheType( const char *NPC_type ) {
 void SP_NPC_spawner( gentity_t *self ) {
 	int t;
 
-	if ( !g_allowNPC.integer ) {
+	if ( !g_allowNPC.getInt() ) {
 		self->think = G_FreeEntity;
 		self->nextthink = level.time;
 		return;

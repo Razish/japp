@@ -756,8 +756,8 @@ void G_RunMissile( gentity_t *ent ) {
 		}
 	}
 	// trace a line from the previous position to the current position
-	if ( d_projectileGhoul2Collision.integer ) {
-		trap->Trace( &tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &origin, passent, ent->clipmask, qfalse, G2TRFLAG_DOGHOULTRACE | G2TRFLAG_GETSURFINDEX | G2TRFLAG_THICK | G2TRFLAG_HITCORPSES, g_g2TraceLod.integer );
+	if ( d_projectileGhoul2Collision.getInt() ) {
+		trap->Trace( &tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &origin, passent, ent->clipmask, qfalse, G2TRFLAG_DOGHOULTRACE | G2TRFLAG_GETSURFINDEX | G2TRFLAG_THICK | G2TRFLAG_HITCORPSES, g_g2TraceLod.getInt() );
 
 		if ( tr.fraction != 1.0f && tr.entityNum < ENTITYNUM_WORLD ) {
 			gentity_t *g2Hit = &g_entities[tr.entityNum];
@@ -823,7 +823,7 @@ void G_RunMissile( gentity_t *ent ) {
 	if ( ent->parent && ent->parent->client && ent->parent->client->hook && ent->parent->client->hook == ent
 		&& (ent->parent->client->ps.duelInProgress
 		|| BG_SaberInSpecial( ent->parent->client->ps.saberMove )
-		|| !(japp_allowHook.integer & (1 << level.gametype))
+		|| !(japp_allowHook.getInt() & (1 << level.gametype))
 		|| ent->parent->client->pers.adminData.isSlept
 		|| g_entities[tr.entityNum].client) )
 	{
@@ -910,7 +910,7 @@ gentity_t *fire_grapple( gentity_t *self, vector3 *start, vector3 *dir ) {
 
 	VectorNormalize( dir );
 
-	hook = CreateMissile( start, dir, japp_hookSpeed.value, 10000, self, qfalse );//G_Spawn();
+	hook = CreateMissile( start, dir, japp_hookSpeed.getFloat(), 10000, self, qfalse );//G_Spawn();
 	hook->classname = "hook";
 	hook->nextthink = level.time + 10000;
 	hook->think = Weapon_HookFree;
@@ -924,7 +924,7 @@ gentity_t *fire_grapple( gentity_t *self, vector3 *start, vector3 *dir ) {
 	hook->target_ent = NULL;
 
 	hook->s.pos.trType = TR_LINEAR;
-	hook->s.pos.trTime = level.time - japp_hookSpeed.integer;
+	hook->s.pos.trTime = level.time - japp_hookSpeed.getInt();
 	hook->s.otherEntityNum = self->s.number;	//	Used to match beam in client
 
 	if ( self->client->pers.adminData.isGhost ) {

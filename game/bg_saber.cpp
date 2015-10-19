@@ -31,7 +31,7 @@ void BG_ForcePowerDrain( playerState_t *ps, forcePowers_t forcePower, int overri
 	int	drain = overrideAmt;
 
 #ifdef PROJECT_GAME
-	if ( g_entities[ps->clientNum].client->pers.adminData.empowered && !japp_empowerDrain.integer )
+	if ( g_entities[ps->clientNum].client->pers.adminData.empowered && !japp_empowerDrain.getInt() )
 		return;
 #endif
 

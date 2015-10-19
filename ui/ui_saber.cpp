@@ -994,14 +994,14 @@ void UI_GetSaberForMenu( char *saber, int saberNum ) {
 	if ( saberNum == 0 ) {
 		trap->Cvar_VariableStringBuffer( "ui_saber", saber, MAX_QPATH );
 		if ( !UI_SaberValidForPlayerInMP( saber ) ) {
-			trap->Cvar_Set( "ui_saber", "kyle" );
+			ui_saber.setString( "kyle" );
 			trap->Cvar_VariableStringBuffer( "ui_saber", saber, MAX_QPATH );
 		}
 	}
 	else {
 		trap->Cvar_VariableStringBuffer( "ui_saber2", saber, MAX_QPATH );
 		if ( !UI_SaberValidForPlayerInMP( saber ) ) {
-			trap->Cvar_Set( "ui_saber2", "kyle" );
+			ui_saber2.setString( "kyle" );
 			trap->Cvar_VariableStringBuffer( "ui_saber2", saber, MAX_QPATH );
 		}
 	}
@@ -1054,7 +1054,7 @@ void UI_SaberDrawBlades( itemDef_t *item, vector3 *origin, vector3 *angles ) {
 		else if ( (item->flags&ITF_ISSABER) ) {
 			trap->Cvar_VariableStringBuffer( "ui_saber", saber, sizeof(saber) );
 			if ( !UI_SaberValidForPlayerInMP( saber ) ) {
-				trap->Cvar_Set( "ui_saber", "kyle" );
+				ui_saber.setString( "kyle" );
 				trap->Cvar_VariableStringBuffer( "ui_saber", saber, sizeof(saber) );
 			}
 			saberModel = 0;
@@ -1062,7 +1062,7 @@ void UI_SaberDrawBlades( itemDef_t *item, vector3 *origin, vector3 *angles ) {
 		else if ( (item->flags&ITF_ISSABER2) ) {
 			trap->Cvar_VariableStringBuffer( "ui_saber2", saber, sizeof(saber) );
 			if ( !UI_SaberValidForPlayerInMP( saber ) ) {
-				trap->Cvar_Set( "ui_saber2", "kyle" );
+				ui_saber2.setString( "kyle" );
 				trap->Cvar_VariableStringBuffer( "ui_saber2", saber, sizeof(saber) );
 			}
 			saberModel = 0;

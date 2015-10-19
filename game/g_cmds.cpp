@@ -280,7 +280,7 @@ static gentity_t *G_AttackerCheck( gentity_t *ent ) {
 	if ( attacker && attacker->client && ent->client->ps.otherKillerTime > level.time
 		&& attacker->client->sess.sessionTeam != TEAM_SPECTATOR && attacker->client->tempSpectate < level.time
 		&& (attacker->client->sess.sessionTeam != ent->client->sess.sessionTeam
-		|| (g_gametype.integer < GT_TEAM && attacker->client->sess.sessionTeam == TEAM_FREE)) && attacker->health > 0 )
+		|| (level.gametype < GT_TEAM && attacker->client->sess.sessionTeam == TEAM_FREE)) && attacker->health > 0 )
 	{
 		otherKiller = qtrue;
 	}
@@ -292,7 +292,7 @@ static gentity_t *G_AttackerCheck( gentity_t *ent ) {
 void Cmd_Kill_f( gentity_t *ent ) {
 	gentity_t *attacker = NULL;
 
-	if ( ent->client->ps.fallingToDeath && !japp_allowFallSuicide.integer ) {
+	if ( ent->client->ps.fallingToDeath && !japp_allowFallSuicide.getInt() ) {
 		return;
 	}
 
@@ -306,7 +306,7 @@ void Cmd_Kill_f( gentity_t *ent ) {
 	}
 
 	if ( (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) && level.numPlayingClients > 1 && !level.warmupTime
-		&& !g_allowDuelSuicide.integer ) {
+		&& !g_allowDuelSuicide.getInt() ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "ATTEMPTDUELKILL" ) ) );
 		return;
 	}
@@ -448,7 +448,7 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 		else
 			team = PickTeam( clientNum );
 
-		if ( g_teamForceBalance.integer && !g_jediVmerc.integer ) {
+		if ( g_teamForceBalance.getInt() && !g_jediVmerc.getInt() ) {
 			int counts[TEAM_NUM_TEAMS];
 
 			counts[TEAM_BLUE] = TeamCount( ent - g_entities, TEAM_BLUE );
@@ -506,7 +506,7 @@ qboolean SetTeam( gentity_t *ent, const char *s, qboolean forced ) {
 		team = TEAM_SPECTATOR;
 	else if ( level.gametype == GT_POWERDUEL && (level.numPlayingClients >= 3 || G_PowerDuelCheckFail( ent )) )
 		team = TEAM_SPECTATOR;
-	else if ( g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer )
+	else if ( g_maxGameClients.getInt() > 0 && level.numNonSpectatorClients >= g_maxGameClients.getInt() )
 		team = TEAM_SPECTATOR;
 
 	// decide if we will allow the change
@@ -844,7 +844,7 @@ static void Cmd_SiegeClass_f( gentity_t *ent ) {
 
 static void Cmd_ForceChanged_f( gentity_t *ent ) {
 	// if it's a spec, just make the changes now
-	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR || japp_instantForceSwitch.integer) {
+	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR || japp_instantForceSwitch.getInt()) {
 		WP_InitForcePowers( ent );
 	}
 	else {
@@ -1174,7 +1174,7 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 	}
 
 	// echo the text to the console
-	if ( dedicated.integer ) {
+	if ( dedicated.getInt() ) {
 		trap->Print( "%s%s\n", name, text );
 	}
 
@@ -1343,7 +1343,7 @@ static void Cmd_VoiceCommand_f( gentity_t *ent ) {
 	if ( trap->Argc() < 2 )
 		return;
 
-	if ( !(japp_allowVoiceChat.bits & (1 << level.gametype)) ) {
+	if ( !(japp_allowVoiceChat.getBits() & (1 << level.gametype)) ) {
 		trap->SendServerCommand( ent - g_entities, "print \"voice_cmd is not applicable in this gametype\n\"" );
 		return;
 	}
@@ -1622,15 +1622,15 @@ static qboolean G_VoteMap( gentity_t *ent, int numArgs, const char *arg1, const 
 	}
 	trap->FS_Close( fp );
 
-	if ( !japp_voteMapAnyGT.integer && !G_DoesMapSupportGametype( arg2, level.gametype ) ) {
+	if ( !japp_voteMapAnyGT.getInt() && !G_DoesMapSupportGametype( arg2, level.gametype ) ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NOVOTE_MAPNOTSUPPORTEDBYGAME" ) ) );
 		return qfalse;
 	}
 
 	// preserve the map rotation
-	if ( nextmap.string[0] ) {
+	if ( nextmap.stringlen() ) {
 		Com_sprintf( level.voteString, sizeof(level.voteString), "%s %s; set nextmap \"%s\"", arg1, arg2,
-			nextmap.string );
+			nextmap.getStr() );
 	}
 	else {
 		Com_sprintf( level.voteString, sizeof(level.voteString), "%s %s", arg1, arg2 );
@@ -1666,7 +1666,7 @@ static qboolean G_VoteMapRestart( gentity_t *ent, int numArgs, const char *arg1,
 }
 
 static qboolean G_VoteNextmap( gentity_t *ent, int numArgs, const char *arg1, const char *arg2 ) {
-	if ( !nextmap.string[0] ) {
+	if ( !nextmap.stringlen() ) {
 		trap->SendServerCommand( ent - g_entities, "print \"nextmap not set.\n\"" );
 		return qfalse;
 	}
@@ -1749,7 +1749,7 @@ void SV_ToggleAllowVote_f( void ) {
 	if ( trap->Argc() == 1 ) {
 		int i = 0;
 		for ( i = 0; i < validVoteStringsSize; i++ ) {
-			if ( (g_allowVote.bits & (1 << i)) ) {
+			if ( (g_allowVote.getBits() & (1 << i)) ) {
 				trap->Print( "%2d [X] %s\n", i, validVoteStrings[i].string );
 			}
 			else {
@@ -1772,10 +1772,9 @@ void SV_ToggleAllowVote_f( void ) {
 			return;
 		}
 
-		trap->Cvar_Set( "g_allowVote", va( "%i", (1 << index) ^ (g_allowVote.bits & mask ) ) );
-		trap->Cvar_Update( &g_allowVote );
+		g_allowVote.setBits( (1 << index) ^ (g_allowVote.getBits() & mask) );
 
-		trap->Print( "%s %s^7\n", validVoteStrings[index].string, ((g_allowVote.bits & (1 << index))
+		trap->Print( "%s %s^7\n", validVoteStrings[index].string, ((g_allowVote.getBits() & (1 << index))
 			? "^2Enabled" : "^1Disabled") );
 	}
 }
@@ -1786,7 +1785,7 @@ static void Cmd_CallVote_f( gentity_t *ent ) {
 	voteString_t	*vote = NULL;
 
 	// not allowed to vote at all
-	if ( !g_allowVote.integer ) {
+	if ( !g_allowVote.getInt() ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "NOVOTE" ) ) );
 		return;
 	}
@@ -1817,7 +1816,7 @@ static void Cmd_CallVote_f( gentity_t *ent ) {
 
 	// check for invalid votes
 	for ( i = 0; i < validVoteStringsSize; i++ ) {
-		if ( !(g_allowVote.bits & (1 << i)) )
+		if ( !(g_allowVote.getBits() & (1 << i)) )
 			continue;
 
 		if ( !Q_stricmp( arg1, validVoteStrings[i].string ) )
@@ -1845,7 +1844,7 @@ static void Cmd_CallVote_f( gentity_t *ent ) {
 		trap->SendServerCommand( ent - g_entities, "print \"Invalid vote string.\n\"" );
 		trap->SendServerCommand( ent - g_entities, "print \"Allowed vote strings are: \"" );
 		for ( i = 0; i < validVoteStringsSize; i++ ) {
-			if ( !(g_allowVote.bits & (1 << i)) )
+			if ( !(g_allowVote.getBits() & (1 << i)) )
 				continue;
 
 			toggle = !toggle;
@@ -1878,7 +1877,7 @@ validVote:
 
 	level.votingGametype = qfalse;
 
-	level.voteExecuteDelay = vote->voteDelay ? japp_voteDelay.integer : 0;
+	level.voteExecuteDelay = vote->voteDelay ? japp_voteDelay.getInt() : 0;
 
 	// there is still a vote to be executed, execute it and store the new vote
 	if ( level.voteExecuteTime ) {
@@ -2187,7 +2186,7 @@ void Cmd_SaberAttackCycle_f( gentity_t *ent ) {
 				}
 			}
 
-			if ( d_saberStanceDebug.integer )
+			if ( d_saberStanceDebug.getInt() )
 				trap->SendServerCommand( ent - g_entities, va( "print \"SABERSTANCEDEBUG: Attempted to toggle dual saber blade.\n\"" ) );
 			return;
 		}
@@ -2198,7 +2197,7 @@ void Cmd_SaberAttackCycle_f( gentity_t *ent ) {
 			// second blade off
 			if ( ent->client->ps.saberInFlight ) {
 				// can't turn second blade back on if it's in the air, you naughty boy!
-				if ( d_saberStanceDebug.integer )
+				if ( d_saberStanceDebug.getInt() )
 					trap->SendServerCommand( ent - g_entities, va( "print \"SABERSTANCEDEBUG: Attempted to toggle staff blade in air.\n\"" ) );
 				return;
 			}
@@ -2238,7 +2237,7 @@ void Cmd_SaberAttackCycle_f( gentity_t *ent ) {
 				}
 			}
 		}
-		if ( d_saberStanceDebug.integer )
+		if ( d_saberStanceDebug.getInt() )
 			trap->SendServerCommand( ent - g_entities, va( "print \"SABERSTANCEDEBUG: Attempted to toggle staff blade.\n\"" ) );
 		return;
 	}
@@ -2269,14 +2268,14 @@ void Cmd_SaberAttackCycle_f( gentity_t *ent ) {
 			}
 		}
 
-		if ( d_saberStanceDebug.integer )
+		if ( d_saberStanceDebug.getInt() )
 			trap->SendServerCommand( ent - g_entities, va( "print \"SABERSTANCEDEBUG: Attempted to cycle given class stance.\n\"" ) );
 	}
 	else {
 		selectLevel++;
 		if ( selectLevel > ent->client->ps.fd.forcePowerLevel[FP_SABER_OFFENSE] )
 			selectLevel = FORCE_LEVEL_1;
-		if ( d_saberStanceDebug.integer )
+		if ( d_saberStanceDebug.getInt() )
 			trap->SendServerCommand( ent - g_entities, va( "print \"SABERSTANCEDEBUG: Attempted to cycle stance normally.\n\"" ) );
 	}
 
@@ -2307,7 +2306,7 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 	trace_t *tr;
 	int weapon = WP_SABER;
 
-	if ( !(g_privateDuel.bits & PRIVDUEL_ALLOW) ) {
+	if ( !(g_privateDuel.getBits() & PRIVDUEL_ALLOW) ) {
 		return;
 	}
 
@@ -2325,7 +2324,7 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 	}
 
 	// no private dueling in team modes
-	if ( !(g_privateDuel.bits & PRIVDUEL_TEAM) && level.gametype >= GT_TEAM ) {
+	if ( !(g_privateDuel.getBits() & PRIVDUEL_TEAM) && level.gametype >= GT_TEAM ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"",
 			G_GetStringEdString( "MP_SVGAME", "NODUEL_GAMETYPE" ) ) );
 		return;
@@ -2340,18 +2339,18 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 	}
 
 	//New: Don't let a player duel if he just did and hasn't waited 10 seconds yet (note: If someone challenges him, his duel timer will reset so he can accept)
-	if ( !(g_privateDuel.bits & PRIVDUEL_MULTI) && ent->client->ps.fd.privateDuelTime > level.time ) {
+	if ( !(g_privateDuel.getBits() & PRIVDUEL_MULTI) && ent->client->ps.fd.privateDuelTime > level.time ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "CANTDUEL_JUSTDID" ) ) );
 		return;
 	}
 
 	//Raz: Multi-duel
-	if ( !(g_privateDuel.bits & PRIVDUEL_MULTI) && G_OtherPlayersDueling() ) {
+	if ( !(g_privateDuel.getBits() & PRIVDUEL_MULTI) && G_OtherPlayersDueling() ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "CANTDUEL_BUSY" ) ) );
 		return;
 	}
 
-	if ( (g_privateDuel.bits & PRIVDUEL_WEAP) ) {
+	if ( (g_privateDuel.getBits() & PRIVDUEL_WEAP) ) {
 		if ( !(ent->client->pers.CSF & CSF_WEAPONDUEL) || trap->Argc() == 1 ) {
 			weapon = ent->client->ps.weapon;
 		}
@@ -2446,11 +2445,11 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 				= challenged->health
 				= ent->client->ps.stats[STAT_HEALTH]
 				= challenged->client->ps.stats[STAT_HEALTH]
-				= g_privateDuelHealth.integer;
+				= g_privateDuelHealth.getInt();
 
 			ent->client->ps.stats[STAT_ARMOR]
 				= challenged->client->ps.stats[STAT_ARMOR]
-				= g_privateDuelShield.integer;
+				= g_privateDuelShield.getInt();
 
 		}
 		else {
@@ -3067,7 +3066,7 @@ static void Cmd_Drop_f( gentity_t *ent ) {
 	if ( !Q_stricmp( arg, "flag" ) ) {
 		powerup_t powerup = (ent->client->ps.persistant[PERS_TEAM] == TEAM_RED) ? PW_BLUEFLAG : PW_REDFLAG;
 
-		if ( !japp_allowFlagDrop.integer ) {
+		if ( !japp_allowFlagDrop.getInt() ) {
 			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Not allowed to drop the flag\n\"" );
 			return;
 		}
@@ -3101,7 +3100,7 @@ static void Cmd_Drop_f( gentity_t *ent ) {
 		vector3 angs = { 0.0f, 0.0f, 0.0f };
 		int ammo, i = 0;
 
-		if ( !japp_allowWeaponDrop.integer ) {
+		if ( !japp_allowWeaponDrop.getInt() ) {
 			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Not allowed to drop weapons\n\"" );
 			return;
 		}
@@ -3266,11 +3265,11 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 
 		// SP/MP
 		Q_PrintBuffer( &pb, va( "  %s" S_COLOR_WHITE "style\n",
-			d_saberSPStyleDamage.integer ? S_COLOR_GREEN "SP " : S_COLOR_RED "MP ") );
+			d_saberSPStyleDamage.getInt() ? S_COLOR_GREEN "SP " : S_COLOR_RED "MP ") );
 
 		// JA++ tweaks
-		if ( japp_saberTweaks.integer ) {
-			const uint32_t tweaks = japp_saberTweaks.integer;
+		if ( japp_saberTweaks.getInt() ) {
+			const uint32_t tweaks = japp_saberTweaks.getBits();
 			Q_PrintBuffer( &pb, "  JA++ tweaks:\n" );
 
 			Q_PrintBuffer( &pb, va( "    Interpolation %s" S_COLOR_WHITE "\n",
@@ -3286,12 +3285,12 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 			Q_PrintBuffer( &pb, va( "    Reduce blocks %s " S_COLOR_WHITE "(%s%.02f " S_COLOR_WHITE "- %s%.02f"
 				S_COLOR_WHITE ") * %s%.02f" S_COLOR_WHITE "\n",
 				(tweaks & SABERTWEAK_REDUCEBLOCKS) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled",
-				(japp_saberBlockChanceMin.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceMin ) ))
-				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMin.value,
-				(japp_saberBlockChanceMax.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceMax ) ))
-				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMax.value,
-				(japp_saberBlockChanceScale.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceScale ) ))
-				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceScale.value ) );
+				(!japp_saberBlockChanceMin.isDefault())
+				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMin.getFloat(),
+				(!japp_saberBlockChanceMax.isDefault())
+				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMax.getFloat(),
+				(!japp_saberBlockChanceScale.isDefault())
+				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceScale.getFloat() ) );
 
 #ifdef _DEBUG
 			if ( tweaks & SABERTWEAK_REDUCEBLOCKS ) {
@@ -3299,10 +3298,10 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 				for ( ourLevel = 1; ourLevel <= 3; ourLevel++ ) {
 					for ( theirLevel = 1; theirLevel <= 3; theirLevel++ ) {
 						const float diff = (float)(theirLevel - ourLevel); // range [0, 2]
-						const float parity = japp_saberBlockStanceParity.value; // range [0, 3]
-						const float chanceMin = japp_saberBlockChanceMin.value;
-						const float chanceMax = japp_saberBlockChanceMax.value;
-						const float chanceScalar = japp_saberBlockChanceScale.value;
+						const float parity = japp_saberBlockStanceParity.getFloat(); // range [0, 3]
+						const float chanceMin = japp_saberBlockChanceMin.getFloat();
+						const float chanceMax = japp_saberBlockChanceMax.getFloat();
+						const float chanceScalar = japp_saberBlockChanceScale.getFloat();
 						const float chance = Q_clamp( chanceMin, (1.0f - (diff / parity)) * chanceScalar, chanceMax );
 						Q_PrintBuffer( &pb, va( "      %i blocking %i: %.03f\n", ourLevel, theirLevel, chance ) );
 					}
@@ -3311,22 +3310,22 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 #endif // _DEBUG
 
 			Q_PrintBuffer( &pb, va( "      %s%.03f " S_COLOR_WHITE "stance parity\n",
-				(japp_saberBlockStanceParity.value != atoff( G_Cvar_DefaultString( &japp_saberBlockStanceParity ) ))
-				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockStanceParity.value ) );
+				(!japp_saberBlockStanceParity.isDefault())
+				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockStanceParity.getFloat() ) );
 
 			Q_PrintBuffer( &pb, S_COLOR_WHITE "\n" );
 		}
 
 		// damage scale
 		Q_PrintBuffer( &pb, va( "  %s%.03f " S_COLOR_WHITE "damage scale\n",
-			(g_saberDamageScale.value != atoff( G_Cvar_DefaultString( &g_saberDamageScale ) ))
-			? S_COLOR_RED : S_COLOR_GREEN, g_saberDamageScale.value ) );
+			(!g_saberDamageScale.isDefault())
+			? S_COLOR_RED : S_COLOR_GREEN, g_saberDamageScale.getFloat() ) );
 
 		// idle damage
 		Q_PrintBuffer( &pb, va( "  " S_COLOR_WHITE "Idle damage %s" S_COLOR_WHITE "\n",
-			(japp_saberIdleDamage.integer != atoff( G_Cvar_DefaultString( &japp_saberIdleDamage ) ))
+			(!japp_saberIdleDamage.isDefault())
 			? S_COLOR_RED : S_COLOR_GREEN,
-			japp_saberIdleDamage.integer ? "enabled" : "disabled" ) );
+			japp_saberIdleDamage.getInt() ? "enabled" : "disabled" ) );
 
 		Q_PrintBuffer( &pb, "\n" );
 	}
@@ -3377,7 +3376,7 @@ static void Cmd_Ready_f( gentity_t *ent ) {
 	gentity_t *e = NULL;
 	int i = 0;
 
-	if ( !g_doWarmup.integer || level.warmupTime == 0 || level.restarted || level.allReady ) {
+	if ( !g_doWarmup.getInt() || level.warmupTime == 0 || level.restarted || level.allReady ) {
 		return;
 	}
 
@@ -3464,7 +3463,7 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 				ent->client->pers.saber2 ) );
 		}
 	}
-	else if ( !(japp_allowSaberSwitch.bits & (1 << level.gametype)) ) {
+	else if ( !(japp_allowSaberSwitch.getBits() & (1 << level.gametype)) ) {
 		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Not allowed to change saber\n\"" );
 		return;
 	}
@@ -3490,7 +3489,7 @@ static void Cmd_Saber_f( gentity_t *ent ) {
 		}
 
 		//HACK: should really find a way around this :D
-		if ( japp_antiUserinfoFlood.integer && ent->userinfoSpam >= 12 ) {
+		if ( japp_antiUserinfoFlood.getInt() && ent->userinfoSpam >= 12 ) {
 			return;
 		}
 
@@ -3592,7 +3591,7 @@ qboolean SetEmote( gentity_t *ent, const emote_t *emote ) {
 	forceHandAnims_t handExtend = HANDEXTEND_TAUNT;
 	int emoteTime;
 
-	if ( !(japp_allowEmotes.bits & (1 << level.gametype)) ) {
+	if ( !(japp_allowEmotes.getBits() & (1 << level.gametype)) ) {
 		trap->SendServerCommand( ent - g_entities, "print \"Emotes are not allowed in this gametype\n\"" );
 		return qfalse;
 	}
@@ -3768,7 +3767,7 @@ static void Cmd_Emote_kiss( gentity_t *ent ) {
 static void Cmd_Jetpack_f( gentity_t *ent ) {
 	const gitem_t *item = BG_FindItemForHoldable( HI_JETPACK );
 
-	if ( ent->client->ps.duelInProgress || !(japp_allowJetpack.bits & (1 << level.gametype)) ) {
+	if ( ent->client->ps.duelInProgress || !(japp_allowJetpack.getBits() & (1 << level.gametype)) ) {
 		return;
 	}
 
@@ -3903,7 +3902,7 @@ uint32_t G_CmdValid( const gentity_t *ent, const command_t *cmd ) {
 	if ( (cmd->flags & CMDFLAG_NOINTERMISSION) && level.intermissiontime )
 		return CMDFAIL_NOINTERMISSION;
 
-	if ( (cmd->flags & CMDFLAG_CHEAT) && !sv_cheats.integer )
+	if ( (cmd->flags & CMDFLAG_CHEAT) && !sv_cheats.getInt() )
 		return CMDFAIL_CHEAT;
 
 	if ( (cmd->flags & CMDFLAG_ALIVE)

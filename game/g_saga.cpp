@@ -96,7 +96,7 @@ void InitSiegeMode( void ) {
 	SiegeSetCompleteData( 0 );
 
 	//get pers data in case it existed from last level
-	if ( g_siegeTeamSwitch.integer ) {
+	if ( g_siegeTeamSwitch.getInt() ) {
 		trap->SiegePersGet( &g_siegePersistant );
 		if ( g_siegePersistant.beatingTime ) {
 			trap->SetConfigstring( CS_SIEGE_TIMEOVERRIDE, va( "%i", g_siegePersistant.lastTime ) );
@@ -140,15 +140,15 @@ void InitSiegeMode( void ) {
 	}
 
 	if ( BG_SiegeGetValueGroup( siege_info, "Teams", teams ) ) {
-		if ( g_siegeTeam1.string[0] && Q_stricmp( g_siegeTeam1.string, "none" ) ) { //check for override
-			Q_strncpyz( team1, g_siegeTeam1.string, sizeof(team1) );
+		if ( g_siegeTeam1.stringlen() && Q_stricmp( g_siegeTeam1.getStr(), "none" ) ) { //check for override
+			Q_strncpyz( team1, g_siegeTeam1.getStr(), sizeof(team1) );
 		}
 		else { //otherwise use level default
 			BG_SiegeGetPairedValue( teams, "team1", team1 );
 		}
 
-		if ( g_siegeTeam2.string[0] && Q_stricmp( g_siegeTeam2.string, "none" ) ) { //check for override
-			Q_strncpyz( team2, g_siegeTeam2.string, sizeof(team2) );
+		if ( g_siegeTeam2.stringlen() && Q_stricmp( g_siegeTeam2.getStr(), "none" ) ) { //check for override
+			Q_strncpyz( team2, g_siegeTeam2.getStr(), sizeof(team2) );
 		}
 		else { //otherwise use level default
 			BG_SiegeGetPairedValue( teams, "team2", team2 );
@@ -168,7 +168,7 @@ void InitSiegeMode( void ) {
 		}
 		if ( BG_SiegeGetPairedValue( gParseObjectives, "Timed", goalreq ) ) {
 			rebel_time_limit = atoi( goalreq ) * 1000;
-			if ( g_siegeTeamSwitch.integer &&
+			if ( g_siegeTeamSwitch.getInt() &&
 				g_siegePersistant.beatingTime ) {
 				gRebelCountdown = level.time + g_siegePersistant.lastTime;
 			}
@@ -196,7 +196,7 @@ void InitSiegeMode( void ) {
 			}
 			else {
 				imperial_time_limit = atoi( goalreq ) * 1000;
-				if ( g_siegeTeamSwitch.integer &&
+				if ( g_siegeTeamSwitch.getInt() &&
 					g_siegePersistant.beatingTime ) {
 					gImperialCountdown = level.time + g_siegePersistant.lastTime;
 				}
@@ -572,7 +572,7 @@ void SiegeRoundComplete( int winningteam, int winningclient ) {
 		G_UseTargets2( &g_entities[originalWinningClient], &g_entities[originalWinningClient], teamstr );
 	}
 
-	if ( g_siegeTeamSwitch.integer &&
+	if ( g_siegeTeamSwitch.getInt() &&
 		(imperial_time_limit || rebel_time_limit) ) { //handle stupid team switching crap
 		int time = 0;
 		if ( imperial_time_limit ) {
@@ -764,7 +764,7 @@ void SiegeCheckTimers( void ) {
 			i++;
 		}
 
-		if ( g_siegeTeamSwitch.integer &&
+		if ( g_siegeTeamSwitch.getInt() &&
 			g_siegePersistant.beatingTime ) {
 			gImperialCountdown = level.time + g_siegePersistant.lastTime;
 			gRebelCountdown = level.time + g_siegePersistant.lastTime;

@@ -191,12 +191,12 @@ void G_Throw( gentity_t *targ, vector3 *newDir, float push ) {
 	vector3 kvel;
 	float mass = (targ->physicsBounce > 0) ? targ->physicsBounce : 200;
 
-	if ( g_gravity.value > 0 ) {
-		VectorScale( newDir, g_knockback.value * push / mass * 0.8f, &kvel );
-		kvel.z = newDir->z * g_knockback.value * push / mass * 1.5f;
+	if ( g_gravity.getFloat() > 0 ) {
+		VectorScale( newDir, g_knockback.getFloat() * push / mass * 0.8f, &kvel );
+		kvel.z = newDir->z * g_knockback.getFloat() * push / mass * 1.5f;
 	}
 	else
-		VectorScale( newDir, g_knockback.value * (float)push / mass, &kvel );
+		VectorScale( newDir, g_knockback.getFloat() * (float)push / mass, &kvel );
 
 	if ( targ->client )
 		VectorAdd( &targ->client->ps.velocity, &kvel, &targ->client->ps.velocity );
@@ -450,7 +450,7 @@ gentity_t *G_SpawnReservedEntity( void ) {
 }
 
 void InitReservedEntities( void ) {
-	for ( int i = level.num_entities; i < japp_reserveEntitySlots.integer; i++ ) {
+	for ( int i = level.num_entities; i < japp_reserveEntitySlots.getInt(); i++ ) {
 		gentity_t *ent = G_Spawn();
 		G_InitReservedEntity( ent );
 		level.reservedEnts.push_back( ent );
@@ -1126,7 +1126,7 @@ void TryUse( gentity_t *ent ) {
 
 	//Check for a use command
 	if ( ValidUseTarget( target ) && (level.gametype != GT_SIEGE
-		|| !target->alliedTeam || target->alliedTeam != ent->client->sess.sessionTeam || g_ff_objectives.integer) ) {
+		|| !target->alliedTeam || target->alliedTeam != ent->client->sess.sessionTeam || g_ff_objectives.getInt()) ) {
 		if ( ent->client->ps.torsoAnim == BOTH_BUTTON_HOLD || ent->client->ps.torsoAnim == BOTH_CONSOLE1 )
 			ent->client->ps.torsoTimer = 500;
 		else
@@ -1618,7 +1618,7 @@ trace_t *G_RealTrace( gentity_t *ent, float dist ) {
 	static trace_t tr;
 	vector3	start, end;
 
-	if ( japp_unlagged.integer )
+	if ( japp_unlagged.getInt() )
 		G_TimeShiftAllClients( ent->client->pers.cmd.serverTime, ent );
 
 	//Get start
@@ -1631,11 +1631,11 @@ trace_t *G_RealTrace( gentity_t *ent, float dist ) {
 
 	trap->Trace( &tr, &start, NULL, NULL, &end, ent->s.number, MASK_OPAQUE | CONTENTS_BODY | CONTENTS_ITEM | CONTENTS_CORPSE, qfalse, 0, 0 );
 
-	if ( g_debugTrace.integer ) {
+	if ( g_debugTrace.getInt() ) {
 		G_TestLine( &start, &tr.endpos, COLOR_MAGENTA, 2500 );
 	}
 
-	if ( japp_unlagged.integer ) {
+	if ( japp_unlagged.getInt() ) {
 		G_UnTimeShiftAllClients( ent );
 	}
 

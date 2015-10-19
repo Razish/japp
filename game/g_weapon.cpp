@@ -375,7 +375,7 @@ static void WP_DisruptorMainFire( gentity_t *ent ) {
 	float		shotRange = 8192;
 	int			ignore, traces;
 
-	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
+	if ( japp_unlagged.getInt() && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
 		G_TimeShiftAllClients( ent->client->pers.cmd.serverTime, ent );
 	}
 
@@ -393,10 +393,10 @@ static void WP_DisruptorMainFire( gentity_t *ent ) {
 	ignore = ent->s.number;
 	traces = 0;
 	while ( traces < 10 ) {//need to loop this in case we hit a Jedi who dodges the shot
-		if ( d_projectileGhoul2Collision.integer ) {
+		if ( d_projectileGhoul2Collision.getInt() ) {
 			trap->Trace( &tr, &start, NULL, NULL, &end, ignore, MASK_SHOT, qfalse,
 				G2TRFLAG_DOGHOULTRACE | G2TRFLAG_GETSURFINDEX | G2TRFLAG_THICK | G2TRFLAG_HITCORPSES,
-				g_g2TraceLod.integer );
+				g_g2TraceLod.getInt() );
 		}
 		else {
 			trap->Trace( &tr, &start, NULL, NULL, &end, ignore, MASK_SHOT, qfalse, 0, 0 );
@@ -408,7 +408,7 @@ static void WP_DisruptorMainFire( gentity_t *ent ) {
 
 		traceEnt = &g_entities[tr.entityNum];
 
-		if ( d_projectileGhoul2Collision.integer && traceEnt->inuse && traceEnt->client ) {
+		if ( d_projectileGhoul2Collision.getInt() && traceEnt->inuse && traceEnt->client ) {
 			// g2 collision checks -rww
 			if ( traceEnt->inuse && traceEnt->client && traceEnt->ghoul2 ) {
 				// since we used G2TRFLAG_GETSURFINDEX, tr.surfaceFlags will actually contain the index of the surface
@@ -459,7 +459,7 @@ static void WP_DisruptorMainFire( gentity_t *ent ) {
 				te->s.weapon = 0;//saberNum
 				te->s.legsAnim = 0;//bladeNum
 
-				if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
+				if ( japp_unlagged.getInt() && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
 					G_UnTimeShiftAllClients( ent );
 				}
 				return;
@@ -467,7 +467,7 @@ static void WP_DisruptorMainFire( gentity_t *ent ) {
 		}
 		else if ( (traceEnt->flags & FL_SHIELDED) ) {
 			// stopped cold
-			if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
+			if ( japp_unlagged.getInt() && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
 				G_UnTimeShiftAllClients( ent );
 			}
 			return;
@@ -509,14 +509,14 @@ static void WP_DisruptorMainFire( gentity_t *ent ) {
 		}
 	}
 
-	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
+	if ( japp_unlagged.getInt() && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
 		G_UnTimeShiftAllClients( ent );
 	}
 }
 
 qboolean G_CanDisruptify( gentity_t *ent ) {
 	// instagib handles disruption in G_Damage
-	if ( japp_instagib.integer ) {
+	if ( japp_instagib.getInt() ) {
 		return qfalse;
 	}
 
@@ -547,7 +547,7 @@ void WP_DisruptorAltFire( gentity_t *ent ) {
 	int			traces = DISRUPTOR_ALT_TRACES;
 	qboolean	fullCharge = qfalse;
 
-	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
+	if ( japp_unlagged.getInt() && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
 		G_TimeShiftAllClients( ent->client->pers.cmd.serverTime, ent );
 	}
 
@@ -597,10 +597,10 @@ void WP_DisruptorAltFire( gentity_t *ent ) {
 	for ( i = 0; i < traces; i++ ) {
 		VectorMA( &start, shotRange, &forward, &end );
 
-		if ( d_projectileGhoul2Collision.integer ) {
+		if ( d_projectileGhoul2Collision.getInt() ) {
 			trap->Trace( &tr, &start, NULL, NULL, &end, skip, MASK_SHOT, qfalse,
 				G2TRFLAG_DOGHOULTRACE | G2TRFLAG_GETSURFINDEX | G2TRFLAG_THICK | G2TRFLAG_HITCORPSES,
-				g_g2TraceLod.integer );
+				g_g2TraceLod.getInt() );
 		}
 		else {
 			trap->Trace( &tr, &start, NULL, NULL, &end, skip, MASK_SHOT, qfalse, 0, 0 );
@@ -612,7 +612,7 @@ void WP_DisruptorAltFire( gentity_t *ent ) {
 
 		traceEnt = &g_entities[tr.entityNum];
 
-		if ( d_projectileGhoul2Collision.integer && traceEnt->inuse && traceEnt->client ) {
+		if ( d_projectileGhoul2Collision.getInt() && traceEnt->inuse && traceEnt->client ) {
 			// g2 collision checks -rww
 			if ( traceEnt->inuse && traceEnt->client && traceEnt->ghoul2 ) {
 				// since we used G2TRFLAG_GETSURFINDEX, tr.surfaceFlags will actually contain the index of the surface
@@ -665,7 +665,7 @@ void WP_DisruptorAltFire( gentity_t *ent ) {
 				te->s.weapon = 0;//saberNum
 				te->s.legsAnim = 0;//bladeNum
 
-				if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
+				if ( japp_unlagged.getInt() && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
 					G_UnTimeShiftAllClients( ent );
 				}
 
@@ -767,7 +767,7 @@ void WP_DisruptorAltFire( gentity_t *ent ) {
 		skip = tr.entityNum;
 	}
 
-	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
+	if ( japp_unlagged.getInt() && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
 		G_UnTimeShiftAllClients( ent );
 	}
 }
@@ -1751,7 +1751,7 @@ qboolean WP_LobFire( gentity_t *self, vector3 *start, vector3 *target, vector3 *
 
 		VectorScale( &targetDir, shotSpeed, &shotVel );
 		travelTime = targetDist / shotSpeed;
-		shotVel.z += travelTime * 0.5f * g_gravity.value;
+		shotVel.z += travelTime * 0.5f * g_gravity.getFloat();
 
 		if ( !hitCount ) {
 			// save the first (ideal) one as the failCase (fallback value)
@@ -1947,7 +1947,7 @@ void proxMineThink( gentity_t *ent ) {
 			&& cl->client->sess.sessionTeam != TEAM_SPECTATOR && cl->client->tempSpectate < level.time
 			&& cl->health > 0 )
 		{
-			if ( !OnSameTeam( owner, cl ) || g_friendlyFire.integer ) {
+			if ( !OnSameTeam( owner, cl ) || g_friendlyFire.getInt() ) {
 				// not on the same team, or friendly fire is enabled
 				vector3 v;
 
@@ -2131,7 +2131,7 @@ void WP_PlaceLaserTrap( gentity_t *ent, qboolean alt_fire ) {
 
 	laserTrap = G_Spawn();
 
-	if ( japp_removeOldExplosives.integer ) {
+	if ( japp_removeOldExplosives.getInt() ) {
 		// limit to 10 placed at any one time
 		//	see how many there are now
 		while ( (found = G_Find( found, FOFS( classname ), "laserTrap" )) != NULL ) {
@@ -2451,7 +2451,7 @@ void RemoveDetpacks( gentity_t *ent ) {
 }
 
 qboolean CheatsOn( void ) {
-	if ( !sv_cheats.integer ) {
+	if ( !sv_cheats.getInt() ) {
 		return qfalse;
 	}
 	return qtrue;
@@ -2464,7 +2464,7 @@ void WP_DropDetPack( gentity_t *ent, qboolean alt_fire ) {
 		return;
 	}
 
-	if ( japp_removeOldExplosives.integer && !CheatsOn() ) {
+	if ( japp_removeOldExplosives.getInt() && !CheatsOn() ) {
 		// limit to 10 placed at any one time
 		gentity_t *found = NULL;
 		int trapcount = 0, trapcount_org;
@@ -2540,7 +2540,7 @@ static void WP_FireConcussionAlt( gentity_t *ent ) {//a rail-gun-like beam
 	vector3 shot_mins, shot_maxs;
 	int			i;
 
-	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
+	if ( japp_unlagged.getInt() && ent->client && !(ent->r.svFlags & SVF_BOT) ) {
 		G_TimeShiftAllClients( ent->client->pers.cmd.serverTime, ent );
 	}
 
@@ -2574,8 +2574,8 @@ static void WP_FireConcussionAlt( gentity_t *ent ) {//a rail-gun-like beam
 		// if you want to be able to hit guys in emplaced guns, use "G2_COLLIDE, 10" instead of "G2_RETURNONHIT, 0"
 		// alternately, if you end up hitting an emplaced_gun that has a sitter, just redo this one trace with the
 		//	"G2_COLLIDE, 10" to see if we it the sitter
-		if ( d_projectileGhoul2Collision.integer ) {
-			trap->Trace( &tr, &start, &shot_mins, &shot_maxs, &end, skip, MASK_SHOT, qfalse, G2TRFLAG_DOGHOULTRACE | G2TRFLAG_GETSURFINDEX | G2TRFLAG_HITCORPSES, g_g2TraceLod.integer );
+		if ( d_projectileGhoul2Collision.getInt() ) {
+			trap->Trace( &tr, &start, &shot_mins, &shot_maxs, &end, skip, MASK_SHOT, qfalse, G2TRFLAG_DOGHOULTRACE | G2TRFLAG_GETSURFINDEX | G2TRFLAG_HITCORPSES, g_g2TraceLod.getInt() );
 		}
 		else {
 			trap->Trace( &tr, &start, &shot_mins, &shot_maxs, &end, skip, MASK_SHOT, qfalse, 0, 0 );
@@ -2583,7 +2583,7 @@ static void WP_FireConcussionAlt( gentity_t *ent ) {//a rail-gun-like beam
 
 		traceEnt = &g_entities[tr.entityNum];
 
-		if ( d_projectileGhoul2Collision.integer && traceEnt->inuse && traceEnt->client ) {
+		if ( d_projectileGhoul2Collision.getInt() && traceEnt->inuse && traceEnt->client ) {
 			// g2 collision checks -rww
 			if ( traceEnt->inuse && traceEnt->client && traceEnt->ghoul2 ) { //since we used G2TRFLAG_GETSURFINDEX, tr.surfaceFlags will actually contain the index of the surface on the ghoul2 model we collided with.
 				traceEnt->client->g2LastSurfaceHit = tr.surfaceFlags;
@@ -2736,7 +2736,7 @@ static void WP_FireConcussionAlt( gentity_t *ent ) {//a rail-gun-like beam
 	VectorCopy( &muzzle, &tent->s.origin2 );
 	VectorCopy( &forward, &tent->s.angles2 );
 
-	if ( japp_unlagged.integer && ent->client && !(ent->r.svFlags & SVF_BOT) )
+	if ( japp_unlagged.getInt() && ent->client && !(ent->r.svFlags & SVF_BOT) )
 		G_UnTimeShiftAllClients( ent );
 }
 
@@ -3022,7 +3022,7 @@ void CalcMuzzlePoint( const gentity_t *ent, vector3 *forward, vector3 *right, ve
 
 	VectorCopy( &ent->s.pos.trBase, muzzlePoint );
 
-	if ( japp_shootFromEye.integer ) {
+	if ( japp_shootFromEye.getInt() ) {
 		VectorClear( &muzzleOffPoint );
 	}
 	else {
@@ -3036,7 +3036,7 @@ void CalcMuzzlePoint( const gentity_t *ent, vector3 *forward, vector3 *right, ve
 		muzzlePoint->z += ent->client->ps.viewheight + muzzleOffPoint.z;
 	}
 
-	if ( !japp_accurateMuzzle.integer ) {
+	if ( !japp_accurateMuzzle.getInt() ) {
 		VectorSnap( muzzlePoint ); // snap to integer coordinates for more efficient network bandwidth usage
 	}
 }
@@ -3046,7 +3046,7 @@ void CalcMuzzlePointOrigin( gentity_t *ent, vector3 *origin, vector3 *forward, v
 	VectorCopy( &ent->s.pos.trBase, muzzlePoint );
 	muzzlePoint->z += ent->client->ps.viewheight;
 	VectorMA( muzzlePoint, 14, forward, muzzlePoint );
-	if ( !japp_accurateMuzzle.integer ) {
+	if ( !japp_accurateMuzzle.getInt() ) {
 		VectorSnap( muzzlePoint ); // snap to integer coordinates for more efficient network bandwidth usage
 	}
 }
@@ -3353,7 +3353,7 @@ void G_EstimateCamPos( vector3 *viewAngles, vector3 *cameraFocusLoc, float viewh
 
 	VectorCopy( viewAngles, &cameraFocusAngles );
 	cameraFocusAngles.pitch += pitchOffset;
-	if ( !bg_fighterAltControl.integer ) {
+	if ( !bg_fighterAltControl.getInt() ) {
 		// clamp view pitch
 		cameraFocusAngles.pitch = AngleNormalize180( cameraFocusAngles.pitch );
 		if ( cameraFocusAngles.pitch > 80.0f ) {

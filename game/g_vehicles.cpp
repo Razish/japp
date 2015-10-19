@@ -960,7 +960,7 @@ qboolean Initialize( Vehicle_t *pVeh ) {
 	pVeh->m_vOrientation->yaw = parent->s.angles.yaw;
 
 	if ( pVeh->m_pVehicleInfo->gravity &&
-		pVeh->m_pVehicleInfo->gravity != g_gravity.value ) {//not normal gravity
+		pVeh->m_pVehicleInfo->gravity != g_gravity.getFloat() ) {//not normal gravity
 		if ( parent->NPC ) {
 			parent->NPC->aiFlags |= NPCAI_CUSTOM_GRAVITY;
 		}

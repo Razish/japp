@@ -5,6 +5,7 @@
 #include "g_ICARUScb.h"
 #include "g_nav.h"
 #include "bg_saga.h"
+#include "bg_xcvar.h"
 #include "JAPP/jp_crash.h"
 #include "bg_lua.h"
 #include "JAPP/jp_cinfo.h"
@@ -109,186 +110,138 @@ static void G_FindTeams( void ) {
 #include "JAPP/jp_promode.h"
 
 static void SetCInfo( int check, uint32_t bit ) {
-	uint32_t cinfo = (unsigned)jp_cinfo.integer;
+	uint32_t cinfo = jp_cinfo.getBits();
 
 	if ( check )	cinfo |= bit;
 	else			cinfo &= ~bit;
 
-	trap->Cvar_Set( "jp_cinfo", va( "%u", cinfo ) );
-	trap->Cvar_Update( &jp_cinfo );
+	jp_cinfo.setBits( cinfo );
 }
 
-static void CVU_Duel( void ) {
-	SetCInfo( (g_privateDuel.bits & PRIVDUEL_WEAP), CINFO_PRIVDUELWEAP );
+static void CVU_Duel( const xcvar *cv ) {
+	SetCInfo( (cv->getBits() & PRIVDUEL_WEAP), CINFO_PRIVDUELWEAP );
 }
 
-static void CVU_Warmup( void ) {
+static void CVU_Warmup( const xcvar *cv ) {
 	level.warmupTime = -1;
 }
 
-static void CVU_BusyAttack( void ) {
-	SetCInfo( !japp_allowBusyAttack.integer, CINFO_NOBUSYATK );
+static void CVU_BusyAttack( const xcvar *cv ) {
+	SetCInfo( !cv->getInt(), CINFO_NOBUSYATK );
 }
 
-static void CVU_Butterfly( void ) {
-	SetCInfo( !japp_allowButterfly.integer, CINFO_NOBUTTERFLY );
+static void CVU_Butterfly( const xcvar *cv ) {
+	SetCInfo( !cv->getInt(), CINFO_NOBUTTERFLY );
 }
 
-static void CVU_DFA( void ) {
-	SetCInfo( !japp_allowDFA.integer, CINFO_NODFA );
+static void CVU_DFA( const xcvar *cv ) {
+	SetCInfo( !cv->getInt(), CINFO_NODFA );
 }
 
-static void CVU_Kata( void ) {
-	SetCInfo( !japp_allowKata.integer, CINFO_NOKATA );
+static void CVU_Kata( const xcvar *cv ) {
+	SetCInfo( !cv->getInt(), CINFO_NOKATA );
 }
 
-static void CVU_Ledge( void ) {
-	SetCInfo( japp_allowLedgeGrab.integer, CINFO_LEDGEGRAB );
+static void CVU_Ledge( const xcvar *cv ) {
+	SetCInfo( cv->getInt(), CINFO_LEDGEGRAB );
 }
 
-static void CVU_SPCartwheel( void ) {
-	SetCInfo( !japp_allowSPCartwheel.integer, CINFO_NOSPCARTWHEEL );
+static void CVU_SPCartwheel( const xcvar *cv ) {
+	SetCInfo( !cv->getInt(), CINFO_NOSPCARTWHEEL );
 }
 
-static void CVU_Stab( void ) {
-	SetCInfo( !japp_allowStab.integer, CINFO_NOSTAB );
+static void CVU_Stab( const xcvar *cv ) {
+	SetCInfo( !cv->getInt(), CINFO_NOSTAB );
 }
 
-static void CVU_ToggleAtk( void ) {
-	SetCInfo( japp_allowToggleSpecialAttacks.integer, CINFO_TOGGLESPECIALATK );
+static void CVU_ToggleAtk( const xcvar *cv ) {
+	SetCInfo( cv->getInt(), CINFO_TOGGLESPECIALATK );
 }
 
-static void CVU_FixRoll( void ) {
-	SetCInfo( japp_fixRoll.bits & 1, CINFO_JK2ROLL1 );
-	SetCInfo( japp_fixRoll.bits & 2, CINFO_JK2ROLL2 );
-	SetCInfo( japp_fixRoll.bits & 4, CINFO_JK2ROLL3 );
+static void CVU_FixRoll( const xcvar *cv ) {
+	SetCInfo( cv->getBits() & 1, CINFO_JK2ROLL1 );
+	SetCInfo( cv->getBits() & 2, CINFO_JK2ROLL2 );
+	SetCInfo( cv->getBits() & 4, CINFO_JK2ROLL3 );
 }
 
-static void CVU_Flipkick( void ) {
-	SetCInfo( japp_flipKick.integer, CINFO_FLIPKICK );
+static void CVU_Flipkick( const xcvar *cv ) {
+	SetCInfo( cv->getInt(), CINFO_FLIPKICK );
 }
 
-static void CVU_YellowDFA( void ) {
-	SetCInfo( japp_improveYellowDFA.integer, CINFO_YELLOWDFA );
+static void CVU_YellowDFA( const xcvar *cv ) {
+	SetCInfo( cv->getInt(), CINFO_YELLOWDFA );
 }
 
-static void CVU_Promode( void ) {
-	SetCInfo( japp_promode.integer, CINFO_CPMPHYSICS );
-	CPM_UpdateSettings( !!(jp_cinfo.bits & CINFO_CPMPHYSICS) );
+static void CVU_Promode( const xcvar *cv ) {
+	SetCInfo( cv->getInt(), CINFO_CPMPHYSICS );
+	CPM_UpdateSettings( !!(jp_cinfo.getBits() & CINFO_CPMPHYSICS) );
 }
 
-static void CVU_HeadSlide( void ) {
-	SetCInfo( japp_slideOnHead.integer, CINFO_HEADSLIDE );
+static void CVU_HeadSlide( const xcvar *cv ) {
+	SetCInfo( cv->getInt(), CINFO_HEADSLIDE );
 }
 
-static void CVU_VQ3Physics( void ) {
-	SetCInfo( japp_vq3physics.integer, CINFO_VQ3PHYS );
+static void CVU_VQ3Physics( const xcvar *cv ) {
+	SetCInfo( cv->getInt(), CINFO_VQ3PHYS );
 }
 
-static void CVU_WeaponPU( void ) {
-	SetCInfo( japp_weaponPickupAlways.integer, CINFO_ALWAYSPICKUPWEAP );
+static void CVU_WeaponPU( const xcvar *cv ) {
+	SetCInfo( cv->getInt(), CINFO_ALWAYSPICKUPWEAP );
 }
 
-static void CVU_WeaponRoll( void ) {
-	SetCInfo( japp_weaponRoll.integer, CINFO_WEAPONROLL );
+static void CVU_WeaponRoll( const xcvar *cv ) {
+	SetCInfo( cv->getInt(), CINFO_WEAPONROLL );
 }
 
-static void CVU_CInfo( void ) {
-	CPM_UpdateSettings( !!(jp_cinfo.bits & CINFO_CPMPHYSICS) );
+static void CVU_CInfo( const xcvar *cv ) {
+	CPM_UpdateSettings( !!(jp_cinfo.getBits() & CINFO_CPMPHYSICS) );
 }
 
+static void CVU_Password( const xcvar *cv )
+{
+	char password[MAX_CVAR_VALUE_STRING];
+	Q_strncpyz( password, cv->getStr(), sizeof( password ) );
+	Q_strstrip( password, "%", "." );
 
-typedef struct cvarTable_s {
-	vmCvar_t	*vmCvar;
-	const char	*cvarName, *defaultString;
-	void( *update )(void);
-	uint32_t	cvarFlags;
-	qboolean	trackChange; // track this variable, and announce if changed
-} cvarTable_t;
+	if ( strcmp( cv->getStr(), password ) )
+	{
+		g_password.setString( password );
+	}
+
+	if ( g_password.stringlen() && Q_stricmp( g_password.getStr(), "none" ) )
+	{
+		g_needpass.setInt( 1 );
+	}
+	else
+	{
+		g_needpass.setInt( 0 );
+	}
+}
 
 #define XCVAR_DECL
 #include "g_xcvar.h"
 #undef XCVAR_DECL
 
-static cvarTable_t gameCvarTable[] = {
-#define XCVAR_LIST
-#include "g_xcvar.h"
-#undef XCVAR_LIST
-};
-static int gameCvarTableSize = ARRAY_LEN( gameCvarTable );
-
-const char *G_Cvar_DefaultString( const vmCvar_t *vmCvar ) {
-	int i = 0;
-	const cvarTable_t *cv = NULL;
-
-	for ( i = 0, cv = gameCvarTable; i < gameCvarTableSize; i++, cv++ ) {
-		if ( cv->vmCvar == vmCvar ) {
-			return cv->defaultString;
-		}
-	}
-
-	return NULL;
-}
-
-void G_RegisterCvars( void ) {
-	int i = 0;
-	cvarTable_t *cv = NULL;
-
-	// register all cvars
-	for ( i = 0, cv = gameCvarTable; i < gameCvarTableSize; i++, cv++ )
-		trap->Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
-
-	// now update them
-	for ( i = 0, cv = gameCvarTable; i < gameCvarTableSize; i++, cv++ ) {
-		if ( cv->update )
-			cv->update();
-	}
-}
-
 void G_CacheGametype( void ) {
 	// check some things
-	if ( g_gametype.string[0] && isalpha( g_gametype.string[0] ) ) {
-		int gt = BG_GetGametypeForString( g_gametype.string );
+	if ( g_gametype.stringlen() && isalpha( g_gametype.getStr()[0] ) ) {
+		int gt = BG_GetGametypeForString( g_gametype.getStr() );
 		if ( gt == -1 ) {
-			trap->Print( "Gametype '%s' unrecognised, defaulting to FFA/Deathmatch\n", g_gametype.string );
+			trap->Print( "Gametype '%s' unrecognised, defaulting to FFA/Deathmatch\n", g_gametype.getStr() );
 			level.gametype = GT_FFA;
 		}
 		else
 			level.gametype = gt;
 	}
-	else if ( g_gametype.integer < 0 || level.gametype >= GT_MAX_GAME_TYPE ) {
-		trap->Print( "g_gametype %i is out of range, defaulting to 0\n", level.gametype );
+	else if ( g_gametype.getInt() < 0 || g_gametype.getInt() >= GT_MAX_GAME_TYPE ) {
+		trap->Print( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.getInt() );
 		level.gametype = GT_FFA;
 	}
 	else
-		level.gametype = atoi( g_gametype.string );
+		level.gametype = atoi( g_gametype.getStr() );
 
-	trap->Cvar_Set( "g_gametype", va( "%i", level.gametype ) );
-}
-
-void G_UpdateCvars( void ) {
-	int i = 0;
-	cvarTable_t *cv = NULL;
-
-	for ( i = 0, cv = gameCvarTable; i < gameCvarTableSize; i++, cv++ ) {
-		if ( cv->vmCvar ) {
-			int modCount = cv->vmCvar->modificationCount;
-			trap->Cvar_Update( cv->vmCvar );
-			if ( cv->vmCvar->modificationCount != modCount ) {
-				if ( cv->update ) {
-					cv->update();
-				}
-
-				JPLua::Cvar_Update( cv->cvarName );
-
-				if ( cv->trackChange ) {
-					trap->SendServerCommand( -1, va( "print \"Server: %s changed to %s\n\"",
-						cv->cvarName, cv->vmCvar->string )
-					);
-				}
-			}
-		}
-	}
+	if ( level.gametype != g_gametype.getInt() )
+		g_gametype.setInt( level.gametype );
 }
 
 char gSharedBuffer[MAX_G_SHARED_BUFFER_SIZE];
@@ -344,7 +297,7 @@ static void G_AddSingleBox( const vector3 *mins, const vector3 *maxs ) {
 		bmins.z = -zd;
 		bmaxs.z = zu;
 
-		if ( developer.integer ) {
+		if ( developer.getInt() ) {
 			Com_Printf( "  placed box at %s\n", vtos( &ent->r.currentOrigin ) );
 			Com_Printf( "    mins   %s\n", vtos( &ent->r.mins ) );
 			Com_Printf( "    maxs   %s\n", vtos( &ent->r.maxs ) );
@@ -474,8 +427,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	}
 
 	//Init RMG to 0, it will be autoset to 1 if there is terrain on the level.
-	trap->Cvar_Set( "RMG", "0" );
-	RMG.integer = 0;
+	RMG.setInt( 0 );
 
 	//Clean up any client-server ghoul2 instance attachments that may still exist exe-side
 	trap->G2API_CleanEntAttachments();
@@ -491,8 +443,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	srand( randomSeed );
 
-	G_RegisterCvars();
-
 	trap->Cvar_Register( NULL, "ssf", va( "%X", JAPP_SERVER_FLAGS ), CVAR_SERVERINFO );
 
 	G_InitMemory();
@@ -505,11 +455,11 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.follow1 = level.follow2 = -1;
 
 	// logging
-	if ( g_logConsole.integer )		G_OpenLog( LOG_DIRECTORY "console.log", &level.log.console, g_logConsole.integer == 2 );
+	if ( g_logConsole.getInt() )	G_OpenLog( LOG_DIRECTORY "console.log", &level.log.console, g_logConsole.getInt() == 2 );
 	else							trap->Print( "Not logging console to disk.\n" );
-	if ( g_logSecurity.integer )	G_OpenLog( LOG_DIRECTORY "security.log", &level.log.security, g_logSecurity.integer == 2 );
+	if ( g_logSecurity.getInt() )	G_OpenLog( LOG_DIRECTORY "security.log", &level.log.security, g_logSecurity.getInt() == 2 );
 	else							trap->Print( "Not logging security events to disk.\n" );
-	if ( g_logAdmin.integer )		G_OpenLog( LOG_DIRECTORY "admin.log", &level.log.admin, g_logAdmin.integer == 2 );
+	if ( g_logAdmin.getInt() )		G_OpenLog( LOG_DIRECTORY "admin.log", &level.log.admin, g_logAdmin.getInt() == 2 );
 	else							trap->Print( "Not logging admin events to disk.\n" );
 
 	trap->GetServerinfo( cs, sizeof(cs) );
@@ -539,7 +489,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.gentities = g_entities;
 
 	// initialize all clients for this game
-	level.maxclients = sv_maxclients.integer;
+	level.maxclients = sv_maxclients.getInt();
 	memset( g_clients, 0, MAX_CLIENTS * sizeof(g_clients[0]) );
 	level.clients = g_clients;
 
@@ -633,7 +583,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	}
 
 	if ( level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL )
-		G_LogPrintf( level.log.console, "Duel Tournament Begun: kill limit %d, win limit: %d\n", fraglimit.integer, duel_fraglimit.integer );
+		G_LogPrintf( level.log.console, "Duel Tournament Begun: kill limit %d, win limit: %d\n", fraglimit.getInt(), duel_fraglimit.getInt() );
 
 	//not loaded - need to calc paths
 	if ( navCalculatePaths ) {
@@ -790,7 +740,7 @@ void AddTournamentPlayer( void ) {
 		if ( client->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		if ( !g_allowHighPingDuelist.integer && client->ps.ping >= 999 ) { //don't add people who are lagging out if cvar is not set to allow it.
+		if ( !g_allowHighPingDuelist.getInt() && client->ps.ping >= 999 ) { //don't add people who are lagging out if cvar is not set to allow it.
 			continue;
 		}
 		if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
@@ -1471,12 +1421,12 @@ qboolean DuelLimitHit( void ) {
 	int i;
 	gclient_t *cl;
 
-	for ( i = 0; i < sv_maxclients.integer; i++ ) {
+	for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 		cl = level.clients + i;
 		if ( cl->pers.connected != CON_CONNECTED )
 			continue;
 
-		if ( duel_fraglimit.integer && cl->sess.wins >= duel_fraglimit.integer )
+		if ( duel_fraglimit.getInt() && cl->sess.wins >= duel_fraglimit.getInt() )
 			return qtrue;
 	}
 
@@ -1487,7 +1437,7 @@ void DuelResetWinsLosses( void ) {
 	int i;
 	gclient_t *cl;
 
-	for ( i = 0; i < sv_maxclients.integer; i++ ) {
+	for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 		cl = level.clients + i;
 		if ( cl->pers.connected != CON_CONNECTED )
 			continue;
@@ -1523,7 +1473,7 @@ void ExitLevel( void ) {
 
 
 	if ( level.gametype == GT_SIEGE &&
-		g_siegeTeamSwitch.integer &&
+		g_siegeTeamSwitch.getInt() &&
 		g_siegePersistant.beatingTime ) { //restart same map...
 		trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
 	}
@@ -1533,14 +1483,14 @@ void ExitLevel( void ) {
 	level.intermissiontime = 0;
 
 	if ( level.gametype == GT_SIEGE &&
-		g_siegeTeamSwitch.integer ) { //switch out now
+		g_siegeTeamSwitch.getInt() ) { //switch out now
 		SiegeDoTeamAssign();
 	}
 
 	// reset all the scores so we don't enter the intermission again
 	level.teamScores[TEAM_RED] = 0;
 	level.teamScores[TEAM_BLUE] = 0;
-	for ( i = 0; i < sv_maxclients.integer; i++ ) {
+	for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 		cl = level.clients + i;
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
@@ -1553,7 +1503,7 @@ void ExitLevel( void ) {
 
 	// change all client states to connecting, so the early players into the
 	// next level will know the others aren't done reconnecting
-	for ( i = 0; i < sv_maxclients.integer; i++ ) {
+	for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
 			level.clients[i].pers.connected = CON_CONNECTING;
 		}
@@ -1567,7 +1517,7 @@ void QDECL G_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	char string[1024] = { 0 };
 	size_t len;
 
-	if ( g_logFormat.integer == 0 ) {
+	if ( g_logFormat.getInt() == 0 ) {
 		int msec = level.time - level.startTime;
 		int secs = msec / 1000;
 		int mins = secs / 60;
@@ -1588,7 +1538,7 @@ void QDECL G_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	Q_vsnprintf( string + len, sizeof(string)-len, fmt, argptr );
 	va_end( argptr );
 
-	if ( dedicated.integer )
+	if ( dedicated.getInt() )
 		trap->Print( "%s", string + len );
 
 	if ( !fileHandle )
@@ -1689,7 +1639,7 @@ void CheckIntermissionExit( void ) {
 		(level.time > level.intermissiontime + 2000) ) {
 		gDidDuelStuff = qtrue;
 
-		if ( g_austrian.integer && level.gametype != GT_POWERDUEL ) {
+		if ( g_austrian.getInt() && level.gametype != GT_POWERDUEL ) {
 			G_LogPrintf( level.log.console, "Duel Results:\n" );
 			//G_LogPrintf( level.log.console, "Duel Time: %d\n", level.time );
 			G_LogPrintf( level.log.console, "winner: %s, score: %d, wins/losses: %d/%d\n",
@@ -1723,7 +1673,7 @@ void CheckIntermissionExit( void ) {
 				AddTournamentPlayer();
 			}
 
-			if ( g_austrian.integer ) {
+			if ( g_austrian.getInt() ) {
 				if ( level.gametype == GT_POWERDUEL ) {
 					G_LogPrintf( level.log.console, "Power Duel Initiated: %s %d/%d vs %s %d/%d and %s %d/%d, kill limit: %d\n",
 						level.clients[level.sortedClients[0]].pers.netname,
@@ -1735,7 +1685,7 @@ void CheckIntermissionExit( void ) {
 						level.clients[level.sortedClients[2]].pers.netname,
 						level.clients[level.sortedClients[2]].sess.wins,
 						level.clients[level.sortedClients[2]].sess.losses,
-						fraglimit.integer );
+						fraglimit.getInt() );
 				}
 				else {
 					G_LogPrintf( level.log.console, "Duel Initiated: %s %d/%d vs %s %d/%d, kill limit: %d\n",
@@ -1745,7 +1695,7 @@ void CheckIntermissionExit( void ) {
 						level.clients[level.sortedClients[1]].pers.netname,
 						level.clients[level.sortedClients[1]].sess.wins,
 						level.clients[level.sortedClients[1]].sess.losses,
-						fraglimit.integer );
+						fraglimit.getInt() );
 				}
 			}
 
@@ -1765,7 +1715,7 @@ void CheckIntermissionExit( void ) {
 			return;
 		}
 
-		if ( g_austrian.integer && level.gametype != GT_POWERDUEL ) {
+		if ( g_austrian.getInt() && level.gametype != GT_POWERDUEL ) {
 			G_LogPrintf( level.log.console, "Duel Tournament Winner: %s wins/losses: %d/%d\n",
 				level.clients[level.sortedClients[0]].pers.netname,
 				level.clients[level.sortedClients[0]].sess.wins,
@@ -1810,7 +1760,7 @@ void CheckIntermissionExit( void ) {
 			return;
 		}
 
-		for ( i = 0; i < sv_maxclients.integer; i++ ) { //being in a "ready" state is not necessary here, so clear it for everyone
+		for ( i = 0; i < sv_maxclients.getInt(); i++ ) { //being in a "ready" state is not necessary here, so clear it for everyone
 			//yes, I also thinking holding this in a ps value uniquely for each player
 			//is bad and wrong, but it wasn't my idea.
 			cl = level.clients + i;
@@ -1824,7 +1774,7 @@ void CheckIntermissionExit( void ) {
 
 	// copy the readyMask to each player's stats so
 	// it can be displayed on the scoreboard
-	for ( i = 0; i < sv_maxclients.integer; i++ ) {
+	for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 		cl = level.clients + i;
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
@@ -1837,7 +1787,7 @@ void CheckIntermissionExit( void ) {
 		return;
 	}
 
-	if ( d_noIntermissionWait.integer ) { //don't care who wants to go, just go.
+	if ( d_noIntermissionWait.getInt() ) { //don't care who wants to go, just go.
 		ExitLevel();
 		return;
 	}
@@ -1946,7 +1896,7 @@ void CheckExitRules( void ) {
 	if ( level.gametype != GT_SIEGE ) {
 		if ( ScoreIsTied() ) {
 			// always wait for sudden death
-			if ( (level.gametype != GT_DUEL) || !timelimit.value ) {
+			if ( (level.gametype != GT_DUEL) || !timelimit.getFloat() ) {
 				if ( level.gametype != GT_POWERDUEL ) {
 					return;
 				}
@@ -1955,11 +1905,11 @@ void CheckExitRules( void ) {
 	}
 
 	if ( level.gametype != GT_SIEGE ) {
-		if ( timelimit.value > 0.0f && !level.warmupTime ) {
-			if ( level.time - level.startTime >= timelimit.value * 60000 ) {
+		if ( timelimit.getFloat() > 0.0f && !level.warmupTime ) {
+			if ( level.time - level.startTime >= timelimit.getFloat() * 60000 ) {
 				//				trap->SendServerCommand( -1, "print \"Timelimit hit.\n\"");
 				trap->SendServerCommand( -1, va( "print \"%s.\n\"", G_GetStringEdString( "MP_SVGAME", "TIMELIMIT_HIT" ) ) );
-				if ( d_powerDuelPrint.integer ) {
+				if ( d_powerDuelPrint.getInt() ) {
 					Com_Printf( "POWERDUEL WIN CONDITION: Timelimit hit (1)\n" );
 				}
 				LogExit( "Timelimit hit." );
@@ -1982,7 +1932,7 @@ void CheckExitRules( void ) {
 
 	if ( level.gametype == GT_DUEL ||
 		level.gametype == GT_POWERDUEL ) {
-		if ( fraglimit.integer > 1 ) {
+		if ( fraglimit.getInt() > 1 ) {
 			sKillLimit = "Kill limit hit.";
 		}
 		else {
@@ -1993,26 +1943,26 @@ void CheckExitRules( void ) {
 	else {
 		sKillLimit = "Kill limit hit.";
 	}
-	if ( level.gametype < GT_SIEGE && fraglimit.integer ) {
-		if ( level.teamScores[TEAM_RED] >= fraglimit.integer ) {
+	if ( level.gametype < GT_SIEGE && fraglimit.getInt() ) {
+		if ( level.teamScores[TEAM_RED] >= fraglimit.getInt() ) {
 			trap->SendServerCommand( -1, va( "print \"Red %s\n\"", G_GetStringEdString( "MP_SVGAME", "HIT_THE_KILL_LIMIT" ) ) );
-			if ( d_powerDuelPrint.integer ) {
+			if ( d_powerDuelPrint.getInt() ) {
 				Com_Printf( "POWERDUEL WIN CONDITION: Kill limit (1)\n" );
 			}
 			LogExit( sKillLimit );
 			return;
 		}
 
-		if ( level.teamScores[TEAM_BLUE] >= fraglimit.integer ) {
+		if ( level.teamScores[TEAM_BLUE] >= fraglimit.getInt() ) {
 			trap->SendServerCommand( -1, va( "print \"Blue %s\n\"", G_GetStringEdString( "MP_SVGAME", "HIT_THE_KILL_LIMIT" ) ) );
-			if ( d_powerDuelPrint.integer ) {
+			if ( d_powerDuelPrint.getInt() ) {
 				Com_Printf( "POWERDUEL WIN CONDITION: Kill limit (2)\n" );
 			}
 			LogExit( sKillLimit );
 			return;
 		}
 
-		for ( i = 0; i < sv_maxclients.integer; i++ ) {
+		for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 			cl = level.clients + i;
 			if ( cl->pers.connected != CON_CONNECTED ) {
 				continue;
@@ -2021,8 +1971,8 @@ void CheckExitRules( void ) {
 				continue;
 			}
 
-			if ( (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) && duel_fraglimit.integer && cl->sess.wins >= duel_fraglimit.integer ) {
-				if ( d_powerDuelPrint.integer ) {
+			if ( (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) && duel_fraglimit.getInt() && cl->sess.wins >= duel_fraglimit.getInt() ) {
+				if ( d_powerDuelPrint.getInt() ) {
 					Com_Printf( "POWERDUEL WIN CONDITION: Duel limit hit (1)\n" );
 				}
 				LogExit( "Duel limit hit." );
@@ -2032,8 +1982,8 @@ void CheckExitRules( void ) {
 				return;
 			}
 
-			if ( cl->ps.persistant[PERS_SCORE] >= fraglimit.integer ) {
-				if ( d_powerDuelPrint.integer ) {
+			if ( cl->ps.persistant[PERS_SCORE] >= fraglimit.getInt() ) {
+				if ( d_powerDuelPrint.getInt() ) {
 					Com_Printf( "POWERDUEL WIN CONDITION: Kill limit (3)\n" );
 				}
 				LogExit( sKillLimit );
@@ -2050,16 +2000,16 @@ void CheckExitRules( void ) {
 		}
 	}
 
-	if ( level.gametype >= GT_CTF && capturelimit.integer ) {
+	if ( level.gametype >= GT_CTF && capturelimit.getInt() ) {
 
-		if ( level.teamScores[TEAM_RED] >= capturelimit.integer ) {
+		if ( level.teamScores[TEAM_RED] >= capturelimit.getInt() ) {
 			trap->SendServerCommand( -1, va( "print \"%s \"", G_GetStringEdString( "MP_SVGAME", "PRINTREDTEAM" ) ) );
 			trap->SendServerCommand( -1, va( "print \"%s.\n\"", G_GetStringEdString( "MP_SVGAME", "HIT_CAPTURE_LIMIT" ) ) );
 			LogExit( "Capturelimit hit." );
 			return;
 		}
 
-		if ( level.teamScores[TEAM_BLUE] >= capturelimit.integer ) {
+		if ( level.teamScores[TEAM_BLUE] >= capturelimit.getInt() ) {
 			trap->SendServerCommand( -1, va( "print \"%s \"", G_GetStringEdString( "MP_SVGAME", "PRINTBLUETEAM" ) ) );
 			trap->SendServerCommand( -1, va( "print \"%s.\n\"", G_GetStringEdString( "MP_SVGAME", "HIT_CAPTURE_LIMIT" ) ) );
 			LogExit( "Capturelimit hit." );
@@ -2115,7 +2065,7 @@ void CheckTournament( void ) {
 
 		if ( level.numPlayingClients >= 2 ) {
 			// nmckenzie: DUEL_HEALTH
-			if ( g_showDuelHealths.integer ) {
+			if ( g_showDuelHealths.getInt() ) {
 				playerState_t *ps1, *ps2;
 				ps1 = &level.clients[level.sortedClients[0]].ps;
 				ps2 = &level.clients[level.sortedClients[1]].ps;
@@ -2124,7 +2074,7 @@ void CheckTournament( void ) {
 			}
 		}
 
-		if ( !g_doWarmup.integer ) {
+		if ( !g_doWarmup.getInt() ) {
 			// don't care about any of this stuff then, just add people and leave me alone
 			level.warmupTime = 0;
 			return;
@@ -2148,7 +2098,7 @@ void CheckTournament( void ) {
 			if ( level.warmupTime < 0 ) {
 				if ( level.numPlayingClients == 2 ) {
 					// fudge by -1 to account for extra delays
-					level.warmupTime = level.time + (g_warmup.integer - 1) * 1000;
+					level.warmupTime = level.time + (g_warmup.getInt() - 1) * 1000;
 
 					if ( level.warmupTime < level.time + 3000 ) {
 						// this is an unpleasant hack to keep the level from resetting completely on the client
@@ -2163,7 +2113,7 @@ void CheckTournament( void ) {
 			// if the warmup time has counted down, restart
 			if ( level.time > level.warmupTime ) {
 				level.warmupTime += 10000;
-				trap->Cvar_Set( "g_restarted", "1" );
+				g_restarted.setInt( 1 );
 				trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
 				level.restarted = qtrue;
 				return;
@@ -2242,7 +2192,7 @@ void CheckTournament( void ) {
 
 					trap->SetConfigstring( CS_CLIENT_DUELISTS, va( "%i|%i|%i", level.sortedClients[0], level.sortedClients[1], level.sortedClients[2] ) );
 
-					if ( g_austrian.integer ) {
+					if ( g_austrian.getInt() ) {
 						G_LogPrintf( level.log.console, "Duel Initiated: %s %d/%d vs %s %d/%d and %s %d/%d, kill limit: %d\n",
 							level.clients[level.sortedClients[0]].pers.netname,
 							level.clients[level.sortedClients[0]].sess.wins,
@@ -2253,7 +2203,7 @@ void CheckTournament( void ) {
 							level.clients[level.sortedClients[2]].pers.netname,
 							level.clients[level.sortedClients[2]].sess.wins,
 							level.clients[level.sortedClients[2]].sess.losses,
-							fraglimit.integer );
+							fraglimit.getInt() );
 					}
 					//trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
 					//FIXME: This seems to cause problems. But we'd like to reset things whenever a new opponent is set.
@@ -2307,7 +2257,7 @@ void CheckTournament( void ) {
 		// if all players have arrived, start the countdown
 		if ( level.warmupTime < 0 ) {
 			// fudge by -1 to account for extra delays
-			level.warmupTime = level.time + (g_warmup.integer - 1) * 1000;
+			level.warmupTime = level.time + (g_warmup.getInt() - 1) * 1000;
 			trap->SetConfigstring( CS_WARMUP, va( "%i", level.warmupTime ) );
 			return;
 		}
@@ -2315,7 +2265,7 @@ void CheckTournament( void ) {
 		// if the warmup time has counted down, restart
 		if ( level.time > level.warmupTime ) {
 			level.warmupTime += 10000;
-			trap->Cvar_Set( "g_restarted", "1" );
+			g_restarted.setInt( 1 );
 			trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = qtrue;
 			return;
@@ -2327,7 +2277,7 @@ void G_KickAllBots( void ) {
 	int i;
 	gclient_t	*cl;
 
-	for ( i = 0; i < sv_maxclients.integer; i++ ) {
+	for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 		cl = level.clients + i;
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
@@ -2362,10 +2312,10 @@ void CheckVote( void ) {
 				G_RefreshNextMap( level.votingGametypeTo, qfalse );
 			}
 
-			if ( g_fraglimitVoteCorrection.integer ) { //This means to auto-correct fraglimit when voting to and from duel.
+			if ( g_fraglimitVoteCorrection.getInt() ) { //This means to auto-correct fraglimit when voting to and from duel.
 				const int currentGT = level.gametype;
-				const int currentFL = fraglimit.integer;
-				const int currentTL = timelimit.integer;
+				const int currentFL = fraglimit.getInt();
+				const int currentTL = timelimit.getInt();
 
 				if ( (level.votingGametypeTo == GT_DUEL || level.votingGametypeTo == GT_POWERDUEL) && currentGT != GT_DUEL && currentGT != GT_POWERDUEL ) {
 					if ( currentFL > 3 || !currentFL ) { //if voting to duel, and fraglimit is more than 3 (or unlimited), then set it down to 3
@@ -2430,12 +2380,12 @@ void CheckReady( void ) {
 	gentity_t *ent = NULL;
 	uint16_t readyMask = 0u;
 
-	if ( !g_doWarmup.integer || !level.warmupTime || !level.numPlayingClients || level.restarted || level.allReady ) {
+	if ( !g_doWarmup.getInt() || !level.warmupTime || !level.numPlayingClients || level.restarted || level.allReady ) {
 		return;
 	}
 
 	playerCount = level.numPlayingClients;
-	for ( i = 0, ent = g_entities; i < sv_maxclients.integer; i++, ent++ ) {
+	for ( i = 0, ent = g_entities; i < sv_maxclients.getInt(); i++, ent++ ) {
 		if ( !ent->inuse || ent->client->pers.connected == CON_DISCONNECTED ) {
 			continue;
 		}
@@ -2450,7 +2400,7 @@ void CheckReady( void ) {
 		}
 	}
 
-	for ( i = 0, ent = g_entities; i < sv_maxclients.integer; i++, ent++ ) {
+	for ( i = 0, ent = g_entities; i < sv_maxclients.getInt(); i++, ent++ ) {
 		if ( !ent->inuse || ent->client->pers.connected == CON_DISCONNECTED ) {
 			continue;
 		}
@@ -2458,16 +2408,16 @@ void CheckReady( void ) {
 	}
 
 	f = (float)readyCount / (float)playerCount;
-	t = (japp_readyThreshold.value - f); // 100 players 33 ready 0.50 needed, [f, t] = [0.33333, 0.16666], numRequired = total*t
-	if ( f >= japp_readyThreshold.value ) {
+	t = (japp_readyThreshold.getFloat() - f); // 100 players 33 ready 0.50 needed, [f, t] = [0.33333, 0.16666], numRequired = total*t
+	if ( f >= japp_readyThreshold.getFloat() ) {
 		level.warmupTime = level.time + 3000;
 		level.allReady = qtrue;
 	}
 	else if ( playerCount ) {
 		static int lastPrint = 0;
-		if ( lastPrint < level.time - g_warmupPrintDelay.integer ) {
+		if ( lastPrint < level.time - g_warmupPrintDelay.getInt() ) {
 			char msg[MAX_STRING_CHARS / 2] = { 0 };
-			Com_sprintf( msg, sizeof(msg), S_COLOR_GREEN"Waiting for players to ready up!\n%i more needed\n\nType /ready",
+			Com_sprintf( msg, sizeof(msg), S_COLOR_GREEN "Waiting for players to ready up!\n%i more needed\n\nType /ready",
 				(int)ceilf( (float)(playerCount) * t ) );
 			G_Announce( msg );
 			lastPrint = level.time;
@@ -2486,32 +2436,6 @@ void PrintTeam( int team, char *message ) {
 	}
 }
 
-void CheckCvars( void ) {
-	static int lastMod = -1;
-
-	if ( g_password.modificationCount != lastMod ) {
-		char password[MAX_INFO_STRING];
-		char *c = password;
-		lastMod = g_password.modificationCount;
-
-		strcpy( password, g_password.string );
-		while ( *c ) {
-			if ( *c == '%' ) {
-				*c = '.';
-			}
-			c++;
-		}
-		trap->Cvar_Set( "g_password", password );
-
-		if ( *g_password.string && Q_stricmp( g_password.string, "none" ) ) {
-			trap->Cvar_Set( "g_needpass", "1" );
-		}
-		else {
-			trap->Cvar_Set( "g_needpass", "0" );
-		}
-	}
-}
-
 void proxMineThink( gentity_t *ent );
 #include "b_local.h"
 
@@ -2522,7 +2446,7 @@ void G_RunThink( gentity_t *ent ) {
 	//OSP: pause
 	//	If paused, push nextthink
 	if ( level.pause.state != PAUSE_NONE ) {
-		if ( ent - g_entities >= sv_maxclients.integer && ent->nextthink > level.time )
+		if ( ent - g_entities >= sv_maxclients.getInt() && ent->nextthink > level.time )
 			ent->nextthink += level.time - level.previousTime;
 
 		// special case, mines need update here
@@ -2624,7 +2548,7 @@ void G_RunFrame( int levelTime ) {
 	static int lastMsgTime = 0;
 
 	if ( level.gametype == GT_SIEGE &&
-		g_siegeRespawn.integer &&
+		g_siegeRespawn.getInt() &&
 		g_siegeRespawnCheck < level.time ) { //check for a respawn wave
 		int i = 0;
 		gentity_t *clEnt;
@@ -2640,7 +2564,7 @@ void G_RunFrame( int levelTime ) {
 			i++;
 		}
 
-		g_siegeRespawnCheck = level.time + g_siegeRespawn.integer * 1000;
+		g_siegeRespawnCheck = level.time + g_siegeRespawn.getInt() * 1000;
 	}
 
 	if ( gDoSlowMoDuel ) {
@@ -2733,7 +2657,7 @@ void G_RunFrame( int levelTime ) {
 			lastMsgTime = level.time;
 		}
 
-		if ( level.time > level.pause.time - (japp_unpauseTime.integer * 1000) )
+		if ( level.time > level.pause.time - (japp_unpauseTime.getInt() * 1000) )
 			level.pause.state = PAUSE_UNPAUSING;
 	}
 	if ( level.pause.state == PAUSE_UNPAUSING ) {
@@ -2748,14 +2672,14 @@ void G_RunFrame( int levelTime ) {
 		}
 	}
 
-	if ( g_allowNPC.integer ) {
+	if ( g_allowNPC.getInt() ) {
 		NAV_CheckCalcPaths();
 	}
 
 	AI_UpdateGroups();
 
-	if ( g_allowNPC.integer ) {
-		if ( d_altRoutes.integer ) {
+	if ( g_allowNPC.getInt() ) {
+		if ( d_altRoutes.getInt() ) {
 			trap->Nav_CheckAllFailedEdges();
 		}
 		trap->Nav_ClearCheckedNodes();
@@ -2772,7 +2696,7 @@ void G_RunFrame( int levelTime ) {
 				ent->lastWaypoint = ent->waypoint;
 				ent->waypoint = WAYPOINT_NONE;
 			}
-			if ( d_altRoutes.integer ) {
+			if ( d_altRoutes.getInt() ) {
 				trap->Nav_CheckFailedNodes( (sharedEntity_t *)ent );
 			}
 		}
@@ -2784,7 +2708,7 @@ void G_RunFrame( int levelTime ) {
 	g_TimeSinceLastFrame = (level.time - g_LastFrameTime);
 
 	// get any cvar changes
-	G_UpdateCvars();
+	XCVAR_UpdateXCvars();
 
 
 
@@ -3017,7 +2941,7 @@ void G_RunFrame( int levelTime ) {
 				WP_SaberStartMissileBlockCheck( ent, &ent->client->pers.cmd );
 			}
 
-			if ( g_allowNPC.integer ) {
+			if ( g_allowNPC.getInt() ) {
 				//This was originally intended to only be done for client 0.
 				//Make sure it doesn't slow things down too much with lots of clients in game.
 				NAV_FindPlayerWaypoint( i );
@@ -3044,7 +2968,7 @@ void G_RunFrame( int levelTime ) {
 
 		G_RunThink( ent );
 
-		if ( g_allowNPC.integer ) {
+		if ( g_allowNPC.getInt() ) {
 			ClearNPCGlobals();
 		}
 	}
@@ -3097,9 +3021,6 @@ void G_RunFrame( int levelTime ) {
 
 	// check for allready during warmup
 	CheckReady();
-
-	// for tracking changes
-	CheckCvars();
 
 #ifdef _G_FRAME_PERFANAL
 	iTimer_GameChecks = trap->PrecisionTimer_End( timer_GameChecks );

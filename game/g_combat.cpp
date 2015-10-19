@@ -202,7 +202,7 @@ void AddScore( gentity_t *ent, vector3 *origin, int score ) {
 	}
 
 	// show score plum
-	if ( japp_scorePlums.integer )
+	if ( japp_scorePlums.getInt() )
 		ScorePlum( ent, origin, score );
 
 	//
@@ -1781,7 +1781,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	//Use any target we had
 	G_UseTargets( self, self );
 
-	if ( g_slowmoDuelEnd.integer && (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) && attacker && attacker->inuse && attacker->client ) {
+	if ( g_slowmoDuelEnd.getInt() && (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) && attacker && attacker->inuse && attacker->client ) {
 		if ( !gDoSlowMoDuel ) {
 			gDoSlowMoDuel = qtrue;
 			gSlowMoDuelTime = level.time;
@@ -1888,7 +1888,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		Q_strcat( buf, sizeof(buf), va( "%s by %s\n", self->client->pers.netname, obit ) );
 	G_LogPrintf( level.log.console, "%s", buf );
 
-	if ( g_austrian.integer
+	if ( g_austrian.getInt()
 		&& (level.gametype == GT_DUEL)
 		&& level.numPlayingClients >= 2 ) {
 		int spawnTime = (level.clients[level.sortedClients[0]].respawnTime > level.clients[level.sortedClients[1]].respawnTime) ? level.clients[level.sortedClients[0]].respawnTime : level.clients[level.sortedClients[1]].respawnTime;
@@ -2043,7 +2043,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	Team_FragBonuses( self, inflictor, attacker );
 
 	// if I committed suicide, the flag does not fall, it returns.
-	if ( meansOfDeath == MOD_SUICIDE && !japp_suicideDropFlag.integer ) {
+	if ( meansOfDeath == MOD_SUICIDE && !japp_suicideDropFlag.getInt() ) {
 		if ( self->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
 			Team_ReturnFlag( TEAM_FREE );
 			self->client->ps.powerups[PW_NEUTRALFLAG] = 0;
@@ -2310,12 +2310,12 @@ void G_ApplyKnockback( gentity_t *targ, vector3 *newDir, float knockback ) {
 	else
 		mass = 200;
 
-	if ( g_gravity.value > 0 ) {
-		VectorScale( newDir, g_knockback.value * (float)knockback / mass * 0.8f, &kvel );
-		kvel.z = newDir->z * g_knockback.value * (float)knockback / mass * 1.5f;
+	if ( g_gravity.getFloat() > 0 ) {
+		VectorScale( newDir, g_knockback.getFloat() * (float)knockback / mass * 0.8f, &kvel );
+		kvel.z = newDir->z * g_knockback.getFloat() * (float)knockback / mass * 1.5f;
 	}
 	else {
-		VectorScale( newDir, g_knockback.value * (float)knockback / mass, &kvel );
+		VectorScale( newDir, g_knockback.getFloat() * (float)knockback / mass, &kvel );
 	}
 
 	if ( targ->client ) {
@@ -3183,7 +3183,7 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 	*/
 
 	//if ( g_dismemberment->integer >= 11381138 || !ent->client->dismembered )
-	if ( g_dismember.integer == 100 ) { //full probability...
+	if ( g_dismember.getInt() == 100 ) { //full probability...
 		if ( ent->client && ent->client->NPC_class == CLASS_PROTOCOL ) {
 			dismember = qtrue;
 		}
@@ -3269,7 +3269,7 @@ qboolean G_GetHitLocFromSurfName( gentity_t *ent, const char *surfName, int *hit
 void G_CheckForDismemberment( gentity_t *ent, gentity_t *enemy, vector3 *point, int damage, int deathAnim, qboolean postDeath ) {
 	int hitLoc = -1, hitLocUse = -1;
 	vector3 boltPoint;
-	int dismember = g_dismember.integer;
+	int dismember = g_dismember.getInt();
 
 	if ( ent->localAnimIndex > 1 ) {
 		if ( !ent->NPC ) {
@@ -3303,7 +3303,7 @@ void G_CheckForDismemberment( gentity_t *ent, gentity_t *enemy, vector3 *point, 
 		hitLoc = HL_HAND_RT;
 	}
 	else {
-		if ( d_saberGhoul2Collision.integer && ent->client && ent->client->g2LastSurfaceTime == level.time ) {
+		if ( d_saberGhoul2Collision.getInt() && ent->client && ent->client->g2LastSurfaceTime == level.time ) {
 			char hitSurface[MAX_QPATH];
 
 			trap->G2API_GetSurfaceName( ent->ghoul2, ent->client->g2LastSurfaceHit, 0, hitSurface );
@@ -3364,7 +3364,7 @@ void G_CheckForDismemberment( gentity_t *ent, gentity_t *enemy, vector3 *point, 
 
 	if ( ent->client ) {
 		G_GetDismemberBolt( ent, &boltPoint, hitLocUse );
-		if ( g_austrian.integer
+		if ( g_austrian.getInt()
 			&& (level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL) ) {
 			G_LogPrintf( level.log.console, "Duel Dismemberment: %s dismembered at %s\n", ent->client->pers.netname, hitLocName[hitLoc] );
 		}
@@ -3378,7 +3378,7 @@ void G_CheckForDismemberment( gentity_t *ent, gentity_t *enemy, vector3 *point, 
 void G_LocationBasedDamageModifier( gentity_t *ent, vector3 *point, int mod, uint32_t dflags, int *damage ) {
 	int hitLoc = -1;
 
-	if ( !g_locationBasedDamage.integer ) { //then leave it alone
+	if ( !g_locationBasedDamage.getInt() ) { //then leave it alone
 		return;
 	}
 
@@ -3398,8 +3398,8 @@ void G_LocationBasedDamageModifier( gentity_t *ent, vector3 *point, int mod, uin
 		return;
 	}
 
-	if ( (d_saberGhoul2Collision.integer && ent->client && ent->client->g2LastSurfaceTime == level.time && mod == MOD_SABER) || //using ghoul2 collision? Then if the mod is a saber we should have surface data from the last hit (unless thrown).
-		(d_projectileGhoul2Collision.integer && ent->client && ent->client->g2LastSurfaceTime == level.time) ) //It's safe to assume we died from the projectile that just set our surface index. So, go ahead and use that as the surf I guess.
+	if ( (d_saberGhoul2Collision.getInt() && ent->client && ent->client->g2LastSurfaceTime == level.time && mod == MOD_SABER) || //using ghoul2 collision? Then if the mod is a saber we should have surface data from the last hit (unless thrown).
+		(d_projectileGhoul2Collision.getInt() && ent->client && ent->client->g2LastSurfaceTime == level.time) ) //It's safe to assume we died from the projectile that just set our surface index. So, go ahead and use that as the surf I guess.
 	{
 		char hitSurface[MAX_QPATH];
 
@@ -3507,7 +3507,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			return;
 		}
 
-		if ((japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK)) && !targ->client->ps.duelInProgress) {
+		if ((japp_chatProtection.getInt() && (targ->client->ps.eFlags & EF_TALK)) && !targ->client->ps.duelInProgress) {
 			return;
 	    }
 
@@ -3516,7 +3516,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		if ( attacker->client->pers.adminData.isSlept || attacker->client->pers.adminData.isGhost ) {
 			return;
 		}
-		if ( japp_chatProtection.integer && !attacker->client->ps.duelInProgress
+		if ( japp_chatProtection.getInt() && !attacker->client->ps.duelInProgress
 			&& (attacker->client->ps.eFlags & EF_TALK) )
 		{
 			return;
@@ -3610,7 +3610,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		if ( attacker && attacker->client && attacker->s.number != targ->client->ps.duelIndex ) {
 			return;
 		}
-		else if ( !(g_privateDuel.integer & PRIVDUEL_WEAP) && (attacker && attacker->client && mod != MOD_SABER) ) {
+		else if ( !(g_privateDuel.getInt() & PRIVDUEL_WEAP) && (attacker && attacker->client && mod != MOD_SABER) ) {
 			return;
 		}
 	}
@@ -3618,7 +3618,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		if ( targ && targ->client && targ->s.number != attacker->client->ps.duelIndex ) {
 			return;
 		}
-		else if ( !(g_privateDuel.integer & PRIVDUEL_WEAP) && (targ && targ->client && mod != MOD_SABER) ) {
+		else if ( !(g_privateDuel.getInt() & PRIVDUEL_WEAP) && (targ && targ->client && mod != MOD_SABER) ) {
 			return;
 		}
 	}
@@ -3712,7 +3712,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		mass = 200;
 
 		if ( mod == MOD_SABER ) {
-			float saberKnockbackScale = g_saberDmgVelocityScale.value;
+			float saberKnockbackScale = g_saberDmgVelocityScale.getFloat();
 			if ( (dflags&DAMAGE_SABER_KNOCKBACK1)
 				|| (dflags&DAMAGE_SABER_KNOCKBACK2) ) {//saber does knockback, scale it by the right number
 				if ( !saberKnockbackScale ) {
@@ -3742,10 +3742,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 					}
 				}
 			}
-			VectorScale( dir, (g_knockback.value * (float)knockback / mass)*saberKnockbackScale, &kvel );
+			VectorScale( dir, (g_knockback.getFloat() * (float)knockback / mass)*saberKnockbackScale, &kvel );
 		}
 		else {
-			VectorScale( dir, g_knockback.value * (float)knockback / mass, &kvel );
+			VectorScale( dir, g_knockback.getFloat() * (float)knockback / mass, &kvel );
 		}
 		VectorAdd( &targ->client->ps.velocity, &kvel, &targ->client->ps.velocity );
 
@@ -3762,7 +3762,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		}
 		// set the timer so that the other client can't cancel
 		// out the movement immediately
-		if ( !targ->client->ps.pm_time && (g_saberDmgVelocityScale.integer || mod != MOD_SABER || (dflags&DAMAGE_SABER_KNOCKBACK1) || (dflags&DAMAGE_SABER_KNOCKBACK2) || (dflags&DAMAGE_SABER_KNOCKBACK1_B2) || (dflags&DAMAGE_SABER_KNOCKBACK2_B2)) ) {
+		if ( !targ->client->ps.pm_time && (g_saberDmgVelocityScale.getInt() || mod != MOD_SABER || (dflags&DAMAGE_SABER_KNOCKBACK1) || (dflags&DAMAGE_SABER_KNOCKBACK2) || (dflags&DAMAGE_SABER_KNOCKBACK1_B2) || (dflags&DAMAGE_SABER_KNOCKBACK2_B2)) ) {
 			int		t;
 
 			t = knockback * 2;
@@ -3783,7 +3783,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 	}
 
 
-	if ( (g_jediVmerc.integer || level.gametype == GT_SIEGE)
+	if ( (g_jediVmerc.getInt() || level.gametype == GT_SIEGE)
 		&& client ) {//less explosive damage for jedi, more saber damage for non-jedi
 		if ( client->ps.trueJedi
 			|| (level.gametype == GT_SIEGE&&client->ps.weapon == WP_SABER) ) {//if the target is a trueJedi, reduce splash and explosive damage to 1/2
@@ -3831,7 +3831,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		// if the attacker was on the same team
 		if ( targ != attacker ) {
 			if ( OnSameTeam( targ, attacker ) ) {
-				if ( !g_friendlyFire.integer ) {
+				if ( !g_friendlyFire.getInt() ) {
 					return;
 				}
 			}
@@ -3840,7 +3840,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 				targ != attacker->activator &&
 				attacker->activator->inuse && attacker->activator->client ) { //emplaced guns don't hurt teammates of user
 				if ( OnSameTeam( targ, attacker->activator ) ) {
-					if ( !g_friendlyFire.integer ) {
+					if ( !g_friendlyFire.getInt() ) {
 						return;
 					}
 				}
@@ -3850,12 +3850,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 				attacker->s.number >= MAX_CLIENTS &&
 				attacker->alliedTeam &&
 				targ->client->sess.sessionTeam == attacker->alliedTeam &&
-				!g_friendlyFire.integer ) { //things allied with my team should't hurt me.. I guess
+				!g_friendlyFire.getInt() ) { //things allied with my team should't hurt me.. I guess
 				return;
 			}
 		}
 
-		if ( level.gametype == GT_JEDIMASTER && !g_friendlyFire.integer &&
+		if ( level.gametype == GT_JEDIMASTER && !g_friendlyFire.getInt() &&
 			targ && targ->client && attacker && attacker->client &&
 			targ != attacker && !targ->client->ps.isJediMaster && !attacker->client->ps.isJediMaster &&
 			G_ThereIsAMaster() ) {
@@ -3868,7 +3868,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			gentity_t *targown = &g_entities[targ->s.owner];
 
 			if ( targown && targown->inuse && targown->client && OnSameTeam( targown, attacker ) ) {
-				if ( !g_friendlyFire.integer ) {
+				if ( !g_friendlyFire.getInt() ) {
 					return;
 				}
 			}
@@ -3894,7 +3894,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 	//NOTE: non-client objects hitting clients (and clients hitting clients) purposely doesn't obey this teamnodmg (for emplaced guns)
 	if ( attacker && !targ->client ) {//attacker hit a non-client
 		if ( level.gametype == GT_SIEGE &&
-			!g_ff_objectives.integer ) {//in siege mode (and...?)
+			!g_ff_objectives.getInt() ) {//in siege mode (and...?)
 			if ( targ->teamnodmg ) {//targ shouldn't take damage from a certain team
 				if ( attacker->client ) {//a client hit a non-client object
 					if ( targ->teamnodmg == attacker->client->sess.sessionTeam ) {
@@ -3968,7 +3968,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 
 	take -= asave;
 
-	if ( japp_instagib.integer && mod != MOD_UNKNOWN && mod != MOD_FORCE_DARK && mod != MOD_WATER && mod != MOD_SLIME
+	if ( japp_instagib.getInt() && mod != MOD_UNKNOWN && mod != MOD_FORCE_DARK && mod != MOD_WATER && mod != MOD_SLIME
 		&& mod != MOD_LAVA && mod != MOD_CRUSH && mod != MOD_TELEFRAG && mod != MOD_FALLING && mod != MOD_SUICIDE
 		&& mod != MOD_TRIGGER_HURT && mod != MOD_TEAM_CHANGE ) {
 		// instagib
@@ -3976,7 +3976,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		take = targ->health;
 	}
 
-	if ( japp_damageNotifications.integer ) {
+	if ( japp_damageNotifications.getInt() ) {
 		trap->SendServerCommand( attacker - g_entities, va( "chat \"" S_COLOR_WHITE "* Damage given: " S_COLOR_RED "%i"
 			S_COLOR_WHITE "/" S_COLOR_GREEN "%i " S_COLOR_WHITE " (%i)\"", take, asave, take + asave )
 		);
@@ -4162,7 +4162,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 		}
 	}
 
-	if ( g_debugDamage.integer ) {
+	if ( g_debugDamage.getInt() ) {
 		trap->Print( "%i: client:%i health:%i damage:%i armor:%i\n", level.time, targ->s.number,
 			targ->health, take, asave );
 	}
@@ -4324,7 +4324,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 				&& (targ->s.eType == ET_PLAYER || targ->s.NPC_class != CLASS_VEHICLE) ) {
 				targ->locationDamage[gPainHitLoc] += take;
 
-				if ( g_armBreakage.integer && !targ->client->ps.brokenLimbs && targ->client->ps.stats[STAT_HEALTH] > 0
+				if ( g_armBreakage.getInt() && !targ->client->ps.brokenLimbs && targ->client->ps.stats[STAT_HEALTH] > 0
 					&& targ->health > 0 && !(targ->s.eFlags & EF_DEAD) ) { //check for breakage
 					if ( targ->locationDamage[HL_ARM_RT] + targ->locationDamage[HL_HAND_RT] >= 80 )
 						G_BreakArm( targ, BROKENLIMB_RARM );
@@ -4363,7 +4363,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 					VectorClear( &targ->pos2 );
 			}
 
-			if ( japp_instagib.integer && targ->client ) {
+			if ( japp_instagib.getInt() && targ->client ) {
 				targ->client->ps.eFlags |= EF_DISINTEGRATION;
 				VectorCopy( &targ->pos1, &targ->client->ps.lastHitLoc );
 				targ->r.contents = CONTENTS_NONE;
@@ -4389,7 +4389,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 			return;
 		}
 		else {
-			if ( g_debugMelee.integer ) {//getting hurt makes you let go of the wall
+			if ( g_debugMelee.getInt() ) {//getting hurt makes you let go of the wall
 				if ( targ->client && (targ->client->ps.pm_flags&PMF_STUCK_TO_WALL) ) {
 					G_LetGoOfWall( targ );
 				}
@@ -4421,7 +4421,7 @@ static qboolean CanDamage( gentity_t *targ, gentity_t *attacker, vector3 *origin
 	vector3	midpoint;
 
 	if ( targ && attacker && targ->client ) {
-		if ( japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK) ) {
+		if ( japp_chatProtection.getInt() && (targ->client->ps.eFlags & EF_TALK) ) {
 			return qfalse;
 		}
 		if ( (attacker->client && attacker->client->ps.duelInProgress

@@ -1524,7 +1524,7 @@ void ST_Commander( void ) {
 	//Go through the list:
 
 	//Everyone should try to get to a combat point if possible
-	if ( d_asynchronousGroupAI.integer ) {//do one member a turn
+	if ( d_asynchronousGroupAI.getInt() ) {//do one member a turn
 		group->activeMemberNum++;
 		if ( group->activeMemberNum >= group->numGroup ) {
 			group->activeMemberNum = 0;
@@ -2230,7 +2230,7 @@ void NPC_BSST_Attack( void ) {
 			if ( NPC->s.weapon == WP_ROCKET_LAUNCHER
 				&& (ucmd.buttons&BUTTON_ATTACK)
 				&& !move
-				&& g_spSkill.integer > 1
+				&& g_spSkill.getInt() > 1
 				&& !Q_irand( 0, 3 ) ) {//every now and then, shoot a homing rocket
 				ucmd.buttons &= ~BUTTON_ATTACK;
 				ucmd.buttons |= BUTTON_ALT_ATTACK;

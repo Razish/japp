@@ -96,7 +96,7 @@ static qboolean Update( Vehicle_t *pVeh, const usercmd_t *pUcmd ) {
 	assert( pVeh->m_pParentEntity );
 	if ( !BG_FighterUpdate( pVeh, pUcmd, &((gentity_t *)pVeh->m_pParentEntity)->r.mins,
 		&((gentity_t *)pVeh->m_pParentEntity)->r.maxs,
-		g_gravity.value,
+		g_gravity.getFloat(),
 		G_VehicleTrace ) ) {
 		return qfalse;
 	}

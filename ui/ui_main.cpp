@@ -789,16 +789,16 @@ static void UI_BuildPlayerList( void ) {
 
 
 	if ( n < uiInfo.myTeamCount ) {
-		trap->Cvar_Set( "cg_selectedPlayerName", uiInfo.teamNames[n] );
+		cg_selectedPlayerName.setString( uiInfo.teamNames[n] );
 	}
 	else {
-		trap->Cvar_Set( "cg_selectedPlayerName", "Everyone" );
+		cg_selectedPlayerName.setString( "Everyone" );
 	}
 
 	if ( !team || team == TEAM_SPECTATOR ) {
 		n = uiInfo.myTeamCount;
-		trap->Cvar_Set( "cg_selectedPlayer", va( "%d", n ) );
-		trap->Cvar_Set( "cg_selectedPlayerName", "N/A" );
+		cg_selectedPlayer.setInt( n );
+		cg_selectedPlayerName.setString( "N/A" );
 	}
 }
 
@@ -1375,11 +1375,11 @@ static void UI_SetCapFragLimits( qboolean uiVars ) {
 	int frag = 10;
 
 	if ( uiVars ) {
-		trap->Cvar_Set( "ui_captureLimit", va( "%d", cap ) );
-		trap->Cvar_Set( "ui_fragLimit", va( "%d", frag ) );
+		ui_captureLimit.setInt( cap );
+		ui_fragLimit.setInt( frag );
 	}
 	else {
-		trap->Cvar_Set( "capturelimit", va( "%d", cap ) );
+		capturelimit.setInt( cap );
 		trap->Cvar_Set( "fraglimit", va( "%d", frag ) );
 	}
 }
@@ -3108,7 +3108,7 @@ static qboolean UI_Skill_HandleKey( uint32_t flags, float *special, int key ) {
 static qboolean UI_TeamName_HandleKey( uint32_t flags, float *special, int key, qboolean blue ) {
 	if ( key == A_MOUSE1 || key == A_MOUSE2 || key == A_ENTER || key == A_KP_ENTER ) {
 		int i;
-		i = UI_TeamIndexFromName( UI_Cvar_VariableString( (blue) ? "ui_blueTeam" : "ui_redTeam" ) );
+		i = UI_TeamIndexFromName( ( blue ) ? ui_blueteam.getStr() : ui_redteam.getStr() );
 
 		if ( key == A_MOUSE2 ) {
 			i--;
@@ -3124,7 +3124,7 @@ static qboolean UI_TeamName_HandleKey( uint32_t flags, float *special, int key, 
 			i = uiInfo.teamCount - 1;
 		}
 
-		trap->Cvar_Set( (blue) ? "ui_blueTeam" : "ui_redTeam", uiInfo.teamList[i].teamName );
+		(blue) ? ui_blueteam.setString( uiInfo.teamList[i].teamName ) : ui_redteam.setString( uiInfo.teamList[i].teamName );
 
 		return qtrue;
 	}
@@ -3311,7 +3311,7 @@ static qboolean UI_Crosshair_HandleKey( uint32_t flags, float *special, int key 
 		if ( uiInfo.currentCrosshair >= NUM_CROSSHAIRS )	uiInfo.currentCrosshair = 0;
 		else if ( uiInfo.currentCrosshair < 0 )				uiInfo.currentCrosshair = NUM_CROSSHAIRS - 1;
 
-		trap->Cvar_Set( "cg_drawCrosshair", va( "%d", uiInfo.currentCrosshair ) );
+		cg_drawCrosshair.setInt( uiInfo.currentCrosshair );
 		return qtrue;
 	}
 	return qfalse;
@@ -7920,8 +7920,6 @@ void UI_Init( qboolean inGameLoad ) {
 
 	uiInfo.inGameLoad = inGameLoad;
 
-	XCVAR_RegisterXCvars();
-
 	//initialize all these cvars to "0"
 	UI_SiegeSetCvarsForClass( NULL );
 
@@ -8098,7 +8096,7 @@ void UI_Init( qboolean inGameLoad ) {
 	UI_InitForceShaders();
 
 	// sets defaults for ui temp cvars
-	uiInfo.currentCrosshair = (int)trap->Cvar_VariableValue( "cg_drawCrosshair" );
+	uiInfo.currentCrosshair = cg_drawCrosshair.getInt();
 	trap->Cvar_Set( "ui_mousePitch", (trap->Cvar_VariableValue( "m_pitch" ) >= 0) ? "0" : "1" );
 	trap->Cvar_Set( "ui_mousePitchVeh", (trap->Cvar_VariableValue( "m_pitchVeh" ) >= 0) ? "0" : "1" );
 
@@ -8714,6 +8712,8 @@ float UI_Font_HeightPixels( const int iFontIndex, const float scale ) {
 extern "C" {
 Q_EXPORT uiExport_t* QDECL GetModuleAPI( int apiVersion, uiImport_t *import ) {
 	static uiExport_t uie = { 0 };
+
+	XCVAR_RegisterXCvars();
 
 	assert( import );
 	trap = import;

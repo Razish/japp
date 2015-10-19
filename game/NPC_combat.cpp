@@ -93,7 +93,7 @@ void G_AttackDelay( gentity_t *self, gentity_t *enemy ) {
 		AngleVectors( &self->client->renderInfo.eyeAngles, &fwd, NULL, NULL );
 		//dir[2] = fwd[2] = 0;//ignore z diff?
 
-		attDelay = (4 - g_spSkill.integer) * 500;//initial: from 1000ms delay on hard to 2000ms delay on easy
+		attDelay = (4 - g_spSkill.getInt()) * 500;//initial: from 1000ms delay on hard to 2000ms delay on easy
 		if ( self->client->playerTeam == NPCTEAM_PLAYER ) {//invert
 			attDelay = 2000 - attDelay;
 		}
@@ -185,8 +185,8 @@ void G_AttackDelay( gentity_t *self, gentity_t *enemy ) {
 		}
 
 		//don't shoot right away
-		if ( attDelay > 4000 + ((2 - g_spSkill.integer) * 3000) ) {
-			attDelay = 4000 + ((2 - g_spSkill.integer) * 3000);
+		if ( attDelay > 4000 + ((2 - g_spSkill.getInt()) * 3000) ) {
+			attDelay = 4000 + ((2 - g_spSkill.getInt()) * 3000);
 		}
 		TIMER_Set( self, "attackDelay", attDelay );//Q_irand( 1500, 4500 ) );
 		//don't move right away either
@@ -316,7 +316,7 @@ void G_SetEnemy( gentity_t *self, gentity_t *enemy ) {
 			//When first get mad, aim is bad
 			//Hmm, base on game difficulty, too?  Rank?
 			if ( self->client->playerTeam == NPCTEAM_PLAYER ) {
-				G_AimSet( self, Q_irand( self->NPC->stats.aim - (5 * (g_spSkill.integer)), self->NPC->stats.aim - g_spSkill.integer ) );
+				G_AimSet( self, Q_irand( self->NPC->stats.aim - (5 * (g_spSkill.getInt())), self->NPC->stats.aim - g_spSkill.getInt() ) );
 			}
 			else {
 				int minErr = 3;
@@ -330,7 +330,7 @@ void G_SetEnemy( gentity_t *self, gentity_t *enemy ) {
 					maxErr = 15;
 				}
 
-				G_AimSet( self, Q_irand( self->NPC->stats.aim - (maxErr*(3 - g_spSkill.integer)), self->NPC->stats.aim - (minErr*(3 - g_spSkill.integer)) ) );
+				G_AimSet( self, Q_irand( self->NPC->stats.aim - (maxErr*(3 - g_spSkill.getInt())), self->NPC->stats.aim - (minErr*(3 - g_spSkill.getInt())) ) );
 			}
 		}
 
@@ -830,10 +830,10 @@ void ShootThink( void ) {
 			if ( client->ps.weapon == WP_EMPLACED_GUN ) {
 				if ( NPC->parent ) // try and get the debounce values from the chair if we can
 				{
-					if ( g_spSkill.integer == 0 ) {
+					if ( g_spSkill.getInt() == 0 ) {
 						delay = NPC->parent->random + 150;
 					}
-					else if ( g_spSkill.integer == 1 ) {
+					else if ( g_spSkill.getInt() == 1 ) {
 						delay = NPC->parent->random + 100;
 					}
 					else {
@@ -841,10 +841,10 @@ void ShootThink( void ) {
 					}
 				}
 				else {
-					if ( g_spSkill.integer == 0 ) {
+					if ( g_spSkill.getInt() == 0 ) {
 						delay = 350;
 					}
-					else if ( g_spSkill.integer == 1 ) {
+					else if ( g_spSkill.getInt() == 1 ) {
 						delay = 300;
 					}
 					else {
@@ -2515,7 +2515,7 @@ void NPC_CheckGetNewWeapon( void ) {
 
 void NPC_AimAdjust( int change ) {
 	if ( !TIMER_Exists( NPC, "aimDebounce" ) ) {
-		int debounce = 500 + (3 - g_spSkill.integer) * 100;
+		int debounce = 500 + (3 - g_spSkill.getInt()) * 100;
 		TIMER_Set( NPC, "aimDebounce", Q_irand( debounce, debounce + 1000 ) );
 		//int debounce = 1000+(3-g_spSkill.integer)*500;
 		//TIMER_Set( NPC, "aimDebounce", Q_irand( debounce, debounce+2000 ) );
@@ -2534,7 +2534,7 @@ void NPC_AimAdjust( int change ) {
 
 		//Com_Printf( "%s new aim = %d\n", NPC->NPC_type, NPCInfo->currentAim );
 
-		debounce = 500 + (3 - g_spSkill.integer) * 100;
+		debounce = 500 + (3 - g_spSkill.getInt()) * 100;
 		TIMER_Set( NPC, "aimDebounce", Q_irand( debounce, debounce + 1000 ) );
 		//int debounce = 1000+(3-g_spSkill.integer)*500;
 		//TIMER_Set( NPC, "aimDebounce", Q_irand( debounce, debounce+2000 ) );
@@ -2548,7 +2548,7 @@ void G_AimSet( gentity_t *self, int aim ) {
 		self->NPC->currentAim = aim;
 		//Com_Printf( "%s new aim = %d\n", self->NPC_type, self->NPC->currentAim );
 
-		debounce = 500 + (3 - g_spSkill.integer) * 100;
+		debounce = 500 + (3 - g_spSkill.getInt()) * 100;
 		TIMER_Set( self, "aimDebounce", Q_irand( debounce, debounce + 1000 ) );
 		//	int debounce = 1000+(3-g_spSkill.integer)*500;
 		//	TIMER_Set( self, "aimDebounce", Q_irand( debounce,debounce+2000 ) );

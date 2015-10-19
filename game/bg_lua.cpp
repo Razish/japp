@@ -43,7 +43,6 @@ namespace JPLua {
 		std::unordered_map<std::string, bool> plugins;
 	} autoload;
 
-	#if defined( PROJECT_CGAME )
 	void UpdateAutoload( const xcvar *cv ) {
 		autoload.plugins.clear();
 
@@ -65,31 +64,6 @@ namespace JPLua {
 			autoload.plugins[p] = true;
 		}
 	}
-	#else
-	void UpdateAutoload( void ) {
-	#if defined(PROJECT_GAME)
-		char *autoloadStr = g_jpluaAutoload.string;
-	#else
-		//char *autoloadStr = g_jpluaAutoload.string;
-	#endif
-
-		autoload.plugins.clear();
-
-		if ( !strcmp( autoloadStr, "1" ) ) {
-			autoload.all = true;
-			return;
-		}
-		else if ( !strcmp( autoloadStr, "0" ) ) {
-			autoload.all = false;
-			return;
-		}
-		autoload.all = false;
-		const char *delim = " ";
-		for ( char *p = strtok( autoloadStr, delim ); p; p = strtok( NULL, delim ) ) {
-			autoload.plugins[p] = true;
-		}
-	}
-	#endif
 
 	void ListPlugins( void ) {
 		plugin_t *plugin = nullptr;
@@ -1509,7 +1483,7 @@ namespace JPLua {
 	void Init( void ) {
 	#ifdef JPLUA
 	#if defined(PROJECT_GAME)
-		if ( !g_jplua.integer ) {
+		if ( !g_jplua.getInt() ) {
 	#elif defined(PROJECT_CGAME)
 		if ( !cg_jplua.getInt() ) {
 	#endif

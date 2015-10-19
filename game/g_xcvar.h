@@ -1,15 +1,17 @@
 
+class xcvar;
+
 #ifdef XCVAR_PROTO
-#define XCVAR_DEF( name, defVal, update, flags, announce ) extern vmCvar_t name;
+#define XCVAR_DEF( name, defVal, update, flags, announce ) extern xcvar name;
 #endif
 
 #ifdef XCVAR_DECL
-#define XCVAR_DEF( name, defVal, update, flags, announce ) vmCvar_t name;
+#define XCVAR_DEF( name, defVal, update, flags, announce ) xcvar name( #name, defVal, flags, update, announce );
 #endif
 
-#ifdef XCVAR_LIST
+/*#ifdef XCVAR_LIST
 #define XCVAR_DEF( name, defVal, update, flags, announce ) { & name , #name , defVal , update , flags , announce },
-#endif
+#endif*/
 
 XCVAR_DEF( bg_fighterAltControl, "0", NULL, CVAR_SERVERINFO, qtrue )
 XCVAR_DEF( bot_addDelay, "3", NULL, CVAR_NONE, qfalse )
@@ -99,7 +101,7 @@ XCVAR_DEF( g_maxHolocronCarry, "3", NULL, CVAR_LATCH, qfalse )
 XCVAR_DEF( g_motd, "", NULL, CVAR_NONE, qfalse )
 XCVAR_DEF( g_needpass, "0", NULL, CVAR_SERVERINFO | CVAR_ROM, qtrue )
 XCVAR_DEF( g_noSpecMove, "0", NULL, CVAR_SERVERINFO, qtrue )
-XCVAR_DEF( g_password, "", NULL, CVAR_NONE, qfalse )
+XCVAR_DEF( g_password, "", CVU_Password, CVAR_NONE, qfalse )
 XCVAR_DEF( g_powerDuelEndHealth, "90", NULL, CVAR_ARCHIVE, qtrue )
 XCVAR_DEF( g_powerDuelStartHealth, "150", NULL, CVAR_ARCHIVE, qtrue )
 XCVAR_DEF( g_privateDuel, "23", CVU_Duel, CVAR_ARCHIVE, qtrue )

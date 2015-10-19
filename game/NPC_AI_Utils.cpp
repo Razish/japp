@@ -317,7 +317,7 @@ void AI_GetGroup( gentity_t *self ) {
 		return;
 	}
 
-	if ( d_noGroupAI.integer ) {
+	if ( d_noGroupAI.getInt() ) {
 		self->NPC->group = NULL;
 		return;
 	}
@@ -674,7 +674,7 @@ qboolean AI_RefreshGroup( AIGroupInfo_t *group ) {
 		else {
 			group->morale += member->NPC->rank;
 		}
-		if ( group->commander && d_npcai.integer ) {
+		if ( group->commander && d_npcai.getInt() ) {
 			//G_DebugLine( group->commander->r.currentOrigin, member->r.currentOrigin, FRAMETIME, 0x00ff00ff, qtrue );
 			G_TestLine( &group->commander->r.currentOrigin, &member->r.currentOrigin, 0x00000ff, FRAMETIME );
 		}
@@ -754,7 +754,7 @@ qboolean AI_RefreshGroup( AIGroupInfo_t *group ) {
 void AI_UpdateGroups( void ) {
 	int i;
 
-	if ( d_noGroupAI.integer ) {
+	if ( d_noGroupAI.getInt() ) {
 		return;
 	}
 	//Clear all Groups

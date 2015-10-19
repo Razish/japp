@@ -235,7 +235,7 @@ void Seeker_Hunt( qboolean visible, qboolean advance ) {
 		VectorNormalize( &forward );
 	}
 
-	speed = SEEKER_FORWARD_BASE_SPEED + SEEKER_FORWARD_MULTIPLIER * g_spSkill.integer;
+	speed = SEEKER_FORWARD_BASE_SPEED + SEEKER_FORWARD_MULTIPLIER * g_spSkill.getInt();
 	VectorMA( &NPC->client->ps.velocity, speed, &forward, &NPC->client->ps.velocity );
 }
 

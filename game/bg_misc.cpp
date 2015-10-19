@@ -1006,7 +1006,7 @@ void BG_CycleInven( playerState_t *ps, int direction ) {
 
 static qboolean BG_AlwaysPickupWeapons( void ) {
 #ifdef PROJECT_GAME
-	return !!((jp_cinfo.bits & CINFO_ALWAYSPICKUPWEAP));
+	return !!((jp_cinfo.getBits() & CINFO_ALWAYSPICKUPWEAP));
 #elif defined( PROJECT_CGAME )
 	return !!((cgs.japp.jp_cinfo & CINFO_ALWAYSPICKUPWEAP));
 #else
@@ -2099,7 +2099,7 @@ int BG_GetGametypeForString( const char *gametype ) {
 
 qboolean GetCInfo( uint32_t bit ) {
 #if defined(PROJECT_GAME)
-	uint32_t cinfo = (unsigned)jp_cinfo.integer;
+	uint32_t cinfo = (unsigned)jp_cinfo.getInt();
 #elif defined(PROJECT_CGAME)
 	uint32_t cinfo = cgs.japp.jp_cinfo;
 #else

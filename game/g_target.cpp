@@ -694,7 +694,7 @@ void scriptrunner_run( gentity_t *self ) {
 	if ( self->behaviorSet[BSET_USE] ) {
 		if ( self->spawnflags & 1 ) {
 			if ( !self->activator ) {
-				if ( developer.integer ) {
+				if ( developer.getInt() ) {
 					Com_Printf( "target_scriptrunner tried to run on invalid entity!\n" );
 				}
 				return;
@@ -711,14 +711,14 @@ void scriptrunner_run( gentity_t *self ) {
 					trap->ICARUS_InitEnt( (sharedEntity_t *)self->activator );
 				}
 				else {
-					if ( developer.integer ) {
+					if ( developer.getInt() ) {
 						Com_Printf( "target_scriptrunner tried to run on invalid ICARUS activator!\n" );
 					}
 					return;
 				}
 			}
 
-			if ( developer.integer ) {
+			if ( developer.getInt() ) {
 				Com_Printf( "target_scriptrunner running %s on activator %s\n", self->behaviorSet[BSET_USE], self->activator->targetname );
 			}
 			if ( !strncmp( self->behaviorSet[BSET_USE], Q3_SCRIPT_DIR "/", strlen( Q3_SCRIPT_DIR "/" ) ) )
@@ -727,7 +727,7 @@ void scriptrunner_run( gentity_t *self ) {
 				trap->ICARUS_RunScript( (sharedEntity_t *)self->activator, va( "%s/%s", Q3_SCRIPT_DIR, self->behaviorSet[BSET_USE] ) );
 		}
 		else {
-			if ( developer.integer && self->activator ) {
+			if ( developer.getInt() && self->activator ) {
 				Com_Printf( "target_scriptrunner %s used by %s\n", self->targetname, self->activator->targetname );
 			}
 			G_ActivateBehavior( self, BSET_USE );
@@ -841,7 +841,7 @@ void target_level_change_use( gentity_t *self, gentity_t *other, gentity_t *acti
 		return;
 	}
 
-	trap->Cvar_Set( "nextmap", va( "map %s", self->message ) );
+	nextmap.setString( va( "map %s", self->message ) );
 	ExitLevel();
 }
 

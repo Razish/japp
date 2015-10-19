@@ -4,12 +4,12 @@
 #include "b_local.h"
 #include "qcommon/q_shared.h"
 
-void Debug_Printf( vmCvar_t *cv, int debugLevel, const char *fmt, ... ) {
+void Debug_Printf( const xcvar *cv, int debugLevel, const char *fmt, ... ) {
 	const char *color;
 	va_list argptr;
 	char msg[1024];
 
-	if ( cv->value < debugLevel )
+	if ( cv->getFloat() < debugLevel )
 		return;
 
 	if ( debugLevel == DEBUG_LEVEL_DETAIL )
@@ -28,12 +28,12 @@ void Debug_Printf( vmCvar_t *cv, int debugLevel, const char *fmt, ... ) {
 	Com_Printf( "%s%5i:%s", color, level.time, msg );
 }
 
-void Debug_NPCPrintf( gentity_t *printNPC, vmCvar_t *cv, int debugLevel, const char *fmt, ... ) {
+void Debug_NPCPrintf( gentity_t *printNPC, const xcvar *cv, int debugLevel, const char *fmt, ... ) {
 	const char *color;
 	va_list argptr;
 	char msg[1024];
 
-	if ( cv->value < debugLevel ) {
+	if ( cv->getFloat() < debugLevel ) {
 		return;
 	}
 

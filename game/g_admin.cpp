@@ -618,7 +618,7 @@ static qboolean AM_CanInflict( const gentity_t *entInflicter, const gentity_t *e
 	}
 
 	if ( inflicter->rank == victim->rank ) {
-		if ( japp_passRankConflicts.integer ) {
+		if ( japp_passRankConflicts.getInt() ) {
 			G_LogPrintf( level.log.console, "%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s"
 				"(User: %s) (Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank,
 				entVictim->client->pers.netname, victim->user, victim->rank );
@@ -909,7 +909,7 @@ static void AM_SetLoginEffect(gentity_t *ent){
 		ent->client->pers.adminData.logineffect = 0;
 		return;
 	}
-	ent->client->ps.powerups[ent->client->pers.adminData.logineffect] = level.time + (japp_adminEffectDuration.integer * 1000);
+	ent->client->ps.powerups[ent->client->pers.adminData.logineffect] = level.time + (japp_adminEffectDuration.getInt() * 1000);
 }
 
 // log in using user + pass
@@ -1571,7 +1571,7 @@ static void AM_Poll( gentity_t *ent ) {
 		}
 	}
 
-	level.voteExecuteDelay = japp_voteDelay.integer;
+	level.voteExecuteDelay = japp_voteDelay.getInt();
 	level.voteTime = level.time;
 	level.voteYes = 0;
 	level.voteNo = 0;
@@ -1829,7 +1829,7 @@ void Slap( gentity_t *targ ) {
 		Weapon_HookFree( targ->client->hook );
 	}
 	G_Knockdown( targ );
-	G_Throw( targ, &newDir, japp_slapDistance.value );
+	G_Throw( targ, &newDir, japp_slapDistance.getFloat() );
 
 	//trap->SendServerCommand( targ - g_entities, "cp \"You have been slapped\"" );
 	AM_DrawString(ADMIN_STRING_SLAP, targ, NULL);
@@ -2301,7 +2301,7 @@ static void AM_Slay( gentity_t *ent ) {
 		return;
 	}
 	Cmd_Kill_f(targetEnt);
-	if (japp_slaydismember.integer){
+	if (japp_slaydismember.getInt()){
 		AM_Dismember(targetEnt);
 	}
 	G_LogPrintf( level.log.admin, "\t%s slayed %s\n", G_PrintClient( ent-g_entities ), G_PrintClient( targetClient ) );
@@ -2846,7 +2846,7 @@ static void AM_Map( gentity_t *ent ) {
 
 	trap->Argv( 2, map, sizeof(map) );
 
-	if ( !japp_ammapAnyGametype.integer ) {
+	if ( !japp_ammapAnyGametype.getInt() ) {
 		if ( !G_DoesMapSupportGametype( map, gametype ) ) {
 			AM_ConsolePrint( ent, va( "Map: %s does not support gametype: %s, or the map doesn't exist.\n",
 				map, BG_GetGametypeString( gametype ) ) );
@@ -2863,8 +2863,8 @@ static void AM_Map( gentity_t *ent ) {
 	G_LogPrintf( level.log.admin, "\t%s changed map to \"%s\" with gametype \"%s\"\n", G_PrintClient( ent-g_entities ),
 		map, BG_GetGametypeString( gametype ) );
 	trap->SendConsoleCommand( EXEC_APPEND, va( "g_gametype %d\n", gametype ) );
-	if ( nextmap.string[0] ) {
-		trap->SendConsoleCommand( EXEC_APPEND, va( "map %s; set nextmap \"%s\"\n", map, nextmap.string ) );
+	if ( nextmap.stringlen() ) {
+		trap->SendConsoleCommand( EXEC_APPEND, va( "map %s; set nextmap \"%s\"\n", map, nextmap.getStr() ) );
 	}
 	else {
 		trap->SendConsoleCommand( EXEC_APPEND, va( "map %s\n", map ) );
@@ -2906,7 +2906,7 @@ void Merc_Off( gentity_t *ent ) {
 	int i;
 	weapon_t newWeap = WP_NONE, wp = (weapon_t)ent->client->ps.weapon;
 
-	ent->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
+	ent->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.getInt();
 
 	for ( i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
 		if ( (ent->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {

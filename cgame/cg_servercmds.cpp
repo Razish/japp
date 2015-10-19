@@ -139,20 +139,20 @@ void CG_ParseServerinfo( void ) {
 	Q_strncpyz( cgs.mapnameClean, mapname, sizeof(cgs.mapnameClean) );
 
 	//rww - You must do this one here, Info_ValueForKey always uses the same memory pointer.
-	trap->Cvar_Set( "ui_about_mapname", mapname );
+	ui_about_mapname.setString( mapname );
 
 	Com_sprintf( cgs.mapname, sizeof(cgs.mapname), "maps/%s.bsp", mapname );
 
-	trap->Cvar_Set( "ui_about_gametype", va( "%i", cgs.gametype ) );
-	trap->Cvar_Set( "ui_about_fraglimit", va( "%i", cgs.fraglimit ) );
-	trap->Cvar_Set( "ui_about_duellimit", va( "%i", cgs.duel_fraglimit ) );
-	trap->Cvar_Set( "ui_about_capturelimit", va( "%i", cgs.capturelimit ) );
-	trap->Cvar_Set( "ui_about_timelimit", va( "%i", cgs.timelimit ) );
-	trap->Cvar_Set( "ui_about_maxclients", va( "%i", cgs.maxclients ) );
-	trap->Cvar_Set( "ui_about_dmflags", va( "%i", cgs.dmflags ) );
-	trap->Cvar_Set( "ui_about_hostname", Info_ValueForKey( info, "sv_hostname" ) );
-	trap->Cvar_Set( "ui_about_needpass", Info_ValueForKey( info, "g_needpass" ) );
-	trap->Cvar_Set( "ui_about_botminplayers", Info_ValueForKey( info, "bot_minplayers" ) );
+	ui_about_gametype.setInt( cgs.gametype );
+	ui_about_fraglimit.setInt( cgs.fraglimit );
+	ui_about_duellimit.setInt( cgs.duel_fraglimit );
+	ui_about_capturelimit.setInt( cgs.capturelimit );
+	ui_about_timelimit.setInt( cgs.timelimit );
+	ui_about_maxclients.setInt( cgs.maxclients );
+	ui_about_dmflags.setInt( cgs.dmflags );
+	ui_about_hostname.setString( Info_ValueForKey( info, "sv_hostname" ) );
+	ui_about_needpass.setString( Info_ValueForKey( info, "g_needpass" ) );
+	ui_about_botminplayers.setString( Info_ValueForKey( info, "bot_minplayers" ) );
 
 	//Set the siege teams based on what the server has for overrides.
 	trap->Cvar_Set( "cg_siegeTeam1", Info_ValueForKey( info, "g_siegeTeam1" ) );

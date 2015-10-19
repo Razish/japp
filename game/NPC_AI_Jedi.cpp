@@ -294,7 +294,7 @@ void Boba_FlyStart( gentity_t *self ) {//switch to seeker AI for a while
 }
 
 void Boba_FlyStop( gentity_t *self ) {
-	self->client->ps.gravity = g_gravity.value;
+	self->client->ps.gravity = g_gravity.getFloat();
 	if ( self->NPC ) {
 		self->NPC->aiFlags &= ~NPCAI_CUSTOM_GRAVITY;
 	}
@@ -1133,7 +1133,7 @@ static void Jedi_AdjustSaberAnimLevel( gentity_t *self, int newLevel ) {
 		self->client->ps.fd.saberAnimLevel = newLevel;
 	}
 
-	if ( d_JediAI.integer ) {
+	if ( d_JediAI.getInt() ) {
 		switch ( self->client->ps.fd.saberAnimLevel ) {
 		case FORCE_LEVEL_1:
 			Com_Printf( S_COLOR_GREEN"%s Saber Attack Set: fast\n", self->NPC_type );
@@ -1372,7 +1372,7 @@ static void Jedi_CombatDistance( int enemy_dist ) {//FIXME: for many of these ch
 			NPC->client->ps.weaponTime <= 0 && //I'm not busy
 			WP_ForcePowerAvailable( NPC, FP_GRIP, 0 ) && //I can use the power
 			!Q_irand( 0, 10 ) && //don't do it all the time, averages to 1 check a second
-			Q_irand( 0, 6 ) < g_spSkill.integer && //more likely on harder diff
+			Q_irand( 0, 6 ) < g_spSkill.getInt() && //more likely on harder diff
 			Q_irand( RANK_CIVILIAN, RANK_CAPTAIN ) < NPCInfo->rank )//more likely against harder enemies
 		{//They're throwing their saber, grip them!
 			//taunt
@@ -1426,7 +1426,7 @@ static void Jedi_CombatDistance( int enemy_dist ) {//FIXME: for many of these ch
 					else if ( WP_ForcePowerAvailable( NPC, FP_LIGHTNING, 0 ) && Q_irand( 0, 1 ) ) {
 						ForceLightning( NPC );
 						if ( NPC->client->ps.fd.forcePowerLevel[FP_LIGHTNING] > FORCE_LEVEL_1 ) {
-							NPC->client->ps.weaponTime = Q_irand( 1000, 3000 + (g_spSkill.integer * 500) );
+							NPC->client->ps.weaponTime = Q_irand( 1000, 3000 + (g_spSkill.getInt() * 500) );
 							TIMER_Set( NPC, "holdLightning", NPC->client->ps.weaponTime );
 						}
 						TIMER_Set( NPC, "attackDelay", NPC->client->ps.weaponTime );
@@ -1846,8 +1846,8 @@ int Jedi_ReCalcParryTime( gentity_t *self, evasionType_t evasionType ) {
 		return bg_parryDebounce[self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE]];
 	}
 	else if ( self->NPC ) {
-		if ( !g_saberRealisticCombat.integer
-			&& (g_spSkill.integer == 2 || (g_spSkill.integer == 1 && self->client->NPC_class == CLASS_TAVION)) ) {
+		if ( !g_saberRealisticCombat.getInt()
+			&& (g_spSkill.getInt() == 2 || (g_spSkill.getInt() == 1 && self->client->NPC_class == CLASS_TAVION)) ) {
 			if ( self->client->NPC_class == CLASS_TAVION ) {
 				return 0;
 			}
@@ -1867,8 +1867,8 @@ int Jedi_ReCalcParryTime( gentity_t *self, evasionType_t evasionType ) {
 				baseTime = Q_irand( 1, 3 ) * 50;
 			}
 			else {
-				if ( g_saberRealisticCombat.integer ) {
-					switch ( g_spSkill.integer ) {
+				if ( g_saberRealisticCombat.getInt() ) {
+					switch ( g_spSkill.getInt() ) {
 					case 0:
 						baseTime = 500;
 						break;
@@ -1882,7 +1882,7 @@ int Jedi_ReCalcParryTime( gentity_t *self, evasionType_t evasionType ) {
 					}
 				}
 				else {
-					switch ( g_spSkill.integer ) {
+					switch ( g_spSkill.getInt() ) {
 					case 0:
 						baseTime = 200;//500;
 						break;
@@ -1944,8 +1944,8 @@ int Jedi_ReCalcParryTime( gentity_t *self, evasionType_t evasionType ) {
 qboolean Jedi_QuickReactions( gentity_t *self ) {
 	if ( (self->client->NPC_class == CLASS_JEDI && NPCInfo->rank == RANK_COMMANDER) ||
 		self->client->NPC_class == CLASS_TAVION ||
-		(self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] > FORCE_LEVEL_1&&g_spSkill.integer > 1) ||
-		(self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] > FORCE_LEVEL_2&&g_spSkill.integer > 0) ) {
+		(self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] > FORCE_LEVEL_1&&g_spSkill.getInt() > 1) ||
+		(self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] > FORCE_LEVEL_2&&g_spSkill.getInt() > 0) ) {
 		return qtrue;
 	}
 	return qfalse;
@@ -2044,7 +2044,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 		}
 	}
 	// Figure out what quadrant the block was in.
-	if ( d_JediAI.integer ) {
+	if ( d_JediAI.getInt() ) {
 		Com_Printf( "(%d) evading attack from height %4.2f, zdiff: %4.2f, rightdot: %4.2f\n", level.time, hitloc.z - self->r.absmin.z, zdiff, rightdot );
 	}
 
@@ -2080,7 +2080,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						if ( zdiff > 5 ) {
 							TIMER_Start( self, "duck", Q_irand( 500, 1500 ) );
 							evasionType = EVASION_DUCK_PARRY;
-							if ( d_JediAI.integer ) {
+							if ( d_JediAI.getInt() ) {
 								Com_Printf( "duck " );
 							}
 						}
@@ -2089,7 +2089,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						}
 					}
 				}
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "UR block\n" );
 				}
 			}
@@ -2118,7 +2118,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						if ( zdiff > 5 ) {
 							TIMER_Start( self, "duck", Q_irand( 500, 1500 ) );
 							evasionType = EVASION_DUCK_PARRY;
-							if ( d_JediAI.integer ) {
+							if ( d_JediAI.getInt() ) {
 								Com_Printf( "duck " );
 							}
 						}
@@ -2127,7 +2127,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						}
 					}
 				}
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "UL block\n" );
 				}
 			}
@@ -2137,7 +2137,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 				if ( self->client->ps.groundEntityNum != ENTITYNUM_NONE ) {
 					duckChance = 4;
 				}
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "TOP block\n" );
 				}
 			}
@@ -2147,7 +2147,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 				//duckChance = 2;
 				TIMER_Start( self, "duck", Q_irand( 500, 1500 ) );
 				evasionType = EVASION_DUCK;
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "duck " );
 				}
 			}
@@ -2163,7 +2163,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 				//duckChance = 2;
 				TIMER_Start( self, "duck", Q_irand( 500, 1500 ) );
 				evasionType = EVASION_DUCK;
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "duck " );
 				}
 			}
@@ -2191,7 +2191,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						evasionType = EVASION_PARRY;
 					}
 				}
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "mid-UR block\n" );
 				}
 			}
@@ -2215,7 +2215,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						evasionType = EVASION_PARRY;
 					}
 				}
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "mid-UL block\n" );
 				}
 			}
@@ -2227,7 +2227,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 				else {
 					evasionType = EVASION_PARRY;
 				}
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "mid-TOP block\n" );
 				}
 			}
@@ -2238,7 +2238,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 		if ( self->client->ps.groundEntityNum == ENTITYNUM_NONE ) {//already in air, duck to pull up legs
 			TIMER_Start( self, "duck", Q_irand( 500, 1500 ) );
 			evasionType = EVASION_DUCK;
-			if ( d_JediAI.integer ) {
+			if ( d_JediAI.getInt() ) {
 				Com_Printf( "legs up\n" );
 			}
 			if ( incoming || !saberBusy ) {
@@ -2246,14 +2246,14 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 				if ( rightdot >= 0 ) {
 					self->client->ps.saberBlocked = BLOCKED_LOWER_RIGHT;
 					evasionType = EVASION_DUCK_PARRY;
-					if ( d_JediAI.integer ) {
+					if ( d_JediAI.getInt() ) {
 						Com_Printf( "LR block\n" );
 					}
 				}
 				else {
 					self->client->ps.saberBlocked = BLOCKED_LOWER_LEFT;
 					evasionType = EVASION_DUCK_PARRY;
-					if ( d_JediAI.integer ) {
+					if ( d_JediAI.getInt() ) {
 						Com_Printf( "LL block\n" );
 					}
 				}
@@ -2269,7 +2269,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 					&& !(self->client->ps.fd.forcePowersActive&(1 << FP_RAGE))
 					&& !PM_InKnockDown( &self->client->ps ) ) {
 					self->client->ps.fd.forceJumpCharge = 320;//FIXME: calc this intelligently
-					if ( d_JediAI.integer ) {
+					if ( d_JediAI.getInt() ) {
 						Com_Printf( "force jump + " );
 					}
 				}
@@ -2300,7 +2300,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 							self->client->ps.velocity.z = JUMP_VELOCITY;
 						}
 					}
-					if ( d_JediAI.integer ) {
+					if ( d_JediAI.getInt() ) {
 						Com_Printf( "jump + " );
 					}
 				}
@@ -2351,7 +2351,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 					else if ( evasionType == EVASION_NONE ) {
 						evasionType = EVASION_PARRY;
 					}
-					if ( d_JediAI.integer ) {
+					if ( d_JediAI.getInt() ) {
 						Com_Printf( "LR block\n" );
 					}
 				}
@@ -2363,7 +2363,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 					else if ( evasionType == EVASION_NONE ) {
 						evasionType = EVASION_PARRY;
 					}
-					if ( d_JediAI.integer ) {
+					if ( d_JediAI.getInt() ) {
 						Com_Printf( "LL block\n" );
 					}
 				}
@@ -2375,14 +2375,14 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 			if ( rightdot >= 0 ) {
 				self->client->ps.saberBlocked = BLOCKED_LOWER_RIGHT;
 				evasionType = EVASION_PARRY;
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "LR block\n" );
 				}
 			}
 			else {
 				self->client->ps.saberBlocked = BLOCKED_LOWER_LEFT;
 				evasionType = EVASION_PARRY;
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "LL block\n" );
 				}
 			}
@@ -2397,7 +2397,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 						&& !PM_InKnockDown( &self->client->ps ) ) {
 						self->client->ps.fd.forceJumpCharge = 320;//FIXME: calc this intelligently
 						evasionType = EVASION_FJUMP;
-						if ( d_JediAI.integer ) {
+						if ( d_JediAI.getInt() ) {
 							Com_Printf( "force jump + " );
 						}
 					}
@@ -2415,7 +2415,7 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 							self->client->ps.velocity.z = JUMP_VELOCITY;
 						}
 						evasionType = EVASION_JUMP_PARRY;
-						if ( d_JediAI.integer ) {
+						if ( d_JediAI.getInt() ) {
 							Com_Printf( "jump + " );
 						}
 					}
@@ -2577,7 +2577,7 @@ static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bl
 	dist = ShortestLineSegBewteen2LineSegs( &NPC->enemy->client->renderInfo.muzzlePoint, &saberTip, &bottom, &top, &saberPoint, &axisPoint );
 	if ( dist > NPC->r.maxs.x * 5 )//was *3
 	{//FIXME: sometimes he reacts when you're too far away to actually hit him
-		if ( d_JediAI.integer ) {
+		if ( d_JediAI.getInt() ) {
 			Com_Printf( S_COLOR_RED"enemy saber dist: %4.2f\n", dist );
 		}
 		/*
@@ -2594,7 +2594,7 @@ static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bl
 		}
 		return qfalse;
 	}
-	if ( d_JediAI.integer ) {
+	if ( d_JediAI.getInt() ) {
 		Com_Printf( S_COLOR_GREEN"enemy saber dist: %4.2f\n", dist );
 	}
 
@@ -2647,7 +2647,7 @@ static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bl
 		VectorCopy( &tr.endpos, &hitloc );
 	}
 
-	if ( d_JediAI.integer ) {
+	if ( d_JediAI.getInt() ) {
 		//G_DebugLine( saberPoint, hitloc, FRAMETIME, WPDEBUG_SaberColor( NPC->enemy->client->ps.saber[saberNum].blade[bladeNum].color ), qtrue );
 		G_TestLine( &saberPoint, &hitloc, 0x0000ff, FRAMETIME );
 	}
@@ -2664,7 +2664,7 @@ static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bl
 		//debounce our parry recalc time
 		parryReCalcTime = Jedi_ReCalcParryTime( NPC, evasionType );
 		TIMER_Set( NPC, "parryReCalcTime", Q_irand( 0, parryReCalcTime ) );
-		if ( d_JediAI.integer ) {
+		if ( d_JediAI.getInt() ) {
 			Com_Printf( "Keep parry choice until: %d\n", level.time + parryReCalcTime );
 		}
 
@@ -2899,7 +2899,7 @@ static void Jedi_EvasionSaber( vector3 *enemy_movedir, float enemy_dist, vector3
 					}
 				}
 				else {//strafed
-					if ( d_JediAI.integer ) {
+					if ( d_JediAI.getInt() ) {
 						Com_Printf( "def strafe\n" );
 					}
 					if ( !(NPCInfo->scriptFlags&SCF_NO_ACROBATICS)
@@ -3296,7 +3296,7 @@ static void Jedi_CombatTimersUpdate( int enemy_dist ) {
 		//FIXME: Maybe more likely to do this if aggression higher?  Or some other stat?
 		if ( !Q_irand( 0, 4 ) ) {//start a strafe
 			if ( Jedi_Strafe( 1000, 3000, 0, 4000, qtrue ) ) {
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "off strafe\n" );
 				}
 			}
@@ -3334,7 +3334,7 @@ static void Jedi_CombatTimersUpdate( int enemy_dist ) {
 					Jedi_AdjustSaberAnimLevel( NPC, (NPC->client->ps.fd.saberAnimLevel - 1) );
 				}
 			}
-			if ( d_JediAI.integer ) {
+			if ( d_JediAI.getInt() ) {
 				Com_Printf( "(%d) PARRY: agg %d, no parry until %d\n", level.time, NPCInfo->stats.aggression, level.time + 100 );
 			}
 			newFlags &= ~SEF_PARRIED;
@@ -3345,7 +3345,7 @@ static void Jedi_CombatTimersUpdate( int enemy_dist ) {
 			{
 				//Com_Printf( "(%d) drop agg - we hit enemy\n", level.time );
 				Jedi_Aggression( NPC, -1 );
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "(%d) HIT: agg %d\n", level.time, NPCInfo->stats.aggression );
 				}
 				if ( !Q_irand( 0, 3 )
@@ -3372,7 +3372,7 @@ static void Jedi_CombatTimersUpdate( int enemy_dist ) {
 					Jedi_Aggression( NPC, -2 );//really should back off!
 				}
 				Jedi_AdjustSaberAnimLevel( NPC, (NPC->client->ps.fd.saberAnimLevel + 1) );//use a stronger attack
-				if ( d_JediAI.integer ) {
+				if ( d_JediAI.getInt() ) {
 					Com_Printf( "(%d) KNOCK-BLOCKED: agg %d\n", level.time, NPCInfo->stats.aggression );
 				}
 			}
@@ -3381,7 +3381,7 @@ static void Jedi_CombatTimersUpdate( int enemy_dist ) {
 				{
 					//Com_Printf( "(%d) drop agg - we were blocked\n", level.time );
 					Jedi_Aggression( NPC, -1 );
-					if ( d_JediAI.integer ) {
+					if ( d_JediAI.getInt() ) {
 						Com_Printf( "(%d) BLOCKED: agg %d\n", level.time, NPCInfo->stats.aggression );
 					}
 				}
@@ -3904,7 +3904,7 @@ static void Jedi_CheckEnemyMovement( float enemy_dist ) {
 							TIMER_Set( NPC, "strafeLeft", -1 );
 							TIMER_Set( NPC, "strafeRight", -1 );
 							TIMER_Set( NPC, "noStrafe", Q_irand( 500, 1000 ) );
-							TIMER_Set( NPC, "noturn", Q_irand( 250, 500 )*(3 - g_spSkill.integer) );
+							TIMER_Set( NPC, "noturn", Q_irand( 250, 500 )*(3 - g_spSkill.getInt()) );
 
 							VectorCopy( &NPC->enemy->client->ps.velocity, &enemyFwd );
 							VectorNormalize( &enemyFwd );
@@ -4231,13 +4231,13 @@ void NPC_Jedi_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	if ( other->s.weapon == WP_SABER ) {//back off
 		TIMER_Set( self, "parryTime", -1 );
 		if ( self->client->NPC_class == CLASS_DESANN || !Q_stricmp( "Yoda", self->NPC_type ) ) {//less for Desann
-			self->client->ps.fd.forcePowerDebounce[FP_SABER_DEFENSE] = level.time + (3 - g_spSkill.integer) * 50;
+			self->client->ps.fd.forcePowerDebounce[FP_SABER_DEFENSE] = level.time + (3 - g_spSkill.getInt()) * 50;
 		}
 		else if ( self->NPC->rank >= RANK_LT_JG ) {
-			self->client->ps.fd.forcePowerDebounce[FP_SABER_DEFENSE] = level.time + (3 - g_spSkill.integer) * 100;//300
+			self->client->ps.fd.forcePowerDebounce[FP_SABER_DEFENSE] = level.time + (3 - g_spSkill.getInt()) * 100;//300
 		}
 		else {
-			self->client->ps.fd.forcePowerDebounce[FP_SABER_DEFENSE] = level.time + (3 - g_spSkill.integer) * 200;//500
+			self->client->ps.fd.forcePowerDebounce[FP_SABER_DEFENSE] = level.time + (3 - g_spSkill.getInt()) * 200;//500
 		}
 		if ( !Q_irand( 0, 3 ) ) {//ouch... maybe switch up which saber power level we're using
 			Jedi_AdjustSaberAnimLevel( self, Q_irand( FORCE_LEVEL_1, FORCE_LEVEL_3 ) );
@@ -4247,12 +4247,12 @@ void NPC_Jedi_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 			//Com_Printf( "(%d) drop agg - hit by saber\n", level.time );
 			Jedi_Aggression( self, -1 );
 		}
-		if ( d_JediAI.integer ) {
+		if ( d_JediAI.getInt() ) {
 			Com_Printf( "(%d) PAIN: agg %d, no parry until %d\n", level.time, self->NPC->stats.aggression, level.time + 500 );
 		}
 		//for testing only
 		// Figure out what quadrant the hit was in.
-		if ( d_JediAI.integer ) {
+		if ( d_JediAI.getInt() ) {
 			vector3	diff, fwdangles, right;
 			float rightdot, zdiff;
 
@@ -4626,7 +4626,7 @@ static void Jedi_Attack( void ) {
 			float chance;
 
 			if ( NPC->client->NPC_class == CLASS_DESANN || !Q_stricmp( "Yoda", NPC->NPC_type ) ) {
-				if ( g_spSkill.integer ) {
+				if ( g_spSkill.getInt() ) {
 					chance = 4.0f;//he pushes *hard*
 				}
 				else {
@@ -4634,11 +4634,11 @@ static void Jedi_Attack( void ) {
 				}
 			}
 			else if ( NPC->client->NPC_class == CLASS_TAVION ) {
-				chance = 2.0f + g_spSkill.value;//from 2 to 4
+				chance = 2.0f + g_spSkill.getFloat();//from 2 to 4
 			}
 			else {//the escalation in difficulty is nice, here, but cap it so it doesn't get *impossible* on hard
 				float maxChance = (float)(RANK_LT) / 2.0f + 3.0f;//5?
-				if ( !g_spSkill.integer ) {
+				if ( !g_spSkill.getInt() ) {
 					chance = (float)(NPCInfo->rank) / 2.0f;
 				}
 				else {
@@ -4851,14 +4851,14 @@ static void Jedi_Attack( void ) {
 
 	if ( NPC->client->NPC_class != CLASS_BOBAFETT ) {
 		if ( NPC->client->NPC_class == CLASS_TAVION
-			|| (g_spSkill.integer && (NPC->client->NPC_class == CLASS_DESANN || NPCInfo->rank >= Q_irand( RANK_CREWMAN, RANK_CAPTAIN ))) ) {//Tavion will kick in force speed if the player does...
+			|| (g_spSkill.getInt() && (NPC->client->NPC_class == CLASS_DESANN || NPCInfo->rank >= Q_irand( RANK_CREWMAN, RANK_CAPTAIN ))) ) {//Tavion will kick in force speed if the player does...
 			if ( NPC->enemy
 				&& NPC->enemy->s.number >= 0 && NPC->enemy->s.number < MAX_CLIENTS
 				&& NPC->enemy->client
 				&& (NPC->enemy->client->ps.fd.forcePowersActive & (1 << FP_SPEED))
 				&& !(NPC->client->ps.fd.forcePowersActive & (1 << FP_SPEED)) ) {
 				int chance = 0;
-				switch ( g_spSkill.integer ) {
+				switch ( g_spSkill.getInt() ) {
 				case 0:
 					chance = 9;
 					break;

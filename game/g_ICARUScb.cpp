@@ -259,7 +259,7 @@ void G_DebugPrint( int level, const char *format, ... ) {
 
 	//Don't print messages they don't want to see
 	//if ( g_ICARUSDebug->integer < level )
-	if ( developer.integer != 2 )
+	if ( developer.getInt() != 2 )
 		return;
 
 	va_start( argptr, format );
@@ -1053,7 +1053,12 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value ) {
 		return 0;
 
 	case SET_GRAVITY://## %f="0.0" # Change this ent's gravity - 800 default
-		*value = g_gravity.value;
+		if ( ent->client == NULL ) {
+			*value = g_gravity.getFloat();
+			//G_DebugPrint( WL_WARNING, "Q3_GetFloat: SET_GRAVITY, %s not a client\n", ent->targetname );
+			return 0;
+		}
+		*value = ent->client->ps.gravity;
 		break;
 
 	case SET_FACEEYESCLOSED:

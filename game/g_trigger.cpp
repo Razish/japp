@@ -919,7 +919,7 @@ void AimAtTarget( gentity_t *self ) {
 	}
 
 	height = ent->s.origin.z - origin.z;
-	gravity = g_gravity.value;
+	gravity = g_gravity.getFloat();
 	time = sqrtf( height / (.5f * gravity) );
 	if ( !time ) {
 		G_FreeEntity( self );
@@ -1198,7 +1198,7 @@ void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 			G_Damage( other, other, other, &vDir, &other->client->ps.origin, Q3_INFINITE, 0, MOD_FALLING );
 		}
 		else {
-			if ( japp_fallToDeathInstant.integer ) {
+			if ( japp_fallToDeathInstant.getInt() ) {
 				player_die( other, other, other, Q3_INFINITE, MOD_FALLING );
 				respawn( other );
 			}

@@ -167,7 +167,7 @@ void Remote_Hunt( qboolean visible, qboolean advance, qboolean retreat ) {
 		VectorNormalize( &forward );
 	}
 
-	speed = REMOTE_FORWARD_BASE_SPEED + REMOTE_FORWARD_MULTIPLIER * g_spSkill.integer;
+	speed = REMOTE_FORWARD_BASE_SPEED + REMOTE_FORWARD_MULTIPLIER * g_spSkill.getInt();
 	if ( retreat == qtrue ) {
 		speed *= -1;
 	}

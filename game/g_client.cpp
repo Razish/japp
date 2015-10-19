@@ -356,9 +356,9 @@ void JMSaberTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	// Track the jedi master
 	trap->SetConfigstring( CS_CLIENT_JEDIMASTER, va( "%i", other->s.number ) );
 
-	if ( g_spawnInvulnerability.integer ) {
+	if ( g_spawnInvulnerability.getInt() ) {
 		other->client->ps.eFlags |= EF_INVULNERABLE;
-		other->client->invulnerableTimer = level.time + g_spawnInvulnerability.integer;
+		other->client->invulnerableTimer = level.time + g_spawnInvulnerability.getInt();
 	}
 
 	trap->SendServerCommand( -1, va( "cp \"%s %s\n\"", other->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "BECOMEJM" ) ) );
@@ -989,9 +989,9 @@ void respawn( gentity_t *ent ) {
 	trap->UnlinkEntity( (sharedEntity_t *)ent );
 
 	if ( level.gametype == GT_SIEGE ) {
-		if ( g_siegeRespawn.integer ) {
+		if ( g_siegeRespawn.getInt() ) {
 			if ( ent->client->tempSpectate < level.time ) {
-				int minDel = g_siegeRespawn.integer * 2000;
+				int minDel = g_siegeRespawn.getInt() * 2000;
 				if ( minDel < 20000 ) {
 					minDel = 20000;
 				}
@@ -1358,7 +1358,7 @@ void SetupGameGhoul2Model( gentity_t *ent, char *modelname, char *skinName ) {
 
 	if ( precachedKyle && trap->G2API_HaveWeGhoul2Models( precachedKyle ) ) {
 		//rww - allow option for perplayer models on server for collision and bolt stuff.
-		if ( d_perPlayerGhoul2.integer || ent->s.number >= MAX_CLIENTS ) {
+		if ( d_perPlayerGhoul2.getInt() || ent->s.number >= MAX_CLIENTS ) {
 			char modelFullPath[MAX_QPATH], truncModelName[MAX_QPATH], skin[MAX_QPATH], vehicleName[MAX_QPATH];
 			int skinHandle = 0, i = 0;
 			char *p;
@@ -1402,7 +1402,7 @@ void SetupGameGhoul2Model( gentity_t *ent, char *modelname, char *skinName ) {
 						Q_strncpyz( skin, "default", sizeof(skin) );
 					}
 
-					if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer ) {
+					if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.getInt() ) {
 						//Also adjust customRGBA for team colors.
 						vector3 colorOverride;
 
@@ -1672,7 +1672,7 @@ void SV_ToggleUserinfoValidation_f( void ) {
 	if ( trap->Argc() == 1 ) {
 		unsigned int i = 0;
 		for ( i = 0; i < numUserinfoFields; i++ ) {
-			if ( (japp_userinfoValidate.bits & (1 << i)) ) {
+			if ( (japp_userinfoValidate.getBits() & (1 << i)) ) {
 				trap->Print( "%2d [X] %s\n", i, userinfoFields[i].fieldClean );
 			}
 			else {
@@ -1680,7 +1680,7 @@ void SV_ToggleUserinfoValidation_f( void ) {
 			}
 		}
 		for ( ; i < numUserinfoFields + USERINFO_VALIDATION_MAX; i++ ) {
-			if ( (japp_userinfoValidate.bits & (1 << i)) ) {
+			if ( (japp_userinfoValidate.getBits() & (1 << i)) ) {
 				trap->Print( "%2d [X] %s\n", i, userinfoValidateExtra[i - numUserinfoFields] );
 			}
 			else {
@@ -1704,16 +1704,15 @@ void SV_ToggleUserinfoValidation_f( void ) {
 			return;
 		}
 
-		trap->Cvar_Set( "japp_userinfoValidate", va( "%i", (1 << index) ^ (japp_userinfoValidate.bits & mask) ) );
-		trap->Cvar_Update( &japp_userinfoValidate );
+		japp_userinfoValidate.setBits( (1 << index) ^ (japp_userinfoValidate.getBits() & mask) );
 
 		if ( index < numUserinfoFields ) {
 			trap->Print( "%s %s\n", userinfoFields[index].fieldClean,
-				((japp_userinfoValidate.bits & (1 << index)) ? "Validated" : "Ignored") );
+				((japp_userinfoValidate.getBits() & (1 << index)) ? "Validated" : "Ignored") );
 		}
 		else {
 			trap->Print( "%s %s\n", userinfoValidateExtra[index - numUserinfoFields],
-				((japp_userinfoValidate.bits & (1 << index)) ? "Validated" : "Ignored") );
+				((japp_userinfoValidate.getBits() & (1 << index)) ? "Validated" : "Ignored") );
 		}
 	}
 }
@@ -1729,7 +1728,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	memset( fieldCount, 0, sizeof(fieldCount) );
 
 	// size checks
-	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_SIZE)) ) {
+	if ( japp_userinfoValidate.getBits() & (1 << (numUserinfoFields + USERINFO_VALIDATION_SIZE)) ) {
 		if ( length < 1 )
 			return "Userinfo too short";
 		else if ( length >= MAX_INFO_STRING )
@@ -1737,7 +1736,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	}
 
 	// slash checks
-	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_SLASH)) ) {
+	if ( japp_userinfoValidate.getBits() & (1 << (numUserinfoFields + USERINFO_VALIDATION_SLASH)) ) {
 		// there must be a leading slash
 		if ( userinfo[0] != '\\' )
 			return "Missing leading slash";
@@ -1757,7 +1756,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	}
 
 	// extended characters are impossible to type, may want to disable
-	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_EXTASCII)) ) {
+	if ( japp_userinfoValidate.getBits() & (1 << (numUserinfoFields + USERINFO_VALIDATION_EXTASCII)) ) {
 		for ( i = 0, count = 0; i < length; i++ ) {
 			if ( userinfo[i] < 0 )
 				count++;
@@ -1767,7 +1766,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	}
 
 	// disallow \n \r ; and \"
-	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_CONTROLCHARS)) ) {
+	if ( japp_userinfoValidate.getBits() & (1 << (numUserinfoFields + USERINFO_VALIDATION_CONTROLCHARS)) ) {
 		if ( Q_strchrs( userinfo, "\n\r;\"" ) )
 			return "Invalid characters found";
 	}
@@ -1787,7 +1786,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 
 	// count the number of fields
 	for ( i = 0, info = userinfoFields; i<numUserinfoFields; i++, info++ ) {
-		if ( japp_userinfoValidate.bits & (1 << i) ) {
+		if ( japp_userinfoValidate.getBits() & (1 << i) ) {
 			if ( info->minCount && !fieldCount[i] )
 				return va( "%s field not found", info->fieldClean );
 			else if ( fieldCount[i] > info->maxCount )
@@ -1820,7 +1819,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	}
 
 	//Raz: Scooper's code for userinfo spamming
-	if ( japp_antiUserinfoFlood.integer && !(ent->r.svFlags & SVF_BOT) ) {
+	if ( japp_antiUserinfoFlood.getInt() && !(ent->r.svFlags & SVF_BOT) ) {
 		ent->userinfoChanged = level.time;
 
 		if ( ent->userinfoSpam > 12 ) {
@@ -1892,9 +1891,9 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 			Q_CleanString( client->pers.netnameClean, STRIP_COLOUR );
 		}
 		else if ( client->pers.adminData.renamedTime != 0
-			&& client->pers.adminData.renamedTime > level.time - (japp_amrenameTime.value * 60.0f) * 1000 )
+			&& client->pers.adminData.renamedTime > level.time - (japp_amrenameTime.getFloat() * 60.0f) * 1000 )
 		{
-			float remaining = japp_amrenameTime.value * 60.0f;
+			float remaining = japp_amrenameTime.getFloat() * 60.0f;
 			remaining -= (level.time - client->pers.adminData.renamedTime) / 1000.0f;
 			trap->SendServerCommand( clientNum, va( "print \"You are not allowed to change name for another "
 				S_COLOR_CYAN "%.1f " S_COLOR_WHITE "seconds\n\"", remaining ) );
@@ -1911,7 +1910,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	// set model
 	Q_strncpyz( model, Info_ValueForKey( userinfo, "model" ), sizeof(model) );
 
-	if ( d_perPlayerGhoul2.integer && Q_stricmp( model, client->modelname ) ) {
+	if ( d_perPlayerGhoul2.getInt() && Q_stricmp( model, client->modelname ) ) {
 		Q_strncpyz( client->modelname, model, sizeof(client->modelname) );
 		modelChanged = qtrue;
 	}
@@ -1924,7 +1923,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	value = Info_ValueForKey( userinfo, "char_color_blue" );
 	client->ps.customRGBA[2] = value ? Q_clampi( 0, atoi( value ), 255 ) : 255;
 	client->ps.customRGBA[3] = 255;
-	if ( japp_charRestrictRGB.integer
+	if ( japp_charRestrictRGB.getInt()
 		&& ((client->ps.customRGBA[0] + client->ps.customRGBA[1] + client->ps.customRGBA[2]) < 100) )
 	{
 		client->ps.customRGBA[0] = client->ps.customRGBA[1] = client->ps.customRGBA[2] = 255;
@@ -1933,7 +1932,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	Q_strncpyz( forcePowers, Info_ValueForKey( userinfo, "forcepowers" ), sizeof(forcePowers) );
 
 	// update our customRGBA for team colors.
-	if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer ) {
+	if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.getInt() ) {
 		char skin[MAX_QPATH] = { 0 };
 		vector3 colorOverride;
 
@@ -1996,7 +1995,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 			if ( scl->forcedModel[0] ) {
 				// be sure to override the model we actually use
 				Q_strncpyz( model, scl->forcedModel, sizeof(model) );
-				if ( d_perPlayerGhoul2.integer && Q_stricmp( model, client->modelname ) ) {
+				if ( d_perPlayerGhoul2.getInt() && Q_stricmp( model, client->modelname ) ) {
 					Q_strncpyz( client->modelname, model, sizeof(client->modelname) );
 					modelChanged = qtrue;
 				}
@@ -2067,9 +2066,9 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	}
 
 	s = Info_ValueForKey( userinfo, "snaps" );
-	if ( atoi( s ) < sv_fps.integer ) {
+	if ( atoi( s ) < sv_fps.getInt() ) {
 		trap->SendServerCommand( clientNum, va( "print \"" S_COLOR_YELLOW "Recommend setting /snaps %d or higher to "
-			"match this server's sv_fps\n\"", sv_fps.integer ) );
+			"match this server's sv_fps\n\"", sv_fps.getInt() ) );
 	}
 
 	// send over a subset of the userinfo keys so other clients can
@@ -2128,7 +2127,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		client->torsoLastFlip = client->legsLastFlip = qfalse;
 	}
 
-	if ( g_logClientInfo.integer ) {
+	if ( g_logClientInfo.getInt() ) {
 		if ( strcmp( oldClientinfo, buf ) ) {
 			G_LogPrintf( level.log.console, "ClientUserinfoChanged: %i %s\n", clientNum, buf );
 		}
@@ -2186,25 +2185,25 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	}
 
 	// password checks
-	if ( !isBot && g_needpass.integer ) {
+	if ( !isBot && g_needpass.getInt() ) {
 		// check for a password
 		value = Info_ValueForKey( userinfo, "password" );
-		if ( g_password.string[0] && Q_stricmp( g_password.string, "none" ) && strcmp( g_password.string, value ) ) {
+		if ( g_password.stringlen() && Q_stricmp( g_password.getStr(), "none" ) && strcmp( g_password.getStr(), value ) ) {
 			return G_GetStringEdString( "MP_SVGAME", "INVALID_ESCAPE_TO_MAIN" );
 		}
 	}
 
 	// disallow multiple connections from same IP
 	if ( !isBot && firstTime ) {
-		if ( japp_antiFakePlayer.integer ) {
+		if ( japp_antiFakePlayer.getInt() ) {
 			// check for > g_maxConnPerIP connections from same IP
 			int count = 0, i = 0;
-			for ( i = 0; i<sv_maxclients.integer; i++ ) {
+			for ( i = 0; i<sv_maxclients.getInt(); i++ ) {
 				if ( CompareIPString( tmpIP, level.clients[i].sess.IP ) ) {
 					count++;
 				}
 			}
-			if ( count > japp_maxConnPerIP.integer ) {
+			if ( count > japp_maxConnPerIP.getInt() ) {
 				return "Too many connections from the same IP";
 			}
 		}
@@ -2998,7 +2997,7 @@ void ClientSpawn( gentity_t *ent ) {
 	client->ps.customRGBA[2] = (value = Info_ValueForKey( userinfo, "char_color_blue" )) ? Q_clampi( 0, atoi( value ), 255 ) : 255;
 
 	//Prevent skins being too dark
-	if ( japp_charRestrictRGB.integer
+	if ( japp_charRestrictRGB.getInt()
 		&& ((client->ps.customRGBA[0] + client->ps.customRGBA[1] + client->ps.customRGBA[2]) < 100) )
 	{
 		client->ps.customRGBA[0] = client->ps.customRGBA[1] = client->ps.customRGBA[2] = 255;
@@ -3007,7 +3006,7 @@ void ClientSpawn( gentity_t *ent ) {
 	client->ps.customRGBA[3] = 255;
 
 	// update our customRGBA for team colors.
-	if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.integer ) {
+	if ( level.gametype >= GT_TEAM && level.gametype != GT_SIEGE && !g_jediVmerc.getInt() ) {
 		char skin[MAX_QPATH] = { 0 }, model[MAX_QPATH] = { 0 };
 		vector3 colorOverride = { 0.0f };
 
@@ -3109,17 +3108,17 @@ void ClientSpawn( gentity_t *ent ) {
 	client->ps.stats[STAT_WEAPONS] = (1 << WP_NONE);
 
 	if ( level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL ) {
-		wDisable = g_duelWeaponDisable.integer;
+		wDisable = g_duelWeaponDisable.getInt();
 	}
 	else {
-		wDisable = g_weaponDisable.integer;
+		wDisable = g_weaponDisable.getInt();
 	}
 
 	if ( level.gametype != GT_HOLOCRON
 		&& level.gametype != GT_JEDIMASTER
 		&& !HasSetSaberOnly()
-		&& !AllForceDisabled( g_forcePowerDisable.integer )
-		&& g_jediVmerc.integer ) {
+		&& !AllForceDisabled( g_forcePowerDisable.getInt() )
+		&& g_jediVmerc.getInt() ) {
 		if ( level.gametype >= GT_TEAM && (client->sess.sessionTeam == TEAM_BLUE || client->sess.sessionTeam == TEAM_RED) ) {//In Team games, force one side to be merc and other to be jedi
 			if ( level.numPlayingClients > 0 ) {//already someone in the game
 				int		i, forceTeam = TEAM_SPECTATOR;
@@ -3188,11 +3187,11 @@ void ClientSpawn( gentity_t *ent ) {
 		else {
 			int newWeap = -1, wp = client->ps.weapon;
 
-			client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
+			client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.getInt();
 
 			// give ammo for all available weapons
 			for ( i = WP_BRYAR_PISTOL; i <= LAST_USEABLE_WEAPON; i++ ) {
-				if ( japp_spawnWeaps.bits & (1 << i) ) {
+				if ( japp_spawnWeaps.getBits() & (1 << i) ) {
 					ammo_t ammo = weaponData[i].ammoIndex;
 					const gitem_t *it = BG_FindItemForAmmo( ammo );
 					if ( it )
@@ -3341,10 +3340,10 @@ void ClientSpawn( gentity_t *ent ) {
 	}
 	else if ( level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL ) {//only start with 100 health in Duel
 		if ( level.gametype == GT_POWERDUEL && client->sess.duelTeam == DUELTEAM_LONE ) {
-			if ( duel_fraglimit.integer ) {
+			if ( duel_fraglimit.getInt() ) {
 
 				ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] =
-					g_powerDuelStartHealth.integer - ((g_powerDuelStartHealth.integer - g_powerDuelEndHealth.integer) * (float)client->sess.wins / (float)duel_fraglimit.integer);
+					g_powerDuelStartHealth.getInt() - ((g_powerDuelStartHealth.getInt() - g_powerDuelEndHealth.getInt()) * (float)client->sess.wins / (float)duel_fraglimit.getInt());
 			}
 			else {
 				ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] = 150;
@@ -3402,7 +3401,7 @@ void ClientSpawn( gentity_t *ent ) {
 		client->ps.torsoTimer = client->ps.legsTimer = 0;
 
 		if ( client->ps.weapon == WP_SABER ) {
-			if ( japp_spawnActivateSaber.integer ) {
+			if ( japp_spawnActivateSaber.getInt() ) {
 				G_SetAnim( ent, NULL, SETANIM_BOTH, BOTH_STAND1TO2, animFlags, 0 );
 			}
 			else {
@@ -3429,7 +3428,7 @@ void ClientSpawn( gentity_t *ent ) {
 	}
 
 	client->respawnTime = level.time;
-	client->inactivityTime = level.time + g_inactivity.integer * 1000;
+	client->inactivityTime = level.time + g_inactivity.getInt() * 1000;
 	client->latched_buttons = 0;
 
 	if ( level.intermissiontime ) {
@@ -3485,9 +3484,9 @@ void ClientSpawn( gentity_t *ent ) {
 		trap->LinkEntity( (sharedEntity_t *)ent );
 	}
 
-	if ( g_spawnInvulnerability.integer ) {
+	if ( g_spawnInvulnerability.getInt() ) {
 		ent->client->ps.eFlags |= EF_INVULNERABLE;
-		ent->client->invulnerableTimer = level.time + g_spawnInvulnerability.integer;
+		ent->client->invulnerableTimer = level.time + g_spawnInvulnerability.getInt();
 	}
 
 	// run the presend to set anything else

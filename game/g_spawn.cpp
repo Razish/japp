@@ -1410,10 +1410,10 @@ void SP_worldspawn( void ) {
 	G_SpawnString( "message", "", &text );
 	trap->SetConfigstring( CS_MESSAGE, text );				// map specific message
 
-	trap->SetConfigstring( CS_MOTD, g_motd.string );		// message of the day
+	trap->SetConfigstring( CS_MOTD, g_motd.getStr() );		// message of the day
 
 	G_SpawnString( "gravity", "800", &text );
-	trap->Cvar_Set( "g_gravity", text );
+	g_gravity.setString( text );
 
 	G_SpawnString( "enableBreath", "0", &text );
 	trap->Cvar_Set( "g_enableBreath", text );
@@ -1426,13 +1426,13 @@ void SP_worldspawn( void ) {
 
 	// see if we want a warmup time
 	trap->SetConfigstring( CS_WARMUP, "" );
-	if ( g_restarted.integer ) {
-		trap->Cvar_Set( "g_restarted", "0" );
+	if ( g_restarted.getInt() ) {
+		g_restarted.setInt( 0 );
 		level.warmupTime = 0;
 	}
 
 	//Raz: Fix warmup
-	else if ( g_doWarmup.integer && level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL && level.gametype != GT_SIEGE ) { // Turn it on
+	else if ( g_doWarmup.getInt() && level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL && level.gametype != GT_SIEGE ) { // Turn it on
 		level.warmupTime = -1;
 		trap->SetConfigstring( CS_WARMUP, va( "%i", level.warmupTime ) );
 		G_LogPrintf( level.log.console, "Warmup:\n" );

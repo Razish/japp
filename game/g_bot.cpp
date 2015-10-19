@@ -176,7 +176,7 @@ const char *G_RefreshNextMap( int gametype, qboolean forced ) {
 	qboolean	loopingUp = qfalse;
 	//	vmCvar_t	mapname;
 
-	if ( !g_autoMapCycle.integer && !forced ) {
+	if ( !g_autoMapCycle.getInt() && !forced ) {
 		return NULL;
 	}
 
@@ -219,11 +219,11 @@ const char *G_RefreshNextMap( int gametype, qboolean forced ) {
 
 	if ( desiredMap == thisLevel ) { //If this is the only level for this game mode or we just can't find a map for this game mode, then nextmap
 		//will always restart.
-		trap->Cvar_Set( "nextmap", "map_restart 0" );
+		nextmap.setString( "map_restart 0" );
 	}
 	else { //otherwise we have a valid nextmap to cycle to, so use it.
 		type = Info_ValueForKey( level.arenas.infos[desiredMap], "map" );
-		trap->Cvar_Set( "nextmap", va( "map %s", type ) );
+		nextmap.setString( va( "map %s", type ) );
 	}
 
 	return Info_ValueForKey( level.arenas.infos[desiredMap], "map" );
@@ -316,7 +316,7 @@ void G_AddRandomBot( int team ) {
 	for ( n = 0; n < level.bots.num; n++ ) {
 		value = Info_ValueForKey( level.bots.infos[n], "name" );
 		//
-		for ( i = 0; i < sv_maxclients.integer; i++ ) {
+		for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 			cl = level.clients + i;
 			if ( cl->pers.connected != CON_CONNECTED ) {
 				continue;
@@ -338,7 +338,7 @@ void G_AddRandomBot( int team ) {
 				break;
 			}
 		}
-		if ( i >= sv_maxclients.integer ) {
+		if ( i >= sv_maxclients.getInt() ) {
 			num++;
 		}
 	}
@@ -346,7 +346,7 @@ void G_AddRandomBot( int team ) {
 	for ( n = 0; n < level.bots.num; n++ ) {
 		value = Info_ValueForKey( level.bots.infos[n], "name" );
 		//
-		for ( i = 0; i < sv_maxclients.integer; i++ ) {
+		for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 			cl = level.clients + i;
 			if ( cl->pers.connected != CON_CONNECTED ) {
 				continue;
@@ -368,7 +368,7 @@ void G_AddRandomBot( int team ) {
 				break;
 			}
 		}
-		if ( i >= sv_maxclients.integer ) {
+		if ( i >= sv_maxclients.getInt() ) {
 			num--;
 			if ( num <= 0 ) {
 				skill = G_Cvar_VariableValue( "g_spSkill" );
@@ -388,7 +388,7 @@ int G_RemoveRandomBot( int team ) {
 	int i;
 	gclient_t	*cl;
 
-	for ( i = 0; i < sv_maxclients.integer; i++ ) {
+	for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 		cl = level.clients + i;
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
@@ -415,7 +415,7 @@ int G_CountHumanPlayers( int team ) {
 	gclient_t	*cl;
 
 	num = 0;
-	for ( i = 0; i < sv_maxclients.integer; i++ ) {
+	for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 		cl = level.clients + i;
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
@@ -436,7 +436,7 @@ int G_CountBotPlayers( int team ) {
 	gclient_t	*cl;
 
 	num = 0;
-	for ( i = 0; i < sv_maxclients.integer; i++ ) {
+	for ( i = 0; i < sv_maxclients.getInt(); i++ ) {
 		cl = level.clients + i;
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
@@ -479,17 +479,16 @@ void G_CheckMinimumPlayers( void ) {
 		return;
 
 	//only check once each 10 seconds
-	if ( checkminimumplayers_time > level.time - (bot_addDelay.integer * 1000) )
+	if ( checkminimumplayers_time > level.time - (bot_addDelay.getInt() * 1000) )
 		return;
 
 	checkminimumplayers_time = level.time;
 
-	if ( bot_minplayers.integer <= 0 )
+	if ( bot_minplayers.getInt() <= 0 )
 		return;
 
-	if ( bot_minplayers.integer > sv_maxclients.integer ) {
-		trap->Cvar_Set( "bot_minplayers", sv_maxclients.string );
-		trap->Cvar_Update( &bot_minplayers );
+	if ( bot_minplayers.getInt() > sv_maxclients.getInt() ) {
+		bot_minplayers.setInt( sv_maxclients.getInt() );
 	}
 
 	humanplayers = G_CountHumanPlayers( -1 );
@@ -497,12 +496,12 @@ void G_CheckMinimumPlayers( void ) {
 
 	// if numPlayers < minPlayers and (maxBots and numPlayers < maxBots)
 	//	then addbot
-	if ( (humanplayers + botplayers) < bot_minplayers.integer
-		&& (!bot_maxbots.integer || (humanplayers + botplayers) < bot_maxbots.integer) ) {
+	if ( (humanplayers + botplayers) < bot_minplayers.getInt()
+		&& (!bot_maxbots.getInt() || (humanplayers + botplayers) < bot_maxbots.getInt()) ) {
 		G_AddRandomBot( -1 );
 	}
-	else if ( ((humanplayers + botplayers) > bot_minplayers.integer && botplayers)
-		|| (botplayers > bot_maxbots.integer && botplayers && bot_maxbots.integer) ) {
+	else if ( ((humanplayers + botplayers) > bot_minplayers.getInt() && botplayers)
+		|| (botplayers > bot_maxbots.getInt() && botplayers && bot_maxbots.getInt()) ) {
 		// try to remove spectators first
 		if ( !G_RemoveRandomBot( TEAM_SPECTATOR ) )
 			G_RemoveRandomBot( -1 );

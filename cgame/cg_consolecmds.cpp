@@ -211,7 +211,7 @@ static const size_t numPluginDisableOpts = ARRAY_LEN( pluginDisableStrings );
 static void CG_PluginDisable_f( void ) {
 	uint32_t i;
 	if ( trap->Cmd_Argc() > 1 ) {
-		char arg[8] = { 0 }, buf[16] = { 0 };
+		char arg[8] = { 0 };
 		int current, index;
 		uint32_t toggle;
 		trap->Cmd_Argv( 1, arg, sizeof(arg) );
@@ -221,20 +221,16 @@ static void CG_PluginDisable_f( void ) {
 			return;
 		}
 
-		trap->Cvar_VariableStringBuffer( "cp_pluginDisable", buf, sizeof(buf) );
-		current = atoi( buf );
+		current = cp_pluginDisable.getInt();
 		toggle = (1 << index);
-		trap->Cvar_Set( "cp_pluginDisable", va( "%i", toggle ^ current ) );
+		cp_pluginDisable.setInt( toggle ^ current );
 
 		Com_Printf( "%s %s\n", pluginDisableStrings[index], ((current&toggle) ? S_COLOR_GREEN"Allowed" : S_COLOR_RED"Disallowed") );
 	}
 	else {
-		char buf[16] = { 0 };
-		trap->Cvar_VariableStringBuffer( "cp_pluginDisable", buf, sizeof(buf) );
-
 		Com_Printf( "Usage: /pluginDisable <ID>\n" );
 		for ( i = 0; i < numPluginDisableOpts; i++ ) {
-			qboolean allowed = !(atoi( buf ) & (1 << i));
+			qboolean allowed = !(cp_pluginDisable.getBits() & (1 << i));
 			Com_Printf( S_COLOR_WHITE "(" S_COLOR_CYAN "%i" S_COLOR_WHITE ") ^%c%s\n", i,
 				(allowed ? COLOR_GREEN : COLOR_RED), pluginDisableStrings[i]
 			);

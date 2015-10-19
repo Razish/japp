@@ -6,7 +6,7 @@ static int allocPoint;
 void *G_Alloc( int size ) {
 	char *p = NULL;
 
-	if ( g_debugAlloc.integer ) {
+	if ( g_debugAlloc.getInt() ) {
 		trap->Print( "G_Alloc of %i bytes (%i left)\n", size, sizeof(memoryPool) - allocPoint - ((size + 31) & ~31) );
 	}
 

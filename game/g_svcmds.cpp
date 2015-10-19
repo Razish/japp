@@ -417,16 +417,16 @@ static void SV_Pause_f( void ) {
 	//OSP: pause
 	if ( level.pause.state == PAUSE_NONE ) {
 		level.pause.state = PAUSE_PAUSED;
-		level.pause.time = level.time + japp_pauseTime.integer * 1000;
+		level.pause.time = level.time + japp_pauseTime.getInt() * 1000;
 	}
 	else if ( level.pause.state == PAUSE_PAUSED ) {
 		level.pause.state = PAUSE_UNPAUSING;
-		level.pause.time = level.time + japp_unpauseTime.integer * 1000;
+		level.pause.time = level.time + japp_unpauseTime.getInt() * 1000;
 	}
 }
 
 static void SV_Say_f( void ) {
-	if ( dedicated.integer ) {
+	if ( dedicated.getInt() ) {
 		trap->SendServerCommand( -1, va( "print \"server: %s\n\"", ConcatArgs( 1 ) ) );
 	}
 }

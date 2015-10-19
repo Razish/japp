@@ -54,7 +54,7 @@ int adjustRespawnTime( float preRespawnTime, int itemType, int itemTag ) {
 		}
 	}
 
-	if ( !g_adaptRespawn.integer ) {
+	if ( !g_adaptRespawn.getInt() ) {
 		return((int)respawnTime);
 	}
 
@@ -942,7 +942,7 @@ void ItemUse_Sentry( gentity_t *ent ) {
 }
 
 void ItemUse_Seeker( gentity_t *ent ) {
-	if ( level.gametype == GT_SIEGE && d_siegeSeekerNPC.integer ) {//actualy spawn a remote NPC
+	if ( level.gametype == GT_SIEGE && d_siegeSeekerNPC.getInt() ) {//actualy spawn a remote NPC
 		gentity_t *remote = NPC_SpawnType( ent, "remote", NULL, qfalse, NULL );
 		if ( remote && remote->client ) {//set it to my team
 			remote->s.owner = remote->r.ownerNum = ent->s.number;
@@ -1924,7 +1924,7 @@ int Pickup_Weapon( gentity_t *ent, gentity_t *other ) {
 
 	G_LogWeaponPickup( other->s.number, ent->item->giTag );
 
-	return adjustRespawnTime( g_weaponRespawn.integer, ent->item->giType, ent->item->giTag );
+	return adjustRespawnTime( g_weaponRespawn.getInt(), ent->item->giType, ent->item->giTag );
 }
 
 int Pickup_Health( gentity_t *ent, gentity_t *other ) {
@@ -1990,7 +1990,7 @@ void RespawnItem( gentity_t *ent ) {
 			;
 	}
 
-	if ( japp_itemPush.integer )
+	if ( japp_itemPush.getInt() )
 	{
 		VectorCopy( &ent->origOrigin, &ent->s.origin );
 		VectorCopy( &ent->origOrigin, &ent->s.pos.trBase );
@@ -2031,7 +2031,7 @@ void ResetItem( gentity_t *ent ) {
 	VectorCopy( &ent->origOrigin, &ent->s.apos.trBase);
 	VectorCopy( &ent->origOrigin, &ent->r.currentOrigin);
 
-	if ( g_gametype.integer == GT_CTF && ent->item && ent->item->giType == IT_TEAM )
+	if ( level.gametype == GT_CTF && ent->item && ent->item->giType == IT_TEAM )
 		Team_FreeEntity(ent);
 
 	trap->LinkEntity( (sharedEntity_t *) ent );
@@ -2049,7 +2049,7 @@ qboolean CheckPushItem( gentity_t *ent ) {
 		}
 
 	if ( ent->item->giType == IT_WEAPON ||
-		( japp_itemPush.integer == 2 && ent->item->giType == IT_TEAM ) ||
+		( japp_itemPush.getInt() == 2 && ent->item->giType == IT_TEAM ) ||
 		 ent->item->giType == IT_POWERUP ) {
 			// check for if dropped item
 			if ( ent->r.svFlags & EF_DROPPEDWEAPON )
@@ -2242,7 +2242,7 @@ void Touch_Item( gentity_t *ent, gentity_t *other, trace_t *trace ) {
 		return;
 	}
 
-	if ( g_logItemPickup.integer )
+	if ( g_logItemPickup.getInt() )
 		G_LogPrintf( level.log.console, "Item: %i %s %s\n", other->s.number, other->client ? other->client->pers.netname : "<null>", ent->item->classname );
 
 	// play the normal pickup sound
@@ -2502,7 +2502,7 @@ gentity_t *Drop_Item( gentity_t *ent, const  gitem_t *item, float angle ) {
 	trap->Trace( &tr, &ent->s.pos.trBase, &mins, &maxs, &newOrigin, ent - g_entities, CONTENTS_SOLID, qfalse, 0, 0 );
 	VectorCopy( &tr.endpos, &newOrigin );
 
-	if ( japp_itemDropStyle.integer == 1 ) {
+	if ( japp_itemDropStyle.getInt() == 1 ) {
 		VectorScale( &velocity, 150, &velocity );
 		velocity.z += 200 + crandom() * 50;
 		return LaunchItem_Throw( item, &newOrigin, &velocity );
@@ -2567,7 +2567,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 		}
 	}
 
-	if ( g_forcePowerDisable.integer && !japp_alwaysSpawnPowerups.integer ) { //if force powers disabled, don't add force powerups
+	if ( g_forcePowerDisable.getInt() && !japp_alwaysSpawnPowerups.getInt() ) { //if force powers disabled, don't add force powerups
 		if ( ent->item->giType == IT_POWERUP ) {
 			if ( ent->item->giTag == PW_FORCE_ENLIGHTENED_LIGHT ||
 				ent->item->giTag == PW_FORCE_ENLIGHTENED_DARK ||
@@ -2780,10 +2780,10 @@ void G_SpawnItem( gentity_t *ent, const gitem_t *item ) {
 	G_SpawnFloat( "wait", "0", &ent->wait );
 
 	if ( level.gametype == GT_DUEL || level.gametype == GT_POWERDUEL ) {
-		wDisable = g_duelWeaponDisable.integer;
+		wDisable = g_duelWeaponDisable.getInt();
 	}
 	else {
-		wDisable = g_weaponDisable.integer;
+		wDisable = g_weaponDisable.getInt();
 	}
 
 	if ( item->giType == IT_WEAPON &&

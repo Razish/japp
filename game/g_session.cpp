@@ -167,7 +167,7 @@ void G_InitClientSessionData( gclient_t *client, char *userinfo, qboolean isBot 
 
 	// initial team determination
 	if ( level.gametype >= GT_TEAM ) {
-		if ( g_teamAutoJoin.integer && !(g_entities[client - level.clients].r.svFlags & SVF_BOT) ) {
+		if ( g_teamAutoJoin.getInt() && !(g_entities[client - level.clients].r.svFlags & SVF_BOT) ) {
 			sess->sessionTeam = PickTeam( -1 );
 			BroadcastTeamChange( client, -1 );
 		}
@@ -205,10 +205,10 @@ void G_InitClientSessionData( gclient_t *client, char *userinfo, qboolean isBot 
 			case GT_HOLOCRON:
 			case GT_JEDIMASTER:
 			case GT_SINGLE_PLAYER:
-				if ( g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer ) {
+				if ( g_maxGameClients.getInt() > 0 && level.numNonSpectatorClients >= g_maxGameClients.getInt() ) {
 					sess->sessionTeam = TEAM_SPECTATOR;
 				}
-				else if ( g_teamAutoJoin.integer == 2 ) {
+				else if ( g_teamAutoJoin.getInt() == 2 ) {
 					// force joining in all gametypes
 					sess->sessionTeam = TEAM_FREE;
 				}

@@ -720,7 +720,7 @@ void NPC_BSGM_Attack( void ) {
 		else if ( !NPC->lockCount && NPC->locationDamage[HL_GENERIC1] > GENERATOR_HEALTH
 			&& TIMER_Done( NPC, "attackDelay" )
 			&& InFront( &NPC->enemy->r.currentOrigin, &NPC->r.currentOrigin, &NPC->client->ps.viewangles, 0.3f )
-			&& ((!Q_irand( 0, 10 * (2 - g_spSkill.integer) ) && enemyDist4 > MIN_LOB_DIST_SQUARED&& enemyDist4 < MAX_LOB_DIST_SQUARED)
+			&& ((!Q_irand( 0, 10 * (2 - g_spSkill.getInt()) ) && enemyDist4 > MIN_LOB_DIST_SQUARED&& enemyDist4 < MAX_LOB_DIST_SQUARED)
 			|| (!TIMER_Done( NPC, "noLob" ) && !TIMER_Done( NPC, "noRapid" )))
 			&& NPC->enemy->s.weapon != WP_TURRET ) {//sometimes use the laser beam attack, but only after he's taken down our generator
 			shoot4 = qfalse;

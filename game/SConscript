@@ -30,6 +30,7 @@ files = [
 	'game/bg_slidemove.cpp',
 	'game/bg_vehicleLoad.cpp',
 	'game/bg_weapons.cpp',
+	'game/bg_xcvar.cpp',
 	'game/FighterNPC.cpp',
 	'game/g_active.cpp',
 	'game/g_admin.cpp',

@@ -106,7 +106,7 @@ void NAVNEW_PushBlocker( gentity_t *self, gentity_t *blocker, vector3 *right, qb
 		}
 
 		if ( leftSucc == 0.0f && rightSucc == 0.0f ) {//both sides failed
-			if ( d_patched.integer ) {//use patch-style navigation
+			if ( d_patched.getInt() ) {//use patch-style navigation
 				blocker->client->pushVecTime = 0;
 			}
 			return;
@@ -373,7 +373,7 @@ qboolean NAVNEW_AvoidCollision( gentity_t *self, gentity_t *goal, navInfo_t *inf
 
 		if ( setBlockedInfo ) {
 			if ( self->NPC->consecutiveBlockedMoves > blockedMovesLimit ) {
-				if ( d_patched.integer ) {//use patch-style navigation
+				if ( d_patched.getInt() ) {//use patch-style navigation
 					self->NPC->consecutiveBlockedMoves++;
 				}
 				NPC_SetBlocked( self, info->blocker );
@@ -619,11 +619,11 @@ int	NAVNEW_MoveToGoal( gentity_t *self, navInfo_t *info ) {
 				}
 			}
 			else if ( bestNode != self->waypoint ) {//we headed toward our next waypoint (instead of our waypoint) and failed
-				if ( d_altRoutes.integer ) {//mark this edge failed and try our waypoint
+				if ( d_altRoutes.getInt() ) {//mark this edge failed and try our waypoint
 					//NOTE: don't assume there is something blocking the direct path
 					//			between my waypoint and the bestNode... I could be off
 					//			that path because of collision avoidance...
-					if ( d_patched.integer &&//use patch-style navigation
+					if ( d_patched.getInt() &&//use patch-style navigation
 						(!trap->Nav_NodesAreNeighbors( self->waypoint, bestNode )
 						|| NAVNEW_TestNodeConnectionBlocked( self->waypoint, bestNode, self, self->NPC->goalEntity->s.number, qfalse, qtrue )) ) {//the direct path between these 2 nodes is blocked by an ent
 						trap->Nav_AddFailedEdge( self->s.number, self->waypoint, bestNode );
@@ -636,7 +636,7 @@ int	NAVNEW_MoveToGoal( gentity_t *self, navInfo_t *info ) {
 				}
 			}
 			else {//we headed for *our* waypoint and couldn't get to it
-				if ( d_altRoutes.integer ) {
+				if ( d_altRoutes.getInt() ) {
 					//remember that this node is blocked
 					trap->Nav_AddFailedNode( (sharedEntity_t *)self, self->waypoint );
 					//Now we should get our waypoints again

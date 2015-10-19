@@ -252,7 +252,7 @@ void TransferWPData( int from, int to ) {
 
 void CreateNewWP( vector3 *origin, int flags ) {
 	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
-		if ( !RMG.integer ) {
+		if ( !RMG.getInt() ) {
 			trap->Print( S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE );
 		}
 		return;
@@ -422,7 +422,7 @@ int CreateNewWP_InTrail( vector3 *origin, int flags, int afterindex ) {
 	i = 0;
 
 	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
-		if ( !RMG.integer ) {
+		if ( !RMG.getInt() ) {
 			trap->Print( S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE );
 		}
 		return 0;
@@ -489,7 +489,7 @@ int CreateNewWP_InsertUnder( vector3 *origin, int flags, int afterindex ) {
 	i = 0;
 
 	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
-		if ( !RMG.integer ) {
+		if ( !RMG.getInt() ) {
 			trap->Print( S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE );
 		}
 		return 0;
@@ -762,7 +762,7 @@ int ConnectTrail( int startindex, int endindex, qboolean behindTheScenes ) {
 	vector3 validspotpos;
 	trace_t tr;
 
-	if ( RMG.integer ) { //this might be temporary. Or not.
+	if ( RMG.getInt() ) { //this might be temporary. Or not.
 		if ( !(gWPArray[startindex]->flags & WPFLAG_NEVERONEWAY) &&
 			!(gWPArray[endindex]->flags & WPFLAG_NEVERONEWAY) ) {
 			gWPArray[startindex]->flags |= WPFLAG_ONEWAY_FWD;
@@ -771,14 +771,14 @@ int ConnectTrail( int startindex, int endindex, qboolean behindTheScenes ) {
 		return 0;
 	}
 
-	if ( !RMG.integer ) {
+	if ( !RMG.getInt() ) {
 		branchDistance = TABLE_BRANCH_DISTANCE;
 	}
 	else {
 		branchDistance = 512; //be less precise here, terrain is fairly broad, and we don't want to take an hour precalculating
 	}
 
-	if ( RMG.integer ) {
+	if ( RMG.getInt() ) {
 		maxDistFactor = 700;
 	}
 
@@ -831,7 +831,7 @@ int ConnectTrail( int startindex, int endindex, qboolean behindTheScenes ) {
 	nodenum++;
 
 	while ( nodenum < MAX_NODETABLE_SIZE && !foundit && cancontinue ) {
-		if ( RMG.integer ) { //adjust the branch distance dynamically depending on the distance from the start and end points.
+		if ( RMG.getInt() ) { //adjust the branch distance dynamically depending on the distance from the start and end points.
 			vector3 startDist;
 			vector3 endDist;
 			float startDistf;
@@ -1145,7 +1145,7 @@ int RepairPaths( qboolean behindTheScenes ) {
 		return 0;
 	}
 
-	if ( RMG.integer ) {
+	if ( RMG.getInt() ) {
 		maxDistFactor = 800; //higher tolerance here.
 	}
 
@@ -1275,7 +1275,7 @@ void CalculatePaths( void ) {
 		return;
 	}
 
-	if ( RMG.integer ) {
+	if ( RMG.getInt() ) {
 		maxNeighborDist = DEFAULT_GRID_SPACING + (DEFAULT_GRID_SPACING*0.5f);
 	}
 
@@ -2674,7 +2674,7 @@ void BeginAutoPathRoutine( void ) { //Called for RMG levels.
 
 	//rww - Using a faster in-engine version because we're having to wait for this stuff to get done as opposed to just saving it once.
 	trap->BotUpdateWaypoints( gWPNum, gWPArray );
-	trap->BotCalculatePaths( RMG.integer );
+	trap->BotCalculatePaths( RMG.getInt() );
 	//CalculatePaths(); //make everything nice and connected
 
 	FlagObjects(); //currently only used for flagging waypoints nearest CTF flags
@@ -2699,7 +2699,7 @@ void LoadPath_ThisLevel( void ) {
 
 	trap->Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
 
-	if ( RMG.integer ) { //If RMG, generate the path on-the-fly
+	if ( RMG.getInt() ) { //If RMG, generate the path on-the-fly
 		trap->Cvar_Register( &bot_normgpath, "bot_normgpath", "1", CVAR_CHEAT );
 		//note: This is disabled for now as I'm using standard bot nav
 		//on premade terrain levels.
