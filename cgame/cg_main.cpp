@@ -1718,6 +1718,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 
 	trap->RegisterSharedMemory( cg.sharedBuffer );
 
+	XCVAR_RegisterXCvars();
 	CG_InitConsoleCommands();
 
 	// logging
@@ -2208,8 +2209,6 @@ float CG_Font_HeightPixels( const int iFontIndex, const float scale ) {
 extern "C" {
 Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *import ) {
 	static cgameExport_t cge = { 0 };
-
-	XCVAR_RegisterXCvars();
 
 	assert( import );
 	trap = import;

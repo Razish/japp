@@ -443,6 +443,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	srand( randomSeed );
 
+	XCVAR_RegisterXCvars();
 	trap->Cvar_Register( NULL, "ssf", va( "%X", JAPP_SERVER_FLAGS ), CVAR_SERVERINFO );
 
 	G_InitMemory();

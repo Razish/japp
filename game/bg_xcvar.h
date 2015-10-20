@@ -73,7 +73,7 @@ public:
 	{
 		return string.c_str();
 	}
-	auto stringlen() const
+	size_t stringlen() const
 	{
 		return string.length();
 	}
@@ -136,9 +136,12 @@ public:
 	}
 
 	// called once on every module startup
-	friend void XCVAR_RegisterXCvars();
+	friend void XCVAR_RegisterXCvars( void );
 
 	// called every module update frame because
 	// engine cannot invoke update callbacks in modules
-	friend void XCVAR_UpdateXCvars();
+	friend void XCVAR_UpdateXCvars( void );
 };
+
+void XCVAR_RegisterXCvars( void );
+void XCVAR_UpdateXCvars( void );

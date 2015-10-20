@@ -13,7 +13,7 @@
 static xcvar* xCvars = nullptr;
 
 xcvar::xcvar( const char* newName, const char* newDefaultStr, uint32_t newCvarFlags, xcvarModificationCallback_t newModCallback, qboolean newTrackChange ) :
-	name( newName ), defaultString( newDefaultStr ), string( newDefaultStr ), flags( newCvarFlags ), modificationCallback( newModCallback ), trackChange(newTrackChange), internalCvar()
+	name( newName ), defaultString( newDefaultStr ), string( newDefaultStr ), flags( newCvarFlags ), trackChange(newTrackChange), internalCvar(), modificationCallback( newModCallback )
 {
 	value = atof( newDefaultStr );
 	integer = atoi( newDefaultStr );
@@ -125,7 +125,7 @@ void xcvar::setString( const char* newStr )
 	update();
 }
 
-void XCVAR_RegisterXCvars()
+void XCVAR_RegisterXCvars( void )
 {
 	xcvar* c = xCvars;
 	while ( c )
@@ -134,7 +134,7 @@ void XCVAR_RegisterXCvars()
 		c = c->next;
 	}
 }
-void XCVAR_UpdateXCvars()
+void XCVAR_UpdateXCvars( void )
 {
 	xcvar* c = xCvars;
 	while ( c )

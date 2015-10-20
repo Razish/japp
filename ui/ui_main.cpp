@@ -7912,13 +7912,14 @@ static qhandle_t UI_RegisterShaderNoMip( const char *name ) {
 }
 
 void UI_Init( qboolean inGameLoad ) {
-	const char *menuSet;
 	qhandle_t value;
 
 	// Get the list of possible languages
 	uiInfo.languageCount = trap->SE_GetNumLanguages();	// this does a dir scan, so use carefully
 
 	uiInfo.inGameLoad = inGameLoad;
+
+	XCVAR_RegisterXCvars();
 
 	//initialize all these cvars to "0"
 	UI_SiegeSetCvarsForClass( NULL );
@@ -8062,15 +8063,18 @@ void UI_Init( qboolean inGameLoad ) {
 	uiInfo.characterCount = 0;
 	uiInfo.aliasCount = 0;
 
-	menuSet = UI_Cvar_VariableString( "ui_menuFilesMP" );
-	if ( menuSet == NULL || menuSet[0] == '\0' )
+	const char *menuSet = UI_Cvar_VariableString( "ui_menuFilesMP" );
+	if ( menuSet == NULL || menuSet[0] == '\0' ) {
 		menuSet = "ui/jampmenus.txt";
+	}
 
 #if 1
-	if ( inGameLoad )
+	if ( inGameLoad ) {
 		UI_LoadMenus( "ui/jampingame.txt", qtrue );
-	else if ( !ui_bypassMainMenuLoad.getInt() )
+	}
+	else if ( !ui_bypassMainMenuLoad.getInt() ) {
 		UI_LoadMenus( menuSet, qtrue );
+	}
 #else //this was adding quite a giant amount of time to the load time
 	UI_LoadMenus( menuSet, qtrue );
 	UI_LoadMenus( "ui/jampingame.txt", qtrue );
@@ -8712,8 +8716,6 @@ float UI_Font_HeightPixels( const int iFontIndex, const float scale ) {
 extern "C" {
 Q_EXPORT uiExport_t* QDECL GetModuleAPI( int apiVersion, uiImport_t *import ) {
 	static uiExport_t uie = { 0 };
-
-	XCVAR_RegisterXCvars();
 
 	assert( import );
 	trap = import;

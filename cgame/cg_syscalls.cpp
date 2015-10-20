@@ -3,7 +3,6 @@
 // cg_syscalls.c -- this file is only included when building a dll
 // cg_syscalls.asm is included instead when building a qvm
 #include "cg_local.h"
-#include "../game/bg_xcvar.h"
 
 static intptr_t( QDECL *Q_syscall )(intptr_t arg, ...) = (intptr_t( QDECL * )(intptr_t, ...)) - 1;
 
@@ -11,8 +10,6 @@ static void TranslateSyscalls( void );
 
 extern "C" Q_EXPORT void dllEntry(intptr_t(QDECL *syscallptr)(intptr_t arg, ...)) {
 	Q_syscall = syscallptr;
-
-	XCVAR_RegisterXCvars();
 
 	TranslateSyscalls();
 }
