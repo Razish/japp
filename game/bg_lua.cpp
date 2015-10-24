@@ -90,19 +90,24 @@ namespace JPLua {
 		return nullptr;
 	}
 
-	qboolean IteratePlugins( plugin_t **plugin, bool ifActive ) {
-		if ( !*plugin ) {
-			*plugin = ls.plugins;
+	qboolean IteratePlugins(plugin_t **plugin, bool ifActive) {
+		// ensure plugin exists
+		if (!*plugin) {
+			if (ls.plugins) {
+				*plugin = ls.plugins;
+			}
+			else {
+				*plugin = nullptr;
+				return qfalse;
+			}
 		}
 		else {
-			do {
-				*plugin = (*plugin)->next;
-			} while ( ifActive && *plugin && !(*plugin)->enabled );
+			*plugin = (*plugin)->next;
 		}
 
-		if ( ifActive && *plugin && !(*plugin)->enabled ) {
-			*plugin = nullptr;
-			return qfalse;
+		// skip over disabled plugins if we don't want them
+		while (ifActive && *plugin && !(*plugin)->enabled) {
+			*plugin = (*plugin)->next;
 		}
 
 		ls.currentPlugin = *plugin;
@@ -111,19 +116,24 @@ namespace JPLua {
 	}
 
 	// stateless version of the above - does not set ls.currentPlugin
-	qboolean IteratePluginsTemp( plugin_t **plugin, bool ifActive ) {
-		if ( !*plugin ) {
-			*plugin = ls.plugins;
+	qboolean IteratePluginsTemp(plugin_t **plugin, bool ifActive) {
+		// ensure plugin exists
+		if (!*plugin) {
+			if (ls.plugins) {
+				*plugin = ls.plugins;
+			}
+			else {
+				*plugin = nullptr;
+				return qfalse;
+			}
 		}
 		else {
-			do {
-				*plugin = (*plugin)->next;
-			} while ( ifActive && *plugin && !(*plugin)->enabled );
+			*plugin = (*plugin)->next;
 		}
 
-		if ( ifActive && *plugin && !(*plugin)->enabled ) {
-			*plugin = nullptr;
-			return qfalse;
+		// skip over disabled plugins if we don't want them
+		while (ifActive && *plugin && !(*plugin)->enabled) {
+			*plugin = (*plugin)->next;
 		}
 
 		return (*plugin != NULL) ? qtrue : qfalse;
@@ -827,12 +837,12 @@ namespace JPLua {
 		vector4 colour;
 		int x, y, w, h, shader;
 
-		x = lua_tointeger( L, 1 );
-		y = lua_tointeger( L, 2 );
-		w = lua_tointeger( L, 3 );
-		h = lua_tointeger( L, 4 );
+		x = luaL_checknumber( L, 1 );
+		y = luaL_checknumber(L, 2);
+		w = luaL_checknumber(L, 3);
+		h = luaL_checknumber(L, 4);
 		ReadFloats( colour.raw, 4, L, 5 );
-		shader = lua_tointeger( L, 6 );
+		shader = lua_tointeger(L, 6);
 
 		trap->R_SetColor( &colour );
 		CG_DrawPic( x, y, w, h, shader );
@@ -897,7 +907,7 @@ namespace JPLua {
 		qboolean customfont = lua_toboolean(L, 4);
 
 		if (customfont)
-			trap->R_Font_HeightPixels(font, scale);
+			lua_pushnumber( L, trap->R_Font_HeightPixels(font, scale));
 		else
 			lua_pushnumber( L, CG_Text_Height( text, scale, font ) );
 		return 1;
@@ -912,9 +922,9 @@ namespace JPLua {
 		qboolean customfont = lua_toboolean(L, 4);
 
 		if (customfont)
-			trap->R_Font_StrLenPixels(text, font, scale);
+			lua_pushnumber( L, trap->R_Font_StrLenPixels(text, font, scale));
 		else
-			lua_pushnumber(L, CG_Text_Width(text, scale, font));
+			lua_pushnumber( L, CG_Text_Width(text, scale, font));
 		return 1;
 	}
 	#endif
