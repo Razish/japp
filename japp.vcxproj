@@ -20,6 +20,7 @@
     <None Include="package.lua" />
     <None Include="README.md" />
     <None Include="SConstruct" />
+    <None Include="semver\SConscript" />
     <None Include="ui\SConscript" />
   </ItemGroup>
   <ItemGroup>
@@ -29,12 +30,15 @@
     <ClInclude Include="cgame\animtable.h" />
     <ClInclude Include="cgame\cg_lights.h" />
     <ClInclude Include="cgame\cg_local.h" />
+    <ClInclude Include="cgame\cg_luafont.h" />
     <ClInclude Include="cgame\cg_luainterface.h" />
     <ClInclude Include="cgame\cg_lualocalentity.h" />
     <ClInclude Include="cgame\cg_luarefentity.h" />
     <ClInclude Include="cgame\cg_luaserver.h" />
+    <ClInclude Include="cgame\cg_luatextbox.h" />
     <ClInclude Include="cgame\cg_media.h" />
     <ClInclude Include="cgame\cg_public.h" />
+    <ClInclude Include="cgame\cg_serverHistory.h" />
     <ClInclude Include="cgame\cg_xcvar.h" />
     <ClInclude Include="cgame\fx_local.h" />
     <ClInclude Include="cgame\tr_types.h" />
@@ -56,6 +60,7 @@
     <ClInclude Include="game\bg_luaentity.h" />
     <ClInclude Include="game\bg_luaevent.h" />
     <ClInclude Include="game\bg_luafs.h" />
+    <ClInclude Include="game\bg_luainternal.h" />
     <ClInclude Include="game\bg_lualogger.h" />
     <ClInclude Include="game\bg_luaplayer.h" />
     <ClInclude Include="game\bg_luaserialiser.h" />
@@ -73,6 +78,7 @@
     <ClInclude Include="game\g_ICARUScb.h" />
     <ClInclude Include="game\g_local.h" />
     <ClInclude Include="game\g_luasql.h" />
+    <ClInclude Include="game\g_luaweapon.h" />
     <ClInclude Include="game\g_nav.h" />
     <ClInclude Include="game\g_public.h" />
     <ClInclude Include="game\g_team.h" />
@@ -130,11 +136,13 @@
     <ClInclude Include="lua\lvm.h" />
     <ClInclude Include="lua\lzio.h" />
     <ClInclude Include="qcommon\cm_public.h" />
+    <ClInclude Include="qcommon\md5.h" />
     <ClInclude Include="qcommon\qcommon.h" />
     <ClInclude Include="qcommon\qfiles.h" />
     <ClInclude Include="qcommon\q_asm.h" />
     <ClInclude Include="qcommon\q_shared.h" />
     <ClInclude Include="qcommon\tags.h" />
+    <ClInclude Include="semver\semver.h" />
     <ClInclude Include="server\server.h" />
     <ClInclude Include="ui\keycodes.h" />
     <ClInclude Include="ui\menudef.h" />
@@ -155,11 +163,13 @@
     <ClCompile Include="cgame\cg_info.cpp" />
     <ClCompile Include="cgame\cg_light.cpp" />
     <ClCompile Include="cgame\cg_localents.cpp" />
+    <ClCompile Include="cgame\cg_luafont.cpp" />
     <ClCompile Include="cgame\cg_luaitem.cpp" />
     <ClCompile Include="cgame\cg_lualocalentity.cpp" />
     <ClCompile Include="cgame\cg_luamenu.cpp" />
     <ClCompile Include="cgame\cg_luarefentity.cpp" />
     <ClCompile Include="cgame\cg_luaserver.cpp" />
+    <ClCompile Include="cgame\cg_luatextbox.cpp" />
     <ClCompile Include="cgame\cg_main.cpp" />
     <ClCompile Include="cgame\cg_marks.cpp" />
     <ClCompile Include="cgame\cg_media.cpp" />
@@ -171,6 +181,7 @@
     <ClCompile Include="cgame\cg_saga.cpp" />
     <ClCompile Include="cgame\cg_scoreboard.cpp" />
     <ClCompile Include="cgame\cg_servercmds.cpp" />
+    <ClCompile Include="cgame\cg_serverHistory.cpp" />
     <ClCompile Include="cgame\cg_serverModification.cpp" />
     <ClCompile Include="cgame\cg_smartentities.cpp" />
     <ClCompile Include="cgame\cg_snapshot.cpp" />
@@ -229,6 +240,7 @@
     <ClCompile Include="game\g_log.cpp" />
     <ClCompile Include="game\g_luamysql.cpp" />
     <ClCompile Include="game\g_luasqlite.cpp" />
+    <ClCompile Include="game\g_luaweapon.cpp" />
     <ClCompile Include="game\g_main.cpp" />
     <ClCompile Include="game\g_mem.cpp" />
     <ClCompile Include="game\g_misc.cpp" />
@@ -240,6 +252,7 @@
     <ClCompile Include="game\g_playerbans.cpp" />
     <ClCompile Include="game\g_saga.cpp" />
     <ClCompile Include="game\g_session.cpp" />
+    <ClCompile Include="game\g_smartentities.cpp" />
     <ClCompile Include="game\g_spawn.cpp" />
     <ClCompile Include="game\g_svcmds.cpp" />
     <ClCompile Include="game\g_syscalls.cpp" />
@@ -337,8 +350,10 @@
     <ClCompile Include="lua\lundump.c" />
     <ClCompile Include="lua\lvm.c" />
     <ClCompile Include="lua\lzio.c" />
+    <ClCompile Include="qcommon\md5.cpp" />
     <ClCompile Include="qcommon\q_math.cpp" />
     <ClCompile Include="qcommon\q_shared.cpp" />
+    <ClCompile Include="semver\semver.c" />
     <ClCompile Include="sqlite\sqlite3.c" />
     <ClCompile Include="ui\ui_atoms.cpp" />
     <ClCompile Include="ui\ui_cvar.cpp" />

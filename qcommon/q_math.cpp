@@ -1753,6 +1753,20 @@ float G_PointDistFromLineSegment( const vector3 *start, const vector3 *end, cons
 	return Distance( &intersection, from );
 }
 
-qboolean FloatCompare( float f1, float f2, float epsilon ) {
-	return !!(Q_fabs( f1 - f2 ) < epsilon);
+
+//TODO: unit test precision at different ranges (and double conversion/promotion?)
+bool flcmp( const float &f1, const float &f2, const float epsilon ) {
+	const float delta = std::abs( f2 - f1 );
+
+	return delta < epsilon;
+}
+
+bool flcmp_old( const float &f1, const float &f2, const float epsilon ) {
+	return Q_fabs( f2 - f1 ) < epsilon;
+}
+
+bool dblcmp( const double &f1, const double &f2, const double epsilon ) {
+	const double delta = std::abs( f2 - f1 );
+
+	return delta < epsilon;
 }

@@ -14,10 +14,12 @@
 	#include "g_luasql.h"
 	#include "g_luaweapon.h"
 #elif defined(PROJECT_CGAME)
-	#include "cg_luaserver.h"
+	#include "cg_luafont.h"
 	#include "cg_luainterface.h"
-	#include "cg_luarefentity.h"
 	#include "cg_lualocalentity.h"
+	#include "cg_luarefentity.h"
+	#include "cg_luaserver.h"
+	#include "cg_luatextbox.h"
 #endif
 
 #include "semver/semver.h"

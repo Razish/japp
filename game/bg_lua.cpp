@@ -90,10 +90,10 @@ namespace JPLua {
 		return nullptr;
 	}
 
-	qboolean IteratePlugins(plugin_t **plugin, bool ifActive) {
+	qboolean IteratePlugins( plugin_t **plugin, bool ifActive ) {
 		// ensure plugin exists
-		if (!*plugin) {
-			if (ls.plugins) {
+		if ( !*plugin ) {
+			if ( ls.plugins ) {
 				*plugin = ls.plugins;
 			}
 			else {
@@ -106,7 +106,7 @@ namespace JPLua {
 		}
 
 		// skip over disabled plugins if we don't want them
-		while (ifActive && *plugin && !(*plugin)->enabled) {
+		while ( ifActive && *plugin && !(*plugin)->enabled ) {
 			*plugin = (*plugin)->next;
 		}
 
@@ -116,10 +116,10 @@ namespace JPLua {
 	}
 
 	// stateless version of the above - does not set ls.currentPlugin
-	qboolean IteratePluginsTemp(plugin_t **plugin, bool ifActive) {
+	qboolean IteratePluginsTemp( plugin_t **plugin, bool ifActive ) {
 		// ensure plugin exists
-		if (!*plugin) {
-			if (ls.plugins) {
+		if ( !*plugin ) {
+			if ( ls.plugins ) {
 				*plugin = ls.plugins;
 			}
 			else {
@@ -132,7 +132,7 @@ namespace JPLua {
 		}
 
 		// skip over disabled plugins if we don't want them
-		while (ifActive && *plugin && !(*plugin)->enabled) {
+		while ( ifActive && *plugin && !(*plugin)->enabled ) {
 			*plugin = (*plugin)->next;
 		}
 
@@ -429,12 +429,12 @@ namespace JPLua {
 			lua_pushstring( L, ls.currentPlugin->name );
 			lua_settable( L, top );
 
-		if (semver_lt(ls.currentPlugin->requiredJPLuaVersion, jpluaVersion)) {
-			luaO_pushfstring(L, S_COLOR_RED " %s requires ls.v%d.%d.%d\n", ls.currentPlugin->name,
+		if ( semver_lt( ls.currentPlugin->requiredJPLuaVersion, jpluaVersion ) ) {
+			luaO_pushfstring( L, S_COLOR_RED " %s requires JPLua v%d.%d.%d\n", ls.currentPlugin->name,
 				ls.currentPlugin->requiredJPLuaVersion.major, ls.currentPlugin->requiredJPLuaVersion.minor,
 				ls.currentPlugin->requiredJPLuaVersion.patch
-				);
-			luaD_throw(L, LUA_ERRRUN);
+			);
+			luaD_throw( L, LUA_ERRRUN );
 			return 0;
 		}
 		//save in the registry, but push on stack again straight away
@@ -614,7 +614,25 @@ namespace JPLua {
 			return 1;
 		}
 
-		if ( !strcmp( key, "version" ) ) {
+		if ( !strcmp( key, "isClient" ) ) {
+		#if defined(PROJECT_GAME)
+			lua_pushboolean( L, 0 );
+		#elif defined(PROJECT_CGAME)
+			lua_pushboolean( L, 1 );
+		#else
+			lua_pushnil( L );
+		#endif
+		}
+		else if ( !strcmp( key, "isServer" ) ) {
+		#if defined(PROJECT_GAME)
+			lua_pushboolean( L, 1 );
+		#elif defined(PROJECT_CGAME)
+			lua_pushboolean( L, 0 );
+		#else
+			lua_pushnil( L );
+		#endif
+		}
+		else if ( !strcmp( key, "version" ) ) {
 			lua_newtable( L );
 			int top = lua_gettop( L );
 
@@ -635,7 +653,7 @@ namespace JPLua {
 		return 1;
 	}
 	static int System_NewIndex( lua_State *L ) {
-		return luaL_error( L, "Attempt to modify read-only data (ls." );
+		return luaL_error( L, "Attempt to modify read-only data (JPLua)" );
 	}
 	static const struct luaL_Reg systemMeta[] = {
 		{ "__index", System_Index },
@@ -842,7 +860,7 @@ namespace JPLua {
 		w = luaL_checknumber(L, 3);
 		h = luaL_checknumber(L, 4);
 		ReadFloats( colour.raw, 4, L, 5 );
-		shader = lua_tointeger(L, 6);
+		shader = lua_tointeger( L, 6 );
 
 		trap->R_SetColor( &colour );
 		CG_DrawPic( x, y, w, h, shader );
@@ -888,12 +906,18 @@ namespace JPLua {
 
 	#ifdef PROJECT_CGAME
 	static int Export_DrawText( lua_State *L ) {
+		float x = luaL_checknumber( L, 1 );
+		float y = luaL_checknumber( L, 2 );
+		const char *text = luaL_checkstring( L, 3 );
 		vector4 colour = { 1.0f };
-
 		ReadFloats( colour.raw, 4, L, 4 );
+		float scale = luaL_checknumber( L, 5 );
+		int style = luaL_checkinteger( L, 6 );
+		int iMenuFont = luaL_checkinteger( L, 7 );
+		int customFont = luaL_checkinteger( L, 8 );
 
-		CG_Text_Paint( (float)lua_tonumber( L, 1 ), (float)lua_tonumber( L, 2 ), (float)lua_tonumber( L, 5 ), &colour,
-			lua_tostring( L, 3 ), 0.0f, 0, lua_tointeger( L, 6 ), lua_tointeger( L, 7 ), lua_toboolean(L, 8) );
+
+		CG_Text_Paint( x, y, scale, &colour, text, 0.0f, 0, style, iMenuFont, customFont );
 
 		return 0;
 	}
@@ -916,15 +940,21 @@ namespace JPLua {
 
 	#ifdef PROJECT_CGAME
 	static int Export_Font_StringLengthPixels( lua_State *L ) {
-		const char *text = lua_tostring(L, 1);
-		float scale = lua_tonumber(L, 2);
-		qhandle_t font = lua_tointeger(L, 3);
-		qboolean customfont = lua_toboolean(L, 4);
+		const char *text = luaL_checkstring( L, 1 );
+		float scale = luaL_checknumber( L, 2 );
+		qhandle_t font = luaL_checkinteger( L, 3 );
+		qboolean customfont = luaL_checkinteger( L, 4 );
 
-		if (customfont)
-			lua_pushnumber( L, trap->R_Font_StrLenPixels(text, font, scale));
-		else
-			lua_pushnumber( L, CG_Text_Width(text, scale, font));
+		if ( !text ) {
+			lua_pushnil( L );
+			return 1;
+		}
+		if ( customfont ) {
+			trap->R_Font_StrLenPixels( text, font, scale );
+		}
+		else {
+			lua_pushnumber( L, CG_Text_Width( text, scale, font ) );
+		}
 		return 1;
 	}
 	#endif
@@ -1313,11 +1343,6 @@ namespace JPLua {
 
 		return 1;
 	}
-
-	static int Export_RegisterFont( lua_State *L ) {
-		lua_pushinteger( L, trap->R_RegisterFont( luaL_checkstring( L, 1 ) ) );
-		return 1;
-	}
 	#endif
 
 	#ifdef PROJECT_GAME
@@ -1390,19 +1415,17 @@ namespace JPLua {
 	#endif
 		{ "AddListener", Event_AddListener }, // AddListener( string name, function listener )
 		{ "AddServerCommand", Export_AddServerCommand }, // AddServerCommand( string cmd )
+	#ifdef PROJECT_GAME
+		{ "ConnectToDB", ConnectToDB}, // ConnectToDB ( int type(1 - MySQL , 2 - SQLite), ...) // SQLite (type, string path) || MySQL ( type, string host, string user, string db, string password, int port )
+	#endif
 		{ "CreateCvar", CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
+	#ifdef PROJECT_GAME
+		{ "CreateEntity", Entity_Create },
+	#endif
 	#ifdef PROJECT_CGAME
 		{ "CreateMenu", Interface_CreateMenu },
 		{ "CreateLocalEntity", LocalEntity_Create },
 		{ "CreateRefEntity", RefEntity_Create },
-	#endif
-	#ifdef PROJECT_GAME
-		{ "CreateEntity", Entity_Create },
-	#endif
-	#ifdef PROJECT_GAME
-		{ "ConnectToDB", ConnectToDB}, // ConnectToDB ( int type(1 - MySQL , 2 - SQLite), ...) // SQLite (type, string path) || MySQL ( type, string host, string user, string db, string password, int port )
-	#endif
-	#ifdef PROJECT_CGAME
 		{ "DrawPic", Export_DrawPic }, // DrawPic( float x, float y, float width, float height, table { float r, float g, float b, float a }, integer shaderHandle )
 		{ "DrawRect", Export_DrawRect }, // DrawRect( float x, float y, float width, float height, table { float r, float g, float b, float a } )
 		{ "DrawRotatedPic", Export_DrawRotatedPic }, // DrawPic( float x, float y, float width, float height, float angle, table { float r, float g, float b, float a }, integer shaderHandle )
@@ -1415,13 +1438,13 @@ namespace JPLua {
 		{ "EntitiesInRadius", EntitiesInRadius },
 		{ "FindEntityByClassname", FindEntityByClassName },
 	#endif
-		{ "GetConfigString", GetConfigString }, // table GetConfigString()
-		{ "GetCvar", GetCvar }, // Cvar GetCvar( string name )
 		{ "GetEntity", Entity_Get }, // GetEntity(num) or GetEntity() for full list
 		{ "GetFileList", File_GetFileList}, // table GetFileList(string path, string extension)
 	#ifdef PROJECT_CGAME
 		{ "GetFPS", Export_GetFPS }, // integer GetFPS()
 	#endif
+		{ "GetConfigString", GetConfigString }, // table GetConfigString()
+		{ "GetCvar", GetCvar }, // Cvar GetCvar( string name )
 		{ "GetGameType", Export_GetGameType }, // integer GetGameType()
 	#ifdef PROJECT_CGAME
 		{ "GetGLConfig", GetGLConfig }, // table GetGLConfig()
@@ -1432,11 +1455,15 @@ namespace JPLua {
 		{ "GetMapTime", Export_GetMapTime }, // string GetMapTime()
 	#ifdef PROJECT_CGAME
 		{ "GetMenu", Interface_GetMenu },
+	#endif
+	#ifdef PROJECT_GAME
+		{ "GetModelBounds", GetModelBounds },
+	#endif
+	#ifdef PROJECT_CGAME
 		{ "GetMousePos", Export_GetMousePos }, // [{x,y}, nil] GetMousePos
 	#endif
 		{ "GetPlayer", GetPlayer }, // Player GetPlayer( integer clientNum )
 	#ifdef PROJECT_GAME
-		{ "GetModelBounds", GetModelBounds },
 		{ "GetPlayers", Export_GetPlayers }, // {Player,...} GetPlayers()
 	#endif
 		{ "GetPlayerTable", Player_GetMetaTable }, // Player.meta GetPlayerTable()
@@ -1448,38 +1475,43 @@ namespace JPLua {
 		{ "GetTime", Export_GetTime }, // integer GetTime()
 		{ "OpenFile", File_Open},
 		{ "RayTrace", Export_Trace }, // traceResult Trace( stuff )
-		{ "RegisterPlugin", RegisterPlugin }, // plugin RegisterPlugin( string name, string version )
 	#ifdef PROJECT_CGAME
-		{ "RegisterFont", Export_RegisterFont }, // RegisterFont( string name)
+		{ "RegisterFont", RegisterFont }, // RegisterFont( string name)
 		{ "RegisterShader", Export_RegisterShader }, // integer RegisterShader( string path )
 		{ "RegisterSound", Export_RegisterSound }, // integer RegisterSound( string path )
+	#endif
+		{ "RegisterPlugin", RegisterPlugin }, // plugin RegisterPlugin( string name, string version )
+	#ifdef PROJECT_CGAME
 		{ "RemapShader", Export_RemapShader }, // RemapShader( string oldshader, string newshader, string timeoffset )
 	#endif
 		{ "RemoveListener", Event_RemoveListener }, // RemoveListener( string name )
-	#ifdef PROJECT_CGAME
-		{ "SendChatText", Export_SendChatText }, // SendChatText( string text )
-	#endif
 	#ifdef PROJECT_GAME
 		{ "ScreenShake", ScreenShake },
 	#endif
+	#ifdef PROJECT_CGAME
+		{ "SendChatText", Export_SendChatText }, // SendChatText( string text )
+	#endif
 		{ "SendConsoleCommand", Export_SendConsoleCommand }, // SendConsoleCommand( string command )
-	#ifdef PROJECT_GAME
-		{ "SendReliableCommand", Export_SendReliableCommand }, // SendReliableCommand( integer clientNum, string cmd )
-	#endif
-	#ifdef PROJECT_GAME
-		{ "SetConfigString", SetConfigString}, // SetConfigString(integer type ( CS_SYSTEMINFO + i ) , value
-		{ "SetWeaponFireFunc", Weapon_SetFireFunction },
-		{ "SetWeaponAltFireFunc", Weapon_SetAltFireFunction },
-	#endif
 	#ifdef PROJECT_CGAME
 		{ "SendServerCommand", Export_SendServerCommand }, // SendServerCommand( string command )
+	#endif
+	#ifdef PROJECT_GAME
+		{ "SendReliableCommand", Export_SendReliableCommand }, // SendReliableCommand( integer clientNum, string cmd )
+		{ "SetConfigString", SetConfigString}, // SetConfigString(integer type ( CS_SYSTEMINFO + i ) , value
+	#endif
+	#ifdef PROJECT_CGAME
 		{ "SetKeyCatcher", Export_SetKeyCatcher }, // SetKeyCatcher( integer catcherMask )
 		{ "SetMousePos", Export_SetMousePos }, // SetMousePos( integer x, integer y )
+	#endif
+	#ifdef PROJECT_GAME
+		{ "SetWeaponAltFireFunc", Weapon_SetAltFireFunction },
+		{ "SetWeaponFireFunc", Weapon_SetFireFunction },
 	#endif
 		{ "StackDump", StackDump },
 	#ifdef PROJECT_CGAME
 		{ "StartLocalSound", Export_StartLocalSound }, // StartLocalSound( integer soundHandle, integer channelNum )
 		{ "TestLine", Export_TestLine }, // traceResult Trace( stuff )
+		{ "TextBox", CreateTextBox }, // TextBox TextBox( integer fontIndex )
 	#endif
 		{ "Vector3", GetVector3 }, // Vector Vector3( [float x, float y, float z] )
 	#ifdef PROJECT_CGAME
@@ -1577,6 +1609,8 @@ namespace JPLua {
 		Register_Item( ls.L );
 		Register_RefEntity( ls.L );
 		Register_LocalEntity( ls.L );
+		Register_Font( ls.L );
+		Register_TextBox( ls.L );
 	#endif
 		Register_Cvar( ls.L );
 		Register_Logger( ls.L );

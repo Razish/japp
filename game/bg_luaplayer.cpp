@@ -900,14 +900,14 @@ namespace JPLua {
 	}
 
 	//TODO: Client-side?
-	static int Player_GetFreeze(lua_State *L, jpluaEntity_t *ent){ 
+	static int Player_GetFreeze(lua_State *L, jpluaEntity_t *ent){
 		lua_pushboolean(L, ent->client->pers.adminData.isFrozen);
 		return 1;
 	}
 	#endif
 
 
-	static const property_t playerProperties [] = {
+	static const entityProperty_t playerProperties [] = {
 	#if defined(PROJECT_GAME)
 		{
 			"adminPrivileges",
@@ -1230,8 +1230,8 @@ namespace JPLua {
 		}
 
 		// assume it's a field
-		const property_t *property = (property_t *)bsearch( key, playerProperties, numPlayerProperties,
-			sizeof(property_t), propertycmp
+		const entityProperty_t *property = (entityProperty_t *)bsearch( key, playerProperties, numPlayerProperties,
+			sizeof(entityProperty_t), EntityPropertyCompare
 		);
 		if ( property ) {
 			if ( property->Get ) {
@@ -1258,8 +1258,8 @@ namespace JPLua {
 		}
 
 		// assume it's a field
-		const property_t *property = (property_t *)bsearch(key, playerProperties, numPlayerProperties,
-			sizeof(property_t), propertycmp
+		const entityProperty_t *property = (entityProperty_t *)bsearch(key, playerProperties, numPlayerProperties,
+			sizeof(entityProperty_t), EntityPropertyCompare
 		);
 		if ( property ) {
 			if ( property->Set ) {
@@ -1671,8 +1671,6 @@ namespace JPLua {
 
 	// Register the Player class for Lua
 	void Register_Player( lua_State *L ) {
-		const luaL_Reg *r;
-
 		luaL_newmetatable( L, PLAYER_META ); // Create metatable for Player class, push on stack
 
 		// Lua won't attempt to directly index userdata, only via metatables
@@ -1682,7 +1680,7 @@ namespace JPLua {
 		lua_settable( L, -3 ); // metatable.__index = metatable
 
 		// fill metatable with fields
-		for ( r = jplua_player_meta; r->name; r++ ) {
+		for ( const luaL_Reg *r = jplua_player_meta; r->name; r++ ) {
 			lua_pushcfunction( L, r->func );
 			lua_setfield( L, -2, r->name );
 		}

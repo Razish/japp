@@ -109,6 +109,10 @@
     <File Name="cgame/cg_serverHistory.cpp"/>
     <File Name="cgame/cg_lualocalentity.cpp"/>
     <File Name="cgame/cg_luarefentity.cpp"/>
+    <File Name="cgame/cg_luafont.cpp"/>
+    <File Name="cgame/cg_luafont.h"/>
+    <File Name="cgame/cg_luatextbox.cpp"/>
+    <File Name="cgame/cg_luatextbox.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="game">
     <File Name="game/g_log.cpp"/>

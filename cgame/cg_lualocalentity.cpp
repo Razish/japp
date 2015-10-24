@@ -345,7 +345,7 @@ namespace JPLua {
 			localEntityProperties,
 			numLocalEntityProperties,
 			sizeof(le_prop_t),
-			propertycmp
+			EntityPropertyCompare
 		);
 		if ( property ) {
 			if ( property->Get ) {
@@ -377,7 +377,7 @@ namespace JPLua {
 			localEntityProperties,
 			numLocalEntityProperties,
 			sizeof(le_prop_t),
-			propertycmp
+			EntityPropertyCompare
 		);
 		if ( property ) {
 			if ( property->Set ) {

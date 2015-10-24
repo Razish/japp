@@ -22,8 +22,8 @@ namespace JPLua {
 	static jpluaEntity_t *ents = cg_entities;
 #endif
 
-	int propertycmp( const void *a, const void *b ) {
-		return strcmp( (const char *)a, ((property_t *)b)->name );
+	int EntityPropertyCompare( const void *a, const void *b ) {
+		return strcmp( (const char *)a, ((entityProperty_t *)b)->name );
 	}
 
 	void Entity_CreateRef( lua_State *L, jpluaEntity_t *ent ) {
@@ -738,7 +738,7 @@ namespace JPLua {
 
 #endif
 
-	static const property_t entityProperties[] = {
+	static const entityProperty_t entityProperties[] = {
 		{
 			"angles",
 			Entity_GetAngles,
@@ -898,12 +898,12 @@ namespace JPLua {
 		}
 
 		// assume it's a field
-		const property_t *property = (property_t *)bsearch(
+		const entityProperty_t *property = (entityProperty_t *)bsearch(
 			key,
 			entityProperties,
 			numEntityProperties,
-			sizeof(property_t),
-			propertycmp
+			sizeof(entityProperty_t),
+			EntityPropertyCompare
 		);
 		if ( property ) {
 			if ( property->Get ) {
@@ -930,12 +930,12 @@ namespace JPLua {
 		}
 
 		// assume it's a field
-		const property_t *property = (property_t *)bsearch(
+		const entityProperty_t *property = (entityProperty_t *)bsearch(
 			key,
 			entityProperties,
 			numEntityProperties,
-			sizeof(property_t),
-			propertycmp
+			sizeof(entityProperty_t),
+			EntityPropertyCompare
 		);
 		if ( property ) {
 			if ( property->Set ) {

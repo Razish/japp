@@ -49,14 +49,12 @@ namespace JPLua {
 	};
 
 #ifdef JPLUA_INTERNALS
-	typedef int(*getFunc_t)( lua_State *L, jpluaEntity_t *ent );
-	typedef void(*setFunc_t)( lua_State *L, jpluaEntity_t *ent );
-	struct property_t {
+	struct entityProperty_t {
 		const char		*name;
-		getFunc_t		Get;
-		setFunc_t		Set;
+		int				(*Get)( lua_State *L, jpluaEntity_t *ent );
+		void			(*Set)( lua_State *L, jpluaEntity_t *ent );
 	};
-	int propertycmp( const void *a, const void *b );
+	int EntityPropertyCompare( const void *a, const void *b );
 
 	void Register_Entity( lua_State *L );
 	void Entity_CreateRef( lua_State *L, jpluaEntity_t *ent );

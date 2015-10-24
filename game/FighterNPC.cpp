@@ -1065,7 +1065,7 @@ void FighterPitchAdjust( Vehicle_t *pVeh, playerState_t *riderPS, playerState_t 
 
 void FighterPitchClamp( Vehicle_t *pVeh, playerState_t *riderPS, playerState_t *parentPS, int curTime ) {
 	if ( !BG_UnrestrainedPitchRoll( riderPS, pVeh ) ) {//cap pitch reasonably
-		if ( !FloatCompare( pVeh->m_pVehicleInfo->pitchLimit, -1.0f, 0.001f )
+		if ( !flcmp( pVeh->m_pVehicleInfo->pitchLimit, -1.0f, 0.001f )
 			&& !pVeh->m_iRemovedSurfaces
 			&& parentPS->electrifyTime < curTime ) {
 			if ( pVeh->m_vOrientation->pitch > pVeh->m_pVehicleInfo->pitchLimit ) {
@@ -1334,7 +1334,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh ) {
 					}
 				}
 #else// VEH_CONTROL_SCHEME_4
-				if ( !FloatCompare( pVeh->m_pVehicleInfo->rollLimit, -1, 0.001f ) ) {
+				if ( !flcmp( pVeh->m_pVehicleInfo->rollLimit, -1, 0.001f ) ) {
 					if ( curRoll > pVeh->m_pVehicleInfo->rollLimit ) {
 						curRoll = pVeh->m_pVehicleInfo->rollLimit;
 					}
@@ -1425,7 +1425,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh ) {
 		float strafeDif = AngleSubtract( strafeRoll, pVeh->m_vOrientation->roll );
 		pVeh->m_vOrientation->roll += (strafeDif*0.1f)*pVeh->m_fTimeModifier;
 		if ( !BG_UnrestrainedPitchRoll( riderPS, pVeh ) ) {//cap it reasonably
-			if ( !FloatCompare( pVeh->m_pVehicleInfo->rollLimit, -1, 0.001f )
+			if ( !flcmp( pVeh->m_pVehicleInfo->rollLimit, -1, 0.001f )
 				&& !pVeh->m_iRemovedSurfaces
 				&& parentPS->electrifyTime<curTime ) {
 				if ( pVeh->m_vOrientation->roll > pVeh->m_pVehicleInfo->rollLimit ) {

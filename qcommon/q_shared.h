@@ -261,6 +261,22 @@ float LittleFloat( const float l );
 #endif // __FreeBSD__
 
 
+// compiler specific junk, function names etc
+#if defined(_MSC_VER)
+	// visual studio
+	#define JAPP_FUNCTION __FUNCTION__
+	#define JAPP_FUNCTION_VERBOSE __FUNCSIG__
+#elif defined(__GNUC__) || defined(__clang__)
+	// gcc, clang
+	#define JAPP_FUNCTION __FUNCTION__
+	#define JAPP_FUNCTION_VERBOSE __PRETTY_FUNCTION__
+#elif defined(__INTEL_COMPILER)
+	//TODO: icc / intel
+#else
+	#define JAPP_FUNCTION "<unknown-func>"
+	#define JAPP_FUNCTION_VERBOSE XS_FUNCTION
+#endif
+
 #include "qcommon/q_asm.h"
 
 
@@ -2309,16 +2325,16 @@ const char *GetStringForID( const stringID_table_t *table, int id );
 
 // stuff to help out during development process, force reloading/uncacheing of certain filetypes...
 //
-typedef enum {
+enum forceReload_e {
 	eForceReload_NOTHING,
 	//	eForceReload_BSP,	// not used in MP codebase
 	eForceReload_MODELS,
 	eForceReload_ALL
 
-} ForceReload_e;
+};
 
 
-enum {
+enum fonts_e {
 	FONT_NONE,
 	FONT_SMALL = 1,
 	FONT_MEDIUM,
@@ -2349,7 +2365,9 @@ vector3 *tv( float x, float y, float z );
 char *vtos( const vector3 *v );
 void Q_WriteJSONToFile( void *root, fileHandle_t f );
 void Q_BinaryDump( const char *filename, const void *buffer, size_t len );
-qboolean FloatCompare( float f1, float f2, float epsilon );
+bool flcmp( const float &f1, const float &f2, const float epsilon = 0.00001f );
+bool flcmp_old( const float &f1, const float &f2, const float epsilon = 0.00001f );
+bool dblcmp( const double &f1, const double &f2, const double epsilon = 0.000000000000001 );
 
 typedef struct printBufferSession_s {
 	size_t length, maxLength;

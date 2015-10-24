@@ -381,7 +381,7 @@ void NPC_BSGrenadier_Attack( void ) {
 		if ( NPC->client->ps.weapon == WP_THERMAL ) {//grenadier
 			trace_t	trace;
 			trap->Trace( &trace, &NPC->r.currentOrigin, &NPC->enemy->r.mins, &NPC->enemy->r.maxs, &NPC->enemy->r.currentOrigin, NPC->s.number, NPC->enemy->clipmask, qfalse, 0, 0 );
-			if ( !trace.allsolid && !trace.startsolid && (FloatCompare( trace.fraction, 1.0f, 0.001f ) || trace.entityNum == NPC->enemy->s.number) ) {//I can get right to him
+			if ( !trace.allsolid && !trace.startsolid && (flcmp( trace.fraction, 1.0f, 0.001f ) || trace.entityNum == NPC->enemy->s.number) ) {//I can get right to him
 				//reset fire-timing variables
 				NPC_ChangeWeapon( WP_STUN_BATON );
 				if ( !(NPCInfo->scriptFlags&SCF_CHASE_ENEMIES) )//NPCInfo->behaviorState == BS_STAND_AND_SHOOT )

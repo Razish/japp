@@ -523,7 +523,7 @@ void NPC_BSSniper_Attack( void ) {
 			if ( NPCInfo->scriptFlags & SCF_ALT_FIRE ) {//use primary fire
 				trace_t	trace;
 				trap->Trace( &trace, &NPC->enemy->r.currentOrigin, &NPC->enemy->r.mins, &NPC->enemy->r.maxs, &NPC->r.currentOrigin, NPC->enemy->s.number, NPC->enemy->clipmask, qfalse, 0, 0 );
-				if ( !trace.allsolid && !trace.startsolid && (FloatCompare( trace.fraction, 1.0f, 0.001f ) || trace.entityNum == NPC->s.number) ) {//he can get right to me
+				if ( !trace.allsolid && !trace.startsolid && (flcmp( trace.fraction, 1.0f, 0.001f ) || trace.entityNum == NPC->s.number) ) {//he can get right to me
 					NPCInfo->scriptFlags &= ~SCF_ALT_FIRE;
 					//reset fire-timing variables
 					NPC_ChangeWeapon( WP_DISRUPTOR );

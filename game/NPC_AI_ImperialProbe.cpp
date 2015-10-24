@@ -359,7 +359,7 @@ void NPC_Probe_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 		VectorSet( &endPos, self->r.currentOrigin.x, self->r.currentOrigin.y, self->r.currentOrigin.z - 128 );
 		trap->Trace( &trace, &self->r.currentOrigin, NULL, NULL, &endPos, self->s.number, MASK_SOLID, qfalse, 0, 0 );
 
-		if ( FloatCompare( trace.fraction, 1.0f, 0.001f ) || mod == MOD_DEMP2 ) // demp2 always does this
+		if ( flcmp( trace.fraction, 1.0f, 0.001f ) || mod == MOD_DEMP2 ) // demp2 always does this
 		{
 			/*
 			if (self->client->clientInfo.headModel != 0)

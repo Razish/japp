@@ -401,7 +401,7 @@ namespace JPLua{
 			refEntityProperties,
 			numRefEntityProperties,
 			sizeof(re_prop_t),
-			propertycmp
+			EntityPropertyCompare
 			);
 		if (property) {
 			if (property->Get) {
@@ -433,7 +433,7 @@ namespace JPLua{
 			refEntityProperties,
 			numRefEntityProperties,
 			sizeof(re_prop_t),
-			propertycmp
+			EntityPropertyCompare
 			);
 		if (property) {
 			if (property->Set) {
