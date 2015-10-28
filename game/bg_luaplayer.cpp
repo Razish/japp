@@ -94,12 +94,12 @@ namespace JPLua {
 
 	static int Player_GetAmmo( lua_State *L, jpluaEntity_t *ent ) {
 	#if defined(PROJECT_GAME)
-		lua_newtable(L);
-		int top = lua_gettop(L);
-		for (int i = 1; i < WP_NUM_WEAPONS; i++) {
-			lua_pushinteger(L, i);
-			lua_pushinteger(L, ent->playerState->ammo[i]);
-			lua_settable(L, top);
+		lua_newtable( L );
+		int top = lua_gettop( L );
+		for ( int i = 1; i < WP_NUM_WEAPONS; i++ ) {
+			lua_pushinteger( L, i );
+			lua_pushinteger( L, ent->playerState->ammo[weaponData[i].ammoIndex] );
+			lua_settable( L, top );
 		}
 	#elif defined(PROJECT_CGAME)
 		if ( (int)(ent - ents) == cg.clientNum ) {
@@ -107,7 +107,7 @@ namespace JPLua {
 			int top = lua_gettop( L );
 			for ( int i = 1; i < WP_NUM_WEAPONS; i++ ) {
 				lua_pushinteger( L, i );
-				lua_pushinteger( L, cg.predictedPlayerState.ammo[i] );
+				lua_pushinteger( L, cg.predictedPlayerState.ammo[weaponData[i].ammoIndex] );
 				lua_settable( L, top );
 			}
 		}

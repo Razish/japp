@@ -392,13 +392,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <NMakeBuildCommandLine>scons.bat -Q debug=1 no_sql=1</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>scons.bat -Q -c debug=1 no_sql=1</NMakeCleanCommandLine>
-    <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;PROJECT_GAME;PROJECT_CGAME;PROJECT_UI;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>.;game;cgame;ui;mysql;sqlite;</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>scons.bat -Q no_sql=1</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>scons.bat -Q -c no_sql=1</NMakeCleanCommandLine>
-    <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>WIN32;NDEBUG;PROJECT_GAME;PROJECT_CGAME;PROJECT_UI;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>.;game;cgame;ui;mysql;sqlite;</NMakeIncludeSearchPath>
   </PropertyGroup>
   <ItemDefinitionGroup>

@@ -3,7 +3,7 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 
-#define UI_API_VERSION 1
+#define UI_API_VERSION 2
 #define UI_LEGACY_API_VERSION 7
 
 typedef struct uiClientState_s {
@@ -624,7 +624,7 @@ typedef struct uiImport_s {
 		qhandle_t hShader
 	);
 
-	float( *R_Font_StrLenPixels )(
+	int( *R_Font_StrLenPixels )(
 		const char *text,
 		const int iFontIndex,
 		const float scale
@@ -634,7 +634,7 @@ typedef struct uiImport_s {
 		const char *text
 	);
 
-	float( *R_Font_HeightPixels )(
+	int( *R_Font_HeightPixels )(
 		const int iFontIndex,
 		const float scale
 	);
@@ -965,6 +965,14 @@ typedef struct uiImport_s {
 		int toBoltIndex,
 		int toModel
 	);
+
+	struct {
+		float( *R_Font_StrLenPixels )(
+			const char *text,
+			const int iFontIndex,
+			const float scale
+		);
+	} ext;
 } uiImport_t;
 
 typedef struct uiExport_s {

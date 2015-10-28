@@ -45,11 +45,11 @@
 #define WINDOW_UNUSED02000000		(0x02000000u) //
 #define WINDOW_INTRANSITIONMODEL	(0x04000000u) // delayed script waiting to run
 
-
-// CGAME cursor type bits
-#define CURSOR_NONE					(0x0001u)
-#define CURSOR_ARROW				(0x0002u)
-#define CURSOR_SIZER				(0x0004u)
+enum cursorType_e {
+	CURSOR_NONE = 0,
+	CURSOR_ARROW,
+	CURSOR_SIZER,
+};
 
 #define STRING_POOL_SIZE (512*1024)
 
@@ -399,68 +399,188 @@ typedef struct {
 	qboolean( *handler ) (itemDef_t *item, char** args);
 } commandDef_t;
 
-typedef struct displayContextDef_s {
-	qhandle_t( *registerShaderNoMip )				(const char *p);
-	void( *setColor )							(const vector4 *v);
-	void( *drawHandlePic )					(float x, float y, float w, float h, qhandle_t asset);
-	void( *drawStretchPic )					(float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader);
-#ifdef PROJECT_CGAME
-	void( *drawText )							(float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont, qboolean customfont);
-#else
-	void(*drawText)							(float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style, int iMenuFont);
-#endif
-	float( *textWidth )						(const char *text, float scale, int iMenuFont);
-	float( *textHeight )						(const char *text, float scale, int iMenuFont);
-	qhandle_t( *registerModel )					(const char *p);
-	void( *modelBounds )						(qhandle_t model, vector3 *min, vector3 *max);
-	void( *fillRect )							(float x, float y, float w, float h, const vector4 *color);
-	void( *drawRect )							(float x, float y, float w, float h, float size, const vector4 *color);
-	void( *drawSides )						(float x, float y, float w, float h, float size);
-	void( *drawTopBottom )					(float x, float y, float w, float h, float size);
-	void( *clearScene )						(void);
-	void( *addRefEntityToScene )				(const refEntity_t *re, int gameEntity);
-	void( *renderScene )						(const refdef_t *fd);
-	qhandle_t( *RegisterFont )						(const char *fontName);
-	float( *Font_StrLenPixels )				(const char *text, const int iFontIndex, const float scale);
-	int( *Font_StrLenChars )					(const char *text);
-	float( *Font_HeightPixels )				(const int iFontIndex, const float scale);
-	void( *Font_DrawString )					(int ox, int oy, const char *text, const vector4 *rgba, const int setIndex, int iCharLimit, const float scale);
-	qboolean( *Language_IsAsian )					(void);
-	qboolean( *Language_UsesSpaces )				(void);
-	unsigned int( *AnyLanguage_ReadCharFromString )	(const char *psText, int *piAdvanceCount, qboolean *pbIsTrailingPunctuation);
-	void( *ownerDrawItem )					(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle, int iMenuFont);
-	float( *getValue )							(int ownerDraw);
-	qboolean( *ownerDrawVisible )					(uint32_t flags);
-	void( *runScript )						(char **p);
-	qboolean( *deferScript )						(char **p);
-	void( *getTeamColor )						(vector4 *color);
-	void( *getCVarString )					(const char *cvar, char *buffer, int bufsize);
-	float( *getCVarValue )						(const char *cvar);
-	void( *setCVar )							(const char *cvar, const char *value);
-	void( *drawTextWithCursor )				(float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iFontIndex);
-	void( *setOverstrikeMode )				(qboolean b);
-	qboolean( *getOverstrikeMode )				(void);
-	void( *startLocalSound )					(sfxHandle_t sfx, int channelNum);
-	qboolean( *ownerDrawHandleKey )				(int ownerDraw, uint32_t flags, float *special, int key);
-	int( *feederCount )						(int feederID);
-	const char *	(*feederItemText)					(int feederID, int index, int column, qhandle_t *handle1, qhandle_t *handle2, qhandle_t *handle3);
-	qhandle_t( *feederItemImage )					(int feederID, int index);
-	qboolean( *feederSelection )					(int feederID, int index, itemDef_t *item);
-	void( *keynumToStringBuf )				(int keynum, char *buf, int buflen);
-	void( *getBindingBuf )					(int keynum, char *buf, int buflen);
-	void( *setBinding )						(int keynum, const char *binding);
-	void( *executeText )						(int exec_when, const char *text);
-	void( *Error )							(int level, const char *error, ...);
-	void( *Print )							(const char *msg, ...);
-	void( *Pause )							(qboolean b);
-	int( *ownerDrawWidth )					(int ownerDraw, float scale);
-	sfxHandle_t( *registerSound )					(const char *name);
-	void( *startBackgroundTrack )				(const char *intro, const char *loop, qboolean bReturnWithoutStarting);
-	void( *stopBackgroundTrack )				(void);
-	int( *playCinematic )					(const char *name, float x, float y, float w, float h);
-	void( *stopCinematic )					(int handle);
-	void( *drawCinematic )					(int handle, float x, float y, float w, float h);
-	void( *runCinematicFrame )				(int handle);
+struct displayContextDef_t {
+	qhandle_t (*registerShaderNoMip)(
+		const char *p
+	);
+	void (*setColor)(
+		const vector4 *v
+	);
+	void (*drawHandlePic)(
+		float x, float y, float w, float h, qhandle_t asset
+	);
+	void (*drawStretchPic)(
+		float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader
+	);
+	void (*drawText)(
+		float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style,
+		int iMenuFont, bool customFont
+	);
+	float (*textWidth)(
+		const char *text, float scale, int iMenuFont, bool customFont
+	);
+	float (*textHeight)(
+		const char *text, float scale, int iMenuFont, bool customFont
+	);
+	qhandle_t (*registerModel)(
+		const char *p
+	);
+	void (*modelBounds)(
+		qhandle_t model, vector3 *min, vector3 *max
+	);
+	void (*fillRect)(
+		float x, float y, float w, float h, const vector4 *color
+	);
+	void (*drawRect)(
+		float x, float y, float w, float h, float size, const vector4 *color
+	);
+	void (*drawSides)(
+		float x, float y, float w, float h, float size
+	);
+	void (*drawTopBottom)(
+		float x, float y, float w, float h, float size
+	);
+	void (*clearScene)(
+		void
+	);
+	void (*addRefEntityToScene)(
+		const refEntity_t *re, int gameEntity
+	);
+	void (*renderScene)(
+		const refdef_t *fd
+	);
+	qhandle_t (*RegisterFont)(
+		const char *fontName
+	);
+	int (*Font_StrLenPixels)(
+		const char *text, const int iFontIndex, const float scale
+	);
+	int (*Font_StrLenChars)(
+		const char *text
+	);
+	int (*Font_HeightPixels)(
+		const int iFontIndex, const float scale
+	);
+	void (*Font_DrawString)(
+		int ox, int oy, const char *text, const vector4 *rgba, const int setIndex, int iCharLimit, const float scale
+	);
+	qboolean (*Language_IsAsian)(
+		void
+	);
+	qboolean (*Language_UsesSpaces)(
+		void
+	);
+	unsigned int (*AnyLanguage_ReadCharFromString)(
+		const char *psText, int *piAdvanceCount, qboolean *pbIsTrailingPunctuation
+	);
+	void (*ownerDrawItem)(
+		float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags,
+		int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle, int iMenuFont,
+		bool customFont
+	);
+	float (*getValue)(
+		int ownerDraw
+	);
+	qboolean (*ownerDrawVisible)(
+		uint32_t flags
+	);
+	void (*runScript)(
+		char **p
+	);
+	qboolean (*deferScript)(
+		char **p
+	);
+	void (*getTeamColor)(
+		vector4 *color
+	);
+	void (*getCVarString)(
+		const char *cvar, char *buffer, int bufsize
+	);
+	float (*getCVarValue)(
+		const char *cvar
+	);
+	void (*setCVar)(
+		const char *cvar, const char *value
+	);
+	void (*drawTextWithCursor)(
+		float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit,
+		int style, int iFontIndex, bool customFont
+	);
+	void (*setOverstrikeMode)(
+		qboolean b
+	);
+	qboolean (*getOverstrikeMode )(
+		void
+	);
+	void (*startLocalSound)(
+		sfxHandle_t sfx, int channelNum
+	);
+	qboolean (*ownerDrawHandleKey )(
+		int ownerDraw, uint32_t flags, float *special, int key
+	);
+	int (*feederCount)(
+		int feederID
+	);
+	const char *(*feederItemText)(
+		int feederID, int index, int column, qhandle_t *handle1, qhandle_t *handle2, qhandle_t *handle3
+	);
+	qhandle_t (*feederItemImage)(
+		int feederID, int index
+	);
+	qboolean (*feederSelection)(
+		int feederID, int index, itemDef_t *item
+	);
+	void (*keynumToStringBuf)(
+		int keynum, char *buf, int buflen
+	);
+	void (*getBindingBuf)(
+		int keynum, char *buf, int buflen
+	);
+	void (*setBinding)(
+		int keynum, const char *binding
+	);
+	void (*executeText)(
+		int exec_when, const char *text
+	);
+	void (*Error)(
+		int level, const char *error, ...
+	);
+	void (*Print)(
+		const char *msg, ...
+	);
+	void (*Pause)(
+		qboolean b
+	);
+	int (*ownerDrawWidth)(
+		int ownerDraw, float scale
+	);
+	sfxHandle_t (*registerSound)(
+		const char *name
+	);
+	void (*startBackgroundTrack)(
+		const char *intro, const char *loop, qboolean bReturnWithoutStarting
+	);
+	void (*stopBackgroundTrack)(
+		void
+	);
+	int (*playCinematic)(
+		const char *name, float x, float y, float w, float h
+	);
+	void (*stopCinematic)(
+		int handle
+	);
+	void (*drawCinematic)(
+		int handle, float x, float y, float w, float h
+	);
+	void (*runCinematicFrame)(
+		int handle
+	);
+
+	struct {
+		float (*Font_StrLenPixels)(
+			const char *text, const int iFontIndex, const float scale
+		);
+	} ext;
 
 	float			yscale, xscale;
 	float			bias;
@@ -477,7 +597,7 @@ typedef struct displayContextDef_s {
 	qhandle_t		cursor;
 	float			FPS;
 	float widthRatioCoef;	//to make 2Ds be not stretched
-} displayContextDef_t;
+};
 
 const char *String_Alloc( const char *p );
 void String_Init( void );
@@ -521,7 +641,7 @@ itemDef_t *Menu_GetMatchingItemByNumber( menuDef_t *menu, int index, const char 
 displayContextDef_t *Display_GetContext( void );
 void *Display_CaptureItem( int x, int y );
 qboolean Display_MouseMove( void *p, int x, int y );
-int Display_CursorType( int x, int y );
+cursorType_e Display_CursorType( int x, int y );
 qboolean Display_KeyBindPending( void );
 void Menus_OpenByName( const char *p );
 menuDef_t *Menus_FindByName( const char *p );
@@ -541,3 +661,10 @@ qboolean UI_OutOfMemory( void );
 
 void Controls_GetConfig( void );
 void Controls_SetConfig( qboolean restart );
+
+void Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit,
+	int style, int iMenuFont, bool customFont
+);
+float Text_Width( const char *text, float scale, int iMenuFont, bool customFont );
+float Text_Height( const char *text, float scale, int iMenuFont, bool customFont );
+

@@ -328,7 +328,7 @@ static const resource_t gfx[] = {
 	{ &media.gfx.interface.crosshairs[6], "gfx/2d/crosshairg", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.crosshairs[7], "gfx/2d/crosshairh", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.crosshairs[8], "gfx/2d/crosshairi", RFL_NOMIP, GTB_ALL },
-	{ &media.gfx.interface.cursor, "menu/art/3_cursor2", RFL_NOMIP, GTB_ALL },
+	{ &media.gfx.interface.cursor, "cursor", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.cursorSelect, "ui/assets/selectcursor", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.cursorSize, "ui/assets/sizecursor", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.defer, "gfx/2d/defer", RFL_NOMIP, GTB_ALL },

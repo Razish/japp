@@ -14,6 +14,10 @@ namespace JPLua {
 		vector4		colour;
 		int			style;
 		bool		centered;
+
+		// cached
+		bool		recalculate;
+		float		width, height;
 	};
 
 #ifdef JPLUA_INTERNALS

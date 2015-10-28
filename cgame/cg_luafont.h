@@ -6,7 +6,6 @@ namespace JPLua {
 
 	// Font instance userdata type
 	struct luaFont_t {
-		qhandle_t	handle; // internal asset handle, cached
 		int			index; // e.g. FONT_SMALL
 		int			reference;
 	};

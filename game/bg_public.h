@@ -1787,3 +1787,4 @@ float BG_GetLegsAnimPoint( playerState_t *ps, int AnimIndex );
 extern const char *gametypeStringShort[GT_MAX_GAME_TYPE];
 const char *BG_GetGametypeString( int gametype );
 int BG_GetGametypeForString( const char *gametype );
+team_t BG_GetOpposingTeam( team_t team );

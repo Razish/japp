@@ -210,8 +210,7 @@ qboolean BG_ParseLiteral( const char **data, const char *string );
 //
 // NPC parameters file : scripts/NPCs.cfg
 //
-#define MAX_NPC_DATA_SIZE (512 * 1024)
-char	NPCParms[MAX_NPC_DATA_SIZE];
+static std::string NPCParms = "";
 
 // Should be used to determine pip bolt-ons
 static rank_t TranslateRankName( const char *name ) {
@@ -366,7 +365,7 @@ void NPC_PrecacheAnimationCFG( const char *NPC_type ) {
 		return;
 	}
 
-	p = NPCParms;
+	p = NPCParms.c_str();
 	COM_BeginParseSession(NPCFile);
 
 	// look for the right NPC
@@ -526,7 +525,7 @@ void NPC_Precache( gentity_t *spawner ) {
 	}
 	Q_strncpyz( customSkin, "default", sizeof(customSkin) );
 
-	p = NPCParms;
+	p = NPCParms.c_str();
 	Com_sprintf( sessionName, sizeof(sessionName), "NPC_Precache(%s)", spawner->NPC_type );
 	COM_BeginParseSession( sessionName );
 
@@ -978,7 +977,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 	else {
 		int fp;
 
-		p = NPCParms;
+		p = NPCParms.c_str();
 		Com_sprintf( sessionName, sizeof(sessionName), "NPC_ParseParms(%s)", NPCName );
 		COM_BeginParseSession( sessionName );
 
@@ -2745,55 +2744,33 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 	return qtrue;
 }
 
-char npcParseBuffer[MAX_NPC_DATA_SIZE];
-
 void NPC_LoadParms( void ) {
-	int			len, totallen, npcExtFNLen, fileCnt, i;
-	//	const char	*filename = "ext_data/NPC2.cfg";
-	char		/**buffer,*/ *holdChar, *marker;
-	char		npcExtensionListBuf[2048];			//	The list of file names read in
-	fileHandle_t f;
-	len = 0;
-
-	//remember where to store the next one
-	totallen = len;
-	marker = NPCParms + totallen;
-	*marker = 0;
-
 	//now load in the extra .npc extensions
-	fileCnt = trap->FS_GetFileList( "ext_data/NPCs", ".npc", npcExtensionListBuf, sizeof(npcExtensionListBuf) );
+	char npcExtensionListBuf[2048];
+	int fileCnt = trap->FS_GetFileList( "ext_data/NPCs", ".npc", npcExtensionListBuf, sizeof(npcExtensionListBuf) );
 
-	holdChar = npcExtensionListBuf;
-	for ( i = 0; i < fileCnt; i++, holdChar += npcExtFNLen + 1 ) {
+	int npcExtFNLen = 0;
+	char *holdChar = npcExtensionListBuf;
+	for ( int i = 0; i < fileCnt; i++, holdChar += npcExtFNLen + 1 ) {
 		npcExtFNLen = strlen( holdChar );
 
-		//	Com_Printf( "Parsing %s\n", holdChar );
-
-		len = trap->FS_Open( va( "ext_data/NPCs/%s", holdChar ), &f, FS_READ );
+		fileHandle_t f;
+		int len = trap->FS_Open( va( "ext_data/NPCs/%s", holdChar ), &f, FS_READ );
 
 		if ( len == -1 ) {
 			Com_Printf( "error reading file\n" );
+			break;
 		}
-		else {
-			if ( totallen + len >= MAX_NPC_DATA_SIZE ) {
-				trap->Error( ERR_DROP, "NPC extensions (*.npc) are too large (%i > %i)", totallen + len,
-					MAX_NPC_DATA_SIZE );
-			}
-			trap->FS_Read( npcParseBuffer, len, f );
-			npcParseBuffer[len] = 0;
 
-			len = COM_Compress( npcParseBuffer );
+		char *npcParseBuffer = new char[len + 1]{};
+		trap->FS_Read( npcParseBuffer, len, f );
+		len = COM_Compress( npcParseBuffer );
 
-			strcat( marker, npcParseBuffer );
-			strcat( marker, "\n" );
-			len++;
-			trap->FS_Close( f );
+		NPCParms += npcParseBuffer;
+		NPCParms += "\n";
+		delete[] npcParseBuffer;
 
-			totallen += len;
-			marker = NPCParms + totallen;
-			//*marker = 0; //rww - make sure this is null or strcat will not append to the correct place
-			//rww  12/19/02-actually the probelm was npcParseBuffer not being nul-term'd, which could cause issues in the strcat too
-		}
+		trap->FS_Close( f );
 	}
 }
 

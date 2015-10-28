@@ -44,7 +44,7 @@ typedef enum ammo_e {
 	AMMO_MAX
 } ammo_t;
 
-typedef struct weaponData_s {
+extern const struct weaponData_t {
 	const char *longName; // spawning name
 	ammo_t ammoIndex; // index to proper ammo slot
 	int ammoLow; // count when ammo is low
@@ -60,6 +60,6 @@ typedef struct weaponData_s {
 		int chargeMax;
 		int chargeTime;
 	} alt;
-} weaponData_t;
-extern const weaponData_t weaponData[WP_NUM_WEAPONS];
+} weaponData[WP_NUM_WEAPONS];
+
 extern const int ammoMax[AMMO_MAX];

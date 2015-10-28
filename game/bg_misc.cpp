@@ -2118,3 +2118,15 @@ qboolean GetCPD( bgEntity_t *self, uint32_t bit ) {
 #endif
 	return !!(cpd & bit);
 }
+
+team_t BG_GetOpposingTeam( team_t team ) {
+	if ( team == TEAM_RED ) {
+		return TEAM_BLUE;
+	}
+	else if ( team == TEAM_BLUE ) {
+		return TEAM_RED;
+	}
+	else {
+		return team;
+	}
+}

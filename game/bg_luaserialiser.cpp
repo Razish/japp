@@ -22,15 +22,9 @@ namespace JPLua {
 	//Func: GetSerialiser( string fileName, [FSMode mode] )
 	//Retn: Serialiser object
 	int GetSerialiser( lua_State *L ) {
-		const char *path = NULL;
-		fsMode_t mode = FS_READ;
-
 		//TODO: force reading/writing to plugin directory?
-		luaL_argcheck( L, lua_type( L, 1 ) == LUA_TSTRING, 1, "'string' expected" );
-		path = lua_tostring( L, 1 );
-
-		luaL_argcheck( L, lua_type( L, 2 ) == LUA_TNUMBER, 2, "'integer' expected" );
-		mode = (fsMode_t)lua_tointeger( L, 2 );
+		const char *path = luaL_checkstring( L, 1 );
+		fsMode_t mode = (fsMode_t)luaL_checkinteger( L, 2 );
 
 		Serialiser_CreateRef( L, path, mode );
 		return 1;

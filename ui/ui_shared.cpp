@@ -11,6 +11,8 @@
 #include "bg_public.h"
 #include "anims.h"
 #include "Ghoul2/G2.h"
+#include "qcommon/qfiles.h"
+
 extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
 void UI_UpdateCharacterSkin( void );
 
@@ -3814,9 +3816,8 @@ void  Menus_Activate( menuDef_t *menu ) {
 }
 
 int Display_VisibleMenuCount( void ) {
-	int i, count;
-	count = 0;
-	for ( i = 0; i < menuCount; i++ ) {
+	int count = 0;
+	for ( int i = 0; i < menuCount; i++ ) {
 		if ( Menus[i].window.flags & (WINDOW_FORCED | WINDOW_VISIBLE) ) {
 			count++;
 		}
@@ -4055,12 +4056,14 @@ void Item_SetTextExtents( itemDef_t *item, int *width, int *height, const char *
 	*height = item->textRect.h;
 
 	// keeps us from computing the widths and heights more than once
-	if ( *width == 0 || (item->type == ITEM_TYPE_OWNERDRAW && item->textalignment == ITEM_ALIGN_CENTER)
+	if ( *width == 0
+		|| (item->type == ITEM_TYPE_OWNERDRAW && item->textalignment == ITEM_ALIGN_CENTER)
 #ifndef PROJECT_CGAME
 		|| (item->text && item->text[0] == '@' && item->asset != se_language.modificationCount)	//string package language changed
 #endif
-		) {
-		int originalWidth = DC->textWidth( textPtr, item->textscale, item->iMenuFont );
+		)
+	{
+		float originalWidth = DC->textWidth( textPtr, item->textscale, item->iMenuFont, false );
 
 		if ( item->type == ITEM_TYPE_OWNERDRAW && (item->textalignment == ITEM_ALIGN_CENTER || item->textalignment == ITEM_ALIGN_RIGHT) ) {
 			originalWidth += DC->ownerDrawWidth( item->window.ownerDraw, item->textscale );
@@ -4068,11 +4071,11 @@ void Item_SetTextExtents( itemDef_t *item, int *width, int *height, const char *
 		else if ( item->type == ITEM_TYPE_EDITFIELD && item->textalignment == ITEM_ALIGN_CENTER && item->cvar ) {
 			char buff[256];
 			DC->getCVarString( item->cvar, buff, 256 );
-			originalWidth += DC->textWidth( buff, item->textscale, item->iMenuFont );
+			originalWidth += DC->textWidth( buff, item->textscale, item->iMenuFont, false );
 		}
 
-		*width = DC->textWidth( textPtr, item->textscale, item->iMenuFont );
-		*height = DC->textHeight( textPtr, item->textscale, item->iMenuFont );
+		*width = DC->textWidth( textPtr, item->textscale, item->iMenuFont, false );
+		*height = DC->textHeight( textPtr, item->textscale, item->iMenuFont, false );
 
 		item->textRect.w = *width;
 		item->textRect.h = *height;
@@ -4082,7 +4085,7 @@ void Item_SetTextExtents( itemDef_t *item, int *width, int *height, const char *
 			item->textRect.x = item->textalignx - originalWidth;
 		}
 		else if ( item->textalignment == ITEM_ALIGN_CENTER ) {
-			item->textRect.x = item->textalignx - originalWidth / 2;
+			item->textRect.x = item->textalignx - originalWidth / 2.0f;
 		}
 
 		ToWindowCoords( &item->textRect.x, &item->textRect.y, &item->window );
@@ -4176,7 +4179,7 @@ void Item_Text_AutoWrapped_Paint( itemDef_t *item ) {
 	//{
 	//	item->value = (int)(0.5f + (float)DC->textWidth(textPtr, item->textscale, item->font) / item->window.rect.w);
 	//}
-	height = DC->textHeight( textPtr, item->textscale, item->iMenuFont );
+	height = DC->textHeight( textPtr, item->textscale, item->iMenuFont, false );
 
 	y = item->textaligny;
 	len = 0;
@@ -4190,7 +4193,7 @@ void Item_Text_AutoWrapped_Paint( itemDef_t *item ) {
 			newLinePtr = p + 1;
 			newLineWidth = textWidth;
 		}
-		textWidth = DC->textWidth( buff, item->textscale, 0 );
+		textWidth = DC->textWidth( buff, item->textscale, 0, false );
 		if ( (newLine && textWidth > item->window.rect.w) || *p == '\n' || *p == '\0' ) {
 			if ( len ) {
 				if ( item->textalignment == ITEM_ALIGN_LEFT ) {
@@ -4206,11 +4209,9 @@ void Item_Text_AutoWrapped_Paint( itemDef_t *item ) {
 				ToWindowCoords( &item->textRect.x, &item->textRect.y, &item->window );
 				//
 				buff[newLine] = '\0';
-#ifdef PROJECT_CGAME
-				DC->drawText(item->textRect.x, item->textRect.y, item->textscale, &color, buff, 0, 0, item->textStyle, item->iMenuFont, qfalse);
-#else
-				DC->drawText(item->textRect.x, item->textRect.y, item->textscale, &color, buff, 0, 0, item->textStyle, item->iMenuFont);
-#endif
+				DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &color, buff, 0, 0, item->textStyle,
+					item->iMenuFont, false
+				);
 			}
 			if ( *p == '\0' ) {
 				break;
@@ -4270,20 +4271,12 @@ void Item_Text_Wrapped_Paint( itemDef_t *item ) {
 	while ( p && *p ) {
 		strncpy( buff, start, p - start + 1 );
 		buff[p - start] = '\0';
-#ifdef PROJECT_CGAME
-		DC->drawText( x, y, item->textscale, &color, buff, 0, 0, item->textStyle, item->iMenuFont, qfalse );
-#else
-		DC->drawText( x, y, item->textscale, &color, buff, 0, 0, item->textStyle, item->iMenuFont );
-#endif
+		DC->drawText( x, y, item->textscale, &color, buff, 0, 0, item->textStyle, item->iMenuFont, false );
 		y += height + 2;
 		start += p - start + 1;
 		p = strchr( p + 1, '\r' );
 	}
-#ifdef PROJECT_CGAME
-	DC->drawText( x, y, item->textscale, &color, start, 0, 0, item->textStyle, item->iMenuFont, qfalse );
-#else
-	DC->drawText( x, y, item->textscale, &color, buff, 0, 0, item->textStyle, item->iMenuFont );
-#endif
+	DC->drawText( x, y, item->textscale, &color, start, 0, 0, item->textStyle, item->iMenuFont, false );
 }
 
 void Item_Text_Paint( itemDef_t *item ) {
@@ -4326,13 +4319,10 @@ void Item_Text_Paint( itemDef_t *item ) {
 		return;
 	}
 
-
 	Item_TextColor( item, &color );
-#ifdef PROJECT_CGAME
-	DC->drawText(item->textRect.x, item->textRect.y, item->textscale, &color, textPtr, 0, 0, item->textStyle, item->iMenuFont, qfalse);
-#else
-	DC->drawText(item->textRect.x, item->textRect.y, item->textscale, &color, textPtr, 0, 0, item->textStyle, item->iMenuFont);
-#endif
+	DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &color, textPtr, 0, 0, item->textStyle,
+		item->iMenuFont, false
+	);
 
 	if ( item->text2 )	// Is there a second line of text?
 	{
@@ -4343,11 +4333,9 @@ void Item_Text_Paint( itemDef_t *item ) {
 			textPtr = text;
 		}
 		Item_TextColor( item, &color );
-#ifdef PROJECT_CGAME
-		DC->drawText( item->textRect.x + item->text2alignx, item->textRect.y + item->text2aligny, item->textscale, &color, textPtr, 0, 0, item->textStyle, item->iMenuFont, qfalse );
-#else
-		DC->drawText( item->textRect.x + item->text2alignx, item->textRect.y + item->text2aligny, item->textscale, &color, textPtr, 0, 0, item->textStyle, item->iMenuFont );
-#endif
+		DC->drawText( item->textRect.x + item->text2alignx, item->textRect.y + item->text2aligny, item->textscale,
+			&color, textPtr, 0, 0, item->textStyle, item->iMenuFont, false
+		);
 	}
 }
 
@@ -4389,14 +4377,15 @@ void Item_TextField_Paint( itemDef_t *item ) {
 	offset = (item->text && *item->text) ? 8 : 0;
 	if ( item->window.flags & WINDOW_HASFOCUS && g_editingField ) {
 		char cursor = DC->getOverstrikeMode() ? '_' : '|';
-		DC->drawTextWithCursor( item->textRect.x + item->textRect.w + offset, item->textRect.y, item->textscale, &newColor, buff + editPtr->paintOffset, item->cursorPos - editPtr->paintOffset, cursor, item->window.rect.w, item->textStyle, item->iMenuFont );
+		DC->drawTextWithCursor( item->textRect.x + item->textRect.w + offset, item->textRect.y, item->textscale,
+			&newColor, buff + editPtr->paintOffset, item->cursorPos - editPtr->paintOffset, cursor, item->window.rect.w,
+			item->textStyle, item->iMenuFont, false
+		);
 	}
 	else {
-#ifdef PROJECT_CGAME
-		DC->drawText( item->textRect.x + item->textRect.w + offset, item->textRect.y, item->textscale, &newColor, buff + editPtr->paintOffset, 0, item->window.rect.w, item->textStyle, item->iMenuFont, qfalse );
-#else
-		DC->drawText( item->textRect.x + item->textRect.w + offset, item->textRect.y, item->textscale, &newColor, buff + editPtr->paintOffset, 0, item->window.rect.w, item->textStyle, item->iMenuFont );
-#endif
+		DC->drawText( item->textRect.x + item->textRect.w + offset, item->textRect.y, item->textscale, &newColor,
+			buff + editPtr->paintOffset, 0, item->window.rect.w, item->textStyle, item->iMenuFont, false
+		);
 	}
 }
 
@@ -4432,18 +4421,14 @@ void Item_YesNo_Paint( itemDef_t *item ) {
 
 	if ( item->text ) {
 		Item_Text_Paint( item );
-#ifdef PROJECT_CGAME
-		DC->drawText( item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, &newColor, yesnovalue, 0, 0, item->textStyle, item->iMenuFont, qfalse );
-#else
-		DC->drawText(item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, &newColor, yesnovalue, 0, 0, item->textStyle, item->iMenuFont);
-#endif
+		DC->drawText( item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, &newColor, yesnovalue,
+			0, 0, item->textStyle, item->iMenuFont, false
+		);
 	}
 	else {
-#ifdef PROJECT_CGAME
-		DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &newColor, yesnovalue, 0, 0, item->textStyle, item->iMenuFont, qfalse );
-#else
-		DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &newColor, yesnovalue, 0, 0, item->textStyle, item->iMenuFont );
-#endif
+		DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &newColor, yesnovalue, 0, 0, item->textStyle,
+			item->iMenuFont, false
+		);
 	}
 }
 
@@ -4478,18 +4463,14 @@ void Item_Multi_Paint( itemDef_t *item ) {
 
 	if ( item->text ) {
 		Item_Text_Paint( item );
-#ifdef PROJECT_CGAME
-		DC->drawText( item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, &newColor, text, 0, 0, item->textStyle, item->iMenuFont, qfalse );
-#else
-		DC->drawText( item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, &newColor, text, 0, 0, item->textStyle, item->iMenuFont );
-#endif
+		DC->drawText( item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, &newColor, text, 0, 0,
+			item->textStyle, item->iMenuFont, false
+		);
 	}
 	else {
-#ifdef PROJECT_CGAME
-		DC->drawText( item->textRect.x + item->xoffset, item->textRect.y, item->textscale, &newColor, text, 0, 0, item->textStyle, item->iMenuFont, qfalse );
-#else
-		DC->drawText( item->textRect.x + item->xoffset, item->textRect.y, item->textscale, &newColor, text, 0, 0, item->textStyle, item->iMenuFont );
-#endif
+		DC->drawText( item->textRect.x + item->xoffset, item->textRect.y, item->textscale, &newColor, text, 0, 0,
+			item->textStyle, item->iMenuFont, false
+		);
 	}
 }
 
@@ -4791,32 +4772,28 @@ void Item_Bind_Paint( itemDef_t *item ) {
 
 		// If the text runs past the limit bring the scale down until it fits.
 		textScale = item->textscale;
-		textWidth = DC->textWidth( g_nameBind1, (float)textScale, item->iMenuFont );
+		textWidth = DC->textWidth( g_nameBind1, (float)textScale, item->iMenuFont, false );
 		startingXPos = (item->textRect.x + item->textRect.w + 8);
 
 		while ( (startingXPos + textWidth) >= SCREEN_WIDTH ) {
 			textScale -= .05f;
-			textWidth = DC->textWidth( g_nameBind1, (float)textScale, item->iMenuFont );
+			textWidth = DC->textWidth( g_nameBind1, (float)textScale, item->iMenuFont, false );
 		}
 
 		// Try to adjust it's y placement if the scale has changed.
 		yAdj = 0;
 		if ( textScale != item->textscale ) {
-			textHeight = DC->textHeight( g_nameBind1, item->textscale, item->iMenuFont );
-			yAdj = textHeight - DC->textHeight( g_nameBind1, textScale, item->iMenuFont );
+			textHeight = DC->textHeight( g_nameBind1, item->textscale, item->iMenuFont, false );
+			yAdj = textHeight - DC->textHeight( g_nameBind1, textScale, item->iMenuFont, false );
 		}
-#ifdef PROJECT_CGAME
-		DC->drawText( startingXPos, item->textRect.y + yAdj, textScale, &newColor, g_nameBind1, 0, maxChars, item->textStyle, item->iMenuFont, qfalse );
-#else
-		DC->drawText(startingXPos, item->textRect.y + yAdj, textScale, &newColor, g_nameBind1, 0, maxChars, item->textStyle, item->iMenuFont);
-#endif
+		DC->drawText( startingXPos, item->textRect.y + yAdj, textScale, &newColor, g_nameBind1, 0, maxChars,
+			item->textStyle, item->iMenuFont, false
+		);
 	}
 	else {
-#ifdef PROJECT_CGAME
-		DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &newColor, (value != 0) ? "FIXME" : "FIXME", 0, maxChars, item->textStyle, item->iMenuFont, qfalse );
-#else
-		DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &newColor, (value != 0) ? "FIXME" : "FIXME", 0, maxChars, item->textStyle, item->iMenuFont );
-#endif
+		DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &newColor, (value != 0) ? "FIXME" : "FIXME",
+			0, maxChars, item->textStyle, item->iMenuFont, false
+		);
 	}
 }
 
@@ -5205,11 +5182,7 @@ void Item_TextScroll_Paint( itemDef_t *item ) {
 		if ( !text ) {
 			continue;
 		}
-#ifdef PROJECT_CGAME
 		DC->drawText( x + 4, y, item->textscale, &item->window.foreColor, text, 0, 0, item->textStyle, item->iMenuFont, qfalse );
-#else
-		DC->drawText( x + 4, y, item->textscale, &item->window.foreColor, text, 0, 0, item->textStyle, item->iMenuFont );
-#endif
 
 		size -= scrollPtr->lineHeight;
 		if ( size < scrollPtr->lineHeight ) {
@@ -5328,11 +5301,9 @@ void Item_ListBox_Paint( itemDef_t *item ) {
 		// Show pic name
 		text = DC->feederItemText( item->special.i, item->cursorPos, 0, &optionalImage1, &optionalImage2, &optionalImage3 );
 		if ( text ) {
-#ifdef PROJECT_CGAME
-			DC->drawText( item->window.rect.x, item->window.rect.y + item->window.rect.h, item->textscale, &item->window.foreColor, text, 0, 0, item->textStyle, item->iMenuFont, qfalse );
-#else
-			DC->drawText( item->window.rect.x, item->window.rect.y + item->window.rect.h, item->textscale, &item->window.foreColor, text, 0, 0, item->textStyle, item->iMenuFont );
-#endif
+			DC->drawText( item->window.rect.x, item->window.rect.y + item->window.rect.h, item->textscale,
+				&item->window.foreColor, text, 0, 0, item->textStyle, item->iMenuFont, false
+			);
 		}
 #endif
 
@@ -5476,21 +5447,21 @@ void Item_ListBox_Paint( itemDef_t *item ) {
 						}
 
 						/*
-						if (optionalImage >= 0) {
-						DC->drawHandlePic(x + 4 + listPtr->columnInfo[j].pos, y - 1 + listPtr->elementHeight / 2, listPtr->columnInfo[j].width, listPtr->columnInfo[j].width, optionalImage);
+						if ( optionalImage >= 0 ) {
+							DC->drawHandlePic( x + 4 + listPtr->columnInfo[j].pos, y - 1 + listPtr->elementHeight / 2,
+								listPtr->columnInfo[j].width, listPtr->columnInfo[j].width, optionalImage
+							);
 						}
 						else
 						*/
 						if ( text ) {
 							int textyOffset;
 							textyOffset = 0;
-							//							DC->drawText(x + 4 + listPtr->columnInfo[j].pos, y + listPtr->elementHeight, item->textscale, item->window.foreColor, text, 0, listPtr->columnInfo[j].maxChars, item->textStyle);
-							//WAS LAST						DC->drawText(x + 4 + listPtr->columnInfo[j].pos, y, item->textscale, item->window.foreColor, text, 0, listPtr->columnInfo[j].maxChars, item->textStyle, item->iMenuFont);
-#ifdef PROJECT_CGAME
-							DC->drawText( x + 4 + listPtr->columnInfo[j].pos, y + listPtr->elementHeight + textyOffset + item->textaligny, item->textscale, &item->window.foreColor, text, 0, listPtr->columnInfo[j].maxChars, item->textStyle, item->iMenuFont, qfalse );
-#else
-							DC->drawText( x + 4 + listPtr->columnInfo[j].pos, y + listPtr->elementHeight + textyOffset + item->textaligny, item->textscale, &item->window.foreColor, text, 0, listPtr->columnInfo[j].maxChars, item->textStyle, item->iMenuFont );
-#endif
+							DC->drawText( x + 4 + listPtr->columnInfo[j].pos,
+								y + listPtr->elementHeight + textyOffset + item->textaligny, item->textscale,
+								&item->window.foreColor, text, 0, listPtr->columnInfo[j].maxChars, item->textStyle,
+								item->iMenuFont, false
+							);
 
 
 						}
@@ -5499,28 +5470,35 @@ void Item_ListBox_Paint( itemDef_t *item ) {
 						}
 						DC->setColor( NULL );
 						if ( optionalImage3 >= 0 ) {
-							DC->drawHandlePic( imageStartX - listPtr->elementHeight * 3, y + listPtr->elementHeight + 2, listPtr->elementHeight, listPtr->elementHeight, optionalImage3 );
+							DC->drawHandlePic( imageStartX - listPtr->elementHeight * 3, y + listPtr->elementHeight + 2,
+								listPtr->elementHeight, listPtr->elementHeight, optionalImage3
+							);
 						}
 						if ( optionalImage2 >= 0 ) {
-							DC->drawHandlePic( imageStartX - listPtr->elementHeight * 2, y + listPtr->elementHeight + 2, listPtr->elementHeight, listPtr->elementHeight, optionalImage2 );
+							DC->drawHandlePic( imageStartX - listPtr->elementHeight * 2, y + listPtr->elementHeight + 2,
+								listPtr->elementHeight, listPtr->elementHeight, optionalImage2
+							);
 						}
 						if ( optionalImage1 >= 0 ) {
-							DC->drawHandlePic( imageStartX - listPtr->elementHeight, y + listPtr->elementHeight + 2, listPtr->elementHeight, listPtr->elementHeight, optionalImage1 );
+							DC->drawHandlePic( imageStartX - listPtr->elementHeight * 1, y + listPtr->elementHeight + 2,
+								listPtr->elementHeight, listPtr->elementHeight, optionalImage1
+							);
 						}
 					}
 				}
 				else {
 					text = DC->feederItemText( item->special.i, i, 0, &optionalImage1, &optionalImage2, &optionalImage3 );
 					if ( optionalImage1 >= 0 || optionalImage2 >= 0 || optionalImage3 >= 0 ) {
-						//DC->drawHandlePic(x + 4 + listPtr->elementHeight, y, listPtr->columnInfo[j].width, listPtr->columnInfo[j].width, optionalImage);
+						/*
+						DC->drawHandlePic( x + 4 + listPtr->elementHeight, y, listPtr->columnInfo[j].width,
+							listPtr->columnInfo[j].width, optionalImage
+						);
+						*/
 					}
 					else if ( text ) {
-						//						DC->drawText(x + 4, y + listPtr->elementHeight, item->textscale, item->window.foreColor, text, 0, 0, item->textStyle);
-#ifdef PROJECT_CGAME
-						DC->drawText( x + 4, y + item->textaligny, item->textscale, &item->window.foreColor, text, 0, 0, item->textStyle, item->iMenuFont, qfalse );
-#else
-						DC->drawText( x + 4, y + item->textaligny, item->textscale, &item->window.foreColor, text, 0, 0, item->textStyle, item->iMenuFont );
-#endif
+						DC->drawText( x + 4, y + item->textaligny, item->textscale, &item->window.foreColor, text, 0, 0,
+							item->textStyle, item->iMenuFont, false
+						);
 					}
 				}
 
@@ -5597,14 +5575,14 @@ void Item_OwnerDraw_Paint( itemDef_t *item ) {
 			Item_Text_Paint( item );
 			if ( item->text[0] ) {
 				// +8 is an offset kludge to properly align owner draw items that have text combined with them
-				DC->ownerDrawItem( item->textRect.x + item->textRect.w + 8, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special.f, item->textscale, &color, item->window.background, item->textStyle, item->iMenuFont );
+				DC->ownerDrawItem( item->textRect.x + item->textRect.w + 8, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special.f, item->textscale, &color, item->window.background, item->textStyle, item->iMenuFont, false );
 			}
 			else {
-				DC->ownerDrawItem( item->textRect.x + item->textRect.w, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special.f, item->textscale, &color, item->window.background, item->textStyle, item->iMenuFont );
+				DC->ownerDrawItem( item->textRect.x + item->textRect.w, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special.f, item->textscale, &color, item->window.background, item->textStyle, item->iMenuFont, false );
 			}
 		}
 		else {
-			DC->ownerDrawItem( item->window.rect.x, item->window.rect.y, item->window.rect.w, item->window.rect.h, item->textalignx, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special.f, item->textscale, &color, item->window.background, item->textStyle, item->iMenuFont );
+			DC->ownerDrawItem( item->window.rect.x, item->window.rect.y, item->window.rect.w, item->window.rect.h, item->textalignx, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special.f, item->textscale, &color, item->window.background, item->textStyle, item->iMenuFont, false );
 		}
 	}
 }
@@ -5987,50 +5965,48 @@ void Item_Paint( itemDef_t *item ) {
 
 				Item_TextColor( item, &color );
 
-				{// stupid C language
-					float fDescScale = parent->descScale ? parent->descScale : 1;
-					float fDescScaleCopy = fDescScale;
-					int iYadj = 0;
-					while ( 1 ) {
-						vector4 _color = { 0.0f, 0.0f, 0.0f, 0.5f };
-						textWidth = DC->textWidth( textPtr, fDescScale, FONT_SMALL2 );
+				float fDescScale = parent->descScale ? parent->descScale : 1;
+				float fDescScaleCopy = fDescScale;
+				int iYadj = 0;
+				while ( 1 ) {
+					vector4 _color = { 0.0f, 0.0f, 0.0f, 0.5f };
+					textWidth = DC->textWidth( textPtr, fDescScale, FONT_SMALL2, false );
 
-						if ( parent->descAlignment == ITEM_ALIGN_RIGHT ) {
-							xPos = parent->descX - textWidth;	// Right justify
-						}
-						else if ( parent->descAlignment == ITEM_ALIGN_CENTER ) {
-							xPos = parent->descX - (textWidth / 2);	// Center justify
-						}
-						else										// Left justify
-						{
-							xPos = parent->descX;
-						}
-
-						if ( parent->descAlignment == ITEM_ALIGN_CENTER ) {
-							// only this one will auto-shrink the scale until we eventually fit...
-							//
-							if ( xPos + textWidth > (SCREEN_WIDTH - 4) ) {
-								fDescScale -= 0.001f;
-								continue;
-							}
-						}
-
-						// Try to adjust it's y placement if the scale has changed...
-						//
-						if ( fDescScale != fDescScaleCopy ) {
-							int iOriginalTextHeight = DC->textHeight( textPtr, fDescScaleCopy, FONT_MEDIUM );
-							iYadj = iOriginalTextHeight - DC->textHeight( textPtr, fDescScale, FONT_MEDIUM );
-						}
-
-						//Raz: Added background
-						DC->fillRect( xPos, parent->descY + iYadj, textWidth, DC->textHeight( textPtr, fDescScale, FONT_MEDIUM ), &_color );
-#ifdef PROJECT_CGAME
-						DC->drawText( xPos, parent->descY + iYadj, fDescScale, &parent->descColor, textPtr, 0, 0, item->textStyle, FONT_SMALL2, qfalse );
-#else
-						DC->drawText( xPos, parent->descY + iYadj, fDescScale, &parent->descColor, textPtr, 0, 0, item->textStyle, FONT_SMALL2 );
-#endif
-						break;
+					if ( parent->descAlignment == ITEM_ALIGN_RIGHT ) {
+						xPos = parent->descX - textWidth;	// Right justify
 					}
+					else if ( parent->descAlignment == ITEM_ALIGN_CENTER ) {
+						xPos = parent->descX - (textWidth / 2);	// Center justify
+					}
+					else										// Left justify
+					{
+						xPos = parent->descX;
+					}
+
+					if ( parent->descAlignment == ITEM_ALIGN_CENTER ) {
+						// only this one will auto-shrink the scale until we eventually fit...
+						//
+						if ( xPos + textWidth > (SCREEN_WIDTH - 4) ) {
+							fDescScale -= 0.001f;
+							continue;
+						}
+					}
+
+					// Try to adjust it's y placement if the scale has changed...
+					//
+					if ( fDescScale != fDescScaleCopy ) {
+						int iOriginalTextHeight = DC->textHeight( textPtr, fDescScaleCopy, FONT_MEDIUM, false );
+						iYadj = iOriginalTextHeight - DC->textHeight( textPtr, fDescScale, FONT_MEDIUM, false );
+					}
+
+					//Raz: Added background
+					DC->fillRect( xPos, parent->descY + iYadj, textWidth,
+						DC->textHeight( textPtr, fDescScale, FONT_MEDIUM, false ), &_color
+					);
+					DC->drawText( xPos, parent->descY + iYadj, fDescScale, &parent->descColor, textPtr, 0, 0,
+						item->textStyle, FONT_SMALL2, false
+					);
+					break;
 				}
 			}
 		}
@@ -8104,8 +8080,10 @@ static void Item_TextScroll_BuildLines( itemDef_t* item ) {
 				scrollPtr->pLines[scrollPtr->iLineCount] = String_Alloc( sLineForDisplay );
 				break;	// print this line
 			}
-			else
-				if ( DC->textWidth( sLineForDisplay, item->textscale, item->iMenuFont ) >= iBoxWidth ) {
+			else {
+				//TODO: rewrite so we calculate the length of each character, rather than appending a char to the main
+				//	string each iteration
+				if ( DC->textWidth( sLineForDisplay, item->textscale, item->iMenuFont, false ) >= iBoxWidth ) {
 					// reached screen edge, so cap off string at bytepos after last good position...
 					//
 					if ( uiLetter > 255 && bIsTrailingPunctuation && !trap->R_Language_UsesSpaces() ) {
@@ -8134,6 +8112,7 @@ static void Item_TextScroll_BuildLines( itemDef_t* item ) {
 						break;	// print this line
 					}
 				}
+			}
 
 			// record last-good linebreak pos...  (ie if we've just concat'd a punctuation point (western or asian) or space)
 			//
@@ -8196,7 +8175,7 @@ static void Item_TextScroll_BuildLines( itemDef_t* item ) {
 		}
 
 		// Get the current character width
-		cw = DC->textWidth ( va("%c", *lineEnd), item->textscale, item->iMenuFont );
+		cw = DC->textWidth ( va("%c", *lineEnd), item->textscale, item->iMenuFont, false );
 
 		// Past the end of the boundary?
 		if ( w + cw > (item->window.rect.w - SCROLLBAR_SIZE - 10) )
@@ -8735,13 +8714,8 @@ void Menu_PaintAll( void ) {
 
 	if ( debugMode ) {
 		vector4 v = { 1, 1, 1, 1 };
-#ifdef PROJECT_CGAME
 		DC->drawText( 5, 25, .75f, &v, va( "fps: %f", DC->FPS ), 0, 0, 0, 0, qfalse );
 		DC->drawText( 5, 45, .75f, &v, va( "x: %.0f  y:%.0f", DC->cursorx, DC->cursory ), 0, 0, 0, 0, qfalse );
-#else
-		DC->drawText( 5, 25, .75f, &v, va( "fps: %f", DC->FPS ), 0, 0, 0, 0);
-		DC->drawText( 5, 45, .75f, &v, va( "x: %.0f  y:%.0f", DC->cursorx, DC->cursory ), 0, 0, 0, 0 );
-#endif
 	}
 }
 
@@ -8756,9 +8730,9 @@ displayContextDef_t *Display_GetContext( void ) {
 void *Display_CaptureItem( int x, int y ) {
 	int i;
 
-	for ( i = 0; i < menuCount; i++ ) {
+	for ( i = 0; i < Display_VisibleMenuCount(); i++ ) {
 		// turn off focus each item
-		// menu->items[i].window.flags &= ~WINDOW_HASFOCUS;
+		//menu->items[i].window.flags &= ~WINDOW_HASFOCUS;
 		if ( Rect_ContainsPoint( &Menus[i].window.rect, x, y ) ) {
 			return &Menus[i];
 		}
@@ -8793,20 +8767,21 @@ qboolean Display_MouseMove( void *p, int x, int y ) {
 
 }
 
-int Display_CursorType( int x, int y ) {
-	int i;
-	for ( i = 0; i < menuCount; i++ ) {
-		rectDef_t r2;
-		r2.x = Menus[i].window.rect.x - 3;
-		r2.y = Menus[i].window.rect.y - 3;
-		r2.w = r2.h = 7;
-		if ( Rect_ContainsPoint( &r2, x, y ) ) {
-			return CURSOR_SIZER;
+cursorType_e Display_CursorType( int x, int y ) {
+	for ( int i = 0; i < Menu_Count(); i++ ) {
+		menuDef_t *menu = &Menus[i];
+		if ( (menu->window.flags & (WINDOW_VISIBLE | WINDOW_FORCED) ) ) {
+			rectDef_t r2;
+			r2.x = menu->window.rect.x - 3;
+			r2.y = menu->window.rect.y - 3;
+			r2.w = r2.h = 7;
+			if ( Rect_ContainsPoint( &r2, x, y ) ) {
+				return CURSOR_SIZER;
+			}
 		}
 	}
 	return CURSOR_ARROW;
 }
-
 
 void Display_HandleKey( int key, qboolean down, int x, int y ) {
 	menuDef_t *menu = (menuDef_t *)Display_CaptureItem( x, y );
@@ -8857,7 +8832,6 @@ void Display_CacheAll( void ) {
 	}
 }
 
-
 static qboolean Menu_OverActiveItem( menuDef_t *menu, float x, float y ) {
 	if ( menu && menu->window.flags & (WINDOW_VISIBLE | WINDOW_FORCED) ) {
 		if ( Rect_ContainsPoint( &menu->window.rect, x, y ) ) {
@@ -8893,4 +8867,72 @@ static qboolean Menu_OverActiveItem( menuDef_t *menu, float x, float y ) {
 		}
 	}
 	return qfalse;
+}
+
+static qhandle_t MenuFontToHandle( int iMenuFont ) {
+#if defined(PROJECT_UI)
+	const cachedAssets_t *assets = &uiInfo.uiDC.Assets;
+#elif defined(PROJECT_CGAME)
+	const cachedAssets_t *assets = &cgDC.Assets;
+#endif
+
+	switch ( iMenuFont ) {
+	case FONT_SMALL:		return assets->qhSmallFont;
+	case FONT_MEDIUM:		return assets->qhMediumFont;
+	case FONT_LARGE:		return assets->qhBigFont;
+	case FONT_SMALL2:		return assets->qhSmall2Font;
+	case FONT_JAPPLARGE:	return assets->japp.fontLarge;
+	case FONT_JAPPSMALL:	return assets->japp.fontSmall;
+	case FONT_JAPPMONO:		return assets->japp.fontMono;
+	default:				return assets->qhMediumFont;
+	}
+}
+
+//TODO: return height consumed by string?
+void Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit,
+	int style, int iMenuFont, bool customFont )
+{
+	uint32_t iStyleOR = 0u;
+	switch ( style ) {
+	case ITEM_TEXTSTYLE_NORMAL:				iStyleOR = 0; default: break;		// normal text
+	case ITEM_TEXTSTYLE_BLINK:				iStyleOR = STYLE_BLINK; break;		// fast blinking
+	case ITEM_TEXTSTYLE_PULSE:				iStyleOR = STYLE_BLINK; break;		// slow pulsing
+	case ITEM_TEXTSTYLE_SHADOWED:			iStyleOR = STYLE_DROPSHADOW; break;	// drop shadow
+	case ITEM_TEXTSTYLE_OUTLINED:			iStyleOR = STYLE_DROPSHADOW; break;	// drop shadow
+	case ITEM_TEXTSTYLE_OUTLINESHADOWED:	iStyleOR = STYLE_DROPSHADOW; break;	// drop shadow
+	case ITEM_TEXTSTYLE_SHADOWEDMORE:		iStyleOR = STYLE_DROPSHADOW; break;	// drop shadow
+	}
+
+	//TODO: left, center, right alignment
+	//TODO: styles (blink, pulse)
+
+	trap->R_Font_DrawString( x, y, text, color,
+		iStyleOR | (customFont ? iMenuFont : MenuFontToHandle( iMenuFont )),
+		!limit ? -1 : limit, // -1 = no limit
+		scale
+	);
+
+	trap->R_SetColor( nullptr );
+}
+
+float Text_Width( const char *text, float scale, int iMenuFont, bool customFont ) {
+	qhandle_t iFontIndex = customFont ? iMenuFont : MenuFontToHandle( iMenuFont );
+
+#if 0
+	float f1 = trap->ext.R_Font_StrLenPixels( text, iFontIndex, scale );
+	float f2 = trap->R_Font_StrLenPixels( text, iFontIndex, scale );
+	if ( flcmp( f1, f2 ) ) {
+		// ...
+	}
+	return japp_preciseFonts.integer ? f1 : f2;
+#else
+	return trap->R_Font_StrLenPixels( text, iFontIndex, scale );
+#endif
+}
+
+float Text_Height( const char *text, float scale, int iMenuFont, bool customFont ) {
+	qhandle_t iFontIndex = customFont ? iMenuFont : MenuFontToHandle( iMenuFont );
+
+	//TODO: trap->ext.***
+	return trap->R_Font_HeightPixels( iFontIndex, scale );
 }

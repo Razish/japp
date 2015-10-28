@@ -5,6 +5,7 @@
 #define JPLUA_INTERNALS
 
 extern "C" {
+	#define LUA_COMPAT_APIINTCASTS
 	#include "../lua/lua.h"
 	#include "../lua/lualib.h"
 	#include "../lua/lauxlib.h"

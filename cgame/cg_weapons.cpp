@@ -2,6 +2,7 @@
 #include "cg_local.h"
 #include "fx_local.h"
 #include "cg_media.h"
+#include "ui/ui_shared.h"
 
 // set up the appropriate ghoul2 info to a refent
 void CG_SetGhoul2InfoRef( refEntity_t *ent, refEntity_t	*s1 ) {
@@ -13,36 +14,43 @@ void CG_SetGhoul2InfoRef( refEntity_t *ent, refEntity_t	*s1 ) {
 
 // The server says this item is used on this level
 void CG_RegisterItemVisuals( int itemNum ) {
-	itemInfo_t		*itemInfo;
-	const gitem_t	*item;
 	int				handle;
 
 	if ( itemNum < 0 || itemNum >= (int)bg_numItems ) {
 		trap->Error( ERR_DROP, "CG_RegisterItemVisuals: itemNum %d out of range [0-%d]", itemNum, bg_numItems - 1 );
+		return;
 	}
 
-	itemInfo = &cg_items[itemNum];
-	if ( itemInfo->registered )
+	itemInfo_t *itemInfo = &cg_items[itemNum];
+	if ( itemInfo->registered ) {
 		return;
-
-	item = &bg_itemlist[itemNum];
-
+	}
 	memset( itemInfo, 0, sizeof(*itemInfo) );
 	itemInfo->registered = qtrue;
 
-	if ( item->giType == IT_TEAM && (item->giTag == PW_REDFLAG || item->giTag == PW_BLUEFLAG) && cgs.gametype == GT_CTY )
+	const gitem_t *item = &bg_itemlist[itemNum];
+	if ( item->giType == IT_TEAM && cgs.gametype == GT_CTY
+		&& (item->giTag == PW_REDFLAG || item->giTag == PW_BLUEFLAG) )
+	{
 		itemInfo->models[0] = trap->R_RegisterModel( item->world_model[1] );
-	else if ( item->giType == IT_WEAPON && (item->giTag == WP_THERMAL || item->giTag == WP_TRIP_MINE || item->giTag == WP_DET_PACK) )
+	}
+	else if ( item->giType == IT_WEAPON
+		&& (item->giTag == WP_THERMAL || item->giTag == WP_TRIP_MINE || item->giTag == WP_DET_PACK) )
+	{
 		itemInfo->models[0] = trap->R_RegisterModel( item->world_model[1] );
-	else
+	}
+	else {
 		itemInfo->models[0] = trap->R_RegisterModel( item->world_model[0] );
+	}
 
 	if ( !Q_stricmp( &item->world_model[0][strlen( item->world_model[0] ) - 4], ".glm" ) ) {
 		handle = trap->G2API_InitGhoul2Model( &itemInfo->g2Models[0], item->world_model[0], 0, 0, 0, 0, 0 );
-		if ( handle < 0 )
+		if ( handle < 0 ) {
 			itemInfo->g2Models[0] = NULL;
-		else
+		}
+		else {
 			itemInfo->radius[0] = 60;
+		}
 	}
 	if ( item->icon )
 		itemInfo->icon = trap->R_RegisterShaderNoMip( item->icon );
@@ -590,13 +598,16 @@ void CG_DrawIconBackground( void ) {
 	if ( cg_hudFiles.integer )
 		return;
 
-	if ( inTime > wpTime )
+	if ( inTime > wpTime ) {
 		cg.iconSelectTime = cg.invenSelectTime;
-	else
+	}
+	else {
 		cg.iconSelectTime = cg.weaponSelectTime;
+	}
 
-	if ( fpTime > inTime && fpTime > wpTime )
+	if ( fpTime > inTime && fpTime > wpTime ) {
 		cg.iconSelectTime = cg.forceSelectTime;
+	}
 
 	if ( (cg.iconSelectTime + WEAPON_SELECT_TIME) < cg.time ) {
 		// Time is up for the HUD to display
@@ -844,16 +855,26 @@ void CG_DrawWeaponSelect( void ) {
 
 	// draw the selected name
 	if ( cg_weapons[cg.weaponSelect].item ) {
-		vector4			textColor = { .875f, .718f, .121f, 1.0f };
-		char text[1024], upperKey[1024];
+		vector4 textColor = { .875f, .718f, .121f, 1.0f };
 
-		strcpy( upperKey, cg_weapons[cg.weaponSelect].item->classname );
+		char upperKey[1024];
+		Com_sprintf( upperKey, sizeof(upperKey), "SP_INGAME_%s", cg_weapons[cg.weaponSelect].item->classname );
 		Q_strupr( upperKey );
 
-		if ( trap->SE_GetStringTextString( va( "SP_INGAME_%s", upperKey ), text, sizeof(text) ) )
-			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y + 45 + yOffset, text, UI_CENTER | UI_SMALLFONT, &textColor );
-		else
-			UI_DrawProportionalString( (SCREEN_WIDTH / 2), y + 45 + yOffset, cg_weapons[cg.weaponSelect].item->classname, UI_CENTER | UI_SMALLFONT, &textColor );
+		const char *s = nullptr;
+		char text[1024];
+		if ( trap->SE_GetStringTextString( upperKey, text, sizeof(text) ) ) {
+			s = text;
+		}
+		else {
+			s = cg_weapons[cg.weaponSelect].item->classname;
+		}
+		const int fontHandle = FONT_SMALL;
+		const float fontScale = 1.0f;
+		const float width = Text_Width( s, fontScale, fontHandle, false );
+		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y + 45 + yOffset, fontScale, &textColor, s, 0.0f, 0,
+			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+		);
 	}
 
 	trap->R_SetColor( NULL );

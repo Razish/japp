@@ -429,7 +429,7 @@ namespace JPLua {
 			lua_pushstring( L, ls.currentPlugin->name );
 			lua_settable( L, top );
 
-		if ( semver_lt( ls.currentPlugin->requiredJPLuaVersion, jpluaVersion ) ) {
+		if ( semver_gt( ls.currentPlugin->requiredJPLuaVersion, jpluaVersion ) ) {
 			luaO_pushfstring( L, S_COLOR_RED " %s requires JPLua v%d.%d.%d\n", ls.currentPlugin->name,
 				ls.currentPlugin->requiredJPLuaVersion.major, ls.currentPlugin->requiredJPLuaVersion.minor,
 				ls.currentPlugin->requiredJPLuaVersion.patch
@@ -737,10 +737,11 @@ namespace JPLua {
 	static void PostInit( lua_State *L ) {
 		const char *err = NULL;
 		Register_System( L );
-		if ((err = LoadFile(L, va("%sinit" JPLUA_EXTENSION, baseDir)))){
-			trap->Print(S_COLOR_GREEN "JPLua:" S_COLOR_RED " Failed to load main scripts: %s\n");
-			trap->Print(va("   %s\n", err));
-			Shutdown(qfalse);
+		const char *fileName = va( "%sinit" JPLUA_EXTENSION, baseDir );
+		if ( (err = LoadFile( L, fileName )) ) {
+			trap->Print( S_COLOR_GREEN "JPLua:" S_COLOR_RED " Failed to load main scripts: %s\n", fileName );
+			trap->Print( "   %s\n", err );
+			Shutdown( qfalse );
 			return;
 		}
 		ls.initialised = qtrue;
@@ -852,18 +853,23 @@ namespace JPLua {
 
 	#ifdef PROJECT_CGAME
 	static int Export_DrawPic( lua_State *L ) {
-		vector4 colour;
-		int x, y, w, h, shader;
+		const float x = luaL_checknumber( L, 1 );
+		const float y = luaL_checknumber( L, 2 );
+		const float w = luaL_checknumber( L, 3 );
+		const float h = luaL_checknumber( L, 4 );
 
-		x = luaL_checknumber( L, 1 );
-		y = luaL_checknumber(L, 2);
-		w = luaL_checknumber(L, 3);
-		h = luaL_checknumber(L, 4);
-		ReadFloats( colour.raw, 4, L, 5 );
-		shader = lua_tointeger( L, 6 );
+		vector4 colour;
+		if ( lua_type( L, 5 ) == LUA_TTABLE ) {
+			ReadFloats( colour.raw, 4, L, 5 );
+		}
+		else {
+			VectorSet4( &colour, 1.0f, 1.0f, 1.0f, 1.0f );
+		}
+
+		qhandle_t shader = luaL_checkinteger( L, 6 );
 
 		trap->R_SetColor( &colour );
-		CG_DrawPic( x, y, w, h, shader );
+			CG_DrawPic( x, y, w, h, shader );
 		trap->R_SetColor( NULL );
 
 		return 0;
@@ -917,7 +923,7 @@ namespace JPLua {
 		int customFont = luaL_checkinteger( L, 8 );
 
 
-		CG_Text_Paint( x, y, scale, &colour, text, 0.0f, 0, style, iMenuFont, customFont );
+		Text_Paint( x, y, scale, &colour, text, 0.0f, 0, style, iMenuFont, customFont );
 
 		return 0;
 	}
@@ -925,15 +931,20 @@ namespace JPLua {
 
 	#ifdef PROJECT_CGAME
 	static int Export_Font_StringHeightPixels( lua_State *L ) {
-		const char *text = lua_tostring(L, 1);
-		float scale = lua_tonumber(L, 2);
-		qhandle_t font = lua_tointeger(L, 3);
-		qboolean customfont = lua_toboolean(L, 4);
+		const char *text = luaL_checkstring( L, 1 );
+		float scale = luaL_checknumber( L, 2 );
+		qhandle_t font = luaL_checkinteger( L, 3 );
+		int customFont = 0;
+		if ( lua_isboolean( L, 4 ) ) {
+			customFont = lua_toboolean( L, 4 );
+		}
 
-		if (customfont)
-			lua_pushnumber( L, trap->R_Font_HeightPixels(font, scale));
-		else
-			lua_pushnumber( L, CG_Text_Height( text, scale, font ) );
+		if ( !text ) {
+			lua_pushnil( L );
+		}
+		else {
+			lua_pushnumber( L, Text_Height( text, scale, font, customFont ) );
+		}
 		return 1;
 	}
 	#endif
@@ -943,17 +954,16 @@ namespace JPLua {
 		const char *text = luaL_checkstring( L, 1 );
 		float scale = luaL_checknumber( L, 2 );
 		qhandle_t font = luaL_checkinteger( L, 3 );
-		qboolean customfont = luaL_checkinteger( L, 4 );
+		int customFont = 0;
+		if ( lua_isboolean( L, 4 ) ) {
+			customFont = lua_toboolean( L, 4 );
+		}
 
 		if ( !text ) {
 			lua_pushnil( L );
-			return 1;
-		}
-		if ( customfont ) {
-			trap->R_Font_StrLenPixels( text, font, scale );
 		}
 		else {
-			lua_pushnumber( L, CG_Text_Width( text, scale, font ) );
+			lua_pushnumber( L, Text_Width( text, scale, font, customFont ) );
 		}
 		return 1;
 	}
@@ -973,15 +983,23 @@ namespace JPLua {
 	}
 	#endif
 
-	static int Export_GetGameType( lua_State *L ) {
+	static int Export_GetFlagStatus( lua_State *L ) {
 	#if defined(PROJECT_GAME)
-
-		lua_pushinteger( L, level.gametype );
-
+		//TODO: GetFlagStatus on server
+		lua_pushnil( L );
+		lua_pushnil( L );
 	#elif defined(PROJECT_CGAME)
+		lua_pushinteger( L, (lua_Integer)CG_GetFlagStatus( TEAM_RED ) );
+		lua_pushinteger( L, (lua_Integer)CG_GetFlagStatus( TEAM_BLUE ) );
+	#endif
+		return 2;
+	}
 
+	static int Export_GetGametype( lua_State *L ) {
+	#if defined(PROJECT_GAME)
+		lua_pushinteger( L, level.gametype );
+	#elif defined(PROJECT_CGAME)
 		lua_pushinteger( L, cgs.gametype );
-
 	#endif
 		return 1;
 	}
@@ -1080,6 +1098,14 @@ namespace JPLua {
 		return 1;
 	}
 
+#if defined(PROJECT_CGAME)
+	static int Export_GetScores( lua_State *L ) {
+		lua_pushinteger( L, cgs.scores1 );
+		lua_pushinteger( L, cgs.scores2 );
+		return 2;
+	}
+#endif
+
 	static int Export_GetTime( lua_State *L ) {
 	#if defined(PROJECT_GAME)
 		lua_pushinteger( L, level.time );
@@ -1147,7 +1173,19 @@ namespace JPLua {
 
 	#ifdef PROJECT_CGAME
 	static int Export_RegisterShader( lua_State *L ) {
-		lua_pushinteger( L, trap->R_RegisterShader( lua_tostring( L, 1 ) ) );
+		const char *shaderName = luaL_checkstring( L, 1 );
+		const bool noMip = lua_toboolean( L, 2 );
+
+		qhandle_t handle = NULL_HANDLE;
+		if ( noMip ) {
+			handle = trap->R_RegisterShaderNoMip( shaderName );
+		}
+		else {
+			handle = trap->R_RegisterShader( shaderName );
+		}
+
+		lua_pushinteger( L, handle );
+
 		return 1;
 	}
 	#endif
@@ -1186,9 +1224,12 @@ namespace JPLua {
 
 	static int Export_SendConsoleCommand( lua_State *L ) {
 	#if defined(PROJECT_GAME)
-		trap->SendConsoleCommand( lua_tointeger( L, 1 ), va( "%s\n", lua_tostring( L, 2 ) ) );
+		int target = luaL_checkinteger( L, 1 );
+		const char *cmd = luaL_checkstring( L, 2 );
+		trap->SendConsoleCommand( target, va( "%s\n", cmd ) );
 	#elif defined(PROJECT_CGAME)
-		trap->SendConsoleCommand( lua_tostring( L, 1 ) );
+		const char *cmd = luaL_checkstring( L, 1 );
+		trap->SendConsoleCommand( va( "%s\n", cmd ) );
 	#endif
 		return 0;
 	}
@@ -1320,26 +1361,44 @@ namespace JPLua {
 	#ifdef PROJECT_CGAME
 	static int GetGLConfig( lua_State *L ) {
 		glconfig_t config;
-		int top;
-
 		trap->GetGlconfig( &config );
 
 		lua_newtable( L );
-		top = lua_gettop( L );
-		lua_pushstring( L, "renderer" ); lua_pushstring( L, config.renderer_string ); lua_settable( L, top );
-		lua_pushstring( L, "vendor" ); lua_pushstring( L, config.vendor_string ); lua_settable( L, top );
-		lua_pushstring( L, "version" ); lua_pushstring( L, config.version_string ); lua_settable( L, top );
-		lua_pushstring( L, "extensions" ); lua_pushstring( L, config.extensions_string ); lua_settable( L, top );
+		int top = lua_gettop( L );
+		lua_pushstring( L, "renderer" );
+			lua_pushstring( L, config.renderer_string );
+			lua_settable( L, top );
+		lua_pushstring( L, "vendor" );
+			lua_pushstring( L, config.vendor_string );
+			lua_settable( L, top );
+		lua_pushstring( L, "version" );
+			lua_pushstring( L, config.version_string );
+			lua_settable( L, top );
+		lua_pushstring( L, "extensions" );
+			lua_pushstring( L, config.extensions_string );
+			lua_settable( L, top );
+		lua_pushstring( L, "colorbits" );
+			lua_pushinteger( L, config.colorBits );
+			lua_settable( L, top );
+		lua_pushstring( L, "depthbits" );
+			lua_pushinteger( L, config.depthBits );
+			lua_settable( L, top );
+		lua_pushstring( L, "stencilBits" );
+			lua_pushinteger( L, config.stencilBits );
+			lua_settable( L, top );
+		lua_pushstring( L, "width" );
+			lua_pushinteger( L, config.vidWidth );
+			lua_settable( L, top );
+		lua_pushstring( L, "height" );
+			lua_pushinteger( L, config.vidHeight );
+			lua_settable( L, top );
+		lua_pushstring( L, "frequency" );
+			lua_pushinteger( L, config.displayFrequency );
+			lua_settable( L, top );
 
-		lua_pushstring( L, "colorbits" ); lua_pushinteger( L, config.colorBits ); lua_settable( L, top );
-		lua_pushstring( L, "depthbits" ); lua_pushinteger( L, config.depthBits ); lua_settable( L, top );
-		lua_pushstring( L, "stencilBits" ); lua_pushinteger( L, config.stencilBits ); lua_settable( L, top );
-
-		lua_pushstring( L, "width" ); lua_pushinteger( L, config.vidWidth ); lua_settable( L, top );
-		lua_pushstring( L, "height" ); lua_pushinteger( L, config.vidHeight ); lua_settable( L, top );
-		lua_pushstring( L, "frequency" ); lua_pushinteger( L, config.displayFrequency ); lua_settable( L, top );
-
-		lua_pushstring( L, "fullscreen" ); lua_pushboolean( L, config.isFullscreen ); lua_settable( L, top );
+		lua_pushstring( L, "fullscreen" );
+			lua_pushboolean( L, config.isFullscreen );
+			lua_settable( L, top );
 
 		return 1;
 	}
@@ -1445,7 +1504,8 @@ namespace JPLua {
 	#endif
 		{ "GetConfigString", GetConfigString }, // table GetConfigString()
 		{ "GetCvar", GetCvar }, // Cvar GetCvar( string name )
-		{ "GetGameType", Export_GetGameType }, // integer GetGameType()
+		{ "GetFlagStatus", Export_GetFlagStatus }, // FlagStatus GetFlagStatus( integer team )
+		{ "GetGametype", Export_GetGametype }, // integer GetGametype()
 	#ifdef PROJECT_CGAME
 		{ "GetGLConfig", GetGLConfig }, // table GetGLConfig()
 		{ "GetKeyCatcher", Export_GetKeyCatcher }, // integer GetKeyCatcher()
@@ -1471,6 +1531,7 @@ namespace JPLua {
 		{ "GetSerialiser", GetSerialiser }, // Serialiser GetSerialiser( string fileName )
 	#ifdef PROJECT_CGAME
 		{ "GetServer", GetServer }, // Server GetServer()
+		{ "GetScores", Export_GetScores }, // integer, integer GetScores()
 	#endif
 		{ "GetTime", Export_GetTime }, // integer GetTime()
 		{ "OpenFile", File_Open},
@@ -1541,7 +1602,7 @@ namespace JPLua {
 		}
 
 		// set the ls.version
-		semver_parse( "13.0.0", &jpluaVersion );
+		semver_parse( "13.1.0", &jpluaVersion );
 
 		// set the callback in case of an error
 		lua_atpanic( ls.L, Error );

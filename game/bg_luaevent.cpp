@@ -43,11 +43,11 @@ namespace JPLua {
 
 		if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
 #if defined(PROJECT_GAME)
-			G_LogPrintf( level.log.console, "ls. AddListener failed, function signature invalid registering %s "
+			G_LogPrintf( level.log.console, "JPLua AddListener failed, function signature invalid registering %s "
 				"(plugin: %s) - Is it up to date?\n", listenerArg, ls.currentPlugin->name
 			);
 #elif defined(PROJECT_CGAME)
-			trap->Print( "ls. AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up "
+			trap->Print( "JPLua AddListener failed, function signature invalid registering %s (plugin: %s) - Is it up "
 				"to date?\n", listenerArg, ls.currentPlugin->name
 			);
 #endif
@@ -62,11 +62,11 @@ namespace JPLua {
 		}
 
 #if defined(PROJECT_GAME)
-		G_LogPrintf( level.log.console, "ls. AddListener failed, could not find event %s (plugin: %s) - Is it up to "
+		G_LogPrintf( level.log.console, "JPLua AddListener failed, could not find event %s (plugin: %s) - Is it up to "
 			"date?\n", listenerArg, ls.currentPlugin->name
 		);
 #elif defined(PROJECT_CGAME)
-		trap->Print( "ls. AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n",
+		trap->Print( "JPLua AddListener failed, could not find event %s (plugin: %s) - Is it up to date?\n",
 			listenerArg, ls.currentPlugin->name );
 #endif
 
@@ -80,11 +80,11 @@ namespace JPLua {
 
 		if ( lua_type( L, 1 ) != LUA_TSTRING ) {
 #if defined(PROJECT_GAME)
-			G_LogPrintf( level.log.console, "ls. RemoveListener failed, function signature invalid registering %s "
+			G_LogPrintf( level.log.console, "JPLua RemoveListener failed, function signature invalid registering %s "
 				"(plugin: %s) - Is it up to date?\n", listenerArg, ls.currentPlugin->name
 			);
 #elif defined(PROJECT_CGAME)
-			trap->Print( "ls. RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it "
+			trap->Print( "JPLua RemoveListener failed, function signature invalid registering %s (plugin: %s) - Is it "
 				"up to date?\n", listenerArg, ls.currentPlugin->name
 			);
 #endif
@@ -100,11 +100,11 @@ namespace JPLua {
 		}
 
 #if defined(PROJECT_GAME)
-		G_LogPrintf( level.log.console, "ls. RemoveListener failed, could not find event %s (plugin: %s) - Is it up "
+		G_LogPrintf( level.log.console, "JPLua RemoveListener failed, could not find event %s (plugin: %s) - Is it up "
 			"to date?\n", listenerArg, ls.currentPlugin->name
 		);
 #elif defined(PROJECT_CGAME)
-		trap->Print( "ls. RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n",
+		trap->Print( "JPLua RemoveListener failed, could not find event %s (plugin: %s) - Is it up to date?\n",
 			listenerArg, ls.currentPlugin->name );
 #endif
 
@@ -187,7 +187,7 @@ namespace JPLua {
 	}
 
 #ifdef PROJECT_CGAME
-	char *Event_ChatMessageSent( const char *msg, messageMode_t mode, int targetClient ) {
+	char *Event_ChatMessageSent( const char *msg, messageMode_e mode, int targetClient ) {
 		static char tmpMsg[MAX_STRING_CHARS] = { 0 }; // although a chat message can only be MAX_SAY_TEXT long..-name?
 #ifdef JPLUA
 		plugin_t *plugin = NULL;
@@ -549,22 +549,22 @@ namespace JPLua {
 #endif
 
 #ifdef PROJECT_CGAME
-	qboolean Event_HUD( void ) {
-		qboolean ret = qfalse;
+	uint32_t Event_HUD( void ) {
+		uint32_t events = 0u;
 
 #ifdef JPLUA
 		plugin_t *plugin = NULL;
 		while ( IteratePlugins( &plugin ) ) {
 			if ( plugin->eventListeners[JPLUA_EVENT_HUD] ) {
 				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_HUD] );
-				Call( ls.L, 0, 1 );
-				if ( !ret )
-					ret = !!lua_tointeger( ls.L, -1 );
+				lua_pushunsigned( ls.L, events );
+				Call( ls.L, 1, 1 );
+				events |= lua_tounsigned( ls.L, -1 );
 			}
 		}
 #endif //JPLUA
 
-		return ret;
+		return events;
 	}
 #endif
 

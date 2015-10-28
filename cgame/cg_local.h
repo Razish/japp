@@ -100,6 +100,12 @@
 #define TURN_ON					(0x0000u)
 #define TURN_OFF				(0x0100u)
 
+#define HUDEVENT_NONE			(0x00u)
+#define HUDEVENT_STATS			(0x01u)
+#define HUDEVENT_FLAGS			(0x02u)
+#define HUDEVENT_SCORES			(0x04u)
+#define HUDEVENT_ALL			(0x07u)
+
 typedef enum footstep_e {
 	FOOTSTEP_STONEWALK,
 	FOOTSTEP_STONERUN,
@@ -790,7 +796,7 @@ typedef struct cgs_s {
 	int				duelWinner;
 	int				duelist1, duelist2, duelist3;
 	int				duelist1health, duelist2health, duelist3health;
-	int				redflag, blueflag;		// flag status from configstrings
+	flagStatus_t	redflag, blueflag;		// flag status from configstrings
 	qhandle_t		gameModels[MAX_MODELS];
 	sfxHandle_t		gameSounds[MAX_SOUNDS];
 	fxHandle_t		gameEffects[MAX_FX];
@@ -822,11 +828,11 @@ typedef struct siegeExtended_s {
 	int			lastUpdated;
 } siegeExtended_t;
 
-typedef enum messageMode_e {
+enum messageMode_e {
 	CHAT_ALL = 0,
 	CHAT_TEAM,
 	CHAT_WHISPER,
-} messageMode_t;
+};
 
 extern forceTicPos_t	ammoTicPos[];
 extern cg_t				cg;
@@ -891,7 +897,7 @@ void			CG_ChatboxDraw( void );
 void			CG_ChatboxHistoryDn( void );
 void			CG_ChatboxHistoryUp( void );
 void			CG_ChatboxInit( void );
-void			CG_ChatboxOpen( messageMode_t mode );
+void			CG_ChatboxOpen( messageMode_e mode );
 void			CG_ChatboxOutgoing( void );
 void			CG_ChatboxScroll( int direction );
 void			CG_ChatboxSelect( char *cbName );
@@ -964,8 +970,8 @@ qboolean		CG_G2TraceCollide( trace_t *tr, const vector3 *mins, const vector3 *ma
 void *			CG_G2WeaponInstance( centity_t *cent, int weapon );
 uint32_t		CG_GetCameraClip( void );
 int				CG_GetClassCount( team_t team, int siegeClass );
-void			CG_GetWeaponMuzzleBolt( int clIndex, vector3 *to );
 void			CG_GetColorForHealth( int health, int armor, vector4 *hcolor );
+flagStatus_t	CG_GetFlagStatus( team_t team );
 const char *	CG_GetGameStatusText( void );
 const char *	CG_GetKillerText( void );
 const char *	CG_GetLocationString( const char *loc );
@@ -974,6 +980,7 @@ const char *	CG_GetStringEdString( const char *refSection, const char *refName )
 void			CG_GetTeamColor( vector4 *color );
 int				CG_GetTeamNonScoreCount( team_t team );
 float			CG_GetValue( int ownerDraw );
+void			CG_GetWeaponMuzzleBolt( int clIndex, vector3 *to );
 void			CG_GlassShatter( int entnum, vector3 *dmgPt, vector3 *dmgDir, float dmgRadius, int maxShards );
 int				CG_HandleAppendedSkin( char *modelName );
 void			CG_ImpactMark( qhandle_t markShader, const vector3 *origin, const vector3 *dir, float orientation,
@@ -1014,12 +1021,12 @@ void			CG_NextForcePower_f( void );
 void			CG_NextInventory_f( void );
 void			CG_NextWeapon_f( void );
 void			CG_NewClientInfo( int clientNum, qboolean entitiesInitialized );
-qboolean		CG_OtherTeamDroppedFlag( void );
-qboolean		CG_OtherTeamHasFlag( void );
+bool			CG_OtherTeamDroppedFlag( void );
+bool			CG_OtherTeamHasFlag( void );
 void			CG_OutOfAmmoChange( int oldWeapon ); // should this be in pmove?
 void			CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw,
 					uint32_t ownerDrawFlags, int align, float special, float scale, const vector4 *color,
-					qhandle_t shader, int textStyle, int font );
+					qhandle_t shader, int textStyle, int font, bool customFont );
 qboolean		CG_OwnerDrawVisible( uint32_t flags );
 void			CG_PainEvent( centity_t *cent, int health );
 void			CG_ParseServerinfo( void );
@@ -1085,12 +1092,8 @@ void			CG_TestModelPrevSkin_f( void );
 void			CG_TestModelSetAnglespost_f( void );
 void			CG_TestModelSetAnglespre_f( void );
 void			CG_TestModelSurfaceOnOff_f( void );
-float			CG_Text_Height( const char *text, float scale, int iMenuFont );
-void			CG_Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust,
-					int limit, int style, int iMenuFont, qboolean customfont);
 void			CG_Text_PaintChar( float x, float y, float width, float height, float scale, float s, float t, float s2,
 					float t2, qhandle_t hShader );
-float			CG_Text_Width( const char *text, float scale, int iMenuFont );
 void			CG_TestLine( vector3 *start, vector3 *end, int time, uint32_t color, int radius );
 void			CG_TileClear( void );
 void			CG_Trace( trace_t *result, const vector3 *start, const vector3 *mins, const vector3 *maxs,
@@ -1103,8 +1106,8 @@ void			CG_UpdateCvars( void );
 void			CG_Weapon_f( void );
 void			CG_WeaponClean_f( void );
 qboolean		CG_WorldCoordToScreenCoordFloat( const vector3 *point, float *x, float *y );
-qboolean		CG_YourTeamDroppedFlag( void );
-qboolean		CG_YourTeamHasFlag( void );
+bool			CG_YourTeamDroppedFlag( void );
+bool			CG_YourTeamHasFlag( void );
 void			CG_ZoomDown_f( void );
 void			CG_ZoomUp_f( void );
 void			CGCam_SetMusicMult( float multiplier, int duration );
@@ -1127,12 +1130,8 @@ void			FX_TurretProjectileThink( centity_t *cent, const struct weaponInfo_s *wea
 void			FX_TurretHitWall( vector3 *origin, vector3 *normal );
 void			FX_TurretHitPlayer( vector3 *origin, vector3 *normal, qboolean humanoid );
 void			HandleTeamBinds( char *buf, int bufsize );
-qhandle_t		MenuFontToHandle( int iMenuFont );
 void			ScaleModelAxis( refEntity_t *ent );
 void			SE_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity );
 qboolean		SE_RenderThisEntity( vector3 *testOrigin, int gameEntity );
 qboolean		Server_Supports( uint32_t supportFlag );
 void			TurretClientRun( centity_t *ent );
-void			UI_DrawProportionalString( int x, int y, const char* str, int style, const vector4 *color );
-void			UI_DrawScaledProportionalString( int x, int y, const char* str, int style, const vector4 *color,
-					float scale );

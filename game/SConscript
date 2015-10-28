@@ -143,7 +143,7 @@ if no_sql == 0:
 		game_env['LIBS'] += [ 'mysqlclient']
 
 if plat == 'Windows':
-	game_env['LIBS'] += [ 'advapi32' ]
+	game_env['LIBS'] += [ 'advapi32', 'Shell32' ]
 	if bits == 32:
 		game_env['LIBS'] += [ 'user32' ]
 

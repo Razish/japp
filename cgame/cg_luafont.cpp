@@ -21,7 +21,6 @@ namespace JPLua {
 		luaFont_t *font = (luaFont_t *)lua_newuserdata( L, sizeof(luaFont_t) );
 		std::memset( font, 0, sizeof(*font) );
 		font->index = fontIndex;
-		font->handle = MenuFontToHandle( fontIndex );
 		lua_pushvalue( L, 2 );
 		font->reference = luaL_ref( L, LUA_REGISTRYINDEX );
 		//lua_pop( L, 1 );
@@ -43,15 +42,6 @@ namespace JPLua {
 		return 1;
 	}
 
-	static int Font_GetHandle( lua_State *L, luaFont_t *font ) {
-		lua_pushinteger( L, font->handle );
-		return 1;
-	}
-
-	static void Font_SetHandle( lua_State *L, luaFont_t *font ) {
-		font->handle = luaL_checkinteger( L, 3 );
-	}
-
 	static int Font_GetIndex( lua_State *L, luaFont_t *font ) {
 		lua_pushinteger( L, font->index );
 		return 1;
@@ -59,18 +49,9 @@ namespace JPLua {
 
 	static void Font_SetIndex( lua_State *L, luaFont_t *font ) {
 		font->index = luaL_checkinteger( L, 3 );
-
-		// retrieve the font handle, though perhaps we want a pointer that will be modified elsewhere? (e.g. when new
-		//	font assets are loaded
-		font->handle = MenuFontToHandle( font->index );
 	}
 
 	static const fontProperty_t fontProperties[] = {
-		{
-			"handle",
-			Font_GetHandle,
-			Font_SetHandle
-		},
 		{
 			"index",
 			Font_GetIndex,

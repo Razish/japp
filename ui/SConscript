@@ -41,7 +41,7 @@ ui_env['LIBS'] = [
 ]
 
 if plat == 'Windows' and bits == 32:
-	ui_env['LIBS'] += [ 'user32' ]
+	ui_env['LIBS'] += [ 'user32', 'Shell32' ]
 
 # project settings
 ui_env['CPPPATH'] += [ '#/ui' ]

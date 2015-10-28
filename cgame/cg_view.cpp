@@ -2305,7 +2305,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 			trap->Cvar_Set( "timescale", va( "%f", timescale.value ) );
 	}
 
-	//Raz: ls.
+	//Raz: JPLua
 	JPLua::Event_RunFrame();
 
 	// actually issue the rendering calls
@@ -2315,23 +2315,22 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	CG_DrawAutoMap();
 
 	cg.currentRefdef = REFDEF_ALTVIEW;
-	{
-		int i = 0;
-		altViewX = 0;
-		altViewY = 0;
-		for ( i = 0; i < 4; i++ ) {
-			//	CG_DrawAltView( i );
-		}
-		altViewX = 0;
-		altViewY = 0;
+	altViewX = 0;
+	altViewY = 0;
+	for ( int i = 0; i < 4; i++ ) {
+		//	CG_DrawAltView( i );
 	}
+	altViewX = 0;
+	altViewY = 0;
 
 	//Reset the refdef for future frames
 	cg.currentRefdef = REFDEF_DEFAULT;
 
-	if ( (trap->Key_GetCatcher() & KEYCATCH_CGAME) && !CG_ChatboxActive() ) {
+	// draw the cursor
+	if ( (trap->Key_GetCatcher() & KEYCATCH_CGAME) /*&& !CG_ChatboxActive()*/ ) {
+		const float cursorSize = 48.0f;
 		displayContextDef_t *dc = Display_GetContext();
-		CG_DrawPic( dc->cursorx, dc->cursory, 40.0f, 40.0f, media.gfx.interface.cursor );
+		CG_DrawPic( dc->cursorx, dc->cursory, cursorSize, cursorSize, cgs.activeCursor );
 	}
 
 	trap->R_SetColor( NULL );

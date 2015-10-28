@@ -133,6 +133,23 @@ namespace JPLua {
 		return 1;
 	}
 
+	//Func: Cvar:GetBoolean()
+	//Retn: boolean value of the Cvar's value
+	static int Cvar_GetBoolean( lua_State *L ) {
+		luaCvar_t *luaCvar = CheckCvar( L, 1 );
+		char buf[MAX_CVAR_VALUE_STRING];
+
+		trap->Cvar_VariableStringBuffer( luaCvar->name, buf, sizeof(buf) );
+		if ( buf[0] ) {
+			lua_pushboolean( L, atoi( buf ) ? 1 : 0 );
+		}
+		else {
+			lua_pushnil( L );
+		}
+
+		return 1;
+	}
+
 	//Func: Cvar:Reset()
 	//Retn: --
 	static int Cvar_Reset( lua_State *L ) {
@@ -208,6 +225,7 @@ namespace JPLua {
 		{ "GetInteger", Cvar_GetInteger },
 		{ "GetString", Cvar_GetString },
 		{ "GetFloat", Cvar_GetFloat },
+		{ "GetBoolean", Cvar_GetBoolean },
 
 		{ "Reset", Cvar_Reset },
 		{ "Set", Cvar_Set },

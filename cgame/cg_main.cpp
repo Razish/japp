@@ -1209,22 +1209,23 @@ float CG_Cvar_Get( const char *cvar ) {
 	return (float)atof( buff );
 }
 
-void CG_Text_PaintWithCursor( float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont ) {
-	CG_Text_Paint(x, y, scale, color, text, 0, limit, style, iMenuFont, qfalse);
+void CG_Text_PaintWithCursor( float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont, bool customFont ) {
+	Text_Paint( x, y, scale, color, text, 0, limit, style, iMenuFont, customFont );
+	//FIXME: add cursor code
 }
 
 static int CG_OwnerDrawWidth( int ownerDraw, float scale ) {
 	switch ( ownerDraw ) {
 	case CG_GAME_TYPE:
-		return CG_Text_Width( BG_GetGametypeString( cgs.gametype ), scale, FONT_MEDIUM );
+		return Text_Width( BG_GetGametypeString( cgs.gametype ), scale, FONT_MEDIUM, false );
 	case CG_GAME_STATUS:
-		return CG_Text_Width( CG_GetGameStatusText(), scale, FONT_MEDIUM );
+		return Text_Width( CG_GetGameStatusText(), scale, FONT_MEDIUM, false );
 	case CG_KILLER:
-		return CG_Text_Width( CG_GetKillerText(), scale, FONT_MEDIUM );
+		return Text_Width( CG_GetKillerText(), scale, FONT_MEDIUM, false );
 	case CG_RED_NAME:
-		return CG_Text_Width( DEFAULT_REDTEAM_NAME/*cg_redTeamName.string*/, scale, FONT_MEDIUM );
+		return Text_Width( DEFAULT_REDTEAM_NAME/*cg_redTeamName.string*/, scale, FONT_MEDIUM, false );
 	case CG_BLUE_NAME:
-		return CG_Text_Width( DEFAULT_BLUETEAM_NAME/*cg_blueTeamName.string*/, scale, FONT_MEDIUM );
+		return Text_Width( DEFAULT_BLUETEAM_NAME/*cg_blueTeamName.string*/, scale, FONT_MEDIUM, false );
 	default:
 		break;
 	}
@@ -1307,9 +1308,9 @@ void CG_LoadHudMenu( void ) {
 	cgDC.setColor = trap->R_SetColor;
 	cgDC.drawHandlePic = CG_DrawPic;
 	cgDC.drawStretchPic = trap->R_DrawStretchPic;
-	cgDC.drawText = CG_Text_Paint;
-	cgDC.textWidth = CG_Text_Width;
-	cgDC.textHeight = CG_Text_Height;
+	cgDC.drawText = Text_Paint;
+	cgDC.textWidth = Text_Width;
+	cgDC.textHeight = Text_Height;
 	cgDC.registerModel = trap->R_RegisterModel;
 	cgDC.modelBounds = trap->R_ModelBounds;
 	cgDC.fillRect = CG_FillRect;
@@ -1353,6 +1354,8 @@ void CG_LoadHudMenu( void ) {
 	cgDC.stopCinematic = CG_StopCinematic;
 	cgDC.drawCinematic = CG_DrawCinematic;
 	cgDC.runCinematicFrame = CG_RunCinematicFrame;
+
+	cgDC.ext.Font_StrLenPixels = trap->ext.R_Font_StrLenPixels;
 
 	Init_Display( &cgDC );
 
@@ -1786,7 +1789,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	cg.forceHUDNextFlashTime = 0;
 	cg.renderingThirdPerson = cg_thirdPerson.integer;
 	cg.weaponSelect = WP_BRYAR_PISTOL;
-	cgs.redflag = cgs.blueflag = -1;
+	cgs.redflag = cgs.blueflag = FLAG_ATBASE;
 	cg.demoPlayback = demoPlayback;
 	cgs.levelStartTime = atoi( CG_ConfigString( CS_LEVEL_START_TIME ) );
 
@@ -1812,6 +1815,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 	WP_SaberLoadParms();
 	//	CG_LoadingString( "Media" );
 	CG_LoadMedia();
+	cgs.activeCursor = media.gfx.interface.cursor;
 	CG_LoadingString( "Siege data" );
 	CG_InitSiegeMode();
 	CG_LoadingString( "Trueview" );
@@ -2150,12 +2154,6 @@ void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	trap->FS_Write( string, strlen( string ), fileHandle );
 }
 
-static void _CG_MouseEvent( int x, int y ) {
-	cgDC.cursorx = cgs.cursorX;
-	cgDC.cursory = cgs.cursorY;
-	CG_MouseEvent( x, y );
-}
-
 static qboolean CG_IncomingConsoleCommand( void ) {
 	//rww - let mod authors filter client console messages so they can cut them off if they want.
 	//return qtrue if the command is ok. Otherwise, you can set char 0 on the command str to 0 and return
@@ -2166,7 +2164,7 @@ static qboolean CG_IncomingConsoleCommand( void ) {
 	if ( strstr( icc->conCommand, "wait" ) )
 	{ //filter out commands contaning wait
 		Com_Printf( "You can't use commands containing the string wait with MyMod v1.0\n" );
-		icc->conCommand[0] = 0;
+		icc->conCommand[0] = '\0';
 		return qfalse;
 	}
 	else if ( strstr( icc->conCommand, "blah" ) )
@@ -2229,20 +2227,6 @@ static void CG_FX_CameraShake( void ) {
 
 cgameImport_t *trap = NULL;
 
-typedef int( *R_Font_StrLenPixels_t )(const char *text, const int iFontIndex, const float scale);
-int( *R_Font_StrLenPixels )(const char *text, const int iFontIndex, const float scale);
-float CG_Font_StrLenPixels( const char *text, const int iFontIndex, const float scale ) {
-	float width = (float)R_Font_StrLenPixels( text, iFontIndex, 4.0f );
-	return (width / 4.0f) * scale;
-}
-
-int( *R_Font_HeightPixels )(const int iFontIndex, const float scale);
-typedef int( *R_Font_HeightPixels_t )(const int iFontIndex, const float scale);
-float CG_Font_HeightPixels( const int iFontIndex, const float scale ) {
-	float height = (float)R_Font_HeightPixels( iFontIndex, 4.0f );
-	return (height / 4.0f) * scale;
-}
-
 extern "C" {
 Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *import ) {
 	static cgameExport_t cge = { 0 };
@@ -2251,12 +2235,6 @@ Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *impor
 	trap = import;
 	Com_Printf = trap->Print;
 	Com_Error = trap->Error;
-
-	//HACK: work-around for JA's crappy width calculation
-	R_Font_StrLenPixels = (R_Font_StrLenPixels_t)trap->R_Font_StrLenPixels;
-	R_Font_HeightPixels = (R_Font_HeightPixels_t)trap->R_Font_HeightPixels;
-	trap->R_Font_StrLenPixels = CG_Font_StrLenPixels;
-	trap->R_Font_HeightPixels = CG_Font_HeightPixels;
 
 	memset( &cge, 0, sizeof(cge) );
 
@@ -2272,7 +2250,7 @@ Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *impor
 	cge.CrosshairPlayer = CG_CrosshairPlayer;
 	cge.LastAttacker = CG_LastAttacker;
 	cge.KeyEvent = CG_KeyEvent;
-	cge.MouseEvent = _CG_MouseEvent;
+	cge.MouseEvent = CG_MouseEvent;
 	cge.EventHandling = CG_EventHandling;
 	cge.PointContents = C_PointContents;
 	cge.GetLerpOrigin = C_GetLerpOrigin;
@@ -2292,7 +2270,6 @@ Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *impor
 	cge.AutomapInput = CG_AutomapInput;
 	cge.MiscEnt = CG_MiscEnt;
 	cge.CameraShake = CG_FX_CameraShake;
-
 
 	return &cge;
 }
@@ -2329,7 +2306,7 @@ Q_EXPORT intptr_t vmMain( int command, intptr_t arg0, intptr_t arg1, intptr_t ar
 		return 0;
 
 	case CG_MOUSE_EVENT:
-		_CG_MouseEvent( arg0, arg1 );
+		CG_MouseEvent( arg0, arg1 );
 		return 0;
 
 	case CG_EVENT_HANDLING:

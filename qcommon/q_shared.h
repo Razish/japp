@@ -143,6 +143,7 @@ float LittleFloat( const float l );
 #define NOSCROLL
 #define NOMINMAX
 #include <windows.h>
+#include <Shellapi.h>
 
 #undef QDECL
 #define	QDECL __cdecl
@@ -282,6 +283,9 @@ float LittleFloat( const float l );
 
 // TYPE DEFINITIONS
 typedef unsigned char byte;
+typedef float real32_t;
+typedef double real64_t;
+typedef long double real80_t;
 
 static const uint32_t qfalse = 0;
 static const uint32_t qtrue = 1;
@@ -2386,3 +2390,5 @@ void Q_RemoveFromBitflags( uint32_t *bits, int index, uint32_t bitsPerByte );
 
 int Q_CompareNetAddress( const netadr_t *a1, const netadr_t *a2 );
 const char *Q_PrintNetAddress( const netadr_t *adr );
+bool Q_PointInBounds( float x, float y, float startX, float startY, float width, float height );
+void Q_OpenURL( const char *url );

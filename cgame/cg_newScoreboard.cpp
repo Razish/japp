@@ -9,7 +9,7 @@ static int JP_GetScoreboardFont( void ) {
 }
 
 static void DrawServerInfo( float fade ) {
-	const qhandle_t fontLarge = MenuFontToHandle( FONT_JAPPLARGE ), fontSmall = MenuFontToHandle( FONT_JAPPMONO );
+	const int fontLarge = FONT_JAPPLARGE, fontSmall = FONT_JAPPMONO;
 	const float fontScale = 0.5f, lineHeightBig = 14.0f,
 		lineHeightSmall = trap->R_Font_HeightPixels( fontSmall, fontScale );
 	const char *tmp = NULL;
@@ -19,19 +19,20 @@ static void DrawServerInfo( float fade ) {
 
 	// map name
 	tmp = va( "%s (%s)", (char *)CG_ConfigString( CS_MESSAGE ), cgs.mapname );
-	trap->R_Font_DrawString( 0.0f, y, tmp, &colour, fontSmall | STYLE_DROPSHADOW, -1, fontScale );
+	Text_Paint( 0.0f, y, fontScale, &colour, tmp, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontSmall, false );
 	y -= lineHeightSmall;
 
 	// server name
-	trap->R_Font_DrawString( 0.0f, y, cgs.japp.serverName, &colour, fontSmall | STYLE_DROPSHADOW, -1, fontScale );
+	Text_Paint( 0.0f, y, fontScale, &colour, cgs.japp.serverName, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontSmall, false );
 	y -= lineHeightSmall;
 
 	y = 42.0f;
 
 	// gametype
 	tmp = BG_GetGametypeString( cgs.gametype );
-	trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
-		tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
+	Text_Paint( SCREEN_WIDTH / 2.0f - Text_Width( tmp, fontScale, fontLarge, false ) / 2.0f, y, fontScale, &colour,
+		tmp, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontLarge, false
+	);
 	y += lineHeightBig;
 
 	switch ( cgs.gametype ) {
@@ -71,8 +72,9 @@ static void DrawServerInfo( float fade ) {
 		else
 			tmp = "Playing forever!";
 
-		trap->R_Font_DrawString( SCREEN_WIDTH / 2.0f - trap->R_Font_StrLenPixels( tmp, fontLarge, fontScale ) / 2.0f, y,
-			tmp, &colour, fontLarge | STYLE_DROPSHADOW, -1, fontScale );
+		Text_Paint( SCREEN_WIDTH / 2.0f - Text_Width( tmp, fontScale, fontLarge, false ), y, fontScale, &colour, tmp,
+			0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontLarge, false
+		);
 		y += lineHeightBig * 2;
 		//FALL THROUGH TO GENERIC TEAM GAME INFO!
 
@@ -113,7 +115,7 @@ static void DrawServerInfo( float fade ) {
 }
 
 static void DrawPlayerCount_Free( float fade ) {
-	const qhandle_t fontHandle = MenuFontToHandle( FONT_JAPPLARGE );
+	const int fontHandle = FONT_JAPPLARGE;
 	const float fontScale = 0.5f, width = SCREEN_WIDTH / 2.0f, lineHeight = 14.0f;
 	float y = 108.0f;
 	const char *tmp = NULL;
@@ -133,21 +135,25 @@ static void DrawPlayerCount_Free( float fade ) {
 	}
 
 	// player count
-	if ( botCount )
+	if ( botCount ) {
 		tmp = va( "%i players / %i bots", freeCount - botCount, botCount );
-	else
+	}
+	else {
 		tmp = va( "%i players", freeCount );
-	trap->R_Font_DrawString( width - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y, tmp, &colour,
-		fontHandle, -1, fontScale );
+	}
+	Text_Paint( width - Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f, y, fontScale, &colour, tmp, 0.0f, 0,
+		ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+	);
 
 	// spectator count
 	tmp = va( "%2i spectators", specCount );
-	trap->R_Font_DrawString( width - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y + lineHeight * 20,
-		tmp, &colour, fontHandle, -1, fontScale );
+	Text_Paint( width - Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f, y + lineHeight * 20, fontScale,
+		&colour, tmp, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+	);
 }
 
 void DrawPlayerCount_Team( float fade ) {
-	const qhandle_t fontHandle = MenuFontToHandle( FONT_JAPPLARGE );
+	const int fontHandle = FONT_JAPPLARGE;
 	const float fontScale = 0.5f, width = SCREEN_WIDTH / 2.0f, lineHeight = 14.0f;
 	float y = 108.0f;
 	const char *tmp = NULL;
@@ -164,32 +170,39 @@ void DrawPlayerCount_Team( float fade ) {
 			blueCount++;
 			pingAccumBlue += cg.scores[i].ping;
 		}
-		else if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_SPECTATOR )
+		else if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_SPECTATOR ) {
 			specCount++;
+		}
 	}
 
-	if ( redCount )
+	if ( redCount ) {
 		pingAvgRed = ceilf( pingAccumRed / redCount );
-	if ( blueCount )
+	}
+	if ( blueCount ) {
 		pingAvgBlue = ceilf( pingAccumBlue / blueCount );
+	}
 
 	if ( cgs.scores1 >= cgs.scores2 ) {
 		// red team
 		tmp = va( S_COLOR_RED "%i players " S_COLOR_WHITE "(%3i avg ping)", redCount, pingAvgRed );
-		trap->R_Font_DrawString( width / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y, tmp,
-			&colour, fontHandle, -1, fontScale );
+		Text_Paint( width / 2.0f - Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f, y, fontScale, &colour, tmp, 0.0f, 0,
+			ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+		);
 		// blue team
 		tmp = va( S_COLOR_CYAN "%i players " S_COLOR_WHITE "(%3i avg ping)", blueCount, pingAvgBlue );
-		trap->R_Font_DrawString( width + width / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y, tmp,
-			&colour, fontHandle, -1, fontScale );
+		Text_Paint( width + width / 2.0f - Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f, y, fontScale, &colour, tmp,
+			0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+		);
 	}
 	else {
 		tmp = va( S_COLOR_CYAN "%i players " S_COLOR_WHITE "(%i avg ping)", blueCount, pingAvgBlue );
-		trap->R_Font_DrawString( width / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y, tmp,
-			&colour, fontHandle, -1, fontScale );
+		Text_Paint( width / 2.0f - Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f, y, fontScale, &colour, tmp,
+			0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+		);
 		tmp = va( S_COLOR_RED "%i players " S_COLOR_WHITE "(%i avg ping)", redCount, pingAvgRed );
-		trap->R_Font_DrawString( width + width / 2.0f - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f, y, tmp,
-			&colour, fontHandle, -1, fontScale );
+		Text_Paint( width + width / 2.0f - Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f, y, fontScale,
+			&colour, tmp, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+		);
 	}
 
 	tmp = va( "%2i spectators", specCount );
@@ -251,29 +264,33 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 		return 0;
 
 	trap->R_SetColor( &background );
-	CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f * 2 + 5.0f, lineHeight*1.5f, media.gfx.interface.scoreboardLine );
+	CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f * 2 + 5.0f, lineHeight*1.25f, media.gfx.interface.scoreboardLine );
 	trap->R_SetColor( NULL );
 
 	tmp = "Name";
-	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f,
-		y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f, tmp, &white,
-		fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+	Text_Paint( x - (Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f) + columnOffset[column++],
+		y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &white, tmp, 0.0f, 0,
+		ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+	);
 
 	tmp = "Score";
-	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f,
-		y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f, tmp, &white,
-		fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+	Text_Paint( x - (Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f) + columnOffset[column++],
+		y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &white, tmp, 0.0f, 0,
+		ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+	);
 
 	tmp = "Ping";
-	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f,
-		y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f, tmp, &white,
-		fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+	Text_Paint( x - (Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f) + columnOffset[column++],
+		y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &white, tmp, 0.0f, 0,
+		ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+	);
 
 	tmp = "Time";
-	trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle, fontScale ) / 2.0f,
-		y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f, tmp, &white,
-		fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-	y += lineHeight*1.5f;
+	Text_Paint( x - (Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f) + columnOffset[column++],
+		y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &white, tmp, 0.0f, 0,
+		ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+	);
+	y += lineHeight * 1.25f;
 
 	savedY = y;
 
@@ -283,10 +300,12 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 		clientInfo_t *ci = &cgs.clientinfo[score->client];
 		if ( ci->team == TEAM_FREE ) {
 			// background
-			if ( ci - cgs.clientinfo == cg.snap->ps.clientNum )
+			if ( ci - cgs.clientinfo == cg.snap->ps.clientNum ) {
 				trap->R_SetColor( &blue );
-			else
+			}
+			else {
 				trap->R_SetColor( &background );
+			}
 
 			CG_DrawPic( x + 10.0f - 5.0f, y, endX - 10.0f * 2 + 5.0f, lineHeight, media.gfx.interface.scoreboardLine );
 			trap->R_SetColor( NULL );
@@ -301,7 +320,8 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 		score_t *score = &cg.scores[i];
 		clientInfo_t *ci = &cgs.clientinfo[score->client];
 		if ( ci->team == TEAM_FREE ) {
-			vector4	pingColour = { 1.0f, 1.0f, 1.0f, 1.0f }, pingGood = { 0.0f, 1.0f, 0.0f, 1.0f },
+			vector4	pingColour = { 1.0f, 1.0f, 1.0f, 1.0f },
+				pingGood = { 0.0f, 1.0f, 0.0f, 1.0f },
 				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
 			pingColour.a = pingGood.a = pingBad.a = fade;
 
@@ -324,21 +344,24 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 
 			else if ( ci->botSkill != -1 ) {
 				tmp = "BOT";
-				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle,
-					fontScale ) / 2.0f) - 1.0f, tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+				Text_Paint( x + 8.0f, y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &white,
+					tmp, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+				);
 			}
 
 			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
 				tmp = "READY";
-				trap->R_Font_DrawString( x + 8.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle,
-					fontScale ) / 2.0f) - 1.0f, tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+				Text_Paint( x + 8.0f, y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &white,
+					tmp, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+				);
 			}
 
 			//Name
 			tmp = ci->name;
-			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
-				fontScale ) / 2.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f,
-				tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+			Text_Paint( x - (Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f) + columnOffset[column++],
+				y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &white, tmp, 0.0f, 0,
+				ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+			);
 
 			//Score
 			if ( score->ping == -1 ) {
@@ -357,29 +380,33 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 				tmp = va( "%02i/%02i", score->score, score->deaths );
 			}
 
-			trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
-				fontScale ) / 2.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle, fontScale ) / 2.0f) - 1.0f,
-				tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+			Text_Paint( x - (Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f) + columnOffset[column++],
+				y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &white, tmp, 0.0f, 0,
+				ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+			);
 
 			if ( score->ping != -1 ) {
 				if ( ci->botSkill != -1 ) {
 					tmp = "--";
-					trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
-						fontScale ) / 2.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle,
-						fontScale ) / 2.0f) - 1.0f, tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+					Text_Paint( x - (Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f) + columnOffset[column++],
+						y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &white, tmp, 0.0f, 0,
+						ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+					);
 				}
 				else {//Ping
 					tmp = va( "%i", score->ping );
-					trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
-						fontScale ) / 2.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle,
-						fontScale ) / 2.0f) - 1.0f, tmp, &pingColour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+					Text_Paint( x - (Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f) + columnOffset[column++],
+						y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &pingColour, tmp,
+						0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+					);
 				}
 
 				//Time
 				tmp = va( "%i", score->time );
-				trap->R_Font_DrawString( x + columnOffset[column++] - trap->R_Font_StrLenPixels( tmp, fontHandle,
-					fontScale ) / 2.0f, y + (lineHeight / 2.0f) - (trap->R_Font_HeightPixels( fontHandle,
-					fontScale ) / 2.0f) - 1.0f, tmp, &white, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+				Text_Paint( x - (Text_Width( tmp, fontScale, fontHandle, false ) / 2.0f) + columnOffset[column++],
+					y + (Text_Height( tmp, fontScale, fontHandle, false ) / 2.0f), fontScale, &white, tmp, 0.0f, 0,
+					ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+				);
 			}
 
 			y += lineHeight;
@@ -800,14 +827,14 @@ static int ListPlayers_Team( float fade, float x, float y, float fontScale, int 
 }
 
 static void DrawSpectators( float fade ) {
-	const qhandle_t fontHandle = MenuFontToHandle( JP_GetScoreboardFont() );
+	const int fontHandle = JP_GetScoreboardFont();
 	const float fontScale = 0.5f, lineHeight = 14.0f;
 	float y = 128.0f;
 	vector4 white = { 1.0f, 1.0f, 1.0f, 1.0f };
 	white.a = fade;
 
 	CG_BuildSpectatorString();
-	cg.scoreboard.spectatorWidth = CG_Text_Width( cg.scoreboard.spectatorList, fontScale, fontHandle );
+	cg.scoreboard.spectatorWidth = Text_Width( cg.scoreboard.spectatorList, fontScale, fontHandle, false );
 
 	if ( cg.scoreboard.spectatorLen ) {
 		const float dt = (cg.time - cg.scoreboard.spectatorResetTime)*0.0625f;
@@ -817,13 +844,13 @@ static void DrawSpectators( float fade ) {
 			cg.scoreboard.spectatorX = SCREEN_WIDTH;
 			cg.scoreboard.spectatorResetTime = cg.time;
 		}
-		CG_Text_Paint( cg.scoreboard.spectatorX, (y + lineHeight * 20) - 3, fontScale, &white, cg.scoreboard.spectatorList,
-			0, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, qfalse);
+		Text_Paint( cg.scoreboard.spectatorX, (y + lineHeight * 20) - 3, fontScale, &white, cg.scoreboard.spectatorList,
+			0, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false );
 	}
 }
 
 static void DrawPlayers_Free( float fade ) {
-	const qhandle_t fontHandle = MenuFontToHandle( JP_GetScoreboardFont() );
+	const int fontHandle = JP_GetScoreboardFont();
 	const float fontScale = 0.45f, lineHeight = 14.0f;
 	float x = 0, y = 128.0f;
 	const int playerCount = PlayerCount( TEAM_FREE );
@@ -837,7 +864,7 @@ static void DrawPlayers_Free( float fade ) {
 }
 
 static void DrawPlayers_Team( float fade ) {
-	const qhandle_t fontHandle = MenuFontToHandle( JP_GetScoreboardFont() );
+	const int fontHandle = JP_GetScoreboardFont();
 	const float fontScale = 0.5f, lineHeight = 14.0f;
 	float x = 0, y = 128.0f;
 
@@ -898,31 +925,35 @@ static void DrawClientInfo( float fade ) {
 	struct tm *timeinfo;
 	time_t tm;
 	char buf[256];
-	const qhandle_t fontHandle = MenuFontToHandle( FONT_JAPPMONO );
+	const int fontHandle = FONT_JAPPMONO;
 	const float fontScale = 0.5f;
-	const float lineHeight = trap->R_Font_HeightPixels( fontHandle, fontScale );
-	float y = SCREEN_HEIGHT - lineHeight - 4.0f;
 	vector4 colour;
+	float y = SCREEN_HEIGHT - 4.0f;
 
 	VectorCopy4( &g_color_table[ColorIndex( COLOR_ORANGE )], &colour );
 	colour.a = fade;
 
 #ifdef REVISION
+	y -= Text_Height( REVISION, fontScale, fontHandle, false );
 	// JA++ version
-	trap->R_Font_DrawString( SCREEN_WIDTH - trap->R_Font_StrLenPixels( REVISION, fontHandle, fontScale ) - 21.0f, y,
-		REVISION, &colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
-	y -= lineHeight;
+	Text_Paint( SCREEN_WIDTH - Text_Width( REVISION, fontScale, fontHandle, false ), y, fontScale, &colour,
+		REVISION, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+	);
 #endif
 
 	// date
 	time( &tm );
 	timeinfo = localtime( &tm );
 
-	Com_sprintf( buf, sizeof(buf), "%s %i%s %04i, %02i:%02i:%02i", months[timeinfo->tm_mon], timeinfo->tm_mday,
-		GetDateSuffix( timeinfo->tm_mday ), 1900 + timeinfo->tm_year, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec );
+	Com_sprintf( buf, sizeof(buf), "%s %i%s %04i, %02i:%02i:%02i",
+		months[timeinfo->tm_mon], timeinfo->tm_mday, GetDateSuffix( timeinfo->tm_mday ),
+		1900 + timeinfo->tm_year, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec
+	);
 
-	trap->R_Font_DrawString( SCREEN_WIDTH - trap->R_Font_StrLenPixels( buf, fontHandle, fontScale ) - 12.0f, y, buf,
-		&colour, fontHandle | STYLE_DROPSHADOW, -1, fontScale );
+	y -= Text_Height( buf, fontScale, fontHandle, false );
+	Text_Paint( SCREEN_WIDTH - Text_Width( buf, fontScale, fontHandle, false ), y, fontScale, &colour, buf,
+		0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+	);
 }
 
 //Scoreboard entry point

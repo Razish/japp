@@ -7,7 +7,19 @@ namespace JPLua {
 
 	static const char TEXTBOX_META[] = "TextBox.meta";
 
-	int TextBoxPropertyCompare( const void *a, const void *b ) {
+	static void CalculateDimensions( luaTextBox_t *box ) {
+		if ( box->recalculate ) {
+			const bool customFont = box->font != nullptr;
+			const int fontHandle = customFont ? box->font->index : FONT_MEDIUM;
+
+			box->width = Text_Width( box->text.c_str(), box->scale, fontHandle, customFont );
+			box->height = Text_Height( box->text.c_str(), box->scale, fontHandle, customFont );
+
+			box->recalculate = false;
+		}
+	}
+
+	static int TextBoxPropertyCompare( const void *a, const void *b ) {
 		return strcmp( (const char *)a, ((textBoxProperty_t *)b)->name );
 	}
 
@@ -17,6 +29,7 @@ namespace JPLua {
 		box->font = nullptr;
 		box->scale = 1.0f;
 		box->text = "";
+		box->recalculate = true;
 		luaL_getmetatable( L, TEXTBOX_META );
 		lua_setmetatable( L, -2 );
 	}
@@ -79,9 +92,11 @@ namespace JPLua {
 		}
 		luaFont_t *font = CheckFont( L, 3 );
 		box->font = font;
+		box->recalculate = true;
 	}
 
 	static int TextBox_GetScale( lua_State *L, luaTextBox_t *box ) {
+		CalculateDimensions( box );
 		lua_pushnumber( L, box->scale );
 		return 1;
 	}
@@ -89,6 +104,7 @@ namespace JPLua {
 	static void TextBox_SetScale( lua_State *L, luaTextBox_t *box ) {
 		const float scale = luaL_checknumber( L, 3 );
 		box->scale = scale;
+		box->recalculate = true;
 	}
 
 	static int TextBox_GetStyle( lua_State *L, luaTextBox_t *box ) {
@@ -109,6 +125,19 @@ namespace JPLua {
 	static void TextBox_SetText( lua_State *L, luaTextBox_t *box ) {
 		const char *text = luaL_checkstring( L, 3 );
 		box->text = text;
+		box->recalculate = true;
+	}
+
+	static int TextBox_GetWidth( lua_State *L, luaTextBox_t *box ) {
+		CalculateDimensions( box );
+		lua_pushnumber( L, box->width );
+		return 1;
+	}
+
+	static int TextBox_GetHeight( lua_State *L, luaTextBox_t *box ) {
+		CalculateDimensions( box );
+		lua_pushnumber( L, box->height );
+		return 1;
 	}
 
 	static const textBoxProperty_t textBoxProperties[] = {
@@ -128,6 +157,11 @@ namespace JPLua {
 			TextBox_SetFont
 		},
 		{
+			"height",
+			TextBox_GetHeight,
+			nullptr
+		},
+		{
 			"scale",
 			TextBox_GetScale,
 			TextBox_SetScale
@@ -141,6 +175,11 @@ namespace JPLua {
 			"text",
 			TextBox_GetText,
 			TextBox_SetText
+		},
+		{
+			"width",
+			TextBox_GetWidth,
+			nullptr
 		}
 	};
 	static const size_t numTextBoxProperties = ARRAY_LEN( textBoxProperties );
@@ -245,28 +284,19 @@ namespace JPLua {
 	//Retn: --
 	static int TextBox_Draw( lua_State *L ) {
 		luaTextBox_t *box = CheckTextBox( L, 1 );
+		CalculateDimensions( box );
 		float x = luaL_checknumber( L, 2 );
 		float y = luaL_checknumber( L, 3 );
+		bool customFont = box->font != nullptr;
+		int fontHandle = customFont ? box->font->index : FONT_MEDIUM;
 		const char *text = box->text.c_str();
-		float scale = box->scale;
-		int style = box->style;
-		int customFont = 0; // ???
-		int iMenuFont = box->font ? box->font->index : (customFont ? 0 : FONT_MEDIUM);
 
 		if ( box->centered ) {
-			float width = 0.0f;
-			if ( customFont ) {
-				width = trap->R_Font_StrLenPixels( text, box->font->handle, scale );
-			}
-			else {
-				width = CG_Text_Width( text, scale, box->font->index );
-			}
-			x -= width / 2.0f;
+			x -= box->width / 2.0f;
+			//y -= box->height / 2.0f;
 		}
 
-		CG_Text_Paint( x, y, scale, &box->colour, text, 0.0f, 0, style, iMenuFont,
-			customFont
-		);
+		Text_Paint( x, y, box->scale, &box->colour, text, 0.0f, 0, box->style, fontHandle, customFont );
 		return 0;
 	}
 

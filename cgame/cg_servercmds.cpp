@@ -197,7 +197,7 @@ static void CG_ParseWarmup( void ) {
 
 //Raz: This is a reverse map of flag statuses as seen in g_team.c
 //static char ctfFlagStatusRemap[] = { '0', '1', '*', '*', '2' };
-static char ctfFlagStatusRemap[] = {
+static flagStatus_t ctfFlagStatusRemap[] = {
 	FLAG_ATBASE,
 	FLAG_TAKEN,
 	//FLAG_TAKEN_RED,	// these were used for 1-flag CTF

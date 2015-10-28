@@ -592,128 +592,51 @@ void _UI_DrawRect( float x, float y, float width, float height, float size, cons
 	trap->R_SetColor( NULL );
 }
 
-qhandle_t MenuFontToHandle( int iMenuFont ) {
-	switch ( iMenuFont ) {
-	case FONT_SMALL: return uiInfo.uiDC.Assets.qhSmallFont;
-	case FONT_MEDIUM: return uiInfo.uiDC.Assets.qhMediumFont;
-	case FONT_LARGE: return uiInfo.uiDC.Assets.qhBigFont;
-	case FONT_SMALL2: return uiInfo.uiDC.Assets.qhSmall2Font;
-		//Raz: fonts
-	case FONT_JAPPLARGE: return uiInfo.uiDC.Assets.japp.fontLarge;
-	case FONT_JAPPSMALL: return uiInfo.uiDC.Assets.japp.fontSmall;
-	case FONT_JAPPMONO: return uiInfo.uiDC.Assets.japp.fontMono;
-	default: return uiInfo.uiDC.Assets.qhMediumFont;
-	}
-}
+void Text_PaintWithCursor( float x, float y, float scale, const vector4 *color, const char *text, int cursorPos,
+	char cursor, int limit, int style, int iMenuFont, bool customFont )
+{
+	Text_Paint( x, y, scale, color, text, 0, limit, style, iMenuFont, customFont );
 
-float Text_Width( const char *text, float scale, int iMenuFont ) {
-	qhandle_t iFontIndex = MenuFontToHandle( iMenuFont );
+	// now print the cursor as well...
+	char sTemp[1024];
+	int iCopyCount = limit
+		? std::min( (signed)strlen( text ), limit )
+		: (signed)strlen( text );
+	iCopyCount = std::min( iCopyCount, cursorPos );
+	iCopyCount = std::min( static_cast<size_t>( iCopyCount ), sizeof(sTemp) );
 
-	return trap->R_Font_StrLenPixels( text, iFontIndex, scale );
-}
+	// copy text into temp buffer for pixel measure...
+	strncpy( sTemp, text, iCopyCount );
+	sTemp[iCopyCount] = '\0';
 
-float Text_Height( const char *text, float scale, int iMenuFont ) {
-	qhandle_t iFontIndex = MenuFontToHandle( iMenuFont );
+	const char *cursorStr = va( "%c", cursor );
+	float iNextXpos = Text_Width( cursorStr, scale, iMenuFont, customFont );
 
-	return trap->R_Font_HeightPixels( iFontIndex, scale );
-}
-
-void Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style,
-	int iMenuFont ) {
-	uint32_t iStyleOR = 0;
-	qhandle_t iFontIndex = MenuFontToHandle( iMenuFont );
-
-	// kludge.. convert JK2 menu styles to SOF2 printstring ctrl codes...
-	switch ( style ) {
-		// fast blinking
-	case ITEM_TEXTSTYLE_BLINK:
-		iStyleOR = STYLE_BLINK;
-		break;
-
-		// slow pulsing
-	case ITEM_TEXTSTYLE_PULSE:
-		iStyleOR = STYLE_BLINK;
-		break;
-
-		// drop shadow
-	case ITEM_TEXTSTYLE_SHADOWED:
-		iStyleOR = STYLE_DROPSHADOW;
-		break;
-
-		// drop shadow
-	case ITEM_TEXTSTYLE_OUTLINED:
-		iStyleOR = STYLE_DROPSHADOW;
-		break;
-
-		// drop shadow
-	case ITEM_TEXTSTYLE_OUTLINESHADOWED:
-		iStyleOR = STYLE_DROPSHADOW;
-		break;
-
-		// drop shadow
-	case ITEM_TEXTSTYLE_SHADOWEDMORE:
-		iStyleOR = STYLE_DROPSHADOW;
-		break;
-
-		// normal text
-	case ITEM_TEXTSTYLE_NORMAL:
-	default:
-		iStyleOR = 0;
-		break;
-	}
-
-	trap->R_Font_DrawString( x, y, text, color, iStyleOR | iFontIndex, !limit ? -1 : limit, scale );
-}
-
-
-void Text_PaintWithCursor( float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont ) {
-	Text_Paint( x, y, scale, color, text, 0, limit, style, iMenuFont );
-
-	// now print the cursor as well...  (excuse the braces, it's for porting C++ to C)
-	//
-	{
-		char sTemp[1024];
-		int iCopyCount = limit ? std::min( (signed)strlen( text ), limit ) : (signed)strlen( text );
-		iCopyCount = std::min( iCopyCount, cursorPos );
-		iCopyCount = std::min( static_cast<size_t>( iCopyCount ), sizeof(sTemp) );
-
-		// copy text into temp buffer for pixel measure...
-		//
-		strncpy( sTemp, text, iCopyCount );
-		sTemp[iCopyCount] = '\0';
-
-		{
-			qhandle_t iFontIndex = MenuFontToHandle( iMenuFont );
-			float iNextXpos = trap->R_Font_StrLenPixels( sTemp, iFontIndex, scale );
-
-			Text_Paint( x + iNextXpos, y, scale, color, va( "%c", cursor ), 0, limit, style | ITEM_TEXTSTYLE_BLINK, iMenuFont );
-		}
-	}
+	Text_Paint( x + iNextXpos, y, scale, color, cursorStr, 0, limit, style | ITEM_TEXTSTYLE_BLINK,
+		iMenuFont, customFont
+	);
 }
 
 
 // maxX param is initially an X limit, but is also used as feedback. 0 = text was clipped to fit within, else maxX = next pos
 //
-static void Text_Paint_Limit( float *maxX, float x, float y, float scale, const vector4 *color, const char* text, float adjust, int limit, int iMenuFont ) {
-	// this is kinda dirty, but...
-	//
-	qhandle_t iFontIndex = MenuFontToHandle( iMenuFont );
-
-	//float fMax = *maxX;
-	float iPixelLen = trap->R_Font_StrLenPixels( text, iFontIndex, scale );
+static void Text_Paint_Limit( float *maxX, float x, float y, float scale, const vector4 *color, const char *text,
+	float adjust, int limit, int iMenuFont, bool customFont )
+{
+	float iPixelLen = Text_Width( text, scale, iMenuFont, customFont );
 	if ( x + iPixelLen > *maxX ) {
 		// whole text won't fit, so we need to print just the amount that does...
 		//  Ok, this is slow and tacky, but only called occasionally, and it works...
-		//
 		char sTemp[4096] = { 0 };	// lazy assumption
 		const char *psText = text;
 		char *psOut = &sTemp[0];
 		char *psOutLastGood = psOut;
 		unsigned int uiLetter;
 
-		while ( *psText && (x + trap->R_Font_StrLenPixels( sTemp, iFontIndex, scale ) <= *maxX)
-			&& psOut < &sTemp[sizeof(sTemp)-1]	// sanity
-			) {
+		while ( *psText
+			&& (x + Text_Width( sTemp, scale, iMenuFont, customFont ) <= *maxX)
+			&& psOut < &sTemp[sizeof(sTemp)-1] )	// sanity
+		{
 			int iAdvanceCount;
 			psOutLastGood = psOut;
 
@@ -731,13 +654,12 @@ static void Text_Paint_Limit( float *maxX, float x, float y, float scale, const 
 		*psOutLastGood = '\0';
 
 		*maxX = 0;	// feedback
-		Text_Paint( x, y, scale, color, sTemp, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont );
+		Text_Paint( x, y, scale, color, sTemp, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont, customFont );
 	}
 	else {
 		// whole text fits fine, so print it all...
-		//
 		*maxX = x + iPixelLen;	// feedback the next position, as the caller expects
-		Text_Paint( x, y, scale, color, text, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont );
+		Text_Paint( x, y, scale, color, text, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont, customFont );
 	}
 }
 
@@ -919,7 +841,9 @@ char parsedFPMessage[1024];
 
 extern int FPMessageTime;
 
-void Text_PaintCenter( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int iMenuFont );
+void Text_PaintCenter( float x, float y, float scale, const vector4 *color, const char *text, float adjust,
+	int iMenuFont, bool customFont
+);
 
 const char *UI_GetStringEdString( const char *refSection, const char *refName ) {
 	static char text[1024] = { 0 };
@@ -1360,13 +1284,13 @@ const char *UI_FilterDir( int value ) {
 
 static const char *handicapValues[] = { "None", "95", "90", "85", "80", "75", "70", "65", "60", "55", "50", "45", "40", "35", "30", "25", "20", "15", "10", "5", NULL };
 
-static void UI_DrawHandicap( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
-	int i, h;
+static void UI_DrawHandicap( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
+	int h = Q_clampi( 5, trap->Cvar_VariableValue( "handicap" ), 100 );
+	int i = 20 - h / 5;
 
-	h = Q_clampi( 5, trap->Cvar_VariableValue( "handicap" ), 100 );
-	i = 20 - h / 5;
-
-	Text_Paint( rect->x, rect->y, scale, color, handicapValues[i], 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, handicapValues[i], 0, 0, textStyle, iMenuFont, customFont );
 }
 
 static void UI_SetCapFragLimits( qboolean uiVars ) {
@@ -1384,19 +1308,29 @@ static void UI_SetCapFragLimits( qboolean uiVars ) {
 }
 
 // ui_gameType assumes gametype 0 is -1 ALL and will not show
-static void UI_DrawGameType( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
-	Text_Paint( rect->x, rect->y, scale, color, BG_GetGametypeString( ui_gameType.integer ), 0, 0, textStyle, iMenuFont );
+static void UI_DrawGameType( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
+	Text_Paint( rect->x, rect->y, scale, color, BG_GetGametypeString( ui_gameType.integer ), 0, 0, textStyle, iMenuFont,
+		customFont
+	);
 }
 
-static void UI_DrawNetGameType( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawNetGameType( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	if ( ui_netGameType.integer < 0 || ui_netGameType.integer >= GT_MAX_GAME_TYPE ) {
 		trap->Cvar_Set( "ui_netGameType", "0" );
 		trap->Cvar_Update( &ui_netGameType );
 	}
-	Text_Paint( rect->x, rect->y, scale, color, BG_GetGametypeString( ui_netGameType.integer ), 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, BG_GetGametypeString( ui_netGameType.integer ), 0, 0, textStyle,
+		iMenuFont, customFont
+	);
 }
 
-static void UI_DrawAutoSwitch( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawAutoSwitch( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	int switchVal = trap->Cvar_VariableValue( "cg_autoswitch" );
 	const char *switchString = "AUTOSWITCH1";
 	const char *stripString = NULL;
@@ -1418,21 +1352,25 @@ static void UI_DrawAutoSwitch( rectDef_t *rect, float scale, const vector4 *colo
 	stripString = UI_GetStringEdString( "MP_INGAME", (char *)switchString );
 
 	if ( stripString ) {
-		Text_Paint( rect->x, rect->y, scale, color, stripString, 0, 0, textStyle, iMenuFont );
+		Text_Paint( rect->x, rect->y, scale, color, stripString, 0, 0, textStyle, iMenuFont, customFont );
 	}
 }
 
-static void UI_DrawJoinGameType( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawJoinGameType( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	if ( ui_joinGameType.integer < -1 || ui_joinGameType.integer >= GT_MAX_GAME_TYPE ) {
 		trap->Cvar_Set( "ui_joinGameType", "-1" );
 		trap->Cvar_Update( &ui_joinGameType );
 	}
 
 	if ( ui_joinGameType.integer == -1 ) {
-		Text_Paint( rect->x, rect->y, scale, color, "Any", 0, 0, textStyle, iMenuFont );
+		Text_Paint( rect->x, rect->y, scale, color, "Any", 0, 0, textStyle, iMenuFont, customFont );
 	}
 	else {
-		Text_Paint( rect->x, rect->y, scale, color, BG_GetGametypeString( ui_joinGameType.integer ), 0, 0, textStyle, iMenuFont );
+		Text_Paint( rect->x, rect->y, scale, color, BG_GetGametypeString( ui_joinGameType.integer ), 0, 0, textStyle,
+			iMenuFont, customFont
+		);
 	}
 }
 
@@ -1450,24 +1388,30 @@ static int UI_TeamIndexFromName( const char *name ) {
 	return 0;
 }
 
-static void UI_DrawSkill( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawSkill( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	int i;
 	i = trap->Cvar_VariableValue( "g_spSkill" );
 	if ( i < 1 || i >( signed )numSkillLevels ) {
 		i = 1;
 	}
-	Text_Paint( rect->x, rect->y, scale, color, (char *)UI_GetStringEdString( "MP_INGAME", (char *)skillLevels[i - 1] ), 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, (char *)UI_GetStringEdString( "MP_INGAME", (char *)skillLevels[i - 1] ),
+		0, 0, textStyle, iMenuFont, customFont
+	);
 }
 
 static void UI_DrawGenericNum( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min,
-	int max, int type, int iMenuFont )
+	int max, int type, int iMenuFont, bool customFont )
 {
 	char s[32];
 	Com_sprintf( s, sizeof(s), "%i", Q_clampi( min, val, max ) );
-	Text_Paint( rect->x, rect->y, scale, color, s, 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, s, 0, 0, textStyle, iMenuFont, customFont );
 }
 
-static void UI_DrawForceMastery( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min, int max, int iMenuFont ) {
+static void UI_DrawForceMastery( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min,
+	int max, int iMenuFont, bool customFont )
+{
 	int i;
 	char *s;
 
@@ -1480,10 +1424,12 @@ static void UI_DrawForceMastery( rectDef_t *rect, float scale, const vector4 *co
 	}
 
 	s = (char *)UI_GetStringEdString( "MP_INGAME", forceMasteryLevels[i] );
-	Text_Paint( rect->x, rect->y, scale, color, s, 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, s, 0, 0, textStyle, iMenuFont, customFont );
 }
 
-static void UI_DrawSkinColor( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min, int max, int iMenuFont ) {
+static void UI_DrawSkinColor( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min,
+	int max, int iMenuFont, bool customFont )
+{
 	char s[256];
 
 	switch ( val ) {
@@ -1501,10 +1447,12 @@ static void UI_DrawSkinColor( rectDef_t *rect, float scale, const vector4 *color
 		break;
 	}
 
-	Text_Paint( rect->x, rect->y, scale, color, s, 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, s, 0, 0, textStyle, iMenuFont, customFont );
 }
 
-static void UI_DrawForceSide( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min, int max, int iMenuFont ) {
+static void UI_DrawForceSide( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min,
+	int max, int iMenuFont, bool customFont )
+{
 	char s[256];
 	menuDef_t *menu;
 
@@ -1568,7 +1516,7 @@ static void UI_DrawForceSide( rectDef_t *rect, float scale, const vector4 *color
 		}
 	}
 
-	Text_Paint( rect->x, rect->y, scale, color, s, 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, s, 0, 0, textStyle, iMenuFont, customFont );
 }
 
 qboolean UI_HasSetSaberOnly( const char *info, const int gametype ) {
@@ -1641,7 +1589,9 @@ qboolean UI_TrueJediEnabled( void ) {
 	return (trueJedi != 0);
 }
 
-static void UI_DrawJediNonJedi( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min, int max, int iMenuFont ) {
+static void UI_DrawJediNonJedi( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int val, int min,
+	int max, int iMenuFont, bool customFont )
+{
 	int i;
 	char s[256];
 	//menuDef_t *menu;
@@ -1665,18 +1615,24 @@ static void UI_DrawJediNonJedi( rectDef_t *rect, float scale, const vector4 *col
 	else
 		trap->SE_GetStringTextString( "MENUS_YES", s, sizeof(s) );
 
-	Text_Paint( rect->x, rect->y, scale, color, s, 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, s, 0, 0, textStyle, iMenuFont, customFont );
 }
 
-static void UI_DrawTeamName( rectDef_t *rect, float scale, const vector4 *color, qboolean blue, int textStyle, int iMenuFont ) {
+static void UI_DrawTeamName( rectDef_t *rect, float scale, const vector4 *color, qboolean blue, int textStyle,
+	int iMenuFont, bool customFont )
+{
 	int i;
 	i = UI_TeamIndexFromName( UI_Cvar_VariableString( (blue) ? "ui_blueTeam" : "ui_redTeam" ) );
 	if ( i >= 0 && i < uiInfo.teamCount ) {
-		Text_Paint( rect->x, rect->y, scale, color, va( "%s: %s", (blue) ? "Blue" : "Red", uiInfo.teamList[i].teamName ), 0, 0, textStyle, iMenuFont );
+		Text_Paint( rect->x, rect->y, scale, color,
+			va( "%s: %s", (blue) ? "Blue" : "Red", uiInfo.teamList[i].teamName ), 0, 0, textStyle, iMenuFont, customFont
+		);
 	}
 }
 
-static void UI_DrawTeamMember( rectDef_t *rect, float scale, const vector4 *color, qboolean blue, int num, int textStyle, int iMenuFont ) {
+static void UI_DrawTeamMember( rectDef_t *rect, float scale, const vector4 *color, qboolean blue, int num,
+	int textStyle, int iMenuFont, bool customFont )
+{
 	// 0 - None
 	// 1 - Human
 	// 2..NumCharacters - Bot
@@ -1729,7 +1685,7 @@ static void UI_DrawTeamMember( rectDef_t *rect, float scale, const vector4 *colo
 		text = UI_GetBotNameByNumber( value );
 	}
 
-	Text_Paint( rect->x, rect->y, scale, &finalColor, text, 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, &finalColor, text, 0, 0, textStyle, iMenuFont, customFont );
 }
 
 static void UI_DrawMapPreview( rectDef_t *rect, float scale, const vector4 *color, qboolean net ) {
@@ -1976,14 +1932,18 @@ void UpdateForceStatus( void ) {
 	}
 }
 
-static void UI_DrawNetSource( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawNetSource( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	if ( ui_netSource.integer < 0 || ui_netSource.integer > numNetSources ) {
 		trap->Cvar_Set( "ui_netSource", "0" );
 		trap->Cvar_Update( &ui_netSource );
 	}
 
 	trap->SE_GetStringTextString( "MENUS_SOURCE", holdSPString, sizeof(holdSPString) );
-	Text_Paint( rect->x, rect->y, scale, color, va( "%s %s", holdSPString, GetNetSourceString( ui_netSource.integer ) ), 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, va( "%s %s", holdSPString, GetNetSourceString( ui_netSource.integer ) ),
+		0, 0, textStyle, iMenuFont, customFont
+	);
 }
 
 static void UI_DrawNetMapPreview( rectDef_t *rect, float scale, const vector4 *color ) {
@@ -2012,10 +1972,14 @@ static void UI_DrawNetMapCinematic( rectDef_t *rect, float scale, const vector4 
 	}
 }
 
-static void UI_DrawNetFilter( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawNetFilter( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	trap->SE_GetStringTextString( "MENUS_GAME", holdSPString, sizeof(holdSPString) );
 
-	Text_Paint( rect->x, rect->y, scale, color, va( "%s %s", holdSPString, UI_FilterDescription( ui_serverFilterType.integer ) ), 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, va( "%s %s", holdSPString,
+		UI_FilterDescription( ui_serverFilterType.integer ) ), 0, 0, textStyle, iMenuFont, customFont
+	);
 }
 
 static const char *UI_AIFromName( const char *name ) {
@@ -2060,15 +2024,21 @@ UI_DrawPlayer( rect->x, rect->y, rect->w, rect->h, &info2, uiInfo.uiDC.realTime 
 }
 */
 
-static void UI_DrawAllMapsSelection( rectDef_t *rect, float scale, const vector4 *color, int textStyle, qboolean net, int iMenuFont ) {
+static void UI_DrawAllMapsSelection( rectDef_t *rect, float scale, const vector4 *color, int textStyle, qboolean net,
+	int iMenuFont, bool customFont )
+{
 	int map = (net) ? ui_currentNetMap.integer : ui_currentMap.integer;
 	if ( map >= 0 && map < uiInfo.mapCount ) {
-		Text_Paint( rect->x, rect->y, scale, color, uiInfo.mapList[map].mapName, 0, 0, textStyle, iMenuFont );
+		Text_Paint( rect->x, rect->y, scale, color, uiInfo.mapList[map].mapName, 0, 0, textStyle, iMenuFont, customFont );
 	}
 }
 
-static void UI_DrawOpponentName( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
-	Text_Paint( rect->x, rect->y, scale, color, UI_Cvar_VariableString( "ui_opponentName" ), 0, 0, textStyle, iMenuFont );
+static void UI_DrawOpponentName( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
+	Text_Paint( rect->x, rect->y, scale, color, UI_Cvar_VariableString( "ui_opponentName" ), 0, 0, textStyle, iMenuFont,
+		customFont
+	);
 }
 
 static int UI_OwnerDrawWidth( int ownerDraw, float scale ) {
@@ -2261,29 +2231,42 @@ static int UI_OwnerDrawWidth( int ownerDraw, float scale ) {
 	}
 
 	if ( s ) {
-		return Text_Width( s, scale, 0 );
+		return Text_Width( s, scale, 0, false );
 	}
 	return 0;
 }
 
-static void UI_DrawBotName( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawBotName( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	int value = uiInfo.botIndex;
 	const char *text = "";
 	if ( value >= UI_GetNumBots() ) {
 		value = 0;
 	}
 	text = UI_GetBotNameByNumber( value );
-	Text_Paint( rect->x, rect->y, scale, color, text, 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, text, 0, 0, textStyle, iMenuFont, customFont );
 }
 
-static void UI_DrawBotSkill( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawBotSkill( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	if ( uiInfo.skillIndex < numSkillLevels ) {
-		Text_Paint( rect->x, rect->y, scale, color, (char *)UI_GetStringEdString( "MP_INGAME", (char *)skillLevels[uiInfo.skillIndex] ), 0, 0, textStyle, iMenuFont );
+		Text_Paint( rect->x, rect->y, scale, color, UI_GetStringEdString( "MP_INGAME", skillLevels[uiInfo.skillIndex] ),
+			0, 0, textStyle, iMenuFont, customFont
+		);
 	}
 }
 
-static void UI_DrawRedBlue( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
-	Text_Paint( rect->x, rect->y, scale, color, (uiInfo.redBlue == 0) ? UI_GetStringEdString( "MP_INGAME", "RED" ) : UI_GetStringEdString( "MP_INGAME", "BLUE" ), 0, 0, textStyle, iMenuFont );
+static void UI_DrawRedBlue( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
+	Text_Paint( rect->x, rect->y, scale, color,
+		(uiInfo.redBlue == 0)
+			? UI_GetStringEdString( "MP_INGAME", "RED" )
+			: UI_GetStringEdString( "MP_INGAME", "BLUE" ),
+		0, 0, textStyle, iMenuFont, customFont
+	);
 }
 
 static void UI_DrawCrosshair( rectDef_t *rect, float scale, const vector4 *color ) {
@@ -2299,15 +2282,21 @@ static void UI_DrawCrosshair( rectDef_t *rect, float scale, const vector4 *color
 	trap->R_SetColor( NULL );
 }
 
-static void UI_DrawSelectedPlayer( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawSelectedPlayer( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	if ( uiInfo.uiDC.realTime > uiInfo.playerRefresh ) {
 		uiInfo.playerRefresh = uiInfo.uiDC.realTime + 3000;
 		UI_BuildPlayerList();
 	}
-	Text_Paint( rect->x, rect->y, scale, color, UI_Cvar_VariableString( "cg_selectedPlayerName" ), 0, 0, textStyle, iMenuFont );
+	Text_Paint( rect->x, rect->y, scale, color, UI_Cvar_VariableString( "cg_selectedPlayerName" ), 0, 0, textStyle,
+		iMenuFont, customFont
+	);
 }
 
-static void UI_DrawServerRefreshDate( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawServerRefreshDate( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	if ( uiInfo.serverStatus.refreshActive ) {
 		vector4 lowLight, newColor;
 		lowLight.r = 0.8f * color->r;
@@ -2317,18 +2306,22 @@ static void UI_DrawServerRefreshDate( rectDef_t *rect, float scale, const vector
 		LerpColor( color, &lowLight, &newColor, 0.5f + 0.5f*sinf( (float)(uiInfo.uiDC.realTime / PULSE_DIVISOR) ) );
 
 		trap->SE_GetStringTextString( "MP_INGAME_GETTINGINFOFORSERVERS", holdSPString, sizeof(holdSPString) );
-		Text_Paint( rect->x, rect->y, scale, &newColor, va( (char *)holdSPString, trap->LAN_GetServerCount( UI_SourceForLAN() ) ), 0, 0, textStyle, iMenuFont );
+		Text_Paint( rect->x, rect->y, scale, &newColor, va( (char *)holdSPString,
+			trap->LAN_GetServerCount( UI_SourceForLAN() ) ), 0, 0, textStyle, iMenuFont, customFont
+		);
 	}
 	else {
 		char buff[64];
 		Q_strncpyz( buff, UI_Cvar_VariableString( va( "ui_lastServerRefresh_%i", ui_netSource.integer ) ), sizeof( buff ) );
 		trap->SE_GetStringTextString( "MP_INGAME_SERVER_REFRESHTIME", holdSPString, sizeof(holdSPString) );
 
-		Text_Paint( rect->x, rect->y, scale, color, va( "%s: %s", holdSPString, buff ), 0, 0, textStyle, iMenuFont );
+		Text_Paint( rect->x, rect->y, scale, color, va( "%s: %s", holdSPString, buff ), 0, 0, textStyle, iMenuFont,
+			customFont
+		);
 	}
 }
 
-static void UI_DrawServerMOTD( rectDef_t *rect, float scale, const vector4 *color, int iMenuFont ) {
+static void UI_DrawServerMOTD( rectDef_t *rect, float scale, const vector4 *color, int iMenuFont, bool customFont ) {
 	if ( uiInfo.serverStatus.motdLen ) {
 		float maxX;
 
@@ -2348,7 +2341,9 @@ static void UI_DrawServerMOTD( rectDef_t *rect, float scale, const vector4 *colo
 			uiInfo.serverStatus.motdTime = uiInfo.uiDC.realTime + 10;
 			if ( uiInfo.serverStatus.motdPaintX <= rect->x + 2 ) {
 				if ( uiInfo.serverStatus.motdOffset < uiInfo.serverStatus.motdLen ) {
-					uiInfo.serverStatus.motdPaintX += Text_Width( &uiInfo.serverStatus.motd[uiInfo.serverStatus.motdOffset], scale, 1 ) - 1;
+					uiInfo.serverStatus.motdPaintX += Text_Width(
+						&uiInfo.serverStatus.motd[uiInfo.serverStatus.motdOffset], scale, iMenuFont, customFont
+					) - 1;
 					uiInfo.serverStatus.motdOffset++;
 				}
 				else {
@@ -2373,10 +2368,14 @@ static void UI_DrawServerMOTD( rectDef_t *rect, float scale, const vector4 *colo
 		}
 
 		maxX = rect->x + rect->w - 2;
-		Text_Paint_Limit( &maxX, uiInfo.serverStatus.motdPaintX, rect->y + rect->h - 3, scale, color, &uiInfo.serverStatus.motd[uiInfo.serverStatus.motdOffset], 0, 0, iMenuFont );
+		Text_Paint_Limit( &maxX, uiInfo.serverStatus.motdPaintX, rect->y + rect->h - 3, scale, color,
+			&uiInfo.serverStatus.motd[uiInfo.serverStatus.motdOffset], 0, 0, iMenuFont, customFont
+		);
 		if ( uiInfo.serverStatus.motdPaintX2 >= 0 ) {
 			float maxX2 = rect->x + rect->w - 2;
-			Text_Paint_Limit( &maxX2, uiInfo.serverStatus.motdPaintX2, rect->y + rect->h - 3, scale, color, uiInfo.serverStatus.motd, 0, uiInfo.serverStatus.motdOffset, iMenuFont );
+			Text_Paint_Limit( &maxX2, uiInfo.serverStatus.motdPaintX2, rect->y + rect->h - 3, scale, color,
+				uiInfo.serverStatus.motd, 0, uiInfo.serverStatus.motdOffset, iMenuFont, customFont
+			);
 		}
 		if ( uiInfo.serverStatus.motdOffset && maxX > 0 ) {
 			// if we have an offset ( we are skipping the first part of the string ) and we fit the string
@@ -2390,31 +2389,45 @@ static void UI_DrawServerMOTD( rectDef_t *rect, float scale, const vector4 *colo
 	}
 }
 
-static void UI_DrawKeyBindStatus( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
-	//	int ofs = 0; TTimo: unused
+static void UI_DrawKeyBindStatus( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	if ( Display_KeyBindPending() ) {
-		Text_Paint( rect->x, rect->y, scale, color, UI_GetStringEdString( "MP_INGAME", "WAITING_FOR_NEW_KEY" ), 0, 0, textStyle, iMenuFont );
-	}
-	else {
-		//		Text_Paint(rect->x, rect->y, scale, color, "Press ENTER or CLICK to change, Press BACKSPACE to clear", 0, 0, textStyle,iMenuFont);
+		Text_Paint( rect->x, rect->y, scale, color, UI_GetStringEdString( "MP_INGAME", "WAITING_FOR_NEW_KEY" ), 0, 0,
+			textStyle, iMenuFont, customFont
+		);
 	}
 }
 
-static void UI_DrawGLInfo( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont ) {
+static void UI_DrawGLInfo( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int iMenuFont,
+	bool customFont )
+{
 	char * eptr;
 	char buff[4096];
 	const char *lines[128];
-	int y, numLines, i;
+	float y = 0.0f;
+	float lineHeight = 15.0f;
 
-	Text_Paint( rect->x + 2, rect->y, scale, color, va( "GL_VENDOR: %s", uiInfo.uiDC.glconfig.vendor_string ), 0, rect->w, textStyle, iMenuFont );
-	Text_Paint( rect->x + 2, rect->y + 15, scale, color, va( "GL_VERSION: %s: %s", uiInfo.uiDC.glconfig.version_string, uiInfo.uiDC.glconfig.renderer_string ), 0, rect->w, textStyle, iMenuFont );
-	Text_Paint( rect->x + 2, rect->y + 30, scale, color, va( "GL_PIXELFORMAT: color(%d-bits) Z(%d-bits) stencil(%d-bits)", uiInfo.uiDC.glconfig.colorBits, uiInfo.uiDC.glconfig.depthBits, uiInfo.uiDC.glconfig.stencilBits ), 0, rect->w, textStyle, iMenuFont );
+	Text_Paint( rect->x + 2, rect->y + y, scale, color,
+		va( "GL_VENDOR: %s", uiInfo.uiDC.glconfig.vendor_string ), 0, rect->w, textStyle, iMenuFont, customFont
+	);
+	y += lineHeight;
+	Text_Paint( rect->x + 2, rect->y + y, scale, color,
+		va( "GL_VERSION: %s: %s", uiInfo.uiDC.glconfig.version_string, uiInfo.uiDC.glconfig.renderer_string ),
+		0, rect->w, textStyle, iMenuFont, customFont
+	);
+	y += lineHeight;
+	Text_Paint( rect->x + 2, rect->y + y, scale, color,
+		va( "GL_PIXELFORMAT: color(%d-bits) Z(%d-bits) stencil(%d-bits)",
+			uiInfo.uiDC.glconfig.colorBits, uiInfo.uiDC.glconfig.depthBits, uiInfo.uiDC.glconfig.stencilBits ),
+		0, rect->w, textStyle, iMenuFont, customFont
+	);
 
 	// build null terminated extension strings
 	Q_strncpyz( buff, uiInfo.uiDC.glconfig.extensions_string, 4096 );
 	eptr = buff;
 	y = rect->y + 45;
-	numLines = 0;
+	int numLines = 0;
 	while ( y < rect->y + rect->h && *eptr ) {
 		while ( *eptr && *eptr == ' ' )
 			*eptr++ = '\0';
@@ -2428,27 +2441,30 @@ static void UI_DrawGLInfo( rectDef_t *rect, float scale, const vector4 *color, i
 			eptr++;
 	}
 
-	i = 0;
-	while ( i < numLines ) {
-		Text_Paint( rect->x + 2, y, scale, color, lines[i++], 0, (rect->w / 2), textStyle, iMenuFont );
+	for ( int i = 0; i < numLines; ) {
+		Text_Paint( rect->x + 2, y, scale, color, lines[i++], 0, (rect->w / 2), textStyle, iMenuFont, false );
 		if ( i < numLines ) {
-			Text_Paint( rect->x + rect->w / 2, y, scale, color, lines[i++], 0, (rect->w / 2), textStyle, iMenuFont );
+			Text_Paint( rect->x + rect->w / 2, y, scale, color, lines[i++], 0, (rect->w / 2), textStyle, iMenuFont,
+				false
+			);
 		}
-		y += 10;
+		y += 10.0f;
 		if ( y > rect->y + rect->h - 11 ) {
 			break;
 		}
 	}
 }
 
-static void UI_Version( rectDef_t *rect, float scale, const vector4 *color, int iMenuFont ) {
-	int width = uiInfo.uiDC.textWidth( JAPP_VERSION, scale, iMenuFont );
-
-	uiInfo.uiDC.drawText(rect->x - width, rect->y, scale, color, JAPP_VERSION, 0, 0, 0, iMenuFont);
+static void UI_Version( rectDef_t *rect, float scale, const vector4 *color, int iMenuFont, bool customFont ) {
+	float width = uiInfo.uiDC.textWidth( JAPP_VERSION, scale, iMenuFont, customFont );
+	uiInfo.uiDC.drawText( rect->x - width, rect->y, scale, color, JAPP_VERSION, 0, 0, 0, iMenuFont, customFont );
 }
 
 //FIXME: table drive
-static void UI_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle, int iMenuFont ) {
+static void UI_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw,
+	uint32_t ownerDrawFlags, int align, float special, float scale, const vector4 *color, qhandle_t shader,
+	int textStyle, int iMenuFont, bool customFont )
+{
 	rectDef_t rect;
 	int findex;
 	int drawRank = 0, iUse = 0;
@@ -2460,25 +2476,27 @@ static void UI_OwnerDraw( float x, float y, float w, float h, float text_x, floa
 
 	switch ( ownerDraw ) {
 	case UI_HANDICAP:
-		UI_DrawHandicap( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawHandicap( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_SKIN_COLOR:
-		UI_DrawSkinColor( &rect, scale, color, textStyle, uiSkinColor, TEAM_FREE, TEAM_BLUE, iMenuFont );
+		UI_DrawSkinColor( &rect, scale, color, textStyle, uiSkinColor, TEAM_FREE, TEAM_BLUE, iMenuFont, customFont );
 		break;
 	case UI_FORCE_SIDE:
-		UI_DrawForceSide( &rect, scale, color, textStyle, uiForceSide, 1, 2, iMenuFont );
+		UI_DrawForceSide( &rect, scale, color, textStyle, uiForceSide, 1, 2, iMenuFont, customFont );
 		break;
 	case UI_JEDI_NONJEDI:
-		UI_DrawJediNonJedi( &rect, scale, color, textStyle, uiJediNonJedi, 0, 1, iMenuFont );
+		UI_DrawJediNonJedi( &rect, scale, color, textStyle, uiJediNonJedi, 0, 1, iMenuFont, customFont );
 		break;
 	case UI_FORCE_POINTS:
-		UI_DrawGenericNum( &rect, scale, color, textStyle, uiForceAvailable, 1, forceMasteryPoints[MAX_FORCE_RANK], ownerDraw, iMenuFont );
+		UI_DrawGenericNum( &rect, scale, color, textStyle, uiForceAvailable, 1, forceMasteryPoints[MAX_FORCE_RANK],
+			ownerDraw, iMenuFont, customFont
+		);
 		break;
 	case UI_FORCE_MASTERY_SET:
-		UI_DrawForceMastery( &rect, scale, color, textStyle, uiForceRank, 0, MAX_FORCE_RANK, iMenuFont );
+		UI_DrawForceMastery( &rect, scale, color, textStyle, uiForceRank, 0, MAX_FORCE_RANK, iMenuFont, customFont );
 		break;
 	case UI_FORCE_RANK:
-		UI_DrawForceMastery( &rect, scale, color, textStyle, uiForceRank, 0, MAX_FORCE_RANK, iMenuFont );
+		UI_DrawForceMastery( &rect, scale, color, textStyle, uiForceRank, 0, MAX_FORCE_RANK, iMenuFont, customFont );
 		break;
 	case UI_FORCE_RANK_HEAL:
 	case UI_FORCE_RANK_LEVITATION:
@@ -2513,16 +2531,16 @@ static void UI_OwnerDraw( float x, float y, float w, float h, float text_x, floa
 		//	UI_DrawPlayerModel(&rect);
 		break;
 	case UI_GAMETYPE:
-		UI_DrawGameType( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawGameType( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_NETGAMETYPE:
-		UI_DrawNetGameType( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawNetGameType( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_AUTOSWITCHLIST:
-		UI_DrawAutoSwitch( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawAutoSwitch( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_JOINGAMETYPE:
-		UI_DrawJoinGameType( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawJoinGameType( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_MAPPREVIEW:
 		UI_DrawMapPreview( &rect, scale, color, qtrue );
@@ -2536,15 +2554,15 @@ static void UI_OwnerDraw( float x, float y, float w, float h, float text_x, floa
 		UI_DrawMapCinematic( &rect, scale, color, qtrue );
 		break;
 	case UI_SKILL:
-		UI_DrawSkill( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawSkill( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_TOTALFORCESTARS:
 		//      UI_DrawTotalForceStars(&rect, scale, color, textStyle);
 		break;
 	case UI_BLUETEAMNAME:
-		UI_DrawTeamName( &rect, scale, color, qtrue, textStyle, iMenuFont );
+		UI_DrawTeamName( &rect, scale, color, qtrue, textStyle, iMenuFont, customFont );
 	case UI_REDTEAMNAME:
-		UI_DrawTeamName( &rect, scale, color, qfalse, textStyle, iMenuFont );
+		UI_DrawTeamName( &rect, scale, color, qfalse, textStyle, iMenuFont, customFont );
 	case UI_BLUETEAM1:
 	case UI_BLUETEAM2:
 	case UI_BLUETEAM3:
@@ -2557,7 +2575,7 @@ static void UI_OwnerDraw( float x, float y, float w, float h, float text_x, floa
 			iUse = ownerDraw - UI_BLUETEAM1 + 1;
 		else
 			iUse = ownerDraw - 274; //unpleasent hack because I don't want to move up all the UI_BLAHTEAM# defines
-		UI_DrawTeamMember( &rect, scale, color, qtrue, iUse, textStyle, iMenuFont );
+		UI_DrawTeamMember( &rect, scale, color, qtrue, iUse, textStyle, iMenuFont, customFont );
 	case UI_REDTEAM1:
 	case UI_REDTEAM2:
 	case UI_REDTEAM3:
@@ -2570,10 +2588,10 @@ static void UI_OwnerDraw( float x, float y, float w, float h, float text_x, floa
 			iUse = ownerDraw - UI_REDTEAM1 + 1;
 		else
 			iUse = ownerDraw - 277; //unpleasent hack because I don't want to move up all the UI_BLAHTEAM# defines
-		UI_DrawTeamMember( &rect, scale, color, qfalse, iUse, textStyle, iMenuFont );
+		UI_DrawTeamMember( &rect, scale, color, qfalse, iUse, textStyle, iMenuFont, customFont );
 		break;
 	case UI_NETSOURCE:
-		UI_DrawNetSource( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawNetSource( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_NETMAPPREVIEW:
 		UI_DrawNetMapPreview( &rect, scale, color );
@@ -2582,7 +2600,7 @@ static void UI_OwnerDraw( float x, float y, float w, float h, float text_x, floa
 		UI_DrawNetMapCinematic( &rect, scale, color );
 		break;
 	case UI_NETFILTER:
-		UI_DrawNetFilter( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawNetFilter( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_OPPONENTMODEL:
 		//UI_DrawOpponent(&rect);
@@ -2595,48 +2613,47 @@ static void UI_OwnerDraw( float x, float y, float w, float h, float text_x, floa
 	case UI_OPPONENTLOGO_NAME:
 		break;
 	case UI_ALLMAPS_SELECTION:
-		UI_DrawAllMapsSelection( &rect, scale, color, textStyle, qtrue, iMenuFont );
+		UI_DrawAllMapsSelection( &rect, scale, color, textStyle, qtrue, iMenuFont, customFont );
 		break;
 	case UI_MAPS_SELECTION:
-		UI_DrawAllMapsSelection( &rect, scale, color, textStyle, qfalse, iMenuFont );
+		UI_DrawAllMapsSelection( &rect, scale, color, textStyle, qfalse, iMenuFont, customFont );
 		break;
 	case UI_OPPONENT_NAME:
-		UI_DrawOpponentName( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawOpponentName( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_BOTNAME:
-		UI_DrawBotName( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawBotName( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_BOTSKILL:
-		UI_DrawBotSkill( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawBotSkill( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_REDBLUE:
-		UI_DrawRedBlue( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawRedBlue( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_CROSSHAIR:
 		UI_DrawCrosshair( &rect, scale, color );
 		break;
 	case UI_SELECTEDPLAYER:
-		UI_DrawSelectedPlayer( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawSelectedPlayer( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_SERVERREFRESHDATE:
-		UI_DrawServerRefreshDate( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawServerRefreshDate( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_SERVERMOTD:
-		UI_DrawServerMOTD( &rect, scale, color, iMenuFont );
+		UI_DrawServerMOTD( &rect, scale, color, iMenuFont, customFont );
 		break;
 	case UI_GLINFO:
-		UI_DrawGLInfo( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawGLInfo( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_KEYBINDSTATUS:
-		UI_DrawKeyBindStatus( &rect, scale, color, textStyle, iMenuFont );
+		UI_DrawKeyBindStatus( &rect, scale, color, textStyle, iMenuFont, customFont );
 		break;
 	case UI_VERSION:
-		UI_Version( &rect, scale, color, iMenuFont );
+		UI_Version( &rect, scale, color, iMenuFont, customFont );
 		break;
 	default:
 		break;
 	}
-
 }
 
 static qboolean UI_OwnerDrawVisible( uint32_t flags ) {
@@ -5196,10 +5213,16 @@ static void UI_RunMenuScript( char **args ) {
 						// successfully added
 						Com_Printf( "Added favorite server %s\n", addr );
 
-
-						//						trap->SE_GetStringTextString((char *)va("%s_GETTINGINFOFORSERVERS",uiInfo.uiDC.Assets.stringedFile), holdSPString, sizeof(holdSPString));
-						//						Text_Paint(rect->x, rect->y, scale, newColor, va((char *) holdSPString, trap->LAN_GetServerCount(ui_netSource.integer)), 0, 0, textStyle);
-
+						/*
+						trap->SE_GetStringTextString(
+							va( "%s_GETTINGINFOFORSERVERS", uiInfo.uiDC.Assets.stringedFile ),
+							holdSPString, sizeof(holdSPString)
+						);
+						Text_Paint( rect->x, rect->y, scale, newColor,
+							va( holdSPString, trap->LAN_GetServerCount( ui_netSource.integer ) ), 0, 0, textStyle,
+							false
+						);
+						*/
 					}
 				}
 			}
@@ -8038,7 +8061,9 @@ void UI_Init( qboolean inGameLoad ) {
 	uiInfo.uiDC.drawCinematic = &UI_DrawCinematic;
 	uiInfo.uiDC.runCinematicFrame = &UI_RunCinematicFrame;
 
+	uiInfo.uiDC.ext.Font_StrLenPixels = trap->ext.R_Font_StrLenPixels;
 
+	//TODO: communicate between cgame<->ui a better way
 	value = trap->R_RegisterFont( "ocr_a" );
 	trap->Cvar_Register( NULL, "font_small", va( "%i", value ), CVAR_ROM | CVAR_INTERNAL );
 	uiInfo.uiDC.Assets.qhSmallFont = value;
@@ -8296,12 +8321,16 @@ static void UI_PrintTime( char *buf, int bufsize, int time ) {
 	}
 }
 
-void Text_PaintCenter( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int iMenuFont ) {
-	int len = Text_Width( text, scale, iMenuFont );
-	Text_Paint( x - len / 2, y, scale, color, text, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, iMenuFont );
+void Text_PaintCenter( float x, float y, float scale, const vector4 *color, const char *text, float adjust,
+	int iMenuFont, bool customFont )
+{
+	int len = Text_Width( text, scale, iMenuFont, customFont );
+	Text_Paint( x - len / 2, y, scale, color, text, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, iMenuFont, customFont );
 }
 
-static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint, float yStart, float scale, int iMenuFont ) {
+static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint, float yStart, float scale,
+	int iMenuFont, bool customFont )
+{
 	char sDownLoading[256];
 	char sEstimatedTimeLeft[256];
 	char sTransferRate[256];
@@ -8340,9 +8369,9 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 
 	UI_SetColor( &colorWhite );
 
-	Text_PaintCenter( centerPoint, yStart + 112, scale, &colorWhite, sDownLoading, 0, iMenuFont );
-	Text_PaintCenter( centerPoint, yStart + 192, scale, &colorWhite, sEstimatedTimeLeft, 0, iMenuFont );
-	Text_PaintCenter( centerPoint, yStart + 248, scale, &colorWhite, sTransferRate, 0, iMenuFont );
+	Text_PaintCenter( centerPoint, yStart + 112, scale, &colorWhite, sDownLoading, 0, iMenuFont, customFont );
+	Text_PaintCenter( centerPoint, yStart + 192, scale, &colorWhite, sEstimatedTimeLeft, 0, iMenuFont, customFont );
+	Text_PaintCenter( centerPoint, yStart + 248, scale, &colorWhite, sTransferRate, 0, iMenuFont, customFont );
 
 	if ( downloadSize > 0 ) {
 		s = va( "%s (%d%%)", downloadName, (int)((float)downloadCount * 100.0f / downloadSize) );
@@ -8351,14 +8380,14 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 		s = downloadName;
 	}
 
-	Text_PaintCenter( centerPoint, yStart + 136, scale, &colorWhite, s, 0, iMenuFont );
+	Text_PaintCenter( centerPoint, yStart + 136, scale, &colorWhite, s, 0, iMenuFont, customFont );
 
 	UI_ReadableSize( dlSizeBuf, sizeof dlSizeBuf, downloadCount );
 	UI_ReadableSize( totalSizeBuf, sizeof totalSizeBuf, downloadSize );
 
 	if ( downloadCount < 4096 || !downloadTime ) {
-		Text_PaintCenter( leftWidth, yStart + 216, scale, &colorWhite, "estimating", 0, iMenuFont );
-		Text_PaintCenter( leftWidth, yStart + 160, scale, &colorWhite, va( "(%s %s %s %s)", dlSizeBuf, sOf, totalSizeBuf, sCopied ), 0, iMenuFont );
+		Text_PaintCenter( leftWidth, yStart + 216, scale, &colorWhite, "estimating", 0, iMenuFont, customFont );
+		Text_PaintCenter( leftWidth, yStart + 160, scale, &colorWhite, va( "(%s %s %s %s)", dlSizeBuf, sOf, totalSizeBuf, sCopied ), 0, iMenuFont, customFont );
 	}
 	else {
 		if ( (uiInfo.uiDC.realTime - downloadTime) / 1000 ) {
@@ -8377,21 +8406,21 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 			UI_PrintTime( dlTimeBuf, sizeof dlTimeBuf,
 				(n - (((downloadCount / 1024) * n) / (downloadSize / 1024))) * 1000 );
 
-			Text_PaintCenter( leftWidth, yStart + 216, scale, &colorWhite, dlTimeBuf, 0, iMenuFont );
-			Text_PaintCenter( leftWidth, yStart + 160, scale, &colorWhite, va( "(%s %s %s %s)", dlSizeBuf, sOf, totalSizeBuf, sCopied ), 0, iMenuFont );
+			Text_PaintCenter( leftWidth, yStart + 216, scale, &colorWhite, dlTimeBuf, 0, iMenuFont, customFont );
+			Text_PaintCenter( leftWidth, yStart + 160, scale, &colorWhite, va( "(%s %s %s %s)", dlSizeBuf, sOf, totalSizeBuf, sCopied ), 0, iMenuFont, customFont );
 		}
 		else {
-			Text_PaintCenter( leftWidth, yStart + 216, scale, &colorWhite, "estimating", 0, iMenuFont );
+			Text_PaintCenter( leftWidth, yStart + 216, scale, &colorWhite, "estimating", 0, iMenuFont, customFont );
 			if ( downloadSize ) {
-				Text_PaintCenter( leftWidth, yStart + 160, scale, &colorWhite, va( "(%s %s %s %s)", dlSizeBuf, sOf, totalSizeBuf, sCopied ), 0, iMenuFont );
+				Text_PaintCenter( leftWidth, yStart + 160, scale, &colorWhite, va( "(%s %s %s %s)", dlSizeBuf, sOf, totalSizeBuf, sCopied ), 0, iMenuFont, customFont );
 			}
 			else {
-				Text_PaintCenter( leftWidth, yStart + 160, scale, &colorWhite, va( "(%s %s)", dlSizeBuf, sCopied ), 0, iMenuFont );
+				Text_PaintCenter( leftWidth, yStart + 160, scale, &colorWhite, va( "(%s %s)", dlSizeBuf, sCopied ), 0, iMenuFont, customFont );
 			}
 		}
 
 		if ( xferRate ) {
-			Text_PaintCenter( leftWidth, yStart + 272, scale, &colorWhite, va( "%s/%s", xferRateBuf, sSec ), 0, iMenuFont );
+			Text_PaintCenter( leftWidth, yStart + 272, scale, &colorWhite, va( "%s/%s", xferRateBuf, sSec ), 0, iMenuFont, customFont );
 		}
 	}
 }
@@ -8434,24 +8463,24 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 	info[0] = '\0';
 	if ( trap->GetConfigString( CS_SERVERINFO, info, sizeof(info) ) ) {
 		trap->SE_GetStringTextString( "MENUS_LOADING_MAPNAME", sStringEdTemp, sizeof(sStringEdTemp) );
-		Text_PaintCenter( centerPoint, yStart, scale, &colorWhite, va( /*"Loading %s"*/sStringEdTemp, Info_ValueForKey( info, "mapname" ) ), 0, FONT_MEDIUM );
+		Text_PaintCenter( centerPoint, yStart, scale, &colorWhite, va( /*"Loading %s"*/sStringEdTemp, Info_ValueForKey( info, "mapname" ) ), 0, FONT_MEDIUM, false );
 	}
 
 	if ( !Q_stricmp( cstate.servername, "localhost" ) ) {
 		trap->SE_GetStringTextString( "MENUS_STARTING_UP", sStringEdTemp, sizeof(sStringEdTemp) );
-		Text_PaintCenter( centerPoint, yStart + 48, scale, &colorWhite, sStringEdTemp, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM );
+		Text_PaintCenter( centerPoint, yStart + 48, scale, &colorWhite, sStringEdTemp, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, false );
 	}
 	else {
 		trap->SE_GetStringTextString( "MENUS_CONNECTING_TO", sStringEdTemp, sizeof(sStringEdTemp) );
 		strcpy( text, va(/*"Connecting to %s"*/sStringEdTemp, cstate.servername ) );
-		Text_PaintCenter( centerPoint, yStart + 48, scale, &colorWhite, text, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM );
+		Text_PaintCenter( centerPoint, yStart + 48, scale, &colorWhite, text, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, false );
 	}
 
 	// display global MOTD at bottom
-	Text_PaintCenter( centerPoint, 425, scale, &colorWhite, Info_ValueForKey( cstate.updateInfoString, "motd" ), 0, FONT_MEDIUM );
+	Text_PaintCenter( centerPoint, 425, scale, &colorWhite, Info_ValueForKey( cstate.updateInfoString, "motd" ), 0, FONT_MEDIUM, false );
 	// print any server info (server full, bad version, etc)
 	if ( cstate.connState < CA_CONNECTED ) {
-		Text_PaintCenter( centerPoint, yStart + 176, scale, &colorWhite, cstate.messageString, 0, FONT_MEDIUM );
+		Text_PaintCenter( centerPoint, yStart + 176, scale, &colorWhite, cstate.messageString, 0, FONT_MEDIUM, false );
 	}
 
 	switch ( cstate.connState ) {
@@ -8472,7 +8501,7 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 
 		trap->Cvar_VariableStringBuffer( "cl_downloadName", downloadName, sizeof(downloadName) );
 		if ( *downloadName ) {
-			UI_DisplayDownloadInfo( downloadName, centerPoint, yStart, scale, FONT_MEDIUM );
+			UI_DisplayDownloadInfo( downloadName, centerPoint, yStart, scale, FONT_MEDIUM, false );
 			return;
 		}
 	}
@@ -8488,7 +8517,7 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 	}
 
 	if ( Q_stricmp( cstate.servername, "localhost" ) ) {
-		Text_PaintCenter( centerPoint, yStart + 80, scale, &colorWhite, s, 0, FONT_MEDIUM );
+		Text_PaintCenter( centerPoint, yStart + 80, scale, &colorWhite, s, 0, FONT_MEDIUM, false );
 	}
 	// password required / connection rejected information goes here
 }
@@ -8717,20 +8746,6 @@ void JP_SaveFavServers( void )
 
 uiImport_t *trap = NULL;
 
-typedef int( *R_Font_StrLenPixels_t )(const char *text, const int iFontIndex, const float scale);
-int( *R_Font_StrLenPixels )(const char *text, const int iFontIndex, const float scale);
-float UI_Font_StrLenPixels( const char *text, const int iFontIndex, const float scale ) {
-	float width = (float)R_Font_StrLenPixels( text, iFontIndex, 4.0f );
-	return (width / 4.0f) * scale;
-}
-
-int( *R_Font_HeightPixels )(const int iFontIndex, const float scale);
-typedef int( *R_Font_HeightPixels_t )(const int iFontIndex, const float scale);
-float UI_Font_HeightPixels( const int iFontIndex, const float scale ) {
-	float height = (float)R_Font_HeightPixels( iFontIndex, 4.0f );
-	return (height / 4.0f) * scale;
-}
-
 extern "C" {
 Q_EXPORT uiExport_t* QDECL GetModuleAPI( int apiVersion, uiImport_t *import ) {
 	static uiExport_t uie = { 0 };
@@ -8739,12 +8754,6 @@ Q_EXPORT uiExport_t* QDECL GetModuleAPI( int apiVersion, uiImport_t *import ) {
 	trap = import;
 	Com_Printf = trap->Print;
 	Com_Error = trap->Error;
-
-	//HACK: work-around for JA's crappy width calculation
-	R_Font_StrLenPixels = (R_Font_StrLenPixels_t)trap->R_Font_StrLenPixels;
-	R_Font_HeightPixels = (R_Font_HeightPixels_t)trap->R_Font_HeightPixels;
-	trap->R_Font_StrLenPixels = UI_Font_StrLenPixels;
-	trap->R_Font_HeightPixels = UI_Font_HeightPixels;
 
 	memset( &uie, 0, sizeof(uie) );
 

@@ -4,6 +4,7 @@
 #include "cg_local.h"
 #include "qcommon/q_shared.h"
 #include "cg_media.h"
+#include "ui/ui_shared.h"	// for some text style junk
 
 // Coordinates are 640*480 virtual values
 void CG_DrawRect( float x, float y, float width, float height, float size, const vector4 *color ) {
@@ -56,18 +57,6 @@ void CG_DrawTopBottom( float x, float y, float w, float h, float size ) {
 	size *= cgs.screenYScale;
 	trap->R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, media.gfx.world.whiteShader );
 	trap->R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, media.gfx.world.whiteShader );
-}
-
-/*
--------------------------
-CGC_FillRect2
-real coords
--------------------------
-*/
-void CG_FillRect2( float x, float y, float width, float height, const vector4 *color ) {
-	trap->R_SetColor( color );
-	trap->R_DrawStretchPic( x, y, width, height, 0, 0, 0, 0, media.gfx.world.whiteShader );
-	trap->R_SetColor( NULL );
 }
 
 // Coordinates are 640*480 virtual values
@@ -140,7 +129,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor
 		//
 		vector4 color;
 		memcpy( &color, setColor, sizeof(color) );	// de-const it
-		CG_Text_Paint( x, y, 1.0f,	// float scale,
+		Text_Paint( x, y, 1.0f,	// float scale,
 			&color,		// vector4 color,
 			string,		// const char *text,
 			0.0f,		// float adjust,
@@ -470,67 +459,3 @@ void CG_DrawNumField( int x, int y, int width, int value, int charWidth, int cha
 	}
 
 }
-
-#include "ui/ui_shared.h"	// for some text style junk
-void UI_DrawProportionalString( int x, int y, const char* str, int style, const vector4 *color ) {
-	// having all these different style defines (1 for UI, one for CG, and now one for the re->font stuff)
-	//	is dumb, but for now...
-	//
-	int iStyle = 0;
-	int iMenuFont = (style & UI_SMALLFONT) ? FONT_SMALL : FONT_MEDIUM;
-
-	switch ( style & (UI_LEFT | UI_CENTER | UI_RIGHT) ) {
-	default:
-	case UI_LEFT:
-		// nada...
-		break;
-
-	case UI_CENTER:
-		x -= CG_Text_Width( str, 1.0f, iMenuFont ) / 2;
-		break;
-
-	case UI_RIGHT:
-		x -= CG_Text_Width( str, 1.0f, iMenuFont ) / 2;
-		break;
-	}
-
-	if ( style & UI_DROPSHADOW )
-		iStyle = ITEM_TEXTSTYLE_SHADOWED;
-	else if ( style & (UI_BLINK | UI_PULSE) )
-		iStyle = ITEM_TEXTSTYLE_BLINK;
-
-	CG_Text_Paint(x, y, 1.0f, color, str, 0, 0, iStyle, iMenuFont, qfalse);
-}
-
-void UI_DrawScaledProportionalString( int x, int y, const char* str, int style, const vector4 *color, float scale ) {
-	// having all these different style defines (1 for UI, one for CG, and now one for the re->font stuff)
-	//	is dumb, but for now...
-	//
-	int iStyle = 0;
-
-	switch ( style & (UI_LEFT | UI_CENTER | UI_RIGHT) ) {
-	default:
-	case UI_LEFT:
-		// nada...
-		break;
-
-	case UI_CENTER:
-		x -= CG_Text_Width( str, scale, FONT_MEDIUM ) / 2;
-		break;
-
-	case UI_RIGHT:
-		x -= CG_Text_Width( str, scale, FONT_MEDIUM ) / 2;
-		break;
-	}
-
-	if ( style & UI_DROPSHADOW )
-		iStyle = ITEM_TEXTSTYLE_SHADOWED;
-	else if ( style & (UI_BLINK | UI_PULSE) )
-		iStyle = ITEM_TEXTSTYLE_BLINK;
-
-	CG_Text_Paint(x, y, scale, color, str, 0, 0, iStyle, FONT_MEDIUM, qfalse);
-}
-
-
-
-

@@ -12,6 +12,9 @@
 #include "ui_local.h"
 #endif
 
+#if defined(_WIN32)
+#endif
+
 #if defined( PROJECT_GAME ) || defined( PROJECT_CGAME ) || defined( PROJECT_UI )
 void( *Com_Error )(int level, const char *error, ...);
 void( *Com_Printf )(const char *msg, ...);
@@ -266,6 +269,8 @@ const char *SkipWhitespace( const char *data, qboolean *hasNewLines ) {
 	return data;
 }
 
+// compresses the buffer in-place and adds a null terminator
+// returns the strlen of the new buffer
 ptrdiff_t COM_Compress( char *data_p ) {
 	char *in, *out;
 	int c;
@@ -1395,4 +1400,23 @@ const char *Q_PrintNetAddress( const netadr_t *adr ) {
 		return "";
 	}
 	return va( "%i.%i.%i.%i", adr->ip[0], adr->ip[1], adr->ip[2], adr->ip[3] );
+}
+
+bool Q_PointInBounds( float x, float y, float startX, float startY, float width, float height ) {
+	return x > startX
+		&& y > startY
+		&& x <= (startX + width)
+		&& y <= (startY + height);
+}
+
+void Q_OpenURL( const char *url ) {
+#if defined(_WIN32)
+	ShellExecute( NULL, "open", url, NULL, NULL, SW_SHOWNORMAL );
+#elif defined(MACOS_X)
+	CFURLRef urlRef = CFURLCreateWithBytes( NULL, (UInt8*)url, strlen( url ), kCFStringEncodingASCII, NULL );
+		LSOpenCFURLRef( urlRef, 0 );
+	CFRelease( urlRef );
+#elif defined(__linux__)
+	system( va( "xdg-open \"%s\"", url ) );
+#endif
 }

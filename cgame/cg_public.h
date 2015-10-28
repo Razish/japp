@@ -3,7 +3,7 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 
-#define	CGAME_API_VERSION		1
+#define	CGAME_API_VERSION		2
 
 #define	CMD_BACKUP			64
 #define	CMD_MASK			(CMD_BACKUP - 1)
@@ -542,9 +542,9 @@ typedef struct cgameImport_s {
 	void( *R_DrawRotatePic )						(float x, float y, float w, float h, float s1, float t1, float s2, float t2, float a1, qhandle_t hShader);	// 0 = white
 	void( *R_DrawRotatePic2 )						(float x, float y, float w, float h, float s1, float t1, float s2, float t2, float a1, qhandle_t hShader);	// 0 = white
 	void( *R_Font_DrawString )					(int ox, int oy, const char *text, const vector4 *rgba, const int setIndex, int iCharLimit, const float scale);
-	float( *R_Font_HeightPixels )					(const int iFontIndex, const float scale);
+	int( *R_Font_HeightPixels )					(const int iFontIndex, const float scale);
 	int( *R_Font_StrLenChars )					(const char *text);
-	float( *R_Font_StrLenPixels )					(const char *text, const int iFontIndex, const float scale);
+	int( *R_Font_StrLenPixels )					(const char *text, const int iFontIndex, const float scale);
 	void( *R_GetBModelVerts )						(int bmodelIndex, vector3 *vec, vector3 *normal);
 	float( *R_GetDistanceCull )					(void);
 	qboolean( *R_GetEntityToken )						(char *buffer, int size);
@@ -693,6 +693,10 @@ typedef struct cgameImport_s {
 	void( *G2API_CleanEntAttachments )			(void);
 	qboolean( *G2API_OverrideServer )					(void *serverInstance);
 	void( *G2API_GetSurfaceName )					(void *ghoul2, int surfNumber, int modelIndex, char *fillBuf);
+
+	struct {
+		float ( *R_Font_StrLenPixels )					(const char *text, const int iFontIndex, const float scale);
+	} ext;
 } cgameImport_t;
 
 typedef struct cgameExport_s {

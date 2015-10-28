@@ -27,6 +27,9 @@ XCVAR_DEF( g_botsFile, "", NULL, CVAR_INIT | CVAR_ROM )
 XCVAR_DEF( g_spSkill, "2", NULL, CVAR_ARCHIVE | CVAR_INTERNAL )
 XCVAR_DEF( g_warmup, "20", NULL, CVAR_ARCHIVE )
 XCVAR_DEF( japp_crashHandler, "1", NULL, CVAR_ARCHIVE )
+#ifdef _DEBUG
+XCVAR_DEF( japp_preciseFonts, "0", NULL, CVAR_ARCHIVE )
+#endif
 XCVAR_DEF( japp_ratioFix, "0", UI_Set2DRatio, CVAR_ARCHIVE )
 XCVAR_DEF( japp_version, JAPP_VERSION, NULL, CVAR_ROM )
 XCVAR_DEF( se_language, "english", NULL, CVAR_ARCHIVE | CVAR_NORESTART )
