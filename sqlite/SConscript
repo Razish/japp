@@ -1,17 +1,28 @@
 Import( '*' )
 
 # environment
-env.VariantDir( build_dir, '#', duplicate = 0 )
+env.VariantDir(
+	build_dir,
+	'#',
+	duplicate = 0
+)
 sqlite_env = env.Clone()
 
 # sources
-files = [ 'sqlite/sqlite3.c' ]
+files = [
+	'sqlite/sqlite3.c',
+]
 files = [build_dir + f for f in files]
 
 # project settings
-if plat == 'Linux':
-	sqlite_env['CCFLAGS'] += [ '-fPIC' ]
+if realcc == 'gcc' or realcc == 'clang':
+	sqlite_env['CCFLAGS'] += [
+		'-fPIC',
+	]
 
 # targets
-result = sqlite_env.StaticLibrary( build_dir + 'libsqlite3', files )
+result = sqlite_env.StaticLibrary(
+	build_dir + 'libsqlite3',
+	files
+)
 Return( "result" )

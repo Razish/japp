@@ -1,7 +1,11 @@
 Import( '*' )
 
 # environment
-env.VariantDir( build_dir, '#', duplicate = 0 )
+env.VariantDir(
+	build_dir,
+	'#',
+	duplicate = 0
+)
 lua_env = env.Clone()
 
 # sources
@@ -44,13 +48,17 @@ files = [build_dir + f for f in files]
 
 # project settings
 if plat == 'Linux':
-	lua_env['CCFLAGS'] += [ '-fPIC' ]
-	lua_env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
+	lua_env['CPPDEFINES'] += [
+		'LUA_USE_LINUX',
+	]
 lua_env['CPPDEFINES'] += [
 	'LUA_COMPAT_BITLIB',
-	'LUA_COMPAT_APIINTCASTS'
+	'LUA_COMPAT_APIINTCASTS',
 ]
 
 # targets
-result = lua_env.StaticLibrary( build_dir + 'liblua', files )
+result = lua_env.StaticLibrary(
+	build_dir + 'liblua',
+	files
+)
 Return( "result" )

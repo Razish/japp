@@ -582,7 +582,7 @@ void CG_ChatboxDraw( void ) {
 
 					// retrieve any stored URL positions
 					const float height = Text_Height( tmp, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
-					const float width = Text_Width( tmp, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
+					//const float width = Text_Width( tmp, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
 					Text_Paint(
 						cg.chatbox.pos.x, cg.chatbox.pos.y + yAccum - (height / 2.0f),
 						cg.chatbox.size.scale, &colorWhite, tmp, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(),
@@ -591,6 +591,8 @@ void CG_ChatboxDraw( void ) {
 					for ( chatEntry_t::urlLocation *url = chat->URLs; url; url = url->next ) {
 						char scratch[CHAT_MESSAGE_LENGTH];
 						Q_strncpyz( scratch, tmp, url->start + 1 );
+
+						//FIXME: somehow this isn't accurate when using r_aspectCorrectFonts?!
 						url->pos.x = cg.chatbox.pos.x
 							+ Text_Width( scratch, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
 
@@ -961,7 +963,7 @@ static void Field_CharEvent( field_t *edit, int key ) {
 			{
 				// check for URLs
 				int i = MAX_CHATBOX_ENTRIES - std::min( cg_chatboxLineCount.integer, currentChatbox->numActiveLines );
-				int numLines = 0, done = 0, j = 0;
+				int done = 0;
 				i += currentChatbox->scrollAmount;
 				for ( done = 0; done < cg_chatboxLineCount.integer && i < MAX_CHATBOX_ENTRIES; i++, done++ ) {
 					chatEntry_t *chat = &currentChatbox->chatBuffer[i];

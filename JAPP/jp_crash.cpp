@@ -561,6 +561,7 @@ static void JP_Crash_AddOSData( fileHandle_t f ) {
 	JP_FS_WriteString( va( "Operating system: %s\n", JP_GetOSDisplayString() ), f );
 }
 
+#if 0
 static int GetModuleNamePtr( void* ptr, char *buffFile, char *buffName, void ** ModuleBase, int * ModuleSize ) {
 	MODULEENTRY32 M = { 0 };
 	HANDLE	hSnapshot;
@@ -590,6 +591,7 @@ static int GetModuleNamePtr( void* ptr, char *buffFile, char *buffName, void ** 
 	// No matches found
 	return 0;
 }
+#endif
 
 static const char *GetExceptionCodeDescription( int ExceptionCode ) {
 	switch ( ExceptionCode ) {
@@ -796,7 +798,7 @@ static void JP_Crash_DisAsm( struct _EXCEPTION_POINTERS *EI, fileHandle_t f ) {
 		}
 
 		JP_FS_WriteString( va( "0x%08X - %-30s", (unsigned int)ud_insn_off( &da ), ud_insn_asm( &da ) ), f );
-		if ( ((da.mnemonic >= UD_Ija && da.mnemonic <= UD_Ijz) || da.mnemonic == UD_Icall) && da.operand[0].type == UD_OP_JIMM ) {
+		if ( ((da.mnemonic >= UD_Ijz && da.mnemonic <= UD_Ija) || da.mnemonic == UD_Icall) && da.operand[0].type == UD_OP_JIMM ) {
 			// Its a call or jump, see if we got a symbol for it
 			// BUT FIRST ;P
 			// Since debug compiles employ a call table, we'll disassemble it first
@@ -971,14 +973,10 @@ void G_ShutdownGame( int restart );
 static LONG WINAPI UnhandledExceptionHandler( struct _EXCEPTION_POINTERS *EI /*ExceptionInfo*/ ) {
 	// Alright, we got an exception here, create a crash log and let the program grind to a halt :P
 	static char SymPath[4096];
-	static char basepath[260];
-	static char fspath[260];
 	const char *filename = JP_Crash_GetCrashlogName();
 	fileHandle_t f;
 
 	SymPath[0] = 0;
-	basepath[0] = 0;
-	fspath[0] = 0;
 
 	bCrashing = 1;
 	InitSymbolPath( SymPath, NULL );
@@ -1047,23 +1045,20 @@ static LONG WINAPI UnhandledExceptionHandler_Failsafe( struct _EXCEPTION_POINTER
 		// Alright, we got a VERY serious issue here..
 		// In this state the exception handler itself will run outta stack too
 		// So we'll just use a nice hack here to roll up esp by 16k
-		__asm
-		{
-			mov eax, EI
-				mov StackBackupStart, esp
-				mov esi, esp
-				mov edi, offset StackBackup
-				mov ecx, 0x6000
-				rep stosd
-				add esp, 0x18000
-				push eax
-				call UnhandledExceptionHandler
-				jmp skip
-		}
+		qasm2( mov eax, EI )
+		qasm2( mov StackBackupStart, esp )
+		qasm2( mov esi, esp )
+		qasm2( mov edi, offset StackBackup )
+		qasm2( mov ecx, 0x6000 )
+		qasm1( rep stosd )
+		qasm2( add esp, 0x18000 )
+		qasm1( push eax )
+		qasm1( call UnhandledExceptionHandler )
+		qasm1( jmp skip )
 	}
 	StackBackupStart = 0;
 	return UnhandledExceptionHandler( EI );
-skip:
+	qasmL(skip:)
 	;
 }
 

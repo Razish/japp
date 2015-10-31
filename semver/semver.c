@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 #include <malloc.h>
 #elif defined(__clang__) || defined(__GNUC__)
 #include <alloca.h>

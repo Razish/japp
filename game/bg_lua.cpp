@@ -553,6 +553,8 @@ namespace JPLua {
 		ls.plugins = plugin;
 	}
 
+	//FIXME: add UntrackPlugin again
+#if 0
 	static void UntrackPlugin( plugin_t *plugin ) {
 		plugin_t *p = ls.plugins, *prev = nullptr;
 		while ( p ) {
@@ -603,6 +605,7 @@ namespace JPLua {
 		}
 		//TODO: make sure plugins and currentPlugin are still valid?
 	}
+#endif
 
 	static int System_Index( lua_State *L ) {
 		const char *key = lua_tostring( L, 2 );

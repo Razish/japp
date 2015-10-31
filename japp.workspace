@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="japp" Database="">
+  <Environment>
+    <![CDATA[]]>
+  </Environment>
+  <Project Name="japp" Path="japp.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="no">
+      <Project Name="japp" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="no">
+      <Project Name="japp" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Debug-32" Selected="yes">
+      <Project Name="japp" ConfigName="Debug-32"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release-32" Selected="no">
+      <Project Name="japp" ConfigName="Release-32"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

@@ -1,8 +1,17 @@
+import os
 Import( '*' )
 
 # environment
-build_dir = 'build' + '/' + configuration + '/' + env['CC'] + '/' + str(bits) + '/ui/'
-env.VariantDir( build_dir, '#', duplicate = 0 )
+build_dir = 'build' + os.sep\
+	+ configuration + os.sep\
+	+ realcc + os.sep\
+	+ str(bits) + os.sep\
+	+ 'ui' + os.sep
+env.VariantDir(
+	build_dir,
+	'#',
+	duplicate = 0
+)
 ui_env = env.Clone()
 
 # sources
@@ -23,30 +32,50 @@ files = [
 	'ui/ui_shared.cpp',
 	'ui/ui_syscalls.cpp',
 	'qcommon/q_math.cpp',
-	'qcommon/q_shared.cpp'
+	'qcommon/q_shared.cpp',
 ]
 files = [build_dir + f for f in files]
 
 # libraries
 libraries = [
-	'cJSON'
+	'cJSON',
 ]
 if bits == 32:
-	libraries += [ 'libudis86' ]
+	libraries += [
+		'libudis86'
+	]
 ui_env['LIBS'] = [
 	ui_env.SConscript(
-		'#/' + lib + '/SConscript',
-		exports = [ 'arch', 'bits', 'build_dir', 'configuration', 'env', 'plat' ]
+		'#' + os.sep + lib + os.sep + 'SConscript',
+		exports = [
+			'arch',
+			'bits',
+			'build_dir',
+			'configuration',
+			'env',
+			'plat',
+			'realcc',
+		]
 	) for lib in libraries
 ]
 
 if plat == 'Windows' and bits == 32:
-	ui_env['LIBS'] += [ 'user32', 'Shell32' ]
+	ui_env['LIBS'] += [
+		'user32',
+		'Shell32'
+	]
 
 # project settings
-ui_env['CPPPATH'] += [ '#/ui' ]
-ui_env['CPPDEFINES'] += [ 'PROJECT_UI' ]
+ui_env['CPPPATH'] += [
+	'#' + os.sep + 'ui',
+]
+ui_env['CPPDEFINES'] += [
+	'PROJECT_UI',
+]
 ui_env['LIBPREFIX'] = ''
 
 # targets
-ui_env.SharedLibrary( '#' + '/ui' + arch, files )
+ui_env.SharedLibrary(
+	'#' + os.sep + 'ui' + arch,
+	files
+)

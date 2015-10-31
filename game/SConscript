@@ -1,8 +1,17 @@
+import os
 Import( '*' )
 
 # environment
-build_dir = 'build' + '/' + configuration + '/' + env['CC'] + '/' + str(bits) + '/game/'
-env.VariantDir( build_dir, '#', duplicate = 0 )
+build_dir = 'build' + os.sep\
+	+ configuration + os.sep\
+	+ realcc + os.sep\
+	+ str(bits) + os.sep\
+	+ 'game' + os.sep
+env.VariantDir(
+	build_dir,
+	'#',
+	duplicate = 0
+)
 game_env = env.Clone()
 
 # sources
@@ -116,7 +125,7 @@ files = [
 	'JAPP/jp_tokenparser.cpp',
 	'qcommon/md5.cpp',
 	'qcommon/q_math.cpp',
-	'qcommon/q_shared.cpp'
+	'qcommon/q_shared.cpp',
 ]
 files = [build_dir + f for f in files]
 
@@ -127,32 +136,67 @@ libraries = [
 	'semver',
 ]
 if no_sql == 0:
-	libraries += [ 'sqlite' ]
+	libraries += [
+		'sqlite'
+	]
 if bits == 32:
-	libraries += [ 'libudis86' ]
+	libraries += [
+		'libudis86'
+	]
 game_env['LIBS'] = [
 	game_env.SConscript(
-		'#/' + lib + '/SConscript',
-		exports = [ 'arch', 'bits', 'build_dir', 'configuration', 'env', 'plat' ]
+		'#' + os.sep + lib + os.sep + 'SConscript',
+		exports = [
+			'arch',
+			'bits',
+			'build_dir',
+			'configuration',
+			'env',
+			'plat',
+			'realcc',
+		]
 	) for lib in libraries
 ]
 if no_sql == 0:
 	if plat == 'Windows':
-	    game_env['LIBS'] += [ 'mysqlclient_' + configuration]
+	    game_env['LIBS'] += [
+			'mysqlclient_' + configuration,
+		]
 	else:
-		game_env['LIBS'] += [ 'mysqlclient']
+		#FIXME: debug libs?
+		game_env['LIBS'] += [
+			'mysqlclient',
+		]
 
 if plat == 'Windows':
-	game_env['LIBS'] += [ 'advapi32', 'Shell32' ]
+	game_env['LIBS'] += [
+		'advapi32',
+		'Shell32',
+	]
 	if bits == 32:
-		game_env['LIBS'] += [ 'user32' ]
+		game_env['LIBS'] += [
+			'user32',
+			'DbgHelp'
+		]
 
 # project settings
-game_env['CPPPATH'] += [ '#/game' ]
-game_env['CPPDEFINES'] += [ 'PROJECT_GAME', 'JPLUA' ]
+game_env['CPPPATH'] += [
+	'#' + os.sep + 'game'
+]
+game_env['CPPDEFINES'] += [
+	'PROJECT_GAME',
+	'JPLUA',
+	'LUA_COMPAT_BITLIB',
+	'LUA_COMPAT_APIINTCASTS',
+]
 if plat == 'Linux':
-	game_env['CPPDEFINES'] += [ 'LUA_USE_LINUX' ]
+	game_env['CPPDEFINES'] += [
+		'LUA_USE_LINUX',
+	]
 game_env['LIBPREFIX'] = ''
 
 # targets
-game_env.SharedLibrary( '#' + '/jampgame' + arch, files )
+game_env.SharedLibrary(
+	'#' + os.sep + 'jampgame' + arch,
+	files
+)

@@ -8178,8 +8178,7 @@ static void Item_TextScroll_BuildLines( itemDef_t* item ) {
 		cw = DC->textWidth ( va("%c", *lineEnd), item->textscale, item->iMenuFont, false );
 
 		// Past the end of the boundary?
-		if ( w + cw > (item->window.rect.w - SCROLLBAR_SIZE - 10) )
-		{
+		if ( w + cw > (item->window.rect.w - SCROLLBAR_SIZE - 10) ) {
 			// Past the end so backtrack to the word boundary
 			while ( *lineEnd != ' ' && *lineEnd != '\t' && lineEnd > lineStart )
 			{
@@ -8926,7 +8925,9 @@ float Text_Width( const char *text, float scale, int iMenuFont, bool customFont 
 	}
 	return japp_preciseFonts.integer ? f1 : f2;
 #else
-	return trap->R_Font_StrLenPixels( text, iFontIndex, scale );
+	return japp_preciseFonts.integer
+		? trap->ext.R_Font_StrLenPixels( text, iFontIndex, scale )
+		: trap->R_Font_StrLenPixels( text, iFontIndex, scale );
 #endif
 }
 

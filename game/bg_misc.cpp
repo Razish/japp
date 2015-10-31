@@ -880,8 +880,9 @@ int BG_ProperForceIndex( int power ) {
 	int i;
 
 	for ( i = 0; i < NUM_FORCE_POWERS; i++ ) {
-		if ( forcePowerSorted[i] == power )
+		if ( forcePowerSorted[i] == power ) {
 			return i;
+		}
 	}
 
 	return -1;
@@ -919,10 +920,18 @@ void BG_CycleForce( playerState_t *ps, int direction ) {
 		}
 
 		// get the next/prev power and handle overflow
-		if ( direction == 1 )	x++;
-		else					x--;
-		if ( x >= NUM_FORCE_POWERS )	x = 0;
-		if ( x < 0 )					x = NUM_FORCE_POWERS - 1;
+		if ( direction == 1 ) {
+			x++;
+		}
+		else {
+			x--;
+		}
+		if ( x >= NUM_FORCE_POWERS ) {
+			x = 0;
+		}
+		if ( x < 0 ) {
+			x = NUM_FORCE_POWERS - 1;
+		}
 
 		i = forcePowerSorted[x]; //set to the sorted value again
 	}

@@ -1142,7 +1142,6 @@ static void CG_DrawFlagStatusQ3P( void ) {
 	const vector4 *scoreColour = &colorTable[(team == TEAM_RED) ? CT_HUD_RED : CT_CYAN];
 	float scoreWidth = Text_Width( scoreStr, fontScale, fontHandle, false );
 	float scoreHeight = Text_Height( scoreStr, fontScale, fontHandle, false );
-	const float iconStart = leftX + iconSize - (iconSize * cgs.widthRatioCoef);
 	Text_Paint( leftX + ((iconSize * cgs.widthRatioCoef) / 2.0f) - (scoreWidth / 2.0f), y - scoreHeight, fontScale,
 		scoreColour, scoreStr, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
 	);

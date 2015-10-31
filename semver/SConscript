@@ -1,18 +1,29 @@
 Import( '*' )
 
 # environment
-env.VariantDir( build_dir, '#', duplicate = 0 )
+env.VariantDir(
+	build_dir,
+	'#',
+	duplicate = 0
+)
 semver_env = env.Clone()
 
 # sources
-files = [ 'semver/semver.c' ]
+files = [
+	'semver/semver.c',
+]
 files = [build_dir + f for f in files]
 
 # project settings
-if plat == 'Linux':
-	semver_env['CCFLAGS'] += [ '-fPIC' ]
-	semver_env['CFLAGS'] += [ '-std=c99' ]
+if realcc == 'gcc' or realcc == 'clang':
+	semver_env['CFLAGS'] += [
+		'-std=c99',
+		'-Wno-declaration-after-statement',
+	]
 
 # targets
-result = semver_env.StaticLibrary( build_dir + 'libsemver', files )
+result = semver_env.StaticLibrary(
+	build_dir + 'libsemver',
+	files
+)
 Return( "result" )

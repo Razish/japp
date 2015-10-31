@@ -9922,7 +9922,12 @@ void PmoveSingle( pmove_t *pmove ) {
 		PM_HoverTrace();
 	}
 	PM_SetWaterLevel();
-	if ( pm->cmd.forcesel != (byte)-1 && (pm->ps->fd.forcePowersKnown & (1 << pm->cmd.forcesel)) ) {
+
+	if ( pm->cmd.forcesel != (byte)-1
+		&& (pm->ps->fd.forcePowersKnown & (1 << pm->cmd.forcesel))
+		&& pm->cmd.forcesel != FP_LEVITATION
+		&& pm->cmd.forcesel < NUM_FORCE_POWERS )
+	{
 		pm->ps->fd.forcePowerSelected = pm->cmd.forcesel;
 	}
 	if ( pm->cmd.invensel != (byte)-1 && (pm->ps->stats[STAT_HOLDABLE_ITEMS] & (1 << pm->cmd.invensel)) ) {

@@ -68,11 +68,17 @@ extern int g_G2AllocServer;
 #endif
 
 #if defined(_MSC_VER)
-#define Q_EXPORT __declspec(dllexport)
-#elif __GNUC__ >= 3
-#define Q_EXPORT __attribute__((visibility("default")))
+	#define Q_EXPORT __declspec(dllexport)
+	#define Q_NAKED __declspec(naked)
+	#define Q_USED
+#elif defined(__GNUC__) && (__GNUC__ >= 3)
+	#define Q_EXPORT __attribute__(( visibility( "default" ) ))
+	#define Q_NAKED __attribute__(( noinline ))
+	#define Q_USED __attribute__(( used ))
 #else
-#define Q_EXPORT
+	#define Q_EXPORT
+	#define Q_NAKED
+	#define Q_USED
 #endif
 
 #include <cassert>
@@ -141,7 +147,9 @@ float LittleFloat( const float l );
 //Raz: added
 #define WIN32_LEAN_AND_MEAN
 #define NOSCROLL
-#define NOMINMAX
+#if defined(_MSC_VER)
+	define NOMINMAX
+#endif
 #include <windows.h>
 #include <Shellapi.h>
 

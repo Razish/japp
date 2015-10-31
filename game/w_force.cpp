@@ -275,7 +275,9 @@ void WP_InitForcePowers( gentity_t *ent ) {
 	}
 
 	if ( !(ent->client->ps.fd.forcePowersKnown & (1 << ent->client->ps.fd.forcePowerSelected)) ) {
+		assert( "WP_InitForcePowers" && lastFPKnown != -1 );
 		if ( lastFPKnown == -1 ) {
+			// this won't ever happen?
 			lastFPKnown = FP_FIRST;
 		}
 		ent->client->ps.fd.forcePowerSelected = lastFPKnown;

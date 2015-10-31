@@ -181,7 +181,6 @@ pip-log.txt
 
 # Codelite
 .codelite
-*.workspace
 
 #############
 ## Mac

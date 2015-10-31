@@ -778,237 +778,279 @@ int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
 	return sides;
 }
 #else
-#pragma warning( disable: 4035 )
 
-__declspec(naked) int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
-	static int bops_initialized;
-	static int Ljmptab[8];
+#if defined(_MSC_VER)
+	#pragma warning( push )
+	#pragma warning( disable: 4035 )
+#elif defined(__GNUC__)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wreturn-type"
+#endif // _MSC_VER
 
-	__asm {
+Q_NAKED int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
+	qnakedstart(BOPS)
 
-		push ebx
+	static int Q_USED bops_initialized;
+	static int Q_USED Ljmptab[8];
 
-			cmp bops_initialized, 1
-			je  initialized
-			mov bops_initialized, 1
+	qasm1( push ebx )
 
-			mov Ljmptab[0 * 4], offset Lcase0
-			mov Ljmptab[1 * 4], offset Lcase1
-			mov Ljmptab[2 * 4], offset Lcase2
-			mov Ljmptab[3 * 4], offset Lcase3
-			mov Ljmptab[4 * 4], offset Lcase4
-			mov Ljmptab[5 * 4], offset Lcase5
-			mov Ljmptab[6 * 4], offset Lcase6
-			mov Ljmptab[7 * 4], offset Lcase7
+#if defined(_MSC_VER)
+	qasm2( cmp bops_initialized, 1 )
+	qasm1( je initialized )
+	qasm2( mov bops_initialized, 1 )
+#elif defined(__GNUC__)
+	__asm__( "cmp %0, 1\n" : : "r" (bops_initialized) );
+	qasm1( je initialized )
+	__asm__( "mov %0, 1\n" : "=r" (bops_initialized) : );
+#endif
 
-initialized :
+#if defined(_MSC_VER)
+	qasm2( mov Ljmptab[0 * 4], offset Lcase0 )
+	qasm2( mov Ljmptab[1 * 4], offset Lcase1 )
+	qasm2( mov Ljmptab[2 * 4], offset Lcase2 )
+	qasm2( mov Ljmptab[3 * 4], offset Lcase3 )
+	qasm2( mov Ljmptab[4 * 4], offset Lcase4 )
+	qasm2( mov Ljmptab[5 * 4], offset Lcase5 )
+	qasm2( mov Ljmptab[6 * 4], offset Lcase6 )
+	qasm2( mov Ljmptab[7 * 4], offset Lcase7 )
+#elif defined(__GNUC__)
+	__asm__( "mov %0, offset Lcase0\n" : "=m" (Ljmptab[0]) : );
+	__asm__( "mov %0, offset Lcase1\n" : "=m" (Ljmptab[1]) : );
+	__asm__( "mov %0, offset Lcase2\n" : "=m" (Ljmptab[2]) : );
+	__asm__( "mov %0, offset Lcase3\n" : "=m" (Ljmptab[3]) : );
+	__asm__( "mov %0, offset Lcase4\n" : "=m" (Ljmptab[4]) : );
+	__asm__( "mov %0, offset Lcase5\n" : "=m" (Ljmptab[5]) : );
+	__asm__( "mov %0, offset Lcase6\n" : "=m" (Ljmptab[6]) : );
+	__asm__( "mov %0, offset Lcase7\n" : "=m" (Ljmptab[7]) : );
+#endif
 
-		mov edx, dword ptr[4 + 12 + esp]
-			mov ecx, dword ptr[4 + 4 + esp]
-			xor eax, eax
-			mov ebx, dword ptr[4 + 8 + esp]
-			mov al, byte ptr[17 + edx]
-			cmp al, 8
-			jge Lerror
-			fld dword ptr[0 + edx]
-			fld st( 0 )
-			jmp dword ptr[Ljmptab + eax * 4]
-Lcase0:
-			fmul dword ptr[ebx]
-				fld dword ptr[0 + 4 + edx]
-				fxch st( 2 )
-				fmul dword ptr[ecx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[4 + ebx]
-				fld dword ptr[0 + 8 + edx]
-				fxch st( 2 )
-				fmul dword ptr[4 + ecx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[8 + ebx]
-				fxch st( 5 )
-				faddp st( 3 ), st( 0 )
-				fmul dword ptr[8 + ecx]
-				fxch st( 1 )
-				faddp st( 3 ), st( 0 )
-				fxch st( 3 )
-				faddp st( 2 ), st( 0 )
-				jmp LSetSides
-Lcase1 :
-			fmul dword ptr[ecx]
-				fld dword ptr[0 + 4 + edx]
-				fxch st( 2 )
-				fmul dword ptr[ebx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[4 + ebx]
-				fld dword ptr[0 + 8 + edx]
-				fxch st( 2 )
-				fmul dword ptr[4 + ecx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[8 + ebx]
-				fxch st( 5 )
-				faddp st( 3 ), st( 0 )
-				fmul dword ptr[8 + ecx]
-				fxch st( 1 )
-				faddp st( 3 ), st( 0 )
-				fxch st( 3 )
-				faddp st( 2 ), st( 0 )
-				jmp LSetSides
-Lcase2 :
-			fmul dword ptr[ebx]
-				fld dword ptr[0 + 4 + edx]
-				fxch st( 2 )
-				fmul dword ptr[ecx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[4 + ecx]
-				fld dword ptr[0 + 8 + edx]
-				fxch st( 2 )
-				fmul dword ptr[4 + ebx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[8 + ebx]
-				fxch st( 5 )
-				faddp st( 3 ), st( 0 )
-				fmul dword ptr[8 + ecx]
-				fxch st( 1 )
-				faddp st( 3 ), st( 0 )
-				fxch st( 3 )
-				faddp st( 2 ), st( 0 )
-				jmp LSetSides
-Lcase3 :
-			fmul dword ptr[ecx]
-				fld dword ptr[0 + 4 + edx]
-				fxch st( 2 )
-				fmul dword ptr[ebx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[4 + ecx]
-				fld dword ptr[0 + 8 + edx]
-				fxch st( 2 )
-				fmul dword ptr[4 + ebx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[8 + ebx]
-				fxch st( 5 )
-				faddp st( 3 ), st( 0 )
-				fmul dword ptr[8 + ecx]
-				fxch st( 1 )
-				faddp st( 3 ), st( 0 )
-				fxch st( 3 )
-				faddp st( 2 ), st( 0 )
-				jmp LSetSides
-Lcase4 :
-			fmul dword ptr[ebx]
-				fld dword ptr[0 + 4 + edx]
-				fxch st( 2 )
-				fmul dword ptr[ecx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[4 + ebx]
-				fld dword ptr[0 + 8 + edx]
-				fxch st( 2 )
-				fmul dword ptr[4 + ecx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[8 + ecx]
-				fxch st( 5 )
-				faddp st( 3 ), st( 0 )
-				fmul dword ptr[8 + ebx]
-				fxch st( 1 )
-				faddp st( 3 ), st( 0 )
-				fxch st( 3 )
-				faddp st( 2 ), st( 0 )
-				jmp LSetSides
-Lcase5 :
-			fmul dword ptr[ecx]
-				fld dword ptr[0 + 4 + edx]
-				fxch st( 2 )
-				fmul dword ptr[ebx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[4 + ebx]
-				fld dword ptr[0 + 8 + edx]
-				fxch st( 2 )
-				fmul dword ptr[4 + ecx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[8 + ecx]
-				fxch st( 5 )
-				faddp st( 3 ), st( 0 )
-				fmul dword ptr[8 + ebx]
-				fxch st( 1 )
-				faddp st( 3 ), st( 0 )
-				fxch st( 3 )
-				faddp st( 2 ), st( 0 )
-				jmp LSetSides
-Lcase6 :
-			fmul dword ptr[ebx]
-				fld dword ptr[0 + 4 + edx]
-				fxch st( 2 )
-				fmul dword ptr[ecx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[4 + ecx]
-				fld dword ptr[0 + 8 + edx]
-				fxch st( 2 )
-				fmul dword ptr[4 + ebx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[8 + ecx]
-				fxch st( 5 )
-				faddp st( 3 ), st( 0 )
-				fmul dword ptr[8 + ebx]
-				fxch st( 1 )
-				faddp st( 3 ), st( 0 )
-				fxch st( 3 )
-				faddp st( 2 ), st( 0 )
-				jmp LSetSides
-Lcase7 :
-			fmul dword ptr[ecx]
-				fld dword ptr[0 + 4 + edx]
-				fxch st( 2 )
-				fmul dword ptr[ebx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[4 + ecx]
-				fld dword ptr[0 + 8 + edx]
-				fxch st( 2 )
-				fmul dword ptr[4 + ebx]
-				fxch st( 2 )
-				fld st( 0 )
-				fmul dword ptr[8 + ecx]
-				fxch st( 5 )
-				faddp st( 3 ), st( 0 )
-				fmul dword ptr[8 + ebx]
-				fxch st( 1 )
-				faddp st( 3 ), st( 0 )
-				fxch st( 3 )
-				faddp st( 2 ), st( 0 )
-LSetSides:
-			faddp st( 2 ), st( 0 )
-				fcomp dword ptr[12 + edx]
-				xor ecx, ecx
-				fnstsw ax
-				fcomp dword ptr[12 + edx]
-				and ah, 1
-				xor ah, 1
-				add cl, ah
-				fnstsw ax
-				and ah, 1
-				add ah, ah
-				add cl, ah
-				pop ebx
-				mov eax, ecx
-				ret
-Lerror :
-			int 3
-	}
+	qasmL(initialized:)
+	qasm2( mov edx, dword ptr[4 + 12 + esp] )
+	qasm2( mov ecx, dword ptr[4 + 4 + esp] )
+	qasm2( xor eax, eax )
+	qasm2( mov ebx, dword ptr[4 + 8 + esp] )
+	qasm2( mov al, byte ptr[17 + edx] )
+	qasm2( cmp al, 8 )
+	qasm1( jge Lerror )
+	qasm1( fld dword ptr[0 + edx] )
+	qasm1( fld st( 0 ) )
+#if defined(_MSC_VER)
+	qasm1( jmp dword ptr[Ljmptab + eax * 4] )
+#elif defined(__GNUC__)
+	__asm__( "jmp dword ptr[%0 + eax * 4]\n" : : "r" (Ljmptab) : );
+#endif
+
+	qasmL(Lcase0:)
+	qasm1( fmul dword ptr[ebx] )
+	qasm1( fld dword ptr[0 + 4 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[ecx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[4 + ebx] )
+	qasm1( fld dword ptr[0 + 8 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[4 + ecx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[8 + ebx] )
+	qasm1( fxch st( 5 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fmul dword ptr[8 + ecx] )
+	qasm1( fxch st( 1 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fxch st( 3 ) )
+	qasm2( faddp st( 2 ), st( 0 ) )
+	qasm1( jmp LSetSides )
+
+	qasmL(Lcase1:)
+	qasm1( fmul dword ptr[ecx] )
+	qasm1( fld dword ptr[0 + 4 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[ebx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[4 + ebx] )
+	qasm1( fld dword ptr[0 + 8 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[4 + ecx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[8 + ebx] )
+	qasm1( fxch st( 5 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fmul dword ptr[8 + ecx] )
+	qasm1( fxch st( 1 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fxch st( 3 ) )
+	qasm2( faddp st( 2 ), st( 0 ) )
+	qasm1( jmp LSetSides )
+
+	qasmL(Lcase2:)
+	qasm1( fmul dword ptr[ebx] )
+	qasm1( fld dword ptr[0 + 4 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[ecx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[4 + ecx] )
+	qasm1( fld dword ptr[0 + 8 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[4 + ebx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[8 + ebx] )
+	qasm1( fxch st( 5 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fmul dword ptr[8 + ecx] )
+	qasm1( fxch st( 1 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fxch st( 3 ) )
+	qasm2( faddp st( 2 ), st( 0 ) )
+	qasm1( jmp LSetSides )
+
+	qasmL(Lcase3:)
+	qasm1( fmul dword ptr[ecx] )
+	qasm1( fld dword ptr[0 + 4 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[ebx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[4 + ecx] )
+	qasm1( fld dword ptr[0 + 8 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[4 + ebx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[8 + ebx] )
+	qasm1( fxch st( 5 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fmul dword ptr[8 + ecx] )
+	qasm1( fxch st( 1 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fxch st( 3 ) )
+	qasm2( faddp st( 2 ), st( 0 ) )
+	qasm1( jmp LSetSides )
+
+	qasmL(Lcase4:)
+	qasm1( fmul dword ptr[ebx] )
+	qasm1( fld dword ptr[0 + 4 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[ecx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[4 + ebx] )
+	qasm1( fld dword ptr[0 + 8 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[4 + ecx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[8 + ecx] )
+	qasm1( fxch st( 5 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fmul dword ptr[8 + ebx] )
+	qasm1( fxch st( 1 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fxch st( 3 ) )
+	qasm2( faddp st( 2 ), st( 0 ) )
+	qasm1( jmp LSetSides )
+
+	qasmL(Lcase5:)
+	qasm1( fmul dword ptr[ecx] )
+	qasm1( fld dword ptr[0 + 4 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[ebx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[4 + ebx] )
+	qasm1( fld dword ptr[0 + 8 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[4 + ecx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[8 + ecx] )
+	qasm1( fxch st( 5 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fmul dword ptr[8 + ebx] )
+	qasm1( fxch st( 1 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fxch st( 3 ) )
+	qasm2( faddp st( 2 ), st( 0 ) )
+	qasm1( jmp LSetSides )
+
+	qasmL(Lcase6:)
+	qasm1( fmul dword ptr[ebx] )
+	qasm1( fld dword ptr[0 + 4 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[ecx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[4 + ecx] )
+	qasm1( fld dword ptr[0 + 8 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[4 + ebx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[8 + ecx] )
+	qasm1( fxch st( 5 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fmul dword ptr[8 + ebx] )
+	qasm1( fxch st( 1 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fxch st( 3 ) )
+	qasm2( faddp st( 2 ), st( 0 ) )
+	qasm1( jmp LSetSides )
+
+	qasmL(Lcase7:)
+	qasm1( fmul dword ptr[ecx] )
+	qasm1( fld dword ptr[0 + 4 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[ebx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[4 + ecx] )
+	qasm1( fld dword ptr[0 + 8 + edx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fmul dword ptr[4 + ebx] )
+	qasm1( fxch st( 2 ) )
+	qasm1( fld st( 0 ) )
+	qasm1( fmul dword ptr[8 + ecx] )
+	qasm1( fxch st( 5 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fmul dword ptr[8 + ebx] )
+	qasm1( fxch st( 1 ) )
+	qasm2( faddp st( 3 ), st( 0 ) )
+	qasm1( fxch st( 3 ) )
+	qasm2( faddp st( 2 ), st( 0 ) )
+
+	qasmL(LSetSides:)
+	qasm2( faddp st( 2 ), st( 0 ) )
+	qasm1( fcomp dword ptr[12 + edx] )
+	qasm2( xor ecx, ecx )
+	qasm1( fnstsw ax )
+	qasm1( fcomp dword ptr[12 + edx] )
+	qasm2( and ah, 1 )
+	qasm2( xor ah, 1 )
+	qasm2( add cl, ah )
+	qasm1( fnstsw ax )
+	qasm2( and ah, 1 )
+	qasm2( add ah, ah )
+	qasm2( add cl, ah )
+	qasm1( pop ebx )
+	qasm2( mov eax, ecx )
+	qasm1( ret )
+
+	qasmL(Lerror:)
+	qasm1( int 3 )
+
+	qnakedend(BOPS)
 }
-#pragma warning( default: 4035 )
+#if defined(_MSC_VER)
+	#pragma warning( pop )
+#elif defined(__GNUC__)
+	#pragma GCC diagnostic pop
+#endif // _MSC_VER
 
 #endif
 #endif
