@@ -6595,238 +6595,338 @@ static void G_KickSomeMofos( gentity_t *ent ) {
 	}
 	else {
 		switch ( ent->client->ps.legsAnim ) {
+
 		case BOTH_GETUP_BROLL_B:
 		case BOTH_GETUP_BROLL_F:
 		case BOTH_GETUP_FROLL_B:
-		case BOTH_GETUP_FROLL_F:
-			if ( elapsedTime >= 250 && remainingTime >= 250 ) {//front
+		case BOTH_GETUP_FROLL_F: {
+			if ( elapsedTime >= 250 && remainingTime >= 250 ) {
+				// front
 				doKick = qtrue;
-				if ( ri->footRBolt != -1 ) {//actually trace to a bolt
+				if ( ri->footRBolt != -1 ) {
+					// actually trace to a bolt
 					G_GetBoltPosition( ent, ri->footRBolt, &kickEnd, 0 );
 					VectorSubtract( &kickEnd, &ent->client->ps.origin, &kickDir );
 					kickDir.z = 0;//ah, flatten it, I guess...
 					VectorNormalize( &kickDir );
 				}
-				else {//guess
+				else {
+					// guess
 					AngleVectors( &fwdAngs, &kickDir, NULL, NULL );
 				}
 			}
-			break;
+		} break;
+
 		case BOTH_A7_KICK_F_AIR:
 		case BOTH_A7_KICK_B_AIR:
 		case BOTH_A7_KICK_R_AIR:
-		case BOTH_A7_KICK_L_AIR:
-			if ( elapsedTime >= 100 && remainingTime >= 250 ) {//air
+		case BOTH_A7_KICK_L_AIR: {
+			if ( elapsedTime >= 100 && remainingTime >= 250 ) {
+				// air
 				doKick = qtrue;
-				if ( ri->footRBolt != -1 ) {//actually trace to a bolt
+				if ( ri->footRBolt != -1 ) {
+					// actually trace to a bolt
 					G_GetBoltPosition( ent, ri->footRBolt, &kickEnd, 0 );
 					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
 					kickDir.z = 0;//ah, flatten it, I guess...
 					VectorNormalize( &kickDir );
 				}
-				else {//guess
+				else {
+					// guess
 					AngleVectors( &fwdAngs, &kickDir, NULL, NULL );
 				}
 			}
-			break;
-		case BOTH_A7_KICK_F:
+		} break;
+
+		case BOTH_A7_KICK_F: {
 			//FIXME: push forward?
-			if ( elapsedTime >= 250 && remainingTime >= 250 ) {//front
+			if ( elapsedTime >= 250 && remainingTime >= 250 ) {
+				// front
 				doKick = qtrue;
-				if ( ri->footRBolt != -1 ) {//actually trace to a bolt
+				if ( ri->footRBolt != -1 ) {
+					// actually trace to a bolt
 					G_GetBoltPosition( ent, ri->footRBolt, &kickEnd, 0 );
 					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
 					kickDir.z = 0;//ah, flatten it, I guess...
 					VectorNormalize( &kickDir );
 				}
-				else {//guess
+				else {
+					// guess
 					AngleVectors( &fwdAngs, &kickDir, NULL, NULL );
 				}
 			}
-			break;
-		case BOTH_A7_KICK_B:
+		} break;
+
+		case BOTH_A7_KICK_B: {
 			//FIXME: push back?
-			if ( elapsedTime >= 250 && remainingTime >= 250 ) {//back
+			if ( elapsedTime >= 250 && remainingTime >= 250 ) {
+				// back
 				doKick = qtrue;
-				if ( ri->footRBolt != -1 ) {//actually trace to a bolt
+				if ( ri->footRBolt != -1 ) {
+					// actually trace to a bolt
 					G_GetBoltPosition( ent, ri->footRBolt, &kickEnd, 0 );
 					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
 					kickDir.z = 0;//ah, flatten it, I guess...
 					VectorNormalize( &kickDir );
 				}
-				else {//guess
+				else {
+					// guess
 					AngleVectors( &fwdAngs, &kickDir, NULL, NULL );
 					VectorScale( &kickDir, -1, &kickDir );
 				}
 			}
-			break;
-		case BOTH_A7_KICK_R:
+		} break;
+
+		case BOTH_A7_KICK_R: {
 			//FIXME: push right?
-			if ( elapsedTime >= 250 && remainingTime >= 250 ) {//right
+			if ( elapsedTime >= 250 && remainingTime >= 250 ) {
+				// right
 				doKick = qtrue;
-				if ( ri->footRBolt != -1 ) {//actually trace to a bolt
+				if ( ri->footRBolt != -1 ) {
+					// actually trace to a bolt
 					G_GetBoltPosition( ent, ri->footRBolt, &kickEnd, 0 );
 					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
 					kickDir.z = 0;//ah, flatten it, I guess...
 					VectorNormalize( &kickDir );
 				}
-				else {//guess
+				else {
+					// guess
 					AngleVectors( &fwdAngs, NULL, &kickDir, NULL );
 				}
 			}
-			break;
-		case BOTH_A7_KICK_L:
+		} break;
+
+		case BOTH_A7_KICK_L: {
 			//FIXME: push left?
-			if ( elapsedTime >= 250 && remainingTime >= 250 ) {//left
+			if ( elapsedTime >= 250 && remainingTime >= 250 ) {
+				// left
 				doKick = qtrue;
-				if ( ri->footLBolt != -1 ) {//actually trace to a bolt
+				if ( ri->footLBolt != -1 ) {
+					// actually trace to a bolt
 					G_GetBoltPosition( ent, ri->footLBolt, &kickEnd, 0 );
 					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
 					kickDir.z = 0;//ah, flatten it, I guess...
 					VectorNormalize( &kickDir );
 				}
-				else {//guess
+				else {
+					// guess
 					AngleVectors( &fwdAngs, NULL, &kickDir, NULL );
 					VectorScale( &kickDir, -1, &kickDir );
 				}
 			}
-			break;
-		case BOTH_A7_KICK_S:
+		} break;
+
+		// diagonal left
+		case BOTH_MELEE_SPINKICK: {
+			//FIXME: push left?
+			if ( elapsedTime >= 300 && remainingTime >= 100 ) {
+				// left
+				doKick = qtrue;
+				if ( ri->footLBolt != -1 ) {
+					// actually trace to a bolt
+					G_GetBoltPosition( ent, ri->footLBolt, &kickEnd, 0 );
+					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
+					kickDir.z = 0; // ah, flatten it, I guess...
+					VectorNormalize( &kickDir );
+				}
+				else {
+					// guess
+					AngleVectors( &fwdAngs, NULL, &kickDir, NULL );
+					VectorScale( &kickDir, -1, &kickDir );
+				}
+			}
+		} break;
+
+		// diagonal right
+		case BOTH_MELEE_BACKKICK: {
+			//FIXME: push right?
+			if ( elapsedTime >= 300 && remainingTime >= 50 ) {
+				// right
+				doKick = qtrue;
+				if ( ri->footRBolt != -1 ) {
+					// actually trace to a bolt
+					G_GetBoltPosition( ent, ri->footRBolt, &kickEnd, 0 );
+					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
+					kickDir.z = 0; // ah, flatten it, I guess...
+					VectorNormalize( &kickDir );
+				}
+				else {
+					// guess
+					AngleVectors( &fwdAngs, NULL, &kickDir, NULL );
+					VectorScale( &kickDir, -1, &kickDir );
+				}
+			}
+		} break;
+
+		case BOTH_A7_KICK_S: {
 			kickPush = flrand( 75.0f, 125.0f );
-			if ( ri->footRBolt != -1 ) {//actually trace to a bolt
-				if ( elapsedTime >= 550
-					&& elapsedTime <= 1050 ) {
+			if ( ri->footRBolt != -1 ) {
+				// actually trace to a bolt
+				if ( elapsedTime >= 550 && elapsedTime <= 1050 ) {
 					doKick = qtrue;
 					G_GetBoltPosition( ent, ri->footRBolt, &kickEnd, 0 );
 					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
-					kickDir.z = 0;//ah, flatten it, I guess...
+					kickDir.z = 0; // ah, flatten it, I guess...
 					VectorNormalize( &kickDir );
 					//NOTE: have to fudge this a little because it's not getting enough range with the anim as-is
 					VectorMA( &kickEnd, 8.0f, &kickDir, &kickEnd );
 				}
 			}
-			else {//guess
-				if ( elapsedTime >= 400 && elapsedTime < 500 ) {//front
+			else {
+				// guess
+				if ( elapsedTime >= 400 && elapsedTime < 500 ) {
+					// front
 					doKick = qtrue;
 					AngleVectors( &fwdAngs, &kickDir, NULL, NULL );
 				}
-				else if ( elapsedTime >= 500 && elapsedTime < 600 ) {//front-right?
+				else if ( elapsedTime >= 500 && elapsedTime < 600 ) {
+					// front-right?
 					doKick = qtrue;
 					fwdAngs.yaw += 45;
 					AngleVectors( &fwdAngs, &kickDir, NULL, NULL );
 				}
-				else if ( elapsedTime >= 600 && elapsedTime < 700 ) {//right
+				else if ( elapsedTime >= 600 && elapsedTime < 700 ) {
+					// right
 					doKick = qtrue;
 					AngleVectors( &fwdAngs, NULL, &kickDir, NULL );
 				}
-				else if ( elapsedTime >= 700 && elapsedTime < 800 ) {//back-right?
+				else if ( elapsedTime >= 700 && elapsedTime < 800 ) {
+					// back-right?
 					doKick = qtrue;
 					fwdAngs.yaw += 45;
 					AngleVectors( &fwdAngs, NULL, &kickDir, NULL );
 				}
-				else if ( elapsedTime >= 800 && elapsedTime < 900 ) {//back
+				else if ( elapsedTime >= 800 && elapsedTime < 900 ) {
+					// back
 					doKick = qtrue;
 					AngleVectors( &fwdAngs, &kickDir, NULL, NULL );
 					VectorScale( &kickDir, -1, &kickDir );
 				}
-				else if ( elapsedTime >= 900 && elapsedTime < 1000 ) {//back-left?
+				else if ( elapsedTime >= 900 && elapsedTime < 1000 ) {
+					// back-left?
 					doKick = qtrue;
 					fwdAngs.yaw += 45;
 					AngleVectors( &fwdAngs, &kickDir, NULL, NULL );
 				}
-				else if ( elapsedTime >= 1000 && elapsedTime < 1100 ) {//left
+				else if ( elapsedTime >= 1000 && elapsedTime < 1100 ) {
+					// left
 					doKick = qtrue;
 					AngleVectors( &fwdAngs, NULL, &kickDir, NULL );
 					VectorScale( &kickDir, -1, &kickDir );
 				}
-				else if ( elapsedTime >= 1100 && elapsedTime < 1200 ) {//front-left?
+				else if ( elapsedTime >= 1100 && elapsedTime < 1200 ) {
+					// front-left?
 					doKick = qtrue;
 					fwdAngs.yaw += 45;
 					AngleVectors( &fwdAngs, NULL, &kickDir, NULL );
 					VectorScale( &kickDir, -1, &kickDir );
 				}
 			}
-			break;
-		case BOTH_A7_KICK_BF:
+		} break;
+
+		case BOTH_A7_KICK_BF: {
 			kickPush = flrand( 75.0f, 125.0f );
 			kickDist += 20.0f;
-			if ( elapsedTime < 1500 ) {//auto-aim!
-				//			overridAngles = PM_AdjustAnglesForBFKick( ent, ucmd, fwdAngs, qboolean(elapsedTime<850) )?qtrue:overridAngles;
-				//FIXME: if we haven't done the back kick yet and there's no-one there to
-				//			kick anymore, go into some anim that returns us to our base stance
+			if ( elapsedTime < 1500 ) {
+				// auto-aim!
+				//FIXME: if we haven't done the back kick yet and there's no-one there to kick anymore, go into some
+				//	anim that returns us to our base stance
+				/*
+				overridAngles = PM_AdjustAnglesForBFKick( ent, ucmd, fwdAngs, qboolean(elapsedTime<850) )
+					? qtrue
+					: overridAngles;
+				*/
 			}
-			if ( ri->footRBolt != -1 ) {//actually trace to a bolt
-				if ( (elapsedTime >= 750 && elapsedTime < 850)
-					|| (elapsedTime >= 1400 && elapsedTime < 1500) ) {//right, though either would do
+			if ( ri->footRBolt != -1 ) {
+				// actually trace to a bolt
+				if ( (elapsedTime >= 750 && elapsedTime < 850) || (elapsedTime >= 1400 && elapsedTime < 1500) ) {
+					// right, though either would do
 					doKick = qtrue;
 					G_GetBoltPosition( ent, ri->footRBolt, &kickEnd, 0 );
 					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
-					kickDir.z = 0;//ah, flatten it, I guess...
+					kickDir.z = 0; // ah, flatten it, I guess...
 					VectorNormalize( &kickDir );
 					//NOTE: have to fudge this a little because it's not getting enough range with the anim as-is
 					VectorMA( &kickEnd, 8, &kickDir, &kickEnd );
 				}
 			}
-			else {//guess
-				if ( elapsedTime >= 250 && elapsedTime < 350 ) {//front
+			else {
+				// guess
+				if ( elapsedTime >= 250 && elapsedTime < 350 ) {
+					// front
 					doKick = qtrue;
 					AngleVectors( &fwdAngs, &kickDir, NULL, NULL );
 				}
-				else if ( elapsedTime >= 350 && elapsedTime < 450 ) {//back
+				else if ( elapsedTime >= 350 && elapsedTime < 450 ) {
+					// back
 					doKick = qtrue;
 					AngleVectors( &fwdAngs, &kickDir, NULL, NULL );
 					VectorScale( &kickDir, -1, &kickDir );
 				}
 			}
-			break;
-		case BOTH_A7_KICK_RL:
+		} break;
+
+		case BOTH_A7_KICK_RL: {
 			kickPush = flrand( 75.0f, 125.0f );
 			kickDist += 10.0f;
 
-			//ok, I'm tracing constantly on these things, they NEVER hit otherwise (in MP at least)
-
+			// ok, I'm tracing constantly on these things, they NEVER hit otherwise (in MP at least)
 			//FIXME: auto aim at enemies on the side of us?
-			//overridAngles = PM_AdjustAnglesForRLKick( ent, ucmd, fwdAngs, qboolean(elapsedTime<850) )?qtrue:overridAngles;
-			//if ( elapsedTime >= 250 && elapsedTime < 350 )
-			if ( level.framenum & 1 ) {//right
+			/*
+			overridAngles = PM_AdjustAnglesForRLKick( ent, ucmd, fwdAngs, (qboolean)(elapsedTime < 850) )
+				? qtrue
+				: overridAngles;
+			*/
+			if ( level.framenum & 1 ) { // ( elapsedTime >= 250 && elapsedTime < 350 ) {
+				// right
 				doKick = qtrue;
-				if ( ri->footRBolt != -1 ) {//actually trace to a bolt
+				if ( ri->footRBolt != -1 ) {
+					// actually trace to a bolt
 					G_GetBoltPosition( ent, ri->footRBolt, &kickEnd, 0 );
 					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
-					kickDir.z = 0;//ah, flatten it, I guess...
+					kickDir.z = 0; // ah, flatten it, I guess...
 					VectorNormalize( &kickDir );
 					//NOTE: have to fudge this a little because it's not getting enough range with the anim as-is
 					VectorMA( &kickEnd, 8, &kickDir, &kickEnd );
 				}
-				else {//guess
+				else {
+					// guess
 					AngleVectors( &fwdAngs, NULL, &kickDir, NULL );
 				}
 			}
-			//else if ( elapsedTime >= 350 && elapsedTime < 450 )
-			else {//left
+			else { //if ( elapsedTime >= 350 && elapsedTime < 450 ) {
+				// left
 				doKick = qtrue;
-				if ( ri->footLBolt != -1 ) {//actually trace to a bolt
+				if ( ri->footLBolt != -1 ) {
+					// actually trace to a bolt
 					G_GetBoltPosition( ent, ri->footLBolt, &kickEnd, 0 );
 					VectorSubtract( &kickEnd, &ent->r.currentOrigin, &kickDir );
-					kickDir.z = 0;//ah, flatten it, I guess...
+					kickDir.z = 0; // ah, flatten it, I guess...
 					VectorNormalize( &kickDir );
 					//NOTE: have to fudge this a little because it's not getting enough range with the anim as-is
 					VectorMA( &kickEnd, 8, &kickDir, &kickEnd );
 				}
-				else {//guess
+				else {
+					// guess
 					AngleVectors( &fwdAngs, NULL, &kickDir, NULL );
 					VectorScale( &kickDir, -1, &kickDir );
 				}
 			}
-			break;
-		default:
-			break;
+		} break;
+
+		default: {
+		} break;
+
 		}
 	}
 
 	if ( doKick ) {
-		//		G_KickTrace( ent, kickDir, kickDist, kickEnd, kickDamage, kickPush );
-		G_KickTrace( ent, &kickDir, kickDist, NULL, kickDamage, kickPush );
+		if ( japp_kickTrace.integer == 1 ) {
+			G_KickTrace( ent, &kickDir, kickDist, nullptr, kickDamage, kickPush );
+		}
+		else if ( japp_kickTrace.integer == 2 ) {
+			G_KickTrace( ent, &kickDir, kickDist, &kickEnd, kickDamage, kickPush );
+		}
 	}
 }
 

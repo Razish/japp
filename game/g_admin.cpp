@@ -542,7 +542,7 @@ static void AM_WriteAccounts( fileHandle_t f ) {
 	}
 	cJSON_AddItemToObject( root, "admins", admins );
 
-	Q_WriteJSONToFile( root, f );
+	Q_FSWriteJSON( root, f );
 }
 
 #define ADMIN_FILE "admins.json"
@@ -836,7 +836,7 @@ static void AM_WriteTelemarks( fileHandle_t f ) {
 	}
 	cJSON_AddItemToObject( root, "telemarks", tms );
 
-	Q_WriteJSONToFile( root, f );
+	Q_FSWriteJSON( root, f );
 }
 
 // load telemarks from disk

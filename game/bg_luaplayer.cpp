@@ -34,8 +34,6 @@ namespace JPLua {
 
 	// Push a Player instance for a client number onto the stack
 	void Player_CreateRef( lua_State *L, int num ) {
-		luaPlayer_t *player = NULL;
-
 	#if defined(PROJECT_GAME)
 		if ( num < 0 || num >= level.maxclients || !g_entities[num].inuse ) {
 	#elif defined(PROJECT_CGAME)
@@ -45,7 +43,7 @@ namespace JPLua {
 			return;
 		}
 
-		player = (luaPlayer_t *)lua_newuserdata( L, sizeof(luaPlayer_t) );
+		luaPlayer_t *player = (luaPlayer_t *)lua_newuserdata( L, sizeof(luaPlayer_t) );
 		player->clientNum = num;
 
 		luaL_getmetatable( L, PLAYER_META );

@@ -59,10 +59,6 @@ int bCrashing = 0;
 #include <features.h>
 #endif
 
-static void JP_FS_WriteString( const char *msg, fileHandle_t f ) {
-	trap->FS_Write( msg, strlen( msg ), f );
-}
-
 int StrToDword( const char *str ) {
 	int len = strlen( str );
 	int pos;

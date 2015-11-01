@@ -150,6 +150,10 @@ static void CVU_SPCartwheel( void ) {
 	SetCInfo( !japp_allowSPCartwheel.integer, CINFO_NOSPCARTWHEEL );
 }
 
+static void CVU_SpinKicks( void ) {
+	SetCInfo( japp_allowSpinkicks.integer, CINFO_SPINKICKS );
+}
+
 static void CVU_Stab( void ) {
 	SetCInfo( !japp_allowStab.integer, CINFO_NOSTAB );
 }

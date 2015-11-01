@@ -379,50 +379,103 @@ void G_InitGentity( gentity_t *e ) {
 
 // give us some decent info on all the active ents -rww
 static void G_SpewEntList( void ) {
-	int i = 0, numNPC = 0, numProjectile = 0, numTempEnt = 0, numTempEntST = 0;
-	char className[MAX_STRING_CHARS], buf[256] = { 0 };
-	gentity_t *ent;
-	fileHandle_t fh;
 	time_t rawtime;
-	const char *str;
-
 	time( &rawtime );
-	strftime( buf, sizeof(buf), "%Y-%m-%d_%H-%M-%S", localtime( &rawtime ) );
-	trap->FS_Open( va( "entspew_%s.txt", buf ), &fh, FS_WRITE );
-	trap->FS_Write( va( "================================\nEntspew triggered at: %s\n================================\n\n", buf ), sizeof(buf), fh );
+	char buf[MAX_STRING_CHARS];
 
-	for ( i = 0, ent = g_entities; i < ENTITYNUM_MAX_NORMAL; i++, ent++ ) {
+	char timeStr[128];
+	strftime( timeStr, sizeof(timeStr), "%Y-%m-%d_%H-%M-%S", localtime( &rawtime ) );
+	fileHandle_t fh = NULL_HANDLE;
+	trap->FS_Open( va( "entspew_%s.txt", timeStr ), &fh, FS_WRITE );
+	Com_sprintf( buf, sizeof(buf), "================================\nEntspew triggered at: %s\n\n", timeStr );
+	Com_Printf( buf );
+	Q_FSWriteString( fh, buf );
+
+	int numNPC = 0;
+	int numProjectile = 0;
+	int numTempEnt = 0;
+	int numTempEntST = 0;
+	for ( int i = 0; i < ENTITYNUM_MAX_NORMAL; i++ ) {
+		const gentity_t *ent = g_entities + i;
 		if ( ent->inuse ) {
-			if ( ent->s.eType == ET_NPC )
+			if ( ent->s.eType == ET_NPC ) {
 				numNPC++;
-			else if ( ent->s.eType == ET_MISSILE )
+			}
+			else if ( ent->s.eType == ET_MISSILE ) {
 				numProjectile++;
+			}
 			else if ( ent->freeAfterEvent ) {
 				numTempEnt++;
-				if ( ent->s.eFlags & EF_SOUNDTRACKER )
+				if ( ent->s.eFlags & EF_SOUNDTRACKER ) {
 					numTempEntST++;
-
-				str = va( "TEMPENT %4i: EV %i\n", ent->s.number, ent->s.eType - ET_EVENTS );
-				Com_Printf( str );
-				if ( fh )
-					trap->FS_Write( str, strlen( str ), fh );
+				}
 			}
-
-			if ( ent->classname && ent->classname[0] )
-				Q_strncpyz( className, ent->classname, sizeof(className) );
-			else
-				Q_strncpyz( className, "Unknown", sizeof(className) );
-			str = va( "ENT %4i: Classname %s\n", ent->s.number, className );
-			Com_Printf( str );
-			if ( fh )
-				trap->FS_Write( str, strlen( str ), fh );
 		}
 	}
 
-	str = va( "TempEnt count: %i\nTempEnt ST: %i\nNPC count: %i\nProjectile count: %i\n", numTempEnt, numTempEntST, numNPC, numProjectile );
-	Com_Printf( str );
-	if ( fh ) {
-		trap->FS_Write( str, strlen( str ), fh );
+	Com_sprintf( buf, sizeof(buf), "map: %s\n", level.rawmapname );
+	Com_Printf( buf );
+	Q_FSWriteString( fh, buf );
+
+	Com_sprintf( buf, sizeof(buf), "players: %i/%i\n", level.numConnectedClients, level.maxclients );
+	Com_Printf( buf );
+	Q_FSWriteString( fh, buf );
+	for ( int i = 0; i < MAX_CLIENTS; i++ ) {
+		const gentity_t *ent = g_entities + i;
+
+		if ( ent->inuse ) {
+			Com_sprintf( buf, sizeof(buf), "    %02i. %s [IP: %s]\n",
+				i,
+				ent->client->pers.netnameClean,
+				(ent->r.svFlags & SVF_BOT) ? "Bot" : ent->client->sess.IP
+			);
+			Com_Printf( buf );
+			Q_FSWriteString( fh, buf );
+		}
+	}
+
+	Com_sprintf( buf, sizeof(buf), "time: %i/%i\n", level.time / 1000 / 60, timelimit.integer );
+	Com_Printf( buf );
+	Q_FSWriteString( fh, buf );
+
+	Com_sprintf( buf, sizeof(buf), "temp entities: %i\n", numTempEnt );
+	Com_Printf( buf );
+	Q_FSWriteString( fh, buf );
+
+	Com_sprintf( buf, sizeof(buf), "soundtracker entities: %i\n", numTempEntST );
+	Com_Printf( buf );
+	Q_FSWriteString( fh, buf );
+
+	Com_sprintf( buf, sizeof(buf), "npc count: %i\n", numNPC );
+	Com_Printf( buf );
+	Q_FSWriteString( fh, buf );
+
+	Com_sprintf( buf, sizeof(buf), "projectile count: %i\n", numProjectile );
+	Com_Printf( buf );
+	Q_FSWriteString( fh, buf );
+
+	Q_strncpyz( buf, "================================\n\n", sizeof(buf) );
+	Com_Printf( buf );
+	Q_FSWriteString( fh, buf );
+
+	for ( int i = 0; i < ENTITYNUM_MAX_NORMAL; i++ ) {
+		const gentity_t *ent = g_entities + i;
+
+		if ( ent->inuse ) {
+			if ( ent->freeAfterEvent ) {
+				Com_sprintf( buf, sizeof(buf), "TENT %4i:     Event %i\n", ent->s.number, ent->s.eType - ET_EVENTS );
+			}
+			else {
+				const char *className = (ent->classname && ent->classname[0]) ? ent->classname : "Unknown";
+				Com_sprintf( buf, sizeof(buf), " ENT %4i: Classname %s\n", ent->s.number, className );
+			}
+
+			Com_Printf( buf );
+			Q_FSWriteString( fh, buf );
+		}
+	}
+
+	if ( fh != NULL_HANDLE ) {
 		trap->FS_Close( fh );
 	}
 }

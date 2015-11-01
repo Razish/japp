@@ -44,7 +44,7 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 
 	trap->FS_Open( fileName, &f, FS_WRITE );
 
-	Q_WriteJSONToFile( root, f );
+	Q_FSWriteJSON( root, f );
 }
 
 // called on a reconnect
@@ -316,7 +316,7 @@ void G_WriteSessionData( void ) {
 	trap->Print( "G_WriteSessionData: writing %s...", metaFileName );
 	trap->FS_Open( metaFileName, &f, FS_WRITE );
 
-	Q_WriteJSONToFile( root, f );
+	Q_FSWriteJSON( root, f );
 
 	for ( i = 0, client = level.clients; i < level.maxclients; i++, client++ ) {
 		if ( client->pers.connected == CON_CONNECTED ) {

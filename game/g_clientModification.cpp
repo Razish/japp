@@ -40,4 +40,5 @@ const char *clientPluginDisableNames[CPD_NUM] = {
 	"CPD_NODFA",				// don't allow DFAs
 	"CPD_OLDGRAPPLE",			// automatically release grapple
 	"CPD_ANNOYINGEMOTES",		// disable annoying emotes
+	"CPD_NOSPINKICKS",			// don't allow diagonal spin kicks
 };

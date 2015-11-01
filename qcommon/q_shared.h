@@ -68,17 +68,29 @@ extern int g_G2AllocServer;
 #endif
 
 #if defined(_MSC_VER)
+
+	// MSVC
 	#define Q_EXPORT __declspec(dllexport)
 	#define Q_NAKED __declspec(naked)
 	#define Q_USED
+	#define Q_UNUSED
+	#define Q_CABI
+
 #elif defined(__GNUC__) && (__GNUC__ >= 3)
+
+	// GCC, ICC, Clang
 	#define Q_EXPORT __attribute__(( visibility( "default" ) ))
 	#define Q_NAKED __attribute__(( noinline ))
 	#define Q_USED __attribute__(( used ))
+	#define Q_UNUSED __attribute__(( unused ))
+
 #else
+
 	#define Q_EXPORT
 	#define Q_NAKED
 	#define Q_USED
+	#define Q_UNUSED
+
 #endif
 
 #include <cassert>
@@ -2375,8 +2387,9 @@ typedef struct netadr_s {
 
 vector3 *tv( float x, float y, float z );
 char *vtos( const vector3 *v );
-void Q_WriteJSONToFile( void *root, fileHandle_t f );
-void Q_BinaryDump( const char *filename, const void *buffer, size_t len );
+void Q_FSBinaryDump( const char *filename, const void *buffer, size_t len );
+void Q_FSWriteJSON( void *root, fileHandle_t f );
+void Q_FSWriteString( fileHandle_t f, const char *msg );
 bool flcmp( const float &f1, const float &f2, const float epsilon = 0.00001f );
 bool flcmp_old( const float &f1, const float &f2, const float epsilon = 0.00001f );
 bool dblcmp( const double &f1, const double &f2, const double epsilon = 0.000000000000001 );

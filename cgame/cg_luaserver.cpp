@@ -12,6 +12,8 @@ namespace JPLua {
 	//		nil if we do not have a valid snapshot
 	int GetServer( lua_State *L ) {
 		if ( cg.snap ) {
+			luaServer_t *server = (luaServer_t *)lua_newuserdata( L, sizeof(luaServer_t) );
+			server->dummy = 0u;
 			luaL_getmetatable( L, SERVER_META );
 			lua_setmetatable( L, -2 );
 		}
@@ -19,6 +21,86 @@ namespace JPLua {
 			lua_pushnil( L );
 
 		return 1;
+	}
+
+	// Ensure the value at the specified index is a valid Server instance,
+	// Return the instance if it is, otherwise return NULL.
+	luaServer_t *CheckServer( lua_State *L, int idx ) {
+		void *ud = luaL_checkudata( L, idx, SERVER_META );
+		luaL_argcheck( L, ud != NULL, 1, "'Server' expected" );
+		return (luaServer_t *)ud;
+	}
+
+	static int Server_GetCInfo( lua_State *L ) {
+		lua_pushunsigned( L, cgs.japp.jp_cinfo );
+		return 1;
+	}
+
+	static const serverProperty_t serverProperties [] = {
+		{
+			"cinfo",
+			Server_GetCInfo,
+			nullptr
+		},
+	};
+	static const size_t numServerProperties = ARRAY_LEN( serverProperties );
+
+	static int ServerPropertyCompare( const void *a, const void *b ) {
+		return strcmp( (const char *)a, ((serverProperty_t *)b)->name );
+	}
+
+	static int Server_Index( lua_State *L ) {
+		Q_UNUSED luaServer_t *server = CheckServer( L, 1 );
+		const char *key = lua_tostring( L, 2 );
+		int returnValues = 0;
+
+		lua_getmetatable( L, 1 );
+		lua_getfield( L, -1, key );
+		if ( !lua_isnil( L, -1 ) ) {
+			return 1;
+		}
+
+		// assume it's a field
+		const serverProperty_t *property = (serverProperty_t *)bsearch( key, serverProperties, numServerProperties,
+			sizeof(serverProperty_t), ServerPropertyCompare
+		);
+		if ( property ) {
+			if ( property->Get ) {
+				returnValues += property->Get( L );
+			}
+		}
+		else {
+			lua_pushnil( L );
+			returnValues++;
+		}
+
+		return returnValues;
+	}
+
+	static int Server_NewIndex( lua_State *L ) {
+		Q_UNUSED luaServer_t *server = CheckServer( L, 1 );
+		const char *key = lua_tostring( L, 2 );
+
+		lua_getmetatable( L, 1 );
+		lua_getfield( L, -1, key );
+
+		if ( !lua_isnil( L, -1 ) ) {
+			return 1;
+		}
+
+		// assume it's a field
+		const serverProperty_t *property = (serverProperty_t *)bsearch( key, serverProperties, numServerProperties,
+			sizeof(serverProperty_t), ServerPropertyCompare
+		);
+		if ( property ) {
+			if ( property->Set ) {
+				property->Set( L );
+			}
+		}
+		else {
+		}
+
+		return 0;
 	}
 
 	//Func: tostring(Server)
@@ -62,6 +144,8 @@ namespace JPLua {
 	}
 
 	static const struct luaL_Reg serverMeta[] = {
+		{ "__index", Server_Index},
+		{ "__newindex", Server_NewIndex},
 		{ "__tostring", Server_ToString },
 		{ "GetName", Server_GetName },
 		{ "GetSSF", Server_GetSSF },
@@ -71,7 +155,6 @@ namespace JPLua {
 
 	// Register the Server class for Lua
 	void Register_Server( lua_State *L ) {
-		const luaL_Reg *r;
 		luaL_newmetatable( L, SERVER_META ); // Create metatable for Server class, push on stack
 
 		// Lua won't attempt to directly index userdata, only via metatables
@@ -81,7 +164,7 @@ namespace JPLua {
 		lua_settable( L, -3 ); // metatable.__index = metatable
 
 		// fill metatable with fields
-		for ( r = serverMeta; r->name; r++ ) {
+		for ( const luaL_Reg *r = serverMeta; r->name; r++ ) {
 			lua_pushcfunction( L, r->func );
 			lua_setfield( L, -2, r->name );
 		}

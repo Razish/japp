@@ -8,7 +8,7 @@
 #define CINFO_HEADSLIDE			(0x00000020u) // jp_slideOnPlayer/japp_slideOnPlayer set
 #define CINFO_NOSPCARTWHEEL		(0x00000040u) // don't allow sp attacks
 #define CINFO_NEWDFA			(0x00000080u) // TODO: new close-range DFA
-#define CINFO_UNKNOWN04			(0x00000100u)
+#define CINFO_SPINKICKS			(0x00000100u) // allow diagonal spin kicks
 #define CINFO_UNKNOWN03			(0x00000200u)
 #define CINFO_MACROSCAN1		(0x00000400u) // IGNORE: macro-scan 1
 #define CINFO_MACROSCAN2		(0x00000800u) // IGNORE: macro-scan 2

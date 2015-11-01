@@ -433,7 +433,7 @@ if debug == 0 or debug == 2:
 if debug:
 	if realcc == 'gcc' or realcc == 'clang':
 		env['CCFLAGS'] += [
-			'-g',
+			'-ggdb3',
 		]
 	elif realcc == 'cl':
 		env['CCFLAGS'] += [

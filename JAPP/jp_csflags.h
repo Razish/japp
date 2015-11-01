@@ -58,4 +58,5 @@
 #define CPD_NODFA				(0x00040000u) // don't allow DFAs
 #define CPD_OLDGRAPPLE			(0X00080000u) // automatically release grapple
 #define CPD_ANNOYINGEMOTES		(0x00100000u) // disable annoying emotes
-#define CPD_NUM					(21)
+#define CPD_NOSPINKICKS			(0x00200000u) // don't allow diagonal spin kicks
+#define CPD_NUM					(22)

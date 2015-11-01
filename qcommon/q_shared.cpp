@@ -1302,8 +1302,16 @@ char *vtos( const vector3 *v ) {
 	return s;
 }
 
+void Q_FSBinaryDump( const char *filename, const void *buffer, size_t len ) {
+	fileHandle_t f = NULL_FILE;
+	trap->FS_Open( filename, &f, FS_WRITE );
+	trap->FS_Write( buffer, (int)len, f );
+	trap->FS_Close( f );
+	f = NULL_FILE;
+}
+
 // serialise a JSON object and write it to the specified file
-void Q_WriteJSONToFile( void *root, fileHandle_t f ) {
+void Q_FSWriteJSON( void *root, fileHandle_t f ) {
 	const char *serialised = NULL;
 
 	serialised = cJSON_Serialize( (cJSON *)root, 1 );
@@ -1314,12 +1322,10 @@ void Q_WriteJSONToFile( void *root, fileHandle_t f ) {
 	cJSON_Delete( (cJSON *)root );
 }
 
-void Q_BinaryDump( const char *filename, const void *buffer, size_t len ) {
-	fileHandle_t f = NULL_FILE;
-	trap->FS_Open( filename, &f, FS_WRITE );
-	trap->FS_Write( buffer, (int)len, f );
-	trap->FS_Close( f );
-	f = NULL_FILE;
+void Q_FSWriteString( fileHandle_t f, const char *msg ) {
+	if ( f != NULL_FILE ) {
+		trap->FS_Write( msg, strlen( msg ), f );
+	}
 }
 
 void Q_NewPrintBuffer( printBufferSession_t *session, size_t length,

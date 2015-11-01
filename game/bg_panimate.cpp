@@ -597,6 +597,7 @@ qboolean BG_SaberInSpecialAttack( int anim ) {
 
 qboolean BG_KickingAnim( int anim ) {
 	switch ( anim ) {
+
 	case BOTH_A7_KICK_F:
 	case BOTH_A7_KICK_B:
 	case BOTH_A7_KICK_R:
@@ -609,15 +610,22 @@ qboolean BG_KickingAnim( int anim ) {
 	case BOTH_A7_KICK_R_AIR:
 	case BOTH_A7_KICK_L_AIR:
 	case BOTH_A7_HILT:
-		//NOT kicks, but do kick traces anyway
+	//NOT kicks, but do kick traces anyway
 	case BOTH_GETUP_BROLL_B:
 	case BOTH_GETUP_BROLL_F:
 	case BOTH_GETUP_FROLL_B:
 	case BOTH_GETUP_FROLL_F:
+	// ja+ moves
+	case BOTH_MELEE_BACKKICK:
+	case BOTH_MELEE_SPINKICK: {
 		return qtrue;
-	default:
-		return qfalse;
+	} break;
+	default: {
+	} break;
+
 	}
+
+	return qfalse;
 }
 
 int BG_InGrappleMove( int anim ) {

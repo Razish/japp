@@ -300,14 +300,12 @@ saberMoveData_t	saberMoveData[LS_MOVE_MAX] = {//							NB:randomized
 	{ "Reflect LR", BOTH_P1_S1_BR, Q_R, Q_BL, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_TR2BL, LS_A_BL2TR, 300 },	// LS_PARRY_LR
 	{ "Reflect LL", BOTH_P1_S1_BL, Q_R, Q_BR, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_TL2BR, LS_A_BR2TL, 300 },	// LS_PARRY_LL,
 
-	/*
 	//Raz: JA+ moves
-	{"JaPlusSpinAtk", 0,				0,		0,		AFLAG_ACTIVE,	0,		0,			0,				0,				0 }, //
-	{"StfNewAnimSpinKickFwd", 0,		0,		0,		AFLAG_ACTIVE,	0,		0,			0,				0,				0 }, //
-	{"NewAnimJumpBackKickSpin", 0,		0,		0,		AFLAG_ACTIVE,	0,		0,			0,				0,				0 }, //
-	{"NewAnimJumpBackKickFlip", 0,		0,		0,		AFLAG_ACTIVE,	0,		0,			0,				0,				0 }, //
-	{"NewAnimFlipSaberStab", 0,			0,		0,		AFLAG_ACTIVE,	0,		0,			0,				0,				0 }, //
-	*/
+	{ "JaPlusSpinAtk",				BOTH_MELEE_SPINKICK,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_S_R2L,		200 }, // LS_JAPLUS_SPINATK
+	{ "StfNewAnimSpinKickFwd",		BOTH_MELEE_BACKKICK,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_S_R2L,		200 }, // LS_JAPLUS_STFNEWANIM_SPINKICKFWD
+	{ "NewAnimJumpBackKickSpin",	BOTH_STAND1,			0,		0,		AFLAG_ACTIVE,	0,		0,			LS_READY,		LS_S_R2L,		0 }, // LS_JAPLUS_NEWANIM_JUMPBACKKICKSPIN
+	{ "NewAnimJumpBackKickFlip",	BOTH_STAND1,			0,		0,		AFLAG_ACTIVE,	0,		0,			LS_READY,		LS_S_R2L,		0 }, // LS_JAPLUS_NEWANIM_JUMPBACKKICKFLIP
+	{ "NewAnimFlipSaberStab",		BOTH_STAND1,			0,		0,		AFLAG_ACTIVE,	0,		0,			LS_READY,		LS_S_R2L,		0 }, // LS_JAPLUS_NEWANIM_FLIPSABERSTAB
 };
 
 
@@ -2100,32 +2098,37 @@ saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
 
 int PM_KickMoveForConditions( void ) {
 	int kickMove = LS_KICK_F;
+	const bool enableSpinkick = !GetCPD( pm_entSelf, CPD_NOSPINKICKS ) && GetCInfo( CINFO_SPINKICKS );
 
 	//FIXME: only if FP_SABER_OFFENSE >= 3
-	if ( pm->cmd.rightmove ) {//kick to side
-		if ( pm->cmd.rightmove > 0 ) {//kick right
-			kickMove = /*(pm->cmd.forwardmove>0) ? BOTH_MELEE_BACKKICK : */LS_KICK_R;
+	if ( pm->cmd.rightmove ) {
+		// kick to side
+		if ( pm->cmd.rightmove > 0 ) {
+			// kick right
+			kickMove = (enableSpinkick && pm->cmd.forwardmove > 0) ? LS_JAPLUS_STFNEWANIM_SPINKICKFWD : LS_KICK_R;
 		}
-		else {//kick left
-			kickMove = /*(pm->cmd.forwardmove>0) ? BOTH_MELEE_SPINKICK : */LS_KICK_L;
+		else {
+			// kick left
+			kickMove = (enableSpinkick && pm->cmd.forwardmove > 0) ? LS_JAPLUS_SPINATK : LS_KICK_L;
 		}
 		pm->cmd.rightmove = 0;
 	}
-	else if ( pm->cmd.forwardmove ) {//kick front/back
-		if ( pm->cmd.forwardmove > 0 ) {//kick fwd
+	else if ( pm->cmd.forwardmove ) {
+		// kick front/back
+		if ( pm->cmd.forwardmove > 0 ) {
+			// kick fwd
 			/*
-			if (pm->ps->groundEntityNum != ENTITYNUM_NONE &&
-			PM_CheckEnemyPresence( DIR_FRONT, 64.0f ))
-			{
-			kickMove = LS_HILT_BASH;
+			if ( pm->ps->groundEntityNum != ENTITYNUM_NONE && PM_CheckEnemyPresence( DIR_FRONT, 64.0f ) ) {
+				kickMove = LS_HILT_BASH;
 			}
-			else
-			*/
-			{
+			else {
 				kickMove = LS_KICK_F;
 			}
+			*/
+			kickMove = LS_KICK_F;
 		}
-		else {//kick back
+		else {
+			// kick back
 			kickMove = LS_KICK_B;
 		}
 		pm->cmd.forwardmove = 0;

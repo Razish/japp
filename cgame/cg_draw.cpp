@@ -1343,7 +1343,9 @@ void CG_DrawHUD( centity_t *cent ) {
 			S_COLOR_GREEN "cg.time: %i\n"
 			S_COLOR_GREEN "speed: %f\n"
 			S_COLOR_CYAN "legsTimer: %i\n"
-			S_COLOR_CYAN "groundEntityNum: %i",
+			S_COLOR_CYAN "groundEntityNum: %i\n"
+			S_COLOR_ORANGE "altdim: %i\n"
+			S_COLOR_ORANGE "cinfo: %u\n",
 			ps->legsAnim,
 			ps->torsoAnim,
 			ps->duelIndex,
@@ -1366,7 +1368,10 @@ void CG_DrawHUD( centity_t *cent ) {
 			cg.time,
 			ps->speed,
 			ps->legsTimer,
-			ps->groundEntityNum );
+			ps->groundEntityNum,
+			!!(cg.snap->ps.eFlags & EF_ALT_DIM),
+			cgs.japp.jp_cinfo
+		);
 
 		Text_Paint( 16 * cgs.widthRatioCoef, y - 380, 0.5f, &colorTable[CT_WHITE], str, 0.0f, 0,
 			ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
