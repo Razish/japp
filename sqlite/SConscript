@@ -15,7 +15,7 @@ files = [
 files = [build_dir + f for f in files]
 
 # project settings
-if realcc == 'gcc' or realcc == 'clang':
+if realcc == 'gcc' or realcc == 'clang' and plat != 'Windows':
 	sqlite_env['CCFLAGS'] += [
 		'-fPIC',
 	]

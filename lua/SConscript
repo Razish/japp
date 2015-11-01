@@ -51,6 +51,11 @@ if plat == 'Linux':
 	lua_env['CPPDEFINES'] += [
 		'LUA_USE_LINUX',
 	]
+	if realcc == 'gcc' or realcc == 'clang':
+		lua_env['CCFLAGS'] += [
+			'-fPIC',
+		]
+
 lua_env['CPPDEFINES'] += [
 	'LUA_COMPAT_BITLIB',
 	'LUA_COMPAT_APIINTCASTS',

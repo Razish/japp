@@ -5362,20 +5362,18 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 			}
 		}
 	}
-	else //We can't find a waypoint, going to need a fallback routine.
-	{
-		/*if (level.gametype == GT_DUEL)*/
-		{ //helps them get out of messy situations
-			/*if ((level.time - bs->forceJumpChargeTime) > 3500)
-			{
+	else {
+		// we can't find a waypoint, going to need a fallback routine.
+		/*
+		if ( (level.time - bs->forceJumpChargeTime) > 3500 ) {
 			bs->forceJumpChargeTime = level.time + 2000;
-			trap->EA_MoveForward(bs->client);
-			}
-			*/
-			bs->jumpTime = level.time + 1500;
-			bs->jumpHoldTime = level.time + 1500;
-			bs->jDelay = 0;
+			trap->EA_MoveForward( bs->client );
 		}
+		*/
+		bs->jumpTime = level.time + 1500;
+		bs->jumpHoldTime = level.time + 1500;
+		bs->jDelay = 0;
+
 		doingFallback = BotFallbackNavigation( bs );
 	}
 

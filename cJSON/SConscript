@@ -14,6 +14,12 @@ files = [
 ]
 files = [build_dir + f for f in files]
 
+# project settings
+if realcc == 'gcc' or realcc == 'clang' and plat != 'Windows':
+	json_env['CCFLAGS'] += [
+		'-fPIC',
+	]
+
 # targets
 result = json_env.StaticLibrary(
 	build_dir + 'libcJSON',

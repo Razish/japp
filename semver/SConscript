@@ -20,6 +20,10 @@ if realcc == 'gcc' or realcc == 'clang':
 		'-std=c99',
 		'-Wno-declaration-after-statement',
 	]
+if realcc == 'gcc' or realcc == 'clang' and plat != 'Windows':
+	semver_env['CCFLAGS'] += [
+		'-fPIC',
+	]
 
 # targets
 result = semver_env.StaticLibrary(

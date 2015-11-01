@@ -20,6 +20,12 @@ files = [
 ]
 files = [build_dir + f for f in files]
 
+# project settings
+if realcc == 'gcc' or realcc == 'clang' and plat != 'Windows':
+	udis86_env['CCFLAGS'] += [
+		'-fPIC',
+	]
+
 # targets
 result = udis86_env.StaticLibrary(
 	build_dir + 'libudis86',
