@@ -177,6 +177,15 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 	} break;
 
 	}
+		if ( !string.empty() ) {
+		if ( std::string( admin_strings[type].name ).find( "ALL" ) ) {
+			G_Announce( string.c_str() );
+			return;
+		}
+		else {
+			trap->SendServerCommand( ent->s.number, va( "cp \"%s\n\"", string.c_str() ) );
+		}
+	}
 
 	if ( announce ) {
 		std::string anon = string_list[announce];
@@ -190,15 +199,7 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 				anon.replace( anon.find_first_of( "$3" ), 2, arg2 );
 				trap->SendServerCommand( ent->s.number, va( "print \"%s\n\"", anon.c_str() ) );
 			}
-			G_Announce( anon.c_str() );
-		}
-	}
-	if ( !string.empty() ) {
-		if ( std::string( admin_strings[type].name ).find( "ALL" ) ) {
-			G_Announce( string.c_str() );
-		}
-		else {
-			trap->SendServerCommand( ent->s.number, va( "cp \"%s\n\"", string.c_str() ) );
+			G_Announce( anon.c_str(), ent->s.number);
 		}
 	}
 }

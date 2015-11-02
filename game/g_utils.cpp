@@ -1708,8 +1708,15 @@ const char *G_PrintClient( int clientNum ) {
 	return out;
 }
 
-void G_Announce(const char *msg) {
+void G_Announce( const char *msg ) {
 	trap->SendServerCommand( -1, va( "cp \"%s\"", msg ) );
+}
+
+void G_Announce( const char *msg, int except ){
+	for (int i = 0; i < MAX_CLIENTS; i++){
+		if (i == except) continue;
+		trap->SendServerCommand(i, va( "cp \"%s\"", msg ) );
+	}
 }
 
 struct modelBounds_t {

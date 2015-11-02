@@ -855,6 +855,7 @@ void			G_AddPredictableEvent( gentity_t *ent, int event, int eventParm );
 char *			G_AddSpawnVarToken( const char *string );
 void *			G_Alloc( int size );
 void			G_Announce( const char *msg );
+void 			G_Announce( const char *msg, int except );
 void			G_AvoidBox( gentity_t *ent );
 int				G_BoneIndex( const char *name );
 qboolean		G_BotConnect( int clientNum, qboolean restart );
