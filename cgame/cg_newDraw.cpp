@@ -1,6 +1,7 @@
 #include "cg_local.h"
 #include "ui/ui_shared.h"
 #include "cg_media.h"
+#include "bg_lua.h"
 
 extern displayContextDef_t cgDC;
 
