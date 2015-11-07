@@ -1468,6 +1468,15 @@ namespace JPLua {
 	#endif
 
 
+	#ifdef PROJECT_CGAME
+	static int Export_IsKeyDown( lua_State *L ){
+		int key = luaL_checkinteger( L, 1 );
+		lua_pushboolean(L, trap->Key_IsDown( key ) );
+		return 1;
+	}
+
+	#endif
+
 	static const importTable_t imports[] = {
 	#ifdef PROJECT_GAME
 		{ "AddClientCommand", Export_AddClientCommand }, // AddClientCommand( string cmd )
@@ -1537,6 +1546,9 @@ namespace JPLua {
 		{ "GetScores", Export_GetScores }, // integer, integer GetScores()
 	#endif
 		{ "GetTime", Export_GetTime }, // integer GetTime()
+	#ifdef PROJECT_CGAME
+		{ "IsKeyDown", Export_IsKeyDown }, // boolean IsKeyDown( integer ) 
+	#endif
 		{ "OpenFile", File_Open},
 		{ "RayTrace", Export_Trace }, // traceResult Trace( stuff )
 	#ifdef PROJECT_CGAME
