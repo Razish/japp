@@ -34,6 +34,7 @@ namespace JPLua {
 		ENUM2STRING( JPLUA_EVENT_CONNECTSCREEN ),
 		ENUM2STRING( JPLUA_EVENT_PAIN ),
 		ENUM2STRING( JPLUA_EVENT_PLAYERDEATH ),
+		ENUM2STRING( JPLUA_EVENT_KEYDOWN ),
 		ENUM2STRING( JPLUA_EVENT_SABERTOUCH ),
 	};
 
@@ -779,6 +780,28 @@ namespace JPLua {
 			}
 			Call(ls.L, 1, 0);
 			ret = qtrue;
+		}
+#endif // JPLUA
+		return ret;
+	}
+#endif
+
+#if defined(PROJECT_CGAME)
+	qboolean Event_KeyDown( int key ) {
+		qboolean ret = qfalse;
+#ifdef JPLUA
+		plugin_t *plugin = NULL;
+		while ( IteratePlugins( &plugin ) ) {
+			if ( plugin->eventListeners[JPLUA_EVENT_PAIN] ) {
+				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_PAIN] );
+				
+				lua_pushstring( ls.L, va("%c", key));
+
+				Call( ls.L, 1, 1 );
+				if ( !ret ) {
+					ret = !!lua_toboolean( ls.L, -1 );
+				}
+			}
 		}
 #endif // JPLUA
 		return ret;

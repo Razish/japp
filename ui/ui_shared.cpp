@@ -1220,6 +1220,16 @@ menuDef_t *Menus_FindByName( const char *p ) {
 	return NULL;
 }
 
+menuDef_t *Menus_FindByID( int id ) {
+	int i;
+	for ( i = 0; i < menuCount; i++ ) {
+		if ( Menus[i].id == id) {
+			return &Menus[i];
+		}
+	}
+	return NULL;
+}
+
 void Menus_ShowByName( const char *p ) {
 	menuDef_t *menu = Menus_FindByName( p );
 	if ( menu ) {

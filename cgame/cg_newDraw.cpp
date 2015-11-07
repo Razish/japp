@@ -785,6 +785,10 @@ void CG_KeyEvent( int key, qboolean down ) {
 	if ( !down ) {
 		return;
 	}
+	
+	if (JPLua::Event_KeyDown(key)){
+		return;
+	}
 
 	if ( CG_ChatboxActive() ) {
 		CG_ChatboxChar( key );

@@ -12,7 +12,7 @@ namespace JPLua {
 
 	struct interfaceItem_t {
 		int id;
-		char *name;
+		char name[64];
 		menuDef_t *parent;
 	};
 

@@ -22,7 +22,7 @@ namespace JPLua {
 		JPLUA_EVENT_PAIN,
 		JPLUA_EVENT_PLAYERDEATH,
 		JPLUA_EVENT_SABERTOUCH,
-
+		JPLUA_EVENT_KEYDOWN,
 		JPLUA_EVENT_MAX
 	};
 
@@ -109,5 +109,9 @@ namespace JPLua {
 #endif
 
 	qboolean Event_ServerCommand( void );
+
+#ifdef PROJECT_CGAME
+	qboolean Event_KeyDown( int key );
+#endif
 
 } // namespace JPLua

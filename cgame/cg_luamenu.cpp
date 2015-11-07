@@ -55,7 +55,7 @@ namespace JPLua {
 		luaL_argcheck( L, ud != NULL, 1, "'Menu' expected" );
 		interfaceMenu_t *data = (interfaceMenu_t *)ud;
 
-		return Menus_FindByName( data->name );
+		return Menus_FindByID( data->id );
 	}
 
 	void Interface_CallMenuFunc( int type, menuDef_t *menu ) {
@@ -155,15 +155,6 @@ namespace JPLua {
 	}
 	#endif
 
-	menuDef_t *Menus_GetByID( int id ) {
-		for ( int i = 0; i < menuCount; i++ ) {
-			if ( Menus[i].id == id ) {
-				return &Menus[i];
-			}
-		}
-		return NULL;
-	}
-
 	int Interface_CreateMenu( lua_State *L ) {
 		menuDef_t *menu = Interface_CreateMenu( luaL_checknumber( L, 1 ), luaL_checknumber( L, 2 ),
 			luaL_checknumber( L, 3 ), luaL_checknumber( L, 4 ), luaL_checkstring( L,5 )
@@ -180,7 +171,7 @@ namespace JPLua {
 	int Interface_GetMenu( lua_State *L ) {
 		int arg1Type = lua_type( L, 1 );
 		if ( arg1Type == LUA_TNUMBER ) {
-			menuDef_t *menu = Menus_GetByID( luaL_checkinteger( L, 1 ) );
+			menuDef_t *menu = Menus_FindByID( luaL_checkinteger( L, 1 ) );
 			if ( menu ) {
 				Menu_CreateRef( L, menu );
 			}
