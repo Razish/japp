@@ -6,12 +6,13 @@
 #include "bg_public.h"
 
 #if defined( PROJECT_GAME )
-#include "g_local.h"
+	#include "g_local.h"
 #elif defined( PROJECT_UI )
-#include "ui_local.h"
+	#include "ui_local.h"
 #elif defined( PROJECT_CGAME )
-#include "cg_local.h"
+	#include "cg_local.h"
 #endif
+
 #include "JAPP/jp_cinfo.h"
 
 #ifdef PROJECT_GAME
@@ -323,7 +324,7 @@ const stringID_table_t eTypes[ET_MAX] = {
 	ENUM2STRING( ET_EVENTS ),
 };
 
-qboolean BG_FileExists( const char *fileName ) {
+static qboolean BG_FileExists( const char *fileName ) {
 	if ( fileName && fileName[0] ) {
 		int fh = 0;
 		trap->FS_Open( fileName, &fh, FS_READ );

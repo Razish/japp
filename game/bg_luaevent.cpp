@@ -17,7 +17,7 @@ namespace JPLua {
 #endif
 	extern std::unordered_map<std::string, command_t> serverCommands;
 
-	static const stringID_table_t events[JPLUA_EVENT_MAX] = {
+	static const stringID_table_t eventNames[JPLUA_EVENT_MAX] = {
 		ENUM2STRING( JPLUA_EVENT_UNLOAD ),
 		ENUM2STRING( JPLUA_EVENT_RUNFRAME ),
 		ENUM2STRING( JPLUA_EVENT_CHATMSGRECV ),
@@ -56,7 +56,7 @@ namespace JPLua {
 		}
 
 		for ( int i = 0; i < JPLUA_EVENT_MAX; i++ ) {
-			if ( !Q_stricmp( listenerArg, events[i].name ) ) {
+			if ( !Q_stricmp( listenerArg, eventNames[i].name ) ) {
 				ls.currentPlugin->eventListeners[i] = luaL_ref( L, LUA_REGISTRYINDEX );
 				return 0;
 			}
@@ -93,7 +93,7 @@ namespace JPLua {
 		}
 
 		for ( i = 0; i < JPLUA_EVENT_MAX; i++ ) {
-			if ( !Q_stricmp( listenerArg, events[i].name ) ) {
+			if ( !Q_stricmp( listenerArg, eventNames[i].name ) ) {
 				luaL_unref( L, LUA_REGISTRYINDEX, ls.currentPlugin->eventListeners[i] );
 				ls.currentPlugin->eventListeners[i] = 0;
 				return 0;

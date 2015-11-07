@@ -6,8 +6,8 @@
 
 static void TranslateSyscalls( void );
 
-static intptr_t( QDECL *Q_syscall )(intptr_t arg, ...) = (intptr_t( QDECL * )(intptr_t, ...)) - 1;
-extern "C" Q_EXPORT void dllEntry( intptr_t( QDECL *syscallptr )(intptr_t arg, ...) ) {
+static intptr_t( Q_DECL *Q_syscall )(intptr_t arg, ...) = (intptr_t( Q_DECL * )(intptr_t, ...)) - 1;
+Q_CABI Q_EXPORT void dllEntry( intptr_t( Q_DECL *syscallptr )(intptr_t arg, ...) ) {
 	Q_syscall = syscallptr;
 
 	TranslateSyscalls();
@@ -987,7 +987,7 @@ void SVSyscall_Trace( trace_t *results, const vector3 *start, const vector3 *min
 	else
 		trap_Trace( results, start, mins, maxs, end, passEntityNum, contentmask );
 }
-void QDECL G_Error( int errorLevel, const char *error, ... ) {
+void Q_DECL G_Error( int errorLevel, const char *error, ... ) {
 	va_list argptr;
 	char text[1024];
 
@@ -998,7 +998,7 @@ void QDECL G_Error( int errorLevel, const char *error, ... ) {
 	trap_Error( text );
 }
 
-void QDECL G_Printf( const char *msg, ... ) {
+void Q_DECL G_Printf( const char *msg, ... ) {
 	va_list argptr;
 	char text[4096] = { 0 };
 	int ret;

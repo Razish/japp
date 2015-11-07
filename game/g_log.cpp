@@ -111,7 +111,7 @@ void G_LogWeaponInit( void ) {
 #endif //LOGGING_WEAPONS
 }
 
-void QDECL G_LogWeaponPickup( int client, int weaponid ) {
+void G_LogWeaponPickup( int client, int weaponid ) {
 	if ( client >= MAX_CLIENTS )
 		return;
 #ifdef LOGGING_WEAPONS
@@ -120,7 +120,7 @@ void QDECL G_LogWeaponPickup( int client, int weaponid ) {
 #endif //_LOGGING_WEAPONS
 }
 
-void QDECL G_LogWeaponFire( int client, int weaponid ) {
+void G_LogWeaponFire( int client, int weaponid ) {
 #ifdef LOGGING_WEAPONS
 	int dur;
 
@@ -138,7 +138,7 @@ void QDECL G_LogWeaponFire( int client, int weaponid ) {
 #endif //_LOGGING_WEAPONS
 }
 
-void QDECL G_LogWeaponDamage( int client, int mod, int amount ) {
+void G_LogWeaponDamage( int client, int mod, int amount ) {
 #ifdef LOGGING_WEAPONS
 	if ( client >= MAX_CLIENTS )
 		return;
@@ -147,7 +147,7 @@ void QDECL G_LogWeaponDamage( int client, int mod, int amount ) {
 #endif //_LOGGING_WEAPONS
 }
 
-void QDECL G_LogWeaponKill( int client, int mod ) {
+void G_LogWeaponKill( int client, int mod ) {
 #ifdef LOGGING_WEAPONS
 	if ( client >= MAX_CLIENTS )
 		return;
@@ -156,7 +156,7 @@ void QDECL G_LogWeaponKill( int client, int mod ) {
 #endif //_LOGGING_WEAPONS
 }
 
-void QDECL G_LogWeaponFrag( int attacker, int deadguy ) {
+void G_LogWeaponFrag( int attacker, int deadguy ) {
 #ifdef LOGGING_WEAPONS
 	if ( (attacker >= MAX_CLIENTS) || (deadguy >= MAX_CLIENTS) )
 		return;
@@ -165,7 +165,7 @@ void QDECL G_LogWeaponFrag( int attacker, int deadguy ) {
 #endif //_LOGGING_WEAPONS
 }
 
-void QDECL G_LogWeaponDeath( int client, int weaponid ) {
+void G_LogWeaponDeath( int client, int weaponid ) {
 #ifdef LOGGING_WEAPONS
 	if ( client >= MAX_CLIENTS )
 		return;
@@ -174,7 +174,7 @@ void QDECL G_LogWeaponDeath( int client, int weaponid ) {
 #endif //_LOGGING_WEAPONS
 }
 
-void QDECL G_LogWeaponPowerup( int client, int powerupid ) {
+void G_LogWeaponPowerup( int client, int powerupid ) {
 #ifdef LOGGING_WEAPONS
 	if ( client >= MAX_CLIENTS )
 		return;
@@ -183,7 +183,7 @@ void QDECL G_LogWeaponPowerup( int client, int powerupid ) {
 #endif //_LOGGING_WEAPONS
 }
 
-void QDECL G_LogWeaponItem( int client, int itemid ) {
+void G_LogWeaponItem( int client, int itemid ) {
 #ifdef LOGGING_WEAPONS
 	if ( client >= MAX_CLIENTS )
 		return;
@@ -1471,7 +1471,7 @@ int GetFavoriteWeaponForClient( int nClient ) {
 }
 
 // kef -- if a client leaves the game, clear out all counters he may have set
-void QDECL G_ClearClientLog( int client ) {
+void G_ClearClientLog( int client ) {
 	int i = 0;
 
 	for ( i = 0; i < WP_NUM_WEAPONS; i++ ) {

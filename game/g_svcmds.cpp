@@ -34,7 +34,7 @@ gclient_t *ClientForString( const char *s ) {
 	return NULL;
 }
 
-int QDECL G_SortPlayersByScoreRate( const void *a, const void *b ) {
+int G_SortPlayersByScoreRate( const void *a, const void *b ) {
 	gclient_t *cla = &level.clients[*((int*)a)],
 		*clb = &level.clients[*((int*)b)];
 	float arate, brate;

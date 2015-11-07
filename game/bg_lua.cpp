@@ -435,7 +435,6 @@ namespace JPLua {
 				ls.currentPlugin->requiredJPLuaVersion.patch
 			);
 			luaD_throw( L, LUA_ERRRUN );
-			return 0;
 		}
 		//save in the registry, but push on stack again straight away
 		ls.currentPlugin->handle = luaL_ref( L, LUA_REGISTRYINDEX );

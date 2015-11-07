@@ -1,98 +1,6 @@
 #pragma once
 
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
-
-
-// q_shared.h -- included first by ALL program modules.
-// A user mod should never modify this file
-
-//NOTENOTE: Only change this to re-point ICARUS to a new script directory
-#define Q3_SCRIPT_DIR	"scripts"
-
-#define MAX_TEAMNAME 32
-
-#define JAPLUS_CLIENT_VERSION	"1.4B4"
-
-#if defined(PROJECT_GAME)
-// ...
-#elif defined(PROJECT_CGAME) || defined(PROJECT_UI)
-//	#define JPLUA_DEBUG
-#define RAZTEST //Vehicles? First person stuff?
-#define IMPROVED_RAGDOLL
-//	#define FAV_SERVERS // jappeng adds this to engine
-#endif
-
-#include "teams.h" //npc team stuff
-
-#define MAX_WORLD_COORD		( 64 * 1024 )
-#define MIN_WORLD_COORD		( -64 * 1024 )
-#define WORLD_SIZE			( MAX_WORLD_COORD - MIN_WORLD_COORD )
-
-//Pointer safety utilities
-#define VALID( a )		( a != NULL )
-#define	VALIDATE( a )	( assert( a ) )
-
-#define	VALIDATEV( a )	if ( a == NULL ) {	assert(0);	return;			}
-#define	VALIDATEB( a )	if ( a == NULL ) {	assert(0);	return qfalse;	}
-#define VALIDATEP( a )	if ( a == NULL ) {	assert(0);	return NULL;	}
-
-#define VALIDSTRING( a )	( ( a != NULL ) && ( a[0] != '\0' ) )
-#define VALIDENT( e )		( ( e != NULL ) && ( (e)->inuse ) )
-
-#define ARRAY_LEN( x ) ( sizeof( x ) / sizeof( *(x) ) )
-#define STRING( a ) #a
-#define XSTRING( a ) STRING( a )
-
-
-/*
-#define G2_EHNANCEMENTS
-
-#ifdef G2_EHNANCEMENTS
-//these two will probably explode if they're defined independant of one another.
-//rww - RAGDOLL_BEGIN
-#define JK2_RAGDOLL
-//rww - RAGDOLL_END
-//rww - Bone cache for multiplayer base.
-#define MP_BONECACHE
-#endif
-*/
-
-#ifdef _DEBUG
-#define G2_PERFORMANCE_ANALYSIS
-#define _FULL_G2_LEAK_CHECKING
-extern int g_Ghoul2Allocations;
-extern int g_G2ServerAlloc;
-extern int g_G2ClientAlloc;
-extern int g_G2AllocServer;
-#endif
-
-#if defined(_MSC_VER)
-
-	// MSVC
-	#define Q_EXPORT __declspec(dllexport)
-	#define Q_NAKED __declspec(naked)
-	#define Q_USED
-	#define Q_UNUSED
-	#define Q_CABI
-
-#elif defined(__GNUC__) && (__GNUC__ >= 3)
-
-	// GCC, ICC, Clang
-	#define Q_EXPORT __attribute__(( visibility( "default" ) ))
-	#define Q_NAKED __attribute__(( noinline ))
-	#define Q_USED __attribute__(( used ))
-	#define Q_UNUSED __attribute__(( unused ))
-
-#else
-
-	#define Q_EXPORT
-	#define Q_NAKED
-	#define Q_USED
-	#define Q_UNUSED
-
-#endif
-
+// standard c headers
 #include <cassert>
 #include <cmath>
 #include <cstdio>
@@ -106,183 +14,76 @@ extern int g_G2AllocServer;
 #include <cerrno>
 #include <cstdint>
 
+// standard c++ headers
 #include <algorithm>
 #include <string>
 
-#if UINTPTR_MAX == 0xffffffff
-#define ARCH_WIDTH 32
-#elif UINTPTR_MAX == 0xffffffffffffffff
-#define ARCH_WIDTH 64
-#else
-#error "Could not determine architecture"
+// OS specific definitions
+#if defined(_WIN32)
+
+	#define WIN32_LEAN_AND_MEAN
+	#define NOSCROLL
+	#if defined(_MSC_VER)
+		#define NOMINMAX
+	#endif
+	#include <windows.h>
+	#include <Shellapi.h>
+
+	#define	PATH_SEP "\\"
+	#define DLL_EXT ".dll"
+
+#elif defined(MACOS_X)
+
+	#include <sys/mman.h>
+	#include <unistd.h>
+	#define stricmp strcasecmp
+
+	#define	PATH_SEP "/"
+	#define DLL_EXT ".dylib"
+
+#elif defined(__linux__)
+
+	#include <sys/mman.h>
+	#include <unistd.h>
+	#define stricmp strcasecmp
+	#define	PATH_SEP "/"
+	#define DLL_EXT ".so"
+	#define RAND_MAX 2147483647
+
 #endif
 
-#if defined(__arm__) || defined(_M_ARM)
-	#define QARCH_ARM
-#endif
-
-#define JAPP_VERSION_SMALL "JA++, " XSTRING( ARCH_WIDTH ) " bits, " __DATE__
-#ifdef REVISION
-#define JAPP_VERSION JAPP_VERSION_SMALL ", " REVISION
-#else
-#define JAPP_VERSION JAPP_VERSION_SMALL
-#endif
-
-// this is the define for determining if we have an asm version of a C function
-#if (defined(_M_IX86) || defined(__i386__)) && !defined(__sun__) && !defined(__LCC__)
-#define id386	1
-#else
-#define id386	0
-#endif
-
-#if (defined(powerc) || defined(powerpc) || defined(ppc) || defined(__ppc) || defined(__ppc__)) && !defined(C_ONLY)
-#define idppc	1
-#else
-#define idppc	0
-#endif
-
-// for windows fastcall option
-#define	QDECL
-
-short BigShort( short l );
-short LittleShort( short l );
-int BigLong( int l );
-int LittleLong( int l );
-float BigFloat( const float *l );
-float LittleFloat( const float l );
-
-
-// WIN32 DEFINES
-
-#ifdef _WIN32
-
-//Raz: added
-#define WIN32_LEAN_AND_MEAN
-#define NOSCROLL
+// compiler specific definitions
 #if defined(_MSC_VER)
-	define NOMINMAX
-#endif
-#include <windows.h>
-#include <Shellapi.h>
 
-#undef QDECL
-#define	QDECL __cdecl
+	// MSVC
+	#define Q_EXPORT __declspec(dllexport)
+	#define Q_NAKED __declspec(naked)
+	#define Q_USED
+	#define Q_UNUSED
+	#define Q_DECL __cdecl
 
-// buildstring will be incorporated into the version string
-#define ARCH_STRING "x86"
+#elif defined(__GNUC__) && (__GNUC__ >= 3)
 
-//#define USE_SSE
+	// GCC, ICC, Clang
+	#define Q_EXPORT __attribute__(( visibility( "default" ) ))
+	#define Q_NAKED __attribute__(( noinline ))
+	#define Q_USED __attribute__(( used ))
+	#define Q_UNUSED __attribute__(( unused ))
+	#define Q_DECL __attribute__(( cdecl ))
 
-#define	PATH_SEP "\\"
-#define DLL_EXT ".dll"
+#else
 
-#endif // _WIN32
+	#define Q_EXPORT
+	#define Q_NAKED
+	#define Q_USED
+	#define Q_UNUSED
+	#define Q_DECL
 
-
-// MAC OS X DEFINES
-#ifdef MACOS_X
-
-#include <sys/mman.h>
-#include <unistd.h>
-
-#define __cdecl
-#define __declspec(x)
-#define stricmp strcasecmp
-
-#if defined(__ppc__)
-#define ARCH_STRING "ppc"
-#define Q3_BIG_ENDIAN
-#elif defined(__i386__)
-#define ARCH_STRING "x86"
-#define Q3_LITTLE_ENDIAN
-#elif defined(__x86_64__)
-#define idx64
-#define ARCH_STRING "x86_64"
-#define Q3_LITTLE_ENDIAN
 #endif
 
-#define	PATH_SEP "/"
-#define DLL_EXT ".dylib"
+#define Q_CABI extern "C"
 
-#endif // MACOS_X
-
-
-// LINUX DEFINES
-
-#ifdef __linux__
-#include <sys/mman.h>
-#include <unistd.h>
-
-#define stricmp strcasecmp
-
-#if defined(__i386__)
-#define ARCH_STRING "i386"
-#elif defined(__x86_64__)
-#define idx64
-#define ARCH_STRING "x86_64"
-#elif defined(__powerpc64__)
-#define ARCH_STRING "ppc64"
-#elif defined(__powerpc__)
-#define ARCH_STRING "ppc"
-#elif defined(__s390__)
-#define ARCH_STRING "s390"
-#elif defined(__s390x__)
-#define ARCH_STRING "s390x"
-#elif defined(__ia64__)
-#define ARCH_STRING "ia64"
-#elif defined(__alpha__)
-#define ARCH_STRING "alpha"
-#elif defined(__sparc__)
-#define ARCH_STRING "sparc"
-#elif defined(__arm__)
-#define ARCH_STRING "arm"
-#elif defined(__cris__)
-#define ARCH_STRING "cris"
-#elif defined(__hppa__)
-#define ARCH_STRING "hppa"
-#elif defined(__mips__)
-#define ARCH_STRING "mips"
-#elif defined(__sh__)
-#define ARCH_STRING "sh"
-#endif
-
-#define	PATH_SEP "/"
-#define DLL_EXT ".so"
-
-#define RAND_MAX 2147483647
-
-#ifdef Q3_STATIC
-#define	GAME_HARD_LINKED
-#define	CGAME_HARD_LINKED
-#define	UI_HARD_LINKED
-#define	BOTLIB_HARD_LINKED
-#endif
-
-#endif // __linux__
-
-
-// FREEBSD DEFINES
-
-#ifdef __FreeBSD__ // rb010123
-
-#define stricmp strcasecmp
-
-#if defined(__i386__)
-#define ARCH_STRING "i386"
-#elif defined(__amd64__)
-#define idx64
-#define ARCH_STRING "amd64"
-#elif defined(__axp__)
-#define ARCH_STRING "alpha"
-#endif
-
-#define	PATH_SEP "/"
-#define DLL_EXT ".so"
-
-#endif // __FreeBSD__
-
-
-// compiler specific junk, function names etc
+// helper for current function name
 #if defined(_MSC_VER)
 	// visual studio
 	#define JAPP_FUNCTION __FUNCTION__
@@ -295,13 +96,25 @@ float LittleFloat( const float l );
 	//TODO: icc / intel
 #else
 	#define JAPP_FUNCTION "<unknown-func>"
-	#define JAPP_FUNCTION_VERBOSE XS_FUNCTION
+	#define JAPP_FUNCTION_VERBOSE JAPP_FUNCTION
 #endif
 
-#include "qcommon/q_asm.h"
+// check for 32/64 bit
+#if UINTPTR_MAX == 0xffffffff
+	#define ARCH_WIDTH 32
+#elif UINTPTR_MAX == 0xffffffffffffffff
+	#define ARCH_WIDTH 64
+#else
+	#error "Could not determine architecture"
+#endif
 
+#define Q3_LITTLE_ENDIAN // assume little endian
 
-// TYPE DEFINITIONS
+#if defined(__arm__) || defined(_M_ARM)
+	#define QARCH_ARM
+#endif
+
+// type definitions
 typedef unsigned char byte;
 typedef float real32_t;
 typedef double real64_t;
@@ -325,52 +138,64 @@ typedef int32_t qhandle_t, fxHandle_t, sfxHandle_t, fileHandle_t, clipHandle_t;
 #define NULL_HANDLE ((qhandle_t)0)
 #define NULL_FILE ((fileHandle_t)0)
 
+// helpers
+#define ARRAY_LEN( x )		( sizeof( x ) / sizeof( *(x) ) )
+#define STRING( a )			#a
+#define XSTRING( a )		STRING( a )
+#define VALIDSTRING( a )	( ( a != nullptr ) && ( a[0] != '\0' ) )
+
+#include "qcommon/q_asm.h"
+#include "teams.h" // npc team stuff
+
+// ja++ version
+#define JAPP_VERSION_SMALL "JA++, " XSTRING( ARCH_WIDTH ) " bits, " __DATE__
+#ifdef REVISION
+	#define JAPP_VERSION JAPP_VERSION_SMALL ", " REVISION
+#else
+	#define JAPP_VERSION JAPP_VERSION_SMALL
+#endif
+
+#define Q3_SCRIPT_DIR		"scripts"	// only change this to re-point ICARUS to a new script directory
+#define MAX_TEAMNAME		(32)
+#define MAX_WORLD_COORD		( 64 * 1024)
+#define MIN_WORLD_COORD		(-64 * 1024)
+#define WORLD_SIZE			(MAX_WORLD_COORD - MIN_WORLD_COORD)
+
+short BigShort( short l );
+short LittleShort( short l );
+int BigLong( int l );
+int LittleLong( int l );
+float BigFloat( const float *l );
+float LittleFloat( const float l );
+
 //FIXME: can't think of a better place to put this atm, should probably be in the platform specific definitions
 int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
 
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
-
-#define	MAX_QINT			0x7fffffff
+#define	MAX_QINT			(0x7fffffff)
 #define	MIN_QINT			(-MAX_QINT-1)
-
-
-// the game guarantees that no string from the network will ever
-// exceed MAX_STRING_CHARS
-#define	MAX_STRING_CHARS	1024	// max length of a string passed to Cmd_TokenizeString
-#define	MAX_STRING_TOKENS	1024	// max tokens resulting from Cmd_TokenizeString
-#define	MAX_TOKEN_CHARS		1024	// max length of an individual token
-
-#define	MAX_INFO_STRING		1024
-#define	MAX_INFO_KEY		1024
-#define	MAX_INFO_VALUE		1024
-
-#define	BIG_INFO_STRING		8192  // used for system info key only
-#define	BIG_INFO_KEY		  8192
-#define	BIG_INFO_VALUE		8192
-
-#define NET_ADDRSTRMAXLEN 48 // maximum length of an IPv6 address string including trailing '\0'
-
-//Raz: moved these from ui_local.h so we can access them everywhere
-#define MAX_ADDRESSLENGTH		256//64
-#define MAX_HOSTNAMELENGTH		256//22
-#define MAX_MAPNAMELENGTH		256//16
-#define MAX_STATUSLENGTH		256//64
-
-
-
-#define	MAX_QPATH			64		// max length of a quake game pathname
+#define	MAX_STRING_CHARS	(1024)	// max length of a string passed to Cmd_TokenizeString
+#define	MAX_STRING_TOKENS	(1024)	// max tokens resulting from Cmd_TokenizeString
+#define	MAX_TOKEN_CHARS		(1024)	// max length of an individual token
+#define	MAX_INFO_STRING		(1024)
+#define	MAX_INFO_KEY		(1024)
+#define	MAX_INFO_VALUE		(1024)
+#define	BIG_INFO_STRING		(8192)  // used for system info key only
+#define	BIG_INFO_KEY		(8192)
+#define	BIG_INFO_VALUE		(8192)
+#define NET_ADDRSTRMAXLEN	(48)	// maximum length of an IPv6 address string including trailing '\0'
+#define MAX_ADDRESSLENGTH	(256)	// 64
+#define MAX_HOSTNAMELENGTH	(256)	// 22
+#define MAX_MAPNAMELENGTH	(256)	// 16
+#define MAX_STATUSLENGTH	(256)	// 64
+#define	MAX_QPATH			(64)	// max length of a quake game pathname
 #ifdef PATH_MAX
-#define MAX_OSPATH			PATH_MAX
+	#define MAX_OSPATH		PATH_MAX
 #else
-#define	MAX_OSPATH			256		// max length of a filesystem pathname
+	#define	MAX_OSPATH		256		// max length of a filesystem pathname
 #endif
-
 #define	MAX_NAME_LENGTH		32		// max length of a client name
 #define MAX_NETNAME			36
-
-#define	MAX_SAY_TEXT	150
+#define	MAX_SAY_TEXT		150
 
 // paramters for command buffer stuffing
 typedef enum cbufExec_t {
@@ -379,10 +204,7 @@ typedef enum cbufExec_t {
 	EXEC_APPEND			// add to end of the command buffer (normal case)
 } cbufExec_t;
 
-
-//
 // these aren't needed by any of the VMs.  put in another header?
-//
 #define	MAX_MAP_AREA_BYTES		32		// bit vector of area visibility
 
 
@@ -925,37 +747,8 @@ struct cplane_s;
 extern	vector3	vec3_origin;
 extern	vector3	axisDefault[3];
 
-#if idppc
-
-static inline float Q_rsqrt( float number ) {
-	float x = 0.5f * number;
-	float y;
-#ifdef __GNUC__
-	asm("frsqrte %0,%1" : "=f" (y) : "f" (number));
-#else
-	y = __frsqrte( number );
-#endif
-	return y * (1.5f - (x * y * y));
-}
-
-#ifdef __GNUC__
-static inline float Q_fabs(float x) {
-	float abs_x;
-
-	asm("fabs %0,%1" : "=f" (abs_x) : "f" (x));
-	return abs_x;
-}
-#else
-#define Q_fabs __fabsf
-#endif
-
-#else
-
 float Q_fabs( float f );
 float Q_rsqrt( float f );		// reciprocal square root
-
-#endif
-
 
 #define SQRTFAST( x ) ( (x) * Q_rsqrt( x ) )
 
@@ -1181,8 +974,8 @@ void Info_NextPair( const char **s, char *key, char *value );
 extern void( *Com_Error )(int level, const char *error, ...);
 extern void( *Com_Printf )(const char *msg, ...);
 #else
-void QDECL Com_Error( int level, const char *error, ... );
-void QDECL Com_Printf( const char *msg, ... );
+void Q_DECL Com_Error( int level, const char *error, ... );
+void Q_DECL Com_Printf( const char *msg, ... );
 #endif
 
 

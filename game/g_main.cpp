@@ -1093,7 +1093,7 @@ void AdjustTournamentScores( void ) {
 	}
 }
 
-int QDECL SortRanks( const void *a, const void *b ) {
+int SortRanks( const void *a, const void *b ) {
 	gclient_t	*ca, *cb;
 
 	ca = &level.clients[*(int *)a];
@@ -1566,7 +1566,7 @@ void ExitLevel( void ) {
 }
 
 // Print to the logfile with a time stamp if it is open
-void QDECL G_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
+void G_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	va_list argptr;
 	char string[1024] = { 0 };
 	size_t len;
@@ -3015,7 +3015,8 @@ void G_RunFrame( int levelTime ) {
 			if ( level.pause.state == PAUSE_NONE
 				&& !level.intermissiontime
 				&& !(ent->client->ps.pm_flags & PMF_FOLLOW)
-				&& ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+				&& ent->client->sess.sessionTeam != TEAM_SPECTATOR )
+			{
 				WP_ForcePowersUpdate( ent, &ent->client->pers.cmd );
 				WP_SaberPositionUpdate( ent, &ent->client->pers.cmd );
 				WP_SaberStartMissileBlockCheck( ent, &ent->client->pers.cmd );
@@ -3250,8 +3251,8 @@ static qboolean	G_NAV_CheckNodeFailedForEnt( int entID, int nodeNum ) {
 }
 
 gameImport_t *trap = NULL;
-extern "C" {
-Q_EXPORT gameExport_t* QDECL GetModuleAPI( int apiVersion, gameImport_t *import ) {
+Q_CABI {
+Q_EXPORT gameExport_t* Q_DECL GetModuleAPI( int apiVersion, gameImport_t *import ) {
 	static gameExport_t ge = { 0 };
 
 	assert( import );

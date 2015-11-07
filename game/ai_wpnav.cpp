@@ -1787,7 +1787,7 @@ void FlagObjects( void ) {
 	while ( i < level.num_entities ) {
 		ent = &g_entities[i];
 
-		if ( VALIDENT( ent ) && ent->classname ) {
+		if ( G_IsValidEntity( ent ) && ent->classname ) {
 			if ( !flag_red && strcmp( ent->classname, "team_CTF_redflag" ) == 0 )
 				flag_red = ent;
 			else if ( !flag_blue && strcmp( ent->classname, "team_CTF_blueflag" ) == 0 )
@@ -2651,7 +2651,7 @@ void BeginAutoPathRoutine( void ) { //Called for RMG levels.
 	while ( i < level.num_entities ) {
 		ent = &g_entities[i];
 
-		if ( VALIDENT( ent ) && VALIDSTRING( ent->classname ) && !Q_stricmp( ent->classname, "info_player_deathmatch" ) ) {
+		if ( G_IsValidEntity( ent ) && VALIDSTRING( ent->classname ) && !Q_stricmp( ent->classname, "info_player_deathmatch" ) ) {
 			if ( ent->s.origin.z < 1280 ) { //h4x
 				gSpawnPoints[gSpawnPointNum] = ent;
 				gSpawnPointNum++;

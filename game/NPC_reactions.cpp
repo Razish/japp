@@ -32,7 +32,6 @@ static void NPC_CheckAttacker( gentity_t *other, int mod ) {
 	//			as an enemy.  Ideally, there would be code before this to prevent that from
 	//			happening, but that is presumptuous.
 
-	//valid ent - FIXME: a VALIDENT macro would be nice here
 	if ( !other )
 		return;
 

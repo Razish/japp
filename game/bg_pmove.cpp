@@ -8572,7 +8572,7 @@ static void PM_CmdForSaberMoves( usercmd_t *ucmd ) {
 			}
 		}
 		else { //saberstaff attacks
-			int aLen = PM_AnimLength( 0, (animNumber_t)pm->ps->legsAnim );
+			aLen = PM_AnimLength( 0, (animNumber_t)pm->ps->legsAnim );
 			float lenMin = 1700.0f;
 			float lenMax = 1800.0f;
 
@@ -9178,13 +9178,15 @@ void PmoveSingle( pmove_t *pmove ) {
 		}
 		stiffenedUp = qtrue;
 	}
-	else if (
-		(pm->ps->legsAnim) == (BOTH_A2_STABBACK1) ||
-		(pm->ps->legsAnim) == (BOTH_ATTACK_BACK) ||
-		(pm->ps->legsAnim) == (BOTH_CROUCHATTACKBACK1) ||
-		(pm->ps->legsAnim) == (BOTH_FORCELEAP2_T__B_) ||
-		(pm->ps->legsAnim) == (BOTH_JUMPFLIPSTABDOWN) ||
-		(pm->ps->legsAnim) == (BOTH_JUMPFLIPSLASHDOWN1) ) {
+	else if ( pm->ps->legsAnim == BOTH_A2_STABBACK1
+		|| pm->ps->legsAnim == BOTH_ATTACK_BACK
+		|| pm->ps->legsAnim == BOTH_CROUCHATTACKBACK1
+		|| pm->ps->legsAnim == BOTH_FORCELEAP2_T__B_
+		|| pm->ps->legsAnim == BOTH_JUMPFLIPSTABDOWN
+		|| pm->ps->legsAnim == BOTH_JUMPFLIPSLASHDOWN1
+		|| pm->ps->legsAnim == BOTH_NEW_STABEE
+		|| pm->ps->legsAnim == BOTH_NEW_STABER )
+	{
 		stiffenedUp = qtrue;
 	}
 	else if ( pm->ps->legsAnim == BOTH_ROLL_STAB ) {

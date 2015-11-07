@@ -284,6 +284,20 @@ namespace JPLua {
 		return 1;
 	}
 
+	static int Player_GetDeaths( lua_State *L, jpluaEntity_t *ent ) {
+	#if defined(PROJECT_GAME)
+		lua_pushinteger( L, ent->client->ps.persistant[PERS_KILLED] );
+	#elif defined(PROJECT_CGAME)
+		if ( (int)(ent - ents) == cg.clientNum ) {
+			lua_pushinteger( L, cg.predictedPlayerState.persistant[PERS_KILLED] );
+		}
+		else {
+			lua_pushinteger( L, cg.scores[cgs.clientinfo[(int)(ent - ents)].score].deaths );
+		}
+	#endif
+		return 1;
+	}
+
 	static int Player_GetDueling( lua_State *L, jpluaEntity_t *ent ) {
 	#if defined(PROJECT_GAME)
 		lua_pushboolean( L, ent->client->ps.duelInProgress ? 1 : 0 );
@@ -944,6 +958,11 @@ namespace JPLua {
 	#elif defined(PROJECT_CGAME)
 			nullptr
 	#endif
+		},
+		{
+			"deaths",
+			Player_GetDeaths,
+			nullptr
 		},
 		{
 			"duelPartner",

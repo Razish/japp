@@ -12,8 +12,9 @@
 
 
 // the maximum size of game relative pathnames
-#define	MAX_QPATH		64
-
+#ifndef MAX_QPATH
+	#define	MAX_QPATH (64)
+#endif
 // QVM files
 
 #define	VM_MAGIC	0x12721444

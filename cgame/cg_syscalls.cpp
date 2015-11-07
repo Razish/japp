@@ -4,11 +4,11 @@
 // cg_syscalls.asm is included instead when building a qvm
 #include "cg_local.h"
 
-static intptr_t( QDECL *Q_syscall )(intptr_t arg, ...) = (intptr_t( QDECL * )(intptr_t, ...)) - 1;
+static intptr_t( Q_DECL *Q_syscall )(intptr_t arg, ...) = (intptr_t( Q_DECL * )(intptr_t, ...)) - 1;
 
 static void TranslateSyscalls( void );
 
-extern "C" Q_EXPORT void dllEntry(intptr_t(QDECL *syscallptr)(intptr_t arg, ...)) {
+Q_CABI Q_EXPORT void dllEntry(intptr_t(Q_DECL *syscallptr)(intptr_t arg, ...)) {
 	Q_syscall = syscallptr;
 
 	TranslateSyscalls();
@@ -743,7 +743,7 @@ float CGSyscall_R_GetDistanceCull( void ) { float tmp; trap_R_GetDistanceCull( &
 void CGSyscall_FX_PlayEffectID( int id, const vector3 *org, const vector3 *fwd, int vol, int rad, qboolean isPortal ) { if ( isPortal ) trap_FX_PlayPortalEffectID( id, org, fwd, vol, rad ); else trap_FX_PlayEffectID( id, org, fwd, vol, rad ); }
 void CGSyscall_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) { trap_G2API_CollisionDetect( collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, fRadius ); }
 
-void QDECL CG_Error( int level, const char *error, ... ) {
+void Q_DECL CG_Error( int level, const char *error, ... ) {
 	va_list argptr;
 	char text[1024] = { 0 };
 
@@ -754,7 +754,7 @@ void QDECL CG_Error( int level, const char *error, ... ) {
 	trap_Error( text );
 }
 
-void QDECL CG_Printf( const char *msg, ... ) {
+void Q_DECL CG_Printf( const char *msg, ... ) {
 	va_list argptr;
 	char text[4096] = { 0 };
 	int ret;

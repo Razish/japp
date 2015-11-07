@@ -103,9 +103,34 @@ static int cJSON_strcasecmp( const char *s1, const char *s2 ) {
 	return tolower( *(const unsigned char *)s1 ) - tolower( *(const unsigned char *)s2 );
 }
 
-static void *(*cJSON_malloc)(size_t sz) = malloc;
-static void *(*cJSON_realloc)(void *ptr, size_t sz) = realloc;
-static void( *cJSON_free )(void *ptr) = free;
+// override memory allocator
+
+#if defined(_MSC_VER)
+
+	// required to fix C4232: address of dllimport 'malloc' is not static, identity not guaranteed
+	//	does not happen with runtime symbol resolution
+
+	static void *local_malloc( size_t sz ) {
+		return malloc( sz );
+	}
+	static void *local_realloc( void *ptr, size_t sz ) {
+		return realloc( ptr, sz );
+	}
+	static void local_free( void *ptr ) {
+		free( ptr );
+	}
+
+	void *(*cJSON_malloc)	( size_t sz )				= local_malloc;
+	void *(*cJSON_realloc)	( void *ptr, size_t sz )	= local_realloc;
+	void  (*cJSON_free)		( void *ptr )				= local_free;
+
+#else
+
+	static void *(*cJSON_malloc)	( size_t sz )				= malloc;
+	static void *(*cJSON_realloc)	( void *ptr, size_t sz )	= realloc;
+	static void  (*cJSON_free)		( void *ptr )				= free;
+
+#endif
 
 static long cJSON_GenerateHashValue( const char *name, const int size ) {
 	int		i;
@@ -141,7 +166,6 @@ static char* cJSON_strdup( const char* str ) {
 
 void cJSON_InitHooks( cJSON_Hooks* hooks ) {
 	if ( !hooks ) {/* Reset hooks */
-
 		cJSON_malloc = malloc;
 		cJSON_realloc = realloc;
 		cJSON_free = free;

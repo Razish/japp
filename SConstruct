@@ -18,6 +18,9 @@
 debug = int( ARGUMENTS.get( 'debug', 0 ) )
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 no_sql = int( ARGUMENTS.get( 'no_sql', 0 ) )
+no_crashhandler = int( ARGUMENTS.get( 'no_crashhandler', 0 ) )
+toolStr = ARGUMENTS.get( 'tools', 'gcc,g++,ar,as,gnulink' )
+tools = [x for x in toolStr.split( ',' )]
 
 def cmp_version( v1, v2 ):
 	def normalise( v ):
@@ -67,10 +70,11 @@ else:
 clangHack = plat == 'Darwin'
 
 # create the build environment
+#FIXME: also consider LD, AS, AR in the toolset
 import os
 env = Environment(
 	TARGET_ARCH = arch,
-	tools = ['gcc', 'g++', 'ar', 'as', 'gnulink'],
+	tools = tools,
 	ENV = { 'PATH' : os.environ['PATH'] }
 )
 
@@ -145,46 +149,77 @@ if revision:
 		revision += '*'
 
 # set job/thread count
-if plat == 'Linux' or plat == 'Darwin':
-	# works on recent mac/linux
-	status, num_cores = commands.getstatusoutput( 'getconf _NPROCESSORS_ONLN' )
-	if status != 0:
+def GetNumCores():
+	if plat == 'Linux' or plat == 'Darwin':
+		# works on recent mac/linux
+		status, num_cores = commands.getstatusoutput( 'getconf _NPROCESSORS_ONLN' )
+		if status == 0:
+			return int(num_cores)
+
 		# only works on linux
 		status, num_cores = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
-	env.SetOption( 'num_jobs', int(num_cores) if status == 0 else 1 )
-elif plat == 'Windows':
-	num_cores = int( os.environ['NUMBER_OF_PROCESSORS'] )
-	env.SetOption( 'num_jobs', num_cores )
+		if status == 0:
+			return int(num_cores)
+
+		return 1;
+
+	elif plat == 'Windows':
+		# exists since at-least XP SP2
+		return int( os.environ['NUMBER_OF_PROCESSORS'] )
+env.SetOption( 'num_jobs', GetNumCores() )
 
 # notify the user of the build configuration
 if not env.GetOption( 'clean' ):
-	msg = 'Building for ' + plat + ' ' + str(bits) + ' bits (' \
+	# compile-time environment
+	msg = 'Building '
+	if revision:
+		msg += revision + ' '
+	msg += 'for ' + plat + ' '
+	if force32:
+		msg += 'forced '
+	msg += str(bits) + ' bits '
+	msg += '(' \
 		+ realcc + '/' + realcxx + ' ' + ccversion + ', '\
 		+ 'python ' + platform.python_version() + ', '\
 		+ 'scons ' + sconsversion \
-		+ ')'
+		+ ')\n'
+
+	# build
+	msg += 'using ' + str(env.GetOption( 'num_jobs' )) + ' threads'
+	msg += '\n' + realcc + ' located at ' + commands.getoutput( 'where ' + realcc ).split( '\n' )[0]
+	if 'AR' in env:
+		msg += '\n' + env['AR'] + ' located at ' + commands.getoutput( 'where ' + env['AR'] ).split( '\n' )[0]
+	if 'AS' in env:
+		msg += '\n' + env['AS'] + ' located at ' + commands.getoutput( 'where ' + env['AS'] ).split( '\n' )[0]
+	msg += '\npython located at ' + sys.executable
+	msg += '\nscons' + ' located at ' + commands.getoutput( 'where ' + 'scons' ).split( '\n' )[0]
+
+	# build options
+	msg += 'options: '
 	if debug:
-		msg += ', debug symbols'
+		msg += 'debug symbols, '
 	if debug == 0 or debug == 2:
 		msg += ', optimised'
-	msg += ', x87 fpu' if 'NO_SSE' in os.environ else ', SSE'
-	if force32:
-		msg += ', forcing 32 bit build'
-	msg += ', ' + str(env.GetOption( 'num_jobs' )) + ' threads'
-	#msg += '\n' + realcc + ' located at ' + commands.getoutput( 'where ' + realcc )
-	#msg += '\npython located at ' + sys.executable
-	#msg += '\nscons' + ' located at ' + commands.getoutput( 'where ' + 'scons' )
-	if revision:
-		msg += '\ngit revision: ' + revision
+	msg += 'x87 fpu\n' if 'NO_SSE' in os.environ else 'SSE\n'
+
 	print( msg )
+
+# clear default compiler/linker switches
+def emptyEnv( env, e ):
+	if e in env and env[e]:
+		print( 'discarding ' + e + ': ' + env[e] )
+	env[e] = []
+emptyEnv( env, 'CPPDEFINES' )
+emptyEnv( env, 'CFLAGS' )
+emptyEnv( env, 'CCFLAGS' )
+emptyEnv( env, 'CXXFLAGS' )
+emptyEnv( env, 'LINKFLAGS' )
 
 # compiler switches
 if realcc == 'gcc' or realcc == 'clang':
-	env['CPPDEFINES'] = []
-	env['CFLAGS'] = []
-	env['CCFLAGS'] = []
-	env['CXXFLAGS'] = []
-
+	env['CCFLAGS'] += [
+		#'-M',
+	]
 	# c warnings
 	env['CFLAGS'] += [
 		'-Wdeclaration-after-statement',
@@ -235,7 +270,7 @@ if realcc == 'gcc' or realcc == 'clang':
 	# gcc-specific warnings
 	if realcc == 'gcc' and cmp_version( ccversion, '4.6' ) >= 0 and arch != 'arm':
 		env['CCFLAGS'] += [
-			'-Wlogical-op'
+			'-Wlogical-op',
 		]
 
 		# requires gcc 4.7 or above
@@ -257,7 +292,7 @@ if realcc == 'gcc' or realcc == 'clang':
 	else:
 		env['CCFLAGS'] += [
 			'-mstackrealign',
-			'-masm=intel'
+			'-masm=intel',
 		]
 		if 'NO_SSE' in os.environ:
 			env['CCFLAGS'] += [
@@ -292,7 +327,6 @@ if realcc == 'gcc' or realcc == 'clang':
 			]
 	env['CCFLAGS'] += [
 		'-fvisibility=hidden',
-		'-fomit-frame-pointer',
 	]
 
 	# misc settings
@@ -313,18 +347,26 @@ if realcc == 'gcc' or realcc == 'clang':
 	]
 
 elif realcc == 'cl':
-	# msvc
-	env['CFLAGS'] = [
-		'/TC',	# compile as c
-	]
-	env['CCFLAGS'] = [
-		'/EHsc',				# exception handling
-		'/nologo',				# remove watermark
+	env['CCFLAGS'] += [
+		#'/showIncludes',
 	]
 
-	env['LINKFLAGS'] = [
+	# msvc
+	env['CFLAGS'] += [
+		'/TC',	# compile as c
+	]
+	env['CXXFLAGS'] += [
+		'/TP',	# compile as c++
+	]
+	env['CCFLAGS'] += [
+		'/EHsc',	# exception handling
+		'/nologo',	# remove watermark
+	]
+
+	env['LINKFLAGS'] += [
 		'/ERRORREPORT:none',	# don't send error reports for internal linker errors
 		'/NOLOGO',				# remove watermark
+		'/MACHINE:' + arch,		# 32/64 bit linking
 	]
 	if bits == 64:
 		env['LINKFLAGS'] += [
@@ -335,7 +377,7 @@ elif realcc == 'cl':
 			'/SUBSYSTEM:WINDOWS,5.1',	# graphical application, XP support
 		]
 
-	env['CPPDEFINES'] = [
+	env['CPPDEFINES'] += [
 		'_WIN32',
 	]
 	if bits == 64:
@@ -410,6 +452,7 @@ if debug == 0 or debug == 2:
 	if realcc == 'gcc' or realcc == 'clang':
 		env['CCFLAGS'] += [
 			'-O2', # O3 may not be best, due to cache size not being big enough for the amount of inlining performed
+			'-fomit-frame-pointer',
 		]
 		if debug == 0 and realcc == 'gcc':
 			env['LINKFLAGS'] += [
@@ -433,8 +476,14 @@ if debug == 0 or debug == 2:
 if debug:
 	if realcc == 'gcc' or realcc == 'clang':
 		env['CCFLAGS'] += [
-			'-ggdb3',
+			'-g3',
+			#'-pg',
+			#'-finstrument-functions',
+			'-fno-omit-frame-pointer',
 		]
+		#env['LINKFLAGS'] += [
+		#	'-pg',
+		#]
 	elif realcc == 'cl':
 		env['CCFLAGS'] += [
 			'/Od',		# disable optimisations
@@ -442,9 +491,10 @@ if debug:
 		    '/MDd',		# multi-threaded debug runtime for DLLs
 		]
 		env['LINKFLAGS'] += [
-			'/DEBUG',		# generate debug info
+			'/DEBUG',			# generate debug info
+			'/OPT:ICF',			# enable COMDAT folding
+			'/INCREMENTAL:NO',	# no incremental linking
 		]
-		env['PDB'] = product_name + '.pdb'
 
 	env['CPPDEFINES'] += [
 		'_DEBUG',
@@ -455,14 +505,20 @@ if revision:
 		'REVISION=\\"' + revision + '\\"'
 	]
 
+if no_crashhandler:
+	env['CPPDEFINES'] += [
+		'NO_CRASHHANDLER',
+	]
+
 if no_sql:
 	env['CPPDEFINES'] += [
 		'NO_SQL',
 	]
 
+# build-time settings
 env['CPPDEFINES'] += [
 	'JAPP_COMPILER=\\"' + realcc + ' ' + ccversion + '\\"',
-	'NO_CRASHHANDLER'
+	'ARCH_STRING=\\"' + arch + '\\"',
 ]
 
 env['CPPPATH'] = [
@@ -470,7 +526,7 @@ env['CPPPATH'] = [
 	'..' + os.sep + 'game',
 ]
 env['LIBPATH'] = [
-	'#' + os.sep + 'libs' + os.sep + plat + os.sep + str(bits) + os.sep
+	'#' + os.sep + 'libs' + os.sep + plat + os.sep + realcc + os.sep + str(bits) + os.sep
 ]
 
 if debug == 1:
@@ -484,8 +540,9 @@ else:
 projects = [
 	'game',
 	'cgame',
-	'ui'
+	'ui',
 ]
+
 for project in projects:
 	env.SConscript(
 		os.path.join( project, 'SConscript' ),
@@ -494,6 +551,7 @@ for project in projects:
 			'bits',
 			'configuration',
 			'env',
+			'no_crashhandler',
 			'no_sql',
 			'plat',
 			'realcc',

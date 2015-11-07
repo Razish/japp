@@ -605,25 +605,22 @@ void VectorRotate( vector3 *in, vector3 matrix[3], vector3 *out ) {
 	out->z = DotProduct( in, &matrix[2] );
 }
 
-#if !idppc
-/*
-** float q_rsqrt( float number )
-*/
 float Q_rsqrt( float number ) {
 	byteAlias_t ba;
-	float x2, y;
-	const float threehalfs = 1.5F;
+	float x2;
+	const float threehalfs = 1.5f;
 
 	x2 = number * 0.5F;
 	ba.f = number;
 	ba.i = 0x5f3759df - (ba.i >> 1);               // what the fuck?
-	y = ba.f;
+	float y = ba.f;
 	y = y * (threehalfs - (x2 * y * y));   // 1st iteration
-	//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+	//y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
 
-#ifdef __linux__
+#if defined(__linux__)
 	assert( !isnan( y ) );
 #endif
+
 	return y;
 }
 
@@ -633,7 +630,6 @@ float Q_fabs( float f ) {
 	ba.i &= 0x7FFFFFFF;
 	return ba.f;
 }
-#endif
 
 float LerpAngle( float from, float to, float frac ) {
 	float	a;
@@ -713,12 +709,9 @@ void SetPlaneSignbits( cplane_t *out ) {
 
 #if !( (defined MACOS_X || defined __linux__ || defined __FreeBSD__) && (defined __i386__) && (!defined C_ONLY)) // rb010123
 
-#if defined __LCC__ || defined C_ONLY || !id386 || defined(MINGW32)
+#if defined C_ONLY || defined(MINGW32)
 
 int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
-	float	dist1, dist2;
-	int		sides;
-
 	// fast axial cases
 	if ( p->type < 3 ) {
 		if ( p->dist <= emins->raw[p->type] ) {
@@ -731,6 +724,7 @@ int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
 	}
 
 	// general case
+	float dist1, dist2;
 	switch ( p->signbits ) {
 	case 0:
 		dist1 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
@@ -769,7 +763,7 @@ int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
 		break;
 	}
 
-	sides = 0;
+	int sides = 0;
 	if ( dist1 >= p->dist )
 		sides = 1;
 	if ( dist2 < p->dist )
@@ -838,7 +832,7 @@ Q_NAKED int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p )
 #if defined(_MSC_VER)
 	qasm1( jmp dword ptr[Ljmptab + eax * 4] )
 #elif defined(__GNUC__)
-	__asm__( "jmp dword ptr[%0 + eax * 4]\n" : : "r" (Ljmptab) : );
+	__asm__( "jmp dword ptr[%0 + eax * 4]\n" : : "r" (Ljmptab) );
 #endif
 
 	qasmL(Lcase0:)

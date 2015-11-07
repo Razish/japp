@@ -903,6 +903,7 @@ void			G_InitBots( qboolean restart );
 void			G_InitGentity( gentity_t *e );
 void			G_InitMemory( void );
 void			G_InitClientSessionData( gclient_t *client, char *userinfo, qboolean isBot );
+bool			G_IsValidEntity( const gentity_t *ent, bool doAssert = true );
 int				G_ItemUsable( playerState_t *ps, int forcedUse );
 void			G_KillBox( gentity_t *ent );
 void			G_KillG2Queue( int entNum );

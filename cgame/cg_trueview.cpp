@@ -316,7 +316,7 @@ void CG_TrueView( centity_t *cent ) {
 	// Restrict True View Model changes to the player and do the True View camera view work.
 	if ( cg.snap && cent->currentState.number == cg.snap->ps.clientNum ) {
 		if ( !cg.renderingThirdPerson && (cg_trueGuns.integer || cent->currentState.weapon == WP_SABER
-			|| cent->currentState.weapon == WP_MELEE) && !cg.predictedPlayerState.zoomMode && !cg.japp.fakeGun ) {
+			|| cent->currentState.weapon == WP_MELEE) && !cg.predictedPlayerState.zoomMode && !cg_fakeGun.integer ) {
 			mdxaBone_t 		eyeMatrix;
 			vector3			eyeAngles, eyeAxis[3], oldEyeOrigin;
 			qhandle_t		eyesBolt;

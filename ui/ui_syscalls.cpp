@@ -4,11 +4,11 @@
 // syscalls.asm is included instead when building a qvm
 #include "ui_local.h"
 
-static intptr_t( QDECL *Q_syscall )(intptr_t arg, ...) = (intptr_t( QDECL * )(intptr_t, ...)) - 1;
+static intptr_t( Q_DECL *Q_syscall )(intptr_t arg, ...) = (intptr_t( Q_DECL * )(intptr_t, ...)) - 1;
 
 static void TranslateSyscalls( void );
 
-extern "C" Q_EXPORT void dllEntry(intptr_t(QDECL *syscallptr)(intptr_t arg, ...)) {
+extern "C" Q_EXPORT void dllEntry(intptr_t(Q_DECL *syscallptr)(intptr_t arg, ...)) {
 	Q_syscall = syscallptr;
 
 	TranslateSyscalls();
@@ -436,7 +436,7 @@ int UISyscall_FS_Write( const void *buffer, int len, fileHandle_t f ) { trap_FS_
 void UISyscall_R_AddPolysToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int num ) { trap_R_AddPolyToScene( hShader, numVerts, verts ); }
 void UISyscall_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) { trap_G2API_CollisionDetect( collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, fRadius ); }
 
-void QDECL UI_Error( int level, const char *error, ... ) {
+void Q_DECL UI_Error( int level, const char *error, ... ) {
 	va_list argptr;
 	char text[4096] = { 0 };
 
@@ -447,7 +447,7 @@ void QDECL UI_Error( int level, const char *error, ... ) {
 	trap_Error( text );
 }
 
-void QDECL UI_Printf( const char *msg, ... ) {
+void Q_DECL UI_Printf( const char *msg, ... ) {
 	va_list argptr;
 	char text[4096] = { 0 };
 	int ret;

@@ -141,6 +141,9 @@ if plat == 'Linux':
 	]
 cgame_env['LIBPREFIX'] = ''
 
+if realcc == 'cl':
+	cgame_env['PDB'] = 'cgame' + arch + '.pdb'
+
 # targets
 cgame_env.SharedLibrary(
 	'#' + os.sep + 'cgame' + arch,

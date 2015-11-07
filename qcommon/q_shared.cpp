@@ -1385,9 +1385,6 @@ int Q_CompareNetAddress( const netadr_t *a1, const netadr_t *a2 ) {
 	else if ( a1 && !a2 ) {
 		return -1;
 	}
-	else {
-		return 0;
-	}
 
 	for ( int i = 0; i < 4; i++ ) {
 		if ( a1->ip[i] < a2->ip[i] ) {

@@ -1,5 +1,4 @@
-#ifndef TEAMS_H
-#define TEAMS_H
+#pragma once
 
 typedef enum npcteam_e {
 	NPCTEAM_FREE,			// also TEAM_FREE - caution, some code checks a team_t via "if (!team_t_varname)" so I guess this should stay as entry 0, great or what? -slc
@@ -72,5 +71,3 @@ typedef enum {
 
 	CLASS_NUM_CLASSES
 } class_t;
-
-#endif	// #ifndef TEAMS_H

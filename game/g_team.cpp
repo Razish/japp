@@ -76,29 +76,6 @@ const char *TeamColorString( int team ) {
 	return S_COLOR_WHITE;
 }
 
-// NULL for everyone
-/*
-void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) {
-char		msg[1024];
-va_list		argptr;
-char		*p;
-
-va_start (argptr,fmt);
-if (vsprintf (msg, fmt, argptr) > sizeof(msg)) {
-trap->Error( ERR_DROP, "PrintMsg overrun" );
-}
-va_end (argptr);
-
-// double quotes are bad
-while ((p = strchr(msg, '"')) != NULL)
-*p = '\'';
-
-trap->SendServerCommand ( ( (ent == NULL) ? -1 : ent-g_entities ), va("print \"%s\"", msg ));
-}
-*/
-//Printing messages to players via this method is no longer done, StringEd stuff is client only.
-
-
 //plIndex used to print pl->client->pers.netname
 //teamIndex used to print team name
 void PrintCTFMessage( int plIndex, int teamIndex, int ctfMessage ) {
@@ -1115,7 +1092,7 @@ gentity_t *SelectSiegeSpawnPoint( int siegeClass, team_t team, int teamstate, ve
 	return spot;
 }
 
-static int QDECL SortClients( const void *a, const void *b ) {
+static int SortClients( const void *a, const void *b ) {
 	return *(int *)a - *(int *)b;
 }
 

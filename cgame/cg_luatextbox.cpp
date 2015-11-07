@@ -54,7 +54,7 @@ namespace JPLua {
 
 	static void TextBox_SetCentered( lua_State *L, luaTextBox_t *box ) {
 		if ( lua_isboolean( L, 3 ) ) {
-			const int centered = lua_toboolean( L, 3 );
+			const bool centered = !!lua_toboolean( L, 3 );
 			box->centered = centered;
 		}
 	}

@@ -1781,3 +1781,22 @@ void G_GetModelBounds( const char *name, vector3 *mins, vector3 *maxs ) {
 
 	free( buf );
 }
+
+bool G_IsValidEntity( const gentity_t *ent, bool doAssert ) {
+	if ( doAssert ) {
+		assert( ent );
+		assert( ent->inuse );
+		assert( (ent - g_entities) < 0 );
+		assert( (ent - g_entities) >= MAX_GENTITIES );
+	}
+
+	if ( !ent
+		|| !ent->inuse
+		|| (ent - g_entities) < 0
+		|| (ent - g_entities) >= MAX_GENTITIES )
+	{
+		return false;
+	}
+
+	return true;
+}

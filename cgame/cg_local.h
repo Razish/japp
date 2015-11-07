@@ -667,8 +667,6 @@ typedef struct cg_s {
 		qboolean		isfixedVector;
 		vector3			fixedVector;
 
-		qboolean		fakeGun;
-
 		qboolean		trueviewWarning;
 	} japp;
 

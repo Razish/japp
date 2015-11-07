@@ -1143,6 +1143,3 @@ typedef struct gameExport_s {
 	void( *NAV_FindCombatPointWaypoints )		(void);
 	int( *BG_GetItemIndexByTag )				(int tag, itemType_t type);
 } gameExport_t;
-
-//linking of game library
-typedef gameExport_t* (QDECL *GetGameAPI_t)(int apiVersion, gameImport_t *import);

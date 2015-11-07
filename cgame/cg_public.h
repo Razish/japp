@@ -730,4 +730,4 @@ typedef struct cgameExport_s {
 } cgameExport_t;
 
 //linking of cgame library
-typedef cgameExport_t* (QDECL *GetCGameAPI_t)(int apiVersion, cgameImport_t *import);
+typedef cgameExport_t* (Q_DECL *GetCGameAPI_t)(int apiVersion, cgameImport_t *import);

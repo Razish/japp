@@ -174,6 +174,12 @@ static void CG_CopyNames_f( void ) {
 #endif //WIN32
 }
 
+#if !defined(NO_CRASHHANDLER)
+static void CG_Crash_f( void ) {
+	qasm1( int 3 );
+}
+#endif
+
 static void CG_ShowPlayerID_f( void ) {
 	int i;
 	for ( i = 0; i < cgs.maxclients; i++ ) {
@@ -367,10 +373,6 @@ void CG_FixDirection( void ) {
 	trap->Print( "Direction set (%.3f,%.3f).\n", cg.japp.fixedVector.x, cg.japp.fixedVector.y );
 }
 
-void CG_FakeGun_f( void ) {
-	cg.japp.fakeGun = !cg.japp.fakeGun;
-}
-
 void CG_SayTeam_f( void ) {
 	char buf[MAX_TOKEN_CHARS] = { 0 };
 	trap->Cmd_Args( buf, sizeof(buf) );
@@ -420,8 +422,10 @@ static const command_t commands[] = {
 	{ "chattabprev", Cmd_ChatboxSelectTabPrevNoKeys },
 	{ "clearchat", CG_ClearChat_f },
 	{ "copynames", CG_CopyNames_f },
+#if !defined(NO_CRASHHANDLER)
+	{ "crash", CG_Crash_f },
+#endif
 	{ "engage_duel", NULL },
-	{ "fakegun", CG_FakeGun_f },
 	{ "follow", NULL },
 	{ "forcechanged", NULL },
 	{ "forcenext", CG_NextForcePower_f },

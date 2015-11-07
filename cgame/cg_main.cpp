@@ -2122,7 +2122,7 @@ char *ConcatArgs( int start ) {
 }
 
 // Print to the logfile with a time stamp if it is open
-void QDECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
+void Q_DECL CG_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	va_list argptr;
 	char string[1024] = { 0 };
 	size_t len;
@@ -2228,7 +2228,7 @@ static void CG_FX_CameraShake( void ) {
 cgameImport_t *trap = NULL;
 
 extern "C" {
-Q_EXPORT cgameExport_t* QDECL GetModuleAPI( int apiVersion, cgameImport_t *import ) {
+Q_EXPORT cgameExport_t* Q_DECL GetModuleAPI( int apiVersion, cgameImport_t *import ) {
 	static cgameExport_t cge = { 0 };
 
 	assert( import );

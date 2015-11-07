@@ -1176,25 +1176,19 @@ static int CG_CalcViewValues( int clientNum ) {
 		CG_EmplacedView( &cg_entities[cg.snap->ps.emplacedIndex].currentState.angles );
 
 	if ( !manningTurret ) {
-#ifndef RAZTEST
-		if ( cg.predictedPlayerState.m_iVehicleNum //in a vehicle
-			&& BG_UnrestrainedPitchRoll( &cg.predictedPlayerState, cg_entities[cg.predictedPlayerState.m_iVehicleNum].m_pVehicle ) )//can roll/pitch without restriction
-		{//use the vehicle's viewangles to render view!
-			CG_OffsetFighterView();
-		}
-		else if ( cg.renderingThirdPerson ) {
-#else
 		if ( cg.renderingThirdPerson ) {
-#endif
+			//TODO: offset fighter view?
 			// back away from character
 			if ( cg_thirdPersonSpecialCam.integer && BG_SaberInSpecial( cg.predictedPlayerState.saberMove ) ) {
 				// the action cam
 				//couldn't do it for whatever reason, resort back to third person then
-				if ( !CG_ThirdPersonActionCam( clientNum ) )
+				if ( !CG_ThirdPersonActionCam( clientNum ) ) {
 					CG_OffsetThirdPersonView( clientNum );
+				}
 			}
-			else
+			else {
 				CG_OffsetThirdPersonView( clientNum );
+			}
 		}
 		else // offset for local bobbing and kicks
 			CG_OffsetFirstPersonView();
@@ -2176,30 +2170,34 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		if ( cg_trueInvertSaber.integer == 2 && (cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) )
 #endif
 			cg.renderingThirdPerson = qtrue;
-#ifdef RAZTEST
 		else if ( cg.predictedPlayerState.fallingToDeath
-#else
-		else if ( cg.predictedPlayerState.fallingToDeath || cg.predictedPlayerState.m_iVehicleNum
-#endif
-			|| (cg_trueInvertSaber.integer == 1 && !cg_thirdPerson.integer && (cg.predictedPlayerState.weapon == WP_SABER
-			|| cg.predictedPlayerState.weapon == WP_MELEE)) ) {
+			|| cg.predictedPlayerState.m_iVehicleNum
+			|| (cg_trueInvertSaber.integer == 1
+				&& !cg_thirdPerson.integer
+				&& (cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)) )
+		{
 			cg.renderingThirdPerson = qtrue;
 		}
 		else if ( cg_trueInvertSaber.integer == 1 && cg_thirdPerson.integer
-			&& (cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) ) {
+			&& (cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) )
+		{
 			cg.renderingThirdPerson = qfalse;
 		}
-		else if ( cg.predictedPlayerState.zoomMode )
+		else if ( cg.predictedPlayerState.zoomMode ) {
 			cg.renderingThirdPerson = 0;
-		if ( cg.japp.fakeGun )
+		}
+		if ( cg_fakeGun.integer ) {
 			cg.renderingThirdPerson = 0;
+		}
 	}
 
-	if ( cg.predictedPlayerState.pm_type == PM_SPECTATOR )
+	if ( cg.predictedPlayerState.pm_type == PM_SPECTATOR ) {
 		cg.renderingThirdPerson = 0;
+	}
 
-	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR )
+	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
 		cg.renderingThirdPerson = 0;
+	}
 
 	// build cg.refdef
 	inwater = CG_CalcViewValues( cg.clientNum );

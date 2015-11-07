@@ -3670,9 +3670,7 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 		unblockable = qtrue;
 		self->client->ps.saberBlocked = 0;
 
-		if ( d_saberSPStyleDamage.integer ) {
-		}
-		else if ( !inBackAttack ) {
+		if ( !d_saberSPStyleDamage.integer && !inBackAttack ) {
 			// do extra damage for special unblockables
 			if ( self->client->ps.saberMove == LS_A_JUMP_T__B_ ) {
 				// This is very tiny, because this move has a huge damage ramp
@@ -7079,27 +7077,24 @@ void WP_SaberPositionUpdate( gentity_t *self, usercmd_t *ucmd ) { //rww - keep t
 		}
 	}
 
-	if ( self &&
-		self->inuse &&
-		self->client &&
-		self->client->saberCycleQueue &&
-		(self->client->ps.weaponTime <= 0 || self->health < 1) ) { //we cycled attack levels while we were busy, so update now that we aren't (even if that means we're dead)
+	if ( self && self->inuse && self->client && self->client->saberCycleQueue
+		&& (self->client->ps.weaponTime <= 0 || self->health < 1) )
+	{
+		// we cycled attack levels while we were busy, so update now that we aren't (even if that means we're dead)
 		self->client->ps.fd.saberAnimLevel = self->client->saberCycleQueue;
 		self->client->saberCycleQueue = 0;
 	}
 
-	if ( !self ||
-		!self->inuse ||
-		!self->client ||
-		!self->ghoul2 ||
-		!g2SaberInstance ) {
+	if ( !self || !self->inuse || !self->client || !self->ghoul2 || !g2SaberInstance ) {
 		return;
 	}
 
-	if ( BG_KickingAnim( self->client->ps.legsAnim ) ) { //do some kick traces and stuff if we're in the appropriate anim
+	if ( BG_KickingAnim( self->client->ps.legsAnim ) ) {
+		// do some kick traces and stuff if we're in the appropriate anim
 		G_KickSomeMofos( self );
 	}
-	else if ( self->client->ps.torsoAnim == BOTH_KYLE_GRAB ) { //try to grab someone
+	else if ( self->client->ps.torsoAnim == BOTH_KYLE_GRAB ) {
+		// try to grab someone
 		G_GrabSomeMofos( self );
 	}
 	else if ( self->client->grappleState ) {
@@ -7304,9 +7299,8 @@ void WP_SaberPositionUpdate( gentity_t *self, usercmd_t *ucmd ) { //rww - keep t
 		}
 	}
 
-	//If this is a listen server (client+server running on same machine),
-	//then lets try to steal the skeleton/etc data off the client instance
-	//for this entity to save us processing time.
+	// if this is a listen server (client+server running on same machine), then lets try to steal the skeleton/etc data
+	//	off the client instance for this entity to save us processing time.
 	clientOverride = trap->G2API_OverrideServer( self->ghoul2 );
 
 	saberNum = self->client->ps.saberEntityNum;
@@ -7322,15 +7316,19 @@ void WP_SaberPositionUpdate( gentity_t *self, usercmd_t *ucmd ) { //rww - keep t
 
 	mySaber = &g_entities[saberNum];
 
-	if ( self->health < 1 ) { //we don't want to waste precious CPU time calculating saber positions for corpses. But we want to avoid the saber ent position lagging on spawn, so..
-		//I guess it's good to keep the position updated even when contents are 0
-		if ( mySaber && ((mySaber->r.contents & CONTENTS_LIGHTSABER) || mySaber->r.contents == 0) && !self->client->ps.saberInFlight ) { //Since we haven't got a bolt position, place it on top of the player origin.
+	if ( self->health < 1 ) {
+		// we don't want to waste precious CPU time calculating saber positions for corpses. But we want to avoid the
+		//	saber ent position lagging on spawn, so..
+		// I guess it's good to keep the position updated even when contents are 0
+		if ( mySaber && ((mySaber->r.contents & CONTENTS_LIGHTSABER) || mySaber->r.contents == 0)
+			&& !self->client->ps.saberInFlight )
+		{
+			// Since we haven't got a bolt position, place it on top of the player origin.
 			VectorCopy( &self->client->ps.origin, &mySaber->r.currentOrigin );
 		}
 
-		//I don't want to return now actually, I want to keep g2 instances for corpses up to
-		//date because I'm doing better corpse hit detection/dismem (particularly for the
-		//npc's)
+		// I don't want to return now actually, I want to keep g2 instances for corpses up to date because I'm doing
+		//	better corpse hit detection/dismem (particularly for the npc's)
 		//return;
 	}
 
@@ -7373,7 +7371,7 @@ nextStep:
 
 	VectorCopy( &self->client->ps.origin, &properOrigin );
 
-	//try to predict the origin based on velocity so it's more like what the client is seeing
+	// try to predict the origin based on velocity so it's more like what the client is seeing
 	VectorCopy( &self->client->ps.velocity, &addVel );
 	VectorNormalize( &addVel );
 

@@ -1,6 +1,5 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
 // cg_players.c -- handle the media and animation for player entities
+
 #include "cg_local.h"
 #include "Ghoul2/G2.h"
 #include "bg_saga.h"
@@ -10,6 +9,8 @@
 #include "bg_vehicles.h"
 #include "JAPP/jp_csflags.h"
 #include "JAPP/jp_ssflags.h"
+
+#define IMPROVED_RAGDOLL
 
 extern int cgSiegeTeam1PlShader;
 extern int cgSiegeTeam2PlShader;
@@ -666,7 +667,7 @@ void CG_LoadCISounds( clientInfo_t *ci, qboolean modelloaded ) {
 				if ( !ci->siegeSounds[i] )
 					ci->siegeSounds[i] = trap->S_RegisterSound( va( "sound/%s/%s", soundpath, soundName ) );
 			}
-			else if ( modelloaded ) 
+			else if ( modelloaded )
 				ci->siegeSounds[i] = trap->S_RegisterSound( va( "sound/chars/%s/misc/%s", dir, soundName ) );
 
 			if ( !ci->siegeSounds[i] ) {
@@ -2539,8 +2540,9 @@ qboolean CG_RagDoll( centity_t *cent, vector3 *forcedAngles ) {
 					VectorNormalize( &vSub );
 					vectoangles( &vSub, &vSub );
 
-					if ( deathDone || (vSub.pitch < 50 && vSub.pitch > -50) )
+					if ( deathDone || (vSub.pitch < 50 && vSub.pitch > -50) ) {
 						inSomething = qtrue;
+					}
 #else
 					inSomething = qtrue;
 #endif
@@ -2576,25 +2578,27 @@ qboolean CG_RagDoll( centity_t *cent, vector3 *forcedAngles ) {
 		tParms.startFrame = bgAllAnims[cent->localAnimIndex].anims[ragAnim].firstFrame;// + bgAllAnims[cent->localAnimIndex].anims[ragAnim].numFrames;
 		tParms.endFrame = bgAllAnims[cent->localAnimIndex].anims[ragAnim].firstFrame + bgAllAnims[cent->localAnimIndex].anims[ragAnim].numFrames;
 #ifdef IMPROVED_RAGDOLL
-		{
-			float animSpeed = 0;
-			int blendTime = 600;
-			uint32_t flags = BONE_ANIM_OVERRIDE_FREEZE;
-
-			if ( bgAllAnims[cent->localAnimIndex].anims[ragAnim].loopFrames != -1 )
-				flags = BONE_ANIM_OVERRIDE_LOOP;
-
-			if ( cg_animBlend.integer )
-				flags |= BONE_ANIM_BLEND;
-
-			animSpeed = 50.0f / bgAllAnims[cent->localAnimIndex].anims[ragAnim].frameLerp;
-			trap->G2API_SetBoneAnim( cent->ghoul2, 0, "lower_lumbar", tParms.startFrame, tParms.endFrame, flags, animSpeed,
-				cg.time, -1, blendTime );
-			trap->G2API_SetBoneAnim( cent->ghoul2, 0, "Motion", tParms.startFrame, tParms.endFrame, flags, animSpeed,
-				cg.time, -1, blendTime );
-			trap->G2API_SetBoneAnim( cent->ghoul2, 0, "model_root", tParms.startFrame, tParms.endFrame, flags, animSpeed,
-				cg.time, -1, blendTime );
+		uint32_t flags = BONE_ANIM_OVERRIDE_FREEZE;
+		if ( bgAllAnims[cent->localAnimIndex].anims[ragAnim].loopFrames != -1 ) {
+			flags = BONE_ANIM_OVERRIDE_LOOP;
 		}
+
+		if ( cg_animBlend.integer ) {
+			flags |= BONE_ANIM_BLEND;
+		}
+
+		const float animSpeed = 50.0f / bgAllAnims[cent->localAnimIndex].anims[ragAnim].frameLerp;
+		const int blendTime = 600;
+
+		trap->G2API_SetBoneAnim( cent->ghoul2, 0, "lower_lumbar", tParms.startFrame, tParms.endFrame, flags, animSpeed,
+			cg.time, -1, blendTime
+		);
+		trap->G2API_SetBoneAnim( cent->ghoul2, 0, "Motion", tParms.startFrame, tParms.endFrame, flags, animSpeed,
+			cg.time, -1, blendTime
+		);
+		trap->G2API_SetBoneAnim( cent->ghoul2, 0, "model_root", tParms.startFrame, tParms.endFrame, flags, animSpeed,
+			cg.time, -1, blendTime
+		);
 #else //with my new method of doing things I want it to continue the anim
 		{
 			float currentFrame;
@@ -7077,7 +7081,7 @@ void CG_Player( centity_t *cent ) {
 		if ( !cg.renderingThirdPerson ) {
 			if ( (!cg_trueGuns.integer && cg.predictedPlayerState.weapon != WP_SABER
 				&& cg.predictedPlayerState.weapon != WP_MELEE) || (cg.predictedPlayerState.weapon == WP_SABER
-				&& cg_trueSaberOnly.integer) || cg.predictedPlayerState.zoomMode || cg.japp.fakeGun ) {
+				&& cg_trueSaberOnly.integer) || cg.predictedPlayerState.zoomMode || cg_fakeGun.integer ) {
 				renderfx = RF_THIRD_PERSON; // only draw in mirrors
 			}
 		}

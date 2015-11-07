@@ -205,14 +205,22 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	weaponInfo_t *weapon;
 	centity_t *nonPredictedCent;
 
-	weaponNum = (weapon_t)cent->currentState.weapon;
+	if ( !thirdPerson && cg_fakeGun.integer ) {
+		weaponNum = (weapon_t)cg_fakeGun.integer;
+	}
+	else {
+		weaponNum = (weapon_t)cent->currentState.weapon;
+	}
 
-	if ( cent->currentState.weapon == WP_EMPLACED_GUN )
+	if ( weaponNum == WP_EMPLACED_GUN )
 		return;
 
 	// spectator mode, don't draw it...
-	if ( cg.predictedPlayerState.pm_type == PM_SPECTATOR && cent->currentState.number == cg.predictedPlayerState.clientNum )
+	if ( cg.predictedPlayerState.pm_type == PM_SPECTATOR
+		&& cent->currentState.number == cg.predictedPlayerState.clientNum )
+	{
 		return;
+	}
 
 	CG_RegisterWeapon( weaponNum );
 	weapon = &cg_weapons[weaponNum];
@@ -236,10 +244,16 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 		if ( !ps ) {
 			// add weapon ready sound
-			if ( (cent->currentState.eFlags & EF_FIRING) && weapon->firingSound )
-				trap->S_AddLoopingSound( cent->currentState.number, &cent->lerpOrigin, &vec3_origin, weapon->firingSound );
-			else if ( weapon->readySound )
-				trap->S_AddLoopingSound( cent->currentState.number, &cent->lerpOrigin, &vec3_origin, weapon->readySound );
+			if ( (cent->currentState.eFlags & EF_FIRING) && weapon->firingSound ) {
+				trap->S_AddLoopingSound( cent->currentState.number, &cent->lerpOrigin, &vec3_origin,
+					weapon->firingSound
+				);
+			}
+			else if ( weapon->readySound ) {
+				trap->S_AddLoopingSound( cent->currentState.number, &cent->lerpOrigin, &vec3_origin,
+					weapon->readySound
+				);
+			}
 		}
 
 		CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_weapon" );
@@ -315,10 +329,10 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	// Do special charge bits
 	// Make the guns do their charging visual in True View.
 	if ( (ps || cg.renderingThirdPerson || cg.predictedPlayerState.clientNum != cent->currentState.number || cg_trueGuns.integer) &&
-		((cent->currentState.modelindex2 == WEAPON_CHARGING_ALT && cent->currentState.weapon == WP_BRYAR_PISTOL) ||
-		(cent->currentState.modelindex2 == WEAPON_CHARGING_ALT && cent->currentState.weapon == WP_BRYAR_OLD) ||
-		(cent->currentState.weapon == WP_BOWCASTER && cent->currentState.modelindex2 == WEAPON_CHARGING) ||
-		(cent->currentState.weapon == WP_DEMP2 && cent->currentState.modelindex2 == WEAPON_CHARGING_ALT)) ) {
+		((cent->currentState.modelindex2 == WEAPON_CHARGING_ALT && weaponNum == WP_BRYAR_PISTOL) ||
+		(cent->currentState.modelindex2 == WEAPON_CHARGING_ALT && weaponNum == WP_BRYAR_OLD) ||
+		(weaponNum == WP_BOWCASTER && cent->currentState.modelindex2 == WEAPON_CHARGING) ||
+		(weaponNum == WP_DEMP2 && cent->currentState.modelindex2 == WEAPON_CHARGING_ALT)) ) {
 		int shader = 0;
 		float val = 0.0f;
 		float scale = 1.0f;
@@ -346,17 +360,17 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			BG_GiveMeVectorFromMatrix( &boltMatrix, POSITIVE_X, &flashdir );
 		}
 
-		if ( cent->currentState.weapon == WP_BRYAR_PISTOL || cent->currentState.weapon == WP_BRYAR_OLD ) {
+		if ( weaponNum == WP_BRYAR_PISTOL || weaponNum == WP_BRYAR_OLD ) {
 			// Hardcoded max charge time of 1 second
 			val = (cg.time - cent->currentState.constantLight) * 0.001f;
 			shader = media.gfx.world.bryarFrontFlash;
 		}
-		else if ( cent->currentState.weapon == WP_BOWCASTER ) {
+		else if ( weaponNum == WP_BOWCASTER ) {
 			// Hardcoded max charge time of 1 second
 			val = (cg.time - cent->currentState.constantLight) * 0.001f;
 			shader = media.gfx.world.greenFrontFlash;
 		}
-		else if ( cent->currentState.weapon == WP_DEMP2 ) {
+		else if ( weaponNum == WP_DEMP2 ) {
 			val = (cg.time - cent->currentState.constantLight) * 0.001f;
 			shader = media.gfx.world.lightningFlash;
 			scale = 1.75f;
@@ -464,49 +478,49 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 // Add the weapon, and flash for the player's view
 void CG_AddViewWeapon( playerState_t *ps ) {
-	refEntity_t hand;
-	centity_t *cent = NULL;
-	clientInfo_t *ci = NULL;
-	vector3 angles;
-	weaponInfo_t *weapon = NULL;
-	float desiredFov = 0.0f;
-	refdef_t *refdef = CG_GetRefdef();
-
 	// no gun if in third person view or a camera is active
-	if ( ps->persistant[PERS_TEAM] == TEAM_SPECTATOR || ps->pm_type == PM_INTERMISSION || cg.renderingThirdPerson )
+	if ( ps->persistant[PERS_TEAM] == TEAM_SPECTATOR || ps->pm_type == PM_INTERMISSION || cg.renderingThirdPerson ) {
 		return;
+	}
 
+	const int weap = cg_fakeGun.integer ? cg_fakeGun.integer : ps->weapon;
+	float desiredFov = 0.0f;
 	if ( !cg.renderingThirdPerson
-		&& (cg_trueGuns.integer || cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE)
+		&& (cg_trueGuns.integer || weap == WP_SABER || weap == WP_MELEE)
 		&& cg_trueFOV.value
 		&& cg.predictedPlayerState.pm_type != PM_SPECTATOR
-		&& cg.predictedPlayerState.pm_type != PM_INTERMISSION ) {
+		&& cg.predictedPlayerState.pm_type != PM_INTERMISSION )
+	{
 		desiredFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_trueFOV.value;
 	}
-	else
+	else {
 		desiredFov = cg_fovViewmodel.integer ? cg_fovViewmodel.value : cg_fov.value;
+	}
 
 	desiredFov = Q_clampi( 1, desiredFov, 180 );
 
 	// allow the gun to be completely removed
-	if ( !cg.japp.fakeGun && (!cg_drawGun.integer || cg.predictedPlayerState.zoomMode || cg_trueGuns.integer
-		|| cg.predictedPlayerState.weapon == WP_SABER || cg.predictedPlayerState.weapon == WP_MELEE) ) {
+	if ( !cg_fakeGun.integer && (!cg_drawGun.integer || cg.predictedPlayerState.zoomMode || cg_trueGuns.integer
+		|| weap == WP_SABER || weap == WP_MELEE) ) {
 		return;
 	}
 
 	// don't draw if testing a gun model
-	if ( cg.testGun )
+	if ( cg.testGun ) {
 		return;
+	}
 
-	cent = &cg_entities[cg.predictedPlayerState.clientNum];
-	CG_RegisterWeapon( ps->weapon );
-	weapon = cg.japp.fakeGun ? &cg_weapons[WP_BRYAR_PISTOL] : &cg_weapons[ps->weapon];
+	centity_t *cent = &cg_entities[cg.predictedPlayerState.clientNum];
+	CG_RegisterWeapon( weap );
 
+	refEntity_t hand;
 	memset( &hand, 0, sizeof(hand) );
 
 	// set up gun position
+	vector3 angles;
 	CG_CalculateWeaponPosition( &hand.origin, &angles );
 
+	refdef_t *refdef = CG_GetRefdef();
 	VectorMA( &hand.origin, cg.gunAlign.x, &refdef->viewaxis[0], &hand.origin );
 	VectorMA( &hand.origin, cg.gunAlign.y, &refdef->viewaxis[1], &hand.origin );
 	VectorMA( &hand.origin, cg.gunAlign.z, &refdef->viewaxis[2], &hand.origin );
@@ -539,15 +553,18 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 		float currentFrame;
 
 		// get clientinfo for animation map
+		clientInfo_t *ci = nullptr;
 		if ( cent->currentState.eType == ET_NPC ) {
-			if ( !cent->npcClient )
+			if ( !cent->npcClient ) {
 				return;
+			}
 			ci = cent->npcClient;
 		}
-		else
+		else {
 			ci = &cgs.clientinfo[cent->currentState.clientNum];
+		}
 
-		//Raz: Smoother first-person anims by eezstreet http://jkhub.org/topic/1499-/
+		// smoother first-person anims by eezstreet http://jkhub.org/topic/1499-/
 		//		actually ported from SP
 #if 1
 		// Sil's fix
@@ -574,8 +591,9 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 		}
 	}
 
-	hand.hModel = weapon->handsModel;
-	hand.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON;// | RF_MINLIGHT;
+	weaponInfo_t *wi = &cg_weapons[weap];
+	hand.hModel = wi->handsModel;
+	hand.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON;
 
 	// add everything onto the hand
 	CG_AddPlayerWeapon( &hand, ps, &cg_entities[cg.predictedPlayerState.clientNum], ps->persistant[PERS_TEAM], &angles, qfalse );
