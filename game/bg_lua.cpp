@@ -1546,7 +1546,7 @@ namespace JPLua {
 	#endif
 		{ "GetTime", Export_GetTime }, // integer GetTime()
 	#ifdef PROJECT_CGAME
-		{ "IsKeyDown", Export_IsKeyDown }, // boolean IsKeyDown( integer ) 
+		{ "IsKeyDown", Export_IsKeyDown }, // boolean IsKeyDown( integer )
 	#endif
 		{ "OpenFile", File_Open},
 		{ "RayTrace", Export_Trace }, // traceResult Trace( stuff )
@@ -1616,7 +1616,7 @@ namespace JPLua {
 		}
 
 		// set the ls.version
-		semver_parse( "13.2.0", &jpluaVersion );
+		semver_parse( "13.2.1", &jpluaVersion );
 
 		// set the callback in case of an error
 		lua_atpanic( ls.L, Error );
