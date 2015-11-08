@@ -3,9 +3,10 @@
 # written by Raz0r
 #
 # options:
-#	debug		generate debug information. value 2 also enables optimisations
-#	force32		force 32 bit target when on 64 bit machine
-#	no_sql		don't include any SQL dependencies
+#	debug			generate debug information. value 2 also enables optimisations
+#	force32			force 32 bit target when on 64 bit machine
+#	no_sql			don't include any SQL dependencies
+#	no_crashhandler	don't include the crash logger (x86 only)
 #
 # example:
 #	scons -Q debug=1 force32=1
@@ -16,12 +17,14 @@
 #
 
 debug = int( ARGUMENTS.get( 'debug', 0 ) )
+configuration = { 0: lambda x: 'release', 1: lambda x: 'debug', 2: lambda x: 'optimised-debug' }[debug](debug)
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 no_sql = int( ARGUMENTS.get( 'no_sql', 0 ) )
 no_crashhandler = int( ARGUMENTS.get( 'no_crashhandler', 0 ) )
 toolStr = ARGUMENTS.get( 'tools', 'gcc,g++,ar,as,gnulink' )
 tools = [x for x in toolStr.split( ',' )]
 
+# compare semantic versions (1.0.2 < 1.0.10 < 1.2.0)
 def cmp_version( v1, v2 ):
 	def normalise( v ):
 		import re
@@ -104,16 +107,12 @@ if 'TERM' in os.environ:
 	env['ENV']['TERM'] = os.environ['TERM']
 import sys
 colours = {}
-colours['white'] = '\033[1;97m'
-colours['cyan'] = '\033[96m'
-colours['orange'] = '\033[33m'
-colours['green'] = '\033[92m'
-colours['end']  = '\033[0m'
-
-# if the output is not a terminal, remove the colours
-if not sys.stdout.isatty():
-	for key in colours.keys():
-		colours[key] = ''
+enableColours = sys.stdout.isatty()
+colours['white'] = '\033[1;97m' if enableColours else ''
+colours['cyan'] = '\033[96m' if enableColours else ''
+colours['orange'] = '\033[33m' if enableColours else ''
+colours['green'] = '\033[92m' if enableColours else ''
+colours['end']  = '\033[0m' if enableColours else ''
 
 env['SHCCCOMSTR'] = env['SHCXXCOMSTR'] = env['CCCOMSTR'] = env['CXXCOMSTR'] = \
 	'%s compiling: %s$SOURCE%s' % (colours['cyan'], colours['white'], colours['end'])
@@ -170,55 +169,60 @@ env.SetOption( 'num_jobs', GetNumCores() )
 
 # notify the user of the build configuration
 if not env.GetOption( 'clean' ):
-	# compile-time environment
+	# build tools
 	msg = 'Building '
 	if revision:
 		msg += revision + ' '
 	msg += 'for ' + plat + ' '
 	if force32:
 		msg += 'forced '
-	msg += str(bits) + ' bits '
-	msg += '(' \
-		+ realcc + '/' + realcxx + ' ' + ccversion + ', '\
-		+ 'python ' + platform.python_version() + ', '\
-		+ 'scons ' + sconsversion \
-		+ ')\n'
-
-	# build
-	msg += 'using ' + str(env.GetOption( 'num_jobs' )) + ' threads'
-	msg += '\n' + realcc + ' located at ' + commands.getoutput( 'where ' + realcc ).split( '\n' )[0]
-	if 'AR' in env:
-		msg += '\n' + env['AR'] + ' located at ' + commands.getoutput( 'where ' + env['AR'] ).split( '\n' )[0]
-	if 'AS' in env:
-		msg += '\n' + env['AS'] + ' located at ' + commands.getoutput( 'where ' + env['AS'] ).split( '\n' )[0]
-	msg += '\npython located at ' + sys.executable
-	msg += '\nscons' + ' located at ' + commands.getoutput( 'where ' + 'scons' ).split( '\n' )[0]
+	msg += str(bits) + ' bits using ' + str(env.GetOption( 'num_jobs' )) + ' threads\n'\
+		+ '\t' + realcc + '/' + realcxx + ': ' + ccversion + '\n'\
+		+ '\tpython: ' + platform.python_version() + '\n'\
+		+ '\tscons: ' + sconsversion + '\n'
 
 	# build options
-	msg += 'options: '
-	if debug:
-		msg += 'debug symbols, '
-	if debug == 0 or debug == 2:
-		msg += ', optimised'
-	msg += 'x87 fpu\n' if 'NO_SSE' in os.environ else 'SSE\n'
+	msg += 'options:\n'\
+		+ '\tconfiguration: ' + configuration + '\n'\
+		+ '\tinstruction set: ' + arch\
+			+ ((' with x87 fpu' if 'NO_SSE' in os.environ else ' with SSE') if arch != 'arm' else '') + '\n'\
+		+ '\tsql support: ' + ('dis' if no_sql else 'en') + 'abled\n'\
+		+ '\tcrash logging: ' + ('dis' if no_crashhandler else 'en') + 'abled\n'
+
+	# build environment
+	if 'SCONS_DEBUG' in os.environ:
+		msg += realcc + ' located at ' + commands.getoutput( 'where ' + realcc ).split( '\n' )[0] + '\n'
+		if 'AR' in env:
+			msg += env['AR'] + ' located at ' + commands.getoutput( 'where ' + env['AR'] ).split( '\n' )[0] + '\n'
+		if 'AS' in env:
+			msg += env['AS'] + ' located at ' + commands.getoutput( 'where ' + env['AS'] ).split( '\n' )[0] + '\n'
+		msg += 'python located at ' + sys.executable + '\n'
+		msg += 'scons' + ' located at ' + commands.getoutput( 'where ' + 'scons' ).split( '\n' )[0] + '\n'
 
 	print( msg )
 
 # clear default compiler/linker switches
 def emptyEnv( env, e ):
-	if e in env and env[e]:
-		print( 'discarding ' + e + ': ' + env[e] )
+	if 'SCONS_DEBUG' in os.environ:
+		if e in env:
+			if env[e]:
+				print( 'discarding ' + e + ': ' + env[e] )
+			else:
+				print( 'env[' + e + '] is empty' )
+		else:
+			print( 'env[' + e + '] does not exist' )
 	env[e] = []
 emptyEnv( env, 'CPPDEFINES' )
 emptyEnv( env, 'CFLAGS' )
 emptyEnv( env, 'CCFLAGS' )
 emptyEnv( env, 'CXXFLAGS' )
 emptyEnv( env, 'LINKFLAGS' )
+emptyEnv( env, 'ARFLAGS' )
 
 # compiler switches
 if realcc == 'gcc' or realcc == 'clang':
 	env['CCFLAGS'] += [
-		#'-M',
+		#'-M',	# show include hierarchy
 	]
 	# c warnings
 	env['CFLAGS'] += [
@@ -346,12 +350,14 @@ if realcc == 'gcc' or realcc == 'clang':
 		'-std=c++11',
 	]
 
+	# archive flags
+	env['ARFLAGS'] = 'rc'
+
 elif realcc == 'cl':
+	# msvc
 	env['CCFLAGS'] += [
 		#'/showIncludes',
 	]
-
-	# msvc
 	env['CFLAGS'] += [
 		'/TC',	# compile as c
 	]
@@ -528,13 +534,6 @@ env['CPPPATH'] = [
 env['LIBPATH'] = [
 	'#' + os.sep + 'libs' + os.sep + plat + os.sep + realcc + os.sep + str(bits) + os.sep
 ]
-
-if debug == 1:
-	configuration = 'debug'
-elif debug == 2:
-	configuration = 'optimised-debug'
-else:
-	configuration = 'release'
 
 # invoke the per-project scripts
 projects = [
