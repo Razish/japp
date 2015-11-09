@@ -707,347 +707,349 @@ void SetPlaneSignbits( cplane_t *out ) {
 }
 
 
-#if !( (defined MACOS_X || defined __linux__ || defined __FreeBSD__) && (defined __i386__) && (!defined C_ONLY)) // rb010123
+#if !defined(QARCH_X86) || defined(C_ONLY)
 
-#if defined C_ONLY || defined(MINGW32)
+	int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
+		// fast axial cases
+		if ( p->type < 3 ) {
+			if ( p->dist <= emins->raw[p->type] ) {
+				return 1;
+			}
+			if ( p->dist >= emaxs->raw[p->type] ) {
+				return 2;
+			}
+			return 3;
+		}
 
-int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
-	// fast axial cases
-	if ( p->type < 3 ) {
-		if ( p->dist <= emins->raw[p->type] ) {
-			return 1;
+		// general case
+		float dist1, dist2;
+		switch ( p->signbits ) {
+		case 0:
+			dist1 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
+			dist2 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emins->z;
+			break;
+		case 1:
+			dist1 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
+			dist2 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emins->z;
+			break;
+		case 2:
+			dist1 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
+			dist2 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
+			break;
+		case 3:
+			dist1 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
+			dist2 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
+			break;
+		case 4:
+			dist1 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
+			dist2 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
+			break;
+		case 5:
+			dist1 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
+			dist2 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
+			break;
+		case 6:
+			dist1 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emins->z;
+			dist2 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
+			break;
+		case 7:
+			dist1 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emins->z;
+			dist2 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
+			break;
+		default:
+			dist1 = dist2 = 0;		// shut up compiler
+			break;
 		}
-		if ( p->dist >= emaxs->raw[p->type] ) {
-			return 2;
-		}
-		return 3;
+
+		int sides = 0;
+		if ( dist1 >= p->dist )
+			sides = 1;
+		if ( dist2 < p->dist )
+			sides |= 2;
+
+		return sides;
 	}
 
-	// general case
-	float dist1, dist2;
-	switch ( p->signbits ) {
-	case 0:
-		dist1 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
-		dist2 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emins->z;
-		break;
-	case 1:
-		dist1 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
-		dist2 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emins->z;
-		break;
-	case 2:
-		dist1 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
-		dist2 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
-		break;
-	case 3:
-		dist1 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
-		dist2 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
-		break;
-	case 4:
-		dist1 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
-		dist2 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
-		break;
-	case 5:
-		dist1 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emins->z;
-		dist2 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emaxs->z;
-		break;
-	case 6:
-		dist1 = p->normal.x*emaxs->x + p->normal.y*emins->y + p->normal.z*emins->z;
-		dist2 = p->normal.x*emins->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
-		break;
-	case 7:
-		dist1 = p->normal.x*emins->x + p->normal.y*emins->y + p->normal.z*emins->z;
-		dist2 = p->normal.x*emaxs->x + p->normal.y*emaxs->y + p->normal.z*emaxs->z;
-		break;
-	default:
-		dist1 = dist2 = 0;		// shut up compiler
-		break;
-	}
-
-	int sides = 0;
-	if ( dist1 >= p->dist )
-		sides = 1;
-	if ( dist2 < p->dist )
-		sides |= 2;
-
-	return sides;
-}
 #else
 
-#if defined(_MSC_VER)
-	#pragma warning( push )
-	#pragma warning( disable: 4035 )
-#elif defined(__GNUC__)
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wreturn-type"
-#endif // _MSC_VER
+	#if defined(_MSC_VER)
+		#pragma warning( push )
+		#pragma warning( disable: 4035 )
+	#elif defined(__GNUC__)
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wreturn-type"
+	#endif // _MSC_VER
 
-Q_NAKED int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
-	qnakedstart(BOPS)
+	Q_NAKED int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
+		qnakedstart(BOPS)
 
-	static int Q_USED bops_initialized;
-	static int Q_USED Ljmptab[8];
+		static int Q_USED bops_initialized;
+		static int Q_USED Ljmptab[8];
 
-	qasm1( push ebx )
+	#if defined(_MSC_VER)
+		qasm1( push ebx )
+		qasm2( cmp bops_initialized, 1 )
+		qasm1( je initialized )
+		qasm2( mov bops_initialized, 1 )
+	#elif defined(__GNUC__)
+		__asm__( "push $ebx" );
+		__asm__( "cmp %0, 1\n" : : "r" (bops_initialized) );
+		qasm1( je initialized )
+		__asm__( "mov %0, 1\n" : "=r" (bops_initialized) : );
+	#endif
 
-#if defined(_MSC_VER)
-	qasm2( cmp bops_initialized, 1 )
-	qasm1( je initialized )
-	qasm2( mov bops_initialized, 1 )
-#elif defined(__GNUC__)
-	__asm__( "cmp %0, 1\n" : : "r" (bops_initialized) );
-	qasm1( je initialized )
-	__asm__( "mov %0, 1\n" : "=r" (bops_initialized) : );
-#endif
+	#if defined(_MSC_VER)
+		qasm2( mov Ljmptab[0 * 4], offset Lcase0 )
+		qasm2( mov Ljmptab[1 * 4], offset Lcase1 )
+		qasm2( mov Ljmptab[2 * 4], offset Lcase2 )
+		qasm2( mov Ljmptab[3 * 4], offset Lcase3 )
+		qasm2( mov Ljmptab[4 * 4], offset Lcase4 )
+		qasm2( mov Ljmptab[5 * 4], offset Lcase5 )
+		qasm2( mov Ljmptab[6 * 4], offset Lcase6 )
+		qasm2( mov Ljmptab[7 * 4], offset Lcase7 )
+	#elif defined(__GNUC__)
+		__asm__( "mov %0, offset Lcase0\n" : "=m" (Ljmptab[0]) : );
+		__asm__( "mov %0, offset Lcase1\n" : "=m" (Ljmptab[1]) : );
+		__asm__( "mov %0, offset Lcase2\n" : "=m" (Ljmptab[2]) : );
+		__asm__( "mov %0, offset Lcase3\n" : "=m" (Ljmptab[3]) : );
+		__asm__( "mov %0, offset Lcase4\n" : "=m" (Ljmptab[4]) : );
+		__asm__( "mov %0, offset Lcase5\n" : "=m" (Ljmptab[5]) : );
+		__asm__( "mov %0, offset Lcase6\n" : "=m" (Ljmptab[6]) : );
+		__asm__( "mov %0, offset Lcase7\n" : "=m" (Ljmptab[7]) : );
+	#endif
 
-#if defined(_MSC_VER)
-	qasm2( mov Ljmptab[0 * 4], offset Lcase0 )
-	qasm2( mov Ljmptab[1 * 4], offset Lcase1 )
-	qasm2( mov Ljmptab[2 * 4], offset Lcase2 )
-	qasm2( mov Ljmptab[3 * 4], offset Lcase3 )
-	qasm2( mov Ljmptab[4 * 4], offset Lcase4 )
-	qasm2( mov Ljmptab[5 * 4], offset Lcase5 )
-	qasm2( mov Ljmptab[6 * 4], offset Lcase6 )
-	qasm2( mov Ljmptab[7 * 4], offset Lcase7 )
-#elif defined(__GNUC__)
-	__asm__( "mov %0, offset Lcase0\n" : "=m" (Ljmptab[0]) : );
-	__asm__( "mov %0, offset Lcase1\n" : "=m" (Ljmptab[1]) : );
-	__asm__( "mov %0, offset Lcase2\n" : "=m" (Ljmptab[2]) : );
-	__asm__( "mov %0, offset Lcase3\n" : "=m" (Ljmptab[3]) : );
-	__asm__( "mov %0, offset Lcase4\n" : "=m" (Ljmptab[4]) : );
-	__asm__( "mov %0, offset Lcase5\n" : "=m" (Ljmptab[5]) : );
-	__asm__( "mov %0, offset Lcase6\n" : "=m" (Ljmptab[6]) : );
-	__asm__( "mov %0, offset Lcase7\n" : "=m" (Ljmptab[7]) : );
-#endif
+		qasmL(initialized:)
+		qasm2( mov edx, dword ptr[4 + 12 + esp] )
+		qasm2( mov ecx, dword ptr[4 + 4 + esp] )
+		qasm2( xor eax, eax )
+		qasm2( mov ebx, dword ptr[4 + 8 + esp] )
+		qasm2( mov al, byte ptr[17 + edx] )
+		qasm2( cmp al, 8 )
+		qasm1( jge Lerror )
+		qasm1( fld dword ptr[0 + edx] )
+		qasm1( fld st( 0 ) )
+	#if defined(_MSC_VER)
+		qasm1( jmp dword ptr[Ljmptab + eax * 4] )
+	#elif defined(__GNUC__)
+		__asm__( "jmp dword ptr[%0 + eax * 4]\n" : : "r" (Ljmptab) );
+	#endif
 
-	qasmL(initialized:)
-	qasm2( mov edx, dword ptr[4 + 12 + esp] )
-	qasm2( mov ecx, dword ptr[4 + 4 + esp] )
-	qasm2( xor eax, eax )
-	qasm2( mov ebx, dword ptr[4 + 8 + esp] )
-	qasm2( mov al, byte ptr[17 + edx] )
-	qasm2( cmp al, 8 )
-	qasm1( jge Lerror )
-	qasm1( fld dword ptr[0 + edx] )
-	qasm1( fld st( 0 ) )
-#if defined(_MSC_VER)
-	qasm1( jmp dword ptr[Ljmptab + eax * 4] )
-#elif defined(__GNUC__)
-	__asm__( "jmp dword ptr[%0 + eax * 4]\n" : : "r" (Ljmptab) );
-#endif
+		qasmL(Lcase0:)
+		qasm1( fmul dword ptr[ebx] )
+		qasm1( fld dword ptr[0 + 4 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[ecx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[4 + ebx] )
+		qasm1( fld dword ptr[0 + 8 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[4 + ecx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[8 + ebx] )
+		qasm1( fxch st( 5 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fmul dword ptr[8 + ecx] )
+		qasm1( fxch st( 1 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fxch st( 3 ) )
+		qasm2( faddp st( 2 ), st( 0 ) )
+		qasm1( jmp LSetSides )
 
-	qasmL(Lcase0:)
-	qasm1( fmul dword ptr[ebx] )
-	qasm1( fld dword ptr[0 + 4 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[ecx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[4 + ebx] )
-	qasm1( fld dword ptr[0 + 8 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[4 + ecx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[8 + ebx] )
-	qasm1( fxch st( 5 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fmul dword ptr[8 + ecx] )
-	qasm1( fxch st( 1 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fxch st( 3 ) )
-	qasm2( faddp st( 2 ), st( 0 ) )
-	qasm1( jmp LSetSides )
+		qasmL(Lcase1:)
+		qasm1( fmul dword ptr[ecx] )
+		qasm1( fld dword ptr[0 + 4 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[ebx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[4 + ebx] )
+		qasm1( fld dword ptr[0 + 8 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[4 + ecx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[8 + ebx] )
+		qasm1( fxch st( 5 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fmul dword ptr[8 + ecx] )
+		qasm1( fxch st( 1 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fxch st( 3 ) )
+		qasm2( faddp st( 2 ), st( 0 ) )
+		qasm1( jmp LSetSides )
 
-	qasmL(Lcase1:)
-	qasm1( fmul dword ptr[ecx] )
-	qasm1( fld dword ptr[0 + 4 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[ebx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[4 + ebx] )
-	qasm1( fld dword ptr[0 + 8 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[4 + ecx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[8 + ebx] )
-	qasm1( fxch st( 5 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fmul dword ptr[8 + ecx] )
-	qasm1( fxch st( 1 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fxch st( 3 ) )
-	qasm2( faddp st( 2 ), st( 0 ) )
-	qasm1( jmp LSetSides )
+		qasmL(Lcase2:)
+		qasm1( fmul dword ptr[ebx] )
+		qasm1( fld dword ptr[0 + 4 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[ecx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[4 + ecx] )
+		qasm1( fld dword ptr[0 + 8 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[4 + ebx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[8 + ebx] )
+		qasm1( fxch st( 5 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fmul dword ptr[8 + ecx] )
+		qasm1( fxch st( 1 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fxch st( 3 ) )
+		qasm2( faddp st( 2 ), st( 0 ) )
+		qasm1( jmp LSetSides )
 
-	qasmL(Lcase2:)
-	qasm1( fmul dword ptr[ebx] )
-	qasm1( fld dword ptr[0 + 4 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[ecx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[4 + ecx] )
-	qasm1( fld dword ptr[0 + 8 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[4 + ebx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[8 + ebx] )
-	qasm1( fxch st( 5 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fmul dword ptr[8 + ecx] )
-	qasm1( fxch st( 1 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fxch st( 3 ) )
-	qasm2( faddp st( 2 ), st( 0 ) )
-	qasm1( jmp LSetSides )
+		qasmL(Lcase3:)
+		qasm1( fmul dword ptr[ecx] )
+		qasm1( fld dword ptr[0 + 4 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[ebx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[4 + ecx] )
+		qasm1( fld dword ptr[0 + 8 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[4 + ebx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[8 + ebx] )
+		qasm1( fxch st( 5 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fmul dword ptr[8 + ecx] )
+		qasm1( fxch st( 1 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fxch st( 3 ) )
+		qasm2( faddp st( 2 ), st( 0 ) )
+		qasm1( jmp LSetSides )
 
-	qasmL(Lcase3:)
-	qasm1( fmul dword ptr[ecx] )
-	qasm1( fld dword ptr[0 + 4 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[ebx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[4 + ecx] )
-	qasm1( fld dword ptr[0 + 8 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[4 + ebx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[8 + ebx] )
-	qasm1( fxch st( 5 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fmul dword ptr[8 + ecx] )
-	qasm1( fxch st( 1 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fxch st( 3 ) )
-	qasm2( faddp st( 2 ), st( 0 ) )
-	qasm1( jmp LSetSides )
+		qasmL(Lcase4:)
+		qasm1( fmul dword ptr[ebx] )
+		qasm1( fld dword ptr[0 + 4 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[ecx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[4 + ebx] )
+		qasm1( fld dword ptr[0 + 8 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[4 + ecx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[8 + ecx] )
+		qasm1( fxch st( 5 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fmul dword ptr[8 + ebx] )
+		qasm1( fxch st( 1 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fxch st( 3 ) )
+		qasm2( faddp st( 2 ), st( 0 ) )
+		qasm1( jmp LSetSides )
 
-	qasmL(Lcase4:)
-	qasm1( fmul dword ptr[ebx] )
-	qasm1( fld dword ptr[0 + 4 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[ecx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[4 + ebx] )
-	qasm1( fld dword ptr[0 + 8 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[4 + ecx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[8 + ecx] )
-	qasm1( fxch st( 5 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fmul dword ptr[8 + ebx] )
-	qasm1( fxch st( 1 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fxch st( 3 ) )
-	qasm2( faddp st( 2 ), st( 0 ) )
-	qasm1( jmp LSetSides )
+		qasmL(Lcase5:)
+		qasm1( fmul dword ptr[ecx] )
+		qasm1( fld dword ptr[0 + 4 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[ebx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[4 + ebx] )
+		qasm1( fld dword ptr[0 + 8 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[4 + ecx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[8 + ecx] )
+		qasm1( fxch st( 5 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fmul dword ptr[8 + ebx] )
+		qasm1( fxch st( 1 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fxch st( 3 ) )
+		qasm2( faddp st( 2 ), st( 0 ) )
+		qasm1( jmp LSetSides )
 
-	qasmL(Lcase5:)
-	qasm1( fmul dword ptr[ecx] )
-	qasm1( fld dword ptr[0 + 4 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[ebx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[4 + ebx] )
-	qasm1( fld dword ptr[0 + 8 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[4 + ecx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[8 + ecx] )
-	qasm1( fxch st( 5 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fmul dword ptr[8 + ebx] )
-	qasm1( fxch st( 1 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fxch st( 3 ) )
-	qasm2( faddp st( 2 ), st( 0 ) )
-	qasm1( jmp LSetSides )
+		qasmL(Lcase6:)
+		qasm1( fmul dword ptr[ebx] )
+		qasm1( fld dword ptr[0 + 4 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[ecx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[4 + ecx] )
+		qasm1( fld dword ptr[0 + 8 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[4 + ebx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[8 + ecx] )
+		qasm1( fxch st( 5 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fmul dword ptr[8 + ebx] )
+		qasm1( fxch st( 1 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fxch st( 3 ) )
+		qasm2( faddp st( 2 ), st( 0 ) )
+		qasm1( jmp LSetSides )
 
-	qasmL(Lcase6:)
-	qasm1( fmul dword ptr[ebx] )
-	qasm1( fld dword ptr[0 + 4 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[ecx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[4 + ecx] )
-	qasm1( fld dword ptr[0 + 8 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[4 + ebx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[8 + ecx] )
-	qasm1( fxch st( 5 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fmul dword ptr[8 + ebx] )
-	qasm1( fxch st( 1 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fxch st( 3 ) )
-	qasm2( faddp st( 2 ), st( 0 ) )
-	qasm1( jmp LSetSides )
+		qasmL(Lcase7:)
+		qasm1( fmul dword ptr[ecx] )
+		qasm1( fld dword ptr[0 + 4 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[ebx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[4 + ecx] )
+		qasm1( fld dword ptr[0 + 8 + edx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fmul dword ptr[4 + ebx] )
+		qasm1( fxch st( 2 ) )
+		qasm1( fld st( 0 ) )
+		qasm1( fmul dword ptr[8 + ecx] )
+		qasm1( fxch st( 5 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fmul dword ptr[8 + ebx] )
+		qasm1( fxch st( 1 ) )
+		qasm2( faddp st( 3 ), st( 0 ) )
+		qasm1( fxch st( 3 ) )
+		qasm2( faddp st( 2 ), st( 0 ) )
 
-	qasmL(Lcase7:)
-	qasm1( fmul dword ptr[ecx] )
-	qasm1( fld dword ptr[0 + 4 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[ebx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[4 + ecx] )
-	qasm1( fld dword ptr[0 + 8 + edx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fmul dword ptr[4 + ebx] )
-	qasm1( fxch st( 2 ) )
-	qasm1( fld st( 0 ) )
-	qasm1( fmul dword ptr[8 + ecx] )
-	qasm1( fxch st( 5 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fmul dword ptr[8 + ebx] )
-	qasm1( fxch st( 1 ) )
-	qasm2( faddp st( 3 ), st( 0 ) )
-	qasm1( fxch st( 3 ) )
-	qasm2( faddp st( 2 ), st( 0 ) )
+		qasmL(LSetSides:)
+		qasm2( faddp st( 2 ), st( 0 ) )
+		qasm1( fcomp dword ptr[12 + edx] )
+		qasm2( xor ecx, ecx )
+		qasm1( fnstsw ax )
+		qasm1( fcomp dword ptr[12 + edx] )
+		qasm2( and ah, 1 )
+		qasm2( xor ah, 1 )
+		qasm2( add cl, ah )
+		qasm1( fnstsw ax )
+		qasm2( and ah, 1 )
+		qasm2( add ah, ah )
+		qasm2( add cl, ah )
+	#if defined(_MSC_VER)
+		qasm1( pop ebx )
+	#elif defined(__GNUC__)
+		__asm__( "pop $ebx" );
+	#endif
+		qasm2( mov eax, ecx )
+		qasm1( ret )
 
-	qasmL(LSetSides:)
-	qasm2( faddp st( 2 ), st( 0 ) )
-	qasm1( fcomp dword ptr[12 + edx] )
-	qasm2( xor ecx, ecx )
-	qasm1( fnstsw ax )
-	qasm1( fcomp dword ptr[12 + edx] )
-	qasm2( and ah, 1 )
-	qasm2( xor ah, 1 )
-	qasm2( add cl, ah )
-	qasm1( fnstsw ax )
-	qasm2( and ah, 1 )
-	qasm2( add ah, ah )
-	qasm2( add cl, ah )
-	qasm1( pop ebx )
-	qasm2( mov eax, ecx )
-	qasm1( ret )
+		qasmL(Lerror:)
+		qasm1( int 3 )
 
-	qasmL(Lerror:)
-	qasm1( int 3 )
+		qnakedend(BOPS)
+	}
+	#if defined(_MSC_VER)
+		#pragma warning( pop )
+	#elif defined(__GNUC__)
+		#pragma GCC diagnostic pop
+	#endif // _MSC_VER
 
-	qnakedend(BOPS)
-}
-#if defined(_MSC_VER)
-	#pragma warning( pop )
-#elif defined(__GNUC__)
-	#pragma GCC diagnostic pop
-#endif // _MSC_VER
-
-#endif
-#endif
+#endif // C_ONLY
 
 float RadiusFromBounds( const vector3 *mins, const vector3 *maxs ) {
 	int		i;

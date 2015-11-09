@@ -415,7 +415,7 @@ static void UI_DoServerRefresh( void );
 static void UI_BuildServerDisplayList( int force );
 static void UI_BuildServerStatus( qboolean force );
 static void UI_BuildFindPlayerList( qboolean force );
-static int Q_DECL UI_ServersQsortCompare( const void *arg1, const void *arg2 );
+static int UI_ServersQsortCompare( const void *arg1, const void *arg2 );
 static int UI_MapCountByGameType( qboolean singlePlayer );
 static int UI_HeadCountByColor( void );
 static const char *UI_SelectedMap( int index, int *actual );
@@ -3501,7 +3501,7 @@ static float UI_GetValue( int ownerDraw ) {
 	return 0;
 }
 
-static int Q_DECL UI_ServersQsortCompare( const void *arg1, const void *arg2 ) {
+static int UI_ServersQsortCompare( const void *arg1, const void *arg2 ) {
 	return trap->LAN_CompareServers( UI_SourceForLAN(), uiInfo.serverStatus.sortKey, uiInfo.serverStatus.sortDir, *(int*)arg1, *(int*)arg2 );
 }
 
@@ -8746,8 +8746,8 @@ void JP_SaveFavServers( void )
 
 uiImport_t *trap = NULL;
 
-extern "C" {
-Q_EXPORT uiExport_t* Q_DECL GetModuleAPI( int apiVersion, uiImport_t *import ) {
+Q_CABI {
+Q_EXPORT Q_CDECL uiExport_t *GetModuleAPI( int apiVersion, uiImport_t *import ) {
 	static uiExport_t uie = { 0 };
 
 	assert( import );

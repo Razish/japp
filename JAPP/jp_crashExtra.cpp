@@ -12,7 +12,7 @@
 #else
 
 #ifdef PROJECT_CGAME
-Q_CABI Q_EXPORT void Q_DECL CrashReport( int fileHandle ) {
+Q_CABI Q_CDECL Q_EXPORT void CrashReport( int fileHandle ) {
 	char text[] = "Test from cgame\n";
 	Q_FSWriteString( fileHandle, text );
 }

@@ -17,5 +17,11 @@
     <WorkspaceConfiguration Name="Release-32" Selected="no">
       <Project Name="japp" ConfigName="Release-32"/>
     </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Optimised Debug" Selected="no">
+      <Project Name="japp" ConfigName="Optimised Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Optimised Debug-32" Selected="no">
+      <Project Name="japp" ConfigName="Optimised Debug-32"/>
+    </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

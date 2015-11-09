@@ -232,7 +232,7 @@ extern	cvar_t	*sv_allowAnonymous;
 // sv_main.c
 //
 void SV_FinalMessage( char *message );
-//void Q_DECL SV_SendServerCommand( client_t *cl, const char *fmt, ...);
+//void Q_CDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...);
 
 
 void SV_AddOperatorCommands( void );

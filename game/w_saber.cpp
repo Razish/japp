@@ -3212,7 +3212,6 @@ void WP_SaberBounceSound( gentity_t *ent, int saberNum, int bladeNum ) {
 
 	else if ( WP_SaberBladeUseSecondBladeStyle( &ent->client->saber[saberNum], bladeNum ) && ent->client->saber[saberNum].block2Sound[0] )
 		G_Sound( ent, CHAN_AUTO, ent->client->saber[saberNum].block2Sound[Q_irand( 0, 2 )] );
-
 	else
 		G_Sound( ent, CHAN_AUTO, G_SoundIndex( va( "sound/weapons/saber/saberblock%d.wav", index ) ) );
 }
@@ -3236,7 +3235,6 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 	static int selfSaberLevel, otherSaberLevel;
 	int dmg = 0;
 	int attackStr = 0;
-	float saberBoxSize = d_saberBoxTraceSize.value;
 	qboolean idleDamage = qfalse;
 	qboolean didHit = qfalse;
 	qboolean sabersClashed = qfalse;
@@ -3256,38 +3254,32 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 
 	selfSaberLevel = G_SaberAttackPower( self, SaberAttacking( self ) );
 
-	//Add the standard radius into the box size
-	saberBoxSize += (self->client->saber[rSaberNum].blade[rBladeNum].radius*0.5f);
-
-	if ( self->client->ps.weaponTime <= 0 ) { //if not doing any attacks or anything, just use point traces.
-		VectorClear( &saberTrMins );
-		VectorClear( &saberTrMaxs );
+	float saberBoxSize;
+	if ( self->client->ps.weaponTime <= 0 ) {
+		saberBoxSize = 0.0;
 	}
-	else if ( d_saberGhoul2Collision.integer ) {
-		if ( d_saberSPStyleDamage.integer || (japp_saberTweaks.integer & SABERTWEAK_TRACESIZE) ) {
-			// SP-size saber damage traces
-			VectorSet( &saberTrMins, -2, -2, -2 );
-			VectorSet( &saberTrMaxs, 2, 2, 2 );
+	else {
+		saberBoxSize = d_saberBoxTraceSize.value;
+		const float hiltRadius = self->client->saber[rSaberNum].blade[rBladeNum].radius;
+		if ( d_saberGhoul2Collision.integer ) {
+			if ( d_saberSPStyleDamage.integer || (japp_saberTweaks.integer & SABERTWEAK_TRACESIZE) ) {
+				saberBoxSize = 2.0f;
+			}
+			else {
+				saberBoxSize = (d_saberBoxTraceSize.value + (hiltRadius * 0.5f)) * 3.0f;
+			}
 		}
 		else {
-			VectorSet( &saberTrMins, -saberBoxSize * 3, -saberBoxSize * 3, -saberBoxSize * 3 );
-			VectorSet( &saberTrMaxs, saberBoxSize * 3, saberBoxSize * 3, saberBoxSize * 3 );
+			if ( d_saberAlwaysBoxTrace.integer || self->client->ps.fd.saberAnimLevel == FORCE_LEVEL_1 ) {
+				saberBoxSize = d_saberBoxTraceSize.value + (hiltRadius * 0.5f);
+			}
+			else {
+				saberBoxSize = hiltRadius * 0.4f;
+			}
 		}
 	}
-	else if ( self->client->ps.fd.saberAnimLevel < FORCE_LEVEL_2 ) { //box trace for fast, because it doesn't get updated so often
-		VectorSet( &saberTrMins, -saberBoxSize, -saberBoxSize, -saberBoxSize );
-		VectorSet( &saberTrMaxs, saberBoxSize, saberBoxSize, saberBoxSize );
-	}
-	else if ( d_saberAlwaysBoxTrace.integer ) {
-		VectorSet( &saberTrMins, -saberBoxSize, -saberBoxSize, -saberBoxSize );
-		VectorSet( &saberTrMaxs, saberBoxSize, saberBoxSize, saberBoxSize );
-	}
-	else { //just trace the minimum blade radius
-		saberBoxSize = (self->client->saber[rSaberNum].blade[rBladeNum].radius*0.4f);
-
-		VectorSet( &saberTrMins, -saberBoxSize, -saberBoxSize, -saberBoxSize );
-		VectorSet( &saberTrMaxs, saberBoxSize, saberBoxSize, saberBoxSize );
-	}
+	VectorSet( &saberTrMins, -saberBoxSize, -saberBoxSize, -saberBoxSize );
+	VectorSet( &saberTrMaxs,  saberBoxSize,  saberBoxSize,  saberBoxSize );
 
 	while ( !saberTraceDone ) {
 		if ( doInterpolate && !d_saberSPStyleDamage.integer && !(japp_saberTweaks.integer & SABERTWEAK_INTERPOLATE) ) {

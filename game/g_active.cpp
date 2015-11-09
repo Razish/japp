@@ -2826,13 +2826,25 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( ent->s.eType != ET_NPC && ent->client && ent->client->pers.connected == CON_CONNECTED
 		&& !!(japp_allowHook.bits & (1 << level.gametype)) )
 	{
-		const qboolean oldGrapple = GetCPD( (bgEntity_t *)ent, CPD_OLDGRAPPLE )
+		const bool saberBusy = PM_SaberInStart( ent->client->ps.saberMove )
+					|| BG_SaberInAttack( ent->client->ps.saberMove )
+					|| PM_SaberInReturn( ent->client->ps.saberMove )
+					|| PM_SaberInTransition( ent->client->ps.saberMove );
+		const bool oldGrapple = GetCPD( (bgEntity_t *)ent, CPD_OLDGRAPPLE )
 			|| !Client_Supports( ent, CSF_GRAPPLE_SWING );
-		const qboolean pullGrapple = !!(ent->client->pers.cmd.buttons & BUTTON_GRAPPLE);
-		const qboolean releaseGrapple = !!(ent->client->pers.cmd.buttons & BUTTON_USE);
-		if ( !ent->client->hook && pullGrapple && ent->client->ps.pm_type != PM_DEAD
+		const bool pullGrapple = !!(ent->client->pers.cmd.buttons & BUTTON_GRAPPLE);
+		const bool releaseGrapple = !!(ent->client->pers.cmd.buttons & BUTTON_USE);
+
+		if ( ent->client->hook && pullGrapple
+			&& (saberBusy
+				|| ent->client->ps.duelInProgress
+				|| ent->client->ps.forceHandExtend != HANDEXTEND_NONE) )
+		{
+			Weapon_HookFree( ent->client->hook );
+		}
+		else if ( !ent->client->hook && pullGrapple && ent->client->ps.pm_type != PM_DEAD
 			&& ent->client->lastHookTime <= level.time - japp_hookDebouncer.integer
-			&& !BG_SaberInAttack( ent->client->ps.saberMove ) )
+			&& !saberBusy )
 		{
 			Weapon_GrapplingHook_Fire( ent );
 		}
@@ -2840,9 +2852,7 @@ void ClientThink_real( gentity_t *ent ) {
 		if ( ent->client->hook && ent->client->hook->inuse ) {
 			if ( (releaseGrapple && ent->client->hookHasBeenFired && !ent->client->fireHeld)
 				|| (oldGrapple && !pullGrapple && ent->client->hook)
-				|| (!pullGrapple && ent->client->fireHeld && ent->client->hookHasBeenFired)
-				|| ent->client->ps.duelInProgress
-				|| ent->client->ps.forceHandExtend != HANDEXTEND_NONE )
+				|| (!pullGrapple && ent->client->fireHeld && ent->client->hookHasBeenFired) )
 			{
 				Weapon_HookFree( ent->client->hook );
 			}

@@ -52,6 +52,12 @@
 
 #endif
 
+#if defined(__arm__) || defined(_M_ARM)
+	#define QARCH_ARM
+#elif defined(i386) || defined(__i386__) || defined(_M_IX86)
+	#define QARCH_X86
+#endif
+
 // compiler specific definitions
 #if defined(_MSC_VER)
 
@@ -60,7 +66,7 @@
 	#define Q_NAKED __declspec(naked)
 	#define Q_USED
 	#define Q_UNUSED
-	#define Q_DECL __cdecl
+	#define Q_CDECL __cdecl
 
 #elif defined(__GNUC__) && (__GNUC__ >= 3)
 
@@ -69,7 +75,11 @@
 	#define Q_NAKED __attribute__(( noinline ))
 	#define Q_USED __attribute__(( used ))
 	#define Q_UNUSED __attribute__(( unused ))
-	#define Q_DECL __attribute__(( cdecl ))
+	#if defined(QARCH_X86)
+		#define Q_CDECL __attribute__(( cdecl ))
+	#else
+		#define Q_CDECL
+	#endif
 
 #else
 
@@ -77,7 +87,7 @@
 	#define Q_NAKED
 	#define Q_USED
 	#define Q_UNUSED
-	#define Q_DECL
+	#define Q_CDECL
 
 #endif
 
@@ -109,10 +119,6 @@
 #endif
 
 #define Q3_LITTLE_ENDIAN // assume little endian
-
-#if defined(__arm__) || defined(_M_ARM)
-	#define QARCH_ARM
-#endif
 
 // type definitions
 typedef unsigned char byte;
@@ -974,8 +980,8 @@ void Info_NextPair( const char **s, char *key, char *value );
 extern void( *Com_Error )(int level, const char *error, ...);
 extern void( *Com_Printf )(const char *msg, ...);
 #else
-void Q_DECL Com_Error( int level, const char *error, ... );
-void Q_DECL Com_Printf( const char *msg, ... );
+void Q_CDECL Com_Error( int level, const char *error, ... );
+void Q_CDECL Com_Printf( const char *msg, ... );
 #endif
 
 

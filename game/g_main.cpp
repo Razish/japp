@@ -3252,7 +3252,7 @@ static qboolean	G_NAV_CheckNodeFailedForEnt( int entID, int nodeNum ) {
 
 gameImport_t *trap = NULL;
 Q_CABI {
-Q_EXPORT gameExport_t* Q_DECL GetModuleAPI( int apiVersion, gameImport_t *import ) {
+Q_EXPORT Q_CDECL gameExport_t *GetModuleAPI( int apiVersion, gameImport_t *import ) {
 	static gameExport_t ge = { 0 };
 
 	assert( import );

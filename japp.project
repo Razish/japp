@@ -16,7 +16,43 @@
   "arguments": [],
   "parentProject": ""
  }, {
+  "name": "Debug-32",
+  "enabled": false,
+  "buildDirectory": "build",
+  "sourceDirectory": "$(ProjectPath)",
+  "generator": "",
+  "buildType": "",
+  "arguments": [],
+  "parentProject": ""
+ }, {
+  "name": "Optimised Debug",
+  "enabled": false,
+  "buildDirectory": "build",
+  "sourceDirectory": "$(ProjectPath)",
+  "generator": "",
+  "buildType": "",
+  "arguments": [],
+  "parentProject": ""
+ }, {
+  "name": "Optimised Debug-32",
+  "enabled": false,
+  "buildDirectory": "build",
+  "sourceDirectory": "$(ProjectPath)",
+  "generator": "",
+  "buildType": "",
+  "arguments": [],
+  "parentProject": ""
+ }, {
   "name": "Release",
+  "enabled": false,
+  "buildDirectory": "build",
+  "sourceDirectory": "$(ProjectPath)",
+  "generator": "",
+  "buildType": "",
+  "arguments": [],
+  "parentProject": ""
+ }, {
+  "name": "Release-32",
   "enabled": false,
   "buildDirectory": "build",
   "sourceDirectory": "$(ProjectPath)",
@@ -488,7 +524,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="ja" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -501,8 +537,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Q -c debug=1 no_sql=1</CleanCommand>
-        <BuildCommand>scons -Q debug=1 no_sql=1</BuildCommand>
+        <CleanCommand>scons -Qc debug=1 force32=0 no_sql=1</CleanCommand>
+        <BuildCommand>scons -Q debug=1 force32=0 no_sql=1</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -526,7 +562,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="ja" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -539,8 +575,84 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Q -c debug=1 force32=1 no_sql=1</CleanCommand>
+        <CleanCommand>scons -Qc debug=1 force32=1 no_sql=1</CleanCommand>
         <BuildCommand>scons -Q debug=1 force32=1 no_sql=1</BuildCommand>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory>$(WorkspacePath)</WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Optimised Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g" C_Options="-g" Assembler="" Required="no" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="yes">
+        <RebuildCommand/>
+        <CleanCommand>scons -Qc debug=2 force32=0 no_sql=1</CleanCommand>
+        <BuildCommand>scons -Q debug=2 force32=0 no_sql=1</BuildCommand>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory>$(WorkspacePath)</WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Optimised Debug-32" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g" C_Options="-g" Assembler="" Required="no" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="yes">
+        <RebuildCommand/>
+        <CleanCommand>scons -Qc debug=2 force32=1 no_sql=1</CleanCommand>
+        <BuildCommand>scons -Q debug=2 force32=1 no_sql=1</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -564,7 +676,7 @@
       </Compiler>
       <Linker Options="-O2" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Release" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="ja" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="" IntermediateDirectory="./Release" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_game &quot;japlus&quot; +exec &quot;sv.conf&quot; +exec &quot;cl.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -577,8 +689,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Q -c no_sql=1</CleanCommand>
-        <BuildCommand>scons -Q no_sql=1</BuildCommand>
+        <CleanCommand>scons -Qc debug=0 force32=0 no_sql=1</CleanCommand>
+        <BuildCommand>scons -Q debug=0 force32=0 no_sql=1</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -602,7 +714,7 @@
       </Compiler>
       <Linker Options="-O2" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Release" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="ja" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="" IntermediateDirectory="./Release" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -615,8 +727,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Q -c force32=1 no_sql=1</CleanCommand>
-        <BuildCommand>scons -Q force32=1 no_sql=1</BuildCommand>
+        <CleanCommand>scons -Qc debug=0 force32=1 no_sql=1</CleanCommand>
+        <BuildCommand>scons -Q debug=0 force32=1 no_sql=1</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>

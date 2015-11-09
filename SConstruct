@@ -298,6 +298,10 @@ if realcc == 'gcc' or realcc == 'clang':
 			'-mstackrealign',
 			'-masm=intel',
 		]
+		env['ASFLAGS'] += [
+			'-msyntax=intel',
+			'-mmnemonic=intel',
+		]
 		if 'NO_SSE' in os.environ:
 			env['CCFLAGS'] += [
 				'-mfpmath=387',

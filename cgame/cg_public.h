@@ -729,5 +729,5 @@ typedef struct cgameExport_s {
 	void( *CameraShake )				(void);
 } cgameExport_t;
 
-//linking of cgame library
-typedef cgameExport_t* (Q_DECL *GetCGameAPI_t)(int apiVersion, cgameImport_t *import);
+// linking of cgame library
+typedef cgameExport_t* (Q_CDECL *GetCGameAPI_t)(int apiVersion, cgameImport_t *import);

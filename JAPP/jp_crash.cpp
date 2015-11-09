@@ -106,7 +106,7 @@ int StrToDword( const char *str ) {
 #define Sys_LibraryError() dlerror()
 #endif
 
-void *Q_LoadLibrary( const char *name, void (Q_DECL **func)(int) ) {
+void *Q_LoadLibrary( const char *name, void (Q_CDECL **func)(int) ) {
 	void *libHandle = NULL;
 	char fsGame[MAX_CVAR_VALUE_STRING];
 	trap->Cvar_VariableStringBuffer( "fs_game", fsGame, sizeof(fsGame) );
@@ -119,7 +119,7 @@ void *Q_LoadLibrary( const char *name, void (Q_DECL **func)(int) ) {
 	}
 
 
-	*func = (void (Q_DECL *)(int))Sys_LoadFunction( libHandle, "CrashReport" );
+	*func = (void (Q_CDECL *)(int))Sys_LoadFunction( libHandle, "CrashReport" );
 	if ( !*func ) {
 		Com_Printf( "Q_LoadLibrary(%s) failed to find CrashReport function:\n\"%s\" !\n", name, Sys_LibraryError() );
 		Sys_UnloadLibrary( libHandle );
@@ -1282,11 +1282,11 @@ static void JP_Crash_AddCrashInfo( int signal, siginfo_t *siginfo, ucontext_t *c
 }
 
 static void JP_Crash_AddRegisterDump( ucontext_t *ctx, fileHandle_t f ) {
-	Q_FSWriteString( f, "General Purpose & Control Registers:\n", f );
+	Q_FSWriteString( f, "General Purpose & Control Registers:\n" );
 	Q_FSWriteString( f, va( "EAX: 0x%08X, EBX: 0x%08X, ECX: 0x%08X, EDX: 0x%08X\n", ctx->uc_mcontext.gregs[REG_EAX], ctx->uc_mcontext.gregs[REG_EBX], ctx->uc_mcontext.gregs[REG_ECX], ctx->uc_mcontext.gregs[REG_EDX] ) );
 	Q_FSWriteString( f, va( "EDI: 0x%08X, ESI: 0x%08X, ESP: 0x%08X, EBP: 0x%08X\n", ctx->uc_mcontext.gregs[REG_EDI], ctx->uc_mcontext.gregs[REG_ESI], ctx->uc_mcontext.gregs[REG_ESP], ctx->uc_mcontext.gregs[REG_EBP] ) );
 	Q_FSWriteString( f, va( "EIP: 0x%08X\n\n",  ctx->uc_mcontext.gregs[REG_EIP] ) );
-	Q_FSWriteString( f, "Segment Registers:\n", f );
+	Q_FSWriteString( f, "Segment Registers:\n" );
 	Q_FSWriteString( f, va( "CS: 0x%08X, DS: 0x%08X, ES: 0x%08X\n", ctx->uc_mcontext.gregs[REG_CS], ctx->uc_mcontext.gregs[REG_DS], ctx->uc_mcontext.gregs[REG_ES] ) );
 	Q_FSWriteString( f, va( "FS: 0x%08X, GS: 0x%08X, SS: 0x%08X\n\n", ctx->uc_mcontext.gregs[REG_FS], ctx->uc_mcontext.gregs[REG_GS], ctx->uc_mcontext.gregs[REG_SS] ) );
 }
@@ -1521,7 +1521,7 @@ static void CrashHandler( int signal, siginfo_t *siginfo, ucontext_t *ctx ) {
 #else
 	Q_FSWriteString( f, "Side: Client-side\n" );
 #endif
-	Q_FSWriteString( "Build Date/Time: " __DATE__ " " __TIME__ "\n" );
+	Q_FSWriteString( f, "Build Date/Time: " __DATE__ " " __TIME__ "\n" );
 	JP_Crash_AddOSData( f );
 	JP_Enum_MemoryMap();
 	Q_FSWriteString( f, "Crash type: Exception\n\n" );
