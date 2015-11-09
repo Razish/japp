@@ -2,3 +2,5 @@ japp | Debug
 japp | Debug-32
 japp | Release
 japp | Release-32
+japp | Optimised Debug
+japp | Optimised Debug-32

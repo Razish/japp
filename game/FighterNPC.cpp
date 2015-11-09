@@ -515,7 +515,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh ) {
 
 #if 1//This is working now, but there are some transitional jitters... Rich?
 	// STRAFING
-	if ( (int)pVeh->m_pVehicleInfo->strafePerc
+	if ( !flcmp( pVeh->m_pVehicleInfo->strafePerc, 0.0f )
 #ifdef PROJECT_GAME//only do this check on game side, because if it's cgame, it's being predicted, and it's only predicted if the local client is the driver
 		&& pVeh->m_pVehicleInfo->Inhabited( pVeh )//has to have a driver in order to be capable of landing
 #endif
@@ -1192,7 +1192,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh ) {
 		while ( m < 3 ) {
 			aVelDif = pVeh->m_vFullAngleVelocity.raw[m];
 
-			if ( (int)aVelDif ) {
+			if ( !flcmp( aVelDif, 0.0f ) ) {
 				dForVel = (aVelDif*0.1f)*pVeh->m_fTimeModifier;
 				if ( dForVel > 1.0f || dForVel < -1.0f ) {
 					pVeh->m_vOrientation->raw[m] += dForVel;
@@ -1334,7 +1334,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh ) {
 					}
 				}
 #else// VEH_CONTROL_SCHEME_4
-				if ( !flcmp( pVeh->m_pVehicleInfo->rollLimit, -1, 0.001f ) ) {
+				if ( !flcmp( pVeh->m_pVehicleInfo->rollLimit, -1 ) ) {
 					if ( curRoll > pVeh->m_pVehicleInfo->rollLimit ) {
 						curRoll = pVeh->m_pVehicleInfo->rollLimit;
 					}
@@ -1409,7 +1409,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh ) {
 	if ( !parentPS->hackingTime ) {//use that roll
 		pVeh->m_vOrientation->roll = curRoll;
 		//NOTE: this seems really backwards...
-		if ( (int)pVeh->m_vOrientation->roll ) { //continually adjust the yaw based on the roll..
+		if ( !flcmp( pVeh->m_vOrientation->roll, 0.0f ) ) { //continually adjust the yaw based on the roll..
 			if ( (pVeh->m_iRemovedSurfaces || parentPS->electrifyTime >= curTime)//spiralling out of control
 				&& (!(pVeh->m_pParentEntity->s.number % 4) || !(pVeh->m_pParentEntity->s.number % 5)) ) {//leave YAW alone
 			}
@@ -1425,7 +1425,7 @@ static void ProcessOrientCommands( Vehicle_t *pVeh ) {
 		float strafeDif = AngleSubtract( strafeRoll, pVeh->m_vOrientation->roll );
 		pVeh->m_vOrientation->roll += (strafeDif*0.1f)*pVeh->m_fTimeModifier;
 		if ( !BG_UnrestrainedPitchRoll( riderPS, pVeh ) ) {//cap it reasonably
-			if ( !flcmp( pVeh->m_pVehicleInfo->rollLimit, -1, 0.001f )
+			if ( !flcmp( pVeh->m_pVehicleInfo->rollLimit, -1 )
 				&& !pVeh->m_iRemovedSurfaces
 				&& parentPS->electrifyTime<curTime ) {
 				if ( pVeh->m_vOrientation->roll > pVeh->m_pVehicleInfo->rollLimit ) {

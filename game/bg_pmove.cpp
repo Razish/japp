@@ -438,8 +438,8 @@ static void PM_SetVehicleAngles( vector3 *normal ) {
 	//float	curVehicleBankingSpeed;
 	vehicleBankingSpeed = (pVeh->m_pVehicleInfo->bankingSpeed*32.0f)*pml.frametime;//0.25f
 
-	if ( vehicleBankingSpeed <= 0
-		|| (pVeh->m_pVehicleInfo->pitchLimit == 0 && pVeh->m_pVehicleInfo->rollLimit == 0) ) {//don't bother, this vehicle doesn't bank
+	if ( vehicleBankingSpeed <= 0 || (pVeh->m_pVehicleInfo->pitchLimit == 0 && pVeh->m_pVehicleInfo->rollLimit == 0) ) {
+		// don't bother, this vehicle doesn't bank
 		return;
 	}
 	//FIXME: do 3 traces to define a plane and use that... smoothes it out some, too...
@@ -525,18 +525,14 @@ static void PM_SetVehicleAngles( vector3 *normal ) {
 			continue;
 		}
 		//bank faster the higher the difference is
-#if 0
-		else if ( i == 0/*PITCH*/ )
-			curVehicleBankingSpeed = vehicleBankingSpeed*fabsf(AngleNormalize180(AngleSubtract( vAngles.pitch, pVeh->m_vOrientation->pitch )))/(g_vehicleInfo[pm->ps->vehicleIndex].pitchLimit/2.0f);
-		else if ( i == 2/*ROLL*/ )
-			curVehicleBankingSpeed = vehicleBankingSpeed*fabsf(AngleNormalize180(AngleSubtract( vAngles.roll, pVeh->m_vOrientation->roll )))/(g_vehicleInfo[pm->ps->vehicleIndex].rollLimit/2.0f);
-
-		if ( curVehicleBankingSpeed )
-#endif
-		{
-			if ( pVeh->m_vOrientation->raw[i] >= vAngles.raw[i] + vehicleBankingSpeed )	pVeh->m_vOrientation->raw[i] -= vehicleBankingSpeed;
-			else if ( pVeh->m_vOrientation->raw[i] <= vAngles.raw[i] - vehicleBankingSpeed )	pVeh->m_vOrientation->raw[i] += vehicleBankingSpeed;
-			else																				pVeh->m_vOrientation->raw[i] = vAngles.raw[i];
+		if ( pVeh->m_vOrientation->raw[i] >= vAngles.raw[i] + vehicleBankingSpeed ) {
+			pVeh->m_vOrientation->raw[i] -= vehicleBankingSpeed;
+		}
+		else if ( pVeh->m_vOrientation->raw[i] <= vAngles.raw[i] - vehicleBankingSpeed ) {
+			pVeh->m_vOrientation->raw[i] += vehicleBankingSpeed;
+		}
+		else {
+			pVeh->m_vOrientation->raw[i] = vAngles.raw[i];
 		}
 	}
 }
@@ -3053,6 +3049,7 @@ static void PM_AirMove( void ) {
 	if ( pVeh && pVeh->m_pVehicleInfo->hoverHeight > 0 ) {
 		// in a hovering vehicle, have air control
 		if ( 1 ) {
+			wishSpeed = pm->ps->speed;
 			VectorScale( &pm->ps->moveDir, pm->ps->speed, &wishVel );
 			VectorCopy( &pm->ps->moveDir, &wishDir );
 			scale = 1.0f;
@@ -3063,11 +3060,11 @@ static void PM_AirMove( void ) {
 		VectorClear( &wishVel );
 	}
 	else {
-		// reduced air control while not jetting
 		wishVel.x = pml.forward.x*fmove + pml.right.x*smove;
 		wishVel.y = pml.forward.y*fmove + pml.right.y*smove;
 		wishVel.z = 0;
 
+		// reduced air control while not jetting
 		if ( pm->ps->pm_type == PM_JETPACK ) {
 			// if we are jetting then we have more control than usual
 			if ( pm->cmd.upmove <= 0 ) {
