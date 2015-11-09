@@ -792,7 +792,7 @@ void SetPlaneSignbits( cplane_t *out ) {
 		qasm1( je initialized )
 		qasm2( mov bops_initialized, 1 )
 	#elif defined(__GNUC__)
-		__asm__( "push $ebx" );
+		__asm__( "push %ebx" );
 		__asm__( "cmp %0, 1\n" : : "r" (bops_initialized) );
 		qasm1( je initialized )
 		__asm__( "mov %0, 1\n" : "=r" (bops_initialized) : );
@@ -1033,7 +1033,7 @@ void SetPlaneSignbits( cplane_t *out ) {
 	#if defined(_MSC_VER)
 		qasm1( pop ebx )
 	#elif defined(__GNUC__)
-		__asm__( "pop $ebx" );
+		__asm__( "pop %ebx" );
 	#endif
 		qasm2( mov eax, ecx )
 		qasm1( ret )
