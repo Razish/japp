@@ -912,7 +912,6 @@ namespace JPLua {
 			}
 			VectorClear(&ent->client->ps.velocity);
 		}
-		}
 		else
 			ent->client->pers.adminData.isFrozen = qfalse;
 	}
