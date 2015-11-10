@@ -905,8 +905,14 @@ namespace JPLua {
 
 	static void Player_SetFreeze(lua_State *L, jpluaEntity_t *ent){
 		bool doFreeze = lua_toboolean( L, 3 ) ? true : false;
-		if (doFreeze)
+		if (doFreeze){
 			ent->client->pers.adminData.isFrozen = qtrue;
+			if ( ent->client->hook ){
+				Weapon_HookFree(ent->client->hook);
+			}
+			VectorClear(&ent->client->ps.velocity);
+		}
+		}
 		else
 			ent->client->pers.adminData.isFrozen = qfalse;
 	}
