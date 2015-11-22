@@ -2901,6 +2901,9 @@ void Merc_On( gentity_t *ent ) {
 	for ( i = 0; i < AMMO_MAX; i++ ) {
 		ent->client->ps.ammo[i] = ammoMax[i];
 	}
+	for (i = 0; i < HI_NUM_HOLDABLE; i++){
+		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << i);
+	}
 }
 
 void Merc_Off( gentity_t *ent ) {
@@ -2908,6 +2911,7 @@ void Merc_Off( gentity_t *ent ) {
 	weapon_t newWeap = WP_NONE, wp = (weapon_t)ent->client->ps.weapon;
 
 	ent->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
+	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = japp_spawnItems.integer;
 
 	for ( i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
 		if ( (ent->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
