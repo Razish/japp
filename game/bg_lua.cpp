@@ -1476,6 +1476,14 @@ namespace JPLua {
 
 	#endif
 
+	#ifdef PROJECT_CGAME
+	static int Export_OpenURL( lua_State *L ){
+		const char *url = luaL_checkstring(L, 1);
+		Q_OpenURL(url);
+		return 0;
+	}
+	#endif
+
 	static const importTable_t imports[] = {
 	#ifdef PROJECT_GAME
 		{ "AddClientCommand", Export_AddClientCommand }, // AddClientCommand( string cmd )
@@ -1549,6 +1557,9 @@ namespace JPLua {
 		{ "IsKeyDown", Export_IsKeyDown }, // boolean IsKeyDown( integer )
 	#endif
 		{ "OpenFile", File_Open},
+#ifdef PROJECT_CGAME
+		{ "OpenURL", Export_OpenURL},
+#endif
 		{ "RayTrace", Export_Trace }, // traceResult Trace( stuff )
 	#ifdef PROJECT_CGAME
 		{ "RegisterFont", RegisterFont }, // RegisterFont( string name)

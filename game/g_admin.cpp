@@ -94,8 +94,7 @@ static void AM_ParseString( const char *data ) {
 	}
 	for ( int i = 0; i < ADMIN_STRING_MAX; i++ ) {
 		temp = cJSON_GetObjectItem( root, admin_strings[i].name );
-		string_list[i].clear();
-		string_list[i].append( cJSON_ToString( temp ) );
+		string_list[i] = cJSON_ToString(temp);
 	}
 	cJSON_Delete( root );
 }

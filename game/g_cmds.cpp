@@ -3666,7 +3666,7 @@ EMOTE( cower )
 EMOTE( dance1 )
 EMOTE( dance2 )
 EMOTE( dance3 )
-EMOTE( die1 )
+EMOTE( die )
 EMOTE( die2 )
 EMOTE( fabulous )
 EMOTE( finishinghim )
@@ -3802,8 +3802,6 @@ static int cmdcmp( const void *a, const void *b ) {
 static const command_t commands[] = {
 	{ "amaimgun", Cmd_Emote_aimgun, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amatease", Cmd_Emote_atease, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
-	{ "amhiltthrow1", Cmd_Emote_amhiltthrow1, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
-	{ "amhiltthrow2", Cmd_Emote_amhiltthrow2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "ambeg", Cmd_Emote_beg, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "ambreakdance", Cmd_Emote_breakdance, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "ambreakdance2", Cmd_Emote_breakdance2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
@@ -3811,7 +3809,7 @@ static const command_t commands[] = {
 	{ "amdance1", Cmd_Emote_dance1, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdance2", Cmd_Emote_dance2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdance3", Cmd_Emote_dance3, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
-	{ "amdie", Cmd_Emote_die1, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amdie", Cmd_Emote_die, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdie2", Cmd_Emote_die2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdropsaber", Cmd_Emote_Dropsaber, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amfabulous", Cmd_Emote_fabulous, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
@@ -3819,6 +3817,8 @@ static const command_t commands[] = {
 	{ "amharlem", Cmd_Emote_harlem, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amheal", Cmd_Emote_heal, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amhello", Cmd_Emote_hello, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amhiltthrow1", Cmd_Emote_amhiltthrow1, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amhiltthrow2", Cmd_Emote_amhiltthrow2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amhips", Cmd_Emote_hips, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amhug", Cmd_Emote_hug, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "aminfo", Cmd_AMInfo_f, GTB_ALL, 0 },
@@ -3839,7 +3839,7 @@ static const command_t commands[] = {
 	{ "amsit3", Cmd_Emote_sit3, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsit4", Cmd_Emote_sit4, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsit6", Cmd_Emote_sit6, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
-	{ "amsleep", Cmd_Emote_sleep, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amasleep", Cmd_Emote_sleep, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsmack1", Cmd_Emote_smack1, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amsmack2", Cmd_Emote_smack2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amstand", Cmd_Emote_stand, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
