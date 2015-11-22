@@ -188,7 +188,7 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 
 	if ( announce ) {
 		std::string anon = string_list[announce];
-		if ( !string.empty() ){
+		if ( !anon.empty() ){
 			anon.replace( anon.find_first_of( "$1" ), 2, ent->client->pers.netname );
 			if ( announce == ADMIN_STRING_GIVE_ANNOUNCE ) {
 				anon.replace( anon.find_first_of( "$2" ), 2, arg ); // e.g (player) got weapon(force, ammo)
@@ -197,6 +197,7 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 				anon.replace( anon.find_first_of( "$2" ), 2, arg2 );
 				anon.replace( anon.find_first_of( "$3" ), 2, arg2 );
 				trap->SendServerCommand( ent->s.number, va( "print \"%s\n\"", anon.c_str() ) );
+				return;
 			}
 			G_Announce( anon.c_str(), ent->s.number);
 		}
@@ -1150,7 +1151,7 @@ static void AM_Ghost( gentity_t *ent ) {
 		Ghost_Off( ent );
 
 		//trap->SendServerCommand( targetClient, "cp \"" S_COLOR_CYAN "Unghosted\n\"" );
-		AM_DrawString(ADMIN_STRING_GHOST, targ, NULL);
+		AM_DrawString(ADMIN_STRING_UNGHOSTED, targ, NULL);
 	}
 	else {
 		G_LogPrintf( level.log.admin, "\t%s ghosting %s\n", G_PrintClient( ent-g_entities ),
@@ -1159,7 +1160,7 @@ static void AM_Ghost( gentity_t *ent ) {
 		Ghost_On( ent );
 
 		//trap->SendServerCommand( targetClient, "cp \"You are now a " S_COLOR_CYAN "ghost\n\"" );
-		AM_DrawString(ADMIN_STRING_UNGHOSTED, targ, NULL);
+		AM_DrawString(ADMIN_STRING_GHOST, targ, NULL);
 	}
 	trap->LinkEntity( (sharedEntity_t *)targ );
 }
