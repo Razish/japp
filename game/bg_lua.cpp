@@ -327,7 +327,7 @@ namespace JPLua {
 
 	static const char *colourComponents[] = { "r", "g", "b", "a" };
 	void ReadColour( float *out, int numComponents, lua_State *L, int idx ) {
-		for ( int i = 0; i < numComponents; i++ ) {
+		for ( int i = 0; i < numComponents && i < ARRAY_LEN(colourComponents); i++ ) {
 			lua_getfield( L, idx, colourComponents[i] );
 			out[i] = lua_tonumber( L, -1 );
 		}
