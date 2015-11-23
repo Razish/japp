@@ -2643,6 +2643,13 @@ void ClientThink_real( gentity_t *ent ) {
 			ForceSpeed( ent, 0 );
 			break;
 		case GENCMD_FORCE_THROW:
+			if (ent->client->ps.forceDodgeAnim == BOTH_KISSEE){
+				extern qboolean SetEmote(gentity_t *ent, const emote_t *emote);
+				static const emote_t emote = { "smack", BOTH_FORCEGRIP3THROW, MAX_ANIMATIONS, EMF_HOLSTER };
+				SetEmote(ent, &emote);
+				G_SoundOnEnt(ent, CHAN_BODY, "sound/weapons/melee/punch2.mp3");
+				break;
+			}
 			ForceThrow( ent, qfalse );
 			break;
 		case GENCMD_FORCE_PULL:
