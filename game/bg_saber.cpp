@@ -305,7 +305,7 @@ saberMoveData_t	saberMoveData[LS_MOVE_MAX] = {//							NB:randomized
 	{ "StfNewAnimSpinKickFwd",		BOTH_MELEE_BACKKICK,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_S_R2L,		200 }, // LS_JAPLUS_STFNEWANIM_SPINKICKFWD
 	{ "NewAnimJumpBackKickSpin",	BOTH_STAND1,			0,		0,		AFLAG_ACTIVE,	0,		0,			LS_READY,		LS_S_R2L,		0 }, // LS_JAPLUS_NEWANIM_JUMPBACKKICKSPIN
 	{ "NewAnimJumpBackKickFlip",	BOTH_STAND1,			0,		0,		AFLAG_ACTIVE,	0,		0,			LS_READY,		LS_S_R2L,		0 }, // LS_JAPLUS_NEWANIM_JUMPBACKKICKFLIP
-	{ "NewAnimFlipSaberStab",		BOTH_STAND1,			0,		0,		AFLAG_ACTIVE,	0,		0,			LS_READY,		LS_S_R2L,		0 }, // LS_JAPLUS_NEWANIM_FLIPSABERSTAB
+	{ "NewAnimFlipSaberStab",		BOTH_NEW_STABER,		Q_T,	Q_B,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_READY,		200 }, // LS_JAPLUS_NEWANIM_FLIPSABERSTAB
 };
 
 
@@ -1558,18 +1558,24 @@ saberMoveName_t PM_SaberJumpAttackMove( void ) {
 	saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
 
 	//see if we have an overridden (or cancelled) lunge move
-	if ( saber1 && saber1->jumpAtkFwdMove != LS_INVALID )
-		if ( saber1->jumpAtkFwdMove != LS_NONE )
+	if ( saber1 && saber1->jumpAtkFwdMove != LS_INVALID ) {
+		if ( saber1->jumpAtkFwdMove != LS_NONE ) {
 			return (saberMoveName_t)saber1->jumpAtkFwdMove;
-	if ( saber2 && saber2->jumpAtkFwdMove != LS_INVALID )
-		if ( saber2->jumpAtkFwdMove != LS_NONE )
+		}
+	}
+	if ( saber2 && saber2->jumpAtkFwdMove != LS_INVALID ) {
+		if ( saber2->jumpAtkFwdMove != LS_NONE ) {
 			return (saberMoveName_t)saber2->jumpAtkFwdMove;
+		}
+	}
 
-	//no overrides, cancelled?
-	if ( saber1 && saber1->jumpAtkFwdMove == LS_NONE )
-		return LS_A_T2B;//LS_NONE;
-	if ( saber2 && saber2->jumpAtkFwdMove == LS_NONE )
-		return LS_A_T2B;//LS_NONE;
+	// no overrides, cancelled?
+	if ( saber1 && saber1->jumpAtkFwdMove == LS_NONE ) {
+		return LS_A_T2B; //LS_NONE;
+	}
+	if ( saber2 && saber2->jumpAtkFwdMove == LS_NONE ) {
+		return LS_A_T2B; //LS_NONE;
+	}
 
 	//just do it
 	VectorCopy( &pm->ps->viewangles, &fwdAngles );
@@ -1577,13 +1583,19 @@ saberMoveName_t PM_SaberJumpAttackMove( void ) {
 	AngleVectors( &fwdAngles, &jumpFwd, NULL, NULL );
 	VectorScale( &jumpFwd, 300, &pm->ps->velocity );
 	pm->ps->velocity.z = 280;
-	PM_SetForceJumpZStart( pm->ps->origin.z );//so we don't take damage if we land at same height
+	PM_SetForceJumpZStart( pm->ps->origin.z ); // so we don't take damage if we land at same height
 
 	PM_AddEvent( EV_JUMP );
 	pm->ps->fd.forceJumpSound = 1;
 	pm->cmd.upmove = 0;
 
-	return LS_A_JUMP_T__B_;
+	if ( GetCInfo( CINFO_NEWDFAALT ) && !GetCPD( pm_entSelf, CPD_NEWDFAALT ) && (pm->cmd.buttons & BUTTON_ALT_ATTACK) ) {
+		return LS_JAPLUS_NEWANIM_FLIPSABERSTAB;
+	}
+	//TODO CINFO_NEWDFAPRIM
+	else {
+		return LS_A_JUMP_T__B_;
+	}
 }
 
 float PM_GroundDistance( void ) {
@@ -1763,7 +1775,7 @@ static qboolean PM_StabDisabled( void ) {
 	return GetCInfo( CINFO_NOSTAB ) || (GetCPD( pm_entSelf, CPD_NOSTAB ) && GetCInfo( CINFO_NOSTAB ));
 }
 
-saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
+static saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
 	saberMoveName_t newmove = LS_NONE;
 	qboolean noSpecials = PM_InSecondaryStyle();
 	qboolean allowCartwheels = qtrue;
@@ -1774,48 +1786,47 @@ saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
 		saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
 		saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
 
-		if ( saber1
-			&& saber1->jumpAtkRightMove != LS_INVALID ) {
-			if ( saber1->jumpAtkRightMove != LS_NONE ) {//actually overriding
+		if ( saber1 && saber1->jumpAtkRightMove != LS_INVALID ) {
+			if ( saber1->jumpAtkRightMove != LS_NONE ) {
+				// actually overriding
 				overrideJumpRightAttackMove = (saberMoveName_t)saber1->jumpAtkRightMove;
 			}
-			else if ( saber2
-				&& saber2->jumpAtkRightMove > LS_NONE ) {//would be cancelling it, but check the second saber, too
+			else if ( saber2 && saber2->jumpAtkRightMove > LS_NONE ) {
+				// would be cancelling it, but check the second saber, too
 				overrideJumpRightAttackMove = (saberMoveName_t)saber2->jumpAtkRightMove;
 			}
-			else {//nope, just cancel it
+			else {
+				// nope, just cancel it
 				overrideJumpRightAttackMove = LS_NONE;
 			}
 		}
-		else if ( saber2
-			&& saber2->jumpAtkRightMove != LS_INVALID ) {//first saber not overridden, check second
+		else if ( saber2 && saber2->jumpAtkRightMove != LS_INVALID ) {
+			// first saber not overridden, check second
 			overrideJumpRightAttackMove = (saberMoveName_t)saber2->jumpAtkRightMove;
 		}
 
-		if ( saber1
-			&& saber1->jumpAtkLeftMove != LS_INVALID ) {
-			if ( saber1->jumpAtkLeftMove != LS_NONE ) {//actually overriding
+		if ( saber1 && saber1->jumpAtkLeftMove != LS_INVALID ) {
+			if ( saber1->jumpAtkLeftMove != LS_NONE ) {
+				// actually overriding
 				overrideJumpLeftAttackMove = (saberMoveName_t)saber1->jumpAtkLeftMove;
 			}
-			else if ( saber2
-				&& saber2->jumpAtkLeftMove > LS_NONE ) {//would be cancelling it, but check the second saber, too
+			else if ( saber2 && saber2->jumpAtkLeftMove > LS_NONE ) {
+				// would be cancelling it, but check the second saber, too
 				overrideJumpLeftAttackMove = (saberMoveName_t)saber2->jumpAtkLeftMove;
 			}
-			else {//nope, just cancel it
+			else {
+				// nope, just cancel it
 				overrideJumpLeftAttackMove = LS_NONE;
 			}
 		}
-		else if ( saber2
-			&& saber2->jumpAtkLeftMove != LS_INVALID ) {//first saber not overridden, check second
+		else if ( saber2 && saber2->jumpAtkLeftMove != LS_INVALID ) {//first saber not overridden, check second
 			overrideJumpLeftAttackMove = (saberMoveName_t)saber1->jumpAtkLeftMove;
 		}
 
-		if ( saber1
-			&& (saber1->saberFlags&SFL_NO_CARTWHEELS) ) {
+		if ( saber1 && (saber1->saberFlags & SFL_NO_CARTWHEELS) ) {
 			allowCartwheels = qfalse;
 		}
-		if ( saber2
-			&& (saber2->saberFlags&SFL_NO_CARTWHEELS) ) {
+		if ( saber2 && (saber2->saberFlags & SFL_NO_CARTWHEELS) ) {
 			allowCartwheels = qfalse;
 		}
 	}
@@ -1824,7 +1835,7 @@ saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
 		if ( !noSpecials
 			&& overrideJumpRightAttackMove != LS_NONE
 			&& pm->ps->velocity.z > 20.0f //pm->ps->groundEntityNum != ENTITYNUM_NONE//on ground
-			&& (pm->cmd.buttons&BUTTON_ATTACK)//hitting attack
+			&& (pm->cmd.buttons & BUTTON_ATTACK)//hitting attack
 			&& PM_GroundDistance() < 70.0f //not too high above ground
 			&& (pm->cmd.upmove > 0 || (pm->ps->pm_flags & PMF_JUMP_HELD))//focus-holding player
 			&& BG_EnoughForcePowerForMove( SABER_ALT_ATTACK_POWER_LR ) )//have enough power
@@ -1970,24 +1981,26 @@ saberMoveName_t PM_SaberAttackForMovement( saberMoveName_t curmove ) {
 			}
 
 			// red DFA
-			else if ( !PM_DFADisabled() &&
-				!noSpecials &&
-				pm->ps->fd.saberAnimLevel == SS_STRONG &&
-				pm->ps->velocity.z > 100 &&
-				PM_GroundDistance() < 32 &&
-				!BG_InSpecialJump( pm->ps->legsAnim ) &&
-				!BG_SaberInSpecialAttack( pm->ps->torsoAnim ) &&
-				BG_EnoughForcePowerForMove( SABER_ALT_ATTACK_POWER_FB ) ) { //DFA
-				//trace_t tr;
-
-				//if (PM_SomeoneInFront(&tr))
-					{
-						newmove = PM_SaberJumpAttackMove();
-						if ( newmove != LS_A_T2B
-							&& newmove != LS_NONE ) {
-							BG_ForcePowerDrain( pm->ps, FP_GRIP, SABER_ALT_ATTACK_POWER_FB );
-						}
+			else if ( !PM_DFADisabled()
+				&& !noSpecials
+				&& pm->ps->fd.saberAnimLevel == SS_STRONG
+				&& pm->ps->velocity.z > 100
+				&& PM_GroundDistance() < 32
+				&& !BG_InSpecialJump( pm->ps->legsAnim )
+				&& !BG_SaberInSpecialAttack( pm->ps->torsoAnim )
+				&& BG_EnoughForcePowerForMove( SABER_ALT_ATTACK_POWER_FB ) )
+			{
+				#if 0
+				trace_t tr;
+				if ( PM_SomeoneInFront( &tr ) ) {
+				#else
+				if ( 1 ) {
+				#endif
+					newmove = PM_SaberJumpAttackMove();
+					if ( newmove != LS_A_T2B && newmove != LS_NONE ) {
+						BG_ForcePowerDrain( pm->ps, FP_GRIP, SABER_ALT_ATTACK_POWER_FB );
 					}
+				}
 			}
 
 			// blue lunge
@@ -2918,7 +2931,11 @@ weapChecks:
 			curmove = LS_READY;
 		}
 
-		if ( curmove == LS_A_JUMP_T__B_ || pm->ps->torsoAnim == BOTH_FORCELEAP2_T__B_ ) {//must transition back to ready from this anim
+		if ( curmove == LS_A_JUMP_T__B_
+			|| curmove == LS_JAPLUS_NEWANIM_FLIPSABERSTAB
+			|| pm->ps->torsoAnim == BOTH_FORCELEAP2_T__B_ )
+		{
+			// must transition back to ready from this anim
 			newmove = LS_R_T2B;
 		}
 		// check for fire
@@ -3022,7 +3039,10 @@ weapChecks:
 					else */
 					newmove = PM_SaberAttackForMovement( (saberMoveName_t)curmove );
 					if ( (PM_SaberInBounce( curmove ) || PM_SaberInBrokenParry( curmove ))
-						&& saberMoveData[newmove].startQuad == saberMoveData[curmove].endQuad ) {//this attack would be a repeat of the last (which was blocked), so don't actually use it, use the default chain attack for this bounce
+						&& saberMoveData[newmove].startQuad == saberMoveData[curmove].endQuad )
+					{
+						// this attack would be a repeat of the last (which was blocked), so don't actually use it,
+						//	use the default chain attack for this bounce
 						newmove = saberMoveData[curmove].chain_attack;
 					}
 
@@ -3277,7 +3297,9 @@ void PM_SetSaberMove( short newMove ) {
 			|| newMove == LS_UPSIDE_DOWN_ATTACK
 			|| newMove == LS_PULL_ATTACK_STAB
 			|| newMove == LS_PULL_ATTACK_SWING
-			|| BG_KickMove( newMove ) ) {
+			|| BG_KickMove( newMove )
+			|| newMove == LS_JAPLUS_NEWANIM_FLIPSABERSTAB )
+		{
 			parts = SETANIM_BOTH;
 		}
 		else if ( BG_SpinningSaberAnim( anim ) ) {//spins must be played on entire body

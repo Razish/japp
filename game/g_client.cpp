@@ -2890,14 +2890,16 @@ void ClientSpawn( gentity_t *ent ) {
 		}
 	}
 
-	if ( client->ps.fd.forceDoInit ) { //force a reread of force powers
+	if ( client->ps.fd.forceDoInit && !ent->client->pers.adminData.merc ) {
+		// force a reread of force powers
 		WP_InitForcePowers( ent );
 		client->ps.fd.forceDoInit = 0;
 	}
 
-	if ( ent->client->ps.fd.saberAnimLevel != SS_STAFF && ent->client->ps.fd.saberAnimLevel != SS_DUAL &&
-		ent->client->ps.fd.saberAnimLevel == ent->client->ps.fd.saberDrawAnimLevel &&
-		ent->client->ps.fd.saberAnimLevel == ent->client->sess.saberLevel ) {
+	if ( ent->client->ps.fd.saberAnimLevel != SS_STAFF && ent->client->ps.fd.saberAnimLevel != SS_DUAL
+		&& ent->client->ps.fd.saberAnimLevel == ent->client->ps.fd.saberDrawAnimLevel
+		&& ent->client->ps.fd.saberAnimLevel == ent->client->sess.saberLevel )
+	{
 		ent->client->sess.saberLevel = Q_clampi( SS_FAST, ent->client->sess.saberLevel, SS_STRONG );
 		ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel;
 
@@ -3119,7 +3121,8 @@ void ClientSpawn( gentity_t *ent ) {
 		&& level.gametype != GT_JEDIMASTER
 		&& !HasSetSaberOnly()
 		&& !AllForceDisabled( g_forcePowerDisable.integer )
-		&& g_jediVmerc.integer ) {
+		&& g_jediVmerc.integer )
+	{
 		if ( level.gametype >= GT_TEAM && (client->sess.sessionTeam == TEAM_BLUE || client->sess.sessionTeam == TEAM_RED) ) {//In Team games, force one side to be merc and other to be jedi
 			if ( level.numPlayingClients > 0 ) {//already someone in the game
 				int		i, forceTeam = TEAM_SPECTATOR;
@@ -3186,8 +3189,6 @@ void ClientSpawn( gentity_t *ent ) {
 			}
 		}
 		else {
-			int newWeap = -1, wp = client->ps.weapon;
-
 			client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
 
 			// give ammo for all available weapons
@@ -3200,6 +3201,7 @@ void ClientSpawn( gentity_t *ent ) {
 				}
 			}
 
+			int newWeap = -1;
 			for ( i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
 				if ( (client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
 					newWeap = i;
@@ -3218,17 +3220,18 @@ void ClientSpawn( gentity_t *ent ) {
 					newWeap = WP_NONE;
 			}
 
+			weapon_t wp = (weapon_t)ent->client->ps.weapon;
 			if ( newWeap != -1 )	ent->client->ps.weapon = newWeap;
 			else					ent->client->ps.weapon = 0;
 
-			G_AddEvent( ent, EV_NOAMMO, wp );
+			if ( ent->client->ps.weapon != WP_SABER ) {
+				G_AddEvent( ent, EV_NOAMMO, wp );
+			}
 		}
 	}
 
-	if ( level.gametype == GT_SIEGE && client->siegeClass != -1 &&
-		client->sess.sessionTeam != TEAM_SPECTATOR ) { //well then, we will use a custom weaponset for our class
-		int m = 0;
-
+	else if ( client->siegeClass != -1 && client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		// well then, we will use a custom weaponset for our class
 		client->ps.stats[STAT_WEAPONS] = bgSiegeClasses[client->siegeClass].weapons;
 
 		if ( client->ps.stats[STAT_WEAPONS] & (1 << WP_SABER) )
@@ -3239,20 +3242,21 @@ void ClientSpawn( gentity_t *ent ) {
 			client->ps.weapon = WP_MELEE;
 		inSiegeWithClass = qtrue;
 
-		while ( m < WP_NUM_WEAPONS ) {
+		for ( int m = 0; m < WP_NUM_WEAPONS; m++ ) {
 			if ( client->ps.stats[STAT_WEAPONS] & (1 << m) ) {
-				if ( client->ps.weapon != WP_SABER ) { //try to find the highest ranking weapon we have
+				if ( client->ps.weapon != WP_SABER ) {
+					// try to find the highest ranking weapon we have
 					if ( m > client->ps.weapon ) {
 						client->ps.weapon = m;
 					}
 				}
 
-				if ( m >= WP_BRYAR_PISTOL ) { //Max his ammo out for all the weapons he has.
-					if ( level.gametype == GT_SIEGE
-						&& m == WP_ROCKET_LAUNCHER ) {//don't give full ammo!
+				if ( m >= WP_BRYAR_PISTOL ) {
+					// Max his ammo out for all the weapons he has.
+					if ( m == WP_ROCKET_LAUNCHER ) {
+						// don't give full ammo!
 						//FIXME: extern this and check it when getting ammo from supplier, pickups or ammo stations!
-						if ( client->siegeClass != -1 &&
-							(bgSiegeClasses[client->siegeClass].classflags & (1 << CFL_SINGLE_ROCKET)) ) {
+						if ( bgSiegeClasses[client->siegeClass].classflags & (1 << CFL_SINGLE_ROCKET) ) {
 							client->ps.ammo[weaponData[m].ammoIndex] = 1;
 						}
 						else {
@@ -3260,9 +3264,8 @@ void ClientSpawn( gentity_t *ent ) {
 						}
 					}
 					else {
-						if ( level.gametype == GT_SIEGE
-							&& client->siegeClass != -1
-							&& (bgSiegeClasses[client->siegeClass].classflags & (1 << CFL_EXTRA_AMMO)) ) {//double ammo
+						if ( bgSiegeClasses[client->siegeClass].classflags & (1 << CFL_EXTRA_AMMO) ) {
+							// double ammo
 							client->ps.ammo[weaponData[m].ammoIndex] = ammoMax[weaponData[m].ammoIndex] * 2;
 							client->ps.eFlags |= EF_DOUBLE_AMMO;
 						}
@@ -3272,19 +3275,36 @@ void ClientSpawn( gentity_t *ent ) {
 					}
 				}
 			}
-			m++;
 		}
-	}
 
-	if ( level.gametype == GT_SIEGE &&
-		client->siegeClass != -1 &&
-		client->sess.sessionTeam != TEAM_SPECTATOR ) { //use class-specified inventory
+		// use class-specified inventory
 		client->ps.stats[STAT_HOLDABLE_ITEMS] = bgSiegeClasses[client->siegeClass].invenItems;
 		client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
 	}
+
 	else {
-		client->ps.stats[STAT_HOLDABLE_ITEMS] = 0;
-		client->ps.stats[STAT_HOLDABLE_ITEM] = 0;
+		if ( client->pers.adminData.merc ) {
+			ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = ((1 << HI_NUM_HOLDABLE) - 1) & ~1;
+			ent->client->ps.stats[STAT_HOLDABLE_ITEM] = HI_NONE + 1;
+		}
+		else {
+			client->ps.stats[STAT_HOLDABLE_ITEMS] = japp_spawnItems.integer;
+			uint32_t x = client->ps.stats[STAT_HOLDABLE_ITEMS];
+			// get the right-most bit
+			x &= -x;
+			// log2n of x is array index of bit-value
+			x = (x >= 1000000000)
+				? 9 : (x >= 100000000)
+				? 8 : (x >= 10000000)
+				? 7 : (x >= 1000000)
+				? 6 : (x >= 100000)
+				? 5 : (x >= 10000)
+				? 4 : (x >= 1000)
+				? 3 : (x >= 100)
+				? 2 : (x >= 10)
+				? 1 : 0;
+			client->ps.stats[STAT_HOLDABLE_ITEM] = x;
+		}
 	}
 
 	if ( level.gametype == GT_SIEGE &&

@@ -953,45 +953,46 @@ static void CG_RegisterModels( void ) {
 			cgs.gameModels[i] = 0; //FIXME: register here so that stuff gets precached!!!
 	}
 
-	CG_LoadingString( "BSP instances" );
-	size_t numBSPInstances = 1;
+	size_t numBSPInstances = 0;
 	for ( i = 1; i < MAX_SUB_BSP; i++ ) {
 		const char *bspName = CG_ConfigString( CS_BSP_MODELS + i );
 		if ( bspName[0] ) {
 			numBSPInstances++;
 		}
 	}
-	for ( i = 1; i < numBSPInstances; i++ ) {
-		//TODO: test validity
-		char loadingStr[1024];
-		Com_sprintf( loadingStr, sizeof(loadingStr), "Loading BSP instances (%i/%i)", i, numBSPInstances );
-		const char *bspName = NULL;
-		vector3 mins, maxs;
-		int j, sub = 0;
-		char temp[MAX_QPATH];
-
-		bspName = CG_ConfigString( CS_BSP_MODELS + i );
+	for ( i = 1; i < numBSPInstances + 1; i++ ) {
+		const char *bspName = CG_ConfigString( CS_BSP_MODELS + i );
 		if ( !bspName[0] ) {
 			break;
 		}
 
+		char loadingStr[1024];
+		Com_sprintf( loadingStr, sizeof(loadingStr), "Loading BSP instance %i/%i: %s",
+			i, numBSPInstances, bspName+1
+		);
+		CG_LoadingString( loadingStr );
+
 		trap->CM_LoadMap( bspName, qtrue );
 		cgs.inlineDrawModel[breakPoint] = trap->R_RegisterModel( bspName );
+		vector3 mins, maxs;
 		trap->R_ModelBounds( cgs.inlineDrawModel[breakPoint], &mins, &maxs );
-		for ( j = 0; j < 3; j++ ) {
+		for ( int j = 0; j < 3; j++ ) {
 			cgs.inlineModelMidpoints[breakPoint].raw[j] = mins.raw[j] + 0.5f * (maxs.raw[j] - mins.raw[j]);
 		}
-
 		breakPoint++;
-		for ( sub = 1; sub < MAX_MODELS; sub++ ) {
+
+		for ( int sub = 1; sub < MAX_MODELS; sub++ ) {
+			char temp[MAX_QPATH];
 			Com_sprintf( temp, MAX_QPATH, "*%d-%d", i, sub );
 			cgs.inlineDrawModel[breakPoint] = trap->R_RegisterModel( temp );
-			if ( !cgs.inlineDrawModel[breakPoint] )
+			if ( !cgs.inlineDrawModel[breakPoint] ) {
 				break;
+			}
 
 			trap->R_ModelBounds( cgs.inlineDrawModel[breakPoint], &mins, &maxs );
-			for ( j = 0; j < 3; j++ )
+			for ( int j = 0; j < 3; j++ ) {
 				cgs.inlineModelMidpoints[breakPoint].raw[j] = mins.raw[j] + 0.5f * (maxs.raw[j] - mins.raw[j]);
+			}
 			breakPoint++;
 		}
 	}

@@ -134,8 +134,8 @@ namespace JPLua {
 	int Entity_Create( lua_State *L ) {
 		gentity_t *ent;
 
-		if (lua_type(L, 1) != LUA_TTABLE) {
-			trap->Print("Entity_Create failed, not a table\n");
+		if ( lua_type( L, 1 ) != LUA_TTABLE ) {
+			trap->Print( "Entity_Create failed, not a table\n" );
 			return 0;
 		}
 
@@ -143,60 +143,68 @@ namespace JPLua {
 		level.numSpawnVars = 0;
 		level.numSpawnVarChars = 0;
 
-		lua_pushnil(L);
+		lua_pushnil( L );
 		const char *value, *key;
-		for (int i = 0; lua_next(L, 1); i++){
-			if (lua_type(L, -2) != LUA_TSTRING) continue; // key can be only string
-			switch (lua_type(L, -1)){
+		for ( int i = 0; lua_next( L, 1 ); i++ ) {
+			if ( lua_type( L, -2 ) != LUA_TSTRING ) {
+				continue; // key can be only string
+			}
+			switch ( lua_type( L, -1 ) ) {
+
 			case LUA_TNONE:
 			case LUA_TNIL:
-			case LUA_TBOOLEAN:
+			case LUA_TBOOLEAN: {
 				continue;
-			case LUA_TNUMBER:
-				key = luaL_checkstring(L, -2);
-				value = luaL_checkstring(L, -1);
-				break;
+			} break;
+
 			case LUA_TSTRING:
+			case LUA_TNUMBER: {
 				key = luaL_checkstring(L, -2);
 				value = luaL_checkstring(L, -1);
-				break;
+			} break;
+
 			case LUA_TTABLE:
 			case LUA_TFUNCTION:
-			case LUA_TUSERDATA: /// Vector...Player...Entity...etc
-				key = lua_tostring(L, -2);
+			case LUA_TUSERDATA: {
+				// Vector, Player, Entity etc
+				key = lua_tostring( L, -2 );
 
-				if (lua_getmetatable(L, -1)){ // Get Userdata metatable
-					luaL_getmetatable(L, "Vector.meta"); // Get metatable for comparing
-					StackDump(L);
-					if (lua_rawequal(L, -1, -2)){
-						vector3 *vector = CheckVector(L, -3);
-						value = va("%.0f %.0f %.0f", vector->x, vector->y, vector->z);
-						lua_pop(L, 2);
+				if ( lua_getmetatable( L, -1 ) ) {
+					// get userdata metatable
+					luaL_getmetatable( L, "Vector.meta" ); // get metatable for comparing
+					if ( lua_rawequal( L, -1, -2 ) ) {
+						vector3 *vector = CheckVector( L, -3 );
+						value = va( "%.0f %.0f %.0f", vector->x, vector->y, vector->z );
+						lua_pop( L, 2 );
 						break;
 					}
-					lua_pop(L, 2); // Pop metatables from stack
+					lua_pop( L, 2 ); // pop metatable from stack
 				}
+			} // fall through
+
 			case LUA_TTHREAD:
-			default:
-				lua_pop(L, 1);
+			default: {
+				lua_pop( L, 1 );
 				continue;
+			} break;
+
 			}
 
-			level.spawnVars[level.numSpawnVars][0] = G_AddSpawnVarToken(key);
-			level.spawnVars[level.numSpawnVars][1] = G_AddSpawnVarToken(value);
+			level.spawnVars[level.numSpawnVars][0] = G_AddSpawnVarToken( key );
+			level.spawnVars[level.numSpawnVars][1] = G_AddSpawnVarToken( value );
 
 			level.numSpawnVars++;
-			lua_pop(L, 1);
+			lua_pop( L, 1 );
 		}
-		ent = G_SpawnGEntityFromSpawnVars(qfalse);
+		ent = G_SpawnGEntityFromSpawnVars( qfalse );
 
 		level.manualSpawning = qfalse;
 
-		if (!ent){
-			lua_pushnil(L);
+		if ( !ent ) {
+			lua_pushnil( L );
 			return 1;
 		}
-		Entity_CreateRef(L, ent);
+		Entity_CreateRef( L, ent );
 		return 1;
 	}
 #endif

@@ -201,9 +201,9 @@ namespace JPLua {
 	//Retn: --
 	int Serialiser_Close( lua_State *L ) {
 		serialiser_t *serialiser = CheckSerialiser( L, 1 );
-
 		if ( serialiser->write ) {
-			const char *buffer = cJSON_Serialize( serialiser->outRoot, 1 );
+			int compress = lua_toboolean( L, 2 );
+			const char *buffer = cJSON_Serialize( serialiser->outRoot, compress ? 0 : 1 );
 
 			trap->FS_Write( buffer, strlen( buffer ), serialiser->fileHandle );
 			free( (void *)buffer );
@@ -231,11 +231,11 @@ namespace JPLua {
 		int len = 0;
 
 		serialiser = (serialiser_t *)lua_newuserdata( L, sizeof(serialiser_t) );
-		if (ls.currentPlugin){
-			Com_sprintf(serialiser->fileName, sizeof(serialiser->fileName), "%s%s/%s", pluginDir, ls.currentPlugin->name, path);
+		if ( ls.currentPlugin ) {
+			Com_sprintf( serialiser->fileName, sizeof(serialiser->fileName), "%s%s/%s", pluginDir, ls.currentPlugin->name, path );
 		}
-		else{
-			Com_sprintf(serialiser->fileName, sizeof(serialiser->fileName), "%s%s", pluginDir, path);
+		else {
+			Com_sprintf( serialiser->fileName, sizeof(serialiser->fileName), "%s%s", pluginDir, path );
 		}
 		len = trap->FS_Open( serialiser->fileName, &serialiser->fileHandle, mode );
 
@@ -258,9 +258,9 @@ namespace JPLua {
 				free( contents );
 				contents = NULL;
 			}
-			else if (len < 0){
-				lua_pop(L, 1); //pop userdata
-				lua_pushnil(L); // push nil
+			else if ( len < 0 ) {
+				lua_pop( L, 1 ); //pop userdata
+				lua_pushnil( L ); // push nil
 			}
 			else{
 				serialiser->inRoot = NULL;

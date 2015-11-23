@@ -1771,6 +1771,9 @@ extern const int WeaponAttackAnim[WP_NUM_WEAPONS];
 
 extern const int forcePowerDarkLight[NUM_FORCE_POWERS];
 
+extern bgEntity_t *pm_entSelf;
+extern bgEntity_t *pm_entVeh;
+
 
 #define ARENAS_PER_TIER		4
 #define MAX_ARENAS			1024

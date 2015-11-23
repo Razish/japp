@@ -456,10 +456,12 @@ void Q_CDECL UI_Printf( const char *msg, ... ) {
 	ret = Q_vsnprintf( text, sizeof(text), msg, argptr );
 	va_end( argptr );
 
-	if ( ret == -1 )
+	if ( ret == -1 ) {
 		trap_Print( "UI_Printf: overflow of 4096 bytes buffer\n" );
-	else
+	}
+	else {
 		trap_Print( text );
+	}
 }
 
 void SE_R_AddRefEntityToScene( const refEntity_t *re, int gameEntity ) {

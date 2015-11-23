@@ -345,6 +345,7 @@ namespace JPLua {
 			out[i] = lua_tonumber( L, -1 );
 			lua_pop( L, 1 );
 		}
+		lua_pop( L, 1 );
 	}
 
 	void PushInfostring( lua_State *L, const char *info ) {
@@ -430,9 +431,10 @@ namespace JPLua {
 			lua_settable( L, top );
 
 		if ( semver_gt( ls.currentPlugin->requiredJPLuaVersion, jpluaVersion ) ) {
-			luaO_pushfstring( L, S_COLOR_RED " %s requires JPLua v%d.%d.%d\n", ls.currentPlugin->name,
-				ls.currentPlugin->requiredJPLuaVersion.major, ls.currentPlugin->requiredJPLuaVersion.minor,
-				ls.currentPlugin->requiredJPLuaVersion.patch
+			luaO_pushfstring( L, S_COLOR_RED " %s requires JPLua v%d.%d.%d, you have JPLua v%d.%d.%d\n",
+				ls.currentPlugin->name, ls.currentPlugin->requiredJPLuaVersion.major,
+				ls.currentPlugin->requiredJPLuaVersion.minor, ls.currentPlugin->requiredJPLuaVersion.patch,
+				jpluaVersion.major, jpluaVersion.minor, jpluaVersion.patch
 			);
 			luaD_throw( L, LUA_ERRRUN );
 		}
@@ -1003,20 +1005,17 @@ namespace JPLua {
 	#elif defined(PROJECT_CGAME)
 		lua_pushinteger( L, cgs.gametype );
 	#endif
+
 		return 1;
 	}
 
 	static int Export_GetMap( lua_State *L ) {
 	#if defined(PROJECT_GAME)
-
 		char mapname[MAX_CVAR_VALUE_STRING];
 		COM_StripExtension( level.rawmapname, mapname, sizeof(mapname) );
 		lua_pushstring( L, mapname );
-
 	#elif defined(PROJECT_CGAME)
-
 		lua_pushstring( L, cgs.mapnameClean );
-
 	#endif
 
 		return 1;
@@ -1627,7 +1626,7 @@ namespace JPLua {
 		}
 
 		// set the ls.version
-		semver_parse( "13.2.1", &jpluaVersion );
+		semver_parse( "13.2.2", &jpluaVersion );
 
 		// set the callback in case of an error
 		lua_atpanic( ls.L, Error );

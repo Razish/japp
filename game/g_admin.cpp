@@ -24,46 +24,131 @@ static qboolean telemarksVisible = qfalse;
 static int effectid = 0;
 int lastluaid = -1;
 
-static std::array<std::string, ADMIN_STRING_MAX> string_list;
-static const stringID_table_t admin_strings[ADMIN_STRING_MAX] = {
-	ENUM2STRING(ADMIN_STRING_BAN),
-	ENUM2STRING(ADMIN_STRING_EMPOWER),
-	ENUM2STRING(ADMIN_STRING_EMPOWER_ANNOUNCE),
-	ENUM2STRING(ADMIN_STRING_UNEMPOWER),
-	ENUM2STRING(ADMIN_STRING_FREEZE),
-	ENUM2STRING(ADMIN_STRING_UNFREEZED),
-	ENUM2STRING(ADMIN_STRING_GHOST),
-	ENUM2STRING(ADMIN_STRING_GHOST_ANNOUNCE),
-	ENUM2STRING(ADMIN_STRING_UNGHOSTED),
-	ENUM2STRING(ADMIN_STRING_GIVE),
-	ENUM2STRING(ADMIN_STRING_GIVE_ANNOUNCE),
-	ENUM2STRING(ADMIN_STRING_KICK),
-	ENUM2STRING(ADMIN_STRING_MAP),
-	ENUM2STRING(ADMIN_STRING_MERC),
-	ENUM2STRING(ADMIN_STRING_MERC_ANNOUNCE),
-	ENUM2STRING(ADMIN_STRING_UNMERCED),
-	ENUM2STRING(ADMIN_STRING_PROTECT),
-	ENUM2STRING(ADMIN_STRING_PROTECT_ANNOUNCE),
-	ENUM2STRING(ADMIN_STRING_UNPROTECTED),
-	ENUM2STRING(ADMIN_STRING_SILENCE),
-	ENUM2STRING(ADMIN_STRING_SILENCE_ANNOUNCE),
-	ENUM2STRING(ADMIN_STRING_SILENCE_ALL),
-	ENUM2STRING(ADMIN_STRING_UNSILENCED),
-	ENUM2STRING(ADMIN_STRING_UNSILENCED_ALL),
-	ENUM2STRING(ADMIN_STRING_SLAP),
-	ENUM2STRING(ADMIN_STRING_SLAY),
-	ENUM2STRING(ADMIN_STRING_SLAY_ANNOUNCE),
-	ENUM2STRING(ADMIN_STRING_SLAY_ALL),
-	ENUM2STRING(ADMIN_STRING_SLEEP),
-	ENUM2STRING(ADMIN_STRING_SLEEP_ANNOUNCE),
-	ENUM2STRING(ADMIN_STRING_SLEEP_ALL),
-	ENUM2STRING(ADMIN_STRING_TELE),
-	ENUM2STRING(ADMIN_STRING_TELE_ANNOUNCE),
-	ENUM2STRING(ADMIN_STRING_WAKE),
-	ENUM2STRING(ADMIN_STRING_WAKE_ANNOUNCE),
-	ENUM2STRING(ADMIN_STRING_WAKE_ALL),
-	ENUM2STRING(ADMIN_STRING_WEATHER),
-	ENUM2STRING(ADMIN_STRING_RENAME),
+enum adminStrings_e {
+	ADMIN_STRING_BAN = 0,
+	ADMIN_STRING_EMPOWER,
+	ADMIN_STRING_EMPOWER_ANNOUNCE,
+	ADMIN_STRING_UNEMPOWER,
+	ADMIN_STRING_FREEZE,
+	ADMIN_STRING_UNFREEZED,
+	ADMIN_STRING_GHOST,
+	ADMIN_STRING_GHOST_ANNOUNCE,
+	ADMIN_STRING_UNGHOSTED,
+	ADMIN_STRING_GIVE,
+	ADMIN_STRING_GIVE_ANNOUNCE,
+	ADMIN_STRING_KICK,
+	ADMIN_STRING_MAP,
+	ADMIN_STRING_MERC,
+	ADMIN_STRING_MERC_ANNOUNCE,
+	ADMIN_STRING_UNMERCED,
+	ADMIN_STRING_UNMERCED_ANNOUNCE,
+	ADMIN_STRING_PROTECT,
+	ADMIN_STRING_PROTECT_ANNOUNCE,
+	ADMIN_STRING_UNPROTECTED,
+	ADMIN_STRING_SILENCE,
+	ADMIN_STRING_SILENCE_ANNOUNCE,
+	ADMIN_STRING_SILENCE_ALL,
+	ADMIN_STRING_UNSILENCED,
+	ADMIN_STRING_UNSILENCED_ALL,
+	ADMIN_STRING_SLAP,
+	ADMIN_STRING_SLAY,
+	ADMIN_STRING_SLAY_ANNOUNCE,
+	ADMIN_STRING_SLAY_ALL,
+	ADMIN_STRING_SLEEP,
+	ADMIN_STRING_SLEEP_ANNOUNCE,
+	ADMIN_STRING_SLEEP_ALL,
+	ADMIN_STRING_TELE,
+	ADMIN_STRING_TELE_ANNOUNCE,
+	ADMIN_STRING_WAKE,
+	ADMIN_STRING_WAKE_ANNOUNCE,
+	ADMIN_STRING_WAKE_ALL,
+	ADMIN_STRING_WEATHER,
+	ADMIN_STRING_RENAME,
+
+	ADMIN_STRING_MAX
+};
+static std::array<std::string, ADMIN_STRING_MAX> adminStrings = { {
+	"You have been banned", // ADMIN_STRING_BAN
+	"The Gods gave you power", // ADMIN_STRING_EMPOWER
+	"$1 has been empowered", // ADMIN_STRING_EMPOWER_ANNOUNCE
+	"You have lost your powers", // ADMIN_STRING_UNEMPOWER
+	"Don't move!", // ADMIN_STRING_FREEZE
+	"You may go now", // ADMIN_STRING_UNFREEZED
+	"No one sees you", // ADMIN_STRING_GHOST
+	"$1 is a ghost", // ADMIN_STRING_GHOST_ANNOUNCE
+	"You are visible again", // ADMIN_STRING_UNGHOSTED
+	"You received $1", // ADMIN_STRING_GIVE
+	"$1 received $2", // ADMIN_STRING_GIVE_ANNOUNCE
+	"You have been kicked (Reason: $1)", // ADMIN_STRING_KICK
+	"", // ADMIN_STRING_MAP
+	"Look at all the guns you've got", // ADMIN_STRING_MERC
+	"$1 has got a lot of guns, run away", // ADMIN_STRING_MERC_ANNOUNCE
+	"You have lost your guns", // ADMIN_STRING_UNMERCED
+	"$1 has lost their guns", // ADMIN_STRING_UNMERCED_ANNOUNCE
+	"You are protected", // ADMIN_STRING_PROTECT
+	"$1 is untouchable", // ADMIN_STRING_PROTECT_ANNOUNCE
+	"You've lost your protection", // ADMIN_STRING_UNPROTECTED
+	"Stop talking!", // ADMIN_STRING_SILENCE
+	"$1 has been silenced", // ADMIN_STRING_SILENCE_ANNOUNCE
+	"You all have been silenced", // ADMIN_STRING_SILENCE_ALL
+	"You may talk now", // ADMIN_STRING_UNSILENCED
+	"You all have been unsilenced", // ADMIN_STRING_UNSILENCED_ALL
+	"You have been slapped", // ADMIN_STRING_SLAP
+	"You have been slain", // ADMIN_STRING_SLAY
+	"$1 has been slain", // ADMIN_STRING_SLAY_ANNOUNCE
+	"You all have been slain", // ADMIN_STRING_SLAY_ALL
+	"Sweet dreams", // ADMIN_STRING_SLEEP
+	"$1 fell asleep", // ADMIN_STRING_SLEEP_ANNOUNCE
+	"It's time to sleep, everyone", // ADMIN_STRING_SLEEP_ALL
+	"You've been teleported", // ADMIN_STRING_TELE
+	"$1 has been abducted by the aliens", // ADMIN_STRING_TELE_ANNOUNCE
+	"Wakey-wakey, sunshine!", // ADMIN_STRING_WAKE
+	"$1 woke up", // ADMIN_STRING_WAKE_ANNOUNCE
+	"Rise and shine, everyone", // ADMIN_STRING_WAKE_ALL
+	"$1 set weather to $2", // ADMIN_STRING_WEATHER
+	"$1 renamed $2 to $3", // ADMIN_STRING_RENAME
+} };
+
+static const stringID_table_t adminStringsByIndex[ADMIN_STRING_MAX] = {
+	ENUM2STRING( ADMIN_STRING_BAN ),
+	ENUM2STRING( ADMIN_STRING_EMPOWER ),
+	ENUM2STRING( ADMIN_STRING_EMPOWER_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_UNEMPOWER ),
+	ENUM2STRING( ADMIN_STRING_FREEZE ),
+	ENUM2STRING( ADMIN_STRING_UNFREEZED ),
+	ENUM2STRING( ADMIN_STRING_GHOST ),
+	ENUM2STRING( ADMIN_STRING_GHOST_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_UNGHOSTED ),
+	ENUM2STRING( ADMIN_STRING_GIVE ),
+	ENUM2STRING( ADMIN_STRING_GIVE_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_KICK ),
+	ENUM2STRING( ADMIN_STRING_MAP ),
+	ENUM2STRING( ADMIN_STRING_MERC ),
+	ENUM2STRING( ADMIN_STRING_MERC_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_UNMERCED ),
+	ENUM2STRING( ADMIN_STRING_UNMERCED_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_PROTECT ),
+	ENUM2STRING( ADMIN_STRING_PROTECT_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_UNPROTECTED ),
+	ENUM2STRING( ADMIN_STRING_SILENCE ),
+	ENUM2STRING( ADMIN_STRING_SILENCE_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_SILENCE_ALL ),
+	ENUM2STRING( ADMIN_STRING_UNSILENCED ),
+	ENUM2STRING( ADMIN_STRING_UNSILENCED_ALL ),
+	ENUM2STRING( ADMIN_STRING_SLAP ),
+	ENUM2STRING( ADMIN_STRING_SLAY ),
+	ENUM2STRING( ADMIN_STRING_SLAY_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_SLAY_ALL ),
+	ENUM2STRING( ADMIN_STRING_SLEEP ),
+	ENUM2STRING( ADMIN_STRING_SLEEP_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_SLEEP_ALL ),
+	ENUM2STRING( ADMIN_STRING_TELE ),
+	ENUM2STRING( ADMIN_STRING_TELE_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_WAKE ),
+	ENUM2STRING( ADMIN_STRING_WAKE_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_WAKE_ALL ),
+	ENUM2STRING( ADMIN_STRING_WEATHER ),
+	ENUM2STRING( ADMIN_STRING_RENAME ),
 };
 
 static void AM_ConsolePrint( const gentity_t *ent, const char *msg ) {
@@ -93,8 +178,10 @@ static void AM_ParseString( const char *data ) {
 		return;
 	}
 	for ( int i = 0; i < ADMIN_STRING_MAX; i++ ) {
-		temp = cJSON_GetObjectItem( root, admin_strings[i].name );
-		string_list[i] = cJSON_ToString(temp);
+		temp = cJSON_GetObjectItem( root, adminStringsByIndex[i].name );
+		if ( temp ) {
+			adminStrings[i] = cJSON_ToString( temp );
+		}
 	}
 	cJSON_Delete( root );
 }
@@ -102,7 +189,7 @@ static void AM_ParseString( const char *data ) {
 static void AM_FillStrings( fileHandle_t handle ) {
 	cJSON *root = cJSON_CreateObject();
 	for ( int i = 0; i < ADMIN_STRING_MAX; i++ ) {
-		cJSON_AddStringToObject( root, admin_strings[i].name, string_list[i].c_str() );
+		cJSON_AddStringToObject( root, adminStringsByIndex[i].name, adminStrings[i].c_str() );
 	}
 	const char *buffer = cJSON_Serialize( root, 1 );
 	trap->FS_Write( buffer, strlen( buffer ), handle );
@@ -112,14 +199,14 @@ static void AM_FillStrings( fileHandle_t handle ) {
 //NOTE: arg2 is expected to be at-least 128 bytes long
 static void AM_DrawString( int type, gentity_t *ent = NULL, const char *arg = NULL, char *arg2 = NULL );
 static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2 ) {
-	std::string string = string_list[type];
+	std::string string = adminStrings[type];
 	int announce = 0;
 
 	switch ( type ) {
 	case ADMIN_STRING_KICK:
 	case ADMIN_STRING_BAN: {
 		if ( arg ) {
-			if ( strlen( arg ) == 0 ) {
+			if ( strlen( arg ) != 0 ) {
 				string.replace( string.find_first_of( "$1" ), 2, arg ); // reason
 			}
 			else {
@@ -144,6 +231,10 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 
 	case ADMIN_STRING_MERC: {
 		announce = ADMIN_STRING_MERC_ANNOUNCE;
+	} break;
+
+	case ADMIN_STRING_UNMERCED: {
+		announce = ADMIN_STRING_UNMERCED_ANNOUNCE;
 	} break;
 
 	case ADMIN_STRING_PROTECT: {
@@ -176,8 +267,9 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 	} break;
 
 	}
-		if ( !string.empty() ) {
-		if ( std::string( admin_strings[type].name ).find( "ALL" ) ) {
+
+	if ( !string.empty() ) {
+		if ( std::string( adminStringsByIndex[type].name ).find( "ALL" ) != std::string::npos ) {
 			G_Announce( string.c_str() );
 			return;
 		}
@@ -187,7 +279,7 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 	}
 
 	if ( announce ) {
-		std::string anon = string_list[announce];
+		std::string anon = adminStrings[announce];
 		if ( !anon.empty() ){
 			anon.replace( anon.find_first_of( "$1" ), 2, ent->client->pers.netname );
 			if ( announce == ADMIN_STRING_GIVE_ANNOUNCE ) {
@@ -197,7 +289,6 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 				anon.replace( anon.find_first_of( "$2" ), 2, arg2 );
 				anon.replace( anon.find_first_of( "$3" ), 2, arg2 );
 				trap->SendServerCommand( ent->s.number, va( "print \"%s\n\"", anon.c_str() ) );
-				return;
 			}
 			G_Announce( anon.c_str(), ent->s.number);
 		}
@@ -205,122 +296,6 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 }
 
 void AM_LoadStrings( void ) {
-	//setup defaults
-	string_list[ADMIN_STRING_BAN].append(
-		"You have been banned"
-	);
-	string_list[ADMIN_STRING_EMPOWER].append(
-		"The Gods gave you power"
-	);
-	string_list[ADMIN_STRING_EMPOWER_ANNOUNCE].append(
-		"$1 has been empowered"
-	);
-	string_list[ADMIN_STRING_UNEMPOWER].append(
-		"You have lost your powers"
-	);
-	string_list[ADMIN_STRING_FREEZE].append(
-		"Don't move!"
-	);
-	string_list[ADMIN_STRING_UNFREEZED].append(
-		"You may go now"
-	);
-	string_list[ADMIN_STRING_GHOST].append(
-		"No one sees you"
-	);
-	string_list[ADMIN_STRING_GHOST_ANNOUNCE].append(
-		"$1 is a ghost"
-	);
-	string_list[ADMIN_STRING_UNGHOSTED].append(
-		"You are visible again"
-	);
-	string_list[ADMIN_STRING_GIVE].append(
-		"You received $1"
-	);
-	string_list[ADMIN_STRING_GIVE_ANNOUNCE].append(
-		"$1 received $2"
-	);
-	string_list[ADMIN_STRING_KICK].append(
-		"You have been kicked (Reason: $1)"
-	);
-	string_list[ADMIN_STRING_MAP].append(
-		""
-	);
-	string_list[ADMIN_STRING_MERC].append(
-		"Look at all the guns you've got"
-	);
-	string_list[ADMIN_STRING_MERC_ANNOUNCE].append(
-		"$1 has got a lot of guns, run away"
-	);
-	string_list[ADMIN_STRING_UNMERCED].append(
-		"You have lost your guns"
-	);
-	string_list[ADMIN_STRING_PROTECT].append(
-		"You are protected"
-	);
-	string_list[ADMIN_STRING_PROTECT_ANNOUNCE].append(
-		"$1 is untouchable"
-	);
-	string_list[ADMIN_STRING_UNPROTECTED].append(
-		"You've lost your protection"
-	);
-	string_list[ADMIN_STRING_SILENCE].append(
-		"Stop talking!"
-	);
-	string_list[ADMIN_STRING_SILENCE_ANNOUNCE].append(
-		"$1 has been silenced"
-	);
-	string_list[ADMIN_STRING_SILENCE_ALL].append(
-		"You all have been silenced"
-	);
-	string_list[ADMIN_STRING_UNSILENCED].append(
-		"You may talk now"
-	);
-	string_list[ADMIN_STRING_UNSILENCED_ALL].append(
-		"You all have been unsilenced"
-	);
-	string_list[ADMIN_STRING_SLAP].append(
-		"You have been slapped"
-	);
-	string_list[ADMIN_STRING_SLAY].append(
-		"You have been slain"
-	);
-	string_list[ADMIN_STRING_SLAY_ANNOUNCE].append(
-		"$1 has been slain"
-	);
-	string_list[ADMIN_STRING_SLAY_ALL].append(
-		"You all have been slain"
-	);
-	string_list[ADMIN_STRING_SLEEP].append(
-		"Sweet dreams"
-	);
-	string_list[ADMIN_STRING_SLEEP_ANNOUNCE].append(
-		"$1 fell asleep"
-	);
-	string_list[ADMIN_STRING_SLEEP_ALL].append(
-		"It's time to sleep, everyone"
-	);
-	string_list[ADMIN_STRING_TELE].append(
-		"You've been teleported"
-	);
-	string_list[ADMIN_STRING_TELE_ANNOUNCE].append(
-		"$1 has been abducted by the aliens"
-	);
-	string_list[ADMIN_STRING_WAKE].append(
-		"Wakey-wakey, sunshine!"
-	);
-	string_list[ADMIN_STRING_WAKE_ANNOUNCE].append(
-		"$1 woke up"
-	);
-	string_list[ADMIN_STRING_WAKE_ALL].append(
-		"Rise and shine, everyone"
-	);
-	string_list[ADMIN_STRING_WEATHER].append(
-		"$1 set weather to $2"
-	);
-	string_list[ADMIN_STRING_RENAME].append(
-		"$1 renamed $2 to $3"
-	);
-
 	fileHandle_t f = NULL_FILE;
 	unsigned int len = trap->FS_Open( "admin_strings.json", &f, FS_READ );
 	trap->Print( "Loading admin strings\n" );
@@ -1121,46 +1096,47 @@ void Ghost_Off( gentity_t *ent ) {
 
 // ghost specified client (or self)
 static void AM_Ghost( gentity_t *ent ) {
-	char arg1[64] = {};
-	int targetClient;
-	gentity_t *targ;
-
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
 		return;
 	}
 
 	//Self, partial name, clientNum
+	char arg1[64]{};
 	trap->Argv( 1, arg1, sizeof(arg1) );
-	targetClient = (trap->Argc() > 1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT ) : ent - g_entities;
+	int targetClient = (trap->Argc() > 1)
+		? G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT )
+		: ent - g_entities;
 
 	if ( targetClient == -1 ) {
 		return;
 	}
 
-	targ = &g_entities[targetClient];
+	gentity_t *targ = &g_entities[targetClient];
 
 	if ( !AM_CanInflict( ent, targ ) ) {
 		return;
 	}
 
 	if ( targ->client->pers.adminData.isGhost ) {
-		G_LogPrintf( level.log.admin, "\t%s unghosting %s\n", G_PrintClient( ent-g_entities ),
-			G_PrintClient( targetClient ) );
+		G_LogPrintf( level.log.admin, "\t%s unghosting %s\n",
+			G_PrintClient( ent-g_entities ), G_PrintClient( targetClient )
+		);
 
 		Ghost_Off( ent );
 
 		//trap->SendServerCommand( targetClient, "cp \"" S_COLOR_CYAN "Unghosted\n\"" );
-		AM_DrawString(ADMIN_STRING_UNGHOSTED, targ, NULL);
+		AM_DrawString( ADMIN_STRING_UNGHOSTED, targ, NULL );
 	}
 	else {
-		G_LogPrintf( level.log.admin, "\t%s ghosting %s\n", G_PrintClient( ent-g_entities ),
-			G_PrintClient( targetClient ) );
+		G_LogPrintf( level.log.admin, "\t%s ghosting %s\n",
+			G_PrintClient( ent-g_entities ), G_PrintClient( targetClient )
+		);
 
 		Ghost_On( ent );
 
 		//trap->SendServerCommand( targetClient, "cp \"You are now a " S_COLOR_CYAN "ghost\n\"" );
-		AM_DrawString(ADMIN_STRING_GHOST, targ, NULL);
+		AM_DrawString( ADMIN_STRING_GHOST, targ, NULL );
 	}
 	trap->LinkEntity( (sharedEntity_t *)targ );
 }
@@ -2896,34 +2872,129 @@ static void AM_Vstr( gentity_t *ent ) {
 }
 
 void Merc_On( gentity_t *ent ) {
-	int i;
+	// save forcepower data because we strip them + revert
+	for ( int fp = 0; fp < NUM_FORCE_POWERS; fp++ ) {
+		ent->client->pers.adminData.forcePowerBaseLevel[fp] = ent->client->ps.fd.forcePowerBaseLevel[fp];
+		ent->client->pers.adminData.forcePowerLevel[fp] = ent->client->ps.fd.forcePowerLevel[fp];
+		if ( ent->client->ps.fd.forcePowersActive & (1 << fp) ) {
+			WP_ForcePowerStop( ent, (forcePowers_t)fp );
+		}
+		ent->client->ps.holocronsCarried[fp] = 0;
+		ent->client->ps.fd.forcePowerDebounce[fp] = 0;
+		ent->client->ps.fd.forcePowerDuration[fp] = 0;
+	}
+	ent->client->ps.fd.forceDeactivateAll = 0;
+	ent->client->pers.adminData.forcePowerMax = ent->client->ps.fd.forcePowerMax;
+	ent->client->ps.fd.forcePowerMax = ent->client->ps.fd.forcePower = 0;
+	ent->client->ps.fd.forcePowerRegenDebounceTime = level.time;
+	ent->client->pers.adminData.forcePowersKnown = ent->client->ps.fd.forcePowersKnown;
+	ent->client->ps.fd.forcePowersKnown = 0;
+	ent->client->ps.fd.forceGripEntityNum = ENTITYNUM_NONE;
+	ent->client->ps.fd.forceMindtrickTargetIndex[0] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[1] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[2] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[3] = 0u;
+	ent->client->ps.fd.forceJumpZStart = 0;
+	ent->client->ps.fd.forceJumpCharge = 0;
+	ent->client->ps.fd.forceJumpSound = 0;
+	ent->client->ps.fd.forceGripDamageDebounceTime = 0;
+	ent->client->ps.fd.forceGripBeingGripped = 0;
+	ent->client->ps.fd.forceGripCripple = 0;
+	ent->client->ps.fd.forceGripUseTime = 0;
+	ent->client->ps.fd.forceGripSoundTime = 0;
+	ent->client->ps.fd.forceGripStarted = 0;
+	ent->client->ps.fd.forceHealTime = 0;
+	ent->client->ps.fd.forceHealAmount = 0;
+	ent->client->ps.fd.forceRageRecoveryTime = 0;
+	ent->client->ps.fd.forceDrainEntNum = ENTITYNUM_NONE;
+	ent->client->ps.fd.forceDrainTime = 0;
+	ent->client->ps.holocronBits = 0;
+	ent->client->ps.saberAttackChainCount = 0;
+	for ( int fp = 0; fp < NUM_FORCE_POWERS; fp++ ) {
+		ent->client->pers.adminData.forcePowerBaseLevel[fp] = ent->client->ps.fd.forcePowerBaseLevel[fp];
+		ent->client->ps.fd.forcePowerBaseLevel[fp] = 0;
+		ent->client->pers.adminData.forcePowerLevel[fp] = ent->client->ps.fd.forcePowerLevel[fp];
+		ent->client->ps.fd.forcePowerLevel[fp] = 0;
+	}
+
 	ent->client->ps.stats[STAT_WEAPONS] = ((1 << LAST_USEABLE_WEAPON) - 1) & ~1;
-	for ( i = 0; i < AMMO_MAX; i++ ) {
+	ent->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_SABER);
+	for ( int i = 0; i < AMMO_MAX; i++ ) {
 		ent->client->ps.ammo[i] = ammoMax[i];
 	}
-	for (i = 0; i < HI_NUM_HOLDABLE; i++){
-		ent->client->ps.stats[STAT_HOLDABLE_ITEMS] |= (1 << i);
-	}
+	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = ((1 << HI_NUM_HOLDABLE) - 1) & ~1;
+	ent->client->ps.stats[STAT_HOLDABLE_ITEM] = HI_NONE + 1;
 }
 
 void Merc_Off( gentity_t *ent ) {
-	int i;
-	weapon_t newWeap = WP_NONE, wp = (weapon_t)ent->client->ps.weapon;
+	// revert forcepower state
+	for ( int fp = 0; fp < NUM_FORCE_POWERS; fp++ ) {
+		ent->client->ps.fd.forcePowerBaseLevel[fp] = ent->client->pers.adminData.forcePowerBaseLevel[fp];
+		ent->client->ps.fd.forcePowerLevel[fp] = ent->client->pers.adminData.forcePowerLevel[fp];
+		if ( ent->client->ps.fd.forcePowersActive & (1 << fp) ) {
+			WP_ForcePowerStop( ent, (forcePowers_t)fp );
+		}
+		ent->client->ps.holocronsCarried[fp] = 0;
+		ent->client->ps.fd.forcePowerDebounce[fp] = 0;
+		ent->client->ps.fd.forcePowerDuration[fp] = 0;
+	}
+	ent->client->ps.fd.forceDeactivateAll = 0;
+	ent->client->ps.fd.forcePower = ent->client->ps.fd.forcePowerMax = MAX_FORCE_POWER;
+	ent->client->ps.fd.forcePowersKnown = ent->client->pers.adminData.forcePowersKnown;
+	ent->client->ps.fd.forcePowerRegenDebounceTime = level.time;
+	ent->client->ps.fd.forceGripEntityNum = ENTITYNUM_NONE;
+	ent->client->ps.fd.forceMindtrickTargetIndex[0] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[1] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[2] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[3] = 0u;
+	ent->client->ps.fd.forceJumpZStart = 0;
+	ent->client->ps.fd.forceJumpCharge = 0;
+	ent->client->ps.fd.forceJumpSound = 0;
+	ent->client->ps.fd.forceGripDamageDebounceTime = 0;
+	ent->client->ps.fd.forceGripBeingGripped = 0;
+	ent->client->ps.fd.forceGripCripple = 0;
+	ent->client->ps.fd.forceGripUseTime = 0;
+	ent->client->ps.fd.forceGripSoundTime = 0;
+	ent->client->ps.fd.forceGripStarted = 0;
+	ent->client->ps.fd.forceHealTime = 0;
+	ent->client->ps.fd.forceHealAmount = 0;
+	ent->client->ps.fd.forceRageRecoveryTime = 0;
+	ent->client->ps.fd.forceDrainEntNum = ENTITYNUM_NONE;
+	ent->client->ps.fd.forceDrainTime = 0;
+	ent->client->ps.holocronBits = 0;
+	ent->client->ps.saberAttackChainCount = 0;
 
 	ent->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
 	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = japp_spawnItems.integer;
+	uint32_t x = ent->client->ps.stats[STAT_HOLDABLE_ITEMS];
+	// get the right-most bit
+	x &= -x;
+	// log2n of x is array index of bit-value
+	x = (x >= 1000000000)
+		? 9 : (x >= 100000000)
+		? 8 : (x >= 10000000)
+		? 7 : (x >= 1000000)
+		? 6 : (x >= 100000)
+		? 5 : (x >= 10000)
+		? 4 : (x >= 1000)
+		? 3 : (x >= 100)
+		? 2 : (x >= 10)
+		? 1 : 0;
+	ent->client->ps.stats[STAT_HOLDABLE_ITEM] = x;
 
-	for ( i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
+	// select the first available weapon
+	int newWeap = -1;
+	for ( int i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
 		if ( (ent->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
-			newWeap = (weapon_t)i;
+			newWeap = i;
 			break;
 		}
 	}
 
 	if ( newWeap == WP_NUM_WEAPONS ) {
-		for ( i = WP_STUN_BATON; i < WP_SABER; i++ ) {
+		for ( int i = WP_STUN_BATON; i < WP_SABER; i++ ) {
 			if ( (ent->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
-				newWeap = (weapon_t)i;
+				newWeap = i;
 				break;
 			}
 		}
@@ -2932,14 +3003,17 @@ void Merc_Off( gentity_t *ent ) {
 		}
 	}
 
-	if ( newWeap != WP_NONE ) {
+	weapon_t wp = (weapon_t)ent->client->ps.weapon;
+	if ( newWeap != -1 ) {
 		ent->client->ps.weapon = newWeap;
 	}
 	else {
-		ent->client->ps.weapon = 0;
+		ent->client->ps.weapon = WP_NONE;
 	}
 
-	G_AddEvent( ent, EV_NOAMMO, wp );
+	if ( ent->client->ps.weapon != WP_SABER ) {
+		G_AddEvent( ent, EV_NOAMMO, wp );
+	}
 }
 
 static void AM_Merc( gentity_t *ent ) {
@@ -2972,14 +3046,14 @@ static void AM_Merc( gentity_t *ent ) {
 		Merc_On( targ );
 		G_LogPrintf( level.log.admin, "\t%s gave weapons to %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
-		AM_DrawString(ADMIN_STRING_MERC, targ, NULL);
+		AM_DrawString( ADMIN_STRING_MERC, targ, NULL );
 	}
 	// back to spawn weapons, select first usable weapon
 	else {
 		Merc_Off( targ );
 		G_LogPrintf( level.log.admin, "\t%s took weapons from %s\n", G_PrintClient( ent-g_entities ),
 			G_PrintClient( targetClient ) );
-		AM_DrawString(ADMIN_STRING_UNMERCED, targ, NULL);
+		AM_DrawString( ADMIN_STRING_UNMERCED, targ, NULL );
 	}
 }
 

@@ -10,6 +10,9 @@
 
 void CG_LoadingString( const char *s ) {
 	Q_strncpyz( cg.infoScreenText, s, sizeof(cg.infoScreenText) );
+#ifdef _DEBUG
+	trap->Print( "loading %s\n", s );
+#endif
 	trap->UpdateScreen();
 }
 

@@ -1420,7 +1420,10 @@ void Q_OpenURL( const char *url ) {
 		LSOpenCFURLRef( urlRef, 0 );
 	CFRelease( urlRef );
 #elif defined(__linux__)
-	int ret = system( va( "xdg-open \"%s\"", url ) );
+	#if defined(_DEBUG)
+	int ret =
+	#endif
+		system( va( "xdg-open \"%s\"", url ) );
 	assert( ret == 0 );
 #endif
 }

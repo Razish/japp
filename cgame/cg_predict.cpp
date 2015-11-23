@@ -323,7 +323,9 @@ uint32_t CG_PointContents( const vector3 *point, int passEntityNum ) {
 		if ( !cmodel )
 			continue;
 
-		contents |= trap->CM_TransformedPointContents( point, cmodel, &ent->origin, &ent->angles );
+		if ( !VectorCompare( &ent->origin, &vec3_origin ) ) {
+			contents |= trap->CM_TransformedPointContents( point, cmodel, &ent->origin, &ent->angles );
+		}
 	}
 
 	return contents;

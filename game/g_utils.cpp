@@ -1702,8 +1702,7 @@ const char *G_PrintClient( int clientNum ) {
 	char *out = buf[(index++)&(NUM_CLIENTINFOBUFFERS-1)];
 	gentity_t *ent = g_entities + clientNum;
 
-	Com_sprintf( out, MAX_STRING_CHARS, "\"%02i\" \"%s\" \"%s\"", clientNum, ent->client->pers.netname,
-		ent->client->sess.IP );
+	Com_sprintf( out, MAX_STRING_CHARS, "[%2i](%s):%s", clientNum, ent->client->pers.netname, ent->client->sess.IP );
 
 	return out;
 }

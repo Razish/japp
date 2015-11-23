@@ -2785,9 +2785,11 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		break;
 
 	case EV_PLAYDOORSOUND:
+		DEBUGNAME( "EV_PLAYDOORSOUND" );
 		CG_PlayDoorSound( cent, es->eventParm );
 		break;
 	case EV_PLAYDOORLOOPSOUND:
+		DEBUGNAME( "EV_PLAYDOORLOOPSOUND" );
 		CG_PlayDoorLoopSound( cent );
 		break;
 	case EV_BMODEL_SOUND:

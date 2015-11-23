@@ -9161,10 +9161,16 @@ void PmoveSingle( pmove_t *pmove ) {
 	}
 
 	// DFA
-	else if ( pm->ps->saberMove == LS_A_BACK || pm->ps->saberMove == LS_A_BACK_CR ||
-		pm->ps->saberMove == LS_A_BACKSTAB || pm->ps->saberMove == LS_A_FLIP_STAB ||
-		pm->ps->saberMove == LS_A_FLIP_SLASH || pm->ps->saberMove == LS_A_JUMP_T__B_ ||
-		pm->ps->saberMove == LS_DUAL_LR || pm->ps->saberMove == LS_DUAL_FB ) {
+	else if ( pm->ps->saberMove == LS_A_BACK
+		|| pm->ps->saberMove == LS_A_BACK_CR
+		|| pm->ps->saberMove == LS_A_BACKSTAB
+		|| pm->ps->saberMove == LS_A_FLIP_STAB
+		|| pm->ps->saberMove == LS_A_FLIP_SLASH
+		|| pm->ps->saberMove == LS_A_JUMP_T__B_
+		|| pm->ps->saberMove == LS_DUAL_LR
+		|| pm->ps->saberMove == LS_DUAL_FB
+		|| pm->ps->saberMove == LS_JAPLUS_NEWANIM_FLIPSABERSTAB )
+	{
 		if ( !GetCInfo( CINFO_YELLOWDFA )
 			&& (pm->ps->legsAnim == BOTH_JUMPFLIPSTABDOWN || pm->ps->legsAnim == BOTH_JUMPFLIPSLASHDOWN1) ) {
 			// flipover medium stance attack
@@ -9318,7 +9324,8 @@ void PmoveSingle( pmove_t *pmove ) {
 		}
 	}
 
-	if ( pm->ps->saberMove == LS_A_JUMP_T__B_ ) {//can't move during leap
+	if ( pm->ps->saberMove == LS_A_JUMP_T__B_ || pm->ps->saberMove == LS_JAPLUS_NEWANIM_FLIPSABERSTAB ) {
+		// can't move during leap
 		if ( pm->ps->groundEntityNum != ENTITYNUM_NONE ) {//hit the ground
 			pm->cmd.forwardmove = 0;
 		}
@@ -9514,9 +9521,13 @@ void PmoveSingle( pmove_t *pmove ) {
 	PM_AdjustAngleForWallRun( pm->ps, &pm->cmd, qtrue );
 	PM_AdjustAngleForWallGrap( pm->ps, &pm->cmd );
 
-	if ( pm->ps->saberMove == LS_A_JUMP_T__B_ || pm->ps->saberMove == LS_A_LUNGE ||
-		pm->ps->saberMove == LS_A_BACK_CR || pm->ps->saberMove == LS_A_BACK ||
-		pm->ps->saberMove == LS_A_BACKSTAB ) {
+	if ( pm->ps->saberMove == LS_A_JUMP_T__B_
+		|| pm->ps->saberMove == LS_A_LUNGE
+		|| pm->ps->saberMove == LS_A_BACK_CR
+		|| pm->ps->saberMove == LS_A_BACK
+		|| pm->ps->saberMove == LS_A_BACKSTAB
+		|| pm->ps->saberMove == LS_JAPLUS_NEWANIM_FLIPSABERSTAB )
+	{
 		PM_SetPMViewAngle( pm->ps, &pm->ps->viewangles, &pm->cmd );
 	}
 

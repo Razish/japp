@@ -53,6 +53,8 @@ typedef struct gclient_s gclient_t;
 #define	MAX_ALERT_EVENTS				(32)
 #define MAX_REFNAME						(32)
 #define MAX_FILEPATH					(144)
+#define	MAX_FORCE_POWER					(100)
+
 
 #define PRIVDUEL_ALLOW					(0x0001u)
 #define PRIVDUEL_MULTI					(0x0002u)
@@ -349,19 +351,19 @@ struct gentity_s {
 	int					setTime;
 	int					nextthink;
 
-	void( *think )(gentity_t *self);
+	void				(*think)( gentity_t *self );
 	int					lua_think;
-	void( *reached )(gentity_t *self); // movers call this when hitting endpoint
+	void				(*reached)( gentity_t *self ); // movers call this when hitting endpoint
 	int					lua_reached;
-	void( *blocked )(gentity_t *self, gentity_t *other);
+	void				(*blocked)( gentity_t *self, gentity_t *other );
 	int					lua_blocked;
-	void( *touch )(gentity_t *self, gentity_t *other, trace_t *trace);
+	void				(*touch)( gentity_t *self, gentity_t *other, trace_t *trace );
 	int					lua_touch;
-	void( *use )(gentity_t *self, gentity_t *other, gentity_t *activator);
+	void				(*use)( gentity_t *self, gentity_t *other, gentity_t *activator );
 	int					lua_use;
-	void( *pain )(gentity_t *self, gentity_t *attacker, int damage);
+	void				(*pain)( gentity_t *self, gentity_t *attacker, int damage	);
 	int					lua_pain;
-	void( *die )(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
+	void				(*die)( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod );
 	int					lua_die;
 
 	qboolean			uselua;

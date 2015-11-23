@@ -1417,11 +1417,8 @@ float DotProduct( const vector3 *vec1, const vector3 *vec2 ) {
 #endif
 }
 
-qboolean VectorCompare( const vector3 *vec1, const vector3 *vec2 ) {
-	if ( vec1->x == vec2->x && vec1->y == vec2->y && vec1->z == vec2->z ) {
-		return qtrue;
-	}
-	return qfalse;
+bool VectorCompare( const vector3 *vec1, const vector3 *vec2 ) {
+	return flcmp( vec1->x, vec2->x ) && flcmp( vec1->y, vec2->y ) && flcmp( vec1->z, vec2->z );
 }
 
 #ifdef _MSC_VER // windows

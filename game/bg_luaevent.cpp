@@ -130,6 +130,7 @@ namespace JPLua {
 
 	void Event_RunFrame( void ) {
 #ifdef JPLUA
+		lua_gc( ls.L, LUA_GCSTEP, 1 );
 		plugin_t *plugin = NULL;
 		while ( IteratePlugins( &plugin ) ) {
 			if ( plugin->eventListeners[JPLUA_EVENT_RUNFRAME] ) {
@@ -794,7 +795,7 @@ namespace JPLua {
 		while ( IteratePlugins( &plugin ) ) {
 			if ( plugin->eventListeners[JPLUA_EVENT_PAIN] ) {
 				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_PAIN] );
-				
+
 				lua_pushstring( ls.L, va("%c", key));
 
 				Call( ls.L, 1, 1 );

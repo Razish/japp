@@ -806,7 +806,7 @@ void		VectorInverse( vector3 *vec );
 void		VectorAverage( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
 void		CrossProduct( const vector3 *vec1, const vector3 *vec2, vector3 *vecOut );
 float		DotProduct( const vector3 *vec1, const vector3 *vec2 );
-qboolean	VectorCompare( const vector3 *vec1, const vector3 *vec2 );
+bool		VectorCompare( const vector3 *vec1, const vector3 *vec2 );
 void		VectorSnap( vector3 *v );
 void		VectorSnapTowards( vector3 *v, vector3 *to );
 
