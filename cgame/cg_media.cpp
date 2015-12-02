@@ -898,6 +898,18 @@ static void CG_RegisterGraphics( void ) {
 
 		cgs.gameIcons[i] = trap->R_RegisterShaderNoMip( iconName );
 	}
+
+	//check for cg_drawRewards
+	if (cg_drawRewards.integer){
+		if (!(media.gfx.interface.medals.assist &&
+			media.gfx.interface.medals.capture &&
+			media.gfx.interface.medals.defend &&
+			media.gfx.interface.medals.excellent &&
+			media.gfx.interface.medals.gauntlet &&
+			media.gfx.interface.medals.impressive)){
+			trap->Cvar_Set("cg_drawRewards", "0");
+		}
+	}
 }
 
 static void CG_RegisterModels( void ) {
