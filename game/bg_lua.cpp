@@ -42,7 +42,7 @@ namespace JPLua {
 		std::unordered_map<std::string, bool> plugins;
 	} autoload;
 
-	void UpdateAutoload( void ) {
+	void UpdateAutoload( void ) { 
 	#if defined(PROJECT_GAME)
 		char *autoloadStr = g_jpluaAutoload.string;
 	#elif defined(PROJECT_CGAME)

@@ -2324,7 +2324,7 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		Q_strncpyz( client->sess.IP, tmpIP, sizeof(client->sess.IP) );
 	}
 
-	G_LogPrintf( level.log.console, "ClientConnect: %i (%s) [IP: %s]\n", clientNum, client->pers.netname, tmpIP );
+	G_LogPrintf(level.log.console, "ClientConnect: %i (%s" S_COLOR_WHITE ") [IP: %s" S_COLOR_WHITE "]\n", clientNum, client->pers.netname, tmpIP );
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
 	if ( firstTime ) {

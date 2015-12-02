@@ -908,6 +908,7 @@ static void CG_RegisterGraphics( void ) {
 			media.gfx.interface.medals.gauntlet &&
 			media.gfx.interface.medals.impressive)){
 			trap->Cvar_Set("cg_drawRewards", "0");
+			trap->Cvar_Update(&cg_drawRewards);
 		}
 	}
 }

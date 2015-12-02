@@ -231,12 +231,18 @@ void CG_ChatboxOutgoing( void ) {
 static const char *preMatches[] = {
 	"www.",
 	"http://",
-	"https://"
+	"https://",
+	"ftp://"
 };
 static const char *postMatches[] = {
 	".com",
 	".org",
-	".net"
+	".net",
+	".ru",
+	".co.uk",
+	".ua",
+	".tk",
+	".biz"
 };
 
 // returns 0 if no URLs were found
