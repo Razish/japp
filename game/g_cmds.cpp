@@ -3273,26 +3273,33 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 			const uint32_t tweaks = japp_saberTweaks.integer;
 			Q_PrintBuffer( &pb, "  JA++ tweaks:\n" );
 
-			Q_PrintBuffer( &pb, va( "    Interpolation %s" S_COLOR_WHITE "\n",
-				(tweaks & SABERTWEAK_INTERPOLATE) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
-			Q_PrintBuffer( &pb, va( "    Prolonged swing damage %s" S_COLOR_WHITE "\n",
-				(tweaks & SABERTWEAK_PROLONGDAMAGE) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
-			Q_PrintBuffer( &pb, va( "    Deflection %s" S_COLOR_WHITE "\n",
-				(tweaks & SABERTWEAK_POSDEFLECTION) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
-			Q_PrintBuffer( &pb, va( "    Special moves %s" S_COLOR_WHITE "\n",
-				(tweaks & SABERTWEAK_SPECIALMOVES) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled" ) );
-			Q_PrintBuffer( &pb, va( "    Trace size %s" S_COLOR_WHITE "\n",
-				(tweaks & SABERTWEAK_TRACESIZE) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled") );
-			Q_PrintBuffer( &pb, va( "    Reduce blocks %s " S_COLOR_WHITE "(%s%.02f " S_COLOR_WHITE "- %s%.02f"
-				S_COLOR_WHITE ") * %s%.02f" S_COLOR_WHITE "\n",
-				(tweaks & SABERTWEAK_REDUCEBLOCKS) ? S_COLOR_GREEN"enabled" : S_COLOR_RED"disabled",
+			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Interpolation\n",
+				(tweaks & SABERTWEAK_INTERPOLATE) ? S_COLOR_GREEN "+" : S_COLOR_RED "x" )
+			);
+			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Prolonged swing damage\n",
+				(tweaks & SABERTWEAK_PROLONGDAMAGE) ? S_COLOR_GREEN "+" : S_COLOR_RED "x" )
+			);
+			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Deflection position fix\n",
+				(tweaks & SABERTWEAK_POSDEFLECTION) ? S_COLOR_GREEN "+" : S_COLOR_RED "x" )
+			);
+			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Special move damage tweak\n",
+				(tweaks & SABERTWEAK_SPECIALMOVEDMG) ? S_COLOR_GREEN "+" : S_COLOR_RED "x" )
+			);
+			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Saber box trace size tweak\n",
+				(tweaks & SABERTWEAK_TRACESIZE) ? S_COLOR_GREEN "+" : S_COLOR_RED "x" )
+			);
+			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Reduce blocks (",
+				(tweaks & SABERTWEAK_REDUCEBLOCKS) ? S_COLOR_GREEN "+" : S_COLOR_RED "x" )
+			);
+			Q_PrintBuffer( &pb, va( "%s%.02f " S_COLOR_WHITE "- %s%.02f" S_COLOR_WHITE ") * %s%.02f" S_COLOR_WHITE "\n",
 				(japp_saberBlockChanceMin.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceMin ) ))
-				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMin.value,
+					? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMin.value,
 				(japp_saberBlockChanceMax.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceMax ) ))
-				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMax.value,
+					? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMax.value,
 				(japp_saberBlockChanceScale.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceScale ) ))
-				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceScale.value ) );
-
+					? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceScale.value
+				)
+			);
 #ifdef _DEBUG
 			if ( tweaks & SABERTWEAK_REDUCEBLOCKS ) {
 				int ourLevel, theirLevel;
@@ -3312,7 +3319,24 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 
 			Q_PrintBuffer( &pb, va( "      %s%.03f " S_COLOR_WHITE "stance parity\n",
 				(japp_saberBlockStanceParity.value != atoff( G_Cvar_DefaultString( &japp_saberBlockStanceParity ) ))
-				? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockStanceParity.value ) );
+					? S_COLOR_RED : S_COLOR_GREEN,
+				japp_saberBlockStanceParity.value )
+			);
+			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Staff deflect fix\n",
+				(tweaks & SABERTWEAK_TWOBLADEDEFLECTFIX) ? S_COLOR_GREEN "+" : S_COLOR_RED "x" )
+			);
+			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Nerf damage\n",
+				d_saberSPStyleDamage.integer
+					? S_COLOR_YELLOW "-"
+					: (tweaks & SABERTWEAK_NERFDMG) ? S_COLOR_GREEN "+" : S_COLOR_RED "x"
+				)
+			);
+			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Never location based damage\n",
+				g_locationBasedDamage.integer
+					? ((tweaks & SABERTWEAK_NOTLOCATIONBASED) ? S_COLOR_GREEN "+" : S_COLOR_RED "x")
+					: S_COLOR_YELLOW "-"
+				)
+			);
 
 			Q_PrintBuffer( &pb, S_COLOR_WHITE "\n" );
 		}
@@ -3326,7 +3350,7 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 		Q_PrintBuffer( &pb, va( "  " S_COLOR_WHITE "Idle damage %s" S_COLOR_WHITE "\n",
 			(japp_saberIdleDamage.integer != atoff( G_Cvar_DefaultString( &japp_saberIdleDamage ) ))
 			? S_COLOR_RED : S_COLOR_GREEN,
-			japp_saberIdleDamage.integer ? "enabled" : "disabled" ) );
+			japp_saberIdleDamage.integer ? "+" : "x" ) );
 
 		Q_PrintBuffer( &pb, "\n" );
 	}

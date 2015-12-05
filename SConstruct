@@ -218,6 +218,7 @@ emptyEnv( env, 'CCFLAGS' )
 emptyEnv( env, 'CXXFLAGS' )
 emptyEnv( env, 'LINKFLAGS' )
 emptyEnv( env, 'ARFLAGS' )
+emptyEnv( env, 'LIBS' )
 
 # compiler switches
 if realcc == 'gcc' or realcc == 'clang':

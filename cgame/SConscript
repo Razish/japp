@@ -103,7 +103,7 @@ libraries = [
 	'lua',
 	'semver',
 ]
-cgame_env['LIBS'] = [
+cgame_env['LIBS'] += [
 	cgame_env.SConscript(
 		'#' + os.sep + lib + os.sep + 'SConscript',
 		exports = [

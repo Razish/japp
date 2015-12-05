@@ -3672,7 +3672,7 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 			else if ( self->client->ps.saberMove == LS_A_FLIP_STAB || self->client->ps.saberMove == LS_A_FLIP_SLASH ) {
 				// yellow DFA
 				dmg += 5; //ditto
-				if ( japp_saberTweaks.integer & SABERTWEAK_SPECIALMOVES ) {
+				if ( japp_saberTweaks.integer & SABERTWEAK_SPECIALMOVEDMG ) {
 					dmg *= 0.5f;
 				}
 				else {
