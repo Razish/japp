@@ -23,14 +23,16 @@ namespace JPLua {
 			if ( handle->altFire && handle->altFire != -1 ) {
 				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, handle->altFire );
 				Entity_CreateRef( ls.L, ent );
-				Call( ls.L, 1, 0 );
+				lua_pushinteger(L, ent->client->ps.weaponChargeTime);
+				Call( ls.L, 2, 0 );
 				return qtrue;
 			}
 		}
 		if ( handle->fire && handle->fire != -1 ) {
 			lua_rawgeti( ls.L, LUA_REGISTRYINDEX, handle->fire );
 			Entity_CreateRef( ls.L, ent );
-			Call( ls.L, 1, 0 );
+			lua_pushinteger(L, ent->client->ps.weaponChargeTime);
+			Call( ls.L, 2, 0 );
 			return qtrue;
 		}
 	#endif

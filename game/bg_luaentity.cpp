@@ -29,7 +29,7 @@ namespace JPLua {
 	void Entity_CreateRef( lua_State *L, jpluaEntity_t *ent ) {
 		luaEntity_t *data = NULL;
 #ifdef PROJECT_GAME
-		if ( ent->inuse ) {
+		if (ent && ent->inuse ) {
 			data = (luaEntity_t *)lua_newuserdata( L, sizeof(luaEntity_t) );
 			if ( ent->client && ent->s.eType == ET_PLAYER && ent->ID == 0 ) {
 				// Player entities are created in engine :(
@@ -836,6 +836,27 @@ namespace JPLua {
 		ent->s.weapon = lua_tointeger(L, 3);
 	}
 #endif
+
+#ifdef PROJECT_GAME
+	static int Entity_GetParent(lua_State *L, jpluaEntity_t *ent){
+		Entity_CreateRef(L, ent->parent);
+		return 1;
+	}
+
+	static void Entity_SetParent(lua_State *L, jpluaEntity_t *ent){
+		ent->parent = CheckEntity(L, 3);
+	}
+#endif
+#ifdef PROJECT_GAME
+	static int Entity_Entity_GetNextthink(lua_State *L, jpluaEntity_t *ent){
+		lua_pushinteger(L, ent->nextthink);
+		return 1;
+	}
+
+	static void Entity_Entity_SetNextthink(lua_State *L, jpluaEntity_t *ent){
+		ent->nextthing = lua_tointeger(L, 3);
+	}
+#endif
 	static const entityProperty_t entityProperties[] = {
 		{
 			"angles",
@@ -964,6 +985,13 @@ namespace JPLua {
 			nullptr
 #endif
 		},
+#if defined(PROJECT_GAME)
+		{
+			"nextthink",
+			Entity_GetNextthink,
+			Entity_SetNextthink
+		},
+#endif
 
 		{
 			"player",
@@ -1212,6 +1240,15 @@ namespace JPLua {
 	}
 #endif
 
+#ifdef PROJECT_GAME
+	static int Entity_RunObject(lua_State *L){
+		gentity_t *ent = CheckEntity(L, 1);
+		if (ent){
+			G_RunObject( ent );
+		}
+		return 0;
+	}
+#endif
 	static const struct luaL_Reg entityMeta[] = {
 		{ "__index", Entity_Index },
 		{ "__newindex", Entity_NewIndex },
@@ -1234,6 +1271,7 @@ namespace JPLua {
 		{ "Scale", Entity_Scale },
 		{ "SetVar", Entity_SetVar },
 		{ "GetVar", Entity_GetVar },
+		{ "RunObject", Entity_RunObject},
 #endif
 		{ NULL, NULL }
 	};
