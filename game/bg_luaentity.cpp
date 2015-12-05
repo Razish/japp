@@ -848,13 +848,13 @@ namespace JPLua {
 	}
 #endif
 #ifdef PROJECT_GAME
-	static int Entity_Entity_GetNextthink(lua_State *L, jpluaEntity_t *ent){
+	static int Entity_GetNextthink(lua_State *L, jpluaEntity_t *ent){
 		lua_pushinteger(L, ent->nextthink);
 		return 1;
 	}
 
-	static void Entity_Entity_SetNextthink(lua_State *L, jpluaEntity_t *ent){
-		ent->nextthing = lua_tointeger(L, 3);
+	static void Entity_SetNextthink(lua_State *L, jpluaEntity_t *ent){
+		ent->nextthink = lua_tointeger(L, 3);
 	}
 #endif
 	static const entityProperty_t entityProperties[] = {
@@ -991,6 +991,13 @@ namespace JPLua {
 			Entity_GetNextthink,
 			Entity_SetNextthink
 		},
+#endif
+#if defined(PROJECT_GAME)
+		{
+			"parent",
+			Entity_GetParent,
+			Entity_SetParent
+			},
 #endif
 
 		{

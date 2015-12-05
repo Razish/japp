@@ -23,7 +23,7 @@ namespace JPLua {
 			if ( handle->altFire && handle->altFire != -1 ) {
 				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, handle->altFire );
 				Entity_CreateRef( ls.L, ent );
-				lua_pushinteger(L, ent->client->ps.weaponChargeTime);
+				lua_pushinteger( ls.L, ent->client->ps.weaponChargeTime);
 				Call( ls.L, 2, 0 );
 				return qtrue;
 			}
@@ -31,7 +31,7 @@ namespace JPLua {
 		if ( handle->fire && handle->fire != -1 ) {
 			lua_rawgeti( ls.L, LUA_REGISTRYINDEX, handle->fire );
 			Entity_CreateRef( ls.L, ent );
-			lua_pushinteger(L, ent->client->ps.weaponChargeTime);
+			lua_pushinteger( ls.L, ent->client->ps.weaponChargeTime);
 			Call( ls.L, 2, 0 );
 			return qtrue;
 		}
