@@ -746,6 +746,96 @@ namespace JPLua {
 
 #endif
 
+#ifdef PROJECT_GAME
+	static int Entity_GetTrajectory(lua_State *L, jpluaEntity_t *ent){
+		lua_newtable(L);
+		int top = lua_gettop(L);
+
+		lua_pushstring(L, "trType"); lua_pushinteger(L, ent->s.pos.trType); lua_settable(L, top);
+		lua_pushstring(L, "trTime"); lua_pushinteger(L, ent->s.pos.trTime); lua_settable(L, top);
+		lua_pushstring(L, "trDuration"); lua_pushinteger(L, ent->s.pos.trDuration); lua_settable(L, top);
+		lua_pushstring(L, "trBase"); Vector_CreateRef(L, &ent->s.pos.trBase); lua_settable(L, top);
+		lua_pushstring(L, "trDelta"); Vector_CreateRef(L, &ent->s.pos.trDelta); lua_settable(L, top);
+		return 1;
+	}
+
+	static void Entity_SetTrajectory(lua_State *L, jpluaEntity_t *ent){
+		if ( lua_type( L, 3) != LUA_TTABLE ) {
+			trap->Print( "JPLua::Entity_SetTrajectory failed, not a table\n" );
+			return;
+		}
+		lua_getfield( L, 3, "trType" );
+			ent->s.pos.trType = (trType_t)lua_tointeger(L, -1);
+			lua_pop(L,1);
+		lua_getfield( L, 3, "trTime" );
+			ent->s.pos.trTime = lua_tointeger(L, -1);
+			lua_pop(L,1);
+		lua_getfield( L, 3, "trDuration" );
+			ent->s.pos.trDuration = lua_tointeger(L, -1);
+			lua_pop(L,1);
+		lua_getfield( L, 3, "trBase" );
+		VectorCopy(CheckVector(L,-1), &ent->s.pos.trBase);
+			lua_pop(L,1);
+		lua_getfield( L, 3, "trDelta" );
+			VectorCopy(CheckVector(L,-1), &ent->s.pos.trDelta);
+			lua_pop(L,1);
+	}
+#endif
+
+#ifdef PROJECT_GAME
+	static int Entity_GetFlags(lua_State *L, jpluaEntity_t *ent){
+		lua_pushinteger(L, ent->flags);
+		return 1;
+	}
+
+	static void Entity_SetFlags(lua_State *L, jpluaEntity_t *ent){
+		ent->flags = lua_tointeger(L, 3);
+	}
+#endif
+
+#ifdef PROJECT_GAME
+	static int Entity_GetDamage(lua_State *L, jpluaEntity_t *ent){
+		lua_pushinteger(L, ent->damage);
+		return 1;
+	}
+
+	static void Entity_SetDamage(lua_State *L, jpluaEntity_t *ent){
+		ent->damage = lua_tointeger(L, 3);
+	}
+#endif
+
+#ifdef PROJECT_GAME
+	static int Entity_GetEType(lua_State *L, jpluaEntity_t *ent){
+		lua_pushinteger(L, ent->s.eType);
+		return 1;
+	}
+
+	static void Entity_SetEType(lua_State *L, jpluaEntity_t *ent){
+		ent->s.eType = lua_tointeger(L, 3);
+	}
+#endif
+
+#ifdef PROJECT_GAME
+	static int Entity_GetSVFlags(lua_State *L, jpluaEntity_t *ent){
+		lua_pushinteger(L, ent->r.svFlags);
+		return 1;
+	}
+
+	static void Entity_SetSVFlags(lua_State *L, jpluaEntity_t *ent){
+		ent->r.svFlags = lua_tointeger(L, 3);
+	}
+#endif
+
+#ifdef PROJECT_GAME
+	static int Entity_GetWeapon(lua_State *L, jpluaEntity_t *ent){
+		lua_pushinteger(L, ent->s.weapon);
+		return 1;
+	}
+
+	static void Entity_SetWeapon(lua_State *L, jpluaEntity_t *ent){
+		ent->s.weapon = lua_tointeger(L, 3);
+	}
+#endif
 	static const entityProperty_t entityProperties[] = {
 		{
 			"angles",
@@ -796,6 +886,30 @@ namespace JPLua {
 			"contents",
 			Entity_GetContents,
 			Entity_SetContents
+		},
+#endif
+
+#if defined(PROJECT_GAME)
+		{
+			"damage",
+			Entity_GetDamage,
+			Entity_SetDamage
+		},
+#endif
+
+#if defined(PROJECT_GAME)
+		{
+			"eType",
+			Entity_GetEType,
+			Entity_SetEType
+		},
+#endif
+
+#if defined(PROJECT_GAME)
+		{
+			"flags",
+			Entity_GetFlags,
+			Entity_SetFlags,
 		},
 #endif
 		{
@@ -877,6 +991,14 @@ namespace JPLua {
 
 #if defined(PROJECT_GAME)
 		{
+			"svFlags",
+			Entity_GetSVFlags,
+			Entity_SetSVFlags,
+		},
+#endif
+
+#if defined(PROJECT_GAME)
+		{
 			"touchable",
 			Entity_GetTouchable,
 			Entity_SetTouchable
@@ -885,9 +1007,24 @@ namespace JPLua {
 
 #if defined(PROJECT_GAME)
 		{
+			"trajectory",
+			Entity_GetTrajectory,
+			Entity_SetTrajectory,
+		},
+#endif
+
+#if defined(PROJECT_GAME)
+		{
 			"usable",
 			Entity_GetUseable,
 			Entity_SetUseable
+		},
+#endif
+#if defined(PROJECT_GAME)
+		{
+			"weapon",
+			Entity_GetWeapon,
+			Entity_SetWeapon
 		},
 #endif
 	};
