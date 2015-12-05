@@ -133,14 +133,12 @@ namespace JPLua {
 #ifdef PROJECT_GAME
 	int Entity_Create( lua_State *L ) {
 		gentity_t *ent;
-
-		if ( lua_type( L, 1 ) != LUA_TTABLE ) {
+		if ( lua_gettop(L) == 0  ) { // kill me please
+			ent = G_Spawn();
+		}else if( lua_type(L, 1) == LUA_TTABLE){
 			trap->Print( "Entity_Create failed, not a table\n" );
 			return 0;
-		}else if( lua_type(L, 1) == LUA_TNONE){
-			ent  = G_Spawn();
-		}
-		else{
+		}else{
 			level.manualSpawning = qtrue;
 			level.numSpawnVars = 0;
 			level.numSpawnVarChars = 0;
