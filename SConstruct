@@ -457,6 +457,10 @@ elif realcc == 'cl':
 
 if plat == 'Darwin':
 	env['CPPDEFINES'] += [ 'MACOS_X' ]
+	env['LINKFLAGS'] += [
+		'-framework', 'CoreFoundation',
+		'-framework', 'ApplicationServices'
+	]
 
 # debug / release
 if debug == 0 or debug == 2:
