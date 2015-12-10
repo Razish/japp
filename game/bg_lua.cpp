@@ -1121,7 +1121,7 @@ namespace JPLua {
 		vector3 *start, *end, mins, maxs;
 		float size;
 		int skipNumber, mask;
-		int top, top2, top3;
+		int top, top2;
 
 		start = CheckVector(L, 1);
 
@@ -1147,24 +1147,13 @@ namespace JPLua {
 		lua_pushstring( L, "entityNum" ); lua_pushinteger( L, tr.entityNum ); lua_settable( L, top );
 		lua_pushstring( L, "fraction" ); lua_pushnumber( L, tr.fraction ); lua_settable( L, top );
 
-		lua_pushstring( L, "endpos" );
-		lua_newtable( L ); top2 = lua_gettop( L );
-		lua_pushstring( L, "x" ); lua_pushnumber( L, tr.endpos.x ); lua_settable( L, top2 );
-		lua_pushstring( L, "y" ); lua_pushnumber( L, tr.endpos.y ); lua_settable( L, top2 );
-		lua_pushstring( L, "z" ); lua_pushnumber( L, tr.endpos.z ); lua_settable( L, top2 );
-		lua_settable( L, top );
+		lua_pushstring( L, "endpos" );Vector_CreateRef(L, &tr.endpos);lua_settable( L, top );
 
-		lua_pushstring( L, "plane" );
-		lua_newtable( L ); top2 = lua_gettop( L );
-		lua_pushstring( L, "normal" );
-		lua_newtable( L ); top3 = lua_gettop( L );
-		lua_pushstring( L, "x" ); lua_pushnumber( L, tr.plane.normal.x ); lua_settable( L, top3 );
-		lua_pushstring( L, "y" ); lua_pushnumber( L, tr.plane.normal.y ); lua_settable( L, top3 );
-		lua_pushstring( L, "z" ); lua_pushnumber( L, tr.plane.normal.z ); lua_settable( L, top3 );
-		lua_settable( L, top2 );
-		lua_pushstring( L, "dist" ); lua_pushnumber( L, tr.plane.dist ); lua_settable( L, top2 );
-		lua_pushstring( L, "type" ); lua_pushinteger( L, tr.plane.type ); lua_settable( L, top2 );
-		lua_pushstring( L, "signbits" ); lua_pushinteger( L, tr.plane.signbits ); lua_settable( L, top2 );
+		lua_pushstring( L, "plane" );lua_newtable( L ); top2 = lua_gettop( L );
+			lua_pushstring( L, "normal" );Vector_CreateRef(L, &tr.plane.normal);lua_settable( L, top2 );
+			lua_pushstring( L, "dist" ); lua_pushnumber( L, tr.plane.dist ); lua_settable( L, top2 );
+			lua_pushstring( L, "type" ); lua_pushinteger( L, tr.plane.type ); lua_settable( L, top2 );
+			lua_pushstring( L, "signbits" ); lua_pushinteger( L, tr.plane.signbits ); lua_settable( L, top2 );
 		lua_settable( L, top );
 
 		lua_pushstring( L, "surfaceFlags" ); lua_pushinteger( L, tr.surfaceFlags ); lua_settable( L, top );
@@ -1483,6 +1472,19 @@ namespace JPLua {
 	}
 	#endif
 
+#ifdef PROJECT_GAME
+	static int TeamLock(lua_State *L){
+		int team = lua_tointeger(L, 1);
+		qboolean enabled = lua_toboolean(L, 2);
+
+		if (TEAM_FREE <= team < TEAM_NUM_TEAMS){
+			level.lockedTeams[team] = enabled;
+		}
+		return 0;
+	}
+
+#endif
+
 	static const importTable_t imports[] = {
 	#ifdef PROJECT_GAME
 		{ "AddClientCommand", Export_AddClientCommand }, // AddClientCommand( string cmd )
@@ -1555,6 +1557,9 @@ namespace JPLua {
 	#ifdef PROJECT_CGAME
 		{ "IsKeyDown", Export_IsKeyDown }, // boolean IsKeyDown( integer )
 	#endif
+	#ifdef PROJECT_GAME
+		{ "TeamLock", TeamLock},
+	#endif
 		{ "OpenFile", File_Open},
 #ifdef PROJECT_CGAME
 		{ "OpenURL", Export_OpenURL},
@@ -1626,7 +1631,7 @@ namespace JPLua {
 		}
 
 		// set the ls.version
-		semver_parse( "13.2.3", &jpluaVersion );
+		semver_parse( "13.2.4", &jpluaVersion );
 
 		// set the callback in case of an error
 		lua_atpanic( ls.L, Error );

@@ -258,6 +258,10 @@ namespace JPLua {
 	}
 
 	void Vector_CreateRef( lua_State *L, const vector3 *vec ) {
+		if (!vec){
+			lua_pushnil(L);
+			return;
+		}
 		vector3 *v = (vector3 *)lua_newuserdata( L, sizeof(*v) );
 		memcpy( v, vec, sizeof(*v) );
 		luaL_getmetatable( L, VECTOR_META );

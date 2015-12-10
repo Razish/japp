@@ -39,6 +39,7 @@ namespace JPLua {
 		}
 		else {
 			lua_pushnil( L );
+			return;
 		}
 #elif defined PROJECT_CGAME
 		if ( ent ){ /// : dddd
@@ -98,6 +99,7 @@ namespace JPLua {
 			int num = lua_tointeger( L, 1 );
 			if ( num < 0 || num >= MAX_GENTITIES ) {
 				lua_pushnil( L );
+				return 1;
 			}
 			Entity_CreateRef( L, &ents[num] );
 		}
@@ -383,6 +385,11 @@ namespace JPLua {
 		lua_pushstring( L, ent->classname );
 		return 1;
 	}
+	
+	static void Entity_SetClassName( lua_State *L, jpluaEntity_t *ent ) {
+		const char *name = lua_tostring(L,3);
+		ent->classname = BG_StringAlloc(name);
+	}
 #endif
 
 	static int Entity_GetModel( lua_State *L, jpluaEntity_t *ent ) {
@@ -555,21 +562,22 @@ namespace JPLua {
 #elif defined(PROJECT_CGAME)
 		trap->R_ModelBounds( ent->currentState.modelindex, &mins, &maxs );
 #endif
+		lua_newtable(L); int top = lua_gettop(L);
+		lua_pushstring(L, "mins");Vector_CreateRef( L, &mins);lua_settable(L, top);
+		lua_pushstring(L, "maxs");Vector_CreateRef( L, &maxs);lua_settable(L, top);
 
-		Vector_CreateRef( L, mins.x, mins.y, mins.z );
-		Vector_CreateRef( L, maxs.x, maxs.y, maxs.z );
-
-		return 2;
+		return 1;
 	}
 
 #if defined(PROJECT_GAME)
 	static void Entity_SetBounds( lua_State *L, jpluaEntity_t *ent ) {
 		lua_getfield( L, 3, "mins" );
 		vector3 *mins = CheckVector( L, -1 );
+		lua_pop(L, 1);
 		lua_getfield( L, 3, "maxs" );
 		vector3 *maxs = CheckVector( L, -1 );
+		lua_pop(L, 1);
 
-		//JAPPFIXME: is this all that's required? no re-linking?
 		trap->UnlinkEntity((sharedEntity_t*)ent);
 		VectorCopy( mins, &ent->r.mins );
 		VectorCopy( maxs, &ent->r.maxs );
@@ -844,7 +852,9 @@ namespace JPLua {
 	}
 
 	static void Entity_SetParent(lua_State *L, jpluaEntity_t *ent){
-		ent->parent = CheckEntity(L, 3);
+		gentity_t *parent = CheckEntity(L, 3);
+		ent->parent = parent;
+		ent->r.ownerNum = parent->s.number;
 	}
 #endif
 #ifdef PROJECT_GAME
@@ -857,6 +867,77 @@ namespace JPLua {
 		ent->nextthink = lua_tointeger(L, 3);
 	}
 #endif
+
+#ifdef PROJECT_GAME
+	static int Entity_GetPos_2(lua_State *L, jpluaEntity_t *ent){ //crying(
+		lua_newtable(L);
+		int top = lua_gettop(L);
+		lua_pushstring(L, "pos1");Vector_CreateRef(L, &ent->pos1);lua_settable(L, top);
+		lua_pushstring(L, "pos2");Vector_CreateRef(L, &ent->pos2);lua_settable(L, top);
+		lua_pushstring(L, "pos3");Vector_CreateRef(L, &ent->pos3);lua_settable(L, top);
+		return 1;
+	}
+
+	static void Entity_SetPos_2(lua_State *L, jpluaEntity_t *ent){
+		if ( lua_type( L, 3) != LUA_TTABLE ) {
+			trap->Print( "JPLua::Entity_SetPos_2 failed, not a table\n" );
+			return;
+		}
+		lua_getfield( L, 3, "pos1" );
+		VectorCopy(CheckVector(L,-1), &ent->pos1);
+		lua_pop(L,1);
+		lua_getfield( L, 3, "pos2" );
+		VectorCopy(CheckVector(L,-1), &ent->pos2);
+		lua_pop(L,1);
+		lua_getfield( L, 3, "pos3" );
+		VectorCopy(CheckVector(L,-1), &ent->pos3);
+		lua_pop(L,1);
+	}
+#endif
+
+#ifdef PROJECT_GAME
+	static int Entity_GetPhysicsObject(lua_State *L, jpluaEntity_t *ent){
+		lua_pushboolean(L, ent->physicsObject);
+		return 1;
+	}
+
+	static void Entity_SetPhysicsObject(lua_State *L, jpluaEntity_t *ent){
+		ent->physicsObject = lua_toboolean(L, 3);
+	}
+#endif
+
+#ifdef PROJECT_GAME
+	static int Entity_GetBounceCount(lua_State *L, jpluaEntity_t *ent){
+		lua_pushinteger(L, ent->bounceCount);
+		return 1;
+	}
+	
+	static void Entity_SetBounceCount(lua_State *L, jpluaEntity_t *ent){
+		ent->bounceCount = lua_tointeger(L, 3);
+	}
+#endif
+
+#ifdef PROJECT_GAME
+	static int Entity_GetMOD(lua_State *L, jpluaEntity_t *ent){
+		lua_pushinteger(L, ent->methodOfDeath);
+		lua_pushinteger(L, ent->splashMethodOfDeath);
+		return 2;
+	}
+	
+	static void Entity_SetMOD(lua_State *L, jpluaEntity_t *ent){
+		if ( lua_type( L, 3) != LUA_TTABLE ) {
+			trap->Print( "JPLua::Entity_GetMOD failed, not a table\n" );
+			return;
+		}
+		lua_getfield( L, 3, "methodOfDeath" );
+			ent->methodOfDeath = lua_tointeger(L, 3);
+			lua_pop(L,1);
+		lua_getfield( L, 3, "splashMethodOfDeath" );
+			ent->splashMethodOfDeath = lua_tointeger(L, 3);
+			lua_pop(L,1);
+	}
+
+#endif
 	static const entityProperty_t entityProperties[] = {
 		{
 			"angles",
@@ -867,6 +948,14 @@ namespace JPLua {
 			nullptr
 #endif
 		},
+		
+#if defined(PROJECT_GAME)
+		{
+			"bounceCount",
+			Entity_GetBounceCount,
+			Entity_SetBounceCount
+		},
+#endif
 
 		{
 			"bounds",
@@ -890,7 +979,7 @@ namespace JPLua {
 		{
 			"classname",
 			Entity_GetClassName,
-			NULL
+			Entity_SetClassName
 		},
 #endif
 
@@ -930,7 +1019,7 @@ namespace JPLua {
 		{
 			"flags",
 			Entity_GetFlags,
-			Entity_SetFlags,
+			Entity_SetFlags
 		},
 #endif
 		{
@@ -959,7 +1048,7 @@ namespace JPLua {
 		{
 			"light",
 			Entity_GetLight,
-			Entity_SetLight,
+			Entity_SetLight
 		},
 		{
 			"linked",
@@ -973,6 +1062,14 @@ namespace JPLua {
 			"material",
 			Entity_GetMaterial,
 			Entity_SetMaterial
+		},
+#endif
+
+#if defined(PROJECT_GAME)
+		{
+			"methodOfDeath",
+			Entity_GetMOD,
+			Entity_SetMOD
 		},
 #endif
 
@@ -1000,6 +1097,14 @@ namespace JPLua {
 			},
 #endif
 
+#if defined(PROJECT_GAME)
+		{
+			"physicsObject",
+			Entity_GetPhysicsObject,
+			Entity_SetPhysicsObject
+		},
+#endif
+
 		{
 			"player",
 			Entity_ToPlayer,
@@ -1015,6 +1120,13 @@ namespace JPLua {
 			nullptr
 #endif
 		},
+#if defined(PROJECT_GAME)
+		{
+			"position_2",
+			Entity_GetPos_2,
+			Entity_SetPos_2
+		},
+#endif
 
 #if defined(PROJECT_GAME)
 		{
@@ -1028,7 +1140,7 @@ namespace JPLua {
 		{
 			"svFlags",
 			Entity_GetSVFlags,
-			Entity_SetSVFlags,
+			Entity_SetSVFlags
 		},
 #endif
 
@@ -1044,7 +1156,7 @@ namespace JPLua {
 		{
 			"trajectory",
 			Entity_GetTrajectory,
-			Entity_SetTrajectory,
+			Entity_SetTrajectory
 		},
 #endif
 

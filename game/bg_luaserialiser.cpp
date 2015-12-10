@@ -261,6 +261,7 @@ namespace JPLua {
 			else if ( len < 0 ) {
 				lua_pop( L, 1 ); //pop userdata
 				lua_pushnil( L ); // push nil
+				return;
 			}
 			else{
 				serialiser->inRoot = NULL;
