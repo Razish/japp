@@ -1,6 +1,13 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 // q_shared.c -- stateless support routines that are included in each code dll
+
+#if defined(MACOS_X)
+//#include <CoreFoundation/CFURL.h>
+#include <CoreFoundation/CFBundle.h>
+#include <ApplicationServices/ApplicationServices.h>
+#endif
+
 #include "qcommon/q_shared.h"
 #include "cJSON/cJSON.h"
 

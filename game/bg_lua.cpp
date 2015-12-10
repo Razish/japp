@@ -1612,7 +1612,7 @@ namespace JPLua {
 
 	#endif // JPLUA
 
-	// initialise the ls.system
+	// initialise the JPLua system
 	void Init( void ) {
 	#ifdef JPLUA
 	#if defined(PROJECT_GAME)

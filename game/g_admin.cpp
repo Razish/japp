@@ -68,7 +68,7 @@ enum adminStrings_e {
 	ADMIN_STRING_MAX
 };
 static std::array<std::string, ADMIN_STRING_MAX> adminStrings = { {
-	"You have been banned", // ADMIN_STRING_BAN
+	"was banned (reason: $1)", // ADMIN_STRING_BAN
 	"The Gods gave you power", // ADMIN_STRING_EMPOWER
 	"$1 has been empowered", // ADMIN_STRING_EMPOWER_ANNOUNCE
 	"You have lost your powers", // ADMIN_STRING_UNEMPOWER
@@ -79,7 +79,7 @@ static std::array<std::string, ADMIN_STRING_MAX> adminStrings = { {
 	"You are visible again", // ADMIN_STRING_UNGHOSTED
 	"You received $1", // ADMIN_STRING_GIVE
 	"$1 received $2", // ADMIN_STRING_GIVE_ANNOUNCE
-	"You have been kicked (Reason: $1)", // ADMIN_STRING_KICK
+	"was kicked (reason: $1)", // ADMIN_STRING_KICK
 	"", // ADMIN_STRING_MAP
 	"Look at all the guns you've got", // ADMIN_STRING_MERC
 	"$1 has got a lot of guns, run away", // ADMIN_STRING_MERC_ANNOUNCE
@@ -273,8 +273,11 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 			G_Announce( string.c_str() );
 			return;
 		}
-		else {
+		else if ( ent ) {
 			trap->SendServerCommand( ent->s.number, va( "cp \"%s\n\"", string.c_str() ) );
+		}
+		else {
+			// something like ban or kick, where it's pointless for ent to receive the message
 		}
 	}
 

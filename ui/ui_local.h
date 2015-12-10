@@ -242,18 +242,37 @@ typedef struct modInfo_s {
 	const char *modDescr;
 } modInfo_t;
 
-typedef struct playerSpeciesInfo_s {
-	char		Name[64];
-	int			SkinHeadCount;
-	char		SkinHeadNames[MAX_PLAYERMODELS][16];
-	int			SkinTorsoCount;
-	char		SkinTorsoNames[MAX_PLAYERMODELS][16];
-	int			SkinLegCount;
-	char		SkinLegNames[MAX_PLAYERMODELS][16];
-	char		ColorShader[MAX_PLAYERMODELS][64];
-	int			ColorCount;
-	char		ColorActionText[MAX_PLAYERMODELS][128];
-} playerSpeciesInfo_t;
+#define SKIN_LENGTH			16
+#define ACTION_BUFFER_SIZE	128
+
+struct skinName_t {
+	char name[SKIN_LENGTH];
+};
+
+struct playerColor_t {
+	char shader[MAX_QPATH];
+	char actionText[ACTION_BUFFER_SIZE];
+};
+
+struct playerSpeciesInfo_t {
+	char			 Name[MAX_QPATH];
+
+	int				 SkinHeadCount;
+	int				 SkinHeadMax;
+	skinName_t		*SkinHead;
+
+	int				 SkinTorsoCount;
+	int				 SkinTorsoMax;
+	skinName_t		 *SkinTorso;
+
+	int				 SkinLegCount;
+	int				 SkinLegMax;
+	skinName_t		*SkinLeg;
+
+	int				 ColorMax;
+	int				 ColorCount;
+	playerColor_t	*Color;
+};
 
 typedef struct uiInfo_s {
 	displayContextDef_t		uiDC;
@@ -338,8 +357,9 @@ typedef struct uiInfo_s {
 
 	qboolean				inGameLoad;
 
+	int						playerSpeciesMax;
 	int						playerSpeciesCount;
-	playerSpeciesInfo_t		playerSpecies[MAX_PLAYERMODELS];
+	playerSpeciesInfo_t		*playerSpecies;
 	int						playerSpeciesIndex;
 
 	short					movesTitleIndex;

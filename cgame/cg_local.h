@@ -596,6 +596,7 @@ typedef struct cg_s {
 	int				soundTime;
 	qhandle_t		soundBuffer[MAX_SOUNDBUFFER];
 	int				voiceChatTime;
+
 	int				voiceChatBufferIn;
 	int				voiceChatBufferOut;
 	int				warmup;

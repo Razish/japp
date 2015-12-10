@@ -707,7 +707,7 @@ void SetPlaneSignbits( cplane_t *out ) {
 }
 
 
-#if !defined(QARCH_X86) || defined(C_ONLY)
+#if !defined(QARCH_X86) || defined(C_ONLY) || defined(MACOS_X)
 
 	int BoxOnPlaneSide( vector3 *emins, vector3 *emaxs, struct cplane_s *p ) {
 		// fast axial cases

@@ -132,11 +132,12 @@ typedef struct gclient_s gclient_t;
 #define SABERTWEAK_INTERPOLATE			(0x0001u) // use SP style interpolation, also fix various small issues
 #define SABERTWEAK_PROLONGDAMAGE		(0x0002u) // allow damaging in wind-up and return animations
 #define SABERTWEAK_POSDEFLECTION		(0x0004u) // calculate deflection based on position rather than animation
-#define SABERTWEAK_SPECIALMOVES			(0x0008u) // tweak damages for special moves
+#define SABERTWEAK_SPECIALMOVEDMG		(0x0008u) // tweak damages for special moves
 #define SABERTWEAK_TRACESIZE			(0x0010u) // use SP saber trace size or based off radius defined in .sab file
 #define SABERTWEAK_REDUCEBLOCKS			(0x0020u) // reduce chance of blocking based on saber stance
 #define SABERTWEAK_TWOBLADEDEFLECTFIX	(0x0040u) // fix deflection bug when toggling second saber
 #define SABERTWEAK_NERFDMG				(0x0080u) // nerf moves like roll-stab
+#define SABERTWEAK_NOTLOCATIONBASED		(0x0100u) // never use location based damage for sabers
 
 #define MOVER_START_ON					(0x0001)
 #define MOVER_FORCE_ACTIVATE			(0x0002)

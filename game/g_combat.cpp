@@ -3381,6 +3381,9 @@ void G_LocationBasedDamageModifier( gentity_t *ent, vector3 *point, int mod, uin
 	if ( !g_locationBasedDamage.integer ) { //then leave it alone
 		return;
 	}
+	else if ( mod == MOD_SABER && (japp_saberTweaks.integer & SABERTWEAK_NOTLOCATIONBASED) ) {
+		return;
+	}
 
 	if ( (dflags&DAMAGE_NO_HIT_LOC) ) { //then leave it alone
 		return;

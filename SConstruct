@@ -218,6 +218,7 @@ emptyEnv( env, 'CCFLAGS' )
 emptyEnv( env, 'CXXFLAGS' )
 emptyEnv( env, 'LINKFLAGS' )
 emptyEnv( env, 'ARFLAGS' )
+emptyEnv( env, 'LIBS' )
 
 # compiler switches
 if realcc == 'gcc' or realcc == 'clang':
@@ -456,6 +457,10 @@ elif realcc == 'cl':
 
 if plat == 'Darwin':
 	env['CPPDEFINES'] += [ 'MACOS_X' ]
+	env['LINKFLAGS'] += [
+		'-framework', 'CoreFoundation',
+		'-framework', 'ApplicationServices'
+	]
 
 # debug / release
 if debug == 0 or debug == 2:
