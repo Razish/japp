@@ -2834,8 +2834,8 @@ static float CG_DrawMiniScoreboard( float y ) {
 		Q_strcat( s, sizeof(s), cgs.scores2 == SCORE_NOT_PRESENT ? "-" : (va( "%i", cgs.scores2 )) );
 
 		w = Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer, false );
-		Text_Paint( SCREEN_WIDTH - (SCREEN_WIDTH - w) * cgs.widthRatioCoef, y, cg_topRightSize.value,
-			&g_color_table[ColorIndex(COLOR_WHITE)], s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer, false
+		Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &g_color_table[ColorIndex(COLOR_WHITE)], s, 0, 0,
+			ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer, false
 		);
 		return y + Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer, false );
 	}
@@ -2844,58 +2844,55 @@ static float CG_DrawMiniScoreboard( float y ) {
 }
 
 static float CG_DrawEnemyInfo( float y ) {
-	float		size;
 	int			clientNum;
-	const char	*title;
-	clientInfo_t	*ci;
-	int xOffset = 0;
+	const char *title = nullptr;
+	const qhandle_t fontHandle = FONT_SMALL2;
+	const float fontScale = 1.0f;
+	float textWidth = 0.0f;
 
 	if ( !cg.snap || !cg_drawEnemyInfo.integer || cg.predictedPlayerState.stats[STAT_HEALTH] <= 0
-		|| cgs.gametype == GT_POWERDUEL ) {
+		|| cgs.gametype == GT_POWERDUEL )
+	{
 		return y;
 	}
 
 	if ( cgs.gametype == GT_JEDIMASTER ) {
-		//title = "Jedi Master";
+		// show who the jedi master is
 		title = CG_GetStringEdString( "MP_INGAME", "MASTERY7" );
 		clientNum = cgs.jediMaster;
 
-		if ( clientNum < 0 ) {
-			//return y;
-			//			title = "Get Saber!";
+		// no jedi master - we have to get the saber
+		if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
 			title = CG_GetStringEdString( "MP_INGAME", "GET_SABER" );
 
-
-			size = ICON_SIZE * 1.25f;
 			y += 5;
 
-			CG_DrawPic( SCREEN_WIDTH - (size - 12 + xOffset) * cgs.widthRatioCoef, y, size * cgs.widthRatioCoef, size,
+			CG_DrawPic(
+				SCREEN_WIDTH - (ICON_SIZE * cgs.widthRatioCoef), y,
+				ICON_SIZE * cgs.widthRatioCoef, ICON_SIZE,
 				media.gfx.interface.weaponIcons[WP_SABER]
 			);
 
-			y += size;
+			y += ICON_SIZE;
 
-			/*
-			Text_Paint( 630 - Text_Width ( ci->name, 0.7f, FONT_MEDIUM ), y, 0.7f, &colorWhite, ci->name, 0, 0, 0, FONT_MEDIUM );
-			y += 15;
-			*/
-
-			Text_Paint( 630 - Text_Width( title, 0.7f, FONT_MEDIUM, false ) + xOffset, y, 0.7f, &colorWhite, title, 0,
-				0, 0, FONT_MEDIUM, false
+			textWidth = Text_Width( title, 0.7f, FONT_MEDIUM, false );
+			Text_Paint( SCREEN_WIDTH - textWidth, y, 0.7f, &colorWhite, title, 0, 0, 0,
+				FONT_MEDIUM, false
 			);
 
 			return y + BIGCHAR_HEIGHT + 2;
 		}
 	}
 	else if ( cg.snap->ps.duelInProgress ) {
-		//		title = "Dueling";
 		title = CG_GetStringEdString( "MP_INGAME", "DUELING" );
 		clientNum = cg.snap->ps.duelIndex;
 	}
 	else if ( cgs.gametype == GT_DUEL && cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR ) {
 		title = CG_GetStringEdString( "MP_INGAME", "DUELING" );
+
 		if ( cg.snap->ps.clientNum == cgs.duelist1 ) {
-			clientNum = cgs.duelist2; //if power duel, should actually draw both duelists 2 and 3 I guess
+			// if power duel, should actually draw both duelists 2 and 3 I guess
+			clientNum = cgs.duelist2;
 		}
 		else if ( cg.snap->ps.clientNum == cgs.duelist2 ) {
 			clientNum = cgs.duelist1;
@@ -2908,57 +2905,66 @@ static float CG_DrawEnemyInfo( float y ) {
 		}
 	}
 	else {
-		if ( cgs.duelWinner < 0 || cgs.duelWinner >= MAX_CLIENTS )
+		if ( cgs.duelWinner < 0 || cgs.duelWinner >= MAX_CLIENTS ) {
 			return y;
+		}
 
 		title = va( "%s: %i", CG_GetStringEdString( "MP_INGAME", "LEADER" ), cgs.scores1 );
-
 		clientNum = cgs.duelWinner;
 	}
 
-	if ( clientNum >= MAX_CLIENTS || !(&cgs.clientinfo[clientNum]) ) {
+	if ( clientNum < 0 || clientNum >= MAX_CLIENTS || !cgs.clientinfo[clientNum].infoValid ) {
 		return y;
 	}
 
-	ci = &cgs.clientinfo[clientNum];
-
-	size = ICON_SIZE * 1.25f * cgs.widthRatioCoef;
+	const clientInfo_t *ci = &cgs.clientinfo[clientNum];
 	y += 5;
 
+	// draw their skin icon
 	if ( ci->modelIcon ) {
-		CG_DrawPic( SCREEN_WIDTH - (size - 0 + xOffset)*cgs.widthRatioCoef, y, size * cgs.widthRatioCoef, size,
+		CG_DrawPic(
+			SCREEN_WIDTH - (ICON_SIZE * cgs.widthRatioCoef), y,
+			ICON_SIZE * cgs.widthRatioCoef, ICON_SIZE,
 			ci->modelIcon
 		);
 	}
 
-	y += size;
+	y += ICON_SIZE;
 
-	Text_Paint( 630 - (Text_Width( ci->name, 1.0f, FONT_SMALL2, false ) + xOffset) * cgs.widthRatioCoef, y, 1.0f,
-		&colorWhite, ci->name, 0, 0, 0, FONT_SMALL2, false
-	); // EpicCheck
+	textWidth = Text_Width( ci->name, fontScale, fontHandle, false );
+	Text_Paint( SCREEN_WIDTH - textWidth, y, fontScale, &colorWhite, ci->name, 0.0f, 0, 0, fontHandle,
+		false
+	);
 
 	y += 15;
-	Text_Paint( 630 - (Text_Width( title, 1.0f, FONT_SMALL2, false ) + xOffset) * cgs.widthRatioCoef, y, 1.0f,
-		&colorWhite, title, 0, 0, 0, FONT_SMALL2, false
-	); // EpicCheck
+	textWidth = Text_Width( title, fontScale, fontHandle, false );
+	Text_Paint( SCREEN_WIDTH - textWidth, y, fontScale, &colorWhite, title, 0.0f, 0, 0, fontHandle,
+		false
+	);
 
-	if ( (cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL) && cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR ) {//also print their score
+	if ( (cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL)
+		&& cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR )
+	{
+		// also print their score
 		char text[1024];
 		y += 15;
 		Com_sprintf( text, sizeof(text), "%i/%i", cgs.clientinfo[clientNum].score, cgs.fraglimit );
-		Text_Paint( 630 - (Text_Width( text, 0.7f, FONT_MEDIUM, false ) + xOffset) * cgs.widthRatioCoef, y, 0.7f,
-			&colorWhite, text, 0, 0, 0, FONT_MEDIUM, false
-		); // EpicCheck
+		textWidth = Text_Width( text, 0.7f, FONT_MEDIUM, false );
+		Text_Paint( SCREEN_WIDTH - textWidth, y, 0.7f, &colorWhite, text, 0, 0, 0, FONT_MEDIUM, false );
 	}
 
 	// nmckenzie: DUEL_HEALTH - fixme - need checks and such here.  And this is coded to duelist 1 right now, which is wrongly.
 	if ( cgs.showDuelHealths >= 2 ) {
 		y += 15;
 		if ( cgs.duelist1 == clientNum ) {
-			CG_DrawDuelistHealth(SCREEN_WIDTH - (size - 5 + xOffset)*cgs.widthRatioCoef, y, 64 * cgs.widthRatioCoef, 8, 1);
+			CG_DrawDuelistHealth( SCREEN_WIDTH - (ICON_SIZE - 5) * cgs.widthRatioCoef, y, 64 * cgs.widthRatioCoef, 8,
+				1
+			);
 		}
 		else if ( cgs.duelist2 == clientNum ) {
-			CG_DrawDuelistHealth(SCREEN_WIDTH - (size - 5 + xOffset)*cgs.widthRatioCoef, y, 64 * cgs.widthRatioCoef, 8, 2);
+			CG_DrawDuelistHealth( SCREEN_WIDTH - (ICON_SIZE - 5) * cgs.widthRatioCoef, y, 64 * cgs.widthRatioCoef, 8,
+				2
+			);
 		}
 	}
 

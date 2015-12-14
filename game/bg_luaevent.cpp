@@ -130,7 +130,9 @@ namespace JPLua {
 
 	void Event_RunFrame( void ) {
 #ifdef JPLUA
-		lua_gc( ls.L, LUA_GCSTEP, 1 );
+		if ( ls.L ) {
+			lua_gc( ls.L, LUA_GCSTEP, 1 );
+		}
 		plugin_t *plugin = NULL;
 		while ( IteratePlugins( &plugin ) ) {
 			if ( plugin->eventListeners[JPLUA_EVENT_RUNFRAME] ) {
