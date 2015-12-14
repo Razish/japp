@@ -42,7 +42,7 @@ namespace JPLua {
 		std::unordered_map<std::string, bool> plugins;
 	} autoload;
 
-	void UpdateAutoload( void ) { 
+	void UpdateAutoload( void ) {
 	#if defined(PROJECT_GAME)
 		char *autoloadStr = g_jpluaAutoload.string;
 	#elif defined(PROJECT_CGAME)
@@ -1473,13 +1473,18 @@ namespace JPLua {
 	#endif
 
 #ifdef PROJECT_GAME
-	static int TeamLock(lua_State *L){
-		int team = lua_tointeger(L, 1);
-		qboolean enabled = lua_toboolean(L, 2);
+	static int TeamLock( lua_State *L ) {
+		int team = luaL_checkinteger( L, 1 );
+		luaL_checktype( L, 2, LUA_TBOOLEAN );
+		qboolean enabled = lua_toboolean( L, 2 );
 
-		if (TEAM_FREE <= team < TEAM_NUM_TEAMS){
+		if ( team >= TEAM_FREE && team < TEAM_NUM_TEAMS ) {
 			level.lockedTeams[team] = enabled;
 		}
+		else {
+			return luaL_error( L, "team ID %i not in range [%i,%i]", team, TEAM_FREE, TEAM_NUM_TEAMS - 1 );
+		}
+
 		return 0;
 	}
 
