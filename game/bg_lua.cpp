@@ -1636,7 +1636,7 @@ namespace JPLua {
 		}
 
 		// set the ls.version
-		semver_parse( "13.2.4", &jpluaVersion );
+		semver_parse( "13.2.5", &jpluaVersion );
 
 		// set the callback in case of an error
 		lua_atpanic( ls.L, Error );

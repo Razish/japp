@@ -327,7 +327,7 @@ namespace JPLua {
 	#elif defined(PROJECT_CGAME)
 		entityState_t *es = &ent->currentState;
 	#endif
-		lua_pushboolean( L, es->saberHolstered );
+		lua_pushinteger( L, es->saberHolstered );
 		return 1;
 	}
 
