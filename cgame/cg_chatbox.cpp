@@ -70,6 +70,7 @@ static chatHistory_t *currentHistory = NULL;
 // chatbox input
 field_t chatField;
 messageMode_e chatMode = CHAT_ALL;
+static bool overstrike = false;
 static int chatTargetClient = -1;
 static bool chatActive = false;
 
@@ -643,11 +644,25 @@ void CG_ChatboxDraw( void ) {
 				cursorOffset += Text_Width( va( "%c", msg[j] ), cg.chatbox.size.scale, CG_GetChatboxFont(), false );
 			}
 
-			const float cursorHeight = Text_Height( "_", cg.chatbox.size.scale, CG_GetChatboxFont(), false );
-			Text_Paint( cg.chatbox.pos.x + cursorPre + cursorOffset, cg.chatbox.pos.y + yAccum - (cursorHeight / 2.0f),
-				cg.chatbox.size.scale, &g_color_table[ColorIndex( COLOR_WHITE )], "_", 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED,
-				CG_GetChatboxFont(), false
-			);
+			const char *cursorChar = overstrike ? "#" : "|";
+			const float cursorWidth = Text_Width( cursorChar, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
+			const float cursorHeight = Text_Height( cursorChar, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
+			if ( !overstrike ) {
+				cursorOffset -= cursorWidth / 2.0f;
+			}
+			if ( overstrike ) {
+				CG_FillRect(
+					cg.chatbox.pos.x + cursorPre + cursorOffset, cg.chatbox.pos.y + yAccum,
+					cursorWidth, cursorHeight / 1.5f, &g_color_table[ColorIndex( COLOR_WHITE )]
+				);
+			}
+			else {
+				Text_Paint(
+					cg.chatbox.pos.x + cursorPre + cursorOffset, cg.chatbox.pos.y + yAccum - (cursorHeight / 2.0f),
+					cg.chatbox.size.scale, &g_color_table[ColorIndex( COLOR_WHITE )], cursorChar, 0.0f, 0,
+					ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(), false
+				);
+			}
 		}
 		yAccum += height;
 	}
@@ -843,28 +858,32 @@ static void Field_CharEvent( field_t *edit, int key ) {
 	int fieldLen = strlen( edit->buffer );
 
 	//key = tolower( key );
-	//trap->Print( JAPP_FUNCTION " %d\n", key );
 
 	// handle shortcuts
 	//RAZTODO: advanced text editing
 	if ( trap->Key_IsDown( A_CTRL ) ) {
 		switch ( key ) {
-		case 'a': // home
+
+		// home
+		case 'a': {
 			edit->cursor = 0;
 			edit->scroll = 0;
-			break;
+		} break;
 
-		case A_BACKSPACE: // clear
-		case 'c': // clear
+		// clear
+		case A_BACKSPACE:
+		case 'c': {
 			Field_Clear( edit );
-			break;
+		} break;
 
-		case 'e': // end
+		// end
+		case 'e': {
 			edit->cursor = fieldLen;
 			edit->scroll = edit->cursor - edit->widthInChars;
-			break;
+		} break;
 
-		case 'h': // backspace
+		// backspace
+		case 'h': {
 			if ( edit->cursor > 0 ) {
 				memmove( edit->buffer + edit->cursor - 1, edit->buffer + edit->cursor, fieldLen + 1 - edit->cursor );
 				edit->cursor--;
@@ -872,14 +891,17 @@ static void Field_CharEvent( field_t *edit, int key ) {
 					edit->scroll--;
 				}
 			}
-			break;
+		} break;
 
-		case 'v': // paste
+		// paste
+		case 'v': {
 			//RAZTODO: Field_Paste
-			break;
+			CG_ChatboxAddMessage( S_COLOR_YELLOW "Clipboard support is not available for this chatbox yet", qfalse, "normal" );
+		} break;
 
-		default:
-			break;
+		default: {
+		} break;
+
 		}
 
 		return;
@@ -887,61 +909,61 @@ static void Field_CharEvent( field_t *edit, int key ) {
 
 	if ( !(key & K_CHAR_FLAG) ) {
 		switch ( key ) {
-		case A_ENTER:
-		case A_KP_ENTER:
-			CG_ChatboxOutgoing();
-			break;
 
-		case A_TAB:
+		case A_ENTER:
+		case A_KP_ENTER: {
+			CG_ChatboxOutgoing();
+		} break;
+
+		case A_TAB: {
 			CG_ChatboxTabComplete();
-			break;
+		} break;
 
 		case A_PAGE_DOWN:
-		case A_MWHEELDOWN:
+		case A_MWHEELDOWN: {
 			CG_ChatboxScroll( 0 );
-			break;
+		} break;
 
 		case A_PAGE_UP:
-		case A_MWHEELUP:
+		case A_MWHEELUP: {
 			CG_ChatboxScroll( 1 );
-			break;
+		} break;
 
-		case A_CURSOR_UP:
+		case A_CURSOR_UP: {
 			CG_ChatboxHistoryUp();
-			break;
+		} break;
 
-		case A_CURSOR_DOWN:
+		case A_CURSOR_DOWN: {
 			CG_ChatboxHistoryDn();
-			break;
+		} break;
 
-		case A_CURSOR_RIGHT:
+		case A_CURSOR_RIGHT: {
 			if ( edit->cursor < fieldLen ) {
 				edit->cursor++;
 			}
-			break;
+		} break;
 
-		case A_CURSOR_LEFT:
+		case A_CURSOR_LEFT: {
 			if ( edit->cursor > 0 ) {
 				edit->cursor--;
 			}
-			break;
+		} break;
 
-		case A_INSERT:
-			//RAZTODO: chatbox overstrike mode
-			//kg.key_overstrikeMode = (qboolean)!kg.key_overstrikeMode;
-			break;
+		case A_INSERT: {
+			overstrike = !overstrike;
+		} break;
 
-		case A_HOME:
+		case A_HOME: {
 			edit->cursor = 0;
 			edit->scroll = 0;
-			break;
+		} break;
 
-		case A_END:
+		case A_END: {
 			edit->cursor = fieldLen;
 			edit->scroll = edit->cursor - edit->widthInChars;
-			break;
+		} break;
 
-		case A_BACKSPACE:
+		case A_BACKSPACE: {
 			if ( edit->cursor > 0 ) {
 				memmove( edit->buffer + edit->cursor - 1, edit->buffer + edit->cursor, fieldLen + 1 - edit->cursor );
 				edit->cursor--;
@@ -949,15 +971,15 @@ static void Field_CharEvent( field_t *edit, int key ) {
 					edit->scroll--;
 				}
 			}
-			break;
+		} break;
 
-		case A_DELETE:
+		case A_DELETE: {
 			if ( edit->cursor < fieldLen ) {
 				memmove( edit->buffer + edit->cursor, edit->buffer + edit->cursor + 1, fieldLen - edit->cursor );
 			}
-			break;
+		} break;
 
-		case A_MOUSE1:
+		case A_MOUSE1: {
 			if ( Q_PointInBounds( cgs.cursorX, cgs.cursorY, cg.chatbox.pos.x, inputLinePosY,
 					inputLineWidth, inputLineHeight ) )
 			{
@@ -984,10 +1006,11 @@ static void Field_CharEvent( field_t *edit, int key ) {
 					}
 				}
 			}
-			break;
+		} break;
 
-		default:
-			break;
+		default: {
+		} break;
+
 		}
 
 		// Change scroll if cursor is no longer visible
@@ -1008,12 +1031,14 @@ static void Field_CharEvent( field_t *edit, int key ) {
 		return;
 	}
 
-	//RAZTODO: chatbox overstrike mode
 	// - 2 to leave room for the leading slash and trailing \0
 	if ( fieldLen == MAX_EDIT_LINE - 1 ) {
 		return; // all full
 	}
-	memmove( edit->buffer + edit->cursor + 1, edit->buffer + edit->cursor, fieldLen + 1 - edit->cursor );
+
+	if ( !overstrike ) {
+		memmove( edit->buffer + edit->cursor + 1, edit->buffer + edit->cursor, fieldLen + 1 - edit->cursor );
+	}
 	edit->buffer[edit->cursor++] = key;
 
 	if ( edit->cursor >= edit->widthInChars ) {
