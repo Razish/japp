@@ -2,7 +2,11 @@
 //
 // cg_draw.c -- draw all of the graphical elements during
 // active (after loading) gameplay
+
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
 #include <queue>
+
 #include "cg_local.h"
 #include "bg_saga.h"
 #include "ui/ui_shared.h"
@@ -2821,23 +2825,98 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team ) 
 // UPPER RIGHT CORNER
 
 static float CG_DrawMiniScoreboard( float y ) {
-	char s[MAX_QPATH];
-
-	if ( !cg_drawScores.integer || cgs.gametype == GT_SIEGE )
+	if ( !cg_drawScores.integer || cgs.gametype == GT_SIEGE ) {
 		return y;
+	}
 
 	if ( cgs.gametype >= GT_TEAM ) {
-		float w;
+		char s[MAX_STRING_CHARS];
 		Q_strncpyz( s, va( "%s: ", CG_GetStringEdString( "MP_INGAME", "RED" ) ), sizeof(s) );
 		Q_strcat( s, sizeof(s), cgs.scores1 == SCORE_NOT_PRESENT ? "-" : (va( "%i", cgs.scores1 )) );
 		Q_strcat( s, sizeof(s), va( " %s: ", CG_GetStringEdString( "MP_INGAME", "BLUE" ) ) );
 		Q_strcat( s, sizeof(s), cgs.scores2 == SCORE_NOT_PRESENT ? "-" : (va( "%i", cgs.scores2 )) );
 
-		w = Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer, false );
+		float w = Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer, false );
 		Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &g_color_table[ColorIndex(COLOR_WHITE)], s, 0, 0,
 			ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer, false
 		);
-		return y + Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer, false );
+
+		y += Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer, false );
+	}
+
+	else if ( cgs.gametype == GT_FFA ) {
+		if ( cg_drawScores.integer == 2 && !cg.scoreBoardShowing ) {
+			const qhandle_t fontHandle = FONT_JAPPMONO;
+			const float fontScale = 0.5;
+			// start at 4, because we'll put ourselves at the end if we're no in the top 5
+			// end result will be showing up to 5 players
+			int numScores = std::min( cg.numScores, 4 );
+			const score_t *ourScore = nullptr;
+			for ( int i = 0; i < numScores; i++ ) {
+				const score_t *score = &cg.scores[i];
+				const clientInfo_t *ci = &cgs.clientinfo[score->client];
+				if ( ci->infoValid && score->client == cg.snap->ps.clientNum ) {
+					numScores++;
+					break;
+				}
+			}
+			for ( int i = 0; i < cg.numScores; i++ ) {
+				const score_t *score = &cg.scores[i];
+				if ( score->client == cg.snap->ps.clientNum ) {
+					ourScore = score;
+					break;
+				}
+			}
+
+			char buf[5][128]{};
+			uint32_t numWritten = 0u;
+			for ( int i = 0; i < numScores; i++ ) {
+				const score_t *score = &cg.scores[i];
+				const clientInfo_t *ci = &cgs.clientinfo[score->client];
+
+				if ( !ci->infoValid ) {
+					continue;
+				}
+
+				if ( cg.numScores && ourScore ) {
+					if ( score->client == cg.snap->ps.clientNum ) {
+						Com_sprintf( buf[numWritten], sizeof(buf[0]), "%s " S_COLOR_WHITE "%s",
+							ci->name,
+							CG_PlaceString( numWritten + 1 )
+						);
+					}
+					else {
+						const int net = score->score - ourScore->score;
+						const char sign = (net >= 0) ? '-' : '+';
+
+						Com_sprintf( buf[numWritten], sizeof(buf[0]), "%s " S_COLOR_WHITE "(%s%c%i" S_COLOR_WHITE ") %s",
+							ci->name,
+							(net < 0) ? (S_COLOR_GREEN) : ((net > 0) ? S_COLOR_RED : S_COLOR_WHITE),
+							sign,
+							std::abs( net ),
+							CG_PlaceString( numWritten + 1 )
+						);
+					}
+				}
+				else {
+					Com_sprintf( buf[numWritten], sizeof(buf[0]), "%s " S_COLOR_WHITE "%s",
+						ci->name,
+						CG_PlaceString( numWritten + 1 )
+					);
+				}
+
+				numWritten++;
+			}
+
+			const float textHeight = Text_Height( buf[0], fontScale, fontHandle, false );
+			for ( int i = 0; i < numWritten; i++ ) {
+				const float textWidth = Text_Width( buf[i], fontScale, fontHandle, false );
+				Text_Paint( SCREEN_WIDTH - textWidth, y + (i * textHeight), fontScale, &colorWhite, buf[i], 0.0f, 0,
+					ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+				);
+				y += textHeight;
+			}
+		}
 	}
 
 	return y;
@@ -2850,7 +2929,7 @@ static float CG_DrawEnemyInfo( float y ) {
 	const float fontScale = 1.0f;
 	float textWidth = 0.0f;
 
-	if ( !cg.snap || !cg_drawEnemyInfo.integer || cg.predictedPlayerState.stats[STAT_HEALTH] <= 0
+	if ( !cg.snap || cg_drawEnemyInfo.integer != 1 || cg.predictedPlayerState.stats[STAT_HEALTH] <= 0
 		|| cgs.gametype == GT_POWERDUEL )
 	{
 		return y;
@@ -3805,10 +3884,13 @@ static void CG_DrawUpperRight( void ) {
 
 	trap->R_SetColor( &colorTable[CT_WHITE] );
 
-	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 1 )
+	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 1 ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qtrue );
-	if ( cg_drawSnapshot.integer )
+	}
+
+	if ( cg_drawSnapshot.integer ) {
 		y = CG_DrawSnapshot( y );
+	}
 
 	y = CG_DrawFPS( y );
 	y = CG_DrawTimer( y );
