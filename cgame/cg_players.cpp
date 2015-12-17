@@ -4402,13 +4402,13 @@ void CG_DoSFXSaber( vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, 
 
 		if ( color >= SABER_RGB ) {
 			// Add the saber surface that provides color.
-			sbak.customShader = media.gfx.world.saber.sfx.blade2;
+			saber.customShader = media.gfx.world.saber.sfx.blade2;
 			saber.reType = RT_LINE;
 			saber.shaderTexCoord.x = saber.shaderTexCoord.y = 1.0f;
 			saber.shaderRGBA[0] = saber.shaderRGBA[1] = saber.shaderRGBA[2] = saber.shaderRGBA[3] = 0xff;
 			saber.radius = coreradius;
 			saber.saberLength = base_len;
-			SE_R_AddRefEntityToScene( &sbak, cnum );
+			SE_R_AddRefEntityToScene( &saber, cnum );
 		}
 	}
 
@@ -5126,8 +5126,17 @@ CheckTrail:
 
 	saberTrail = &client->saber[saberNum].blade[bladeNum].trail;
 	if ( !sfxSabers ) {
-		float stDur = saberMoveData[cent->currentState.saberMove].trailLength;
+		if ( cent->currentState.saberMove < 0 || cent->currentState.saberMove >= LS_MOVE_MAX ) {
+		#if defined(_DEBUG)
+			trap->Print( "ignoring trail for move %i, not in range [0, %i]\n",
+				cent->currentState.saberMove, LS_MOVE_MAX - 1
+			);
+		#endif
+			goto JustDoIt;
+		}
 
+		float stDur = saberMoveData[cent->currentState.saberMove].trailLength;
+		// bugged for saberMove 167
 		stDur = (stDur / 5.0f)*cg_saberTrailLength.value;
 
 		//Raz: Saber trail length scalars

@@ -302,12 +302,12 @@ saberMoveData_t	saberMoveData[LS_MOVE_MAX] = {//							NB:randomized
 
 	//Raz: JA+ moves
 	{ "JaPlusSpinAtk",				BOTH_MELEE_SPINKICK,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_S_R2L,		200 }, // LS_JAPLUS_SPINATK
-	{ "StfNewAnimSpinKickFwd",		BOTH_MELEE_BACKKICK,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_S_R2L,		200 }, // LS_JAPLUS_STFNEWANIM_SPINKICKFWD
+	{ "StfNewAnimBackKickFwd",		BOTH_MELEE_BACKKICK,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_S_R2L,		200 }, // LS_JAPLUS_STFNEWANIM_BACKKICKFWD
+	{ "StfNewAnimSpinKickFwd",		BOTH_MELEE_SPINKICK,	Q_R,	Q_R,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_S_R2L,		200 }, // LS_JAPLUS_STFNEWANIM_SPINKICKFWD
 	{ "NewAnimJumpBackKickSpin",	BOTH_STAND1,			0,		0,		AFLAG_ACTIVE,	0,		0,			LS_READY,		LS_S_R2L,		0 }, // LS_JAPLUS_NEWANIM_JUMPBACKKICKSPIN
 	{ "NewAnimJumpBackKickFlip",	BOTH_STAND1,			0,		0,		AFLAG_ACTIVE,	0,		0,			LS_READY,		LS_S_R2L,		0 }, // LS_JAPLUS_NEWANIM_JUMPBACKKICKFLIP
 	{ "NewAnimFlipSaberStab",		BOTH_NEW_STABER,		Q_T,	Q_B,	AFLAG_ACTIVE,	100,	BLK_TIGHT,	LS_READY,		LS_READY,		200 }, // LS_JAPLUS_NEWANIM_FLIPSABERSTAB
 };
-
 
 int transitionMove[Q_NUM_QUADS][Q_NUM_QUADS] =
 {
@@ -2118,11 +2118,11 @@ int PM_KickMoveForConditions( void ) {
 		// kick to side
 		if ( pm->cmd.rightmove > 0 ) {
 			// kick right
-			kickMove = (enableSpinkick && pm->cmd.forwardmove > 0) ? LS_JAPLUS_STFNEWANIM_SPINKICKFWD : LS_KICK_R;
+			kickMove = (enableSpinkick && (pm->cmd.forwardmove > 0)) ? LS_JAPLUS_STFNEWANIM_BACKKICKFWD : LS_KICK_R;
 		}
 		else {
 			// kick left
-			kickMove = (enableSpinkick && pm->cmd.forwardmove > 0) ? LS_JAPLUS_SPINATK : LS_KICK_L;
+			kickMove = (enableSpinkick && (pm->cmd.forwardmove > 0)) ? LS_JAPLUS_STFNEWANIM_SPINKICKFWD : LS_KICK_L;
 		}
 		pm->cmd.rightmove = 0;
 	}

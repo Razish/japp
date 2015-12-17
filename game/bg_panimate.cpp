@@ -252,7 +252,15 @@ qboolean BG_SaberInAttack( int move ) {
 	case LS_DUAL_FB:
 	case LS_DUAL_LR:
 	case LS_HILT_BASH:
+
+	// added by ja+
+	case LS_JAPLUS_SPINATK:
+	case LS_JAPLUS_STFNEWANIM_BACKKICKFWD:
+	case LS_JAPLUS_STFNEWANIM_SPINKICKFWD:
+	case LS_JAPLUS_NEWANIM_JUMPBACKKICKSPIN:
+	case LS_JAPLUS_NEWANIM_JUMPBACKKICKFLIP:
 	case LS_JAPLUS_NEWANIM_FLIPSABERSTAB:
+
 		return qtrue;
 	default:
 		return qfalse;
@@ -338,7 +346,15 @@ qboolean BG_SaberInSpecial( int move ) {
 	case LS_DUAL_FB:
 	case LS_DUAL_LR:
 	case LS_HILT_BASH:
+
+	// added from ja+
+	case LS_JAPLUS_SPINATK:
+	case LS_JAPLUS_STFNEWANIM_BACKKICKFWD:
+	case LS_JAPLUS_STFNEWANIM_SPINKICKFWD:
+	case LS_JAPLUS_NEWANIM_JUMPBACKKICKSPIN:
+	case LS_JAPLUS_NEWANIM_JUMPBACKKICKFLIP:
 	case LS_JAPLUS_NEWANIM_FLIPSABERSTAB:
+
 		return qtrue;
 	default:
 		return qfalse;
@@ -359,6 +375,11 @@ qboolean BG_KickMove( int move ) {
 	case LS_KICK_R_AIR:
 	case LS_KICK_L_AIR:
 	case LS_HILT_BASH:
+
+	// added by ja+
+	case LS_JAPLUS_STFNEWANIM_BACKKICKFWD:
+	case LS_JAPLUS_STFNEWANIM_SPINKICKFWD:
+
 		return qtrue;
 	default:
 		return qfalse;
@@ -591,6 +612,11 @@ qboolean BG_SaberInSpecialAttack( int anim ) {
 	case BOTH_A6_FB:
 	case BOTH_A6_LR:
 	case BOTH_A7_HILT:
+
+	// added by ja+
+	case BOTH_MELEE_SPINKICK:
+	case BOTH_MELEE_BACKKICK:
+
 		return qtrue;
 	default:
 		return qfalse;
@@ -617,9 +643,12 @@ qboolean BG_KickingAnim( int anim ) {
 	case BOTH_GETUP_BROLL_F:
 	case BOTH_GETUP_FROLL_B:
 	case BOTH_GETUP_FROLL_F:
-	// ja+ moves
+
+	// added by ja+
 	case BOTH_MELEE_BACKKICK:
-	case BOTH_MELEE_SPINKICK: {
+	case BOTH_MELEE_SPINKICK:
+
+	{
 		return qtrue;
 	} break;
 	default: {
@@ -2227,6 +2256,7 @@ static void BG_StartLegsAnim( playerState_t *ps, int anim ) {
 		BG_FlipPart( ps, SETANIM_LEGS );
 	}
 #endif
+
 	ps->legsAnim = anim;
 
 #ifdef _DEBUG
