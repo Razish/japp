@@ -58,56 +58,54 @@
 	#define QARCH_X86
 #endif
 
-// compiler specific definitions
+// compiler specific definitions, function names etc
+
 #if defined(_MSC_VER)
 
-	// MSVC
+	// visual studio
+	#define Q_FUNCTION __FUNCTION__
+	#define Q_FUNCTION_VERBOSE __FUNCSIG__
 	#define Q_EXPORT __declspec(dllexport)
 	#define Q_NAKED __declspec(naked)
 	#define Q_USED
 	#define Q_UNUSED
+	#define Q_WARN_UNUSED_RESULT
 	#define Q_CDECL __cdecl
 
-#elif defined(__GNUC__) && (__GNUC__ >= 3)
+#elif defined(__GNUC__) || defined(__clang__)
 
-	// GCC, ICC, Clang
+	// gcc, clang
+	#define Q_FUNCTION __FUNCTION__
+	#define Q_FUNCTION_VERBOSE __PRETTY_FUNCTION__
 	#define Q_EXPORT __attribute__(( visibility( "default" ) ))
 	#define Q_NAKED __attribute__(( noinline ))
 	#define Q_USED __attribute__(( used ))
 	#define Q_UNUSED __attribute__(( unused ))
+	#define Q_WARN_UNUSED_RESULT __attribute__(( warn_unused_result ))
 	#if defined(QARCH_X86)
 		#define Q_CDECL __attribute__(( cdecl ))
 	#else
 		#define Q_CDECL
 	#endif
 
+#elif defined(__INTEL_COMPILER)
+
+	//TODO: icc / intel
+
 #else
 
+	#define Q_FUNCTION "<unknown-func>"
+	#define Q_FUNCTION_VERBOSE Q_FUNCTION
 	#define Q_EXPORT
 	#define Q_NAKED
 	#define Q_USED
 	#define Q_UNUSED
+	#define Q_WARN_UNUSED_RESULT
 	#define Q_CDECL
 
 #endif
 
 #define Q_CABI extern "C"
-
-// helper for current function name
-#if defined(_MSC_VER)
-	// visual studio
-	#define JAPP_FUNCTION __FUNCTION__
-	#define JAPP_FUNCTION_VERBOSE __FUNCSIG__
-#elif defined(__GNUC__) || defined(__clang__)
-	// gcc, clang
-	#define JAPP_FUNCTION __FUNCTION__
-	#define JAPP_FUNCTION_VERBOSE __PRETTY_FUNCTION__
-#elif defined(__INTEL_COMPILER)
-	//TODO: icc / intel
-#else
-	#define JAPP_FUNCTION "<unknown-func>"
-	#define JAPP_FUNCTION_VERBOSE JAPP_FUNCTION
-#endif
 
 // check for 32/64 bit
 #if UINTPTR_MAX == 0xffffffff
