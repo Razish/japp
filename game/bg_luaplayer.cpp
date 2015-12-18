@@ -32,6 +32,14 @@ namespace JPLua {
 	#endif
 	}
 
+	static entityState_t *GetEntitystate( jpluaEntity_t *ent ) {
+	#if defined(PROJECT_GAME)
+		return &ent->s;
+	#elif defined(PROJECT_CGAME)
+		return &ent->currentState;
+	#endif
+	}
+
 	// Push a Player instance for a client number onto the stack
 	void Player_CreateRef( lua_State *L, int num ) {
 	#if defined(PROJECT_GAME)
@@ -117,12 +125,11 @@ namespace JPLua {
 	}
 
 	static int Player_GetAngles( lua_State *L, jpluaEntity_t *ent ) {
+		const playerState_t *ps = GetPlayerstate( ent );
 	#if defined(PROJECT_GAME)
-		const vector3 *angles = &ent->client->ps.viewangles;
+		const vector3 *angles = &ps->viewangles;
 	#elif defined(PROJECT_CGAME)
-		const vector3 *angles = ((int)(ent - ents) == cg.clientNum)
-			? &cg.predictedPlayerState.viewangles
-			: &ent->lerpAngles;
+		const vector3 *angles = ps ? &ps->viewangles : &ent->lerpAngles;
 	#endif
 
 		Vector_CreateRef( L, angles->x, angles->y, angles->z );
@@ -130,16 +137,13 @@ namespace JPLua {
 	}
 
 	static int Player_GetArmor( lua_State *L, jpluaEntity_t *ent ) {
-	#if defined(PROJECT_GAME)
-		lua_pushinteger( L, ent->client->ps.stats[STAT_ARMOR] );
-	#elif defined(PROJECT_CGAME)
-		if ( (int)(ent - ents) == cg.clientNum ) {
-			lua_pushinteger( L, cg.predictedPlayerState.stats[STAT_ARMOR] );
+		const playerState_t *ps = GetPlayerstate( ent );
+		if ( ps ) {
+			lua_pushinteger( L, ps->stats[STAT_ARMOR] );
 		}
 		else {
 			lua_pushnil( L );
 		}
-	#endif
 
 		return 1;
 	}
@@ -147,30 +151,25 @@ namespace JPLua {
 	static int Player_GetDuelingPartner( lua_State *L, jpluaEntity_t *ent ) {
 		const playerState_t *ps = GetPlayerstate( ent );
 
-	#if defined(PROJECT_CGAME)
-		if ( (int)(ent - ents) == cg.clientNum ) {
-	#endif
-			if ( ps->duelInProgress ) {
-				Player_CreateRef( L, ps->duelIndex );
-			}
-			else {
-				lua_pushnil( L );
-			}
-	#if defined(PROJECT_CGAME)
+		if ( ps && ps->duelInProgress ) {
+			Player_CreateRef( L, ps->duelIndex );
 		}
 		else {
 			lua_pushnil( L );
 		}
-	#endif
 
 		return 1;
 	}
 
 	static int Player_GetEFlags( lua_State *L, jpluaEntity_t *ent ) {
 		const playerState_t *ps = GetPlayerstate( ent );
+		const entityState_t *es = GetEntitystate( ent );
 
 		if ( ps ) {
 			lua_pushinteger( L, ps->eFlags );
+		}
+		else if ( es ) {
+			lua_pushinteger( L, es->eFlags );
 		}
 		else {
 			lua_pushnil( L );
@@ -221,6 +220,7 @@ namespace JPLua {
 		}
 		else {
 			if ( cgs.clientinfo[(int)(ent - ents)].team == cg.predictedPlayerState.persistant[PERS_TEAM] ) {
+				//TODO: verify that this works
 				lua_pushinteger( L, ent->currentState.health );
 			}
 			else {
@@ -232,7 +232,8 @@ namespace JPLua {
 	}
 
 	static int Player_GetID( lua_State *L, jpluaEntity_t *ent ) {
-		lua_pushinteger( L, (int)(ent - ents) );
+		const entityState_t *es = GetEntitystate( ent );
+		lua_pushinteger( L, es->number );
 		return 1;
 	}
 
@@ -244,27 +245,29 @@ namespace JPLua {
 	#endif
 
 	static int Player_GetAlive( lua_State *L, jpluaEntity_t *ent ) {
+		const playerState_t *ps = GetPlayerstate( ent );
 	#if defined(PROJECT_GAME)
-		if ( ent->client->ps.stats[STAT_HEALTH] > 0
-			&& !(ent->client->ps.eFlags & EF_DEAD)
-			&& ent->client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR
+		if ( ps->stats[STAT_HEALTH] > 0
+			&& !(ps->eFlags & EF_DEAD)
+			&& ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
 			&& ent->client->tempSpectate < level.time )
 		{
 			lua_pushboolean( L, 1 );
 			return 1;
 		}
 	#elif defined(PROJECT_CGAME)
-		if ( (int)(ent - ents) == cg.clientNum ) {
-			if ( cg.predictedPlayerState.stats[STAT_HEALTH] > 0
-				&& !(cg.predictedPlayerState.eFlags & EF_DEAD)
-				&& cg.predictedPlayerState.persistant[PERS_TEAM] != TEAM_SPECTATOR )
+		const entityState_t *es = GetEntitystate( ent );
+		if ( es->number == cg.clientNum ) {
+			if ( ps->stats[STAT_HEALTH] > 0
+				&& !(ps->eFlags & EF_DEAD)
+				&& ps->persistant[PERS_TEAM] != TEAM_SPECTATOR )
 			{
 				lua_pushboolean( L, 1 );
 				return 1;
 			}
 		}
-		else if ( !(ent->currentState.eFlags & EF_DEAD)
-			&& cgs.clientinfo[(int)(ent - ents)].team != TEAM_SPECTATOR )
+		else if ( !(es->eFlags & EF_DEAD)
+			&& cgs.clientinfo[es->number].team != TEAM_SPECTATOR )
 		{
 			lua_pushboolean( L, 1 );
 			return 1;
@@ -285,14 +288,16 @@ namespace JPLua {
 	}
 
 	static int Player_GetDeaths( lua_State *L, jpluaEntity_t *ent ) {
+		const playerState_t *ps = GetPlayerstate( ent );
 	#if defined(PROJECT_GAME)
-		lua_pushinteger( L, ent->client->ps.persistant[PERS_KILLED] );
+		lua_pushinteger( L, ps->persistant[PERS_KILLED] );
 	#elif defined(PROJECT_CGAME)
+		const entityState_t *es = GetEntitystate( ent );
 		if ( (int)(ent - ents) == cg.clientNum ) {
-			lua_pushinteger( L, cg.predictedPlayerState.persistant[PERS_KILLED] );
+			lua_pushinteger( L, ps->persistant[PERS_KILLED] );
 		}
 		else {
-			lua_pushinteger( L, cg.scores[cgs.clientinfo[(int)(ent - ents)].score].deaths );
+			lua_pushinteger( L, cg.scores[cgs.clientinfo[es->number].score].deaths );
 		}
 	#endif
 		return 1;
@@ -302,7 +307,7 @@ namespace JPLua {
 	#if defined(PROJECT_GAME)
 		lua_pushboolean( L, ent->client->ps.duelInProgress ? 1 : 0 );
 	#else
-		lua_pushboolean(L, cg.duelInProgress);
+		lua_pushboolean( L, cg.duelInProgress );
 	#endif
 		return 1;
 	}
@@ -322,21 +327,13 @@ namespace JPLua {
 	#endif
 
 	static int Player_GetHolstered( lua_State *L, jpluaEntity_t *ent ) {
-	#if defined(PROJECT_GAME)
-		entityState_t *es = &ent->s;
-	#elif defined(PROJECT_CGAME)
-		entityState_t *es = &ent->currentState;
-	#endif
+		const entityState_t *es = GetEntitystate( ent );
 		lua_pushinteger( L, es->saberHolstered );
 		return 1;
 	}
 
 	static int Player_GetInAir( lua_State *L, jpluaEntity_t *ent ) {
-	#if defined(PROJECT_GAME)
-		entityState_t *es = &ent->s;
-	#elif defined(PROJECT_CGAME)
-		entityState_t *es = &ent->currentState;
-	#endif
+		const entityState_t *es = GetEntitystate( ent );
 		lua_pushboolean( L, es->groundEntityNum == ENTITYNUM_NONE );
 		return 1;
 	}
@@ -349,11 +346,7 @@ namespace JPLua {
 	#endif
 
 	static int Player_GetProtected( lua_State *L, jpluaEntity_t *ent ) {
-	#if defined(PROJECT_GAME)
-		entityState_t *es = &ent->s;
-	#elif defined(PROJECT_CGAME)
-		entityState_t *es = &ent->currentState;
-	#endif
+		const entityState_t *es = GetEntitystate( ent );
 		lua_pushboolean( L, (es->eFlags & EF_INVULNERABLE) ? 1 : 0 );
 		return 1;
 	}
@@ -404,20 +397,14 @@ namespace JPLua {
 
 	static int Player_GetLegsAnim( lua_State *L, jpluaEntity_t *ent ) {
 		const playerState_t *ps = GetPlayerstate( ent );
-	#if defined(PROJECT_CGAME)
-		entityState_t *es = &cg_entities[(int)(ent - ents)].currentState;
-	#endif
+		const entityState_t *es = GetEntitystate( ent );
 
-	#if defined(PROJECT_CGAME)
 		if ( ps ) {
-	#endif
 			lua_pushinteger( L, ps->legsAnim );
-	#if defined(PROJECT_CGAME)
 		}
 		else {
 			lua_pushinteger( L, es->legsAnim );
 		}
-	#endif
 
 		return 1;
 	}
@@ -477,11 +464,12 @@ namespace JPLua {
 	}
 
 	static int Player_GetPosition( lua_State *L, jpluaEntity_t *ent ) {
+		const playerState_t *ps = GetPlayerstate( ent );
 	#if defined(PROJECT_GAME)
-		const vector3 *pos = &ent->client->ps.origin;
+		const vector3 *pos = &ps->origin;
 	#elif defined(PROJECT_CGAME)
 		const vector3 *pos = ((int)(ent - ents) == cg.clientNum)
-			? &cg.predictedPlayerState.origin
+			? &ps->origin
 			: &ent->currentState.pos.trBase; // not cent->lerpOrigin?
 	#endif
 
@@ -505,16 +493,24 @@ namespace JPLua {
 	}
 
 	static int Player_GetScore( lua_State *L, jpluaEntity_t *ent ) {
-	#if defined(PROJECT_GAME)
-		lua_pushinteger( L, ent->client->ps.persistant[PERS_SCORE] );
-	#elif defined(PROJECT_CGAME)
-		if ( (int)(ent - ents) == cg.clientNum ) {
-			lua_pushinteger( L, cg.predictedPlayerState.persistant[PERS_SCORE] );
+		const playerState_t *ps = GetPlayerstate( ent );
+		if ( ps ) {
+			lua_pushinteger( L, ps->persistant[PERS_SCORE] );
 		}
 		else {
-			lua_pushinteger( L, cg.scores[cgs.clientinfo[(int)(ent - ents)].score].score );
+		#if defined(PROJECT_GAME)
+			// should never happen
+			lua_pushnil( L );
+		#elif defined(PROJECT_CGAME)
+			if ( cg.numScores ) {
+				const entityState_t *es = GetEntitystate( ent );
+				const clientInfo_t *ci = &cgs.clientinfo[es->number];
+				if ( ci->infoValid ) {
+					lua_pushinteger( L, cg.scores[ci->score].score );
+				}
+			}
+		#endif
 		}
-	#endif
 		return 1;
 	}
 
@@ -522,11 +518,17 @@ namespace JPLua {
 	#if defined(PROJECT_GAME)
 		lua_pushinteger( L, ent->client->sess.sessionTeam );
 	#elif defined(PROJECT_CGAME)
-		if ( (int)(ent - ents) == cg.clientNum ) {
-			lua_pushinteger( L, cg.predictedPlayerState.persistant[PERS_TEAM] );
+		const playerState_t *ps = GetPlayerstate( ent );
+		const entityState_t *es = GetEntitystate( ent );
+		const clientInfo_t *ci = &cgs.clientinfo[es->number];
+		if ( ps ) {
+			lua_pushinteger( L, ps->persistant[PERS_TEAM] );
+		}
+		else if ( ci->infoValid ) {
+			lua_pushinteger( L, ci->team );
 		}
 		else {
-			lua_pushinteger( L, cgs.clientinfo[(int)(ent - ents)].team );
+			lua_pushnil( L );
 		}
 	#endif
 		return 1;
@@ -534,20 +536,17 @@ namespace JPLua {
 
 	static int Player_GetTorsoAnim( lua_State *L, jpluaEntity_t *ent ) {
 		const playerState_t *ps = GetPlayerstate( ent );
-	#if defined(PROJECT_CGAME)
-		entityState_t *es = &cg_entities[(int)(ent - ents)].currentState;
-	#endif
+		const entityState_t *es = GetEntitystate( ent );
 
-	#if defined(PROJECT_CGAME)
 		if ( ps ) {
-	#endif
 			lua_pushinteger( L, ps->torsoAnim );
-	#if defined(PROJECT_CGAME)
 		}
-		else {
+		else if ( es ) {
 			lua_pushinteger( L, es->torsoAnim );
 		}
-	#endif
+		else {
+			lua_pushnil( L );
+		}
 		return 1;
 	}
 
