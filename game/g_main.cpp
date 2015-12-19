@@ -1093,6 +1093,41 @@ void AdjustTournamentScores( void ) {
 	}
 }
 
+static real32_t CalculateScore( const gclient_t *client ) {
+	const real32_t kills = (real32_t)client->ps.persistant[PERS_SCORE];
+	const real32_t deaths = (real32_t)client->ps.persistant[PERS_KILLED];
+	const real32_t kdr = flcmp( deaths, 0.0f ) ? kills / deaths : kills;
+
+	switch( japp_sortScoreStyle.integer ) {
+
+		case 1: {
+			// sort by kill count
+			return kills;
+		} break;
+
+		case 2: {
+			// sort by net kills
+			return kills - deaths;
+		} break;
+
+		case 3: {
+			// sort by kill death ratio
+			return kdr;
+		} break;
+
+		case 4: {
+			// sort by kills per minute
+			return kills / (real32_t)(level.time - client->pers.connectTime);
+		} break;
+
+		default: {
+			// sort by clientNum
+			return level.maxclients - (client - level.clients);
+		} break;
+
+	}
+}
+
 int SortRanks( const void *a, const void *b ) {
 	gclient_t	*ca, *cb;
 
@@ -1146,15 +1181,17 @@ int SortRanks( const void *a, const void *b ) {
 	}
 
 	// then sort by score
-	if ( ca->ps.persistant[PERS_SCORE]
-	> cb->ps.persistant[PERS_SCORE] ) {
+	const real32_t scoreA = CalculateScore( ca );
+	const real32_t scoreB = CalculateScore( cb );
+	if ( scoreA > scoreB ) {
 		return -1;
 	}
-	if ( ca->ps.persistant[PERS_SCORE]
-		< cb->ps.persistant[PERS_SCORE] ) {
+	else if ( scoreA < scoreB ) {
 		return 1;
 	}
-	return 0;
+	else {
+		return 0;
+	}
 }
 
 qboolean gQueueScoreMessage = qfalse;
