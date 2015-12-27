@@ -1245,7 +1245,7 @@ namespace JPLua {
 #if defined(PROJECT_GAME)
 	static int Entity_Free( lua_State *L ) {
 		jpluaEntity_t *ent = CheckEntity( L, 1 );
-		if ( !ent->client ) {
+		if (ent && !ent->client ) {
 			// can't free client entity
 			G_FreeEntity( ent );
 		}
@@ -1255,6 +1255,7 @@ namespace JPLua {
 
 	static int Entity_Use( lua_State *L ) {
 		gentity_t *ent = CheckEntity(L, 1);
+		if (!ent) return 0;
 		GlobalUse(ent, ent, ent);
 		return 0;
 	}
@@ -1318,6 +1319,7 @@ namespace JPLua {
 
 	static int Entity_SetVar(lua_State *L){
 		jpluaEntity_t *ent = CheckEntity(L, 1);
+		if (!ent) return 0;
 		const char *key = luaL_checkstring(L, 2);
 		const char *value = luaL_checkstring(L, 3);
 		BG_ParseField(fields, ARRAY_LEN(fields), key, value, (byte *)ent);
@@ -1331,6 +1333,7 @@ namespace JPLua {
 
 	static int Entity_GetVar(lua_State *L){
 		byte *ent = (byte *)CheckEntity(L, 1);
+		if (!ent) return 0;
 		const char *key = luaL_checkstring(L,2);
 
 		const BG_field_t *f = (BG_field_t *)bsearch( key, fields, ARRAY_LEN(fields), sizeof(BG_field_t), spawncmp );

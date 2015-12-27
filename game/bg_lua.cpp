@@ -1180,12 +1180,14 @@ namespace JPLua {
 	}
 	#endif
 
-	#ifdef PROJECT_CGAME
 	static int Export_RegisterSound( lua_State *L ) {
+#ifdef PROJECT_CGAME
 		lua_pushinteger( L, trap->S_RegisterSound( lua_tostring( L, 1 ) ) );
+#elif defined PROJECT_GAME
+		lua_pushinteger(L, G_SoundIndex( lua_tostring( L, 1 ) ) );
+#endif
 		return 1;
 	}
-	#endif
 
 	#ifdef PROJECT_CGAME
 	static int Export_RemapShader( lua_State *L ) {
@@ -1573,8 +1575,8 @@ namespace JPLua {
 	#ifdef PROJECT_CGAME
 		{ "RegisterFont", RegisterFont }, // RegisterFont( string name)
 		{ "RegisterShader", Export_RegisterShader }, // integer RegisterShader( string path )
+#endif
 		{ "RegisterSound", Export_RegisterSound }, // integer RegisterSound( string path )
-	#endif
 		{ "RegisterPlugin", RegisterPlugin }, // plugin RegisterPlugin( string name, string version )
 	#ifdef PROJECT_CGAME
 		{ "RemapShader", Export_RemapShader }, // RemapShader( string oldshader, string newshader, string timeoffset )

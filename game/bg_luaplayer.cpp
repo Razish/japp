@@ -920,6 +920,14 @@ namespace JPLua {
 		lua_pushboolean(L, ent->client->pers.adminData.isFrozen);
 		return 1;
 	}
+
+	static void Player_SetSpeed(lua_State *L, jpluaEntity_t *ent){
+		ent->client->ps.speed = lua_tonumber(L, 3);
+	}
+
+	static int Player_GetSpeed(lua_State *L, jpluaEntity_t *ent){
+		lua_pushnumber(L, ent->client->ps.speed);
+	}
 	#endif
 
 
@@ -1200,6 +1208,13 @@ namespace JPLua {
 			nullptr
 	#endif
 		},
+#if defined(PROJECT_GAME)
+		{
+			"speed",
+			Player_GetSpeed,
+			Player_SetSpeed
+		},
+#endif
 		{
 			"team",
 			Player_GetTeam,
