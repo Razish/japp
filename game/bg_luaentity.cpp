@@ -137,7 +137,7 @@ namespace JPLua {
 		gentity_t *ent;
 		if ( lua_gettop(L) == 0  ) { // kill me please
 			ent = G_Spawn();
-		}else if( lua_type(L, 1) == LUA_TTABLE){
+		}else if( !lua_type(L, 1) == LUA_TTABLE){
 			trap->Print( "Entity_Create failed, not a table\n" );
 			return 0;
 		}else{
