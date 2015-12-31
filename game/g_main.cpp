@@ -2571,30 +2571,21 @@ void G_RunThink( gentity_t *ent ) {
 			ent->genericValue15 += level.time - level.previousTime;
 	}
 
+	JPLua::Entity_CallFunction(ent, JPLua::JPLUA_ENTITY_THINK);
 	thinktime = ent->nextthink;
-	if ( thinktime <= 0 ) {
-		goto runicarus;
-	}
-	if ( thinktime > level.time ) {
-		goto runicarus;
+
+	if ( (thinktime <= 0 || thinktime > level.time) && ent->inuse && !ent->think) {
+		SaveNPCGlobals();
+		if (NPCInfo == NULL && ent->NPC != NULL)
+			SetNPCGlobals(ent);
+		trap->ICARUS_MaintainTaskManager(ent->s.number);
+		RestoreNPCGlobals();
+		return;
 	}
 
 	ent->nextthink = 0;
-	JPLua::Entity_CallFunction( ent, JPLua::JPLUA_ENTITY_THINK );
-	if ( !ent->think ) {
-		//trap->Error( ERR_DROP, "NULL ent->think");
-		goto runicarus;
-	}
 	ent->think( ent );
 
-runicarus:
-	if ( ent->inuse ) {
-		SaveNPCGlobals();
-		if ( NPCInfo == NULL && ent->NPC != NULL )
-			SetNPCGlobals( ent );
-		trap->ICARUS_MaintainTaskManager( ent->s.number );
-		RestoreNPCGlobals();
-	}
 }
 
 int g_LastFrameTime = 0;

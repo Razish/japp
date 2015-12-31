@@ -144,7 +144,7 @@ namespace JPLua {
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			item->lua_onFocus = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !item->uselua ) {
-				item->uselua = qtrue;
+				item->uselua = true;
 			}
 		}
 
@@ -159,7 +159,7 @@ namespace JPLua {
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			item->lua_leaveFocus = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !item->uselua ) {
-				item->uselua = qtrue;
+				item->uselua = true;
 			}
 		}
 
@@ -174,7 +174,7 @@ namespace JPLua {
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			item->lua_action = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !item->uselua ) {
-				item->uselua = qtrue;
+				item->uselua = true;
 			}
 		}
 
@@ -189,7 +189,7 @@ namespace JPLua {
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			item->lua_accept = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !item->uselua ) {
-				item->uselua = qtrue;
+				item->uselua = true;
 			}
 		}
 
@@ -204,7 +204,7 @@ namespace JPLua {
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			item->lua_mouseEnter = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !item->uselua ) {
-				item->uselua = qtrue;
+				item->uselua = true;
 			}
 		}
 
@@ -219,7 +219,7 @@ namespace JPLua {
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			item->lua_mouseEnterText = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !item->uselua ) {
-				item->uselua = qtrue;
+				item->uselua = true;
 			}
 		}
 
@@ -234,7 +234,7 @@ namespace JPLua {
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			item->lua_mouseLeave = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !item->uselua ) {
-				item->uselua = qtrue;
+				item->uselua = true;
 			}
 		}
 
@@ -249,7 +249,7 @@ namespace JPLua {
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			item->lua_mouseLeaveText = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !item->uselua ) {
-				item->uselua = qtrue;
+				item->uselua = true;
 			}
 		}
 
@@ -485,7 +485,7 @@ namespace JPLua {
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			listPtr->lua_DoubleClick = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !listPtr->uselua ) {
-				listPtr->uselua = qtrue;
+				listPtr->uselua = true;
 			}
 		}
 

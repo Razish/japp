@@ -105,7 +105,7 @@ namespace JPLua {
 		if ( lua_isfunction( L, 2 ) ) {
 			menu->lua_onOpen = luaL_ref(L, LUA_REGISTRYINDEX);
 			if ( !menu->uselua ) {
-				menu->uselua = qtrue;
+				menu->uselua = true;
 			}
 		}
 
@@ -120,7 +120,7 @@ namespace JPLua {
 		if ( lua_isfunction( L, 2 ) ) {
 			menu->lua_onClose = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !menu->uselua ) {
-				menu->uselua = qtrue;
+				menu->uselua = true;
 			}
 		}
 		return 0;
@@ -134,7 +134,7 @@ namespace JPLua {
 		if (lua_type(L, 2) == LUA_TFUNCTION){
 			menu->lua_onAccept = luaL_ref(L, LUA_REGISTRYINDEX);
 			if (!menu->uselua){
-				menu->uselua = qtrue;
+				menu->uselua = true;
 			}
 		}
 		return 0;
@@ -148,7 +148,7 @@ namespace JPLua {
 		if ( lua_isfunction( L, 2 ) ) {
 			menu->lua_onESC = luaL_ref( L, LUA_REGISTRYINDEX );
 			if ( !menu->uselua ) {
-				menu->uselua = qtrue;
+				menu->uselua = true;
 			}
 		}
 		return 0;

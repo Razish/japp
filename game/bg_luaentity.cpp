@@ -629,7 +629,7 @@ namespace JPLua {
 		jpluaEntity_t *ent = CheckEntity( L, 1 );
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			ent->lua_think = luaL_ref( L, LUA_REGISTRYINDEX );
-			ent->uselua = qtrue;
+			ent->uselua = true;
 		}
 
 		return 0;
@@ -641,7 +641,7 @@ namespace JPLua {
 		jpluaEntity_t *ent = CheckEntity( L, 1 );
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			ent->lua_reached = luaL_ref( L, LUA_REGISTRYINDEX );
-			ent->uselua = qtrue;
+			ent->uselua = true;
 		}
 
 		return 0;
@@ -653,7 +653,7 @@ namespace JPLua {
 		jpluaEntity_t *ent = CheckEntity( L, 1 );
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			ent->lua_blocked = luaL_ref( L, LUA_REGISTRYINDEX );
-			ent->uselua = qtrue;
+			ent->uselua = true;
 		}
 
 		return 0;
@@ -665,7 +665,7 @@ namespace JPLua {
 		jpluaEntity_t *ent = CheckEntity( L, 1 );
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			ent->lua_touch = luaL_ref( L, LUA_REGISTRYINDEX );
-			ent->uselua = qtrue;
+			ent->uselua = true;
 		}
 
 		return 0;
@@ -677,7 +677,7 @@ namespace JPLua {
 		jpluaEntity_t *ent = CheckEntity( L, 1 );
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			ent->lua_use = luaL_ref( L, LUA_REGISTRYINDEX );
-			ent->uselua = qtrue;
+			ent->uselua = true;
 		}
 
 		return 0;
@@ -689,7 +689,7 @@ namespace JPLua {
 		jpluaEntity_t *ent = CheckEntity( L, 1 );
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			ent->lua_pain = luaL_ref( L, LUA_REGISTRYINDEX );
-			ent->uselua = qtrue;
+			ent->uselua = true;
 		}
 
 		return 0;
@@ -701,7 +701,7 @@ namespace JPLua {
 		jpluaEntity_t *ent = CheckEntity( L, 1 );
 		if ( lua_type( L, 2 ) == LUA_TFUNCTION ) {
 			ent->lua_die = luaL_ref(L, LUA_REGISTRYINDEX);
-			ent->uselua = qtrue;
+			ent->uselua = true;
 		}
 
 		return 0;

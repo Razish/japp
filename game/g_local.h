@@ -367,7 +367,7 @@ struct gentity_s {
 	void				(*die)( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod );
 	int					lua_die;
 
-	qboolean			uselua;
+	bool				uselua;
 
 	int					pain_debounce_time;
 	int					fly_sound_debounce_time;	// wind tunnel
