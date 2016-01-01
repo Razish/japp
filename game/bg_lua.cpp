@@ -650,6 +650,26 @@ namespace JPLua {
 				lua_pushinteger( L, jpluaVersion.patch );
 				lua_settable( L, top );
 		}
+		else if (!strcmp(key, "plugins")) {
+			lua_newtable(L);
+			int top = lua_gettop(L), top2, count = 1;
+			plugin_t *plugin = NULL;
+			char buf[16] = { '\0' };
+			while (IteratePluginsTemp(&plugin, false)){
+				lua_pushinteger(L, count++);
+				lua_newtable(L);
+				top2 = lua_gettop(L);
+				lua_pushstring(L, "enabled"); lua_pushboolean(L, plugin->enabled); lua_settable(L, top2);
+				lua_pushstring(L, "name"); lua_pushstring(L, plugin->name); lua_settable(L, top2);
+				lua_pushstring(L, "longname"); lua_pushstring(L, plugin->longname); lua_settable(L, top2);
+				semver_render(&plugin->requiredJPLuaVersion, buf);
+				lua_pushstring(L, "requiredJPLuaversion"); lua_pushstring(L, buf); lua_settable(L, top2);
+				semver_render(&plugin->version, buf);
+				lua_pushstring(L, "requiredJPLuaversion"); lua_pushstring(L, buf); lua_settable(L, top2);
+				
+				lua_settable(L, top);
+			}
+		}
 		else {
 			lua_pushnil( L );
 		}

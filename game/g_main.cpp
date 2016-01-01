@@ -2570,8 +2570,6 @@ void G_RunThink( gentity_t *ent ) {
 		if ( ent->think == proxMineThink && ent->genericValue15 > level.time )
 			ent->genericValue15 += level.time - level.previousTime;
 	}
-
-	JPLua::Entity_CallFunction(ent, JPLua::JPLUA_ENTITY_THINK);
 	thinktime = ent->nextthink;
 
 	if ( (thinktime <= 0 || thinktime > level.time) && ent->inuse && !ent->think) {
@@ -2582,6 +2580,7 @@ void G_RunThink( gentity_t *ent ) {
 		RestoreNPCGlobals();
 		return;
 	}
+	JPLua::Entity_CallFunction(ent, JPLua::JPLUA_ENTITY_THINK);
 
 	ent->nextthink = 0;
 	ent->think( ent );
