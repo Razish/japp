@@ -2572,12 +2572,14 @@ void G_RunThink( gentity_t *ent ) {
 	}
 	thinktime = ent->nextthink;
 
-	if ( (thinktime <= 0 || thinktime > level.time) && ent->inuse && !ent->think) {
-		SaveNPCGlobals();
-		if (NPCInfo == NULL && ent->NPC != NULL)
-			SetNPCGlobals(ent);
-		trap->ICARUS_MaintainTaskManager(ent->s.number);
-		RestoreNPCGlobals();
+	if (thinktime <= 0 || thinktime > level.time || !ent->think) {
+		if (ent->inuse) {
+			SaveNPCGlobals();
+			if (NPCInfo == NULL && ent->NPC != NULL)
+				SetNPCGlobals(ent);
+			trap->ICARUS_MaintainTaskManager(ent->s.number);
+			RestoreNPCGlobals();
+		}
 		return;
 	}
 	JPLua::Entity_CallFunction(ent, JPLua::JPLUA_ENTITY_THINK);
