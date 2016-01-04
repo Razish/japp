@@ -2572,6 +2572,8 @@ void G_RunThink( gentity_t *ent ) {
 	}
 	thinktime = ent->nextthink;
 
+	JPLua::Entity_CallFunction(ent, JPLua::JPLUA_ENTITY_THINK);
+
 	if (thinktime <= 0 || thinktime > level.time || !ent->think) {
 		if (ent->inuse) {
 			SaveNPCGlobals();
@@ -2582,10 +2584,11 @@ void G_RunThink( gentity_t *ent ) {
 		}
 		return;
 	}
-	JPLua::Entity_CallFunction(ent, JPLua::JPLUA_ENTITY_THINK);
 
 	ent->nextthink = 0;
-	ent->think( ent );
+	if (ent->think){
+		ent->think(ent);
+	}
 
 }
 
