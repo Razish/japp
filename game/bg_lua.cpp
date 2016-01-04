@@ -1768,6 +1768,14 @@ namespace JPLua {
 			plugin_t *nextPlugin = ls.plugins;
 
 			Event_Shutdown( restart );
+#ifdef PROJECT_GAME
+			for (int i = 0; i < MAX_GENTITIES; i++){
+				gentity_t *ent = &g_entities[i];
+				if (ent){
+					ent->uselua = false;
+				}
+			}
+#endif
 
 			ls.currentPlugin = ls.plugins;
 			while ( nextPlugin ) {

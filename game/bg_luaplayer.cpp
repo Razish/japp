@@ -927,6 +927,7 @@ namespace JPLua {
 
 	static int Player_GetSpeed(lua_State *L, jpluaEntity_t *ent){
 		lua_pushnumber(L, ent->client->ps.speed);
+		return 1;
 	}
 	#endif
 

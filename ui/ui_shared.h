@@ -157,7 +157,7 @@ typedef struct listBoxDef_s {
 	qboolean notselectable;
 	//JLF MPMOVED
 	qboolean	scrollhidden;
-	qboolean	uselua;
+	bool		uselua;
 	int			lua_DoubleClick;
 } listBoxDef_t;
 
@@ -288,7 +288,7 @@ typedef struct itemDef_s {
 
 	//Raz: custom slider size
 	rectDef_t	slider;
-	qboolean	uselua;
+	bool		uselua;
 	int			id;
 	int			lua_onFocus;
 	int			lua_leaveFocus;
@@ -330,7 +330,7 @@ typedef struct menuDef_s {
 	float		appearanceIncrement;		//
 	int			id;
 
-	qboolean	uselua;
+	bool		uselua;
 	int			lua_onOpen;
 	int			lua_onClose;
 	int			lua_onAccept;
