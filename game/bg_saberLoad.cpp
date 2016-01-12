@@ -12,8 +12,6 @@
 #include "ui/ui_local.h"
 #endif
 
-extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
-
 int BG_SoundIndex( const char *sound ) {
 #if defined(PROJECT_GAME)
 	return G_SoundIndex( sound );

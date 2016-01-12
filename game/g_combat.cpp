@@ -1520,8 +1520,6 @@ void G_AddPowerDuelLoserScore( int team, int score ) {
 	}
 }
 
-extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
-
 void AI_DeleteSelfFromGroup( gentity_t *self );
 void AI_GroupMemberKilled( gentity_t *self );
 void Boba_FlyStop( gentity_t *self );

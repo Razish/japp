@@ -37,6 +37,7 @@ namespace JPLua {
 	void ReadFloats( float *out, int numComponents, lua_State *L, int idx );
 	void PushInfostring( lua_State *L, const char *info );
 	void PopInfostring( lua_State *L, char *info );
+	int traceback( lua_State *L );
 
 	struct importTable_t {
 		const char *name;
@@ -47,6 +48,28 @@ namespace JPLua {
 		int handle;
 		plugin_t *owner;
 	}command_t;
+
+	class StackCheck {
+	private:
+		lua_State *state;
+		int top;
+
+	public:
+		StackCheck( lua_State *L ) : state(L), top( lua_gettop(state) ) {}
+		StackCheck() = delete;
+		StackCheck( const StackCheck& ) = delete;
+		StackCheck& operator=( const StackCheck& ) = delete;
+		~StackCheck() {
+		#ifdef _DEBUG
+			int newTop = lua_gettop( state );
+			if ( newTop != top ) {
+				trap->Print( "%s: top of stack %i -> %i\n", Q_FUNCTION_VERBOSE, top, newTop );
+				traceback( state );
+			}
+			assert( top == newTop );
+		#endif
+		}
+	};
 
 
 } // namespace JPLua

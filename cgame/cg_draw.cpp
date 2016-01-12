@@ -3958,19 +3958,25 @@ static void CG_DrawReward( void ) {
 
 qboolean CG_DrawMapChange( void ) {
 	if ( cg.mMapChange ) {
-		const char *s = NULL;
-		int w;
+		const float fontScale = 1.0;
+		const qhandle_t fontHandle = FONT_SMALL;
 
 		trap->R_SetColor( NULL );
 		CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, trap->R_RegisterShaderNoMip( "menu/art/unknownmap_mp" ) );
 
-		s = CG_GetStringEdString( "MP_INGAME", "SERVER_CHANGING_MAPS" ); // s = "Server Changing Maps";
-		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH * cgs.widthRatioCoef;
-		CG_DrawBigString((SCREEN_WIDTH / 2) - w / 2, 100, s, 1.0F); //EpicCheck
+		const char *s = CG_GetStringEdString( "MP_INGAME", "SERVER_CHANGING_MAPS" ); // s = "Server Changing Maps";
+		float w = Text_Width( s, fontScale, fontHandle, false );
+		Text_Paint(
+			(SCREEN_WIDTH / 2.0f) - (w / 2.0f), 100, fontScale, &colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED,
+			fontHandle, false
+		);
 
 		s = CG_GetStringEdString( "MP_INGAME", "PLEASE_WAIT" ); // s = "Please wait...";
-		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH * cgs.widthRatioCoef;
-		CG_DrawBigString((SCREEN_WIDTH / 2) - w / 2, 200, s, 1.0F); // EpicCheck
+		w = Text_Width( s, fontScale, fontHandle, false );
+		Text_Paint(
+			(SCREEN_WIDTH / 2.0f) - (w / 2.0f), 200, fontScale, &colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED,
+			fontHandle, false
+		);
 		return qtrue;
 	}
 
@@ -4018,7 +4024,6 @@ static void CG_DrawDisconnect( void ) {
 	int			cmdNum;
 	usercmd_t	cmd;
 	const char	*s = NULL;
-	int			w;
 
 	if ( CG_DrawMapChange() )
 		return;
@@ -4033,8 +4038,13 @@ static void CG_DrawDisconnect( void ) {
 
 	// also add text in center of screen
 	s = CG_GetStringEdString( "MP_INGAME", "CONNECTION_INTERRUPTED" );
-	w = CG_DrawStrlen(s) * BIGCHAR_WIDTH * cgs.widthRatioCoef;
-	CG_DrawBigString( (SCREEN_WIDTH / 2) - w / 2, 100, s, 1.0F );
+	const float fontScale = 1.0f;
+	const qhandle_t fontHandle = FONT_SMALL;
+	const float w = Text_Width( s, fontScale, fontHandle, false );
+	Text_Paint(
+		(SCREEN_WIDTH / 2.0f) - (w / 2.0f), 100.0f,
+		fontScale, &colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+	);
 
 	// blink the icon
 	if ( (cg.time >> 9) & 1 ) {
@@ -4946,10 +4956,10 @@ void CG_SaberClashFlare( void ) {
 
 	CG_WorldCoordToScreenCoord( &cg_saberFlashPos, &x, &y );
 
-	color.r = 0.8f;
-	color.g = 0.8f;
-	color.b = 0.8f;
-	color.a = 1.0f;
+	color.r = 1.0f;
+	color.g = 1.0f;
+	color.b = 1.0f;
+	color.a = 0.8f;
 
 	trap->R_SetColor( &color );
 

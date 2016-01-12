@@ -7,9 +7,10 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#include "bg_weapons.h"
-#include "anims.h"
-#include "bg_vehicles.h"
+#include "game/bg_weapons.h"
+#include "game/anims.h"
+#include "game/bg_animTable.h"
+#include "game/bg_vehicles.h"
 
 //these two defs are shared now because we do clientside ent parsing
 #define	MAX_SPAWN_VARS			64

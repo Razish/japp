@@ -1656,7 +1656,6 @@ static int G_GetParryForBlock( int block ) {
 int PM_SaberBounceForAttack( int move );
 int PM_SaberDeflectionForQuad( int quad );
 
-extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
 static qboolean WP_GetSaberDeflectionAngle( gentity_t *attacker, gentity_t *defender, float saberHitFraction ) {
 	qboolean animBasedDeflection = !(japp_saberTweaks.integer & SABERTWEAK_POSDEFLECTION);
 	int attSaberLevel, defSaberLevel;

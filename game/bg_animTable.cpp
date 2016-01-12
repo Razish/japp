@@ -1,9 +1,8 @@
-// special file included only by cg_players.cpp & ui_players.cpp
-//
-// moved it from the original header file for PCH reasons...
-//
-stringID_table_t animTable[MAX_ANIMATIONS + 1] =
-{
+#include "qcommon/q_shared.h"
+#include "game/anims.h"
+#include "game/bg_animTable.h"
+
+const stringID_table_t animTable[MAX_ANIMATIONS + 1] = {
 	//HEAD ANIMS
 	//# #sep Head-only anims
 	ENUM2STRING( FACE_TALK0 ),			//# silent
@@ -1818,6 +1817,6 @@ stringID_table_t animTable[MAX_ANIMATIONS + 1] =
 	ENUM2STRING( BOTH_CIN_49 ),		//# Level specific cinematic
 	ENUM2STRING( BOTH_CIN_50 ),		//# Level specific cinematic
 
-	//must be terminated
+	// must be terminated
 	{ NULL, -1 }
 };

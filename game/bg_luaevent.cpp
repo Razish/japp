@@ -34,12 +34,15 @@ namespace JPLua {
 		ENUM2STRING( JPLUA_EVENT_CONNECTSCREEN ),
 		ENUM2STRING( JPLUA_EVENT_PAIN ),
 		ENUM2STRING( JPLUA_EVENT_PLAYERDEATH ),
+		ENUM2STRING( JPLUA_EVENT_PRIVATEDUEL ),
 		ENUM2STRING( JPLUA_EVENT_SABERTOUCH ),
 		ENUM2STRING( JPLUA_EVENT_KEYDOWN ),
 	};
 
 	// called by lua
 	int Event_AddListener( lua_State *L ) {
+		StackCheck st( L );
+
 		const char *listenerArg = lua_tostring( L, 1 );
 
 		if ( lua_type( L, 1 ) != LUA_TSTRING || lua_type( L, 2 ) != LUA_TFUNCTION ) {
@@ -692,6 +695,24 @@ namespace JPLua {
 #endif
 #endif // JPLUA
 	}
+
+#ifdef PROJECT_CGAME
+	void Event_PrivateDuel( int number, int eventParm ) {
+#ifdef JPLUA
+		plugin_t *plugin = NULL;
+		while ( IteratePlugins( &plugin ) ) {
+			if ( plugin->eventListeners[JPLUA_EVENT_PRIVATEDUEL] ) {
+				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_PRIVATEDUEL] );
+
+				lua_pushinteger( ls.L, number );
+				lua_pushinteger( ls.L, eventParm );
+
+				Call( ls.L, 2, 0 );
+			}
+		}
+#endif // JPLUA
+	}
+#endif
 
 #ifdef PROJECT_CGAME
 	void Event_SaberTouch( int victim, int attacker ) {

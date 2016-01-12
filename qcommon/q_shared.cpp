@@ -1025,35 +1025,35 @@ const char *Info_ValueForKey( const char *s, const char *key ) {
 }
 
 // Used to iterate through all the key/value pairs in an info string
-void Info_NextPair( const char **head, char *key, char *value ) {
-	char *o;
-	const char *s;
-
-	s = *head;
-
-	if ( *s == '\\' )
+bool Info_NextPair( const char **head, infoPair_t *ip ) {
+	const char *s = *head;
+	if ( *s == '\\' ) {
 		s++;
+	}
 
-	key[0] = value[0] = '\0';
+	ip->key[0] = ip->value[0] = '\0';
 
-	o = key;
+	char *o = ip->key;
 	while ( *s != '\\' ) {
 		if ( !*s ) {
-			*o = 0;
+			*o = '\0';
 			*head = s;
-			return;
+			return false;
 		}
 		*o++ = *s++;
 	}
-	*o = 0;
+	*o = '\0';
 	s++;
 
-	o = value;
-	while ( *s != '\\' && *s )
+	o = ip->value;
+	while ( *s != '\\' && *s ) {
 		*o++ = *s++;
-	*o = 0;
+	}
+	*o = '\0';
 
 	*head = s;
+
+	return true;
 }
 
 void Info_RemoveKey( char *s, const char *key ) {

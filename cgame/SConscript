@@ -65,6 +65,7 @@ files = [
 	'cgame/fx_heavyrepeater.cpp',
 	'cgame/fx_rocketlauncher.cpp',
 	'game/AnimalNPC.cpp',
+	'game/bg_animTable.cpp',
 	'game/bg_g2_utils.cpp',
 	'game/bg_lua.cpp',
 	'game/bg_luacvar.cpp',

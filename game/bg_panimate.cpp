@@ -4,7 +4,6 @@
 #include "bg_public.h"
 #include "bg_local.h"
 #include "anims.h"
-#include "cgame/animtable.h"
 #if defined( PROJECT_GAME )
 #include "g_local.h"
 #elif defined( PROJECT_CGAME )

@@ -29,10 +29,7 @@ enum {
 
 #include "ICARUS/interpreter.h"
 
-extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
-
-stringID_table_t setTable[] =
-{
+stringID_table_t setTable[] = {
 	ENUM2STRING( SET_SPAWNSCRIPT ), //0
 	ENUM2STRING( SET_USESCRIPT ),
 	ENUM2STRING( SET_AWAKESCRIPT ),
@@ -302,7 +299,7 @@ void G_DebugPrint( int level, const char *format, ... ) {
 	}
 }
 
-static char *Q3_GetAnimLower( gentity_t *ent ) {
+static const char *Q3_GetAnimLower( gentity_t *ent ) {
 	int anim = 0;
 
 	if ( ent->client == NULL ) {
@@ -312,10 +309,10 @@ static char *Q3_GetAnimLower( gentity_t *ent ) {
 
 	anim = ent->client->ps.legsAnim;
 
-	return (char *)animTable[anim].name;
+	return animTable[anim].name;
 }
 
-static char *Q3_GetAnimUpper( gentity_t *ent ) {
+static const char *Q3_GetAnimUpper( gentity_t *ent ) {
 	int anim = 0;
 
 	if ( ent->client == NULL ) {
@@ -325,14 +322,12 @@ static char *Q3_GetAnimUpper( gentity_t *ent ) {
 
 	anim = ent->client->ps.torsoAnim;
 
-	return (char *)animTable[anim].name;
+	return animTable[anim].name;
 }
 
-static char *Q3_GetAnimBoth( gentity_t *ent ) {
-	char	*lowerName, *upperName;
-
-	lowerName = Q3_GetAnimLower( ent );
-	upperName = Q3_GetAnimUpper( ent );
+static const char *Q3_GetAnimBoth( gentity_t *ent ) {
+	const char *lowerName = Q3_GetAnimLower( ent );
+	const char *upperName = Q3_GetAnimUpper( ent );
 
 	if ( !lowerName || !lowerName[0] ) {
 		G_DebugPrint( WL_WARNING, "Q3_GetAnimBoth: NULL legs animation string found!\n" );

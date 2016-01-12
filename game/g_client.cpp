@@ -1719,83 +1719,95 @@ void SV_ToggleUserinfoValidation_f( void ) {
 }
 
 static const char *G_ValidateUserinfo( const char *userinfo ) {
-	unsigned int		i = 0, count = 0;
-	size_t				length = strlen( userinfo );
-	userinfoValidate_t	*info = NULL;
-	char				key[BIG_INFO_KEY], value[BIG_INFO_VALUE];
-	const char			*s;
 	unsigned int		fieldCount[ARRAY_LEN( userinfoFields )];
 
 	memset( fieldCount, 0, sizeof(fieldCount) );
 
 	// size checks
+	const size_t length = strlen( userinfo );
 	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_SIZE)) ) {
-		if ( length < 1 )
+		if ( length < 1 ) {
 			return "Userinfo too short";
-		else if ( length >= MAX_INFO_STRING )
+		}
+		else if ( length >= MAX_INFO_STRING ) {
 			return "Userinfo too long";
+		}
 	}
 
 	// slash checks
 	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_SLASH)) ) {
 		// there must be a leading slash
-		if ( userinfo[0] != '\\' )
+		if ( userinfo[0] != '\\' ) {
 			return "Missing leading slash";
+		}
 
 		// no trailing slashes allowed, engine will append ip\\ip:port
-		if ( userinfo[length - 1] == '\\' )
+		if ( userinfo[length - 1] == '\\' ) {
 			return "Trailing slash";
+		}
 
 		// format for userinfo field is: \\key\\value
 		// so there must be an even amount of slashes
-		for ( i = 0, count = 0; i < length; i++ ) {
-			if ( userinfo[i] == '\\' )
+		uint32_t count = 0;
+		for ( int i = 0; i < length; i++ ) {
+			if ( userinfo[i] == '\\' ) {
 				count++;
+			}
 		}
-		if ( (count & 1) ) // odd
+		if ( (count & 1) ) {
+			// odd
 			return "Bad number of slashes";
+		}
 	}
 
 	// extended characters are impossible to type, may want to disable
 	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_EXTASCII)) ) {
-		for ( i = 0, count = 0; i < length; i++ ) {
-			if ( userinfo[i] < 0 )
+		uint32_t count = 0u;
+		for ( int i = 0; i < length; i++ ) {
+			if ( userinfo[i] < 0 ) {
 				count++;
+			}
 		}
-		if ( count )
+		if ( count ) {
 			return "Extended ASCII characters found";
+		}
 	}
 
 	// disallow \n \r ; and \"
 	if ( japp_userinfoValidate.bits & (1 << (numUserinfoFields + USERINFO_VALIDATION_CONTROLCHARS)) ) {
-		if ( Q_strchrs( userinfo, "\n\r;\"" ) )
+		if ( Q_strchrs( userinfo, "\n\r\t;\"" ) ) {
 			return "Invalid characters found";
+		}
 	}
 
-	s = userinfo;
+	infoPair_t ip;
+	const char *s = userinfo;
 	while ( s ) {
-		Info_NextPair( &s, key, value );
-
-		if ( !key[0] )
+		if ( !Info_NextPair( &s, &ip ) ) {
 			break;
+		}
 
-		for ( i = 0; i < numUserinfoFields; i++ ) {
-			if ( !Q_stricmp( key, userinfoFields[i].fieldClean ) )
+		for ( int i = 0; i < numUserinfoFields; i++ ) {
+			if ( !Q_stricmp( ip.key, userinfoFields[i].fieldClean ) ) {
 				fieldCount[i]++;
+			}
 		}
 	}
 
 	// count the number of fields
-	for ( i = 0, info = userinfoFields; i<numUserinfoFields; i++, info++ ) {
+	userinfoValidate_t	*info = userinfoFields;
+	for ( int i = 0; i < numUserinfoFields; i++, info++ ) {
 		if ( japp_userinfoValidate.bits & (1 << i) ) {
-			if ( info->minCount && !fieldCount[i] )
+			if ( info->minCount && !fieldCount[i] ) {
 				return va( "%s field not found", info->fieldClean );
-			else if ( fieldCount[i] > info->maxCount )
+			}
+			else if ( fieldCount[i] > info->maxCount ) {
 				return va( "Too many %s fields (%i/%i)", info->fieldClean, fieldCount[i], info->maxCount );
+			}
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // Called from ClientConnect when the player first connects and directly by the server system when the player updates a

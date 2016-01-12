@@ -16,6 +16,8 @@ namespace JPLua {
 	//Func: CreateCvar(name [, value [, flags] ])
 	//Retn: An Cvar object, creating one if necessary
 	int CreateCvar( lua_State *L ) {
+		StackCheck st( L );
+
 		const char *name = lua_tostring( L, 1 );
 
 		trap->Cvar_Register( NULL, name, lua_tostring( L, 2 ), lua_tointeger( L, 3 ) );

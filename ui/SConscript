@@ -16,6 +16,7 @@ ui_env = env.Clone()
 
 # sources
 files = [
+	'game/bg_animTable.cpp',
 	'game/bg_misc.cpp',
 	'game/bg_saberLoad.cpp',
 	'game/bg_saga.cpp',

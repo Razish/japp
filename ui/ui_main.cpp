@@ -2,8 +2,8 @@
 #include "ui_local.h"
 #include "qcommon/qfiles.h"
 #include "ui_force.h"
-#include "cgame/animtable.h" //we want this to be compiled into the module because we access it in the shared module.
 #include "game/bg_saga.h"
+#include "game/bg_animTable.h"
 #include "ui_shared.h"
 #include "JAPP/jp_crash.h"
 #include "JAPP/jp_csflags.h"

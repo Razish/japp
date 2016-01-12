@@ -21,6 +21,7 @@ namespace JPLua {
 		JPLUA_EVENT_CONNECTSCREEN,
 		JPLUA_EVENT_PAIN,
 		JPLUA_EVENT_PLAYERDEATH,
+		JPLUA_EVENT_PRIVATEDUEL,
 		JPLUA_EVENT_SABERTOUCH,
 		JPLUA_EVENT_KEYDOWN,
 		JPLUA_EVENT_MAX
@@ -98,6 +99,10 @@ namespace JPLua {
 	void Event_PlayerDeath( int clientNum, int mod, int inflictor );
 #elif defined(PROJECT_CGAME)
 	bool Event_PlayerDeath( int clientNum, int mod, int inflictor );
+#endif
+
+#ifdef PROJECT_CGAME
+	void Event_PrivateDuel( int number, int eventParm );
 #endif
 
 #ifdef PROJECT_CGAME

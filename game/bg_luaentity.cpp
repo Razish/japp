@@ -385,7 +385,7 @@ namespace JPLua {
 		lua_pushstring( L, ent->classname );
 		return 1;
 	}
-	
+
 	static void Entity_SetClassName( lua_State *L, jpluaEntity_t *ent ) {
 		const char *name = lua_tostring(L,3);
 		ent->classname = BG_StringAlloc(name);
@@ -911,7 +911,7 @@ namespace JPLua {
 		lua_pushinteger(L, ent->bounceCount);
 		return 1;
 	}
-	
+
 	static void Entity_SetBounceCount(lua_State *L, jpluaEntity_t *ent){
 		ent->bounceCount = lua_tointeger(L, 3);
 	}
@@ -923,7 +923,7 @@ namespace JPLua {
 		lua_pushinteger(L, ent->splashMethodOfDeath);
 		return 2;
 	}
-	
+
 	static void Entity_SetMOD(lua_State *L, jpluaEntity_t *ent){
 		if ( lua_type( L, 3) != LUA_TTABLE ) {
 			trap->Print( "JPLua::Entity_GetMOD failed, not a table\n" );
@@ -948,7 +948,7 @@ namespace JPLua {
 			nullptr
 #endif
 		},
-		
+
 #if defined(PROJECT_GAME)
 		{
 			"bounceCount",
@@ -1094,7 +1094,7 @@ namespace JPLua {
 			"parent",
 			Entity_GetParent,
 			Entity_SetParent
-			},
+		},
 #endif
 
 #if defined(PROJECT_GAME)

@@ -1315,6 +1315,8 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 	case EV_PRIVATE_DUEL:
 		DEBUGNAME( "EV_PRIVATE_DUEL" );
 
+		JPLua::Event_PrivateDuel( es->number, es->eventParm );
+
 		if ( cg.snap->ps.clientNum != es->number ) {
 			break;
 		}

@@ -100,7 +100,6 @@
     <File Name="cgame/fx_force.cpp"/>
     <File Name="cgame/cg_scoreboard.cpp"/>
     <File Name="cgame/cg_saga.cpp"/>
-    <File Name="cgame/animtable.h"/>
     <File Name="cgame/cg_local.h"/>
     <File Name="cgame/fx_bryarpistol.cpp"/>
     <File Name="cgame/cg_event.cpp"/>
@@ -184,7 +183,6 @@
     <File Name="game/say.h"/>
     <File Name="game/g_bot.cpp"/>
     <File Name="game/bg_luaserialiser.h"/>
-    <File Name="game/animtable.h"/>
     <File Name="game/bg_lualogger.h"/>
     <File Name="game/NPC_AI_Jedi.cpp"/>
     <File Name="game/NPC_AI_Sniper.cpp"/>
@@ -305,6 +303,8 @@
     <File Name="game/bg_luaentity.cpp"/>
     <File Name="game/bg_luaentity.h"/>
     <File Name="game/bg_luainternal.h"/>
+    <File Name="game/bg_animTable.cpp"/>
+    <File Name="game/bg_animTable.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="cJSON">
     <File Name="cJSON/cJSON.c"/>

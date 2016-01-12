@@ -20,8 +20,6 @@ void CG_AddBracketedEnt( centity_t *cent );	//cg_ents.c
 qboolean CG_InFighter( void );
 qboolean WP_SaberBladeUseSecondBladeStyle( saberInfo_t *saber, int bladeNum );
 
-extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
-
 const char *cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
 	"*death1",
 	"*death2",

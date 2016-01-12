@@ -13,7 +13,6 @@
 #include "Ghoul2/G2.h"
 #include "qcommon/qfiles.h"
 
-extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
 void UI_UpdateCharacterSkin( void );
 
 #define SCROLL_TIME_START					500

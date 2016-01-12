@@ -1,9 +1,9 @@
 //bg_vehicleLoad.c
 
 #include "qcommon/q_shared.h"
-#include "bg_public.h"
-#include "bg_vehicles.h"
-#include "bg_weapons.h"
+#include "game/bg_public.h"
+#include "game/bg_vehicles.h"
+#include "game/bg_weapons.h"
 
 #if defined(PROJECT_GAME)
 #include "g_local.h"
@@ -12,8 +12,6 @@
 #elif defined(PROJECT_UI)
 #include "ui/ui_local.h"
 #endif
-
-extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
 
 // These buffers are filled in with the same contents and then just read from in
 // a few places. We only need one copy on Xbox.

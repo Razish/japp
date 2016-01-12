@@ -1413,6 +1413,15 @@ namespace JPLua {
 		return 1;
 	}
 
+	#if defined(PROJECT_GAME)
+	static int Player_ConsolePrint( lua_State *L ) {
+		luaPlayer_t *player = CheckPlayer( L, 1 );
+		const char *msg = luaL_checkstring( L, 2 );
+		trap->SendServerCommand( player->clientNum, va( "print \"%s\"", msg ) );
+		return 0;
+	}
+	#endif
+
 	#if defined(PROJECT_CGAME)
 	static int Player_GetClientInfo( lua_State *L ) {
 		luaPlayer_t *player = CheckPlayer( L, 1 );
@@ -1689,6 +1698,9 @@ namespace JPLua {
 		{ "__newindex", Player_NewIndex},
 		{ "__eq", Player_Equals },
 		{ "__tostring", Player_ToString },
+	#if defined(PROJECT_GAME)
+		{ "ConsolePrint", Player_ConsolePrint },
+	#endif
 	#if defined(PROJECT_CGAME)
 		{ "GetClientInfo", Player_GetClientInfo },
 	#elif defined(PROJECT_GAME)

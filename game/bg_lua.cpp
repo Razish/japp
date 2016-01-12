@@ -161,6 +161,47 @@ namespace JPLua {
 	#endif
 	}
 
+	void Util_ArgAsString( lua_State *L, char *out, int bufsize ) {
+		int args = lua_gettop( L );
+		const char *res;
+		int i;
+
+		// Lets do this a lil different, concat all args and use that as the message ^^
+		Push_ToString( L ); // Ref to tostring (instead of a global lookup, in case someone changes it)
+
+		for ( i = 1; i <= args; i++ ) {
+			lua_pushvalue( L, -1 );
+			lua_pushvalue( L, i );
+			lua_call( L, 1, 1 ); // Assume this will never error out
+			res = lua_tostring( L, -1 );
+			if ( res ) {
+				Q_strcat( out, bufsize, res );
+			}
+			lua_pop( L, 1 );
+		}
+		lua_pop( L, 1 );
+
+		return;
+	}
+
+	static int Export_Print( lua_State *L ) {
+		char buf[1024] = { 0 };
+		//TODO: print buffering?
+
+		Util_ArgAsString( L, buf, sizeof(buf) );
+	#ifdef PROJECT_GAME
+		if ( lastluaid == -1 ) {
+	#endif
+			trap->Print( "%s\n", buf );
+	#ifdef PROJECT_GAME
+		}
+		else {
+			trap->SendServerCommand( lastluaid, va( "print \"%s\n\"", buf ) );
+		}
+	#endif
+		return 0;
+	}
+
 	// lua calls this if it panics, it'll then terminate the server with exit( EXIT_FAILURE )
 	// this error should never happen in a release build
 	static int Error( lua_State *L ) {
@@ -173,6 +214,8 @@ namespace JPLua {
 		if ( lua_pcall( L, argCount, resCount, 0 ) ) {
 			trap->Print( S_COLOR_GREEN "JPLua " S_COLOR_RED "Error: %s\n", lua_tostring( L, -1 ) );
 			lua_pop( L, 1 );
+
+			//TODO: disable current plugin..?
 			return qfalse;
 		}
 		return qtrue;
@@ -284,47 +327,6 @@ namespace JPLua {
 		return 1;
 	}
 
-	void Util_ArgAsString( lua_State *L, char *out, int bufsize ) {
-		int args = lua_gettop( L );
-		const char *res;
-		int i;
-
-		// Lets do this a lil different, concat all args and use that as the message ^^
-		Push_ToString( L ); // Ref to tostring (instead of a global lookup, in case someone changes it)
-
-		for ( i = 1; i <= args; i++ ) {
-			lua_pushvalue( L, -1 );
-			lua_pushvalue( L, i );
-			lua_call( L, 1, 1 ); // Assume this will never error out
-			res = lua_tostring( L, -1 );
-			if ( res ) {
-				Q_strcat( out, bufsize, res );
-			}
-			lua_pop( L, 1 );
-		}
-		lua_pop( L, 1 );
-
-		return;
-	}
-
-	static int Export_Print( lua_State *L ) {
-		char buf[1024] = { 0 };
-		//TODO: print buffering?
-
-		Util_ArgAsString( L, buf, sizeof(buf) );
-	#ifdef PROJECT_GAME
-		if ( lastluaid == -1 ) {
-	#endif
-			trap->Print( "%s\n", buf );
-	#ifdef PROJECT_GAME
-		}
-		else {
-			trap->SendServerCommand( lastluaid, va( "print \"%s\n\"", buf ) );
-		}
-	#endif
-		return 0;
-	}
-
 	static const char *colourComponents[] = { "r", "g", "b", "a" };
 	void ReadColour( float *out, int numComponents, lua_State *L, int idx ) {
 		for ( int i = 0; i < numComponents && i < ARRAY_LEN(colourComponents); i++ ) {
@@ -350,7 +352,7 @@ namespace JPLua {
 
 	void PushInfostring( lua_State *L, const char *info ) {
 		const char *s;
-		char key[BIG_INFO_KEY], value[BIG_INFO_VALUE];
+		infoPair_t ip;
 		int top = 0;
 
 		lua_newtable( L );
@@ -359,12 +361,11 @@ namespace JPLua {
 		//RAZTODO: cache userinfo somehow :/
 		s = info;
 		while ( s ) {
-			Info_NextPair( &s, key, value );
-
-			if ( !key[0] )
+			if ( !Info_NextPair( &s, &ip ) ) {
 				break;
+			}
 
-			lua_pushstring( L, key ); lua_pushstring( L, value ); lua_settable( L, top );
+			lua_pushstring( L, ip.key ); lua_pushstring( L, ip.value ); lua_settable( L, top );
 		}
 	}
 
@@ -375,6 +376,12 @@ namespace JPLua {
 			lua_pop( L, 1 );
 		}
 		lua_pop( L, 1 );
+	}
+
+	int traceback( lua_State *L ) {
+		luaL_traceback( L, L, nullptr, 1 );
+		Export_Print( L );
+		return 1;
 	}
 
 	static int Export_Require( lua_State *L ) {
@@ -788,6 +795,8 @@ namespace JPLua {
 
 	#ifdef PROJECT_GAME
 	static int Export_AddClientCommand( lua_State *L ) {
+		StackCheck st( L );
+
 		const char *name = luaL_checkstring( L, 1 );
 		command_t &cmd = clientCommands[name];
 
@@ -822,6 +831,8 @@ namespace JPLua {
 
 	#ifdef PROJECT_CGAME
 	static int Export_AddConsoleCommand( lua_State *L ) {
+		StackCheck st( L );
+
 		const char *name = luaL_checkstring( L, 1 );
 		command_t &cmd = consoleCommands[name];
 		if ( cmd.handle ) {
@@ -857,6 +868,8 @@ namespace JPLua {
 	#endif
 
 	static int Export_AddServerCommand( lua_State *L ) {
+		StackCheck st( L );
+
 		const char *name = luaL_checkstring( L, 1 );
 		command_t &cmd = serverCommands[name];
 		if ( cmd.handle ) {
@@ -1325,6 +1338,8 @@ namespace JPLua {
 
 	#ifdef PROJECT_GAME
 	static int ConnectToDB( lua_State *L ) {
+		StackCheck st( L );
+
 	#if defined(NO_SQL)
 		lua_pushnil( L );
 		return 1;
@@ -1522,7 +1537,7 @@ namespace JPLua {
 		{ "AddListener", Event_AddListener }, // AddListener( string name, function listener )
 		{ "AddServerCommand", Export_AddServerCommand }, // AddServerCommand( string cmd )
 	#ifdef PROJECT_GAME
-		{ "ConnectToDB", ConnectToDB}, // ConnectToDB ( int type(1 - MySQL , 2 - SQLite), ...) // SQLite (type, string path) || MySQL ( type, string host, string user, string db, string password, int port )
+		{ "ConnectToDB", ConnectToDB }, // ConnectToDB ( int type(1 - MySQL , 2 - SQLite), ...) // SQLite (type, string path) || MySQL ( type, string host, string user, string db, string password, int port )
 	#endif
 		{ "CreateCvar", CreateCvar }, // Cvar CreateCvar( string name [, string value [, integer flags] ] )
 	#ifdef PROJECT_GAME
@@ -1658,7 +1673,7 @@ namespace JPLua {
 		}
 
 		// set the ls.version
-		semver_parse( "13.2.6", &jpluaVersion );
+		semver_parse( "13.3.7", &jpluaVersion );
 
 		// set the callback in case of an error
 		lua_atpanic( ls.L, Error );

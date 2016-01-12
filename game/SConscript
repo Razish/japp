@@ -20,6 +20,7 @@ files = [
 	'game/ai_util.cpp',
 	'game/ai_wpnav.cpp',
 	'game/AnimalNPC.cpp',
+	'game/bg_animTable.cpp',
 	'game/bg_g2_utils.cpp',
 	'game/bg_lua.cpp',
 	'game/bg_luacvar.cpp',

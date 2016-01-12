@@ -202,11 +202,11 @@ int Q_vsnprintf( char *str, size_t size, const char *format, va_list args );
 #define	MAX_SAY_TEXT		150
 
 // paramters for command buffer stuffing
-typedef enum cbufExec_t {
+enum cbufExec_t {
 	EXEC_NOW,			// don't return until completed, a VM should NEVER use this, because some commands might cause the VM to be unloaded...
 	EXEC_INSERT,		// insert at current position, but don't run yet
 	EXEC_APPEND			// add to end of the command buffer (normal case)
-} cbufExec_t;
+};
 
 // these aren't needed by any of the VMs.  put in another header?
 #define	MAX_MAP_AREA_BYTES		32		// bit vector of area visibility
@@ -966,12 +966,18 @@ typedef struct qint64_s {
 	byte b0, b1, b2, b3, b4, b5, b6, b7;
 } qint64_t;
 
+struct infoPair_t {
+	char key[BIG_INFO_KEY];
+	char value[BIG_INFO_VALUE];
+};
+//TODO: infoPairIterator_t? to iterate over an infostring parsing out (or offering string_view?) to key,value pairs
+
 const char *Info_ValueForKey( const char *s, const char *key );
 void Info_RemoveKey( char *s, const char *key );
 void Info_RemoveKey_Big( char *s, const char *key );
 void Info_SetValueForKey( char *s, const char *key, const char *value );
 void Info_SetValueForKey_Big( char *s, const char *key, const char *value );
-void Info_NextPair( const char **s, char *key, char *value );
+bool Info_NextPair( const char **s, infoPair_t *ip );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
 #if defined( PROJECT_GAME ) || defined( PROJECT_CGAME ) || defined( PROJECT_UI )

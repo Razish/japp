@@ -5,7 +5,6 @@
 
 #ifdef JPLUA
 
-extern stringID_table_t animTable[MAX_ANIMATIONS + 1]; //FIXNE: move decl to header
 extern const char *styles[]; //FIXME: rename, move to header
 
 namespace JPLua {
