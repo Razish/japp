@@ -33,8 +33,8 @@ void Interrogator_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 	*/
 	{
 		self->client->ps.eFlags2 &= ~EF2_FLYING;//moveType = MT_WALK;
-		self->client->ps.velocity.x = Q_irand( -10, -20 );
-		self->client->ps.velocity.y = Q_irand( -10, -20 );
+		self->client->ps.velocity.x = Q_irand( -20, -10 );
+		self->client->ps.velocity.y = Q_irand( -20, -10 );
 		self->client->ps.velocity.z = -100;
 	}
 	//self->takedamage = qfalse;

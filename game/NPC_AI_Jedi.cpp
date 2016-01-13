@@ -3251,7 +3251,7 @@ static void Jedi_CombatTimersUpdate( int enemy_dist ) {
 			Jedi_Aggression( NPC, Q_irand( 0, 3 ) );
 		}
 		else if ( NPC->client->ps.fd.forceRageRecoveryTime > level.time ) {//recovering
-			Jedi_Aggression( NPC, Q_irand( 0, -2 ) );
+			Jedi_Aggression( NPC, Q_irand( -2, 0 ) );
 		}
 		if ( NPC->enemy && NPC->enemy->client ) {
 			switch ( NPC->enemy->client->ps.weapon ) {
