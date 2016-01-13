@@ -876,6 +876,19 @@ static void Field_CharEvent( field_t *edit, int key ) {
 			Field_Clear( edit );
 		} break;
 
+		// scroll to first message
+		case A_HOME: {
+			const int numActiveLines = currentChatbox->numActiveLines;
+			currentChatbox->scrollAmount = numActiveLines >= cg_chatboxLineCount.integer
+				? (std::min( numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer) * -1
+				: 0;
+		} break;
+
+		// scroll to last message
+		case A_END: {
+			currentChatbox->scrollAmount = 0;
+		} break;
+
 		// end
 		case 'e': {
 			edit->cursor = fieldLen;
