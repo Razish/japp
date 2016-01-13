@@ -1,5 +1,4 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+#include <set>
 
 #include "g_local.h"
 #include "g_ICARUScb.h"
@@ -1563,9 +1562,8 @@ void ExitLevel( void ) {
 	}
 
 
-	if ( level.gametype == GT_SIEGE &&
-		g_siegeTeamSwitch.integer &&
-		g_siegePersistant.beatingTime ) { //restart same map...
+	if ( level.gametype == GT_SIEGE && g_siegeTeamSwitch.integer && g_siegePersistant.beatingTime ) {
+		// restart same map...
 		trap->SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
 	}
 	else {
@@ -1638,6 +1636,41 @@ void G_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	trap->FS_Write( string, strlen( string ), fileHandle );
 }
 
+static bool ReadNextmap( char *value, size_t valueLen, std::set<std::string> &cvarsRead ) {
+	std::string str( value );
+
+	if ( cvarsRead.find( str ) != cvarsRead.end() ) {
+		Q_strncpyz( value, "unknown (circular loop)", valueLen );
+		return true;
+	}
+	cvarsRead.insert( str );
+
+	std::vector<std::string> tokens;
+	const char *delim = " ";
+	char tmp[MAX_CVAR_VALUE_STRING];
+	Q_strncpyz( tmp, value, sizeof(tmp) );
+	for ( char *p = strtok( tmp, delim ); p; p = strtok( NULL, delim ) ) {
+		tokens.push_back( p );
+	}
+
+	if ( tokens.size() == 1 ) {
+		// it's probably map_restart or such, just print it because it's probably valuable
+		return true;
+	}
+	else if ( tokens.size() == 2 ) {
+		if ( !Q_stricmp( tokens[0].c_str(), "vstr" ) ) {
+			// recursively read the nextmap from this string
+			trap->Cvar_VariableStringBuffer( tokens[1].c_str(), value, valueLen );
+			return false;
+		}
+		return true;
+	}
+	else {
+		// some more complex setting - the full commandline in a mapcycle, could be sensitive
+		return true;
+	}
+}
+
 // Append information about this game to the log file
 void LogExit( const char *string ) {
 	int				i, numSorted;
@@ -1692,6 +1725,18 @@ void LogExit( const char *string ) {
 	trap->SendConsoleCommand( EXEC_APPEND, (won) ? "spWin\n" : "spLose\n" );
 	}
 	*/
+
+	if ( japp_showNextMap.integer ) {
+		std::set<std::string> cvarsRead;
+		char buffer[MAX_CVAR_VALUE_STRING];
+		Q_strncpyz( buffer, nextmap.string, sizeof(buffer) );
+		while ( !ReadNextmap( buffer, sizeof(buffer), cvarsRead ) ) {
+			// ...
+		}
+		trap->SendServerCommand( -1,
+			va( "print \"" S_COLOR_CYAN "next map is " S_COLOR_YELLOW "%s\n\"", buffer )
+		);
+	}
 }
 
 qboolean gDidDuelStuff = qfalse; //gets reset on game reinit
