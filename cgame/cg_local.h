@@ -669,6 +669,8 @@ typedef struct cg_s {
 		vector3			fixedVector;
 
 		qboolean		trueviewWarning;
+
+		int				grappleLanded; // cg.snap->serverTime that your hook stopped moving
 	} japp;
 
 	struct {

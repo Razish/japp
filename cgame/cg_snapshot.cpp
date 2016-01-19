@@ -21,6 +21,24 @@ static void CG_ResetEntity( centity_t *cent ) {
 		CG_ResetPlayerEntity( cent );
 }
 
+static void TrackGrappleHook( const centity_t *cent ) {
+	if ( cent->currentValid && cent->currentState.eType == ET_MISSILE && !cent->currentState.generic1
+		&& cent->currentState.otherEntityNum == cg.clientNum )
+	{
+		static int32_t position[3]{};
+		vector3 tmp;
+		BG_EvaluateTrajectory( &cent->currentState.pos, cg.time, &tmp );
+		VectorSnap( &tmp );
+		if ( flcmp( tmp.x, position[0] ) && flcmp( tmp.y, position[1] ) && flcmp( tmp.z, position[2] ) ) {
+			// hasn't moved between frames, it must have landed..?
+			cg.japp.grappleLanded = cg.snap->serverTime;
+		}
+		position[0] = tmp.x;
+		position[1] = tmp.y;
+		position[2] = tmp.z;
+	}
+}
+
 // cent->nextState is moved to cent->currentState and events are fired
 static void CG_TransitionEntity( centity_t *cent ) {
 	cent->currentState = cent->nextState;
@@ -35,6 +53,8 @@ static void CG_TransitionEntity( centity_t *cent ) {
 
 	// check for events
 	CG_CheckEvents( cent );
+
+	TrackGrappleHook( cent );
 }
 
 // This will only happen on the very first snapshot, or on tourney restarts.
