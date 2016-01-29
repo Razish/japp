@@ -17,8 +17,8 @@ addons:
     - libreadline-dev
 
 before install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update      ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install sdl2; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update            ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install scons sdl2; fi
 
 script:
   - scons -Q -j1 debug=0 force32=0 no_sql=1
