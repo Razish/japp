@@ -7,10 +7,9 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get -qq install g++-4.8
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 
 install:
   - sudo apt-get install libreadline-dev
 
 script:
-  - scons -Q -j1 debug=0 force32=0 no_sql=1
+  - scons -Q -j1 debug=0 force32=0 no_sql=1 CC=gcc-4.8 CXX=g++-4.8
