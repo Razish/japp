@@ -1,6 +1,6 @@
 language: cpp
 compiler: g++
-env: MORE_WARNINGS=1
+env: MORE_WARNINGS=1 CC= CXX=
 
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
