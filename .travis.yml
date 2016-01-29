@@ -1,4 +1,3 @@
-language: cpp
 env: MORE_WARNINGS=1
 
 before_install:
