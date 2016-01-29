@@ -1,13 +1,24 @@
 env: MORE_WARNINGS=1
 
-before_install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get -qq update
-  - sudo apt-get -qq install g++-4.8
-  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+matrix:
+  include:
+    - os: linux
+      sudo: false
+    - os: osx
+      osx_image: xcode7.3
 
-install:
-  - sudo apt-get install libreadline-dev
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-4.8
+    - g++-4.8
+    - libreadline-dev
+
+before install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update      ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install sdl2; fi
 
 script:
   - scons -Q -j1 debug=0 force32=0 no_sql=1
