@@ -12,4 +12,6 @@ install:
   - sudo apt-get install libreadline-dev
 
 script:
+  - unset CC
+  - unset CXX
   - scons -Q -j1 debug=0 force32=0 no_sql=1 CC=gcc-4.8 CXX=g++-4.8
