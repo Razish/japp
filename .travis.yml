@@ -18,8 +18,6 @@ addons:
       - libreadline-dev
 
 script:
-  - echo $TRAVIS_OS_NAME
-  - find / -type f -iname "gcc*" -print
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update            ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install scons sdl2; fi
-  - scons -Q -j1 debug=0 force32=0 no_sql=1 CC=gcc-4.8 CXX=g++-4.8
+  - scons -Q -j1 debug=0 force32=0 no_sql=1 CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8
