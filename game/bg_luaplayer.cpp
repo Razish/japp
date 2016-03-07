@@ -1703,7 +1703,7 @@ namespace JPLua {
 			if (lua_type(L, -1) != LUA_TTABLE) {
 				trap->Print("Player_Mindtrick failed, not a table\n");
 				StackDump(L);
-				return;
+				return 0;
 			}
 
 			lua_pushnil(L);
