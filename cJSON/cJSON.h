@@ -93,6 +93,7 @@ extern "C"
 	extern cJSON *cJSON_CreateBoolean( int boolean );
 	extern cJSON *cJSON_CreateNumber( double num );
 	extern cJSON *cJSON_CreateInteger( int num );
+	extern cJSON *cJSON_CreateLongInteger( int64_t num );
 	extern cJSON *cJSON_CreateString( const char *string );
 	extern cJSON *cJSON_CreateArray( void );
 	extern cJSON *cJSON_CreateObject( void );
@@ -129,6 +130,7 @@ extern "C"
 #define cJSON_AddFalseToObject(object, name)		cJSON_AddItemToObject(object, name, cJSON_CreateFalse())
 #define cJSON_AddBooleanToObject(object, name, b)	cJSON_AddItemToObject(object, name, cJSON_CreateBoolean(b))
 #define cJSON_AddIntegerToObject(object, name, i)	cJSON_AddItemToObject(object, name, cJSON_CreateInteger(i))
+#define cJSON_AddLongIntegerToObject(object, name, i)	cJSON_AddItemToObject(object, name, cJSON_CreateLongInteger(i))
 #define cJSON_AddNumberToObject(object, name, n)	cJSON_AddItemToObject(object, name, cJSON_CreateNumber(n))
 #define cJSON_AddStringToObject(object, name, s)	cJSON_AddItemToObject(object, name, cJSON_CreateString(s))
 
@@ -138,6 +140,7 @@ extern "C"
 #define cJSON_AddFalseToArray(arry)			cJSON_AddItemToArray(arry, cJSON_CreateFalse())
 #define cJSON_AddBooleanToArray(arry, b)	cJSON_AddItemToArray(arry, cJSON_CreateBoolean(b))
 #define cJSON_AddIntegerToArray(arry, i)	cJSON_AddItemToArray(arry, cJSON_CreateInteger(i))
+#define cJSON_AddLongIntegerToArray(arry, i)	cJSON_AddItemToArray(arry, cJSON_CreateLongInteger(i))
 #define cJSON_AddNumberToArray(arry, n)		cJSON_AddItemToArray(arry, cJSON_CreateNumber(n))
 #define cJSON_AddStringToArray(arry, s)		cJSON_AddItemToArray(arry, cJSON_CreateString(s))
 
@@ -159,12 +162,14 @@ extern "C"
 	extern int			cJSON_ToBoolean( cJSON *item );
 	extern double		cJSON_ToNumber( cJSON *item );
 	extern int			cJSON_ToInteger( cJSON *item );
+	extern int64_t		cJSON_ToLongInteger( cJSON *item );
 	extern const char * cJSON_ToString( cJSON *item );
 
 	// Retreive values with default value (if they're of a wrong type or nonexistant)
 	extern int			cJSON_ToBooleanOpt( cJSON *item, int defval );
 	extern double		cJSON_ToNumberOpt( cJSON *item, double defval );
 	extern int			cJSON_ToIntegerOpt( cJSON *item, int defval );
+	extern int64_t		cJSON_ToLongIntegerOpt(cJSON *item, int64_t defval);
 	extern const char *	cJSON_ToStringOpt( cJSON *item, const char *defval );
 
 	// Retrive values directly. No type checking or default values.

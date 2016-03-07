@@ -49,7 +49,8 @@
 #include <float.h>
 #include <limits.h>
 #include <ctype.h>
-
+#define __STDC_FORMAT_MACROS // older compilers need this
+#include <inttypes.h>
 #define __cJSON_INTERNAL
 
 // cJSON Types:
@@ -82,6 +83,7 @@ typedef struct cJSON_s {
 	char *valuestring;			// The item's string, if type == cJSON_String
 	int valueint;				// The item's number, if type == cJSON_Number
 	double valuedouble;			// The item's number, if type == cJSON_Number
+	int64_t valuelong;		// The item's number, if type == cJSON_Number
 
 	/* Subitem data */
 	char *string;				// The item's name string, if this item is the child of, or is in the list of subitems of an object.
@@ -325,7 +327,8 @@ void cJSON_SafeDelete( cJSON **c ) {
 
 // Parse the input text to generate a number, and populate the result into item.
 static const char *parse_number( cJSON *item, const char *num ) {
-	double n = 0, sign = 1, scale = 0;
+	long double n = 0, sign = 1, scale = 0;
+
 	int subscale = 0, signsubscale = 1;
 
 	// Could use sscanf for this?
@@ -367,8 +370,9 @@ static const char *parse_number( cJSON *item, const char *num ) {
 
 	n = sign * n * pow( 10.0, (scale + subscale * signsubscale) );	// number = +/- number.fraction * 10^+/- exponent
 
-	item->valuedouble = n;
+	item->valuedouble = (double)n;
 	item->valueint = (int)n;
+	item->valuelong = (int64_t)n;
 	item->type = cJSON_Number;
 	return num;
 }
@@ -1394,6 +1398,14 @@ cJSON *cJSON_CreateInteger( int num ) {
 	return item;
 }
 
+cJSON *cJSON_CreateLongInteger(int64_t num){
+	cJSON *item = cJSON_New_Item();
+	item->type = cJSON_Number;
+	item->valuedouble = (double)num;
+	item->valueint = (int)num;
+	item->valuelong = num;
+}
+
 cJSON *cJSON_CreateString( const char *string ) {
 	cJSON *item = cJSON_New_Item();
 	item->type = cJSON_String;
@@ -1453,6 +1465,18 @@ cJSON *cJSON_CreateDoubleArray( double *numbers, int count ) {
 	}
 	return a;
 }
+
+cJSON *cJSON_CreateLongIntArray(int64_t *numbers, int count) {
+	int i;
+	cJSON *a = cJSON_CreateArray();
+
+	for (i = 0; i < count; i++) {
+		cJSON *n = cJSON_CreateLongInteger(numbers[i]);
+		cJSON_AddItemToArray(a, n);
+	}
+	return a;
+}
+
 
 cJSON *cJSON_CreateStringArray( const char **strings, int count ) {
 	int i;
@@ -1569,6 +1593,26 @@ int cJSON_ToIntegerOpt( cJSON *item, int defval ) {
 	}
 }
 
+int64_t cJSON_ToLongIntegerOpt(cJSON *item, int64_t defval){
+	if (!item) {
+		return defval;
+	}
+	switch (item->type) {
+	case cJSON_False:
+	case cJSON_True:
+	case cJSON_NULL:
+		return defval;
+	case cJSON_Number:
+		return item->valuelong;
+	case cJSON_String:
+		return atoll(item->valuestring);
+	case cJSON_Array:
+	case cJSON_Object:
+	default:
+		return defval;
+	}
+}
+
 const char *cJSON_ToStringOpt( cJSON *item, const char *defval ) {
 	if ( !item ) {
 		return defval;
@@ -1598,6 +1642,10 @@ __inline double cJSON_ToNumber( cJSON *item ) {
 
 __inline int cJSON_ToInteger( cJSON *item ) {
 	return cJSON_ToIntegerOpt( item, 0 );
+}
+
+__inline int64_t cJSON_ToLongInteger(cJSON *item){
+	return cJSON_ToLongIntegerOpt(item, 0);
 }
 
 __inline const char * cJSON_ToString( cJSON *item ) {

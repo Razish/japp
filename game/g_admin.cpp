@@ -18,6 +18,9 @@
 #include "qcommon/md5.h"
 #include <array>
 
+#define __STDC_FORMAT_MACROS // older compilers need this
+#include <inttypes.h>
+
 static adminUser_t *adminUsers = NULL;
 static telemark_t *telemarks = NULL;
 static qboolean telemarksVisible = qfalse;
@@ -689,22 +692,29 @@ static uint32_t GetAdminsBitflag( void ) {
 	return mask;
 }
 
-void G_BroadcastToAdminsOnly( gentity_t *ent ) {
+void G_BroadcastToAdminsOnly( gentity_t *ent  ) {
 	ent->r.svFlags |= SVF_BROADCASTCLIENTS;
 	ent->r.broadcastClients[0] = GetAdminsBitflag();
 }
 
+void G_BroadcastToClient(gentity_t *ent, gentity_t *client){
+	uint32_t bit = 0;
+	bit = (1 << client->s.number);
+	ent->r.svFlags |= SVF_BROADCASTCLIENTS;
+	ent->r.broadcastClients[0] = bit;
+}
+
 void SP_fx_runner( gentity_t *ent );
-static void SpawnTelemark( telemark_t *tm, vector3 *position ) {
+static void SpawnTelemark( telemark_t *tm, vector3 *position, gentity_t *ent ) {
 	tm->ent = G_Spawn();
 	tm->ent->fullName = "env/btend";
 	VectorCopy( position, &tm->ent->s.origin );
 	SP_fx_runner( tm->ent );
-	G_BroadcastToAdminsOnly( tm->ent );
+	G_BroadcastToClient(tm->ent, ent);
 }
 
 // add or update an existing telemark
-static telemark_t *AM_AddTelemark( const char *name, vector3 *position ) {
+static telemark_t *AM_AddTelemark( const char *name, vector3 *position, gentity_t *ent ) {
 	telemark_t *tm = NULL;
 
 	for ( tm = telemarks; tm; tm = tm->next ) {
@@ -726,7 +736,7 @@ static telemark_t *AM_AddTelemark( const char *name, vector3 *position ) {
 	Q_strncpyz( tm->name, name, sizeof(tm->name) );
 	VectorCopy( position, &tm->position );
 	if ( telemarksVisible ) {
-		SpawnTelemark( tm, position );
+		SpawnTelemark( tm, position, ent );
 	}
 
 	return tm;
@@ -1432,7 +1442,7 @@ static void AM_Telemark( gentity_t *ent ) {
 	}
 
 	G_LogPrintf( level.log.admin, "\t%s creating telemark \"%s\"\n", G_PrintClient( ent-g_entities ), name );
-	ent->client->pers.adminData.telemark = AM_AddTelemark( name, &ent->client->ps.origin );
+	ent->client->pers.adminData.telemark = AM_AddTelemark( name, &ent->client->ps.origin, ent );
 }
 
 // mark targeted location
@@ -1450,7 +1460,7 @@ static void AM_GunTeleportMark( gentity_t *ent ) {
 
 	VectorMA( &tr->endpos, 48.0f, &tr->plane.normal, &telePos );
 
-	ent->client->pers.adminData.telemark = AM_AddTelemark( va( "default_%s", ent->client->pers.netnameClean ), &telePos );
+	ent->client->pers.adminData.telemark = AM_AddTelemark( va( "default_%s", ent->client->pers.netnameClean ), &telePos, ent );
 	tent = G_PlayEffect( EFFECT_EXPLOSION, &tr->endpos, &tr->plane.normal );
 	tent->r.svFlags |= SVF_SINGLECLIENT;
 	tent->r.singleClient = ent->s.number;
@@ -1517,7 +1527,7 @@ static void AM_SeeTelemarks( gentity_t *ent ) {
 	}
 	else {
 		for ( tm = telemarks; tm; tm = tm->next ) {
-			SpawnTelemark( tm, &tm->position );
+			SpawnTelemark( tm, &tm->position, ent );
 		}
 	}
 	telemarksVisible = !telemarksVisible;
