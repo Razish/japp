@@ -5,6 +5,7 @@
 #include "cg_local.h"
 #endif
 #include "bg_luainternal.h"
+#include <array>
 
 #ifdef JPLUA
 
@@ -1692,6 +1693,35 @@ namespace JPLua {
 		Entity_CreateRef(L, ent);
 		return 1;
 	}
+#if defined(PROJECT_GAME)
+	static int Player_Mindtrick(lua_State *L){
+		jpluaEntity_t *entity = &ents[CheckPlayer(L, 1)->clientNum];
+		std::array<int, MAX_CLIENTS> out;
+		out.fill(-1);
+		//Clients who will be invisible for player
+		{
+			if (lua_type(L, -1) != LUA_TTABLE) {
+				trap->Print("Player_Mindtrick failed, not a table\n");
+				StackDump(L);
+				return;
+			}
+
+			lua_pushnil(L);
+			for (int i = 0; i < MAX_CLIENTS && lua_next(L, -2); i++) {
+				out[i] = lua_tointeger(L, -1);
+				lua_pop(L, 1);
+			}
+			lua_pop(L, 1);
+		}
+
+		for (int i = 0; i < MAX_CLIENTS && out[i] != -1; i++){
+			gentity_t *ent = &g_entities[i];
+			Q_AddToBitflags(ent->client->ps.fd.forceMindtrickTargetIndex, entity->s.number, 16);
+		}
+		return 0;
+	}
+
+#endif
 
 	static const struct luaL_Reg jplua_player_meta[] = {
 		{ "__index", Player_Index},
@@ -1709,6 +1739,7 @@ namespace JPLua {
 		{ "Give", Player_Give },
 		{ "Kick", Player_Kick },
 		{ "Kill", Player_Kill },
+		{ "Mindtrick", Player_Mindtrick},
 		{ "Slap", Player_Slap},
 		{ "Take", Player_Take },
 		{ "Teleport", Player_Teleport },

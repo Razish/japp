@@ -206,11 +206,16 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 	case ADMIN_STRING_KICK:
 	case ADMIN_STRING_BAN: {
 		if ( arg ) {
+			size_t pos = 0;
 			if ( strlen( arg ) != 0 ) {
-				string.replace( string.find_first_of( "$1" ), 2, arg ); // reason
+				if ((pos = string.find("$1")) != -1){
+					string.replace(pos, 2, arg); // reason
+				}
 			}
 			else {
-				string.replace( string.find_first_of( "$1" ), 2, "null" );
+				if ((pos = string.find("$1")) != -1){
+					string.replace(pos, 2, "null");
+				}
 			}
 			Q_strncpyz( arg2, string.c_str(), 128 ); //FIXME: make sure 128 is the right size
 		}
@@ -226,7 +231,10 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 
 	case ADMIN_STRING_GIVE: {
 		announce = ADMIN_STRING_GIVE_ANNOUNCE;
-		string.replace( string.find_first_of( "$1" ), 2, arg ); // what received)
+		size_t pos = 0;
+		if ((pos = string.find("$1")) != -1){
+			string.replace(pos, 2, arg); // what received)
+		}
 	} break;
 
 	case ADMIN_STRING_MERC: {
@@ -262,8 +270,13 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 	} break;
 
 	case ADMIN_STRING_WEATHER: {
-		string.replace( string.find_first_of( "$1" ), 2, ent->client->pers.netname ); // what received)
-		string.replace( string.find_first_of( "$2" ), 2, arg );
+		size_t pos = 0;
+		if ((pos = string.find("$1")) != -1){
+			string.replace(pos, 2, ent->client->pers.netname);
+			if ((pos = string.find("$2")) != -1){
+				string.replace(pos, 2, arg);
+			}
+		}
 	} break;
 
 	}
@@ -282,15 +295,24 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 	}
 
 	if ( announce ) {
+		size_t pos = -1;
 		std::string anon = adminStrings[announce];
 		if ( !anon.empty() ){
-			anon.replace( anon.find_first_of( "$1" ), 2, ent->client->pers.netname );
+			if ((pos = anon.find("$1")) != -1){
+				anon.replace(pos, 2, ent->client->pers.netname);
+			}
 			if ( announce == ADMIN_STRING_GIVE_ANNOUNCE ) {
-				anon.replace( anon.find_first_of( "$2" ), 2, arg ); // e.g (player) got weapon(force, ammo)
+				if ((pos = anon.find("$2")) != -1){
+					anon.replace(pos, 2, arg); // e.g (player) got weapon(force, ammo)
+				}
 			}
 			else if ( announce == ADMIN_STRING_RENAME ) {
-				anon.replace( anon.find_first_of( "$2" ), 2, arg2 );
-				anon.replace( anon.find_first_of( "$3" ), 2, arg2 );
+				if ((pos = anon.find("$2")) != -1){
+					anon.replace(pos, 2, arg2);
+				}
+				if ((pos = anon.find("$3")) != -1){
+					anon.replace(pos, 2, arg2);
+				}
 				trap->SendServerCommand( ent->s.number, va( "print \"%s\n\"", anon.c_str() ) );
 			}
 			G_Announce( anon.c_str(), ent->s.number);
@@ -3386,6 +3408,37 @@ static void AM_Give(gentity_t *ent){
 	}
 }
 
+void AM_MindTrick(gentity_t *ent){
+	gentity_t *target = NULL;
+	int client = -1;
+	char arg1[64] = {};
+
+	if (!ent) {
+		trap->Print("This command is not available for server console use yet\n");
+		return;
+	}
+
+	if (trap->Argc() < 3) {
+		AM_ConsolePrint(ent, "Syntax: \\amgive <client> ammo/weapon/force id <amount> \n");
+		return;
+	}
+
+	trap->Argv(1, arg1, sizeof(arg1));
+
+	client = G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT);
+	if (client == -1) {
+		return;
+	}
+	target = &g_entities[client];
+	if (!target) return;
+	for (int i = 0;i < MAX_CLIENTS; i++){
+		gentity_t *e = &g_entities[i];
+		if (e){
+			Q_AddToBitflags(e->client->ps.fd.forceMindtrickTargetIndex, target->s.number, 16);
+		}
+	}
+}
+
 typedef struct adminCommand_s {
 	const char *cmd;
 	uint32_t privilege;
@@ -3416,6 +3469,7 @@ static const adminCommand_t adminCommands[] = {
 	{ "amluareload", PRIV_LUA, AM_ReloadLua }, // reload JPLua system
 	{ "ammap", PRIV_MAP, AM_Map }, // change map and gamemode
 	{ "ammerc", PRIV_MERC, AM_Merc }, // give all weapons
+	{ "ammindtrick", PRIV_MINDTRICK, AM_MindTrick }, // mindtrick client
 	{ "amnpc", PRIV_NPCSPAWN, AM_NPCSpawn }, // spawn an NPC (including vehicles)
 	{ "ampoll", PRIV_POLL, AM_Poll }, // call an arbitrary vote
 	{ "amprotect", PRIV_PROTECT, AM_Protect }, // protect the specified client
