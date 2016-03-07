@@ -9883,12 +9883,11 @@ void PmoveSingle( pmove_t *pmove ) {
 		noAnimate = qtrue;
 	}
 
-	if ( pm_entSelf->s.NPC_class != CLASS_VEHICLE
-		&&pm->ps->m_iVehicleNum ) {//don't even run physics on a player if he's on a vehicle - he goes where the vehicle goes
+	if ( pm_entSelf->s.NPC_class != CLASS_VEHICLE && pm->ps->m_iVehicleNum ) {
+		// don't even run physics on a player if he's on a vehicle - he goes where the vehicle goes
 	}
-	else { //don't even run physics on a player if he's on a vehicle - he goes where the vehicle goes
-		if ( pm->ps->pm_type == PM_FLOAT
-			|| pm_flying == FLY_NORMAL ) {
+	else {
+		if ( pm->ps->pm_type == PM_FLOAT || pm_flying == FLY_NORMAL ) {
 			PM_FlyMove();
 		}
 		else if ( pm_flying == FLY_VEHICLE ) {

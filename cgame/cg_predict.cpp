@@ -589,6 +589,22 @@ void CG_Cube( vector3 *mins, vector3 *maxs, vector3 *color, float alpha );
 pmove_t cg_vehPmove;
 qboolean cg_vehPmoveSet = qfalse;
 
+// retrieves the entityNum of your grapple hook
+// returns -1 on failure
+static int FindGrappleHook( int clientNum ) {
+	for ( centity_t &cent : cg_entities ) {
+		if ( cent.currentValid && cent.currentState.eType == ET_MISSILE && !cent.currentState.generic1 ) {
+			// this is a hook
+			if ( cent.currentState.otherEntityNum == clientNum && cg.japp.grappleLanded == cg.snap->serverTime ) {
+				// and it's ours, woohoo
+				return cent.currentState.number;
+			}
+		}
+	}
+
+	return -1;
+}
+
 // Generates cg.predictedPlayerState for the current cg.time
 // cg.predictedPlayerState is guaranteed to be valid after exiting.
 // For demo playback, this will be an interpolation between two valid playerState_t.
@@ -905,33 +921,70 @@ void CG_PredictPlayerState( void ) {
 			}
 		}
 
-		if ( cg.japp.isGhosted && cgs.clientinfo[ps->clientNum].team != TEAM_SPECTATOR )
+		if ( cg.japp.isGhosted && cgs.clientinfo[ps->clientNum].team != TEAM_SPECTATOR ) {
 			cg_pmove.tracemask &= ~CONTENTS_PLAYERCLIP;
+		}
 
-		{// jetpack prediction
-			static int onTime = 0, offTime = 0;
-			if ( !onTime )		onTime = cg.time + 1000;
-			if ( !offTime )		offTime = cg.time + 1000;
+		// jetpack prediction
+		static int onTime = 0, offTime = 0;
+		if ( !onTime ) {
+			onTime = cg.time + 1000;
+		}
+		if ( !offTime ) {
+			offTime = cg.time + 1000;
+		}
 
-			if ( cg.predictedPlayerState.jetpackFuel > 5 && (cg.predictedPlayerState.eFlags & EF_JETPACK) &&
-				cg.predictedPlayerState.groundEntityNum == ENTITYNUM_NONE && (cg_pmove.cmd.buttons & BUTTON_USE) ) {
+		if ( cg.predictedPlayerState.jetpackFuel > 5 && (cg.predictedPlayerState.eFlags & EF_JETPACK)
+			&& cg.predictedPlayerState.groundEntityNum == ENTITYNUM_NONE && (cg_pmove.cmd.buttons & BUTTON_USE) )
+		{
+			if ( cg.predictedPlayerState.pm_type != PM_JETPACK && offTime < cg.time ) {
+				onTime = cg.time + 1000;
+				cg.predictedPlayerState.pm_type = PM_JETPACK;
+				cg.predictedPlayerState.eFlags |= EF_JETPACK_ACTIVE;
+			}
 
-
-				if ( cg.predictedPlayerState.pm_type != PM_JETPACK && offTime < cg.time ) {
-					onTime = cg.time + 1000;
-					cg.predictedPlayerState.pm_type = PM_JETPACK;
-					cg.predictedPlayerState.eFlags |= EF_JETPACK_ACTIVE;
-				}
-
-				if ( cg.predictedPlayerState.pm_type == PM_JETPACK && onTime < cg.time ) {
-					offTime = cg.time + 1000;
-					cg.predictedPlayerState.pm_type = PM_NORMAL;
-					cg.predictedPlayerState.eFlags &= ~EF_JETPACK_ACTIVE;
-				}
+			if ( cg.predictedPlayerState.pm_type == PM_JETPACK && onTime < cg.time ) {
+				offTime = cg.time + 1000;
+				cg.predictedPlayerState.pm_type = PM_NORMAL;
+				cg.predictedPlayerState.eFlags &= ~EF_JETPACK_ACTIVE;
 			}
 		}
 
 		cg_pmove.gripSpeedScale = cgs.japp.gripSpeed.set ? cgs.japp.gripSpeed.scale : 0.4f;
+
+		// grapple prediction
+		if ( cg_predictGrapple.integer ) {
+			const bool doGrapplePull = cg_pmove.cmd.buttons & BUTTON_GRAPPLE;
+			const bool doReleaseGrapple = cg_pmove.cmd.buttons & BUTTON_USE;
+			const bool isWalking = cg_pmove.cmd.buttons & BUTTON_WALKING;
+			const bool grappleSwinging = cg.predictedPlayerState.eFlags & EF_GRAPPLE_SWING;
+			const bool grapplePulling = cg.predictedPlayerState.pm_flags & PMF_GRAPPLE_PULL;
+			if ( FindGrappleHook( cg.clientNum ) != -1 ) {
+				if ( doReleaseGrapple ) {
+					cg.predictedPlayerState.pm_flags &= ~PMF_GRAPPLE_PULL;
+					cg.predictedPlayerState.eFlags &= ~EF_GRAPPLE_SWING;
+				}
+				else if ( grappleSwinging ) {
+					if ( doGrapplePull ) {
+						cg.predictedPlayerState.pm_flags |= PMF_GRAPPLE_PULL;
+						cg.predictedPlayerState.eFlags &= ~EF_GRAPPLE_SWING;
+					}
+					else if ( isWalking ) {
+						cg.predictedPlayerState.eFlags &= ~EF_GRAPPLE_SWING;
+					}
+				}
+				else if ( grapplePulling ) {
+					if ( !doGrapplePull ) {
+						cg.predictedPlayerState.pm_flags &= ~PMF_GRAPPLE_PULL;
+						cg.predictedPlayerState.eFlags |= EF_GRAPPLE_SWING;
+					}
+				}
+				else if ( !isWalking ) {
+					//FIXME: only necessary on ja+?
+					cg.predictedPlayerState.eFlags |= EF_GRAPPLE_SWING;
+				}
+			}
+		}
 
 		Pmove( &cg_pmove );
 
