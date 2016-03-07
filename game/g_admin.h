@@ -37,7 +37,7 @@ typedef struct adminData_s {
 typedef struct adminUser_s {
 	char		user[64];		// user
 	char		password[64];	// password
-	uint32_t	privileges;		// 32 privs
+	uint64_t	privileges;		// 64 privs
 	char		loginMsg[128];	// login message
 	int			rank;			// rank
 	int         logineffect;    // login effect
@@ -76,7 +76,7 @@ typedef struct adminUser_s {
 #define PRIV_GIVE       (0x10000000u)
 #define PRIV_MINDTRICK  (0x40000000u)
 
-void		 AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const int rank, const char *loginMsg, int effect );
+void		 AM_AddAdmin( const char *user, const char *pass, uint64_t privileges, const int rank, const char *loginMsg, int effect );
 void		 AM_DeleteAdmin( const char *user );
 void		 AM_ListAdmins( void );
 void		 AM_LoadAdmins( void );
@@ -86,7 +86,7 @@ void		 AM_LoadTelemarks( void );
 void		 AM_SaveTelemarks( void );
 adminUser_t	*AM_ChecksumLogin( const char *checksum );
 void		 AM_ApplySessionTransition( gentity_t *ent );
-qboolean	 AM_HasPrivilege( const gentity_t *ent, uint32_t privilege );
+qboolean	 AM_HasPrivilege( const gentity_t *ent, uint64_t privilege );
 void		 AM_PrintCommands( gentity_t *ent, printBufferSession_t *pb );
 qboolean	 AM_HandleCommands( gentity_t *ent, const char *cmd );
 void		 G_BroadcastToAdminsOnly( gentity_t *ent );

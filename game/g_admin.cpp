@@ -459,8 +459,8 @@ void AM_ListAdmins( void ) {
 
 	for ( admin = adminUsers; admin; admin = admin->next ) {
 		gentity_t *ent = NULL;
-
-		trap->Print( " %3d: %s/%s:%d (%d) %s\n", ++count, admin->user, admin->password, admin->rank, admin->privileges,
+		 
+		trap->Print( " %3d: %s/%s:%d (%" PRId64 ") %s\n", ++count, admin->user, admin->password, admin->rank, admin->privileges,
 			admin->loginMsg );
 
 		for ( ent = g_entities; ent - g_entities < level.maxclients; ent++ ) {
@@ -509,7 +509,7 @@ static void AM_ReadAccounts( const char *jsonText ) {
 		}
 
 		// privs
-		user->privileges = cJSON_ToInteger( cJSON_GetObjectItem( item, "privs" ) );
+		user->privileges = cJSON_ToLongInteger( cJSON_GetObjectItem( item, "privs" ) );
 
 		// rank
 		user->rank = cJSON_ToInteger( cJSON_GetObjectItem( item, "rank" ) );
@@ -537,7 +537,7 @@ static void AM_WriteAccounts( fileHandle_t f ) {
 		cJSON *item = cJSON_CreateObject();
 		cJSON_AddStringToObject( item, "user", admin->user );
 		cJSON_AddStringToObject( item, "pass", admin->password );
-		cJSON_AddIntegerToObject( item, "privs", admin->privileges );
+		cJSON_AddLongIntegerToObject( item, "privs", admin->privileges );
 		cJSON_AddIntegerToObject( item, "rank", admin->rank );
 		cJSON_AddStringToObject( item, "message", admin->loginMsg );
 		cJSON_AddIntegerToObject(item, "effect", admin->logineffect);
