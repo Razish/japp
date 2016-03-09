@@ -797,22 +797,33 @@ int Q_PrintStrlen( const char *string ) {
 //				Q_strstrip( "Bo\nb is h\rairy!!", "\n\r!", "12" );	// "Bo1b is h2airy"
 //				Q_strstrip( "Bo\nb is h\rairy!!", "\n\r!", NULL );	// "Bob is hairy"
 void Q_strstrip( char *string, const char *strip, const char *repl ) {
-	char		*out = string, *p = string, c;
-	const char	*s = strip;
-	int			replaceLen = repl ? strlen( repl ) : 0, offset = 0;
+	if ( !string || !string[0] ) {
+		// nothing to do and "" is probably read-only anyway
+		return;
+	}
 
+	const size_t replaceLen = repl ? strlen( repl ) : 0u;
+
+	char *out = string;
+	const char *p = string;
+	char c;
 	while ( (c = *p++) != '\0' ) {
-		for ( s = strip; *s; s++ ) {
-			offset = s - strip;
+		bool recordChar = true;
+		for ( const char *s = strip; *s; s++ ) {
+			const ptrdiff_t offset = s - strip;
 			if ( c == *s ) {
-				if ( !repl || offset >= replaceLen )
-					c = *p++;
-				else
+				if ( !repl || offset >= replaceLen ) {
+					recordChar = false;
+				}
+				else {
 					c = repl[offset];
+				}
 				break;
 			}
 		}
-		*out++ = c;
+		if ( recordChar ) {
+			*out++ = c;
+		}
 	}
 	*out = '\0';
 }

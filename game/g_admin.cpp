@@ -1904,6 +1904,7 @@ void G_SleepClient( gclient_t *cl ) {
 	if ( cl->hook ) {
 		Weapon_HookFree( cl->hook );
 	}
+	BG_ClearRocketLock( &cl->ps );
 	VectorClear( &cl->ps.velocity );
 	cl->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
 	cl->ps.forceHandExtendTime = INT32_MAX;

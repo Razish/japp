@@ -1385,20 +1385,13 @@ void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 		ent->client->pers.cmd.rightmove ) { //hack, don't do while moving
 		return;
 	}
-	if ( taunt != TAUNT_TAUNT ) {//normal taunt always allowed
-		if ( level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL ) {//no taunts unless in Duel
-			//	return;
-		}
-	}
 
-	//Raz: rocket lock bug
 	BG_ClearRocketLock( &ent->client->ps );
 
-	if ( ent->client->ps.torsoTimer < 1
-		&& ent->client->ps.forceHandExtend == HANDEXTEND_NONE
-		&& ent->client->ps.legsTimer < 1
-		&& ent->client->ps.weaponTime < 1
-		&& ent->client->ps.saberLockTime < level.time ) {
+	if ( ent->client->ps.torsoTimer < 1 && ent->client->ps.forceHandExtend == HANDEXTEND_NONE
+		&& ent->client->ps.legsTimer < 1 && ent->client->ps.weaponTime < 1
+		&& ent->client->ps.saberLockTime < level.time )
+	{
 		int anim = -1;
 		switch ( taunt ) {
 		case TAUNT_TAUNT:
@@ -1408,19 +1401,19 @@ void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 			else if ( ent->client->saber[0].tauntAnim != -1 ) {
 				anim = ent->client->saber[0].tauntAnim;
 			}
-			else if ( ent->client->saber[1].model[0]
-				&& ent->client->saber[1].tauntAnim != -1 ) {
+			else if ( ent->client->saber[1].model[0] && ent->client->saber[1].tauntAnim != -1 ) {
 				anim = ent->client->saber[1].tauntAnim;
 			}
 			else {
 				switch ( ent->client->ps.fd.saberAnimLevel ) {
 				case SS_FAST:
 				case SS_TAVION:
-					if ( ent->client->ps.saberHolstered == 1
-						&& ent->client->saber[1].model[0] ) {//turn off second saber
+					if ( ent->client->ps.saberHolstered == 1 && ent->client->saber[1].model[0] ) {
+						// turn off second saber
 						G_Sound( ent, CHAN_WEAPON, ent->client->saber[1].soundOff );
 					}
-					else if ( ent->client->ps.saberHolstered == 0 ) {//turn off first
+					else if ( ent->client->ps.saberHolstered == 0 ) {
+						// turn off first
 						G_Sound( ent, CHAN_WEAPON, ent->client->saber[0].soundOff );
 					}
 					ent->client->ps.saberHolstered = 2;
@@ -1432,8 +1425,8 @@ void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 					anim = BOTH_ENGAGETAUNT;
 					break;
 				case SS_DUAL:
-					if ( ent->client->ps.saberHolstered == 1
-						&& ent->client->saber[1].model[0] ) {//turn on second saber
+					if ( ent->client->ps.saberHolstered == 1 && ent->client->saber[1].model[0] ) {
+						// turn on second saber
 						G_Sound( ent, CHAN_WEAPON, ent->client->saber[1].soundOn );
 					}
 					else if ( ent->client->ps.saberHolstered == 2 ) {//turn on first
@@ -1443,7 +1436,8 @@ void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 					anim = BOTH_DUAL_TAUNT;
 					break;
 				case SS_STAFF:
-					if ( ent->client->ps.saberHolstered > 0 ) {//turn on all blades
+					if ( ent->client->ps.saberHolstered > 0 ) {
+						// turn on all blades
 						G_Sound( ent, CHAN_WEAPON, ent->client->saber[0].soundOn );
 					}
 					ent->client->ps.saberHolstered = 0;
@@ -1458,18 +1452,18 @@ void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 			if ( ent->client->saber[0].bowAnim != -1 ) {
 				anim = ent->client->saber[0].bowAnim;
 			}
-			else if ( ent->client->saber[1].model[0]
-				&& ent->client->saber[1].bowAnim != -1 ) {
+			else if ( ent->client->saber[1].model[0] && ent->client->saber[1].bowAnim != -1 ) {
 				anim = ent->client->saber[1].bowAnim;
 			}
 			else {
 				anim = BOTH_BOW;
 			}
-			if ( ent->client->ps.saberHolstered == 1
-				&& ent->client->saber[1].model[0] ) {//turn off second saber
+			if ( ent->client->ps.saberHolstered == 1 && ent->client->saber[1].model[0] ) {
+				// turn off second saber
 				G_Sound( ent, CHAN_WEAPON, ent->client->saber[1].soundOff );
 			}
-			else if ( ent->client->ps.saberHolstered == 0 ) {//turn off first
+			else if ( ent->client->ps.saberHolstered == 0 ) {
+				// turn off first
 				G_Sound( ent, CHAN_WEAPON, ent->client->saber[0].soundOff );
 			}
 			ent->client->ps.saberHolstered = 2;
@@ -1478,37 +1472,37 @@ void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 			if ( ent->client->saber[0].meditateAnim != -1 ) {
 				anim = ent->client->saber[0].meditateAnim;
 			}
-			else if ( ent->client->saber[1].model[0]
-				&& ent->client->saber[1].meditateAnim != -1 ) {
+			else if ( ent->client->saber[1].model[0] && ent->client->saber[1].meditateAnim != -1 ) {
 				anim = ent->client->saber[1].meditateAnim;
 			}
 			else {
 				anim = BOTH_MEDITATE;
 			}
-			if ( ent->client->ps.saberHolstered == 1
-				&& ent->client->saber[1].model[0] ) {//turn off second saber
+			if ( ent->client->ps.saberHolstered == 1 && ent->client->saber[1].model[0] ) {
+				// turn off second saber
 				G_Sound( ent, CHAN_WEAPON, ent->client->saber[1].soundOff );
 			}
-			else if ( ent->client->ps.saberHolstered == 0 ) {//turn off first
+			else if ( ent->client->ps.saberHolstered == 0 ) {
+				// turn off first
 				G_Sound( ent, CHAN_WEAPON, ent->client->saber[0].soundOff );
 			}
 			ent->client->ps.saberHolstered = 2;
 			break;
 		case TAUNT_FLOURISH:
 			if ( ent->client->ps.weapon == WP_SABER ) {
-				if ( ent->client->ps.saberHolstered == 1
-					&& ent->client->saber[1].model[0] ) {//turn on second saber
+				if ( ent->client->ps.saberHolstered == 1 && ent->client->saber[1].model[0] ) {
+					// turn on second saber
 					G_Sound( ent, CHAN_WEAPON, ent->client->saber[1].soundOn );
 				}
-				else if ( ent->client->ps.saberHolstered == 2 ) {//turn on first
+				else if ( ent->client->ps.saberHolstered == 2 ) {
+					// turn on first
 					G_Sound( ent, CHAN_WEAPON, ent->client->saber[0].soundOn );
 				}
 				ent->client->ps.saberHolstered = 0;
 				if ( ent->client->saber[0].flourishAnim != -1 ) {
 					anim = ent->client->saber[0].flourishAnim;
 				}
-				else if ( ent->client->saber[1].model[0]
-					&& ent->client->saber[1].flourishAnim != -1 ) {
+				else if ( ent->client->saber[1].model[0] && ent->client->saber[1].flourishAnim != -1 ) {
 					anim = ent->client->saber[1].flourishAnim;
 				}
 				else {
@@ -1540,8 +1534,7 @@ void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 			if ( ent->client->saber[0].gloatAnim != -1 ) {
 				anim = ent->client->saber[0].gloatAnim;
 			}
-			else if ( ent->client->saber[1].model[0]
-				&& ent->client->saber[1].gloatAnim != -1 ) {
+			else if ( ent->client->saber[1].model[0] && ent->client->saber[1].gloatAnim != -1 ) {
 				anim = ent->client->saber[1].gloatAnim;
 			}
 			else {
@@ -1555,25 +1548,28 @@ void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 					break;
 				case SS_STRONG:
 				case SS_DESANN:
-					if ( ent->client->ps.saberHolstered ) {//turn on first
+					if ( ent->client->ps.saberHolstered ) {
+						// turn on first
 						G_Sound( ent, CHAN_WEAPON, ent->client->saber[0].soundOn );
 					}
 					ent->client->ps.saberHolstered = 0;
 					anim = BOTH_VICTORY_STRONG;
 					break;
 				case SS_DUAL:
-					if ( ent->client->ps.saberHolstered == 1
-						&& ent->client->saber[1].model[0] ) {//turn on second saber
+					if ( ent->client->ps.saberHolstered == 1 && ent->client->saber[1].model[0] ) {
+						// turn on second saber
 						G_Sound( ent, CHAN_WEAPON, ent->client->saber[1].soundOn );
 					}
-					else if ( ent->client->ps.saberHolstered == 2 ) {//turn on first
+					else if ( ent->client->ps.saberHolstered == 2 ) {
+						// turn on first
 						G_Sound( ent, CHAN_WEAPON, ent->client->saber[0].soundOn );
 					}
 					ent->client->ps.saberHolstered = 0;
 					anim = BOTH_VICTORY_DUAL;
 					break;
 				case SS_STAFF:
-					if ( ent->client->ps.saberHolstered ) {//turn on first
+					if ( ent->client->ps.saberHolstered ) {
+						// turn on first
 						G_Sound( ent, CHAN_WEAPON, ent->client->saber[0].soundOn );
 					}
 					ent->client->ps.saberHolstered = 0;
@@ -1591,10 +1587,11 @@ void G_SetTauntAnim( gentity_t *ent, int taunt ) {
 			if ( ent->client->ps.groundEntityNum != ENTITYNUM_NONE ) {
 				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
 				ent->client->ps.forceDodgeAnim = anim;
-				ent->client->ps.forceHandExtendTime = level.time + BG_AnimLength( ent->localAnimIndex, (animNumber_t)anim );
+				ent->client->ps.forceHandExtendTime = level.time
+					+ BG_AnimLength( ent->localAnimIndex, (animNumber_t)anim );
 			}
-			if ( taunt != TAUNT_MEDITATE
-				&& taunt != TAUNT_BOW ) {//no sound for meditate or bow
+			if ( taunt != TAUNT_MEDITATE && taunt != TAUNT_BOW ) {
+				// no sound for meditate or bow
 				G_AddEvent( ent, EV_TAUNT, taunt );
 			}
 		}
