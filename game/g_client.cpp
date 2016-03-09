@@ -1810,6 +1810,7 @@ static const char *G_ValidateUserinfo( const char *userinfo ) {
 	return nullptr;
 }
 
+extern void G_ResetSaberStyle(gentity_t *ent);
 // Called from ClientConnect when the player first connects and directly by the server system when the player updates a
 //	userinfo variable.
 // The game can override any of the settings and call trap->SetUserinfo if desired.
@@ -2003,7 +2004,20 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 			G_SetSaber( ent, 1, scl->saber2[0] ? scl->saber2 : "none", qtrue );
 
 			//make sure the saber models are updated
-			G_SaberModelSetup( ent );
+			G_SaberModelSetup(ent);
+			const char *saber, *key, *value;
+			trap->GetUserinfo(ent - g_entities, userinfo, sizeof(userinfo));
+			for (int i = 0; i < MAX_SABERS; i++) {
+				saber = (i & 1) ? ent->client->pers.saber2 : ent->client->pers.saber1;
+				key = va("saber%d", i + 1);
+				value = Info_ValueForKey(userinfo, key);
+				if (Q_stricmp(value, saber)) {
+					// they don't match up, force the user info
+					Info_SetValueForKey(userinfo, key, saber);
+					trap->SetUserinfo(ent - g_entities, userinfo);
+				}
+			}
+			G_ResetSaberStyle(ent);
 
 			if ( scl->forcedModel[0] ) {
 				// be sure to override the model we actually use

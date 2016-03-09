@@ -381,7 +381,7 @@ static void AM_ClearAccounts( void ) {
 }
 
 // add or update an existing admin account (user, pass, privileges, login mesage)
-void AM_AddAdmin( const char *user, const char *pass, uint32_t privileges, const int rank, const char *loginMsg, int effect ) {
+void AM_AddAdmin( const char *user, const char *pass, uint64_t privileges, const int rank, const char *loginMsg, int effect ) {
 	adminUser_t	*admin = NULL;
 
 	for ( admin = adminUsers; admin; admin = admin->next ) {
@@ -3524,7 +3524,7 @@ static uint32_t GetPrivileges( const gentity_t *ent ) {
 	return user ? user->privileges : 0u;
 }
 
-qboolean AM_HasPrivilege( const gentity_t *ent, uint32_t privilege ) {
+qboolean AM_HasPrivilege( const gentity_t *ent, uint64_t privilege ) {
 	adminUser_t *user = ent->client->pers.adminUser;
 
 	if ( user && (user->privileges & privilege) ) {

@@ -3447,7 +3447,7 @@ static void Cmd_Origin_f( gentity_t *ent ) {
 		vtos( &targ->client->ps.viewangles ) ) );
 }
 
-static void G_ResetSaberStyle( gentity_t *ent ) {
+void G_ResetSaberStyle( gentity_t *ent ) {
 	// dual
 	if ( ent->client->saber[0].model[0] && ent->client->saber[1].model[0] )
 		ent->client->ps.fd.saberAnimLevelBase = ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = SS_DUAL;
