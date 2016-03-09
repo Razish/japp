@@ -784,7 +784,7 @@ gentity_t *SelectSpectatorSpawnPoint( vector3 *origin, vector3 *angles ) {
 	return NULL;
 }
 
-#define BODY_SINK_TIME		30000//45000
+#define BODY_SINK_TIME		japp_corpseRemovalTime.value * 1000//30000//45000
 
 void InitBodyQue( void ) {
 	int		i;
