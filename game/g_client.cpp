@@ -2005,19 +2005,22 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 
 			//make sure the saber models are updated
 			G_SaberModelSetup(ent);
-			const char *saber, *key, *value;
-			trap->GetUserinfo(ent - g_entities, userinfo, sizeof(userinfo));
-			for (int i = 0; i < MAX_SABERS; i++) {
-				saber = (i & 1) ? ent->client->pers.saber2 : ent->client->pers.saber1;
-				key = va("saber%d", i + 1);
-				value = Info_ValueForKey(userinfo, key);
-				if (Q_stricmp(value, saber)) {
-					// they don't match up, force the user info
-					Info_SetValueForKey(userinfo, key, saber);
-					trap->SetUserinfo(ent - g_entities, userinfo);
+
+			if (japp_instantSaberSwitch.integer){
+				const char *saber, *key, *value;
+				trap->GetUserinfo(ent - g_entities, userinfo, sizeof(userinfo));
+				for (int i = 0; i < MAX_SABERS; i++) {
+					saber = (i & 1) ? ent->client->pers.saber2 : ent->client->pers.saber1;
+					key = va("saber%d", i + 1);
+					value = Info_ValueForKey(userinfo, key);
+					if (Q_stricmp(value, saber)) {
+						// they don't match up, force the user info
+						Info_SetValueForKey(userinfo, key, saber);
+						trap->SetUserinfo(ent - g_entities, userinfo);
+					}
 				}
+				G_ResetSaberStyle(ent);
 			}
-			G_ResetSaberStyle(ent);
 
 			if ( scl->forcedModel[0] ) {
 				// be sure to override the model we actually use
