@@ -4623,7 +4623,7 @@ static void CG_DrawCrosshair( vector3 *worldPoint, qboolean chEntValid ) {
 	float x, y, w, h, f, chX, chY;
 	qhandle_t hShader = 0;
 	qboolean corona = qfalse;
-	vector4 colour = { 0.0f };
+	vector4 colour = { 1.0f, 1.0f, 1.0, 1.0f };
 	centity_t *crossEnt = NULL;
 	refdef_t *refdef = CG_GetRefdef();
 
