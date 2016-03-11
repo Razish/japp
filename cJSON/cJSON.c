@@ -27,8 +27,8 @@
 	* Added function to swap 2 items in arrays
 	* Added functions to clear arrays and objects
 	* Added extended lookup, to allow retreival of deeply nested items in 1 call
-
-	*/
+	* Added 64 bit integer support
+*/
 
 // cJSON
 // JSON parser in C.
@@ -1404,6 +1404,7 @@ cJSON *cJSON_CreateLongInteger(int64_t num){
 	item->valuedouble = (double)num;
 	item->valueint = (int)num;
 	item->valuelong = num;
+	return item;
 }
 
 cJSON *cJSON_CreateString( const char *string ) {

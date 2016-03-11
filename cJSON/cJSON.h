@@ -27,8 +27,8 @@
 	* Added function to swap 2 items in arrays
 	* Added functions to clear arrays and objects
 	* Added extended lookup, to allow retreival of deeply nested items in 1 call
-
-	*/
+	* Added 64 bit integer support
+*/
 
 
 #ifndef cJSON__h
@@ -125,24 +125,24 @@ extern "C"
 	extern void cJSON_ReplaceItemInObject( cJSON *object, const char *string, cJSON *newitem );
 
 	// Convenience functions: Add item to object
-#define cJSON_AddNullToObject(object, name)			cJSON_AddItemToObject(object, name, cJSON_CreateNull())
-#define cJSON_AddTrueToObject(object, name)			cJSON_AddItemToObject(object, name, cJSON_CreateTrue())
-#define cJSON_AddFalseToObject(object, name)		cJSON_AddItemToObject(object, name, cJSON_CreateFalse())
-#define cJSON_AddBooleanToObject(object, name, b)	cJSON_AddItemToObject(object, name, cJSON_CreateBoolean(b))
-#define cJSON_AddIntegerToObject(object, name, i)	cJSON_AddItemToObject(object, name, cJSON_CreateInteger(i))
-#define cJSON_AddLongIntegerToObject(object, name, i)	cJSON_AddItemToObject(object, name, cJSON_CreateLongInteger(i))
-#define cJSON_AddNumberToObject(object, name, n)	cJSON_AddItemToObject(object, name, cJSON_CreateNumber(n))
-#define cJSON_AddStringToObject(object, name, s)	cJSON_AddItemToObject(object, name, cJSON_CreateString(s))
+	#define cJSON_AddNullToObject(object, name)				cJSON_AddItemToObject(object, name, cJSON_CreateNull())
+	#define cJSON_AddTrueToObject(object, name)				cJSON_AddItemToObject(object, name, cJSON_CreateTrue())
+	#define cJSON_AddFalseToObject(object, name)			cJSON_AddItemToObject(object, name, cJSON_CreateFalse())
+	#define cJSON_AddBooleanToObject(object, name, b)		cJSON_AddItemToObject(object, name, cJSON_CreateBoolean(b))
+	#define cJSON_AddIntegerToObject(object, name, i)		cJSON_AddItemToObject(object, name, cJSON_CreateInteger(i))
+	#define cJSON_AddLongIntegerToObject(object, name, i)	cJSON_AddItemToObject(object, name, cJSON_CreateLongInteger(i))
+	#define cJSON_AddNumberToObject(object, name, n)		cJSON_AddItemToObject(object, name, cJSON_CreateNumber(n))
+	#define cJSON_AddStringToObject(object, name, s)		cJSON_AddItemToObject(object, name, cJSON_CreateString(s))
 
 	// Convenience functions: Add item to array
-#define cJSON_AddNullToArray(arry)			cJSON_AddItemToArray(arry, cJSON_CreateNull())
-#define cJSON_AddTrueToArray(arry)			cJSON_AddItemToArray(arry, cJSON_CreateTrue())
-#define cJSON_AddFalseToArray(arry)			cJSON_AddItemToArray(arry, cJSON_CreateFalse())
-#define cJSON_AddBooleanToArray(arry, b)	cJSON_AddItemToArray(arry, cJSON_CreateBoolean(b))
-#define cJSON_AddIntegerToArray(arry, i)	cJSON_AddItemToArray(arry, cJSON_CreateInteger(i))
-#define cJSON_AddLongIntegerToArray(arry, i)	cJSON_AddItemToArray(arry, cJSON_CreateLongInteger(i))
-#define cJSON_AddNumberToArray(arry, n)		cJSON_AddItemToArray(arry, cJSON_CreateNumber(n))
-#define cJSON_AddStringToArray(arry, s)		cJSON_AddItemToArray(arry, cJSON_CreateString(s))
+	#define cJSON_AddNullToArray(arry)				cJSON_AddItemToArray(arry, cJSON_CreateNull())
+	#define cJSON_AddTrueToArray(arry)				cJSON_AddItemToArray(arry, cJSON_CreateTrue())
+	#define cJSON_AddFalseToArray(arry)				cJSON_AddItemToArray(arry, cJSON_CreateFalse())
+	#define cJSON_AddBooleanToArray(arry, b)		cJSON_AddItemToArray(arry, cJSON_CreateBoolean(b))
+	#define cJSON_AddIntegerToArray(arry, i)		cJSON_AddItemToArray(arry, cJSON_CreateInteger(i))
+	#define cJSON_AddLongIntegerToArray(arry, i)	cJSON_AddItemToArray(arry, cJSON_CreateLongInteger(i))
+	#define cJSON_AddNumberToArray(arry, n)			cJSON_AddItemToArray(arry, cJSON_CreateNumber(n))
+	#define cJSON_AddStringToArray(arry, s)			cJSON_AddItemToArray(arry, cJSON_CreateString(s))
 
 	// Value types
 	extern int cJSON_IsNULL( cJSON *item );
