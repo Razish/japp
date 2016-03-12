@@ -2303,7 +2303,7 @@ static qboolean G_OtherPlayersDueling( void ) {
 	return qfalse;
 }
 
-void Cmd_EngageDuel_f( gentity_t *ent ) {
+void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 	trace_t *tr;
 	int weapon = WP_SABER;
 
@@ -2391,6 +2391,22 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 				ent->client->pers.netname, weaponData[challenged->client->pers.duelWeapon].longName ) );
 
 
+			if (fullforce) {
+				if (!(g_privateDuel.bits & PRIVDUEL_MULTI)) {
+					trap->SendServerCommand(ent - g_entities, "print \"Fullforce duels not allowed!\n\"");
+					return;
+				}
+				ent->duelFullForce = true;
+				ent->client->ps.fd.forcePowerSelected = 0;
+				ent->duelForcePowersKnown = ent->client->ps.fd.forcePowersKnown;
+				for (int i = 0; i < NUM_FORCE_POWERS; i++) {
+					ent->duelForcePowerBaseLevel[i] = ent->client->ps.fd.forcePowerBaseLevel[i];
+					ent->client->ps.fd.forcePowerBaseLevel[i] = 3;
+					ent->duelForcePowerLevel[i] = ent->client->ps.fd.forcePowerLevel[i];
+					ent->client->ps.fd.forcePowerLevel[i] = 3;
+					ent->client->ps.fd.forcePowersKnown |= (1 << i);
+				}
+			}
 
 
 			ent->client->ps.duelInProgress = challenged->client->ps.duelInProgress = qtrue;
@@ -2476,6 +2492,10 @@ void Cmd_EngageDuel_f( gentity_t *ent ) {
 		ent->client->ps.duelIndex = challenged->s.number;
 		ent->client->ps.duelTime = level.time + 5000;
 	}
+}
+
+void Cmd_EngageFullForceDuel_f(gentity_t *ent) {
+	Cmd_EngageDuel_f(ent, true);
 }
 
 #ifdef _DEBUG
@@ -3881,6 +3901,7 @@ static const command_t commands[] = {
 	{ "debugBMove_Up", Cmd_BotMoveUp_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
 	{ "drop", Cmd_Drop_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "duelteam", Cmd_DuelTeam_f, GTB_DUEL | GTB_POWERDUEL, CMDFLAG_NOINTERMISSION },
+	{ "engageduelff", Cmd_EngageFullForceDuel_f, GTB_ALL, CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 	{ "follow", Cmd_Follow_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "follownext", Cmd_FollowNext_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "followprev", Cmd_FollowPrev_f, GTB_ALL, CMDFLAG_NOINTERMISSION },

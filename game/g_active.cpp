@@ -2118,6 +2118,16 @@ void ClientThink_real( gentity_t *ent ) {
 		if ( !duelAgainst || !duelAgainst->client || !duelAgainst->inuse || duelAgainst->client->ps.duelIndex != ent->s.number ) {
 			ent->client->ps.duelInProgress = 0;
 			G_AddEvent( ent, EV_PRIVATE_DUEL, 0 );
+			if (ent->duelFullForce) {
+				ent->client->ps.fd.forcePowerSelected = 0; // HACK: What the actual fuck
+				ent->client->ps.fd.forcePowersKnown = ent->duelForcePowersKnown;
+
+				for (int i = 0; i < NUM_FORCE_POWERS; i++) {
+					ent->client->ps.fd.forcePowerBaseLevel[i] = ent->client->pers.adminData.forcePowerBaseLevel[i];
+					ent->client->ps.fd.forcePowerLevel[i] = ent->client->pers.adminData.forcePowerLevel[i];
+				}
+				ent->duelFullForce = false;
+			}
 		}
 		else if ( duelAgainst->health < 1 || duelAgainst->client->ps.stats[STAT_HEALTH] < 1 ) {
 			ent->client->ps.duelInProgress = 0;
@@ -2125,6 +2135,28 @@ void ClientThink_real( gentity_t *ent ) {
 
 			G_AddEvent( ent, EV_PRIVATE_DUEL, 0 );
 			G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, 0 );
+
+			if (ent->duelFullForce) {
+				ent->client->ps.fd.forcePowerSelected = 0;
+				ent->client->ps.fd.forcePowersKnown = ent->duelForcePowersKnown;
+
+				for (int i = 0; i < NUM_FORCE_POWERS; i++) {
+					ent->client->ps.fd.forcePowerBaseLevel[i] = ent->duelForcePowerBaseLevel[i];
+					ent->client->ps.fd.forcePowerLevel[i] = ent->duelForcePowerLevel[i];
+				}
+				ent->duelFullForce = false;
+			}
+
+			if (duelAgainst->duelFullForce) {
+				duelAgainst->client->ps.fd.forcePowerSelected = 0;
+				duelAgainst->client->ps.fd.forcePowersKnown = ent->duelForcePowersKnown;
+
+				for (int i = 0; i < NUM_FORCE_POWERS; i++) {
+					duelAgainst->client->ps.fd.forcePowerBaseLevel[i] = ent->duelForcePowerBaseLevel[i];
+					duelAgainst->client->ps.fd.forcePowerLevel[i] = ent->duelForcePowerLevel[i];
+				}
+				duelAgainst->duelFullForce = false;
+			}
 
 			if ( ent->health > 0 && ent->client->ps.stats[STAT_HEALTH] > 0 ) {
 				char pre1[(MAX_NETNAME * 2) + 64] = {};
@@ -2250,6 +2282,28 @@ void ClientThink_real( gentity_t *ent ) {
 
 				G_AddEvent( ent, EV_PRIVATE_DUEL, 0 );
 				G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, 0 );
+
+				if (ent->duelFullForce) {
+					ent->client->ps.fd.forcePowerSelected = 0;
+					ent->client->ps.fd.forcePowersKnown = ent->duelForcePowersKnown;
+
+					for (int i = 0; i < NUM_FORCE_POWERS; i++) {
+						ent->client->ps.fd.forcePowerBaseLevel[i] = ent->duelForcePowerBaseLevel[i];
+						ent->client->ps.fd.forcePowerLevel[i] = ent->duelForcePowerLevel[i];
+					}
+					ent->duelFullForce = false;
+				}
+
+				if (duelAgainst->duelFullForce) {
+					duelAgainst->client->ps.fd.forcePowerSelected = 0;
+					duelAgainst->client->ps.fd.forcePowersKnown = ent->duelForcePowersKnown;
+
+					for (int i = 0; i < NUM_FORCE_POWERS; i++) {
+						duelAgainst->client->ps.fd.forcePowerBaseLevel[i] = ent->duelForcePowerBaseLevel[i];
+						duelAgainst->client->ps.fd.forcePowerLevel[i] = ent->duelForcePowerLevel[i];
+					}
+					duelAgainst->duelFullForce = false;
+				}
 
 				trap->SendServerCommand( -1, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELSTOP" ) ) );
 			}
