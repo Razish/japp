@@ -387,7 +387,7 @@ void AM_AddAdmin( const char *user, const char *pass, uint64_t privileges, const
 	for ( admin = adminUsers; admin; admin = admin->next ) {
 		if ( !strcmp( user, admin->user ) ) {
 			G_LogPrintf( level.log.admin, "[ADD] Overwriting user \"%s\"\n", user );
-			trap->Print( "Overwriting existing admin: %s/%s:%d (%d) %s\n", admin->user, admin->password, admin->rank,
+			trap->Print( "Overwriting existing admin: %s/%s:%d (%" PRId64 ") %s\n", admin->user, admin->password, admin->rank,
 				admin->privileges, admin->loginMsg );
 			break;
 		}
@@ -3281,7 +3281,7 @@ static void AM_Grant(gentity_t *ent){
 	gentity_t *target = NULL;
 	char arg1[64] = {};
 	char arg2[16] = {};
-	uint32_t priv = 0;
+	uint64_t priv = 0;
 	if (!ent) {
 		trap->Print("This command is not available for server console use yet\n");
 		return;
@@ -3452,7 +3452,7 @@ void AM_MindTrick(gentity_t *ent){
 
 typedef struct adminCommand_s {
 	const char *cmd;
-	uint32_t privilege;
+	uint64_t privilege;		//Since we've got 64 bitfields we want to use them, right?
 	void( *func )(gentity_t *ent);
 } adminCommand_t;
 
@@ -3520,7 +3520,7 @@ static int cmdcmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((adminCommand_t*)b)->cmd );
 }
 
-static uint32_t GetPrivileges( const gentity_t *ent ) {
+static uint64_t GetPrivileges( const gentity_t *ent ) {
 	adminUser_t *user = ent->client->pers.adminUser;
 	return user ? user->privileges : 0u;
 }
@@ -3556,7 +3556,7 @@ qboolean AM_HandleCommands( gentity_t *ent, const char *cmd ) {
 
 	else if ( !AM_HasPrivilege( ent, command->privilege ) ) {
 		trap->SendServerCommand( ent - g_entities, "print \"Insufficient privileges\n\"" );
-		G_LogPrintf( level.log.admin, "[FAILED-EXECUTE] %s (%u & %u), %s\n", cmd, GetPrivileges( ent ),
+		G_LogPrintf( level.log.admin, "[FAILED-EXECUTE] %s (%" PRId64 " & %" PRId64 "), %s\n", cmd, GetPrivileges( ent ),
 			command->privilege, G_PrintClient( ent-g_entities ) );
 		return qtrue;
 	}
