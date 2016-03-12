@@ -172,7 +172,7 @@ static void SV_AdminAdd_f( void ) {
 	trap->Argv( 5, argEffect, sizeof(argEffect));
 	argMsg = ConcatArgs( 6 );
 
-	AM_AddAdmin( argUser, argPass, atoi( argPrivs ), atoi( argRank ), argMsg, atoi(argEffect));
+	AM_AddAdmin( argUser, argPass, atoll( argPrivs ), atoi( argRank ), argMsg, atoi(argEffect));
 	AM_SaveAdmins();
 }
 
