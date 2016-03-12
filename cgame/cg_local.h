@@ -887,7 +887,7 @@ void			CG_BuildSolidList( void );
 void			CG_BuildSpectatorString( void );
 void			CG_CacheG2AnimInfo( char *modelName );
 void			CG_CalcEntityLerpPositions( centity_t *cent );
-void			CG_CenterPrint( const char *str, int y, int charWidth );
+void			CG_CenterPrint( const char *str, int y, int charWidth, int showtime = 0 );
 void			CG_ChatBox_AddString( char *chatStr );
 qboolean		CG_ChatboxActive( void );
 void			CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *cbName );
