@@ -387,7 +387,7 @@ void AM_AddAdmin( const char *user, const char *pass, uint64_t privileges, const
 	for ( admin = adminUsers; admin; admin = admin->next ) {
 		if ( !strcmp( user, admin->user ) ) {
 			G_LogPrintf( level.log.admin, "[ADD] Overwriting user \"%s\"\n", user );
-			trap->Print( "Overwriting existing admin: %s/%s:%d (%d) %s\n", admin->user, admin->password, admin->rank,
+			trap->Print( "Overwriting existing admin: %s/%s:%d (%" PRId64 ") %s\n", admin->user, admin->password, admin->rank,
 				admin->privileges, admin->loginMsg );
 			break;
 		}
@@ -3556,7 +3556,7 @@ qboolean AM_HandleCommands( gentity_t *ent, const char *cmd ) {
 
 	else if ( !AM_HasPrivilege( ent, command->privilege ) ) {
 		trap->SendServerCommand( ent - g_entities, "print \"Insufficient privileges\n\"" );
-		G_LogPrintf( level.log.admin, "[FAILED-EXECUTE] %s (%u & %u), %s\n", cmd, GetPrivileges( ent ),
+		G_LogPrintf( level.log.admin, "[FAILED-EXECUTE] %s (%" PRId64 " & %" PRId64 "), %s\n", cmd, GetPrivileges( ent ),
 			command->privilege, G_PrintClient( ent-g_entities ) );
 		return qtrue;
 	}
