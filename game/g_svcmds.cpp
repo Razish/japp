@@ -491,6 +491,10 @@ qboolean ConsoleCommand( void ) {
 		return qtrue;
 	}
 
+	if (AM_HandleCommands(nullptr, cmd)) {
+		return qtrue;
+	}
+
 	command = (svCommand_t *)bsearch( cmd, svCommands, numSvCommands, sizeof(svCommands[0]), cmdcmp );
 	if ( !command ) {
 		return qfalse;
