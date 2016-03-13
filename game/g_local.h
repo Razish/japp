@@ -62,6 +62,7 @@ typedef struct gclient_s gclient_t;
 #define PRIVDUEL_NOSEVER				(0x0008u)
 #define PRIVDUEL_TEAM					(0x0010u)
 #define PRIVDUEL_WEAP					(0x0020u)
+#define PRIVDUEL_FULLFORCE				(0x0040u)
 
 #define DUELSTATS_HEALTH				(0x0001u)
 #define DUELSTATS_TIME					(0x0002u)
@@ -421,6 +422,12 @@ struct gentity_s {
 	vector3				origOrigin;
 	qboolean			spawnedBefore;
 	int					ID;
+
+	//fullforce duels
+	bool				duelFullForce;
+	int					duelForcePowersKnown;
+	int duelForcePowerBaseLevel[NUM_FORCE_POWERS];
+	int duelForcePowerLevel[NUM_FORCE_POWERS];
 };
 
 typedef struct playerTeamState_s {
@@ -825,7 +832,7 @@ void			ClientThink( int clientNum, usercmd_t *ucmd );
 void			ClientEndFrame( gentity_t *ent );
 qboolean		Client_Disabled( const gentity_t *self, uint32_t pluginDisable );
 qboolean		Client_Supports( const gentity_t *ent, uint32_t supportFlag );
-void			Cmd_EngageDuel_f( gentity_t *ent );
+void			Cmd_EngageDuel_f( gentity_t *ent, bool fullforce = false );
 void			Cmd_FollowCycle_f( gentity_t *ent, int dir );
 void			Cmd_SaberAttackCycle_f( gentity_t *ent );
 void			Cmd_Score_f( gentity_t *ent );
