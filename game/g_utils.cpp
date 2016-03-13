@@ -1607,13 +1607,25 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 			e = g_entities + i;
 			if ( e->inuse && e->client->pers.connected != CON_DISCONNECTED )
 				return i;
-			if ( print )
-				trap->SendServerCommand( ent - g_entities, va( "print \"Client %d is not on the server\n\"", i ) );
+			if (print) {
+				if (ent) {
+					trap->SendServerCommand(ent - g_entities, va("print \"Client %d is not on the server\n\"", i));
+				}
+				else {
+					trap->Print(va("Client %d is not on the server\n", i));
+				}
+			}
 			return -1;
 		}
 		else {
-			if ( print )
-				trap->SendServerCommand( ent - g_entities, va( "print \"Client %d is out of range [0, %d]\n\"", i, level.maxclients - 1 ) );
+			if (print) {
+				if (ent) {
+					trap->SendServerCommand(ent - g_entities, va("print \"Client %d is out of range [0, %d]\n\"", i, level.maxclients - 1));
+				}
+				else {
+					trap->Print(va("Client %d is out of range [0, %d]\n", i, level.maxclients - 1));
+				}
+			}
 			return -1;
 		}
 	}
@@ -1654,14 +1666,24 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 					matches[i], g_entities[matches[i]].client->pers.netname )
 				);
 			}
-			trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
+			if (ent) {
+				trap->SendServerCommand(ent - g_entities, va("print \"%s\"", msg));
+			}
+			else {
+				trap->Print(va("print %s", msg));
+			}
 			return -1;
 		}
 	}
 
 	//Failed, target client does not exist
 	if ( print ) {
-		trap->SendServerCommand( ent - g_entities, va( "print \"Client %s does not exist\n\"", cleanedMatch ) );
+		if (ent) {
+			trap->SendServerCommand(ent - g_entities, va("print \"Client %s does not exist\n\"", cleanedMatch));
+		}
+		else {
+			trap->Print(va("Client %s does not exist\n", cleanedMatch));
+		}
 	}
 	return -1;
 }
