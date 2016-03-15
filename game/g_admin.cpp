@@ -3355,7 +3355,7 @@ void AM_MindTrick(gentity_t *ent){
 	char arg1[64] = {};
 
 	if (trap->Argc() < 3) {
-		AM_ConsolePrint(ent, "Syntax: \\amgive <client> ammo/weapon/force id <amount> \n");
+		AM_ConsolePrint(ent, "Syntax: \\ammindtrick <client> \n");
 		return;
 	}
 
@@ -3366,10 +3366,13 @@ void AM_MindTrick(gentity_t *ent){
 		return;
 	}
 	target = &g_entities[client];
+
 	if (!target) return;
+	if (!AM_CanInflict(ent, target)) return;
+
 	for (int i = 0;i < MAX_CLIENTS; i++){
 		gentity_t *e = &g_entities[i];
-		if (e){
+		if (e && e != target){
 			Q_AddToBitflags(e->client->ps.fd.forceMindtrickTargetIndex, target->s.number, 16);
 		}
 	}
