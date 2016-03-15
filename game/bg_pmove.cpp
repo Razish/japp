@@ -9271,14 +9271,20 @@ void PmoveSingle( pmove_t *pmove ) {
 			}
 		}
 		//Raz: Prediction hacks to match JA+ server (gloat, bow, etc)
+		//Wolf: @Raz next time you should add the same flags as define in G_Sleep,
+		//		since you wrote a hack here.
 		//	else
 		else if ( pm->ps->torsoAnim != BOTH_BOW && (pm->ps->torsoAnim < BOTH_SHOWOFF_FAST || pm->ps->torsoAnim > BOTH_VICTORY_STAFF) ) {
-			if ( pm->ps->legsAnim == BOTH_MEDITATE ) {
+			if ( pm->ps->legsAnim == BOTH_MEDITATE &&  (pm->ps->forceHandExtend != HANDEXTEND_KNOCKDOWN &&
+														pm->ps->forceHandExtendTime != INT32_MAX &&
+														pm->ps->forceDodgeAnim != 0)) {
 				if ( pm->ps->legsTimer < 100 ) {
 					pm->ps->legsTimer = 100;
 				}
 			}
-			if ( pm->ps->torsoAnim == BOTH_MEDITATE ) {
+			if ( pm->ps->torsoAnim == BOTH_MEDITATE && (pm->ps->forceHandExtend != HANDEXTEND_KNOCKDOWN &&
+														pm->ps->forceHandExtendTime != INT32_MAX &&
+														pm->ps->forceDodgeAnim != 0)) {
 				if ( pm->ps->torsoTimer < 100 ) {
 					pm->ps->legsTimer = 100;
 				}
