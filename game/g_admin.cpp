@@ -3354,8 +3354,8 @@ void AM_MindTrick(gentity_t *ent){
 	int client = -1;
 	char arg1[64] = {};
 
-	if (trap->Argc() < 3) {
-		AM_ConsolePrint(ent, "Syntax: \\amgive <client> ammo/weapon/force id <amount> \n");
+	if (trap->Argc() < 2) {
+		AM_ConsolePrint(ent, "Syntax: \\ammindtrick <client>\n");
 		return;
 	}
 
@@ -3365,12 +3365,22 @@ void AM_MindTrick(gentity_t *ent){
 	if (client == -1) {
 		return;
 	}
+
+	if (!AM_CanInflict(ent, &g_entities[client])) {
+		return;
+	}
+
+	//Whats wrong with this code???
+	//
+	//Q_AddToBitflags(e->client->ps.fd.forceMindtrickTargetIndex, target->s.number, 16);  -Line 3383 / g_admin.cpp
+	//                ^ if this is not our own gentity_t number it will crash the server... why ????
+
 	target = &g_entities[client];
 	if (!target) return;
 	for (int i = 0;i < MAX_CLIENTS; i++){
 		gentity_t *e = &g_entities[i];
 		if (e){
-			Q_AddToBitflags(e->client->ps.fd.forceMindtrickTargetIndex, target->s.number, 16);
+			Q_AddToBitflags(e->client->ps.fd.forceMindtrickTargetIndex, target->s.number, 16); 
 		}
 	}
 }
