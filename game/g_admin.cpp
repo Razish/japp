@@ -3354,7 +3354,7 @@ void AM_MindTrick(gentity_t *ent){
 	int client = -1;
 	char arg1[64] = {};
 
-	if (trap->Argc() < 3) {
+	if (trap->Argc() < 2) {
 		AM_ConsolePrint(ent, "Syntax: \\ammindtrick <client> \n");
 		return;
 	}
