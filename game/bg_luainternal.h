@@ -60,7 +60,7 @@ namespace JPLua {
 		StackCheck( const StackCheck& ) = delete;
 		StackCheck& operator=( const StackCheck& ) = delete;
 		~StackCheck() {
-		#ifdef _DEBUG
+		#if defined(LUA_DEBUG)
 			int newTop = lua_gettop( state );
 			if ( newTop != top ) {
 				trap->Print( "%s: top of stack %i -> %i\n", Q_FUNCTION_VERBOSE, top, newTop );
