@@ -1139,9 +1139,16 @@ static void AM_Ghost( gentity_t *ent ) {
 	//can ghost, partial name or clientNum
 	trap->Argv(1, arg1, sizeof(arg1));
 
-	if (ent) 
-	{
-		targetClient = (trap->Argc() > 1) ? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT) : ent - g_entities;
+	if (ent) {
+		targetClient = (trap->Argc() > 1) 
+			? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT) 
+			: ent - g_entities;
+	}
+	
+	else {
+		targetClient = (trap->Argc() > 1)
+			? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT)
+			: -1;
 	}
 
 	if (targetClient == -1) {
