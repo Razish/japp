@@ -1136,7 +1136,7 @@ static void AM_Ghost( gentity_t *ent ) {
 		return;
 	}
 
-	//cam ghpst, partial name or clientNum
+	//can ghost, partial name or clientNum
 	trap->Argv(1, arg1, sizeof(arg1));
 
 	if (ent) 
