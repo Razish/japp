@@ -1126,32 +1126,36 @@ void Ghost_Off( gentity_t *ent ) {
 
 // ghost specified client (or self)
 static void AM_Ghost( gentity_t *ent ) {
-	//Self, partial name, clientNum
 	char arg1[64]{};
-	trap->Argv( 1, arg1, sizeof(arg1) );
 	gentity_t *targ = nullptr;
 	int targetClient = -1;
 
-	if (arg1[0]) {
-		if (ent) {
-			targetClient = (trap->Argc() > 1)
-				? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT)
-				: ent - g_entities;
-		}
-		else {
-			targetClient = (trap->Argc() > 1)
-				? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT)
-				: -1;
-		}
 
-		if (targetClient == -1) {
-			return;
-		}
-		targ = &g_entities[targetClient];
+	if (trap->Argc() < 1) {
+		AM_ConsolePrint(ent, "Syntax: \\amghost <client/ID>\n");
+		return;
 	}
+
+	//can ghost, partial name or clientNum
+	trap->Argv(1, arg1, sizeof(arg1));
+
+	if (ent) {
+		targetClient = (trap->Argc() > 1) 
+			? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT) 
+			: ent - g_entities;
+	}
+	
 	else {
-		targ = ent;
+		targetClient = (trap->Argc() > 1)
+			? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT)
+			: -1;
 	}
+
+	if (targetClient == -1) {
+		return;
+	}
+
+	targ = &g_entities[targetClient];
 
 	if ( !AM_CanInflict( ent, targ ) ) {
 		return;
