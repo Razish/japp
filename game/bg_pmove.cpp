@@ -3134,7 +3134,10 @@ static void PM_AirMove( void ) {
 static void PM_GrappleMove( void ) {
 	vector3 vel = { 0.0f };
 	vector3 v = { 0.0f };
+	vector3 facingFwd, facingRight, facingAngles;
 	float vLen = 0.0f;
+	int	anim = -1;
+	float dotR, dotF;
 
 	VectorScale( &pml.forward, -16, &v );
 	VectorAdd( &pm->ps->lastHitLoc, &v, &v );
@@ -3150,6 +3153,37 @@ static void PM_GrappleMove( void ) {
 	VectorCopy( &vel, &pm->ps->velocity );
 
 	pml.groundPlane = qfalse;
+	
+	VectorSet(&facingAngles, 0, pm->ps->viewangles.yaw, 0);
+
+	AngleVectors(&facingAngles, &facingFwd, &facingRight, NULL);
+	dotR = DotProduct(&facingRight, &pm->ps->velocity);
+	dotF = DotProduct(&facingFwd, &pm->ps->velocity);
+
+	if (fabsf(dotR) > fabsf(dotF) * 1.5f) {
+		if (dotR > 150) {
+			anim = BOTH_FORCEJUMPRIGHT1;
+		}
+		else if (dotR < -150) {
+			anim = BOTH_FORCEJUMPLEFT1;
+		}
+	}
+	else {
+		if (dotF > 150) {
+			anim = BOTH_FORCEJUMP1;
+		}
+		else if (dotF < -150) {
+			anim = BOTH_FORCEJUMPBACK1;
+		}
+}
+	if (anim != -1) {
+		int parts = SETANIM_BOTH;
+		if (pm->ps->weaponTime) {//FIXME: really only care if we're in a saber attack anim...
+			parts = SETANIM_LEGS;
+		}
+
+		PM_SetAnim(parts, anim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 150);
+	}
 }
 
 #if 0
@@ -3174,6 +3208,9 @@ static void PM_GrappleSwing( void )
 #else
 void PM_GrappleSwing( void ) {
 	vector3 dist;
+	vector3 facingFwd, facingRight, facingAngles;
+	int	anim = -1;
+	float dotR, dotF;
 	float length, length2;
 
 	VectorSubtract( &pm->ps->lastHitLoc, &pml.previous_origin, &dist );
@@ -3201,8 +3238,36 @@ void PM_GrappleSwing( void ) {
 
 	pml.groundPlane = qfalse;
 
-	//RAZTODO: Play animation, similar to force jump animation playing
-	//	sub_2001AB20();
+	VectorSet(&facingAngles, 0, pm->ps->viewangles.yaw, 0);
+
+	AngleVectors(&facingAngles, &facingFwd, &facingRight, NULL);
+	dotR = DotProduct(&facingRight, &pm->ps->velocity);
+	dotF = DotProduct(&facingFwd, &pm->ps->velocity);
+
+	if (fabsf(dotR) > fabsf(dotF) * 1.5f) {
+		if (dotR > 150) {
+			anim = BOTH_FORCEJUMPRIGHT1;
+		}
+		else if (dotR < -150) {
+			anim = BOTH_FORCEJUMPLEFT1;
+		}
+	}
+	else {
+		if (dotF > 150) {
+			anim = BOTH_FORCEJUMP1;
+		}
+		else if (dotF < -150) {
+			anim = BOTH_FORCEJUMPBACK1;
+		}
+	}
+	if (anim != -1) {
+		int parts = SETANIM_BOTH;
+		if (pm->ps->weaponTime) {//FIXME: really only care if we're in a saber attack anim...
+			parts = SETANIM_LEGS;
+		}
+
+		PM_SetAnim(parts, anim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 150);
+	}
 }
 #endif
 
