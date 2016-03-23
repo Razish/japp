@@ -3238,9 +3238,6 @@ void PM_GrappleSwing( void ) {
 
 	pml.groundPlane = qfalse;
 
-	//RAZTODO: Play animation, similar to force jump animation playing
-	//	sub_2001AB20();
-
 	VectorSet(&facingAngles, 0, pm->ps->viewangles.yaw, 0);
 
 	AngleVectors(&facingAngles, &facingFwd, &facingRight, NULL);
