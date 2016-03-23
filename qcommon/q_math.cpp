@@ -618,7 +618,7 @@ float Q_rsqrt( float number ) {
 	//y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
 
 #if defined(__linux__)
-	assert( !isnan( y ) );
+	assert( !std::isnan( y ) );
 #endif
 
 	return y;
