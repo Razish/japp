@@ -436,6 +436,20 @@ int UISyscall_FS_Write( const void *buffer, int len, fileHandle_t f ) { trap_FS_
 void UISyscall_R_AddPolysToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int num ) { trap_R_AddPolyToScene( hShader, numVerts, verts ); }
 void UISyscall_G2API_CollisionDetect( CollisionRecord_t *collRecMap, void* ghoul2, const vector3 *angles, const vector3 *position, int frameNumber, int entNum, vector3 *rayStart, vector3 *rayEnd, vector3 *scale, uint32_t traceFlags, int useLod, float fRadius ) { trap_G2API_CollisionDetect( collRecMap, ghoul2, angles, position, frameNumber, entNum, rayStart, rayEnd, scale, traceFlags, useLod, fRadius ); }
 
+static void trap_AddCommand( const char *cmd_name ) {
+	//TODO: warn developer only
+	Com_Printf( S_COLOR_YELLOW "WARNING: trap->ext.AddCommand(%s) is only supported with OpenJK mod API!\n",
+		cmd_name
+	);
+}
+
+static void trap_RemoveCommand( const char *cmd_name ) {
+	//TODO: warn developer only
+	Com_Printf( S_COLOR_YELLOW "WARNING: trap->ext.RemoveCommand(%s) is only supported with OpenJK mod API!\n",
+		cmd_name
+	);
+}
+
 void Q_CDECL UI_Error( int level, const char *error, ... ) {
 	va_list argptr;
 	char text[4096] = { 0 };
@@ -622,4 +636,6 @@ static void TranslateSyscalls( void ) {
 	trap->G2API_AttachG2Model = trap_G2API_AttachG2Model;
 
 	trap->ext.R_Font_StrLenPixels = trap_R_Font_StrLenPixelsFloat;
+	trap->ext.AddCommand = trap_AddCommand;
+	trap->ext.RemoveCommand = trap_RemoveCommand;
 }
