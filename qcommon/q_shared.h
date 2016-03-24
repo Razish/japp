@@ -1013,6 +1013,7 @@ void Q_CDECL Com_Printf( const char *msg, ... );
 // nothing outside the Cvar_*() functions should modify these fields!
 typedef struct cvar_s {
 	char		*name;
+	char		*description;
 	char		*string;
 	char		*resetString;
 	char		*latchedString;

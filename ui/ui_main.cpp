@@ -8803,7 +8803,7 @@ Q_EXPORT Q_CDECL uiExport_t *GetModuleAPI( int apiVersion, uiImport_t *import ) 
 	memset( &uie, 0, sizeof(uie) );
 
 	if ( apiVersion != UI_API_VERSION ) {
-		trap->Print( "Mismatched UI_API_VERSION: expected %i, got %i\n", UI_API_VERSION, apiVersion );
+		trap->Print( "Mismatched UI_API_VERSION: expected %i from engine, got %i\n", UI_API_VERSION, apiVersion );
 		return NULL;
 	}
 
