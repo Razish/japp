@@ -387,7 +387,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 
 			chat->isUsed = qtrue;
 			for ( j = i; j >= 0; j-- ) {
-				const char *tmp = &message[i];
+				const char *tmp = &message[j];
 				if ( Q_IsColorString( tmp ) ) {// == '^' && message[j+1] >= '0' && message[j+1] <= '9' )
 					lastColor = message[j + 1];
 					break;
