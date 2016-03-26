@@ -491,7 +491,7 @@ qboolean ConsoleCommand( void ) {
 		return qtrue;
 	}
 
-	if (AM_HandleCommands(nullptr, cmd)) {
+	if ( AM_HandleCommands( nullptr, cmd ) ) {
 		return qtrue;
 	}
 

@@ -67,6 +67,10 @@ enum adminStrings_e {
 	ADMIN_STRING_WAKE_ALL,
 	ADMIN_STRING_WEATHER,
 	ADMIN_STRING_RENAME,
+	ADMIN_STRING_NOTARGETON,
+	ADMIN_STRING_NOTARGETOFF,
+	ADMIN_STRING_NOTARGETON_ANNOUNCE,
+	ADMIN_STRING_NOTARGETOFF_ANNOUNCE,
 
 	ADMIN_STRING_MAX
 };
@@ -110,6 +114,10 @@ static std::array<std::string, ADMIN_STRING_MAX> adminStrings = { {
 	"Rise and shine, everyone", // ADMIN_STRING_WAKE_ALL
 	"$1 set weather to $2", // ADMIN_STRING_WEATHER
 	"$1 renamed $2 to $3", // ADMIN_STRING_RENAME
+	"You are no longer seen by NPCs", // ADMIN_STRING_NOTARGETON
+	"NPCs can see you again", // ADMIN_STRING_NOTARGETOFF
+	"$1 is no longer seen by NPCs", // ADMIN_STRING_NOTARGETON_ANNOUNCE
+	"$1 can seen by NPCs again", // ADMIN_STRING_NOTARGETOFF_ANNOUNCE
 } };
 
 static const stringID_table_t adminStringsByIndex[ADMIN_STRING_MAX] = {
@@ -152,6 +160,10 @@ static const stringID_table_t adminStringsByIndex[ADMIN_STRING_MAX] = {
 	ENUM2STRING( ADMIN_STRING_WAKE_ALL ),
 	ENUM2STRING( ADMIN_STRING_WEATHER ),
 	ENUM2STRING( ADMIN_STRING_RENAME ),
+	ENUM2STRING( ADMIN_STRING_NOTARGETON ),
+	ENUM2STRING( ADMIN_STRING_NOTARGETOFF ),
+	ENUM2STRING( ADMIN_STRING_NOTARGETON_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_NOTARGETOFF_ANNOUNCE ),
 };
 
 static void AM_ConsolePrint( const gentity_t *ent, const char *msg ) {
@@ -281,6 +293,14 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 				string.replace(pos, 2, arg);
 			}
 		}
+	} break;
+
+	case ADMIN_STRING_NOTARGETON: {
+		announce = ADMIN_STRING_NOTARGETON_ANNOUNCE;
+	} break;
+
+	case ADMIN_STRING_NOTARGETOFF: {
+		announce = ADMIN_STRING_NOTARGETOFF_ANNOUNCE;
 	} break;
 
 	}
@@ -460,7 +480,7 @@ void AM_ListAdmins( void ) {
 
 	for ( admin = adminUsers; admin; admin = admin->next ) {
 		gentity_t *ent = NULL;
-		 
+
 		trap->Print( " %3d: %s/%s:%d (%" PRId64 ") %s\n", ++count, admin->user, admin->password, admin->rank, admin->privileges,
 			admin->loginMsg );
 
@@ -1140,11 +1160,11 @@ static void AM_Ghost( gentity_t *ent ) {
 	trap->Argv(1, arg1, sizeof(arg1));
 
 	if (ent) {
-		targetClient = (trap->Argc() > 1) 
-			? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT) 
+		targetClient = (trap->Argc() > 1)
+			? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT)
 			: ent - g_entities;
 	}
-	
+
 	else {
 		targetClient = (trap->Argc() > 1)
 			? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT)
@@ -3382,6 +3402,57 @@ void AM_MindTrick(gentity_t *ent){
 	}
 }
 
+static void AM_NoTarget( gentity_t *ent ) {
+	char arg1[64]{};
+	gentity_t *targ = nullptr;
+	int targetClient = -1;
+
+
+	if ( trap->Argc() < 1 ) {
+		AM_ConsolePrint( ent, "Syntax: \\amnotarget <client/ID>\n" );
+		return;
+	}
+
+	// can toggle noclip for partial name or clientNum
+	trap->Argv( 1, arg1, sizeof(arg1) );
+
+	targetClient = (trap->Argc() > 1)
+		? G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT )
+		: ent
+			? ent - g_entities
+			: -1;
+
+	if ( targetClient == -1 ) {
+		return;
+	}
+
+	targ = &g_entities[targetClient];
+
+	if ( !AM_CanInflict( ent, targ ) ) {
+		return;
+	}
+
+	if ( targ->flags & FL_NOTARGET ) {
+		G_LogPrintf( level.log.admin, "\t%s disabling notarget for %s\n",
+			ent ? G_PrintClient( ent - g_entities ) : "Console", G_PrintClient( targetClient )
+		);
+
+		targ->flags &= ~FL_NOTARGET;
+
+		AM_DrawString( ADMIN_STRING_NOTARGETOFF, targ, nullptr );
+	}
+	else {
+		G_LogPrintf( level.log.admin, "\t%s enabling notarget for %s\n",
+			ent ? G_PrintClient( ent - g_entities ) : "Console", G_PrintClient( targetClient )
+		);
+
+		targ->flags |= FL_NOTARGET;
+
+		AM_DrawString( ADMIN_STRING_NOTARGETON, targ, nullptr );
+	}
+	trap->LinkEntity( (sharedEntity_t *)targ );
+}
+
 typedef struct adminCommand_s {
 	const char *cmd;
 	uint64_t privilege;		//Since we've got 64 bitfields we want to use them, right?
@@ -3413,6 +3484,7 @@ static const adminCommand_t adminCommands[] = {
 	{ "ammap", PRIV_MAP, AM_Map }, // change map and gamemode
 	{ "ammerc", PRIV_MERC, AM_Merc }, // give all weapons
 	{ "ammindtrick", PRIV_MINDTRICK, AM_MindTrick }, // mindtrick client
+	{ "amnotarget", PRIV_NOTARGET, AM_NoTarget }, // toggle notarget mode
 	{ "amnpc", PRIV_NPCSPAWN, AM_NPCSpawn }, // spawn an NPC (including vehicles)
 	{ "ampoll", PRIV_POLL, AM_Poll }, // call an arbitrary vote
 	{ "amprotect", PRIV_PROTECT, AM_Protect }, // protect the specified client
@@ -3476,7 +3548,7 @@ qboolean AM_HasPrivilege( const gentity_t *ent, uint64_t privilege ) {
 qboolean AM_HandleCommands( gentity_t *ent, const char *cmd ) {
 	adminCommand_t *command = NULL;
 
-	if (ent == nullptr) { // call from console
+	if ( ent == nullptr ) { // call from console
 		command = (adminCommand_t *)bsearch(cmd, adminCommands, numAdminCommands, sizeof(adminCommands[0]), cmdcmp);
 		if (command) {
 			command->func(nullptr);
@@ -3484,8 +3556,7 @@ qboolean AM_HandleCommands( gentity_t *ent, const char *cmd ) {
 		}
 	}
 
-
-	if ( !Q_stricmp( cmd, "amlogin" ) ) {
+	else if ( !Q_stricmp( cmd, "amlogin" ) ) {
 		AM_Login( ent );
 		return qtrue;
 	}
