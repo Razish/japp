@@ -51,6 +51,7 @@ files = [
 	'game/g_cmds.cpp',
 	'game/g_combat.cpp',
 	'game/g_exphysics.cpp',
+    'game/g_geoip.cpp',
 	'game/g_ICARUScb.cpp',
 	'game/g_items.cpp',
 	'game/g_log.cpp',
@@ -127,6 +128,7 @@ files = [
 	'qcommon/md5.cpp',
 	'qcommon/q_math.cpp',
 	'qcommon/q_shared.cpp',
+    'maxmind/maxminddb.c',
 ]
 files = [build_dir + f for f in files]
 
@@ -197,7 +199,7 @@ if plat == 'Linux':
 game_env['LIBPREFIX'] = ''
 
 if realcc == 'cl':
-	game_env['PDB'] = 'jampgame' + arch + '.pdb'
+	game_env['PDB'] = '#' + os.sep + 'jampgame' + arch + '.pdb'
 
 # targets
 game_env.SharedLibrary(
