@@ -135,6 +135,7 @@
     <ClInclude Include="lua\lundump.h" />
     <ClInclude Include="lua\lvm.h" />
     <ClInclude Include="lua\lzio.h" />
+    <ClInclude Include="maxmind\maxminddb.h" />
     <ClInclude Include="qcommon\cm_public.h" />
     <ClInclude Include="qcommon\md5.h" />
     <ClInclude Include="qcommon\qcommon.h" />
@@ -235,6 +236,7 @@
     <ClCompile Include="game\g_cmds.cpp" />
     <ClCompile Include="game\g_combat.cpp" />
     <ClCompile Include="game\g_exphysics.cpp" />
+    <ClCompile Include="game\g_geoip.cpp" />
     <ClCompile Include="game\g_ICARUScb.cpp" />
     <ClCompile Include="game\g_items.cpp" />
     <ClCompile Include="game\g_log.cpp" />
@@ -350,6 +352,7 @@
     <ClCompile Include="lua\lundump.c" />
     <ClCompile Include="lua\lvm.c" />
     <ClCompile Include="lua\lzio.c" />
+    <ClCompile Include="maxmind\maxminddb.c" />
     <ClCompile Include="qcommon\md5.cpp" />
     <ClCompile Include="qcommon\q_math.cpp" />
     <ClCompile Include="qcommon\q_shared.cpp" />
@@ -390,8 +393,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeBuildCommandLine>scons.bat -Q debug=1 no_sql=1</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>scons.bat -Q -c debug=1 no_sql=1</NMakeCleanCommandLine>
+    <NMakeBuildCommandLine>scons.bat -Q debug=1 no_sql=1 tools=default</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.bat -Q -c debug=1 no_sql=1 tools=default</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;PROJECT_GAME;PROJECT_CGAME;PROJECT_UI;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>.;game;cgame;ui;mysql;sqlite;</NMakeIncludeSearchPath>
   </PropertyGroup>
