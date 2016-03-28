@@ -222,14 +222,14 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 	case ADMIN_STRING_KICK:
 	case ADMIN_STRING_BAN: {
 		if ( arg ) {
-			size_t pos = 0;
+			std::string::size_type pos = 0;
 			if ( strlen( arg ) != 0 ) {
-				if ((pos = string.find("$1")) != -1){
+				if ((pos = string.find("$1")) != std::string::npos){
 					string.replace(pos, 2, arg); // reason
 				}
 			}
 			else {
-				if ((pos = string.find("$1")) != -1){
+				if ((pos = string.find("$1")) != std::string::npos){
 					string.replace(pos, 2, "null");
 				}
 			}
@@ -247,8 +247,8 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 
 	case ADMIN_STRING_GIVE: {
 		announce = ADMIN_STRING_GIVE_ANNOUNCE;
-		size_t pos = 0;
-		if ((pos = string.find("$1")) != -1){
+		std::string::size_type pos = 0;
+		if ((pos = string.find("$1")) != std::string::npos){
 			string.replace(pos, 2, arg); // what received)
 		}
 	} break;
@@ -286,10 +286,10 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 	} break;
 
 	case ADMIN_STRING_WEATHER: {
-		size_t pos = 0;
-		if ((pos = string.find("$1")) != -1){
+		std::string::size_type pos = 0;
+		if ((pos = string.find("$1")) != std::string::npos){
 			string.replace(pos, 2, ent->client->pers.netname);
-			if ((pos = string.find("$2")) != -1){
+			if ((pos = string.find("$2")) != std::string::npos){
 				string.replace(pos, 2, arg);
 			}
 		}
@@ -319,22 +319,22 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 	}
 
 	if ( announce ) {
-		size_t pos = -1;
+		std::string::size_type pos = 0;
 		std::string anon = adminStrings[announce];
 		if ( !anon.empty() ){
-			if ((pos = anon.find("$1")) != -1){
+			if ((pos = anon.find("$1")) != std::string::npos){
 				anon.replace(pos, 2, ent->client->pers.netname);
 			}
 			if ( announce == ADMIN_STRING_GIVE_ANNOUNCE ) {
-				if ((pos = anon.find("$2")) != -1){
+				if ((pos = anon.find("$2")) != std::string::npos){
 					anon.replace(pos, 2, arg); // e.g (player) got weapon(force, ammo)
 				}
 			}
 			else if ( announce == ADMIN_STRING_RENAME ) {
-				if ((pos = anon.find("$2")) != -1){
+				if ((pos = anon.find("$2")) != std::string::npos){
 					anon.replace(pos, 2, arg2);
 				}
-				if ((pos = anon.find("$3")) != -1){
+				if ((pos = anon.find("$3")) != std::string::npos){
 					anon.replace(pos, 2, arg2);
 				}
 				trap->SendServerCommand( ent->s.number, va( "print \"%s\n\"", anon.c_str() ) );
