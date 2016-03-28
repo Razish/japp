@@ -243,7 +243,8 @@ static const char *postMatches[] = {
 	".co.uk",
 	".ua",
 	".tk",
-	".biz"
+	".biz",
+	".tk"
 };
 
 // returns 0 if no URLs were found

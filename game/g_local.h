@@ -459,6 +459,7 @@ typedef struct clientSession_s {
 	int					duelTeam;
 	int					siegeDesiredTeam;
 	char				IP[NET_ADDRSTRMAXLEN];
+	std::string			geoipData;
 } clientSession_t;
 
 typedef struct clientPersistant_s {
@@ -1131,3 +1132,27 @@ extern const char		*clientPluginDisableNames[];
 extern gameImport_t		*trap;
 
 extern const stringID_table_t TeamTable[];
+
+//GeoIP things
+
+class GeoIPData {
+private:
+	int status;
+	std::string ip;
+	std::string data;
+	bool ready;
+public:
+	GeoIPData(const std::string ip) : ip(ip) {};
+	~GeoIPData() {};
+	bool isReady() { return ready; };
+	std::string* getData() { return &data; };
+	std::string& getIp() { return ip; };
+	int getStatus() { return this->status; };
+	void setStatus(int value) { this->status = value; };
+};
+
+namespace GeoIP {
+	bool Init(void);
+	void ShutDown(void);
+	GeoIPData *GetIPInfo(const std::string ip);
+}

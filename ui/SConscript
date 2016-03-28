@@ -82,7 +82,7 @@ ui_env['CPPDEFINES'] += [
 ui_env['LIBPREFIX'] = ''
 
 if realcc == 'cl':
-	ui_env['PDB'] = 'ui' + arch + '.pdb'
+	ui_env['PDB'] = '#' + os.sep + 'ui' + arch + '.pdb'
 
 # targets
 ui_env.SharedLibrary(
