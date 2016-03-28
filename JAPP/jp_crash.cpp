@@ -31,7 +31,7 @@ int bCrashing = 0;
 
 	#undef WIN32_LEAN_AND_MEAN
 	#include <WinNT.h>
-
+	#pragma comment(lib, "user32.lib")
 #elif defined(__linux__)
 	#ifndef __USE_GNU
 		#define __USE_GNU
