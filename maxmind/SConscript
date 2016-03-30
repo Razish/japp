@@ -19,7 +19,9 @@ if realcc == 'gcc' or realcc == 'clang' and plat != 'Windows':
 	maxmind_env['CCFLAGS'] += [
 		'-fPIC',
 	]
-	
+	maxmind_env['CPPPATH'] += [
+	'#' + os.sep + 'maxmind'
+]
 # targets
 result = maxmind_env.StaticLibrary(
 	build_dir + 'libmaxmind',
