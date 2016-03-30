@@ -136,7 +136,7 @@ libraries = [
 	'cJSON',
 	'lua',
 	'semver',
-	'Maxmind',
+	'maxmind',
 ]
 if no_sql == 0:
 	libraries += [
