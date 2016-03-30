@@ -747,4 +747,11 @@
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="maxmind">
+    <File Name="maxmind/maxminddb_config.h"/>
+    <File Name="maxmind/maxminddb-compat-util.h"/>
+    <File Name="maxmind/maxminddb.h"/>
+    <File Name="maxmind/SConscript"/>
+    <File Name="maxmind/maxminddb.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>

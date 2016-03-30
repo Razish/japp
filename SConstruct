@@ -227,7 +227,7 @@ if realcc == 'gcc' or realcc == 'clang':
 	]
 	# c warnings
 	env['CFLAGS'] += [
-		'-Wdeclaration-after-statement',
+		#'-Wdeclaration-after-statement',
 		'-Wnested-externs',
 		'-Wold-style-definition',
 		'-Wstrict-prototypes',

@@ -16,9 +16,13 @@ files = [
 files = [build_dir + f for f in files]
 
 # project settings
-if realcc == 'gcc' or realcc == 'clang' and plat != 'Windows':
-	maxmind_env['CCFLAGS'] += [
-		'-fPIC',
+if realcc == 'gcc' or realcc == 'clang':
+	if plat != 'Windows':
+		maxmind_env['CCFLAGS'] += [
+			'-fPIC',
+		]
+	maxmind_env['CFLAGS'] += [
+		'-std=c99',
 	]
 	maxmind_env['CPPPATH'] += [
 	'#' + os.sep + 'maxmind'
