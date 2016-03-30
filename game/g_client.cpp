@@ -6,6 +6,7 @@
 #include "bg_luaevent.h"
 #include "JAPP/jp_csflags.h"
 #include "bg_lua.h"
+#include <unordered_map>
 
 // g_client.c -- client functions that don't happen every frame
 
@@ -2190,6 +2191,8 @@ static qboolean CompareIPString( const char *ip1, const char *ip2 ) {
 // Otherwise, the client will be sent the current gamestate and will eventually get to ClientBegin
 // firstTime will be qtrue the very first time a client connects to the server machine, but qfalse on map changes and
 //	tournament restarts.
+static std::unordered_map<int, GeoIPData*> pending_list;
+
 const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	gentity_t *ent = g_entities + clientNum, *te = NULL;
 	gclient_t *client;
@@ -2289,6 +2292,28 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		G_LogPrintf( level.log.console, msg );
 	}
 
+	//Get GeoIP data
+	if (pending_list[clientNum] == nullptr) {
+		pending_list[clientNum] = GeoIP::GetIPInfo(value);
+		return "Please wait...";
+	}
+	else if (pending_list[clientNum] != nullptr && !pending_list[clientNum]->isReady()) {
+		return "Please wait...";
+	}
+	else if (pending_list[clientNum] != nullptr && pending_list[clientNum]->isReady()) {
+		GeoIPData *data = pending_list[clientNum];
+		if (data->getStatus()) {
+			ent->client->sess.geoipData = *data->getData();
+		}
+		else {
+			trap->Print("Failed to Get GeoIP data. IP: %s Error: %s", data->getIp().c_str(), data->getData()->c_str());
+			ent->client->sess.geoipData = "Unknown";
+		}
+		delete data;
+		pending_list[clientNum] = nullptr;
+	}
+
+
 	// JPLua plugins can deny connections
 	if ( (result = JPLua::Event_ClientConnect( clientNum, userinfo, tmpIP, firstTime )) ) {
 		Com_Printf( "Denied: %s\n", result );
@@ -2357,8 +2382,8 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
 	if ( firstTime ) {
-		trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s\n\"", client->pers.netname,
-			G_GetStringEdString( "MP_SVGAME", "PLCONNECT" ) ) );
+		trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s From: %s\n\"", client->pers.netname,
+			G_GetStringEdString( "MP_SVGAME", "PLCONNECT" ), ent->client->sess.geoipData.c_str() ) );
 	}
 
 	if ( level.gametype >= GT_TEAM && client->sess.sessionTeam != TEAM_SPECTATOR ) {

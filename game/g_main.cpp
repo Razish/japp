@@ -692,6 +692,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	AM_LoadStrings();
 	AM_LoadTelemarks();
 	JP_Bans_Init();
+	GeoIP::Init();
 
 #ifdef JPLUA
 	JPLua::Init();
@@ -703,6 +704,7 @@ void G_ShutdownGame( int restart ) {
 	gentity_t *ent;
 
 	//	trap->Print ("==== ShutdownGame ====\n");
+	GeoIP::ShutDown();
 	JP_Bans_SaveBans();
 	JP_Bans_Clear();
 	AM_SaveTelemarks();
@@ -3329,7 +3331,7 @@ static qboolean	G_NAV_CheckNodeFailedForEnt( int entID, int nodeNum ) {
 
 gameImport_t *trap = NULL;
 Q_CABI {
-Q_EXPORT Q_CDECL gameExport_t *GetModuleAPI( int apiVersion, gameImport_t *import ) {
+Q_EXPORT gameExport_t *GetModuleAPI( int apiVersion, gameImport_t *import ) {
 	static gameExport_t ge = { 0 };
 
 	assert( import );

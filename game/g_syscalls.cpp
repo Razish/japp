@@ -7,7 +7,7 @@
 static void TranslateSyscalls( void );
 
 static intptr_t( Q_CDECL *Q_syscall )(intptr_t arg, ...) = (intptr_t( Q_CDECL * )(intptr_t, ...)) - 1;
-Q_CABI Q_CDECL Q_EXPORT void dllEntry( intptr_t( Q_CDECL *syscallptr )(intptr_t arg, ...) ) {
+Q_CABI Q_EXPORT void dllEntry( intptr_t( Q_CDECL *syscallptr )(intptr_t arg, ...) ) {
 	Q_syscall = syscallptr;
 
 	TranslateSyscalls();

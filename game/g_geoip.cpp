@@ -5,8 +5,6 @@
 extern "C" {
 	#include "maxmind\maxminddb.h"
 }
-#pragma comment(lib,"WS2_32")
-
 namespace GeoIP {
 	static MMDB_s handle;
 	bool Init(void) {
