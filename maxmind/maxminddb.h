@@ -16,11 +16,12 @@ extern "C" {
 #include <stdio.h>
 #include <sys/types.h>
 
+/* libmaxminddb package version from configure */
+#define PACKAGE_VERSION "1.2.0"
+
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
-/* libmaxminddb package version from configure */
-#define PACKAGE_VERSION "1.2.0"
 
 typedef ADDRESS_FAMILY sa_family_t;
 

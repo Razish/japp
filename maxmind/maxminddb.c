@@ -1,4 +1,4 @@
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 #include "maxminddb.h"
@@ -137,13 +137,13 @@ LOCAL const uint8_t *find_metadata(const uint8_t *file_content,
                                    ssize_t file_size, uint32_t *metadata_size);
 LOCAL int read_metadata(MMDB_s *mmdb);
 LOCAL MMDB_s make_fake_metadata_db(MMDB_s *mmdb);
-LOCAL int value_for_key_as_uint16(MMDB_entry_s *start, char *key,
+LOCAL int value_for_key_as_uint16(MMDB_entry_s *start, const char *key,
                                   uint16_t *value);
-LOCAL int value_for_key_as_uint32(MMDB_entry_s *start, char *key,
+LOCAL int value_for_key_as_uint32(MMDB_entry_s *start, const char *key,
                                   uint32_t *value);
-LOCAL int value_for_key_as_uint64(MMDB_entry_s *start, char *key,
+LOCAL int value_for_key_as_uint64(MMDB_entry_s *start, const char *key,
                                   uint64_t *value);
-LOCAL int value_for_key_as_string(MMDB_entry_s *start, char *key,
+LOCAL int value_for_key_as_string(MMDB_entry_s *start, const char *key,
                                   char const **value);
 LOCAL int populate_languages_metadata(MMDB_s *mmdb, MMDB_s *metadata_db,
                                       MMDB_entry_s *metadata_start);
@@ -547,7 +547,7 @@ LOCAL MMDB_s make_fake_metadata_db(MMDB_s *mmdb)
     return fake_metadata_db;
 }
 
-LOCAL int value_for_key_as_uint16(MMDB_entry_s *start, char *key,
+LOCAL int value_for_key_as_uint16(MMDB_entry_s *start, const char *key,
                                   uint16_t *value)
 {
     MMDB_entry_data_s entry_data;
@@ -566,7 +566,7 @@ LOCAL int value_for_key_as_uint16(MMDB_entry_s *start, char *key,
     return MMDB_SUCCESS;
 }
 
-LOCAL int value_for_key_as_uint32(MMDB_entry_s *start, char *key,
+LOCAL int value_for_key_as_uint32(MMDB_entry_s *start, const char *key,
                                   uint32_t *value)
 {
     MMDB_entry_data_s entry_data;
@@ -585,7 +585,7 @@ LOCAL int value_for_key_as_uint32(MMDB_entry_s *start, char *key,
     return MMDB_SUCCESS;
 }
 
-LOCAL int value_for_key_as_uint64(MMDB_entry_s *start, char *key,
+LOCAL int value_for_key_as_uint64(MMDB_entry_s *start, const char *key,
                                   uint64_t *value)
 {
     MMDB_entry_data_s entry_data;
@@ -604,7 +604,7 @@ LOCAL int value_for_key_as_uint64(MMDB_entry_s *start, char *key,
     return MMDB_SUCCESS;
 }
 
-LOCAL int value_for_key_as_string(MMDB_entry_s *start, char *key,
+LOCAL int value_for_key_as_string(MMDB_entry_s *start, const char *key,
                                   char const **value)
 {
     MMDB_entry_data_s entry_data;

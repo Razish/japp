@@ -26,9 +26,12 @@ static const char *TB_NearestPickup( void ) {
 static const char *TB_NearestAlly( void ) {
 	float bestDist = 999999999.9f;
 	int bestClient = -1;
-	int i = 0;
 
-	for ( i = 0; i < cgs.maxclients; i++ ) {
+	if ( !cg.snap ) {
+		return "";
+	}
+
+	for ( size_t i = 0; i < cgs.maxclients; i++ ) {
 		if ( i != cg.clientNum && cgs.clientinfo[i].team == cg.snap->ps.persistant[PERS_TEAM] ) {
 			float dist = Distance( &cg_entities[i].lerpOrigin, &cg.predictedPlayerState.origin );
 			if ( dist < bestDist ) {
@@ -56,11 +59,15 @@ static const char *TB_Location( void ) {
 }
 
 static const char *TB_Health( void ) {
-	return va( "%i", cg.snap->ps.stats[STAT_HEALTH] );
+	return cg.snap
+		? va( "%i", cg.snap->ps.stats[STAT_HEALTH] )
+		: "";
 }
 
 static const char *TB_Armor( void ) {
-	return va( "%i", cg.snap->ps.stats[STAT_ARMOR] );
+	return cg.snap
+		? va( "%i", cg.snap->ps.stats[STAT_ARMOR] )
+		: "";
 }
 
 static const char *TB_Weapon( void ) {

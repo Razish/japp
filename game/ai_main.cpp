@@ -249,7 +249,7 @@ int PassLovedOneCheck( bot_state_t *bs, gentity_t *ent );
 
 void ExitLevel( void );
 
-Q_CDECL void BotAI_Print( int type, const char *fmt, ... ) {
+void BotAI_Print( int type, const char *fmt, ... ) {
 	//FIXME: add BotAI_Print
 }
 

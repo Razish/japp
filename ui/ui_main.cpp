@@ -8792,7 +8792,7 @@ void JP_SaveFavServers( void )
 uiImport_t *trap = NULL;
 
 Q_CABI {
-Q_EXPORT Q_CDECL uiExport_t *GetModuleAPI( int apiVersion, uiImport_t *import ) {
+Q_EXPORT uiExport_t *GetModuleAPI( int apiVersion, uiImport_t *import ) {
 	static uiExport_t uie = { 0 };
 
 	assert( import );
