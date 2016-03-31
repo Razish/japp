@@ -170,7 +170,9 @@ if no_sql == 0:
 		game_env['LIBS'] += [
 			'mysqlclient',
 		]
-		
+game_env['LIBS'] += [
+	'pthread',
+]
 if plat == 'Windows':
 	game_env['LIBS'] += [
 		'advapi32',
@@ -183,7 +185,7 @@ if plat == 'Windows':
 			'Psapi',
 			'user32',
 		]
-		
+
 # project settings
 game_env['CPPPATH'] += [
 	'#' + os.sep + 'game'

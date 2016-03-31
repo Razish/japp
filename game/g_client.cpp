@@ -2292,28 +2292,6 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		G_LogPrintf( level.log.console, msg );
 	}
 
-	//Get GeoIP data
-	if (pending_list[clientNum] == nullptr) {
-		pending_list[clientNum] = GeoIP::GetIPInfo(value);
-		return "Please wait...";
-	}
-	else if (pending_list[clientNum] != nullptr && !pending_list[clientNum]->isReady()) {
-		return "Please wait...";
-	}
-	else if (pending_list[clientNum] != nullptr && pending_list[clientNum]->isReady()) {
-		GeoIPData *data = pending_list[clientNum];
-		if (data->getStatus()) {
-			ent->client->sess.geoipData = *data->getData();
-		}
-		else {
-			trap->Print("Failed to Get GeoIP data. IP: %s Error: %s", data->getIp().c_str(), data->getData()->c_str());
-			ent->client->sess.geoipData = "Unknown";
-		}
-		delete data;
-		pending_list[clientNum] = nullptr;
-	}
-
-
 	// JPLua plugins can deny connections
 	if ( (result = JPLua::Event_ClientConnect( clientNum, userinfo, tmpIP, firstTime )) ) {
 		Com_Printf( "Denied: %s\n", result );
@@ -2378,12 +2356,50 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		Q_strncpyz( client->sess.IP, tmpIP, sizeof(client->sess.IP) );
 	}
 
+	// get GeoIP data
+	if ( japp_detectCountry.integer && !isBot && firstTime && Q_stricmp( value, "localhost" ) ) {
+		GeoIPData *gip = pending_list[clientNum];
+		if ( !gip ) {
+			gip = GeoIP::GetIPInfo( value );
+			if ( gip ) {
+				pending_list[clientNum] = gip;
+				return "Please wait...";
+			}
+			// else GeoIP stuff isn't working
+		}
+		else if ( gip ) {
+			if ( !gip->isReady() ) {
+				return "Please wait...";
+			}
+			if ( gip->getStatus() ) {
+				const char *sData = gip->getData()->c_str();
+				trap->Print( "Got GeoIP data. IP: %s Data: %s",
+					gip->getIp().c_str(), sData
+				);
+				Q_strncpyz( ent->client->sess.geoipData, sData, sizeof(ent->client->sess.geoipData) );
+			}
+			else {
+				trap->Print( "Failed to Get GeoIP data. IP: %s Error: %s",
+					gip->getIp().c_str(), gip->getData()->c_str()
+				);
+				Q_strncpyz( ent->client->sess.geoipData, "Unknown", sizeof(ent->client->sess.geoipData) );
+			}
+			delete gip;
+			pending_list[clientNum] = nullptr;
+		}
+	}
+
 	G_LogPrintf(level.log.console, "ClientConnect: %i (%s" S_COLOR_WHITE ") [IP: %s" S_COLOR_WHITE "]\n", clientNum, client->pers.netname, tmpIP );
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
 	if ( firstTime ) {
-		trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s From: %s\n\"", client->pers.netname,
-			G_GetStringEdString( "MP_SVGAME", "PLCONNECT" ), ent->client->sess.geoipData.c_str() ) );
+		trap->SendServerCommand( -1,
+			va( "print \"%s" S_COLOR_WHITE " %s From: %s\n\"",
+				client->pers.netname,
+				G_GetStringEdString( "MP_SVGAME", "PLCONNECT" ),
+				ent->client->sess.geoipData
+			)
+		);
 	}
 
 	if ( level.gametype >= GT_TEAM && client->sess.sessionTeam != TEAM_SPECTATOR ) {

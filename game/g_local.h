@@ -459,7 +459,7 @@ typedef struct clientSession_s {
 	int					duelTeam;
 	int					siegeDesiredTeam;
 	char				IP[NET_ADDRSTRMAXLEN];
-	std::string			geoipData;
+	char				geoipData[128];
 } clientSession_t;
 
 typedef struct clientPersistant_s {
@@ -1137,10 +1137,10 @@ extern const stringID_table_t TeamTable[];
 
 class GeoIPData {
 private:
-	int status;
-	std::string ip;
-	std::string data;
-	bool ready;
+	int status = 0;
+	std::string ip = "";
+	std::string data = "";
+	bool ready = false;
 public:
 	GeoIPData(const std::string ip) : ip(ip) {};
 	~GeoIPData() {};

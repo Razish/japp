@@ -305,6 +305,7 @@
     <File Name="game/bg_luainternal.h"/>
     <File Name="game/bg_animTable.cpp"/>
     <File Name="game/bg_animTable.h"/>
+    <File Name="game/g_geoip.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="cJSON">
     <File Name="cJSON/cJSON.c"/>
@@ -507,6 +508,13 @@
     <File Name="semver/semver.c"/>
     <File Name="semver/semver.h"/>
     <File Name="semver/SConscript"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="maxmind">
+    <File Name="maxmind/maxminddb_config.h"/>
+    <File Name="maxmind/maxminddb-compat-util.h"/>
+    <File Name="maxmind/maxminddb.h"/>
+    <File Name="maxmind/SConscript"/>
+    <File Name="maxmind/maxminddb.c"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>
@@ -747,11 +755,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="maxmind">
-    <File Name="maxmind/maxminddb_config.h"/>
-    <File Name="maxmind/maxminddb-compat-util.h"/>
-    <File Name="maxmind/maxminddb.h"/>
-    <File Name="maxmind/SConscript"/>
-    <File Name="maxmind/maxminddb.c"/>
-  </VirtualDirectory>
 </CodeLite_Project>
