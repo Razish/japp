@@ -67,33 +67,25 @@ static void CG_ScoresUp_f( void ) {
 	}
 }
 
-static void CG_TellTarget_f( void ) {
-	int		clientNum;
-	char	command[128];
-	char	message[128];
-
-	clientNum = CG_CrosshairPlayer();
-	if ( clientNum == -1 )
-		return;
-
-	trap->Cmd_Args( message, sizeof(message) );
-	Com_sprintf( command, sizeof(command), "tell %i %s", clientNum, message );
-	trap->SendClientCommand( command );
-}
-
-static void CG_TellAttacker_f( void ) {
-	int		clientNum;
-	char	command[128];
-	char	message[128];
-
-	clientNum = CG_LastAttacker();
+static void CG_TellClient( int clientNum ) {
 	if ( clientNum == -1 ) {
 		return;
 	}
 
+	char message[MAX_SAY_TEXT];
 	trap->Cmd_Args( message, sizeof(message) );
-	Com_sprintf( command, sizeof(command), "tell %i %s", clientNum, message );
-	trap->SendClientCommand( command );
+
+	char cmd[MAX_STRING_CHARS];
+	Com_sprintf( cmd, sizeof(cmd), "tell %i %s\n", clientNum, message );
+	trap->SendClientCommand( cmd );
+}
+
+static void CG_TellTarget_f( void ) {
+	CG_TellClient( CG_CrosshairPlayer() );
+}
+
+static void CG_TellAttacker_f( void ) {
+	CG_TellClient( CG_LastAttacker() );
 }
 
 void CG_SiegeBriefingDisplay( int team, qboolean dontShow );
