@@ -35,6 +35,19 @@ def cmp_version( v1, v2 ):
 		normalise( v2 )
 	)
 
+def run_command( cmd ):
+	import subprocess
+	p = subprocess.Popen(
+		cmd.split( ' ' ),
+		stdout=subprocess.PIPE,
+		stderr=subprocess.PIPE
+	)
+	out, err = p.communicate()
+	out = out.strip('\n') # bah why is this necessary
+	if err:
+		print( 'run_command: ' + err )
+	return 0 if not err else 1, out
+
 import platform
 plat = platform.system() # Windows or Linux
 try:
@@ -126,12 +139,11 @@ env['SHLINKCOMSTR'] = env['LINKCOMSTR'] = \
 	'%s   linking: %s$TARGET%s' % (colours['green'], colours['white'], colours['end'])
 
 # obtain the compiler version
-import commands
 if realcc == 'cl':
 	# msvc
 	ccversion = env['MSVC_VERSION']
 elif realcc == 'gcc' or realcc == 'clang':
-	status, ccrawversion = commands.getstatusoutput( realcc + ' -dumpversion' )
+	status, ccrawversion = run_command( realcc + ' -dumpversion' )
 	ccversion = None if status else ccrawversion
 
 # scons version
@@ -139,11 +151,11 @@ import SCons
 sconsversion = SCons.__version__
 
 # git revision
-status, rawrevision = commands.getstatusoutput( 'git rev-parse --short HEAD' )
+status, rawrevision = run_command( 'git rev-parse --short HEAD' )
 revision = None if status else rawrevision
 
 if revision:
-	status, dummy = commands.getstatusoutput( 'git diff-index --quiet HEAD' )
+	status, dummy = run_command( 'git diff-index --quiet HEAD' )
 	if status:
 		revision += '*'
 
@@ -151,12 +163,12 @@ if revision:
 def GetNumCores():
 	if plat == 'Linux' or plat == 'Darwin':
 		# works on recent mac/linux
-		status, num_cores = commands.getstatusoutput( 'getconf _NPROCESSORS_ONLN' )
+		status, num_cores = run_command( 'getconf _NPROCESSORS_ONLN' )
 		if status == 0:
 			return int(num_cores)
 
 		# only works on linux
-		status, num_cores = commands.getstatusoutput( 'cat /proc/cpuinfo | grep processor | wc -l' )
+		status, num_cores = run_command( 'cat /proc/cpuinfo | grep processor | wc -l' )
 		if status == 0:
 			return int(num_cores)
 
@@ -191,13 +203,13 @@ if not env.GetOption( 'clean' ):
 
 	# build environment
 	if 'SCONS_DEBUG' in os.environ:
-		msg += realcc + ' located at ' + commands.getoutput( 'where ' + realcc ).split( '\n' )[0] + '\n'
+		msg += realcc + ' located at ' + run_command( 'where ' + realcc )[1].split( '\n' )[0] + '\n'
 		if 'AR' in env:
-			msg += env['AR'] + ' located at ' + commands.getoutput( 'where ' + env['AR'] ).split( '\n' )[0] + '\n'
+			msg += env['AR'] + ' located at ' + run_command( 'where ' + env['AR'] )[1].split( '\n' )[0] + '\n'
 		if 'AS' in env:
-			msg += env['AS'] + ' located at ' + commands.getoutput( 'where ' + env['AS'] ).split( '\n' )[0] + '\n'
+			msg += env['AS'] + ' located at ' + run_command( 'where ' + env['AS'] )[1].split( '\n' )[0] + '\n'
 		msg += 'python located at ' + sys.executable + '\n'
-		msg += 'scons' + ' located at ' + commands.getoutput( 'where ' + 'scons' ).split( '\n' )[0] + '\n'
+		msg += 'scons' + ' located at ' + run_command( 'where ' + 'scons' )[1].split( '\n' )[0] + '\n'
 
 	print( msg )
 
