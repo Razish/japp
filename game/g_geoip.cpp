@@ -41,7 +41,7 @@ namespace GeoIP {
 							}
 
 							error = GetLastError();
-							Com_DPrintf(
+							trap->Print(
 								"FS_WriteToTemporaryFile failed for '%s'. Win32 error code: 0x%08x\n",
 								fs_temporaryFileNames[fs_temporaryFileWriteIdx],
 								error
@@ -74,21 +74,21 @@ namespace GeoIP {
 					}
 					else {
 						error = GetLastError();
-						Com_DPrintf( "FS_WriteToTemporaryFile failed to write '%s'. Win32 error code: 0x%08x\n",
+						trap->Print( "FS_WriteToTemporaryFile failed to write '%s'. Win32 error code: 0x%08x\n",
 							tempFileName, error
 						);
 					}
 				}
 				else {
 					error = GetLastError();
-					Com_DPrintf( "FS_WriteToTemporaryFile failed to create '%s'. Win32 error code: 0x%08x\n",
+					trap->Print( "FS_WriteToTemporaryFile failed to create '%s'. Win32 error code: 0x%08x\n",
 						tempFileName, error
 					);
 				}
 			}
 			else {
 				error = GetLastError();
-				Com_DPrintf( "FS_WriteToTemporaryFile failed to generate temporary file name. Win32 error code: 0x%08x\n",
+				trap->Print( "FS_WriteToTemporaryFile failed to generate temporary file name. Win32 error code: 0x%08x\n",
 					error
 				);
 			}
@@ -96,7 +96,7 @@ namespace GeoIP {
 		else
 		{
 			error = GetLastError();
-			Com_DPrintf( "FS_WriteToTemporaryFile failed to get temporary file folder. Win32 error code: 0x%08x\n",
+			trap->Print( "FS_WriteToTemporaryFile failed to get temporary file folder. Win32 error code: 0x%08x\n",
 				error
 			);
 		}
