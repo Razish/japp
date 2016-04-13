@@ -2695,9 +2695,11 @@ void ClientThink_real( gentity_t *ent ) {
 			break;
 		case GENCMD_FORCE_THROW:
 			if (ent->client->ps.forceDodgeAnim == BOTH_KISSEE){
-				extern qboolean SetEmote(gentity_t *ent, const emote_t *emote);
-				static const emote_t emote = { "smack", BOTH_FORCEGRIP3THROW, MAX_ANIMATIONS, EMF_HOLSTER };
-				SetEmote(ent, &emote);
+
+				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+				ent->client->ps.forceHandExtendTime = level.time + BG_AnimLength(ent->localAnimIndex, BOTH_FORCEGRIP3THROW);
+				ent->client->ps.forceDodgeAnim = BOTH_FORCEGRIP3THROW;
+
 				G_SoundOnEnt(ent, CHAN_BODY, "sound/weapons/melee/punch2.mp3");
 				break;
 			}
