@@ -1434,14 +1434,13 @@ void Q_OpenURL( const char *url ) {
 #if defined(_WIN32)
 	ShellExecute( NULL, "open", url, NULL, NULL, SW_SHOWNORMAL );
 #elif defined(MACOS_X)
-	CFURLRef urlRef = CFURLCreateWithBytes( NULL, (UInt8*)url, strlen( url ), kCFStringEncodingASCII, NULL );
-		LSOpenCFURLRef( urlRef, 0 );
+	CFURLRef urlRef = CFURLCreateWithBytes( NULL, (UInt8 *)url, strlen( url ), kCFStringEncodingASCII, NULL );
+	LSOpenCFURLRef( urlRef, 0 );
 	CFRelease( urlRef );
 #elif defined(__linux__)
-	#if defined(_DEBUG)
-	int ret =
-	#endif
-		system( va( "xdg-open \"%s\"", url ) );
-	assert( ret == 0 );
+	int ret = system( va( "xdg-open \"%s\"", url ) );
+	if ( ret != EXIT_SUCCESS ) {
+		trap->Print( "Could not open URL: %s\n", url );
+	}
 #endif
 }
