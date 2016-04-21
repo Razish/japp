@@ -231,9 +231,7 @@ void CG_ChatboxOutgoing( void ) {
 
 static const char *preMatches[] = {
 	"www.",
-	"http://",
-	"https://",
-	"ftp://"
+	"://"
 };
 static const char *postMatches[] = {
 	".com",
@@ -263,20 +261,29 @@ static size_t CG_ParseURLs( char *message ) {
 
 		ptrdiff_t offset = p - scratch;
 		size_t len = strlen( p );
-		for ( const char *match : preMatches ) {
-			size_t matchLen = strlen( match );
+		for ( const char *preMatch : preMatches ) {
+			size_t matchLen = strlen( preMatch );
 			if ( len < matchLen ) {
 				break;
 			}
-			if ( !Q_strncmp( p, match, matchLen ) ) {
+			if ( !Q_strncmp( p, preMatch, matchLen ) ) {
 				// got a pre match, try to verify with a post match
 				for ( char *dot = p; (dot = strchr( dot, '.' )) != nullptr; dot++ ) {
-					for ( const char *match : postMatches ) {
-						size_t matchLen = strlen( match );
+					for ( const char *postMatch : postMatches ) {
+						size_t matchLen = strlen( postMatch );
 						if ( len < matchLen ) {
 							break;
 						}
-						if ( !Q_strncmp( dot, match, matchLen ) ) {
+						if ( !Q_strncmp( dot, postMatch, matchLen ) ) {
+							const char *p2 = postMatch;
+							while ( p2-p > 0 ) {
+								p2--;
+								if ( *--p2 == ' ' ) {
+									size_t realPreLength = postMatch - p2;
+									offset = (p - scratch) - realPreLength;
+									break;
+								}
+							}
 							return offset;
 						}
 					}
@@ -286,12 +293,12 @@ static size_t CG_ParseURLs( char *message ) {
 
 		// no pre matches, can still try post matches
 		for ( char *dot = p; (dot = strchr( dot, '.' )) != nullptr; dot++ ) {
-			for ( const char *match : postMatches ) {
-				size_t matchLen = strlen( match );
+			for ( const char *postMatch : postMatches ) {
+				size_t matchLen = strlen( postMatch );
 				if ( len < matchLen ) {
 					break;
 				}
-				if ( !Q_strncmp( dot, match, matchLen ) ) {
+				if ( !Q_strncmp( dot, postMatch, matchLen ) ) {
 					return offset;
 				}
 			}
@@ -505,6 +512,20 @@ static const char *GetPreText( qboolean clean ) {
 	}
 }
 
+static char GetChatColour( void ) {
+	switch ( chatMode ) {
+	default:
+	case CHAT_ALL:
+		return COLOR_GREEN;
+
+	case CHAT_TEAM:
+		return COLOR_CYAN;
+
+	case CHAT_WHISPER:
+		return COLOR_MAGENTA;
+	}
+}
+
 void CG_ChatboxDraw( void ) {
 	int i = MAX_CHATBOX_ENTRIES - std::min( cg_chatboxLineCount.integer, currentChatbox->numActiveLines );
 	int numLines = 0, done = 0, j = 0;
@@ -629,7 +650,7 @@ void CG_ChatboxDraw( void ) {
 		const char *pre = GetPreText( qfalse );
 		const char *cleanPre = GetPreText( qtrue );
 		char msg[MAX_EDIT_LINE];
-		Com_sprintf( msg, sizeof(msg), pre, chatField.buffer );
+		Com_sprintf( msg, sizeof(msg), pre, va( S_COLOR_ESCAPE "%c%s", GetChatColour(), chatField.buffer ) );
 		const float height = Text_Height( msg, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
 		inputLineHeight = height;
 		inputLineWidth = Text_Width( msg, cg.chatbox.size.scale, CG_GetChatboxFont(), false );

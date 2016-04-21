@@ -730,6 +730,7 @@ extern const vector4 colorDkBlue;
 #define COLOR_GREY		'9'
 #define ColorIndex(c)	( ( (c) - '0' ) & Q_COLOR_BITS )
 
+#define S_COLOR_ESCAPE	"^"
 #define S_COLOR_BLACK	"^0"
 #define S_COLOR_RED		"^1"
 #define S_COLOR_GREEN	"^2"
