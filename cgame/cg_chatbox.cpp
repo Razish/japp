@@ -714,7 +714,7 @@ void CG_ChatboxTabComplete( void ) {
 		char *p = &chatField.buffer[0];//[chatField->cursor];
 
 		p = &chatField.buffer[chatField.cursor];
-		//find current word
+		// find current word
 		while ( p > &chatField.buffer[0] && *(p - 1) != ' ' ) {
 			p--;
 		}
@@ -1016,12 +1016,36 @@ static void Field_CharEvent( field_t *edit, int key ) {
 
 		case A_MOUSE1: {
 			if ( Q_PointInBounds( cgs.cursorX, cgs.cursorY, cg.chatbox.pos.x, inputLinePosY,
-					inputLineWidth, inputLineHeight ) )
+					SCREEN_WIDTH, inputLineHeight ) )
 			{
-				//TODO: positioning cursor
-				//TODO: drag-selection
+				const char *pre = GetPreText( qtrue );
+				const size_t bias = strlen( pre );
+				char msg[MAX_EDIT_LINE];
+				Com_sprintf( msg, sizeof(msg), va( "%s%s", pre, chatField.buffer ) );
+
+				// update the cursor position by checking the entire width character by character
+				//	this approach should work well with JA's crappy font code
+				bool cursorSet = false;
+				char savedChar;
+				size_t i = bias + 1u;
+				do {
+					savedChar = msg[i];
+					msg[i] = '\0';
+					edit->cursor = i - bias - 1;
+					//TODO: drag-selection
+					float width = Text_Width( msg, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
+					if ( cgs.cursorX < cg.chatbox.pos.x + width ) {
+						cursorSet = true;
+						break;
+					}
+					msg[i] = savedChar;
+				} while ( i == 1u || msg[i++] );
+
+				if ( !cursorSet ) {
+					edit->cursor = fieldLen;
+				}
 			}
-			if ( Q_PointInBounds( cgs.cursorX, cgs.cursorY, cg.chatbox.pos.x, cg.chatbox.pos.y,
+			else if ( Q_PointInBounds( cgs.cursorX, cgs.cursorY, cg.chatbox.pos.x, cg.chatbox.pos.y,
 					chatboxWidth, chatboxHeight ) )
 			{
 				// check for URLs
