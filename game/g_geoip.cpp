@@ -15,7 +15,9 @@ namespace GeoIP {
 	static char		fs_temporaryFileNames[8][MAX_OSPATH];
 #endif
 
-	qboolean WriteToTemporaryFile( const void *data, size_t dataLength, char **tempFilePath ) {
+	// caller must free() tempFilePath is return value is true
+	// extension is only used on linux and mac but should be in the form ".dat"
+	bool WriteToTemporaryFile( const void *data, size_t dataLength, char **tempFilePath, const char *extension ) {
 	#if defined(_WIN32)
 		DWORD error;
 		TCHAR tempPath[MAX_PATH];
@@ -42,9 +44,8 @@ namespace GeoIP {
 
 							error = GetLastError();
 							trap->Print(
-								"FS_WriteToTemporaryFile failed for '%s'. Win32 error code: 0x%08x\n",
-								fs_temporaryFileNames[fs_temporaryFileWriteIdx],
-								error
+								"%s failed for '%s'. Win32 error code: 0x%08x\n",
+								JAPP_FUNCTION, fs_temporaryFileNames[fs_temporaryFileWriteIdx], error
 							);
 
 							// Failed to delete, possibly because DLL was still in use. This can
@@ -70,80 +71,77 @@ namespace GeoIP {
 							Q_strncpyz( *tempFilePath, tempFileName, fileNameLen + 1 );
 						}
 
-						return qtrue;
+						return true;
 					}
 					else {
 						error = GetLastError();
-						trap->Print( "FS_WriteToTemporaryFile failed to write '%s'. Win32 error code: 0x%08x\n",
-							tempFileName, error
+						trap->Print( "%s failed to write '%s'. Win32 error code: 0x%08x\n",
+							JAPP_FUNCTION, tempFileName, error
 						);
 					}
 				}
 				else {
 					error = GetLastError();
-					trap->Print( "FS_WriteToTemporaryFile failed to create '%s'. Win32 error code: 0x%08x\n",
-						tempFileName, error
+					trap->Print( "%s failed to create '%s'. Win32 error code: 0x%08x\n",
+						JAPP_FUNCTION, tempFileName, error
 					);
 				}
 			}
 			else {
 				error = GetLastError();
-				trap->Print( "FS_WriteToTemporaryFile failed to generate temporary file name. Win32 error code: 0x%08x\n",
-					error
+				trap->Print( "%s failed to generate temporary file name. Win32 error code: 0x%08x\n",
+					JAPP_FUNCTION, error
 				);
 			}
 		}
 		else
 		{
 			error = GetLastError();
-			trap->Print( "FS_WriteToTemporaryFile failed to get temporary file folder. Win32 error code: 0x%08x\n",
-				error
+			trap->Print( "%s failed to get temporary file folder. Win32 error code: 0x%08x\n",
+				JAPP_FUNCTION, error
 			);
 		}
-	#elif defined(__linux__)
-		// buffer to hold the temporary file name
-		char nameBuff[32]{};
+	#elif defined(__linux__) || defined(MACOS_X)
+		// grab the best path for the temporary file
+	#if 0
+		const char *tmpDir = getenv( "TMPDIR" );
+		if ( !tmpDir || !tmpDir[0] ) {
+			tmpDir = "/tmp";
+		}
+	#else
+		const char *tmpDir = ".";
+	#endif
+		char absPath[MAX_OSPATH];
+		Com_sprintf( absPath, sizeof(absPath), "%s/maxmind-XXXXXX%s", tmpDir, extension );
 
-		// buffer to hold data to be written/read to/from temporary file
-		char buffer[24]{};
-
-		// Copy the relevant information in the buffers
-		strncpy( nameBuff, "/tmp/myTmpFile-XXXXXX", 21 );
-		strncpy( buffer, "Hello World", 11 );
-
+		// create the temporary file, this function will replace the Xs
 		errno = 0;
-		// Create the temporary file, this function will replace the 'X's
-		int filedes = mkstemp( nameBuff );
-
-		// Call unlink so that whenever the file is closed or the program exits
-		// the temporary file is deleted
-		unlink( nameBuff );
+		int filedes = mkstemps( absPath, strlen(extension) );
+		unlink( absPath ); // so the temporary file is deleted when closed/program exits
 
 		if ( filedes < 1 ) {
-			printf( "\n Creation of temp file failed with error [%s]\n", strerror( errno ) );
-			return 1;
+			trap->Print( "failed to create temporary file: %s\n", absPath, strerror( errno ) );
+			return true;
 		}
 		else {
-			printf( "\n Temporary file [%s] created\n", nameBuff );
+			trap->Print( "created temporary file: %s\n", absPath );
 		}
 
+		// write to the temporary file
 		errno = 0;
-		// Write some data to the temporary file
-		if ( -1 == write( filedes, data, dataLength ) ) {
-			printf( "\n write failed with error [%s]\n", strerror( errno ) );
-			return 1;
+		if ( write( filedes, data, dataLength ) == -1 ) {
+			trap->Print( "failed to write to temporary file %s: %s\n", absPath, strerror( errno ) );
+			return true;
 		}
 
 		if ( tempFilePath ) {
-			size_t fileNameLen = strlen( nameBuff );
+			size_t fileNameLen = strlen( absPath );
 			*tempFilePath = (char *)malloc( fileNameLen + 1 );
-			Q_strncpyz( *tempFilePath, nameBuff, fileNameLen + 1 );
+			Q_strncpyz( *tempFilePath, absPath, fileNameLen + 1 );
 		}
-
-		return qtrue;
 	#endif
 
-		return qfalse;
+		return false;
 	}
 
 	bool Init( void ) {
@@ -153,10 +151,7 @@ namespace GeoIP {
 		handle = new MMDB_s{};
 		int status = -1;
 
-		char fs_gameString[MAX_CVAR_VALUE_STRING];
-		trap->Cvar_VariableStringBuffer( "fs_game", fs_gameString, sizeof(fs_gameString) );
-		const char *sPath = va( "%s/GeoLite2-Country.mmdb", fs_gameString );
-
+		const char *sPath = "GeoLite2-Country.mmdb";
 		trap->Print( "Loading %s\n", sPath );
 		fileHandle_t f = NULL_FILE;
 		unsigned int len = trap->FS_Open( sPath, &f, FS_READ );
@@ -182,21 +177,34 @@ namespace GeoIP {
 		trap->FS_Close( f );
 		buf[len] = '\0';
 
-		// pass it off to the json reader
-		char *tmpFilePath = nullptr;
-		trap->Print( "writing to temporary file\n" );
-		if ( WriteToTemporaryFile( buf, len, &tmpFilePath ) ) {
-			trap->Print( "loading from temporary file %s\n", tmpFilePath );
-			if ( (status = MMDB_open( tmpFilePath, MMDB_MODE_MMAP, handle ) ) != MMDB_SUCCESS ) {
-				trap->Print( "Error occured while initialising MaxMind GeoIP: \"%s\"\n", MMDB_strerror( status ) );
-				delete handle;
-				handle = nullptr;
-				return false;
+		const char *extension = nullptr;
+		for ( const char *p = sPath + strlen(sPath); p != sPath; p-- ) {
+			if ( *p == '.' ) {
+				extension = p;
+				break;
 			}
 		}
+		char *tmpFilePath = nullptr;
+		if ( WriteToTemporaryFile( buf, len, &tmpFilePath, extension ) ) {
+			trap->Print( "Failed to create temporary file\n" );
+			free( buf );
+			return false;
+		}
 
+		trap->Print( "loading from temporary file %s\n", tmpFilePath );
+		status = MMDB_open( tmpFilePath, MMDB_MODE_MMAP, handle );
+		if ( status != MMDB_SUCCESS ) {
+			trap->Print( "Error occured while initialising MaxMind GeoIP: \"%s\"\n", MMDB_strerror( status ) );
+			delete handle;
+			handle = nullptr;
+
+			free( tmpFilePath );
+			free( buf );
+			return false;
+		}
+
+		free( tmpFilePath );
 		free( buf );
-
 		return true;
 	}
 
