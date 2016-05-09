@@ -857,10 +857,13 @@ void UI_SetColor( const vector4 *rgba ) {
 }
 
 void UI_CleanupGhoul2( void );
+void UI_FreeAllSpecies( void );
 
 void UI_Shutdown( void ) {
 	trap->LAN_SaveCachedServers();
 	UI_CleanupGhoul2();
+
+	UI_FreeAllSpecies();
 
 #ifdef FAV_SERVERS
 	JP_SaveFavServers();
