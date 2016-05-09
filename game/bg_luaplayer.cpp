@@ -642,13 +642,13 @@ namespace JPLua {
 
 	#if defined(PROJECT_GAME)
 	static void Player_SetEFlags( lua_State *L, jpluaEntity_t *ent ) {
-		ent->client->ps.eFlags = luaL_checkinteger( L, 3 );
+		ent->s.eFlags = ent->client->ps.eFlags = luaL_checkinteger( L, 3 );
 	}
 	#endif
 
 	#if defined(PROJECT_GAME)
 	static void Player_SetEFlags2( lua_State *L, jpluaEntity_t *ent ) {
-		ent->client->ps.eFlags2 = luaL_checkinteger( L, 3 );
+		ent->s.eFlags2 = ent->client->ps.eFlags2 = luaL_checkinteger( L, 3 );
 	}
 	#endif
 
@@ -883,6 +883,7 @@ namespace JPLua {
 	}
 	#endif
 
+	// Player.entity
 	static int Player_ToEntity( lua_State *L, jpluaEntity_t *ent ) {
 		Entity_CreateRef( L, ent );
 		return 1;
@@ -1687,6 +1688,7 @@ namespace JPLua {
 	}
 	#endif
 
+	// Player:ToEntity()
 	static int Player_ToEntity(lua_State *L){
 		luaPlayer_t *player = CheckPlayer(L, 1);
 		jpluaEntity_t *ent = &ents[player->clientNum];

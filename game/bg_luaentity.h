@@ -56,6 +56,7 @@ namespace JPLua {
 	};
 	int EntityPropertyCompare( const void *a, const void *b );
 
+	int Entity_GetMetaTable( lua_State *L );
 	void Register_Entity( lua_State *L );
 	void Entity_CreateRef( lua_State *L, jpluaEntity_t *ent );
 	int Entity_Get( lua_State *L );

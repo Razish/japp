@@ -22,6 +22,14 @@ namespace JPLua {
 	static jpluaEntity_t *ents = cg_entities;
 #endif
 
+	static entityState_t *GetEntitystate( jpluaEntity_t *ent ) {
+	#if defined(PROJECT_GAME)
+		return &ent->s;
+	#elif defined(PROJECT_CGAME)
+		return &ent->currentState;
+	#endif
+	}
+
 	int EntityPropertyCompare( const void *a, const void *b ) {
 		return strcmp( (const char *)a, ((entityProperty_t *)b)->name );
 	}
@@ -42,9 +50,13 @@ namespace JPLua {
 			return;
 		}
 #elif defined PROJECT_CGAME
-		if ( ent ){ /// : dddd
+		if ( ent && ent->currentValid ) {
 			data = (luaEntity_t *)lua_newuserdata( L, sizeof(luaEntity_t) );
 			data->id = ent->currentState.number;
+		}
+		else {
+			lua_pushnil( L );
+			return;
 		}
 #endif
 		luaL_getmetatable( L, ENTITY_META );
@@ -70,15 +82,18 @@ namespace JPLua {
 		return ent;
 	}
 
+	int Entity_GetMetaTable( lua_State *L ) {
+		luaL_getmetatable( L, ENTITY_META );
+		return 1;
+	}
+
 	static int Entity_Equals( lua_State *L ) {
-		const jpluaEntity_t *e1 = CheckEntity( L, 1 ), *e2 = CheckEntity( L, 2 );
+		jpluaEntity_t *e1 = CheckEntity( L, 1 );
+		jpluaEntity_t *e2 = CheckEntity( L, 2 );
+		const entityState_t *es1 = GetEntitystate( e1 );
+		const entityState_t *es2 = GetEntitystate( e2 );
 
-#ifdef PROJECT_GAME
-		lua_pushboolean( L, (e1->s.number == e2->s.number) ? 1 : 0);
-#elif defined PROJECT_CGAME
-		lua_pushboolean( L, (e1->currentState.number == e2->currentState.number) ? 1 : 0 );
-#endif
-
+		lua_pushboolean( L, (es1->number == es2->number) ? 1 : 0 );
 		return 1;
 	}
 
@@ -812,12 +827,59 @@ namespace JPLua {
 	}
 #endif
 
-#ifdef PROJECT_GAME
-	static int Entity_GetEType(lua_State *L, jpluaEntity_t *ent){
-		lua_pushinteger(L, ent->s.eType);
+	static int Entity_GetEFlags( lua_State *L, jpluaEntity_t *ent ) {
+		const entityState_t *es = GetEntitystate( ent );
+
+		if ( es ) {
+			lua_pushinteger( L, es->eFlags );
+		}
+		else {
+			lua_pushnil( L );
+		}
+
 		return 1;
 	}
 
+#if defined(PROJECT_GAME)
+	static void Entity_SetEFlags( lua_State *L, jpluaEntity_t *ent ) {
+		const int eFlags = luaL_checkinteger( L, 3 );
+		ent->s.eFlags = eFlags;
+		if ( ent->client ) {
+			ent->client->ps.eFlags = eFlags;
+		}
+	}
+#endif
+
+	static int Entity_GetEFlags2( lua_State *L, jpluaEntity_t *ent ) {
+		const entityState_t *es = GetEntitystate( ent );
+
+		if ( es ) {
+			lua_pushinteger( L, es->eFlags2 );
+		}
+		else {
+			lua_pushnil( L );
+		}
+
+		return 1;
+	}
+
+#if defined(PROJECT_GAME)
+	static void Entity_SetEFlags2( lua_State *L, jpluaEntity_t *ent ) {
+		const int eFlags2 = luaL_checkinteger( L, 3 );
+		ent->s.eFlags2 = eFlags2;
+		if ( ent->client ) {
+			ent->client->ps.eFlags2 = eFlags2;
+		}
+	}
+#endif
+
+	static int Entity_GetEType(lua_State *L, jpluaEntity_t *ent){
+		const entityState_t *es = GetEntitystate( ent );
+		lua_pushinteger( L, es->eType );
+		return 1;
+	}
+
+#ifdef PROJECT_GAME
 	static void Entity_SetEType(lua_State *L, jpluaEntity_t *ent){
 		ent->s.eType = lua_tointeger(L, 3);
 	}
@@ -869,29 +931,35 @@ namespace JPLua {
 #endif
 
 #ifdef PROJECT_GAME
-	static int Entity_GetPos_2(lua_State *L, jpluaEntity_t *ent){ //crying(
-		lua_newtable(L);
-		int top = lua_gettop(L);
-		lua_pushstring(L, "pos1");Vector_CreateRef(L, &ent->pos1);lua_settable(L, top);
-		lua_pushstring(L, "pos2");Vector_CreateRef(L, &ent->pos2);lua_settable(L, top);
-		lua_pushstring(L, "pos3");Vector_CreateRef(L, &ent->pos3);lua_settable(L, top);
+	static int Entity_GetMoverPos( lua_State *L, jpluaEntity_t *ent ) {
+		lua_newtable( L );
+		int top = lua_gettop( L );
+		lua_pushstring( L, "pos1" );
+			Vector_CreateRef( L, &ent->pos1 );
+			lua_settable( L, top );
+		lua_pushstring( L, "pos2" );
+			Vector_CreateRef( L, &ent->pos2 );
+			lua_settable( L, top );
+		lua_pushstring( L, "pos3" );
+			Vector_CreateRef( L, &ent->pos3 );
+			lua_settable( L, top );
 		return 1;
 	}
 
-	static void Entity_SetPos_2(lua_State *L, jpluaEntity_t *ent){
-		if ( lua_type( L, 3) != LUA_TTABLE ) {
-			trap->Print( "JPLua::Entity_SetPos_2 failed, not a table\n" );
+	static void Entity_SetMoverPos( lua_State *L, jpluaEntity_t *ent ) {
+		if ( lua_type( L, 3 ) != LUA_TTABLE ) {
+			trap->Print( "JPLua::Entity_SetMoverPos failed, not a table\n" );
 			return;
 		}
 		lua_getfield( L, 3, "pos1" );
-		VectorCopy(CheckVector(L,-1), &ent->pos1);
-		lua_pop(L,1);
+			VectorCopy( CheckVector( L, -1 ), &ent->pos1 );
+			lua_pop( L, 1 );
 		lua_getfield( L, 3, "pos2" );
-		VectorCopy(CheckVector(L,-1), &ent->pos2);
-		lua_pop(L,1);
+			VectorCopy( CheckVector( L, -1 ), &ent->pos2 );
+			lua_pop( L, 1 );
 		lua_getfield( L, 3, "pos3" );
-		VectorCopy(CheckVector(L,-1), &ent->pos3);
-		lua_pop(L,1);
+			VectorCopy( CheckVector( L, -1 ), &ent->pos3 );
+			lua_pop( L, 1 );
 	}
 #endif
 
@@ -1007,13 +1075,35 @@ namespace JPLua {
 		},
 #endif
 
+		{
+			"eFlags",
+			Entity_GetEFlags,
 #if defined(PROJECT_GAME)
+			Entity_SetEFlags
+#elif defined(PROJECT_CGAME)
+			nullptr
+#endif
+		},
+
+		{
+			"eFlags2",
+			Entity_GetEFlags2,
+#if defined(PROJECT_GAME)
+			Entity_SetEFlags2
+#elif defined(PROJECT_CGAME)
+			nullptr
+#endif
+		},
+
 		{
 			"eType",
 			Entity_GetEType,
+#if defined(PROJECT_GAME)
 			Entity_SetEType
-		},
+#elif defined(PROJECT_CGAME)
+			nullptr
 #endif
+		},
 
 #if defined(PROJECT_GAME)
 		{
@@ -1082,6 +1172,15 @@ namespace JPLua {
 			nullptr
 #endif
 		},
+
+#if defined(PROJECT_GAME)
+		{
+			"moverPosition",
+			Entity_GetMoverPos,
+			Entity_SetMoverPos
+		},
+#endif
+
 #if defined(PROJECT_GAME)
 		{
 			"nextthink",
@@ -1089,6 +1188,7 @@ namespace JPLua {
 			Entity_SetNextthink
 		},
 #endif
+
 #if defined(PROJECT_GAME)
 		{
 			"parent",
@@ -1120,13 +1220,6 @@ namespace JPLua {
 			nullptr
 #endif
 		},
-#if defined(PROJECT_GAME)
-		{
-			"position_2",
-			Entity_GetPos_2,
-			Entity_SetPos_2
-		},
-#endif
 
 #if defined(PROJECT_GAME)
 		{

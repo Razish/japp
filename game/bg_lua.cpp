@@ -673,7 +673,7 @@ namespace JPLua {
 				lua_pushstring(L, "requiredJPLuaversion"); lua_pushstring(L, buf); lua_settable(L, top2);
 				semver_render(&plugin->version, buf);
 				lua_pushstring(L, "requiredJPLuaversion"); lua_pushstring(L, buf); lua_settable(L, top2);
-				
+
 				lua_settable(L, top);
 			}
 		}
@@ -1560,6 +1560,7 @@ namespace JPLua {
 		{ "FindEntityByClassname", FindEntityByClassName },
 	#endif
 		{ "GetEntity", Entity_Get }, // GetEntity(num) or GetEntity() for full list
+		{ "GetEntityTable", Entity_GetMetaTable }, // Entity.meta GetEntityTable()
 		{ "GetFileList", File_GetFileList}, // table GetFileList(string path, string extension)
 	#ifdef PROJECT_CGAME
 		{ "GetFPS", Export_GetFPS }, // integer GetFPS()
@@ -1597,6 +1598,7 @@ namespace JPLua {
 	#endif
 		{ "GetTime", Export_GetTime }, // integer GetTime()
 	#ifdef PROJECT_CGAME
+
 		{ "IsKeyDown", Export_IsKeyDown }, // boolean IsKeyDown( integer )
 	#endif
 	#ifdef PROJECT_GAME
@@ -1673,7 +1675,7 @@ namespace JPLua {
 		}
 
 		// set the ls.version
-		semver_parse( "13.3.7", &jpluaVersion );
+		semver_parse( "13.4.0", &jpluaVersion );
 
 		// set the callback in case of an error
 		lua_atpanic( ls.L, Error );
