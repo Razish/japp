@@ -744,7 +744,18 @@ void CG_ChatboxTabComplete( void ) {
 		if ( numMatches == 1 ) {
 			size_t oldCursor = chatField.cursor;
 			ptrdiff_t delta = &chatField.buffer[oldCursor] - p;
-			const char *str = va( "%s " S_COLOR_GREEN, cgs.clientinfo[match].name );
+
+			// find the last used colour
+			char previousColour = GetChatColour();
+			char *pc = &chatField.buffer[chatField.cursor];
+			while ( pc > &chatField.buffer[0] && *(pc - 1) != '^' ) {
+				pc--;
+			}
+			if ( pc - chatField.buffer > 0u ) {
+				previousColour = *pc;
+			}
+
+			const char *str = va( "%s " S_COLOR_ESCAPE "%c", cgs.clientinfo[match].name, previousColour );
 			size_t drawLen, len;
 
 			Q_strncpyz( p, str, sizeof(chatField.buffer) - (p - &chatField.buffer[0]) );
