@@ -352,7 +352,7 @@ static const resource_t gfx[] = {
 	{ &media.gfx.interface.forcePowerIcons[FP_SABER_OFFENSE], "gfx/mp/f_icon_saber_attack", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.forcePowerIcons[FP_SABER_DEFENSE], "gfx/mp/f_icon_saber_defend", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.forcePowerIcons[FP_SABERTHROW], "gfx/mp/f_icon_saber_throw", RFL_NOMIP, GTB_ALL },
-	{ &media.gfx.interface.hackerIcon, "gfx/mp/c_icon_tech", RFL_NOMIP, GTB_SIEGE },
+	{ &media.gfx.interface.hackerIcon, "gfx/mp/c_icon_tech", RFL_NOMIP, GTB_SIEGE|GTB_FFA },
 	{ &media.gfx.interface.heart, "ui/assets/statusbar/selectedhealth", RFL_NONE, GTB_ALL },
 //	{ &media.gfx.interface.invenIcons[HI_NONE], NULL, RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.invenIcons[HI_SEEKER], "gfx/hud/i_icon_seeker", RFL_NOMIP, GTB_ALL },
