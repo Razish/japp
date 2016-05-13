@@ -45,7 +45,7 @@ namespace GeoIP {
 							error = GetLastError();
 							trap->Print(
 								"%s failed for '%s'. Win32 error code: 0x%08x\n",
-								JAPP_FUNCTION, fs_temporaryFileNames[fs_temporaryFileWriteIdx], error
+								Q_FUNCTION, fs_temporaryFileNames[fs_temporaryFileWriteIdx], error
 							);
 
 							// Failed to delete, possibly because DLL was still in use. This can
@@ -76,21 +76,21 @@ namespace GeoIP {
 					else {
 						error = GetLastError();
 						trap->Print( "%s failed to write '%s'. Win32 error code: 0x%08x\n",
-							JAPP_FUNCTION, tempFileName, error
+							Q_FUNCTION, tempFileName, error
 						);
 					}
 				}
 				else {
 					error = GetLastError();
 					trap->Print( "%s failed to create '%s'. Win32 error code: 0x%08x\n",
-						JAPP_FUNCTION, tempFileName, error
+						Q_FUNCTION, tempFileName, error
 					);
 				}
 			}
 			else {
 				error = GetLastError();
 				trap->Print( "%s failed to generate temporary file name. Win32 error code: 0x%08x\n",
-					JAPP_FUNCTION, error
+					Q_FUNCTION, error
 				);
 			}
 		}
@@ -98,7 +98,7 @@ namespace GeoIP {
 		{
 			error = GetLastError();
 			trap->Print( "%s failed to get temporary file folder. Win32 error code: 0x%08x\n",
-				JAPP_FUNCTION, error
+				Q_FUNCTION, error
 			);
 		}
 	#elif defined(__linux__) || defined(MACOS_X)

@@ -31,7 +31,7 @@ static const char *TB_NearestAlly( void ) {
 		return "";
 	}
 
-	for ( size_t i = 0; i < cgs.maxclients; i++ ) {
+	for ( int i = 0; i < cgs.maxclients; i++ ) {
 		if ( i != cg.clientNum && cgs.clientinfo[i].team == cg.snap->ps.persistant[PERS_TEAM] ) {
 			float dist = Distance( &cg_entities[i].lerpOrigin, &cg.predictedPlayerState.origin );
 			if ( dist < bestDist ) {
