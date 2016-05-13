@@ -1500,8 +1500,9 @@ void CG_DrawHUD( centity_t *cent ) {
 							const char *s = CG_GetScoreString();
 							const float fontScale = 0.7f;
 							const int fontHandle = FONT_SMALL;
+							const float textWidth = Text_Width( s, fontScale, fontHandle, false );
 							//FIXME: right-aligned
-							Text_Paint( SCREEN_WIDTH - (SCREEN_WIDTH - focusItem->window.rect.x),
+							Text_Paint( SCREEN_WIDTH - (SCREEN_WIDTH - focusItem->window.rect.x) - textWidth,
 								focusItem->window.rect.y, fontScale, &focusItem->window.foreColor, s, 0.0f, 0,
 								ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
 							);
