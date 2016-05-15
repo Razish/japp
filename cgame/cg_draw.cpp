@@ -3985,7 +3985,7 @@ qboolean CG_DrawMapChange( void ) {
 	return qfalse;
 }
 
-#define	LAG_SAMPLES		128
+#define	LAG_SAMPLES		64
 
 static struct lagometer_s {
 	int		frameSamples[LAG_SAMPLES];
@@ -4158,8 +4158,8 @@ static void CG_DrawLagometer( void ) {
 
 	trap->R_SetColor( NULL );
 
-	const float fontScale = 0.5f;
-	const int fontHandle = FONT_SMALL;
+	const float fontScale = 0.33333f;
+	const int fontHandle = FONT_JAPPMONO;
 	if ( cg_noPredict.integer || g_synchronousClients.integer ) {
 		Text_Paint( x, y, fontScale, &colorTable[CT_WHITE], "snc", fontScale, 0, ITEM_TEXTSTYLE_SHADOWEDMORE,
 			fontHandle, false
@@ -4167,6 +4167,17 @@ static void CG_DrawLagometer( void ) {
 	}
 	else if ( cg.snap && cg_lagometer.integer == 2 ) {
 		Text_Paint( x, y, fontScale, &colorTable[CT_WHITE], va( "%i", cg.snap->ping ), 0.0f, 0,
+			ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+		);
+
+		int32_t total = 0u;
+		for ( size_t i = 0u; i < LAG_SAMPLES; i++ ) {
+			total += lagometer.frameSamples[i];
+		}
+		float avgXerp = total / (float)LAG_SAMPLES;
+		const char *xerpText = va( "%04.1f", avgXerp );
+		const float xerpWidth = Text_Width( xerpText, fontScale, fontHandle, false );
+		Text_Paint( x + (w * cgs.widthRatioCoef) - xerpWidth, y, fontScale, &colorTable[CT_WHITE], xerpText, 0.0f, 0,
 			ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
 		);
 	}
