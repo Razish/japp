@@ -385,7 +385,7 @@ static const resource_t gfx[] = {
 	{ &media.gfx.interface.pain, "gfx/misc/borgeyeflare", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.painShields, "gfx/mp/dmgshader_shields", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.painShieldsAndHealth, "gfx/mp/dmgshader_shieldsandhealth", RFL_NOMIP, GTB_ALL },
-	{ &media.gfx.interface.powerduelAlly, "gfx/mp/pduel_icon_double", RFL_NOMIP, GTB_POWERDUEL },
+	{ &media.gfx.interface.powerduelAlly, "gfx/mp/pduel_icon_double", RFL_NOMIP, GTB_POWERDUEL|GTB_FFA|GTB_TEAM },
 	{ &media.gfx.interface.radar, "gfx/menus/radar/radar", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.rageRecovery, "gfx/mp/f_icon_ragerec", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.scoreboardLine, "gfx/menus/scoreboard", RFL_NOMIP, GTB_ALL },
