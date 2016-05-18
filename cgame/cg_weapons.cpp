@@ -177,6 +177,31 @@ static void CG_CalculateWeaponPosition( vector3 *origin, vector3 *angles ) {
 		angles->yaw += scale * fracsin * cg.gunIdleDrift.amount.yaw;
 		angles->roll += scale * fracsin * cg.gunIdleDrift.amount.roll;
 	}
+
+	if ( cg_gunMomentumEnable.integer ) {
+		// sway viewmodel when changing viewangles
+		static vector3 previousAngles{};
+		static int previousTime = 0;
+
+		vector3 deltaAngles;
+		AnglesSubtract( angles, &previousAngles, &deltaAngles );
+		VectorScale( &deltaAngles, 1.0f, &deltaAngles );
+
+		const double dampTime = (double)(cg.time - previousTime) * (1.0 / (double)cg_gunMomentumInterval.integer);
+		const double dampRatio = std::pow( std::abs( (double)cg_gunMomentumDamp.value ), dampTime );
+		VectorMA( &previousAngles, dampRatio, &deltaAngles, angles );
+		VectorCopy( angles, &previousAngles );
+		previousTime = cg.time;
+
+		// move viewmodel downwards when jumping etc
+		static float previousOriginZ = 0.0f;
+		const float deltaZ = origin->z - previousOriginZ;
+		if ( deltaZ > 0.0f ) {
+			origin->z = origin->z - deltaZ * cg_gunMomentumFall.value;
+		}
+		previousOriginZ = origin->z;
+	}
+
 }
 
 static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups ) {

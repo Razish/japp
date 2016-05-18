@@ -648,15 +648,13 @@ float LerpAngle( float from, float to, float frac ) {
 
 // Always returns a value from -180 to 180
 float AngleSubtract( float a1, float a2 ) {
-	float	a;
-
-	a = a1 - a2;
-	a = fmod( a, 360 );//chop it down quickly, then level it out
+	float a = a1 - a2;
+	a = fmod( a, 360.0f ); // chop it down quickly, then level it out
 	while ( a > 180 ) {
-		a -= 360;
+		a -= 360.0f;
 	}
-	while ( a < -180 ) {
-		a += 360;
+	while ( a < -180.0f ) {
+		a += 360.0f;
 	}
 	return a;
 }

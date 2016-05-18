@@ -506,7 +506,9 @@ typedef struct chatBoxItem_s {
 typedef enum refdefView_e {
 	REFDEF_DEFAULT = 0,
 	REFDEF_AUTOMAP,
+#ifdef ENABLE_ALTVIEW
 	REFDEF_ALTVIEW,
+#endif
 	REFDEF_SCOREBOARD,
 	REFDEF_MAX
 } refdefViews_t;

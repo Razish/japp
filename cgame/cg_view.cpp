@@ -1710,6 +1710,7 @@ void CG_DrawAutoMap( void ) {
 	trap->R_RenderScene( &refdef );
 }
 
+#ifdef ENABLE_ALTVIEW
 static float altViewX = 0.0f, altViewY = 0.0f;
 void CG_DrawAltView( int clientNum ) {
 	clientInfo_t	*local;
@@ -1793,6 +1794,7 @@ void CG_DrawAltView( int clientNum ) {
 			altViewY = 0;
 	}
 }
+#endif
 
 static qboolean cg_rangedFogging = qfalse; //so we know if we should go back to normal fog
 float cg_linearFogOverride = 0.0f; //designer-specified override for linear fogging style
@@ -2312,14 +2314,16 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	cg.currentRefdef = REFDEF_AUTOMAP;
 	CG_DrawAutoMap();
 
+#ifdef ENABLE_ALTVIEW
 	cg.currentRefdef = REFDEF_ALTVIEW;
 	altViewX = 0;
 	altViewY = 0;
 	for ( int i = 0; i < 4; i++ ) {
-		//	CG_DrawAltView( i );
+			CG_DrawAltView( i );
 	}
 	altViewX = 0;
 	altViewY = 0;
+#endif
 
 	//Reset the refdef for future frames
 	cg.currentRefdef = REFDEF_DEFAULT;

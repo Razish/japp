@@ -380,7 +380,10 @@ void BG_ParseField( const BG_field_t *l_fields, int numFields, const char *key, 
 				((float *)(b + f->ofs))[2] = vec.z;
 			}
 			else {
-				Com_Printf( "BG_ParseField: F_VECTOR (%s:%s) with incorrect amount of arguments. Using null vector\n", key, value );
+				Com_Printf(
+					"BG_ParseField(%s): F_VECTOR (%s:%s) with incorrect amount of arguments. Using null vector\n",
+					f->name, key, value
+				);
 				((float *)(b + f->ofs))[0] = ((float *)(b + f->ofs))[1] = ((float *)(b + f->ofs))[2] = 0.0f;
 			}
 			break;
