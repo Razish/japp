@@ -472,17 +472,32 @@ static void CG_ChatboxDrawTabs( void ) {
 		float textWidth = Text_Width( name, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
 		float textHeight = Text_Height( name, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
 
-		CG_FillRect( cg.chatbox.pos.x + xOffset,
-			cg.chatbox.pos.y + (cg_chatboxLineHeight.value * cg_chatboxLineCount.integer) + (textHeight * 0.25f),
-			textWidth + 16.0f, cg_chatboxLineHeight.value,
-			(cb == currentChatbox) ? &colorTable[CT_DKGREY] : &colorTable[CT_BLACK] );
+		CG_FillRect(
+			cg.chatbox.pos.x + cg.chatbox.size.width - textWidth - 16.0f - xOffset,
+			cg.chatbox.pos.y + chatboxHeight + textHeight,
+			textWidth + 16.0f,
+			textHeight,
+			(cb == currentChatbox) ? &colorTable[CT_DKGREY] : &colorTable[CT_BLACK]
+		);
 
-		Text_Paint( cg.chatbox.pos.x + xOffset + 8.0f,
-			cg.chatbox.pos.y + (cg_chatboxLineHeight.value * cg_chatboxLineCount.integer),
-			cg.chatbox.size.scale, &colorWhite, va( "^%c%s", (cb == currentChatbox)
-			? COLOR_GREEN
-			: (cb->notification && ((int)(trap->Milliseconds() >> 8) & 1)) ? COLOR_RED : COLOR_WHITE, cb->shortname ),
-			0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(), false );
+		char nameColour = COLOR_WHITE;
+		if ( cb == currentChatbox ) {
+			nameColour = COLOR_GREEN;
+		}
+		else if ( cb->notification ) {
+			if ( (trap->Milliseconds() >> 8) & 1 ) {
+				// chatbox demands attention, flicker between white and red
+				nameColour = COLOR_RED;
+			}
+		}
+		Text_Paint(
+			cg.chatbox.pos.x + cg.chatbox.size.width - textWidth - 8.0f - xOffset,
+			cg.chatbox.pos.y + chatboxHeight + textHeight,
+			cg.chatbox.size.scale,
+			&colorWhite,
+			va( "^%c%s", nameColour, cb->shortname ),
+			0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(), false
+		);
 
 		xOffset += textWidth + 16.0f;
 		cb = cb->next;
@@ -538,10 +553,6 @@ void CG_ChatboxDraw( void ) {
 
 	currentChatbox->notification = qfalse;
 
-	if ( cg_chatboxTabs.integer ) {
-		CG_ChatboxDrawTabs();
-	}
-
 	if ( currentChatbox->numActiveLines == 0 ) {
 		skipDraw = true;
 	}
@@ -554,7 +565,8 @@ void CG_ChatboxDraw( void ) {
 	float height = Text_Height( scrollMsg, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
 
 	if ( !skipDraw && currentChatbox->scrollAmount < 0 && CG_ChatboxActive() ) {
-		Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + yAccum - (height / 2.0f),
+		Text_Paint(
+			cg.chatbox.pos.x, cg.chatbox.pos.y + yAccum - (height / 2.0f),
 			cg.chatbox.size.scale, &colorWhite, scrollMsg, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(), false
 		);
 	}
@@ -589,8 +601,12 @@ void CG_ChatboxDraw( void ) {
 						|| currentChatbox->scrollAmount
 						|| CG_ChatboxActive()) )
 				{
-					CG_FillRect( cg.chatbox.pos.x, cg.chatbox.pos.y + yAccum, cg.chatbox.size.width/*chatboxWidth*/,
-						chatboxHeight, &cg.chatbox.background
+					CG_FillRect(
+						cg.chatbox.pos.x,
+						cg.chatbox.pos.y + yAccum,
+						cg.chatbox.size.width,
+						chatboxHeight,
+						&cg.chatbox.background
 					);
 					break;
 				}
@@ -648,7 +664,6 @@ void CG_ChatboxDraw( void ) {
 	// draw the input line
 	if ( CG_ChatboxActive() ) {
 		inputLinePosY = cg.chatbox.pos.y + yAccum;
-
 		const char *pre = GetPreText( qfalse );
 		const char *cleanPre = GetPreText( qtrue );
 		char msg[MAX_EDIT_LINE];
@@ -659,7 +674,7 @@ void CG_ChatboxDraw( void ) {
 		Text_Paint( cg.chatbox.pos.x, cg.chatbox.pos.y + yAccum - (height / 2.0f), cg.chatbox.size.scale,
 			&g_color_table[ColorIndex( COLOR_WHITE )], msg, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(), false
 		);
-		if ( ((trap->Milliseconds() >> 8) & 1) ) {
+		if ( (trap->Milliseconds() >> 8) & 1 ) {
 			const float cursorPre = Text_Width( cleanPre, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
 			float cursorOffset = 0.0f;
 
@@ -689,6 +704,10 @@ void CG_ChatboxDraw( void ) {
 			}
 		}
 		yAccum += height;
+	}
+
+	if ( cg_chatboxTabs.integer ) {
+		CG_ChatboxDrawTabs();
 	}
 }
 
