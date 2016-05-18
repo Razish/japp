@@ -413,6 +413,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 	memset( chat, 0, sizeof(chatEntry_t) ); //Clear the last element, ready for writing
 	Q_strncpyz( chat->message, message, i + 1 );
 
+	// parse out URLs
 	size_t offset = 0u, tmpOffset = 0u;
 	while ( (tmpOffset = CG_ParseURLs( chat->message + offset )) != 0u ) {
 		chatEntry_t::urlLocation *loc = new chatEntry_t::urlLocation{};
@@ -617,15 +618,16 @@ void CG_ChatboxDraw( void ) {
 						cg.chatbox.size.scale, &colorWhite, tmp, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, CG_GetChatboxFont(),
 						false
 					);
+					const size_t timestampLength = cg_chatboxTimeShow.integer ? strlen( chat->timeStamp ) : 0u;
 					for ( chatEntry_t::urlLocation *url = chat->URLs; url; url = url->next ) {
 						char scratch[CHAT_MESSAGE_LENGTH];
-						Q_strncpyz( scratch, tmp, url->start + 1 );
+						Q_strncpyz( scratch, tmp, url->start + timestampLength + 1 );
 
 						//FIXME: somehow this isn't accurate when using r_aspectCorrectFonts?!
 						url->pos.x = cg.chatbox.pos.x
 							+ Text_Width( scratch, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
 
-						Q_strncpyz( scratch, tmp + url->start, url->length );
+						Q_strncpyz( scratch, tmp + url->start + timestampLength, url->length );
 						url->size.x = Text_Width( scratch, cg.chatbox.size.scale, CG_GetChatboxFont(), false );
 
 						url->pos.y = cg.chatbox.pos.y + yAccum - (height / 2.0f);
