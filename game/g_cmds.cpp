@@ -3311,37 +3311,6 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Reduce blocks (",
 				(tweaks & SABERTWEAK_REDUCEBLOCKS) ? S_COLOR_GREEN "+" : S_COLOR_RED "x" )
 			);
-			Q_PrintBuffer( &pb, va( "%s%.02f " S_COLOR_WHITE "- %s%.02f" S_COLOR_WHITE ") * %s%.02f" S_COLOR_WHITE "\n",
-				(japp_saberBlockChanceMin.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceMin ) ))
-					? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMin.value,
-				(japp_saberBlockChanceMax.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceMax ) ))
-					? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceMax.value,
-				(japp_saberBlockChanceScale.value != atoff( G_Cvar_DefaultString( &japp_saberBlockChanceScale ) ))
-					? S_COLOR_RED : S_COLOR_GREEN, japp_saberBlockChanceScale.value
-				)
-			);
-#ifdef _DEBUG
-			if ( tweaks & SABERTWEAK_REDUCEBLOCKS ) {
-				int ourLevel, theirLevel;
-				for ( ourLevel = 1; ourLevel <= 3; ourLevel++ ) {
-					for ( theirLevel = 1; theirLevel <= 3; theirLevel++ ) {
-						const float diff = (float)(theirLevel - ourLevel); // range [0, 2]
-						const float parity = japp_saberBlockStanceParity.value; // range [0, 3]
-						const float chanceMin = japp_saberBlockChanceMin.value;
-						const float chanceMax = japp_saberBlockChanceMax.value;
-						const float chanceScalar = japp_saberBlockChanceScale.value;
-						const float chance = Q_clamp( chanceMin, (1.0f - (diff / parity)) * chanceScalar, chanceMax );
-						Q_PrintBuffer( &pb, va( "      %i blocking %i: %.03f\n", ourLevel, theirLevel, chance ) );
-					}
-				}
-			}
-#endif // _DEBUG
-
-			Q_PrintBuffer( &pb, va( "      %s%.03f " S_COLOR_WHITE "stance parity\n",
-				(japp_saberBlockStanceParity.value != atoff( G_Cvar_DefaultString( &japp_saberBlockStanceParity ) ))
-					? S_COLOR_RED : S_COLOR_GREEN,
-				japp_saberBlockStanceParity.value )
-			);
 			Q_PrintBuffer( &pb, va( "    [%s" S_COLOR_WHITE "] Staff deflect fix\n",
 				(tweaks & SABERTWEAK_TWOBLADEDEFLECTFIX) ? S_COLOR_GREEN "+" : S_COLOR_RED "x" )
 			);
