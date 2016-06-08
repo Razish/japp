@@ -3015,28 +3015,48 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( japp_flipKick.integer && client->ps.forceKickFlip ) {
 		gentity_t *faceKicked = &g_entities[client->ps.forceKickFlip - 1];
 
-		if ( faceKicked && faceKicked->client && (!OnSameTeam( ent, faceKicked ) || g_friendlyFire.integer) &&
-			(!faceKicked->client->ps.duelInProgress || faceKicked->client->ps.duelIndex == ent->s.number) &&
-			(!ent->client->ps.duelInProgress || ent->client->ps.duelIndex == faceKicked->s.number) ) {
-			if ( faceKicked && faceKicked->client && faceKicked->health && faceKicked->takedamage ) {//push them away and do pain
+		if ( faceKicked && faceKicked->client
+			&& (!OnSameTeam( ent, faceKicked ) || g_friendlyFire.integer)
+			&& (!faceKicked->client->ps.duelInProgress || faceKicked->client->ps.duelIndex == ent->s.number)
+			&& (!ent->client->ps.duelInProgress || ent->client->ps.duelIndex == faceKicked->s.number) )
+		{
+			if ( faceKicked->health > 0
+				&& faceKicked->takedamage
+				&& !(faceKicked->client->ps.eFlags & EF_INVULNERABLE) )
+			{
+				// push them away and do pain
 				vector3 oppDir;
-				float strength = VectorNormalize2( &client->ps.velocity, &oppDir );
+				const float strength = VectorNormalize2( &client->ps.velocity, &oppDir );
 
 				VectorScale( &oppDir, -1, &oppDir );
 
-				if ( japp_flipKickDamage.integer )
-					G_Damage( faceKicked, ent, ent, &oppDir, &client->ps.origin, japp_flipKickDamage.integer, DAMAGE_NO_ARMOR, MOD_MELEE );
+				if ( japp_flipKickDamage.integer ) {
+					G_Damage(
+						faceKicked, ent, ent, &oppDir, &client->ps.origin, japp_flipKickDamage.integer, DAMAGE_NO_ARMOR,
+						MOD_MELEE
+					);
+				}
 
-				if ( faceKicked->client->ps.weapon != WP_SABER ||
-					faceKicked->client->ps.fd.saberAnimLevel != FORCE_LEVEL_3 ||
-					(!BG_SaberInAttack( faceKicked->client->ps.saberMove ) && !PM_SaberInStart( faceKicked->client->ps.saberMove ) && !PM_SaberInReturn( faceKicked->client->ps.saberMove ) && !PM_SaberInTransition( faceKicked->client->ps.saberMove )) ) {
+				if ( faceKicked->client->ps.weapon != WP_SABER
+					|| faceKicked->client->ps.fd.saberAnimLevel != FORCE_LEVEL_3
+					|| (!BG_SaberInAttack( faceKicked->client->ps.saberMove )
+						&& !PM_SaberInStart( faceKicked->client->ps.saberMove )
+						&& !PM_SaberInReturn( faceKicked->client->ps.saberMove )
+						&& !PM_SaberInTransition( faceKicked->client->ps.saberMove )) )
+				{
 					if ( faceKicked->health > 0 &&
 						faceKicked->client->ps.stats[STAT_HEALTH] > 0 &&
-						faceKicked->client->ps.forceHandExtend != HANDEXTEND_KNOCKDOWN ) {
-						if ( japp_flipKickKnockdown.integer && BG_KnockDownable( &faceKicked->client->ps ) && Q_irand( 1, 10 ) <= 3 ) { //only actually knock over sometimes, but always do velocity hit
+						faceKicked->client->ps.forceHandExtend != HANDEXTEND_KNOCKDOWN )
+					{
+						// only actually knock over sometimes, but always do velocity hit
+						if ( japp_flipKickKnockdown.integer
+							&& BG_KnockDownable( &faceKicked->client->ps )
+							&& Q_irand( 1, 10 ) <= 3 )
+						{
 							faceKicked->client->ps.forceHandExtend = HANDEXTEND_KNOCKDOWN;
 							faceKicked->client->ps.forceHandExtendTime = level.time + 1100;
-							faceKicked->client->ps.forceDodgeAnim = 0; //this toggles between 1 and 0, when it's 1 we should play the get up anim
+							// this toggles between 1 and 0, when it's 1 we should play the get up anim
+							faceKicked->client->ps.forceDodgeAnim = 0;
 						}
 
 						faceKicked->client->ps.otherKiller = ent->s.number;
@@ -3049,7 +3069,9 @@ void ClientThink_real( gentity_t *ent ) {
 					}
 				}
 
-				G_Sound( faceKicked, CHAN_AUTO, G_SoundIndex( va( "sound/weapons/melee/punch%d", Q_irand( 1, 4 ) ) ) );
+				const char *soundPath = va( "sound/weapons/melee/punch%d", Q_irand( 1, 4 ) );
+				G_Sound( faceKicked, CHAN_AUTO, G_SoundIndex( soundPath ) );
+
 			}
 		}
 
