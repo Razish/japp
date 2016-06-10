@@ -2143,3 +2143,46 @@ team_t BG_GetOpposingTeam( team_t team ) {
 		return team;
 	}
 }
+
+#if defined(PROJECT_GAME)
+bool BG_HasSetSaberOnly( void )
+#elif defined(PROJECT_CGAME) || defined(PROJECT_UI)
+bool BG_HasSetSaberOnly( const char *info )
+#endif
+{
+#if defined(PROJECT_GAME)
+	const int gametype = level.gametype;
+#elif defined(PROJECT_CGAME)
+	const int gametype = cgs.gametype;
+#elif defined(PROJECT_UI)
+	const int gametype = ui_gameType.integer;
+#endif
+
+	if ( gametype == GT_JEDIMASTER ) {
+		return false;
+	}
+
+	const uint32_t weaponDisable = (gametype == GT_DUEL || gametype == GT_POWERDUEL)
+#if defined(PROJECT_GAME)
+		? g_duelWeaponDisable.integer
+		: g_weaponDisable.integer;
+#elif defined(PROJECT_CGAME) || defined(PROJECT_UI)
+		? atoi( Info_ValueForKey( info, "g_duelWeaponDisable" ) )
+		: atoi( Info_ValueForKey( info, "g_weaponDisable" ) );
+#endif
+
+	for ( int wp = WP_NONE; wp < WP_NUM_WEAPONS; wp++ ) {
+		if ( !(weaponDisable & (1 << wp))
+			&& wp != WP_NONE
+			&& wp != WP_STUN_BATON
+			&& wp != WP_MELEE
+			&& wp != WP_SABER
+			&& wp != WP_EMPLACED_GUN
+			&& wp != WP_TURRET )
+		{
+			return false;
+		}
+	}
+
+	return true;
+}

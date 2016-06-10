@@ -2534,7 +2534,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 	}
 
 	if ( level.gametype != GT_JEDIMASTER ) {
-		if ( HasSetSaberOnly() ) {
+		if ( BG_HasSetSaberOnly() ) {
 			if ( ent->item->giType == IT_AMMO ) {
 				G_FreeEntity( ent );
 				return;

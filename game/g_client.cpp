@@ -3189,7 +3189,7 @@ void ClientSpawn( gentity_t *ent ) {
 
 	if ( level.gametype != GT_HOLOCRON
 		&& level.gametype != GT_JEDIMASTER
-		&& !HasSetSaberOnly()
+		&& !BG_HasSetSaberOnly()
 		&& !AllForceDisabled( g_forcePowerDisable.integer )
 		&& g_jediVmerc.integer )
 	{

@@ -878,7 +878,7 @@ qboolean CalculateTactician( gentity_t *ent, int *kills ) {
 	int			killsWithWeapon[WP_NUM_WEAPONS];
 	int			playTime = (level.time - ent->client->pers.enterTime) / 60000;
 
-	if ( HasSetSaberOnly() ) {//duh, only 1 weapon
+	if ( BG_HasSetSaberOnly() ) {//duh, only 1 weapon
 		return qfalse;
 	}
 	if ( level.gametype == GT_JEDIMASTER && ent->client->ps.isJediMaster ) {//Jedi Master (was Borg queen) has only 1 weapon

@@ -1006,7 +1006,6 @@ void			G_WriteClientSessionData( const gclient_t *client );
 void			G_WriteSessionData( void );
 void			GetAnglesForDirection( const vector3 *p1, const vector3 *p2, vector3 *out );
 void			GlobalUse( gentity_t *self, gentity_t *other, gentity_t *activator );
-qboolean		HasSetSaberOnly( void );
 void			ItemUse_Binoculars( gentity_t *ent );
 void			ItemUse_Jetpack( gentity_t *ent );
 void			ItemUse_MedPack( gentity_t *ent );

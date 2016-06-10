@@ -798,7 +798,7 @@ void HolocronTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 		other->client->ps.holocronsCarried[index_lowest] = 0;
 
 		/*
-		if (index_lowest == FP_SABER_OFFENSE && !HasSetSaberOnly())
+		if (index_lowest == FP_SABER_OFFENSE && !BG_HasSetSaberOnly())
 		{ //you lost your saberattack holocron, so no more saber for you
 		other->client->ps.stats[STAT_WEAPONS] |= (1 << WP_STUN_BATON);
 		other->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_SABER);
@@ -823,7 +823,7 @@ void HolocronTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	self->pos2.y = level.time + HOLOCRON_RESPAWN_TIME;
 
 	/*
-	if (self->count == FP_SABER_OFFENSE && !HasSetSaberOnly())
+	if (self->count == FP_SABER_OFFENSE && !BG_HasSetSaberOnly())
 	{ //player gets a saber
 	other->client->ps.stats[STAT_WEAPONS] |= (1 << WP_SABER);
 	other->client->ps.stats[STAT_WEAPONS] &= ~(1 << WP_STUN_BATON);
@@ -925,7 +925,7 @@ void SP_misc_holocron( gentity_t *ent ) {
 		return;
 	}
 
-	if ( HasSetSaberOnly() ) {
+	if ( BG_HasSetSaberOnly() ) {
 		if ( ent->count == FP_SABER_OFFENSE ||
 			ent->count == FP_SABER_DEFENSE ||
 			ent->count == FP_SABERTHROW ) { //having saber holocrons in saber only mode is pointless

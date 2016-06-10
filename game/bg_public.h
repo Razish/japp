@@ -1799,3 +1799,13 @@ extern const char *gametypeStringShort[GT_MAX_GAME_TYPE];
 const char *BG_GetGametypeString( int gametype );
 int BG_GetGametypeForString( const char *gametype );
 team_t BG_GetOpposingTeam( team_t team );
+
+// returns false if any usable projectile/ammo-consuming weapons are enabled
+//	this ignores melee, saber, stun baton etc
+bool BG_HasSetSaberOnly(
+#if defined(PROJECT_GAME)
+	void
+#elif defined(PROJECT_CGAME) || defined(PROJECT_UI)
+	const char *info
+#endif
+);
