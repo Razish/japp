@@ -5743,7 +5743,8 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].alt.chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
 #ifdef PROJECT_GAME
-					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
+					if ( !( ((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer ) || 
+						 !((gentity_t *)pm_entSelf)->client->ps.duelInProgress )
 #endif
 						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].alt.charge;
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].alt.chargeTime;
@@ -5777,7 +5778,8 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
 #ifdef PROJECT_GAME
-					if ( !((gentity_t *)pm_entSelf)->client->pers.adminData.merc || !japp_mercInfiniteAmmo.integer )
+					if (!(((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer) ||
+						!((gentity_t *)pm_entSelf)->client->ps.duelInProgress)
 #endif
 						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].charge;
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].chargeTime;
