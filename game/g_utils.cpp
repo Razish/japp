@@ -1804,20 +1804,86 @@ void G_GetModelBounds( const char *name, vector3 *mins, vector3 *maxs ) {
 }
 
 bool G_IsValidEntity( const gentity_t *ent, bool doAssert ) {
+	const ptrdiff_t entityNum = ent - g_entities;
+
+	const bool result = ent
+		&& ent->inuse
+		&& entityNum >= 0
+		&& entityNum < MAX_GENTITIES;
+
 	if ( doAssert ) {
-		assert( ent );
-		assert( ent->inuse );
-		assert( (ent - g_entities) < 0 );
-		assert( (ent - g_entities) >= MAX_GENTITIES );
+		assert( result );
+	}
+	return result;
+}
+
+//TODO: make all of this BG compatible
+
+bool G_PlayerIsDueling( const gentity_t *ent ) {
+	return G_IsValidEntity( ent )
+		&& ent->client
+		&& ent->s.eType == ET_PLAYER
+		&& ent->client->ps.duelInProgress;
+}
+
+gentity_t *G_GetDuelPartner( const gentity_t *ent ) {
+	// no partner if we're not dueling - also performs validity checks
+	if ( !G_PlayerIsDueling( ent ) ) {
+		return nullptr;
 	}
 
-	if ( !ent
-		|| !ent->inuse
-		|| (ent - g_entities) < 0
-		|| (ent - g_entities) >= MAX_GENTITIES )
-	{
+	const int partnerID = ent->client->ps.duelIndex;
+	if ( partnerID == ENTITYNUM_NONE ) {
+		return nullptr;
+	}
+
+	gentity_t *partner = &g_entities[ent->client->ps.duelIndex];
+	if ( !G_PlayerIsDueling( partner ) ) {
+		return nullptr;
+	}
+
+	if ( partner->client->ps.duelIndex != ent->s.number ) {
+		return nullptr;
+	}
+
+	return partner;
+}
+
+bool G_PlayersDuelingEachother( const gentity_t *e1, const gentity_t *e2 ) {
+	// must be currently dueling
+	if ( !G_PlayerIsDueling( e1 ) || !G_PlayerIsDueling( e2 ) ) {
 		return false;
 	}
 
+	// must be partners
+	const gentity_t *e1Partner = G_GetDuelPartner( e1 );
+	const gentity_t *e2Partner = G_GetDuelPartner( e2 );
+	if ( !e1Partner || !e2Partner ) {
+		// wtf?
+		assert( !"should not happen - both players dueling, but without a partner" );
+		return false;
+	}
+	if ( e1Partner != e2 || e2Partner != e1 ) {
+		return false;
+	}
+
+	return true;
+}
+
+bool G_CheckDuelIsolation( const gentity_t *e1, const gentity_t *e2 ) {
+	if ( G_PlayerIsDueling( e1 ) || G_PlayerIsDueling( e2 ) ) {
+		return G_PlayersDuelingEachother( e1, e2 );
+	}
+	return true;
+}
+
+bool G_CheckDuelIsolationSkip( const gentity_t *e1, const gentity_t *e2 ) {
+	if ( G_PlayerIsDueling( e1 ) != G_PlayerIsDueling( e2 ) ) {
+		// i'm dueling and they're not
+		// or they're dueling and i'm not
+	}
+	if ( G_PlayerIsDueling( e1 ) || G_PlayerIsDueling( e2 ) ) {
+		return !G_PlayersDuelingEachother( e1, e2 );
+	}
 	return true;
 }

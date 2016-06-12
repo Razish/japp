@@ -879,6 +879,15 @@ int				G_CheckAlertEvents( gentity_t *self, qboolean checkSight, qboolean checkS
 					int minAlertLevel /*= AEL_MINOR*/ );
 void			G_CheckBotSpawn( void );
 void			G_CheckClientTimeouts( gentity_t *ent );
+// returns true if:
+//	e1 and e2 are dueling eachother
+//	e1 and e2 are not dueling
+// else returns false
+bool			G_CheckDuelIsolation( const gentity_t *e1, const gentity_t *e2 );
+// returns true if:
+//	e1 or e2 are dueling, but not with eachother
+// else returns false
+bool			G_CheckDuelIsolationSkip( const gentity_t *e1, const gentity_t *e2 );
 qboolean		G_CheckForDanger( gentity_t *self, int alertEvent );
 void			G_CheckForDismemberment( gentity_t *ent, gentity_t *enemy, vector3 *point, int damage, int deathAnim,
 					qboolean postDeath );
@@ -907,6 +916,9 @@ gentity_t *		G_Find( gentity_t *from, int fieldofs, const char *match );
 void			G_FreeEntity( gentity_t *e );
 char *			G_GetBotInfoByName( const char *name );
 void			G_GetDismemberBolt( gentity_t *self, vector3 *boltPoint, int limbType );
+// if dueling, returns private duel partner
+// else returns nullptr
+gentity_t *		G_GetDuelPartner( const gentity_t *ent );
 void			G_GetModelBounds(const char *name, vector3 *mins, vector3 *maxs);
 const char *	G_GetStringEdString( const char *refSection, const char *refName );
 int				G_IconIndex( const char *name );
@@ -941,6 +953,10 @@ void			G_PlayDoorLoopSound( gentity_t *ent );
 void			G_PlayDoorSound( gentity_t *ent, int type );
 gentity_t *		G_PlayEffect( int fxID, vector3 *org, vector3 *ang );
 gentity_t *		G_PlayEffectID( const int fxID, vector3 *org, vector3 *ang );
+// returns true if ent is a player and they are in a private duel
+bool			G_PlayerIsDueling( const gentity_t *ent );
+// returns true if both players are in a private duel with eachother
+bool			G_PlayersDuelingEachother( const gentity_t *e1, const gentity_t *e2 );
 void			G_PowerDuelCount( int *loners, int *doubles, qboolean countSpec );
 void			G_PrecacheDispensers( void );
 gentity_t *		G_PreDefSound( vector3 *org, int pdSound );
