@@ -3252,11 +3252,7 @@ void ClientSpawn( gentity_t *ent ) {
 
 	if ( level.gametype != GT_SIEGE ) {
 		if ( ent->client->pers.adminData.merc ) {
-			int i = 0;
-			client->ps.stats[STAT_WEAPONS] = ((1 << LAST_USEABLE_WEAPON) - 1) & ~1;
-			for ( i = 0; i < AMMO_MAX; i++ ) {
-				client->ps.ammo[i] = ammoMax[i];
-			}
+			Merc_On( ent );
 		}
 		else {
 			client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
