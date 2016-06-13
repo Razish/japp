@@ -5635,7 +5635,7 @@ void WP_SaberAddG2Model( gentity_t *saberent, const char *saberModel, qhandle_t 
 }
 
 //Make the saber go flying directly out of the owner's hand in the specified direction
-qboolean saberKnockOutOfHand( gentity_t *saberent, gentity_t *saberOwner, vector3 *velocity ) {
+qboolean saberKnockOutOfHand( gentity_t *saberent, gentity_t *saberOwner, const vector3 *velocity ) {
 	if ( !saberent || !saberOwner ||
 		!saberent->inuse || !saberOwner->inuse ||
 		!saberOwner->client ) {

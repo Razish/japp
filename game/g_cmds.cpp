@@ -3743,16 +3743,30 @@ EMOTE( surrender )
 EMOTE( wait )
 EMOTE( won )
 
-static void Cmd_Emote_Knockdown(gentity_t *ent){
-	G_Knockdown(ent);
+static void Cmd_KnockMeDown( gentity_t *ent ) {
+	G_Knockdown( ent );
 }
 
-extern void MakeDeadSaber(gentity_t *ent);
-static void Cmd_Emote_Dropsaber(gentity_t *ent){
-	gentity_t *saber = &g_entities[ent->client->ps.saberEntityNum];
-	if (saber){
-		MakeDeadSaber(saber);
+static void Cmd_DropSaber( gentity_t *ent ) {
+	if ( !japp_allowDropSaber.integer ) {
+		trap->SendServerCommand( ent - g_entities, "print \"amdropsaber is disabled\n\"" );
+		return;
 	}
+	if ( !ent->client->ps.saberEntityNum ) {
+		return;
+	}
+
+	gentity_t *saber = &g_entities[ent->client->ps.saberEntityNum];
+	if ( ent->client->ps.saberInFlight ) {
+		// turn it off in midair
+		saberKnockDown( saber, ent, ent );
+		return;
+	}
+	const vector3 *velocity = &vec3_origin;
+	if ( japp_allowDropSaber.integer == 2 ) {
+		velocity = &ent->client->ps.velocity;
+	}
+	saberKnockOutOfHand( saber, ent, velocity );
 }
 
 static void Cmd_Emote_hug( gentity_t *ent ) {
@@ -3856,7 +3870,7 @@ static const command_t commands[] = {
 	{ "amdance3", Cmd_Emote_dance3, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdie", Cmd_Emote_die, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amdie2", Cmd_Emote_die2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
-	{ "amdropsaber", Cmd_Emote_Dropsaber, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amdropsaber", Cmd_DropSaber, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amfabulous", Cmd_Emote_fabulous, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amfinishinghim", Cmd_Emote_finishinghim, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amharlem", Cmd_Emote_harlem, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
@@ -3870,7 +3884,7 @@ static const command_t commands[] = {
 	{ "amkiss", Cmd_Emote_kiss, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amkneel", Cmd_Emote_kneel, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amkneel2", Cmd_Emote_kneel2, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
-	{ "amknockmedown", Cmd_Emote_Knockdown, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
+	{ "amknockmedown", Cmd_KnockMeDown, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amneo", Cmd_Emote_neo, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amnod", Cmd_Emote_nod, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amnoisy", Cmd_Emote_noisy, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },

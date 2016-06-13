@@ -1046,6 +1046,7 @@ void			respawn( gentity_t *ent );
 void			RespawnItem( gentity_t *ent );
 void			ResetItem( gentity_t *ent );
 qboolean		CheckPushItem( gentity_t *ent );
+qboolean		saberKnockOutOfHand( gentity_t *saberent, gentity_t *saberOwner, const vector3 *velocity );
 void			SaveRegisteredItems( void );
 gentity_t *		SelectSpawnPoint( vector3 *avoidPoint, vector3 *origin, vector3 *angles, team_t team );
 void			SendScoreboardMessageToAllClients( void );
