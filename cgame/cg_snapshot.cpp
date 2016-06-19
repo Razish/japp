@@ -22,8 +22,8 @@ static void CG_ResetEntity( centity_t *cent ) {
 }
 
 static void TrackGrappleHook( const centity_t *cent ) {
-	if ( cent->currentValid && cent->currentState.eType == ET_MISSILE && !cent->currentState.generic1
-		&& cent->currentState.otherEntityNum == cg.clientNum )
+	if ( cent->currentValid && cent->currentState.eType == ET_MISSILE && cent->currentState.weapon == WP_STUN_BATON
+		&& !cent->currentState.generic1 && cent->currentState.otherEntityNum == cg.clientNum )
 	{
 		static int32_t position[3]{};
 		vector3 tmp;

@@ -593,7 +593,9 @@ qboolean cg_vehPmoveSet = qfalse;
 // returns -1 on failure
 static int FindGrappleHook( int clientNum ) {
 	for ( centity_t &cent : cg_entities ) {
-		if ( cent.currentValid && cent.currentState.eType == ET_MISSILE && !cent.currentState.generic1 ) {
+		if ( cent.currentValid && cent.currentState.eType == ET_MISSILE && cent.currentState.weapon == WP_STUN_BATON
+			&& !cent.currentState.generic1 )
+		{
 			// this is a hook
 			if ( cent.currentState.otherEntityNum == clientNum && cg.japp.grappleLanded == cg.snap->serverTime ) {
 				// and it's ours, woohoo
