@@ -1390,32 +1390,41 @@ namespace JPLua {
 	}
 
 #ifdef PROJECT_GAME
-	static int Entity_Scale(lua_State *L){
-		jpluaEntity_t *ent = CheckEntity(L, 1);
-		int value = luaL_checkinteger(L, 2);
-		if (!ent) return 0;
+	static int Entity_Scale( lua_State *L ) {
+		jpluaEntity_t *ent = CheckEntity( L, 1 );
 
-		ent->s.iModelScale = Q_clampi(0, value, 1023);
+		if ( !ent ) {
+			return 0;
+		}
 
-		if (ent->client)
-		ent->client->ps.iModelScale = ent->s.iModelScale;
+		const int scale = luaL_checkinteger( L, 2 );
+		ent->s.iModelScale = Q_clampi( 0, scale, 1023 );
+
+		if ( ent->client ) {
+			ent->client->ps.iModelScale = ent->s.iModelScale;
+		}
 
 		float fScale = ent->s.iModelScale / 100.0f;
 		ent->modelScale.x = ent->modelScale.y = ent->modelScale.z = fScale;
-		VectorScale(&ent->r.mins, fScale, &ent->r.mins);
-		VectorScale(&ent->r.maxs, fScale, &ent->r.maxs);
+		VectorScale( &ent->r.mins, fScale, &ent->r.mins );
+		VectorScale( &ent->r.maxs, fScale, &ent->r.maxs );
 
-		trap->LinkEntity((sharedEntity_t *)ent);
-		G_CheckInSolid(ent, qtrue); // check
+		trap->LinkEntity( (sharedEntity_t *)ent );
+		G_CheckInSolid( ent, qtrue ); // check
 		return 0;
 	}
 
-	static int Entity_SetVar(lua_State *L){
-		jpluaEntity_t *ent = CheckEntity(L, 1);
-		if (!ent) return 0;
-		const char *key = luaL_checkstring(L, 2);
-		const char *value = luaL_checkstring(L, 3);
-		BG_ParseField(fields, ARRAY_LEN(fields), key, value, (byte *)ent);
+	static int Entity_SetVar( lua_State *L ) {
+		jpluaEntity_t *ent = CheckEntity( L, 1 );
+
+		if ( !ent ) {
+			return 0;
+		}
+
+		const char *key = luaL_checkstring( L, 2 );
+		const char *value = luaL_checkstring( L, 3 );
+		BG_ParseField( fields, ARRAY_LEN( fields ), key, value, (byte *)ent );
+
 		return 0;
 	}
 

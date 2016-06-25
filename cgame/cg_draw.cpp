@@ -2042,7 +2042,6 @@ float CG_DrawVehicleShields( const menuDef_t	*menuHUD, const centity_t *veh ) {
 int cg_vehicleAmmoWarning = 0;
 int cg_vehicleAmmoWarningTime = 0;
 void CG_DrawVehicleAmmo( const menuDef_t *menuHUD, const centity_t *veh ) {
-	int i;
 	char itemName[64];
 	float inc, currValue, maxAmmo;
 	vector4	calcColor;
@@ -2064,7 +2063,7 @@ void CG_DrawVehicleAmmo( const menuDef_t *menuHUD, const centity_t *veh ) {
 	currValue = cg.predictedVehicleState.ammo[0];
 
 	inc = (float)maxAmmo / MAX_VHUD_AMMO_TICS;
-	for ( i = 1; i <= MAX_VHUD_AMMO_TICS; i++ ) {
+	for ( int i = 1; i <= MAX_VHUD_AMMO_TICS; i++ ) {
 		sprintf( itemName, "ammo_tic%d", i );
 
 		item = Menu_FindItemByName( (menuDef_t *)menuHUD, itemName );
@@ -2318,7 +2317,6 @@ void CG_DrawVehicleWeaponsLinked( const menuDef_t	*menuHUD, const centity_t *veh
 }
 
 void CG_DrawVehicleSpeed( const menuDef_t	*menuHUD, const centity_t *veh ) {
-	int i;
 	char itemName[64];
 	float inc, currValue, maxSpeed;
 	vector4		calcColor;
@@ -2342,7 +2340,7 @@ void CG_DrawVehicleSpeed( const menuDef_t	*menuHUD, const centity_t *veh ) {
 	// Look at the amount of health left and show only as much of the graphic as there is health.
 	// Use alpha to fade out partial section of health
 	inc = (float)maxSpeed / MAX_VHUD_SPEED_TICS;
-	for ( i = 1; i <= MAX_VHUD_SPEED_TICS; i++ ) {
+	for ( int i = 1; i <= MAX_VHUD_SPEED_TICS; i++ ) {
 		sprintf( itemName, "speed_tic%d", i );
 
 		item = Menu_FindItemByName( (menuDef_t *)menuHUD, itemName );
@@ -5204,8 +5202,7 @@ qboolean CG_InATST( void ) {
 }
 
 void CG_DrawBracketedEntities( void ) {
-	int i;
-	for ( i = 0; i < cg.bracketedEntityCount; i++ ) {
+	for ( int i = 0; i < cg.bracketedEntityCount; i++ ) {
 		centity_t *cent = &cg_entities[cg.bracketedEntities[i]];
 		CG_BracketEntity( cent, CG_RadiusForCent( cent ) );
 	}
@@ -5313,7 +5310,6 @@ static void CG_DrawRocketLocking( int lockEntNum, int lockTime )
 	float lockTimeInterval = ((cgs.gametype == GT_SIEGE) ? 2400.0f : 1200.0f) / 16.0f;
 	//FIXME: if in a vehicle, use the vehicle's lockOnTime...
 	int dif = (cg.time - cg.snap->ps.rocketLockTime) / lockTimeInterval;
-	int i;
 	refdef_t *refdef = CG_GetRefdef();
 
 	if ( !cg.snap->ps.rocketLockTime ) {
@@ -5439,7 +5435,7 @@ static void CG_DrawRocketLocking( int lockEntNum, int lockTime )
 
 		oldDif = dif;
 
-		for ( i = 0; i < dif; i++ ) {
+		for ( int i = 0; i < dif; i++ ) {
 			color.r = 1.0f;
 			color.g = 0.0f;
 			color.b = 0.0f;
@@ -5818,35 +5814,43 @@ static void CG_DrawCrosshairNames( void ) {
 }
 
 static void CG_DrawClientNames( void ) {
-	const char *name = NULL;
-	int i;
-	const centity_t *cent = NULL;
-	int iMenuFont = FONT_JAPPSMALL;
-	const float fontScale = 0.75f, fontHeight = trap->R_Font_HeightPixels( iMenuFont, fontScale );
+	const qhandle_t fontHandle = FONT_JAPPSMALL;
+	const float fontScale = 0.75f;
+	const float fontHeight = trap->R_Font_HeightPixels( fontHandle, fontScale );
 	const vector4 *colour = &g_color_table[ColorIndex( COLOR_WHITE )];
-	float x, y;
 
-	if ( !cg_drawSpectatorNames.integer || !cg.snap )
+	if ( !cg_drawSpectatorNames.integer || !cg.snap ) {
 		return;
+	}
 
-	for ( i = 0, cent = cg_entities; i < cgs.maxclients; i++, cent++ ) {
+	for ( centity_t &cent : cg_entities ) {
+		const int id = cent.currentState.number;
+		if ( id >= cgs.maxclients ) {
+			break;
+		}
+
+		const clientInfo_t &ci = cgs.clientinfo[id];
+		if ( !ci.infoValid || ci.team == TEAM_SPECTATOR ) {
+			continue;
+		}
+		if ( !trap->R_InPVS( &CG_GetRefdef()->vieworg, &cent.lerpOrigin, cg.snap->areamask ) ) {
+			continue;
+		}
+
 		vector3 point;
-
-		if ( !cgs.clientinfo[i].infoValid || cgs.clientinfo[i].team == TEAM_SPECTATOR )
-			continue;
-		if ( !trap->R_InPVS( &CG_GetRefdef()->vieworg, &cent->lerpOrigin, cg.snap->areamask ) )
-			continue;
-
-		name = cgs.clientinfo[i].name;
-		VectorCopy( &cent->lerpOrigin, &point );
+		VectorCopy( &cent.lerpOrigin, &point );
 		point.z += DEFAULT_VIEWHEIGHT; // player height
 
+		float x, y;
 		if ( CG_WorldCoordToScreenCoordFloat( &point, &x, &y ) ) {
 			if ( cgs.gametype >= GT_TEAM ) {
-				colour = &g_color_table[ColorIndex( (cgs.clientinfo[i].team == TEAM_RED) ? COLOR_RED : COLOR_CYAN )];
+				colour = &g_color_table[ColorIndex( (ci.team == TEAM_RED) ? COLOR_RED : COLOR_CYAN )];
 			}
-			Text_Paint( x - Text_Width( name, fontScale, iMenuFont, false ) / 2.0f, y - (fontHeight / 2.0f), fontScale,
-				colour, name, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, iMenuFont, false
+			const char *name = ci.name;
+			Text_Paint(
+				x - Text_Width( name, fontScale, fontHandle, false ) / 2.0f,
+				y - (fontHeight / 2.0f),
+				fontScale, colour, name, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
 			);
 		}
 	}

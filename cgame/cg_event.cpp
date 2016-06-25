@@ -1066,8 +1066,7 @@ const char	*cg_stringEdVoiceChatTable[MAX_CUSTOM_SIEGE_SOUNDS] =
 
 //stupid way of figuring out what string to use for voice chats
 const char *CG_GetStringForVoiceSound( const char *s ) {
-	int i;
-	for ( i = 0; i < MAX_CUSTOM_SIEGE_SOUNDS; i++ ) {
+	for ( int i = 0; i < MAX_CUSTOM_SIEGE_SOUNDS; i++ ) {
 		if ( bg_customSiegeSoundNames[i] && !Q_stricmp( bg_customSiegeSoundNames[i], s ) ) {
 			// get the matching reference name
 			assert( cg_stringEdVoiceChatTable[i] );

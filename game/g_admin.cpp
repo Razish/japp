@@ -2343,7 +2343,7 @@ static void AM_Ban( gentity_t *ent ) {
 	int targetClient;
 
 	if ( trap->Argc() < 2 ) {
-		AM_ConsolePrint( ent, "Syntax: \\amban <client> <duration> <reason>\n" );
+		AM_ConsolePrint( ent, "Syntax: \\amban <client> [duration] [reason]\n" );
 		return;
 	}
 

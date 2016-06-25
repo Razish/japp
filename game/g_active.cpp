@@ -2167,16 +2167,26 @@ void ClientThink_real( gentity_t *ent ) {
 				const char *loser = duelAgainst->client->pers.netname;
 
 				// x has defeated y
-				Com_sprintf( pre1, sizeof(pre1), "%s " S_COLOR_WHITE "%s %s", winner, defeated, loser );
-				Com_sprintf( pre2, sizeof(pre2), "You %s %s", defeated, loser );
+				Com_sprintf( pre1, sizeof(pre1),
+					"%s " S_COLOR_WHITE "%s %s", winner, defeated, loser
+				);
+				Com_sprintf( pre2, sizeof(pre2),
+					"You %s %s", defeated, loser
+				);
 
 				// with h/a remaining
 				if ( japp_duelStats.bits & DUELSTATS_HEALTH ) {
 					const int health = ent->client->ps.stats[STAT_HEALTH];
 					const int armor = ent->client->ps.stats[STAT_ARMOR];
 
-					Q_strcat( buf, sizeof(buf), va( " " S_COLOR_WHITE "with " S_COLOR_RED "%i" S_COLOR_WHITE "/"
-						S_COLOR_GREEN "%i " S_COLOR_WHITE "remaining", health, armor ) );
+					Q_strcat( buf, sizeof(buf),
+						va(
+							" " S_COLOR_WHITE "with " S_COLOR_RED "%i" S_COLOR_WHITE "/" S_COLOR_GREEN "%i "
+								S_COLOR_WHITE "remaining",
+							health,
+							armor
+						)
+					);
 				}
 
 				// in xx:xx
@@ -2187,15 +2197,17 @@ void ClientThink_real( gentity_t *ent ) {
 
 					secs %= 60;
 
-					Q_strcat( buf, sizeof(buf), va( " " S_COLOR_WHITE "in " S_COLOR_CYAN "%i" S_COLOR_WHITE ":"
-						S_COLOR_CYAN "%02i", mins, secs ) );
+					Q_strcat( buf, sizeof(buf),
+						va( " " S_COLOR_WHITE "in " S_COLOR_CYAN "%i" S_COLOR_WHITE ":" S_COLOR_CYAN "%02i", mins, secs )
+					);
 				}
 
 				// with y hits
 				if ( japp_duelStats.bits & DUELSTATS_HITS ) {
 					const int hits = ent->duelHitCount;
-					Q_strcat( buf, sizeof(buf), va( " " S_COLOR_WHITE "with " S_COLOR_YELLOW "%i" S_COLOR_WHITE " hits",
-						hits ) );
+					Q_strcat( buf, sizeof(buf),
+						va( " " S_COLOR_WHITE "with " S_COLOR_YELLOW "%i" S_COLOR_WHITE " hits", hits )
+					);
 				}
 
 				trap->SendServerCommand( -1, va( "print \"%s%s\n\"", pre1, buf ) );
@@ -2204,9 +2216,15 @@ void ClientThink_real( gentity_t *ent ) {
 
 			else {
 				// it was a draw, because we both managed to die in the same frame
-				trap->SendServerCommand( -1, va( "print \"%s: %s " S_COLOR_WHITE "vs %s! " S_COLOR_WHITE "(" S_COLOR_RED
-					"%i" S_COLOR_WHITE "/" S_COLOR_GREEN "%i" S_COLOR_WHITE ")\n\"", G_GetStringEdString( "MP_SVGAME",
-					"PLDUELTIE" ), ent->client->pers.netname, duelAgainst->client->pers.netname ) );
+				trap->SendServerCommand( -1,
+					va(
+						"print \"%s: %s " S_COLOR_WHITE "vs %s! " S_COLOR_WHITE "(" S_COLOR_RED "%i" S_COLOR_WHITE "/"
+							S_COLOR_GREEN "%i" S_COLOR_WHITE ")\n\"",
+						G_GetStringEdString( "MP_SVGAME", "PLDUELTIE" ),
+						ent->client->pers.netname,
+						duelAgainst->client->pers.netname
+					)
+				);
 				trap->SendServerCommand( -1, va( "cp \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELTIE" ) ) );
 			}
 

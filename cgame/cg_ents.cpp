@@ -13,7 +13,6 @@ static void CG_Missile( centity_t *cent );
 
 // Modifies the entities position and axis by the given tag location
 void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, const char *tagName ) {
-	int i;
 	orientation_t lerped;
 
 	// lerp the tag
@@ -21,7 +20,7 @@ void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qha
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( &parent->origin, &entity->origin );
-	for ( i = 0; i < 3; i++ )
+	for ( int i = 0; i < 3; i++ )
 		VectorMA( &entity->origin, lerped.origin.raw[i], &parent->axis[i], &entity->origin );
 
 	// had to cast away the const to avoid compiler problems...
@@ -31,7 +30,6 @@ void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qha
 
 // Modifies the entities position and axis by the given tag location
 void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, const char *tagName ) {
-	int i;
 	orientation_t lerped;
 	vector3 tempAxis[3];
 
@@ -41,7 +39,7 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( &parent->origin, &entity->origin );
-	for ( i = 0; i < 3; i++ )
+	for ( int i = 0; i < 3; i++ )
 		VectorMA( &entity->origin, lerped.origin.raw[i], &parent->axis[i], &entity->origin );
 
 	// had to cast away the const to avoid compiler problems...
@@ -1352,7 +1350,6 @@ static void CG_General( centity_t *cent ) {
 	if ( cent->bolt3 == 999 ) { //this is an in-flight saber being rendered manually
 		vector3 org;
 		float wv;
-		int i;
 		addspriteArgStruct_t fxSArgs;
 		//refEntity_t sRef;
 		//memcpy( &sRef, &ent, sizeof( sRef ) );
@@ -1365,7 +1362,7 @@ static void CG_General( centity_t *cent ) {
 		ent.shaderRGBA[2] = wv * 0;
 		SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 
-		for ( i = -4; i < 10; i += 1 ) {
+		for ( int i = -4; i < 10; i += 1 ) {
 			VectorMA( &ent.origin, -i, &ent.axis[2], &org );
 
 			VectorCopy( &org, &fxSArgs.origin );
@@ -2206,7 +2203,6 @@ static void CG_Missile( centity_t *cent ) {
 	if ( s1->weapon == WP_SABER && cgs.gametype == GT_JEDIMASTER ) { //in jedimaster always make the saber glow when on the ground
 		vector3 org;
 		float wv;
-		int i;
 		addspriteArgStruct_t fxSArgs;
 		//refEntity_t sRef;
 		//memcpy( &sRef, &ent, sizeof( sRef ) );
@@ -2219,7 +2215,7 @@ static void CG_Missile( centity_t *cent ) {
 		ent.shaderRGBA[2] = wv * 0;
 		SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
 
-		for ( i = -4; i < 10; i += 1 ) {
+		for ( int i = -4; i < 10; i += 1 ) {
 			VectorMA( &ent.origin, -i, &ent.axis[2], &org );
 
 			VectorCopy( &org, &fxSArgs.origin );

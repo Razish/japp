@@ -2419,14 +2419,13 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 // called when a client has finished connecting, and is ready to be placed into the level
 // this will happen every level load, and on transition between teams, but doesn't happen on respawns
 void ClientBegin( int clientNum, qboolean allowTeamReset ) {
-	gentity_t *ent, *tent;
+	gentity_t *ent = g_entities + clientNum;
+	gentity_t *tent;
 	gclient_t *client;
 	uint32_t flags;
-	int i, spawnCount;
+	int spawnCount;
 	char userinfo[MAX_INFO_VALUE];
 	char modelname[MAX_QPATH];
-
-	ent = g_entities + clientNum;
 
 	if ( (ent->r.svFlags & SVF_BOT) && level.gametype >= GT_TEAM ) {
 		if ( allowTeamReset ) {
@@ -2503,22 +2502,19 @@ void ClientBegin( int clientNum, qboolean allowTeamReset ) {
 	flags = client->ps.eFlags;
 	spawnCount = client->ps.persistant[PERS_SPAWN_COUNT];
 
-	i = 0;
-
-	while ( i < NUM_FORCE_POWERS ) {
+	for ( int i = 0; i < NUM_FORCE_POWERS; i++ ) {
 		if ( ent->client->ps.fd.forcePowersActive & (1 << i) ) {
 			WP_ForcePowerStop( ent, (forcePowers_t)i );
 		}
-		i++;
 	}
 
-	i = TRACK_CHANNEL_1;
-
-	while ( i < NUM_TRACK_CHANNELS ) {
-		if ( ent->client->ps.fd.killSoundEntIndex[i - 50] && ent->client->ps.fd.killSoundEntIndex[i - 50] < MAX_GENTITIES && ent->client->ps.fd.killSoundEntIndex[i - 50] > 0 ) {
+	for ( int i = TRACK_CHANNEL_1; i < NUM_TRACK_CHANNELS; i++ ) {
+		if ( ent->client->ps.fd.killSoundEntIndex[i - 50]
+			&& ent->client->ps.fd.killSoundEntIndex[i - 50] < MAX_GENTITIES
+			&& ent->client->ps.fd.killSoundEntIndex[i - 50] > 0 )
+		{
 			G_MuteSound( ent->client->ps.fd.killSoundEntIndex[i - 50], CHAN_VOICE );
 		}
-		i++;
 	}
 
 	memset( &client->ps, 0, sizeof(client->ps) );
