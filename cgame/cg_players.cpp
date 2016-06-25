@@ -1220,9 +1220,9 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 
 	//saber being used
 	v = Info_ValueForKey( configstring, "st" );
-	yo = (clientNum == cg.clientNum) ? cg_forceOwnSaber.string : cg_forceEnemySaber.string;
+	yo = (clientNum == cg.clientNum) ? cg.forceOwnSaber[0].c_str() : cg.forceEnemySaber[0].c_str();
 	if ( v && Q_stricmp( v, ci->saberName ) ) {
-		if ( yo[0] )
+		if ( yo && yo[0] )
 			Q_strncpyz( newInfo.saberName, yo, sizeof(newInfo.saberName) );
 		else
 			Q_strncpyz( newInfo.saberName, v, sizeof(newInfo.saberName) );
@@ -1237,8 +1237,18 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	}
 
 	v = Info_ValueForKey( configstring, "st2" );
+	if ( v && v[0] && strcmp( v, "none" ) ) {
+		yo = (clientNum == cg.clientNum) ? cg.forceOwnSaber[1].c_str() : cg.forceEnemySaber[1].c_str();
+	}
+	else {
+		yo = nullptr;
+	}
 	if ( v && Q_stricmp( v, ci->saber2Name ) ) {
-		Q_strncpyz( newInfo.saber2Name, v, sizeof(newInfo.saber2Name) );
+		if ( yo && yo[0] )
+			Q_strncpyz( newInfo.saber2Name, yo, sizeof(newInfo.saber2Name) );
+		else
+			Q_strncpyz( newInfo.saber2Name, v, sizeof(newInfo.saber2Name) );
+
 		WP_SetSaber( clientNum, newInfo.saber, 1, newInfo.saber2Name );
 		saberUpdate[1] = qtrue;
 	}

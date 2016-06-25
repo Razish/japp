@@ -1,6 +1,10 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 // cg_main.c -- initialization and primary entry point for cgame
+#include <string>
+#include <iostream>
+#include <sstream>
+
 #include "cg_local.h"
 #include "bg_lua.h"
 #include "bg_local.h"
@@ -346,16 +350,29 @@ static void CVU_ForceColour( void ) {
 }
 
 static void CVU_ForceModel( void ) {
-	int i;
-
-	for ( i = 0; i < cgs.maxclients; i++ ) {
+	for ( int i = 0; i < cgs.maxclients; i++ ) {
 		const char *clientInfo;
 
 		clientInfo = CG_ConfigString( CS_PLAYERS + i );
-		if ( !VALIDSTRING( clientInfo ) )
+		if ( !VALIDSTRING( clientInfo ) ) {
 			continue;
+		}
 
 		CG_NewClientInfo( i, qtrue );
+	}
+}
+
+static void CVU_ForceOwnSaber( void ) {
+	std::stringstream ss( cg_forceOwnSaber.string );
+	for ( int i = 0; i < MAX_SABERS; i++ ) {
+		ss >> cg.forceOwnSaber[i];
+	}
+}
+
+static void CVU_ForceEnemySaber( void ) {
+	std::stringstream ss( cg_forceEnemySaber.string );
+	for ( int i = 0; i < MAX_SABERS; i++ ) {
+		ss >> cg.forceEnemySaber[i];
 	}
 }
 
@@ -753,19 +770,16 @@ void CG_BuildSpectatorString( void ) {
 }
 
 static void CG_RegisterClients( void ) {
-	int i;
-
 	cg.loading = qtrue;
 	CG_LoadingClient( cg.clientNum );
 	CG_NewClientInfo( cg.clientNum, qfalse );
 
-	for ( i = 0; i < MAX_CLIENTS; i++ ) {
-		const char *clientInfo;
-
-		if ( cg.clientNum == i )
+	for ( int i = 0; i < cgs.maxclients; i++ ) {
+		if ( i == cg.clientNum ) {
 			continue;
+		}
 
-		clientInfo = CG_ConfigString( CS_PLAYERS + i );
+		const char *clientInfo = CG_ConfigString( CS_PLAYERS + i );
 		if ( !clientInfo[0] )
 			continue;
 		CG_LoadingClient( i );
@@ -1393,19 +1407,16 @@ void CG_AssetCache( void ) {
 }
 
 void CG_TransitionPermanent( void ) {
-	centity_t *cent = NULL;
-	int i;
-
 	cg_numpermanents = 0;
+	for ( int i = 0; i < MAX_GENTITIES; i++ ) {
+		centity_t &cent = cg_entities[i];
+		if ( trap->GetDefaultState( i, &cent.currentState ) ) {
+			cent.nextState = cent.currentState;
+			VectorCopy( &cent.currentState.origin, &cent.lerpOrigin );
+			VectorCopy( &cent.currentState.angles, &cent.lerpAngles );
+			cent.currentValid = qtrue;
 
-	for ( i = 0, cent = cg_entities; i < MAX_GENTITIES; i++, cent++ ) {
-		if ( trap->GetDefaultState( i, &cent->currentState ) ) {
-			cent->nextState = cent->currentState;
-			VectorCopy( &cent->currentState.origin, &cent->lerpOrigin );
-			VectorCopy( &cent->currentState.angles, &cent->lerpAngles );
-			cent->currentValid = qtrue;
-
-			cg_permanents[cg_numpermanents++] = cent;
+			cg_permanents[cg_numpermanents++] = &cent;
 		}
 	}
 }
@@ -1751,9 +1762,13 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 
 	// clear out globals
 	memset( cg_entities, 0, sizeof(cg_entities) );
-	memset( &cg, 0, sizeof(cg) );
+
+	cgs.~cgs_t();
+	new( &cgs ) cgs_t{}; // Using {} instead of () to work around MSVC bug
+	cg.~cg_t();
+	new( &cg ) cg_t{};
+
 	memset( cg_items, 0, sizeof(cg_items) );
-	memset( &cgs, 0, sizeof(cgs) );
 	memset( cg_weapons, 0, sizeof(cg_weapons) );
 
 	trap->RegisterSharedMemory( cg.sharedBuffer );

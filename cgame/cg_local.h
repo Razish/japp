@@ -729,6 +729,8 @@ typedef struct cg_s {
 	vector3			automapAngle;
 	vector3			gunAlign;
 	vector3			gunBob;
+	std::string		forceOwnSaber[MAX_SABERS];
+	std::string		forceEnemySaber[MAX_SABERS];
 } cg_t;
 
 typedef struct forceTicPos_s {
