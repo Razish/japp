@@ -259,10 +259,10 @@ static void CG_ResetThirdPersonViewDamp( int clientNum ) {
 	trace_t trace;
 
 	// Cap the pitch within reasonable limits
-	if ( cameraFocusAngles[clientNum].pitch > 80.0f )
-		cameraFocusAngles[clientNum].pitch = 80.0f;
-	else if ( cameraFocusAngles[clientNum].pitch < -80.0f )
-		cameraFocusAngles[clientNum].pitch = -80.0f;
+	if ( cameraFocusAngles[clientNum].pitch > 90.0f )
+		cameraFocusAngles[clientNum].pitch = 90.0f;
+	else if ( cameraFocusAngles[clientNum].pitch < -90.0f )
+		cameraFocusAngles[clientNum].pitch = -90.0f;
 
 	AngleVectors( &cameraFocusAngles[clientNum], &camerafwd, NULL, &cameraup );
 
@@ -519,10 +519,12 @@ static void CG_OffsetThirdPersonView( int clientNum ) {
 			//FIXME: when pitch >= 90 or <= -90, camera rotates oddly... need to CrossProduct not just vectoangles
 		}
 		else {
-#if 1
-			if ( cameraFocusAngles[clientNum].pitch > 80.0f )	cameraFocusAngles[clientNum].pitch = 80.0f;
-			else if ( cameraFocusAngles[clientNum].pitch < -80.0f )	cameraFocusAngles[clientNum].pitch = -80.0f;
-#endif
+			if ( cameraFocusAngles[clientNum].pitch > 90.0f ) {
+				cameraFocusAngles[clientNum].pitch = 90.0f;
+			}
+			else if ( cameraFocusAngles[clientNum].pitch < -90.0f ) {
+				cameraFocusAngles[clientNum].pitch = -90.0f;
+			}
 		}
 
 		AngleVectors( &cameraFocusAngles[clientNum], &camerafwd, NULL, &cameraup );
