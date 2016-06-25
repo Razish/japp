@@ -5752,6 +5752,37 @@ static void UI_RunMenuScript( char **args ) {
 		else if ( Q_stricmp( name, "clampmaxplayers" ) == 0 ) {
 			UI_ClampMaxPlayers();
 		}
+		else if ( !Q_stricmp( name, "sendModSayMsg" ) ) {
+			switch ( ui_modSay.integer ) {
+				case 0: {
+					// clansay
+					trap->Cmd_ExecuteText( EXEC_APPEND,
+						va( "clansay %s\n", ui_modSayText.string )
+					);
+				} break;
+				case 1: {
+					// tell
+					trap->Cmd_ExecuteText( EXEC_APPEND,
+						va( "tell %i %s\n", uiInfo.playerIndex, ui_modSayText.string )
+					);
+				} break;
+				case 2: {
+					// amsay
+					trap->Cmd_ExecuteText( EXEC_APPEND,
+						va( "amsay %s\n", ui_modSayText.string )
+					);
+				} break;
+				case 3: {
+					// ampsay
+					trap->Cmd_ExecuteText( EXEC_APPEND,
+						va( "ampsay %i %s\n",
+							ui_modSayAllPlayer.integer ? -1 : uiInfo.playerIndex,
+							ui_modSayText.string
+						)
+					);
+				} break;
+			}
+		}
 		else {
 			Com_Printf( "unknown UI script %s\n", name );
 		}
