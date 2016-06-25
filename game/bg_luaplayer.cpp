@@ -455,6 +455,19 @@ namespace JPLua {
 		return 1;
 	}
 
+	static int Player_GetModel( lua_State *L, jpluaEntity_t *ent ) {
+	#if defined(PROJECT_GAME)
+		char userinfo[MAX_INFO_STRING];
+		trap->GetUserinfo( (int)(ent - ents), userinfo, sizeof(userinfo) );
+		const char *model = Info_ValueForKey( userinfo, "model" );
+	#elif defined(PROJECT_CGAME)
+		const char *model = cgs.clientinfo[(int)(ent - ents)].modelName;
+	#endif
+
+		lua_pushstring( L, model );
+		return 1;
+	}
+
 	static int Player_GetName( lua_State *L, jpluaEntity_t *ent ) {
 	#if defined(PROJECT_GAME)
 		lua_pushstring( L, ent->client->pers.netname );
@@ -1173,6 +1186,11 @@ namespace JPLua {
 		{
 			"maxAmmo",
 			Player_GetMaxAmmo,
+			NULL
+		},
+		{
+			"model",
+			Player_GetModel,
 			NULL
 		},
 		{
