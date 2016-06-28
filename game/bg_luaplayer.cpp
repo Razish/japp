@@ -944,6 +944,26 @@ namespace JPLua {
 		lua_pushnumber(L, ent->client->ps.speed);
 		return 1;
 	}
+	
+	static void Player_SetClanMemberStatus(lua_State *L, jpluaEntity_t *ent){
+		bool memberstatus = lua_toboolean(L, 3) ? true : false;
+
+		if (memberstatus) {
+			if (!ent->client->pers.adminData.clanMember) {
+				ClanMemberStatus_ON(ent);
+			}
+		}
+		else {
+			if (ent->client->pers.adminData.clanMember) {
+				ClanMemberStatus_OFF(ent);
+			}
+		}
+	}
+
+	static int Player_GetClanMemberStatus(lua_State *L, jpluaEntity_t *ent){
+		lua_pushboolean(L, ent->client->pers.adminData.clanMember);
+		return 1;
+	}
 	#endif
 
 
@@ -1084,6 +1104,13 @@ namespace JPLua {
 			nullptr
 	#endif
 		},
+	#if defined(PROJECT_GAME)
+		{
+			"isClanMember",
+			Player_GetClanMemberStatus,
+			Player_SetClanMemberStatus
+		},
+	#endif
 		{
 			"isDueling",
 			Player_GetDueling,

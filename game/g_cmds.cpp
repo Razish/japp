@@ -1052,6 +1052,11 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, char color, con
 		return;
 	}
 
+	// only send clan messages to other clan members and yourself
+	if ( mode == SAY_CLAN && !other->client->pers.adminData.clanMember && ent != other ){
+		return;
+	}
+
 	// this client is ignoring us
 	if ( other->client->pers.ignore & (1 << (ent - g_entities)) ) {
 		return;
@@ -1103,7 +1108,7 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 	}
 
 	//RAZTODO: strip ext ascii/control chars
-	if ( strstr( ent->client->pers.netname, "<Admin>" ) || Q_strchrs( chatText, "\n\r\x0b" ) ) {
+	if ( strstr( ent->client->pers.netname, "<Admin>" ) || strstr(ent->client->pers.netname, "<Clan>") || Q_strchrs( chatText, "\n\r\x0b" ) ) {
 		returnToSender = qtrue;
 	}
 
@@ -1115,6 +1120,13 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chat
 			ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE
 		);
 		color = COLOR_YELLOW;
+		break;
+	case SAY_CLAN:
+		G_LogPrintf( level.log.console, "clansay: %s: %s\n", ent->client->pers.netname, chatText );
+		Com_sprintf(name, sizeof(name), S_COLOR_RED"<Admin>" S_COLOR_WHITE "%s%c%c" EC ": ",
+			ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE
+			);
+		color = COLOR_RED;
 		break;
 	case SAY_ALL:
 		if ( !Q_stricmpn( chatText, "/me ", 4 ) ) {
@@ -1231,6 +1243,34 @@ static void Cmd_SayAdmin_f( gentity_t *ent ) {
 	}
 }
 
+static void Cmd_SayClan_f(gentity_t *ent) {
+	char *p = NULL;
+	char *res = NULL;
+	chatType_t type = SAY_CLAN;
+
+	if (!ent->client->pers.adminData.clanMember){
+		trap->SendServerCommand(ent - g_entities, "print \"You are not allowed to execute this command.\n\"");
+		return;
+	}
+
+	if (trap->Argc() < 2) {
+		return;
+	}
+
+	p = ConcatArgs(1);
+
+	if (strlen(p) > MAX_SAY_TEXT) {
+		p[MAX_SAY_TEXT - 1] = '\0';
+		G_LogPrintf(level.log.security, "Cmd_SayClan_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p);
+	}
+	if ((res = JPLua::Event_ChatMessageRecieved(ent->s.number, p, type))) {
+		G_Say(ent, NULL, type, res);
+	}
+	else {
+		G_Say(ent, NULL, type, p);
+	}
+}
+
 static void Cmd_SayTeam_f( gentity_t *ent ) {
 	char *p = NULL;
 	char *res = NULL;
@@ -1253,6 +1293,9 @@ static void Cmd_SayTeam_f( gentity_t *ent ) {
 	if ( ent->client->pers.sayTeamMethod == STM_ADMIN ) {
 		type = SAY_ADMIN;
 	}
+	if (ent->client->pers.sayTeamMethod == STM_CLAN) {
+		type = SAY_CLAN;
+	}
 	else if ( ent->client->pers.sayTeamMethod == STM_CENTERPRINT ) {
 		if ( ent->client->pers.adminUser && AM_HasPrivilege( ent, PRIV_ANNOUNCE ) ) {
 			Q_ConvertLinefeeds( p );
@@ -1269,7 +1312,8 @@ static void Cmd_SayTeam_f( gentity_t *ent ) {
 static const char *sayTeamMethods[STM_NUM_METHODS] = {
 	"team",
 	"admin",
-	"centerprint"
+	"centerprint",
+	"clan"
 };
 
 static void Cmd_SayTeamMod_f( gentity_t *ent ) {
@@ -3908,6 +3952,7 @@ static const command_t commands[] = {
 	{ "amwait", Cmd_Emote_wait, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "amwon", Cmd_Emote_won, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE },
 	{ "callvote", Cmd_CallVote_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
+	{ "clansay", Cmd_SayClan_f, GTB_ALL, 0 },
 	{ "debugBMove_Back", Cmd_BotMoveBack_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
 	{ "debugBMove_Forward", Cmd_BotMoveForward_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
 	{ "debugBMove_Left", Cmd_BotMoveLeft_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },

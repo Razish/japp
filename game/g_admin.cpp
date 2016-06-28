@@ -3453,6 +3453,14 @@ static void AM_NoTarget( gentity_t *ent ) {
 	trap->LinkEntity( (sharedEntity_t *)targ );
 }
 
+void ClanMemberStatus_ON(gentity_t *targ) {
+	targ->client->pers.adminData.clanMember = qtrue;
+}
+
+void ClanMemberStatus_OFF(gentity_t *targ) {
+	targ->client->pers.adminData.clanMember = qfalse;
+}
+
 typedef struct adminCommand_s {
 	const char *cmd;
 	uint64_t privilege;		//Since we've got 64 bitfields we want to use them, right?
@@ -3622,5 +3630,8 @@ void AM_ApplySessionTransition( gentity_t *ent ) {
 	}
 	if ( data->isSlept ) {
 		G_SleepClient( ent->client );
+	}
+	if ( data->clanMember ) {
+		ClanMemberStatus_ON( ent );
 	}
 }
