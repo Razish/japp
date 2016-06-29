@@ -41,7 +41,6 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 	cJSON_AddBooleanToObject( root, "silenced", !!client->pers.adminData.silenced );
 	cJSON_AddBooleanToObject( root, "slept", !!client->pers.adminData.isSlept );
 	cJSON_AddIntegerToObject( root, "tempprivs", !!client->pers.tempprivs);
-	cJSON_AddBooleanToObject(root, "clanmember", !!client->pers.adminData.clanMember);
 
 	trap->FS_Open( fileName, &f, FS_WRITE );
 
@@ -147,11 +146,8 @@ void G_ReadClientSessionData( gclient_t *client ) {
 	if ( (object = cJSON_GetObjectItem( root, "slept" )) ) {
 		client->pers.adminData.isSlept = cJSON_ToBoolean( object );
 	}
-	if ((object = cJSON_GetObjectItem( root, "tempprivs" ))) {
+	if ((object = cJSON_GetObjectItem(root, "tempprivs"))) {
 		client->pers.tempprivs = cJSON_ToInteger(object);
-	}
-	if ((object = cJSON_GetObjectItem( root, "clanmember" ))) {
-		client->pers.adminData.clanMember = cJSON_ToBoolean(object);
 	}
 
 	client->ps.fd.saberAnimLevel = sess->saberLevel;

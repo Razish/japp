@@ -21,7 +21,6 @@ typedef struct adminData_s {
 	telemark_t *telemark; // last marked location
 	qboolean empowered; // are they empowered?
 	qboolean merc; // are they merced?
-	qboolean clanMember; // are they logged in with clanpass?
 	int renamedTime; // level.time they were renamed
 	int logineffect;
 
@@ -114,6 +113,3 @@ void Merc_Off( gentity_t *ent );
 void Ghost_On( gentity_t *ent );
 void Ghost_Off( gentity_t *ent );
 void Slap( gentity_t *targ );
-void ClanMemberStatus_ON( gentity_t *targ );
-void ClanMemberStatus_OFF( gentity_t *targ );
- 

@@ -212,7 +212,6 @@ typedef enum sayTeamMethod_e {
 	STM_TEAM = 0,
 	STM_ADMIN,
 	STM_CENTERPRINT,
-	STM_CLAN,
 	STM_NUM_METHODS
 } sayTeamMethod_t;
 
