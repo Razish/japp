@@ -384,15 +384,24 @@ static void CG_HudReload_f( void ) {
 }
 
 void CG_MessageModeAll_f( void ) {
-	CG_ChatboxOpen( CHAT_ALL );
+	if( cg_newChatbox.integer )
+		CG_ChatboxOpen( CHAT_ALL );
+	else
+		trap->SendConsoleCommand( "messagemode" );
 }
 
 void CG_MessageModeTeam_f( void ) {
-	CG_ChatboxOpen( CHAT_TEAM );
+	if( cg_newChatbox.integer )
+		CG_ChatboxOpen( CHAT_TEAM );
+	else
+		trap->SendConsoleCommand( "messagemode2" );
 }
 
 void CG_MessageModeTell_f( void ) {
-	CG_ChatboxOpen( CHAT_WHISPER );
+	if( cg_newChatbox.integer )
+		CG_ChatboxOpen( CHAT_WHISPER );
+	else
+		trap->SendConsoleCommand( "messagemode3" );
 }
 
 typedef struct command_s {
