@@ -134,15 +134,15 @@ static int cJSON_strcasecmp( const char *s1, const char *s2 ) {
 
 #endif
 
-static long cJSON_GenerateHashValue( const char *name, const int size ) {
+static uint32_t cJSON_GenerateHashValue( const char *name, const int size ) {
 	int		i;
-	long	hash;
+	uint32_t	hash;
 
 	hash = 0;
 	i = 0;
 	while ( name[i] != '\0' ) {
 		char letter = (char)tolower( name[i] );
-		hash += (long)(letter)*(i + 119);
+		hash += (uint32_t)(letter)*(i + 119);
 		i++;
 	}
 	hash = (hash ^ (hash >> 10) ^ (hash >> 20));
@@ -845,7 +845,7 @@ cJSON *cJSON_GetArrayItem( cJSON *arry, int item ) {
 
 cJSON *cJSON_GetObjectItem( cJSON *object, const char *string ) {
 	cJSON *c;
-	long hash;
+	uint32_t hash;
 	if ( !object || object->type != cJSON_Object ) {
 		return 0;	// Not an object
 	}
@@ -1070,7 +1070,7 @@ void cJSON_InsertItemInArray( cJSON *arry, cJSON *item, int before ) {
 }
 
 void cJSON_AddItemToObject( cJSON *object, const char *string, cJSON *item ) {
-	long hash;
+	uint32_t hash;
 	if ( object->type != cJSON_Object ) {
 		return;
 	}
@@ -1152,7 +1152,7 @@ void cJSON_DeleteItemFromArray( cJSON *arry, int which ) {
 
 cJSON *cJSON_DetachItemFromObject( cJSON *object, const char *string ) {
 	cJSON *c = 0, *p = 0;
-	long hash;
+	uint32_t hash;
 
 	hash = cJSON_GenerateHashValue( string, cJSON_HashTableSize );
 

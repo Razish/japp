@@ -26,6 +26,7 @@ files = [
 	'JAPP/jp_tokenparser.cpp',
 	'ui/ui_atoms.cpp',
 	'ui/ui_cvar.cpp',
+	'ui/ui_fonts.cpp',
 	'ui/ui_force.cpp',
 	'ui/ui_gameinfo.cpp',
 	'ui/ui_main.cpp',

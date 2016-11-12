@@ -14,6 +14,7 @@
 #include "bg_luaevent.h"
 #include "cg_media.h"
 #include "JAPP/jp_ssflags.h"
+#include "ui/ui_fonts.h"
 
 float CG_RadiusForCent( centity_t *cent );
 qboolean CG_CalcMuzzlePoint( int entityNum, vector3 *muzzle );
@@ -703,9 +704,10 @@ static void CG_DrawAmmo( centity_t	*cent, menuDef_t *menuHUD ) {
 		if ( focusItem ) {
 			const float fontScale = 1.0f;
 			const int fontHandle = FONT_SMALL;
-			Text_Paint( SCREEN_WIDTH - (SCREEN_WIDTH - focusItem->window.rect.x) * cgs.widthRatioCoef,
-				focusItem->window.rect.y, fontScale, &focusItem->window.foreColor, "--", 0.0f, 0,
-				ITEM_TEXTSTYLE_NORMAL, fontHandle, false
+			const Font font( fontHandle, fontScale, false );
+			font.Paint(
+				SCREEN_WIDTH - (SCREEN_WIDTH - focusItem->window.rect.x) * cgs.widthRatioCoef,
+				focusItem->window.rect.y, "--", &focusItem->window.foreColor, ITEM_TEXTSTYLE_NORMAL
 			);
 		}
 	}
@@ -919,23 +921,21 @@ static void JP_DrawStats( void ) {
 		speed
 	);
 
-	{
-		const char *statStr = va( "%-12s%i\n%-12s%i\n%-12s%.2f\n\n%-12s%i\n%-12s%i\n\n%-12s%s\n%-12s%s\n\n%-12s%s",
-			"Score", cg.snap->ps.persistant[PERS_SCORE],
-			"Deaths", cg.snap->ps.persistant[PERS_KILLED],
-			"Ratio", cg.snap->ps.persistant[PERS_KILLED]
-				? (float)((float)cg.snap->ps.persistant[PERS_SCORE] / (float)cg.snap->ps.persistant[PERS_KILLED])
-				: (float)cg.snap->ps.persistant[PERS_SCORE],
-			"Ping", ping,
-			"FPS", cg.japp.fps,
-			"Local time", localTimeStr,
-			"Map Time", mapTimeStr,
-			"Speed", speedStr );
+	const char *statStr = va(
+		"%-12s%i\n%-12s%i\n%-12s%.2f\n\n%-12s%i\n%-12s%i\n\n%-12s%s\n%-12s%s\n\n%-12s%s",
+		"Score", cg.snap->ps.persistant[PERS_SCORE],
+		"Deaths", cg.snap->ps.persistant[PERS_KILLED],
+		"Ratio", cg.snap->ps.persistant[PERS_KILLED]
+			? (float)((float)cg.snap->ps.persistant[PERS_SCORE] / (float)cg.snap->ps.persistant[PERS_KILLED])
+			: (float)cg.snap->ps.persistant[PERS_SCORE],
+		"Ping", ping,
+		"FPS", cg.japp.fps,
+		"Local time", localTimeStr,
+		"Map Time", mapTimeStr,
+		"Speed", speedStr );
 
-		Text_Paint( cg.statsPos.x, cg.statsPos.y, cg_hudStatsScale.value, &colorWhite, statStr, 0.0f, 0,
-			ITEM_ALIGN_RIGHT | ITEM_TEXTSTYLE_OUTLINED, FONT_JAPPMONO, false
-		);
-	}
+	const Font font( FONT_JAPPMONO, cg_hudStatsScale.value, false );
+	font.Paint( cg.statsPos.x, cg.statsPos.y, statStr, &colorWhite, ITEM_ALIGN_RIGHT | ITEM_TEXTSTYLE_OUTLINED );
 }
 
 void JP_DrawMovementKeys( void ) {
@@ -1004,20 +1004,22 @@ void JP_DrawMovementKeys( void ) {
 		}
 	}
 
-	w1 = Text_Width( "v W ^", cg_movementKeysScale.value, fontIndex, false );
-	w2 = Text_Width( "A S D", cg_movementKeysScale.value, fontIndex, false );
-	height = Text_Height( "A S D v W ^", cg_movementKeysScale.value, fontIndex, false );
+	const Font font( fontIndex, cg_movementKeysScale.value, false );
+	w1 = font.Width( "v W ^" );
+	w2 = font.Width( "A S D" );
+	height = font.Height( "A S D v W ^" );
 
 	Com_sprintf( str1, sizeof(str1), va( "^%cv ^%cW ^%c^", (cmd.upmove < 0) ? COLOR_RED : COLOR_WHITE,
 		(cmd.forwardmove > 0) ? COLOR_RED : COLOR_WHITE, (cmd.upmove > 0) ? COLOR_RED : COLOR_WHITE ) );
 	Com_sprintf( str2, sizeof(str2), va( "^%cA ^%cS ^%cD", (cmd.rightmove < 0) ? COLOR_RED : COLOR_WHITE,
 		(cmd.forwardmove < 0) ? COLOR_RED : COLOR_WHITE, (cmd.rightmove > 0) ? COLOR_RED : COLOR_WHITE ) );
 
-	Text_Paint( cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y, cg_movementKeysScale.value, &colorWhite,
-		str1, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex, false
+	font.Paint(
+		cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y, str1, &colorWhite, ITEM_TEXTSTYLE_OUTLINED
 	);
-	Text_Paint( cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y + height, cg_movementKeysScale.value,
-		&colorWhite, str2, 0.0f, 0, ITEM_TEXTSTYLE_OUTLINED, fontIndex, false
+	font.Paint(
+		cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y + height, str2, &colorWhite,
+		ITEM_TEXTSTYLE_OUTLINED
 	);
 }
 
@@ -1062,7 +1064,7 @@ void JP_DrawAccel( void ) {
 
 		percent = Q_clamp( -1.0f, avgAccel / maxAccel, 1.0f );
 		/*
-		Text_Paint(	cg.accelerometer.position.x + (cg.accelerometer.size.w/2),
+		font.Paint(	cg.accelerometer.position.x + (cg.accelerometer.size.w/2),
 		cg.accelerometer.position.y +  cg.accelerometer.size.h,
 		va( "%.3f", avgAccel ),
 		UI_SMALLFONT|UI_DROPSHADOW|UI_CENTER,
@@ -1097,6 +1099,7 @@ static void CG_DrawFlagStatusQ3P( void ) {
 
 	const int fontHandle = FONT_SMALL;
 	const float fontScale = 1.0f;
+	const Font font( fontHandle, fontScale, false );
 	const float iconSize = ICON_SIZE;
 	const vector4 faded = { 0.25f, 0.25f, 0.25f, 0.75f };
 	const vector4 defer = { 1.0f, 1.0f, 1.0f, 0.9f };
@@ -1127,10 +1130,11 @@ static void CG_DrawFlagStatusQ3P( void ) {
 		);
 
 		const char *s = "Flag stolen!";
-		const float width = Text_Width( s, fontScale, fontHandle, false );
-		const float height = Text_Height( s, fontScale, fontHandle, false );
-		Text_Paint( leftX + ((iconSize * cgs.widthRatioCoef) / 2.0f) - (width / 2.0f), y - height * 2.0f, fontScale,
-			&colorYellow, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+		const float width = font.Width( s );
+		const float height = font.Height( s );
+		font.Paint(
+			leftX + ((iconSize * cgs.widthRatioCoef) / 2.0f) - (width / 2.0f), y - height * 2.0f, s, &colorYellow,
+			ITEM_TEXTSTYLE_SHADOWEDMORE
 		);
 		trap->R_SetColor( NULL );
 	}
@@ -1145,10 +1149,11 @@ static void CG_DrawFlagStatusQ3P( void ) {
 
 	const char *scoreStr = va( "%i", (team == TEAM_RED) ? cgs.scores1 : cgs.scores2 );
 	const vector4 *scoreColour = &colorTable[(team == TEAM_RED) ? CT_HUD_RED : CT_CYAN];
-	float scoreWidth = Text_Width( scoreStr, fontScale, fontHandle, false );
-	float scoreHeight = Text_Height( scoreStr, fontScale, fontHandle, false );
-	Text_Paint( leftX + ((iconSize * cgs.widthRatioCoef) / 2.0f) - (scoreWidth / 2.0f), y - scoreHeight, fontScale,
-		scoreColour, scoreStr, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+	float scoreWidth = font.Width( scoreStr );
+	float scoreHeight = font.Height( scoreStr );
+	font.Paint(
+		leftX + ((iconSize * cgs.widthRatioCoef) / 2.0f) - (scoreWidth / 2.0f), y - scoreHeight, scoreStr, scoreColour,
+		ITEM_TEXTSTYLE_SHADOWED
 	);
 	trap->R_SetColor( NULL );
 
@@ -1172,10 +1177,11 @@ static void CG_DrawFlagStatusQ3P( void ) {
 	}
 	scoreStr = va( "%i", (team == TEAM_RED) ? cgs.scores2 : cgs.scores1 );
 	scoreColour = &colorTable[(team == TEAM_RED) ? CT_CYAN: CT_HUD_RED];
-	scoreWidth = Text_Width( scoreStr, fontScale, fontHandle, false );
-	scoreHeight = Text_Height( scoreStr, fontScale, fontHandle, false );
-	Text_Paint( rightX + ((iconSize * cgs.widthRatioCoef) / 2.0f) - (scoreWidth / 2.0f), y - scoreHeight, fontScale,
-		scoreColour, scoreStr, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+	scoreWidth = font.Width( scoreStr );
+	scoreHeight = font.Height( scoreStr );
+	font.Paint(
+		rightX + ((iconSize * cgs.widthRatioCoef) / 2.0f) - (scoreWidth / 2.0f), y - scoreHeight, scoreStr, scoreColour,
+		ITEM_TEXTSTYLE_SHADOWED
 	);
 	trap->R_SetColor( NULL );
 }
@@ -1305,22 +1311,19 @@ void CG_DrawHUD( centity_t *cent ) {
 		entityState_t *es = &cg_entities[cg.snap->ps.clientNum].currentState;
 		playerState_t *ps = &cg.predictedPlayerState;
 
+		Font font( fontHandle, fontScale );
 		if ( cg_smartEntities.integer ) {//Smart entities
 			str = S_COLOR_RED "Smart entities ON";
-			const float width = Text_Width( str, fontScale, fontHandle, false );
+			const float width = font.Width( str );
 			x = (36 - ( width / 2.0f));
-			Text_Paint( x + 16, y - 180, fontScale, &colorTable[CT_VLTBLUE1], str, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
-			);
+			font.Paint( x + 16, y - 180, str, &colorTable[CT_VLTBLUE1], ITEM_TEXTSTYLE_SHADOWEDMORE );
 		}
 
 		if ( cg.snap->ps.eFlags & EF_ALT_DIM ) {//alt-dim
 			str = S_COLOR_RED "Alternate dimension!";
-			const float width = Text_Width( str, fontScale, fontHandle, false );
+			const float width = font.Width( str );
 			x = (48 - (width / 2.0f));
-			Text_Paint( x + 16, y - 140, fontScale, &colorTable[CT_VLTBLUE1], str, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
-			);
+			font.Paint( x + 16, y - 140, str, &colorTable[CT_VLTBLUE1], ITEM_TEXTSTYLE_SHADOWEDMORE );
 		}
 
 		//(eFlags2 & 512) == grapple is out
@@ -1378,9 +1381,8 @@ void CG_DrawHUD( centity_t *cent ) {
 			cgs.japp.jp_cinfo
 		);
 
-		Text_Paint( 16 * cgs.widthRatioCoef, y - 380, 0.5f, &colorTable[CT_WHITE], str, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
-		);
+		font.scale = 0.5f;
+		font.Paint( 16 * cgs.widthRatioCoef, y - 380, str, &colorTable[CT_WHITE], ITEM_TEXTSTYLE_SHADOWEDMORE );
 	}
 #endif
 
@@ -1406,15 +1408,12 @@ void CG_DrawHUD( centity_t *cent ) {
 
 			// health
 			const char *str = va( "%i", cg.snap->ps.stats[STAT_HEALTH] );
-			Text_Paint( x + 16, y + 40, fontScale, &colorTable[CT_HUD_RED], str, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-			);
+			const Font font( fontHandle, fontScale, false );
+			font.Paint( x + 16, y + 40, str, &colorTable[CT_HUD_RED], ITEM_TEXTSTYLE_SHADOWED );
 
 			// armor
 			str = va( "%i", cg.snap->ps.stats[STAT_ARMOR] );
-			Text_Paint( x + 18 + 14, y + 40 + 14, fontScale, &colorTable[CT_HUD_GREEN], str, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-			);
+			font.Paint( x + 18 + 14, y + 40 + 14, str, &colorTable[CT_HUD_GREEN], ITEM_TEXTSTYLE_SHADOWED );
 
 			if ( cg.snap->ps.weapon == WP_SABER ) {
 				if ( cg.snap->ps.fd.saberDrawAnimLevel == SS_DUAL ) {
@@ -1442,12 +1441,12 @@ void CG_DrawHUD( centity_t *cent ) {
 				);
 
 			str = va( "%s", ammoString );
-			Text_Paint( SCREEN_WIDTH - (weapX + 16 + 32), y + 40, fontScale,
-				&colorTable[CT_HUD_ORANGE], str, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+			font.Paint(
+				SCREEN_WIDTH - (weapX + 16 + 32), y + 40, str, &colorTable[CT_HUD_ORANGE], ITEM_TEXTSTYLE_SHADOWED
 			);
 			str = va( "%i", cg.snap->ps.fd.forcePower );
-			Text_Paint( SCREEN_WIDTH - (x + 18 + 14 + 32), y + 40 + 14, fontScale,
-				&colorTable[CT_ICON_BLUE], str, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+			font.Paint(
+				SCREEN_WIDTH - (x + 18 + 14 + 32), y + 40 + 14, str, &colorTable[CT_ICON_BLUE], ITEM_TEXTSTYLE_SHADOWED
 			);
 		}
 		else {
@@ -1500,11 +1499,12 @@ void CG_DrawHUD( centity_t *cent ) {
 							const char *s = CG_GetScoreString();
 							const float fontScale = 0.7f;
 							const int fontHandle = FONT_SMALL;
-							const float textWidth = Text_Width( s, fontScale, fontHandle, false );
+							const Font font( fontHandle, fontScale, false );
+							const float textWidth = font.Width( s );
 							//FIXME: right-aligned
-							Text_Paint( SCREEN_WIDTH - (SCREEN_WIDTH - focusItem->window.rect.x) - textWidth,
-								focusItem->window.rect.y, fontScale, &focusItem->window.foreColor, s, 0.0f, 0,
-								ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+							font.Paint(
+								SCREEN_WIDTH - (SCREEN_WIDTH - focusItem->window.rect.x) - textWidth,
+								focusItem->window.rect.y, s, &focusItem->window.foreColor, ITEM_TEXTSTYLE_SHADOWED
 							);
 						}
 					}
@@ -1703,10 +1703,12 @@ void CG_DrawForceSelect( void ) {
 	if ( showPowersName[cg.forceSelect] ) {
 		const float fontScale = 1.0;
 		const int fontHandle = FONT_SMALL;
+		const Font font( fontHandle, fontScale, false );
 		const char *str = CG_GetStringEdString( "SP_INGAME", showPowersName[cg.forceSelect] );
-		const float width = Text_Width( str, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y + 30 + yOffset, fontScale, &colorTable[CT_ICON_BLUE], str,
-			0.0f, 0, ITEM_TEXTSTYLE_NORMAL, fontHandle, false
+		const float width = font.Width( str );
+		font.Paint(
+			(SCREEN_WIDTH / 2.0f) - (width / 2.0f), y + 30 + yOffset, str, &colorTable[CT_ICON_BLUE],
+			ITEM_TEXTSTYLE_NORMAL
 		);
 	}
 }
@@ -1752,10 +1754,11 @@ void CG_DrawInvenSelect( void ) {
 		y2 = 0; //err?
 		const float fontScale = 1.0f;
 		const int fontHandle = FONT_SMALL;
+		const Font font( fontHandle, fontScale, false );
 		const char *str = "EMPTY INVENTORY";
-		const float width = Text_Width( str, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y2 + 22, fontScale, &colorTable[CT_ICON_BLUE], str, 0.0f, 0,
-			ITEM_TEXTSTYLE_NORMAL, fontHandle, false
+		const float width = font.Width( str );
+		font.Paint(
+			(SCREEN_WIDTH / 2.0f) - (width / 2.0f), y2 + 22, str, &colorTable[CT_ICON_BLUE], ITEM_TEXTSTYLE_NORMAL
 		);
 		return;
 	}
@@ -1849,22 +1852,17 @@ void CG_DrawInvenSelect( void ) {
 
 			strcpy( upperKey, bg_itemlist[itemNdex].classname );
 
+			const float fontScale = 1.0f;
+			const int fontHandle = FONT_SMALL;
+			const Font font( fontHandle, fontScale, false );
 			if ( trap->SE_GetStringTextString( va( "SP_INGAME_%s", upperKey ), text, sizeof(text) ) ) {
-				const float fontScale = 1.0f;
-				const int fontHandle = FONT_SMALL;
-				const float width = Text_Width( text, fontScale, fontHandle, false );
-				Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y + 45, fontScale, &textColor, text, 0.0f, 0,
-					ITEM_TEXTSTYLE_NORMAL, fontHandle, false
-				);
+				const float width = font.Width( text );
+				font.Paint( (SCREEN_WIDTH / 2.0f) - (width / 2.0f), y + 45, text, &textColor, ITEM_TEXTSTYLE_NORMAL );
 			}
 			else {
-				const float fontScale = 1.0f;
-				const int fontHandle = FONT_SMALL;
 				const char *str = bg_itemlist[itemNdex].classname;
-				const float width = Text_Width( str, fontScale, fontHandle, false );
-				Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y + 45, fontScale, &textColor, str, 0.0f,
-					0, ITEM_TEXTSTYLE_NORMAL, fontHandle, false
-				);
+				const float width = font.Width( str );
+				font.Paint( (SCREEN_WIDTH / 2.0f) - (width / 2.0f), y + 45, str, &textColor, ITEM_TEXTSTYLE_NORMAL );
 			}
 		}
 	}
@@ -2828,6 +2826,9 @@ static float CG_DrawMiniScoreboard( float y ) {
 	if ( !cg_drawScores.integer || cgs.gametype == GT_SIEGE ) {
 		return y;
 	}
+	//const qhandle_t fontHandle = FONT_JAPPMONO;
+	//const float fontScale = 0.5;
+	const Font font( cg_topRightFont.integer, cg_topRightSize.value, false );
 
 	if ( cgs.gametype >= GT_TEAM ) {
 		char s[MAX_STRING_CHARS];
@@ -2836,21 +2837,18 @@ static float CG_DrawMiniScoreboard( float y ) {
 		Q_strcat( s, sizeof(s), va( " %s: ", CG_GetStringEdString( "MP_INGAME", "BLUE" ) ) );
 		Q_strcat( s, sizeof(s), cgs.scores2 == SCORE_NOT_PRESENT ? "-" : (va( "%i", cgs.scores2 )) );
 
-		float w = Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer, false );
-		Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &g_color_table[ColorIndex(COLOR_WHITE)], s, 0, 0,
-			ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer, false
-		);
+		float w = font.Width( s );
+		font.Paint( SCREEN_WIDTH - w, y, s, &g_color_table[ColorIndex(COLOR_WHITE)], ITEM_TEXTSTYLE_SHADOWED );
 
-		y += Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer, false );
+		y += font.Height( s );
 	}
 
 	else if ( cgs.gametype == GT_FFA ) {
 		if ( cg_drawScores.integer == 2 && !cg.scoreBoardShowing ) {
-			const qhandle_t fontHandle = FONT_JAPPMONO;
-			const float fontScale = 0.5;
+			const int numToShow = 5;
 			// start at 4, because we'll put ourselves at the end if we're no in the top 5
 			// end result will be showing up to 5 players
-			int numScores = std::min( cg.numScores, 4 );
+			int numScores = std::min( cg.numScores, numToShow-1 );
 			const score_t *ourScore = nullptr;
 			for ( int i = 0; i < numScores; i++ ) {
 				const score_t *score = &cg.scores[i];
@@ -2868,7 +2866,7 @@ static float CG_DrawMiniScoreboard( float y ) {
 				}
 			}
 
-			char buf[5][128]{};
+			char buf[numToShow][128]{};
 			uint32_t numWritten = 0u;
 			for ( int i = 0; i < numScores; i++ ) {
 				const score_t *score = &cg.scores[i];
@@ -2908,11 +2906,11 @@ static float CG_DrawMiniScoreboard( float y ) {
 				numWritten++;
 			}
 
-			const float textHeight = Text_Height( buf[0], fontScale, fontHandle, false );
+			const float textHeight = font.Height( buf[0] );
 			for ( int i = 0; i < numWritten; i++ ) {
-				const float textWidth = Text_Width( buf[i], fontScale, fontHandle, false );
-				Text_Paint( SCREEN_WIDTH - textWidth, y + (i * textHeight), fontScale, &colorWhite, buf[i], 0.0f, 0,
-					ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+				const float textWidth = font.Width( buf[i] );
+				font.Paint(
+					SCREEN_WIDTH - textWidth, y + (i * textHeight), buf[i], &colorWhite, ITEM_TEXTSTYLE_SHADOWED
 				);
 				y += textHeight;
 			}
@@ -2925,8 +2923,8 @@ static float CG_DrawMiniScoreboard( float y ) {
 static float CG_DrawEnemyInfo( float y ) {
 	int			clientNum;
 	const char *title = nullptr;
-	const qhandle_t fontHandle = FONT_SMALL2;
-	const float fontScale = 1.0f;
+	const Font fontSmall( FONT_MEDIUM, 0.7, false );
+	const Font fontLarge( FONT_SMALL2, 1.0f, false );
 	float textWidth = 0.0f;
 
 	if ( !cg.snap || cg_drawEnemyInfo.integer != 1 || cg.predictedPlayerState.stats[STAT_HEALTH] <= 0
@@ -2954,10 +2952,9 @@ static float CG_DrawEnemyInfo( float y ) {
 
 			y += ICON_SIZE;
 
-			textWidth = Text_Width( title, 0.7f, FONT_MEDIUM, false );
-			Text_Paint( SCREEN_WIDTH - textWidth, y, 0.7f, &colorWhite, title, 0, 0, 0,
-				FONT_MEDIUM, false
-			);
+
+			textWidth = fontSmall.Width( title );
+			fontSmall.Paint( SCREEN_WIDTH - textWidth, y, title, &colorWhite );
 
 			return y + BIGCHAR_HEIGHT + 2;
 		}
@@ -3010,16 +3007,12 @@ static float CG_DrawEnemyInfo( float y ) {
 
 	y += ICON_SIZE;
 
-	textWidth = Text_Width( ci->name, fontScale, fontHandle, false );
-	Text_Paint( SCREEN_WIDTH - textWidth, y, fontScale, &colorWhite, ci->name, 0.0f, 0, 0, fontHandle,
-		false
-	);
+	textWidth = fontLarge.Width( ci->name );
+	fontLarge.Paint( SCREEN_WIDTH - textWidth, y, ci->name, &colorWhite );
 
 	y += 15;
-	textWidth = Text_Width( title, fontScale, fontHandle, false );
-	Text_Paint( SCREEN_WIDTH - textWidth, y, fontScale, &colorWhite, title, 0.0f, 0, 0, fontHandle,
-		false
-	);
+	textWidth = fontLarge.Width( title );
+	fontLarge.Paint( SCREEN_WIDTH - textWidth, y, title, &colorWhite );
 
 	if ( (cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL)
 		&& cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR )
@@ -3028,8 +3021,8 @@ static float CG_DrawEnemyInfo( float y ) {
 		char text[1024];
 		y += 15;
 		Com_sprintf( text, sizeof(text), "%i/%i", cgs.clientinfo[clientNum].score, cgs.fraglimit );
-		textWidth = Text_Width( text, 0.7f, FONT_MEDIUM, false );
-		Text_Paint( SCREEN_WIDTH - textWidth, y, 0.7f, &colorWhite, text, 0, 0, 0, FONT_MEDIUM, false );
+		textWidth = fontSmall.Width( text );
+		fontSmall.Paint( SCREEN_WIDTH - textWidth, y, text, &colorWhite );
 	}
 
 	// nmckenzie: DUEL_HEALTH - fixme - need checks and such here.  And this is coded to duelist 1 right now, which is wrongly.
@@ -3089,6 +3082,7 @@ static float CG_DrawFPS( float y ) {
 
 	cg.japp.fps = fps = 1000.0f * (float)((float)(FPS_FRAMES) / (float)total);
 
+	const Font font( cg_topRightFont.integer, cg_topRightSize.value, false );
 	if ( cg_drawFPS.integer ) {
 		vector4 fpsColour = { 1.0f, 1.0f, 1.0f, 1.0f }, fpsGood = { 0.0f, 1.0f, 0.0f, 1.0f }, fpsBad = { 1.0f, 0.0f, 0.0f, 1.0f };
 		CG_LerpColour(
@@ -3100,20 +3094,16 @@ static float CG_DrawFPS( float y ) {
 		);
 
 		s = va( "%ifps", fps );
-		w = Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer, false );
-		Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &fpsColour, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED,
-			cg_topRightFont.integer, false
-		);
-		y += Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer, false );
+		w = font.Width( s );
+		font.Paint( SCREEN_WIDTH - w, y, s, &fpsColour, ITEM_TEXTSTYLE_SHADOWED );
+		y += font.Height( s );
 	}
 	if ( cg_drawFPS.integer == 2 ) {
 		s = va( "%i/%3.2f msec", frameTime, 1000.0f / (float)fps );
 
-		w = Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer, false );
-		Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, &g_color_table[ColorIndex(COLOR_GREY)], s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, cg_topRightFont.integer, qfalse);
-
-		y += Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer, false );
+		w = font.Width( s );
+		font.Paint( SCREEN_WIDTH - w, y, s, &g_color_table[ColorIndex(COLOR_GREY)], ITEM_TEXTSTYLE_SHADOWED );
+		y += font.Height( s );
 	}
 	return y;
 }
@@ -3646,13 +3636,12 @@ static float CG_DrawTimer( float y ) {
 	secs %= 60;
 	//	msec %= 1000;
 
+	const Font font( cg_topRightFont.integer, cg_topRightSize.value, false );
 	s = va( "%i:%02i", mins, abs( secs ) );
-	w = Text_Width( s, cg_topRightSize.value, cg_topRightFont.integer, false );
-	Text_Paint( SCREEN_WIDTH - w, y, cg_topRightSize.value, timeColour, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED,
-		cg_topRightFont.integer, false
-	);
+	w = font.Width( s );
+	font.Paint( SCREEN_WIDTH - w, y, s, timeColour, ITEM_TEXTSTYLE_SHADOWED );
 
-	return y + Text_Height( s, cg_topRightSize.value, cg_topRightFont.integer, false );
+	return y + font.Height( s );
 }
 
 static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
@@ -3865,8 +3854,10 @@ static void CG_DrawPowerupIcons( int y ) {
 					const char *s = va( "%i", secondsLeft );
 					const float fontScale = 1.0f;
 					const int fontHandle = FONT_LARGE;
-					Text_Paint( (SCREEN_WIDTH - iconWidth - (iconWidth * cgs.widthRatioCoef)), y - 8, fontScale,
-						&colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+					const Font font( fontHandle, fontScale, false );
+					font.Paint(
+						(SCREEN_WIDTH - iconWidth - (iconWidth * cgs.widthRatioCoef)), y - 8, s, &colorWhite,
+						ITEM_TEXTSTYLE_SHADOWED
 					);
 				}
 
@@ -3957,30 +3948,26 @@ static void CG_DrawReward( void ) {
 }
 
 qboolean CG_DrawMapChange( void ) {
-	if ( cg.mMapChange ) {
-		const float fontScale = 1.0;
-		const qhandle_t fontHandle = FONT_SMALL;
-
-		trap->R_SetColor( NULL );
-		CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, trap->R_RegisterShaderNoMip( "menu/art/unknownmap_mp" ) );
-
-		const char *s = CG_GetStringEdString( "MP_INGAME", "SERVER_CHANGING_MAPS" ); // s = "Server Changing Maps";
-		float w = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint(
-			(SCREEN_WIDTH / 2.0f) - (w / 2.0f), 100, fontScale, &colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED,
-			fontHandle, false
-		);
-
-		s = CG_GetStringEdString( "MP_INGAME", "PLEASE_WAIT" ); // s = "Please wait...";
-		w = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint(
-			(SCREEN_WIDTH / 2.0f) - (w / 2.0f), 200, fontScale, &colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED,
-			fontHandle, false
-		);
-		return qtrue;
+	if ( !cg.mMapChange ) {
+		return false;
 	}
 
-	return qfalse;
+	const float fontScale = 1.0;
+	const qhandle_t fontHandle = FONT_SMALL;
+	const Font font( fontHandle, fontScale, false );
+
+	trap->R_SetColor( NULL );
+	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, trap->R_RegisterShaderNoMip( "menu/art/unknownmap_mp" ) );
+
+	const char *s = CG_GetStringEdString( "MP_INGAME", "SERVER_CHANGING_MAPS" ); // s = "Server Changing Maps";
+	float w = font.Width( s );
+	font.Paint( (SCREEN_WIDTH / 2.0f) - (w / 2.0f), 100, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
+
+	s = CG_GetStringEdString( "MP_INGAME", "PLEASE_WAIT" ); // s = "Please wait...";
+	w = font.Width( s );
+	font.Paint( (SCREEN_WIDTH / 2.0f) - (w / 2.0f), 200, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
+
+	return true;
 }
 
 #define	LAG_SAMPLES		64
@@ -4040,11 +4027,9 @@ static void CG_DrawDisconnect( void ) {
 	s = CG_GetStringEdString( "MP_INGAME", "CONNECTION_INTERRUPTED" );
 	const float fontScale = 1.0f;
 	const qhandle_t fontHandle = FONT_SMALL;
-	const float w = Text_Width( s, fontScale, fontHandle, false );
-	Text_Paint(
-		(SCREEN_WIDTH / 2.0f) - (w / 2.0f), 100.0f,
-		fontScale, &colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-	);
+	const Font font( fontHandle, fontScale, false );
+	const float w = font.Width( s );
+	font.Paint( (SCREEN_WIDTH / 2.0f) - (w / 2.0f), 100.0f, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 
 	// blink the icon
 	if ( (cg.time >> 9) & 1 ) {
@@ -4158,15 +4143,12 @@ static void CG_DrawLagometer( void ) {
 
 	const float fontScale = 0.33333f;
 	const int fontHandle = FONT_JAPPMONO;
+	const Font font( fontHandle, fontScale, false );
 	if ( cg_noPredict.integer || g_synchronousClients.integer ) {
-		Text_Paint( x, y, fontScale, &colorTable[CT_WHITE], "snc", fontScale, 0, ITEM_TEXTSTYLE_SHADOWEDMORE,
-			fontHandle, false
-		);
+		font.Paint( x, y, "snc", &colorTable[CT_WHITE], ITEM_TEXTSTYLE_SHADOWEDMORE );
 	}
 	else if ( cg.snap && cg_lagometer.integer == 2 ) {
-		Text_Paint( x, y, fontScale, &colorTable[CT_WHITE], va( "%i", cg.snap->ping ), 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
-		);
+		font.Paint( x, y, va( "%i", cg.snap->ping ), &colorTable[CT_WHITE], ITEM_TEXTSTYLE_SHADOWEDMORE );
 
 		int32_t total = 0u;
 		for ( size_t i = 0u; i < LAG_SAMPLES; i++ ) {
@@ -4174,9 +4156,9 @@ static void CG_DrawLagometer( void ) {
 		}
 		float avgXerp = total / (float)LAG_SAMPLES;
 		const char *xerpText = va( "%04.1f", avgXerp );
-		const float xerpWidth = Text_Width( xerpText, fontScale, fontHandle, false );
-		Text_Paint( x + (w * cgs.widthRatioCoef) - xerpWidth, y, fontScale, &colorTable[CT_WHITE], xerpText, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+		const float xerpWidth = font.Width( xerpText );
+		font.Paint(
+			x + (w * cgs.widthRatioCoef) - xerpWidth, y, xerpText, &colorTable[CT_WHITE], ITEM_TEXTSTYLE_SHADOWEDMORE
 		);
 	}
 
@@ -4274,6 +4256,7 @@ static void CG_DrawCenterString(void){
 	y = data->y - data->numLines * BIGCHAR_HEIGHT / 2;
 	start = data->string;
 
+	const Font font( FONT_MEDIUM, scale, false );
 	while (1) {
 		char linebuffer[1024];
 
@@ -4285,10 +4268,10 @@ static void CG_DrawCenterString(void){
 		}
 		linebuffer[l] = 0;
 
-		w = Text_Width( linebuffer, scale, FONT_MEDIUM, false );
-		h = Text_Height( linebuffer, scale, FONT_MEDIUM, false );
+		w = font.Width( linebuffer );
+		h = font.Height( linebuffer );
 		x = (SCREEN_WIDTH - w) / 2;
-		Text_Paint(x, y + h, scale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, qfalse);
+		font.Paint( x, y + h, linebuffer, color, ITEM_TEXTSTYLE_SHADOWEDMORE );
 		y += h + 6;
 
 		while (*start && (*start != '\n')) {
@@ -4342,10 +4325,10 @@ static void CG_DrawCenterString( void ) {
 		}
 		linebuffer[l] = 0;
 
-		w = Text_Width( linebuffer, scale, FONT_MEDIUM );
-		h = Text_Height( linebuffer, scale, FONT_MEDIUM );
+		w = font.Width( linebuffer, scale, FONT_MEDIUM );
+		h = font.Height( linebuffer, scale, FONT_MEDIUM );
 		x = (SCREEN_WIDTH - w) / 2;
-		Text_Paint(x, y + h, scale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, qfalse);
+		font.Paint(x, y + h, scale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, qfalse);
 		y += h + 6;
 
 		while ( *start && (*start != '\n') ) {
@@ -5781,32 +5764,31 @@ static void CG_DrawCrosshairNames( void ) {
 	if ( isVeh ) {
 		const float fontScale = 1.0f;
 		const int fontHandle = FONT_MEDIUM;
+		const Font font( fontHandle, fontScale, false );
 		char str[MAX_STRING_CHARS];
 		Com_sprintf( str, MAX_STRING_CHARS, "%s (pilot)", name );
-		const float width = Text_Width( str, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 170, fontScale, &tcolor, str, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
-		);
+		const float width = font.Width( str );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 170, str, &tcolor, ITEM_TEXTSTYLE_SHADOWEDMORE );
 	}
 	else if ( cg_drawCrosshairNames.integer == 1 ) {
 		const float fontScale = 1.0f;
 		const int fontHandle = FONT_MEDIUM;
-		const float width = Text_Width( name, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 170, fontScale, &tcolor, name, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
-		);
+		const Font font( fontHandle, fontScale, false );
+		const float width = font.Width( name );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 170, name, &tcolor, ITEM_TEXTSTYLE_SHADOWEDMORE );
 	}
 	else if ( cg_drawCrosshairNames.integer >= 2 && !CG_FadeColor2( &tcolor, cg.crosshairClientTime, 250.0f ) ) {
 		float fontScale = 0.875f;
 		const int fontHandle = FONT_JAPPSMALL;
+		const Font font( fontHandle, fontScale, false );
 
 		if ( cg_drawCrosshairNames.integer == 3 ) {
 			// shrink as it fades
 			fontScale *= tcolor.a;
 		}
-		const float width = Text_Width( name, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), (SCREEN_HEIGHT / 2) - 70.0f, fontScale, &tcolor, name, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
+		const float width = font.Width( name );
+		font.Paint(
+			(SCREEN_WIDTH / 2) - (width / 2.0f), (SCREEN_HEIGHT / 2) - 70.0f, name, &tcolor, ITEM_TEXTSTYLE_SHADOWEDMORE
 		);
 	}
 
@@ -5816,7 +5798,7 @@ static void CG_DrawCrosshairNames( void ) {
 static void CG_DrawClientNames( void ) {
 	const qhandle_t fontHandle = FONT_JAPPSMALL;
 	const float fontScale = 0.75f;
-	const float fontHeight = trap->R_Font_HeightPixels( fontHandle, fontScale );
+	const Font font( fontHandle, fontScale, false );
 	const vector4 *colour = &g_color_table[ColorIndex( COLOR_WHITE )];
 
 	if ( !cg_drawSpectatorNames.integer || !cg.snap ) {
@@ -5847,11 +5829,9 @@ static void CG_DrawClientNames( void ) {
 				colour = &g_color_table[ColorIndex( (ci.team == TEAM_RED) ? COLOR_RED : COLOR_CYAN )];
 			}
 			const char *name = ci.name;
-			Text_Paint(
-				x - Text_Width( name, fontScale, fontHandle, false ) / 2.0f,
-				y - (fontHeight / 2.0f),
-				fontScale, colour, name, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, fontHandle, false
-			);
+			const float textWidth = font.Width( name );
+			const float textHeight = font.Height( name );
+			font.Paint( x - textWidth / 2.0f, y - textHeight / 2.0f, name, colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
 		}
 	}
 }
@@ -5882,9 +5862,9 @@ static void CG_DrawSpectator( void ) {
 				CG_GetStringEdString( "MP_INGAME", "SPECHUD_VERSUS" ), cgs.clientinfo[cgs.duelist2].name
 			);
 		}
-		Text_Paint( (SCREEN_WIDTH / 2) - Text_Width( text, 1.0f, FONT_LARGE, false ) / 2, 420, 1.0f, &colorWhite, text,
-			0, 0, 0, FONT_LARGE, false
-		);
+		const Font largeFont( FONT_LARGE, 1.0f, false );
+		const Font mediumFont( FONT_MEDIUM, 1.0f, false );
+		largeFont.Paint( (SCREEN_WIDTH / 2) - largeFont.Width( text ) / 2, 420, text, &colorWhite );
 
 		trap->R_SetColor( &colorTable[CT_WHITE] );
 		if ( cgs.clientinfo[cgs.duelist1].modelIcon ) {
@@ -5904,13 +5884,14 @@ static void CG_DrawSpectator( void ) {
 
 		if ( cgs.gametype != GT_POWERDUEL ) {
 			Com_sprintf( text, sizeof(text), "%i/%i", cgs.clientinfo[cgs.duelist1].score, cgs.fraglimit );
-			Text_Paint( 42 - Text_Width( text, 1.0f, FONT_MEDIUM, false ) / 2, SCREEN_HEIGHT - (size * 1.5f) + 64, 1.0f,
-				&colorWhite, text, 0, 0, 0, FONT_MEDIUM, false
+			mediumFont.Paint(
+				42 - mediumFont.Width( text ) / 2, SCREEN_HEIGHT - (size * 1.5f) + 64, text, &colorWhite
 			);
 
 			Com_sprintf( text, sizeof(text), "%i/%i", cgs.clientinfo[cgs.duelist2].score, cgs.fraglimit );
-			Text_Paint( SCREEN_WIDTH - size + 22 - Text_Width( text, 1.0f, FONT_MEDIUM, false ) / 2,
-				SCREEN_HEIGHT - (size * 1.5f) + 64, 1.0f, &colorWhite, text, 0, 0, 0, FONT_MEDIUM, false
+			mediumFont.Paint(
+				SCREEN_WIDTH - size + 22 - mediumFont.Width( text ) / 2, SCREEN_HEIGHT - (size * 1.5f) + 64, text,
+				&colorWhite
 			);
 		}
 
@@ -5932,12 +5913,9 @@ static void CG_DrawSpectator( void ) {
 	CG_DrawPic( (SCREEN_WIDTH / 3.0f) - ((SCREEN_WIDTH / 3.0f) / 2.0f), 0, (SCREEN_WIDTH / 3.0f)*2.0f, 60.0f, media.gfx.interface.forceIconBackground );
 	trap->R_SetColor( NULL );
 
-	Text_Paint( (SCREEN_WIDTH / 2.0f) - (Text_Width( s, 0.5f, FONT_JAPPLARGE, false ) / 2.0f), 0/*420*/, 0.5f,
-		&colorWhite, s, 0, 0, 0, FONT_JAPPLARGE, false
-	);
-	Text_Paint( (SCREEN_WIDTH / 2.0f) - (Text_Width( s2, 0.5f, FONT_JAPPLARGE, false ) / 2.0f), 16/*440*/, 0.5f,
-		&colorWhite, s2, 0, 0, 0, FONT_JAPPLARGE, false
-	);
+	const Font topFont( FONT_JAPPLARGE, 0.5f, false );
+	topFont.Paint( (SCREEN_WIDTH / 2.0f) - (topFont.Width( s ) / 2.0f), 0/*420*/, s, &colorWhite );
+	topFont.Paint( (SCREEN_WIDTH / 2.0f) - (topFont.Width( s2 ) / 2.0f), 16/*440*/, s2, &colorWhite );
 }
 
 static void CG_DrawVote( void ) {
@@ -6065,9 +6043,14 @@ static void CG_DrawTeamVote( void ) {
 }
 
 qboolean CG_DrawQ3PScoreboard( void );
+qboolean CG_DrawJAPPScoreboard( void );
 static qboolean CG_DrawScoreboard( void ) {
-	if ( cg_newScoreboard.integer == 1 )
+	if ( cg_newScoreboard.integer == 1 ) {
 		return CG_DrawQ3PScoreboard();
+	}
+	else if ( cg_newScoreboard.integer == 2 ) {
+		return CG_DrawJAPPScoreboard();
+	}
 	else
 		return CG_DrawOldScoreboard();
 #if 0
@@ -6149,31 +6132,32 @@ static void CG_DrawIntermission( void ) {
 }
 
 static qboolean CG_DrawFollow( void ) {
-	const char	*s;
-
-	if ( !CG_IsFollowing() || cg.scoreBoardShowing )
+	if ( !CG_IsFollowing() || cg.scoreBoardShowing ) {
 		return qfalse;
+	}
 
-	//	s = "following";
+	const Font font( FONT_JAPPLARGE, 0.875f );
+	const char *s = nullptr;
 	if ( cgs.gametype == GT_POWERDUEL ) {
 		clientInfo_t *ci = &cgs.clientinfo[cg.snap->ps.clientNum];
 
-		if ( ci->duelTeam == DUELTEAM_LONE )	s = CG_GetStringEdString( "MP_INGAME", "FOLLOWINGLONE" );
-		else if ( ci->duelTeam == DUELTEAM_DOUBLE )	s = CG_GetStringEdString( "MP_INGAME", "FOLLOWINGDOUBLE" );
-		else										s = CG_GetStringEdString( "MP_INGAME", "FOLLOWING" );
+		if ( ci->duelTeam == DUELTEAM_LONE ) {
+			s = CG_GetStringEdString( "MP_INGAME", "FOLLOWINGLONE" );
+		}
+		else if ( ci->duelTeam == DUELTEAM_DOUBLE ) {
+			s = CG_GetStringEdString( "MP_INGAME", "FOLLOWINGDOUBLE" );
+		}
+		else {
+			s = CG_GetStringEdString( "MP_INGAME", "FOLLOWING" );
+		}
 	}
 	else {
 		s = CG_GetStringEdString( "MP_INGAME", "FOLLOWING" );
 	}
-
-	Text_Paint( (SCREEN_WIDTH / 2) - Text_Width( s, 0.875f, FONT_JAPPLARGE, false ) / 2, 72, 0.875f, &colorWhite, s, 0,
-		0, 0, FONT_JAPPLARGE, false
-	);
+	font.Paint( (SCREEN_WIDTH / 2) - font.Width( s ) / 2, 72, s, &colorWhite );
 
 	s = cgs.clientinfo[cg.snap->ps.clientNum].name;
-	Text_Paint( (SCREEN_WIDTH / 2) - Text_Width( s, 0.875f, FONT_JAPPLARGE, false ) / 2, 96, 0.875f, &colorWhite, s, 0,
-		0, 0, FONT_JAPPLARGE, false
-	);
+	font.Paint( (SCREEN_WIDTH / 2) - font.Width( s ) / 2, 96, s, &colorWhite );
 
 	return qtrue;
 }
@@ -6237,10 +6221,9 @@ static void CG_DrawWarmup( void ) {
 			else {
 				s = va( "%s vs %s", ci1->name, ci2->name );
 			}
-			w = Text_Width( s, 0.6f, FONT_MEDIUM, false );
-			Text_Paint( (SCREEN_WIDTH / 2) - w / 2, 60, 0.6f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE,
-				FONT_MEDIUM, false
-			);
+			const Font font( FONT_MEDIUM, 0.6f, false );
+			w = font.Width( s );
+			font.Paint( (SCREEN_WIDTH / 2) - w / 2, 60, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWEDMORE );
 		}
 	}
 	else {
@@ -6274,10 +6257,9 @@ static void CG_DrawWarmup( void ) {
 		else {
 			s = "Unknown";
 		}
-		w = Text_Width( s, 1.5f, FONT_MEDIUM, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - w / 2, 90, 1.5f, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE,
-			FONT_MEDIUM, false
-		);
+		const Font font( FONT_MEDIUM, 1.5f, false );
+		w = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - w / 2, 90, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWEDMORE );
 	}
 
 	sec = (sec - cg.time) / 1000;
@@ -6321,10 +6303,9 @@ static void CG_DrawWarmup( void ) {
 		break;
 	}
 
-	w = Text_Width( s, scale, FONT_MEDIUM, false );
-	Text_Paint( (SCREEN_WIDTH / 2) - w / 2, 125, scale, &colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM,
-		false
-	);
+	const Font font( FONT_MEDIUM, scale, false );
+	w = font.Width( s );
+	font.Paint( (SCREEN_WIDTH / 2) - w / 2, 125, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWEDMORE );
 }
 
 void CG_DrawTimedMenus( void ) {
@@ -6512,10 +6493,10 @@ static void CG_DrawSiegeTimer( int timeRemaining, qboolean isMyTeam ) {
 	item = Menu_FindItemByName( menuHUD, "timer" );
 	if ( item ) {
 		const int fColor = isMyTeam ? CT_HUD_RED : CT_HUD_GREEN;
-		const int fontHandle = FONT_SMALL;
-		const float fontScale = 1.0f;
-		Text_Paint( SCREEN_WIDTH - (SCREEN_WIDTH - item->window.rect.x) * cgs.widthRatioCoef, item->window.rect.y,
-			fontScale, &colorTable[fColor], timeStr, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+		const Font font( FONT_SMALL, 1.0f, false );
+		font.Paint(
+			SCREEN_WIDTH - (SCREEN_WIDTH - item->window.rect.x) * cgs.widthRatioCoef, item->window.rect.y, timeStr,
+			&colorTable[fColor], ITEM_TEXTSTYLE_SHADOWED
 		);
 	}
 }
@@ -6548,10 +6529,10 @@ static void CG_DrawSiegeDeathTimer( int timeRemaining ) {
 
 	item = Menu_FindItemByName( menuHUD, "deathtimer" );
 	if ( item ) {
-		const int fontHandle = FONT_SMALL;
-		const float fontScale = 1.0f;
-		Text_Paint( SCREEN_WIDTH - (SCREEN_WIDTH - item->window.rect.x) * cgs.widthRatioCoef, item->window.rect.y,
-			fontScale, &item->window.foreColor, timeStr, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
+		const Font font( FONT_SMALL, 1.0f, false );
+		font.Paint(
+			SCREEN_WIDTH - (SCREEN_WIDTH - item->window.rect.x) * cgs.widthRatioCoef, item->window.rect.y, timeStr,
+			&item->window.foreColor, ITEM_TEXTSTYLE_SHADOWED
 		);
 	}
 }
@@ -6635,8 +6616,8 @@ void CG_ChatBox_AddString( char *chatStr ) {
 
 	chat->lines = 1;
 
-	//FIXME: scale isn't correct here?
-	chatLen = Text_Width( chat->string, 1.0f, FONT_SMALL, false );
+	const Font font( FONT_SMALL, 0.65f, false );
+	chatLen = font.Width( chat->string );
 	if ( chatLen > CHATBOX_CUTOFF_LEN ) {
 		// we have to break it into segments...
 		int i, lastLinePt = 0;
@@ -6646,7 +6627,7 @@ void CG_ChatBox_AddString( char *chatStr ) {
 		for ( i = 0; chat->string[i]; i++ ) {
 			s[0] = chat->string[i];
 			s[1] = 0;
-			chatLen += Text_Width( s, 0.65f, FONT_SMALL, false );
+			chatLen += font.Width( s );
 
 			if ( chatLen >= CHATBOX_CUTOFF_LEN ) {
 				int j;
@@ -6714,9 +6695,10 @@ static void CG_ChatBox_DrawStrings( void ) {
 	// move initial point up so we draw bottom-up (visually)
 	y -= (CHATBOX_FONT_HEIGHT*fontScale)*linesToDraw;
 
+	const Font font( FONT_SMALL, fontScale, false );
 	//we have the items we want to draw, just quickly loop through them now
 	for ( i = 0; i < numToDraw; i++ ) {
-		Text_Paint(x, y, fontScale, &colorWhite, drawThese[i]->string, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL, qfalse);
+		font.Paint( x, y, drawThese[i]->string, &colorWhite, ITEM_TEXTSTYLE_OUTLINED );
 		y += ((CHATBOX_FONT_HEIGHT*fontScale)*drawThese[i]->lines);
 	}
 }

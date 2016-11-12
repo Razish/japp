@@ -12,6 +12,7 @@
 #include "cg_lights.h"
 #include "cg_media.h"
 #include "cg_serverHistory.h"
+#include "ui/ui_fonts.h"
 
 displayContextDef_t cgDC;
 
@@ -1224,22 +1225,24 @@ float CG_Cvar_Get( const char *cvar ) {
 }
 
 void CG_Text_PaintWithCursor( float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont, bool customFont ) {
-	Text_Paint( x, y, scale, color, text, 0, limit, style, iMenuFont, customFont );
+	const Font font( iMenuFont, scale, customFont );
+	font.Paint( x, y, text, color, style, limit );
 	//FIXME: add cursor code
 }
 
 static int CG_OwnerDrawWidth( int ownerDraw, float scale ) {
+	const Font font( FONT_MEDIUM, scale, false );
 	switch ( ownerDraw ) {
 	case CG_GAME_TYPE:
-		return Text_Width( BG_GetGametypeString( cgs.gametype ), scale, FONT_MEDIUM, false );
+		return font.Width( BG_GetGametypeString( cgs.gametype ) );
 	case CG_GAME_STATUS:
-		return Text_Width( CG_GetGameStatusText(), scale, FONT_MEDIUM, false );
+		return font.Width( CG_GetGameStatusText() );
 	case CG_KILLER:
-		return Text_Width( CG_GetKillerText(), scale, FONT_MEDIUM, false );
+		return font.Width( CG_GetKillerText() );
 	case CG_RED_NAME:
-		return Text_Width( DEFAULT_REDTEAM_NAME/*cg_redTeamName.string*/, scale, FONT_MEDIUM, false );
+		return font.Width( DEFAULT_REDTEAM_NAME/*cg_redTeamName.string*/ );
 	case CG_BLUE_NAME:
-		return Text_Width( DEFAULT_BLUETEAM_NAME/*cg_blueTeamName.string*/, scale, FONT_MEDIUM, false );
+		return font.Width( DEFAULT_BLUETEAM_NAME/*cg_blueTeamName.string*/ );
 	default:
 		break;
 	}
@@ -1322,9 +1325,6 @@ void CG_LoadHudMenu( void ) {
 	cgDC.setColor = trap->R_SetColor;
 	cgDC.drawHandlePic = CG_DrawPic;
 	cgDC.drawStretchPic = trap->R_DrawStretchPic;
-	cgDC.drawText = Text_Paint;
-	cgDC.textWidth = Text_Width;
-	cgDC.textHeight = Text_Height;
 	cgDC.registerModel = trap->R_RegisterModel;
 	cgDC.modelBounds = trap->R_ModelBounds;
 	cgDC.fillRect = CG_FillRect;

@@ -2,6 +2,7 @@
 #include "ui/ui_shared.h"
 #include "cg_media.h"
 #include "bg_lua.h"
+#include "ui/ui_fonts.h"
 
 extern displayContextDef_t cgDC;
 
@@ -246,7 +247,8 @@ void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vect
 	qboolean bIsTrailingPunctuation;
 
 	//float fMax = *maxX;
-	float iPixelLen = Text_Width( text, scale, iMenuFont, customFont );
+	const Font font( iMenuFont, scale, customFont );
+	float iPixelLen = font.Width( text );
 	if ( x + iPixelLen > *maxX ) {
 		// whole text won't fit, so we need to print just the amount that does...
 		//  Ok, this is slow and tacky, but only called occasionally, and it works...
@@ -256,7 +258,7 @@ void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vect
 		char *psOutLastGood = psOut;
 		unsigned int uiLetter;
 
-		while ( *psText && (x + Text_Width( sTemp, scale, iMenuFont, customFont ) <= *maxX)
+		while ( *psText && (x + font.Width( sTemp ) <= *maxX)
 			&& psOut < &sTemp[sizeof(sTemp)-1] ) {
 			int iAdvanceCount;
 			psOutLastGood = psOut;
@@ -274,12 +276,12 @@ void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vect
 		*psOutLastGood = '\0';
 
 		*maxX = 0; // feedback
-		Text_Paint( x, y, scale, color, sTemp, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont, customFont );
+		font.Paint( x, y, sTemp, color, ITEM_TEXTSTYLE_NORMAL, limit, adjust );
 	}
 	else {
 		// whole text fits fine, so print it all...
 		*maxX = x + iPixelLen;	// feedback the next position, as the caller expects
-		Text_Paint( x, y, scale, color, text, adjust, limit, ITEM_TEXTSTYLE_NORMAL, iMenuFont, customFont );
+		font.Paint( x, y, text, color, ITEM_TEXTSTYLE_NORMAL, limit, adjust );
 	}
 }
 
@@ -293,6 +295,7 @@ void CG_DrawNewTeamInfo( rectDef_t *rect, float text_x, float text_y, float scal
 	clientInfo_t *ci;
 	const gitem_t *item;
 	qhandle_t h;
+	const Font font( FONT_MEDIUM, scale, false );
 
 	// max player name width
 	pwidth = 0;
@@ -300,7 +303,7 @@ void CG_DrawNewTeamInfo( rectDef_t *rect, float text_x, float text_y, float scal
 	for ( i = 0; i<count; i++ ) {
 		ci = cgs.clientinfo + sortedTeamPlayers[i];
 		if ( ci->infoValid && ci->team == cg.snap->ps.persistant[PERS_TEAM] ) {
-			len = Text_Width( ci->name, scale, FONT_MEDIUM, false );
+			len = font.Width( ci->name );
 			if ( len > pwidth )
 				pwidth = len;
 		}
@@ -311,7 +314,7 @@ void CG_DrawNewTeamInfo( rectDef_t *rect, float text_x, float text_y, float scal
 	for ( i = 1; i<MAX_LOCATIONS; i++ ) {
 		p = CG_GetLocationString( CG_ConfigString( CS_LOCATIONS + i ) );
 		if ( p && *p ) {
-			len = Text_Width( p, scale, FONT_MEDIUM, false );
+			len = font.Width( p );
 			if ( len > lwidth )
 				lwidth = len;
 		}
@@ -340,7 +343,7 @@ void CG_DrawNewTeamInfo( rectDef_t *rect, float text_x, float text_y, float scal
 			CG_DrawPic( xx, y + 1, PIC_WIDTH - 2, PIC_WIDTH - 2, media.gfx.interface.heart );
 
 			//	Com_sprintf( st, sizeof(st), "%3i %3i", ci->health,	ci->armor );
-			//	Text_Paint( xx, y + text_y, scale, hcolor, st, 0, 0 );
+			//	font.Paint( xx, y + text_y, scale, hcolor, st, 0, 0 );
 
 			// draw weapon icon
 			xx += PIC_WIDTH + 1;
@@ -393,7 +396,8 @@ void CG_DrawTeamSpectators( rectDef_t *rect, float scale, const vector4 *color, 
 			cg.spectatorTime = cg.time + 10;
 			if ( cg.spectatorPaintX <= rect->x + 2 ) {
 				if ( cg.spectatorOffset < cg.spectatorLen ) {
-					cg.spectatorPaintX += Text_Width( &cg.spectatorList[cg.spectatorOffset], scale, FONT_MEDIUM, false )
+					const Font font( FONT_MEDIUM, scale, false );
+					cg.spectatorPaintX += font.Width( &cg.spectatorList[cg.spectatorOffset] )
 										- 1;
 					cg.spectatorOffset++;
 				}
@@ -502,10 +506,9 @@ void CG_DrawMedal( int ownerDraw, rectDef_t *rect, float scale, const vector4 *c
 
 	if ( text ) {
 		newColour.a = 1.0f;
-		value = Text_Width( text, scale, FONT_MEDIUM, false );
-		Text_Paint( rect->x + (rect->w - value) / 2, rect->y + rect->h + 10, scale, &newColour, text, 0, 0, 0,
-			FONT_MEDIUM, false
-		);
+		const Font font( FONT_MEDIUM, scale, false );
+		value = font.Width( text );
+		font.Paint( rect->x + (rect->w - value) / 2, rect->y + rect->h + 10, text, &newColour );
 	}
 
 	trap->R_SetColor( NULL );
@@ -786,7 +789,7 @@ void CG_KeyEvent( int key, qboolean down ) {
 	if ( !down ) {
 		return;
 	}
-	
+
 	if (JPLua::Event_KeyDown(key)){
 		return;
 	}

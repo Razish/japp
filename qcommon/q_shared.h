@@ -871,6 +871,10 @@ int Q_capi( int value, int max );
 float Q_bump( float min, float value );
 int Q_bumpi( int min, int value );
 
+uint32_t Q_PoT( uint32_t i );
+uint32_t Q_RoundToNextPoT( uint32_t value, uint32_t roundTo );
+uint32_t Q_RoundToNearMultipleDown( uint32_t value, uint32_t roundTo );
+
 char		*COM_SkipPath( char *pathname );
 void		COM_StripExtension( const char *in, char *out, int destsize );
 void		COM_DefaultExtension( char *path, int maxSize, const char *extension );

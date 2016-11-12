@@ -12,6 +12,7 @@
 #include "anims.h"
 #include "Ghoul2/G2.h"
 #include "qcommon/qfiles.h"
+#include "ui/ui_fonts.h"
 
 void UI_UpdateCharacterSkin( void );
 
@@ -169,18 +170,18 @@ qboolean UI_OutOfMemory( void ) {
 	return outOfMemory;
 }
 
-#define HASH_TABLE_SIZE 2048
+#define HASH_TABLE_SIZE 1024
 
 // return a hash value for the string
-static long hashForString( const char *str ) {
+static uint32_t hashForString( const char *str ) {
 	int		i;
-	long	hash;
+	uint32_t	hash;
 
 	hash = 0;
 	i = 0;
 	while ( str[i] != '\0' ) {
 		char letter = tolower( (unsigned char)str[i] );
-		hash += (long)(letter)*(i + 119);
+		hash += (uint32_t)(letter)*(i + 119);
 		i++;
 	}
 	hash &= (HASH_TABLE_SIZE - 1);
@@ -200,10 +201,6 @@ static stringDef_t *strHandle[HASH_TABLE_SIZE];
 
 
 const char *String_Alloc( const char *p ) {
-	int len;
-	long hash;
-	stringDef_t *str, *last;
-
 	if ( p == NULL ) {
 		return NULL;
 	}
@@ -212,9 +209,9 @@ const char *String_Alloc( const char *p ) {
 		return "";
 	}
 
-	hash = hashForString( p );
+	uint32_t hash = hashForString( p );
 
-	str = strHandle[hash];
+	stringDef_t *str = strHandle[hash];
 	while ( str ) {
 		if ( strcmp( p, str->str ) == 0 ) {
 			return str->str;
@@ -222,14 +219,14 @@ const char *String_Alloc( const char *p ) {
 		str = str->next;
 	}
 
-	len = strlen( p );
+	int len = strlen( p );
 	if ( len + strPoolIndex + 1 < STRING_POOL_SIZE ) {
 		int ph = strPoolIndex;
 		strcpy( &strPool[strPoolIndex], p );
 		strPoolIndex += len + 1;
 
 		str = strHandle[hash];
-		last = str;
+		stringDef_t *last = str;
 		while ( last && last->next ) {
 			last = last->next;
 		}
@@ -462,13 +459,20 @@ qboolean String_Parse( char **p, const char **out ) {
 
 qboolean PC_String_Parse( int handle, const char **out ) {
 	static const char *squiggy = "}";
-	pc_token_t token;
+	pc_token_t token{};
+	static int counter = 0;
+	counter++;
 
 	if ( !trap->PC_ReadToken( handle, &token ) )
 		return qfalse;
 
+	//trap->Print( "PC_String_Parse counter: %i, token.string: %s\n", counter, token.string );
+	if ( !token.string[0] ) {
+		*(out) = "";
+	}
 	// Save some memory by not return the end squiggy as an allocated string
-	if ( !Q_stricmp( token.string, "}" ) )
+	// TODO: return other saved strings?
+	else if ( !Q_stricmp( token.string, "}" ) )
 		*(out) = squiggy;
 	else
 		*(out) = String_Alloc( token.string );
@@ -4072,7 +4076,8 @@ void Item_SetTextExtents( itemDef_t *item, int *width, int *height, const char *
 #endif
 		)
 	{
-		float originalWidth = DC->textWidth( textPtr, item->textscale, item->iMenuFont, false );
+		const Font font( item->iMenuFont, item->textscale, false );
+		float originalWidth = font.Width( textPtr );
 
 		if ( item->type == ITEM_TYPE_OWNERDRAW && (item->textalignment == ITEM_ALIGN_CENTER || item->textalignment == ITEM_ALIGN_RIGHT) ) {
 			originalWidth += DC->ownerDrawWidth( item->window.ownerDraw, item->textscale );
@@ -4080,11 +4085,11 @@ void Item_SetTextExtents( itemDef_t *item, int *width, int *height, const char *
 		else if ( item->type == ITEM_TYPE_EDITFIELD && item->textalignment == ITEM_ALIGN_CENTER && item->cvar ) {
 			char buff[256];
 			DC->getCVarString( item->cvar, buff, 256 );
-			originalWidth += DC->textWidth( buff, item->textscale, item->iMenuFont, false );
+			originalWidth += font.Width( buff );
 		}
 
-		*width = DC->textWidth( textPtr, item->textscale, item->iMenuFont, false );
-		*height = DC->textHeight( textPtr, item->textscale, item->iMenuFont, false );
+		*width = font.Width( textPtr );
+		*height = font.Height( textPtr );
 
 		item->textRect.w = *width;
 		item->textRect.h = *height;
@@ -4186,9 +4191,10 @@ void Item_Text_AutoWrapped_Paint( itemDef_t *item ) {
 	//Item_SetTextExtents(item, &width, &height, textPtr);
 	//if (item->value == 0)
 	//{
-	//	item->value = (int)(0.5f + (float)DC->textWidth(textPtr, item->textscale, item->font) / item->window.rect.w);
+	//	item->value = (int)(0.5f + (float)font.Width(textPtr, item->textscale, item->font) / item->window.rect.w);
 	//}
-	height = DC->textHeight( textPtr, item->textscale, item->iMenuFont, false );
+	const Font font( item->iMenuFont, item->textscale, false );
+	height = font.Height( textPtr );
 
 	y = item->textaligny;
 	len = 0;
@@ -4202,7 +4208,7 @@ void Item_Text_AutoWrapped_Paint( itemDef_t *item ) {
 			newLinePtr = p + 1;
 			newLineWidth = textWidth;
 		}
-		textWidth = DC->textWidth( buff, item->textscale, 0, false );
+		textWidth = font.Width( buff );
 		if ( (newLine && textWidth > item->window.rect.w) || *p == '\n' || *p == '\0' ) {
 			if ( len ) {
 				if ( item->textalignment == ITEM_ALIGN_LEFT ) {
@@ -4218,9 +4224,7 @@ void Item_Text_AutoWrapped_Paint( itemDef_t *item ) {
 				ToWindowCoords( &item->textRect.x, &item->textRect.y, &item->window );
 				//
 				buff[newLine] = '\0';
-				DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &color, buff, 0, 0, item->textStyle,
-					item->iMenuFont, false
-				);
+				font.Paint( item->textRect.x, item->textRect.y, buff, &color, item->textStyle );
 			}
 			if ( *p == '\0' ) {
 				break;
@@ -4277,15 +4281,16 @@ void Item_Text_Wrapped_Paint( itemDef_t *item ) {
 	y = item->textRect.y;
 	start = textPtr;
 	p = strchr( textPtr, '\r' );
+	const Font font( item->iMenuFont, item->textscale, false );
 	while ( p && *p ) {
 		strncpy( buff, start, p - start + 1 );
 		buff[p - start] = '\0';
-		DC->drawText( x, y, item->textscale, &color, buff, 0, 0, item->textStyle, item->iMenuFont, false );
+		font.Paint( x, y, buff, &color, item->textStyle );
 		y += height + 2;
 		start += p - start + 1;
 		p = strchr( p + 1, '\r' );
 	}
-	DC->drawText( x, y, item->textscale, &color, start, 0, 0, item->textStyle, item->iMenuFont, false );
+	font.Paint( x, y, start, &color, item->textStyle );
 }
 
 void Item_Text_Paint( itemDef_t *item ) {
@@ -4329,9 +4334,8 @@ void Item_Text_Paint( itemDef_t *item ) {
 	}
 
 	Item_TextColor( item, &color );
-	DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &color, textPtr, 0, 0, item->textStyle,
-		item->iMenuFont, false
-	);
+	const Font font( item->iMenuFont, item->textscale, false );
+	font.Paint( item->textRect.x, item->textRect.y, textPtr, &color, item->textStyle );
 
 	if ( item->text2 )	// Is there a second line of text?
 	{
@@ -4342,8 +4346,8 @@ void Item_Text_Paint( itemDef_t *item ) {
 			textPtr = text;
 		}
 		Item_TextColor( item, &color );
-		DC->drawText( item->textRect.x + item->text2alignx, item->textRect.y + item->text2aligny, item->textscale,
-			&color, textPtr, 0, 0, item->textStyle, item->iMenuFont, false
+		font.Paint(
+			item->textRect.x + item->text2alignx, item->textRect.y + item->text2aligny, textPtr, &color, item->textStyle
 		);
 	}
 }
@@ -4392,8 +4396,10 @@ void Item_TextField_Paint( itemDef_t *item ) {
 		);
 	}
 	else {
-		DC->drawText( item->textRect.x + item->textRect.w + offset, item->textRect.y, item->textscale, &newColor,
-			buff + editPtr->paintOffset, 0, item->window.rect.w, item->textStyle, item->iMenuFont, false
+		const Font font( item->iMenuFont, item->textscale, false );
+		font.Paint(
+			item->textRect.x + item->textRect.w + offset, item->textRect.y, buff + editPtr->paintOffset, &newColor,
+			item->textStyle, item->window.rect.w
 		);
 	}
 }
@@ -4428,16 +4434,13 @@ void Item_YesNo_Paint( itemDef_t *item ) {
 	else
 		yesnovalue = (value != 0) ? sYES : sNO;
 
+	const Font font( item->iMenuFont, item->textscale, false );
 	if ( item->text ) {
 		Item_Text_Paint( item );
-		DC->drawText( item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, &newColor, yesnovalue,
-			0, 0, item->textStyle, item->iMenuFont, false
-		);
+		font.Paint( item->textRect.x + item->textRect.w + 8, item->textRect.y, yesnovalue, &newColor, item->textStyle );
 	}
 	else {
-		DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &newColor, yesnovalue, 0, 0, item->textStyle,
-			item->iMenuFont, false
-		);
+		font.Paint( item->textRect.x, item->textRect.y, yesnovalue, &newColor, item->textStyle );
 	}
 }
 
@@ -4470,16 +4473,13 @@ void Item_Multi_Paint( itemDef_t *item ) {
 		text = temp;
 	}
 
+	const Font font( item->iMenuFont, item->textscale, false );
 	if ( item->text ) {
 		Item_Text_Paint( item );
-		DC->drawText( item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, &newColor, text, 0, 0,
-			item->textStyle, item->iMenuFont, false
-		);
+		font.Paint( item->textRect.x + item->textRect.w + 8, item->textRect.y, text, &newColor, item->textStyle );
 	}
 	else {
-		DC->drawText( item->textRect.x + item->xoffset, item->textRect.y, item->textscale, &newColor, text, 0, 0,
-			item->textStyle, item->iMenuFont, false
-		);
+		font.Paint( item->textRect.x + item->xoffset, item->textRect.y, text, &newColor, item->textStyle );
 	}
 }
 
@@ -4744,8 +4744,7 @@ void Item_Bind_Paint( itemDef_t *item ) {
 	vector4 newColor, lowLight;
 	float value;
 	int maxChars = 0;
-	float	textScale, textWidth;
-	int		textHeight, yAdj, startingXPos;
+	int		yAdj, startingXPos;
 
 
 	menuDef_t *parent = (menuDef_t*)item->parent;
@@ -4775,33 +4774,37 @@ void Item_Bind_Paint( itemDef_t *item ) {
 		memcpy( &newColor, &item->window.foreColor, sizeof(vector4) );
 	}
 
+	Font font( item->iMenuFont, item->textscale, false );
 	if ( item->text ) {
 		Item_Text_Paint( item );
 		BindingFromName( item->cvar );
 
 		// If the text runs past the limit bring the scale down until it fits.
-		textScale = item->textscale;
-		textWidth = DC->textWidth( g_nameBind1, (float)textScale, item->iMenuFont, false );
+		float textWidth = font.Width( g_nameBind1 );
 		startingXPos = (item->textRect.x + item->textRect.w + 8);
 
 		while ( (startingXPos + textWidth) >= SCREEN_WIDTH ) {
-			textScale -= .05f;
-			textWidth = DC->textWidth( g_nameBind1, (float)textScale, item->iMenuFont, false );
+			font.scale -= .05f;
+			textWidth = font.Width( g_nameBind1 );
 		}
 
 		// Try to adjust it's y placement if the scale has changed.
 		yAdj = 0;
-		if ( textScale != item->textscale ) {
-			textHeight = DC->textHeight( g_nameBind1, item->textscale, item->iMenuFont, false );
-			yAdj = textHeight - DC->textHeight( g_nameBind1, textScale, item->iMenuFont, false );
+		if ( flcmp( font.scale, item->textscale ) ) {
+			const float newHeight = font.Height( g_nameBind1 );
+
+			const float newScale = font.scale;
+			font.scale = item->textscale;
+			const float oldHeight = font.Height( g_nameBind1 );
+			font.scale = newScale;
+
+			yAdj = oldHeight - newHeight;
 		}
-		DC->drawText( startingXPos, item->textRect.y + yAdj, textScale, &newColor, g_nameBind1, 0, maxChars,
-			item->textStyle, item->iMenuFont, false
-		);
+		font.Paint( startingXPos, item->textRect.y + yAdj, g_nameBind1, &newColor, item->textStyle, maxChars );
 	}
 	else {
-		DC->drawText( item->textRect.x, item->textRect.y, item->textscale, &newColor, (value != 0) ? "FIXME" : "FIXME",
-			0, maxChars, item->textStyle, item->iMenuFont, false
+		font.Paint(
+			item->textRect.x, item->textRect.y, (value != 0) ? "FIXME" : "FIXME", &newColor, item->textStyle, maxChars
 		);
 	}
 }
@@ -5184,6 +5187,7 @@ void Item_TextScroll_Paint( itemDef_t *item ) {
 	x = item->window.rect.x + item->textalignx + 1;
 	y = item->window.rect.y + item->textaligny + 1;
 
+	const Font font( item->iMenuFont, item->textscale, false );
 	for ( i = scrollPtr->startPos; i < count; i++ ) {
 		const char *text;
 
@@ -5191,7 +5195,7 @@ void Item_TextScroll_Paint( itemDef_t *item ) {
 		if ( !text ) {
 			continue;
 		}
-		DC->drawText( x + 4, y, item->textscale, &item->window.foreColor, text, 0, 0, item->textStyle, item->iMenuFont, qfalse );
+		font.Paint( x + 4, y, text, &item->window.foreColor, item->textStyle );
 
 		size -= scrollPtr->lineHeight;
 		if ( size < scrollPtr->lineHeight ) {
@@ -5310,8 +5314,10 @@ void Item_ListBox_Paint( itemDef_t *item ) {
 		// Show pic name
 		text = DC->feederItemText( item->special.i, item->cursorPos, 0, &optionalImage1, &optionalImage2, &optionalImage3 );
 		if ( text ) {
-			DC->drawText( item->window.rect.x, item->window.rect.y + item->window.rect.h, item->textscale,
-				&item->window.foreColor, text, 0, 0, item->textStyle, item->iMenuFont, false
+			const Font font( item->iMenuFont, item->textscale );
+			font.Paint(
+				item->window.rect.x, item->window.rect.y + item->window.rect.h, text, &item->window.foreColor,
+				item->textStyle
 			);
 		}
 #endif
@@ -5434,6 +5440,7 @@ void Item_ListBox_Paint( itemDef_t *item ) {
 			y = item->window.rect.y + 1 - listPtr->elementHeight;
 			i = listPtr->startPos;
 
+			const Font font( item->iMenuFont, item->textscale, false );
 			for ( ; i < count; i++ ) {
 				const char *text;
 				// always draw at least one
@@ -5464,12 +5471,10 @@ void Item_ListBox_Paint( itemDef_t *item ) {
 						else
 						*/
 						if ( text ) {
-							int textyOffset;
-							textyOffset = 0;
-							DC->drawText( x + 4 + listPtr->columnInfo[j].pos,
-								y + listPtr->elementHeight + textyOffset + item->textaligny, item->textscale,
-								&item->window.foreColor, text, 0, listPtr->columnInfo[j].maxChars, item->textStyle,
-								item->iMenuFont, false
+							font.Paint(
+								x + 4 + listPtr->columnInfo[j].pos,
+								y + listPtr->elementHeight + item->textaligny, text,
+								&item->window.foreColor, item->textStyle, listPtr->columnInfo[j].maxChars
 							);
 
 
@@ -5505,9 +5510,7 @@ void Item_ListBox_Paint( itemDef_t *item ) {
 						*/
 					}
 					else if ( text ) {
-						DC->drawText( x + 4, y + item->textaligny, item->textscale, &item->window.foreColor, text, 0, 0,
-							item->textStyle, item->iMenuFont, false
-						);
+						font.Paint( x + 4, y + item->textaligny, text, &item->window.foreColor, item->textStyle );
 					}
 				}
 
@@ -5600,7 +5603,7 @@ void Item_OwnerDraw_Paint( itemDef_t *item ) {
 void Item_Paint( itemDef_t *item ) {
 	vector4		red;
 	menuDef_t *parent = (menuDef_t*)item->parent;
-	int			xPos, textWidth;
+	int			xPos;
 	vector4		color = { 1, 1, 1, 1 };
 
 	red.r = red.a = 1;
@@ -5976,10 +5979,11 @@ void Item_Paint( itemDef_t *item ) {
 
 				float fDescScale = parent->descScale ? parent->descScale : 1;
 				float fDescScaleCopy = fDescScale;
-				int iYadj = 0;
+				float iYadj = 0.0f;
+				Font font( FONT_SMALL2, fDescScale, false );
 				while ( 1 ) {
 					vector4 _color = { 0.0f, 0.0f, 0.0f, 0.5f };
-					textWidth = DC->textWidth( textPtr, fDescScale, FONT_SMALL2, false );
+					const float textWidth = font.Width( textPtr );
 
 					if ( parent->descAlignment == ITEM_ALIGN_RIGHT ) {
 						xPos = parent->descX - textWidth;	// Right justify
@@ -5996,25 +6000,26 @@ void Item_Paint( itemDef_t *item ) {
 						// only this one will auto-shrink the scale until we eventually fit...
 						//
 						if ( xPos + textWidth > (SCREEN_WIDTH - 4) ) {
-							fDescScale -= 0.001f;
+							font.scale -= 0.001f;
 							continue;
 						}
 					}
 
 					// Try to adjust it's y placement if the scale has changed...
 					//
-					if ( fDescScale != fDescScaleCopy ) {
-						int iOriginalTextHeight = DC->textHeight( textPtr, fDescScaleCopy, FONT_MEDIUM, false );
-						iYadj = iOriginalTextHeight - DC->textHeight( textPtr, fDescScale, FONT_MEDIUM, false );
+					if ( font.scale != fDescScaleCopy ) {
+						const float newScale = font.scale;
+						font.scale = fDescScaleCopy;
+						const float origHeight = font.Height( textPtr );
+						font.scale = newScale;
+						iYadj = origHeight - font.Height( textPtr );
 					}
 
 					//Raz: Added background
 					DC->fillRect( xPos, parent->descY + iYadj, textWidth,
-						DC->textHeight( textPtr, fDescScale, FONT_MEDIUM, false ), &_color
+						font.Height( textPtr ), &_color
 					);
-					DC->drawText( xPos, parent->descY + iYadj, fDescScale, &parent->descColor, textPtr, 0, 0,
-						item->textStyle, FONT_SMALL2, false
-					);
+					font.Paint( xPos, parent->descY + iYadj, textPtr, &parent->descColor, item->textStyle );
 					break;
 				}
 			}
@@ -6378,7 +6383,7 @@ void Item_ValidateTypeData( itemDef_t *item ) {
 	}
 }
 
-#define KEYWORDHASH_SIZE	512
+#define KEYWORDHASH_SIZE	256
 
 typedef struct keywordHash_s {
 	const char *keyword;
@@ -6386,11 +6391,13 @@ typedef struct keywordHash_s {
 	struct keywordHash_s *next;
 } keywordHash_t;
 
-static int KeywordHash_Key( const char *keyword ) {
-	int hash, i;
-
-	hash = 0;
-	for ( i = 0; keyword[i] != '\0'; i++ ) {
+static uint32_t KeywordHash_Key( const char *keyword ) {
+	if ( !keyword || !keyword[0] ) {
+		trap->Error( ERR_FATAL, "KeywordHash_Key: missing keyword!\n" );
+		return 0u;
+	}
+	uint32_t hash = 0u;
+	for ( uint32_t i = 0; keyword[i] != '\0'; i++ ) {
 		if ( keyword[i] >= 'A' && keyword[i] <= 'Z' )
 			hash += (keyword[i] + ('a' - 'A')) * (119 + i);
 		else
@@ -6401,23 +6408,20 @@ static int KeywordHash_Key( const char *keyword ) {
 }
 
 static void KeywordHash_Add( keywordHash_t *table[], keywordHash_t *key ) {
-	int hash;
-
-	hash = KeywordHash_Key( key->keyword );
-	/*
-		if (table[hash]) {
-		int collision = qtrue;
-		}
-		*/
+	uint32_t hash = KeywordHash_Key( key->keyword );
+	if ( table[hash] ) {
+		// this isn't really an error, but can degrade performance on small hash tables comparitive to the size of the
+		//	data set
+		// if hash collision occurs, it becomes a linear search through the collisions for this hash, by insertion order
+		//trap->Print( "KeywordHash_Add: collision on %s: %u\n", key->keyword, hash );
+	}
 	key->next = table[hash];
 	table[hash] = key;
 }
 
 static keywordHash_t *KeywordHash_Find( keywordHash_t *table[], char *keyword ) {
 	keywordHash_t *key;
-	int hash;
-
-	hash = KeywordHash_Key( keyword );
+	uint32_t hash = KeywordHash_Key( keyword );
 	for ( key = table[hash]; key; key = key->next ) {
 		if ( !Q_stricmp( key->keyword, keyword ) )
 			return key;
@@ -8047,6 +8051,7 @@ static void Item_TextScroll_BuildLines( itemDef_t* item ) {
 	scrollPtr->iLineCount = 0;
 	memset( (char*)scrollPtr->pLines, 0, sizeof(scrollPtr->pLines) );
 
+	const Font font( item->iMenuFont, item->textscale, false );
 	while ( *psCurrentTextReadPos && (scrollPtr->iLineCount < MAX_TEXTSCROLL_LINES) ) {
 		char sLineForDisplay[2048];	// ott
 
@@ -8092,7 +8097,7 @@ static void Item_TextScroll_BuildLines( itemDef_t* item ) {
 			else {
 				//TODO: rewrite so we calculate the length of each character, rather than appending a char to the main
 				//	string each iteration
-				if ( DC->textWidth( sLineForDisplay, item->textscale, item->iMenuFont, false ) >= iBoxWidth ) {
+				if ( font.Width( sLineForDisplay ) >= iBoxWidth ) {
 					// reached screen edge, so cap off string at bytepos after last good position...
 					//
 					if ( uiLetter > 255 && bIsTrailingPunctuation && !trap->R_Language_UsesSpaces() ) {
@@ -8184,7 +8189,7 @@ static void Item_TextScroll_BuildLines( itemDef_t* item ) {
 		}
 
 		// Get the current character width
-		cw = DC->textWidth ( va("%c", *lineEnd), item->textscale, item->iMenuFont, false );
+		cw = font.Width ( va("%c", *lineEnd), item->textscale, item->iMenuFont, false );
 
 		// Past the end of the boundary?
 		if ( w + cw > (item->window.rect.w - SCROLLBAR_SIZE - 10) ) {
@@ -8711,19 +8716,19 @@ int Menu_Count( void ) {
 }
 
 void Menu_PaintAll( void ) {
-	int i;
 	if ( captureFunc ) {
 		captureFunc( captureData );
 	}
 
-	for ( i = 0; i < Menu_Count(); i++ ) {
+	const size_t numMenus = Menu_Count();
+	for ( size_t i = 0; i < numMenus; i++ ) {
 		Menu_Paint( &Menus[i], qfalse );
 	}
 
 	if ( debugMode ) {
-		vector4 v = { 1, 1, 1, 1 };
-		DC->drawText( 5, 25, .75f, &v, va( "fps: %f", DC->FPS ), 0, 0, 0, 0, qfalse );
-		DC->drawText( 5, 45, .75f, &v, va( "x: %.0f  y:%.0f", DC->cursorx, DC->cursory ), 0, 0, 0, 0, qfalse );
+		const Font font( FONT_NONE, 0.75f, false );
+		font.Paint( 5.0f, 25.0f, va( "fps: %f", DC->FPS ) );
+		font.Paint( 5.0f, 45.0f, va( "x: %.0f  y:%.0f", DC->cursorx, DC->cursory ) );
 	}
 }
 
@@ -8875,74 +8880,4 @@ static qboolean Menu_OverActiveItem( menuDef_t *menu, float x, float y ) {
 		}
 	}
 	return qfalse;
-}
-
-static qhandle_t MenuFontToHandle( int iMenuFont ) {
-#if defined(PROJECT_UI)
-	const cachedAssets_t *assets = &uiInfo.uiDC.Assets;
-#elif defined(PROJECT_CGAME)
-	const cachedAssets_t *assets = &cgDC.Assets;
-#endif
-
-	switch ( iMenuFont ) {
-	case FONT_SMALL:		return assets->qhSmallFont;
-	case FONT_MEDIUM:		return assets->qhMediumFont;
-	case FONT_LARGE:		return assets->qhBigFont;
-	case FONT_SMALL2:		return assets->qhSmall2Font;
-	case FONT_JAPPLARGE:	return assets->japp.fontLarge;
-	case FONT_JAPPSMALL:	return assets->japp.fontSmall;
-	case FONT_JAPPMONO:		return assets->japp.fontMono;
-	default:				return assets->qhMediumFont;
-	}
-}
-
-//TODO: return height consumed by string?
-void Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit,
-	int style, int iMenuFont, bool customFont )
-{
-	uint32_t iStyleOR = 0u;
-	switch ( style ) {
-	case ITEM_TEXTSTYLE_NORMAL:				iStyleOR = 0; default: break;		// normal text
-	case ITEM_TEXTSTYLE_BLINK:				iStyleOR = STYLE_BLINK; break;		// fast blinking
-	case ITEM_TEXTSTYLE_PULSE:				iStyleOR = STYLE_BLINK; break;		// slow pulsing
-	case ITEM_TEXTSTYLE_SHADOWED:			iStyleOR = STYLE_DROPSHADOW; break;	// drop shadow
-	case ITEM_TEXTSTYLE_OUTLINED:			iStyleOR = STYLE_DROPSHADOW; break;	// drop shadow
-	case ITEM_TEXTSTYLE_OUTLINESHADOWED:	iStyleOR = STYLE_DROPSHADOW; break;	// drop shadow
-	case ITEM_TEXTSTYLE_SHADOWEDMORE:		iStyleOR = STYLE_DROPSHADOW; break;	// drop shadow
-	}
-
-	//TODO: left, center, right alignment
-	//TODO: styles (blink, pulse)
-
-	trap->R_Font_DrawString( x, y, text, color,
-		iStyleOR | (customFont ? iMenuFont : MenuFontToHandle( iMenuFont )),
-		!limit ? -1 : limit, // -1 = no limit
-		scale
-	);
-
-	trap->R_SetColor( nullptr );
-}
-
-float Text_Width( const char *text, float scale, int iMenuFont, bool customFont ) {
-	qhandle_t iFontIndex = customFont ? iMenuFont : MenuFontToHandle( iMenuFont );
-
-#if 0
-	float f1 = trap->ext.R_Font_StrLenPixels( text, iFontIndex, scale );
-	float f2 = trap->R_Font_StrLenPixels( text, iFontIndex, scale );
-	if ( flcmp( f1, f2 ) ) {
-		// ...
-	}
-	return japp_preciseFonts.integer ? f1 : f2;
-#else
-	return japp_preciseFonts.integer
-		? trap->ext.R_Font_StrLenPixels( text, iFontIndex, scale )
-		: trap->R_Font_StrLenPixels( text, iFontIndex, scale );
-#endif
-}
-
-float Text_Height( const char *text, float scale, int iMenuFont, bool customFont ) {
-	qhandle_t iFontIndex = customFont ? iMenuFont : MenuFontToHandle( iMenuFont );
-
-	//TODO: trap->ext.***
-	return trap->R_Font_HeightPixels( iFontIndex, scale );
 }

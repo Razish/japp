@@ -95,7 +95,6 @@
     <File Name="cgame/cg_effects.cpp"/>
     <File Name="cgame/cg_turret.cpp"/>
     <File Name="cgame/fx_heavyrepeater.cpp"/>
-    <File Name="cgame/cg_newScoreboard.cpp"/>
     <File Name="cgame/cg_luaserver.cpp"/>
     <File Name="cgame/fx_force.cpp"/>
     <File Name="cgame/cg_scoreboard.cpp"/>
@@ -148,6 +147,7 @@
     <File Name="cgame/cg_luafont.h"/>
     <File Name="cgame/cg_luatextbox.cpp"/>
     <File Name="cgame/cg_luatextbox.h"/>
+    <File Name="cgame/cg_q3pScoreboard.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="game">
     <File Name="game/g_log.cpp"/>
@@ -402,6 +402,7 @@
     <File Name="qcommon/qfiles.h"/>
     <File Name="qcommon/md5.cpp"/>
     <File Name="qcommon/md5.h"/>
+    <File Name="cgame/cg_jappScoreboard.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="server">
     <File Name="server/server.h"/>
@@ -423,6 +424,8 @@
     <File Name="ui/ui_local.h"/>
     <File Name="ui/SConscript"/>
     <File Name="ui/ui_main.cpp"/>
+    <File Name="ui/ui_fonts.cpp"/>
+    <File Name="ui/ui_fonts.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="sqlite">
     <File Name="sqlite/sqlite3.h"/>
@@ -533,6 +536,7 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -571,6 +575,7 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -609,6 +614,7 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -647,6 +653,7 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Debug" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -685,6 +692,7 @@
       <Linker Options="-O2" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Release" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_game &quot;japlus&quot; +exec &quot;sv.conf&quot; +exec &quot;cl.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -723,6 +731,7 @@
       <Linker Options="-O2" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Release" Command="openjk" CommandArguments="+set fs_basepath &quot;ja&quot; +set fs_homepath &quot;homepath&quot; +set fs_cdpath &quot;cdpath&quot; +set fs_game &quot;japlus&quot; +exec &quot;cl.conf&quot; +exec &quot;sv.conf&quot;" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="." PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>

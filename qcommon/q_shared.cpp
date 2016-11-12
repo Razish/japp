@@ -79,6 +79,26 @@ int Q_bumpi( int min, int value ) {
 	return (value < min) ? min : value;
 }
 
+uint32_t Q_PoT( uint32_t i ) {
+	i--;
+	i |= i >>  1;
+	i |= i >>  2;
+	i |= i >>  4;
+	i |= i >>  8;
+	i |= i >> 16;
+	i++;
+
+	return i;
+}
+
+uint32_t Q_RoundToNextPoT( uint32_t value, uint32_t roundTo ) {
+	return (value + (roundTo - 1)) & ~(roundTo - 1);
+}
+
+uint32_t Q_RoundToNearMultipleDown( uint32_t value, uint32_t roundTo ) {
+	return std::floor( value / roundTo ) * roundTo;
+}
+
 char *COM_SkipPath( char *pathname ) {
 	char *last;
 

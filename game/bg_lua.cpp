@@ -3,6 +3,7 @@
 #elif defined(PROJECT_CGAME)
 #include "cg_local.h"
 #endif
+#include "ui/ui_fonts.h"
 
 #include "bg_luainternal.h"
 
@@ -959,8 +960,8 @@ namespace JPLua {
 		int iMenuFont = luaL_checkinteger( L, 7 );
 		int customFont = luaL_checkinteger( L, 8 );
 
-
-		Text_Paint( x, y, scale, &colour, text, 0.0f, 0, style, iMenuFont, customFont );
+		const Font font( iMenuFont, scale, customFont );
+		font.Paint( x, y, text, &colour, style );
 
 		return 0;
 	}
@@ -970,7 +971,7 @@ namespace JPLua {
 	static int Export_Font_StringHeightPixels( lua_State *L ) {
 		const char *text = luaL_checkstring( L, 1 );
 		float scale = luaL_checknumber( L, 2 );
-		qhandle_t font = luaL_checkinteger( L, 3 );
+		qhandle_t fontHandle = luaL_checkinteger( L, 3 );
 		int customFont = 0;
 		if ( lua_isboolean( L, 4 ) ) {
 			customFont = lua_toboolean( L, 4 );
@@ -980,7 +981,8 @@ namespace JPLua {
 			lua_pushnil( L );
 		}
 		else {
-			lua_pushnumber( L, Text_Height( text, scale, font, customFont ) );
+			const Font font( fontHandle, scale, customFont );
+			lua_pushnumber( L, font.Height( text ) );
 		}
 		return 1;
 	}
@@ -990,7 +992,7 @@ namespace JPLua {
 	static int Export_Font_StringLengthPixels( lua_State *L ) {
 		const char *text = luaL_checkstring( L, 1 );
 		float scale = luaL_checknumber( L, 2 );
-		qhandle_t font = luaL_checkinteger( L, 3 );
+		qhandle_t fontHandle = luaL_checkinteger( L, 3 );
 		int customFont = 0;
 		if ( lua_isboolean( L, 4 ) ) {
 			customFont = lua_toboolean( L, 4 );
@@ -1000,7 +1002,8 @@ namespace JPLua {
 			lua_pushnil( L );
 		}
 		else {
-			lua_pushnumber( L, Text_Width( text, scale, font, customFont ) );
+			const Font font( fontHandle, scale, customFont );
+			lua_pushnumber( L, font.Width( text ) );
 		}
 		return 1;
 	}

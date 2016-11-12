@@ -412,16 +412,6 @@ struct displayContextDef_t {
 	void (*drawStretchPic)(
 		float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader
 	);
-	void (*drawText)(
-		float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit, int style,
-		int iMenuFont, bool customFont
-	);
-	float (*textWidth)(
-		const char *text, float scale, int iMenuFont, bool customFont
-	);
-	float (*textHeight)(
-		const char *text, float scale, int iMenuFont, bool customFont
-	);
 	qhandle_t (*registerModel)(
 		const char *p
 	);
@@ -662,10 +652,3 @@ qboolean UI_OutOfMemory( void );
 
 void Controls_GetConfig( void );
 void Controls_SetConfig( qboolean restart );
-
-void Text_Paint( float x, float y, float scale, const vector4 *color, const char *text, float adjust, int limit,
-	int style, int iMenuFont, bool customFont
-);
-float Text_Width( const char *text, float scale, int iMenuFont, bool customFont );
-float Text_Height( const char *text, float scale, int iMenuFont, bool customFont );
-

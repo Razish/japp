@@ -4,6 +4,7 @@
 #include "ui/ui_shared.h"
 #include "cg_media.h"
 #include "bg_luaevent.h"
+#include "ui/ui_fonts.h"
 
 #define MAX_LOADING_PLAYER_ICONS	16
 #define MAX_LOADING_ITEM_ICONS		26
@@ -66,10 +67,11 @@ static void CG_LoadBar( void ) {
 		const int fontHandle = FONT_JAPPMONO;
 		const float fontScale = 1.0f;
 
+		const Font font( fontHandle, fontScale, false );
 		Com_sprintf( text, sizeof(text), "%3i%%", (int)(floorf( cg.loadFrac * 100.0f )) );
-		textWidth = Text_Width( text, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (textWidth / 2.0f), SCREEN_HEIGHT - 64.0f, fontScale, &colorWhite, text, 0.0f,
-			0, ITEM_TEXTSTYLE_OUTLINED, fontHandle, false
+		textWidth = font.Width( text );
+		font.Paint(
+			(SCREEN_WIDTH / 2) - (textWidth / 2.0f), SCREEN_HEIGHT - 64.0f, text, &colorWhite, ITEM_TEXTSTYLE_OUTLINED
 		);
 	}
 }
@@ -106,23 +108,20 @@ void CG_DrawInformation( void ) {
 
 	const float fontScale = 1.0f;
 	const int fontHandle = FONT_MEDIUM;
+	const Font font( fontHandle, fontScale, false );
 	float width = 0.0f;
 
 	// the first 150 rows are reserved for the client connection
 	// screen to write into
 	if ( cg.infoScreenText[0] ) {
 		s = va( CG_GetStringEdString( "MENUS", "LOADING_MAPNAME" ), cg.infoScreenText );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 128 - 32, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 128 - 32, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 	}
 	else {
 		s = CG_GetStringEdString( "MENUS", "AWAITING_SNAPSHOT" );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 128 - 32, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 128 - 32, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 	}
 
 	// draw info string information
@@ -132,38 +131,30 @@ void CG_DrawInformation( void ) {
 	Q_strncpyz( buf, Info_ValueForKey( info, "sv_hostname" ), sizeof(buf) );
 	// allow colours, don't allow extended ASCII
 	Q_CleanString( buf, STRIP_EXTASCII );
-	width = Text_Width( buf, fontScale, fontHandle, false );
-	Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, buf, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED,
-		fontHandle, false
-	);
+	width = font.Width( buf );
+	font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, buf, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 	y += iPropHeight;
 
 	// pure server
 	if ( atoi( Info_ValueForKey( sysInfo, "sv_pure" ) ) ) {
 		s = CG_GetStringEdString( "MP_INGAME", "PURE_SERVER" );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 	}
 
 	// server-specific message of the day
 	s = CG_ConfigString( CS_MOTD );
 	if ( s[0] ) {
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 	}
 
 	trap->Cvar_VariableStringBuffer( "cl_motdString", buf, sizeof(buf) );
 	if ( buf[0] ) {
-		width = Text_Width( buf, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 420 - iPropHeight, fontScale, &colorWhite, buf, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( buf );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 420 - iPropHeight, buf, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 	}
 
 	// some extra space after hostname and motd
@@ -172,19 +163,15 @@ void CG_DrawInformation( void ) {
 #ifdef _DEBUG
 	// debug build
 	s = "DEBUG BUILD";
-	width = Text_Width( s, fontScale, fontHandle, false );
-	Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED,
-		fontHandle, false
-	);
+	width = font.Width( s );
+	font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 	y += iPropHeight;
 #endif
 
 	// JA++ version
 	s = JAPP_VERSION_SMALL;
-	width = Text_Width( s, fontScale, fontHandle, false );
-	Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED,
-		fontHandle, false
-	);
+	width = font.Width( s );
+	font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 	y += iPropHeight;
 
 	// some extra space after hostname and motd
@@ -193,39 +180,31 @@ void CG_DrawInformation( void ) {
 	// map-specific message (long map name)
 	s = CG_ConfigString( CS_MESSAGE );
 	if ( s[0] ) {
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED,
-			fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 	}
 
 	// cheats warning
 	if ( atoi( Info_ValueForKey( sysInfo, "sv_cheats" ) ) ) {
 		s = CG_GetStringEdString( "MP_INGAME", "CHEATSAREENABLED" );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 	}
 
 	// game type
 	s = BG_GetGametypeString( cgs.gametype );
-	width = Text_Width( s, fontScale, fontHandle, false );
-	Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0, ITEM_TEXTSTYLE_SHADOWED,
-		fontHandle, false
-	);
+	width = font.Width( s );
+	font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 	y += iPropHeight;
 
 	if ( cgs.gametype != GT_SIEGE ) {
 		value = atoi( Info_ValueForKey( info, "timelimit" ) );
 		if ( value ) {
 			s = va( "%s %i", CG_GetStringEdString( "MP_INGAME", "TIMELIMIT" ), value );
-			//
-			Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-			);
+			width = font.Width( s );
+			font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 			y += iPropHeight;
 		}
 
@@ -233,10 +212,8 @@ void CG_DrawInformation( void ) {
 			value = atoi( Info_ValueForKey( info, "fraglimit" ) );
 			if ( value ) {
 				s = va( "%s %i", CG_GetStringEdString( "MP_INGAME", "FRAGLIMIT" ), value );
-				width = Text_Width( s, fontScale, fontHandle, false );
-				Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-					ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-				);
+				width = font.Width( s );
+				font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 				y += iPropHeight;
 			}
 
@@ -244,9 +221,8 @@ void CG_DrawInformation( void ) {
 				value = atoi( Info_ValueForKey( info, "duel_fraglimit" ) );
 				if ( value ) {
 					s = va( "%s %i", CG_GetStringEdString( "MP_INGAME", "WINLIMIT" ), value );
-					Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-						ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-					);
+					width = font.Width( s );
+					font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 					y += iPropHeight;
 				}
 			}
@@ -257,10 +233,8 @@ void CG_DrawInformation( void ) {
 		value = atoi( Info_ValueForKey( info, "capturelimit" ) );
 		if ( value ) {
 			s = va( "%s %i", CG_GetStringEdString( "MP_INGAME", "CAPTURELIMIT" ), value );
-			width = Text_Width( s, fontScale, fontHandle, false );
-			Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-			);
+			width = font.Width( s );
+			font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 			y += iPropHeight;
 		}
 	}
@@ -269,10 +243,8 @@ void CG_DrawInformation( void ) {
 		value = atoi( Info_ValueForKey( info, "g_forceBasedTeams" ) );
 		if ( value ) {
 			s = CG_GetStringEdString( "MP_INGAME", "FORCEBASEDTEAMS" );
-			width = Text_Width( s, fontScale, fontHandle, false );
-			Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-			);
+			width = font.Width( s );
+			font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 			y += iPropHeight;
 		}
 	}
@@ -286,20 +258,16 @@ void CG_DrawInformation( void ) {
 		value = atoi( Info_ValueForKey( info, "g_maxForceRank" ) );
 		if ( value && !valueNOFP && value < NUM_FORCE_MASTERY_LEVELS ) {
 			s = va( "%s %s", fmStr, CG_GetStringEdString( "MP_INGAME", forceMasteryLevels[value] ) );
-			width = Text_Width( s, fontScale, fontHandle, false );
-			Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-			);
+			width = font.Width( s );
+			font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 			y += iPropHeight;
 		}
 		else if ( !valueNOFP ) {
 			s = va( "%s %s",
 				fmStr, CG_GetStringEdString( "MP_INGAME", forceMasteryLevels[NUM_FORCE_MASTERY_LEVELS - 1] )
 			);
-			width = Text_Width( s, fontScale, fontHandle, false );
-			Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-			);
+			width = font.Width( s );
+			font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 			y += iPropHeight;
 		}
 
@@ -308,19 +276,15 @@ void CG_DrawInformation( void ) {
 		//RAZTODO: weapon disable
 		if ( cgs.gametype != GT_JEDIMASTER && value ) {
 			s = va( "%s", CG_GetStringEdString( "MP_INGAME", "SABERONLYSET" ) );
-			width = Text_Width( s, fontScale, fontHandle, false );
-			Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-			);
+			width = font.Width( s );
+			font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 			y += iPropHeight;
 		}
 
 		if ( valueNOFP ) {
 			s = va( "%s", CG_GetStringEdString( "MP_INGAME", "NOFPSET" ) );
-			width = Text_Width( s, fontScale, fontHandle, false );
-			Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-				ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-			);
+			width = font.Width( s );
+			font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 			y += iPropHeight;
 		}
 	}
@@ -330,42 +294,32 @@ void CG_DrawInformation( void ) {
 	switch ( cgs.gametype ) {
 	case GT_FFA:
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_FFA_1" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 		break;
 
 	case GT_HOLOCRON:
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_HOLO_1" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 
 		y += iPropHeight;
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_HOLO_2" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 		break;
 
 	case GT_JEDIMASTER:
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_JEDI_1" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_JEDI_2" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 		break;
 
@@ -375,49 +329,37 @@ void CG_DrawInformation( void ) {
 
 	case GT_DUEL:
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_DUEL_1" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_DUEL_2" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 		break;
 
 	case GT_POWERDUEL:
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_POWERDUEL_1" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_POWERDUEL_2" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 		break;
 
 	case GT_TEAM:
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_TEAM_1" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_TEAM_2" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 		break;
 
@@ -426,33 +368,25 @@ void CG_DrawInformation( void ) {
 
 	case GT_CTF:
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTF_1" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTF_2" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 		break;
 
 	case GT_CTY:
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTY_1" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 
 		s = va( "%s", CG_GetStringEdString( "MP_INGAME", "RULES_CTY_2" ) );
-		width = Text_Width( s, fontScale, fontHandle, false );
-		Text_Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, fontScale, &colorWhite, s, 0.0f, 0,
-			ITEM_TEXTSTYLE_SHADOWED, fontHandle, false
-		);
+		width = font.Width( s );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
 		y += iPropHeight;
 		break;
 	default:
