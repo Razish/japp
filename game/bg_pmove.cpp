@@ -3153,7 +3153,7 @@ static void PM_GrappleMove( void ) {
 	VectorCopy( &vel, &pm->ps->velocity );
 
 	pml.groundPlane = qfalse;
-	
+
 	VectorSet(&facingAngles, 0, pm->ps->viewangles.yaw, 0);
 
 	AngleVectors(&facingAngles, &facingFwd, &facingRight, NULL);
@@ -5743,7 +5743,7 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].alt.chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
 #ifdef PROJECT_GAME
-					if ( !( ((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer ) || 
+					if ( !( ((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer ) ||
 						 !((gentity_t *)pm_entSelf)->client->ps.duelInProgress )
 #endif
 						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].alt.charge;
@@ -8753,6 +8753,7 @@ void PM_VehicleViewAngles( playerState_t *ps, bgEntity_t *veh, usercmd_t *ucmd )
 #endif //VEH_CONTROL_SCHEME_4
 		{//only if not if doing special free-roll/pitch control
 			setAngles = qtrue;
+			clampMin.pitch = -pVeh->m_pVehicleInfo->lookPitch;
 			clampMax.pitch = pVeh->m_pVehicleInfo->lookPitch;
 			clampMin.yaw = clampMax.yaw = 0;
 			clampMin.roll = clampMax.roll = -1;

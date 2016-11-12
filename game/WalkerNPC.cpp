@@ -149,7 +149,7 @@ static void ProcessMoveCommands( Vehicle_t *pVeh ) {
 	/********************************************************************************/
 }
 
-void WalkerYawAdjust( Vehicle_t *pVeh, playerState_t *riderPS, playerState_t *parentPS ) {
+static void WalkerYawAdjust( Vehicle_t *pVeh, playerState_t *riderPS, playerState_t *parentPS ) {
 	float angDif = AngleSubtract( pVeh->m_vOrientation->yaw, riderPS->viewangles.yaw );
 
 	if ( parentPS && parentPS->speed ) {
