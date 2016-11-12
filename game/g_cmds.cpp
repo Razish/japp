@@ -2159,6 +2159,10 @@ void Cmd_SaberAttackCycle_f( gentity_t *ent ) {
 	if ( ent->client->ps.weapon != WP_SABER )
 		return;
 
+	if ( !japp_allowToggleSaberInSpecial.integer && BG_SaberInSpecial( ent->client->ps.saberMove ) ) {
+		return;
+	}
+
 	if ( ent->client->saber[0].model[0] && ent->client->saber[1].model[0] ) {
 		// no cycling for akimbo
 		if ( WP_SaberCanTurnOffSomeBlades( &ent->client->saber[1] ) ) {
