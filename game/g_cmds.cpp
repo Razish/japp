@@ -3915,7 +3915,7 @@ static const command_t commands[] = {
 	{ "debugBMove_Up", Cmd_BotMoveUp_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
 	{ "drop", Cmd_Drop_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "duelteam", Cmd_DuelTeam_f, GTB_DUEL | GTB_POWERDUEL, CMDFLAG_NOINTERMISSION },
-	{ "engageduelff", Cmd_EngageFullForceDuel_f, GTB_ALL, CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
+	{ "engage_fullforceduel", Cmd_EngageFullForceDuel_f, GTB_ALL, CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 	{ "follow", Cmd_Follow_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "follownext", Cmd_FollowNext_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "followprev", Cmd_FollowPrev_f, GTB_ALL, CMDFLAG_NOINTERMISSION },

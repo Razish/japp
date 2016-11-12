@@ -425,6 +425,7 @@ static const command_t commands[] = {
 #if !defined(NO_CRASHHANDLER) && !defined(MACOS_X)
 	{ "crash", CG_Crash_f },
 #endif
+	{ "engage_fullforceduel", NULL },
 	{ "engage_duel", NULL },
 	{ "follow", NULL },
 	{ "forcechanged", NULL },
