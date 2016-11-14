@@ -2180,6 +2180,19 @@ void CheckTournament( void ) {
 	//		return;
 	//	}
 
+	if ( level.gametype == GT_DUEL && japp_duelRacemode.integer ) {
+		if ( level.forcedRespawnTime != 0 && level.forcedRespawnTime <= level.time ) {
+			level.forcedRespawnTime = 0;
+
+			gentity_t *ent = g_entities;
+			for ( uint32_t i = 0u; i < level.maxclients; i++, ent++ ) {
+				if ( ent->client->pers.connected == CON_CONNECTED && ent->client->sess.sessionTeam == TEAM_FREE ) {
+					respawn( ent );
+				}
+			}
+		}
+	}
+
 	if ( level.gametype == GT_POWERDUEL ) {
 		if ( level.numPlayingClients >= 3 && level.numNonSpectatorClients >= 3 ) {
 			trap->SetConfigstring( CS_CLIENT_DUELISTS, va( "%i|%i|%i", level.sortedClients[0], level.sortedClients[1], level.sortedClients[2] ) );

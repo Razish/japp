@@ -2247,6 +2247,30 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			}
 		}
 	}
+	else if ( level.gametype == GT_DUEL ) {
+		if ( japp_duelRacemode.integer ) {
+			level.forcedRespawnTime = level.time + 2500;
+
+			// TODO: print race statistics
+
+			gentity_t *ent = g_entities;
+			for ( uint32_t i = 0u; i < level.maxclients; i++, ent++ ) {
+				if ( ent->s.number != self->s.number
+					&& ent->client->pers.connected == CON_CONNECTED
+					&& ent->client->sess.sessionTeam == TEAM_FREE )
+				{
+					VectorClear( &ent->client->ps.velocity );
+					/*
+					ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+					ent->client->ps.forceDodgeAnim = BOTH_SHOWOFF_STRONG;
+					ent->client->ps.forceHandExtendTime = level.time + 2500;
+					*/
+					G_AddEvent( ent, EV_TAUNT, TAUNT_GLOAT );
+					break;
+				}
+			}
+		}
+	}
 }
 
 int CheckArmor( gentity_t *ent, int damage, uint32_t dflags ) {
@@ -3510,7 +3534,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vecto
 
 		if ((japp_chatProtection.integer && (targ->client->ps.eFlags & EF_TALK)) && !targ->client->ps.duelInProgress) {
 			return;
-	    }
+		}
 
 	}
 	if ( attacker && attacker->client ) {

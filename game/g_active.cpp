@@ -1804,8 +1804,9 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	//OSP: pause
-	if ( level.pause.state != PAUSE_NONE ) {
-		ucmd->buttons = ucmd->generic_cmd = 0;
+	if ( level.pause.state != PAUSE_NONE || level.forcedRespawnTime != 0 ) {
+		ucmd->buttons &= BUTTON_TALK; // only talk allowed
+		ucmd->generic_cmd = 0;
 		ucmd->forwardmove = ucmd->rightmove = ucmd->upmove = 0;
 		client->ps.pm_type = PM_FREEZE;
 	}

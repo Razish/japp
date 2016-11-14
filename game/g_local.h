@@ -755,6 +755,7 @@ typedef struct level_locals_s {
 	int					gametype;
 	qboolean			allReady;
 	qboolean			lockedTeams[TEAM_NUM_TEAMS];
+	int					forcedRespawnTime;
 
 	std::vector<gentity_t *>	reservedEnts;
 
