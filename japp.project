@@ -148,6 +148,7 @@
     <File Name="cgame/cg_luatextbox.cpp"/>
     <File Name="cgame/cg_luatextbox.h"/>
     <File Name="cgame/cg_q3pScoreboard.cpp"/>
+    <File Name="cgame/cg_jappScoreboard.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="game">
     <File Name="game/g_log.cpp"/>
@@ -402,7 +403,6 @@
     <File Name="qcommon/qfiles.h"/>
     <File Name="qcommon/md5.cpp"/>
     <File Name="qcommon/md5.h"/>
-    <File Name="cgame/cg_jappScoreboard.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="server">
     <File Name="server/server.h"/>
