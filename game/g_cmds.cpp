@@ -110,9 +110,9 @@ static void G_Give( gentity_t *ent, const char *name, const char *args, int argc
 
 	if ( give_all || !Q_stricmp( name, "ammo" ) ) {
 		int num = 999;
-		if ( argc == 3 )
+		if ( argc == 3 ) {
 			num = Q_clampi( 0, atoi( args ), 999 );
-			num = atoi( args );
+		}
 		for ( i = AMMO_BLASTER; i < AMMO_MAX; i++ )
 			ent->client->ps.ammo[i] = num;
 		if ( !give_all )
