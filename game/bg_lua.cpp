@@ -333,6 +333,7 @@ namespace JPLua {
 		for ( int i = 0; i < numComponents && i < ARRAY_LEN(colourComponents); i++ ) {
 			lua_getfield( L, idx, colourComponents[i] );
 			out[i] = lua_tonumber( L, -1 );
+			lua_pop(L, 1);
 		}
 	}
 
