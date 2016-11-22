@@ -19,11 +19,11 @@ extern int lastluaid;
 
 namespace JPLua {
 
-	static const char *baseDir = "lua/";
+	const char *baseDir = "lua/";
 	#if defined(PROJECT_GAME)
-	static const char *pluginDir = "lua/sv/";
+	const char *pluginDir = "lua/sv/";
 	#elif defined(PROJECT_CGAME)
-	static const char *pluginDir = "lua/cl/";
+	const char *pluginDir = "lua/cl/";
 	#endif
 
 	luaState_t ls;

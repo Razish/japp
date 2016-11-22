@@ -12,13 +12,6 @@
 namespace JPLua {
 	static const char SERIALISER_META[] = "Serialiser.meta";
 
-	//FIXME: shouldn't these be elsewhere?
-#if defined(PROJECT_GAME)
-	static const char *pluginDir = "lua/sv/";
-#elif defined(PROJECT_CGAME)
-	static const char *pluginDir = "lua/cl/";
-#endif
-
 	//Func: GetSerialiser( string fileName, [FSMode mode] )
 	//Retn: Serialiser object
 	int GetSerialiser( lua_State *L ) {

@@ -10,12 +10,6 @@
 namespace JPLua {
 	static const char LOGGER_META[] = "Logger.meta";
 
-	#if defined(PROJECT_GAME)
-	static const char *pluginDir = "lua/sv/";
-	#elif defined(PROJECT_CGAME)
-	static const char *pluginDir = "lua/cl/";
-	#endif
-
 	//Func: GetLogger( string fileName )
 	//Retn: Logger object
 	int GetLogger( lua_State *L ) {
