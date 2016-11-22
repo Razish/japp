@@ -1115,8 +1115,10 @@ static void DrawPlayers_Duel( float fade ) {
 				const real32_t blockHeight = font.Height();
 				int32_t usedBlocks = 0;
 
-				/*
 				// draw losses first
+				/* this really only works with "best out of i" situations, not first to "i"
+				//	and consider interlacing the blips (historic/chronologic)
+				//	...not possible/feasibly reliable on base/ja+
 				const int32_t numLossBlocks = std::min( ci.losses, cgs.duel_fraglimit );
 				for ( int32_t i = 0; i < numLossBlocks; i++ ) {
 					CG_FillRect( x + (usedBlocks * blockWidth), y, blockWidth, blockHeight, &colorTable[CT_RED] );
@@ -1158,6 +1160,7 @@ static void DrawPlayers_Duel( float fade ) {
 					font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
 				#endif
 				return true;
+
 			},
 			{ 4.0f, 4.0f }
 		},
@@ -1218,6 +1221,7 @@ static void DrawPlayers_Duel( float fade ) {
 	DrawSpectators( fade );
 }
 
+// vertical split
 static void DrawPlayers_Team( float fade ) {
 	const float y = 128.0f;
 
@@ -1234,6 +1238,7 @@ static void DrawPlayers_Team( float fade ) {
 }
 
 // controller for drawing the 'players' section. will call the relevant functions based on gametype
+// this is so e.g. team games can have two panes, one for each team
 static void DrawPlayers( float fade ) {
 	switch ( cgs.gametype ) {
 	case GT_FFA:

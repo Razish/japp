@@ -7,590 +7,107 @@
 		<Option makefile_is_custom="1" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
+		<Option extended_obj_names="1" />
 		<MakeCommands>
-			<Build command="" />
-			<CompileFile command="" />
-			<Clean command="" />
-			<DistClean command="" />
-			<AskRebuildNeeded command="" />
-			<SilentBuild command="" />
+			<Build command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 tools=default" />
+			<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
+			<Clean command="scons -Qc -f $makefile force32=0 debug=0 no_sql=1 tools=default" />
+			<DistClean command="$make -f $makefile distclean$target" />
+			<AskRebuildNeeded command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 tools=default" />
+			<SilentBuild command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 tools=default &gt; $(CMD_NULL)" />
 		</MakeCommands>
 		<Build>
 			<Target title="Debug">
-				<Option output="japp" prefix_auto="1" extension_auto="1" />
-				<Option type="1" />
+				<Option output="openjk" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="./" />
+				<Option object_output="build/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
 				<MakeCommands>
-					<Build command="scons -Q -f $makefile debug=1" />
-					<CompileFile command="scons -Q -f $makefile debug=1 $file" />
-					<Clean command="scons -Q -f $makefile debug=1 -c" />
-					<AskRebuildNeeded command="scons -Q -f $makefile debug=1 -q" />
-					<SilentBuild command="scons -Q -f $makefile debug=1 -s" />
+					<Build command="scons -Q -f $makefile force32=0 debug=1 no_sql=1 tools=default" />
+					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
+					<Clean command="scons -Qc -f $makefile force32=0 debug=1 no_sql=1 tools=default" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="scons -Q -f $makefile force32=0 debug=1 no_sql=1 tools=default" />
+					<SilentBuild command="scons -Q -f $makefile force32=0 debug=1 no_sql=1 tools=default &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="Debug-32">
+				<Option output="openjk" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="./" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 tools=default" />
+					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
+					<Clean command="scons -Qc -f $makefile force32=1 debug=1 no_sql=1 tools=default" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 tools=default" />
+					<SilentBuild command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 tools=default &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="Optimised Debug">
+				<Option output="openjk" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="./" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command="scons -Q -f $makefile force32=0 debug=2 no_sql=1 tools=default" />
+					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
+					<Clean command="scons -Qc -f $makefile force32=0 debug=2 no_sql=1 tools=default" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="scons -Q -f $makefile force32=0 debug=2 no_sql=1 tools=default" />
+					<SilentBuild command="scons -Q -f $makefile force32=0 debug=2 no_sql=1 tools=default &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="Optimised Debug-32">
+				<Option output="openjk" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="0" extension_auto="0" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 tools=default" />
+					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
+					<Clean command="scons -Qc -f $makefile force32=1 debug=1 no_sql=1 tools=default" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 tools=default" />
+					<SilentBuild command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 tools=default &gt; $(CMD_NULL)" />
 				</MakeCommands>
 			</Target>
 			<Target title="Release">
-				<Option output="japp" prefix_auto="1" extension_auto="1" />
-				<Option type="1" />
+				<Option output="openjk" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="./" />
+				<Option object_output="build/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
 				<MakeCommands>
-					<Build command="scons -Q -f $makefile debug=0" />
-					<CompileFile command="scons -Q -f $makefile debug=0 $file" />
-					<Clean command="scons -Q -f $makefile debug=0 -c" />
-					<AskRebuildNeeded command="scons -Q -f $makefile debug=0 -q" />
-					<SilentBuild command="scons -Q -f $makefile debug=0 -s" />
+					<Build command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 tools=default" />
+					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
+					<Clean command="scons -Qc -f $makefile force32=0 debug=0 no_sql=1 tools=default" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 tools=default" />
+					<SilentBuild command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 tools=default &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+			<Target title="Release-32">
+				<Option output="openjk" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="./" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<MakeCommands>
+					<Build command="scons -Q -f $makefile force32=1 debug=0 no_sql=1 tools=default" />
+					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
+					<Clean command="scons -Qc -f $makefile force32=1 debug=0 no_sql=1 tools=default" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="scons -Q -f $makefile force32=1 debug=0 no_sql=1 tools=default" />
+					<SilentBuild command="scons -Q -f $makefile force32=1 debug=0 no_sql=1 tools=default &gt; $(CMD_NULL)" />
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="Ghoul2/G2.h" />
-		<Unit filename="ICARUS/Q3_Interface.h" />
-		<Unit filename="ICARUS/Q3_Registers.h" />
-		<Unit filename="ICARUS/interpreter.h" />
-		<Unit filename="JAPP/jp_cinfo.h" />
-		<Unit filename="JAPP/jp_crash.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="JAPP/jp_crash.h" />
-		<Unit filename="JAPP/jp_crashExtra.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="JAPP/jp_csflags.h" />
-		<Unit filename="JAPP/jp_promode.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="JAPP/jp_promode.h" />
-		<Unit filename="JAPP/jp_ssflags.h" />
-		<Unit filename="JAPP/jp_stack.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="JAPP/jp_stack.h" />
-		<Unit filename="JAPP/jp_tokenparser.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="JAPP/jp_tokenparser.h" />
-		<Unit filename="LICENSE.txt" />
-		<Unit filename="README.md" />
-		<Unit filename="SConstruct" />
-		<Unit filename="build.sh" />
-		<Unit filename="cgame/SConscript" />
-		<Unit filename="cgame/animtable.h" />
-		<Unit filename="cgame/cg_chatbox.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_consolecmds.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_draw.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_drawtools.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_effects.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_ents.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_event.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_info.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_light.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_lights.h" />
-		<Unit filename="cgame/cg_local.h" />
-		<Unit filename="cgame/cg_localents.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_luaserver.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_luaserver.h" />
-		<Unit filename="cgame/cg_main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_marks.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_media.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_media.h" />
-		<Unit filename="cgame/cg_newDraw.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_newScoreboard.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_players.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_playerstate.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_predict.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_public.h" />
-		<Unit filename="cgame/cg_saga.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_scoreboard.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_serverModification.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_servercmds.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_smartentities.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_snapshot.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_syscalls.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_teambinds.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_trueview.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_turret.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_view.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_weaponinit.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_weapons.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/cg_xcvar.h" />
-		<Unit filename="cgame/fx_blaster.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/fx_bowcaster.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/fx_bryarpistol.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/fx_demp2.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/fx_disruptor.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/fx_flechette.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/fx_force.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/fx_heavyrepeater.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/fx_local.h" />
-		<Unit filename="cgame/fx_rocketlauncher.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="cgame/tr_types.h" />
-		<Unit filename="clean.sh" />
-		<Unit filename="game/AnimalNPC.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/FighterNPC.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Atst.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Default.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Droid.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_GalakMech.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Grenadier.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Howler.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_ImperialProbe.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Interrogator.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Jedi.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Mark1.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Mark2.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_MineMonster.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Rancor.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Remote.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Seeker.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Sentry.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Sniper.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Stormtrooper.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Utils.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_AI_Wampa.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_behavior.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_combat.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_goal.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_misc.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_move.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_reactions.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_senses.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_sounds.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_spawn.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_stats.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/NPC_utils.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/SConscript" />
-		<Unit filename="game/SpeederNPC.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/WalkerNPC.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/ai.h" />
-		<Unit filename="game/ai_main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/ai_main.h" />
-		<Unit filename="game/ai_util.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/ai_wpnav.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/anims.h" />
-		<Unit filename="game/animtable.h" />
-		<Unit filename="game/b_local.h" />
-		<Unit filename="game/b_public.h" />
-		<Unit filename="game/be_aas.h" />
-		<Unit filename="game/be_ai_char.h" />
-		<Unit filename="game/be_ai_chat.h" />
-		<Unit filename="game/be_ai_gen.h" />
-		<Unit filename="game/be_ai_goal.h" />
-		<Unit filename="game/be_ai_move.h" />
-		<Unit filename="game/be_ai_weap.h" />
-		<Unit filename="game/be_ea.h" />
-		<Unit filename="game/bg_g2_utils.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_local.h" />
-		<Unit filename="game/bg_lua.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_lua.h" />
-		<Unit filename="game/bg_luacvar.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_luacvar.h" />
-		<Unit filename="game/bg_luaevent.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_luaevent.h" />
-		<Unit filename="game/bg_lualogger.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_lualogger.h" />
-		<Unit filename="game/bg_luaplayer.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_luaplayer.h" />
-		<Unit filename="game/bg_luaserialiser.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_luaserialiser.h" />
-		<Unit filename="game/bg_luavector.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_luavector.h" />
-		<Unit filename="game/bg_misc.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_panimate.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_pmove.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_public.h" />
-		<Unit filename="game/bg_saber.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_saberLoad.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_saga.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_saga.h" />
-		<Unit filename="game/bg_slidemove.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_vehicleLoad.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_vehicles.h" />
-		<Unit filename="game/bg_weapons.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/bg_weapons.h" />
-		<Unit filename="game/botlib.h" />
-		<Unit filename="game/chars.h" />
-		<Unit filename="game/g_ICARUScb.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_ICARUScb.h" />
-		<Unit filename="game/g_active.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_admin.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_admin.h" />
-		<Unit filename="game/g_arenas.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_bot.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_chatFilters.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_chatFilters.h" />
-		<Unit filename="game/g_client.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_clientModification.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_cmds.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_combat.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_exphysics.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_items.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_local.h" />
-		<Unit filename="game/g_log.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_mem.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_misc.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_missile.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_mover.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_nav.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_nav.h" />
-		<Unit filename="game/g_navnew.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_object.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_playerbans.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_public.h" />
-		<Unit filename="game/g_saga.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_session.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_spawn.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_svcmds.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_syscalls.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_target.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_team.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_team.h" />
-		<Unit filename="game/g_timer.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_trigger.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_turret.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_turret_G2.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_unlagged.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_unlagged.h" />
-		<Unit filename="game/g_utils.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_vehicleTurret.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_vehicles.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_weapon.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/g_xcvar.h" />
-		<Unit filename="game/inv.h" />
-		<Unit filename="game/match.h" />
-		<Unit filename="game/npc_headers.h" />
-		<Unit filename="game/say.h" />
-		<Unit filename="game/surfaceflags.h" />
-		<Unit filename="game/syn.h" />
-		<Unit filename="game/teams.h" />
-		<Unit filename="game/tri_coll_test.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/w_force.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/w_saber.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="game/w_saber.h" />
-		<Unit filename="package.lua" />
-		<Unit filename="qcommon/cm_public.h" />
-		<Unit filename="qcommon/disablewarnings.h" />
-		<Unit filename="qcommon/game_version.h" />
-		<Unit filename="qcommon/q_asm.h" />
-		<Unit filename="qcommon/q_math.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="qcommon/q_shared.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="qcommon/q_shared.h" />
-		<Unit filename="qcommon/qcommon.h" />
-		<Unit filename="qcommon/qfiles.h" />
-		<Unit filename="qcommon/tags.h" />
-		<Unit filename="server/server.h" />
-		<Unit filename="ui/SConscript" />
-		<Unit filename="ui/keycodes.h" />
-		<Unit filename="ui/menudef.h" />
-		<Unit filename="ui/ui_atoms.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="ui/ui_cvar.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="ui/ui_force.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="ui/ui_force.h" />
-		<Unit filename="ui/ui_gameinfo.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="ui/ui_local.h" />
-		<Unit filename="ui/ui_main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="ui/ui_public.h" />
-		<Unit filename="ui/ui_saber.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="ui/ui_shared.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="ui/ui_shared.h" />
-		<Unit filename="ui/ui_syscalls.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="ui/ui_xcvar.h" />
 		<Extensions>
 			<code_completion />
+			<envvars />
 			<debugger />
+			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
