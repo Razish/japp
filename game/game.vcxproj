@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\JAPP\jp_crash.cpp" />
+    <ClCompile Include="..\JAPP\jp_promode.cpp" />
+    <ClCompile Include="..\JAPP\jp_stack.cpp" />
+    <ClCompile Include="..\JAPP\jp_tokenparser.cpp" />
+    <ClCompile Include="..\qcommon\md5.cpp" />
+    <ClCompile Include="..\qcommon\q_math.cpp" />
+    <ClCompile Include="..\qcommon\q_shared.cpp" />
+    <ClCompile Include="ai_main.cpp" />
+    <ClCompile Include="ai_util.cpp" />
+    <ClCompile Include="ai_wpnav.cpp" />
+    <ClCompile Include="AnimalNPC.cpp" />
+    <ClCompile Include="bg_animTable.cpp" />
+    <ClCompile Include="bg_g2_utils.cpp" />
+    <ClCompile Include="bg_lua.cpp" />
+    <ClCompile Include="bg_luacvar.cpp" />
+    <ClCompile Include="bg_luaentity.cpp" />
+    <ClCompile Include="bg_luaevent.cpp" />
+    <ClCompile Include="bg_luafs.cpp" />
+    <ClCompile Include="bg_lualogger.cpp" />
+    <ClCompile Include="bg_luaplayer.cpp" />
+    <ClCompile Include="bg_luaserialiser.cpp" />
+    <ClCompile Include="bg_luasocket.cpp" />
+    <ClCompile Include="bg_luavector.cpp" />
+    <ClCompile Include="bg_misc.cpp" />
+    <ClCompile Include="bg_panimate.cpp" />
+    <ClCompile Include="bg_pmove.cpp" />
+    <ClCompile Include="bg_saber.cpp" />
+    <ClCompile Include="bg_saberLoad.cpp" />
+    <ClCompile Include="bg_saga.cpp" />
+    <ClCompile Include="bg_slidemove.cpp" />
+    <ClCompile Include="bg_vehicleLoad.cpp" />
+    <ClCompile Include="bg_weapons.cpp" />
+    <ClCompile Include="FighterNPC.cpp" />
+    <ClCompile Include="g_active.cpp" />
+    <ClCompile Include="g_admin.cpp" />
+    <ClCompile Include="g_arenas.cpp" />
+    <ClCompile Include="g_bot.cpp" />
+    <ClCompile Include="g_chatFilters.cpp" />
+    <ClCompile Include="g_client.cpp" />
+    <ClCompile Include="g_clientModification.cpp" />
+    <ClCompile Include="g_cmds.cpp" />
+    <ClCompile Include="g_combat.cpp" />
+    <ClCompile Include="g_exphysics.cpp" />
+    <ClCompile Include="g_geoip.cpp" />
+    <ClCompile Include="g_ICARUScb.cpp" />
+    <ClCompile Include="g_items.cpp" />
+    <ClCompile Include="g_log.cpp" />
+    <ClCompile Include="g_luamysql.cpp" />
+    <ClCompile Include="g_luasqlite.cpp" />
+    <ClCompile Include="g_luaweapon.cpp" />
+    <ClCompile Include="g_main.cpp" />
+    <ClCompile Include="g_mem.cpp" />
+    <ClCompile Include="g_misc.cpp" />
+    <ClCompile Include="g_missile.cpp" />
+    <ClCompile Include="g_mover.cpp" />
+    <ClCompile Include="g_nav.cpp" />
+    <ClCompile Include="g_navnew.cpp" />
+    <ClCompile Include="g_object.cpp" />
+    <ClCompile Include="g_playerbans.cpp" />
+    <ClCompile Include="g_saga.cpp" />
+    <ClCompile Include="g_session.cpp" />
+    <ClCompile Include="g_smartentities.cpp" />
+    <ClCompile Include="g_spawn.cpp" />
+    <ClCompile Include="g_svcmds.cpp" />
+    <ClCompile Include="g_syscalls.cpp" />
+    <ClCompile Include="g_target.cpp" />
+    <ClCompile Include="g_team.cpp" />
+    <ClCompile Include="g_timer.cpp" />
+    <ClCompile Include="g_trigger.cpp" />
+    <ClCompile Include="g_turret.cpp" />
+    <ClCompile Include="g_turret_G2.cpp" />
+    <ClCompile Include="g_unlagged.cpp" />
+    <ClCompile Include="g_utils.cpp" />
+    <ClCompile Include="g_vehicles.cpp" />
+    <ClCompile Include="g_vehicleTurret.cpp" />
+    <ClCompile Include="g_weapon.cpp" />
+    <ClCompile Include="NPC.cpp" />
+    <ClCompile Include="NPC_AI_Atst.cpp" />
+    <ClCompile Include="NPC_AI_Default.cpp" />
+    <ClCompile Include="NPC_AI_Droid.cpp" />
+    <ClCompile Include="NPC_AI_GalakMech.cpp" />
+    <ClCompile Include="NPC_AI_Grenadier.cpp" />
+    <ClCompile Include="NPC_AI_Howler.cpp" />
+    <ClCompile Include="NPC_AI_ImperialProbe.cpp" />
+    <ClCompile Include="NPC_AI_Interrogator.cpp" />
+    <ClCompile Include="NPC_AI_Jedi.cpp" />
+    <ClCompile Include="NPC_AI_Mark1.cpp" />
+    <ClCompile Include="NPC_AI_Mark2.cpp" />
+    <ClCompile Include="NPC_AI_MineMonster.cpp" />
+    <ClCompile Include="NPC_AI_Rancor.cpp" />
+    <ClCompile Include="NPC_AI_Remote.cpp" />
+    <ClCompile Include="NPC_AI_Seeker.cpp" />
+    <ClCompile Include="NPC_AI_Sentry.cpp" />
+    <ClCompile Include="NPC_AI_Sniper.cpp" />
+    <ClCompile Include="NPC_AI_Stormtrooper.cpp" />
+    <ClCompile Include="NPC_AI_Utils.cpp" />
+    <ClCompile Include="NPC_AI_Wampa.cpp" />
+    <ClCompile Include="NPC_behavior.cpp" />
+    <ClCompile Include="NPC_combat.cpp" />
+    <ClCompile Include="NPC_goal.cpp" />
+    <ClCompile Include="NPC_misc.cpp" />
+    <ClCompile Include="NPC_move.cpp" />
+    <ClCompile Include="NPC_reactions.cpp" />
+    <ClCompile Include="NPC_senses.cpp" />
+    <ClCompile Include="NPC_sounds.cpp" />
+    <ClCompile Include="NPC_spawn.cpp" />
+    <ClCompile Include="NPC_stats.cpp" />
+    <ClCompile Include="NPC_utils.cpp" />
+    <ClCompile Include="SpeederNPC.cpp" />
+    <ClCompile Include="tri_coll_test.cpp" />
+    <ClCompile Include="WalkerNPC.cpp" />
+    <ClCompile Include="w_force.cpp" />
+    <ClCompile Include="w_saber.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\JAPP\jp_cinfo.h" />
+    <ClInclude Include="..\JAPP\jp_crash.h" />
+    <ClInclude Include="..\JAPP\jp_csflags.h" />
+    <ClInclude Include="..\JAPP\jp_promode.h" />
+    <ClInclude Include="..\JAPP\jp_ssflags.h" />
+    <ClInclude Include="..\JAPP\jp_stack.h" />
+    <ClInclude Include="..\JAPP\jp_tokenparser.h" />
+    <ClInclude Include="..\qcommon\md5.h" />
+    <ClInclude Include="..\qcommon\q_shared.h" />
+    <ClInclude Include="ai.h" />
+    <ClInclude Include="ai_main.h" />
+    <ClInclude Include="anims.h" />
+    <ClInclude Include="be_aas.h" />
+    <ClInclude Include="be_ai_char.h" />
+    <ClInclude Include="be_ai_chat.h" />
+    <ClInclude Include="be_ai_gen.h" />
+    <ClInclude Include="be_ai_goal.h" />
+    <ClInclude Include="be_ai_move.h" />
+    <ClInclude Include="be_ai_weap.h" />
+    <ClInclude Include="be_ea.h" />
+    <ClInclude Include="bg_animTable.h" />
+    <ClInclude Include="bg_local.h" />
+    <ClInclude Include="bg_lua.h" />
+    <ClInclude Include="bg_luacvar.h" />
+    <ClInclude Include="bg_luaentity.h" />
+    <ClInclude Include="bg_luaevent.h" />
+    <ClInclude Include="bg_luafs.h" />
+    <ClInclude Include="bg_luainternal.h" />
+    <ClInclude Include="bg_lualogger.h" />
+    <ClInclude Include="bg_luaplayer.h" />
+    <ClInclude Include="bg_luaserialiser.h" />
+    <ClInclude Include="bg_luasocket.h" />
+    <ClInclude Include="bg_luavector.h" />
+    <ClInclude Include="bg_public.h" />
+    <ClInclude Include="bg_saga.h" />
+    <ClInclude Include="bg_vehicles.h" />
+    <ClInclude Include="bg_weapons.h" />
+    <ClInclude Include="botlib.h" />
+    <ClInclude Include="b_local.h" />
+    <ClInclude Include="b_public.h" />
+    <ClInclude Include="chars.h" />
+    <ClInclude Include="g_admin.h" />
+    <ClInclude Include="g_chatFilters.h" />
+    <ClInclude Include="g_ICARUScb.h" />
+    <ClInclude Include="g_local.h" />
+    <ClInclude Include="g_luasql.h" />
+    <ClInclude Include="g_luaweapon.h" />
+    <ClInclude Include="g_nav.h" />
+    <ClInclude Include="g_public.h" />
+    <ClInclude Include="g_team.h" />
+    <ClInclude Include="g_unlagged.h" />
+    <ClInclude Include="g_xcvar.h" />
+    <ClInclude Include="npc_headers.h" />
+    <ClInclude Include="say.h" />
+    <ClInclude Include="surfaceflags.h" />
+    <ClInclude Include="syn.h" />
+    <ClInclude Include="teams.h" />
+    <ClInclude Include="w_saber.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2FB1189B-44C9-4D81-8441-19CDE84AE19E}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>scons.bat -Q debug=1 no_sql=1 tools=default project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.bat -Q -c debug=1 no_sql=1 tools=default project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;PROJECT_GAME;$(NMakePreprocessorDefinitions);JPLUA;</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(SolutionDir);$(SolutionDir)game;$(SolutionDir)cgame;$(SolutionDir)ui;$(SolutionDir)mysql;$(SolutionDir)sqlite</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeBuildCommandLine>scons.bat -Q no_sql=1 project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.bat -Q -c no_sql=1 project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>WIN32;NDEBUG;PROJECT_GAME;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(SolutionDir);$(SolutionDir)game;$(SolutionDir)cgame;$(SolutionDir)ui;$(SolutionDir)mysql;$(SolutionDir)sqlite</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

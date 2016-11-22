@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\game\AnimalNPC.cpp" />
+    <ClCompile Include="..\game\bg_animTable.cpp" />
+    <ClCompile Include="..\game\bg_g2_utils.cpp" />
+    <ClCompile Include="..\game\bg_lua.cpp" />
+    <ClCompile Include="..\game\bg_luacvar.cpp" />
+    <ClCompile Include="..\game\bg_luaentity.cpp" />
+    <ClCompile Include="..\game\bg_luaevent.cpp" />
+    <ClCompile Include="..\game\bg_luafs.cpp" />
+    <ClCompile Include="..\game\bg_lualogger.cpp" />
+    <ClCompile Include="..\game\bg_luaplayer.cpp" />
+    <ClCompile Include="..\game\bg_luaserialiser.cpp" />
+    <ClCompile Include="..\game\bg_luasocket.cpp" />
+    <ClCompile Include="..\game\bg_luavector.cpp" />
+    <ClCompile Include="..\game\bg_misc.cpp" />
+    <ClCompile Include="..\game\bg_panimate.cpp" />
+    <ClCompile Include="..\game\bg_pmove.cpp" />
+    <ClCompile Include="..\game\bg_saber.cpp" />
+    <ClCompile Include="..\game\bg_saberLoad.cpp" />
+    <ClCompile Include="..\game\bg_saga.cpp" />
+    <ClCompile Include="..\game\bg_slidemove.cpp" />
+    <ClCompile Include="..\game\bg_vehicleLoad.cpp" />
+    <ClCompile Include="..\game\bg_weapons.cpp" />
+    <ClCompile Include="..\game\FighterNPC.cpp" />
+    <ClCompile Include="..\game\SpeederNPC.cpp" />
+    <ClCompile Include="..\game\WalkerNPC.cpp" />
+    <ClCompile Include="..\JAPP\jp_crashExtra.cpp" />
+    <ClCompile Include="..\JAPP\jp_promode.cpp" />
+    <ClCompile Include="..\JAPP\jp_stack.cpp" />
+    <ClCompile Include="..\JAPP\jp_tokenparser.cpp" />
+    <ClCompile Include="..\qcommon\q_math.cpp" />
+    <ClCompile Include="..\qcommon\q_shared.cpp" />
+    <ClCompile Include="..\ui\ui_fonts.cpp" />
+    <ClCompile Include="..\ui\ui_shared.cpp" />
+    <ClCompile Include="cg_chatbox.cpp" />
+    <ClCompile Include="cg_consolecmds.cpp" />
+    <ClCompile Include="cg_draw.cpp" />
+    <ClCompile Include="cg_drawtools.cpp" />
+    <ClCompile Include="cg_effects.cpp" />
+    <ClCompile Include="cg_ents.cpp" />
+    <ClCompile Include="cg_event.cpp" />
+    <ClCompile Include="cg_info.cpp" />
+    <ClCompile Include="cg_jappScoreboard.cpp" />
+    <ClCompile Include="cg_light.cpp" />
+    <ClCompile Include="cg_localents.cpp" />
+    <ClCompile Include="cg_luafont.cpp" />
+    <ClCompile Include="cg_luaitem.cpp" />
+    <ClCompile Include="cg_lualocalentity.cpp" />
+    <ClCompile Include="cg_luamenu.cpp" />
+    <ClCompile Include="cg_luarefentity.cpp" />
+    <ClCompile Include="cg_luaserver.cpp" />
+    <ClCompile Include="cg_luatextbox.cpp" />
+    <ClCompile Include="cg_main.cpp" />
+    <ClCompile Include="cg_marks.cpp" />
+    <ClCompile Include="cg_media.cpp" />
+    <ClCompile Include="cg_newDraw.cpp" />
+    <ClCompile Include="cg_players.cpp" />
+    <ClCompile Include="cg_playerstate.cpp" />
+    <ClCompile Include="cg_predict.cpp" />
+    <ClCompile Include="cg_q3pScoreboard.cpp" />
+    <ClCompile Include="cg_saga.cpp" />
+    <ClCompile Include="cg_scoreboard.cpp" />
+    <ClCompile Include="cg_servercmds.cpp" />
+    <ClCompile Include="cg_serverHistory.cpp" />
+    <ClCompile Include="cg_serverModification.cpp" />
+    <ClCompile Include="cg_smartentities.cpp" />
+    <ClCompile Include="cg_snapshot.cpp" />
+    <ClCompile Include="cg_syscalls.cpp" />
+    <ClCompile Include="cg_teambinds.cpp" />
+    <ClCompile Include="cg_trueview.cpp" />
+    <ClCompile Include="cg_turret.cpp" />
+    <ClCompile Include="cg_view.cpp" />
+    <ClCompile Include="cg_weaponinit.cpp" />
+    <ClCompile Include="cg_weapons.cpp" />
+    <ClCompile Include="fx_blaster.cpp" />
+    <ClCompile Include="fx_bowcaster.cpp" />
+    <ClCompile Include="fx_bryarpistol.cpp" />
+    <ClCompile Include="fx_demp2.cpp" />
+    <ClCompile Include="fx_disruptor.cpp" />
+    <ClCompile Include="fx_flechette.cpp" />
+    <ClCompile Include="fx_force.cpp" />
+    <ClCompile Include="fx_heavyrepeater.cpp" />
+    <ClCompile Include="fx_rocketlauncher.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\game\bg_lua.h" />
+    <ClInclude Include="..\game\bg_luacvar.h" />
+    <ClInclude Include="..\game\bg_luaentity.h" />
+    <ClInclude Include="..\game\bg_luaevent.h" />
+    <ClInclude Include="..\game\bg_luafs.h" />
+    <ClInclude Include="..\game\bg_luainternal.h" />
+    <ClInclude Include="..\game\bg_lualogger.h" />
+    <ClInclude Include="..\game\bg_luaplayer.h" />
+    <ClInclude Include="..\game\bg_luaserialiser.h" />
+    <ClInclude Include="..\game\bg_luasocket.h" />
+    <ClInclude Include="..\game\bg_luavector.h" />
+    <ClInclude Include="..\qcommon\q_shared.h" />
+    <ClInclude Include="..\ui\ui_shared.h" />
+    <ClInclude Include="cg_lights.h" />
+    <ClInclude Include="cg_local.h" />
+    <ClInclude Include="cg_luafont.h" />
+    <ClInclude Include="cg_luainterface.h" />
+    <ClInclude Include="cg_lualocalentity.h" />
+    <ClInclude Include="cg_luarefentity.h" />
+    <ClInclude Include="cg_luaserver.h" />
+    <ClInclude Include="cg_luatextbox.h" />
+    <ClInclude Include="cg_media.h" />
+    <ClInclude Include="cg_public.h" />
+    <ClInclude Include="cg_serverHistory.h" />
+    <ClInclude Include="cg_xcvar.h" />
+    <ClInclude Include="fx_local.h" />
+    <ClInclude Include="tr_types.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3271A73E-369D-4589-979B-0ED42C45090A}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>scons.bat -Q debug=1 no_sql=1 tools=default project=cgame -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.bat -Q -c debug=1 no_sql=1 tools=default project=cgame -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;PROJECT_CGAME;$(NMakePreprocessorDefinitions);JPLUA;</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(SolutionDir);$(SolutionDir)game;$(SolutionDir)cgame;$(SolutionDir)ui;$(SolutionDir)mysql;$(SolutionDir)sqlite</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeBuildCommandLine>scons.bat -Q no_sql=1 project=cgame -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.bat -Q -c no_sql=1 project=cgame -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>WIN32;NDEBUG;PROJECT_CGAME;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(SolutionDir)\;$(SolutionDir)\game;$(SolutionDir)\cgame;$(SolutionDir)\ui;$(SolutionDir)\mysql;$(SolutionDir)\sqlite;</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

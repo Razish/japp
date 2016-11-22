@@ -1165,7 +1165,7 @@ public:
 	std::string* getData() { return &data; };
 	std::string& getIp() { return ip; };
 	int getStatus() { return this->status; };
-	void setStatus(int value) { this->status = value; };
+	void setStatus(int value) { this->status = value; this->ready = true; };
 };
 
 namespace GeoIP {

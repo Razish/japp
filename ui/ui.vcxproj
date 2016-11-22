@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\qcommon\q_shared.h" />
+    <ClInclude Include="keycodes.h" />
+    <ClInclude Include="menudef.h" />
+    <ClInclude Include="ui_fonts.h" />
+    <ClInclude Include="ui_force.h" />
+    <ClInclude Include="ui_local.h" />
+    <ClInclude Include="ui_public.h" />
+    <ClInclude Include="ui_shared.h" />
+    <ClInclude Include="ui_xcvar.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\game\bg_animTable.cpp" />
+    <ClCompile Include="..\game\bg_misc.cpp" />
+    <ClCompile Include="..\game\bg_saberLoad.cpp" />
+    <ClCompile Include="..\game\bg_saga.cpp" />
+    <ClCompile Include="..\game\bg_vehicleLoad.cpp" />
+    <ClCompile Include="..\game\bg_weapons.cpp" />
+    <ClCompile Include="..\JAPP\jp_crash.cpp" />
+    <ClCompile Include="..\JAPP\jp_tokenparser.cpp" />
+    <ClCompile Include="..\qcommon\q_math.cpp" />
+    <ClCompile Include="..\qcommon\q_shared.cpp" />
+    <ClCompile Include="ui_atoms.cpp" />
+    <ClCompile Include="ui_cvar.cpp" />
+    <ClCompile Include="ui_fonts.cpp" />
+    <ClCompile Include="ui_force.cpp" />
+    <ClCompile Include="ui_gameinfo.cpp" />
+    <ClCompile Include="ui_main.cpp" />
+    <ClCompile Include="ui_saber.cpp" />
+    <ClCompile Include="ui_shared.cpp" />
+    <ClCompile Include="ui_syscalls.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4E64C2C8-9E76-4C88-808B-B28A61919D53}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>scons.bat -Q debug=1 no_sql=1 tools=default project=ui -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.bat -Q -c debug=1 no_sql=1 tools=default project=ui -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;PROJECT_UI;$(NMakePreprocessorDefinitions);JPLUA;</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>$(SolutionDir);$(SolutionDir)game;$(SolutionDir)cgame;$(SolutionDir)ui;$(SolutionDir)mysql;$(SolutionDir)sqlite</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeBuildCommandLine>scons.bat -Q no_sql=1 project=ui  -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.bat -Q -c no_sql=1 project=ui  -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeCleanCommandLine>
+    <NMakePreprocessorDefinitions>WIN32;NDEBUG;PROJECT_UI;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath>.;game;cgame;ui;mysql;sqlite;</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

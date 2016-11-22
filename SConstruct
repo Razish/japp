@@ -23,6 +23,7 @@ no_sql = int( ARGUMENTS.get( 'no_sql', 0 ) )
 no_crashhandler = int( ARGUMENTS.get( 'no_crashhandler', 0 ) )
 toolStr = ARGUMENTS.get( 'tools', 'gcc,g++,ar,as,gnulink' )
 tools = [x for x in toolStr.split( ',' )]
+proj = ARGUMENTS.get( 'project', '')
 
 # compare semantic versions (1.0.2 < 1.0.10 < 1.2.0)
 def cmp_version( v1, v2 ):
@@ -563,9 +564,11 @@ projects = [
 	'ui',
 ]
 
-for project in projects:
+print(Dir('#').srcnode().abspath)
+
+if proj != '' and (proj in projects):
 	env.SConscript(
-		os.path.join( project, 'SConscript' ),
+		os.path.join( proj, 'SConscript' ),
 		exports = [
 			'arch',
 			'bits',
@@ -577,3 +580,18 @@ for project in projects:
 			'realcc',
 		]
 	)
+else:
+	for project in projects:
+		env.SConscript(
+			os.path.join( project, 'SConscript' ),
+			exports = [
+				'arch',
+				'bits',
+				'configuration',
+				'env',
+				'no_crashhandler',
+				'no_sql',
+				'plat',
+				'realcc',
+			]
+		)

@@ -64,6 +64,7 @@
     <ClInclude Include="game\bg_lualogger.h" />
     <ClInclude Include="game\bg_luaplayer.h" />
     <ClInclude Include="game\bg_luaserialiser.h" />
+    <ClInclude Include="game\bg_luasocket.h" />
     <ClInclude Include="game\bg_luavector.h" />
     <ClInclude Include="game\bg_public.h" />
     <ClInclude Include="game\bg_saga.h" />
@@ -215,6 +216,7 @@
     <ClCompile Include="game\bg_lualogger.cpp" />
     <ClCompile Include="game\bg_luaplayer.cpp" />
     <ClCompile Include="game\bg_luaserialiser.cpp" />
+    <ClCompile Include="game\bg_luasocket.cpp" />
     <ClCompile Include="game\bg_luavector.cpp" />
     <ClCompile Include="game\bg_misc.cpp" />
     <ClCompile Include="game\bg_panimate.cpp" />
@@ -395,7 +397,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <NMakeBuildCommandLine>scons.bat -Q debug=1 no_sql=1 tools=default</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>scons.bat -Q -c debug=1 no_sql=1 tools=default</NMakeCleanCommandLine>
-    <NMakePreprocessorDefinitions>WIN32;_DEBUG;PROJECT_GAME;PROJECT_CGAME;PROJECT_UI;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;PROJECT_GAME;PROJECT_CGAME;PROJECT_UI;$(NMakePreprocessorDefinitions);JPLUA;</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>.;game;cgame;ui;mysql;sqlite;</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
