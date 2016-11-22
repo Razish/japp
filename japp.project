@@ -549,8 +549,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=1 force32=0 no_sql=1</CleanCommand>
-        <BuildCommand>scons -Q debug=1 force32=0 no_sql=1</BuildCommand>
+        <CleanCommand>scons -Qc debug=1 force32=0 no_sql=1 tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=1 force32=0 no_sql=1 tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -588,8 +588,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=1 force32=1 no_sql=1</CleanCommand>
-        <BuildCommand>scons -Q debug=1 force32=1 no_sql=1</BuildCommand>
+        <CleanCommand>scons -Qc debug=1 force32=1 no_sql=1 tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=1 force32=1 no_sql=1 tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -627,8 +627,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=2 force32=0 no_sql=1</CleanCommand>
-        <BuildCommand>scons -Q debug=2 force32=0 no_sql=1</BuildCommand>
+        <CleanCommand>scons -Qc debug=2 force32=0 no_sql=1 tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=2 force32=0 no_sql=1 tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -666,8 +666,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=2 force32=1 no_sql=1</CleanCommand>
-        <BuildCommand>scons -Q debug=2 force32=1 no_sql=1</BuildCommand>
+        <CleanCommand>scons -Qc debug=2 force32=1 no_sql=1 tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=2 force32=1 no_sql=1 tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -705,8 +705,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=0 force32=0 no_sql=1</CleanCommand>
-        <BuildCommand>scons -Q debug=0 force32=0 no_sql=1</BuildCommand>
+        <CleanCommand>scons -Qc debug=0 force32=0 no_sql=1 tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=0 force32=0 no_sql=1 tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -744,8 +744,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=0 force32=1 no_sql=1</CleanCommand>
-        <BuildCommand>scons -Q debug=0 force32=1 no_sql=1</BuildCommand>
+        <CleanCommand>scons -Qc debug=0 force32=1 no_sql=1 tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=0 force32=1 no_sql=1 tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>

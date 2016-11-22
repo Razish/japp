@@ -7,6 +7,14 @@
 #include "cg_media.h"
 #include "ui/ui_fonts.h"
 
+#if defined(_MSC_VER)
+	#pragma warning( push )
+	//#pragma warning( disable: ???? )
+#elif defined(__GNUC__)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Winline"
+#endif // _MSC_VER
+
 static int JP_GetScoreboardFont( void ) {
 	return Q_clampi( FONT_SMALL, cg_newScoreboardFont.integer, FONT_NUM_FONTS );
 }
@@ -282,6 +290,11 @@ static int PlayerCount( team_t team ) {
 struct Column {
 	const char *title;
 	std::function<
+		bool(
+			const Column &self
+		)
+	> Filter;
+	std::function<
 		float(
 			Column &self, const Font &font
 		)
@@ -310,6 +323,142 @@ struct Column {
 	float width;
 };
 
+// helper funcs
+static bool FilterTrue( const Column &self ) {
+	return true;
+}
+
+// name column helpers
+static const Column
+	nameColumn{
+		"Name",
+		FilterTrue,
+		[]( Column &self, const Font &font ) {
+			return std::max(
+				font.Width( self.title ),
+				font.Width( "12345678901234567890123456789012345" )
+			);
+		},
+		[]( const Column &self, float &x, float y, const Font &font, float fade ) {
+			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
+			const float textWidth = font.Width( self.title );
+			font.Paint( x + self.width - textWidth, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		},
+		[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
+			const clientInfo_t &ci )
+		{
+			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
+			const char *text = ci.name;
+			const float textWidth = font.Width( text );
+			font.Paint( x + self.width - textWidth, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+
+			return true;
+		},
+		{ 0.0f, 4.0f },
+		0.0f
+	},
+	pingColumn{
+		"Ping",
+		FilterTrue,
+		[]( Column &self, const Font &font ) {
+			float longestPing = 0.0f;
+			for ( int i = 0; i < cg.numScores; i++ ) {
+				const score_t &score = cg.scores[i];
+				const clientInfo_t &ci = cgs.clientinfo[score.client];
+				const char *text = nullptr;
+				if ( ci.botSkill != -1 ) {
+					text = "--";
+				}
+				else {
+					text = va( "%i", score.ping );
+				}
+
+				const float pingWidth = font.Width( text );
+				if ( longestPing < pingWidth ) {
+					longestPing = pingWidth;
+				}
+			}
+			return std::max(
+				longestPing,
+				font.Width( self.title )
+			);
+		},
+		[]( const Column &self, float &x, float y, const Font &font, float fade ) {
+			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
+			const float textWidth = font.Width( self.title );
+			font.Paint(
+				x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
+			);
+		},
+		[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
+			const clientInfo_t &ci )
+		{
+			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
+			if ( ci.botSkill != -1 ) {
+				const char *text = "--";
+				const float textWidth = font.Width( text );
+				font.Paint(
+					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
+				);
+			}
+			else {
+				vector4 pingColour{ 1.0f, 1.0f, 1.0f, fade };
+				const vector4 pingGood{ 0.0f, 1.0f, 0.0f, fade };
+				const vector4 pingBad{ 1.0f, 0.0f, 0.0f, fade };
+				CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score.ping / 300.0f, 1.0f ) );
+
+				const char *text = va( "%i", score.ping );
+				const float textWidth = font.Width( text );
+				font.Paint(
+					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &pingColour, ITEM_TEXTSTYLE_SHADOWEDMORE
+				);
+			}
+			return true;
+		},
+		{ 0.0f, 4.0f },
+		0.0f
+	},
+	timeColumn{
+		"Time",
+		FilterTrue,
+		[]( Column &self, const Font &font ) {
+			float longestTime = 0.0f;
+			for ( int i = 0; i < cg.numScores; i++ ) {
+				const score_t &score = cg.scores[i];
+				const char *text = va( "%i", score.time );
+
+				const float timeWidth = font.Width( text );
+				if ( longestTime < timeWidth ) {
+					longestTime = timeWidth;
+				}
+			}
+			return std::max(
+				longestTime,
+				font.Width( self.title )
+			);
+		},
+		[]( const Column &self, float &x, float y, const Font &font, float fade ) {
+			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
+			const float textWidth = font.Width( self.title );
+			font.Paint(
+				x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
+			);
+		},
+		[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
+			const clientInfo_t &ci )
+		{
+			const char *text = va( "%i", score.time );
+			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
+			const float textWidth = font.Width( text );
+			font.Paint(
+				x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
+			);
+			return true;
+		},
+		{ 0.0f, 4.0f },
+		0.0f
+	};
+
 // returns number of players on team 'team'
 static int ListPlayers_TDM( float fade, float _x, float _y, team_t team ) {
 	const int playerCount = PlayerCount( team );
@@ -323,43 +472,11 @@ static int ListPlayers_TDM( float fade, float _x, float _y, team_t team ) {
 	float x = startX;
 	float y = startY;
 
-	enum ColumnID : uint32_t {
-		COLUMN_NAME,
-		COLUMN_SCORE,
-		COLUMN_RATIO,
-		//COLUMN_KPM,
-		COLUMN_PING,
-		COLUMN_TIME,
-		NUM_COLUMNS
-	};
-	static Column columns[NUM_COLUMNS] = {
-		{
-			"Name",
-			[]( Column &self, const Font &font ) {
-				return std::max(
-					font.Width( self.title ),
-					font.Width( "12345678901234567890123456789012345" )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint( x + self.width - textWidth, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const char *text = ci.name;
-				const float textWidth = font.Width( text );
-				font.Paint( x + self.width - textWidth, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-
-				return true;
-			},
-			{ 0.0f, 4.0f }
-		},
+	static Column columns[] = {
+		nameColumn,
 		{
 			"Score",
+			FilterTrue,
 			[]( Column &self, const Font &font ) {
 				return std::max(
 					font.Width( "88 / 88" ),
@@ -389,6 +506,7 @@ static int ListPlayers_TDM( float fade, float _x, float _y, team_t team ) {
 		},
 		{
 			"Ratio",
+			FilterTrue,
 			[]( Column &self, const Font &font ) {
 				return std::max(
 					font.Width( "1.33" ),
@@ -424,133 +542,8 @@ static int ListPlayers_TDM( float fade, float _x, float _y, team_t team ) {
 			},
 			{ 4.0f, 4.0f }
 		},
-		#if 0
-		{
-			"KPM",
-			[]( Column &self, const Font &font ) {
-				return std::max(
-					font.Width( "--" ),
-					font.Width( self.title )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const char *text = "--";
-				const float textWidth = font.Width( text );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-				return true;
-			},
-			{ 4.0f, 4.0f }
-		},
-		#endif
-		{
-			"Ping",
-			[]( Column &self, const Font &font ) {
-				float longestPing = 0.0f;
-				for ( int i = 0; i < cg.numScores; i++ ) {
-					const score_t &score = cg.scores[i];
-					const clientInfo_t &ci = cgs.clientinfo[score.client];
-					const char *text = nullptr;
-					if ( ci.botSkill != -1 ) {
-						text = "--";
-					}
-					else {
-						text = va( "%i", score.ping );
-					}
-
-					const float pingWidth = font.Width( text );
-					if ( longestPing < pingWidth ) {
-						longestPing = pingWidth;
-					}
-				}
-				return std::max(
-					longestPing,
-					font.Width( self.title )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				if ( ci.botSkill != -1 ) {
-					const char *text = "--";
-					const float textWidth = font.Width( text );
-					font.Paint(
-						x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-					);
-				}
-				else {
-					vector4 pingColour{ 1.0f, 1.0f, 1.0f, fade };
-					const vector4 pingGood{ 0.0f, 1.0f, 0.0f, fade };
-					const vector4 pingBad{ 1.0f, 0.0f, 0.0f, fade };
-					CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score.ping / 300.0f, 1.0f ) );
-
-					const char *text = va( "%i", score.ping );
-					const float textWidth = font.Width( text );
-					font.Paint(
-						x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &pingColour, ITEM_TEXTSTYLE_SHADOWEDMORE
-					);
-				}
-				return true;
-			},
-			{ 4.0f, 4.0f }
-		},
-		{
-			"Time",
-			[]( Column &self, const Font &font ) {
-				float longestTime = 0.0f;
-				for ( int i = 0; i < cg.numScores; i++ ) {
-					const score_t &score = cg.scores[i];
-					const char *text = va( "%i", score.time );
-
-					const float timeWidth = font.Width( text );
-					if ( longestTime < timeWidth ) {
-						longestTime = timeWidth;
-					}
-				}
-				return std::max(
-					longestTime,
-					font.Width( self.title )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const char *text = va( "%i", score.time );
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( text );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-				return true;
-			},
-			{ 4.0f, 4.0f }
-		},
+		pingColumn,
+		timeColumn,
 	};
 
 	static int lastFont = -1;
@@ -574,6 +567,9 @@ static int ListPlayers_TDM( float fade, float _x, float _y, team_t team ) {
 	}
 
 	for ( auto &column : columns ) {
+		if ( !column.Filter( column ) ) {
+			continue;
+		}
 		x += column.padding.x;
 		column.DrawTitle( column, x, y, font, fade );
 		y += lineHeight * 1.5f;
@@ -593,37 +589,12 @@ static int ListPlayers_TDM( float fade, float _x, float _y, team_t team ) {
 	}
 	x = startX;
 
-#if 0
-	// Second pass, text + icons
-	for ( int i = 0; i < playerCount; i++ ) {
-		score_t *score = &cg.scores[i];
-		clientInfo_t *ci = &cgs.clientinfo[score->client];
-		if ( ci->team == TEAM_FREE ) {
-			if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags & EF_CONNECTION) ) {
-				trap->R_SetColor( &white );
-				CG_DrawPic( x + 5.0f, y + 1.0f, lineHeight - 2.0f, lineHeight - 2.0f, media.gfx.interface.connection );
-				trap->R_SetColor( NULL );
-			}
-
-			else if ( cg.snap->ps.duelInProgress && (ci - cgs.clientinfo == cg.snap->ps.duelIndex
-				|| ci - cgs.clientinfo == cg.snap->ps.clientNum) ) {
-				trap->R_SetColor( &white );
-				CG_DrawPic( x + 5.0f, y + 1.0f, lineHeight - 2.0f, lineHeight - 2.0f, media.gfx.interface.powerduelAlly );
-				trap->R_SetColor( NULL );
-			}
-
-			else if ( ci->botSkill != -1 ) {
-				tmp = "BOT";
-				font.Paint( x + 8.0f, y + (font.Height( tmp ) / 2.0f), tmp, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			}
-
-			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
-				tmp = "READY";
-				font.Paint( x + 8.0f, y + (font.Height( tmp ) / 2.0f), tmp, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			}
-		}
-	}
-#endif
+	// TODO: lag if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags & EF_CONNECTION) )
+	//	media.gfx.interface.connection );
+	// TODO: duel if ( cg.snap->ps.duelInProgress && (ci - cgs.clientinfo == cg.snap->ps.duelIndex || ci - cgs.clientinfo == cg.snap->ps.clientNum) )
+	//	media.gfx.interface.powerduelAlly );
+	// TODO: bot: if ( ci->botSkill != -1 )
+	// TODO: ready: if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) )
 
 	return 0;
 }
@@ -641,44 +612,11 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 	float x = startX;
 	float y = startY;
 
-	enum ColumnID : uint32_t {
-		COLUMN_NAME,
-		COLUMN_SCORE,
-		COLUMN_CAPTURES,
-		COLUMN_ASSISTS,
-		COLUMN_DEFENSE,
-		COLUMN_PING,
-		COLUMN_TIME,
-		NUM_COLUMNS
-	};
-	static Column columns[NUM_COLUMNS] = {
-		{
-			"Name",
-			[]( Column &self, const Font &font ) {
-				return std::max(
-					font.Width( self.title ),
-					font.Width( "12345678901234567890123456789012345" )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint( x + self.width - textWidth, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const char *text = ci.name;
-				const float textWidth = font.Width( text );
-				font.Paint( x + self.width - textWidth, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-
-				return true;
-			},
-			{ 0.0f, 4.0f }
-		},
+	static Column columns[] = {
+		nameColumn,
 		{
 			"Score",
+			FilterTrue,
 			[]( Column &self, const Font &font ) {
 				return std::max(
 					std::max(
@@ -711,6 +649,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 		},
 		{
 			"Captures",
+			FilterTrue,
 			[]( Column &self, const Font &font ) {
 				return std::max(
 					font.Width( "88" ),
@@ -739,6 +678,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 		},
 		{
 			"Assists",
+			FilterTrue,
 			[]( Column &self, const Font &font ) {
 				return std::max(
 					font.Width( "88" ),
@@ -767,6 +707,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 		},
 		{
 			"Defense",
+			FilterTrue,
 			[]( Column &self, const Font &font ) {
 				return std::max(
 					font.Width( "88" ),
@@ -793,103 +734,8 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 			},
 			{ 4.0f, 4.0f }
 		},
-		{
-			"Ping",
-			[]( Column &self, const Font &font ) {
-				float longestPing = 0.0f;
-				for ( int i = 0; i < cg.numScores; i++ ) {
-					const score_t &score = cg.scores[i];
-					const clientInfo_t &ci = cgs.clientinfo[score.client];
-					const char *text = nullptr;
-					if ( ci.botSkill != -1 ) {
-						text = "--";
-					}
-					else {
-						text = va( "%i", score.ping );
-					}
-
-					const float pingWidth = font.Width( text );
-					if ( longestPing < pingWidth ) {
-						longestPing = pingWidth;
-					}
-				}
-				return std::max(
-					longestPing,
-					font.Width( self.title )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				if ( ci.botSkill != -1 ) {
-					const char *text = "--";
-					const float textWidth = font.Width( text );
-					font.Paint(
-						x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-					);
-				}
-				else {
-					vector4 pingColour{ 1.0f, 1.0f, 1.0f, fade };
-					const vector4 pingGood{ 0.0f, 1.0f, 0.0f, fade };
-					const vector4 pingBad{ 1.0f, 0.0f, 0.0f, fade };
-					CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score.ping / 300.0f, 1.0f ) );
-
-					const char *text = va( "%i", score.ping );
-					const float textWidth = font.Width( text );
-					font.Paint(
-						x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &pingColour, ITEM_TEXTSTYLE_SHADOWEDMORE
-					);
-				}
-				return true;
-			},
-			{ 4.0f, 4.0f }
-		},
-		{
-			"Time",
-			[]( Column &self, const Font &font ) {
-				float longestTime = 0.0f;
-				for ( int i = 0; i < cg.numScores; i++ ) {
-					const score_t &score = cg.scores[i];
-					const char *text = va( "%i", score.time );
-
-					const float timeWidth = font.Width( text );
-					if ( longestTime < timeWidth ) {
-						longestTime = timeWidth;
-					}
-				}
-				return std::max(
-					longestTime,
-					font.Width( self.title )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const char *text = va( "%i", score.time );
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( text );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-				return true;
-			},
-			{ 4.0f, 4.0f }
-		},
+		pingColumn,
+		timeColumn,
 	};
 
 	static int lastFont = -1;
@@ -913,6 +759,9 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 	}
 
 	for ( auto &column : columns ) {
+		if ( !column.Filter( column ) ) {
+			continue;
+		}
 		x += column.padding.x;
 		column.DrawTitle( column, x, y, font, fade );
 		y += lineHeight * 1.5f;
@@ -932,37 +781,12 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 	}
 	x = startX;
 
-#if 0
-	// Second pass, text + icons
-	for ( int i = 0; i < playerCount; i++ ) {
-		score_t *score = &cg.scores[i];
-		clientInfo_t *ci = &cgs.clientinfo[score->client];
-		if ( ci->team == TEAM_FREE ) {
-			if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags & EF_CONNECTION) ) {
-				trap->R_SetColor( &white );
-				CG_DrawPic( x + 5.0f, y + 1.0f, lineHeight - 2.0f, lineHeight - 2.0f, media.gfx.interface.connection );
-				trap->R_SetColor( NULL );
-			}
-
-			else if ( cg.snap->ps.duelInProgress && (ci - cgs.clientinfo == cg.snap->ps.duelIndex
-				|| ci - cgs.clientinfo == cg.snap->ps.clientNum) ) {
-				trap->R_SetColor( &white );
-				CG_DrawPic( x + 5.0f, y + 1.0f, lineHeight - 2.0f, lineHeight - 2.0f, media.gfx.interface.powerduelAlly );
-				trap->R_SetColor( NULL );
-			}
-
-			else if ( ci->botSkill != -1 ) {
-				tmp = "BOT";
-				font.Paint( x + 8.0f, y + (font.Height( tmp ) / 2.0f), tmp, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			}
-
-			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
-				tmp = "READY";
-				font.Paint( x + 8.0f, y + (font.Height( tmp ) / 2.0f), tmp, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			}
-		}
-	}
-#endif
+	// TODO: lag if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags & EF_CONNECTION) )
+	//	media.gfx.interface.connection );
+	// TODO: duel if ( cg.snap->ps.duelInProgress && (ci - cgs.clientinfo == cg.snap->ps.duelIndex || ci - cgs.clientinfo == cg.snap->ps.clientNum) )
+	//	media.gfx.interface.powerduelAlly );
+	// TODO: bot: if ( ci->botSkill != -1 )
+	// TODO: ready: if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) )
 
 	return 0;
 }
@@ -1033,41 +857,11 @@ static void DrawPlayers_Free( float fade ) {
 	float x = startX;
 	float y = startY;
 
-	enum ColumnID : uint32_t {
-		COLUMN_NAME,
-		COLUMN_SCORE,
-		COLUMN_PING,
-		COLUMN_TIME,
-		NUM_COLUMNS
-	};
-	static Column columns[NUM_COLUMNS] = {
-		{
-			"Name",
-			[]( Column &self, const Font &font ) {
-				return std::max(
-					font.Width( self.title ),
-					font.Width( "12345678901234567890123456789012345" )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint( x + self.width - textWidth, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const char *text = ci.name;
-				const float textWidth = font.Width( text );
-				font.Paint( x + self.width - textWidth, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-
-				return true;
-			},
-			{ 0.0f, 4.0f }
-		},
+	static Column columns[] = {
+		nameColumn,
 		{
 			"Score",
+			FilterTrue,
 			[]( Column &self, const Font &font ) {
 				float longestScore = 0.0f;
 				for ( int i = 0; i < cg.numScores; i++ ) {
@@ -1126,104 +920,42 @@ static void DrawPlayers_Free( float fade ) {
 			},
 			{ 4.0f, 4.0f }
 		},
-		//TODO: deaths, net, kpm
 		{
-			"Ping",
+			"KPM",
+			[]( const Column &self ) {
+				return cg_newScoreboardShowKPM.integer;
+			},
 			[]( Column &self, const Font &font ) {
-				float longestPing = 0.0f;
-				for ( int i = 0; i < cg.numScores; i++ ) {
-					const score_t &score = cg.scores[i];
-					const clientInfo_t &ci = cgs.clientinfo[score.client];
-					const char *text = nullptr;
-					if ( ci.botSkill != -1 ) {
-						text = "--";
-					}
-					else {
-						text = va( "%i", score.ping );
-					}
-
-					const float pingWidth = font.Width( text );
-					if ( longestPing < pingWidth ) {
-						longestPing = pingWidth;
-					}
-				}
 				return std::max(
-					longestPing,
+					font.Width( "8.88" ),
 					font.Width( self.title )
 				);
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
+				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
 			{
+				const char *text = nullptr;
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				if ( ci.botSkill != -1 ) {
-					const char *text = "--";
-					const float textWidth = font.Width( text );
-					font.Paint(
-						x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-					);
+				if ( score.ping == -1 ) {
+					text = "--";
 				}
 				else {
-					vector4 pingColour{ 1.0f, 1.0f, 1.0f, fade };
-					const vector4 pingGood{ 0.0f, 1.0f, 0.0f, fade };
-					const vector4 pingBad{ 1.0f, 0.0f, 0.0f, fade };
-					CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score.ping / 300.0f, 1.0f ) );
-
-					const char *text = va( "%i", score.ping );
-					const float textWidth = font.Width( text );
-					font.Paint(
-						x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &pingColour, ITEM_TEXTSTYLE_SHADOWEDMORE
-					);
+					const float ratio = (score.time != 0)
+						? (static_cast<float>(score.score) / score.time)
+						: score.score;
+					text = va( "%.2f", ratio );
 				}
+				font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
 				return true;
 			},
 			{ 4.0f, 4.0f }
 		},
-		{
-			"Time",
-			[]( Column &self, const Font &font ) {
-				float longestTime = 0.0f;
-				for ( int i = 0; i < cg.numScores; i++ ) {
-					const score_t &score = cg.scores[i];
-					const char *text = va( "%i", score.time );
-
-					const float timeWidth = font.Width( text );
-					if ( longestTime < timeWidth ) {
-						longestTime = timeWidth;
-					}
-				}
-				return std::max(
-					longestTime,
-					font.Width( self.title )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const char *text = va( "%i", score.time );
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( text );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-				return true;
-			},
-			{ 4.0f, 4.0f }
-		},
+		pingColumn,
+		timeColumn,
 	};
 
 	static int lastFont = -1;
@@ -1247,6 +979,9 @@ static void DrawPlayers_Free( float fade ) {
 	}
 
 	for ( auto &column : columns ) {
+		if ( !column.Filter( column ) ) {
+			continue;
+		}
 		x += column.padding.x;
 		column.DrawTitle( column, x, y, font, fade );
 		y += lineHeight * 1.5f;
@@ -1266,37 +1001,12 @@ static void DrawPlayers_Free( float fade ) {
 	}
 	x = startX;
 
-#if 0
-	// Second pass, text + icons
-	for ( int i = 0; i < playerCount; i++ ) {
-		score_t *score = &cg.scores[i];
-		clientInfo_t *ci = &cgs.clientinfo[score->client];
-		if ( ci->team == TEAM_FREE ) {
-			if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags & EF_CONNECTION) ) {
-				trap->R_SetColor( &white );
-				CG_DrawPic( x + 5.0f, y + 1.0f, lineHeight - 2.0f, lineHeight - 2.0f, media.gfx.interface.connection );
-				trap->R_SetColor( NULL );
-			}
-
-			else if ( cg.snap->ps.duelInProgress && (ci - cgs.clientinfo == cg.snap->ps.duelIndex
-				|| ci - cgs.clientinfo == cg.snap->ps.clientNum) ) {
-				trap->R_SetColor( &white );
-				CG_DrawPic( x + 5.0f, y + 1.0f, lineHeight - 2.0f, lineHeight - 2.0f, media.gfx.interface.powerduelAlly );
-				trap->R_SetColor( NULL );
-			}
-
-			else if ( ci->botSkill != -1 ) {
-				tmp = "BOT";
-				font.Paint( x + 8.0f, y + (font.Height( tmp ) / 2.0f), tmp, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			}
-
-			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
-				tmp = "READY";
-				font.Paint( x + 8.0f, y + (font.Height( tmp ) / 2.0f), tmp, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			}
-		}
-	}
-#endif
+	// TODO: lag if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags & EF_CONNECTION) )
+	//	media.gfx.interface.connection );
+	// TODO: duel if ( cg.snap->ps.duelInProgress && (ci - cgs.clientinfo == cg.snap->ps.duelIndex || ci - cgs.clientinfo == cg.snap->ps.clientNum) )
+	//	media.gfx.interface.powerduelAlly );
+	// TODO: bot: if ( ci->botSkill != -1 )
+	// TODO: ready: if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) )
 
 	DrawSpectators( fade );
 }
@@ -1313,42 +1023,11 @@ static void DrawPlayers_Duel( float fade ) {
 	float x = startX;
 	float y = startY;
 
-	enum ColumnID : uint32_t {
-		COLUMN_NAME,
-		COLUMN_SCORE,
-		COLUMN_PROGRESS,
-		COLUMN_PING,
-		COLUMN_TIME,
-		NUM_COLUMNS
-	};
-	static Column columns[NUM_COLUMNS] = {
-		{
-			"Name",
-			[]( Column &self, const Font &font ) {
-				return std::max(
-					font.Width( self.title ),
-					font.Width( "12345678901234567890123456789012345" )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint( x + self.width - textWidth, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const char *text = ci.name;
-				const float textWidth = font.Width( text );
-				font.Paint( x + self.width - textWidth, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-
-				return true;
-			},
-			{ 0.0f, 4.0f }
-		},
+	static Column columns[] = {
+		nameColumn,
 		{
 			"Game",
+			FilterTrue,
 			[]( Column &self, const Font &font ) {
 				return 128;
 			},
@@ -1416,6 +1095,7 @@ static void DrawPlayers_Duel( float fade ) {
 		},
 		{
 			"Match",
+			FilterTrue,
 			[]( Column &self, const Font &font ) {
 				return 128;
 			},
@@ -1435,8 +1115,10 @@ static void DrawPlayers_Duel( float fade ) {
 				const real32_t blockHeight = font.Height();
 				int32_t usedBlocks = 0;
 
-				/*
 				// draw losses first
+				/* this really only works with "best out of i" situations, not first to "i"
+				//	and consider interlacing the blips (historic/chronologic)
+				//	...not possible/feasibly reliable on base/ja+
 				const int32_t numLossBlocks = std::min( ci.losses, cgs.duel_fraglimit );
 				for ( int32_t i = 0; i < numLossBlocks; i++ ) {
 					CG_FillRect( x + (usedBlocks * blockWidth), y, blockWidth, blockHeight, &colorTable[CT_RED] );
@@ -1478,107 +1160,12 @@ static void DrawPlayers_Duel( float fade ) {
 					font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
 				#endif
 				return true;
+
 			},
 			{ 4.0f, 4.0f }
 		},
-		//TODO: deaths, net, kpm
-		{
-			"Ping",
-			[]( Column &self, const Font &font ) {
-				float longestPing = 0.0f;
-				for ( int i = 0; i < cg.numScores; i++ ) {
-					const score_t &score = cg.scores[i];
-					const clientInfo_t &ci = cgs.clientinfo[score.client];
-					const char *text = nullptr;
-					if ( ci.botSkill != -1 ) {
-						text = "--";
-					}
-					else {
-						text = va( "%i", score.ping );
-					}
-
-					const float pingWidth = font.Width( text );
-					if ( longestPing < pingWidth ) {
-						longestPing = pingWidth;
-					}
-				}
-				return std::max(
-					longestPing,
-					font.Width( self.title )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				if ( ci.botSkill != -1 ) {
-					const char *text = "--";
-					const float textWidth = font.Width( text );
-					font.Paint(
-						x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-					);
-				}
-				else {
-					vector4 pingColour{ 1.0f, 1.0f, 1.0f, fade };
-					const vector4 pingGood{ 0.0f, 1.0f, 0.0f, fade };
-					const vector4 pingBad{ 1.0f, 0.0f, 0.0f, fade };
-					CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score.ping / 300.0f, 1.0f ) );
-
-					const char *text = va( "%i", score.ping );
-					const float textWidth = font.Width( text );
-					font.Paint(
-						x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &pingColour, ITEM_TEXTSTYLE_SHADOWEDMORE
-					);
-				}
-				return true;
-			},
-			{ 4.0f, 4.0f }
-		},
-		{
-			"Time",
-			[]( Column &self, const Font &font ) {
-				float longestTime = 0.0f;
-				for ( int i = 0; i < cg.numScores; i++ ) {
-					const score_t &score = cg.scores[i];
-					const char *text = va( "%i", score.time );
-
-					const float timeWidth = font.Width( text );
-					if ( longestTime < timeWidth ) {
-						longestTime = timeWidth;
-					}
-				}
-				return std::max(
-					longestTime,
-					font.Width( self.title )
-				);
-			},
-			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( self.title );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-			},
-			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
-				const clientInfo_t &ci )
-			{
-				const char *text = va( "%i", score.time );
-				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				const float textWidth = font.Width( text );
-				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
-				);
-				return true;
-			},
-			{ 4.0f, 4.0f }
-		},
+		pingColumn,
+		timeColumn,
 	};
 
 	static int lastFont = -1;
@@ -1602,6 +1189,9 @@ static void DrawPlayers_Duel( float fade ) {
 	}
 
 	for ( auto &column : columns ) {
+		if ( !column.Filter( column ) ) {
+			continue;
+		}
 		x += column.padding.x;
 		column.DrawTitle( column, x, y, font, fade );
 		y += lineHeight * 1.5f;
@@ -1621,41 +1211,17 @@ static void DrawPlayers_Duel( float fade ) {
 	}
 	x = startX;
 
-#if 0
-	// Second pass, text + icons
-	for ( int i = 0; i < playerCount; i++ ) {
-		score_t *score = &cg.scores[i];
-		clientInfo_t *ci = &cgs.clientinfo[score->client];
-		if ( ci->team == TEAM_FREE ) {
-			if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags & EF_CONNECTION) ) {
-				trap->R_SetColor( &white );
-				CG_DrawPic( x + 5.0f, y + 1.0f, lineHeight - 2.0f, lineHeight - 2.0f, media.gfx.interface.connection );
-				trap->R_SetColor( NULL );
-			}
-
-			else if ( cg.snap->ps.duelInProgress && (ci - cgs.clientinfo == cg.snap->ps.duelIndex
-				|| ci - cgs.clientinfo == cg.snap->ps.clientNum) ) {
-				trap->R_SetColor( &white );
-				CG_DrawPic( x + 5.0f, y + 1.0f, lineHeight - 2.0f, lineHeight - 2.0f, media.gfx.interface.powerduelAlly );
-				trap->R_SetColor( NULL );
-			}
-
-			else if ( ci->botSkill != -1 ) {
-				tmp = "BOT";
-				font.Paint( x + 8.0f, y + (font.Height( tmp ) / 2.0f), tmp, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			}
-
-			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
-				tmp = "READY";
-				font.Paint( x + 8.0f, y + (font.Height( tmp ) / 2.0f), tmp, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
-			}
-		}
-	}
-#endif
+	// TODO: lag if ( score->ping >= 999 || (cg_entities[score->client].currentState.eFlags & EF_CONNECTION) )
+	//	media.gfx.interface.connection );
+	// TODO: duel if ( cg.snap->ps.duelInProgress && (ci - cgs.clientinfo == cg.snap->ps.duelIndex || ci - cgs.clientinfo == cg.snap->ps.clientNum) )
+	//	media.gfx.interface.powerduelAlly );
+	// TODO: bot: if ( ci->botSkill != -1 )
+	// TODO: ready: if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) )
 
 	DrawSpectators( fade );
 }
 
+// vertical split
 static void DrawPlayers_Team( float fade ) {
 	const float y = 128.0f;
 
@@ -1672,6 +1238,7 @@ static void DrawPlayers_Team( float fade ) {
 }
 
 // controller for drawing the 'players' section. will call the relevant functions based on gametype
+// this is so e.g. team games can have two panes, one for each team
 static void DrawPlayers( float fade ) {
 	switch ( cgs.gametype ) {
 	case GT_FFA:
@@ -1772,3 +1339,10 @@ qboolean CG_DrawJAPPScoreboard( void ) {
 	CG_LoadDeferredPlayers();
 	return qtrue;
 }
+
+#if defined(_MSC_VER)
+	#pragma warning( pop )
+#elif defined(__GNUC__)
+	#pragma GCC diagnostic pop
+#endif // _MSC_VER
+
