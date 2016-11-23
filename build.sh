@@ -5,9 +5,12 @@ ARGS=($@)
 ARGSLEN=${#ARGS[@]}
 
 # options
+PROJECT=game,cgame,ui
+TOOLS=default
 DEBUG=0
 FORCE32=0
-NOSQL=0
+NOSQL=1
+export NO_SSE=1
 
 build='scons -Q'
 
@@ -34,4 +37,4 @@ do
 	esac
 done
 
-$build debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL
+$build debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL project=$PROJECT tools=$TOOLS
