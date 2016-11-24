@@ -2923,7 +2923,7 @@ static float CG_DrawMiniScoreboard( float y ) {
 static float CG_DrawEnemyInfo( float y ) {
 	int			clientNum;
 	const char *title = nullptr;
-	const Font fontSmall( FONT_MEDIUM, 0.7, false );
+	const Font fontSmall( FONT_MEDIUM, 0.7f, false );
 	const Font fontLarge( FONT_SMALL2, 1.0f, false );
 	float textWidth = 0.0f;
 

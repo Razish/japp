@@ -923,7 +923,7 @@ static void DrawPlayers_Free( float fade ) {
 		{
 			"KPM",
 			[]( const Column &self ) {
-				return cg_newScoreboardShowKPM.integer;
+				return cg_newScoreboardShowKPM.integer != 0;
 			},
 			[]( Column &self, const Font &font ) {
 				return std::max(

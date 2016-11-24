@@ -22,7 +22,7 @@ force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 no_sql = int( ARGUMENTS.get( 'no_sql', 0 ) )
 no_crashhandler = int( ARGUMENTS.get( 'no_crashhandler', 0 ) )
 toolStr = ARGUMENTS.get( 'tools', 'gcc,g++,ar,as,gnulink' )
-tools = [x for x in toolStr.split( ',' )]
+tools = toolStr.split( ',' )
 proj = ARGUMENTS.get( 'project', 'game,cgame,ui' )
 
 # compare semantic versions (1.0.2 < 1.0.10 < 1.2.0)
@@ -464,8 +464,8 @@ elif realcc == 'cl':
 		]
 
 	env['LINKFLAGS'] += [
-		'/NODEFAULTLIB:LIBCMTD',
-		'/NODEFAULTLIB:MSVCRT',
+		#'/NODEFAULTLIB:LIBCMTD',
+		#'/NODEFAULTLIB:MSVCRT',
 	]
 
 if plat == 'Darwin':
