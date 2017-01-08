@@ -2396,19 +2396,33 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 
 
 			if (fullforce) {
-				if (!(g_privateDuel.bits & PRIVDUEL_MULTI)) {
+				if (!(g_privateDuel.bits & PRIVDUEL_FULLFORCE)) {
 					trap->SendServerCommand(ent - g_entities, "print \"Fullforce duels not allowed!\n\"");
 					return;
 				}
 				ent->duelFullForce = true;
+				challenged->duelFullForce = true;
+
 				ent->client->ps.fd.forcePowerSelected = 0;
+				challenged->client->ps.fd.forcePowerSelected = 0;
+
 				ent->duelForcePowersKnown = ent->client->ps.fd.forcePowersKnown;
+				challenged->duelForcePowersKnown = ent->client->ps.fd.forcePowersKnown;
 				for (int i = 0; i < NUM_FORCE_POWERS; i++) {
 					ent->duelForcePowerBaseLevel[i] = ent->client->ps.fd.forcePowerBaseLevel[i];
+					challenged->duelForcePowerBaseLevel[i] = challenged->client->ps.fd.forcePowerBaseLevel[i];
+					
 					ent->client->ps.fd.forcePowerBaseLevel[i] = 3;
+					challenged->client->ps.fd.forcePowerBaseLevel[i] = 3;
+
 					ent->duelForcePowerLevel[i] = ent->client->ps.fd.forcePowerLevel[i];
+					challenged->duelForcePowerLevel[i] = challenged->client->ps.fd.forcePowerLevel[i];
+
 					ent->client->ps.fd.forcePowerLevel[i] = 3;
+					challenged->client->ps.fd.forcePowerLevel[i] = 3;
+
 					ent->client->ps.fd.forcePowersKnown |= (1 << i);
+					challenged->client->ps.fd.forcePowersKnown |= (1 << i);
 				}
 			}
 

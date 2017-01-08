@@ -751,6 +751,8 @@ qboolean BG_HasYsalamiri( int gametype, playerState_t *ps ) {
 }
 
 qboolean BG_CanUseFPNow( int gametype, playerState_t *ps, int time, forcePowers_t power ) {
+	gentity_t *ent = &g_entities[ps->clientNum];
+
 	if ( BG_HasYsalamiri( gametype, ps ) ) {
 		return qfalse;
 	}
@@ -767,7 +769,7 @@ qboolean BG_CanUseFPNow( int gametype, playerState_t *ps, int time, forcePowers_
 		return qfalse;
 	}
 
-	if ( ps->duelInProgress ) {
+	if ( ps->duelInProgress  && !ent->duelFullForce) {
 		if ( power != FP_SABER_OFFENSE && power != FP_SABER_DEFENSE && /*power != FP_SABERTHROW &&*/
 			power != FP_LEVITATION ) {
 			if ( !ps->saberLockFrame || power != FP_PUSH ) {
