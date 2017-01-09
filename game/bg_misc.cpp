@@ -770,7 +770,7 @@ qboolean BG_CanUseFPNow( int gametype, playerState_t *ps, int time, forcePowers_
 #ifdef PROJECT_GAME
 	if ( ps->duelInProgress && !g_entities[ps->clientNum].duelFullForce ) {
 #else
-	if (ps->duelInProgress &&) {
+	if (ps->duelInProgress) {
 #endif
 		if ( power != FP_SABER_OFFENSE && power != FP_SABER_DEFENSE && /*power != FP_SABERTHROW &&*/
 			power != FP_LEVITATION ) {
