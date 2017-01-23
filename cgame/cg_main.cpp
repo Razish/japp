@@ -622,7 +622,7 @@ void CG_UpdateCvars( void ) {
 }
 
 int CG_CrosshairPlayer( void ) {
-	if ( cg.time > (cg.crosshairClientTime + 1000) )
+	if ( cg.time >= (cg.crosshairClientTime + 1000) )
 		return -1;
 
 	if ( cg.crosshairClientNum >= MAX_CLIENTS )
