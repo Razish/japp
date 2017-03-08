@@ -16,7 +16,7 @@ void CG_TargetCommand_f( void ) {
 	char	test[4];
 
 	targetNum = CG_CrosshairPlayer();
-	if ( !targetNum ) {
+	if ( targetNum == -1 ) {
 		return;
 	}
 
@@ -293,17 +293,19 @@ void CG_LuaList_f( void ) {
 }
 
 void CG_LuaLoad_f( void ) {
-	if ( trap->Cmd_Argc() != 2 ) {
-		trap->Print( "You must specify the plugin's name\n" );
+	int argc = trap->Cmd_Argc();
+	if ( argc < 2 ) {
+		trap->Print( "You must specify a plugin name\n" );
 		return;
 	}
-	//TODO: lua_load plugin1 plugin2
 
-	char pluginName[32];
-	trap->Cmd_Argv( 1, pluginName, sizeof(pluginName) );
-	JPLua::plugin_t *plugin = JPLua::FindPlugin( pluginName );
-	if ( plugin ) {
-		JPLua::EnablePlugin( plugin );
+	for ( int i = 1; i < argc; i++ ) {
+		char pluginName[32];
+		trap->Cmd_Argv( i, pluginName, sizeof(pluginName) );
+		JPLua::plugin_t *plugin = JPLua::FindPlugin( pluginName );
+		if ( plugin ) {
+			JPLua::EnablePlugin( plugin );
+		}
 	}
 }
 
