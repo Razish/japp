@@ -145,7 +145,7 @@ if realcc == 'cl':
 	ccversion = env['MSVC_VERSION']
 elif realcc == 'gcc' or realcc == 'clang':
 	status, ccrawversion = run_command( realcc + ' -dumpversion' )
-	ccversion = None if status else ccrawversion
+	ccversion = 'None' if status else ccrawversion
 
 # scons version
 import SCons
@@ -153,7 +153,7 @@ sconsversion = SCons.__version__
 
 # git revision
 status, rawrevision = run_command( 'git rev-parse --short HEAD' )
-revision = None if status else rawrevision
+revision = 'None' if status else rawrevision
 
 if revision:
 	status, dummy = run_command( 'git diff-index --quiet HEAD' )
