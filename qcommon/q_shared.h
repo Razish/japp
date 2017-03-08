@@ -1336,6 +1336,10 @@ typedef enum forceSide_e {
 
 #define FALL_FADE_TIME			3000
 
+#define DUEL_NORMAL				0x00000001u
+#define DUEL_FULLFORCE			0x00000002u
+#define DUEL_START				0x00000004u
+
 //#define _ONEBIT_COMBO
 //Crazy optimization attempt to take all those 1 bit values and shove them into a single
 //send. May help us not have to send so many 1/0 bits to acknowledge modified values. -rww
@@ -1530,7 +1534,7 @@ typedef struct playerState_s {
 
 	int			duelIndex;
 	int			duelTime;
-	qboolean	duelInProgress;
+	uint32_t	duelInProgress;
 
 	int			saberAttackChainCount;
 

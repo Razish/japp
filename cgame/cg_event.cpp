@@ -1321,14 +1321,14 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 		}
 
 		if ( es->eventParm ) { //starting the duel
-			if ( es->eventParm == 2 ) {
-				CG_CenterPrint( CG_GetStringEdString( "MP_SVGAME", "BEGIN_DUEL" ), 120, GIANTCHAR_WIDTH * 2 );
-				trap->S_StartLocalSound( media.sounds.warning.countFight, CHAN_ANNOUNCER );
-				cg.duelInProgress = qtrue;
-			}
-			else {
-				trap->S_StartBackgroundTrack( "music/mp/duel.mp3", "music/mp/duel.mp3", qfalse );
-				cg.duelInProgress = qtrue;
+			if (es->eventParm) {
+				if (!(es->eventParm & DUEL_START)) {
+					cg.duelInProgress = es->eventParm;
+					trap->S_StartBackgroundTrack("music/mp/duel.mp3", "music/mp/duel.mp3", qfalse);
+					return;
+				}
+				CG_CenterPrint(CG_GetStringEdString("MP_SVGAME", "BEGIN_DUEL"), 120, GIANTCHAR_WIDTH * 2);
+				trap->S_StartLocalSound(media.sounds.warning.countFight, CHAN_ANNOUNCER);
 			}
 		}
 		else { //ending the duel

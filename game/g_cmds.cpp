@@ -2315,6 +2315,13 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 		return;
 	}
 
+	if (fullforce) {
+		if (!(g_privateDuel.bits & PRIVDUEL_FULLFORCE)) {
+			trap->SendServerCommand(ent - g_entities, "print \"Fullforce duels not allowed!\n\"");
+			return;
+		}
+	}
+
 	// not allowed if you're not alive or not ingame
 	if ( ent->health <= 0
 		|| ent->client->tempSpectate >= level.time
@@ -2394,32 +2401,26 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 				challenged->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELACCEPT" ),
 				ent->client->pers.netname, weaponData[challenged->client->pers.duelWeapon].longName ) );
 
+			if (fullforce){
 
-			if (fullforce) {
-				if (!(g_privateDuel.bits & PRIVDUEL_FULLFORCE)) {
-					trap->SendServerCommand(ent - g_entities, "print \"Fullforce duels not allowed!\n\"");
-					return;
-				}
-				ent->duelFullForce = true;
-				challenged->duelFullForce = true;
+				ent->duelFullForce = qtrue;
+				challenged->duelFullForce = qtrue;
 
 				ent->client->ps.fd.forcePowerSelected = 0;
 				challenged->client->ps.fd.forcePowerSelected = 0;
 
-				ent->duelForcePowersKnown = ent->client->ps.fd.forcePowersKnown;
+				ent->duelForcePowersKnown =  ent->client->ps.fd.forcePowersKnown;
 				challenged->duelForcePowersKnown = ent->client->ps.fd.forcePowersKnown;
 				for (int i = 0; i < NUM_FORCE_POWERS; i++) {
 					ent->duelForcePowerBaseLevel[i] = ent->client->ps.fd.forcePowerBaseLevel[i];
 					challenged->duelForcePowerBaseLevel[i] = challenged->client->ps.fd.forcePowerBaseLevel[i];
 					
-					ent->client->ps.fd.forcePowerBaseLevel[i] = 3;
-					challenged->client->ps.fd.forcePowerBaseLevel[i] = 3;
+					ent->client->ps.fd.forcePowerBaseLevel[i] = challenged->client->ps.fd.forcePowerBaseLevel[i] = 3;
 
 					ent->duelForcePowerLevel[i] = ent->client->ps.fd.forcePowerLevel[i];
 					challenged->duelForcePowerLevel[i] = challenged->client->ps.fd.forcePowerLevel[i];
 
-					ent->client->ps.fd.forcePowerLevel[i] = 3;
-					challenged->client->ps.fd.forcePowerLevel[i] = 3;
+					ent->client->ps.fd.forcePowerLevel[i] = challenged->client->ps.fd.forcePowerLevel[i] = 3;
 
 					ent->client->ps.fd.forcePowersKnown |= (1 << i);
 					challenged->client->ps.fd.forcePowersKnown |= (1 << i);
@@ -2434,8 +2435,8 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 			VectorCopy( &ent->client->ps.origin, &ent->client->pers.duelStartPos );
 			VectorCopy( &challenged->client->ps.origin, &challenged->client->pers.duelStartPos );
 
-			G_AddEvent( ent, EV_PRIVATE_DUEL, 1 );
-			G_AddEvent( challenged, EV_PRIVATE_DUEL, 1 );
+			G_AddEvent( ent, EV_PRIVATE_DUEL, (ent->duelFullForce == challenged->duelFullForce == qtrue) ? DUEL_FULLFORCE : DUEL_NORMAL );
+			G_AddEvent( challenged, EV_PRIVATE_DUEL, (ent->duelFullForce == challenged->duelFullForce == qtrue) ? DUEL_FULLFORCE : DUEL_NORMAL);
 
 			ent->duelStartTick = level.time;
 			challenged->duelStartTick = level.time;

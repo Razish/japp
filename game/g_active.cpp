@@ -2082,7 +2082,7 @@ void ClientThink_real( gentity_t *ent ) {
 				if ( ent->client->saber[1].soundOn )
 					G_Sound( ent, CHAN_AUTO, ent->client->saber[1].soundOn );
 
-				G_AddEvent( ent, EV_PRIVATE_DUEL, 2 );
+				G_AddEvent( ent, EV_PRIVATE_DUEL, DUEL_START );
 
 				ent->client->ps.duelTime = 0;
 			}
@@ -2100,7 +2100,7 @@ void ClientThink_real( gentity_t *ent ) {
 					G_Sound( duelAgainst, CHAN_AUTO, duelAgainst->client->saber[1].soundOn );
 				}
 
-				G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, 2 );
+				G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, DUEL_START );
 
 				duelAgainst->client->ps.duelTime = 0;
 			}
@@ -2127,7 +2127,7 @@ void ClientThink_real( gentity_t *ent ) {
 					ent->client->ps.fd.forcePowerBaseLevel[i] = ent->client->pers.adminData.forcePowerBaseLevel[i];
 					ent->client->ps.fd.forcePowerLevel[i] = ent->client->pers.adminData.forcePowerLevel[i];
 				}
-				ent->duelFullForce = false;
+				ent->duelFullForce = qfalse;
 			}
 		}
 		else if ( duelAgainst->health < 1 || duelAgainst->client->ps.stats[STAT_HEALTH] < 1 ) {
@@ -2145,7 +2145,7 @@ void ClientThink_real( gentity_t *ent ) {
 					ent->client->ps.fd.forcePowerBaseLevel[i] = ent->duelForcePowerBaseLevel[i];
 					ent->client->ps.fd.forcePowerLevel[i] = ent->duelForcePowerLevel[i];
 				}
-				ent->duelFullForce = false;
+				ent->duelFullForce = qfalse;
 			}
 
 			if (duelAgainst->duelFullForce) {
@@ -2156,7 +2156,7 @@ void ClientThink_real( gentity_t *ent ) {
 					duelAgainst->client->ps.fd.forcePowerBaseLevel[i] = ent->duelForcePowerBaseLevel[i];
 					duelAgainst->client->ps.fd.forcePowerLevel[i] = ent->duelForcePowerLevel[i];
 				}
-				duelAgainst->duelFullForce = false;
+				duelAgainst->duelFullForce = qfalse;
 			}
 
 			if ( ent->health > 0 && ent->client->ps.stats[STAT_HEALTH] > 0 ) {
@@ -2310,7 +2310,7 @@ void ClientThink_real( gentity_t *ent ) {
 						ent->client->ps.fd.forcePowerBaseLevel[i] = ent->duelForcePowerBaseLevel[i];
 						ent->client->ps.fd.forcePowerLevel[i] = ent->duelForcePowerLevel[i];
 					}
-					ent->duelFullForce = false;
+					ent->duelFullForce = qfalse;
 				}
 
 				if (duelAgainst->duelFullForce) {
@@ -2321,7 +2321,7 @@ void ClientThink_real( gentity_t *ent ) {
 						duelAgainst->client->ps.fd.forcePowerBaseLevel[i] = ent->duelForcePowerBaseLevel[i];
 						duelAgainst->client->ps.fd.forcePowerLevel[i] = ent->duelForcePowerLevel[i];
 					}
-					duelAgainst->duelFullForce = false;
+					duelAgainst->duelFullForce = qfalse;
 				}
 
 				trap->SendServerCommand( -1, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELSTOP" ) ) );

@@ -9,6 +9,7 @@
 #include "bg_luaplayer.h"
 #include "bg_luaserialiser.h"
 #include "bg_luavector.h"
+#include "bg_luasocket.h"
 
 #if defined(PROJECT_GAME)
 	#include "g_luasql.h"

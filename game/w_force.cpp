@@ -388,11 +388,11 @@ int ForcePowerUsableOn( gentity_t *attacker, gentity_t *other, forcePowers_t for
 	}
 
 	//Dueling fighters cannot use force powers on others, with the exception of force push when locked with each other
-	if ( attacker && attacker->client && attacker->client->ps.duelInProgress ) {
+	if ( attacker && attacker->client && attacker->client->ps.duelInProgress && !(attacker->duelFullForce)) {
 		return 0;
 	}
 
-	if ( other && other->client && other->client->ps.duelInProgress ) {
+	if ( other && other->client && other->client->ps.duelInProgress && !(other->duelFullForce)) {
 		return 0;
 	}
 
