@@ -936,7 +936,7 @@ void G_SoundOnEnt( gentity_t *ent, soundChannel_t channel, const char *soundPath
 
 // Returns whether or not the targeted entity is useable
 qboolean ValidUseTarget( gentity_t *ent ) {
-	if ( !ent->use )
+	if ( !ent->use && (!ent->uselua && !ent->lua_use) )
 		return qfalse;
 
 	// set by target_deactivate

@@ -442,7 +442,7 @@ void G_TouchTriggers( gentity_t *ent ) {
 	for ( i = 0; i < num; i++ ) {
 		hit = &g_entities[touch[i]];
 
-		if ( !hit->touch && !ent->touch ) {
+		if ( !hit->touch && (!hit->uselua && !hit->lua_touch) && !ent->touch && (!ent->uselua && !ent->lua_touch)) {
 			continue;
 		}
 		if ( !(hit->r.contents & CONTENTS_TRIGGER) ) {
@@ -472,15 +472,16 @@ void G_TouchTriggers( gentity_t *ent ) {
 
 		memset( &trace, 0, sizeof(trace) );
 
-		if ( hit->touch )
-			hit->touch( hit, ent, &trace );
+		if (hit->touch) {
+			hit->touch(hit, ent, &trace);
+		}
 		JPLua::Entity_CallFunction(hit, JPLua::JPLUA_ENTITY_TOUCH, (intptr_t)ent, (intptr_t)&trace);
 
 		if (ent->r.svFlags & SVF_BOT){
-			JPLua::Entity_CallFunction(ent, JPLua::JPLUA_ENTITY_TOUCH, (intptr_t)hit, (intptr_t)&trace);
 			if (ent->touch){
 				ent->touch(ent, hit, &trace);
 			}
+			JPLua::Entity_CallFunction(ent, JPLua::JPLUA_ENTITY_TOUCH, (intptr_t)hit, (intptr_t)&trace);
 		}
 	}
 
