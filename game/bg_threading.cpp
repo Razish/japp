@@ -13,7 +13,7 @@ void CheckTasks(void) {
 	size_t i = 0;
 	for (auto it = tasks.begin(); it != tasks.end(); ++it, i++) {
 		if (!*it) continue;
-		Task<bool> *tsk = (Task<bool>*)(*it);
+		TaskInterface *tsk = (TaskInterface*)(*it);
 		if (tsk->isReady()) {
 			tsk->runCallback(tsk->getResult());
 			delete tasks[i];
