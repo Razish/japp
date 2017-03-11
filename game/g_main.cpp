@@ -9,6 +9,8 @@
 #include "JAPP/jp_cinfo.h"
 #include "JAPP/jp_ssflags.h"
 
+#include "bg_threading.h"
+
 level_locals_t	level;
 
 int		eventClearTime = 0;
@@ -2717,6 +2719,8 @@ void G_RunFrame( int levelTime ) {
 	void		*timer_GameChecks;
 	void		*timer_Queues;
 #endif
+	CheckTasks();
+
 	static int lastMsgTime = 0;
 
 	if ( level.gametype == GT_SIEGE &&

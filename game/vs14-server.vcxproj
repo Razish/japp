@@ -41,6 +41,7 @@
     <ClCompile Include="bg_saberLoad.cpp" />
     <ClCompile Include="bg_saga.cpp" />
     <ClCompile Include="bg_slidemove.cpp" />
+    <ClCompile Include="bg_threading.cpp" />
     <ClCompile Include="bg_vehicleLoad.cpp" />
     <ClCompile Include="bg_weapons.cpp" />
     <ClCompile Include="FighterNPC.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="bg_luavector.h" />
     <ClInclude Include="bg_public.h" />
     <ClInclude Include="bg_saga.h" />
+    <ClInclude Include="bg_threading.h" />
     <ClInclude Include="bg_vehicles.h" />
     <ClInclude Include="bg_weapons.h" />
     <ClInclude Include="botlib.h" />

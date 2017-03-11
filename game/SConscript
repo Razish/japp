@@ -38,6 +38,7 @@ files = [
 	'game/bg_saberLoad.cpp',
 	'game/bg_saga.cpp',
 	'game/bg_slidemove.cpp',
+	'game/bg_threading.cpp',
 	'game/bg_vehicleLoad.cpp',
 	'game/bg_weapons.cpp',
 	'game/FighterNPC.cpp',
