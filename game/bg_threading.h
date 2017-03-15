@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+#include <memory>
 #include <future>
 /*
 
@@ -45,7 +47,7 @@ public:
 
 	bool isReady(void)
 	{
-		if (valid && wait_for(std::chrono::microseconds(1)) == std::future_status::ready) {
+		if (valid && this.wait_for(std::chrono::microseconds(1)) == std::future_status::ready) {
 			return true;
 		}
 		return false;

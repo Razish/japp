@@ -365,7 +365,7 @@ if realcc == 'gcc' or realcc == 'clang':
 	# c++ flags
 	env['CXXFLAGS'] += [
 		'-fvisibility-inlines-hidden',
-		'-std=c++11',
+		'-std=c++14',
 	]
 
 	# archive flags

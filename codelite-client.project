@@ -570,6 +570,7 @@
     <File Name="game/g_luasqlite.cpp"/>
     <File Name="game/NPC_spawn.cpp"/>
     <File Name="game/bg_g2_utils.cpp"/>
+    <File Name="game/bg_threading.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="libudis86">
     <File Name="libudis86/syn.h"/>
