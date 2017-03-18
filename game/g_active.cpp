@@ -2135,9 +2135,6 @@ void ClientThink_real( gentity_t *ent ) {
 			ent->client->ps.duelInProgress = 0;
 			duelAgainst->client->ps.duelInProgress = 0;
 
-			G_AddEvent( ent, EV_PRIVATE_DUEL, 0 );
-			G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, 0 );
-
 			if (ent->duelFullForce) {
 				ent->client->ps.fd.forcePowerSelected = 0;
 				ent->client->ps.fd.forcePowersKnown = ent->duelForcePowersKnown;
@@ -2287,7 +2284,9 @@ void ClientThink_real( gentity_t *ent ) {
 					}
 				}
 			}
-
+			
+			G_AddEvent( ent, EV_PRIVATE_DUEL, 0 );
+			G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, 0 );
 		}
 		else if ( !(g_privateDuel.bits & PRIVDUEL_NOSEVER) ) {
 			vector3 vSub;
