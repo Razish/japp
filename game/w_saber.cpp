@@ -4938,6 +4938,9 @@ void WP_SaberStartMissileBlockCheck( gentity_t *self, usercmd_t *ucmd ) {
 		else//player
 		{
 			gentity_t *owner = &g_entities[incoming->r.ownerNum];
+			if (self->client && self->client->ps.duelInProgress && self->client->ps.duelIndex != owner->s.number){
+				return;
+			}
 
 			WP_SaberBlockNonRandom( self, &incoming->r.currentOrigin, qtrue );
 			if ( owner && owner->client && (!self->enemy || self->enemy->s.weapon != WP_SABER) )//keep enemy jedi over shooters

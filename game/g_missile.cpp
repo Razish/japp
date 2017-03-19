@@ -731,6 +731,9 @@ void G_RunMissile( gentity_t *ent ) {
 	trace_t		tr;
 	int			passent;
 	qboolean	isKnockedSaber = qfalse;
+	
+	int traces = 3;
+	gentity_t *te;
 
 	if ( ent->neverFree && ent->s.weapon == WP_SABER && (ent->flags & FL_BOUNCE_HALF) ) {
 		isKnockedSaber = qtrue;
@@ -755,36 +758,36 @@ void G_RunMissile( gentity_t *ent ) {
 			passent = ent->r.ownerNum;
 		}
 	}
-	// trace a line from the previous position to the current position
-	if ( d_projectileGhoul2Collision.integer ) {
-		trap->Trace( &tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &origin, passent, ent->clipmask, qfalse, G2TRFLAG_DOGHOULTRACE | G2TRFLAG_GETSURFINDEX | G2TRFLAG_THICK | G2TRFLAG_HITCORPSES, g_g2TraceLod.integer );
+	for ( int i = 0; i < traces; i++ ) {
+		// trace a line from the previous position to the current position
+		if ( d_projectileGhoul2Collision.integer ) {
+			trap->Trace( &tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &origin, passent, ent->clipmask, qfalse, G2TRFLAG_DOGHOULTRACE | G2TRFLAG_GETSURFINDEX | G2TRFLAG_THICK | G2TRFLAG_HITCORPSES, g_g2TraceLod.integer );
 
-		if ( tr.fraction != 1.0f && tr.entityNum < ENTITYNUM_WORLD ) {
-			gentity_t *g2Hit = &g_entities[tr.entityNum];
+			if ( tr.fraction != 1.0f && tr.entityNum < ENTITYNUM_WORLD ) {
+				gentity_t *g2Hit = &g_entities[tr.entityNum];
 
-			if ( g2Hit->inuse && g2Hit->client && g2Hit->ghoul2 ) { //since we used G2TRFLAG_GETSURFINDEX, tr.surfaceFlags will actually contain the index of the surface on the ghoul2 model we collided with.
-				g2Hit->client->g2LastSurfaceHit = tr.surfaceFlags;
-				g2Hit->client->g2LastSurfaceTime = level.time;
-			}
-
-			if ( g2Hit->ghoul2 ) {
-				tr.surfaceFlags = 0; //clear the surface flags after, since we actually care about them in here.
-			}
-
-			//Raz: Portals!
-			if ( g2Hit->s.eType == ET_SPECIAL && g2Hit->s.userInt1 ) {
-				if ( g2Hit->touch ) {
-					g2Hit->touch( g2Hit, ent, &tr );
+				if ( g2Hit->inuse && g2Hit->client && g2Hit->ghoul2 ) { //since we used G2TRFLAG_GETSURFINDEX, tr.surfaceFlags will actually contain the index of the surface on the ghoul2 model we collided with.
+					g2Hit->client->g2LastSurfaceHit = tr.surfaceFlags;
+					g2Hit->client->g2LastSurfaceTime = level.time;
 				}
-				JPLua::Entity_CallFunction( g2Hit, JPLua::JPLUA_ENTITY_TOUCH, (intptr_t)ent, (intptr_t)&tr );
-				goto passthrough;
+
+				if ( g2Hit->ghoul2 ) {
+					tr.surfaceFlags = 0; //clear the surface flags after, since we actually care about them in here.
+				}
+
+				//Raz: Portals!
+				if ( g2Hit->s.eType == ET_SPECIAL && g2Hit->s.userInt1 ) {
+					if ( g2Hit->touch ) {
+						g2Hit->touch( g2Hit, ent, &tr );
+					}
+					JPLua::Entity_CallFunction( g2Hit, JPLua::JPLUA_ENTITY_TOUCH, (intptr_t)ent, (intptr_t)&tr );
+					goto passthrough;
+				}
 			}
 		}
-	}
-	else {
-		trap->Trace( &tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &origin, passent, ent->clipmask, qfalse, 0, 0 );
-	}
-
+		else {
+			trap->Trace( &tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &origin, passent, ent->clipmask, qfalse, 0, 0 );
+		}
 	if ( tr.startsolid || tr.allsolid ) {
 		// make sure the tr.entityNum is set to the entity we're stuck in
 		trap->Trace( &tr, &ent->r.currentOrigin, &ent->r.mins, &ent->r.maxs, &ent->r.currentOrigin, passent, ent->clipmask, qfalse, 0, 0 );
@@ -801,6 +804,15 @@ void G_RunMissile( gentity_t *ent ) {
 	}
 
 	trap->LinkEntity( (sharedEntity_t *)ent );
+
+	te = &g_entities[tr.entityNum];
+	if(te->inuse &&  ((te->client && te->client->ps.duelInProgress && te->client->ps.duelIndex != ent->parent->s.number) ||
+	  (!Q_stricmp(te->classname, "lightsaber") && (g_entities[te->r.ownerNum].client->ps.duelInProgress) && (g_entities[te->r.ownerNum].client->ps.duelIndex != ent->parent->s.number )))){
+		  
+		VectorCopy( &tr.endpos, &ent->r.currentOrigin );
+		passent = te->s.number;
+		continue;
+	}
 
 	if ( ent->s.weapon == G2_MODEL_PART && !ent->bounceCount ) {
 		vector3 lowerOrg;
@@ -903,6 +915,8 @@ passthrough:
 
 	// check think function after bouncing
 	G_RunThink( ent );
+	return;
+	}
 }
 
 gentity_t *fire_grapple( gentity_t *self, vector3 *start, vector3 *dir ) {

@@ -2585,7 +2585,7 @@ static void WP_FireConcussionAlt( gentity_t *ent ) {//a rail-gun-like beam
 
 		if ( d_projectileGhoul2Collision.integer && traceEnt->inuse && traceEnt->client ) {
 			// g2 collision checks -rww
-			if ( traceEnt->inuse && traceEnt->client && traceEnt->ghoul2 ) { //since we used G2TRFLAG_GETSURFINDEX, tr.surfaceFlags will actually contain the index of the surface on the ghoul2 model we collided with.
+			if ( traceEnt->inuse && traceEnt->client && traceEnt->ghoul2 ) { //since a we used G2TRFLAG_GETSURFINDEX, tr.surfaceFlags will actually contain the index of the surface on the ghoul2 model we collided with.
 				traceEnt->client->g2LastSurfaceHit = tr.surfaceFlags;
 				traceEnt->client->g2LastSurfaceTime = level.time;
 				//	traceEnt->client->g2LastSurfaceModel = G2MODEL_PLAYER; //Raz: Fix from OJP-E
@@ -2608,6 +2608,11 @@ static void WP_FireConcussionAlt( gentity_t *ent ) {//a rail-gun-like beam
 #ifdef _DEBUG
 			Com_Printf( "BAD! Concussion gun shot somehow traced back and hit the owner!\n" );
 #endif
+			continue;
+		}
+		
+		if (traceEnt && traceEnt->client && traceEnt->client->ps.duelInProgress && traceEnt->client->ps.duelIndex != ent->s.number){
+			skip = tr.entityNum;
 			continue;
 		}
 
@@ -2896,8 +2901,6 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire ) {
 		// hit something
 		tr_ent = &g_entities[tr.entityNum];
 
-		G_Sound( ent, CHAN_AUTO, G_SoundIndex( va( "sound/weapons/melee/punch%d", Q_irand( 1, 4 ) ) ) );
-
 		if ( tr_ent->takedamage && tr_ent->client ) {
 			// special duel checks
 			if ( tr_ent->client->ps.duelInProgress && tr_ent->client->ps.duelIndex != ent->s.number ) {
@@ -2922,7 +2925,8 @@ void WP_FireMelee( gentity_t *ent, qboolean alt_fire ) {
 				// 2x damage for heavy melee class
 				dmg *= 2;
 			}
-
+			
+			G_Sound( ent, CHAN_AUTO, G_SoundIndex( va( "sound/weapons/melee/punch%d", Q_irand( 1, 4 ) ) ) );
 			G_Damage( tr_ent, ent, ent, &forward, &tr.endpos, dmg, DAMAGE_NO_ARMOR, MOD_MELEE );
 		}
 	}
