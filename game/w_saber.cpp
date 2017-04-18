@@ -8043,7 +8043,6 @@ void WP_SaberBlock( gentity_t *playerent, vector3 *hitloc, qboolean missileBlock
 	if ( missileBlock )
 		playerent->client->ps.saberBlocked = WP_MissileBlockForBlock( playerent->client->ps.saberBlocked );
 }
-
 static int G_SaberLevelForStance( int stance ) {
 	switch ( stance ) {
 	case SS_FAST:
@@ -8062,113 +8061,146 @@ static int G_SaberLevelForStance( int stance ) {
 
 	return 0;
 }
-int WP_SaberCanBlock( gentity_t *self, vector3 *point, uint32_t dflags, int mod, qboolean projectile, int attackStr ) {
+
+
+int WP_SaberCanBlock( gentity_t *self, vector3 *point, uint32_t dflags, int mod, qboolean projectile, int attackStr )
+{
 	qboolean thrownSaber = qfalse;
 	float blockFactor = 0.0f;
 
-	if ( !self || !self->client || !point ) {
-		return 0;
-	}
-
-	if ( self->client->pers.adminData.isSlept || self->client->pers.adminData.isGhost
-		|| BG_SaberInAttack( self->client->ps.saberMove ) )
+	if (!self || !self->client || !point)
 	{
 		return 0;
 	}
 
-	if ( attackStr == 999 ) {
+	if (attackStr == 999)
+	{
 		attackStr = 0;
 		thrownSaber = qtrue;
 	}
 
-	if ( PM_InSaberAnim( self->client->ps.torsoAnim )
-		&& !self->client->ps.saberBlocked
-		&& self->client->ps.saberMove != LS_READY
-		&& self->client->ps.saberMove != LS_NONE )
+	if (BG_SaberInAttack(self->client->ps.saberMove))
 	{
-		if ( self->client->ps.saberMove < LS_PARRY_UP || self->client->ps.saberMove > LS_REFLECT_LL ) {
+		return 0;
+	}
+
+	if (PM_InSaberAnim(self->client->ps.torsoAnim) && !self->client->ps.saberBlocked &&
+		self->client->ps.saberMove != LS_READY && self->client->ps.saberMove != LS_NONE)
+	{
+		if ( self->client->ps.saberMove < LS_PARRY_UP || self->client->ps.saberMove > LS_REFLECT_LL )
+		{
 			return 0;
 		}
 	}
 
-	if ( PM_SaberInBrokenParry( self->client->ps.saberMove )
-		|| !self->client->ps.saberEntityNum //saber is knocked away
-		|| BG_SabersOff( &self->client->ps )
-		|| self->client->ps.weapon != WP_SABER
-		|| self->client->ps.weaponstate == WEAPON_RAISING
-		|| self->client->ps.saberInFlight ) {
+	if (PM_SaberInBrokenParry(self->client->ps.saberMove))
+	{
 		return 0;
 	}
 
-	if ( (self->client->pers.cmd.buttons & BUTTON_ATTACK)/* &&
-		(projectile || attackStr == FORCE_LEVEL_3)*/ ) { //don't block when the player is trying to slash, if it's a projectile or he's doing a very strong attack
+	if (!self->client->ps.saberEntityNum)
+	{ //saber is knocked away
 		return 0;
 	}
 
+	if (BG_SabersOff( &self->client->ps ))
+	{
+		return 0;
+	}
+
+	if (self->client->ps.weapon != WP_SABER)
+	{
+		return 0;
+	}
+
+	if (self->client->ps.weaponstate == WEAPON_RAISING)
+	{
+		return 0;
+	}
+
+	if (self->client->ps.saberInFlight)
+	{
+		return 0;
+	}
+
+	if ((self->client->pers.cmd.buttons & BUTTON_ATTACK)/* &&
+		(projectile || attackStr == FORCE_LEVEL_3)*/)
+	{ //don't block when the player is trying to slash, if it's a projectile or he's doing a very strong attack
+		return 0;
+	}
+
+	if (SaberAttacking(self))
+	{ //attacking, can't block now
+		return 0;
+	}
+	// Loda japro for diff 
 	if ( japp_saberTweaks.integer & SABERTWEAK_REDUCEBLOCKS ) {
 		const int ourLevel = G_SaberLevelForStance( self->client->ps.fd.saberAnimLevel );
 		const int theirLevel = G_SaberLevelForStance( attackStr );
 		const float diff = (float)(theirLevel - ourLevel); // range [0, 2]
-		const float parity = japp_saberBlockStanceParity.value; // range [0, 3]
-		const float chanceMin = japp_saberBlockChanceMin.value;
-		const float chanceMax = japp_saberBlockChanceMax.value;
-		const float chanceScalar = japp_saberBlockChanceScale.value;
-		const float chance = Q_clamp( chanceMin, (1.0f - (diff / parity)) * chanceScalar, chanceMax );
-		if ( flrand( 0.0f, 1.0f ) > chance ) {
-			return 0;
-		}
-	}
+		
+		if (diff >= 0) //Diff is positive if they are stronger than us.
+			return 0; //Dont block if attacker style is equal or greater than ours
+	}	
 
-	if ( SaberAttacking( self ) ) { //attacking, can't block now
-		return 0;
-	}
-
-	if ( self->client->ps.saberMove != LS_READY &&
-		!self->client->ps.saberBlocking ) {
-		return 0;
-	}
-
-	if ( self->client->ps.saberBlockTime >= level.time ) {
-		return 0;
-	}
-
-	if ( self->client->ps.forceHandExtend != HANDEXTEND_NONE ) {
-		return 0;
-	}
-
-	if ( self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == FORCE_LEVEL_3 ) {
-		if ( d_saberGhoul2Collision.integer ) {
-			blockFactor = 0.3f;
-		}
-		else {
-			blockFactor = 0.05f;
-		}
-	}
-	else if ( self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == FORCE_LEVEL_2 ) {
-		blockFactor = 0.6f;
-	}
-	else if ( self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == FORCE_LEVEL_1 ) {
-		blockFactor = 0.9f;
-	}
-	else { //for now we just don't get to autoblock with no def
-		return 0;
-	}
-
-	if ( thrownSaber ) {
-		blockFactor -= 0.25f;
-	}
-
-	if ( attackStr ) { //blocking a saber, not a projectile.
-		blockFactor -= 0.25f;
-	}
-
-	if ( !InFront( point, &self->client->ps.origin, &self->client->ps.viewangles, blockFactor ) ) //orig 0.2f
+	if (self->client->ps.saberMove != LS_READY &&
+		!self->client->ps.saberBlocking)
 	{
 		return 0;
 	}
 
-	if ( projectile ) {
-		WP_SaberBlockNonRandom( self, point, projectile );
+	if (self->client->ps.saberBlockTime >= level.time)
+	{
+		return 0;
+	}
+
+	if (self->client->ps.forceHandExtend != HANDEXTEND_NONE)
+	{
+		return 0;
+	}
+
+	if (self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == FORCE_LEVEL_3)
+	{
+		if (d_saberGhoul2Collision.integer)
+		{
+			blockFactor = 0.3f;
+		}
+		else
+		{
+			blockFactor = 0.05f;
+		}
+	}
+	else if (self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == FORCE_LEVEL_2)
+	{
+		blockFactor = 0.6f;
+	}
+	else if (self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == FORCE_LEVEL_1)
+	{
+		blockFactor = 0.9f;
+	}
+	else
+	{ //for now we just don't get to autoblock with no def
+		return 0;
+	}
+
+	if (thrownSaber)
+	{
+		blockFactor -= 0.25f;
+	}
+
+	if (attackStr)
+	{ //blocking a saber, not a projectile.
+		blockFactor -= 0.25f;
+	}
+
+	if (!InFront( point, &self->client->ps.origin, &self->client->ps.viewangles, blockFactor )) //orig 0.2f
+	{
+		return 0;
+	}
+
+	if (projectile)
+	{
+		WP_SaberBlockNonRandom(self, point, projectile);
 	}
 	return 1;
 }
