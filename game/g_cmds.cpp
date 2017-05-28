@@ -2512,8 +2512,15 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 
 		challenged->client->ps.fd.privateDuelTime = 0; //reset the timer in case this player just got out of a duel. He should still be able to accept the challenge.
 
-		ent->client->ps.forceHandExtend = challenged->client->ps.forceHandExtend = HANDEXTEND_DUELCHALLENGE;
-		ent->client->ps.forceHandExtendTime = challenged->client->ps.forceHandExtendTime = level.time + 1000;
+		if (japp_duelBow.integer) {
+			ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+			ent->client->ps.forceDodgeAnim = BOTH_BOW;
+			ent->client->ps.forceHandExtendTime = level.time + BG_AnimLength(ent->localAnimIndex, (animNumber_t)BOTH_BOW);
+		}
+		else {
+			ent->client->ps.forceHandExtend = challenged->client->ps.forceHandExtend = HANDEXTEND_DUELCHALLENGE;
+			ent->client->ps.forceHandExtendTime = challenged->client->ps.forceHandExtendTime = level.time + 1000;
+		}
 
 		ent->client->ps.duelIndex = challenged->s.number;
 		ent->client->ps.duelTime = challenged->client->ps.duelTime = level.time + 5000;

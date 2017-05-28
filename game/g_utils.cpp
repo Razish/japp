@@ -1594,7 +1594,7 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 	qboolean firstMatch = !!(flags & FINDCL_FIRSTMATCH);
 	qboolean print = (!!(flags & FINDCL_PRINT)) && ent;
 	qboolean caseSensitive = !!(flags & FINDCL_CASE);
-	qboolean useInflictor = !!(flags & FINDCL_USEENT);
+	qboolean useInflictor = !!(flags & FINDCL_USESELF);
 	qboolean( *compareFunc )(const char *s1, const char *s2);
 	if ( caseSensitive )
 		compareFunc = substr ? cmpSubCase : cmpWholeCase;

@@ -2130,6 +2130,7 @@ void ClientThink_real( gentity_t *ent ) {
 				}
 				ent->duelFullForce = qfalse;
 			}
+			level.duelInProgress--;
 		}
 		else if ( duelAgainst->health < 1 || duelAgainst->client->ps.stats[STAT_HEALTH] < 1 ) {
 			ent->client->ps.duelInProgress = 0;
@@ -2287,6 +2288,7 @@ void ClientThink_real( gentity_t *ent ) {
 			
 			G_AddEvent( ent, EV_PRIVATE_DUEL, 0 );
 			G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, 0 );
+			level.duelInProgress--;
 		}
 		else if ( !(g_privateDuel.bits & PRIVDUEL_NOSEVER) ) {
 			vector3 vSub;
@@ -2326,6 +2328,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 				trap->SendServerCommand( -1, va( "print \"%s\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELSTOP" ) ) );
 			}
+			level.duelInProgress--;
 		}
 	}
 
