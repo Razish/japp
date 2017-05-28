@@ -1592,13 +1592,19 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 	gentity_t *e;
 	qboolean substr = !!(flags & FINDCL_SUBSTR);
 	qboolean firstMatch = !!(flags & FINDCL_FIRSTMATCH);
-	qboolean print = !!(flags & FINDCL_PRINT);
+	qboolean print = (!!(flags & FINDCL_PRINT)) && ent;
 	qboolean caseSensitive = !!(flags & FINDCL_CASE);
+	qboolean useInflictor = !!(flags & FINDCL_USEENT);
 	qboolean( *compareFunc )(const char *s1, const char *s2);
 	if ( caseSensitive )
 		compareFunc = substr ? cmpSubCase : cmpWholeCase;
 	else
 		compareFunc = substr ? cmpSub : cmpWhole;
+
+
+	if (!match[0] && ent && useInflictor) {
+		return ent->s.clientNum;
+	}
 
 	// First check for clientNum match
 	if ( Q_StringIsInteger( match ) ) {
@@ -1727,6 +1733,11 @@ const char *G_PrintClient( int clientNum ) {
 	Com_sprintf( out, MAX_STRING_CHARS, "[%2i](%s):%s", clientNum, ent->client->pers.netname, ent->client->sess.IP );
 
 	return out;
+}
+
+const char *G_PrintClient(gentity_t *ent) {
+	if (!ent) return "Server";
+	return G_PrintClient(ent - g_entities);
 }
 
 void G_Announce( const char *msg ) {
@@ -1886,4 +1897,49 @@ bool G_CheckDuelIsolationSkip( const gentity_t *e1, const gentity_t *e2 ) {
 		return !G_PlayersDuelingEachother( e1, e2 );
 	}
 	return true;
+}
+
+ammo_t G_AmmoForWeapon(weapon_t weapon){
+	
+	switch(weapon){
+		case WP_NONE:
+			return AMMO_NONE;
+		case WP_STUN_BATON:
+			return AMMO_NONE;
+		case WP_MELEE:
+			return AMMO_NONE;
+		case WP_SABER:
+			return AMMO_NONE;
+		case WP_BRYAR_PISTOL:
+			return AMMO_BLASTER;
+		case WP_BLASTER:
+			return AMMO_BLASTER;
+		case WP_DISRUPTOR:
+			return AMMO_POWERCELL;
+		case WP_BOWCASTER:
+			return AMMO_POWERCELL;
+		case WP_REPEATER:
+			return AMMO_METAL_BOLTS;
+		case WP_DEMP2:
+			return AMMO_POWERCELL;
+		case WP_FLECHETTE:
+			return AMMO_METAL_BOLTS;
+		case WP_ROCKET_LAUNCHER:
+			return AMMO_ROCKETS;
+		case WP_THERMAL:
+			return AMMO_THERMAL;
+		case WP_TRIP_MINE:
+			return AMMO_TRIPMINE;
+		case WP_DET_PACK:
+			return AMMO_DETPACK;
+		case WP_CONCUSSION:
+			return AMMO_METAL_BOLTS;
+		case WP_BRYAR_OLD:
+			return AMMO_BLASTER;
+		case WP_EMPLACED_GUN:
+		case WP_TURRET:
+		case WP_NUM_WEAPONS:
+		default:
+			return AMMO_NONE;
+	}	
 }

@@ -2438,10 +2438,8 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 			G_AddEvent( ent, EV_PRIVATE_DUEL, (ent->duelFullForce == challenged->duelFullForce == qtrue) ? DUEL_FULLFORCE : DUEL_NORMAL );
 			G_AddEvent( challenged, EV_PRIVATE_DUEL, (ent->duelFullForce == challenged->duelFullForce == qtrue) ? DUEL_FULLFORCE : DUEL_NORMAL);
 
-			ent->duelStartTick = level.time;
-			challenged->duelStartTick = level.time;
-			ent->duelHitCount = 0;
-			challenged->duelHitCount = 0;
+			ent->duelStartTick = challenged->duelStartTick = level.time;
+			ent->duelHitCount = challenged->duelHitCount = 0;
 
 			if ( challenged->client->pers.duelWeapon == WP_SABER ) {
 				// Holster their sabers now, until the duel starts (then they'll get auto-turned on to look cool)
@@ -2475,6 +2473,11 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 			}
 
 			ent->client->ps.weapon = challenged->client->ps.weapon = challenged->client->pers.duelWeapon;
+			
+			if ( WP_SABER < challenged->client->pers.duelWeapon < WP_NUM_WEAPONS){
+				ammo_t ammo = G_AmmoForWeapon((weapon_t)challenged->client->pers.duelWeapon);
+				ent->client->ps.ammo[ammo] = challenged->client->ps.ammo[ammo] = 999;
+			}
 
 			// set health etc
 			ent->health
@@ -2505,11 +2508,11 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 
 		challenged->client->ps.fd.privateDuelTime = 0; //reset the timer in case this player just got out of a duel. He should still be able to accept the challenge.
 
-		ent->client->ps.forceHandExtend = HANDEXTEND_DUELCHALLENGE;
-		ent->client->ps.forceHandExtendTime = level.time + 1000;
+		ent->client->ps.forceHandExtend = challenged->client->ps.forceHandExtend = HANDEXTEND_DUELCHALLENGE;
+		ent->client->ps.forceHandExtendTime = challenged->client->ps.forceHandExtendTime = level.time + 1000;
 
 		ent->client->ps.duelIndex = challenged->s.number;
-		ent->client->ps.duelTime = level.time + 5000;
+		ent->client->ps.duelTime = challenged->client->ps.duelTime = level.time + 5000;
 	}
 }
 
