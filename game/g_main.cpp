@@ -2024,6 +2024,9 @@ void CheckExitRules( void ) {
 
 	if ( level.intermissionQueued ) {
 		//int time = (g_singlePlayer.integer) ? SP_INTERMISSION_DELAY_TIME : INTERMISSION_DELAY_TIME;
+		if (japp_allowTimeoutDuels.integer && level.duelInProgress) {
+			return; // wait until latest duel finished
+		}
 		int time = INTERMISSION_DELAY_TIME;
 		if ( level.time - level.intermissionQueued >= time ) {
 			level.intermissionQueued = 0;

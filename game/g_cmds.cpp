@@ -2311,6 +2311,10 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 	trace_t *tr;
 	int weapon = WP_SABER;
 
+	if (level.intermissionQueued) {
+		return;
+	}
+
 	if ( !(g_privateDuel.bits & PRIVDUEL_ALLOW) ) {
 		return;
 	}
@@ -2513,6 +2517,7 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 
 		ent->client->ps.duelIndex = challenged->s.number;
 		ent->client->ps.duelTime = challenged->client->ps.duelTime = level.time + 5000;
+		level.duelInProgress++;
 	}
 }
 
