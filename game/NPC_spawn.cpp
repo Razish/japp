@@ -674,7 +674,7 @@ void NPC_Begin( gentity_t *ent ) {
 				ent->nextthink = level.time + 100;
 			}
 			else {
-				G_DebugPrint( WL_DEBUG, "NPC %s could not spawn, waiting %4.2 secs to try again\n", ent->targetname, ent->wait / 1000.0f );
+				G_DebugPrint( WL_DEBUG, "NPC %s could not spawn, waiting %4.2 secs to try again\n", ent->targetname, (double)(ent->wait / 1000.0f) );
 				ent->think = NPC_Begin;
 				ent->nextthink = level.time + ent->wait;//try again in half a second
 			}

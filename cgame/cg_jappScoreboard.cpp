@@ -54,8 +54,7 @@ static void DrawServerInfo( float fade ) {
 	case GT_FFA:
 		if ( cgs.timelimit && cgs.fraglimit ) {
 			tmp = va(
-				"Until " S_COLOR_YELLOW "%i " S_COLOR_WHITE "frags or " S_COLOR_YELLOW "%i" S_COLOR_WHITE "/"
-					S_COLOR_YELLOW "%i minutes",
+				"Until " S_COLOR_YELLOW "%i " S_COLOR_WHITE "frags or " S_COLOR_YELLOW "%i" S_COLOR_WHITE "/" S_COLOR_YELLOW "%i minutes",
 				cgs.fraglimit, (cg.time - cgs.levelStartTime) / 60000, cgs.timelimit
 			);
 		}
@@ -82,10 +81,9 @@ static void DrawServerInfo( float fade ) {
 	case GT_CTY:
 		if ( cgs.timelimit && cgs.capturelimit ) {
 			tmp = va(
-				"Until " S_COLOR_YELLOW "%i" S_COLOR_WHITE "/" S_COLOR_YELLOW "%i " S_COLOR_WHITE "captures or "
-					S_COLOR_YELLOW "%i" S_COLOR_WHITE "/" S_COLOR_YELLOW "%i minutes",
-				std::max( cgs.scores1, cgs.scores2 ), cgs.capturelimit, (cg.time - cgs.levelStartTime) / 60000,
-				cgs.timelimit
+				"Until " S_COLOR_YELLOW "%i" S_COLOR_WHITE "/" S_COLOR_YELLOW "%i " S_COLOR_WHITE "captures or " S_COLOR_YELLOW "%i" S_COLOR_WHITE
+					"/" S_COLOR_YELLOW "%i minutes",
+				std::max( cgs.scores1, cgs.scores2 ), cgs.capturelimit, (cg.time - cgs.levelStartTime) / 60000, cgs.timelimit
 			);
 		}
 		else if ( cgs.timelimit ) {
@@ -288,38 +286,30 @@ static int PlayerCount( team_t team ) {
 }
 
 struct Column {
+	// title - e.g. "Name", "Score", "Ping"
 	const char *title;
-	std::function<
-		bool(
-			const Column &self
-		)
-	> Filter;
-	std::function<
-		float(
-			Column &self, const Font &font
-		)
-	> CalculateWidth;
-	std::function<
-		void(
-			const Column &self,
-			float &x,
-			float y,
-			const Font &font,
-			float fade
-		)
-	> DrawTitle;
-	std::function<
-		bool(
-			const Column &self,
-			float x,
-			float y,
-			const Font &font,
-			float fade,
-			const score_t &score,
-			const clientInfo_t &ci
-		)
-	> DrawElement;
-	vector2 padding; // left and right padding
+
+	// Filter - whether or not to show this column at the moment (toggle via cvar, etc)
+	//	self
+	std::function<bool( const Column &self )> Filter;
+
+	// CalculateWidth - determine how wide this column needs to be to fit every row
+	//	self, font
+	std::function<float( Column &self, const Font &font )> CalculateWidth;
+
+	// DrawTitle - draw the column title at the given location
+	//	self, x, y, font, fade
+	std::function<void( const Column &self, float &x, float y, const Font &font, float fade )> DrawTitle;
+
+	// DrawElement - draw a single row for this column
+	//	self, x, y, font, fade, score, ci
+	std::function<bool( const Column &self, float x, float y, const Font &font, float fade, const score_t &score, const clientInfo_t &ci )>
+		DrawElement;
+
+	// left and right padding
+	vector2 padding;
+
+	// cached width so we don't need to run expensive calculation each render..only when the information changes?
 	float width;
 };
 

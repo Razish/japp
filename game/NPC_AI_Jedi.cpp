@@ -2045,7 +2045,10 @@ evasionType_t Jedi_SaberBlockGo( gentity_t *self, usercmd_t *cmd, vector3 *pHitl
 	}
 	// Figure out what quadrant the block was in.
 	if ( d_JediAI.integer ) {
-		Com_Printf( "(%d) evading attack from height %4.2f, zdiff: %4.2f, rightdot: %4.2f\n", level.time, hitloc.z - self->r.absmin.z, zdiff, rightdot );
+		Com_Printf(
+			"(%d) evading attack from height %4.2f, zdiff: %4.2f, rightdot: %4.2f\n",
+			level.time, (double)(hitloc.z - self->r.absmin.z), (double)zdiff, (double)rightdot
+		);
 	}
 
 	//UL = > -1//-6
@@ -2578,7 +2581,7 @@ static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bl
 	if ( dist > NPC->r.maxs.x * 5 )//was *3
 	{//FIXME: sometimes he reacts when you're too far away to actually hit him
 		if ( d_JediAI.integer ) {
-			Com_Printf( S_COLOR_RED"enemy saber dist: %4.2f\n", dist );
+			Com_Printf( S_COLOR_RED "enemy saber dist: %4.2f\n", (double)dist );
 		}
 		/*
 		if ( dist < 300 //close
@@ -2595,7 +2598,7 @@ static qboolean Jedi_SaberBlock( int saberNum, int bladeNum ) //saberNum = 0, bl
 		return qfalse;
 	}
 	if ( d_JediAI.integer ) {
-		Com_Printf( S_COLOR_GREEN"enemy saber dist: %4.2f\n", dist );
+		Com_Printf( S_COLOR_GREEN "enemy saber dist: %4.2f\n", (double)dist );
 	}
 
 	VectorSubtract( &saberPoint, &NPC->enemy->client->renderInfo.muzzlePoint, &pointDir );
@@ -4263,7 +4266,10 @@ void NPC_Jedi_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 			rightdot = DotProduct( &right, &diff );
 			zdiff = point.z - self->client->renderInfo.eyePoint.z;
 
-			Com_Printf( "(%d) saber hit at height %4.2f, zdiff: %4.2f, rightdot: %4.2f\n", level.time, point.z - self->r.absmin.z, zdiff, rightdot );
+			Com_Printf(
+				"(%d) saber hit at height %4.2f, zdiff: %4.2f, rightdot: %4.2f\n",
+				level.time, (double)(point.z - self->r.absmin.z), (double)zdiff, (double)rightdot
+			);
 		}
 	}
 	else {//attack

@@ -2847,7 +2847,7 @@ static precache_t precacheList[] = {
 static const int numPrecacheItems = ARRAY_LEN( precacheList );
 
 int classcmp( const void *a, const void *b ) {
-	return Q_stricmp( (const char *)a, ((precache_t*)b)->classname );
+	return Q_stricmp( (const char *)a, ((const precache_t*)b)->classname );
 }
 
 void NPC_PrecacheByClassName( const char *type ) {

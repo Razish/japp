@@ -9309,13 +9309,15 @@ void PmoveSingle( pmove_t *pmove ) {
 		pm->ps->legsAnim == BOTH_JUMP_BACKKICK_SPIN || //Dual special move
 		pm->ps->legsAnim == BOTH_FORCE_GETUP_F2 || //amdie get up
 		pm->ps->legsAnim == BOTH_SABERKILLER1 || //amfinishinghim
-		pm->ps->legsAnim == BOTH_FORCE_GETUP_F2 //ampower
-		)
+		pm->ps->legsAnim == BOTH_FORCE_GETUP_F2 ) //ampower
+	{
 		stiffenedUp = qtrue;
+	}
 
 	else if ( BG_SaberInKata( pm->ps->saberMove ) ||
 		BG_InKataAnim( pm->ps->torsoAnim ) ||
-		BG_InKataAnim( pm->ps->legsAnim ) ) {
+		BG_InKataAnim( pm->ps->legsAnim ) )
+	{
 		PM_MoveForKata( &pm->cmd );
 	}
 	else if ( BG_FullBodyTauntAnim( pm->ps->legsAnim )

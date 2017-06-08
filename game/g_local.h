@@ -1162,7 +1162,7 @@ private:
 	std::string data = "";
 	bool ready = false;
 public:
-	GeoIPData(const std::string ip) : ip(ip) {};
+	GeoIPData(const std::string _ip) : ip(_ip) {};
 	~GeoIPData() {};
 	bool isReady() { return ready; };
 	std::string* getData() { return &data; };

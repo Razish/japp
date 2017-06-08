@@ -1701,7 +1701,7 @@ void CG_DrawForceSelect( void ) {
 	}
 
 	if ( showPowersName[cg.forceSelect] ) {
-		const float fontScale = 1.0;
+		const float fontScale = 1.0f;
 		const int fontHandle = FONT_SMALL;
 		const Font font( fontHandle, fontScale, false );
 		const char *str = CG_GetStringEdString( "SP_INGAME", showPowersName[cg.forceSelect] );
@@ -2827,7 +2827,7 @@ static float CG_DrawMiniScoreboard( float y ) {
 		return y;
 	}
 	//const qhandle_t fontHandle = FONT_JAPPMONO;
-	//const float fontScale = 0.5;
+	//const float fontScale = 0.5f;
 	const Font font( cg_topRightFont.integer, cg_topRightSize.value, false );
 
 	if ( cgs.gametype >= GT_TEAM ) {
@@ -3952,7 +3952,7 @@ qboolean CG_DrawMapChange( void ) {
 		return false;
 	}
 
-	const float fontScale = 1.0;
+	const float fontScale = 1.0f;
 	const qhandle_t fontHandle = FONT_SMALL;
 	const Font font( fontHandle, fontScale, false );
 
@@ -4625,7 +4625,7 @@ static void CG_DrawCrosshair( vector3 *worldPoint, qboolean chEntValid ) {
 	float x, y, w, h, f, chX, chY;
 	qhandle_t hShader = 0;
 	qboolean corona = qfalse;
-	vector4 colour = { 1.0f, 1.0f, 1.0, 1.0f };
+	vector4 colour = { 1.0f, 1.0f, 1.0f, 1.0f };
 	centity_t *crossEnt = NULL;
 	refdef_t *refdef = CG_GetRefdef();
 
@@ -4659,7 +4659,7 @@ static void CG_DrawCrosshair( vector3 *worldPoint, qboolean chEntValid ) {
 					if ( cgs.gametype >= GT_TEAM
 						&& cgs.clientinfo[crossEnt->currentState.number].team == cgs.clientinfo[cg.snap->ps.clientNum].team ) {
 						// ally
-						VectorSet4( &colour, 0.0f, 1.0f, 0.0, 1.0f );
+						VectorSet4( &colour, 0.0f, 1.0f, 0.0f, 1.0f );
 					}
 					else {
 						if ( cgs.gametype == GT_POWERDUEL

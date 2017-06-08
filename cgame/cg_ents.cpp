@@ -226,10 +226,10 @@ static void CG_EntityEffects( centity_t *cent ) {
 		float	i, r, g, b;
 
 		cl = cent->currentState.constantLight;
-		r = (float)(cl & 0xFF) / 255.0;
-		g = (float)((cl >> 8) & 0xFF) / 255.0;
-		b = (float)((cl >> 16) & 0xFF) / 255.0;
-		i = (float)((cl >> 24) & 0xFF) * 4.0;
+		r = (float)(cl & 0xFF) / 255.0f;
+		g = (float)((cl >> 8) & 0xFF) / 255.0f;
+		b = (float)((cl >> 16) & 0xFF) / 255.0f;
+		i = (float)((cl >> 24) & 0xFF) * 4.0f;
 		trap->R_AddLightToScene( &cent->lerpOrigin, i, r, g, b );
 	}
 
@@ -1641,7 +1641,7 @@ static void CG_Item( centity_t *cent ) {
 		ent.renderfx |= RF_FORCE_ENT_ALPHA;
 		//	VectorCopy( cent->currentState.angles, angs );
 		angs.pitch = 0.0f;
-		angs.yaw = 360.0f * (fmod(cg.time * 0.001, 360.0 / 128.0)) / (360.0 / 128.0);
+		angs.yaw = 360.0f * (fmod(cg.time * 0.001f, 360.0f / 128.0f)) / (360.0f / 128.0f);
 		angs.roll = 0.0f;
 		AnglesToAxis( &angs, ent.axis );
 

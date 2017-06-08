@@ -559,7 +559,7 @@ void NPC_BSJump( void ) {
 
 		assert( z >= 0 );
 
-		//		Com_Printf("apex is %4.2f percent from p1: ", (xy-z)*0.5/xy*100.0f);
+		//		Com_Printf("apex is %4.2f percent from p1: ", (xy-z)*0.5f/xy*100.0f);
 
 		// Don't need to set apex xy if NPC is jumping directly up.
 		if ( xy > 0.0f ) {

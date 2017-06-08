@@ -4181,7 +4181,6 @@ void UI_FindCurrentSiegeTeamClass( void ) {
 	menuDef_t *menu;
 	int myTeam = (int)(trap->Cvar_VariableValue( "ui_myteam" ));
 	const char *itemname;
-	itemDef_t *item;
 	int	baseClass;
 
 	menu = Menu_GetFocused();	// Get current menu
@@ -4196,15 +4195,13 @@ void UI_FindCurrentSiegeTeamClass( void ) {
 
 	// If the player is on a team,
 	if ( myTeam == TEAM_RED ) {
-		itemDef_t *item;
-		item = (itemDef_t *)Menu_FindItemByName( menu, "onteam1" );
+		itemDef_t *item = Menu_FindItemByName( menu, "onteam1" );
 		if ( item ) {
 			Item_RunScript( item, item->action );
 		}
 	}
 	else if ( myTeam == TEAM_BLUE ) {
-		itemDef_t *item;
-		item = (itemDef_t *)Menu_FindItemByName( menu, "onteam2" );
+		itemDef_t *item = Menu_FindItemByName( menu, "onteam2" );
 		if ( item ) {
 			Item_RunScript( item, item->action );
 		}
@@ -4239,7 +4236,7 @@ void UI_FindCurrentSiegeTeamClass( void ) {
 		return;
 	}
 
-	item = (itemDef_t *)Menu_FindItemByName( menu, itemname );
+	itemDef_t *item = (itemDef_t *)Menu_FindItemByName( menu, itemname );
 	if ( item ) {
 		Item_RunScript( item, item->action );
 	}
@@ -4510,7 +4507,6 @@ void UI_UpdateCharacterSkin( void ) {
 }
 
 static void UI_ResetCharacterListBoxes( void ) {
-
 	itemDef_t *item;
 	menuDef_t *menu;
 	listBoxDef_t *listPtr;

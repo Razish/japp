@@ -15,10 +15,14 @@ files = [
 files = [build_dir + f for f in files]
 
 # project settings
-if realcc == 'gcc' or realcc == 'clang' and plat != 'Windows':
+if 'gcc' in realcc or 'clang' in realcc:
 	sqlite_env['CCFLAGS'] += [
-		'-fPIC',
+		'-Wno-unused-const-variable'
 	]
+	if plat != 'Windows':
+		sqlite_env['CCFLAGS'] += [
+			'-fPIC',
+		]
 
 # targets
 result = sqlite_env.StaticLibrary(

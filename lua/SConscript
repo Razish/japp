@@ -19,7 +19,8 @@ files = [
 	'lua/lctype.c',
 	'lua/ldblib.c',
 	'lua/ldebug.c',
-	'lua/ldo.c', 'lua/ldump.c',
+	'lua/ldo.c',
+	'lua/ldump.c',
 	'lua/lfunc.c',
 	'lua/lgc.c',
 	'lua/linit.c',
@@ -51,9 +52,11 @@ if plat == 'Linux':
 	lua_env['CPPDEFINES'] += [
 		'LUA_USE_LINUX',
 	]
-	if realcc == 'gcc' or realcc == 'clang':
+	if 'gcc' in realcc or 'clang' in realcc:
 		lua_env['CCFLAGS'] += [
 			'-fPIC',
+			'-Wno-cast-qual',
+			'-Wno-unsuffixed-float-constants',
 		]
 
 lua_env['CPPDEFINES'] += [

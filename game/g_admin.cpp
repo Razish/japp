@@ -1037,7 +1037,7 @@ static void AM_WhoIs( gentity_t *ent ) {
 	gentity_t *e = NULL;
 	printBufferSession_t pb;
 
-	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent ? (ent - g_entities) : -1 );
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5f, PB_Callback, ent ? (ent - g_entities) : -1 );
 
 	//TODO: optimal spacing
 	Q_PrintBuffer( &pb, "Listing admins...\n" );
@@ -1065,7 +1065,7 @@ static void AM_Status( gentity_t *ent ) {
 	gentity_t *e;
 	printBufferSession_t pb;
 
-	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent ? (ent - g_entities) : -1 );
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5f, PB_Callback, ent ? (ent - g_entities) : -1 );
 
 	Q_PrintBuffer( &pb, "Listing users...\n" );
 	Q_PrintBuffer( &pb, "clientNum   Name                                IP                      Admin User\n" );
@@ -1524,7 +1524,7 @@ static void AM_ListTelemarks( gentity_t *ent ) {
 	int i;
 	printBufferSession_t pb;
 
-	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent ? (ent - g_entities) : -1 );
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5f, PB_Callback, ent ? (ent - g_entities) : -1 );
 
 	// append each mark to the end of the string
 	Q_PrintBuffer( &pb, "Listing telemarks...\n" );
@@ -2641,7 +2641,7 @@ static void AM_EntList( gentity_t *ent ) {
 	int i;
 	printBufferSession_t pb;
 
-	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5, PB_Callback, ent ? (ent - g_entities) : -1 );
+	Q_NewPrintBuffer( &pb, MAX_STRING_CHARS / 1.5f, PB_Callback, ent ? (ent - g_entities) : -1 );
 
 	Q_PrintBuffer( &pb, "Listing entities...\n" );
 	for ( i = MAX_CLIENTS, e = g_entities + MAX_CLIENTS; i < ENTITYNUM_WORLD; i++, e++ ) {

@@ -218,7 +218,7 @@ checkprint:
 		const char *flagstr = GetFlagStr( gWPArray[bestindex]->flags );
 		gLastPrintedIndex = bestindex;
 		trap->Print( S_COLOR_YELLOW "Waypoint %i\nFlags - %i (%s) (w%f)\nOrigin - %s\n", gWPArray[bestindex]->index,
-			gWPArray[bestindex]->flags, flagstr, gWPArray[bestindex]->weight, vtos( &gWPArray[bestindex]->origin ) );
+			gWPArray[bestindex]->flags, flagstr, (double)gWPArray[bestindex]->weight, vtos( &gWPArray[bestindex]->origin ) );
 
 		plum = G_TempEntity( &gWPArray[bestindex]->origin, EV_SCOREPLUM );
 		plum->r.svFlags |= SVF_BROADCAST;
@@ -1206,7 +1206,7 @@ int OrgVisibleCurve( vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2,
 
 int CanForceJumpTo( int baseindex, int testingindex, float distance ) {
 	float heightdif;
-	vector3 xy_base, xy_test, v, mins, maxs;
+	vector3 xy_base, xy_test, mins, maxs;
 	wpobject_t *wpBase = gWPArray[baseindex];
 	wpobject_t *wpTest = gWPArray[testingindex];
 
@@ -1226,9 +1226,10 @@ int CanForceJumpTo( int baseindex, int testingindex, float distance ) {
 
 	xy_base.z = xy_test.z;
 
-	VectorSubtract( &xy_base, &xy_test, &v );
+	vector3 testVec;
+	VectorSubtract( &xy_base, &xy_test, &testVec );
 
-	if ( VectorLength( &v ) > MAX_NEIGHBOR_LINK_DISTANCE ) {
+	if ( VectorLength( &testVec ) > MAX_NEIGHBOR_LINK_DISTANCE ) {
 		return 0;
 	}
 
@@ -1908,7 +1909,7 @@ int SavePathData( const char *filename ) {
 	fileString = (char *)B_TempAlloc( 524288 );
 	storeString = (char *)B_TempAlloc( 4096 );
 
-	Com_sprintf( fileString, 524288, "%i %i %f (%f %f %f) { ", gWPArray[i]->index, gWPArray[i]->flags, gWPArray[i]->weight, gWPArray[i]->origin.x, gWPArray[i]->origin.y, gWPArray[i]->origin.z );
+	Com_sprintf( fileString, 524288, "%i %i %f (%s) { ", gWPArray[i]->index, gWPArray[i]->flags, (double)gWPArray[i]->weight, vtos( &gWPArray[i]->origin ) );
 
 	n = 0;
 
@@ -1938,7 +1939,7 @@ int SavePathData( const char *filename ) {
 
 	while ( i < gWPNum ) {
 		//sprintf(fileString, "%s%i %i %f (%f %f %f) { ", fileString, gWPArray[i]->index, gWPArray[i]->flags, gWPArray[i]->weight, gWPArray[i]->origin.x, gWPArray[i]->origin.y, gWPArray[i]->origin.z);
-		Com_sprintf( storeString, 4096, "%i %i %f (%f %f %f) { ", gWPArray[i]->index, gWPArray[i]->flags, gWPArray[i]->weight, gWPArray[i]->origin.x, gWPArray[i]->origin.y, gWPArray[i]->origin.z );
+		Com_sprintf( storeString, 4096, "%i %i %f (%s) { ", gWPArray[i]->index, gWPArray[i]->flags, (double)gWPArray[i]->weight, vtos( &gWPArray[i]->origin ) );
 
 		n = 0;
 
@@ -1962,7 +1963,7 @@ int SavePathData( const char *filename ) {
 
 		gWPArray[i]->disttonext = flLen;
 
-		Com_sprintf( storeString, 4096, "%s} %f\n", storeString, flLen );
+		Com_sprintf( storeString, 4096, "%s} %f\n", storeString, (double)flLen );
 
 		strcat( fileString, storeString );
 
@@ -2642,7 +2643,6 @@ void G_RMGPathing( void ) { //Generate waypoint information on-the-fly for the r
 void BeginAutoPathRoutine( void ) { //Called for RMG levels.
 	int i = 0;
 	gentity_t *ent = NULL;
-	vector3 v;
 
 	gSpawnPointNum = 0;
 
@@ -2681,9 +2681,10 @@ void BeginAutoPathRoutine( void ) { //Called for RMG levels.
 
 	i = 0;
 
+	vector3 vec;
 	while ( i < gWPNum - 1 ) { //disttonext is normally set on save, and when a file is loaded. For RMG we must do it after calc'ing.
-		VectorSubtract( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, &v );
-		gWPArray[i]->disttonext = VectorLength( &v );
+		VectorSubtract( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, &vec );
+		gWPArray[i]->disttonext = VectorLength( &vec );
 		i++;
 	}
 

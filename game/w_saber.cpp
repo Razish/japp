@@ -3255,7 +3255,7 @@ static qboolean CheckSaberDamage( gentity_t *self, int rSaberNum, int rBladeNum,
 
 	float saberBoxSize;
 	if ( self->client->ps.weaponTime <= 0 ) {
-		saberBoxSize = 0.0;
+		saberBoxSize = 0.0f;
 	}
 	else {
 		saberBoxSize = d_saberBoxTraceSize.value;

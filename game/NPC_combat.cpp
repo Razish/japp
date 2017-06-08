@@ -1270,7 +1270,10 @@ gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis
 												failed = qtrue;
 											}
 											else {
-												Debug_Printf( &d_npcai, DEBUG_LEVEL_INFO, "%s saw %s trying to hide - hiddenDir %s targetDir %s dot %f\n", NPC->targetname, newenemy->targetname, vtos( &newenemy->client->hiddenDir ), vtos( &diff ), dot );
+												Debug_Printf(
+													&d_npcai, DEBUG_LEVEL_INFO, "%s saw %s trying to hide - hiddenDir %s targetDir %s dot %f\n",
+													NPC->targetname, newenemy->targetname, vtos( &newenemy->client->hiddenDir ), vtos( &diff ), (double)dot
+												);
 											}
 										}
 										else {
@@ -1278,7 +1281,10 @@ gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis
 										}
 									}
 									else {
-										Debug_Printf( &d_npcai, DEBUG_LEVEL_INFO, "%s saw %s trying to hide - hiddenDist %f\n", NPC->targetname, newenemy->targetname, newenemy->client->hiddenDist );
+										Debug_Printf(
+											&d_npcai, DEBUG_LEVEL_INFO, "%s saw %s trying to hide - hiddenDist %f\n",
+											NPC->targetname, newenemy->targetname, (double)newenemy->client->hiddenDist
+										);
 									}
 								}
 
@@ -1381,7 +1387,10 @@ gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis
 										continue;
 									}
 									else {
-										Debug_Printf( &d_npcai, DEBUG_LEVEL_INFO, "%s saw %s trying to hide - hiddenDir %s targetDir %s dot %f\n", NPC->targetname, newenemy->targetname, vtos( &newenemy->client->hiddenDir ), vtos( &diff ), dot );
+										Debug_Printf(
+											&d_npcai, DEBUG_LEVEL_INFO, "%s saw %s trying to hide - hiddenDir %s targetDir %s dot %f\n",
+											NPC->targetname, newenemy->targetname, vtos( &newenemy->client->hiddenDir ), vtos( &diff ), (double)dot
+										);
 									}
 								}
 								else {
@@ -1389,7 +1398,10 @@ gentity_t *NPC_PickEnemy( gentity_t *closestTo, int enemyTeam, qboolean checkVis
 								}
 							}
 							else {
-								Debug_Printf( &d_npcai, DEBUG_LEVEL_INFO, "%s saw %s trying to hide - hiddenDist %f\n", NPC->targetname, newenemy->targetname, newenemy->client->hiddenDist );
+								Debug_Printf(
+									&d_npcai, DEBUG_LEVEL_INFO, "%s saw %s trying to hide - hiddenDist %f\n",
+									NPC->targetname, newenemy->targetname, (double)newenemy->client->hiddenDist
+								);
 							}
 						}
 
@@ -1924,8 +1936,8 @@ qboolean NPC_CheckCanAttack( float attack_scale, qboolean stationary ) {
 			(!traceEnt || !traceEnt->client || !NPC->client->enemyTeam || NPC->client->enemyTeam != traceEnt->client->playerTeam) )
 			{//no, so shoot for somewhere between the head and torso
 			//NOTE: yes, I know this looks weird, but it works
-			enemy_org[0] += 0.3*flrand(NPC->enemy->r.mins[0], NPC->enemy->r.maxs[0]);
-			enemy_org[1] += 0.3*flrand(NPC->enemy->r.mins[1], NPC->enemy->r.maxs[1]);
+			enemy_org[0] += 0.3f*flrand(NPC->enemy->r.mins[0], NPC->enemy->r.maxs[0]);
+			enemy_org[1] += 0.3f*flrand(NPC->enemy->r.mins[1], NPC->enemy->r.maxs[1]);
 			enemy_org[2] -= NPC->enemy->r.maxs[2]*flrand(0.0f, 1.0f);
 
 			attack_scale *= 0.75f;

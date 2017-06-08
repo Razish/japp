@@ -1190,7 +1190,7 @@ void PM_SaberLocked( void ) {
 					}
 				}
 				else {
-					curFrame = ceil( currentFrame ) + strength;
+					curFrame = ceilf( currentFrame ) + strength;
 					//advance my frame one
 					if ( curFrame >= anim->firstFrame + anim->numFrames ) {//I won!  Break out
 						PM_SaberLockBreak( genemy, qtrue, strength );
@@ -1204,7 +1204,7 @@ void PM_SaberLocked( void ) {
 			}
 			else { //new locks
 				if ( BG_CheckIncrementLockAnim( pm->ps->torsoAnim, SABERLOCK_WIN ) ) {
-					curFrame = ceil( currentFrame ) + strength;
+					curFrame = ceilf( currentFrame ) + strength;
 					//advance my frame one
 					if ( curFrame >= anim->firstFrame + anim->numFrames ) {//I won!  Break out
 						PM_SaberLockBreak( genemy, qtrue, strength );

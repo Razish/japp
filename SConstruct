@@ -12,8 +12,8 @@
 #	scons -Q debug=1 force32=1
 #
 # envvars:
-#	MORE_WARNINGS	enable additional warnings
 #	NO_SSE			disable SSE floating point instructions, force x87 fpu
+#	MORE_WARNINGS	enable additional warnings
 #
 
 debug = int( ARGUMENTS.get( 'debug', 0 ) )
@@ -89,10 +89,13 @@ clangHack = plat == 'Darwin'
 # create the build environment
 #FIXME: also consider LD, AS, AR in the toolset
 import os
+def get_env( key, default_value = None ):
+	return default_value if key not in os.environ else os.environ[key]
+
 env = Environment(
 	TARGET_ARCH = arch,
 	tools = tools,
-	ENV = { 'PATH' : os.environ['PATH'] }
+	ENV = { 'TMP' : get_env( 'TMP' ), 'PATH' : get_env( 'PATH' ) } # import basic shell environment
 )
 
 # set the proper compiler name
@@ -126,7 +129,7 @@ colours['white'] = '\033[1;97m' if enableColours else ''
 colours['cyan'] = '\033[96m' if enableColours else ''
 colours['orange'] = '\033[33m' if enableColours else ''
 colours['green'] = '\033[92m' if enableColours else ''
-colours['end']  = '\033[0m' if enableColours else ''
+colours['end'] = '\033[0m' if enableColours else ''
 
 env['SHCCCOMSTR'] = env['SHCXXCOMSTR'] = env['CCCOMSTR'] = env['CXXCOMSTR'] = \
 	'%s compiling: %s$SOURCE%s' % (colours['cyan'], colours['white'], colours['end'])
@@ -143,9 +146,10 @@ env['SHLINKCOMSTR'] = env['LINKCOMSTR'] = \
 if realcc == 'cl':
 	# msvc
 	ccversion = env['MSVC_VERSION']
-elif realcc == 'gcc' or realcc == 'clang':
+elif 'gcc' in realcc or 'clang' in realcc:
+	# probably gcc or clang
 	status, ccrawversion = run_command( realcc + ' -dumpversion' )
-	ccversion = 'None' if status else ccrawversion
+	ccversion = None if status else ccrawversion
 
 # scons version
 import SCons
@@ -153,7 +157,7 @@ sconsversion = SCons.__version__
 
 # git revision
 status, rawrevision = run_command( 'git rev-parse --short HEAD' )
-revision = 'None' if status else rawrevision
+revision = None if status else rawrevision
 
 if revision:
 	status, dummy = run_command( 'git diff-index --quiet HEAD' )
@@ -234,7 +238,7 @@ emptyEnv( env, 'ARFLAGS' )
 emptyEnv( env, 'LIBS' )
 
 # compiler switches
-if realcc == 'gcc' or realcc == 'clang':
+if 'gcc' in realcc or 'clang' in realcc:
 	env['CCFLAGS'] += [
 		#'-M',	# show include hierarchy
 	]
@@ -267,26 +271,30 @@ if realcc == 'gcc' or realcc == 'clang':
 
 	# strict c/cpp warnings
 	if 'MORE_WARNINGS' in os.environ:
+		env['CFLAGS'] += [
+			'-Wbad-function-cast',
+		]
 		env['CCFLAGS'] += [
 			'-Waggregate-return',
-			'-Wbad-function-cast',
 			'-Wcast-qual',
-			'-Wfloat-equal',
-			'-Wlong-long',
+			#'-Wfloat-equal',
+			#'-Wlong-long',
 			'-Wshadow',
-			'-Wsign-conversion',
+			#'-Wsign-conversion',
 			'-Wswitch-default',
 			'-Wunreachable-code',
 		]
 		if not clangHack:
+			env['CFLAGS'] += [
+				'-Wunsuffixed-float-constants',
+			]
 			env['CCFLAGS'] += [
 				'-Wdouble-promotion',
-				'-Wsuggest-attribute=const',
-				'-Wunsuffixed-float-constants',
+				#'-Wsuggest-attribute=const',
 			]
 
 	# gcc-specific warnings
-	if realcc == 'gcc' and cmp_version( ccversion, '4.6' ) >= 0 and arch != 'arm':
+	if 'gcc' in realcc and cmp_version( ccversion, '4.6' ) >= 0 and arch != 'arm':
 		env['CCFLAGS'] += [
 			'-Wlogical-op',
 		]
@@ -322,7 +330,7 @@ if realcc == 'gcc' or realcc == 'clang':
 				'-mno-sse2',
 				'-ffloat-store',
 			]
-			if realcc == 'gcc':
+			if 'gcc' in realcc:
 				env['CFLAGS'] += [
 					'-fexcess-precision=standard',
 				]
@@ -352,7 +360,7 @@ if realcc == 'gcc' or realcc == 'clang':
 	]
 
 	# misc settings
-	#if realcc == 'gcc' and cmp_version( ccversion, '4.9' ) >= 0:
+	#if 'gcc' in realcc and cmp_version( ccversion, '4.9' ) >= 0:
 	#	env['CCFLAGS'] += [
 	#		'-fdiagnostics-color',
 	#	]
@@ -477,12 +485,12 @@ if plat == 'Darwin':
 
 # debug / release
 if debug == 0 or debug == 2:
-	if realcc == 'gcc' or realcc == 'clang':
+	if 'gcc' in realcc or 'clang' in realcc:
 		env['CCFLAGS'] += [
 			'-O2', # O3 may not be best, due to cache size not being big enough for the amount of inlining performed
 			'-fomit-frame-pointer',
 		]
-		if debug == 0 and realcc == 'gcc':
+		if debug == 0 and 'gcc' in realcc:
 			env['LINKFLAGS'] += [
 				'-s',	# strip unused symbols
 			]
@@ -502,21 +510,23 @@ if debug == 0 or debug == 2:
 		]
 
 if debug:
-	if realcc == 'gcc' or realcc == 'clang':
+	if 'gcc' in realcc or 'clang' in realcc:
 		env['CCFLAGS'] += [
 			'-g3',
 			#'-pg',
 			#'-finstrument-functions',
 			'-fno-omit-frame-pointer',
+			#'-fsanitize=address',
 		]
 		#env['LINKFLAGS'] += [
 		#	'-pg',
+		#	'-fsanitize=address',
 		#]
 	elif realcc == 'cl':
 		env['CCFLAGS'] += [
 			'/Od',		# disable optimisations
 			'/Z7',		# emit debug information
-		    '/MDd',		# multi-threaded debug runtime for DLLs
+			'/MDd',		# multi-threaded debug runtime for DLLs
 		]
 		env['LINKFLAGS'] += [
 			'/DEBUG',			# generate debug info

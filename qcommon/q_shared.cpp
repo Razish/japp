@@ -1321,21 +1321,21 @@ const vector4 colorTable[CT_MAX] = {
 static vector3 tempVecs[NUM_TEMPVECS];
 vector3 *tv( float x, float y, float z ) {
 	static int index = 0;
-	vector3 *v = &tempVecs[index++];
+	vector3 *vec = &tempVecs[index++];
 	index &= NUM_TEMPVECS - 1;
 
-	VectorSet( v, x, y, z );
+	VectorSet( vec, x, y, z );
 
-	return v;
+	return vec;
 }
 
 static char tempStrs[NUM_TEMPVECS][32];
-char *vtos( const vector3 *v ) {
+char *vtos( const vector3 *vec ) {
 	static int index = 0;
 	char *s = tempStrs[index++];
 	index &= NUM_TEMPVECS - 1;
 
-	Com_sprintf( s, 32, "(%i %i %i)", (int)v->x, (int)v->y, (int)v->z );
+	Com_sprintf( s, 32, "(%i %i %i)", (int)vec->x, (int)vec->y, (int)vec->z );
 
 	return s;
 }
@@ -1350,9 +1350,7 @@ void Q_FSBinaryDump( const char *filename, const void *buffer, size_t len ) {
 
 // serialise a JSON object and write it to the specified file
 void Q_FSWriteJSON( void *root, fileHandle_t f ) {
-	const char *serialised = NULL;
-
-	serialised = cJSON_Serialize( (cJSON *)root, 1 );
+	const char *serialised = cJSON_Serialize( (cJSON *)root, 1 );
 	trap->FS_Write( serialised, strlen( serialised ), f );
 	trap->FS_Close( f );
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Workspace Name="JA++" Database="">
+<CodeLite_Workspace Name="JA++" Database="" Version="10.0.0">
   <Environment>
     <![CDATA[]]>
   </Environment>
-  <Project Name="Client" Path="codelite-client.project" Active="No"/>
-  <Project Name="Server" Path="codelite-server.project" Active="Yes"/>
+  <Project Name="Client" Path="codelite-client.project" Active="Yes"/>
+  <Project Name="Server" Path="codelite-server.project" Active="No"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="no">
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
       <Project Name="Client" ConfigName="Debug"/>
       <Project Name="Server" ConfigName="Debug"/>
@@ -26,7 +26,7 @@
       <Project Name="Client" ConfigName="Release-32"/>
       <Project Name="Server" ConfigName="Release-32"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Optimised Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Optimised Debug" Selected="no">
       <Environment/>
       <Project Name="Client" ConfigName="Optimised Debug"/>
       <Project Name="Server" ConfigName="Optimised Debug"/>
