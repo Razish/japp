@@ -2319,9 +2319,9 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 		return;
 	}
 
-	if (fullforce) {
-		if (!(g_privateDuel.bits & PRIVDUEL_FULLFORCE)) {
-			trap->SendServerCommand(ent - g_entities, "print \"Fullforce duels not allowed!\n\"");
+	if ( fullforce ) {
+		if ( !(g_privateDuel.bits & PRIVDUEL_FULLFORCE) ) {
+			trap->SendServerCommand( ent - g_entities, "print \"Fullforce duels not allowed!\n\"" );
 			return;
 		}
 	}
@@ -2405,8 +2405,7 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 				challenged->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELACCEPT" ),
 				ent->client->pers.netname, weaponData[challenged->client->pers.duelWeapon].longName ) );
 
-			if (fullforce){
-
+			if ( fullforce ) {
 				ent->duelFullForce = qtrue;
 				challenged->duelFullForce = qtrue;
 
@@ -2418,7 +2417,7 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 				for (int i = 0; i < NUM_FORCE_POWERS; i++) {
 					ent->duelForcePowerBaseLevel[i] = ent->client->ps.fd.forcePowerBaseLevel[i];
 					challenged->duelForcePowerBaseLevel[i] = challenged->client->ps.fd.forcePowerBaseLevel[i];
-					
+
 					ent->client->ps.fd.forcePowerBaseLevel[i] = challenged->client->ps.fd.forcePowerBaseLevel[i] = 3;
 
 					ent->duelForcePowerLevel[i] = ent->client->ps.fd.forcePowerLevel[i];
@@ -2439,8 +2438,8 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 			VectorCopy( &ent->client->ps.origin, &ent->client->pers.duelStartPos );
 			VectorCopy( &challenged->client->ps.origin, &challenged->client->pers.duelStartPos );
 
-			G_AddEvent( ent, EV_PRIVATE_DUEL, (ent->duelFullForce == challenged->duelFullForce == qtrue) ? DUEL_FULLFORCE : DUEL_NORMAL );
-			G_AddEvent( challenged, EV_PRIVATE_DUEL, (ent->duelFullForce == challenged->duelFullForce == qtrue) ? DUEL_FULLFORCE : DUEL_NORMAL);
+			G_AddEvent( ent, EV_PRIVATE_DUEL, (ent->duelFullForce && challenged->duelFullForce) ? DUEL_FULLFORCE : DUEL_NORMAL );
+			G_AddEvent( challenged, EV_PRIVATE_DUEL, (ent->duelFullForce && challenged->duelFullForce) ? DUEL_FULLFORCE : DUEL_NORMAL);
 
 			ent->duelStartTick = challenged->duelStartTick = level.time;
 			ent->duelHitCount = challenged->duelHitCount = 0;
@@ -2477,10 +2476,12 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 			}
 
 			ent->client->ps.weapon = challenged->client->ps.weapon = challenged->client->pers.duelWeapon;
-			
-			if ( WP_SABER < challenged->client->pers.duelWeapon < WP_NUM_WEAPONS){
-				ammo_t ammo = G_AmmoForWeapon((weapon_t)challenged->client->pers.duelWeapon);
-				ent->client->ps.ammo[ammo] = challenged->client->ps.ammo[ammo] = 999;
+
+			const weaponData_t *wd = &weaponData[challenged->client->pers.duelWeapon];
+			if ( wd->shotCost != 0 ) {
+				// this weapon requires ammo, give it
+				ammo_t ammo = G_AmmoForWeapon( (weapon_t)challenged->client->pers.duelWeapon );
+				ent->client->ps.ammo[ammo] = challenged->client->ps.ammo[ammo] = ammoMax[wd->ammoIndex];
 			}
 
 			// set health etc

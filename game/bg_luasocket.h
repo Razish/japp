@@ -8,7 +8,7 @@
 #include <ws2tcpip.h>
 #else
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED == 1020
+#if defined(MAC_OS_X_VERSION_MIN_REQUIRED) && MAC_OS_X_VERSION_MIN_REQUIRED == 1020
 // needed for socklen_t on OSX 10.2
 #        define _BSD_SOCKLEN_T_
 #endif
