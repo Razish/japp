@@ -993,6 +993,9 @@ static void AM_Login( gentity_t *ent ) {
 
 // logout
 static void AM_Logout( gentity_t *ent ) {
+	if ( !ent ) {
+		return;
+	}
 	G_LogPrintf( level.log.admin, "[LOGOUT] \"%s\", %s\n", ent->client->pers.adminUser->user,
 		G_PrintClient( ent-g_entities ) );
 	ent->client->pers.adminUser = NULL;
@@ -1104,7 +1107,7 @@ static void AM_Announce( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof(arg1) );
 	if ( arg1[0] == '-' && arg1[1] == '1' ) {
 		// announce to everyone
-		G_LogPrintf( level.log.admin, "\t%s to <all clients>, %s\n", ent ? G_PrintClient(ent - g_entities) : "Console", msg );
+		G_LogPrintf( level.log.admin, "\t%s to <all clients>, %s\n", ent ? G_PrintClient(ent - g_entities) : "Server", msg );
 		G_Announce( msg );
 		if (ent) {
 			trap->SendServerCommand(-1, va("print \"%s\n\"", msg));
@@ -1118,7 +1121,7 @@ static void AM_Announce( gentity_t *ent ) {
 			return;
 		}
 
-		G_LogPrintf( level.log.admin, "\t%s to %s, %s\n", ent ? G_PrintClient( ent-g_entities ) : "Console",
+		G_LogPrintf( level.log.admin, "\t%s to %s, %s\n", ent ? G_PrintClient( ent-g_entities ) : "Server",
 			G_PrintClient( targetClient ), msg );
 		trap->SendServerCommand( targetClient, va( "cp \"%s\"", msg ) );
 		trap->SendServerCommand( targetClient, va( "print \"%s\n\"", msg ) );
@@ -1183,7 +1186,7 @@ static void AM_Ghost( gentity_t *ent ) {
 
 	if ( targ->client->pers.adminData.isGhost ) {
 		G_LogPrintf( level.log.admin, "\t%s unghosting %s\n",
-			ent ? G_PrintClient(ent - g_entities) : "Console", G_PrintClient( targetClient )
+			ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( targetClient )
 		);
 
 		Ghost_Off( targ );
@@ -1193,7 +1196,7 @@ static void AM_Ghost( gentity_t *ent ) {
 	}
 	else {
 		G_LogPrintf( level.log.admin, "\t%s ghosting %s\n",
-			ent ? G_PrintClient(ent - g_entities) : "Console", G_PrintClient( targetClient )
+			ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( targetClient )
 		);
 
 		Ghost_On( targ );
@@ -1310,7 +1313,7 @@ static void AM_Teleport( gentity_t *ent ) {
 				tm = FindTelemark( cleanedInput );
 				if ( tm ) {
 					G_LogPrintf( level.log.admin, "\t%s teleporting %s to named telemark \"%s\"\n",
-						ent ? G_PrintClient(ent - g_entities) : "Console", G_PrintClient( targetClient1 ), tm->name );
+						ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( targetClient1 ), tm->name );
 					TeleportPlayer( &g_entities[targetClient1], &tm->position, ent ? &ent->client->ps.viewangles : &g_entities[targetClient1].client->ps.viewangles );
 					AM_DrawString(ADMIN_STRING_TELE, &g_entities[targetClient1], NULL);
 					return;
@@ -1342,7 +1345,7 @@ static void AM_Teleport( gentity_t *ent ) {
 					VectorCopy( &tr.endpos, &telePos );
 				}
 
-				G_LogPrintf( level.log.admin, "\t%s teleporting %s to %s\n", ent ? G_PrintClient(ent - g_entities) : "Console",
+				G_LogPrintf( level.log.admin, "\t%s teleporting %s to %s\n", ent ? G_PrintClient(ent - g_entities) : "Server",
 					G_PrintClient( targetClient1 ), G_PrintClient( targetClient2 ) );
 				TeleportPlayer( &g_entities[targetClient1], &telePos, &g_entities[targetClient1].client->ps.viewangles );
 				AM_DrawString(ADMIN_STRING_TELE, &g_entities[targetClient1], NULL);
@@ -1387,7 +1390,7 @@ static void AM_Teleport( gentity_t *ent ) {
 			trap->Argv( 4, argZ, sizeof(argZ) );
 
 			VectorCopy( tv( atoi( argX ), atoi( argY ), atoi( argZ ) ), &telePos );
-			G_LogPrintf( level.log.admin, "\t%s teleporting %s to %s\n", ent ? G_PrintClient(ent - g_entities) : "Console",
+			G_LogPrintf( level.log.admin, "\t%s teleporting %s to %s\n", ent ? G_PrintClient(ent - g_entities) : "Server",
 				G_PrintClient( targetClient ), vtos( &telePos ) );
 
 			// amtele c x y z r
@@ -1714,7 +1717,7 @@ static void AM_Protect( gentity_t *ent ) {
 
 	// can protect: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof(arg1) );
-	targetClient = (trap->Argc() > 1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT ) : ent - g_entities;
+	targetClient = (!ent || trap->Argc() > 1) ? G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT ) : ent - g_entities;
 
 	if ( targetClient == -1 ) {
 		return;
@@ -1807,12 +1810,7 @@ static void AM_Empower( gentity_t *ent ) {
 
 	// can empower: self, partial name, clientNum
 	trap->Argv( 1, arg1, sizeof(arg1) );
-	if (ent) {
-		targetClient = (trap->Argc() > 1) ? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT) : ent - g_entities;
-	}
-	else {
-		targetClient = (trap->Argc() > 1) ? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT) : -1;
-	}
+	targetClient = (!ent || trap->Argc() > 1) ? G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT) : ent - g_entities;
 
 	if ( targetClient == -1 ) {
 		return;
@@ -3237,7 +3235,7 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 	}
 
 	level.lockedTeams[team] = qfalse;
-	G_LogPrintf( level.log.admin, "\t%s unlocked \"%s\" team\n", G_PrintClient( ent-g_entities ), arg1 );
+	G_LogPrintf( level.log.admin, "\t%s unlocked \"%s\" team\n", ent ? G_PrintClient( ent - g_entities ) : "Server", arg1 );
 	if (ent) {
 		trap->SendServerCommand(-1, va("print \"%s " S_COLOR_WHITE "team has been unlocked\n\"", TeamName(team)));
 	}
@@ -3374,32 +3372,39 @@ static void AM_Give(gentity_t *ent){
 }
 
 void AM_MindTrick(gentity_t *ent){
-	gentity_t *target = NULL;
-	int client = -1;
+	if ( trap->Argc() < 2 ) {
+		AM_ConsolePrint( ent, "Syntax: \\ammindtrick <client> \n" );
+		return;
+	}
+
 	char arg1[64] = {};
+	trap->Argv( 1, arg1, sizeof(arg1) );
 
-	if (trap->Argc() < 2) {
-		AM_ConsolePrint(ent, "Syntax: \\ammindtrick <client> \n");
+	int client = G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT );
+	if ( client == -1 ) {
+		AM_ConsolePrint( ent, "no clients found\n" );
+		return;
+	}
+	const gentity_t *target = &g_entities[client];
+	if ( !G_IsValidEntity( target ) ) {
+		return;
+	}
+	if ( !AM_CanInflict( ent, target ) ) {
 		return;
 	}
 
-	trap->Argv(1, arg1, sizeof(arg1));
+	gentity_t *e = g_entities;
+	for ( int i = 0; i < level.maxclients; i++, e++ ) {
+		if ( !G_IsValidEntity( e, false ) ) {
+			continue;
+		}
 
-	client = G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT);
-	if (client == -1) {
-		return;
-	}
-	target = &g_entities[client];
-
-	if (!target) return;
-	if (!AM_CanInflict(ent, target)) return;
-
-	for (int i = 0;i < MAX_CLIENTS; i++){
-		gentity_t *e = &g_entities[i];
-		if (e && e != target){
-			Q_AddToBitflags(e->client->ps.fd.forceMindtrickTargetIndex, target->s.number, 16);
+		if ( e != target ) {
+			Q_AddToBitflags( e->client->ps.fd.forceMindtrickTargetIndex, target->s.number, 16 );
 		}
 	}
+
+	//TODO: AM_DrawString
 }
 
 static void AM_NoTarget( gentity_t *ent ) {
@@ -3434,7 +3439,7 @@ static void AM_NoTarget( gentity_t *ent ) {
 
 	if ( targ->flags & FL_NOTARGET ) {
 		G_LogPrintf( level.log.admin, "\t%s disabling notarget for %s\n",
-			ent ? G_PrintClient( ent - g_entities ) : "Console", G_PrintClient( targetClient )
+			ent ? G_PrintClient( ent - g_entities ) : "Server", G_PrintClient( targetClient )
 		);
 
 		targ->flags &= ~FL_NOTARGET;
@@ -3443,7 +3448,7 @@ static void AM_NoTarget( gentity_t *ent ) {
 	}
 	else {
 		G_LogPrintf( level.log.admin, "\t%s enabling notarget for %s\n",
-			ent ? G_PrintClient( ent - g_entities ) : "Console", G_PrintClient( targetClient )
+			ent ? G_PrintClient( ent - g_entities ) : "Server", G_PrintClient( targetClient )
 		);
 
 		targ->flags |= FL_NOTARGET;
@@ -3453,11 +3458,11 @@ static void AM_NoTarget( gentity_t *ent ) {
 	trap->LinkEntity( (sharedEntity_t *)targ );
 }
 
-typedef struct adminCommand_s {
+struct adminCommand_t {
 	const char *cmd;
-	uint64_t privilege;		//Since we've got 64 bitfields we want to use them, right?
-	void( *func )(gentity_t *ent);
-} adminCommand_t;
+	uint64_t privilege; // required privilege flag
+	void (*func)( gentity_t *ent );
+};
 
 static const adminCommand_t adminCommands[] = {
 	// these must be in alphabetical order for the binary search to work
@@ -3598,7 +3603,7 @@ void AM_PrintCommands( gentity_t *ent, printBufferSession_t *pb ) {
 		if ( AM_HasPrivilege( ent, command->privilege ) ) {
 			const char *tmpMsg = va( " ^%c%s", (++toggle & 1 ? COLOR_GREEN : COLOR_YELLOW), command->cmd );
 
-			//newline if we reach limit
+			// newline if we reach limit
 			if ( count >= limit ) {
 				tmpMsg = va( "\n   %s", tmpMsg );
 				count = 0;
