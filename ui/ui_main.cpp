@@ -5755,6 +5755,10 @@ static void UI_RunMenuScript( char **args ) {
 			UI_ClampMaxPlayers();
 		}
 		else if ( !Q_stricmp( name, "sendModSayMsg" ) ) {
+			if ( ui_modSayText.string[0] == '\0' ) {
+				trap->Print( "error: no message to send\n" );
+				return;
+			}
 			switch ( ui_modSay.integer ) {
 				case 0: {
 					// clansay
