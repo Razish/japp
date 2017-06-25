@@ -40,7 +40,7 @@ for prefix,pak in pairs( paks ) do
 		local filelist = ''
 		for _,file in pairs( files ) do
 			if lfs.touch( file ) == nil then
-				error( 'Missing file ' .. file )
+				print( 'Missing file: ' .. file )
 			else
 				filelist = filelist .. ' ' .. file -- append file name
 			end
@@ -55,11 +55,13 @@ for prefix,pak in pairs( paks ) do
 			os.remove( outname )
 		end
 
-		print( 'creating "' .. outname .. '"' )
-		if linux then
-			os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >/dev/null 2>&1' )
-		else
-			os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >nul 2>&1' )
+		if #filelist ~= 0 then
+			print( 'creating "' .. outname .. '"' )
+			if linux then
+				os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >/dev/null 2>&1' )
+			else
+				os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >nul 2>&1' )
+			end
 		end
 	end
 end
