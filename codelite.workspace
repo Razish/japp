@@ -31,7 +31,7 @@
       <Project Name="Client" ConfigName="Optimised Debug"/>
       <Project Name="Server" ConfigName="Optimised Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Optimised Debug-32" Selected="yes">
+    <WorkspaceConfiguration Name="Optimised Debug-32" Selected="no">
       <Environment/>
       <Project Name="Client" ConfigName="Optimised Debug-32"/>
       <Project Name="Server" ConfigName="Optimised Debug-32"/>
