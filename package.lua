@@ -5,6 +5,7 @@
 	Requires lua 5.1, lua-filesystem, 7zip
 --]]
 
+-- luacheck: globals lfs
 require "lfs" -- lua filesystem
 
 if lfs == nil then
@@ -16,7 +17,7 @@ local bits = (arg[1] == '64bit') and 64 or 32
 local extension = linux and '.zip' or '.pk3'
 local suffix = (linux and 'linux' or 'win') .. tostring( bits )
 local libExt = linux and '.so' or '.dll'
-local arch = ''
+local arch
 if linux then
 	arch = (bits == 32) and 'i386' or 'x86_64'
 else
@@ -25,7 +26,10 @@ end
 
 local paks = {
 	['cl'] = {
-		['bins'] = { 'cgame' .. arch .. libExt, 'ui' .. arch .. libExt },
+		['bins'] = {
+			'cgame' .. arch .. libExt,
+			'ui' .. arch .. libExt,
+		},
 		-- pdb for windows?
 	},
 
@@ -57,7 +61,7 @@ for prefix,pak in pairs( paks ) do
 
 		if #filelist ~= 0 then
 			print( 'creating "' .. outname .. '"' )
-			if linux then
+			if linux ~= false then
 				os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >/dev/null 2>&1' )
 			else
 				os.execute( '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' >nul 2>&1' )

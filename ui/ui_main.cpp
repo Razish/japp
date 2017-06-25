@@ -1560,7 +1560,8 @@ qboolean UI_TrueJediEnabled( void ) {
 	disabledForce = atoi( Info_ValueForKey( info, "g_forcePowerDisable" ) );
 	allForceDisabled = UI_AllForceDisabled( disabledForce );
 	gametype = atoi( Info_ValueForKey( info, "g_gametype" ) );
-	assert( gametype == ui_gameType.integer );
+	//JAPPFIXME: discover why this assertion isn't true on listen server
+	//assert( gametype == ui_gameType.integer );
 	saberOnly = BG_HasSetSaberOnly( info );
 
 	if ( gametype == GT_HOLOCRON
@@ -7737,23 +7738,18 @@ static void UI_BuildQ3Model_List( void ) {
 
 				uiInfo.q3HeadIcons[uiInfo.q3HeadCount] = 0;//trap->R_RegisterShaderNoMip(fpath);
 				{
-					char iconNameFromSkinName[256];
-					int i = 0;
-					int skinPlace;
-
-					i = strlen( uiInfo.q3HeadNames[uiInfo.q3HeadCount] );
-
-					while ( uiInfo.q3HeadNames[uiInfo.q3HeadCount][i] != '/' )
+					int i = strlen( uiInfo.q3HeadNames[uiInfo.q3HeadCount] );
+					while ( uiInfo.q3HeadNames[uiInfo.q3HeadCount][i] != '/' ) {
 						i--;
-
+					}
 					i++;
-					skinPlace = i; //remember that this is where the skin name begins
+					int skinPlace = i; //remember that this is where the skin name begins
 
 					//now, build a full path out of what's in q3HeadNames, into iconNameFromSkinName
+					char iconNameFromSkinName[256];
 					Com_sprintf( iconNameFromSkinName, sizeof(iconNameFromSkinName), "models/players/%s", uiInfo.q3HeadNames[uiInfo.q3HeadCount] );
 
 					i = strlen( iconNameFromSkinName );
-
 					while ( iconNameFromSkinName[i] != '/' )
 						i--;
 
@@ -7763,7 +7759,6 @@ static void UI_BuildQ3Model_List( void ) {
 
 					//and now, for the final step, append the skin name from q3HeadNames onto the end of iconNameFromSkinName
 					i = strlen( iconNameFromSkinName );
-
 					while ( uiInfo.q3HeadNames[uiInfo.q3HeadCount][skinPlace] ) {
 						iconNameFromSkinName[i] = uiInfo.q3HeadNames[uiInfo.q3HeadCount][skinPlace];
 						i++;
@@ -7773,8 +7768,9 @@ static void UI_BuildQ3Model_List( void ) {
 
 					//and now we are ready to register (thankfully this will only happen once)
 					uiInfo.q3HeadIcons[uiInfo.q3HeadCount] = trap->R_RegisterShaderNoMip( iconNameFromSkinName );
-					if ( !uiInfo.q3HeadIcons[uiInfo.q3HeadCount] )
-						uiInfo.q3HeadIcons[uiInfo.q3HeadCount] = trap->R_RegisterShaderNoMip( "gfx/2d/defer.tga" );
+					if ( !uiInfo.q3HeadIcons[uiInfo.q3HeadCount] ) {
+						uiInfo.q3HeadIcons[uiInfo.q3HeadCount] = trap->R_RegisterShaderNoMip( "gfx/menus/missing_skin" );
+					}
 				}
 				uiInfo.q3HeadCount++;
 				//rww - we are now registering them as they are drawn like the TA feeder, so as to decrease UI load time.
@@ -7785,7 +7781,6 @@ static void UI_BuildQ3Model_List( void ) {
 			}
 		}
 	}
-
 }
 
 void UI_SiegeInit( void ) {

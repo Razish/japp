@@ -964,6 +964,7 @@ bool			G_PlayersDuelingEachother( const gentity_t *e1, const gentity_t *e2 );
 void			G_PowerDuelCount( int *loners, int *doubles, qboolean countSpec );
 void			G_PrecacheDispensers( void );
 gentity_t *		G_PreDefSound( vector3 *org, int pdSound );
+const char *	G_PrintClient( gentity_t *ent );
 const char *	G_PrintClient( int clientNum );
 void			G_PrintCommands( gentity_t *ent, printBufferSession_t *pb );
 qboolean		G_RadiusDamage( vector3 *origin, gentity_t *attacker, float damage, float radius, gentity_t *ignore,

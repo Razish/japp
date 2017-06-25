@@ -1696,17 +1696,20 @@ int G_ClientFromString( const gentity_t *ent, const char *match, uint32_t flags 
 
 // trace from eyes using unlagged
 trace_t *G_RealTrace( gentity_t *ent, float dist ) {
+	//TODO: cyclic buffer
 	static trace_t tr;
-	vector3	start, end;
 
-	if ( japp_unlagged.integer )
+	if ( japp_unlagged.integer ) {
 		G_TimeShiftAllClients( ent->client->pers.cmd.serverTime, ent );
+	}
 
 	//Get start
+	vector3	start;
 	VectorCopy( &ent->client->ps.origin, &start );
 	start.z += ent->client->ps.viewheight; //36.0f;
 
 	//Get end
+	vector3 end;
 	AngleVectors( &ent->client->ps.viewangles, &end, NULL, NULL );
 	VectorMA( &start, (dist > 0.0f) ? dist : 16384.0f, &end, &end );
 
@@ -1735,9 +1738,17 @@ const char *G_PrintClient( int clientNum ) {
 	return out;
 }
 
-const char *G_PrintClient(gentity_t *ent) {
-	if (!ent) return "Server";
-	return G_PrintClient(ent - g_entities);
+const char *G_PrintClient( gentity_t *ent ) {
+	if ( !ent ) {
+		return "Server";
+	}
+	const ptrdiff_t index = ent - g_entities;
+	if ( index < 0 || index >= level.maxclients ) {
+		// should never happen
+		return "Unknown";
+	}
+
+	return G_PrintClient( ent - g_entities );
 }
 
 void G_Announce( const char *msg ) {
@@ -1899,47 +1910,10 @@ bool G_CheckDuelIsolationSkip( const gentity_t *e1, const gentity_t *e2 ) {
 	return true;
 }
 
-ammo_t G_AmmoForWeapon(weapon_t weapon){
-	
-	switch(weapon){
-		case WP_NONE:
-			return AMMO_NONE;
-		case WP_STUN_BATON:
-			return AMMO_NONE;
-		case WP_MELEE:
-			return AMMO_NONE;
-		case WP_SABER:
-			return AMMO_NONE;
-		case WP_BRYAR_PISTOL:
-			return AMMO_BLASTER;
-		case WP_BLASTER:
-			return AMMO_BLASTER;
-		case WP_DISRUPTOR:
-			return AMMO_POWERCELL;
-		case WP_BOWCASTER:
-			return AMMO_POWERCELL;
-		case WP_REPEATER:
-			return AMMO_METAL_BOLTS;
-		case WP_DEMP2:
-			return AMMO_POWERCELL;
-		case WP_FLECHETTE:
-			return AMMO_METAL_BOLTS;
-		case WP_ROCKET_LAUNCHER:
-			return AMMO_ROCKETS;
-		case WP_THERMAL:
-			return AMMO_THERMAL;
-		case WP_TRIP_MINE:
-			return AMMO_TRIPMINE;
-		case WP_DET_PACK:
-			return AMMO_DETPACK;
-		case WP_CONCUSSION:
-			return AMMO_METAL_BOLTS;
-		case WP_BRYAR_OLD:
-			return AMMO_BLASTER;
-		case WP_EMPLACED_GUN:
-		case WP_TURRET:
-		case WP_NUM_WEAPONS:
-		default:
-			return AMMO_NONE;
-	}	
+ammo_t G_AmmoForWeapon( weapon_t weapon ) {
+	if ( weapon < WP_NONE || weapon >= WP_NUM_WEAPONS ) {
+		return AMMO_NONE;
+	}
+
+	return weaponData[weapon].ammoIndex;
 }

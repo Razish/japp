@@ -1631,11 +1631,11 @@ void G_LogPrintf( fileHandle_t fileHandle, const char *fmt, ... ) {
 	Q_vsnprintf( string + len, sizeof(string)-len, fmt, argptr );
 	va_end( argptr );
 
-	if ( dedicated.integer )
-		trap->Print( "%s", string + len );
+	trap->Print( "%s", string + len );
 
-	if ( !fileHandle )
+	if ( !fileHandle ) {
 		return;
+	}
 
 	trap->FS_Write( string, strlen( string ), fileHandle );
 }

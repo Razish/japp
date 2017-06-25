@@ -974,7 +974,7 @@ static void AM_Login( gentity_t *ent ) {
 		char *sendMsg = NULL;
 
 		AM_SetLoginEffect(ent);
-		G_LogPrintf( level.log.admin, "[LOGIN] \"%s\", %s\n", argUser, G_PrintClient( ent-g_entities ) );
+		G_LogPrintf( level.log.admin, "[LOGIN] \"%s\", %s\n", argUser, G_PrintClient( ent ) );
 		if (!VALIDSTRING(loginMsg)) {
 			trap->SendServerCommand(ent - g_entities, "print \"You have logged in\n\"");
 			return;
@@ -985,8 +985,7 @@ static void AM_Login( gentity_t *ent ) {
 		free( sendMsg );
 	}
 	else {
-		G_LogPrintf( level.log.admin, "[FAILED-LOGIN] Failed attempt from %s, \"amlogin %s %s\"\n",
-			G_PrintClient( ent-g_entities ), argUser, argPass );
+		G_LogPrintf( level.log.admin, "[FAILED-LOGIN] Failed attempt from %s, \"amlogin %s %s\"\n", G_PrintClient( ent ), argUser, argPass );
 		trap->SendServerCommand( ent - g_entities, "print \"Invalid login\n\"" );
 	}
 }
@@ -996,8 +995,7 @@ static void AM_Logout( gentity_t *ent ) {
 	if ( !ent ) {
 		return;
 	}
-	G_LogPrintf( level.log.admin, "[LOGOUT] \"%s\", %s\n", ent->client->pers.adminUser->user,
-		G_PrintClient( ent-g_entities ) );
+	G_LogPrintf( level.log.admin, "[LOGOUT] \"%s\", %s\n", ent->client->pers.adminUser->user, G_PrintClient( ent ) );
 	ent->client->pers.adminUser = NULL;
 	trap->SendServerCommand( ent - g_entities, "print \"You have logged out\n\"" );
 }
@@ -1107,7 +1105,7 @@ static void AM_Announce( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof(arg1) );
 	if ( arg1[0] == '-' && arg1[1] == '1' ) {
 		// announce to everyone
-		G_LogPrintf( level.log.admin, "\t%s to <all clients>, %s\n", ent ? G_PrintClient(ent - g_entities) : "Server", msg );
+		G_LogPrintf( level.log.admin, "\t%s to <all clients>, %s\n", G_PrintClient( ent ), msg );
 		G_Announce( msg );
 		if (ent) {
 			trap->SendServerCommand(-1, va("print \"%s\n\"", msg));
@@ -1121,8 +1119,7 @@ static void AM_Announce( gentity_t *ent ) {
 			return;
 		}
 
-		G_LogPrintf( level.log.admin, "\t%s to %s, %s\n", ent ? G_PrintClient( ent-g_entities ) : "Server",
-			G_PrintClient( targetClient ), msg );
+		G_LogPrintf( level.log.admin, "\t%s to %s, %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ), msg );
 		trap->SendServerCommand( targetClient, va( "cp \"%s\"", msg ) );
 		trap->SendServerCommand( targetClient, va( "print \"%s\n\"", msg ) );
 		if (ent) {
@@ -1185,9 +1182,7 @@ static void AM_Ghost( gentity_t *ent ) {
 	}
 
 	if ( targ->client->pers.adminData.isGhost ) {
-		G_LogPrintf( level.log.admin, "\t%s unghosting %s\n",
-			ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( targetClient )
-		);
+		G_LogPrintf( level.log.admin, "\t%s unghosting %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 
 		Ghost_Off( targ );
 
@@ -1195,9 +1190,7 @@ static void AM_Ghost( gentity_t *ent ) {
 		AM_DrawString( ADMIN_STRING_UNGHOSTED, targ, NULL );
 	}
 	else {
-		G_LogPrintf( level.log.admin, "\t%s ghosting %s\n",
-			ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( targetClient )
-		);
+		G_LogPrintf( level.log.admin, "\t%s ghosting %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 
 		Ghost_On( targ );
 
@@ -1215,8 +1208,7 @@ static void AM_Clip( gentity_t *ent ) {
 	}
 
 	ent->client->noclip = !ent->client->noclip;
-	G_LogPrintf( level.log.admin, "\tturning %s for %s\n", ent->client->noclip ? "on" : "off",
-		G_PrintClient( ent-g_entities ) );
+	G_LogPrintf( level.log.admin, "\tturning %s for %s\n", ent->client->noclip ? "on" : "off", G_PrintClient( ent  ) );
 	AM_ConsolePrint( ent, va( "Noclip %s\n", ent->client->noclip ? S_COLOR_GREEN "on" : S_COLOR_RED "off" ) );
 }
 
@@ -1227,22 +1219,23 @@ static void AM_Teleport( gentity_t *ent ) {
 		return;
 	}
 
-	//No args means we teleport ourself to our last marked coordinates
+	//TODO: validate that target entities are not spectators etc
+
+	// no args means we teleport ourself to our last marked coordinates
 	if ( trap->Argc() == 1 && ent && ent->client->pers.adminData.telemark ) {
-		G_LogPrintf( level.log.admin, "\t%s teleporting self to last telemark\n", G_PrintClient( ent-g_entities ) );
+		G_LogPrintf( level.log.admin, "\t%s teleporting self to last telemark\n", G_PrintClient( ent ) );
 		TeleportPlayer( ent, &ent->client->pers.adminData.telemark->position, &ent->client->ps.viewangles );
 	}
 
 	// 1 arg means we're teleporting ourself to x (self -> client, self -> namedTelePos)
 	else if ( trap->Argc() == 2 && ent ) {
 		char arg1[64] = {};
-		int targetClient;
 
 		trap->Argv( 1, arg1, sizeof(arg1) );
-		targetClient = G_ClientFromString( ent, arg1, FINDCL_SUBSTR );
+		const int targetClientNum = G_ClientFromString( ent, arg1, FINDCL_SUBSTR );
 
 		// no client with this name, check for named teleport
-		if ( targetClient == -1 ) {
+		if ( targetClientNum == -1 ) {
 			char cleanedInput[MAX_TELEMARK_NAME_LEN];
 			telemark_t *tm = NULL;
 
@@ -1251,8 +1244,7 @@ static void AM_Teleport( gentity_t *ent ) {
 
 			tm = FindTelemark( cleanedInput );
 			if ( tm ) {
-				G_LogPrintf( level.log.admin, "\t%s teleporting self to named telemark \"%s\"\n",
-					G_PrintClient( ent-g_entities ), tm->name );
+				G_LogPrintf( level.log.admin, "\t%s teleporting self to named telemark \"%s\"\n", G_PrintClient( ent ), tm->name );
 				TeleportPlayer( ent, &tm->position, &ent->client->ps.viewangles );
 				AM_DrawString(ADMIN_STRING_TELE, ent, NULL);
 				return;
@@ -1261,17 +1253,17 @@ static void AM_Teleport( gentity_t *ent ) {
 			AM_ConsolePrint( ent, "AM_Teleport: Assumed telemark but found no matching telemark\n" );
 		}
 		// must be teleporting self -> client
-		else if ( g_entities[targetClient].inuse ) {
+		else if ( g_entities[targetClientNum].inuse ) {
 			vector3 targetPos, telePos, angles;
 			trace_t tr;
 
-			VectorCopy( &level.clients[targetClient].ps.origin, &targetPos );
-			VectorCopy( &level.clients[targetClient].ps.viewangles, &angles );
+			VectorCopy( &level.clients[targetClientNum].ps.origin, &targetPos );
+			VectorCopy( &level.clients[targetClientNum].ps.viewangles, &angles );
 			angles.pitch = angles.roll = 0.0f;
 			AngleVectors( &angles, &angles, NULL, NULL );
 
 			VectorMA( &targetPos, 64.0f, &angles, &telePos );
-			trap->Trace( &tr, &targetPos, NULL, NULL, &telePos, targetClient, CONTENTS_SOLID, qfalse, 0, 0 );
+			trap->Trace( &tr, &targetPos, NULL, NULL, &telePos, targetClientNum, CONTENTS_SOLID, qfalse, 0, 0 );
 			if ( tr.fraction < 1.0f ) {
 				VectorMA( &tr.endpos, 32.0f, &tr.plane.normal, &telePos );
 			}
@@ -1279,8 +1271,7 @@ static void AM_Teleport( gentity_t *ent ) {
 				VectorCopy( &tr.endpos, &telePos );
 			}
 
-			G_LogPrintf( level.log.admin, "\t%s teleporting to %s\n", G_PrintClient( ent-g_entities ),
-				G_PrintClient( targetClient ) );
+			G_LogPrintf( level.log.admin, "\t%s teleporting to %s\n", G_PrintClient( ent ), G_PrintClient( targetClientNum ) );
 			TeleportPlayer( ent, &telePos, &ent->client->ps.viewangles );
 			AM_DrawString(ADMIN_STRING_TELE, ent, NULL);
 		}
@@ -1289,21 +1280,21 @@ static void AM_Teleport( gentity_t *ent ) {
 	// 2 args mean we're teleporting x to y (client -> client, client -> telemark)
 	else if ( trap->Argc() == 3 ) {
 		char arg1[64] = {}, arg2[64] = {};
-		int targetClient1, targetClient2;
 
 		trap->Argv( 1, arg1, sizeof(arg1) );
-		targetClient1 = G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT );
+		const int targetClient1Num = G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT );
 		trap->Argv( 2, arg2, sizeof(arg2) );
-		targetClient2 = G_ClientFromString( ent, arg2, FINDCL_SUBSTR | FINDCL_PRINT );
+		const int targetClient2Num = G_ClientFromString( ent, arg2, FINDCL_SUBSTR | FINDCL_PRINT );
 
 		// first arg is a valid client, attempt to find destination
-		if ( targetClient1 != -1 ) {
+		if ( targetClient1Num != -1 ) {
+			gentity_t *targetClient1 = &g_entities[targetClient1Num];
 			// no client with this name - check for telemark
-			if ( targetClient2 == -1 ) {
+			if ( targetClient2Num == -1 ) {
 				char cleanedInput[MAX_TELEMARK_NAME_LEN] = {};
 				telemark_t *tm = NULL;
 
-				if ( !AM_CanInflict( ent, &g_entities[targetClient1] ) ) {
+				if ( !AM_CanInflict( ent, targetClient1 ) ) {
 					return;
 				}
 
@@ -1312,10 +1303,12 @@ static void AM_Teleport( gentity_t *ent ) {
 
 				tm = FindTelemark( cleanedInput );
 				if ( tm ) {
-					G_LogPrintf( level.log.admin, "\t%s teleporting %s to named telemark \"%s\"\n",
-						ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( targetClient1 ), tm->name );
-					TeleportPlayer( &g_entities[targetClient1], &tm->position, ent ? &ent->client->ps.viewangles : &g_entities[targetClient1].client->ps.viewangles );
-					AM_DrawString(ADMIN_STRING_TELE, &g_entities[targetClient1], NULL);
+					G_LogPrintf( level.log.admin,
+						"\t%s teleporting %s to named telemark \"%s\"\n",
+						G_PrintClient( ent ), G_PrintClient( targetClient1Num ), tm->name
+					);
+					TeleportPlayer( targetClient1, &tm->position, ent ? &ent->client->ps.viewangles : &targetClient1->client->ps.viewangles );
+					AM_DrawString(ADMIN_STRING_TELE, targetClient1, NULL);
 					return;
 				}
 
@@ -1324,20 +1317,21 @@ static void AM_Teleport( gentity_t *ent ) {
 
 			// must be teleporting client -> client
 			else {
-				vector3 targetPos, telePos, angles;
-				trace_t tr;
-
-				if ( !AM_CanInflict( ent, &g_entities[targetClient1] ) ) {
+				if ( !AM_CanInflict( ent, targetClient1 ) ) {
 					return;
 				}
 
-				VectorCopy( &level.clients[targetClient2].ps.origin, &targetPos );
-				VectorCopy( &level.clients[targetClient2].ps.viewangles, &angles );
+				gentity_t *targetClient2 = &g_entities[targetClient2Num];
+
+				vector3 targetPos, telePos, angles;
+				VectorCopy( &level.clients[targetClient2Num].ps.origin, &targetPos );
+				VectorCopy( &level.clients[targetClient2Num].ps.viewangles, &angles );
 				angles.pitch = angles.roll = 0.0f;
 				AngleVectors( &angles, &angles, NULL, NULL );
 
 				VectorMA( &targetPos, 64.0f, &angles, &telePos );
-				trap->Trace( &tr, &targetPos, NULL, NULL, &telePos, targetClient2, CONTENTS_SOLID, qfalse, 0, 0 );
+				trace_t tr;
+				trap->Trace( &tr, &targetPos, NULL, NULL, &telePos, targetClient2Num, CONTENTS_SOLID, qfalse, 0, 0 );
 				if ( tr.fraction < 1.0f ) {
 					VectorMA( &tr.endpos, 32.0f, &tr.plane.normal, &telePos );
 				}
@@ -1345,10 +1339,12 @@ static void AM_Teleport( gentity_t *ent ) {
 					VectorCopy( &tr.endpos, &telePos );
 				}
 
-				G_LogPrintf( level.log.admin, "\t%s teleporting %s to %s\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-					G_PrintClient( targetClient1 ), G_PrintClient( targetClient2 ) );
-				TeleportPlayer( &g_entities[targetClient1], &telePos, &g_entities[targetClient1].client->ps.viewangles );
-				AM_DrawString(ADMIN_STRING_TELE, &g_entities[targetClient1], NULL);
+				G_LogPrintf( level.log.admin,
+					"\t%s teleporting %s to %s\n",
+					G_PrintClient( ent ), G_PrintClient( targetClient1 ), G_PrintClient( targetClient2 )
+				);
+				TeleportPlayer( &g_entities[targetClient1Num], &telePos, &g_entities[targetClient1Num].client->ps.viewangles );
+				AM_DrawString(ADMIN_STRING_TELE, &g_entities[targetClient1Num], NULL);
 			}
 		}
 	}
@@ -1363,7 +1359,7 @@ static void AM_Teleport( gentity_t *ent ) {
 		trap->Argv( 3, argZ, sizeof( argZ ) );
 
 		VectorSet( &telePos, atoff( argX ), atof( argY ), atof( argZ ) );
-		G_LogPrintf( level.log.admin, "\t%s teleporting to %s\n", G_PrintClient( ent-g_entities ), vtos( &telePos ) );
+		G_LogPrintf( level.log.admin, "\t%s teleporting to %s\n", G_PrintClient( ent ), vtos( &telePos ) );
 		TeleportPlayer( ent, &telePos, &ent->client->ps.viewangles );
 		AM_DrawString(ADMIN_STRING_TELE, ent, NULL);
 	}
@@ -1372,41 +1368,40 @@ static void AM_Teleport( gentity_t *ent ) {
 	// amtele c x y z r - tele c to x y z with r
 	else if ( trap->Argc() > 4 ) {
 		char argC[64] = {};
-		int targetClient;
 
 		trap->Argv( 1, argC, sizeof(argC) );
-		targetClient = G_ClientFromString( ent, argC, FINDCL_SUBSTR | FINDCL_PRINT );
+		const int targetClientNum = G_ClientFromString( ent, argC, FINDCL_SUBSTR | FINDCL_PRINT );
 
-		if ( targetClient != -1 ) {
-			vector3	telePos;
-			char argX[16] = {}, argY[16] = {}, argZ[16] = {};
-
-			if ( !AM_CanInflict( ent, &g_entities[targetClient] ) ) {
+		if ( targetClientNum != -1 ) {
+			if ( !AM_CanInflict( ent, &g_entities[targetClientNum] ) ) {
 				return;
 			}
 
+			gentity_t *targetClient = &g_entities[targetClientNum];
+			char argX[16] = {}, argY[16] = {}, argZ[16] = {};
 			trap->Argv( 2, argX, sizeof(argX) );
 			trap->Argv( 3, argY, sizeof(argY) );
 			trap->Argv( 4, argZ, sizeof(argZ) );
 
+			vector3	telePos;
 			VectorCopy( tv( atoi( argX ), atoi( argY ), atoi( argZ ) ), &telePos );
-			G_LogPrintf( level.log.admin, "\t%s teleporting %s to %s\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-				G_PrintClient( targetClient ), vtos( &telePos ) );
+			G_LogPrintf( level.log.admin, "\t%s teleporting %s to %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ), vtos( &telePos ) );
 
 			// amtele c x y z r
 			if ( trap->Argc() == 6 ) {
-				vector3 angles = { 0.0f };
 				char argR[8] = {};
-
 				trap->Argv( 5, argR, sizeof(argR) );
+
+				vector3 angles = { 0.0f };
 				angles.yaw = atoi( argR );
-				TeleportPlayer( &g_entities[targetClient], &telePos, &angles );
-				AM_DrawString(ADMIN_STRING_TELE, &g_entities[targetClient], NULL);
+
+				TeleportPlayer( targetClient, &telePos, &angles );
+				AM_DrawString(ADMIN_STRING_TELE, targetClient, NULL);
 			}
 			// amtele c x y z
 			else {
-				TeleportPlayer( &g_entities[targetClient], &telePos, &g_entities[targetClient].client->ps.viewangles );
-				AM_DrawString(ADMIN_STRING_TELE, &g_entities[targetClient], NULL);
+				TeleportPlayer( targetClient, &telePos, &g_entities[targetClientNum].client->ps.viewangles );
+				AM_DrawString(ADMIN_STRING_TELE, targetClient, NULL);
 			}
 		}
 	}
@@ -1414,16 +1409,15 @@ static void AM_Teleport( gentity_t *ent ) {
 
 // teleport self to targeted position
 static void AM_GunTeleport( gentity_t *ent ) {
-	trace_t *tr;
-	vector3 telepos;
-
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
 		return;
 	}
 
-	tr = G_RealTrace( ent, 0.0f );
+	trace_t *tr = G_RealTrace( ent, 0.0f );
+
 	// don't get stuck in walls
+	vector3 telepos;
 	VectorMA( &tr->endpos, 48.0f, &tr->plane.normal, &telepos );
 	TeleportPlayer( ent, &telepos, &ent->client->ps.viewangles );
 	AM_DrawString(ADMIN_STRING_TELE, ent, NULL);
@@ -1431,17 +1425,14 @@ static void AM_GunTeleport( gentity_t *ent ) {
 
 // teleport targeted client to self
 static void AM_GunTeleportRev( gentity_t *ent ) {
-	trace_t	*tr;
-	vector3	angles, telepos;
-
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
 		return;
 	}
 
-	tr = G_RealTrace( ent, 0.0f );
-
+	trace_t	*tr = G_RealTrace( ent, 0.0f );
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
+		vector3	angles, telepos;
 		AngleVectors( &ent->client->ps.viewangles, &angles, NULL, NULL );
 		VectorMA( &ent->client->ps.origin, 48.0f, &angles, &telepos );
 
@@ -1449,8 +1440,7 @@ static void AM_GunTeleportRev( gentity_t *ent ) {
 			return;
 		}
 
-		G_LogPrintf( level.log.admin, "\t%s teleporting %s to self\n", G_PrintClient( ent-g_entities ),
-			G_PrintClient( tr->entityNum ) );
+		G_LogPrintf( level.log.admin, "\t%s teleporting %s to self\n", G_PrintClient( ent ), G_PrintClient( tr->entityNum ) );
 		TeleportPlayer( &g_entities[tr->entityNum], &telepos, &level.clients[tr->entityNum].ps.viewangles );
 		AM_DrawString(ADMIN_STRING_TELE, &g_entities[tr->entityNum], NULL);
 	}
@@ -1472,7 +1462,7 @@ static void AM_Telemark( gentity_t *ent ) {
 		Com_sprintf( name, sizeof(name), "default_%s", ent->client->pers.netnameClean );
 	}
 
-	G_LogPrintf( level.log.admin, "\t%s creating telemark \"%s\"\n", G_PrintClient( ent-g_entities ), name );
+	G_LogPrintf( level.log.admin, "\t%s creating telemark \"%s\"\n", G_PrintClient( ent ), name );
 	ent->client->pers.adminData.telemark = AM_AddTelemark( name, &ent->client->ps.origin, ent );
 }
 
@@ -1516,8 +1506,7 @@ static void AM_RemoveTelemark( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof(arg1) );
 	Q_CleanString( arg1, STRIP_COLOUR );
 
-	G_LogPrintf( level.log.admin, "\t%s attempting to remove telemark \"%s\" (may not succeed)\n",
-		G_PrintClient( ent-g_entities ), arg1 );
+	G_LogPrintf( level.log.admin, "\t%s attempting to remove telemark \"%s\" (may not succeed)\n", G_PrintClient( ent ), arg1 );
 	AM_DeleteTelemark( ent, arg1 );
 }
 
@@ -1644,8 +1633,7 @@ static void AM_KillVote( gentity_t *ent ) {
 	trap->SetConfigstring( CS_VOTE_NO, "" );
 
 	trap->SendServerCommand( -1, "print \"" S_COLOR_RED "Vote has been killed!\n\"" );
-
-		G_LogPrintf( level.log.admin, "\t%s killed a vote\n", ent ? G_PrintClient( ent - g_entities ) : "Server" );
+	G_LogPrintf( level.log.admin, "\t%s killed a vote\n", G_PrintClient( ent ) );
 }
 
 // force the specified client to a specific team
@@ -1682,8 +1670,7 @@ static void AM_ForceTeam( gentity_t *ent ) {
 	}
 
 	if ( targ->inuse && targ->client && targ->client->pers.connected ) {
-		G_LogPrintf( level.log.admin, "\t%s forced %s to team %s\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-			G_PrintClient( targetClient ), arg2 );
+		G_LogPrintf( level.log.admin, "\t%s forced %s to team %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ), arg2 );
 		SetTeam( targ, arg2, qtrue );
 	}
 }
@@ -1703,8 +1690,7 @@ static void AM_GunSpectate( gentity_t *ent ) {
 		if ( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) ) {
 			return;
 		}
-		G_LogPrintf( level.log.admin, "\t%s forced %s to spectator\n", G_PrintClient( ent-g_entities ),
-			G_PrintClient( tr->entityNum ) );
+		G_LogPrintf( level.log.admin, "\t%s forced %s to spectator\n", G_PrintClient( ent ), G_PrintClient( tr->entityNum ) );
 		SetTeam( &g_entities[tr->entityNum], "s", qtrue );
 	}
 }
@@ -1732,8 +1718,10 @@ static void AM_Protect( gentity_t *ent ) {
 	targ->client->ps.eFlags ^= EF_INVULNERABLE;
 	targ->client->invulnerableTimer = !!(targ->client->ps.eFlags & EF_INVULNERABLE) ? 0x7FFFFFFF : level.time;
 
-	G_LogPrintf( level.log.admin, "\t%s %sprotected %s\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-		!!(targ->client->ps.eFlags & EF_INVULNERABLE) ? "" : "un", G_PrintClient( targetClient ) );
+	G_LogPrintf( level.log.admin,
+		"\t%s %sprotected %s\n", G_PrintClient( ent ),
+		!!(targ->client->ps.eFlags & EF_INVULNERABLE) ? "" : "un", G_PrintClient( targetClient )
+	);
 	//trap->SendServerCommand( ent - g_entities, va( "print \"%s " S_COLOR_WHITE "has been %sprotected\n\"",
 	//	targ->client->pers.netname, !!(targ->client->ps.eFlags&EF_INVULNERABLE) ? S_COLOR_GREEN : S_COLOR_RED"un" ) );
 	if (!!(targ->client->ps.eFlags&EF_INVULNERABLE))
@@ -1761,13 +1749,17 @@ static void AM_GunProtect( gentity_t *ent ) {
 		}
 
 		e->client->ps.eFlags ^= EF_INVULNERABLE;
-		G_LogPrintf( level.log.admin, "\t%s %sprotected %s\n", G_PrintClient( ent-g_entities ),
-			!!(e->client->ps.eFlags&EF_INVULNERABLE) ? "" : "un", G_PrintClient( tr->entityNum ) );
+		G_LogPrintf( level.log.admin,
+			"\t%s %sprotected %s\n", G_PrintClient( ent ),
+			!!(e->client->ps.eFlags&EF_INVULNERABLE) ? "" : "un", G_PrintClient( tr->entityNum )
+		);
 
-		if (!!(e->client->ps.eFlags&EF_INVULNERABLE))
-			AM_DrawString(ADMIN_STRING_PROTECT, e, NULL);
-		else
-			AM_DrawString(ADMIN_STRING_UNPROTECTED, e, NULL);
+		if ( !!(e->client->ps.eFlags & EF_INVULNERABLE) ) {
+			AM_DrawString( ADMIN_STRING_PROTECT, e, NULL );
+		}
+		else {
+			AM_DrawString( ADMIN_STRING_UNPROTECTED, e, NULL );
+		}
 
 		e->client->invulnerableTimer = !!(e->client->ps.eFlags & EF_INVULNERABLE) ? 0x7FFFFFFF : level.time;
 	}
@@ -1825,14 +1817,12 @@ static void AM_Empower( gentity_t *ent ) {
 	targ->client->pers.adminData.empowered = !targ->client->pers.adminData.empowered;
 	if ( targ->client->pers.adminData.empowered ) {
 		Empower_On( targ );
-		G_LogPrintf( level.log.admin, "\t%s empowered %s\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-			G_PrintClient( targetClient ) );
+		G_LogPrintf( level.log.admin, "\t%s empowered %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 		AM_DrawString(ADMIN_STRING_EMPOWER, targ, NULL);
 	}
 	else {
 		Empower_Off( targ );
-		G_LogPrintf( level.log.admin, "\t%s unempowered %s\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-			G_PrintClient( targetClient ) );
+		G_LogPrintf( level.log.admin, "\t%s unempowered %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 		AM_DrawString(ADMIN_STRING_UNEMPOWER, targ, NULL);
 	}
 }
@@ -1884,7 +1874,7 @@ static void AM_Slap( gentity_t *ent ) {
 		return;
 	}
 
-	G_LogPrintf( level.log.admin, "\t%s slapped %s\n", ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( targetClient ) );
+	G_LogPrintf( level.log.admin, "\t%s slapped %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 	Slap( &g_entities[targetClient] );
 }
 
@@ -1903,8 +1893,7 @@ static void AM_GunSlap( gentity_t *ent ) {
 		if ( !AM_CanInflict( ent, &g_entities[tr->entityNum] ) ) {
 			return;
 		}
-		G_LogPrintf( level.log.admin, "\t%s slapped %s\n", G_PrintClient( ent-g_entities ),
-			G_PrintClient( tr->entityNum ) );
+		G_LogPrintf( level.log.admin, "\t%s slapped %s\n", G_PrintClient( ent ), G_PrintClient( tr->entityNum ) );
 		Slap( &g_entities[tr->entityNum] );
 	}
 }
@@ -1978,7 +1967,7 @@ static void AM_Sleep( gentity_t *ent ) {
 
 			G_SleepClient( e->client );
 		}
-		G_LogPrintf( level.log.admin, "\t%s slept everyone\n", ent ? G_PrintClient(ent - g_entities) : "Server");
+		G_LogPrintf( level.log.admin, "\t%s slept everyone\n", G_PrintClient( ent ) );
 		//trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_CYAN "slept\n\"" );
 		AM_DrawString(ADMIN_STRING_SLEEP_ALL, NULL, NULL);
 	}
@@ -1996,7 +1985,7 @@ static void AM_Sleep( gentity_t *ent ) {
 
 		G_SleepClient( e->client );
 
-		G_LogPrintf( level.log.admin, "\t%s slept %s\n", ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( clientNum ) );
+		G_LogPrintf( level.log.admin, "\t%s slept %s\n", G_PrintClient( ent ), G_PrintClient( clientNum ) );
 		//G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "slept", e->client->pers.netname ) );
 		//trap->SendServerCommand( clientNum, "cp \"You have been " S_COLOR_CYAN "slept\n\"" );
 		AM_DrawString(ADMIN_STRING_SLEEP, e, NULL);
@@ -2056,7 +2045,7 @@ static void AM_Wake( gentity_t *ent ) {
 
 			G_WakeClient( e->client );
 		}
-		G_LogPrintf( level.log.admin, "\t%s woke everyone\n", ent ? G_PrintClient(ent - g_entities) : "Server");
+		G_LogPrintf( level.log.admin, "\t%s woke everyone\n", G_PrintClient( ent ) );
 		//trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_CYAN "woken\n\"" );
 		AM_DrawString(ADMIN_STRING_WAKE_ALL, NULL, NULL);
 	}
@@ -2074,7 +2063,7 @@ static void AM_Wake( gentity_t *ent ) {
 
 		G_WakeClient( e->client );
 
-		G_LogPrintf( level.log.admin, "\t%s woke %s\n", ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( clientNum ) );
+		G_LogPrintf( level.log.admin, "\t%s woke %s\n", G_PrintClient( ent ), G_PrintClient( clientNum ) );
 		//G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "woken", e->client->pers.netname ) );
 		//trap->SendServerCommand( clientNum, "cp \"You have been " S_COLOR_CYAN "woken\n\"" );
 		AM_DrawString(ADMIN_STRING_WAKE, e, NULL);
@@ -2083,37 +2072,34 @@ static void AM_Wake( gentity_t *ent ) {
 
 // toggle the 'slept' state of the targeted client
 static void AM_GunSleep( gentity_t *ent ) {
-	trace_t	*tr;
-
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
 		return;
 	}
 
-	tr = G_RealTrace( ent, 0.0f );
-
+	trace_t	*tr = G_RealTrace( ent, 0.0f );
 	if ( tr->entityNum >= 0 && tr->entityNum < MAX_CLIENTS ) {
-		gentity_t *e = g_entities + tr->entityNum;
-		//const char *action = e->client->pers.adminData.isSlept ? "woken" : "slept";
+		gentity_t *target = g_entities + tr->entityNum;
 
-		if ( !AM_CanInflict( ent, e ) ) {
+		if ( !AM_CanInflict( ent, target ) ) {
 			return;
 		}
 
-		if ( e->client->pers.adminData.isSlept ) {
-			G_WakeClient( e->client );
+		if ( target->client->pers.adminData.isSlept ) {
+			G_WakeClient( target->client );
 		}
 		else {
-			G_SleepClient( e->client );
+			G_SleepClient( target->client );
 		}
 
-		G_LogPrintf( level.log.admin, "\t%s %s %s\n", G_PrintClient( ent-g_entities ),
-			e->client->pers.adminData.isSlept ? "slept" : "woke", G_PrintClient( tr->entityNum ) );
-		//G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "%s", e->client->pers.netname, action ) );
+		const char *verb = target->client->pers.adminData.isSlept ? "slept" : "woke";
+		G_LogPrintf( level.log.admin, "\t%s %s %s\n", G_PrintClient( ent ), verb, G_PrintClient( tr->entityNum ) );
+		//G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "%s", target->client->pers.netname, action ) );
 		//trap->SendServerCommand( tr->entityNum, va( "cp \"You have been " S_COLOR_CYAN "%s\n\"", action ) );
-		AM_DrawString(ADMIN_STRING_SLEEP, e, NULL);
+		AM_DrawString(ADMIN_STRING_SLEEP, target, NULL);
 	}
 }
+
 static void AM_GunFreeze( gentity_t *ent ) {
 	if ( !ent ) {
 		trap->Print( "This command is not available for server console use yet\n" );
@@ -2155,7 +2141,7 @@ static void AM_Silence( gentity_t *ent ) {
 
 			cl->pers.adminData.silenced = qtrue;
 		}
-		G_LogPrintf( level.log.admin, "\t%s silenced everyone\n", ent ? G_PrintClient(ent - g_entities) : "Server");
+		G_LogPrintf( level.log.admin, "\t%s silenced everyone\n", G_PrintClient( ent ) );
 		//trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_CYAN "silenced\n\"" );
 		AM_DrawString(ADMIN_STRING_SILENCE_ALL, NULL, NULL);
 		return;
@@ -2171,7 +2157,7 @@ static void AM_Silence( gentity_t *ent ) {
 	}
 
 	level.clients[targetClient].pers.adminData.silenced = qtrue;
-	G_LogPrintf( level.log.admin, "\t%s silenced %s\n", ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( targetClient ) );
+	G_LogPrintf( level.log.admin, "\t%s silenced %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 	//G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "silenced",
 	//	level.clients[targetClient].pers.netname ) );
 	//trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_CYAN "silenced\n\"" );
@@ -2205,7 +2191,7 @@ static void AM_Unsilence( gentity_t *ent ) {
 
 			level.clients[i].pers.adminData.silenced = qfalse;
 		}
-		G_LogPrintf( level.log.admin, "\t%s unsilenced everyone\n", ent ? G_PrintClient(ent - g_entities) : "Server");
+		G_LogPrintf( level.log.admin, "\t%s unsilenced everyone\n", G_PrintClient( ent ) );
 		//trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_CYAN "unsilenced\n\"" );
 		AM_DrawString(ADMIN_STRING_UNSILENCED_ALL, NULL, NULL);
 		return;
@@ -2221,8 +2207,7 @@ static void AM_Unsilence( gentity_t *ent ) {
 	}
 
 	level.clients[targetClient].pers.adminData.silenced = qfalse;
-	G_LogPrintf( level.log.admin, "\t%s unsilenced %s\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-		G_PrintClient( targetClient ) );
+	G_LogPrintf( level.log.admin, "\t%s unsilenced %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 	//G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_CYAN "un-silenced",
 	//	level.clients[targetClient].pers.netname ) );
 	//trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_CYAN "un-silenced\n\"" );
@@ -2271,7 +2256,7 @@ static void AM_Slay( gentity_t *ent ) {
 
 			Cmd_Kill_f( e );
 		}
-		G_LogPrintf( level.log.admin, "\t%s slayed everyone\n", ent ? G_PrintClient(ent - g_entities) : "Server");
+		G_LogPrintf( level.log.admin, "\t%s slayed everyone\n", G_PrintClient( ent ) );
 		//trap->SendServerCommand( -1, "cp \"You have all been " S_COLOR_RED "slain\n\"" );
 		AM_DrawString(ADMIN_STRING_SLAY_ALL, NULL, NULL);
 		return;
@@ -2297,7 +2282,7 @@ static void AM_Slay( gentity_t *ent ) {
 	if (japp_slaydismember.integer){
 		AM_Dismember(targetEnt);
 	}
-	G_LogPrintf( level.log.admin, "\t%s slayed %s\n", ent ? G_PrintClient(ent - g_entities) : "Server", G_PrintClient( targetClient ) );
+	G_LogPrintf( level.log.admin, "\t%s slayed %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 	//G_Announce( va( "%s\n" S_COLOR_WHITE "has been " S_COLOR_RED "slain", targetEnt->client->pers.netname ) );
 	//trap->SendServerCommand( targetClient, "cp \"You have been " S_COLOR_RED "slain\n\"" );
 	AM_DrawString(ADMIN_STRING_SLAY, targetEnt, NULL);
@@ -2329,8 +2314,7 @@ static void AM_Kick( gentity_t *ent ) {
 		return;
 	}
 
-	G_LogPrintf( level.log.admin, "\t%s kicked %s for \"%s\"\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-		G_PrintClient( clientNum ), reason );
+	G_LogPrintf( level.log.admin, "\t%s kicked %s for \"%s\"\n", G_PrintClient( ent ), G_PrintClient( clientNum ), reason );
 	AM_DrawString(ADMIN_STRING_KICK, NULL, reason, string); //:p messy messy messy
 	trap->DropClient( clientNum, string );
 }
@@ -2376,8 +2360,7 @@ static void AM_Ban( gentity_t *ent ) {
 			AM_ConsolePrint( ent, va( "Failed to add ban: %s\n", errorMsg ) );
 		}
 		else {
-			G_LogPrintf( level.log.admin, "\t%s banned %s for \"%s\" until \"%s\"\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-				target, reason, duration );
+			G_LogPrintf( level.log.admin, "\t%s banned %s for \"%s\" until \"%s\"\n", G_PrintClient( ent ), target, reason, duration );
 			AM_DrawString(ADMIN_STRING_BAN, NULL, reason, string); //:p messy messy messy
 			trap->DropClient( targetClient, string );
 		}
@@ -2420,8 +2403,7 @@ static void AM_BanIP( gentity_t *ent ) {
 			Q_PrintBuffer( &pb, "\n" );
 			Q_DeletePrintBuffer( &pb );
 
-			G_LogPrintf( level.log.admin, "\t%s banned IP \"%s\" for \"%s\" until \"%s\"\n",
-				ent ? G_PrintClient(ent - g_entities) : "Server", ip, reason, duration );
+			G_LogPrintf( level.log.admin, "\t%s banned IP \"%s\" for \"%s\" until \"%s\"\n", G_PrintClient( ent ), ip, reason, duration );
 		}
 	}
 }
@@ -2590,16 +2572,17 @@ static void AM_EntSpawn( gentity_t *ent ) {
 	// build the key/value pairs
 	if ( ent ) {
 		trace_t *tr = G_RealTrace( ent, 0.0f );
-		Q_strncpyz( buf, va( "origin %.0f,%.0f,%.0f classname ", tr->endpos.x, tr->endpos.y, tr->endpos.z ),
-			sizeof(buf) );
+		Com_sprintf( buf, sizeof(buf), "origin %i,%i,%i classname ", (int)tr->endpos.x, (int)tr->endpos.y, (int)tr->endpos.z );
 	}
 	else {
 		Q_strncpyz( buf, "classname ", sizeof(buf) );
 	}
 	Q_strcat( buf, sizeof(buf), ConcatArgs( 1 ) );
 
+	AM_ConsolePrint( ent, va( "spawning entity: %s\n", buf ) );
+
 	if ( ent ) {
-		G_LogPrintf( level.log.admin, "\t%s spawned \"%s\"\n", G_PrintClient( ent - g_entities ), buf );
+		G_LogPrintf( level.log.admin, "\t%s spawned \"%s\"\n", G_PrintClient( ent ), buf );
 	}
 
 	level.manualSpawning = qtrue;
@@ -2649,8 +2632,7 @@ static void AM_EntList( gentity_t *ent ) {
 		else {
 			const float distance = ent ? Distance( &ent->s.origin, &e->s.origin ) : 1337.0f;
 			const char *classname = (e->classname && e->classname[0]) ? e->classname : "Unknown";
-			Q_PrintBuffer( &pb, va( "%4i: %s, type: %i, distance: %.0f, coords: %s\n", i, classname, e->s.eType,
-				distance, vtos( &e->s.origin ) ) );
+			Q_PrintBuffer( &pb, va( "%4i: %s, type: %i, distance: %.0f, coords: %s\n", i, classname, e->s.eType, distance, vtos( &e->s.origin ) ) );
 		}
 	}
 	Q_PrintBuffer( &pb, "\n" );
@@ -2715,8 +2697,7 @@ static void AM_EntRemove( gentity_t *ent ) {
 	if ( target ) {
 		if ( target->jpSpawned ) {
 			const char *classname = (target->classname && target->classname[0]) ? target->classname : "Unknown";
-			G_LogPrintf( level.log.admin, "\t%s removed \"%s\" entity\n", ent ? G_PrintClient( ent - g_entities ) : "Server",
-				classname );
+			G_LogPrintf( level.log.admin, "\t%s removed \"%s\" entity\n", G_PrintClient( ent ), classname );
 			G_FreeEntity( target );
 		}
 		else {
@@ -2734,7 +2715,7 @@ static void AM_NPCSpawn( gentity_t *ent ) {
 	}
 
 	Cmd_NPC_f( ent );
-	G_LogPrintf( level.log.admin, "\t%s spawned \"%s\"\n", G_PrintClient( ent-g_entities ), ConcatArgs( 1 ) );
+	G_LogPrintf( level.log.admin, "\t%s spawned \"%s\"\n", G_PrintClient( ent ), ConcatArgs( 1 ) );
 }
 
 static void AM_Lua( gentity_t *ent ) {
@@ -2758,7 +2739,7 @@ static void AM_Lua( gentity_t *ent ) {
 
 	args = ConcatArgs( 1 );
 
-	G_LogPrintf( level.log.admin, "\t%s executed lua code \"%s\"\n", G_PrintClient( ent-g_entities ), args );
+	G_LogPrintf( level.log.admin, "\t%s executed lua code \"%s\"\n", G_PrintClient( ent ), args );
 	lastluaid = ent->s.number;
 	const char *status = JPLua::DoString( args );
 	if ( status ) {
@@ -2780,7 +2761,7 @@ static void AM_ReloadLua( gentity_t *ent ) {
 		return;
 	}
 
-	G_LogPrintf( level.log.admin, "\t%s reloaded JPLua\n", G_PrintClient( ent-g_entities ) );
+	G_LogPrintf( level.log.admin, "\t%s reloaded JPLua\n", G_PrintClient( ent ) );
 	JPLua::Shutdown( qtrue );
 	JPLua::Init();
 #else
@@ -2834,12 +2815,10 @@ static void AM_Map( gentity_t *ent ) {
 
 	if ( (filter = Q_strchrs( args, ";\n" )) != NULL ) {
 		args[filter - args] = '\0';
-		G_LogPrintf( level.log.security, "%s passed suspicious arguments to \"ammap\" that contained ';' or '\\n'\n",
-			G_PrintClient( ent-g_entities ) );
+		G_LogPrintf( level.log.security, "%s passed suspicious arguments to \"ammap\" that contained ';' or '\\n'\n", G_PrintClient( ent ) );
 	}
 
-	G_LogPrintf( level.log.admin, "\t%s changed map to \"%s\" with gametype \"%s\"\n", G_PrintClient( ent-g_entities ),
-		map, BG_GetGametypeString( gametype ) );
+	G_LogPrintf( level.log.admin, "\t%s changed map to \"%s\" with gametype \"%s\"\n", G_PrintClient( ent ), map, BG_GetGametypeString( gametype ) );
 	trap->SendConsoleCommand( EXEC_APPEND, va( "g_gametype %d\n", gametype ) );
 	if ( nextmap.string[0] ) {
 		trap->SendConsoleCommand( EXEC_APPEND, va( "map %s; set nextmap \"%s\"\n", map, nextmap.string ) );
@@ -2864,11 +2843,10 @@ static void AM_Vstr( gentity_t *ent ) {
 
 	if ( (filter = Q_strchrs( args, ";\n" )) != NULL ) {
 		args[filter - args] = '\0';
-		G_LogPrintf( level.log.security, "%s passed suspicious arguments to \"amvstr\" that contained ';' or '\\n'\n",
-			G_PrintClient( ent-g_entities ) );
+		G_LogPrintf( level.log.security, "%s passed suspicious arguments to \"amvstr\" that contained ';' or '\\n'\n", G_PrintClient( ent ) );
 	}
 
-	G_LogPrintf( level.log.admin, "\t%s executed variable string \"%s\"\n", G_PrintClient( ent-g_entities ), args );
+	G_LogPrintf( level.log.admin, "\t%s executed variable string \"%s\"\n", G_PrintClient( ent ), args );
 	trap->SendConsoleCommand( EXEC_APPEND, va( "vstr %s\n", args ) );
 }
 
@@ -3047,15 +3025,13 @@ static void AM_Merc( gentity_t *ent ) {
 	// give everything between WP_NONE and LAST_USEABLE_WEAPON
 	if ( targ->client->pers.adminData.merc ) {
 		Merc_On( targ );
-		G_LogPrintf( level.log.admin, "\t%s gave weapons to %s\n", ent ? G_PrintClient( ent-g_entities ) : "Server",
-			G_PrintClient( targetClient ) );
+		G_LogPrintf( level.log.admin, "\t%s gave weapons to %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 		AM_DrawString( ADMIN_STRING_MERC, targ, NULL );
 	}
 	// back to spawn weapons, select first usable weapon
 	else {
 		Merc_Off( targ );
-		G_LogPrintf( level.log.admin, "\t%s took weapons from %s\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-			G_PrintClient( targetClient ) );
+		G_LogPrintf( level.log.admin, "\t%s took weapons from %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 		AM_DrawString( ADMIN_STRING_UNMERCED, targ, NULL );
 	}
 }
@@ -3084,8 +3060,7 @@ static void AM_Rename( gentity_t *ent ) {
 		return;
 	}
 
-	G_LogPrintf( level.log.admin, "\t%s renamed %s to \"%s\"\n", ent ? G_PrintClient(ent - g_entities) : "Server",
-		G_PrintClient( targetClient ), arg2 );
+	G_LogPrintf( level.log.admin, "\t%s renamed %s to \"%s\"\n", G_PrintClient( ent ), G_PrintClient( targetClient ), arg2 );
 
 	Q_strncpyz( oldName, e->client->pers.netname, sizeof(oldName) );
 	ClientCleanName( arg2, e->client->pers.netname, sizeof(e->client->pers.netname) );
@@ -3141,7 +3116,7 @@ static void AM_LockTeam( gentity_t *ent ) {
 		}
 		// force all to spectator? unlock spectator?
 		if ( lockedAny ) {
-			G_LogPrintf( level.log.admin, "\t%s locked all teams\n", ent ? G_PrintClient(ent - g_entities) : "Server");
+			G_LogPrintf( level.log.admin, "\t%s locked all teams\n", G_PrintClient( ent ) );
 			if (ent) {
 				trap->SendServerCommand(-1, "print \"" S_COLOR_YELLOW "All teams are locked\n\"");
 			}
@@ -3177,7 +3152,7 @@ static void AM_LockTeam( gentity_t *ent ) {
 	}
 
 	level.lockedTeams[team] = qtrue;
-	G_LogPrintf( level.log.admin, "\t%s locked \"%s\" team\n", ent ? G_PrintClient(ent - g_entities) : "Server", arg1 );
+	G_LogPrintf( level.log.admin, "\t%s locked \"%s\" team\n", G_PrintClient( ent ), arg1 );
 	if (ent) {
 		trap->SendServerCommand(-1, va("print \"%s " S_COLOR_WHITE "team has been locked\n\"", TeamName(team)));
 	}
@@ -3204,7 +3179,7 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 			level.lockedTeams[i] = qfalse;
 		}
 		if ( unlockedAny ) {
-			G_LogPrintf( level.log.admin, "\t%s unlocked all teams\n", ent ? G_PrintClient(ent - g_entities) : "Server" );
+			G_LogPrintf( level.log.admin, "\t%s unlocked all teams\n", G_PrintClient( ent ) );
 			if (ent) {
 				trap->SendServerCommand(-1, "print \"" S_COLOR_CYAN "All teams are unlocked\n\"");
 			}
@@ -3235,7 +3210,7 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 	}
 
 	level.lockedTeams[team] = qfalse;
-	G_LogPrintf( level.log.admin, "\t%s unlocked \"%s\" team\n", ent ? G_PrintClient( ent - g_entities ) : "Server", arg1 );
+	G_LogPrintf( level.log.admin, "\t%s unlocked \"%s\" team\n", G_PrintClient( ent ), arg1 );
 	if (ent) {
 		trap->SendServerCommand(-1, va("print \"%s " S_COLOR_WHITE "team has been unlocked\n\"", TeamName(team)));
 	}
@@ -3438,18 +3413,14 @@ static void AM_NoTarget( gentity_t *ent ) {
 	}
 
 	if ( targ->flags & FL_NOTARGET ) {
-		G_LogPrintf( level.log.admin, "\t%s disabling notarget for %s\n",
-			ent ? G_PrintClient( ent - g_entities ) : "Server", G_PrintClient( targetClient )
-		);
+		G_LogPrintf( level.log.admin, "\t%s disabling notarget for %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 
 		targ->flags &= ~FL_NOTARGET;
 
 		AM_DrawString( ADMIN_STRING_NOTARGETOFF, targ, nullptr );
 	}
 	else {
-		G_LogPrintf( level.log.admin, "\t%s enabling notarget for %s\n",
-			ent ? G_PrintClient( ent - g_entities ) : "Server", G_PrintClient( targetClient )
-		);
+		G_LogPrintf( level.log.admin, "\t%s enabling notarget for %s\n", G_PrintClient( ent ), G_PrintClient( targetClient ) );
 
 		targ->flags |= FL_NOTARGET;
 
@@ -3573,12 +3544,14 @@ qboolean AM_HandleCommands( gentity_t *ent, const char *cmd ) {
 
 	else if ( !AM_HasPrivilege( ent, command->privilege ) ) {
 		trap->SendServerCommand( ent - g_entities, "print \"Insufficient privileges\n\"" );
-		G_LogPrintf( level.log.admin, "[FAILED-EXECUTE] %s (%" PRId64 " & %" PRId64 "), %s\n", cmd, GetPrivileges( ent ),
-			command->privilege, G_PrintClient( ent-g_entities ) );
+		G_LogPrintf( level.log.admin,
+			"[FAILED-EXECUTE] %s (%" PRId64 " & %" PRId64 "), %s\n",
+			cmd, GetPrivileges( ent ), command->privilege, G_PrintClient( ent )
+		);
 		return qtrue;
 	}
 
-	G_LogPrintf( level.log.admin, "[EXECUTE] %s, %s\n", cmd, G_PrintClient( ent-g_entities ) );
+	G_LogPrintf( level.log.admin, "[EXECUTE] %s, %s\n", cmd, G_PrintClient( ent ) );
 	command->func( ent );
 
 	return qtrue;

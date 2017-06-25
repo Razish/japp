@@ -1838,8 +1838,8 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 		ent->userinfoChanged = level.time;
 
 		if ( ent->userinfoSpam > 12 ) {
-			trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "Userinfo changing too fast. "
-				"Ignored.\n\"" ) );
+			G_LogPrintf( level.log.security, "Client %s userinfo changing too fast. Ignored.\n", G_PrintClient( ent ) );
+			trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "Userinfo changing too fast. Ignored.\n\"" ) );
 			return qfalse;
 		}
 		ent->userinfoSpam++;
@@ -1848,8 +1848,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	// check for malformed or illegal info strings
 	s = G_ValidateUserinfo( userinfo );
 	if ( s && *s ) {
-		G_LogPrintf( level.log.security, "Client %d (%s) failed userinfo validation: %s [IP: %s]\n", clientNum,
-			ent->client->pers.netname, s, client->sess.IP );
+		G_LogPrintf( level.log.security, "Client %s failed userinfo validation: %s\n", G_PrintClient( ent ), s );
 		trap->DropClient( clientNum, va( "Failed userinfo validation: %s", s ) );
 		G_LogPrintf( level.log.security, "Userinfo: %s\n", userinfo );
 		return qfalse;
@@ -2257,8 +2256,7 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		Q_strncpyz( tmp, Info_ValueForKey( userinfo, "cjp_client" ), sizeof(tmp) );
 		if ( Q_strchrs( tmp, "\n\r;\"" ) ) {
 			// sent, but malicious
-			G_LogPrintf( level.log.security, "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum,
-				tmpIP );
+			G_LogPrintf( level.log.security, "ClientConnect(%d) Spoofed userinfo 'cjp_client'. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 		Q_strcat( msg, sizeof(msg), va( "cjp_client: %s...", tmp[0] ? tmp : "basejka" ) );
@@ -2276,15 +2274,13 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		value = Info_ValueForKey( userinfo, "csf" );
 		if ( Q_strchrs( value, "\n\r;\"" ) ) {
 			// sent, but malicious
-			G_LogPrintf( level.log.security, "ClientConnect(%d): Spoofed userinfo 'csf'. [IP: %s]\n", clientNum,
-				tmpIP );
+			G_LogPrintf( level.log.security, "ClientConnect(%d): Spoofed userinfo 'csf'. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 
 		if ( value[0] && sscanf( value, "%X", &finalCSF ) != 1 ) {
 			// sent, but failed to parse. probably malicious
-			G_LogPrintf( level.log.security, "ClientConnect(%d): userinfo 'csf' was found, but empty. [IP: %s]\n",
-				clientNum, tmpIP );
+			G_LogPrintf( level.log.security, "ClientConnect(%d): userinfo 'csf' was found, but empty. [IP: %s]\n", clientNum, tmpIP );
 			return "Invalid userinfo detected";
 		}
 		Q_strcat( msg, sizeof(msg), va( " final csf 0x%X\n", finalCSF ) );
@@ -2294,7 +2290,7 @@ const char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	// JPLua plugins can deny connections
 	if ( (result = JPLua::Event_ClientConnect( clientNum, userinfo, tmpIP, firstTime )) ) {
-		Com_Printf( "Denied: %s\n", result );
+		G_LogPrintf( level.log.console, "Connection from %s denied by plugin: %s\n", tmpIP, result );
 		return result;
 	}
 

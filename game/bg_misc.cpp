@@ -767,12 +767,16 @@ qboolean BG_CanUseFPNow( int gametype, playerState_t *ps, int time, forcePowers_
 	if ( ps->m_iVehicleNum ) { //can't use powers while riding a vehicle (this may change, I don't know)
 		return qfalse;
 	}
-	if (ps->duelInProgress) {
+	if ( ps->duelInProgress ) {
 #ifdef PROJECT_GAME
-		if (g_entities[ps->clientNum].duelFullForce) return qtrue; 
+		if ( g_entities[ps->clientNum].duelFullForce ) {
 #elif defined PROJECT_CGAME
-		if (cg.duelInProgress & DUEL_FULLFORCE) return qtrue;
+		if ( cg.duelInProgress & DUEL_FULLFORCE ) {
+#else
+		{
 #endif
+			return qtrue;
+		}
 
 		if ( power != FP_SABER_OFFENSE && power != FP_SABER_DEFENSE && /*power != FP_SABERTHROW &&*/
 			power != FP_LEVITATION ) {

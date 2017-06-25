@@ -2065,17 +2065,15 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( ent->client->ps.duelInProgress ) {
 		gentity_t *duelAgainst = &g_entities[ent->client->ps.duelIndex];
 
-		//Keep the time updated, so once this duel ends this player can't engage in a duel for another
-		//10 seconds. This will give other people a chance to engage in duels in case this player wants
-		//to engage again right after he's done fighting and someone else is waiting.
+		// keep the time updated, so once this duel ends this player can't engage in a duel for another 10 seconds
+		// this will give other people a chance to engage in duels in case this player wants to engage again right after
+		//	he's done fighting and someone else is waiting.
 		if ( !(g_privateDuel.bits & PRIVDUEL_MULTI) )
 			ent->client->ps.fd.privateDuelTime = level.time + 10000;
 
 		if ( ent->client->ps.duelTime < level.time ) {
 			//Bring out the sabers
-			if ( japp_duelActivateSaber.integer && ent->client->ps.weapon == WP_SABER && ent->client->ps.saberHolstered
-				&& ent->client->ps.duelTime )
-			{
+			if ( japp_duelActivateSaber.integer && ent->client->ps.weapon == WP_SABER && ent->client->ps.saberHolstered && ent->client->ps.duelTime ) {
 				ent->client->ps.saberHolstered = 0;
 
 				if ( ent->client->saber[0].soundOn )
@@ -2089,8 +2087,7 @@ void ClientThink_real( gentity_t *ent ) {
 			}
 
 			if ( japp_duelActivateSaber.integer && duelAgainst && duelAgainst->client && duelAgainst->inuse
-				&& duelAgainst->client->ps.weapon == WP_SABER && duelAgainst->client->ps.saberHolstered
-				&& duelAgainst->client->ps.duelTime )
+				&& duelAgainst->client->ps.weapon == WP_SABER && duelAgainst->client->ps.saberHolstered && duelAgainst->client->ps.duelTime )
 			{
 				duelAgainst->client->ps.saberHolstered = 0;
 
@@ -2285,7 +2282,7 @@ void ClientThink_real( gentity_t *ent ) {
 					}
 				}
 			}
-			
+
 			G_AddEvent( ent, EV_PRIVATE_DUEL, 0 );
 			G_AddEvent( duelAgainst, EV_PRIVATE_DUEL, 0 );
 			level.duelInProgress--;

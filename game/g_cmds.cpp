@@ -2308,7 +2308,6 @@ static qboolean G_OtherPlayersDueling( void ) {
 }
 
 void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
-	trace_t *tr;
 	int weapon = WP_SABER;
 
 	if (level.intermissionQueued) {
@@ -2378,8 +2377,7 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 		}
 	}
 
-	tr = G_RealTrace( ent, 256.0f );
-
+	const trace_t *tr = G_RealTrace( ent, 256.0f );
 	if ( tr->fraction < 1.0f && tr->entityNum < MAX_CLIENTS ) {
 		gentity_t *challenged = &g_entities[tr->entityNum];
 
@@ -2401,9 +2399,12 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 		}
 
 		if ( challenged->client->ps.duelIndex == ent->s.number && challenged->client->ps.duelTime >= level.time ) {
-			trap->SendServerCommand( -1, va( "print \"%s " S_COLOR_WHITE "%s %s " S_COLOR_WHITE "(%s)!\n\"",
-				challenged->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELACCEPT" ),
-				ent->client->pers.netname, weaponData[challenged->client->pers.duelWeapon].longName ) );
+			trap->SendServerCommand( -1,
+				va( "print \"%s " S_COLOR_WHITE "%s %s " S_COLOR_WHITE "(%s)!\n\"",
+					challenged->client->pers.netname, G_GetStringEdString( "MP_SVGAME", "PLDUELACCEPT" ),
+					ent->client->pers.netname, weaponData[challenged->client->pers.duelWeapon].longName
+				)
+			);
 
 			if ( fullforce ) {
 				ent->duelFullForce = qtrue;
@@ -2429,7 +2430,6 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 					challenged->client->ps.fd.forcePowersKnown |= (1 << i);
 				}
 			}
-
 
 			ent->client->ps.duelInProgress = challenged->client->ps.duelInProgress = qtrue;
 			ent->client->ps.duelTime = challenged->client->ps.duelTime = level.time + 2000;
@@ -2495,6 +2495,7 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 				= challenged->client->ps.stats[STAT_ARMOR]
 				= g_privateDuelShield.integer;
 
+			level.duelInProgress++;
 		}
 		else {
 			// Print the message that a player has been challenged in private, only announce the actual duel initiation in private
@@ -2509,23 +2510,23 @@ void Cmd_EngageDuel_f( gentity_t *ent, bool fullforce ) {
 				"\n\"", G_GetStringEdString( "MP_SVGAME", "PLDUELCHALLENGED" ), challenged->client->pers.netname,
 				weaponData[weapon].longName )
 			);
+
+			/*
+			if ( japp_duelBow.integer ) {
+				ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
+				ent->client->ps.forceDodgeAnim = BOTH_BOW;
+				ent->client->ps.forceHandExtendTime = level.time + BG_AnimLength(ent->localAnimIndex, (animNumber_t)BOTH_BOW);
+			}
+			*/
 		}
 
 		challenged->client->ps.fd.privateDuelTime = 0; //reset the timer in case this player just got out of a duel. He should still be able to accept the challenge.
 
-		if (japp_duelBow.integer) {
-			ent->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
-			ent->client->ps.forceDodgeAnim = BOTH_BOW;
-			ent->client->ps.forceHandExtendTime = level.time + BG_AnimLength(ent->localAnimIndex, (animNumber_t)BOTH_BOW);
-		}
-		else {
-			ent->client->ps.forceHandExtend = challenged->client->ps.forceHandExtend = HANDEXTEND_DUELCHALLENGE;
-			ent->client->ps.forceHandExtendTime = challenged->client->ps.forceHandExtendTime = level.time + 1000;
-		}
+		ent->client->ps.forceHandExtend = HANDEXTEND_DUELCHALLENGE;
+		ent->client->ps.forceHandExtendTime = level.time + 1000;
 
 		ent->client->ps.duelIndex = challenged->s.number;
-		ent->client->ps.duelTime = challenged->client->ps.duelTime = level.time + 5000;
-		level.duelInProgress++;
+		ent->client->ps.duelTime = level.time + 5000;
 	}
 }
 
@@ -2791,23 +2792,23 @@ static void Cmd_Playertint_f( gentity_t *ent ) {
 	* Strip colour codes from identifier???
 	* Check for match against identifier
 	* Loop through all clients, check for match against identifier
-	* Send message to legacy clients as: "chat \"<^4#^7short-name>PlayerName^7"EC": ^7Message\""
-	* Send message to modern clients as: "chat \""CHANNEL_EC"identifier"CHANNEL_EC"PlayerName^7"EC": ^7Message\""
+	* Send message to legacy clients as: "chat \"<^4#^7short-name>PlayerName^7" EC ": ^7Message\""
+	* Send message to modern clients as: "chat \"" CHANNEL_EC "identifier" CHANNEL_EC "PlayerName^7" EC ": ^7Message\""
 
 	Client info:
 	* List of channel identifiers + short names (For legacy support)
 	* Number of channels joined (For flood reasons, limit to jp_maxChannels - default 10)
+*/
 
-	*/
-
-//Filters bad characters out of the channel identifier
+// filters bad characters out of the channel identifier
 static void JP_FilterIdentifier( char *ident ) {
 	char *s = ident, *out = ident, c = 0;
 
 	Q_CleanString( ident, STRIP_COLOUR );
 	while ( (c = *s++) != '\0' ) {
-		if ( c < '$' || c > '}' || c == ';' )
+		if ( c < '$' || c > '}' || c == ';' ) {
 			continue;
+		}
 		*out++ = c;
 	}
 	*out = '\0';
@@ -2826,13 +2827,13 @@ static void JP_ListChannels( gentity_t *ent ) {
 				);
 			}
 			else {
-				Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- %s " S_COLOR_WHITE "[" S_COLOR_GREEN "%s"
-					S_COLOR_WHITE "]\n", channel->identifier, channel->shortname )
+				Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- %s " S_COLOR_WHITE "[" S_COLOR_GREEN
+					"%s" S_COLOR_WHITE "]\n", channel->identifier, channel->shortname )
 				);
 			}
 		}
 		else {
-			Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE"- %s\n", channel->identifier ) );
+			Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- %s\n", channel->identifier ) );
 		}
 		channel = channel->next;
 	}
@@ -2847,14 +2848,10 @@ static void Cmd_JoinChannel_f( gentity_t *ent ) {
 
 	if ( trap->Argc() < 2 ) {
 		if ( legacyClient ) {
-			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW
-				"Usage: \\joinchan <identifier/password> [short-name]>\n\""
-			);
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\joinchan <identifier/password> [short-name]>\n\"" );
 		}
 		else {
-			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW
-				"Usage: \\joinchan <identifier/password>\n\""
-			);
+			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\joinchan <identifier/password>\n\"" );
 		}
 		return;
 	}
@@ -2865,14 +2862,12 @@ static void Cmd_JoinChannel_f( gentity_t *ent ) {
 
 	JP_FilterIdentifier( arg1_ident );
 
-	// Try to find an existing channel
+	// try to find an existing channel
 	channel = ent->client->pers.channels;
 	while ( channel ) {
 		if ( !strcmp( arg1_ident, channel->identifier ) ) {
-			// Already joined, return
-			trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "You are already in channel '%s'"
-				"\n\"", arg1_ident )
-			);
+			// already joined, return
+			trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "You are already in channel '%s'" "\n\"", arg1_ident ) );
 			//TODO: update short-name?
 			//		for legacy clients
 			return;
