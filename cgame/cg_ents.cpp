@@ -1309,8 +1309,12 @@ static void CG_General( centity_t *cent ) {
 
 			if ( curTimeDif < 3400 ) {
 				if ( lightSide ) {
-					if ( curTimeDif < 2200 ) { //probably temporary
-						trap->S_StartSound( NULL, cent->currentState.number, CHAN_AUTO, trap->S_RegisterSound( "sound/weapons/saber/saberhum1.wav" ) );
+					if ( curTimeDif < 2200
+						&& cg.frametime > 0
+						&& ((cg.frametime < 50 && cg.time % 50 <= cg.frametime)
+						|| cg.frametime >= 50))  //probably temporary
+					{
+						trap->S_StartSound(NULL, cent->currentState.number, CHAN_AUTO, trap->S_RegisterSound("sound/weapons/saber/saberhum1.wav"));
 					}
 				}
 				else { //probably temporary as well
@@ -1324,7 +1328,11 @@ static void CG_General( centity_t *cent ) {
 					else {
 						ent.customShader = media.gfx.world.electricBody2;
 					}
-					if ( random() > 0.9f ) {
+					if (( random() > 0.9f )
+						&& cg.frametime > 0
+						&& ((cg.frametime < 50 && cg.time % 50 <= cg.frametime)
+						|| cg.frametime >=50))
+					{
 						trap->S_StartSound( NULL, cent->currentState.number, CHAN_AUTO, media.sounds.environment.crackle );
 					}
 					SE_R_AddRefEntityToScene( &ent, cent->currentState.number );
