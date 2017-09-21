@@ -273,7 +273,7 @@ static const resource_t gfx[] = {
 	{ &media.gfx.interface.automap.frameLeft, "gfx/mp_automap/mpauto_frame_left", RFL_NOMIP, GTB_SIEGE },
 	{ &media.gfx.interface.automap.frameRight, "gfx/mp_automap/mpauto_frame_right", RFL_NOMIP, GTB_SIEGE },
 	{ &media.gfx.interface.automap.frameTop, "gfx/mp_automap/mpauto_frame_top", RFL_NOMIP, GTB_SIEGE },
-	{ &media.gfx.interface.automap.playerIcon, "gfx/menus/radar/arrow_w", RFL_NOMIP, GTB_ALL&~GTB_NOTTEAM },
+	{ &media.gfx.interface.automap.playerIcon, "gfx/menus/radar/arrow_w", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.automap.rocketIcon, "gfx/menus/radar/rocket", RFL_NOMIP, GTB_SIEGE },
 	{ &media.gfx.interface.binoculars.arrow, "gfx/2d/binSideArrow", RFL_NOMIP, GTB_ALL },
 	{ &media.gfx.interface.binoculars.circle, "gfx/2d/binCircle", RFL_NOMIP, GTB_ALL },
