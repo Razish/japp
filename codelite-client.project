@@ -167,6 +167,8 @@
     <File Name="cgame/cg_drawtools.cpp"/>
     <File Name="cgame/cg_luarefentity.h"/>
     <File Name="cgame/cg_luainterface.h"/>
+    <File Name="cgame/cg_notify.h"/>
+    <File Name="cgame/cg_notify.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="game">
     <File Name="game/g_ICARUScb.cpp"/>
@@ -560,8 +562,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=1 force32=0 no_sql=1 project=cgame,ui tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=1 force32=0 no_sql=1 project=cgame,ui tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=1 force32=0 no_sql=1 no_notify=0 project=cgame,ui tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=1 force32=0 no_sql=1 no_notify=0 project=cgame,ui tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -599,8 +601,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=1 force32=1 no_sql=1 project=cgame,ui tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=1 force32=1 no_sql=1 project=cgame,ui tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=1 force32=1 no_sql=1 no_notify=0 project=cgame,ui tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=1 force32=1 no_sql=1 no_notify=0 project=cgame,ui tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -638,8 +640,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=2 force32=0 no_sql=1 project=cgame,ui tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=2 force32=0 no_sql=1 project=cgame,ui tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=2 force32=0 no_sql=1 no_notify=0 project=cgame,ui tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=2 force32=0 no_sql=1 no_notify=0 project=cgame,ui tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -677,8 +679,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=2 force32=1 no_sql=1 project=cgame,ui tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=2 force32=1 no_sql=1 project=cgame,ui tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=2 force32=1 no_sql=1 no_notify=0 project=cgame,ui tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=2 force32=1 no_sql=1 no_notify=0 project=cgame,ui tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -716,8 +718,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=0 force32=0 no_sql=1 project=cgame,ui tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=0 force32=0 no_sql=1 project=cgame,ui tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=0 force32=0 no_sql=1 no_notify=0 project=cgame,ui tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=0 force32=0 no_sql=1 no_notify=0 project=cgame,ui tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -755,8 +757,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=0 force32=1 no_sql=1 project=cgame,ui tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=0 force32=1 no_sql=1 project=cgame,ui tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=0 force32=1 no_sql=1 no_notify=0 project=cgame,ui tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=0 force32=1 no_sql=1 no_notify=0 project=cgame,ui tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>

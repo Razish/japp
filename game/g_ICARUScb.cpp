@@ -1204,6 +1204,7 @@ int Q3_GetFloat( int entID, int type, const char *name, float *value ) {
 		return 0;
 	case SET_INVINCIBLE://## %t="BOOL_TYPES" # Completely unkillable
 		*value = (ent->flags&FL_GODMODE);
+		break;
 	case SET_MISSIONSTATUSACTIVE:	//# Turns on Mission Status Screen
 		return 0;
 	case SET_NO_COMBAT_TALK://## %t="BOOL_TYPES" # NPCs will not do their combat talking noises when this is on

@@ -6,6 +6,7 @@
 #	debug			generate debug information. value 2 also enables optimisations
 #	force32			force 32 bit target when on 64 bit machine
 #	no_sql			don't include any SQL dependencies
+#	no_notify		don't include libnotify etc dependencies
 #	no_crashhandler	don't include the crash logger (x86 only)
 #
 # example:
@@ -20,6 +21,7 @@ debug = int( ARGUMENTS.get( 'debug', 0 ) )
 configuration = { 0: lambda x: 'release', 1: lambda x: 'debug', 2: lambda x: 'optimised-debug' }[debug](debug)
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 no_sql = int( ARGUMENTS.get( 'no_sql', 0 ) )
+no_notify = int( ARGUMENTS.get( 'no_notify', 0 ) )
 no_crashhandler = int( ARGUMENTS.get( 'no_crashhandler', 0 ) )
 toolStr = ARGUMENTS.get( 'tools', 'gcc,g++,ar,as,gnulink' )
 tools = toolStr.split( ',' )
@@ -204,6 +206,7 @@ if not env.GetOption( 'clean' ):
 		+ '\tinstruction set: ' + arch\
 			+ ((' with x87 fpu' if 'NO_SSE' in os.environ else ' with SSE') if arch != 'arm' else '') + '\n'\
 		+ '\tsql support: ' + ('dis' if no_sql else 'en') + 'abled\n'\
+		+ '\tnotify support: ' + ('dis' if no_notify else 'en') + 'abled\n'\
 		+ '\tcrash logging: ' + ('dis' if no_crashhandler else 'en') + 'abled\n'
 
 	# build environment
@@ -553,6 +556,11 @@ if no_sql:
 		'NO_SQL',
 	]
 
+if no_notify:
+	env['CPPDEFINES'] += [
+		'NO_NOTIFY',
+	]
+
 # build-time settings
 env['CPPDEFINES'] += [
 	'JAPP_COMPILER=\\"' + realcc + ' ' + ccversion + '\\"',
@@ -584,6 +592,7 @@ for project in [p for p in projects if not proj or p in proj.split(',')]:
 			'env',
 			'no_crashhandler',
 			'no_sql',
+			'no_notify',
 			'plat',
 			'realcc',
 		]

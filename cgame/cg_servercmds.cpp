@@ -1269,24 +1269,28 @@ static void CG_ServerCommand( void ) {
 	if ( !strcmp( cmd, "chat" ) ) {
 		char *msg = JPLua::Event_ChatMessageRecieved( CG_Argv( 1 ) );
 
-		//If a ls.plugin cancelled it, bail
-		if ( !msg )
+		// if a plugin cancelled it, bail
+		if ( !msg ) {
 			return;
+		}
 
 		if ( !cg_teamChatsOnly.integer ) {
 			char cbName[MAX_CHATBOX_IDENTIFIER_SIZE] = "normal";
 			trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 			Q_strncpyz( text, msg, MAX_SAY_TEXT );
 
-			if ( CG_ContainsChannelEscapeChar( text ) )
+			if ( CG_ContainsChannelEscapeChar( text ) ) {
 				Q_strncpyz( cbName, CG_RemoveChannelEscapeChar( text ), sizeof(cbName) );
+			}
 
 			CG_RemoveChatEscapeChar( text );
 			CG_LogPrintf( cg.log.console, va( "%s\n", text ) );
-			if ( cg_newChatbox.integer )
+			if ( cg_newChatbox.integer ) {
 				CG_ChatboxAddMessage( text, qfalse, cbName );
-			else
+			}
+			else {
 				CG_ChatBox_AddString( text );
+			}
 			trap->Print( "*%s\n", text );
 			Q_CleanString( text, STRIP_COLOUR );
 			CG_LogPrintf( cg.log.chat, va( "%s\n", text ) );

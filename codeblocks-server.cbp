@@ -24,9 +24,9 @@
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<MakeCommands>
-					<Build command="scons -Q -f $makefile force32=0 debug=1 no_sql=1 project=game tools=default" />
+					<Build command="scons -Q -f $makefile force32=0 debug=1 no_sql=1 no_notify=0 project=game tools=default" />
 					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
-					<Clean command="scons -Qc -f $makefile force32=0 debug=1 no_sql=1 project=game tools=default" />
+					<Clean command="scons -Qc -f $makefile force32=0 debug=1 no_sql=1 no_notify=0 project=game tools=default" />
 					<DistClean command="$make -f $makefile distclean$target" />
 					<AskRebuildNeeded command="scons -Q -f $makefile force32=0 debug=1 no_sql=1 project=game tools=default" />
 					<SilentBuild command="scons -Q -f $makefile force32=0 debug=1 no_sql=1 project=game tools=default &gt; $(CMD_NULL)" />
@@ -38,12 +38,12 @@
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<MakeCommands>
-					<Build command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 project=game tools=default" />
+					<Build command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 no_notify=0 project=game tools=default" />
 					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
-					<Clean command="scons -Qc -f $makefile force32=1 debug=1 no_sql=1 project=game tools=default" />
+					<Clean command="scons -Qc -f $makefile force32=1 debug=1 no_sql=1 no_notify=0 project=game tools=default" />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 project=game tools=default" />
-					<SilentBuild command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 project=game tools=default &gt; $(CMD_NULL)" />
+					<AskRebuildNeeded command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 no_notify=0 project=game tools=default" />
+					<SilentBuild command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 no_notify=0 project=game tools=default &gt; $(CMD_NULL)" />
 				</MakeCommands>
 			</Target>
 			<Target title="Optimised Debug">
@@ -52,12 +52,12 @@
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<MakeCommands>
-					<Build command="scons -Q -f $makefile force32=0 debug=2 no_sql=1 project=game tools=default" />
+					<Build command="scons -Q -f $makefile force32=0 debug=2 no_sql=1 no_notify=0 project=game tools=default" />
 					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
-					<Clean command="scons -Qc -f $makefile force32=0 debug=2 no_sql=1 project=game tools=default" />
+					<Clean command="scons -Qc -f $makefile force32=0 debug=2 no_sql=1 no_notify=0 project=game tools=default" />
 					<DistClean command="$make -f $makefile distclean$target" />
 					<AskRebuildNeeded command="scons -Q -f $makefile force32=0 debug=2 no_sql=1 project=game tools=default" />
-					<SilentBuild command="scons -Q -f $makefile force32=0 debug=2 no_sql=1 project=game tools=default &gt; $(CMD_NULL)" />
+					<SilentBuild command="scons -Q -f $makefile force32=0 debug=2 no_sql=1 no_notify=0 project=game tools=default &gt; $(CMD_NULL)" />
 				</MakeCommands>
 			</Target>
 			<Target title="Optimised Debug-32">
@@ -65,12 +65,12 @@
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<MakeCommands>
-					<Build command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 project=game tools=default" />
+					<Build command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 no_notify=0 project=game tools=default" />
 					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
-					<Clean command="scons -Qc -f $makefile force32=1 debug=1 no_sql=1 project=game tools=default" />
+					<Clean command="scons -Qc -f $makefile force32=1 debug=1 no_sql=1 no_notify=0 project=game tools=default" />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 project=game tools=default" />
-					<SilentBuild command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 project=game tools=default &gt; $(CMD_NULL)" />
+					<AskRebuildNeeded command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 no_notify=0 project=game tools=default" />
+					<SilentBuild command="scons -Q -f $makefile force32=1 debug=1 no_sql=1 no_notify=0 project=game tools=default &gt; $(CMD_NULL)" />
 				</MakeCommands>
 			</Target>
 			<Target title="Release">
@@ -80,12 +80,12 @@
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<MakeCommands>
-					<Build command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 project=game tools=default" />
+					<Build command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 no_notify=0 project=game tools=default" />
 					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
-					<Clean command="scons -Qc -f $makefile force32=0 debug=0 no_sql=1 project=game tools=default" />
+					<Clean command="scons -Qc -f $makefile force32=0 debug=0 no_sql=1 no_notify=0 project=game tools=default" />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 project=game tools=default" />
-					<SilentBuild command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 project=game tools=default &gt; $(CMD_NULL)" />
+					<AskRebuildNeeded command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 no_notify=0 project=game tools=default" />
+					<SilentBuild command="scons -Q -f $makefile force32=0 debug=0 no_sql=1 no_notify=0 project=game tools=default &gt; $(CMD_NULL)" />
 				</MakeCommands>
 			</Target>
 			<Target title="Release-32">
@@ -94,12 +94,12 @@
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<MakeCommands>
-					<Build command="scons -Q -f $makefile force32=1 debug=0 no_sql=1 project=game tools=default" />
+					<Build command="scons -Q -f $makefile force32=1 debug=0 no_sql=1 no_notify=0 project=game tools=default" />
 					<CompileFile command='echo &quot;ERROR: Compilation of single files is disabled, use build instead.&quot;; return 1' />
-					<Clean command="scons -Qc -f $makefile force32=1 debug=0 no_sql=1 project=game tools=default" />
+					<Clean command="scons -Qc -f $makefile force32=1 debug=0 no_sql=1 no_notify=0 project=game tools=default" />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="scons -Q -f $makefile force32=1 debug=0 no_sql=1 project=game tools=default" />
-					<SilentBuild command="scons -Q -f $makefile force32=1 debug=0 no_sql=1 project=game tools=default &gt; $(CMD_NULL)" />
+					<AskRebuildNeeded command="scons -Q -f $makefile force32=1 debug=0 no_sql=1 no_notify=0 project=game tools=default" />
+					<SilentBuild command="scons -Q -f $makefile force32=1 debug=0 no_sql=1 no_notify=0 project=game tools=default &gt; $(CMD_NULL)" />
 				</MakeCommands>
 			</Target>
 		</Build>

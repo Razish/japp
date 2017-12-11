@@ -360,25 +360,22 @@ static void Cmd_KillOther_f( gentity_t *ent ) {
 void BroadcastTeamChange( gclient_t *client, int oldTeam ) {
 	client->ps.fd.forceDoInit = 1; //every time we change teams make sure our force powers are set right
 
-	if ( level.gametype == GT_SIEGE )
+	if ( level.gametype == GT_SIEGE ) {
 		return;
+	}
 
 	if ( client->sess.sessionTeam == TEAM_RED ) {
-		G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname,
-			G_GetStringEdString( "MP_SVGAME", "JOINEDTHEREDTEAM" ) ) );
+		G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname, G_GetStringEdString( "MP_SVGAME", "JOINEDTHEREDTEAM" ) ) );
 	}
 	else if ( client->sess.sessionTeam == TEAM_BLUE ) {
-		G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname,
-			G_GetStringEdString( "MP_SVGAME", "JOINEDTHEBLUETEAM" ) ) );
+		G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname, G_GetStringEdString( "MP_SVGAME", "JOINEDTHEBLUETEAM" ) ) );
 	}
 	else if ( client->sess.sessionTeam == TEAM_SPECTATOR && oldTeam != TEAM_SPECTATOR ) {
-		G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname,
-			G_GetStringEdString( "MP_SVGAME", "JOINEDTHESPECTATORS" ) ) );
+		G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname, G_GetStringEdString( "MP_SVGAME", "JOINEDTHESPECTATORS" ) ) );
 	}
 	else if ( client->sess.sessionTeam == TEAM_FREE ) {
 		if ( level.gametype != GT_DUEL && level.gametype != GT_POWERDUEL ) {
-			G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname,
-				G_GetStringEdString( "MP_SVGAME", "JOINEDTHEBATTLE" ) ) );
+			G_Announce( va( "%s" S_COLOR_WHITE " %s", client->pers.netname, G_GetStringEdString( "MP_SVGAME", "JOINEDTHEBATTLE" ) ) );
 		}
 	}
 

@@ -13,6 +13,7 @@
 #include "cg_media.h"
 #include "cg_serverHistory.h"
 #include "ui/ui_fonts.h"
+#include "cg_notify.h"
 
 displayContextDef_t cgDC;
 
@@ -1822,31 +1823,46 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 
 	CG_TransitionPermanent();
 
+	CG_LoadingString( "Notifications" );
+	CG_NotifyInit();
+
 	CG_LoadingString( "Server info" );
 	CG_ParseServerinfo();
+
 	CG_LoadingString( "String pool" );
 	String_Init();
+
 	CG_LoadingString( "Saber hilts" );
 	WP_SaberLoadParms();
-	//	CG_LoadingString( "Media" );
+
+	//CG_LoadingString( "Media" );
 	CG_LoadMedia();
 	cgs.activeCursor = media.gfx.interface.cursor;
+
 	CG_LoadingString( "Siege data" );
 	CG_InitSiegeMode();
+
 	CG_LoadingString( "Trueview" );
 	CG_TrueViewInit();
+
 	CG_LoadingString( "Asset cache" );
 	CG_AssetCache();
+
 	CG_LoadingString( "HUD" );
 	CG_LoadHudMenu(); // load new hud stuff
+
 	CG_LoadingString( "Players" );
 	CG_RegisterClients();
+
 	CG_LoadingString( "Local entities" );
 	CG_InitLocalEntities();
+
 	CG_LoadingString( "Marks" );
 	CG_InitMarkPolys();
+
 	CG_LoadingString( "JPLua" );
 	JPLua::Init();
+
 	CG_LoadingString( "Chatbox" );
 	CG_ChatboxInit();
 
@@ -1868,18 +1884,23 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum, qb
 		unsigned long datatype; // #defined in winnt.h (predefined types 0-11)
 		LONG error;
 		if ( (error = RegOpenKeyExA( (HKEY)HKEY_CURRENT_USER, (LPCSTR)JP_TIMESTAMP_REGISTRY_KEY, (DWORD)0,
-			(REGSAM)KEY_QUERY_VALUE, &hkey )) == ERROR_SUCCESS ) {
+			(REGSAM)KEY_QUERY_VALUE, &hkey )) == ERROR_SUCCESS )
+		{
 			if ( (error = RegQueryValueExA( (HKEY)hkey, (LPCSTR)JP_TIMESTAMP_REGISTRY_NAME, (LPDWORD)NULL,
-				(LPDWORD)&datatype, (LPBYTE)registryValue, (LPDWORD)&datalen )) == ERROR_SUCCESS ) {
-				if ( registryValue[0] == 'H' )
+				(LPDWORD)&datatype, (LPBYTE)registryValue, (LPDWORD)&datalen )) == ERROR_SUCCESS )
+			{
+				if ( registryValue[0] == 'H' ) {
 					cg.japp.timestamp24Hour = qtrue;
+				}
 				RegCloseKey( hkey );
 			}
-			else
+			else {
 				Com_Printf( S_COLOR_RED "Error, couldn't query registry string " JP_TIMESTAMP_REGISTRY_NAME ", error code %i\n", error );
+			}
 		}
-		else
+		else {
 			Com_Printf( S_COLOR_RED "Error, couldn't open registry key " JP_TIMESTAMP_REGISTRY_KEY ", error code %i\n", error );
+		}
 	}
 #endif
 
@@ -1962,6 +1983,8 @@ void CG_Shutdown( void ) {
 	//Raz: Lua!
 	JPLua::Shutdown( qfalse );
 #endif // JPLUA
+
+	CG_NotifyShutdown();
 
 	// close log files
 	CG_LogPrintf( cg.log.chat, "End logging\n------------------------------------------------------------\n\n" );

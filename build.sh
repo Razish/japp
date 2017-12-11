@@ -10,6 +10,7 @@ TOOLS=default
 DEBUG=0
 FORCE32=0
 NOSQL=1
+NONOTIFY=0
 export NO_SSE=1
 
 build='scons -Q'
@@ -32,9 +33,12 @@ do
 	"nosql")
 		NOSQL=1
 		;;
+	"nonotify")
+		NONOTIFY=1
+		;;
 	*)
 		;;
 	esac
 done
 
-$build debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL project=$PROJECT tools=$TOOLS
+$build debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL no_notify=$NONOTIFY project=$PROJECT tools=$TOOLS

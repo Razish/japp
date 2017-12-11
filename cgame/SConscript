@@ -38,6 +38,7 @@ files = [
 	'cgame/cg_marks.cpp',
 	'cgame/cg_media.cpp',
 	'cgame/cg_newDraw.cpp',
+	'cgame/cg_notify.cpp',
 	'cgame/cg_players.cpp',
 	'cgame/cg_playerstate.cpp',
 	'cgame/cg_predict.cpp',
@@ -128,6 +129,10 @@ if plat == 'Windows':
 		'Advapi32',
 		'Shell32',
 	]
+elif plat == 'Linux':
+	if not no_notify:
+		# for libnotify on GTK+ systems
+		cgame_env.ParseConfig( 'pkg-config glib-2.0 gtk+-2.0 libnotify --cflags --libs' )
 
 # project settings
 cgame_env['CPPPATH'] += [
@@ -142,6 +147,10 @@ cgame_env['CPPDEFINES'] += [
 if plat == 'Linux':
 	cgame_env['CPPDEFINES'] += [
 		'LUA_USE_LINUX',
+	]
+else:
+	cgame_env['CPPDEFINES'] += [
+		'NO_NOTIFY'
 	]
 cgame_env['LIBPREFIX'] = ''
 

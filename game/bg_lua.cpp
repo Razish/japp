@@ -2,6 +2,7 @@
 #include "g_local.h"
 #elif defined(PROJECT_CGAME)
 #include "cg_local.h"
+#include "cg_notify.h"
 #endif
 #include "ui/ui_fonts.h"
 
@@ -1278,6 +1279,17 @@ namespace JPLua {
 	#endif
 
 	#ifdef PROJECT_CGAME
+	static int Export_SendNotification( lua_State *L ) {
+		const char *title = luaL_checkstring( L, 1 );
+		const char *msg = luaL_checkstring( L, 2 );
+		const uint32_t timeout = luaL_checkinteger( L, 3 );
+		const char *iconName = luaL_checkstring( L, 4 );
+		CG_NotifySend( title, msg, timeout, iconName );
+		return 0;
+	}
+	#endif
+
+	#ifdef PROJECT_CGAME
 	static int Export_SetKeyCatcher( lua_State *L ) {
 		uint32_t catcherMask = (uint32_t)lua_tointeger( L, 1 );
 		trap->Key_SetCatcher( catcherMask );
@@ -1631,6 +1643,7 @@ namespace JPLua {
 	#endif
 		{ "SendConsoleCommand", Export_SendConsoleCommand }, // SendConsoleCommand( string command )
 	#ifdef PROJECT_CGAME
+		{ "SendNotification", Export_SendNotification }, // SendNotification( string title, string message, integer timeout, string iconName )
 		{ "SendServerCommand", Export_SendServerCommand }, // SendServerCommand( string command )
 	#endif
 	#ifdef PROJECT_GAME
@@ -1679,7 +1692,7 @@ namespace JPLua {
 		}
 
 		// set the ls.version
-		semver_parse( "13.5.0", &jpluaVersion );
+		semver_parse( "13.6.0", &jpluaVersion );
 
 		// set the callback in case of an error
 		lua_atpanic( ls.L, Error );

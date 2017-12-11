@@ -95,8 +95,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=1 force32=0 no_sql=1 project=game tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=1 force32=0 no_sql=1 project=game tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=1 force32=0 no_sql=1 no_notify=0 project=game tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=1 force32=0 no_sql=1 no_notify=0 project=game tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -134,8 +134,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=1 force32=1 no_sql=1 project=game tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=1 force32=1 no_sql=1 project=game tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=1 force32=1 no_sql=1 no_notify=0 project=game tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=1 force32=1 no_sql=1 no_notify=0 project=game tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -173,8 +173,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=2 force32=0 no_sql=1 project=game tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=2 force32=0 no_sql=1 project=game tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=2 force32=0 no_sql=1 no_notify=0 project=game tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=2 force32=0 no_sql=1 no_notify=0 project=game tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -212,8 +212,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=2 force32=1 no_sql=1 project=game tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=2 force32=1 no_sql=1 project=game tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=2 force32=1 no_sql=1 no_notify=0 project=game tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=2 force32=1 no_sql=1 no_notify=0 project=game tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -251,8 +251,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=0 force32=0 no_sql=1 project=game tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=0 force32=0 no_sql=1 project=game tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=0 force32=0 no_sql=1 no_notify=0 project=game tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=0 force32=0 no_sql=1 no_notify=0 project=game tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
@@ -290,8 +290,8 @@
       <PostBuild/>
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
-        <CleanCommand>scons -Qc debug=0 force32=1 no_sql=1 project=game tools=default</CleanCommand>
-        <BuildCommand>scons -Q debug=0 force32=1 no_sql=1 project=game tools=default</BuildCommand>
+        <CleanCommand>scons -Qc debug=0 force32=1 no_sql=1 no_notify=0 project=game tools=default</CleanCommand>
+        <BuildCommand>scons -Q debug=0 force32=1 no_sql=1 no_notify=0 project=game tools=default</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
