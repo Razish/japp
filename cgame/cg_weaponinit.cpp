@@ -9,6 +9,9 @@ void CG_RegisterWeapon( int weaponNum ) {
 	vector3			mins, maxs;
 	int				i;
 
+	if ( weaponNum < 0 || weaponNum >= MAX_WEAPONS ) {
+		return;
+	}
 	weaponInfo = &cg_weapons[weaponNum];
 
 	if ( weaponNum == 0 )
