@@ -944,6 +944,16 @@ namespace JPLua {
 		lua_pushnumber(L, ent->client->ps.speed);
 		return 1;
 	}
+
+	static int Player_GetSupportFlags( lua_State *L, jpluaEntity_t *ent ) {
+		lua_pushinteger( L, ent->client->pers.CSF );
+		return 1;
+	}
+
+	static int Player_GetPluginDisabled( lua_State *L, jpluaEntity_t *ent ) {
+		lua_pushinteger( L, ent->client->pers.CPD );
+		return 1;
+	}
 	#endif
 
 
@@ -1202,6 +1212,13 @@ namespace JPLua {
 			nullptr
 	#endif
 		},
+	#if defined(PROJECT_GAME)
+		{
+			"pluginDisabled",
+			Player_GetPluginDisabled,
+			nullptr
+		},
+	#endif
 		{
 			"position",
 			Player_GetPosition,
@@ -1229,14 +1246,21 @@ namespace JPLua {
 			nullptr
 	#endif
 		},
-#if defined(PROJECT_GAME)
+	#if defined(PROJECT_GAME)
 		{
 			"speed",
 			Player_GetSpeed,
 			Player_SetSpeed
 		},
-#endif
+	#endif
+	#if defined(PROJECT_GAME)
 		{
+			"supportFlags",
+			Player_GetSupportFlags,
+			nullptr
+		},
+	#endif
+	{
 			"team",
 			Player_GetTeam,
 	#if defined(PROJECT_GAME)

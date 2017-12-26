@@ -27,7 +27,7 @@
 		#define NOMINMAX
 	#endif
 	#include <windows.h>
-	#include <Shellapi.h>
+	#include <shellapi.h>
 
 	#define	PATH_SEP "\\"
 	#define DLL_EXT ".dll"

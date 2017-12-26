@@ -1624,6 +1624,21 @@ void ClientThink_real( gentity_t *ent ) {
 		return;
 	}
 
+	// mark the time, so the connection sprite can be removed
+	ucmd = &ent->client->pers.cmd;
+
+	// sanity check the command time to prevent speedup cheating
+	if ( ucmd->serverTime > level.time + 200 ) {
+		ucmd->serverTime = level.time + 200;
+	}
+	if ( ucmd->serverTime < level.time - 1000 ) {
+		ucmd->serverTime = level.time - 1000;
+	}
+
+	if ( isNPC && (ucmd->serverTime - client->ps.commandTime) < 1 ) {
+		ucmd->serverTime = client->ps.commandTime + 100;
+	}
+
 	// This code was moved here from clientThink to fix a problem with g_synchronousClients
 	// being set to 1 when in vehicles.
 	if ( ent->s.number < MAX_CLIENTS && ent->client->ps.m_iVehicleNum ) {//driving a vehicle
@@ -1708,25 +1723,8 @@ void ClientThink_real( gentity_t *ent ) {
 		}
 	}
 
-	// mark the time, so the connection sprite can be removed
-	ucmd = &ent->client->pers.cmd;
-
 	if ( client && (client->ps.eFlags2&EF2_HELD_BY_MONSTER) ) {
 		G_HeldByMonster( ent, ucmd );
-	}
-
-	// sanity check the command time to prevent speedup cheating
-	if ( ucmd->serverTime > level.time + 200 ) {
-		ucmd->serverTime = level.time + 200;
-		//		trap->Print("serverTime <<<<<\n" );
-	}
-	if ( ucmd->serverTime < level.time - 1000 ) {
-		ucmd->serverTime = level.time - 1000;
-		//		trap->Print("serverTime >>>>>\n" );
-	}
-
-	if ( isNPC && (ucmd->serverTime - client->ps.commandTime) < 1 ) {
-		ucmd->serverTime = client->ps.commandTime + 100;
 	}
 
 	msec = ucmd->serverTime - client->ps.commandTime;

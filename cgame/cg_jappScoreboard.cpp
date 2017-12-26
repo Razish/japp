@@ -1283,12 +1283,6 @@ static void DrawClientInfo( float fade ) {
 	VectorCopy4( &g_color_table[ColorIndex( COLOR_ORANGE )], &colour );
 	colour.a = fade;
 
-#ifdef REVISION
-	y -= font.Height( REVISION );
-	// JA++ version
-	font.Paint( SCREEN_WIDTH - font.Width( REVISION ), y, REVISION, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
-#endif
-
 	// date
 	time( &tm );
 	timeinfo = localtime( &tm );
@@ -1300,6 +1294,12 @@ static void DrawClientInfo( float fade ) {
 
 	y -= font.Height( buf );
 	font.Paint( SCREEN_WIDTH - font.Width( buf ), y, buf, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+
+#ifdef REVISION
+	y -= font.Height( REVISION );
+	// JA++ version
+	font.Paint( SCREEN_WIDTH - font.Width( REVISION ), y, REVISION, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+#endif
 }
 
 //Scoreboard entry point

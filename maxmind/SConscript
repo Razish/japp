@@ -16,20 +16,22 @@ files = [
 files = [build_dir + f for f in files]
 
 # project settings
-if 'gcc' in realcc or 'clang' in realcc:
-	if plat != 'Windows':
+if 'gcc' in env['CC'] or 'clang' in env['CC']:
+	if target_plat != 'Windows':
 		maxmind_env['CCFLAGS'] += [
 			'-fPIC',
 		]
 	maxmind_env['CFLAGS'] += [
 		'-std=c99',
 	]
-	maxmind_env['CPPPATH'] += [
-		'#' + os.sep + 'maxmind'
-	]
+
+maxmind_env['CPPPATH'] += [
+	'#' + os.sep + 'maxmind'
+]
+
 # targets
 result = maxmind_env.StaticLibrary(
 	build_dir + 'libmaxmind',
 	files
 )
-Return( "result" )
+Return( 'result' )

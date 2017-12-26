@@ -15,9 +15,12 @@ files = [
 files = [build_dir + f for f in files]
 
 # project settings
-if ('gcc' in realcc or 'clang' in realcc) and plat != 'Windows':
+if 'gcc' in env['CC'] or 'clang' in env['CC']:
+	if target_plat != 'Windows':
+		json_env['CCFLAGS'] += [
+			'-fPIC',
+		]
 	json_env['CCFLAGS'] += [
-		'-fPIC',
 		'-Wno-unsuffixed-float-constants',
 		'-Wno-cast-qual',
 	]

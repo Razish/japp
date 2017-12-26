@@ -1,19 +1,23 @@
 #include "g_local.h"
-#include <unordered_map>
-#include <future>
-#include <mutex>
+#ifndef NO_GEOIP
+	#include <unordered_map>
+	#include <future>
+	#include <mutex>
+#endif
 extern "C" {
 	#include "maxmind/maxminddb.h"
 }
+
 namespace GeoIP {
+#ifndef NO_GEOIP
 	static MMDB_s *handle = nullptr;
 
-#ifdef _WIN32
-	// temporary files - store them in a circular buffer.
-	// We're pretty much guaranteed to not need more than 8 temp files at a time.
-	static int		fs_temporaryFileWriteIdx = 0;
-	static char		fs_temporaryFileNames[8][MAX_OSPATH];
-#endif
+	#ifdef _WIN32
+		// temporary files - store them in a circular buffer.
+		// We're pretty much guaranteed to not need more than 8 temp files at a time.
+		static int		fs_temporaryFileWriteIdx = 0;
+		static char		fs_temporaryFileNames[8][MAX_OSPATH];
+	#endif
 
 	// caller must free() tempFilePath is return value is true
 	// extension is only used on linux and mac but should be in the form ".dat"
@@ -143,8 +147,12 @@ namespace GeoIP {
 
 		return false;
 	}
+#endif // NO_GEOIP
 
 	bool Init( void ) {
+	#ifdef NO_GEOIP
+		return false;
+	#else
 		if ( !japp_detectCountry.integer ) {
 			return false;
 		}
@@ -209,16 +217,20 @@ namespace GeoIP {
 		free( tmpFilePath );
 		free( buf );
 		return true;
+	#endif // NO_GEOIP
 	}
 
 	void ShutDown( void ) {
+	#ifndef NO_GEOIP
 		if ( handle ) {
 			MMDB_close( handle );
 			delete handle;
 			handle = nullptr;
 		}
+	#endif // NO_GEOIP
 	}
 
+#ifndef NO_GEOIP
 	static void Worker( GeoIPData *data ) {
 		int error = -1, gai_error = -1;
 		MMDB_lookup_result_s result =  MMDB_lookup_string( handle, data->getIp().c_str(), &gai_error, &error );
@@ -255,8 +267,12 @@ namespace GeoIP {
 			return;
 		}
 	}
+#endif // NO_GEOIP
 
 	GeoIPData *GetIPInfo( const std::string ip ) {
+	#ifdef NO_GEOIP
+		return nullptr;
+	#else
 		if ( !japp_detectCountry.integer ) {
 			return nullptr;
 		}
@@ -268,5 +284,6 @@ namespace GeoIP {
 		else {
 			return nullptr;
 		}
+	#endif // NO_GEOIP
 	}
 }

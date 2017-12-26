@@ -21,7 +21,7 @@ files = [
 files = [build_dir + f for f in files]
 
 # project settings
-if ('gcc' in realcc or 'clang' in realcc) and plat != 'Windows':
+if ('gcc' in env['CC'] or 'clang' in env['CC']) and target_plat != 'Windows':
 	udis86_env['CCFLAGS'] += [
 		'-fPIC',
 	]

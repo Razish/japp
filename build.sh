@@ -11,6 +11,8 @@ DEBUG=0
 FORCE32=0
 NOSQL=1
 NONOTIFY=0
+NOCRASHHANDLER=0
+NOGEOIP=0
 export NO_SSE=1
 
 build='scons -Q'
@@ -36,9 +38,15 @@ do
 	"nonotify")
 		NONOTIFY=1
 		;;
+	"nocrashhandler")
+		NOCRASHHANDLER=1
+		;;
+	"nogeoip")
+		NOGEOIP=1
+		;;
 	*)
 		;;
 	esac
 done
 
-$build debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL no_notify=$NONOTIFY project=$PROJECT tools=$TOOLS
+$build debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL no_notify=$NONOTIFY no_crashhandler=$NOCRASHHANDLER no_geoip=$NOGEOIP project=$PROJECT tools=$TOOLS

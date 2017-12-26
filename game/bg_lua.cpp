@@ -1284,8 +1284,10 @@ namespace JPLua {
 		const char *msg = luaL_checkstring( L, 2 );
 		const uint32_t timeout = luaL_checkinteger( L, 3 );
 		const char *iconName = luaL_checkstring( L, 4 );
-		CG_NotifySend( title, msg, timeout, iconName );
-		return 0;
+
+		bool success = CG_NotifySend( title, msg, timeout, iconName );
+		lua_pushboolean( L, success );
+		return 1;
 	}
 	#endif
 

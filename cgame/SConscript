@@ -4,7 +4,7 @@ Import( '*' )
 # environment
 build_dir = 'build' + os.sep\
 	+ configuration + os.sep\
-	+ realcc + os.sep\
+	+ env['CC'] + os.sep\
 	+ str(bits) + os.sep\
 	+ 'cgame' + os.sep
 env.VariantDir(
@@ -117,20 +117,20 @@ cgame_env['LIBS'] += [
 			'build_dir',
 			'configuration',
 			'env',
-			'plat',
-			'realcc',
+			'host_plat',
+			'target_plat',
 		]
 	) for lib in libraries
 ]
 
-if plat == 'Windows':
+if target_plat == 'Windows':
 	cgame_env['LIBS'] += [
 		'user32',
-		'Advapi32',
-		'Shell32',
+		'advapi32',
+		'shell32',
 	]
-elif plat == 'Linux':
-	if not no_notify:
+if not no_notify:
+	if target_plat == 'Linux':
 		# for libnotify on GTK+ systems
 		cgame_env.ParseConfig( 'pkg-config glib-2.0 gtk+-2.0 libnotify --cflags --libs' )
 
@@ -144,17 +144,13 @@ cgame_env['CPPDEFINES'] += [
 	'LUA_COMPAT_BITLIB',
 	'LUA_COMPAT_APIINTCASTS',
 ]
-if plat == 'Linux':
+if target_plat == 'Linux':
 	cgame_env['CPPDEFINES'] += [
 		'LUA_USE_LINUX',
 	]
-else:
-	cgame_env['CPPDEFINES'] += [
-		'NO_NOTIFY'
-	]
 cgame_env['LIBPREFIX'] = ''
 
-if realcc == 'cl':
+if env['CC'] == 'cl':
 	cgame_env['PDB'] = '#' + os.sep + 'cgame' + arch + '.pdb'
 
 # targets

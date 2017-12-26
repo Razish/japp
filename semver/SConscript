@@ -15,19 +15,19 @@ files = [
 files = [build_dir + f for f in files]
 
 # project settings
-if 'gcc' in realcc or 'clang' in realcc:
+if 'gcc' in env['CC'] or 'clang' in env['CC']:
+	if target_plat != 'Windows':
+		semver_env['CCFLAGS'] += [
+			'-fPIC',
+		]
 	semver_env['CFLAGS'] += [
 		'-std=c99',
 		'-Wno-declaration-after-statement',
 	]
-	if plat != 'Windows':
-		semver_env['CCFLAGS'] += [
-			'-fPIC',
-		]
 
 # targets
 result = semver_env.StaticLibrary(
 	build_dir + 'libsemver',
 	files
 )
-Return( "result" )
+Return( 'result' )

@@ -30,7 +30,7 @@ int bCrashing = 0;
 #if defined(_WIN32)
 
 	#undef WIN32_LEAN_AND_MEAN
-	#include <WinNT.h>
+	#include <winnt.h>
 #elif defined(__linux__)
 	#ifndef __USE_GNU
 		#define __USE_GNU

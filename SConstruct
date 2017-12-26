@@ -3,34 +3,49 @@
 # written by Raz0r
 #
 # options:
+#	target			cross-compile for "Windows", "Linux" or "Darwin"
 #	debug			generate debug information. value 2 also enables optimisations
 #	force32			force 32 bit target when on 64 bit machine
-#	no_sql			don't include any SQL dependencies
-#	no_notify		don't include libnotify etc dependencies
-#	no_crashhandler	don't include the crash logger (x86 only)
+#	no_sql			disable sqlite+mysql support (external dependencies)
+#	no_notify		disable desktop notifications (external dependencies: libnotify etc)
+#	no_crashhandler	disable x86 crash logger
+#	no_geoip		disable support for asynchronous geoip lookup
 #
-# example:
-#	scons -Q debug=1 force32=1
+#	simple example:
+#		scons -Q debug=1 force32=1
+#	cross-compile from linux64 to win64:
+#		CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ scons -Q no_sql=1 no_crashhandler=1 no_geoip=1 target=Windows
+#	cross-compile from linux64 to win32:
+#		CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ scons -Q no_sql=1 no_crashhandler=1 no_geoip=1 force32=1 target=Windows
 #
 # envvars:
 #	NO_SSE			disable SSE floating point instructions, force x87 fpu
 #	MORE_WARNINGS	enable additional warnings
 #
+#pylint: disable=W0312,C0326,C0330
+
+import platform
+import os
+import re
+import SCons
+import subprocess
+import sys
 
 debug = int( ARGUMENTS.get( 'debug', 0 ) )
-configuration = { 0: lambda x: 'release', 1: lambda x: 'debug', 2: lambda x: 'optimised-debug' }[debug](debug)
 force32 = int( ARGUMENTS.get( 'force32', 0 ) )
 no_sql = int( ARGUMENTS.get( 'no_sql', 0 ) )
 no_notify = int( ARGUMENTS.get( 'no_notify', 0 ) )
 no_crashhandler = int( ARGUMENTS.get( 'no_crashhandler', 0 ) )
+no_geoip = int( ARGUMENTS.get( 'no_geoip', 0 ) )
 toolStr = ARGUMENTS.get( 'tools', 'gcc,g++,ar,as,gnulink' )
 tools = toolStr.split( ',' )
 proj = ARGUMENTS.get( 'project', 'game,cgame,ui' )
 
+configuration = { 0: lambda x: 'release', 1: lambda x: 'debug', 2: lambda x: 'optimised-debug' }[debug](debug)
+
 # compare semantic versions (1.0.2 < 1.0.10 < 1.2.0)
 def cmp_version( v1, v2 ):
 	def normalise( v ):
-		import re
 		return [int(x) for x in re.sub( r'(\.0+)*$', '', v ).split( '.' )]
 
 	return cmp(
@@ -39,7 +54,6 @@ def cmp_version( v1, v2 ):
 	)
 
 def run_command( cmd ):
-	import subprocess
 	p = subprocess.Popen(
 		cmd.split( ' ' ),
 		stdout=subprocess.PIPE,
@@ -51,8 +65,8 @@ def run_command( cmd ):
 		print( 'run_command: ' + err )
 	return 0 if not err else 1, out
 
-import platform
-plat = platform.system() # Windows or Linux
+host_plat = platform.system() # Windows, Linux, Darwin
+target_plat = ARGUMENTS.get( 'target', host_plat ) # Windows, Linux, Darwin
 try:
 	bits = int( platform.architecture()[0][:2] ) # 32 or 64
 except( ValueError, TypeError ):
@@ -63,68 +77,58 @@ arch = None # platform-specific, set manually
 if force32:
 	bits = 32
 if bits == 32:
-	if plat == 'Windows':
+	if target_plat == 'Windows':
 		arch = 'x86'
-	elif plat == 'Linux':
+	elif target_plat == 'Linux':
+		#FIXME: we need to read the TARGET platform, not the HOST platform...this breaks cross-compiling to ARM
 		if platform.machine()[:3] == 'arm':
 			arch = 'arm'
 		else:
 			arch = 'i386'
-	elif plat == 'Darwin':
+	elif target_plat == 'Darwin':
 		arch = 'i386'
 	else:
-		raise Exception( 'unexpected platform: ' + plat )
+		raise Exception( 'unexpected platform: ' + target_plat )
 elif bits == 64:
-	if plat == 'Windows':
+	if target_plat == 'Windows':
 		arch = 'x64'
-	elif plat == 'Linux':
+	elif target_plat == 'Linux':
 		arch = 'x86_64'
-	elif plat == 'Darwin':
+	elif target_plat == 'Darwin':
 		arch = 'x86_64'
 	else:
-		raise Exception( 'unexpected platform: ' + plat )
+		raise Exception( 'unexpected platform: ' + target_plat )
 else:
 	raise Exception( 'could not determine architecture width: ' + str(bits) )
 
-clangHack = plat == 'Darwin'
+clangHack = host_plat == 'Darwin'
 
 # create the build environment
 #FIXME: also consider LD, AS, AR in the toolset
-import os
 def get_env( key, default_value = None ):
 	return default_value if key not in os.environ else os.environ[key]
 
 env = Environment(
 	TARGET_ARCH = arch,
 	tools = tools,
-	ENV = { 'TMP' : get_env( 'TMP' ), 'PATH' : get_env( 'PATH' ) } # import basic shell environment
+	# import basic shell environment
+	ENV = {
+		'TMP': get_env( 'TMP' ),
+		'PATH': get_env( 'PATH' ),
+		'CC': get_env( 'CC' ),
+		'CXX': get_env( 'CXX' ),
+	}
 )
 
-# set the proper compiler name
-realcc = ARGUMENTS.get( 'CC', None )
-realcxx = ARGUMENTS.get( 'CXX', None )
-
+# grab the compiler name
 if 'CC' in os.environ:
-	if 'ccc' in os.environ['CC']:
-		env['CC'] = os.environ['CC']
-		env['CXX'] = os.environ['CXX']
-		# running a scan-build
-		if realcc is None or realcxx is None:
-			raise Exception( 'please specify CC/CXX as such: scons CC=gcc CXX=g++' )
-	else:
-		# not a scan-build, do not allow inheriting CC/CXX from outside environment
-		raise Exception( 'please specify CC/CXX as such: scons CC=gcc CXX=g++' )
-elif realcc is None and realcxx is None:
-	realcc = env['CC']
-	realcxx = env['CXX']
-	#FIXME: realcxx is "$CC" on Windows/MSVC
-
-env['ENV'].update( x for x in os.environ.items() if x[0].startswith( 'CCC_' ) )
+	env['CC'] = os.environ['CC']
+if 'CXX' in os.environ:
+	env['CXX'] = os.environ['CXX']
 
 # prettify the compiler output
 if 'TERM' in os.environ:
 	env['ENV']['TERM'] = os.environ['TERM']
-import sys
 colours = {}
 enableColours = sys.stdout.isatty()
 colours['white'] = '\033[1;97m' if enableColours else ''
@@ -145,17 +149,13 @@ env['SHLINKCOMSTR'] = env['LINKCOMSTR'] = \
 	'%s   linking: %s$TARGET%s' % (colours['green'], colours['white'], colours['end'])
 
 # obtain the compiler version
-if realcc == 'cl':
+if env['CC'] == 'cl':
 	# msvc
 	ccversion = env['MSVC_VERSION']
-elif 'gcc' in realcc or 'clang' in realcc:
+elif 'gcc' in env['CC'] or 'clang' in env['CC']:
 	# probably gcc or clang
-	status, ccrawversion = run_command( realcc + ' -dumpversion' )
+	status, ccrawversion = run_command( env['CC'] + ' -dumpversion' )
 	ccversion = None if status else ccrawversion
-
-# scons version
-import SCons
-sconsversion = SCons.__version__
 
 # git revision
 status, rawrevision = run_command( 'git rev-parse --short HEAD' )
@@ -168,7 +168,7 @@ if revision:
 
 # set job/thread count
 def GetNumCores():
-	if plat == 'Linux' or plat == 'Darwin':
+	if host_plat == 'Linux' or host_plat == 'Darwin':
 		# works on recent mac/linux
 		status, num_cores = run_command( 'getconf _NPROCESSORS_ONLN' )
 		if status == 0:
@@ -179,26 +179,24 @@ def GetNumCores():
 		if status == 0:
 			return int(num_cores)
 
-		return 1;
-
-	elif plat == 'Windows':
-		# exists since at-least XP SP2
+		return 1
+	elif host_plat == 'Windows':
+		# requires >= XP SP2
 		return int( os.environ['NUMBER_OF_PROCESSORS'] )
+	return None
 env.SetOption( 'num_jobs', GetNumCores() )
 
 # notify the user of the build configuration
 if not env.GetOption( 'clean' ):
 	# build tools
-	msg = 'Building '
-	if revision:
-		msg += revision + ' '
-	msg += 'for ' + plat + ' '
-	if force32:
-		msg += 'forced '
-	msg += str(bits) + ' bits using ' + str(env.GetOption( 'num_jobs' )) + ' threads\n'\
-		+ '\t' + realcc + '/' + realcxx + ': ' + ccversion + '\n'\
-		+ '\tpython: ' + platform.python_version() + '\n'\
-		+ '\tscons: ' + sconsversion + '\n'
+	msg = 'Building ' + ((revision + ' ') if revision else '')
+	msg += 'using ' + str(env.GetOption( 'num_jobs' )) + ' threads\n'\
+		+ '\thost: ' + host_plat + '\n'\
+		+ '\ttarget: ' + target_plat + ' ' + ('forced ' if force32 else '') + str(bits) + 'bit\n'\
+		+ '\tC compiler: ' + env['CC'] + ' ' + ccversion + '\n'\
+		+ '\tC++ compiler: ' + env['CXX'] + ' ' + ccversion + '\n'\
+		+ '\tpython: ' + platform.python_version() + ' at ' + sys.executable + '\n'\
+		+ '\tscons: ' + SCons.__version__ + '\n'
 
 	# build options
 	msg += 'options:\n'\
@@ -207,11 +205,12 @@ if not env.GetOption( 'clean' ):
 			+ ((' with x87 fpu' if 'NO_SSE' in os.environ else ' with SSE') if arch != 'arm' else '') + '\n'\
 		+ '\tsql support: ' + ('dis' if no_sql else 'en') + 'abled\n'\
 		+ '\tnotify support: ' + ('dis' if no_notify else 'en') + 'abled\n'\
-		+ '\tcrash logging: ' + ('dis' if no_crashhandler else 'en') + 'abled\n'
+		+ '\tcrash logging: ' + ('dis' if no_crashhandler else 'en') + 'abled\n'\
+		+ '\tgeoip support: ' + ('dis' if no_geoip else 'en') + 'abled\n'
 
 	# build environment
 	if 'SCONS_DEBUG' in os.environ:
-		msg += realcc + ' located at ' + run_command( 'where ' + realcc )[1].split( '\n' )[0] + '\n'
+		msg += env['CC'] + ' located at ' + run_command( 'where ' + env['CC'] )[1].split( '\n' )[0] + '\n'
 		if 'AR' in env:
 			msg += env['AR'] + ' located at ' + run_command( 'where ' + env['AR'] )[1].split( '\n' )[0] + '\n'
 		if 'AS' in env:
@@ -241,7 +240,7 @@ emptyEnv( env, 'ARFLAGS' )
 emptyEnv( env, 'LIBS' )
 
 # compiler switches
-if 'gcc' in realcc or 'clang' in realcc:
+if 'gcc' in env['CC'] or 'clang' in env['CC']:
 	env['CCFLAGS'] += [
 		#'-M',	# show include hierarchy
 	]
@@ -297,7 +296,7 @@ if 'gcc' in realcc or 'clang' in realcc:
 			]
 
 	# gcc-specific warnings
-	if 'gcc' in realcc and cmp_version( ccversion, '4.6' ) >= 0 and arch != 'arm':
+	if 'gcc' in env['CC'] and cmp_version( ccversion, '4.6' ) >= 0 and arch != 'arm':
 		env['CCFLAGS'] += [
 			'-Wlogical-op',
 		]
@@ -333,7 +332,7 @@ if 'gcc' in realcc or 'clang' in realcc:
 				'-mno-sse2',
 				'-ffloat-store',
 			]
-			if 'gcc' in realcc:
+			if 'gcc' in env['CC']:
 				env['CFLAGS'] += [
 					'-fexcess-precision=standard',
 				]
@@ -363,7 +362,7 @@ if 'gcc' in realcc or 'clang' in realcc:
 	]
 
 	# misc settings
-	#if 'gcc' in realcc and cmp_version( ccversion, '4.9' ) >= 0:
+	#if 'gcc' in env['CC'] and cmp_version( ccversion, '4.9' ) >= 0:
 	#	env['CCFLAGS'] += [
 	#		'-fdiagnostics-color',
 	#	]
@@ -382,7 +381,7 @@ if 'gcc' in realcc or 'clang' in realcc:
 	# archive flags
 	env['ARFLAGS'] = 'rc'
 
-elif realcc == 'cl':
+elif env['CC'] == 'cl':
 	# msvc
 	env['CCFLAGS'] += [
 		#'/showIncludes',
@@ -479,7 +478,7 @@ elif realcc == 'cl':
 		#'/NODEFAULTLIB:MSVCRT',
 	]
 
-if plat == 'Darwin':
+if target_plat == 'Darwin':
 	env['CPPDEFINES'] += [ 'MACOS_X' ]
 	env['LINKFLAGS'] += [
 		'-framework', 'CoreFoundation',
@@ -488,16 +487,16 @@ if plat == 'Darwin':
 
 # debug / release
 if debug == 0 or debug == 2:
-	if 'gcc' in realcc or 'clang' in realcc:
+	if 'gcc' in env['CC'] or 'clang' in env['CC']:
 		env['CCFLAGS'] += [
 			'-O2', # O3 may not be best, due to cache size not being big enough for the amount of inlining performed
 			'-fomit-frame-pointer',
 		]
-		if debug == 0 and 'gcc' in realcc:
+		if debug == 0 and 'gcc' in env['CC']:
 			env['LINKFLAGS'] += [
 				'-s',	# strip unused symbols
 			]
-	elif realcc == 'cl':
+	elif env['CC'] == 'cl':
 		env['CCFLAGS'] += [
 			'/O2',	# maximise speed
 			'/MD',	# multi-threaded runtime for DLLs
@@ -513,7 +512,7 @@ if debug == 0 or debug == 2:
 		]
 
 if debug:
-	if 'gcc' in realcc or 'clang' in realcc:
+	if 'gcc' in env['CC'] or 'clang' in env['CC']:
 		env['CCFLAGS'] += [
 			'-g3',
 			#'-pg',
@@ -525,7 +524,7 @@ if debug:
 		#	'-pg',
 		#	'-fsanitize=address',
 		#]
-	elif realcc == 'cl':
+	elif env['CC'] == 'cl':
 		env['CCFLAGS'] += [
 			'/Od',		# disable optimisations
 			'/Z7',		# emit debug information
@@ -546,6 +545,14 @@ if revision:
 		'REVISION=\\"' + revision + '\\"'
 	]
 
+# override options
+if target_plat != 'Linux':
+	# only have notification backend available for linux
+	no_notify = 1
+if target_plat == 'Windows' and 'mingw' in env['CC']:
+	# Dec 2017: cross-compiling with MinGW does not fully support std::future
+	no_geoip = 1
+
 if no_crashhandler:
 	env['CPPDEFINES'] += [
 		'NO_CRASHHANDLER',
@@ -561,9 +568,14 @@ if no_notify:
 		'NO_NOTIFY',
 	]
 
+if no_geoip:
+	env['CPPDEFINES'] += [
+		'NO_GEOIP',
+	]
+
 # build-time settings
 env['CPPDEFINES'] += [
-	'JAPP_COMPILER=\\"' + realcc + ' ' + ccversion + '\\"',
+	'JAPP_COMPILER=\\"' + env['CC'] + ' ' + ccversion + '\\"',
 	'ARCH_STRING=\\"' + arch + '\\"',
 ]
 
@@ -572,8 +584,15 @@ env['CPPPATH'] = [
 	'..' + os.sep + 'game',
 ]
 env['LIBPATH'] = [
-	'#' + os.sep + 'libs' + os.sep + plat + os.sep + realcc + os.sep + str(bits) + os.sep
+	'#' + os.sep + 'libs' + os.sep + target_plat + os.sep + env['CC'] + os.sep + str(bits) + os.sep
 ]
+
+if target_plat == 'Windows':
+	env['SHLIBSUFFIX'] = '.dll'
+elif target_plat == 'Linux':
+	env['SHLIBSUFFIX'] = '.so'
+elif target_plat == 'Darwin':
+	env['SHLIBSUFFIX'] = '.dylib'
 
 # invoke the per-project scripts
 projects = [
@@ -593,7 +612,8 @@ for project in [p for p in projects if not proj or p in proj.split(',')]:
 			'no_crashhandler',
 			'no_sql',
 			'no_notify',
-			'plat',
-			'realcc',
+			'no_geoip',
+			'host_plat',
+			'target_plat',
 		]
 	)

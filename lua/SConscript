@@ -48,16 +48,19 @@ files = [
 files = [build_dir + f for f in files]
 
 # project settings
-if plat == 'Linux':
+if 'gcc' in env['CC'] or 'clang' in env['CC']:
+	if target_plat != 'Windows':
+		lua_env['CCFLAGS'] += [
+			'-fPIC',
+		]
+	lua_env['CCFLAGS'] += [
+		'-Wno-cast-qual',
+		'-Wno-unsuffixed-float-constants',
+	]
+if target_plat == 'Linux':
 	lua_env['CPPDEFINES'] += [
 		'LUA_USE_LINUX',
 	]
-	if 'gcc' in realcc or 'clang' in realcc:
-		lua_env['CCFLAGS'] += [
-			'-fPIC',
-			'-Wno-cast-qual',
-			'-Wno-unsuffixed-float-constants',
-		]
 
 lua_env['CPPDEFINES'] += [
 	'LUA_COMPAT_BITLIB',

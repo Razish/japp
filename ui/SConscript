@@ -4,7 +4,7 @@ Import( '*' )
 # environment
 build_dir = 'build' + os.sep\
 	+ configuration + os.sep\
-	+ realcc + os.sep\
+	+ env['CC'] + os.sep\
 	+ str(bits) + os.sep\
 	+ 'ui' + os.sep
 env.VariantDir(
@@ -56,21 +56,21 @@ ui_env['LIBS'] += [
 			'build_dir',
 			'configuration',
 			'env',
-			'plat',
-			'realcc',
+			'host_plat',
+			'target_plat',
 		]
 	) for lib in libraries
 ]
 
-if plat == 'Windows':
+if target_plat == 'Windows':
 	ui_env['LIBS'] += [
 		'user32',
-		'Shell32',
+		'shell32',
 	]
 	if no_crashhandler == 0:
 		ui_env['LIBS'] += [
-			'DbgHelp',
-			'Psapi',
+			'dbghelp',
+			'psapi',
 			'user32',
 		]
 
@@ -83,7 +83,7 @@ ui_env['CPPDEFINES'] += [
 ]
 ui_env['LIBPREFIX'] = ''
 
-if realcc == 'cl':
+if env['CC'] == 'cl':
 	ui_env['PDB'] = '#' + os.sep + 'ui' + arch + '.pdb'
 
 # targets
