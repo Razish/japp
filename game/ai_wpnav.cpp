@@ -1474,7 +1474,7 @@ void CalculateWeightGoals( void ) { //set waypoint weights depending on weapon a
 				gWPArray[i]->weight = 0;
 
 				if ( gWPArray[i]->flags & WPFLAG_GOALPOINT ) {
-					gWPArray[i]->flags -= WPFLAG_GOALPOINT;
+					gWPArray[i]->flags &= ~WPFLAG_GOALPOINT;
 				}
 			}
 
@@ -3047,10 +3047,10 @@ int AcceptBotCommand( char *cmd, gentity_t *pl ) {
 		while ( i < gWPNum ) {
 			if ( gWPArray[i] && gWPArray[i]->inuse ) {
 				if ( gWPArray[i]->flags & WPFLAG_ONEWAY_FWD ) {
-					gWPArray[i]->flags -= WPFLAG_ONEWAY_FWD;
+					gWPArray[i]->flags &= ~WPFLAG_ONEWAY_FWD;
 				}
 				if ( gWPArray[i]->flags & WPFLAG_ONEWAY_BACK ) {
-					gWPArray[i]->flags -= WPFLAG_ONEWAY_BACK;
+					gWPArray[i]->flags &= ~WPFLAG_ONEWAY_BACK;
 				}
 			}
 
