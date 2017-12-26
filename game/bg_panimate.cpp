@@ -1392,12 +1392,11 @@ qboolean BG_FullBodyTauntAnim( int anim ) {
 	}
 }
 
-// Get the "length" of an anim given the local anim index (which skeleton) and anim number.
-// Obviously does not take things like the length of the anim while force speeding (as an example) and whatnot into
-//	account.
+// get the "length" of an anim given the local anim index (which skeleton) and anim number.
+// obviously does not take things like the length of the anim while force speeding (as an example) and whatnot into account.
 int BG_AnimLength( int index, animNumber_t anim ) {
-	if ( anim >= MAX_ANIMATIONS ) {
-		return -1;
+	if ( (int)anim < 0 || anim >= MAX_ANIMATIONS ) {
+		return 0;
 	}
 
 	return bgAllAnims[index].anims[anim].numFrames * fabsf( (float)(bgAllAnims[index].anims[anim].frameLerp) );
@@ -1405,8 +1404,10 @@ int BG_AnimLength( int index, animNumber_t anim ) {
 
 //just use whatever pm->animations is
 int PM_AnimLength( int index, animNumber_t anim ) {
-	if ( anim >= MAX_ANIMATIONS || !pm->animations )
+	if ( !pm->animations || (int)anim < 0 || anim >= MAX_ANIMATIONS ) {
 		return -1;
+	}
+
 	return pm->animations[anim].numFrames * fabsf( (float)(pm->animations[anim].frameLerp) );
 }
 
