@@ -2572,6 +2572,7 @@ qboolean TryGrapple( gentity_t *ent ) {
 			ent->client->ps.legsTimer = ent->client->ps.torsoTimer;
 		}
 		ent->client->ps.weaponTime = ent->client->ps.torsoTimer;
+		ent->client->dangerTime = level.time;
 		return qtrue;
 	}
 
