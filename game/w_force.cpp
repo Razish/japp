@@ -3805,6 +3805,17 @@ void HolocronUpdate( gentity_t *self ) { //keep holocron status updated in holoc
 					self->client->ps.fd.forcePowerLevel[i] = noHRank;
 				else
 					self->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_1;
+
+				//make sure that the player's saber stance is reset so they can't continue to use that stance when they don't have the skill for it anymore.
+				if ( self->client->saber[0].model[0] && self->client->saber[1].model[0] ) {
+					self->client->ps.fd.saberAnimLevelBase = self->client->ps.fd.saberAnimLevel = self->client->ps.fd.saberDrawAnimLevel = SS_DUAL;
+				}
+				else if ( (self->client->saber[0].saberFlags & SFL_TWO_HANDED) ) {
+					self->client->ps.fd.saberAnimLevel = self->client->ps.fd.saberDrawAnimLevel = SS_STAFF;
+				}
+				else {
+					self->client->ps.fd.saberAnimLevelBase = self->client->ps.fd.saberAnimLevel = self->client->ps.fd.saberDrawAnimLevel = SS_MEDIUM;
+				}
 			}
 			else
 				self->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_0;
