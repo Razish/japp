@@ -346,7 +346,7 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 
 void AM_LoadStrings( void ) {
 	fileHandle_t f = NULL_FILE;
-	unsigned int len = trap->FS_Open( "admin_strings.json", &f, FS_READ );
+	int len = trap->FS_Open( "admin_strings.json", &f, FS_READ );
 	trap->Print( "Loading admin strings\n" );
 
 	// no file
@@ -365,6 +365,7 @@ void AM_LoadStrings( void ) {
 
 	char *buf = NULL;
 	if ( !(buf = (char *)malloc( len + 1 )) ) {
+		trap->FS_Close( f );
 		return;
 	}
 
@@ -595,6 +596,7 @@ void AM_LoadAdmins( void ) {
 
 	// alloc memory for buffer
 	if ( !(buf = (char*)malloc( len + 1 )) ) {
+		trap->FS_Close( f );
 		return;
 	}
 
@@ -896,6 +898,7 @@ void AM_LoadTelemarks( void ) {
 
 	// alloc memory for buffer
 	if ( !(buf = (char*)malloc( len + 1 )) ) {
+		trap->FS_Close( f );
 		return;
 	}
 
@@ -917,7 +920,6 @@ void AM_SaveTelemarks( void ) {
 	Com_sprintf( loadPath, sizeof(loadPath), "telemarks" PATH_SEP "%s.json", level.rawmapname );
 	trap->FS_Open( loadPath, &f, FS_WRITE );
 	Com_Printf( "Saving telemarks (%s)\n", loadPath );
-
 	AM_WriteTelemarks( f );
 }
 

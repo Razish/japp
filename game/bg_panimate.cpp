@@ -2090,14 +2090,15 @@ int BG_ParseAnimationFile( const char *filename, animation_t *animset, qboolean 
 	// load the file
 	if ( !BGPAFtextLoaded || !isHumanoid ) { //rww - We are always using the same animation config now. So only load it once.
 		len = trap->FS_Open( filename, &f, FS_READ );
-		if ( (len <= 0) || (len >= sizeof(BGPAFtext)-1) ) {
+		if ( !f || len <= 0 ) {
 			if ( dynAlloc ) {
 				BG_AnimsetFree( animset );
 			}
-			if ( len > 0 ) {
-				Com_Error( ERR_DROP, "%s exceeds the allowed game-side animation buffer!", filename );
-			}
 			return -1;
+		}
+		if ( len >= sizeof(BGPAFtext)-1 ) {
+			trap->FS_Close( f );
+			Com_Error( ERR_DROP, "%s exceeds the allowed game-side animation buffer!", filename );
 		}
 
 		trap->FS_Read( BGPAFtext, len, f );

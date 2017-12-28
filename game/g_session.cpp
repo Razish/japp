@@ -68,6 +68,7 @@ void G_ReadClientSessionData( gclient_t *client ) {
 
 	buffer = (char *)malloc( len + 1 );
 	if ( !buffer ) {
+		trap->FS_Close( f );
 		return;
 	}
 

@@ -424,7 +424,7 @@ static void G_SpawnHoleFixes( void ) {
 	Com_sprintf( filename, sizeof(filename), "%s_holes.cfg", mapname );
 
 	len = trap->FS_Open( filename, &f, FS_READ );
-	if ( len != -1 ) {
+	if ( f && len != -1 ) {
 		// read mins, maxs out of file
 		char *text = (char *)calloc( len + 1, 1 );
 		const char *cursor = text;

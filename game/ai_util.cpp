@@ -561,6 +561,7 @@ void BotUtilizePersonality( bot_state_t *bs ) {
 	if ( len >= BUFSIZE ) {
 		trap->Print( S_COLOR_RED "Personality file exceeds maximum length\n" );
 		B_TempFree( BUFSIZE ); //buf
+		trap->FS_Close( f );
 		return;
 	}
 

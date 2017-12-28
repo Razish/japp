@@ -1179,6 +1179,7 @@ void BG_VehWeaponLoadParms( void ) {
 			}
 
 			if ( totallen + len >= MAX_VEH_WEAPON_DATA_SIZE ) {
+				trap->FS_Close( f );
 				Com_Error( ERR_DROP, "Vehicle Weapon extensions (*.vwp) are too large" );
 			}
 			strcat( marker, tempReadBuffer );
@@ -1240,6 +1241,7 @@ void BG_VehicleLoadParms( void ) {//HMM... only do this if there's a vehicle on 
 			}
 
 			if ( totallen + len >= MAX_VEHICLE_DATA_SIZE ) {
+				trap->FS_Close( f );
 				Com_Error( ERR_DROP, "Vehicle extensions (*.veh) are too large" );
 			}
 			strcat( marker, tempReadBuffer );

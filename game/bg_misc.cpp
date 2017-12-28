@@ -326,10 +326,10 @@ const stringID_table_t eTypes[ET_MAX] = {
 
 static qboolean BG_FileExists( const char *fileName ) {
 	if ( fileName && fileName[0] ) {
-		int fh = 0;
-		trap->FS_Open( fileName, &fh, FS_READ );
-		if ( fh > 0 ) {
-			trap->FS_Close( fh );
+		fileHandle_t f = NULL_FILE;
+		trap->FS_Open( fileName, &f, FS_READ );
+		if ( f ) {
+			trap->FS_Close( f );
 			return qtrue;
 		}
 	}

@@ -276,10 +276,12 @@ int UI_ParseAnimationFile( const char *filename, animation_t *animset, qboolean 
 	// load the file
 	if ( !UIPAFtextLoaded || !isHumanoid ) { //rww - We are always using the same animation config now. So only load it once.
 		len = trap->FS_Open( filename, &f, FS_READ );
-		if ( (len <= 0) || (len >= (signed)sizeof(UIPAFtext)-1) ) {
-			if ( len > 0 ) {
-				Com_Error( ERR_DROP, "%s exceeds the allowed ui-side animation buffer!", filename );
-			}
+		if ( !f || len <= 0 ) {
+			return -1;
+		}
+		if ( len >= (signed)sizeof(UIPAFtext)-1 ) {
+			trap->FS_Close( f );
+			Com_Error( ERR_DROP, "%s exceeds the allowed ui-side animation buffer!", filename );
 			return -1;
 		}
 
@@ -5836,7 +5838,11 @@ void UI_SetSiegeTeams( void ) {
 
 	len = trap->FS_Open( levelname, &f, FS_READ );
 
-	if ( !f || len >= MAX_SIEGE_INFO_SIZE ) {
+	if ( !f ) {
+		return;
+	}
+	if ( len >= MAX_SIEGE_INFO_SIZE ) {
+		trap->FS_Close( f );
 		return;
 	}
 
@@ -7897,6 +7903,7 @@ static void UI_BuildPlayerModel_List( qboolean inGameLoad ) {
 
 			char *buffer = (char *)malloc( fileLen + 1 );
 			if ( !buffer ) {
+				trap->FS_Close( f );
 				Com_Error( ERR_FATAL, "Could not allocate buffer to read %s", fPath );
 			}
 
@@ -8749,6 +8756,7 @@ void JP_ParseFavServers( void )
 
 	if ( (buf = (char*)malloc(len+1)) == 0 )
 	{
+		trap->FS_Close( f );
 		Com_Printf( S_COLOR_RED"failed! "S_COLOR_WHITE"(Failed to allocate buffer)\n" );
 		return;
 	}

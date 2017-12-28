@@ -2230,6 +2230,7 @@ void WP_SaberLoadParms( void ) {
 		}
 
 		if ( (totallen + len + 1) >= MAX_SABER_DATA_SIZE ) {
+			trap->FS_Close( f );
 #ifdef PROJECT_UI
 			Com_Error( ERR_FATAL, "WP_SaberLoadParms: Saber extensions (*.sab) are too large!\nRan out of space before reading %s", holdChar );
 #else

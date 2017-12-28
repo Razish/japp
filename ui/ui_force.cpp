@@ -1019,6 +1019,7 @@ void UI_ForceConfigHandle( int oldindex, int newindex ) {
 	}
 
 	if ( len >= 8192 ) {
+		trap->FS_Close( f );
 		return;
 	}
 

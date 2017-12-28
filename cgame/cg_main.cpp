@@ -1289,8 +1289,8 @@ void CG_LoadMenus( const char *menuFile ) {
 	}
 
 	if ( len >= MAX_MENUDEFFILE ) {
-		trap->Error( ERR_DROP, S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE );
 		trap->FS_Close( f );
+		trap->Error( ERR_DROP, S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE );
 		return;
 	}
 

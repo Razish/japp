@@ -128,7 +128,11 @@ void CG_InitSiegeMode( void ) {
 	Com_sprintf( levelname, sizeof(levelname), "maps/%s.siege", cgs.mapnameClean );
 
 	len = trap->FS_Open( levelname, &f, FS_READ );
-	if ( !f || len <= 0 || len >= MAX_SIEGE_INFO_SIZE ) {
+	if ( !f || len <= 0 ) {
+		goto failure;
+	}
+	if ( len >= MAX_SIEGE_INFO_SIZE ) {
+		trap->FS_Close( f );
 		goto failure;
 	}
 

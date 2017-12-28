@@ -181,6 +181,7 @@ namespace GeoIP {
 		// alloc memory for buffer
 		char *buf = (char *)malloc( len + 1 );
 		if ( !buf ) {
+			trap->FS_Close( f );
 			return false;
 		}
 
