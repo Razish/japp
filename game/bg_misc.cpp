@@ -1309,7 +1309,7 @@ void BG_GiveMeVectorFromMatrix( mdxaBone_t *boltMatrix, uint32_t flags, vector3 
 	}
 }
 
-const char *eventnames[] = {
+const char *eventnames[EV_NUM_ENTITY_EVENTS] = {
 	"EV_NONE",
 
 	"EV_CLIENTJOIN",

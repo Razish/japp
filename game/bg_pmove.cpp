@@ -3175,7 +3175,7 @@ static void PM_GrappleMove( void ) {
 		else if (dotF < -150) {
 			anim = BOTH_FORCEJUMPBACK1;
 		}
-}
+	}
 	if (anim != -1) {
 		int parts = SETANIM_BOTH;
 		if (pm->ps->weaponTime) {//FIXME: really only care if we're in a saber attack anim...

@@ -7099,24 +7099,28 @@ void WP_SaberPositionUpdate( gentity_t *self, usercmd_t *ucmd ) { //rww - keep t
 			!BG_InGrappleMove( self->client->ps.torsoAnim ) || !BG_InGrappleMove( self->client->ps.legsAnim ) ||
 			!self->client->grappleState || !grappler->client->grappleState ||
 			grappler->health < 1 || self->health < 1 ||
-			!G_PrettyCloseIGuess( self->client->ps.origin.z, grappler->client->ps.origin.z, 4.0f ) ) {
+			!G_PrettyCloseIGuess( self->client->ps.origin.z, grappler->client->ps.origin.z, 4.0f ) )
+		{
 			self->client->grappleState = 0;
 
 			//Raz: begin melee changes
-			if ( self->client->ps.torsoAnim == BOTH_KYLE_PA_3 && (self->client->ps.torsoTimer > 100 ||
-				self->client->ps.legsTimer > 100) ) {
+			if ( self->client->ps.torsoAnim == BOTH_KYLE_PA_3
+				&& (self->client->ps.torsoTimer > 100 || self->client->ps.legsTimer > 100) )
+			{
 				G_SetAnim( self, &self->client->pers.cmd, SETANIM_BOTH, BOTH_STAND1, SETANIM_FLAG_OVERRIDE, 0 );
 				self->client->ps.weaponTime = self->client->ps.torsoTimer = 0;
 			}
-			else
+			else {
 				//Raz end
 				if ( (BG_InGrappleMove( self->client->ps.torsoAnim ) && self->client->ps.torsoTimer > 100) ||
-					(BG_InGrappleMove( self->client->ps.legsAnim ) && self->client->ps.legsTimer > 100) ) { //if they're pretty far from finishing the anim then shove them into another anim
+					(BG_InGrappleMove( self->client->ps.legsAnim ) && self->client->ps.legsTimer > 100) )
+				{ //if they're pretty far from finishing the anim then shove them into another anim
 					G_SetAnim( self, &self->client->pers.cmd, SETANIM_BOTH, BOTH_KYLE_MISS, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0 );
 					if ( self->client->ps.torsoAnim == BOTH_KYLE_MISS ) { //providing the anim set succeeded..
 						self->client->ps.weaponTime = self->client->ps.torsoTimer;
 					}
 				}
+			}
 		}
 		else {
 			vector3 grapAng;
