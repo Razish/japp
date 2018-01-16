@@ -1721,10 +1721,10 @@ void ClientThink_real( gentity_t *ent ) {
 				}
 			}
 		}
-	}
 
-	if ( client && (client->ps.eFlags2&EF2_HELD_BY_MONSTER) ) {
-		G_HeldByMonster( ent, ucmd );
+		if ( client->ps.eFlags2 & EF2_HELD_BY_MONSTER ) {
+			G_HeldByMonster( ent, ucmd );
+		}
 	}
 
 	msec = ucmd->serverTime - client->ps.commandTime;
