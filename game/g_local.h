@@ -779,6 +779,11 @@ typedef struct level_locals_s {
 		int					num;
 		char				*infos[MAX_ARENAS];
 	} arenas;
+
+	struct {
+		// 16 bits for clients, 16 bits padding. repeat 4 times
+		uint32_t			mindtricked[4]; // cache of all clients that are mindtricked
+	} admin;
 } level_locals_t;
 
 typedef struct refTag_s {

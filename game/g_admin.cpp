@@ -66,11 +66,14 @@ enum adminStrings_e {
 	ADMIN_STRING_WAKE_ANNOUNCE,
 	ADMIN_STRING_WAKE_ALL,
 	ADMIN_STRING_WEATHER,
-	ADMIN_STRING_RENAME,
 	ADMIN_STRING_NOTARGETON,
 	ADMIN_STRING_NOTARGETOFF,
 	ADMIN_STRING_NOTARGETON_ANNOUNCE,
 	ADMIN_STRING_NOTARGETOFF_ANNOUNCE,
+	ADMIN_STRING_MINDTRICKON,
+	ADMIN_STRING_MINDTRICKOFF,
+	ADMIN_STRING_MINDTRICKON_ANNOUNCE,
+	ADMIN_STRING_MINDTRICKOFF_ANNOUNCE,
 
 	ADMIN_STRING_MAX
 };
@@ -113,11 +116,14 @@ static std::array<std::string, ADMIN_STRING_MAX> adminStrings = { {
 	"$1 woke up", // ADMIN_STRING_WAKE_ANNOUNCE
 	"Rise and shine, everyone", // ADMIN_STRING_WAKE_ALL
 	"$1 set weather to $2", // ADMIN_STRING_WEATHER
-	"$1 renamed $2 to $3", // ADMIN_STRING_RENAME
 	"You are no longer seen by NPCs", // ADMIN_STRING_NOTARGETON
 	"NPCs can see you again", // ADMIN_STRING_NOTARGETOFF
 	"$1 is no longer seen by NPCs", // ADMIN_STRING_NOTARGETON_ANNOUNCE
 	"$1 can seen by NPCs again", // ADMIN_STRING_NOTARGETOFF_ANNOUNCE
+	"You have been mindtricked", // ADMIN_STRING_MINDTRICKON
+	"You have been unmindtricked", // ADMIN_STRING_MINDTRICKOFF
+	"$1 has been mindtricked", // ADMIN_STRING_MINDTRICKON_ANNOUNCE
+	"$1 has been unmindtricked", // ADMIN_STRING_MINDTRICKOFF_ANNOUNCE
 } };
 
 static const stringID_table_t adminStringsByIndex[ADMIN_STRING_MAX] = {
@@ -159,11 +165,14 @@ static const stringID_table_t adminStringsByIndex[ADMIN_STRING_MAX] = {
 	ENUM2STRING( ADMIN_STRING_WAKE_ANNOUNCE ),
 	ENUM2STRING( ADMIN_STRING_WAKE_ALL ),
 	ENUM2STRING( ADMIN_STRING_WEATHER ),
-	ENUM2STRING( ADMIN_STRING_RENAME ),
 	ENUM2STRING( ADMIN_STRING_NOTARGETON ),
 	ENUM2STRING( ADMIN_STRING_NOTARGETOFF ),
 	ENUM2STRING( ADMIN_STRING_NOTARGETON_ANNOUNCE ),
 	ENUM2STRING( ADMIN_STRING_NOTARGETOFF_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_MINDTRICKON ),
+	ENUM2STRING( ADMIN_STRING_MINDTRICKOFF ),
+	ENUM2STRING( ADMIN_STRING_MINDTRICKON_ANNOUNCE ),
+	ENUM2STRING( ADMIN_STRING_MINDTRICKOFF_ANNOUNCE ),
 };
 
 static void AM_ConsolePrint( const gentity_t *ent, const char *msg ) {
@@ -212,9 +221,11 @@ static void AM_FillStrings( fileHandle_t handle ) {
 }
 
 //NOTE: arg2 is expected to be at-least 128 bytes long
-static void AM_DrawString( int type, gentity_t *ent = NULL, const char *arg = NULL, char *arg2 = NULL );
-static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2 ) {
-	if (!ent) return;
+static void AM_DrawString( int type, const gentity_t *ent = NULL, const char *arg = NULL, char *arg2 = NULL );
+static void AM_DrawString( int type, const gentity_t *ent, const char *arg, char *arg2 ) {
+	if ( !ent ) {
+		return;
+	}
 	std::string string = adminStrings[type];
 	int announce = 0;
 
@@ -303,6 +314,14 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 		announce = ADMIN_STRING_NOTARGETOFF_ANNOUNCE;
 	} break;
 
+	case ADMIN_STRING_MINDTRICKON: {
+		announce = ADMIN_STRING_MINDTRICKON_ANNOUNCE;
+	} break;
+
+	case ADMIN_STRING_MINDTRICKOFF: {
+		announce = ADMIN_STRING_MINDTRICKOFF_ANNOUNCE;
+	} break;
+
 	}
 
 	if ( !string.empty() ) {
@@ -329,15 +348,6 @@ static void AM_DrawString( int type, gentity_t *ent, const char *arg, char *arg2
 				if ((pos = anon.find("$2")) != std::string::npos){
 					anon.replace(pos, 2, arg); // e.g (player) got weapon(force, ammo)
 				}
-			}
-			else if ( announce == ADMIN_STRING_RENAME ) {
-				if ((pos = anon.find("$2")) != std::string::npos){
-					anon.replace(pos, 2, arg2);
-				}
-				if ((pos = anon.find("$3")) != std::string::npos){
-					anon.replace(pos, 2, arg2);
-				}
-				trap->SendServerCommand( ent->s.number, va( "print \"%s\n\"", anon.c_str() ) );
 			}
 			G_Announce( anon.c_str(), ent->s.number);
 		}
@@ -2871,10 +2881,10 @@ void Merc_On( gentity_t *ent ) {
 	ent->client->pers.adminData.forcePowersKnown = ent->client->ps.fd.forcePowersKnown;
 	ent->client->ps.fd.forcePowersKnown = 0;
 	ent->client->ps.fd.forceGripEntityNum = ENTITYNUM_NONE;
-	ent->client->ps.fd.forceMindtrickTargetIndex[0] = 0u;
-	ent->client->ps.fd.forceMindtrickTargetIndex[1] = 0u;
-	ent->client->ps.fd.forceMindtrickTargetIndex[2] = 0u;
-	ent->client->ps.fd.forceMindtrickTargetIndex[3] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[0] = level.admin.mindtricked[0];
+	ent->client->ps.fd.forceMindtrickTargetIndex[1] = level.admin.mindtricked[1];
+	ent->client->ps.fd.forceMindtrickTargetIndex[2] = level.admin.mindtricked[2];
+	ent->client->ps.fd.forceMindtrickTargetIndex[3] = level.admin.mindtricked[3];
 	ent->client->ps.fd.forceJumpZStart = 0;
 	ent->client->ps.fd.forceJumpCharge = 0;
 	ent->client->ps.fd.forceJumpSound = 0;
@@ -2924,10 +2934,10 @@ void Merc_Off( gentity_t *ent ) {
 	ent->client->ps.fd.forcePowersKnown = ent->client->pers.adminData.forcePowersKnown;
 	ent->client->ps.fd.forcePowerRegenDebounceTime = level.time;
 	ent->client->ps.fd.forceGripEntityNum = ENTITYNUM_NONE;
-	ent->client->ps.fd.forceMindtrickTargetIndex[0] = 0u;
-	ent->client->ps.fd.forceMindtrickTargetIndex[1] = 0u;
-	ent->client->ps.fd.forceMindtrickTargetIndex[2] = 0u;
-	ent->client->ps.fd.forceMindtrickTargetIndex[3] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[0] = level.admin.mindtricked[0];
+	ent->client->ps.fd.forceMindtrickTargetIndex[1] = level.admin.mindtricked[1];
+	ent->client->ps.fd.forceMindtrickTargetIndex[2] = level.admin.mindtricked[2];
+	ent->client->ps.fd.forceMindtrickTargetIndex[3] = level.admin.mindtricked[3];
 	ent->client->ps.fd.forceJumpZStart = 0;
 	ent->client->ps.fd.forceJumpCharge = 0;
 	ent->client->ps.fd.forceJumpSound = 0;
@@ -3088,10 +3098,7 @@ static void AM_Rename( gentity_t *ent ) {
 	trap->GetUserinfo( targetClient, info, sizeof(info) );
 	Info_SetValueForKey( info, "name", e->client->pers.netname );
 	trap->SetUserinfo( targetClient, info );
-	//trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " %s %s\n\"", oldName,
-	//	G_GetStringEdString( "MP_SVGAME", "PLRENAME" ), e->client->pers.netname )
-	//);
-	AM_DrawString(ADMIN_STRING_RENAME, ent, oldName, e->client->pers.netname);
+	trap->SendServerCommand( -1, va( "print \"%s" S_COLOR_WHITE " was force-renamed to %s\n\"", oldName, e->client->pers.netname ) );
 
 	e->client->pers.adminData.renamedTime = level.time;
 }
@@ -3348,7 +3355,7 @@ static void AM_Give(gentity_t *ent){
 	}
 }
 
-void AM_MindTrick(gentity_t *ent){
+void AM_MindTrick( gentity_t *ent ) {
 	if ( trap->Argc() < 2 ) {
 		AM_ConsolePrint( ent, "Syntax: \\ammindtrick <client> \n" );
 		return;
@@ -3362,6 +3369,7 @@ void AM_MindTrick(gentity_t *ent){
 		AM_ConsolePrint( ent, "no clients found\n" );
 		return;
 	}
+
 	const gentity_t *target = &g_entities[client];
 	if ( !G_IsValidEntity( target ) ) {
 		return;
@@ -3370,18 +3378,9 @@ void AM_MindTrick(gentity_t *ent){
 		return;
 	}
 
-	gentity_t *e = g_entities;
-	for ( int i = 0; i < level.maxclients; i++, e++ ) {
-		if ( !G_IsValidEntity( e, false ) ) {
-			continue;
-		}
-
-		if ( e != target ) {
-			Q_AddToBitflags( e->client->ps.fd.forceMindtrickTargetIndex, target->s.number, 16 );
-		}
-	}
-
-	//TODO: AM_DrawString
+	bool didRemove = Q_InBitflags( level.admin.mindtricked, target->s.number, 16 );
+	Q_ToggleBitflags( level.admin.mindtricked, target->s.number, 16 );
+	AM_DrawString( didRemove ? ADMIN_STRING_MINDTRICKOFF : ADMIN_STRING_MINDTRICKON, target, nullptr );
 }
 
 static void AM_NoTarget( gentity_t *ent ) {

@@ -317,10 +317,11 @@ void WP_SpawnInitForcePowers( gentity_t *ent ) {
 	ent->client->ps.fd.forcePower = ent->client->ps.fd.forcePowerMax = MAX_FORCE_POWER;
 	ent->client->ps.fd.forcePowerRegenDebounceTime = level.time;
 	ent->client->ps.fd.forceGripEntityNum = ENTITYNUM_NONE;
-	ent->client->ps.fd.forceMindtrickTargetIndex[0] = 0u;
-	ent->client->ps.fd.forceMindtrickTargetIndex[1] = 0u;
-	ent->client->ps.fd.forceMindtrickTargetIndex[2] = 0u;
-	ent->client->ps.fd.forceMindtrickTargetIndex[3] = 0u;
+	ent->client->ps.fd.forceMindtrickTargetIndex[0] = level.admin.mindtricked[0];
+	ent->client->ps.fd.forceMindtrickTargetIndex[1] = level.admin.mindtricked[1];
+	ent->client->ps.fd.forceMindtrickTargetIndex[2] = level.admin.mindtricked[2];
+	ent->client->ps.fd.forceMindtrickTargetIndex[3] = level.admin.mindtricked[3];
+	Q_RemoveFromBitflags( ent->client->ps.fd.forceMindtrickTargetIndex, ent - g_entities, 16 );
 
 	ent->client->ps.holocronBits = 0;
 
@@ -2945,10 +2946,11 @@ void WP_ForcePowerStop( gentity_t *self, forcePowers_t forcePower ) {
 		if ( wasActive & (1 << FP_TELEPATHY) ) {
 			G_Sound( self, CHAN_AUTO, G_SoundIndex( "sound/weapons/force/distractstop.wav" ) );
 		}
-		self->client->ps.fd.forceMindtrickTargetIndex[0] = 0u;
-		self->client->ps.fd.forceMindtrickTargetIndex[1] = 0u;
-		self->client->ps.fd.forceMindtrickTargetIndex[2] = 0u;
-		self->client->ps.fd.forceMindtrickTargetIndex[3] = 0u;
+		self->client->ps.fd.forceMindtrickTargetIndex[0] = level.admin.mindtricked[0];
+		self->client->ps.fd.forceMindtrickTargetIndex[1] = level.admin.mindtricked[1];
+		self->client->ps.fd.forceMindtrickTargetIndex[2] = level.admin.mindtricked[2];
+		self->client->ps.fd.forceMindtrickTargetIndex[3] = level.admin.mindtricked[3];
+		Q_RemoveFromBitflags( self->client->ps.fd.forceMindtrickTargetIndex, self - g_entities, 16 );
 		break;
 	case FP_SEE:
 		if ( wasActive & (1 << FP_SEE) ) {
@@ -3223,7 +3225,7 @@ static void WP_UpdateMindtrickEnts( gentity_t *self ) {
 	int i = 0;
 
 	for ( i = 0, ent = g_entities; i < level.maxclients; i++, ent++ ) {
-		if ( Q_InBitflags( self->client->ps.fd.forceMindtrickTargetIndex, i, 16 ) ) {
+		if ( Q_InBitflags( self->client->ps.fd.forceMindtrickTargetIndex, i, 16 ) && !Q_InBitflags( level.admin.mindtricked, i, 16 ) ) {
 			if ( !ent || !ent->client || !ent->inuse || ent->health < 1
 				|| (ent->client->ps.fd.forcePowersActive & (1 << FP_SEE)) )
 			{
@@ -3243,9 +3245,13 @@ static void WP_UpdateMindtrickEnts( gentity_t *self ) {
 		}
 	}
 
-	if ( !self->client->ps.fd.forceMindtrickTargetIndex[0] && !self->client->ps.fd.forceMindtrickTargetIndex[1]
-		&& !self->client->ps.fd.forceMindtrickTargetIndex[2] && !self->client->ps.fd.forceMindtrickTargetIndex[3] )
-	{
+	uint32_t tmpTricked[4] = {
+		self->client->ps.fd.forceMindtrickTargetIndex[0] & ~level.admin.mindtricked[0],
+		self->client->ps.fd.forceMindtrickTargetIndex[1] & ~level.admin.mindtricked[1],
+		self->client->ps.fd.forceMindtrickTargetIndex[2] & ~level.admin.mindtricked[2],
+		self->client->ps.fd.forceMindtrickTargetIndex[3] & ~level.admin.mindtricked[3]
+	};
+	if ( !tmpTricked[0] && !tmpTricked[1] && !tmpTricked[2] && !tmpTricked[3] ) {
 		// everyone who we had tricked is no longer tricked, so stop the power
 		WP_ForcePowerStop( self, FP_TELEPATHY );
 	}
@@ -4126,10 +4132,11 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd ) {
 
 	if ( !(self->client->ps.fd.forcePowersActive & (1 << FP_TELEPATHY)) ) {
 		// clear the mindtrick index values
-		self->client->ps.fd.forceMindtrickTargetIndex[0] = 0u;
-		self->client->ps.fd.forceMindtrickTargetIndex[1] = 0u;
-		self->client->ps.fd.forceMindtrickTargetIndex[2] = 0u;
-		self->client->ps.fd.forceMindtrickTargetIndex[3] = 0u;
+		self->client->ps.fd.forceMindtrickTargetIndex[0] = level.admin.mindtricked[0];
+		self->client->ps.fd.forceMindtrickTargetIndex[1] = level.admin.mindtricked[1];
+		self->client->ps.fd.forceMindtrickTargetIndex[2] = level.admin.mindtricked[2];
+		self->client->ps.fd.forceMindtrickTargetIndex[3] = level.admin.mindtricked[3];
+		Q_RemoveFromBitflags( self->client->ps.fd.forceMindtrickTargetIndex, self - g_entities, 16 );
 	}
 
 	if ( self->health < 1 ) {

@@ -3639,6 +3639,9 @@ void ClientDisconnect( int clientNum ) {
 	}
 	ent->client->pers.ignore = 0u;
 
+	// unmindtrick this client slot
+	Q_RemoveFromBitflags( level.admin.mindtricked, clientNum, 16 );
+
 	// stop any following clients
 	for ( i = 0; i < level.maxclients; i++ ) {
 		if ( level.clients[i].sess.sessionTeam == TEAM_SPECTATOR
