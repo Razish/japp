@@ -4816,7 +4816,7 @@ static void CG_DrawCrosshair( vector3 *worldPoint, qboolean chEntValid ) {
 	}
 
 	if ( !hShader )
-		hShader = media.gfx.interface.crosshairs[cg_drawCrosshair.integer % NUM_CROSSHAIRS];
+		hShader = media.gfx.interface.crosshairs[Q_clampi( 0, cg_drawCrosshair.integer-1, NUM_CROSSHAIRS-1 )];
 
 	chX = x + refdef->x + 0.5f * (SCREEN_WIDTH - w * cgs.widthRatioCoef);
 	chY = y + refdef->y + 0.5f * (SCREEN_HEIGHT - h);
