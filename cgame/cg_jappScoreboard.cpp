@@ -163,6 +163,7 @@ static void DrawPlayerCount_Free( float fade ) {
 	float y = 108.0f;
 	float textWidth = 0.0f;
 	float textHeight = 0.0f;
+	const vector4 color = { 1.0f, 1.0f, 1.0f, fade };
 
 	// count the free, spectating and bot players
 	int freeCount = 0, specCount = 0, botCount = 0;
@@ -188,14 +189,14 @@ static void DrawPlayerCount_Free( float fade ) {
 	}
 	textHeight = font.Height( tmp );
 	textWidth = font.Width( tmp );
-	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &color, ITEM_TEXTSTYLE_SHADOWED );
 	y += textHeight;
 
 	// spectator count
 	tmp = va( "%2i spectators", specCount );
 	textHeight = font.Height( tmp );
 	textWidth = font.Width( tmp );
-	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &color, ITEM_TEXTSTYLE_SHADOWED );
 	y += textHeight;
 }
 
