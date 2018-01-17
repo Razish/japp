@@ -478,6 +478,13 @@ elif env['CC'] == 'cl':
 		#'/NODEFAULTLIB:MSVCRT',
 	]
 
+# if using mingw as cross-compiler, statically link libgcc/libstdc++ to avoid missing dependency on SJLJ exception handling
+if 'mingw' in env['CC'] and host_plat != target_plat:
+	env['LINKFLAGS'] += [
+		'-static-libgcc',
+		'-static-libstdc++',
+	]
+
 if target_plat == 'Darwin':
 	env['CPPDEFINES'] += [ 'MACOS_X' ]
 	env['LINKFLAGS'] += [
