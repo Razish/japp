@@ -1400,16 +1400,17 @@ void Q_DeletePrintBuffer( printBufferSession_t *session ) {
 }
 
 // useful if your bit-flags are spread across multiple variables (i.e. mindtrick index)
-qboolean Q_InBitflags( const uint32_t *bits, int index, uint32_t bitsPerByte ) {
-	return !!( bits[index / bitsPerByte] & (1 << (index % bitsPerByte)) );
+bool Q_InBitflags( const uint32_t *bits, int index, uint32_t bitsPerChunk ) {
+	return !!( bits[index / bitsPerChunk] & (1 << (index % bitsPerChunk)) );
 }
-
-void Q_AddToBitflags( uint32_t *bits, int index, uint32_t bitsPerByte ) {
-	bits[index / bitsPerByte] |= (1 << (index % bitsPerByte));
+void Q_AddToBitflags( uint32_t *bits, int index, uint32_t bitsPerChunk ) {
+	bits[index / bitsPerChunk] |= (1 << (index % bitsPerChunk));
 }
-
-void Q_RemoveFromBitflags( uint32_t *bits, int index, uint32_t bitsPerByte ) {
-	bits[index / bitsPerByte] &= ~(1 << (index % bitsPerByte));
+void Q_ToggleBitflags( uint32_t *bits, int index, uint32_t bitsPerChunk ) {
+	bits[index / bitsPerChunk] ^= (1 << (index % bitsPerChunk));
+}
+void Q_RemoveFromBitflags( uint32_t *bits, int index, uint32_t bitsPerChunk ) {
+	bits[index / bitsPerChunk] &= ~(1 << (index % bitsPerChunk));
 }
 
 // can be used for sorting

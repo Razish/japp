@@ -2218,9 +2218,10 @@ void Q_NewPrintBuffer( printBufferSession_t *session, size_t length,
 void Q_PrintBuffer( printBufferSession_t *session, const char *append );
 void Q_DeletePrintBuffer( printBufferSession_t *session );
 
-qboolean Q_InBitflags( const uint32_t *bits, int index, uint32_t bitsPerByte );
-void Q_AddToBitflags( uint32_t *bits, int index, uint32_t bitsPerByte );
-void Q_RemoveFromBitflags( uint32_t *bits, int index, uint32_t bitsPerByte );
+bool Q_InBitflags( const uint32_t *bits, int index, uint32_t bitsPerChunk );
+void Q_AddToBitflags( uint32_t *bits, int index, uint32_t bitsPerChunk );
+void Q_ToggleBitflags( uint32_t *bits, int index, uint32_t bitsPerChunk );
+void Q_RemoveFromBitflags( uint32_t *bits, int index, uint32_t bitsPerChunk );
 
 int Q_CompareNetAddress( const netadr_t *a1, const netadr_t *a2 );
 const char *Q_PrintNetAddress( const netadr_t *adr );
