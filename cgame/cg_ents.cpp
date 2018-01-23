@@ -702,6 +702,19 @@ static void CG_General( centity_t *cent ) {
 		return;
 	}
 
+	if ( cent->currentState.eType == ET_BODY ) {
+		if ( cg.predictedPlayerState.duelInProgress ) {
+			// never show corpses in duels
+			return;
+		}
+
+		// check if we want to fade bodies instantly
+		// note, the server delays the EV_BODYFADE by quite some time so we will handle it all ourselves
+		if ( cent->bodyFadeTime == 0 ) {
+			cent->bodyFadeTime = cg.time + 5000;
+		}
+	}
+
 	if ( cent->ghoul2 && !cent->currentState.modelGhoul2 && cent->currentState.eType != ET_BODY &&
 		cent->currentState.number >= MAX_CLIENTS ) { //this is a bad thing
 		if ( trap->G2_HaveWeGhoul2Models( cent->ghoul2 ) ) {
@@ -841,6 +854,11 @@ static void CG_General( centity_t *cent ) {
 		}
 
 		if ( cg_dismember.integer < 2 && (cent->currentState.modelGhoul2 == G2_MODELPART_HEAD || cent->currentState.modelGhoul2 == G2_MODELPART_WAIST) ) { //dismember settings are not high enough to display decaps and torso slashes
+			return;
+		}
+
+		if ( cg_noBodies.integer ) {
+			// no bodies, so no limbs :^)
 			return;
 		}
 
@@ -1223,7 +1241,10 @@ static void CG_General( centity_t *cent ) {
 			cent->dustTrailTime = cg.time;
 		}
 
-		CG_Disintegration( cent, &ent );
+		if ( !cg_noBodies.integer ) {
+			// don't bother with disintegrating bodies that we've already told to fade
+			CG_Disintegration( cent, &ent );
+		}
 		return;
 	}
 	else if ( cent->currentState.eType == ET_BODY ) {
@@ -1231,7 +1252,7 @@ static void CG_General( centity_t *cent ) {
 			qboolean lightSide = cent->teamPowerType;
 			vector3 hitLoc, tempAng;
 			float tempLength;
-			int curTimeDif = ((cg.time + 60000) - cent->bodyFadeTime);
+			int curTimeDif = ((cg.time + (cg_noBodies.integer ? 5000 : BODY_FADE_TIME)) - cent->bodyFadeTime);
 			int tMult = curTimeDif*0.08f;
 
 			ent.renderfx |= RF_FORCE_ENT_ALPHA;
@@ -1343,6 +1364,10 @@ static void CG_General( centity_t *cent ) {
 		}
 		else {
 			cent->dustTrailTime = 0;
+			if ( cg_noBodies.integer ) {
+				// this body has faded already, bail
+				return;
+			}
 		}
 	}
 

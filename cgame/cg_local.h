@@ -78,6 +78,8 @@
 #define MAX_CHATBOX_IDENTIFIER_SIZE		(32)
 #define CAMERA_SIZE						(4)
 #define MAX_MISC_ENTS					(4000)
+#define BODY_FADE_TIME					(60000)
+#define REFRACT_EFFECT_DURATION 		(500)
 
 #define NEWFX_DISINT			(0x0001u)
 #define NEWFX_RUPTOR			(0x0002u)

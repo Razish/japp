@@ -2512,12 +2512,17 @@ void CG_EntityEvent( centity_t *cent, vector3 *position ) {
 			break;
 		}
 
+		if ( cg_noBodies.integer ) {
+			// we handle the timing locally if we don't want bodies
+			return;
+		}
+
 		if ( cent->ghoul2 && trap->G2_HaveWeGhoul2Models( cent->ghoul2 ) ) {
 			//turn the inside of the face off, to avoid showing the mouth when we start alpha fading the corpse
 			trap->G2API_SetSurfaceOnOff( cent->ghoul2, "head_eyes_mouth", 0x00000002/*G2SURFACEFLAG_OFF*/ );
 		}
 
-		cent->bodyFadeTime = cg.time + 60000;
+		cent->bodyFadeTime = cg.time + BODY_FADE_TIME;
 		break;
 
 		//

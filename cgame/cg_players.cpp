@@ -3462,7 +3462,6 @@ static void CG_PlayerSplash( centity_t *cent ) {
 	trap->R_AddPolysToScene( media.gfx.world.wakeMark, 4, verts, 1 );
 }
 
-#define REFRACT_EFFECT_DURATION (500)
 static void CG_ForcePushBlur( vector3 *org, centity_t *cent ) {
 	refdef_t *refdef = CG_GetRefdef();
 	if ( !cent || !cg_renderToTextureFX.integer ) {
