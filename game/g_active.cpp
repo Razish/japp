@@ -2156,7 +2156,7 @@ void ClientThink_real( gentity_t *ent ) {
 			if ( ent->health > 0 && ent->client->ps.stats[STAT_HEALTH] > 0 ) {
 				char pre1[(MAX_NETNAME * 2) + 64] = {};
 				char pre2[(MAX_NETNAME * 2) + 64] = {};
-				char buf[MAX_STRING_CHARS - sizeof(pre1)] = {};
+				char buf[MAX_STRING_CHARS - std::max( sizeof(pre1), sizeof(pre2) )] = {};
 				const char *winner = ent->client->pers.netname;
 				const char *defeated = G_GetStringEdString( "MP_SVGAME", "PLDUELWINNER" );
 				const char *loser = duelAgainst->client->pers.netname;
@@ -2166,7 +2166,7 @@ void ClientThink_real( gentity_t *ent ) {
 					"%s " S_COLOR_WHITE "%s %s", winner, defeated, loser
 				);
 				Com_sprintf( pre2, sizeof(pre2),
-					"You %s %s", defeated, loser
+					"You have defeated %s", loser
 				);
 
 				// with h/a remaining
@@ -2207,7 +2207,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 				trap->SendServerCommand( -1, va( "print \"%s%s\n\"", pre1, buf ) );
 				trap->SendServerCommand( ent - g_entities, va( "cp \"%s%s\n\"", pre2, buf ) );
-				}
+			}
 
 			else {
 				// it was a draw, because we both managed to die in the same frame
@@ -3047,11 +3047,13 @@ void ClientThink_real( gentity_t *ent ) {
 
 				VectorScale( &oppDir, -1, &oppDir );
 
-				if ( japp_flipKickDamage.integer ) {
-					G_Damage(
-						faceKicked, ent, ent, &oppDir, &client->ps.origin, japp_flipKickDamage.integer, DAMAGE_NO_ARMOR,
-						MOD_MELEE
-					);
+				if ( ent->client->ps.duelInProgress && ent->client->ps.duelIndex == faceKicked->s.number ) {
+					if ( japp_flipKickDamageDuel.integer ) {
+						G_Damage( faceKicked, ent, ent, &oppDir, &client->ps.origin, japp_flipKickDamageDuel.integer, DAMAGE_NO_ARMOR, MOD_MELEE );
+					}
+				}
+				else if ( japp_flipKickDamage.integer ) {
+					G_Damage( faceKicked, ent, ent, &oppDir, &client->ps.origin, japp_flipKickDamage.integer, DAMAGE_NO_ARMOR, MOD_MELEE );
 				}
 
 				if ( faceKicked->client->ps.weapon != WP_SABER
@@ -3088,7 +3090,6 @@ void ClientThink_real( gentity_t *ent ) {
 
 				const char *soundPath = va( "sound/weapons/melee/punch%d", Q_irand( 1, 4 ) );
 				G_Sound( faceKicked, CHAN_AUTO, G_SoundIndex( soundPath ) );
-
 			}
 		}
 
