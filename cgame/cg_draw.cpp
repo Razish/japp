@@ -4223,126 +4223,84 @@ void CG_CenterPrint( const char *str, int y, int charWidth, int showtime ) {
 	centerprint_queue.push( data );
 }
 
+qboolean BG_IsWhiteSpace( char c ) {
+	return c == ' ' || c == '\n' || c == '\0';
+}
+
 static void CG_DrawCenterString(void){
-	int		x, y, w, h;
 	vector4 *color;
-	cp_string_t *data;
-	char	*start;
-	int		l;
-	const float scale = 1.0f; //0.5f
-	float showtime = 0;
 
-	if (centerprint_queue.size() == 0) return;
-	data = centerprint_queue.front();
-
-	if (data->starttime == 0) data->starttime = cg.time;
-	if (data->showtime == 0) {
-		showtime = cg_centerTime.value;
+	if ( centerprint_queue.size() == 0 ) {
+		return;
 	}
-	else {
-		showtime = data->showtime;
+	cp_string_t *data = centerprint_queue.front();
+
+	if ( data->starttime == 0 ) {
+		data->starttime = cg.time;
 	}
 
-	color = CG_FadeColor(data->starttime , 1000 * showtime);
-	if (!color) {
-		free(data);
+	const float showtime = data->showtime ? data->showtime : cg_centerTime.value;
+	color = CG_FadeColor( data->starttime, 1000 * showtime );
+	if ( !color ) {
+		free( data );
 		centerprint_queue.pop();
 		return;
 	}
 
-	trap->R_SetColor(color);
+	const Font font( FONT_MEDIUM, 1.0f, false );
+	trap->R_SetColor( color );
 
-
-	y = data->y - data->numLines * BIGCHAR_HEIGHT / 2;
-	start = data->string;
-
-	const Font font( FONT_MEDIUM, scale, false );
-	while (1) {
+	const char *start = data->string;
+	int y = data->y - data->numLines * font.Height( start ) / 2;
+	while ( 1 ) {
 		char linebuffer[1024];
 
-		for (l = 0; l < 50; l++) {
+		int l;
+		for ( l = 0; l < 50; l++) {
 			if (!start[l] || start[l] == '\n') {
 				break;
 			}
 			linebuffer[l] = start[l];
 		}
-		linebuffer[l] = 0;
+		linebuffer[l] = '\0';
 
-		w = font.Width( linebuffer );
-		h = font.Height( linebuffer );
-		x = (SCREEN_WIDTH - w) / 2;
-		font.Paint( x, y + h, linebuffer, color, ITEM_TEXTSTYLE_SHADOWEDMORE );
-		y += h + 6;
-
-		while (*start && (*start != '\n')) {
-			start++;
-		}
-		if (!*start) {
-			break;
-		}
-		start++;
-	}
-
-	trap->R_SetColor(NULL);
-
-}
-
-/*
-static void CG_DrawCenterString( void ) {
-	char	*start;
-	int		l;
-	int		x, y, w;
-	int h;
-	vector4 *color;
-	cp_string_t *data;
-	const float scale = 1.0f; //0.5f
-
-
-	if ( !cg.centerPrintTime ) {
-		return;
-	}
-
-	color = CG_FadeColor( cg.centerPrintTime, 1000 * cg_centerTime.value );
-	if ( !color ) {
-		return;
-	}
-
-	trap->R_SetColor( color );
-
-
-	start = cg.centerPrint;
-
-	y = cg.centerPrintY - cg.centerPrintLines * BIGCHAR_HEIGHT / 2;
-
-	while ( 1 ) {
-		char linebuffer[1024];
-
-		for ( l = 0; l < 50; l++ ) {
-			if ( !start[l] || start[l] == '\n' ) {
-				break;
+		if( !BG_IsWhiteSpace( start[l] ) && !BG_IsWhiteSpace( linebuffer[l-1] ) ) {
+			// we might have cut a word off, attempt to find a spot where we won't cut words off at.
+			int savedL = l;
+			int counter;
+			for ( counter = l-2; counter >= 0; counter-- ) {
+				if ( BG_IsWhiteSpace( start[counter] ) ) {
+					// this location is whitespace, line break from this position
+					linebuffer[counter] = 0;
+					l = counter + 1;
+					break;
+				}
 			}
-			linebuffer[l] = start[l];
+			if ( counter < 0 ) {
+				// couldn't find a break in the text, just go ahead and cut off the word mid-word.
+				l = savedL;
+			}
 		}
-		linebuffer[l] = 0;
 
-		w = font.Width( linebuffer, scale, FONT_MEDIUM );
-		h = font.Height( linebuffer, scale, FONT_MEDIUM );
-		x = (SCREEN_WIDTH - w) / 2;
-		font.Paint(x, y + h, scale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM, qfalse);
+		const float w = font.Width( linebuffer );
+		const float h = font.Height( linebuffer );
+		font.Paint( (SCREEN_WIDTH - w) / 2, y + h, linebuffer, color, ITEM_TEXTSTYLE_SHADOWEDMORE );
 		y += h + 6;
 
-		while ( *start && (*start != '\n') ) {
-			start++;
+		if ( start[l] && start[l] == '\n' ) {
+			// next char is a newline, advance past
+			l++;
 		}
-		if ( !*start ) {
+		if ( !start[l] ) {
+			// end of string, we're done.
 			break;
 		}
-		start++;
+		// advance pointer to the last character that we didn't read in.
+		start = &start[l];
 	}
 
 	trap->R_SetColor( NULL );
 }
-*/
 
 #define HEALTH_WIDTH		50.0f
 #define HEALTH_HEIGHT		5.0f
@@ -4816,7 +4774,7 @@ static void CG_DrawCrosshair( vector3 *worldPoint, qboolean chEntValid ) {
 	}
 
 	if ( !hShader )
-		hShader = media.gfx.interface.crosshairs[Q_clampi( 0, cg_drawCrosshair.integer-1, NUM_CROSSHAIRS-1 )];
+		hShader = media.gfx.interface.crosshairs[Q_clampi( 1, cg_drawCrosshair.integer, NUM_CROSSHAIRS ) - 1];
 
 	chX = x + refdef->x + 0.5f * (SCREEN_WIDTH - w * cgs.widthRatioCoef);
 	chY = y + refdef->y + 0.5f * (SCREEN_HEIGHT - h);
