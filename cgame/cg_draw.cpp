@@ -53,7 +53,6 @@ typedef struct cp_string_s{
 	int y;
 	int width;
 	int starttime;
-	int showtime;
 }cp_string_t;
 
 std::queue<cp_string_t*> centerprint_queue;
@@ -4189,7 +4188,7 @@ void CG_DrawSiegeMessageNonMenu( const char *str ) {
 }
 
 // Called for important messages that should stay in the center of the screen for a few moments
-void CG_CenterPrint( const char *str, int y, int charWidth, int showtime ) {
+void CG_CenterPrint( const char *str, int y, int charWidth ) {
 	char *s = NULL;
 	int i = 0;
 	cp_string_t *data = (cp_string_t*)malloc(sizeof(cp_string_t));
@@ -4199,7 +4198,6 @@ void CG_CenterPrint( const char *str, int y, int charWidth, int showtime ) {
 	data->width = charWidth;
 	data->numLines = 1;
 	data->starttime = 0;
-	data->showtime = showtime;
 
 	// count the number of lines for centering
 	s = data->string;
@@ -4239,8 +4237,7 @@ static void CG_DrawCenterString(void){
 		data->starttime = cg.time;
 	}
 
-	const float showtime = data->showtime ? data->showtime : cg_centerTime.value;
-	color = CG_FadeColor( data->starttime, 1000 * showtime );
+	color = CG_FadeColor( data->starttime, 1000 * cg_centerTime.value );
 	if ( !color ) {
 		free( data );
 		centerprint_queue.pop();
