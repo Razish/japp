@@ -702,7 +702,7 @@ static void CG_General( centity_t *cent ) {
 		return;
 	}
 
-	if ( cent->currentState.eType == ET_BODY ) {
+	if ( cent->currentState.eType == ET_BODY && cg_noBodies.integer ) {
 		if ( cg.predictedPlayerState.duelInProgress ) {
 			// never show corpses in duels
 			return;
