@@ -9,6 +9,7 @@ namespace JPLua {
 		JPLUA_EVENT_RUNFRAME,
 		JPLUA_EVENT_CHATMSGRECV,
 		JPLUA_EVENT_CHATMSGSEND,
+		JPLUA_EVENT_CHATMSGPLUGIN,
 		JPLUA_EVENT_CLIENTBEGIN,
 		JPLUA_EVENT_CLIENTCOMMAND,
 		JPLUA_EVENT_CLIENTCONNECT,
@@ -45,6 +46,10 @@ namespace JPLua {
 
 #ifdef PROJECT_CGAME
 	char *Event_ChatMessageSent( const char *msg, messageMode_e mode, int targetClient );
+#endif
+
+#if defined(PROJECT_GAME)
+	char *Event_ChatMessagePlugin( int clientNum, const char *msg );
 #endif
 
 #ifdef PROJECT_GAME

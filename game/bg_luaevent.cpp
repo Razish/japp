@@ -22,6 +22,7 @@ namespace JPLua {
 		ENUM2STRING( JPLUA_EVENT_RUNFRAME ),
 		ENUM2STRING( JPLUA_EVENT_CHATMSGRECV ),
 		ENUM2STRING( JPLUA_EVENT_CHATMSGSEND ),
+		ENUM2STRING( JPLUA_EVENT_CHATMSGPLUGIN ),
 		ENUM2STRING( JPLUA_EVENT_CLIENTBEGIN ),
 		ENUM2STRING( JPLUA_EVENT_CLIENTCOMMAND ),
 		ENUM2STRING( JPLUA_EVENT_CLIENTCONNECT ),
@@ -149,9 +150,9 @@ namespace JPLua {
 #if defined(PROJECT_CGAME)
 	char *Event_ChatMessageRecieved( const char *msg ) {
 #elif defined(PROJECT_GAME)
-	char *Event_ChatMessageRecieved(int clientNum, const char *msg, int type ) {
+	char *Event_ChatMessageRecieved( int clientNum, const char *msg, int type ) {
 #endif
-		static char tmpMsg[MAX_SAY_TEXT] = { 0 }; // although a chat message can only be MAX_SAY_TEXT long..-name?
+		static char tmpMsg[MAX_SAY_TEXT] = { 0 };
 #ifdef JPLUA
 		plugin_t *plugin = NULL;
 #endif
@@ -169,11 +170,12 @@ namespace JPLua {
 #elif defined(PROJECT_GAME)
 				Player_CreateRef( ls.L, clientNum );
 				lua_pushstring( ls.L, tmpMsg );
-				lua_pushinteger(ls.L, type);
+				lua_pushinteger( ls.L, type );
 				Call( ls.L, 3, 1 );
 #endif
 
 				int retType = lua_type( ls.L, -1 );
+
 				// returned nil, no use passing it to other plugins
 				if ( retType == LUA_TNIL ) {
 					return NULL;
@@ -182,8 +184,8 @@ namespace JPLua {
 					Q_strncpyz( tmpMsg, lua_tostring( ls.L, -1 ), sizeof(tmpMsg) );
 				}
 				else {
-					trap->Print( "Invalid return value in %s (JPLUA_EVENT_CHATMSGRECV), expected string or nil but got "
-						"%s", plugin->name, lua_typename( ls.L, -1 )
+					trap->Print(
+						"Invalid return value in %s (JPLUA_EVENT_CHATMSGRECV), expected string or nil but got %s", plugin->name, lua_typename( ls.L, -1 )
 					);
 				}
 			}
@@ -213,15 +215,56 @@ namespace JPLua {
 				Call( ls.L, 3, 1 );
 
 				// returned nil, no use passing it to other plugins
-				if ( lua_type( ls.L, -1 ) == LUA_TNIL )
+				if ( lua_type( ls.L, -1 ) == LUA_TNIL ) {
 					return NULL;
-				else if ( lua_type( ls.L, -1 ) == LUA_TSTRING )
+				}
+				else if ( lua_type( ls.L, -1 ) == LUA_TSTRING ) {
 					Q_strncpyz( tmpMsg, lua_tostring( ls.L, -1 ), MAX_SAY_TEXT );
+				}
 				else {
-					trap->Print( "Invalid return value in %s (JPLUA_EVENT_CHATMSGSEND), expected string or nil but got "
-						"%s\n", plugin->name, lua_typename( ls.L, -1 )
+					trap->Print(
+						"Invalid return value in %s (JPLUA_EVENT_CHATMSGSEND), expected string or nil but got %s\n", plugin->name, lua_typename( ls.L, -1 )
 					);
+				}
+			}
+		}
+#endif // JPLUA
+
+		return tmpMsg;
+	}
+#endif
+
+#if defined(PROJECT_GAME)
+	char *Event_ChatMessagePlugin( int clientNum, const char *msg ) {
+		static char tmpMsg[MAX_SAY_TEXT] = { 0 };
+#ifdef JPLUA
+		plugin_t *plugin = NULL;
+#endif
+
+		Q_strncpyz( tmpMsg, msg, MAX_SAY_TEXT );
+
+#ifdef JPLUA
+		while ( IteratePlugins( &plugin ) ) {
+			if ( plugin->eventListeners[JPLUA_EVENT_CHATMSGPLUGIN] ) {
+				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_CHATMSGPLUGIN] );
+
+				Player_CreateRef( ls.L, clientNum );
+				lua_pushstring( ls.L, tmpMsg );
+				Call( ls.L, 2, 1 );
+
+				int retType = lua_type( ls.L, -1 );
+
+				// returned nil, no use passing it to other plugins
+				if ( retType == LUA_TNIL ) {
 					return NULL;
+				}
+				else if ( retType == LUA_TSTRING ) {
+					Q_strncpyz( tmpMsg, lua_tostring( ls.L, -1 ), sizeof(tmpMsg) );
+				}
+				else {
+					trap->Print(
+						"Invalid return value in %s (JPLUA_EVENT_CHATMSGPLUGIN), expected string or nil but got %s", plugin->name, lua_typename( ls.L, -1 )
+					);
 				}
 			}
 		}
