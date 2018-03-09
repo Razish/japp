@@ -2218,7 +2218,12 @@ static qboolean PM_CheckJump( void ) {
 				vector3	idealNormal = { 0 }, wallNormal = { 0 };
 				trace_t	trace;
 				qboolean doTrace = qfalse;
-				int contents = MASK_PLAYERSOLID;
+                                int contents; //MASK_PLAYERSOLID;
+
+                                if (GetCInfo( CINFO_FLIPKICK ) > 0)
+                                        contents = MASK_PLAYERSOLID;//MASK_PLAYERSOLID;
+                                else
+                                        contents = MASK_SOLID;
 
 				VectorSet( &mins, pm->mins.x, pm->mins.y, 0 );
 				VectorSet( &maxs, pm->maxs.x, pm->maxs.y, 24 );
