@@ -253,11 +253,11 @@ static void CG_Menu_f( void ) {
 	trap->Key_SetCatcher( trap->Key_GetCatcher() ^ KEYCATCH_CGAME );
 }
 
-static void Cmd_ChatboxSelectTabNextNoKeys( void ) {
-	CG_ChatboxSelectTabNextNoKeys();
+void Cmd_ChatboxSelectTabNext( void ) {
+	CG_ChatboxSelectTabNext();
 }
-static void Cmd_ChatboxSelectTabPrevNoKeys( void ) {
-	CG_ChatboxSelectTabPrevNoKeys();
+void Cmd_ChatboxSelectTabPrev( void ) {
+	CG_ChatboxSelectTabPrev();
 }
 
 static void CG_ChatboxFindTab_f( void ) {
@@ -420,8 +420,8 @@ static const command_t commands[] = {
 	{ "callvote", NULL },
 	{ "cgmenu", CG_Menu_f },
 	{ "chattabfind", CG_ChatboxFindTab_f },
-	{ "chattabnext", Cmd_ChatboxSelectTabNextNoKeys },
-	{ "chattabprev", Cmd_ChatboxSelectTabPrevNoKeys },
+	{ "chattabnext", Cmd_ChatboxSelectTabNext },
+	{ "chattabprev", Cmd_ChatboxSelectTabPrev },
 	{ "clearchat", CG_ClearChat_f },
 	{ "copynames", CG_CopyNames_f },
 #if !defined(NO_CRASHHANDLER) && !defined(MACOS_X)

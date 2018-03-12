@@ -196,7 +196,7 @@ namespace JPLua {
 	}
 
 #ifdef PROJECT_CGAME
-	char *Event_ChatMessageSent( const char *msg, messageMode_e mode, int targetClient ) {
+	char *Event_ChatMessageSent( const char *msg, messageMode_e mode, int targetClient, const char *shortName, const char *identifier ) {
 		static char tmpMsg[MAX_STRING_CHARS] = { 0 }; // although a chat message can only be MAX_SAY_TEXT long..-name?
 #ifdef JPLUA
 		plugin_t *plugin = NULL;
@@ -212,7 +212,9 @@ namespace JPLua {
 				lua_pushstring( ls.L, tmpMsg );
 				lua_pushinteger( ls.L, mode );
 				lua_pushinteger( ls.L, targetClient );
-				Call( ls.L, 3, 1 );
+				lua_pushstring( ls.L, shortName );
+				lua_pushstring( ls.L, identifier );
+				Call( ls.L, 5, 1 );
 
 				// returned nil, no use passing it to other plugins
 				if ( lua_type( ls.L, -1 ) == LUA_TNIL ) {

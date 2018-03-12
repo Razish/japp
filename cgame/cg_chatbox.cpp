@@ -16,7 +16,6 @@ typedef struct field_s {
 } field_t;
 
 #define MAX_CHATBOX_ENTRIES (512)
-#define MAX_CHATBOX_IDENTIFIER_SIZE (32)
 
 #define EXAMPLE_TIMESTAMP "[^800:00:00^8] "
 #define TIMESTAMP_LENGTH sizeof(EXAMPLE_TIMESTAMP)
@@ -24,19 +23,17 @@ typedef struct field_s {
 #define EXAMPLE_TIMESTAMP_CLEAN "[00:00:00] "
 #define TIMESTAMP_LENGTH_CLEAN sizeof(EXAMPLE_TIMESTAMP_CLEAN)
 
-#define CHAT_MESSAGE_LENGTH (MAX_SAY_TEXT)
-
 //CHATBOX OBJECTS
 typedef struct chatEntry_s {
 	char		timeStamp[TIMESTAMP_LENGTH];
-	char		message[CHAT_MESSAGE_LENGTH];
+	char		message[MAX_SAY_TEXT];
 	qboolean	isUsed;
 	int			time;
 
 	struct urlLocation {
 		size_t	start, length;
 		vector2	pos, size;
-		char	text[CHAT_MESSAGE_LENGTH];
+		char	text[MAX_SAY_TEXT];
 
 		urlLocation *next;
 	} *URLs;
@@ -99,17 +96,20 @@ static chatBox_t *CG_GetChatboxByName( const char *cbName ) {
 	chatBox_t *cb = chatboxList;
 	chatBox_t *prev = cb;
 
-	//No root object. Create one IMMEDIATELY
-	if ( !cb )
+	// no root object - create one immediately
+	if ( !cb ) {
 		prev = cb = chatboxList = CG_CreateChatboxObject( "normal" );
+	}
 
 	// just return the default tab if we don't want multiple tabs
-	if ( !cg_chatboxTabs.integer )
+	if ( !cg_chatboxTabs.integer ) {
 		return cb;
+	}
 
 	while ( cb ) {
-		if ( !Q_stricmp( cbName, cb->shortname ) )
+		if ( !Q_stricmp( cbName, cb->shortname ) ) {
 			return cb;
+		}
 
 		prev = cb;
 		cb = cb->next;
@@ -125,50 +125,43 @@ static chatBox_t *CG_GetChatboxByName( const char *cbName ) {
 	return cb;
 }
 
-// these match g_cmds.c
-#define EC			"\x19"
-#define CHANNEL_EC	"\x10"
-#define ADMIN_EC	"\x11"
-#define PRIVATE_EC	"\x12"
+// these match g_cmds.cpp
+#define SAY_EC		"\x19" // end of medium
+#define TAB_EC		"\x11" // device control 1
+#define UNUSED02_EC	"\x12" // devuce control 2
+#define UNUSED01_EC	"\x13" // devuce control 3
+#define MOD_EC		"\x14" // device control 4
 
-qboolean CG_ContainsChannelEscapeChar( char *text ) {
-	char *s = text, c = 0;
-	//RAZTODO: strchr?
-	while ( (c = *s++) != '\0' ) {
-		if ( c == *CHANNEL_EC )
-			return qtrue;
-	}
-	return qfalse;
+bool CG_ContainsChatTabEscapeChar( const char *text ) {
+	return strchr( text, *TAB_EC ) != nullptr;
 }
 
-char *CG_RemoveChannelEscapeChar( char *text ) {
-#if 0
-	static char ident[4][MAX_CHATBOX_IDENTIFIER_SIZE] = { { 0 } };
-	static int index;
-	char *identPos = strstr( text, CHANNEL_EC );
-	char *colonPos = strstr( identPos, ":" );
-	char *buf = (char *)&ident[index++ & 3];
-	int identSize = identPos - colonPos;
-	int endLen = strlen( colonPos );
-
-	Q_strncpyz( buf, identPos, min( identSize, MAX_CHATBOX_IDENTIFIER_SIZE ) );
-	Q_strncpyz( identPos, colonPos, endLen );
-
-	return buf;
-#else
+const char *CG_ExtractChatTabEscapeChar( const char *text ) {
 	static char ident[4][MAX_CHATBOX_IDENTIFIER_SIZE] = { { 0 } };
 	static int index;
 	char *buf = (char *)&ident[index++ & 3];
-	char *identPos = strstr( text, CHANNEL_EC ) + 1;
-	char *identEnd = strstr( identPos, CHANNEL_EC );
+	const char *identPos = strstr( text, TAB_EC ) + 1;
+	const char *identEnd = strstr( identPos, TAB_EC );
 	int identSize = (identEnd - identPos) + 1;
-	int endLen = strlen( identEnd );
+	//int endLen = strlen( identEnd );
 
 	Q_strncpyz( buf, identPos, std::min( identSize, MAX_CHATBOX_IDENTIFIER_SIZE ) );
-	Q_strncpyz( identPos - 1, identEnd + 1, endLen );
+	//Q_strncpyz( identPos - 1, identEnd + 1, endLen );
 
 	return buf;
+}
+
+void CG_RemoveChatEscapeChars( char *text ) {
+#if 0
+	int wi = 0;
+	for ( int ri = 0; text[ri]; ri++ ) {
+		if ( text[ri] != *SAY_EC && text[ri] != *TAB_EC && text[ri] != *UNUSED02_EC && text[ri] != *UNUSED01_EC && text[ri] != *MOD_EC ) {
+			text[wi++] = text[ri];
+		}
+	}
+	text[wi] = '\0';
 #endif
+	Q_strstrip( text, SAY_EC TAB_EC UNUSED02_EC UNUSED01_EC MOD_EC, nullptr );
 }
 
 void CG_ChatboxInit( void ) {
@@ -210,23 +203,65 @@ void CG_ChatboxOutgoing( void ) {
 	// commit the current line to history
 	CG_GetNewChatHistory( chatField.buffer );
 
-	msg = JPLua::Event_ChatMessageSent( msg, chatMode, chatTargetClient );
-
-	// lua event ate it
-	if ( !msg || !msg[0] )
+	// pass to lua event, which may consume it
+	msg = JPLua::Event_ChatMessageSent( msg, chatMode, chatTargetClient, currentChatbox->shortname, currentChatbox->identifier );
+	if ( !msg || !msg[0] ) {
 		return;
+	}
+
+	// hijack global say when using tabbed chatbox
+	if ( chatMode == CHAT_ALL ) {
+		if ( currentChatbox->shortname[0] ) {
+			if ( !strcmp( currentChatbox->shortname, "normal" ) ) {
+				// global say to "normal" is default behaviour, let it go
+				assert( chatTargetClient == -1 );
+				//chatMode = CHAT_ALL;
+			}
+			else if ( !strcmp( currentChatbox->shortname, "team" ) ) {
+				// redirect global say from "team" tab
+				chatMode = CHAT_TEAM;
+			}
+			else {
+				// this will happen if we're using global reply to an unknown tab
+				// we will hazard a guess that this is meant to be a private message
+				// if that fails, will fall back to team chat and hope the server can work some redirect magic (e.g. say_team_mod)w
+
+				// check if "@username"
+				if ( currentChatbox->shortname[0] == '@' ) {
+					for ( int i = 0; i < cgs.maxclients; i++ ) {
+						if ( cgs.clientinfo[i].infoValid ) {
+							char theirName[MAX_NETNAME]{};
+							Q_strncpyz( theirName, cgs.clientinfo[i].name, sizeof(theirName) );
+							Q_CleanString( theirName, STRIP_COLOUR );
+							if ( !Q_strncmp( theirName, &currentChatbox->shortname[1], std::min( (size_t)(MAX_CHATBOX_IDENTIFIER_SIZE-1), sizeof(theirName) ) ) ) {
+								chatMode = CHAT_WHISPER;
+								chatTargetClient = i;
+								break;
+							}
+						}
+					}
+				}
+
+				chatMode = CHAT_TEAM;
+			}
+		}
+	}
 
 	switch ( chatMode ) {
+
 	default:
-	case CHAT_ALL:
+	case CHAT_ALL: {
 		trap->SendClientCommand( va( "say %s", msg ) );
-		break;
-	case CHAT_TEAM:
+	} break;
+
+	case CHAT_TEAM: {
 		trap->SendClientCommand( va( "say_team %s", msg ) );
-		break;
-	case CHAT_WHISPER:
+	} break;
+
+	case CHAT_WHISPER: {
 		trap->SendClientCommand( va( "tell %i %s", chatTargetClient, msg ) );
-		break;
+	} break;
+
 	}
 }
 
@@ -250,7 +285,7 @@ static const char *postMatches[] = {
 // else return an offset into message where the first URL is located
 // call multiple times to parse multiple urls
 static size_t CG_ParseURLs( char *message ) {
-	char scratch[CHAT_MESSAGE_LENGTH];
+	char scratch[MAX_SAY_TEXT];
 	std::memcpy( scratch, message, sizeof(scratch) );
 
 	const char *delim = " ";
@@ -318,7 +353,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 	int i = 0;
 
 	float accumLength = 0.0f;
-	char buf[CHAT_MESSAGE_LENGTH] = { 0 };
+	char buf[MAX_SAY_TEXT] = { 0 };
 	struct tm *timeinfo;
 	time_t tm;
 	const Font font( CG_GetChatboxFont(), cg.chatbox.size.scale );
@@ -329,6 +364,10 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 
 	if ( cb != currentChatbox ) {
 		cb->notification = qtrue;
+		if ( cg_chatboxTabs.integer == 2 && strcmp( cbName, "normal" ) ) {
+			// auto-switch to this tab if it's not global chat
+			CG_ChatboxSelect( cbName );
+		}
 	}
 
 	// Stop scrolling up if we've already scrolled, similar to console behaviour
@@ -338,7 +377,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 			: 0 );
 	}
 
-	for ( i = 0, strLength = strlen( message ); i<strLength && i<CHAT_MESSAGE_LENGTH; i++ ) {
+	for ( i = 0, strLength = strlen( message ); i<strLength && i<MAX_SAY_TEXT; i++ ) {
 		char *p = (char*)&message[i];
 		Com_sprintf( buf, sizeof(buf), "%c", *p );
 		if ( !Q_IsColorString( p ) && (i > 0 && !Q_IsColorString( p - 1 )) ) {
@@ -349,7 +388,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 			char lastColor = COLOR_GREEN;
 			int j = i;
 			int savedOffset = i;
-			char tempMessage[CHAT_MESSAGE_LENGTH];
+			char tempMessage[MAX_SAY_TEXT];
 
 			//Attempt to back-track, find a space (' ') within X characters or pixels
 			//RAZTODO: Another method using character width? Meh
@@ -454,7 +493,7 @@ void CG_ChatboxAddMessage( const char *message, qboolean multiLine, const char *
 
 			msec = cg.time - cgs.levelStartTime;	seconds = msec / 1000;
 			mins = seconds / 60;					seconds -= mins * 60;
-			hours = mins / 60;					mins -= hours * 60;
+			hours = mins / 60;						mins -= hours * 60;
 
 			Com_sprintf( chat->timeStamp, sizeof(chat->timeStamp), "[^%c%02i:%02i:%02i" S_COLOR_WHITE "] ",
 				*(char *)cg_chatboxTimeColour.string, hours, mins, seconds );
@@ -637,7 +676,7 @@ void CG_ChatboxDraw( void ) {
 					);
 					const size_t timestampLength = cg_chatboxTimeShow.integer ? strlen( chat->timeStamp ) : 0u;
 					for ( chatEntry_t::urlLocation *url = chat->URLs; url; url = url->next ) {
-						char scratch[CHAT_MESSAGE_LENGTH];
+						char scratch[MAX_SAY_TEXT];
 						Q_strncpyz( scratch, tmp, url->start + timestampLength + 1 );
 
 						//FIXME: somehow this isn't accurate when using r_aspectCorrectFonts?!
@@ -660,6 +699,10 @@ void CG_ChatboxDraw( void ) {
 				}
 			}
 		}
+	}
+
+	if ( cg_chatboxTabs.integer ) {
+		CG_ChatboxDrawTabs();
 	}
 
 	// draw the input line
@@ -705,10 +748,6 @@ void CG_ChatboxDraw( void ) {
 			}
 		}
 		yAccum += height;
-	}
-
-	if ( cg_chatboxTabs.integer ) {
-		CG_ChatboxDrawTabs();
 	}
 }
 
@@ -808,11 +847,11 @@ void CG_ChatboxTabComplete( void ) {
 	}
 }
 
-void CG_ChatboxSelectTabNextNoKeys( void ) {
+void CG_ChatboxSelectTabNext( void ) {
 	currentChatbox = currentChatbox->next ? currentChatbox->next : chatboxList;
 }
 
-void CG_ChatboxSelectTabPrevNoKeys( void ) {
+void CG_ChatboxSelectTabPrev( void ) {
 	if ( currentChatbox->prev ) {
 		currentChatbox = currentChatbox->prev;
 	}
@@ -825,7 +864,7 @@ void CG_ChatboxSelectTabPrevNoKeys( void ) {
 	}
 }
 
-void CG_ChatboxSelect( char *cbName ) {
+void CG_ChatboxSelect( const char *cbName ) {
 	currentChatbox = CG_GetChatboxByName( cbName );
 }
 
@@ -846,7 +885,7 @@ void CG_ChatboxHistoryUp( void ) {
 	chatField.cursor = strlen( chatField.buffer );
 }
 
-static void Field_Clear( field_t *edit ) {
+static void ChatField_Clear( field_t *edit ) {
 	edit->buffer[0] = 0;
 	edit->cursor = 0;
 	edit->scroll = 0;
@@ -861,7 +900,7 @@ void CG_ChatboxHistoryDn( void ) {
 		chatField.cursor = strlen( chatField.buffer );
 	}
 	else {
-		Field_Clear( &chatField );
+		ChatField_Clear( &chatField );
 	}
 }
 
@@ -900,7 +939,7 @@ void CG_ChatboxOpen( messageMode_e mode ) {
 
 	chatActive = true;
 	chatMode = mode;
-	Field_Clear( &chatField );
+	ChatField_Clear( &chatField );
 	trap->Key_SetCatcher( trap->Key_GetCatcher() | KEYCATCH_CGAME );
 }
 
@@ -909,7 +948,7 @@ void CG_ChatboxClose( void ) {
 	trap->Key_SetCatcher( trap->Key_GetCatcher() & ~KEYCATCH_CGAME );
 }
 
-static void Field_CharEvent( field_t *edit, int key ) {
+static void ChatField_CharEvent( field_t *edit, int key ) {
 	int fieldLen = strlen( edit->buffer );
 
 	//key = tolower( key );
@@ -925,29 +964,36 @@ static void Field_CharEvent( field_t *edit, int key ) {
 			edit->scroll = 0;
 		} break;
 
-		// clear
-		case A_BACKSPACE:
-		case 'c': {
-			Field_Clear( edit );
+		// end
+		case 'e': {
+			edit->cursor = fieldLen;
+			edit->scroll = edit->cursor - edit->widthInChars;
 		} break;
 
-		// scroll to first message
+		// clear
+		case A_BACKSPACE: {
+			ChatField_Clear( edit );
+		} break;
+
+		// scroll to first/last message
 		case A_HOME: {
 			const int numActiveLines = currentChatbox->numActiveLines;
 			currentChatbox->scrollAmount = numActiveLines >= cg_chatboxLineCount.integer
 				? (std::min( numActiveLines, MAX_CHATBOX_ENTRIES ) - cg_chatboxLineCount.integer) * -1
 				: 0;
 		} break;
-
-		// scroll to last message
 		case A_END: {
 			currentChatbox->scrollAmount = 0;
 		} break;
 
-		// end
-		case 'e': {
-			edit->cursor = fieldLen;
-			edit->scroll = edit->cursor - edit->widthInChars;
+		// scroll through chat tabs
+		case A_PAGE_UP:
+		case A_MWHEELUP: {
+			CG_ChatboxSelectTabNext();
+		} break;
+		case A_PAGE_DOWN:
+		case A_MWHEELDOWN: {
+			CG_ChatboxSelectTabPrev();
 		} break;
 
 		// backspace
@@ -961,9 +1007,13 @@ static void Field_CharEvent( field_t *edit, int key ) {
 			}
 		} break;
 
-		// paste
+		// copy/paste
+		case 'c': {
+			//RAZTODO: ChatField_Copy
+			CG_ChatboxAddMessage( S_COLOR_YELLOW "Clipboard support is not available for this chatbox yet", qfalse, "normal" );
+		} break;
 		case 'v': {
-			//RAZTODO: Field_Paste
+			//RAZTODO: ChatField_Paste
 			CG_ChatboxAddMessage( S_COLOR_YELLOW "Clipboard support is not available for this chatbox yet", qfalse, "normal" );
 		} break;
 
@@ -1144,7 +1194,7 @@ static void Field_CharEvent( field_t *edit, int key ) {
 }
 
 void CG_ChatboxChar( int key ) {
-	Field_CharEvent( &chatField, key );
+	ChatField_CharEvent( &chatField, key );
 }
 
 qboolean CG_ChatboxActive( void ) {

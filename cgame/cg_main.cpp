@@ -412,6 +412,10 @@ static void CVU_ChatboxSize( void ) {
 	}
 }
 
+static void CVU_ChatboxTabs( void ) {
+	CG_ChatboxSelect( "normal" );
+}
+
 static void CVU_CrosshairColour( void ) {
 	ivector4 *v = &cg.crosshair.colour;
 	if ( sscanf( cg_crosshairColour.string, "%i %i %i %i", &v->r, &v->g, &v->b, &v->a ) != 4 ) {

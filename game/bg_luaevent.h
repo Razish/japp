@@ -45,7 +45,7 @@ namespace JPLua {
 #endif
 
 #ifdef PROJECT_CGAME
-	char *Event_ChatMessageSent( const char *msg, messageMode_e mode, int targetClient );
+	char *Event_ChatMessageSent( const char *msg, messageMode_e mode, int targetClient, const char *shortName, const char *identifier );
 #endif
 
 #if defined(PROJECT_GAME)

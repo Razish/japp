@@ -1074,10 +1074,12 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, char color, con
 	}
 }
 
-#define EC			"\x19"
-#define CHANNEL_EC	"\x10"
-#define ADMIN_EC	"\x11"
-#define MOD_EC		"\x12" // reserved for plugin use
+// these match cg_chatbox.cpp
+#define SAY_EC		"\x19" // end of medium
+#define TAB_EC		"\x11" // device control 1
+#define UNUSED02_EC	"\x12" // devuce control 2
+#define UNUSED01_EC	"\x13" // devuce control 3
+#define MOD_EC		"\x14" // device control 4
 
 static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *unsafeText ) {
 	char chatText[MAX_SAY_TEXT];
@@ -1148,7 +1150,7 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *unsa
 		G_LogPrintf( level.log.console, "amsay: %s: %s\n", ent->client->pers.netname, chatText );
 		color = COLOR_YELLOW;
 
-		Com_sprintf( name, sizeof(name), S_COLOR_YELLOW "<Admin>" S_COLOR_WHITE "%s" S_COLOR_WHITE EC ": ", ent->client->pers.netname );
+		Com_sprintf( name, sizeof(name), S_COLOR_YELLOW "<Admin>" S_COLOR_WHITE "%s" S_COLOR_WHITE SAY_EC ": ", ent->client->pers.netname );
 	} break;
 
 	case SAY_ALL: {
@@ -1159,10 +1161,10 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *unsa
 		if ( !Q_stricmpn( chatText, "/me ", 4 ) ) {
 			Q_strncpyz( chatText, chatText+4, sizeof(chatText) ); // skip "/me "
 			color = COLOR_WHITE;
-			Com_sprintf( name, sizeof(name), S_COLOR_WHITE "* %s" S_COLOR_WHITE EC " ", ent->client->pers.netname );
+			Com_sprintf( name, sizeof(name), S_COLOR_WHITE "* %s" S_COLOR_WHITE SAY_EC " ", ent->client->pers.netname );
 		}
 		else {
-			Com_sprintf( name, sizeof(name), "%s" S_COLOR_WHITE EC ": ", ent->client->pers.netname );
+			Com_sprintf( name, sizeof(name), "%s" S_COLOR_WHITE SAY_EC ": ", ent->client->pers.netname );
 		}
 	} break;
 
@@ -1173,7 +1175,7 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *unsa
 		if ( Team_GetLocationMsg( ent, location, sizeof(location) ) ) {
 			locMsg = location;
 		}
-		Com_sprintf( name, sizeof(name), EC "(%s" S_COLOR_WHITE EC ")" EC ": ", ent->client->pers.netname );
+		Com_sprintf( name, sizeof(name), SAY_EC "(%s" S_COLOR_WHITE SAY_EC ")" SAY_EC ": ", ent->client->pers.netname );
 	} break;
 
 	case SAY_TELL: {
@@ -1187,7 +1189,7 @@ static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *unsa
 		{
 			locMsg = location;
 		}
-		Com_sprintf( name, sizeof(name), EC "[%s" S_COLOR_WHITE EC "]" EC ": ", ent->client->pers.netname );
+		Com_sprintf( name, sizeof(name), SAY_EC "[%s" S_COLOR_WHITE SAY_EC "]" SAY_EC ": ", ent->client->pers.netname );
 	} break;
 
 	}

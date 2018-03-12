@@ -1693,8 +1693,8 @@ namespace JPLua {
 			return;
 		}
 
-		// set the ls.version
-		semver_parse( "13.6.0", &jpluaVersion );
+		// set the JPLua version
+		semver_parse( "13.6.1", &jpluaVersion );
 
 		// set the callback in case of an error
 		lua_atpanic( ls.L, Error );
@@ -1785,7 +1785,7 @@ namespace JPLua {
 
 		for ( int i = 0; i < JPLUA_FRAMEWORK_MAX; i++ ) {
 			if ( framework[i] < 0 ) {
-				Com_Error( ERR_FATAL, "FATAL ERROR: Could not properly initialize the ls.framework!\n" );
+				Com_Error( ERR_FATAL, "FATAL ERROR: Could not properly initialize the JPLua framework!\n" );
 			}
 		}
 
@@ -1805,11 +1805,8 @@ namespace JPLua {
 
 			Event_Shutdown( restart );
 #ifdef PROJECT_GAME
-			for (int i = 0; i < MAX_GENTITIES; i++){
-				gentity_t *ent = &g_entities[i];
-				if (ent){
-					ent->uselua = false;
-				}
+			for ( auto &ent : g_entities ) {
+				ent.uselua = false;
 			}
 #endif
 

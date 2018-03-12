@@ -885,18 +885,6 @@ static void CG_MapRestart( void ) {
 	}
 }
 
-static void CG_RemoveChatEscapeChar( char *text ) {
-	int i, l;
-
-	l = 0;
-	for ( i = 0; text[i]; i++ ) {
-		if ( text[i] == '\x19' )
-			continue;
-		text[l++] = text[i];
-	}
-	text[l] = '\0';
-}
-
 #define MAX_STRINGED_SV_STRING (1024)
 
 void CG_CheckSVStringEdRef( char *buf, const char *str ) {
@@ -1269,11 +1257,11 @@ static void CG_ServerCommand( void ) {
 			trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 			Q_strncpyz( text, msg, MAX_SAY_TEXT );
 
-			if ( CG_ContainsChannelEscapeChar( text ) ) {
-				Q_strncpyz( cbName, CG_RemoveChannelEscapeChar( text ), sizeof(cbName) );
+			if ( CG_ContainsChatTabEscapeChar( text ) ) {
+				Q_strncpyz( cbName, CG_ExtractChatTabEscapeChar( text ), sizeof(cbName) );
 			}
 
-			CG_RemoveChatEscapeChar( text );
+			CG_RemoveChatEscapeChars( text );
 			CG_LogPrintf( cg.log.console, va( "%s\n", text ) );
 			if ( cg_newChatbox.integer ) {
 				CG_ChatboxAddMessage( text, qfalse, cbName );
@@ -1292,7 +1280,7 @@ static void CG_ServerCommand( void ) {
 	if ( !strcmp( cmd, "tchat" ) ) {
 		trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 		Q_strncpyz( text, CG_Argv( 1 ), MAX_SAY_TEXT );
-		CG_RemoveChatEscapeChar( text );
+		CG_RemoveChatEscapeChars( text );
 		CG_LogPrintf( cg.log.console, va( "%s\n", text ) );
 		if ( cg_newChatbox.integer )
 			CG_ChatboxAddMessage( text, qfalse, "team" );
@@ -1324,7 +1312,7 @@ static void CG_ServerCommand( void ) {
 			trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 			//	Q_strncpyz( text, CG_Argv( 1 ), MAX_SAY_TEXT );
 			Com_sprintf( text, sizeof(text), "%s" S_COLOR_WHITE "<%s> ^%s%s", name, loc, color, message );
-			CG_RemoveChatEscapeChar( text );
+			CG_RemoveChatEscapeChars( text );
 			//Raz: Siege chat now uses the fancy new chatbox
 			if ( cg_newChatbox.integer )
 				CG_ChatboxAddMessage( text, qfalse, "normal" );
@@ -1353,7 +1341,7 @@ static void CG_ServerCommand( void ) {
 		trap->S_StartLocalSound( media.sounds.interface.talk, CHAN_LOCAL_SOUND );
 		//	Q_strncpyz( text, CG_Argv( 1 ), MAX_SAY_TEXT );
 		Com_sprintf( text, sizeof(text), "%s" S_COLOR_WHITE "<%s> ^%s%s", name, loc, color, message );
-		CG_RemoveChatEscapeChar( text );
+		CG_RemoveChatEscapeChars( text );
 		if ( cg_newChatbox.integer )
 			CG_ChatboxAddMessage( text, qfalse, "team" );
 		else
