@@ -1282,11 +1282,13 @@ static void CG_General( centity_t *cent ) {
 				ent.shaderRGBA[3] = 200;
 				if ( !cent->dustTrailTime ) {
 					cent->dustTrailTime = cg.time;
-					if ( lightSide ) {
-						trap->S_StartSound( NULL, cent->currentState.number, CHAN_AUTO, trap->S_RegisterSound( "sound/weapons/force/see.wav" ) );
-					}
-					else {
-						trap->S_StartSound( NULL, cent->currentState.number, CHAN_AUTO, trap->S_RegisterSound( "sound/weapons/force/lightning" ) );
+					if ( cg_noBodies.integer != 2 ) {
+						if ( lightSide ) {
+							trap->S_StartSound( NULL, cent->currentState.number, CHAN_AUTO, trap->S_RegisterSound( "sound/weapons/force/see.wav" ) );
+						}
+						else {
+							trap->S_StartSound( NULL, cent->currentState.number, CHAN_AUTO, trap->S_RegisterSound( "sound/weapons/force/lightning" ) );
+						}
 					}
 				}
 				ent.endTime = cent->dustTrailTime;
@@ -1333,7 +1335,8 @@ static void CG_General( centity_t *cent ) {
 					if ( curTimeDif < 2200
 						&& cg.frametime > 0
 						&& ((cg.frametime < 50 && cg.time % 50 <= cg.frametime)
-						|| cg.frametime >= 50))  //probably temporary
+							|| cg.frametime >= 50) // probably temporary
+						&& cg_noBodies.integer != 2 )
 					{
 						trap->S_StartSound(NULL, cent->currentState.number, CHAN_AUTO, trap->S_RegisterSound("sound/weapons/saber/saberhum1.wav"));
 					}
@@ -1349,10 +1352,11 @@ static void CG_General( centity_t *cent ) {
 					else {
 						ent.customShader = media.gfx.world.electricBody2;
 					}
-					if (( random() > 0.9f )
+					if ( random() > 0.9f
 						&& cg.frametime > 0
 						&& ((cg.frametime < 50 && cg.time % 50 <= cg.frametime)
-						|| cg.frametime >=50))
+							|| cg.frametime >= 50)
+						&& cg_noBodies.integer != 2 )
 					{
 						trap->S_StartSound( NULL, cent->currentState.number, CHAN_AUTO, media.sounds.environment.crackle );
 					}

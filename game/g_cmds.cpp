@@ -1040,7 +1040,7 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, char color, con
 	}
 
 	// only send team messages to those on your team
-	if ( mode == SAY_TEAM  && !OnSameTeam( ent, other ) ) {
+	if ( mode == SAY_TEAM && !OnSameTeam( ent, other ) ) {
 		return;
 	}
 
@@ -1062,211 +1062,219 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, char color, con
 		return;
 	}
 
-	if ( locMsg )
-	{
-		trap->SendServerCommand( other - g_entities, va( "%s \"%s\" \"%s\" \"%c\" \"%s\"",
-			(mode == SAY_TEAM) ? "ltchat" : "lchat", name, locMsg, color, message ) );
+	if ( locMsg ) {
+		trap->SendServerCommand(
+			other - g_entities, va( "%s \"%s\" \"%s\" \"%c\" \"%s\"", (mode == SAY_TEAM) ? "ltchat" : "lchat", name, locMsg, color, message )
+		);
 	}
-	else
-	{
-		trap->SendServerCommand( other - g_entities, va( "%s \"%s%c%c%s\"",
-			(mode == SAY_TEAM) ? "tchat" : "chat", name, Q_COLOR_ESCAPE, color, message ) );
+	else {
+		trap->SendServerCommand(
+			other - g_entities, va( "%s \"%s%c%c%s\"", (mode == SAY_TEAM) ? "tchat" : "chat", name, Q_COLOR_ESCAPE, color, message )
+		);
 	}
 }
 
-#define EC			"\x19"
-#define CHANNEL_EC	"\x10"
-#define ADMIN_EC	"\x11"
-#define PRIVATE_EC	"\x12"
+// these match cg_chatbox.cpp
+#define SAY_EC		"\x19" // end of medium
+#define TAB_EC		"\x11" // device control 1
+#define UNUSED02_EC	"\x12" // devuce control 2
+#define UNUSED01_EC	"\x13" // devuce control 3
+#define MOD_EC		"\x14" // device control 4
 
-static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) {
-	int			i;
-	gentity_t	*other;
-	int			color;
-	char		name[96];
-	// don't let text be too long for malicious reasons
-	char		text[MAX_SAY_TEXT];
-	char		location[64];
-	char		*locMsg = NULL;
-	qboolean	isMeCmd = qfalse;
-	qboolean	returnToSender = qfalse;
+static void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *unsafeText ) {
+	char chatText[MAX_SAY_TEXT];
+	Q_strncpyz( chatText, unsafeText, sizeof(chatText) );
 
-	if ( level.gametype < GT_TEAM && mode == SAY_TEAM ) {
-		mode = SAY_ALL;
+	//RAZTODO: strip ext ascii/control chars
+
+	if ( strlen( unsafeText ) > MAX_SAY_TEXT ) {
+		G_LogPrintf( level.log.security, "G_Say from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, chatText );
 	}
 
 	if ( ent->client->pers.adminData.silenced ) {
 		return;
 	}
 
-	//RAZTODO: strip ext ascii/control chars
-	if ( strstr( ent->client->pers.netname, "<Admin>" ) || Q_strchrs( chatText, "\n\r\x0b" ) ) {
-		returnToSender = qtrue;
+	if ( mode == SAY_TEAM ) {
+		// redirect to general chat in non-team gametypes
+		if ( level.gametype < GT_TEAM ) {
+			mode = SAY_ALL;
+		}
+
+		// ...but still handle say_team_mod specialisation
+		if ( ent->client->pers.sayTeamMethod == STM_PLUGIN ) {
+			char *pluginResult = JPLua::Event_ChatMessagePlugin( ent->s.number, chatText );
+			if ( pluginResult ) {
+				Q_strncpyz( chatText, pluginResult, sizeof(chatText) );
+			}
+			else {
+				// event was cancelled
+				return;
+			}
+		}
+		else if ( ent->client->pers.sayTeamMethod == STM_ADMIN ) {
+			mode = SAY_ADMIN;
+		}
+		else if ( ent->client->pers.sayTeamMethod == STM_CENTERPRINT ) {
+			// handle centerprint specially
+			if ( ent->client->pers.adminUser && AM_HasPrivilege( ent, PRIV_ANNOUNCE ) ) {
+				Q_ConvertLinefeeds( chatText );
+				G_Announce( chatText );
+			}
+			else {
+				trap->SendServerCommand( ent - g_entities, "print \"You are not allowed to execute that command.\n\"" );
+			}
+			return;
+		}
 	}
+
+	// allow plugins to transform chat messages
+	char *pluginResult = JPLua::Event_ChatMessageRecieved( ent->s.number, chatText, mode );
+	if ( pluginResult ) {
+		Q_strncpyz( chatText, pluginResult, sizeof(chatText) );
+	}
+	else {
+		// event was cancelled
+		return;
+	}
+
+	char name[96];
+	char location[64];
+	char *locMsg = NULL;
+	int color = COLOR_WHITE;
 
 	switch ( mode ) {
+
 	default:
-	case SAY_ADMIN:
+	case SAY_ADMIN: {
 		G_LogPrintf( level.log.console, "amsay: %s: %s\n", ent->client->pers.netname, chatText );
-		Com_sprintf( name, sizeof(name), S_COLOR_YELLOW"<Admin>" S_COLOR_WHITE "%s%c%c" EC ": ",
-			ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE
-		);
 		color = COLOR_YELLOW;
-		break;
-	case SAY_ALL:
-		if ( !Q_stricmpn( chatText, "/me ", 4 ) ) {
-			// A /me command
-			isMeCmd = qtrue;
-			chatText += 4; //Skip "^7* "
-		}
+
+		Com_sprintf( name, sizeof(name), S_COLOR_YELLOW "<Admin>" S_COLOR_WHITE "%s" S_COLOR_WHITE SAY_EC ": ", ent->client->pers.netname );
+	} break;
+
+	case SAY_ALL: {
 		G_LogPrintf( level.log.console, "say: %s: %s\n", ent->client->pers.netname, chatText );
-		if ( isMeCmd ) {
-			Com_sprintf( name, sizeof(name), S_COLOR_WHITE "* %s" S_COLOR_WHITE EC " ", ent->client->pers.netname );
+		color = COLOR_GREEN;
+
+		// handle /me commands
+		if ( !Q_stricmpn( chatText, "/me ", 4 ) ) {
+			Q_strncpyz( chatText, chatText+4, sizeof(chatText) ); // skip "/me "
 			color = COLOR_WHITE;
+			Com_sprintf( name, sizeof(name), S_COLOR_WHITE "* %s" S_COLOR_WHITE SAY_EC " ", ent->client->pers.netname );
 		}
 		else {
-			Com_sprintf( name, sizeof(name), "%s" S_COLOR_WHITE EC ": ", ent->client->pers.netname );
-			color = COLOR_GREEN;
+			Com_sprintf( name, sizeof(name), "%s" S_COLOR_WHITE SAY_EC ": ", ent->client->pers.netname );
 		}
-		break;
-	case SAY_TEAM:
+	} break;
+
+	case SAY_TEAM: {
 		G_LogPrintf( level.log.console, "sayteam: %s: %s\n", ent->client->pers.netname, chatText );
-		if ( Team_GetLocationMsg( ent, location, sizeof(location) ) ) {
-			Com_sprintf( name, sizeof(name), EC "(%s%c%c" EC ")" EC ": ", ent->client->pers.netname, Q_COLOR_ESCAPE,
-				COLOR_WHITE
-			);
-			locMsg = location;
-		}
-		else {
-			Com_sprintf( name, sizeof(name), EC "(%s%c%c" EC ")" EC ": ", ent->client->pers.netname, Q_COLOR_ESCAPE,
-				COLOR_WHITE
-			);
-		}
 		color = COLOR_CYAN;
-		break;
-	case SAY_TELL:
-		if ( target && level.gametype >= GT_TEAM && target->client->sess.sessionTeam == ent->client->sess.sessionTeam &&
-			Team_GetLocationMsg( ent, location, sizeof(location) ) ) {
-			Com_sprintf( name, sizeof(name), EC "[%s%c%c" EC "]" EC ": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+
+		if ( Team_GetLocationMsg( ent, location, sizeof(location) ) ) {
 			locMsg = location;
 		}
-		else
-			Com_sprintf( name, sizeof(name), EC "[%s%c%c" EC "]" EC ": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+		Com_sprintf( name, sizeof(name), SAY_EC "(%s" S_COLOR_WHITE SAY_EC ")" SAY_EC ": ", ent->client->pers.netname );
+	} break;
+
+	case SAY_TELL: {
+		if ( ent != target ) {
+			G_LogPrintf( level.log.console, "tell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, chatText );
+		}
 		color = COLOR_MAGENTA;
-		break;
+
+		if ( target && level.gametype >= GT_TEAM && target->client->sess.sessionTeam == ent->client->sess.sessionTeam
+			&& Team_GetLocationMsg( ent, location, sizeof(location) ) )
+		{
+			locMsg = location;
+		}
+		Com_sprintf( name, sizeof(name), SAY_EC "[%s" S_COLOR_WHITE SAY_EC "]" SAY_EC ": ", ent->client->pers.netname );
+	} break;
+
 	}
 
-	Q_strncpyz( text, chatText, sizeof(text) );
-
-	if ( returnToSender ) {
-		//Raz: Silly kids, make it look like they said something
-		G_LogPrintf( level.log.security, "%s attempted to send a bogus message: %s\n", ent->client->pers.netnameClean, text );
-		G_SayTo( ent, ent, mode, color, name, text, locMsg );
+	if ( strstr( ent->client->pers.netname, "<Admin>" ) || Q_strchrs( chatText, "\n\r\x0b" ) ) {
+		// silly kids, make it look like they said something
+		G_LogPrintf( level.log.security, "%s attempted to send a bogus message: %s\n", ent->client->pers.netnameClean, chatText );
+		G_SayTo( ent, ent, mode, color, name, chatText, locMsg );
 		return;
 	}
 
 	if ( target ) {
-		G_SayTo( ent, target, mode, color, name, text, locMsg );
+		G_SayTo( ent, target, mode, color, name, chatText, locMsg );
 		return;
 	}
 
 	// echo the text to the console
 	if ( dedicated.integer ) {
-		trap->Print( "%s%s\n", name, text );
+		trap->Print( "%s%s\n", name, chatText );
 	}
 
-	// send it to all the apropriate clients
+	// send it to all the appropriate clients
+	int i;
+	gentity_t *other;
 	for ( i = 0, other = g_entities; i < level.maxclients; i++, other++ ) {
-		G_SayTo( ent, other, mode, color, name, text, locMsg );
+		G_SayTo( ent, other, mode, color, name, chatText, locMsg );
 	}
 }
 
+// say
 static void Cmd_Say_f( gentity_t *ent ) {
-	char *p = NULL;
-	char *res = NULL;
-	chatType_t type = SAY_ALL;
-
 	if ( trap->Argc() < 2 ) {
 		return;
 	}
-
-	p = ConcatArgs( 1 );
-
-	//Raz: BOF
-	if ( strlen( p ) > MAX_SAY_TEXT ) {
-		p[MAX_SAY_TEXT - 1] = '\0';
-		G_LogPrintf( level.log.security, "Cmd_Say_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
-	}
-	if ((res = JPLua::Event_ChatMessageRecieved(ent->s.number, p, type))){
-		G_Say(ent, NULL, type, res);
-	}
-	else{
-		G_Say(ent, NULL, type, p);
-	}
+	G_Say( ent, NULL, SAY_ALL, ConcatArgs( 1 ) );
 }
 
+// amsay
 static void Cmd_SayAdmin_f( gentity_t *ent ) {
-	char *p = NULL;
-	char *res = NULL;
-	chatType_t type = SAY_ADMIN;
-
 	if ( trap->Argc() < 2 ) {
 		return;
 	}
-
-	p = ConcatArgs( 1 );
-
-	if ( strlen( p ) > MAX_SAY_TEXT ) {
-		p[MAX_SAY_TEXT - 1] = '\0';
-		G_LogPrintf( level.log.security, "Cmd_SayAdmin_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
-	}
-	if ((res = JPLua::Event_ChatMessageRecieved(ent->s.number, p, type))){
-		G_Say(ent, NULL, type, res);
-	}
-	else{
-		G_Say(ent, NULL, type, p);
-	}
+	G_Say( ent, NULL, SAY_ADMIN, ConcatArgs( 1 ) );
 }
 
+// say_team
 static void Cmd_SayTeam_f( gentity_t *ent ) {
-	char *p = NULL;
-	char *res = NULL;
-	chatType_t type = (level.gametype >= GT_TEAM) ? SAY_TEAM : SAY_ALL;
+	if ( trap->Argc() < 2 ) {
+		return;
+	}
+	G_Say( ent, NULL, SAY_TEAM, ConcatArgs( 1 ) );
+}
 
+// tell
+static void Cmd_Tell_f( gentity_t *ent ) {
 	if ( trap->Argc() < 2 ) {
 		return;
 	}
 
-	p = ConcatArgs( 1 );
-
-	//Raz: BOF
-	if ( strlen( p ) > MAX_SAY_TEXT ) {
-		p[MAX_SAY_TEXT - 1] = '\0';
-		G_LogPrintf( level.log.security, "Cmd_SayTeam_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
-	}
-	if ((res = JPLua::Event_ChatMessageRecieved(ent->s.number, p, type))){
-		Q_strncpyz(p, res, MAX_SAY_TEXT);
-	}
-	if ( ent->client->pers.sayTeamMethod == STM_ADMIN ) {
-		type = SAY_ADMIN;
-	}
-	else if ( ent->client->pers.sayTeamMethod == STM_CENTERPRINT ) {
-		if ( ent->client->pers.adminUser && AM_HasPrivilege( ent, PRIV_ANNOUNCE ) ) {
-			Q_ConvertLinefeeds( p );
-			G_Announce( p );
-		}
-		else {
-			trap->SendServerCommand( ent - g_entities, "print \"You are not allowed to execute that command.\n\"" );
-		}
+	char arg[MAX_TOKEN_CHARS];
+	trap->Argv( 1, arg, sizeof(arg) );
+	int targetNum = G_ClientFromString( ent, arg, FINDCL_SUBSTR | FINDCL_PRINT );
+	if ( targetNum == -1 ) {
 		return;
 	}
-	G_Say( ent, NULL, type, p );
+
+	gentity_t *target = &g_entities[targetNum];
+	if ( !target || !target->inuse || !target->client ) {
+		return;
+	}
+
+	char *msg = ConcatArgs( 2 );
+	G_Say( ent, target, SAY_TELL, msg );
+	// don't tell to the player self if it was already directed to this player
+	//	also don't send the chat back to a bot
+	if ( ent != target && !(ent->r.svFlags & SVF_BOT) ) {
+		G_Say( ent, ent, SAY_TELL, msg );
+	}
 }
 
 static const char *sayTeamMethods[STM_NUM_METHODS] = {
 	"team",
 	"admin",
-	"centerprint"
+	"centerprint",
+	"plugin",
 };
 
 static void Cmd_SayTeamMod_f( gentity_t *ent ) {
@@ -1295,39 +1303,6 @@ static void Cmd_SayTeamMod_f( gentity_t *ent ) {
 
 	trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_CYAN "redirecting team messages to: "
 		S_COLOR_YELLOW "%s\n\"", sayTeamMethods[ent->client->pers.sayTeamMethod] ) );
-}
-
-static void Cmd_Tell_f( gentity_t *ent ) {
-	int			targetNum;
-	gentity_t	*target;
-	char		*p, arg[MAX_TOKEN_CHARS];
-
-	if ( trap->Argc() < 2 )
-		return;
-
-	trap->Argv( 1, arg, sizeof(arg) );
-	targetNum = G_ClientFromString( ent, arg, FINDCL_SUBSTR | FINDCL_PRINT );
-	if ( targetNum == -1 )
-		return;
-
-	target = &g_entities[targetNum];
-	if ( !target || !target->inuse || !target->client )
-		return;
-
-	p = ConcatArgs( 2 );
-
-	//Raz: BOF
-	if ( strlen( p ) > MAX_SAY_TEXT ) {
-		p[MAX_SAY_TEXT - 1] = '\0';
-		G_LogPrintf( level.log.security, "Cmd_Tell_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
-	}
-
-	G_LogPrintf( level.log.console, "tell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, p );
-	G_Say( ent, target, SAY_TELL, p );
-	// don't tell to the player self if it was already directed to this player
-	// also don't send the chat back to a bot
-	if ( ent != target && !(ent->r.svFlags & SVF_BOT) )
-		G_Say( ent, ent, SAY_TELL, p );
 }
 
 //siege voice command
@@ -2761,347 +2736,6 @@ static void Cmd_Playertint_f( gentity_t *ent ) {
 	ent->client->ps.customRGBA[2] = blue;
 }
 
-
-/*
-	Channels description and implementation
-
-	/joinchan <identifier> <short-name>
-	* Strip invalid (non-alphanumeric?) characters from identifier
-	* Strip colour codes from identifier???
-	* Create structure to contain identifier and short-name, add to linked list
-	* Loop through all clients, check for match against identifier
-
-	/whoischan <identifier>
-	* Strip invalid (non-alphanumeric?) characters from identifier
-	* Strip colour codes from identifier???
-	* Check for match against identifier
-	* Loop through all clients, check for match against identifier
-	* Print client names
-
-	/leavechan <identifier>
-	* Strip invalid (non-alphanumeric?) characters from identifier
-	* Strip colour codes from identifier???
-	* Check for match against identifier
-	* Loop through clients
-	* Broadcast message
-
-	/msgchan <identifier> <message>
-	* Strip invalid (non-alphanumeric?) characters from identifier
-	* Strip colour codes from identifier???
-	* Check for match against identifier
-	* Loop through all clients, check for match against identifier
-	* Send message to legacy clients as: "chat \"<^4#^7short-name>PlayerName^7" EC ": ^7Message\""
-	* Send message to modern clients as: "chat \"" CHANNEL_EC "identifier" CHANNEL_EC "PlayerName^7" EC ": ^7Message\""
-
-	Client info:
-	* List of channel identifiers + short names (For legacy support)
-	* Number of channels joined (For flood reasons, limit to jp_maxChannels - default 10)
-*/
-
-// filters bad characters out of the channel identifier
-static void JP_FilterIdentifier( char *ident ) {
-	char *s = ident, *out = ident, c = 0;
-
-	Q_CleanString( ident, STRIP_COLOUR );
-	while ( (c = *s++) != '\0' ) {
-		if ( c < '$' || c > '}' || c == ';' ) {
-			continue;
-		}
-		*out++ = c;
-	}
-	*out = '\0';
-}
-
-static void JP_ListChannels( gentity_t *ent ) {
-	qboolean legacyClient = !(ent->client->pers.CSF & CSF_CHAT_FILTERS);
-	channel_t *channel = ent->client->pers.channels;
-	char msg[960] = { 0 };
-
-	while ( channel ) {
-		if ( legacyClient ) {
-			if ( channel == ent->client->pers.activeChannel ) {
-				Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- " S_COLOR_YELLOW "%s " S_COLOR_WHITE "[" S_COLOR_GREEN
-					"%s" S_COLOR_WHITE "]\n", channel->identifier, channel->shortname )
-				);
-			}
-			else {
-				Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- %s " S_COLOR_WHITE "[" S_COLOR_GREEN
-					"%s" S_COLOR_WHITE "]\n", channel->identifier, channel->shortname )
-				);
-			}
-		}
-		else {
-			Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- %s\n", channel->identifier ) );
-		}
-		channel = channel->next;
-	}
-	trap->SendServerCommand( ent - g_entities, va( "print \"%s\"", msg ) );
-}
-
-static void Cmd_JoinChannel_f( gentity_t *ent ) {
-	qboolean legacyClient = !Client_Supports( ent, CSF_CHAT_FILTERS );
-	char arg1_ident[32] = { 0 };
-	char arg2_shortname[32] = { 0 };
-	channel_t *channel = NULL, *prev = NULL;
-
-	if ( trap->Argc() < 2 ) {
-		if ( legacyClient ) {
-			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\joinchan <identifier/password> [short-name]>\n\"" );
-		}
-		else {
-			trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\joinchan <identifier/password>\n\"" );
-		}
-		return;
-	}
-
-	trap->Argv( 1, arg1_ident, sizeof(arg1_ident) );
-	if ( legacyClient )
-		trap->Argv( 2, arg2_shortname, sizeof(arg2_shortname) );
-
-	JP_FilterIdentifier( arg1_ident );
-
-	// try to find an existing channel
-	channel = ent->client->pers.channels;
-	while ( channel ) {
-		if ( !strcmp( arg1_ident, channel->identifier ) ) {
-			// already joined, return
-			trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "You are already in channel '%s'" "\n\"", arg1_ident ) );
-			//TODO: update short-name?
-			//		for legacy clients
-			return;
-		}
-		prev = channel;
-		channel = channel->next;
-	}
-
-	//Not in this channel (or any channels) so allocate a new one
-	channel = (channel_t *)malloc( sizeof(channel_t) );
-	memset( channel, 0, sizeof(channel_t) );
-
-	//attach to linked list of channels
-	if ( prev )
-		prev->next = channel;
-	else
-		ent->client->pers.channels = channel;
-
-	Q_strncpyz( channel->identifier, arg1_ident, sizeof(channel->identifier) );
-	if ( legacyClient )
-		Q_strncpyz( channel->shortname, arg2_shortname, sizeof(channel->shortname) );
-
-	//Notify about the successful join
-	trap->SendServerCommand( ent - g_entities, legacyClient
-		? va( "print \"Successfully joined channel '%s' (shortname: '%s')\n\"", arg1_ident, arg2_shortname )
-		: va( "print \"Successfully joined channel '%s'\n\"", arg1_ident )
-	);
-
-	return;
-}
-
-static void Cmd_WhoisChannel_f( gentity_t *ent ) {
-	qboolean legacyClient = !Client_Supports( ent, CSF_CHAT_FILTERS );
-	char msg[960] = { 0 };
-
-	// Supported client
-	if ( trap->Argc() == 2 && !legacyClient ) {
-		char arg1_ident[32] = { 0 };
-		gentity_t *other = NULL;
-		channel_t *chan = NULL;
-		qboolean in = qfalse;
-		int i;
-
-		trap->Argv( 1, arg1_ident, sizeof(arg1_ident) );
-		JP_FilterIdentifier( arg1_ident );
-
-		//Check if they're even in the channel
-		for ( chan = ent->client->pers.channels; chan; chan = chan->next ) {
-			if ( !strcmp( chan->identifier, arg1_ident ) ) {
-				in = qtrue;
-				break;
-			}
-		}
-		if ( !in ) {
-			trap->SendServerCommand( ent - g_entities, va( "print \"You are not in channel '%s'\n\"", arg1_ident, msg ) );
-			return;
-		}
-
-		for ( i = 0, other = g_entities; i < MAX_CLIENTS; i++, other++ ) {
-			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED ) {
-				chan = other->client->pers.channels;
-				while ( chan ) {
-					if ( !strcmp( chan->identifier, arg1_ident ) )
-						Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- %s\n", other->client->pers.netname ) );
-					chan = chan->next;
-				}
-			}
-		}
-		trap->SendServerCommand( ent - g_entities, va( "print \"Players in channel '%s':\n%s\"", arg1_ident, msg ) );
-	}
-	else if ( legacyClient ) {
-		char arg1_ident[32] = { 0 };
-		gentity_t *other = NULL;
-		int i;
-
-		trap->Argv( 1, arg1_ident, sizeof(arg1_ident) );
-		JP_FilterIdentifier( arg1_ident );
-
-		if ( !ent->client->pers.activeChannel ) {
-			trap->SendServerCommand( ent - g_entities, "print \"You are not in any channels\n\"" );
-			return;
-		}
-
-		for ( i = 0, other = g_entities; i < MAX_CLIENTS; i++, other++ ) {
-			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED ) {
-				channel_t *chan = other->client->pers.channels;
-				while ( chan ) {
-					if ( chan == ent->client->pers.activeChannel )
-						Q_strcat( msg, sizeof(msg), va( S_COLOR_WHITE "- %s\n", other->client->pers.netname ) );
-					chan = chan->next;
-				}
-			}
-		}
-		trap->SendServerCommand( ent - g_entities, va( "print \"Players in channel '%s':\n%s\"", arg1_ident, msg ) );
-	}
-	else
-		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW "Usage: \\whoischan <identifier/password>\n\"" );
-
-	return;
-}
-
-static void Cmd_LeaveChannel_f( gentity_t *ent ) {
-	qboolean legacyClient = !Client_Supports( ent, CSF_CHAT_FILTERS );
-
-	if ( trap->Argc() == 2 && !legacyClient ) {
-		channel_t *channel = ent->client->pers.channels;
-		channel_t *prev = NULL;
-		char arg1_ident[32] = { 0 };
-
-		trap->Argv( 1, arg1_ident, sizeof(arg1_ident) );
-		JP_FilterIdentifier( arg1_ident );
-
-		while ( channel ) {
-			if ( !strcmp( arg1_ident, channel->identifier ) ) {
-				if ( prev )
-					prev->next = channel->next;
-				else
-					ent->client->pers.channels = channel->next;
-				free( channel );
-
-				trap->SendServerCommand( ent - g_entities, va( "print \"Successfully left channel '%s'\n\"", arg1_ident ) );
-				if ( ent->client->pers.channels ) {
-					trap->SendServerCommand( ent - g_entities, "print \"You are currently in these channels:\n\"" );
-					JP_ListChannels( ent );
-				}
-				return;
-			}
-			prev = channel;
-			channel = channel->next;
-		}
-		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "Error leaving channel '%s'. You "
-			"were not in the channel.\n\"", arg1_ident )
-		);
-		if ( ent->client->pers.channels ) {
-			trap->SendServerCommand( ent - g_entities, "print \"You are currently in these channels:\n\"" );
-			JP_ListChannels( ent );
-		}
-	}
-	else if ( legacyClient ) {
-		//if activeChannel
-		//if activeChannel->next
-		//set activeChannel to activeChannel->next
-		//else (find the last channel)
-		//while channelList
-		//if channel->next
-		//channel = channel->next
-		//else
-		//free() activeChannel
-		//set activeChannel to channel
-		//not in any channels, todo..
-		//free() activeChannel
-	}
-
-	return;
-}
-
-static void Cmd_MessageChannel_f( gentity_t *ent ) {
-	qboolean legacyClient = !Client_Supports( ent, CSF_CHAT_FILTERS );
-	char *msg = ConcatArgs( 2 );
-	char name[MAX_STRING_CHARS] = { 0 };
-
-	// Supported client
-	if ( trap->Argc() >= 3 && !legacyClient ) {
-		char arg1_ident[32] = { 0 };
-		gentity_t *other = NULL;
-		channel_t *chan = NULL;
-		qboolean in = qfalse;
-		int i;
-
-		trap->Argv( 1, arg1_ident, sizeof(arg1_ident) );
-		JP_FilterIdentifier( arg1_ident );
-
-		//Check if they're even in the channel
-		for ( chan = ent->client->pers.channels; chan; chan = chan->next ) {
-			if ( !strcmp( arg1_ident, chan->identifier ) ) {
-				in = qtrue;
-				break;
-			}
-		}
-		if ( !in ) {
-			trap->SendServerCommand( ent - g_entities, va( "print \"You are not in channel '%s'\n\"", arg1_ident, msg ) );
-			return;
-		}
-
-		Com_sprintf( name, sizeof(name), "%s" S_COLOR_WHITE CHANNEL_EC "%s" CHANNEL_EC ": ", ent->client->pers.netname,
-			chan->identifier
-		);
-
-		for ( i = 0, other = g_entities; i < MAX_CLIENTS; i++, other++ ) {
-			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED ) {
-				chan = other->client->pers.channels;
-				while ( chan ) {
-					if ( !strcmp( chan->identifier, arg1_ident ) )
-						G_SayTo( ent, other, SAY_ALL, COLOR_RED, name, msg, NULL );
-					chan = chan->next;
-				}
-			}
-		}
-	}
-	else if ( legacyClient ) {
-		char arg1_ident[32] = { 0 };
-		gentity_t *other = NULL;
-		int i;
-
-		trap->Argv( 1, arg1_ident, sizeof(arg1_ident) );
-		JP_FilterIdentifier( arg1_ident );
-
-		if ( !ent->client->pers.activeChannel ) {
-			trap->SendServerCommand( ent - g_entities, "print \"You are not in any channels\n\"" );
-			return;
-		}
-
-		Com_sprintf( name, sizeof(name), "%s" S_COLOR_WHITE CHANNEL_EC "%s" CHANNEL_EC ": ", ent->client->pers.netname,
-			ent->client->pers.activeChannel->identifier
-		);
-
-		for ( i = 0, other = g_entities; i < MAX_CLIENTS; i++, other++ ) {
-			if ( other->inuse && other->client && other->client->pers.connected == CON_CONNECTED ) {
-				channel_t *chan = other->client->pers.channels;
-				while ( chan ) {
-					if ( chan == ent->client->pers.activeChannel )
-						G_SayTo( ent, other, SAY_ALL, COLOR_RED, name, msg, NULL );
-					chan = chan->next;
-				}
-			}
-		}
-	}
-	else {
-		trap->SendServerCommand( ent - g_entities, "print \"" S_COLOR_YELLOW
-			"Usage: \\msgchan <identifier/password> <message>\n\""
-		);
-	}
-
-	return;
-}
-
 static void Cmd_Drop_f( gentity_t *ent ) {
 	char arg[128] = { 0 };
 
@@ -3954,12 +3588,9 @@ static const command_t commands[] = {
 	{ "god", Cmd_God_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 	{ "ignore", Cmd_Ignore_f, GTB_ALL, 0 },
 	{ "jetpack", Cmd_Jetpack_f, GTB_ALL & ~GTB_SIEGE, 0 },
-	{ "joinchan", Cmd_JoinChannel_f, GTB_ALL, 0 },
 	{ "kill", Cmd_Kill_f, GTB_ALL, CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 	{ "killother", Cmd_KillOther_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
-	{ "leavechan", Cmd_LeaveChannel_f, GTB_ALL, 0 },
 	{ "levelshot", Cmd_LevelShot_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
-	{ "msgchan", Cmd_MessageChannel_f, GTB_ALL, 0 },
 	{ "noclip", Cmd_Noclip_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 	{ "notarget", Cmd_Notarget_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 	{ "npc", Cmd_NPC_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE },
@@ -3980,7 +3611,6 @@ static const command_t commands[] = {
 	{ "voice_cmd", Cmd_VoiceCommand_f, GTB_ALL, 0 },
 	{ "vote", Cmd_Vote_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
 	{ "where", Cmd_Where_f, GTB_ALL, CMDFLAG_NOINTERMISSION },
-	{ "whoischan", Cmd_WhoisChannel_f, GTB_ALL, 0 },
 	{ "wrists", Cmd_Kill_f, GTB_ALL, CMDFLAG_ALIVE | CMDFLAG_NOINTERMISSION },
 };
 static size_t numCommands = ARRAY_LEN( commands );

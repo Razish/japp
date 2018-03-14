@@ -213,8 +213,16 @@ typedef enum sayTeamMethod_e {
 	STM_TEAM = 0,
 	STM_ADMIN,
 	STM_CENTERPRINT,
+	STM_PLUGIN,
 	STM_NUM_METHODS
 } sayTeamMethod_t;
+
+typedef enum chatType_e {
+	SAY_ALL = 0,
+	SAY_TEAM,
+	SAY_TELL,
+	SAY_ADMIN,
+} chatType_t;
 
 typedef enum alertEventType_e {
 	AET_SIGHT,
@@ -258,12 +266,6 @@ typedef enum brushMoveState_e {
 	BMS_MID,
 	BMS_END
 } brushMoveState_t;
-
-typedef struct channel_s {
-	char identifier[32];
-	char shortname[32]; //only legacy clients need this
-	struct channel_s *next;
-} channel_t;
 
 struct gentity_s {
 	entityState_t		s; // communicated by server to clients
@@ -483,7 +485,6 @@ typedef struct clientPersistant_s {
 	int					connectTime;
 	uint32_t			CSF, CPD; // CSF_***/CPD_*** bit-flags
 	char				saber1[MAX_QPATH], saber2[MAX_QPATH];
-	channel_t			*channels, *activeChannel; // linked list of channels. activeChannel only used for legacy clients that don't support inline chat filters/tabs
 	int					duelWeapon; // for weapon-specific duels - pistols etc
 	vector3				duelStartPos; // respawn client to this position when duel ends
 	uint32_t			ignore;
