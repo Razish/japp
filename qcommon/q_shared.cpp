@@ -959,6 +959,12 @@ void Q_ConvertLinefeeds( char *string ) {
 	}
 }
 
+void Q_LerpColour( const vector4 *start, const vector4 *end, vector4 *out, float point ) {
+	out->r = start->r + point*(end->r - start->r);
+	out->g = start->g + point*(end->g - start->g);
+	out->b = start->b + point*(end->b - start->b);
+}
+
 // C99 standard: vsnprintf returns the number of characters (excluding the trailing '\0') which would have been written
 //	to the final string if enough space had been available
 //	snprintf and vsnprintf do not write more than size bytes (including the trailing '\0')

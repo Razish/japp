@@ -958,7 +958,7 @@ namespace JPLua {
 		vector4 colour = { 1.0f };
 		ReadFloats( colour.raw, 4, L, 4 );
 		float scale = luaL_checknumber( L, 5 );
-		int style = luaL_checkinteger( L, 6 );
+		uiTextStyle_e style = (uiTextStyle_e)luaL_checkinteger( L, 6 );
 		int iMenuFont = luaL_checkinteger( L, 7 );
 		int customFont = luaL_checkinteger( L, 8 );
 

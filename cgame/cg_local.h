@@ -4,6 +4,7 @@
 //
 #include "qcommon/q_shared.h"
 #include "tr_types.h"
+#include "ui/menudef.h"
 #include "bg_public.h"
 #include "cg_public.h"
 
@@ -999,7 +1000,6 @@ qboolean		CG_IsSpectating( void );
 qboolean		CG_IsFollowing( void );
 void			CG_KeyEvent( int key, qboolean down );
 int				CG_LastAttacker( void );
-void			CG_LerpColour( const vector4 *start, const vector4 *end, vector4 *out, float point );
 void			CG_ListModelBones_f( void );
 void			CG_ListModelSurfaces_f( void );
 void			CG_LoadDeferredPlayers( void );
@@ -1024,7 +1024,7 @@ bool			CG_OtherTeamDroppedFlag( void );
 bool			CG_OtherTeamHasFlag( void );
 void			CG_OutOfAmmoChange( int oldWeapon ); // should this be in pmove?
 void			CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special,
-					float scale, const vector4 *color, qhandle_t shader, int textStyle, int font, bool customFont );
+					float scale, const vector4 *color, qhandle_t shader, uiTextStyle_e textStyle, int font, bool customFont );
 qboolean		CG_OwnerDrawVisible( uint32_t flags );
 void			CG_PainEvent( centity_t *cent, int health );
 void			CG_ParseServerinfo( void );

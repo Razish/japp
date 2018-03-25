@@ -276,12 +276,12 @@ void CG_Text_Paint_Limit( float *maxX, float x, float y, float scale, const vect
 		*psOutLastGood = '\0';
 
 		*maxX = 0; // feedback
-		font.Paint( x, y, sTemp, color, ITEM_TEXTSTYLE_NORMAL, limit, adjust );
+		font.Paint( x, y, sTemp, color, uiTextStyle_e::Normal, limit, adjust );
 	}
 	else {
 		// whole text fits fine, so print it all...
 		*maxX = x + iPixelLen;	// feedback the next position, as the caller expects
-		font.Paint( x, y, text, color, ITEM_TEXTSTYLE_NORMAL, limit, adjust );
+		font.Paint( x, y, text, color, uiTextStyle_e::Normal, limit, adjust );
 	}
 }
 
@@ -514,9 +514,9 @@ void CG_DrawMedal( int ownerDraw, rectDef_t *rect, float scale, const vector4 *c
 	trap->R_SetColor( NULL );
 }
 
-void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags,
-	int align, float special, float scale, const vector4 *color, qhandle_t shader, int textStyle, int iMenuFont,
-	bool customFont )
+void CG_OwnerDraw(
+	float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, uint32_t ownerDrawFlags, int align, float special, float scale,
+	const vector4 *color, qhandle_t shader, uiTextStyle_e textStyle, int iMenuFont, bool customFont )
 {
 	//Ignore all this, at least for now. May put some stat stuff back in menu files later.
 #if 0

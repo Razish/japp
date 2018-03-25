@@ -120,7 +120,6 @@ void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 
 }
 
-#include "ui/menudef.h"	// for "ITEM_TEXTSTYLE_SHADOWED"
 // Draws a multi-colored string with a drop shadow, optionally forcing to a fixed color.
 // Coordinates are at 640 by 480 virtual resolution
 void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor,
@@ -131,7 +130,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const vector4 *setColor
 		//
 		vector4 color;
 		memcpy( &color, setColor, sizeof(color) );	// de-const it
-		font.Paint( x, y, string, &color, shadow ? ITEM_TEXTSTYLE_SHADOWED : 0 );
+		font.Paint( x, y, string, &color, shadow ? Shadowed : Normal );
 	}
 	else {
 		vector4		color;
@@ -303,12 +302,6 @@ qboolean CG_FadeColor2( vector4 *color, int startMsec, int totalMsec ) {
 		color->a = 1.0f - dt / totalMsec;
 		return qfalse;
 	}
-}
-
-void CG_LerpColour( const vector4 *start, const vector4 *end, vector4 *out, float point ) {
-	out->r = start->r + point*(end->r - start->r);
-	out->g = start->g + point*(end->g - start->g);
-	out->b = start->b + point*(end->b - start->b);
 }
 
 void CG_ColorForGivenHealth( vector4 *hcolor, int health ) {

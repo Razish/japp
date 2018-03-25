@@ -8,7 +8,6 @@
 #include "ui/ui_public.h"
 #include "bg_luaevent.h"
 #include "bg_local.h"
-#include "ui/menudef.h"
 #include "Ghoul2/G2.h"
 #include "cg_media.h"
 

@@ -19,8 +19,8 @@ extern int uiSaberColorShaders[NUM_SABER_COLORS];
 
 void UI_InitForceShaders( void );
 void UI_ReadLegalForce( void );
-void UI_DrawTotalForceStars( rectDef_t *rect, float scale, vector4 *color, int textStyle );
-void UI_DrawForceStars( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int findex, int val, int min, int max );
+void UI_DrawTotalForceStars( rectDef_t *rect, float scale, vector4 *color, uiTextStyle_e textStyle );
+void UI_DrawForceStars( rectDef_t *rect, float scale, const vector4 *color, uiTextStyle_e textStyle, int findex, int val, int min, int max );
 void UI_UpdateClientForcePowers( const char *teamArg );
 void UI_SaveForceTemplate( void );
 void UI_UpdateForcePowers( void );

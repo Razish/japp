@@ -222,7 +222,7 @@ typedef enum gametype_e {
 #define GTB_NOTFLAG			(0x00FFu) // **SPECIAL: All of the above gametypes, i.e. not flag-related
 #define GTB_CTF				(0x0100u) // capture the flag
 #define GTB_CTY				(0x0200u) // capture the ysalimiri
-#define GTB_ALL				(0x01FFu) // all
+#define GTB_ALL				(0x03FFu) // all
 
 typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
@@ -1800,6 +1800,7 @@ float BG_GetLegsAnimPoint( playerState_t *ps, int AnimIndex );
 extern const char *gametypeStringShort[GT_MAX_GAME_TYPE];
 const char *BG_GetGametypeString( int gametype );
 int BG_GetGametypeForString( const char *gametype );
+uint32_t BG_GetMapTypeBits( const char *type );
 team_t BG_GetOpposingTeam( team_t team );
 
 // returns false if any usable projectile/ammo-consuming weapons are enabled

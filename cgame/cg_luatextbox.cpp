@@ -116,7 +116,7 @@ namespace JPLua {
 
 	static void TextBox_SetStyle( lua_State *L, luaTextBox_t *box ) {
 		const int style = luaL_checkinteger( L, 3 );
-		box->style = style;
+		box->style = (uiTextStyle_e)style;
 	}
 
 	static int TextBox_GetText( lua_State *L, luaTextBox_t *box ) {

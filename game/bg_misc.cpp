@@ -2089,7 +2089,7 @@ const char *BG_GetGametypeString( int gametype ) {
 		return "Cooperative";
 
 	case GT_TEAM:
-		return "Team Deathmatch";
+		return "Team FFA";
 	case GT_SIEGE:
 		return "Siege";
 	case GT_CTF:
@@ -2118,6 +2118,50 @@ int BG_GetGametypeForString( const char *gametype ) {
 	else if ( !Q_stricmp( gametype, "ctf" ) )			return GT_CTF;
 	else if ( !Q_stricmp( gametype, "cty" ) )			return GT_CTY;
 	else												return -1;
+}
+
+// from scripts/foo.arena "type" keyword
+uint32_t BG_GetMapTypeBits( const char *type ) {
+	uint32_t typeBits = 0u;
+
+	if ( *type ) {
+		if ( strstr( type, "ffa" ) ) {
+			typeBits |= (1 << GT_FFA);
+			typeBits |= (1 << GT_TEAM);
+			typeBits |= (1 << GT_JEDIMASTER);
+			typeBits |= (1 << GT_HOLOCRON);
+		}
+		if ( strstr( type, "coop" ) ) {
+			typeBits |= (1 << GT_SINGLE_PLAYER);
+		}
+		if ( strstr( type, "holocron" ) ) {
+			typeBits |= (1 << GT_HOLOCRON);
+		}
+		if ( strstr( type, "jedimaster" ) ) {
+			typeBits |= (1 << GT_JEDIMASTER);
+		}
+		if ( strstr( type, "duel" ) || strstr( type, "powerduel" ) ) {
+			typeBits |= (1 << GT_DUEL);
+			typeBits |= (1 << GT_POWERDUEL);
+		}
+		if ( strstr( type, "siege" ) ) {
+			typeBits |= (1 << GT_SIEGE);
+		}
+		if ( strstr( type, "ctf" ) ) {
+			typeBits |= (1 << GT_CTF);
+			typeBits |= (1 << GT_CTY);
+		}
+		if ( strstr( type, "cty" ) ) {
+			typeBits |= (1 << GT_CTY);
+		}
+	}
+	else {
+		typeBits |= (1 << GT_FFA);
+		typeBits |= (1 << GT_TEAM);
+		typeBits |= (1 << GT_JEDIMASTER);
+	}
+
+	return typeBits;
 }
 
 qboolean GetCInfo( uint32_t bit ) {

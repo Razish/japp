@@ -1,6 +1,5 @@
 
 #include "cg_local.h"
-#include "ui/menudef.h"
 #include "ui/keycodes.h"
 #include "bg_luaevent.h"
 #include "cg_media.h"
@@ -536,7 +535,7 @@ static void CG_ChatboxDrawTabs( void ) {
 			cg.chatbox.pos.y + chatboxHeight + textHeight,
 			va( "^%c%s", nameColour, cb->shortname ),
 			&colorWhite,
-			ITEM_TEXTSTYLE_OUTLINED
+			uiTextStyle_e::Outlined
 		);
 
 		xOffset += textWidth + 16.0f;
@@ -608,7 +607,7 @@ void CG_ChatboxDraw( void ) {
 	if ( !skipDraw && currentChatbox->scrollAmount < 0 && CG_ChatboxActive() ) {
 		font.Paint(
 			cg.chatbox.pos.x, cg.chatbox.pos.y + yAccum - (height / 2.0f),
-			scrollMsg, &colorWhite, ITEM_TEXTSTYLE_OUTLINED
+			scrollMsg, &colorWhite, uiTextStyle_e::Outlined
 		);
 	}
 	yAccum += height;
@@ -672,7 +671,7 @@ void CG_ChatboxDraw( void ) {
 					//const float width = font.Width( tmp );
 					font.Paint(
 						cg.chatbox.pos.x, cg.chatbox.pos.y + yAccum - (height / 2.0f),
-						tmp, &colorWhite, ITEM_TEXTSTYLE_OUTLINED
+						tmp, &colorWhite, uiTextStyle_e::Outlined
 					);
 					const size_t timestampLength = cg_chatboxTimeShow.integer ? strlen( chat->timeStamp ) : 0u;
 					for ( chatEntry_t::urlLocation *url = chat->URLs; url; url = url->next ) {
@@ -690,7 +689,7 @@ void CG_ChatboxDraw( void ) {
 						url->size.y = height;
 
 						font.Paint(
-							url->pos.x, url->pos.y, scratch, &colorTable[CT_LTBLUE2], ITEM_TEXTSTYLE_OUTLINED
+							url->pos.x, url->pos.y, scratch, &colorTable[CT_LTBLUE2], uiTextStyle_e::Outlined
 						);
 						CG_FillRect( url->pos.x, url->pos.y + height + 2.0f, url->size.x, 1.0f, &colorTable[CT_LTBLUE2] );
 					}
@@ -717,7 +716,7 @@ void CG_ChatboxDraw( void ) {
 		inputLineWidth = font.Width( msg );
 		font.Paint(
 			cg.chatbox.pos.x, cg.chatbox.pos.y + yAccum - (height / 2.0f), msg,
-			&g_color_table[ColorIndex( COLOR_WHITE )], ITEM_TEXTSTYLE_OUTLINED
+			&g_color_table[ColorIndex( COLOR_WHITE )], uiTextStyle_e::Outlined
 		);
 		if ( (trap->Milliseconds() >> 8) & 1 ) {
 			const float cursorPre = font.Width( cleanPre );
@@ -743,7 +742,7 @@ void CG_ChatboxDraw( void ) {
 			else {
 				font.Paint(
 					cg.chatbox.pos.x + cursorPre + cursorOffset, cg.chatbox.pos.y + yAccum - (cursorHeight / 2.0f),
-					cursorChar, &g_color_table[ColorIndex( COLOR_WHITE )], ITEM_TEXTSTYLE_OUTLINED
+					cursorChar, &g_color_table[ColorIndex( COLOR_WHITE )], uiTextStyle_e::Outlined
 				);
 			}
 		}

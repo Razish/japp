@@ -21,18 +21,18 @@ static void DrawServerInfo( float fade ) {
 
 	// map name
 	tmp = va( "%s (%s)", (char *)CG_ConfigString( CS_MESSAGE ), cgs.mapname );
-	fontSmall.Paint( 0.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+	fontSmall.Paint( 0.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 	y -= lineHeightSmall;
 
 	// server name
-	fontSmall.Paint( 0.0f, y, cgs.japp.serverName, &colour, ITEM_TEXTSTYLE_SHADOWED );
+	fontSmall.Paint( 0.0f, y, cgs.japp.serverName, &colour, uiTextStyle_e::Shadowed );
 	y -= lineHeightSmall;
 
 	y = 42.0f;
 
 	// gametype
 	tmp = BG_GetGametypeString( cgs.gametype );
-	fontLarge.Paint( SCREEN_WIDTH / 2.0f - fontLarge.Width( tmp ) / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+	fontLarge.Paint( SCREEN_WIDTH / 2.0f - fontLarge.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 	y += lineHeightBig;
 
 	switch ( cgs.gametype ) {
@@ -74,7 +74,7 @@ static void DrawServerInfo( float fade ) {
 		else
 			tmp = "Playing forever!";
 
-		fontLarge.Paint( SCREEN_WIDTH / 2.0f - fontLarge.Width( tmp ), y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+		fontLarge.Paint( SCREEN_WIDTH / 2.0f - fontLarge.Width( tmp ), y, tmp, &colour, uiTextStyle_e::Shadowed );
 		y += lineHeightBig * 2;
 		//FALL THROUGH TO GENERIC TEAM GAME INFO!
 
@@ -141,11 +141,11 @@ static void DrawPlayerCount_Free( float fade ) {
 	else {
 		tmp = va( "%i players", freeCount );
 	}
-	font.Paint( width - font.Width( tmp ) / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+	font.Paint( width - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
 
 	// spectator count
 	tmp = va( "%2i spectators", specCount );
-	font.Paint( width - font.Width( tmp ) / 2.0f, y + lineHeight * 20, tmp, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+	font.Paint( width - font.Width( tmp ) / 2.0f, y + lineHeight * 20, tmp, &colour, uiTextStyle_e::ShadowedMore );
 }
 
 static void DrawPlayerCount_Team( float fade ) {
@@ -181,16 +181,16 @@ static void DrawPlayerCount_Team( float fade ) {
 	if ( cgs.scores1 >= cgs.scores2 ) {
 		// red team
 		tmp = va( S_COLOR_RED "%i players " S_COLOR_WHITE "(%3i avg ping)", redCount, pingAvgRed );
-		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
 		// blue team
 		tmp = va( S_COLOR_CYAN "%i players " S_COLOR_WHITE "(%3i avg ping)", blueCount, pingAvgBlue );
-		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
 	}
 	else {
 		tmp = va( S_COLOR_CYAN "%i players " S_COLOR_WHITE "(%i avg ping)", blueCount, pingAvgBlue );
-		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
 		tmp = va( S_COLOR_RED "%i players " S_COLOR_WHITE "(%i avg ping)", redCount, pingAvgRed );
-		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
 	}
 
 	tmp = va( "%2i spectators", specCount );
@@ -260,25 +260,25 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 	tmp = "Name";
 	font.Paint(
 		x - (font.Width( tmp ) / 2.0f) + columnOffset[column++], y, tmp, &white,
-		ITEM_TEXTSTYLE_SHADOWEDMORE
+		uiTextStyle_e::ShadowedMore
 	);
 
 	tmp = "Score";
 	font.Paint(
 		x - (font.Width( tmp ) / 2.0f) + columnOffset[column++], y, tmp, &white,
-		ITEM_TEXTSTYLE_SHADOWEDMORE
+		uiTextStyle_e::ShadowedMore
 	);
 
 	tmp = "Ping";
 	font.Paint(
 		x - (font.Width( tmp ) / 2.0f) + columnOffset[column++], y, tmp, &white,
-		ITEM_TEXTSTYLE_SHADOWEDMORE
+		uiTextStyle_e::ShadowedMore
 	);
 
 	tmp = "Time";
 	font.Paint(
 		x - (font.Width( tmp ) / 2.0f) + columnOffset[column++], y, tmp, &white,
-		ITEM_TEXTSTYLE_SHADOWEDMORE
+		uiTextStyle_e::ShadowedMore
 	);
 	y += lineHeight * 1.25f;
 
@@ -315,7 +315,7 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
 			pingColour.a = pingGood.a = pingBad.a = fade;
 
-			CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score->ping / 300.0f, 1.0f ) );
+			Q_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score->ping / 300.0f, 1.0f ) );
 
 			column = 0;
 
@@ -335,20 +335,20 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 			else if ( ci->botSkill != -1 ) {
 				tmp = "BOT";
 				font.Paint(
-					x + 8.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
+					x + 8.0f, y, tmp, &white, uiTextStyle_e::ShadowedMore
 				);
 			}
 
 			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
 				tmp = "READY";
-				font.Paint( x + 8.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x + 8.0f, y, tmp, &white, uiTextStyle_e::ShadowedMore );
 			}
 
 			//Name
 			tmp = ci->name;
 			font.Paint(
 				x - (font.Width( tmp ) / 2.0f) + columnOffset[column++], y, tmp, &white,
-				ITEM_TEXTSTYLE_SHADOWEDMORE
+				uiTextStyle_e::ShadowedMore
 			);
 
 			//Score
@@ -370,7 +370,7 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 
 			font.Paint(
 				x - (font.Width( tmp ) / 2.0f) + columnOffset[column++], y, tmp, &white,
-				ITEM_TEXTSTYLE_SHADOWEDMORE
+				uiTextStyle_e::ShadowedMore
 			);
 
 			if ( score->ping != -1 ) {
@@ -378,14 +378,14 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 					tmp = "--";
 					font.Paint(
 						x - (font.Width( tmp ) / 2.0f) + columnOffset[column++], y, tmp,
-						&white, ITEM_TEXTSTYLE_SHADOWEDMORE
+						&white, uiTextStyle_e::ShadowedMore
 					);
 				}
 				else {//Ping
 					tmp = va( "%i", score->ping );
 					font.Paint(
 						x - (font.Width( tmp ) / 2.0f) + columnOffset[column++], y, tmp,
-						&pingColour, ITEM_TEXTSTYLE_SHADOWEDMORE
+						&pingColour, uiTextStyle_e::ShadowedMore
 					);
 				}
 
@@ -393,7 +393,7 @@ static int ListPlayers_FFA( float fade, float x, float y, float fontScale, int f
 				tmp = va( "%i", score->time );
 				font.Paint(
 					x - (font.Width( tmp ) / 2.0f) + columnOffset[column++], y, tmp,
-					&white, ITEM_TEXTSTYLE_SHADOWEDMORE
+					&white, uiTextStyle_e::ShadowedMore
 				);
 			}
 
@@ -440,19 +440,19 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 	trap->R_SetColor( NULL );
 
 	tmp = "Name";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 
 	tmp = "Score";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 
 	tmp = "Net";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 
 	tmp = "Ping";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 
 	tmp = "Time";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 	y += lineHeight*1.5f;
 
 	savedY = y;
@@ -485,7 +485,7 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 			vector4	pingColour = { 1.0f, 1.0f, 1.0f, 1.0f }, pingGood = { 0.0f, 1.0f, 0.0f, 1.0f },
 				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
 			pingColour.a = pingGood.a = pingBad.a = fade;
-			CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score->ping / 300.0f, 1.0f ) );
+			Q_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score->ping / 300.0f, 1.0f ) );
 
 			column = 0;
 
@@ -506,38 +506,38 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 
 			else if ( ci->botSkill != -1 ) {
 				tmp = "BOT";
-				font.Paint( x + 8.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+				font.Paint( x + 8.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 			}
 
 			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
 				tmp = "READY";
-				font.Paint( x + 8.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+				font.Paint( x + 8.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 			}
 
 			// Name
 			tmp = ci->name;
 			font.Paint(
-				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 			);
 
 			// Score
 			tmp = va( "%02i/%02i", score->score, score->deaths );
 			font.Paint(
-				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 			);
 
 			// Net
 			tmpI = score->score - score->deaths;
 			tmp = va( "%c%i", (tmpI >= 0) ? '+' : '-', abs( tmpI ) );
 			font.Paint(
-				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 			);
 
 			if ( score->ping != -1 ) {
 				if ( ci->botSkill != -1 ) {
 					tmp = "--";
 					font.Paint(
-						x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+						x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 					);
 				}
 				else {
@@ -545,14 +545,14 @@ static int ListPlayers_TDM( float fade, float x, float y, float fontScale, int f
 					tmp = va( "%i", score->ping );
 					font.Paint(
 						x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &pingColour,
-						ITEM_TEXTSTYLE_SHADOWED
+						uiTextStyle_e::Shadowed
 					);
 				}
 
 				// Time
 				tmp = va( "%i", score->time );
 				font.Paint(
-					x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+					x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 				);
 			}
 
@@ -599,25 +599,25 @@ static int ListPlayers_CTF( float fade, float x, float y, float fontScale, int f
 	trap->R_SetColor( NULL );
 
 	tmp = "Name";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 
 	tmp = "Score";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 
 	tmp = "Cap";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 
 	tmp = "Def";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 
 	tmp = "Asst";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 
 	tmp = "Ping";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 
 	tmp = "Time";
-	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 	y += lineHeight*1.5f;
 
 	savedY = y;
@@ -649,7 +649,7 @@ static int ListPlayers_CTF( float fade, float x, float y, float fontScale, int f
 			vector4 pingColour = { 1.0f, 1.0f, 1.0f, 1.0f }, pingGood = { 0.0f, 1.0f, 0.0f, 1.0f },
 				pingBad = { 1.0f, 0.0f, 0.0f, 1.0f };
 			pingColour.a = pingGood.a = pingBad.a = fade;
-			CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score->ping / 300.0f, 1.0f ) );
+			Q_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score->ping / 300.0f, 1.0f ) );
 
 			column = 0;
 
@@ -667,49 +667,49 @@ static int ListPlayers_CTF( float fade, float x, float y, float fontScale, int f
 
 			else if ( ci->botSkill != -1 ) {
 				tmp = "BOT";
-				font.Paint( x + 8.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+				font.Paint( x + 8.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 			}
 
 			else if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) ) {
 				tmp = "READY";
-				font.Paint( x + 8.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED );
+				font.Paint( x + 8.0f, y, tmp, &white, uiTextStyle_e::Shadowed );
 			}
 
 			// Name
 			tmp = ci->name;
 			font.Paint(
-				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 			);
 
 			// Score
 			tmp = va( "%4i", score->score );
 			font.Paint(
-				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 			);
 
 			// Capture
 			tmp = va( "%2i", score->captures );
 			font.Paint(
-				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 			);
 
 			// Defend
 			tmp = va( "%2i", score->defendCount );
 			font.Paint(
-				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 			);
 
 			// Assist
 			tmp = va( "%2i", score->assistCount );
 			font.Paint(
-				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+				x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 			);
 
 			if ( score->ping != -1 ) {
 				if ( ci->botSkill != -1 ) {
 					tmp = "--";
 					font.Paint(
-						x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+						x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 					);
 				}
 				else {
@@ -717,14 +717,14 @@ static int ListPlayers_CTF( float fade, float x, float y, float fontScale, int f
 					tmp = va( "%i", score->ping );
 					font.Paint(
 						x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &pingColour,
-						ITEM_TEXTSTYLE_SHADOWED
+						uiTextStyle_e::Shadowed
 					);
 				}
 
 				// Time
 				tmp = va( "%i", score->time );
 				font.Paint(
-					x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, ITEM_TEXTSTYLE_SHADOWED
+					x + columnOffset[column++] - font.Width( tmp ) / 2.0f, y, tmp, &white, uiTextStyle_e::Shadowed
 				);
 			}
 
@@ -814,7 +814,7 @@ static void DrawSpectators( float fade ) {
 		}
 		font.Paint(
 			cg.scoreboard.spectatorX, (y + lineHeight * 20) - 3, cg.scoreboard.spectatorList, &white,
-			ITEM_TEXTSTYLE_SHADOWED
+			uiTextStyle_e::Shadowed
 		);
 	}
 }
@@ -905,7 +905,7 @@ static void DrawClientInfo( float fade ) {
 #ifdef REVISION
 	y -= font.Height( REVISION );
 	// JA++ version
-	font.Paint( SCREEN_WIDTH - font.Width( REVISION ), y, REVISION, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+	font.Paint( SCREEN_WIDTH - font.Width( REVISION ), y, REVISION, &colour, uiTextStyle_e::ShadowedMore );
 #endif
 
 	// date
@@ -918,7 +918,7 @@ static void DrawClientInfo( float fade ) {
 	);
 
 	y -= font.Height( buf );
-	font.Paint( SCREEN_WIDTH - font.Width( buf ), y, buf, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+	font.Paint( SCREEN_WIDTH - font.Width( buf ), y, buf, &colour, uiTextStyle_e::ShadowedMore );
 }
 
 //Scoreboard entry point

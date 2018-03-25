@@ -31,6 +31,22 @@ void UI_Set2DRatio( void ) {
 	}
 }
 
+static void CVU_Master1( void ) {
+	trap->Cmd_ExecuteText( EXEC_NOW, va( "set sv_master1 \"%s\"", ui_sv_master1.string ) );
+}
+static void CVU_Master2( void ) {
+	trap->Cmd_ExecuteText( EXEC_NOW, va( "set sv_master2 \"%s\"", ui_sv_master2.string ) );
+}
+static void CVU_Master3( void ) {
+	trap->Cmd_ExecuteText( EXEC_NOW, va( "set sv_master3 \"%s\"", ui_sv_master3.string ) );
+}
+static void CVU_Master4( void ) {
+	trap->Cmd_ExecuteText( EXEC_NOW, va( "set sv_master4 \"%s\"", ui_sv_master4.string ) );
+}
+static void CVU_Master5( void ) {
+	trap->Cmd_ExecuteText( EXEC_NOW, va( "set sv_master5 \"%s\"", ui_sv_master5.string ) );
+}
+
 static const cvarTable_t uiCvarTable[] = {
 #define XCVAR_LIST
 #include "ui_xcvar.h"

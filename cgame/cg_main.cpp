@@ -1229,7 +1229,7 @@ float CG_Cvar_Get( const char *cvar ) {
 	return (float)atof( buff );
 }
 
-void CG_Text_PaintWithCursor( float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, int style, int iMenuFont, bool customFont ) {
+void CG_Text_PaintWithCursor( float x, float y, float scale, const vector4 *color, const char *text, int cursorPos, char cursor, int limit, uiTextStyle_e style, int iMenuFont, bool customFont ) {
 	const Font font( iMenuFont, scale, customFont );
 	font.Paint( x, y, text, color, style, limit );
 	//FIXME: add cursor code

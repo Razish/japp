@@ -105,7 +105,6 @@ void UI_LoadArenas( void ) {
 	int numdirs, i, n, dirlen;
 	char filename[MAX_QPATH], *dirptr;
 	static char dirlist[MAPSBUFSIZE];
-	const char *type;
 
 	dirlist[0] = '\0';
 
@@ -127,60 +126,15 @@ void UI_LoadArenas( void ) {
 	}
 
 	for ( n = 0; n < ui_numArenas; n++ ) {
-		// determine type
-
 		uiInfo.mapList[uiInfo.mapCount].cinematic = -1;
 		uiInfo.mapList[uiInfo.mapCount].mapLoadName = String_Alloc( Info_ValueForKey( ui_arenaInfos[n], "map" ) );
 		uiInfo.mapList[uiInfo.mapCount].mapName = String_Alloc( Info_ValueForKey( ui_arenaInfos[n], "longname" ) );
 		uiInfo.mapList[uiInfo.mapCount].levelShot = -1;
 		uiInfo.mapList[uiInfo.mapCount].imageName = String_Alloc( va( "levelshots/%s", uiInfo.mapList[uiInfo.mapCount].mapLoadName ) );
-		uiInfo.mapList[uiInfo.mapCount].typeBits = 0;
+		uiInfo.mapList[uiInfo.mapCount].typeBits = BG_GetMapTypeBits( Info_ValueForKey( ui_arenaInfos[n], "type" ) );
 
-		type = Info_ValueForKey( ui_arenaInfos[n], "type" );
-		// if no type specified, it will be treated as "ffa"
-		if ( *type ) {
-			if ( strstr( type, "ffa" ) ) {
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_FFA);
-				//Raz: JK2 gametypes
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_JEDIMASTER);
-			}
-			if ( strstr( type, "coop" ) ) {
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_SINGLE_PLAYER);
-			}
-			if ( strstr( type, "holocron" ) ) {
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_HOLOCRON);
-			}
-			if ( strstr( type, "jedimaster" ) ) {
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_JEDIMASTER);
-			}
-			if ( strstr( type, "duel" ) ) {
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_DUEL);
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_POWERDUEL);
-			}
-			if ( strstr( type, "powerduel" ) ) {
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_DUEL);
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_POWERDUEL);
-			}
-			if ( strstr( type, "siege" ) ) {
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_SIEGE);
-			}
-			if ( strstr( type, "ctf" ) ) {
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_CTF);
-				//Raz: JK2 gametypes
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_CTY);
-			}
-			if ( strstr( type, "cty" ) ) {
-				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_CTY);
-			}
-		}
-		else {
-			uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_FFA);
-			//Raz: JK2 gametypes
-			uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_JEDIMASTER);
-		}
-
-		uiInfo.mapCount++;
-		if ( uiInfo.mapCount >= MAX_MAPS ) {
+		if ( ++uiInfo.mapCount >= MAX_MAPS ) {
+			trap->Print( S_COLOR_YELLOW "Warning: Too many maps in .arena files (%i > %i)", uiInfo.mapCount, MAX_MAPS );
 			break;
 		}
 	}

@@ -985,7 +985,7 @@ namespace JPLua {
 	static int Item_TextStyle( lua_State *L ) {
 		itemDef_t *item = CheckItem( L, 1 );
 
-		item->textStyle = luaL_checkinteger( L, 2 );
+		item->textStyle = (uiTextStyle_e)luaL_checkinteger( L, 2 );
 
 		return 0;
 	}

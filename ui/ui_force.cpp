@@ -110,7 +110,7 @@ void UI_InitForceShaders( void ) {
 }
 
 // Draw the stars spent on the current force power
-void UI_DrawForceStars( rectDef_t *rect, float scale, const vector4 *color, int textStyle, int forceindex, int val, int min, int max ) {
+void UI_DrawForceStars( rectDef_t *rect, float scale, const vector4 *color, uiTextStyle_e textStyle, int forceindex, int val, int min, int max ) {
 	int	i, pad = 4;
 	int	xPos, width = 16;
 	int starcolor;

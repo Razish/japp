@@ -4125,7 +4125,7 @@ void Item_TextColor( itemDef_t *item, vector4 *newColor ) {
 		lowLight.a = 0.8f * parent->focusColor.a;
 		LerpColor( &parent->focusColor, &lowLight, newColor, 0.5f + 0.5f*sinf( (float)(DC->realTime / PULSE_DIVISOR) ) );
 	}
-	else if ( item->textStyle == ITEM_TEXTSTYLE_BLINK && !((DC->realTime / BLINK_DIVISOR) & 1) ) {
+	else if ( item->textStyle == uiTextStyle_e::Blink && !((DC->realTime / BLINK_DIVISOR) & 1) ) {
 		lowLight.r = 0.8f * item->window.foreColor.r;
 		lowLight.g = 0.8f * item->window.foreColor.g;
 		lowLight.b = 0.8f * item->window.foreColor.b;
@@ -5563,7 +5563,7 @@ void Item_OwnerDraw_Paint( itemDef_t *item ) {
 			lowLight.a = 0.8f * parent->focusColor.a;
 			LerpColor( &parent->focusColor, &lowLight, &color, 0.5f + 0.5f*sinf( (float)(DC->realTime / PULSE_DIVISOR) ) );
 		}
-		else if ( item->textStyle == ITEM_TEXTSTYLE_BLINK && !((DC->realTime / BLINK_DIVISOR) & 1) ) {
+		else if ( item->textStyle == uiTextStyle_e::Blink && !((DC->realTime / BLINK_DIVISOR) & 1) ) {
 			lowLight.r = 0.8f * item->window.foreColor.r;
 			lowLight.g = 0.8f * item->window.foreColor.g;
 			lowLight.b = 0.8f * item->window.foreColor.b;
@@ -7309,7 +7309,7 @@ qboolean ItemParse_textscale( itemDef_t *item, int handle ) {
 }
 
 qboolean ItemParse_textstyle( itemDef_t *item, int handle ) {
-	if ( !PC_Int_Parse( handle, &item->textStyle ) ) {
+	if ( !PC_Int_Parse( handle, (int *)&item->textStyle ) ) {
 		return qfalse;
 	}
 	return qtrue;

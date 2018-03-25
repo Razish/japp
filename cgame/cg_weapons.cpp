@@ -914,7 +914,7 @@ void CG_DrawWeaponSelect( void ) {
 		}
 		const Font font( FONT_SMALL, 1.0f, false );
 		const float width = font.Width( s );
-		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y + 45 + yOffset, s, &textColor, ITEM_TEXTSTYLE_SHADOWED );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y + 45 + yOffset, s, &textColor, uiTextStyle_e::Shadowed );
 	}
 
 	trap->R_SetColor( NULL );

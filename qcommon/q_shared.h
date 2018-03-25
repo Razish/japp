@@ -962,6 +962,7 @@ const char *Q_stristr( const char *s, const char *find );
 #define STRIP_EXTASCII	(0x00000002u)
 void Q_CleanString( char *string, uint32_t flags );
 void Q_ConvertLinefeeds( char *string );
+void Q_LerpColour( const vector4 *start, const vector4 *end, vector4 *out, float point );
 void Com_sprintf( char *dest, int size, const char *fmt, ... );
 const char *va( const char *format, ... );
 

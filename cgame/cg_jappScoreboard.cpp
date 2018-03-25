@@ -21,7 +21,7 @@ static int JP_GetScoreboardFont( void ) {
 
 static void DrawServerInfo( float fade ) {
 	const Font fontLarge( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value, false );
-	const Font fontSmall( FONT_JAPPMONO, cg_newScoreboardFontSize.value, false );
+	const Font fontSmall( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value * 1.25f, false );
 	const char *tmp = NULL;
 	float y = 16.0f;
 	float textWidth = 0.0f;
@@ -33,21 +33,21 @@ static void DrawServerInfo( float fade ) {
 	tmp = va( "%s (%s)", CG_ConfigString( CS_MESSAGE ), cgs.mapnameClean );
 	textHeight = fontSmall.Height( tmp );
 	textWidth = fontSmall.Width( tmp );
-	fontSmall.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+	fontSmall.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 	y += textHeight;
 
 	// server name
 	tmp = cgs.japp.serverName;
 	textHeight = fontSmall.Height( tmp );
 	textWidth = fontSmall.Width( tmp );
-	fontSmall.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+	fontSmall.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 	y += textHeight;
 
 	// gametype
 	tmp = BG_GetGametypeString( cgs.gametype );
 	textHeight = fontSmall.Height( tmp );
 	textWidth = fontSmall.Width( tmp );
-	fontSmall.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+	fontSmall.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 	y += textHeight;
 
 	switch ( cgs.gametype ) {
@@ -73,7 +73,7 @@ static void DrawServerInfo( float fade ) {
 
 		textHeight = fontLarge.Height( tmp );
 		textWidth = fontLarge.Width( tmp );
-		fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+		fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 		y += textHeight;
 		break;
 
@@ -104,7 +104,7 @@ static void DrawServerInfo( float fade ) {
 
 		textHeight = fontLarge.Height( tmp );
 		textWidth = fontLarge.Width( tmp );
-		fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+		fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 		y += textHeight;
 		//FALL THROUGH TO GENERIC TEAM GAME INFO!
 
@@ -113,39 +113,39 @@ static void DrawServerInfo( float fade ) {
 			tmp = S_COLOR_YELLOW "Teams are tied";
 			textHeight = fontLarge.Height( tmp );
 			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 			y += textHeight;
 
 			tmp = va( S_COLOR_RED "%i " S_COLOR_WHITE "/ " S_COLOR_CYAN "%i", cgs.scores1, cgs.scores2 );
 			textHeight = fontLarge.Height( tmp );
 			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 			y += textHeight;
 		}
 		else if ( cgs.scores1 > cgs.scores2 ) {
 			tmp = S_COLOR_RED "Red " S_COLOR_WHITE "leads";
 			textHeight = fontLarge.Height( tmp );
 			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 			y += textHeight;
 
 			tmp = va( S_COLOR_RED "%i " S_COLOR_WHITE "/ " S_COLOR_CYAN "%i", cgs.scores1, cgs.scores2 );
 			textHeight = fontLarge.Height( tmp );
 			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 			y += textHeight;
 		}
 		else {
 			tmp = S_COLOR_CYAN "Blue " S_COLOR_WHITE "leads";
 			textHeight = fontLarge.Height( tmp );
 			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 			y += textHeight;
 
 			tmp = va( S_COLOR_CYAN "%i " S_COLOR_WHITE "/ " S_COLOR_RED "%i", cgs.scores2, cgs.scores1 );
 			textHeight = fontLarge.Height( tmp );
 			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWED );
+			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
 			y += textHeight;
 		}
 
@@ -158,7 +158,7 @@ static void DrawServerInfo( float fade ) {
 }
 
 static void DrawPlayerCount_Free( float fade ) {
-	const Font font( FONT_JAPPLARGE, cg_newScoreboardFontSize.value, false );
+	const Font font( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value, false );
 	const char *tmp = NULL;
 	float y = 108.0f;
 	float textWidth = 0.0f;
@@ -189,14 +189,14 @@ static void DrawPlayerCount_Free( float fade ) {
 	}
 	textHeight = font.Height( tmp );
 	textWidth = font.Width( tmp );
-	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &color, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &color, uiTextStyle_e::Shadowed );
 	y += textHeight;
 
 	// spectator count
 	tmp = va( "%2i spectators", specCount );
 	textHeight = font.Height( tmp );
 	textWidth = font.Width( tmp );
-	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &color, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &color, uiTextStyle_e::Shadowed );
 	y += textHeight;
 }
 
@@ -234,16 +234,16 @@ static void DrawPlayerCount_Team( float fade ) {
 	if ( cgs.scores1 >= cgs.scores2 ) {
 		// red team
 		tmp = va( S_COLOR_RED "%i players " S_COLOR_WHITE "(%3i avg ping)", redCount, pingAvgRed );
-		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
 		// blue team
 		tmp = va( S_COLOR_CYAN "%i players " S_COLOR_WHITE "(%3i avg ping)", blueCount, pingAvgBlue );
-		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
 	}
 	else {
 		tmp = va( S_COLOR_CYAN "%i players " S_COLOR_WHITE "(%i avg ping)", blueCount, pingAvgBlue );
-		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
 		tmp = va( S_COLOR_RED "%i players " S_COLOR_WHITE "(%i avg ping)", redCount, pingAvgRed );
-		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
 	}
 
 	tmp = va( "%2i spectators", specCount );
@@ -333,7 +333,7 @@ static const Column
 		[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
 			const float textWidth = font.Width( self.title );
-			font.Paint( x + self.width - textWidth, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+			font.Paint( x + self.width - textWidth, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 		},
 		[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 			const clientInfo_t &ci )
@@ -341,7 +341,7 @@ static const Column
 			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
 			const char *text = ci.name;
 			const float textWidth = font.Width( text );
-			font.Paint( x + self.width - textWidth, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+			font.Paint( x + self.width - textWidth, y, text, &white, uiTextStyle_e::ShadowedMore );
 
 			return true;
 		},
@@ -378,7 +378,7 @@ static const Column
 			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
 			const float textWidth = font.Width( self.title );
 			font.Paint(
-				x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
+				x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, uiTextStyle_e::ShadowedMore
 			);
 		},
 		[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
@@ -389,19 +389,19 @@ static const Column
 				const char *text = "--";
 				const float textWidth = font.Width( text );
 				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
+					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, uiTextStyle_e::ShadowedMore
 				);
 			}
 			else {
 				vector4 pingColour{ 1.0f, 1.0f, 1.0f, fade };
 				const vector4 pingGood{ 0.0f, 1.0f, 0.0f, fade };
 				const vector4 pingBad{ 1.0f, 0.0f, 0.0f, fade };
-				CG_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score.ping / 300.0f, 1.0f ) );
+				Q_LerpColour( &pingGood, &pingBad, &pingColour, std::min( score.ping / 300.0f, 1.0f ) );
 
 				const char *text = va( "%i", score.ping );
 				const float textWidth = font.Width( text );
 				font.Paint(
-					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &pingColour, ITEM_TEXTSTYLE_SHADOWEDMORE
+					x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &pingColour, uiTextStyle_e::ShadowedMore
 				);
 			}
 			return true;
@@ -432,7 +432,7 @@ static const Column
 			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
 			const float textWidth = font.Width( self.title );
 			font.Paint(
-				x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
+				x + (self.width / 2.0f) - (textWidth / 2.0f), y, self.title, &white, uiTextStyle_e::ShadowedMore
 			);
 		},
 		[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
@@ -442,7 +442,7 @@ static const Column
 			const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
 			const float textWidth = font.Width( text );
 			font.Paint(
-				x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE
+				x + (self.width / 2.0f) - (textWidth / 2.0f), y, text, &white, uiTextStyle_e::ShadowedMore
 			);
 			return true;
 		},
@@ -476,7 +476,7 @@ static int ListPlayers_TDM( float fade, float _x, float _y, team_t team ) {
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
@@ -489,7 +489,7 @@ static int ListPlayers_TDM( float fade, float _x, float _y, team_t team ) {
 				else {
 					text = va( "%i / %i ", score.score, score.deaths );
 				}
-				font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, text, &white, uiTextStyle_e::ShadowedMore );
 
 				return true;
 			},
@@ -506,7 +506,7 @@ static int ListPlayers_TDM( float fade, float _x, float _y, team_t team ) {
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
@@ -528,7 +528,7 @@ static int ListPlayers_TDM( float fade, float _x, float _y, team_t team ) {
 
 					text = va( "%.2f", ratio );
 				}
-				font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, text, &white, uiTextStyle_e::ShadowedMore );
 				return true;
 			},
 			{ 4.0f, 4.0f }
@@ -619,7 +619,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
@@ -632,7 +632,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 				else {
 					text = va( "%i", score.score );
 				}
-				font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, text, &white, uiTextStyle_e::ShadowedMore );
 
 				return true;
 			},
@@ -649,7 +649,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
@@ -662,7 +662,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 				else {
 					text = va( "%i", score.captures );
 				}
-				font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, text, &white, uiTextStyle_e::ShadowedMore );
 				return true;
 			},
 			{ 4.0f, 4.0f }
@@ -678,7 +678,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
@@ -691,7 +691,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 				else {
 					text = va( "%i", score.assistCount );
 				}
-				font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, text, &white, uiTextStyle_e::ShadowedMore );
 				return true;
 			},
 			{ 4.0f, 4.0f }
@@ -707,7 +707,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
@@ -720,7 +720,7 @@ static int ListPlayers_CTF( float fade, float _x, float _y, team_t team ) {
 				else {
 					text = va( "%i", score.defendCount );
 				}
-				font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, text, &white, uiTextStyle_e::ShadowedMore );
 				return true;
 			},
 			{ 4.0f, 4.0f }
@@ -831,7 +831,7 @@ static void DrawSpectators( float fade ) {
 		}
 		font.Paint(
 			cg.scoreboard.spectatorX, (y + lineHeight * 20) - 3, cg.scoreboard.spectatorList, &white,
-			ITEM_TEXTSTYLE_SHADOWED
+			uiTextStyle_e::Shadowed
 		);
 	}
 }
@@ -884,7 +884,7 @@ static void DrawPlayers_Free( float fade ) {
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
@@ -906,7 +906,7 @@ static void DrawPlayers_Free( float fade ) {
 				else {
 					text = va( "%02i/%02i", score.score, score.deaths );
 				}
-				font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, text, &white, uiTextStyle_e::ShadowedMore );
 				return true;
 			},
 			{ 4.0f, 4.0f }
@@ -924,7 +924,7 @@ static void DrawPlayers_Free( float fade ) {
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
@@ -940,7 +940,7 @@ static void DrawPlayers_Free( float fade ) {
 						: score.score;
 					text = va( "%.2f", ratio );
 				}
-				font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, text, &white, uiTextStyle_e::ShadowedMore );
 				return true;
 			},
 			{ 4.0f, 4.0f }
@@ -1024,7 +1024,7 @@ static void DrawPlayers_Duel( float fade ) {
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
@@ -1078,7 +1078,7 @@ static void DrawPlayers_Duel( float fade ) {
 					else {
 						text = va( "%02i of %02i " S_COLOR_GREY "(L: %02i)", ci.wins, cgs.duel_fraglimit, ci.losses );
 					}
-					font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+					font.Paint( x, y, text, &white, uiTextStyle_e::ShadowedMore );
 				#endif
 				return true;
 			},
@@ -1092,7 +1092,7 @@ static void DrawPlayers_Duel( float fade ) {
 			},
 			[]( const Column &self, float &x, float y, const Font &font, float fade ) {
 				const vector4 white{ 1.0f, 1.0f, 1.0f, fade };
-				font.Paint( x, y, self.title, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+				font.Paint( x, y, self.title, &white, uiTextStyle_e::ShadowedMore );
 			},
 			[]( const Column &self, float x, float y, const Font &font, float fade, const score_t &score,
 				const clientInfo_t &ci )
@@ -1148,7 +1148,7 @@ static void DrawPlayers_Duel( float fade ) {
 					else {
 						text = va( "%02i of %02i " S_COLOR_GREY "(L: %02i)", ci.wins, cgs.duel_fraglimit, ci.losses );
 					}
-					font.Paint( x, y, text, &white, ITEM_TEXTSTYLE_SHADOWEDMORE );
+					font.Paint( x, y, text, &white, uiTextStyle_e::ShadowedMore );
 				#endif
 				return true;
 
@@ -1277,7 +1277,7 @@ static void DrawClientInfo( float fade ) {
 	struct tm *timeinfo;
 	time_t tm;
 	char buf[256];
-	const Font font( FONT_JAPPMONO, 0.5f, false );
+	const Font font( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value, false );
 	vector4 colour;
 	float y = SCREEN_HEIGHT - 4.0f;
 
@@ -1294,12 +1294,12 @@ static void DrawClientInfo( float fade ) {
 	);
 
 	y -= font.Height( buf );
-	font.Paint( SCREEN_WIDTH - font.Width( buf ), y, buf, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+	font.Paint( SCREEN_WIDTH - font.Width( buf ), y, buf, &colour, uiTextStyle_e::ShadowedMore );
 
 #ifdef REVISION
 	y -= font.Height( REVISION );
 	// JA++ version
-	font.Paint( SCREEN_WIDTH - font.Width( REVISION ), y, REVISION, &colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+	font.Paint( SCREEN_WIDTH - font.Width( REVISION ), y, REVISION, &colour, uiTextStyle_e::ShadowedMore );
 #endif
 }
 

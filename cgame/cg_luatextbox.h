@@ -8,16 +8,16 @@ namespace JPLua {
 
 	// TextBox instance userdata type
 	struct luaTextBox_t {
-		luaFont_t	*font; // from RegisterFont( int fontIndex );
-		float		scale;
-		std::string	text; // std::string?
-		vector4		colour;
-		int			style;
-		bool		centered;
+		luaFont_t		*font; // from RegisterFont( int fontIndex );
+		float			scale;
+		std::string		text; // std::string?
+		vector4			colour;
+		uiTextStyle_e	style;
+		bool			centered;
 
 		// cached
-		bool		recalculate;
-		float		width, height;
+		bool			recalculate;
+		float			width, height;
 	};
 
 #ifdef JPLUA_INTERNALS

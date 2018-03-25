@@ -96,51 +96,6 @@ void G_LoadArenasFromFile( char *filename ) {
 	level.arenas.num += G_ParseInfos( buf, MAX_ARENAS - level.arenas.num, &level.arenas.infos[level.arenas.num] );
 }
 
-int G_GetMapTypeBits( const char *type ) {
-	int typeBits = 0;
-
-	if ( *type ) {
-		if ( strstr( type, "ffa" ) ) {
-			typeBits |= (1 << GT_FFA);
-			typeBits |= (1 << GT_TEAM);
-			//Raz: JK2 gametypes
-			typeBits |= (1 << GT_JEDIMASTER);
-		}
-		if ( strstr( type, "holocron" ) ) {
-			typeBits |= (1 << GT_HOLOCRON);
-		}
-		if ( strstr( type, "jedimaster" ) ) {
-			typeBits |= (1 << GT_JEDIMASTER);
-		}
-		if ( strstr( type, "duel" ) ) {
-			typeBits |= (1 << GT_DUEL);
-			typeBits |= (1 << GT_POWERDUEL);
-		}
-		if ( strstr( type, "powerduel" ) ) {
-			typeBits |= (1 << GT_DUEL);
-			typeBits |= (1 << GT_POWERDUEL);
-		}
-		if ( strstr( type, "siege" ) ) {
-			typeBits |= (1 << GT_SIEGE);
-		}
-		if ( strstr( type, "ctf" ) ) {
-			typeBits |= (1 << GT_CTF);
-			//Raz: JK2 gametypes
-			typeBits |= (1 << GT_CTY);
-		}
-		if ( strstr( type, "cty" ) ) {
-			typeBits |= (1 << GT_CTY);
-		}
-	}
-	else {
-		typeBits |= (1 << GT_FFA);
-		//Raz: JK2 gametypes
-		typeBits |= (1 << GT_JEDIMASTER);
-	}
-
-	return typeBits;
-}
-
 qboolean G_DoesMapSupportGametype( const char *mapname, int gametype ) {
 	int i;
 	const char *type = NULL;
@@ -160,7 +115,7 @@ qboolean G_DoesMapSupportGametype( const char *mapname, int gametype ) {
 
 	type = Info_ValueForKey( level.arenas.infos[i], "type" );
 
-	if ( G_GetMapTypeBits( type ) & (1 << gametype) )
+	if ( BG_GetMapTypeBits( type ) & (1 << gametype) )
 		return qtrue;
 
 	return qfalse;
@@ -208,7 +163,7 @@ const char *G_RefreshNextMap( int gametype, qboolean forced ) {
 
 		type = Info_ValueForKey( level.arenas.infos[n], "type" );
 
-		typeBits = G_GetMapTypeBits( type );
+		typeBits = BG_GetMapTypeBits( type );
 		if ( typeBits & (1 << gametype) ) {
 			desiredMap = n;
 			break;

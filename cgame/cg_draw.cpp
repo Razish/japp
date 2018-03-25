@@ -706,7 +706,7 @@ static void CG_DrawAmmo( centity_t	*cent, menuDef_t *menuHUD ) {
 			const Font font( fontHandle, fontScale, false );
 			font.Paint(
 				SCREEN_WIDTH - (SCREEN_WIDTH - focusItem->window.rect.x) * cgs.widthRatioCoef,
-				focusItem->window.rect.y, "--", &focusItem->window.foreColor, ITEM_TEXTSTYLE_NORMAL
+				focusItem->window.rect.y, "--", &focusItem->window.foreColor, uiTextStyle_e::Normal
 			);
 		}
 	}
@@ -934,7 +934,7 @@ static void JP_DrawStats( void ) {
 		"Speed", speedStr );
 
 	const Font font( FONT_JAPPMONO, cg_hudStatsScale.value, false );
-	font.Paint( cg.statsPos.x, cg.statsPos.y, statStr, &colorWhite, ITEM_ALIGN_RIGHT | ITEM_TEXTSTYLE_OUTLINED );
+	font.Paint( cg.statsPos.x, cg.statsPos.y, statStr, &colorWhite, uiTextStyle_e::Outlined );
 }
 
 void JP_DrawMovementKeys( void ) {
@@ -1014,11 +1014,11 @@ void JP_DrawMovementKeys( void ) {
 		(cmd.forwardmove < 0) ? COLOR_RED : COLOR_WHITE, (cmd.rightmove > 0) ? COLOR_RED : COLOR_WHITE ) );
 
 	font.Paint(
-		cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y, str1, &colorWhite, ITEM_TEXTSTYLE_OUTLINED
+		cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y, str1, &colorWhite, uiTextStyle_e::Outlined
 	);
 	font.Paint(
 		cg.moveKeysPos.x - std::max( w1, w2 ) / 2.0f, cg.moveKeysPos.y + height, str2, &colorWhite,
-		ITEM_TEXTSTYLE_OUTLINED
+		uiTextStyle_e::Outlined
 	);
 }
 
@@ -1133,7 +1133,7 @@ static void CG_DrawFlagStatusQ3P( void ) {
 		const float height = font.Height( s );
 		font.Paint(
 			leftX + ((iconSize * cgs.widthRatioCoef) / 2.0f) - (width / 2.0f), y - height * 2.0f, s, &colorYellow,
-			ITEM_TEXTSTYLE_SHADOWEDMORE
+			uiTextStyle_e::ShadowedMore
 		);
 		trap->R_SetColor( NULL );
 	}
@@ -1152,7 +1152,7 @@ static void CG_DrawFlagStatusQ3P( void ) {
 	float scoreHeight = font.Height( scoreStr );
 	font.Paint(
 		leftX + ((iconSize * cgs.widthRatioCoef) / 2.0f) - (scoreWidth / 2.0f), y - scoreHeight, scoreStr, scoreColour,
-		ITEM_TEXTSTYLE_SHADOWED
+		uiTextStyle_e::Shadowed
 	);
 	trap->R_SetColor( NULL );
 
@@ -1180,7 +1180,7 @@ static void CG_DrawFlagStatusQ3P( void ) {
 	scoreHeight = font.Height( scoreStr );
 	font.Paint(
 		rightX + ((iconSize * cgs.widthRatioCoef) / 2.0f) - (scoreWidth / 2.0f), y - scoreHeight, scoreStr, scoreColour,
-		ITEM_TEXTSTYLE_SHADOWED
+		uiTextStyle_e::Shadowed
 	);
 	trap->R_SetColor( NULL );
 }
@@ -1315,14 +1315,14 @@ void CG_DrawHUD( centity_t *cent ) {
 			str = S_COLOR_RED "Smart entities ON";
 			const float width = font.Width( str );
 			x = (36 - ( width / 2.0f));
-			font.Paint( x + 16, y - 180, str, &colorTable[CT_VLTBLUE1], ITEM_TEXTSTYLE_SHADOWEDMORE );
+			font.Paint( x + 16, y - 180, str, &colorTable[CT_VLTBLUE1], uiTextStyle_e::ShadowedMore );
 		}
 
 		if ( cg.snap->ps.eFlags & EF_ALT_DIM ) {//alt-dim
 			str = S_COLOR_RED "Alternate dimension!";
 			const float width = font.Width( str );
 			x = (48 - (width / 2.0f));
-			font.Paint( x + 16, y - 140, str, &colorTable[CT_VLTBLUE1], ITEM_TEXTSTYLE_SHADOWEDMORE );
+			font.Paint( x + 16, y - 140, str, &colorTable[CT_VLTBLUE1], uiTextStyle_e::ShadowedMore );
 		}
 
 		//(eFlags2 & 512) == grapple is out
@@ -1381,7 +1381,7 @@ void CG_DrawHUD( centity_t *cent ) {
 		);
 
 		font.scale = 0.5f;
-		font.Paint( 16 * cgs.widthRatioCoef, y - 380, str, &colorTable[CT_WHITE], ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( 16 * cgs.widthRatioCoef, y - 380, str, &colorTable[CT_WHITE], uiTextStyle_e::ShadowedMore );
 	}
 #endif
 
@@ -1408,11 +1408,11 @@ void CG_DrawHUD( centity_t *cent ) {
 			// health
 			const char *str = va( "%i", cg.snap->ps.stats[STAT_HEALTH] );
 			const Font font( fontHandle, fontScale, false );
-			font.Paint( x + 16, y + 40, str, &colorTable[CT_HUD_RED], ITEM_TEXTSTYLE_SHADOWED );
+			font.Paint( x + 16, y + 40, str, &colorTable[CT_HUD_RED], uiTextStyle_e::Shadowed );
 
 			// armor
 			str = va( "%i", cg.snap->ps.stats[STAT_ARMOR] );
-			font.Paint( x + 18 + 14, y + 40 + 14, str, &colorTable[CT_HUD_GREEN], ITEM_TEXTSTYLE_SHADOWED );
+			font.Paint( x + 18 + 14, y + 40 + 14, str, &colorTable[CT_HUD_GREEN], uiTextStyle_e::Shadowed );
 
 			if ( cg.snap->ps.weapon == WP_SABER ) {
 				if ( cg.snap->ps.fd.saberDrawAnimLevel == SS_DUAL ) {
@@ -1441,11 +1441,11 @@ void CG_DrawHUD( centity_t *cent ) {
 
 			str = va( "%s", ammoString );
 			font.Paint(
-				SCREEN_WIDTH - (weapX + 16 + 32), y + 40, str, &colorTable[CT_HUD_ORANGE], ITEM_TEXTSTYLE_SHADOWED
+				SCREEN_WIDTH - (weapX + 16 + 32), y + 40, str, &colorTable[CT_HUD_ORANGE], uiTextStyle_e::Shadowed
 			);
 			str = va( "%i", cg.snap->ps.fd.forcePower );
 			font.Paint(
-				SCREEN_WIDTH - (x + 18 + 14 + 32), y + 40 + 14, str, &colorTable[CT_ICON_BLUE], ITEM_TEXTSTYLE_SHADOWED
+				SCREEN_WIDTH - (x + 18 + 14 + 32), y + 40 + 14, str, &colorTable[CT_ICON_BLUE], uiTextStyle_e::Shadowed
 			);
 		}
 		else {
@@ -1503,7 +1503,7 @@ void CG_DrawHUD( centity_t *cent ) {
 							//FIXME: right-aligned
 							font.Paint(
 								SCREEN_WIDTH - (SCREEN_WIDTH - focusItem->window.rect.x) - textWidth,
-								focusItem->window.rect.y, s, &focusItem->window.foreColor, ITEM_TEXTSTYLE_SHADOWED
+								focusItem->window.rect.y, s, &focusItem->window.foreColor, uiTextStyle_e::Shadowed
 							);
 						}
 					}
@@ -1707,7 +1707,7 @@ void CG_DrawForceSelect( void ) {
 		const float width = font.Width( str );
 		font.Paint(
 			(SCREEN_WIDTH / 2.0f) - (width / 2.0f), y + 30 + yOffset, str, &colorTable[CT_ICON_BLUE],
-			ITEM_TEXTSTYLE_NORMAL
+			uiTextStyle_e::Normal
 		);
 	}
 }
@@ -1757,7 +1757,7 @@ void CG_DrawInvenSelect( void ) {
 		const char *str = "EMPTY INVENTORY";
 		const float width = font.Width( str );
 		font.Paint(
-			(SCREEN_WIDTH / 2.0f) - (width / 2.0f), y2 + 22, str, &colorTable[CT_ICON_BLUE], ITEM_TEXTSTYLE_NORMAL
+			(SCREEN_WIDTH / 2.0f) - (width / 2.0f), y2 + 22, str, &colorTable[CT_ICON_BLUE], uiTextStyle_e::Normal
 		);
 		return;
 	}
@@ -1856,12 +1856,12 @@ void CG_DrawInvenSelect( void ) {
 			const Font font( fontHandle, fontScale, false );
 			if ( trap->SE_GetStringTextString( va( "SP_INGAME_%s", upperKey ), text, sizeof(text) ) ) {
 				const float width = font.Width( text );
-				font.Paint( (SCREEN_WIDTH / 2.0f) - (width / 2.0f), y + 45, text, &textColor, ITEM_TEXTSTYLE_NORMAL );
+				font.Paint( (SCREEN_WIDTH / 2.0f) - (width / 2.0f), y + 45, text, &textColor, uiTextStyle_e::Normal );
 			}
 			else {
 				const char *str = bg_itemlist[itemNdex].classname;
 				const float width = font.Width( str );
-				font.Paint( (SCREEN_WIDTH / 2.0f) - (width / 2.0f), y + 45, str, &textColor, ITEM_TEXTSTYLE_NORMAL );
+				font.Paint( (SCREEN_WIDTH / 2.0f) - (width / 2.0f), y + 45, str, &textColor, uiTextStyle_e::Normal );
 			}
 		}
 	}
@@ -2837,7 +2837,7 @@ static float CG_DrawMiniScoreboard( float y ) {
 		Q_strcat( s, sizeof(s), cgs.scores2 == SCORE_NOT_PRESENT ? "-" : (va( "%i", cgs.scores2 )) );
 
 		float w = font.Width( s );
-		font.Paint( SCREEN_WIDTH - w, y, s, &g_color_table[ColorIndex(COLOR_WHITE)], ITEM_TEXTSTYLE_SHADOWED );
+		font.Paint( SCREEN_WIDTH - w, y, s, &g_color_table[ColorIndex(COLOR_WHITE)], uiTextStyle_e::Shadowed );
 
 		y += font.Height( s );
 	}
@@ -2909,7 +2909,7 @@ static float CG_DrawMiniScoreboard( float y ) {
 			for ( int i = 0; i < numWritten; i++ ) {
 				const float textWidth = font.Width( buf[i] );
 				font.Paint(
-					SCREEN_WIDTH - textWidth, y + (i * textHeight), buf[i], &colorWhite, ITEM_TEXTSTYLE_SHADOWED
+					SCREEN_WIDTH - textWidth, y + (i * textHeight), buf[i], &colorWhite, uiTextStyle_e::Shadowed
 				);
 				y += textHeight;
 			}
@@ -3084,7 +3084,7 @@ static float CG_DrawFPS( float y ) {
 	const Font font( cg_topRightFont.integer, cg_topRightSize.value, false );
 	if ( cg_drawFPS.integer ) {
 		vector4 fpsColour = { 1.0f, 1.0f, 1.0f, 1.0f }, fpsGood = { 0.0f, 1.0f, 0.0f, 1.0f }, fpsBad = { 1.0f, 0.0f, 0.0f, 1.0f };
-		CG_LerpColour(
+		Q_LerpColour(
 			&fpsBad, &fpsGood, &fpsColour,
 			std::min(
 				std::max( 0.0f, static_cast<float>( fps ) ) / std::max( IDEAL_FPS, static_cast<float>( maxFPS ) ),
@@ -3094,14 +3094,14 @@ static float CG_DrawFPS( float y ) {
 
 		s = va( "%ifps", fps );
 		w = font.Width( s );
-		font.Paint( SCREEN_WIDTH - w, y, s, &fpsColour, ITEM_TEXTSTYLE_SHADOWED );
+		font.Paint( SCREEN_WIDTH - w, y, s, &fpsColour, uiTextStyle_e::Shadowed );
 		y += font.Height( s );
 	}
 	if ( cg_drawFPS.integer == 2 ) {
 		s = va( "%i/%3.2f msec", frameTime, 1000.0f / (float)fps );
 
 		w = font.Width( s );
-		font.Paint( SCREEN_WIDTH - w, y, s, &g_color_table[ColorIndex(COLOR_GREY)], ITEM_TEXTSTYLE_SHADOWED );
+		font.Paint( SCREEN_WIDTH - w, y, s, &g_color_table[ColorIndex(COLOR_GREY)], uiTextStyle_e::Shadowed );
 		y += font.Height( s );
 	}
 	return y;
@@ -3638,7 +3638,7 @@ static float CG_DrawTimer( float y ) {
 	const Font font( cg_topRightFont.integer, cg_topRightSize.value, false );
 	s = va( "%i:%02i", mins, abs( secs ) );
 	w = font.Width( s );
-	font.Paint( SCREEN_WIDTH - w, y, s, timeColour, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( SCREEN_WIDTH - w, y, s, timeColour, uiTextStyle_e::Shadowed );
 
 	return y + font.Height( s );
 }
@@ -3856,7 +3856,7 @@ static void CG_DrawPowerupIcons( int y ) {
 					const Font font( fontHandle, fontScale, false );
 					font.Paint(
 						(SCREEN_WIDTH - iconWidth - (iconWidth * cgs.widthRatioCoef)), y - 8, s, &colorWhite,
-						ITEM_TEXTSTYLE_SHADOWED
+						uiTextStyle_e::Shadowed
 					);
 				}
 
@@ -3960,11 +3960,11 @@ qboolean CG_DrawMapChange( void ) {
 
 	const char *s = CG_GetStringEdString( "MP_INGAME", "SERVER_CHANGING_MAPS" ); // s = "Server Changing Maps";
 	float w = font.Width( s );
-	font.Paint( (SCREEN_WIDTH / 2.0f) - (w / 2.0f), 100, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( (SCREEN_WIDTH / 2.0f) - (w / 2.0f), 100, s, &colorWhite, uiTextStyle_e::Shadowed );
 
 	s = CG_GetStringEdString( "MP_INGAME", "PLEASE_WAIT" ); // s = "Please wait...";
 	w = font.Width( s );
-	font.Paint( (SCREEN_WIDTH / 2.0f) - (w / 2.0f), 200, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( (SCREEN_WIDTH / 2.0f) - (w / 2.0f), 200, s, &colorWhite, uiTextStyle_e::Shadowed );
 
 	return true;
 }
@@ -4028,7 +4028,7 @@ static void CG_DrawDisconnect( void ) {
 	const qhandle_t fontHandle = FONT_SMALL;
 	const Font font( fontHandle, fontScale, false );
 	const float w = font.Width( s );
-	font.Paint( (SCREEN_WIDTH / 2.0f) - (w / 2.0f), 100.0f, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWED );
+	font.Paint( (SCREEN_WIDTH / 2.0f) - (w / 2.0f), 100.0f, s, &colorWhite, uiTextStyle_e::Shadowed );
 
 	// blink the icon
 	if ( (cg.time >> 9) & 1 ) {
@@ -4144,10 +4144,10 @@ static void CG_DrawLagometer( void ) {
 	const int fontHandle = FONT_JAPPMONO;
 	const Font font( fontHandle, fontScale, false );
 	if ( cg_noPredict.integer || g_synchronousClients.integer ) {
-		font.Paint( x, y, "snc", &colorTable[CT_WHITE], ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( x, y, "snc", &colorTable[CT_WHITE], uiTextStyle_e::ShadowedMore );
 	}
 	else if ( cg.snap && cg_lagometer.integer == 2 ) {
-		font.Paint( x, y, va( "%i", cg.snap->ping ), &colorTable[CT_WHITE], ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( x, y, va( "%i", cg.snap->ping ), &colorTable[CT_WHITE], uiTextStyle_e::ShadowedMore );
 
 		int32_t total = 0u;
 		for ( size_t i = 0u; i < LAG_SAMPLES; i++ ) {
@@ -4157,7 +4157,7 @@ static void CG_DrawLagometer( void ) {
 		const char *xerpText = va( "%04.1f", avgXerp );
 		const float xerpWidth = font.Width( xerpText );
 		font.Paint(
-			x + (w * cgs.widthRatioCoef) - xerpWidth, y, xerpText, &colorTable[CT_WHITE], ITEM_TEXTSTYLE_SHADOWEDMORE
+			x + (w * cgs.widthRatioCoef) - xerpWidth, y, xerpText, &colorTable[CT_WHITE], uiTextStyle_e::ShadowedMore
 		);
 	}
 
@@ -4281,7 +4281,7 @@ static void CG_DrawCenterString(void){
 
 		const float w = font.Width( linebuffer );
 		const float h = font.Height( linebuffer );
-		font.Paint( (SCREEN_WIDTH - w) / 2, y + h, linebuffer, color, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( (SCREEN_WIDTH - w) / 2, y + h, linebuffer, color, uiTextStyle_e::ShadowedMore );
 		y += h + 6;
 
 		if ( start[l] && start[l] == '\n' ) {
@@ -5723,14 +5723,14 @@ static void CG_DrawCrosshairNames( void ) {
 		char str[MAX_STRING_CHARS];
 		Com_sprintf( str, MAX_STRING_CHARS, "%s (pilot)", name );
 		const float width = font.Width( str );
-		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 170, str, &tcolor, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 170, str, &tcolor, uiTextStyle_e::ShadowedMore );
 	}
 	else if ( cg_drawCrosshairNames.integer == 1 ) {
 		const float fontScale = 1.0f;
 		const int fontHandle = FONT_MEDIUM;
 		const Font font( fontHandle, fontScale, false );
 		const float width = font.Width( name );
-		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 170, name, &tcolor, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), 170, name, &tcolor, uiTextStyle_e::ShadowedMore );
 	}
 	else if ( cg_drawCrosshairNames.integer >= 2 && !CG_FadeColor2( &tcolor, cg.crosshairClientTime, 250.0f ) ) {
 		float fontScale = 0.875f;
@@ -5743,7 +5743,7 @@ static void CG_DrawCrosshairNames( void ) {
 		}
 		const float width = font.Width( name );
 		font.Paint(
-			(SCREEN_WIDTH / 2) - (width / 2.0f), (SCREEN_HEIGHT / 2) - 70.0f, name, &tcolor, ITEM_TEXTSTYLE_SHADOWEDMORE
+			(SCREEN_WIDTH / 2) - (width / 2.0f), (SCREEN_HEIGHT / 2) - 70.0f, name, &tcolor, uiTextStyle_e::ShadowedMore
 		);
 	}
 
@@ -5786,7 +5786,7 @@ static void CG_DrawClientNames( void ) {
 			const char *name = ci.name;
 			const float textWidth = font.Width( name );
 			const float textHeight = font.Height( name );
-			font.Paint( x - textWidth / 2.0f, y - textHeight / 2.0f, name, colour, ITEM_TEXTSTYLE_SHADOWEDMORE );
+			font.Paint( x - textWidth / 2.0f, y - textHeight / 2.0f, name, colour, uiTextStyle_e::ShadowedMore );
 		}
 	}
 }
@@ -6178,7 +6178,7 @@ static void CG_DrawWarmup( void ) {
 			}
 			const Font font( FONT_MEDIUM, 0.6f, false );
 			w = font.Width( s );
-			font.Paint( (SCREEN_WIDTH / 2) - w / 2, 60, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWEDMORE );
+			font.Paint( (SCREEN_WIDTH / 2) - w / 2, 60, s, &colorWhite, uiTextStyle_e::ShadowedMore );
 		}
 	}
 	else {
@@ -6214,7 +6214,7 @@ static void CG_DrawWarmup( void ) {
 		}
 		const Font font( FONT_MEDIUM, 1.5f, false );
 		w = font.Width( s );
-		font.Paint( (SCREEN_WIDTH / 2) - w / 2, 90, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWEDMORE );
+		font.Paint( (SCREEN_WIDTH / 2) - w / 2, 90, s, &colorWhite, uiTextStyle_e::ShadowedMore );
 	}
 
 	sec = (sec - cg.time) / 1000;
@@ -6260,7 +6260,7 @@ static void CG_DrawWarmup( void ) {
 
 	const Font font( FONT_MEDIUM, scale, false );
 	w = font.Width( s );
-	font.Paint( (SCREEN_WIDTH / 2) - w / 2, 125, s, &colorWhite, ITEM_TEXTSTYLE_SHADOWEDMORE );
+	font.Paint( (SCREEN_WIDTH / 2) - w / 2, 125, s, &colorWhite, uiTextStyle_e::ShadowedMore );
 }
 
 void CG_DrawTimedMenus( void ) {
@@ -6451,7 +6451,7 @@ static void CG_DrawSiegeTimer( int timeRemaining, qboolean isMyTeam ) {
 		const Font font( FONT_SMALL, 1.0f, false );
 		font.Paint(
 			SCREEN_WIDTH - (SCREEN_WIDTH - item->window.rect.x) * cgs.widthRatioCoef, item->window.rect.y, timeStr,
-			&colorTable[fColor], ITEM_TEXTSTYLE_SHADOWED
+			&colorTable[fColor], uiTextStyle_e::Shadowed
 		);
 	}
 }
@@ -6487,7 +6487,7 @@ static void CG_DrawSiegeDeathTimer( int timeRemaining ) {
 		const Font font( FONT_SMALL, 1.0f, false );
 		font.Paint(
 			SCREEN_WIDTH - (SCREEN_WIDTH - item->window.rect.x) * cgs.widthRatioCoef, item->window.rect.y, timeStr,
-			&item->window.foreColor, ITEM_TEXTSTYLE_SHADOWED
+			&item->window.foreColor, uiTextStyle_e::Shadowed
 		);
 	}
 }
@@ -6653,7 +6653,7 @@ static void CG_ChatBox_DrawStrings( void ) {
 	const Font font( FONT_SMALL, fontScale, false );
 	//we have the items we want to draw, just quickly loop through them now
 	for ( i = 0; i < numToDraw; i++ ) {
-		font.Paint( x, y, drawThese[i]->string, &colorWhite, ITEM_TEXTSTYLE_OUTLINED );
+		font.Paint( x, y, drawThese[i]->string, &colorWhite, uiTextStyle_e::Outlined );
 		y += ((CHATBOX_FONT_HEIGHT*fontScale)*drawThese[i]->lines);
 	}
 }

@@ -81,25 +81,25 @@ float Font::Height( const char *text ) const {
 	return trap->R_Font_HeightPixels( realHandle, scale );
 }
 
-void Font::Paint( float x, float y, const char *text, const vector4 *colour, int style, int limit, float adjust ) const {
+void Font::Paint( float x, float y, const char *text, const vector4 *colour, uiTextStyle_e style, int limit, float adjust ) const {
 	uint32_t iStyleOR = 0u;
 	switch ( style ) {
 
 	default:
-	case ITEM_TEXTSTYLE_NORMAL: {
+	case Normal: {
 		// normal text
-		iStyleOR = 0;
+		iStyleOR = 0u;
 	} break;
 
-	case ITEM_TEXTSTYLE_BLINK: // fast blinking
-	case ITEM_TEXTSTYLE_PULSE: { // slow pulsing
+	case Blink: // fast blinking
+	case Pulse: { // slow pulsing
 		iStyleOR = STYLE_BLINK;
 	} break;
 
-	case ITEM_TEXTSTYLE_SHADOWED: // drop shadow
-	case ITEM_TEXTSTYLE_OUTLINED: // drop shadow
-	case ITEM_TEXTSTYLE_OUTLINESHADOWED: // drop shadow
-	case ITEM_TEXTSTYLE_SHADOWEDMORE: { // drop shadow
+	case Shadowed: // drop shadow
+	case Outlined: // drop shadow
+	case OutlineShadowed: // drop shadow
+	case ShadowedMore: { // drop shadow
 		iStyleOR = STYLE_DROPSHADOW;
 	} break;
 
