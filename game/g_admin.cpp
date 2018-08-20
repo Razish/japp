@@ -2239,6 +2239,19 @@ static void AM_Dismember(gentity_t *ent){
 
 
 void Cmd_Kill_f( gentity_t *ent );
+
+static qboolean Can_Slay( gentity_t *ent) {
+	if( ent->client->pers.connected == CON_DISCONNECTED
+		|| ent->client->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR
+	    || ent->client->tempSpectate >= level.time
+		|| ent->client->pers.adminData.isSlept
+		|| ent->health <= 0 )
+	{
+		return qfalse;
+	}
+	return qtrue;
+}
+
 // slay the specified client
 static void AM_Slay( gentity_t *ent ) {
 	char arg1[64] = {};
@@ -2256,8 +2269,7 @@ static void AM_Slay( gentity_t *ent ) {
 		int i;
 		gentity_t *e;
 		for ( i = 0, e = g_entities; i < level.maxclients; i++, e++ ) {
-			if ( !e->inuse || ent->client->pers.connected == CON_DISCONNECTED
-				|| ent->client->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR || ent->client->tempSpectate >= level.time )
+			if ( !e->inuse || !Can_Slay( ent ) )
 			{
 				continue;
 			}
@@ -2281,8 +2293,7 @@ static void AM_Slay( gentity_t *ent ) {
 
 	targetEnt = g_entities + targetClient;
 
-	if ( targetEnt->client->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR
-		|| targetEnt->client->tempSpectate >= level.time )
+	if ( !Can_Slay( targetEnt ) )
 	{
 		return;
 	}
