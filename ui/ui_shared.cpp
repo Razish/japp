@@ -7646,10 +7646,10 @@ qboolean ItemParse_cvarStrList( itemDef_t *item, int handle ) {
 #ifndef PROJECT_CGAME
 		for ( ; multiPtr->count < uiInfo.languageCount; multiPtr->count++ ) {
 			// The displayed text
-			trap->SE_GetLanguageName( (const int)multiPtr->count, (char *)currLanguage[multiPtr->count] );	// eg "English"
+			trap->SE_GetLanguageName( (int)multiPtr->count, (char *)currLanguage[multiPtr->count] );	// eg "English"
 			multiPtr->cvarList[multiPtr->count] = languageString;
 			// The cvar value that goes into se_language
-			trap->SE_GetLanguageName( (const int)multiPtr->count, (char *)currLanguage[multiPtr->count] );
+			trap->SE_GetLanguageName( (int)multiPtr->count, (char *)currLanguage[multiPtr->count] );
 			multiPtr->cvarStr[multiPtr->count] = currLanguage[multiPtr->count];
 		}
 #endif

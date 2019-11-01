@@ -5748,10 +5748,13 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].alt.chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
 #ifdef PROJECT_GAME
-					if ( !( ((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer ) ||
-						 !((gentity_t *)pm_entSelf)->client->ps.duelInProgress )
+					gentity_t *self = (gentity_t *)pm_entSelf;
+					if ( (self->client->pers.adminData.merc && !japp_mercInfiniteAmmo.integer)
+						|| !self->client->ps.duelInProgress )
 #endif
+					{
 						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].alt.charge;
+					}
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].alt.chargeTime;
 				}
 			}
@@ -5783,10 +5786,13 @@ static qboolean PM_DoChargedWeapons( qboolean vehicleRocketLock, bgEntity_t *veh
 			else if ( (pm->cmd.serverTime - pm->ps->weaponChargeTime) < weaponData[pm->ps->weapon].chargeMax ) {
 				if ( pm->ps->weaponChargeSubtractTime < pm->cmd.serverTime ) {
 #ifdef PROJECT_GAME
-					if (!(((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer) ||
-						!((gentity_t *)pm_entSelf)->client->ps.duelInProgress)
+					gentity_t *self = (gentity_t *)pm_entSelf;
+					if ( (self->client->pers.adminData.merc && !japp_mercInfiniteAmmo.integer)
+						|| !self->client->ps.duelInProgress )
 #endif
+					{
 						pm->ps->ammo[weaponData[pm->ps->weapon].ammoIndex] -= weaponData[pm->ps->weapon].charge;
+					}
 					pm->ps->weaponChargeSubtractTime = pm->cmd.serverTime + weaponData[pm->ps->weapon].chargeTime;
 				}
 			}
@@ -7011,15 +7017,19 @@ static void PM_Weapon( void ) {
 		PM_StartTorsoAnim( WeaponAttackAnim[weapon] );
 	}
 
-#ifdef PROJECT_GAME
-	if ( ((gentity_t *)pm_entSelf)->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer )
-		amount = 0;
-	else
-#endif
 	if ( pm->cmd.buttons & BUTTON_ALT_ATTACK )
 		amount = weaponData[pm->ps->weapon].alt.shotCost;
 	else
 		amount = weaponData[pm->ps->weapon].shotCost;
+
+#ifdef PROJECT_GAME
+	gentity_t *self = (gentity_t *)pm_entSelf;
+	if ( (self->client->pers.adminData.merc && japp_mercInfiniteAmmo.integer)
+		|| self->client->ps.duelInProgress )
+	{
+		amount = 0;
+	}
+#endif
 
 	pm->ps->weaponstate = WEAPON_FIRING;
 

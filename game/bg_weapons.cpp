@@ -29,26 +29,26 @@ const vector3 WP_MuzzlePoint[WP_NUM_WEAPONS] = {
 };
 
 const weaponData_t weaponData[WP_NUM_WEAPONS] = {
-	// longname						ammoIndex			ammoLow	shotCost	fireTime	charge	chargeMax	chargeTime	altShotCost.alt.fireTime	altCharge	altChargeMax	altChargeTime
-	{ "No Weapon",					AMMO_NONE,			0,		0,			0,			0,		0,			0,			{ 0,		0,			0,			0,				0 } },
-	{ "Stun Baton",					AMMO_NONE,			5,		0,			400,		0,		0,			0,			{ 0,		400,		0,			0,				0 } },
-	{ "Melee",						AMMO_NONE,			5,		0,			400,		0,		0,			0,			{ 0,		400,		0,			0,				0 } },
-	{ "Lightsaber",					AMMO_NONE,			5,		0,			100,		0,		0,			0,			{ 0,		100,		0,			0,				0 } },
-	{ "Bryar Pistol",				AMMO_BLASTER,		0,		0,			800,		0,		0,			0,			{ 0,		800,		0,			0,				0 } },
-	{ "E11 Blaster Rifle",			AMMO_BLASTER,		5,		2,			350,		0,		0,			0,			{ 3,		150,		0,			0,				0 } },
-	{ "Tenloss Disruptor Rifle",	AMMO_POWERCELL,		5,		5,			600,		0,		0,			0,			{ 6,		1300,		3,			1700,			200 } },
-	{ "Wookiee Bowcaster",			AMMO_POWERCELL,		5,		5,			1000,		5,		1700,		400,		{ 5,		750,		0,			0,				0 } },
-	{ "Imperial Heavy Repeater",	AMMO_METAL_BOLTS,	5,		1,			100,		0,		0,			0,			{ 15,		800,		0,			0,				0 } },
-	{ "DEMP2",						AMMO_POWERCELL,		5,		8,			500,		0,		0,			0,			{ 6,		900,		3,			2100,			250 } },
-	{ "Golan Arms Flechette",		AMMO_METAL_BOLTS,	5,		10,			700,		0,		0,			0,			{ 15,		800,		0,			0,				0 } },
-	{ "Merr-Sonn Missile System",	AMMO_ROCKETS,		5,		1,			900,		0,		0,			0,			{ 2,		1200,		0,			0,				0 } },
-	{ "Thermal Detonator",			AMMO_THERMAL,		0,		1,			800,		0,		0,			0,			{ 1,		400,		0,			0,				0 } },
-	{ "Trip Mine",					AMMO_TRIPMINE,		0,		1,			800,		0,		0,			0,			{ 1,		400,		0,			0,				0 } },
-	{ "Det Pack",					AMMO_DETPACK,		0,		1,			800,		0,		0,			0,			{ 0,		400,		0,			0,				0 } },
-	{ "Concussion Rifle",			AMMO_METAL_BOLTS,	40,		40,			800,		0,		0,			0,			{ 50,		1200,		0,			0,				0 } },
-	{ "Bryar Pistol",				AMMO_BLASTER,		15,		2,			400,		0,		0,			0,			{ 2,		400,		1,			1500,			200 } },
-	{ "Emplaced Gun",				AMMO_NONE,			0,		0,			100,		0,		0,			0,			{ 0,		100,		0,			0,				0 } },
-	{ "Turret",						AMMO_NONE,			0,		0,			0,			0,		0,			0,			{ 0,		0,			0,			0,				0 } },
+	// longname						ammoIndex			ammoLow	shotCost	fireTime	charge	chargeMax	chargeTime	alt.ShotCost	alt.fireTime	alt.charge	alt.chargeMax	alt.chargeTime
+	{ "No Weapon",					AMMO_NONE,			0,		0,			0,			0,		0,			0,			{ 0,			0,				0,			0,				0 } },
+	{ "Stun Baton",					AMMO_NONE,			5,		0,			400,		0,		0,			0,			{ 0,			400,			0,			0,				0 } },
+	{ "Melee",						AMMO_NONE,			5,		0,			400,		0,		0,			0,			{ 0,			400,			0,			0,				0 } },
+	{ "Lightsaber",					AMMO_NONE,			5,		0,			100,		0,		0,			0,			{ 0,			100,			0,			0,				0 } },
+	{ "Bryar Pistol",				AMMO_BLASTER,		0,		0,			800,		0,		0,			0,			{ 0,			800,			0,			0,				0 } },
+	{ "E11 Blaster Rifle",			AMMO_BLASTER,		5,		2,			350,		0,		0,			0,			{ 3,			150,			0,			0,				0 } },
+	{ "Tenloss Disruptor Rifle",	AMMO_POWERCELL,		5,		5,			600,		0,		0,			0,			{ 6,			1300,			3,			1700,			200 } },
+	{ "Wookiee Bowcaster",			AMMO_POWERCELL,		5,		5,			1000,		5,		1700,		400,		{ 5,			750,			0,			0,				0 } },
+	{ "Imperial Heavy Repeater",	AMMO_METAL_BOLTS,	5,		1,			100,		0,		0,			0,			{ 15,			800,			0,			0,				0 } },
+	{ "DEMP2",						AMMO_POWERCELL,		5,		8,			500,		0,		0,			0,			{ 6,			900,			3,			2100,			250 } },
+	{ "Golan Arms Flechette",		AMMO_METAL_BOLTS,	5,		10,			700,		0,		0,			0,			{ 15,			800,			0,			0,				0 } },
+	{ "Merr-Sonn Missile System",	AMMO_ROCKETS,		5,		1,			900,		0,		0,			0,			{ 2,			1200,			0,			0,				0 } },
+	{ "Thermal Detonator",			AMMO_THERMAL,		0,		1,			800,		0,		0,			0,			{ 1,			400,			0,			0,				0 } },
+	{ "Trip Mine",					AMMO_TRIPMINE,		0,		1,			800,		0,		0,			0,			{ 1,			400,			0,			0,				0 } },
+	{ "Det Pack",					AMMO_DETPACK,		0,		1,			800,		0,		0,			0,			{ 0,			400,			0,			0,				0 } },
+	{ "Concussion Rifle",			AMMO_METAL_BOLTS,	40,		40,			800,		0,		0,			0,			{ 50,			1200,			0,			0,				0 } },
+	{ "Bryar Pistol",				AMMO_BLASTER,		15,		2,			400,		0,		0,			0,			{ 2,			400,			1,			1500,			200 } },
+	{ "Emplaced Gun",				AMMO_NONE,			0,		0,			100,		0,		0,			0,			{ 0,			100,			0,			0,				0 } },
+	{ "Turret",						AMMO_NONE,			0,		0,			0,			0,		0,			0,			{ 0,			0,				0,			0,				0 } },
 };
 
 const int ammoMax[AMMO_MAX] = {

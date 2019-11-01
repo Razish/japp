@@ -19,11 +19,10 @@ static int JP_GetScoreboardFont( void ) {
 	return Q_clampi( FONT_SMALL, cg_newScoreboardFont.integer, FONT_NUM_FONTS );
 }
 
-static void DrawServerInfo( float fade ) {
-	const Font fontLarge( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value, false );
-	const Font fontSmall( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value * 1.25f, false );
+static void DrawServerInfo( float fade, float &finalY ) {
+	const Font fontNormal( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value, false );
+	const Font fontLarge( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value * 1.25f, false );
 	const char *tmp = NULL;
-	float y = 16.0f;
 	float textWidth = 0.0f;
 	float textHeight = 0.0f;
 	vector4 colour = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -31,24 +30,24 @@ static void DrawServerInfo( float fade ) {
 
 	// map name
 	tmp = va( "%s (%s)", CG_ConfigString( CS_MESSAGE ), cgs.mapnameClean );
-	textHeight = fontSmall.Height( tmp );
-	textWidth = fontSmall.Width( tmp );
-	fontSmall.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-	y += textHeight;
+	textHeight = fontLarge.Height( tmp );
+	textWidth = fontLarge.Width( tmp );
+	fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+	finalY += textHeight;
 
 	// server name
 	tmp = cgs.japp.serverName;
-	textHeight = fontSmall.Height( tmp );
-	textWidth = fontSmall.Width( tmp );
-	fontSmall.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-	y += textHeight;
+	textHeight = fontLarge.Height( tmp );
+	textWidth = fontLarge.Width( tmp );
+	fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+	finalY += textHeight;
 
 	// gametype
 	tmp = BG_GetGametypeString( cgs.gametype );
-	textHeight = fontSmall.Height( tmp );
-	textWidth = fontSmall.Width( tmp );
-	fontSmall.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-	y += textHeight;
+	textHeight = fontLarge.Height( tmp );
+	textWidth = fontLarge.Width( tmp );
+	fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+	finalY += textHeight;
 
 	switch ( cgs.gametype ) {
 	case GT_FFA:
@@ -71,10 +70,10 @@ static void DrawServerInfo( float fade ) {
 			tmp = "Playing forever!";
 		}
 
-		textHeight = fontLarge.Height( tmp );
-		textWidth = fontLarge.Width( tmp );
-		fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-		y += textHeight;
+		textHeight = fontNormal.Height( tmp );
+		textWidth = fontNormal.Width( tmp );
+		fontNormal.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+		finalY += textHeight;
 		break;
 
 	case GT_CTF:
@@ -102,51 +101,51 @@ static void DrawServerInfo( float fade ) {
 			tmp = "Playing forever!";
 		}
 
-		textHeight = fontLarge.Height( tmp );
-		textWidth = fontLarge.Width( tmp );
-		fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-		y += textHeight;
+		textHeight = fontNormal.Height( tmp );
+		textWidth = fontNormal.Width( tmp );
+		fontNormal.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+		finalY += textHeight;
 		//FALL THROUGH TO GENERIC TEAM GAME INFO!
 
 	case GT_TEAM:
 		if ( cgs.scores1 == cgs.scores2 ) {
 			tmp = S_COLOR_YELLOW "Teams are tied";
-			textHeight = fontLarge.Height( tmp );
-			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-			y += textHeight;
+			textHeight = fontNormal.Height( tmp );
+			textWidth = fontNormal.Width( tmp );
+			fontNormal.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+			finalY += textHeight;
 
 			tmp = va( S_COLOR_RED "%i " S_COLOR_WHITE "/ " S_COLOR_CYAN "%i", cgs.scores1, cgs.scores2 );
-			textHeight = fontLarge.Height( tmp );
-			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-			y += textHeight;
+			textHeight = fontNormal.Height( tmp );
+			textWidth = fontNormal.Width( tmp );
+			fontNormal.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+			finalY += textHeight;
 		}
 		else if ( cgs.scores1 > cgs.scores2 ) {
 			tmp = S_COLOR_RED "Red " S_COLOR_WHITE "leads";
-			textHeight = fontLarge.Height( tmp );
-			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-			y += textHeight;
+			textHeight = fontNormal.Height( tmp );
+			textWidth = fontNormal.Width( tmp );
+			fontNormal.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+			finalY += textHeight;
 
 			tmp = va( S_COLOR_RED "%i " S_COLOR_WHITE "/ " S_COLOR_CYAN "%i", cgs.scores1, cgs.scores2 );
-			textHeight = fontLarge.Height( tmp );
-			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-			y += textHeight;
+			textHeight = fontNormal.Height( tmp );
+			textWidth = fontNormal.Width( tmp );
+			fontNormal.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+			finalY += textHeight;
 		}
 		else {
 			tmp = S_COLOR_CYAN "Blue " S_COLOR_WHITE "leads";
-			textHeight = fontLarge.Height( tmp );
-			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-			y += textHeight;
+			textHeight = fontNormal.Height( tmp );
+			textWidth = fontNormal.Width( tmp );
+			fontNormal.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+			finalY += textHeight;
 
 			tmp = va( S_COLOR_CYAN "%i " S_COLOR_WHITE "/ " S_COLOR_RED "%i", cgs.scores2, cgs.scores1 );
-			textHeight = fontLarge.Height( tmp );
-			textWidth = fontLarge.Width( tmp );
-			fontLarge.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &colour, uiTextStyle_e::Shadowed );
-			y += textHeight;
+			textHeight = fontNormal.Height( tmp );
+			textWidth = fontNormal.Width( tmp );
+			fontNormal.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed );
+			finalY += textHeight;
 		}
 
 		//TODO: playing until x/y
@@ -157,13 +156,14 @@ static void DrawServerInfo( float fade ) {
 	}
 }
 
-static void DrawPlayerCount_Free( float fade ) {
+static void DrawPlayerCount_Free( float fade, float &finalY ) {
 	const Font font( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value, false );
 	const char *tmp = NULL;
-	float y = 108.0f;
 	float textWidth = 0.0f;
 	float textHeight = 0.0f;
 	const vector4 color = { 1.0f, 1.0f, 1.0f, fade };
+
+	// y = 108.0f;
 
 	// count the free, spectating and bot players
 	int freeCount = 0, specCount = 0, botCount = 0;
@@ -189,26 +189,27 @@ static void DrawPlayerCount_Free( float fade ) {
 	}
 	textHeight = font.Height( tmp );
 	textWidth = font.Width( tmp );
-	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &color, uiTextStyle_e::Shadowed );
-	y += textHeight;
+	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &color, uiTextStyle_e::Shadowed );
+	finalY += textHeight;
 
 	// spectator count
 	tmp = va( "%2i spectators", specCount );
 	textHeight = font.Height( tmp );
 	textWidth = font.Width( tmp );
-	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, y, tmp, &color, uiTextStyle_e::Shadowed );
-	y += textHeight;
+	font.Paint( (SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &color, uiTextStyle_e::Shadowed );
+	finalY += textHeight;
 }
 
-static void DrawPlayerCount_Team( float fade ) {
+static void DrawPlayerCount_Team( float fade, float &finalY ) {
 	const Font font( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value, false );
 	const float width = SCREEN_WIDTH / 2.0f;
 	const float lineHeight = 14.0f;
-	float y = 108.0f;
 	const char *tmp = NULL;
 	vector4 colour = { 1.0f, 1.0f, 1.0f, 1.0f };
 	int i, redCount = 0, blueCount = 0, specCount = 0, pingAccumRed = 0, pingAvgRed = 0, pingAccumBlue = 0, pingAvgBlue = 0;
 	colour.a = fade;
+
+	// y = 108.0f;
 
 	for ( i = 0; i < cg.numScores; i++ ) {
 		if ( cgs.clientinfo[cg.scores[i].client].team == TEAM_RED ) {
@@ -234,23 +235,26 @@ static void DrawPlayerCount_Team( float fade ) {
 	if ( cgs.scores1 >= cgs.scores2 ) {
 		// red team
 		tmp = va( S_COLOR_RED "%i players " S_COLOR_WHITE "(%3i avg ping)", redCount, pingAvgRed );
-		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
+		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, finalY, tmp, &colour, uiTextStyle_e::ShadowedMore );
 		// blue team
 		tmp = va( S_COLOR_CYAN "%i players " S_COLOR_WHITE "(%3i avg ping)", blueCount, pingAvgBlue );
-		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
+		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, finalY, tmp, &colour, uiTextStyle_e::ShadowedMore );
+		finalY += font.Height( tmp );
 	}
 	else {
 		tmp = va( S_COLOR_CYAN "%i players " S_COLOR_WHITE "(%i avg ping)", blueCount, pingAvgBlue );
-		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
+		font.Paint( width / 2.0f - font.Width( tmp ) / 2.0f, finalY, tmp, &colour, uiTextStyle_e::ShadowedMore );
 		tmp = va( S_COLOR_RED "%i players " S_COLOR_WHITE "(%i avg ping)", redCount, pingAvgRed );
-		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, y, tmp, &colour, uiTextStyle_e::ShadowedMore );
+		font.Paint( width + width / 2.0f - font.Width( tmp ) / 2.0f, finalY, tmp, &colour, uiTextStyle_e::ShadowedMore );
+		finalY += font.Height( tmp );
 	}
 
 	tmp = va( "%2i spectators", specCount );
-	font.Paint( width - font.Width( tmp ) / 2.0f, y + lineHeight * 20, tmp, &colour );
+	font.Paint( width - font.Width( tmp ) / 2.0f, finalY + lineHeight * 20, tmp, &colour );
+	finalY += font.Height( tmp );
 }
 
-static void DrawPlayerCount( float fade ) {
+static void DrawPlayerCount( float fade, float &finalY ) {
 	switch ( cgs.gametype ) {
 	case GT_FFA:
 	case GT_HOLOCRON:
@@ -258,14 +262,14 @@ static void DrawPlayerCount( float fade ) {
 	case GT_DUEL:
 	case GT_POWERDUEL:
 	case GT_SINGLE_PLAYER:
-		DrawPlayerCount_Free( fade );
+		DrawPlayerCount_Free( fade, finalY );
 		break;
 
 	case GT_TEAM:
 	case GT_SIEGE:
 	case GT_CTF:
 	case GT_CTY:
-		DrawPlayerCount_Team( fade );
+		DrawPlayerCount_Team( fade, finalY );
 		break;
 	default:
 		break;
@@ -811,12 +815,13 @@ static int ListPlayers_Team( float fade, float x, float y, team_t team ) {
 	return -1;
 }
 
-static void DrawSpectators( float fade ) {
+static void DrawSpectators( float fade, float &finalY ) {
 	const Font font( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value, false );
 	const float lineHeight = 14.0f;
-	float y = 128.0f;
 	vector4 white = { 1.0f, 1.0f, 1.0f, 1.0f };
 	white.a = fade;
+
+	// y = 128.0f;
 
 	CG_BuildSpectatorString();
 	cg.scoreboard.spectatorWidth = font.Width( cg.scoreboard.spectatorList );
@@ -830,13 +835,14 @@ static void DrawSpectators( float fade ) {
 			cg.scoreboard.spectatorResetTime = cg.time;
 		}
 		font.Paint(
-			cg.scoreboard.spectatorX, (y + lineHeight * 20) - 3, cg.scoreboard.spectatorList, &white,
+			cg.scoreboard.spectatorX, (finalY + lineHeight * 20) - 3, cg.scoreboard.spectatorList, &white,
 			uiTextStyle_e::Shadowed
 		);
+		finalY += font.Height( cg.scoreboard.spectatorList );
 	}
 }
 
-static void DrawPlayers_Free( float fade ) {
+static void DrawPlayers_Free( float fade, float &finalY ) {
 	const int playerCount = PlayerCount( TEAM_FREE );
 	if ( !playerCount ) {
 		return;
@@ -844,7 +850,7 @@ static void DrawPlayers_Free( float fade ) {
 
 	const Font font( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value, false );
 	const float startX = 0.0f;
-	const float startY = 128.0f;
+	const float startY = finalY; // 128.0f;
 	float x = startX;
 	float y = startY;
 
@@ -999,10 +1005,10 @@ static void DrawPlayers_Free( float fade ) {
 	// TODO: bot: if ( ci->botSkill != -1 )
 	// TODO: ready: if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) )
 
-	DrawSpectators( fade );
+	DrawSpectators( fade, finalY );
 }
 
-static void DrawPlayers_Duel( float fade ) {
+static void DrawPlayers_Duel( float fade, float &finalY ) {
 	const int playerCount = PlayerCount( TEAM_FREE );
 	if ( !playerCount ) {
 		return;
@@ -1010,7 +1016,7 @@ static void DrawPlayers_Duel( float fade ) {
 
 	const Font font( JP_GetScoreboardFont(), cg_newScoreboardFontSize.value, false );
 	const float startX = 0.0f;
-	const float startY = 128.0f;
+	const float startY = finalY; // 128.0f;
 	float x = startX;
 	float y = startY;
 
@@ -1209,46 +1215,46 @@ static void DrawPlayers_Duel( float fade ) {
 	// TODO: bot: if ( ci->botSkill != -1 )
 	// TODO: ready: if ( cg.snap->ps.stats[STAT_CLIENTS_READY] & (1 << score->client) )
 
-	DrawSpectators( fade );
+	DrawSpectators( fade, finalY );
 }
 
 // vertical split
-static void DrawPlayers_Team( float fade ) {
-	const float y = 128.0f;
+static void DrawPlayers_Team( float fade, float &finalY ) {
+	// y = 128.0f;
 
 	if ( cgs.scores1 >= cgs.scores2 ) {
-		ListPlayers_Team( fade, 0, y, TEAM_RED );
-		ListPlayers_Team( fade, 0 + SCREEN_WIDTH / 2.0f, y, TEAM_BLUE );
+		ListPlayers_Team( fade, 0, finalY, TEAM_RED );
+		ListPlayers_Team( fade, 0 + SCREEN_WIDTH / 2.0f, finalY, TEAM_BLUE );
 	}
 	else {
-		ListPlayers_Team( fade, 0, y, TEAM_BLUE );
-		ListPlayers_Team( fade, 0 + SCREEN_WIDTH / 2.0f, y, TEAM_RED );
+		ListPlayers_Team( fade, 0, finalY, TEAM_BLUE );
+		ListPlayers_Team( fade, 0 + SCREEN_WIDTH / 2.0f, finalY, TEAM_RED );
 	}
 
-	DrawSpectators( fade );
+	DrawSpectators( fade, finalY );
 }
 
 // controller for drawing the 'players' section. will call the relevant functions based on gametype
 // this is so e.g. team games can have two panes, one for each team
-static void DrawPlayers( float fade ) {
+static void DrawPlayers( float fade, float &finalY ) {
 	switch ( cgs.gametype ) {
 	case GT_FFA:
 	case GT_HOLOCRON:
 	case GT_JEDIMASTER:
 	case GT_SINGLE_PLAYER:
-		DrawPlayers_Free( fade );
+		DrawPlayers_Free( fade, finalY );
 		break;
 
 	case GT_DUEL:
 	case GT_POWERDUEL:
-		DrawPlayers_Duel( fade );
+		DrawPlayers_Duel( fade, finalY );
 		break;
 
 	case GT_TEAM:
 	case GT_SIEGE:
 	case GT_CTF:
 	case GT_CTY:
-		DrawPlayers_Team( fade );
+		DrawPlayers_Team( fade, finalY );
 		break;
 
 	default:
@@ -1320,10 +1326,11 @@ qboolean CG_DrawJAPPScoreboard( void ) {
 		fade = fadeWhite.a;
 	}
 
-	DrawServerInfo( fade );
+	float y = 16.0f;
+	DrawServerInfo( fade, y );
 
-	DrawPlayerCount( fade );
-	DrawPlayers( fade );
+	DrawPlayerCount( fade, y );
+	DrawPlayers( fade, y );
 
 	DrawClientInfo( fade );
 

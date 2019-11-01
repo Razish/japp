@@ -23,6 +23,7 @@ if 'gcc' in env['CC'] or 'clang' in env['CC']:
 	json_env['CCFLAGS'] += [
 		'-Wno-unsuffixed-float-constants',
 		'-Wno-cast-qual',
+		'-Wno-implicit-fallthrough',
 	]
 
 # targets

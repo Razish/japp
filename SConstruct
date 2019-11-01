@@ -46,7 +46,8 @@ configuration = { 0: lambda x: 'release', 1: lambda x: 'debug', 2: lambda x: 'op
 # compare semantic versions (1.0.2 < 1.0.10 < 1.2.0)
 def cmp_version( v1, v2 ):
 	def normalise( v ):
-		return [int(x) for x in re.sub( r'(\.0+)*$', '', v ).split( '.' )]
+		return [int(x) for x in re.split( r'[^0-9.]', v )[0].split('.')]
+		#return [int(x) for x in re.sub( r'(\.0-+)*$', '', v ).split( '.' )]
 
 	return cmp(
 		normalise( v1 ),

@@ -223,7 +223,7 @@ void CG_ChatboxOutgoing( void ) {
 			else {
 				// this will happen if we're using global reply to an unknown tab
 				// we will hazard a guess that this is meant to be a private message
-				// if that fails, will fall back to team chat and hope the server can work some redirect magic (e.g. say_team_mod)w
+				// if that fails, will fall back to team chat and hope the server can work some redirect magic (e.g. say_team_mod)
 
 				// check if "@username"
 				if ( currentChatbox->shortname[0] == '@' ) {

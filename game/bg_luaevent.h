@@ -44,7 +44,7 @@ namespace JPLua {
 	char *Event_ChatMessageRecieved( int clientNum, const char *msg, int type );
 #endif
 
-#ifdef PROJECT_CGAME
+#if defined(PROJECT_CGAME)
 	char *Event_ChatMessageSent( const char *msg, messageMode_e mode, int targetClient, const char *shortName, const char *identifier );
 #endif
 
@@ -52,11 +52,11 @@ namespace JPLua {
 	char *Event_ChatMessagePlugin( int clientNum, const char *msg );
 #endif
 
-#ifdef PROJECT_GAME
+#if defined(PROJECT_GAME)
 	void Event_ClientBegin( int clientNum );
 #endif
 
-#ifdef PROJECT_GAME
+#if defined(PROJECT_GAME)
 	qboolean Event_ClientCommand( int clientNum );
 #endif
 
@@ -66,31 +66,31 @@ namespace JPLua {
 	void Event_ClientConnect( int clientNum );
 #endif
 
-#ifdef PROJECT_GAME
+#if defined(PROJECT_GAME)
 	void Event_ClientDisconnect( int clientNum );
 #endif
 
-#ifdef PROJECT_CGAME
+#if defined(PROJECT_CGAME)
 	void Event_ClientInfoUpdate( int clientNum, clientInfo_t *oldInfo, clientInfo_t *newInfo );
 #endif
 
-#ifdef PROJECT_GAME
+#if defined(PROJECT_GAME)
 	void Event_ClientSpawn( int clientNum, qboolean firstSpawn );
 #endif
 
-#ifdef PROJECT_GAME
+#if defined(PROJECT_GAME)
 	qboolean Event_ClientUserinfoChanged( int clientNum, char *userinfo );
 #endif
 
-#ifdef PROJECT_CGAME
+#if defined(PROJECT_CGAME)
 	qboolean Event_HUD( void );
 #endif
 
-#ifdef PROJECT_CGAME
+#if defined(PROJECT_CGAME)
 	qboolean Event_VehicleHUD( void );
 #endif
 
-#ifdef PROJECT_CGAME
+#if defined(PROJECT_CGAME)
 	qboolean Event_ConnectScreen( void );
 #endif
 
@@ -101,26 +101,28 @@ namespace JPLua {
 #endif
 
 #if defined(PROJECT_GAME)
-	void Event_PlayerDeath( int clientNum, int mod, int inflictor );
+	void Event_PlayerDeath(
 #elif defined(PROJECT_CGAME)
-	bool Event_PlayerDeath( int clientNum, int mod, int inflictor );
+	bool Event_PlayerDeath(
 #endif
+		int clientNum, int mod, int inflictor
+	);
 
-#ifdef PROJECT_CGAME
+#if defined(PROJECT_CGAME)
 	void Event_PrivateDuel( int number, int eventParm );
 #endif
 
-#ifdef PROJECT_CGAME
+#if defined(PROJECT_CGAME)
 	void Event_SaberTouch( int victim, int attacker );
 #endif
 
-#ifdef PROJECT_CGAME
+#if defined(PROJECT_CGAME)
 	qboolean Event_ConsoleCommand( void );
 #endif
 
 	qboolean Event_ServerCommand( void );
 
-#ifdef PROJECT_CGAME
+#if defined(PROJECT_CGAME)
 	qboolean Event_KeyDown( int key );
 #endif
 

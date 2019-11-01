@@ -100,7 +100,8 @@ enum {
 	NUM_TYPES
 };
 
-enum {
+#undef MSG_EOF
+enum messageTypes_e {
 	MSG_COMPLETED,
 	MSG_EOF,
 	NUM_MESSAGES,

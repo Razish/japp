@@ -1169,6 +1169,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 	case IT_BAD:
 		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );
+		return qfalse;
 	default:
 #ifdef _DEBUG
 		Com_Printf( "BG_CanItemBeGrabbed: unknown enum %d\n", item->giType );

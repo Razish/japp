@@ -2268,12 +2268,11 @@ static void UI_DrawCrosshair( rectDef_t *rect, float scale, const vector4 *color
 	float size = 32.0f;
 
 	trap->R_SetColor( color );
-	if ( uiInfo.currentCrosshair < 0 || uiInfo.currentCrosshair >= NUM_CROSSHAIRS )
-		uiInfo.currentCrosshair = 0;
+	const qhandle_t hShader = uiInfo.uiDC.Assets.crosshairShader[Q_clampi( 1, uiInfo.currentCrosshair, NUM_CROSSHAIRS ) - 1];
 
 	size = std::min( rect->w, rect->h );
 
-	UI_DrawHandlePic( rect->x, rect->y, size, size, uiInfo.uiDC.Assets.crosshairShader[uiInfo.currentCrosshair] );
+	UI_DrawHandlePic( rect->x, rect->y, size, size, hShader );
 	trap->R_SetColor( NULL );
 }
 
@@ -7758,7 +7757,7 @@ static void UI_BuildQ3Model_List( void ) {
 
 				s = 0;
 
-				//Raz: Slider does a hack here to remove siege models and tavion/possessed
+				//Raz: Slider does a hack here to remove siege models and tavion/possessed (probably just red/blue/default)
 
 				while ( s < uiInfo.q3HeadCount ) { //check for dupes
 					if ( !Q_stricmp( va( "%s%s", dirptr, skinname ), uiInfo.q3HeadNames[s] ) ) {

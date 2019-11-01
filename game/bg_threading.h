@@ -5,7 +5,7 @@
 #include <future>
 /*
 
-new Task([ function ], [ callback ( nullptr) ], argN...) 
+new Task([ function ], [ callback ( nullptr) ], argN...)
 
 
 */
@@ -14,7 +14,8 @@ class TaskInterface {
 public:
 	virtual bool isReady(void) = 0;
 	virtual void runCallback(void *arg) = 0 ;
-	virtual void* getResult(void) = 0; 
+	virtual void* getResult(void) = 0;
+	virtual ~TaskInterface() = 0;
 };
 
 extern std::vector<TaskInterface*> tasks;
@@ -47,7 +48,7 @@ public:
 
 	bool isReady(void)
 	{
-		if (valid && this.wait_for(std::chrono::microseconds(1)) == std::future_status::ready) {
+		if (valid && this->wait_for(std::chrono::microseconds(1)) == std::future_status::ready) {
 			return true;
 		}
 		return false;

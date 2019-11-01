@@ -271,6 +271,7 @@ static void UI_RGBForSaberColor( saber_colors_t color, vector3 *rgb, int bnum ) 
 		break;
 	case SABER_BLACK:
 		VectorSet( rgb, 1.0f, 1.0f, 1.0f );
+		// fall through
 	default:
 	case SABER_RGB:
 		if ( bnum == 0 ) {
@@ -283,8 +284,9 @@ static void UI_RGBForSaberColor( saber_colors_t color, vector3 *rgb, int bnum ) 
 			rgb->g = atoi( UI_Cvar_VariableString( "ui_sab2_g" ) );
 			rgb->b = atoi( UI_Cvar_VariableString( "ui_sab2_b" ) );
 		}
-		for ( i = 0; i < 3; i++ )
+		for ( i = 0; i < 3; i++ ) {
 			rgb->raw[i] /= 255;
+		}
 		break;
 	}
 }
