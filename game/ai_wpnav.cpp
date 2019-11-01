@@ -1910,7 +1910,7 @@ int SavePathData( const char *filename ) {
 	fileString = (char *)B_TempAlloc( 524288 );
 	storeString = (char *)B_TempAlloc( 4096 );
 
-	Com_sprintf( fileString, 524288, "%i %i %f (%s) { ", gWPArray[i]->index, gWPArray[i]->flags, (double)gWPArray[i]->weight, vtos( &gWPArray[i]->origin ) );
+	Com_sprintf( fileString, 524288, "%i %i %f %s { ", gWPArray[i]->index, gWPArray[i]->flags, (double)gWPArray[i]->weight, vtos( &gWPArray[i]->origin ) );
 
 	n = 0;
 
@@ -1940,7 +1940,7 @@ int SavePathData( const char *filename ) {
 
 	while ( i < gWPNum ) {
 		//sprintf(fileString, "%s%i %i %f (%f %f %f) { ", fileString, gWPArray[i]->index, gWPArray[i]->flags, gWPArray[i]->weight, gWPArray[i]->origin.x, gWPArray[i]->origin.y, gWPArray[i]->origin.z);
-		Com_sprintf( storeString, 4096, "%i %i %f (%s) { ", gWPArray[i]->index, gWPArray[i]->flags, (double)gWPArray[i]->weight, vtos( &gWPArray[i]->origin ) );
+		Com_sprintf( storeString, 4096, "%i %i %f %s { ", gWPArray[i]->index, gWPArray[i]->flags, (double)gWPArray[i]->weight, vtos( &gWPArray[i]->origin ) );
 
 		n = 0;
 
