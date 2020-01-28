@@ -4990,8 +4990,19 @@ void CG_AddSaberBlade( centity_t *cent, centity_t *scent, refEntity_t *saber, in
 	VectorMA( &org, saberLen, &axis[0], &end );
 	VectorAdd( &end, &axis[0], &end );
 
-	if ( cent->currentState.eType == ET_NPC )
-		scolor = client->saber[saberNum].blade[bladeNum].color;
+	if ( cent->currentState.eType == ET_NPC ) {
+		if ( cent->currentState.boltToPlayer ) {
+			if ( saberNum == 0 ) {
+				scolor = (cent->currentState.boltToPlayer & 0x07) - 1;
+			}
+			else {
+				scolor = ((cent->currentState.boltToPlayer & 0x38) >> 3) - 1;
+			}
+		}
+		else {
+			scolor = client->saber[saberNum].blade[bladeNum].color;
+		}
+	}
 	else {
 		if ( saberNum == 0 )
 			scolor = client->icolor1;

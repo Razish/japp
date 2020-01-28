@@ -2069,7 +2069,8 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 				if ( NPC->client ) {
 					saber_colors_t color = TranslateSaberColor( value );
 					for ( n = 0; n < MAX_BLADES; n++ ) {
-						NPC->client->saber[0].blade[n].color = color;
+						NPC->s.boltToPlayer = NPC->s.boltToPlayer & 0x38;//(111000)
+						NPC->s.boltToPlayer += (color + 1);
 					}
 				}
 				continue;
@@ -2152,7 +2153,8 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 				if ( NPC->client ) {
 					saber_colors_t color = TranslateSaberColor( value );
 					for ( n = 0; n < MAX_BLADES; n++ ) {
-						NPC->client->saber[1].blade[n].color = color;
+						NPC->s.boltToPlayer = NPC->s.boltToPlayer & 0x7;//(000111)
+						NPC->s.boltToPlayer += ((color + 1) << 3);
 					}
 				}
 				continue;
