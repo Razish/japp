@@ -918,7 +918,7 @@ static void PM_Friction( void ) {
 
 // Handles user intended acceleration
 static void PM_Accelerate( vector3 *wishdir, float wishspeed, float accel ) {
-	if ( pm->gametype != GT_SIEGE
+	if ( (pm->gametype != GT_SIEGE && !GetCInfo( CINFO_NOSTRAFEJUMP ))
 		|| pm->ps->m_iVehicleNum
 		|| pm->ps->clientNum >= MAX_CLIENTS
 		|| pm->ps->pm_type != PM_NORMAL ) { //standard method, allows "bunnyhopping" and whatnot

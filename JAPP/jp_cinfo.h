@@ -28,7 +28,7 @@
 #define CINFO_NODFA				(0x02000000u) // |--don't allow DFAs
 #define CINFO_TOGGLESPECIALATK	(0x04000000u) // ^ allow toggling of these
 #define CINFO_VQ3PHYS			(0x08000000u)
-#define CINFO_UNUSED04			(0x10000000u)
+#define CINFO_NOSTRAFEJUMP		(0x10000000u)
 #define CINFO_UNUSED03			(0x20000000u)
 #define CINFO_UNUSED02			(0x40000000u)
 #define CINFO_UNUSED01			(0x80000000u)
