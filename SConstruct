@@ -43,6 +43,9 @@ proj = ARGUMENTS.get( 'project', 'game,cgame,ui' )
 
 configuration = { 0: lambda x: 'release', 1: lambda x: 'debug', 2: lambda x: 'optimised-debug' }[debug](debug)
 
+def cmp(a, b):
+	return (a > b) - (a < b)
+
 # compare semantic versions (1.0.2 < 1.0.10 < 1.2.0)
 def cmp_version( v1, v2 ):
 	def normalise( v ):
@@ -61,10 +64,10 @@ def run_command( cmd ):
 		stderr=subprocess.PIPE
 	)
 	out, err = p.communicate()
-	out = out.strip('\n') # bah why is this necessary
+	
 	if err:
 		print( 'run_command: ' + err )
-	return 0 if not err else 1, out
+	return 0 if not err else 1, out.decode('utf-8')
 
 host_plat = platform.system() # Windows, Linux, Darwin
 target_plat = ARGUMENTS.get( 'target', host_plat ) # Windows, Linux, Darwin
