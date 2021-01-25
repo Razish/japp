@@ -65,9 +65,11 @@ def run_command( cmd ):
 	)
 	out, err = p.communicate()
 	
+	out = out.decode('utf-8').strip('\n')
+	
 	if err:
 		print( 'run_command: ' + err )
-	return 0 if not err else 1, out.decode('utf-8')
+	return 0 if not err else 1, out
 
 host_plat = platform.system() # Windows, Linux, Darwin
 target_plat = ARGUMENTS.get( 'target', host_plat ) # Windows, Linux, Darwin
