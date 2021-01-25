@@ -213,14 +213,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeBuildCommandLine>scons.bat -Q debug=1 no_sql=1 tools=default project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>scons.bat -Q -c debug=1 no_sql=1 tools=default project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeCleanCommandLine>
+    <NMakeBuildCommandLine>scons.exe -Q force32=1 debug=1 no_sql=1 tools=default project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.exe -Q -c force32=1 debug=1 no_sql=1 tools=default project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;PROJECT_GAME;$(NMakePreprocessorDefinitions);JPLUA;</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(SolutionDir);$(SolutionDir)game;$(SolutionDir)cgame;$(SolutionDir)ui;$(SolutionDir)mysql;$(SolutionDir)sqlite</NMakeIncludeSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <NMakeBuildCommandLine>scons.bat -Q no_sql=1 project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeBuildCommandLine>
-    <NMakeCleanCommandLine>scons.bat -Q -c no_sql=1 project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeCleanCommandLine>
+    <NMakeBuildCommandLine>scons.exe -Q force32=1 no_sql=1 project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>scons.exe -Q -c force32=1 no_sql=1 project=game -f $(SolutionDir)\SConstruct -C $(SolutionDir)\</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;PROJECT_GAME;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(SolutionDir);$(SolutionDir)game;$(SolutionDir)cgame;$(SolutionDir)ui;$(SolutionDir)mysql;$(SolutionDir)sqlite</NMakeIncludeSearchPath>
   </PropertyGroup>
