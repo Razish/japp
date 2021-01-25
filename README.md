@@ -8,7 +8,7 @@ see [japp.jkhub.org](http://japp.jkhub.org) for more information
 * Python 3.9.1
 * [Scons](https://github.com/SCons/scons)
 
-ex: `scons debug=1 force32=1`
+e.g. `scons debug=1 force32=1`
 
 Windows
 
