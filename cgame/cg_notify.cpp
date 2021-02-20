@@ -36,6 +36,9 @@ bool CG_NotifySend( const char *title, const char *msg, uint32_t timeout, const 
 	}
 
 	NotifyNotification *n = notify_notification_new( titleBuf, msg, iconName );
+	if ( !n ) {
+		return false;
+	}
 	notify_notification_set_timeout( n, timeout );
 	GError *err = nullptr;
 	if ( !notify_notification_show( n, &err ) ) {
