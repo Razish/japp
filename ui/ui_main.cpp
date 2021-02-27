@@ -3038,11 +3038,11 @@ static qboolean UI_NetGameType_HandleKey( uint32_t flags, float *special, int ke
 			value++;
 		}
 
-		if ( value < -1 ) {
+		if ( value < 0 ) {
 			value = GT_MAX_GAME_TYPE - 1;
 		}
 		else if ( value >= GT_MAX_GAME_TYPE ) {
-			value = -1;
+			value = 0;
 		}
 
 		trap->Cvar_Set( "ui_netGameType", va( "%d", value ) );

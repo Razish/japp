@@ -7921,7 +7921,7 @@ void BG_IK_MoveArm( void *ghoul2, int lHandBolt, int time, entityState_t *ent, i
 		trap->G2API_SetBoneAngles( ghoul2, 0, "lradius", &vec3_origin, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y, NEGATIVE_Z, NULL, 0, time );
 
 		//Get the anim/frames that the pelvis is on exactly, and match the left arm back up with them again.
-		trap->G2API_GetBoneAnim( ghoul2, "pelvis", (const int)time, &cFrame, &sFrame, &eFrame, &flags, &animSpeed, 0, 0 );
+		trap->G2API_GetBoneAnim( ghoul2, "pelvis", time, &cFrame, &sFrame, &eFrame, &flags, &animSpeed, 0, 0 );
 		trap->G2API_SetBoneAnim( ghoul2, 0, "lhumerus", sFrame, eFrame, flags, animSpeed, time, sFrame, 300 );
 		trap->G2API_SetBoneAnim( ghoul2, 0, "lradius", sFrame, eFrame, flags, animSpeed, time, sFrame, 300 );
 

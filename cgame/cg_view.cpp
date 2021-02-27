@@ -2347,9 +2347,4 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	}
 
 	trap->R_SetColor( NULL );
-
-#ifdef _DEBUG
-	if ( cg_stats.integer )
-		trap->Print( "cg.clientFrame:%i\n", cg.clientFrame );
-#endif
 }
