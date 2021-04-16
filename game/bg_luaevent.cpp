@@ -178,15 +178,18 @@ namespace JPLua {
 
 				// returned nil, no use passing it to other plugins
 				if ( retType == LUA_TNIL ) {
+					lua_pop( ls.L, 1 );
 					return NULL;
 				}
 				else if ( retType == LUA_TSTRING ) {
 					Q_strncpyz( tmpMsg, lua_tostring( ls.L, -1 ), sizeof(tmpMsg) );
+					lua_pop( ls.L, 1 );
 				}
 				else {
 					trap->Print(
 						"Invalid return value in %s (JPLUA_EVENT_CHATMSGRECV), expected string or nil but got %s", plugin->name, lua_typename( ls.L, -1 )
 					);
+					lua_pop( ls.L, 1 );
 				}
 			}
 		}
@@ -218,15 +221,18 @@ namespace JPLua {
 
 				// returned nil, no use passing it to other plugins
 				if ( lua_type( ls.L, -1 ) == LUA_TNIL ) {
+					lua_pop( ls.L, 1 );
 					return NULL;
 				}
 				else if ( lua_type( ls.L, -1 ) == LUA_TSTRING ) {
 					Q_strncpyz( tmpMsg, lua_tostring( ls.L, -1 ), MAX_SAY_TEXT );
+					lua_pop( ls.L, 1 );
 				}
 				else {
 					trap->Print(
 						"Invalid return value in %s (JPLUA_EVENT_CHATMSGSEND), expected string or nil but got %s\n", plugin->name, lua_typename( ls.L, -1 )
 					);
+					lua_pop( ls.L, 1 );
 				}
 			}
 		}
@@ -258,15 +264,18 @@ namespace JPLua {
 
 				// returned nil, no use passing it to other plugins
 				if ( retType == LUA_TNIL ) {
+					lua_pop( ls.L, 1 );
 					return NULL;
 				}
 				else if ( retType == LUA_TSTRING ) {
 					Q_strncpyz( tmpMsg, lua_tostring( ls.L, -1 ), sizeof(tmpMsg) );
+					lua_pop( ls.L, 1 );
 				}
 				else {
 					trap->Print(
 						"Invalid return value in %s (JPLUA_EVENT_CHATMSGPLUGIN), expected string or nil but got %s", plugin->name, lua_typename( ls.L, -1 )
 					);
+					lua_pop( ls.L, 1 );
 				}
 			}
 		}
@@ -322,16 +331,19 @@ namespace JPLua {
 				Call( ls.L, 2, 1 );
 				int retType = lua_type( ls.L, -1 );
 				if ( retType == LUA_TNIL ) {
+					lua_pop( ls.L, 1 );
 					continue;
 				}
 				else if ( retType == LUA_TNUMBER ) {
 					ret = qtrue;
+					lua_pop( ls.L, 1 );
 					break;
 				}
 				else {
 					trap->Print( "Invalid return value in %s (JPLUA_EVENT_CLIENTCOMMAND), expected integer or nil but "
 						"got %s\n", plugin->name, lua_typename( ls.L, -1 )
 					);
+					lua_pop( ls.L, 1 );
 				}
 			}
 		}
@@ -362,6 +374,7 @@ namespace JPLua {
 	const char *Event_ClientConnect( int clientNum, const char *userinfo, const char *IP, qboolean firstTime ) {
 #ifdef JPLUA
 		plugin_t *plugin = NULL;
+		const char* string = NULL;
 		while ( IteratePlugins( &plugin ) ) {
 			if ( plugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] ) {
 				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_CLIENTCONNECT] );
@@ -375,15 +388,23 @@ namespace JPLua {
 
 				// connection allowed, pass to other plugins
 				if ( lua_type( ls.L, -1 ) == LUA_TNIL )
+				{
+					lua_pop( ls.L, 1 );
 					continue;
+				}
 
 				// denied, no use passing it to other plugins
-				if ( lua_type( ls.L, -1 ) == LUA_TSTRING )
-					return lua_tostring( ls.L, -1 );
+				if (lua_type(ls.L, -1) == LUA_TSTRING)
+				{
+					string = lua_tostring( ls.L, -1 );
+					lua_pop( ls.L, 1 );
+					return string;
+				}
 				else {
 					trap->Print( "Invalid return value in %s (JPLUA_EVENT_CLIENTCONNECT), expected string or nil but "
 						"got %s\n", plugin->name, lua_typename( ls.L, -1 )
 					);
+					lua_pop( ls.L, 1 );
 					return NULL;
 				}
 			}
@@ -592,6 +613,12 @@ namespace JPLua {
 					trap->Print( "Invalid return value in %s (JPLUA_EVENT_CLIENTUSERINFOCHANGED), expected table or nil"
 						" but got %s\n", plugin->name, lua_typename( ls.L, -1 )
 					);
+					lua_pop( ls.L, 1 );
+				}
+				else
+				{
+					//the return type was nil, but we still have to pop it off the lua stack.
+					lua_pop( ls.L, 1 );
 				}
 			}
 		}
@@ -612,6 +639,7 @@ namespace JPLua {
 				lua_pushunsigned( ls.L, events );
 				Call( ls.L, 1, 1 );
 				events |= lua_tounsigned( ls.L, -1 );
+				lua_pop( ls.L, 1 );
 			}
 		}
 #endif //JPLUA
@@ -632,6 +660,7 @@ namespace JPLua {
 				Call( ls.L, 0, 1 );
 				if ( !ret )
 					ret = !!lua_tointeger( ls.L, -1 );
+				lua_pop( ls.L, 1 );
 			}
 		}
 #endif //JPLUA
@@ -652,6 +681,7 @@ namespace JPLua {
 				Call( ls.L, 0, 1 );
 				if ( !ret )
 					ret = !!lua_tointeger( ls.L, -1 );
+				lua_pop( ls.L, 1 );
 			}
 		}
 #endif //JPLUA
@@ -732,6 +762,7 @@ namespace JPLua {
 				if ( !ret ) {
 					ret = !!lua_toboolean( ls.L, -1 );
 				}
+				lua_pop( ls.L, 1 );
 #endif
 			}
 		}
@@ -861,8 +892,8 @@ namespace JPLua {
 #ifdef JPLUA
 		plugin_t *plugin = NULL;
 		while ( IteratePlugins( &plugin ) ) {
-			if ( plugin->eventListeners[JPLUA_EVENT_PAIN] ) {
-				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_PAIN] );
+			if ( plugin->eventListeners[JPLUA_EVENT_KEYDOWN] ) {
+				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_KEYDOWN] );
 
 				lua_pushstring( ls.L, va("%c", key));
 
@@ -870,6 +901,7 @@ namespace JPLua {
 				if ( !ret ) {
 					ret = !!lua_toboolean( ls.L, -1 );
 				}
+				lua_pop( ls.L, 1 );
 			}
 		}
 #endif // JPLUA

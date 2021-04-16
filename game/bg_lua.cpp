@@ -144,6 +144,7 @@ namespace JPLua {
 	const char *DoString( const char *str ) {
 		if ( luaL_dostring( ls.L, str ) != 0 ) {
 			const char *errorMsg = lua_tostring( ls.L, -1 );
+			lua_pop( ls.L, 1 );
 			trap->Print( S_COLOR_RED "Lua Error: " S_COLOR_WHITE "%s\n", errorMsg );
 			return errorMsg;
 		}
@@ -217,7 +218,7 @@ namespace JPLua {
 			trap->Print( S_COLOR_GREEN "JPLua " S_COLOR_RED "Error: %s\n", lua_tostring( L, -1 ) );
 			lua_pop( L, 1 );
 
-			//TODO: disable current plugin..?
+			DisablePlugin(ls.currentPlugin, qtrue);
 			return qfalse;
 		}
 		return qtrue;
@@ -481,14 +482,14 @@ namespace JPLua {
 
 		return true;
 	}
-
-	void DisablePlugin( plugin_t *plugin ) {
+	void DisablePlugin( plugin_t *plugin, qboolean error ) {
 		if ( !plugin->enabled ) {
 			trap->Print( S_COLOR_YELLOW "plugin '%s' already unloaded\n", plugin->name );
+			return;
 		}
 
 		// call the unload event
-		if ( plugin->eventListeners[JPLUA_EVENT_UNLOAD] ) {
+		if ( plugin->eventListeners[JPLUA_EVENT_UNLOAD] && !error ) {
 			// save the current plugin
 			plugin_t *current = ls.currentPlugin;
 			ls.currentPlugin = plugin;
@@ -496,6 +497,9 @@ namespace JPLua {
 			lua_pushboolean( ls.L, qfalse );
 			Call( ls.L, 1, 0 );
 			ls.currentPlugin = current;
+		}
+		else {
+			return;
 		}
 		std::vector<std::string> todelete; // TODO: Find another safe way to remove commands?
 #ifdef PROJECT_GAME

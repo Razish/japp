@@ -644,6 +644,7 @@ gentity_t *SelectRandomFurthestSpawnPoint( vector3 *avoidPoint, vector3 *origin,
 	// select a random spot from the spawn points furthest away
 	//rnd = random() * (numSpots / 2);
 	//rnd = Q_irand( 0, QRAND_MAX - 1 ) / numSpots
+	numSpots--; //this is currently a workaround for the "numSpots" value being null from the while loops above.
 	rnd = Q_irand( 0, numSpots );
 
 	VectorCopy( &list_spot[rnd]->s.origin, origin );

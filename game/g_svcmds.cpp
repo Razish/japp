@@ -408,7 +408,7 @@ static void SV_LuaDisablePlugin( void ){
 	if (!name[0]) return;
 	JPLua::plugin_t *plg = JPLua::FindPlugin(name);
 	if (plg){
-		JPLua::DisablePlugin(plg);
+		JPLua::DisablePlugin(plg, qfalse);
 	}
 }
 #endif

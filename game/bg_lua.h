@@ -48,7 +48,7 @@ namespace JPLua {
 	qboolean IteratePluginsTemp( plugin_t **plugin, bool ifActive = true ); // FIXME: hide type of plugin_t?
 	void ListPlugins( void );
 	bool EnablePlugin( plugin_t *plugin );
-	void DisablePlugin( plugin_t *plugin );
+	void DisablePlugin( plugin_t *plugin, qboolean error );
 	plugin_t *FindPlugin( const char * const pluginName );
 	void UpdateAutoload( void );
 	const char *DoString( const char *str );

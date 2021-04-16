@@ -324,7 +324,7 @@ void CG_LuaReload_f( void ) {
 	for ( char *p = strtok( args, delim ); p; p = strtok( NULL, delim ) ) {
 		JPLua::plugin_t *plugin = JPLua::FindPlugin( p );
 		if ( plugin ) {
-			JPLua::DisablePlugin( plugin );
+			JPLua::DisablePlugin( plugin, qfalse);
 			JPLua::EnablePlugin( plugin );
 		}
 	}
@@ -340,7 +340,7 @@ void CG_LuaUnload_f( void ) {
 	trap->Cmd_Argv( 1, pluginName, sizeof(pluginName) );
 	JPLua::plugin_t *plugin = JPLua::FindPlugin( pluginName );
 	if ( plugin ) {
-		JPLua::DisablePlugin( plugin );
+		JPLua::DisablePlugin( plugin, qfalse );
 	}
 }
 
