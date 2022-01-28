@@ -144,6 +144,7 @@ namespace JPLua {
 	const char *DoString( const char *str ) {
 		if ( luaL_dostring( ls.L, str ) != 0 ) {
 			const char *errorMsg = lua_tostring( ls.L, -1 );
+			lua_pop( ls.L, 1 );
 			trap->Print( S_COLOR_RED "Lua Error: " S_COLOR_WHITE "%s\n", errorMsg );
 			return errorMsg;
 		}
