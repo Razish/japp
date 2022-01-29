@@ -1,26 +1,26 @@
 #pragma once
 
 #ifdef JPLUA
-#include "bg_luacvar.h"
-#include "bg_luaentity.h"
-#include "bg_luaevent.h"
-#include "bg_luafs.h"
-#include "bg_lualogger.h"
-#include "bg_luaplayer.h"
-#include "bg_luaserialiser.h"
-#include "bg_luavector.h"
-#include "bg_luasocket.h"
+#include "game/bg_luacvar.h"
+#include "game/bg_luaentity.h"
+#include "game/bg_luaevent.h"
+#include "game/bg_luafs.h"
+#include "game/bg_lualogger.h"
+#include "game/bg_luaplayer.h"
+#include "game/bg_luaserialiser.h"
+#include "game/bg_luavector.h"
+#include "game/bg_luasocket.h"
 
 #if defined(PROJECT_GAME)
-	#include "g_luasql.h"
-	#include "g_luaweapon.h"
+	#include "game/g_luasql.h"
+	#include "game/g_luaweapon.h"
 #elif defined(PROJECT_CGAME)
-	#include "cg_luafont.h"
-	#include "cg_luainterface.h"
-	#include "cg_lualocalentity.h"
-	#include "cg_luarefentity.h"
-	#include "cg_luaserver.h"
-	#include "cg_luatextbox.h"
+	#include "cgame/cg_luafont.h"
+	#include "cgame/cg_luainterface.h"
+	#include "cgame/cg_lualocalentity.h"
+	#include "cgame/cg_luarefentity.h"
+	#include "cgame/cg_luaserver.h"
+	#include "cgame/cg_luatextbox.h"
 #endif
 
 #include "semver/semver.h"

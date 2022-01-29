@@ -2199,12 +2199,13 @@ team_t BG_GetOpposingTeam( team_t team ) {
 	}
 }
 
+bool BG_HasSetSaberOnly(
 #if defined(PROJECT_GAME)
-bool BG_HasSetSaberOnly( void )
+	void
 #elif defined(PROJECT_CGAME) || defined(PROJECT_UI)
-bool BG_HasSetSaberOnly( const char *info )
+	const char *info
 #endif
-{
+) {
 #if defined(PROJECT_GAME)
 	const int gametype = level.gametype;
 #elif defined(PROJECT_CGAME)

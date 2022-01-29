@@ -1,12 +1,12 @@
 #if defined(PROJECT_GAME)
 #include "g_local.h"
 #elif defined(PROJECT_CGAME)
-#include "cg_local.h"
-#include "cg_notify.h"
+#include "cgame/cg_local.h"
+#include "cgame/cg_notify.h"
 #endif
 #include "ui/ui_fonts.h"
 
-#include "bg_luainternal.h"
+#include "game/bg_luainternal.h"
 
 #ifdef JPLUA
 
@@ -302,7 +302,7 @@ namespace JPLua {
 				trap->Print( "%s", lua_typename( L, t ) );
 				break;
 			}
-			trap->Print( "  " );
+			trap->Print( "\n" );
 		}
 		trap->Print( "\n" );
 

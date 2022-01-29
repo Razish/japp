@@ -766,7 +766,7 @@ void CG_ChatboxScroll( int direction ) {
 	}
 }
 
-void CG_ChatboxTabComplete( void ) {
+static void CG_ChatboxTabComplete( void ) {
 	if ( cg_chatboxCompletion.integer ) {
 		int i = 0, match = -1, numMatches = 0;
 		char currWord[MAX_INFO_STRING] = { 0 };

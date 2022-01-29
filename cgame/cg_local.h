@@ -3,10 +3,10 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 #include "qcommon/q_shared.h"
-#include "tr_types.h"
+#include "cgame/tr_types.h"
 #include "ui/menudef.h"
-#include "bg_public.h"
-#include "cg_public.h"
+#include "game/bg_public.h"
+#include "cgame/cg_public.h"
 
 //Raz: Added
 #define XCVAR_PROTO
@@ -908,7 +908,6 @@ void			CG_ChatboxScroll( int direction );
 void			CG_ChatboxSelect( const char *cbName );
 void			CG_ChatboxSelectTabNext( void );
 void			CG_ChatboxSelectTabPrev( void );
-void			CG_ChatboxTabComplete( void );
 void			CG_CheckChangedPredictableEvents( playerState_t *ps );
 void			CG_CheckEvents( centity_t *cent );
 void			CG_CheckPlayerG2Weapons( playerState_t *ps, centity_t *cent );

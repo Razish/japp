@@ -2340,7 +2340,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	cg.currentRefdef = REFDEF_DEFAULT;
 
 	// draw the cursor
-	if ( (trap->Key_GetCatcher() & KEYCATCH_CGAME) /*&& !CG_ChatboxActive()*/ ) {
+	if ( (trap->Key_GetCatcher() & KEYCATCH_CGAME) ) {
 		const float cursorSize = 48.0f;
 		displayContextDef_t *dc = Display_GetContext();
 		CG_DrawPic( dc->cursorx, dc->cursory, cursorSize, cursorSize, cgs.activeCursor );
