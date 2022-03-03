@@ -8607,7 +8607,7 @@ void BG_G2ATSTAngles( void *ghoul2, int time, vector3 *cent_lerpAngles ) {//				
 static qboolean PM_AdjustAnglesForDualJumpAttack( playerState_t *ps, usercmd_t *ucmd ) {
 	//ucmd->angles.pitch = ANGLE2SHORT( ps->viewangles.pitch ) - ps->delta_angles.pitch;
 	//ucmd->angles.yaw = ANGLE2SHORT( ps->viewangles.yaw ) - ps->delta_angles.yaw;
-	return qtrue;
+	return ps->fd.saberAnimLevel != SS_STRONG;
 }
 
 static void PM_CmdForSaberMoves( usercmd_t *ucmd ) {
@@ -9270,7 +9270,12 @@ void PmoveSingle( pmove_t *pmove ) {
 		|| pm->ps->legsAnim == BOTH_JUMPFLIPSTABDOWN
 		|| pm->ps->legsAnim == BOTH_JUMPFLIPSLASHDOWN1
 		|| pm->ps->legsAnim == BOTH_NEW_STABEE
-		|| pm->ps->legsAnim == BOTH_NEW_STABER )
+		|| pm->ps->legsAnim == BOTH_NEW_STABER
+		|| pm->ps->legsAnim == BOTH_JUMP_BACKFLIP_ATCK
+		|| pm->ps->legsAnim == BOTH_JUMP_BACKFLIP_ATCKEE
+		|| pm->ps->legsAnim == BOTH_JUMP_BACKFLIP_ATCK_MISSED
+		|| pm->ps->legsAnim == BOTH_ALORA_SPIN_SLASH
+		|| pm->ps->legsAnim == BOTH_FJSS_TR_BL )
 	{
 		stiffenedUp = qtrue;
 	}
@@ -9616,7 +9621,7 @@ void PmoveSingle( pmove_t *pmove ) {
 		|| pm->ps->saberMove == LS_A_BACK_CR
 		|| pm->ps->saberMove == LS_A_BACK
 		|| pm->ps->saberMove == LS_A_BACKSTAB
-		|| pm->ps->saberMove == LS_JAPLUS_NEWANIM_FLIPSABERSTAB )
+		/*|| pm->ps->saberMove == LS_JAPLUS_NEWANIM_FLIPSABERSTAB*/ )
 	{
 		PM_SetPMViewAngle( pm->ps, &pm->ps->viewangles, &pm->cmd );
 	}

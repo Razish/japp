@@ -681,6 +681,8 @@ void Q_strncpyz( char *dest, const char *src, int destsize ) {
 		return;
 	}
 
+	assert( dest != src );
+
 	strncpy( dest, src, destsize - 1 );
 	dest[destsize - 1] = 0;
 }
@@ -957,6 +959,17 @@ void Q_ConvertLinefeeds( char *string ) {
 		if ( w < r )
 			*w = '\0';
 	}
+}
+
+int Q_CountChars( const char *str, char needle ) {
+	int c = 0;
+	while ( *str ) {
+		if ( *str == needle ) {
+			c++;
+		}
+		str++;
+	}
+	return c;
 }
 
 void Q_LerpColour( const vector4 *start, const vector4 *end, vector4 *out, float point ) {
@@ -1356,7 +1369,7 @@ void Q_FSBinaryDump( const char *filename, const void *buffer, size_t len ) {
 
 // serialise a JSON object and write it to the specified file
 void Q_FSWriteJSON( void *root, fileHandle_t f ) {
-	const char *serialised = cJSON_Serialize( (cJSON *)root, 1 );
+	const char *serialised = cJSON_Print( (cJSON *)root );
 	trap->FS_Write( serialised, strlen( serialised ), f );
 	trap->FS_Close( f );
 
@@ -1463,7 +1476,7 @@ void Q_OpenURL( const char *url ) {
 	LSOpenCFURLRef( urlRef, 0 );
 	CFRelease( urlRef );
 #elif defined(__linux__)
-	int ret = system( va( "xdg-open \"%s\"", url ) );
+	int ret = system( va( "xdg-open \"%s\"&", url ) );
 	if ( ret != EXIT_SUCCESS ) {
 		trap->Print( "Could not open URL: %s\n", url );
 	}

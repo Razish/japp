@@ -259,6 +259,9 @@ void CG_SetConfigValues( void ) {
 }
 
 void CG_ShaderStateChanged( void ) {
+	if ( !cg_remaps.integer ) {
+		return;
+	}
 	char originalShader[MAX_QPATH], newShader[MAX_QPATH], timeOffset[16];
 	const char *n, *t;
 	const char *o = CG_ConfigString( CS_SHADERSTATE );
@@ -759,8 +762,9 @@ static void CG_ConfigStringModified( void ) {
 		}
 	}
 
-	else if ( num == CS_SHADERSTATE )
+	else if ( num == CS_SHADERSTATE ) {
 		CG_ShaderStateChanged();
+	}
 
 	else if ( num >= CS_LIGHT_STYLES && num < CS_LIGHT_STYLES + (MAX_LIGHT_STYLES * 3) )
 		CG_SetLightstyle( num - CS_LIGHT_STYLES );

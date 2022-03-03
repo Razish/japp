@@ -1417,8 +1417,8 @@ void PM_DebugLegsAnim( int anim ) {
 
 	if ( oldAnim < MAX_TOTALANIMATIONS && oldAnim >= BOTH_DEATH1 &&
 		newAnim < MAX_TOTALANIMATIONS && newAnim >= BOTH_DEATH1 ) {
-		Com_Printf( "OLD: %s\n", animTable[oldAnim] );
-		Com_Printf( "NEW: %s\n", animTable[newAnim] );
+		Com_Printf( "OLD: %s\n", animTable[oldAnim].name );
+		Com_Printf( "NEW: %s\n", animTable[newAnim].name );
 	}
 }
 

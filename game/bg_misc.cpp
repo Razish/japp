@@ -443,7 +443,7 @@ qboolean BG_LegalizedForcePowers( char *powerOut, size_t powerOutSize, int maxRa
 	int final_Powers[NUM_FORCE_POWERS] = { 0 };
 
 	if ( powerLen >= sizeof(powerBuf) ) {
-		trap->Print( "BG_LegalizedForcePowers: powerLen:%i >= sizeof(powerBuf):%i\n", powerLen, sizeof(powerBuf) );
+		trap->Print( "BG_LegalizedForcePowers: powerLen:%i >= sizeof(powerBuf):%i\n", powerLen, (int)sizeof(powerBuf) );
 		// This should not happen. If it does, this is obviously a bogus string.
 		Q_strncpyz( powerBuf, DEFAULT_FORCEPOWERS, sizeof(powerBuf) );
 		maintainsValidity = qfalse;

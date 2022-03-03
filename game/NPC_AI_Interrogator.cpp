@@ -13,7 +13,8 @@ enum {
 void NPC_Interrogator_Precache( void ) {
 	G_SoundIndex( "sound/chars/interrogator/misc/torture_droid_lp" );
 	G_SoundIndex( "sound/chars/mark1/misc/anger.wav" );
-	G_SoundIndex( "sound/chars/probe/misc/talk" );
+	G_SoundIndex( "sound/chars/probe/misc/probetalk1" );
+	G_SoundIndex( "sound/chars/probe/misc/probetalk2" );
 	G_SoundIndex( "sound/chars/interrogator/misc/torture_droid_inject" );
 	G_SoundIndex( "sound/chars/interrogator/misc/int_droid_explo" );
 	G_EffectIndex( "explosions/droidexplosion1" );
@@ -309,7 +310,7 @@ void Interrogator_Attack( void ) {
 	//randomly talk
 	if ( TIMER_Done( NPC, "patrolNoise" ) ) {
 		if ( TIMER_Done( NPC, "angerNoise" ) ) {
-			G_SoundOnEnt( NPC, CHAN_AUTO, va( "sound/chars/probe/misc/talk.wav", Q_irand( 1, 3 ) ) );
+			G_SoundOnEnt( NPC, CHAN_AUTO, va( "sound/chars/probe/misc/probetalk%i.mp3", Q_irand( 1, 2 ) ) );
 
 			TIMER_Set( NPC, "patrolNoise", Q_irand( 4000, 10000 ) );
 		}

@@ -930,7 +930,7 @@ static void CG_RegisterModels( void ) {
 		vector3 mins, maxs;
 		int j;
 
-		Com_sprintf( name, sizeof(name), "*%i", i );
+		Com_sprintf( name, sizeof(name), "*%i", (int)i );
 		cgs.inlineDrawModel[i] = trap->R_RegisterModel( name );
 		if ( !cgs.inlineDrawModel[i] ) {
 			breakPoint = i;
@@ -981,7 +981,7 @@ static void CG_RegisterModels( void ) {
 
 		char loadingStr[1024];
 		Com_sprintf( loadingStr, sizeof(loadingStr), "Loading BSP instance %i/%i: %s",
-			i, numBSPInstances, bspName+1
+			(int)i, (int)numBSPInstances, bspName+1
 		);
 		CG_LoadingString( loadingStr );
 
@@ -996,7 +996,7 @@ static void CG_RegisterModels( void ) {
 
 		for ( int sub = 1; sub < MAX_MODELS; sub++ ) {
 			char temp[MAX_QPATH];
-			Com_sprintf( temp, MAX_QPATH, "*%d-%d", i, sub );
+			Com_sprintf( temp, MAX_QPATH, "*%d-%d", (int)i, sub );
 			cgs.inlineDrawModel[breakPoint] = trap->R_RegisterModel( temp );
 			if ( !cgs.inlineDrawModel[breakPoint] ) {
 				break;

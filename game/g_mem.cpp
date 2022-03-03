@@ -7,7 +7,7 @@ void *G_Alloc( int size ) {
 	char *p = NULL;
 
 	if ( g_debugAlloc.integer ) {
-		trap->Print( "G_Alloc of %i bytes (%i left)\n", size, sizeof(memoryPool) - allocPoint - ((size + 31) & ~31) );
+		trap->Print( "G_Alloc of %i bytes (%i left)\n", size, (int)(sizeof(memoryPool) - allocPoint - ((size + 31) & ~31)) );
 	}
 
 	if ( allocPoint + size > sizeof(memoryPool) ) {
@@ -27,5 +27,5 @@ void G_InitMemory( void ) {
 }
 
 void G_ShowGameMem( void ) {
-	trap->Print( "Game memory status: %i out of %i bytes allocated\n", allocPoint, sizeof(memoryPool) );
+	trap->Print( "Game memory status: %i out of %i bytes allocated\n", allocPoint, (int)sizeof(memoryPool) );
 }

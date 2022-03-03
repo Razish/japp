@@ -42,18 +42,18 @@ namespace JPLua {
 			int keyType = lua_type( L, -2 );
 			int valueType = lua_type( L, -1 );
 
-			cJSON_AddIntegerToObject( item, "key_type", keyType );
+			cJSON_AddNumberToObject( item, "key_type", keyType );
 			if ( keyType == LUA_TSTRING ) {
 				cJSON_AddStringToObject( item, "key", lua_tostring( L, -2 ) );
 			}
 			else if ( keyType == LUA_TNUMBER ) {
-				cJSON_AddIntegerToObject( item, "key", lua_tointeger( L, -2 ) );
+				cJSON_AddNumberToObject( item, "key", lua_tointeger( L, -2 ) );
 			}
 			else {
 				Com_Printf( "Can not serialise key in table %s: invalid type %s\n", name, lua_typename( L, keyType ) );
 			}
 
-			cJSON_AddIntegerToObject( item, "value_type", valueType );
+			cJSON_AddNumberToObject( item, "value_type", valueType );
 			if ( valueType == LUA_TTABLE ) {
 				if ( lua_rawequal( L, -1, tableIndex ) ) {
 					Com_Printf( "Can not serialise key <FIXME> in table %s: self-references are fatal!\n", name );
@@ -68,7 +68,7 @@ namespace JPLua {
 				cJSON_AddNumberToObject( item, "value", lua_tonumber( L, -1 ) );
 			}
 			else if ( valueType == LUA_TBOOLEAN ) {
-				cJSON_AddIntegerToObject( item, "value", !!lua_toboolean( L, -1 ) );
+				cJSON_AddBoolToObject( item, "value", !!lua_toboolean( L, -1 ) );
 			}
 			else if ( valueType == LUA_TSTRING ) {
 				cJSON_AddStringToObject( item, "value", lua_tostring( L, -1 ) );
@@ -107,15 +107,15 @@ namespace JPLua {
 
 			// key
 			it = cJSON_GetObjectItem( e, "key" );
-			kType = cJSON_ToInteger( cJSON_GetObjectItem( e, "key_type" ) );
-			if ( (tmp = cJSON_ToString( it )) )
+			kType = cJSON_GetObjectItem( e, "key_type" )->valueint;
+			if ( (tmp = it->valuestring) )
 				Q_strncpyz( k, tmp, sizeof(k) );
 
 			if ( kType == LUA_TSTRING ) {
 				lua_pushstring( L, k );
 			}
 			else if ( kType == LUA_TNUMBER ) {
-				lua_pushnumber( L, cJSON_ToNumber( it ) );
+				lua_pushnumber( L, it->valueint );
 			}
 			else {
 				Com_Printf( "Invalid key type %s when reading table %s\n", lua_typename( L, kType ), name );
@@ -123,19 +123,19 @@ namespace JPLua {
 
 			// value must be created based on type.
 			it = cJSON_GetObjectItem( e, "value" );
-			vType = cJSON_ToInteger( cJSON_GetObjectItem( e, "value_type" ) );
+			vType = cJSON_GetObjectItem( e, "value_type" )->valueint;
 			if ( vType == LUA_TTABLE ) {
 				Serialiser_IterateTableRead( e, "value", L );
 			}
 			else if ( vType == LUA_TNUMBER ) {
-				lua_pushnumber( L, cJSON_ToNumber( it ) );
+				lua_pushnumber( L, it->valuedouble );
 			}
 			else if ( vType == LUA_TBOOLEAN ) {
-				lua_pushboolean( L, cJSON_ToBoolean( it ) );
+				lua_pushboolean( L, it->valueint );
 			}
 			else if ( vType == LUA_TSTRING ) {
-				char v[1024 * 8]; // should be plenty..
-				if ( (tmp = cJSON_ToString( it )) )
+				char v[MAX_STRING_CHARS * 8]; // should be plenty..
+				if ( (tmp = it->valuestring) )
 					Q_strncpyz( v, tmp, sizeof(v) );
 				lua_pushstring( L, v );
 			}
@@ -195,8 +195,8 @@ namespace JPLua {
 	int Serialiser_Close( lua_State *L ) {
 		serialiser_t *serialiser = CheckSerialiser( L, 1 );
 		if ( serialiser->write ) {
-			int compress = lua_toboolean( L, 2 );
-			const char *buffer = cJSON_Serialize( serialiser->outRoot, compress ? 0 : 1 );
+			int Q_UNUSED compress = lua_toboolean( L, 2 );
+			const char *buffer = cJSON_Print( serialiser->outRoot );
 
 			trap->FS_Write( buffer, strlen( buffer ), serialiser->fileHandle );
 			free( (void *)buffer );
@@ -232,6 +232,8 @@ namespace JPLua {
 		}
 		len = trap->FS_Open( serialiser->fileName, &serialiser->fileHandle, mode );
 
+		serialiser->inRoot = nullptr;
+		serialiser->outRoot = nullptr;
 		if ( mode == FS_WRITE ) {
 			serialiser->write = qtrue;
 			serialiser->read = qfalse;
@@ -244,7 +246,7 @@ namespace JPLua {
 				char *contents = (char *)malloc( len );
 
 				trap->FS_Read( contents, len, serialiser->fileHandle );
-				serialiser->inRoot = cJSON_Parse( contents );
+				serialiser->inRoot = cJSON_ParseWithLength( contents, len );
 				if ( !serialiser->inRoot )
 					Com_Printf( "Couldn't parse serialised JSON data %s\n", path );
 

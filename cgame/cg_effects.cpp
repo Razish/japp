@@ -498,7 +498,7 @@ void CG_DoGlass( vector3 verts[4], vector3 *normal, vector3 *dmgPt, vector3 *dmg
 
 			Vector2Set( &biPoints[1], xx + stepWidth, zz );
 
-			if ( t + 1 > 0 && t + 1 < mxWidth ) {
+			if ( i + 1 > 0 && i + 1 < mxHeight && t + 1 > 0 && t + 1 < mxWidth ) {
 				xx = x - offX[i + 1][t + 1];
 			}
 			else {
@@ -514,7 +514,7 @@ void CG_DoGlass( vector3 verts[4], vector3 *normal, vector3 *dmgPt, vector3 *dmg
 
 			Vector2Set( &biPoints[2], xx + stepWidth, zz + stepHeight );
 
-			if ( t > 0 && t < mxWidth ) {
+			if ( i + 1 > 0 && i + 1 < mxHeight && t > 0 && t < mxWidth ) {
 				xx = x - offX[i + 1][t];
 			}
 			else {

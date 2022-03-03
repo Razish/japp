@@ -303,7 +303,7 @@ static void SV_EntityList_f( void ) {
 			Q_strcat( buf, sizeof(buf), va( "%4i: %-3i                ", e, check->s.eType ) );
 		}
 		else {
-			Q_strcat( buf, sizeof(buf), va( "%4i: %-20s ", e, eTypes[check->s.eType] ) );
+			Q_strcat( buf, sizeof(buf), va( "%4i: %-20s ", e, eTypes[check->s.eType].name ) );
 		}
 
 		if ( check->classname ) {

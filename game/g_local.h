@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <vector>
-
 #ifdef _DEBUG
 #define DEBUG_SABER_BOX
 #endif
@@ -760,8 +758,6 @@ typedef struct level_locals_s {
 	int					forcedRespawnTime;
 	int					duelInProgress;
 
-	std::vector<gentity_t *>	reservedEnts;
-
 	struct {
 		fileHandle_t		admin, console, security;
 	} log;
@@ -810,7 +806,6 @@ void			AddSightEvent( gentity_t *owner, vector3 *position, float radius, alertEv
 void			AddSoundEvent( gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel,
 					qboolean needLOS );
 void			B_InitAlloc( void );
-void			B_CleanupAlloc( void );
 void			BeginIntermission( void );
 void			Blocked_Mover( gentity_t *ent, gentity_t *other );
 void			BlowDetpacks( gentity_t *ent );
@@ -944,7 +939,7 @@ void			G_Knockdown( gentity_t *self );
 void			G_LeaveVehicle( gentity_t *ent, qboolean ConCheck );
 void			G_LoadArenas( void );
 void			G_LogExit( const char *string );
-void			G_LogPrintf( fileHandle_t filehandle, const char *fmt, ... );
+void			G_LogPrintf( fileHandle_t filehandle, const char *fmt, ... ) __attribute__ ((format (printf, 2, 3)));
 void			G_LogWeaponDamage( int client, int mod, int amount );
 void			G_LogWeaponDeath( int client, int weaponid );
 void			G_LogWeaponFire( int client, int weaponid );

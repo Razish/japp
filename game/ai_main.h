@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "bg_saga.h"
 
 //#define FORCEJUMP_INSTANTMETHOD 1
@@ -332,7 +334,7 @@ typedef struct bot_state_s {
 void *B_TempAlloc( int size );
 void B_TempFree( int size );
 
-void *B_Alloc( int size );
+void *B_AllocZ( int size );
 void B_Free( void *ptr );
 
 //resets the whole bot state
@@ -380,8 +382,7 @@ extern float gDeactivated;
 extern float gBotEdit;
 extern int gWPRenderedFrame;
 
-extern wpobject_t *gWPArray[MAX_WPARRAY_SIZE];
-extern int gWPNum;
+extern std::vector<wpobject_t *> gWPArray;
 
 extern int gLastPrintedIndex;
 extern nodeobject_t nodetable[MAX_NODETABLE_SIZE];

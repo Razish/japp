@@ -976,7 +976,7 @@ qboolean Asset_Parse( int handle ) {
 
 		if ( Q_stricmp( token.string, "cursor" ) == 0 ) {
 			if ( !PC_String_Parse( handle, &uiInfo.uiDC.Assets.cursorStr ) ) {
-				Com_Printf( S_COLOR_YELLOW, "Bad 1st parameter for keyword 'cursor'" );
+				Com_Printf( S_COLOR_YELLOW "Bad 1st parameter for keyword 'cursor'" );
 				return qfalse;
 			}
 			uiInfo.uiDC.Assets.cursor = trap->R_RegisterShaderNoMip( uiInfo.uiDC.Assets.cursorStr );
@@ -3679,19 +3679,19 @@ static void UI_StartSkirmish( qboolean next ) {
 	trap->Cvar_Set( "ui_singlePlayerActive", "1" );
 
 	// set up sp overrides, will be replaced on postgame
-	trap->Cvar_Set( "ui_saveCaptureLimit", va( "%i", trap->Cvar_VariableValue( "capturelimit" ) ) );
-	trap->Cvar_Set( "ui_saveFragLimit", va( "%i", trap->Cvar_VariableValue( "fraglimit" ) ) );
-	trap->Cvar_Set( "ui_saveDuelLimit", va( "%i", trap->Cvar_VariableValue( "duel_fraglimit" ) ) );
+	trap->Cvar_Set( "ui_saveCaptureLimit", va( "%i", (int)trap->Cvar_VariableValue( "capturelimit" ) ) );
+	trap->Cvar_Set( "ui_saveFragLimit", va( "%i", (int)trap->Cvar_VariableValue( "fraglimit" ) ) );
+	trap->Cvar_Set( "ui_saveDuelLimit", va( "%i", (int)trap->Cvar_VariableValue( "duel_fraglimit" ) ) );
 
 	UI_SetCapFragLimits( qfalse );
 
 
-	trap->Cvar_Set( "ui_drawTimer", va( "%i", trap->Cvar_VariableValue( "cg_drawTimer" ) ) );
-	trap->Cvar_Set( "ui_doWarmup", va( "%i", trap->Cvar_VariableValue( "g_doWarmup" ) ) );
-	trap->Cvar_Set( "ui_friendlyFire", va( "%i", trap->Cvar_VariableValue( "g_friendlyFire" ) ) );
-	trap->Cvar_Set( "ui_maxClients", va( "%i", trap->Cvar_VariableValue( "sv_maxClients" ) ) );
-	trap->Cvar_Set( "ui_Warmup", va( "%i", trap->Cvar_VariableValue( "g_warmup" ) ) );
-	trap->Cvar_Set( "ui_pure", va( "%i", trap->Cvar_VariableValue( "sv_pure" ) ) );
+	trap->Cvar_Set( "ui_drawTimer", va( "%i", (int)trap->Cvar_VariableValue( "cg_drawTimer" ) ) );
+	trap->Cvar_Set( "ui_doWarmup", va( "%i", (int)trap->Cvar_VariableValue( "g_doWarmup" ) ) );
+	trap->Cvar_Set( "ui_friendlyFire", va( "%i", (int)trap->Cvar_VariableValue( "g_friendlyFire" ) ) );
+	trap->Cvar_Set( "ui_maxClients", va( "%i", (int)trap->Cvar_VariableValue( "sv_maxClients" ) ) );
+	trap->Cvar_Set( "ui_Warmup", va( "%i", (int)trap->Cvar_VariableValue( "g_warmup" ) ) );
+	trap->Cvar_Set( "ui_pure", va( "%i", (int)trap->Cvar_VariableValue( "sv_pure" ) ) );
 	trap->Cvar_Set( "cg_cameraOrbit", "0" );
 	trap->Cvar_Set( "cg_drawTimer", "1" );
 	trap->Cvar_Set( "g_doWarmup", "1" );
@@ -5176,10 +5176,10 @@ static void UI_RunMenuScript( char **args ) {
 		}
 		else if ( Q_stricmp( name, "addBot" ) == 0 ) {
 			if ( trap->Cvar_VariableValue( "g_gametype" ) >= GT_TEAM ) {
-				trap->Cmd_ExecuteText( EXEC_APPEND, va( "addbot \"%s\" %i %s\n", UI_GetBotNameByNumber( uiInfo.botIndex ), uiInfo.skillIndex + 1, (uiInfo.redBlue == 0) ? "Red" : "Blue" ) );
+				trap->Cmd_ExecuteText( EXEC_APPEND, va( "addbot \"%s\" %i %s\n", UI_GetBotNameByNumber( uiInfo.botIndex ), (int)(uiInfo.skillIndex + 1), (uiInfo.redBlue == 0) ? "Red" : "Blue" ) );
 			}
 			else {
-				trap->Cmd_ExecuteText( EXEC_APPEND, va( "addbot \"%s\" %i %s\n", UI_GetBotNameByNumber( uiInfo.botIndex ), uiInfo.skillIndex + 1, (uiInfo.redBlue == 0) ? "Red" : "Blue" ) );
+				trap->Cmd_ExecuteText( EXEC_APPEND, va( "addbot \"%s\" %i %s\n", UI_GetBotNameByNumber( uiInfo.botIndex ), (int)(uiInfo.skillIndex + 1), (uiInfo.redBlue == 0) ? "Red" : "Blue" ) );
 			}
 		}
 		else if ( Q_stricmp( name, "addFavorite" ) == 0 ) {

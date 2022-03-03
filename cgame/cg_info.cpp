@@ -148,7 +148,8 @@ void CG_DrawInformation( void ) {
 	if ( s[0] ) {
 		width = font.Width( s );
 		font.Paint( (SCREEN_WIDTH / 2) - (width / 2.0f), y, s, &colorWhite, uiTextStyle_e::Shadowed );
-		y += iPropHeight;
+		int numLines = Q_CountChars( s, '\n' ) + 1;
+		y += iPropHeight * numLines;
 	}
 
 	trap->Cvar_VariableStringBuffer( "cl_motdString", buf, sizeof(buf) );

@@ -124,7 +124,7 @@ namespace GeoIP {
 		unlink( absPath ); // so the temporary file is deleted when closed/program exits
 
 		if ( filedes < 1 ) {
-			trap->Print( "failed to create temporary file: %s\n", absPath, strerror( errno ) );
+			trap->Print( "failed to create temporary file(%s): %s\n", absPath, strerror( errno ) );
 			return true;
 		}
 		else {

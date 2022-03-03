@@ -75,8 +75,8 @@ float NPC_GetPainChance( gentity_t *self, int damage );
 //
 // NPC_misc.cpp
 //
-void Debug_Printf( vmCvar_t *cv, int level, const char *fmt, ... );
-void Debug_NPCPrintf( gentity_t *printNPC, vmCvar_t *cv, int debugLevel, const char *fmt, ... );
+void Debug_Printf( vmCvar_t *cv, int level, const char *fmt, ... ) __attribute__ ((format (printf, 3, 4)));
+void Debug_NPCPrintf( gentity_t *printNPC, vmCvar_t *cv, int debugLevel, const char *fmt, ... ) __attribute__ ((format (printf, 4, 5)));
 
 //NPC_ai variables - shared by NPC.cpp andf the following modules
 extern gentity_t	*NPC;

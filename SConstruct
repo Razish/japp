@@ -37,6 +37,7 @@ no_sql = int( ARGUMENTS.get( 'no_sql', 0 ) )
 no_notify = int( ARGUMENTS.get( 'no_notify', 0 ) )
 no_crashhandler = int( ARGUMENTS.get( 'no_crashhandler', 0 ) )
 no_geoip = int( ARGUMENTS.get( 'no_geoip', 0 ) )
+use_asan = int( ARGUMENTS.get( 'use_asan', 0 ) )
 toolStr = ARGUMENTS.get( 'tools', 'gcc,g++,ar,as,gnulink' )
 tools = toolStr.split( ',' )
 proj = ARGUMENTS.get( 'project', 'game,cgame,ui' )
@@ -64,9 +65,9 @@ def run_command( cmd ):
 		stderr=subprocess.PIPE
 	)
 	out, err = p.communicate()
-	
+
 	out = out.decode('utf-8').strip('\n')
-	
+
 	if err:
 		print( 'run_command: ' + err )
 	return 0 if not err else 1, out
@@ -212,7 +213,8 @@ if not env.GetOption( 'clean' ):
 		+ '\tsql support: ' + ('dis' if no_sql else 'en') + 'abled\n'\
 		+ '\tnotify support: ' + ('dis' if no_notify else 'en') + 'abled\n'\
 		+ '\tcrash logging: ' + ('dis' if no_crashhandler else 'en') + 'abled\n'\
-		+ '\tgeoip support: ' + ('dis' if no_geoip else 'en') + 'abled\n'
+		+ '\tgeoip support: ' + ('dis' if no_geoip else 'en') + 'abled\n'\
+		+ '\taddress sanitizer: ' + ('dis' if not use_asan else 'en') + 'abled\n'
 
 	# build environment
 	if 'SCONS_DEBUG' in os.environ:
@@ -531,12 +533,18 @@ if debug:
 			#'-pg',
 			#'-finstrument-functions',
 			'-fno-omit-frame-pointer',
-			#'-fsanitize=address',
 		]
-		#env['LINKFLAGS'] += [
+		if use_asan:
+			env['CCFLAGS'] += [
+				'-fsanitize=address',
+			]
+		env['LINKFLAGS'] += [
 		#	'-pg',
-		#	'-fsanitize=address',
-		#]
+		]
+		if use_asan:
+			env['LINKFLAGS'] += [
+				'-fsanitize=address',
+			]
 	elif env['CC'] == 'cl':
 		env['CCFLAGS'] += [
 			'/Od',		# disable optimisations

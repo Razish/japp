@@ -179,7 +179,7 @@ namespace JPLua {
 			if ( res ) {
 				Q_strcat( out, bufsize, res );
 			}
-			lua_pop( L, 1 );
+			lua_pop( L, 3 );
 		}
 		lua_pop( L, 1 );
 
@@ -212,10 +212,10 @@ namespace JPLua {
 		return 0;
 	}
 
+	//NOTE: caller must pop return values from stack
 	qboolean Call( lua_State *L, int argCount, int resCount ) {
 		if ( lua_pcall( L, argCount, resCount, 0 ) ) {
 			trap->Print( S_COLOR_GREEN "JPLua " S_COLOR_RED "Error: %s\n", lua_tostring( L, -1 ) );
-			lua_pop( L, 1 );
 
 			//TODO: disable current plugin..?
 			return qfalse;
@@ -391,8 +391,8 @@ namespace JPLua {
 		const char *path = va( "%s%s", ls.initialised ? pluginDir : baseDir, lua_tostring( L, 1 ) );
 		const char *err = NULL;
 		if ((err = LoadFile(L, path))){
-			trap->Print(va(S_COLOR_GREEN "JPLua:" S_COLOR_RED " Failed to load: %s\n"), lua_tostring(L, 1));
-			trap->Print(va("   %s\n", err));
+			trap->Print( S_COLOR_GREEN "JPLua:" S_COLOR_RED " Failed to load: %s\n", lua_tostring( L, 1 ) );
+			trap->Print( "   %s\n", err );
 		}
 		return 0;
 	}
@@ -1405,44 +1405,38 @@ namespace JPLua {
 
 	#ifdef PROJECT_CGAME
 	static int GetGLConfig( lua_State *L ) {
-		glconfig_t config;
-		trap->GetGlconfig( &config );
-
 		lua_newtable( L );
 		int top = lua_gettop( L );
 		lua_pushstring( L, "renderer" );
-			lua_pushstring( L, config.renderer_string );
+			lua_pushstring( L, cgs.glconfig.renderer_string );
 			lua_settable( L, top );
 		lua_pushstring( L, "vendor" );
-			lua_pushstring( L, config.vendor_string );
+			lua_pushstring( L, cgs.glconfig.vendor_string );
 			lua_settable( L, top );
 		lua_pushstring( L, "version" );
-			lua_pushstring( L, config.version_string );
-			lua_settable( L, top );
-		lua_pushstring( L, "extensions" );
-			lua_pushstring( L, config.extensions_string );
+			lua_pushstring( L, cgs.glconfig.version_string );
 			lua_settable( L, top );
 		lua_pushstring( L, "colorbits" );
-			lua_pushinteger( L, config.colorBits );
+			lua_pushinteger( L, cgs.glconfig.colorBits );
 			lua_settable( L, top );
 		lua_pushstring( L, "depthbits" );
-			lua_pushinteger( L, config.depthBits );
+			lua_pushinteger( L, cgs.glconfig.depthBits );
 			lua_settable( L, top );
 		lua_pushstring( L, "stencilBits" );
-			lua_pushinteger( L, config.stencilBits );
+			lua_pushinteger( L, cgs.glconfig.stencilBits );
 			lua_settable( L, top );
 		lua_pushstring( L, "width" );
-			lua_pushinteger( L, config.vidWidth );
+			lua_pushinteger( L, cgs.glconfig.vidWidth );
 			lua_settable( L, top );
 		lua_pushstring( L, "height" );
-			lua_pushinteger( L, config.vidHeight );
+			lua_pushinteger( L, cgs.glconfig.vidHeight );
 			lua_settable( L, top );
 		lua_pushstring( L, "frequency" );
-			lua_pushinteger( L, config.displayFrequency );
+			lua_pushinteger( L, cgs.glconfig.displayFrequency );
 			lua_settable( L, top );
 
 		lua_pushstring( L, "fullscreen" );
-			lua_pushboolean( L, config.isFullscreen );
+			lua_pushboolean( L, cgs.glconfig.isFullscreen );
 			lua_settable( L, top );
 
 		return 1;

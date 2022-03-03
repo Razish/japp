@@ -884,8 +884,8 @@ namespace JPLua {
 #ifdef JPLUA
 		plugin_t *plugin = NULL;
 		while ( IteratePlugins( &plugin ) ) {
-			if ( plugin->eventListeners[JPLUA_EVENT_PAIN] ) {
-				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_PAIN] );
+			if ( plugin->eventListeners[JPLUA_EVENT_KEYDOWN] ) {
+				lua_rawgeti( ls.L, LUA_REGISTRYINDEX, plugin->eventListeners[JPLUA_EVENT_KEYDOWN] );
 
 				lua_pushstring( ls.L, va("%c", key));
 

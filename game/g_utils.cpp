@@ -2,13 +2,14 @@
 //
 // g_utils.c -- misc utility functions for game module
 
+#include <vector>
+#include <unordered_map>
+
 #include "g_local.h"
 #include "bg_saga.h"
 #include "qcommon/q_shared.h"
 #include "qcommon/qfiles.h"
 #include "bg_lua.h"
-
-#include <unordered_map>
 
 typedef struct shaderRemap_s {
 	char oldShader[MAX_QPATH], newShader[MAX_QPATH];
@@ -20,6 +21,7 @@ typedef struct shaderRemap_s {
 static int remapCount = 0;
 static shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
 static int entitycount = 0;
+static std::vector<gentity_t *> reservedEnts;
 
 void AddRemap( const char *oldShader, const char *newShader, float timeOffset ) {
 	int i;
@@ -487,9 +489,9 @@ static void G_InitReservedEntity( gentity_t *ent ) {
 
 gentity_t *G_SpawnReservedEntity( void ) {
 	static size_t index = 0u;
-	if ( level.reservedEnts.size() ) {
-		gentity_t *e = level.reservedEnts[index++];
-		index %= level.reservedEnts.size();
+	if ( reservedEnts.size() ) {
+		gentity_t *e = reservedEnts[index++];
+		index %= reservedEnts.size();
 
 		G_FreeEntity( e );
 		//TODO: return flags etc..? :/
@@ -506,7 +508,7 @@ void InitReservedEntities( void ) {
 	for ( int i = level.num_entities; i < japp_reserveEntitySlots.integer; i++ ) {
 		gentity_t *ent = G_Spawn();
 		G_InitReservedEntity( ent );
-		level.reservedEnts.push_back( ent );
+		reservedEnts.push_back( ent );
 	}
 }
 

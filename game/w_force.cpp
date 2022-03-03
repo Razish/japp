@@ -1032,21 +1032,18 @@ void ForceGrip( gentity_t *self ) {
 		return;
 	}
 
-	//[JAPRO - Serverside - Force - Allow grip while in getup - Start]
-	if (self->client->ps.weaponTime > 0)
-	{
-		if (japp_fixGetups.integer && (self->client->ps.legsAnim == BOTH_GETUP_BROLL_R || self->client->ps.legsAnim == BOTH_GETUP_BROLL_L || self->client->ps.legsAnim == BOTH_GETUP_BROLL_F || self->client->ps.legsAnim == BOTH_GETUP_BROLL_B))
-		{
+	// from jaPRO
+	if ( self->client->ps.weaponTime > 0 ) {
+		if ( japp_fixGetups.integer && (self->client->ps.legsAnim == BOTH_GETUP_BROLL_R || self->client->ps.legsAnim == BOTH_GETUP_BROLL_L || self->client->ps.legsAnim == BOTH_GETUP_BROLL_F || self->client->ps.legsAnim == BOTH_GETUP_BROLL_B) ) {
 		}
 		else if (japp_fixRoll.integer && ((self->client->ps.legsAnim == BOTH_ROLL_F || self->client->ps.legsAnim == BOTH_ROLL_B || self->client->ps.legsAnim == BOTH_ROLL_R || self->client->ps.legsAnim == BOTH_ROLL_L)))
 		{
 		}
-		else 
+		else
 		{
 			return;
 		}
 	}
-	//[JAPRO - Serverside - Force - Allow grip while in getup - End]
 
 	if ( self->client->ps.fd.forceGripUseTime > level.time ) {
 		return;

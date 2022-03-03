@@ -369,7 +369,7 @@ retryModel:
 	if ( checkSkin )
 		ci->torsoSkin = checkSkin;
 	else
-		ci->torsoSkin = trap->R_RegisterSkin( va( "models/players/%s/model_default.skin", modelName, skinName ) );
+		ci->torsoSkin = trap->R_RegisterSkin( va( "models/players/%s/model_default.skin", modelName ) );
 	Com_sprintf( afilename, sizeof(afilename), "models/players/%s/model.glm", modelName );
 	handle = trap->G2API_InitGhoul2Model( &ci->ghoul2Model, afilename, 0, ci->torsoSkin, 0, 0, 0 );
 
@@ -1222,11 +1222,8 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	//saber being used
 	v = Info_ValueForKey( configstring, "st" );
 	yo = (clientNum == cg.clientNum) ? cg.forceOwnSaber[0].c_str() : cg.forceEnemySaber[0].c_str();
-	if ( v && Q_stricmp( v, ci->saberName ) ) {
-		if ( yo && yo[0] )
-			Q_strncpyz( newInfo.saberName, yo, sizeof(newInfo.saberName) );
-		else
-			Q_strncpyz( newInfo.saberName, v, sizeof(newInfo.saberName) );
+	if ( (v && Q_stricmp( v, ci->saberName )) || (yo && Q_stricmp( yo, ci->saberName )) ) {
+		Q_strncpyz( newInfo.saberName, (yo && yo[0]) ? yo : v, sizeof(newInfo.saberName) );
 
 		WP_SetSaber( clientNum, newInfo.saber, 0, newInfo.saberName );
 		saberUpdate[0] = qtrue;
@@ -1244,11 +1241,8 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 	else {
 		yo = nullptr;
 	}
-	if ( v && Q_stricmp( v, ci->saber2Name ) ) {
-		if ( yo && yo[0] )
-			Q_strncpyz( newInfo.saber2Name, yo, sizeof(newInfo.saber2Name) );
-		else
-			Q_strncpyz( newInfo.saber2Name, v, sizeof(newInfo.saber2Name) );
+	if ( (v && Q_stricmp( v, ci->saber2Name )) || (yo && Q_stricmp( yo, ci->saber2Name )) ) {
+		Q_strncpyz( newInfo.saber2Name, (yo && yo[0]) ? yo : v, sizeof(newInfo.saber2Name) );
 
 		WP_SetSaber( clientNum, newInfo.saber, 1, newInfo.saber2Name );
 		saberUpdate[1] = qtrue;
@@ -1322,8 +1316,10 @@ void CG_NewClientInfo( int clientNum, qboolean entitiesInitialized ) {
 		// if we are defering loads, just have it pick the first valid
 		if ( cg.snap && cg.snap->ps.clientNum == clientNum )
 			CG_LoadClientInfo( &newInfo );
-		else if ( cg_deferPlayers.integer && cgs.gametype != GT_SIEGE && !cg.loading )
+		else if ( cg_deferPlayers.integer && cgs.gametype != GT_SIEGE && !cg.loading ) {
 			CG_SetDeferredClientInfo( &newInfo );
+			cg.haveDeferredPlayers = true;
+		}
 		else
 			CG_LoadClientInfo( &newInfo );
 	}
@@ -1445,6 +1441,7 @@ void CG_ActualLoadDeferredPlayers( void ) {
 	int i;
 	clientInfo_t *ci;
 
+	cg.haveDeferredPlayers = false;
 	// scan for a deferred player to load
 	for ( i = 0, ci = cgs.clientinfo; i < cgs.maxclients; i++, ci++ ) {
 		if ( ci->infoValid && ci->deferred ) {

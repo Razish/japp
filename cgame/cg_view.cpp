@@ -2057,7 +2057,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		pwSet = 1;
 	}
 
-	if ( cgQueueLoad ) {
+	if ( cgQueueLoad || (cg.haveDeferredPlayers && cg_deferPlayers.integer == 2 && cg.snap && VectorLength( &cg.snap->ps.velocity ) < 1.0f ) ) {
 		// do this before you start messing around with adding ghoul2 refents and crap
 		CG_ActualLoadDeferredPlayers();
 		cgQueueLoad = qfalse;

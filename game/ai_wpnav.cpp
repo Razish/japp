@@ -8,8 +8,7 @@ float gDeactivated = 0;
 float gBotEdit = 0;
 int gWPRenderedFrame = 0;
 
-wpobject_t *gWPArray[MAX_WPARRAY_SIZE];
-int gWPNum = 0;
+std::vector<wpobject_t *> gWPArray;
 
 int gLastPrintedIndex = -1;
 
@@ -18,7 +17,7 @@ int nodenum; //so we can connect broken trails
 
 uint32_t gLevelFlags = 0;
 
-char *GetFlagStr( uint32_t flags ) {
+static char *GetFlagStr( uint32_t flags ) {
 	static char flagstr[128];
 	char *p = flagstr;
 
@@ -156,8 +155,8 @@ void BotWaypointRender( void ) {
 	i = gWPRenderedFrame;
 	inc_checker = gWPRenderedFrame;
 
-	for ( i = gWPRenderedFrame; i < gWPNum; i++ ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse ) {
+	for ( int size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] ) {
 			plum = G_TempEntity( &gWPArray[i]->origin, EV_SCOREPLUM );
 			plum->r.svFlags |= SVF_BROADCAST;
 			plum->s.time = i;
@@ -180,7 +179,7 @@ void BotWaypointRender( void ) {
 		}
 	}
 
-	if ( i >= gWPNum ) {
+	if ( i >= gWPArray.size() ) {
 		gWPRenderTime = level.time + 1500; //wait a bit after we finish doing the whole trail
 		gWPRenderedFrame = 0;
 	}
@@ -200,8 +199,8 @@ checkprint:
 	bestdist = 256; //max distance for showing point info
 	gotbestindex = 0;
 
-	for ( i = 0; i < gWPNum; i++ ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] ) {
 			VectorSubtract( &viewent->client->ps.origin, &gWPArray[i]->origin, &a );
 
 			checkdist = VectorLength( &a );
@@ -229,153 +228,86 @@ checkprint:
 	}
 }
 
-void TransferWPData( int from, int to ) {
-	if ( !gWPArray[to] ) {
-		gWPArray[to] = (wpobject_t *)B_Alloc( sizeof(wpobject_t) );
-	}
-
-	if ( !gWPArray[to] ) {
-		trap->Print( S_COLOR_RED "FATAL ERROR: Could not allocated memory for waypoint\n" );
-	}
-
-	assert( gWPArray[from] );
-
-	gWPArray[to]->flags = gWPArray[from]->flags;
-	gWPArray[to]->weight = gWPArray[from]->weight;
-	gWPArray[to]->associated_entity = gWPArray[from]->associated_entity;
-	gWPArray[to]->disttonext = gWPArray[from]->disttonext;
-	gWPArray[to]->forceJumpTo = gWPArray[from]->forceJumpTo;
-	gWPArray[to]->index = to;
-	gWPArray[to]->inuse = gWPArray[from]->inuse;
-	VectorCopy( &gWPArray[from]->origin, &gWPArray[to]->origin );
-}
-
-void CreateNewWP( vector3 *origin, int flags ) {
-	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
-		if ( !RMG.integer ) {
-			trap->Print( S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE );
-		}
-		return;
-	}
-
-	if ( !gWPArray[gWPNum] ) {
-		gWPArray[gWPNum] = (wpobject_t *)B_Alloc( sizeof(wpobject_t) );
-	}
-
-	if ( !gWPArray[gWPNum] ) {
+static void CreateNewWP( vector3 *origin, int flags ) {
+	wpobject_t *wp = (wpobject_t *)B_AllocZ( sizeof(wpobject_t) );
+	if ( !wp ) {
 		trap->Print( S_COLOR_RED "ERROR: Could not allocated memory for waypoint\n" );
 	}
 
-	gWPArray[gWPNum]->flags = flags;
-	gWPArray[gWPNum]->weight = 0; //calculated elsewhere
-	gWPArray[gWPNum]->associated_entity = ENTITYNUM_NONE; //set elsewhere
-	gWPArray[gWPNum]->forceJumpTo = 0;
-	gWPArray[gWPNum]->disttonext = 0; //calculated elsewhere
-	gWPArray[gWPNum]->index = gWPNum;
-	gWPArray[gWPNum]->inuse = 1;
-	VectorCopy( origin, &gWPArray[gWPNum]->origin );
-	gWPNum++;
+	wp->flags = flags;
+	wp->weight = 0; //calculated elsewhere
+	wp->associated_entity = ENTITYNUM_NONE; //set elsewhere
+	wp->forceJumpTo = 0;
+	wp->disttonext = 0; //calculated elsewhere
+	wp->index = gWPArray.size();
+	VectorCopy( origin, &wp->origin );
+	gWPArray.push_back( wp );
 }
 
-void CreateNewWP_FromObject( wpobject_t *wp ) {
-	int i;
-
-	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
-		return;
-	}
-
-	if ( !gWPArray[gWPNum] ) {
-		gWPArray[gWPNum] = (wpobject_t *)B_Alloc( sizeof(wpobject_t) );
-	}
-
-	if ( !gWPArray[gWPNum] ) {
+static void CreateNewWP_FromObject( wpobject_t *srcWP ) {
+	wpobject_t *destWP = (wpobject_t *)B_AllocZ( sizeof(wpobject_t) );
+	if ( !destWP ) {
 		trap->Print( S_COLOR_RED "ERROR: Could not allocated memory for waypoint\n" );
 	}
 
-	gWPArray[gWPNum]->flags = wp->flags;
-	gWPArray[gWPNum]->weight = wp->weight;
-	gWPArray[gWPNum]->associated_entity = wp->associated_entity;
-	gWPArray[gWPNum]->disttonext = wp->disttonext;
-	gWPArray[gWPNum]->forceJumpTo = wp->forceJumpTo;
-	gWPArray[gWPNum]->index = gWPNum;
-	gWPArray[gWPNum]->inuse = 1;
-	VectorCopy( &wp->origin, &gWPArray[gWPNum]->origin );
-	gWPArray[gWPNum]->neighbornum = wp->neighbornum;
+	destWP->flags = srcWP->flags;
+	destWP->weight = srcWP->weight;
+	destWP->associated_entity = srcWP->associated_entity;
+	destWP->disttonext = srcWP->disttonext;
+	destWP->forceJumpTo = srcWP->forceJumpTo;
+	destWP->index = gWPArray.size();
+	VectorCopy( &srcWP->origin, &destWP->origin );
+	destWP->neighbornum = srcWP->neighbornum;
 
-	i = wp->neighbornum;
-
-	while ( i >= 0 ) {
-		gWPArray[gWPNum]->neighbors[i].num = wp->neighbors[i].num;
-		gWPArray[gWPNum]->neighbors[i].forceJumpTo = wp->neighbors[i].forceJumpTo;
-
-		i--;
+	for ( int i = srcWP->neighbornum; i >= 0; i-- ) {
+		destWP->neighbors[i].num = srcWP->neighbors[i].num;
+		destWP->neighbors[i].forceJumpTo = srcWP->neighbors[i].forceJumpTo;
 	}
 
-	if ( gWPArray[gWPNum]->flags & WPFLAG_RED_FLAG ) {
-		flagRed = gWPArray[gWPNum];
+	if ( destWP->flags & WPFLAG_RED_FLAG ) {
+		flagRed = destWP;
 		oFlagRed = flagRed;
 	}
-	else if ( gWPArray[gWPNum]->flags & WPFLAG_BLUE_FLAG ) {
-		flagBlue = gWPArray[gWPNum];
+	else if ( destWP->flags & WPFLAG_BLUE_FLAG ) {
+		flagBlue = destWP;
 		oFlagBlue = flagBlue;
 	}
 
-	gWPNum++;
+	gWPArray.push_back( destWP );
 }
 
-void RemoveWP( void ) {
-	if ( gWPNum <= 0 ) {
+static void RemoveWP( void ) {
+	if ( gWPArray.size() <= 0 ) {
 		return;
 	}
 
-	gWPNum--;
-
-	if ( !gWPArray[gWPNum] || !gWPArray[gWPNum]->inuse ) {
+	wpobject_t *back = gWPArray.back();
+	if ( !back ) {
 		return;
 	}
 
-	//B_Free((wpobject_t *)gWPArray[gWPNum]);
-	if ( gWPArray[gWPNum] ) {
-		memset( gWPArray[gWPNum], 0, sizeof(*gWPArray[gWPNum]) );
-	}
-
-	//gWPArray[gWPNum] = NULL;
-
-	if ( gWPArray[gWPNum] ) {
-		gWPArray[gWPNum]->inuse = 0;
-	}
+	B_Free( back );
+	gWPArray.pop_back();
 }
 
-void RemoveAllWP( void ) {
-	while ( gWPNum ) {
-		RemoveWP();
-	}
-}
-
-void RemoveWP_InTrail( int afterindex ) {
+static void RemoveWP_InTrail( int afterindex ) {
 	int foundindex;
 	int foundanindex;
-	int didchange;
-	int i;
 
 	foundindex = 0;
 	foundanindex = 0;
-	didchange = 0;
-	i = 0;
 
-	if ( afterindex < 0 || afterindex >= gWPNum ) {
+	if ( afterindex < 0 || afterindex >= gWPArray.size() ) {
 		trap->Print( S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex );
 		return;
 	}
 
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] && gWPArray[i]->index == afterindex ) {
 			foundindex = i;
 			foundanindex = 1;
 			break;
 		}
-
-		i++;
 	}
 
 	if ( !foundanindex ) {
@@ -383,64 +315,29 @@ void RemoveWP_InTrail( int afterindex ) {
 		return;
 	}
 
-	i = 0;
-
-	while ( i <= gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->index == foundindex ) {
-			//B_Free(gWPArray[i]);
-
-			//Keep reusing the memory
-			memset( gWPArray[i], 0, sizeof(*gWPArray[i]) );
-
-			//gWPArray[i] = NULL;
-			gWPArray[i]->inuse = 0;
-			didchange = 1;
-		}
-		else if ( gWPArray[i] && didchange ) {
-			TransferWPData( i, i - 1 );
-			//B_Free(gWPArray[i]);
-
-			//Keep reusing the memory
-			memset( gWPArray[i], 0, sizeof(*gWPArray[i]) );
-
-			//gWPArray[i] = NULL;
-			gWPArray[i]->inuse = 0;
-		}
-
-		i++;
-	}
-	gWPNum--;
+	auto it = gWPArray.begin() + foundindex;
+	B_Free( *it );
+	gWPArray.erase( it );
 }
 
-int CreateNewWP_InTrail( vector3 *origin, int flags, int afterindex ) {
+static int CreateNewWP_InTrail( vector3 *origin, int flags, int afterindex ) {
 	int foundindex;
 	int foundanindex;
-	int i;
 
 	foundindex = 0;
 	foundanindex = 0;
-	i = 0;
 
-	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
-		if ( !RMG.integer ) {
-			trap->Print( S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE );
-		}
-		return 0;
-	}
-
-	if ( afterindex < 0 || afterindex >= gWPNum ) {
+	if ( afterindex < 0 || afterindex >= gWPArray.size() ) {
 		trap->Print( S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex );
 		return 0;
 	}
 
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] && gWPArray[i]->index == afterindex ) {
 			foundindex = i;
 			foundanindex = 1;
 			break;
 		}
-
-		i++;
 	}
 
 	if ( !foundanindex ) {
@@ -448,109 +345,22 @@ int CreateNewWP_InTrail( vector3 *origin, int flags, int afterindex ) {
 		return 0;
 	}
 
-	i = gWPNum;
-
-	while ( i >= 0 ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index != foundindex ) {
-			TransferWPData( i, i + 1 );
-		}
-		else if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == foundindex ) {
-			i++;
-
-			if ( !gWPArray[i] ) {
-				gWPArray[i] = (wpobject_t *)B_Alloc( sizeof(wpobject_t) );
-			}
-
-			gWPArray[i]->flags = flags;
-			gWPArray[i]->weight = 0; //calculated elsewhere
-			gWPArray[i]->associated_entity = ENTITYNUM_NONE; //set elsewhere
-			gWPArray[i]->disttonext = 0; //calculated elsewhere
-			gWPArray[i]->forceJumpTo = 0;
-			gWPArray[i]->index = i;
-			gWPArray[i]->inuse = 1;
-			VectorCopy( origin, &gWPArray[i]->origin );
-			gWPNum++;
-			break;
-		}
-
-		i--;
-	}
+	wpobject_t *newWP = (wpobject_t *)B_AllocZ( sizeof(wpobject_t) );
+	newWP->flags = flags;
+	newWP->weight = 0; //calculated elsewhere
+	newWP->associated_entity = ENTITYNUM_NONE; //set elsewhere
+	newWP->disttonext = 0; //calculated elsewhere
+	newWP->forceJumpTo = 0;
+	newWP->index = foundindex;
+	VectorCopy( origin, &newWP->origin );
+	gWPArray.emplace( gWPArray.begin() + foundindex, newWP );
 
 	return 1;
 }
 
-int CreateNewWP_InsertUnder( vector3 *origin, int flags, int afterindex ) {
+static void TeleportToWP( gentity_t *pl, int afterindex ) {
 	int foundindex;
 	int foundanindex;
-	int i;
-
-	foundindex = 0;
-	foundanindex = 0;
-	i = 0;
-
-	if ( gWPNum >= MAX_WPARRAY_SIZE ) {
-		if ( !RMG.integer ) {
-			trap->Print( S_COLOR_YELLOW "Warning: Waypoint limit hit (%i)\n", MAX_WPARRAY_SIZE );
-		}
-		return 0;
-	}
-
-	if ( afterindex < 0 || afterindex >= gWPNum ) {
-		trap->Print( S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex );
-		return 0;
-	}
-
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex ) {
-			foundindex = i;
-			foundanindex = 1;
-			break;
-		}
-
-		i++;
-	}
-
-	if ( !foundanindex ) {
-		trap->Print( S_COLOR_YELLOW "Waypoint index %i should exist, but does not (?)\n", afterindex );
-		return 0;
-	}
-
-	i = gWPNum;
-
-	while ( i >= 0 ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index != foundindex ) {
-			TransferWPData( i, i + 1 );
-		}
-		else if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == foundindex ) {
-			//i++;
-			TransferWPData( i, i + 1 );
-
-			if ( !gWPArray[i] ) {
-				gWPArray[i] = (wpobject_t *)B_Alloc( sizeof(wpobject_t) );
-			}
-
-			gWPArray[i]->flags = flags;
-			gWPArray[i]->weight = 0; //calculated elsewhere
-			gWPArray[i]->associated_entity = ENTITYNUM_NONE; //set elsewhere
-			gWPArray[i]->disttonext = 0; //calculated elsewhere
-			gWPArray[i]->forceJumpTo = 0;
-			gWPArray[i]->index = i;
-			gWPArray[i]->inuse = 1;
-			VectorCopy( origin, &gWPArray[i]->origin );
-			gWPNum++;
-			break;
-		}
-
-		i--;
-	}
-
-	return 1;
-}
-
-void TeleportToWP( gentity_t *pl, int afterindex ) {
-	int foundindex;
-	int foundanindex;
-	int i;
 
 	if ( !pl || !pl->client ) {
 		return;
@@ -558,21 +368,18 @@ void TeleportToWP( gentity_t *pl, int afterindex ) {
 
 	foundindex = 0;
 	foundanindex = 0;
-	i = 0;
 
-	if ( afterindex < 0 || afterindex >= gWPNum ) {
+	if ( afterindex < 0 || afterindex >= gWPArray.size() ) {
 		trap->Print( S_COLOR_YELLOW "Waypoint number %i does not exist\n", afterindex );
 		return;
 	}
 
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->index == afterindex ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] && gWPArray[i]->index == afterindex ) {
 			foundindex = i;
 			foundanindex = 1;
 			break;
 		}
-
-		i++;
 	}
 
 	if ( !foundanindex ) {
@@ -585,8 +392,8 @@ void TeleportToWP( gentity_t *pl, int afterindex ) {
 	return;
 }
 
-void WPFlagsModify( int wpnum, int flags ) {
-	if ( wpnum < 0 || wpnum >= gWPNum || !gWPArray[wpnum] || !gWPArray[wpnum]->inuse ) {
+static void WPFlagsModify( int wpnum, int flags ) {
+	if ( wpnum < 0 || wpnum >= gWPArray.size() || !gWPArray[wpnum] ) {
 		trap->Print( S_COLOR_YELLOW "WPFlagsModify: Waypoint %i does not exist\n", wpnum );
 		return;
 	}
@@ -606,27 +413,22 @@ static int NotWithinRange( int base, int extent ) {
 	return 1;
 }
 
-int NodeHere( vector3 *spot ) {
-	int i;
-
-	i = 0;
-
-	while ( i < nodenum ) {
-		if ( (int)nodetable[i].origin.x == (int)spot->x &&
-			(int)nodetable[i].origin.y == (int)spot->y ) {
-			if ( (int)nodetable[i].origin.z == (int)spot->z ||
-				((int)nodetable[i].origin.z < (int)spot->z && (int)nodetable[i].origin.z + 5 >( int )spot->z) ||
-				((int)nodetable[i].origin.z >( int )spot->z && (int)nodetable[i].origin.z - 5 < (int)spot->z) ) {
+static int NodeHere( vector3 *spot ) {
+	for ( const auto &node : nodetable ) {
+		if ( (int)node.origin.x == (int)spot->x &&
+			(int)node.origin.y == (int)spot->y ) {
+			if ( (int)node.origin.z == (int)spot->z ||
+				((int)node.origin.z < (int)spot->z && (int)node.origin.z + 5 >( int )spot->z) ||
+				((int)node.origin.z >( int )spot->z && (int)node.origin.z - 5 < (int)spot->z) ) {
 				return 1;
 			}
 		}
-		i++;
 	}
 
 	return 0;
 }
 
-int CanGetToVector( vector3 *org1, vector3 *org2, vector3 *mins, vector3 *maxs ) {
+static int CanGetToVector( vector3 *org1, vector3 *org2, vector3 *mins, vector3 *maxs ) {
 	trace_t tr;
 
 	trap->Trace( &tr, org1, mins, maxs, org2, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
@@ -762,25 +564,7 @@ int ConnectTrail( int startindex, int endindex, qboolean behindTheScenes ) {
 	vector3 validspotpos;
 	trace_t tr;
 
-	if ( RMG.integer ) { //this might be temporary. Or not.
-		if ( !(gWPArray[startindex]->flags & WPFLAG_NEVERONEWAY) &&
-			!(gWPArray[endindex]->flags & WPFLAG_NEVERONEWAY) ) {
-			gWPArray[startindex]->flags |= WPFLAG_ONEWAY_FWD;
-			gWPArray[endindex]->flags |= WPFLAG_ONEWAY_BACK;
-		}
-		return 0;
-	}
-
-	if ( !RMG.integer ) {
-		branchDistance = TABLE_BRANCH_DISTANCE;
-	}
-	else {
-		branchDistance = 512; //be less precise here, terrain is fairly broad, and we don't want to take an hour precalculating
-	}
-
-	if ( RMG.integer ) {
-		maxDistFactor = 700;
-	}
+	branchDistance = TABLE_BRANCH_DISTANCE;
 
 	VectorSet( &mins, -15, -15, 0 );
 	VectorSet( &maxs, 15, 15, 0 );
@@ -831,24 +615,6 @@ int ConnectTrail( int startindex, int endindex, qboolean behindTheScenes ) {
 	nodenum++;
 
 	while ( nodenum < MAX_NODETABLE_SIZE && !foundit && cancontinue ) {
-		if ( RMG.integer ) { //adjust the branch distance dynamically depending on the distance from the start and end points.
-			vector3 startDist;
-			vector3 endDist;
-			float startDistf;
-			float endDistf;
-
-			VectorSubtract( &nodetable[nodenum - 1].origin, &gWPArray[startindex]->origin, &startDist );
-			VectorSubtract( &nodetable[nodenum - 1].origin, &gWPArray[endindex]->origin, &endDist );
-
-			startDistf = VectorLength( &startDist );
-			endDistf = VectorLength( &endDist );
-
-			if ( startDistf < 64 || endDistf < 64 )	branchDistance = 64;
-			else if ( startDistf < 128 || endDistf < 128 )	branchDistance = 128;
-			else if ( startDistf < 256 || endDistf < 256 )	branchDistance = 256;
-			else if ( startDistf < 512 || endDistf < 512 )	branchDistance = 512;
-			else											branchDistance = 800;
-		}
 		cancontinue = 0;
 		i = 0;
 		prenodestart = nodenum;
@@ -1084,7 +850,7 @@ int ConnectTrail( int startindex, int endindex, qboolean behindTheScenes ) {
 }
 
 int OpposingEnds( int start, int end ) {
-	if ( !gWPArray[start] || !gWPArray[start]->inuse || !gWPArray[end] || !gWPArray[end]->inuse ) {
+	if ( !gWPArray[start] || !gWPArray[end] ) {
 		return 0;
 	}
 
@@ -1101,7 +867,7 @@ int DoorBlockingSection( int start, int end ) { //if a door blocks the trail, we
 	gentity_t *testdoor;
 	int start_trace_index;
 
-	if ( !gWPArray[start] || !gWPArray[start]->inuse || !gWPArray[end] || !gWPArray[end]->inuse ) {
+	if ( !gWPArray[start] || !gWPArray[end] ) {
 		return 0;
 	}
 
@@ -1137,25 +903,18 @@ int DoorBlockingSection( int start, int end ) { //if a door blocks the trail, we
 }
 
 int RepairPaths( qboolean behindTheScenes ) {
-	int i;
 	vector3 a;
 	float maxDistFactor = 400;
 
-	if ( !gWPNum ) {
+	if ( gWPArray.empty() ) {
 		return 0;
 	}
-
-	if ( RMG.integer ) {
-		maxDistFactor = 800; //higher tolerance here.
-	}
-
-	i = 0;
 
 	trap->Cvar_Update( &bot_wp_distconnect );
 	trap->Cvar_Update( &bot_wp_visconnect );
 
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i + 1] && gWPArray[i + 1]->inuse ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] && gWPArray[i + 1] ) {
 			VectorSubtract( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, &a );
 
 			if ( !(gWPArray[i + 1]->flags & WPFLAG_NOVIS) &&
@@ -1163,22 +922,11 @@ int RepairPaths( qboolean behindTheScenes ) {
 				!(gWPArray[i]->flags & WPFLAG_CALCULATED) && //don't calculate it again
 				!OpposingEnds( i, i + 1 ) &&
 				((bot_wp_distconnect.value && VectorLength( &a ) > maxDistFactor) || (!OrgVisible( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, ENTITYNUM_NONE ) && bot_wp_visconnect.value)) &&
-				!DoorBlockingSection( i, i + 1 ) ) {
+				!DoorBlockingSection( i, i + 1 ) )
+			{
 				ConnectTrail( i, i + 1, behindTheScenes );
-
-				if ( gWPNum >= MAX_WPARRAY_SIZE ) { //Bad!
-					gWPNum = MAX_WPARRAY_SIZE;
-					break;
-				}
-
-				/*if (!ctRet)
-				{
-				return 0;
-				}*/ //we still want to write it..
 			}
 		}
-
-		i++;
 	}
 
 	return 1;
@@ -1213,7 +961,7 @@ int CanForceJumpTo( int baseindex, int testingindex, float distance ) {
 	VectorSet( &mins, -15, -15, -15 );
 	VectorSet( &maxs, 15, 15, 15 );
 
-	if ( !wpBase || !wpBase->inuse || !wpTest || !wpTest->inuse ) {
+	if ( !wpBase || !wpTest ) {
 		return 0;
 	}
 
@@ -1264,30 +1012,22 @@ int CanForceJumpTo( int baseindex, int testingindex, float distance ) {
 }
 
 void CalculatePaths( void ) {
-	int i;
-	int c;
 	int forceJumpable;
 	int maxNeighborDist = MAX_NEIGHBOR_LINK_DISTANCE;
 	float nLDist;
 	vector3 a;
 	vector3 mins, maxs;
 
-	if ( !gWPNum ) {
+	if ( gWPArray.empty() ) {
 		return;
-	}
-
-	if ( RMG.integer ) {
-		maxNeighborDist = DEFAULT_GRID_SPACING + (DEFAULT_GRID_SPACING*0.5f);
 	}
 
 	VectorSet( &mins, -15, -15, -15 );
 	VectorSet( &maxs, 15, 15, 15 );
 
 	//now clear out all the neighbor data before we recalculate
-	i = 0;
-
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse && gWPArray[i]->neighbornum ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] && gWPArray[i]->neighbornum ) {
 			while ( gWPArray[i]->neighbornum >= 0 ) {
 				gWPArray[i]->neighbors[gWPArray[i]->neighbornum].num = 0;
 				gWPArray[i]->neighbors[gWPArray[i]->neighbornum].forceJumpTo = 0;
@@ -1295,18 +1035,12 @@ void CalculatePaths( void ) {
 			}
 			gWPArray[i]->neighbornum = 0;
 		}
-
-		i++;
 	}
 
-	i = 0;
-
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse ) {
-			c = 0;
-
-			while ( c < gWPNum ) {
-				if ( gWPArray[c] && gWPArray[c]->inuse && i != c &&
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] ) {
+			for ( int c = 0; c < size; c++ ) {
+				if ( gWPArray[c] && i != c &&
 					NotWithinRange( i, c ) ) {
 					VectorSubtract( &gWPArray[i]->origin, &gWPArray[c]->origin, &a );
 
@@ -1330,10 +1064,8 @@ void CalculatePaths( void ) {
 						break;
 					}
 				}
-				c++;
 			}
 		}
-		i++;
 	}
 }
 
@@ -1390,7 +1122,7 @@ void CalculateSiegeGoals( void ) {
 
 			wpindex = GetNearestVisibleWP( &dif, tent->s.number );
 
-			if ( wpindex != -1 && gWPArray[wpindex] && gWPArray[wpindex]->inuse ) { //found the waypoint nearest the center of this objective-related object
+			if ( wpindex != -1 && gWPArray[wpindex] ) { //found the waypoint nearest the center of this objective-related object
 				if ( ent->side == SIEGETEAM_TEAM1 ) {
 					gWPArray[wpindex]->flags |= WPFLAG_SIEGE_IMPERIALOBJ;
 				}
@@ -1428,21 +1160,19 @@ float botGlobalNavWeaponWeights[WP_NUM_WEAPONS] =
 };
 
 int GetNearestVisibleWPToItem( vector3 *org, int ignore ) {
-	int i;
 	float bestdist;
 	float flLen;
 	int bestindex;
 	vector3 a, mins, maxs;
 
-	i = 0;
 	bestdist = 64; //has to be less than 64 units to the item or it isn't safe enough
 	bestindex = -1;
 
 	VectorSet( &mins, -15, -15, 0 );
 	VectorSet( &maxs, 15, 15, 0 );
 
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse &&
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] &&
 			gWPArray[i]->origin.z - 15 < org->z &&
 			gWPArray[i]->origin.z + 15 > org->z ) {
 			VectorSubtract( org, &gWPArray[i]->origin, &a );
@@ -1453,15 +1183,12 @@ int GetNearestVisibleWPToItem( vector3 *org, int ignore ) {
 				bestindex = i;
 			}
 		}
-
-		i++;
 	}
 
 	return bestindex;
 }
 
 void CalculateWeightGoals( void ) { //set waypoint weights depending on weapon and item placement
-	int i = 0;
 	int wpindex = 0;
 	gentity_t *ent;
 	float weight;
@@ -1469,22 +1196,18 @@ void CalculateWeightGoals( void ) { //set waypoint weights depending on weapon a
 	trap->Cvar_Update( &bot_wp_clearweight );
 
 	if ( bot_wp_clearweight.integer ) { //if set then flush out all weight/goal values before calculating them again
-		while ( i < gWPNum ) {
-			if ( gWPArray[i] && gWPArray[i]->inuse ) {
+		for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+			if ( gWPArray[i] ) {
 				gWPArray[i]->weight = 0;
 
 				if ( gWPArray[i]->flags & WPFLAG_GOALPOINT ) {
 					gWPArray[i]->flags &= ~WPFLAG_GOALPOINT;
 				}
 			}
-
-			i++;
 		}
 	}
 
-	i = 0;
-
-	while ( i < level.num_entities ) {
+	for ( int i = 0; i < level.num_entities; i++ ) {
 		ent = &g_entities[i];
 
 		weight = 0;
@@ -1505,34 +1228,31 @@ void CalculateWeightGoals( void ) { //set waypoint weights depending on weapon a
 		if ( ent && weight ) {
 			wpindex = GetNearestVisibleWPToItem( &ent->s.pos.trBase, ent->s.number );
 
-			if ( wpindex != -1 && gWPArray[wpindex] && gWPArray[wpindex]->inuse ) { //found the waypoint nearest the center of this object
+			if ( wpindex != -1 && gWPArray[wpindex] ) { //found the waypoint nearest the center of this object
 				gWPArray[wpindex]->weight = weight;
 				gWPArray[wpindex]->flags |= WPFLAG_GOALPOINT;
 				gWPArray[wpindex]->associated_entity = ent->s.number;
 			}
 		}
-
-		i++;
 	}
 }
 
 void CalculateJumpRoutes( void ) {
-	int i = 0;
 	float nheightdif = 0;
 	float pheightdif = 0;
 
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] ) {
 			if ( gWPArray[i]->flags & WPFLAG_JUMP ) {
 				nheightdif = 0;
 				pheightdif = 0;
 
 				gWPArray[i]->forceJumpTo = 0;
 
-				if ( gWPArray[i - 1] && gWPArray[i - 1]->inuse && (gWPArray[i - 1]->origin.z + 16) < gWPArray[i]->origin.z )
+				if (i > 0 && gWPArray[i - 1] && (gWPArray[i - 1]->origin.z+16) < gWPArray[i]->origin.z)
 					nheightdif = (gWPArray[i]->origin.z - gWPArray[i - 1]->origin.z);
 
-				if ( gWPArray[i + 1] && gWPArray[i + 1]->inuse && (gWPArray[i + 1]->origin.z + 16) < gWPArray[i]->origin.z )
+				if ( i + 1 < gWPArray.size() && gWPArray[i + 1] && (gWPArray[i + 1]->origin.z + 16) < gWPArray[i]->origin.z )
 					pheightdif = (gWPArray[i]->origin.z - gWPArray[i + 1]->origin.z);
 
 				if ( nheightdif > pheightdif )
@@ -1545,57 +1265,39 @@ void CalculateJumpRoutes( void ) {
 				}
 			}
 		}
-
-		i++;
 	}
 }
 
 int LoadPathData( const char *filename ) {
-	fileHandle_t f;
-	char *fileString;
-	char *currentVar;
-	char *routePath;
-	wpobject_t thiswp;
-	int len;
 	int i, i_cv;
 	int nei_num;
 
 	i = 0;
 
-	routePath = (char *)B_TempAlloc( 1024 );
-
-	Com_sprintf( routePath, 1024, "botroutes/%s.wnt\0", filename );
-
-	len = trap->FS_Open( routePath, &f, FS_READ );
-
-	B_TempFree( 1024 ); //routePath
-
+	char routePath[MAX_QPATH];
+	Com_sprintf( routePath, sizeof(routePath), "botroutes/%s.wnt", filename );
+	fileHandle_t f;
+	int len = trap->FS_Open( routePath, &f, FS_READ );
 	if ( !f ) {
 		trap->Print( S_COLOR_YELLOW "Bot route data not found for %s\n", filename );
 		return 2;
 	}
 
-	if ( len >= 524288 ) {
-		trap->Print( S_COLOR_RED "Route file exceeds maximum length\n" );
-		trap->FS_Close( f );
-		return 0;
-	}
+	char *fileContents = (char *)B_AllocZ( len );
+	char currentVar[MAX_TOKEN_CHARS];
 
-	fileString = (char *)B_TempAlloc( 524288 );
-	currentVar = (char *)B_TempAlloc( 2048 );
+	trap->FS_Read( fileContents, len, f );
 
-	trap->FS_Read( fileString, len, f );
-
-	if ( fileString[i] == 'l' ) { //contains a "levelflags" entry..
+	if ( fileContents[i] == 'l' ) { //contains a "levelflags" entry..
 		char readLFlags[64];
 		i_cv = 0;
 
-		while ( fileString[i] != ' ' ) {
+		while ( fileContents[i] != ' ' ) {
 			i++;
 		}
 		i++;
-		while ( fileString[i] != '\n' ) {
-			readLFlags[i_cv] = fileString[i];
+		while ( fileContents[i] != '\n' ) {
+			readLFlags[i_cv] = fileContents[i];
 			i_cv++;
 			i++;
 		}
@@ -1611,9 +1313,9 @@ int LoadPathData( const char *filename ) {
 	while ( i < len ) {
 		i_cv = 0;
 
+		wpobject_t thiswp = {};
 		thiswp.index = 0;
 		thiswp.flags = 0;
-		thiswp.inuse = 0;
 		thiswp.neighbornum = 0;
 		thiswp.origin.x = 0;
 		thiswp.origin.y = 0;
@@ -1631,8 +1333,8 @@ int LoadPathData( const char *filename ) {
 			nei_num++;
 		}
 
-		while ( fileString[i] != ' ' ) {
-			currentVar[i_cv] = fileString[i];
+		while ( fileContents[i] != ' ' ) {
+			currentVar[i_cv] = fileContents[i];
 			i_cv++;
 			i++;
 		}
@@ -1643,8 +1345,8 @@ int LoadPathData( const char *filename ) {
 		i_cv = 0;
 		i++;
 
-		while ( fileString[i] != ' ' ) {
-			currentVar[i_cv] = fileString[i];
+		while ( fileContents[i] != ' ' ) {
+			currentVar[i_cv] = fileContents[i];
 			i_cv++;
 			i++;
 		}
@@ -1655,8 +1357,8 @@ int LoadPathData( const char *filename ) {
 		i_cv = 0;
 		i++;
 
-		while ( fileString[i] != ' ' ) {
-			currentVar[i_cv] = fileString[i];
+		while ( fileContents[i] != ' ' ) {
+			currentVar[i_cv] = fileContents[i];
 			i_cv++;
 			i++;
 		}
@@ -1668,8 +1370,8 @@ int LoadPathData( const char *filename ) {
 		i++;
 		i++;
 
-		while ( fileString[i] != ' ' ) {
-			currentVar[i_cv] = fileString[i];
+		while ( fileContents[i] != ' ' ) {
+			currentVar[i_cv] = fileContents[i];
 			i_cv++;
 			i++;
 		}
@@ -1680,8 +1382,8 @@ int LoadPathData( const char *filename ) {
 		i_cv = 0;
 		i++;
 
-		while ( fileString[i] != ' ' ) {
-			currentVar[i_cv] = fileString[i];
+		while ( fileContents[i] != ' ' ) {
+			currentVar[i_cv] = fileContents[i];
 			i_cv++;
 			i++;
 		}
@@ -1692,8 +1394,8 @@ int LoadPathData( const char *filename ) {
 		i_cv = 0;
 		i++;
 
-		while ( fileString[i] != ')' ) {
-			currentVar[i_cv] = fileString[i];
+		while ( fileContents[i] != ')' ) {
+			currentVar[i_cv] = fileContents[i];
 			i_cv++;
 			i++;
 		}
@@ -1703,10 +1405,10 @@ int LoadPathData( const char *filename ) {
 
 		i += 4;
 
-		while ( fileString[i] != '}' ) {
+		while ( fileContents[i] != '}' ) {
 			i_cv = 0;
-			while ( fileString[i] != ' ' && fileString[i] != '-' ) {
-				currentVar[i_cv] = fileString[i];
+			while ( fileContents[i] != ' ' && fileContents[i] != '-' ) {
+				currentVar[i_cv] = fileContents[i];
 				i_cv++;
 				i++;
 			}
@@ -1714,12 +1416,12 @@ int LoadPathData( const char *filename ) {
 
 			thiswp.neighbors[thiswp.neighbornum].num = atoi( currentVar );
 
-			if ( fileString[i] == '-' ) {
+			if ( fileContents[i] == '-' ) {
 				i_cv = 0;
 				i++;
 
-				while ( fileString[i] != ' ' ) {
-					currentVar[i_cv] = fileString[i];
+				while ( fileContents[i] != ' ' ) {
+					currentVar[i_cv] = fileContents[i];
 					i_cv++;
 					i++;
 				}
@@ -1740,8 +1442,8 @@ int LoadPathData( const char *filename ) {
 		i++;
 		i++;
 
-		while ( fileString[i] != '\n' ) {
-			currentVar[i_cv] = fileString[i];
+		while ( fileContents[i] != '\n' ) {
+			currentVar[i_cv] = fileContents[i];
 			i_cv++;
 			i++;
 		}
@@ -1753,8 +1455,7 @@ int LoadPathData( const char *filename ) {
 		i++;
 	}
 
-	B_TempFree( 524288 ); //fileString
-	B_TempFree( 2048 ); //currentVar
+	B_Free( fileContents );
 
 	trap->FS_Close( f );
 
@@ -1774,7 +1475,7 @@ int LoadPathData( const char *filename ) {
 }
 
 void FlagObjects( void ) {
-	int i = 0, bestindex = 0, found = 0;
+	int bestindex = 0, found = 0;
 	float bestdist = 999999, tlen = 0;
 	gentity_t *flag_red, *flag_blue, *ent;
 	vector3 a, mins, maxs;
@@ -1786,7 +1487,7 @@ void FlagObjects( void ) {
 	VectorSet( &mins, -15, -15, -5 );
 	VectorSet( &maxs, 15, 15, 5 );
 
-	while ( i < level.num_entities ) {
+	for ( int i = 0; i < level.num_entities; i++ ) {
 		ent = &g_entities[i];
 
 		if ( G_IsValidEntity( ent ) && ent->classname ) {
@@ -1798,18 +1499,14 @@ void FlagObjects( void ) {
 			if ( flag_red && flag_blue )
 				break;
 		}
-
-		i++;
 	}
-
-	i = 0;
 
 	if ( !flag_red || !flag_blue ) {
 		return;
 	}
 
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] ) {
 			VectorSubtract( &flag_red->s.pos.trBase, &gWPArray[i]->origin, &a );
 			tlen = VectorLength( &a );
 
@@ -1824,8 +1521,6 @@ void FlagObjects( void ) {
 			}
 
 		}
-
-		i++;
 	}
 
 	if ( found ) {
@@ -1838,10 +1533,9 @@ void FlagObjects( void ) {
 	bestdist = 999999;
 	bestindex = 0;
 	found = 0;
-	i = 0;
 
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] ) {
 			VectorSubtract( &flag_blue->s.pos.trBase, &gWPArray[i]->origin, &a );
 			tlen = VectorLength( &a );
 
@@ -1856,8 +1550,6 @@ void FlagObjects( void ) {
 			}
 
 		}
-
-		i++;
 	}
 
 	if ( found ) {
@@ -1880,13 +1572,13 @@ int SavePathData( const char *filename ) {
 	fileString = NULL;
 	i = 0;
 
-	if ( !gWPNum ) {
+	if ( gWPArray.empty() ) {
 		return 0;
 	}
 
 	routePath = (char *)B_TempAlloc( 1024 );
 
-	Com_sprintf( routePath, 1024, "botroutes/%s.wnt\0", filename );
+	Com_sprintf( routePath, 1024, "botroutes/%s.wnt", filename );
 
 	trap->FS_Open( routePath, &f, FS_WRITE );
 
@@ -1924,7 +1616,7 @@ int SavePathData( const char *filename ) {
 		n++;
 	}
 
-	if ( gWPArray[i + 1] && gWPArray[i + 1]->inuse && gWPArray[i + 1]->index ) {
+	if ( gWPArray[i + 1] && gWPArray[i + 1]->index ) {
 		VectorSubtract( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, &a );
 		flLen = VectorLength( &a );
 	}
@@ -1938,7 +1630,7 @@ int SavePathData( const char *filename ) {
 
 	i++;
 
-	while ( i < gWPNum ) {
+	for ( int size = gWPArray.size(); i < size; i++ ) {
 		//sprintf(fileString, "%s%i %i %f (%f %f %f) { ", fileString, gWPArray[i]->index, gWPArray[i]->flags, gWPArray[i]->weight, gWPArray[i]->origin.x, gWPArray[i]->origin.y, gWPArray[i]->origin.z);
 		Com_sprintf( storeString, 4096, "%i %i %f %s { ", gWPArray[i]->index, gWPArray[i]->flags, (double)gWPArray[i]->weight, vtos( &gWPArray[i]->origin ) );
 
@@ -1954,7 +1646,7 @@ int SavePathData( const char *filename ) {
 			n++;
 		}
 
-		if ( gWPArray[i + 1] && gWPArray[i + 1]->inuse && gWPArray[i + 1]->index ) {
+		if ( gWPArray[i + 1] && gWPArray[i + 1]->index ) {
 			VectorSubtract( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, &a );
 			flLen = VectorLength( &a );
 		}
@@ -1967,8 +1659,6 @@ int SavePathData( const char *filename ) {
 		Com_sprintf( storeString, 4096, "%s} %f\n", storeString, (double)flLen );
 
 		strcat( fileString, storeString );
-
-		i++;
 	}
 
 	trap->FS_Write( fileString, strlen( fileString ), f );
@@ -2207,15 +1897,13 @@ void CreateAsciiTableRepresentation( void )
 			qboolean gotit = qfalse;
 
 			i = 0;
-			while (i < gWPNum)
-			{
+			for ( int size = gWPArray.size(); i < size; i++ ) {
 				if (((int)gWPArray[i]->origin.x <= placeX && (int)gWPArray[i]->origin.x > oldX) &&
 					((int)gWPArray[i]->origin.y <= placeY && (int)gWPArray[i]->origin.y > oldY))
 				{
 					gotit = qtrue;
 					break;
 				}
-				i++;
 			}
 
 			if (gotit)
@@ -2430,269 +2118,9 @@ void CreateAsciiNodeTableRepresentation(int start, int end)
 }
 #endif
 
-qboolean G_BackwardAttachment( int start, int finalDestination, int insertAfter ) { //After creating a node path between 2 points, this function links the 2 points with actual waypoint data.
-	int indexDirections[4]; //0 == down, 1 == up, 2 == left, 3 == right
-	int i = 0;
-	int lowestWeight = 9999;
-	int desiredIndex = -1;
-	vector2 givenXY;
-
-	givenXY.x = nodetable[start].origin.x;
-	givenXY.y = nodetable[start].origin.y;
-	givenXY.x -= DEFAULT_GRID_SPACING;
-	indexDirections[0] = G_NodeMatchingXY_BA( givenXY.x, givenXY.y, finalDestination );
-
-	givenXY.x = nodetable[start].origin.x;
-	givenXY.y = nodetable[start].origin.y;
-	givenXY.y += DEFAULT_GRID_SPACING;
-	indexDirections[1] = G_NodeMatchingXY_BA( givenXY.x, givenXY.y, finalDestination );
-
-	givenXY.x = nodetable[start].origin.x;
-	givenXY.y = nodetable[start].origin.y;
-	givenXY.y -= DEFAULT_GRID_SPACING;
-	indexDirections[2] = G_NodeMatchingXY_BA( givenXY.x, givenXY.y, finalDestination );
-
-	givenXY.x = nodetable[start].origin.x;
-	givenXY.y = nodetable[start].origin.y;
-	givenXY.y += DEFAULT_GRID_SPACING;
-	indexDirections[3] = G_NodeMatchingXY_BA( givenXY.x, givenXY.y, finalDestination );
-
-	while ( i < 4 ) {
-		if ( indexDirections[i] != -1 ) {
-			if ( indexDirections[i] == finalDestination ) { //hooray, we've found the original point and linked all the way back to it.
-				CreateNewWP_InsertUnder( &nodetable[start].origin, 0, insertAfter );
-				CreateNewWP_InsertUnder( &nodetable[indexDirections[i]].origin, 0, insertAfter );
-				return qtrue;
-			}
-
-			if ( nodetable[indexDirections[i]].weight < lowestWeight && nodetable[indexDirections[i]].weight && !nodetable[indexDirections[i]].flags /*&& (nodetable[indexDirections[i]].origin.z-64 < nodetable[start].origin.z)*/ ) {
-				desiredIndex = indexDirections[i];
-				lowestWeight = nodetable[indexDirections[i]].weight;
-			}
-		}
-		i++;
-	}
-
-	if ( desiredIndex != -1 ) { //Create a waypoint here, and then recursively call this function for the next neighbor with the lowest weight.
-		if ( gWPNum < 3900 ) {
-			CreateNewWP_InsertUnder( &nodetable[start].origin, 0, insertAfter );
-		}
-		else {
-			return qfalse;
-		}
-
-		nodetable[start].flags = 1;
-		return G_BackwardAttachment( desiredIndex, finalDestination, insertAfter );
-	}
-
-	return qfalse;
-}
-
-
 #ifdef _DEBUG
 #define PATH_TIME_DEBUG
 #endif
-
-void G_RMGPathing( void ) { //Generate waypoint information on-the-fly for the random mission.
-	float placeX, placeY, placeZ;
-	int i = 0;
-	int gridSpacing = DEFAULT_GRID_SPACING;
-	int nearestIndex = 0;
-	int nearestIndexForNext = 0;
-#ifdef PATH_TIME_DEBUG
-	int startTime = 0;
-	int endTime = 0;
-#endif
-	vector3 downVec, trMins, trMaxs;
-	trace_t tr;
-	gentity_t *terrain = G_Find( NULL, FOFS( classname ), "terrain" );
-
-	if ( !terrain || !terrain->inuse || terrain->s.eType != ET_TERRAIN ) {
-		trap->Print( "Error: RMG with no terrain!\n" );
-		return;
-	}
-
-#ifdef PATH_TIME_DEBUG
-	startTime = trap->Milliseconds();
-#endif
-
-	nodenum = 0;
-	memset( &nodetable, 0, sizeof(nodetable) );
-
-	VectorSet( &trMins, -15, -15, DEFAULT_MINS_2 );
-	VectorSet( &trMaxs, 15, 15, DEFAULT_MAXS_2 );
-
-	placeX = terrain->r.absmin.x;
-	placeY = terrain->r.absmin.y;
-	placeZ = terrain->r.absmax.z - 400;
-
-	//skim through the entirety of the terrain limits and drop nodes, removing
-	//nodes that start in solid or fall too high on the terrain.
-	while ( placeY < terrain->r.absmax.y ) {
-		if ( nodenum >= MAX_NODETABLE_SIZE ) {
-			break;
-		}
-
-		while ( placeX < terrain->r.absmax.x ) {
-			if ( nodenum >= MAX_NODETABLE_SIZE ) {
-				break;
-			}
-
-			nodetable[nodenum].origin.x = placeX;
-			nodetable[nodenum].origin.y = placeY;
-			nodetable[nodenum].origin.z = placeZ;
-
-			VectorCopy( &nodetable[nodenum].origin, &downVec );
-			downVec.z -= 3000;
-			trap->Trace( &tr, &nodetable[nodenum].origin, &trMins, &trMaxs, &downVec, ENTITYNUM_NONE, MASK_SOLID, qfalse, 0, 0 );
-
-			if ( (tr.entityNum >= ENTITYNUM_WORLD || g_entities[tr.entityNum].s.eType == ET_TERRAIN) && tr.endpos.z < terrain->r.absmin.z + 750 ) { //only drop nodes on terrain directly
-				VectorCopy( &tr.endpos, &nodetable[nodenum].origin );
-				nodenum++;
-			}
-			else {
-				VectorClear( &nodetable[nodenum].origin );
-			}
-
-			placeX += gridSpacing;
-		}
-
-		placeX = terrain->r.absmin.x;
-		placeY += gridSpacing;
-	}
-
-	G_NodeClearForNext();
-
-	//The grid has been placed down, now use it to connect the points in the level.
-	while ( i < gSpawnPointNum - 1 ) {
-		if ( !gSpawnPoints[i] || !gSpawnPoints[i]->inuse || !gSpawnPoints[i + 1] || !gSpawnPoints[i + 1]->inuse ) {
-			i++;
-			continue;
-		}
-
-		nearestIndex = G_NearestNodeToPoint( &gSpawnPoints[i]->s.origin );
-		nearestIndexForNext = G_NearestNodeToPoint( &gSpawnPoints[i + 1]->s.origin );
-
-		if ( nearestIndex == -1 || nearestIndexForNext == -1 ) { //Looks like there is no grid data near one of the points. Ideally, this will never happen.
-			i++;
-			continue;
-		}
-
-		if ( nearestIndex == nearestIndexForNext ) { //Two spawn points on top of each other? We don't need to do both points, keep going until the next differs.
-			i++;
-			continue;
-		}
-
-		//So, nearestIndex is now the node for the spawn point we're on, and nearestIndexForNext is the
-		//node we want to get to from here.
-
-		//For now I am going to branch out mindlessly, but I will probably want to use some sort of A* algorithm
-		//here to lessen the time taken.
-		if ( G_RecursiveConnection( nearestIndex, nearestIndexForNext, 0, qtrue, terrain->r.absmin.z ) != nearestIndexForNext ) { //failed to branch to where we want. Oh well, try it without trace checks.
-			G_NodeClearForNext();
-
-			if ( G_RecursiveConnection( nearestIndex, nearestIndexForNext, 0, qfalse, terrain->r.absmin.z ) != nearestIndexForNext ) { //still failed somehow. Just disregard this point.
-				G_NodeClearForNext();
-				i++;
-				continue;
-			}
-		}
-
-		//Now our node array is set up so that highest reasonable weight is the destination node, and 2 is next to the original index,
-		//so trace back to that point.
-		G_NodeClearFlags();
-
-#ifdef ASCII_ART_DEBUG
-#ifdef ASCII_ART_NODE_DEBUG
-		CreateAsciiNodeTableRepresentation(nearestIndex, nearestIndexForNext);
-#endif
-#endif
-		if ( G_BackwardAttachment( nearestIndexForNext, nearestIndex, gWPNum - 1 ) ) { //successfully connected the trail from nearestIndex to nearestIndexForNext
-			if ( gSpawnPoints[i + 1]->inuse && gSpawnPoints[i + 1]->item &&
-				gSpawnPoints[i + 1]->item->giType == IT_TEAM ) { //This point is actually a CTF flag.
-				if ( gSpawnPoints[i + 1]->item->giTag == PW_REDFLAG || gSpawnPoints[i + 1]->item->giTag == PW_BLUEFLAG ) { //Place a waypoint on the flag next in the trail, so the nearest grid point will link to it.
-					CreateNewWP_InsertUnder( &gSpawnPoints[i + 1]->s.origin, WPFLAG_NEVERONEWAY, gWPNum - 1 );
-				}
-			}
-
-		}
-		else {
-			break;
-		}
-
-#ifdef DEBUG_NODE_FILE
-		G_DebugNodeFile();
-#endif
-
-		G_NodeClearForNext();
-		i++;
-	}
-
-	RepairPaths( qtrue ); //this has different behaviour for RMG and will just flag all points one way that don't trace to each other.
-
-#ifdef PATH_TIME_DEBUG
-	endTime = trap->Milliseconds();
-
-	trap->Print( "Total routing time taken: %ims\n", (endTime - startTime) );
-#endif
-
-#ifdef ASCII_ART_DEBUG
-	CreateAsciiTableRepresentation();
-#endif
-}
-
-void BeginAutoPathRoutine( void ) { //Called for RMG levels.
-	int i = 0;
-	gentity_t *ent = NULL;
-
-	gSpawnPointNum = 0;
-
-	CreateNewWP( &vec3_origin, 0 ); //create a dummy waypoint to insert under
-
-	while ( i < level.num_entities ) {
-		ent = &g_entities[i];
-
-		if ( G_IsValidEntity( ent ) && VALIDSTRING( ent->classname ) && !Q_stricmp( ent->classname, "info_player_deathmatch" ) ) {
-			if ( ent->s.origin.z < 1280 ) { //h4x
-				gSpawnPoints[gSpawnPointNum] = ent;
-				gSpawnPointNum++;
-			}
-		}
-		else if ( ent && ent->inuse && ent->item && ent->item->giType == IT_TEAM &&
-			(ent->item->giTag == PW_REDFLAG || ent->item->giTag == PW_BLUEFLAG) ) { //also make it path to flags in CTF.
-			gSpawnPoints[gSpawnPointNum] = ent;
-			gSpawnPointNum++;
-		}
-
-		i++;
-	}
-
-	if ( gSpawnPointNum < 1 ) {
-		return;
-	}
-
-	G_RMGPathing();
-
-	//rww - Using a faster in-engine version because we're having to wait for this stuff to get done as opposed to just saving it once.
-	trap->BotUpdateWaypoints( gWPNum, gWPArray );
-	trap->BotCalculatePaths( RMG.integer );
-	//CalculatePaths(); //make everything nice and connected
-
-	FlagObjects(); //currently only used for flagging waypoints nearest CTF flags
-
-	i = 0;
-
-	vector3 vec;
-	while ( i < gWPNum - 1 ) { //disttonext is normally set on save, and when a file is loaded. For RMG we must do it after calc'ing.
-		VectorSubtract( &gWPArray[i]->origin, &gWPArray[i + 1]->origin, &vec );
-		gWPArray[i]->disttonext = VectorLength( &vec );
-		i++;
-	}
-
-	RemoveWP(); //remove the dummy point at the end of the trail
-}
-
-extern vmCvar_t bot_normgpath;
 
 void LoadPath_ThisLevel( void ) {
 	vmCvar_t	mapname;
@@ -2701,24 +2129,8 @@ void LoadPath_ThisLevel( void ) {
 
 	trap->Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
 
-	if ( RMG.integer ) { //If RMG, generate the path on-the-fly
-		trap->Cvar_Register( &bot_normgpath, "bot_normgpath", "1", CVAR_CHEAT );
-		//note: This is disabled for now as I'm using standard bot nav
-		//on premade terrain levels.
-
-		if ( !bot_normgpath.integer ) { //autopath the random map
-			BeginAutoPathRoutine();
-		}
-		else { //try loading standard nav data
-			LoadPathData( level.rawmapname );
-		}
-
-		gLevelFlags |= LEVELFLAG_NOPOINTPREDICTION;
-	}
-	else {
-		if ( LoadPathData( level.rawmapname ) == 2 ) {
-			//enter "edit" mode if cheats enabled?
-		}
+	if ( LoadPathData( level.rawmapname ) == 2 ) {
+		//enter "edit" mode if cheats enabled?
 	}
 
 	trap->Cvar_Update( &bot_wp_edit );
@@ -2902,7 +2314,7 @@ int AcceptBotCommand( char *cmd, gentity_t *pl ) {
 		}
 		else {
 			trap->Print( S_COLOR_YELLOW "You didn't specify an index. Assuming last.\n" );
-			TeleportToWP( pl, gWPNum - 1 );
+			TeleportToWP( pl, gWPArray.size() - 1 );
 		}
 		return 1;
 	}
@@ -3043,10 +2455,8 @@ int AcceptBotCommand( char *cmd, gentity_t *pl ) {
 	}
 
 	if ( Q_stricmp( cmd, "bot_wp_killoneways" ) == 0 ) {
-		i = 0;
-
-		while ( i < gWPNum ) {
-			if ( gWPArray[i] && gWPArray[i]->inuse ) {
+		for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+			if ( gWPArray[i] ) {
 				if ( gWPArray[i]->flags & WPFLAG_ONEWAY_FWD ) {
 					gWPArray[i]->flags &= ~WPFLAG_ONEWAY_FWD;
 				}
@@ -3054,8 +2464,6 @@ int AcceptBotCommand( char *cmd, gentity_t *pl ) {
 					gWPArray[i]->flags &= ~WPFLAG_ONEWAY_BACK;
 				}
 			}
-
-			i++;
 		}
 
 		return 1;

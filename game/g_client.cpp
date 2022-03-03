@@ -410,10 +410,10 @@ void SP_info_jedimaster_start( gentity_t *ent ) {
 
 	ent->flags = FL_BOUNCE_HALF;
 
-	ent->s.modelindex = G_ModelIndex( "models/weapons2/saber/saber_w.glm" );
+	ent->s.modelindex = G_ModelIndex( DEFAULT_SABER_MODEL );
 	ent->s.modelGhoul2 = 1;
 	ent->s.g2radius = 20;
-	//	ent->s.eType		= ET_GENERAL;
+	//ent->s.eType = ET_GENERAL;
 	ent->s.eType = ET_MISSILE;
 	ent->s.weapon = WP_SABER;
 	ent->s.pos.trType = TR_GRAVITY;
@@ -644,7 +644,7 @@ gentity_t *SelectRandomFurthestSpawnPoint( vector3 *avoidPoint, vector3 *origin,
 	// select a random spot from the spawn points furthest away
 	//rnd = random() * (numSpots / 2);
 	//rnd = Q_irand( 0, QRAND_MAX - 1 ) / numSpots
-	rnd = Q_irand( 0, numSpots );
+	rnd = Q_irand( 0, numSpots / 2 );
 
 	VectorCopy( &list_spot[rnd]->s.origin, origin );
 	origin->z += 9;
@@ -1093,7 +1093,7 @@ static qboolean IsSuffixed( const char *cleanName, int32_t *suffixNum ) {
 	if ( cleanName - bracketL < (ptrdiff_t)(len - 3) ) {
 #ifdef _DEBUG
 		trap->Print( "DuplicateNames: bracket came too early, not removing suffix. [cleanName - bracketL](%d) < "
-			"[len - 3]()\n", cleanName - bracketL, len - 3 );
+			"[len - 3](%d)\n", (int)(cleanName - bracketL), (int)len - 3 );
 #endif
 		return qfalse;
 	}
@@ -1703,7 +1703,7 @@ void SV_ToggleUserinfoValidation_f( void ) {
 
 		if ( index > numUserinfoFields + USERINFO_VALIDATION_MAX - 1 ) {
 			trap->Print( "ToggleUserinfoValidation: Invalid range: %i [0, %i]\n", index,
-				numUserinfoFields + USERINFO_VALIDATION_MAX - 1 );
+				(int)(numUserinfoFields + USERINFO_VALIDATION_MAX - 1) );
 			return;
 		}
 
@@ -2137,7 +2137,7 @@ qboolean ClientUserinfoChanged( int clientNum ) {
 	}
 	if ( level.gametype == GT_SIEGE ) {
 		Q_strcat( buf, sizeof(buf), va( "siegeclass\\%s\\", className ) );
-		Q_strcat( buf, sizeof(buf), va( "sdt\\%i\\", className ) );
+		Q_strcat( buf, sizeof(buf), va( "sdt\\%i\\", client->sess.siegeDesiredTeam ) );
 	}
 
 	trap->GetConfigstring( CS_PLAYERS + clientNum, oldClientinfo, sizeof(oldClientinfo) );
@@ -3249,11 +3249,22 @@ void ClientSpawn( gentity_t *ent ) {
 			Merc_On( ent );
 		}
 		else {
-			client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
+			uint32_t spawnWeaps = japp_spawnWeaps.integer;
+			if ( level.gametype == GT_JEDIMASTER ) {
+				// in jedi master, remove saber from spawnWeaps
+				if ( spawnWeaps & (1<<WP_SABER) ) {
+					spawnWeaps &= ~(1<<WP_SABER);
+				}
+			}
+			if ( !spawnWeaps ) {
+				// at least give them melee..
+				spawnWeaps |= (1<<WP_MELEE);
+			}
+			client->ps.stats[STAT_WEAPONS] = spawnWeaps;
 
 			// give ammo for all available weapons
 			for ( i = WP_BRYAR_PISTOL; i <= LAST_USEABLE_WEAPON; i++ ) {
-				if ( japp_spawnWeaps.bits & (1 << i) ) {
+				if ( spawnWeaps & (1 << i) ) {
 					ammo_t ammo = weaponData[i].ammoIndex;
 					const gitem_t *it = BG_FindItemForAmmo( ammo );
 					if ( it )

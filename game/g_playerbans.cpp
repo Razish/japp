@@ -73,7 +73,7 @@ void JP_Bans_LoadBans( void ) {
 
 	JP_Bans_Clear();
 
-	nextBanId = cJSON_ToInteger( cJSON_GetObjectItem( root, "nextid" ) );
+	nextBanId = cJSON_GetObjectItem( root, "nextid" )->valueint;
 	bans = cJSON_GetObjectItem( root, "bans" );
 
 	banCount = cJSON_GetArraySize( bans );
@@ -83,14 +83,14 @@ void JP_Bans_LoadBans( void ) {
 
 		entry = (banentry_t *)malloc( sizeof(banentry_t) );
 
-		entry->id = cJSON_ToInteger( cJSON_GetObjectItem( item, "id" ) );
-		entry->mask = cJSON_ToInteger( cJSON_GetObjectItem( item, "mask" ) );
-		entry->expireTime = cJSON_ToInteger( cJSON_GetObjectItem( item, "expire" ) );
-		Q_strncpyz( entry->banreason, cJSON_ToString( cJSON_GetObjectItem( item, "reason" ) ), sizeof(entry->banreason) );
-		entry->ip.b[0] = cJSON_ToInteger( cJSON_GetArrayItem( ip, 0 ) );
-		entry->ip.b[1] = cJSON_ToInteger( cJSON_GetArrayItem( ip, 1 ) );
-		entry->ip.b[2] = cJSON_ToInteger( cJSON_GetArrayItem( ip, 2 ) );
-		entry->ip.b[3] = cJSON_ToInteger( cJSON_GetArrayItem( ip, 3 ) );
+		entry->id = cJSON_GetObjectItem( item, "id" )->valueint;
+		entry->mask = cJSON_GetObjectItem( item, "mask" )->valueint;
+		entry->expireTime = cJSON_GetObjectItem( item, "expire" )->valueint;
+		Q_strncpyz( entry->banreason, cJSON_GetObjectItem( item, "reason" )->valuestring, sizeof(entry->banreason) );
+		entry->ip.b[0] = cJSON_GetArrayItem( ip, 0 )->valueint;
+		entry->ip.b[1] = cJSON_GetArrayItem( ip, 1 )->valueint;
+		entry->ip.b[2] = cJSON_GetArrayItem( ip, 2 )->valueint;
+		entry->ip.b[3] = cJSON_GetArrayItem( ip, 3 )->valueint;
 
 		entry->next = banlist;
 		banlist = entry;
@@ -110,7 +110,7 @@ void JP_Bans_SaveBans( void ) {
 	unsigned int	curr = time( NULL );
 
 	root = cJSON_CreateObject();
-	cJSON_AddIntegerToObject( root, "nextid", nextBanId );
+	cJSON_AddNumberToObject( root, "nextid", nextBanId );
 
 	bans = cJSON_CreateArray();
 
@@ -122,14 +122,14 @@ void JP_Bans_SaveBans( void ) {
 		item = cJSON_CreateObject();
 		ip = cJSON_CreateArray();
 
-		cJSON_AddIntegerToObject( item, "id", entry->id );
-		cJSON_AddIntegerToObject( item, "mask", entry->mask );
-		cJSON_AddIntegerToObject( item, "expire", entry->expireTime );
+		cJSON_AddNumberToObject( item, "id", entry->id );
+		cJSON_AddNumberToObject( item, "mask", entry->mask );
+		cJSON_AddNumberToObject( item, "expire", entry->expireTime );
 		cJSON_AddStringToObject( item, "reason", entry->banreason );
-		cJSON_AddIntegerToArray( ip, entry->ip.b[0] );
-		cJSON_AddIntegerToArray( ip, entry->ip.b[1] );
-		cJSON_AddIntegerToArray( ip, entry->ip.b[2] );
-		cJSON_AddIntegerToArray( ip, entry->ip.b[3] );
+		cJSON_AddItemToArray( ip, cJSON_CreateNumber( entry->ip.b[0] ) );
+		cJSON_AddItemToArray( ip, cJSON_CreateNumber( entry->ip.b[1] ) );
+		cJSON_AddItemToArray( ip, cJSON_CreateNumber( entry->ip.b[2] ) );
+		cJSON_AddItemToArray( ip, cJSON_CreateNumber( entry->ip.b[3] ) );
 		cJSON_AddItemToObject( item, "ip", ip );
 
 		cJSON_AddItemToArray( bans, item );
@@ -137,7 +137,7 @@ void JP_Bans_SaveBans( void ) {
 
 	cJSON_AddItemToObject( root, "bans", bans );
 
-	buffer = cJSON_Serialize( root, 1 );
+	buffer = cJSON_Print( root );
 
 	trap->FS_Open( BANFILE, &f, FS_WRITE );
 	trap->FS_Write( buffer, strlen( buffer ), f );

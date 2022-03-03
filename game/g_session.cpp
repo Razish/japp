@@ -11,21 +11,21 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 	fileHandle_t f;
 	char fileName[MAX_QPATH] = {};
 
-	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", client - level.clients );
+	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", (int)(client - level.clients) );
 	Com_Printf( "Writing session file %s\n", fileName );
 
 	root = cJSON_CreateObject();
-	cJSON_AddIntegerToObject( root, "sessionTeam", sess->sessionTeam );
-	cJSON_AddIntegerToObject( root, "spectatorTime", sess->spectatorTime );
-	cJSON_AddIntegerToObject( root, "spectatorState", sess->spectatorState );
-	cJSON_AddIntegerToObject( root, "spectatorClient", sess->spectatorClient );
-	cJSON_AddIntegerToObject( root, "wins", sess->wins );
-	cJSON_AddIntegerToObject( root, "losses", sess->losses );
-	cJSON_AddIntegerToObject( root, "setForce", sess->setForce );
-	cJSON_AddIntegerToObject( root, "saberLevel", sess->saberLevel );
-	cJSON_AddIntegerToObject( root, "selectedFP", sess->selectedFP );
-	cJSON_AddIntegerToObject( root, "duelTeam", sess->duelTeam );
-	cJSON_AddIntegerToObject( root, "siegeDesiredTeam", sess->siegeDesiredTeam );
+	cJSON_AddNumberToObject( root, "sessionTeam", sess->sessionTeam );
+	cJSON_AddNumberToObject( root, "spectatorTime", sess->spectatorTime );
+	cJSON_AddNumberToObject( root, "spectatorState", sess->spectatorState );
+	cJSON_AddNumberToObject( root, "spectatorClient", sess->spectatorClient );
+	cJSON_AddNumberToObject( root, "wins", sess->wins );
+	cJSON_AddNumberToObject( root, "losses", sess->losses );
+	cJSON_AddNumberToObject( root, "setForce", sess->setForce );
+	cJSON_AddNumberToObject( root, "saberLevel", sess->saberLevel );
+	cJSON_AddNumberToObject( root, "selectedFP", sess->selectedFP );
+	cJSON_AddNumberToObject( root, "duelTeam", sess->duelTeam );
+	cJSON_AddNumberToObject( root, "siegeDesiredTeam", sess->siegeDesiredTeam );
 	cJSON_AddStringToObject( root, "siegeClass", *sess->siegeClass ? sess->siegeClass : "none" );
 	cJSON_AddStringToObject( root, "IP", sess->IP );
 	if ( client->pers.adminUser ) {
@@ -36,11 +36,11 @@ void G_WriteClientSessionData( const gclient_t *client ) {
 		Crypto::ChecksumMD5( combined, strlen( combined ), checksum );
 		cJSON_AddStringToObject( root, "admin", checksum );
 	}
-	cJSON_AddBooleanToObject( root, "empowered", !!client->pers.adminData.empowered );
-	cJSON_AddBooleanToObject( root, "merc", !!client->pers.adminData.merc );
-	cJSON_AddBooleanToObject( root, "silenced", !!client->pers.adminData.silenced );
-	cJSON_AddBooleanToObject( root, "slept", !!client->pers.adminData.isSlept );
-	cJSON_AddIntegerToObject( root, "tempprivs", !!client->pers.tempprivs);
+	cJSON_AddNumberToObject( root, "empowered", !!client->pers.adminData.empowered );
+	cJSON_AddNumberToObject( root, "merc", !!client->pers.adminData.merc );
+	cJSON_AddNumberToObject( root, "silenced", !!client->pers.adminData.silenced );
+	cJSON_AddNumberToObject( root, "slept", !!client->pers.adminData.isSlept );
+	cJSON_AddNumberToObject( root, "tempprivs", !!client->pers.tempprivs);
 
 	trap->FS_Open( fileName, &f, FS_WRITE );
 
@@ -57,7 +57,7 @@ void G_ReadClientSessionData( gclient_t *client ) {
 	unsigned int len = 0;
 	const char *tmp = NULL;
 
-	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", client - level.clients );
+	Com_sprintf( fileName, sizeof(fileName), "session/client%02i.json", (int)(client - level.clients) );
 	len = trap->FS_Open( fileName, &f, FS_READ );
 
 	// no file
@@ -81,74 +81,74 @@ void G_ReadClientSessionData( gclient_t *client ) {
 	free( buffer );
 
 	if ( !root ) {
-		Com_Printf( "G_ReadSessionData(%02i): could not parse session data\n", client - level.clients );
+		Com_Printf( "G_ReadSessionData(%02i): could not parse session data\n", (int)(client - level.clients) );
 		return;
 	}
 
 	if ( (object = cJSON_GetObjectItem( root, "sessionTeam" )) ) {
-		sess->sessionTeam = (team_t)cJSON_ToInteger( object );
+		sess->sessionTeam = (team_t)object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "spectatorTime" )) ) {
-		sess->spectatorTime = cJSON_ToInteger( object );
+		sess->spectatorTime = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "spectatorState" )) ) {
-		sess->spectatorState = (spectatorState_t)cJSON_ToInteger( object );
+		sess->spectatorState = (spectatorState_t)object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "spectatorClient" )) ) {
-		sess->spectatorClient = cJSON_ToInteger( object );
+		sess->spectatorClient = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "wins" )) ) {
-		sess->wins = cJSON_ToInteger( object );
+		sess->wins = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "losses" )) ) {
-		sess->losses = cJSON_ToInteger( object );
+		sess->losses = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "setForce" )) ) {
-		sess->setForce = cJSON_ToInteger( object );
+		sess->setForce = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "saberLevel" )) ) {
-		sess->saberLevel = cJSON_ToInteger( object );
+		sess->saberLevel = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "selectedFP" )) ) {
-		sess->selectedFP = cJSON_ToInteger( object );
+		sess->selectedFP = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "duelTeam" )) ) {
-		sess->duelTeam = cJSON_ToInteger( object );
+		sess->duelTeam = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "siegeDesiredTeam" )) ) {
-		sess->siegeDesiredTeam = cJSON_ToInteger( object );
+		sess->siegeDesiredTeam = object->valueint;
 	}
 
 	if ( (object = cJSON_GetObjectItem( root, "siegeClass" )) ) {
-		if ( (tmp = cJSON_ToString( object )) ) {
+		if ( (tmp = object->valuestring) ) {
 			Q_strncpyz( sess->siegeClass, tmp, sizeof(sess->siegeClass) );
 		}
 	}
 	if ( (object = cJSON_GetObjectItem( root, "IP" )) ) {
-		if ( (tmp = cJSON_ToString( object )) ) {
+		if ( (tmp = object->valuestring) ) {
 			Q_strncpyz( sess->IP, tmp, sizeof(sess->IP) );
 		}
 	}
 	if ( (object = cJSON_GetObjectItem( root, "admin" )) ) {
-		if ( (tmp = cJSON_ToString( object )) ) {
+		if ( (tmp = object->valuestring) ) {
 			client->pers.adminUser = AM_ChecksumLogin( tmp );
 		}
 	}
 
 	if ( (object = cJSON_GetObjectItem( root, "empowered" )) ) {
-		client->pers.adminData.empowered = cJSON_ToBoolean( object );
+		client->pers.adminData.empowered = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "merc" )) ) {
-		client->pers.adminData.merc = cJSON_ToBoolean( object );
+		client->pers.adminData.merc = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "silenced" )) ) {
-		client->pers.adminData.silenced = cJSON_ToBoolean( object );
+		client->pers.adminData.silenced = object->valueint;
 	}
 	if ( (object = cJSON_GetObjectItem( root, "slept" )) ) {
-		client->pers.adminData.isSlept = cJSON_ToBoolean( object );
+		client->pers.adminData.isSlept = object->valueint;
 	}
 	if ((object = cJSON_GetObjectItem(root, "tempprivs"))) {
-		client->pers.tempprivs = cJSON_ToInteger(object);
+		client->pers.tempprivs = object->valueint;
 	}
 
 	client->ps.fd.saberAnimLevel = sess->saberLevel;
@@ -295,7 +295,7 @@ void G_ReadSessionData( void ) {
 	root = cJSON_Parse( buffer );
 
 	// if the gametype changed since the last session, don't use any client sessions
-	if ( level.gametype != cJSON_ToInteger( cJSON_GetObjectItem( root, "gametype" ) ) ) {
+	if ( level.gametype != cJSON_GetObjectItem( root, "gametype" )->valueint ) {
 		level.newSession = qtrue;
 		trap->Print( "gametype changed, clearing session data..." );
 	}
@@ -312,7 +312,7 @@ void G_WriteSessionData( void ) {
 	const gclient_t *client = NULL;
 	cJSON *root = cJSON_CreateObject();
 
-	cJSON_AddIntegerToObject( root, "gametype", level.gametype );
+	cJSON_AddNumberToObject( root, "gametype", level.gametype );
 
 	trap->Print( "G_WriteSessionData: writing %s...", metaFileName );
 	trap->FS_Open( metaFileName, &f, FS_WRITE );

@@ -1054,7 +1054,9 @@ void JP_DrawAccel( void ) {
 		VectorCopy( &currentVelocity, &lastVelocity );
 		lastSpeed = speed;
 
-		memcpy( &accelSamples[0], &accelSamples[1], sizeof(float)* (NUM_ACCEL_SAMPLES - 1) );
+		for ( int i = 0; i < NUM_ACCEL_SAMPLES-1; i++ ) {
+			accelSamples[i] = accelSamples[i+1];
+		}
 		accelSamples[NUM_ACCEL_SAMPLES - 1] = accel;
 
 		for ( i = 0; i < NUM_ACCEL_SAMPLES; i++ )
@@ -1258,7 +1260,7 @@ const char *CG_GetScoreString( void ) {
 			if ( scoreBias == 0 ) {
 				// we are the leader
 				if ( cgs.scores2 <= 0 ) {	// Nobody to be ahead of yet.
-					Com_sprintf( scoreBiasStr, sizeof(scoreBiasStr), "" );
+					scoreBiasStr[0] = '\0';
 				}
 				else {
 					scoreBias = cg.snap->ps.persistant[PERS_SCORE] - cgs.scores2;
@@ -1303,7 +1305,7 @@ const char *CG_GetScoreString( void ) {
 void CG_DrawHUD( centity_t *cent ) {
 #ifdef _DEBUG
 	if ( cg_debugInfo.integer ) {
-		int x = 0, y = SCREEN_HEIGHT - 80;
+		int y = SCREEN_HEIGHT - 80;
 		const char *str = NULL;
 		const int fontHandle = FONT_SMALL;
 		const float fontScale = 0.8f;
@@ -1311,25 +1313,17 @@ void CG_DrawHUD( centity_t *cent ) {
 		playerState_t *ps = &cg.predictedPlayerState;
 
 		Font font( fontHandle, fontScale );
-		if ( cg_smartEntities.integer ) {//Smart entities
-			str = S_COLOR_RED "Smart entities ON";
-			const float width = font.Width( str );
-			x = (36 - ( width / 2.0f));
-			font.Paint( x + 16, y - 180, str, &colorTable[CT_VLTBLUE1], uiTextStyle_e::ShadowedMore );
-		}
-
-		if ( cg.snap->ps.eFlags & EF_ALT_DIM ) {//alt-dim
-			str = S_COLOR_RED "Alternate dimension!";
-			const float width = font.Width( str );
-			x = (48 - (width / 2.0f));
-			font.Paint( x + 16, y - 140, str, &colorTable[CT_VLTBLUE1], uiTextStyle_e::ShadowedMore );
-		}
 
 		//(eFlags2 & 512) == grapple is out
 		//(eFlags & 65536) == grapple controls movement
 		str = va(
+			S_COLOR_CYAN "saberMove: %i\n"
 			S_COLOR_CYAN "legsAnim: %i\n"
 			S_COLOR_CYAN "torsoAnim: %i\n"
+			S_COLOR_CYAN "legsTimer: %i\n"
+			S_COLOR_CYAN "torsoTimer: %i\n"
+			S_COLOR_CYAN "groundEntityNum: %i\n"
+
 			S_COLOR_CYAN "duelIndex: %i\n"
 			S_COLOR_CYAN "duelInProgress: %i\n"
 			S_COLOR_CYAN "eFlags: %i\n"
@@ -1340,21 +1334,29 @@ void CG_DrawHUD( centity_t *cent ) {
 			S_COLOR_CYAN "pm_flags: %i\n"
 			S_COLOR_CYAN "pm_type: %i\n"
 			S_COLOR_CYAN "ragAttach: %i\n"
+			S_COLOR_CYAN "forcePowerSelected: %i\n"
+			S_COLOR_CYAN "forcePowersKnown: %i\n"
+			S_COLOR_CYAN "speed: %f\n"
+
 			S_COLOR_YELLOW "bolt1: %i\n"
 			S_COLOR_YELLOW "bolt2: %i\n"
 			S_COLOR_YELLOW "generic1: %i\n"
 			S_COLOR_YELLOW "genericenemyindex: %i\n"
-			S_COLOR_CYAN "forcePowerSelected: %i\n"
-			S_COLOR_CYAN "forcePowersKnown: %i\n"
+
 			S_COLOR_GREEN "cg.forceSelect: %i\n"
 			S_COLOR_GREEN "cg.time: %i\n"
-			S_COLOR_GREEN "speed: %f\n"
-			S_COLOR_CYAN "legsTimer: %i\n"
-			S_COLOR_CYAN "groundEntityNum: %i\n"
+			S_COLOR_GREEN "cg.haveDeferred: %i\n"
+
 			S_COLOR_ORANGE "altdim: %i\n"
-			S_COLOR_ORANGE "cinfo: %u\n",
+			S_COLOR_ORANGE "cinfo: %u\n"
+			S_COLOR_ORANGE "smartEntities: %i\n",
+
+			ps->saberMove,
 			ps->legsAnim,
 			ps->torsoAnim,
+			ps->legsTimer,
+			ps->torsoTimer,
+			ps->groundEntityNum,
 			ps->duelIndex,
 			ps->duelInProgress,
 			ps->eFlags,
@@ -1365,19 +1367,22 @@ void CG_DrawHUD( centity_t *cent ) {
 			ps->pm_flags,
 			ps->pm_type,
 			ps->ragAttach,
+			ps->fd.forcePowerSelected,
+			ps->fd.forcePowersKnown,
+			ps->speed,
+
 			es->bolt1,
 			es->bolt2,
 			es->generic1,
 			es->genericenemyindex,
-			ps->fd.forcePowerSelected,
-			ps->fd.forcePowersKnown,
+
 			cg.forceSelect,
 			cg.time,
-			ps->speed,
-			ps->legsTimer,
-			ps->groundEntityNum,
+			cg.haveDeferredPlayers,
+
 			!!(cg.snap->ps.eFlags & EF_ALT_DIM),
-			cgs.japp.jp_cinfo
+			cgs.japp.jp_cinfo,
+			!!cg_smartEntities.integer
 		);
 
 		font.scale = 0.5f;
@@ -4911,7 +4916,9 @@ void CG_SaberClashFlare( void ) {
 		v = 0.001f;
 	}
 
-	CG_WorldCoordToScreenCoord( &cg_saberFlashPos, &x, &y );
+	if ( !CG_WorldCoordToScreenCoord( &cg_saberFlashPos, &x, &y ) ) {
+		return;
+	}
 
 	color.r = 1.0f;
 	color.g = 1.0f;

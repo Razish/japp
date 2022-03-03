@@ -3,12 +3,6 @@
 #include "botlib.h"
 #include "ai_main.h"
 
-#ifdef BOT_ZMALLOC
-#define MAX_BALLOC 8192
-
-void *BAllocList[MAX_BALLOC];
-#endif
-
 char gBotChatBuffer[MAX_CLIENTS][MAX_CHAT_BUFFER_SIZE];
 
 void *B_TempAlloc( int size ) {
@@ -19,136 +13,19 @@ void B_TempFree( int size ) {
 	BG_TempFree( size );
 }
 
-
-void *B_Alloc( int size ) {
-#ifdef BOT_ZMALLOC
-	void *ptr = NULL;
-	int i = 0;
-
-#ifdef BOTMEMTRACK
-	int free = 0;
-	int used = 0;
-
-	while (i < MAX_BALLOC)
-	{
-		if (!BAllocList[i])
-		{
-			free++;
-		}
-		else
-		{
-			used++;
-		}
-
-		i++;
-	}
-
-	trap->Print("Allocations used: %i\nFree allocation slots: %i\n", used, free);
-
-	i = 0;
-#endif
-
-	ptr = trap->BotGetMemoryGame(size);
-
-	while (i < MAX_BALLOC)
-	{
-		if (!BAllocList[i])
-		{
-			BAllocList[i] = ptr;
-			break;
-		}
-		i++;
-	}
-
-	if (i == MAX_BALLOC)
-	{
-		//If this happens we'll have to rely on this chunk being freed manually with B_Free, which it hopefully will be
-#ifdef DEBUG
-		trap->Print("WARNING: MAXIMUM B_ALLOC ALLOCATIONS EXCEEDED\n");
-#endif
-	}
-
+// wrapper to allocate zero-filled memory
+void *B_AllocZ( int size ) {
+	void *ptr = malloc( size );
+	memset( ptr, 0, size );
 	return ptr;
-#else
-
-	return BG_Alloc( size );
-
-#endif
 }
 
 void B_Free( void *ptr ) {
-#ifdef BOT_ZMALLOC
-	int i = 0;
-
-#ifdef BOTMEMTRACK
-	int free = 0;
-	int used = 0;
-
-	while (i < MAX_BALLOC)
-	{
-		if (!BAllocList[i])
-		{
-			free++;
-		}
-		else
-		{
-			used++;
-		}
-
-		i++;
-	}
-
-	trap->Print("Allocations used: %i\nFree allocation slots: %i\n", used, free);
-
-	i = 0;
-#endif
-
-	while (i < MAX_BALLOC)
-	{
-		if (BAllocList[i] == ptr)
-		{
-			BAllocList[i] = NULL;
-			break;
-		}
-
-		i++;
-	}
-
-	if (i == MAX_BALLOC)
-	{
-		//Likely because the limit was exceeded and we're now freeing the chunk manually as we hoped would happen
-#ifdef DEBUG
-		trap->Print("WARNING: Freeing allocation which is not in the allocation structure\n");
-#endif
-	}
-
-	trap->BotFreeMemoryGame(ptr);
-#endif
+	free( ptr );
 }
 
 void B_InitAlloc( void ) {
-#ifdef BOT_ZMALLOC
-	memset(BAllocList, 0, sizeof(BAllocList));
-#endif
-
-	memset( gWPArray, 0, sizeof(gWPArray) );
-}
-
-void B_CleanupAlloc( void ) {
-#ifdef BOT_ZMALLOC
-	int i = 0;
-
-	while (i < MAX_BALLOC)
-	{
-		if (BAllocList[i])
-		{
-			trap->BotFreeMemoryGame(BAllocList[i]);
-			BAllocList[i] = NULL;
-		}
-
-		i++;
-	}
-#endif
+	gWPArray.clear();
 }
 
 int GetValueGroup( const char *buf, const char *group, char *outbuf ) {
@@ -675,10 +552,10 @@ void BotUtilizePersonality( bot_state_t *bs ) {
 	}
 
 	if ( !failed && GetPairedValue( group, "forceinfo", readbuf ) ) {
-		Com_sprintf( bs->forceinfo, sizeof(bs->forceinfo), "%s\0", readbuf );
+		Com_sprintf( bs->forceinfo, sizeof(bs->forceinfo), "%s", readbuf );
 	}
 	else {
-		Com_sprintf( bs->forceinfo, sizeof(bs->forceinfo), "%s\0", DEFAULT_FORCEPOWERS );
+		Com_sprintf( bs->forceinfo, sizeof(bs->forceinfo), "%s", DEFAULT_FORCEPOWERS );
 	}
 
 	i = 0;

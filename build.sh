@@ -13,6 +13,7 @@ NOSQL=1
 NONOTIFY=0
 NOCRASHHANDLER=0
 NOGEOIP=0
+USE_ASAN=0
 export NO_SSE=1
 
 build='scons -Q'
@@ -29,6 +30,9 @@ do
 	"analyse")
 		build='scan-build $build'
 		;;
+		"use_asan")
+			USE_ASAN=1
+			;;
 	"force32")
 		FORCE32=1
 		;;
@@ -49,4 +53,4 @@ do
 	esac
 done
 
-$build debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL no_notify=$NONOTIFY no_crashhandler=$NOCRASHHANDLER no_geoip=$NOGEOIP project=$PROJECT tools=$TOOLS
+$build debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL no_notify=$NONOTIFY no_crashhandler=$NOCRASHHANDLER no_geoip=$NOGEOIP use_asan=$USE_ASAN project=$PROJECT tools=$TOOLS

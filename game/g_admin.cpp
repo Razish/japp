@@ -204,7 +204,7 @@ static void AM_ParseString( const char *data ) {
 	for ( int i = 0; i < ADMIN_STRING_MAX; i++ ) {
 		temp = cJSON_GetObjectItem( root, adminStringsByIndex[i].name );
 		if ( temp ) {
-			adminStrings[i] = cJSON_ToString( temp );
+			adminStrings[i] = temp->valuestring;
 		}
 	}
 	cJSON_Delete( root );
@@ -215,7 +215,7 @@ static void AM_FillStrings( fileHandle_t handle ) {
 	for ( int i = 0; i < ADMIN_STRING_MAX; i++ ) {
 		cJSON_AddStringToObject( root, adminStringsByIndex[i].name, adminStrings[i].c_str() );
 	}
-	const char *buffer = cJSON_Serialize( root, 1 );
+	const char *buffer = cJSON_Print( root );
 	trap->FS_Write( buffer, strlen( buffer ), handle );
 	cJSON_Delete( root );
 }
@@ -531,28 +531,28 @@ static void AM_ReadAccounts( const char *jsonText ) {
 		adminUsers = user;
 
 		// user
-		if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( item, "user" ) )) ) {
+		if ( (tmp = cJSON_GetObjectItem( item, "user" )->valuestring ) ) {
 			Q_strncpyz( user->user, tmp, sizeof(user->user) );
 		}
 
 		// pass
-		if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( item, "pass" ) )) ) {
+		if ( (tmp = cJSON_GetObjectItem( item, "pass" )->valuestring ) ) {
 			Q_strncpyz( user->password, tmp, sizeof(user->password) );
 		}
 
 		// privs
-		user->privileges = cJSON_ToLongInteger( cJSON_GetObjectItem( item, "privs" ) );
+		user->privileges = cJSON_GetObjectItem( item, "privs" )->valuedouble;
 
 		// rank
-		user->rank = cJSON_ToInteger( cJSON_GetObjectItem( item, "rank" ) );
+		user->rank = cJSON_GetObjectItem( item, "rank" )->valueint;
 
 		// login message
-		if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( item, "message" ) )) ) {
+		if ( (tmp = cJSON_GetObjectItem( item, "message" )->valuestring ) ) {
 			Q_strncpyz( user->loginMsg, tmp, sizeof(user->loginMsg) );
 		}
 
 		// login effect
-		user->logineffect = cJSON_ToInteger(cJSON_GetObjectItem(item, "effect"));
+		user->logineffect = cJSON_GetObjectItem( item, "effect" )->valueint;
 	}
 
 	cJSON_Delete( root );
@@ -569,10 +569,10 @@ static void AM_WriteAccounts( fileHandle_t f ) {
 		cJSON *item = cJSON_CreateObject();
 		cJSON_AddStringToObject( item, "user", admin->user );
 		cJSON_AddStringToObject( item, "pass", admin->password );
-		cJSON_AddLongIntegerToObject( item, "privs", admin->privileges );
-		cJSON_AddIntegerToObject( item, "rank", admin->rank );
+		cJSON_AddNumberToObject( item, "privs", admin->privileges );
+		cJSON_AddNumberToObject( item, "rank", admin->rank );
 		cJSON_AddStringToObject( item, "message", admin->loginMsg );
-		cJSON_AddIntegerToObject(item, "effect", admin->logineffect);
+		cJSON_AddNumberToObject(item, "effect", admin->logineffect);
 
 		cJSON_AddItemToArray( admins, item );
 	}
@@ -632,53 +632,51 @@ void AM_SaveAdmins( void ) {
 
 // returns qtrue if inflicter is higher on the rank hierarchy, and qtrue on equal if japp_passRankConflicts is 1.
 //	otherwise, returns qfalse and prints a message to the inflicter to warn them.
-static qboolean AM_CanInflict( const gentity_t *entInflicter, const gentity_t *entVictim ) {
-	const adminUser_t *inflicter, *victim;
-
+static bool AM_CanInflict( const gentity_t *entInflicter, const gentity_t *entVictim ) {
 	// if they're not valid, pretend we can inflict divine punishment on them
-	if ( !entInflicter || !entInflicter->inuse || !entInflicter->client
-		|| !entVictim || !entVictim->inuse || !entVictim->client )
-	{
-		return qtrue;
+	if ( !entInflicter || !entInflicter->inuse || !entInflicter->client || !entVictim || !entVictim->inuse || !entVictim->client ) {
+		return true;
 	}
 
-	inflicter = entInflicter->client->pers.adminUser;
-	victim = entVictim->client->pers.adminUser;
+	const adminUser_t *inflicter = entInflicter->client->pers.adminUser;
+	const adminUser_t *victim = entVictim->client->pers.adminUser;
 
 	// if either one is not an admin, they lose by default.
 	if ( !victim ) {
-		return qtrue; // victim isn't an admin.
+		return true; // victim isn't an admin.
 	}
 
 	if ( entInflicter == entVictim ) {
-		return qtrue; // you can abuse yourself, of course.
+		return true; // you can abuse yourself, of course.
 	}
 
-	if ( inflicter->rank == victim->rank ) {
+	if ( inflicter && inflicter->rank == victim->rank ) {
 		if ( japp_passRankConflicts.integer ) {
-			G_LogPrintf( level.log.console, "%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s"
-				"(User: %s) (Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank,
-				entVictim->client->pers.netname, victim->user, victim->rank );
-			return qtrue;
+			G_LogPrintf( level.log.console,
+				"%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s (User: %s) (Rank: %d)",
+				entInflicter->client->pers.netname, inflicter->user, inflicter->rank, entVictim->client->pers.netname, victim->user, victim->rank
+			);
+			return true;
 		}
 		else {
-			trap->SendServerCommand( entInflicter->s.number, "print \"" S_COLOR_RED "Can not use admin commands on "
-				"those of an equal rank: (japp_passRankConflicts)\n\"" );
-			return qfalse;
+			trap->SendServerCommand( entInflicter->s.number,
+				"print \"" S_COLOR_RED "Can not use admin commands on those of an equal rank: (japp_passRankConflicts)\n\""
+			);
+			return false;
 		}
 	}
 
-	if ( inflicter->rank > victim->rank ) {
+	if ( inflicter && inflicter->rank > victim->rank ) {
 		// inflicter is of a higher rank and so he/she can freely abuse those lesser.
-		G_LogPrintf( level.log.console, "%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s (User:"
-			" %s) (Rank: %d)", entInflicter->client->pers.netname, inflicter->user, inflicter->rank,
-			entVictim->client->pers.netname, victim->user, victim->rank );
-		return qtrue;
+		G_LogPrintf( level.log.console,
+			"%s (User: %s) (Rank: %d) inflicting command on lower ranked player %s (User: %s) (Rank: %d)",
+			entInflicter->client->pers.netname, inflicter->user, inflicter->rank, entVictim->client->pers.netname, victim->user, victim->rank
+		);
+		return true;
 	}
 	else {
-		trap->SendServerCommand( entInflicter->s.number, "print \"" S_COLOR_RED "Can not use admin commands on those "
-			"of a higher rank.\n\"" );
-		return qfalse;
+		trap->SendServerCommand( entInflicter->s.number, "print \"" S_COLOR_RED "Can not use admin commands on those of a higher rank.\n\"" );
+		return false;
 	}
 }
 
@@ -822,7 +820,7 @@ static void AM_DeleteTelemark( gentity_t *ent, const char *name ) {
 // parse json object for telemarks
 static void AM_ReadTelemarks( const char *jsonText ) {
 	cJSON *root = NULL, *tms = NULL;
-	int tmCount = 0, i = 0, tmpInt = 0;
+	int tmCount = 0, i = 0;
 	const char *tmp = NULL;
 	telemark_t *tm = NULL;
 
@@ -846,17 +844,14 @@ static void AM_ReadTelemarks( const char *jsonText ) {
 		telemarks = tm;
 
 		// name
-		if ( (tmp = cJSON_ToString( cJSON_GetObjectItem( item, "name" ) )) ) {
+		if ( (tmp = cJSON_GetObjectItem( item, "name" )->valuestring ) ) {
 			Q_strncpyz( tm->name, tmp, sizeof(tm->name) );
 		}
 
 		// position
-		tmpInt = cJSON_ToInteger( cJSON_GetObjectItem( item, "x" ) );
-		tm->position.x = tmpInt;
-		tmpInt = cJSON_ToInteger( cJSON_GetObjectItem( item, "y" ) );
-		tm->position.y = tmpInt;
-		tmpInt = cJSON_ToInteger( cJSON_GetObjectItem( item, "z" ) );
-		tm->position.z = tmpInt;
+		tm->position.x = cJSON_GetObjectItem( item, "x" )->valueint;
+		tm->position.y = cJSON_GetObjectItem( item, "y" )->valueint;
+		tm->position.z = cJSON_GetObjectItem( item, "z" )->valueint;
 	}
 
 	cJSON_Delete( root );
@@ -872,9 +867,9 @@ static void AM_WriteTelemarks( fileHandle_t f ) {
 	for ( tm = telemarks; tm; tm = tm->next ) {
 		cJSON *item = cJSON_CreateObject();
 		cJSON_AddStringToObject( item, "name", tm->name );
-		cJSON_AddIntegerToObject( item, "x", tm->position.x );
-		cJSON_AddIntegerToObject( item, "y", tm->position.y );
-		cJSON_AddIntegerToObject( item, "z", tm->position.z );
+		cJSON_AddNumberToObject( item, "x", tm->position.x );
+		cJSON_AddNumberToObject( item, "y", tm->position.y );
+		cJSON_AddNumberToObject( item, "z", tm->position.z );
 
 		cJSON_AddItemToArray( tms, item );
 	}
@@ -2820,8 +2815,7 @@ static void AM_Map( gentity_t *ent ) {
 			gametype = i;
 		}
 		else {
-			AM_ConsolePrint( ent, va( "AM_Map: argument 1 must be a valid gametype or gametype number identifier\n",
-				map, BG_GetGametypeString( gametype ) ) );
+			AM_ConsolePrint( ent, "AM_Map: argument 1 must be a valid gametype or gametype number identifier\n" );
 			return;
 		}
 	}
@@ -2966,7 +2960,18 @@ void Merc_Off( gentity_t *ent ) {
 	ent->client->ps.holocronBits = 0;
 	ent->client->ps.saberAttackChainCount = 0;
 
-	ent->client->ps.stats[STAT_WEAPONS] = japp_spawnWeaps.integer;
+	uint32_t spawnWeaps = japp_spawnWeaps.integer;
+	if ( level.gametype == GT_JEDIMASTER ) {
+		// in jedi master, remove saber from spawnWeaps
+		if ( spawnWeaps & (1<<WP_SABER) ) {
+			spawnWeaps &= ~(1<<WP_SABER);
+		}
+	}
+	if ( !spawnWeaps ) {
+		// at least give them melee..
+		spawnWeaps |= WP_MELEE;
+	}
+	ent->client->ps.stats[STAT_WEAPONS] = spawnWeaps;
 	ent->client->ps.stats[STAT_HOLDABLE_ITEMS] = japp_spawnItems.integer;
 	uint32_t x = ent->client->ps.stats[STAT_HOLDABLE_ITEMS];
 	// get the right-most bit
@@ -2984,7 +2989,7 @@ void Merc_Off( gentity_t *ent ) {
 		? 1 : 0;
 	ent->client->ps.stats[STAT_HOLDABLE_ITEM] = x;
 
-	// select the first available weapon
+	// select the first available weapon, prefer saber
 	int newWeap = -1;
 	for ( int i = WP_SABER; i < WP_NUM_WEAPONS; i++ ) {
 		if ( (ent->client->ps.stats[STAT_WEAPONS] & (1 << i)) ) {
@@ -3237,29 +3242,26 @@ static void AM_UnlockTeam( gentity_t *ent ) {
 }
 
 static void AM_Grant(gentity_t *ent){
-	int client;
-	gentity_t *target = NULL;
+	if ( trap->Argc() < 2 ) {
+		AM_ConsolePrint( ent, "Syntax: \\amgrant <client> <privileges>\n" );
+		return;
+	}
+
+	// client
 	char arg1[64] = {};
+	trap->Argv( 1, arg1, sizeof(arg1) );
+	int client = G_ClientFromString( ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT );
+	if ( client == -1 ) {
+		return;
+	}
+	gentity_t &target = g_entities[client];
+
+	// privs
 	char arg2[16] = {};
-	uint64_t priv = 0;
+	trap->Argv( 2, arg2, sizeof(arg2) );
+	uint64_t privs = atoi( arg2 );
 
-	if (trap->Argc() < 2) {
-		AM_ConsolePrint(ent, "Syntax: \\amgrant <client> <privileges>\n");
-		return;
-	}
-
-	trap->Argv(1, arg1, sizeof(arg1));
-	client = G_ClientFromString(ent, arg1, FINDCL_SUBSTR | FINDCL_PRINT);
-	trap->Argv(2, arg2, sizeof(arg2));
-	priv = atoi(arg2);
-
-	if (client == -1) {
-		return;
-	}
-
-	target = &g_entities[client];
-	target->client->pers.tempprivs = priv;
-
+	target.client->pers.tempprivs = privs;
 }
 
 static void AM_UnGrant(gentity_t *ent){

@@ -5968,9 +5968,9 @@ void Item_Paint( itemDef_t *item ) {
 			//		else
 			{	// Draw the desctext
 				const char *textPtr = item->descText;
+				char temp[MAX_STRING_CHARS] = {0};
 				if ( *textPtr == '@' )	// string reference
 				{
-					char	temp[MAX_STRING_CHARS];
 					trap->SE_GetStringTextString( &textPtr[1], temp, sizeof(temp) );
 					textPtr = temp;
 				}
@@ -6660,9 +6660,10 @@ qboolean ItemParse_asset_model( itemDef_t *item, int handle ) {
 
 #ifndef PROJECT_CGAME
 	//Raz: Added
+	char modelPath[MAX_QPATH];
+	char skinpath[MAX_QPATH];
+	char ui_char_model[MAX_QPATH];
 	if ( !Q_stricmp( token.string, "model" ) ) {
-		char modelPath[MAX_QPATH];
-		char skinpath[MAX_QPATH];
 		char *skinPtr = NULL;
 		trap->Cvar_VariableStringBuffer( "model", skinpath, sizeof(skinpath) );
 
@@ -6674,8 +6675,6 @@ qboolean ItemParse_asset_model( itemDef_t *item, int handle ) {
 	}
 
 	if ( !Q_stricmp( token.string, "ui_char_model" ) ) {
-		char modelPath[MAX_QPATH];
-		char ui_char_model[MAX_QPATH];
 		trap->Cvar_VariableStringBuffer( "ui_char_model", ui_char_model, sizeof(ui_char_model) );
 		Com_sprintf( modelPath, sizeof(modelPath), "models/players/%s/model.glm", ui_char_model );
 		temp = modelPath;

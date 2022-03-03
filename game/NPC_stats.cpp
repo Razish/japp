@@ -1265,7 +1265,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC ) {
 				if ( n != 100 ) {
 					NPC->client->ps.iModelScale = n; //so the client knows
 					if ( n >= 1024 ) {
-						Com_Printf( "WARNING: MP does not support scaling up to or over 1024%\n" );
+						Com_Printf( "WARNING: MP does not support scaling up to or over 1024%%\n" );
 						n = 1023;
 					}
 

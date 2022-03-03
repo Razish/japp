@@ -765,8 +765,8 @@ typedef enum gameExportLegacy_e {
 
 typedef struct gameImport_s {
 	// misc
-	void( *Print )								(const char *msg, ...);
-	void( *Error )								(int level, const char *error, ...);
+	void( *Print )								(const char *msg, ...) __attribute__ ((format (printf, 1, 2)));
+	void( *Error )								(int level, const char *error, ...) __attribute__ ((format (printf, 2, 3)));
 	int( *Milliseconds )							(void);
 	void( *PrecisionTimerStart )					(void **timer);
 	int( *PrecisionTimerEnd )					(void *timer);

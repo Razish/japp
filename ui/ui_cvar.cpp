@@ -58,6 +58,18 @@ void UI_RegisterCvars( void ) {
 	size_t i = 0;
 	const cvarTable_t *cv = NULL;
 
+	char buf[MAX_CVAR_VALUE_STRING];
+	trap->Cvar_VariableStringBuffer( "sv_master1", buf, sizeof(buf) );
+	trap->Cvar_Set( "ui_sv_master1", buf );
+	trap->Cvar_VariableStringBuffer( "sv_master2", buf, sizeof(buf) );
+	trap->Cvar_Set( "ui_sv_master2", buf );
+	trap->Cvar_VariableStringBuffer( "sv_master3", buf, sizeof(buf) );
+	trap->Cvar_Set( "ui_sv_master3", buf );
+	trap->Cvar_VariableStringBuffer( "sv_master4", buf, sizeof(buf) );
+	trap->Cvar_Set( "ui_sv_master4", buf );
+	trap->Cvar_VariableStringBuffer( "sv_master5", buf, sizeof(buf) );
+	trap->Cvar_Set( "ui_sv_master5", buf );
+
 	for ( i = 0, cv = uiCvarTable; i < uiCvarTableSize; i++, cv++ ) {
 		trap->Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
 		if ( cv->update )

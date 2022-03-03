@@ -2213,8 +2213,7 @@ void ClientThink_real( gentity_t *ent ) {
 				// it was a draw, because we both managed to die in the same frame
 				trap->SendServerCommand( -1,
 					va(
-						"print \"%s: %s " S_COLOR_WHITE "vs %s! " S_COLOR_WHITE "(" S_COLOR_RED "%i" S_COLOR_WHITE "/"
-							S_COLOR_GREEN "%i" S_COLOR_WHITE ")\n\"",
+						"print \"%s: %s " S_COLOR_WHITE "vs %s!\n\"",
 						G_GetStringEdString( "MP_SVGAME", "PLDUELTIE" ),
 						ent->client->pers.netname,
 						duelAgainst->client->pers.netname

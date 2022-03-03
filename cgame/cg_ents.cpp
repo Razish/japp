@@ -668,7 +668,7 @@ SE_R_AddRefEntityToScene(&ent);
 void CG_AddRadarEnt( centity_t *cent ) {
 	if ( cg.radarEntityCount == ARRAY_LEN( cg.radarEntities ) ) {
 #ifdef _DEBUG
-		Com_Printf( S_COLOR_YELLOW"Warning: CG_AddRadarEnt full. (%d max)\n", ARRAY_LEN( cg.radarEntities ) );
+		Com_Printf( S_COLOR_YELLOW "Warning: CG_AddRadarEnt full. (%d max)\n", (int)ARRAY_LEN( cg.radarEntities ) );
 #endif
 		return;
 	}
@@ -678,7 +678,7 @@ void CG_AddRadarEnt( centity_t *cent ) {
 void CG_AddBracketedEnt( centity_t *cent ) {
 	if ( cg.bracketedEntityCount == ARRAY_LEN( cg.bracketedEntities ) ) {
 #ifdef _DEBUG
-		Com_Printf( S_COLOR_YELLOW"Warning: CG_AddBracketedEnt full. (%d max)\n", ARRAY_LEN( cg.bracketedEntities ) );
+		Com_Printf( S_COLOR_YELLOW "Warning: CG_AddBracketedEnt full. (%d max)\n", (int)ARRAY_LEN( cg.bracketedEntities ) );
 #endif
 		return;
 	}
@@ -2654,6 +2654,10 @@ static void CG_FX( centity_t *cent ) {
 	int				efxIndex = 0;
 	entityState_t	*s1;
 	const char		*s;
+
+	if ( japp_noFXRunner.integer ) {
+		return;
+	}
 
 	if ( cent->miscTime > cg.time ) {
 		return;

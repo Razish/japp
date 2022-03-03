@@ -114,7 +114,7 @@ void InitSiegeMode( void ) {
 
 	trap->Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
 
-	Com_sprintf( levelname, sizeof(levelname), "maps/%s.siege\0", mapname.string );
+	Com_sprintf( levelname, sizeof(levelname), "maps/%s.siege", mapname.string );
 
 	if ( !levelname[0] ) {
 		goto failure;

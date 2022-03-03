@@ -379,7 +379,7 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam ) {
 		}
 	}
 
-	G_LogPrintf( level.log.console, "setteam:  %i %s %s\n", client - level.clients, TeamName( oldTeam ), TeamName( client->sess.sessionTeam ) );
+	G_LogPrintf( level.log.console, "setteam:  %i %s %s\n", (int)(client - level.clients), TeamName( oldTeam ), TeamName( client->sess.sessionTeam ) );
 }
 
 static qboolean G_PowerDuelCheckFail( gentity_t *ent ) {
@@ -1371,7 +1371,7 @@ static void Cmd_GameCommand_f( gentity_t *ent ) {
 
 	if ( trap->Argc() != 3 ) {
 		trap->SendServerCommand( ent - g_entities, va( "print \"" S_COLOR_YELLOW "Usage: \\gc <player id> <order 0-%d>"
-			"\n\"", numgc_orders - 1 )
+			"\n\"", (int)numgc_orders - 1 )
 		);
 		return;
 	}
@@ -3035,7 +3035,7 @@ static void Cmd_AMInfo_f( gentity_t *ent ) {
 			? S_COLOR_RED : S_COLOR_GREEN, g_saberDamageScale.value ) );
 
 		// idle damage
-		Q_PrintBuffer( &pb, va( "  " S_COLOR_WHITE "Idle damage %s" S_COLOR_WHITE "\n",
+		Q_PrintBuffer( &pb, va( "  " S_COLOR_WHITE "Idle damage %s %s" S_COLOR_WHITE "\n",
 			(japp_saberIdleDamage.integer != atoff( G_Cvar_DefaultString( &japp_saberIdleDamage ) ))
 			? S_COLOR_RED : S_COLOR_GREEN,
 			japp_saberIdleDamage.integer ? "+" : "x" ) );

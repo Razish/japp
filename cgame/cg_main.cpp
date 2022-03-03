@@ -353,28 +353,31 @@ static void CVU_ForceColour( void ) {
 
 static void CVU_ForceModel( void ) {
 	for ( int i = 0; i < cgs.maxclients; i++ ) {
-		const char *clientInfo;
-
-		clientInfo = CG_ConfigString( CS_PLAYERS + i );
-		if ( !VALIDSTRING( clientInfo ) ) {
-			continue;
+		if ( VALIDSTRING( CG_ConfigString( CS_PLAYERS + i ) ) ) {
+			CG_NewClientInfo( i, qtrue );
 		}
-
-		CG_NewClientInfo( i, qtrue );
 	}
 }
 
 static void CVU_ForceOwnSaber( void ) {
 	std::stringstream ss( cg_forceOwnSaber.string );
 	for ( int i = 0; i < MAX_SABERS; i++ ) {
+		cg.forceOwnSaber[i] = "";
 		ss >> cg.forceOwnSaber[i];
 	}
+	CG_NewClientInfo( cg.clientNum, qtrue );
 }
 
 static void CVU_ForceEnemySaber( void ) {
 	std::stringstream ss( cg_forceEnemySaber.string );
 	for ( int i = 0; i < MAX_SABERS; i++ ) {
+		cg.forceEnemySaber[i] = "";
 		ss >> cg.forceEnemySaber[i];
+	}
+	for ( int i = 0; i < cgs.maxclients; i++ ) {
+		if ( VALIDSTRING( CG_ConfigString( CS_PLAYERS + i ) ) ) {
+			CG_NewClientInfo( i, qtrue );
+		}
 	}
 }
 
@@ -1287,7 +1290,7 @@ void CG_LoadMenus( const char *menuFile ) {
 
 		len = trap->FS_Open( "ui/jahud.txt", &f, FS_READ );
 		if ( !f ) {
-			trap->Error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n", menuFile );
+			trap->Error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n" );
 			return;
 		}
 	}

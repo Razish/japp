@@ -113,11 +113,13 @@ void HandleTeamBinds( char *buf, int bufsize ) {
 			continue;
 
 		tmp = Q_strrep( p, teamBinds[i].key, teamBinds[i].GetValue() );
-		if ( p != buf )
+		if ( p != buf ) {
 			free( p );
+		}
 		p = tmp;
 	}
-	Q_strncpyz( buf, p, bufsize );
-	if ( p != buf )
+	if ( p != buf ) {
+		Q_strncpyz( buf, p, bufsize );
 		free( p );
+	}
 }

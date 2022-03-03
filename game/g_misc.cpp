@@ -434,18 +434,6 @@ void SP_misc_bsp( gentity_t *ent ) {
 	level.mBSPInstanceDepth--;
 	//level.mFilter[0] = level.mTeamFilter[0] = 0;
 	level.mTeamFilter[0] = 0;
-
-	/*
-	if ( g_debugRMG.integer )
-	{
-	G_SpawnDebugCylinder ( ent->s.origin, ent->s.time2, &g_entities[0], 2000, COLOR_WHITE );
-
-	if ( ent->s.time )
-	{
-	G_SpawnDebugCylinder ( ent->s.origin, ent->s.time, &g_entities[0], 2000, COLOR_RED );
-	}
-	}
-	*/
 }
 
 /*QUAKED terrain (1.0 1.0 1.0) ? NOVEHDMG
@@ -478,41 +466,12 @@ void SP_terrain( gentity_t *ent ) {
 	char				*value;
 	int					terrainID;
 
-	//Force it to 1 when there is terrain on the level.
-	trap->Cvar_Set( "RMG", "1" );
-	RMG.integer = 1;
-
 	VectorClear( &ent->s.angles );
 	trap->SetBrushModel( (sharedEntity_t *)ent, ent->model );
 
 	// Get the shader from the top of the brush
 	//	shaderNum = gi.CM_GetShaderNum(s.modelindex);
 	shaderNum = 0;
-
-	if ( RMG.integer ) {
-		/*
-		// Grab the default terrain file from the RMG cvar
-		trap->Cvar_VariableStringBuffer("RMG_terrain", temp, MAX_QPATH);
-		Com_sprintf(final, MAX_QPATH, "%s", temp);
-		AddSpawnField("terrainDef", temp);
-
-		trap->Cvar_VariableStringBuffer("RMG_instances", temp, MAX_QPATH);
-		Com_sprintf(final, MAX_QPATH, "%s", temp);
-		AddSpawnField("instanceDef", temp);
-
-		trap->Cvar_VariableStringBuffer("RMG_miscents", temp, MAX_QPATH);
-		Com_sprintf(final, MAX_QPATH, "%s", temp);
-		AddSpawnField("miscentDef", temp);
-		*/
-		//rww - disabled for now, don't want cvar overrides.
-
-		trap->Cvar_VariableStringBuffer( "RMG_seed", seed, MAX_QPATH );
-		trap->Cvar_VariableStringBuffer( "RMG_mission", missionType, MAX_QPATH );
-
-		//rww - May want to implement these at some point.
-		//trap->Cvar_VariableStringBuffer("RMG_soundset", soundSet, MAX_QPATH);
-		//trap->SetConfigstring(CS_AMBIENT_SOUNDSETS, soundSet );
-	}
 
 	// Get info required for the common init
 	temp[0] = 0;
@@ -584,32 +543,6 @@ void SP_terrain( gentity_t *ent ) {
 
 	// Hook into the world so physics will work
 	trap->LinkEntity( (sharedEntity_t *)ent );
-
-	// If running RMG then initialize the terrain and handle team skins
-	if ( RMG.integer ) {
-		trap->RMG_Init(/*terrainID*/ );
-
-		/*
-		if ( level.gametypeData->teams )
-		{
-		char temp[MAX_QPATH];
-
-		// Red team change from RMG ?
-		trap->GetConfigstring ( CS_GAMETYPE_REDTEAM, temp, MAX_QPATH );
-		if ( Q_stricmp ( temp, level.gametypeTeam[TEAM_RED] ) )
-		{
-		level.gametypeTeam[TEAM_RED] = trap->VM_LocalStringAlloc ( temp );
-		}
-
-		// Blue team change from RMG ?
-		trap->GetConfigstring ( CS_GAMETYPE_BLUETEAM, temp, MAX_QPATH );
-		if ( Q_stricmp ( temp, level.gametypeTeam[TEAM_BLUE] ) )
-		{
-		level.gametypeTeam[TEAM_BLUE] = trap->VM_LocalStringAlloc ( temp );
-		}
-		}
-		*/
-	}
 }
 
 //rww - Called by skyportal entities. This will check through entities and flag them

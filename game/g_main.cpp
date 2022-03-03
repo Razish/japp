@@ -202,6 +202,9 @@ static void CVU_CInfo( void ) {
 	CPM_UpdateSettings( !!(jp_cinfo.bits & CINFO_CPMPHYSICS) );
 }
 
+static void CVU_Motd( void ) {
+	Q_ConvertLinefeeds( g_motd.string );
+}
 
 typedef struct cvarTable_s {
 	vmCvar_t	*vmCvar;
@@ -300,7 +303,6 @@ char gSharedBuffer[MAX_G_SHARED_BUFFER_SIZE];
 
 void WP_SaberLoadParms( void );
 void BG_VehicleLoadParms( void );
-void RemoveAllWP( void );
 void BG_ClearVehicleParseParms( void );
 gentity_t *SelectRandomDeathmatchSpawnPoint( void );
 void SP_info_jedimaster_start( gentity_t *ent );
@@ -477,10 +479,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	if ( japp_crashHandler.integer ) {
 		ActivateCrashHandler();
 	}
-
-	//Init RMG to 0, it will be autoset to 1 if there is terrain on the level.
-	trap->Cvar_Set( "RMG", "0" );
-	RMG.integer = 0;
 
 	//Clean up any client-server ghoul2 instance attachments that may still exist exe-side
 	trap->G2API_CleanEntAttachments();
@@ -769,8 +767,6 @@ void G_ShutdownGame( int restart ) {
 	if ( trap->Cvar_VariableIntegerValue( "bot_enable" ) ) {
 		BotAIShutdown( restart );
 	}
-
-	B_CleanupAlloc(); //clean up all allocations made with B_Alloc
 
 	DeactivateCrashHandler();
 }

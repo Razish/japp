@@ -18,7 +18,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	int				handle;
 
 	if ( itemNum < 0 || itemNum >= (int)bg_numItems ) {
-		trap->Error( ERR_DROP, "CG_RegisterItemVisuals: itemNum %d out of range [0-%d]", itemNum, bg_numItems - 1 );
+		trap->Error( ERR_DROP, "CG_RegisterItemVisuals: itemNum %d out of range [0-%d]", itemNum, (int)bg_numItems - 1 );
 		return;
 	}
 

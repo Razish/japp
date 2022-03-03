@@ -46,7 +46,6 @@ vmCvar_t bot_forcepowers;
 vmCvar_t bot_forgimmick;
 vmCvar_t bot_honorableduelacceptance;
 vmCvar_t bot_pvstype;
-vmCvar_t bot_normgpath;
 
 #ifdef _DEBUG
 vmCvar_t bot_getinthecarrr;
@@ -638,10 +637,9 @@ int PlayersInGame( void ) {
 int BotAISetupClient( int client, struct bot_settings_s *settings, qboolean restart ) {
 	bot_state_t *bs;
 
-	if ( !botstates[client] ) botstates[client] = (bot_state_t *)B_Alloc( sizeof(bot_state_t) ); //G_Alloc(sizeof(bot_state_t));
-	//rww - G_Alloc bad! B_Alloc good.
-
-	memset( botstates[client], 0, sizeof(bot_state_t) );
+	if ( !botstates[client] ) {
+		botstates[client] = (bot_state_t *)B_AllocZ( sizeof(bot_state_t) );
+	}
 
 	bs = botstates[client];
 
@@ -827,12 +825,7 @@ int WPOrgVisible( gentity_t *bot, vector3 *org1, vector3 *org2, int ignore ) {
 int OrgVisibleBox( vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2, int ignore ) {
 	trace_t tr;
 
-	if ( RMG.integer ) {
-		trap->Trace( &tr, org1, NULL, NULL, org2, ignore, MASK_SOLID, qfalse, 0, 0 );
-	}
-	else {
-		trap->Trace( &tr, org1, mins, maxs, org2, ignore, MASK_SOLID, qfalse, 0, 0 );
-	}
+	trap->Trace( &tr, org1, mins, maxs, org2, ignore, MASK_SOLID, qfalse, 0, 0 );
 
 	if ( tr.fraction == 1 && !tr.startsolid && !tr.allsolid ) {
 		return 1;
@@ -869,53 +862,27 @@ int CheckForFunc( vector3 *org, int ignore ) {
 	return 0;
 }
 
-//perform pvs check based on rmg or not
-qboolean BotPVSCheck( const vector3 *p1, const vector3 *p2 ) {
-	if ( RMG.integer && bot_pvstype.integer ) {
-		vector3 subPoint;
-		VectorSubtract( p1, p2, &subPoint );
-
-		if ( VectorLength( &subPoint ) > 5000 )
-			return qfalse;
-		return qtrue;
-	}
-
-	return trap->InPVS( p1, p2 );
-}
-
 //get the index to the nearest visible waypoint in the global trail
 int GetNearestVisibleWP( vector3 *org, int ignore ) {
-	int i;
-	float bestdist;
 	float flLen;
-	int bestindex;
 	vector3 a, mins, maxs;
 
-	i = 0;
-	if ( RMG.integer ) {
-		bestdist = 300;
-	}
-	else {
-		bestdist = 800;//99999;
-		//don't trace over 800 units away to avoid GIANT HORRIBLE SPEED HITS ^_^
-	}
-	bestindex = -1;
+	float bestdist = 800;//99999;
+	int bestindex = -1;
 
 	VectorSet( &mins, -15, -15, -1 );
 	VectorSet( &maxs, 15, 15, 1 );
 
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] ) {
 			VectorSubtract( org, &gWPArray[i]->origin, &a );
 			flLen = VectorLength( &a );
 
-			if ( flLen < bestdist && (RMG.integer || BotPVSCheck( org, &gWPArray[i]->origin )) && OrgVisibleBox( org, &mins, &maxs, &gWPArray[i]->origin, ignore ) ) {
+			if ( flLen < bestdist && trap->InPVS( org, &gWPArray[i]->origin ) && OrgVisibleBox( org, &mins, &maxs, &gWPArray[i]->origin, ignore ) ) {
 				bestdist = flLen;
 				bestindex = i;
 			}
 		}
-
-		i++;
 	}
 
 	return bestindex;
@@ -928,15 +895,8 @@ int GetNearestVisibleWP( vector3 *org, int ignore ) {
 //see if this is a valid waypoint to pick up in our
 //current state (whatever that may be)
 int PassWayCheck( bot_state_t *bs, int windex ) {
-	if ( !gWPArray[windex] || !gWPArray[windex]->inuse ) { //bad point index
+	if ( !gWPArray[windex] ) { //bad point index
 		return 0;
-	}
-
-	if ( RMG.integer ) {
-		if ( (gWPArray[windex]->flags & WPFLAG_RED_FLAG) ||
-			(gWPArray[windex]->flags & WPFLAG_BLUE_FLAG) ) { //red or blue flag, we'd like to get here
-			return 1;
-		}
 	}
 
 	if ( bs->wpDirection && (gWPArray[windex]->flags & WPFLAG_ONEWAY_FWD) ) { //we're not travelling in a direction on the trail that will allow us to pass this point
@@ -973,41 +933,14 @@ float TotalTrailDistance( int start, int end, bot_state_t *bs ) {
 	}
 
 	while ( beginat < endat ) {
-		if ( beginat >= gWPNum || !gWPArray[beginat] || !gWPArray[beginat]->inuse ) { //invalid waypoint index
+		if ( beginat >= gWPArray.size() || !gWPArray[beginat] ) { //invalid waypoint index
 			return -1;
 		}
 
-		if ( !RMG.integer ) {
-			if ( (end > start && gWPArray[beginat]->flags & WPFLAG_ONEWAY_BACK) ||
-				(start > end && gWPArray[beginat]->flags & WPFLAG_ONEWAY_FWD) ) { //a one-way point, this means this path cannot be travelled to the final point
-				return -1;
-			}
-		}
-
-#if 0 //disabled force jump checks for now
-		if (gWPArray[beginat]->forceJumpTo)
-		{
-			if (gWPArray[beginat-1] && gWPArray[beginat-1]->origin.z+64 < gWPArray[beginat]->origin.z)
-			{
-				gdif = gWPArray[beginat]->origin.z - gWPArray[beginat-1]->origin.z;
-			}
-
-			if (gdif)
-			{
-				if (bs && bs->cur_ps.fd.forcePowerLevel[FP_LEVITATION] < gWPArray[beginat]->forceJumpTo)
-				{
-					return -1;
-				}
-			}
-		}
-
-		if (bs->wpCurrent && gWPArray[windex]->forceJumpTo &&
-			gWPArray[windex]->origin.z > (bs->wpCurrent->origin.z+64) &&
-			bs->cur_ps.fd.forcePowerLevel[FP_LEVITATION] < gWPArray[windex]->forceJumpTo)
-		{
+		if ( (end > start && gWPArray[beginat]->flags & WPFLAG_ONEWAY_BACK) ||
+			(start > end && gWPArray[beginat]->flags & WPFLAG_ONEWAY_FWD) ) { //a one-way point, this means this path cannot be travelled to the final point
 			return -1;
 		}
-#endif
 
 		distancetotal += gWPArray[beginat]->disttonext;
 
@@ -1171,7 +1104,7 @@ qboolean BotCTFGuardDuty( bot_state_t *bs ) {
 //this function will be called. We will perform any
 //checks for flags on the current wp and activate
 //any "touch" events based on that.
-void WPTouchRoutine( bot_state_t *bs ) {
+static void WPTouchRoutine( bot_state_t *bs ) {
 	int lastNum;
 
 	if ( !bs->wpCurrent ) {
@@ -1199,6 +1132,7 @@ void WPTouchRoutine( bot_state_t *bs ) {
 
 	if ( bs->isCamper && bot_camp.integer && (BotIsAChickenWuss( bs ) || BotCTFGuardDuty( bs ) || bs->isCamper == 2) && ((bs->wpCurrent->flags & WPFLAG_SNIPEORCAMP) || (bs->wpCurrent->flags & WPFLAG_SNIPEORCAMPSTAND)) &&
 		bs->cur_ps.weapon != WP_SABER && bs->cur_ps.weapon != WP_MELEE && bs->cur_ps.weapon != WP_STUN_BATON ) { //if we're a camper and a chicken then camp
+
 		if ( bs->wpDirection ) {
 			lastNum = bs->wpCurrent->index + 1;
 		}
@@ -1206,7 +1140,7 @@ void WPTouchRoutine( bot_state_t *bs ) {
 			lastNum = bs->wpCurrent->index - 1;
 		}
 
-		if ( gWPArray[lastNum] && gWPArray[lastNum]->inuse && gWPArray[lastNum]->index && bs->isCamping < level.time ) {
+		if ( lastNum >= 0 && lastNum < gWPArray.size() && gWPArray[lastNum] && gWPArray[lastNum]->index && bs->isCamping < level.time ) {
 			bs->isCamping = level.time + rand() % 15000 + 30000;
 			bs->wpCamping = bs->wpCurrent;
 			bs->wpCampingTo = gWPArray[lastNum];
@@ -1762,7 +1696,7 @@ int ScanForEnemies( bot_state_t *bs ) {
 	}
 
 	while ( i <= MAX_CLIENTS ) {
-		if ( i != bs->client && g_entities[i].client && !OnSameTeam( &g_entities[bs->client], &g_entities[i] ) && PassStandardEnemyChecks( bs, &g_entities[i] ) && BotPVSCheck( &g_entities[i].client->ps.origin, &bs->eye ) && PassLovedOneCheck( bs, &g_entities[i] ) ) {
+		if ( i != bs->client && g_entities[i].client && !OnSameTeam( &g_entities[bs->client], &g_entities[i] ) && PassStandardEnemyChecks( bs, &g_entities[i] ) && trap->InPVS( &g_entities[i].client->ps.origin, &bs->eye ) && PassLovedOneCheck( bs, &g_entities[i] ) ) {
 			VectorSubtract( &g_entities[i].client->ps.origin, &bs->eye, &a );
 			distcheck = VectorLength( &a );
 			vectoangles( &a, &a );
@@ -1998,7 +1932,7 @@ gentity_t *GetNearestBadThing( bot_state_t *bs ) {
 				factor = 0;
 			}
 
-			if ( glen < bestdist*factor && BotPVSCheck( &bs->origin, &ent->s.pos.trBase ) ) {
+			if ( glen < bestdist*factor && trap->InPVS( &bs->origin, &ent->s.pos.trBase ) ) {
 				trap->Trace( &tr, &bs->origin, NULL, NULL, &ent->s.pos.trBase, bs->client, MASK_SOLID, qfalse, 0, 0 );
 
 				if ( tr.fraction == 1 || tr.entityNum == ent->s.number ) {
@@ -2235,7 +2169,6 @@ int BotGetFlagHome( bot_state_t *bs ) {
 }
 
 void GetNewFlagPoint( wpobject_t *wp, gentity_t *flagEnt, int team ) { //get the nearest possible waypoint to the flag since it's not in its original position
-	int i = 0;
 	vector3 a, mins, maxs;
 	float bestdist;
 	float testdist;
@@ -2258,7 +2191,7 @@ void GetNewFlagPoint( wpobject_t *wp, gentity_t *flagEnt, int team ) { //get the
 		}
 	}
 
-	for ( i = 0; i < gWPNum; i++ ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
 		VectorSubtract( &gWPArray[i]->origin, &flagEnt->s.pos.trBase, &a );
 		testdist = VectorLength( &a );
 
@@ -2310,7 +2243,7 @@ int CTFTakesPriority( bot_state_t *bs ) {
 		(level.time - bs->lastDeadTime) < BOT_MAX_WEAPON_GATHER_TIME ) { //get the nearest weapon laying around base before heading off for battle
 		idleWP = GetBestIdleGoal( bs );
 
-		if ( idleWP != -1 && gWPArray[idleWP] && gWPArray[idleWP]->inuse ) {
+		if ( idleWP != -1 && gWPArray[idleWP] ) {
 			if ( bs->wpDestSwitchTime < level.time )
 				bs->wpDestination = gWPArray[idleWP];
 			return 1;
@@ -2334,7 +2267,6 @@ int CTFTakesPriority( bot_state_t *bs ) {
 		enemyFlag = PW_REDFLAG;
 
 	if ( !flagRed || !flagBlue ||
-		!flagRed->inuse || !flagBlue->inuse ||
 		!eFlagRed || !eFlagBlue ) {
 		return 0;
 	}
@@ -2456,7 +2388,6 @@ int EntityVisibleBox( vector3 *org1, vector3 *mins, vector3 *maxs, vector3 *org2
 
 //Get the closest objective for siege and go after it
 int Siege_TargetClosestObjective( bot_state_t *bs, int flag ) {
-	int i = 0;
 	int bestindex = -1;
 	float testdistance = 0;
 	float bestdistance = 999999999.9f;
@@ -2472,8 +2403,8 @@ int Siege_TargetClosestObjective( bot_state_t *bs, int flag ) {
 		goto hasPoint;
 	}
 
-	while ( i < gWPNum ) {
-		if ( gWPArray[i] && gWPArray[i]->inuse && (gWPArray[i]->flags & flag) && gWPArray[i]->associated_entity != ENTITYNUM_NONE &&
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
+		if ( gWPArray[i] && (gWPArray[i]->flags & flag) && gWPArray[i]->associated_entity != ENTITYNUM_NONE &&
 			&g_entities[gWPArray[i]->associated_entity] && g_entities[gWPArray[i]->associated_entity].use ) {
 			VectorSubtract( &gWPArray[i]->origin, &bs->origin, &a );
 			testdistance = VectorLength( &a );
@@ -2483,8 +2414,6 @@ int Siege_TargetClosestObjective( bot_state_t *bs, int flag ) {
 				bestindex = i;
 			}
 		}
-
-		i++;
 	}
 
 	if ( bestindex != -1 ) {
@@ -2571,7 +2500,7 @@ void Siege_DefendFromAttackers( bot_state_t *bs ) { //this may be a little cheap
 
 	wpClose = GetNearestVisibleWP( &g_entities[bestindex].client->ps.origin, -1 );
 
-	if ( wpClose != -1 && gWPArray[wpClose] && gWPArray[wpClose]->inuse ) {
+	if ( wpClose != -1 && gWPArray[wpClose] ) {
 		bs->wpDestination = gWPArray[wpClose];
 		bs->destinationGrabTime = level.time + 10000;
 	}
@@ -2649,7 +2578,7 @@ int SiegeTakesPriority( bot_state_t *bs ) {
 		(level.time - bs->lastDeadTime) < BOT_MAX_WEAPON_GATHER_TIME ) { //get the nearest weapon laying around base before heading off for battle
 		idleWP = GetBestIdleGoal( bs );
 
-		if ( idleWP != -1 && gWPArray[idleWP] && gWPArray[idleWP]->inuse ) {
+		if ( idleWP != -1 && gWPArray[idleWP] ) {
 			if ( bs->wpDestSwitchTime < level.time ) {
 				bs->wpDestination = gWPArray[idleWP];
 			}
@@ -2698,7 +2627,7 @@ int SiegeTakesPriority( bot_state_t *bs ) {
 				dif.y = (bs->shootGoal->r.absmax.y + bs->shootGoal->r.absmin.y) / 2;
 				dif.z = (bs->shootGoal->r.absmax.z + bs->shootGoal->r.absmin.z) / 2;
 
-				if ( !BotPVSCheck( &bs->origin, &dif ) ) {
+				if ( !trap->InPVS( &bs->origin, &dif ) ) {
 					bs->shootGoal = NULL;
 				}
 				else {
@@ -2718,7 +2647,7 @@ int SiegeTakesPriority( bot_state_t *bs ) {
 			dif.y = (bs->shootGoal->r.absmax.y + bs->shootGoal->r.absmin.y) / 2;
 			dif.z = (bs->shootGoal->r.absmax.z + bs->shootGoal->r.absmin.z) / 2;
 
-			if ( !BotPVSCheck( &bs->origin, &dif ) )
+			if ( !trap->InPVS( &bs->origin, &dif ) )
 				bs->shootGoal = NULL;
 			else {
 				trap->Trace( &tr, &bs->origin, NULL, NULL, &dif, bs->client, MASK_SOLID, qfalse, 0, 0 );
@@ -2735,7 +2664,7 @@ int SiegeTakesPriority( bot_state_t *bs ) {
 			dif.y = (bs->shootGoal->r.absmax.y + bs->shootGoal->r.absmin.y) / 2;
 			dif.z = (bs->shootGoal->r.absmax.z + bs->shootGoal->r.absmin.z) / 2;
 
-			if ( !BotPVSCheck( &bs->origin, &dif ) ) {
+			if ( !trap->InPVS( &bs->origin, &dif ) ) {
 				bs->shootGoal = NULL;
 			}
 			else {
@@ -2799,7 +2728,7 @@ int JMTakesPriority( bot_state_t *bs ) {
 			wpClose = GetNearestVisibleWP( &theImportantEntity->r.currentOrigin, theImportantEntity->s.number );
 		}
 
-		if ( wpClose != -1 && gWPArray[wpClose] && gWPArray[wpClose]->inuse ) {
+		if ( wpClose != -1 && gWPArray[wpClose] ) {
 			/*
 			Com_Printf("BOT GRABBED IDEAL JM LOCATION\n");
 			if (bs->wpDestination != gWPArray[wpClose])
@@ -2866,7 +2795,6 @@ int BotHasAssociated( bot_state_t *bs, wpobject_t *wp ) {
 //let's just find the best thing to do given the current
 //situation.
 int GetBestIdleGoal( bot_state_t *bs ) {
-	int i = 0;
 	int highestweight = 0;
 	int desiredindex = -1;
 	int dist_to_weight = 0;
@@ -2891,9 +2819,8 @@ int GetBestIdleGoal( bot_state_t *bs ) {
 		return -1;
 	}
 
-	while ( i < gWPNum ) {
+	for ( int i = 0, size = gWPArray.size(); i < size; i++ ) {
 		if ( gWPArray[i] &&
-			gWPArray[i]->inuse &&
 			(gWPArray[i]->flags & WPFLAG_GOALPOINT) &&
 			gWPArray[i]->weight > highestweight &&
 			!BotHasAssociated( bs, gWPArray[i] ) ) {
@@ -2909,8 +2836,6 @@ int GetBestIdleGoal( bot_state_t *bs ) {
 				}
 			}
 		}
-
-		i++;
 	}
 
 	return desiredindex;
@@ -2991,7 +2916,7 @@ void GetIdealDestination( bot_state_t *bs ) {
 		else
 			tempInt = bs->wpCurrent->index - 1;
 
-		if ( gWPArray[tempInt] && gWPArray[tempInt]->inuse && bs->escapeDirTime < level.time ) {
+		if ( tempInt >= 0 && tempInt < gWPArray.size() && gWPArray[tempInt] && bs->escapeDirTime < level.time ) {
 			VectorSubtract( &badthing->s.pos.trBase, &bs->wpCurrent->origin, &a );
 			plusLen = VectorLength( &a );
 			VectorSubtract( &badthing->s.pos.trBase, &gWPArray[tempInt]->origin, &a );
@@ -3070,11 +2995,11 @@ void GetIdealDestination( bot_state_t *bs ) {
 			if ( bs->frame_Enemy_Len > 400 ) { //good distance away, start running toward a good place for an item or powerup or whatever
 				idleWP = GetBestIdleGoal( bs );
 
-				if ( idleWP != -1 && gWPArray[idleWP] && gWPArray[idleWP]->inuse )
+				if ( idleWP != -1 && gWPArray[idleWP] )
 					bs->wpDestination = gWPArray[idleWP];
 			}
-			else if ( gWPArray[cWPIndex - 1] && gWPArray[cWPIndex - 1]->inuse &&
-				gWPArray[cWPIndex + 1] && gWPArray[cWPIndex + 1]->inuse ) {
+			else if ( cWPIndex > 0 && cWPIndex + 1 < gWPArray.size() && gWPArray[cWPIndex - 1] &&
+				gWPArray[cWPIndex + 1] ) {
 				VectorSubtract( &gWPArray[cWPIndex + 1]->origin, &usethisvec, &a );
 				plusLen = VectorLength( &a );
 				VectorSubtract( &gWPArray[cWPIndex - 1]->origin, &usethisvec, &a );
@@ -3105,7 +3030,7 @@ void GetIdealDestination( bot_state_t *bs ) {
 		//trap->Print("I need something to do\n");
 		idleWP = GetBestIdleGoal( bs );
 
-		if ( idleWP != -1 && gWPArray[idleWP] && gWPArray[idleWP]->inuse )
+		if ( idleWP != -1 && gWPArray[idleWP] )
 			bs->wpDestination = gWPArray[idleWP];
 	}
 }
@@ -5186,23 +5111,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 
 	//ESTABLISH VISIBILITIES AND DISTANCES FOR THE WHOLE FRAME HERE
 	if ( bs->wpCurrent ) {
-		if ( RMG.integer ) { //this is somewhat hacky, but in RMG we don't really care about vertical placement because points are scattered across only the terrain.
-			vector3 vecB, vecC;
-
-			vecB.x = bs->origin.x;
-			vecB.y = bs->origin.y;
-			vecB.z = bs->origin.z;
-
-			vecC.x = bs->wpCurrent->origin.x;
-			vecC.y = bs->wpCurrent->origin.y;
-			vecC.z = vecB.z;
-
-
-			VectorSubtract( &vecC, &vecB, &a );
-		}
-		else {
-			VectorSubtract( &bs->wpCurrent->origin, &bs->origin, &a );
-		}
+		VectorSubtract( &bs->wpCurrent->origin, &bs->origin, &a );
 		bs->frame_Waypoint_Len = VectorLength( &a );
 
 		visResult = WPOrgVisible( &g_entities[bs->client], &bs->origin, &bs->wpCurrent->origin, bs->client );
@@ -5272,10 +5181,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 		}
 
 		if ( bs->frame_Waypoint_Vis || (bs->wpCurrent->flags & WPFLAG_NOVIS) ) {
-			if ( RMG.integer )
-				bs->wpSeenTime = level.time + 5000; //if we lose sight of the point, we have 1.5f seconds to regain it before we drop it
-			else
-				bs->wpSeenTime = level.time + 1500; //if we lose sight of the point, we have 1.5f seconds to regain it before we drop it
+			bs->wpSeenTime = level.time + 1500; //if we lose sight of the point, we have 1.5f seconds to regain it before we drop it
 		}
 		VectorCopy( &bs->wpCurrent->origin, &bs->goalPosition );
 		if ( bs->wpDirection ) {
@@ -5299,7 +5205,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 					bs->duckTime = level.time + 1000;
 			}
 		}
-		else if ( gWPArray[goalWPIndex] && gWPArray[goalWPIndex]->inuse &&
+		else if ( goalWPIndex >= 0 && goalWPIndex < gWPArray.size() && gWPArray[goalWPIndex] &&
 			!(gLevelFlags & LEVELFLAG_NOPOINTPREDICTION) ) {
 			VectorSubtract( &gWPArray[goalWPIndex]->origin, &bs->origin, &a );
 			vectoangles( &a, &ang );
@@ -5322,15 +5228,7 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 			}
 		}
 
-		if ( RMG.integer ) {
-			if ( bs->frame_Waypoint_Vis ) {
-				if ( bs->wpCurrent && !bs->wpCurrent->flags ) {
-					wpTouchDist *= 3;
-				}
-			}
-		}
-
-		if ( bs->frame_Waypoint_Len < wpTouchDist || (RMG.integer && bs->frame_Waypoint_Len < wpTouchDist * 2) ) {
+		if ( bs->frame_Waypoint_Len < wpTouchDist ) {
 			WPTouchRoutine( bs );
 
 			if ( !bs->wpDirection ) {
@@ -5340,11 +5238,11 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 				desiredIndex = bs->wpCurrent->index - 1;
 			}
 
-			if ( gWPArray[desiredIndex] &&
-				gWPArray[desiredIndex]->inuse &&
-				desiredIndex < gWPNum &&
-				desiredIndex >= 0 &&
-				PassWayCheck( bs, desiredIndex ) ) {
+			if ( desiredIndex >= 0 &&
+				desiredIndex < gWPArray.size() &&
+				gWPArray[desiredIndex] &&
+				PassWayCheck( bs, desiredIndex ) )
+			{
 				bs->wpCurrent = gWPArray[desiredIndex];
 			}
 			else {
@@ -5370,24 +5268,13 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 			trap->EA_MoveForward( bs->client );
 		}
 		*/
-		bs->jumpTime = level.time + 1500;
-		bs->jumpHoldTime = level.time + 1500;
-		bs->jDelay = 0;
-
-		doingFallback = BotFallbackNavigation( bs );
-	}
-
-	if ( RMG.integer ) { //for RMG if the bot sticks around an area too long, jump around randomly some to spread to a new area (horrible hacky method)
-		vector3 vSubDif;
-
-		VectorSubtract( &bs->origin, &bs->lastSignificantAreaChange, &vSubDif );
-		if ( VectorLength( &vSubDif ) > 1500 ) {
-			VectorCopy( &bs->origin, &bs->lastSignificantAreaChange );
-			bs->lastSignificantChangeTime = level.time + 20000;
+		if (bot_fallbackNoWP.integer == 1) {
+			bs->jumpTime = level.time + 1500;
+			bs->jumpHoldTime = level.time + 1500;
+			bs->jDelay = 0;
 		}
 
-		if ( bs->lastSignificantChangeTime < level.time )
-			bs->iHaveNoIdeaWhereIAmGoing = level.time + 17000;
+		doingFallback = BotFallbackNavigation( bs );
 	}
 
 	if ( bs->iHaveNoIdeaWhereIAmGoing > level.time && !bs->currentEnemy ) {
@@ -5399,47 +5286,6 @@ void StandardBotAI( bot_state_t *bs, float thinktime ) {
 		bs->jumpHoldTime = level.time + 150;
 		bs->jDelay = 0;
 		bs->lastSignificantChangeTime = level.time + 25000;
-	}
-
-	if ( bs->wpCurrent && RMG.integer ) {
-		qboolean doJ = qfalse;
-
-		if ( bs->wpCurrent->origin.z - 192 > bs->origin.z )
-			doJ = qtrue;
-		else if ( (bs->wpTravelTime - level.time) < 5000 && bs->wpCurrent->origin.z - 64 > bs->origin.z )
-			doJ = qtrue;
-		else if ( (bs->wpTravelTime - level.time) < 7000 && (bs->wpCurrent->flags & WPFLAG_RED_FLAG) ) {
-			if ( (level.time - bs->jumpTime) > 200 ) {
-				bs->jumpTime = level.time + 100;
-				bs->jumpHoldTime = level.time + 100;
-				bs->jDelay = 0;
-			}
-		}
-		else if ( (bs->wpTravelTime - level.time) < 7000 && (bs->wpCurrent->flags & WPFLAG_BLUE_FLAG) ) {
-			if ( (level.time - bs->jumpTime) > 200 ) {
-				bs->jumpTime = level.time + 100;
-				bs->jumpHoldTime = level.time + 100;
-				bs->jDelay = 0;
-			}
-		}
-		else if ( bs->wpCurrent->index > 0 ) {
-			if ( (bs->wpTravelTime - level.time) < 7000 ) {
-				if ( (gWPArray[bs->wpCurrent->index - 1]->flags & WPFLAG_RED_FLAG) ||
-					(gWPArray[bs->wpCurrent->index - 1]->flags & WPFLAG_BLUE_FLAG) ) {
-					if ( (level.time - bs->jumpTime) > 200 ) {
-						bs->jumpTime = level.time + 100;
-						bs->jumpHoldTime = level.time + 100;
-						bs->jDelay = 0;
-					}
-				}
-			}
-		}
-
-		if ( doJ ) {
-			bs->jumpTime = level.time + 1500;
-			bs->jumpHoldTime = level.time + 1500;
-			bs->jDelay = 0;
-		}
 	}
 
 	bs->doingFallback = doingFallback;
