@@ -281,7 +281,7 @@ if not env.GetOption("clean"):
         + "\n"
         + "\tinstruction set: "
         + arch
-        + ((" with x87 fpu" if "NO_SSE" in os.environ else " with SSE") if arch != "arm" else "")
+        + ((" with x87 fpu" if "NO_SSE" in os.environ else " with SSE") if arch[:3] != "arm" else "")
         + "\n"
         + "\tsql support: "
         + ("dis" if no_sql else "en")
@@ -391,7 +391,7 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
             ]
 
     # gcc-specific warnings
-    if "gcc" in env["CC"] and cmp_version(ccversion, "4.6") >= 0 and arch != "arm":
+    if "gcc" in env["CC"] and cmp_version(ccversion, "4.6") >= 0 and arch[:3] != "arm":
         env["CCFLAGS"] += [
             "-Wlogical-op",
         ]
@@ -408,7 +408,7 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
     ]
 
     # c/cpp flags
-    if arch == "arm":
+    if arch[:3] == "arm":
         env["CCFLAGS"] += [
             "-fsigned-char",
         ]
