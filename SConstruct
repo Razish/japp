@@ -45,7 +45,11 @@ toolStr = ARGUMENTS.get("tools", "gcc,g++,ar,as,gnulink")
 tools = toolStr.split(",")
 proj = ARGUMENTS.get("project", "game,cgame,ui")
 
-configuration = {0: lambda x: "release", 1: lambda x: "debug", 2: lambda x: "optimised-debug",}[
+configuration = {
+    0: lambda x: "release",
+    1: lambda x: "debug",
+    2: lambda x: "optimised-debug",
+}[
     debug
 ](debug)
 
@@ -64,7 +68,7 @@ def cmp_version(v1, v2):
 
 
 def run_command(cmd):
-    with (subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)) as p:
+    with subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
         out, err = p.communicate()
         out = out.decode("utf-8").strip("\n")
         if err:
@@ -86,29 +90,29 @@ if force32:
 if bits == 32:
     if target_plat == "Windows":
         arch = "x86"
-    elif target_plat == "Linux":
+    elif target_plat in ("Linux", "Darwin"):
         # FIXME: we need to read the TARGET platform, not the HOST platform...this breaks cross-compiling to ARM
         if platform.machine()[:3] == "arm":
             arch = "arm"
         else:
             arch = "i386"
-    elif target_plat == "Darwin":
-        arch = "i386"
     else:
         raise RuntimeError("unexpected platform: " + target_plat)
 elif bits == 64:
     if target_plat == "Windows":
         arch = "x64"
-    elif target_plat == "Linux":
-        arch = "x86_64"
-    elif target_plat == "Darwin":
-        arch = "x86_64"
+    elif target_plat in ("Linux", "Darwin"):
+        if platform.machine()[:3] == "arm":
+            arch = "arm64"
+        else:
+            arch = "x86_64"
     else:
         raise RuntimeError("unexpected platform: " + target_plat)
 else:
     raise RuntimeError("could not determine architecture width: " + str(bits))
 
 clangHack = host_plat == "Darwin"
+
 
 # create the build environment
 # FIXME: also consider LD, AS, AR in the toolset
@@ -178,6 +182,7 @@ env["RANLIBCOMSTR"] = f"{colours['orange']}  indexing: {colours['white']}$TARGET
 env["ASCOMSTR"] = f"{colours['orange']}assembling: {colours['white']}$TARGET{colours['end']}"
 env["SHLINKCOMSTR"] = env["LINKCOMSTR"] = f"{colours['green']}   linking: {colours['white']}$TARGET{colours['end']}"
 
+
 # obtain the compiler version
 def get_compiler_version():
     if env["CC"] == "cl":
@@ -191,6 +196,7 @@ def get_compiler_version():
 
 
 ccversion = get_compiler_version()
+
 
 # git revision
 def get_git_revision():
@@ -206,6 +212,7 @@ def get_git_revision():
 
 
 revision = get_git_revision()
+
 
 # set job/thread count
 def GetNumCores():
@@ -304,6 +311,7 @@ if not env.GetOption("clean"):
         msg += "scons" + " located at " + run_command("where " + "scons")[1].split("\n", maxsplit=1)[0] + "\n"
 
     print(msg)
+
 
 # clear default compiler/linker switches
 def emptyEnv(_env, e):
