@@ -1,35 +1,28 @@
-Import( '*' )
+Import("*")
 
 # environment
-env.VariantDir(
-	build_dir,
-	'#',
-	duplicate = 0
-)
+env.VariantDir(build_dir, "#", duplicate=0)
 semver_env = env.Clone()
 
 # sources
 files = [
-	'semver/semver.c',
+    "semver/semver.c",
 ]
 files = [build_dir + f for f in files]
 
 # project settings
-if 'gcc' in env['CC'] or 'clang' in env['CC']:
-	if target_plat != 'Windows':
-		semver_env['CCFLAGS'] += [
-			'-fPIC',
-		]
-	semver_env['CFLAGS'] += [
-		'-std=c99',
-		'-Wno-declaration-after-statement',
-		'-Wno-stack-usage',
-		'-Wno-unused-function',
-	]
+if "gcc" in env["CC"] or "clang" in env["CC"]:
+    if target_plat != "Windows":
+        semver_env["CCFLAGS"] += [
+            "-fPIC",
+        ]
+    semver_env["CFLAGS"] += [
+        "-std=c99",
+        "-Wno-declaration-after-statement",
+        "-Wno-stack-usage",
+        "-Wno-unused-function",
+    ]
 
 # targets
-result = semver_env.StaticLibrary(
-	build_dir + 'libsemver',
-	files
-)
-Return( 'result' )
+result = semver_env.StaticLibrary(build_dir + "libsemver", files)
+Return("result")

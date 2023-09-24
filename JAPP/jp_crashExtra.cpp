@@ -12,11 +12,11 @@
 #else
 
 #ifdef PROJECT_CGAME
-Q_CABI Q_EXPORT void CrashReport( int fileHandle ) {
-	char text[] = "Test from cgame\n";
-	Q_FSWriteString( fileHandle, text );
+Q_CABI Q_EXPORT void CrashReport(int fileHandle) {
+    char text[] = "Test from cgame\n";
+    Q_FSWriteString(fileHandle, text);
 }
 
 #endif
 
-#endif //ARCH_WIDTH == 32
+#endif // ARCH_WIDTH == 32

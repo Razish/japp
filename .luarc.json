@@ -1,0 +1,13 @@
+{
+	"$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+	"diagnostics": {
+		"globals": [
+			"lfs"
+		]
+	},
+	"runtime.version": "Lua 5.3",
+	"telemetry.enable": false,
+	"workspace.library": [
+		"${3rd}/lfs/library"
+	]
+}

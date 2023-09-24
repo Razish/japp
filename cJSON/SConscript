@@ -1,34 +1,30 @@
-Import( '*' )
+Import("*")
 
 # environment
-env.VariantDir(
-	build_dir,
-	'#',
-	duplicate = 0
-)
+env.VariantDir(build_dir, "#", duplicate=0)
 json_env = env.Clone()
 
 # sources
 files = [
-	'cJSON/cJSON.c',
+    "cJSON/cJSON.c",
 ]
 files = [build_dir + f for f in files]
 
 # project settings
-if 'gcc' in env['CC'] or 'clang' in env['CC']:
-	if target_plat != 'Windows':
-		json_env['CCFLAGS'] += [
-			'-fPIC',
-		]
-	json_env['CCFLAGS'] += [
-		'-Wno-unsuffixed-float-constants',
-		'-Wno-cast-qual',
-		'-Wno-implicit-fallthrough',
-	]
+if "gcc" in env["CC"] or "clang" in env["CC"]:
+    if target_plat != "Windows":
+        json_env["CCFLAGS"] += [
+            "-fPIC",
+        ]
+    json_env["CCFLAGS"] += [
+        "-Wno-cast-qual",
+        "-Wno-implicit-fallthrough",
+    ]
+    if "clang" not in env["CC"]:
+        json_env["CCFLAGS"] += [
+            "-Wno-unsuffixed-float-constants",
+        ]
 
 # targets
-result = json_env.StaticLibrary(
-	build_dir + 'libcJSON',
-	files
-)
-Return( "result" )
+result = json_env.StaticLibrary(build_dir + "libcJSON", files)
+Return("result")

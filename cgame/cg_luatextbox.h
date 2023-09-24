@@ -6,39 +6,39 @@
 
 namespace JPLua {
 
-	// TextBox instance userdata type
-	struct luaTextBox_t {
-		luaFont_t		*font; // from RegisterFont( int fontIndex );
-		float			scale;
-		std::string		text; // std::string?
-		vector4			colour;
-		uiTextStyle_e	style;
-		bool			centered;
+// TextBox instance userdata type
+struct luaTextBox_t {
+    luaFont_t *font; // from RegisterFont( int fontIndex );
+    float scale;
+    std::string text; // std::string?
+    vector4 colour;
+    uiTextStyle_e style;
+    bool centered;
 
-		// cached
-		bool			recalculate;
-		float			width, height;
-	};
+    // cached
+    bool recalculate;
+    float width, height;
+};
 
 #ifdef JPLUA_INTERNALS
-	struct textBoxProperty_t {
-		const char		*name;
-		int				(*Get)( lua_State *L, luaTextBox_t *box );
-		void			(*Set)( lua_State *L, luaTextBox_t *box );
-	};
-	int textBoxPropertyCompare( const void *a, const void *b );
+struct textBoxProperty_t {
+    const char *name;
+    int (*Get)(lua_State *L, luaTextBox_t *box);
+    void (*Set)(lua_State *L, luaTextBox_t *box);
+};
+int textBoxPropertyCompare(const void *a, const void *b);
 
-	//internal: push a TextBox object on the stack
-	void TextBox_CreateRef( lua_State *L, int fontIndex );
+// internal: push a TextBox object on the stack
+void TextBox_CreateRef(lua_State *L, int fontIndex);
 
-	// return a TextBox object
-	int CreateTextBox( lua_State *L );
-	luaTextBox_t *CheckTextBox( lua_State *L, int idx );
+// return a TextBox object
+int CreateTextBox(lua_State *L);
+luaTextBox_t *CheckTextBox(lua_State *L, int idx);
 
-	// register the TextBox metatable
-	void Register_TextBox( lua_State *L );
+// register the TextBox metatable
+void Register_TextBox(lua_State *L);
 #endif // JPLUA_INTERNALS
 
-} // namespace JPLUA
+} // namespace JPLua
 
 #endif // JPLUA

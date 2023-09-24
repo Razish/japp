@@ -1,160 +1,149 @@
 import os
-Import( '*' )
+
+Import("*")
 
 # environment
-build_dir = 'build' + os.sep\
-	+ configuration + os.sep\
-	+ env['CC'] + os.sep\
-	+ str(bits) + os.sep\
-	+ 'cgame' + os.sep
-env.VariantDir(
-	build_dir,
-	'#',
-	duplicate = 0
-)
+build_dir = "build" + os.sep + configuration + os.sep + env["CC"] + os.sep + str(bits) + os.sep + "cgame" + os.sep
+env.VariantDir(build_dir, "#", duplicate=0)
 cgame_env = env.Clone()
 
 # sources
 files = [
-	'cgame/cg_chatbox.cpp',
-	'cgame/cg_consolecmds.cpp',
-	'cgame/cg_draw.cpp',
-	'cgame/cg_drawtools.cpp',
-	'cgame/cg_effects.cpp',
-	'cgame/cg_ents.cpp',
-	'cgame/cg_event.cpp',
-	'cgame/cg_info.cpp',
-	'cgame/cg_jappScoreboard.cpp',
-	'cgame/cg_light.cpp',
-	'cgame/cg_localents.cpp',
-	'cgame/cg_luafont.cpp',
-	'cgame/cg_luaitem.cpp',
-	'cgame/cg_lualocalentity.cpp',
-	'cgame/cg_luamenu.cpp',
-	'cgame/cg_luarefentity.cpp',
-	'cgame/cg_luaserver.cpp',
-	'cgame/cg_luatextbox.cpp',
-	'cgame/cg_main.cpp',
-	'cgame/cg_marks.cpp',
-	'cgame/cg_media.cpp',
-	'cgame/cg_newDraw.cpp',
-	'cgame/cg_notify.cpp',
-	'cgame/cg_players.cpp',
-	'cgame/cg_playerstate.cpp',
-	'cgame/cg_predict.cpp',
-	'cgame/cg_q3pScoreboard.cpp',
-	'cgame/cg_saga.cpp',
-	'cgame/cg_scoreboard.cpp',
-	'cgame/cg_servercmds.cpp',
-	'cgame/cg_serverHistory.cpp',
-	'cgame/cg_serverModification.cpp',
-	'cgame/cg_smartentities.cpp',
-	'cgame/cg_snapshot.cpp',
-	'cgame/cg_syscalls.cpp',
-	'cgame/cg_teambinds.cpp',
-	'cgame/cg_trueview.cpp',
-	'cgame/cg_turret.cpp',
-	'cgame/cg_view.cpp',
-	'cgame/cg_weaponinit.cpp',
-	'cgame/cg_weapons.cpp',
-	'cgame/fx_blaster.cpp',
-	'cgame/fx_bowcaster.cpp',
-	'cgame/fx_bryarpistol.cpp',
-	'cgame/fx_demp2.cpp',
-	'cgame/fx_disruptor.cpp',
-	'cgame/fx_flechette.cpp',
-	'cgame/fx_force.cpp',
-	'cgame/fx_heavyrepeater.cpp',
-	'cgame/fx_rocketlauncher.cpp',
-	'game/AnimalNPC.cpp',
-	'game/bg_animTable.cpp',
-	'game/bg_g2_utils.cpp',
-	'game/bg_lua.cpp',
-	'game/bg_luacvar.cpp',
-	'game/bg_luaentity.cpp',
-	'game/bg_luaevent.cpp',
-	'game/bg_luafs.cpp',
-	'game/bg_lualogger.cpp',
-	'game/bg_luaplayer.cpp',
-	'game/bg_luaserialiser.cpp',
-	'game/bg_luavector.cpp',
-	'game/bg_misc.cpp',
-	'game/bg_panimate.cpp',
-	'game/bg_pmove.cpp',
-	'game/bg_saber.cpp',
-	'game/bg_saberLoad.cpp',
-	'game/bg_saga.cpp',
-	'game/bg_slidemove.cpp',
-	'game/bg_threading.cpp',
-	'game/bg_vehicleLoad.cpp',
-	'game/bg_weapons.cpp',
-	'game/FighterNPC.cpp',
-	'game/SpeederNPC.cpp',
-	'game/WalkerNPC.cpp',
-	'JAPP/jp_crashExtra.cpp',
-	'JAPP/jp_promode.cpp',
-	'JAPP/jp_stack.cpp',
-	'JAPP/jp_tokenparser.cpp',
-	'ui/ui_fonts.cpp',
-	'ui/ui_shared.cpp',
-	'qcommon/q_math.cpp',
-	'qcommon/q_shared.cpp',
+    "cgame/cg_chatbox.cpp",
+    "cgame/cg_consolecmds.cpp",
+    "cgame/cg_draw.cpp",
+    "cgame/cg_drawtools.cpp",
+    "cgame/cg_effects.cpp",
+    "cgame/cg_ents.cpp",
+    "cgame/cg_event.cpp",
+    "cgame/cg_info.cpp",
+    "cgame/cg_jappScoreboard.cpp",
+    "cgame/cg_light.cpp",
+    "cgame/cg_localents.cpp",
+    "cgame/cg_luafont.cpp",
+    "cgame/cg_luaitem.cpp",
+    "cgame/cg_lualocalentity.cpp",
+    "cgame/cg_luamenu.cpp",
+    "cgame/cg_luarefentity.cpp",
+    "cgame/cg_luaserver.cpp",
+    "cgame/cg_luatextbox.cpp",
+    "cgame/cg_main.cpp",
+    "cgame/cg_marks.cpp",
+    "cgame/cg_media.cpp",
+    "cgame/cg_newDraw.cpp",
+    "cgame/cg_notify.cpp",
+    "cgame/cg_players.cpp",
+    "cgame/cg_playerstate.cpp",
+    "cgame/cg_predict.cpp",
+    "cgame/cg_q3pScoreboard.cpp",
+    "cgame/cg_saga.cpp",
+    "cgame/cg_scoreboard.cpp",
+    "cgame/cg_servercmds.cpp",
+    "cgame/cg_serverHistory.cpp",
+    "cgame/cg_serverModification.cpp",
+    "cgame/cg_smartentities.cpp",
+    "cgame/cg_snapshot.cpp",
+    "cgame/cg_syscalls.cpp",
+    "cgame/cg_teambinds.cpp",
+    "cgame/cg_trueview.cpp",
+    "cgame/cg_turret.cpp",
+    "cgame/cg_view.cpp",
+    "cgame/cg_weaponinit.cpp",
+    "cgame/cg_weapons.cpp",
+    "cgame/fx_blaster.cpp",
+    "cgame/fx_bowcaster.cpp",
+    "cgame/fx_bryarpistol.cpp",
+    "cgame/fx_demp2.cpp",
+    "cgame/fx_disruptor.cpp",
+    "cgame/fx_flechette.cpp",
+    "cgame/fx_force.cpp",
+    "cgame/fx_heavyrepeater.cpp",
+    "cgame/fx_rocketlauncher.cpp",
+    "game/AnimalNPC.cpp",
+    "game/bg_animTable.cpp",
+    "game/bg_g2_utils.cpp",
+    "game/bg_lua.cpp",
+    "game/bg_luacvar.cpp",
+    "game/bg_luaentity.cpp",
+    "game/bg_luaevent.cpp",
+    "game/bg_luafs.cpp",
+    "game/bg_lualogger.cpp",
+    "game/bg_luaplayer.cpp",
+    "game/bg_luaserialiser.cpp",
+    "game/bg_luavector.cpp",
+    "game/bg_misc.cpp",
+    "game/bg_panimate.cpp",
+    "game/bg_pmove.cpp",
+    "game/bg_saber.cpp",
+    "game/bg_saberLoad.cpp",
+    "game/bg_saga.cpp",
+    "game/bg_slidemove.cpp",
+    "game/bg_threading.cpp",
+    "game/bg_vehicleLoad.cpp",
+    "game/bg_weapons.cpp",
+    "game/FighterNPC.cpp",
+    "game/SpeederNPC.cpp",
+    "game/WalkerNPC.cpp",
+    "JAPP/jp_crashExtra.cpp",
+    "JAPP/jp_promode.cpp",
+    "JAPP/jp_stack.cpp",
+    "JAPP/jp_tokenparser.cpp",
+    "ui/ui_fonts.cpp",
+    "ui/ui_shared.cpp",
+    "qcommon/q_math.cpp",
+    "qcommon/q_shared.cpp",
 ]
 files = [build_dir + f for f in files]
 
 # libraries
 libraries = [
-	'cJSON',
-	'lua',
-	'semver',
+    "cJSON",
+    "lua",
+    "semver",
 ]
-cgame_env['LIBS'] += [
-	cgame_env.SConscript(
-		'#' + os.sep + lib + os.sep + 'SConscript',
-		exports = [
-			'arch',
-			'bits',
-			'build_dir',
-			'configuration',
-			'env',
-			'host_plat',
-			'target_plat',
-		]
-	) for lib in libraries
+cgame_env["LIBS"] += [
+    cgame_env.SConscript(
+        "#" + os.sep + lib + os.sep + "SConscript",
+        exports=[
+            "arch",
+            "bits",
+            "build_dir",
+            "configuration",
+            "env",
+            "host_plat",
+            "target_plat",
+        ],
+    )
+    for lib in libraries
 ]
 
-if target_plat == 'Windows':
-	cgame_env['LIBS'] += [
-		'user32',
-		'advapi32',
-		'shell32',
-	]
+if target_plat == "Windows":
+    cgame_env["LIBS"] += [
+        "user32",
+        "advapi32",
+        "shell32",
+    ]
 if not no_notify:
-	if target_plat == 'Linux':
-		# for libnotify on GTK+ systems
-		cgame_env.ParseConfig( 'pkg-config glib-2.0 gtk+-2.0 libnotify --cflags --libs' )
+    if target_plat == "Linux":
+        # for libnotify on GTK+ systems
+        cgame_env.ParseConfig("pkg-config glib-2.0 gtk+-2.0 libnotify --cflags --libs")
 
 # project settings
-cgame_env['CPPPATH'] += [
-	'#' + os.sep + 'cgame'
+cgame_env["CPPPATH"] += ["#" + os.sep + "cgame"]
+cgame_env["CPPDEFINES"] += [
+    "PROJECT_CGAME",
+    "JPLUA",
+    "LUA_COMPAT_BITLIB",
+    "LUA_COMPAT_APIINTCASTS",
 ]
-cgame_env['CPPDEFINES'] += [
-	'PROJECT_CGAME',
-	'JPLUA',
-	'LUA_COMPAT_BITLIB',
-	'LUA_COMPAT_APIINTCASTS',
-]
-if target_plat == 'Linux':
-	cgame_env['CPPDEFINES'] += [
-		'LUA_USE_LINUX',
-	]
-cgame_env['LIBPREFIX'] = ''
+if target_plat == "Linux":
+    cgame_env["CPPDEFINES"] += [
+        "LUA_USE_LINUX",
+    ]
+cgame_env["LIBPREFIX"] = ""
 
-if env['CC'] == 'cl':
-	cgame_env['PDB'] = '#' + os.sep + 'cgame' + arch + '.pdb'
+if env["CC"] == "cl":
+    cgame_env["PDB"] = "#" + os.sep + "cgame" + arch + ".pdb"
 
 # targets
-cgame_env.SharedLibrary(
-	'#' + os.sep + 'cgame' + arch,
-	files
-)
+cgame_env.SharedLibrary("#" + os.sep + "cgame" + arch, files)

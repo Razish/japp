@@ -1,93 +1,82 @@
 import os
-Import( '*' )
+
+Import("*")
 
 # environment
-build_dir = 'build' + os.sep\
-	+ configuration + os.sep\
-	+ env['CC'] + os.sep\
-	+ str(bits) + os.sep\
-	+ 'ui' + os.sep
-env.VariantDir(
-	build_dir,
-	'#',
-	duplicate = 0
-)
+build_dir = "build" + os.sep + configuration + os.sep + env["CC"] + os.sep + str(bits) + os.sep + "ui" + os.sep
+env.VariantDir(build_dir, "#", duplicate=0)
 ui_env = env.Clone()
 
 # sources
 files = [
-	'game/bg_animTable.cpp',
-	'game/bg_misc.cpp',
-	'game/bg_saberLoad.cpp',
-	'game/bg_saga.cpp',
-	'game/bg_threading.cpp',
-	'game/bg_vehicleLoad.cpp',
-	'game/bg_weapons.cpp',
-	'JAPP/jp_crash.cpp',
-	'JAPP/jp_tokenparser.cpp',
-	'ui/ui_atoms.cpp',
-	'ui/ui_cvar.cpp',
-	'ui/ui_fonts.cpp',
-	'ui/ui_force.cpp',
-	'ui/ui_gameinfo.cpp',
-	'ui/ui_main.cpp',
-	'ui/ui_saber.cpp',
-	'ui/ui_shared.cpp',
-	'ui/ui_syscalls.cpp',
-	'qcommon/q_math.cpp',
-	'qcommon/q_shared.cpp',
+    "game/bg_animTable.cpp",
+    "game/bg_misc.cpp",
+    "game/bg_saberLoad.cpp",
+    "game/bg_saga.cpp",
+    "game/bg_threading.cpp",
+    "game/bg_vehicleLoad.cpp",
+    "game/bg_weapons.cpp",
+    "JAPP/jp_crash.cpp",
+    "JAPP/jp_tokenparser.cpp",
+    "ui/ui_atoms.cpp",
+    "ui/ui_cvar.cpp",
+    "ui/ui_fonts.cpp",
+    "ui/ui_force.cpp",
+    "ui/ui_gameinfo.cpp",
+    "ui/ui_main.cpp",
+    "ui/ui_saber.cpp",
+    "ui/ui_shared.cpp",
+    "ui/ui_syscalls.cpp",
+    "qcommon/q_math.cpp",
+    "qcommon/q_shared.cpp",
 ]
 files = [build_dir + f for f in files]
 
 # libraries
 libraries = [
-	'cJSON',
+    "cJSON",
 ]
 if bits == 32 and no_crashhandler == 0:
-	libraries += [
-		'libudis86'
-	]
-ui_env['LIBS'] += [
-	ui_env.SConscript(
-		'#' + os.sep + lib + os.sep + 'SConscript',
-		exports = [
-			'arch',
-			'bits',
-			'build_dir',
-			'configuration',
-			'env',
-			'host_plat',
-			'target_plat',
-		]
-	) for lib in libraries
+    libraries += ["libudis86"]
+ui_env["LIBS"] += [
+    ui_env.SConscript(
+        "#" + os.sep + lib + os.sep + "SConscript",
+        exports=[
+            "arch",
+            "bits",
+            "build_dir",
+            "configuration",
+            "env",
+            "host_plat",
+            "target_plat",
+        ],
+    )
+    for lib in libraries
 ]
 
-if target_plat == 'Windows':
-	ui_env['LIBS'] += [
-		'user32',
-		'shell32',
-	]
-	if no_crashhandler == 0:
-		ui_env['LIBS'] += [
-			'dbghelp',
-			'psapi',
-			'user32',
-		]
+if target_plat == "Windows":
+    ui_env["LIBS"] += [
+        "user32",
+        "shell32",
+    ]
+    if no_crashhandler == 0:
+        ui_env["LIBS"] += [
+            "dbghelp",
+            "psapi",
+            "user32",
+        ]
 
 # project settings
-ui_env['CPPPATH'] += [
-	'#' + os.sep + 'ui',
+ui_env["CPPPATH"] += [
+    "#" + os.sep + "ui",
 ]
-ui_env['CPPDEFINES'] += [
-	'PROJECT_UI',
+ui_env["CPPDEFINES"] += [
+    "PROJECT_UI",
 ]
-ui_env['LIBPREFIX'] = ''
+ui_env["LIBPREFIX"] = ""
 
-if env['CC'] == 'cl':
-	ui_env['PDB'] = '#' + os.sep + 'ui' + arch + '.pdb'
+if env["CC"] == "cl":
+    ui_env["PDB"] = "#" + os.sep + "ui" + arch + ".pdb"
 
 # targets
-ui_env.SharedLibrary(
-	'#' + os.sep + 'ui' + arch,
-	files
-)
+ui_env.SharedLibrary("#" + os.sep + "ui" + arch, files)

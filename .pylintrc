@@ -1,0 +1,51 @@
+[MAIN]
+
+[BASIC]
+
+[CLASSES]
+
+[DESIGN]
+
+[EXCEPTIONS]
+
+[FORMAT]
+
+# Maximum number of characters on a single line.
+max-line-length=120
+
+[IMPORTS]
+
+[LOGGING]
+
+[MESSAGES CONTROL]
+
+# see <https://pylint.readthedocs.io/en/latest/user_guide/messages/messages_overview.html>
+
+#disable=raw-checker-failed,
+#        bad-inline-option,
+#        locally-disabled,
+#        file-ignored,
+#        suppressed-message,
+#        useless-suppression,
+#        deprecated-pragma,
+#        use-symbolic-message-instead,
+disable=invalid-name,
+        missing-function-docstring
+
+[METHOD_ARGS]
+
+[MISCELLANEOUS]
+
+[REFACTORING]
+
+[REPORTS]
+
+[SIMILARITIES]
+
+[SPELLING]
+
+[STRING]
+
+[TYPECHECK]
+
+[VARIABLES]

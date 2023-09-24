@@ -1,32 +1,23 @@
-Import( '*' )
+Import("*")
 
 # environment
-env.VariantDir(
-	build_dir,
-	'#',
-	duplicate = 0
-)
+env.VariantDir(build_dir, "#", duplicate=0)
 sqlite_env = env.Clone()
 
 # sources
 files = [
-	'sqlite/sqlite3.c',
+    "sqlite/sqlite3.c",
 ]
 files = [build_dir + f for f in files]
 
 # project settings
-if 'gcc' in env['CC'] or 'clang' in env['CC']:
-	if target_plat != 'Windows':
-		sqlite_env['CCFLAGS'] += [
-			'-fPIC',
-		]
-	sqlite_env['CCFLAGS'] += [
-		'-Wno-unused-const-variable'
-	]
+if "gcc" in env["CC"] or "clang" in env["CC"]:
+    if target_plat != "Windows":
+        sqlite_env["CCFLAGS"] += [
+            "-fPIC",
+        ]
+    sqlite_env["CCFLAGS"] += ["-Wno-unused-const-variable"]
 
 # targets
-result = sqlite_env.StaticLibrary(
-	build_dir + 'libsqlite3',
-	files
-)
-Return( "result" )
+result = sqlite_env.StaticLibrary(build_dir + "libsqlite3", files)
+Return("result")

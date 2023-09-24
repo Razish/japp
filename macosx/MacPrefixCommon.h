@@ -2,7 +2,7 @@
 #define MacPrefixCommon_h
 
 // gcc-only
-#define MACOS_X			1
+#define MACOS_X 1
 
 // CW-only
 //#define __MACOS__		1

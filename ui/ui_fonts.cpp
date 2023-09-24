@@ -1,64 +1,60 @@
-#if defined( PROJECT_UI )
-	#include "ui_local.h"
-#elif defined( PROJECT_CGAME )
-	#include "cgame/cg_local.h"
+#if defined(PROJECT_UI)
+#include "ui_local.h"
+#elif defined(PROJECT_CGAME)
+#include "cgame/cg_local.h"
 #endif
 #include "ui/ui_shared.h"
-#include "qcommon/qfiles.h"	// for STYLE_BLINK etc
+#include "qcommon/qfiles.h" // for STYLE_BLINK etc
 #include "ui/ui_fonts.h"
 
 #if defined(PROJECT_CGAME)
-	extern displayContextDef_t cgDC;
+extern displayContextDef_t cgDC;
 #endif
 
-static qhandle_t GetRealHandle( int iMenuFont ) {
+static qhandle_t GetRealHandle(int iMenuFont) {
 #if defined(PROJECT_UI)
-	const cachedAssets_t &assets = uiInfo.uiDC.Assets;
+    const cachedAssets_t &assets = uiInfo.uiDC.Assets;
 #elif defined(PROJECT_CGAME)
-	const cachedAssets_t &assets = cgDC.Assets;
+    const cachedAssets_t &assets = cgDC.Assets;
 #endif
 
-	switch ( iMenuFont ) {
+    switch (iMenuFont) {
 
-	case FONT_SMALL: {
-		return assets.qhSmallFont;
-	} break;
+    case FONT_SMALL: {
+        return assets.qhSmallFont;
+    } break;
 
-	default:
-	case FONT_MEDIUM: {
-		return assets.qhMediumFont;
-	} break;
+    default:
+    case FONT_MEDIUM: {
+        return assets.qhMediumFont;
+    } break;
 
-	case FONT_LARGE: {
-		return assets.qhBigFont;
-	} break;
+    case FONT_LARGE: {
+        return assets.qhBigFont;
+    } break;
 
-	case FONT_SMALL2: {
-		return assets.qhSmall2Font;
-	} break;
+    case FONT_SMALL2: {
+        return assets.qhSmall2Font;
+    } break;
 
-	case FONT_JAPPLARGE: {
-		return assets.japp.fontLarge;
-	} break;
+    case FONT_JAPPLARGE: {
+        return assets.japp.fontLarge;
+    } break;
 
-	case FONT_JAPPSMALL: {
-		return assets.japp.fontSmall;
-	} break;
+    case FONT_JAPPSMALL: {
+        return assets.japp.fontSmall;
+    } break;
 
-	case FONT_JAPPMONO: {
-		return assets.japp.fontMono;
-	} break;
-
-	}
+    case FONT_JAPPMONO: {
+        return assets.japp.fontMono;
+    } break;
+    }
 }
 
-Font::Font( qhandle_t fontHandle, float fontScale, bool isCustomFont )
-	: handle( fontHandle ), scale( fontScale ), customFont( isCustomFont )
-{
-}
+Font::Font(qhandle_t fontHandle, float fontScale, bool isCustomFont) : handle(fontHandle), scale(fontScale), customFont(isCustomFont) {}
 
-float Font::Width( const char *text ) const {
-	qhandle_t realHandle = customFont ? handle : GetRealHandle( handle );
+float Font::Width(const char *text) const {
+    qhandle_t realHandle = customFont ? handle : GetRealHandle(handle);
 
 #if 0
 	float f1 = trap->ext.R_Font_StrLenPixels( text, iFontIndex, scale );
@@ -68,52 +64,46 @@ float Font::Width( const char *text ) const {
 	}
 	return japp_preciseFonts.integer ? f1 : f2;
 #else
-	return japp_preciseFonts.integer
-		? trap->ext.R_Font_StrLenPixels( text, realHandle, scale )
-		: trap->R_Font_StrLenPixels( text, realHandle, scale );
+    return japp_preciseFonts.integer ? trap->ext.R_Font_StrLenPixels(text, realHandle, scale) : trap->R_Font_StrLenPixels(text, realHandle, scale);
 #endif
 }
 
-float Font::Height( const char *text ) const {
-	qhandle_t realHandle = customFont ? handle : GetRealHandle( handle );
+float Font::Height(const char *text) const {
+    qhandle_t realHandle = customFont ? handle : GetRealHandle(handle);
 
-	//TODO: trap->ext.***
-	return trap->R_Font_HeightPixels( realHandle, scale );
+    // TODO: trap->ext.***
+    return trap->R_Font_HeightPixels(realHandle, scale);
 }
 
-void Font::Paint( float x, float y, const char *text, const vector4 *colour, uiTextStyle_e style, int limit, float adjust ) const {
-	uint32_t iStyleOR = 0u;
-	switch ( style ) {
+void Font::Paint(float x, float y, const char *text, const vector4 *colour, uiTextStyle_e style, int limit, float adjust) const {
+    uint32_t iStyleOR = 0u;
+    switch (style) {
 
-	default:
-	case Normal: {
-		// normal text
-		iStyleOR = 0u;
-	} break;
+    default:
+    case Normal: {
+        // normal text
+        iStyleOR = 0u;
+    } break;
 
-	case Blink: // fast blinking
-	case Pulse: { // slow pulsing
-		iStyleOR = STYLE_BLINK;
-	} break;
+    case Blink:   // fast blinking
+    case Pulse: { // slow pulsing
+        iStyleOR = STYLE_BLINK;
+    } break;
 
-	case Shadowed: // drop shadow
-	case Outlined: // drop shadow
-	case OutlineShadowed: // drop shadow
-	case ShadowedMore: { // drop shadow
-		iStyleOR = STYLE_DROPSHADOW;
-	} break;
+    case Shadowed:        // drop shadow
+    case Outlined:        // drop shadow
+    case OutlineShadowed: // drop shadow
+    case ShadowedMore: {  // drop shadow
+        iStyleOR = STYLE_DROPSHADOW;
+    } break;
+    }
 
-	}
+    // TODO: left, center, right alignment
+    // TODO: styles (blink, pulse)
 
-	//TODO: left, center, right alignment
-	//TODO: styles (blink, pulse)
+    trap->R_Font_DrawString(x, y, text, colour, iStyleOR | (customFont ? handle : GetRealHandle(handle)),
+                            limit ? limit : -1, // -1 = no limit
+                            scale);
 
-	trap->R_Font_DrawString(
-		x, y, text, colour,
-		iStyleOR | (customFont ? handle : GetRealHandle( handle )),
-		limit ? limit : -1, // -1 = no limit
-		scale
-	);
-
-	trap->R_SetColor( nullptr );
+    trap->R_SetColor(nullptr);
 }

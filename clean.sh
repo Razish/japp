@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 # fetch arguments
-ARGS=($@)
+ARGS=("$@")
 ARGSLEN=${#ARGS[@]}
 
 # options
@@ -16,10 +17,9 @@ NOGEOIP=0
 USE_ASAN=0
 export NO_SSE=1
 
-clean='scons -Qc'
+clean="scons -Qc"
 
-for (( i=0; i<${ARGSLEN}; i++ ));
-do
+for ((i = 0; i < ARGSLEN; i++)); do
 	case ${ARGS[$i]} in
 	"debug")
 		DEBUG=1
@@ -45,8 +45,8 @@ do
 	"nogeoip")
 		NOGEOIP=1
 		;;
-	*)
-		;;
+	*) ;;
+
 	esac
 done
 

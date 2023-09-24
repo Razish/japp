@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 # fetch arguments
 ARGS=($@)
@@ -18,8 +19,7 @@ export NO_SSE=1
 
 build='scons -Q'
 
-for (( i=0; i<${ARGSLEN}; i++ ));
-do
+for ((i = 0; i < ARGSLEN; i++)); do
 	case ${ARGS[$i]} in
 	"debug")
 		DEBUG=1
@@ -30,9 +30,9 @@ do
 	"analyse")
 		build='scan-build $build'
 		;;
-		"use_asan")
-			USE_ASAN=1
-			;;
+	"use_asan")
+		USE_ASAN=1
+		;;
 	"force32")
 		FORCE32=1
 		;;
@@ -48,8 +48,8 @@ do
 	"nogeoip")
 		NOGEOIP=1
 		;;
-	*)
-		;;
+	*) ;;
+
 	esac
 done
 

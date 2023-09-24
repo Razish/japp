@@ -1,34 +1,27 @@
-Import( '*' )
+Import("*")
 
 # environment
-env.VariantDir(
-	build_dir,
-	'#',
-	duplicate = 0
-)
+env.VariantDir(build_dir, "#", duplicate=0)
 udis86_env = env.Clone()
 
 # sources
 files = [
-	'libudis86/decode.c',
-	'libudis86/input.c',
-	'libudis86/itab.c',
-	'libudis86/syn-att.c',
-	'libudis86/syn-intel.c',
-	'libudis86/syn.c',
-	'libudis86/udis86.c',
+    "libudis86/decode.c",
+    "libudis86/input.c",
+    "libudis86/itab.c",
+    "libudis86/syn-att.c",
+    "libudis86/syn-intel.c",
+    "libudis86/syn.c",
+    "libudis86/udis86.c",
 ]
 files = [build_dir + f for f in files]
 
 # project settings
-if ('gcc' in env['CC'] or 'clang' in env['CC']) and target_plat != 'Windows':
-	udis86_env['CCFLAGS'] += [
-		'-fPIC',
-	]
+if ("gcc" in env["CC"] or "clang" in env["CC"]) and target_plat != "Windows":
+    udis86_env["CCFLAGS"] += [
+        "-fPIC",
+    ]
 
 # targets
-result = udis86_env.StaticLibrary(
-	build_dir + 'libudis86',
-	files
-)
-Return( "result" )
+result = udis86_env.StaticLibrary(build_dir + "libudis86", files)
+Return("result")
