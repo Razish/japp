@@ -285,7 +285,7 @@ static int Player_GetDueling(lua_State *L, jpluaEntity_t *ent) {
 #if defined(PROJECT_GAME)
     lua_pushboolean(L, ent->client->ps.duelInProgress);
 #else
-    lua_pushboolean(L, cg.duelInProgress);
+    lua_pushboolean(L, cg.clientNum == ent->currentState.number ? cg.duelInProgress : ent->currentState.bolt1);
 #endif
     return 1;
 }

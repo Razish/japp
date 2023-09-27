@@ -1871,11 +1871,11 @@ void CG_EntityEvent(centity_t *cent, vector3 *position) {
             int hitOtherFxID = media.efx.saberCut;
             int hitSound = trap->S_RegisterSound(va("sound/weapons/saber/saberhit%i.wav", Q_irand(1, 3)));
 
-            JPLua::Event_SaberTouch(es->otherEntityNum, es->otherEntityNum2);
+            JPLua::Event_SaberTouch(es->otherEntityNum, es->otherEntityNum2, es->eventParm);
 
             // Raz: Duel isolation
             //	Com_Printf( "\n\ncg.snap->ps.duelInProgress: %i\ncg.snap->ps.duelIndex: %i\nes->otherEntityNum2: %i\ncg.snap->ps.clientNum: %i\n",
-            //cg.snap->ps.duelInProgress, cg.snap->ps.duelIndex, es->otherEntityNum2, cg.snap->ps.clientNum );
+            // cg.snap->ps.duelInProgress, cg.snap->ps.duelIndex, es->otherEntityNum2, cg.snap->ps.clientNum );
             if (cg.snap->ps.duelInProgress && es->otherEntityNum2 != cg.snap->ps.clientNum && es->otherEntityNum2 != cg.snap->ps.duelIndex)
                 return;
 

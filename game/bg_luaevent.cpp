@@ -755,7 +755,7 @@ void Event_PrivateDuel(int number, int eventParm) {
 #endif
 
 #ifdef PROJECT_CGAME
-void Event_SaberTouch(int victim, int attacker) {
+void Event_SaberTouch(int victim, int attacker, int eventParm) {
 #ifdef JPLUA
     plugin_t *plugin = NULL;
     while (IteratePlugins(&plugin)) {
@@ -764,8 +764,9 @@ void Event_SaberTouch(int victim, int attacker) {
 
             Player_CreateRef(ls.L, victim);
             Player_CreateRef(ls.L, attacker);
+            lua_pushinteger(ls.L, eventParm);
 
-            Call(ls.L, 2, 0);
+            Call(ls.L, 3, 0);
         }
     }
 #endif // JPLUA

@@ -112,7 +112,7 @@ void Event_PrivateDuel(int number, int eventParm);
 #endif
 
 #if defined(PROJECT_CGAME)
-void Event_SaberTouch(int victim, int attacker);
+void Event_SaberTouch(int victim, int attacker, int eventParm);
 #endif
 
 #if defined(PROJECT_CGAME)
