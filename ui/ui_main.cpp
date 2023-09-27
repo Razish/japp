@@ -7883,20 +7883,22 @@ void UI_KeyEvent(int key, qboolean down) {
 }
 
 void UI_MouseEvent(int dx, int dy) {
+    float dxScaled = dx;
+    float dyScaled = dy;
     if (japp_ratioFix.integer & (1 << RATIOFIX_MOUSEINPUT)) {
         // optional - the engine may have already scaled this
-        dx *= SCREEN_WIDTH / (float)uiInfo.uiDC.glconfig.vidWidth;
-        dy *= SCREEN_HEIGHT / (float)uiInfo.uiDC.glconfig.vidHeight;
+        dxScaled *= (SCREEN_WIDTH / (float)uiInfo.uiDC.glconfig.vidWidth);
+        dyScaled *= (SCREEN_HEIGHT / (float)uiInfo.uiDC.glconfig.vidHeight);
     }
 
     // update mouse screen position
-    uiInfo.uiDC.cursorx += dx;
+    uiInfo.uiDC.cursorx += dxScaled;
     if (uiInfo.uiDC.cursorx < 0)
         uiInfo.uiDC.cursorx = 0;
     else if (uiInfo.uiDC.cursorx > SCREEN_WIDTH)
         uiInfo.uiDC.cursorx = SCREEN_WIDTH;
 
-    uiInfo.uiDC.cursory += dy;
+    uiInfo.uiDC.cursory += dyScaled;
     if (uiInfo.uiDC.cursory < 0)
         uiInfo.uiDC.cursory = 0;
     else if (uiInfo.uiDC.cursory > SCREEN_HEIGHT)

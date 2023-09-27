@@ -1006,7 +1006,7 @@ void CG_ManualEntityRender(centity_t *cent);
 void CG_MissileHitPlayer(int weapon, vector3 *origin, vector3 *dir, int entityNum, qboolean alt_fire);
 void CG_MissileHitWall(int weapon, int clientNum, vector3 *origin, vector3 *dir, impactSound_t soundType, qboolean alt_fire, int charge);
 void CG_MiscModelExplosion(vector3 *mins, vector3 *maxs, int size, material_t chunkType);
-void CG_MouseEvent(int x, int y);
+void CG_MouseEvent(int dx, int dy);
 void CG_NextForcePower_f(void);
 void CG_NextInventory_f(void);
 void CG_NextWeapon_f(void);

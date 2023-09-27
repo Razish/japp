@@ -736,9 +736,15 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
 #endif
 }
 
-void CG_MouseEvent(int x, int y) {
-    cgDC.cursorx = cgs.cursorX = Q_clamp(0.0f, cgs.cursorX + x, SCREEN_WIDTH);
-    cgDC.cursory = cgs.cursorY = Q_clamp(0.0f, cgs.cursorY + y, SCREEN_HEIGHT);
+void CG_MouseEvent(int dx, int dy) {
+    float dxScaled = dx;
+    float dyScaled = dy;
+    if (japp_ratioFix.integer & (1 << RATIOFIX_MOUSEINPUT)) {
+        dxScaled *= (SCREEN_WIDTH / (float)cgs.glconfig.vidWidth);
+        dyScaled *= (SCREEN_HEIGHT / (float)cgs.glconfig.vidHeight);
+    }
+    cgDC.cursorx = cgs.cursorX = Q_clamp(0.0f, cgs.cursorX + dxScaled, SCREEN_WIDTH);
+    cgDC.cursory = cgs.cursorY = Q_clamp(0.0f, cgs.cursorY + dyScaled, SCREEN_HEIGHT);
 
     cursorType_e cursorType = Display_CursorType(cgs.cursorX, cgs.cursorY);
     if (cursorType == CURSOR_NONE || cursorType == CURSOR_ARROW) {
@@ -748,7 +754,7 @@ void CG_MouseEvent(int x, int y) {
     }
 
     if (cgs.capturedItem) {
-        Display_MouseMove(cgs.capturedItem, x, y);
+        Display_MouseMove(cgs.capturedItem, dxScaled, dyScaled);
     } else {
         Display_MouseMove(NULL, cgs.cursorX, cgs.cursorY);
     }
