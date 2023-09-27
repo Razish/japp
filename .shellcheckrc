@@ -1,0 +1,3 @@
+external-sources=true
+disable=SC2002 # Useless cat
+enable=check-extra-masked-returns,deprecate-which,quote-safe-variables

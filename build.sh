@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cd "$(dirname "$0")"
+
 # fetch arguments
-ARGS=($@)
+ARGS=("$@")
 ARGSLEN=${#ARGS[@]}
 
 # options
@@ -17,7 +19,7 @@ NOGEOIP=0
 USE_ASAN=0
 export NO_SSE=1
 
-build='scons -Q'
+build="scons -Q"
 
 for ((i = 0; i < ARGSLEN; i++)); do
 	case ${ARGS[$i]} in
@@ -28,7 +30,7 @@ for ((i = 0; i < ARGSLEN; i++)); do
 		DEBUG=2
 		;;
 	"analyse")
-		build='scan-build $build'
+		build="scan-build \$build"
 		;;
 	"use_asan")
 		USE_ASAN=1
@@ -53,4 +55,13 @@ for ((i = 0; i < ARGSLEN; i++)); do
 	esac
 done
 
-$build debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL no_notify=$NONOTIFY no_crashhandler=$NOCRASHHANDLER no_geoip=$NOGEOIP use_asan=$USE_ASAN project=$PROJECT tools=$TOOLS
+$build \
+	"debug=$DEBUG" \
+	"force32=$FORCE32" \
+	"no_crashhandler=$NOCRASHHANDLER" \
+	"no_geoip=$NOGEOIP" \
+	"no_notify=$NONOTIFY" \
+	"no_sql=$NOSQL" \
+	"project=$PROJECT" \
+	"tools=$TOOLS" \
+	"use_asan=$USE_ASAN"

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cd "$(dirname "$0")"
+
 # fetch arguments
 ARGS=("$@")
 ARGSLEN=${#ARGS[@]}
@@ -50,7 +52,16 @@ for ((i = 0; i < ARGSLEN; i++)); do
 	esac
 done
 
-$clean debug=$DEBUG force32=$FORCE32 no_sql=$NOSQL no_notify=$NONOTIFY no_crashhandler=$NOCRASHHANDLER no_geoip=$NOGEOIP use_asan=$USE_ASAN project=$PROJECT tools=$TOOLS
+$clean \
+	"debug=$DEBUG" \
+	"force32=$FORCE32" \
+	"no_crashhandler=$NOCRASHHANDLER" \
+	"no_geoip=$NOGEOIP" \
+	"no_notify=$NONOTIFY" \
+	"no_sql=$NOSQL" \
+	"project=$PROJECT" \
+	"tools=$TOOLS" \
+	"use_asan=$USE_ASAN"
 
 # remove any lingering object files
 find . -type f -name "*.os" -delete
