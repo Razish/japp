@@ -19,7 +19,10 @@ build="scons -Q"
 
 ARGS=("$@")
 for ((i = 0; i < ${#ARGS[@]}; i++)); do
-	case ${ARGS[$i]} in
+	case ${ARGS[$i],,} in
+	"release")
+		DEBUG=0
+		;;
 	"debug")
 		DEBUG=1
 		;;
