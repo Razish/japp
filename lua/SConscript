@@ -52,7 +52,7 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
     lua_env["CCFLAGS"] += [
         "-Wno-cast-qual",
     ]
-    if "clang" not in env["CC"]:
+    if "gcc" in env["CC"]:
         lua_env["CCFLAGS"] += [
             "-Wno-unsuffixed-float-constants",
         ]

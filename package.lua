@@ -1,39 +1,54 @@
+#!/usr/bin/env lua
+
 require 'lfs' -- lua filesystem
 
 --[[
-JA++ binaries package script
-author: Raz0r
+	JA++ binaries package script
 
-requirements:
-- lua 5.1
-- lua-filesystem
-- 7zip
+	requirements:
+	- lua 5.4
+	- luafilesystem
+	- 7zip or zip
 --]]
 
-if lfs == nil then error('lua-filesystem not available for this version of lua (' .. _VERSION .. ')') end
+if lfs == nil then error('missing lua-filesystem (Lua ' .. _VERSION .. ') - try installing with luarocks') end
 
-local linux = true and package.config:find('/') or false
-local bits = (arg[1] == '64bit') and 64 or 32
-local extension = linux and '.zip' or '.pk3'
-local suffix = (linux and 'linux' or 'win') .. tostring(bits)
-local libExt = linux and '.so' or '.dll'
-local arch
-if linux then
-    arch = (bits == 32) and 'i386' or 'x86_64'
-else
-    arch = (bits == 32) and 'x86' or 'x64'
+local function get_platform_details()
+    if package.config:sub(1, 1) == '\\' then
+        -- Windows
+        local env_OS = os.getenv('OS')
+        local env_ARCH = os.getenv('PROCESSOR_ARCHITECTURE')
+        if env_OS and env_ARCH then return env_OS, env_ARCH end
+    else
+        -- hopefullu a POSIX-y unix
+        local os_name = io.popen('uname -s', 'r'):read('*l')
+        local arch_name = io.popen('uname -m', 'r'):read('*l')
+        return os_name, arch_name
+    end
+
+    return '', ''
 end
+
+local host_platform, arch = get_platform_details()
+local nixy = true and package.config:find('/') or false
+local suffix = host_platform .. '_' .. arch
+local libExt = ({
+    Linux = '.so', --
+    Windows = '.dll', --
+    Darwin = '.dylib',
+})[host_platform]
+local extension = nixy and '.zip' or '.pk3'
 
 local paks = {
     ['cl'] = {
-        ['bins'] = {'cgame' .. arch .. libExt, 'ui' .. arch .. libExt}
+        ['bins'] = {'cgame' .. arch .. libExt, 'ui' .. arch .. libExt},
         -- pdb for windows?
     },
 
     ['sv'] = {
-        ['bins'] = {'jampgame' .. arch .. libExt}
+        ['bins'] = {'jampgame' .. arch .. libExt},
         -- pdb for windows?
-    }
+    },
 }
 
 for prefix, pak in pairs(paks) do
@@ -58,9 +73,16 @@ for prefix, pak in pairs(paks) do
 
         if #filelist ~= 0 then
             print('creating "' .. outname .. '"')
-            local redirect = (linux ~= false) and '>/dev/null 2>&1' or '>nul 2>&1'
-            -- FIXME: consider `zip` on macOS, check availability with `command -v foo`
-            os.execute('7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' ' .. redirect)
+            local redirect = (nixy ~= false) and '>/dev/null' or '>nul'
+            local cmd = nil
+            if nixy and os.execute('command -v zip' .. redirect) then
+                cmd = 'zip ' .. outname .. ' ' .. filelist .. redirect
+            elseif os.execute('command -v 7z' .. redirect) then
+                cmd = '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' ' .. redirect
+            else
+                error('can\'t find zip or 7z on PATH')
+            end
+            if os.execute(cmd) == nil then error() end
         end
     end
 end

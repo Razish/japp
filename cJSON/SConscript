@@ -20,7 +20,7 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
         "-Wno-cast-qual",
         "-Wno-implicit-fallthrough",
     ]
-    if "clang" not in env["CC"]:
+    if "gcc" in env["CC"]:
         json_env["CCFLAGS"] += [
             "-Wno-unsuffixed-float-constants",
         ]

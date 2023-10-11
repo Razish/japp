@@ -3,25 +3,22 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-# fetch arguments
-ARGS=("$@")
-ARGSLEN=${#ARGS[@]}
-
 # options
-PROJECT=game,cgame,ui
-TOOLS=default
-DEBUG=0
-FORCE32=0
-NOSQL=1
-NONOTIFY=0
-NOCRASHHANDLER=0
-NOGEOIP=0
-USE_ASAN=0
-export NO_SSE=1
+: "${PROJECT:=game,cgame,ui}"
+: "${TOOLS:=default}"
+: "${DEBUG:=0}"
+: "${FORCE32:=0}"
+: "${NOSQL:=1}"
+: "${NONOTIFY:=0}"
+: "${NOCRASHHANDLER:=0}"
+: "${NOGEOIP:=0}"
+: "${USE_ASAN:=0}"
+export NO_SSE="${NO_SSE:=1}"
 
 build="scons -Q"
 
-for ((i = 0; i < ARGSLEN; i++)); do
+ARGS=("$@")
+for ((i = 0; i < ${#ARGS[@]}; i++)); do
 	case ${ARGS[$i]} in
 	"debug")
 		DEBUG=1
