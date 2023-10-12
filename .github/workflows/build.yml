@@ -51,7 +51,7 @@ jobs:
           Invoke-WebRequest "http://luarocks.github.io/luarocks/releases/luarocks-3.9.2-windows-64.zip" -OutFile luarocks.zip
           Expand-Archive .\luarocks.zip .
           cd .\luarocks-3.9.2-windows-64\
-          tree {{ github.workspace }} /F
+          tree ${{ github.workspace }} /F
           .\luarocks.exe config variables.LUA_DIR ${{ github.workspace }}/.lua/
           .\luarocks.exe config variables.LUA_INCDIR ${{ github.workspace }}/.lua/include
           .\luarocks.exe config variables.LUA_LIBDIR ${{ github.workspace }}/.lua/
@@ -125,7 +125,7 @@ jobs:
         run: |
           if [ ${{ matrix.arch }} == "x86" ]; then
             export FORCE32=1
-            export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/i386-linux-gnu/pkgconfig/"
+            export PKG_CONFIG_PATH="/usr/lib/i386-linux-gnu/pkgconfig/:$PKG_CONFIG_PATH"
           fi
           ./build.sh ${{ matrix.build_type }}
 
