@@ -34,8 +34,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Prepare environment
-        uses: microsoft/setup-msbuild@v1.1
+      # for cl.exe
+      - uses: ilammy/msvc-dev-cmd@v1
 
       - uses: leafo/gh-actions-lua@v10
         with:
