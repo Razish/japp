@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: leafo/gh-actions-lua@10
+      - uses: leafo/gh-actions-lua@v10
         with:
           luaVersion: 5.4
 
@@ -113,7 +113,7 @@ jobs:
           else
             sudo apt-get -qq update
           fi
-          sudo apt-get -y install scons lua5.4 lua-filesystem
+          sudo apt-get -y install scons lua5.4 lua-filesystem libgtk2.0-dev libnotify-dev
 
       - name: Build
         working-directory: ${{ github.workspace }}
