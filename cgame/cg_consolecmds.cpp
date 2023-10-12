@@ -156,16 +156,10 @@ static void CG_CopyNames_f(void) {
 #endif // WIN32
 }
 
-#if !defined(NO_CRASHHANDLER)
-static void CG_Crash_f(void) {
-#if defined(_MSC_VER) && ARCH_WIDTH == 64 && defined(QARCH_X86)
-    // MSVC does not support inline assembly on x86_64
-    int *x = nullptr;
-    *x = 1 / 0; // sorry universe
+#if ARCH_WIDTH == 64 || defined(MACOS_X) || defined(QARCH_ARM) || defined(NO_CRASHHANDLER)
+// no crash handler
 #else
-    qasm1(int 3)
-#endif
-}
+static void CG_Crash_f(void) { qasm1(int 3) }
 #endif
 
 static void CG_ShowPlayerID_f(void) {
@@ -406,7 +400,9 @@ static const command_t commands[] = {
     {"chattabprev", Cmd_ChatboxSelectTabPrev},
     {"clearchat", CG_ClearChat_f},
     {"copynames", CG_CopyNames_f},
-#if !defined(NO_CRASHHANDLER)
+#if ARCH_WIDTH == 64 || defined(MACOS_X) || defined(QARCH_ARM) || defined(NO_CRASHHANDLER)
+// no crash handler
+#else
     {"crash", CG_Crash_f},
 #endif
     {"engage_fullforceduel", NULL},
