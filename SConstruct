@@ -131,6 +131,7 @@ env = Environment(
         "PATH": get_env("PATH"),
         "CC": get_env("CC"),
         "CXX": get_env("CXX"),
+        "PKG_CONFIG_PATH": get_env("PKG_CONFIG_PATH"),
     },
 )
 env.Tool("compilation_db")
