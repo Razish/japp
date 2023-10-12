@@ -34,6 +34,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Prepare environment
+        uses: microsoft/setup-msbuild@v1.1
+
       - uses: leafo/gh-actions-lua@v10
         with:
           luaVersion: 5.4
@@ -64,9 +67,6 @@ jobs:
       #     Expand-Archive .\luarocks.zip .
       #     cd .\luarocks\luarocks-3.9.2-win32\
       #     .\win32\lua5.1\bin\lua5.1.exe .\install.bat /L /NOADMIN /P ..\lr-install
-
-      - name: Prepare environment
-        uses: microsoft/setup-msbuild@v1.1
 
       - name: Build
         working-directory: ${{ github.workspace }}
@@ -110,10 +110,12 @@ jobs:
             sudo dpkg --add-architecture i386
             sudo apt-get -qq update
             sudo apt-get -y install gcc-multilib g++-multilib
+            sudo apt-get -y install libgtk2.0-dev:i386 libnotify-dev:i386
           else
             sudo apt-get -qq update
+            sudo apt-get -y install libgtk2.0-dev libnotify-dev
           fi
-          sudo apt-get -y install scons lua5.4 lua-filesystem libgtk2.0-dev libnotify-dev
+          sudo apt-get -y install scons lua5.4 lua-filesystem
 
       - name: Build
         working-directory: ${{ github.workspace }}
