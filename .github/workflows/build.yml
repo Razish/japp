@@ -50,7 +50,7 @@ jobs:
         run: |
           Invoke-WebRequest "http://luarocks.github.io/luarocks/releases/luarocks-3.9.2-windows-64.zip" -OutFile luarocks.zip
           Expand-Archive .\luarocks.zip .
-          cd .\luarocks\luarocks-3.9.2-windows-64\
+          cd .\luarocks-3.9.2-windows-64\
           .\luarocks.exe config variables.LUA_DIR ${{ github.workspace }}/.lua/
           .\luarocks.exe config variables.LUA_INCDIR ${{ github.workspace }}/.lua/include
           .\luarocks.exe config variables.LUA_LIBDIR ${{ github.workspace }}/.lua/
