@@ -134,6 +134,9 @@ jobs:
         working-directory: ${{ github.workspace }}
         shell: bash
         run: |
+          if [ ${{ matrix.arch }} == "x86" ]; then
+            export TARGET_ARCH="i386"
+          fi
           ./package.lua
           tar -czvf japp-linux-${{ matrix.arch }}-${{ matrix.build_type }}.tar.gz *.zip
 
