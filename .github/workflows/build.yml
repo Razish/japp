@@ -32,7 +32,7 @@ jobs:
             platform: x64
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # for cl.exe
       - uses: ilammy/msvc-dev-cmd@v1
@@ -110,12 +110,13 @@ jobs:
             sudo dpkg --add-architecture i386
             sudo apt-get -qq update
             sudo apt-get -y install gcc-multilib g++-multilib
-            sudo apt-get -y install libgtk2.0-dev:i386 libnotify-dev:i386
+            sudo apt-get -y install libgtk2.0-dev:i386 libnotify-dev:i386 libreadline-dev:i386
           else
             sudo apt-get -qq update
-            sudo apt-get -y install libgtk2.0-dev libnotify-dev
+            sudo apt-get -y install libgtk2.0-dev libnotify-dev libreadline-dev
           fi
-          sudo apt-get -y install scons lua5.4 lua-filesystem
+          sudo apt-get -y install lua5.4 lua-filesystem
+          sudo apt-get -y install scons
 
       - name: Build
         working-directory: ${{ github.workspace }}
@@ -123,6 +124,7 @@ jobs:
         run: |
           if [ ${{ matrix.arch }} == "x86" ]; then
             export FORCE32=1
+            export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/i386-linux-gnu/pkgconfig/"
           fi
           ./build.sh ${{ matrix.build_type }}
 
