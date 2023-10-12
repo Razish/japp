@@ -48,7 +48,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         shell: pwsh
         run: |
-          wget "http://luarocks.github.io/luarocks/releases/luarocks-3.9.2-windows-64.zip" -o luarocks.zip
+          Invoke-WebRequest "http://luarocks.github.io/luarocks/releases/luarocks-3.9.2-windows-64.zip" -OutFile luarocks.zip
           Expand-Archive .\luarocks.zip .
           cd .\luarocks\luarocks-3.9.2-windows-64\
           .\luarocks.exe config variables.LUA_DIR ${{ github.workspace }}/.lua/
