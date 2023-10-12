@@ -107,15 +107,10 @@ if bits == 32:
     else:
         raise RuntimeError("unexpected platform: " + target_plat)
 elif bits == 64:
-    if target_plat == "Windows":
-        arch = "x64"
-    elif target_plat in ("Linux", "Darwin"):
-        if platform.machine()[:3] == "arm":
-            arch = "arm64"
-        else:
-            arch = "x86_64"
+    if platform.machine()[:3] == "arm":
+        arch = "arm64"
     else:
-        raise RuntimeError("unexpected platform: " + target_plat)
+        arch = "x86_64"
 else:
     raise RuntimeError("could not determine architecture width: " + str(bits))
 

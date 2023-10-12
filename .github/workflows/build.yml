@@ -26,11 +26,6 @@ jobs:
       matrix:
         arch: [x86, x86_64]
         build_type: [Debug, Release]
-        include:
-          - arch: x86
-            platform: Win32
-          - arch: x86_64
-            platform: x64
 
     steps:
       - uses: actions/checkout@v4

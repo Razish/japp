@@ -157,7 +157,9 @@ static void CG_CopyNames_f(void) {
 }
 
 #if !defined(NO_CRASHHANDLER) && !defined(MACOS_X)
-static void CG_Crash_f(void) { qasm1(int 3); }
+static void CG_Crash_f(void) {
+    { qasm1(int 3) }
+}
 #endif
 
 static void CG_ShowPlayerID_f(void) {
