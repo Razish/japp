@@ -54,7 +54,7 @@ jobs:
           tree ${{ github.workspace }} /F
           .\luarocks.exe config variables.LUA_DIR ${{ github.workspace }}/.lua/
           .\luarocks.exe config variables.LUA_INCDIR ${{ github.workspace }}/.lua/include
-          .\luarocks.exe config variables.LUA_LIBDIR ${{ github.workspace }}/.lua/
+          .\luarocks.exe config variables.LUA_LIBDIR ${{ github.workspace }}/.lua/lib
           .\luarocks.exe install luafilesystem
 
       # - name: Install Lua
