@@ -26,7 +26,7 @@ extern struct luaState_t {
     lua_State *L;
 } ls;
 
-void DPrintf(const char *msg, ...) __attribute__((format(printf, 1, 2)));
+void DPrintf(const char *msg, ...) Q_PRINT_FORMAT(1, 2);
 
 // these all act on a given lua state
 qboolean Call(lua_State *L, int argCount, int resCount);

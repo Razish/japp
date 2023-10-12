@@ -22,6 +22,7 @@ jobs:
     name: Windows ${{ matrix.arch }} ${{ matrix.build_type }}
     runs-on: windows-2022
     strategy:
+      fail-fast: false
       matrix:
         arch: [x86, x86_64]
         build_type: [Debug, Release]
@@ -210,7 +211,6 @@ jobs:
     if: github.event_name == 'release'
     needs: [msvc, ubuntu, macos]
     runs-on: ubuntu-22.04
-
     strategy:
       matrix:
         include:
