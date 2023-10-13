@@ -17,7 +17,9 @@ local function get_platform_details()
     if package.config:sub(1, 1) == '\\' then
         -- Windows
         local env_OS = os.getenv('OS')
+        print('env_OS: ' .. env_OS)
         local env_ARCH = os.getenv('PROCESSOR_ARCHITECTURE')
+        print('env_ARCH: ' .. env_ARCH)
         if env_OS and env_ARCH then return env_OS, env_ARCH end
     else
         -- hopefullu a POSIX-y unix
@@ -30,8 +32,11 @@ local function get_platform_details()
 end
 
 local host_platform, arch = get_platform_details()
+print('host_platform: ' .. host_platform)
+print('arch: ' .. arch)
 local target_arch = os.getenv('TARGET_ARCH') -- this can override what arch we're packaging
 arch = target_arch and target_arch or arch
+print('arch: ' .. arch)
 
 local nixy = true and package.config:find('/') or false
 local suffix = host_platform .. '_' .. arch
@@ -40,6 +45,7 @@ local libExt = ({
     Windows = '.dll', --
     Darwin = '.dylib',
 })[host_platform]
+print('libExt: ' .. libExt)
 local extension = nixy and '.zip' or '.pk3'
 
 local paks = {
