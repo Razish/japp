@@ -70,6 +70,9 @@ jobs:
         working-directory: ${{ github.workspace }}
         shell: pwsh
         run: |
+          if ( ${{ matrix.arch }} -eq "x86" ) {
+            $env:TARGET_ARCH="x86"
+          }
           $env:PATH="${{ github.workspace }}\.lua\lib;$env:PATH"
           $env:LUA_CPATH="$env:USERPROFILE\AppData\Roaming\LuaRocks\lib\lua\5.4\?.dll"
           lua package.lua
