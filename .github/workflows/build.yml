@@ -70,6 +70,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         shell: pwsh
         run: |
+          $env:PATH="${{ github.workspace }}\.lua\lib;$env:PATH"
           $env:LUA_CPATH="$env:USERPROFILE\AppData\Roaming\LuaRocks\lib\lua\5.4\?.dll"
           lua package.lua
           7z a -tzip -y japp-windows-${{ matrix.arch }}-${{ matrix.build_type }}.zip *.pk3
