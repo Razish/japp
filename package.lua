@@ -8,7 +8,7 @@ require 'lfs' -- lua filesystem
 	requirements:
 	- lua 5.4
 	- luafilesystem
-	- 7zip or zip
+	- 7z or zip
 --]]
 
 if lfs == nil then error('missing lua-filesystem (Lua ' .. _VERSION .. ') - try installing with luarocks') end
@@ -45,15 +45,10 @@ local libExt = ({
     Darwin = '.dylib',
 })[host_platform]
 local extension = nixy and '.zip' or '.pk3'
-local redirect_cmd = nixy and '>/dev/null' or '>nul'
+local redirect_stdout = nixy and '>/dev/null' or '>nul'
+local redirect_all = nixy and '>/dev/null 2>&1' or '>nul 2>&1'
 
-local function test_cmd(cmd)
-    if nixy then
-        return os.execute('command -v ' .. cmd .. redirect_cmd)
-    else
-        return os.execute('where.exe ' .. cmd .. redirect_cmd)
-    end
-end
+local function test_cmd(cmd) return os.execute((nixy and 'command -v ' or 'where.exe ') .. cmd .. redirect_all) end
 
 local paks = {
     ['cl'] = {
@@ -91,9 +86,9 @@ for prefix, pak in pairs(paks) do
             print('creating "' .. outname .. '"')
             local cmd = nil
             if test_cmd('zip') then
-                cmd = 'zip ' .. outname .. ' ' .. filelist .. redirect_cmd
+                cmd = 'zip ' .. outname .. ' ' .. filelist .. redirect_stdout
             elseif test_cmd('7z') then
-                cmd = '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' ' .. redirect_cmd
+                cmd = '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' ' .. redirect_stdout
             else
                 error('can\'t find zip or 7z on PATH')
             end

@@ -82,7 +82,7 @@ jobs:
         if: ${{ matrix.build_type == 'Release' }}
         with:
           name: japp-windows-${{ matrix.arch }}-${{ matrix.build_type }}
-          path: ${{ github.workspace }}
+          path: ${{ github.workspace }}/japp-windows-${{ matrix.arch }}-${{ matrix.build_type }}.zip
           if-no-files-found: error
 
   ubuntu:
