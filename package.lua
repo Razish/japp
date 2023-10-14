@@ -17,18 +17,20 @@ local function get_platform_details()
     if package.config:sub(1, 1) == '\\' then
         -- Windows
         local env_OS = os.getenv('OS')
+        local osTranslation = {Windows_NT = 'Windows'};
+        local os_name = osTranslation[env_OS] and osTranslation[env_OS] or env_OS
+
         local env_ARCH = os.getenv('PROCESSOR_ARCHITECTURE')
         local archTranslation = {AMD64 = 'x86_64'};
-        local arch = archTranslation[env_ARCH] and archTranslation[env_ARCH] or env_ARCH
-        if env_OS and arch then return env_OS, arch end
+        local arch_name = archTranslation[env_ARCH] and archTranslation[env_ARCH] or env_ARCH
+
+        return os_name, arch_name
     else
         -- hopefullu a POSIX-y unix
         local os_name = io.popen('uname -s', 'r'):read('*l')
         local arch_name = io.popen('uname -m', 'r'):read('*l')
         return os_name, arch_name
     end
-
-    return '', ''
 end
 
 local host_platform, arch = get_platform_details()
@@ -39,10 +41,19 @@ local nixy = true and package.config:find('/') or false
 local suffix = host_platform .. '_' .. arch
 local libExt = ({
     Linux = '.so', --
-    Windows_NT = '.dll', --
+    Windows = '.dll', --
     Darwin = '.dylib',
 })[host_platform]
 local extension = nixy and '.zip' or '.pk3'
+local redirect_cmd = nixy and '>/dev/null' or '>nul'
+
+local function test_cmd(cmd)
+    if nixy then
+        return os.execute('command -v ' .. cmd .. redirect_cmd)
+    else
+        return os.execute('where.exe ' .. cmd .. redirect_cmd)
+    end
+end
 
 local paks = {
     ['cl'] = {
@@ -78,12 +89,11 @@ for prefix, pak in pairs(paks) do
 
         if #filelist ~= 0 then
             print('creating "' .. outname .. '"')
-            local redirect = (nixy ~= false) and '>/dev/null' or '>nul'
             local cmd = nil
-            if nixy and os.execute('command -v zip' .. redirect) then
-                cmd = 'zip ' .. outname .. ' ' .. filelist .. redirect
-            elseif os.execute('command -v 7z' .. redirect) then
-                cmd = '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' ' .. redirect
+            if test_cmd('zip') then
+                cmd = 'zip ' .. outname .. ' ' .. filelist .. redirect_cmd
+            elseif test_cmd('7z') then
+                cmd = '7z a -tzip -y ' .. outname .. ' ' .. filelist .. ' ' .. redirect_cmd
             else
                 error('can\'t find zip or 7z on PATH')
             end
