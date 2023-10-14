@@ -475,8 +475,15 @@ elif env["CC"] == "cl":
     env["LINKFLAGS"] += [
         "/ERRORREPORT:none",  # don't send error reports for internal linker errors
         "/NOLOGO",  # remove watermark
-        "/MACHINE:" + arch,  # 32/64 bit linking
     ]
+    if arch == "x86_64":
+        env["LINKFLAGS"] += [
+            "/MACHINE:X64",
+        ]
+    else:
+        env["LINKFLAGS"] += [
+            "/MACHINE:" + arch,
+        ]
     if bits == 64:
         env["LINKFLAGS"] += [
             "/SUBSYSTEM:WINDOWS",  # graphical application

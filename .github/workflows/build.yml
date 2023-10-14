@@ -87,7 +87,6 @@ jobs:
 
   ubuntu:
     name: Ubuntu ${{ matrix.arch }} ${{ matrix.build_type }}
-    if: ${{ false }} # disable for now
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -142,7 +141,6 @@ jobs:
 
   macos:
     name: macOS ${{ matrix.arch }} ${{ matrix.build_type }}
-    if: ${{ false }} # disable for now
     runs-on: macos-12
     strategy:
       fail-fast: false
@@ -192,8 +190,8 @@ jobs:
 
       - name: Create binary archives
         run: |
-          7z a -r japp-windows-x86.zip ./japp-windows-x86-Release/* '-x!msvcp*.*' '-x!vcruntime*.*' '-x!concrt*.*'
-          7z a -r japp-windows-x86_64.zip ./japp-windows-x86_64-Release/* '-x!msvcp*.*' '-x!vcruntime*.*' '-x!concrt*.*'
+          7z a -r japp-windows-x86.zip ./japp-windows-x86-Release/*
+          7z a -r japp-windows-x86_64.zip ./japp-windows-x86_64-Release/*
           mv ./japp-linux-x86-Release/* japp-linux-x86.tar.gz
           mv ./japp-linux-x86_64-Release/* japp-linux-x86_64.tar.gz
           mv ./japp-macos-x86_64-Release/* japp-macos-x86_64.tar.gz
@@ -247,7 +245,7 @@ jobs:
       - name: Create archive
         run: |
           if [ "${{ matrix.zip }}" == "true" ]; then
-            7z a -r ${{ matrix.artifact_name }} ./${{ matrix.artifact_dir }}/* '-x!msvcp*.*' '-x!vcruntime*.*' '-x!concrt*.*'
+            7z a -r ${{ matrix.artifact_name }} ./${{ matrix.artifact_dir }}/*
           else
             mv ./${{ matrix.artifact_dir }}/* ${{ matrix.artifact_name }}
           fi
