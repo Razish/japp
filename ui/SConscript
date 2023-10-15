@@ -79,4 +79,5 @@ if env["CC"] == "cl":
     ui_env["PDB"] = "#" + os.sep + "ui" + arch + ".pdb"
 
 # targets
-ui_env.SharedLibrary("#" + os.sep + "ui" + arch, files)
+result = ui_env.SharedLibrary("#" + os.sep + "ui" + arch, files)
+Return("result")

@@ -1,7 +1,15 @@
+# intermediate files
 .cache/
+build/
 .sconsign.dblite
+compile_commands.json
+
+# build results
 *.dll
+*.dylib
 *.pk3
 *.so
-build/
-compile_commands.json
+*.zip
+
+# OS clutter
+.DS_Store

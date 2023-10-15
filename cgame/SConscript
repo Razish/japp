@@ -146,4 +146,5 @@ if env["CC"] == "cl":
     cgame_env["PDB"] = "#" + os.sep + "cgame" + arch + ".pdb"
 
 # targets
-cgame_env.SharedLibrary("#" + os.sep + "cgame" + arch, files)
+result = cgame_env.SharedLibrary("#" + os.sep + "cgame" + arch, files)
+Return("result")

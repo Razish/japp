@@ -156,8 +156,10 @@ static void CG_CopyNames_f(void) {
 #endif // WIN32
 }
 
-#if !defined(NO_CRASHHANDLER) && !defined(MACOS_X)
-static void CG_Crash_f(void) { qasm1(int 3); }
+#if ARCH_WIDTH == 64 || defined(MACOS_X) || defined(QARCH_ARM) || defined(NO_CRASHHANDLER)
+// no crash handler
+#else
+static void CG_Crash_f(void) { qasm1(int 3) }
 #endif
 
 static void CG_ShowPlayerID_f(void) {
@@ -398,7 +400,9 @@ static const command_t commands[] = {
     {"chattabprev", Cmd_ChatboxSelectTabPrev},
     {"clearchat", CG_ClearChat_f},
     {"copynames", CG_CopyNames_f},
-#if !defined(NO_CRASHHANDLER) && !defined(MACOS_X)
+#if ARCH_WIDTH == 64 || defined(MACOS_X) || defined(QARCH_ARM) || defined(NO_CRASHHANDLER)
+// no crash handler
+#else
     {"crash", CG_Crash_f},
 #endif
     {"engage_fullforceduel", NULL},

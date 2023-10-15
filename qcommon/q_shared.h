@@ -63,30 +63,32 @@
 #if defined(_MSC_VER)
 
 // visual studio
+#define Q_CDECL __cdecl
+#define Q_EXPORT __declspec(dllexport)
 #define Q_FUNCTION __FUNCTION__
 #define Q_FUNCTION_VERBOSE __FUNCSIG__
-#define Q_EXPORT __declspec(dllexport)
 #define Q_NAKED __declspec(naked)
-#define Q_USED
+#define Q_PRINT_FORMAT(stringPos, vaPos)
 #define Q_UNUSED
+#define Q_USED
 #define Q_WARN_UNUSED_RESULT
-#define Q_CDECL __cdecl
 
 #elif defined(__GNUC__) || defined(__clang__)
 
 // gcc, clang
-#define Q_FUNCTION __FUNCTION__
-#define Q_FUNCTION_VERBOSE __PRETTY_FUNCTION__
-#define Q_EXPORT __attribute__((visibility("default")))
-#define Q_NAKED __attribute__((noinline))
-#define Q_USED __attribute__((used))
-#define Q_UNUSED __attribute__((unused))
-#define Q_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 #if defined(QARCH_X86)
 #define Q_CDECL __attribute__((cdecl))
 #else
 #define Q_CDECL
 #endif
+#define Q_EXPORT __attribute__((visibility("default")))
+#define Q_FUNCTION __FUNCTION__
+#define Q_FUNCTION_VERBOSE __PRETTY_FUNCTION__
+#define Q_NAKED __attribute__((noinline))
+#define Q_PRINT_FORMAT(stringPos, vaPos) __attribute__((format(printf, stringPos, vaPos)))
+#define Q_UNUSED __attribute__((unused))
+#define Q_USED __attribute__((used))
+#define Q_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 
 #elif defined(__INTEL_COMPILER)
 
@@ -715,7 +717,7 @@ extern const vector4 colorDkBlue;
 #define Q_COLOR_ESCAPE '^'
 #define Q_COLOR_BITS 0xF // was 7
 // you MUST have the last bit on here about colour strings being less than 7 or taiwanese strings register as colour!!!!
-//#define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= '7' && *((p)+1) >= '0' )
+// #define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE && *((p)+1) <= '7' && *((p)+1) >= '0' )
 #define Q_IsColorString(p) (p && *(p) == Q_COLOR_ESCAPE && *((p) + 1) && *((p) + 1) != Q_COLOR_ESCAPE && *((p) + 1) <= '9' && *((p) + 1) >= '0')
 #define Q_IsColorStringExt(p) ((p) && *(p) == Q_COLOR_ESCAPE && *((p) + 1) && *((p) + 1) >= '0' && *((p) + 1) <= '9') // ^[0-9]
 
@@ -763,7 +765,7 @@ extern vector3 axisDefault[3];
 float Q_fabs(float f);
 float Q_rsqrt(float f); // reciprocal square root
 
-#define SQRTFAST(x) ((x)*Q_rsqrt(x))
+#define SQRTFAST(x) ((x) * Q_rsqrt(x))
 
 signed char ClampChar(int i);
 signed short ClampShort(int i);
@@ -780,8 +782,8 @@ void ByteToDir(int b, vector3 *dir);
 
 #define Square(x) ((x) * (x))
 
-#define DEG2RAD(a) (((a)*M_PI) / 180.0F)
-#define RAD2DEG(a) (((a)*180.0f) / M_PI)
+#define DEG2RAD(a) (((a) * M_PI) / 180.0F)
+#define RAD2DEG(a) (((a) * 180.0f) / M_PI)
 
 void VectorAdd(const vector3 *vec1, const vector3 *vec2, vector3 *vecOut);
 void VectorSubtract(const vector3 *vec1, const vector3 *vec2, vector3 *vecOut);
@@ -893,8 +895,8 @@ const char *SkipWhitespace(const char *data, qboolean *hasNewLines);
 char *COM_Parse(const char **data_p);
 char *COM_ParseExt(const char **data_p, qboolean allowLineBreak);
 ptrdiff_t COM_Compress(char *data_p);
-void COM_ParseError(char *format, ...) __attribute__((format(printf, 1, 2)));
-void COM_ParseWarning(char *format, ...) __attribute__((format(printf, 1, 2)));
+void COM_ParseError(char *format, ...) Q_PRINT_FORMAT(1, 2);
+void COM_ParseWarning(char *format, ...) Q_PRINT_FORMAT(1, 2);
 qboolean COM_ParseString(const char **data, const char **s);
 qboolean COM_ParseInt(const char **data, int *i);
 qboolean COM_ParseFloat(const char **data, float *f);
@@ -955,8 +957,8 @@ const char *Q_stristr(const char *s, const char *find);
 void Q_CleanString(char *string, uint32_t flags);
 void Q_ConvertLinefeeds(char *string);
 void Q_LerpColour(const vector4 *start, const vector4 *end, vector4 *out, float point);
-void Com_sprintf(char *dest, int size, const char *fmt, ...) __attribute__((format(printf, 3, 4)));
-const char *va(const char *format, ...) __attribute__((format(printf, 1, 2)));
+void Com_sprintf(char *dest, int size, const char *fmt, ...) Q_PRINT_FORMAT(3, 4);
+const char *va(const char *format, ...) Q_PRINT_FORMAT(1, 2);
 
 // 64-bit integers for global rankings interface
 // implemented as a struct for qvm compatibility
@@ -979,11 +981,11 @@ bool Info_NextPair(const char **s, infoPair_t *ip);
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
 #if defined(PROJECT_GAME) || defined(PROJECT_CGAME) || defined(PROJECT_UI)
-extern void (*Com_Error)(int level, const char *error, ...) __attribute__((format(printf, 2, 3)));
-extern void (*Com_Printf)(const char *msg, ...) __attribute__((format(printf, 1, 2)));
+extern void (*Com_Error)(int level, const char *error, ...) Q_PRINT_FORMAT(2, 3);
+extern void (*Com_Printf)(const char *msg, ...) Q_PRINT_FORMAT(1, 2);
 #else
-void Q_CDECL Com_Error(int level, const char *error, ...) __attribute__((format(printf, 2, 3)));
-void Q_CDECL Com_Printf(const char *msg, ...) __attribute__((format(printf, 1, 2)));
+void Q_CDECL Com_Error(int level, const char *error, ...) Q_PRINT_FORMAT(2, 3);
+void Q_CDECL Com_Printf(const char *msg, ...) Q_PRINT_FORMAT(1, 2);
 #endif
 
 // Many variables can be used for cheating purposes, so when cheats is zero, force all unspecified variables to their
@@ -1136,23 +1138,23 @@ typedef struct orientation_s {
 // channel 0 never willingly overrides
 // other channels will allways override a playing sound on that channel
 typedef enum soundChannel_e {
-    CHAN_AUTO,         //## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # Auto-picks an empty channel to play sound on
-    CHAN_LOCAL,        //## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # menu sounds, etc
-    CHAN_WEAPON,       //## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
-    CHAN_VOICE,        //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Voice sounds cause mouth animation
-    CHAN_VOICE_ATTEN,  //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Causes mouth animation but still use normal sound falloff
-    CHAN_ITEM,         //## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
-    CHAN_BODY,         //## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
-    CHAN_AMBIENT,      //## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # added for ambient sounds
-    CHAN_LOCAL_SOUND,  //## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #chat messages, etc
-    CHAN_ANNOUNCER,    //## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #announcer voices, etc
-    CHAN_LESS_ATTEN,   //## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #attenuates similar to chan_voice, but uses empty channel auto-pick behaviour
-    CHAN_MENU1,        //## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #menu stuff, etc
-    CHAN_VOICE_GLOBAL, //## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Causes mouth animation and is broadcast, like announcer
-    CHAN_MUSIC,        //## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #music played as a looping sound - added by BTO (VV)
+    CHAN_AUTO,         // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # Auto-picks an empty channel to play sound on
+    CHAN_LOCAL,        // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # menu sounds, etc
+    CHAN_WEAPON,       // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
+    CHAN_VOICE,        // ## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Voice sounds cause mouth animation
+    CHAN_VOICE_ATTEN,  // ## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Causes mouth animation but still use normal sound falloff
+    CHAN_ITEM,         // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
+    CHAN_BODY,         // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3"
+    CHAN_AMBIENT,      // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3" # added for ambient sounds
+    CHAN_LOCAL_SOUND,  // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #chat messages, etc
+    CHAN_ANNOUNCER,    // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #announcer voices, etc
+    CHAN_LESS_ATTEN,   // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #attenuates similar to chan_voice, but uses empty channel auto-pick behaviour
+    CHAN_MENU1,        // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #menu stuff, etc
+    CHAN_VOICE_GLOBAL, // ## %s !!"W:\game\base\!!sound\voice\*.wav;*.mp3" # Causes mouth animation and is broadcast, like announcer
+    CHAN_MUSIC,        // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #music played as a looping sound - added by BTO (VV)
 } soundChannel_t;
 
-#define ANGLE2SHORT(x) ((int)((x)*65536 / 360) & 65535)
+#define ANGLE2SHORT(x) ((int)((x) * 65536 / 360) & 65535)
 #define SHORT2ANGLE(x) ((x) * (360.0f / 65536))
 
 #define SNAPFLAG_RATE_DELAYED 1
@@ -1317,9 +1319,9 @@ typedef enum forceSide_e { FORCESIDE_NEUTRAL, FORCESIDE_LIGHT, FORCESIDE_DARK } 
 #define DUEL_FULLFORCE 0x00000002u
 #define DUEL_START 0x00000004u
 
-//#define _ONEBIT_COMBO
-// Crazy optimization attempt to take all those 1 bit values and shove them into a single
-// send. May help us not have to send so many 1/0 bits to acknowledge modified values. -rww
+// #define _ONEBIT_COMBO
+//  Crazy optimization attempt to take all those 1 bit values and shove them into a single
+//  send. May help us not have to send so many 1/0 bits to acknowledge modified values. -rww
 
 #define _OPTIMIZED_VEHICLE_NETWORKING
 // Instead of sending 2 full playerStates for the pilot and the vehicle, send a smaller,

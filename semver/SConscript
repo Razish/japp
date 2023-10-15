@@ -19,9 +19,12 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
     semver_env["CFLAGS"] += [
         "-std=c99",
         "-Wno-declaration-after-statement",
-        "-Wno-stack-usage",
         "-Wno-unused-function",
     ]
+    if "gcc" in env["CC"]:
+        semver_env["CFLAGS"] += [
+            "-Wno-stack-usage",
+        ]
 
 # targets
 result = semver_env.StaticLibrary(build_dir + "libsemver", files)

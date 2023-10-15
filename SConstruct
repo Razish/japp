@@ -21,10 +21,14 @@
 # 	cross-compile from linux64 to win32:
 # 		CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ \
 # 		scons -Q no_sql=1 no_crashhandler=1 no_geoip=1 force32=1 target=Windows
+# 	compile on macOS without pretending clang is gcc:
+# 		CC=clang CXX=clang++ scons -Q
 #
 # envvars:
 # 	NO_SSE			disable SSE floating point instructions, force x87 fpu
 # 	MORE_WARNINGS	enable additional warnings
+# 	LESS_WARNINGS	disable some default warnings
+# 	SCONS_DEBUG 	disable some default warnings
 #
 
 import platform
@@ -72,8 +76,12 @@ def run_command(cmd):
         out, err = p.communicate()
         out = out.decode("utf-8").strip("\n")
         if err:
-            print("run_command: " + err)
+            print("run_command: " + err.decode("utf-8").strip("\n"))
         return 0 if not err else 1, out
+
+
+def get_env(key, default_value=None):
+    return default_value if key not in os.environ else os.environ[key]
 
 
 host_plat = platform.system()  # Windows, Linux, Darwin
@@ -99,27 +107,16 @@ if bits == 32:
     else:
         raise RuntimeError("unexpected platform: " + target_plat)
 elif bits == 64:
-    if target_plat == "Windows":
-        arch = "x64"
-    elif target_plat in ("Linux", "Darwin"):
-        if platform.machine()[:3] == "arm":
-            arch = "arm64"
-        else:
-            arch = "x86_64"
+    if platform.machine()[:3] == "arm":
+        arch = "arm64"
     else:
-        raise RuntimeError("unexpected platform: " + target_plat)
+        arch = "x86_64"
 else:
     raise RuntimeError("could not determine architecture width: " + str(bits))
-
-clangHack = host_plat == "Darwin"
 
 
 # create the build environment
 # FIXME: also consider LD, AS, AR in the toolset
-def get_env(key, default_value=None):
-    return default_value if key not in os.environ else os.environ[key]
-
-
 env = Environment(
     TARGET_ARCH=arch,
     tools=tools,
@@ -129,6 +126,7 @@ env = Environment(
         "PATH": get_env("PATH"),
         "CC": get_env("CC"),
         "CXX": get_env("CXX"),
+        "PKG_CONFIG_PATH": get_env("PKG_CONFIG_PATH"),
     },
 )
 env.Tool("compilation_db")
@@ -151,29 +149,6 @@ colours["orange"] = "\033[33m" if enableColours else ""
 colours["green"] = "\033[92m" if enableColours else ""
 colours["end"] = "\033[0m" if enableColours else ""
 
-# env["SHCCCOMSTR"] = env["SHCXXCOMSTR"] = env["CCCOMSTR"] = env[
-#     "CXXCOMSTR"
-# ] = "%s compiling: %s$SOURCE%s" % (colours["cyan"], colours["white"], colours["end"])
-# env["ARCOMSTR"] = "%s archiving: %s$TARGET%s" % (
-#     colours["orange"],
-#     colours["white"],
-#     colours["end"],
-# )
-# env["RANLIBCOMSTR"] = "%s  indexing: %s$TARGET%s" % (
-#     colours["orange"],
-#     colours["white"],
-#     colours["end"],
-# )
-# env["ASCOMSTR"] = "%sassembling: %s$TARGET%s" % (
-#     colours["orange"],
-#     colours["white"],
-#     colours["end"],
-# )
-# env["SHLINKCOMSTR"] = env["LINKCOMSTR"] = "%s   linking: %s$TARGET%s" % (
-#     colours["green"],
-#     colours["white"],
-#     colours["end"],
-# )
 env["SHCCCOMSTR"] = env["SHCXXCOMSTR"] = env["CCCOMSTR"] = env[
     "CXXCOMSTR"
 ] = f"{colours['cyan']} compiling: {colours['white']}$SOURCE{colours['end']}"
@@ -199,6 +174,7 @@ ccversion = get_compiler_version()
 
 
 # git revision
+# TODO: consider tags
 def get_git_revision():
     cmd_status, rawrevision = run_command("git rev-parse --short HEAD")
     git_revision = None if cmd_status else rawrevision
@@ -281,7 +257,7 @@ if not env.GetOption("clean"):
         + "\n"
         + "\tinstruction set: "
         + arch
-        + ((" with x87 fpu" if "NO_SSE" in os.environ else " with SSE") if arch[:3] != "arm" else "")
+        + ((" with x87 fpu" if int(get_env("NO_SSE", 0)) else " with SSE") if arch[:3] != "arm" else "")
         + "\n"
         + "\tsql support: "
         + ("dis" if no_sql else "en")
@@ -301,7 +277,7 @@ if not env.GetOption("clean"):
     )
 
     # build environment
-    if "SCONS_DEBUG" in os.environ:
+    if int(get_env("SCONS_DEBUG", 0)):
         msg += env["CC"] + " located at " + run_command("where " + env["CC"])[1].split("\n", maxsplit=1)[0] + "\n"
         if "AR" in env:
             msg += env["AR"] + " located at " + run_command("where " + env["AR"])[1].split("\n", maxsplit=1)[0] + "\n"
@@ -315,7 +291,7 @@ if not env.GetOption("clean"):
 
 # clear default compiler/linker switches
 def emptyEnv(_env, e):
-    if "SCONS_DEBUG" in os.environ:
+    if int(get_env("SCONS_DEBUG", 0)):
         if e in _env:
             if _env[e]:
                 print("discarding " + e + ": " + _env[e])
@@ -367,7 +343,7 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
     ]
 
     # strict c/cpp warnings
-    if "MORE_WARNINGS" in os.environ:
+    if int(get_env("MORE_WARNINGS", 0)):
         env["CFLAGS"] += [
             "-Wbad-function-cast",
         ]
@@ -381,20 +357,21 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
             "-Wswitch-default",
             "-Wunreachable-code",
         ]
-        if not clangHack:
-            env["CFLAGS"] += [
-                "-Wunsuffixed-float-constants",
-            ]
-            env["CCFLAGS"] += [
-                "-Wdouble-promotion",
-                #'-Wsuggest-attribute=const',
-            ]
 
     # gcc-specific warnings
-    if "gcc" in env["CC"] and cmp_version(ccversion, "4.6") >= 0 and arch[:3] != "arm":
-        env["CCFLAGS"] += [
-            "-Wlogical-op",
+    if "gcc" in env["CC"]:
+        env["CFLAGS"] += [
+            "-Wunsuffixed-float-constants",
         ]
+        env["CCFLAGS"] += [
+            "-Wdouble-promotion",
+            #'-Wsuggest-attribute=const',
+        ]
+
+        if cmp_version(ccversion, "4.6") >= 0 and arch[:3] != "arm":
+            env["CCFLAGS"] += [
+                "-Wlogical-op",
+            ]
 
         # requires gcc 4.7 or above
         if cmp_version(ccversion, "4.7") >= 0:
@@ -407,12 +384,18 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
         "-Wno-char-subscripts",
     ]
 
+    env["CCFLAGS"] += [
+        "-fvisibility=hidden",
+    ]
+
     # c/cpp flags
     if arch[:3] == "arm":
+        # arm
         env["CCFLAGS"] += [
             "-fsigned-char",
         ]
     else:
+        # x86
         env["CCFLAGS"] += [
             "-mstackrealign",
             "-masm=intel",
@@ -421,29 +404,29 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
             "-msyntax=intel",
             "-mmnemonic=intel",
         ]
-        if "NO_SSE" in os.environ:
+        if int(get_env("NO_SSE", 0)):
             env["CCFLAGS"] += [
                 "-mno-sse2",
             ]
-        if "clang" not in env["CC"]:
-            env["CFLAGS"] += [
-                "-fexcess-precision=standard",
-                "-mfpmath=387",
-                "-ffloat-store",
-            ]
-        else:
-            env["CCFLAGS"] += [
-                "-mfpmath=sse",
-                "-msse2",
-            ]
-        if arch == "i386":
-            env["CCFLAGS"] += [
-                "-march=i686",
-            ]
-        elif arch == "x86_64":
-            env["CCFLAGS"] += [
-                "-mtune=generic",
-            ]
+            if "clang" not in env["CC"]:
+                env["CFLAGS"] += [
+                    "-fexcess-precision=standard",
+                    "-mfpmath=387",
+                    "-ffloat-store",
+                ]
+            else:
+                env["CCFLAGS"] += [
+                    "-mfpmath=sse",
+                    "-msse2",
+                ]
+            if arch == "i386":
+                env["CCFLAGS"] += [
+                    "-march=i686",
+                ]
+            elif arch == "x86_64":
+                env["CCFLAGS"] += [
+                    "-mtune=generic",
+                ]
 
         if bits == 32:
             env["CCFLAGS"] += [
@@ -452,9 +435,6 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
             env["LINKFLAGS"] += [
                 "-m32",
             ]
-    env["CCFLAGS"] += [
-        "-fvisibility=hidden",
-    ]
 
     # misc settings
     # if 'gcc' in env['CC'] and cmp_version( ccversion, '4.9' ) >= 0:
@@ -495,8 +475,15 @@ elif env["CC"] == "cl":
     env["LINKFLAGS"] += [
         "/ERRORREPORT:none",  # don't send error reports for internal linker errors
         "/NOLOGO",  # remove watermark
-        "/MACHINE:" + arch,  # 32/64 bit linking
     ]
+    if arch == "x86_64":
+        env["LINKFLAGS"] += [
+            "/MACHINE:X64",
+        ]
+    else:
+        env["LINKFLAGS"] += [
+            "/MACHINE:" + arch,
+        ]
     if bits == 64:
         env["LINKFLAGS"] += [
             "/SUBSYSTEM:WINDOWS",  # graphical application
@@ -515,7 +502,7 @@ elif env["CC"] == "cl":
         ]
 
     # fpu control
-    if "NO_SSE" in os.environ:
+    if int(get_env("NO_SSE", 0)):
         env["CCFLAGS"] += [
             "/fp:precise",  # precise FP
         ]
@@ -533,7 +520,7 @@ elif env["CC"] == "cl":
             ]
 
     # strict c/cpp warnings
-    if "LESS_WARNINGS" in os.environ:
+    if int(get_env("LESS_WARNINGS", 0)):
         env["CCFLAGS"] += [
             "/W2",
         ]
@@ -554,7 +541,7 @@ elif env["CC"] == "cl":
             "/we 4305",
             "/we 4700",
         ]
-    if "MORE_WARNINGS" in os.environ:
+    if int(get_env("MORE_WARNINGS", 0)):
         env["CCFLAGS"] += [
             "/Wall",
         ]
@@ -592,15 +579,19 @@ if target_plat == "Darwin":
 
 # debug / release
 if debug in (0, 2):
+    # release or fastdebug
     if "gcc" in env["CC"] or "clang" in env["CC"]:
         env["CCFLAGS"] += [
             "-O2",  # O3 may not be best, due to cache size not being big enough for the amount of inlining performed
             "-fomit-frame-pointer",
         ]
-        if debug == 0 and "gcc" in env["CC"]:
-            env["LINKFLAGS"] += [
-                "-s",  # strip unused symbols
-            ]
+        if debug == 0:
+            # strip unused symbols
+            # for macOS, we run the `strip` utility after linking
+            if "gcc" in env["CC"]:
+                env["LINKFLAGS"] += [
+                    "-s",
+                ]
     elif env["CC"] == "cl":
         env["CCFLAGS"] += [
             "/O2",  # maximise speed
@@ -692,7 +683,7 @@ env["CPPPATH"] = [
     "#",
     ".." + os.sep + "game",
 ]
-env["LIBPATH"] = ["#" + os.sep + "libs" + os.sep + target_plat + os.sep + env["CC"] + os.sep + str(bits) + os.sep]
+env["LIBPATH"] = ["#" + os.sep + "libs" + os.sep + target_plat + os.sep + str(bits) + os.sep]
 
 if target_plat == "Windows":
     env["SHLIBSUFFIX"] = ".dll"
@@ -709,7 +700,7 @@ projects = [
 ]
 
 for project in [p for p in projects if not proj or p in proj.split(",")]:
-    env.SConscript(
+    result = env.SConscript(
         os.path.join(project, "SConscript"),
         exports=[
             "arch",
@@ -724,3 +715,8 @@ for project in [p for p in projects if not proj or p in proj.split(",")]:
             "target_plat",
         ],
     )
+    # strip symbols
+    # if not env.GetOption("clean")
+    if host_plat == "Darwin" and "clang" in env["CC"]:
+        for f in result:
+            AddPostAction(result, Action("strip -x " + f.name))

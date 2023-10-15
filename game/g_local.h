@@ -906,7 +906,7 @@ void G_Knockdown(gentity_t *self);
 void G_LeaveVehicle(gentity_t *ent, qboolean ConCheck);
 void G_LoadArenas(void);
 void G_LogExit(const char *string);
-void G_LogPrintf(fileHandle_t filehandle, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+void G_LogPrintf(fileHandle_t filehandle, const char *fmt, ...) Q_PRINT_FORMAT(2, 3);
 void G_LogWeaponDamage(int client, int mod, int amount);
 void G_LogWeaponDeath(int client, int weaponid);
 void G_LogWeaponFire(int client, int weaponid);

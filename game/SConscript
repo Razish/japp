@@ -200,4 +200,5 @@ if env["CC"] == "cl":
     game_env["PDB"] = "#" + os.sep + "jampgame" + arch + ".pdb"
 
 # targets
-game_env.SharedLibrary("#" + os.sep + "jampgame" + arch, files)
+result = game_env.SharedLibrary("#" + os.sep + "jampgame" + arch, files)
+Return("result")

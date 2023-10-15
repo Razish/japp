@@ -449,8 +449,8 @@ typedef enum cgameExportLegacy_e {
 
 typedef struct cgameImport_s {
     // common
-    void (*Print)(const char *msg, ...) __attribute__((format(printf, 1, 2)));
-    void (*Error)(int level, const char *error, ...) __attribute__((format(printf, 2, 3)));
+    void (*Print)(const char *msg, ...) Q_PRINT_FORMAT(1, 2);
+    void (*Error)(int level, const char *error, ...) Q_PRINT_FORMAT(2, 3);
     void (*SnapVector)(vector3 *v);
     int (*MemoryRemaining)(void);
     void (*RegisterSharedMemory)(char *memory);

@@ -1,0 +1,259 @@
+name: build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+      - ".gitignore"
+  pull_request:
+    branches: [master]
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+      - ".gitignore"
+  release:
+    types: [published]
+
+jobs:
+  msvc:
+    name: Windows ${{ matrix.arch }} ${{ matrix.build_type }}
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86, x86_64]
+        build_type: [Debug, Release]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # for cl.exe
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: 5.4
+
+      # waiting for https://github.com/leafo/gh-actions-luarocks/pull/14 to be merged
+      # - uses: leafo/gh-actions-luarocks@v4
+
+      - name: Install Luarocks
+        working-directory: ${{ github.workspace }}
+        shell: pwsh
+        run: |
+          Invoke-WebRequest "http://luarocks.github.io/luarocks/releases/luarocks-3.9.2-windows-64.zip" -OutFile luarocks.zip
+          Expand-Archive .\luarocks.zip .
+          cd .\luarocks-3.9.2-windows-64\
+          .\luarocks.exe config variables.LUA_DIR ${{ github.workspace }}/.lua/
+          .\luarocks.exe config variables.LUA_INCDIR ${{ github.workspace }}/.lua/include
+          .\luarocks.exe config variables.LUA_LIBDIR ${{ github.workspace }}/.lua/lib
+          .\luarocks.exe install luafilesystem
+
+      - name: Install Scons
+        working-directory: ${{ github.workspace }}
+        run: python -m pip install scons
+
+      - name: Build
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        run: |
+          if [ ${{ matrix.arch }} == "x86" ]; then
+            export FORCE32=1
+          fi
+          ./build.sh ${{ matrix.build_type }}
+
+      - name: Package
+        if: ${{ matrix.build_type == 'Release' }}
+        working-directory: ${{ github.workspace }}
+        shell: pwsh
+        run: |
+          if ( "${{ matrix.arch }}" -eq "x86" ) {
+            $env:TARGET_ARCH="x86"
+          }
+          $env:PATH="${{ github.workspace }}\.lua\lib;$env:PATH"
+          $env:LUA_CPATH="$env:USERPROFILE\AppData\Roaming\LuaRocks\lib\lua\5.4\?.dll"
+          lua package.lua
+          7z a -tzip -y japp-windows-${{ matrix.arch }}-${{ matrix.build_type }}.zip *.pk3
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ matrix.build_type == 'Release' }}
+        with:
+          name: japp-windows-${{ matrix.arch }}-${{ matrix.build_type }}
+          path: ${{ github.workspace }}/japp-windows-${{ matrix.arch }}-${{ matrix.build_type }}.zip
+          if-no-files-found: error
+
+  ubuntu:
+    name: Ubuntu ${{ matrix.arch }} ${{ matrix.build_type }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86, x86_64]
+        build_type: [Debug, Release]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Prepare environment
+        run: |
+          if [ ${{ matrix.arch }} == "x86" ]; then
+            sudo dpkg --add-architecture i386
+            sudo apt-get -qq update
+            sudo apt-get -y install gcc-multilib g++-multilib
+            sudo apt-get -y install libgtk2.0-dev:i386 libnotify-dev:i386 libreadline-dev:i386
+          else
+            sudo apt-get -qq update
+            sudo apt-get -y install libgtk2.0-dev libnotify-dev libreadline-dev
+          fi
+          sudo apt-get -y install lua5.4 lua-filesystem
+          sudo apt-get -y install scons
+
+      - name: Build
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        run: |
+          if [ ${{ matrix.arch }} == "x86" ]; then
+            export FORCE32=1
+            export PKG_CONFIG_PATH="/usr/lib/i386-linux-gnu/pkgconfig/:$PKG_CONFIG_PATH"
+          fi
+          ./build.sh ${{ matrix.build_type }}
+
+      - name: Package
+        if: ${{ matrix.build_type == 'Release' }}
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        run: |
+          if [ ${{ matrix.arch }} == "x86" ]; then
+            export TARGET_ARCH="i386"
+          fi
+          ./package.lua
+          tar -czvf japp-linux-${{ matrix.arch }}-${{ matrix.build_type }}.tar.gz *.zip
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ matrix.build_type == 'Release' }}
+        with:
+          name: japp-linux-${{ matrix.arch }}-${{ matrix.build_type }}
+          path: ${{github.workspace}}/japp-linux-${{ matrix.arch }}-${{ matrix.build_type }}.tar.gz
+          if-no-files-found: error
+
+  macos:
+    name: macOS ${{ matrix.arch }} ${{ matrix.build_type }}
+    runs-on: macos-12
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64]
+        build_type: [Debug, Release]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Prepare environment
+        run: |
+          brew install scons lua luarocks
+          luarocks install luafilesystem
+
+      - name: Build
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        run: CC=clang CXX=clang++ ./build.sh ${{ matrix.build_type }}
+
+      - name: Package
+        if: ${{ matrix.build_type == 'Release' }}
+        working-directory: ${{ github.workspace }}
+        shell: bash
+        run: |
+          ./package.lua
+          tar -czvf japp-macos-${{ matrix.arch }}-${{ matrix.build_type }}.tar.gz *.zip
+
+      - uses: actions/upload-artifact@v3
+        if: ${{ matrix.build_type == 'Release' }}
+        with:
+          name: japp-macos-${{ matrix.arch }}-${{ matrix.build_type }}
+          path: ${{ github.workspace }}/japp-macos-${{ matrix.arch }}-${{ matrix.build_type }}.tar.gz
+          if-no-files-found: error
+
+  create-latest:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [msvc, ubuntu, macos]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Create binary archives
+        run: |
+          7z a -r japp-windows-x86.zip ./japp-windows-x86-Release/*
+          7z a -r japp-windows-x86_64.zip ./japp-windows-x86_64-Release/*
+          mv ./japp-linux-x86-Release/* japp-linux-x86.tar.gz
+          mv ./japp-linux-x86_64-Release/* japp-linux-x86_64.tar.gz
+          mv ./japp-macos-x86_64-Release/* japp-macos-x86_64.tar.gz
+
+      - name: Create latest build
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: Latest Build
+          files: |
+            *.zip
+            *.tar.gz
+
+  create-release:
+    if: github.event_name == 'release'
+    needs: [msvc, ubuntu, macos]
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - artifact_dir: japp-windows-x86-Release
+            artifact_name: japp-windows-x86.zip
+            zip: true
+
+          - artifact_dir: japp-windows-x86_64-Release
+            artifact_name: japp-windows-x86_64.zip
+            zip: true
+
+          - artifact_dir: japp-linux-x86-Release
+            artifact_name: japp-linux-x86.tar.gz
+            zip: false
+
+          - artifact_dir: japp-linux-x86_64-Release
+            artifact_name: japp-linux-x86_64.tar.gz
+            zip: false
+
+          - artifact_dir: japp-macos-x86_64-Release
+            artifact_name: japp-macos-x86_64.tar.gz
+            zip: false
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Create archive
+        run: |
+          if [ "${{ matrix.zip }}" == "true" ]; then
+            7z a -r ${{ matrix.artifact_name }} ./${{ matrix.artifact_dir }}/*
+          else
+            mv ./${{ matrix.artifact_dir }}/* ${{ matrix.artifact_name }}
+          fi
+
+      - name: Upload archives
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
+          overwrite: true
+          file: ${{ matrix.artifact_name }}
