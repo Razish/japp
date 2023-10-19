@@ -3,8 +3,6 @@
 #include "anims.h"
 #include "w_saber.h"
 
-qboolean BG_SabersOff(playerState_t *ps);
-
 void CG_DrawAlert(vector3 *origin, float rating);
 void G_AddVoiceEvent(gentity_t *self, int event, int speakDebounceTime);
 void ForceJump(gentity_t *self, usercmd_t *ucmd);

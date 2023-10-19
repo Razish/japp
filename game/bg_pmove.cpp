@@ -31,7 +31,6 @@ qboolean TryGrapple(gentity_t *ent); // g_cmds.c
 qboolean BG_FullBodyTauntAnim(int anim);
 float PM_WalkableGroundDistance(void);
 qboolean PM_GroundSlideOkay(float zNormal);
-saberInfo_t *BG_MySaber(int clientNum, int saberNum);
 
 pmove_t *pm;
 pml_t pml;

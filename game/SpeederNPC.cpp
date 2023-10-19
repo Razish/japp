@@ -19,7 +19,6 @@ int PM_AnimLength(int index, animNumber_t anim);
 
 void BG_SetAnim(playerState_t *ps, animation_t *animations, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime);
 int BG_GetTime(void);
-qboolean BG_SabersOff(playerState_t *ps);
 
 // Alright, actually, most of this file is shared between game and cgame for MP.
 // I would like to keep it this way, so when modifying for SP please keep in

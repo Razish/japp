@@ -1,14 +1,13 @@
 
-#ifdef XCVAR_PROTO
+#if defined(XCVAR_PROTO)
 #define XCVAR_DEF(name, defVal, update, flags, announce) extern vmCvar_t name;
-#endif
-
-#ifdef XCVAR_DECL
+#elif defined(XCVAR_DECL)
 #define XCVAR_DEF(name, defVal, update, flags, announce) vmCvar_t name;
-#endif
-
-#ifdef XCVAR_LIST
+#elif defined(XCVAR_LIST)
 #define XCVAR_DEF(name, defVal, update, flags, announce) {&name, #name, defVal, update, flags, announce},
+#else
+#pragma message("missing XCVAR expansion def")
+#define XCVAR_DEF(...)
 #endif
 
 XCVAR_DEF(bg_fighterAltControl, "0", NULL, CVAR_SERVERINFO, qtrue)
@@ -69,6 +68,8 @@ XCVAR_DEF(g_dismember, "0", NULL, CVAR_ARCHIVE, qtrue)
 XCVAR_DEF(g_doWarmup, "0", NULL, CVAR_NONE, qtrue)
 XCVAR_DEF(g_duelWeaponDisable, "1", NULL, CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, qtrue)
 XCVAR_DEF(g_ff_objectives, "0", NULL, CVAR_CHEAT | CVAR_NORESTART, qtrue)
+XCVAR_DEF(g_fixSaberDisarmBonus, "1", NULL, CVAR_ARCHIVE, qtrue)
+XCVAR_DEF(g_fixSaberMoveData, "1", CVU_FixSaberMoveData, CVAR_ARCHIVE, qtrue)
 XCVAR_DEF(g_forceBasedTeams, "0", NULL, CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, qfalse)
 XCVAR_DEF(g_forceClientUpdateRate, "250", NULL, CVAR_NONE, qfalse)
 XCVAR_DEF(g_forceDodge, "1", NULL, CVAR_NONE, qtrue)
