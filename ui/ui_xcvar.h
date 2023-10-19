@@ -1,14 +1,13 @@
 
-#ifdef XCVAR_PROTO
+#if defined(XCVAR_PROTO)
 #define XCVAR_DEF(name, defVal, update, flags) extern vmCvar_t name;
-#endif
-
-#ifdef XCVAR_DECL
+#elif defined(XCVAR_DECL)
 #define XCVAR_DEF(name, defVal, update, flags) vmCvar_t name;
-#endif
-
-#ifdef XCVAR_LIST
+#elif defined(XCVAR_LIST)
 #define XCVAR_DEF(name, defVal, update, flags) {&name, #name, defVal, update, flags},
+#else
+#pragma message("missing XCVAR expansion def")
+#define XCVAR_DEF(...)
 #endif
 
 XCVAR_DEF(capturelimit, "0", NULL, CVAR_ARCHIVE | CVAR_NORESTART | CVAR_SERVERINFO) // fixme init'd to 8 in game module

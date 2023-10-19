@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <set>
 
 #include "g_local.h"
@@ -168,6 +169,19 @@ static void CVU_WeaponRoll(void) { SetCInfo(japp_weaponRoll.integer, CINFO_WEAPO
 static void CVU_CInfo(void) { CPM_UpdateSettings(!!(jp_cinfo.bits & CINFO_CPMPHYSICS)); }
 
 static void CVU_Motd(void) { Q_ConvertLinefeeds(g_motd.string); }
+
+static void CVU_FixSaberMoveData(void) {
+    char sLegacyFixes[32];
+    trap->GetConfigstring(CS_LEGACY_FIXES, sLegacyFixes, sizeof(sLegacyFixes));
+
+    uint32_t legacyFixes = strtoul(sLegacyFixes, NULL, 0);
+    if (g_fixSaberMoveData.integer) {
+        legacyFixes |= (1 << LEGACYFIX_SABERMOVEDATA);
+    } else {
+        legacyFixes &= ~(1 << LEGACYFIX_SABERMOVEDATA);
+    }
+    trap->SetConfigstring(CS_LEGACY_FIXES, va("%" PRIu32, legacyFixes));
+}
 
 typedef struct cvarTable_s {
     vmCvar_t *vmCvar;
@@ -421,17 +435,13 @@ static void G_SpawnHoleFixes(void) {
 }
 
 void G_InitGame(int levelTime, int randomSeed, int restart) {
-    int i;
-    vmCvar_t mapname;
-    vmCvar_t ckSum;
-    char cs[MAX_INFO_STRING] = {0};
     vmCvar_t japp_crashHandler;
-
     trap->Cvar_Register(&japp_crashHandler, "japp_crashHandler", "1", CVAR_ARCHIVE);
-
     if (japp_crashHandler.integer) {
         ActivateCrashHandler();
     }
+
+    srand(randomSeed);
 
     // Clean up any client-server ghoul2 instance attachments that may still exist exe-side
     trap->G2API_CleanEntAttachments();
@@ -445,7 +455,9 @@ void G_InitGame(int levelTime, int randomSeed, int restart) {
     // Load external vehicle data
     BG_VehicleLoadParms();
 
-    srand(randomSeed);
+    // init as zero, to be updated by the following cvar registration
+    // relevant cvars call their update func to modify CS_LEGACY_FIXES when necessary
+    trap->SetConfigstring(CS_LEGACY_FIXES, "0");
 
     G_RegisterCvars();
 
@@ -474,6 +486,7 @@ void G_InitGame(int levelTime, int randomSeed, int restart) {
     else
         trap->Print("Not logging admin events to disk.\n");
 
+    char cs[MAX_INFO_STRING] = {0};
     trap->GetServerinfo(cs, sizeof(cs));
     G_LogPrintf(level.log.console, "------------------------------------------------------------\n");
     G_LogPrintf(level.log.console, "InitGame: %s\n", cs);
@@ -506,7 +519,7 @@ void G_InitGame(int levelTime, int randomSeed, int restart) {
     level.clients = g_clients;
 
     // set client fields on player ents
-    for (i = 0; i < level.maxclients; i++) {
+    for (int i = 0; i < level.maxclients; i++) {
         g_entities[i].client = level.clients + i;
     }
 
@@ -538,6 +551,7 @@ void G_InitGame(int levelTime, int randomSeed, int restart) {
     // make sure saber data is loaded before this! (so we can precache the appropriate hilts)
     InitSiegeMode();
 
+    vmCvar_t mapname, ckSum;
     trap->Cvar_Register(&mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM);
     trap->Cvar_Register(&ckSum, "sv_mapChecksum", "", CVAR_ROM);
 
@@ -604,7 +618,7 @@ void G_InitGame(int levelTime, int randomSeed, int restart) {
         navCalcPathTime = 0;
     }
 
-    for (i = 0; i < MAX_CUSTOM_SIEGE_SOUNDS; i++) {
+    for (int i = 0; i < MAX_CUSTOM_SIEGE_SOUNDS; i++) {
         if (!bg_customSiegeSoundNames[i]) {
             break;
         }
@@ -614,8 +628,7 @@ void G_InitGame(int levelTime, int randomSeed, int restart) {
     // Raz: JK2 gametypes
     if (level.gametype == GT_JEDIMASTER) { // make sure that there's a jedimaster saber spawn point.
         gentity_t *jmsaber = NULL;
-        int i = 0;
-        for (i = 0; i < level.num_entities; i++) { // scan for jmsaber
+        for (int i = 0; i < level.num_entities; i++) { // scan for jmsaber
             if (g_entities[i].isSaberEntity) {
                 jmsaber = &g_entities[i];
                 break;

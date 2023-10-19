@@ -146,7 +146,7 @@ const int forcePowerDarkLight[NUM_FORCE_POWERS] = // 0 == neutral
         0,               // FP_SABER_OFFENSE,
         0,               // FP_SABER_DEFENSE,
         0                // FP_SABERTHROW,
-          // NUM_FORCE_POWERS
+                         // NUM_FORCE_POWERS
 };
 
 const int WeaponReadyAnim[WP_NUM_WEAPONS] = {
@@ -2372,6 +2372,9 @@ uint32_t BG_GetMapTypeBits(const char *type) {
             typeBits |= (1 << GT_TEAM);
             typeBits |= (1 << GT_JEDIMASTER);
             typeBits |= (1 << GT_HOLOCRON);
+        }
+        if (strstr(type, "team")) {
+            typeBits |= (1 << GT_TEAM);
         }
         if (strstr(type, "coop")) {
             typeBits |= (1 << GT_SINGLE_PLAYER);

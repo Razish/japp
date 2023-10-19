@@ -11,8 +11,6 @@ require 'lfs' -- lua filesystem
 	- 7z or zip
 --]]
 
-if lfs == nil then error('missing lua-filesystem (Lua ' .. _VERSION .. ') - try installing with luarocks') end
-
 local function get_platform_details()
     if package.config:sub(1, 1) == '\\' then
         -- Windows
@@ -37,13 +35,13 @@ local host_platform, arch = get_platform_details()
 local target_arch = os.getenv('TARGET_ARCH') -- this can override what arch we're packaging
 arch = target_arch and target_arch or arch
 
-local nixy = true and package.config:find('/') or false
 local suffix = host_platform .. '_' .. arch
 local libExt = ({
     Linux = '.so', --
     Windows = '.dll', --
     Darwin = '.dylib',
 })[host_platform]
+local nixy = true and package.config:find('/') or false
 local extension = nixy and '.zip' or '.pk3'
 local redirect_stdout = nixy and '>/dev/null' or '>nul'
 local redirect_all = nixy and '>/dev/null 2>&1' or '>nul 2>&1'

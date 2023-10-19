@@ -5,12 +5,11 @@
 #include "JAPP/jp_cinfo.h"
 #include "JAPP/jp_csflags.h"
 
-#ifdef PROJECT_GAME
-#include "g_local.h"
+#if defined(PROJECT_GAME)
+#include "g_local.h" // for cvars
+#elif defined(PROJECT_CGAME)
+#include "cgame/cg_local.h" // for configstrings
 #endif
-
-qboolean BG_SabersOff(playerState_t *ps);
-saberInfo_t *BG_MySaber(int clientNum, int saberNum);
 
 int PM_irand_timesync(int val1, int val2) {
     int i;
@@ -288,29 +287,27 @@ saberMoveData_t saberMoveData[LS_MOVE_MAX] = {
     {"Reflected BL", BOTH_V1_BL_S1, Q_BL, Q_BL, AFLAG_ACTIVE, 100, BLK_NO, LS_READY, LS_READY, 150}, //	LS_V1_BL
     {"Reflected B", BOTH_V1_B__S1, Q_B, Q_B, AFLAG_ACTIVE, 100, BLK_NO, LS_READY, LS_READY, 150},    //	LS_V1_B_
 
-    // Raz: Animation fix begin
     // Broken parries
     {"BParry Top", BOTH_H1_S1_T_, Q_T, Q_B, AFLAG_ACTIVE, 50, BLK_NO, LS_READY, LS_READY, 150},  // LS_PARRY_UP,
     {"BParry UR", BOTH_H1_S1_TR, Q_TR, Q_BL, AFLAG_ACTIVE, 50, BLK_NO, LS_READY, LS_READY, 150}, // LS_PARRY_UR,
     {"BParry UL", BOTH_H1_S1_TL, Q_TL, Q_BR, AFLAG_ACTIVE, 50, BLK_NO, LS_READY, LS_READY, 150}, // LS_PARRY_UL,
-    {"BParry LR", BOTH_H1_S1_BR, Q_BL, Q_TR, AFLAG_ACTIVE, 50, BLK_NO, LS_READY, LS_READY, 150}, // LS_PARRY_LR,
+    {"BParry LR", BOTH_H1_S1_BL, Q_BL, Q_TR, AFLAG_ACTIVE, 50, BLK_NO, LS_READY, LS_READY, 150}, // LS_PARRY_LR,
     {"BParry Bot", BOTH_H1_S1_B_, Q_B, Q_T, AFLAG_ACTIVE, 50, BLK_NO, LS_READY, LS_READY, 150},  // LS_PARRY_LR
-    {"BParry LL", BOTH_H1_S1_BL, Q_BR, Q_TL, AFLAG_ACTIVE, 50, BLK_NO, LS_READY, LS_READY, 150}, // LS_PARRY_LL
+    {"BParry LL", BOTH_H1_S1_BR, Q_BR, Q_TL, AFLAG_ACTIVE, 50, BLK_NO, LS_READY, LS_READY, 150}, // LS_PARRY_LL
 
     // Knockaways
     {"Knock Top", BOTH_K1_S1_T_, Q_R, Q_T, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_BL2TR, LS_T1_T__BR, 150}, // LS_PARRY_UP,
     {"Knock UR", BOTH_K1_S1_TR, Q_R, Q_TR, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_BL2TR, LS_T1_TR__R, 150}, // LS_PARRY_UR,
     {"Knock UL", BOTH_K1_S1_TL, Q_R, Q_TL, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_BR2TL, LS_T1_TL__L, 150}, // LS_PARRY_UL,
-    {"Knock LR", BOTH_K1_S1_BR, Q_R, Q_BL, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_TL2BR, LS_T1_BL_TL, 150}, // LS_PARRY_LR,
-    {"Knock LL", BOTH_K1_S1_BL, Q_R, Q_BR, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_TR2BL, LS_T1_BR_TR, 150}, // LS_PARRY_LL
+    {"Knock LR", BOTH_K1_S1_BL, Q_R, Q_BL, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_TL2BR, LS_T1_BL_TL, 150}, // LS_PARRY_LR,
+    {"Knock LL", BOTH_K1_S1_BR, Q_R, Q_BR, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_TR2BL, LS_T1_BR_TR, 150}, // LS_PARRY_LL
 
     // Parry
     {"Parry Top", BOTH_P1_S1_T_, Q_R, Q_T, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_BL2TR, LS_A_T2B, 150},   // LS_PARRY_UP,
     {"Parry UR", BOTH_P1_S1_TR, Q_R, Q_TL, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_BL2TR, LS_A_TR2BL, 150}, // LS_PARRY_UR,
     {"Parry UL", BOTH_P1_S1_TL, Q_R, Q_TR, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_BR2TL, LS_A_TL2BR, 150}, // LS_PARRY_UL,
-    {"Parry LR", BOTH_P1_S1_BR, Q_R, Q_BR, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_TL2BR, LS_A_BR2TL, 150}, // LS_PARRY_LR,
-    {"Parry LL", BOTH_P1_S1_BL, Q_R, Q_BL, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_TR2BL, LS_A_BL2TR, 150}, // LS_PARRY_LL
-    // Raz: Animation fix end
+    {"Parry LR", BOTH_P1_S1_BL, Q_R, Q_BR, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_TL2BR, LS_A_BR2TL, 150}, // LS_PARRY_LR,
+    {"Parry LL", BOTH_P1_S1_BR, Q_R, Q_BL, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_TR2BL, LS_A_BL2TR, 150}, // LS_PARRY_LL
 
     // Reflecting a missile
     {"Reflect Top", BOTH_P1_S1_T_, Q_R, Q_T, AFLAG_ACTIVE, 50, BLK_WIDE, LS_R_BL2TR, LS_A_T2B, 300},   // LS_PARRY_UP,
@@ -327,6 +324,33 @@ saberMoveData_t saberMoveData[LS_MOVE_MAX] = {
     {"NewAnimJumpBackKickFlip", BOTH_STAND1, 0, 0, AFLAG_ACTIVE, 0, 0, LS_READY, LS_S_R2L, 0},                       // LS_JAPLUS_NEWANIM_JUMPBACKKICKFLIP
     {"NewAnimFlipSaberStab", BOTH_NEW_STABER, Q_T, Q_B, AFLAG_ACTIVE, 100, BLK_TIGHT, LS_READY, LS_READY, 200},      // LS_JAPLUS_NEWANIM_FLIPSABERSTAB
 };
+
+void BG_FixSaberMoveData(void) {
+#if defined(PROJECT_GAME)
+    const qboolean doFix = !!g_fixSaberMoveData.integer;
+#elif defined(PROJECT_CGAME)
+    const char *cs = CG_ConfigString(CS_LEGACY_FIXES);
+    const uint32_t legacyFixes = strtoul(cs, NULL, 0);
+    const qboolean doFix = !!(legacyFixes & (1 << LEGACYFIX_SABERMOVEDATA));
+#endif
+    saberMoveData_t *move;
+
+    for (move = saberMoveData; move - saberMoveData < ARRAY_LEN(saberMoveData); move++) {
+        if (!strcmp(move->name, "BParry LR")) {
+            move->animToUse = doFix ? BOTH_H1_S1_BR : BOTH_H1_S1_BL;
+        } else if (!strcmp(move->name, "BParry LL")) {
+            move->animToUse = doFix ? BOTH_H1_S1_BL : BOTH_H1_S1_BR;
+        } else if (!strcmp(move->name, "Knock LR")) {
+            move->animToUse = doFix ? BOTH_K1_S1_BR : BOTH_K1_S1_BL;
+        } else if (!strcmp(move->name, "Knock LL")) {
+            move->animToUse = doFix ? BOTH_K1_S1_BL : BOTH_K1_S1_BR;
+        } else if (!strcmp(move->name, "Parry LR")) {
+            move->animToUse = doFix ? BOTH_P1_S1_BR : BOTH_P1_S1_BL;
+        } else if (!strcmp(move->name, "Parry LL")) {
+            move->animToUse = doFix ? BOTH_P1_S1_BL : BOTH_P1_S1_BR;
+        }
+    }
+}
 
 int transitionMove[Q_NUM_QUADS][Q_NUM_QUADS] = {
     {LS_NONE, LS_T1_BR__R, LS_T1_BR_TR, LS_T1_BR_T_, LS_T1_BR_TL, LS_T1_BR__L, LS_T1_BR_BL, LS_NONE},
@@ -892,17 +916,17 @@ int PM_SaberLockResultAnim(playerState_t *duelist, qboolean superBreak, qboolean
 #endif
 
     if (superBreak && !won) { // if you lose a superbreak, you're defenseless
-        /*
-        //Taken care of in SetSaberBoxSize()
-        //make saberent not block
-        gentity_t *saberent = &g_entities[duelist->client->ps.saberEntityNum];
-        if ( saberent )
-        {
-        VectorClear(saberent->mins);
-        VectorClear(saberent->maxs);
-        G_SetOrigin(saberent, duelist->currentOrigin);
-        }
-        */
+                              /*
+                              //Taken care of in SetSaberBoxSize()
+                              //make saberent not block
+                              gentity_t *saberent = &g_entities[duelist->client->ps.saberEntityNum];
+                              if ( saberent )
+                              {
+                              VectorClear(saberent->mins);
+                              VectorClear(saberent->maxs);
+                              G_SetOrigin(saberent, duelist->currentOrigin);
+                              }
+                              */
 #ifdef PROJECT_GAME
         if (1)
 #else
@@ -2407,7 +2431,7 @@ void PM_WeaponLightsaber(void) {
         //	if (pm->ps->saberBlocked && pm->ps->torsoAnim != saberMoveData[pm->ps->saberMove].animToUse)
         //	{ //rww - keep him in the blocking pose until he can attack again
         //		PM_SetAnim(SETANIM_TORSO,saberMoveData[pm->ps->saberMove].animToUse,saberMoveData[pm->ps->saberMove].animSetFlags|SETANIM_FLAG_HOLD,
-        //saberMoveData[pm->ps->saberMove].blendTime); 		return;
+        // saberMoveData[pm->ps->saberMove].blendTime); 		return;
         //	}
     } else {
         pm->ps->weaponstate = WEAPON_READY;

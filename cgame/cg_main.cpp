@@ -771,6 +771,9 @@ static void CG_RegisterClients(void) {
 }
 
 const char *CG_ConfigString(int index) {
+	// don't read configstrings before initialisation
+	assert( cgs.gameState.dataCount != 0 );
+
     if (index < 0 || index >= MAX_CONFIGSTRINGS) {
         trap->Error(ERR_DROP, "CG_ConfigString: bad index: %i", index);
         return NULL;
@@ -1708,6 +1711,8 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum, qbo
     memset(cg_items, 0, sizeof(cg_items));
     memset(cg_weapons, 0, sizeof(cg_weapons));
 
+    trap->GetGameState(&cgs.gameState);
+
     trap->RegisterSharedMemory(cg.sharedBuffer);
 
     CG_RegisterCvars();
@@ -1758,7 +1763,6 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum, qbo
     cgs.screenYScale = cgs.glconfig.vidHeight / SCREEN_HEIGHT;
     CG_Set2DRatio();
 
-    trap->GetGameState(&cgs.gameState);
     s = CG_ConfigString(CS_GAME_VERSION);
     if (strcmp(s, GAME_VERSION)) {
         trap->Error(ERR_DROP, "Client/Server game mismatch: " GAME_VERSION "/%s", s);
@@ -1853,6 +1857,7 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum, qbo
     }
 
     CG_UpdateServerHistory();
+	BG_FixSaberMoveData();
 }
 
 // makes sure returned string is in localized format

@@ -2,8 +2,6 @@
 #include "g_nav.h"
 #include "anims.h"
 
-qboolean BG_SabersOff(playerState_t *ps);
-
 void CG_DrawAlert(vector3 *origin, float rating);
 void G_AddVoiceEvent(gentity_t *self, int event, int speakDebounceTime);
 void NPC_TempLookTarget(gentity_t *self, int lookEntNum, int minLookTime, int maxLookTime);
@@ -332,7 +330,7 @@ qboolean Grenadier_EvaluateShot(int hit) {
     }
 
     if (hit == NPC->enemy->s.number ||
-        (&g_entities[hit] != NULL && (g_entities[hit].r.svFlags & SVF_GLASS_BRUSH))) { // can hit enemy or will hit glass, so shoot anyway
+        (g_entities[hit].inuse && (g_entities[hit].r.svFlags & SVF_GLASS_BRUSH))) { // can hit enemy or will hit glass, so shoot anyway
         return qtrue;
     }
     return qfalse;

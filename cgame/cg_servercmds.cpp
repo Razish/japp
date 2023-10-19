@@ -752,6 +752,11 @@ static void CG_ConfigStringModified(void) {
         CG_ShaderStateChanged();
     }
 
+    else if (num == CS_LEGACY_FIXES) {
+        // LEGACYFIX_SABERMOVEDATA may have changed
+        BG_FixSaberMoveData();
+    }
+
     else if (num >= CS_LIGHT_STYLES && num < CS_LIGHT_STYLES + (MAX_LIGHT_STYLES * 3))
         CG_SetLightstyle(num - CS_LIGHT_STYLES);
 }

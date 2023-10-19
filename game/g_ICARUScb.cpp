@@ -8,7 +8,6 @@
 #include "g_nav.h"
 #include "bg_lua.h"
 
-qboolean BG_SabersOff(playerState_t *ps);
 extern stringID_table_t WPTable[];
 extern stringID_table_t BSTable[];
 

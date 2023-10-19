@@ -10,8 +10,6 @@
 #include "cgame/cg_local.h"
 #endif
 
-saberInfo_t *BG_MySaber(int clientNum, int saberNum);
-
 // Called regardless of pm validity:
 //  VVFIXME - Most of these functions are totally stateless and stupid.
 //  Don't need multiple copies of this, but it's much easier (and less likely to break in the future) if I keep separate

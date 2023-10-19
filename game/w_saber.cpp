@@ -17,7 +17,6 @@ qboolean PM_SaberInBounce(int move);
 qboolean BG_SaberInReturn(int move);
 qboolean BG_InKnockDownOnGround(playerState_t *ps);
 qboolean BG_StabDownAnim(int anim);
-qboolean BG_SabersOff(playerState_t *ps);
 qboolean BG_SaberInAttackPure(int move);
 qboolean WP_SaberBladeUseSecondBladeStyle(saberInfo_t *saber, int bladeNum);
 qboolean WP_SaberBladeDoTransitionDamage(saberInfo_t *saber, int bladeNum);
@@ -82,6 +81,16 @@ qboolean G_CanBeEnemy(gentity_t *self, gentity_t *enemy) {
     // ptrs!
     if (!self->inuse || !enemy->inuse || !self->client || !enemy->client)
         return qfalse;
+
+    if (self->client->ps.duelInProgress && self->client->ps.duelIndex != enemy->s.number) {
+        // dueling but not with this person
+        return qfalse;
+    }
+
+    if (enemy->client->ps.duelInProgress && enemy->client->ps.duelIndex != self->s.number) {
+        // other guy dueling but not with me
+        return qfalse;
+    }
 
     if (level.gametype < GT_TEAM)
         return qtrue;
@@ -3856,7 +3865,7 @@ static qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBladeNum, 
         } else if ((selfSaberLevel > FORCE_LEVEL_2) && // if we're doing a special attack, we can send them into a broken parry too (MP only)
                                                        //( otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] < selfSaberLevel ||
                                                        //(otherOwner->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == selfSaberLevel && (Q_irand(1, 10) >=
-                                                       //otherSaberLevel*3 || unblockable)) ) &&
+                                                       // otherSaberLevel*3 || unblockable)) ) &&
                    otherSaberLevel >= FORCE_LEVEL_3 && PM_SaberInParry(otherOwner->client->ps.saberMove) &&
                    !PM_SaberInBrokenParry(otherOwner->client->ps.saberMove) && !PM_SaberInParry(self->client->ps.saberMove) &&
                    !PM_SaberInBrokenParry(self->client->ps.saberMove) && !PM_SaberInBounce(self->client->ps.saberMove) &&
@@ -5345,7 +5354,7 @@ qboolean saberCheckKnockdown_DuelLoss(gentity_t *saberent, gentity_t *saberOwner
 
     if (other && other->client) {
         disarmChance += other->client->saber[0].disarmBonus;
-        if (other->client->saber[1].model[0] && !other->client->ps.saberHolstered) {
+        if (g_fixSaberDisarmBonus.integer && other->client->saber[1].model[0] && !other->client->ps.saberHolstered) {
             disarmChance += other->client->saber[1].disarmBonus;
         }
     }
@@ -5416,7 +5425,7 @@ qboolean saberCheckKnockdown_BrokenParry(gentity_t *saberent, gentity_t *saberOw
 
         if (other && other->client) {
             disarmChance += other->client->saber[0].disarmBonus;
-            if (other->client->saber[1].model[0] && !other->client->ps.saberHolstered) {
+            if (g_fixSaberDisarmBonus.integer && other->client->saber[1].model[0] && !other->client->ps.saberHolstered) {
                 disarmChance += other->client->saber[1].disarmBonus;
             }
         }
