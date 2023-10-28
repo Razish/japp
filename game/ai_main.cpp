@@ -2358,12 +2358,12 @@ int Siege_TargetClosestObjective(bot_state_t *bs, int flag) {
     VectorSet(&maxs, 1, 1, 1);
 
     if (bs->wpDestination && (bs->wpDestination->flags & flag) && bs->wpDestination->associated_entity != ENTITYNUM_NONE &&
-        &g_entities[bs->wpDestination->associated_entity] && g_entities[bs->wpDestination->associated_entity].use) {
+        g_entities[bs->wpDestination->associated_entity].inuse && g_entities[bs->wpDestination->associated_entity].use) {
         goto hasPoint;
     }
 
     for (int i = 0, size = gWPArray.size(); i < size; i++) {
-        if (gWPArray[i] && (gWPArray[i]->flags & flag) && gWPArray[i]->associated_entity != ENTITYNUM_NONE && &g_entities[gWPArray[i]->associated_entity] &&
+        if (gWPArray[i] && (gWPArray[i]->flags & flag) && gWPArray[i]->associated_entity != ENTITYNUM_NONE && g_entities[gWPArray[i]->associated_entity].inuse &&
             g_entities[gWPArray[i]->associated_entity].use) {
             VectorSubtract(&gWPArray[i]->origin, &bs->origin, &a);
             testdistance = VectorLength(&a);

@@ -31,9 +31,9 @@
 #define FORCE_LIGHTNING_RADIUS 300
 #define MAX_DRAIN_DISTANCE 512
 
-typedef enum forceJump_e { FJ_FORWARD, FJ_BACKWARD, FJ_RIGHT, FJ_LEFT, FJ_UP } forceJump_t;
+enum forceJump_e { FJ_FORWARD, FJ_BACKWARD, FJ_RIGHT, FJ_LEFT, FJ_UP };
 
-typedef enum {
+enum evasionType_e {
     EVASION_NONE = 0,
     EVASION_PARRY,
     EVASION_DUCK_PARRY,
@@ -45,7 +45,7 @@ typedef enum {
     EVASION_CARTWHEEL,
     EVASION_OTHER,
     NUM_EVASION_TYPES
-} evasionType_t;
+};
 
 #define SABERMINS_X -3.0f //-24.0f
 #define SABERMINS_Y -3.0f //-24.0f

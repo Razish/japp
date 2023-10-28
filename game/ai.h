@@ -1,18 +1,21 @@
 #pragma once
 
+#include "qcommon/q_shared.h"
+#include "game/g_local.h"
+
 // Distance ratings
-typedef enum {
+enum distance_e {
     DIST_MELEE,
     DIST_LONG,
-} distance_e;
+};
 
 // Attack types
-typedef enum {
+enum attack_e {
     ATTACK_MELEE,
     ATTACK_RANGE,
-} attack_e;
+};
 
-enum {
+enum squadState_e {
     SQUAD_IDLE,            // No target found, waiting
     SQUAD_STAND_AND_SHOOT, // Standing in position and shoot (no cover)
     SQUAD_RETREAT,         // Running away from combat
@@ -24,15 +27,7 @@ enum {
 };
 
 // sigh... had to move in here for groupInfo
-typedef enum //# rank_e
-{ RANK_CIVILIAN,
-  RANK_CREWMAN,
-  RANK_ENSIGN,
-  RANK_LT_JG,
-  RANK_LT,
-  RANK_LT_COMM,
-  RANK_COMMANDER,
-  RANK_CAPTAIN } rank_t;
+enum rank_e { RANK_CIVILIAN, RANK_CREWMAN, RANK_ENSIGN, RANK_LT_JG, RANK_LT, RANK_LT_COMM, RANK_COMMANDER, RANK_CAPTAIN };
 
 qboolean NPC_CheckPlayerTeamStealth(void);
 
@@ -89,7 +84,7 @@ typedef struct AIGroupMember_s {
 typedef struct AIGroupInfo_s {
     int numGroup;
     qboolean processed;
-    npcteam_t team;
+    npcteam_e team;
     gentity_t *enemy;
     int enemyWP;
     int speechDebounceTime;
@@ -106,10 +101,10 @@ typedef struct AIGroupInfo_s {
     AIGroupMember_t member[MAX_GROUP_MEMBERS];
 } AIGroupInfo_t;
 
-int AI_GetGroupSize(vector3 *origin, int radius, team_t playerTeam, gentity_t *avoid);
+int AI_GetGroupSize(vector3 *origin, int radius, team_e playerTeam, gentity_t *avoid);
 int AI_GetGroupSize2(gentity_t *ent, int radius);
 
 void AI_GetGroup(gentity_t *self);
 
 qboolean AI_CheckEnemyCollision(gentity_t *ent, qboolean takeEnemy);
-gentity_t *AI_DistributeAttack(gentity_t *attacker, gentity_t *enemy, team_t team, int threshold);
+gentity_t *AI_DistributeAttack(gentity_t *attacker, gentity_t *enemy, team_e team, int threshold);

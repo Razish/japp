@@ -2558,7 +2558,7 @@ void WP_SaberStartMissileBlockCheck(gentity_t *self, usercmd_t *ucmd);
 qboolean G_PointInBounds(vector3 *point, vector3 *mins, vector3 *maxs);
 
 int g_siegeRespawnCheck = 0;
-void SetMoverState(gentity_t *ent, moverState_t moverState, int time);
+void SetMoverState(gentity_t *ent, moverState_e moverState, int time);
 
 // Advances the non-player objects in the world
 void G_RunFrame(int levelTime) {
@@ -2623,7 +2623,7 @@ void G_RunFrame(int levelTime) {
                 if (useDif > 1.0f) {
                     useDif = 1.0f;
                 }
-                trap->Cvar_Set("timescale", va("%f", useDif));
+                trap->Cvar_Set("timescale", va("%f", (double)useDif));
             } else {
                 char buf[128];
                 float tFVal = 0;
@@ -2678,7 +2678,7 @@ void G_RunFrame(int levelTime) {
     }
     if (level.pause.state == PAUSE_PAUSED) {
         if (lastMsgTime < level.time - 500) {
-            G_Announce(va("Match has been paused.\n%.0f seconds remaining", ceilf((level.pause.time - level.time) / 1000.0f)));
+            G_Announce(va("Match has been paused.\n%.0f seconds remaining", (double)ceilf((level.pause.time - level.time) / 1000.0f)));
             lastMsgTime = level.time;
         }
 
@@ -2687,7 +2687,7 @@ void G_RunFrame(int levelTime) {
     }
     if (level.pause.state == PAUSE_UNPAUSING) {
         if (lastMsgTime < level.time - 500) {
-            G_Announce(va("MATCH IS UNPAUSING\nin %.0f...", ceilf((level.pause.time - level.time) / 1000.0f)));
+            G_Announce(va("MATCH IS UNPAUSING\nin %.0f...", (double)ceilf((level.pause.time - level.time) / 1000.0f)));
             lastMsgTime = level.time;
         }
 
@@ -3368,7 +3368,7 @@ Q_CABI {
             return 0;
 
         case GAME_GETITEMINDEXBYTAG:
-            return BG_GetItemIndexByTag(arg0, (itemType_t)arg1);
+            return BG_GetItemIndexByTag(arg0, (itemType_e)arg1);
 
         default:
             break;

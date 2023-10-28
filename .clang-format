@@ -5,4 +5,4 @@ ColumnLimit: 160
 SortIncludes: Never
 ---
 Language: Cpp
-Standard: c++14
+Standard: c++17

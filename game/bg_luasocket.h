@@ -53,11 +53,11 @@
 
 namespace JPLua {
 
-typedef enum { JPLUA_SOCKET_TCP = 0, JPLUA_SOCKET_UDP } jpluaSocketProtocol_t;
+enum jpluaSocketProtocol_e { JPLUA_SOCKET_TCP = 0, JPLUA_SOCKET_UDP };
 
 typedef struct jpluaSocket_s {
     unsigned int socket;
-    jpluaSocketProtocol_t protocol;
+    jpluaSocketProtocol_e protocol;
     sockaddr_in *sockinfo;
 } jpluaSocket_t;
 

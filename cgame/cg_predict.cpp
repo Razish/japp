@@ -772,7 +772,7 @@ void CG_PredictPlayerState(void) {
                 len = VectorLength(&delta);
                 if (len > 0.1f) {
                     if (cg_showVehMiss.integer)
-                        trap->Print("VEH Prediction miss: %f\n", len);
+                        trap->Print("VEH Prediction miss: %f\n", (double)len);
                     if (cg_errorDecay.integer) {
                         int t;
                         float f;
@@ -782,7 +782,7 @@ void CG_PredictPlayerState(void) {
                         if (f < 0)
                             f = 0;
                         if (f > 0 && cg_showVehMiss.integer)
-                            trap->Print("VEH Double prediction decay: %f\n", f);
+                            trap->Print("VEH Double prediction decay: %f\n", (double)f);
                         VectorScale(&cg.predictedError, f, &cg.predictedError);
                     } else
                         VectorClear(&cg.predictedError);
@@ -794,11 +794,11 @@ void CG_PredictPlayerState(void) {
                     if (!VectorCompare(&oldVehicleState.vehOrientation, &cg.predictedVehicleState.vehOrientation)) {
                         trap->Print("VEH orient prediction error\n");
                         trap->Print("VEH pitch prediction miss: %f\n",
-                                    AngleSubtract(oldVehicleState.vehOrientation.x, cg.predictedVehicleState.vehOrientation.x));
+                                    (double)AngleSubtract(oldVehicleState.vehOrientation.x, cg.predictedVehicleState.vehOrientation.x));
                         trap->Print("VEH yaw prediction miss: %f\n",
-                                    AngleSubtract(oldVehicleState.vehOrientation.y, cg.predictedVehicleState.vehOrientation.y));
+                                    (double)AngleSubtract(oldVehicleState.vehOrientation.y, cg.predictedVehicleState.vehOrientation.y));
                         trap->Print("VEH roll prediction miss: %f\n",
-                                    AngleSubtract(oldVehicleState.vehOrientation.z, cg.predictedVehicleState.vehOrientation.z));
+                                    (double)AngleSubtract(oldVehicleState.vehOrientation.z, cg.predictedVehicleState.vehOrientation.z));
                     }
                 }
             }
@@ -822,7 +822,7 @@ void CG_PredictPlayerState(void) {
                 len = VectorLength(&delta);
                 if (len > 0.1f) {
                     if (cg_showMiss.integer)
-                        trap->Print("Prediction miss: %f\n", len);
+                        trap->Print("Prediction miss: %f\n", (double)len);
                     if (cg_errorDecay.integer) {
                         int t;
                         float f;
@@ -832,7 +832,7 @@ void CG_PredictPlayerState(void) {
                         if (f < 0)
                             f = 0;
                         if (f > 0 && cg_showMiss.integer)
-                            trap->Print("Double prediction decay: %f\n", f);
+                            trap->Print("Double prediction decay: %f\n", (double)f);
                         VectorScale(&cg.predictedError, f, &cg.predictedError);
                     } else
                         VectorClear(&cg.predictedError);

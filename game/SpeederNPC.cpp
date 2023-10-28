@@ -14,7 +14,7 @@ extern vector3 playerMins;
 extern vector3 playerMaxs;
 void ChangeWeapon(gentity_t *ent, int newWeapon);
 void PM_SetAnim(pmove_t *pm, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime);
-int PM_AnimLength(int index, animNumber_t anim);
+int PM_AnimLength(int index, animNumber_e anim);
 #endif
 
 void BG_SetAnim(playerState_t *ps, animation_t *animations, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime);
@@ -255,7 +255,7 @@ void AnimateVehicle(Vehicle_t *pVeh) {}
 // would be nice to have proper prediction of animations. -rww
 //  This function makes sure that the rider's in this vehicle are properly animated.
 void AnimateRiders(Vehicle_t *pVeh) {
-    animNumber_t Anim = BOTH_VS_IDLE;
+    animNumber_e Anim = BOTH_VS_IDLE;
     int iFlags = SETANIM_FLAG_NORMAL, iBlend = 300;
     playerState_t *pilotPS;
     int curTime;
@@ -320,7 +320,7 @@ void AnimateRiders(Vehicle_t *pVeh) {
         qboolean Right = (pVeh->m_ucmd.rightmove > 0);
         qboolean Left = (pVeh->m_ucmd.rightmove < 0);
         qboolean Turbo = (curTime < pVeh->m_iTurboTime);
-        EWeaponPose WeaponPose = WPOSE_NONE;
+        weaponPose_e WeaponPose = WPOSE_NONE;
 
         // Remove Crashing Flag
         pVeh->m_ulFlags &= ~VEH_CRASHING;

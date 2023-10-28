@@ -41,12 +41,12 @@
     TFL_WALK | TFL_CROUCH | TFL_BARRIERJUMP | TFL_JUMP | TFL_LADDER | TFL_WALKOFFLEDGE | TFL_SWIM | TFL_WATERJUMP | TFL_TELEPORT | TFL_ELEVATOR | TFL_AIR |    \
         TFL_WATER | TFL_JUMPPAD | TFL_FUNCBOB
 
-typedef enum {
+enum solid_e {
     SOLID_NOT,     // no interaction with other objects
     SOLID_TRIGGER, // only touch when inside, after moving
     SOLID_BBOX,    // touch on edge
     SOLID_BSP      // bsp clip, touch on edge
-} solid_t;
+};
 
 // a trace is returned when a box is swept through the AAS world
 typedef struct aas_trace_s {

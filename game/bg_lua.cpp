@@ -301,11 +301,11 @@ int StackDump(lua_State *L) {
 }
 
 // Framework functions constants
-typedef enum jpLuaConsts_e {
+enum jpLuaConsts_e {
     JPLUA_FRAMEWORK_TOSTRING,
     JPLUA_FRAMEWORK_PAIRS,
     JPLUA_FRAMEWORK_MAX,
-} jpLuaConsts_t;
+};
 
 // contains lua references to framework functions, if any of these are 0 after init, we have a serious problem
 static int framework[JPLUA_FRAMEWORK_MAX];
@@ -1157,7 +1157,7 @@ int Export_Trace(lua_State *L) {
 
     start = CheckVector(L, 1);
 
-    size = lua_tonumber(L, 2) / 2.0f;
+    size = (float)(lua_tonumber(L, 2) / 2.0);
     VectorSet(&mins, size, size, size);
     VectorScale(&mins, -1.0f, &maxs);
 
@@ -1184,7 +1184,7 @@ int Export_Trace(lua_State *L) {
     lua_pushinteger(L, tr.entityNum);
     lua_settable(L, top);
     lua_pushstring(L, "fraction");
-    lua_pushnumber(L, tr.fraction);
+    lua_pushnumber(L, (double)tr.fraction);
     lua_settable(L, top);
 
     lua_pushstring(L, "endpos");
@@ -1198,7 +1198,7 @@ int Export_Trace(lua_State *L) {
     Vector_CreateRef(L, &tr.plane.normal);
     lua_settable(L, top2);
     lua_pushstring(L, "dist");
-    lua_pushnumber(L, tr.plane.dist);
+    lua_pushnumber(L, (double)tr.plane.dist);
     lua_settable(L, top2);
     lua_pushstring(L, "type");
     lua_pushinteger(L, tr.plane.type);

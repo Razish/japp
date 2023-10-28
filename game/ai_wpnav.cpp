@@ -1627,7 +1627,7 @@ int SavePathData(const char *filename) {
 
     gWPArray[i]->disttonext = flLen;
 
-    Com_sprintf(fileString, 524288, "%s} %f\n", fileString, flLen);
+    Com_sprintf(fileString, 524288, "%s} %f\n", fileString, (double)flLen);
 
     i++;
 

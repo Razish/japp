@@ -1024,11 +1024,11 @@ qboolean CanShoot(gentity_t *ent, gentity_t *shooter) {
 }
 
 /*
-void NPC_CheckPossibleEnemy( gentity_t *other, visibility_t vis )
+void NPC_CheckPossibleEnemy( gentity_t *other, visibility_e vis )
 
 Added: hacks for scripted NPCs
 */
-void NPC_CheckPossibleEnemy(gentity_t *other, visibility_t vis) {
+void NPC_CheckPossibleEnemy(gentity_t *other, visibility_e vis) {
     // is he is already our enemy?
     if (other == NPC->enemy)
         return;
@@ -1192,7 +1192,7 @@ gentity_t *NPC_PickEnemy(gentity_t *closestTo, int enemyTeam, qboolean checkVis,
     float bestDist = Q3_INFINITE;
     qboolean failed = qfalse;
     int visChecks = (CHECK_360 | CHECK_FOV | CHECK_VISRANGE);
-    visibility_t minVis = VIS_FOV;
+    visibility_e minVis = VIS_FOV;
 
     if (enemyTeam == NPCTEAM_NEUTRAL) {
         return NULL;
@@ -1206,6 +1206,7 @@ gentity_t *NPC_PickEnemy(gentity_t *closestTo, int enemyTeam, qboolean checkVis,
     }
 
     if (findPlayersFirst) { // try to find a player first
+                            // FIXME: clientNum 0
         newenemy = &g_entities[0];
         if (newenemy->client && !(newenemy->flags & FL_NOTARGET) && !(newenemy->s.eFlags & EF_NODRAW)) {
             if (newenemy->health > 0) {

@@ -1974,7 +1974,7 @@ qboolean CheckItemCanBePickedUpByNPC(gentity_t *item, gentity_t *pickerupper) {
         && !(pickerupper->NPC->scriptFlags & SCF_FORCED_MARCH) // not being forced to march
         /*&& item->item->giTag != INV_SECURITY_KEY*/) { // non-player, in combat, picking up a dropped item that does NOT belong to the player and it *not* a
                                                         // security key
-        if (level.time - item->s.time < 3000) // was 5000
+        if (level.time - item->s.time < 3000)           // was 5000
         {
             return qfalse;
         }
@@ -2416,9 +2416,9 @@ void FinishSpawningItem(gentity_t *ent) {
             }
         } else {
             if (ent->item->giType == IT_AMMO) {
-                ammo_t ammo_type = (ammo_t)ent->item->giTag;
+                ammo_e ammo_type = (ammo_e)ent->item->giTag;
                 for (int i = WP_BRYAR_PISTOL; i < WP_NUM_WEAPONS; i++) {
-                    if (G_AmmoForWeapon((weapon_t)i) == ammo_type) {
+                    if (G_AmmoForWeapon((weapon_e)i) == ammo_type) {
                         if (g_weaponDisable.bits & i) {
                             continue; // disabled
                         } else {

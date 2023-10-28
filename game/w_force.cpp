@@ -1800,7 +1800,7 @@ qboolean ForceTelepathyCheckDirectNPCTarget(gentity_t *self, trace_t *tr, qboole
         switch (traceEnt->client->NPC_class) {
         case CLASS_GALAKMECH: // cant grip him, he's in armor
         case CLASS_ATST:      // much too big to grip!
-                         // no droids either
+                              // no droids either
         case CLASS_PROBE:
         case CLASS_GONK:
         case CLASS_R2D2:
@@ -1869,8 +1869,8 @@ qboolean ForceTelepathyCheckDirectNPCTarget(gentity_t *self, trace_t *tr, qboole
                         traceEnt->genericValue2 = traceEnt->client->enemyTeam;
                         traceEnt->genericValue3 = traceEnt->s.teamowner;
                         // set the new values
-                        traceEnt->client->playerTeam = (npcteam_t)newPlayerTeam;
-                        traceEnt->client->enemyTeam = (npcteam_t)newEnemyTeam;
+                        traceEnt->client->playerTeam = (npcteam_e)newPlayerTeam;
+                        traceEnt->client->enemyTeam = (npcteam_e)newEnemyTeam;
                         traceEnt->s.teamowner = newPlayerTeam;
                         // FIXME: need a *charmed* timer on this...?  Or do TEAM_PLAYERS assume that "confusion" means they should switch to team_enemy when
                         // done?

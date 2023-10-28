@@ -232,10 +232,10 @@ static void CG_DrawZoomMask(void) {
         //		CG_DrawPic( 198, 118, 246, 246, media.gfx.interface.disruptor.light );
 
         if ((cg.snap->ps.eFlags & EF_DOUBLE_AMMO)) {
-            ammo_t ammoIndex = weaponData[WP_DISRUPTOR].ammoIndex;
+            ammo_e ammoIndex = weaponData[WP_DISRUPTOR].ammoIndex;
             max = cg.snap->ps.ammo[ammoIndex] / ((float)ammoMax[ammoIndex] * 2.0f);
         } else {
-            ammo_t ammoIndex = weaponData[WP_DISRUPTOR].ammoIndex;
+            ammo_e ammoIndex = weaponData[WP_DISRUPTOR].ammoIndex;
             max = cg.snap->ps.ammo[ammoIndex] / (float)ammoMax[ammoIndex];
         }
         if (max > 1.0f)
@@ -655,7 +655,7 @@ static void CG_DrawAmmo(centity_t *cent, menuDef_t *menuHUD) {
         focusItem = Menu_FindItemByName(menuHUD, "ammoamount");
         trap->R_SetColor(&colorTable[CT_WHITE]);
         if (focusItem) {
-            ammo_t ammoIndex = weaponData[cent->currentState.weapon].ammoIndex;
+            ammo_e ammoIndex = weaponData[cent->currentState.weapon].ammoIndex;
             if ((cent->currentState.eFlags & EF_DOUBLE_AMMO)) {
                 inc = (float)(ammoMax[ammoIndex] * 2.0f) / MAX_HUD_TICS;
             } else {
@@ -828,14 +828,14 @@ static void JP_DrawStats(void) {
     }
 
     // Speedometer
-    Com_sprintf(speedStr, sizeof(speedStr), "%s%04.01f ups", (speed >= 800.0f ? S_COLOR_RED : (speed >= 550.0f ? S_COLOR_YELLOW : S_COLOR_WHITE)), speed);
+    Com_sprintf(speedStr, sizeof(speedStr), "%s%04.01f ups", (speed >= 800.0f ? S_COLOR_RED : (speed >= 550.0f ? S_COLOR_YELLOW : S_COLOR_WHITE)),
+                (double)speed);
 
-    const char *statStr =
-        va("%-12s%i\n%-12s%i\n%-12s%.2f\n\n%-12s%i\n%-12s%i\n\n%-12s%s\n%-12s%s\n\n%-12s%s", "Score", cg.snap->ps.persistant[PERS_SCORE], "Deaths",
-           cg.snap->ps.persistant[PERS_KILLED], "Ratio",
-           cg.snap->ps.persistant[PERS_KILLED] ? (float)((float)cg.snap->ps.persistant[PERS_SCORE] / (float)cg.snap->ps.persistant[PERS_KILLED])
-                                               : (float)cg.snap->ps.persistant[PERS_SCORE],
-           "Ping", ping, "FPS", cg.japp.fps, "Local time", localTimeStr, "Map Time", mapTimeStr, "Speed", speedStr);
+    const char *statStr = va("%-12s%i\n%-12s%i\n%-12s%.2f\n\n%-12s%i\n%-12s%i\n\n%-12s%s\n%-12s%s\n\n%-12s%s", "Score", cg.snap->ps.persistant[PERS_SCORE],
+                             "Deaths", cg.snap->ps.persistant[PERS_KILLED], "Ratio",
+                             cg.snap->ps.persistant[PERS_KILLED] ? (double)(cg.snap->ps.persistant[PERS_SCORE] / (float)cg.snap->ps.persistant[PERS_KILLED])
+                                                                 : (double)cg.snap->ps.persistant[PERS_SCORE],
+                             "Ping", ping, "FPS", cg.japp.fps, "Local time", localTimeStr, "Map Time", mapTimeStr, "Speed", speedStr);
 
     const Font font(FONT_JAPPMONO, cg_hudStatsScale.value, false);
     font.Paint(cg.statsPos.x, cg.statsPos.y, statStr, &colorWhite, uiTextStyle_e::Outlined);
@@ -1181,7 +1181,7 @@ void CG_DrawHUD(centity_t *cent) {
 
                  ps->saberMove, ps->legsAnim, ps->torsoAnim, ps->legsTimer, ps->torsoTimer, ps->groundEntityNum, ps->duelIndex, ps->duelInProgress, ps->eFlags,
                  ps->eFlags2, ps->activeForcePass, ps->generic1, ps->genericEnemyIndex, ps->pm_flags, ps->pm_type, ps->ragAttach, ps->fd.forcePowerSelected,
-                 ps->fd.forcePowersKnown, ps->speed,
+                 ps->fd.forcePowersKnown, (double)ps->speed,
 
                  es->bolt1, es->bolt2, es->generic1, es->genericenemyindex,
 
@@ -2099,7 +2099,7 @@ void CG_DrawVehicleArmor(const menuDef_t *menuHUD, const centity_t *veh) {
     }
 }
 
-enum {
+enum vehDamageLocation_e {
     VEH_DAMAGE_FRONT = 0,
     VEH_DAMAGE_BACK,
     VEH_DAMAGE_LEFT,
@@ -2629,7 +2629,7 @@ static float CG_DrawFPS(float y) {
         y += font.Height(s);
     }
     if (cg_drawFPS.integer == 2) {
-        s = va("%i/%3.2f msec", frameTime, 1000.0f / (float)fps);
+        s = va("%i/%3.2f msec", frameTime, (double)(1000.0f / (float)fps));
 
         w = font.Width(s);
         font.Paint(SCREEN_WIDTH - w, y, s, &g_color_table[ColorIndex(COLOR_GREY)], uiTextStyle_e::Shadowed);
@@ -3297,7 +3297,7 @@ static float CG_DrawTeamOverlay(float y, qboolean right, qboolean upper) {
             for (j = 0; j <= PW_NUM_POWERUPS; j++) {
                 if (ci->powerups & (1 << j)) {
 
-                    item = BG_FindItemForPowerup((powerup_t)j);
+                    item = BG_FindItemForPowerup((powerup_e)j);
 
                     if (item) {
                         CG_DrawPic(xx + xOffset, y, TINYCHAR_WIDTH * cgs.widthRatioCoef, TINYCHAR_HEIGHT, trap->R_RegisterShader(item->icon));
@@ -3329,7 +3329,7 @@ static void CG_DrawPowerupIcons(int y) {
 
     for (int j = 0; j < PW_NUM_POWERUPS; j++) {
         if (cg.snap->ps.powerups[j] > cg.time) {
-            const gitem_t *item = BG_FindItemForPowerup((powerup_t)j);
+            const gitem_t *item = BG_FindItemForPowerup((powerup_e)j);
             if (item) {
                 qhandle_t icon = NULL_HANDLE;
                 // FIXME: is this hack necessary? investigate icons for the actual items
@@ -3632,7 +3632,7 @@ static void CG_DrawLagometer(void) {
             total += lagometer.frameSamples[i];
         }
         float avgXerp = total / (float)LAG_SAMPLES;
-        const char *xerpText = va("%04.1f", avgXerp);
+        const char *xerpText = va("%04.1f", (double)avgXerp);
         const float xerpWidth = font.Width(xerpText);
         font.Paint(x + (w * cgs.widthRatioCoef) - xerpWidth, y, xerpText, &colorTable[CT_WHITE], uiTextStyle_e::ShadowedMore);
     }

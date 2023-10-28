@@ -54,7 +54,7 @@ static int RefEntity_Free(lua_State *L) {
     return 0;
 }
 
-static void RefEntity_SetReType(lua_State *L, refEntity_t *ent) { ent->reType = (refEntityType_t)luaL_checkinteger(L, 3); }
+static void RefEntity_SetReType(lua_State *L, refEntity_t *ent) { ent->reType = (refEntityType_e)luaL_checkinteger(L, 3); }
 
 static int RefEntity_GetReType(lua_State *L, refEntity_t *ent) {
     lua_pushinteger(L, ent->reType);

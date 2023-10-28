@@ -1025,16 +1025,16 @@ static void HandleEntityAdjustment(void) {
     newOrigin.z = origin.z;
     VectorAdd(&newOrigin, &level.mOriginAdjust, &newOrigin);
     // damn VMs don't handle outputing a float that is compatible with sscanf in all cases
-    Com_sprintf(temp, MAX_QPATH, "%0.0f %0.0f %0.0f", newOrigin.x, newOrigin.y, newOrigin.z);
+    Com_sprintf(temp, MAX_QPATH, "%0.0f %0.0f %0.0f", (double)newOrigin.x, (double)newOrigin.y, (double)newOrigin.z);
     AddSpawnField("origin", temp);
 
     G_SpawnString("angles", NOVALUE, &value);
     if (Q_stricmp(value, NOVALUE) != 0) {
         sscanf(value, "%f %f %f", &angles.x, &angles.y, &angles.z);
 
-        angles.yaw = fmod(angles.y + level.mRotationAdjust, 360.0f);
+        angles.yaw = fmodf(angles.y + level.mRotationAdjust, 360.0f);
         // damn VMs don't handle outputing a float that is compatible with sscanf in all cases
-        Com_sprintf(temp, MAX_QPATH, "%0.0f %0.0f %0.0f", angles.x, angles.y, angles.z);
+        Com_sprintf(temp, MAX_QPATH, "%0.0f %0.0f %0.0f", (double)angles.x, (double)angles.y, (double)angles.z);
         AddSpawnField("angles", temp);
     } else {
         G_SpawnString("angle", NOVALUE, &value);
@@ -1043,8 +1043,8 @@ static void HandleEntityAdjustment(void) {
         } else {
             angles.y = 0.0f;
         }
-        angles.y = fmod(angles.y + level.mRotationAdjust, 360.0f);
-        Com_sprintf(temp, MAX_QPATH, "%0.0f", angles.y);
+        angles.y = fmodf(angles.y + level.mRotationAdjust, 360.0f);
+        Com_sprintf(temp, MAX_QPATH, "%0.0f", (double)angles.y);
         AddSpawnField("angle", temp);
     }
 
@@ -1056,8 +1056,8 @@ static void HandleEntityAdjustment(void) {
     } else {
         angles.x = angles.y = angles.z = 0.0f;
     }
-    angles.y = fmod(angles.y + level.mRotationAdjust, 360.0f);
-    Com_sprintf(temp, MAX_QPATH, "%0.0f %0.0f %0.0f", angles.x, angles.y, angles.z);
+    angles.y = fmodf(angles.y + level.mRotationAdjust, 360.0f);
+    Com_sprintf(temp, MAX_QPATH, "%0.0f %0.0f %0.0f", (double)angles.x, (double)angles.y, (double)angles.z);
     AddSpawnField("direction", temp);
 
     AddSpawnField("BSPInstanceID", level.mTargetAdjust);

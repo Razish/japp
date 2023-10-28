@@ -1875,7 +1875,7 @@ void G_SleepClient(gclient_t *cl) {
 }
 
 void G_WakeClient(gclient_t *cl) {
-    const animNumber_t anim = BOTH_GETUP1;
+    const animNumber_e anim = BOTH_GETUP1;
     cl->pers.adminData.isSlept = qfalse;
     cl->ps.forceHandExtendTime = level.time + BG_AnimLength(g_entities[cl->ps.clientNum].localAnimIndex, anim);
     cl->ps.forceDodgeAnim = anim;
@@ -2569,7 +2569,7 @@ static void AM_EntList(gentity_t *ent) {
         } else {
             const float distance = ent ? Distance(&ent->s.origin, &e->s.origin) : 1337.0f;
             const char *classname = (e->classname && e->classname[0]) ? e->classname : "Unknown";
-            Q_PrintBuffer(&pb, va("%4i: %s, type: %i, distance: %.0f, coords: %s\n", i, classname, e->s.eType, distance, vtos(&e->s.origin)));
+            Q_PrintBuffer(&pb, va("%4i: %s, type: %i, distance: %.0f, coords: %s\n", i, classname, e->s.eType, (double)distance, vtos(&e->s.origin)));
         }
     }
     Q_PrintBuffer(&pb, "\n");
@@ -2918,7 +2918,7 @@ void Merc_Off(gentity_t *ent) {
         }
     }
 
-    weapon_t wp = (weapon_t)ent->client->ps.weapon;
+    weapon_e wp = (weapon_e)ent->client->ps.weapon;
     if (newWeap != -1) {
         ent->client->ps.weapon = newWeap;
     } else {
@@ -3026,7 +3026,7 @@ static void AM_Rename(gentity_t *ent) {
 
 static void AM_LockTeam(gentity_t *ent) {
     char arg1[16] = {};
-    team_t team;
+    team_e team;
 
     if (trap->Argc() != 2) {
         AM_ConsolePrint(ent, "Syntax: \\amlockteam <team, -1>\n");
@@ -3085,7 +3085,7 @@ static void AM_LockTeam(gentity_t *ent) {
 
 static void AM_UnlockTeam(gentity_t *ent) {
     char arg1[16] = {};
-    team_t team;
+    team_e team;
 
     if (trap->Argc() != 2) {
         AM_ConsolePrint(ent, "Syntax: \\amunlockteam <team, -1>\n");

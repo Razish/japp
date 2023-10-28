@@ -4,11 +4,7 @@
 void Interrogator_Idle(void);
 void DeathFX(gentity_t *ent);
 
-enum {
-    LSTATE_BLADESTOP = 0,
-    LSTATE_BLADEUP,
-    LSTATE_BLADEDOWN,
-};
+enum localState_e { LSTATE_BLADESTOP = 0, LSTATE_BLADEUP, LSTATE_BLADEDOWN };
 
 void NPC_Interrogator_Precache(void) {
     G_SoundIndex("sound/chars/interrogator/misc/torture_droid_lp");
@@ -58,7 +54,7 @@ void Interrogator_PartsMove(void) {
         }
 
         //	gi.G2API_SetBoneAnglesIndex( &NPC->ghoul2[NPC->playerModel], NPC->genericBone1, NPC->pos1, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y,
-        //NEGATIVE_Z, NULL );
+        // NEGATIVE_Z, NULL );
         NPC_SetBoneAngles(NPC, "left_arm", &NPC->pos1);
 
         TIMER_Set(NPC, "syringeDelay", Q_irand(100, 1000));
@@ -86,7 +82,7 @@ void Interrogator_PartsMove(void) {
 
         NPC->pos2.x = AngleNormalize360(NPC->pos2.x);
         //	gi.G2API_SetBoneAnglesIndex( &NPC->ghoul2[NPC->playerModel], NPC->genericBone2, NPC->pos2, BONE_ANGLES_POSTMULT, POSITIVE_X, NEGATIVE_Y,
-        //NEGATIVE_Z, NULL );
+        // NEGATIVE_Z, NULL );
 
         NPC_SetBoneAngles(NPC, "right_arm", &NPC->pos2);
     }

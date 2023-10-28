@@ -181,7 +181,6 @@
     <ClInclude Include="g_unlagged.h" />
     <ClInclude Include="g_xcvar.h" />
     <ClInclude Include="npc_headers.h" />
-    <ClInclude Include="say.h" />
     <ClInclude Include="surfaceflags.h" />
     <ClInclude Include="syn.h" />
     <ClInclude Include="teams.h" />

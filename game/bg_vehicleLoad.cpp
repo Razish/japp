@@ -43,7 +43,7 @@ int numVehicles = 0; // first one is null/default
 
 void BG_VehicleLoadParms(void);
 
-typedef enum {
+enum vehFieldType_e {
     VF_IGNORE,
     VF_INT,
     VF_FLOAT,
@@ -61,12 +61,12 @@ typedef enum {
     VF_SHADER_NOMIP,  // (cgame only) take the string, call trap->R_RegisterShaderNoMip
     VF_SOUND,         // take the string, get the G_SoundIndex
     VF_SOUND_CLIENT   // (cgame only) take the string, get the index
-} vehFieldType_t;
+};
 
 typedef struct {
     const char *name;
     size_t ofs;
-    vehFieldType_t type;
+    vehFieldType_e type;
 } vehField_t;
 
 const vehField_t vehWeaponFields[NUM_VWEAP_PARMS] = {
@@ -104,7 +104,7 @@ static qboolean BG_ParseVehWeaponParm(vehWeaponInfo_t *vehWeapon, char *parmName
     vector3 vec;
     byte *b = (byte *)vehWeapon;
     int _iFieldsRead = 0;
-    vehicleType_t vehType;
+    vehicleType_e vehType;
     char value[1024];
 
     Q_strncpyz(value, pValue, sizeof(value));
@@ -141,8 +141,8 @@ static qboolean BG_ParseVehWeaponParm(vehWeaponInfo_t *vehWeapon, char *parmName
                 *(qboolean *)(b + vehWeaponFields[i].ofs) = (qboolean)(atof(value) != 0);
                 break;
             case VF_VEHTYPE:
-                vehType = (vehicleType_t)GetIDForString(VehicleTable, value);
-                *(vehicleType_t *)(b + vehWeaponFields[i].ofs) = vehType;
+                vehType = (vehicleType_e)GetIDForString(VehicleTable, value);
+                *(vehicleType_e *)(b + vehWeaponFields[i].ofs) = vehType;
                 break;
             case VF_ANIM: {
                 int anim = GetIDForString(animTable, value);
@@ -585,8 +585,8 @@ void BG_VehicleSetDefaults(vehicleInfo_t *vehicle) {
             //general data
             vehicle->type = VH_SPEEDER;				//what kind of vehicle
             //FIXME: no saber or weapons if numHands = 2, should switch to speeder weapon, no attack anim on player
-            vehicle->numHands = 0;					//if 2 hands, no weapons, if 1 hand, can use 1-handed weapons, if 0 hands, can use 2-handed
-       weapons vehicle->lookPitch = 0;				//How far you can look up and down off the forward of the vehicle vehicle->lookYaw = 5;
+            vehicle->numHands = 0;					//if 2 hands, no weapons, if 1 hand, can use 1-handed weapons, if 0 hands, can use
+       2-handed weapons vehicle->lookPitch = 0;				//How far you can look up and down off the forward of the vehicle vehicle->lookYaw = 5;
        //How far you can look left and right off the forward of the vehicle
             vehicle->length = 0;					//how long it is - used for body length traces when turning/moving?
             vehicle->width = 0;						//how wide it is - used for body length traces when turning/moving?
@@ -631,18 +631,18 @@ void BG_VehicleSetDefaults(vehicleInfo_t *vehicle) {
             strcpy(vehicle->model, "models/map_objects/ships/swoop.md3");
 
             vehicle->modelIndex = 0;							//set internally, not until this vehicle is spawned into the level
-            vehicle->skin = NULL;								//what skin to use - if make it an NPC's primary model, don't need
-       this? vehicle->riderAnim = BOTH_GUNSIT1;					//what animation the rider uses
+            vehicle->skin = NULL;								//what skin to use - if make it an NPC's primary model, don't
+       need this? vehicle->riderAnim = BOTH_GUNSIT1;					//what animation the rider uses
 
             vehicle->soundOn = NULL;							//sound to play when get on it
             vehicle->soundLoop = NULL;							//sound to loop while riding it
             vehicle->soundOff = NULL;							//sound to play when get off
             vehicle->exhaustFX = NULL;							//exhaust effect, played from "*exhaust" bolt(s)
             vehicle->trailFX = NULL;							//trail effect, played from "*trail" bolt(s)
-            vehicle->impactFX = NULL;							//explosion effect, for when it blows up (should have the sound built into explosion
-       effect)
-            vehicle->explodeFX = NULL;							//explosion effect, for when it blows up (should have the sound built into explosion
-       effect) vehicle->wakeFX = NULL;								//effect itmakes when going across water
+            vehicle->impactFX = NULL;							//explosion effect, for when it blows up (should have the sound built
+       into explosion effect)
+            vehicle->explodeFX = NULL;							//explosion effect, for when it blows up (should have the sound built
+       into explosion effect) vehicle->wakeFX = NULL;								//effect itmakes when going across water
 
             //other misc stats
             vehicle->gravity = VEH_DEFAULT_GRAVITY;				//normal is 800
@@ -667,8 +667,9 @@ void BG_VehicleSetDefaults(vehicleInfo_t *vehicle) {
             vehicle->cameraOverride = qfalse;					//whether or not to use all of the following 3rd person camera override values
             vehicle->cameraRange = 0.0f;						//how far back the camera should be - normal is 80
             vehicle->cameraVertOffset = 0.0f;					//how high over the vehicle origin the camera should be - normal is 16
-            vehicle->cameraHorzOffset = 0.0f;					//how far to left/right (negative/positive) of of the vehicle origin the camera should be -
-       normal is 0
+            vehicle->cameraHorzOffset = 0.0f;					//how far to left/right (negative/positive) of of the vehicle origin the camera
+       should be
+       - normal is 0
             vehicle->cameraPitchOffset = 0.0f;					//a modifier on the camera's pitch (up/down angle) to the vehicle - normal is 0
             vehicle->cameraFOV = 0.0f;							//third person camera FOV, default is 80
             vehicle->cameraAlpha = qfalse;						//fade out the vehicle if it's in the way of the crosshair
@@ -699,7 +700,7 @@ static qboolean BG_ParseVehicleParm(vehicleInfo_t *vehicle, const char *parmName
     vector3 vec;
     byte *b = (byte *)vehicle;
     int _iFieldsRead = 0;
-    vehicleType_t vehType;
+    vehicleType_e vehType;
     char value[MAX_STRING_CHARS];
 
     Q_strncpyz(value, pValue, sizeof(value));
@@ -738,8 +739,8 @@ static qboolean BG_ParseVehicleParm(vehicleInfo_t *vehicle, const char *parmName
                 *(qboolean *)(b + vehicleFields[i].ofs) = (qboolean)(atof(value) != 0);
                 break;
             case VF_VEHTYPE:
-                vehType = (vehicleType_t)GetIDForString(VehicleTable, value);
-                *(vehicleType_t *)(b + vehicleFields[i].ofs) = vehType;
+                vehType = (vehicleType_e)GetIDForString(VehicleTable, value);
+                *(vehicleType_e *)(b + vehicleFields[i].ofs) = vehType;
                 break;
             case VF_ANIM: {
                 int anim = GetIDForString(animTable, value);

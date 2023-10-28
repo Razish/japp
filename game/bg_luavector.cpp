@@ -137,7 +137,7 @@ static int Vector_ToString(lua_State *L) {
     vector3 *v = CheckVector(L, 1);
     char str[64];
 
-    Com_sprintf(str, sizeof(str), "%.3f %.3f %.3f", v->x, v->y, v->z);
+    Com_sprintf(str, sizeof(str), "%.3f %.3f %.3f", (double)v->x, (double)v->y, (double)v->z);
     lua_pushfstring(L, "Vector3( %s )", str);
 
     return 1;
@@ -159,7 +159,7 @@ static int Vector_Cross(lua_State *L) {
 static int Vector_Distance(lua_State *L) {
     vector3 *from = CheckVector(L, 1), *to = CheckVector(L, 2);
 
-    lua_pushnumber(L, Distance(from, to));
+    lua_pushnumber(L, (double)Distance(from, to));
 
     return 1;
 }
@@ -169,7 +169,7 @@ static int Vector_Distance(lua_State *L) {
 static int Vector_DistanceSquared(lua_State *L) {
     vector3 *from = CheckVector(L, 1), *to = CheckVector(L, 2);
 
-    lua_pushnumber(L, DistanceSquared(from, to));
+    lua_pushnumber(L, (double)DistanceSquared(from, to));
 
     return 1;
 }
@@ -179,7 +179,7 @@ static int Vector_DistanceSquared(lua_State *L) {
 static int Vector_Dot(lua_State *L) {
     vector3 *from = CheckVector(L, 1), *to = CheckVector(L, 2);
 
-    lua_pushnumber(L, DotProduct(from, to));
+    lua_pushnumber(L, (double)DotProduct(from, to));
 
     return 1;
 }
@@ -215,7 +215,7 @@ static int Vector_MA(lua_State *L) {
 static int Vector_Normalise(lua_State *L) {
     vector3 *v = CheckVector(L, 1);
 
-    lua_pushnumber(L, VectorNormalize(v));
+    lua_pushnumber(L, (double)VectorNormalize(v));
 
     return 1;
 }
@@ -237,7 +237,7 @@ static int Vector_NormaliseCopy(lua_State *L) {
     float length = VectorNormalize2(v1, &v2);
 
     Vector_CreateRef(L, v2.x, v2.y, v2.z);
-    lua_pushnumber(L, length);
+    lua_pushnumber(L, (double)length);
 
     return 2;
 }

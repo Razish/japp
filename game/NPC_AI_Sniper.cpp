@@ -31,11 +31,7 @@ static qboolean shoot2;
 static float enemyDist2;
 
 // Local state enums
-enum {
-    LSTATE_NONE = 0,
-    LSTATE_UNDERFIRE,
-    LSTATE_INVESTIGATE,
-};
+enum localState_e { LSTATE_NONE = 0, LSTATE_UNDERFIRE, LSTATE_INVESTIGATE };
 
 void Sniper_ClearTimers(gentity_t *ent) {
     TIMER_Set(ent, "chatter", 0);

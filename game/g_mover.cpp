@@ -422,7 +422,7 @@ void CalcTeamDoorCenter(gentity_t *ent, vector3 *center) {
     }
 }
 
-void SetMoverState(gentity_t *ent, moverState_t moverState, int time) {
+void SetMoverState(gentity_t *ent, moverState_e moverState, int time) {
     vector3 delta;
     float f;
 
@@ -473,7 +473,7 @@ void SetMoverState(gentity_t *ent, moverState_t moverState, int time) {
 }
 
 // All entities in a mover team will move from pos1 to pos2 in the same amount of time
-void MatchTeam(gentity_t *teamLeader, moverState_t moverState, int time) {
+void MatchTeam(gentity_t *teamLeader, moverState_e moverState, int time) {
     gentity_t *slave;
 
     for (slave = teamLeader; slave; slave = slave->teamchain) {
@@ -1952,7 +1952,7 @@ void funcBBrushDieGo(gentity_t *self) {
     if (self->radius > 0.0f) {
         // designer wants to scale number of chunks, helpful because the above scale code is far from perfect
         //	I do this after the scale calculation because it seems that the chunk size generally seems to be very close, it's just the number of chunks is a
-        //bit weak
+        // bit weak
         numChunks *= self->radius;
     }
 
@@ -2060,7 +2060,7 @@ void funcBBrushPain(gentity_t *self, gentity_t *attacker, int damage) {
         if (self->radius > 0.0f) {
             // designer wants to scale number of chunks, helpful because the above scale code is far from perfect
             //	I do this after the scale calculation because it seems that the chunk size generally seems to be very close, it's just the number of chunks is a
-            //bit weak
+            // bit weak
             numChunks = ceilf(numChunks * self->radius);
         }
         G_Chunks(self->s.number, &org, &dir, &self->r.absmin, &self->r.absmax, 300, numChunks, self->material, 0, (scale * self->mass));

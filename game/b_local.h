@@ -5,7 +5,6 @@
 
 #include "g_local.h"
 #include "b_public.h"
-#include "say.h"
 
 #include "ai.h"
 
@@ -61,7 +60,7 @@ extern gentity_t *NPC;
 extern gNPC_t *NPCInfo;
 extern gclient_t *client;
 extern usercmd_t ucmd;
-extern visibility_t enemyVisibility;
+extern visibility_e enemyVisibility;
 
 // AI_Default
 qboolean NPC_CheckInvestigate(int alertEventNum);
@@ -85,7 +84,7 @@ void NPC_BSFollowLeader(void);
 void NPC_BSJump(void);
 void NPC_BSRemove(void);
 void NPC_BSSearch(void);
-void NPC_BSSearchStart(int homeWp, bState_t bState);
+void NPC_BSSearchStart(int homeWp, bState_e bState);
 void NPC_BSWander(void);
 void NPC_StartFlee(gentity_t *enemy, vector3 *dangerPoint, int dangerLevel, int fleeTimeMin, int fleeTimeMax);
 void G_StartFlee(gentity_t *self, gentity_t *enemy, vector3 *dangerPoint, int dangerLevel, int fleeTimeMin, int fleeTimeMax);
@@ -97,7 +96,7 @@ void ShootThink(void);
 void WeaponThink(qboolean inCombat);
 qboolean HaveWeapon(int weapon);
 qboolean CanShoot(gentity_t *ent, gentity_t *shooter);
-void NPC_CheckPossibleEnemy(gentity_t *other, visibility_t vis);
+void NPC_CheckPossibleEnemy(gentity_t *other, visibility_e vis);
 gentity_t *NPC_PickEnemy(gentity_t *closestTo, int enemyTeam, qboolean checkVis, qboolean findPlayersFirst, qboolean findClosest);
 gentity_t *NPC_CheckEnemy(qboolean findNew, qboolean tooFarOk, qboolean setEnemy); // setEnemy = qtrue
 qboolean NPC_CheckAttack(float scale);
@@ -167,7 +166,7 @@ qboolean CanSee(gentity_t *ent);
 qboolean InFOV(gentity_t *ent, gentity_t *from, int hFOV, int vFOV);
 qboolean InFOV2(vector3 *origin, gentity_t *from, int hFOV, int vFOV);
 qboolean InFOV3(vector3 *spot, vector3 *from, vector3 *fromAngles, int hFOV, int vFOV);
-visibility_t NPC_CheckVisibility(gentity_t *ent, uint32_t flags);
+visibility_e NPC_CheckVisibility(gentity_t *ent, uint32_t flags);
 qboolean InVisrange(gentity_t *ent);
 
 // NPC_spawn
@@ -183,7 +182,7 @@ extern int teamNumbers[TEAM_NUM_TEAMS];
 extern int teamStrength[TEAM_NUM_TEAMS];
 extern int teamCounter[TEAM_NUM_TEAMS];
 
-void CalcEntitySpot(const gentity_t *ent, const spot_t spot, vector3 *point);
+void CalcEntitySpot(const gentity_t *ent, const spot_e spot, vector3 *point);
 qboolean NPC_UpdateAngles(qboolean doPitch, qboolean doYaw);
 void NPC_UpdateShootAngles(vector3 *angles, qboolean doPitch, qboolean doYaw);
 qboolean NPC_UpdateFiringAngles(qboolean doPitch, qboolean doYaw);

@@ -45,7 +45,7 @@ int LocalEntity_Create(lua_State *L) {
     return 1;
 }
 
-static void LocalEntity_SetType(lua_State *L, localEntity_t *ent) { ent->leType = (leType_t)luaL_checkinteger(L, 3); }
+static void LocalEntity_SetType(lua_State *L, localEntity_t *ent) { ent->leType = (leType_e)luaL_checkinteger(L, 3); }
 
 static int LocalEntity_GetType(lua_State *L, localEntity_t *ent) {
     lua_pushinteger(L, ent->leType);
@@ -160,14 +160,14 @@ static int LocalEntity_GetLightColor(lua_State *L, localEntity_t *ent) {
     return 1;
 }
 
-static void LocalEntity_SetMarkType(lua_State *L, localEntity_t *ent) { ent->leMarkType = (leMarkType_t)luaL_checkinteger(L, 3); }
+static void LocalEntity_SetMarkType(lua_State *L, localEntity_t *ent) { ent->leMarkType = (leMarkType_e)luaL_checkinteger(L, 3); }
 
 static int LocalEntity_GetMarkType(lua_State *L, localEntity_t *ent) {
     lua_pushinteger(L, ent->leMarkType);
     return 1;
 }
 
-static void LocalEntity_SetBSndType(lua_State *L, localEntity_t *ent) { ent->leBounceSoundType = (leBounceSoundType_t)luaL_checkinteger(L, 3); }
+static void LocalEntity_SetBSndType(lua_State *L, localEntity_t *ent) { ent->leBounceSoundType = (leBounceSoundType_e)luaL_checkinteger(L, 3); }
 
 static int LocalEntity_GetBSndType(lua_State *L, localEntity_t *ent) {
     lua_pushinteger(L, ent->leBounceSoundType);

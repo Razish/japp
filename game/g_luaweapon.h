@@ -15,6 +15,6 @@ int Weapon_SetAltFireFunction(lua_State *L);
 
 #endif // JPLUA
 
-qboolean Weapon_CallFunction(gentity_t *ent, weapon_t type, qboolean altFire);
+qboolean Weapon_CallFunction(gentity_t *ent, weapon_e type, qboolean altFire);
 
 } // namespace JPLua

@@ -28,7 +28,7 @@ void G_ReflectMissile(gentity_t *ent, gentity_t *missile, vector3 *forward) {
     speed = VectorNormalize(&missile->s.pos.trDelta);
 
     // if ( ent && owner && owner->NPC && owner->enemy && Q_stricmp( "Tavion", owner->NPC_type ) == 0 && Q_irand( 0, 3 ) )
-    if (&g_entities[missile->r.ownerNum] && missile->s.weapon != WP_SABER && missile->s.weapon != G2_MODEL_PART && !isowner) { // bounce back at them if you can
+    if (g_entities[missile->r.ownerNum].inuse && missile->s.weapon != WP_SABER && missile->s.weapon != G2_MODEL_PART && !isowner) { // bounce back at them if you can
         VectorSubtract(&g_entities[missile->r.ownerNum].r.currentOrigin, &missile->r.currentOrigin, &bounce_dir);
         VectorNormalize(&bounce_dir);
     } else if (isowner) { // in this case, actually push the missile away from me, and since we're giving boost to our own missile by pushing it, up the
@@ -527,7 +527,7 @@ void G_MissileImpact(gentity_t *ent, trace_t *trace) {
             }
 
             if (didDmg && other && other->client) { // What I'm wondering is why this isn't in the NPC pain funcs. But this is what SP does, so whatever.
-                class_t npc_class = other->client->NPC_class;
+                class_e npc_class = other->client->NPC_class;
 
                 // If we are a robot and we aren't currently doing the full body electricity...
                 if (npc_class == CLASS_SEEKER || npc_class == CLASS_PROBE || npc_class == CLASS_MOUSE || npc_class == CLASS_GONK || npc_class == CLASS_R2D2 ||

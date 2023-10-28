@@ -16,7 +16,7 @@ namespace JPLua {
 std::unordered_map<int, luaWeapon_t> weaponCallbacks;
 #endif // JPLUA
 
-qboolean Weapon_CallFunction(gentity_t *ent, weapon_t type, qboolean altFire) {
+qboolean Weapon_CallFunction(gentity_t *ent, weapon_e type, qboolean altFire) {
 #ifdef JPLUA
     luaWeapon_t *handle = &weaponCallbacks[type];
     if (altFire) {
@@ -41,7 +41,7 @@ qboolean Weapon_CallFunction(gentity_t *ent, weapon_t type, qboolean altFire) {
 
 #ifdef JPLUA
 int Weapon_SetFireFunction(lua_State *L) {
-    weapon_t type = (weapon_t)luaL_checkinteger(L, 1);
+    weapon_e type = (weapon_e)luaL_checkinteger(L, 1);
     luaWeapon_t *handle = &weaponCallbacks[type];
     if (lua_type(L, 2) != LUA_TFUNCTION) {
         return 0;
@@ -58,7 +58,7 @@ int Weapon_SetFireFunction(lua_State *L) {
 }
 
 int Weapon_SetAltFireFunction(lua_State *L) {
-    weapon_t type = (weapon_t)luaL_checkinteger(L, 1);
+    weapon_e type = (weapon_e)luaL_checkinteger(L, 1);
     luaWeapon_t *handle = &weaponCallbacks[type];
     if (lua_type(L, 2) != LUA_TFUNCTION) {
         return 0;

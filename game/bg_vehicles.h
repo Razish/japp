@@ -2,7 +2,7 @@
 
 #include "qcommon/q_shared.h"
 
-typedef enum vehicleType_e {
+enum vehicleType_e {
     VH_NONE = 0, // 0 just in case anyone confuses VH_NONE and VEHICLE_NONE below
     VH_WALKER,   // something you ride inside of, it walks like you, like an AT-ST
     VH_FIGHTER,  // something you fly inside of, like an X-Wing or TIE fighter
@@ -10,14 +10,14 @@ typedef enum vehicleType_e {
     VH_ANIMAL,   // animal you ride on top of that walks, like a tauntaun
     VH_FLIER,    // animal you ride on top of that flies, like a giant mynoc?
     VH_NUM_VEHICLES
-} vehicleType_t;
+};
 
-typedef enum {
+enum weaponPose_e {
     WPOSE_NONE = 0,
     WPOSE_BLASTER,
     WPOSE_SABERLEFT,
     WPOSE_SABERRIGHT,
-} EWeaponPose;
+};
 
 extern stringID_table_t VehicleTable[VH_NUM_VEHICLES + 1];
 
@@ -38,17 +38,17 @@ typedef struct vehWeaponInfo_s {
     int iLoopSound;           // index of loopSound
     float fSpeed;             // speed of projectile/range of traceline
     float fHoming;            // 0.0f = not homing, 0.5f = half vel to targ, half cur vel, 1.0f = all vel to targ
-    float fHomingFOV; // missile will lose lock on if DotProduct of missile direction and direction to target ever drops below this (-1 to 1, -1 = never lose
-                      // target, 0 = lose if ship gets behind missile, 1 = pretty much will lose it's target right away)
-    int iLockOnTime;           // 0 = no lock time needed, else # of ms needed to lock on
-    int iDamage;               // damage done when traceline or projectile directly hits target
-    int iSplashDamage;         // damage done to ents in splashRadius of end of traceline or projectile origin on impact
-    float fSplashRadius;       // radius that ent must be in to take splashDamage (linear fall-off)
-    int iAmmoPerShot;          // how much "ammo" each shot takes
-    int iHealth;               // if non-zero, projectile can be shot, takes this much damage before being destroyed
-    float fWidth;              // width of traceline or bounding box of projecile (non-rotating!)
-    float fHeight;             // height of traceline or bounding box of projecile (non-rotating!)
-    int iLifeTime;             // removes itself after this amount of time
+    float fHomingFOV;    // missile will lose lock on if DotProduct of missile direction and direction to target ever drops below this (-1 to 1, -1 = never lose
+                         // target, 0 = lose if ship gets behind missile, 1 = pretty much will lose it's target right away)
+    int iLockOnTime;     // 0 = no lock time needed, else # of ms needed to lock on
+    int iDamage;         // damage done when traceline or projectile directly hits target
+    int iSplashDamage;   // damage done to ents in splashRadius of end of traceline or projectile origin on impact
+    float fSplashRadius; // radius that ent must be in to take splashDamage (linear fall-off)
+    int iAmmoPerShot;    // how much "ammo" each shot takes
+    int iHealth;         // if non-zero, projectile can be shot, takes this much damage before being destroyed
+    float fWidth;        // width of traceline or bounding box of projecile (non-rotating!)
+    float fHeight;       // height of traceline or bounding box of projecile (non-rotating!)
+    int iLifeTime;       // removes itself after this amount of time
     qboolean bExplodeOnExpire; // when iLifeTime is up, explodes rather than simply removing itself
 } vehWeaponInfo_t;
 // NOTE: this MUST stay up to date with the number of variables in the vehFields table!!!
@@ -288,7 +288,7 @@ typedef struct vehicleInfo_s {
     char *name; // unique name of the vehicle
 
     // general data
-    vehicleType_t type;      // what kind of vehicle
+    vehicleType_e type;      // what kind of vehicle
     int numHands;            // if 2 hands, no weapons, if 1 hand, can use 1-handed weapons, if 0 hands, can use 2-handed weapons
     float lookPitch;         // How far you can look up and down off the forward of the vehicle
     float lookYaw;           // How far you can look left and right off the forward of the vehicle
@@ -308,7 +308,7 @@ typedef struct vehicleInfo_s {
     float decelIdle;      // when giving no input, how quickly it drops to speedIdle
     float throttleSticks; // if true, speed stays at whatever you accel/decel to, unless you turbo or brake
     float strafePerc;     // multiplier on current speed for strafing.  If 1.0f, you can strafe at the same speed as you're going forward, 0.5f is half, 0 is no
-                      // strafing
+                          // strafing
 
     // handling stats
     float bankingSpeed;             // how quickly it pitches and rolls (not under player control)
@@ -553,7 +553,7 @@ extern int numVehicles;
 #define VEH_MOUNT_THROW_LEFT -5
 #define VEH_MOUNT_THROW_RIGHT -6
 
-typedef enum { VEH_EJECT_LEFT, VEH_EJECT_RIGHT, VEH_EJECT_FRONT, VEH_EJECT_REAR, VEH_EJECT_TOP, VEH_EJECT_BOTTOM } vehEject_t;
+enum vehEject_e { VEH_EJECT_LEFT, VEH_EJECT_RIGHT, VEH_EJECT_FRONT, VEH_EJECT_REAR, VEH_EJECT_TOP, VEH_EJECT_BOTTOM };
 
 // Vehicle flags.
 #define VEH_NONE (0x0000u)

@@ -11,7 +11,7 @@
 extern stringID_table_t WPTable[];
 extern stringID_table_t BSTable[];
 
-enum {
+enum token_e {
     TK_EOF = -1,
     TK_UNDEFINED,
     TK_COMMENT,
@@ -648,7 +648,7 @@ void Q3_Lerp2Pos(int taskID, int entID, vector3 *origin, vector3 *angles, float 
     gentity_t *ent = &g_entities[entID];
     vector3 ang;
     int i;
-    moverState_t moverState;
+    moverState_e moverState;
 
     if (!ent) {
         G_DebugPrint(WL_WARNING, "Q3_Lerp2Pos: invalid entID %d\n", entID);
@@ -1328,7 +1328,7 @@ int Q3_GetString(int entID, int type, const char *name, const char **value) {
 
         //# #sep Scripts and other file paths
     case SET_SPAWNSCRIPT: //## %s="NULL" !!"W:\game\base\scripts\!!#*.txt" # Script to run when spawned //0 - do not change these, these are equal to
-                          //BSET_SPAWN, etc
+                          // BSET_SPAWN, etc
         *value = ent->behaviorSet[BSET_SPAWN];
         break;
     case SET_USESCRIPT: //## %s="NULL" !!"W:\game\base\scripts\!!#*.txt" # Script to run when used
@@ -1584,7 +1584,7 @@ static void Q3_SetAngles(int entID, vector3 *angles) {
 // Lerps the origin to the destination value
 void Q3_Lerp2Origin(int taskID, int entID, vector3 *origin, float duration) {
     gentity_t *ent = &g_entities[entID];
-    moverState_t moverState;
+    moverState_e moverState;
 
     if (!ent) {
         G_DebugPrint(WL_WARNING, "Q3_Lerp2Origin: invalid entID %d\n", entID);
@@ -1948,7 +1948,7 @@ static void Q3_SetArmor(int entID, int data) {
 // FIXME: this should be a general NPC wrapper function that is called ANY time a bState is changed...
 static qboolean Q3_SetBState(int entID, const char *bs_name) {
     gentity_t *ent = &g_entities[entID];
-    bState_t bSID;
+    bState_e bSID;
 
     if (!ent) {
         G_DebugPrint(WL_WARNING, "Q3_SetBState: invalid entID %d\n", entID);
@@ -1960,8 +1960,8 @@ static qboolean Q3_SetBState(int entID, const char *bs_name) {
         return qtrue; // ok to complete
     }
 
-    bSID = (bState_t)(GetIDForString(BSTable, bs_name));
-    if (bSID != (bState_t)-1) {
+    bSID = (bState_e)(GetIDForString(BSTable, bs_name));
+    if (bSID != (bState_e)-1) {
         if (bSID == BS_SEARCH || bSID == BS_WANDER) {
             // FIXME: Reimplement
 
@@ -2046,7 +2046,7 @@ static qboolean Q3_SetBState(int entID, const char *bs_name) {
 
 static qboolean Q3_SetTempBState(int entID, const char *bs_name) {
     gentity_t *ent = &g_entities[entID];
-    bState_t bSID;
+    bState_e bSID;
 
     if (!ent) {
         G_DebugPrint(WL_WARNING, "Q3_SetTempBState: invalid entID %d\n", entID);
@@ -2058,8 +2058,8 @@ static qboolean Q3_SetTempBState(int entID, const char *bs_name) {
         return qtrue; // ok to complete
     }
 
-    bSID = (bState_t)(GetIDForString(BSTable, bs_name));
-    if (bSID != (bState_t)-1) {
+    bSID = (bState_e)(GetIDForString(BSTable, bs_name));
+    if (bSID != (bState_e)-1) {
         ent->NPC->tempBehavior = bSID;
     }
 
@@ -2082,7 +2082,7 @@ static qboolean Q3_SetTempBState(int entID, const char *bs_name) {
 
 static void Q3_SetDefaultBState(int entID, const char *bs_name) {
     gentity_t *ent = &g_entities[entID];
-    bState_t bSID;
+    bState_e bSID;
 
     if (!ent) {
         G_DebugPrint(WL_WARNING, "Q3_SetDefaultBState: invalid entID %d\n", entID);
@@ -2094,8 +2094,8 @@ static void Q3_SetDefaultBState(int entID, const char *bs_name) {
         return;
     }
 
-    bSID = (bState_t)(GetIDForString(BSTable, bs_name));
-    if (bSID != (bState_t)-1) {
+    bSID = (bState_e)(GetIDForString(BSTable, bs_name));
+    if (bSID != (bState_e)-1) {
         ent->NPC->defaultBehavior = bSID;
     }
 }
@@ -2232,7 +2232,7 @@ void Q3_SetViewEntity(int entID, const char *name) { G_DebugPrint(WL_WARNING, "Q
 void ChangeWeapon(gentity_t *ent, int newWeapon);
 static void Q3_SetWeapon(int entID, const char *wp_name) {
     gentity_t *ent = &g_entities[entID];
-    weapon_t wp = (weapon_t)GetIDForString(WPTable, wp_name);
+    weapon_e wp = (weapon_e)GetIDForString(WPTable, wp_name);
 
     ent->client->ps.stats[STAT_WEAPONS] = (1 << wp);
     ChangeWeapon(ent, wp);
@@ -2531,8 +2531,8 @@ void Q3_SetParm(int entID, int parmNum, const char *parmValue) {
     }
 
     if ((val = Q3_GameSideCheckStringCounterIncrement(parmValue))) {
-        val += atof(ent->parms->parm[parmNum]);
-        Com_sprintf(ent->parms->parm[parmNum], sizeof(ent->parms->parm), "%f", val);
+        val += atoff(ent->parms->parm[parmNum]);
+        Com_sprintf(ent->parms->parm[parmNum], sizeof(ent->parms->parm), "%f", (double)val);
     } else { // Just copy the string
         // copy only 16 characters
         strncpy(ent->parms->parm[parmNum], parmValue, sizeof(ent->parms->parm[0]));
@@ -2965,7 +2965,7 @@ static void Q3_SetNoImpactDamage(int entID, qboolean noImp) { G_DebugPrint(WL_WA
 
 static qboolean Q3_SetBehaviorSet(int entID, int toSet, const char *scriptname) {
     gentity_t *ent = &g_entities[entID];
-    bSet_t bSet;
+    bSet_e bSet;
 
     if (!ent) {
         G_DebugPrint(WL_WARNING, "Q3_SetBehaviorSet: invalid entID %d\n", entID);

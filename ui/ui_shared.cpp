@@ -221,11 +221,11 @@ void String_Report(void) {
     f = strPoolIndex;
     f /= STRING_POOL_SIZE;
     f *= 100;
-    Com_Printf("String Pool is %.1f%% full, %i bytes out of %i used.\n", f, strPoolIndex, STRING_POOL_SIZE);
+    Com_Printf("String Pool is %.1f%% full, %i bytes out of %i used.\n", (double)f, strPoolIndex, STRING_POOL_SIZE);
     f = allocPoint;
     f /= MEM_POOL_SIZE;
     f *= 100;
-    Com_Printf("Memory Pool is %.1f%% full, %i bytes out of %i used.\n", f, allocPoint, MEM_POOL_SIZE);
+    Com_Printf("Memory Pool is %.1f%% full, %i bytes out of %i used.\n", (double)f, allocPoint, MEM_POOL_SIZE);
 }
 
 void String_Init(void) {
@@ -852,9 +852,9 @@ qboolean Script_SetItemRectCvar(itemDef_t *item, char **args) {
             if (String_Parse(&holdBuf, &holdVal)) {
                 menuDef_t *menu = (menuDef_t *)item->parent;
 
-                item2->window.rectClient.x = atof(holdVal) + menu->window.rect.x;
+                item2->window.rectClient.x = atoff(holdVal) + menu->window.rect.x;
                 if (String_Parse(&holdBuf, &holdVal)) {
-                    item2->window.rectClient.y = atof(holdVal) + menu->window.rect.y;
+                    item2->window.rectClient.y = atoff(holdVal) + menu->window.rect.y;
                     if (String_Parse(&holdBuf, &holdVal)) {
                         item2->window.rectClient.w = atof(holdVal);
                         if (String_Parse(&holdBuf, &holdVal)) {
@@ -2954,7 +2954,7 @@ qboolean Item_Multi_HandleKey(itemDef_t *item, int key) {
                     if (((float)((int)value)) == value) {
                         DC->setCVar(item->cvar, va("%i", (int)value));
                     } else {
-                        DC->setCVar(item->cvar, va("%f", value));
+                        DC->setCVar(item->cvar, va("%f", (double)value));
                     }
                 }
                 if (item->special.i) { // its a feeder?
@@ -3337,7 +3337,7 @@ static void Scroll_Slider_ThumbFunc(void *p) {
     value /= sliderWidth;
     value *= (editDef->maxVal - editDef->minVal);
     value += editDef->minVal;
-    DC->setCVar(si->item->cvar, va("%f", value));
+    DC->setCVar(si->item->cvar, va("%f", (double)value));
 }
 
 void Item_StartCapture(itemDef_t *item, int key) {
@@ -3448,7 +3448,7 @@ qboolean Item_Slider_HandleKey(itemDef_t *item, int key, qboolean down) {
                     // vm fuckage
                     // value = (((float)(DC->cursorx - x)/ SLIDER_WIDTH) * (editDef->maxVal - editDef->minVal));
                     value += editDef->minVal;
-                    DC->setCVar(item->cvar, va("%f", value));
+                    DC->setCVar(item->cvar, va("%f", (double)value));
                     return qtrue;
                 }
             }
@@ -3910,13 +3910,13 @@ void Item_TextColor(itemDef_t *item, vector4 *newColor) {
         lowLight.g = 0.8f * parent->focusColor.g;
         lowLight.b = 0.8f * parent->focusColor.b;
         lowLight.a = 0.8f * parent->focusColor.a;
-        LerpColor(&parent->focusColor, &lowLight, newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / PULSE_DIVISOR)));
+        LerpColor(&parent->focusColor, &lowLight, newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / (float)PULSE_DIVISOR)));
     } else if (item->textStyle == uiTextStyle_e::Blink && !((DC->realTime / BLINK_DIVISOR) & 1)) {
         lowLight.r = 0.8f * item->window.foreColor.r;
         lowLight.g = 0.8f * item->window.foreColor.g;
         lowLight.b = 0.8f * item->window.foreColor.b;
         lowLight.a = 0.8f * item->window.foreColor.a;
-        LerpColor(&item->window.foreColor, &lowLight, newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / PULSE_DIVISOR)));
+        LerpColor(&item->window.foreColor, &lowLight, newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / (float)PULSE_DIVISOR)));
     } else {
         memcpy(newColor, &item->window.foreColor, sizeof(vector4));
         // items can be enabled and disabled based on cvars
@@ -3998,7 +3998,7 @@ void Item_Text_AutoWrapped_Paint(itemDef_t *item) {
                 } else if (item->textalignment == ITEM_ALIGN_RIGHT) {
                     item->textRect.x = item->textalignx - newLineWidth;
                 } else if (item->textalignment == ITEM_ALIGN_CENTER) {
-                    item->textRect.x = item->textalignx - newLineWidth / 2;
+                    item->textRect.x = item->textalignx - newLineWidth / 2.0f;
                 }
                 item->textRect.y = y;
                 ToWindowCoords(&item->textRect.x, &item->textRect.y, &item->window);
@@ -4153,7 +4153,7 @@ void Item_TextField_Paint(itemDef_t *item) {
         lowLight.g = 0.8f * parent->focusColor.g;
         lowLight.b = 0.8f * parent->focusColor.b;
         lowLight.a = 0.8f * parent->focusColor.a;
-        LerpColor(&parent->focusColor, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / PULSE_DIVISOR)));
+        LerpColor(&parent->focusColor, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / (float)PULSE_DIVISOR)));
     } else {
         memcpy(&newColor, &item->window.foreColor, sizeof(vector4));
     }
@@ -4185,7 +4185,7 @@ void Item_YesNo_Paint(itemDef_t *item) {
         lowLight.g = 0.8f * parent->focusColor.g;
         lowLight.b = 0.8f * parent->focusColor.b;
         lowLight.a = 0.8f * parent->focusColor.a;
-        LerpColor(&parent->focusColor, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / PULSE_DIVISOR)));
+        LerpColor(&parent->focusColor, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / (float)PULSE_DIVISOR)));
     } else {
         memcpy(&newColor, &item->window.foreColor, sizeof(vector4));
     }
@@ -4218,7 +4218,7 @@ void Item_Multi_Paint(itemDef_t *item) {
         lowLight.g = 0.8f * parent->focusColor.g;
         lowLight.b = 0.8f * parent->focusColor.b;
         lowLight.a = 0.8f * parent->focusColor.a;
-        LerpColor(&parent->focusColor, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / PULSE_DIVISOR)));
+        LerpColor(&parent->focusColor, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / (float)PULSE_DIVISOR)));
     } else {
         memcpy(&newColor, &item->window.foreColor, sizeof(vector4));
     }
@@ -4460,7 +4460,7 @@ void Item_Slider_Paint(itemDef_t *item) {
         lowLight.g = 0.8f * parent->focusColor.g;
         lowLight.b = 0.8f * parent->focusColor.b;
         lowLight.a = 0.8f * parent->focusColor.a;
-        LerpColor(&parent->focusColor, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / PULSE_DIVISOR)));
+        LerpColor(&parent->focusColor, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / (float)PULSE_DIVISOR)));
     } else {
         memcpy(&newColor, &item->window.foreColor, sizeof(vector4));
     }
@@ -4523,7 +4523,7 @@ void Item_Bind_Paint(itemDef_t *item) {
             lowLight.b = 0.8f * parent->focusColor.b;
             lowLight.a = 0.8f * parent->focusColor.a;
         }
-        LerpColor(&parent->focusColor, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / PULSE_DIVISOR)));
+        LerpColor(&parent->focusColor, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(DC->realTime / (float)PULSE_DIVISOR)));
     } else {
         memcpy(&newColor, &item->window.foreColor, sizeof(vector4));
     }
@@ -5279,13 +5279,13 @@ void Item_OwnerDraw_Paint(itemDef_t *item) {
             lowLight.g = 0.8f * parent->focusColor.g;
             lowLight.b = 0.8f * parent->focusColor.b;
             lowLight.a = 0.8f * parent->focusColor.a;
-            LerpColor(&parent->focusColor, &lowLight, &color, 0.5f + 0.5f * sinf((float)(DC->realTime / PULSE_DIVISOR)));
+            LerpColor(&parent->focusColor, &lowLight, &color, 0.5f + 0.5f * sinf((float)(DC->realTime / (float)PULSE_DIVISOR)));
         } else if (item->textStyle == uiTextStyle_e::Blink && !((DC->realTime / BLINK_DIVISOR) & 1)) {
             lowLight.r = 0.8f * item->window.foreColor.r;
             lowLight.g = 0.8f * item->window.foreColor.g;
             lowLight.b = 0.8f * item->window.foreColor.b;
             lowLight.a = 0.8f * item->window.foreColor.a;
-            LerpColor(&item->window.foreColor, &lowLight, &color, 0.5f + 0.5f * sinf((float)(DC->realTime / PULSE_DIVISOR)));
+            LerpColor(&item->window.foreColor, &lowLight, &color, 0.5f + 0.5f * sinf((float)(DC->realTime / (float)PULSE_DIVISOR)));
         }
 
         if (item->disabled) {
@@ -6283,7 +6283,7 @@ qboolean ItemParse_asset_model_go(itemDef_t *item, const char *name, int *runTim
 
             if (modelPtr->g2skin) {
                 //					DC->g2_SetSkin( &item->ghoul2[0], 0, modelPtr->g2skin );//this is going to set the surfs on/off matching
-                //the skin file trap->G2API_InitGhoul2Model(&item->ghoul2, name, 0, modelPtr->g2skin, 0, 0, 0); ahh, what are you doing?!
+                // the skin file trap->G2API_InitGhoul2Model(&item->ghoul2, name, 0, modelPtr->g2skin, 0, 0, 0); ahh, what are you doing?!
                 trap->G2API_SetSkin(item->ghoul2, 0, modelPtr->g2skin, modelPtr->g2skin);
             }
         }
@@ -6712,7 +6712,7 @@ qboolean ItemParse_flag(itemDef_t *item, int handle) {
     }
 
     if (itemFlags[i].string == NULL) {
-        Com_Printf(va(S_COLOR_YELLOW "Unknown item style value '%s'", token.string));
+        Com_Printf( S_COLOR_YELLOW "Unknown item style value '%s'", token.string);
     }
 
     return qtrue;
@@ -8330,8 +8330,8 @@ void Menu_PaintAll(void) {
 
     if (debugMode) {
         const Font font(FONT_NONE, 0.75f, false);
-        font.Paint(5.0f, 25.0f, va("fps: %f", DC->FPS));
-        font.Paint(5.0f, 45.0f, va("x: %.0f  y:%.0f", DC->cursorx, DC->cursory));
+        font.Paint(5.0f, 25.0f, va("fps: %f", (double)DC->FPS));
+        font.Paint(5.0f, 45.0f, va("x: %i  y:%i", (int)DC->cursorx, (int)DC->cursory));
     }
 }
 

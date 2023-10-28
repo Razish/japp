@@ -34,7 +34,7 @@ qboolean G_HeavyMelee(gentity_t *attacker) {
     return qfalse;
 }
 
-hitLocation_t G_GetHitLocation(gentity_t *target, vector3 *ppoint) {
+hitLocation_e G_GetHitLocation(gentity_t *target, vector3 *ppoint) {
     vector3 point, point_dir, fwd, rt, up, tangles, tcenter;
     float udot, fdot, rdot;
     int vertical, forward, lateral, hitLoc;
@@ -246,7 +246,7 @@ void TossClientWeapon(gentity_t *self, vector3 *direction, float speed) {
     }
 
     // find the item type for this weapon
-    item = BG_FindItemForWeapon((weapon_t)weapon);
+    item = BG_FindItemForWeapon((weapon_e)weapon);
 
     ammoSub = (self->client->ps.ammo[weaponData[weapon].ammoIndex] - bg_itemlist[BG_GetItemIndexByTag(weapon, IT_WEAPON)].quantity);
 
@@ -338,7 +338,7 @@ void TossClientItems(gentity_t *self) {
         gentity_t *te;
 
         // find the item type for this weapon
-        item = BG_FindItemForWeapon((weapon_t)weapon);
+        item = BG_FindItemForWeapon((weapon_e)weapon);
 
         // tell all clients to remove the weapon model on this guy until he respawns
         te = G_TempEntity(&vec3_origin, EV_DESTROY_WEAPON_MODEL);
@@ -354,7 +354,7 @@ void TossClientItems(gentity_t *self) {
         angle = 45;
         for (i = 1; i < PW_NUM_POWERUPS; i++) {
             if (self->client->ps.powerups[i] > level.time) {
-                item = BG_FindItemForPowerup((powerup_t)i);
+                item = BG_FindItemForPowerup((powerup_e)i);
                 if (!item) {
                     continue;
                 }

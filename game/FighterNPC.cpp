@@ -17,7 +17,7 @@ extern vector3 playerMins;
 extern vector3 playerMaxs;
 void ChangeWeapon(gentity_t *ent, int newWeapon);
 void PM_SetAnim(pmove_t *pm, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime);
-int PM_AnimLength(int index, animNumber_t anim);
+int PM_AnimLength(int index, animNumber_e anim);
 void G_VehicleTrace(trace_t *results, const vector3 *start, const vector3 *tMins, const vector3 *tMaxs, const vector3 *end, int passEntityNum, int contentmask);
 #endif
 
@@ -216,7 +216,7 @@ qboolean FighterIsLaunching(Vehicle_t *pVeh, playerState_t *parentPS) {
 qboolean FighterSuspended(Vehicle_t *pVeh, playerState_t *parentPS) {
 #if defined(PROJECT_GAME) // only do this check on game side, because if it's cgame, it's being predicted, and it's only predicted if the local client is the
                           // driver
-    if (!pVeh->m_pPilot                                                                             // empty
+    if (!pVeh->m_pPilot   // empty
         && !(int)parentPS->speed                                                                    // not moving
         && pVeh->m_ucmd.forwardmove <= 0                                                            // not trying to go forward for whatever reason
         && pVeh->m_pParentEntity != NULL && (((gentity_t *)pVeh->m_pParentEntity)->spawnflags & 2)) // SUSPENDED spawnflag is on
@@ -260,8 +260,8 @@ static void ProcessMoveCommands(Vehicle_t *pVeh) {
                 parentPS->speed = 0.0f;
             } else {
                 if (parentPS->speed < HYPERSPACE_SPEED) { // just started hyperspace
-                    // MIKE: This is going to play the sound twice for the predicting client, I suggest using
-                    // a predicted event or only doing it game-side. -rich
+                                                          // MIKE: This is going to play the sound twice for the predicting client, I suggest using
+                                                          // a predicted event or only doing it game-side. -rich
 #if defined(PROJECT_GAME)
                     // G_EntitySound( ((gentity_t *)(pVeh->m_pParentEntity)), CHAN_LOCAL, pVeh->m_pVehicleInfo->soundHyper );
 #elif defined(PROJECT_CGAME)

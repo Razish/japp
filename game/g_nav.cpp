@@ -202,7 +202,7 @@ qboolean NAV_ClearPathToPoint(gentity_t *self, vector3 *pmins, vector3 *pmaxs, v
             return qtrue;
         } else {
             if (NAVDEBUG_showCollision) {
-                if (trace.entityNum < ENTITYNUM_WORLD && (&g_entities[trace.entityNum] != NULL) && g_entities[trace.entityNum].s.eType != ET_MOVER) {
+                if (trace.entityNum < ENTITYNUM_WORLD && (g_entities[trace.entityNum].inuse) && g_entities[trace.entityNum].s.eType != ET_MOVER) {
                     vector3 p1, p2;
                     //	G_DrawEdge( point, trace.endpos, EDGE_PATH );
                     VectorAdd(&g_entities[trace.entityNum].r.mins, &g_entities[trace.entityNum].r.currentOrigin, &p1);
@@ -228,7 +228,7 @@ qboolean NAV_ClearPathToPoint(gentity_t *self, vector3 *pmins, vector3 *pmaxs, v
         }
 
         if (NAVDEBUG_showCollision) {
-            if (trace.entityNum < ENTITYNUM_WORLD && (&g_entities[trace.entityNum] != NULL) && g_entities[trace.entityNum].s.eType != ET_MOVER) {
+            if (trace.entityNum < ENTITYNUM_WORLD && (g_entities[trace.entityNum].inuse) && g_entities[trace.entityNum].s.eType != ET_MOVER) {
                 vector3 p1, p2;
                 //	G_DrawEdge( self->r.currentOrigin, trace.endpos, EDGE_PATH );
                 VectorAdd(&g_entities[trace.entityNum].r.mins, &g_entities[trace.entityNum].r.currentOrigin, &p1);

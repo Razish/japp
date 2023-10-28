@@ -339,7 +339,7 @@ void CG_FixDirection(void) {
 
     cg.japp.fixedVector.z = 0;
     cg.japp.isfixedVector = qtrue;
-    trap->Print("Direction set (%.3f,%.3f).\n", cg.japp.fixedVector.x, cg.japp.fixedVector.y);
+    trap->Print("Direction set (%.3f,%.3f).\n", (double)cg.japp.fixedVector.x, (double)cg.japp.fixedVector.y);
 }
 
 void CG_SayTeam_f(void) {

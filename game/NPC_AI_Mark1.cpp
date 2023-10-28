@@ -23,16 +23,7 @@
 #define BOWCASTER_SPLASH_RADIUS 0
 
 // Local state enums
-enum {
-    LSTATE_NONE = 0,
-    LSTATE_ASLEEP,
-    LSTATE_WAKEUP,
-    LSTATE_FIRED0,
-    LSTATE_FIRED1,
-    LSTATE_FIRED2,
-    LSTATE_FIRED3,
-    LSTATE_FIRED4,
-};
+enum localState_e { LSTATE_NONE = 0, LSTATE_ASLEEP, LSTATE_WAKEUP, LSTATE_FIRED0, LSTATE_FIRED1, LSTATE_FIRED2, LSTATE_FIRED3, LSTATE_FIRED4 };
 
 void Mark1_BlasterAttack(qboolean advance);
 void DeathFX(gentity_t *ent);

@@ -36,7 +36,7 @@ typedef struct snapshot_s {
     int serverCommandSequence; // snapshot becomes current
 } snapshot_t;
 
-typedef enum cgameEvent_e { CGAME_EVENT_NONE = 0, CGAME_EVENT_TEAMMENU, CGAME_EVENT_SCOREBOARD, CGAME_EVENT_EDITHUD } cgameEvent_t;
+enum cgameEvent_e { CGAME_EVENT_NONE = 0, CGAME_EVENT_TEAMMENU, CGAME_EVENT_SCOREBOARD, CGAME_EVENT_EDITHUD };
 
 typedef struct autoMapInput_s {
     float up;
@@ -174,7 +174,7 @@ typedef struct ragCallbackTraceLine_s {
 
 #define MAX_CG_SHARED_BUFFER_SIZE 2048
 
-typedef enum cgameImportLegacy_e {
+enum cgameImportLegacy_e {
     CG_PRINT = 0,
     CG_ERROR,
     CG_MILLISECONDS,
@@ -410,9 +410,9 @@ typedef enum cgameImportLegacy_e {
     CG_R_WEATHER_CONTENTS_OVERRIDE,
     CG_R_WORLDEFFECTCOMMAND,
     CG_WE_ADDWEATHERZONE
-} cgameImportLegacy_t;
+};
 
-typedef enum cgameExportLegacy_e {
+enum cgameExportLegacy_e {
     CG_INIT,
     CG_SHUTDOWN,
     CG_CONSOLE_COMMAND,
@@ -445,7 +445,7 @@ typedef enum cgameExportLegacy_e {
     CG_MISC_ENT,
     CG_GET_SORTED_FORCE_POWER,
     CG_FX_CAMERASHAKE,
-} cgameExportLegacy_t;
+};
 
 typedef struct cgameImport_s {
     // common
@@ -713,7 +713,7 @@ typedef struct cgameExport_s {
     void (*Init)(int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback);
     void (*Shutdown)(void);
     qboolean (*ConsoleCommand)(void);
-    void (*DrawActiveFrame)(int serverTime, stereoFrame_t stereoView, qboolean demoPlayback);
+    void (*DrawActiveFrame)(int serverTime, stereoFrame_e stereoView, qboolean demoPlayback);
     int (*CrosshairPlayer)(void);
     int (*LastAttacker)(void);
     void (*KeyEvent)(int key, qboolean down);

@@ -4,10 +4,6 @@
 
 #pragma once
 
-#ifdef _DEBUG
-#define DEBUG_SABER_BOX
-#endif
-
 #define FOFS(x) offsetof(gentity_t, x)
 
 #include "qcommon/q_shared.h"
@@ -146,9 +142,9 @@ typedef struct gclient_s gclient_t;
 #define MOVER_PLAYER_USE (0x0040)
 #define MOVER_INACTIVE (0x0080)
 
-typedef enum moverState_e { MOVER_POS1, MOVER_POS2, MOVER_1TO2, MOVER_2TO1 } moverState_t;
+enum moverState_e { MOVER_POS1, MOVER_POS2, MOVER_1TO2, MOVER_2TO1 };
 
-typedef enum hitLocation_e {
+enum hitLocation_e {
     HL_NONE = 0,
     HL_FOOT_RT,
     HL_FOOT_LT,
@@ -173,71 +169,71 @@ typedef enum hitLocation_e {
     HL_GENERIC5,
     HL_GENERIC6,
     HL_MAX
-} hitLocation_t;
+};
 
-typedef enum damageRedirect_e {
+enum damageRedirect_e {
     DR_NONE = 0,
     DR_HEAD,
     DR_RLEG,
     DR_LLEG,
-} damageRedirect_t;
+};
 
-typedef enum clientConnected_e { CON_DISCONNECTED, CON_CONNECTING, CON_CONNECTED } clientConnected_t;
+enum clientConnected_e { CON_DISCONNECTED, CON_CONNECTING, CON_CONNECTED };
 
-typedef enum spectatorState_e { SPECTATOR_NOT, SPECTATOR_FREE, SPECTATOR_FOLLOW, SPECTATOR_SCOREBOARD } spectatorState_t;
+enum spectatorState_e { SPECTATOR_NOT, SPECTATOR_FREE, SPECTATOR_FOLLOW, SPECTATOR_SCOREBOARD };
 
-typedef enum playerTeamStateState_e {
+enum playerTeamStateState_e {
     TEAM_BEGIN, // Beginning a team game, spawn at base
     TEAM_ACTIVE // Now actively playing
-} playerTeamStateState_t;
+};
 
-typedef enum sayTeamMethod_e { STM_TEAM = 0, STM_ADMIN, STM_CENTERPRINT, STM_PLUGIN, STM_NUM_METHODS } sayTeamMethod_t;
+enum sayTeamMethod_e { STM_TEAM = 0, STM_ADMIN, STM_CENTERPRINT, STM_PLUGIN, STM_NUM_METHODS };
 
-typedef enum chatType_e {
+enum chatType_e {
     SAY_ALL = 0,
     SAY_TEAM,
     SAY_TELL,
     SAY_ADMIN,
-} chatType_t;
+};
 
-typedef enum alertEventType_e {
+enum alertEventType_e {
     AET_SIGHT,
     AET_SOUND,
-} alertEventType_t;
+};
 
-typedef enum alertEventLevel_e {
+enum alertEventLevel_e {
     AEL_NONE = 0,
     AEL_MINOR,        // Enemy responds to the sound, but only by looking
     AEL_SUSPICIOUS,   // Enemy looks at the sound, and will also investigate it
     AEL_DISCOVERED,   // Enemy knows the player is around, and will actively hunt
     AEL_DANGER,       // Enemy should try to find cover
     AEL_DANGER_GREAT, // Enemy should run like hell!
-} alertEventLevel_t;
+};
 
-typedef enum teleportBits_e {
+enum teleportBits_e {
     JAPP_TPBIT_SILENT = 0,
     JAPP_TPBIT_NOSLICK,
     JAPP_TPBIT_KEEPVELOCITY,
     JAPP_TPBIT_KEEPANGLES,
     JAPP_TPBIT_NOTELEFRAG,
-} teleportBits_t;
+};
 
-typedef enum userinfoValidationBits_e {
+enum userinfoValidationBits_e {
     // validation & (1<<(numUserinfoFields+USERINFO_VALIDATION_BLAH))
     USERINFO_VALIDATION_SIZE = 0,
     USERINFO_VALIDATION_SLASH,
     USERINFO_VALIDATION_EXTASCII,
     USERINFO_VALIDATION_CONTROLCHARS,
     USERINFO_VALIDATION_MAX
-} userinfoValidationBits_t;
+};
 
-typedef enum matchPause_e {
+enum matchPause_e {
     PAUSE_NONE = 0,
     PAUSE_PAUSED,
     PAUSE_UNPAUSING,
-} matchPause_t;
+};
 
-typedef enum brushMoveState_e { BMS_START = 0, BMS_MID, BMS_END } brushMoveState_t;
+enum brushMoveState_e { BMS_START = 0, BMS_MID, BMS_END };
 
 struct gentity_s {
     entityState_t s;            // communicated by server to clients
@@ -302,7 +298,7 @@ struct gentity_s {
     const char *NPC_type;
     char *NPC_targetname;
     char *NPC_target;
-    moverState_t moverState;
+    moverState_e moverState;
     int soundPos1, sound1to2, sound2to1, soundPos2, soundLoop;
     gentity_t *parent;
     gentity_t *nextTrain, *prevTrain;
@@ -405,7 +401,7 @@ struct gentity_s {
 };
 
 typedef struct playerTeamState_s {
-    playerTeamStateState_t state;
+    playerTeamStateState_e state;
     int location;
     int captures;
     int basedefense;
@@ -420,9 +416,9 @@ typedef struct playerTeamState_s {
 } playerTeamState_t;
 
 typedef struct clientSession_s {
-    team_t sessionTeam;
+    team_e sessionTeam;
     int spectatorTime; // for determining next-in-line to play
-    spectatorState_t spectatorState;
+    spectatorState_e spectatorState;
     int spectatorClient;     // for chasecam and follow mode
     int wins, losses;        // tournament stats
     unsigned int selectedFP; // check against this, if doesn't match value in playerstate then update userinfo
@@ -437,7 +433,7 @@ typedef struct clientSession_s {
 } clientSession_t;
 
 typedef struct clientPersistant_s {
-    clientConnected_t connected;
+    clientConnected_e connected;
     usercmd_t cmd;              // we would lose angles if not persistant
     qboolean localClient;       // true if "ip" info key is "localhost"
     qboolean initialSpawn;      // the first spawn should be at a cool location
@@ -460,7 +456,7 @@ typedef struct clientPersistant_s {
     vector3 duelStartPos; // respawn client to this position when duel ends
     uint32_t ignore;
     int speed;
-    sayTeamMethod_t sayTeamMethod;
+    sayTeamMethod_e sayTeamMethod;
 } clientPersistant_t;
 
 typedef struct clientTrail_s {
@@ -490,7 +486,7 @@ typedef struct renderInfo_s {
     vector3 torsoAngles;
     vector3 eyePoint, eyeAngles;
     int lookTarget;
-    lookMode_t lookMode;
+    lookMode_e lookMode;
     int lookTargetClearTime;     // Time to clear the lookTarget
     int lastVoiceVolume;         // Last frame's voice volume
     vector3 lastHeadAngles;      // Last headAngles, NOT actual facing of head model
@@ -505,7 +501,7 @@ typedef struct renderInfo_s {
 
 typedef struct emote_s {
     const char *name;
-    animNumber_t animLoop, animLeave;
+    animNumber_e animLoop, animLeave;
     uint32_t flags;
 } emote_t;
 
@@ -580,9 +576,9 @@ struct gclient_s {
     float hiddenDist;  // How close ents have to be to pick you up as an enemy
     vector3 hiddenDir; // Normalized direction in which NPCs can't see you (you are hidden)
     renderInfo_t renderInfo;
-    npcteam_t playerTeam, enemyTeam;
+    npcteam_e playerTeam, enemyTeam;
     gentity_t *leader;
-    class_t NPC_class;
+    class_e NPC_class;
     vector3 pushVec;
     int pushVecTime;
     int siegeClass;
@@ -617,7 +613,7 @@ struct gclient_s {
     qboolean scoresWaiting;
     struct {
         qboolean freeze;
-        animNumber_t nextAnim;
+        animNumber_e nextAnim;
     } emote;
     struct {
         int drain, lightning;
@@ -640,8 +636,8 @@ typedef struct combatPoint_s {
 typedef struct alertEvent_s {
     vector3 position;        // Where the event is located
     float radius;            // Consideration radius
-    alertEventLevel_t level; // Priority level of the event
-    alertEventType_t type;   // Event type (sound,sight)
+    alertEventLevel_e level; // Priority level of the event
+    alertEventType_e type;   // Event type (sound,sight)
     gentity_t *owner;        // Who made the sound
     float light;             // ambient light level at point
     float addLight;          // additional light- makes it more noticable, even in darkness
@@ -775,8 +771,8 @@ typedef struct bot_settings_s {
 void Add_Ammo(gentity_t *ent, int weapon, int count);
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset);
 void AddScore(gentity_t *ent, vector3 *origin, int score);
-void AddSightEvent(gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, float addLight);
-void AddSoundEvent(gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, qboolean needLOS);
+void AddSightEvent(gentity_t *owner, vector3 *position, float radius, alertEventLevel_e alertLevel, float addLight);
+void AddSoundEvent(gentity_t *owner, vector3 *position, float radius, alertEventLevel_e alertLevel, qboolean needLOS);
 void B_InitAlloc(void);
 void BeginIntermission(void);
 void Blocked_Mover(gentity_t *ent, gentity_t *other);
@@ -840,7 +836,7 @@ void G_AddEvent(gentity_t *ent, int event, int eventParm);
 void G_AddPredictableEvent(gentity_t *ent, int event, int eventParm);
 char *G_AddSpawnVarToken(const char *string);
 void *G_Alloc(int size);
-ammo_t G_AmmoForWeapon(weapon_t weapon);
+ammo_e G_AmmoForWeapon(weapon_e weapon);
 void G_Announce(const char *msg);
 void G_Announce(const char *msg, int except);
 void G_AvoidBox(gentity_t *ent);
@@ -978,7 +974,7 @@ void G_SpawnItem(gentity_t *ent, const gitem_t *item);
 gentity_t *G_SpawnReservedEntity(void);
 qboolean G_SpawnString(const char *key, const char *defaultString, char **out);
 qboolean G_SpawnVector(const char *key, const char *defaultString, vector3 *out);
-void G_TeamCommand(team_t team, const char *cmd);
+void G_TeamCommand(team_e team, const char *cmd);
 gentity_t *G_TempEntity(vector3 *origin, int event);
 void G_TestLine(vector3 *start, vector3 *end, int color, int time);
 void G_Throw(gentity_t *targ, vector3 *newDir, float push);
@@ -1014,14 +1010,14 @@ void Jetpack_On(gentity_t *ent);
 gentity_t *LaunchItem_Throw(const gitem_t *item, vector3 *origin, vector3 *velocity);
 qboolean LogAccuracyHit(gentity_t *target, gentity_t *attacker);
 void MaintainBodyQueue(gentity_t *ent);
-void MatchTeam(gentity_t *teamLeader, moverState_t moverState, int time);
+void MatchTeam(gentity_t *teamLeader, moverState_e moverState, int time);
 void MoveClientToIntermission(gentity_t *client);
 float NPC_GetHFOVPercentage(vector3 *spot, vector3 *from, vector3 *facing, float hFOV);
 float NPC_GetVFOVPercentage(vector3 *spot, vector3 *from, vector3 *facing, float vFOV);
 gentity_t *NPC_SpawnType(gentity_t *ent, const char *npc_type, const char *targetname, qboolean isVehicle, vector3 *origin);
 qboolean OnSameTeam(gentity_t *ent1, gentity_t *ent2);
 int OrgVisible(vector3 *org1, vector3 *org2, int ignore);
-team_t PickTeam(int ignoreClientNum);
+team_e PickTeam(int ignoreClientNum);
 void player_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
 void PrecacheItem(const gitem_t *it);
 void RegisterItem(const gitem_t *item);
@@ -1032,7 +1028,7 @@ void ResetItem(gentity_t *ent);
 qboolean CheckPushItem(gentity_t *ent);
 qboolean saberKnockOutOfHand(gentity_t *saberent, gentity_t *saberOwner, const vector3 *velocity);
 void SaveRegisteredItems(void);
-gentity_t *SelectSpawnPoint(vector3 *avoidPoint, vector3 *origin, vector3 *angles, team_t team);
+gentity_t *SelectSpawnPoint(vector3 *avoidPoint, vector3 *origin, vector3 *angles, team_e team);
 void SendScoreboardMessageToAllClients(void);
 void SetClientViewAngle(gentity_t *ent, vector3 *angle);
 qboolean SetTeam(gentity_t *ent, const char *s, qboolean forced);
@@ -1055,7 +1051,7 @@ int TAG_GetOrigin2(const char *owner, const char *name, vector3 *origin);
 int TAG_GetAngles(const char *owner, const char *name, vector3 *angles);
 int TAG_GetRadius(const char *owner, const char *name);
 uint32_t TAG_GetFlags(const char *owner, const char *name);
-int TeamCount(int ignoreClientNum, team_t team);
+int TeamCount(int ignoreClientNum, team_e team);
 void Team_CheckDroppedItem(gentity_t *dropped);
 void TeleportPlayer(gentity_t *player, vector3 *origin, vector3 *angles);
 void TIMER_Clear(void);

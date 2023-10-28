@@ -6,9 +6,7 @@ void Remote_Strafe(void);
 #define VELOCITY_DECAY 0.85f
 
 // Local state enums
-enum {
-    LSTATE_NONE = 0,
-};
+enum localState_e { LSTATE_NONE = 0 };
 
 void Remote_Idle(void);
 

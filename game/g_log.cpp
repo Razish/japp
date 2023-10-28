@@ -266,7 +266,7 @@ void G_LogWeaponOutput(void) {
         } else {
             pershot = 0;
         }
-        G_LogPrintf(level.log.console, "%15s:  Damage: %6d,  Kills: %5d,  Dmg per Shot: %f\n", weaponNameFromIndex[j], totaldamage[j], totalkills[j], pershot);
+        G_LogPrintf(level.log.console, "%15s:  Damage: %6d,  Kills: %5d,  Dmg per Shot: %f\n", weaponNameFromIndex[j], totaldamage[j], totalkills[j], (double)pershot);
     }
 
     G_LogPrintf(level.log.console, "\n****Combat Data By Damage Type:\n");
@@ -1172,7 +1172,7 @@ qboolean CalculateTeamRedShirt(gentity_t *ent) {
     return qfalse;
 }
 
-typedef enum {
+enum awardType_e {
     AWARD_EFFICIENCY,    // Accuracy
     AWARD_SHARPSHOOTER,  // Most compression rifle frags
     AWARD_UNTOUCHABLE,   // Perfect (no deaths)
@@ -1183,9 +1183,9 @@ typedef enum {
     AWARD_TEAM,          // MVP/Defender/Warrior/Carrier/Interceptor/Bravery
     AWARD_SECTION31,     // All-around god
     AWARD_MAX
-} awardType_t;
+};
 
-typedef enum {
+enum teamAward_e {
     TEAM_NONE = 0,    // ha ha! you suck!
     TEAM_MVP,         // most overall points
     TEAM_DEFENDER,    // killed the most baddies near your flag
@@ -1194,7 +1194,7 @@ typedef enum {
     TEAM_INTERCEPTOR, // returned your own flag the most
     TEAM_BRAVERY,     // Red Shirt Award (tm). you died more than anybody.
     TEAM_MAX
-} teamAward_e;
+};
 
 int CalculateTeamAward(gentity_t *ent) {
     int teamAwards = 0;

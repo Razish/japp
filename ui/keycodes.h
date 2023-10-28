@@ -5,7 +5,7 @@
 
 // these are the key numbers that should be passed to KeyEvent
 
-typedef enum {
+enum fakeAscii_e {
     A_NULL = 0,
     A_SHIFT,
     A_CTRL,
@@ -337,7 +337,7 @@ typedef enum {
     A_AUX31,
 
     MAX_KEYS
-} fakeAscii_t;
+};
 
 // The menu code needs to get both key and char events, but
 // to avoid duplicating the paths, the char events are just
