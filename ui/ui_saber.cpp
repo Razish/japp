@@ -5,8 +5,8 @@ void WP_SaberLoadParms(void);
 qboolean WP_SaberParseParm(const char *saberName, const char *parmname, char *saberData);
 saber_colors_t TranslateSaberColor(const char *name);
 const char *SaberColorToString(saber_colors_t color);
-saber_styles_t TranslateSaberStyle(const char *name);
-saberType_t TranslateSaberType(const char *name);
+saber_styles_e TranslateSaberStyle(const char *name);
+saberType_e TranslateSaberType(const char *name);
 
 qboolean ui_saber_parms_parsed = qfalse;
 
@@ -664,7 +664,7 @@ void UI_DoSFXSaber(vector3 *blade_muz, vector3 *blade_tip, vector3 *trail_tip, v
     }
 }
 
-void UI_SaberDrawBlade(itemDef_t *item, char *saberName, int saberModel, saberType_t saberType, vector3 *origin, vector3 *angles, int bladeNum) {
+void UI_SaberDrawBlade(itemDef_t *item, char *saberName, int saberModel, saberType_e saberType, vector3 *origin, vector3 *angles, int bladeNum) {
     vector3 org_, end, axis_[3] = {{0.0f}}; // shut the compiler up
     mdxaBone_t boltMatrix;
     effectTrailArgStruct_t fx;
@@ -940,7 +940,7 @@ return;
 }
 if ( saber[0] )
 {
-saberType_t saberType;
+saberType_e saberType;
 int curBlade;
 int numBlades = UI_SaberNumBladesForSaber( saber );
 if ( numBlades )
@@ -959,7 +959,7 @@ UI_SaberDrawBlade( item, saber, saberType, origin, angles, curBlade );
 
 void UI_GetSaberForMenu(char *saber, int saberNum) {
     char saberTypeString[MAX_QPATH] = {0};
-    saberType_t saberType = SABER_NONE;
+    saberType_e saberType = SABER_NONE;
 
     if (saberNum == 0) {
         trap->Cvar_VariableStringBuffer("ui_saber", saber, MAX_QPATH);
@@ -1037,7 +1037,7 @@ void UI_SaberDrawBlades(itemDef_t *item, vector3 *origin, vector3 *angles) {
             return;
         }
         if (saber[0]) {
-            saberType_t saberType;
+            saberType_e saberType;
             int curBlade = 0;
             int numBlades = UI_SaberNumBladesForSaber(saber);
             if (numBlades) { // okay, here we go, time to draw each blade...

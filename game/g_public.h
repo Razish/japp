@@ -95,8 +95,7 @@ typedef struct entityShared_s {
 } entityShared_t;
 
 // bstate.h
-typedef enum          // # bState_e
-{                     // These take over only if script allows them to be autonomous
+enum bState_e {       // These take over only if script allows them to be autonomous
     BS_DEFAULT = 0,   // # default behavior for that NPC
     BS_ADVANCE_FIGHT, // # Advance to captureGoal and shoot enemies if you can
     BS_SLEEP,         // # Play awake script when startled by sound
@@ -107,9 +106,9 @@ typedef enum          // # bState_e
     BS_NOCLIP,        // # Moves through walls, etc.
     BS_REMOVE,        // # Waits for player to leave PVS then removes itself
     BS_CINEMATIC,     // # Does nothing but face it's angles and move to a goal if it has one
-                  // # #eol
-                  //  internal bStates only
-    BS_WAIT, // # Does nothing but face it's angles
+                      // # #eol
+                      //  internal bStates only
+    BS_WAIT,          // # Does nothing but face it's angles
     BS_STAND_GUARD,
     BS_PATROL,
     BS_INVESTIGATE, // # head towards temp goal and look for enemies and listen for sounds
@@ -117,34 +116,34 @@ typedef enum          // # bState_e
     BS_HUNT_AND_KILL,
     BS_FLEE, // # Run away!
     NUM_BSTATES
-} bState_t;
+};
 
-enum { EDGE_NORMAL, EDGE_PATH, EDGE_BLOCKED, EDGE_FAILED, EDGE_MOVEDIR };
+enum navEdgeDrawType_e { EDGE_NORMAL, EDGE_PATH, EDGE_BLOCKED, EDGE_FAILED, EDGE_MOVEDIR };
 
-enum {
+enum navNodeDrawType_e {
     NODE_NORMAL,
     NODE_START,
     NODE_GOAL,
     NODE_NAVGOAL,
 };
 
-typedef enum          // # taskID_e
-{ TID_CHAN_VOICE = 0, // Waiting for a voice sound to complete
-  TID_ANIM_UPPER,     // Waiting to finish a lower anim holdtime
-  TID_ANIM_LOWER,     // Waiting to finish a lower anim holdtime
-  TID_ANIM_BOTH,      // Waiting to finish lower and upper anim holdtimes or normal md3 animating
-  TID_MOVE_NAV,       // Trying to get to a navgoal or For ET_MOVERS
-  TID_ANGLE_FACE,     // Turning to an angle or facing
-  TID_BSTATE,         // Waiting for a certain bState to finish
-  TID_LOCATION,       // Waiting for ent to enter a specific trigger_location
-  //	TID_MISSIONSTATUS,	// Waiting for player to finish reading MISSION STATUS SCREEN
-  TID_RESIZE, // Waiting for clear bbox to inflate size
-  TID_SHOOT,  // Waiting for fire event
-  NUM_TIDS,   // for def of taskID array
-} taskID_t;
+enum taskID_e {
+    TID_CHAN_VOICE = 0, // Waiting for a voice sound to complete
+    TID_ANIM_UPPER,     // Waiting to finish a lower anim holdtime
+    TID_ANIM_LOWER,     // Waiting to finish a lower anim holdtime
+    TID_ANIM_BOTH,      // Waiting to finish lower and upper anim holdtimes or normal md3 animating
+    TID_MOVE_NAV,       // Trying to get to a navgoal or For ET_MOVERS
+    TID_ANGLE_FACE,     // Turning to an angle or facing
+    TID_BSTATE,         // Waiting for a certain bState to finish
+    TID_LOCATION,       // Waiting for ent to enter a specific trigger_location
+    //	TID_MISSIONSTATUS,	// Waiting for player to finish reading MISSION STATUS SCREEN
+    TID_RESIZE, // Waiting for clear bbox to inflate size
+    TID_SHOOT,  // Waiting for fire event
+    NUM_TIDS,   // for def of taskID array
+};
 
-typedef enum // # bSet_e
-{            // This should check to matching a behavior state name first, then look for a script
+enum bSet_e {
+    // This should check to matching a behavior state name first, then look for a script
     BSET_INVALID = -1,
     BSET_FIRST = 0,
     BSET_SPAWN = 0, // # script to use when first spawned
@@ -166,7 +165,7 @@ typedef enum // # bSet_e
     BSET_MINDTRICK, // # script to run when player does a mind trick on this NPC
 
     NUM_BSETS
-} bSet_t;
+};
 
 #define MAX_PARMS 16
 #define MAX_PARM_STRING_LENGTH MAX_QPATH // was 16, had to lengthen it so they could take a valid file path
@@ -323,7 +322,7 @@ typedef struct T_G_ICARUS_GETSETIDFORSTRING_s {
     char string[2048];
 } T_G_ICARUS_GETSETIDFORSTRING;
 
-typedef enum gameImportLegacy_e {
+enum gameImportLegacy_e {
     G_PRINT,
     G_ERROR,
     G_MILLISECONDS,
@@ -709,9 +708,9 @@ typedef enum gameImportLegacy_e {
 
     G_BOT_UPDATEWAYPOINTS,
     G_BOT_CALCULATEPATHS
-} gameImportLegacy_t;
+};
 
-typedef enum gameExportLegacy_e {
+enum gameExportLegacy_e {
     GAME_INIT,
     GAME_SHUTDOWN,
     GAME_CLIENT_CONNECT,
@@ -753,7 +752,7 @@ typedef enum gameExportLegacy_e {
     GAME_NAV_FINDCOMBATPOINTWAYPOINTS,
 
     GAME_GETITEMINDEXBYTAG
-} gameExportLegacy_t;
+};
 
 typedef struct gameImport_s {
     // misc
@@ -1148,5 +1147,5 @@ typedef struct gameExport_s {
     qboolean (*NAV_EntIsBreakable)(int entityNum);
     qboolean (*NAV_EntIsRemovableUsable)(int entNum);
     void (*NAV_FindCombatPointWaypoints)(void);
-    int (*BG_GetItemIndexByTag)(int tag, itemType_t type);
+    int (*BG_GetItemIndexByTag)(int tag, itemType_e type);
 } gameExport_t;

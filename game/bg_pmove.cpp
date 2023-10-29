@@ -2186,7 +2186,7 @@ static qboolean PM_CheckJump(void) {
                 }
             }
         } else { // in the air
-            animNumber_t legsAnim = (animNumber_t)pm->ps->legsAnim;
+            animNumber_e legsAnim = (animNumber_e)pm->ps->legsAnim;
 
             if (legsAnim == BOTH_WALL_RUN_LEFT || legsAnim == BOTH_WALL_RUN_RIGHT) { // running on a wall
                 vector3 right, traceto, mins, maxs, fwdAngles;
@@ -2201,7 +2201,7 @@ static qboolean PM_CheckJump(void) {
 
                 if (legsAnim == BOTH_WALL_RUN_LEFT) {
                     if (pm->ps->legsTimer > 400) { // not at the end of the anim
-                        float animLen = PM_AnimLength(0, (animNumber_t)BOTH_WALL_RUN_LEFT);
+                        float animLen = PM_AnimLength(0, (animNumber_e)BOTH_WALL_RUN_LEFT);
                         if (pm->ps->legsTimer < animLen - 400) { // not at start of anim
                             VectorMA(&pm->ps->origin, -16, &right, &traceto);
                             anim = BOTH_WALL_RUN_LEFT_FLIP;
@@ -2209,7 +2209,7 @@ static qboolean PM_CheckJump(void) {
                     }
                 } else if (legsAnim == BOTH_WALL_RUN_RIGHT) {
                     if (pm->ps->legsTimer > 400) { // not at the end of the anim
-                        float animLen = PM_AnimLength(0, (animNumber_t)BOTH_WALL_RUN_RIGHT);
+                        float animLen = PM_AnimLength(0, (animNumber_e)BOTH_WALL_RUN_RIGHT);
                         if (pm->ps->legsTimer < animLen - 400) { // not at start of anim
                             VectorMA(&pm->ps->origin, 16, &right, &traceto);
                             anim = BOTH_WALL_RUN_RIGHT_FLIP;
@@ -2518,7 +2518,7 @@ static qboolean PM_CheckJump(void) {
     && ( BG_SaberInAttack( pm->ps->saberMove ) ) )
     {//not in an anim we shouldn't interrupt
     //see if it's not too late to start a special jump-attack
-    float animLength = PM_AnimLength( 0, (animNumber_t)pm->ps->torsoAnim );
+    float animLength = PM_AnimLength( 0, (animNumber_e)pm->ps->torsoAnim );
     if ( animLength - pm->ps->torsoTimer < 500 )
     {//just started the saberMove
     //check for special-case jump attacks
@@ -5643,7 +5643,7 @@ backAgain:
             if (pm->ps->torsoTimer > 0 && (pm->ps->torsoAnim == BOTH_VS_ATR_S || pm->ps->torsoAnim == BOTH_VS_ATL_S)) {
                 /*
                 //FIXME: no need to even call the PM_SetAnim at all in this case
-                Anim = (animNumber_t)pm->ps->torsoAnim;
+                Anim = (animNumber_e)pm->ps->torsoAnim;
                 iFlags = SETANIM_FLAG_NORMAL;
                 break;
                 */
@@ -7013,7 +7013,7 @@ void BG_CmdForRoll(playerState_t *ps, int anim, usercmd_t *pCmd) {
         if (ps->torsoTimer <= 250)
             pCmd->forwardmove = pCmd->rightmove = 0;
         // beginning of anim
-        else if (PM_AnimLength(0, (animNumber_t)ps->legsAnim) - ps->torsoTimer < 350)
+        else if (PM_AnimLength(0, (animNumber_e)ps->legsAnim) - ps->torsoTimer < 350)
             pCmd->forwardmove = pCmd->rightmove = 0;
         else {
             // FIXME: ramp down over length of anim
@@ -7028,7 +7028,7 @@ void BG_CmdForRoll(playerState_t *ps, int anim, usercmd_t *pCmd) {
         if (ps->torsoTimer <= 100)
             pCmd->forwardmove = pCmd->rightmove = 0;
         // beginning of anim
-        else if (PM_AnimLength(0, (animNumber_t)ps->legsAnim) - ps->torsoTimer < 200)
+        else if (PM_AnimLength(0, (animNumber_e)ps->legsAnim) - ps->torsoTimer < 200)
             pCmd->forwardmove = pCmd->rightmove = 0;
         else {
             // FIXME: ramp down over length of anim
@@ -7043,7 +7043,7 @@ void BG_CmdForRoll(playerState_t *ps, int anim, usercmd_t *pCmd) {
         if (ps->torsoTimer <= 550)
             pCmd->forwardmove = pCmd->rightmove = 0;
         // beginning of anim
-        else if (PM_AnimLength(0, (animNumber_t)ps->legsAnim) - ps->torsoTimer < 150)
+        else if (PM_AnimLength(0, (animNumber_e)ps->legsAnim) - ps->torsoTimer < 150)
             pCmd->forwardmove = pCmd->rightmove = 0;
         else {
             pCmd->forwardmove = 64;
@@ -8091,7 +8091,7 @@ static void PM_CmdForSaberMoves(usercmd_t *ucmd) {
                 }
             }
         } else { // saberstaff attacks
-            aLen = PM_AnimLength(0, (animNumber_t)pm->ps->legsAnim);
+            aLen = PM_AnimLength(0, (animNumber_e)pm->ps->legsAnim);
             float lenMin = 1700.0f;
             float lenMax = 1800.0f;
 

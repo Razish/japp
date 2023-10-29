@@ -463,12 +463,12 @@ void SP_terrain(gentity_t *ent) {
     Info_SetValueForKey(temp, "terxels", va("%d", atoi(value)));
 
     Info_SetValueForKey(temp, "seed", seed);
-    Info_SetValueForKey(temp, "minx", va("%f", ent->r.mins.x));
-    Info_SetValueForKey(temp, "miny", va("%f", ent->r.mins.y));
-    Info_SetValueForKey(temp, "minz", va("%f", ent->r.mins.z));
-    Info_SetValueForKey(temp, "maxx", va("%f", ent->r.maxs.x));
-    Info_SetValueForKey(temp, "maxy", va("%f", ent->r.maxs.y));
-    Info_SetValueForKey(temp, "maxz", va("%f", ent->r.maxs.z));
+    Info_SetValueForKey(temp, "minx", va("%f", (double)ent->r.mins.x));
+    Info_SetValueForKey(temp, "miny", va("%f", (double)ent->r.mins.y));
+    Info_SetValueForKey(temp, "minz", va("%f", (double)ent->r.mins.z));
+    Info_SetValueForKey(temp, "maxx", va("%f", (double)ent->r.maxs.x));
+    Info_SetValueForKey(temp, "maxy", va("%f", (double)ent->r.maxs.y));
+    Info_SetValueForKey(temp, "maxz", va("%f", (double)ent->r.maxs.z));
 
     Info_SetValueForKey(temp, "modelIndex", va("%d", ent->s.modelindex));
 
@@ -591,8 +591,8 @@ void SP_misc_skyportal(gentity_t *ent) {
     isfog += G_SpawnInt("fognear", "0", &fogn);
     isfog += G_SpawnInt("fogfar", "300", &fogf);
 
-    trap->SetConfigstring(CS_SKYBOXORG, va("%.2f %.2f %.2f %.1f %i %.2f %.2f %.2f %i %i", ent->s.origin.x, ent->s.origin.y, ent->s.origin.z, fov_x, (int)isfog,
-                                           fogv.x, fogv.y, fogv.z, fogn, fogf));
+    trap->SetConfigstring(CS_SKYBOXORG, va("%.2f %.2f %.2f %.1f %i %.2f %.2f %.2f %i %i", (double)ent->s.origin.x, (double)ent->s.origin.y,
+                                           (double)ent->s.origin.z, (double)fov_x, (int)isfog, (double)fogv.x, (double)fogv.y, (double)fogv.z, fogn, fogf));
 
     ent->think = G_PortalifyEntities;
     ent->nextthink = level.time + 1050; // give it some time first so that all other entities are spawned.
@@ -967,7 +967,7 @@ void InitShooter(gentity_t *ent, int weapon) {
     ent->use = Use_Shooter;
     ent->s.weapon = weapon;
 
-    RegisterItem(BG_FindItemForWeapon((weapon_t)weapon));
+    RegisterItem(BG_FindItemForWeapon((weapon_e)weapon));
 
     G_SetMovedir(&ent->s.angles, &ent->movedir);
 
@@ -1944,7 +1944,7 @@ void SP_CreateWind(gentity_t *ent) {
         G_SpawnFloat("speed", "500", &ent->speed);
         VectorScale(&windDir, ent->speed, &windDir);
 
-        Com_sprintf(tmp, sizeof(tmp), "*constantwind ( %f %f %f )", windDir.x, windDir.y, windDir.z);
+        Com_sprintf(tmp, sizeof(tmp), "*constantwind ( %f %f %f )", (double)windDir.x, (double)windDir.y, (double)windDir.z);
         G_EffectIndex(tmp);
     }
 
@@ -2775,7 +2775,7 @@ void SP_misc_weapon_shooter(gentity_t *self) {
         self->s.weapon = self->client->ps.weapon = GetIDForString(WPTable, s);
     }
 
-    RegisterItem(BG_FindItemForWeapon((weapon_t)self->s.weapon));
+    RegisterItem(BG_FindItemForWeapon((weapon_e)self->s.weapon));
 
     // set where our muzzle is
     VectorCopy(&self->s.origin, &self->client->renderInfo.muzzlePoint);

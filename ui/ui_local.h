@@ -31,15 +31,7 @@ void UI_ClearScores(void);
 void UI_LoadArenas(void);
 void UI_LoadForceConfig_List(void);
 
-typedef enum moveDataTitles_e {
-    MD_ACROBATICS = 0,
-    MD_SINGLE_FAST,
-    MD_SINGLE_MEDIUM,
-    MD_SINGLE_STRONG,
-    MD_DUAL_SABERS,
-    MD_SABER_STAFF,
-    MD_MOVE_TITLE_MAX
-} moveDataTitles_t;
+enum moveDataTitles_e { MD_ACROBATICS = 0, MD_SINGLE_FAST, MD_SINGLE_MEDIUM, MD_SINGLE_STRONG, MD_DUAL_SABERS, MD_SABER_STAFF, MD_MOVE_TITLE_MAX };
 
 //
 // ui_players.c
@@ -89,14 +81,14 @@ typedef struct playerInfo_s {
     // currently in use drawing parms
     vector3 viewAngles;
     vector3 moveAngles;
-    weapon_t currentWeapon;
+    weapon_e currentWeapon;
     int legsAnim;
     int torsoAnim;
 
     // animation vars
-    weapon_t weapon;
-    weapon_t lastWeapon;
-    weapon_t pendingWeapon;
+    weapon_e weapon;
+    weapon_e lastWeapon;
+    weapon_e pendingWeapon;
     int weaponTimer;
     int pendingLegsAnim;
     int torsoAnimationTimer;
@@ -394,18 +386,11 @@ void JP_SaveFavServers(void);
 void JP_QueryServer(void);
 #endif
 
-typedef enum updateStatus_e {
-    JAPP_UPDATE_UPTODATE = 0,
-    JAPP_UPDATE_OUTDATED,
-    JAPP_UPDATE_UPDATED,
-} updateStatus_t;
-
 typedef struct uiLocal_s {
 #ifdef FAV_SERVERS
     favServer_t servers[MAX_SERVERS];
     unsigned int serversCount;
 #endif
-    int updateStatus;
 } uiLocal_t;
 
 extern uiLocal_t uiLocal;

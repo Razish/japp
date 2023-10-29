@@ -177,7 +177,7 @@ void BeamOut(gentity_t *self) {
     self->nextthink = level.time + 1500;
     self->think = Disappear;
     self->s.teamowner = TEAM_FREE;
-    self->client->playerTeam = (npcteam_t)self->s.teamowner;
+    self->client->playerTeam = (npcteam_e)self->s.teamowner;
     // self->r.svFlags |= SVF_BEAMING; //this appears unused in SP as well
 }
 
@@ -307,7 +307,7 @@ qboolean NPC_MoveDirClear(int forwardmove, int rightmove, qboolean reset);
 void NPC_BSFollowLeader(void) {
     vector3 vec;
     float leaderDist;
-    visibility_t leaderVis;
+    visibility_e leaderVis;
     int curAnim;
 
     if (!NPC->client->leader) { // ok, stand guard until we find an enemy
@@ -635,8 +635,9 @@ void NPC_BSJump(void) {
 
 void NPC_BSRemove(void) {
     NPC_UpdateAngles(qtrue, qtrue);
+    // FIXME: clientNum 0
     if (!trap->InPVS(&NPC->r.currentOrigin, &g_entities[0].r.currentOrigin)) // FIXME: use cg.vieworg?
-    {                                                                        // rwwFIXMEFIXME: Care about all clients instead of just 0?
+    {
         G_UseTargets2(NPC, NPC, NPC->target3);
         NPC->s.eFlags |= EF_NODRAW;
         NPC->s.eType = ET_INVISIBLE;
@@ -804,7 +805,7 @@ void NPC_BSSearch(void) {
     NPC_UpdateAngles(qtrue, qtrue);
 }
 
-void NPC_BSSearchStart(int homeWp, bState_t bState) {
+void NPC_BSSearchStart(int homeWp, bState_e bState) {
     // FIXME: Reimplement
     if (homeWp == WAYPOINT_NONE) {
         homeWp = NAV_FindClosestWaypointForEnt(NPC, WAYPOINT_NONE);

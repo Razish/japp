@@ -3,9 +3,9 @@
 #ifdef JPLUA
 
 #if defined(PROJECT_GAME)
-#include "g_local.h"
+#include "game/g_local.h"
 #elif defined(PROJECT_CGAME)
-#include "cg_local.h"
+#include "cgame/cg_local.h"
 #endif
 
 namespace JPLua {
@@ -17,7 +17,7 @@ typedef centity_t jpluaEntity_t;
 #endif
 
 #if defined(PROJECT_GAME)
-enum entityFunc_t {
+enum entityFunc_e {
     JPLUA_ENTITY_THINK = 0,
 
     JPLUA_ENTITY_REACHED,
@@ -29,7 +29,7 @@ enum entityFunc_t {
     JPLUA_ENTITY_MAX
 };
 
-void Entity_CallFunction(gentity_t *ent, entityFunc_t funcID, intptr_t arg1 = 0, intptr_t arg2 = 0, intptr_t arg3 = 0, intptr_t arg4 = 0);
+void Entity_CallFunction(gentity_t *ent, entityFunc_e funcID, intptr_t arg1 = 0, intptr_t arg2 = 0, intptr_t arg3 = 0, intptr_t arg4 = 0);
 
 #ifdef JPLUA_INTERNALS
 int Entity_Create(lua_State *L);

@@ -29,7 +29,8 @@ const vector3 WP_MuzzlePoint[WP_NUM_WEAPONS] = {
 };
 
 const weaponData_t weaponData[WP_NUM_WEAPONS] = {
-    // longname						ammoIndex			ammoLow	shotCost	fireTime	charge	chargeMax	chargeTime	alt.ShotCost	alt.fireTime	alt.charge	alt.chargeMax
+    // longname						ammoIndex			ammoLow	shotCost	fireTime	charge	chargeMax	chargeTime	alt.ShotCost	alt.fireTime	alt.charge
+    // alt.chargeMax
     // alt.chargeTime
     {"No Weapon", AMMO_NONE, 0, 0, 0, 0, 0, 0, {0, 0, 0, 0, 0}},
     {"Stun Baton", AMMO_NONE, 5, 0, 400, 0, 0, 0, {0, 400, 0, 0, 0}},
@@ -65,7 +66,7 @@ const int ammoMax[AMMO_MAX] = {
     10   // AMMO_DETPACK
 };
 
-weapon_t BG_FindWeapon(const char *name) {
+weapon_e BG_FindWeapon(const char *name) {
     qboolean numeric = qtrue;
     const char *p = NULL;
     int i;
@@ -81,7 +82,7 @@ weapon_t BG_FindWeapon(const char *name) {
     Com_Printf("BG_FindWeapon( \"%s\" ), numeric = %s\n", name, numeric ? "true" : "false");
 
     if (numeric) {
-        weapon_t wp = (weapon_t)atoi(name);
+        weapon_e wp = (weapon_e)atoi(name);
         if (wp <= WP_NONE || wp > LAST_USEABLE_WEAPON) {
             return WP_NONE;
         }
@@ -90,7 +91,7 @@ weapon_t BG_FindWeapon(const char *name) {
 
     for (i = 0, wd = weaponData; i < WP_NUM_WEAPONS; i++, wd++) {
         if (!Q_stricmp(name, wd->longName)) {
-            return (weapon_t)i;
+            return (weapon_e)i;
         }
     }
 

@@ -67,19 +67,30 @@
 
 // extern qboolean showWaypoints;
 
-typedef enum { VIS_UNKNOWN, VIS_NOT, VIS_PVS, VIS_360, VIS_FOV, VIS_SHOOT } visibility_t;
-typedef enum { SPOT_ORIGIN, SPOT_CHEST, SPOT_HEAD, SPOT_HEAD_LEAN, SPOT_WEAPON, SPOT_LEGS, SPOT_GROUND } spot_t;
+enum jumpState_e { JS_WAITING = 0, JS_FACING, JS_CROUCHING, JS_JUMPING, JS_LANDING };
 
-typedef enum //# lookMode_e
-{ LM_ENT = 0,
-  LM_INTEREST } lookMode_t;
+enum lookMode_e { LM_ENT = 0, LM_INTEREST };
 
-typedef enum //# jumpState_e
-{ JS_WAITING = 0,
-  JS_FACING,
-  JS_CROUCHING,
-  JS_JUMPING,
-  JS_LANDING } jumpState_t;
+enum speechType_e {
+    SPEECH_CHASE,
+    SPEECH_CONFUSED,
+    SPEECH_COVER,
+    SPEECH_DETECTED,
+    SPEECH_GIVEUP,
+    SPEECH_LOOK,
+    SPEECH_LOST,
+    SPEECH_OUTFLANK,
+    SPEECH_ESCAPING,
+    SPEECH_SIGHT,
+    SPEECH_SOUND,
+    SPEECH_SUSPICIOUS,
+    SPEECH_YELL,
+    SPEECH_PUSHED
+};
+
+enum spot_e { SPOT_ORIGIN, SPOT_CHEST, SPOT_HEAD, SPOT_HEAD_LEAN, SPOT_WEAPON, SPOT_LEGS, SPOT_GROUND };
+
+enum visibility_e { VIS_UNKNOWN, VIS_NOT, VIS_PVS, VIS_360, VIS_FOV, VIS_SHOOT };
 
 typedef struct gNPCstats_e { // Stats, loaded in, and can be set by scripts
     // AI
@@ -110,12 +121,12 @@ typedef struct gNPCstats_e { // Stats, loaded in, and can be set by scripts
 #define MAX_ENEMY_POS_LAG 2400
 #define ENEMY_POS_LAG_INTERVAL 100
 #define ENEMY_POS_LAG_STEPS (MAX_ENEMY_POS_LAG / ENEMY_POS_LAG_INTERVAL)
-typedef struct {
+typedef struct gNPC_s {
     // FIXME: Put in playerInfo or something
     int timeOfDeath; // FIXME do we really need both of these
     gentity_t *touchedByPlayer;
 
-    visibility_t enemyLastVisibility;
+    visibility_e enemyLastVisibility;
 
     int aimTime;
     float desiredYaw;
@@ -145,12 +156,12 @@ typedef struct {
     vector3 shootAngles; // Angles to where bot is shooting - fixme: make he torso turn to reflect these
 
     // extra character info
-    rank_t rank; // for pips
+    rank_e rank; // for pips
 
     // Behavior state info
-    bState_t behaviorState;   // determines what actions he should be doing
-    bState_t defaultBehavior; // State bot will default to if none other set
-    bState_t tempBehavior;    // While valid, overrides other behavior
+    bState_e behaviorState;   // determines what actions he should be doing
+    bState_e defaultBehavior; // State bot will default to if none other set
+    bState_e tempBehavior;    // While valid, overrides other behavior
 
     qboolean ignorePain; // only play pain scripts when take pain
 
@@ -166,7 +177,7 @@ typedef struct {
 
     // bState-specific fields
     gentity_t *coverTarg;
-    jumpState_t jumpState;
+    jumpState_e jumpState;
     float followDist;
 
     // goal, navigation & pathfinding
@@ -214,10 +225,10 @@ typedef struct {
     vector3 blockedDest;
 
     //
-    int combatPoint;            // NPCs in bState BS_COMBAT_POINT will find their closest empty combat_point
-    int lastFailedCombatPoint;  // NPCs in bState BS_COMBAT_POINT will find their closest empty combat_point
-    int movementSpeech;         // what to say when you first successfully move
-    float movementSpeechChance; // how likely you are to say it
+    int combatPoint;             // NPCs in bState BS_COMBAT_POINT will find their closest empty combat_point
+    int lastFailedCombatPoint;   // NPCs in bState BS_COMBAT_POINT will find their closest empty combat_point
+    speechType_e movementSpeech; // what to say when you first successfully move
+    float movementSpeechChance;  // how likely you are to say it
 
     // Testing physics at 20fps
     int nextBStateThink;

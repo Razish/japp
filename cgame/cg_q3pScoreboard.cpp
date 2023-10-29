@@ -66,7 +66,7 @@ static void DrawServerInfo(float fade) {
 
         fontLarge.Paint(SCREEN_WIDTH / 2.0f - fontLarge.Width(tmp), y, tmp, &colour, uiTextStyle_e::Shadowed);
         y += lineHeightBig * 2;
-        // FALL THROUGH TO GENERIC TEAM GAME INFO!
+        [[fallthrough]]; // to generic team game info
 
     case GT_TEAM:
         if (cgs.scores1 == cgs.scores2) {
@@ -205,7 +205,7 @@ static void DrawPlayerCount(float fade) {
 }
 
 // number of players on team 'team'
-static int PlayerCount(team_t team) {
+static int PlayerCount(team_e team) {
     int i, count = 0;
 
     for (i = 0; i < cg.numScores; i++) {
@@ -351,7 +351,7 @@ static int ListPlayers_FFA(float fade, float x, float y, float fontScale, int fo
 }
 
 // returns number of players on team 'team'
-static int ListPlayers_TDM(float fade, float x, float y, float fontScale, int fontHandle, team_t team) {
+static int ListPlayers_TDM(float fade, float x, float y, float fontScale, int fontHandle, team_e team) {
     const char *tmp = NULL;
     vector4 white = {1.0f, 1.0f, 1.0f, 1.0f}, blue = {0.6f, 0.6f, 1.0f, 1.0f}, background = {0.75f, 0.75f, 0.75f, 1.0f}, teamRed = {0.7f, 0.4f, 0.4f, 1.0f},
             teamBlue = {0.4f, 0.4f, 0.7f, 1.0f};
@@ -489,7 +489,7 @@ static int ListPlayers_TDM(float fade, float x, float y, float fontScale, int fo
 }
 
 // returns number of players on team 'team'
-static int ListPlayers_CTF(float fade, float x, float y, float fontScale, int fontHandle, team_t team) {
+static int ListPlayers_CTF(float fade, float x, float y, float fontScale, int fontHandle, team_e team) {
     const char *tmp = NULL;
     vector4 white = {1.0f, 1.0f, 1.0f, 1.0f}, blue = {0.6f, 0.6f, 1.0f, 1.0f}, background = {0.75f, 0.75f, 0.75f, 1.0f}, teamRed = {0.7f, 0.4f, 0.4f, 1.0f},
             teamBlue = {0.4f, 0.4f, 0.7f, 1.0f};
@@ -668,7 +668,7 @@ static int ListPlayers_Free(float fade, float x, float y, float fontScale, int f
 }
 
 // render a list of players on team 'team' at 'x', 'y' using relevant information based on gametype
-static int ListPlayers_Team(float fade, float x, float y, float fontScale, int fontHandle, float lineHeight, team_t team) {
+static int ListPlayers_Team(float fade, float x, float y, float fontScale, int fontHandle, float lineHeight, team_e team) {
     switch (cgs.gametype) {
     case GT_FFA:
     case GT_HOLOCRON:

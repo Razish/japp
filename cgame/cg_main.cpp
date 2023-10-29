@@ -771,8 +771,8 @@ static void CG_RegisterClients(void) {
 }
 
 const char *CG_ConfigString(int index) {
-	// don't read configstrings before initialisation
-	assert( cgs.gameState.dataCount != 0 );
+    // don't read configstrings before initialisation
+    assert(cgs.gameState.dataCount != 0);
 
     if (index < 0 || index >= MAX_CONFIGSTRINGS) {
         trap->Error(ERR_DROP, "CG_ConfigString: bad index: %i", index);
@@ -1857,7 +1857,7 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum, qbo
     }
 
     CG_UpdateServerHistory();
-	BG_FixSaberMoveData();
+    BG_FixSaberMoveData();
 }
 
 // makes sure returned string is in localized format
@@ -2264,7 +2264,7 @@ Q_CABI {
             return CG_ConsoleCommand();
 
         case CG_DRAW_ACTIVE_FRAME:
-            CG_DrawActiveFrame(arg0, (stereoFrame_t)arg1, (qboolean)arg2);
+            CG_DrawActiveFrame(arg0, (stereoFrame_e)arg1, (qboolean)arg2);
             return 0;
 
         case CG_CROSSHAIR_PLAYER:

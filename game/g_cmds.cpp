@@ -392,7 +392,7 @@ qboolean g_preventTeamBegin = qfalse;
 qboolean SetTeam(gentity_t *ent, const char *s, qboolean forced) {
     int team, oldTeam, clientNum, specClient;
     gclient_t *client;
-    spectatorState_t specState;
+    spectatorState_e specState;
 
     // this prevents rare creation of invalid players
     if (!ent->inuse) {
@@ -525,7 +525,7 @@ qboolean SetTeam(gentity_t *ent, const char *s, qboolean forced) {
         G_ClearVote(ent);
     }
 
-    client->sess.sessionTeam = (team_t)team;
+    client->sess.sessionTeam = (team_e)team;
     client->sess.spectatorState = specState;
     client->sess.spectatorClient = specClient;
 
@@ -1247,7 +1247,7 @@ static void Cmd_SayTeamMod_f(gentity_t *ent) {
         int i = ent->client->pers.sayTeamMethod;
         i++;
         i %= STM_NUM_METHODS;
-        ent->client->pers.sayTeamMethod = (sayTeamMethod_t)i;
+        ent->client->pers.sayTeamMethod = (sayTeamMethod_e)i;
     }
 
     else {
@@ -1257,7 +1257,7 @@ static void Cmd_SayTeamMod_f(gentity_t *ent) {
         trap->Argv(1, arg, sizeof(arg));
         for (i = 0; i < STM_NUM_METHODS; i++) {
             if (!Q_stricmp(arg, sayTeamMethods[i])) {
-                ent->client->pers.sayTeamMethod = (sayTeamMethod_t)i;
+                ent->client->pers.sayTeamMethod = (sayTeamMethod_e)i;
                 break;
             }
         }
@@ -1623,7 +1623,7 @@ static qboolean G_VoteTimelimit(gentity_t *ent, int numArgs, const char *arg1, c
     if (Q_isintegral(tl))
         Com_sprintf(level.voteString, sizeof(level.voteString), "%s %i", arg1, (int)tl);
     else
-        Com_sprintf(level.voteString, sizeof(level.voteString), "%s %.3f", arg1, tl);
+        Com_sprintf(level.voteString, sizeof(level.voteString), "%s %.3f", arg1, (double)tl);
     Q_strncpyz(level.voteDisplayString, level.voteString, sizeof(level.voteDisplayString));
     Q_strncpyz(level.voteStringClean, level.voteString, sizeof(level.voteStringClean));
     return qtrue;
@@ -1649,7 +1649,12 @@ typedef struct voteString_s {
 } voteString_t;
 
 static voteString_t validVoteStrings[] = {
-    // vote string				aliases										# args	valid gametypes							exec delay		short help	long
+    // vote string				aliases										# args	valid gametypes
+    // exec
+    // delay
+    // short
+    // help
+    // long
     // help
     {"allready", "ready", G_VoteAllready, 0, GTB_ALL, qfalse, NULL, ""},
     {"capturelimit", "caps", G_VoteCapturelimit, 1, GTB_CTF | GTB_CTY, qtrue, "<num>", ""},
@@ -1912,7 +1917,7 @@ void G_LeaveVehicle(gentity_t *ent, qboolean ConCheck) {
         if (veh->inuse && veh->client && veh->m_pVehicle) {
             if (ConCheck) {
                 // check connection
-                clientConnected_t pCon = ent->client->pers.connected;
+                clientConnected_e pCon = ent->client->pers.connected;
                 ent->client->pers.connected = CON_DISCONNECTED;
                 veh->m_pVehicle->m_pVehicleInfo->Eject(veh->m_pVehicle, (bgEntity_t *)ent, qtrue);
                 ent->client->pers.connected = pCon;
@@ -2305,7 +2310,7 @@ void Cmd_EngageDuel_f(gentity_t *ent, bool fullforce) {
                                            weaponData[challenged->client->pers.duelWeapon].longName));
 
             if (japp_duelBow.integer) {
-                int bowTime = BG_AnimLength(ent->localAnimIndex, (animNumber_t)BOTH_BOW);
+                int bowTime = BG_AnimLength(ent->localAnimIndex, (animNumber_e)BOTH_BOW);
                 ent->client->ps.forceHandExtend = challenged->client->ps.forceHandExtend = HANDEXTEND_TAUNT;
                 ent->client->ps.forceDodgeAnim = challenged->client->ps.forceDodgeAnim = BOTH_BOW;
                 ent->client->ps.forceHandExtendTime = challenged->client->ps.forceHandExtendTime = level.time + bowTime;
@@ -2391,7 +2396,7 @@ void Cmd_EngageDuel_f(gentity_t *ent, bool fullforce) {
             const weaponData_t *wd = &weaponData[challenged->client->pers.duelWeapon];
             if (wd->shotCost != 0) {
                 // this weapon requires ammo, give it
-                ammo_t ammo = G_AmmoForWeapon((weapon_t)challenged->client->pers.duelWeapon);
+                ammo_e ammo = G_AmmoForWeapon((weapon_e)challenged->client->pers.duelWeapon);
                 ent->client->ps.ammo[ammo] = challenged->client->ps.ammo[ammo] = ammoMax[wd->ammoIndex];
             }
 
@@ -2665,7 +2670,7 @@ static void Cmd_Drop_f(gentity_t *ent) {
     trap->Argv(1, arg, sizeof(arg));
 
     if (!Q_stricmp(arg, "flag")) {
-        powerup_t powerup = (ent->client->ps.persistant[PERS_TEAM] == TEAM_RED) ? PW_BLUEFLAG : PW_REDFLAG;
+        powerup_e powerup = (ent->client->ps.persistant[PERS_TEAM] == TEAM_RED) ? PW_BLUEFLAG : PW_REDFLAG;
 
         if (!japp_allowFlagDrop.integer) {
             trap->SendServerCommand(ent - g_entities, "print \"" S_COLOR_YELLOW "Not allowed to drop the flag\n\"");
@@ -2694,7 +2699,7 @@ static void Cmd_Drop_f(gentity_t *ent) {
             ent->client->ps.powerups[powerup] = 0;
         }
     } else if (!Q_stricmp(arg, "weapon")) {
-        weapon_t wp = (weapon_t)ent->client->ps.weapon, newWeap = WP_NONE;
+        weapon_e wp = (weapon_e)ent->client->ps.weapon, newWeap = WP_NONE;
         const gitem_t *item = NULL;
         gentity_t *drop = NULL;
         vector3 angs = {0.0f, 0.0f, 0.0f};
@@ -2735,7 +2740,7 @@ static void Cmd_Drop_f(gentity_t *ent) {
         for (i = 0; i < WP_NUM_WEAPONS; i++) {
             if ((ent->client->ps.stats[STAT_WEAPONS] & (1 << i)) && i != WP_NONE) {
                 // this one's good
-                newWeap = (weapon_t)i;
+                newWeap = (weapon_e)i;
                 break;
             }
         }
@@ -2756,7 +2761,7 @@ static void Cmd_Drop_f(gentity_t *ent) {
     } else if (!Q_stricmp(arg, "powerup")) {
         gentity_t *drop = NULL;
         vector3 angs = {0.0f, 0.0f, 0.0f};
-        powerup_t powerup = PW_NONE;
+        powerup_e powerup = PW_NONE;
         const gitem_t *item = NULL;
 
         if (ent->client->ps.powerups[PW_FORCE_ENLIGHTENED_DARK] >= level.time && ent->client->pers.adminData.logineffect != PW_FORCE_ENLIGHTENED_DARK) {
@@ -2872,11 +2877,11 @@ static void Cmd_AMInfo_f(gentity_t *ent) {
             Q_PrintBuffer(&pb, va("    [%s" S_COLOR_WHITE "] Reduce blocks (", (tweaks & SABERTWEAK_REDUCEBLOCKS) ? S_COLOR_GREEN "+" : S_COLOR_RED "x"));
             Q_PrintBuffer(&pb, va("%s%.02f " S_COLOR_WHITE "- %s%.02f" S_COLOR_WHITE ") * %s%.02f" S_COLOR_WHITE "\n",
                                   (japp_saberBlockChanceMin.value != atoff(G_Cvar_DefaultString(&japp_saberBlockChanceMin))) ? S_COLOR_RED : S_COLOR_GREEN,
-                                  japp_saberBlockChanceMin.value,
+                                  (double)japp_saberBlockChanceMin.value,
                                   (japp_saberBlockChanceMax.value != atoff(G_Cvar_DefaultString(&japp_saberBlockChanceMax))) ? S_COLOR_RED : S_COLOR_GREEN,
-                                  japp_saberBlockChanceMax.value,
+                                  (double)japp_saberBlockChanceMax.value,
                                   (japp_saberBlockChanceScale.value != atoff(G_Cvar_DefaultString(&japp_saberBlockChanceScale))) ? S_COLOR_RED : S_COLOR_GREEN,
-                                  japp_saberBlockChanceScale.value));
+                                  (double)japp_saberBlockChanceScale.value));
 #ifdef _DEBUG
             if (tweaks & SABERTWEAK_REDUCEBLOCKS) {
                 int ourLevel, theirLevel;
@@ -2888,7 +2893,7 @@ static void Cmd_AMInfo_f(gentity_t *ent) {
                         const float chanceMax = japp_saberBlockChanceMax.value;
                         const float chanceScalar = japp_saberBlockChanceScale.value;
                         const float chance = Q_clamp(chanceMin, (1.0f - (diff / parity)) * chanceScalar, chanceMax);
-                        Q_PrintBuffer(&pb, va("      %i blocking %i: %.03f\n", ourLevel, theirLevel, chance));
+                        Q_PrintBuffer(&pb, va("      %i blocking %i: %.03f\n", ourLevel, theirLevel, (double)chance));
                     }
                 }
             }
@@ -2897,7 +2902,7 @@ static void Cmd_AMInfo_f(gentity_t *ent) {
             Q_PrintBuffer(&pb,
                           va("      %s%.03f " S_COLOR_WHITE "stance parity\n",
                              (japp_saberBlockStanceParity.value != atoff(G_Cvar_DefaultString(&japp_saberBlockStanceParity))) ? S_COLOR_RED : S_COLOR_GREEN,
-                             japp_saberBlockStanceParity.value));
+                             (double)japp_saberBlockStanceParity.value));
             Q_PrintBuffer(&pb,
                           va("    [%s" S_COLOR_WHITE "] Staff deflect fix\n", (tweaks & SABERTWEAK_TWOBLADEDEFLECTFIX) ? S_COLOR_GREEN "+" : S_COLOR_RED "x"));
             Q_PrintBuffer(&pb, va("    [%s" S_COLOR_WHITE "] Nerf damage\n", d_saberSPStyleDamage.integer    ? S_COLOR_YELLOW "-"
@@ -2913,7 +2918,7 @@ static void Cmd_AMInfo_f(gentity_t *ent) {
         // damage scale
         Q_PrintBuffer(&pb, va("  %s%.03f " S_COLOR_WHITE "damage scale\n",
                               (g_saberDamageScale.value != atoff(G_Cvar_DefaultString(&g_saberDamageScale))) ? S_COLOR_RED : S_COLOR_GREEN,
-                              g_saberDamageScale.value));
+                              (double)g_saberDamageScale.value));
 
         // idle damage
         Q_PrintBuffer(&pb, va("  " S_COLOR_WHITE "Idle damage %s %s" S_COLOR_WHITE "\n",
@@ -3165,7 +3170,7 @@ static const size_t numEmotes = ARRAY_LEN(emotes);
 static int emotecmp(const void *a, const void *b) { return strcmp((const char *)a, ((const emote_t *)b)->name); }
 
 qboolean SetEmote(gentity_t *ent, const emote_t *emote) {
-    forceHandAnims_t handExtend = HANDEXTEND_TAUNT;
+    forceHandAnims_e handExtend = HANDEXTEND_TAUNT;
     int emoteTime;
 
     if (!(japp_allowEmotes.bits & (1 << level.gametype))) {

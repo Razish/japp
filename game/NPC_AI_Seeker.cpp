@@ -436,6 +436,7 @@ void NPC_BSSeeker_Default(void) {
     */
     // N/A for MP.
     if (NPC->r.ownerNum < ENTITYNUM_NONE) {
+        // FIXME: clientNum 0
         gentity_t *owner = &g_entities[0];
         if (owner->health <= 0 || (owner->client && owner->client->pers.connected == CON_DISCONNECTED)) { // owner is dead or gone
             // remove me

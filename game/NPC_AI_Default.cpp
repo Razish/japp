@@ -58,7 +58,7 @@ void NPC_StandIdle(void) {
             //Start that animation going
             NPC_SetAnim( NPC, SETANIM_BOTH, baseSeq + newIdle, SETANIM_FLAG_OVERRIDE|SETANIM_FLAG_HOLD );
 
-            int newTime = PM_AnimLength( NPC->client->clientInfo.animFileIndex, (animNumber_t) (baseSeq + newIdle) );
+            int newTime = PM_AnimLength( NPC->client->clientInfo.animFileIndex, (animNumber_e) (baseSeq + newIdle) );
 
             //Don't do this again for a random amount of time
             TIMER_Set( NPC, "idleAnim", newTime + Q_irand( 2000, 10000 ) );
@@ -166,7 +166,7 @@ void NPC_BSHuntAndKill(void) {
     qboolean turned = qfalse;
     vector3 vec;
     float enemyDist;
-    visibility_t oEVis;
+    visibility_e oEVis;
     int curAnim;
 
     NPC_CheckEnemy(NPCInfo->tempBehavior != BS_HUNT_AND_KILL, qfalse, qtrue); // don't find new enemy if this is tempbehav

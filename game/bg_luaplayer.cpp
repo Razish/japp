@@ -1547,8 +1547,8 @@ static int Player_SetAnim(lua_State *L) {
     int animLoop = luaL_checkinteger(L, 2), animLeave = luaL_checkinteger(L, 3), flags = luaL_checkinteger(L, 4);
     emote_t emote;
     emote.name = "jplua emote";
-    emote.animLoop = (animNumber_t)animLoop;
-    emote.animLeave = (animNumber_t)animLeave;
+    emote.animLoop = (animNumber_e)animLoop;
+    emote.animLeave = (animNumber_e)animLeave;
     emote.flags = flags;
 
     SetEmote(ent, &emote);

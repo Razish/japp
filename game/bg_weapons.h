@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum weapon_e {
+enum weapon_e {
     WP_NONE = 0,
     WP_STUN_BATON,
     WP_MELEE,
@@ -21,8 +21,8 @@ typedef enum weapon_e {
     WP_EMPLACED_GUN,
     WP_TURRET,
     WP_NUM_WEAPONS
-} weapon_t;
-weapon_t BG_FindWeapon(const char *name);
+};
+weapon_e BG_FindWeapon(const char *name);
 
 #define FIRST_WEAPON (WP_BRYAR_PISTOL)          // this is the first weapon for next and prev weapon switching
 #define LAST_USEABLE_WEAPON (WP_BRYAR_OLD)      // anything > this will be considered not player useable
@@ -30,7 +30,7 @@ weapon_t BG_FindWeapon(const char *name);
 
 extern const vector3 WP_MuzzlePoint[WP_NUM_WEAPONS];
 
-typedef enum ammo_e {
+enum ammo_e {
     AMMO_NONE = 0,
     AMMO_FORCE,
     AMMO_BLASTER,
@@ -42,11 +42,11 @@ typedef enum ammo_e {
     AMMO_TRIPMINE,
     AMMO_DETPACK,
     AMMO_MAX
-} ammo_t;
+};
 
 extern const struct weaponData_t {
     const char *longName; // spawning name
-    ammo_t ammoIndex;     // index to proper ammo slot
+    ammo_e ammoIndex;     // index to proper ammo slot
     int ammoLow;          // count when ammo is low
     int shotCost;         // amount of energy used per shot
     int fireTime;         // amount of time between firings

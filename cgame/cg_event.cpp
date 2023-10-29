@@ -78,7 +78,7 @@ static void CG_Obituary(entityState_t *ent) {
     int mod, target, attacker;
     const char *message, *targetInfo, *attackerInfo;
     char targetName[32], attackerName[32];
-    gender_t gender;
+    gender_e gender;
     clientInfo_t *ci;
 
     target = ent->otherEntityNum;
@@ -1137,7 +1137,7 @@ void CG_EntityEvent(centity_t *cent, vector3 *position) {
     case EV_FOOTSTEP:
         DEBUGNAME("EV_FOOTSTEP");
         if (cg_footsteps.integer) {
-            footstep_t soundType;
+            footstep_e soundType;
             switch (es->eventParm) {
             case MATERIAL_MUD:
                 soundType = FOOTSTEP_MUDWALK;

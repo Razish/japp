@@ -3,7 +3,7 @@
 #define TURN_OFF 0x00000100
 
 // Local state enums
-enum { LSTATE_NONE = 0, LSTATE_BACKINGUP, LSTATE_SPINNING, LSTATE_PAIN, LSTATE_DROP };
+enum localState_e { LSTATE_NONE = 0, LSTATE_BACKINGUP, LSTATE_SPINNING, LSTATE_PAIN, LSTATE_DROP };
 
 void R2D2_PartsMove(void) {
     // Front 'eye' lense

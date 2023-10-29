@@ -864,7 +864,7 @@ void CG_Chunks(int owner, vector3 *origin, const vector3 *normal, const vector3 
     vector3 dir;
     int i, j, k;
     int chunkModel = 0;
-    leBounceSoundType_t bounce = LEBS_NONE;
+    leBounceSoundType_e bounce = LEBS_NONE;
     float r, speedMod = 1.0f;
     qboolean chunk = qfalse;
 

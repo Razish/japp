@@ -301,7 +301,7 @@ void G_AddRandomBot(int team) {
                     teamstr = "";
                 Q_strncpyz(netname, value, sizeof(netname));
                 Q_CleanString(netname, STRIP_EXTASCII);
-                trap->SendConsoleCommand(EXEC_INSERT, va("addbot \"%s\" %.2f %s %i\n", netname, skill, teamstr, 0));
+                trap->SendConsoleCommand(EXEC_INSERT, va("addbot \"%s\" %.2f %s %i\n", netname, (double)skill, teamstr, 0));
                 return;
             }
         }
@@ -393,7 +393,7 @@ int G_CountBotPlayers(int team) {
 
 void G_CheckMinimumPlayers(void) {
     int humanplayers, botplayers;
-    static int checkminimumplayers_time;
+    static int checkminimumplayers_time = 0;
 
     if (level.gametype == GT_SIEGE)
         return;
@@ -527,7 +527,7 @@ void G_AddBot(const char *name, float skill, const char *team, int delay, char *
     Info_SetValueForKey(userinfo, "rate", "25000");
     Info_SetValueForKey(userinfo, "snaps", "20");
     Info_SetValueForKey(userinfo, "ip", "localhost");
-    Info_SetValueForKey(userinfo, "skill", va("%.2f", skill));
+    Info_SetValueForKey(userinfo, "skill", va("%.2f", (double)skill));
 
     if (skill >= 1 && skill < 2)
         Info_SetValueForKey(userinfo, "handicap", "50");
@@ -665,7 +665,7 @@ void G_AddBot(const char *name, float skill, const char *team, int delay, char *
         trap->GetUserinfo(clientNum, userinfo, sizeof(userinfo));
 
         if (bot->client->sess.sessionTeam == TEAM_SPECTATOR)
-            bot->client->sess.sessionTeam = (team_t)preTeam;
+            bot->client->sess.sessionTeam = (team_e)preTeam;
 
         if (bot->client->sess.sessionTeam == TEAM_RED)
             team = "Red";

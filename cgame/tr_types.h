@@ -58,7 +58,7 @@ typedef struct poly_s {
     polyVert_t *verts;
 } poly_t;
 
-typedef enum refEntityType_e {
+enum refEntityType_e {
     RT_MODEL,
     RT_POLY,
     RT_SPRITE,
@@ -73,10 +73,10 @@ typedef enum refEntityType_e {
     RT_ENT_CHAIN,
 
     RT_MAX_REF_ENTITY_TYPE
-} refEntityType_t;
+};
 
 typedef struct miniRefEntity_s {
-    refEntityType_t reType;
+    refEntityType_e reType;
     int renderfx;
 
     qhandle_t hModel; // opaque type outside refresh
@@ -113,7 +113,7 @@ typedef struct refEntity_s {
     // this stucture must remain identical as the miniRefEntity_t
     //
     //
-    refEntityType_t reType;
+    refEntityType_e reType;
     int renderfx;
 
     qhandle_t hModel; // opaque type outside refresh
@@ -243,7 +243,7 @@ typedef struct refdef_s {
     char text[MAX_RENDER_STRINGS][MAX_RENDER_STRING_LENGTH];
 } refdef_t;
 
-typedef enum stereoFrame_e { STEREO_CENTER, STEREO_LEFT, STEREO_RIGHT } stereoFrame_t;
+enum stereoFrame_e { STEREO_CENTER, STEREO_LEFT, STEREO_RIGHT };
 
 /*
 ** glconfig_t
@@ -252,7 +252,7 @@ typedef enum stereoFrame_e { STEREO_CENTER, STEREO_LEFT, STEREO_RIGHT } stereoFr
 ** being run right now.  These are constant once the OpenGL
 ** subsystem is initialized.
 */
-typedef enum textureCompression_e { TC_NONE, TC_S3TC, TC_S3TC_DXT } textureCompression_t;
+enum textureCompression_e { TC_NONE, TC_S3TC, TC_S3TC_DXT };
 
 typedef struct glconfig_s {
     const char *renderer_string;
@@ -267,7 +267,7 @@ typedef struct glconfig_s {
     int colorBits, depthBits, stencilBits;
 
     qboolean deviceSupportsGamma;
-    textureCompression_t textureCompression;
+    textureCompression_e textureCompression;
     qboolean textureEnvAddAvailable;
     qboolean clampToEdgeAvailable;
 

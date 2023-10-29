@@ -19,9 +19,9 @@
 #define MAX_EXDATA_ENTS_TO_SEND MAX_CLIENTS // max number of extended data for ents to send
 
 // The basic siege player classes
-typedef enum { SPC_INFANTRY = 0, SPC_VANGUARD, SPC_SUPPORT, SPC_JEDI, SPC_DEMOLITIONIST, SPC_HEAVY_WEAPONS, SPC_MAX } siegePlayerClassFlags_t;
+enum siegePlayerClassFlags_e { SPC_INFANTRY = 0, SPC_VANGUARD, SPC_SUPPORT, SPC_JEDI, SPC_DEMOLITIONIST, SPC_HEAVY_WEAPONS, SPC_MAX };
 
-typedef enum {
+enum siegeClassFlags_e {
     CFL_MORESABERDMG = 0,
     CFL_STRONGAGAINSTPHYSICAL,
     CFL_FASTFORCEREGEN,
@@ -30,7 +30,7 @@ typedef enum {
     CFL_SINGLE_ROCKET, // has only 1 rocket to use with rocketlauncher
     CFL_CUSTOMSKEL,    // class uses a custom skeleton, be sure to load on server etc
     CFL_EXTRA_AMMO
-} siegeClassFlags_t;
+};
 
 #define SIEGE_CLASS_DESC_LEN 4096
 typedef struct siegeClassDesc_s {

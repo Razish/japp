@@ -10,7 +10,7 @@ qboolean WP_SaberParseParms(const char *SaberName, saberInfo_t *saber);
 void WP_RemoveSaber(saberInfo_t *sabers, int saberNum);
 
 const stringID_table_t TeamTable[] = {
-    ENUM2STRING(NPCTEAM_FREE), // caution, some code checks a team_t via "if (!team_t_varname)" so I guess this should stay as entry 0, great or what? -slc
+    ENUM2STRING(NPCTEAM_FREE), // caution, some code checks a team_e via "if (!team_t_varname)" so I guess this should stay as entry 0, great or what? -slc
     ENUM2STRING(NPCTEAM_PLAYER),
     ENUM2STRING(NPCTEAM_ENEMY),
     ENUM2STRING(NPCTEAM_NEUTRAL), // most droids are team_neutral, there are some exceptions like Probe,Seeker,Interrogator
@@ -153,7 +153,7 @@ qboolean BG_ParseLiteral(const char **data, const char *string);
 static std::string NPCParms = "";
 
 // Should be used to determine pip bolt-ons
-static rank_t TranslateRankName(const char *name) {
+static rank_e TranslateRankName(const char *name) {
     if (!Q_stricmp(name, "civilian")) {
         return RANK_CIVILIAN;
     }
@@ -399,14 +399,14 @@ void NPC_PrecacheAnimationCFG(const char *NPC_type) {
 #endif
 }
 
-int NPC_WeaponsForTeam(team_t team, int spawnflags, const char *NPC_type);
-void NPC_PrecacheWeapons(npcteam_t playerTeam, int spawnflags, const char *NPCtype) {
-    int weapons = NPC_WeaponsForTeam((team_t)playerTeam, spawnflags, NPCtype);
+int NPC_WeaponsForTeam(team_e team, int spawnflags, const char *NPC_type);
+void NPC_PrecacheWeapons(npcteam_e playerTeam, int spawnflags, const char *NPCtype) {
+    int weapons = NPC_WeaponsForTeam((team_e)playerTeam, spawnflags, NPCtype);
     int curWeap;
 
     for (curWeap = WP_SABER; curWeap < WP_NUM_WEAPONS; curWeap++) {
         if (weapons & (1 << curWeap)) {
-            RegisterItem(BG_FindItemForWeapon((weapon_t)curWeap));
+            RegisterItem(BG_FindItemForWeapon((weapon_e)curWeap));
         }
     }
 
@@ -417,7 +417,7 @@ void NPC_PrecacheWeapons(npcteam_t playerTeam, int spawnflags, const char *NPCty
 	{
 		if ( (weapons & ( 1 << curWeap )) )
 		{
-			item = FindItemForWeapon( ((weapon_t)(curWeap)) );	//precache the weapon
+			item = FindItemForWeapon( ((weapon_e)(curWeap)) );	//precache the weapon
 			CG_RegisterItemSounds( (item-bg_itemlist) );
 			CG_RegisterItemVisuals( (item-bg_itemlist) );
 			//precache the in-hand/in-world ghoul2 weapon model
@@ -446,7 +446,7 @@ Precaches NPC skins, tgas and md3s.
 
 */
 void NPC_Precache(gentity_t *spawner) {
-    npcteam_t playerTeam = NPCTEAM_FREE;
+    npcteam_e playerTeam = NPCTEAM_FREE;
     const char *token;
     const char *value;
     const char *p;
@@ -565,7 +565,7 @@ void NPC_Precache(gentity_t *spawner) {
             }
             // playerTeam = TranslateTeamName(value);
             Com_sprintf(tk, sizeof(tk), "NPC%s", token);
-            playerTeam = (npcteam_t)GetIDForString(TeamTable, tk);
+            playerTeam = (npcteam_e)GetIDForString(TeamTable, tk);
             continue;
         }
 
@@ -647,7 +647,7 @@ void NPC_Precache(gentity_t *spawner) {
             curWeap = GetIDForString(WPTable, value);
 
             if (curWeap > WP_NONE && curWeap < WP_NUM_WEAPONS) {
-                RegisterItem(BG_FindItemForWeapon((weapon_t)curWeap));
+                RegisterItem(BG_FindItemForWeapon((weapon_e)curWeap));
             }
             continue;
         }
@@ -1500,7 +1500,7 @@ qboolean NPC_ParseParms(const char *NPCName, gentity_t *NPC) {
                 }
                 Com_sprintf(tk, sizeof(tk), "NPC%s", token);
                 NPC->s.teamowner = GetIDForString(TeamTable, tk); // TranslateTeamName(value);
-                NPC->client->playerTeam = (npcteam_t)NPC->s.teamowner;
+                NPC->client->playerTeam = (npcteam_e)NPC->s.teamowner;
                 continue;
             }
 
@@ -1512,7 +1512,7 @@ qboolean NPC_ParseParms(const char *NPCName, gentity_t *NPC) {
                     continue;
                 }
                 Com_sprintf(tk, sizeof(tk), "NPC%s", token);
-                NPC->client->enemyTeam = (npcteam_t)GetIDForString(TeamTable, tk); // TranslateTeamName(value);
+                NPC->client->enemyTeam = (npcteam_e)GetIDForString(TeamTable, tk); // TranslateTeamName(value);
                 continue;
             }
 
@@ -1521,7 +1521,7 @@ qboolean NPC_ParseParms(const char *NPCName, gentity_t *NPC) {
                 if (COM_ParseString(&p, &value)) {
                     continue;
                 }
-                NPC->client->NPC_class = (class_t)GetIDForString(ClassTable, value);
+                NPC->client->NPC_class = (class_e)GetIDForString(ClassTable, value);
                 NPC->s.NPC_class = NPC->client->NPC_class; // we actually only need this value now, but at the moment I don't feel like changing the 200+
                                                            // references to client->NPC_class.
 
@@ -1770,7 +1770,7 @@ qboolean NPC_ParseParms(const char *NPCName, gentity_t *NPC) {
                         continue;
                     }
                     if (NPC->NPC) {
-                        NPC->NPC->defaultBehavior = (bState_t)(n);
+                        NPC->NPC->defaultBehavior = (bState_e)(n);
                     }
                     continue;
                 }
@@ -1860,7 +1860,7 @@ qboolean NPC_ParseParms(const char *NPCName, gentity_t *NPC) {
                     NPC->client->ps.weapon = weap;
                     NPC->client->ps.stats[STAT_WEAPONS] |= (1 << NPC->client->ps.weapon);
                     if (weap > WP_NONE) {
-                        //	RegisterItem( FindItemForWeapon( (weapon_t)(NPC->client->ps.weapon) ) );	//precache the weapon
+                        //	RegisterItem( FindItemForWeapon( (weapon_e)(NPC->client->ps.weapon) ) );	//precache the weapon
                         NPC->client->ps.ammo[weaponData[NPC->client->ps.weapon].ammoIndex] = 100; // FIXME: max ammo!
                     }
                 }

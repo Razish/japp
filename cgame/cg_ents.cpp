@@ -1631,7 +1631,7 @@ static void CG_Item(centity_t *cent) {
         ent.renderfx |= RF_FORCE_ENT_ALPHA;
         //	VectorCopy( cent->currentState.angles, angs );
         angs.pitch = 0.0f;
-        angs.yaw = 360.0f * (fmod(cg.time * 0.001f, 360.0f / 128.0f)) / (360.0f / 128.0f);
+        angs.yaw = 360.0f * (fmodf(cg.time * 0.001f, 360.0f / 128.0f)) / (360.0f / 128.0f);
         angs.roll = 0.0f;
         AnglesToAxis(&angs, ent.axis);
 

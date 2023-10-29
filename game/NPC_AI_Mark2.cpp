@@ -11,12 +11,7 @@
 #define MIN_DISTANCE_SQR (MIN_DISTANCE * MIN_DISTANCE)
 
 // Local state enums
-enum {
-    LSTATE_NONE = 0,
-    LSTATE_DROPPINGDOWN,
-    LSTATE_DOWN,
-    LSTATE_RISINGUP,
-};
+enum localState_e { LSTATE_NONE = 0, LSTATE_DROPPINGDOWN, LSTATE_DOWN, LSTATE_RISINGUP };
 
 void NPC_Mark2_Precache(void) {
     G_SoundIndex("sound/chars/mark2/misc/mark2_explo"); // blows up on death

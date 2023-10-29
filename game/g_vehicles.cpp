@@ -1402,7 +1402,7 @@ static qboolean UpdateRider(Vehicle_t *pVeh, bgEntity_t *pRider, usercmd_t *pUmc
             // If going too fast, roll off.
             if ((parent->client->ps.speed <= 600) && pUmcd->rightmove != 0) {
                 if (pVeh->m_pVehicleInfo->Eject(pVeh, pRider, qfalse)) {
-                    animNumber_t Anim;
+                    animNumber_e Anim;
                     int iFlags = SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD | SETANIM_FLAG_HOLDLESS, iBlend = 300;
                     if (pUmcd->rightmove > 0) {
                         Anim = BOTH_ROLL_R;
@@ -1421,7 +1421,7 @@ static qboolean UpdateRider(Vehicle_t *pVeh, bgEntity_t *pRider, usercmd_t *pUmc
                 }
             } else {
                 // FIXME: Check trace to see if we should start playing the animation.
-                animNumber_t Anim;
+                animNumber_e Anim;
                 int iFlags = SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, iBlend = 500;
                 if (pUmcd->rightmove > 0) {
                     Anim = BOTH_VS_DISMOUNT_R;
@@ -1487,7 +1487,7 @@ static qboolean UpdateRider(Vehicle_t *pVeh, bgEntity_t *pRider, usercmd_t *pUmc
 
         // Roll off.
         if (pUmcd->upmove < 0) {
-            animNumber_t Anim = BOTH_ROLL_B;
+            animNumber_e Anim = BOTH_ROLL_B;
             pVeh->m_EjectDir = VEH_EJECT_REAR;
             if (pUmcd->rightmove > 0) {
                 Anim = BOTH_ROLL_R;

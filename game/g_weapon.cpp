@@ -354,7 +354,7 @@ static void WP_FireBlaster(gentity_t *ent, qboolean altFire) {
     WP_FireBlasterMissile(ent, &muzzle, &dir, altFire);
 }
 
-hitLocation_t G_GetHitLocation(gentity_t *target, vector3 *ppoint);
+hitLocation_e G_GetHitLocation(gentity_t *target, vector3 *ppoint);
 
 static void WP_DisruptorMainFire(gentity_t *ent) {
     int damage = DISRUPTOR_MAIN_DAMAGE;
@@ -2393,7 +2393,7 @@ void WP_DropDetPack(gentity_t *ent, qboolean alt_fire) {
             }
             if (removeMe != -1) {
                 // remove it... or blow it?
-                if (&g_entities[foundDetPacks[removeMe]] == NULL) {
+                if (!g_entities[foundDetPacks[removeMe]].inuse) {
                     break;
                 } else {
                     G_FreeEntity(&g_entities[foundDetPacks[removeMe]]);
@@ -3705,7 +3705,7 @@ void FireWeapon(gentity_t *ent, qboolean altFire) {
         CalcMuzzlePoint(ent, &forward, &vright, &up, &muzzle);
 
         // fire the specific weapon
-        if (JPLua::Weapon_CallFunction(ent, (weapon_t)ent->s.weapon, altFire)) {
+        if (JPLua::Weapon_CallFunction(ent, (weapon_e)ent->s.weapon, altFire)) {
             // jplua override
             return;
         }

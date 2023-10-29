@@ -6,7 +6,7 @@
 qboolean G_CheckForStrongAttackMomentum(gentity_t *self);
 void G_AddVoiceEvent(gentity_t *self, int event, int speakDebounceTime);
 void cgi_S_StartSound(vector3 *origin, int entityNum, int entchannel, sfxHandle_t sfx);
-qboolean Q3_TaskIDPending(gentity_t *ent, taskID_t taskType);
+qboolean Q3_TaskIDPending(gentity_t *ent, taskID_e taskType);
 qboolean NPC_CheckLookTarget(gentity_t *self);
 qboolean Jedi_WaitingAmbush(gentity_t *self);
 void Jedi_Ambush(gentity_t *self);
@@ -78,6 +78,7 @@ static void NPC_CheckAttacker(gentity_t *other, int mod) {
         }
     }
     // Special case player interactions
+    // FIXME: clientNum 0
     if (other == &g_entities[0]) {
         // Account for the skill level to skew the results
         float luckThreshold;
@@ -275,7 +276,7 @@ void NPC_ChoosePainAnimation(gentity_t *self, gentity_t *other, vector3 *point, 
 }
 
 void NPC_Pain(gentity_t *self, gentity_t *attacker, int damage) {
-    npcteam_t otherTeam = NPCTEAM_FREE;
+    npcteam_e otherTeam = NPCTEAM_FREE;
     int voiceEvent = -1;
     gentity_t *other = attacker;
     int mod = gPainMOD;

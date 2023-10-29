@@ -674,7 +674,7 @@ int Team_TouchOurFlag(gentity_t *ent, gentity_t *other, int team) {
         if (teamgame.bestCapTime == -1) {
             trap->SendServerCommand(-1, va("print \"%s " S_COLOR_GREEN "captured the %s flag in " S_COLOR_CYAN "%.3f " S_COLOR_GREEN
                                            "seconds, setting the record\n\"",
-                                           cl->pers.netname, TeamName(OtherTeam(team)), capTime / 1000.0f));
+                                           cl->pers.netname, TeamName(OtherTeam(team)), (double)(capTime / 1000.0f)));
             teamgame.bestCapTime = capTime;
             Q_strncpyz(teamgame.bestCapName, cl->pers.netname, sizeof(teamgame.bestCapName));
         } else if (capTime < teamgame.bestCapTime) {
@@ -682,14 +682,14 @@ int Team_TouchOurFlag(gentity_t *ent, gentity_t *other, int team) {
                 trap->SendServerCommand(-1, va("print \"%s " S_COLOR_GREEN "captured the %s flag in " S_COLOR_CYAN "%.3f " S_COLOR_GREEN
                                                "seconds, breaking their record of " S_COLOR_CYAN "%.3f " S_COLOR_GREEN "seconds (" S_COLOR_YELLOW
                                                "+%.3f" S_COLOR_GREEN ")\n\"",
-                                               cl->pers.netname, TeamName(OtherTeam(team)), capTime / 1000.0f, teamgame.bestCapTime / 1000.0f,
-                                               (teamgame.bestCapTime - capTime) / 1000.0f));
+                                               cl->pers.netname, TeamName(OtherTeam(team)), (double)(capTime / 1000.0f),
+                                               (double)(teamgame.bestCapTime / 1000.0f), (double)((teamgame.bestCapTime - capTime) / 1000.0f)));
             else {
                 trap->SendServerCommand(-1, va("print \"%s " S_COLOR_GREEN "captured the %s flag in " S_COLOR_CYAN "%.3f " S_COLOR_GREEN
                                                "seconds, breaking %s" S_COLOR_GREEN "'s record of " S_COLOR_CYAN "%.3f " S_COLOR_GREEN
                                                "seconds (" S_COLOR_YELLOW "+%.3f" S_COLOR_GREEN ")\n\"",
-                                               cl->pers.netname, TeamName(OtherTeam(team)), capTime / 1000.0f, teamgame.bestCapName,
-                                               teamgame.bestCapTime / 1000.0f, (teamgame.bestCapTime - capTime) / 1000.0f));
+                                               cl->pers.netname, TeamName(OtherTeam(team)), (double)(capTime / 1000.0f), teamgame.bestCapName,
+                                               (double)(teamgame.bestCapTime / 1000.0f), (double)((teamgame.bestCapTime - capTime) / 1000.0f)));
             }
             teamgame.bestCapTime = capTime;
             Q_strncpyz(teamgame.bestCapName, cl->pers.netname, sizeof(teamgame.bestCapName));
@@ -698,14 +698,14 @@ int Team_TouchOurFlag(gentity_t *ent, gentity_t *other, int team) {
                 trap->SendServerCommand(-1, va("print \"%s " S_COLOR_GREEN "captured the %s flag in " S_COLOR_CYAN "%.3f " S_COLOR_GREEN
                                                "seconds, failing to break their record of " S_COLOR_CYAN "%.3f " S_COLOR_GREEN "seconds (" S_COLOR_RED
                                                "%.3f" S_COLOR_GREEN ")\n\"",
-                                               cl->pers.netname, TeamName(OtherTeam(team)), capTime / 1000.0f, teamgame.bestCapTime / 1000.0f,
-                                               (teamgame.bestCapTime - capTime) / 1000.0f));
+                                               cl->pers.netname, TeamName(OtherTeam(team)), (double)(capTime / 1000.0f),
+                                               (double)(teamgame.bestCapTime / 1000.0f), (double)((teamgame.bestCapTime - capTime) / 1000.0f)));
             } else {
                 trap->SendServerCommand(-1, va("print \"%s " S_COLOR_GREEN "captured the %s flag in " S_COLOR_CYAN "%.3f " S_COLOR_GREEN
                                                "seconds, failing to break %s" S_COLOR_GREEN "'s record of " S_COLOR_CYAN "%.3f " S_COLOR_GREEN
                                                "seconds (" S_COLOR_RED "%.3f" S_COLOR_GREEN ")\n\"",
-                                               cl->pers.netname, TeamName(OtherTeam(team)), capTime / 1000.0f, teamgame.bestCapName,
-                                               teamgame.bestCapTime / 1000.0f, (teamgame.bestCapTime - capTime) / 1000.0f));
+                                               cl->pers.netname, TeamName(OtherTeam(team)), (double)(capTime / 1000.0f), teamgame.bestCapName,
+                                               (double)(teamgame.bestCapTime / 1000.0f), (double)((teamgame.bestCapTime - capTime) / 1000.0f)));
             }
         }
     } else {
@@ -917,7 +917,7 @@ qboolean Team_GetLocationMsg(gentity_t *ent, char *loc, int loclen) {
 #define MAX_TEAM_SPAWN_POINTS 32
 
 // go to a random point that doesn't telefrag
-gentity_t *SelectRandomTeamSpawnPoint(int teamstate, team_t team, int siegeClass) {
+gentity_t *SelectRandomTeamSpawnPoint(int teamstate, team_e team, int siegeClass) {
     gentity_t *spot, *spots[MAX_TEAM_SPAWN_POINTS];
     int count, selection;
     const char *classname;
@@ -994,7 +994,7 @@ gentity_t *SelectRandomTeamSpawnPoint(int teamstate, team_t team, int siegeClass
     return spots[selection];
 }
 
-gentity_t *SelectCTFSpawnPoint(team_t team, int teamstate, vector3 *origin, vector3 *angles) {
+gentity_t *SelectCTFSpawnPoint(team_e team, int teamstate, vector3 *origin, vector3 *angles) {
     gentity_t *spot;
 
     spot = SelectRandomTeamSpawnPoint(teamstate, team, -1);
@@ -1010,7 +1010,7 @@ gentity_t *SelectCTFSpawnPoint(team_t team, int teamstate, vector3 *origin, vect
     return spot;
 }
 
-gentity_t *SelectSiegeSpawnPoint(int siegeClass, team_t team, int teamstate, vector3 *origin, vector3 *angles) {
+gentity_t *SelectSiegeSpawnPoint(int siegeClass, team_e team, int teamstate, vector3 *origin, vector3 *angles) {
     gentity_t *spot;
 
     spot = SelectRandomTeamSpawnPoint(teamstate, team, siegeClass);

@@ -3,7 +3,6 @@
 //
 #include "b_local.h"
 #include "anims.h"
-#include "say.h"
 #include "ICARUS/Q3_Interface.h"
 
 extern vector3 playerMins;
@@ -30,7 +29,7 @@ gentity_t *NPC;
 gNPC_t *NPCInfo;
 gclient_t *client;
 usercmd_t ucmd;
-visibility_t enemyVisibility;
+visibility_e enemyVisibility;
 
 void pitch_roll_for_slope(gentity_t *forwhom, vector3 *pass_slope);
 void GM_Dying(gentity_t *self);
@@ -443,7 +442,7 @@ static void DeadThink(void) {
                     NPC->nextthink = level.time + FRAMETIME;
                 }
             } else {
-                class_t npc_class;
+                class_e npc_class;
 
                 // Start the body effect first, then delay 400ms before ditching the corpse
                 NPC_RemoveBodyEffect();
@@ -532,6 +531,7 @@ void NPC_ShowDebugInfo(void) {
         vector3 mins, maxs;
 
         while ((found = G_Find(found, FOFS(classname), "NPC")) != NULL) {
+            // FIXME: clientNum 0?
             if (trap->InPVS(&found->r.currentOrigin, &g_entities[0].r.currentOrigin)) {
                 VectorAdd(&found->r.currentOrigin, &found->r.mins, &mins);
                 VectorAdd(&found->r.currentOrigin, &found->r.maxs, &maxs);
@@ -1196,7 +1196,7 @@ void NPC_RunBehavior(int team, int bState) {
 // NPC Behavior state thinking
 void NPC_ExecuteBState(gentity_t *self) //, int msec )
 {
-    bState_t bState;
+    bState_e bState;
 
     NPC_HandleAIFlags();
 

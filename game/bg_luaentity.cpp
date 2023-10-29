@@ -157,7 +157,7 @@ int Entity_Create(lua_State *L) {
 
         lua_pushnil(L);
         const char *value, *key;
-        for (int i = 0; lua_next(L, 1); i++) {
+        while (lua_next(L, 1)) {
             if (lua_type(L, -2) != LUA_TSTRING) {
                 continue; // key can be only string
             }
@@ -186,7 +186,7 @@ int Entity_Create(lua_State *L) {
                     luaL_getmetatable(L, "Vector.meta"); // get metatable for comparing
                     if (lua_rawequal(L, -1, -2)) {
                         vector3 *vector = CheckVector(L, -3);
-                        value = va("%.0f %.0f %.0f", vector->x, vector->y, vector->z);
+                        value = va("%.0f %.0f %.0f", (double)vector->x, (double)vector->y, (double)vector->z);
                         lua_pop(L, 2);
                         break;
                     }
@@ -1383,7 +1383,7 @@ void Register_Entity(lua_State *L) {
 #endif // JPLUA
 
 #ifdef PROJECT_GAME
-void Entity_CallFunction(gentity_t *ent, entityFunc_t funcID, intptr_t arg1, intptr_t arg2, intptr_t arg3, intptr_t arg4) {
+void Entity_CallFunction(gentity_t *ent, entityFunc_e funcID, intptr_t arg1, intptr_t arg2, intptr_t arg3, intptr_t arg4) {
 #ifdef JPLUA
     if (ent->uselua) {
         lua_State *L = ls.L;

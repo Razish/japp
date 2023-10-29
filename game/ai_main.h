@@ -1,6 +1,7 @@
 #include <vector>
 
-#include "bg_saga.h"
+#include "qcommon/q_shared.h"
+#include "game/bg_saga.h"
 
 //#define FORCEJUMP_INSTANTMETHOD 1
 
@@ -81,7 +82,7 @@
 
 #define BOT_SABER_THROW_RANGE 800
 
-typedef enum {
+enum bot_ctf_state_e {
     CTFSTATE_NONE,
     CTFSTATE_ATTACKER,
     CTFSTATE_DEFENDER,
@@ -89,11 +90,11 @@ typedef enum {
     CTFSTATE_GUARDCARRIER,
     CTFSTATE_GETFLAGHOME,
     CTFSTATE_MAXCTFSTATES
-} bot_ctf_state_t;
+};
 
-typedef enum { SIEGESTATE_NONE, SIEGESTATE_ATTACKER, SIEGESTATE_DEFENDER, SIEGESTATE_MAXSIEGESTATES } bot_siege_state_t;
+enum bot_siege_state_e { SIEGESTATE_NONE, SIEGESTATE_ATTACKER, SIEGESTATE_DEFENDER, SIEGESTATE_MAXSIEGESTATES };
 
-typedef enum { TEAMPLAYSTATE_NONE, TEAMPLAYSTATE_FOLLOWING, TEAMPLAYSTATE_ASSISTING, TEAMPLAYSTATE_REGROUP, TEAMPLAYSTATE_MAXTPSTATES } bot_teamplay_state_t;
+enum bot_teamplay_state_e { TEAMPLAYSTATE_NONE, TEAMPLAYSTATE_FOLLOWING, TEAMPLAYSTATE_ASSISTING, TEAMPLAYSTATE_REGROUP, TEAMPLAYSTATE_MAXTPSTATES };
 
 typedef struct botattachment_s {
     int level;

@@ -12,12 +12,12 @@ int teamCounter[TEAM_NUM_TEAMS];
 void G_DebugPrint(int level, const char *format, ...);
 
 /*
-void CalcEntitySpot ( gentity_t *ent, spot_t spot, vector3 *point )
+void CalcEntitySpot ( gentity_t *ent, spot_e spot, vector3 *point )
 
 Added: Uses shootAngles if a NPC has them
 
 */
-void CalcEntitySpot(const gentity_t *ent, const spot_t spot, vector3 *point) {
+void CalcEntitySpot(const gentity_t *ent, const spot_e spot, vector3 *point) {
     vector3 forward, up, right;
     vector3 start, end;
     trace_t tr;
@@ -460,7 +460,7 @@ void SetTeamNumbers(void) {
 extern stringID_table_t BSTable[];
 extern stringID_table_t BSETTable[];
 qboolean G_ActivateBehavior(gentity_t *self, int bset) {
-    bState_t bSID = (bState_t)-1;
+    bState_e bSID = (bState_e)-1;
     char *bs_name = NULL;
 
     if (!self) {
@@ -474,10 +474,10 @@ qboolean G_ActivateBehavior(gentity_t *self, int bset) {
     }
 
     if (self->NPC) {
-        bSID = (bState_t)(GetIDForString(BSTable, bs_name));
+        bSID = (bState_e)(GetIDForString(BSTable, bs_name));
     }
 
-    if (bSID != (bState_t)-1) {
+    if (bSID != (bState_e)-1) {
         self->NPC->tempBehavior = BS_DEFAULT;
         self->NPC->behaviorState = bSID;
     } else {
@@ -801,6 +801,7 @@ gentity_t *NPC_PickEnemyExt(qboolean checkAlerts) {
 
             if (ev->level >= AEL_DISCOVERED) {
                 // If it's the player, attack him
+                // FIXME: clientNum 0
                 if (ev->owner == &g_entities[0])
                     return ev->owner;
 
@@ -814,7 +815,10 @@ gentity_t *NPC_PickEnemyExt(qboolean checkAlerts) {
     return NULL;
 }
 
-qboolean NPC_FindPlayer(void) { return NPC_TargetVisible(&g_entities[0]); }
+qboolean NPC_FindPlayer(void) {
+    // FIXME: clientNum 0
+    return NPC_TargetVisible(&g_entities[0]);
+}
 
 static qboolean NPC_CheckPlayerDistance(void) {
     return qfalse; // MOOT in MP
@@ -1030,8 +1034,7 @@ void NPC_SetLookTarget(gentity_t *self, int entNum, int clearTime) {
 qboolean NPC_CheckLookTarget(gentity_t *self) {
     if (self->client) {
         if (self->client->renderInfo.lookTarget >= 0 && self->client->renderInfo.lookTarget < ENTITYNUM_WORLD) { // within valid range
-            if ((&g_entities[self->client->renderInfo.lookTarget] == NULL) ||
-                !g_entities[self->client->renderInfo.lookTarget].inuse) { // lookTarget not inuse or not valid anymore
+            if (!g_entities[self->client->renderInfo.lookTarget].inuse) { // lookTarget not inuse or not valid anymore
                 NPC_ClearLookTarget(self);
             } else if (self->client->renderInfo.lookTargetClearTime && self->client->renderInfo.lookTargetClearTime < level.time) { // Time to clear lookTarget
                 NPC_ClearLookTarget(self);
@@ -1052,8 +1055,8 @@ void G_AddVoiceEvent(gentity_t *self, int event, int speakDebounceTime);
 
 void NPC_CheckCharmed(void) {
     if (NPCInfo->charmedTime && NPCInfo->charmedTime < level.time && NPC->client) { // we were charmed, set us back!
-        NPC->client->playerTeam = (npcteam_t)NPC->genericValue1;
-        NPC->client->enemyTeam = (npcteam_t)NPC->genericValue2;
+        NPC->client->playerTeam = (npcteam_e)NPC->genericValue1;
+        NPC->client->enemyTeam = (npcteam_e)NPC->genericValue2;
         NPC->s.teamowner = NPC->genericValue3;
 
         NPC->client->leader = NULL;

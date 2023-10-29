@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum animNumber_e {
+enum animNumber_e {
     // HEAD ANIMS
     //# #sep Head-only anims
     FACE_TALK0, //# silent
@@ -1817,6 +1817,6 @@ typedef enum animNumber_e {
     //# #eol
     MAX_ANIMATIONS,
     MAX_TOTALANIMATIONS,
-} animNumber_t;
+};
 
 #define SABER_ANIM_GROUP_SIZE (BOTH_A2_T__B_ - BOTH_A1_T__B_)

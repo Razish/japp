@@ -222,7 +222,7 @@ qboolean InVisrange(gentity_t *ent) { // FIXME: make a calculate visibility for 
 NPC_CheckVisibility
 */
 
-visibility_t NPC_CheckVisibility(gentity_t *ent, uint32_t flags) {
+visibility_e NPC_CheckVisibility(gentity_t *ent, uint32_t flags) {
     // flags should never be 0
     if (!flags) {
         return VIS_NOT;
@@ -277,9 +277,9 @@ visibility_t NPC_CheckVisibility(gentity_t *ent, uint32_t flags) {
     return VIS_SHOOT;
 }
 
-static int G_CheckSoundEvents(gentity_t *self, float maxHearDist, int ignoreAlert, qboolean mustHaveOwner, alertEventLevel_t minAlertLevel) {
+static int G_CheckSoundEvents(gentity_t *self, float maxHearDist, int ignoreAlert, qboolean mustHaveOwner, alertEventLevel_e minAlertLevel) {
     int bestEvent = -1;
-    alertEventLevel_t bestAlert = AEL_NONE;
+    alertEventLevel_e bestAlert = AEL_NONE;
     int bestTime = -1;
     int i;
     float dist, radius;
@@ -344,7 +344,7 @@ float G_GetLightLevel(vector3 *pos, vector3 *fromDir) {
     return lightLevel;
 }
 
-static int G_CheckSightEvents(gentity_t *self, int hFOV, int vFOV, float maxSeeDist, int ignoreAlert, qboolean mustHaveOwner, alertEventLevel_t minAlertLevel) {
+static int G_CheckSightEvents(gentity_t *self, int hFOV, int vFOV, float maxSeeDist, int ignoreAlert, qboolean mustHaveOwner, alertEventLevel_e minAlertLevel) {
     int bestEvent = -1;
     int bestAlert = -1;
     int bestTime = -1;
@@ -412,13 +412,14 @@ int G_CheckAlertEvents(gentity_t *self, qboolean checkSight, qboolean checkSound
     int bestSoundAlert = -1;
     int bestSightAlert = -1;
 
-    if (&g_entities[0] == NULL || g_entities[0].health <= 0) {
+    // FIXME: clientNum 0
+    if (!g_entities[0].inuse || g_entities[0].health <= 0) {
         // player is dead
         return -1;
     }
 
     // get sound event
-    bestSoundEvent = G_CheckSoundEvents(self, maxHearDist, ignoreAlert, mustHaveOwner, (alertEventLevel_t)minAlertLevel);
+    bestSoundEvent = G_CheckSoundEvents(self, maxHearDist, ignoreAlert, mustHaveOwner, (alertEventLevel_e)minAlertLevel);
     // get sound event alert level
     if (bestSoundEvent >= 0) {
         bestSoundAlert = level.alertEvents[bestSoundEvent].level;
@@ -427,10 +428,10 @@ int G_CheckAlertEvents(gentity_t *self, qboolean checkSight, qboolean checkSound
     // get sight event
     if (self->NPC) {
         bestSightEvent =
-            G_CheckSightEvents(self, self->NPC->stats.hfov, self->NPC->stats.vfov, maxSeeDist, ignoreAlert, mustHaveOwner, (alertEventLevel_t)minAlertLevel);
+            G_CheckSightEvents(self, self->NPC->stats.hfov, self->NPC->stats.vfov, maxSeeDist, ignoreAlert, mustHaveOwner, (alertEventLevel_e)minAlertLevel);
     } else {
         // FIXME: look at cg_view to get more accurate numbers?
-        bestSightEvent = G_CheckSightEvents(self, 80, 80, maxSeeDist, ignoreAlert, mustHaveOwner, (alertEventLevel_t)minAlertLevel);
+        bestSightEvent = G_CheckSightEvents(self, 80, 80, maxSeeDist, ignoreAlert, mustHaveOwner, (alertEventLevel_e)minAlertLevel);
     }
     // get sight event alert level
     if (bestSightEvent >= 0) {
@@ -488,7 +489,7 @@ qboolean NPC_CheckForDanger(int alertEvent) { // FIXME: more bStates need to cal
 
 qboolean RemoveOldestAlert(void);
 
-void AddSoundEvent(gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, qboolean needLOS) {
+void AddSoundEvent(gentity_t *owner, vector3 *position, float radius, alertEventLevel_e alertLevel, qboolean needLOS) {
     // FIXME: Handle this in another manner?
     if (level.numAlertEvents >= MAX_ALERT_EVENTS) {
         if (!RemoveOldestAlert()) { // how could that fail?
@@ -520,7 +521,7 @@ void AddSoundEvent(gentity_t *owner, vector3 *position, float radius, alertEvent
     level.numAlertEvents++;
 }
 
-void AddSightEvent(gentity_t *owner, vector3 *position, float radius, alertEventLevel_t alertLevel, float addLight) {
+void AddSightEvent(gentity_t *owner, vector3 *position, float radius, alertEventLevel_e alertLevel, float addLight) {
     // FIXME: Handle this in another manner?
     if (level.numAlertEvents >= MAX_ALERT_EVENTS) {
         if (!RemoveOldestAlert()) { // how could that fail?
@@ -614,8 +615,7 @@ qboolean G_ClearLOS(gentity_t *self, const vector3 *start, const vector3 *end) {
     trap->Trace(&tr, start, NULL, NULL, end, ENTITYNUM_NONE, CONTENTS_OPAQUE /*CONTENTS_SOLID*/ /*(CONTENTS_SOLID|CONTENTS_MONSTERCLIP)*/, qfalse, 0, 0);
     while (tr.fraction < 1.0f && traceCount < 3) { // can see through 3 panes of glass
         if (tr.entityNum < ENTITYNUM_WORLD) {
-            if (&g_entities[tr.entityNum] != NULL && (g_entities[tr.entityNum].r.svFlags & SVF_GLASS_BRUSH)) { // can see through glass, trace again, ignoring
-                                                                                                               // me
+            if (g_entities[tr.entityNum].inuse && (g_entities[tr.entityNum].r.svFlags & SVF_GLASS_BRUSH)) { // can see through glass, trace again, ignoring me
                 trap->Trace(&tr, &tr.endpos, NULL, NULL, end, tr.entityNum, MASK_OPAQUE, qfalse, 0, 0);
                 traceCount++;
                 continue;

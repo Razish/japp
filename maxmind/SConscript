@@ -21,6 +21,9 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
     maxmind_env["CFLAGS"] += [
         "-std=c99",
     ]
+    maxmind_env["CCFLAGS"] += [
+        "-Wno-double-promotion",
+    ]
 
 maxmind_env["CPPPATH"] += ["#" + os.sep + "maxmind"]
 

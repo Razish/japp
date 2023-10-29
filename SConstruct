@@ -28,7 +28,7 @@
 # 	NO_SSE			disable SSE floating point instructions, force x87 fpu
 # 	MORE_WARNINGS	enable additional warnings
 # 	LESS_WARNINGS	disable some default warnings
-# 	SCONS_DEBUG 	disable some default warnings
+# 	SCONS_DEBUG 	debug logging for scons env/tool selection
 #
 
 import platform
@@ -444,13 +444,13 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
 
     # c flags
     env["CFLAGS"] += [
-        "-std=gnu99",
+        "-std=c17",
     ]
 
     # c++ flags
     env["CXXFLAGS"] += [
         "-fvisibility-inlines-hidden",
-        "-std=c++14",
+        "-std=c++17",
     ]
 
     # archive flags
@@ -554,6 +554,16 @@ elif env["CC"] == "cl":
             "/wd 4131",
             "/wd 4996",
         ]
+
+    # c flags
+    env["CFLAGS"] += [
+        "/std:c17",
+    ]
+
+    # c++ flags
+    env["CXXFLAGS"] += [
+        "/std:c++17",
+    ]
 
     env["LINKFLAGS"] += [
         #'/NODEFAULTLIB:LIBCMTD',

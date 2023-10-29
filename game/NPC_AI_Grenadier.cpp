@@ -31,7 +31,7 @@ static qboolean shoot3;
 static float enemyDist3;
 
 // Local state enums
-enum {
+enum localState_e {
     LSTATE_NONE = 0,
     LSTATE_UNDERFIRE,
     LSTATE_INVESTIGATE,

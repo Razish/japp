@@ -1163,7 +1163,7 @@ qboolean BG_CanUseFPNow(int gametype, playerState_t *ps, int time, forcePowers_t
     return qtrue;
 }
 
-const gitem_t *BG_FindItemForPowerup(powerup_t pw) {
+const gitem_t *BG_FindItemForPowerup(powerup_e pw) {
     const gitem_t *it = NULL;
 
     for (it = bg_itemlist + 1; it->classname; it++) {
@@ -1174,7 +1174,7 @@ const gitem_t *BG_FindItemForPowerup(powerup_t pw) {
     return NULL;
 }
 
-const gitem_t *BG_FindItemForHoldable(holdable_t hi) {
+const gitem_t *BG_FindItemForHoldable(holdable_e hi) {
     const gitem_t *it = NULL;
 
     for (it = bg_itemlist + 1; it->classname; it++) {
@@ -1186,7 +1186,7 @@ const gitem_t *BG_FindItemForHoldable(holdable_t hi) {
     return NULL;
 }
 
-const gitem_t *BG_FindItemForWeapon(weapon_t wp) {
+const gitem_t *BG_FindItemForWeapon(weapon_e wp) {
     const gitem_t *it = NULL;
 
     for (it = bg_itemlist + 1; it->classname; it++) {
@@ -1198,7 +1198,7 @@ const gitem_t *BG_FindItemForWeapon(weapon_t wp) {
     return NULL;
 }
 
-const gitem_t *BG_FindItemForAmmo(ammo_t ammo) {
+const gitem_t *BG_FindItemForAmmo(ammo_e ammo) {
     const gitem_t *it = NULL;
 
     for (it = bg_itemlist + 1; it->classname; it++) {
@@ -1305,7 +1305,7 @@ void BG_CycleForce(playerState_t *ps, int direction) {
 }
 
 // Get the itemlist index from the tag and type
-int BG_GetItemIndexByTag(int tag, itemType_t type) {
+int BG_GetItemIndexByTag(int tag, itemType_e type) {
     size_t i;
     const gitem_t *it = NULL;
 
@@ -2430,7 +2430,7 @@ qboolean GetCPD(bgEntity_t *self, uint32_t bit) {
     return !!(cpd & bit);
 }
 
-team_t BG_GetOpposingTeam(team_t team) {
+team_e BG_GetOpposingTeam(team_e team) {
     if (team == TEAM_RED) {
         return TEAM_BLUE;
     } else if (team == TEAM_BLUE) {

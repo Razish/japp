@@ -66,13 +66,13 @@ qboolean PM_SpinningAnim(int anim);
 qboolean PM_InOnGroundAnim(int anim);
 qboolean PM_InRollComplete(playerState_t *ps, int anim);
 
-int PM_AnimLength(int index, animNumber_t anim);
+int PM_AnimLength(int index, animNumber_e anim);
 
 int PM_GetSaberStance(void);
 float PM_GroundDistance(void);
 qboolean PM_SomeoneInFront(trace_t *tr);
-saberMoveName_t PM_SaberFlipOverAttackMove(void);
-saberMoveName_t PM_SaberJumpAttackMove(void);
+saberMoveName_e PM_SaberFlipOverAttackMove(void);
+saberMoveName_e PM_SaberJumpAttackMove(void);
 
 void PM_ClipVelocity(vector3 *in, vector3 *normal, vector3 *out, float overbounce);
 void PM_AddTouchEnt(int entityNum);

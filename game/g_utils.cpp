@@ -49,7 +49,7 @@ const char *BuildShaderStateConfig(void) {
 
     memset(buf, 0, MAX_STRING_CHARS);
     for (i = 0; i < remapCount; i++) {
-        Com_sprintf(out, sizeof(out), "%s=%s:%5.2f@", remappedShaders[i].oldShader, remappedShaders[i].newShader, remappedShaders[i].timeOffset);
+        Com_sprintf(out, sizeof(out), "%s=%s:%5.2f@", remappedShaders[i].oldShader, remappedShaders[i].newShader, (double)remappedShaders[i].timeOffset);
         Q_strcat(buf, sizeof(buf), out);
     }
 
@@ -103,7 +103,7 @@ int G_EffectIndex(const char *name) { return G_FindConfigstringIndex(name, CS_EF
 
 int G_BSPIndex(const char *name) { return G_FindConfigstringIndex(name, CS_BSP_MODELS, MAX_SUB_BSP, qtrue); }
 
-void G_TeamCommand(team_t team, const char *cmd) {
+void G_TeamCommand(team_e team, const char *cmd) {
     int i = 0;
     gclient_t *cl = NULL;
 
@@ -969,7 +969,7 @@ int G_CanUseDispOn(gentity_t *ent, int dispType) {
         // otherwise no
         return 0;
     } else if (dispType == HI_AMMODISP) {
-        ammo_t ammoIndex = weaponData[ent->client->ps.weapon].ammoIndex;
+        ammo_e ammoIndex = weaponData[ent->client->ps.weapon].ammoIndex;
         if (ent->client->ps.weapon <= WP_NONE || ent->client->ps.weapon > LAST_USEABLE_WEAPON) {
             return 0;
         }
@@ -1857,7 +1857,7 @@ bool G_CheckDuelIsolationSkip(const gentity_t *e1, const gentity_t *e2) {
     return true;
 }
 
-ammo_t G_AmmoForWeapon(weapon_t weapon) {
+ammo_e G_AmmoForWeapon(weapon_e weapon) {
     if (weapon < WP_NONE || weapon >= WP_NUM_WEAPONS) {
         return AMMO_NONE;
     }

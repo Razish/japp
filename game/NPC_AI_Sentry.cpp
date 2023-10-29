@@ -14,14 +14,7 @@
 #define SENTRY_HOVER_HEIGHT 24
 
 // Local state enums
-enum {
-    LSTATE_NONE = 0,
-    LSTATE_ASLEEP,
-    LSTATE_WAKEUP,
-    LSTATE_ACTIVE,
-    LSTATE_POWERING_UP,
-    LSTATE_ATTACKING,
-};
+enum localState_e { LSTATE_NONE = 0, LSTATE_ASLEEP, LSTATE_WAKEUP, LSTATE_ACTIVE, LSTATE_POWERING_UP, LSTATE_ATTACKING };
 
 void NPC_Sentry_Precache(void) {
     int i;

@@ -107,7 +107,7 @@
 #define HUDEVENT_SCORES (0x04u)
 #define HUDEVENT_ALL (0x07u)
 
-typedef enum footstep_e {
+enum footstep_e {
     FOOTSTEP_STONEWALK,
     FOOTSTEP_STONERUN,
     FOOTSTEP_METALWALK,
@@ -134,9 +134,9 @@ typedef enum footstep_e {
     FOOTSTEP_WOODWALK,
     FOOTSTEP_WOODRUN,
     FOOTSTEP_TOTAL
-} footstep_t;
+};
 
-typedef enum impactSound_e { IMPACTSOUND_DEFAULT, IMPACTSOUND_METAL, IMPACTSOUND_FLESH } impactSound_t;
+enum impactSound_e { IMPACTSOUND_DEFAULT, IMPACTSOUND_METAL, IMPACTSOUND_FLESH };
 
 // player entities need to track more information than any other type of entity.
 // note that not every player entity is a client entity, because corpses after respawn are outside the normal client
@@ -180,7 +180,7 @@ typedef struct clientInfo_s {
     void *ghoul2Weapons[MAX_SABERS];
     char saberName[64], saber2Name[64];
     char name[MAX_QPATH];
-    team_t team;
+    team_e team;
     int duelTeam;
     int botSkill; // -1 = not bot, 0-5 = bot
     int frame;
@@ -206,7 +206,7 @@ typedef struct clientInfo_s {
     qboolean newAnims;              // true if using the new mission pack animations
     qboolean fixedlegs, fixedtorso; // true if legs yaw is always the same as torso yaw, true if torso never changes yaw
     vector3 headOffset;             // move head in icon views
-    gender_t gender;                // from model
+    gender_e gender;                // from model
     qhandle_t legsModel, legsSkin;
     qhandle_t torsoModel, torsoSkin;
     void *ghoul2Model;
@@ -322,7 +322,7 @@ typedef struct markPoly_s {
     polyVert_t verts[MAX_VERTS_ON_POLY];
 } markPoly_t;
 
-typedef enum leType_e {
+enum leType_e {
     LE_MARK,
     LE_EXPLOSION,
     LE_SPRITE_EXPLOSION,
@@ -337,21 +337,15 @@ typedef enum leType_e {
     LE_OLINE,
     LE_SHOWREFENTITY,
     LE_LINE
-} leType_t;
+};
 
-typedef enum leMarkType_e { LEMT_NONE, LEMT_BURN, LEMT_BLOOD } leMarkType_t; // fragment local entities can leave marks on walls
+enum leMarkType_e { LEMT_NONE, LEMT_BURN, LEMT_BLOOD }; // fragment local entities can leave marks on walls
 
-typedef enum leBounceSoundType_e {
-    LEBS_NONE,
-    LEBS_BLOOD,
-    LEBS_BRASS,
-    LEBS_METAL,
-    LEBS_ROCK
-} leBounceSoundType_t; // fragment local entities can make sounds on impacts
+enum leBounceSoundType_e { LEBS_NONE, LEBS_BLOOD, LEBS_BRASS, LEBS_METAL, LEBS_ROCK }; // fragment local entities can make sounds on impacts
 
 typedef struct localEntity_s {
     struct localEntity_s *prev, *next;
-    leType_t leType;
+    leType_e leType;
     uint32_t leFlags;
     int startTime, endTime;
     int fadeInTime;
@@ -365,8 +359,8 @@ typedef struct localEntity_s {
     float radius;
     float light;
     vector3 lightColor;
-    leMarkType_t leMarkType; // mark to leave on fragment impact
-    leBounceSoundType_t leBounceSoundType;
+    leMarkType_e leMarkType; // mark to leave on fragment impact
+    leBounceSoundType_e leBounceSoundType;
 
     union {
         struct {
@@ -496,7 +490,7 @@ typedef struct chatBoxItem_s {
     int lines;
 } chatBoxItem_t;
 
-typedef enum refdefView_e {
+enum refdefView_e {
     REFDEF_DEFAULT = 0,
     REFDEF_AUTOMAP,
 #ifdef ENABLE_ALTVIEW
@@ -504,7 +498,7 @@ typedef enum refdefView_e {
 #endif
     REFDEF_SCOREBOARD,
     REFDEF_MAX
-} refdefViews_t;
+};
 
 typedef struct cg_s {
     int clientFrame; // incremented each frame
@@ -550,7 +544,7 @@ typedef struct cg_s {
     vector3 autoAngles, autoAnglesFast;
     vector3 autoAxis[3], autoAxisFast[3];
     refdef_t refdef[REFDEF_MAX];
-    refdefViews_t currentRefdef; // Raz: Added
+    refdefView_e currentRefdef; // Raz: Added
     qboolean zoomed;
     int zoomTime;
     float zoomSensitivity;
@@ -744,17 +738,7 @@ typedef struct cgscreffects_s {
     qboolean music_volume_set;
 } cgscreffects_t;
 
-typedef enum chunkModels_e {
-    CHUNK_METAL1 = 0,
-    CHUNK_METAL2,
-    CHUNK_ROCK1,
-    CHUNK_ROCK2,
-    CHUNK_ROCK3,
-    CHUNK_CRATE1,
-    CHUNK_CRATE2,
-    CHUNK_WHITE_METAL,
-    NUM_CHUNK_TYPES
-} chunkModels_t;
+enum chunkModels_e { CHUNK_METAL1 = 0, CHUNK_METAL2, CHUNK_ROCK1, CHUNK_ROCK2, CHUNK_ROCK3, CHUNK_CRATE1, CHUNK_CRATE2, CHUNK_WHITE_METAL, NUM_CHUNK_TYPES };
 
 // The client game static (cgs) structure hold everything loaded or calculated from the gamestate. It will NOT be cleared
 //	when a tournament restart is done, allowing all clients to begin playing instantly
@@ -767,7 +751,7 @@ typedef struct cgs_s {
     qboolean localServer;      // detected on startup by checking sv_running
     int siegeTeamSwitch;
     int showDuelHealths;
-    gametype_t gametype;
+    gametype_e gametype;
     int debugMelee;
     int stepSlideFix;
     int noSpecMove;
@@ -922,7 +906,7 @@ qboolean CG_DeferMenuScript(char **args);
 void CG_DestroyNPCClient(clientInfo_t **ci);
 void CG_Draw3DModel(float x, float y, float w, float h, qhandle_t model, void *ghoul2, int g2radius, qhandle_t skin, vector3 *origin, vector3 *angles);
 void CG_DrawActive(void);
-void CG_DrawActiveFrame(int serverTime, stereoFrame_t stereoView, qboolean demoPlayback);
+void CG_DrawActiveFrame(int serverTime, stereoFrame_e stereoView, qboolean demoPlayback);
 void CG_DrawBigString(int x, int y, const char *s, float alpha);
 void CG_DrawBigStringColor(int x, int y, const char *s, const vector4 *color);
 void CG_DrawFlagModel(float x, float y, float w, float h, int team, qboolean force2D);
@@ -961,16 +945,16 @@ void CG_G2Trace(trace_t *result, const vector3 *start, const vector3 *mins, cons
 qboolean CG_G2TraceCollide(trace_t *tr, const vector3 *mins, const vector3 *maxs, vector3 *lastValidStart, vector3 *lastValidEnd);
 void *CG_G2WeaponInstance(centity_t *cent, int weapon);
 uint32_t CG_GetCameraClip(void);
-int CG_GetClassCount(team_t team, int siegeClass);
+int CG_GetClassCount(team_e team, int siegeClass);
 void CG_GetColorForHealth(int health, int armor, vector4 *hcolor);
-flagStatus_t CG_GetFlagStatus(team_t team);
+flagStatus_t CG_GetFlagStatus(team_e team);
 const char *CG_GetGameStatusText(void);
 const char *CG_GetKillerText(void);
 const char *CG_GetLocationString(const char *loc);
 refdef_t *CG_GetRefdef(void);
 const char *CG_GetStringEdString(const char *refSection, const char *refName);
 void CG_GetTeamColor(vector4 *color);
-int CG_GetTeamNonScoreCount(team_t team);
+int CG_GetTeamNonScoreCount(team_e team);
 float CG_GetValue(int ownerDraw);
 void CG_GetWeaponMuzzleBolt(int clIndex, vector3 *to);
 void CG_GlassShatter(int entnum, vector3 *dmgPt, vector3 *dmgDir, float dmgRadius, int maxShards);
@@ -1004,7 +988,7 @@ localEntity_t *CG_MakeExplosion(vector3 *origin, vector3 *dir, qhandle_t hModel,
                                 uint32_t flags);
 void CG_ManualEntityRender(centity_t *cent);
 void CG_MissileHitPlayer(int weapon, vector3 *origin, vector3 *dir, int entityNum, qboolean alt_fire);
-void CG_MissileHitWall(int weapon, int clientNum, vector3 *origin, vector3 *dir, impactSound_t soundType, qboolean alt_fire, int charge);
+void CG_MissileHitWall(int weapon, int clientNum, vector3 *origin, vector3 *dir, impactSound_e soundType, qboolean alt_fire, int charge);
 void CG_MiscModelExplosion(vector3 *mins, vector3 *maxs, int size, material_t chunkType);
 void CG_MouseEvent(int dx, int dy);
 void CG_NextForcePower_f(void);

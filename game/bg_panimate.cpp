@@ -975,7 +975,7 @@ qboolean BG_InKnockDownOnGround(playerState_t *ps) {
     case BOTH_FORCE_GETUP_B5:
     case BOTH_FORCE_GETUP_B6:
         // at beginning of getup anim
-        if (BG_AnimLength(0, (animNumber_t)ps->legsAnim) - ps->legsTimer < 500)
+        if (BG_AnimLength(0, (animNumber_e)ps->legsAnim) - ps->legsTimer < 500)
             return qtrue;
         break;
 
@@ -988,7 +988,7 @@ qboolean BG_InKnockDownOnGround(playerState_t *ps) {
     case BOTH_GETUP_FROLL_L:
     case BOTH_GETUP_FROLL_R:
         // at beginning of getup anim
-        if (BG_AnimLength(0, (animNumber_t)ps->legsAnim) - ps->legsTimer < 500)
+        if (BG_AnimLength(0, (animNumber_e)ps->legsAnim) - ps->legsTimer < 500)
             return qtrue;
         break;
     case BOTH_LK_DL_ST_T_SB_1_L:
@@ -1384,7 +1384,7 @@ qboolean BG_FullBodyTauntAnim(int anim) {
 
 // get the "length" of an anim given the local anim index (which skeleton) and anim number.
 // obviously does not take things like the length of the anim while force speeding (as an example) and whatnot into account.
-int BG_AnimLength(int index, animNumber_t anim) {
+int BG_AnimLength(int index, animNumber_e anim) {
     if ((int)anim < 0 || anim >= MAX_ANIMATIONS) {
         return 0;
     }
@@ -1393,7 +1393,7 @@ int BG_AnimLength(int index, animNumber_t anim) {
 }
 
 // just use whatever pm->animations is
-int PM_AnimLength(int index, animNumber_t anim) {
+int PM_AnimLength(int index, animNumber_e anim) {
     if (!pm->animations || (int)anim < 0 || anim >= MAX_ANIMATIONS) {
         return -1;
     }
@@ -1544,7 +1544,7 @@ stringID_table_t footstepTypeTable[NUM_FOOTSTEP_TYPES + 1] = {ENUM2STRING(FOOTST
                                                               // must be terminated
                                                               {NULL, -1}};
 
-int CheckAnimFrameForEventType(animevent_t *animEvents, int keyFrame, animEventType_t eventType) {
+int CheckAnimFrameForEventType(animevent_t *animEvents, int keyFrame, animEventType_e eventType) {
     int i;
 
     for (i = 0; i < MAX_ANIM_EVENTS; i++) {
@@ -1561,7 +1561,7 @@ int CheckAnimFrameForEventType(animevent_t *animEvents, int keyFrame, animEventT
 void ParseAnimationEvtBlock(const char *aeb_filename, animevent_t *animEvents, animation_t *animations, int *i, const char **text_p) {
     const char *token;
     int num, n, animNum, keyFrame, lowestVal, highestVal, curAnimEvent, lastAnimEvent = 0;
-    animEventType_t eventType;
+    animEventType_e eventType;
     char stringData[MAX_QPATH];
 
     // get past starting bracket
@@ -1615,7 +1615,7 @@ void ParseAnimationEvtBlock(const char *aeb_filename, animevent_t *animEvents, a
         }
 
         token = COM_Parse(text_p);
-        eventType = (animEventType_t)GetIDForString(animEventTypeTable, token);
+        eventType = (animEventType_e)GetIDForString(animEventTypeTable, token);
         if (eventType == AEV_NONE || (signed)eventType == -1) { // Unrecognized ANIM EVENT TYOE, or we're skipping this line, keep going till you get a good one
             // Com_Printf(S_COLOR_YELLOW"WARNING: Unknown token %s in animEvent file %s\n", token, aeb_filename );
             continue;
@@ -1662,7 +1662,8 @@ void ParseAnimationEvtBlock(const char *aeb_filename, animevent_t *animEvents, a
             } else {
                 animEvents[curAnimEvent].eventData[AED_SOUNDCHANNEL] = CHAN_AUTO;
             }
-            // fall through to normal sound
+            [[fallthrough]]; // to normal sound
+
         case AEV_SOUND: //# animID AEV_SOUND framenum soundpath randomlow randomhi chancetoplay
             // get soundstring
             token = COM_Parse(text_p);

@@ -88,7 +88,7 @@ float CG_GetValue(int ownerDraw) {
 
 // results are valid only for gametypes GT_CTF, GT_CTY and teams TEAM_RED, TEAM_BLUE
 // else FLAG_ATBASE is returned
-flagStatus_t CG_GetFlagStatus(team_t team) {
+flagStatus_t CG_GetFlagStatus(team_e team) {
     if (cgs.gametype >= GT_CTF) {
         if (team == TEAM_RED) {
             return cgs.redflag;
@@ -105,7 +105,7 @@ bool CG_OtherTeamHasFlag(void) {
         return false;
     }
 
-    const team_t team = (team_t)cg.snap->ps.persistant[PERS_TEAM];
+    const team_e team = (team_e)cg.snap->ps.persistant[PERS_TEAM];
     const flagStatus_t status = CG_GetFlagStatus(team);
     return status == FLAG_TAKEN;
 }
@@ -115,7 +115,7 @@ bool CG_YourTeamHasFlag(void) {
         return false;
     }
 
-    const team_t team = BG_GetOpposingTeam((team_t)cg.snap->ps.persistant[PERS_TEAM]);
+    const team_e team = BG_GetOpposingTeam((team_e)cg.snap->ps.persistant[PERS_TEAM]);
     const flagStatus_t status = CG_GetFlagStatus(team);
     return status == FLAG_TAKEN;
 }
@@ -125,7 +125,7 @@ bool CG_OtherTeamDroppedFlag(void) {
         return false;
     }
 
-    const team_t team = BG_GetOpposingTeam((team_t)cg.snap->ps.persistant[PERS_TEAM]);
+    const team_e team = BG_GetOpposingTeam((team_e)cg.snap->ps.persistant[PERS_TEAM]);
     const flagStatus_t status = CG_GetFlagStatus(team);
     return status == FLAG_DROPPED;
 }
@@ -135,7 +135,7 @@ bool CG_YourTeamDroppedFlag(void) {
         return false;
     }
 
-    const team_t team = BG_GetOpposingTeam((team_t)cg.snap->ps.persistant[PERS_TEAM]);
+    const team_e team = BG_GetOpposingTeam((team_e)cg.snap->ps.persistant[PERS_TEAM]);
     const flagStatus_t status = CG_GetFlagStatus(team);
     return status == FLAG_DROPPED;
 }
@@ -323,7 +323,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
             xx = rect->x + 1;
             for (j = 0; j <= PW_NUM_POWERUPS; j++) {
                 if (ci->powerups & (1 << j)) {
-                    if ((item = BG_FindItemForPowerup((powerup_t)j))) {
+                    if ((item = BG_FindItemForPowerup((powerup_e)j))) {
                         CG_DrawPic(xx, y, PIC_WIDTH, PIC_WIDTH, trap->R_RegisterShader(item->icon));
                         xx += PIC_WIDTH;
                     }

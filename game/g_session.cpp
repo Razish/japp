@@ -85,13 +85,13 @@ void G_ReadClientSessionData(gclient_t *client) {
     }
 
     if ((object = cJSON_GetObjectItem(root, "sessionTeam"))) {
-        sess->sessionTeam = (team_t)object->valueint;
+        sess->sessionTeam = (team_e)object->valueint;
     }
     if ((object = cJSON_GetObjectItem(root, "spectatorTime"))) {
         sess->spectatorTime = object->valueint;
     }
     if ((object = cJSON_GetObjectItem(root, "spectatorState"))) {
-        sess->spectatorState = (spectatorState_t)object->valueint;
+        sess->spectatorState = (spectatorState_e)object->valueint;
     }
     if ((object = cJSON_GetObjectItem(root, "spectatorClient"))) {
         sess->spectatorClient = object->valueint;

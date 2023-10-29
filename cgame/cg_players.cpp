@@ -1,12 +1,12 @@
 // cg_players.c -- handle the media and animation for player entities
 
-#include "cg_local.h"
+#include "cgame/cg_local.h"
 #include "Ghoul2/G2.h"
-#include "bg_saga.h"
-#include "fx_local.h"
-#include "bg_luaevent.h"
-#include "cg_media.h"
-#include "bg_vehicles.h"
+#include "game/bg_saga.h"
+#include "cgame/fx_local.h"
+#include "game/bg_luaevent.h"
+#include "cgame/cg_media.h"
+#include "game/bg_vehicles.h"
 #include "JAPP/jp_csflags.h"
 #include "JAPP/jp_ssflags.h"
 
@@ -470,7 +470,7 @@ int CG_G2EvIndexForModel(void *g2, int animIndex) {
 #define DEFAULT_NEUTER_SOUNDPATH "chars/mp_generic_male/misc"
 void CG_LoadCISounds(clientInfo_t *ci, qboolean modelloaded) {
     fileHandle_t f;
-    gender_t gender = GENDER_MALE;
+    gender_e gender = GENDER_MALE;
     int i = 0, fLen = 0;
     const char *dir, *s;
     char soundpath[MAX_QPATH], soundName[1024];
@@ -967,7 +967,7 @@ void CG_NewClientInfo(int clientNum, qboolean entitiesInitialized) {
 
     // team
     v = Info_ValueForKey(configstring, "t");
-    newInfo.team = (team_t)atoi(v);
+    newInfo.team = (team_e)atoi(v);
 
     // copy team info out to menu
     if (clientNum == cg.clientNum)
@@ -1328,10 +1328,10 @@ void CG_ActualLoadDeferredPlayers(void) {
 void CG_LoadDeferredPlayers(void) { cgQueueLoad = qtrue; }
 
 #define FOOTSTEP_DISTANCE (32)
-static void _PlayerFootStep(const vector3 *origin, const float orientation, const float radius, centity_t *const cent, footstepType_t footStepType) {
+static void _PlayerFootStep(const vector3 *origin, const float orientation, const float radius, centity_t *const cent, footstepType_e footStepType) {
     vector3 end, mins = {-7, -7, 0}, maxs = {7, 7, 2};
     trace_t trace;
-    footstep_t soundType = FOOTSTEP_TOTAL;
+    footstep_e soundType = FOOTSTEP_TOTAL;
     qboolean bMark = qfalse;
     qhandle_t footMarkShader;
     int effectID = -1;
@@ -1497,7 +1497,7 @@ static void _PlayerFootStep(const vector3 *origin, const float orientation, cons
         CG_ImpactMark(footMarkShader, &trace.endpos, &trace.plane.normal, orientation, 1, 1, 1, 1.0f, qfalse, radius, qfalse);
 }
 
-static void CG_PlayerFootsteps(centity_t *cent, footstepType_t footStepType) {
+static void CG_PlayerFootsteps(centity_t *cent, footstepType_e footStepType) {
     if (!cg_footsteps.integer)
         return;
 
@@ -1547,6 +1547,7 @@ void CG_PlayerAnimEventDo(centity_t *cent, animevent_t *animEvent) {
     switch (animEvent->eventType) {
     case AEV_SOUNDCHAN:
         channel = (soundChannel_t)animEvent->eventData[AED_SOUNDCHANNEL];
+        [[fallthrough]];
 
     case AEV_SOUND: { // are there variations on the sound?
         const int holdSnd = animEvent->eventData[AED_SOUNDINDEX_START + Q_irand(0, animEvent->eventData[AED_SOUND_NUMRANDOMSNDS])];
@@ -1624,7 +1625,7 @@ void CG_PlayerAnimEventDo(centity_t *cent, animevent_t *animEvent) {
         break;
 
     case AEV_FOOTSTEP:
-        CG_PlayerFootsteps(cent, (footstepType_t)animEvent->eventData[AED_FOOTSTEP_TYPE]);
+        CG_PlayerFootsteps(cent, (footstepType_e)animEvent->eventData[AED_FOOTSTEP_TYPE]);
         break;
 
     case AEV_EFFECT:
@@ -6234,7 +6235,7 @@ static void CG_VehicleEffects(centity_t *cent) {
 #else
                 if (pVehNPC->m_pVehicleInfo->iTrailFX)
 #endif
-                trap->FX_PlayEffectID(pVehNPC->m_pVehicleInfo->iTrailFX, &org, &fwd, -1, -1, qfalse);
+                { trap->FX_PlayEffectID(pVehNPC->m_pVehicleInfo->iTrailFX, &org, &fwd, -1, -1, qfalse); }
 
                 // do exhaust
                 if ((cent->currentState.eFlags & EF_JETPACK_ACTIVE))
@@ -6919,7 +6920,7 @@ void CG_Player(centity_t *cent) {
         VectorCopy(&seeker.origin, &seekorg);
 
         if (cent->currentState.genericenemyindex > MAX_GENTITIES) {
-            float prefig = (cent->currentState.genericenemyindex - cg.time) / 80;
+            float prefig = (cent->currentState.genericenemyindex - cg.time) / 80.0f;
 
             if (prefig > 55)
                 prefig = 55;
@@ -8315,7 +8316,7 @@ stillDoSaber:
         legs.shaderRGBA[0] = 255;
         legs.shaderRGBA[1] = 255;
         legs.shaderRGBA[2] = 255;
-        legs.shaderRGBA[3] = 10.0f + (sinf((float)(cg.time / 4)) * 128.0f);
+        legs.shaderRGBA[3] = 10.0f + (sinf((float)(cg.time / 4.0f)) * 128.0f);
 
         legs.renderfx &= ~RF_RGB_TINT;
         legs.renderfx &= ~RF_FORCE_ENT_ALPHA;
@@ -8601,5 +8602,5 @@ void CG_ResetPlayerEntity(centity_t *cent) {
     }
 
     if (cg_debugPosition.integer)
-        trap->Print("%i ResetPlayerEntity yaw=%.2f\n", cent->currentState.number, cent->pe.torso.yawAngle);
+        trap->Print("%i ResetPlayerEntity yaw=%.2f\n", cent->currentState.number, (double)cent->pe.torso.yawAngle);
 }

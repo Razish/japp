@@ -215,14 +215,14 @@ static void CG_AddWeaponWithPowerups(refEntity_t *gun, int powerups) {
 void CG_AddPlayerWeapon(refEntity_t *parent, playerState_t *ps, centity_t *cent, int team, vector3 *newAngles, qboolean thirdPerson) {
     refEntity_t gun, barrel, flash;
     vector3 angles;
-    weapon_t weaponNum;
+    weapon_e weaponNum;
     weaponInfo_t *weapon;
     centity_t *nonPredictedCent;
 
     if (!thirdPerson && cg_fakeGun.integer) {
-        weaponNum = (weapon_t)cg_fakeGun.integer;
+        weaponNum = (weapon_e)cg_fakeGun.integer;
     } else {
-        weaponNum = (weapon_t)cent->currentState.weapon;
+        weaponNum = (weapon_e)cent->currentState.weapon;
     }
 
     if (weaponNum == WP_EMPLACED_GUN)
@@ -1226,7 +1226,7 @@ qboolean CG_VehicleWeaponImpact(centity_t *cent) {
 }
 
 // Caused by an EV_MISSILE_MISS event, or directly by local bullet tracing
-void CG_MissileHitWall(int weapon, int clientNum, vector3 *origin, vector3 *dir, impactSound_t soundType, qboolean altFire, int charge) {
+void CG_MissileHitWall(int weapon, int clientNum, vector3 *origin, vector3 *dir, impactSound_e soundType, qboolean altFire, int charge) {
     int parm;
     static const vector3 up = {0, 0, 1};
 

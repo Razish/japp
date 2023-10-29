@@ -41,7 +41,7 @@ const char *forcepowerDesc[NUM_FORCE_POWERS] = {
     "@SP_INGAME_FORCE_SABER_DEFENSE_DESC", "@SP_INGAME_FORCE_SABER_THROW_DESC"};
 
 // Movedata Sounds
-typedef enum moveDataSounds_e { MDS_NONE = 0, MDS_FORCE_JUMP, MDS_ROLL, MDS_SABER, MDS_MOVE_SOUNDS_MAX } moveDataSounds_t;
+enum moveDataSounds_e { MDS_NONE = 0, MDS_FORCE_JUMP, MDS_ROLL, MDS_SABER, MDS_MOVE_SOUNDS_MAX };
 
 // Some hard coded badness
 // At some point maybe this should be externalized to a .dat file
@@ -678,7 +678,7 @@ static void UI_BuildPlayerList(void) {
     }
 }
 
-void UI_SetActiveMenu(uiMenuCommand_t menu) {
+void UI_SetActiveMenu(uiMenuCommand_e menu) {
     char buf[256];
 
     // this should be the ONLY way the menu system is brought up
@@ -2164,7 +2164,7 @@ static void UI_DrawServerRefreshDate(rectDef_t *rect, float scale, const vector4
         lowLight.g = 0.8f * color->g;
         lowLight.b = 0.8f * color->b;
         lowLight.a = 0.8f * color->a;
-        LerpColor(color, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(uiInfo.uiDC.realTime / PULSE_DIVISOR)));
+        LerpColor(color, &lowLight, &newColor, 0.5f + 0.5f * sinf((float)(uiInfo.uiDC.realTime / (float)PULSE_DIVISOR)));
 
         trap->SE_GetStringTextString("MP_INGAME_GETTINGINFOFORSERVERS", holdSPString, sizeof(holdSPString));
         const Font font(iMenuFont, scale, customFont);
@@ -3492,20 +3492,20 @@ static void UI_StartSkirmish(qboolean next) {
     if (ui_gameType.integer == GT_DUEL || ui_gameType.integer == GT_POWERDUEL) {
         temp = uiInfo.mapList[ui_currentMap.integer].teamMembers * 2;
         trap->Cvar_Set("sv_maxClients", va("%d", temp));
-        Com_sprintf(buff, sizeof(buff), "wait ; addbot %s %f f, %i \n", uiInfo.mapList[ui_currentMap.integer].opponentName, skill, delay);
+        Com_sprintf(buff, sizeof(buff), "wait ; addbot %s %f f, %i \n", uiInfo.mapList[ui_currentMap.integer].opponentName, (double)skill, delay);
         trap->Cmd_ExecuteText(EXEC_APPEND, buff);
     } else if (ui_gameType.integer == GT_HOLOCRON || ui_gameType.integer == GT_JEDIMASTER) {
         temp = uiInfo.mapList[ui_currentMap.integer].teamMembers * 2;
         trap->Cvar_Set("sv_maxClients", va("%d", temp));
         for (i = 0; i < uiInfo.mapList[ui_currentMap.integer].teamMembers; i++) {
-            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), skill,
+            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), (double)skill,
                         (ui_gameType.integer == GT_HOLOCRON) ? "f" : "b", delay, uiInfo.teamList[k].teamMembers[i]);
             trap->Cmd_ExecuteText(EXEC_APPEND, buff);
             delay += 500;
         }
         k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_teamName"));
         for (i = 0; i < uiInfo.mapList[ui_currentMap.integer].teamMembers - 1; i++) {
-            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), skill,
+            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), (double)skill,
                         (ui_gameType.integer == GT_HOLOCRON) ? "f" : "r", delay, uiInfo.teamList[k].teamMembers[i]);
             trap->Cmd_ExecuteText(EXEC_APPEND, buff);
             delay += 500;
@@ -3514,14 +3514,14 @@ static void UI_StartSkirmish(qboolean next) {
         temp = uiInfo.mapList[ui_currentMap.integer].teamMembers * 2;
         trap->Cvar_Set("sv_maxClients", va("%d", temp));
         for (i = 0; i < uiInfo.mapList[ui_currentMap.integer].teamMembers; i++) {
-            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), skill,
+            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), (double)skill,
                         (ui_gameType.integer == GT_FFA) ? "f" : "b", delay, uiInfo.teamList[k].teamMembers[i]);
             trap->Cmd_ExecuteText(EXEC_APPEND, buff);
             delay += 500;
         }
         k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_teamName"));
         for (i = 0; i < uiInfo.mapList[ui_currentMap.integer].teamMembers - 1; i++) {
-            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), skill,
+            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), (double)skill,
                         (ui_gameType.integer == GT_FFA) ? "f" : "r", delay, uiInfo.teamList[k].teamMembers[i]);
             trap->Cmd_ExecuteText(EXEC_APPEND, buff);
             delay += 500;
@@ -4482,7 +4482,7 @@ void UI_SiegeSetCvarsForClass(siegeClass_t *scl) {
                 count++;
                 trap->Cvar_Set(va("ui_class_weapondesc%i", count), " "); // Blank it out to start with
             } else {
-                const gitem_t *item = BG_FindItemForWeapon((weapon_t)i);
+                const gitem_t *item = BG_FindItemForWeapon((weapon_e)i);
                 trap->Cvar_Set(va("ui_class_weapon%i", count), item->icon);
                 trap->Cvar_Set(va("ui_class_weapondesc%i", count), item->description);
                 count++;
@@ -4499,7 +4499,7 @@ void UI_SiegeSetCvarsForClass(siegeClass_t *scl) {
 
     while (i < HI_NUM_HOLDABLE) {
         if (scl->invenItems & (1 << i)) {
-            const gitem_t *item = BG_FindItemForHoldable((holdable_t)i);
+            const gitem_t *item = BG_FindItemForHoldable((holdable_e)i);
             trap->Cvar_Set(va("ui_class_item%i", count), item->icon);
             trap->Cvar_Set(va("ui_class_itemdesc%i", count), item->description);
             count++;
@@ -4531,7 +4531,7 @@ void UI_SiegeSetCvarsForClass(siegeClass_t *scl) {
     // now health and armor
     trap->Cvar_Set("ui_class_health", va("%i", scl->maxhealth));
     trap->Cvar_Set("ui_class_armor", va("%i", scl->maxarmor));
-    trap->Cvar_Set("ui_class_speed", va("%3.2f", scl->speed));
+    trap->Cvar_Set("ui_class_speed", va("%3.2f", (double)scl->speed));
 
     // now get the icon path based on the shader index
     if (scl->classShader) {
@@ -4678,9 +4678,9 @@ static void UI_RunMenuScript(char **args) {
 
                     if (numval <= maxcl) {
                         if (ui_netGameType.integer >= GT_TEAM) {
-                            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s\n", UI_GetBotNameByNumber(bot - 2), skill, "Blue");
+                            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s\n", UI_GetBotNameByNumber(bot - 2), (double)skill, "Blue");
                         } else {
-                            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f \n", UI_GetBotNameByNumber(bot - 2), skill);
+                            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f \n", UI_GetBotNameByNumber(bot - 2), (double)skill);
                         }
                         trap->Cmd_ExecuteText(EXEC_APPEND, buff);
                         added++;
@@ -4694,9 +4694,9 @@ static void UI_RunMenuScript(char **args) {
 
                     if (numval <= maxcl) {
                         if (ui_netGameType.integer >= GT_TEAM) {
-                            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s\n", UI_GetBotNameByNumber(bot - 2), skill, "Red");
+                            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f %s\n", UI_GetBotNameByNumber(bot - 2), (double)skill, "Red");
                         } else {
-                            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f \n", UI_GetBotNameByNumber(bot - 2), skill);
+                            Com_sprintf(buff, sizeof(buff), "addbot \"%s\" %f \n", UI_GetBotNameByNumber(bot - 2), (double)skill);
                         }
                         trap->Cmd_ExecuteText(EXEC_APPEND, buff);
                         added++;
@@ -5603,7 +5603,7 @@ static int UI_HeadCountByColor(void) {
     for (i = 0; i < uiInfo.q3HeadCount; i++) {
         Q_strncpyz(saved, uiInfo.q3HeadNames[i], sizeof(saved));
         Q_strrev(uiInfo.q3HeadNames[i]);
-        if (uiInfo.q3HeadNames[i] &&
+        if (uiInfo.q3HeadNames[i][0] &&
             (!Q_stricmpn(uiInfo.q3HeadNames[i], teamname, strlen(teamname)) ||
              (uiSkinColor == TEAM_FREE && Q_stricmpn(uiInfo.q3HeadNames[i], "der", 3) && Q_stricmpn(uiInfo.q3HeadNames[i], "eulb", 4)))) {
             Q_strrev(uiInfo.q3HeadNames[i]);
@@ -5681,7 +5681,6 @@ static void UI_BuildServerDisplayList(int force) {
     int i, count, clients, maxClients, ping, game, len, passw /*, visible*/;
     char info[MAX_STRING_CHARS];
     //	qboolean startRefresh = qtrue; TTimo: unused
-    static int numinvisible;
     int lanSource;
 
     if (!(force || uiInfo.uiDC.realTime > uiInfo.serverStatus.nextDisplayRefresh)) {
@@ -5707,7 +5706,6 @@ static void UI_BuildServerDisplayList(int force) {
     lanSource = UI_SourceForLAN();
 
     if (force) {
-        numinvisible = 0;
         // clear number of displayed servers
         uiInfo.serverStatus.numDisplayServers = 0;
         uiInfo.serverStatus.numPlayersOnServers = 0;
@@ -5795,7 +5793,6 @@ static void UI_BuildServerDisplayList(int force) {
             // done with this server
             if (ping > 0) {
                 trap->LAN_MarkServerVisible(lanSource, i, qfalse);
-                numinvisible++;
             }
         }
     }
@@ -5942,7 +5939,7 @@ static int UI_GetServerStatusInfo(const char *serverAddress, serverStatusInfo_t 
 }
 
 static void UI_BuildFindPlayerList(qboolean force) {
-    static int numFound, numTimeOuts;
+    static int numFound;
     int i, j, resend;
     serverStatusInfo_t info;
     char name[MAX_NAME_LENGTH + 2];
@@ -5981,7 +5978,6 @@ static void UI_BuildFindPlayerList(qboolean force) {
         //					sizeof(uiInfo.foundPlayerServerNames[uiInfo.numFoundPlayerServers-1]),
         //						"searching %d...", uiInfo.pendingServerStatus.num);
         numFound = 0;
-        numTimeOuts++;
     }
     for (i = 0; i < MAX_SERVERSTATUSREQUESTS; i++) {
         // if this pending server is valid
@@ -6029,7 +6025,7 @@ static void UI_BuildFindPlayerList(qboolean force) {
         if (!uiInfo.pendingServerStatus.server[i].valid ||
             uiInfo.pendingServerStatus.server[i].startTime < uiInfo.uiDC.realTime - ui_serverStatusTimeOut.integer) {
             if (uiInfo.pendingServerStatus.server[i].valid) {
-                numTimeOuts++;
+                // ...
             }
             // reset server status request for this address
             UI_GetServerStatusInfo(uiInfo.pendingServerStatus.server[i].adrstr, NULL);
@@ -6300,7 +6296,7 @@ static const char *UI_SelectedTeamHead(int index, int *actual) {
     for (i = 0; i < uiInfo.q3HeadCount; i++) {
         Q_strncpyz(saved, uiInfo.q3HeadNames[i], sizeof(saved));
         Q_strrev(uiInfo.q3HeadNames[i]);
-        if (uiInfo.q3HeadNames[i] &&
+        if (uiInfo.q3HeadNames[i][0] &&
             (!Q_stricmpn(uiInfo.q3HeadNames[i], teamname, strlen(teamname)) ||
              (uiSkinColor == TEAM_FREE && Q_stricmpn(uiInfo.q3HeadNames[i], "der", 3) && Q_stricmpn(uiInfo.q3HeadNames[i], "eulb", 4)))) {
             Q_strrev(uiInfo.q3HeadNames[i]);
@@ -8393,7 +8389,7 @@ Q_CABI {
             return Menus_AnyFullScreenVisible();
 
         case UI_SET_ACTIVE_MENU:
-            UI_SetActiveMenu((uiMenuCommand_t)arg0);
+            UI_SetActiveMenu((uiMenuCommand_e)arg0);
             return 0;
 
         case UI_CONSOLE_COMMAND:

@@ -15,7 +15,7 @@ typedef struct uiClientState_s {
     char messageString[MAX_STRING_CHARS];
 } uiClientState_t;
 
-typedef enum uiMenuCommand_e {
+enum uiMenuCommand_e {
     UIMENU_NONE,
     UIMENU_MAIN,
     UIMENU_INGAME,
@@ -28,7 +28,7 @@ typedef enum uiMenuCommand_e {
     UIMENU_VOICECHAT,
     UIMENU_CLOSEALL,
     UIMENU_CLASSSEL
-} uiMenuCommand_t;
+};
 
 #define SORT_HOST 0
 #define SORT_MAP 1
@@ -36,7 +36,7 @@ typedef enum uiMenuCommand_e {
 #define SORT_GAME 3
 #define SORT_PING 4
 
-typedef enum uiImportLegacy_e {
+enum uiImportLegacy_e {
     UI_ERROR,
     UI_PRINT,
     UI_MILLISECONDS,
@@ -189,9 +189,9 @@ typedef enum uiImportLegacy_e {
     UI_G2_GETSURFACENAME,
     UI_G2_SETSKIN,
     UI_G2_ATTACHG2MODEL,
-} uiImportLegacy_t;
+};
 
-typedef enum uiExportLegacy_e {
+enum uiExportLegacy_e {
     UI_GETAPIVERSION = 0,
     UI_INIT,
     UI_SHUTDOWN,
@@ -204,7 +204,7 @@ typedef enum uiExportLegacy_e {
     UI_DRAW_CONNECT_SCREEN,
     UI_HASUNIQUECDKEY,
     UI_MENU_RESET
-} uiExportLegacy_t;
+};
 
 typedef struct uiImport_s {
     void (*Print)(const char *msg, ...);
@@ -496,7 +496,7 @@ typedef struct uiExport_s {
 
     qboolean (*IsFullscreen)(void);
 
-    void (*SetActiveMenu)(uiMenuCommand_t menu);
+    void (*SetActiveMenu)(uiMenuCommand_e menu);
 
     qboolean (*ConsoleCommand)(int realTime);
 

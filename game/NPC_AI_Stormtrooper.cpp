@@ -46,11 +46,7 @@ static vector3 impactPos;
 int groupSpeechDebounceTime[TEAM_NUM_TEAMS]; // used to stop several group AI from speaking all at once
 
 // Local state enums
-enum {
-    LSTATE_NONE = 0,
-    LSTATE_UNDERFIRE,
-    LSTATE_INVESTIGATE,
-};
+enum localState_e { LSTATE_NONE = 0, LSTATE_UNDERFIRE, LSTATE_INVESTIGATE };
 
 void ST_AggressionAdjust(gentity_t *self, int change) {
     int upper_threshold, lower_threshold;
@@ -90,24 +86,7 @@ void ST_ClearTimers(gentity_t *ent) {
     TIMER_Set(ent, "verifyCP", 0);
 }
 
-enum {
-    SPEECH_CHASE,
-    SPEECH_CONFUSED,
-    SPEECH_COVER,
-    SPEECH_DETECTED,
-    SPEECH_GIVEUP,
-    SPEECH_LOOK,
-    SPEECH_LOST,
-    SPEECH_OUTFLANK,
-    SPEECH_ESCAPING,
-    SPEECH_SIGHT,
-    SPEECH_SOUND,
-    SPEECH_SUSPICIOUS,
-    SPEECH_YELL,
-    SPEECH_PUSHED
-};
-
-static void ST_Speech(gentity_t *self, int speechType, float failChance) {
+static void ST_Speech(gentity_t *self, speechType_e speechType, float failChance) {
     if (random() < failChance) {
         return;
     }
@@ -263,11 +242,11 @@ void NPC_ST_SayMovementSpeech(void) {
         ST_Speech(NPC, NPCInfo->movementSpeech, NPCInfo->movementSpeechChance);
     }
 
-    NPCInfo->movementSpeech = 0;
+    NPCInfo->movementSpeech = SPEECH_CHASE;
     NPCInfo->movementSpeechChance = 0.0f;
 }
 
-void NPC_ST_StoreMovementSpeech(int speech, float chance) {
+static void NPC_ST_StoreMovementSpeech(speechType_e speech, float chance) {
     NPCInfo->movementSpeech = speech;
     NPCInfo->movementSpeechChance = chance;
 }
@@ -365,8 +344,8 @@ void NPC_BSST_Sleep(void) {
     // There is an event we heard
     if (alertEvent >= 0) {
         // See if it was enough to wake us up
-        if (level.alertEvents[alertEvent].level == AEL_DISCOVERED &&
-            (NPCInfo->scriptFlags & SCF_LOOK_FOR_ENEMIES)) { // rwwFIXMEFIXME: Care about all clients not just 0
+        if (level.alertEvents[alertEvent].level == AEL_DISCOVERED && (NPCInfo->scriptFlags & SCF_LOOK_FOR_ENEMIES)) {
+            // FIXME: clientNum 0
 #if 0
 			if ( &g_entities[0] && g_entities[0].health > 0 )
 			{
@@ -487,9 +466,9 @@ qboolean NPC_CheckEnemyStealth(gentity_t *target) {
         target_crouching = (target->client->pers.cmd.upmove < 0);
         dist_rating = (target_dist / maxViewDist);
         speed_rating = (target_speed / MAX_VIEW_SPEED);
-        turning_rating = 5.0f; // AngleDelta( target->client->ps.viewangles.pitch, target->lastAngles.pitch )/180.0f + AngleDelta(
-                               // target->client->ps.viewangles.yaw, target->lastAngles.yaw )/180.0f;
-        light_level = (255 / MAX_LIGHT_INTENSITY);            //( target->lightLevel / MAX_LIGHT_INTENSITY );
+        turning_rating = 5.0f;                     // AngleDelta( target->client->ps.viewangles.pitch, target->lastAngles.pitch )/180.0f + AngleDelta(
+                                                   // target->client->ps.viewangles.yaw, target->lastAngles.yaw )/180.0f;
+        light_level = (255 / MAX_LIGHT_INTENSITY); //( target->lightLevel / MAX_LIGHT_INTENSITY );
         FOV_perc = 1.0f - (hAngle_perc + vAngle_perc) * 0.5f; // FIXME: Dunno about the average...
         vis_rating = 0.0f;
 

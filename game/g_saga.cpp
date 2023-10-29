@@ -51,14 +51,14 @@ void G_SiegeRegisterWeaponsAndHoldables(int team) {
                 int j = 0;
                 while (j < WP_NUM_WEAPONS) {
                     if (scl->weapons & (1 << j)) { // we use this weapon so register it.
-                        RegisterItem(BG_FindItemForWeapon((weapon_t)j));
+                        RegisterItem(BG_FindItemForWeapon((weapon_e)j));
                     }
                     j++;
                 }
                 j = 0;
                 while (j < HI_NUM_HOLDABLE) {
                     if (scl->invenItems & (1 << j)) { // we use this item so register it.
-                        RegisterItem(BG_FindItemForHoldable((holdable_t)j));
+                        RegisterItem(BG_FindItemForHoldable((holdable_e)j));
                     }
                     j++;
                 }
@@ -617,7 +617,7 @@ void SetTeamQuick(gentity_t *ent, int team, qboolean doBegin) {
         G_ValidateSiegeClassForTeam(ent, team);
     }
 
-    ent->client->sess.sessionTeam = (team_t)team;
+    ent->client->sess.sessionTeam = (team_e)team;
 
     if (team == TEAM_SPECTATOR) {
         ent->client->sess.spectatorState = SPECTATOR_FREE;

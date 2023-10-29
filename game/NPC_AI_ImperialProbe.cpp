@@ -2,7 +2,7 @@
 #include "g_nav.h"
 
 // Local state enums
-enum { LSTATE_NONE = 0, LSTATE_BACKINGUP, LSTATE_SPINNING, LSTATE_PAIN, LSTATE_DROP };
+enum localState_t { LSTATE_NONE = 0, LSTATE_BACKINGUP, LSTATE_SPINNING, LSTATE_PAIN, LSTATE_DROP };
 
 void ImperialProbe_Idle(void);
 

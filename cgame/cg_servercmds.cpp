@@ -92,7 +92,7 @@ void CG_ParseServerinfo(void) {
     cgs.dmflags = atoi(Info_ValueForKey(info, "dmflags"));
     cgs.duel_fraglimit = atoi(Info_ValueForKey(info, "duel_fraglimit"));
     cgs.capturelimit = atoi(Info_ValueForKey(info, "capturelimit"));
-    cgs.gametype = (gametype_t)atoi(Info_ValueForKey(info, "g_gametype"));
+    cgs.gametype = (gametype_e)atoi(Info_ValueForKey(info, "g_gametype"));
     cgs.japp.jp_cinfo = atoi(Info_ValueForKey(info, "jp_cinfo"));
     cgs.japp.overbounce = atoi(Info_ValueForKey(info, "pmove_overbounce"));
     fraglimit = atoi(Info_ValueForKey(info, "fraglimit"));

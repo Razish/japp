@@ -14,7 +14,7 @@ float DotToSpot(vector3 *spot, vector3 *from, vector3 *fromAngles);
 vector3 playerMins;
 vector3 playerMaxs;
 void PM_SetAnim(pmove_t *pm, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime);
-int PM_AnimLength(int index, animNumber_t anim);
+int PM_AnimLength(int index, animNumber_e anim);
 void Vehicle_SetAnim(gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags, int iBlend);
 void G_VehicleTrace(trace_t *results, const vector3 *start, const vector3 *tMins, const vector3 *tMaxs, const vector3 *end, int passEntityNum, int contentmask);
 
@@ -253,7 +253,7 @@ static void ProcessOrientCommands(Vehicle_t *pVeh) {
 #ifdef PROJECT_GAME // back to our game-only functions
 // This function makes sure that the vehicle is properly animated.
 static void AnimateVehicle(Vehicle_t *pVeh) {
-    animNumber_t Anim = BOTH_STAND1;
+    animNumber_e Anim = BOTH_STAND1;
     int iFlags = SETANIM_FLAG_NORMAL, iBlend = 300;
     gentity_t *parent = (gentity_t *)pVeh->m_pParentEntity;
     float fSpeedPercToMax;

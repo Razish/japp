@@ -56,11 +56,7 @@ extern int bg_parryDebounce[];
 
 static int jediSpeechDebounceTime[TEAM_NUM_TEAMS]; // used to stop several jedi from speaking all at once
 // Local state enums
-enum {
-    LSTATE_NONE = 0,
-    LSTATE_UNDERFIRE,
-    LSTATE_INVESTIGATE,
-};
+enum localState_e { LSTATE_NONE = 0, LSTATE_UNDERFIRE, LSTATE_INVESTIGATE };
 
 void NPC_ShadowTrooper_Precache(void) {
     RegisterItem(BG_FindItemForAmmo(AMMO_FORCE));
@@ -1480,7 +1476,7 @@ FIXME: possibly let player do this too?
 // rwwFIXMEFIXME: Going to use qboolean Jedi_DodgeEvasion( gentity_t *self, gentity_t *shooter, trace_t *tr, int hitLoc ) from
 // w_saber.c.. maybe use seperate one for NPCs or add cases to that one?
 
-evasionType_t Jedi_CheckFlipEvasions(gentity_t *self, float rightdot, float zdiff) {
+evasionType_e Jedi_CheckFlipEvasions(gentity_t *self, float rightdot, float zdiff) {
     if (self->NPC && (self->NPC->scriptFlags & SCF_NO_ACROBATICS)) {
         return EVASION_NONE;
     }
@@ -1502,7 +1498,7 @@ evasionType_t Jedi_CheckFlipEvasions(gentity_t *self, float rightdot, float zdif
 
         AngleVectors(&fwdAngles, NULL, &right, NULL);
 
-        animLength = BG_AnimLength(self->localAnimIndex, (animNumber_t)self->client->ps.legsAnim);
+        animLength = BG_AnimLength(self->localAnimIndex, (animNumber_e)self->client->ps.legsAnim);
         if (self->client->ps.legsAnim == BOTH_WALL_RUN_LEFT && rightdot < 0) { // I'm running on a wall to my left and the attack is on the left
             if (animLength - self->client->ps.legsTimer > 400 && self->client->ps.legsTimer > 400) { // not at the beginning or end of the anim
                 anim = BOTH_WALL_RUN_LEFT_FLIP;
@@ -1722,7 +1718,7 @@ evasionType_t Jedi_CheckFlipEvasions(gentity_t *self, float rightdot, float zdif
     return EVASION_NONE;
 }
 
-int Jedi_ReCalcParryTime(gentity_t *self, evasionType_t evasionType) {
+int Jedi_ReCalcParryTime(gentity_t *self, evasionType_e evasionType) {
     if (!self->client) {
         return 0;
     }
@@ -1835,14 +1831,14 @@ qboolean G_FindClosestPointOnLineSegment(const vector3 *start, const vector3 *en
 // Pick proper block anim
 // FIXME: Based on difficulty level/enemy saber combat skill, make this decision-making more/less effective
 // NOTE: always blocking projectiles in this func!
-evasionType_t Jedi_SaberBlockGo(gentity_t *self, usercmd_t *cmd, vector3 *pHitloc, vector3 *phitDir, gentity_t *incoming, float dist) {
+evasionType_e Jedi_SaberBlockGo(gentity_t *self, usercmd_t *cmd, vector3 *pHitloc, vector3 *phitDir, gentity_t *incoming, float dist) {
     vector3 hitloc, hitdir, diff, fwdangles = {0, 0, 0}, right;
     float rightdot;
     float zdiff;
     int duckChance = 0;
     int dodgeAnim = -1;
     qboolean saberBusy = qfalse, doDodge = qfalse;
-    evasionType_t evasionType = EVASION_NONE;
+    evasionType_e evasionType = EVASION_NONE;
 
     // FIXME: if we don't have our saber in hand, pick the force throw option or a jump or strafe!
     // FIXME: reborn don't block enough anymore
@@ -2285,7 +2281,7 @@ static qboolean Jedi_SaberBlock(int saberNum, int bladeNum) // saberNum = 0, bla
     float pointDist, baseDirPerc, dist;
     float bladeLen = 0;
     trace_t tr;
-    evasionType_t evasionType;
+    evasionType_e evasionType;
 
     // FIXME: reborn don't block enough anymore
     /*

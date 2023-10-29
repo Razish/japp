@@ -87,7 +87,7 @@ static void DrawServerInfo(float fade, float &finalY) {
         textWidth = fontNormal.Width(tmp);
         fontNormal.Paint((SCREEN_WIDTH / 2.0f) - textWidth / 2.0f, finalY, tmp, &colour, uiTextStyle_e::Shadowed);
         finalY += textHeight;
-        // FALL THROUGH TO GENERIC TEAM GAME INFO!
+        [[fallthrough]]; // to generic team game info
 
     case GT_TEAM:
         if (cgs.scores1 == cgs.scores2) {
@@ -252,7 +252,7 @@ static void DrawPlayerCount(float fade, float &finalY) {
 }
 
 // number of players on team 'team'
-static int PlayerCount(team_t team) {
+static int PlayerCount(team_e team) {
     int count = 0;
 
     for (int i = 0; i < cg.numScores; i++) {
@@ -392,7 +392,7 @@ static const Column nameColumn{
                0.0f};
 
 // returns number of players on team 'team'
-static int ListPlayers_TDM(float fade, float _x, float _y, team_t team) {
+static int ListPlayers_TDM(float fade, float _x, float _y, team_e team) {
     const int playerCount = PlayerCount(team);
     if (!playerCount) {
         return 0;
@@ -446,7 +446,7 @@ static int ListPlayers_TDM(float fade, float _x, float _y, team_t team) {
                  net = math.floor( math.abs( net ) )
                  */
 
-                 text = va("%.2f", ratio);
+                 text = va("%.2f", (double)ratio);
              }
              font.Paint(x, y, text, &white, uiTextStyle_e::ShadowedMore);
              return true;
@@ -510,7 +510,7 @@ static int ListPlayers_TDM(float fade, float _x, float _y, team_t team) {
 }
 
 // returns number of players on team 'team'
-static int ListPlayers_CTF(float fade, float _x, float _y, team_t team) {
+static int ListPlayers_CTF(float fade, float _x, float _y, team_e team) {
     const int playerCount = PlayerCount(team);
     if (!playerCount) {
         return 0;
@@ -659,7 +659,7 @@ static int ListPlayers_CTF(float fade, float _x, float _y, team_t team) {
 }
 
 // render a list of players on team 'team' at 'x', 'y' using relevant information based on gametype
-static int ListPlayers_Team(float fade, float x, float y, team_t team) {
+static int ListPlayers_Team(float fade, float x, float y, team_e team) {
     switch (cgs.gametype) {
     case GT_FFA:
     case GT_HOLOCRON:
@@ -790,7 +790,7 @@ static void DrawPlayers_Free(float fade, float &finalY) {
                  text = "--";
              } else {
                  const float ratio = (score.time != 0) ? (static_cast<float>(score.score) / score.time) : score.score;
-                 text = va("%.2f", ratio);
+                 text = va("%.2f", (double)ratio);
              }
              font.Paint(x, y, text, &white, uiTextStyle_e::ShadowedMore);
              return true;

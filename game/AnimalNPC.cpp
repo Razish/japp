@@ -14,7 +14,7 @@ extern vector3 playerMins;
 extern vector3 playerMaxs;
 
 void PM_SetAnim(pmove_t *pm, int setAnimParts, int anim, uint32_t setAnimFlags, int blendTime);
-int PM_AnimLength(int index, animNumber_t anim);
+int PM_AnimLength(int index, animNumber_e anim);
 
 void Vehicle_SetAnim(gentity_t *ent, int setAnimParts, int anim, uint32_t setAnimFlags, int iBlend);
 void G_VehicleTrace(trace_t *results, const vector3 *start, const vector3 *tMins, const vector3 *tMaxs, const vector3 *end, int passEntityNum, int contentmask);
@@ -274,7 +274,7 @@ void AnimalProcessOri(Vehicle_t *pVeh) { ProcessOrientCommands(pVeh); }
 
 #ifdef PROJECT_GAME // back to our game-only functions
 static void AnimateVehicle(Vehicle_t *pVeh) {
-    animNumber_t Anim = BOTH_VT_IDLE;
+    animNumber_e Anim = BOTH_VT_IDLE;
     int iFlags = SETANIM_FLAG_NORMAL, iBlend = 300;
     gentity_t *pilot = (gentity_t *)pVeh->m_pPilot;
     gentity_t *parent = (gentity_t *)pVeh->m_pParentEntity;
@@ -377,7 +377,7 @@ static void AnimateVehicle(Vehicle_t *pVeh) {
 // and lagged
 //  This function makes sure that the rider's in this vehicle are properly animated.
 static void AnimateRiders(Vehicle_t *pVeh) {
-    animNumber_t Anim = BOTH_VT_IDLE;
+    animNumber_e Anim = BOTH_VT_IDLE;
     int iFlags = SETANIM_FLAG_NORMAL, iBlend = 500;
     gentity_t *pilot = (gentity_t *)pVeh->m_pPilot;
     gentity_t *parent = (gentity_t *)pVeh->m_pParentEntity;
@@ -408,7 +408,7 @@ static void AnimateRiders(Vehicle_t *pVeh) {
         qboolean Turbo = (fSpeedPercToMax > 0.0f && level.time < pVeh->m_iTurboTime);
         qboolean Walking = (fSpeedPercToMax > 0.0f && ((pVeh->m_ucmd.buttons & BUTTON_WALKING) || fSpeedPercToMax <= 0.275f));
         qboolean Running = (fSpeedPercToMax > 0.275f);
-        EWeaponPose WeaponPose = WPOSE_NONE;
+        weaponPose_e WeaponPose = WPOSE_NONE;
 
         // Remove Crashing Flag
         pVeh->m_ulFlags &= ~VEH_CRASHING;

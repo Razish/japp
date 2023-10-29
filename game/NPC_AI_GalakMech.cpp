@@ -979,17 +979,17 @@ void NPC_BSGM_Attack(void) {
 #endif
     }
 
-    if (NPCInfo->movementSpeech < 3 && NPCInfo->blockedSpeechDebounceTime <= level.time) {
+    if (NPCInfo->movementSpeech < SPEECH_DETECTED && NPCInfo->blockedSpeechDebounceTime <= level.time) {
         if (NPC->enemy && NPC->enemy->health > 0 && NPC->enemy->painDebounceTime > level.time) {
-            if (NPC->enemy->health < 50 && NPCInfo->movementSpeech == 2) {
+            if (NPC->enemy->health < 50 && NPCInfo->movementSpeech == SPEECH_COVER) {
                 G_AddVoiceEvent(NPC, EV_ANGER2, Q_irand(2000, 4000));
-                NPCInfo->movementSpeech = 3;
-            } else if (NPC->enemy->health < 75 && NPCInfo->movementSpeech == 1) {
+                NPCInfo->movementSpeech = SPEECH_DETECTED;
+            } else if (NPC->enemy->health < 75 && NPCInfo->movementSpeech == SPEECH_CONFUSED) {
                 G_AddVoiceEvent(NPC, EV_ANGER1, Q_irand(2000, 4000));
-                NPCInfo->movementSpeech = 2;
-            } else if (NPC->enemy->health < 100 && NPCInfo->movementSpeech == 0) {
+                NPCInfo->movementSpeech = SPEECH_COVER;
+            } else if (NPC->enemy->health < 100 && NPCInfo->movementSpeech == SPEECH_CHASE) {
                 G_AddVoiceEvent(NPC, EV_ANGER3, Q_irand(2000, 4000));
-                NPCInfo->movementSpeech = 1;
+                NPCInfo->movementSpeech = SPEECH_CONFUSED;
             }
         }
     }

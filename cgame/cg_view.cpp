@@ -1,8 +1,8 @@
-#include "cg_local.h"
-#include "bg_saga.h"
-#include "cg_lights.h"
-#include "bg_luaevent.h"
-#include "cg_media.h"
+#include "cgame/cg_local.h"
+#include "game/bg_saga.h"
+#include "cgame/cg_lights.h"
+#include "game/bg_luaevent.h"
+#include "cgame/cg_media.h"
 
 uint32_t CG_GetCameraClip(void) { return (cg.japp.isGhosted) ? (MASK_SOLID) : (MASK_SOLID | CONTENTS_PLAYERCLIP); }
 
@@ -1443,7 +1443,7 @@ void CG_SE_UpdateMusic(void) {
             if (cgScreenEffects.music_volume_multiplier > 1.0f)
                 cgScreenEffects.music_volume_multiplier = 1.0f;
 
-            Com_sprintf(musMultStr, sizeof(musMultStr), "%f", cgScreenEffects.music_volume_multiplier);
+            Com_sprintf(musMultStr, sizeof(musMultStr), "%f", (double)cgScreenEffects.music_volume_multiplier);
             trap->Cvar_Set("s_musicMult", musMultStr);
 
             if (cgScreenEffects.music_volume_multiplier == 1.0f)
@@ -1459,7 +1459,7 @@ void CG_SE_UpdateMusic(void) {
         // if the volume_time is >= cg.time, we should have a volume multiplier set
         char musMultStr[512];
 
-        Com_sprintf(musMultStr, sizeof(musMultStr), "%f", cgScreenEffects.music_volume_multiplier);
+        Com_sprintf(musMultStr, sizeof(musMultStr), "%f", (double)cgScreenEffects.music_volume_multiplier);
         trap->Cvar_Set("s_musicMult", musMultStr);
         cgScreenEffects.music_volume_set = qtrue;
     }
@@ -1632,8 +1632,8 @@ void CG_DrawAutoMap(void) {
     trap->R_GetRealRes(&vWidth, &vHeight);
 
     // set scaling values so that the 640x480 will result at 1.0f/1.0f
-    hScale = vWidth / SCREEN_WIDTH;
-    vScale = vHeight / SCREEN_HEIGHT;
+    hScale = vWidth / (float)SCREEN_WIDTH;
+    vScale = vHeight / (float)SCREEN_HEIGHT;
 
     x = r_autoMapX.value;
     y = r_autoMapY.value;
@@ -1813,7 +1813,7 @@ static void addVelocityVector(void) {
 
     // dynamic settings
     VectorCopy(&cg.predictedPlayerState.origin, &ref->origin);
-    ref->origin.z += cg.predictedPlayerState.viewheight / 2;
+    ref->origin.z += cg.predictedPlayerState.viewheight / 2.0f;
 
     VectorCopy(&cg.predictedPlayerState.velocity, &velocity);
     velocity.z = 0;
@@ -1887,8 +1887,8 @@ static qboolean addIdealVectors(void) {
     VectorCopy(&cg.predictedPlayerState.origin, &right->origin);
 
     // move both vectors up a bit (dont wanna have it on ground)
-    left->origin.z += cg.predictedPlayerState.viewheight / 2;
-    right->origin.z += cg.predictedPlayerState.viewheight / 2;
+    left->origin.z += cg.predictedPlayerState.viewheight / 2.0f;
+    right->origin.z += cg.predictedPlayerState.viewheight / 2.0f;
 
     // ends of the ideal vectors
     left->oldorigin.z = right->oldorigin.z = 0;
@@ -1986,7 +1986,7 @@ void CG_AddMovementVectors(void) {
 }
 
 // Generates and draws a game scene and status information at the given time.
-void CG_DrawActiveFrame(int serverTime, stereoFrame_t stereoView, qboolean demoPlayback) {
+void CG_DrawActiveFrame(int serverTime, stereoFrame_e stereoView, qboolean demoPlayback) {
     int inwater;
     const char *cstr;
     float mSensitivity = cg.zoomSensitivity, mPitchOverride = 0.0f, mYawOverride = 0.0f;
@@ -2251,7 +2251,7 @@ void CG_DrawActiveFrame(int serverTime, stereoFrame_t stereoView, qboolean demoP
                 timescale.value = cg_timescaleFadeEnd.value;
         }
         if (cg_timescaleFadeSpeed.value)
-            trap->Cvar_Set("timescale", va("%f", timescale.value));
+            trap->Cvar_Set("timescale", va("%f", (double)timescale.value));
     }
 
     // Raz: JPLua

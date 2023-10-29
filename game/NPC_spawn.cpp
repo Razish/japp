@@ -11,7 +11,7 @@
 void G_DebugPrint(int level, const char *format, ...);
 
 void Q3_SetParm(int entID, int parmNum, const char *parmValue);
-team_t TranslateTeamName(const char *name);
+team_e TranslateTeamName(const char *name);
 extern const char *TeamNames[TEAM_NUM_TEAMS];
 
 void PM_SetTorsoAnimTimer(gentity_t *ent, int *torsoAnimTimer, int time);
@@ -27,7 +27,7 @@ void Wampa_SetBolts(gentity_t *self);
 
 #define NSF_DROP_TO_FLOOR 16
 
-int WP_SetSaberModel(gclient_t *client, class_t npcClass) {
+int WP_SetSaberModel(gclient_t *client, class_e npcClass) {
     // rwwFIXMEFIXME: Do something here, need to let the client know.
     return 1;
 }
@@ -364,7 +364,7 @@ void NPC_SetMiscDefaultData(gentity_t *ent) {
     }
 }
 
-int NPC_WeaponsForTeam(team_t team, int spawnflags, const char *NPC_type) {
+int NPC_WeaponsForTeam(team_e team, int spawnflags, const char *NPC_type) {
     //*** not sure how to handle this, should I pass in class instead of team and go from there? - dmv
     switch (team) {
         // no longer exists
@@ -568,13 +568,13 @@ void ChangeWeapon(gentity_t *ent, int newWeapon);
 void NPC_SetWeapons(gentity_t *ent) {
     int bestWeap = WP_NONE;
     int curWeap;
-    int weapons = NPC_WeaponsForTeam((team_t)ent->client->playerTeam, ent->spawnflags, ent->NPC_type);
+    int weapons = NPC_WeaponsForTeam((team_e)ent->client->playerTeam, ent->spawnflags, ent->NPC_type);
 
     ent->client->ps.stats[STAT_WEAPONS] = 0;
     for (curWeap = WP_SABER; curWeap < WP_NUM_WEAPONS; curWeap++) {
         if ((weapons & (1 << curWeap))) {
             ent->client->ps.stats[STAT_WEAPONS] |= (1 << curWeap);
-            //			RegisterItem( FindItemForWeapon( (weapon_t)(curWeap) ) );	//precache the weapon
+            //			RegisterItem( FindItemForWeapon( (weapon_e)(curWeap) ) );	//precache the weapon
             // rwwFIXMEFIXME: Precache
             ent->NPC->currentAmmo = ent->client->ps.ammo[weaponData[curWeap].ammoIndex] = 100; // FIXME: max ammo
 
@@ -914,6 +914,7 @@ void NPC_Begin(gentity_t *ent) {
 
     if (ent->client->playerTeam == NPCTEAM_ENEMY) {                                          // valid enemy spawned
         if (!(ent->spawnflags & SFB_CINEMATIC) && ent->NPC->behaviorState != BS_CINEMATIC) { // not a cinematic enemy
+                                                                                             // FIXME: clientNum 0
             if (g_entities[0].client) {
                 // g_entities[0].client->sess.missionStats.enemiesSpawned++;
                 // rwwFIXMEFIXME: Do something here? And this is a rather strange place to be storing
@@ -1222,7 +1223,7 @@ gentity_t *NPC_Spawn_Do(gentity_t *ent) {
                 if (g_entities[n].s.eType != ET_NPC && g_entities[n].client) {
                     VectorCopy(&g_entities[n].s.origin, &newent->s.origin);
                     newent->s.teamowner = g_entities[n].client->playerTeam;
-                    newent->client->playerTeam = (npcteam_t)newent->s.teamowner;
+                    newent->client->playerTeam = (npcteam_e)newent->s.teamowner;
                     break;
                 }
             }
@@ -1275,7 +1276,7 @@ gentity_t *NPC_Spawn_Do(gentity_t *ent) {
         int parmNum;
 
         for (parmNum = 0; parmNum < MAX_PARMS; parmNum++) {
-            if (ent->parms->parm[parmNum] && ent->parms->parm[parmNum][0]) {
+            if (ent->parms->parm[parmNum][0]) {
                 Q3_SetParm(newent->s.number, parmNum, ent->parms->parm[parmNum]);
             }
         }
@@ -1313,13 +1314,13 @@ gentity_t *NPC_Spawn_Do(gentity_t *ent) {
     newent->alliedTeam = ent->alliedTeam;
     newent->teamnodmg = ent->teamnodmg;
     if (ent->team && ent->team[0]) { // specified team directly?
-        newent->client->sess.sessionTeam = (team_t)atoi(ent->team);
+        newent->client->sess.sessionTeam = (team_e)atoi(ent->team);
     } else if (newent->s.teamowner != TEAM_FREE) {
-        newent->client->sess.sessionTeam = (team_t)newent->s.teamowner;
+        newent->client->sess.sessionTeam = (team_e)newent->s.teamowner;
     } else if (newent->alliedTeam != TEAM_FREE) {
-        newent->client->sess.sessionTeam = (team_t)newent->alliedTeam;
+        newent->client->sess.sessionTeam = (team_e)newent->alliedTeam;
     } else if (newent->teamnodmg != TEAM_FREE) {
-        newent->client->sess.sessionTeam = (team_t)newent->teamnodmg;
+        newent->client->sess.sessionTeam = (team_e)newent->teamnodmg;
     } else {
         newent->client->sess.sessionTeam = TEAM_FREE;
     }
@@ -1357,7 +1358,7 @@ void NPC_ShySpawn(gentity_t *ent) {
     ent->nextthink = level.time + SHY_THINK_TIME;
     ent->think = NPC_ShySpawn;
 
-    // rwwFIXMEFIXME: Care about other clients not just 0?
+    // FIXME: clientNum 0
     if (DistanceSquared(&g_entities[0].r.currentOrigin, &ent->r.currentOrigin) <= SHY_SPAWN_DISTANCE_SQR)
         return;
 
@@ -3278,7 +3279,7 @@ void NPC_Kill_f(void) {
     int n;
     gentity_t *player;
     char name[1024];
-    npcteam_t killTeam = NPCTEAM_FREE;
+    npcteam_e killTeam = NPCTEAM_FREE;
     qboolean killNonSF = qfalse;
 
     trap->Argv(2, name, 1024);
@@ -3309,7 +3310,7 @@ void NPC_Kill_f(void) {
         if (!Q_stricmp("nonally", name)) {
             killNonSF = qtrue;
         } else {
-            killTeam = (npcteam_t)GetIDForString(TeamTable, name);
+            killTeam = (npcteam_e)GetIDForString(TeamTable, name);
 
             if (killTeam == NPCTEAM_FREE) {
                 Com_Printf(S_COLOR_RED "NPC_Kill Error: team '%s' not recognized\n", name);

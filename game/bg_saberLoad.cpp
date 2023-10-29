@@ -190,7 +190,7 @@ saber_colors_t TranslateSaberColor(const char *name) {
     return SABER_BLUE;
 }
 
-saber_styles_t TranslateSaberStyle(const char *name) {
+saber_styles_e TranslateSaberStyle(const char *name) {
     if (!Q_stricmp(name, "fast"))
         return SS_FAST;
     else if (!Q_stricmp(name, "medium"))
@@ -209,7 +209,7 @@ saber_styles_t TranslateSaberStyle(const char *name) {
         return SS_NONE;
 }
 
-saberType_t TranslateSaberType(const char *name) {
+saberType_e TranslateSaberType(const char *name) {
     if (!Q_stricmp(name, "SABER_SINGLE"))
         return SABER_SINGLE;
     if (!Q_stricmp(name, "SABER_STAFF"))
@@ -468,7 +468,7 @@ void WP_SaberSetDefaults(saberInfo_t *saber) {
     saber->gloatAnim = -1;                // -1 - anim to use when hit "gloat"
 
     //***NOTE: you can only have a maximum of 2 "styles" of blades, so this next value, "bladeStyle2Start" is the number of the first blade to use these value
-    //on... all blades before this use the normal values above, all blades at and after this number use the secondary values below***
+    // on... all blades before this use the normal values above, all blades at and after this number use the secondary values below***
     saber->bladeStyle2Start = 0; // 0 - if set, blades from this number and higher use the following values (otherwise, they use the normal values already set)
 
     //***The following can be different for the extra blades - not setting them individually defaults them to the value for the whole saber (and first blade)***
@@ -545,7 +545,7 @@ static void Saber_ParseSaberType(saberInfo_t *saber, const char **p) {
         return;
     saberType = GetIDForString(saberTable, value);
     if (saberType >= SABER_SINGLE && saberType <= NUM_SABERS)
-        saber->type = (saberType_t)saberType;
+        saber->type = (saberType_e)saberType;
 }
 static void Saber_ParseSaberModel(saberInfo_t *saber, const char **p) {
     const char *value;
