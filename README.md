@@ -3,6 +3,8 @@
 ja++ modification for jedi academy - best used with [openjk](http://github.com/JACoders/OpenJK)  
 see [japp.jkhub.org](http://japp.jkhub.org) for more information
 
+[![build](https://github.com/Razish/japp/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Razish/japp/releases/tag/latest)
+
 ## supports
 
 | | Windows | Linux | macOS |
@@ -23,7 +25,8 @@ see [japp.jkhub.org](http://japp.jkhub.org) for more information
 
 ### linux (debian-based)
 
-`git scons gcc g++ libreadline-dev`
+- `git scons gcc g++ libreadline-dev`
+- [asdf-vm](https://asdf-vm.com/guide/getting-started.html) (optional, recommended)
 
 ## compiling
 
@@ -40,10 +43,6 @@ Environment Variables
 
 - `NO_SSE` 1 to not generate SSE2 instructions - closer to basejka. This is used for official builds
 - `MORE_WARNINGS` 1 to enable more compiler warnings
-
-## builders
-
-⚠️ oops they're all gone! please replace me with Github actions!
 
 ## contributors ([full list](https://github.com/Razish/japp/graphs/contributors))
 
