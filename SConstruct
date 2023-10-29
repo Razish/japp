@@ -444,7 +444,7 @@ if "gcc" in env["CC"] or "clang" in env["CC"]:
 
     # c flags
     env["CFLAGS"] += [
-        "-std=gnu99",
+        "-std=c17",
     ]
 
     # c++ flags
