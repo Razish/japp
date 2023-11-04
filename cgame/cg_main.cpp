@@ -1701,6 +1701,7 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum, qbo
     const char *s;
 
     // clear out globals
+    BG_InitAnimsets();
     memset(cg_entities, 0, sizeof(cg_entities));
 
     cgs.~cgs_t();
@@ -1737,7 +1738,6 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum, qbo
         trap->Print("Not logging security events to disk.\n");
 
     // load some permanent stuff
-    BG_InitAnimsets();
     BG_VehicleLoadParms();
     CG_InitJetpackGhoul2();
     CG_PmoveClientPointerUpdate();
