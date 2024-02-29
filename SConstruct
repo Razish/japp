@@ -107,7 +107,7 @@ if bits == 32:
     else:
         raise RuntimeError("unexpected platform: " + target_plat)
 elif bits == 64:
-    if platform.machine()[:3] == "arm":
+    if platform.machine()[:3] == "arm" or platform.machine()[:5] == "aarch":
         arch = "arm64"
     else:
         arch = "x86_64"
@@ -149,9 +149,9 @@ colours["orange"] = "\033[33m" if enableColours else ""
 colours["green"] = "\033[92m" if enableColours else ""
 colours["end"] = "\033[0m" if enableColours else ""
 
-env["SHCCCOMSTR"] = env["SHCXXCOMSTR"] = env["CCCOMSTR"] = env[
-    "CXXCOMSTR"
-] = f"{colours['cyan']} compiling: {colours['white']}$SOURCE{colours['end']}"
+env["SHCCCOMSTR"] = env["SHCXXCOMSTR"] = env["CCCOMSTR"] = env["CXXCOMSTR"] = (
+    f"{colours['cyan']} compiling: {colours['white']}$SOURCE{colours['end']}"
+)
 env["ARCOMSTR"] = f"{colours['orange']} archiving: {colours['white']}$TARGET{colours['end']}"
 env["RANLIBCOMSTR"] = f"{colours['orange']}  indexing: {colours['white']}$TARGET{colours['end']}"
 env["ASCOMSTR"] = f"{colours['orange']}assembling: {colours['white']}$TARGET{colours['end']}"

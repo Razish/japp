@@ -1302,8 +1302,7 @@ void CG_NewClientInfo(int clientNum, qboolean entitiesInitialized) {
     }
 }
 
-qboolean cgQueueLoad = qfalse;
-// Called at the beginning of CG_Player if cgQueueLoad is set.
+// Called at the beginning of CG_Player if cg.queueLoad is set.
 void CG_ActualLoadDeferredPlayers(void) {
     int i;
     clientInfo_t *ci;
@@ -1325,7 +1324,7 @@ void CG_ActualLoadDeferredPlayers(void) {
 }
 
 // Called each frame when a player is dead and the scoreboard is up so deferred players can be loaded
-void CG_LoadDeferredPlayers(void) { cgQueueLoad = qtrue; }
+void CG_LoadDeferredPlayers(void) { cg.queueLoad = qtrue; }
 
 #define FOOTSTEP_DISTANCE (32)
 static void _PlayerFootStep(const vector3 *origin, const float orientation, const float radius, centity_t *const cent, footstepType_e footStepType) {
@@ -1698,7 +1697,6 @@ void CG_PlayerAnimEvents(int animFileIndex, int eventFileIndex, qboolean torso, 
         else {
             // still in same anim, check for looping anim
             animation_t *animation;
-
             inSameAnim = qtrue;
             animation = &bgAllAnims[animFileIndex].anims[anim];
             animBackward = (animation->frameLerp < 0);
@@ -2205,7 +2203,7 @@ void CG_Rag_Trace(trace_t *result, const vector3 *start, const vector3 *mins, co
     result->entityNum = result->fraction != 1.0f ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 }
 
-//#define _RAG_BOLT_TESTING
+// #define _RAG_BOLT_TESTING
 
 #ifdef _RAG_BOLT_TESTING
 void CG_TempTestFunction(centity_t *cent, vector3 *forcedAngles) {
@@ -6235,7 +6233,9 @@ static void CG_VehicleEffects(centity_t *cent) {
 #else
                 if (pVehNPC->m_pVehicleInfo->iTrailFX)
 #endif
-                { trap->FX_PlayEffectID(pVehNPC->m_pVehicleInfo->iTrailFX, &org, &fwd, -1, -1, qfalse); }
+                {
+                    trap->FX_PlayEffectID(pVehNPC->m_pVehicleInfo->iTrailFX, &org, &fwd, -1, -1, qfalse);
+                }
 
                 // do exhaust
                 if ((cent->currentState.eFlags & EF_JETPACK_ACTIVE))
@@ -6426,7 +6426,7 @@ void CG_Player(centity_t *cent) {
     vector3 rootAngles, angles, dir, elevated, enang, seekorg;
     mdxaBone_t boltMatrix, lHandMatrix;
     clientInfo_t *ci;
-    refEntity_t legs, torso;
+    refEntity_t legs = {}, torso = {};
     int clientNum, team;
     uint32_t renderfx;
 

@@ -253,7 +253,6 @@ typedef struct cgMedia_s {
             qhandle_t sightShell;
             qhandle_t solidWhite;
             qhandle_t strafeTrail;
-            qhandle_t surfaceExplosion;
             qhandle_t wakeMark;
             qhandle_t whiteShader;
             qhandle_t yellowDroppedSaber;

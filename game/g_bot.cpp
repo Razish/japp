@@ -3,6 +3,7 @@
 // g_bot.c
 
 #include "g_local.h"
+#include "g_public.h"
 
 #define BOT_BEGIN_DELAY_BASE 2000
 #define BOT_BEGIN_DELAY_INCREMENT 1500

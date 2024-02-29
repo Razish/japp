@@ -141,12 +141,17 @@ jobs:
 
   macos:
     name: macOS ${{ matrix.arch }} ${{ matrix.build_type }}
-    runs-on: macos-12
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64]
+        runner: [macos-12, macos-14]
         build_type: [Debug, Release]
+        include:
+          - runner: macos-12
+            arch: x86_64
+          - runner: macos-14
+            arch: arm64
 
     steps:
       - uses: actions/checkout@v3
@@ -195,6 +200,7 @@ jobs:
           mv ./japp-linux-x86-Release/* japp-linux-x86.tar.gz
           mv ./japp-linux-x86_64-Release/* japp-linux-x86_64.tar.gz
           mv ./japp-macos-x86_64-Release/* japp-macos-x86_64.tar.gz
+          mv ./japp-macos-arm64-Release/* japp-macos-arm64.tar.gz
 
       - name: Create latest build
         uses: marvinpinto/action-automatic-releases@latest
@@ -232,6 +238,10 @@ jobs:
 
           - artifact_dir: japp-macos-x86_64-Release
             artifact_name: japp-macos-x86_64.tar.gz
+            zip: false
+
+          - artifact_dir: japp-macos-arm64-Release
+            artifact_name: japp-macos-arm64.tar.gz
             zip: false
 
     steps:

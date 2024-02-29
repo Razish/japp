@@ -1633,7 +1633,7 @@ int G_ClientFromString(const gentity_t *ent, const char *match, uint32_t flags) 
             if (ent) {
                 trap->SendServerCommand(ent - g_entities, va("print \"%s\"", msg));
             } else {
-                trap->Print(va("print %s", msg));
+                trap->Print("print %s", msg);
             }
             return -1;
         }
@@ -1644,7 +1644,7 @@ int G_ClientFromString(const gentity_t *ent, const char *match, uint32_t flags) 
         if (ent) {
             trap->SendServerCommand(ent - g_entities, va("print \"Client %s does not exist\n\"", cleanedMatch));
         } else {
-            trap->Print(va("Client %s does not exist\n", cleanedMatch));
+            trap->Print("Client %s does not exist\n", cleanedMatch);
         }
     }
     return -1;

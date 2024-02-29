@@ -1768,7 +1768,6 @@ float cg_linearFogOverride = 0.0f;         // designer-specified override for li
 void BG_VehicleTurnRateForSpeed(Vehicle_t *pVeh, float speed, float *mPitchOverride, float *mYawOverride);
 qboolean PM_InKnockDown(playerState_t *ps);
 
-extern qboolean cgQueueLoad;
 void CG_ActualLoadDeferredPlayers(void);
 
 static int cg_siegeClassIndex = -2;
@@ -2006,10 +2005,10 @@ void CG_DrawActiveFrame(int serverTime, stereoFrame_e stereoView, qboolean demoP
         pwSet = 1;
     }
 
-    if (cgQueueLoad || (cg.haveDeferredPlayers && cg_deferPlayers.integer == 2 && cg.snap && VectorLength(&cg.snap->ps.velocity) < 1.0f)) {
+    if (cg.queueLoad || (cg.haveDeferredPlayers && cg_deferPlayers.integer == 2 && cg.snap && VectorLength(&cg.snap->ps.velocity) < 1.0f)) {
         // do this before you start messing around with adding ghoul2 refents and crap
         CG_ActualLoadDeferredPlayers();
-        cgQueueLoad = qfalse;
+        cg.queueLoad = qfalse;
     }
 
     cg.time = serverTime;
@@ -2183,7 +2182,6 @@ void CG_DrawActiveFrame(int serverTime, stereoFrame_e stereoView, qboolean demoP
     if (!cg.hyperspace) {
         CG_AddPacketEntities(qfalse); // adter calcViewValues, so predicted player state is correct
         CG_AddMarks();
-        CG_AddLocalEntities();
         CG_DrawMiscEnts();
     }
     CG_AddViewWeapon(&cg.predictedPlayerState);
@@ -2202,6 +2200,11 @@ void CG_DrawActiveFrame(int serverTime, stereoFrame_e stereoView, qboolean demoP
     if (cg_strafeHelper.integer && cg.predictedPlayerState.stats[STAT_HEALTH] > 0 && cg.predictedPlayerState.pm_type != PM_SPECTATOR &&
         cg.predictedPlayerState.pm_type != PM_INTERMISSION) {
         CG_AddMovementVectors();
+    }
+
+    if (!cg.hyperspace) {
+        // specifically render these later, as they may overflow the refent buffer
+        CG_AddLocalEntities();
     }
 
     refdef->time = cg.time;

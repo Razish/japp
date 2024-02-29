@@ -25,6 +25,8 @@
 
 #include "semver/semver.h"
 
+#define JPLUA_VERSION "13.6.2"
+
 namespace JPLua {
 
 struct plugin_t {
