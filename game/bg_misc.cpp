@@ -199,7 +199,7 @@ const int WeaponReadyLegsAnim[WP_NUM_WEAPONS] = {
     BOTH_STAND1  // WP_TURRET,
 };
 
-const int WeaponAttackAnim[WP_NUM_WEAPONS] = {
+int WeaponAttackAnim[WP_NUM_WEAPONS] = {
     BOTH_ATTACK1, // WP_NONE, //(shouldn't happen)
 
     BOTH_ATTACK3,       // WP_STUN_BATON,
@@ -216,7 +216,7 @@ const int WeaponAttackAnim[WP_NUM_WEAPONS] = {
     BOTH_THERMAL_THROW, // WP_THERMAL,
     BOTH_ATTACK3,       // BOTH_ATTACK11,//WP_TRIP_MINE,
     BOTH_ATTACK3,       // BOTH_ATTACK12,//WP_DET_PACK,
-    BOTH_ATTACK3,       // WP_CONCUSSION, //Raz: Fixed bryar pistol animation
+    BOTH_ATTACK3,       // WP_CONCUSSION,
     BOTH_ATTACK2,       // WP_BRYAR_OLD,
 
     // NOT VALID (e.g. should never really be used):
@@ -224,6 +224,32 @@ const int WeaponAttackAnim[WP_NUM_WEAPONS] = {
 
     BOTH_ATTACK1 // WP_TURRET,
 };
+
+void BG_FixWeaponAttackAnim(void) {
+#if defined(PROJECT_GAME)
+    const qboolean doFix = !!g_fixWeaponAttackAnim.integer;
+#elif defined(PROJECT_CGAME)
+    const char *cs = CG_ConfigString(CS_LEGACY_FIXES);
+    const uint32_t legacyFixes = strtoul(cs, NULL, 0);
+    const qboolean doFix = !!(legacyFixes & (1 << LEGACYFIX_WEAPONATTACKANIM));
+#elif defined(PROJECT_UI)
+    const qboolean doFix = qtrue; // no chance of prediction error from UI code
+#endif
+    int *move;
+
+    for (move = WeaponAttackAnim; move - WeaponAttackAnim < ARRAY_LEN(WeaponAttackAnim); move++) {
+        const weapon_e wpIndex = (weapon_e)(move - WeaponAttackAnim);
+        if (wpIndex == WP_CONCUSSION) {
+            *move = doFix ? BOTH_ATTACK3 : BOTH_ATTACK2;
+        } else if (wpIndex == WP_BRYAR_OLD) {
+            *move = doFix ? BOTH_ATTACK2 : BOTH_STAND1;
+        } else if (wpIndex == WP_EMPLACED_GUN) {
+            *move = doFix ? BOTH_STAND1 : BOTH_ATTACK1;
+        } else if (wpIndex == WP_TURRET) {
+            *move = doFix ? BOTH_ATTACK1 : BOTH_ATTACK2; // better than UB?
+        }
+    }
+}
 
 const stringID_table_t eTypes[ET_MAX] = {
     ENUM2STRING(ET_GENERAL),   ENUM2STRING(ET_PLAYER),   ENUM2STRING(ET_ITEM),         ENUM2STRING(ET_MISSILE),

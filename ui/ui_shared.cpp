@@ -424,8 +424,8 @@ qboolean String_Parse(char **p, const char **out) {
 qboolean PC_String_Parse(int handle, const char **out) {
     static const char *squiggy = "}";
     pc_token_t token{};
-    static int counter = 0;
-    counter++;
+    // static int counter = 0;
+    // counter++;
 
     if (!trap->PC_ReadToken(handle, &token))
         return qfalse;
@@ -6712,7 +6712,7 @@ qboolean ItemParse_flag(itemDef_t *item, int handle) {
     }
 
     if (itemFlags[i].string == NULL) {
-        Com_Printf( S_COLOR_YELLOW "Unknown item style value '%s'", token.string);
+        Com_Printf(S_COLOR_YELLOW "Unknown item style value '%s'", token.string);
     }
 
     return qtrue;

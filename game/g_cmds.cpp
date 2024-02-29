@@ -1,5 +1,6 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
+#include "anims.h"
 #include "g_local.h"
 #include "bg_saga.h"
 #include "g_admin.h"
@@ -3164,6 +3165,7 @@ static const emote_t emotes[] = {
     {"victory", BOTH_TAVION_SCEPTERGROUND, MAX_ANIMATIONS, EMF_NONE},
     {"wait", BOTH_STAND10, BOTH_STAND10TOSTAND1, EMF_STATIC | EMF_HOLD | EMF_HOLSTER},
     {"won", TORSO_HANDSIGNAL1, MAX_ANIMATIONS, EMF_NONE},
+    {"worm", BOTH_WORM, MAX_ANIMATIONS, EMF_STATIC | EMF_HOLD},
 };
 static const size_t numEmotes = ARRAY_LEN(emotes);
 
@@ -3277,6 +3279,7 @@ EMOTE(victory)
 EMOTE(surrender)
 EMOTE(wait)
 EMOTE(won)
+EMOTE(worm)
 
 static void Cmd_KnockMeDown(gentity_t *ent) { G_Knockdown(ent); }
 
@@ -3438,6 +3441,7 @@ static const command_t commands[] = {
     {"amvictory", Cmd_Emote_victory, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE},
     {"amwait", Cmd_Emote_wait, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE},
     {"amwon", Cmd_Emote_won, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE},
+    {"amworm", Cmd_Emote_worm, GTB_ALL, CMDFLAG_NOINTERMISSION | CMDFLAG_ALIVE},
     {"callvote", Cmd_CallVote_f, GTB_ALL, CMDFLAG_NOINTERMISSION},
     {"debugBMove_Back", Cmd_BotMoveBack_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE},
     {"debugBMove_Forward", Cmd_BotMoveForward_f, GTB_ALL, CMDFLAG_CHEAT | CMDFLAG_ALIVE},

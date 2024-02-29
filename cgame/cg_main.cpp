@@ -334,6 +334,11 @@ static void CVU_ForceColour(void) {
 }
 
 static void CVU_ForceModel(void) {
+    if (cg.loading) {
+        cg.haveDeferredPlayers = true;
+        cg.queueLoad = true;
+        return;
+    }
     for (int i = 0; i < cgs.maxclients; i++) {
         if (VALIDSTRING(CG_ConfigString(CS_PLAYERS + i))) {
             CG_NewClientInfo(i, qtrue);
@@ -551,13 +556,6 @@ static void CVU_AccelSize(void) {
     }
 }
 
-typedef struct cvarTable_s {
-    vmCvar_t *vmCvar;
-    const char *cvarName, *defaultString;
-    void (*update)(void);
-    uint32_t cvarFlags;
-} cvarTable_t;
-
 #define XCVAR_DECL
 #include "cg_xcvar.h"
 #undef XCVAR_DECL
@@ -569,38 +567,38 @@ void CG_Set2DRatio(void) {
         cgs.widthRatioCoef = 1.0f;
 }
 
-static cvarTable_t cvarTable[] = {
+static const struct cvarTable_t {
+    vmCvar_t *vmCvar;
+    const char *cvarName, *defaultString;
+    void (*update)(void);
+    uint32_t cvarFlags;
+} cvarTable[] = {
 #define XCVAR_LIST
 #include "cg_xcvar.h"
 #undef XCVAR_LIST
 };
 
-static int cvarTableSize = ARRAY_LEN(cvarTable);
-
 void CG_RegisterCvars(void) {
-    int i;
-    cvarTable_t *cv;
-
-    for (i = 0, cv = cvarTable; i < cvarTableSize; i++, cv++) {
-        trap->Cvar_Register(cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags);
-        if (cv->update)
-            cv->update();
+    for (const auto &cv : cvarTable) {
+        trap->Cvar_Register(cv.vmCvar, cv.cvarName, cv.defaultString, cv.cvarFlags);
+    }
+    for (const auto &cv : cvarTable) {
+        if (cv.update) {
+            cv.update();
+        }
     }
 }
 
 void CG_UpdateCvars(void) {
-    int i;
-    cvarTable_t *cv;
-
-    for (i = 0, cv = cvarTable; i < cvarTableSize; i++, cv++) {
-        if (cv->vmCvar) {
-            int modCount = cv->vmCvar->modificationCount;
-            trap->Cvar_Update(cv->vmCvar);
-            if (cv->vmCvar->modificationCount > modCount) {
-                if (cv->update) {
-                    cv->update();
+    for (const auto &cv : cvarTable) {
+        if (cv.vmCvar) {
+            int modCount = cv.vmCvar->modificationCount;
+            trap->Cvar_Update(cv.vmCvar);
+            if (cv.vmCvar->modificationCount > modCount) {
+                if (cv.update) {
+                    cv.update();
                 }
-                JPLua::Cvar_Update(cv->cvarName);
+                JPLua::Cvar_Update(cv.cvarName);
             }
         }
     }
@@ -772,7 +770,7 @@ static void CG_RegisterClients(void) {
 
 const char *CG_ConfigString(int index) {
     // don't read configstrings before initialisation
-    assert(cgs.gameState.dataCount != 0);
+    // assert(cgs.gameState.dataCount != 0);
 
     if (index < 0 || index >= MAX_CONFIGSTRINGS) {
         trap->Error(ERR_DROP, "CG_ConfigString: bad index: %i", index);
@@ -800,11 +798,11 @@ char *CG_GetMenuBuffer(const char *filename) {
 
     len = trap->FS_Open(filename, &f, FS_READ);
     if (!f) {
-        trap->Print(va(S_COLOR_RED "menu file not found: %s, using default\n", filename));
+        trap->Print(S_COLOR_RED "menu file not found: %s, using default\n", filename);
         return NULL;
     }
     if (len >= MAX_MENUFILE) {
-        trap->Print(va(S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE));
+        trap->Print(S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE);
         trap->FS_Close(f);
         return NULL;
     }
@@ -1697,26 +1695,33 @@ static void CG_CloseLog(fileHandle_t *f) {
 // Called after every level change or subsystem restart
 // Will perform callbacks to make the loading info screen update.
 void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback) {
-    char buf[64];
-    const char *s;
-
     // clear out globals
-    BG_InitAnimsets();
-    memset(cg_entities, 0, sizeof(cg_entities));
-
     cgs.~cgs_t();
     new (&cgs) cgs_t{}; // Using {} instead of () to work around MSVC bug
     cg.~cg_t();
     new (&cg) cg_t{};
-
+    memset(cg_entities, 0, sizeof(cg_entities));
     memset(cg_items, 0, sizeof(cg_items));
     memset(cg_weapons, 0, sizeof(cg_weapons));
+    BG_InitAnimsets();
 
-    trap->GetGameState(&cgs.gameState);
+    cg.clientNum = clientNum;
+    cg.demoPlayback = demoPlayback;
+    cg.forceHUDActive = qtrue;
+    cg.forceHUDNextFlashTime = 0;
+    cg.forceHUDTotalFlashTime = 0;
+    cg.forceSelect = 0xFFFFFFFFu;
+    cg.itemSelect = -1;
+    cg.weaponSelect = WP_BRYAR_PISTOL;
+    cgs.processedSnapshotNum = serverMessageNum;
+    cgs.redflag = cgs.blueflag = FLAG_ATBASE;
+    cgs.serverCommandSequence = serverCommandSequence;
 
-    trap->RegisterSharedMemory(cg.sharedBuffer);
-
+    CG_LoadingString("Cvars");
     CG_RegisterCvars();
+    cg.renderingThirdPerson = cg_thirdPerson.integer;
+
+    CG_LoadingString("Commands");
     CG_InitConsoleCommands();
 
     // logging
@@ -1738,44 +1743,37 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum, qbo
         trap->Print("Not logging security events to disk.\n");
 
     // load some permanent stuff
+    CG_LoadingString("Vehicles");
     BG_VehicleLoadParms();
     CG_InitJetpackGhoul2();
     CG_PmoveClientPointerUpdate();
 
     CG_PreloadMedia();
 
-    cg.clientNum = clientNum;
-    cgs.processedSnapshotNum = serverMessageNum;
-    cgs.serverCommandSequence = serverCommandSequence;
-    cg.itemSelect = -1;
-    cg.forceSelect = 0xFFFFFFFFu;
-    cg.forceHUDActive = qtrue;
-    cg.forceHUDTotalFlashTime = 0;
-    cg.forceHUDNextFlashTime = 0;
-    cg.renderingThirdPerson = cg_thirdPerson.integer;
-    cg.weaponSelect = WP_BRYAR_PISTOL;
-    cgs.redflag = cgs.blueflag = FLAG_ATBASE;
-    cg.demoPlayback = demoPlayback;
-    cgs.levelStartTime = atoi(CG_ConfigString(CS_LEVEL_START_TIME));
-
     trap->GetGlconfig(&cgs.glconfig);
-    cgs.screenXScale = cgs.glconfig.vidWidth / SCREEN_WIDTH;
-    cgs.screenYScale = cgs.glconfig.vidHeight / SCREEN_HEIGHT;
+    cgs.screenXScale = cgs.glconfig.vidWidth / (float)SCREEN_WIDTH;
+    cgs.screenYScale = cgs.glconfig.vidHeight / (float)SCREEN_HEIGHT;
     CG_Set2DRatio();
 
-    s = CG_ConfigString(CS_GAME_VERSION);
+    // NOTE: do not read configstrings before this point
+    trap->GetGameState(&cgs.gameState);
+
+    const char *s = CG_ConfigString(CS_GAME_VERSION);
     if (strcmp(s, GAME_VERSION)) {
         trap->Error(ERR_DROP, "Client/Server game mismatch: " GAME_VERSION "/%s", s);
         return;
     }
 
+    CG_LoadingString("Game state");
+    trap->RegisterSharedMemory(cg.sharedBuffer);
+    CG_ParseServerinfo();
+    cgs.levelStartTime = atoi(CG_ConfigString(CS_LEVEL_START_TIME));
+    Q_strncpyz(cgs.voteString, CG_ConfigString(CS_VOTE_STRING), sizeof(cgs.voteString));
+
     CG_TransitionPermanent();
 
     CG_LoadingString("Notifications");
     CG_NotifyInit();
-
-    CG_LoadingString("Server info");
-    CG_ParseServerinfo();
 
     CG_LoadingString("String pool");
     String_Init();
@@ -1850,6 +1848,7 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum, qbo
     CG_LoadingString("");
 
     // post-init stuff
+    char buf[64];
     trap->Cvar_VariableStringBuffer("rate", buf, sizeof(buf));
     if (atoi(buf) == 4000) {
         trap->Print(S_COLOR_YELLOW "WARNING: Default /rate value detected. Suggest typing /rate 25000 for a smoother "
@@ -1858,6 +1857,7 @@ void CG_Init(int serverMessageNum, int serverCommandSequence, int clientNum, qbo
 
     CG_UpdateServerHistory();
     BG_FixSaberMoveData();
+    BG_FixWeaponAttackAnim();
 }
 
 // makes sure returned string is in localized format

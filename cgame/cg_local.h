@@ -93,7 +93,6 @@
 #define DRAWTIMER_COUNTDOWN (0x0002u)
 #define DRAWTIMER_COLOUR (0x0004u)
 
-#define LEF_PUFF_DONT_SCALE (0x0001u)  // do not scale size over time
 #define LEF_TUMBLE (0x0002u)           // tumble over time, used for ejecting shells
 #define LEF_FADE_RGB (0x0004u)         // explicitly fade
 #define LEF_NO_RANDOM_ROTATE (0x0008u) // MakeExplosion adds random rotate which could be bad in some cases
@@ -323,25 +322,19 @@ typedef struct markPoly_s {
 } markPoly_t;
 
 enum leType_e {
-    LE_MARK,
-    LE_EXPLOSION,
-    LE_SPRITE_EXPLOSION,
-    LE_FADE_SCALE_MODEL, // currently only for Demp2 shock sphere
-    LE_FRAGMENT,
-    LE_PUFF,
-    LE_MOVE_SCALE_FADE,
-    LE_FALL_SCALE_FADE,
-    LE_FADE_RGB,
-    LE_SCALE_FADE,
-    LE_SCOREPLUM,
-    LE_OLINE,
-    LE_SHOWREFENTITY,
-    LE_LINE
+    LE_NONE,
+    LE_FADE_SCALE_MODEL, // demp2
+    LE_FRAGMENT,         // EV_DEBRIS
+    LE_PUFF,             // force push, grip
+    LE_FADE_RGB,         // strafe trail, rail trail
+    LE_SCOREPLUM,        // score plums
+    LE_OLINE,            // portable shield
+    LE_LINE,             // CG_TestLine
+    NUM_LE_TYPES
 };
+extern const stringID_table_t leTypeStrings[NUM_LE_TYPES + 1];
 
-enum leMarkType_e { LEMT_NONE, LEMT_BURN, LEMT_BLOOD }; // fragment local entities can leave marks on walls
-
-enum leBounceSoundType_e { LEBS_NONE, LEBS_BLOOD, LEBS_BRASS, LEBS_METAL, LEBS_ROCK }; // fragment local entities can make sounds on impacts
+enum leBounceSoundType_e { LEBS_NONE, LEBS_METAL, LEBS_ROCK }; // fragment local entities can make sounds on impacts
 
 typedef struct localEntity_s {
     struct localEntity_s *prev, *next;
@@ -359,7 +352,6 @@ typedef struct localEntity_s {
     float radius;
     float light;
     vector3 lightColor;
-    leMarkType_e leMarkType; // mark to leave on fragment impact
     leBounceSoundType_e leBounceSoundType;
 
     union {
@@ -507,6 +499,7 @@ typedef struct cg_s {
     qboolean levelShot; // taking a level menu screenshot
     bool haveDeferredPlayers;
     int deferredPlayerLoading;
+    bool queueLoad;
     qboolean loading;             // don't defer players at initial startup
     qboolean intermissionStarted; // don't play voice rewards, because game will end shortly
     int latestSnapshotNum;        // the number of snapshots the client system has received
@@ -862,8 +855,6 @@ void CG_AdjustEyePos(const char *modelName);
 const char *CG_Argv(int arg);
 localEntity_t *CG_AllocLocalEntity(void);
 void CG_Beam(centity_t *cent);
-void CG_Bleed(vector3 *origin, int entityNum);
-void CG_BubbleTrail(vector3 *start, vector3 *end, float spacing);
 void CG_BuildSolidList(void);
 void CG_BuildSpectatorString(void);
 void CG_CacheG2AnimInfo(char *modelName);
@@ -984,8 +975,6 @@ void CG_LoadingItem(int itemNum);
 void CG_LoadingClient(int clientNum);
 void CG_LoadMenus(const char *menuFile);
 void CG_LogPrintf(fileHandle_t fileHandle, const char *fmt, ...) Q_PRINT_FORMAT(2, 3);
-localEntity_t *CG_MakeExplosion(vector3 *origin, vector3 *dir, qhandle_t hModel, int numframes, qhandle_t shader, int msec, qboolean isSprite, float scale,
-                                uint32_t flags);
 void CG_ManualEntityRender(centity_t *cent);
 void CG_MissileHitPlayer(int weapon, vector3 *origin, vector3 *dir, int entityNum, qboolean alt_fire);
 void CG_MissileHitWall(int weapon, int clientNum, vector3 *origin, vector3 *dir, impactSound_e soundType, qboolean alt_fire, int charge);
@@ -1045,12 +1034,9 @@ void CG_Shutdown(void);
 void CG_ShutDownG2Weapons(void);
 void CG_SiegeRoundOver(centity_t *ent, int won);
 void CG_SiegeObjectiveCompleted(centity_t *ent, int won, int objectivenum);
-localEntity_t *CG_SmokePuff(const vector3 *p, const vector3 *vel, float radius, float r, float g, float b, float a, float duration, int startTime,
-                            int fadeInTime, uint32_t leFlags, qhandle_t hShader);
 void CG_Spark(vector3 *origin, vector3 *dir);
 void CG_StartMusic(qboolean bForceStart);
 qhandle_t CG_StatusHandle(int task);
-void CG_SurfaceExplosion(vector3 *origin, vector3 *normal, float radius, float shake_speed, qboolean smoke);
 vector4 *CG_TeamColor(int team);
 void CG_TestModel_f(void);
 void CG_TestGun_f(void);

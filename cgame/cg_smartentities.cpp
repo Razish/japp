@@ -214,7 +214,7 @@ qboolean SE_RenderPlayer(int targIndex) {
 
 // Tracing non-players seems to have a bad effect, we know players are limited to 32 per frame, however other gentities
 //	that are being added are not! It's stupid to actually add traces for it, even with a limited form i used before of 2
-//	traces per object. There are to many too track and simply drawing them takes less FPS either way.
+//	traces per object. There are too many to track and simply drawing them takes less FPS either way.
 qboolean SE_RenderThisEntity(vector3 *testOrigin, int gameEntity) {
     // If we do not have a snapshot, we cannot calculate anything.
     if (!cg.snap)

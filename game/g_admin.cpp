@@ -179,13 +179,13 @@ static void AM_ConsolePrint(const gentity_t *ent, const char *msg) {
     if (ent) {
         trap->SendServerCommand(ent - g_entities, va("print \"%s\"", msg));
     } else {
-        trap->Print(msg);
+        trap->Print("%s", msg);
     }
 }
 
 static void PB_Callback(const char *buffer, int clientNum) {
     if (clientNum == -1) {
-        trap->Print(buffer);
+        trap->Print("%s", buffer);
     } else {
         trap->SendServerCommand(clientNum, va("print \"%s\"", buffer));
     }

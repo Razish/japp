@@ -1711,7 +1711,7 @@ void Init(void) {
     }
 
     // set the JPLua version
-    semver_parse("13.6.1", &jpluaVersion);
+    semver_parse(JPLUA_VERSION, &jpluaVersion);
 
     // set the callback in case of an error
     lua_atpanic(ls.L, Error);

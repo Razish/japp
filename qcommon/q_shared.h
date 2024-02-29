@@ -155,8 +155,8 @@ typedef int32_t qhandle_t, fxHandle_t, sfxHandle_t, fileHandle_t, clipHandle_t;
 
 // ja++ version
 #define JAPP_VERSION_SMALL "JA++, " XSTRING(ARCH_WIDTH) " bits, " __DATE__
-#ifdef REVISION
-#define JAPP_VERSION JAPP_VERSION_SMALL ", " REVISION
+#ifdef GIT_TAG
+#define JAPP_VERSION JAPP_VERSION_SMALL ", " GIT_TAG
 #else
 #define JAPP_VERSION JAPP_VERSION_SMALL
 #endif
@@ -765,7 +765,7 @@ extern vector3 axisDefault[3];
 float Q_fabs(float f);
 float Q_rsqrt(float f); // reciprocal square root
 
-#define SQRTFAST(x) ((x) * Q_rsqrt(x))
+#define SQRTFAST(x) ((x)*Q_rsqrt(x))
 
 signed char ClampChar(int i);
 signed short ClampShort(int i);
@@ -782,8 +782,8 @@ void ByteToDir(int b, vector3 *dir);
 
 #define Square(x) ((x) * (x))
 
-#define DEG2RAD(a) (((a) * M_PI) / 180.0F)
-#define RAD2DEG(a) (((a) * 180.0f) / M_PI)
+#define DEG2RAD(a) (((a)*M_PI) / 180.0F)
+#define RAD2DEG(a) (((a)*180.0f) / M_PI)
 
 void VectorAdd(const vector3 *vec1, const vector3 *vec2, vector3 *vecOut);
 void VectorSubtract(const vector3 *vec1, const vector3 *vec2, vector3 *vecOut);
@@ -1154,7 +1154,7 @@ typedef enum soundChannel_e {
     CHAN_MUSIC,        // ## %s !!"W:\game\base\!!sound\*.wav;*.mp3" #music played as a looping sound - added by BTO (VV)
 } soundChannel_t;
 
-#define ANGLE2SHORT(x) ((int)((x) * 65536 / 360) & 65535)
+#define ANGLE2SHORT(x) ((int)((x)*65536 / 360) & 65535)
 #define SHORT2ANGLE(x) ((x) * (360.0f / 65536))
 
 #define SNAPFLAG_RATE_DELAYED 1

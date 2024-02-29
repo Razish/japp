@@ -1131,10 +1131,10 @@ static void DrawClientInfo(float fade) {
     y -= font.Height(buf);
     font.Paint(SCREEN_WIDTH - font.Width(buf), y, buf, &colour, uiTextStyle_e::ShadowedMore);
 
-#ifdef REVISION
-    y -= font.Height(REVISION);
+#ifdef GIT_TAG
+    y -= font.Height(GIT_TAG);
     // JA++ version
-    font.Paint(SCREEN_WIDTH - font.Width(REVISION), y, REVISION, &colour, uiTextStyle_e::ShadowedMore);
+    font.Paint(SCREEN_WIDTH - font.Width(GIT_TAG), y, GIT_TAG, &colour, uiTextStyle_e::ShadowedMore);
 #endif
 }
 
