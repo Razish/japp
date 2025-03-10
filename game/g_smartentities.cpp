@@ -234,7 +234,7 @@ static qboolean SE_NetworkPlayer(const gentity_t *self, const gentity_t *other) 
 
 // Tracing non-players seems to have a bad effect, we know players are limited to 32 per frame, however other gentities
 //	that are being added are not! It's stupid to actually add traces for it, even with a limited form i used before of 2
-//	traces per object. There are to many too track and simply networking them takes less FPS either way
+//	traces per object. There are too many to track and simply networking them takes less FPS either way
 qboolean G_EntityOccluded(const gentity_t *self, const gentity_t *other) {
     // This is a non-player object, just send it (see above).
     if (!other->inuse || other->s.number >= level.maxclients) {

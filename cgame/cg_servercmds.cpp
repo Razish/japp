@@ -176,9 +176,6 @@ void CG_ParseServerinfo(void) {
     Q_strncpyz(cgs.japp.serverName, Info_ValueForKey(info, "sv_hostname"), sizeof(cgs.japp.serverName));
     CPM_UpdateSettings(!!(cgs.japp.jp_cinfo & CINFO_CPMPHYSICS));
 
-    // Fix fucked up vote strings
-    Q_strncpyz(cgs.voteString, CG_ConfigString(CS_VOTE_STRING), sizeof(cgs.voteString));
-
     // Raz: Synchronise our expected snaps/sec with the server's framerate
     //		OpenJK servers will try to match us to the sv_fps too (sv_client.cpp -> SV_UserinfoChanged)
     i = atoi(Info_ValueForKey(info, "sv_fps"));
@@ -753,8 +750,9 @@ static void CG_ConfigStringModified(void) {
     }
 
     else if (num == CS_LEGACY_FIXES) {
-        // LEGACYFIX_SABERMOVEDATA may have changed
+        // LEGACYFIX_SABERMOVEDATA etc may have changed
         BG_FixSaberMoveData();
+        BG_FixWeaponAttackAnim();
     }
 
     else if (num >= CS_LIGHT_STYLES && num < CS_LIGHT_STYLES + (MAX_LIGHT_STYLES * 3))

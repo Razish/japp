@@ -516,7 +516,6 @@ static const resource_t gfx[] = {
     {&media.gfx.world.sightShell, "powerups/sightshell", RFL_NONE, GTB_ALL},
     {&media.gfx.world.solidWhite, "gfx/effects/solidWhite_cull", RFL_NONE, GTB_ALL},
     {&media.gfx.world.strafeTrail, "gfx/misc/whiteline2", RFL_NOMIP, GTB_ALL},
-    {&media.gfx.world.surfaceExplosion, "surfaceExplosion", RFL_NONE, GTB_ALL},
     {&media.gfx.world.wakeMark, "wake", RFL_NONE, GTB_ALL},
     //	{ &media.gfx.world.whiteShader, NULL, RFL_NONE, GTB_ALL },
     {&media.gfx.world.yellowDroppedSaber, "gfx/effects/yellow_glow", RFL_NONE, GTB_ALL},

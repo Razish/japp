@@ -8327,6 +8327,25 @@ void JP_SaveFavServers(void) {
 }
 #endif
 
+static void UI_CvarHelp(const char *cvarName, qboolean enter, char *helpBuffer, size_t helpBufferSize) {
+    /*
+    In the digital realm, where lines of code dance and weave,
+    One missing export can bring a program to its knees.
+    A fragile balance disrupted by a single slip,
+    Don't crash my program, let it continue its script.
+
+    Each function, each module, carefully crafted and linked,
+    A symphony of logic, with no room for a missing brink.
+    So delicate, so intricate, a web of commands,
+    Don't let it break, don't let it end.
+
+    For in this world of bytes and bits, where errors hide,
+    A missing export can be a fatal divide.
+    So heed my plea, oh code gods above,
+    Don't crash my program, let it run with love.
+    */
+}
+
 uiImport_t *trap = NULL;
 
 Q_CABI {
@@ -8355,6 +8374,7 @@ Q_CABI {
         uie.ConsoleCommand = UI_ConsoleCommand;
         uie.DrawConnectScreen = UI_DrawConnectScreen;
         uie.MenuReset = Menu_Reset;
+        uie.CvarHelp = UI_CvarHelp;
 
         return &uie;
     }

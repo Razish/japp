@@ -107,7 +107,7 @@ if bits == 32:
     else:
         raise RuntimeError("unexpected platform: " + target_plat)
 elif bits == 64:
-    if platform.machine()[:3] == "arm":
+    if platform.machine()[:3] == "arm" or platform.machine()[:5] == "aarch":
         arch = "arm64"
     else:
         arch = "x86_64"
@@ -149,9 +149,9 @@ colours["orange"] = "\033[33m" if enableColours else ""
 colours["green"] = "\033[92m" if enableColours else ""
 colours["end"] = "\033[0m" if enableColours else ""
 
-env["SHCCCOMSTR"] = env["SHCXXCOMSTR"] = env["CCCOMSTR"] = env[
-    "CXXCOMSTR"
-] = f"{colours['cyan']} compiling: {colours['white']}$SOURCE{colours['end']}"
+env["SHCCCOMSTR"] = env["SHCXXCOMSTR"] = env["CCCOMSTR"] = env["CXXCOMSTR"] = (
+    f"{colours['cyan']} compiling: {colours['white']}$SOURCE{colours['end']}"
+)
 env["ARCOMSTR"] = f"{colours['orange']} archiving: {colours['white']}$TARGET{colours['end']}"
 env["RANLIBCOMSTR"] = f"{colours['orange']}  indexing: {colours['white']}$TARGET{colours['end']}"
 env["ASCOMSTR"] = f"{colours['orange']}assembling: {colours['white']}$TARGET{colours['end']}"
@@ -173,21 +173,13 @@ def get_compiler_version():
 ccversion = get_compiler_version()
 
 
-# git revision
-# TODO: consider tags
-def get_git_revision():
-    cmd_status, rawrevision = run_command("git rev-parse --short HEAD")
-    git_revision = None if cmd_status else rawrevision
-
-    if git_revision:
-        cmd_status, _ = run_command("git diff-index --quiet HEAD")
-        if cmd_status:
-            git_revision += "*"
-
-    return git_revision
+# git tag
+def get_git_tag():
+    cmd_status, rawtag = run_command("git describe --tags --exclude=latest")
+    return None if cmd_status else rawtag
 
 
-revision = get_git_revision()
+git_tag = get_git_tag()
 
 
 # set job/thread count
@@ -215,7 +207,7 @@ env.SetOption("num_jobs", GetNumCores())
 # notify the user of the build configuration
 if not env.GetOption("clean"):
     # build tools
-    msg = "Building " + ((revision + " ") if revision else "")
+    msg = "Building " + ((git_tag + " ") if git_tag else "")
     msg += (
         "using "
         + str(env.GetOption("num_jobs"))
@@ -652,8 +644,8 @@ if debug:
         "_DEBUG",
     ]
 
-if revision:
-    env["CPPDEFINES"] += ['REVISION=\\"' + revision + '\\"']
+if git_tag:
+    env["CPPDEFINES"] += ['GIT_TAG=\\"' + git_tag + '\\"']
 
 # override options
 if target_plat != "Linux":

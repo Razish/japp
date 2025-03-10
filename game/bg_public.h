@@ -140,6 +140,8 @@ Ghoul2 Insert End
 
 enum legacyFixes_e {
     LEGACYFIX_SABERMOVEDATA = 0,
+    LEGACYFIX_WEAPONATTACKANIM,
+    LEGACYFIX_RUNWALKANIMS,
     /*
     m    m                        ""#      "             m                    m
     #    #  mmm   m   m             #    mmm     mmm   mm#mm   mmm   m mm     #
@@ -1587,7 +1589,7 @@ typedef struct saberInfo_s {
 
 extern const int WeaponReadyAnim[WP_NUM_WEAPONS];
 extern const int WeaponReadyLegsAnim[WP_NUM_WEAPONS];
-extern const int WeaponAttackAnim[WP_NUM_WEAPONS];
+extern int WeaponAttackAnim[WP_NUM_WEAPONS];
 
 extern const int forcePowerDarkLight[NUM_FORCE_POWERS];
 
@@ -1631,6 +1633,7 @@ const gitem_t *BG_FindItemForHoldable(holdable_e hi);
 const gitem_t *BG_FindItemForPowerup(powerup_e pw);
 const gitem_t *BG_FindItemForWeapon(weapon_e wp);
 void BG_FixSaberMoveData(void);
+void BG_FixWeaponAttackAnim(void);
 qboolean BG_FlippingAnim(int anim);
 void BG_ForcePowerDrain(playerState_t *ps, forcePowers_t forcePower, int overrideAmt);
 void BG_G2ATSTAngles(void *ghoul2, int time, vector3 *cent_lerpAngles);

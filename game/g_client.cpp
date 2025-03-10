@@ -1863,8 +1863,8 @@ qboolean ClientUserinfoChanged(int clientNum) {
         } else if (client->pers.adminData.renamedTime != 0 && client->pers.adminData.renamedTime > level.time - (japp_amrenameTime.value * 60.0f) * 1000) {
             float remaining = japp_amrenameTime.value * 60.0f;
             remaining -= (level.time - client->pers.adminData.renamedTime) / 1000.0f;
-            trap->SendServerCommand(clientNum,
-                                    va("print \"You are not allowed to change name for another " S_COLOR_CYAN "%.1f " S_COLOR_WHITE "seconds\n\"", (double)remaining));
+            trap->SendServerCommand(
+                clientNum, va("print \"You are not allowed to change name for another " S_COLOR_CYAN "%.1f " S_COLOR_WHITE "seconds\n\"", (double)remaining));
         } else {
             trap->SendServerCommand(-1,
                                     va("print \"%s" S_COLOR_WHITE " %s %s\n\"", oldname, G_GetStringEdString("MP_SVGAME", "PLRENAME"), client->pers.netname));
@@ -2178,18 +2178,16 @@ const char *ClientConnect(int clientNum, qboolean firstTime, qboolean isBot) {
     }
 
     // disallow multiple connections from same IP
-    if (!isBot && firstTime) {
-        if (japp_antiFakePlayer.integer) {
-            // check for > g_maxConnPerIP connections from same IP
-            int count = 0, i = 0;
-            for (i = 0; i < sv_maxclients.integer; i++) {
-                if (CompareIPString(tmpIP, level.clients[i].sess.IP)) {
-                    count++;
-                }
+    if (japp_antiFakePlayer.integer && !isBot && firstTime) {
+        int count = 0, i = 0;
+        gclient_t *cl;
+        for (i = 0, cl = level.clients; i < sv_maxclients.integer; i++, cl++) {
+            if (cl->pers.connected >= CON_CONNECTING && CompareIPString(tmpIP, cl->sess.IP)) {
+                count++;
             }
-            if (count > japp_maxConnPerIP.integer) {
-                return "Too many connections from the same IP";
-            }
+        }
+        if (count >= japp_maxConnPerIP.integer) {
+            return "Too many connections from the same IP";
         }
     }
 
@@ -2236,7 +2234,7 @@ const char *ClientConnect(int clientNum, qboolean firstTime, qboolean isBot) {
         }
         Q_strcat(msg, sizeof(msg), va(" final csf 0x%X\n", finalCSF));
 
-        G_LogPrintf(level.log.console, msg);
+        G_LogPrintf(level.log.console, "%s", msg);
     }
 
     // JPLua plugins can deny connections

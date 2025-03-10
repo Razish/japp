@@ -67,6 +67,8 @@ XCVAR_DEF(g_duelWeaponDisable, "1", NULL, CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_
 XCVAR_DEF(g_ff_objectives, "0", NULL, CVAR_CHEAT | CVAR_NORESTART, qtrue)
 XCVAR_DEF(g_fixSaberDisarmBonus, "1", NULL, CVAR_ARCHIVE, qtrue)
 XCVAR_DEF(g_fixSaberMoveData, "1", CVU_FixSaberMoveData, CVAR_ARCHIVE, qtrue)
+XCVAR_DEF(g_fixRunWalkAnims, "1", CVU_FixRunWalkAnims, CVAR_ARCHIVE, qtrue)
+XCVAR_DEF(g_fixWeaponAttackAnim, "1", CVU_FixWeaponAttackAnim, CVAR_ARCHIVE, qtrue)
 XCVAR_DEF(g_forceBasedTeams, "0", NULL, CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, qfalse)
 XCVAR_DEF(g_forceClientUpdateRate, "250", NULL, CVAR_NONE, qfalse)
 XCVAR_DEF(g_forceDodge, "1", NULL, CVAR_NONE, qtrue)

@@ -160,13 +160,6 @@ static int LocalEntity_GetLightColor(lua_State *L, localEntity_t *ent) {
     return 1;
 }
 
-static void LocalEntity_SetMarkType(lua_State *L, localEntity_t *ent) { ent->leMarkType = (leMarkType_e)luaL_checkinteger(L, 3); }
-
-static int LocalEntity_GetMarkType(lua_State *L, localEntity_t *ent) {
-    lua_pushinteger(L, ent->leMarkType);
-    return 1;
-}
-
 static void LocalEntity_SetBSndType(lua_State *L, localEntity_t *ent) { ent->leBounceSoundType = (leBounceSoundType_e)luaL_checkinteger(L, 3); }
 
 static int LocalEntity_GetBSndType(lua_State *L, localEntity_t *ent) {
@@ -239,11 +232,6 @@ static const le_prop_t localEntityProperties[] = {
         "line_width",
         LocalEntity_Line_GetWidth,
         LocalEntity_Line_SetWidth,
-    },
-    {
-        "marktype",
-        LocalEntity_GetMarkType,
-        LocalEntity_SetMarkType,
     },
     {
         "radius",

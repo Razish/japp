@@ -4700,6 +4700,16 @@ static uint32_t JP_GetJPFixRoll(void) {
     return level;
 }
 
+static bool BG_AreRunWalkAnimsFixed(void) {
+#if defined(PROJECT_GAME)
+    return !!g_fixRunWalkAnims.integer;
+#elif defined(PROJECT_CGAME)
+    const char *cs = CG_ConfigString(CS_LEGACY_FIXES);
+    const uint32_t legacyFixes = strtoul(cs, NULL, 0);
+    return !!(legacyFixes & (1 << LEGACYFIX_RUNWALKANIMS));
+#endif
+}
+
 static void PM_Footsteps(void) {
     float bobmove;
     int old;
@@ -4882,100 +4892,114 @@ static void PM_Footsteps(void) {
                     desiredAnim = BOTH_WALK1;
                 }
             } else if (pm->ps->pm_flags & PMF_BACKWARDS_RUN) {
-                switch (pm->ps->fd.saberAnimLevel) {
-                case SS_STAFF:
-                    if (pm->ps->saberHolstered > 1) { // saber off
-                        desiredAnim = BOTH_RUNBACK1;
-                    } else {
-                        // desiredAnim = BOTH_RUNBACK_STAFF;
-                        // hmm.. stuff runback anim is pretty messed up for some reason.
-                        desiredAnim = BOTH_RUNBACK2;
+                if (BG_AreRunWalkAnimsFixed() && pm->ps->weapon != WP_SABER) {
+                    desiredAnim = BOTH_RUNBACK1;
+                } else {
+                    switch (pm->ps->fd.saberAnimLevel) {
+                    case SS_STAFF:
+                        if (pm->ps->saberHolstered > 1) { // saber off
+                            desiredAnim = BOTH_RUNBACK1;
+                        } else {
+                            // desiredAnim = BOTH_RUNBACK_STAFF;
+                            // hmm.. stuff runback anim is pretty messed up for some reason.
+                            desiredAnim = BOTH_RUNBACK2;
+                        }
+                        break;
+                    case SS_DUAL:
+                        if (pm->ps->saberHolstered > 1) { // sabers off
+                            desiredAnim = BOTH_RUNBACK1;
+                        } else {
+                            // desiredAnim = BOTH_RUNBACK_DUAL;
+                            // and so is the dual
+                            desiredAnim = BOTH_RUNBACK2;
+                        }
+                        break;
+                    default:
+                        if (pm->ps->saberHolstered) { // saber off
+                            desiredAnim = BOTH_RUNBACK1;
+                        } else {
+                            desiredAnim = BOTH_RUNBACK2;
+                        }
+                        break;
                     }
-                    break;
-                case SS_DUAL:
-                    if (pm->ps->saberHolstered > 1) { // sabers off
-                        desiredAnim = BOTH_RUNBACK1;
-                    } else {
-                        // desiredAnim = BOTH_RUNBACK_DUAL;
-                        // and so is the dual
-                        desiredAnim = BOTH_RUNBACK2;
-                    }
-                    break;
-                default:
-                    if (pm->ps->saberHolstered) { // saber off
-                        desiredAnim = BOTH_RUNBACK1;
-                    } else {
-                        desiredAnim = BOTH_RUNBACK2;
-                    }
-                    break;
                 }
             } else {
-                switch (pm->ps->fd.saberAnimLevel) {
-                case SS_STAFF:
-                    if (pm->ps->saberHolstered > 1) { // blades off
-                        desiredAnim = BOTH_RUN1;
-                    } else if (pm->ps->saberHolstered == 1) { // 1 blade on
-                        desiredAnim = BOTH_RUN2;
-                    } else {
-                        if (pm->ps->fd.forcePowersActive & (1 << FP_SPEED)) {
+                if (BG_AreRunWalkAnimsFixed() && pm->ps->weapon != WP_SABER) {
+                    desiredAnim = BOTH_RUN1;
+                } else {
+                    switch (pm->ps->fd.saberAnimLevel) {
+                    case SS_STAFF:
+                        if (pm->ps->saberHolstered > 1) { // blades off
+                            desiredAnim = BOTH_RUN1;
+                        } else if (pm->ps->saberHolstered == 1) { // 1 blade on
+                            desiredAnim = BOTH_RUN2;
+                        } else {
+                            if (pm->ps->fd.forcePowersActive & (1 << FP_SPEED)) {
+                                desiredAnim = BOTH_RUN1;
+                            } else {
+                                desiredAnim = BOTH_RUN_STAFF;
+                            }
+                        }
+                        break;
+                    case SS_DUAL:
+                        if (pm->ps->saberHolstered > 1) { // blades off
+                            desiredAnim = BOTH_RUN1;
+                        } else if (pm->ps->saberHolstered == 1) { // 1 saber on
+                            desiredAnim = BOTH_RUN2;
+                        } else {
+                            desiredAnim = BOTH_RUN_DUAL;
+                        }
+                        break;
+                    default:
+                        if (pm->ps->saberHolstered) { // saber off
                             desiredAnim = BOTH_RUN1;
                         } else {
-                            desiredAnim = BOTH_RUN_STAFF;
+                            desiredAnim = BOTH_RUN2;
                         }
+                        break;
                     }
-                    break;
-                case SS_DUAL:
-                    if (pm->ps->saberHolstered > 1) { // blades off
-                        desiredAnim = BOTH_RUN1;
-                    } else if (pm->ps->saberHolstered == 1) { // 1 saber on
-                        desiredAnim = BOTH_RUN2;
-                    } else {
-                        desiredAnim = BOTH_RUN_DUAL;
-                    }
-                    break;
-                default:
-                    if (pm->ps->saberHolstered) { // saber off
-                        desiredAnim = BOTH_RUN1;
-                    } else {
-                        desiredAnim = BOTH_RUN2;
-                    }
-                    break;
                 }
             }
         } else {
             bobmove = 0.2f; // walking bobs slow
             if (pm->ps->pm_flags & PMF_BACKWARDS_RUN) {
-                switch (pm->ps->fd.saberAnimLevel) {
-                case SS_STAFF:
-                    if (pm->ps->saberHolstered > 1) {
-                        desiredAnim = BOTH_WALKBACK1;
-                    } else if (pm->ps->saberHolstered) {
-                        desiredAnim = BOTH_WALKBACK2;
-                    } else {
-                        desiredAnim = BOTH_WALKBACK_STAFF;
+                if (BG_AreRunWalkAnimsFixed() && pm->ps->weapon != WP_SABER) {
+                    desiredAnim = BOTH_WALKBACK1;
+                } else {
+                    switch (pm->ps->fd.saberAnimLevel) {
+                    case SS_STAFF:
+                        if (pm->ps->saberHolstered > 1) {
+                            desiredAnim = BOTH_WALKBACK1;
+                        } else if (pm->ps->saberHolstered) {
+                            desiredAnim = BOTH_WALKBACK2;
+                        } else {
+                            desiredAnim = BOTH_WALKBACK_STAFF;
+                        }
+                        break;
+                    case SS_DUAL:
+                        if (pm->ps->saberHolstered > 1) {
+                            desiredAnim = BOTH_WALKBACK1;
+                        } else if (pm->ps->saberHolstered) {
+                            desiredAnim = BOTH_WALKBACK2;
+                        } else {
+                            desiredAnim = BOTH_WALKBACK_DUAL;
+                        }
+                        break;
+                    default:
+                        if (pm->ps->saberHolstered) {
+                            desiredAnim = BOTH_WALKBACK1;
+                        } else {
+                            desiredAnim = BOTH_WALKBACK2;
+                        }
+                        break;
                     }
-                    break;
-                case SS_DUAL:
-                    if (pm->ps->saberHolstered > 1) {
-                        desiredAnim = BOTH_WALKBACK1;
-                    } else if (pm->ps->saberHolstered) {
-                        desiredAnim = BOTH_WALKBACK2;
-                    } else {
-                        desiredAnim = BOTH_WALKBACK_DUAL;
-                    }
-                    break;
-                default:
-                    if (pm->ps->saberHolstered) {
-                        desiredAnim = BOTH_WALKBACK1;
-                    } else {
-                        desiredAnim = BOTH_WALKBACK2;
-                    }
-                    break;
                 }
             } else {
                 if (pm->ps->weapon == WP_MELEE) {
                     desiredAnim = BOTH_WALK1;
                 } else if (BG_SabersOff(pm->ps)) {
+                    desiredAnim = BOTH_WALK1;
+                } else if (BG_AreRunWalkAnimsFixed() && pm->ps->weapon != WP_SABER) {
                     desiredAnim = BOTH_WALK1;
                 } else {
                     switch (pm->ps->fd.saberAnimLevel) {

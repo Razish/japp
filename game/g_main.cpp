@@ -170,45 +170,51 @@ static void CVU_CInfo(void) { CPM_UpdateSettings(!!(jp_cinfo.bits & CINFO_CPMPHY
 
 static void CVU_Motd(void) { Q_ConvertLinefeeds(g_motd.string); }
 
-static void CVU_FixSaberMoveData(void) {
+static void UpdateLegacyFixesConfigstring(legacyFixes_e legacyFix, qboolean enabled) {
     char sLegacyFixes[32];
     trap->GetConfigstring(CS_LEGACY_FIXES, sLegacyFixes, sizeof(sLegacyFixes));
 
     uint32_t legacyFixes = strtoul(sLegacyFixes, NULL, 0);
-    if (g_fixSaberMoveData.integer) {
-        legacyFixes |= (1 << LEGACYFIX_SABERMOVEDATA);
+    if (enabled) {
+        legacyFixes |= (1 << legacyFix);
     } else {
-        legacyFixes &= ~(1 << LEGACYFIX_SABERMOVEDATA);
+        legacyFixes &= ~(1 << legacyFix);
     }
     trap->SetConfigstring(CS_LEGACY_FIXES, va("%" PRIu32, legacyFixes));
 }
 
-typedef struct cvarTable_s {
-    vmCvar_t *vmCvar;
-    const char *cvarName, *defaultString;
-    void (*update)(void);
-    uint32_t cvarFlags;
-    qboolean trackChange; // track this variable, and announce if changed
-} cvarTable_t;
+static void CVU_FixSaberMoveData(void) {
+    BG_FixSaberMoveData();
+    UpdateLegacyFixesConfigstring(LEGACYFIX_SABERMOVEDATA, g_fixSaberMoveData.integer);
+}
+
+static void CVU_FixRunWalkAnims(void) { UpdateLegacyFixesConfigstring(LEGACYFIX_RUNWALKANIMS, g_fixRunWalkAnims.integer); }
+
+static void CVU_FixWeaponAttackAnim(void) {
+    BG_FixWeaponAttackAnim();
+    UpdateLegacyFixesConfigstring(LEGACYFIX_WEAPONATTACKANIM, g_fixWeaponAttackAnim.integer);
+}
 
 #define XCVAR_DECL
 #include "g_xcvar.h"
 #undef XCVAR_DECL
 
-static cvarTable_t gameCvarTable[] = {
+static const struct cvarTable_t {
+    vmCvar_t *vmCvar;
+    const char *cvarName, *defaultString;
+    void (*update)(void);
+    uint32_t cvarFlags;
+    qboolean trackChange; // track this variable, and announce if changed
+} cvarTable[] = {
 #define XCVAR_LIST
 #include "g_xcvar.h"
 #undef XCVAR_LIST
 };
-static int gameCvarTableSize = ARRAY_LEN(gameCvarTable);
 
 const char *G_Cvar_DefaultString(const vmCvar_t *vmCvar) {
-    int i = 0;
-    const cvarTable_t *cv = NULL;
-
-    for (i = 0, cv = gameCvarTable; i < gameCvarTableSize; i++, cv++) {
-        if (cv->vmCvar == vmCvar) {
-            return cv->defaultString;
+    for (const auto &cv : cvarTable) {
+        if (cv.vmCvar == vmCvar) {
+            return cv.defaultString;
         }
     }
 
@@ -216,17 +222,15 @@ const char *G_Cvar_DefaultString(const vmCvar_t *vmCvar) {
 }
 
 void G_RegisterCvars(void) {
-    int i = 0;
-    cvarTable_t *cv = NULL;
-
-    // register all cvars
-    for (i = 0, cv = gameCvarTable; i < gameCvarTableSize; i++, cv++)
-        trap->Cvar_Register(cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags);
+    for (const auto &cv : cvarTable) {
+        trap->Cvar_Register(cv.vmCvar, cv.cvarName, cv.defaultString, cv.cvarFlags);
+    }
 
     // now update them
-    for (i = 0, cv = gameCvarTable; i < gameCvarTableSize; i++, cv++) {
-        if (cv->update)
-            cv->update();
+    for (const auto &cv : cvarTable) {
+        if (cv.update) {
+            cv.update();
+        }
     }
 }
 
@@ -249,22 +253,19 @@ void G_CacheGametype(void) {
 }
 
 void G_UpdateCvars(void) {
-    int i = 0;
-    cvarTable_t *cv = NULL;
-
-    for (i = 0, cv = gameCvarTable; i < gameCvarTableSize; i++, cv++) {
-        if (cv->vmCvar) {
-            int modCount = cv->vmCvar->modificationCount;
-            trap->Cvar_Update(cv->vmCvar);
-            if (cv->vmCvar->modificationCount != modCount) {
-                if (cv->update) {
-                    cv->update();
+    for (const auto &cv : cvarTable) {
+        if (cv.vmCvar) {
+            int modCount = cv.vmCvar->modificationCount;
+            trap->Cvar_Update(cv.vmCvar);
+            if (cv.vmCvar->modificationCount != modCount) {
+                if (cv.update) {
+                    cv.update();
                 }
 
-                JPLua::Cvar_Update(cv->cvarName);
+                JPLua::Cvar_Update(cv.cvarName);
 
-                if (cv->trackChange) {
-                    trap->SendServerCommand(-1, va("print \"Server: %s changed to %s\n\"", cv->cvarName, cv->vmCvar->string));
+                if (cv.trackChange) {
+                    trap->SendServerCommand(-1, va("print \"Server: %s changed to %s\n\"", cv.cvarName, cv.vmCvar->string));
                 }
             }
         }

@@ -2488,8 +2488,9 @@ void BG_SetAnim(playerState_t *ps, animation_t *animations, int setAnimParts, in
         animations = bgAllAnims[0].anims;
     }
 
-    //	if ( !animations )
-    //		return;
+    if (!animations) {
+        return;
+    }
 
     if (animations[anim].firstFrame == 0 && animations[anim].numFrames == 0) {
         if (anim == BOTH_RUNBACK1 || anim == BOTH_WALKBACK1 || anim == BOTH_RUN1) { // hack for droids
