@@ -78,7 +78,7 @@ jobs:
           lua package.lua
           7z a -tzip -y japp-windows-${{ matrix.arch }}-${{ matrix.build_type }}.zip *.pk3
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ matrix.build_type == 'Release' }}
         with:
           name: japp-windows-${{ matrix.arch }}-${{ matrix.build_type }}
@@ -132,7 +132,7 @@ jobs:
           ./package.lua
           tar -czvf japp-linux-${{ matrix.arch }}-${{ matrix.build_type }}.tar.gz *.zip
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ matrix.build_type == 'Release' }}
         with:
           name: japp-linux-${{ matrix.arch }}-${{ matrix.build_type }}
@@ -174,7 +174,7 @@ jobs:
           ./package.lua
           tar -czvf japp-macos-${{ matrix.arch }}-${{ matrix.build_type }}.tar.gz *.zip
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ matrix.build_type == 'Release' }}
         with:
           name: japp-macos-${{ matrix.arch }}-${{ matrix.build_type }}
