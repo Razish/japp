@@ -986,29 +986,34 @@ static LONG WINAPI UnhandledExceptionHandler_Failsafe(struct _EXCEPTION_POINTERS
         // Alright, we got a VERY serious issue here..
         // In this state the exception handler itself will run outta stack too
         // So we'll just use a nice hack here to roll up esp by 16k
+
+        // clang-format off
 #if defined(_MSC_VER)
         qasm2(mov eax, EI)
 #elif defined(__GNUC__)
         __asm__("mov %0, esp" : "=m"(StackBackupStart) :);
 #endif
-            qasm2(mov esi, esp)
+        qasm2(mov esi, esp)
 #if defined(_MSC_VER)
-                qasm2(mov edi, offset StackBackup)
+        qasm2(mov edi, offset StackBackup)
 #elif defined(__GNUC__)
-            __asm__("mov edi, offset %0"
-                    :
-                    : "m"(StackBackup));
+        __asm__("mov edi, offset %0"
+                :
+                : "m"(StackBackup));
 #endif
-                    qasm2(mov ecx, 0x6000) qasm1(rep stosd) qasm2(add esp, 0x18000) qasm1(push eax)
+        qasm2(mov ecx, 0x6000)
+        qasm1(rep stosd)
+        qasm2(add esp, 0x18000)
+        qasm1(push eax)
 #if defined(_MSC_VER)
-                        qasm1(call UnhandledExceptionHandler)
+        qasm1(call UnhandledExceptionHandler)
 #elif defined(__GNUC__)
-            __asm__("call %0"
-                    :
-                    : "r"(UnhandledExceptionHandler));
+        __asm__("call %0" : : "r"(UnhandledExceptionHandler));
 #endif
-            // qasm1( jmp skip )
-            qasm1(ret)
+        // qasm1( jmp skip )
+        qasm1(ret)
+
+        // clang-format on
     }
     StackBackupStart = 0;
     return UnhandledExceptionHandler(EI);
