@@ -141,7 +141,7 @@ jobs:
 
   macos:
     name: macOS ${{ matrix.arch }} ${{ matrix.build_type }}
-    runs-on: macos-12
+    runs-on: macos-15
     strategy:
       fail-fast: false
       matrix:
