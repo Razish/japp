@@ -710,7 +710,7 @@ typedef struct cgameImport_s {
 } cgameImport_t;
 
 typedef struct cgameExport_s {
-    void (*Init)(int serverMessageNum, int serverCommandSequence, int clientNum, qboolean demoPlayback);
+    void (*Init)(int serverMessageNum, int serverCommandSequence, int clientNum);
     void (*Shutdown)(void);
     qboolean (*ConsoleCommand)(void);
     void (*DrawActiveFrame)(int serverTime, stereoFrame_e stereoView, qboolean demoPlayback);

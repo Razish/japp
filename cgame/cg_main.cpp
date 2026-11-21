@@ -2197,6 +2197,10 @@ static void CG_FX_CameraShake(void) {
     CG_DoCameraShake(&data->mOrigin, data->mIntensity, data->mRadius, data->mTime);
 }
 
+static void CG_InitAPI(int serverMessageNum, int serverCommandSequence, int clientNum) {
+    CG_Init(serverMessageNum, serverCommandSequence, clientNum, qfalse);
+}
+
 cgameImport_t *trap = NULL;
 
 Q_CABI {
@@ -2215,7 +2219,7 @@ Q_CABI {
             return NULL;
         }
 
-        cge.Init = CG_Init;
+        cge.Init = CG_InitAPI;
         cge.Shutdown = CG_Shutdown;
         cge.ConsoleCommand = CG_ConsoleCommand;
         cge.DrawActiveFrame = CG_DrawActiveFrame;
