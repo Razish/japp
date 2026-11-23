@@ -1816,11 +1816,43 @@ void Item_RunScript(itemDef_t *item, const char *s) {
     }
 }
 
+static void UI_NormalizeMenuCvarTestValue(const char *cvarName, char *buff, size_t buffSize) {
+    // BaseJKA createserver.menu tests ui_netGameType against its 0..5 menu index
+    // (0=FFA, 1=Duel, 2=PowerDuel, 3=TeamFFA, 4=Siege, 5=CTF), whereas JA++ stores
+    // the raw gametype_e enum (0..9) in ui_netGameType.
+    if (cvarName && !Q_stricmp(cvarName, "ui_netGameType")) {
+        const char *mapped = "0";
+        switch (atoi(buff)) {
+        case GT_DUEL:
+            mapped = "1";
+            break;
+        case GT_POWERDUEL:
+            mapped = "2";
+            break;
+        case GT_TEAM:
+            mapped = "3";
+            break;
+        case GT_SIEGE:
+            mapped = "4";
+            break;
+        case GT_CTF:
+        case GT_CTY:
+            mapped = "5";
+            break;
+        default:
+            mapped = "0";
+            break;
+        }
+        Q_strncpyz(buff, mapped, buffSize);
+    }
+}
+
 qboolean Item_EnableShowViaCvar(itemDef_t *item, int flag) {
     char script[2048], *p;
     if (item && item->enableCvar && *item->enableCvar && item->cvarTest && *item->cvarTest) {
         char buff[2048];
         DC->getCVarString(item->cvarTest, buff, sizeof(buff));
+        UI_NormalizeMenuCvarTestValue(item->cvarTest, buff, sizeof(buff));
 
         Q_strncpyz(script, item->enableCvar, 2048);
         p = script;
@@ -1858,6 +1890,7 @@ qboolean Item_EnableShowViaCvar2(itemDef_t *item, int flag) {
     if (item && item->enableCvar2 && *item->enableCvar2 && item->cvarTest2 && *item->cvarTest2) {
         char buff[2048];
         DC->getCVarString(item->cvarTest2, buff, sizeof(buff));
+        UI_NormalizeMenuCvarTestValue(item->cvarTest2, buff, sizeof(buff));
 
         Q_strncpyz(script, item->enableCvar2, 2048);
         p = script;
