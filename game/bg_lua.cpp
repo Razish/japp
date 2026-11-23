@@ -1380,16 +1380,20 @@ static int Export_WorldCoordToScreenCoord(lua_State *L) {
 static int ConnectToDB(lua_State *L) {
     StackCheck st(L);
 
-#if defined(NO_SQL)
+#if defined(NO_SQL) || (defined(NO_MYSQL) && defined(NO_SQLITE))
     lua_pushnil(L);
     return 1;
 #else
     int type = luaL_checkinteger(L, 1);
     switch (type) {
+#if !defined(NO_MYSQL)
     case 1: /// MySQL
         return MySQL_Open(L);
+#endif
+#if !defined(NO_SQLITE)
     case 2: /// SQLite
         return SQLite_Open(L);
+#endif
     default:
         lua_pushnil(L);
         return 1;
@@ -1789,8 +1793,12 @@ void Init(void) {
     Register_File(ls.L);
 #ifdef PROJECT_GAME
 #if !defined(NO_SQL)
+#if !defined(NO_MYSQL)
     Register_MySQL(ls.L);
+#endif
+#if !defined(NO_SQLITE)
     Register_SQLite(ls.L);
+#endif
 #endif
 #endif
 

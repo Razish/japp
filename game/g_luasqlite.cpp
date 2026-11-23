@@ -8,7 +8,11 @@
 
 #ifdef JPLUA
 
-#if !defined(NO_SQL)
+#if !defined(NO_SQL) && !defined(NO_SQLITE)
+
+#if defined(__EMSCRIPTEN__) || defined(__unix__) || defined(__APPLE__)
+#include <sys/stat.h>
+#endif
 
 namespace JPLua {
 
@@ -38,23 +42,63 @@ static int SQLite_ToString(lua_State *L) {
 
 int SQLite_Open(lua_State *L) {
     const char *dbpath = luaL_checkstring(L, 2);
-    const char *path = va("japlus/%s", dbpath); // FIXME: do this properly, maybe sqlite can take a file in memory
+    char fullPath[MAX_OSPATH] = {};
+
+    if (!Q_stricmp(dbpath, ":memory:")) {
+        Q_strncpyz(fullPath, ":memory:", sizeof(fullPath));
+    } else {
+        if (!dbpath[0] || strstr(dbpath, "..") || dbpath[0] == '/' || dbpath[0] == '\\') {
+            trap->Print("SQLite Connection Error: invalid database path '%s'\n", dbpath);
+            lua_pushnil(L);
+            return 1;
+        }
+
+        char gameDir[MAX_QPATH] = {};
+        trap->Cvar_VariableStringBuffer("fs_game", gameDir, sizeof(gameDir));
+        if (!gameDir[0]) {
+            Q_strncpyz(gameDir, "base", sizeof(gameDir));
+        }
+
+        char homePath[MAX_OSPATH] = {};
+        trap->Cvar_VariableStringBuffer("fs_homepath", homePath, sizeof(homePath));
+        if (homePath[0]) {
+            Com_sprintf(fullPath, sizeof(fullPath), "%s/%s/%s", homePath, gameDir, dbpath);
+        } else {
+            Com_sprintf(fullPath, sizeof(fullPath), "%s/%s", gameDir, dbpath);
+        }
+
+#if defined(__EMSCRIPTEN__) || defined(__unix__) || defined(__APPLE__)
+        // Ensure parent directories exist for SQLite database creation.
+        for (char *p = fullPath + 1; *p; ++p) {
+            if (*p == '/') {
+                *p = '\0';
+                mkdir(fullPath, 0755);
+                *p = '/';
+            }
+        }
+#endif
+    }
 
     sqlite3 *db = NULL;
-    int error = sqlite3_open(path, &db);
+    int error = sqlite3_open(fullPath, &db);
     if (error != SQLITE_OK) {
-        trap->Print("SQLite Connection Error: %s", sqlite3_errmsg(db));
-        sqlite3_close(db);
+        trap->Print("SQLite Connection Error: %s\n", db ? sqlite3_errmsg(db) : "out of memory");
+        if (db) {
+            sqlite3_close(db);
+        }
         lua_pushnil(L);
         return 1;
     }
-    SQLite_CreateRef(L, db, path);
+    SQLite_CreateRef(L, db, dbpath);
     return 1;
 }
 
 static int SQLite_Close(lua_State *L) {
     luaSQLite_t *data = CheckSQLite(L, 1);
-    sqlite3_close(data->handle);
+    if (data->handle) {
+        sqlite3_close(data->handle);
+        data->handle = NULL;
+    }
     return 0;
 }
 
@@ -68,22 +112,31 @@ static int SQLite_Query(lua_State *L) {
     luaSQLite_t *data = CheckSQLite(L, 1);
     const char *query = luaL_checkstring(L, 2);
 
-    sqlite3_stmt *stmt;
+    if (!data->handle) {
+        lua_pushnil(L);
+        lua_pushstring(L, "database is closed");
+        return 2;
+    }
+
+    sqlite3_stmt *stmt = NULL;
     int error = sqlite3_prepare_v2(data->handle, query, -1, &stmt, NULL);
     if (error != SQLITE_OK) {
-        trap->Print("SQLite Query Error: %s", sqlite3_errmsg(data->handle));
-        sqlite3_finalize(stmt);
-        sqlite3_close(data->handle);
+        const char *errmsg = sqlite3_errmsg(data->handle);
+        trap->Print("SQLite Query Error: %s\n", errmsg);
+        if (stmt) {
+            sqlite3_finalize(stmt);
+        }
         lua_pushnil(L);
-        return 1;
+        lua_pushstring(L, errmsg);
+        return 2;
     }
 
     int count = sqlite3_column_count(stmt);
     lua_newtable(L);
     int top = lua_gettop(L);
-    int row = 0;
-    while ((error = sqlite3_step(stmt)) != SQLITE_ROW && error != SQLITE_DONE) {
-        lua_pushinteger(L, row);
+    int row = 1;
+    while ((error = sqlite3_step(stmt)) == SQLITE_ROW) {
+        lua_pushinteger(L, row++);
         lua_newtable(L); /// Row - Table
         int tempTop = lua_gettop(L);
         for (int i = 0; i < count; i++) {
@@ -92,7 +145,7 @@ static int SQLite_Query(lua_State *L) {
 
             case SQLITE_INTEGER: {
                 lua_pushstring(L, name);
-                lua_pushinteger(L, sqlite3_column_int(stmt, i));
+                lua_pushinteger(L, sqlite3_column_int64(stmt, i));
                 lua_settable(L, tempTop);
             } break;
 
@@ -104,7 +157,7 @@ static int SQLite_Query(lua_State *L) {
 
             case SQLITE_BLOB: {
                 lua_pushstring(L, name);
-                lua_pushstring(L, (const char *)sqlite3_column_blob(stmt, i));
+                lua_pushlstring(L, (const char *)sqlite3_column_blob(stmt, i), sqlite3_column_bytes(stmt, i));
                 lua_settable(L, tempTop);
             } break;
 
@@ -116,17 +169,27 @@ static int SQLite_Query(lua_State *L) {
 
             case SQLITE3_TEXT: {
                 lua_pushstring(L, name);
-                lua_pushstring(L, (const char *)sqlite3_column_text(stmt, i));
+                lua_pushlstring(L, (const char *)sqlite3_column_text(stmt, i), sqlite3_column_bytes(stmt, i));
                 lua_settable(L, tempTop);
             } break;
 
             default: {
             } break;
             }
-            lua_settable(L, top);
         }
-        row++;
+        lua_settable(L, top);
     }
+
+    if (error != SQLITE_DONE) {
+        const char *errmsg = sqlite3_errmsg(data->handle);
+        trap->Print("SQLite Step Error: %s\n", errmsg);
+        sqlite3_finalize(stmt);
+        lua_pop(L, 1);
+        lua_pushnil(L);
+        lua_pushstring(L, errmsg);
+        return 2;
+    }
+
     sqlite3_finalize(stmt);
     return 1;
 }
