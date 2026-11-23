@@ -2417,17 +2417,19 @@ void FinishSpawningItem(gentity_t *ent) {
         } else {
             if (ent->item->giType == IT_AMMO) {
                 ammo_e ammo_type = (ammo_e)ent->item->giTag;
+                qboolean weaponEnabled = qfalse;
                 for (int i = WP_BRYAR_PISTOL; i < WP_NUM_WEAPONS; i++) {
                     if (G_AmmoForWeapon((weapon_e)i) == ammo_type) {
-                        if (g_weaponDisable.bits & i) {
-                            continue; // disabled
-                        } else {
-                            return; // at least one weapon is enabled - spawn it
+                        if (!(g_weaponDisable.bits & (1 << i))) {
+                            weaponEnabled = qtrue;
+                            break;
                         }
                     }
                 }
-                G_FreeEntity(ent);
-                return;
+                if (!weaponEnabled) {
+                    G_FreeEntity(ent);
+                    return;
+                }
             }
         }
     } else { // no powerups in jedi master
