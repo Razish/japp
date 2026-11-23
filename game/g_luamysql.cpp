@@ -8,7 +8,7 @@
 
 #ifdef JPLUA
 
-#if !defined(NO_SQL)
+#if !defined(NO_SQL) && !defined(NO_MYSQL)
 
 namespace JPLua {
 
