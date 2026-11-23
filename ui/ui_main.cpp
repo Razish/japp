@@ -1276,6 +1276,10 @@ static void UI_DrawNetGameType(rectDef_t *rect, float scale, const vector4 *colo
         trap->Cvar_Set("ui_netGameType", "0");
         trap->Cvar_Update(&ui_netGameType);
     }
+    if (ui_actualNetGametype.integer != ui_netGameType.integer) {
+        trap->Cvar_Set("ui_actualNetGametype", va("%d", ui_netGameType.integer));
+        trap->Cvar_Update(&ui_actualNetGametype);
+    }
     const Font font(iMenuFont, scale, customFont);
     font.Paint(rect->x, rect->y, BG_GetGametypeString(ui_netGameType.integer), color);
 }
@@ -2851,6 +2855,8 @@ static qboolean UI_NetGameType_HandleKey(uint32_t flags, float *special, int key
 
         trap->Cvar_Set("ui_netGameType", va("%d", value));
         trap->Cvar_Update(&ui_netGameType);
+        trap->Cvar_Set("ui_actualNetGametype", va("%d", value));
+        trap->Cvar_Update(&ui_actualNetGametype);
         trap->Cvar_Set("ui_currentNetMap", "0");
         trap->Cvar_Update(&ui_currentNetMap);
         UI_MapCountByGameType(qfalse);
